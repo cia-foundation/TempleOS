@@ -1,0 +1,183 @@
+//This is an alternative window manager.
+//It augments the existing one found
+//in $LK,"::/LT/ADAM/WINDOW.CPZ","FI:::/LT/ADAM/WINDOW.CPZ"$.  It uses
+//the real-time differential equation
+//solver to reposition windows as though
+//they were repulsively charged particles.
+
+//I find this window manager to be a
+//novelty, not desirable for actual
+//use.  You're welcome to add it, or
+//some variation to your start-up
+//scripts if you like it.  It's not
+//fully debugged.
+
+//I had to cheat to make this work.
+//I added $LK,"CRTf_HAS_BEEN_RESIZED2","MN:CRTf_HAS_BEEN_RESIZED2"$ and
+//modified $LK,"::/LT/ADAM/WINDOW.CPZ","FI:::/LT/ADAM/WINDOW.CPZ"$.
+
+Ode *o=NULL;
+I8 tss_cnt=0;
+TssStruct *tss_map=NULL;
+
+void EndTsk()
+{
+  RemQue(o);
+  OdeDel(o);
+  Free(tss_map);
+  Exit;
+}
+
+void MyDerivative(Ode *o,double t,Order2D3 *state,Order2D3 *DstateDt)
+{
+  U8 i,j;
+  double f,d,dd,dx,dy;
+
+  MemSet(DstateDt,0,sizeof(Order2D3)*tss_cnt);
+  for (i=0;i<tss_cnt;i++) {
+    DstateDt[i].x=state[i].DxDt;
+    DstateDt[i].y=state[i].DyDt;
+    for (j=0;j<tss_cnt;j++) {
+      if (i!=j) {
+	dx=state[i].x-state[j].x;
+	dy=state[i].y-state[j].y;
+	dd=Sqr(dx)+Sqr(dy)+1.0;
+	d=Sqrt(dd);
+
+	dx/=d;
+	dy/=d;
+
+	f=1000000.0/dd;
+
+	DstateDt[i].DxDt+=f*dx;
+	DstateDt[i].DyDt+=f*dy;
+      }
+    }
+    DstateDt[i].DxDt-=1.0*state[i].DxDt;  //damping
+    DstateDt[i].DyDt-=1.0*state[i].DyDt;
+  }
+}
+
+void WinMngTsk()
+{
+  BoolU4 same;
+  I8 i,x,y,j,cnt;
+  Order2D3 *tempo;
+  TssStruct *tss;
+
+//This makes so this task doesn't get
+//swapped-out unless voluntarily.
+  Preempt(OFF);
+
+  Fs->end_task_cb=&EndTsk;
+  while (TRUE) {
+    cnt=0;
+    tss=Fs->next_tss;
+    while (tss!=Fs) {
+      if (Bt(&tss->crt_flags,CRTf_SHOW))
+	cnt++;
+      tss=tss->next_tss;
+    }
+
+    if (cnt==tss_cnt) {
+      same=TRUE;
+      i=0;
+      tss=Fs->next_tss;
+      while (tss!=Fs) {
+	if (Bt(&tss->crt_flags,CRTf_SHOW))
+	  if (tss_map[i++]!=tss)
+	    same=FALSE;
+	tss=tss->next_tss;
+      }
+    } else
+      same=FALSE;
+    if (!same) {
+      tss_cnt=cnt;
+      if (o) {
+	RemQue(o);
+	OdeDel(o);
+	Free(tss_map);
+      }
+      o=OdeNew(cnt*sizeof(Order2D3));
+      tss_map=MAlloc(sizeof(U4)*cnt);
+      i=0;
+      tss=Fs->next_tss;
+      while (tss!=Fs) {
+	if (Bt(&tss->crt_flags,CRTf_SHOW)) {
+	  tss_map[i]=tss;
+	  tempo=o->state+sizeof(Order2D3)*i;
+	  tempo->x=(tss->window_left+tss->window_right)>>1;
+	  tempo->y=(tss->window_top+tss->window_bottom)>>1;
+	  tempo->z=0;
+	  tempo->DxDt=0;
+	  tempo->DyDt=0;
+	  tempo->DzDt=0;
+	  i++;
+	}
+	tss=tss->next_tss;
+      }
+      o->derivative=&MyDerivative;
+      o->tolerance_start=.1;
+      InsQue(o,Fs->last_ode);
+    }
+    Sleep(60);
+    cnt=0;
+    tss=Fs->next_tss;
+    while (tss!=Fs) {
+      if (Bt(&tss->crt_flags,CRTf_SHOW))
+	cnt++;
+      tss=tss->next_tss;
+    }
+    if (cnt==tss_cnt) {
+      same=TRUE;
+      i=0;
+      tss=Fs->next_tss;
+      while (tss!=Fs) {
+	if (Bt(&tss->crt_flags,CRTf_SHOW))
+	  if (tss_map[i++]!=tss)
+	    same=FALSE;
+	tss=tss->next_tss;
+      }
+    } else
+      same=FALSE;
+    if (same) {
+      Bts(&sys_flags,SYSf_CLEAR_SCREEN_TEXT);
+      for (i=0;i<tss_cnt;i++) {
+	tss=tss_map[i];
+	tempo=o->state+sizeof(Order2D3)*i;
+	x=tss->window_right-tss->window_left;
+	y=tss->window_bottom-tss->window_top;
+	if (Bt(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED2)) {
+	  tempo->x=(tss->window_left+tss->window_right)>>1;
+	  tempo->y=(tss->window_top+tss->window_bottom)>>1;
+	  tempo->DxDt=0;
+	  tempo->DyDt=0;
+	} else {
+	  j=tempo->x-x>>1;
+	  j&=-4;
+	  if (j<4) j=4;
+	  if (j+x>tss->crt_width-12) j=tss->crt_width-x-12;
+	  SetWindowHor(tss,j,j+x);
+	  j=tempo->y-y>>1;
+	  if (j<2) j=2;
+	  if (j+y>tss->crt_height-3) j=tss->crt_height-y-3;
+	  SetWindowVert(tss,j,j+y);
+
+	  x=(tss->window_left+tss->window_right)>>1;
+	  y=(tss->window_top+tss->window_bottom)>>1;
+	  if (tempo->x>x+8) tempo->x=x+8;
+	  if (tempo->y>y+2) tempo->y=y+2;
+	  if (tempo->x<x-8) tempo->x=x-8;
+	  if (tempo->y<y-2) tempo->y=y-2;
+	  if (tempo->DxDt>32.0)  tempo->DxDt=32.0;
+	  if (tempo->DyDt>8.0)	 tempo->DyDt=8.0;
+	  if (tempo->DxDt<-32.0) tempo->DxDt=-32.0;
+	  if (tempo->DyDt<-8.0)  tempo->DyDt=-8.0;
+	}
+	Btr(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED2);
+      }
+    }
+  }
+}
+
+Spawn(&WinMngTsk,"WINMGR2");

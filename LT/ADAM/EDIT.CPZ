@@ -1,0 +1,3346 @@
+#define EDIT_MENU_NAME "::/LT/ADAM/EDIT.MUZ"
+public void LtfUpdateCurLtfWindow()
+{
+  LTPartition *p;
+  U1 attr=0;
+  Ltf *main=Fs->cur_ltf,*aux=Fs->aux_ltf;
+  ClearWindowText;
+  LtfUpdateWindowJoin(main,TRUE,TRUE,FALSE,FALSE);
+  if (main->flags & LTFF_ATTR_BY_PARTITION) {
+    p=Fs->cur_partition;
+    attr=p->text_attr;
+  }
+  if (main->flags & LTFF_ATTR_BY_FILENAME) {
+    try {
+      p=DriveToPartition(main->filename.name[0]);
+    } catch {
+      p=NULL;
+      Fs->catch_except=TRUE;
+    }
+    if (p)
+      attr=p->text_attr;
+  }
+  if ((attr & 0xF)!=(attr>>4))
+    Fs->border_attribute=attr;
+  if (aux) {
+    if ((attr & 0xF)!=(attr>>4))
+      aux->text_attribute=attr;
+    LtfUpdateWindowJoin(aux,TRUE,FALSE,FALSE,FALSE);
+  }
+}
+
+public LtfEntry *LtfFindAnchor(Ltf *l,I1 *pattern)
+{
+  LtfEntry *ll=l->dummy.next;
+  while (ll!=l) {
+    if (ll->btype==LTFT_ANCHOR) {
+      if (!StrCmp(pattern,ll->aux_string)) {
+	l->cur_entry=ll;
+	l->cur_data_col=ll->min_col;
+	return ll;
+      }
+    }
+    ll=ll->next;
+  }
+  return NULL;
+}
+
+void EditCursorLeft(Ltf *l,U8 sc)
+{
+  I1 *dst;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *cl=l->cur_entry,*original_cl=cl,*nl;
+  I8 cc=l->cur_data_col,y=cl->y;
+  if (sc & SCF_CTRL) {
+    while (cl->last!=l && (cl->last->y==y ||
+	cl->last->flags & LTFLF_SKIP))
+      cl=cl->last;  //TODO: select? recurse?
+    cc=cl->min_col;
+  } else {
+    if (cc>cl->min_col) {
+      if (cl->btype==LTFT_TEXT && cc<cl->max_col) {
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=cl->type;
+	nl->flags=cl->flags;
+	dst=cl->display+cc;
+	nl->display=NewString(dst,l->mem_tss);
+	nl->max_col=StrLen(dst);
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	*dst=0;
+	cl->max_col=cc;
+	InsQue(nl,cl);
+      }
+      cc--;
+      if (cl->btype==LTFT_TEXT && cc>cl->min_col) {
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=cl->type;
+	nl->flags=cl->flags;
+	dst=cl->display+cc;
+	nl->display=NewString(dst,l->mem_tss);
+	nl->max_col=StrLen(dst);
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	*dst=0;
+	cl->max_col=cc;
+	InsQue(nl,cl);
+	cl=nl;
+	cc=cl->min_col;
+      }
+      if ((sc & SCF_SHIFT))
+	cl->type|=LTFLT_SELECTED;
+      else
+	cl->type&=~LTFLT_SELECTED;
+    } else {
+      cc=cl->min_col;
+      while (cl->last!=l &&
+	(cl->last->btype==LTFT_SOFT_CR ||
+	cl->last->flags & LTFLF_SKIP)) {
+	cl=cl->last;
+	if ((sc & SCF_SHIFT))
+	  cl->type|=LTFLT_SELECTED;
+	else
+	  cl->type&=~LTFLT_SELECTED;
+      }
+      if (cl->last!=l) {
+	cl=cl->last;
+	if (cl->max_col>cl->min_col) {
+	  cc=cl->max_col-1;
+	  if (cl->btype==LTFT_TEXT && cc>cl->min_col) {
+	    nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	    nl->type=cl->type;
+	    nl->flags=cl->flags;
+	    dst=cl->display+cc;
+	    nl->display=NewString(dst,l->mem_tss);
+	    nl->max_col=StrLen(dst);
+	    nl->x=cl->x;
+	    nl->y=cl->y;
+	    nl->indent=cl->indent;
+	    nl->page_line_num=cl->page_line_num;
+	    nl->left_margin=cl->left_margin;
+	    nl->right_margin=cl->right_margin;
+	    *dst=0;
+	    cl->max_col=cc;
+	    InsQue(nl,cl);
+	    cl=nl;
+	    cc=cl->min_col;
+	  }
+	} else
+	  cc=cl->max_col;
+	if ((sc & SCF_SHIFT))
+	  cl->type|=LTFLT_SELECTED;
+	else
+	  cl->type&=~LTFLT_SELECTED;
+      }
+    }
+  }
+  l->cur_data_col=cc;
+  l->cur_entry=cl;
+  if (cl!=original_cl)
+    LtfFormBackward(l);
+  l->recalc_start=l->cur_entry->last;
+  Preempt(old_preempt);
+}
+
+void EditCursorRight(Ltf *l,U8 sc)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *dst;
+  LtfEntry *cl=l->cur_entry,*original_cl=cl,*nl;
+  I8 cc=l->cur_data_col,y=cl->y,old_flags,old_color;
+  l->recalc_start=cl->last;
+  if (sc & SCF_CTRL) {
+    while (cl!=l && ((cl->next->y==y &&
+	   cl->next->btype!=LTFT_SOFT_CR) ||
+	   cl->flags & LTFLF_SKIP))
+      cl=cl->next;
+    if (cl->max_col>cl->min_col)
+      cc=cl->max_col-1;
+    else
+      cc=cl->min_col;
+  } else {
+    if (cc<cl->max_col) {
+      if (cl->btype==LTFT_TEXT && cc>cl->min_col) {
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=cl->type;
+	nl->flags=cl->flags;
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	dst=cl->display+cc;
+	nl->display=NewString(dst,l->mem_tss);
+	nl->max_col=StrLen(dst);
+	*dst=0;
+	cl->max_col=cc;
+	InsQue(nl,cl);
+	cl=nl;
+	cc=cl->min_col;
+      }
+      cc++;
+      old_flags=cl->flags;
+      old_color=cl->type;
+      if ((sc & SCF_SHIFT))
+	cl->type|=LTFLT_SELECTED;
+      else
+	cl->type&=~LTFLT_SELECTED;
+      if (cl->btype==LTFT_TEXT && cc<cl->max_col) {
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=LTFT_TEXT | old_color & -0x100;
+	nl->flags=old_flags;
+	dst=cl->display+cc;
+	nl->display=NewString(dst,l->mem_tss);
+	nl->max_col=StrLen(dst);
+	cl->max_col=cc;
+	*dst=0;
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	InsQue(nl,cl);
+	cl=nl;
+	cc=cl->min_col;
+      } else if (cc>=cl->max_col) {
+	cl=cl->next;
+	cc=cl->min_col;
+      }
+    } else {
+      if (cl!=l) {
+	if (cc<=cl->min_col) {
+	  if ((sc & SCF_SHIFT))
+	    cl->type|=LTFLT_SELECTED;
+	  else
+	    cl->type&=~LTFLT_SELECTED;
+	}
+	cl=cl->next;
+	while (cl!=l && cl->flags & LTFLF_SKIP) {
+	  if ((sc & SCF_SHIFT))
+	    cl->type|=LTFLT_SELECTED;
+	  else
+	    cl->type&=~LTFLT_SELECTED;
+	  cl=cl->next;
+	}
+	cc=cl->min_col;
+	if (cl->btype==LTFT_SOFT_CR) {
+	  if ((sc & SCF_SHIFT))
+	    cl->type|=LTFLT_SELECTED;
+	  else
+	    cl->type&=~LTFLT_SELECTED;
+	  cl=cl->next;
+	  cc=cl->min_col;
+	}
+      }
+    }
+  }
+  l->cur_data_col=cc;
+  l->cur_entry=cl;
+  if (cl!=original_cl)
+    LtfFormForward(l);
+  Preempt(old_preempt);
+}
+
+void EditLineUp(Ltf *l,U8 sc)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *dst;
+  I8 y,x;
+  LtfEntry *cl=l->cur_entry,*nl;
+  if (cl->btype==LTFT_HEX_EDIT) {
+    l->cur_data_col=l->cur_data_col-cl->display*3;
+    if (l->cur_data_col>=0)
+      return;
+    else {
+      y=cl->y;
+      l->cur_data_col=0;
+    }
+  }
+  x=l->x; y=l->y;
+  if (cl->btype==LTFT_TEXT) {
+    if (l->cur_data_col>cl->min_col && l->cur_data_col<cl->max_col-1) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+      nl->type=cl->type;
+      nl->flags=cl->flags;
+      dst=cl->display+l->cur_data_col;
+      nl->display=NewString(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      nl->y=cl->y;
+      nl->x=cl->x+l->cur_data_col<<2;
+      nl->indent=cl->indent;
+      nl->page_line_num=cl->page_line_num;
+      nl->left_margin=cl->left_margin;
+      nl->right_margin=cl->right_margin;
+      *dst=0;
+      cl->max_col=l->cur_data_col;
+      InsQue(nl,cl);
+    } else
+      if (l->cur_data_col==cl->min_col && cl->last!=l)
+	cl=cl->last;
+  } else
+    if (cl->last!=l)
+      cl=cl->last;
+  if ((sc & SCF_SHIFT))
+    cl->type|=LTFLT_SELECTED;
+  else
+    cl->type&=~LTFLT_SELECTED;
+  l->cur_entry=cl;
+  LtfFormBackward(l);
+  cl=l->cur_entry;
+  while (cl->last!=l && (cl->y>=y || cl->flags & LTFLF_SKIP)) {
+    cl=cl->last;
+    if ((sc & SCF_SHIFT))
+      cl->type|=LTFLT_SELECTED;
+    else
+      cl->type&=~LTFLT_SELECTED;
+  }
+  y=cl->y;
+  l->y=y;
+  while (cl!=l && (cl->y>=y && cl->x>=x || cl->flags & LTFLF_SKIP)) {
+    if ((sc & SCF_SHIFT))
+      cl->type|=LTFLT_SELECTED;
+    else
+      cl->type&=~LTFLT_SELECTED;
+    cl=cl->last;
+  }
+
+  if (cl==l || cl->y<y)
+    cl=cl->next;
+  else {
+    if (cl->btype!=LTFT_TEXT) {
+      if (sc & SCF_SHIFT)
+	cl->type|=LTFLT_SELECTED;
+      else
+	cl->type&=~LTFLT_SELECTED;
+    } else {
+      if (cl->next->x==x)
+	cl=cl->next;
+    }
+  }
+  if (Bt(ltf_display_types,cl->btype)) {
+    l->cur_data_col=(x-cl->x)>>2;
+    if (cl->btype==LTFT_TEXT) {
+      if (l->cur_data_col>cl->max_col)
+	l->cur_data_col=cl->max_col;
+    } else {
+      if (l->cur_data_col>=cl->max_col)
+	l->cur_data_col=cl->max_col-1;
+    }
+    if (l->cur_data_col<cl->min_col)
+      l->cur_data_col=cl->min_col;
+  } else
+    l->cur_data_col=cl->min_col;
+  if (cl->btype==LTFT_TEXT && cl->x<x) {
+    if (l->cur_data_col<cl->max_col-1) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+      nl->type=cl->type;
+      nl->flags=cl->flags;
+      if ((sc & SCF_SHIFT))
+	nl->type=cl->type | LTFLT_SELECTED;
+      else
+	nl->type=cl->type & ~LTFLT_SELECTED;
+      dst=cl->display+l->cur_data_col;
+      nl->display=NewString(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      nl->indent=cl->indent;
+      nl->page_line_num=cl->page_line_num;
+      nl->left_margin=cl->left_margin;
+      nl->right_margin=cl->right_margin;
+      nl->y=cl->y;
+      nl->x=cl->x+l->cur_data_col<<2;
+      *dst=0;
+      cl->max_col=l->cur_data_col;
+      InsQue(nl,cl);
+      cl=nl;
+      l->cur_data_col=cl->min_col;
+    }
+  }
+  l->cur_entry=cl;
+  LtfFormBackward(l);
+  l->recalc_start=l->cur_entry->last;
+  Preempt(old_preempt);
+}
+
+void EditLineDown(Ltf *l,U8 sc)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *dst;
+  I8 y,x,old_flags=0,old_color;
+  LtfEntry *cl=l->cur_entry,*nl;
+  if (cl->btype==LTFT_HEX_EDIT) {
+    l->cur_data_col=l->cur_data_col+cl->display*3;
+    if (l->cur_data_col/3>=cl->len) {
+      if (cl->next!=l)
+	l->cur_entry=cl->next;
+      l->cur_data_col=l->cur_entry->min_col;
+    }
+    return;
+  }
+  if (cl==l)
+    l->recalc_start=cl;
+  else
+    l->recalc_start=cl->last;
+  x=l->x; y=l->y;
+  if (cl->btype==LTFT_TEXT) {
+    if (l->cur_data_col>cl->min_col && l->cur_data_col<cl->max_col-1) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+      nl->type=cl->type;
+      nl->flags=cl->flags;
+      if ((sc & SCF_SHIFT))
+	nl->type=cl->type | LTFLT_SELECTED;
+      else
+	nl->type=cl->type & ~LTFLT_SELECTED;
+      dst=cl->display+l->cur_data_col;
+      nl->display=NewString(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      nl->indent=cl->indent;
+      nl->page_line_num=cl->page_line_num;
+      nl->left_margin=cl->left_margin;
+      nl->right_margin=cl->right_margin;
+      nl->y=cl->y;
+      nl->x=cl->x+l->cur_data_col<<2;
+      *dst=0;
+      cl->max_col=l->cur_data_col;
+      InsQue(nl,cl);
+      cl=nl;
+      l->cur_data_col=cl->min_col;
+    }
+  }
+  while (cl!=l && (cl->y<=y || cl->flags & LTFLF_SKIP)) {
+    if ((sc & SCF_SHIFT))
+      cl->type|=LTFLT_SELECTED;
+    else
+      cl->type&=~LTFLT_SELECTED;
+    cl=cl->next;
+  }
+  y=cl->y;
+  l->y=y;
+  while (cl!=l && (cl->y<=y && cl->x<=x || cl->flags & LTFLF_SKIP)) {
+    old_flags=cl->flags;
+    old_color=cl->type;
+    if (cl->x<x || cl->flags & LTFLF_SKIP ||
+       cl->x==x && !cl->max_col &&
+       Bt(ltf_nondisplay_invisible_types,cl->btype)) {
+      if ((sc & SCF_SHIFT))
+	cl->type|=LTFLT_SELECTED;
+      else
+	cl->type&=~LTFLT_SELECTED;
+    }
+    cl=cl->next;
+  }
+
+  if (cl->last!=l && (cl->x>x || cl->y>y)) {
+    cl=cl->last;
+    l->cur_entry=cl;
+    LtfFormBackward(l);
+    cl=l->cur_entry;
+  }
+  if (Bt(ltf_display_types,cl->btype)) {
+    l->cur_data_col=(x-cl->x)>>2;
+    if (cl->btype==LTFT_TEXT) {
+      if (l->cur_data_col>cl->max_col)
+	l->cur_data_col=cl->max_col;
+    } else {
+      if (l->cur_data_col>=cl->max_col)
+	l->cur_data_col=cl->max_col-1;
+    }
+    if (l->cur_data_col<cl->min_col)
+      l->cur_data_col=cl->min_col;
+  } else
+    l->cur_data_col=cl->min_col;
+  if (cl->btype==LTFT_TEXT) {
+    if (l->cur_data_col>cl->min_col && l->cur_data_col<cl->max_col-1) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+      nl->type=LTFT_TEXT | old_color & -0x100;
+      nl->flags=old_flags;
+      dst=cl->display+l->cur_data_col;
+      nl->display=NewString(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      *dst=0;
+      cl->max_col=l->cur_data_col;
+      nl->y=cl->y;
+      nl->indent=cl->indent;
+      nl->page_line_num=cl->page_line_num;
+      nl->left_margin=cl->left_margin;
+      nl->right_margin=cl->right_margin;
+      nl->x=cl->x+l->cur_data_col<<2;
+      InsQue(nl,cl);
+      cl=nl;
+      l->cur_data_col=cl->min_col;
+    }
+  }
+  l->cur_entry=cl;
+  LtfFormForward(l);
+  Preempt(old_preempt);
+}
+
+void EditDelChar(Ltf *l)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *cl=l->cur_entry;
+
+  if (cl==l) {
+    Preempt(old_preempt);
+    return;
+  } else
+    l->recalc_start=cl->last;
+  if (cl->max_col!=0 && (cl->btype==LTFT_TEXT || cl->btype==LTFT_DATA)) {
+    if (cl->btype==LTFT_DATA) {
+      if (cl->flags & LTFLF_HAS_TERMINATOR && l->cur_data_col==cl->max_col-1) {
+	Preempt(old_preempt);
+	return;
+      }
+    }
+    if (l->cur_data_col<cl->max_col)
+      StrCpy(cl->display+l->cur_data_col,cl->display+l->cur_data_col+1);
+    if (l->cur_data_col>=cl->max_col-1) {
+      l->cur_entry=cl->next;
+      l->cur_data_col=l->cur_entry->min_col;
+    }
+    LtfRemoveSoftCRs(l,l->cur_entry);
+    Preempt(old_preempt);
+    return;
+  }
+  l->cur_entry=cl->next;
+  l->cur_data_col=l->cur_entry->min_col;
+  RemQue(cl);
+  LtfDelEntry(cl,l->mem_tss);
+  LtfRemoveSoftCRs(l,l->cur_entry);
+  Preempt(old_preempt);
+}
+
+void CheckDollarBufSize(Ltf *l)
+{
+  U1 *b;
+  if (l->dollar_buf_ptr>=l->dollar_buf_size-2) {
+    l->dollar_buf_size*=2;
+    b=MAlloc(l->dollar_buf_size,l->mem_tss);
+    MemCpy(b,l->dollar_buf,l->dollar_buf_ptr);
+    Free(l->dollar_buf,l->mem_tss);
+    l->dollar_buf=b;
+  }
+}
+
+
+public I8 LtfRunLine(Ltf *l,LtfEntry *cl,BoolU4 exited,BoolU4 old_preempt)
+{  //Call with preempt off
+  I8 result=-1;
+  I1 ch=l->cmd_I1,*st;
+  I8 cb(Ltf *l,U1 *user,LtfEntry *ll);
+
+  if (!exited) {
+    if (cl->flags & LTFLF_ESC) {
+      Msg(MSG_KEY_DOWN,CH_ESC,0,1<<TSSCf_DONT_FILTER);
+      return 0;
+    } if (cl->flags & LTFLF_QUIT) {
+      Msg(MSG_KEY_DOWN,CH_CTRLQ,0,1<<TSSCf_DONT_FILTER);
+      return 0;
+    }
+  }
+  if (cl->btype==LTFT_LINK) {
+    if (ch==CH_SPACE)
+      LeftClickLink(l,cl,old_preempt);
+    else if (ch==CH_CR)
+      RightClickLink(l,cl,old_preempt);
+    return 0;
+  }
+  if (ch==CH_SPACE && cl->flags & LTFLF_TREE || cl->btype==LTFT_HIDE_START)
+    cl->flags^=LTFLF_COLLAPSED;
+
+  if ((cl->btype>=LTFT_BUTTON && cl->btype<=LTFT_MENU_VALUE) || cl->btype==LTFT_PICTURE) {
+    if (cl->btype==LTFT_CHECK_BOX)
+      cl->flags^=LTFLF_CHECKED;
+    if (ch==CH_SPACE) {
+      if (cl->flags & LTFLF_LEFT_EXP) {
+	result=cl->left_exp;
+	Msg(MSG_CMD,result,0,1<<TSSCf_DONT_FILTER);
+      }
+      if (cl->flags & LTFLF_LEFT_CB) {
+	cb=cl->left_cb;
+	Preempt(old_preempt);
+	result=cb(l,l->user_data,cl);
+	Preempt(OFF);
+	Msg(MSG_CMD,result,0,1<<TSSCf_DONT_FILTER);
+      }
+      if (cl->flags & LTFLF_LEFT_MACRO) {
+	if (cl->flags & LTFLF_POPUP) {
+	  st=NewString(cl->left_macro);
+	  Preempt(old_preempt);
+	  PopUp(st);
+	  Preempt(OFF);
+	  Free(st);
+	} else {
+	  if (cl->flags & LTFLF_LEFT_AUTO)
+	    AutoString("%s",cl->left_macro);
+	  else
+	    Auto(cl->left_macro);
+	}
+      }
+    } else if (ch==CH_CR) {
+      if (cl->flags & LTFLF_RIGHT_EXP) {
+	result=cl->right_exp;
+	Msg(MSG_CMD,result,0,1<<TSSCf_DONT_FILTER);
+      }
+      if (cl->flags & LTFLF_RIGHT_CB) {
+	cb=cl->right_cb;
+	Preempt(old_preempt);
+	result=cb(l,l->user_data,cl);
+	Preempt(OFF);
+	Msg(MSG_CMD,result,0,1<<TSSCf_DONT_FILTER);
+      }
+      if (cl->flags & LTFLF_RIGHT_MACRO) {
+	if (cl->flags & LTFLF_POPUP) {
+	  st=NewString(cl->right_macro);
+	  Preempt(old_preempt);
+	  PopUp(st);
+	  Preempt(OFF);
+	  Free(st);
+	} else {
+	  if (cl->flags & LTFLF_RIGHT_AUTO)
+	    AutoString("%s",cl->right_macro);
+	  else
+	    Auto(cl->right_macro);
+	}
+      }
+    }
+  }
+  l->cmd_I1=CH_SPACE;
+  return result;
+}
+
+void EditInsertChar(I8 ch,U8 sc,Ltf *l,BoolU4 old_preempt)
+{
+  BoolU4 old_preempt2=Preempt(OFF);
+  I1 *b,*src,*dst;
+  LtfEntry *cl=l->cur_entry,*nl;
+  I8 i,j,m,x=cl->x,y=cl->y;
+
+  l->recalc_start=cl->last;
+
+  if (l->flags & LTFF_IN_DOLLAR) {
+    if (!Bt(printable_chars_bitmap,ch))
+      goto done;
+    CheckDollarBufSize(l);
+    l->dollar_buf[l->dollar_buf_ptr++]=ch;
+    if (ch!='$$') {
+      goto done;
+    } else {
+      l->dollar_buf[l->dollar_buf_ptr]=0;
+      LtfPutS(l,l->dollar_buf);
+      l->flags&=~LTFF_IN_DOLLAR;
+      l->dollar_buf_ptr=0;
+      goto done;
+    }
+  } else {
+    if (ch=='$$') {
+      if (!(l->flags & (LTFF_PLAIN_TEXT | LTFF_PLAIN_TEXT_WITH_TABS))) {
+	l->flags|=LTFF_IN_DOLLAR;
+	l->dollar_buf_ptr=0;
+	l->dollar_buf[l->dollar_buf_ptr++]=ch;
+	goto done;
+      }
+    }
+  }
+
+  if (ch==CH_SPACE || ch==CH_CR) {
+    if (!(sc & SCF_CTRL) && !(sc & SCF_SHIFT)) {
+      if (cl->btype>=LTFT_BUTTON && cl->btype<=LTFT_MENU_VALUE ||
+	   cl->btype==LTFT_LINK || cl->flags & LTFLF_TREE ||
+	   cl->btype==LTFT_HIDE_START) {
+	l->cmd_I1=ch;
+	LtfRunLine(l,cl,FALSE,old_preempt);
+	goto done;
+      }
+    }
+  }
+  if (cl->btype==LTFT_HEX_EDIT) {
+    if (cl->flags & LTFLF_DATA_IS_PTR)
+      b=cl->data;
+    else
+      b=&cl->data;
+    i=l->cur_data_col;
+    j=i%(cl->display*3);
+    m=i/(cl->display*3)*cl->display;
+    if (j>=cl->display<<1)
+      b[j-cl->display<<1+m]=ch;
+    else {
+      ch=ToUpper(ch)-'0';
+      if (ch>9) ch=ch+'0'-'A'+10;
+      if (ch>15) goto done;
+      m=j>>1+m;
+      if (j & 1)
+	b[m]=b[m] & 0xF0| ch;
+      else
+	b[m]=b[m] & 0xF | ch<<4;
+    }
+    l->cur_data_col++;
+    goto done;
+  }
+  if (cl->btype==LTFT_DATA && cl->flags & LTFLF_REFRESH_DATA)
+    goto done;
+  if (l->flags & LTFF_OVERSTRIKE) {
+    if (ch==13) {
+      while (l->cur_entry->next!=l && l->cur_entry->y==y)
+	l->cur_entry=l->cur_entry->next;
+      l->cur_data_col=l->cur_entry->min_col;
+    } else {
+      if (Bt(displayable_chars_bitmap,ch)) {
+	if (cl->btype==LTFT_TEXT) {
+	  if (cl->display[l->cur_data_col]) {
+	    cl->display[l->cur_data_col++]=ch;
+	    goto done;
+	  }
+	} else if (cl->btype==LTFT_DATA) {
+	  if (cl->flags & LTFLF_HAS_TERMINATOR) {
+	    if (cl->display[l->cur_data_col] &&
+	       l->cur_data_col<cl->min_col+cl->len) {
+  	      cl->display[l->cur_data_col++]=ch;
+	      if ( !(cl->display[l->cur_data_col])) {
+  		cl->display[l->cur_data_col]='_';
+  		cl->display[l->cur_data_col+1]=0;
+	      }
+	    }
+	  } else {
+	    if (cl->display[l->cur_data_col])
+	      cl->display[l->cur_data_col++]=ch;
+	  }
+	  goto done;
+	}
+	b=MAlloc(2,l->mem_tss);
+	b[0]=ch;
+	b[1]=0;
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=LTFT_TEXT | l->text_attribute << 8;
+	nl->display=b;
+	nl->max_col=1;
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	InsQue(nl,cl->last);
+      }
+    }
+    goto done;
+  }
+  if (ch==CH_CR || ch==CH_TAB) {
+    nl=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+    if (ch==CH_CR) {
+      if (sc & SCF_CTRL && !(sc & SCF_SHIFT))
+	nl->type=LTFT_PAGE_BREAK | l->text_attribute << 8;
+      else
+	nl->type=LTFT_CR | l->text_attribute << 8;
+    } else
+      nl->type=LTFT_TAB | l->text_attribute << 8;
+    LtfInsert(l,nl);
+  } else {
+    if (ch>=CH_SHIFT_SPACE && ch<=0x7E) {
+      if (cl->btype==LTFT_DATA) {
+	i=cl->len+cl->min_col;
+	if (cl->flags & LTFLF_HAS_TERMINATOR)
+	  i++;
+	if (i>cl->max_col) {
+	  b=cl->display;
+	  cl->max_col++;
+	  for (i=cl->max_col;i>l->cur_data_col;i--)
+	    b[i]=b[i-1];
+	  b[l->cur_data_col++]=ch;
+	}
+      } else if (cl->btype==LTFT_TEXT) {
+	b=MAlloc(cl->max_col+2,l->mem_tss);
+	dst=b;
+	src=cl->display;
+	i=l->cur_data_col;
+	while (i-->0)
+	  *dst++=*src++;
+	*dst++=ch;
+	while (*dst++=*src++);
+	Free(cl->display,l->mem_tss);
+	cl->display=b;
+	cl->max_col++;
+	l->cur_data_col++;
+      } else {
+	b=MAlloc(2,l->mem_tss);
+	b[0]=ch;
+	b[1]=0;
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=LTFT_TEXT | l->text_attribute << 8;
+	nl->display=b;
+	nl->max_col=1;
+	nl->x=cl->x+4;
+	nl->y=cl->y;
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	InsQue(nl,cl->last);
+      }
+    }
+  }
+done:
+  LtfRemoveSoftCRs(l,l->cur_entry);
+  Preempt(old_preempt2);
+}
+
+void EditDelLine(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry,*cl2;
+  I8 y;
+  y=l->y;
+  while (cl!=l && cl->y==y)
+    cl=cl->next;
+  l->cur_entry=cl;
+  l->cur_data_col=cl->min_col;
+  cl=cl->last;
+  while (cl!=l && cl->y==y) {
+    cl2=cl->last;
+    RemQue(cl);
+    LtfDelEntry(cl,l->mem_tss);
+    cl=cl2;
+  }
+  if (cl==l)
+    l->recalc_start=cl;
+  else
+    l->recalc_start=cl->last;
+}
+
+public void LtfLoad(Ltf *l,I1 *src2,U8 size)
+{
+  I8 i;
+  I1 *src;
+  LtfBinEntry *tempb;
+  if (src2) {
+    LtfPutS(l,src2);
+    src=src2+StrLen(src2)+1;
+    i=size-(offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+    while (src<=src2+i) {
+      tempb=MAllocZ(sizeof(LtfBinEntry));
+      MemCpy(&tempb->start,src,offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+      src+=offset(LtfBinEntry.data)-offset(LtfBinEntry.start);
+      tempb->data=MAlloc(tempb->size);
+      if (tempb->size) {
+	MemCpy(tempb->data,src,tempb->size);
+	src+=tempb->size;
+      }
+      InsQue(tempb,l->bin_root.last);
+      if (tempb->num>=l->cur_bin_num)
+	l->cur_bin_num=tempb->num+1;
+    }
+  }
+  if (!(l->flags & (LTFF_PLAIN_TEXT|LTFF_PLAIN_TEXT_WITH_TABS)))
+    LtfValidateBins(l);
+  l->recalc_start=l;
+  LtfRecalc(l);
+}
+
+public Ltf *LtfRead(I1 *name,U8 flags=0)
+{
+  Ltf *l=LtfNew;
+  I1 *src,*name2;
+  U8 size=0;
+  l->flags|=flags;
+  name2=AbsoluteFileName(name);
+  StrCpy(l->filename.name,name2);
+  src=ReadFile(name2,&size,&l->file_attr);
+  Free(name2);
+
+  if (src) {
+    LtfLoad(l,src,size);
+    Free(src);
+  }
+  return l;
+}
+
+public I1 *LtfSave(Ltf *l,U8 *size=NULL)
+{
+  LtfEntry *cl;
+  LtfBinEntry *b;
+  I1 *st;
+  U8 cnt=2; //cursor + terminator
+  I1 *result,*dst,*src,ch;
+  I8 i;
+  if (!(l->flags & (LTFF_PLAIN_TEXT|LTFF_PLAIN_TEXT_WITH_TABS)))
+    LtfValidateBins(l);
+  l->recalc_start=l;
+  LtfRecalc(l);
+  for (cl=l->dummy.next;cl!=l;cl=cl->next) {
+    if (!Bt(ltf_data_types,cl->btype)) {
+      if (cl->btype==LTFT_TEXT &&
+	!(cl->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	 LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP))) {
+	cnt+=StrLen(cl->display);
+	if (!(l->flags & (LTFF_PLAIN_TEXT | LTFF_PLAIN_TEXT_WITH_TABS)))
+	  cnt+=Occurrences(cl->display,'$$');
+      } else if (cl->btype==LTFT_TAB || cl->btype==LTFT_PAGE_BREAK)
+	cnt++;
+      else if (cl->btype==LTFT_CR)
+	cnt+=2;
+      else if (cl->btype!=LTFT_SOFT_CR &&
+	       cl->btype!=LTFT_CURSOR &&
+	       cl->btype!=LTFT_BPT) {
+	st=cl->plain_text;
+	cl->plain_text=LtfToPlainText(cl);
+	Free(st);
+	cnt+=StrLen(cl->plain_text)+2;
+      }
+    }
+  }
+  for (b=l->bin_root.next;b!=&l->bin_root;b=b->next)
+    cnt+=offset(LtfBinEntry.data)-
+	offset(LtfBinEntry.start)+b->size;
+  result=MAlloc(cnt);
+  dst=result;
+  for (cl=l->dummy.next;cl!=l;cl=cl->next) {
+    if (!Bt(ltf_data_types,cl->btype)) {
+      if (cl->btype==LTFT_TEXT &&
+	!(cl->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	   LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP))) {
+	src=cl->display;
+	i=0;
+	while (ch=*src++) {
+	  if (cl==l->cur_entry && i++==l->cur_data_col)
+	    *dst++=CH_CURSOR;
+	  *dst++=ch;
+	  if (ch=='$$') {
+	    if (!(l->flags & (LTFF_PLAIN_TEXT | LTFF_PLAIN_TEXT_WITH_TABS)))
+	      *dst++=ch;
+	  }
+	}
+	if (cl==l->cur_entry && i++==l->cur_data_col)
+	  *dst++=CH_CURSOR;
+      } else {
+	if (cl==l->cur_entry)
+	  *dst++=CH_CURSOR;
+	if (cl->btype==LTFT_TAB)
+	  *dst++=CH_TAB;
+	else if (cl->btype==LTFT_PAGE_BREAK)
+	  *dst++=CH_FORM_FEED;
+	else if (cl->btype==LTFT_CR) {
+	  *dst++=CH_CR;
+	  *dst++=CH_LINE_FEED;
+	} else if (cl->btype!=LTFT_SOFT_CR &&
+		   cl->btype!=LTFT_CURSOR &&
+		   cl->btype!=LTFT_BPT) {
+	  *dst++='$$';
+	  StrCpy(dst,cl->plain_text);
+	  dst+=StrLen(cl->plain_text);
+	  *dst++='$$';
+	}
+      }
+    }
+  }
+  *dst++=0;
+  b=l->bin_root.next;
+  if (b!=&l->bin_root) {
+    while (b!=&l->bin_root) {
+      MemCpy(dst,&b->type,offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+      dst+=offset(LtfBinEntry.data)-offset(LtfBinEntry.start);
+      MemCpy(dst,b->data,b->size);
+      dst+=b->size;
+      b=b->next;
+    }
+  } else
+    cnt--;
+  if (size) *size=cnt;
+  return result;
+}
+
+I1 *EditOverStrikeCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  I1 *st=MAlloc(2,mem_tss);
+  st[0]=(user_data->flags & LTFF_OVERSTRIKE) ? 'O':130;
+  st[1]=0;
+  return st;
+}
+
+I1 *EditDollarCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  I1 *st=MAlloc(2,mem_tss);
+  st[0]=(user_data->flags & LTFF_IN_DOLLAR) ? '$$':130;
+  st[1]=0;
+  return st;
+}
+
+I1 *EditQuotesCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  LexStruct *lx=mem_tss->last_lex;
+  I1 *st=MAlloc(2,mem_tss);
+  st[0]=(lx->flags & LF_IN_QUOTES) ? '"':130;
+  st[1]=0;
+  return st;
+}
+
+I1 *EditBracesCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  LexStruct *lx=mem_tss->last_lex;
+  I1 *st=MAlloc(2,mem_tss);
+  st[0]=(lx->braces_cnt) ? '}':130;
+  st[1]=0;
+  return st;
+}
+
+I1 *EditSemicolonCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  LexStruct *lx=mem_tss->last_lex;
+  I1 *st=MAlloc(2,mem_tss);
+  st[0]=(lx->statement_cnt) ? ';':130;
+  st[1]=0;
+  return st;
+}
+
+I1 *EditDollarTypeCB(Ltf *l,Ltf *user_data,LtfEntry *ll,TssStruct *mem_tss)
+{
+  I1 *src=SysTextSub(user_data->cur_entry->btype,"ST_LTF_CMDS");
+  I1 *st=MAllocZ(4,mem_tss);
+  if (user_data->cur_entry==user_data) {
+    StrCpy(st,"EOF");
+  } else if (src) StrCpy(st,src);
+  return st;
+}
+
+public BoolU4 DoLtf(Ltf *l,BoolU4 home=TRUE,I1 *help=NULL,BoolU4 help_is_file=FALSE)
+{
+  Ltf *menu=NULL,*old_ltf=Fs->cur_ltf,*old_aux=Fs->aux_ltf,*aux;
+  U8 sc=0;
+  I8 old_attribute=Fs->text_attribute;
+  I8 ch=0;
+  LtfEntry *ll;
+  U8 my_LtfPutChar(LTChnl *chnl,I8 ch,U8 sc);
+  BoolU4 old_update=Fs->update_window;
+
+  if (help && !l->menu_ltf) {
+    if (help_is_file)
+      menu=LtfRead(help);
+    else {
+      menu=LtfNew;
+      menu->text_attribute=l->text_attribute;
+      LtfPutS(menu,help);
+    }
+    l->menu_ltf=menu;
+  }
+
+  l->tss=Fs;
+  aux=LtfNew;
+  aux->text_attribute=Fs->border_attribute;
+  LtfPutS(aux,"$$CM +TY,0,-1$$");
+  if (Bt(&Fs->crt_flags,CRTf_HAS_CLOSE_WINDOW))
+    LtfPutS(aux,"$$TX+RX+BD,\"[X]\"$$");
+  if (l->menu_ltf)
+    LtfPutS(aux,"$$TX+LX+BD,\"MENU\"$$");
+
+  ll=LtfPutS(aux,"$$DA-T-P+BD+RD+CX+SCX+IV,256,\"%s...\",16$$");
+  ll->data=&l->filename.name;
+  LtfFormatData(ll);
+
+  LtfPutS(aux,"$$CM+BY+RX,-24,1$$");
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditDollarTypeCB;
+  LtfPutS(aux,"$$CM+BY+RX,-21,1$$");
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditOverStrikeCB;
+  LtfPutS(aux,"$$CM+BY+RX,-20,1$$");  //gets merged without this
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditDollarCB;
+
+  ll=LtfPutS(aux,"$$DA+BD+RD-T,32,\"Line:%04d \"$$");
+  ll->data=&l->line;
+  LtfFormatData(ll);
+  ll=LtfPutS(aux,"$$DA+BD+RD-T,32,\"Col:%04d\"$$\r\n");
+  ll->data=&l->col;
+  LtfFormatData(ll);
+  aux->user_data=l;
+  Fs->aux_ltf=aux;
+
+  l->recalc_start=l;
+  LtfRecalc(l);
+
+  if (home)
+    LtfHome(l);
+  Fs->cur_ltf=l;
+  Fs->text_attribute=l->text_attribute;
+  AssignBit(&Fs->crt_flags,CRTf_HAS_MENU,l->menu_ltf);
+  Fs->update_window=&LtfUpdateCurLtfWindow;
+  Bts(&Fs->crt_flags,CRTf_SHOW);
+  do {
+    ch=GetChar2(&sc);
+    LtfPutChar(l,ch,sc,Bt(&sys_flags,SYSf_PREEMPTIVE));
+    if (Fs->rmt_chnl) {
+      my_LtfPutChar=ext[EXT_RMT_LTFPUTCHAR];
+      my_LtfPutChar(Fs->rmt_chnl,ch,sc);
+    }
+    LtfRecalc(l);
+  } while (ch!=CH_ESC && ch!=CH_CTRLQ);
+  Fs->cur_ltf=old_ltf;
+  Fs->aux_ltf=old_aux;
+  AssignBit(&Fs->crt_flags,CRTf_HAS_MENU,old_ltf->menu_ltf);
+  Fs->text_attribute=old_attribute;
+  Fs->update_window=old_update;
+  LtfDel(aux);
+  if (menu) {
+    l->menu_ltf=NULL;
+    LtfDel(menu);
+  }
+  return ch==CH_ESC;
+}
+
+
+public BoolU4 DoForm(U1 *D,I1 *class_name,
+    I1 *help=NULL,BoolU4 help_is_file=FALSE,
+    I1 *header=NULL,I1 *footer=NULL)
+{
+  BoolU4 result=FALSE;
+  MemberListStruct *ml;
+  LtfEntry *ll;
+  I8 ch=0;
+  ClassStruct *cl=FindLocalHash(class_name,HTT_CLASS);
+  Ltf *l;
+  if (!cl) return FALSE;
+  l=LtfNew;
+  if (header) LtfPutS(l,header);
+  l->flags|=LTFF_OVERSTRIKE | LTFF_FORM;
+  ml=cl->member_list;
+  while (ml) {
+    if (ml->fmtstr) {
+      ll=LtfPutS(l,ml->fmtstr);
+      ll->data=D+ml->offset;
+      ll->my_format_data=ml->fmtdata;
+      LtfFormatData(ll);
+    }
+    ml=ml->next;
+  }
+  if (footer) LtfPutS(l,footer);
+  if (l->dummy.next!=l)  {
+    l->flags&=~(LTFF_ATTR_BY_PARTITION | LTFF_ATTR_BY_FILENAME);
+    LtfRecalc(l);
+    if (DoLtf(l,TRUE,help,help_is_file)) {
+      ll=l->dummy.next;
+      while (ll!=l) {
+	if (ll->btype==LTFT_DATA || ll->btype==LTFT_CHECK_BOX)
+	  LtfGetData(ll);
+	ll=ll->next;
+      }
+      result=TRUE;
+    }
+  }
+  LtfDel(l);
+  return result;
+}
+
+
+public I8 DoMenu(Ltf *m,I1 *help=NULL)
+{
+  LtfEntry *ll;
+  I8 result=-1;
+  BoolU4 old_preempt=Preempt(OFF);
+  if (m) {
+    m->flags&=~(LTFF_ATTR_BY_PARTITION | LTFF_ATTR_BY_FILENAME);
+//TODO: preempt is off and popup in ltf could be run with preempt off
+    if (DoLtf(m,TRUE,help)) {
+      ll=m->cur_entry;
+      if (ll!=m)
+	result=LtfRunLine(m,ll,TRUE,old_preempt);
+    }
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+public void LtfWrite(Ltf *l,BoolU4 prompt=FALSE)
+{
+  U8 size;
+  I1 *buf=LtfSave(l,&size);
+  if (prompt) {
+    if (DoForm(&l->filename,"EditFileNameStruct"))
+      WriteFile(l->filename.name,buf,size,0,l->file_attr);
+  } else
+    WriteFile(l->filename.name,buf,size,0,l->file_attr);
+  Free(buf);
+}
+
+public void DelClipboard()
+{
+  LtfReset(sys_clipboard_ltf,TRUE,TRUE);
+}
+
+
+public void EditCopyToClipboard(Ltf *l)
+{
+  Ltf *b=sys_clipboard_ltf;
+  LtfEntry *cl=l->dummy.next,*nl;
+  LtfBinEntry *tempb;
+  DelClipboard();
+  while (cl!=l) {
+    if (cl->type & LTFLT_SELECTED) {
+      cl->type&=~LTFLT_SELECTED;
+      if (!Bt(ltf_data_types,cl->btype)) {
+	nl=LtfCopyEntry(b,cl);
+	InsQue(nl,b->dummy.last);
+      }
+    }
+    cl=cl->next;
+  }
+}
+
+public void EditCutToClipboard(Ltf *l)
+{
+  Ltf *b=sys_clipboard_ltf;
+  LtfEntry *cl=l->dummy.next,*cl1,*nl,*cl2=NULL;
+  LtfBinEntry *tempb;
+  DelClipboard();
+  while (cl!=l) {
+    cl1=cl->next;
+    if (cl->type & LTFLT_SELECTED) {
+      cl->type&=~LTFLT_SELECTED;
+      if (!Bt(ltf_data_types,cl->btype)) {
+	nl=LtfCopyEntry(b,cl);
+	InsQue(nl,b->dummy.last);
+      }
+      if (cl==l->cur_entry || cl==cl2)
+	cl2=cl->next;
+      RemQue(cl);
+      LtfDelEntry(cl,l->mem_tss);
+    }
+    cl=cl1;
+  }
+  if (cl2) {
+    l->cur_entry=cl2;
+    l->cur_data_col=cl2->min_col;
+  }
+  l->recalc_start=l;
+  LtfRemoveSoftCRs(l,NULL);
+}
+
+public void EditInsertLtf(Ltf *l,Ltf *b)
+{  //TODO: $LK,"LtfReset","MN:LtfReset"$
+  I1 *dst;
+  LtfEntry *nl,*cl=b->dummy.next;
+  LtfBinEntry *tempb;
+  LtfRemoveSoftCRs(l,NULL);
+  if ((l->cur_entry->btype)==LTFT_TEXT &&
+      l->cur_data_col>l->cur_entry->min_col) {
+    if (l->cur_data_col<l->cur_entry->max_col) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+      nl->type=LTFT_TEXT | l->cur_entry->type & 0xFFFFFF00;
+      nl->flags=l->cur_entry->flags;
+      nl->x=l->cur_entry->x;
+      nl->y=l->cur_entry->y;
+      nl->indent=l->cur_entry->indent;
+      nl->page_line_num=l->cur_entry->page_line_num;
+      nl->left_margin=l->cur_entry->left_margin;
+      nl->right_margin=l->cur_entry->right_margin;
+      dst=l->cur_entry->display+l->cur_data_col;
+      nl->display=NewString(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      *dst=0;
+      l->cur_entry->max_col=l->cur_data_col;
+      InsQue(nl,l->cur_entry);
+      l->cur_entry=nl;
+      l->cur_data_col=nl->min_col;
+    } else
+      if (l->cur_entry!=l)
+	l->cur_entry=l->cur_entry->next;
+  }
+  while (cl!=b) {
+    if (cl->btype!=LTFT_SOFT_CR) {
+      nl=LtfCopyEntry(l,cl);
+      InsQue(nl,l->cur_entry->last);
+    }
+    cl=cl->next;
+  }
+  l->recalc_start=l;
+}
+
+void Irq07Handler()
+{
+  Bts(&sys_irq_flags,7);
+}
+ext[EXT_IRQ07]=&Irq07Handler;
+
+#define LPT_INIT	0x09
+#define LPT_ON 		0x1D
+#define LPT_STROBE	(LPT_ON ^ 1)
+#define LPT_OFF 	0x05
+
+I8 lpt1_col=0;
+
+public void Lpt1On()
+{
+  lpt1_col=0;
+  OutP(0x77A,0); //Standard Mode
+  OutP(0x37A,LPT_INIT);
+  OutP(0x37A,LPT_ON);
+}
+
+public void Lpt1Off()
+{
+  Sleep(1000);
+  OutP(0x37A,LPT_OFF);
+}
+
+void Lpt1LineFeed()
+{
+  Lpt1PutChar(CH_CR);
+  Lpt1PutChar(CH_LINE_FEED);
+}
+
+public void Lpt1PutChar(U1 *ch)
+{
+  U8 timeout_jiffies;
+  if (ch==CH_CURSOR) return;
+  do {
+    do {
+      if (InP(0x379)!=0x5F)
+	SwapInNext;
+      else
+	break;
+    } while (TRUE);
+
+    OutP(0x378,ch);
+    Btr(&sys_irq_flags,7);
+    OutP(0x37A,LPT_STROBE);
+    OutP(0x37A,LPT_ON);
+    timeout_jiffies=jiffies+JIFFY_FREQ/100;
+    while (!Btr(&sys_irq_flags,7) &&
+	   jiffies<timeout_jiffies)
+      SwapInNext;
+  } while (jiffies>=timeout_jiffies);
+  if (ch>=CH_SHIFT_SPACE && ch<=0x7F) {
+    lpt1_col++;
+    if (lpt1_col>=80)
+      Lpt1LineFeed;
+  } else if (ch==CH_CR)
+    lpt1_col=0;
+  else if (ch==CH_TAB) {
+    lpt1_col=(lpt1_col+8) & 0xFFFFFFF8;
+    if (lpt1_col>=80)
+      Lpt1LineFeed;
+  }
+}
+
+public void Lpt1PrintF(I1 *src,...)
+{
+  I1 *buf=SPrintFJoin(NULL,src,argc,argv),*ptr=buf;
+  while (*ptr)
+    Lpt1PutChar(*ptr++);
+  Free(buf);
+}
+
+public void Lpt1PrintLtf(Ltf *l)
+{
+  U1 t;
+  BoolU4 just_did_crlf=TRUE;
+  I8 i;
+  LtfEntry *ll;
+  LtfRecalc(l);
+  ll=l->dummy.next;
+  Lpt1On;
+  while (ll!=l) {
+    if (just_did_crlf) {
+      for (i=0;i<ll->indent>>2;i++)
+	Lpt1PutChar(CH_SPACE);
+      just_did_crlf=FALSE;
+    }
+    t=ll->btype;
+    if (Bt(ltf_display_types,t))
+      Lpt1PrintF("%s",ll->display);
+    else if (t==LTFT_TAB)
+      Lpt1PutChar(CH_TAB);
+    else if (t==LTFT_CR || t==LTFT_SOFT_CR) {
+      Lpt1LineFeed;
+      just_did_crlf=TRUE;
+    }
+    ll=ll->next;
+  }
+  Lpt1PutChar(CH_FORM_FEED);
+  Lpt1Off;
+}
+
+public void Lpt1PrintFile(I1 *name)
+{
+  Lpt1On;
+  Lpt1PrintF("%F",name);
+  Lpt1PutChar(CH_FORM_FEED);
+  Lpt1Off;
+}
+
+public void EditFindNext(Ltf *l)
+{
+  I1 *ptr;
+  LtfEntry *ll,*cl=l->cur_entry;
+  U8 ss_flags;
+  if (l->find_replace->match_case)
+    ss_flags=0;
+  else
+    ss_flags=SS_IGNORE_CASE;
+  if (l->find_replace->whole_labels)
+    ss_flags|=SS_WHOLE_LABELS;
+
+  ll=(l->find_replace->scan_forward)?cl->next:cl->last;
+  while (ll!=cl) {
+    if (ll!=l) {
+      if (Bt(ltf_display_types,ll->btype)) {
+	if ((ll->type & LTFLT_SELECTED) || !l->find_replace->scan_selected_text) {
+	   if (ptr=SearchString(ll->display,l->find_replace->find_text,ss_flags)) {
+	    l->cur_entry=ll;
+	    l->cur_data_col=ptr-ll->display;
+	    if (l->cur_data_col<ll->min_col)
+	      l->cur_data_col=ll->min_col;
+	    if (l->cur_data_col>ll->max_col)
+	      l->cur_data_col=ll->max_col;
+	    LtfCenter(l);
+	    return;
+	  }
+	}
+      }
+    }
+    ll=(l->find_replace->scan_forward) ?ll->next:ll->last;
+  }
+}
+
+public I8 PopUp(I1 *msg,TssStruct *parent=NULL)
+{
+  U8 result=0;
+  TssCmdStruct *tempc;
+  TssStruct *tss;
+  tss=Spawn(&ServantUserCmdLine,"SYSTEM TASK",parent);
+  while (!Bt(&tss->task_flags,TSSf_IDLE))
+    SwapInNext;
+  Bts(&tss->crt_flags,CRTf_SHOW);
+  if (!parent) {
+    QueueTaskRequest(tss,parent,msg,(1<<TSSCf_EXIT_ON_COMPLETE));
+    return 0;
+  } else {
+    Fs->popup_tss=tss;
+    tempc=QueueTaskRequest(tss,parent,msg,
+      1<<TSSCf_WAKE_MASTER | 1<<TSSCf_FOCUS_MASTER);
+    GetRequestResult(tempc,&result);
+    Fs->popup_tss=NULL;
+    Kill(tss);
+    return result;
+  }
+}
+
+public I8 PopUpMenu(Ltf *l,I1 *help=NULL)
+{
+  l->flags|=LTFF_MIN_SIZE | LTFF_FORM;
+  return ServantUser("DoMenu(0x%X,0x%X);",l,help);
+}
+
+void PickFileSub(Ltf *l,LTDirEntry *tempm)
+{
+  while (tempm) {
+    if (tempm->attr & LT_ATTR_DIR) {
+      LtfPrintF(l,"$$TR \"%s\"$$\r\n",tempm->name);
+      LtfPutS(l,"$$ID,+2$$");
+      if (tempm->sub)
+	PickFileSub(l,tempm->sub);
+      LtfPutS(l,"$$ID,-2$$");
+    } else
+      LtfPrintF(l,"$$MU,\"%s\",0x%08X$$\r\n",
+	tempm->name,tempm->full_name);
+    tempm=tempm->next;
+  }
+}
+
+public I1 *PopUpPickFile(I1 *mask="/*",I1 *flags="+r")
+{
+  I1 *st,*result=NULL;
+  LTDirEntry *tempm;
+  FlagsStruct f;
+  Ltf *l=LtfNew;
+  GetFFlags(&f,"ST_FILE_UTIL_FLAGS",flags);
+  tempm=FindFiles(mask,&f.on);
+  LtfPutS(l,"$$TR -C+AL,\"\"$$\r\n");
+  LtfPutS(l,"$$ID,+2$$");
+  PickFileSub(l,tempm);
+  LtfPutS(l,"$$ID,-2$$");
+  st=PopUpMenu(l);
+  if (st>0)
+    result=NewString(st);
+  LtfDel(l);
+  DelLTDirList(tempm);
+  return result;
+}
+
+void PickDirSub(Ltf *l,LTDirEntry *tempm)
+{
+  while (tempm) {
+    LtfPrintF(l,"$$TR \"\"$$");
+    LtfPrintF(l,"$$MU,\"%s\",0x%08X$$\r\n",
+      tempm->name,tempm->full_name);
+    LtfPutS(l,"$$ID,+2$$");
+    if (tempm->sub)
+      PickDirSub(l,tempm->sub);
+    LtfPutS(l,"$$ID,-2$$");
+    tempm=tempm->next;
+  }
+}
+
+public I1 *PopUpPickDir(I1 *mask="/*",I1 *flags="+r+D")
+{  //+r=recurse +D=just dirs
+  I1 *st,*result=NULL;
+  LTDirEntry *tempm;
+  FlagsStruct f;
+  Ltf *l=LtfNew;
+  GetFFlags(&f,"ST_FILE_UTIL_FLAGS",flags);
+  tempm=FindFiles(mask,&f.on);
+  LtfPutS(l,"$$TR -C+AL,\"\"$$\r\n");
+  LtfPutS(l,"$$ID,+2$$");
+  PickDirSub(l,tempm);
+  LtfPutS(l,"$$ID,-2$$");
+  st=PopUpMenu(l);
+  if (st>0)
+    result=NewString(st);
+  LtfDel(l);
+  DelLTDirList(tempm);
+  return result;
+}
+
+
+
+public BoolU4 PopUpDoForm(U1 *d,I1 *class_name,
+  I1 *help=NULL,BoolU4 help_is_file=FALSE)
+{  //TODO: add header/footer
+  BoolU4 result;
+  result=ServantUser("DoForm(0x%X,\"%s\",0x%X,%d);",d,class_name,help,help_is_file);
+  return result;
+}
+
+PasswordStruct *PopUpPassword()
+{
+  PasswordStruct *pwr=MAlloc(sizeof(PasswordStruct));
+  pwr->pw[0]=0;
+//TODO: password within file operations locks on servant startup
+//  if (!PopUpDoForm(pwr,"PasswordStruct")) {
+  if (!DoForm(pwr,"PasswordStruct")) {
+    Free(pwr);
+    pwr=NULL;
+  }
+  return pwr;
+}
+
+public I8 PopUpOk(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutS(l,header);
+  LtfPutS(l,"$$CM +CX,0,4$$$$BT, \"OKAY\" 1$$");
+  if (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public I8 PopUpNoYes(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutS(l,header);
+  LtfPutS(l,"$$CM +LX, 2,4$$$$BT, \"YES\",1$$");
+  LtfPutS(l,"$$CM +LX, 18,0$$$$BT, \"NO\",0$$");
+  if (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public I8 PopUpCancelOk(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutS(l,header);
+  LtfPutS(l,"$$CM +LX, 2,4$$$$BT, \"OK\",1$$");
+  LtfPutS(l,"$$CM +LX, 18,0$$$$BT, \"CANCEL\",0$$");
+  if (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public I8 PopUpReplaceSkipAllCancel(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutS(l,header);
+  LtfPutS(l,"$$CM +LX,2,4$$$$BT, \"REPLACE\",0$$");
+  LtfPutS(l,"$$CM +LX, 18,0$$$$BT, \"SKIP\",1$$");
+  LtfPutS(l,"$$CM +LX, 2,3$$$$BT, \"ALL\",2$$");
+  LtfPutS(l,"$$CM +LX, 18,0$$$$BT, \"CANCEL\",3$$");
+  if (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public void EditReplace(Ltf *l)
+{
+  BoolU4 first=TRUE,old_preempt;
+  I8 cmd=0,i,j,plen,rlen,dlen;
+  I1 *src,*dst,*dst2;
+  LtfEntry *cl=l->cur_entry,*ll;
+  U8 ss_flags;
+  if (DoForm(l->find_replace,"EditFindTextStruct")) {
+    if (l->find_replace->match_case)
+      ss_flags=0;
+    else
+      ss_flags=SS_IGNORE_CASE;
+    if (l->find_replace->whole_labels)
+      ss_flags|=SS_WHOLE_LABELS;
+    if (!(l->find_replace->replace)) {
+      EditFindNext(l);
+      return;
+    }
+    plen=StrLen(l->find_replace->find_text);
+    if (!plen) return;
+    rlen=StrLen(l->find_replace->replace_text);
+    ll=cl;
+    while ((ll!=cl || first) && cmd!=3) {
+      first=FALSE;
+      if (ll->btype==LTFT_TEXT &&
+	   ((ll->type & LTFLT_SELECTED) || !l->find_replace->scan_selected_text)) {
+	src=ll->display;
+	while (src && cmd!=3) {
+	  src=SearchString(src,l->find_replace->find_text,ss_flags);
+	  if (src) {
+	    l->cur_data_col=src-ll->display;
+  	    l->cur_entry=ll;
+	    l->recalc_start=l;
+	    if (cmd!=2)
+	      LtfCenter(l);
+  	    ll=l->cur_entry;
+	    src=l->cur_data_col+ll->display;
+	    if (cmd!=2) {
+  	      cmd=PopUpReplaceSkipAllCancel("");
+	      if (cmd==2)
+		old_preempt=Preempt(OFF);
+	    }
+	    if (cmd==0 || cmd==2) {
+	      dlen=StrLen(ll->display);
+	      dst=MAlloc(dlen+1+rlen-plen,l->mem_tss);
+	      dst2=dst;
+	      j=src-ll->display;
+	      for (i=0;i<j;i++)
+		*dst++=ll->display[i];
+	      for (i=0;i<rlen;i++)
+		*dst++=l->find_replace->replace_text[i];
+	      src=dst;
+	      for (i=j+plen;i<=dlen;i++)
+		*dst++=ll->display[i];
+	      Free(ll->display,l->mem_tss);
+	      ll->display=dst2;
+	      l->cur_data_col=src-ll->display;
+  	      l->cur_entry=ll;
+	      if (cmd!=2) {
+		l->recalc_start=l;
+		LtfRemoveSoftCRs(l,l->cur_entry);
+		LtfRecalc(l);
+	      }
+  	      ll=l->cur_entry;
+	      src=l->cur_data_col+ll->display;
+	    } else
+	      src++;
+	  }
+	}
+      }
+      if (l->find_replace->scan_forward) {
+	ll=ll->next;
+	if (ll==l) {
+	  if (cl==l) break;
+	  ll=ll->next;
+	}
+      } else {
+	ll=ll->last;
+	if (ll==l) {
+	  if (cl==l) break;
+	  ll=ll->last;
+	}
+      }
+    }
+  }
+  if (cmd==2) {
+    l->recalc_start=l;
+    LtfRemoveSoftCRs(l,NULL);
+    LtfRecalc(l);
+    Preempt(old_preempt);
+  }
+}
+
+class EditGoToLineStruct
+{
+  I8 line fmtstr "$$DA -T, 256, \"Go to Line:%04d\"$$";
+};
+
+public void EditGoToLine(Ltf *l)
+{
+  EditGoToLineStruct gtl;
+  gtl.line=1;
+  if (DoForm(&gtl,"EditGoToLineStruct")) {
+    l->x=0;
+    l->y=gtl.line-1;
+    LtfUpdateWindowJoin(l,FALSE,FALSE,FALSE,TRUE);
+    LtfCenter(l);
+  }
+}
+
+void TogglePlainTextMode(Ltf *l)
+{
+  U8 size;
+  I1 *st=LtfSave(l,&size);
+  BoolU4 old_preempt=Preempt(OFF);
+  U8 flags=l->flags ^ LTFF_PLAIN_TEXT;
+  Ltf *menu=l->menu_ltf;
+  LtfReset(l,TRUE);
+  l->menu_ltf=menu;
+  l->flags=flags & ~(LTFF_WORD_WRAP|LTFF_INVERTED|LTFF_UNDERLINED|LTFF_BLINK);
+  LtfLoad(l,st,size);
+  LtfCenter(l);
+  Preempt(old_preempt);
+  Free(st);
+}
+
+#define LK_FILE 	0
+#define LK_FILE_ANCHOR	1
+#define LK_FILE_FIND	2
+#define LK_FILE_LINE	3
+#define LK_MAN_PAGE	4
+#define LK_PLAIN 	5
+#define LK_PLAIN_FIND	6
+#define LK_PLAIN_LINE	7
+#define LK_PLACE_ANCHOR	8
+
+I8 PopUpLinkType()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutS(l,"$$MU,\"To file\" LK_FILE$$\r\n");
+  LtfPutS(l,"$$MU,\"To anchor in file\" LK_FILE_ANCHOR$$\r\n");
+  LtfPutS(l,"$$MU,\"To string in file\" LK_FILE_FIND$$\r\n");
+  LtfPutS(l,"$$MU,\"To line in file\" LK_FILE_LINE$$\r\n");
+  LtfPutS(l,"$$MU,\"To man page\" LK_MAN_PAGE$$\r\n");
+  LtfPutS(l,"$$MU,\"To plain-text file\" LK_PLAIN$$\r\n");
+  LtfPutS(l,"$$MU,\"To string in plain-text file\" LK_PLAIN_FIND$$\r\n");
+  LtfPutS(l,"$$MU,\"To line in plain-text file\" LK_PLAIN_LINE$$\r\n");
+  LtfPutS(l,"$$MU,\"Place Anchor\" LK_PLACE_ANCHOR$$\r\n");
+  LtfPutS(l,"$$MU,\"CANCEL\" -1$$");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+class EditFileLinkStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132]	fmtstr "$$DA -P 131 \"File          :%s\"$$\r\n";
+  I1	aux[132];
+  I8	num;
+  BoolU4	hide;
+};
+
+class EditFileAnchorLinkStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132]	fmtstr "$$DA -P 131 \"File          :%s\"$$\r\n";
+  I1	aux[132]	fmtstr "$$DA -P 131 \"Anchor Label  :%s\"$$\r\n";
+  I8	num;
+  BoolU4	hide;
+};
+
+class EditFileFindLinkStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132]	fmtstr "$$DA -P 131 \"File          :%s\"$$\r\n";
+  I1	aux[132]	fmtstr "$$DA -P 131 \"String        :%s\"$$\r\n";
+  I8	num		fmtstr "$$DA -T 131 \"Occurrence Num:%04d\"$$\r\n";
+  BoolU4	hide;
+};
+
+class EditFileLineLinkStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132]	fmtstr "$$DA -P 131 \"File          :%s\"$$\r\n";
+  I1	aux[132];
+  I8	num		fmtstr "$$DA -T 131 \"Line Num      :%04d\"$$\r\n";
+  BoolU4	hide;
+};
+
+class EditManPageLinkStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132];
+  I1	aux[132]	fmtstr "$$DA -P 131 \"Label         :%s\"$$\r\n";
+  I8	num;
+  BoolU4	hide;
+};
+
+class EditPlaceAnchorStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  I1	file[132];
+  I1	aux[132]	fmtstr "$$DA -P 131 \"Anchor Label  :%s\"$$\r\n";
+  I8	num;
+  BoolU4	hide fmtstr "$$CB \"Hide\"$$\r\n";
+};
+
+
+#define CTRL_L_HELP "::/LT/DOC/CtrlL.MUZ"
+I1 *ctrl_L_header="Press WINDOW's key for help\r\n\r\n";
+void EditInsertLink()
+{
+  EditFileLinkStruct *el=MAllocZ(sizeof(EditFileLinkStruct));
+  I8 type=PopUpLinkType;
+  if (type>=0) {
+    el->num=1;
+    switch (type) {
+      case LK_FILE:
+	if (DoForm(el,"EditFileLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"FI:%s\"$$",el->file,el->file);
+	  else
+	    PrintF("$$LK \"%s\",\"FI:%s\"$$",el->display,el->file);
+	}
+	break;
+      case LK_PLAIN:
+	if (DoForm(el,"EditFileLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"PI:%s\"$$",el->file,el->file);
+	  else
+	    PrintF("$$LK \"%s\",\"PI:%s\"$$",el->display,el->file);
+	}
+	break;
+      case LK_FILE_ANCHOR:
+	if (DoForm(el,"EditFileAnchorLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"FA:%s,%s\"$$",el->aux,el->file,el->aux);
+	  else
+	    PrintF("$$LK \"%s\",\"FA:%s,%s\"$$",el->display,el->file,el->aux);
+	}
+	break;
+      case LK_FILE_FIND:
+	if (DoForm(el,"EditFileFindLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (el->num==1) {
+	    if (!el->display[0])
+	      PrintF("$$LK \"%s\",\"FF:%s,%s\"$$",el->aux,el->file,el->aux);
+	    else
+	      PrintF("$$LK \"%s\",\"FF:%s,%s\"$$",el->display,el->file,el->aux);
+	  } else {
+	    if (!el->display[0])
+	      PrintF("$$LK \"%s\",\"FF:%s,%s:%d\"$$",el->aux,el->file,el->aux,el->num);
+	    else
+	      PrintF("$$LK \"%s\",\"FF:%s,%s:%d\"$$",el->display,el->file,el->aux,el->num);
+	  }
+	}
+	break;
+      case LK_PLAIN_FIND:
+	if (DoForm(el,"EditFileFindLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (el->num==1) {
+	    if (!el->display[0])
+	      PrintF("$$LK \"%s\",\"PF:%s,%s\"$$",el->aux,el->file,el->aux);
+	    else
+	      PrintF("$$LK \"%s\",\"PF:%s,%s\"$$",el->display,el->file,el->aux);
+	  } else {
+	    if (!el->display[0])
+	      PrintF("$$LK \"%s\",\"PF:%s,%s:%d\"$$",el->aux,el->file,el->aux,el->num);
+	    else
+	      PrintF("$$LK \"%s\",\"PF:%s,%s:%d\"$$",el->display,el->file,el->aux,el->num);
+	  }
+	}
+	break;
+      case LK_FILE_LINE:
+	if (DoForm(el,"EditFileLineLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"FL:%s,%d\"$$",el->file,el->file,el->num);
+	  else
+	    PrintF("$$LK \"%s\",\"FL:%s,%d\"$$",el->display,el->file,el->num);
+	}
+	break;
+      case LK_PLAIN_LINE:
+	if (DoForm(el,"EditFileLineLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"PL:%s,%d\"$$",el->file,el->file,el->num);
+	  else
+	    PrintF("$$LK \"%s\",\"PL:%s,%d\"$$",el->display,el->file,el->num);
+	}
+	break;
+      case LK_MAN_PAGE:
+	if (DoForm(el,"EditManPageLinkStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0])
+	    PrintF("$$LK \"%s\",\"MN:%s\"$$",el->aux,el->aux);
+	  else
+	    PrintF("$$LK \"%s\",\"MN:%s\"$$",el->display,el->aux);
+	}
+	break;
+      case LK_PLACE_ANCHOR:
+	if (DoForm(el,"EditPlaceAnchorStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+	  if (!el->display[0]) {
+	    if (el->hide)
+	      PrintF("$$AN \"\",\"%s\"$$",el->aux);
+	    else
+	      PrintF("$$AN \"%s\",\"%s\"$$",el->aux,el->aux);
+	  } else
+	    PrintF("$$AN \"%s\",\"%s\"$$",el->display,el->aux);
+	}
+	break;
+    }
+  }
+  Free(el);
+}
+
+I8 PopUpColorType()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutS(l,"$$MU,\"Foreground\" LTFT_FOREGROUND_COLOR$$\r\n");
+  LtfPutS(l,"$$MU,\"Background\" LTFT_BACKGROUND_COLOR$$\r\n");
+  LtfPutS(l,"$$MU,\"Default Foreground\" LTFT_DEFAULT_FOREGROUND_COLOR$$\r\n");
+  LtfPutS(l,"$$MU,\"Default Background\" LTFT_DEFAULT_BACKGROUND_COLOR$$\r\n");
+  LtfPutS(l,"$$MU,\"Link Foreground\" LTFT_LINK_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Link Background\" LTFT_LINK_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Macro Foreground\" LTFT_MACRO_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Macro Background\" LTFT_MACRO_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Anchor Foreground\" LTFT_ANCHOR_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Anchor Background\" LTFT_ANCHOR_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Hidden Foreground\" LTFT_HIDDEN_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Hidden Background\" LTFT_HIDDEN_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Tree Foreground\" LTFT_TREE_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"Tree Background\" LTFT_TREE_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"User Foreground\" LTFT_USER_FOREGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"User Background\" LTFT_USER_BACKGROUND$$\r\n");
+  LtfPutS(l,"$$MU,\"CANCEL\" -1$$");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+
+public I8 PopUpPageSettingType()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutS(l,"$$MU,\"Page Length\",LTFT_PAGE_LENGTH$$\r\n");
+  LtfPutS(l,"$$MU,\"Page Header\",LTFT_HEADER$$\r\n");
+  LtfPutS(l,"$$MU,\"Page Footer\",LTFT_FOOTER$$\r\n");
+  LtfPutS(l,"$$MU,\"Left Margin\",LTFT_LEFT_MARGIN$$\r\n");
+  LtfPutS(l,"$$MU,\"Right Margin\",LTFT_RIGHT_MARGIN$$\r\n");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void EditInsertColor()
+{
+  I8 type=PopUpColorType,col=LTF_DEFAULT;
+  if (type>=0) {
+    col=PopUpColor;
+    if (col!=LTF_DEFAULT)
+      PrintF("$$%Z %d$$",type,"ST_LTF_CMDS",col);
+    else
+      PrintF("$$%Z$$",type,"ST_LTF_CMDS");
+  }
+}
+
+class EditPageSettingStruct
+{
+  I1	value[132]	fmtstr "$$DA -P 131 \"Setting Value:%s\"$$\r\n";
+};
+
+
+void EditInsertPageSetting()
+{
+  I8 type=PopUpPageSettingType;
+  EditPageSettingStruct *el=MAllocZ(sizeof(EditPageSettingStruct));
+  if (type>=0) {
+    if (DoForm(el,"EditPageSettingStruct")) {
+      if (*el->value)
+	PrintF("$$%Z,%s$$",type,"ST_LTF_CMDS",el->value);
+      else
+	PrintF("$$%Z$$",type,"ST_LTF_CMDS");
+    }
+  }
+  Free(el);
+}
+
+I8 PopUpDollarType()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutS(l,"$$MU,\"Link\" LTFT_LINK$$\r\n");
+  LtfPutS(l,"$$MU,\"Text\" LTFT_TEXT$$\r\n");
+  LtfPutS(l,"$$MU,\"Tree Branch\" LTFT_TREE$$\r\n");
+  LtfPutS(l,"$$MU,\"Color\" LTFT_FOREGROUND_COLOR$$\r\n");
+  LtfPutS(l,"$$MU,\"Page Settings\" LTFT_PAGE_LENGTH$$\r\n");
+  LtfPutS(l,"$$MU,\"Cursor Movement\" LTFT_CURSOR_MOVEMENT$$\r\n");
+  LtfPutS(l,"$$MU,\"Button\" LTFT_BUTTON$$\r\n");
+  LtfPutS(l,"$$MU,\"Check Box\" LTFT_CHECK_BOX$$\r\n");
+  LtfPutS(l,"$$MU,\"Macro\" LTFT_MACRO$$\r\n");
+  LtfPutS(l,"$$MU,\"Menu Value\" LTFT_MENU_VALUE$$\r\n");
+  LtfPutS(l,"$$MU,\"Button\" LTFT_BUTTON$$\r\n");
+  LtfPutS(l,"$$MU,\"Data\" LTFT_DATA$$\r\n");
+  LtfPutS(l,"$$MU,\"Hex Edit\" LTFT_HEX_EDIT$$\r\n");
+  LtfPutS(l,"$$MU,\"Hidden Widget\" LTFT_HIDE_START$$\r\n");
+  LtfPutS(l,"$$MU,\"Song\" LTFT_SONG$$\r\n");
+  LtfPutS(l,"$$MU,\"CANCEL\" -1$$");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+class EditDollarTextStruct
+{
+  I1	display[132]	fmtstr "$$DA-P,131,\"Displayed Text:%s\"$$\r\n";
+  BoolU4	left_x	  fmtstr "$$CB \"Left X\"$$\r\n";
+  BoolU4	center_x  fmtstr "$$CB \"Center X\"$$\r\n";
+  BoolU4	right_x   fmtstr "$$CB \"Right X\"$$\r\n";
+  BoolU4	margin_rel fmtstr "$$CB \"Margin Rel X\"$$\r\n";
+  BoolU4	blink	  fmtstr "$$CB \"Blink\"$$\r\n";
+  BoolU4	invert	  fmtstr "$$CB \"Invert\"$$\r\n";
+  BoolU4	underline fmtstr "$$CB \"Underline\"$$\r\n";
+  BoolU4	tree	  fmtstr "$$CB \"Tree\"$$\r\n";
+  BoolU4	collapsed fmtstr "$$CB \"Collapsed\"$$\r\n";
+  BoolU4	alias	  fmtstr "$$CB \"Alias\"$$\r\n";
+  I1	scroll_x [132]	 fmtstr "$$DA-P,131,\"Scroll X Length Expression:%s\"$$\r\n";
+  I1	shift_x  [132]	 fmtstr "$$DA-P,131,\"X Offset Expression       :%s\"$$\r\n";
+  I1	shift_y  [132]	 fmtstr "$$DA-P,131,\"Y Offset Expression       :%s\"$$\r\n";
+};
+
+void EditInsertDollarText()
+{
+  I1 buf[132];
+  EditDollarTextStruct *dt=MAllocZ(sizeof(EditDollarTextStruct));
+  if (DoForm(dt,"EditDollarTextStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (dt->left_x  ) StrCat(buf,"+LX");
+    if (dt->center_x) StrCat(buf,"+CX");
+    if (dt->right_x ) StrCat(buf,"+RX");
+    if (dt->margin_rel) StrCat(buf,"+MRX");
+    if (dt->blink)    StrCat(buf,"+BK");
+    if (dt->invert)   StrCat(buf,"+IV");
+    if (dt->underline) StrCat(buf,"+UL");
+    if (dt->tree)      StrCat(buf,"+TR");
+    if (dt->collapsed) StrCat(buf,"+C");
+    if (dt->alias)     StrCat(buf,"+AL");
+    if (*dt->scroll_x) StrCat(buf,"+SCX");
+    if (*dt->shift_x)  StrCat(buf,"+SX");
+    if (*dt->shift_y)  StrCat(buf,"+SY");
+    PrintF("$$TX %s,\"%s\"",buf,dt->display);
+    if (*dt->shift_x)
+      PrintF(",%s",dt->shift_x);
+    if (*dt->shift_y)
+      PrintF(",%s",dt->shift_y);
+    if (*dt->scroll_x)
+      PrintF(",%s",dt->scroll_x);
+    PrintF("$$");
+  }
+  Free(dt);
+}
+
+class EditSongStruct
+{
+  I1 display[132]	fmtstr "$$DA-P,131,\"Displayed Text:%s\"$$\r\n";
+  I1 song[512]		fmtstr "$$DA-P,511,\"Song          :%s\"$$\r\n";
+};
+
+void EditInsertSong()
+{
+  EditSongStruct *dt=MAllocZ(sizeof(EditSongStruct));
+  if (DoForm(dt,"EditSongStruct",CTRL_L_HELP,TRUE,ctrl_L_header))
+    PrintF("$$SO,\"%s\",\"%s\"$$",dt->display,dt->song);
+  Free(dt);
+}
+
+class EditMacroMenuStruct
+{
+  I1 display[132]	fmtstr "$$DA-P,131,\"Displayed Text            :%s\"$$\r\n";
+  I1 left_macro[512]	fmtstr "$$DA-P,511,\"Left Click Macro          :%s\"$$\r\n";
+  I1 left_exp[132]	fmtstr "$$DA-P,131,\"Left Click Expression     :%s\"$$\r\n";
+  BoolU4 popup		fmtstr "$$CB \"PopUp\"$$\r\n";
+  BoolU4 left_is_auto	fmtstr "$$CB \"Left is AutoString\"$$\r\n";
+  BoolU4 left_x		fmtstr "$$CB \"Left X \"$$\r\n";
+  BoolU4 center_x	fmtstr "$$CB \"Center X \"$$\r\n";
+  BoolU4 right_x	fmtstr "$$CB \"Right X \"$$\r\n";
+  BoolU4 margin_rel	fmtstr "$$CB \"Margin Rel X\"$$\r\n";
+  BoolU4 blink		fmtstr "$$CB \"Blink\"$$\r\n";
+  BoolU4 invert		fmtstr "$$CB \"Invert\"$$\r\n";
+  BoolU4 underline	fmtstr "$$CB \"Underline\"$$\r\n";
+  BoolU4 escape		fmtstr "$$CB \"Escape\"$$\r\n";
+  I1 scroll_x[132]	fmtstr "$$DA-P,131,\"Scroll X Length Expression:%s\"$$\r\n";
+  I1 shift_x[132]	fmtstr "$$DA-P,131,\"X Offset Expression       :%s\"$$\r\n";
+  I1 shift_y[132]	fmtstr "$$DA-P,131,\"Y Offset Expression       :%s\"$$\r\n";
+};
+
+void EditInsertMacroMenu(BoolU4 is_macro)
+{
+  I1 buf[132];
+  EditMacroMenuStruct *dt=MAllocZ(sizeof(EditMacroMenuStruct));
+  dt->underline=TRUE;
+  dt->escape=TRUE;
+  if (DoForm(dt,"EditMacroMenuStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (is_macro && *dt->display) StrCat(buf,"+A ");
+    if (dt->popup)    StrCat(buf,"+PU-X");
+    if (dt->left_x  ) StrCat(buf,"+LX");
+    if (dt->center_x) StrCat(buf,"+CX");
+    if (dt->right_x ) StrCat(buf,"+RX");
+    if (dt->margin_rel) StrCat(buf,"+MRX");
+    if (dt->blink)    StrCat(buf,"+BK");
+    if (dt->invert)   StrCat(buf,"+IV");
+    if (!dt->underline) StrCat(buf,"-UL");
+    if (!dt->escape)	StrCat(buf,"-X");
+    if (*dt->scroll_x) StrCat(buf,"+SCX");
+    if (*dt->shift_x)  StrCat(buf,"+SX");
+    if (*dt->shift_y)  StrCat(buf,"+SY");
+    if (is_macro) {
+      if (*dt->left_exp)	StrCat(buf,"+LE");
+      if (!*dt->left_macro) StrCat(buf,"-LM");
+    } else {
+      if (!*dt->left_exp)	StrCat(buf,"-LE");
+      if (*dt->left_macro) StrCat(buf,"+LM");
+    }
+    if (dt->left_is_auto) StrCat(buf,"+LA");
+    if (dt->display[0] || is_macro) {
+      if (is_macro) {
+	if (*dt->display)
+	  PrintF("$$MA %s,\"%s\"",buf,dt->display);
+	else
+	  PrintF("$$MA %s,",buf);
+      } else
+	PrintF("$$MU %s,\"%s\"",buf,dt->display);
+      if (*dt->left_exp)
+	PrintF(",%s",dt->left_exp);
+      if (*dt->left_macro)
+	PrintF(",\"%s\"",dt->left_macro);
+      if (*dt->shift_x)
+	PrintF(",%s",dt->shift_x);
+      if (*dt->shift_y)
+	PrintF(",%s",dt->shift_y);
+      if (*dt->scroll_x)
+	PrintF(",%s",dt->scroll_x);
+      PrintF("$$");
+    }
+  }
+  Free(dt);
+}
+
+class EditButtonStruct
+{
+  I1	display[132]	fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  BoolU4	popup	 fmtstr "$$CB \"PopUp\"$$\r\n";
+  BoolU4	left_x	 fmtstr "$$CB \"Left X \"$$\r\n";
+  BoolU4	center_x fmtstr "$$CB \"Center X \"$$\r\n";
+  BoolU4	right_x  fmtstr "$$CB \"Right X \"$$\r\n";
+  BoolU4	margin_rel fmtstr "$$CB \"Margin Rel X\"$$\r\n";
+  BoolU4	escape	  fmtstr "$$CB \"Escape\"$$\r\n";
+  I1	left_macro  [132]   fmtstr "$$DA -P 131 \"Left Click Macro:%s\"$$\r\n";
+  BoolU4	left_is_auto	    fmtstr "$$CB \"Left is AutoString\"$$\r\n";
+  I1	left_exp    [132]   fmtstr "$$DA -P 131 \"Left Click Expression:%s\"$$\r\n";
+  BoolU4	quote	 fmtstr "$$CB \"Quote\"$$\r\n";
+};
+
+void EditInsertButton()
+{
+  I1 buf[132];
+  EditButtonStruct *dt=MAllocZ(sizeof(EditButtonStruct));
+  dt->escape=TRUE;
+  if (DoForm(dt,"EditButtonStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (dt->popup)    StrCat(buf,"+PU-X");
+    if (dt->left_x  ) StrCat(buf,"+LX");
+    if (dt->center_x) StrCat(buf,"+CX");
+    if (dt->right_x ) StrCat(buf,"+RX");
+    if (dt->margin_rel) StrCat(buf,"+MRX");
+    if (!dt->escape)	StrCat(buf,"-X");
+    if (!*dt->left_exp)	StrCat(buf,"-LE");
+    if (*dt->left_macro) StrCat(buf,"+LM");
+    if (dt->left_is_auto) StrCat(buf,"+LA");
+    if (dt->display[0]) {
+      if (dt->quote) {
+	PrintF("$$$$BT %s,\\\"%s\\\"",buf,dt->display);
+	if (*dt->left_exp)
+	  PrintF(",%s",dt->left_exp);
+	if (*dt->left_macro)
+	  PrintF(",\\\"%s\\\"",dt->left_macro);
+	PrintF("$$$$");
+      } else {
+	PrintF("$$BT %s,\"%s\"",buf,dt->display);
+	if (*dt->left_exp)
+	  PrintF(",%s",dt->left_exp);
+	if (*dt->left_macro)
+	  PrintF(",\"%s\"",dt->left_macro);
+	PrintF("$$");
+      }
+    }
+  }
+  Free(dt);
+}
+
+
+class EditCursorMovementStruct
+{
+  I1 left_exp[132]	 fmtstr "$$DA -P 131 \"X Expression:%s\"$$\r\n";
+  I1 right_exp[132]	 fmtstr "$$DA -P 131 \"Y Expression:%s\"$$\r\n";
+  BoolU4	left_x	 fmtstr "$$CB \"Left   X \"$$\r\n";
+  BoolU4	center_x fmtstr "$$CB \"Center X \"$$\r\n";
+  BoolU4	right_x  fmtstr "$$CB \"Right  X \"$$\r\n";
+  BoolU4	margin_rel fmtstr "$$CB \"Margin Rel X\"$$\r\n";
+  BoolU4	top_y	 fmtstr "$$CB \"Top    Y \"$$\r\n";
+  BoolU4	center_y fmtstr "$$CB \"Center Y \"$$\r\n";
+  BoolU4	bottom_y fmtstr "$$CB \"Bottom Y \"$$\r\n";
+  BoolU4	page_rel fmtstr "$$CB \"Page Rel Y\"$$\r\n";
+  BoolU4	quote	 fmtstr "$$CB \"Quote\"$$\r\n";
+};
+
+void EditInsertCursorMovement()
+{
+  I1 buf[132];
+  EditCursorMovementStruct *dt=MAllocZ(sizeof(EditCursorMovementStruct));
+  if (DoForm(dt,"EditCursorMovementStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (dt->left_x  ) StrCat(buf,"+LX");
+    if (dt->center_x) StrCat(buf,"+CX");
+    if (dt->right_x ) StrCat(buf,"+RX");
+    if (dt->margin_rel) StrCat(buf,"+MRX");
+    if (dt->top_y   ) StrCat(buf,"+TY");
+    if (dt->center_y) StrCat(buf,"+CY");
+    if (dt->bottom_y) StrCat(buf,"+BY");
+    if (dt->page_rel) StrCat(buf,"+PRY");
+    if (!*dt->left_exp)  StrCat(buf,"-LE");
+    if (!*dt->right_exp) StrCat(buf,"-RE");
+    if (dt->quote)
+      PrintF("$$");
+    PrintF("$$CM %s",buf);
+    if (*dt->left_exp)
+      PrintF(",%s",dt->left_exp);
+    if (*dt->right_exp)
+      PrintF(",%s",dt->right_exp);
+    PrintF("$$");
+    if (dt->quote)
+      PrintF("$$");
+  }
+  Free(dt);
+}
+
+class EditDataStruct
+{
+  I1	format_str [132]   fmtstr "$$DA -P 131 \"Format String:%s\"$$\r\n";
+  U8 len	 fmtstr "$$DA 256 \"Length:%d\"$$\r\n";
+  BoolU4	term	 fmtstr "$$CB \"Terminator\"$$\r\n";
+  BoolU4	string	 fmtstr "$$CB \"String\"$$\r\n";
+  BoolU4	refresh	 fmtstr "$$CB \"Refresh Data\"$$\r\n";
+  BoolU4	password fmtstr "$$CB \"Password\"$$\r\n";
+};
+
+void EditInsertData()
+{
+  I1 buf[132];
+  EditDataStruct *dt=MAllocZ(sizeof(EditDataStruct));
+  dt->term=TRUE;
+  dt->len=256;
+  if (DoForm(dt,"EditDataStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (dt->string)   StrCat(buf,"-P");
+    if (!dt->term)    StrCat(buf,"-T");
+    if (dt->refresh)  StrCat(buf,"+RD");
+    if (dt->password) StrCat(buf,"+PW");
+    PrintF("$$$$DA%s,%d,\\\"%s\\\"$$$$",
+      buf,dt->len,dt->format_str);
+  }
+  Free(dt);
+}
+
+class EditCheckBoxStruct
+{
+  I1	label [132]   fmtstr "$$DA -P 131 \"Displayed Text:%s\"$$\r\n";
+  BoolU4	refresh	 fmtstr "$$CB \"Refresh Data\"$$\r\n";
+};
+
+void EditInsertCheckBox()
+{
+  I1 buf[132];
+  EditCheckBoxStruct *dt=MAllocZ(sizeof(EditCheckBoxStruct));
+  if (DoForm(dt,"EditCheckBoxStruct",CTRL_L_HELP,TRUE)) {
+    *buf=0;
+    if (dt->refresh)  StrCat(buf,"+RD");
+    PrintF("$$$$CB %s,\\\"%s\\\"$$$$",
+      buf,dt->label);
+  }
+  Free(dt);
+}
+
+class EditHexEditStruct
+{
+  U8 cnt fmtstr "$$DA ,256 \"Count:%d\"$$\r\n";
+  U8 cols fmtstr "$$DA ,256 \"Columns:%d\"$$\r\n";
+  BoolU4	zero	 fmtstr "$$CB \"Zero Based\"$$\r\n";
+  BoolU4	refresh	 fmtstr "$$CB \"Refresh Data\"$$\r\n";
+};
+
+void EditInsertHexEdit()
+{
+  I1 buf[132];
+  EditHexEditStruct *dt=MAllocZ(sizeof(EditHexEditStruct));
+  dt->cnt=128;
+  dt->cols=16;
+  dt->zero=TRUE;
+  if (DoForm(dt,"EditHexEditStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (!dt->zero)  StrCat(buf,"-Z");
+    if (dt->refresh)  StrCat(buf,"+RD");
+    PrintF("$$$$HX %s,%d,%d$$$$",
+      buf,dt->cnt,dt->cols);
+  }
+  Free(dt);
+}
+
+class EditTreeStruct
+{
+  I1	label[132] fmtstr "$$DA-P,131,\"Displayed Text:%s\"$$\r\n";
+  I8	indent	   fmtstr "$$DA,131,\"Indention:%d\"$$\r\n";
+  BoolU4	collapsed  fmtstr "$$CB,\"Collapsed\"$$\r\n";
+};
+
+void EditInsertTree()
+{
+  I1 buf[132],*st;
+  EditTreeStruct *dt=MAllocZ(sizeof(EditTreeStruct));
+  dt->collapsed=TRUE;
+  dt->indent=2;
+  if (DoForm(dt,"EditTreeStruct",CTRL_L_HELP,TRUE,ctrl_L_header)) {
+    *buf=0;
+    if (!dt->collapsed)  StrCat(buf,"-C");
+    st=MSPrintF("$$TR %s,\"%s\"$$\r\n$$ID,%d$$*\r\n$$ID,%d$$",
+      buf,dt->label,dt->indent,-dt->indent);
+    LtfSafeInsert(Fs->cur_ltf,st);
+    Free(st);
+  }
+  Free(dt);
+}
+
+void EditInsertHidden()
+{
+  LtfSafeInsert(Fs->cur_ltf,"$$HS$$*$$HE$$");
+}
+
+
+void EditInsertDollarCmd()
+{
+  I8 type=PopUpDollarType;
+  switch (type) {
+    case LTFT_FOREGROUND_COLOR:
+      EditInsertColor;
+      break;
+    case LTFT_PAGE_LENGTH:
+      EditInsertPageSetting;
+      break;
+    case LTFT_LINK:
+      EditInsertLink;
+      break;
+    case LTFT_TEXT:
+      EditInsertDollarText;
+      break;
+    case LTFT_TREE:
+      EditInsertTree;
+      break;
+    case LTFT_MACRO:
+      EditInsertMacroMenu(TRUE);
+      break;
+    case LTFT_MENU_VALUE:
+      EditInsertMacroMenu(FALSE);
+      break;
+    case LTFT_CURSOR_MOVEMENT:
+      EditInsertCursorMovement;
+      break;
+    case LTFT_BUTTON:
+      EditInsertButton;
+      break;
+    case LTFT_DATA:
+      EditInsertData;
+      break;
+    case LTFT_CHECK_BOX:
+      EditInsertCheckBox;
+      break;
+    case LTFT_HEX_EDIT:
+      EditInsertHexEdit;
+      break;
+    case LTFT_HIDE_START:
+      EditInsertHidden;
+      break;
+    case LTFT_SONG:
+      EditInsertSong;
+      break;
+   }
+}
+
+I1 *FavoritesFileName()
+{
+  return MSPrintF("::/LT/ACCOUNTS/%s/FAVOR.MUZ",
+    Fs->account->name);
+}
+
+public void DoFavorites()
+{
+  I1 *name=FavoritesFileName;
+  Edit(name);
+  Free(name);
+}
+
+I1 captured_macro_name[128];
+*captured_macro_name=0;
+
+I8 PopUpExitRecordPlayStopInsert()
+{
+  I8 result=0;
+  I1 buf[80];
+  TssCmdStruct *tempc;
+  Ltf *l=LtfNew;
+  LtfEntry *ll;
+  ll=LtfPutS(l,"$$DA -P ,127 \"Name:%s\"$$");
+  ll->data=captured_macro_name;
+  LtfFormatData(ll);
+  LtfPutS(l,"$$CM +LX +TY, 2,4$$$$BT, \"RECORD\" 1$$");
+  LtfPutS(l,"$$CM +LX +TY, 18,4$$$$BT, \"PLAY\" 2$$");
+  LtfPutS(l,"$$CM +LX +TY, 2,7$$$$BT, \"STOP\" 3$$");
+  LtfPutS(l,"$$CM +LX +TY, 18,7$$$$BT, \"EXIT\" 0$$");
+  LtfPutS(l,"$$CM +LX +TY, 2,10$$$$BT, \"INSERT\" 4$$");
+  l->flags|=LTFF_MIN_SIZE | LTFF_FORM;
+  SPrintF(buf,"DoMenu(0x%X);",l);
+  macro_util_tss=Spawn(&ServantUserCmdLine,"MACRO POPUP",Fs);
+  Fs->popup_tss=macro_util_tss;
+  tempc=QueueTaskRequest(macro_util_tss,Fs,buf,
+    1<<TSSCf_WAKE_MASTER | 1<<TSSCf_FOCUS_MASTER);
+  GetRequestResult(tempc,&result);
+  Fs->popup_tss=NULL;
+  Kill(macro_util_tss);
+  macro_util_tss=NULL;
+  SwapInNext;  //Kill task
+  LtfGetData(ll);
+  LtfDel(l);
+  return result;
+}
+
+
+void DelSysMacro()
+{
+  TssCmdStruct *tempc,*tempc1;
+  tempc=sys_macro_queue.next;
+  while (tempc!=&sys_macro_queue) {
+    tempc1=tempc->next;
+    RemQue(tempc);
+    AFree(tempc);
+    tempc=tempc1;
+  }
+}
+
+I1 *SysMacro2Str()
+{
+  TssCmdStruct *tempc;
+  I8 cnt=0;
+  I1 *ptr,*m;
+  Btr(&sys_flags,SYSf_RECORD_MACRO);
+  tempc=sys_macro_queue.next;
+  while (tempc!=&sys_macro_queue) {
+    cnt++;
+    tempc=tempc->next;
+  }
+  m=MAlloc(cnt*54+1);
+  ptr=m;
+
+  tempc=sys_macro_queue.next;
+  while (tempc!=&sys_macro_queue) {
+    SPrintF(ptr,"Msg(0x%08X,0x%016X,0x%016X);",
+      tempc->code,tempc->p1,tempc->p2);
+    ptr+=54;
+    tempc=tempc->next;
+  }
+  return m;
+}
+
+void PlaySysMacro()
+{
+  I1 *m=SysMacro2Str;
+  while (sys_cur_focus_task==Fs)
+    SwapInNext;
+  XTalkString(sys_cur_focus_task,m);
+  Free(m);
+}
+
+void MacroTask()
+{
+  I8 i;
+  StrCpy(captured_macro_name,"Click Here");
+  do {
+    i=PopUpExitRecordPlayStopInsert;
+    RefocusWindow;
+    switch (i) {
+      case 1:
+	Btr(&sys_flags,SYSf_RECORD_MACRO);
+	DelSysMacro;
+	Bts(&sys_flags,SYSf_RECORD_MACRO);
+	break;
+      case 2:
+	PlaySysMacro;
+	break;
+      case 3:
+	Btr(&sys_flags,SYSf_RECORD_MACRO);
+	break;
+      case 4:
+	if (sys_cur_focus_task)
+	  QueueMsg(sys_cur_focus_task,0,
+	    MSG_KEY_DOWN,0,SC_F2|SCF_SHIFT,0);
+	break;
+    }
+  } while (i>0);
+}
+
+void EditMacroUtil()
+{
+  if (!macro_util_tss)
+    Spawn(&MacroTask,"MACRO TASK");
+}
+
+void EditInsertCapturedMacro()
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *st=SysMacro2Str;
+  PrintF("$$MA+A+LM+LA,\"%s\",\"%s\"$$",
+      captured_macro_name,st);
+  Free(st);
+  Preempt(old_preempt);
+}
+
+public U8 LtfPutChar(Ltf *l,I8 ch,U8 sc,BoolU4 old_preempt)
+{
+  U8 sc2;
+  BoolU4 old_preempt2=Preempt(OFF);
+  LtfEntry *cl;
+  I8 i,x,y,ms=0;
+  I1 *st;
+  if (ch!=CH_ESC && ch!=CH_CTRLQ) {
+    cl=l->cur_entry;
+    x=l->x; y=l->y;
+
+    sc2=sc.u1[0];
+    if (sc2==SC_GUI) {
+      if (l->menu_ltf) {
+	ms=DoMenu(l->menu_ltf);
+	sc=0; sc2=0; ch=0;
+      }
+    }
+
+    if (l->EditPlugIns) {
+      if (l->EditPlugIns(l,ch,sc)) {
+	sc=0; sc2=0; ch=0;
+      }
+    }
+
+    if (Bt(printable_chars_bitmap,ch))
+      EditInsertChar(ch,sc,l,old_preempt);
+    else if (sc2>=SC_F1 && sc2<=SC_F10 && sc & SCF_CTRL && !(sc & SCF_ALT)) {
+      if (!ws_task)
+	ws_task=Spawn(&WsTsk,"WORDSTAT");
+      else {
+	if ((sc & SCF_SHIFT))
+	  WsMan(sc2-SC_F1+1,Fs);
+	else
+	  WsFillin(sc2-SC_F1+1);
+      }
+    } else if (sc2==SC_CURSOR_DOWN||sc2==SC_END) {
+      if (sc2==SC_END || sc & SCF_CTRL) {
+	while (l->cur_entry!=l) {
+	  if ((sc & SCF_SHIFT))
+	    l->cur_entry->type|=LTFLT_SELECTED;
+	  else
+	    l->cur_entry->type&=~LTFLT_SELECTED;
+	  l->cur_entry=l->cur_entry->next;
+	}
+	l->cur_data_col=l->cur_entry->min_col;
+	l->recalc_start=l;
+      } else
+	EditLineDown(l,sc);
+    } else if (sc2==SC_CURSOR_UP||sc2==SC_HOME) {
+      if (sc2==SC_HOME || sc & SCF_CTRL) {
+	while (l->cur_entry!=l) {
+	  if ((sc & SCF_SHIFT))
+	    l->cur_entry->type|=LTFLT_SELECTED;
+	  else
+	    l->cur_entry->type&=~LTFLT_SELECTED;
+	  l->cur_entry=l->cur_entry->last;
+	}
+	l->cur_entry=l->dummy.next;
+	l->cur_data_col=l->cur_entry->min_col;
+	l->recalc_start=l;
+      } else
+	EditLineUp(l,sc);
+    } else if (sc2==SC_PAGE_DOWN) {
+      if (cl!=l)
+	cl=cl->last;
+      for (i=Fs->window_top;i<Fs->window_bottom;i++) {
+	EditLineDown(l,sc);
+	l->y=l->cur_entry->y;
+      }
+      l->recalc_start=cl;
+    } else if (sc2==SC_PAGE_UP) {
+      for (i=Fs->window_top;i<Fs->window_bottom;i++) {
+	EditLineUp(l,sc);
+	l->y=l->cur_entry->y;
+      }
+      cl=l->cur_entry;
+      if (cl==l)
+	l->recalc_start=cl;
+      else
+	l->recalc_start=cl->last;
+    } else if (sc2==SC_CURSOR_LEFT)
+      EditCursorLeft(l,sc);
+    else if (sc2==SC_CURSOR_RIGHT)
+      EditCursorRight(l,sc);
+    else if (sc2==SC_DELETE) {
+      if ((sc & SCF_SHIFT))
+	EditCutToClipboard(l);
+      else
+	EditDelChar(l);
+    } else if (ch==CH_BACKSPACE) {
+      if (l->cur_data_col<=l->cur_entry->min_col) {
+	l->cur_entry=l->cur_entry->last;
+	if (l->cur_entry!=l && l->cur_entry->btype==LTFT_SOFT_CR)
+	  l->cur_entry=l->cur_entry->last;
+	if (l->cur_entry==l ||
+	  (l->cur_entry->btype==LTFT_USER_FOREGROUND ||
+	   l->cur_entry->btype==LTFT_USER_BACKGROUND)) {
+	  l->cur_entry=l->cur_entry->next;
+	  l->cur_data_col=l->cur_entry->min_col;
+	} else {
+	  l->cur_data_col=l->cur_entry->max_col;
+	  if (l->cur_data_col>l->cur_entry->min_col)
+	    l->cur_data_col--;
+	  EditDelChar(l);
+	}
+      } else {
+	l->cur_data_col--;
+	EditDelChar(l);
+      }
+    } else if (ch==25) //ctrl Y
+      EditDelLine(l);
+    else if (ch==12) //ctrl L
+      EditInsertDollarCmd;
+    else if (ch==20)
+      TogglePlainTextMode(l);
+    else if (sc2==SC_INSERT) {
+      if ((sc & SCF_SHIFT))
+	EditInsertLtf(l,sys_clipboard_ltf);
+      else if (sc & SCF_CTRL)
+	EditCopyToClipboard(l);
+      else
+	l->flags^=LTFF_OVERSTRIKE;
+    } else if (ch==6) { //CTRL F
+      if ((sc & SCF_SHIFT))
+	DoFavorites;
+      else
+	EditReplace(l);
+    } else if (ch==18) { //CTRL R
+      if (cl->btype==LTFT_PICTURE)
+	EditExistingGraphic(l,
+	 ((x-l->line_start_col)>>2+cl->max_col)*FONT_WIDTH,
+	 (y-l->cur_top_line_num)*FONT_HEIGHT);
+      else
+	EditInsertGraphic(l,
+	 (x-l->line_start_col)>>2*FONT_WIDTH,
+	 (y-l->cur_top_line_num)*FONT_HEIGHT);
+    } else if (sc2==SC_F2  && !(sc & SCF_CTRL) && !(sc & SCF_ALT)) {
+      if ((sc & SCF_SHIFT))
+	EditInsertCapturedMacro;
+      else
+	EditMacroUtil;
+    } else if (sc2==SC_F9  && !(sc & SCF_CTRL) && !(sc & SCF_ALT)) {
+      if ((sc & SCF_SHIFT))
+	ClearAllBpts(l);
+      else
+	ToggleBpt(l);
+    } else if (sc2==SC_F5  && !(sc & SCF_CTRL) && !(sc & SCF_ALT)) {
+      if ((sc & SCF_SHIFT))
+	LtfStep(l);
+      else
+	LtfGo;
+    } else if (sc2==SC_F3  && !(sc & SCF_CTRL) && !(sc & SCF_ALT)) {
+      l->find_replace->scan_forward=!(sc & SCF_SHIFT);
+      EditFindNext(l);
+    } else if (sc2==SC_F4  && !(sc & SCF_CTRL) && !(sc & SCF_ALT)) {
+      if ((sc & SCF_SHIFT))
+	st=PopUpPickDir;
+      else
+	st=PopUpPickFile;
+      if (st) {
+	PrintF("\"%s\"",st);
+	Free(st);
+      }
+    } else if (ch==7) //CTRL G
+      EditGoToLine(l);
+    else if (ch==19)  // CTRL S
+      LtfWrite(l);
+    else if (ch==1) //CTRL A
+      LtfWrite(l,TRUE);
+    else if (ch==14) { //CTRL N
+      if ((sc & SCF_SHIFT))
+	PrintF("$$ID,-2$$");
+      else
+	PrintF("$$ID,2$$");
+    } else if (ch==23) { //CTRL W
+      if ((sc & SCF_SHIFT))
+	PrintF("$$WW 0$$");
+      else
+	PrintF("$$WW 1$$");
+    } else if (ch==2) { //CTRL B
+      if ((sc & SCF_SHIFT))
+	PrintF("$$BK 0$$");
+      else
+	PrintF("$$BK 1$$");
+    } else if (ch==21) { //CTRL U
+      if ((sc & SCF_SHIFT))
+	PrintF("$$UL 0$$");
+      else
+	PrintF("$$UL 1$$");
+    } else if (ch==26) { //CTRL Z
+      if ((sc & SCF_SHIFT))
+	PrintF("$$IV 0$$");
+      else
+	PrintF("$$IV 1$$");
+    } else if (ch==16) { //CTRL P
+      if ((sc & SCF_SHIFT))
+	PrintF("$$SY 0$$");
+      else if ((sc & SCF_ALT))
+	PrintF("$$SY 3$$");
+      else
+	PrintF("$$SY,-3$$");
+    } else if (sc2==SC_PRTSCRN2)
+      Lpt1PrintLtf(l);
+
+    if (!l->recalc_start)
+      l->recalc_start=l->cur_entry->last;
+  }
+  Preempt(old_preempt2);
+
+  SwapInNext;
+  return ms;
+}
+
+public void LtfPutSPartial(Ltf *l,I1 *st)
+{
+  U1 ch;
+  I1 *b,*src,*dst,*ptr=st,*ptr2;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *cl,*nl;
+  I8 i,j;
+  if (!st) {
+    Preempt(old_preempt);
+    return;
+  }
+  while (ch=*ptr) {
+    if (!Bt(displayable_chars_bitmap,ch) || ch=='$$' ||
+	l->flags & (LTFF_OVERSTRIKE | LTFF_IN_DOLLAR)) {
+      LtfPutChar(l,ch,0,old_preempt);
+      ptr++;
+    } else {
+      ptr2=ptr++;
+      while (TRUE) {
+	ch=*ptr++;
+	if (!Bt(displayable_chars_bitmap,ch) || ch=='$$')
+	  break;
+      }
+      ptr--;
+      *ptr=0;
+      cl=l->cur_entry;
+      l->recalc_start=cl->last;
+      j=StrLen(ptr2);
+      if (cl->btype==LTFT_TEXT) {
+	b=MAlloc(cl->max_col+j+1,l->mem_tss);
+	dst=b;
+	src=cl->display;
+	i=l->cur_data_col;
+	l->cur_data_col=i+j;
+	cl->max_col+=j;
+	while (i-->0)
+	  *dst++=*src++;
+	while (j-->0)
+	  *dst++=*ptr2++;
+	while (*dst++=*src++);
+	Free(cl->display,l->mem_tss);
+	cl->display=b;
+      } else {
+	nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	nl->type=LTFT_TEXT | l->text_attribute << 8;
+	nl->display=NewString(ptr2,l->mem_tss);
+	nl->x=cl->x;
+	nl->y=cl->y;
+	nl->max_col=StrLen(ptr2);
+	nl->indent=cl->indent;
+	nl->page_line_num=cl->page_line_num;
+	nl->left_margin=cl->left_margin;
+	nl->right_margin=cl->right_margin;
+	InsQue(nl,cl->last);
+	l->cur_entry=nl;
+	l->cur_data_col=StrLen(ptr2);
+      }
+      *ptr=ch;
+      LtfRemoveSoftCRs(l,l->cur_entry);
+    }
+    SwapInNext;
+  }
+  Preempt(old_preempt);
+
+}
+
+public void LtfEditFile(I8 type,I1 *filename,
+  I1 *pattern=NULL,I8 num=1)
+{
+  I1 *ptr;
+  I8 i,j,flags=0;
+  LtfEntry *ll;
+  Ltf *l,*m;
+
+  if (type==LK_PLAIN) {
+    type=LK_FILE;
+    flags=LTFF_PLAIN_TEXT;
+  } else if (type==LK_PLAIN_FIND) {
+    type=LK_FILE_FIND;
+    flags=LTFF_PLAIN_TEXT;
+  } else if (type==LK_PLAIN_LINE) {
+    type=LK_FILE_LINE;
+    flags=LTFF_PLAIN_TEXT;
+  }
+  if (!*filename)
+    l=Fs->cur_ltf;
+  else {
+    l=LtfRead(filename,flags);
+    l->flags|=LTFF_ATTR_BY_FILENAME;
+    m=LtfRead(EDIT_MENU_NAME);
+    m->text_attribute=(WHITE<<4)+LTBLUE;
+    l->menu_ltf=m;
+  }
+  if (type==LK_FILE) {
+    if (l->y)
+      LtfCenter(l);
+  } else if (type==LK_FILE_LINE) {
+    l->y=num-1;
+    l->x=0;
+    LtfUpdateWindowJoin(l,FALSE,FALSE,FALSE,TRUE);
+    LtfCenter(l);
+  } else if (type==LK_FILE_ANCHOR) {
+    if (ll=LtfFindAnchor(l,pattern))
+      LtfCenter(l);
+  } else if (type==LK_FILE_FIND) {
+    i=num;
+    ll=l->dummy.next;
+    while (ll!=l) {
+      if (Bt(ltf_display_types,ll->btype)) {
+	if (ptr=StrIStr(ll->display,pattern)) {
+	  j=ptr-ll->display;
+	  i--;
+	  if (i==0) {
+	    l->cur_entry=ll;
+	    if (j<ll->min_col) j=ll->min_col;
+	    if (j>ll->max_col) j=ll->max_col;
+	    l->cur_data_col=j;
+	    LtfCenter(l);
+	    break;
+	  }
+	}
+      }
+      ll=ll->next;
+    }
+  }
+  if (DoLtf(l,FALSE))
+    LtfWrite(l);
+  if (Fs->cur_ltf!=l)
+    LtfDel(l);
+}
+
+public void Edit(I1 *filename)
+{
+  I1 *buf=NewString(filename),
+       *buf2=NewString(filename);
+  U8 num=1;
+  I1 *temp_filename=NewString(filename),
+       *tfn_ptr=temp_filename;
+  SysHashEntry *temph;
+  Ltf *cur;
+  I8 i;
+
+  i=LK_FILE;
+  StrCpy(temp_filename,filename);
+  if (StrLen(filename)>3 && filename[2]==':') {
+    buf[2]=0;
+    i=MatchSysTextEntry(buf,"ST_LINK_TYPES",MLE_IGNORE_CASE);
+    tfn_ptr=temp_filename+3;
+    if (i==LK_MAN_PAGE) {
+      temph=FindLocalHash(tfn_ptr,
+	HTT_GLBL_VAR|HTT_CLASS|HTT_FUNCTION|
+	HTT_STRING_CONSTANT|HTT_SYS_SYMBOL);
+      if (temph)
+	Edit(temph->source_link);
+      Free(temp_filename);
+      Free(buf);
+      Free(buf2);
+      return;
+    }
+    if (i==LK_FILE_LINE||i==LK_PLAIN_LINE) {
+      if (Occurrences(tfn_ptr,',')) {
+	RemoveLastSeg(tfn_ptr,",",buf);
+	num=AtoI(buf);
+      }
+    } else if (i==LK_FILE_ANCHOR) {
+      *buf=0;
+      if (Occurrences(tfn_ptr,','))
+	RemoveLastSeg(tfn_ptr,",",buf);
+    } else if (i==LK_FILE_FIND||i==LK_PLAIN_FIND) {
+      *buf=0;
+      *buf2=0;
+      if (Occurrences(tfn_ptr,','))
+	RemoveLastSeg(tfn_ptr,",",buf);
+      if (Occurrences(buf,':')) {
+	RemoveLastSeg(buf,":",buf2);
+	num=AtoI(buf2);
+      }
+    }
+  }
+  tfn_ptr=NewString(tfn_ptr);
+  LtfEditFile(i,tfn_ptr,buf,num);
+  ClearWindowText;
+  CursorHome;
+  Free(tfn_ptr);
+  Free(temp_filename);
+  Free(buf);
+  Free(buf2);
+}
+
+public void Plain(I1 *filename)
+{
+  I1 *buf=MSPrintF("PI:%s",filename);
+  Edit(buf);
+  Free(buf);
+}
+
+public void UseConsoleLtf(I1 *menu_file)
+{
+  BoolU4 old_preempt;
+  LtfEntry *ll;
+  Ltf *l=LtfNew,*m,*aux=LtfNew;
+  l->max_entries=4096;
+  l->flags|=LTFF_ATTR_BY_PARTITION;
+
+  LtfPutS(aux,"$$CM+BY+RX,-6,1$$");
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditOverStrikeCB;
+  LtfPutS(aux,"$$CM+BY+RX,-5,1$$");  //gets merged without this
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditDollarCB;
+  LtfPutS(aux,"$$CM+BY+RX,-4,1$$");  //gets merged without this
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditQuotesCB;
+  LtfPutS(aux,"$$CM+BY+RX,-3,1$$");  //gets merged without this
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditBracesCB;
+  LtfPutS(aux,"$$CM+BY+RX,-2,1$$");  //gets merged without this
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditSemicolonCB;
+  LtfPutS(aux,"$$CM+BY+RX,-10,1$$");
+  ll=LtfPutS(aux,"$$TX+BD+DC+RD,\" \"$$");
+  ll->display_cb=&EditDollarTypeCB;
+  aux->user_data=l;
+
+  LtfPutS(aux,"$$CM+TY,0,-1$$");
+  ll=LtfPutS(aux,"$$DA-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$");
+  ll->data=&Fs->task_descriptor;
+  LtfFormatData(ll);
+  LtfPrintF(aux,"$$CM,1,0$$$$TX+BD+IV,\"%X\"$$",Fs);
+  aux->text_attribute=Fs->border_attribute;
+  if (Bt(&Fs->crt_flags,CRTf_HAS_CLOSE_WINDOW))
+    LtfPutS(aux,"$$TX+RX+BD,\"[X]\"$$");
+  if (menu_file) {
+    LtfPutS(aux,"$$TX+LX+BD,\"MENU\"$$");
+    m=LtfRead(menu_file);
+    m->flags|=LTFF_ATTR_BY_PARTITION;
+    l->menu_ltf=m;
+    Bts(&Fs->crt_flags,CRTf_HAS_MENU);
+  }
+
+  old_preempt=Preempt(OFF);
+  Fs->update_window=&LtfUpdateCurLtfWindow;
+  Fs->cur_ltf=l;
+  Fs->aux_ltf=aux;
+  Fs->scroll_speed=7;
+  Preempt(old_preempt);
+}
+
+public I1 *LtfGetLine(Ltf *l,LtfEntry *cl,I8 *cur_col=NULL)
+{
+  LtfEntry *cl2=cl;
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *result,*dst,*src,*start;
+  U8 i=0;
+  if (*cur_col)
+    *cur_col=-1;
+  while (cl2!=l && cl2->btype!=LTFT_CR) {
+    if (Bt(ltf_display_types,cl2->btype))
+      i+=StrLen(cl2->display);
+    else if (cl2->btype==LTFT_TAB)
+      i++;
+    cl2=cl2->next;
+  }
+  result=MAlloc(i+1);
+  dst=result;
+  while (cl!=l && cl->btype!=LTFT_CR) {
+    start=dst;
+    if (Bt(ltf_display_types,cl->btype)) {
+      src=cl->display;
+      while (*src)
+	*dst++=*src++;
+    } else if (cl->btype==LTFT_TAB)
+      *dst++=9;
+    if (cl==l->cur_entry && cur_col)
+      *cur_col=start-result+l->cur_data_col;
+    cl=cl->next;
+  }
+  *dst++=0;
+  if (cl==l->cur_entry && cur_col && !l->cur_data_col)
+    *cur_col=dst-1-result;
+  Preempt(old_preempt);
+  return result;
+}
+
+public BoolU4 View()
+{
+  I8 ch=0;
+  U8 sc=0;
+  Ltf *l=Fs->cur_ltf;
+  U8 my_LtfPutChar(LTChnl *chnl,I8 ch,U8 sc);
+  while (ch!=CH_ESC && ch!=CH_CTRLQ) {
+    ch=GetChar2(&sc);
+    LtfPutChar(l,ch,sc,Bt(&sys_flags,SYSf_PREEMPTIVE));
+    if (Fs->rmt_chnl) {
+      my_LtfPutChar=ext[EXT_RMT_LTFPUTCHAR];
+      my_LtfPutChar(Fs->rmt_chnl,ch,sc);
+    }
+    LtfRecalc(l);
+  }
+  return ch==CH_ESC;
+}
+
+
+public LtfEntry *LtfPutLine(LtfEntry *cl)
+{
+  while (cl->btype!=LTFT_ERROR && cl->btype!=LTFT_CR) {
+    if (Bt(ltf_display_types,cl->btype))
+      PutS(cl->display);
+    else if (cl->btype==LTFT_TAB)
+      PutChar(CH_TAB);
+    cl=cl->next;
+  }
+  CrLf;
+  return (cl->btype==LTFT_ERROR) ? cl:cl->next;
+}
+
+I1 *SysGetS()
+{
+  Ltf *l=Fs->cur_ltf;
+  LtfEntry *cl;
+  BoolU4 old_preempt;
+  I1 *result;
+  U8 ch,sc;
+  U8 my_LtfPutChar(LTChnl *chnl,I8 ch,U8 sc);
+  old_preempt=Preempt(OFF);
+  PutS("$$FU$$$$BU$$");
+  do {
+    Preempt(old_preempt);
+    ch=GetChar2(&sc);
+    Preempt(OFF);
+    cl=l->cur_entry;
+    if (ch==CH_ESC) {
+      LtfBottom(l);
+      LtfRunLine(l,cl,TRUE,old_preempt);
+    } if (ch==CH_CTRLQ)
+      Exit;
+    else {
+      LtfPutChar(l,ch,sc,old_preempt);
+      if (Fs->rmt_chnl) {
+	my_LtfPutChar=ext[EXT_RMT_LTFPUTCHAR];
+	my_LtfPutChar(Fs->rmt_chnl,ch,sc);
+      }
+      LtfRecalc(l);
+    }
+//Ctrl shift <CR> is a blank line without entry
+  } while (ch!=CH_CR || sc & SCF_CTRL && (sc & SCF_SHIFT));
+
+  cl=l->cur_entry;
+  do cl=cl->last;
+  while (cl!=l && cl->btype!=LTFT_CR &&
+    cl->btype!=LTFT_USER_FOREGROUND && cl->btype!=LTFT_USER_BACKGROUND);
+
+
+  do cl=cl->last;
+  while (cl!=l && cl->btype!=LTFT_CR &&
+    cl->btype!=LTFT_USER_FOREGROUND && cl->btype!=LTFT_USER_BACKGROUND);
+
+  cl=cl->next;
+  result=LtfGetLine(l,cl,NULL);
+  PutS("$$FU$$$$FG$$$$BG$$");
+  Preempt(old_preempt);
+  return result;
+}
+
+I1 *SysPrompt(BoolU4 double_semicolon=FALSE)
+{
+  I8 i;
+  I1 *s,*result;
+
+  for (i=Fs->answers_displayed;i>0;i--) {
+    if (Fs->answers_types[i-1]==IT_DOUBLE)
+      PrintF("ansd%d=%15.7g=%15e\r\n",i-1,
+	Fs->double_answers[i-1],Fs->double_answers[i-1]);
+    else
+      PrintF("ans%d=0x%016X=%d\r\n",i-1,
+	Fs->answers[i-1],Fs->answers[i-1]);
+  }
+  PrintFDriveTextAttr(PartitionToDrive);
+  s=CurDir;
+  PutS(s);
+  Free(s);
+  PutChar('>');
+  s=SysGetS;
+  if (double_semicolon) {
+    i=StrLen(s);
+    result=MAlloc(i+4);
+    MemCpy(result,s,i+1);
+    i--;
+    while (i>=0 && (result[i]==CH_SPACE || result[i]==CH_SHIFT_SPACE || result[i]==CH_TAB))
+      i--;
+    i++;
+    if (i>0 && result[i-1]==';')
+      result[i++]=';'; //The Lex goes one beyond
+    result[i++]=13;//#define goes to <cr>
+    result[i++]=10;
+    result[i]=0;
+  } else
+    result=NewString(s);
+  Free(s);
+  return result;
+}
+
+public I8 PmtI8(I1 *msg,I8 default,I8 lo=MIN_I8,I8 hi=MAX_I8)
+{
+  I8 result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default);
+    st=SysGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=AtoI(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+public double PmtDouble(I1 *msg,double default,double lo=MIN_double,double hi=MAX_double)
+{
+  double result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default);
+    st=SysGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=A2Double(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+public I1 *PmtStr(I1 *msg,I1 *default)
+{
+  I1 *st;
+  PrintF(msg,default);
+  st=SysGetS;
+  if (!*st) {
+    Free(st);
+    return NewString(default);
+  }
+  return st;
+}
+
+public LTDate PmtLTDate(I1 *msg,LTDate default,LTDate lo=MIN_I8,LTDate hi=MAX_I8)
+{
+  LTDate result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default.date,default.time);
+    st=SysGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=A2LTDate(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+I8 PopUpCancelIncludeDelAuto(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutS(l,header);
+  LtfPutS(l,"$$CM +LX,2,4 $$$$BT, \"INCLUDE\" 1$$");
+  LtfPutS(l,"$$CM +LX,18,0$$$$BT, \"DELETE\" 2$$");
+  LtfPutS(l,"$$CM +LX,2,3 $$$$BT, \"AUTOFILE\" 3$$");
+  LtfPutS(l,"$$CM +LX,18,0$$$$BT, \"COMPILE\" 5$$");
+  LtfPutS(l,"$$CM +LX,2,3 $$$$BT, \"ADAM_INCLUDE\" 4$$");
+  LtfPutS(l,"$$CM +LX,18,0$$$$BT, \"CANCEL\" 0$$");
+  LtfPutS(l,"$$CM +LX,2,3 $$$$BT, \"LOAD\" 6$$");
+  if (footer) LtfPutS(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void LeftClickLink(Ltf *l,LtfEntry *cl,U2 old_preempt2)
+{
+  BoolU4 old_preempt=Bt(&sys_flags,SYSf_PREEMPTIVE);
+  I1 *st;
+  l;//ref to prevent warning
+  if (cl->flags & LTFLF_AUX_STRING)
+    st=NewString(cl->aux_string);
+  else
+    st=NewString(cl->display);
+  Preempt(old_preempt2);
+  Edit(st);
+  Preempt(old_preempt);
+  Free(st);
+}
+
+void LeftDoubleClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2)
+{  //TODO come-up with new uses.
+ l;cl;old_preempt2;//ref to prevent warning
+}
+
+void RightClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2)
+{
+  BoolU4 send_cr=FALSE,old_preempt=Bt(&sys_flags,SYSf_PREEMPTIVE);
+  I1 *st2,*st;
+  I8 i;
+  if (cl->flags & LTFLF_AUX_STRING)
+    st2=NewString(cl->aux_string);
+  else
+    st2=NewString(cl->display);
+  st=(st2[2]==':') ? st2+3:st2;
+  i=PopUpCancelIncludeDelAuto(st);
+  Preempt(old_preempt2);
+  if (i>0) {
+    LtfBottom(l);
+    switch (i) {
+      case 1:
+	if (Occurrences(st,'.') && !WildCardMatch("*.CP?",st)) {
+	  if (!PopUpNoYes("WARNING: Not .CP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "#include \"",st,"\";\r\n$$FU$$$$FG$$$$BG$$";
+	ExecuteFile(st);
+	break;
+      case 2:
+	Del(st);
+	break;
+      case 3:
+	if (Occurrences(st,'.') && !WildCardMatch("*.AU?",st)) {
+	  if (!PopUpNoYes("WARNING: Not .AU? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "AutoFile(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	AutoString("%F\r",st);
+	break;
+      case 4:
+	if (Occurrences(st,'.') && !WildCardMatch("*.CP?",st)) {
+	  if (!PopUpNoYes("WARNING: Not .CP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "Adam(\"#include \\\"",st,"\\\"\" );\r\n$$FU$$$$FG$$$$BG$$";
+	Adam(";#include \"%s\"",st);
+	break;
+      case 5:
+	if (Occurrences(st,'.') && !WildFileNameList("*.CP?;*.AS?",st)) {
+	  if (!PopUpNoYes("WARNING: Not .CP? or .AS? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "CompileFile(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	CompileFile(st);
+	break;
+      case 6:
+	if (Occurrences(st,'.') && !WildCardMatch("*.BI?",st)) {
+	  if (!PopUpNoYes("WARNING: Not .BI? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "Load(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	Load(st);
+	break;
+    }
+  } else
+    send_cr=TRUE;
+  LtfBottom(l);
+  cout "$$FU$$$$FG$$$$BG$$";
+  if (send_cr)
+    PutChar(CH_CR);
+  Preempt(old_preempt);
+  Free(st2);
+}
+
+void RightDoubleClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2)
+{  //TODO come-up with new uses.
+ l;cl;old_preempt2;//ref to prevent warning
+}
+
+public void Man(I1 *st)
+{
+  I1 *name=MAlloc(3+StrLen(st)+1);
+  StrCpy(name,"MN:");
+  StrCat(name,st);
+  Edit(name);
+  Free(name);
+}
+
+ext[EXT_LTF_PUT_I1]=&LtfPutChar;
+ext[EXT_LTF_PUTS]=&LtfPutSPartial;
+ext[EXT_LTF_READ]=&LtfRead;
+ext[EXT_LTF_WRITE]=&LtfWrite;
+ext[EXT_LTF_NEW]=&LtfNew;
+ext[EXT_LTF_RESET]=&LtfReset;
+ext[EXT_LTF_DEL]=&LtfDel;
+
+ 

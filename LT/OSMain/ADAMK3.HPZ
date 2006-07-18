@@ -1,0 +1,290 @@
+extern SysAccntStruct sys_accounts;
+public extern TssStruct *adam_tss;
+public extern U4 num_spawned_users;
+extern TssCmdStruct sys_macro_queue;
+extern TssStruct *macro_util_tss;
+public extern U1 *grfont;
+extern U4 *vga_image;
+
+extern U4 FDC_retries;
+extern U4 FDC_DRIVE_HEADS;
+extern U4 FDC_DISK_CYLINDERS;
+extern U4 FDC_DISK_SECTORS;
+extern U4 FDC_MAX_SECTOR;
+extern U4 FDC_DMA_BUF;
+extern LTCacheBlk *LTDCBase;
+extern LTCacheBlk *LTDCNext_lru,*LTDCLast_lru;
+extern LTCacheBlk **LTDCHashTable;
+public extern void LTDCInitCache(U8 size_in_U1s);
+
+extern U8 sys_timer,jiffies;
+extern U8 rnd_SEED;
+extern I1 sys_temp_filename[80];
+extern U8 disk_status_display,compiled_lines;
+public extern Ltf *sys_clipboard_ltf;
+public extern I8 num_blkdevs;
+extern I1 *sys_startup_account;
+extern I1 *wordstat_mask;
+extern BoolU4 ip_inhibit_win_operations;
+public extern I1 *sys_compile_time;
+ 
+public extern void PortNop();
+public extern void BusyWait(U8 uS); //Loosely timed
+
+//49,710Hz since boot (LTDATE_FREQ)
+public extern LTDate BootTime();
+//18.33333*65536Hz (SYS_TIMER_FREQ)
+public extern U8 ReadSysTimer();
+
+
+extern void KbdCmdSend(U8 port, U1 val);
+extern I8 KbdCmdRead();
+extern void KbdCmdFlush();
+extern void KbdMouseCmdAck(U1 val);
+
+public extern U8 RandU2();
+public extern U8 RandU4();
+public extern U8 DivU8(U8 n1,U8 n2);
+public extern I8 DivI8(I8 n1,I8 n2);
+public extern U8 ModU8(U8 n1,U8 n2);
+public extern I8 ModI8(I8 n1,I8 n2);
+public extern I8 AtoI(I1 *st,I8 radix=10,I1 **end_ptr=NULL);
+public extern void Sleep(U8 mS);
+public extern void Sound(U8 freq);
+public extern void Beep(U8 freq=500,BoolU4 busy=FALSE);
+public extern U8 GetS(I1 *buf,U8 size);
+public extern BoolU4 YorN();
+public extern void D(U1 *buf,U8 cnt=0x80,BoolU4 show_offset=TRUE);
+public extern void Dm(U1 *buf,U8 cnt=0x80);
+
+public extern I8 ToUpper(I8 ch);
+public extern BoolU4 AssignBit(U1 *field,U8 bit,BoolU4 val);
+public extern BoolU4 Externs2Imports(BoolU4 val);
+public extern BoolU4 KeepPrivate(BoolU4 val);
+public extern BoolU4 PTrace(BoolU4 val);
+public extern BoolU4 OTrace(BoolU4 val);
+public extern BoolU4 NoRegVar(BoolU4 val);
+public extern BoolU4 CTrace(BoolU4 val);
+public extern BoolU4 LTrace(BoolU4 val);
+public extern BoolU4 Echo(BoolU4 val);
+public extern BoolU4 Silent(BoolU4 val);
+public extern BoolU4 Preempt(BoolU4 val);
+public extern BoolU4 SysDbg(BoolU4 val);
+public extern BoolU4 IsSysDbg();
+public extern BoolU4 Raw(BoolU4 val);
+public extern BoolU4 IsRaw();
+public extern U1 *Caller();
+public extern U1 *CallerCaller();
+public extern void DbgStr(I1 *st,U8 mS=100);
+public extern void DbgNum(U8 num,U8 mS=100);
+public extern void DbgF(double d,U8 mS=100);
+public extern void DbgAdd(U4 *add,U8 mS=100);
+public extern void DbgD(U4 *add,U8 cnt=0x80,U8 mS=100);
+public extern void DbgDm(U4 *add,U8 cnt=0x80,U8 mS=100);
+extern void ThrowDivide(U1 *eip);
+extern void ThrowFloating(U1 *eip);
+
+public extern SysHashEntry *FindLocalHash(I1 *st,U8 mask);
+public extern void GrClear(GrBitMap *base=NULL);
+public extern GrBitMap *GrBitMapNew(U8 type,U8 width,U8 height);
+public extern void CursorHome();
+public extern void CursorOn();
+public extern void CursorOff();
+public extern void ClearWindowText();
+public extern void InitCrt();
+public extern void PutChar(I1 ch);
+public extern void PutS(I1 *st);
+public extern U1 *AMAlloc(U8 size);
+public extern void AFree(U1 *add);
+public extern U1 *AMAllocIdentical(U1 *src);
+public extern U1 *MAllocIdentical(U1 *src,TssStruct *tss=NULL);
+public extern I1 *ANewString(I1 *buf);
+public extern I1 *NewString(I1 *buf,TssStruct *tss=NULL);
+public extern U1 *AMAllocZ(U8 size);
+public extern U1 *MAllocZ(U8 size,TssStruct *tss=NULL);
+public extern void DelLinkedList(U4 *list);
+public extern void Exit();
+public extern void Kill(TssStruct *tss);
+
+//Exceptions are thrown through the following funcation call.
+//by convention, the first parameter should be a type code.
+public extern U8 ExceptDepth(TssStruct *tss=NULL);
+public extern void throw(...);
+//The following are used internally and should not be called directly
+extern void SysTry(U1 *start_label,U1 *skip_label,U8 my_ebp,U8 my_esp);
+extern void SysCatch();
+
+public extern void ArcCompressBuf(ArcCs *c);
+public extern void ArcFinishCompression(ArcCs *c);
+public extern void ArcExpandBuf(ArcCs *c);
+public extern ArcCs *NewArcCs(BoolU4 expand,BoolU4 text_only);
+public extern void DelArcCs(ArcCs *c);
+public extern ArcCompressStruct *
+  CompressBuf(U1 *src,U8 size,U8 flags=0);
+public extern U1 *ExpandBuf(ArcCompressStruct *r);
+
+
+public extern SysHashEntry *LoadStr(I1 *name, I1 *st);
+public extern SysHashEntry *LoadList(I1 *name, I1 *st);
+public extern I1 *SysText(I1 *name);
+public extern I1 *SysTextSub(U8 sub,I1 *name);
+public extern I8 SysTextSubCount(I1 *name);
+public extern void Beeps(U8 j,BoolU4 busy);
+public extern void UnrecoverableSysError(U8 j);
+public extern void PutSysText(I1 *name);
+public extern SysHashEntry *FindPSect(U1 *add,I8 *offset);
+
+public extern I1 *PointAtListEntry(I8 entry_number, I1 *lst);
+public extern I8 MatchListEntry(I1 *src, I1 *lst,I8 flags=0,I8 *ambiguity_overkill_ptr=NULL);
+public extern I8 MatchSysTextEntry(I1 *src, I1 *lst_name,I8 flags=0,I8 *ambiguity_overkill_ptr=NULL);
+public extern I8 Occurrences(I1 *src, I1 ch);
+public extern I8 SpacesToTabs(I1 *dst,I1 *src);
+public extern I1 *TabsToSpaces(I1 *src);
+public extern I1 *StringUtil(I1 *u, I8 mask);
+public extern I1 *MStringUtil(I1 *u,U8 flags);
+public extern I1 *RemoveFirstSeg(I1 *src, I1 *marker, I1 *dst);
+public extern I1 *RemoveLastSeg(I1 *src, I1 *marker, I1 *dst);
+public extern BoolU4 WildCardMatch(I1 *wild_st,I1 *src_st);
+public extern BoolU4 WildFileNameList(I1 *wild_st,I1 *src_st);
+public extern I1 *Add2String(I1 *base,I1 *addition); //frees base parameter
+public extern I1 *SearchString(I1 *src,I1 *pattern,U8 flags=0);
+
+public extern I1 *SPrintFJoin(I1 *dst,I1 *fmt,I8i argc,I8i *argv);
+public extern void GetFJoin(I1 *src,I1 *fmt,I8i argc,I8i *argv);
+public extern void SPrintF(I1 *dst,I1 *fmt,...);
+public extern void PrintF(I1 *fmt,...);
+public extern I1 *MSPrintF(I1 *fmt,...);
+public extern void Adam(I1 *fmt,...);
+public extern void AdamLog(I1 *fmt,...);
+public extern void AdamErr(I1 *fmt,...);
+public extern U8 System(I1 *fmt,...);
+public extern U8 ServantUser(I1 *fmt,...);
+public extern void XTalk(TssStruct *tss,I1 *fmt,...);
+public extern void XTalkString(TssStruct *tss,I1 *fmt,...);
+public extern void Auto(I1 *fmt,...);
+public extern void AutoString(I1 *fmt,...);
+public extern void AutoFile(I1 *filename);
+public extern void GetF(I1 *src,I1 *fmt,...);
+
+public extern void QSort(void *base,U8 num, U8 width, U1 *compare);
+
+public extern I4 YearStartDate(I4 year);
+public extern LTDate ToLTDate(LTDateStruct *d);
+public extern void ToLTDateStruct(LTDateStruct *d,LTDate ltdt);
+public extern I4 FirstDayOfMonth(I4 i);
+public extern I4 LastDayOfMonth(I4 i);
+public extern I4 FirstDayOfYear(I4 i);
+public extern I4 LastDayOfYear(I4 i);
+public extern U1 DayOfWeek(I4 i);
+public extern void GetCurTimeLTDateStruct(LTDateStruct *r);
+public extern LTDate GetCurTimeLTDate();
+public extern void LTDateToISO(ISODate *dst,LTDate ltdate);
+
+public extern LTBlkDev *local_blkdevs,*boot_blkdev;
+public extern LTPartition *local_partitions,*default_partition;
+public extern I1 default_drive;
+public extern LTPartition *drive_to_partition[32];
+extern void LockPartition(LTPartition *p);
+extern BoolU4 UnlockPartition(LTPartition *p,BoolU4 reset=FALSE);
+public extern void InvalidateDiskCache(LTPartition *p,BoolU4 unlock);
+public extern void ChangeDisk(I1 drive_letter=0);
+public extern void PartitionRep();
+extern void AddBlkDev(LTBlkDev *bd);
+public extern BoolU4 RBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock);
+public extern BoolU4 WBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock);
+public extern void WZeroBlks(LTPartition *p,U8 blk,U8 cnt,BoolU4 unlock);
+public extern LTFile *FOpen(I1 *filename,I1 *flags,U8 cnt=0);
+public extern U8 FSize(LTFile *f);
+public extern void FSync(LTFile *f);
+public extern void FClose(LTFile *f);
+public extern BoolU4 FRBlks(LTFile *f,U1 *buf,U8 blk=LTFB_NEXT_BLK,U8 cnt=1);
+public extern BoolU4 FWBlks(LTFile *f,U1 *buf,U8 blk=LTFB_NEXT_BLK,U8 cnt=1);
+public extern void ReadCDImage(I1 drive,I1 *out_name,U8 cnt);
+public extern void WriteCDImage(I1 drive,I1 *in_name);
+public extern U8 NextClusterNum(LTPartition *p,U8 c,U8 cnt,BoolU4 unlock);
+public extern U8 ClusterBlk(LTPartition *p,U8 c);
+public extern U8 RClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE);
+public extern U8 WClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE);
+public extern void CleanMAPBuf(LTPartition *p);
+public extern U8 AllocClusters(LTPartition *p,U8 c,U8 cnt,BoolU4 contiguous,BoolU4 unlock);
+public extern BoolU4 NewLTDirEntry(LTPartition *p,I1 *cur_dir,LTDirEntry *tempm,BoolU4 free_old_chain=TRUE);
+
+public extern void DelLTDirEntry(LTDirEntry *tempm);
+public extern void DelLTDirList(LTDirEntry *tempm);
+extern LTDirEntry *SysFindFiles(I1 *wild,U8 *fuf_flags=NULL);
+public extern LTDirEntry *FindFiles(I1 *wild,U8 *fuf_flags=NULL);
+extern U8 NameToDirCluster(LTPartition *p,I1 *name,BoolU4 unlock);
+extern U8 NameToParentDirCluster(LTPartition *p,I1 *name,BoolU4 unlock);
+
+public extern void PutFileLink(I1 *name,I8 line=0,BoolU4 plain_text=FALSE);
+public extern void PutDirLink(I1 *name);
+
+public extern void CheckLTPartition(LTPartition *p);
+public extern void CheckLTBlkDev(LTBlkDev *bdev);
+public extern I1 PartitionToDrive(LTPartition *p=NULL);
+public extern LTPartition *DriveToPartition(I1 drive=0);
+public extern LTBlkDev *DriveToBlkDev(I1 drive=0);
+public extern BoolU4 DriveIsWritable(I1 drive=0);
+
+public extern I1 *CurDir();
+public extern I1 *AbsoluteDirName(I1 *name);
+public extern I1 *AbsoluteFileName(I1 *name);
+public extern BoolU4 CheckFileName(I1 *name);
+public extern I1 *ChangeExtension(I1 *name,I1 *extension);
+public extern I1 *DefaultExtension(I1 *name,I1 *extension);
+public extern U8 FileAttr(I1 *name,U8 old_attr=0);
+public extern void GetFFlags(FlagsStruct *f,I1 *systext_list,I1 *st);
+public extern I1 *SPrintFFlags(I1 *dst,I1 *systext_list,U8 flags0,U8 flags1=0);
+public extern void MapDrive(I1 ch,LTPartition *p);
+public extern BoolU4 Drive(I1 drive_letter);
+public extern BoolU4 Cd(I1 *name,BoolU4 make_dirs=FALSE);
+public extern void DelLTFileAccess(LTFileAccess *fa);
+public extern LTFileAccess *NewLTFileAccess(I1 *mask,BoolU4 make_mask=FALSE,BoolU4 make_dirs=FALSE);
+public extern void Dir(I1 *wild=NULL,BoolU4 full=FALSE);
+public extern void Del(I1 *wild,BoolU4 print_msg=TRUE);
+public extern U1 *ReadFile(I1 *filename,U8 *size=NULL,U8 *attr=NULL,BoolU4 raw=FALSE);
+public extern I1 *ReadTextFile(I1 *filename,U8 *attr=NULL);
+public extern BoolU4 FindFile(I1 *filename,LTDirEntry *de=NULL,
+      BoolU4 dir_only=FALSE,BoolU4 file_only=FALSE,BoolU4 scan_parents=FALSE);
+public extern U8 WriteFile(I1 *filename,U1 *fbuf,
+   U8 size,LTDate LTdatetime=0,U8 attr=0,BoolU4 raw=FALSE);
+public extern void WriteTextFile(I1 *filename,I1 *st,U8 attr=0);
+public extern void AddDrives(BoolU4 show_rep=TRUE);
+public extern void SelectDefaultDrive();
+extern BoolU4 CopySingle(I1 *f1,I1 *f2); //LTust one file
+public extern BoolU4 MkDir(I1 *filename);
+public extern BoolU4 IsDir(I1 *dir_name);
+extern void SysDel(I1 *wild,BoolU4 make_mask);	//this is dangerous
+public extern void Format(I1 drive_letter,BoolU4 quick=TRUE,BoolU4 confirm=TRUE,U8 type=PT_LT);
+
+
+public extern TssStruct *Spawn(U1 *start_add,
+	    I1 *desc=NULL,
+	    TssStruct *parent=NULL, //NULL means adam
+	    I1 *account=NULL,	  //Null means use parent's
+	    U8 stk=DEFAULT_STACK);
+public extern SysHashTable *NewHashTable(U8 size,TssStruct *mem_tss=NULL);
+public extern void AddTaskToQueue(TssStruct *tss,TssStruct *pred=NULL);
+public extern TssCmdStruct *
+  QueueTaskRequest(TssStruct *servant,TssStruct *master,
+		     I1 *data,U8 flags);
+public extern TssCmdStruct *
+  QueueTextInput(TssStruct *servant,TssStruct *master,
+		     I1 *data,U8 flags);
+public extern TssCmdStruct *QueueMsg(TssStruct *servant,TssStruct *master,
+		     U8 code,U8 p1,U8 p2,U8 flags);
+public extern void Msg(U8 code,U8 p1,U8 p2,U8 flags=0);
+public extern BoolU4 GetRequestResult(TssCmdStruct *rqst=NULL,U8 *result=NULL);
+
+public extern void HandleServantCmds();
+public extern void InitUserTask();
+public extern void InitLocalTask();
+public extern void InitSysTask();
+public extern I1 *HomeDirString();
+public extern void ContinueServantTask();
+public extern void UserCmdLine();
+extern void SysCmdLine();
+extern void ServantUserCmdLine();
+extern void FaultCmdLine();
+public extern U1 *Load(I1 *filename,BoolU4 no_abs=FALSE);
+ 

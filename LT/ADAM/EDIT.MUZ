@@ -1,0 +1,69 @@
+$FG,2$$WW,1$'^'$FG$ Means the Control Key
+
+$MA+A+LA+S,"Toggle Plain Text       ^T","Msg(2,0x14,0x41400000414);"$
+
+Select Text             SHIFT CURSOR
+$MA+A+LA,"Cut to Clipboard        SHIFT DEL","Msg(2,0,0x3D300000253);"$
+$MA+A+LA,"Copy to Clipboard       ^INS","Msg(2,0,0x4D200000452);"$
+$MA+A+LA,"Paste from Clipboard    SHIFT INS","Msg(2,0,0x2D200000252);"$
+$MA+A+LA,"Del Line                ^Y","Msg(2,0x19,0x41500000415);"$
+
+Begin/End of Line       ^Left/^Right
+Begin/End of File       ^Up/^Down
+
+$MA+A+LA,"Indent In               ^N","Msg(2,0xE,0x43100000431);"$
+$MA+A+LA,"Indent Out              ^SHIFT N","Msg(2,0xE,0x63100000631);"$
+
+$MA+A+LA,"Word Wrap On            ^W","Msg(2,0x17,0x41100000411);"$
+$MA+A+LA,"Word Wrap Off           ^SHIFT W","Msg(2,0x17,0x61100000611);"$
+
+$MA+A+LA,"Underline On            ^U","Msg(2,0x15,0x41600000416);"$
+$MA+A+LA,"Underline Off           ^SHIFT U","Msg(2,0x15,0x61600000616);"$
+
+$MA+A+LA,"Blink On                ^B","Msg(2,2,0x43000000430);"$
+$MA+A+LA,"Blink Off               ^SHIFT B","Msg(2,2,0x63000006300);"$
+
+$MA+A+LA,"Invert Color On         ^Z","Msg(2,0x1A,0x42C0000042C);"$
+$MA+A+LA,"Invert Color Off        ^SHIFT Z","Msg(2,0x1A,0x62C0000062C);"$
+
+$MA+A+LA,"Superscript             ^P","Msg(2,0x10,0x41900000419);"$
+$MA+A+LA,"Normal                  ^SHIFT P","Msg(2,0x10,0x61900000619);"$
+$MA+A+LA,"Subscript               ^ALT P","Msg(2,0x10,0xC1900000C19);"$
+
+$MA+A+LA,"Insert Dollar Cmd       ^L","Msg(2,0xC,0x42600000426);"$
+$MA+A+LA,"Insert Graphic Cmd      ^R","Msg(2,0x12,0x41300000413);"$
+$MA+A+LA,"Macro Capture and Play  F2","Msg(2,0,0x3C0000003C);"$
+
+$MA+A+LA,"Page Break              ^ENTER","Msg(2,0xD,0x41C0000041C);"$
+$MA+A+LA,"Print                   PrintScreen","Msg(2,0,0xB7000000B7);"$
+$MA+A+LA,"Goto Favorites          ^SHIFT F","Msg(2,6,0x62100000621);"$
+
+$MA+A+LA,"Find/Replace            ^F","Msg(2,6,0x42100000421);"$
+$MA+A+LA,"Find Next               F3","Msg(2,0,0x3D0000003D);"$
+$MA+A+LA,"Go to Line              ^G","Msg(2,7,0x42200000422);"$
+$MA+A+LA,"Save                    ^S","Msg(2,0x13,0x41F0000041F);"$
+$MA+A+LA,"Save As                 ^A","Msg(2,1,0x41E0000041E);"$
+$MA+A+LA,"Quit No Save            ^Q","Msg(2,0x11,0x41000000410);"$
+$MA+A+LA,"Quit and Save           ESC","Msg(2,0x1B,0x0100000001);"$
+ 
+$TR,"Cmd Line Issues"$
+$ID,2$$FG$* CTRL-SHIFT-ENTER can be used to insert a carriage return without issuing a cmd.  This is useful when you have scrolled-up and wish to enter a cmd on a blank line.
+* The last semicolon on the line is converted to a double semicolon because the compiler looks ahead before doing a cmd.  This normally has no negative effect, but when entering "if" statements with "else" clauses it presents problems.
+
+
+$ID,-2$$TR,"Hot Keys"$
+$ID,2$$FG,9$CTRL ALT DEL$FG$	Reboots
+$FG,9$CTRL ALT ESC$FG$	Spawns new task
+$FG,9$CTRL ALT TAB$FG$	Switches tasks
+$FG,9$CTRL ALT X$FG$	Kills current task
+$FG,9$$FG,9$CTRL ALT C$FG$	Breaks current program
+$FG,9$WINDOWS KEY$FG$	Activates Menu/Help/Macro area
+$FG,9$CTRL FUNCTION KEY$FG$ Enters autocomplete word
+$FG,9$CTRL SHIFT-FUNCTION KEY$FG$ Does man page on symbol
+$ID,-2$$TR,"Debugging"$
+$ID,2$F9		Toggle Breakpoint
+SHIFT-F9	Clear ALL Breakpoints
+F5		Go
+SHIFT-F5	Single-Step
+$ID,-2$
+* If "MENU" appears on the title bar, you can click it with a mouse.

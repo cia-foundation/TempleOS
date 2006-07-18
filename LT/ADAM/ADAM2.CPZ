@@ -1,0 +1,67 @@
+#include "AdamExt"
+#include "IncCompress"
+#include "MATH"
+#include "ODE"
+Load("ADAMASM");
+#include "ADAMASM.HPZ"
+#include "GRMODE3"
+#include "MUSIC"
+#include "DISK10"
+#include "FIFO"
+#include "COMM"
+#include "INPTR"
+#include "GRELEM"
+#include "LTF"
+#include "UTILS"
+#include "MOUSE"
+#include "JOY"
+#include "WINDOW"
+#include "EDIT"
+#include "LOGIN"
+#include "WORDSTAT"
+
+BoolU4 initial_user_tasks_startup_complete=FALSE;
+public void DuelUsers()
+{
+  I1 buf[80];
+  TssStruct *tss,*tss1;
+
+  tss=Spawn(&UserCmdLine);
+  while (!Bt(&tss->task_flags,TSSf_IDLE))
+    SwapInNext;
+  tss->window_top=2;
+  tss->window_right=(SCREEN_COLS-2)<<1;
+  tss1=tss;
+
+  tss=Spawn(&UserCmdLine);
+  while (!Bt(&tss->task_flags,TSSf_IDLE))
+    SwapInNext;
+  tss->window_top=2;
+  tss->window_left=SCREEN_COLS<<2>>1;
+
+  WindowToTop(tss1);
+  ws_task=Spawn(&WsTsk,"WORDSTAT");
+
+  SPrintF(buf,"Boot Time:%h17Ts\r\n",BootTime);
+  AdamLog(buf);
+  initial_user_tasks_startup_complete=TRUE;
+}
+
+Preempt(ON);
+
+UseConsoleLtf(NULL);
+adam_tss->window_top=2;
+adam_tss->window_bottom=10;
+update_screen_tss=Spawn(&WindowManagerTsk,"WINDOW MANAGER");
+CollectAccntList;
+
+Bts(&Fs->crt_flags,CRTf_SHOW);
+if (!(Fs->account=FindSysAccnt(sys_startup_account)))
+  Fs->account=PopUpGetSysAccnt;
+WsInit(wordstat_mask);
+
+
+//This must be spawned because start-up files
+// may invoke the Adam() cmd.
+Spawn(&DuelUsers,"SPAWNUSERS");
+coutln "\r\nOS Compile Time:",sys_compile_time;

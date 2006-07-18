@@ -1,0 +1,31 @@
+$WW,1$$FG,5$This is to clearify how several mysterious things happen in this operating system.$FG$
+
+1) There are symbol(hash) tables maintained by each task.  When a symbol is not found, the parent task's symbol table is checked.  All process chain back to the adam process.
+
+2) Binary files have export symbols which are loaded into tables.  The operating system OSmain has such a table.  In addition, some map files are processed to provide more information on symbols--source file links.  This is how the $LK,"Man","MN:Man"$() page feature works.
+
+3) The word "$FG,2$public$FG$" does very little except allow the $LK,"HashRep","MN:HashRep"$() program varients to exclude meaningless symbols.  If you wish a full report of public and nonpublic symbols $MA+A-X+PU,"Click Here","LtfSetMax(1000000);HAllRep;View;\r"$.
+
+4) When compilation takes place "dynamically", the structures used by the compiler stick around.  Data on classes can be accessed.  See $LK,"ClassRep","MN:ClassRep"$() or $LK,"TssRep","MN:TssRep"$().
+
+5) When the joystick is calibrated, a file is created.  To recalibrate the joystick, you must del the file "$FG,2$::/LT/ADAM/JOY.DTZ$FG$".
+
+6) Filenames ending in '$FG,2$Z$FG$' are automatically compressed and uncompressed when writing to disk.  File size in directory listing is the compressed size.  You can view uncompressed size with $LK,"Dir","MN:Dir"$("*",TRUE);
+
+7) Some memory objects are allocated when needed and will decrease the available memory displayed.  A task keeps memory objects smaller than a couple blocks in it's own separate heap when freed and these are not counted in the available system free memory, though they are free.  They get returned to the system when the task is killed.  To get a sense of this, compile the operating system and see the amount of memory used.  Then, compile it again and far less will be allocated.  This is because it is reusing the small chunks.
+
+8) The cursor location is stored as an $FG,2$ASCII 5$FG$ in files.  $FG,2$ASCII 31$FG$ is used for $FG,2$SHIFT-SPACE$FG$, a character which does not get converted to tabs by $LK,"S2T","MN:S2T"$().
+
+9) Binary data is stored beyond the terminating $FG,2$NULL$FG$ in text files.  Map files store debug source lines and other files store pictures.
+
+10) Pictures are stored as line coordinates, instead of bit maps.  If you have a drawing with, like 10 lines, 40 numbers are stored, compared to, like 200x200 bytes, for a bitmap.  Therefore, graphics don't take much room.  If the number of lines is large, however, it'd be more efficient to store a bitmap, but this is not yet fully supported.
+
+11) If you change code in the $FG,2$/LT/ADAM$FG$ or $FG,2$/LT/UTILS$FG$ directory, you don't need to recompile, you just need to reboot because those directories get recompiled when you boot.  It uses dynamic compilation.  There is no "$FG,2$.BIN$FG$" file for dynamic compilation.
+
+12) If you find crappy code, it might be from before the compiler had features like the type cast "$FG,2$><$FG$$FG$" statement.  Or, it might have been  something done hurriedly just to get results.  Some things I dive into without planning, like the dollar sign commands.  After, the idea matures, I cleaned-it-up.
+
+13) The hits on hash entries reflect times they have been searched for and found.  The $LK,"FindExtern","MN:FindExtern"$() function is used to search the hash tables for functions which weren't in existence yet.  The $LK,"DrawBorder","MN:DrawBorder"$() function, for example, is searched for every time the screen is updated, therefore it has lots of hits in a hash table report.
+
+14) If a file is not found, the parent directories are searched for a file of the same name.
+
+15) LoseThos partitions will appear as FAT32 to other operating systems, but will not work.  Do not access them from other operating systems.  This is to fool my bootloader.

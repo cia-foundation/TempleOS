@@ -1,0 +1,12 @@
+/*  This is not an AutoFile.  It uses $LK,"AutoString","MN:AutoString"$
+to run text as though from an AutoFile.
+
+  This example shows how you can drive pop-up
+windows.
+*/
+
+Auto(" ");
+coutln "PopUp #1:",PopUpNoYes;
+
+AutoString("Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);PutChar(CH_SPACE);");
+coutln "PopUp #2:",PopUpNoYes;

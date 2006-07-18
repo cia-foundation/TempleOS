@@ -1,0 +1,101 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+PutS("\r");
+
+PopUpOk(
+"After clicking 'OKAY', you will be at the\r\n"
+"command line.\r\n\r\n"
+"Type \"$$FG GREEN$$Dir;$$FG$$\" and press $$FG GREEN$$ENTER$$FG$$.\r\n\r\n"
+"You must remember the semicolon.\r\n"
+);
+
+ASCIIKeys("Dir;\r");
+Sleep(1000);  //allow user time to see dir
+PutChar(CH_CR);
+
+PopUpOk(
+"After clicking 'OKAY', you will be at the\r\n"
+"command line.\r\n\r\n"
+"Press the $$FG GREEN$$WINDOW$$FG$$s key.\r\n\r\n"
+"This will access your macro/menu/help area.\r\n"
+"You can customize it.  It's like your\r\n"
+"START menu.\r\n");
+
+SpecialKey(SC_GUI,"WINDOWS KEY");
+Sleep(1000);
+PopUpOk(
+"For future reference, you can get to the\r\n"
+"menu/macro/help area by clicking the left\r\n"
+"mouse button when the mouse cursor is on\r\n"
+"the word \"MENU\" in the upper-left border\r\n"
+"of the window.\r\n");
+
+PopUpOk(
+"After clicking 'OKAY', you will be back at\r\n"
+"the menu/macro/help area.\r\n\r\n"
+"Press $$FG GREEN$$CURSOR-DOWN$$FG$$ five times.\r\n");
+
+//This puts the cursor at the top
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+
+I8 i;
+for (i=0;i<5;i++)
+  SpecialKey(SC_CURSOR_DOWN,"CURSOR-DOWN");
+
+PopUpOk(
+"After clicking 'OKAY', the cursor will be\r\n"
+"on top of a macro we wish to run.  Usually,\r\n"
+"underlined text will do something.\r\n\r\n"
+"Macros are normally $$FG LTBLUE$$BLUE$$FG$$ and you run\r\n"
+"them by left-clicking the mouse.  You can\r\n"
+"simulate a left-mouse with a $$FG GREEN$$SPACE$$FG$$\r\n"
+"key.\r\n\r\n"
+"After clicking OKAY, press $$FG GREEN$$SPACE$$FG$$.\r\n");
+ASCIIKeys(" ");
+Sleep(1000);
+
+PopUpOk(
+"The macro changed directories and did\r\n"
+"a $$FG GREEN$$Dir;$$FG$$ command.\r\n\r\n"
+"The $$FG RED$$RED$$FG$$ filenames listed are file\r\n"
+"links.  Left-clicking will edit/view them.\r\n"
+"Right-clicking or pressing $$FG GREEN$$ENTER$$FG$$\r\n"
+"when the cursor is on top will bring-up a\r\n"
+"menu of options.\r\n\r\n"
+"The $$FG LTBLUE$$BLUE$$FG$$ underline entries \"$$FG LTBLUE$$.$$FG$$\" and \"$$FG LTBLUE$$..$$FG$$\"\r\n"
+"are macros and will change directories.\r\n");
+
+PopUpOk(
+"As you can see, the command line is not\r\n"
+"different from the help/menu/macro area.\r\n"
+"Both use the same commands and have the same\r\n"
+"'Widgets' available.\r\n\r\n"
+"Both utilize the same underlying document format\r\n"
+"known as LoseThos rich text.  It is similar to\r\n"
+"html because it has ASCII behind it.\r\n\r\n"
+"Press \"$$FG GREEN$$CTRL-T$$FG$$\" after clicking 'OKAY' to toggle\r\n"
+"to plain text mode.\r\n");
+SpecialASCIIKey(20,"CTRL-T");
+Sleep(1000);
+
+PopUpOk(
+"The widgets are bracketed with dollar sign\r\n"
+"characters. \"LK\" stands \"link\" and \"MA\"\r\n"
+"stands for \"macro\".\r\n\r\n"
+"Now, press \"$$FG GREEN$$CTRL-T$$FG$$\" to toggle back to\r\n"
+"regular mode.\r");
+SpecialASCIIKey(20,"CTRL-T");
+Sleep(1000);
+
+PopUpOk(
+"In summary, you left-click on underlined\r\n"
+"text or press $$FG GREEN$$SPACE$$FG$$ when the cursor\r\n"
+"is on top, to perform the primary action.\r\n"
+"You right-click or press $$FG GREEN$$ENTER$$FG$$\r\n"
+"to perform a secondary action.\r\n\r\n"
+
+"The $$FG GREEN$$WINDOW$$FG$$'s key will bring-up the help/macro/menus\r\n"
+"as will clicking on the word \"MENU\" in the\r\n"
+"upper-left corner of a window's border.\r\n\r\n"
+
+"The $$FG GREEN$$CTRL-T$$FG$$ key will toggle plain-text mode.\r\n");

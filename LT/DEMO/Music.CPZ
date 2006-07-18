@@ -1,0 +1,20 @@
+void SoundOff()
+{
+  Sound(0);
+  Exit;
+}
+
+
+void MusicDemoTsk()
+{
+  Fs->end_task_cb=&SoundOff;
+  while (TRUE) {
+    Play("1wCqDsEFG2AB");
+    Play("wCqDsEFG3AB");
+    Play("wCqDsEFG4AB");
+    Play("wCqDsEFG5AB");
+    Play("wCqDsEFG6AB");
+  }
+}
+
+Spawn(&MusicDemoTsk,"MUSIC");

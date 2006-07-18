@@ -1,0 +1,2240 @@
+U8 ltf_display_types[1],ltf_nondisplay_invisible_types[1],
+      ltf_form_types[1],ltf_data_types[1];
+
+ltf_display_types[0]=1<<LTFT_TEXT|1<<LTFT_DATA|
+	1<<LTFT_MENU_VALUE|
+	1<<LTFT_HIDE_START |
+	1<<LTFT_TREE|
+	1<<LTFT_HIDE_END|
+	1<<LTFT_MACRO|
+	1<<LTFT_BUTTON|
+	1<<LTFT_CHECK_BOX|
+	1<<LTFT_LINK|
+	1<<LTFT_ANCHOR|
+	1<<LTFT_PICTURE|
+	1<<LTFT_INSERT_BINARY|
+	1<<LTFT_INSERT_BINARY_TYPE|
+	1<<LTFT_INSERT_BINARY_SIZE|
+	1<<LTFT_SONG;
+ltf_nondisplay_invisible_types[0]=
+  1<<LTFT_PAGE_LENGTH|
+  1<<LTFT_LEFT_MARGIN|
+  1<<LTFT_RIGHT_MARGIN|
+  1<<LTFT_HEADER|
+  1<<LTFT_FOOTER|
+  1<<LTFT_INDENT|
+  1<<LTFT_FOREGROUND_COLOR|
+  1<<LTFT_BACKGROUND_COLOR|
+  1<<LTFT_DEFAULT_FOREGROUND_COLOR|
+  1<<LTFT_DEFAULT_BACKGROUND_COLOR|
+  1<<LTFT_LINK_FOREGROUND|
+  1<<LTFT_LINK_BACKGROUND|
+  1<<LTFT_MACRO_FOREGROUND|
+  1<<LTFT_MACRO_BACKGROUND|
+  1<<LTFT_ANCHOR_FOREGROUND|
+  1<<LTFT_ANCHOR_BACKGROUND|
+  1<<LTFT_HIDDEN_FOREGROUND|
+  1<<LTFT_HIDDEN_BACKGROUND|
+  1<<LTFT_TREE_FOREGROUND|
+  1<<LTFT_TREE_BACKGROUND|
+  1<<LTFT_USER_FOREGROUND|
+  1<<LTFT_USER_BACKGROUND|
+  1<<LTFT_WORD_WRAP|
+  1<<LTFT_UNDERLINED|
+  1<<LTFT_INVERTED|
+  1<<LTFT_BLINK|
+  1<<LTFT_SHIFTED_X|
+  1<<LTFT_SHIFTED_Y|
+  1<<LTFT_PICTURE|
+  1<<LTFT_BPT;
+ltf_form_types[0]=ltf_display_types[0] & ~(1<<LTFT_TEXT)|1<<LTFT_HEX_EDIT;
+ltf_data_types[0]=1<<LTFT_DATA|
+		  1<<LTFT_HEX_EDIT|
+		  1<<LTFT_CHECK_BOX;
+
+
+LtfBinEntry *LtfFindBin(Ltf *l,U8 num)
+{
+  LtfBinEntry *b=l->bin_root.next;
+  while (b!=&l->bin_root) {
+    if (b->num==num)
+      return b;
+    b=b->next;
+  }
+  return NULL;
+}
+
+void LtfValidateBins(Ltf *l)
+{
+  LtfBinEntry *b=l->bin_root.next,*b1;
+  LtfEntry *cl=l->dummy.next;
+  while (b!=&l->bin_root) {
+    b->use_cnt=0;
+    b=b->next;
+  }
+  while (cl!=l) {
+    if (cl->flags & LTFLF_HAS_BIN) {
+      if (cl->bin_data)
+	cl->bin_data->use_cnt++;
+      else {
+	cl->bin_data=LtfFindBin(l,cl->bin_num);
+	if (cl->bin_data)
+	  cl->bin_data->use_cnt++;
+      }
+    }
+    cl=cl->next;
+  }
+  b=l->bin_root.next;
+  l->cur_bin_num=1;
+  while (b!=&l->bin_root) {
+    b1=b->next;
+    if (!b->use_cnt) {
+      RemQue(b);
+      Free(b->data,l->mem_tss);
+      Free(b,l->mem_tss);
+    } else {
+      if (b->num>=l->cur_bin_num)
+	l->cur_bin_num=b->num+1;
+    }
+    b=b1;
+  }
+}
+
+
+void LtfDelBin(LtfBinEntry *b,TssStruct *tss)
+{
+  b->use_cnt--;
+  if (!b->use_cnt) {
+    RemQue(b);
+    Free(b->data,tss);
+    Free(b,tss);
+  }
+}
+
+void LtfDelEntry(LtfEntry *cl,TssStruct *tss)
+{
+  if (Bt(ltf_display_types,cl->btype))
+    Free(cl->display,tss);
+  if (cl->btype>=LTFT_DATA)
+    Free(cl->plain_text,tss);
+  if (cl->flags & LTFLF_LEFT_MACRO)
+    Free(cl->left_macro,tss);
+  if (cl->flags & LTFLF_RIGHT_MACRO)
+    Free(cl->right_macro,tss);
+  if (cl->flags & LTFLF_AUX_STRING)
+    Free(cl->aux_string,tss);
+  if (cl->flags & LTFLF_HAS_BIN)
+    LtfDelBin(cl->bin_data,tss);
+  Free(cl,tss);
+}
+
+
+LtfEntry *LtfCopyEntry(Ltf *l,LtfEntry *cl)
+{
+  LtfEntry *nl;
+  LtfBinEntry *tempb;
+  TssStruct *tss=l->mem_tss;
+  nl=MAllocIdentical(cl,tss);
+  if (Bt(ltf_display_types,cl->btype))
+    nl->display=MAllocIdentical(cl->display,tss);
+  if (cl->btype>=LTFT_DATA)
+    nl->plain_text=NewString(cl->plain_text,tss);
+  if (cl->flags & LTFLF_AUX_STRING)
+    nl->aux_string=NewString(cl->aux_string,tss);
+  if (cl->flags & LTFLF_LEFT_MACRO)
+    nl->left_macro=MAllocIdentical(cl->left_macro,tss);
+  if (cl->flags & LTFLF_RIGHT_MACRO)
+    nl->right_macro=MAllocIdentical(cl->right_macro,tss);
+  if (cl->flags & LTFLF_HAS_BIN) {
+    tempb=MAllocIdentical(cl->bin_data,tss);
+    tempb->data=MAllocIdentical(cl->bin_data->data,tss);
+    nl->bin_num=l->cur_bin_num;
+    tempb->num=l->cur_bin_num++;
+    nl->bin_data=tempb;
+    InsQue(tempb,l->bin_root.last);
+  }
+  return nl;
+}
+
+void LtfFormForward(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry,*cl1=cl->last;
+  if (l->flags & LTFF_FORM) {
+    while (cl!=cl1 && !Bt(ltf_form_types,cl->btype)) {
+      cl=cl->next;
+    }
+    l->cur_data_col=cl->min_col;
+    l->cur_entry=cl;
+  }
+}
+
+void LtfFormBackward(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry,*cl1=cl->next;
+  if (l->flags & LTFF_FORM) {
+    while (cl!=cl1 && !Bt(ltf_form_types,cl->btype)) {
+      cl=cl->last;
+    }
+    l->cur_data_col=cl->min_col;
+    l->cur_entry=cl;
+  }
+}
+
+public void LtfHome(Ltf *l)
+{
+  if (!l) return;
+  l->cur_entry=l->dummy.next;
+  l->cur_data_col=l->cur_entry->min_col;
+  l->x=0;
+  l->y=0;
+  l->line_start_col=0;
+  l->cur_top_line_num=0;
+  LtfFormForward(l);
+}
+
+
+public void LtfReset(Ltf *l,BoolU4 is_old,BoolU4 adam_mem=FALSE)
+{
+  LtfEntry *cl,*cl1;
+  if (!l) return;
+  if (is_old) {
+    cl=l->dummy.next;
+    while (cl!=l) {
+      cl1=cl->next;
+      if (adam_mem)
+	LtfDelEntry(cl,adam_tss);
+      else
+	LtfDelEntry(cl,l->mem_tss);
+      cl=cl1;
+    }
+  }
+//Check $LK,"EditInsertLtf","MN:EditInsertLtf"$
+  l->text_attribute=(WHITE<<4)+BLUE;
+  l->link_attribute=(WHITE<<4)+RED;
+  l->macro_attribute=(WHITE<<4)+LTBLUE;
+  l->anchor_attribute=(WHITE<<4)+BLACK;
+  l->hidden_attribute=(WHITE<<4)+BLACK;
+  l->tree_attribute=(WHITE<<4)+PURPLE;
+  l->user_attribute=(WHITE<<4)+GREEN;
+  l->flags=0;
+  l->dummy.next=l;
+  l->dummy.last=l;
+  l->bin_root.next=&l->bin_root;
+  l->bin_root.last=&l->bin_root;
+  l->cur_bin_num=1;
+  l->recalc_start=l;
+  l->menu_ltf=NULL;
+  l->dollar_buf_ptr=0;
+  l->cmd_I1=CH_SPACE;
+  l->indent=0;
+  l->page_line_num=0;
+  l->page_length=66;
+  l->left_margin=LTF_DEFAULT;
+  l->right_margin=LTF_DEFAULT;
+  l->header=LTF_DEFAULT;
+  l->footer=LTF_DEFAULT;
+
+  cl=&l->dummy;
+  cl->type=LTFT_ERROR;
+  cl->flags=0;
+  cl->x=0;
+  cl->y=0;
+  cl->min_col=0;
+  cl->max_col=0;
+  cl->indent=l->indent;
+  cl->page_line_num=l->page_line_num;
+  cl->left_margin=l->left_margin;
+  cl->right_margin=l->right_margin;
+
+  LtfHome(l);
+}
+
+
+public void LtfDel(Ltf *l,BoolU4 adam_mem=FALSE)
+{
+  Ltf *m;
+
+  if (!l) return;
+  m=l->menu_ltf;
+  LtfReset(l,TRUE,adam_mem);
+  Free(l->find_replace,l->mem_tss);
+  Free(l->dollar_buf,l->mem_tss);
+  LtfDel(m,adam_mem);
+  Free(l,l->mem_tss);
+}
+
+
+void LtfFormatData(LtfEntry *cl)
+{
+  BoolU4 *b;
+  U8 *d;
+  I8 i;
+  if (cl->btype==LTFT_DATA) {
+    d=cl->data;
+    if (cl->flags & LTFLF_DATA_IS_PTR)
+      SPrintF(cl->display,cl->aux_string,*d,cl->my_format_data);
+    else
+      SPrintF(cl->display,cl->aux_string,d,cl->my_format_data);
+    if (cl->flags & LTFLF_HAS_TERMINATOR) {
+      i=StrLen(cl->display);
+      cl->display[i++]='_';
+      cl->display[i]=0;
+    }
+  } else if (cl->btype==LTFT_CHECK_BOX) {
+    if (cl->flags & LTFLF_DATA_IS_PTR)
+      b=cl->data;
+    else
+      b=&cl->data;
+    if (*b)
+      cl->flags|=LTFLF_CHECKED;
+    else
+      cl->flags&=~LTFLF_CHECKED;
+  }
+}
+
+void LtfGetData(LtfEntry *cl)
+{
+  BoolU4 *b;
+  I8 i;
+  if (cl->btype==LTFT_DATA) {
+    i=StrLen(cl->display);
+    if (cl->flags & LTFLF_HAS_TERMINATOR)
+      cl->display[--i]=0;
+    if (i>cl->len+cl->min_col)
+      cl->display[cl->len+cl->min_col]=0;
+    if (cl->flags & LTFLF_DATA_IS_PTR)
+      GetF(cl->display,cl->aux_string,cl->data,cl->my_format_data);
+    else
+      GetF(cl->display,cl->aux_string,&cl->data,cl->my_format_data);
+    if (cl->flags & LTFLF_HAS_TERMINATOR)
+      cl->display[i]='_';
+  } else if (cl->btype==LTFT_CHECK_BOX) {
+    if (cl->flags & LTFLF_DATA_IS_PTR)
+      b=cl->data;
+    else
+      b=&cl->data;
+    if (cl->flags & LTFLF_CHECKED)
+      *b=TRUE;
+    else
+      *b=FALSE;
+  }
+}
+
+
+I8 LtfCharDist(Ltf *l,I8 x,I8 y)
+{
+  I8 dx=(l->x-x)*FONT_WIDTH>>2,dy=(l->y-y)*FONT_HEIGHT;
+  return MulI8(dx,dx)+MulI8(dy,dy);
+}
+
+
+public void LtfUpdateWindowJoin(Ltf *l,BoolU4 to_screen,BoolU4 has_cursor,
+  BoolU4 recalc,BoolU4 find_cur_entry,
+  LtfEntry *pg_found=NULL,I8 num_del_entries=0)
+{
+  I8 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I8;
+  I8 num_entries=0,cursor_y=MIN_I8;
+  LtfEntry *cl,*cl2,*best_cl=l->cur_entry,*alias,*next_pg_found=NULL;
+  I8 ijif;
+  U8 w,w1;
+  U1 *bptr;
+  U1 ch,*ptr,buf[16];
+  BoolU4 del_cl,skipped_update,tree_collapsed;
+  U8 hide_collapsed[2];
+  TssStruct *tss=l->tss,*mem_tss=l->mem_tss;
+  BoolU4 resize=FALSE;
+  BoolU4 extra_processing,same_window;
+  BoolU4 revert_default_color_eol=FALSE;
+  GrBitMap *base=GrNew(grbase2);
+  I8  left_margin=tss->window_left,right_margin=tss->window_right;
+
+  if (!l) return;
+  if (to_screen || find_cur_entry) {
+    recalc=TRUE;
+    l->recalc_start=l;
+  }
+
+  if (has_cursor) {
+    if (Btr(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED))
+      resize=TRUE;
+
+    if (Btr(&tss->crt_flags,CRTf_SCROLL_X))
+      l->line_start_col=(DivI8(MulI8(tss->scroll_x,l->max_x-l->min_x+1),
+	right_margin-left_margin+4)+l->min_x) & -4;
+    if (Btr(&tss->crt_flags,CRTf_SCROLL_Y))
+      l->cur_top_line_num=DivI8(MulI8(tss->scroll_y,l->max_y-l->min_y+1),
+	tss->window_bottom-tss->window_top+1)+l->min_y;
+  }
+  x=0; y=0;
+  l->indent=0;
+  l->page_line_num=0;
+  l->left_margin=LTF_DEFAULT;
+  l->right_margin=LTF_DEFAULT;
+  l->header=LTF_DEFAULT;
+  l->footer=LTF_DEFAULT;
+  same_window=tss->window_top==l->old_window_top &&
+      tss->window_bottom==l->old_window_bottom &&
+      tss->window_left==l->old_window_left &&
+      tss->window_right==l->old_window_right;
+  w=l->text_attribute<<8;
+  if (!find_cur_entry) {
+    l->x=0;
+    l->y=0;
+  }
+  l->flags&=~(LTFF_WORD_WRAP|LTFF_UNDERLINED|LTFF_INVERTED|LTFF_BLINK);
+  l->shifted_x=0;
+  l->shifted_y=0;
+  if (recalc) {
+    if (l->cur_data_col<=l->cur_entry->min_col)
+      l->cur_data_col=l->cur_entry->min_col;
+    if (!l->recalc_start)
+      cl=l; //skip update
+    else {
+      cl=l->recalc_start;
+      if (cl!=l) {
+	i=l->ww_lines_back;
+	ii=i/2;  //Threshold for stopping on SOFT_CR
+	while (i-- && cl->btype!=LTFT_CR &&
+	  (i>ii || cl->btype!=LTFT_SOFT_CR) &&
+	  cl->flags & LTFLF_WORD_WRAP &&
+	  cl->last!=l)
+	    cl=cl->last;
+	if (cl->flags & LTFLF_WORD_WRAP)
+	  l->flags|=LTFF_WORD_WRAP;
+	else
+	  l->flags&=~LTFF_WORD_WRAP;
+	if (cl->flags & LTFLF_UNDERLINED) {
+	  l->flags|=LTFF_UNDERLINED;
+	  w|=LTFLT_UNDERLINED;
+	} else
+	  l->flags&=~LTFF_UNDERLINED;
+	if (cl->flags & LTFLF_INVERTED) {
+	  l->flags|=LTFF_INVERTED;
+	  w|=LTFLT_INVERTED;
+	} else
+	  l->flags&=~LTFF_INVERTED;
+	if (cl->flags & LTFLF_BLINK) {
+	  l->flags|=LTFF_BLINK;
+	  w|=LTFLT_BLINK;
+	} else
+	  l->flags&=~LTFF_BLINK;
+	w|=(cl->type & 0x0C00FF00);
+	x=cl->x; y=cl->y;
+	l->indent=cl->indent;
+	l->page_line_num=cl->page_line_num;
+	l->left_margin=cl->left_margin;
+	l->right_margin=cl->right_margin;
+      } else
+	cl=l->dummy.next;
+    }
+  } else
+    cl=l->dummy.next;
+  x0=l->line_start_col;
+  y0=l->cur_top_line_num;
+  if (l->dummy.next==l) {
+    best_cl=l;
+    best_col=0;
+    l->cur_entry=l;
+    l->cur_data_col=0;
+    cl=l;
+ 
+  }
+  skipped_update=(cl==l && l->dummy.next!=l);
+
+  extra_processing=recalc||find_cur_entry||resize;
+
+  l->min_x=0x7FFFFFFC;	l->min_y=MAX_I4;
+  l->max_x=-0x7FFFFFFF; l->max_y=MIN_I4;
+
+  while (cl!=l) {
+    del_cl=FALSE;
+    if (cl->flags & LTFLF_SKIP) {
+      cl=cl->last;  //for consistency handle skips the same
+      goto skip;
+    }
+    if (cl->flags & LTFLF_DISPLAY_CB) {
+      if (recalc || cl->flags & LTFLF_REFRESH_DATA) {
+	Free(cl->display,mem_tss);
+	cl->display=cl->display_cb(l,l->user_data,cl,mem_tss);
+	cl->max_col=StrLen(cl->display);
+	if (l->cur_entry==cl) {
+	  if (l->cur_data_col>=cl->max_col && cl->max_col)
+	    l->cur_data_col=cl->max_col-1;
+	}
+      }
+    }
+    if (extra_processing) {
+word_wrap_start:
+      cl2=cl->next;
+      if (cl2->btype==LTFT_SOFT_CR) {
+	if (!same_window) {
+	  if (l->cur_entry==cl2) {
+	    l->cur_entry=cl2->next;
+	    l->cur_data_col=l->cur_entry->min_col;
+	  }
+	  if (best_cl==cl2) {
+	    best_cl=cl2->next;
+	    best_col=0;
+	  }
+	  RemQue(cl2);
+	  LtfDelEntry(cl2,mem_tss);
+	  goto word_wrap_start;
+	}
+      }
+      if (cl->btype==LTFT_TEXT) {
+	if (cl->flags==cl2->flags &&
+	  cl->type==cl2->type) {
+	  i=StrLen(cl->display);
+	  j=StrLen(cl2->display);
+	  ptr=MAlloc(i+j+1,mem_tss);
+	  MemCpy(ptr,cl->display,i);
+	  MemCpy(ptr+i,cl2->display,j+1);
+	  Free(cl->display,mem_tss);
+	  cl->display=ptr;
+	  if (l->cur_entry==cl2) {
+	    l->cur_entry=cl;
+	    l->cur_data_col+=i;
+	  }
+	  if (best_cl==cl2) {
+	    best_cl=cl;
+	    best_col=0;
+	  }
+	  RemQue(cl2);
+	  LtfDelEntry(cl2,mem_tss);
+	  goto word_wrap_start;
+	}
+      }
+    }
+    if (cl->flags & LTFLF_SCROLLING_X)
+      k=cl->scroll_len;
+    else if (Bt(ltf_display_types,cl->btype))
+      k=StrLen(cl->display);
+    else
+      k=0;
+    if (cl->flags &
+	(LTFLF_LEFT_X|LTFLF_RIGHT_X|LTFLF_CENTER_X|
+	 LTFLF_TOP_Y|LTFLF_BOTTOM_Y|LTFLF_CENTER_Y)) {
+      if (cl->flags & LTFLF_MARGIN_REL_X) {
+	if (cl->flags & LTFLF_LEFT_X)
+	  x=left_margin-tss->window_left;
+	else if (cl->flags & LTFLF_RIGHT_X)
+	  x=right_margin-(k-1)<<2-tss->window_left;
+	else if (cl->flags & LTFLF_CENTER_X)
+	  x=((right_margin+left_margin)>>1-k>>1-tss->window_left) & -4;
+      } else {
+	if (cl->flags & LTFLF_LEFT_X)
+	  x=x0;
+	else if (cl->flags & LTFLF_RIGHT_X)
+	  x=tss->window_right-tss->window_left+x0-(k-1)<<2;
+	else if (cl->flags & LTFLF_CENTER_X)
+	  x=((tss->window_right-tss->window_left+x0)>>1-k<<1) & -4;
+      }
+      if (cl->flags & LTFLF_PAGE_REL_Y) {
+	if (cl->flags & LTFLF_TOP_Y)
+	  y-=cl->page_line_num;
+	else if (cl->flags & LTFLF_BOTTOM_Y)
+	  y+=l->page_length-cl->page_line_num;
+	else if (cl->flags & LTFLF_CENTER_Y)
+	  y+=l->page_length>>1-cl->page_line_num;
+      } else {
+	if (cl->flags & LTFLF_TOP_Y)
+	  y=y0;
+	else if (cl->flags & LTFLF_BOTTOM_Y)
+	  y=tss->window_bottom-tss->window_top+y0;
+	else if (cl->flags & LTFLF_CENTER_Y)
+	  y=(tss->window_bottom-tss->window_top)>>1+y0;
+      }
+    }
+
+    if (extra_processing && k>0) {
+      if (l->flags & LTFF_WORD_WRAP) {
+	i=(right_margin+4-(x+tss->window_left))>>2;  //Space left ON line
+	ii=(x+4-l->left_margin)>>2;
+	if (cl->btype==LTFT_TEXT) {
+/*
+	  if (l->cur_entry==cl->next && l->cur_data_col==0
+	      && k==i)
+	      i--;
+	  if (l->cur_entry==cl) {
+	    if (l->cur_data_col==i ||
+	       (l->cur_data_col==i+1 && (cl->display[i]==CH_SPACE ||cl->display[i]==CH_SHIFT_SPACE)))
+	    i--;
+	  }
+*/
+	  if (k>i) {
+	    for (j=i;j>8-ii && j>=0;j--)
+	      if (cl->display[j]==CH_SPACE || cl->display==CH_SHIFT_SPACE) {
+		i=j+1;
+		break;
+	      }
+	    if (k>i && i>0) {
+	      cl2=MAllocIdentical(cl,mem_tss);
+	      cl2->display=NewString(cl->display+i,mem_tss);
+	      InsQue(cl2,cl);
+	      if (l->cur_entry==cl && l->cur_data_col>=i) {
+		l->cur_entry=cl2;
+		l->cur_data_col=l->cur_data_col-i;
+	      }
+	      cl->display[i]=0;
+	      ptr=NewString(cl->display,mem_tss);
+	      Free(cl->display,mem_tss);
+	      cl->display=ptr;
+	      cl2=MAllocZ(sizeof(LtfEntryBase),mem_tss);
+	      cl2->type=LTFT_SOFT_CR | cl->type & 0xFFFFFF00;
+	      cl2->flags=cl->flags;
+	      cl2->x=x;
+	      cl2->y=y;
+	      cl2->indent=l->indent;
+	      cl2->page_line_num=l->page_line_num;
+	      cl2->left_margin=l->left_margin;
+	      cl2->right_margin=l->right_margin;
+	      InsQue(cl2,cl);
+	      goto skip_soft_cr;
+	    }
+	  }
+	  if (k==i)
+	    goto skip_soft_cr;
+	}
+	if (k>=i && cl->btype!=LTFT_SOFT_CR && cl->btype!=LTFT_CR
+		 && cl->btype!=LTFT_CURSOR_MOVEMENT) {
+	  if (cl->last->btype!=LTFT_SOFT_CR &&
+	      cl->last->btype!=LTFT_CR &&
+	      cl->last->btype!=LTFT_CURSOR_MOVEMENT) {
+	    cl2=MAllocZ(sizeof(LtfEntryBase),mem_tss);
+	    cl2->type=LTFT_SOFT_CR | cl->type & 0xFFFFFF00;
+	    cl2->flags=LTFLF_WORD_WRAP |
+	      cl->flags & (LTFLF_INVERTED|LTFLF_UNDERLINED|
+	       LTFLF_BLINK|LTFLF_SKIP);
+	    cl2->x=x;
+	    cl2->y=y;
+	    cl2->indent=l->indent;
+	    cl2->page_line_num=l->page_line_num;
+	    cl2->left_margin=l->left_margin;
+	    cl2->right_margin=l->right_margin;
+	    InsQue(cl2,cl->last);
+	    if (l->left_margin==LTF_DEFAULT)
+	      x=l->indent;
+	    else
+	      x=l->left_margin+l->indent;
+	    y++;
+	  }
+	}
+skip_soft_cr:
+      }
+    }
+    if (cl==l->cur_entry)
+      cursor_y=y;
+    cl->x=x;
+    cl->y=y;
+    cl->indent=l->indent;
+    cl->page_line_num=l->page_line_num;
+    cl->left_margin=l->left_margin;
+    cl->right_margin=l->right_margin;
+    cl->type=w & 0xFF00 | cl->type & 0xFFFF00FF;
+    if (l->flags & LTFF_WORD_WRAP)
+      cl->flags|=LTFLF_WORD_WRAP;
+    else
+      cl->flags&=~LTFLF_WORD_WRAP;
+
+    if (l->flags & LTFF_UNDERLINED) {
+      cl->flags|=LTFLF_UNDERLINED;
+      w|=LTFLT_UNDERLINED;
+    } else {
+      cl->flags&=~LTFLF_UNDERLINED;
+      w&=~LTFLT_UNDERLINED;
+    }
+
+    if (l->flags & LTFF_INVERTED) {
+      cl->flags|=LTFLF_INVERTED;
+      w|=LTFLT_INVERTED;
+    } else {
+      cl->flags&=~LTFLF_INVERTED;
+      w&=~LTFLT_INVERTED;
+    }
+    if (l->flags & LTFF_BLINK) {
+      cl->flags|=LTFLF_BLINK;
+      w|=LTFLT_BLINK;
+    } else {
+      cl->flags&=~LTFLF_BLINK;
+      w&=~LTFLT_BLINK;
+    }
+
+    if (x<l->min_x) l->min_x=x;
+    if (y<l->min_y) l->min_y=y;
+
+    if (find_cur_entry) {
+      D=LtfCharDist(l,x,y);
+      col=0;
+    }
+    col2=0;
+    w=w&0xFC00FF00|(l->shifted_x & 0x1F)<<16|(l->shifted_y & 0x1F)<<21;
+    switch (cl->btype) {
+      case LTFT_LINK:
+	w1=w & 0xFFFF0000 | l->link_attribute<<8;
+	break;
+      case LTFT_MACRO:
+      case LTFT_MENU_VALUE:
+	w1=w & 0xFFFF0000 | l->macro_attribute<<8;
+	break;
+      case LTFT_ANCHOR:
+	w1=w & 0xFFFF0000 | l->anchor_attribute<<8;
+	break;
+      case LTFT_TREE:
+	w1=w & 0xFFFF0000 | l->tree_attribute<<8;
+	break;
+      case LTFT_HIDE_START:
+      case LTFT_HIDE_END:
+	w1=w & 0xFFFF0000 | l->hidden_attribute<<8;
+	break;
+      default:
+	w1=w;
+    }
+    w1=w1 & 0xFFFFFF00 | cl->type & 0xF3FF0000;
+    if (cl==l->cur_entry && cl->btype!=LTFT_TEXT)
+	w1^=0xFF00;
+
+    if (cl->flags & LTFLF_REFRESH_DATA) {
+      if (cl->btype==LTFT_DATA || cl->btype==LTFT_CHECK_BOX) {
+	LtfFormatData(cl);
+	if (cl->btype==LTFT_DATA)
+	  cl->max_col=StrLen(cl->display);
+      }
+    }
+
+    ptr=cl->display;
+    if (cl->flags & LTFLF_TREE) {
+      if (StrLen(ptr)>=2) {
+	if (cl->flags & LTFLF_COLLAPSED)
+	  *ptr++='+';
+	else
+	  *ptr++='-';
+	*ptr++=']';
+      }
+    }
+    if (cl->btype==LTFT_CHECK_BOX) {
+      if (StrLen(ptr)>=3) {
+	*ptr++='[';
+	if (cl->flags & LTFLF_CHECKED)
+	  *ptr++='X';
+	else
+	  *ptr++=' ';
+	*ptr++=']';
+      }
+    } else if (cl->btype==LTFT_HIDE_START) {
+      if (StrLen(ptr)>=2) {
+	*ptr++='<';
+	if (cl->flags & LTFLF_COLLAPSED)
+	  *ptr++='+';
+	else
+	  *ptr++='-';
+      }
+    } else if (cl->btype==LTFT_HIDE_END) {
+      if (StrLen(ptr)>=1)
+	*ptr++='>';
+    }
+
+    if (Bt(ltf_display_types,cl->btype)) {
+      if (cl->flags & LTFLF_SCROLLING_X) {
+	j=StrLen(cl->display);
+	if (j && cl->scroll_len) {
+	  ijif=DivU8(MulU8(jiffies,MulU8(FONT_WIDTH,tss->scroll_speed)),JIFFY_FREQ);
+	  ijif=ModU8(ijif,j*FONT_WIDTH);
+	  w1=w1 & 0xFFE0FF00|
+	    ((FONT_WIDTH-1-ModU8(ijif,FONT_WIDTH))<<16);
+	  ijif=DivU8(ijif,FONT_WIDTH);
+	  ptr=cl->display;
+	  for (k=0;k<cl->scroll_len;k++) {
+	    ch=ptr[ModU8(ijif+k,j)];
+	    if (!Bt(displayable_chars_bitmap,ch)) ch='.';
+	    if (to_screen) {
+	      if (cl->flags & LTFLF_BORDER_PLOT)
+		PlotBorderChar(w1+ch,x-x0,y-y0);
+	      else
+		PlotWindowChar(w1+ch,x-x0,y-y0);
+	    }
+	    x+=4;
+	  }
+	}
+	if (find_cur_entry)  {
+	  D=LtfCharDist(l,cl->x,cl->y);
+	  col=cl->min_col;
+	}
+	col2=cl->scroll_len;  //TODO This is flawed
+      } else {
+	ptr=cl->display;
+	if (cl->flags & LTFLF_PASSWORD) {
+	  while (ch=*ptr++) {
+	    if (ch!=CH_TAB) {
+	      if (ptr-1-cl->display>=cl->min_col) {
+		if (!(cl->flags & LTFLF_HAS_TERMINATOR) ||
+		  ptr-cl->display!=StrLen(cl->display))
+		  ch='*';
+	      }
+	      if (to_screen) {
+		if (cl->flags & LTFLF_BORDER_PLOT)
+		  PlotBorderChar(w1+ch,x-x0,y-y0);
+		else
+		  PlotWindowChar(w1+ch,x-x0,y-y0);
+	      }
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=col2;
+		}
+	      }
+	      col2++;
+	      x+=4;
+	    } else {
+	      i=(x+32) & -0x20;
+	      while (x<i) {
+		if (to_screen) {
+		  if (cl->flags & LTFLF_BORDER_PLOT)
+		    PlotBorderChar(w1+CH_SPACE,x-x0,y-y0);
+		  else
+		    PlotWindowChar(w1+CH_SPACE,x-x0,y-y0);
+		}
+		if (find_cur_entry) {
+		  d2=LtfCharDist(l,x,y);
+		  if (d2<D)
+		    D=d2;
+		}
+		x+=4;
+	      }
+	      col2++;
+	    }
+	  }
+	} else {
+	  if (cl->flags & LTFLF_BORDER_PLOT) {
+	    while (ch=*ptr++) {
+	      if (ch!=CH_TAB) {
+		if (to_screen)
+		  PlotBorderChar(w1+ch,x-x0,y-y0);
+		if (find_cur_entry) {
+		  d2=LtfCharDist(l,x,y);
+		  if (d2<D) {
+		    D=d2;
+		    col=col2;
+		  }
+		}
+		col2++;
+		x+=4;
+	      } else {
+		i=(x+32) & -0x20;
+		while (x<i) {
+		  if (to_screen)
+		    PlotBorderChar(w1+CH_SPACE,x-x0,y-y0);
+		  if (find_cur_entry) {
+		    d2=LtfCharDist(l,x,y);
+		    if (d2<D)
+		      D=d2;
+		  }
+		  x+=4;
+		}
+		col2++;
+	      }
+	    }
+	  } else {
+	    if (to_screen) {
+	      while (ch=*ptr++) {
+		if (ch!=CH_TAB) {
+		  PlotWindowChar(w1+ch,x-x0,y-y0);
+		  if (find_cur_entry) {
+		    d2=LtfCharDist(l,x,y);
+		    if (d2<D) {
+		      D=d2;
+		      col=col2;
+		    }
+		  }
+		  col2++;
+		  x+=4;
+		} else {
+		  i=(x+32) & -0x20;
+		  while (x<i) {
+		    PlotWindowChar(w1+CH_SPACE,x-x0,y-y0);
+		    if (find_cur_entry) {
+		      d2=LtfCharDist(l,x,y);
+		      if (d2<D)
+			D=d2;
+		    }
+		    x+=4;
+		  }
+		  col2++;
+		}
+	      }
+	    } else {
+	      while (ch=*ptr++) {
+		if (ch!=CH_TAB) {
+		  if (find_cur_entry) {
+		    d2=LtfCharDist(l,x,y);
+		    if (d2<D) {
+		      D=d2;
+		      col=col2;
+		    }
+		  }
+		  col2++;
+		  x+=4;
+		} else {
+		  i=(x+32) & -0x20;
+		  while (x<i) {
+		    if (find_cur_entry) {
+		      d2=LtfCharDist(l,x,y);
+		      if (d2<D)
+			D=d2;
+		    }
+		    x+=4;
+		  }
+		  col2++;
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+      switch (cl->btype) {
+	case LTFT_TEXT:
+	  if (!col2) {
+	    if (!(cl->flags & LTFLF_TREE) && recalc)
+	      del_cl=TRUE;
+	  }
+	  break;
+	case LTFT_HEX_EDIT:
+	  if (cl->flags & LTFLF_DATA_IS_PTR)
+	    bptr=cl->data;
+	  else
+ 	    bptr=&cl->data;
+	  k=cl->display; //columns
+	  for (i=0;i<cl->len;i=i+k) {
+	    if (cl->flags & LTFLF_ZERO_BASED)
+	      SPrintF(buf,"%08X ",i);
+	    else
+	      SPrintF(buf,"%08X ",bptr);
+	    ptr=buf;
+	    while (ch=*ptr++) {
+	      if (to_screen) {
+		if (cl->flags & LTFLF_BORDER_PLOT)
+		  PlotBorderChar(w1+ch,x-x0,y-y0);
+		else
+		  PlotWindowChar(w1+ch,x-x0,y-y0);
+	      }
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=i*3;
+		}
+	      }
+	      x+=4;
+	    }
+	    if (i+k>cl->len) k=cl->len-i;
+	    for (j=0;j<k;j++) {
+	      SPrintF(buf,"%02X",*bptr++);
+	      ptr=buf;
+	      while (ch=*ptr++) {
+		if (to_screen) {
+		  if (cl->flags & LTFLF_BORDER_PLOT)
+		    PlotBorderChar(w1+ch,x-x0,y-y0);
+		  else
+		    PlotWindowChar(w1+ch,x-x0,y-y0);
+		}
+		if (find_cur_entry) {
+		  d2=LtfCharDist(l,x,y);
+		  if (d2<D) {
+		    D=d2;
+		    col=col2;
+		  }
+		}
+		col2++;
+		x+=4;
+	      }
+	      x+=4;
+	    }
+	    bptr-=j;
+	    x+=(cl->display-k)*12;
+	    for (j=0;j<k;j++) {
+	      ch=*bptr++;
+	      if (!Bt(displayable_chars_bitmap,ch)) ch='.';
+	      if (to_screen) {
+		if (cl->flags & LTFLF_BORDER_PLOT)
+		  PlotBorderChar(w1+ch,x-x0,y-y0);
+		else
+		  PlotWindowChar(w1+ch,x-x0,y-y0);
+	      }
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=col2;
+		}
+	      }
+	      col2++;
+	      x+=4;
+	    }
+	    y++;
+	    x-=cl->display*12+k<<2+36;
+	  }
+	  break;
+	case LTFT_TAB:
+	  i=(x+32) & -0x20;
+	  if (cl->flags & LTFLF_BORDER_PLOT) {
+	    while (x<i) {
+	      if (to_screen)
+		PlotBorderChar(w1+CH_SPACE,x-x0,y-y0);
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D)
+		  D=d2;
+	      }
+	      x+=4;
+	    }
+	  } else {
+	    while (x<i) {
+	      if (to_screen)
+		PlotWindowChar(w1+CH_SPACE,x-x0,y-y0);
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D)
+		  D=d2;
+	      }
+	      x+=4;
+	    }
+	  }
+	  break;
+	case LTFT_CR:
+	case LTFT_SOFT_CR:
+	  if (revert_default_color_eol) {
+	    revert_default_color_eol=FALSE;
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  }
+	  if (l->left_margin==LTF_DEFAULT)
+	    x=l->indent;
+	  else
+	    x=l->indent+l->left_margin;
+	  y++;
+	  l->page_line_num++;
+	  if (l->footer==LTF_DEFAULT) {
+	    if (l->page_line_num>=l->page_length) {
+	      if (l->header==LTF_DEFAULT)
+		l->page_line_num=0;
+	      else {
+		l->page_line_num=l->header;
+		y+=l->header;
+	      }
+	    }
+	  } else {
+	    if (l->page_line_num>=l->page_length-l->footer) {
+	      y+=l->footer;
+	      if (l->header==LTF_DEFAULT)
+		l->page_line_num=0;
+	      else {
+		l->page_line_num=l->header;
+		y+=l->header;
+	      }
+	    }
+	  }
+	  break;
+	case LTFT_CURSOR_MOVEMENT:
+	  x+=cl->cursor_x_offset<<2;
+	  y+=cl->cursor_y_offset;
+	  if (cl->flags & LTFLF_PAGE_REL_Y) {
+	    if (cl->flags & LTFLF_TOP_Y)
+	      l->page_line_num=0;
+	    else if (cl->flags & LTFLF_BOTTOM_Y)
+	      l->page_line_num=l->page_length;
+	    else if (cl->flags & LTFLF_CENTER_Y)
+	      l->page_line_num=l->page_length>>1;
+	  }  //TODO: else
+	  l->page_line_num=(l->page_line_num+
+	    cl->cursor_y_offset)%l->page_length;
+	  break;
+	case LTFT_PAGE_BREAK:
+	  x=0;
+	  y+=l->page_length-cl->page_line_num;
+	  l->page_line_num=0;
+	  if (l->header!=LTF_DEFAULT) {
+	    y+=l->header;
+	    l->page_line_num=l->header;
+	  }
+	  break;
+	case LTFT_INDENT:
+	  if (cl->flags & LTFLF_LEFT_X)
+	    l->indent=cl->attr<<2;
+	  else
+	    l->indent=l->indent+cl->attr<<2;
+	  x=l->indent;
+	  cl->indent=l->indent;
+	  cl->x=0;
+	  if (l->left_margin!=LTF_DEFAULT) {
+	    x+=l->left_margin;
+	    cl->x+=l->left_margin;
+	  }
+	  break;
+	case LTFT_PAGE_LENGTH:
+	  l->page_length=cl->attr;
+	  break;
+	case LTFT_LEFT_MARGIN:
+	  l->left_margin=cl->attr<<2;
+	  cl->left_margin=l->left_margin;
+	  left_margin=tss->window_left+l->left_margin;
+	  break;
+	case LTFT_RIGHT_MARGIN:
+	  l->right_margin=cl->attr<<2;
+	  cl->right_margin=l->right_margin;
+	  right_margin=tss->window_left+l->right_margin;
+	  break;
+	case LTFT_HEADER:
+	  l->header=cl->attr;
+	  break;
+	case LTFT_FOOTER:
+	  l->footer=cl->attr;
+	  break;
+	case LTFT_FOREGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  else
+	    w=w & 0xF000 | cl->attr<<8;
+	  break;
+	case LTFT_BACKGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF00 | l->text_attribute<<8 & 0xF000;
+	  else
+	    w=w & 0xF00 | cl->attr<<12;
+	  break;
+	case LTFT_DEFAULT_FOREGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  else
+	    w=w & 0xF000 | cl->attr <<8;
+	  l->text_attribute=l->text_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_DEFAULT_BACKGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF00 | l->text_attribute<<8 & 0xF000;
+	  else
+	    w=w & 0xF00 | cl->attr <<12;
+	  l->text_attribute=l->text_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_LINK_FOREGROUND:
+	  l->link_attribute=l->link_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_LINK_BACKGROUND:
+	  l->link_attribute=l->link_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_MACRO_FOREGROUND:
+	  l->macro_attribute=l->macro_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_MACRO_BACKGROUND:
+	  l->macro_attribute=l->macro_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_ANCHOR_FOREGROUND:
+	  l->anchor_attribute=l->anchor_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_ANCHOR_BACKGROUND:
+	  l->anchor_attribute=l->anchor_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_HIDDEN_FOREGROUND:
+	  l->hidden_attribute=l->hidden_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_HIDDEN_BACKGROUND:
+	  l->hidden_attribute=l->hidden_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_TREE_FOREGROUND:
+	  l->tree_attribute=l->tree_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_TREE_BACKGROUND:
+	  l->tree_attribute=l->tree_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_USER_FOREGROUND:
+	  if (cl->attr==LTF_DEFAULT) {
+	    w=w & 0xF000 | l->user_attribute<<8 & 0xF00;
+	    if (y==cursor_y) {
+	      l->cur_entry=cl->next;
+	      l->cur_data_col=l->cur_entry->min_col;
+	    }
+	  } else
+	    l->user_attribute=l->user_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_USER_BACKGROUND:
+	  if (cl->attr==LTF_DEFAULT) {
+	    w=w & 0xF00 | l->user_attribute<<8 & 0xF000;
+	    if (y==cursor_y) {
+	      l->cur_entry=cl->next;
+	      l->cur_data_col=l->cur_entry->min_col;
+	    }
+	  } else
+	    l->user_attribute=l->user_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_WORD_WRAP:
+	  if (cl->attr)
+	    l->flags|=LTFF_WORD_WRAP;
+	  else
+	    l->flags&=~LTFF_WORD_WRAP;
+	  break;
+	case LTFT_UNDERLINED:
+	  if (cl->attr)
+	    l->flags|=LTFF_UNDERLINED;
+	  else
+	    l->flags&=~LTFF_UNDERLINED;
+	  break;
+	case LTFT_INVERTED:
+	  if (cl->attr)
+	    l->flags|=LTFF_INVERTED;
+	  else
+	    l->flags&=~LTFF_INVERTED;
+	  break;
+	case LTFT_BLINK:
+	  if (cl->attr)
+	    l->flags|=LTFF_BLINK;
+	  else
+	    l->flags&=~LTFF_BLINK;
+	  break;
+	case LTFT_SHIFTED_X:
+	  l->shifted_x=cl->attr;
+	  break;
+	case LTFT_SHIFTED_Y:
+	  l->shifted_y=cl->attr;
+	  break;
+	case LTFT_CURSOR:
+	  if (!find_cur_entry && !(l->flags & LTFF_NO_CURSOR)) {
+	    l->cur_entry=cl->next;
+	    l->cur_data_col=l->cur_entry->min_col;
+	  }
+	  del_cl=TRUE;
+	  break;
+	case LTFT_PICTURE:
+	  if (!cl->bin_data)
+	    cl->bin_data=LtfFindBin(l,cl->bin_num);
+	  if (cl->bin_data) {
+	    GrReset(base);
+	    base->flags&=~(BMF_DONT_DRAW|BMF_LOCATE_NEAREST|BMF_TRANSFORMATION);
+	    if (!to_screen)
+	      base->flags|=BMF_DONT_DRAW;
+	    i=((w1>>12)&0xF)^0xF;
+	    if (w1 & LTFLT_SELECTED)
+	      i^=0xF;
+	    if (w1 & LTFLT_INVERTED)
+	      i^=0xF;
+	    base->color^=i;
+	    if (find_cur_entry)
+	      base->flags|=BMF_LOCATE_NEAREST;
+	    base->nearest_sub_GrElem=0;
+	    base->nearest_dist=MAX_I8;
+	    if (to_screen && (l->cur_GrElem==cl->bin_data->data)) {
+	      base->flags|=BMF_LOCATE_NEAREST;
+	      base->cur_x=ipx;
+	      base->cur_y=ipy;
+	    } else {
+	      base->cur_x=(l->x-x0)>>2*FONT_WIDTH;
+	      base->cur_y=(l->y-y0)*FONT_HEIGHT;
+	    }
+	    base->cur_z=0;
+	    GrElemsPlot(base,(x-x0)>>2*FONT_WIDTH,
+	      (y-y0)*FONT_HEIGHT,0,cl->bin_data->data,i);
+	    if (to_screen && (l->cur_GrElem==cl->bin_data->data))
+	      l->cur_sub_GrElem=base->nearest_sub_GrElem;
+	    base->flags&=~(BMF_LOCATE_NEAREST|BMF_DONT_DRAW);
+	    D=base->nearest_dist;
+	    col=cl->min_col;
+	  }
+	  break;
+	case LTFT_BPT:
+	  w=w & 0xF000 | RED<<8;
+	  revert_default_color_eol=TRUE;
+	  break;
+	case LTFT_SONG:
+	  if (sys_cur_focus_task==tss && to_screen) {
+	    if (StrCmp(cur_song,cl->song)) {
+	      AFree(cur_song);
+	      ResetMusicSettings;
+	      cur_song=ANewString(cl->song);
+	    }
+	  }
+	  Bts(&tss->task_flags,TSSf_HAS_SONG);
+	  break;
+	case LTFT_CLEAR:
+	  if (recalc && pg_found==cl) {
+	    del_cl=TRUE;
+	    pg_found=FALSE;
+	  } else
+	    next_pg_found=cl;
+	  break;
+      }
+
+    if (cl->flags & LTFLF_HAS_BORDER) {
+      if (cl->flags & LTFLF_SOLID_BORDER)
+	DrawBorder(1,cl->x-x0,x-x0-4,cl->y-y0,y-y0,w1.u1[1],TRUE);
+      else
+	DrawBorder(0,cl->x-x0,x-x0-4,cl->y-y0,y-y0,w1.u1[1],TRUE);
+    }
+    switch (cl->btype) {
+      case LTFT_CHECK_BOX:
+      case LTFT_HIDE_START:
+	cl->max_col=2;
+	break;
+      case LTFT_TREE:
+      case LTFT_BUTTON:
+      case LTFT_LINK:
+      case LTFT_MENU_VALUE:
+      case LTFT_MACRO:
+      case LTFT_HIDE_END:
+	cl->max_col=1;
+	break;
+      default:
+	cl->max_col=(cl->flags & LTFLF_TREE) ? 1:col2;
+    }
+
+    if (x>l->max_x) l->max_x=x;
+    if (y>l->max_y) l->max_y=y;
+    if (D<best_d) {
+      best_d=D;
+      best_cl=cl;
+      best_col=col;
+    }
+    if (cl->flags & LTFLF_TREE) {
+      if (cl->flags & LTFLF_ALIAS)
+	alias=cl;
+      else
+	alias=NULL;
+      if (cl->flags & LTFLF_COLLAPSED)
+	tree_collapsed=TRUE;
+      else
+	tree_collapsed=FALSE;
+      cl2=cl->next;
+      while (cl2!=l && cl2->btype!=LTFT_INDENT && !(cl2->flags & LTFLF_TREE))
+	cl2=cl2->next;
+      if (cl2->btype==LTFT_INDENT) {
+	i=l->indent;
+	j=i;
+	do {
+	  if (tree_collapsed)
+	    cl2->flags|=LTFLF_SKIP;
+	  else
+	    cl2->flags&=~LTFLF_SKIP;
+	  if (alias && cl2==l->cur_entry && Bt(ltf_display_types,cl2->btype)) {
+	    Free(alias->display,mem_tss);
+	    alias->display=MAlloc(StrLen(cl2->display)+4,mem_tss);
+	    alias->display[0]='+';
+	    alias->display[1]=']';
+	    alias->display[2]=CH_SPACE;
+	    StrCpy(alias->display+3,cl2->display);
+	    alias->max_col=cl2->max_col+3;
+	  }
+	  if (cl2->btype==LTFT_INDENT) {
+	    if (cl2->flags & LTFLF_LEFT_X)
+	      j=cl2->attr;
+	    else
+	      j+=cl2->attr;
+	  }
+	  cl2=cl2->next;
+	} while (cl2!=l && j>i);
+      }
+    }
+    if (cl->btype == LTFT_HIDE_START) {
+      if (cl->flags & LTFLF_ALIAS)
+	alias=cl;
+      else
+	alias=NULL;
+      cl2=cl->next;
+      Btr(hide_collapsed,0);
+      j=1;
+      AssignBit(hide_collapsed,j,cl->flags & LTFLF_COLLAPSED);
+      while (cl2!=l && j>0) {
+	if (Bt(hide_collapsed,j))
+	  cl2->flags|=LTFLF_SKIP;
+	else
+	  cl2->flags&=~LTFLF_SKIP;
+	if (cl2->btype==LTFT_HIDE_START) {
+	  j++;
+	  AssignBit(hide_collapsed,j,cl2->flags & LTFLF_COLLAPSED);
+	  if (Bt(hide_collapsed,j-1))
+	    Bts(hide_collapsed,j);
+	} else if (cl2->btype==LTFT_HIDE_END) {
+	  j--;
+	  if (Bt(hide_collapsed,j))
+	    cl2->flags|=LTFLF_SKIP;
+	  else
+	    cl2->flags&=~LTFLF_SKIP;
+	}
+	cl2=cl2->next;
+      }
+    }
+
+skip:
+    cl2=cl->next;
+    while (cl2!=l && cl2->flags & LTFLF_SKIP) {
+/*
+      if (cl2==l->cur_entry) {
+	l->cur_entry=cl2->next;
+	l->cur_data_col=l->cur_entry->min_col;
+      }
+*/
+      cl2->x=x;
+      cl2->y=y;
+      cl2->indent=l->indent;
+      cl2->page_line_num=l->page_line_num;
+      cl2->left_margin=l->left_margin;
+      cl2->right_margin=l->right_margin;
+      cl2->type=w & 0xFF00 | cl2->type & 0xFFFF00FF;
+      if (l->flags & LTFF_WORD_WRAP)
+	cl2->flags|=LTFLF_WORD_WRAP;
+      else
+	cl2->flags&=~LTFLF_WORD_WRAP;
+
+      if (l->flags & LTFF_UNDERLINED) {
+	cl2->flags|=LTFLF_UNDERLINED;
+	w|=LTFLT_UNDERLINED;
+      } else {
+	cl2->flags&=~LTFLF_UNDERLINED;
+	w&=~LTFLT_UNDERLINED;
+      }
+
+      if (l->flags & LTFF_INVERTED) {
+	cl2->flags|=LTFLF_INVERTED;
+	w|=LTFLT_INVERTED;
+      } else {
+	cl2->flags&=~LTFLF_INVERTED;
+	w&=~LTFLT_INVERTED;
+      }
+      if (l->flags & LTFF_BLINK) {
+	cl2->flags|=LTFLF_BLINK;
+	w|=LTFLT_BLINK;
+      } else {
+	cl2->flags&=~LTFLF_BLINK;
+	w&=~LTFLT_BLINK;
+      }
+      cl2=cl2->next;
+    }
+
+    if (del_cl || pg_found || num_entries<num_del_entries) {
+      if (!(cl->flags & LTFLF_HOLD)) {
+	if (cl==l->cur_entry) {
+	  l->cur_entry=cl2;
+	  l->cur_data_col=cl2->min_col;
+	}
+	if (best_cl==cl) {
+	  best_cl=cl2;
+	  best_col=0;
+	}
+	RemQue(cl);
+	LtfDelEntry(cl,mem_tss);
+      }
+    }
+    num_entries++;
+    cl=cl2;
+  }
+
+  //Update header
+  if (!skipped_update) {
+    cl->x=x;
+    cl->y=y;
+    cl->indent=l->indent;
+    cl->page_line_num=l->page_line_num;
+    cl->left_margin=l->left_margin;
+    cl->right_margin=l->right_margin;
+    cl->type=w & 0xFF00 | cl->type & 0xFFFF00FF;
+    if (find_cur_entry) {
+      D=LtfCharDist(l,x,y);
+      if (D<best_d) {
+	best_d=D;
+	best_cl=cl;
+	best_col=0;
+      }
+    }
+  }
+  if (to_screen && l->flags & LTFF_MIN_SIZE) {
+    if (tss->window_right!=tss->window_left+l->max_x+4) {
+      tss->window_right=tss->window_left+l->max_x-l->min_x+4;
+      Bts(&sys_flags,SYSf_CLEAR_SCREEN_TEXT);
+    }
+    if (tss->window_bottom!=tss->window_top+l->max_y+1) {
+      tss->window_bottom=tss->window_top+l->max_y-l->min_y+1;
+      Bts(&sys_flags,SYSf_CLEAR_SCREEN_TEXT);
+    }
+  }
+  if (find_cur_entry) {
+    l->cur_entry=best_cl;
+    l->cur_data_col=best_col;
+  }
+  if ((l->cur_entry->btype)!=LTFT_HEX_EDIT) {
+    l->y=l->cur_entry->y;
+    l->x=l->cur_entry->x+l->cur_data_col<<2;
+  } else {
+    l->y=l->cur_entry->y+l->cur_data_col/3/l->cur_entry->display;
+    x=l->cur_data_col%(l->cur_entry->display*3);
+    i=x/l->cur_entry->display;
+    l->x=l->cur_entry->x+36;
+    if (i<2)
+      l->x+=x>>1*12+(x&1)<<2;
+    else
+      l->x+=l->cur_entry->display*12+(x-l->cur_entry->display<<1)<<2;
+  }
+  l->line=l->y+1;
+  l->col=l->x>>2+1;
+  if (has_cursor) {
+    if (l->cur_top_line_num+tss->window_bottom-tss->window_top>l->max_y)
+      l->cur_top_line_num=l->max_y-(tss->window_bottom-tss->window_top);
+    if (l->cur_top_line_num<l->min_y)
+      l->cur_top_line_num=l->min_y;
+
+    if (l->y-l->cur_top_line_num>tss->window_bottom-tss->window_top)
+      l->cur_top_line_num=l->y-(tss->window_bottom-tss->window_top);
+    if (l->y-l->cur_top_line_num<0)
+      l->cur_top_line_num=l->y;
+
+    if (l->line_start_col+tss->window_right-tss->window_left>l->max_x)
+      l->line_start_col=l->max_x-(tss->window_right-tss->window_left);
+    if (l->line_start_col<l->min_x)
+      l->line_start_col=l->min_x;
+
+    if (l->x-l->line_start_col>tss->window_right-tss->window_left)
+      l->line_start_col=l->x-(tss->window_right-tss->window_left);
+    if (l->x-l->line_start_col<0)
+      l->line_start_col=l->x;
+  }
+  if (recalc)
+    l->recalc_start=NULL;
+  if (to_screen && has_cursor) {
+    tss->cursor_vert=l->y-l->cur_top_line_num+tss->window_top;
+    tss->cursor_hor=l->x-l->line_start_col+tss->window_left;
+    if (jiffies % (JIFFY_FREQ>>2) > (JIFFY_FREQ>>2)>>1) {
+      Btr(&Fs->crt_flags,CRTf_CURSOR_ON);
+      CursorOn;
+    }
+
+    i=l->max_x-l->min_x+1;
+    tss->scroll_x=DivI8(MulI8(l->line_start_col-l->min_x,
+      tss->window_right-tss->window_left+4)+i-1,i)&-4;
+
+    i=l->max_y-l->min_y+1;
+    tss->scroll_y=DivI8(MulI8(l->cur_top_line_num-l->min_y,
+      tss->window_bottom-tss->window_top+1)+i-1,i);
+
+    PlotBorderChar(140+(tss->border_attribute<<8),
+      (tss->window_right-tss->window_left+4),tss->scroll_y);
+    PlotBorderChar(140+(tss->border_attribute<<8),
+      tss->scroll_x,(tss->window_bottom-tss->window_top+1));
+  }
+  if (!same_window && extra_processing) {
+    l->old_window_top=tss->window_top;
+    l->old_window_bottom=tss->window_bottom;
+    l->old_window_left=tss->window_left;
+    l->old_window_right=tss->window_right;
+  }
+  GrDel(base);
+  if (recalc) {
+    i=num_entries-l->max_entries;
+    if (i>1024 && !num_del_entries || next_pg_found)
+      LtfUpdateWindowJoin(l,to_screen,has_cursor,recalc,find_cur_entry,next_pg_found,i);
+  }
+}
+
+void LtfRemoveSoftCRs(Ltf *l,LtfEntry *cl=NULL)
+{
+  LtfEntry *cl2,*saved_cl=cl;
+  BoolU4 old_preempt=Preempt(OFF);
+  if (!cl) cl=l->dummy.next;
+  while (cl!=l) {
+    cl2=cl->next;
+    if (cl->btype==LTFT_SOFT_CR) {
+      if (l->cur_entry==cl) {
+	l->cur_entry=cl2;
+	l->cur_data_col=l->cur_entry->min_col;
+      }
+      RemQue(cl);
+      LtfDelEntry(cl,l->mem_tss);
+    } else if (saved_cl && cl->btype==LTFT_CR)
+      break;
+    cl=cl2;
+  }
+  Preempt(old_preempt);
+}
+
+public void LtfRecalc(Ltf *l)
+{
+  if (l->recalc_start!=l && l->recalc_start)
+    LtfRemoveSoftCRs(l,l->recalc_start);
+  LtfUpdateWindowJoin(l,FALSE,FALSE,TRUE,FALSE);
+}
+ext[EXT_LTF_RECALC]=&LtfRecalc;
+
+
+public void LtfCenter(Ltf *l)
+{
+  TssStruct *tss=l->tss;
+  LtfRecalc(l);
+  l->cur_top_line_num=l->y-(tss->window_bottom-tss->window_top)>>1;
+}
+
+public void LtfBottom(Ltf *l)
+{
+  l->cur_entry=l;
+  l->cur_data_col=0;
+  l->recalc_start=l;
+  LtfRecalc(l);
+}
+
+public Ltf *LtfNew()
+{
+  Ltf *l;
+  l=MAllocZ(sizeof(Ltf));
+  StrCpy(l->filename.name,sys_temp_filename);
+  l->file_attr=0;
+  l->find_replace=MAllocZ(sizeof(EditFindTextStruct));
+  l->find_replace->scan_forward=1;
+  l->find_replace->match_case=1;
+  l->EditPlugIns=Fs->EditPlugIns;
+  l->dollar_buf_size=84;
+  l->dollar_buf=MAlloc(l->dollar_buf_size);
+  l->max_entries=MAX_I4;
+  l->ww_lines_back=32;
+  l->tss=Fs;
+  l->mem_tss=Fs;
+  LtfReset(l,FALSE,FALSE);
+  return l;
+}
+
+void ParseLtfFlags(LexStruct *l,U8 *flags,U4 *type)
+{
+  I8 i;
+  BoolU4 turn_on;
+  while (l->token=='+' || l->token=='-') {
+    turn_on=(l->token=='+');
+    if (Lex(l)==TK_IDENT) {
+      i=MatchSysTextEntry(l->ident,"ST_LTF_FLAGS",MLE_EXACT);
+      if (i<0)
+	*type=LTFT_ERROR;
+      else {
+	AssignBit(flags,i,turn_on);
+	if (i==LTFLf_SELECTED)
+	  AssignBit(type,30,turn_on);
+	else if (i==LTFLf_UNDERLINED)
+	  AssignBit(type,31,turn_on);
+	else if (i==LTFLf_INVERTED)
+    	  AssignBit(type,29,turn_on);
+	else if (i==LTFLf_BLINK)
+	  AssignBit(type,28,turn_on);
+      }
+      Lex(l);  //skip flag
+    }
+  }
+}
+
+void LtfDefaultFlags(U4 *type,U8 *f1)
+{
+  switch (*type & 255) {$AN,"default_flags","default_flags"$
+    case LTFT_TREE:
+      *f1=LTFLF_COLLAPSED|LTFLF_TREE;
+      *type=*type | LTFLT_UNDERLINED;
+      break;
+    case LTFT_DATA:
+      *f1=LTFLF_DATA_IS_PTR | LTFLF_HAS_TERMINATOR | LTFLF_AUX_STRING;
+      break;
+    case LTFT_CURSOR_MOVEMENT:
+      *f1=LTFLF_LEFT_EXP | LTFLF_RIGHT_EXP;
+      break;
+    case LTFT_LINK:
+      *f1=LTFLF_AUX_STRING;
+      *type=*type | LTFLT_UNDERLINED;
+      break;
+    case LTFT_ANCHOR:
+      *f1=LTFLF_AUX_STRING;
+      break;
+    case LTFT_BUTTON:
+      *f1=LTFLF_ESC | LTFLF_LEFT_EXP | LTFLF_HAS_BORDER;
+      break;
+    case LTFT_CHECK_BOX:
+      *f1=LTFLF_DATA_IS_PTR;
+      break;
+    case LTFT_MACRO:
+      *f1=LTFLF_ESC | LTFLF_LEFT_MACRO;
+      *type=*type | LTFLT_UNDERLINED;
+      break;
+    case LTFT_MENU_VALUE:
+      *f1=LTFLF_ESC | LTFLF_LEFT_EXP;
+      *type=*type | LTFLT_UNDERLINED;
+      break;
+    case LTFT_HEX_EDIT:
+      *f1=LTFLF_DATA_IS_PTR | LTFLF_ZERO_BASED;
+      break;
+    case LTFT_PICTURE:
+      *f1=LTFLF_HAS_BIN;
+      break;
+    case LTFT_INSERT_BINARY:
+    case LTFT_INSERT_BINARY_TYPE:
+    case LTFT_INSERT_BINARY_SIZE:
+      *f1=LTFLF_HAS_BIN;
+      break;
+    case LTFT_HIDE_START:
+      *f1=LTFLF_COLLAPSED;
+      *type=*type | LTFLT_UNDERLINED;
+      break;
+    case LTFT_SONG:
+      *f1=LTFLF_LEFT_MACRO;
+      break;
+  }
+}
+
+I1 *LtfToPlainText(LtfEntry *ll)
+{
+  I8 i,j;
+  U8 type=ll->btype,f1=0,flags;
+  I1 *buf,*buf2;
+
+  if (ll->btype==LTFT_ERROR)
+    return NewString(ll->plain_text);
+
+  LtfDefaultFlags(&type,&f1);
+
+  buf=NewString(SysTextSub(ll->btype,"ST_LTF_CMDS"));
+  flags=ll->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	 LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP);
+  for (i=0;i<64;i++)
+    if (Bt(&f1,i)!=Bt(&flags,i)) {
+      if (Bt(&flags,i))
+	buf=Add2String(buf,"+");
+      else
+	buf=Add2String(buf,"-");
+      buf=Add2String(buf,SysTextSub(i,"ST_LTF_FLAGS"));
+    }
+
+  for (i=28;i<32;i++)
+    if (Bt(&type,i)!=Bt(&ll->type,i)) {
+      if (Bt(&ll->type,i))
+	buf=Add2String(buf,"+");
+      else
+	buf=Add2String(buf,"-");
+      switch (i) {
+	case 28: j=LTFLf_BLINK; break;
+	case 29: j=LTFLf_INVERTED; break;
+	case 30: j=LTFLf_SELECTED; break;
+	case 31: j=LTFLf_UNDERLINED; break;
+      }
+      buf=Add2String(buf,SysTextSub(j,"ST_LTF_FLAGS"));
+    }
+  buf=Add2String(buf,",");
+  switch (ll->btype) {
+    case LTFT_TEXT:
+    case LTFT_LINK:
+    case LTFT_ANCHOR:
+    case LTFT_MENU_VALUE:
+    case LTFT_BUTTON:
+    case LTFT_CHECK_BOX:
+    case LTFT_TREE:
+    case LTFT_PICTURE:
+    case LTFT_INSERT_BINARY:
+    case LTFT_INSERT_BINARY_TYPE:
+    case LTFT_INSERT_BINARY_SIZE:
+    case LTFT_SONG:
+      buf=Add2String(buf,"\"");
+      if (i==LTFT_CHECK_BOX) {
+	buf=Add2String(buf,ll->display+4);
+      } else {
+	if (ll->flags & LTFLF_TREE)
+	  buf=Add2String(buf,ll->display+3);
+	else
+	  buf=Add2String(buf,ll->display);
+      }
+      buf=Add2String(buf,"\",");
+      break;
+    case LTFT_DATA:
+      buf2=MSPrintF("%s%d,",buf,ll->len);
+      Free(buf); buf=buf2;
+      break;
+    case LTFT_HEX_EDIT:
+      buf2=MSPrintF("%s%d,",buf,ll->len);
+      Free(buf); buf=buf2;
+      buf2=MSPrintF("%s%d,",buf,ll->display);
+      Free(buf); buf=buf2;
+      break;
+    case LTFT_PAGE_LENGTH:
+    case LTFT_LEFT_MARGIN:
+    case LTFT_RIGHT_MARGIN:
+    case LTFT_HEADER:
+    case LTFT_FOOTER:
+    case LTFT_INDENT:
+    case LTFT_FOREGROUND_COLOR:
+    case LTFT_BACKGROUND_COLOR:
+    case LTFT_DEFAULT_FOREGROUND_COLOR:
+    case LTFT_DEFAULT_BACKGROUND_COLOR:
+    case LTFT_LINK_FOREGROUND:
+    case LTFT_LINK_BACKGROUND:
+    case LTFT_MACRO_FOREGROUND:
+    case LTFT_MACRO_BACKGROUND:
+    case LTFT_ANCHOR_FOREGROUND:
+    case LTFT_ANCHOR_BACKGROUND:
+    case LTFT_HIDDEN_FOREGROUND:
+    case LTFT_HIDDEN_BACKGROUND:
+    case LTFT_TREE_FOREGROUND:
+    case LTFT_TREE_BACKGROUND:
+    case LTFT_USER_FOREGROUND:
+    case LTFT_USER_BACKGROUND:
+    case LTFT_WORD_WRAP:
+    case LTFT_UNDERLINED:
+    case LTFT_INVERTED:
+    case LTFT_BLINK:
+    case LTFT_SHIFTED_X:
+    case LTFT_SHIFTED_Y:
+      if (ll->attr!=LTF_DEFAULT) {
+	buf2=MSPrintF("%s%d,",buf,ll->attr);
+	Free(buf); buf=buf2;
+      }
+      break;
+  }
+  flags=ll->flags& (LTFLF_SCROLLING_X|LTFLF_SHIFTED_X|LTFLF_SCROLLING_Y|
+    LTFLF_AUX_STRING|LTFLF_LEFT_EXP|LTFLF_LEFT_MACRO|
+    LTFLF_HAS_BIN|LTFLF_RIGHT_EXP|LTFLF_RIGHT_MACRO);
+  while (flags) {
+    j=Bsf(flags);
+    Btr(&flags,j);
+    switch (j) {
+      case LTFLf_SCROLLING_X:
+	buf2=MSPrintF("%s%d",buf,ll->scroll_len);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_SHIFTED_X:
+	j=(ll->type.u2[1])&0x1F;
+	if (j&0x10) j|=0xFFFFFFF0;
+	buf2=MSPrintF("%s%d",buf,j);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_SHIFTED_Y:
+	j=(ll->type>>21)&0x1F;
+	if (j&0x10) j|=0xFFFFFFF0;
+	buf2=MSPrintF("%s%d",buf,j);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_AUX_STRING:
+	buf2=MSPrintF("%s\"%Q\"",buf,ll->aux_string);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_LEFT_EXP:
+	buf2=MSPrintF("%s%d",buf,ll->left_exp);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_LEFT_MACRO:
+	buf2=MSPrintF("%s\"%Q\"",buf,ll->left_macro);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_RIGHT_EXP:
+	buf2=MSPrintF("%s%d",buf,ll->right_exp);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_RIGHT_MACRO:
+	buf2=MSPrintF("%s\"%Q\"",buf,ll->right_macro);
+	Free(buf); buf=buf2;
+	break;
+      case LTFLf_HAS_BIN:
+	buf2=MSPrintF("%s%d",buf,ll->bin_num);
+	Free(buf); buf=buf2;
+	break;
+    }
+    buf=Add2String(buf,",");
+  }
+  buf[StrLen(buf)-1]=0;  //Kill last comma
+  buf2=NewString(buf); //exact allocation
+  Free(buf);
+  return buf2;
+}
+
+
+LtfEntry *ParseDollarCmd(I1 *st,TssStruct *tss)
+{
+  I8 i,j,size,flags;
+  I1 *ptr;
+  LtfEntry *ll=NULL;
+  LexStruct *l=LexNew(st,LF_DONT_FREE_BUFFER,NULL);
+  Lex(l);
+  if (l->token==TK_IDENT) {
+    i=MatchSysTextEntry(l->ident,"ST_LTF_CMDS",MLE_IGNORE_CASE);
+    if (i<0)
+      i=LTFT_ERROR;
+    Lex(l); //skip cmd code
+    ll=MAllocZ(sizeof(LtfEntry),tss);
+    ll->type=i;
+    ll->plain_text=NewString(st,tss);
+    LtfDefaultFlags(&ll->type,&ll->flags);
+    ParseLtfFlags(l,&ll->flags,&ll->type);
+
+    if (l->token==',')
+      Lex(l);
+    switch (i) {
+      case LTFT_TEXT:
+      case LTFT_LINK:
+      case LTFT_ANCHOR:
+      case LTFT_MENU_VALUE:
+      case LTFT_BUTTON:
+      case LTFT_CHECK_BOX:
+      case LTFT_TREE:
+      case LTFT_PICTURE:
+      case LTFT_INSERT_BINARY:
+      case LTFT_INSERT_BINARY_TYPE:
+      case LTFT_INSERT_BINARY_SIZE:
+      case LTFT_SONG:
+	if (l->token==TK_STRING) {
+	  st=LexExtendString(l,&size);
+	  if (i==LTFT_CHECK_BOX) {
+	    ll->display=MSPrintF("[X] %s",st);
+	    ll->min_col=1;
+	  } else {
+	    if (ll->flags & LTFLF_TREE) {
+	      ll->display=MSPrintF("+] %s",st);
+	      ll->min_col=1;
+	    } else
+	      ll->display=st;
+	  }
+	} else {
+	  if (i>=LTFT_PICTURE && i<=LTFT_INSERT_BINARY_SIZE ||
+	      i==LTFT_SONG)
+	    ll->display=NewString("");
+	  else {
+	    ll->display=0;
+	    ll->type=LTFT_ERROR;
+	  }
+	}
+	break;
+      case LTFT_HIDE_START:
+	ll->display=NewString("<-");
+	ll->min_col=1;
+	break;
+      case LTFT_HIDE_END:
+	ll->display=NewString(">");
+	break;
+      case LTFT_DATA:
+	ll->flags|=LTFLF_AUX_STRING; //don't allow switched off
+	ll->len=Expression(l);
+	break;
+      case LTFT_HEX_EDIT:
+	ll->len=Expression(l);
+	if (l->token==',')
+	  Lex(l);
+	ll->display=Expression(l); //TODO union
+	break;
+      case LTFT_PAGE_LENGTH:
+      case LTFT_LEFT_MARGIN:
+      case LTFT_RIGHT_MARGIN:
+      case LTFT_HEADER:
+      case LTFT_FOOTER:
+      case LTFT_INDENT:
+      case LTFT_FOREGROUND_COLOR:
+      case LTFT_BACKGROUND_COLOR:
+      case LTFT_DEFAULT_FOREGROUND_COLOR:
+      case LTFT_DEFAULT_BACKGROUND_COLOR:
+      case LTFT_LINK_FOREGROUND:
+      case LTFT_LINK_BACKGROUND:
+      case LTFT_MACRO_FOREGROUND:
+      case LTFT_MACRO_BACKGROUND:
+      case LTFT_ANCHOR_FOREGROUND:
+      case LTFT_ANCHOR_BACKGROUND:
+      case LTFT_HIDDEN_FOREGROUND:
+      case LTFT_HIDDEN_BACKGROUND:
+      case LTFT_TREE_FOREGROUND:
+      case LTFT_TREE_BACKGROUND:
+      case LTFT_USER_FOREGROUND:
+      case LTFT_USER_BACKGROUND:
+      case LTFT_WORD_WRAP:
+      case LTFT_UNDERLINED:
+      case LTFT_INVERTED:
+      case LTFT_BLINK:
+      case LTFT_SHIFTED_X:
+      case LTFT_SHIFTED_Y:
+	if (!l->token)
+	  ll->attr=LTF_DEFAULT;
+	else
+	  ll->attr=Expression(l);
+	break;
+      case LTFT_ERROR:
+	ll->flags=0;
+	ll->type=LTFT_ERROR;
+	break;
+    }
+ 
+    flags=ll->flags& (LTFLF_SCROLLING_X|LTFLF_SHIFTED_X|LTFLF_SCROLLING_Y|
+      LTFLF_AUX_STRING|LTFLF_LEFT_EXP|LTFLF_LEFT_MACRO|
+      LTFLF_HAS_BIN|LTFLF_RIGHT_EXP|LTFLF_RIGHT_MACRO);
+    while (flags) {
+      j=Bsf(flags);
+      Btr(&flags,j);
+      while (l->token==',')
+	Lex(l);
+      switch (j) {  //TODO: Might check for expression errors
+	case LTFLf_SCROLLING_X:
+	  ll->scroll_len=Expression(l);
+	  break;
+	case LTFLf_SHIFTED_X:
+	  ll->type|=((Expression(l) & 0x1F)<<16);
+	  break;
+	case LTFLf_SHIFTED_Y:
+	  ll->type|=((Expression(l) & 0x1F)<<21);
+	  break;
+	case LTFLf_AUX_STRING:
+	  if (l->token==TK_STRING) {
+	    ll->aux_string=LexExtendString(l,&size);
+	    if (i==LTFT_MACRO && !ll->display)
+	      ll->display=NewString(ll->aux_string,tss);
+	    if (i==LTFT_DATA) {
+	      if (ptr=StrStr(ll->aux_string,":"))
+		ll->min_col=ptr-ll->aux_string+1;
+	      ll->display=MAlloc(ll->len+ll->min_col+2,tss);
+	    }
+	  } else
+	    ll->type=LTFT_ERROR;
+	  break;
+	case LTFLf_LEFT_EXP:
+	  ll->left_exp=Expression(l);
+	  break;
+	case LTFLf_LEFT_MACRO:
+	  if (l->token==TK_STRING) {
+	    ll->left_macro=LexExtendString(l,&size);
+	    if (i==LTFT_MACRO && !ll->display)
+	      ll->display=NewString(ll->left_macro,tss);
+	  } else
+	    ll->type=LTFT_ERROR;
+	  break;
+	case LTFLf_RIGHT_EXP:
+	  ll->right_exp=Expression(l);
+	  break;
+	case LTFLf_RIGHT_MACRO:
+	  if (l->token==TK_STRING) {
+	    ll->right_macro=LexExtendString(l,&size);
+	    if (i==LTFT_MACRO && !ll->display)
+	      ll->display=NewString(ll->right_macro,tss);
+	  } else
+	    ll->type=LTFT_ERROR;
+	  break;
+	case LTFLf_HAS_BIN:
+	  if (!l->token)
+	    ll->bin_num=0;
+	  else
+	    ll->bin_num=Expression(l);
+	  break;
+      }
+    }
+  } else if (!ll) {
+    ll=MAllocZ(sizeof(LtfEntry),tss);
+    ll->type=LTFT_ERROR;
+    ll->plain_text=NewString(st,tss);
+  }
+  LexDel(l);
+  return ll;
+}
+
+void LtfInsert(Ltf *l,LtfEntry *ll)
+{
+  I1 *dst;
+  LtfEntry *cl=l->cur_entry,*nl;
+
+  ll->x=cl->x;
+  ll->y=cl->y;
+  ll->indent=cl->indent;
+  ll->page_line_num=cl->page_line_num;
+  ll->left_margin=cl->left_margin;
+  ll->right_margin=cl->right_margin;
+  if (l->cur_data_col>0 &&
+      cl->btype==LTFT_TEXT &&
+      l->cur_data_col<cl->max_col) {
+    nl=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+    nl->type=LTFT_TEXT|cl->type&-0x100;
+    nl->x=cl->x;
+    nl->y=cl->y;
+    nl->indent=cl->indent;
+    nl->page_line_num=cl->page_line_num;
+    nl->left_margin=cl->left_margin;
+    nl->right_margin=cl->right_margin;
+    nl->flags=cl->flags;
+    dst=cl->display+l->cur_data_col;
+    nl->display=NewString(dst,l->mem_tss);
+    *dst=0;
+    cl->max_col=l->cur_data_col;
+    InsQue(nl,cl);
+    l->cur_data_col=0;
+    cl=nl;
+    cl->max_col=StrLen(cl->display);
+  }
+  if (cl->btype==LTFT_TEXT && l->cur_data_col>=cl->max_col) {
+    InsQue(ll,cl);
+    l->cur_entry=ll->next;
+  } else {
+    InsQue(ll,cl->last);
+    l->cur_entry=cl;
+  }
+  l->cur_data_col=l->cur_entry->min_col;
+  LtfRemoveSoftCRs(l,l->cur_entry);
+}
+
+
+public LtfEntry *LtfPutS(Ltf *l,I1 *st)
+{
+  I1 ch,*ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *ll=NULL,*result=NULL,*cl=l->cur_entry;
+  l->recalc_start=l; //TODO:This might be optimized
+  if (!st) {
+    Preempt(old_preempt);
+    return NULL;
+  }
+  while (*ptr) {
+    ptr2=ptr;
+    ch=*ptr++;
+    while (TRUE) {
+      if (l->flags & LTFF_PLAIN_TEXT_WITH_TABS)
+	while (ch && ch!=CH_CR && ch!=CH_LINE_FEED && ch!=CH_CURSOR)
+	  ch=*ptr++;
+      else if (l->flags & LTFF_PLAIN_TEXT)
+	while (ch && ch!=CH_CR && ch!=CH_LINE_FEED && ch!=CH_TAB && ch!=CH_CURSOR && ch!=CH_FORM_FEED)
+	  ch=*ptr++;
+      else
+	while (ch && ch!=CH_CR && ch!=CH_LINE_FEED && ch!=CH_TAB && ch!=CH_CURSOR && ch!=CH_FORM_FEED && ch!='$$')
+	  ch=*ptr++;
+      if (ch==CH_CURSOR) {
+	if (l->flags & LTFF_NO_CURSOR)
+	  ch=*ptr++;
+	else
+	  break;
+      } else
+	break;
+    }
+    ptr--;
+    if (!ch) {
+      if (ptr!=ptr2) {
+	ll=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	ll->type=LTFT_TEXT | l->text_attribute << 8;
+	if (l->flags & LTFF_NO_CURSOR) {
+	  src=NewString(ptr2);
+	  StringUtil(src,SU_REMOVE_CTRL_CHARS);
+	} else
+	  src=ptr2;
+	ll->display=NewString(src,l->mem_tss);
+	ll->max_col=StrLen(src);
+	LtfInsert(l,ll);
+	if (l->flags & LTFF_NO_CURSOR)
+	  Free(src);
+      }
+    } else {
+      if (ptr!=ptr2) {
+	*ptr=0;
+	ll=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	ll->type=LTFT_TEXT | l->text_attribute << 8;
+	if (l->flags & LTFF_NO_CURSOR) {
+	  src=NewString(ptr2);
+	  StringUtil(src,SU_REMOVE_CTRL_CHARS);
+	} else
+	  src=ptr2;
+	ll->display=NewString(src,l->mem_tss);
+	ll->max_col=StrLen(src);
+	LtfInsert(l,ll);
+	if (l->flags & LTFF_NO_CURSOR)
+	  Free(src);
+	*ptr=ch;
+      }
+      if (ch==CH_CURSOR) { //cursor
+	ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+	ll->type=LTFT_CURSOR | l->text_attribute << 8;
+	LtfInsert(l,ll);
+	ptr++;
+      } else if (ch==CH_FORM_FEED) {
+	ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+	ll->type=LTFT_PAGE_BREAK | l->text_attribute << 8;
+	LtfInsert(l,ll);
+	ptr++;
+      } else if (ch==CH_TAB) {
+	ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+	ll->type=LTFT_TAB | l->text_attribute << 8;
+	LtfInsert(l,ll);
+	ptr++;
+      } else if (ch=='$$') {
+	ptr++; //skip first dollar
+	ptr2=ptr;
+	while (*ptr && *ptr!='$$')
+	  ptr++;
+	if (*ptr) {
+	  *ptr=0; //zero second dollar
+	  if (ptr==ptr2) {
+	    ll=MAllocZ(sizeof(LtfEntryBase)+4,l->mem_tss);
+	    ll->type=LTFT_TEXT | l->text_attribute << 8;
+	    ll->max_col=1;
+	    if (l->flags & LTFF_DOUBLE_DOLLARS)
+	      ll->display=NewString("$$$$",l->mem_tss);
+	    else
+	      ll->display=NewString("$$",l->mem_tss);
+   	    LtfInsert(l,ll);
+	  } else {
+	    st2=MAlloc(ptr-ptr2+1);
+	    ptr3=ptr2;
+	    ptr4=st2;
+	    while (*ptr3) {
+	      ch=*ptr3++;
+	      if (ch==CH_CURSOR) {
+		ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+		ll->type=LTFT_CURSOR | l->text_attribute << 8;
+		LtfInsert(l,ll);
+	      } else if (ch==CH_FORM_FEED) {
+		ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+		ll->type=LTFT_PAGE_BREAK | l->text_attribute << 8;
+		LtfInsert(l,ll);
+	      } else
+		*ptr4++=ch;
+	    }
+	    *ptr4=0;
+	    if (ll=ParseDollarCmd(st2,l->mem_tss)) {
+	      result=ll;
+   	      LtfInsert(l,ll);
+	    }
+	    Free(st2);
+	  }
+	  *ptr++='$$';
+	}
+      } else {
+	ll=MAllocZ(sizeof(LtfEntryBase),l->mem_tss);
+	ll->type=LTFT_CR | l->text_attribute << 8;
+   	LtfInsert(l,ll);
+	if (ch==CH_CR)
+	  while (*ptr==CH_CR)
+	    ptr++;
+	if (*ptr==CH_LINE_FEED)
+	  ptr++;
+	while (*ptr==CH_CR)
+	  ptr++;
+      }
+    }
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+
+public LtfEntry *LtfPrintF(Ltf *l,I1 *src,...)
+{
+  LtfEntry *result;
+  I1 *buf=SPrintFJoin(NULL,src,argc,argv);
+  result=LtfPutS(l,buf);
+  Free(buf);
+  return result;
+}
+
+public void LtfSetMax(U8 i)
+{
+  Ltf *l=Fs->cur_ltf;
+  l->max_entries=i;
+}
+
+public void LtfSafeInsert(Ltf *l,I1 *st)
+{ //This is necessary when hidden text might screw-up
+  //inserts.  It does them all-at-once.
+  BoolU4 old_preempt=Preempt(OFF);
+  U8 old_flags=l->flags;
+  l->flags|=LTFF_NO_CURSOR;
+  LtfPutS(l,st);
+  LtfRecalc(l);
+  l->flags=old_flags;
+  Preempt(old_preempt);
+}
+
+public void Type(I1 *name)
+{
+  Ltf *l=LtfRead(name);
+  EditInsertLtf(Fs->cur_ltf,l);
+  LtfDel(l);
+}
+
+sys_clipboard_ltf=LtfNew;

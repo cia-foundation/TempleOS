@@ -1,0 +1,76 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+PutS("\r");
+
+PopUpOk(
+"Now, we're going to demonstrate how to work\r\n"
+"with programs.  We'll change to the \LT\DEMO\r\n"
+"directory.  The change directory command\r\n"
+"will be typed for you and you just need\r\n"
+"to press $$FG GREEN$$ENTER$$FG$$.\r\n\r\n"
+"Note, that directories are specified with\r\n"
+"a forward slash, not a backslash.\r\n"
+"Drives can be specified in a $$FG GREEN$$Cd()$$FG$$ command\r\n"
+"and the boot drive is specified with \"$$FG GREEN$$::$$FG$$\".");
+
+PutS("Cd(\"::/LT/DEMO\");Dir;");
+ASCIIKeys("\r");
+
+
+PopUpOk(
+"Now, we're going to edit a file.  Normally,\r\n"
+"you'll probably left-click on a directory\r\n"
+"listing to edit a file, but we're going to\r\n"
+"type it on the command line.\r\n\r\n"
+"Press $$FG GREEN$$ENTER$$FG$$ to complete the command.\r\n");
+
+PutS("Edit(\"Sound.CPZ\");");
+ASCIIKeys("\r");
+
+Sleep(1000);
+PopUpOk(
+"This program gets keys and plays frequencies.\r\n"
+"It quits when you press $$FG GREEN$$ESC$$FG$$.\r\n\r\n"
+"There is no \"$$FG GREEN$$main()$$FG$$\" function in LoseThos\r\n"
+"programs.  Any program statements outside\r\n"
+"functions get executed when you $$FG GREEN$$#include$$FG$$\r\n"
+"them at the command line.\r\n\r\n"
+"The \"$$FG GREEN$$Organ;$$FG$$\" statement at the bottom\r\n"
+"will run the program when we $$FG GREEN$$#include$$FG$$ it.\r\n");
+
+PopUpOk(
+"The editor and most things exit when you press\r\n"
+"$$FG GREEN$$ESC$$FG$$.  $$FG GREEN$$CTRL-Q$$FG$$ will abort (cancel) most things.\r\n\r\n"
+"The $$FG GREEN$$ESC$$FG$$ key can be simulated with a left\r\n"
+"double-click, while the $$FG GREEN$$CTRL-Q$$FG$$ key can be\r\n"
+"simulated with a right double-click.  When\r\n"
+"you browse documentation, you'll left-click\r\n"
+"on links and right double-click to go back,\r\n"
+"unless you want to save changes to documents\r\n"
+"using left double-click.\r\n\r\n"
+"Press $$FG GREEN$$CTRL-Q$$FG$$ to quit out of the editor.\r\n"
+);
+
+SpecialASCIIKey(CH_CTRLQ,"CTRL-Q");
+
+PopUpOk(
+"Now, we'll run the Sound.CPZ program.\r\n"
+"Press $$FG GREEN$$ENTER$$FG$$ at the command line to\r\n"
+"$$FG GREEN$$#include$$FG$$ it.  Then press keys to\r\n"
+"cause sounds and press $$FG GREEN$$ESC$$FG$$ when\r\n"
+"you are done.\r\n");
+
+PutS("#include \"Sound.CPZ\";");
+ASCIIKeys("\r");
+UntilASCIIKey(CH_ESC);
+
+PopUpOk(
+"The program is still in memory and we\r\n"
+"can start it again by typing \"$$FG GREEN$$Organ;$$FG$$\".\r\n\r\n"
+"Press $$FG GREEN$$ENTER$$FG$$ at the command line to\r\n"
+"run it again.\r\n");
+
+PutS("Organ;");
+ASCIIKeys("\r");
+UntilASCIIKey(27);
+

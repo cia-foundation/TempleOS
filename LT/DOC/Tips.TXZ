@@ -1,0 +1,78 @@
+$WW,1$$FG,5$$IV,1$$TX+CX,"MISC"$$IV,0$$FG$
+
+* Press the $FG,2$WINDOW$FG$'s key at the command line to access your macro/menu area.  Place macros there with $FG,2$CTRL-L$FG$.  Use the "$FG,2$Pop-Up$FG$" option on macros to $LK,"Spawn","MN:Spawn"$ a task to run a file.  It dies when it is finished.  This returns memory to the system allocated by programs. Be sure to press $FG,2$CTRL-S$FG$ to save your macro/menu area after making changes.
+
+* You can adjust the screen refresh rate (software).  It is automatically adjusted based on load.  The range is $LK,"win_min_refresh","MN:win_min_refresh"$,$LK,"win_max_refresh","MN:win_max_refresh"$.
+
+* You can adjust the number of answers displayed by setting $FG,2$Fs->answers_displayed$FG$ to a number from 0-8.  See $LK,"answers_displayed","FF:HOME/USER.CPZ,answers_displayed"$ in your $LK,"HOME/USER.CPZ","FI:HOME/USER.CPZ"$ file.
+
+* You can use "$FG,2$ans0$FG$","$FG,2$ans1$FG$", etc in expressions.  You can use the cmd prompt as a calculator by just entering expressions like "$FG,2$1+2*3;$FG$".  $FG,2$double$FG$ results can be accessed with "$FG,2$ansd0$FG$" or "$FG,2$ansd1$FG$".
+
+* You can recompile and reinstall the kernel with $LK,"InstallBoot","MN:InstallBoot"$().  You can upgrade to 800x600 VGA resolution if your video chip supports it.  You can turn-off $FG,2$WORDSTAT$FG$ initialization by entering $FG,2$<ENTER>$FG$ at the prompt.  To start $FG,2$WORDSTAT$FG$ later, use $LK,"WsInit","MN:WsInit"$().
+
+* Filenames ending in "$FG,2$Z$FG$" will be automatically compressed and uncompressed when read or written.  The compression method is not supported elsewhere.
+
+* The joystick can be recalibrated with $LK,"JoyCalibration","MN:JoyCalibration"$().
+
+* You might speed-up CD-ROM access by changing $FG,2$bdev->max_reads$FG$ if your drive can handle more. See $LK+S,"InitBlkDev","MN:InitBlkDev"$() under ATAPI.
+
+* $LK,"MergeChk","MN:MergeChk"$() can be used to see what's changed.  The "$FG,2$+d$FG$" flag will show differences of files which have changed and allow you to merge code.  (The "$FG,2$+r$FG$" flag will recurse.)
+
+* Use $LK,"Plain","MN:Plain"$() to edit a plain text file.  You'll need this if your file has $FG,2$$$$FG$'s.
+
+* Use $LK,"Silent","MN:Silent"$() to disable output.  Or, $LK,"Btr","MN:Btr"$(&sys_flags,SYSf_NO_IO_SOUND) to turn-off disk IO feedback.
+
+* There are handy functions--$FG,2$F(),R(),FD()$FG$ and $FG,2$RD()$FG$ which are defined in $LK,"HOME/USER.CPZ","FI:HOME/USER.CPZ"$.  They will perform find-and-replace operations accross multiple files.  The "$FG,2$+l$FG$" flag is particularly useful since it limits to whole labels.
+
+* You can save files after making changes, anytime you are within the editor, like when viewing help/macro files.  $FG,2$CTRL-A$FG$ saves as, $FG,2$CTRL-S$FG$ saves with the same name in the scrolling title bar.  Hitting $FG,2$ESC$FG$ will exit and save.  ($FG,2$CTRL-Q$FG$ will exit and not save).  You can save the cmd line window to a file, too, since you're actually in the editor when you're at the cmd line.
+
+* When using $FG,2$CTRL-L$FG$ to insert links in documents, you can usually leave the "Display Text" blank and it will be filled-in automatically based on other entries.
+
+* There is a feature of the compiler/assembler which allows code to be executed in the middle of compilation and data inserted into the compilation stream.  You do a "$FG,2$exe{}$FG$" blk similar to an "$FG,2$asm{}$FG$" blk.  Click here for an example: $LK,"exe {","FF:::/LT/OSMain/END.CPZ,exe {"$.
+
+* Use $LK,"LtfSetMax","MN:LtfSetMax"$() to adjust the size of the cmd line buf.
+
+* If you output to the cmd line and wish to allow users to scroll around and view data, you can use $LK,"View","MN:View"$().  $LK,"Example","MN:WsPutMatrix"$
+
+* Use $LK+S,"View","MN:View"$() in Pop-up macros to linger until the user presses $FG,2$ESC$FG$ or $FG,2$CTRL-Q$FG$.
+
+* You can access the word under the cursor at $LK,"ws_cur_word","MN:ws_cur_word"$, but you should probably turn-off preemption or interrupts momentarily to copy it.
+
+* You can reactivate WORDSTAT after closing it by pressing $FG,2$CTRL-FUNCTION KEY$FG$.
+
+* $LK,"Preempt","MN:Preempt"$() is used to keep a task from being interrupted and swapped-out.  It has a similar effect to turning-off interrupts.  Each task has it's own preemption control.  A task with preemption turned-off can voluntarily $LK,"SwapInNext","MN:SwapInNext"$() with preemption off.
+
+* You can set a color for different drives with $LK,"SetDriveTextAttr","MN:SetDriveTextAttr"$().  Place calls to this in $LK,"::HOME/USER.CPZ","FI:::HOME/USER.CPZ"$.
+
+* If you toggle to plain text when you are working with graphics in a document, you can add duplicate entries for pictures by entering a "$FG,2$PI$FG$" command with the same number.
+
+* If you toggle to plain text when working with graphics, you can add a string to the $FG,2$$$PI$$$FG$ entry to keep track of it.  Try "$FG,2$$$PI,"+",2$$$FG$" where '2' is the picture number.
+
+* I use spaces-to-tab operations on all my files to keep them small.  You have to be careful, though, because spaces in messages will be converted.  I use $FG,2$SHIFT-SPACE$FG$ ' ' in such cases.  See $LK,"S2T","MN:S2T"$() for spaces-to-tabs.
+
+* You can edit an existing Graphic Element by putting the cursor on it and pressing $FG,2$CTRL-R$FG$.
+
+* You can customize the "wallpaper" by adding stuff to the $LK,"WallPaper","MN:WallPaper"$() routine. 
+
+$FG,5$$IV,1$$TX+CX,"DEBUGGING"$$FG$$IV,0$
+
+* While debugging, you specify addresses of assembly OSmain $FG,2$asm{}$FG$ routines with just the label, as in "$FG,2$CP_MALLOC+0x20$FG$".  You specify C+ labels with "&" before functions as in "$FG,2$&Printf+0x10$FG$".
+
+$LK,"D","MN:D"$() $LK,"LtfD","MN:LtfD"$() to hex dump mem with numbering from zero.  With $LK,"LtfD","MN:LtfD"$ the values are updated continually and you can alter mem by editing.
+
+$LK,"Dm","MN:Dm"$() $LK,"LtfDm","MN:LtfDm"$() to hex dump mem with addresses showing.
+
+$LK,"Dasm","MN:Dasm"$() to disassemble mem.
+
+$LK,"Prof","MN:Prof"$() and $LK,"ProfRep","MN:ProfRep"$() provide code profiling.  See $LK,"::/LT/DEMO/AutoFile/Demo2.AUZ","FI:::/LT/DEMO/AutoFile/Demo2.AUZ"$ (This is an "$LK,"AutoFile","FF:::/LT/DOC/OSGlossary.GLZ,AutoFile"$".)
+
+* Use $LK,"DbgNum","MN:DbgNum"$(), $LK,"DbgStr","MN:DbgStr"$() and $LK,"DbgAdd","MN:DbgAdd"$() to print debug info bypassing the window framework.  You can use $LK,"Raw","MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.
+
+* Use $LK,"SysDbg","MN:SysDbg"$() to set a flag which you can read with $LK,"IsSysDbg","MN:IsSysDbg"$() when you wish to trigger some debug activity.
+
+* There are flags for various trace options that can help debugging.  $LK,"Echo","MN:Echo"$() turns on or off raw data going into the lexical analyzer.  $LK,"LTrace","MN:LTrace"$() shows the tokens coming out of the lexical analyzer.  $LK,"CTrace","MN:CTrace"$() disassembles code generated from the C+ compiler.  $LK,"PTrace","MN:PTrace"$() shows "intermediate code" comming out of the first stage of the compiler (it's not 100% valid because it hasn't been fixed-up).  $LK,"OTrace","MN:OTrace"$() shows intermediate code coming-out after optimization.  These flags can be set and reset by placing them in "$FG,2$exe{}$FG$" code blks.
+
+* $FG,4$dbgo$FG$ is an alias for "$FG,2$cout$FG$" and can be used to place output.  You can easily find and remove them doing a $LK,"Grep","MN:Grep"$().
+
+* $LK,"SBpt","MN:SBpt"$() to set breakpoints.  When the fault screen appears, use $LK,"Go","MN:Go"$() to continue.  You can altering modify what is displayed each break-point by $LK,"HOME/FAULT.CPZ","FI:HOME/FAULT.CPZ"$ in your account's home directory.
+

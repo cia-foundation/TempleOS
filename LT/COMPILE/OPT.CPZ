@@ -1,0 +1,3045 @@
+BoolU4 FixupBinaryOp1(IntermediateCode *tempi,
+     IntermediateCode *tempi1,IntermediateCode *tempi2,
+     BoolU4 *is_unsigned)
+{
+  ClassStruct *tempc=tempi->ic_class,*tempc1,*tempc2;
+  tempc1=tempi1->ic_class;
+  tempc2=tempi2->ic_class;
+  if (tempc1->sub_type>=tempc2->sub_type)
+    tempi->ic_class=tempc1;
+  else
+    tempi->ic_class=tempc2;
+  tempc=tempi->ic_class;
+  *is_unsigned=tempc1->sub_type&1 || tempc2->sub_type&1;
+  tempi->ic_class=tempc;
+  if (tempc->sub_type==IT_DOUBLE)
+    return FALSE;
+  return tempi1->ic_code.u2[0]==EC_U8 &&
+	 tempi2->ic_code.u2[0]==EC_U8;
+}
+
+BoolU4 FixupBinaryOp2(IntermediateCode **tempi1,IntermediateCode **tempi2)
+{
+  IntermediateCode *tempii1=*tempi1,
+		   *tempii2=*tempi2;
+  if (tempii1->ic_code.u2[0]==EC_U8 &&
+      !(tempii1->ic_flags & ICF_TO_DOUBLE))
+    return TRUE;
+  if (tempii2->ic_code.u2[0]==EC_U8 &&
+      !(tempii2->ic_flags & ICF_TO_DOUBLE)) {
+    *tempi1=tempii2;
+    *tempi2=tempii1;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+BoolU4 FixupBinaryOp3(IntermediateCode *tempi1)
+{
+  return tempi1->ic_code.u2[0]==EC_U8;
+}
+
+void  ShiftNoPush(IntermediateCode *tempi)
+{
+  if (tempi->ic_flags & ICF_NO_PUSHES) {
+    while (TRUE) {
+      if (!tempi->ic_code.u2[0])
+	return;
+      if (tempi->ic_code.u2[0]!=EC_NOP) {
+	tempi->ic_flags |= ICF_NO_PUSHES;
+	return;
+      }
+      tempi+=sizeof(IntermediateCode);
+    }
+  }
+}
+
+
+void OptMissing(LexStruct *l,I8 pass,IntermediateCode *tempi)
+{
+  coutln "Pass:",pass," Missing IC handler";
+  CbPutIc(tempi);
+  PrsExcept(l,"ST_OPT_INTERNAL_ERROR");
+}
+
+IntermediateCode opt_nop={EC_NOP,0,0,0,0};
+ParseStack *OptStart(LexStruct *l,IntermediateCode **temp_lag)
+{
+  I8 i;
+  ParseStack *ps=MAlloc(sizeof(ParseStack));
+  CbInitInPtrs(&l->cb);
+  ps->ptr=0;
+  PrsPush(ps,0);
+  for (i=0;i<4;i++)
+    temp_lag[i]=&opt_nop;
+  return ps;
+}
+
+
+
+LTextern CP_OPTNEXT BoolU4 OptNext(IntermediateCode *tempi,
+	       IntermediateCode **temp_lag);
+
+/**********
+void OptNext(IntermediateCode *tempi,
+	       IntermediateCode **temp_lag)
+{
+  I8 i,j=0;
+  for (i=3;i>0;i--)
+    temp_lag[i]=temp_lag[i-1];
+  temp_lag[0]=tempi;
+  for (i=0;i<4;i++) //TODO: move end_exp
+    if (temp_lag[i]->ic_code.u2[0]>EC_END_EXP)
+      temp_lag[j++]=temp_lag[i];
+  while (j<4)
+    temp_lag[j++]=&opt_nop;
+}
+************/
+
+void OptEnd(LexStruct *l,I8 pass,ParseStack *ps)
+{
+  if (ps->ptr>2) {
+    PrintF("Pass:%d Stack:%d\r\n",pass,ps->ptr);
+    PrsExcept(l,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
+}
+
+IntermediateCode *CmpOptPass1(LexStruct *l,ClassStruct *fun_class,BoolU4 combined)
+{ //simplify constant arithmetic
+  I8 i1,i2;
+  U8 u1,u2;
+  BoolU4 is_unsigned;
+  ClassStruct *tempc,*tempc1,*tempc2;
+  IntermediateCode *tempi,*tempi1,*tempi2,
+		   *temp_lag[4],*last_with_class=NULL;
+  ParseStack *ps=OptStart(l,temp_lag);
+  if (combined)
+    tempi=l->cb.cb_in_ptr;
+  else
+    tempi=CbGetIc1(&l->cb);
+  while (tempi->ic_code.u2[0]) {
+    OptNext(tempi,temp_lag);
+    switch (tempi->ic_code.u2[0]) {
+	case EC_U8:
+	case EC_U4:
+	case EC_U2:
+	case EC_U1:
+	case EC_DOUBLE:
+	case EC_STRING_CONSTANT:
+	case EC_EBP:
+	case EC_FS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COM:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_U8) {
+	    tempi->ic_data=~tempi1->ic_data;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_NOT:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_U8) {
+	    if (tempi1->ic_data)
+	      tempi->ic_data=0;
+	    else
+	      tempi->ic_data=1;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_UNARY_MINUS:
+ 	  tempi1=PrsPop(ps);
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  tempc=tempi1->ic_class;
+	  if (tempc->type&HTT_INTERNAL_TYPE && tempc->sub_type & 1)
+	    tempi->ic_class=sys_internal_types[tempc->sub_type-1];
+	  if (tempi1->ic_code.u2[0]==EC_U8) {
+	    i1=tempi1->ic_data;
+	    tempi->ic_data=-i1;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U8:
+	case EC_DEREF_U4:
+	case EC_DEREF_U2:
+	case EC_DEREF_U1:
+	case EC_U8_PP:
+	case EC_U4_PP:
+	case EC_U2_PP:
+	case EC_U1_PP:
+	case EC_U8_MM:
+	case EC_U4_MM:
+	case EC_U2_MM:
+	case EC_U1_MM:
+	case EC_PP_U8:
+	case EC_PP_U4:
+	case EC_PP_U2:
+	case EC_PP_U1:
+	case EC_MM_U8:
+	case EC_MM_U4:
+	case EC_MM_U2:
+	case EC_MM_U1:
+	case EC_INC:
+	case EC_DEC:
+	case EC_SHL_CONSTANT1:
+	case EC_SHL_CONSTANT2:
+	case EC_SHR_CONSTANT1:
+	case EC_SHR_CONSTANT2:
+	case EC_ADD64:
+	case EC_ADD32:
+	case EC_ADD8:
+	case EC_SUB64:
+	case EC_SUB32:
+	case EC_SUB8:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_POWER:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc1->sub_type!=IT_DOUBLE)
+	    tempi1->ic_flags|=ICF_TO_DOUBLE;
+	  if (tempc2->sub_type!=IT_DOUBLE)
+	    tempi2->ic_flags|=ICF_TO_DOUBLE;
+	  if (tempc->sub_type!=IT_DOUBLE)
+	    tempi->ic_flags|=ICF_TO_INT|ICF_USE_DOUBLE_TEMPLATE;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHL:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1<<u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1<<i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  } else if (FixupBinaryOp3(tempi2)) {
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi2->ic_code=EC_NOP;
+	    if (tempi2->ic_data<32) {
+	      tempi->ic_data=tempi2->ic_data;
+	      tempi->ic_code=EC_SHL_CONSTANT1;
+	    } else {
+	      tempi->ic_data=tempi2->ic_data-32;
+	      tempi->ic_code=EC_SHL_CONSTANT2;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHR:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1>>u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1>>i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  } else if (FixupBinaryOp3(tempi2)) {
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi2->ic_code=EC_NOP;
+	    if (tempi2->ic_data<32) {
+	      tempi->ic_data=tempi2->ic_data;
+	      tempi->ic_code=EC_SHR_CONSTANT1;
+	    } else {
+	      tempi->ic_data=tempi2->ic_data-32;
+	      tempi->ic_code=EC_SHR_CONSTANT2;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MULTIPLICATION:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=MulU8(u1,u2);
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=MulI8(i1,i2);
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	    PrsPush(ps,tempi);
+	  } else {
+	    if (tempi1->ic_code.u2[0]==EC_U8) {
+	      switch (tempi1->ic_data) {
+		case 1:
+		  tempi1->ic_flags|=tempi->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_code=EC_NOP;
+//		  tempi2->ic_class=tempi->ic_class;
+		  PrsPush(ps,tempi1);
+		  break;
+		case 2:
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_data=1;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 4:
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_data=2;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 8:
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_data=3;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 16:
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_data=4;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 32:
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_code=EC_NOP;
+		  tempi->ic_data=5;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		default:
+		  PrsPush(ps,tempi);
+	      }
+	    } else if (tempi2->ic_code.u2[0]==EC_U8) {
+	      switch (tempi2->ic_data) {
+		case 1:
+		  tempi1->ic_flags|=tempi2->ic_flags|tempi->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_code=EC_NOP;
+//		  tempi1->ic_class=tempi->ic_class;
+		  PrsPush(ps,tempi1);
+		  break;
+		case 2:
+		  tempi->ic_flags|=tempi2->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_data=1;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 4:
+		  tempi->ic_flags|=tempi2->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_data=2;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 8:
+		  tempi->ic_flags|=tempi2->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_data=3;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 16:
+		  tempi->ic_flags|=tempi2->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_data=4;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		case 32:
+		  tempi->ic_flags|=tempi2->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_data=5;
+		  tempi->ic_code=EC_SHL_CONSTANT1;
+		  PrsPush(ps,tempi);
+		  break;
+		default:
+		  PrsPush(ps,tempi);
+	      }
+	    } else
+	      PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_DIVISION:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (!tempi2->ic_data) PrsExcept(l,"ST_DIVIDE_BY_ZERO");
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=DivU8(u1,u2);
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=DivI8(i1,i2);
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	    PrsPush(ps,tempi);
+	  } else {
+	    if (tempi2->ic_code.u2[0]==EC_U8) {
+	      switch (tempi2->ic_data) {
+		case 1:
+		  tempi1->ic_flags|=tempi2->ic_flags|tempi->ic_flags;
+		  tempi2->ic_code=EC_NOP;
+		  tempi->ic_code=EC_NOP;
+//		  tempi1->ic_class=tempi->ic_class;
+		  PrsPush(ps,tempi1);
+		  break;
+		case 2:
+		  tempi2->ic_data=1;
+		  tempi->ic_code=EC_SHR;
+		  PrsPush(ps,tempi);
+		  break;
+		case 4:
+		  tempi2->ic_data=2;
+		  tempi->ic_code=EC_SHR;
+		  PrsPush(ps,tempi);
+		  break;
+		case 8:
+		  tempi2->ic_data=3;
+		  tempi->ic_code=EC_SHR;
+		  PrsPush(ps,tempi);
+		  break;
+		case 16:
+		  tempi2->ic_data=4;
+		  tempi->ic_code=EC_SHR;
+		  PrsPush(ps,tempi);
+		  break;
+		case 32:
+		  tempi2->ic_data=5;
+		  tempi->ic_code=EC_SHR;
+		  PrsPush(ps,tempi);
+		  break;
+		default:
+		  PrsPush(ps,tempi);
+	      }
+	    } else
+	      PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_REMAINDER:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (!tempi2->ic_data) PrsExcept(l,"ST_DIVIDE_BY_ZERO");
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=ModU8(u1,u2);
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=ModI8(i1,i2);
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_AND:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1&u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OR:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1|u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_XOR:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1^u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ADDITION:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1+u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	    PrsPush(ps,tempi);
+	  } else {
+	    if (tempi1->ic_code.u2[0]==EC_U8 && !tempi1->ic_data) {
+	      tempi2->ic_flags|=tempi1->ic_flags|tempi->ic_flags;
+	      tempi1->ic_code=EC_NOP;
+	      tempi->ic_code=EC_NOP;
+//	      tempi2->ic_class=tempi->ic_class;
+	      PrsPush(ps,tempi2);
+	    } else if (tempi2->ic_code.u2[0]==EC_U8 && !tempi2->ic_data) {
+	      tempi1->ic_flags|=tempi2->ic_flags|tempi->ic_flags;
+	      tempi2->ic_code=EC_NOP;
+	      tempi->ic_code=EC_NOP;
+//	      tempi1->ic_class=tempi->ic_class;
+	      PrsPush(ps,tempi1);
+	    } else
+	      PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_SUBTRACTION:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1-u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	    PrsPush(ps,tempi);
+	  } else {
+	    if (tempi2->ic_code.u2[0]==EC_U8 && !tempi2->ic_data) {
+	      tempi1->ic_flags|=tempi2->ic_flags|tempi->ic_flags;
+	      tempi2->ic_code=EC_NOP;
+	      tempi->ic_code=EC_NOP;
+	      tempi1->ic_class=tempi->ic_class;
+	      PrsPush(ps,tempi1);
+	    } else
+	      PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_EQUAL_EQUAL:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1==u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_NOT_EQUAL_TO:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1!=u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LESS_THAN:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1<u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1<i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  if (is_unsigned)
+	    tempi->ic_flags|=ICF_USE_UNSIGNED_TEMPLATE;
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GREATER_THAN:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1>u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1>i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  if (is_unsigned)
+	    tempi->ic_flags|=ICF_USE_UNSIGNED_TEMPLATE;
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LESS_OR_EQUAL:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1<=u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1<=i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  if (is_unsigned)
+	    tempi->ic_flags|=ICF_USE_UNSIGNED_TEMPLATE;
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GREATER_OR_EQUAL:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	    tempi->ic_flags|=ICF_USE_DOUBLE_TEMPLATE;
+	    tempi->ic_class=sys_internal_types[IT_I8];
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    if (is_unsigned) {
+	      u1=tempi1->ic_data;
+	      u2=tempi2->ic_data;
+	      tempi->ic_data=u1>=u2;
+	    } else {
+	      i1=tempi1->ic_data;
+	      i2=tempi2->ic_data;
+	      tempi->ic_data=i1>=i2;
+	    }
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  if (is_unsigned)
+	    tempi->ic_flags|=ICF_USE_UNSIGNED_TEMPLATE;
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_AND_AND:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1&&u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OR_OR:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1||u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_XOR_XOR:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
+	    u1=tempi1->ic_data;
+	    u2=tempi2->ic_data;
+	    tempi->ic_data=u1^^u2;
+	    tempi->ic_code=EC_U8;
+	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	    tempi1->ic_code=EC_NOP;
+	    tempi2->ic_code=EC_NOP;
+	  }
+	  tempi->ic_class=sys_internal_types[IT_I8];
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COLON:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc1=tempi1->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc1->sub_type>=tempc2->sub_type)
+	    tempi->ic_class=tempc1;
+	  else
+	    tempi->ic_class=tempc2;
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    if (tempc1->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (tempc2->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	  }
+	  ps->ptr-=1;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ASSIGN_U8:
+	case EC_MUL_EQUAL_U8:
+	case EC_DIV_EQUAL_U8:
+	case EC_ADD_EQUAL_U8:
+	case EC_SUB_EQUAL_U8:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc=tempi->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE) {
+	    tempc=tempi2->ic_class;
+	    if (tempc->sub_type!=IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_DOUBLE;
+	  } else {
+	    tempc=tempi2->ic_class;
+	    if (tempc->sub_type==IT_DOUBLE)
+	      tempi2->ic_flags|=ICF_TO_INT;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ASSIGN_U4:
+	case EC_ASSIGN_U2:
+	case EC_ASSIGN_U1:
+	case EC_SHL_EQUAL_U8:
+	case EC_SHL_EQUAL_U4:
+	case EC_SHL_EQUAL_U2:
+	case EC_SHL_EQUAL_U1:
+	case EC_SHR_EQUAL_U8:
+	case EC_SHR_EQUAL_U4:
+	case EC_SHR_EQUAL_U2:
+	case EC_SHR_EQUAL_U1:
+	case EC_MUL_EQUAL_U4:
+	case EC_MUL_EQUAL_U2:
+	case EC_MUL_EQUAL_U1:
+	case EC_DIV_EQUAL_U4:
+	case EC_DIV_EQUAL_U2:
+	case EC_DIV_EQUAL_U1:
+	case EC_AND_EQUAL_U8:
+	case EC_AND_EQUAL_U4:
+	case EC_AND_EQUAL_U2:
+	case EC_AND_EQUAL_U1:
+	case EC_OR_EQUAL_U8:
+	case EC_OR_EQUAL_U4:
+	case EC_OR_EQUAL_U2:
+	case EC_OR_EQUAL_U1:
+	case EC_XOR_EQUAL_U8:
+	case EC_XOR_EQUAL_U4:
+	case EC_XOR_EQUAL_U2:
+	case EC_XOR_EQUAL_U1:
+	case EC_ADD_EQUAL_U4:
+	case EC_ADD_EQUAL_U2:
+	case EC_ADD_EQUAL_U1:
+	case EC_SUB_EQUAL_U4:
+	case EC_SUB_EQUAL_U2:
+	case EC_SUB_EQUAL_U1:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  tempc=tempi2->ic_class;
+	  if (tempc->sub_type==IT_DOUBLE)
+	    tempi2->ic_flags|=ICF_TO_INT;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ENTER:
+	case EC_LEAVE:
+	  tempi->ic_data=-fun_class->size;
+	  break;
+	case EC_ADD_ESP32:
+	  ps->ptr-=1+tempi->ic_data>>3;
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD_ESP32) {
+	    tempi->ic_data+=temp_lag[1]->ic_data;
+	    tempi->ic_flags|=temp_lag[1]->ic_flags;
+	    temp_lag[1]->ic_code=EC_NOP;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_CALL:
+	case EC_CALL_INDIRECT:
+	case EC_CALL_INDIRECT2:
+	case EC_CLI:
+	case EC_STI:
+	case EC_GET_FLAGS:
+	case EC_GET_BASE_PTR:
+	case EC_GET_STACK_PTR:
+	case EC_GET_LABEL:
+	case EC_ABSOLUTE_ADDRESS:
+	case EC_TYPE:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_FLAGS:
+	case EC_SET_BASE_PTR:
+	case EC_SET_STACK_PTR:
+	case EC_BSF:
+	case EC_BSR:
+	case EC_BT_CONSTANT:
+	case EC_BTS_CONSTANT:
+	case EC_BTR_CONSTANT:
+	case EC_BTC_CONSTANT:
+	case EC_REMQUE:
+	case EC_INPD:
+	case EC_INPW:
+	case EC_INP:
+	case EC_STRLEN:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BT:
+	case EC_BTS:
+	case EC_BTR:
+	case EC_BTC:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  i1=tempi1->ic_data;
+	  if (FixupBinaryOp3(tempi1) &&
+	      i1>=-128 && i1<128) {
+	    tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	    tempi1->ic_code=EC_NOP;
+	    ShiftNoPush(tempi1);
+	    tempi->ic_data=i1;
+	    tempi->ic_code+=EC_BT_CONSTANT-EC_BT;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INSQUE:
+	case EC_INSQUE_REV:
+	case EC_OUTPD:
+	case EC_OUTPW:
+	case EC_OUTP:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SWITCH:
+	  ps->ptr-=2;
+	  break;
+	case EC_MEMCPY:
+	case EC_MEMSET:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_SKIPZ2:
+	  ps->ptr--;
+ 	  tempi2=temp_lag[1];
+ec_skipz2:
+	    switch (tempi2->ic_code.u2[0]) {
+	      case EC_NOT:
+		tempi->ic_code=EC_SKIPNZ2;
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_class=tempi2->ic_class;
+		tempi->ic_flags=tempi2->ic_flags;
+		tempi2=temp_lag[2];
+		temp_lag[2]=temp_lag[3];
+		temp_lag[3]=&opt_nop;
+		if (tempi2->ic_code.u2[0]!=EC_NOT)
+		  goto ec_skipnz2;
+		else
+		  goto ec_skipz_done;
+	      case EC_EQUAL_EQUAL:
+		tempi->ic_code=EC_EQUAL_EQUAL_SKIPZ2;
+		break;
+	      case EC_NOT_EQUAL_TO:
+		tempi->ic_code=EC_NOT_EQUAL_TO_SKIPZ2;
+		break;
+	      case EC_LESS_THAN:
+		tempi->ic_code=EC_LESS_THAN_SKIPZ2;
+		break;
+	      case EC_GREATER_THAN:
+		tempi->ic_code=EC_GREATER_THAN_SKIPZ2;
+		break;
+	      case EC_LESS_OR_EQUAL:
+		tempi->ic_code=EC_LESS_OR_EQUAL_SKIPZ2;
+		break;
+	      case EC_GREATER_OR_EQUAL:
+		tempi->ic_code=EC_GREATER_OR_EQUAL_SKIPZ2;
+		break;
+	      case EC_OR_OR:
+		tempi->ic_code=EC_OR_OR_SKIPZ2;
+		break;
+	      case EC_AND_AND:
+		tempi->ic_code=EC_AND_AND_SKIPZ2;
+		break;
+	    }
+	    if (tempi->ic_code.u2[0]!=EC_SKIPZ2) {
+	      tempi->ic_class=tempi2->ic_class;
+	      tempi->ic_flags|=tempi2->ic_flags;
+	      tempi2->ic_code=EC_NOP;
+	    }
+ec_skipz_done:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SKIPNZ2:
+	  ps->ptr--;
+ 	  tempi2=temp_lag[1];
+ec_skipnz2:
+	    switch (tempi2->ic_code.u2[0]) {
+	      case EC_NOT:
+		tempi->ic_code=EC_SKIPZ2;
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_class=tempi2->ic_class;
+		tempi->ic_flags=tempi2->ic_flags;
+		tempi2=temp_lag[2];
+		temp_lag[2]=temp_lag[3];
+		temp_lag[3]=&opt_nop;
+		if (tempi2->ic_code.u2[0]!=EC_NOT)
+		  goto ec_skipz2;
+		else
+		  goto ec_skipnz_done;
+	      case EC_EQUAL_EQUAL:
+		tempi->ic_code=EC_NOT_EQUAL_TO_SKIPZ2;
+		break;
+	      case EC_NOT_EQUAL_TO:
+		tempi->ic_code=EC_EQUAL_EQUAL_SKIPZ2;
+		break;
+	      case EC_LESS_THAN:
+		tempi->ic_code=EC_GREATER_OR_EQUAL_SKIPZ2;
+		break;
+	      case EC_GREATER_THAN:
+		tempi->ic_code=EC_LESS_OR_EQUAL_SKIPZ2;
+		break;
+	      case EC_LESS_OR_EQUAL:
+		tempi->ic_code=EC_GREATER_THAN_SKIPZ2;
+		break;
+	      case EC_GREATER_OR_EQUAL:
+		tempi->ic_code=EC_LESS_THAN_SKIPZ2;
+		break;
+	      case EC_OR_OR:
+		tempi->ic_code=EC_OR_OR_SKIPNZ2;
+		break;
+	      case EC_AND_AND:
+		tempi->ic_code=EC_AND_AND_SKIPNZ2;
+		break;
+	    }
+	    if (tempi->ic_code.u2[0]!=EC_SKIPNZ2) {
+	      tempi->ic_class=tempi2->ic_class;
+	      tempi->ic_flags|=tempi2->ic_flags;
+	      tempi2->ic_code=EC_NOP;
+	    }
+ec_skipnz_done:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EQUAL_EQUAL_SKIPZ2:
+	case EC_NOT_EQUAL_TO_SKIPZ2:
+	case EC_LESS_THAN_SKIPZ2:
+	case EC_GREATER_THAN_SKIPZ2:
+	case EC_LESS_OR_EQUAL_SKIPZ2:
+	case EC_GREATER_OR_EQUAL_SKIPZ2:
+	case EC_AND_AND_SKIPZ2:
+	case EC_AND_AND_SKIPNZ2:
+	case EC_OR_OR_SKIPZ2:
+	case EC_OR_OR_SKIPNZ2:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_NULL:
+	case EC_LABEL:
+	case EC_ADDRESS:
+	case EC_QUESTION:
+	case EC_JMP:
+	case EC_IRQ:
+	case EC_NOP:
+	case EC_RET:
+	  break;
+
+	case EC_END_EXP:
+	  ps->ptr--;
+	  break;
+
+	default:
+	  OptMissing(l,1,tempi);
+      }
+    if (tempi->ic_class)
+      last_with_class=tempi;
+    if (combined)
+      tempi+=sizeof(IntermediateCode);
+    else
+      tempi=CbGetIc1(&l->cb);
+  }
+  OptEnd(l,1,ps);
+  return last_with_class;
+}
+
+#define PASS2_OFFSETS 4
+
+void CmpOptPass2(LexStruct *l,ClassStruct *fun_class)
+{
+  MemberListStruct *tempm;
+  ClassStruct *tempc;
+  IntermediateCode *tempi,*tempi1,*tempi2,
+		   *temp_lag[4],*last_with_class=NULL;
+  I8 i,j,o[PASS2_OFFSETS+2],c[PASS2_OFFSETS+2],lea_s[PASS2_OFFSETS+2];
+  ParseStack *ps=OptStart(l,temp_lag);
+
+  for (i=0;i<PASS2_OFFSETS+2;i++) {
+    c[i]=0;
+    o[i]=MAX_I8;
+    lea_s[i]=0;
+  }
+
+  if (fun_class) {
+    tempm=fun_class->member_list;
+    while (tempm) {
+      tempc=tempm->member_class;
+      if (!tempm->cnt && tempc->pointer_cnt && tempm->use_cnt>c[PASS2_OFFSETS-1]) {
+	for (i=0;i<PASS2_OFFSETS;i++)
+	  if (tempm->use_cnt>c[i]) {
+	    for (j=i;j<PASS2_OFFSETS-1;j++) {
+	      c[j+1]=c[j];
+	      o[j+1]=o[j];
+	    }
+	    c[i]=tempm->use_cnt;
+	    o[i]=tempm->offset;
+	    break;
+	  }
+      }
+      tempm=tempm->next;
+    }
+  }
+
+  tempi=l->cb.cb_in_ptr;
+  while (tempi->ic_code.u2[0]) {
+    OptNext(tempi,temp_lag);
+    switch (tempi->ic_code.u2[0]) {
+	case EC_U8:
+	case EC_U4:
+	case EC_U2:
+	case EC_U1:
+	case EC_DOUBLE:
+	case EC_STRING_CONSTANT:
+	case EC_EBP:
+	case EC_FS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COM:
+	case EC_NOT:
+	case EC_UNARY_MINUS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U8:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U8_DISP32;
+	    } else if (temp_lag[2]->ic_code.u2[0]==EC_FS) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_FS_U8_DISP32;
+	    } else if (temp_lag[2]->ic_data==3 &&
+		temp_lag[2]->ic_code.u2[0]==EC_SHL_CONSTANT1) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U8_DISP32_SCALED;
+	      for (i=0;i<PASS2_OFFSETS;i++)
+		if (o[i]==tempi->ic_data)
+		  lea_s[i]+=100000;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U4:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U4_DISP32;
+	    } else if (temp_lag[2]->ic_code.u2[0]==EC_FS) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_FS_U4_DISP32;
+	    } else if (temp_lag[2]->ic_data==2 &&
+		temp_lag[2]->ic_code.u2[0]==EC_SHL_CONSTANT1) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U4_DISP32_SCALED;
+	      for (i=0;i<PASS2_OFFSETS;i++)
+		if (o[i]==tempi->ic_data)
+		  lea_s[i]+=100000;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U2:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U2_DISP32;
+	    } else if (temp_lag[2]->ic_code.u2[0]==EC_FS) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_FS_U2_DISP32;
+	    } else if (temp_lag[2]->ic_data==1 &&
+		temp_lag[2]->ic_code.u2[0]==EC_SHL_CONSTANT1) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U2_DISP32_SCALED;
+	      for (i=0;i<PASS2_OFFSETS;i++)
+		if (o[i]==tempi->ic_data)
+		  lea_s[i]+=100000;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U1:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_U1_DISP32;
+	    } else if (temp_lag[2]->ic_code.u2[0]==EC_FS) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_FS_U1_DISP32;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U4_PP:
+	case EC_U4_MM:
+	case EC_PP_U4:
+	case EC_MM_U4:
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  } else if (temp_lag[1]->ic_code.u2[0]==EC_ADD32 &&
+	      temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==temp_lag[1]->ic_data)
+		lea_s[i]--;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_PP:
+	case EC_U2_PP:
+	case EC_U1_PP:
+	case EC_U8_MM:
+	case EC_U2_MM:
+	case EC_U1_MM:
+	case EC_PP_U8:
+	case EC_PP_U2:
+	case EC_PP_U1:
+	case EC_MM_U8:
+	case EC_MM_U2:
+	case EC_MM_U1:
+	case EC_SHL_CONSTANT1:
+	case EC_SHL_CONSTANT2:
+	case EC_SHR_CONSTANT1:
+	case EC_SHR_CONSTANT2:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_POWER:
+	case EC_SHL:
+	case EC_SHR:
+	case EC_MULTIPLICATION:
+	case EC_DIVISION:
+	case EC_REMAINDER:
+	case EC_AND:
+	case EC_OR:
+	case EC_XOR:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ADDITION:
+	  if (tempi->ic_class->sub_type==IT_DOUBLE) {
+	    ps->ptr-=2;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+ 	  tempi1=PrsPop(ps);
+ 	  tempi2=PrsPop(ps);
+	  if (FixupBinaryOp2(&tempi1,&tempi2)) {
+	    tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	    tempi1->ic_code=EC_NOP;
+	    ShiftNoPush(tempi1);
+	    tempi->ic_data=tempi1->ic_data;
+	    tempi->ic_code=EC_ADD32;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SUBTRACTION:
+	  if (tempi->ic_class->sub_type==IT_DOUBLE) {
+	    ps->ptr-=2;
+	    PrsPush(ps,tempi);
+	    break;
+	  }
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (FixupBinaryOp3(tempi2)) {
+	    tempi->ic_flags|=(tempi2->ic_flags&~ICF_NO_PUSHES);
+	    tempi2->ic_code=EC_NOP;
+	    ShiftNoPush(tempi2);
+	    tempi->ic_data=tempi2->ic_data;
+	    tempi->ic_code=EC_SUB32;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EQUAL_EQUAL:
+	case EC_NOT_EQUAL_TO:
+	case EC_LESS_THAN:
+	case EC_GREATER_THAN:
+	case EC_LESS_OR_EQUAL:
+	case EC_GREATER_OR_EQUAL:
+	case EC_AND_AND:
+	case EC_OR_OR:
+	case EC_XOR_XOR:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COLON:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_ASSIGN_U4:
+	case EC_SHL_EQUAL_U4:
+	case EC_SHR_EQUAL_U4:
+	case EC_MUL_EQUAL_U4:
+	case EC_DIV_EQUAL_U4:
+	case EC_AND_EQUAL_U4:
+	case EC_OR_EQUAL_U4:
+	case EC_XOR_EQUAL_U4:
+	case EC_ADD_EQUAL_U4:
+	case EC_SUB_EQUAL_U4:
+	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP)
+	    for (i=0;i<PASS2_OFFSETS;i++)
+	      if (o[i]==tempi1->ic_data)
+		lea_s[i]--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ASSIGN_U8:
+	case EC_ASSIGN_U2:
+	case EC_ASSIGN_U1:
+	case EC_SHL_EQUAL_U8:
+	case EC_SHL_EQUAL_U2:
+	case EC_SHL_EQUAL_U1:
+	case EC_SHR_EQUAL_U8:
+	case EC_SHR_EQUAL_U2:
+	case EC_SHR_EQUAL_U1:
+	case EC_MUL_EQUAL_U8:
+	case EC_MUL_EQUAL_U2:
+	case EC_MUL_EQUAL_U1:
+	case EC_DIV_EQUAL_U8:
+	case EC_DIV_EQUAL_U2:
+	case EC_DIV_EQUAL_U1:
+	case EC_AND_EQUAL_U8:
+	case EC_AND_EQUAL_U2:
+	case EC_AND_EQUAL_U1:
+	case EC_OR_EQUAL_U8:
+	case EC_OR_EQUAL_U2:
+	case EC_OR_EQUAL_U1:
+	case EC_XOR_EQUAL_U8:
+	case EC_XOR_EQUAL_U2:
+	case EC_XOR_EQUAL_U1:
+	case EC_ADD_EQUAL_U8:
+	case EC_ADD_EQUAL_U2:
+	case EC_ADD_EQUAL_U1:
+	case EC_SUB_EQUAL_U8:
+	case EC_SUB_EQUAL_U2:
+	case EC_SUB_EQUAL_U1:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHL_CONSTANT1:
+	case EC_SHL_CONSTANT2:
+	case EC_SHR_CONSTANT1:
+	case EC_SHR_CONSTANT2:
+	case EC_ADD64:
+	case EC_ADD32:
+	case EC_ADD8:
+	case EC_INC:
+	case EC_SUB64:
+	case EC_SUB32:
+	case EC_SUB8:
+	case EC_DEC:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ENTER:
+	  break;
+	case EC_ADD_ESP32:
+	  ps->ptr-=1+tempi->ic_data>>3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_CALL:
+	case EC_CALL_INDIRECT:
+	case EC_CALL_INDIRECT2:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_CLI:
+	case EC_STI:
+	case EC_GET_FLAGS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_FLAGS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_BASE_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_BASE_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_STACK_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_STACK_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_LABEL:
+	case EC_ABSOLUTE_ADDRESS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_TYPE:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BT:
+	case EC_BTS:
+	case EC_BTR:
+	case EC_BTC:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BSF:
+	case EC_BSR:
+	case EC_BT_CONSTANT:
+	case EC_BTS_CONSTANT:
+	case EC_BTR_CONSTANT:
+	case EC_BTC_CONSTANT:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INSQUE:
+	case EC_INSQUE_REV:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_REMQUE:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MEMCPY:
+	case EC_MEMSET:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INPD:
+	case EC_INPW:
+	case EC_INP:
+	case EC_STRLEN:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OUTPD:
+	case EC_OUTPW:
+	case EC_OUTP:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SWITCH:
+	  ps->ptr-=2;
+	  break;
+	case EC_SKIPZ:
+	case EC_SKIPZ2:
+	case EC_SKIPNZ:
+	case EC_SKIPNZ2:  //not present yet
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EQUAL_EQUAL_SKIPZ:
+	case EC_EQUAL_EQUAL_SKIPZ2:
+	case EC_NOT_EQUAL_TO_SKIPZ:
+	case EC_NOT_EQUAL_TO_SKIPZ2:
+	case EC_LESS_THAN_SKIPZ:
+	case EC_LESS_THAN_SKIPZ2:
+	case EC_GREATER_THAN_SKIPZ:
+	case EC_GREATER_THAN_SKIPZ2:
+	case EC_LESS_OR_EQUAL_SKIPZ:
+	case EC_LESS_OR_EQUAL_SKIPZ2:
+	case EC_GREATER_OR_EQUAL_SKIPZ:
+	case EC_GREATER_OR_EQUAL_SKIPZ2:
+	case EC_AND_AND_SKIPZ:
+	case EC_AND_AND_SKIPZ2:
+	case EC_AND_AND_SKIPNZ:
+	case EC_AND_AND_SKIPNZ2:
+	case EC_OR_OR_SKIPZ:
+	case EC_OR_OR_SKIPZ2:
+	case EC_OR_OR_SKIPNZ:
+	case EC_OR_OR_SKIPNZ2:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LEAVE:
+	case EC_RET:
+	  if (fun_class && (tempi1=last_with_class)) {
+	    if (fun_class->return_class->sub_type==IT_DOUBLE &&
+		tempi1->ic_class->sub_type!=IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_DOUBLE;
+	    if (fun_class->return_class->sub_type!=IT_DOUBLE &&
+		tempi1->ic_class->sub_type==IT_DOUBLE)
+	      tempi1->ic_flags|=ICF_TO_INT;
+	  }
+	  break;
+
+	case EC_NULL:
+	case EC_LABEL:
+	case EC_ADDRESS:
+	case EC_QUESTION:
+	case EC_JMP:
+	case EC_IRQ:
+	case EC_NOP:
+	  break;
+
+	case EC_END_EXP:
+	  ps->ptr--;
+	  break;
+
+	default:
+	  OptMissing(l,2,tempi);
+      }
+    if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+      if (temp_lag[2]->ic_code.u2[0]==EC_EBP) {
+	temp_lag[1]->ic_flags|=temp_lag[2]->ic_flags;
+	temp_lag[2]->ic_code=EC_NOP;
+	temp_lag[1]->ic_code=EC_LEA_DISP32_EBP;
+	for (i=0;i<PASS2_OFFSETS;i++)
+	  if (o[i]==temp_lag[1]->ic_data)
+	    lea_s[i]++;
+      }
+    }
+    if (tempi->ic_class)
+      last_with_class=tempi;
+    tempi+=sizeof(IntermediateCode);
+  }
+  j=0;
+  if (fun_class && !Bt(&l->flags,LFf_NO_REG_VAR)) {
+    for (i=0;i<PASS2_OFFSETS+2;i++)
+      if (!lea_s[i])
+	o[j++]=o[i];
+    for (;j<2;j++)
+      o[j]=MAX_I8;
+    l->ESI_offset=o[0];
+    l->EDI_offset=o[1];
+  } else {
+    l->ESI_offset=MAX_I8;
+    l->EDI_offset=MAX_I8;
+  }
+  OptEnd(l,2,ps);
+}
+
+
+void CmpOptPass3(LexStruct *l,ClassStruct *fun_class)
+{  //Reg optimization
+  I8 i1;
+  IntermediateCode *tempi,*tempi1,*tempi2,
+		   *temp_lag[4];
+  ClassStruct *tempc,*tempc2;
+  ParseStack *ps;
+  fun_class;  //no unused warning
+
+  if (l->flags & LF_NO_REG_OPT)
+    return;
+
+  ps=OptStart(l,temp_lag);
+  tempi=l->cb.cb_in_ptr;
+  while (tempi->ic_code.u2[0]) {
+    OptNext(tempi,temp_lag);
+    switch (tempi->ic_code.u2[0]) {
+	case EC_U8:
+	case EC_U4:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U2:  //doesn't occur
+	case EC_U1:  //doesn't occur
+	case EC_DOUBLE:
+	case EC_STRING_CONSTANT:
+	case EC_EBP:
+	case EC_FS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LEA_DISP32_EBP:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COM:
+	case EC_NOT:
+	case EC_UNARY_MINUS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U4_DISP32:
+	  if (tempi->ic_data==l->ESI_offset)
+	    tempi->ic_code=EC_ESI;
+	  else if (tempi->ic_data==l->EDI_offset)
+	    tempi->ic_code=EC_EDI;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_DISP32:
+	case EC_U2_DISP32:
+	case EC_U1_DISP32:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_DISP32_SCALED:
+	case EC_U4_DISP32_SCALED:
+	case EC_U2_DISP32_SCALED:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_FS_U8_DISP32:
+	case EC_FS_U4_DISP32:
+	case EC_FS_U2_DISP32:
+	case EC_FS_U1_DISP32:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U8:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_DEREF_U8;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_DEREF_U8;
+	    }
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_ESI_U8_DISP32;
+	    }
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_EDI_U8_DISP32;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U4:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_DEREF_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_DEREF_U4;
+	    }
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_ESI_U4_DISP32;
+	    }
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_EDI_U4_DISP32;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U2:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_DEREF_U2;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_DEREF_U2;
+	    }
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_ESI_U2_DISP32;
+	    }
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_EDI_U2_DISP32;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U1:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_DEREF_U1;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_DEREF_U1;
+	    }
+	  }
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+	    if (temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_ESI_U1_DISP32;
+	    }
+	    if (temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	      tempi->ic_flags|=temp_lag[2]->ic_flags|temp_lag[1]->ic_flags;
+	      temp_lag[2]->ic_code=EC_NOP;
+	      temp_lag[1]->ic_code=EC_NOP;
+	      tempi->ic_data=temp_lag[1]->ic_data;
+	      tempi->ic_code=EC_EDI_U1_DISP32;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U4_PP:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_U4_PP;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_U4_PP;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U4_MM:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_U4_MM;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_U4_MM;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_PP_U4:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_PP_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_PP_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MM_U4:
+	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_MM_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags & ~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_MM_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_PP:
+	case EC_U2_PP:
+	case EC_U1_PP:
+	case EC_U8_MM:
+	case EC_U2_MM:
+	case EC_U1_MM:
+	case EC_PP_U8:
+	case EC_PP_U2:
+	case EC_PP_U1:
+	case EC_MM_U8:
+	case EC_MM_U2:
+	case EC_MM_U1:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_POWER:
+	case EC_SHL:
+	case EC_SHR:
+	case EC_MULTIPLICATION:
+	case EC_DIVISION:
+	case EC_REMAINDER:
+	case EC_AND:
+	case EC_OR:
+	case EC_XOR:
+	case EC_ADDITION:
+	case EC_SUBTRACTION:
+	case EC_EQUAL_EQUAL:
+	case EC_NOT_EQUAL_TO:
+	case EC_LESS_THAN:
+	case EC_GREATER_THAN:
+	case EC_LESS_OR_EQUAL:
+	case EC_GREATER_OR_EQUAL:
+	case EC_AND_AND:
+	case EC_OR_OR:
+	case EC_XOR_XOR:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COLON:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ASSIGN_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_ASSIGN_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_ASSIGN_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHL_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_SHL_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_SHL_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHR_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_SHR_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_SHR_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MUL_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_MUL_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_MUL_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DIV_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_DIV_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_DIV_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_AND_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_AND_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_AND_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OR_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_OR_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_OR_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_XOR_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_XOR_EQUAL_U4;
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_XOR_EQUAL_U4;
+	    }
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ADD_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  i1=tempi2->ic_data;
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_ADD_EQUAL_U4;
+	      if (tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_flags|=tempi2->ic_flags;
+		tempi->ic_data=i1;
+		tempi->ic_code=EC_ESI_ADD_EQUAL_U4_CONSTANT_U1;
+	      }
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_ADD_EQUAL_U4;
+	      if (tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_flags|=tempi2->ic_flags;
+		tempi->ic_data=i1;
+		tempi->ic_code=EC_EDI_ADD_EQUAL_U4_CONSTANT_U1;
+	      }
+	    }
+	  }
+	  if (tempi->ic_code.u2[0]==EC_ADD_EQUAL_U4 &&
+	      tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+	    tempi2->ic_code=EC_NOP;
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi->ic_data=i1;
+	    tempi->ic_code=EC_ADD_EQUAL_U4_CONSTANT_U1;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SUB_EQUAL_U4:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  i1=-tempi2->ic_data;
+	  if (tempi1->ic_code.u2[0]==EC_LEA_DISP32_EBP) {
+	    if (tempi1->ic_data==l->ESI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_ESI_SUB_EQUAL_U4;
+	      if (tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_flags|=tempi2->ic_flags;
+		tempi->ic_data=i1;
+		tempi->ic_code=EC_ESI_ADD_EQUAL_U4_CONSTANT_U1;
+	      }
+	    } else if (tempi1->ic_data==l->EDI_offset) {
+	      tempi->ic_flags|=(tempi1->ic_flags&~ICF_NO_PUSHES);
+	      tempi1->ic_code=EC_NOP;
+	      ShiftNoPush(tempi1);
+	      tempi->ic_code=EC_EDI_SUB_EQUAL_U4;
+	      if (tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+		tempi2->ic_code=EC_NOP;
+		tempi->ic_flags|=tempi2->ic_flags;
+		tempi->ic_data=i1;
+		tempi->ic_code=EC_EDI_ADD_EQUAL_U4_CONSTANT_U1;
+	      }
+	    }
+	  }
+	  if (tempi->ic_code.u2[0]==EC_SUB_EQUAL_U4 &&
+	      tempi2->ic_code.u2[0]==EC_U8 &&
+		  i1>=-128 && i1<=127) {
+	    tempi2->ic_code=EC_NOP;
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi->ic_data=i1;
+	    tempi->ic_code=EC_ADD_EQUAL_U4_CONSTANT_U1;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ASSIGN_U8:
+	case EC_ASSIGN_U2:
+	case EC_ASSIGN_U1:
+	case EC_SHL_EQUAL_U8:
+	case EC_SHL_EQUAL_U2:
+	case EC_SHL_EQUAL_U1:
+	case EC_SHR_EQUAL_U8:
+	case EC_SHR_EQUAL_U2:
+	case EC_SHR_EQUAL_U1:
+	case EC_MUL_EQUAL_U8:
+	case EC_MUL_EQUAL_U2:
+	case EC_MUL_EQUAL_U1:
+	case EC_DIV_EQUAL_U8:
+	case EC_DIV_EQUAL_U2:
+	case EC_DIV_EQUAL_U1:
+	case EC_AND_EQUAL_U8:
+	case EC_AND_EQUAL_U2:
+	case EC_AND_EQUAL_U1:
+	case EC_OR_EQUAL_U8:
+	case EC_OR_EQUAL_U2:
+	case EC_OR_EQUAL_U1:
+	case EC_XOR_EQUAL_U8:
+	case EC_XOR_EQUAL_U2:
+	case EC_XOR_EQUAL_U1:
+	case EC_ADD_EQUAL_U2:
+	case EC_ADD_EQUAL_U1:
+	case EC_SUB_EQUAL_U2:
+	case EC_SUB_EQUAL_U1:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_ADD_EQUAL_U8:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  i1=tempi2->ic_data;
+	  tempc=tempi->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc->sub_type!=IT_DOUBLE &&
+	      tempc2->sub_type!=IT_DOUBLE &&
+	      tempi2->ic_code.u2[0]==EC_U8 &&
+	      i1>=-128 && i1<=127) {
+	    tempi2->ic_code=EC_NOP;
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi->ic_data=i1;
+	    tempi->ic_code=EC_ADD_EQUAL_U8_CONSTANT_U1;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_SUB_EQUAL_U8:
+ 	  tempi2=PrsPop(ps);
+ 	  tempi1=PrsPop(ps);
+	  i1=tempi2->ic_data;
+	  tempc=tempi->ic_class;
+	  tempc2=tempi2->ic_class;
+	  if (tempc->sub_type!=IT_DOUBLE &&
+	      tempc2->sub_type!=IT_DOUBLE &&
+	      tempi2->ic_code.u2[0]==EC_U8 &&
+	      i1>=-128 && i1<=127) {
+	    tempi2->ic_code=EC_NOP;
+	    tempi->ic_flags|=tempi2->ic_flags;
+	    tempi->ic_data=i1;
+	    tempi->ic_code=EC_SUB_EQUAL_U8_CONSTANT_U1;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_SHL_CONSTANT1:
+	case EC_SHL_CONSTANT2:
+	case EC_SHR_CONSTANT1:
+	case EC_SHR_CONSTANT2:
+	case EC_ADD64:
+	case EC_ADD32:
+	case EC_SUB64:
+	case EC_SUB32:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ENTER:
+	  if (l->EDI_offset!=MAX_I8)
+	    tempi->ic_code=EC_ENTER2;
+	  else if (l->ESI_offset!=MAX_I8)
+	    tempi->ic_code=EC_ENTER1;
+	  break;
+	case EC_LEAVE:
+	  if (l->EDI_offset!=MAX_I8)
+	    tempi->ic_code=EC_LEAVE2;
+	  else if (l->ESI_offset!=MAX_I8)
+	    tempi->ic_code=EC_LEAVE1;
+	  break;
+	case EC_ADD_ESP32:
+	  i1=tempi->ic_data;
+	  ps->ptr-=1+i1>>3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_CALL:
+	case EC_CALL_INDIRECT:
+	case EC_CALL_INDIRECT2:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_IRQ:
+	  break;
+	case EC_CLI:
+	case EC_STI:
+	case EC_GET_FLAGS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_FLAGS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_BASE_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_BASE_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_STACK_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_STACK_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_LABEL:
+	case EC_ABSOLUTE_ADDRESS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_TYPE:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BT:
+	case EC_BTS:
+	case EC_BTR:
+	case EC_BTC:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BSF:
+	case EC_BSR:
+	case EC_BT_CONSTANT:
+	case EC_BTS_CONSTANT:
+	case EC_BTR_CONSTANT:
+	case EC_BTC_CONSTANT:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INSQUE:
+	case EC_INSQUE_REV:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_REMQUE:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MEMCPY:
+	case EC_MEMSET:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INPD:
+	case EC_INPW:
+	case EC_INP:
+	case EC_STRLEN:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OUTPD:
+	case EC_OUTPW:
+	case EC_OUTP:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_JMP:
+	case EC_SHORT_JMP:
+	  break;
+	case EC_SWITCH:
+	  ps->ptr-=2;
+	  break;
+	case EC_SKIPZ:
+	case EC_SKIPZ2:
+	case EC_SKIPNZ:
+	case EC_SKIPNZ2:  //not present yet
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EQUAL_EQUAL_SKIPZ:
+	case EC_EQUAL_EQUAL_SKIPZ2:
+	case EC_NOT_EQUAL_TO_SKIPZ:
+	case EC_NOT_EQUAL_TO_SKIPZ2:
+	case EC_LESS_THAN_SKIPZ:
+	case EC_LESS_THAN_SKIPZ2:
+	case EC_GREATER_THAN_SKIPZ:
+	case EC_GREATER_THAN_SKIPZ2:
+	case EC_LESS_OR_EQUAL_SKIPZ:
+	case EC_LESS_OR_EQUAL_SKIPZ2:
+	case EC_GREATER_OR_EQUAL_SKIPZ:
+	case EC_GREATER_OR_EQUAL_SKIPZ2:
+	case EC_AND_AND_SKIPZ:
+	case EC_AND_AND_SKIPZ2:
+	case EC_AND_AND_SKIPNZ:
+	case EC_AND_AND_SKIPNZ2:
+	case EC_OR_OR_SKIPZ:
+	case EC_OR_OR_SKIPZ2:
+	case EC_OR_OR_SKIPNZ:
+	case EC_OR_OR_SKIPNZ2:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_NULL:
+	case EC_LABEL:
+	case EC_ADDRESS:
+	case EC_QUESTION:
+	case EC_JMP:
+	case EC_IRQ:
+	case EC_NOP:
+	case EC_RET:
+	  break;
+
+	case EC_END_EXP:
+	  ps->ptr--;
+	  break;
+
+	default:
+	  OptMissing(l,3,tempi);
+      }
+    if (temp_lag[1]->ic_code.u2[0]==EC_ADD32) {
+      if (temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	temp_lag[1]->ic_flags|=temp_lag[2]->ic_flags;
+	temp_lag[2]->ic_code=EC_NOP;
+	temp_lag[1]->ic_code=EC_LEA_DISP32_ESI;
+      } else if (temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	temp_lag[1]->ic_flags|=temp_lag[2]->ic_flags;
+	temp_lag[2]->ic_code=EC_NOP;
+	temp_lag[1]->ic_code=EC_LEA_DISP32_EDI;
+      }
+    }
+    tempi+=sizeof(IntermediateCode);
+  }
+  OptEnd(l,3,ps);
+}
+
+void CmpOptPass4(LexStruct *l,ClassStruct *fun_class)
+{  //adjust constants to smaller sizes
+  I8 i1,i;
+  IntermediateCode *tempi,*tempi1,
+		   *temp_lag[4];
+  ClassStruct *tempc;
+  ParseStack *ps=OptStart(l,temp_lag);
+
+  fun_class;  //no unused warning
+  tempi=l->cb.cb_in_ptr;
+  while (tempi->ic_code.u2[0]) {
+    OptNext(tempi,temp_lag);
+    switch (tempi->ic_code.u2[0]) {
+	case EC_U8:
+	  if (!(tempi->ic_data&0xFFFFFFFF00000000)) {
+	    if (!tempi->ic_data)
+	      tempi->ic_code=EC_ZERO;
+	    else if (tempi->ic_data<=127) {
+	      tempc=tempi->ic_class;
+	      if (!(tempc->sub_type&1))
+		tempi->ic_class=sys_internal_types[tempc->sub_type+1];
+  	      tempi->ic_code=EC_U1;
+	    } else {
+	      tempc=tempi->ic_class;
+	      if (!(tempc->sub_type&1))
+		tempi->ic_class=sys_internal_types[tempc->sub_type+1];
+  	      tempi->ic_code=EC_U4;
+	    }
+	  } else if (tempi->ic_data&0xFFFFFFFF80000000==0xFFFFFFFF80000000) {
+	    tempc=tempi->ic_class;
+	    if (tempc->sub_type&1)
+	      tempi->ic_class=sys_internal_types[tempc->sub_type-1];
+	    tempi->ic_code=EC_U4;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U4:
+	  if (!tempi->ic_data)
+	    tempi->ic_code=EC_ZERO;
+	  else if (tempi->ic_data<=127) {
+	    tempc=tempi->ic_class;
+	    if (!(tempc->sub_type&1))
+	      tempi->ic_class=sys_internal_types[tempc->sub_type+1];
+  	    tempi->ic_code=EC_U1;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U2:  //doesn't occur
+	case EC_U1:  //doesn't occur
+	case EC_DOUBLE:
+	case EC_STRING_CONSTANT:
+	case EC_EBP:
+	case EC_FS:
+	case EC_ESI:
+	case EC_EDI:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LEA_DISP32_EBP:
+	  i1=tempi->ic_data;
+	  if (i1>=-128 && i1<=127)
+	    tempi->ic_code=EC_LEA_DISP8_EBP;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LEA_DISP32_ESI:
+	  i1=tempi->ic_data;
+	  if (i1>=-128 && i1<=127)
+	    tempi->ic_code=EC_LEA_DISP8_ESI;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_LEA_DISP32_EDI:
+	  i1=tempi->ic_data;
+	  if (i1>=-128 && i1<=127)
+	    tempi->ic_code=EC_LEA_DISP8_EDI;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COM:
+	case EC_NOT:
+	case EC_UNARY_MINUS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_DISP32:
+	case EC_U4_DISP32:
+	case EC_U2_DISP32:
+	case EC_U1_DISP32:
+	case EC_ESI_U8_DISP32:
+	case EC_ESI_U4_DISP32:
+	case EC_ESI_U2_DISP32:
+	case EC_ESI_U1_DISP32:
+	case EC_EDI_U8_DISP32:
+	case EC_EDI_U4_DISP32:
+	case EC_EDI_U2_DISP32:
+	case EC_EDI_U1_DISP32:
+	  i1=tempi->ic_data;
+	  if (i1>=-128 && i1<=127)
+	    tempi->ic_code+=EC_U8_DISP8-EC_U8_DISP32;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_U8_DISP32_SCALED:
+	case EC_U4_DISP32_SCALED:
+	case EC_U2_DISP32_SCALED:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_FS_U8_DISP32:
+	case EC_FS_U4_DISP32:
+	case EC_FS_U2_DISP32:
+	case EC_FS_U1_DISP32:
+	case EC_ESI_DEREF_U8:
+	case EC_ESI_DEREF_U4:
+	case EC_ESI_DEREF_U2:
+	case EC_ESI_DEREF_U1:
+	case EC_EDI_DEREF_U8:
+	case EC_EDI_DEREF_U4:
+	case EC_EDI_DEREF_U2:
+	case EC_EDI_DEREF_U1:
+	case EC_ESI_U4_PP:
+	case EC_ESI_U4_MM:
+	case EC_ESI_PP_U4:
+	case EC_ESI_MM_U4:
+	case EC_EDI_U4_PP:
+	case EC_EDI_U4_MM:
+	case EC_EDI_PP_U4:
+	case EC_EDI_MM_U4:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_DEREF_U8:
+	case EC_DEREF_U4:
+	case EC_DEREF_U2:
+	case EC_DEREF_U1:
+	case EC_U8_PP:
+	case EC_U4_PP:
+	case EC_U2_PP:
+	case EC_U1_PP:
+	case EC_U8_MM:
+	case EC_U4_MM:
+	case EC_U2_MM:
+	case EC_U1_MM:
+	case EC_PP_U8:
+	case EC_PP_U4:
+	case EC_PP_U2:
+	case EC_PP_U1:
+	case EC_MM_U8:
+	case EC_MM_U4:
+	case EC_MM_U2:
+	case EC_MM_U1:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_POWER:
+	case EC_SHL:
+	case EC_SHR:
+	case EC_MULTIPLICATION:
+	case EC_DIVISION:
+	case EC_REMAINDER:
+	case EC_AND:
+	case EC_OR:
+	case EC_XOR:
+	case EC_ADDITION:
+	case EC_SUBTRACTION:
+	case EC_EQUAL_EQUAL:
+	case EC_NOT_EQUAL_TO:
+	case EC_LESS_THAN:
+	case EC_GREATER_THAN:
+	case EC_LESS_OR_EQUAL:
+	case EC_GREATER_OR_EQUAL:
+	case EC_AND_AND:
+	case EC_OR_OR:
+	case EC_XOR_XOR:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_COLON:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ESI_ASSIGN_U4:
+	  ps->ptr--;
+	  if (temp_lag[1]->ic_code.u2[0]==EC_DEREF_U4 &&
+	      temp_lag[2]->ic_code.u2[0]==EC_ESI) {
+	    temp_lag[1]->ic_code=EC_NOP;
+	    temp_lag[2]->ic_code=EC_NOP;
+	    tempi->ic_flags|=temp_lag[2]->ic_flags;
+	    tempi->ic_code=EC_ESI_NEXT_EQUAL_U4;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EDI_ASSIGN_U4:
+	  ps->ptr--;
+	  if (temp_lag[1]->ic_code.u2[0]==EC_DEREF_U4 &&
+	      temp_lag[2]->ic_code.u2[0]==EC_EDI) {
+	    temp_lag[1]->ic_code=EC_NOP;
+	    temp_lag[2]->ic_code=EC_NOP;
+	    tempi->ic_flags|=temp_lag[2]->ic_flags;
+	    tempi->ic_code=EC_EDI_NEXT_EQUAL_U4;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ADD_EQUAL_U8_CONSTANT_U1:
+	case EC_SUB_EQUAL_U8_CONSTANT_U1:
+	case EC_ADD_EQUAL_U4_CONSTANT_U1:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ESI_ADD_EQUAL_U4_CONSTANT_U1:
+	case EC_EDI_ADD_EQUAL_U4_CONSTANT_U1:
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_ESI_SHL_EQUAL_U4:
+	case EC_ESI_SHR_EQUAL_U4:
+	case EC_ESI_MUL_EQUAL_U4:
+	case EC_ESI_DIV_EQUAL_U4:
+	case EC_ESI_AND_EQUAL_U4:
+	case EC_ESI_OR_EQUAL_U4:
+	case EC_ESI_XOR_EQUAL_U4:
+	case EC_ESI_ADD_EQUAL_U4:
+	case EC_ESI_SUB_EQUAL_U4:
+
+	case EC_EDI_SHL_EQUAL_U4:
+	case EC_EDI_SHR_EQUAL_U4:
+	case EC_EDI_MUL_EQUAL_U4:
+	case EC_EDI_DIV_EQUAL_U4:
+	case EC_EDI_AND_EQUAL_U4:
+	case EC_EDI_OR_EQUAL_U4:
+	case EC_EDI_XOR_EQUAL_U4:
+	case EC_EDI_ADD_EQUAL_U4:
+	case EC_EDI_SUB_EQUAL_U4:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_ASSIGN_U8:
+	case EC_ASSIGN_U4:
+	case EC_ASSIGN_U2:
+	case EC_ASSIGN_U1:
+	case EC_SHL_EQUAL_U8:
+	case EC_SHL_EQUAL_U4:
+	case EC_SHL_EQUAL_U2:
+	case EC_SHL_EQUAL_U1:
+	case EC_SHR_EQUAL_U8:
+	case EC_SHR_EQUAL_U4:
+	case EC_SHR_EQUAL_U2:
+	case EC_SHR_EQUAL_U1:
+	case EC_MUL_EQUAL_U8:
+	case EC_MUL_EQUAL_U4:
+	case EC_MUL_EQUAL_U2:
+	case EC_MUL_EQUAL_U1:
+	case EC_DIV_EQUAL_U8:
+	case EC_DIV_EQUAL_U4:
+	case EC_DIV_EQUAL_U2:
+	case EC_DIV_EQUAL_U1:
+	case EC_AND_EQUAL_U8:
+	case EC_AND_EQUAL_U4:
+	case EC_AND_EQUAL_U2:
+	case EC_AND_EQUAL_U1:
+	case EC_OR_EQUAL_U8:
+	case EC_OR_EQUAL_U4:
+	case EC_OR_EQUAL_U2:
+	case EC_OR_EQUAL_U1:
+	case EC_XOR_EQUAL_U8:
+	case EC_XOR_EQUAL_U4:
+	case EC_XOR_EQUAL_U2:
+	case EC_XOR_EQUAL_U1:
+	case EC_ADD_EQUAL_U8:
+	case EC_ADD_EQUAL_U4:
+	case EC_ADD_EQUAL_U2:
+	case EC_ADD_EQUAL_U1:
+	case EC_SUB_EQUAL_U8:
+	case EC_SUB_EQUAL_U4:
+	case EC_SUB_EQUAL_U2:
+	case EC_SUB_EQUAL_U1:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SHL_CONSTANT1:
+	case EC_SHL_CONSTANT2:
+	case EC_SHR_CONSTANT1:
+	case EC_SHR_CONSTANT2:
+	case EC_ADD64:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_ADD32:
+	  tempi1=PrsPop(ps);
+	  if (!(i1=tempi->ic_data)) {
+	    tempi1->ic_class=tempi->ic_class;
+	    tempi1->ic_flags|=tempi->ic_flags;
+	    tempi->ic_code=EC_NOP;
+	    PrsPush(ps,tempi1);
+	  } else {
+	    if (i1==1)
+	      tempi->ic_code=EC_INC;
+	    else if (i1==-1)
+	      tempi->ic_code=EC_DEC;
+	    else if (i1>=-128 && i1<=127)
+	      tempi->ic_code=EC_ADD8;
+	    PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_SUB64:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SUB32:
+	  tempi1=PrsPop(ps);
+	  if (!(i1=tempi->ic_data)) {
+	    tempi1->ic_class=tempi->ic_class;
+	    tempi1->ic_flags|=tempi->ic_flags;
+	    tempi->ic_code=EC_NOP;
+	    PrsPush(ps,tempi1);
+	  } else {
+	    if (i1==1)
+	      tempi->ic_code=EC_DEC;
+	    else if (i1==-1)
+	      tempi->ic_code=EC_INC;
+	    else if (i1>=-128 && i1<=127)
+	      tempi->ic_code=EC_SUB8;
+	    PrsPush(ps,tempi);
+	  }
+	  break;
+	case EC_ENTER:
+	case EC_ENTER1:
+	case EC_ENTER2:
+	  break;
+	case EC_LEAVE:
+	  if (temp_lag[1]->ic_code.u2[0]==EC_ADD_ESP32 ||
+	      temp_lag[1]->ic_code.u2[0]==EC_ADD_ESP8) {
+	    tempi->ic_data+=temp_lag[1]->ic_data;
+	    tempi->ic_flags|=temp_lag[1]->ic_flags;
+	    temp_lag[1]->ic_code=EC_NOP;
+	  }
+	  break;
+	case EC_LEAVE1:
+	case EC_LEAVE2:
+	  break;
+	case EC_ADD_ESP32:
+	  i1=tempi->ic_data;
+	  ps->ptr-=1+i1>>3;
+	  if (i1>=-128 && i1<=127) {
+	    if (!i1) {
+	      temp_lag[1]->ic_flags|=tempi->ic_flags;
+	      tempi->ic_code=EC_NOP;
+	    } else
+	      tempi->ic_code=EC_ADD_ESP8;
+	  }
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_CALL:
+	case EC_CALL_INDIRECT:
+	case EC_CALL_INDIRECT2:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_IRQ:
+	  break;
+	case EC_CLI:
+	case EC_STI:
+	case EC_GET_FLAGS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_FLAGS:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_BASE_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_BASE_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_STACK_PTR:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_SET_STACK_PTR:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_GET_LABEL:
+	case EC_ABSOLUTE_ADDRESS:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_TYPE:
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BT:
+	case EC_BTS:
+	case EC_BTR:
+	case EC_BTC:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_BSF:
+	case EC_BSR:
+	case EC_BT_CONSTANT:
+	case EC_BTS_CONSTANT:
+	case EC_BTR_CONSTANT:
+	case EC_BTC_CONSTANT:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INSQUE:
+	case EC_INSQUE_REV:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_REMQUE:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_MEMCPY:
+	case EC_MEMSET:
+	  ps->ptr-=3;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_INPD:
+	case EC_INPW:
+	case EC_INP:
+	case EC_STRLEN:
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_OUTPD:
+	case EC_OUTPW:
+	case EC_OUTP:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_JMP:
+	case EC_SHORT_JMP:
+	  break;
+	case EC_SWITCH:
+	  ps->ptr-=2;
+	  break;
+	case EC_SKIPZ:
+	case EC_SKIPZ2:
+	case EC_SKIPNZ:
+	case EC_SKIPNZ2:  //not present yet
+	  ps->ptr--;
+	  PrsPush(ps,tempi);
+	  break;
+	case EC_EQUAL_EQUAL_SKIPZ:
+	case EC_EQUAL_EQUAL_SKIPZ2:
+	case EC_NOT_EQUAL_TO_SKIPZ:
+	case EC_NOT_EQUAL_TO_SKIPZ2:
+	case EC_LESS_THAN_SKIPZ:
+	case EC_LESS_THAN_SKIPZ2:
+	case EC_GREATER_THAN_SKIPZ:
+	case EC_GREATER_THAN_SKIPZ2:
+	case EC_LESS_OR_EQUAL_SKIPZ:
+	case EC_LESS_OR_EQUAL_SKIPZ2:
+	case EC_GREATER_OR_EQUAL_SKIPZ:
+	case EC_GREATER_OR_EQUAL_SKIPZ2:
+	case EC_AND_AND_SKIPZ:
+	case EC_AND_AND_SKIPZ2:
+	case EC_AND_AND_SKIPNZ:
+	case EC_AND_AND_SKIPNZ2:
+	case EC_OR_OR_SKIPZ:
+	case EC_OR_OR_SKIPZ2:
+	case EC_OR_OR_SKIPNZ:
+	case EC_OR_OR_SKIPNZ2:
+	  ps->ptr-=2;
+	  PrsPush(ps,tempi);
+	  break;
+
+	case EC_NULL:
+	case EC_LABEL:
+	case EC_ADDRESS:
+	case EC_QUESTION:
+	case EC_JMP:
+	case EC_IRQ:
+	case EC_NOP:
+	case EC_RET:
+	  break;
+
+	case EC_END_EXP:
+	  ps->ptr--;
+	  break;
+
+	default:
+	  OptMissing(l,4,tempi);
+      }
+    if (Bt(push_bitmap,tempi->ic_code.u2[0]) && !(tempi->ic_flags & ICF_NO_PUSHES)) {
+      tempi1=temp_lag[1];
+      i=push_map[tempi1->ic_code.u2[0]];
+      i1=tempi1->ic_data;
+      tempc=tempi1->ic_class;
+      switch (i) {
+	case EC_PUSH_U4:
+	  if  (!(tempc->sub_type&1) && i1<0)
+	    i=EC_PUSH_NEG_U4;
+	  break;
+	case EC_PUSH_U2:
+	  if  (!(tempc->sub_type&1) && i1<0)
+	    i=EC_PUSH_NEG_U2;
+	  break;
+	case EC_PUSH_U1:
+	  if (i1<-0x80 || i1>0x7F) {
+	    i=EC_PUSH_U2;
+	    if	(!(tempc->sub_type&1) && i1<0)
+	      i=EC_PUSH_NEG_U2;
+	  } else {
+	    if	(!(tempc->sub_type&1) && i1<0)
+	      i=EC_PUSH_NEG_U1;
+	  }
+	  break;
+      }
+      if (i) {
+	tempi1->ic_code=i;
+	if (!(tempi1->ic_flags & (ICF_TO_DOUBLE|ICF_TO_INT)) )
+	  tempi->ic_flags|=ICF_NO_PUSHES;
+	else
+	  tempi1->ic_flags|=ICF_NO_PUSHES_TO_DOUBLE_OR_INT;
+      }
+    }
+    tempi+=sizeof(IntermediateCode);
+  }
+  OptEnd(l,4,ps);
+}
+ 

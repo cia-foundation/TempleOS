@@ -1,0 +1,19 @@
+// COM port Terminal
+void CommTerm(U4 port=1,U4 baud=9600)
+{
+  U8 sc;
+  U8 ch=0;
+  coutln "ESC to exit";
+  CommOpen8N1(port,baud);
+  while (ch!=CH_ESC) {
+    if (CommScanChar(port,&ch))
+      PutChar(ch);
+    ch=0;
+    if (ScanChar(&sc,&ch))
+      CommPutChar(port,ch);
+    SwapInNext;
+  }
+  CommClose(port);
+}
+
+CommTerm;

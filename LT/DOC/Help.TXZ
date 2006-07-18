@@ -1,0 +1,78 @@
+$WW+H,1$Left-click on the word "$FG,2$MENU$FG$" in the window title bar to pull-up the menu.  Underlined text is usually a link.  Left click with the mouse or press SPACE when the cursor is on top of them to edit/view them.  Right click or press $FG,2$ENTER$FG$ to $FG,2$#include$FG$ them, often causing them to execute.  
+  $FG,9$ESC$FG$		Exits and saves
+  $FG,9$CTRL Q$FG$	Aborts
+  $FG,9$Window's Key$FG$	Views the Menu/Help/Macro area
+Double mouse clicks send $FG,2$ESC$FG$ or $FG,2$CTRLQ$FG$.
+
+Remember to terminate commands with a semicolon.
+
+$TR,"USER HELP"$
+$ID,2$
+See $LK,"::/LT/DOC/OSGlossary.GLZ","FL:::/LT/DOC/OSGlossary.GLZ,1"$ for a glossary.
+
+$TR,"DOLLAR SIGN COMMANDS"$
+$ID,2$$LK,"Dollar Sign Commands","FI:::/LT/DOC/Dollar.TXZ"$ are rich-text commands.  The editor, compiler, assembler and operating system are seamlessly equiped to handle LoseThos rich text.  Commands like $LK,"Dir","MN:Dir"$() and $LK,"Grep","MN:Grep"$() can output links to the command line.
+
+$ID,-2$$TR,"COMMAND PROMPT"$
+$ID,2$The LoseThos command line interface is based on C/C++. Explore the ".CPZ" files or $MA+A-X+PU,"Click Here","HFunsRep;View;"$ to learn which commands are available.  A command which takes no parameters may be executed by typing the name and a semicolon.  Commands with parameters require placing the parameter in parentheses like a function call.
+
+
+$MA,"Dir(\"*\");"$ will list files in the current directory.
+
+$MA,"Dir;"$ uses default of "*".
+
+$MA,"Cd(\"::/LT/APPS\");"$ will change directories
+Directories are referenced with "/" not "\".  The Boot drive is referred to with "$FG,2$::$FG$".  Other drives are referred to by a letter and a colon.  Your user account directory is referred to with "$FG,2$HOME$FG$".
+
+If a file is not found in one directory, all it's parents are searched. 
+
+$FG,9$Edit("FILENAME.TXZ");$FG$ Invokes the editor.  See $LK,"Editor cmds","::/LT/ADAM/EDIT.MUZ"$.  Note that editor commands work practically everywhere--like at the command prompt or within help.
+
+$ID,-2$$TR,"BURNING CD-ROMs/DVDs"$
+$ID,2$0) Prepare a partition (drive) with the files you wish to burn.
+1) Use $LK+S,"CreateCDFile","MN:CreateCDFile"$() to make an ISO image file of a partition.
+2) Use $LK+S,"WriteCDImage","MN:WriteCDImage"$() to burn an ISO file onto a CD or DVD.
+
+Note:  You can create a $LK,"File Partition","FF:::/LT/DOC/OSGlossary.GLZ,File Partition"$ on an ordinary partition, copy files into it, create an image and burn it. 
+$ID,-2$
+See $LK+S,"::/LT/DOC/Quirks.TXZ","FI:::/LT/DOC/Quirks.TXZ"$ for things to watch for.
+
+$ID,-2$$TR,"ADMIN HELP"$
+$ID,2$
+$TR,"ADDING DRIVES"$
+$ID,2$Use $LK,"AddDrives","MN:AddDrives"$() to enable disk drives.  
+
+See $LK+S,"File Partition","FF:::/LT/DOC/OSGlossary.GLZ,File Partition"$ for a definition.
+$ID,-2$
+See $LK,"::/LT/DOC/Install.TXZ","FI:::/LT/DOC/Install.TXZ"$ for details on installing to a hard drive.
+
+See $LK-A+S,"::/LT/OSMain/ADAMK.CPZ"$ for the LoseThos equivalent of the AUTOEXEC.BAT.
+
+$TR,"ACCOUNTS"$
+$ID,2$
+You can add and remove accounts by making or removing directories in the $FG,2$::/LT/ACCOUNTS$FG$ directory.  You'll have to copy start-up files into them.
+
+See $LK-A,"HOME/USER.CPZ"$ for the user start-up file.
+
+See $LK-A,"HOME/USER.MUZ"$ for a personalizable menu/macro area which can be viewed at the command line with the windows key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+See $LK-A,"HOME/FAVOR.MUZ"$ for a handy "favorites" file which can be reached by pressing $FG,2$CTRL-SHIFT-F$FG$, pretty-much anywhere.  Users can place links and todo lists or any text within this.
+
+See $LK-A,"HOME/ADAM3.CPZ"$ for the user files that get loaded into the adam task.  These are only loaded once.
+
+See $LK-A,"HOME/SYSTEM.CPZ"$ for the start-up file used when a $LK,"System","MN:System"$() command is used.
+
+See $LK-A,"HOME/SERVANT.CPZ"$ for the start-up file other commands which $LK,"Spawn","MN:Spawn"$() tasks. 
+
+See $LK-A,"HOME/FAULT.CPZ"$ for a start-up file called when a fault occurs.  When debugging you might place data display commands here.
+
+$ID,-2$
+$ID,-2$$TR,"DEVELOPER HELP"$
+$ID,2$
+See $LK-A+S,"::/LT/DOC/GuideLines.TXZ"$ for some programming guidelines.
+
+See $LK+S,"::/LT/DOC/Graphics.TXZ","FI:::/LT/DOC/Graphics.TXZ"$ for details on graphics programming.
+$ID,-2$
+See $BK,1$$LK+S,"::/LT/DOC/Mysteries.TXZ","FI:::/LT/DOC/Mysteries.TXZ"$$BK,0$ for mysteries explained.
+See $BK,1$$LK+S,"::/LT/DOC/News.TXZ","FL:::/LT/DOC/News.TXZ,1"$$BK,0$ for the latest news.
+

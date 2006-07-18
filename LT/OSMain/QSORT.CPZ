@@ -1,0 +1,29 @@
+
+void QSort(U1 *base,U8 num, U8 width, U1 *compare)
+{ //This uses a shell sort
+  I8 my_compare(U1 *elem1,U1 *elem2 );
+  I8 span=num>>1,i;
+  U1 *b1,*b2,*temp=MAlloc(width);
+  BoolU4 cont;
+
+  my_compare=compare;
+  while (span) {
+    cont=TRUE;
+    while (cont) {
+      cont=FALSE;
+      for (i=0;i+span<num;i++) {
+	b1=base+width*i;
+	b2=base+width*(i+span);
+	if (my_compare(b1,b2)>0) {
+	  MemCpy(temp,b1,width);
+	  MemCpy(b1,b2,width);
+	  MemCpy(b2,temp,width);
+	  cont=TRUE;
+	}
+      }
+    }
+    span>>=1;
+  }
+  Free(temp);
+}
+

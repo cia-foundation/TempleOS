@@ -1,0 +1,169 @@
+$WW,1$$TR,"Task"$
+$ID,2$A "task" is the Intel term for a "process".  Each task has a $LK+S,"TssStruct","MN:TssStruct"$, the name derived from "Task State Something".  The "$FG,2$Fs$FG$" segment register is maintained pointing to the current TssStruct.
+$ID,-2$$TR,"Adam Task"$
+$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all mem objects which are system wide.  When created, it runs the file $LK,"::/LT/OSMain/ADAMK.CPZ","FI:::/LT/OSMain/ADAMK.CPZ"$$ER+A,""$  Normally, ADAMK.CPZ ends by $FG,2$#include$FG$ $LK,"::/LT/ADAM/ADAM2.CPZ","FI:::/LT/ADAM/ADAM2.CPZ"$ where the remainder of the operating system is "$FG,2$#include$FG$d".  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam","MN:Adam"$("") routine will cause the adam task to compile and run text source code.  "$FG,2$#include$FG$" statements can be sent to the $LK,"Adam","MN:Adam"$("") routine, creating system-wide code and data which don't disappear when any particular task ends.
+$ID,-2$$TR,"Parent/Child Task"$
+$ID,2$Often a task will $LK,"Spawn","MN:Spawn"$() or $LK,"PopUp","MN:PopUp"$() a task as a helper.  The helper is known as a Child Task, though you can $FG,2$Spawn$FG$ a task and assign it a different parent... like Adam.  Links are kept as to who Spawned what so that when one task is $LK,"Kill","MN:Kill"$()ed the helper tasks disappear, too.  You see a report on current system tasks with $LK,"TaskRep","MN:TaskRep"$().  There is just one possible window per task, so child tasks are needed.
+$ID,-2$$TR,"C+"$
+$ID,2$The language used by LoseThos is more than "$FG,2$C$FG$" and less than "$FG,2$C++$FG$", so it's just "$FG,2$C+$FG$".
+$ID,-2$$TR,"Static Compiled Mode"$
+$ID,2$I coined this term to refer to conventional compilation mode, but it is not the preferred mode for this operating system and is discouraged.  "$FG,2$.BI?$FG$" files are created directly, skipping "$FG,2$.OBJ$FG$" files.  In this mode, code and data are contiguous.  After compiling, you do a $LK,"Load","MN:Load"$() cmd which is available from right-clicking on a link (like from $LK,"Dir","MN:Dir"$()).  There is no "$FG,2$main()$FG$" routine.  Instead, statements outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$Static Compiled Mode$FG$, use the $LK,"CompileFile","MN:CompileFile"$() routine or right-click on a link.  The OSmain and compiler are made in static compiled mode and stored in "$FG,2$BOOT.BIC$FG$" and "$FG,2$CMP.BIZ$FG$".
+$ID,-2$$TR,"Dynamic Compiled Mode"$
+$ID,2$I coined this term to refer to the mode when the compiler allocates objects(code and data) from the heap, noncontiguously.  This mode is used during command-line operations.  When you "$FG,2$#include$FG$" a file, it is compiled function by function and objects are placed all over in mem.  The $LK,"ExecuteFile","MN:ExecuteFile"$() routine is the same as "$FG,2$#include$FG$" but can be placed in programs.  $LK,"ExecuteString","MN:ExecuteString"$() routine will compile and run a string.  "$FG,2$asm{}$FG$" cmds are not allowed in Dynamic mode.
+$ID,-2$$TR,"Compiler Intermediate Code"$
+$ID,2$The compiler generates instructions one step before making actual assembly(machine) language instructions.  This code is reverse polish in nature and can be viewed with $LK,"PTrace","MN:PTrace"$() or $LK,"OTrace","MN:OTrace"$().  The compiler does not "interpret" code, except in the process of optimization.  The assembly language can be viewed when it is compiled with the $LK,"CTrace","MN:CTrace"$() routine, or afterward with $LK,"Dasm","MN:Dasm"$().
+$ID,-2$$TR,"AutoFile"$
+$ID,2$A $FG,2$C+$FG$ script who's stdout goes to a task's input buffer.  (A $FG,2$PrintF$FG$ will result in characters going to a parent task as though the user typed it.)  $LK,"Msg","MN:Msg"$() can be included in an autofile to send mouse or other commands.  While an autofile is running, the normal input gets diverted to the autofile task and can be filtered and sent back to the parent task.  Unless you are driving functions which prompt for data, you can probably use an $FG,2$#include$FG$ file in place of an $FG,2$AutoFile$FG$. See $LK,"::/LT/DEMO/AutoFile/Demo1.AUZ","FI:::/LT/DEMO/AutoFile/Demo1.AUZ"$.  Note: $LK,"Auto","MN:Auto"$() is a simple routine which call $FG,2$PutS$FG$ from within the helper(child) task to send a string to the parent's input stream.  It differs from $LK,"AutoString","MN:AutoString"$().  You'll probably use $LK,"Auto","MN:Auto"$() a lot but not $LK,"AutoString","MN:AutoString"$().  With $LK,"Auto","MN:Auto"$() you can place answers to the prompts for recompiling the OSMain with $LK,"InstallBoot","MN:InstallBoot"$().
+$ID,-2$$TR,"File Partition"$
+$ID,2$There are physical partitions on disks and then there are virtual partitions which are stored in files on other partitions.  This is a LoseThos feature.  You can create a file partition using AddDrives or at the prompt when you recompile the operating system.  If you answer "Yes" to the prompt on reformating, this partition will be reformatted each time you use it for the first time after booting.  The original purpose of file partitions was as a holding area to collect files to write to a CD-ROM.  Use the file partition's letter when calling $LK,"CreateCDFile","MN:CreateCDFile"$().
+$ID,-2$$TR,"GrElem (Graphic Element)"$
+$ID,2$A graphic element is a line or point or poly-line or whatever, created with $FG,2$CTRL-R$FG$. Several graphic elements are clustered by $FG,2$CTRL-R$FG$.
+$ID,-2$$TR,"SysText"$
+$ID,2$To allow different languages, LoseThos uses strings to identify actual strings to be displayed.  This is basically a level of indirection.  Support for lists of strings is also provided, but it's not especially effecient.  See $LK,"SysText","MN:SysText"$(), $LK,"LoadStr","MN:LoadStr"$(), $LK,"LoadList","MN:LoadList"$(), $LK,"MatchSysTextEntry","MN:MatchSysTextEntry"$() and $LK,"SysTextSub","MN:SysTextSub"$().  $LK,"PrintF","MN:PrintF"$() also has some special codes to support SysText.
+$ID,-2$$TR,"Hard-coded"$
+$ID,2$When you use a raw number instead of a $FG,2$#define$FG$'ed label, that's called "hard-coding".  Use labels whenever possible or your programs will fail if numbers change when the operating system is updated.
+$ID,-2$
+
+$FG,5$$TX+CX,"FileNames"$$FG$
+
+$FG,5$Wildcards$FG$
+  FileName wild card matching allows "$FG,2$*$FG$" to match sequences of arbitrary characters and "$FG,2$?$FG$" for a single arbitrary character.  For some commands, you can enter multiple specifiers separated by "$FG,2$;$FG$".  You don't need to, but can, use "$FG,2$*.*$FG$" instead of "$FG,2$*$FG$" for filenames.  You can specify names to exclude by using a "$FG,2$~$FG$".
+
+$FG,5$*.??Z$FG$
+  Automatically compressed and uncompresses files when read and written.
+$FG,5$$FG,5$*.??C$FG$
+  Contiguous files--NOT compressed.
+$FG,5$*.TX?$FG$
+  Text Files
+$FG,5$*.GL?$FG$
+  Glossary Files--WordStat will show a "$FG,2$#$FG$" next to words which are defined as anchors within glossary files.
+$FG,5$*.CP?$FG$
+  C+ source files.  The default C+ compiler type is "$FG,2$.CPZ$FG$".
+$FG,5$*.HP?$FG$
+  C+ source header files.
+$FG,5$*.AS?$FG$
+  Assembly source files.  The default assembler type is "$FG,2$.ASZ$FG$".
+$FG,5$*.MU?$FG$
+  Menu/Help/Macro files
+$FG,5$*.MP?$FG$
+  Compiler "map" files
+$FG,5$*.BI?$FG$
+  Binary executable files, created by $LK,"CompileFile","MN:CompileFile"$() and read by $LK,"Load","MN:Load"$().
+$FG,5$*.DT?$FG$
+  Data files
+$FG,5$*.DVC$FG$
+  File Partition Drive (A drive stored in a file on another partition)
+$FG,5$$FG,5$*.IS?$FG$
+  CD-ROM image file--ISO9660.  To burn on other operating systems, rename "$FG,2$.ISO$FG$"
+$FG,5$*.AUZ$FG$
+  "AutoFile" Basically a C+ program who's stdout goes to the input of a task when $LK,"AutoFile","MN:AutoFile"$() is called.
+
+$LK,"SOURCE_FILE_MASK","MN:SOURCE_FILE_MASK"$$FG$
+  This $FG,2$#define$FG$ holds a list of source file extensions.
+$LK,"TEXT_FILE_MASK","MN:TEXT_FILE_MASK"$$FG$
+  This $FG,2$#define$FG$ holds a list of text file extensions.
+
+
+
+$FG,5$$TX+CX,"Naming conventions"$
+$FG$
+$FG,5$$FG$The following are rules I stick to.  If you work on the operating system, it'd be good to stick with them for uniformity, but you can do what you like.  Since there are no "$FG,2$namespaces$FG$" and I don't plan to implement name spaces, I highly recommend putting a 2-3 character module code prefix on symbols. e.g. "Ws","Ltf","Lex"
+
+$FG,5$ALL_CAPS$FG$
+  Assembly Language labels are capitalized with underscores between words.  So are $FG,2$#define$FG$'s.
+
+$FG,5$MixedCaps$FG$
+  $FG,2$C+$FG$ Functions and class names are MixedCaps.
+
+$FG,5$lower_case$FG$
+  Local function vars and glbl vars are lower case.  Class member names are also lower_case.
+
+$FG,5$SYSf_????$FG$
+  Flags which are designated with bit numbers instead of bit values are designated with a lower case "$FG,2$f$FG$".
+
+$FG,5$CP_????$FG$
+  Assembly language routines which are C+ callable have a prefix "CP_".
+
+
+
+$AN,"Fs","Fs"$
+  This refers to the CPU segment register called FS.  This register is special in LoseThos because it points to the currently active task's $LK,"TssStruct","MN:TssStruct"$.
+
+$AN,"Tss","Tss"$
+  This is an Intel abbreviation for task state something.  Each task has one of these structures.  LoseThos doesn't actually use this CPU feature.
+ 
+$AN,"Bt,Bts,Btr,Btc","Bt,Bts,Btr,Btc"$
+  These are bit manipulation functions named after Intel instructions.  They stand for "Bit Test", "Bit Test and Set", "Bit Test and Reset" and "Bit Test and Compliment".
+
+$AN,"Cli,Sti","Cli,Sti"$
+  These functions turn on or off interrupts.  They are named after the Intel instructions.  "Cli" turns off interrupts.
+
+$AN,"Root","root"$
+  Refers to the base of a binary tree or the head of a queue.
+
+$AN,"Put","Put"$/$AN,"PrintF","PrintF"$
+  This usually means sending data to a character stream.  I try to use this instead of "Display" or "Dump".
+
+$AN,"Get","Get"$
+  This is the opposite of "Put".
+
+$AN,"Write","Write"$
+  This usually refers to sending data to disk and not to be confused with "Save".
+
+$AN,"Read","Read"$
+  This is the opposite of "Write" and not to be confused with "Load".
+
+$AN,"Load","Load"$
+  Refers to doing more than just reading.
+
+$AN,"Save","Save"$
+  This is an editor cmd.
+
+$AN,"Find","Find"$
+  I try to use this instead of "Locate", etc.
+
+$AN,"struct","struct"$
+  I try to use this instead of "Record" or "Node".
+
+$AN,"Join","Join"$
+  When two parts of a program have a common low-level routine, that routine is often labeled SomethingJoin.
+
+$AN,"Free","Free"$/$AN,"Unused","Unused"$
+  "Free" is a verb meaning to return something (to the system) like mem or disk space.  "Unused" is an adjective.
+
+
+$FG,5$$TX+CX,"Abreviations"$$FG$
+
+$FG,5$Attr$FG$	Attribute
+$FG,5$Blk$FG$	Block
+$FG,5$Buf$FG$	Buffer
+$FG,5$Cb$FG$	Call-back (or code block)
+$FG,5$Chnl$FG$	Channel
+$FG,5$$FG,5$Cmd$FG$	Command
+$FG,5$Cnt$FG$	Count
+$FG,5$Ctrl$FG$	Control.  The control key is indicated with "$FG,2$^$FG$" in documentation.
+$FG,5$Cur$FG$	Current
+$FG,5$Dbg$FG$	Debug
+$FG,5$Del$FG$	Delete
+$FG,5$Dev$FG$	Device
+$FG,5$Dir$FG$	Directory
+$FG,5$Elem$FG$	Element
+$FG,5$Glbl$FG$	Global
+$FG,5$Gr$FG$	Graphic
+$FG,5$ip_$FG$	Input Pointer.  See $LK,"::/LT/ADAM/INPTR.CPZ","FI:::/LT/ADAM/INPTR.CPZ"$.
+$FG,5$Lex$FG$	Lexical analyser
+$FG,5$Lpt$FG$	I think this stands for "line printer port". (It's a DOS term.)
+$FG,5$Ltf$FG$	Linked-Text-File (doubly-linked-list of rich text cmds)
+$FG,5$Mem$FG$	Memory
+$FG,5$$FG,5$Msg$FG$	Message
+$FG,5$Num$FG$	Number
+$FG,5$$FG,5$Ode$FG$	Ordinary differential equation
+$FG,5$Pmt$FG$	Prompt
+$FG,5$Ptr$FG$	Pointer
+$FG,5$Rep$FG$	Report
+$FG,5$$FG,5$Rmt$FG$	Remote
+$FG,5$Rx$FG$	Receive
+$FG,5$$FG,5$$FG,5$Str$FG$	String
+$FG,5$Sys$FG$	System
+$FG,5$Tx$FG$	Transmit
+$FG,5$$FG,5$Var$FG$	Variable

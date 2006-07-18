@@ -1,0 +1,209 @@
+// The following algorithm came from a magazine
+// and I implimented it when I worked for Ticketmaster.
+
+void ArcCompressBuf(ArcCs *c)
+{
+  ArcTableEntry *temp,*temp1;
+  U8 basecode;
+  U1 *src_ptr,*src_limit,ch;
+
+  src_ptr=c->src_buf+c->src_pos;
+  src_limit=c->src_buf+c->src_size;
+
+  if (c->saved_basecode==0xFFFFFFFF)
+    basecode=*src_ptr++;
+  else
+    basecode=c->saved_basecode;
+
+  while (src_ptr<src_limit &&
+    c->dst_pos+c->cur_bits_in_use<=c->dst_size) {
+    ArcGetTableEntry(c);
+
+    arc_start_loop1:
+      if (src_ptr>=src_limit) goto arc_done_compression;
+      ch=*src_ptr++;
+      if (temp=c->hash[basecode])
+	do {
+	  if (temp->ch==ch) {
+	    basecode=(temp-&c->compress[0])>>3;
+	    goto arc_start_loop1;
+	  }
+	} while (temp=temp->next);
+
+    OrWordBitField(c->dst_buf,c->dst_pos,basecode);
+    c->dst_pos+=c->cur_bits_in_use;
+
+    c->entry_used=TRUE;
+    temp=c->cur_entry;
+    temp->basecode=basecode;
+    temp->ch=ch;
+    temp1=&c->hash[basecode];
+    temp->next=temp1->next;
+    temp1->next=temp;
+
+    basecode=ch;
+  }
+arc_done_compression:
+  c->saved_basecode=basecode;
+  c->src_pos=src_ptr-c->src_buf;
+}
+
+void ArcFinishCompression(ArcCs *c)
+{
+  if (c->dst_pos+c->cur_bits_in_use<=c->dst_size) {
+    OrWordBitField(c->dst_buf,c->dst_pos,c->saved_basecode);
+    c->dst_pos+=c->cur_bits_in_use;
+  }
+}
+
+void ArcExpandBuf(ArcCs *c)
+{
+  U1 *dst_ptr,*dst_limit;
+  U8 basecode,lastcode,code;
+  ArcTableEntry *temp,*temp1;
+
+  dst_ptr=c->dst_buf+c->dst_pos;
+  dst_limit=c->dst_buf+c->dst_size;
+
+  while (dst_ptr<dst_limit &&
+	 c->stack_ptr!=c->stack_base)
+    *dst_ptr++ = * -- c->stack_ptr;
+
+  if (c->stack_ptr==c->stack_base && dst_ptr<dst_limit) {
+    if (c->saved_basecode==0xFFFFFFFF) {
+      lastcode=ExtractWordBitField(c->src_buf,c->src_pos,
+	 c->next_bits_in_use);
+      c->src_pos=c->src_pos+c->next_bits_in_use;
+      *dst_ptr++=lastcode;
+      ArcGetTableEntry(c);
+      c->last_ch=lastcode;
+    } else
+      lastcode=c->saved_basecode;
+    while (dst_ptr<dst_limit &&
+      c->src_pos+c->next_bits_in_use<=c->src_size) {
+      basecode=ExtractWordBitField(c->src_buf,c->src_pos,
+	 c->next_bits_in_use);
+      c->src_pos+=c->next_bits_in_use;
+      if (c->cur_entry==&c->compress[basecode]) {
+	*c->stack_ptr++=c->last_ch;
+	code=lastcode;
+      } else
+	code=basecode;
+      while (code>=c->min_table_entry) {
+	*c->stack_ptr++=c->compress[code].ch;
+	code=c->compress[code].basecode;
+      }
+      *c->stack_ptr++=code;
+      c->last_ch=code;
+
+      c->entry_used=TRUE;
+      temp=c->cur_entry;
+      temp->basecode=lastcode;
+      temp->ch=c->last_ch;
+      temp1=&c->hash[lastcode];
+      temp->next=temp1->next;
+      temp1->next=temp;
+
+      ArcGetTableEntry(c);
+      while (dst_ptr<dst_limit && c->stack_ptr!=c->stack_base)
+	*dst_ptr++ = * -- c->stack_ptr;
+      lastcode=basecode;
+    }
+    c->saved_basecode=lastcode;
+  }
+  c->dst_pos=dst_ptr-c->dst_buf;
+}
+
+ArcCs *NewArcCs(BoolU4 expand,BoolU4 text_only)
+{
+  ArcCs *c;
+  c=MAllocZ(sizeof(ArcCs));
+  if (expand) {
+    c->stack_base=MAlloc(ARC_MAX_TABLE_ENTRY+1);
+    c->stack_ptr=c->stack_base;
+  }
+  if (text_only)
+    c->min_bits=7;
+  else
+    c->min_bits=8;
+  c->min_table_entry=1<<c->min_bits;
+  c->free_index=c->min_table_entry;
+  c->next_bits_in_use=c->min_bits+1;
+  c->free_limit=1<<c->next_bits_in_use;
+  c->saved_basecode=0xFFFFFFFF;
+  c->entry_used=TRUE;
+  ArcGetTableEntry(c);
+  c->entry_used=TRUE;
+  return c;
+}
+
+void DelArcCs(ArcCs *c)
+{
+  Free(c->stack_base);
+  Free(c);
+}
+
+
+ArcCompressStruct *CompressBuf(U1 *src,U8 size,
+		U8 flags=0)
+{
+  U8 size_out;
+  ArcCompressStruct *result;
+  BoolU4 text_only=(ArcDetermineCompressionType(src,size)==CT_7_BIT);
+  ArcCs *c=NewArcCs(FALSE,text_only);
+  c->src_size=size;
+  c->src_buf=src;
+  c->dst_size=(size+sizeof(ArcCompressStruct)-1)<<3;
+  c->dst_buf=MAllocZ(c->dst_size>>3);
+  c->dst_pos=(sizeof(ArcCompressStruct)-1)<<3;
+  ArcCompressBuf(c);
+  ArcFinishCompression(c);
+  if (c->src_pos==c->src_size) {
+    size_out=(c->dst_pos+7)>>3;
+    result=MAlloc(size_out);
+    MemCpy(result,c->dst_buf,size_out);
+    result->compression_type=(text_only) ? CT_7_BIT:CT_8_BIT;
+    result->compressed_size=size_out;
+  } else {
+    result=MAlloc(size+sizeof(ArcCompressStruct)-1);
+    MemCpy(result->body,src,size);
+    result->compression_type=CT_NONE;
+    result->compressed_size=size+sizeof(ArcCompressStruct)-1;
+  }
+  result->expanded_size=size;
+  result->flags=flags;
+  Free(c->dst_buf);
+  DelArcCs(c);
+  return result;
+}
+
+U1 *ExpandBuf(ArcCompressStruct *r)
+{
+  ArcCs *c;
+  ArcCompressStruct *r2=r;
+  U1 *result;
+  BoolU4 text_only;
+  result=MAlloc(r2->expanded_size+1);
+  result[r2->expanded_size]=0; //terminate
+
+  text_only=(r2->compression_type==CT_7_BIT);
+  if (r2->compression_type==CT_NONE) {
+    MemCpy(result,r2->body,r2->expanded_size);
+    goto expand_end;
+  }
+  c=NewArcCs(TRUE,text_only);
+  c->src_size=r2->compressed_size<<3;
+  c->src_pos=(sizeof(ArcCompressStruct)-1)<<3;
+  c->src_buf=r2;
+  c->dst_size=r2->expanded_size;
+  c->dst_buf=result;
+  c->dst_pos=0;
+  ArcExpandBuf(c);
+  DelArcCs(c);
+
+expand_end:
+  if (r2!=r)
+    Free(r2);
+  return result;
+}
+

@@ -1,0 +1,800 @@
+#define CH_XOFF		0x13
+#define CH_XON		0x11
+
+#define UART_THR	0
+#define UART_RDR	0
+#define UART_BRDL	0
+#define UART_IER	1
+#define UART_BRDH	1
+#define UART_IIR	2
+#define UART_LCR	3
+#define UART_MCR	4
+#define UART_LSR	5
+#define UART_MSR	6
+
+#define COMMf_INCOMING_XOFFED	0
+#define COMMf_OUTGOING_XOFFED	1
+#define COMMf_TX_XOFF		2
+#define COMMf_TX_XON		3
+
+#define RMT_MAX_PKT_LEN	64  //Must be less then PKT_SYNC
+#define RMT_PKT_ACK	0xA5
+#define RMT_PKT_NACK	0x5A
+#define RMT_PKT_SYNC	0xA3
+#define RMT_PKT_SYNC2	0xA7
+#define RMT_PKT_CHAR	0xA4
+#define RMT_PKT_REQUEST	0xA6
+#define RMT_PKT_CLOSE	0xA8
+
+#define RMT_RQST_NONE		0x00
+#define RMT_RQST_GETMSG		0x01
+#define RMT_RQST_TX_FILE	0x02
+#define RMT_RQST_RX_FILE	0x03
+#define RMT_RQST_TX_BUF		0x04
+#define RMT_RQST_RX_BUF		0x05
+#define RMT_RQST_EXE_LOCAL	0x06
+#define RMT_RQST_PUTS_CNT	0x07
+
+#define RMT_RQST_MAX		0x07
+
+U8 comm_base[5]={0,0x3F8,0x2F8,0x3E8,0x2E8};
+U1Fifo *comm_Rx_fifos[5]={NULL,NULL,NULL,NULL,NULL};
+U1Fifo *comm_Tx_fifos[5]={NULL,NULL,NULL,NULL,NULL};
+U8 comm_flags[5]={0,0,0,0,0};
+LTChnl *comm_chnls[5]={NULL,NULL,NULL,NULL,NULL};
+
+public void RxClose(LTChnl *chnl)
+{
+  U8 base;
+  U8 old_flags=GetFlags;
+  if (!chnl || !chnl->type) return;
+  if (chnl->type==LCT_COMM) {
+    base=comm_base[chnl->port];
+    OutP(base+UART_IER,0);
+    Cli;
+    if (comm_Rx_fifos[chnl->port]) {
+      DelU1Fifo(comm_Rx_fifos[chnl->port]);
+      comm_Rx_fifos[chnl->port]=NULL;
+    }
+    if (comm_Tx_fifos[chnl->port]) {
+      DelU1Fifo(comm_Tx_fifos[chnl->port]);
+      comm_Tx_fifos[chnl->port]=NULL;
+    }
+    comm_chnls[chnl->port]=NULL;
+    SetFlags(old_flags);
+  }
+  AFree(chnl);
+}
+
+public void CommPutChar(U8 port,U1 b)
+{
+  U8 old_flags=GetFlags;
+  U8 base=comm_base[port];
+  Cli;
+  if (b==CH_XOFF)
+    Bts(&comm_flags[port],COMMf_TX_XOFF);
+  else if (b==CH_XON)
+    Bts(&comm_flags[port],COMMf_TX_XON);
+  else {
+    if (U1FifoCnt(comm_Tx_fifos[port])>comm_Tx_fifos[port]->mask-4) {
+      SetFlags(old_flags);
+      while (U1FifoCnt(comm_Tx_fifos[port])>comm_Tx_fifos[port]->mask-4)
+	SwapInNext;
+      Cli;
+    }
+    if (Bt(&comm_flags[port],COMMf_OUTGOING_XOFFED)) {
+      SetFlags(old_flags);
+      while (Bt(&comm_flags[port],COMMf_OUTGOING_XOFFED))
+	SwapInNext;
+      Cli;
+    }
+    if (comm_Tx_fifos[port])
+      U1FifoInsert(comm_Tx_fifos[port],b);
+  }
+  OutP(base+UART_IER,3); //Enable TX & RX IRQ
+  SetFlags(old_flags);
+  BusyWait(300);
+}
+
+public void RmtFlushRxFifo(LTChnl *chnl)
+{
+  if (!chnl || !chnl->type) return;
+  U1FifoFlush(comm_Rx_fifos[chnl->port]);
+  if (Bt(&comm_flags[chnl->port],COMMf_INCOMING_XOFFED))
+    chnl->PutChar(chnl,CH_XON);
+}
+
+public void RmtFlushTxFifo(LTChnl *chnl)
+{
+  U8 base=comm_base[chnl->port];
+  if (!chnl || !chnl->type) return;
+  U1FifoFlush(comm_Tx_fifos[chnl->port]);
+  while (!(InP(base+UART_LSR) & 0x20))
+    SwapInNext;
+}
+
+
+public void RmtPrintF(LTChnl *chnl,I1 *src,...)
+{
+  I1 *buf,*ptr;
+  if (!chnl || !chnl->type) return;
+  buf=SPrintFJoin(NULL,src,argc,argv);
+  ptr=buf;
+  while (*ptr)
+    chnl->PutChar(chnl,*ptr++);
+  Free(buf);
+}
+
+public void CommPrintF(U8 port,I1 *src,...)
+{
+  RmtPrintF(comm_chnls[port],src,argc,argv);
+}
+
+
+void CommRxTxChar(U8 port)
+{
+  U8 ch=0,irq,base=comm_base[port];
+  BoolU4 have_one;
+  if (comm_Rx_fifos[port] &&
+      comm_Tx_fifos[port]) {
+    while (TRUE) {
+      irq=InP(base+UART_IIR);
+      if ((irq & 0x07)==4) {	//RX IRQ
+	ch=InP(base+UART_RDR);
+	if (ch==CH_XOFF)
+	  Bts(&comm_flags[port],COMMf_OUTGOING_XOFFED);
+	else if (ch==CH_XON)
+	  Btr(&comm_flags[port],COMMf_OUTGOING_XOFFED);
+	else {
+	  U1FifoInsert(comm_Rx_fifos[port],ch);
+	  if (U1FifoCnt(comm_Rx_fifos[port])>comm_Rx_fifos[port]->mask>>1)
+	    CommPutChar(port,CH_XOFF);
+	}
+      } else if ((irq & 0x07)==2) {	//TX IRQ
+	have_one=TRUE;
+	if (Btr(&comm_flags[port],COMMf_TX_XOFF))
+	  ch=CH_XOFF;
+	else if (Btr(&comm_flags[port],COMMf_TX_XON))
+	  ch=CH_XON;
+	else if (!U1FifoRemove(comm_Tx_fifos[port],&ch))
+	  have_one=FALSE;
+	if (have_one) {
+	  if (ch==CH_XOFF)
+	    Bts(&comm_flags[port],COMMf_INCOMING_XOFFED);
+	  else if (ch==CH_XON)
+	    Btr(&comm_flags[port],COMMf_INCOMING_XOFFED);
+	  OutP(base+UART_THR,ch);
+	}
+	if (!U1FifoCnt(comm_Tx_fifos[port]))
+	  OutP(base+UART_IER,1); //Enable RX IRQ
+      } else
+	break;
+    }
+  }
+}
+
+public I8 RmtRxFifoCnt(LTChnl *chnl)
+{
+  if (!chnl || !chnl->type) return 0;
+  return U1FifoCnt(comm_Rx_fifos[chnl->port]);
+}
+
+public I8 RmtTxFifoCnt(LTChnl *chnl)
+{
+  if (!chnl || !chnl->type) return 0;
+  return U1FifoCnt(comm_Tx_fifos[chnl->port]);
+}
+
+public void RmtWaitTxDone(LTChnl *chnl)
+{
+  U8 base=comm_base[chnl->port];
+  if (!chnl || !chnl->type) return;
+  while (RmtTxFifoCnt(chnl))
+    SwapInNext;
+  while (!(InP(base+UART_LSR) & 0x20))
+    SwapInNext;
+}
+
+void Irq03Handler()
+{
+  CommRxTxChar(2);
+  CommRxTxChar(4);
+}
+
+void Irq04Handler()
+{
+  CommRxTxChar(1);
+  CommRxTxChar(3);
+}
+
+public U1 CommGetChar(U8 port)
+{
+  U8 ch=0;
+  while (!U1FifoRemove(comm_Rx_fifos[port],&ch))
+    SwapInNext;
+  if (Bt(&comm_flags[port],COMMf_INCOMING_XOFFED) &&
+      U1FifoCnt(comm_Rx_fifos[port])<comm_Rx_fifos[port]->mask>>2)
+    CommPutChar(port,CH_XON);
+  return ch;
+}
+
+public U1 RmtGetChar(LTChnl *chnl)
+{
+  if (!chnl || !chnl->type)
+    return 0;
+  return CommGetChar(chnl->port);
+}
+
+public BoolU4 CommScanChar(U8 port,U1 *ch)
+{
+  U8 ch1=0;
+  if (U1FifoPeek(comm_Rx_fifos[port],&ch1)) {
+    U1FifoRemove(comm_Rx_fifos[port],&ch1);
+    *ch=ch1;
+    if (Bt(&comm_flags[port],COMMf_INCOMING_XOFFED) &&
+	U1FifoCnt(comm_Rx_fifos[port])<comm_Rx_fifos[port]->mask>>2)
+      CommPutChar(port,CH_XON);
+    return TRUE;
+  } else
+    return FALSE;
+}
+
+public BoolU4 RmtScanChar(LTChnl *chnl,U1 *ch)
+{
+  if (!chnl || !chnl->type)
+    return 0;
+  return CommScanChar(chnl->port,ch);
+}
+
+void CommRmtPutChar(LTChnl *chnl,U1 b)
+{
+  CommPutChar(chnl->port,b);
+}
+
+U1 CommRmtGetChar(LTChnl *chnl)
+{
+  return CommGetChar(chnl->port);
+}
+
+BoolU4 CommRmtScanChar(LTChnl *chnl,U1 *ch)
+{
+  return CommScanChar(chnl->port,ch);
+}
+
+public LTChnl *CommOpen8N1(U8 port=1,U8 baud=38400)
+{
+  LTChnl *chnl=NULL;
+  U8 old_flags=GetFlags,base=comm_base[port];
+  Cli;
+  if (!port || port>4 || comm_chnls[port])
+    goto co_exit;
+  chnl=AMAllocZ(sizeof(LTChnl));
+  comm_chnls[port]=chnl;
+  chnl->type=LCT_COMM;
+  base=comm_base[port];
+  chnl->port=port;
+  chnl->baud=baud;
+  chnl->PutChar=&CommRmtPutChar;
+  chnl->GetChar=&CommRmtGetChar;
+  chnl->ScanChar=&CommRmtScanChar;
+  if (comm_Rx_fifos[chnl->port])
+    DelU1Fifo(comm_Rx_fifos[chnl->port]);
+  if (comm_Tx_fifos[chnl->port])
+    DelU1Fifo(comm_Tx_fifos[chnl->port]);
+  comm_flags[chnl->port]=0;
+  comm_Rx_fifos[chnl->port]=NewU1Fifo(0x2000); //must be power of 2
+  comm_Tx_fifos[chnl->port]=NewU1Fifo(0x2000); //must be power of 2
+  OutP(base+UART_LCR,0);     //Set for IER
+  OutP(base+UART_IER,0);
+  OutP(base+UART_LCR,0x80);  //Enable baud rate control
+  OutP(base+UART_BRDL,(0x180/(baud/300)) & 0xFF); //LSB
+  OutP(base+UART_BRDH,(0x180/(baud/300)) / 256);  //MSB
+  OutP(base+UART_LCR,3);     // 8-none-1
+
+  InP(base+UART_RDR);  //read garbage
+  InP(base+UART_LSR);
+
+  OutP(base+UART_MCR,4);
+  OutP(base+UART_IER,0);     //DIsable all IRQ
+  OutP(base+UART_MCR,0xA);	 //out2 and rts
+  OutP(base+UART_IER,1);	 //Enable RX IRQ
+co_exit:
+  SetFlags(old_flags);
+  return chnl;
+}
+
+public void CommClose(U8 port)
+{
+  LTChnl *chnl=comm_chnls[port];
+  RxClose(chnl);
+}
+
+ext[EXT_IRQ03]=&Irq03Handler;
+ext[EXT_IRQ04]=&Irq04Handler;
+
+U8 RmtTxPktU1(LTChnl *chnl,U1 b)
+{
+  if (!chnl || !chnl->type) return 0;
+  if (b==CH_XOFF || b==CH_XON ||
+      b==CH_ESC || b==RMT_PKT_CHAR ||
+      b==RMT_PKT_REQUEST ||
+      b==RMT_PKT_CLOSE) {
+    chnl->PutChar(chnl,CH_ESC);
+    chnl->PutChar(chnl,b^0x80);
+    return 2;
+  } else {
+    chnl->PutChar(chnl,b);
+    return 1;
+  }
+}
+
+BoolU4 RmtRxPktU1(LTChnl *chnl,U1 *b,
+  U8 timeout_jiffies,BoolU4 *esc=NULL)
+{
+  U1 b1;
+  U8 timeout;
+  *b=RMT_PKT_NACK;
+  if (esc)
+    *esc=FALSE;
+  if (!chnl || !chnl->type)
+    return FALSE;
+  timeout=jiffies+timeout_jiffies;
+  while (jiffies<timeout) {
+    if (chnl->ScanChar(chnl,&b1)) {
+      if (b1==CH_ESC) {
+	timeout=jiffies+timeout_jiffies;
+	while (jiffies<timeout) {
+	  if (chnl->ScanChar(chnl,&b1)) {
+	    *b=b1^0x80;
+	    if (esc) *esc=TRUE;
+	    return TRUE;
+	  }
+	  SwapInNext;
+	}
+	return FALSE;
+      } else {
+	if (b1==RMT_PKT_CLOSE) {
+	  Fs->rmt_chnl=NULL;
+	  throw;
+	}
+	*b=b1;
+	return TRUE;
+      }
+    }
+    SwapInNext;
+  }
+  return FALSE;
+}
+
+void RmtTxPkt(LTChnl *chnl,U1 *p,U8 size,U8 rqst=RMT_RQST_NONE)
+{
+  U1 b,xsum;
+  U8 i;
+  if (!chnl || !chnl->type) return;
+  if (rqst) {
+rt_err1:
+    RmtFlushTxFifo(chnl);
+    chnl->PutChar(chnl,RMT_PKT_REQUEST);
+    RmtWaitTxDone(chnl);
+    RmtFlushRxFifo(chnl);
+    RmtTxPktU1(chnl,rqst);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=RMT_PKT_ACK)
+      goto rt_err1;
+  } else if (size==1) {
+rt_err2:
+    RmtFlushTxFifo(chnl);
+    chnl->PutChar(chnl,RMT_PKT_CHAR);
+    RmtWaitTxDone(chnl);
+    RmtFlushRxFifo(chnl);
+    RmtTxPktU1(chnl,p[0]);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=RMT_PKT_ACK)
+      goto rt_err2;
+  } else {
+rt_err3:
+    RmtFlushTxFifo(chnl);
+    RmtTxPktU1(chnl,RMT_PKT_SYNC);
+    RmtWaitTxDone(chnl);
+    RmtFlushRxFifo(chnl);
+    RmtTxPktU1(chnl,RMT_PKT_SYNC2);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=RMT_PKT_ACK)
+      goto rt_err3;
+    RmtTxPktU1(chnl,size);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=RMT_PKT_ACK)
+      goto rt_err3;
+    xsum=0x3A;
+    for (i=0;i<size;i++) {
+      b=p[i];
+      RmtTxPktU1(chnl,b);
+      xsum^=b;
+    }
+    while (RmtTxFifoCnt(chnl)) {
+      if (RmtRxFifoCnt(chnl)) {
+	if (RmtScanChar(chnl,&b)) {
+	  if (b==RMT_PKT_NACK) {
+	    RmtFlushRxFifo(chnl);
+	    goto rt_err3;
+	  }
+	}
+      }
+      SwapInNext;
+    }
+    RmtTxPktU1(chnl,xsum);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=RMT_PKT_ACK)
+      goto rt_err3;
+  }
+}
+
+void RmtRxPkt(LTChnl *chnl,U1 *p,U8 *size=NULL,U8 *rqst=NULL)
+{
+  U1 b,b1,xsum;
+  U8 i,s,r;
+  BoolU4 esc;
+  if (!chnl || !chnl->type) {
+    if (size) *size=0;
+    if (rqst) *rqst=0;
+    return;
+  }
+rr_start:
+  RmtFlushTxFifo(chnl);
+  if (RmtRxFifoCnt(chnl)>2)
+    RmtFlushRxFifo(chnl);
+  s=0;
+  r=0;
+  RmtRxPktU1(chnl,&b,JIFFY_FREQ);
+  RmtRxPktU1(chnl,&b1,JIFFY_FREQ/50,&esc);
+rr_cont:
+  if (b==RMT_PKT_REQUEST) {
+    if (b1>RMT_RQST_MAX) {
+      if (b1==RMT_PKT_REQUEST && !esc)
+	goto rr_cont;
+      else
+	goto rr_err;
+    }
+    r=b1;
+    s=0;
+    goto rr_exit;
+  } else if (b==RMT_PKT_CHAR) {
+    if (b1==RMT_PKT_CHAR && !esc)
+      goto rr_cont;
+    *p=b1;
+    s=1;
+    goto rr_exit;
+  } else if (b==RMT_PKT_SYNC) {
+    if (b1!=RMT_PKT_SYNC2) {
+      if (b1==RMT_PKT_SYNC)
+	goto rr_cont;
+      else
+	goto rr_err;
+    }
+    RmtTxPktU1(chnl,RMT_PKT_ACK);
+    RmtWaitTxDone(chnl);
+    RmtRxPktU1(chnl,&s,JIFFY_FREQ/50);
+    if (s>RMT_MAX_PKT_LEN)
+      goto rr_err;
+    RmtTxPktU1(chnl,RMT_PKT_ACK);
+    RmtWaitTxDone(chnl);
+    xsum=0x3A;
+    for (i=0;i<s;i++) {
+      if (!RmtRxPktU1(chnl,&p[i],JIFFY_FREQ/50))
+	goto rr_err;
+      xsum^=p[i];
+    }
+    RmtRxPktU1(chnl,&b,JIFFY_FREQ/50);
+    if (b!=xsum)
+      goto rr_err;
+    goto rr_exit;
+  }
+
+rr_err:
+  RmtTxPktU1(chnl,RMT_PKT_NACK);
+  RmtWaitTxDone(chnl);
+  goto rr_start;
+
+rr_exit:
+  RmtTxPktU1(chnl,RMT_PKT_ACK);
+  RmtWaitTxDone(chnl);
+  if (size) *size=s;
+  if (rqst) *rqst=r;
+}
+
+public void RmtTxBlk(LTChnl *chnl,U1 *buf,I8 cnt)
+{
+  U1 b[RMT_MAX_PKT_LEN];
+  U8 size;
+  if (!chnl || !chnl->type) return;
+  while (cnt>0) {
+    if (cnt<RMT_MAX_PKT_LEN)
+      size=cnt;
+    else
+      size=RMT_MAX_PKT_LEN;
+    MemCpy(b,buf,size);
+    RmtTxPkt(chnl,b,size);
+    cnt-=size;
+    buf+=size;
+    progress1=cnt;
+  }
+}
+
+public U1 *RmtRxBlk(LTChnl *chnl,I8 cnt)
+{
+  U1 *result,*buf;
+  U1 b[RMT_MAX_PKT_LEN];
+  U8 size=0;
+  if (!chnl || !chnl->type) return NULL;
+  result=MAlloc(cnt);
+  buf=result;
+  while (cnt>0) {
+    RmtRxPkt(chnl,b,&size);
+    MemCpy(buf,b,size);
+    cnt-=size;
+    buf+=size;
+    progress1=cnt;
+  }
+  return result;
+}
+
+public U8 RmtGetMsg(LTChnl *chnl,I8 *p1,I8 *p2)
+{
+  U8 cmd,d,size;
+  U1 b[RMT_MAX_PKT_LEN];
+  *p1=0;
+  *p2=0;
+  if (!chnl || !chnl->type)
+    return 0;
+  if (jiffies<chnl->null_msg_jiffy)
+    return 0;
+  else {
+    RmtTxPkt(chnl,NULL,0,RMT_RQST_GETMSG);
+    RmtRxPkt(chnl,b,&size);
+    if (size!=sizeof(U8)*3)
+      return 0;
+    cmd=b[0]><(U8);
+    *p1=b[8]><(U8);
+    *p2=b[16]><(U8);
+    if (!cmd)
+      chnl->null_msg_jiffy=jiffies+JIFFY_FREQ/50;
+  }
+  return cmd;
+}
+
+public void RmtSendMsg(LTChnl *chnl,U8 cmd,I8 p1,I8 p2)
+{
+  U1 b[RMT_MAX_PKT_LEN];
+  if (!chnl || !chnl->type) return;
+  if (cmd) {
+    b[0]><(U8)=cmd;
+    b[8]><(U8)=p1;
+    b[16]><(U8)=p2;
+    RmtTxPkt(chnl,b,sizeof(U8)*3);
+  } else
+    RmtTxPkt(chnl,b,1);
+}
+
+public void RmtPutCharSC(LTChnl *chnl,I8 ch,U8 sc)
+{
+  if (!chnl || !chnl->type) return;
+  if (ch)
+    RmtTxPkt(chnl,&ch,1);
+}
+
+public void RmtTxBuf(LTChnl *chnl,U1 *buf,U8 size)
+{
+  if (!chnl || !chnl->type) return;
+  if (buf) {
+    RmtTxBlk(chnl,&size,sizeof(U8));
+    RmtTxBlk(chnl,buf,size);
+  }
+}
+
+public U1 *RmtRxBuf(LTChnl *chnl,U8 *size=NULL)
+{
+  U1 *buf;
+  U8 *size2;
+  if (size) *size=0;
+  if (!chnl || !chnl->type) return NULL;
+  size2=RmtRxBlk(chnl,sizeof(U8));
+  buf=RmtRxBlk(chnl,*size2);
+  if (size) *size=*size2;
+  Free(size2);
+  return buf;
+}
+
+public void RmtTxFile(LTChnl *chnl,I1 *filename,
+  BoolU4 raw=TRUE)
+{
+  U8 size;
+  U1 *buf;
+  if (!chnl || !chnl->type) return;
+  buf=ReadFile(filename,&size,NULL,raw);
+  if (buf) {
+    RmtTxBuf(chnl,buf,size);
+    Free(buf);
+  }
+}
+
+public U8 RmtRxFile(LTChnl *chnl,I1 *filename,
+  BoolU4 raw=TRUE)
+{
+  U8 size;
+  U1 *buf;
+  if (!chnl || !chnl->type) return 0;
+  if (buf=RmtRxBuf(chnl,&size)) {
+    WriteFile(filename,buf,size,0,0,raw);
+    Free(buf);
+  }
+  return size;
+}
+
+public void RmtTxPutS(LTChnl *chnl,I1 *st)
+{
+  U8 len;
+  if (!chnl || !chnl->type) return;
+  if (st) {
+    len=StrLen(st);
+    if (len) {
+      if (len>RMT_MAX_PKT_LEN) {
+	RmtTxPkt(chnl,NULL,0,RMT_RQST_PUTS_CNT);
+	RmtTxBuf(chnl,st,len+1);
+      } else
+	RmtTxBlk(chnl,st,len);
+    }
+  }
+}
+
+public void RmtTxPutChar(LTChnl *chnl,I8 ch)
+{
+  if (!chnl || !chnl->type) return;
+  if (ch)
+    RmtTxPkt(chnl,&ch,1);
+}
+
+public I1 *RmtRxPutS(LTChnl *chnl,U8 *rqst=NULL)
+{
+  U1 b[RMT_MAX_PKT_LEN];
+  U8 size;
+  U1 *buf=NULL;
+  if (!chnl || !chnl->type) return NULL;
+  if (RmtRxFifoCnt(chnl)>=2) {
+    RmtRxPkt(chnl,b,&size,rqst);
+    if (size) {
+      buf=MAlloc(size+1);
+      MemCpy(buf,b,size);
+      buf[size]=0;
+    } else
+      buf=MAllocZ(1);
+  }
+  return buf;
+}
+
+/***************
+public U1 *RmtRqstTxBuf(U8 *size=NULL)
+{
+  LTChnl *chnl=Fs->rmt_chnl;
+  if (!chnl || !chnl->type) return NULL;
+  RmtTxPkt(chnl,NULL,0,RMT_RQST_TX_BUF);
+  return RmtRxBuf(chnl,size);
+}
+
+public void RmtRqstRxBuf(U1 *buf,U8 size)
+{
+  LTChnl *chnl=Fs->rmt_chnl;
+  if (!chnl || !chnl->type) return;
+  RmtTxPkt(chnl,NULL,0,RMT_RQST_RX_BUF);
+  RmtTxBuf(chnl,buf,size);
+}
+*************/
+
+public void RmtRqstTxFile(I1 *dst_local_filename,I1 *src_remote_filename)
+{
+  LTChnl *chnl=Fs->rmt_chnl;
+  if (!chnl || !chnl->type) return;
+  RmtTxPkt(chnl,NULL,0,RMT_RQST_TX_FILE);
+  RmtTxBuf(chnl,src_remote_filename,StrLen(src_remote_filename)+1);
+  RmtRxFile(chnl,dst_local_filename);
+}
+
+public void RmtRqstRxFile(I1 *src_local_filename,I1 *dst_remote_filename)
+{
+  LTChnl *chnl=Fs->rmt_chnl;
+  if (!chnl || !chnl->type) return;
+  RmtTxPkt(chnl,NULL,0,RMT_RQST_RX_FILE);
+  RmtTxBuf(chnl,dst_remote_filename,StrLen(dst_remote_filename)+1);
+  RmtTxFile(chnl,src_local_filename);
+}
+
+public void RmtRqstExeLocal(I1 *st)
+{
+  LTChnl *chnl=Fs->rmt_chnl;
+  if (!chnl || !chnl->type) return;
+  RmtTxPkt(chnl,NULL,0,RMT_RQST_EXE_LOCAL);
+  RmtTxBuf(chnl,st,StrLen(st)+1);
+}
+
+void TelnetHostOpen(LTChnl *chnl)
+{
+  if (!chnl || !chnl->type) return;
+  Fs->rmt_chnl=chnl;
+}
+
+void TelnetHostClose(LTChnl *chnl)
+{
+  Fs->rmt_chnl=NULL;
+}
+
+void TelnetGuestOpen(LTChnl *chnl)
+{
+  U8 i,cmd,p1,p2,rqst;
+  U1 *st,*st2;
+  if (!chnl || !chnl->type) return;
+  coutln "CTRL-ALT-C to exit";
+  try
+    while (TRUE) {
+      if (st2=RmtRxPutS(chnl,&rqst)) {
+	switch (rqst) {
+	  case RMT_RQST_NONE:
+	    PutS(st2);
+	    break;
+	  case RMT_RQST_GETMSG:
+	    cmd=GetMsgNoWait(&p1,&p2,
+	      1<<MSG_KEY_DOWN|
+	      1<<MSG_CMD|
+	      1<<MSG_KEY_UP);
+	    RmtSendMsg(chnl,cmd,p1,p2);
+	    break;
+	  case RMT_RQST_TX_FILE:
+	    st=RmtRxBuf(chnl);
+	    RmtTxFile(chnl,st);
+	    Free(st);
+	    break;
+	  case RMT_RQST_RX_FILE:
+	    st=RmtRxBuf(chnl);
+	    RmtRxFile(chnl,st);
+	    Free(st);
+	    break;
+/***********
+	  case RMT_RQST_TX_BUF:
+	    break;
+	  case RMT_RQST_RX_BUF:
+	    RmtRxBuf(chnl);
+	    break;
+************/
+	  case RMT_RQST_EXE_LOCAL:
+	    st=RmtRxBuf(chnl);
+	    ExecuteString(st);
+	    Free(st);
+	    break;
+	  case RMT_RQST_PUTS_CNT:
+	    Free(st2);
+	    st2=RmtRxBuf(chnl);
+	    PutS(st2);
+	    break;
+	}
+	Free(st2);
+	st2=NULL;
+      }
+      SwapInNext;
+    }
+  catch
+    Fs->catch_except=TRUE;
+  for (i=0;i<5;i++) {
+    chnl->PutChar(chnl,RMT_PKT_CLOSE);
+    chnl->PutChar(chnl,RMT_PKT_CLOSE);
+    Sleep(50);
+  }
+}
+
+ext[EXT_RMT_PUTCHAR]=&RmtTxPutChar;
+ext[EXT_RMT_PUTS]=&RmtTxPutS;
+ext[EXT_RMT_LTFPUTCHAR]=&RmtPutCharSC;
+ext[EXT_RMT_GETMSG]=&RmtGetMsg;
+ 

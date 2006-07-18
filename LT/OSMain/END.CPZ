@@ -1,0 +1,345 @@
+void InitSysGlbls()
+{
+  sys_timer=0;
+  jiffies=0;
+  rnd_SEED = 93186752;
+  sys_cur_focus_task=Fs;
+  num_spawned_users=0;
+  compiled_lines=0;
+  ext[EXT_IRQ00]=&SimpleTimerIrq;
+
+  StrCpy(sys_temp_filename,"::/LT/DOC/TEMP.TXZ");
+
+  sys_macro_queue.next=&sys_macro_queue;
+  sys_macro_queue.last=&sys_macro_queue;
+  macro_util_tss=NULL;
+  ip_inhibit_win_operations=FALSE;
+
+  LTDCBase=NULL;
+  LTDCHashTable=NULL;
+
+  exe {
+    I1 *buf,*buf2;
+    LTDate ltdt;
+
+    buf=PmtStr("Start-up Accnt(ENTER will prompt):","");
+    buf2=PmtStr("Wordstat directory list(separated by ';'):","");
+    ExePrintF("sys_startup_account=\"%s\";\r\n",buf);
+    ExePrintF("wordstat_mask=\"%s\";\r\n",buf2);
+    Free(buf);
+    Free(buf2);
+    ltdt=GetCurTimeLTDate;
+    ExePrintF("sys_compile_time=\"%D %T\";\r\n",ltdt.date,ltdt.time);
+    buf=PmtStr("Disk Cache Size (ENTER will use default of %s Bytes):","0x1000000");
+    ExePrintF("LTDCInitCache(%s);",buf);
+    Free(buf);
+  }
+}
+
+
+void AddModuleHash(I1 *name,U8 base)
+{
+  SysHashEntry *temph,**temph1;
+  temph=MAllocZ(sizeof(SysHashEntry));
+  temph->type=HTT_MODULE|HTT_PUBLIC;
+  temph->use_cnt=0;
+  temph->user0=base;
+  temph->source_link=NULL;
+  temph->string=NewString(name);
+  temph1=FindHashBucket(temph->string,Fs->hash_table);
+  temph->next=*temph1;
+  *temph1=temph;
+}
+
+void AddOsMapSymbols()
+{
+  SysHashEntry *temph,**temph1;
+  I1 *sptr;
+  U1 *ptr;
+  U4 *dd;
+  U8 type;
+  I8 i,code;
+
+  code=sys_boot_base;
+  AddModuleHash("/LT/OSMain/OS",code);
+  ptr=sys_boot_header_base;
+  while ((type=*ptr++)!=EIE_END) { //PASS 1
+    dd=ptr;
+    ptr+=4;
+    i=*dd;
+    sptr=ptr;
+    ptr+=StrLen(sptr)+1;
+    if (type<=EIE_LIT_EXPORT) {
+      temph=MAllocZ(sizeof(SysHashEntry));
+      temph->type=HTT_SYS_SYMBOL;
+      temph->use_cnt=0;
+      temph->user0=i+code;
+      temph->source_link=NULL;
+      temph->string=NewString(sptr);
+      temph1=FindHashBucket(temph->string,Fs->hash_table);
+      temph->next=*temph1;
+      *temph1=temph;
+    } else if (type<EIE_MAIN) {
+    } else if (type==EIE_MAIN) {
+    } else if (type==EIE_ABSOLUTE_ADDRESS) {
+      ptr+=i*sizeof(U4);
+    }
+  }
+}
+
+U1 *Load(I1 *filename,BoolU4 no_abs=FALSE)
+{
+  I1 *fbuf,*fbuf2;
+  U1 *code,*ptr,etype,*bb;
+  I1 *sptr,*absname;
+  U2 *ww;
+  U4 *dd;
+  U8 size,cnt;
+  BinFileHeaderStruct *bfh;
+  I8 i,j,l;
+  SysHashEntry *temph,**temph1,*saved_hash_ptr=NULL;
+  ClassStruct *tempc;
+  GlblVarStruct *tempg;
+
+  fbuf=DefaultExtension(filename,"BIZ");
+  bfh=ReadFile(fbuf,&size); //TODO: align to para
+  code=bfh+sizeof(BinFileHeaderStruct);
+
+  if (ArcCheckSum(bfh,bfh->file_size)!=LT_XSUM)
+    throw(EXCEPT_ARC_XSUM);
+
+  absname=AbsoluteFileName(fbuf);
+  Free(fbuf);
+  fbuf=NewString(absname);
+  fbuf2=NewString(absname);
+  RemoveLastSeg(fbuf,".",fbuf2);
+  if (fbuf[1]==':' && StrLen(fbuf)>2)
+    AddModuleHash(fbuf+2,code);
+  Free(fbuf);
+  Free(fbuf2);
+
+  ptr=bfh+bfh->header_offset;
+  while ((etype=*ptr++)!=EIE_END) { //PASS 1
+    dd=ptr;
+    ptr+=sizeof(U4);
+    i=*dd;
+    sptr=ptr;
+    ptr+=StrLen(sptr)+1;
+    if (etype<=EIE_LIT_EXPORT) {
+      temph=MAllocZ(sizeof(SysHashEntry));
+      temph->string=NewString(sptr);
+      temph->type=HTT_SYS_SYMBOL;
+      temph->use_cnt=0;
+      l=StrLen(absname);
+      temph->source_link=MAlloc(l+4);
+      StrCpy(temph->source_link,"FI:");
+      StrCat(temph->source_link,absname);
+      if (etype==EIE_LIT_EXPORT)
+	temph->user0=i;
+      else
+	temph->user0=i+code;
+      temph1=FindHashBucket(temph->string,Fs->hash_table);
+      temph->next=*temph1;
+      *temph1=temph;
+    } else if (etype<EIE_MAIN) {
+      if (*sptr)
+	saved_hash_ptr=FindLocalHash(sptr,HTT_ALL);
+      if (!saved_hash_ptr)
+	coutln SysText("ST_UNRESOLVED_REFERENCE"),sptr;
+      else {
+	bb=code+i;
+	ww=code+i;
+	dd=code+i;
+	if (saved_hash_ptr->type & HTT_FUNCTION) {
+	  tempc=saved_hash_ptr;
+	  if (etype & 1)
+	    i=tempc->executable_address;
+	  else
+	    i=tempc->executable_address-code;
+	} else if (saved_hash_ptr->type & HTT_GLBL_VAR) {
+	  tempg=saved_hash_ptr;
+	  if (etype & 1)
+	    i=tempg->data_address;
+	  else
+	    i=tempg->data_address-code;
+	} else {
+	  if (etype & 1)
+	    i=saved_hash_ptr->user0;
+	  else
+	    i=saved_hash_ptr->user0-code;
+	}
+	if (etype<=EIE_LIT_U1)
+	  *bb=i+*bb;
+	else if (etype<=EIE_LIT_U2)
+	  *ww=i+*ww;
+	else if (etype<=EIE_LIT_U4)
+	  *dd=i+*dd;
+      }
+    } else if (etype==EIE_ABSOLUTE_ADDRESS) {
+      if (no_abs)
+	ptr+=i*sizeof(U4);
+      else {
+	cnt=i;
+	for (j=0;j<cnt;j++) {
+	  dd=ptr;
+	  ptr+=sizeof(U4);
+	  dd=code+*dd;
+	  *dd+=code;
+	}
+      }
+    }
+  }
+
+  ptr=bfh+bfh->header_offset;
+  while ((etype=*ptr++)!=EIE_END) { //PASS 2
+    dd=ptr;
+    ptr+=sizeof(U4);
+    i=*dd;
+    sptr=ptr;
+    ptr+=StrLen(sptr)+1;
+    if (etype<=EIE_LIT_EXPORT) {
+    } else if (etype<EIE_MAIN) {
+    } else if (etype==EIE_MAIN) {
+      Run(i+code);
+    } else if (etype==EIE_ABSOLUTE_ADDRESS) {
+      ptr+=sizeof(U4)*i;
+    }
+  }
+  Free(absname);
+  return bfh;
+}
+
+void InitTimer()
+{
+  OutP(0x43,0x34);
+  OutP(0x40,SYS_TIMER0_PERIOD);
+  OutP(0x40,SYS_TIMER0_PERIOD>>8);
+}
+
+void InitIrqs()
+{ //Init 8259
+  OutP(0x20,0x11); //IW1
+  OutP(0xA0,0x11); //IW1
+  PortNop;
+  OutP(0x21,0x20); //IW2
+  OutP(0xA1,0x28); //IW2
+  PortNop;
+  OutP(0x21,0x04); //IW3
+  OutP(0xA1,0x02); //IW3
+  PortNop;
+  OutP(0x21,0x0D); //IW4
+  OutP(0xA1,0x09); //IW4
+  PortNop;
+  OutP(0x21,0x20); //Mask
+  OutP(0xA1,0x2F); //Mask
+  PortNop;
+}
+
+GrBitMap *GrBitMapNew(U8 type,U8 width,U8 height)
+{  //This only allows widths which are divisible by 8
+  GrBitMap *result;
+  result=MAllocZ(sizeof(GrBitMap));
+  result->type=type;
+  result->width=width;
+  result->internal_width=(width+7)&-8;
+  result->height=height;
+  result->left_margin=0;
+  result->right_margin=width;
+  result->top_margin=0;
+  result->bottom_margin=height;
+  switch (type) {
+    case BMT_COLOR4:
+      result->plane_size=(result->internal_width*result->height)>>3;
+      result->body=MAllocZ(result->plane_size<<2);
+      break;
+    case BMT_MONO:
+      result->plane_size=(result->internal_width*result->height)>>3;
+      result->body=MAllocZ(result->plane_size);
+      break;
+    default:
+      throw(EXCEPT_GRAPHICS,1);
+  }
+  result->pen_width=1;
+  result->r=MAllocZ(9<<3);
+  result->r[0].u4[1]=1;
+  result->r[4].u4[1]=1;
+  result->r[8].u4[1]=1;
+  return result;
+}
+
+void InitGraphics(I8 mode)
+{
+  dc_col=0;
+//TODO reinit VGA without BIOS
+  grmode=mode;
+  grfont=SYS_FONT_8x8;
+  switch (grmode) {
+    case 1:
+      grwidth=640;
+      grheight=480;
+      break;
+    case 2:
+      grwidth=800;
+      grheight=600;
+      break;
+  }
+//TODO free old allocated stuff
+  grbase=GrBitMapNew(BMT_COLOR4,grwidth,grheight);
+  grbase->flags|=BMF_SCREEN_BITMAP;
+  grbase2=GrBitMapNew(BMT_COLOR4,grwidth+64,grheight+64);
+  grbase2->left_margin=32;
+  grbase2->right_margin=grbase2->internal_width-32;
+  grbase2->top_margin=32;
+  grbase2->bottom_margin=grbase2->height-32;
+  grbase2->flags|=BMF_SCREEN_BITMAP;
+  vga_image=MAllocZ(grwidth*grheight>>1);
+  textbase=MAlloc(grwidth/FONT_WIDTH*(grheight/FONT_HEIGHT)<<2);
+  GrClear2(grbase);
+  ClearWindowText;
+
+  OutP(VGA_SC_INDEX,VGA_MAP_MASK);
+  OutP(VGA_SC_DATA,0x0F);
+  MemSet(0xA0000,0,grheight*grwidth>>3);
+}
+
+asm {CP_OS_MAIN:}
+void OsMain()
+{
+  void my_AdamStartUpFile();
+  adam_tss=Fs;
+
+  InitTimer;
+  InitIrqs;
+  ext=MAllocZ(EXT_TABLE_SIZE<<2);
+  InitGraphics(grmode);
+
+  $FG,5$//$BK,1$WARNING$BK,0$ do not do cout before here (null ext[])
+  //DbgNum(), DbgStr() are okay, however.$FG$
+
+  coutln "InitSysTask";
+  InitSysTask;
+  coutln "AddOsMapSymbols";
+  AddOsMapSymbols;
+  coutln "InitSysGlbls";
+  InitSysGlbls;
+  coutln "LoadSysStrings";
+  LoadSysStrings;
+  coutln "ENABLE IRQ's";
+  SetFlags(SYS_DEFAULT_FLAGS);
+  InitKeyboard;
+  coutln "InitAllBlkDevs";
+  InitAllBlkDevs;
+  coutln "Select Default Drive";
+  SelectDefaultDrive;
+  cout "Loading Compiler...";
+
+  Cd("/LT/COMPILE");
+  Load("CMP");
+  coutln "Done";
+  my_AdamStartUpFile=FindExtern("AdamStartUpFile");
+  my_AdamStartUpFile();
+  ContinueServantTask; //Never to return
+}
+
+asm {	ALIGN	16,0x90
+SYS_CS_SIZE::}

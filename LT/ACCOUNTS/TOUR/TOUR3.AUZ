@@ -1,0 +1,95 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+PutS("\rCd(\"::/LT/DEMO\");Dir;\r");
+
+PopUpOk(
+"Now, we're going to add the Sound.CPZ\r\n"
+"program to your start menu.\r\n\r\n"
+"Press the $$FG GREEN$$WINDOW$$FG$$s key\r\n"
+"to get to your menu/macro/help area.\r\n");
+SpecialKey(SC_GUI,"WINDOWS KEY");
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+Sleep(1000);
+
+PopUpOk(
+"Press $$FG GREEN$$CTRL-L$$FG$$ to invoke the\r\n"
+"rich-text resource editor.\r\n");
+SpecialASCIIKey(12,"CTRL-L");
+
+PopUpOk(
+"Press $$FG GREEN$$CURSOR-DOWN$$FG$$ until you reach\r\n"
+"\"Macro\".\r\n");
+I8 i;
+for (i=0;i<8;i++)
+  SpecialKey(SC_CURSOR_DOWN,"CURSOR-DOWN");
+
+PopUpOk(
+"Press $$FG GREEN$$SPACE$$FG$$.\r\n");
+ASCIIKeys(" ");
+Sleep(1000);
+
+
+PopUpOk(
+"Now, we'll fill-in the visible text\r\n"
+"of the macro.\r\n");
+SlowASCIIAutoType("Click Here");
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+PopUpOk("Now, we'll fill-in the macro text.\r\n");
+SlowASCIIAutoType("Cd(\\\"::/LT/DEMO\\\");;#include \\\"Sound.CPZ\\\";\\r");
+
+PopUpOk("Press $$FG GREEN$$ESC$$FG$$ to exit the form.\r\n");
+SpecialASCIIKey(CH_ESC,"ESC");
+Sleep(1000);
+
+PopUpOk("Press $$FG GREEN$$CTRL-SHIFT-ENTER$$FG$$ to insert a line feed.\r\n");
+SpecialASCIIKey(CH_CR,"CTRL-SHIFT-ENTER",SCF_CTRL|SCF_SHIFT,SCF_CTRL|SCF_SHIFT);
+Sleep(1000);
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+PopUpOk(
+"Press $$FG GREEN$$SPACE$$FG$$ to test it.\r\n");
+ASCIIKeys(" ");
+UntilASCIIKey(CH_ESC);
+
+PopUpOk(
+"Now, we'll do a fancier macro that pops-up\r\n"
+"a new window which dies when finished,\r\n"
+"returning memory to the system.\r\n");
+Msg(MSG_KEY_DOWN,0,SC_GUI);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+Msg(MSG_KEY_DOWN,12,0);  //CTRL-L
+for (i=0;i<8;i++)
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+SlowASCIIAutoType(" Click here for Pop-up version");
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+SlowASCIIAutoType("Cd(\\\"::/LT/DEMO\\\");;#include \\\"Sound.CPZ\\\"\\r");
+
+PopUpOk(
+"Press $$FG GREEN$$CURSOR-DOWN$$FG$$ until you reach\r\n"
+"the \"Pop-Up\" check-box.\r\n");
+for (i=0;i<2;i++)
+  SpecialKey(SC_CURSOR_DOWN,"CURSOR-DOWN");
+PopUpOk(
+"Press $$FG GREEN$$SPACE$$FG$$ to\r\n"
+"check the box.\r\n");
+ASCIIKeys(" ");
+Sleep(500);
+
+PopUpOk("Press $$FG GREEN$$ESC$$FG$$ to exit the form.\r\n");
+SpecialASCIIKey(CH_ESC,"ESC");
+Sleep(500);
+
+PopUpOk("Press $$FG GREEN$$CTRL-SHIFT-ENTER$$FG$$ to insert a line feed.\r\n");
+SpecialASCIIKey(CH_CR,"CTRL-SHIFT-ENTER",SCF_CTRL|SCF_SHIFT,SCF_CTRL|SCF_SHIFT);
+Sleep(500);
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+PopUpOk(
+"Press $$FG GREEN$$SPACE$$FG$$ to test it.\r\n");
+ASCIIKeys(" ");
+Sleep(5000);
+
+PopUpOk(
+"Press $$FG GREEN$$CTRL-S$$FG$$ to save your\r\n"
+"macro/menu/help area file, if you wish.\r\n");

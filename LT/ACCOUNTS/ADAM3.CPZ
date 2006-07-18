@@ -1,0 +1,121 @@
+/*  This file gets included once into the
+"Adam" task's memory by $LK,"LoadAdam3","MN:LoadAdam3"$() placed in
+$LK,"HOME/USER.CPZ","FI:HOME/USER.CPZ"$.  The declarations from this file
+are available to all tasks, since all tasks
+chain back to Adam.
+
+If you modify this file, you should place it
+into your HOME directory.  This version is the
+default for accounts without a version in HOME.
+*/
+
+class RenameSymbolStruct
+{
+  I1 find[256]	  fmtstr "$$DA -P ,255 \"Find   :%s\"$$\r\n";
+  I1 replace[256] fmtstr "$$DA -P ,255 \"Replace:%s\"$$\r\n";
+};
+
+void RenameCurSymbol()
+{
+  I1 *buf;
+  RenameSymbolStruct r;
+  BoolU4 old_preempt=Preempt(OFF);
+  StrCpy(r.find,ws_cur_word);
+  StrCpy(r.replace,ws_cur_word);
+  Preempt(old_preempt);
+  if (PopUpDoForm(&r,"RenameSymbolStruct")) {
+    buf=MSPrintF("R(\"%s\",\"%s\",\"+r+l+a\");",r.find,r.replace);
+    PopUp(buf,Fs);
+    Free(buf);
+  }
+}
+
+void RenameFile()
+{
+  I1 *buf;
+  RenameSymbolStruct r;
+  BoolU4 old_preempt=Preempt(OFF);
+  StrCpy(r.find,ws_cur_word);
+  StrCpy(r.replace,ws_cur_word);
+  Preempt(old_preempt);
+  if (PopUpDoForm(&r,"RenameSymbolStruct")) {
+    buf=MSPrintF("R(\"%s\",\"%s\",\"+r+l+a\");",r.find,r.replace);
+    PopUp(buf,Fs);
+    Free(buf);
+  }
+  Move(r.find,r.replace);
+}
+
+void FillinTime()
+{
+  LTDate ltdt;
+  ltdt=GetCurTimeLTDate;
+  PrintF("$$IV 1$$----%D %T----$$IV 0$$\r",ltdt.date,ltdt.time);
+}
+
+
+BoolU4 My_EditPlugIns(Ltf *l,I8 ch,U8 sc)
+{  //You can customize these
+  U8 sc2,ms=0;
+  l;ch; //Ref, So not unused Warn
+  sc2=sc.u1[0];
+  if (sc2>=SC_F1 && sc2<=SC_F10 &&
+       (sc & SCF_ALT) &&
+      !(sc & SCF_CTRL)) {
+    if (sc2==SC_F1) {
+      if ((sc & SCF_SHIFT))
+	PutS("$$FG LTPURPLE$$");
+      else
+	PutS("$$FG PURPLE$$");
+    } else if (sc2==SC_F2) {
+      if ((sc & SCF_SHIFT))
+	PutS("$$FG LTRED$$");
+      else
+	PutS("$$FG RED$$");
+    } else if (sc2==SC_F3) {
+      if ((sc & SCF_SHIFT))
+	PutS("$$FG LTGREEN$$");
+      else
+	PutS("$$FG GREEN$$");
+    } else if (sc2==SC_F4) {
+      if ((sc & SCF_SHIFT))
+	PutS("$$FG LTBLUE$$");
+      else
+	PutS("$$FG$$");
+    } else if (sc2==SC_F6) {
+      if (!(sc & SCF_SHIFT))
+	PopUp("WsInit(\"/LT\");");
+    } else if (sc2==SC_F7) {
+      if ((sc & SCF_SHIFT))
+	LtfSafeInsert(Fs->cur_ltf,
+	  "$$HS+C$$$$FG$$$$HE$$");
+      else
+	FillinTime();
+    } else if (sc2==SC_F8) {
+      if ((sc & SCF_SHIFT))
+	RenameFile();
+      else
+	RenameCurSymbol();
+    } else if (sc2==SC_F9)
+      PopUp("PunchIn;");
+    else if (sc2==SC_F10)
+      PopUp("PunchOut;");
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
+Cd("/LT/UTILS");;
+#include "BOOTINS"
+#include "DBG"
+#include "DIFF"
+#include "GREP"
+#include "S2T"
+#include "HASHUTIL"
+#include "IDE"
+#include "BMP"
+LoadMapFile("::/LT/OSMain/OS.MPZ");  //Enable Man()
+LoadMapFile("::/LT/COMPILE/CMP.MPZ");  //Enable Man()
+LoadMapFile("::/LT/ADAM/ADAMASM.MPZ");	//Enable Man()
+

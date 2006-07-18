@@ -1,0 +1,15 @@
+/* To run this, do a directory, right click on
+this file's name and select "AutoFile".
+Or, type $LK,"AutoFile","MN:AutoFile"$(filename);
+See $LK,"AutoFile","FF:::/LT/DOC/OSGlossary.GLZ,AutoFile"$ in the glossary for more info.
+*/
+
+
+//This is to demo autofiles.
+I4 i;
+for (i=0;i<3;i++)
+  PutS("Dir;\r");
+PutS("$$FG RED$$//Press a letter to complete the mask$$FG$$\r");
+PutS("Dir(\"*.");
+I1 ch=GetKey; //Prompt for first digit of mask
+PrintF("%c*\");\r",ch);

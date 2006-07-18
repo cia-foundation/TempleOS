@@ -1,0 +1,88 @@
+$WW,1$$FG,5$$TX+CX,"OS PROGRAMMING GUIDELINES:"$$FG$
+* Virtual mem is not used.  The stack does not grow, so allocate enough when the task (process) is $LK,"Spawn","MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc","MN:MAlloc"$() and $LK,"Free","MN:Free"$().)
+* I've tried to standardize names see $LK,"Naming convention","FF:::/LT/DOC/OSGlossary.GLZ,Naming convention"$
+* There are two modes of compiling $LK,"Static Compiled Mode","FF:::/LT/DOC/OSGlossary.GLZ,Static Compiled Mode"$ and $LK,"Dynamic Compiled Mode","FF:::/LT/DOC/OSGlossary.GLZ,Dynamic Compiled"$.  Actual compilation is done in both--nothing is "interpreted".
+
+$FG,5$$TX+CX,"Departures from C/C++:"$$FG$
+* Built-in types include $FG,2$I0,I1,I2,I4,I8$FG$ for signed ints and $FG,2$U0,U1,U2,U4,U8$FG$ for unsigned ints and $FG,2$double$FG$.
+* The "$FG,2$`$FG$" operator raises a base to a power.
+* Operator Precidence
+  1) $FG,2$`$FG$,$FG,2$>>$FG$,$FG,2$<<$FG$
+  2) $FG,2$*$FG$,$FG,2$/$FG$,$FG,2$%$FG$
+  3) $FG,2$&$FG$
+  4) $FG,2$|$FG$,$FG,2$^$FG$
+  5) $FG,2$+$FG$,$FG,2$-$FG$
+  6) $FG,2$==$FG$,$FG,2$!=$FG$,$FG,2$<$FG$,$FG,2$>$FG$,$FG,2$<=$FG$,$FG,2$>=$FG$
+  7) $FG,2$&&$FG$
+  8) $FG,2$||$FG$,$FG,2$^^$FG$
+  9) $FG,2$:$FG$,$FG,2$?$FG$
+  10) $FG,2$=$FG$,$FG,2$<<=$FG$,$FG,2$>>=$FG$,$FG,2$*=$FG$,$FG,2$/=$FG$,$FG,2$&=$FG$,$FG,2$|=$FG$,$FG,2$^=$FG$,$FG,2$+=$FG$,$FG,2$-=$FG$
+* No conditional compilation, except with the $FG,2$exe{}$FG$ feature.  With this statement blk in your source code, you can place programs that insert text into the stream of code being compiled.  See $LK,"exe {}","FF:::/LT/OSMain/END.CPZ,exe {"$ for an example where the date/time and compile-time prompting for configuration data is placed into a program.  The $LK,"ExePrintF","MN:ExePrintF"$() and $LK,"ExePutS","MN:ExePutS"$() place text into a source program stream following the conclusion of the $FG,2$exe{}$FG$ blk.  I do hope to add conditional compilation, but it's not a priority.
+* No "$FG,2$#define$FG$" functions exist (I'm not a fan)
+* Pointer arithmetic is not based on size of objects (I'd have no objections to this changing)
+* No type-checking
+* Variable parameter cnts ($FG,2$...$FG$) are accessed with "$FG,2$argc$FG$" and "$FG,2$argv[]$FG$" which are predefined invisible local variable.
+* "$FG,2$cout$FG$" works with commas but not "$FG,2$<<$FG$" and and has no "$FG,2$endl$FG$" or other codes.  Use "$FG,2$coutln$FG$" to print a carriage return after other stuff.  An alias for "$FG,2$cout$FG$" is "$FG,2$dbgo$FG$" or "$FG,2$dbgoln$FG$" and is useful for debugging--I often place debug output all over the place and do a $LK,"Grep","MN:Grep"$() to locate them all.
+* Type casting is done with "$FG,2$><(classname)$FG$" and is postfix.
+* When dealing with function addresses, preceed the name with "$FG,2$&$FG$".  This allows functions to be called like Pascal procedure with no "()" if there are no parameters or there are just default parameters.
+* "$FG,2$$$$FG$" is an escape character.  Two dollar signs signify an ordinary $$.  See $LK,"::/LT/DOC/Dollar.TXZ","FI:::/LT/DOC/Dollar.TXZ"$.
+* There is not a "$FG,2$struct$FG$" keyword, just "$FG,2$class$FG$".
+* "$FG,2$union$FG$" is more like a class, so you don't referrence it with a "$FG,2$union$FG$" label after you define it.  Some common unions are declared in $LK,"ADAMK.HPZ","MN:U2"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.
+* You cannot declare instances of "$FG,2$class$FG$es" or "$FG,2$unions$FG$" in the same statement where they are defined.
+* $FG,2$class$FG$ member vars have two keywords for associating data with member vars -- "$FG,2$fmtstr$FG$" and "$FG,2$fmtdata$FG$".  All compiler structures are saved and you can access the compiler's info about classes and variables.  In the future, I hope to have arbitrary named data on class definitions.
+* "$FG,2$static$FG$" variables in functions are not allowed and I have no plans for doing them--just use a global variable.
+* See $LK,"::/LT/DEMO/Exceptions.CPZ","FI:::/LT/DEMO/Exceptions.CPZ"$.  "$FG,2$try{} catch{}$FG$ and $FG,2$throw$FG$" are different from C++. "$FG,2$throw$FG$" is a function with variable ("$FG,2$...$FG$") parameters.  The values passed in "$FG,2$throw()$FG$" can be accessed from within a "$FG,2$catch{}$FG$" using the "$FG,2$Fs->except_argc$FG$" and "$FG,2$Fs->except_argv[]$FG$" variables.  Within a "$FG,2$catch {}$FG$" blk, set the var "$FG,2$Fs->catch_except$FG$" to "$FG,2$TRUE$FG$" if you want to terminate the search for a handler.  By convention, the first parameter of $FG,2$except_argv[]$FG$ specifies the exception type number.  A list of assigned exception types can be found at $LK,"EXCEPT_LOCAL","MN:EXCEPT_LOCAL"$.  For a handler that will catch all excepts, you can use $LK,"CatchAll","MN:CatchAll"$().
+* A function is available similar to "$FG,2$sizeof$FG$" which provides the offset of a member of a class.  It's called "$FG,2$offset()$FG$".  You place the class name and member inside as in "$FG,2$offset(classname.membername)$FG$".  It has nothing to do with 16-bit code.  $FG,2$sizeof()$FG$ cannot be applied to variables, just classes.  Also, both $FG,2$sizeof()$FG$ and $FG,2$offset()$FG$ only accept one level of member variables.  That is you cannot do $FG,2$sizeof(classname.membername.submembername)$FG$.$FG$
+* There is a function called $LK,"MSize","MN:MSize"$() which gives the size of an object allocated off the heap.  For larger size allocations, the system rounds-up to a power of two, so $FG,2$MSize()$FG$ lets you know the real size.
+* You can $LK,"Free","MN:Free"$() a $FG,2$NULL$FG$ pointer.  Useful variants of $LK,"MAlloc","MN:MAlloc"$() can be found $LK,"Here","MN:MAllocZ"$.  Each task has a heap and you can $FG,2$MAlloc$FG$ and $FG,2$Free$FG$ off of other task's heaps.
+
+$FG,5$$TX+CX,"PrintF Family"$$FG$
+
+$LK,"MSPrintF","MN:MSPrintF"$() is like $LK,"SPrintF","MN:SPrintF"$() but it returns a $LK,"MAlloc","MN:MAlloc"$ated string.  It is vary handy because you don't have to worry about overflow.
+
+$LK,"Auto","MN:Auto"$(I1 *src,...) and text to the current task's input buffer.
+$LK,"AutoString","MN:AutoString"$(I1 *src,...) sends text of an $LK,"AutoFile","FF:::/LT/DOC/OSGlossary.GLZ,AutoFile"$ to the keyboard stream of the current TASK but can also do mouse commands.
+
+$LK,"XTalk","MN:XTalk"$(TssStruct *tss,I1 *src,...) and text to another task's input buffer.
+$LK,"XTalkString","MN:XTalkString"$(TssStruct *tss,I1 *src,...) sends text of an $LK,"AutoFile","FF:::/LT/DOC/OSGlossary.GLZ,AutoFile"$ to the keyboard stream of another TASK but can also do mouse commands.
+
+
+$LK,"LtfPutS","MN:LtfPutS"$(Ltf *l,I1 *src) and $LK,"LtfPrintF","MN:LtfPrintF"$(Ltf *l,I1 *src,...) send text to a linked text file.  You can buffer to a Ltf and save it, providing the functionality of $FG,2$fprintf$FG$.  See $LK,"::/LT/DEMO/FPrintF.CPZ","FI:::/LT/DEMO/FPrintF.CPZ"$.
+
+$LK,"Adam","MN:Adam"$(I1 *src,...) send text to the adam task to be compiled and run.
+$LK,"AdamLog","MN:AdamLog"$(I1 *src,...) and $LK,"AdamErr","MN:AdamErr"$(I1 *src,...) send text to the adam task to be displayed.
+
+
+$LK,"Lpt1PrintF","MN:Lpt1PrintF"$(I1 *src,...) send text to the printer port.
+
+$LK,"ExePrintF","MN:ExePrintF"$(I1 *src,...) and $LK,"ExePutS","MN:ExePutS"$(I1 *src) send text to the stream of code being compiled and must reside in a $FG,2$exe{}$FG$ blk.
+
+$LK,"CommPrintF","MN:CommPrintF"$(U4 port,I1 *src,...) sends text to the comm ports.
+
+$BK,1$Note:$BK,0$ If no $FG,2$PutS$FG$ variant is available, you can use $FG,2$PrintF("%s",src)$FG$.
+
+The $LK,"PrintF","MN:PrintF"$() family supports extended format codes.
+  * $FG,2$"%S"$FG$ will print a systext entry.
+  * $FG,2$"%F"$FG$ will print a text file.
+  * $FG,2$"t"$FG$ is a flag which will truncate to field width.
+  * $FG,2$"%P"$FG$ will display a PSECT expression which is good for pointers or addresses.
+  * $FG,2$"%T"$FG$ and $FG,2$"%D"$FG$ will display a date or time and the format is selected with a subcode, entered after a "$FG,2$h$FG$".  Example: "$FG,2$%20h1D$FG$" uses date format code "1". See $LK,"MSPrintFDate","FF:::/LT/OSMain/SPRINTF.CPZ,MSPrintFDate"$() and $LK,"MSPrintFTime","FF:::/LT/OSMain/SPRINTF.CPZ,MSPrintFTime"$() for subcodes.
+  * $FG,2$"%z"$FG$ will display a sub entry of an enumerated list of text entries. It calls $LK+S,"PointAtListEntry","MN:PointAtListEntry"$().
+  * $FG,2$"%Z"$FG$ will display a SysText sub entry.
+  * $FG,2$"%Q"$FG$ will convert "\" to "\\" and quote to backslash quote. (For use in creating strings in strings.)
+
+
+
+$FG,5$$TX+CX,"Hash symbol tables:"$$FG$
+
+* See $LK,"::/LT/UTILS/HASHUTIL.CPZ","FI:::/LT/UTILS/HASHUTIL.CPZ"$ for examples of how the hash tables are set-up.  Basically, symbols are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for variables and functions.
+* "$FG,2$adam_tss->hash_table$FG$" holds the C/C++ symbols loaded in on start-up.
+* "$FG,2$Fs->hash_table$FG$" holds user C+ symbols and if a symbol is not found, it checks parents.  When a duplicate symbol is added to the table, it overshadows the previous symbol.  When developing software, typically you include the file at the command prompt, make changes and reinclude it.  Old symbols are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
+* To display the contents of a hash table, use the $LK,"HashRep","MN:HashRep"$() routine or the varients.
+
+$FG,5$$TX+CX,"Assembly Language Concerns:"$$FG$
+
+* Segment registers except $FG,2$FS$FG$ are set to $FG,2$0x00000000$FG$ as a base.  
+* $FG,2$FS$FG$ must always point to the per-TASK's structure.  See $LK,"C+","FF:::/LT/OSMain/ADAMK.HPZ,TssStruct:2"$$LK "C++ task struct" "FF:::/LT/OSMain/ADAMK.HPZ,TssStruct"$ and $LK,"Asm","FF:::/LT/OSMain/OSINC.ASZ,TSS_EIP"$$LK "ASM task struct" "FF:::/LT/OSMain/OSINC.ASZ,TSS_BACK_LINK"$.
+* Don't change the segment registers unless interrupts are off.
+* When interacting with compiled code, preserve $FG,2$EBP, ESI, EDI$FG$ because the compiler uses these for register vars.  You are free to trash $FG,2$EAX, EBX, ECX, EDX$FG$.

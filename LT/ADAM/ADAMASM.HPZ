@@ -1,0 +1,10 @@
+public LTextern CP_PLOT_SCREEN_I1 BoolU4 PlotScreenChar(U8 w,I8 x,I8 y);
+public LTextern CP_PLOT_WINDOW_I1 BoolU4 PlotWindowChar(U8 w,I8 x,I8 y);
+public LTextern CP_PLOT_BORDER_I1 BoolU4 PlotBorderChar(U8 w,I8 x,I8 y);
+
+LTextern REVERSE_BITS_TABLE U1 reverse_bits_table[256];
+LTextern GR_XOR_LINE void GrXorLine(U4 **dst3,U4 **src,U4 **src2,U8 d5,U4 **vga);
+LTextern GR_PLOT_CHAR void GrPlotChar(U1 *font_ptr,U1 attr,U1 **dst2,U8 d1,U8 d2);
+LTextern GR_PLOT_BACKGROUND void GrPlotBackground(U1 attr,U1 **dst,U8 d1,U8 d2);
+LTextern GR_UPDATE_WINDOWS void GrUpdateWindows();
+//The callback is void Plot(aux_data,x,y,z)

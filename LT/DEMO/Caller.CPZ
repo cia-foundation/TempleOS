@@ -1,0 +1,23 @@
+void Lowest(U8 i)
+{
+  PrintF("%d,%P %P\r\n",i,Caller,CallerCaller);
+}
+
+void Mid1()
+{
+  Lowest(1);
+}
+
+void Mid2()
+{
+  Lowest(2);
+}
+
+void Top()
+{
+  Mid1;
+  Mid2;
+  Lowest(3);
+}
+
+Top;

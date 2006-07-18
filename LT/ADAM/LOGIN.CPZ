@@ -1,0 +1,58 @@
+void CollectAccntList()
+{
+  LTDirEntry *tempm1;
+  SysAccntStruct *tempa;
+  U8 my_flags=0;
+  sys_accounts.next=&sys_accounts;
+  sys_accounts.last=&sys_accounts;
+  tempm1=FindFiles("/LT/ACCOUNTS/*",&my_flags);
+  while (tempm1) {
+    if ((tempm1->attr & LT_ATTR_DIR) && tempm1->name[0]!='.') {
+      tempa=MAlloc(sizeof(SysAccntStruct));
+      StrCpy(tempa->name,tempm1->name);
+      tempa->flags=0;
+      InsQue(tempa,sys_accounts.last);
+    }
+    tempm1=tempm1->next;
+  }
+  DelLTDirList(tempm1);
+}
+
+public SysAccntStruct *FindSysAccnt(I1 *name)
+{
+  SysAccntStruct *tempa;
+  tempa=sys_accounts.next;
+  while (tempa!=&sys_accounts) {
+    if (!StrCmp(tempa->name,name))
+      return tempa;
+    tempa=tempa->next;
+  }
+  return NULL;
+}
+
+
+public SysAccntStruct *PopUpGetSysAccnt()
+{
+  Ltf *l=LtfNew;
+  SysAccntStruct *tempa;
+
+  LtfPutS(l,"Select Account.\r\nCursor down and press SPACE.\r\n");
+
+  tempa=sys_accounts.next;
+  while (tempa!=&sys_accounts) {
+    LtfPrintF(l,"$$CM +LX 2,3$$$$BT, \"%s\" %d$$",tempa->name,tempa);
+    tempa=tempa->next;
+  }
+  tempa=PopUpMenu(l);
+  LtfDel(l);
+  return tempa;
+}
+
+void LoadAdam3()
+{
+  SysAccntStruct *tempa=Fs->account;
+  if (!Bts(&tempa->flags,SACTf_ADAM3_LOADED)) {
+    Adam("ExecuteFile(\"::/LT/ACCOUNTS/%s/ADAM3.CPZ\");;",
+	    tempa->name);
+  }
+}

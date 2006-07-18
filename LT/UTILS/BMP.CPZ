@@ -1,0 +1,245 @@
+U4i class RGBEntry
+{
+  U1 r,g,b,reserved;
+};
+
+U4i class BGREntry
+{
+  U1 b,g,r,reserved;
+};
+
+class BMPFile
+{
+  U2 type;
+  U4 file_size;
+  U4 reserved;
+  U4 data_offset;
+ 
+  U4 header_size;
+  U4 width;
+  U4 height;
+  U2 planes;
+  U2 bit_cnt;
+  U4 compression;
+  U4 image_size;
+  U4 x_pixels_per_meter;
+  U4 y_pixels_per_meter;
+  U4 colors_used;
+  U4 important_colors;
+
+  U0 end;
+
+  BGREntry pallette[16];
+};
+
+
+BMPFile *NewBMPFile(U8 width,U8 height,U8 bits)
+{
+  BMPFile *r;
+  U8 size;
+  if (bits==24)
+    size=offset(BMPFile.end)+
+	 width*height*sizeof(RGBEntry);
+  else
+    size=offset(BMPFile.end)+
+	 width*height>>1+16*sizeof(BGREntry);
+  r=MAllocZ(size);
+  r->type=0x4D42;
+  r->planes=1;
+  r->file_size=size;
+  r->data_offset=offset(BMPFile.end);
+  r->header_size=offset(BMPFile.end)-
+		 offset(BMPFile.header_size);
+  r->width=width;
+  r->height=height;
+  if (bits==24) {
+    r->bit_cnt=32;
+    r->image_size=width*height<<2;
+  } else {
+    r->bit_cnt=4;
+    r->image_size=width*height>>1;
+    r->data_offset+=16*sizeof(BGREntry);
+    r->pallette[BLACK]	 =0x00000000;
+    r->pallette[BLUE]	 =0x00000080;
+    r->pallette[GREEN]	 =0x00008000;
+    r->pallette[CYAN]	 =0x00008080;
+    r->pallette[RED]	 =0x00800000;
+    r->pallette[PURPLE]  =0x00800080;
+    r->pallette[BROWN]	 =0x00808000;
+    r->pallette[LTGRAY]  =0x00808080;
+
+    r->pallette[DKGRAY]  =0x00000000;
+    r->pallette[LTBLUE]  =0x000000FF;
+    r->pallette[LTGREEN] =0x0000FF00;
+    r->pallette[LTCYAN]  =0x0000FFFF;
+    r->pallette[LTRED]	 =0x00FF0000;
+    r->pallette[LTPURPLE]=0x00FF00FF;
+    r->pallette[YELLOW]  =0x00FFFF00;
+    r->pallette[WHITE]	 =0x00FFFFFF;
+
+  }
+
+  return r;
+}
+
+
+public void CaptureScreen4(I1 *filename)
+{// 4 bit color
+  U1 *src,j;
+  U8 wd=grbase->width>>3,pl=wd*grbase->height;
+  U4 *img=MAlloc(pl<<2);
+  BMPFile *r=NewBMPFile(grbase->width,grbase->height,4);
+  I8 x,y,i;
+  RGBEntry *rgb;
+
+  while (gr_screen_capture)
+    SwapInNext;
+  gr_screen_capture=img;
+  while (gr_screen_capture)
+    SwapInNext;
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=1;i<0x100;i<<=1) {
+	if (i&j)
+	  *rgb |= 0x10;
+	i<<=1;
+
+	if (i&j)
+	  *rgb |= 0x01;
+	rgb++;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=1;i<0x100;i<<=1) {
+	if (i&j)
+	  *rgb |= 0x20;
+	i<<=1;
+
+	if (i&j)
+	  *rgb |= 0x02;
+	rgb++;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl<<1;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=1;i<0x100;i<<=1) {
+	if (i&j)
+	  *rgb |= 0x40;
+	i<<=1;
+
+	if (i&j)
+	  *rgb |= 0x04;
+	rgb++;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl*3;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=1;i<0x100;i<<=1) {
+	if (i&j)
+	  *rgb |= 0x80;
+	i<<=1;
+
+	if (i&j)
+	  *rgb |= 0x08;
+	rgb++;
+      }
+    }
+  }
+  WriteFile(filename,r,r->file_size);
+  Free(img);
+  Free(r);
+}
+
+public void CaptureScreen24(I1 *filename)
+{// 24 bit color
+  U1 *src,j;
+  U8 wd=grbase->width>>3,pl=wd*grbase->height;
+  U4 *img=MAlloc(pl<<2);
+  BMPFile *r=NewBMPFile(grbase->width,grbase->height,24);
+  I8 x,y,i;
+  RGBEntry *rgb;
+
+  while (gr_screen_capture)
+    SwapInNext;
+  gr_screen_capture=img;
+  while (gr_screen_capture)
+    SwapInNext;
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=0x80;i;i>>=1) {
+	if (i&j)
+	  rgb->r=0x7F;
+	rgb+=4;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=0x80;i;i>>=1) {
+	if (i&j)
+	  rgb->g=0x7F;
+	rgb+=4;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl<<1;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=0x80;i;i>>=1) {
+	if (i&j)
+	  rgb->b=0x7F;
+	rgb+=4;
+      }
+    }
+  }
+
+  rgb=r+r->data_offset;
+  for (y=grbase->height-1;y>=0;y--) {
+    src=y*wd+img+pl*3;
+    for (x=0;x<wd;x++) {
+      j=*src++;
+      for (i=0x80;i;i>>=1) {
+	if (i&j) {
+	  if (rgb->r) rgb->r=0xFF;
+	  if (rgb->g) rgb->g=0xFF;
+	  if (rgb->b) rgb->b=0xFF;
+	}
+	rgb+=4;
+      }
+    }
+  }
+  WriteFile(filename,r,r->file_size);
+  Free(img);
+  Free(r);
+}

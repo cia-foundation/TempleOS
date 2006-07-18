@@ -1,0 +1,15 @@
+void Spy(TssStruct *tss)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  SysHashTable *old_hash=Fs->hash_table;
+  Fs->hash_table=tss->hash_table;
+  while (!ScanChar) {
+    LtfBottom(Fs->cur_ltf);
+    PrintF("$$CL$$");
+    TssRep(tss);
+    StackRep(tss->esp);
+    WinSync;
+  }
+  Fs->hash_table=old_hash;
+  Preempt(old_preempt);
+}

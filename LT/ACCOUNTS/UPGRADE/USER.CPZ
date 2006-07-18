@@ -1,0 +1,71 @@
+//This is the startup file for new local users
+UseConsoleLtf("USER.MUZ");
+Fs->answers_displayed=2;  //from 0-8
+
+LoadAdam3;
+
+U8 F(I1 *pattern,I1 *flags="+r+i")
+{
+  return Grep(pattern,"/LT/"TEXT_FILE_MASK,flags);
+}
+
+U8 R(I1 *pattern,I1 *replace_text=NULL,I1 *flags="+r+l")
+{
+  return Grep(pattern,"/LT/"TEXT_FILE_MASK,flags,replace_text);
+}
+
+U8 FD(I1 *pattern,I1 *flags="+r+i")
+{
+  return Grep(pattern,TEXT_FILE_MASK,flags);
+}
+
+U8 RD(I1 *pattern,I1 *replace_text=NULL,I1 *flags="+r+l")
+{
+  return Grep(pattern,TEXT_FILE_MASK,flags,replace_text);
+}
+
+
+PutSysText("ST_USER_STARTUP");
+Type("/LT/DOC/Help.TXZ");
+Fs->scroll_speed=10;
+Bts(&Fs->crt_flags,CRTf_SHOW);
+
+
+Type("/LT/DOC/StartUp.TXZ");
+
+I1 src,dst,*st1,*st2;
+I4 i;
+
+if (Fs->user_num==1) {
+  for (i=0;i<10;i++) CrLf;
+  coutln "This will copy the /LT directory from "
+       "the CD-ROM onto a harddisk overwriting old files. "
+       "It will then recompile "
+       "and modify the boot sector. If your old "
+       "installation is the right disk format and "
+       "you have created your own  ACCOUNTS directory "
+       "that directory will be left intact.";
+  cout "Continue ";
+  if (YorN) {
+    cout "\r\nWould you like to view notes on installation, first";
+    if (YorN)
+      Edit("/LT/DOC/Install.TXZ");
+    coutln "\r\n$$BK,1$$$$FG,PURPLE$$Add Drives so you can upgrade.$$FG$$$$BK,0$$";
+    AddDrives;
+    src=default_drive;
+    cout "\r\n\r\n$$BK,1$$$$FG,PURPLE$$Destination Drive:$$FG$$$$BK,0$$";
+    dst=GetChar;
+    coutln;
+    st1=MSPrintF("%c:/LT",src);
+    st2=MSPrintF("%c:/LT",dst);
+
+    CopyTree(st1,st2);
+    st2=MSPrintF("%c:/0000BOOT",dst);
+    MkDir(st2);
+    Free(st2);
+    st2=MSPrintF("%c:/TEMP",dst);
+    MkDir(st2);
+    Free(st2);
+    InstallBoot(dst);
+  }
+}

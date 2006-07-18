@@ -1,0 +1,1984 @@
+void LockPartition(LTPartition *p)
+{
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  if (p->owning_task!=Fs) {
+    while (Bts(&p->flags,MPEf_LOCKED))
+      SwapInNext;
+    if (bdev->type==LTBDT_FDC)
+      FDCGet(bdev);
+    p->owning_task=Fs;
+  }
+}
+
+BoolU4 UnlockPartition(LTPartition *p,BoolU4 reset=FALSE)
+{
+  LTBlkDev *bdev=p->bdev;
+  BoolU4 old_preempt=Preempt(OFF),result=FALSE;
+  CheckLTPartition(p);
+  if (p->owning_task==Fs) {
+    if (reset) {
+      bdev->flags&=~(LTBDF_INITIALIZED|LTBDF_INIT_IN_PROGRESS);
+      if (bdev->irq)
+	Btr(&sys_irq_busy_flags,bdev->irq);
+    }
+    p->owning_task=0;
+    if (bdev->type==LTBDT_FDC)
+      FDCFree(bdev);
+    Btr(&p->flags,MPEf_LOCKED);
+    result=TRUE;
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+
+void AllocMAPBuf(LTPartition *p,U8 num_blks)
+{
+  CheckLTPartition(p);
+  AFree(p->cur_MAP_blk);
+  AFree(p->buffered_MAP_dirty_bits);
+  p->num_buffered_MAP_blks=num_blks;
+  p->cur_MAP_blk=AMAlloc(BLK_SIZE*num_blks);
+  p->buffered_MAP_dirty_bits=AMAllocZ((num_blks+7)>>3);
+  p->cur_MAP_blk_num=0;
+  RBlks(p,p->cur_MAP_blk,p->MAP1,p->num_buffered_MAP_blks,FALSE);
+}
+
+
+void CleanMAPBuf(LTPartition *p,I8 MAP_select=-1)
+{
+  U8 i;
+  if (MAP_select==-1 || MAP_select==0) {
+    for (i=0;i<p->num_buffered_MAP_blks;i++)
+      if (Bt(p->buffered_MAP_dirty_bits,i))
+	WBlks(p,p->cur_MAP_blk+i*BLK_SIZE,p->MAP1+i+p->cur_MAP_blk_num,1,FALSE);
+  }
+  if (MAP_select==-1 || MAP_select==1) {
+    for (i=0;i<p->num_buffered_MAP_blks;i++)
+      if (Btr(p->buffered_MAP_dirty_bits,i))
+	WBlks(p,p->cur_MAP_blk+i*BLK_SIZE,p->MAP2+i+p->cur_MAP_blk_num,1,FALSE);
+  }
+}
+
+
+void SetLTBuf(LTPartition *p,U8 c)
+{
+  U8 MAP_blk_num=c/(BLK_SIZE<<3);
+  if (MAP_blk_num!=p->cur_MAP_blk_num) {
+    CleanMAPBuf(p);
+    p->cur_MAP_blk_num=MAP_blk_num;
+    RBlks(p,p->cur_MAP_blk,p->MAP1+p->cur_MAP_blk_num,1,FALSE);
+  }
+}
+
+
+void FreeLTFreeList(LTPartition *p,BoolU4 unlock)
+{
+  LTFreeList *tempf,*tempf1;
+  try {
+  LockPartition(p);
+
+  if (tempf=p->next_free) {
+    while (tempf!=&p->next_free) {
+      tempf1=tempf->next;
+      AFree(tempf);
+      tempf=tempf1;
+    }
+  }
+  p->next_free=NULL;
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+}
+
+void BuildLTFreeList(LTPartition *p,BoolU4 unlock)
+{
+  LTFreeList *tempf;
+  U8 i,first=0,
+    max_cluster=(p->size+p->offset-p->data)/p->spc;
+
+  try {
+  LockPartition(p);
+
+  if (p->next_free)
+    FreeLTFreeList(p,FALSE);
+  p->next_free=&p->next_free;
+  p->last_free=&p->next_free;
+  while (first<max_cluster) {
+    i=0;  //count free clusters
+    while (first+i<max_cluster) {
+      SetLTBuf(p,first+i);
+      if (Bt(p->cur_MAP_blk,(first+i)&(BLK_SIZE<<3-1)))
+	break;
+      else
+	i++;
+    }
+    if (i) {
+      tempf=AMAlloc(sizeof(LTFreeList));
+      tempf->size=i;
+      tempf->start=first;
+      InsQue(tempf,p->last_free);
+    }
+    first+=i+1;
+  }
+
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+}
+
+void InitLTPartition(LTPartition *p,BoolU4 unlock)
+{
+  LTBootStruct br;
+  try {
+  LockPartition(p);
+  p->type=PT_LT;
+  FreeLTFreeList(p,FALSE);
+  RBlks(p,&br,p->offset,1,FALSE);
+  p->spc=br.sectors_per_cluster;
+  p->data=p->offset+1+br.bitmap_sectors-1*p->spc;
+  p->root_cluster=br.root_cluster;
+  p->MAP1=p->offset+1;
+  p->MAP2=p->offset+1;
+  AllocMAPBuf(p,1);
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+  UnlockPartition(p);
+}
+
+void InitISOPartition(LTPartition *p,BoolU4 unlock)
+{
+  U8 i=16;
+  ISOPrimaryDescriptor *iso=MAlloc(CD_BLK_SIZE);
+  ISODirEntry *de;
+
+  try {
+  LockPartition(p);
+  p->type=PT_ISO9660;
+  p->spc=CD_BLK_SIZE/BLK_SIZE;
+  p->size=CD_FILE_OFFSET;
+  while (TRUE) {
+    RBlks(p,iso,i*p->spc,p->spc,FALSE);
+    if (iso->type==ISOT_SUPPLEMENTARY_DESC)
+      break;
+    else if (iso->type==ISOT_TERMINATOR)
+      throw(EXCEPT_PARTITION,0);
+    else
+      i++;
+  }
+  p->data=0;
+  de=&iso->root_directory_record;
+  p->root_cluster=de->location.little;
+  p->size=iso->volume_space_size.little*CD_BLK_SIZE/BLK_SIZE;
+  Free(iso);
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+  UnlockPartition(p);
+}
+
+#define ZERO_BUF_SIZE	2048
+void WZeroBlks(LTPartition *p,U8 blk,U8 cnt,BoolU4 unlock)
+{
+  U8 l;
+  U1 *z=MAllocZ(BLK_SIZE*ZERO_BUF_SIZE);
+  while (cnt) {
+    l=cnt;
+    if (l>ZERO_BUF_SIZE)
+      l=ZERO_BUF_SIZE;
+    WBlks(p,z,blk,l,unlock);
+    blk+=l;
+    cnt-=l;
+    SwapInNext;  //Prevent locking
+  }
+  Free(z);
+}
+
+//Very dangerous
+BoolU4 SetDriveType(I1 drive,U8 type=PT_LT)
+{
+  I8 i,j,ext_base,num_partition;
+  U8 offset,cur_type;
+  MasterBootStruct mbr;
+  LTBlkDev *bd=DriveToBlkDev(drive);
+  num_partition=bd->partition_base-'A';
+  switch (bd->type) {
+    case LTBDT_ATA:
+      offset=0;
+      ext_base=INVALID_CLUSTER;
+      while (TRUE) {
+	ATAReadBlks(bd,&mbr,offset,1);
+	j=-1;
+	for (i=0;i<4;i++) {
+	  cur_type=mbr.p[i].type;
+	  if (cur_type) {
+	    if (cur_type==5 || cur_type==0xF)
+	      j=i;
+	    else {
+	      if ((num_partition+'A')==drive) {
+		mbr.p[i].type=type;
+		ATAWriteBlks(bd,&mbr,offset,1);
+		return TRUE;
+	      }
+	      num_partition++;
+	    }
+	  }
+	}
+	if (j<0)
+	  break;
+	if (mbr.p[j].offset==0)
+	  break;
+	if (ext_base==INVALID_CLUSTER) {
+  	  offset=mbr.p[j].offset;
+	  ext_base=offset;
+	} else
+	  offset=mbr.p[j].offset+ext_base;
+      }
+      break;
+  }
+}
+
+void FormatLT(I1 drive_letter,BoolU4 quick=TRUE)
+{
+  U1 *root_dir;
+  LTDirEntry *dLT;
+  LTBootStruct *br=MAllocZ(BLK_SIZE);
+  LTPartition *p=DriveToPartition(drive_letter);
+  U8 i,l;
+  try {
+  LockPartition(p);
+//  SetDriveType(drive_letter,PT_LT);
+  SetDriveType(drive_letter,PT_FAT32);
+  p->type=PT_LT;
+  br->U1s_per_sector=BLK_SIZE;
+  if	  (p->size<0x2000)
+    br->sectors_per_cluster=1;
+  else if (p->size<0x20000)
+    br->sectors_per_cluster=2;
+  else if (p->size<0x200000)
+    br->sectors_per_cluster=4;
+  else if (p->size<0x2000000)
+    br->sectors_per_cluster=8;
+  else if (p->size<0x20000000)
+    br->sectors_per_cluster=16;
+  else
+    br->sectors_per_cluster=32;
+ 
+  br->signature=PT_LT;
+  br->signature2=0xAA55;
+  br->sectors=p->size;
+  l=br->sectors_per_cluster*(BLK_SIZE<<3);
+  l=(br->sectors+l-1)/l;
+  br->bitmap_sectors=l;
+  br->unique_id=BootTime;
+  br->root_cluster=0;
+
+  if (quick)
+    i=l+1;
+  else
+    i=p->size;
+  WZeroBlks(p,p->offset,i,FALSE);
+
+  WBlks(p,br,p->offset,1,FALSE);
+  InitLTPartition(p,FALSE);
+  AllocClusters(p,0,1,FALSE,FALSE);  //Alloc #1
+  br->root_cluster=AllocClusters(p,0,1,FALSE,FALSE);
+  WBlks(p,br,p->offset,1,FALSE);
+  root_dir=MAllocZ(BLK_SIZE*p->spc);
+
+  dLT=root_dir-offset(LTDirEntry.start);
+
+  dLT->attr=LT_ATTR_DIR|LT_ATTR_CONTIGUOUS;
+  dLT->name[0]='.';
+  dLT->cluster=br->root_cluster;
+  dLT->size=p->spc*BLK_SIZE;
+  dLT->expanded_size=dLT->size;
+  dLT->datetime=GetCurTimeLTDate;
+
+  dLT+=LT_DIR_ENTRY_SIZE;
+
+  dLT->name[0]='.';
+  dLT->name[1]='.';
+  dLT->attr=LT_ATTR_DIR|LT_ATTR_CONTIGUOUS;
+  dLT->cluster=br->root_cluster;
+  dLT->datetime=GetCurTimeLTDate;
+
+  WBlks(p,root_dir,p->data+br->root_cluster*p->spc,1,FALSE);
+  InitLTPartition(p,FALSE);
+  UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  Free(br);
+  Free(root_dir);
+}
+
+
+BoolU4 InitBlkDev(LTBlkDev *bd,BoolU4 unlock)
+{
+  LTPartition *p=DriveToPartition(bd->partition_base);
+  BoolU4 old_preempt=Preempt(OFF),result=FALSE;
+  if (!(bd->flags & LTBDF_INITIALIZED)) {
+    bd->flags=bd->flags | LTBDF_INITIALIZED |
+       LTBDF_INIT_IN_PROGRESS;
+    switch(bd->type) {
+      case LTBDT_RAM:
+	bd->RAM_disk=AMAllocZ((bd->max_blk+1)*BLK_SIZE);
+	p->type=PT_LT;
+ //TODO: finish unlock?
+	FormatLT(bd->partition_base,FALSE);
+	break;
+      case LTBDT_FDC:
+	if (!monitor_floppy_tss) {
+	  monitor_floppy_tss=Spawn(&MonitorFDCTsk,"FLOPPY MANAGER");
+	  monitor_floppy_tss->user_aux0=bd;
+	}
+	bd->max_reads=1;
+	bd->max_writes=1;
+	bd->read_freq=750;
+	bd->write_freq=150;
+	break;
+      case LTBDT_ATA:
+	bd->max_reads=128;
+	bd->max_writes=1;
+	bd->read_freq=2000;
+	bd->write_freq=500;
+	IDEInit(bd,TRUE);
+	break;
+      case LTBDT_ATAPI:
+	bd->max_reads=128;
+	bd->max_writes=128;
+	bd->read_freq=1000;
+	bd->write_freq=250;
+	IDEInit(bd,TRUE);
+	break;
+      case LTBDT_FILE:
+	if (bd->flags & LTBDF_FORMAT) {
+ //TODO: finish unlock?
+	  bd->f=FOpen(bd->filename,"wc",p->size);
+	  if (!bd->f)
+	    throw(EXCEPT_PARTITION,1);
+ //TODO: finish unlock?
+	  FormatLT(bd->partition_base,TRUE);
+	} else {
+	  bd->f=FOpen(bd->filename,"wc+");
+	  if (!bd->f)
+	    throw(EXCEPT_PARTITION,2);
+	  bd->max_blk=(FSize(bd->f)+BLK_SIZE-1)/BLK_SIZE-1;
+	  p->size=bd->max_blk+1;
+	  InitLTPartition(p,unlock);
+	}
+	break;
+    }
+    if (bd->flags & LTBDF_READ_CACHE)
+      InvalidateDiskCache(p,unlock);
+    bd->flags=bd->flags & ~LTBDF_INIT_IN_PROGRESS;
+    result=TRUE;
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+BoolU4 RBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock)
+{
+  BoolU4 result=TRUE;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if ((p->offset && blk<p->offset) || blk+cnt>p->offset+p->size)
+    throw(EXCEPT_PARTITION,3);
+  blk+=bdev->offset;
+
+  if (bdev->flags & LTBDF_READ_CACHE)
+    RCache(p,&buf,&blk,&cnt);
+  if (cnt) {
+    if (!Bt(&sys_flags,SYSf_NO_IO_SOUND))
+      Sound(bdev->read_freq);
+    disk_status_display.u2[0]=cnt;
+    result=p->RBlks(p,buf,blk,cnt);
+    bdev->last_jiffy=jiffies;
+    disk_status_display.u2[0]=0;
+    if (!Bt(&sys_flags,SYSf_NO_IO_SOUND))
+      Sound(0);
+    if (bdev->flags & LTBDF_READ_CACHE)
+      LTDCAdd(p,buf,blk,cnt);
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return result;
+}
+
+BoolU4 WBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock)
+{
+  BoolU4 result;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if ((bdev->flags & LTBDF_READ_ONLY) &&
+     !(bdev->flags & LTBDF_READ_ONLY_OVERRIDE))
+    throw(EXCEPT_BLKDEV,0);
+  if ((p->offset && blk<p->offset) || blk+cnt>p->offset+p->size)
+    throw(EXCEPT_PARTITION,4);
+  blk+=bdev->offset;
+  if (cnt) {
+    if (!Bt(&sys_flags,SYSf_NO_IO_SOUND))
+      Sound(bdev->write_freq);
+    disk_status_display.u2[0]=cnt+0x8000;
+    result=p->WBlks(p,buf,blk,cnt);
+    bdev->last_jiffy=jiffies;
+    disk_status_display.u2[0]=0;
+    if (!Bt(&sys_flags,SYSf_NO_IO_SOUND))
+      Sound(0);
+    if (bdev->flags & LTBDF_READ_CACHE)
+      LTDCAdd(p,buf,blk,cnt);
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return result;
+}
+
+
+void InvalidateDiskCache(LTPartition *p,BoolU4 unlock)
+{
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if (bdev->flags & LTBDF_READ_CACHE)
+    LTDCInvalidate(p);
+  if (bdev->type==LTBDT_FDC)
+    InitLTPartition(p,FALSE);
+  else if (p->type==PT_ISO9660) {
+    if (!(bdev->flags & LTBDF_READ_ONLY_OVERRIDE))
+      InitISOPartition(p,FALSE);
+  }
+  if(unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+}
+
+void ChangeDisk(I1 drive_letter=0)
+{
+  LTBlkDev *bdev=DriveToBlkDev(drive_letter);
+  if (!InitBlkDev(bdev,TRUE) && bdev->flags & LTBDF_REMOVABLE)
+    InvalidateDiskCache(DriveToPartition(drive_letter),TRUE);
+  Drive(drive_letter);	//TODO: might preempt off
+  FreeLTFreeList(DriveToPartition(drive_letter),TRUE);
+}
+
+
+void PartitionRep()
+{
+  I8 i;
+  I1 ch;
+  U2 u2;
+  U1 u1;
+  LTPartition *p;
+  LTBlkDev *bdev;
+  coutln "\r\nDefined Partitions:\r\n";
+  for (i=0;i<32;i++) {
+    p=local_partitions+sizeof(LTPartition)*i;
+    bdev=p->bdev;
+    if (p->type) {
+      if (p==default_partition)
+	cout "*";
+      else
+	cout " ";
+      ch=PartitionToDrive(p);
+      cout ch," ";
+      if (p->type==PT_LT)
+	cout "LT     ";
+      else if (p->type==PT_FAT12)
+	cout "FAT12  ";
+      else if (p->type==PT_FAT32)
+	cout "FAT32  ";
+      else if (p->type==PT_ISO9660)
+	cout "ISO9660";
+      else
+	cout "-------";
+      cout " ",SysTextSub(bdev->type,"ST_BLKDEV_TYPES")," ";
+      cout p->offset,"-",p->offset+p->size-1," ";
+      u2=bdev->base0;  cout u2," ";
+      u1=bdev->irq;    cout u1," ";
+      u1=bdev->unit;   coutln u1;
+    }
+  }
+}
+
+void ReleaseTaskPartitions()
+{
+  I8 i;
+  LTPartition *p;
+  for (i=0;i<32;i++) {
+    p=local_partitions+sizeof(LTPartition)*i;
+    if (p->owning_task==Fs) {
+      UnlockPartition(p,TRUE);
+      if (!Bt(&sys_flags,SYSf_NO_IO_SOUND))
+	Sound(0);
+    }
+  }
+}
+
+U8 AddBlkDev(LTBlkDev *bd)
+{
+  I8 i,j,ext_base,num_partition;
+  U8 offset;
+  MasterBootStruct mbr;
+  LTBootStruct br;
+  LTPartition *p;
+  I1 *drname;
+
+  bd->ch_L='L';
+  bd->ch_B='B';
+  bd->ch_D='D';
+  num_partition=bd->partition_base-'A';
+  p=local_partitions+sizeof(LTPartition)*num_partition;
+  MemSet(p,0,sizeof(LTPartition));
+  p->drive=num_partition+'A';
+  p->ch_L='L';
+  p->ch_P='P';
+  p->ch_E='E';
+  p->bdev=bd;
+  p->size=bd->max_blk+1;
+  j=(sys_boot_code.u1[1]==0xE0) ? 0:1;
+  switch (sys_boot_code.u1[0]) {
+    case BOOT_CODE_CDROM:
+      if (sys_boot_code.u2[1]==bd->base0 && j==bd->unit)
+	boot_blkdev=bd;
+      break;
+    case BOOT_CODE_HARDDRIVE:
+      if (sys_boot_code.u2[1]==bd->base0 && j==bd->unit)
+	boot_blkdev=bd;
+      break;
+  }
+  if (boot_blkdev==bd)
+    bd->flags|=LTBDF_HAS_BEEN_RESET;
+
+  switch (bd->type) {
+    case LTBDT_FDC:
+      p->type=PT_LT;
+      p->RBlks=&FDCRBlks;
+      p->WBlks=&FDCWBlks;
+      num_partition++;
+      break;
+    case LTBDT_RAM:
+      p->type=PT_LT;
+      p->RBlks=&RAMRBlks;
+      p->WBlks=&RAMWBlks;
+      num_partition++;
+      break;
+    case LTBDT_ATA:
+      InitBlkDev(bd,TRUE);
+      offset=0;
+      ext_base=INVALID_CLUSTER;
+      while (TRUE) {
+	ATAReadBlks(bd,&mbr,offset,1);
+	j=-1;
+	for (i=0;i<4;i++) {
+	  if (mbr.p[i].type!=0) {
+	    p=local_partitions+sizeof(LTPartition)*num_partition;
+	    MemSet(p,0,sizeof(LTPartition));
+	    p->drive=num_partition+'A';
+	    p->ch_L='L';
+	    p->ch_P='P';
+	    p->ch_E='E';
+	    p->bdev=bd;
+	    p->RBlks=&IDERBlks;
+	    p->WBlks=&IDEWBlks;
+	    p->offset=mbr.p[i].offset+offset;
+	    p->size  =mbr.p[i].size;
+	    p->type  =mbr.p[i].type;
+	    if (p->type==PT_LT)
+	      InitLTPartition(p,TRUE);
+	    else {
+	      if (p->type==PT_FAT32+1) p->type=PT_FAT32;
+	      if (p->type==PT_FAT32) {
+		ATAReadBlks(bd,&br,p->offset,1);
+		if (br.signature==PT_LT)
+		  InitLTPartition(p,TRUE);
+	      }
+	    }
+	    if (p->type==5 || p->type==0xF)
+	      j=i;
+	    else
+	      num_partition++;
+	    }
+	  }
+	if (j<0)
+	  break;
+	if (mbr.p[j].offset==0)
+	  break;
+	if (ext_base==INVALID_CLUSTER) {
+  	  offset=mbr.p[j].offset;
+	  ext_base=offset;
+	} else
+	  offset=mbr.p[j].offset+ext_base;
+      }
+      break;
+    case LTBDT_ATAPI:
+      p->type=PT_ISO9660;
+      p->RBlks=&IDERBlks;
+      p->WBlks=&IDEWBlks;
+      p->size =CD_FILE_OFFSET;
+      num_partition++;
+      break;
+    case LTBDT_FILE:
+      drname=ChangeExtension(bd->filename,"DVC");
+      bd->filename=ANewString(drname);
+      Free(drname);
+      p->type=PT_LT;
+      p->RBlks=&FileRBlks;
+      p->WBlks=&FileWBlks;
+      num_partition++;
+      break;
+  }
+  return num_partition-(bd->partition_base-'A');
+}
+
+
+void AddDrives(BoolU4 show_rep=TRUE)
+{
+  LTBlkDev *bd;
+  I8 base_partition,i,j,k;
+  I1 buf[32],buf2[128];
+  BoolU4 format;
+  do {
+    if (show_rep)
+      PartitionRep;
+    show_rep=TRUE;
+    PutSysText("ST_ADDDRIVES1");
+    base_partition=ToUpper(SysGetChar)-'A';
+    CrLf;
+    if (base_partition>=0 && base_partition<32) {
+
+      PutSysText("ST_ADDDRIVES2");
+      i=SysGetChar-'0';
+      CrLf;
+
+      j=1;k=0;
+      if (i==5) {
+	PutSysText("ST_ADDDRIVES3");
+	GetS(buf2,128);
+	PutSysText("ST_ADDDRIVES4");
+	format=YorN;
+	*buf=0;
+      }
+      if (i==1 || i==5 && format) {
+	PutSysText("ST_ADDDRIVES5");
+	GetS(buf,32);
+      } else if (i!=5) {
+	PutSysText("ST_ADDDRIVES10");
+	j=SysGetChar-'0';
+	CrLf;
+
+	PutSysText("ST_ADDDRIVES7");
+	k=SysGetChar-'0';
+	CrLf;
+      }
+
+      if (i>0 && i<=5 && j>0 && j<=4 && k>=0 && k<=1) {
+	bd=local_blkdevs+sizeof(LTBlkDev)*(num_blkdevs++);
+	bd->partition_base=base_partition+'A';
+
+	bd->type=i;
+	if (i==2 || i==4)
+	  bd->flags=LTBDF_REMOVABLE;
+	else
+	  bd->flags=0;
+	if (i!=1)
+	  bd->flags|=LTBDF_READ_CACHE;
+ 
+	if (i==4) {
+	  bd->blk_size=CD_BLK_SIZE;
+	  bd->flags|=LTBDF_READ_ONLY;
+	} else
+	  bd->blk_size=BLK_SIZE;
+	if (i==1 || i==5 && format) {
+	  bd->max_blk=AtoI(buf)-1;
+	  if (bd->max_blk<FDC_MAX_SECTOR)
+	    bd->max_blk=FDC_MAX_SECTOR;
+	} else if (i==2)
+	  bd->max_blk=FDC_MAX_SECTOR;
+	else
+	  bd->max_blk=0xEFFFFFFF;
+	if (j==2) {
+	  bd->base0=0x3F0;
+	  bd->irq=6;
+	} else if (j==3) {
+	  bd->base0=0x1F0;
+	  bd->base1=0x3F6;
+	  bd->irq=14;
+	} else if (j==4) {
+	  bd->base0=0x170;
+	  bd->base1=0x376;
+	  bd->irq=15;
+	}
+	if (i==5) {
+	  bd->filename=ANewString(buf2);
+	  if (format)
+	    bd->flags=bd->flags|LTBDF_FORMAT;
+	}
+	bd->unit=k;
+	if (!AddBlkDev(bd))
+	  PutSysText("ST_FAILED");
+      } else
+	PutSysText("ST_FAILED");
+    }
+  } while (base_partition>=0 && base_partition<32);
+}
+
+void SetPromptedBaseUnit(LTBlkDev *bd)
+{
+  if (sys_boot_code.u1[1]==0xE0)
+    bd->unit=0;
+  else
+    bd->unit=1;
+  if (sys_boot_code.u2[1]==0x1F0) {
+    bd->base0=0x1F0;
+    bd->base1=0x3F6;
+    bd->irq=14;
+  } else {
+    bd->base0=0x170;
+    bd->base1=0x376;
+    bd->irq=15;
+  }
+}
+
+void InitAllBlkDevs()
+{
+  LTBlkDev *bd;
+  I8 i;
+
+  num_blkdevs=0;
+  boot_blkdev=NULL;
+  local_blkdevs=AMAllocZ(sizeof(LTBlkDev)<<4);
+
+  monitor_floppy_tss=NULL;
+  FDC_retries=2;
+  FDC_DRIVE_HEADS=2;
+  FDC_DISK_CYLINDERS=80;
+  FDC_DISK_SECTORS=18;
+  FDC_MAX_SECTOR=FDC_DRIVE_HEADS*FDC_DISK_CYLINDERS*FDC_DISK_SECTORS-1;
+  FDC_DMA_BUF=0xD000;
+  ext[EXT_IRQ06]=&Irq06Handler;
+
+  ext[EXT_IRQ0E]=&Irq0EHandler;
+  ext[EXT_IRQ0F]=&Irq0FHandler;
+
+  local_partitions=AMAllocZ(sizeof(LTPartition)<<5);
+  for (i=0;i<32;i++)
+    drive_to_partition[i]=local_partitions+sizeof(LTPartition)*i;
+  dc_col=0;
+
+  exe {
+    I8 base_partition,i,j,k,l,num=0;
+    I1 buf[32],buf2[128];
+    BoolU4 format;
+    PutSysText("ST_ADDDRIVES0");
+    do {
+      PutSysText("ST_ADDDRIVES1");
+      base_partition=ToUpper(GetChar)-'A';
+      CrLf;
+      if (base_partition>=0 && base_partition<32) {
+	PutSysText("ST_ADDDRIVES2");
+	i=GetChar-'0';
+	CrLf;
+
+	j=1;k=0;
+	if (i==5) {
+	  PutSysText("ST_ADDDRIVES3");
+	  GetS(buf2,128);
+	  PutSysText("ST_ADDDRIVES4");
+	  format=YorN;
+	  *buf=0;
+	}
+	if (i==1 || i==5 && format) {
+	  PutSysText("ST_ADDDRIVES5");
+	  GetS(buf,32);
+	} else if (i!=5) {
+	  PutSysText("ST_ADDDRIVES6");
+	  j=GetChar-'0';
+	  CrLf;
+
+	  if (j!=5) {
+	    PutSysText("ST_ADDDRIVES7");
+	    k=GetChar-'0';
+	    CrLf;
+	  } else {
+	    if (i!=4) {
+	      PutSysText("ST_ADDDRIVES9");
+	      j=0;  //force error
+	    }
+	  }
+	}
+
+	if (i>0 && i<=5 && j>0 && j<=5 && k>=0 && k<=1) {
+	  ExePrintF("bd=local_blkdevs+sizeof(LTBlkDev)*(num_blkdevs++);");
+	  ExePrintF("bd->partition_base=%d;",
+	    base_partition+'A');
+
+	  ExePrintF("bd->type=%d;",i);
+	  if (i==2 || i==4)
+	    ExePrintF("bd->flags=LTBDF_REMOVABLE;");
+	  else
+	    ExePrintF("bd->flags=0;");
+	  if (i!=1)
+	    ExePrintF("bd->flags=bd->flags|LTBDF_READ_CACHE;");
+
+	  if (i==4) {
+	    ExePrintF("bd->blk_size=CD_BLK_SIZE;");
+	    ExePrintF("bd->flags=bd->flags | LTBDF_READ_ONLY;");
+	  } else
+	    ExePrintF("bd->blk_size=BLK_SIZE;");
+	  if (i==1 || i==5 && format) {
+	    l=AtoI(buf)-1;
+	    if (l<FDC_MAX_SECTOR)
+	      l=FDC_MAX_SECTOR;
+	    ExePrintF("bd->max_blk=%d;",l);
+	  } else if (i==2)
+	    ExePrintF("bd->max_blk=FDC_MAX_SECTOR;");
+	  else
+	    ExePrintF("bd->max_blk=0xEFFFFFFF;");
+
+	  ExePrintF("bd->unit=%d;",k);
+
+	  if (j==2)
+	    ExePrintF("bd->base0=0x3F0;bd->irq=6;");
+	  else if (j==3)
+	    ExePrintF("bd->base0=0x1F0;bd->base1=0x3F6;bd->irq=14;");
+	  else if (j==4)
+	    ExePrintF("bd->base0=0x170;bd->base1=0x376;bd->irq=15;");
+	  else if (j==5)
+	    ExePrintF("SetPromptedBaseUnit(bd);");
+
+	  if (i==5) {
+	    ExePrintF("bd->filename=ANewString(\"%s\");",buf2);
+	    if (format)
+	      ExePrintF("bd->flags=bd->flags|LTBDF_FORMAT;");
+	  }
+	  ExePrintF("AddBlkDev(bd);");
+	  num++;
+	} else
+	  PutSysText("ST_FAILED");
+      }
+    } while (num==0 || base_partition>=0 && base_partition<32);
+    cout "\r\nDefault Drive Letter for phase 2 of boot. "
+	 "Usually it's the same as phase 1. "
+	 "(hitting SPACE will prompt at boot): ";
+    i=GetChar;
+    if (i==13) {
+      i=Fs->user_aux1; //set by bootins
+      PrintF("Using Drive '%c'",i);
+    }
+    CrLf;
+    if (i!=CH_SPACE)
+      i=ToUpper(i);
+    if (i<'A' || i>'Z') {
+      i=0;
+      coutln "Drive will be prompted.";
+    }
+    ExePrintF("default_drive=%d;",i);
+  }
+  PartitionRep;
+}
+
+
+U8 NextClusterNum(LTPartition *p,U8 c,U8 cnt,BoolU4 unlock)
+{
+  CheckLTPartition(p);
+  if (!cnt || !c) return c;
+  try {
+  LockPartition(p);
+  if (p->type==PT_ISO9660 || p->type==PT_LT)
+    c+=cnt;
+  else
+    c=INVALID_CLUSTER;
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return c;
+}
+
+
+U8 ClusterBlk(LTPartition *p,U8 c)
+{
+  CheckLTPartition(p);
+  return p->data+c*p->spc;
+}
+
+U8 RClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE)
+{
+  CheckLTPartition(p);
+  if (!cnt) return c;
+  try {
+  LockPartition(p);
+  if (p->type==PT_ISO9660 || p->type==PT_LT) {
+    RBlks(p,buf,p->data+c*p->spc,p->spc*cnt,FALSE);
+    c+=cnt;
+  } else {
+    while (cnt && c && c!=INVALID_CLUSTER) {
+      RBlks(p,buf,p->data+c*p->spc,p->spc,FALSE);
+      buf+=p->spc*BLK_SIZE;
+      c=NextClusterNum(p,c,1,FALSE);
+      cnt--;
+      if (update_display)
+	disk_status_display.u2[1]--;
+    }
+    if (cnt)
+      UnrecoverableSysError(0x0FFF0001);
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return c;
+}
+
+BoolU4 ToLTFilename(I1 *dst,I1 *src)
+{
+  MemSet(dst,0,LT_MAX_FILENAME_LEN+1);
+  if (!CheckFileName(src))
+    return FALSE;
+  StrCpy(dst,src);
+  return TRUE;
+}
+
+BoolU4 FromISOName(I1 *dst,U1 *src)
+{
+  BoolU4 result=TRUE;
+  I8 i,j,l;
+  MemSet(dst,0,LT_MAX_FILENAME_LEN+1);
+  l=*src++;
+  if (l==1 && !*src) {
+    dst[0]='.';
+  } else if (l==1 && *src==1) {
+    dst[0]='.';
+    dst[1]='.';
+  } else {
+    l/=2;
+    j=0;
+    for (i=0;i<l;i++) {
+      src++;
+      if (*src==';')
+	break;
+      if (Bt(filename_chars_bitmap,*src)) {
+	if (j>=LT_MAX_FILENAME_LEN)
+	  return FALSE;
+	dst[j++]=*src++;
+      } else
+	return FALSE;
+    }
+  }
+  return CheckFileName(dst);
+}
+
+BoolU4 FillLTDirISO(LTPartition *p,LTDirEntry *tempm,ISODirEntry *de,BoolU4 unlock)
+{
+  ArcCompressStruct *buf;
+  BoolU4 result;
+  MemSet(tempm,0,sizeof(LTDirEntry));
+  result=FromISOName(tempm->name,&de->name_len);
+  tempm->cluster=de->location.little;
+  tempm->size=de->size.little;
+  tempm->attr=FileAttr(tempm->name);
+  if (de->flags & ISO_ATTR_DIR)
+    tempm->attr|=LT_ATTR_DIR;
+  tempm->datetime=ISOToLTDate(&de->date);
+  if (tempm->attr & LT_ATTR_COMPRESSED) {
+    buf=MAlloc(BLK_SIZE*p->spc);
+    RClusters(p,buf,tempm->cluster,1,unlock);
+    tempm->expanded_size=buf->expanded_size;
+    Free(buf);
+  } else
+    tempm->expanded_size=tempm->size;
+  return result;
+}
+
+
+BoolU4 FindLTFile(LTPartition *p,U8 cur_dir_cluster,I1 *name,LTDirEntry *result,
+		     BoolU4 dir_only,BoolU4 file_only,BoolU4 unlock)
+{
+  BoolU4 res=FALSE;
+  LTDirEntry *buf,*buf2,*ptr;
+  I1 dname[LT_MAX_FILENAME_LEN+1];
+  U8 cnt;
+  BoolU4 cont2=FALSE;
+  U1 ch;
+
+  MemSet(result,0,sizeof(LTDirEntry));
+  CheckLTPartition(p);
+  if (p->type!=PT_LT)
+    PutSysText("ST_NOT_LT");
+  else if (!ToLTFilename(dname,name))
+    PutSysText("ST_INVALID_FILENAME");
+  else {
+    try {
+    LockPartition(p);
+    buf2=MAlloc(BLK_SIZE*p->spc);
+    RClusters(p,buf2,cur_dir_cluster,1,FALSE);
+
+    ptr=buf2-offset(LTDirEntry.start);
+    buf=MAlloc(ptr->size);
+    RClusters(p,buf,cur_dir_cluster,ptr->size/BLK_SIZE/p->spc,FALSE);
+    Free(buf2);
+
+    ptr=buf-offset(LTDirEntry.start);
+    cnt=ptr->size/LT_DIR_ENTRY_SIZE;
+    ptr->name[0]='.';
+    ptr->name[1]=0;
+    while (cnt--) {
+      ch=ptr->name[0];
+      if (!ch)
+	break;
+      else if (!(ptr->attr & LT_ATTR_DELETED)) {
+	if (dir_only && !(ptr->attr & LT_ATTR_DIR))
+	  cont2=FALSE;
+	else if (file_only && ptr->attr & LT_ATTR_DIR)
+	  cont2=FALSE;
+	else
+	  cont2=TRUE;
+	if (cont2 && !StrCmp(dname,ptr->name)) {
+	  MemCpy(&result->attr,&ptr->attr,LT_DIR_ENTRY_SIZE);
+	  res=TRUE;
+    	  goto exit_this;
+	}
+      }
+      ptr+=LT_DIR_ENTRY_SIZE;
+    }
+exit_this:
+    Free(buf);
+    if (unlock)
+      UnlockPartition(p);
+    } catch
+      UnlockPartition(p);
+  }
+
+  return res;
+}
+
+
+BoolU4 FindISOFile(LTPartition *p,U8 cur_dir_cluster,I1 *name,LTDirEntry *result,
+		     BoolU4 dir_only,BoolU4 file_only,BoolU4 unlock)
+{
+  ISODirEntry *isoptr,*buf;
+  I1 dname[LT_MAX_FILENAME_LEN+1];
+  BoolU4 res=FALSE;
+  I8 i;
+
+  CheckLTPartition(p);
+  if (p->type!=PT_ISO9660)
+    PutSysText("ST_NOT_ISO9660");
+  else {
+    try {
+    LockPartition(p);
+    isoptr=MAlloc(BLK_SIZE*p->spc);
+    RClusters(Fs->cur_partition,isoptr,cur_dir_cluster,1,FALSE);
+    if (isoptr->name_len==1 && isoptr->name==0) { //curdir
+      i=(isoptr->size.little+BLK_SIZE*p->spc-1)/(BLK_SIZE*p->spc);
+      buf=MAlloc(BLK_SIZE*p->spc*i);
+      RClusters(Fs->cur_partition,buf,cur_dir_cluster,i,FALSE);
+      Free(isoptr);
+    } else {
+      buf=isoptr;
+      i=1;
+    }
+    i*=BLK_SIZE*p->spc;
+    isoptr=buf;
+    while (i>0) {
+      if (!isoptr->length) {
+	isoptr++;
+	i--;
+      } else {
+	FromISOName(dname,&isoptr->name_len);
+	if (*dname) {
+	  if (!StrCmp(name,dname)) {
+	    res=FillLTDirISO(p,result,isoptr,FALSE);
+	    if (res &&
+		!(dir_only && !(result->attr & LT_ATTR_DIR)) &&
+		!(file_only && result->attr & LT_ATTR_DIR) )
+	      goto exit_this;
+	    else
+	      res=FALSE;
+	  }
+	}
+	i-=isoptr->length;
+	isoptr+=isoptr->length;
+      }
+    }
+exit_this:
+    Free(buf);
+    if (unlock)
+      UnlockPartition(p);
+    } catch
+      UnlockPartition(p);
+  }
+  return res;
+}
+
+
+U8 NameToDirCluster(LTPartition *p,I1 *name,BoolU4 unlock)
+{
+  BoolU4 cont=TRUE;
+  U8 cur_dir_cluster;
+  LTDirEntry de;
+  I1 *buf=NewString(name),*buf2=NewString(name);
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  cur_dir_cluster=p->root_cluster;
+  while (*buf && cont) {
+    RemoveFirstSeg(buf,"/",buf2);
+    if (*buf2) {
+      if (p->type==PT_LT)
+	cont=FindLTFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else if (p->type==PT_ISO9660)
+	cont=FindISOFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else cont=FALSE;
+      cur_dir_cluster=de.cluster;
+    }
+  }
+  if (!cont) {
+    cout name," ",SysText("ST_FILE_NOT_FOUND");
+    cur_dir_cluster=0;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  Free(buf);
+  Free(buf2);
+  return cur_dir_cluster;
+}
+
+U8 NameToParentDirCluster(LTPartition *p,I1 *name,BoolU4 unlock)
+{
+  BoolU4 cont=TRUE;
+  U8 cur_dir_cluster,cur_dir_cluster2;
+  LTDirEntry de;
+  I1 *buf=NewString(name),*buf2=NewString(name);
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  cur_dir_cluster=p->root_cluster;
+  cur_dir_cluster2=p->root_cluster;
+  while (*buf && cont) {
+    cur_dir_cluster2=cur_dir_cluster;
+    RemoveFirstSeg(buf,"/",buf2);
+    if (*buf2) {
+      if (p->type==PT_LT)
+	cont=FindLTFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else if (p->type==PT_ISO9660)
+	cont=FindISOFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else cont=FALSE;
+      cur_dir_cluster=de.cluster;
+    }
+  }
+  if (!cont) {
+    cout name," ",SysText("ST_FILE_NOT_FOUND");
+    cur_dir_cluster2=0;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  Free(buf);
+  Free(buf2);
+  return cur_dir_cluster2;
+}
+
+
+U1 *ReadISOFile(LTPartition *p,I1 *cur_dir,I1 *filename,U8 *size,
+  U8 *attr,BoolU4 raw,ArcCompressStruct **ac2)
+{
+  U1 *buf=NULL;
+  LTDirEntry de;
+  U8 c,cluster_size=BLK_SIZE*p->spc,cluster_cnt;
+  ArcCompressStruct *ac;
+  U8 cur_dir_cluster=NameToDirCluster(p,cur_dir,TRUE);
+
+  CheckLTPartition(p);
+  if (size)
+    *size=0;
+  if (ac2)
+    *ac2=NULL;
+  if (attr)
+    *attr=0;
+  if (p->type!=PT_ISO9660)
+    PutSysText("ST_NOT_ISO9660");
+  else {
+    try {
+    LockPartition(p);
+    if (FindISOFile(p,cur_dir_cluster,filename,&de,FALSE,TRUE,FALSE)) {
+      if (attr)
+	*attr=de.attr;
+      cluster_cnt=(de.size+cluster_size-1)/cluster_size;
+      buf=MAlloc(cluster_cnt*cluster_size+1);
+      c=de.cluster;
+      disk_status_display.u2[1]=cluster_cnt;
+      c=RClusters(p,buf,c,cluster_cnt,FALSE,TRUE);
+      disk_status_display.u2[1]=0;
+      if ((FileAttr(de.name) & LT_ATTR_COMPRESSED) && !raw) {
+	ac=buf;
+	if (attr)
+	  *attr=FileAttr(de.name,*attr);
+	if (size)
+	  *size=ac->expanded_size;
+	if (ac2) {
+	  *ac2=ac;
+	  buf=ExpandBuf(ac);
+	} else {
+	  buf=ExpandBuf(ac);
+	  Free(ac);
+	}
+      } else {
+	buf[de.size]=0; //Terminate
+	if (size)
+	  *size=de.size;
+      }
+      if (attr)
+	*attr=FileAttr(de.name,*attr);
+    }
+    UnlockPartition(p);
+    } catch
+      UnlockPartition(p);
+  }
+  return buf;
+}
+
+
+
+U1 *ReadLTFile(LTPartition *p,I1 *cur_dir,I1 *filename,U8 *size,
+  U8 *attr,BoolU4 raw,ArcCompressStruct **ac2)
+{
+  U1 *buf=NULL;
+  LTDirEntry de;
+  U8 c,cluster_size=BLK_SIZE*p->spc,cluster_cnt;
+  ArcCompressStruct *ac;
+  U8 cur_dir_cluster=NameToDirCluster(p,cur_dir,TRUE);
+
+  CheckLTPartition(p);
+  if (size)
+    *size=0;
+  if (ac2)
+    *ac2=NULL;
+  if (attr)
+    *attr=0;
+  if (p->type!=PT_LT)
+    PutSysText("ST_NOT_ISO9660");
+  else {
+    try {
+    LockPartition(p);
+    if (FindLTFile(p,cur_dir_cluster,filename,&de,FALSE,TRUE,FALSE)) {
+      if (attr)
+	*attr=de.attr;
+      cluster_cnt=(de.size+cluster_size-1)/cluster_size;
+      buf=MAlloc(cluster_cnt*cluster_size+1);
+      c=de.cluster;
+      disk_status_display.u2[1]=cluster_cnt;
+      c=RClusters(p,buf,c,cluster_cnt,FALSE,TRUE);
+      disk_status_display.u2[1]=0;
+      if (de.xsum) {
+	if ((de.xsum^ArcCheckSum(buf,de.size))!=LT_XSUM)
+	  throw(EXCEPT_ARC_XSUM);
+      }
+      if ((FileAttr(de.name) & LT_ATTR_COMPRESSED) && !raw) {
+	ac=buf;
+	if (attr)
+	  *attr=FileAttr(de.name,*attr);
+	if (size)
+	  *size=ac->expanded_size;
+	if (ac2) {
+	  *ac2=ac;
+	  buf=ExpandBuf(ac);
+	} else {
+	  buf=ExpandBuf(ac);
+	  Free(ac);
+	}
+      } else {
+	buf[de.size]=0; //Terminate
+	if (size)
+	  *size=de.size;
+      }
+      if (attr)
+	*attr=FileAttr(de.name,*attr);
+    }
+    UnlockPartition(p);
+    } catch
+      UnlockPartition(p);
+  }
+  return buf;
+}
+
+BoolU4 CdLT(I1 *name,U8 cur_dir_cluster)
+{
+  LTDirEntry de;
+  if (Fs->cur_partition->type!=PT_LT)
+    PutSysText("ST_NOT_LT");
+  else {
+    if (FindLTFile(Fs->cur_partition,cur_dir_cluster,
+			name,&de,TRUE,FALSE,TRUE)) {
+      return TRUE;
+    } else
+      cout name," ",SysText("ST_FILE_NOT_FOUND");
+  }
+  return FALSE;
+}
+
+BoolU4 CdISO(I1 *name,U8 cur_dir_cluster)
+{
+  LTDirEntry de;
+  if (Fs->cur_partition->type!=PT_ISO9660)
+    PutSysText("ST_NOT_ISO9660");
+  else {
+    if (FindISOFile(Fs->cur_partition,cur_dir_cluster,
+			name,&de,TRUE,FALSE,TRUE)) {
+      return TRUE;
+    } else
+      cout name," ",SysText("ST_FILE_NOT_FOUND");
+  }
+  return FALSE;
+}
+
+U8 WClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE)
+{
+  CheckLTPartition(p);
+  update_display;
+  try {
+    LockPartition(p);
+    if (p->type==PT_LT) {
+      WBlks(p,buf,p->data+c*p->spc,p->spc*cnt,FALSE);
+      c=0;
+    }
+    if (unlock)
+      UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return c;
+}
+
+void FreeLTClusters(LTPartition *p,U8 c,U8 cnt,BoolU4 unlock)
+{
+  LTFreeList *tempf;
+  BoolU4 found=FALSE;
+  CheckLTPartition(p);
+  if (!c) return;
+  if (p->type!=PT_LT)
+    PutSysText("ST_NOT_LT");
+  else {
+    try {
+      LockPartition(p);
+      if (!p->next_free)
+	BuildLTFreeList(p,FALSE);
+      tempf=p->next_free;
+      while (!found && tempf!=&p->next_free) {
+	if (tempf->start+tempf->size==c) {
+	  tempf->size+=cnt;
+	  found=TRUE;
+	} else if (c+cnt==tempf->start) {
+	  tempf->size+=cnt;
+	  tempf->start=c;
+	  found=TRUE;
+	}
+	tempf=tempf->next;
+      }
+      if (!found) {
+	tempf=AMAlloc(sizeof(LTFreeList));
+	tempf->size=cnt;
+	tempf->start=c;
+	InsQue(tempf,p->last_free);
+      }
+      while (cnt--) {
+	SetLTBuf(p,c);
+	Btr(p->cur_MAP_blk,c&(BLK_SIZE<<3-1));
+	Bts(p->buffered_MAP_dirty_bits,0);
+	c++;
+      }
+      CleanMAPBuf(p);
+
+      if (unlock)
+	UnlockPartition(p);
+    } catch
+      UnlockPartition(p);
+  }
+}
+
+U8 AllocLTClusters(LTPartition *p,U8 cnt, BoolU4 unlock)
+{
+  LTFreeList *tempf,*best_free=NULL;
+  U8 i,first,best_size=MAX_U8;
+  if (!cnt)
+    UnrecoverableSysError(0x0FFF0003);
+  try {
+  LockPartition(p);
+  if (!p->next_free)
+    BuildLTFreeList(p,FALSE);
+  tempf=p->next_free;
+  while (tempf!=&p->next_free) {
+    if (tempf->size>=cnt && tempf->size<best_size) {
+      best_free=tempf;
+      best_size=tempf->size;
+    }
+    tempf=tempf->next;
+  }
+  if (!best_free)
+    UnrecoverableSysError(0x0FFF0003);
+  first=best_free->start;
+  for (i=0;i<cnt;i++) {
+    SetLTBuf(p,first+i);
+    Bts(p->cur_MAP_blk,(first+i)&(BLK_SIZE<<3-1));
+    Bts(p->buffered_MAP_dirty_bits,0);
+  }
+  CleanMAPBuf(p);
+  if (best_free->size-=cnt)
+    best_free->start+=cnt;
+  else {
+    RemQue(best_free);
+    AFree(best_free);
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return first;
+}
+
+//c=0 means first cluster in chain
+U8 AllocClusters(LTPartition *p,U8 c,U8 cnt,BoolU4 contiguous,BoolU4 unlock)
+{
+  contiguous; //no unused var warn
+  if (!cnt)
+    return c;
+  CheckLTPartition(p);
+  if (p->type==PT_LT)
+    return AllocLTClusters(p,cnt,unlock);
+}
+
+
+BoolU4 NewLTDirEntry2(LTPartition *p,I1 *cur_dir,LTDirEntry *de,BoolU4 free_old_chain,BoolU4 unlock)
+{
+  LTDirEntry *buf,*buf2,*ptr,de2;
+  LTBootStruct *br;
+  U8 c,i=1,j=0,l=BLK_SIZE/LT_DIR_ENTRY_SIZE,cnt,dir_size;
+  BoolU4 written=FALSE;
+  U1 ch;
+  U8 cur_dir_cluster=NameToDirCluster(p,cur_dir,unlock);
+  I1 *temp,*parent_dir;
+  try {
+    de->attr|=LT_ATTR_CONTIGUOUS;
+    LockPartition(p);
+    buf2=MAlloc(BLK_SIZE*p->spc);
+    RClusters(p,buf2,cur_dir_cluster,1,FALSE);
+
+    ptr=buf2-offset(LTDirEntry.start);
+    buf=MAlloc(ptr->size);
+    RClusters(p,buf,cur_dir_cluster,ptr->size/BLK_SIZE/p->spc,FALSE);
+
+    dir_size=ptr->size;
+    cnt=ptr->size/LT_DIR_ENTRY_SIZE;
+    ptr=buf-offset(LTDirEntry.start)+LT_DIR_ENTRY_SIZE;
+    Free(buf2);
+    while (cnt--) {
+      ch=ptr->name[0];
+      if (!ch) {
+	if (written) break;
+	MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	if ((i+1)*LT_DIR_ENTRY_SIZE+j*BLK_SIZE<dir_size)
+	  WBlks(p,buf+j*BLK_SIZE,
+	     p->data+cur_dir_cluster*p->spc+j,1,FALSE);
+	else {
+	  buf2=MAllocZ(dir_size+p->spc*BLK_SIZE);
+	  MemCpy(buf2,buf,dir_size);
+	  FreeLTClusters(p,cur_dir_cluster,
+	    dir_size/(p->spc*BLK_SIZE),FALSE);
+	  dir_size+=p->spc*BLK_SIZE;
+	  c=AllocClusters(p,0,dir_size/(p->spc*BLK_SIZE),TRUE,FALSE);
+	  Free(buf);
+	  buf=buf2;
+	  ptr=buf-offset(LTDirEntry.start);
+	  ptr->size=dir_size;
+	  ptr->expanded_size=dir_size;
+	  ptr->cluster=c;
+	  WClusters(p,buf,c,dir_size/(p->spc*BLK_SIZE),FALSE);
+	  if (cur_dir_cluster==p->root_cluster) {
+	    br=MAllocZ(BLK_SIZE);
+	    RBlks(p,br,p->offset,1,FALSE);
+	    br->root_cluster=c;
+	    WBlks(p,br,p->offset,1,FALSE);
+	    Free(br);
+	    p->root_cluster=c;
+	  } else {
+	    temp=NewString(cur_dir);
+	    parent_dir=NewString(cur_dir);
+	    RemoveLastSeg(parent_dir,"/",temp);
+	    if (!*parent_dir) StrCpy(parent_dir,"/");
+	    if (FindLTFile(p,NameToDirCluster(p,parent_dir,FALSE),
+		ptr->name,&de2,TRUE,FALSE,FALSE)) {
+	      de2.cluster=c;
+	      de2.size=dir_size;
+	      de2.expanded_size=dir_size;
+	      //TODO: is this supposed to free old chain?
+	      NewLTDirEntry2(p,parent_dir,&de2,FALSE,FALSE);
+	    } else
+	      UnrecoverableSysError(0x0FFF0006);
+	    Free(temp);
+	    Free(parent_dir);
+	  }
+	}
+	break;
+      } else if (ptr->attr & LT_ATTR_DELETED) {
+	if (!written) {
+	  MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	  WBlks(p,buf+j*BLK_SIZE,
+	     p->data+cur_dir_cluster*p->spc+j,1,FALSE);
+	  written=TRUE;
+	}
+      } else {
+	if (!StrCmp(de->name,ptr->name)) {
+	  if (free_old_chain)
+	    FreeLTClusters(p,ptr->cluster,
+	      (ptr->size+p->spc*BLK_SIZE-1)/(p->spc*BLK_SIZE),FALSE);
+	  if (!written) {
+	    MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	    WBlks(p,buf+j*BLK_SIZE,
+	       p->data+cur_dir_cluster*p->spc+j,1,FALSE);
+	    break;
+	  } else {
+	    ptr->attr|=LT_ATTR_DELETED;
+	    WBlks(p,buf+j*BLK_SIZE,
+	       p->data+cur_dir_cluster*p->spc+j,1,FALSE);
+	  }
+	}
+      }
+      ptr+=LT_DIR_ENTRY_SIZE;
+      if (++i>=l) {
+	j++;
+	i=0;
+      }
+    }
+    Free(buf);
+    if (unlock)
+      UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return FALSE;
+}
+
+BoolU4 NewLTDirEntry(LTPartition *p,I1 *cur_dir,LTDirEntry *tempm,BoolU4 free_old_chain=TRUE)
+{
+  if (p->type==PT_LT)
+    return NewLTDirEntry2(p,cur_dir,tempm,free_old_chain,TRUE);
+  return FALSE;
+}
+
+BoolU4 DelLTFiles(LTPartition *p,I1 *cur_dir,I1 *wild,
+		     BoolU4 del_dir=FALSE,BoolU4 print_msg=TRUE)
+{
+  LTDirEntry *buf,*buf2,*ptr;
+  U8 cnt,i=0,j=0,l=BLK_SIZE/LT_DIR_ENTRY_SIZE;
+  U1 ch;
+  U8 cur_dir_cluster=NameToDirCluster(p,cur_dir,TRUE);
+  try {
+    LockPartition(p);
+    buf2=MAlloc(BLK_SIZE*p->spc);
+    RClusters(p,buf2,cur_dir_cluster,1,FALSE);
+
+    ptr=buf2-offset(LTDirEntry.start);
+    buf=MAlloc(ptr->size);
+    RClusters(p,buf,cur_dir_cluster,ptr->size/BLK_SIZE/p->spc,FALSE);
+    Free(buf2);
+
+    ptr=buf-offset(LTDirEntry.start);
+    cnt=ptr->size/LT_DIR_ENTRY_SIZE;
+    ptr->name[0]='.';
+    ptr->name[1]=0;
+    while (cnt--) {
+      ch=ptr->name[0];
+      if (!ch)
+	break;
+      else if (!(ptr->attr & LT_ATTR_DELETED) && ch!='.' && (del_dir ||
+	     !(ptr->attr & LT_ATTR_DIR))) {
+	if (WildFileNameList(wild,ptr->name)) {
+	  if (print_msg)
+	    coutln SysText("ST_DELETE"),ptr->name;
+	  ptr->attr|=LT_ATTR_DELETED;
+	  WBlks(p,buf+j*BLK_SIZE,
+	     p->data+cur_dir_cluster*p->spc+j,1,FALSE);
+	  FreeLTClusters(p,ptr->cluster,
+	      (ptr->size+p->spc*BLK_SIZE-1)/(p->spc*BLK_SIZE),FALSE);
+	}
+      }
+      ptr+=LT_DIR_ENTRY_SIZE;
+      if (++i>=l) {
+	j++;
+	i=0;
+      }
+    }
+    Free(buf);
+    UnlockPartition(p);
+  } catch
+    UnlockPartition(p);
+  return FALSE;
+}
+
+U8 WriteLTFile(LTPartition *p,I1 *cur_dir,I1 *name,U1 *buf,U8 size,
+		LTDate LTdatetime,U8 attr,BoolU4 raw,
+		ArcCompressStruct **ac2)
+{
+  LTDirEntry de;
+  U8 c=0;
+  U8 flags=0,cluster_cnt,
+	cluster_size=BLK_SIZE*p->spc;
+  ArcCompressStruct *ac=NULL;
+  BoolU4 contiguous;
+  U8 cur_dir_cluster=NameToDirCluster(p,cur_dir,TRUE);
+  MemSet(&de,0,sizeof(LTDirEntry));
+  if (ac2) *ac2=NULL;
+  if (!LTdatetime)
+    LTdatetime=GetCurTimeLTDate;
+
+  if (p->type!=PT_LT)
+    PutSysText("ST_NOT_LT");
+  else if (!ToLTFilename(de.name,name))
+    PutSysText("ST_INVALID_FILENAME");
+  else {
+    DelLTFiles(p,cur_dir,de.name,FALSE,FALSE);
+    attr=FileAttr(name,attr);
+    attr|=LT_ATTR_CONTIGUOUS;
+    contiguous=TRUE;
+    de.expanded_size=size;
+    if ((attr & LT_ATTR_COMPRESSED) && !raw) {
+      ac=CompressBuf(buf,size,flags);
+      size=ac->compressed_size;
+      buf=ac;
+    }
+    de.size=size;
+    de.xsum=ArcCheckSum(buf,size)^LT_XSUM;
+    cluster_cnt=(size+cluster_size-1)/cluster_size;
+    if (cluster_cnt)
+      c=AllocClusters(p,0,cluster_cnt,contiguous,TRUE);
+    else
+      c=INVALID_CLUSTER;
+    de.cluster=c;
+    de.attr=attr;
+    de.datetime=LTdatetime;
+    disk_status_display.u2[1]=0x8000+cluster_cnt;
+    if (cluster_cnt)
+      WClusters(p,buf,c,cluster_cnt,TRUE,TRUE);
+    disk_status_display.u2[1]=0;
+    NewLTDirEntry2(p,cur_dir,&de,TRUE,TRUE);
+    if (ac2)
+      *ac2=ac;
+    else
+      Free(ac);
+  }
+  return c;
+}
+
+void DelLTDirEntry(LTDirEntry *tempm)
+{
+  if (tempm) {
+    Free(tempm->full_name);
+    Free(tempm);
+  }
+}
+
+void DelLTDirList(LTDirEntry *tempm)
+{
+  LTDirEntry *tempm2;
+  while (tempm) {
+    tempm2=tempm->next;
+    if (tempm->sub)
+      DelLTDirList(tempm->sub);
+    DelLTDirEntry(tempm);
+    tempm=tempm2;
+  }
+}
+
+LTDirEntry *FindLTFiles(I1 *wild,U8 *fuf_flags)
+{
+  LTPartition *p=Fs->cur_partition;
+  LTDirEntry *buf,*buf2,*ptr;
+  U8 cnt,cur_dir_cluster=NameToDirCluster(p,Fs->cur_dir,FALSE);
+  U1 ch;
+  LTDirEntry *result=NULL,*tempm;
+
+    LockPartition(p);
+    buf2=MAlloc(BLK_SIZE*p->spc);
+    RClusters(p,buf2,cur_dir_cluster,1,FALSE);
+
+    ptr=buf2-offset(LTDirEntry.start);
+    buf=MAlloc(ptr->size);
+    RClusters(p,buf,cur_dir_cluster,ptr->size/BLK_SIZE/p->spc,FALSE);
+    Free(buf2);
+
+    ptr=buf-offset(LTDirEntry.start);
+    cnt=ptr->size/LT_DIR_ENTRY_SIZE;
+    ptr->name[0]='.';
+    ptr->name[1]=0;
+    ptr+=LT_DIR_ENTRY_SIZE;
+    ptr->cluster=NameToParentDirCluster(p,Fs->cur_dir,FALSE);
+    ptr-=LT_DIR_ENTRY_SIZE;
+    while (cnt--) {
+      ch=ptr->name[0];
+      if (!ch)
+	break;
+      else if (!(ptr->attr & LT_ATTR_DELETED)) {
+	tempm=MAllocZ(sizeof(LTDirEntry));
+	MemCpy(&tempm->attr,&ptr->attr,LT_DIR_ENTRY_SIZE);
+	if (Bt(fuf_flags,FUf_RECURSE) && tempm->attr & LT_ATTR_DIR && tempm->name[0]!='.') {
+	  tempm->next=result;
+	  result=tempm;
+	  tempm->full_name=AbsoluteDirName(tempm->name);
+	  UnlockPartition(p);
+	  Cd(tempm->name);
+	  tempm->sub=FindLTFiles(wild,fuf_flags);
+	  Cd("..");
+	  LockPartition(p);
+	} else if ((!(tempm->attr & LT_ATTR_DIR) && !Bt(fuf_flags,FUf_JUST_DIRS)
+		   || !Bt(fuf_flags,FUf_RECURSE)) &&
+      	   WildFileNameList(wild,tempm->name)) {
+	  tempm->next=result;
+	  result=tempm;
+	  tempm->full_name=AbsoluteFileName(tempm->name);
+	} else
+	  DelLTDirEntry(tempm);
+      }
+      ptr+=LT_DIR_ENTRY_SIZE;
+    }
+    Free(buf);
+    UnlockPartition(p);
+  return result;
+}
+
+LTDirEntry *FindISOFiles(I1 *wild,U8 *fuf_flags)
+{
+  LTPartition *p=Fs->cur_partition;
+  ISODirEntry *buf,*isoptr;
+  U8 cur_dir_cluster=NameToDirCluster(p,Fs->cur_dir,TRUE);
+  LTDirEntry *result=NULL,*tempm;
+  I8 i;
+
+  isoptr=MAlloc(BLK_SIZE*p->spc);
+  RClusters(Fs->cur_partition,isoptr,cur_dir_cluster,1,TRUE);
+  if (isoptr->name_len==1 && isoptr->name==0) { //curdir
+    i=(isoptr->size.little+BLK_SIZE*p->spc-1)/(BLK_SIZE*p->spc);
+    buf=MAlloc(BLK_SIZE*p->spc*i);
+    RClusters(Fs->cur_partition,buf,cur_dir_cluster,i,TRUE);
+    Free(isoptr);
+  } else {
+    buf=isoptr;
+    i=1;
+  }
+  i*=BLK_SIZE*p->spc;
+  while (i>0) {
+    if (!buf->length) {
+      buf++;
+      i--;
+    } else {
+      tempm=MAlloc(sizeof(LTDirEntry));
+      if (FillLTDirISO(Fs->cur_partition,tempm,buf,TRUE)) {
+	if (Bt(fuf_flags,FUf_RECURSE) && tempm->attr & LT_ATTR_DIR && tempm->name[0]!='.') {
+	  tempm->next=result;
+	  result=tempm;
+	  tempm->full_name=AbsoluteDirName(tempm->name);
+	  Cd(tempm->name);
+	  tempm->sub=FindISOFiles(wild,fuf_flags);
+	  Cd("..");
+	} else if ((!(tempm->attr & LT_ATTR_DIR) && !Bt(fuf_flags,FUf_JUST_DIRS)
+		   || !Bt(fuf_flags,FUf_RECURSE)) &&
+      	   WildFileNameList(wild,tempm->name)) {
+	  tempm->next=result;
+	  result=tempm;
+	  tempm->full_name=AbsoluteFileName(tempm->name);
+	} else
+	  DelLTDirEntry(tempm);
+      } else
+	DelLTDirEntry(tempm);
+      i-=buf->length;
+      buf+=buf->length;
+    }
+  }
+  Free(buf);
+  return result;
+}
+
+
+I8 CompareLTDir(LTDirEntry **e1,LTDirEntry **e2)
+{
+  I1 buf1[LT_MAX_FILENAME_LEN+1],buf2[LT_MAX_FILENAME_LEN+1];
+  I1 buf3[LT_MAX_FILENAME_LEN+1],buf4[LT_MAX_FILENAME_LEN+1];
+  I8 d1=0,d2=0;
+  if ((*e1)->attr & LT_ATTR_DIR)
+    d1=1;
+  if ((*e2)->attr & LT_ATTR_DIR)
+    d2=1;
+  if (d1!=d2)
+    return d2-d1;
+  else {
+    StrCpy(buf1,(*e1)->name);
+    StrCpy(buf2,(*e2)->name);
+    RemoveLastSeg(buf1,".",buf3);
+    RemoveLastSeg(buf2,".",buf4);
+    if (d1=StrCmp(buf3,buf4))
+      return d1;
+    return StrCmp(buf1,buf2);
+  }
+}
+
+
+void SortLTDirFiles(LTDirEntry **tempm)
+{
+  I8 i,cnt=0;
+  LTDirEntry *tempm1=*tempm,*tempm2,**sort_buf;
+  if (tempm1) {
+    tempm2=tempm1;
+    while (tempm2) {
+      cnt++;
+      tempm2=tempm2->next;
+    }
+    sort_buf=MAlloc(cnt*PTR_SIZE);
+    i=0;
+    tempm2=tempm1;
+    while (tempm2) {
+      sort_buf[i++]=tempm2;
+      tempm2=tempm2->next;
+    }
+    QSort(sort_buf,cnt,PTR_SIZE,&CompareLTDir);
+    tempm1=sort_buf[0];
+    *tempm=tempm1;
+    for (i=0;i<cnt-1;i++) {
+      tempm2=sort_buf[i];
+      tempm2->next=sort_buf[i+1];
+    }
+    tempm2=sort_buf[i];
+    tempm2->next=NULL;
+    Free(sort_buf);
+
+    tempm2=tempm1;
+    while (tempm2) {
+      if (tempm2->sub)
+	SortLTDirFiles(&tempm2->sub);
+      tempm2=tempm2->next;
+    }
+  }
+}
+
+LTDirEntry *SysFindFiles(I1 *wild,U8 *fuf_flags=NULL)
+{
+  LTPartition *p=Fs->cur_partition;
+  LTDirEntry *result=NULL;
+  U8 my_flags=0;
+  if (!fuf_flags) fuf_flags=&my_flags;
+  CheckLTPartition(p);
+  if (p->type==PT_LT)
+    result=FindLTFiles(wild,fuf_flags);
+  else if (p->type==PT_ISO9660)
+    result=FindISOFiles(wild,fuf_flags);
+  else {
+    PutSysText("ST_FILE_SYSTEM_NOT_SUPPORTED");
+    result=NULL;
+  }
+  SortLTDirFiles(&result);
+  return result;
+}
+
+
+void PutFileLink(I1 *name,I8 line=0,BoolU4 plain_text=FALSE)
+{
+  I1 *buf;
+  if (!name) return;
+  buf=AbsoluteFileName(name);
+  if (plain_text) {
+    if (line)
+      PrintF("$$LK \"%s,%04d\",\"PL:%s,%d\"$$",
+	name,line,buf,line);
+    else
+      PrintF("$$LK \"%s\",\"PI:%s\"$$",
+	name,buf);
+  } else {
+    if (line)
+      PrintF("$$LK \"%s,%04d\",\"FL:%s,%d\"$$",
+	name,line,buf,line);
+    else
+      PrintF("$$LK \"%s\",\"FI:%s\"$$",
+	name,buf);
+  }
+  Free(buf);
+}
+
+void PutDirLink(I1 *name)
+{
+  I1 *buf;
+  if (!name) return;
+  buf=AbsoluteDirName(name);
+  PrintF("$$MA +A \"%s\",\"Cd(\\\"%s\\\");Dir;\r\"$$",
+      name,buf);
+  Free(buf);
+}
+
+void DirLT(I1 *wild,BoolU4 full)
+{
+  LTPartition *p=Fs->cur_partition;
+  LTDirEntry *tempm1=NULL,*tempm2;
+  U8 my_flags=0;
+  I1 *st;
+  tempm1=SysFindFiles(wild,&my_flags);
+
+  if (tempm1) {
+    st=CurDir;
+    if (full)
+      coutln "Directory of ",st,
+	"\r\n__DATE__ __TIME__ __SIZE__";
+    else
+      coutln "Directory of ",st,
+	"\r\nDATE_ TIME_ __SIZE__";
+    Free(st);
+    while (tempm1) {
+      tempm2=tempm1->next;
+      if (full) {
+	PrintF("%D %T %08X ",
+	  tempm1->datetime.date,
+	  tempm1->datetime.time,
+	  tempm1->size);
+	cout " ",tempm1->expanded_size,
+	     " ",tempm1->cluster;
+      } else {
+	PrintF("%h1D %h1T %08X ",
+	  tempm1->datetime.date,
+	  tempm1->datetime.time,
+	  tempm1->size);
+      }
+      if (tempm1->attr & LT_ATTR_DIR)
+	PutDirLink(tempm1->name);
+      else
+	PutFileLink(tempm1->name);
+
+      CrLf;
+      DelLTDirEntry(tempm1);
+      tempm1=tempm2;
+    }
+  } else {
+    PutSysText("ST_NO_MATCHING_ENTRIES");
+    return;
+  }
+}
+
+ 

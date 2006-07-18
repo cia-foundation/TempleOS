@@ -1,0 +1,32 @@
+extern I8 PopUp(I1 *msg,TssStruct *parent=NULL);
+extern U8 LtfPutChar(Ltf *l,I8 ch, U8 sc,BoolU4 old_preempt);
+extern void LeftClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2);
+extern void RightClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2);
+extern U8 GetMsg(I8 *param1,I8 *param2,U8 mask=-2,TssStruct *tss=NULL);
+extern U8 GetMsgNoWait(I8 *param1,I8 *param2,U8 mask=-2,TssStruct *tss=NULL);
+extern void LtfInsert(Ltf *l,LtfEntry *ll);
+extern LtfEntry *LtfPutS(Ltf *l,I1 *st);
+extern I8 PopUpMenu(Ltf *l,I1 *help=NULL);
+extern Ltf *LtfNew();
+extern void LtfDel(Ltf *l,BoolU4 root_mem=FALSE);
+extern LtfEntry *LtfPrintF(Ltf *l,I1 *src,...);
+extern void DrawBorder(BoolU4 solid,I8 l,I8 r,I8 t,I8 b,U1 attr,BoolU4 clip);
+extern void EditInsertLtf(Ltf *l,Ltf *b);
+extern Ltf *LtfRead(I1 *name,U8 flags=0);
+extern BoolU4 View();
+extern BoolU4 IsPixelCovered(TssStruct *tss,I8 x,I8 y);
+extern void PlotInputPointer();
+extern void GrCircle(GrBitMap *base,I8 cx,I8 cy,I8 radius,
+  I8 step=1,double start_rad=0,double len_rad=pi2);
+extern void GrPlot0(GrBitMap *base,I8 x,I8 y);
+extern void ClearAllBpts(Ltf *l);
+extern void ToggleBpt(Ltf *l,I8 line_offset=0,U8 flags=SBPTF_BPT);
+extern void LtfGo();
+extern void LtfStep(Ltf *l);
+extern void Lpt1PutChar(U1 ch);
+extern void WsFillin(I8 n);
+extern void WsMan(I8 n,TssStruct *parent=NULL);
+extern void WsTsk();
+extern TssStruct *ws_task;
+extern void Edit(I1 *filename);
+

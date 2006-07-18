@@ -1,0 +1,133 @@
+$WW,1$
+
+$IV,1$----07/18/06 10:25:00----$IV,0$
+* Unmask IRQ's during mouse polling.  Might have side-effects.
+
+$IV,1$----07/16/06 11:44:46----$IV,0$
+* Changed "Message" to "Msg"
+* Expanded serial communication
+* Cleaned-up externs in Adam directory
+
+$IV,1$----07/13/06 09:22:24----$IV,0$
+* Fixed some bugs in disassembler.
+
+$IV,1$----07/12/06 16:47:29----$IV,0$
+* Modified FlagsStruct converting from 128-bit to 64-bit.
+* Fixed bad default flag in $LK,"FileOccurrences","MN:FileOccurrences"$().
+* Fixed bug in FindFile for CD-ROM.  Cd() result was bad.
+
+$IV,1$----07/11/06 17:51:02----$IV,0$
+* Probably fixed problem with SHIFT or CTRL keys getting locked on.
+
+$IV,1$----07/11/06 09:02:06----$IV,0$
+* Fixed bugs with use of HOME directory in Cd() and other spots.  Wasn't changing partitions to the home drive.
+* Moved $LK,"FindFiles","MN:FindFiles"$() to $LK,"SysFindFiles","MN:SysFindFiles"$() and enveloped it so it now supports specifying directories.
+
+$IV,1$----07/11/06 04:43:20----$IV,0$
+* Changed $LK,"Dir","MN:Dir"$() listing--shortened date/time, sorts by filename extension.
+* Moved stuff around in files
+
+$IV,1$----07/10/06 10:46:36----$IV,0$
+* Combined Ltf flags and flags2
+
+$IV,1$----07/10/06 04:24:01----$IV,0$
+* sped-up screen update
+* Enhanced $LK,"ProfRep","MN:ProfRep"$();
+* Increased RAM disk size from 2880 blks to 8192 blks.  This is the 'B' drive.
+
+$IV,1$----07/08/06 05:27:06----$IV,0$
+* Changed music_tempo.  It is now a recripocal and a different scale.
+$IV,1$
+----07/08/06 00:07:23----$IV,0$
+* Changed eigth note tripolets in $LK,"Play","MN:Play"$() from 'S' to "et".
+
+$IV,1$----07/06/06 23:33:18----$IV,0$
+* Fixed $LK,"Edit","MN:Edit"$() menu so that it is active when you click commands.
+* Fixed $LK,"WriteCdImage","MN:WriteCdImage"$() to use proper path in filename.
+
+$IV,1$----07/03/06 23:53:32----$IV,0$
+* Converted some compression routines to asm to speed things up.
+
+$IV,1$----07/01/06 22:30:45----$IV,0$
+* Improved $LK,"::/LT/DEMO/WinMgr2.CPZ","FI:::/LT/DEMO/WinMgr2.CPZ"$.  You really should try it.  It demo's the Ode feature.
+
+$IV,1$----07/01/06 03:55:58----$IV,0$
+* Sped-up compiler$IV,1$
+
+----06/30/06 21:55:59----$IV,0$
+* Fixed some memory leaks in compiler.
+* Changed syntax for type casting.  Now, requires parenthesis.  It's designated with "><(class *)" and it is post-fix.
+$IV,1$----06/30/06 16:40:43----$IV,0$
+* Fixed compiler bugs
+
+$IV,1$----06/29/06 03:32:32----$IV,0$
+* Added $LK,"CurDir","MN:CurDir"$() which returns both drive and directory.
+* Fixed $LK,"CopyTree","MN:CopyTree"$()
+$IV,1$
+----06/28/06 11:13:23----$IV,0$
+* Made major improvement in screen update speed.
+* Sped-up compile time a little
+
+$IV,1$----06/28/06 05:30:34----$IV,0$
+* Added significant compiler optimization
+* Probably fixed bug on Install option for distributed CD-ROMs  (fixed SysGetChar)
+$IV,1$
+----06/27/06 23:32:19----$IV,0$
+* Added minor compiler optimization
+
+$IV,1$----06/27/06 21:20:14----$IV,0$
+* Fixed bug with F2 macro
+* Added minor compiler optimization
+
+$IV,1$----06/27/06 03:50:53----$IV,0$
+* Added compiled_lines to wallpaper
+
+$IV,1$----06/26/06 22:43:23----$IV,0$
+* Fixed $LK,"GrCircle","MN:GrCircle"$() and $LK,"Circle","MN:Circle"$();
+* Added minor compiler optimization.
+* Fixed bug in editor involving cursor-up on nontext widgets.
+* Fixed lacking feature with CTRL-R, adding "END" for text insert points.
+
+$IV,1$
+----06/25/06 19:13:38----$IV,0$
+* Altered the way string constants and Pictures are stored when compiled so that it looks like it is on the heap.  This might fix lots of bugs.  
+* Added $LK,"LtfPutGrElem","MN:LtfPutGrElem"$();
+See $LK,"::/LT/DEMO/Graphics/Sprite3.CPZ","FI:::/LT/DEMO/Graphics/Sprite3.CPZ"$.
+$IV,1$
+----06/24/06 18:20:28----$IV,0$
+* fixed missed optimization in compiler--code is smaller and faster
+
+$IV,1$----06/20/06 19:36:07----$IV,0$
+* $BK,1$WARNING$BK,0$: swapped keyboard scan-code flags SCf_KEY_UP and SCf_E0_PREFIX.  If you have a EditPlugIn, you might need to change it. See $LK,"My_EditPlugIns","FF:::/LT/ACCOUNTS/ADAM3.CPZ,My_EditPlugIns"$.
+* Added numeric keypad support
+* Added HOME/END keys to editor
+ $IV,1$
+----06/20/06 13:00:25----$IV,0$
+* $BK,1$WARNING$BK,0$: renamed "trap" to "except"
+* renamed "heap_cache" stuff to "heap_hash".
+
+$IV,1$----06/14/06 21:01:01----$IV,0$
+* Fixed a word-wrap bug, pretty-much.
+$IV,1$
+----06/12/06 06:02:07----$IV,0$
+* Fixed bug on cursor movement in forms.
+* Added $LK,"::/LT/DEMO/WinMgr2.CPZ","FI:::/LT/DEMO/WinMgr2.CPZ"$
+
+$IV,1$----06/10/06 15:29:42----$IV,0$
+* worked on mouse and mouse wheel
+* modified $LK,"Grep","MN:Grep"$() to return match count.
+* added $LK,"FileOccurrences","MN:FileOccurrences"$() 
+$IV,1$
+----06/07/06 15:08:58----$IV,0$
+* Implemented Scroll-Lock
+* Sets keyboard LEDs
+* Added BSplines
+
+$IV,1$----06/05/06 12:47:59----$IV,0$
+* implemented returns out of catch{}
+$IV,1$----06/05/06 08:51:40----$IV,0$
+* fixed bug in exception handling and implenmented returns out of try{} but not catch {} statements. 
+$IV,1$----06/04/06 07:39:40----$IV,0$
+* Added array nd structure initialization for global variables
+$IV,1$----05/20/06 04:20:38----$IV,0$
+* Added F4 and SHIFT-F4 for picking directories and files.

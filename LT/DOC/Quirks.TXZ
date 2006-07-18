@@ -1,0 +1,9 @@
+$WW,1$* Call $LK,"ChangeDisk","MN:ChangeDisk"$() when you insert a new removable media.
+* You can only $FG,2$extern$FG$ something once.  There is a varient called $FG,2$LTextern$FG$ which binds a C+ definition to a asm symbol.  This, too, can only be done once.
+* Use $FG,2$MulI8,MulU8,DivI8,DivU8,ModI8,ModU8$FG$ when doing 64-bit arithmetic, except if 32-bit results are guarenteed.  When I move to a true 64-bit CPU, these won't be needed.
+* $FG,2$switch/case$FG$ statements allocate a single jump table--do not use with wide, sparce ranges of case values.  Eventually, this might be fixed.
+* Don't use default string constant parameters on functions compiled in $LK,"Static Compiled Mode","FF:::/LT/DOC/OSGlossary.GLZ,Static Compiled Mode"$ because there is a bug.
+* A $LK,"Cd","MN:Cd"$() cmd must be followed by two semicolons if a $FG,2$#include$FG$ is after it.  This is because the precompiler processes the next instruction early.
+* The last semicolon on the cmd line is converted to a double semicolon because the compiler looks ahead before doing a cmd.  This normally has no negative effect, but when entering "$FG,2$if$FG$" statements with "$FG,2$else$FG$" clauses it presents problems.
+* You cannot use $FG,2$$$IB$$,$$IT$$ or $$IS$$$FG$ at the command line or before the $LK,"::/LT/ADAM/EDIT.CPZ","FI:::/LT/ADAM/EDIT.CPZ"$ file has been included during start-up.
+* The assembler error messages are often off by a line and undefines are cryptic.
