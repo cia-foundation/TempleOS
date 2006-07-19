@@ -35,7 +35,7 @@
 #define RMT_RQST_EXE_LOCAL	0x06
 #define RMT_RQST_PUTS_CNT	0x07
 
-#define RMT_RQST_MAX		0x07
+#define RMT_RQST_MAX		0x08
 
 U8 comm_base[5]={0,0x3F8,0x2F8,0x3E8,0x2E8};
 U1Fifo *comm_Rx_fifos[5]={NULL,NULL,NULL,NULL,NULL};
@@ -454,7 +454,7 @@ rr_start:
   RmtRxPktU1(chnl,&b1,JIFFY_FREQ/50,&esc);
 rr_cont:
   if (b==RMT_PKT_REQUEST) {
-    if (b1>RMT_RQST_MAX) {
+    if (b1>=RMT_RQST_MAX) {
       if (b1==RMT_PKT_REQUEST && !esc)
 	goto rr_cont;
       else
@@ -563,6 +563,8 @@ public U8 RmtGetMsg(LTChnl *chnl,I8 *p1,I8 *p2)
     *p2=b[16]><(U8);
     if (!cmd)
       chnl->null_msg_jiffy=jiffies+JIFFY_FREQ/50;
+    else
+      chnl->null_msg_jiffy=0;
   }
   return cmd;
 }
@@ -576,8 +578,10 @@ public void RmtSendMsg(LTChnl *chnl,U8 cmd,I8 p1,I8 p2)
     b[8]><(U8)=p1;
     b[16]><(U8)=p2;
     RmtTxPkt(chnl,b,sizeof(U8)*3);
-  } else
+  } else {
     RmtTxPkt(chnl,b,1);
+    chnl->null_msg_cnt++;
+  }
 }
 
 public void RmtPutCharSC(LTChnl *chnl,I8 ch,U8 sc)
@@ -614,11 +618,15 @@ public void RmtTxFile(LTChnl *chnl,I1 *filename,
 {
   U8 size;
   U1 *buf;
+  LTDirEntry de;
   if (!chnl || !chnl->type) return;
-  buf=ReadFile(filename,&size,NULL,raw);
-  if (buf) {
-    RmtTxBuf(chnl,buf,size);
-    Free(buf);
+  if (FindFile(filename,&de)) {
+    buf=ReadFile(filename,&size,NULL,raw);
+    if (buf) {
+      RmtTxBuf(chnl,&de.start,LT_DIR_ENTRY_SIZE);
+      RmtTxBuf(chnl,buf,size);
+      Free(buf);
+    }
   }
 }
 
@@ -626,12 +634,16 @@ public U8 RmtRxFile(LTChnl *chnl,I1 *filename,
   BoolU4 raw=TRUE)
 {
   U8 size;
-  U1 *buf;
+  U1 *buf,*buf1;
+  LTDirEntry *de;
   if (!chnl || !chnl->type) return 0;
+  buf1=RmtRxBuf(chnl);
+  de=buf1-offset(LTDirEntry.start);
   if (buf=RmtRxBuf(chnl,&size)) {
-    WriteFile(filename,buf,size,0,0,raw);
+    WriteFile(filename,buf,size,de->datetime,de->attr,raw);
     Free(buf);
   }
+  Free(buf1);
   return size;
 }
 
@@ -676,23 +688,23 @@ public I1 *RmtRxPutS(LTChnl *chnl,U8 *rqst=NULL)
   return buf;
 }
 
-/***************
-public U1 *RmtRqstTxBuf(U8 *size=NULL)
+public U1 *RmtRqstTxBuf()
 {
+//Remote must fill-in remote's chnl->tx_buf
+//and remote's chnl->tx_size before calling.
   LTChnl *chnl=Fs->rmt_chnl;
   if (!chnl || !chnl->type) return NULL;
   RmtTxPkt(chnl,NULL,0,RMT_RQST_TX_BUF);
-  return RmtRxBuf(chnl,size);
+  return RmtRxBuf(chnl);
 }
 
-public void RmtRqstRxBuf(U1 *buf,U8 size)
-{
+public void RmtRqstRxBuf(U1 *src_local_buf,U8 size)
+{ //Dst buf address is placed in remote's chnl->rx_buf
   LTChnl *chnl=Fs->rmt_chnl;
   if (!chnl || !chnl->type) return;
   RmtTxPkt(chnl,NULL,0,RMT_RQST_RX_BUF);
-  RmtTxBuf(chnl,buf,size);
+  RmtTxBuf(chnl,src_local_buf,size);
 }
-*************/
 
 public void RmtRqstTxFile(I1 *dst_local_filename,I1 *src_remote_filename)
 {
@@ -736,7 +748,8 @@ void TelnetGuestOpen(LTChnl *chnl)
   U8 i,cmd,p1,p2,rqst;
   U1 *st,*st2;
   if (!chnl || !chnl->type) return;
-  coutln "CTRL-ALT-C to exit";
+  Fs->local_chnl=chnl;
+  coutln "CTRL-ALT-B to break";
   try
     while (TRUE) {
       if (st2=RmtRxPutS(chnl,&rqst)) {
@@ -749,6 +762,12 @@ void TelnetGuestOpen(LTChnl *chnl)
 	      1<<MSG_KEY_DOWN|
 	      1<<MSG_CMD|
 	      1<<MSG_KEY_UP);
+	    if (cmd==MSG_KEY_DOWN &&
+	      p2&SCF_ALT && p2&SCF_CTRL &&
+	      p1==CH_CTRLB) {
+		RmtSendMsg(chnl,0,0,0);
+		goto tel_exit;
+	    }
 	    RmtSendMsg(chnl,cmd,p1,p2);
 	    break;
 	  case RMT_RQST_TX_FILE:
@@ -761,13 +780,12 @@ void TelnetGuestOpen(LTChnl *chnl)
 	    RmtRxFile(chnl,st);
 	    Free(st);
 	    break;
-/***********
 	  case RMT_RQST_TX_BUF:
+	    RmtTxBuf(chnl,chnl->tx_buf,chnl->tx_size);
 	    break;
 	  case RMT_RQST_RX_BUF:
-	    RmtRxBuf(chnl);
+	    chnl->rx_buf=RmtRxBuf(chnl);
 	    break;
-************/
 	  case RMT_RQST_EXE_LOCAL:
 	    st=RmtRxBuf(chnl);
 	    ExecuteString(st);
@@ -786,11 +804,15 @@ void TelnetGuestOpen(LTChnl *chnl)
     }
   catch
     Fs->catch_except=TRUE;
+tel_exit:
+/******
   for (i=0;i<5;i++) {
     chnl->PutChar(chnl,RMT_PKT_CLOSE);
     chnl->PutChar(chnl,RMT_PKT_CLOSE);
     Sleep(50);
   }
+******/
+  Fs->local_chnl=NULL;
 }
 
 ext[EXT_RMT_PUTCHAR]=&RmtTxPutChar;

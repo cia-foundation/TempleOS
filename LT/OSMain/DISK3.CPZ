@@ -1499,7 +1499,7 @@ BoolU4 NewLTDirEntry2(LTPartition *p,I1 *cur_dir,LTDirEntry *de,BoolU4 free_old_
       ch=ptr->name[0];
       if (!ch) {
 	if (written) break;
-	MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	MemCpy(&ptr->start,&de->start,LT_DIR_ENTRY_SIZE);
 	if ((i+1)*LT_DIR_ENTRY_SIZE+j*BLK_SIZE<dir_size)
 	  WBlks(p,buf+j*BLK_SIZE,
 	     p->data+cur_dir_cluster*p->spc+j,1,FALSE);
@@ -1545,7 +1545,7 @@ BoolU4 NewLTDirEntry2(LTPartition *p,I1 *cur_dir,LTDirEntry *de,BoolU4 free_old_
 	break;
       } else if (ptr->attr & LT_ATTR_DELETED) {
 	if (!written) {
-	  MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	  MemCpy(&ptr->start,&de->start,LT_DIR_ENTRY_SIZE);
 	  WBlks(p,buf+j*BLK_SIZE,
 	     p->data+cur_dir_cluster*p->spc+j,1,FALSE);
 	  written=TRUE;
@@ -1556,7 +1556,7 @@ BoolU4 NewLTDirEntry2(LTPartition *p,I1 *cur_dir,LTDirEntry *de,BoolU4 free_old_
 	    FreeLTClusters(p,ptr->cluster,
 	      (ptr->size+p->spc*BLK_SIZE-1)/(p->spc*BLK_SIZE),FALSE);
 	  if (!written) {
-	    MemCpy(&ptr->attr,&de->attr,LT_DIR_ENTRY_SIZE);
+	    MemCpy(&ptr->start,&de->start,LT_DIR_ENTRY_SIZE);
 	    WBlks(p,buf+j*BLK_SIZE,
 	       p->data+cur_dir_cluster*p->spc+j,1,FALSE);
 	    break;
@@ -1742,7 +1742,7 @@ LTDirEntry *FindLTFiles(I1 *wild,U8 *fuf_flags)
 	break;
       else if (!(ptr->attr & LT_ATTR_DELETED)) {
 	tempm=MAllocZ(sizeof(LTDirEntry));
-	MemCpy(&tempm->attr,&ptr->attr,LT_DIR_ENTRY_SIZE);
+	MemCpy(&tempm->start,&ptr->start,LT_DIR_ENTRY_SIZE);
 	if (Bt(fuf_flags,FUf_RECURSE) && tempm->attr & LT_ATTR_DIR && tempm->name[0]!='.') {
 	  tempm->next=result;
 	  result=tempm;
@@ -1981,4 +1981,3 @@ void DirLT(I1 *wild,BoolU4 full)
   }
 }
 
- 

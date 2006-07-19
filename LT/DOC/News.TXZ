@@ -1,5 +1,8 @@
 $WW,1$
 
+$IV,1$----07/19/06 21:44:00----$IV,0$
+* Worked on serial port null modem support.  You can network two computers and do a telnet type thing.  There is now a $LK,"RmtMergeChk","MN:RmtMergeChk"$() routine which will sync two computers.  One has to have a window running $LK,"TelnetHostOpen","MN:TelnetHostOpen"$() which you pass a channel from $LK,"CommOpen8N1","MN:CommOpen8N1"$().
+
 $IV,1$----07/18/06 10:25:00----$IV,0$
 * Unmask IRQ's during mouse polling.  Might have side-effects.
 

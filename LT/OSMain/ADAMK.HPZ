@@ -1462,6 +1462,10 @@ class LTChnl
   U8 port;
   U8 baud;
   U8 null_msg_jiffy;
+  U8 null_msg_cnt;
+  U8 tx_size;
+  U1 *tx_buf;
+  U1 *rx_buf;
   void PutChar(LTChnl *chnl,U1 b);
   U1 GetChar(LTChnl *chnl);
   BoolU4 ScanChar(LTChnl *chnl,U1 *ch);
@@ -1609,6 +1613,7 @@ public class TssStruct
   U4	answers_displayed;
   TssStruct *dbg_tss;
   TssStruct *popup_tss;
+  LTChnl    *local_chnl;
   LTChnl    *rmt_chnl;
   U4	user_aux0;
   U4	user_aux1;
@@ -1685,10 +1690,12 @@ public class MachineRegsStruct
 #define CH_LINE_FEED		0x0A
 #define CH_FORM_FEED		0x0C
 #define CH_CR			0x0D
-#define CH_ESC			27
+#define CH_ESC			0x1B
+#define CH_CTRLB		0x02
+#define CH_CTRLE		0x05
 #define CH_CTRLQ		0x11
-#define CH_SHIFT_SPACE		31
-#define CH_SPACE		32
+#define CH_SHIFT_SPACE		0x1F
+#define CH_SPACE		0x20
 
 #define SC_CR			0x1C
 #define SC_SHIFT		0x2A
@@ -2328,6 +2335,7 @@ class PasswordStruct
 #define FUf_PUBLIC		8
 #define FUf_MAP			9
 #define FUf_JUST_DIRS		10
+#define FUf_JUST_TEXT_FILES	11
 
 class FlagsStruct
 {

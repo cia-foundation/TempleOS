@@ -756,7 +756,7 @@ U8 SizeFlattenLTDirTree(LTDirEntry *tempm)
 {
   U8 result=0;
   while (tempm) {
-    result+=sizeof(LTDirEntry)-offset(LTDirEntry.start)+1;
+    result+=LT_DIR_ENTRY_SIZE+1;
     if (tempm->attr & LT_ATTR_DIR)
       result+=SizeFlattenLTDirTree(tempm->sub);
     tempm=tempm->next;
@@ -770,7 +770,7 @@ U8 FillFlattenLTDirTree(LTDirEntry *tempm,U1 *dst)
   while (tempm) {
     *dst++=1;
     result++;
-    i=sizeof(LTDirEntry)-offset(LTDirEntry.start);
+    i=LT_DIR_ENTRY_SIZE;
     MemCpy(dst,&tempm->start,i);
     dst+=i;
     result+=i;
@@ -790,7 +790,7 @@ public U1 *FlattenLTDirTree(LTDirEntry *tempm,U8 *size=NULL)
   U8 i=SizeFlattenLTDirTree(tempm);
   U1 *buf=MAlloc(i);
   FillFlattenLTDirTree(tempm,buf);
-  if (*size) *size=i;
+  if (size) *size=i;
   return buf;
 }
 
@@ -801,7 +801,7 @@ U1 *DoUnflattenLTDirTree(U1 *src,LTDirEntry **tempm)
   if (*src++) {
     tempm1=MAllocZ(sizeof(LTDirEntry));
     *tempm=tempm1;
-    i=sizeof(LTDirEntry)-offset(LTDirEntry.start);
+    i=LT_DIR_ENTRY_SIZE;
     MemCpy(&tempm1->start,src,i);
     src+=i;
     if (tempm1->attr & LT_ATTR_DIR)
@@ -818,4 +818,3 @@ public LTDirEntry *UnflattenLTDirTree(U1 *src)
   DoUnflattenLTDirTree(src,&tempm);
   return tempm;
 }
- 

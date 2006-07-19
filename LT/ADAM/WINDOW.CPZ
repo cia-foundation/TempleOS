@@ -413,8 +413,8 @@ void InputFilterTask()
   I1 *st;
   TssCmdStruct *tempc,*tempc1;
   BoolU4 old_filter;
-  InitUserTask;
   Preempt(OFF);
+  InitUserTask;
   Bts(&Fs->task_flags,TSSf_INPUT_FILTER_TASK);
   old_filter=Bts(&Fs->parent_tss->task_flags,TSSf_FILTER_INPUT);
   while (TRUE) {
@@ -1040,4 +1040,3 @@ public void PressAKey()
   PutSysText("ST_PRESS_A_KEY");
   GetKey;
 }
- 
