@@ -1,0 +1,140 @@
+#help_index "Sound"
+
+I1 *cur_song=NULL;
+TssStruct *cur_song_tss=NULL;
+U8 music_octive;
+double music_note_len;
+U1 music_note_map[7]={0,2,3,5,7,8,10};
+BoolU4 music_mute=FALSE;
+
+//This is if you wish to sync with a
+//note in a Play() string.  0 is the start
+public I8 music_play_note_num=0;
+
+public double music_tempo,music_stacatto_factor=1.0;
+
+I1 *MusicSetOctive(I1 *st)
+{
+  I1 ch=*st++;
+  while (ch>='0' && ch<='9') {
+    music_octive=ch-'0';
+    ch=*st++;
+  }
+  return --st;
+}
+
+I1 *MusicSetNoteLen(I1 *st)
+{
+  BoolU4 cont=TRUE;
+  do {
+    switch (*st++) {
+      case 'w': music_note_len=4.0;  break;
+      case 'h': music_note_len=2.0;  break;
+      case 'q': music_note_len=1.0;  break;
+      case 'e': music_note_len=0.5;   break;
+      case 's': music_note_len=0.25;   break;
+      case 't': music_note_len=2.0*music_note_len/3.0; break;
+      case '.': music_note_len=1.5*music_note_len; break;
+      default:
+	st--;
+	cont=FALSE;
+    }
+  } while (cont);
+  return st;
+}
+
+public double Note2Freq(I8 note,I8 octive=3)
+{
+  return 2.0`(6+octive+(note-3)/12.0);
+}
+
+public void Play(I1 *st,I1 *words=NULL)
+/*
+  Notes are entered with a capital letter.
+
+  Octives are entered with a digit and
+  stay set until changed.
+
+  Durations are entered with
+    'w' whole note
+    'h' half note
+    'q' quarter note
+    'e' eighth note
+    't' sets to 2/3rds the current duration
+    '.' sets to 1.5 times the current duration
+  durations stay set until changed.
+
+  Sharp and flat are done with '#' or 'b'.
+
+  The variable $FG,4$music_stacatto_factor$FG$ can
+  be set to a range from 0.0 to 1.0.
+
+  The variable $FG,4$music_tempo$FG$ defaults to
+  2.5 and gets faster when bigger.
+ 
+*/
+
+{
+  I1 *word;
+  U8 note,i=0;
+  double f;
+  music_play_note_num=0;
+  while (*st) {
+    st=MusicSetOctive(st);
+    st=MusicSetNoteLen(st);
+    st=MusicSetOctive(st);
+    if (!*st) break;
+    note=*st++-'A';
+    if (note<7) {
+      note=music_note_map[note];
+      if (*st=='b') {
+	note--;
+	st++;
+      } else if (*st=='#') {
+	note++;
+	st++;
+      }
+      f=Note2Freq(note,music_octive);
+    } else
+      f=0;
+    if (words) {
+      if (word=PointAtListEntry(i++,words))
+	if (StrCmp(word," "))
+	  PutS(word);
+    }
+    if (!music_mute)
+      Sound(f);
+    Sleep(1000*music_stacatto_factor*music_note_len/music_tempo);
+    if (!music_mute)
+      Sound(0);
+    Sleep(1000*(1.0-music_stacatto_factor)*music_note_len/music_tempo);
+    music_play_note_num++;
+  }
+}
+
+void ResetMusicSettings()
+{
+  music_stacatto_factor=1.0;
+  music_tempo=2.5;
+  music_octive=3;
+  music_note_len=1.0;
+}
+
+ResetMusicSettings;
+
+
+void EndCurSong()
+{
+  Sound(0);
+  Exit;
+}
+
+void CurSongTsk()
+{
+  Preempt(ON);
+  Fs->end_task_cb=&EndCurSong;
+  while (TRUE)
+    Play(cur_song);
+}
+
+#help_index ""

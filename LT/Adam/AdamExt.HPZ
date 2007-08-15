@@ -1,0 +1,46 @@
+extern void UseConsoleLtf(I1 *menu_file);
+extern BoolU8 WinToTop(TssStruct *tss=NULL);
+extern U8 GetMsg(I8 *param1,I8 *param2,U8 mask=-2,TssStruct *tss=NULL);
+extern U8 ScanMsg(I8 *param1,I8 *param2,U8 mask=-2,TssStruct *tss=NULL);
+extern void PlotInputPointer(GrBitMap *base);
+extern void GrPlot0(GrBitMap *base,I8 x,I8 y);
+extern void DrawTaskBorder(TssStruct *tss);
+extern void UpdateOdes(TssStruct *tss);
+
+extern void IDEClearAllBpts(Ltf *l);
+extern void IDEToggleBpt(Ltf *l);
+
+extern U8 ltf_display_types[1],ltf_nondisplay_invisible_types[1],
+	  ltf_form_types[1],ltf_data_types[1];
+extern I8 PopUp(I1 *msg,TssStruct *parent=NULL,TssStruct **pu_tss=NULL);
+extern LtfEntry *LtfPutSExt(Ltf *l,I1 *st);
+extern I8 PopUpMenu(Ltf *l,I1 *help=NULL);
+extern Ltf *LtfNew();
+extern void LtfDel(Ltf *l);
+extern LtfEntry *LtfPrintF(Ltf *l,I1 *src,...);
+extern I1 *EditPicture();
+extern BoolU8 View();
+extern void IDEGo();
+extern void IDEStep(Ltf *l);
+extern void IDESetLineNum(Ltf *l);
+extern void IDE(I1 *filename);
+extern void LtfD(U1 *buf,U8 cnt=0x80);
+extern void LtfUpdateWinJoin(Ltf *l,BoolU4 to_screen,BoolU4 has_cursor,
+  BoolU4 recalc,BoolU4 find_cur_entry,BoolU4 preempt,
+  LtfEntry *pg_found=NULL,I8 num_del_entries=0);
+extern void LtfRecalc(Ltf *l);
+extern BoolU8 DoForm(U1 *D,I1 *class_name,
+    I1 *help=NULL,BoolU4 help_is_file=FALSE,
+    I1 *header=NULL,I1 *footer=NULL);
+
+extern void WsFillin(I8 n);
+extern void WsMan(I8 n,TssStruct *parent=NULL);
+extern void WsdFillin(I8 n);
+extern void WsdDef(I8 n,TssStruct *parent=NULL);
+extern BoolU8 WordStat(BoolU8 val=ON);
+extern void WsdPopUpDef(I1 *st,I8 num=-1,TssStruct *parent=NULL);
+extern void FileManager(I1 *mask="/*",I1 *flags=NULL);
+extern void LtfHelpIndex(Ltf *l,I1 *index);
+extern void AccntOneTimePopUp(I8 flag_num,I1 *msg);
+
+#define CTRL_L_HELP "::/LT/Doc/CtrlL.MUZ"

@@ -1,0 +1,20 @@
+//star
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  while (TRUE) {
+    Play("etCCBetGGDetBBFeGCetBABeAAqEqF");
+    Play("etCCBetGGDetBBFeGCetBABeAAqEqF");
+    Play("eCGqFqDqDqCeDGqCqB");
+    Play("eCGqFqDqDqCeDGqCqB");
+  }
+}
+
+Song;

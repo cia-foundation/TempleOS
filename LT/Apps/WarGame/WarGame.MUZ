@@ -1,0 +1,14 @@
+$TX+CX,"WarGame"$
+$TX+CX,"------------"$
+$TX+CX,"Button #1 issues command"$s
+
+$TX+CX,"Throttle/Wheel adjusts command strength."$
+ 
+$MA+A+CX,"SPACE Restart"," "$
+$MA+A+CX,"ESC   Quit   ","\033"$
+ 
+$TX+CX,"---------------------------"$
+$MA+A+CX,"'1' No Map                 ","1"$
+$MA+A+CX,"'2' Friendly Fire Power Map","2"$
+$MA+A+CX,"'3' Lapse Time             ","3"$
+ 

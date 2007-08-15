@@ -1,0 +1,28 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3qBeGDetCBCqGAeGCqDC",
+		" \0I \0 \0don't \0 \0 \0mind, \0 \0 \0 \0you \0de\0");
+	Play("BeGDetCBCqGAeGCqDC",
+		"cide.\r\n\0I \0 \0don't \0 \0 \0mind.\r\n\0 \0 \0 \0 \0 \0");
+	Play("etDFGqEeDGqFEetDFFqBetBDB",
+		"I \0trust \0God \0 \0 \0 \0to \0 \0look-out \0for \0me.\r\n\0 \0 \0 \0 \0");
+	Play("DFGqEeDGqFEetDFFqBetBDB",
+		"I \0trust \0God \0 \0 \0 \0to \0 \0look-out \0for \0me.\r\n\0 \0 \0 \0 \0");
+	Play("qC");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

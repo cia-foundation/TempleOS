@@ -1,0 +1,98 @@
+I1 *BootTimeCB(Ltf *l,LtfEntry *ll,TssStruct *mem_tss)
+{
+  LTDate i;
+//$FG,2$This routine is called by the window
+$FG$//$FG,2$manager things would get corrupted
+$FG$//$FG,2$if the window manager used it's own
+$FG$//$FG,2$heap, so we use the owning task's heap.$FG$
+  I1 *st=MAlloc(64,mem_tss);
+  nounusedwarn l,ll;
+
+  i=BootTime;
+
+  //$FG,2$Doesn't have to be fixed width!!$FG$
+  SPrintF(st,"%d=%h11T",i,i);
+  return st;
+}
+
+I1 *CurTimeCB(Ltf *l,LtfEntry *ll,TssStruct *mem_tss)
+{
+  LTDate i;
+  I1 *st=MAlloc(64,mem_tss);
+  nounusedwarn l,ll;
+  i=GetCurTimeLTDate;
+  SPrintF(st,"%h0D %h0T",i,i);
+  return st;
+}
+
+void DoIt()
+{
+/*$FG,2$ The main window is kept at $FG,4$Fs->cur_ltf$FG,2$.
+A second framework is kept at $FG,4$Fs->aux_ltf$FG,2$.
+Normally, the $FG,4$aux_ltf$FG,2$ is used for updating
+the border, primarily.
+
+See $LK,"UseConsoleLtf","MN:UseConsoleLtf"$().
+See $LK,"LtfUpdateBothLtf","MN:LtfUpdateBothLtf"$().
+
+Note: the $FG,4$aux_ltf$FG,2$ is not to be confused
+with the $FG,4$aux_str$FG,2$, a member of the $LK,"LtfEntry","MN:LtfEntry"$.
+
+$FG$*/
+  Ltf *aux=Fs->aux_ltf,
+      *cur=Fs->cur_ltf;
+  LtfEntry *ll;
+
+// $FG,2$We don't want an update between
+$FG$// $FG,2$creating the LtfEntry and defining the
+$FG$// $FG,2$callback, so we turn-off preemption.$FG$
+
+  BoolU4 old_preempt=Preempt(OFF);
+
+  LtfBottom(aux);  //$FG,2$Insert at the bottom$FG$
+  LtfPutSExt(aux,"$$FG,RED$$$$CM+BY+LX,5,-3$$");
+
+//$FG,2$ The $LK,"LtfPutSExt","MN:LtfPutSExt"$() routine returns the address of the last entry.$FG$
+  ll=LtfPutSExt(aux,"$$TX+DC,\" \"$$");
+$FG$// $FG,2$The $FG,4$DC$FG,2$ flag is "has display callback".
+$FG$
+//$FG,2$ Flags are explained here:
+$FG$//	$LK,"::/LT/Doc/CtrlL.MUZ","FI:::/LT/Doc/CtrlL.MUZ"$
+//	$LK,"::/LT/Doc/Dollar.TXZ","FI:::/LT/Doc/Dollar.TXZ"$
+//	$LK,"Dollar Flags","MN:LTFLf_AUX_STR"$
+//	$LK,"ST_LTF_FLAGS","FF:::/LT/OSMain/SysText.CPZ,ST_LTF_FLAGS"$
+
+  ll->display_cb=&BootTimeCB;
+  LtfPutSExt(aux,"$$FG$$");
+
+//$FG,2$$BK,1$WARNING:$BK,0$ If you use the $FG,4$cur_ltf$FG,2$ you
+$FG$//$FG,2$run the risk of the user pressing
+$FG$//$FG,2$$FG,4$CTRL-T$FG,2$ or using the clipboard, both
+$FG$//$FG,2$of which will crash.  So, you might want
+$FG$//$FG,2$to use the $FG,4$aux_ltf$FG,2$.
+$FG$
+  LtfPutSExt(cur,"$$FG,LTRED$$");
+  ll=LtfPutSExt(cur,"$$TX+DC,\" \"$$");
+$FG$  ll->display_cb=&CurTimeCB;
+  LtfPutSExt(cur,"$$FG$$");
+
+  Preempt(old_preempt);
+
+//$FG,2$Send carriage return, new line, so
+$FG$//$FG,2$that the timer string is not part
+$FG$//$FG,2$of the next command on the command line.
+$FG$  CrLf;
+}
+
+
+
+void UndoIt()
+{
+//$FG,2$Clear-out entries without a $FG,4$+H$FG,2$ hold flag.$FG$
+  LtfBottom(Fs->aux_ltf);
+  LtfPutSExt(Fs->aux_ltf,"$$CL$$");
+}
+
+
+DoIt;
+

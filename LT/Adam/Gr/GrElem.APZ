@@ -1,0 +1,1664 @@
+#define GRET_MENU	-999
+#define GRET_CANCEL	-1
+#define GRET_SNAP	-2
+
+#help_index "Graphics/Input"
+I8 PopUpGrElemType(BoolU4 new_picture)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutSExt(l,"$$MU,\"Color (4-bit)\",GRET_COLOR4$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Width\",GRET_WIDTH$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Snap\",GRET_SNAP$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Point\",GRET_POINT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Line\",GRET_LINE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Box\",GRET_BOX$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Circle\",GRET_CIRCLE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Ellipse\",GRET_ELLIPSE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Text\",GRET_TEXT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Flood Fill\",GRET_FLOOD_FILL$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Flood Fill Not Color\",GRET_FLOOD_FILL_NOT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"SpeedLine\",GRET_SPEEDLINE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"PolyLine\",GRET_POLYLINE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"PolyPoint\",GRET_POLYPOINT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"BSpline2\",GRET_BSPLINE2$$\r\n");
+  LtfPutSExt(l,"$$MU,\"BSpline3\",GRET_BSPLINE3$$\r\n");
+  LtfPutSExt(l,"$$MU,\"BSpline2 Closed\",GRET_BSPLINE2_CLOSED$$\r\n");
+  LtfPutSExt(l,"$$MU,\"BSpline3 Closed\",GRET_BSPLINE3_CLOSED$$\r\n");
+  LtfPutSExt(l,"$$MU,\"to Bitmap (4-bit)\",GRET_BITMAP4$$\r\n");
+  LtfPutSExt(l,"$$MU,\"to Bitmap (4-bit) Transparent\",GRET_BITMAP4_TRANSPARENT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"End\",GRET_END$$\r\n");
+  if (new_picture)
+    LtfPutSExt(l,"$$MU,\"Cancel\",GRET_CANCEL$$\r\n");
+  LtfPutSExt(l,"\r\nNote: Right-Click to get back to this menu.\r\n"
+	    "Press ESC to Exit, CTRL-Q to abort.\r\n");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public I8 PopUpColor()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  for (i=0;i<16;i++)
+    LtfPrintF(l,"$$BM,%d$$$$FM,BLACK$$$$MU,\"__%-8Z__\",%d$$\r\n",i,i,"ST_COLORS",i);
+  LtfPutSExt(l,"$$BM,WHITE$$$$MU,\"DEFAULT\",LTF_DEFAULT$$");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+public I8 PopUpI8_16()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  for (i=0;i<16;i++)
+    LtfPrintF(l,"$$MU,\"%d\",%d$$\r\n",i,i);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+#help_index "Graphics/GrElem"
+#help_file "::/LT/Doc/GrElem.TXZ"
+
+U8 GrElemBaseSize(I8 type,BoolU4 queue=TRUE)
+{
+  U8 i=(queue) ? offset(GrElem.start):0;
+  switch (type) {
+    case GRET_COLOR4:
+      i+=1+offset(GrElem.color4)-offset(GrElem.start);
+      break;
+    case GRET_WIDTH:
+      i+=offset(GrElem.y1)-offset(GrElem.start);
+      break;
+    case GRET_TEXT:
+      i+=offset(GrElem.st)-offset(GrElem.start);
+      break;
+    case GRET_POINT:
+    case GRET_FLOOD_FILL:
+    case GRET_FLOOD_FILL_NOT:
+      i+=offset(GrElem.x2)-offset(GrElem.start);
+      break;
+    case GRET_ELLIPSE:
+    case GRET_SPEEDLINE_POINT:
+      i+=sizeof(GrElem)-offset(GrElem.start);
+      break;
+    case GRET_LINE:
+      i+=offset(GrElem.linespeed)-offset(GrElem.start);
+      break;
+    case GRET_BITMAP4:
+    case GRET_BITMAP4_TRANSPARENT:
+      i+=sizeof(GrElem)-offset(GrElem.start);
+      break;
+    case GRET_BOX:
+      i+=offset(GrElem.linespeed)-offset(GrElem.start);
+      break;
+    case GRET_CIRCLE:
+      i+=offset(GrElem.y2)-offset(GrElem.start);
+      break;
+    case GRET_SPEEDLINE:
+    case GRET_POLYLINE:
+    case GRET_POLYPOINT:
+    case GRET_BSPLINE2:
+    case GRET_BSPLINE3:
+    case GRET_BSPLINE2_CLOSED:
+    case GRET_BSPLINE3_CLOSED:
+      i+=offset(GrElem.y1)-offset(GrElem.start);
+      break;
+    case GRET_SHIFT:
+      i+=offset(GrElem.x2)-offset(GrElem.start);
+      break;
+    case GRET_END:
+      i+=offset(GrElem.x1)-offset(GrElem.start);
+      break;
+  }
+  return i;
+}
+
+U8 GrElemSize(GrElem *tempg,BoolU4 queue=TRUE)
+{
+  U8 i=GrElemBaseSize(tempg->type,queue);
+  switch (tempg->type) {
+    case GRET_POLYLINE:
+      i+=tempg->num<<1*sizeof(I4);
+      break;
+    case GRET_TEXT:
+      i+=StrLen(tempg->st)+1;
+      break;
+    case GRET_SPEEDLINE:
+      i+=tempg->num*(2*sizeof(I4)+sizeof(double));
+      break;
+    case GRET_BITMAP4:
+    case GRET_BITMAP4_TRANSPARENT:
+      i+=((tempg->width+7)&~7)*tempg->height*4/8;
+      break;
+    case GRET_POLYPOINT:
+//Backward compatibility kludge: num should num-1
+      i+=sizeof(I4)<<1+(tempg->num*3+7)>>3;
+      break;
+    case GRET_BSPLINE2:
+    case GRET_BSPLINE3:
+    case GRET_BSPLINE2_CLOSED:
+    case GRET_BSPLINE3_CLOSED:
+      i+=tempg->num*sizeof(P3I4);
+      break;
+  }
+  return i;
+}
+
+//If you do not enter a color or width into
+//a GrElem, you can pass a color and width
+//when you plot it.  "colorbase" is the color of
+//the background you are drawing on.
+public void GrElemsPlot(GrBitMap *base,I8 x,I8 y,I8 z,void *elems)
+{
+  GrElem *tempg=elems-offset(GrElem.start);
+  I8 i,j,k;
+  I8 x1,y1,x2,y2;
+  I4 *ptr;
+  I8 cur_sub_GrElem_num=0;
+  U8 colorbase=base->bkcolor;
+  GrBitMap *img;
+  P3I4 *p;
+  nounusedwarn z;
+  if (colorbase.u1[3]==ROPB_COLLISION)
+    base->color=colorbase;
+  while (tempg->type) {
+    base->cur_sub_grelem=cur_sub_GrElem_num++;
+    switch (tempg->type) {
+      case GRET_COLOR4:
+	base->color=colorbase^tempg->color4;
+	break;
+      case GRET_WIDTH:
+	base->pen_width=tempg->width;
+	GrScalePenWidth(base);
+	break;
+      case GRET_POINT:
+	GrPlot3(base,tempg->x1+x,tempg->y1+y,0);
+	break;
+      case GRET_TEXT:
+	GrText3(base,tempg->x1+x,tempg->y1+y,0,tempg->st);
+	break;
+      case GRET_FLOOD_FILL:
+	GrFloodFill3(base,tempg->x1+x,tempg->y1+y,0,FALSE);
+	break;
+      case GRET_FLOOD_FILL_NOT:
+	GrFloodFill3(base,tempg->x1+x,tempg->y1+y,0,TRUE);
+	break;
+      case GRET_SHIFT:
+	x+=tempg->x1;
+	y+=tempg->y1;
+	break;
+      case GRET_LINE:
+	GrLine3(base,tempg->x1+x,tempg->y1+y,0,tempg->x2+x,tempg->y2+y,0);
+	break;
+      case GRET_BITMAP4:
+      case GRET_BITMAP4_TRANSPARENT:
+	img=MAllocZ(sizeof(GrBitMap));
+	img->type=BMT_COLOR4;
+	img->width=tempg->width;
+	img->internal_width=(tempg->width+7)&~7;
+	img->height=tempg->height;
+	img->left_margin=0;
+	img->right_margin=tempg->width;
+	img->top_margin=0;
+	img->bottom_margin=tempg->height;
+	img->plane_size=(img->internal_width*img->height)>>3;
+	img->body=tempg+sizeof(GrElem);
+	img->bitmap_signature=BMS_SIGNATURE;
+	img->bkcolor=tempg->bkcolor;
+	i=base->color;
+	if (tempg->type==GRET_BITMAP4)
+	  base->color=ROP_EQU+i&0xFFFFFF;
+	else
+	  base->color=ROP_TRANSPARENT+i&0xFFFFFF;
+	GrBlot3(base,tempg->x2+x,tempg->y2+y,0,img);
+	base->color=i;
+	Free(img);
+	break;
+      case GRET_BOX:
+	GrBox3(base,tempg->x1+x,tempg->y1+y,0,tempg->x2-tempg->x1,tempg->y2-tempg->y1);
+	break;
+      case GRET_CIRCLE:
+	GrCircle3(base,tempg->x1+x,tempg->y1+y,0,tempg->x2);
+	break;
+      case GRET_ELLIPSE:
+	GrEllipse3(base,tempg->x2+x,tempg->y2+y,0,tempg->width,tempg->height,tempg->rot_angle);
+	break;
+      case GRET_POLYLINE:
+	ptr=&tempg->y1;
+	x1=ptr[0];
+	y1=ptr[1];
+	for (i=1;i<tempg->num;i++) {
+	  x2=ptr[i<<1];
+	  y2=ptr[i<<1+1];
+	  GrLine3(base,x1+x,y1+y,0,x2+x,y2+y,0);
+	  x1=x2;y1=y2;
+	}
+	break;
+      case GRET_SPEEDLINE:
+	ptr=&tempg->y1;
+	x1=ptr[0];
+	y1=ptr[1];
+	for (i=1;i<tempg->num;i++) {
+	  x2=ptr[i<<2];
+	  y2=ptr[i<<2+1];
+//TODO	  GrSpeedLine2(base,x1+x,y1+y,0,x2+x,y2+y,0,ptr[i<<2+2]><(double));
+	  GrSpeedLine(base,x1+x,y1+y,x2+x,y2+y,ptr[i<<2+2]><(double));
+	  x1=x2;y1=y2;
+	}
+	break;
+      case GRET_POLYPOINT:
+	ptr=&tempg->y1;
+	x1=ptr[0];
+	y1=ptr[1];
+	ptr+=sizeof(I4)<<1;
+	k=(tempg->num-1)*3;
+	GrPlot3(base,x1+x,y1+y,0);
+	for (i=0;i<k;i+=3) {
+	  j=ExtractU4BitField(ptr,i,3);
+	  x1+=GrXOffsets[j];
+	  y1+=GrYOffsets[j];
+	  GrPlot3(base,x1+x,y1+y,0);
+	}
+	break;
+      case GRET_BSPLINE2:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x+=x;
+	  p[i].y+=y;
+	}
+	Gr2BSpline3(base,p,tempg->num,FALSE);
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x-=x;
+	  p[i].y-=y;
+	}
+	break;
+      case GRET_BSPLINE3:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x+=x;
+	  p[i].y+=y;
+	}
+	Gr3BSpline3(base,p,tempg->num,FALSE);
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x-=x;
+	  p[i].y-=y;
+	}
+	break;
+      case GRET_BSPLINE2_CLOSED:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x+=x;
+	  p[i].y+=y;
+	}
+	Gr2BSpline3(base,p,tempg->num,TRUE);
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x-=x;
+	  p[i].y-=y;
+	}
+	break;
+      case GRET_BSPLINE3_CLOSED:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x+=x;
+	  p[i].y+=y;
+	}
+	Gr3BSpline3(base,p,tempg->num,TRUE);
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x-=x;
+	  p[i].y-=y;
+	}
+	break;
+    }
+    tempg+=GrElemSize(tempg,FALSE);
+  }
+}
+
+public void GrSetOrigin(GrElem *root,I8 dx,I8 dy,I8 dz)
+{
+  U8 i;
+  I4 *ptr;
+  P3I4 *p;
+  GrElem *tempg=root->next;
+  nounusedwarn dz;
+  while (tempg!=root) {
+    switch (tempg->type) {
+      case GRET_POINT:
+      case GRET_FLOOD_FILL:
+      case GRET_FLOOD_FILL_NOT:
+	tempg->x1+=dx;
+	tempg->y1+=dy;
+	break;
+      case GRET_LINE:
+	tempg->x1+=dx;
+	tempg->y1+=dy;
+	tempg->x2+=dx;
+	tempg->y2+=dy;
+	break;
+      case GRET_BITMAP4:
+      case GRET_BITMAP4_TRANSPARENT:
+      case GRET_ELLIPSE:
+	tempg->x2+=dx;
+	tempg->y2+=dy;
+	break;
+      case GRET_BOX:
+	tempg->x1+=dx;
+	tempg->y1+=dy;
+	tempg->x2+=dx;
+	tempg->y2+=dy;
+	break;
+      case GRET_TEXT:
+      case GRET_CIRCLE:
+	tempg->x1+=dx;
+	tempg->y1+=dy;
+	break;
+      case GRET_POLYLINE:
+	ptr=&tempg->y1;
+	ptr[0]+=dx;
+	ptr[1]+=dy;
+	for (i=1;i<tempg->num;i++) {
+	  ptr[i<<1]+=dx;
+	  ptr[i<<1+1]+=dy;
+	}
+	break;
+      case GRET_SPEEDLINE:
+	ptr=&tempg->y1;
+	ptr[0]+=dx;
+	ptr[1]+=dy;
+	for (i=1;i<tempg->num;i++) {
+	  ptr[i<<2]+=dx;
+	  ptr[i<<2+1]+=dy;
+	}
+	break;
+      case GRET_POLYPOINT:
+	ptr=&tempg->y1;
+	ptr[0]+=dx;
+	ptr[1]+=dy;
+	break;
+      case GRET_BSPLINE2:
+      case GRET_BSPLINE3:
+      case GRET_BSPLINE2_CLOSED:
+      case GRET_BSPLINE3_CLOSED:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  p[i].x+=dx;
+	  p[i].y+=dy;
+	}
+	break;
+    }
+    tempg=tempg->next;
+  }
+}
+
+
+I1 GrElOffset[9]={0,1,2,3,0,4,5,6,7};
+
+void GrPolyPointPlot(GrElem *root,I8 x,I8 y,I8 z)
+{
+  nounusedwarn z;
+  GrElem *tempg=MAllocZ(GrElemBaseSize(GRET_POINT));
+  tempg->type=GRET_POINT;
+  tempg->x1=x;
+  tempg->y1=y;
+  InsQue(tempg,root->last);
+}
+
+
+GrElem *GrTransformCircle(I8 *r,GrElem *tempg)
+{
+  I8 x,y,z,radius=tempg->x2<<24;
+  double m1,a1,m2;
+  GrElem *tempg1=MAllocZ(GrElemBaseSize(GRET_ELLIPSE));
+  tempg1->type=GRET_ELLIPSE;
+
+  x=tempg->x1; y=tempg->y1; z=0;
+  GrRotate(r,&x,&y,&z);
+  tempg1->x2=x;
+  tempg1->y2=y;
+
+  x=radius; y=0; z=0;
+  GrRotate(r,&x,&y,&z);
+  R2P(&m1,&a1,x,y);
+
+  x=0; y=radius; z=0;
+  GrRotate(r,&x,&y,&z);
+  m2=Sqrt(x*x+y*y);
+
+  tempg1->width=m1/0x1000000;
+  tempg1->height=m2/0x1000000;
+  tempg1->rot_angle=-a1;
+
+  return tempg1;
+}
+
+
+GrElem *GrTransformEllipse(I8 *r,GrElem *tempg)
+{
+  I8 x,y,z,x_radius=tempg->width<<24,y_radius=tempg->height<<24;
+  double m1,a1,m2,a2,s,c;
+  GrElem *tempg1=MAllocZ(GrElemBaseSize(GRET_ELLIPSE));
+  tempg1->type=GRET_ELLIPSE;
+
+  x=tempg->x2; y=tempg->y2; z=0;
+  GrRotate(r,&x,&y,&z);
+  tempg1->x2=x;
+  tempg1->y2=y;
+
+  c=Cos(tempg->rot_angle);
+  s=Sin(tempg->rot_angle);
+
+  x=x_radius*c;
+  y=x_radius*s;
+  z=0;
+  GrRotate(r,&x,&y,&z);
+  R2P(&m1,&a1,x,y);
+
+  x=-y_radius*s;
+  y=y_radius*c;
+  z=0;
+  GrRotate(r,&x,&y,&z);
+  R2P(&m2,&a2,x,y);
+  m2=m2*Abs(Sin(a2-a1));
+
+  tempg1->width=m1/0x1000000;
+  tempg1->height=m2/0x1000000;
+  tempg1->rot_angle=-a1;
+
+  return tempg1;
+}
+
+
+public void GrElemTransform(I8 *r,GrElem *root)
+{
+  I8 x,y,z,x1,y1,z1,x2,y2,z2,x3,y3,z3;
+  I8 i,j,k,num;
+  I4 *ptr;
+  P3I4 *p;
+  GrElem *tempg=root->next,root2,*tempg1,*tempg2,*tempg3;
+  while (tempg!=root) {
+    switch (tempg->type) {
+      case GRET_POINT:
+      case GRET_FLOOD_FILL:
+      case GRET_FLOOD_FILL_NOT:
+	x=tempg->x1; y=tempg->y1; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x1=x;
+	tempg->y1=y;
+	break;
+      case GRET_LINE:
+	x=tempg->x1; y=tempg->y1; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x1=x;
+	tempg->y1=y;
+	x=tempg->x2; y=tempg->y2; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x2=x;
+	tempg->y2=y;
+	break;
+      case GRET_BITMAP4:
+      case GRET_BITMAP4_TRANSPARENT:
+	x=tempg->x2; y=tempg->y2; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x2=x;
+	tempg->y2=y;
+	break;
+      case GRET_BOX:
+	x=tempg->x1; y=tempg->y1; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x1=x;
+	tempg->y1=y;
+	x=tempg->x2; y=tempg->y2; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x2=x;
+	tempg->y2=y;
+	break;
+      case GRET_TEXT:
+	x=tempg->x1; y=tempg->y1; z=0;
+	GrRotate(r,&x,&y,&z);
+	tempg->x1=x;
+	tempg->y1=y;
+	break;
+      case GRET_CIRCLE:
+	tempg1=GrTransformCircle(r,tempg);
+	InsQue(tempg1,tempg);
+	RemQue(tempg);
+	Free(tempg);
+	tempg=tempg1;
+	break;
+      case GRET_ELLIPSE:
+	tempg1=GrTransformEllipse(r,tempg);
+	InsQue(tempg1,tempg);
+	RemQue(tempg);
+	Free(tempg);
+	tempg=tempg1;
+	break;
+      case GRET_POLYLINE:
+	ptr=&tempg->y1;
+	x=ptr[0]; y=ptr[1]; z=0;
+	GrRotate(r,&x,&y,&z);
+	ptr[0]=x;
+	ptr[1]=y;
+	for (i=1;i<tempg->num;i++) {
+	  x=ptr[i<<1]; y=ptr[i<<1+1]; z=0;
+	  GrRotate(r,&x,&y,&z);
+	  ptr[i<<1]=x;
+	  ptr[i<<1+1]=y;
+	}
+	break;
+      case GRET_SPEEDLINE:
+	ptr=&tempg->y1;
+	x=ptr[0]; y=ptr[1]; z=0;
+	GrRotate(r,&x,&y,&z);
+	ptr[0]=x;
+	ptr[1]=y;
+	for (i=1;i<tempg->num;i++) {
+	  x=ptr[i<<2]; y=ptr[i<<2+1]; z=0;
+	  GrRotate(r,&x,&y,&z);
+	  ptr[i<<2]=x;
+	  ptr[i<<2+1]=y;
+	}
+	break;
+      case GRET_POLYPOINT:
+	root2.next=&root2;
+	root2.last=&root2;
+	ptr=&tempg->y1;
+	x=ptr[0]; y=ptr[1]; z=0;
+	x1=x; y1=y; z1=z;  //unrotated cur coordinates
+	GrRotate(r,&x,&y,&z);
+	ptr+=sizeof(I4)<<1;
+	k=(tempg->num-1)*3;
+	x2=x; y2=y; z2=z;  //rotated start coordinates
+	x3=x; y3=y; z3=z;  //lag 1 rotated coordinates
+	for (i=0;i<k;i+=3) {
+	  j=ExtractU4BitField(ptr,i,3);
+	  x1+=GrXOffsets[j];
+	  y1+=GrYOffsets[j];
+	  x=x1; y=y1; z=z1;
+	  GrRotate(r,&x,&y,&z);
+	  Line(&root2,x3-x2,y3-y2,0,x-x2,y-y2,0,&GrPolyPointPlot);
+	  x3=x; y3=y; z3=z;
+	}
+
+	num=0;
+	tempg1=root2.next;
+	x3=0; y3=0; z3=0;
+	while (tempg1!=&root2) {
+	  tempg2=tempg1->next;
+	  if (tempg1->x1==x3 && tempg1->y1==y3) {
+	    RemQue(tempg1);
+	    Free(tempg1);
+	  } else {
+	    num++;
+	    x3=tempg1->x1;
+	    y3=tempg1->y1;
+	  }
+	  tempg1=tempg2;
+	}
+
+	tempg3=MAllocZ(GrElemBaseSize(GRET_POLYPOINT)+
+	  sizeof(I4)*2+(num*3+7)>>3);
+	ptr=&tempg3->y1;
+	ptr[0]=x2;
+	ptr[1]=y2;
+	ptr+=sizeof(I4)<<1;
+	x3=0;y3=0; z3=0;
+	i=0;
+	tempg1=root2.next;
+	while (tempg1!=&root2) {
+	  tempg2=tempg1->next;
+	  OrU4BitField(ptr,i,
+	    GrElOffset[SignI8(tempg1->x1-x3)+1+
+		3*(SignI8(tempg1->y1-y3)+1)]);
+	  i+=3;
+	  x3=tempg1->x1;y3=tempg1->y1;
+	  RemQue(tempg1);
+	  Free(tempg1);
+	  tempg1=tempg2;
+	}
+	tempg3->type=GRET_POLYPOINT;
+	tempg3->num=num+1;
+	InsQue(tempg3,tempg);
+	RemQue(tempg);
+	Free(tempg);
+	tempg=tempg3;
+	break;
+      case GRET_BSPLINE2:
+      case GRET_BSPLINE3:
+      case GRET_BSPLINE2_CLOSED:
+      case GRET_BSPLINE3_CLOSED:
+	p=&tempg->y1;
+	for (i=0;i<tempg->num;i++) {
+	  x=ptr[i]; y=ptr[i]; z=0;
+	  GrRotate(r,&x,&y,&z);
+	  p[i].x=x;
+	  p[i].y=y;
+	}
+	break;
+    }
+    tempg=tempg->next;
+  }
+}
+
+class EGETStruct
+{
+  double x_scale  fmtstr "$$DA-T,32,\"X Scale :%12.6f\"$$\r\n";
+  double y_scale  fmtstr "$$DA-T,32,\"Y Scale :%12.6f\"$$\r\n";
+  double z_scale  fmtstr "$$DA-T,32,\"Z Scale :%12.6f\"$$\r\n";
+  double theta1   fmtstr "\r\nAngles are in degrees\r\n$$DA-T,32,\"Theta1  :%12.6f\"$$\r\n";
+  double phi	  fmtstr "$$DA-T,32,\"Phi     :%12.6f\"$$\r\n";
+  double theta2   fmtstr "$$DA-T,32,\"Theta2  :%12.6f\"$$\r\n";
+  double x_offset fmtstr "\r\n$$DA-T,32,\"X Offset:%12.6f\"$$\r\n";
+  double y_offset fmtstr "$$DA-T,32,\"Y Offset:%12.6f\"$$\r\n";
+  double z_offset fmtstr "$$DA-T,32,\"Z Offset:%12.6f\"$$\r\n";
+};
+
+void EditGrElemTransform(GrElem *root)
+{
+  EGETStruct *eg=MAlloc(sizeof(EGETStruct));
+  I8 *r=MAllocZ(sizeof(I8)*16),*r1,*r2;
+  eg->x_scale=1.0;
+  eg->y_scale=1.0;
+  eg->z_scale=1.0;
+  eg->theta1=0.0;
+  eg->phi=0.0;
+  eg->theta2=0.0;
+  eg->x_offset=0.0;
+  eg->y_offset=0.0;
+  eg->z_offset=0.0;
+  if (DoForm(eg,"EGETStruct")) {
+    r[0]=eg->x_scale*gr_scale;
+    r[5]=eg->y_scale*gr_scale;
+    r[10]=eg->z_scale*gr_scale;
+    r[15]=gr_scale;
+
+    r1=GrTheta(-eg->theta1*pi/180.0);
+    r2=GrMulMat(r,r1);
+    Free(r);
+    Free(r1);
+    r=r2;
+
+    r1=GrPhi(eg->phi*pi/180.0);
+    r2=GrMulMat(r,r1);
+    Free(r);
+    Free(r1);
+    r=r2;
+
+    r1=GrTheta(-eg->theta2*pi/180.0);
+    r2=GrMulMat(r,r1);
+    Free(r);
+    Free(r1);
+    r=r2;
+
+    r[3]=eg->x_offset*gr_scale;
+    r[7]=eg->y_offset*gr_scale;
+    r[11]=eg->z_offset*gr_scale;
+
+    GrElemTransform(r,root);
+  }
+  Free(r);
+}
+
+
+void GrElemsDel(GrElem *root)
+{
+  GrElem *tempg,*tempg1;
+  tempg=root->next;
+  while (tempg!=root) {
+    tempg1=tempg->next;
+    Free(tempg);
+    tempg=tempg1;
+  }
+}
+
+GrElem *GrElemsFromQueue(GrElem *root,U4 *size=NULL)
+{
+  U8 s,my_size=GrElemBaseSize(GRET_END,FALSE);
+  GrElem *tempg,*result;
+  U4 *dst;
+
+  tempg=root->next;
+  while (tempg!=root) {
+    my_size+=GrElemSize(tempg,FALSE);
+    tempg=tempg->next;
+  }
+  result=MAlloc(my_size);
+  dst=result;
+  tempg=root->next;
+  while (tempg!=root) {
+    s=GrElemSize(tempg,FALSE);
+    MemCpy(dst,&tempg->type,s);
+    dst+=s;
+    tempg=tempg->next;
+  }
+  *dst=GRET_END;
+  if (size) *size=my_size;
+  return result;
+}
+
+GrElem *GrElemsToQueue(GrElem *elems)
+{
+  U8 s;
+  GrElem *result=MAllocZ(sizeof(GrElem)),
+	 *tempg=elems-offset(GrElem.start),
+	 *tempg1;
+  result->next=result;
+  result->last=result;
+  while (tempg->type) {
+    tempg1=MAlloc(GrElemSize(tempg,TRUE));
+    s=GrElemSize(tempg,FALSE);
+    MemCpy(&tempg1->type,&tempg->type,s);
+    InsQue(tempg1,result->last);
+    tempg+=s;
+  }
+  return result;
+}
+
+public I8 PopUpPickGrElem(GrElem *root,I8 old_num=0)
+{
+  Ltf *l=LtfNew;
+  GrElem *tempg;
+  I8 cur_num=0;
+
+  tempg=root->next;
+  while (tempg!=root) {
+    if (cur_num==old_num)
+      LtfPrintF(l,"$$FM,LTRED$$");
+    else
+      LtfPrintF(l,"$$FM,LTBLUE$$");
+    LtfPrintF(l,"$$MU,\"%Z\",%d$$\r\n",
+      tempg->type,"ST_GRELEM_TYPES",cur_num++);
+    tempg=tempg->next;
+  }
+  if (cur_num==old_num)
+    LtfPrintF(l,"$$FM,LTRED$$");
+  else
+    LtfPrintF(l,"$$FM,LTBLUE$$");
+  LtfPrintF(l,"$$MU,\"END\",%d$$\r\n",cur_num);
+  cur_num=PopUpMenu(l);
+  LtfDel(l);
+  return cur_num;
+}
+
+public BoolU8 GrElemTextEdit(GrElem *root)
+{
+  Ltf *l=LtfNew;
+  GrElem *tempg;
+  LtfEntry *ll;
+  BoolU8 result;
+  tempg=root->next;
+  while (tempg!=root) {
+    LtfPrintF(l,"%Z\r\n",
+      tempg->type,"ST_GRELEM_TYPES");
+    ll=LtfPrintF(l,"  $$HX,%d,16$$\r\n",GrElemSize(tempg,FALSE));
+    ll->data=&tempg->start;
+    tempg=tempg->next;
+  }
+  result=ServantUser("DoMenu(0x%X,0x%X,0x%X);",l,NULL,0);
+  LtfDel(l);
+  return result;
+}
+
+
+#define GED_PICK_TEXT		1
+#define GED_PICK_GRAPHICALLY	2
+#define GED_SET_ORIGIN		3
+#define GED_TRANSFORM		4
+#define GED_SHIFT_ORIGIN	5
+#define GED_INSERT		6
+#define GED_DELETE		7
+#define GED_EDIT		8
+#define GED_END			9
+#define GED_CANCEL		-1
+
+I8 PopUpGrElemsEditChoice()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutSExt(l,"$$MU,\"Pick from text\",GED_PICK_TEXT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Pick graphically\",GED_PICK_GRAPHICALLY$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Set Origin\",GED_SET_ORIGIN$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Transform\",GED_TRANSFORM$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Insert Shift Origin\",GED_SHIFT_ORIGIN$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Insert\",GED_INSERT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Delete\",GED_DELETE$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Edit\",GED_EDIT$$\r\n");
+  LtfPutSExt(l,"$$MU,\"End\",GED_END$$\r\n");
+  LtfPutSExt(l,"$$MU,\"Cancel\",GED_CANCEL$$\r\n");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+GrElem *GrNumToQueue(GrElem *root,I8 num,I8 *x=NULL,I8 *y=NULL)
+{
+  I8 xx=0,yy=0;
+  GrElem *result=root->next;
+  while (result!=root && num--) {
+    if (result->type==GRET_SHIFT) {
+      xx+=result->x1;
+      yy+=result->y1;
+    }
+    result=result->next;
+  }
+  if (x) *x=xx;
+  if (y) *y=yy;
+  return result;
+}
+
+void GrEditUpdate(LtfBinEntry *tempb,GrElem *root)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  Free(tempb->data);
+  tempb->data=GrElemsFromQueue(root,&tempb->size);
+  Preempt(old_preempt);
+}
+
+void GrSetSettings(GrBitMap *base,GrElem *root,I8 cur_num,U8 *color,U8 *bkcolor,I8 *width)
+{
+  GrElem *tempg;
+  *bkcolor=(Fs->text_attribute>>4)&15;
+  *color=ROP_EQU|BLACK^*bkcolor;
+  *width=1;
+  GrReset(base);
+
+  tempg=root->next;
+  while (cur_num>0 && tempg!=root) {
+    switch (tempg->type) {
+      case GRET_COLOR4:
+	*color=tempg->color4^*bkcolor;
+	base->color=*color;
+	break;
+      case GRET_WIDTH:
+	*width=tempg->width;
+	base->pen_width=*width;
+	break;
+    }
+    cur_num--;
+    tempg=tempg->next;
+  }
+}
+
+class GrSnapStruct
+{
+  I8 x,y,z,xo,yo,zo;
+};
+
+void GrSetSnap(GrSnapStruct *g)
+{
+  ipx_snap=g->x;
+  ipy_snap=g->y;
+  ipz_snap=g->z;
+  ipx_snap_offset=g->xo;
+  ipy_snap_offset=g->yo;
+  ipz_snap_offset=g->zo;
+}
+
+BoolU8 GrElemsInsert(LtfBinEntry *tempb,I8 *cur_num,GrElem *root,I8 x,I8 y,BoolU4 new_picture)
+{
+  I8 i,cmd,x1,y1,x2,y2,x3,y3,p1,p2,
+     bkcolor,color,num,old_width;
+  I4 *ptr;
+  BoolU4 old_ip_double=Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+  I8 eletype=GRET_MENU;
+  GrElem root2,*tempg,*tempg1,*tempg2,*insert_point;
+  BoolU4 old_inhibit=ip_inhibit_win_operations;
+  GrBitMap *base=GrAlias(Gs->grbase,Fs);
+  I8 width;
+  GrSnapStruct old_snap,new_snap;
+  GrBitMap *img;
+  P3I4 *p;
+  I1 *st;
+  double m1,a1;
+  insert_point=GrNumToQueue(root,*cur_num,&x1,&y1);
+  x+=x1; y+=y1;
+ 
+  old_snap.x=ipx_snap;
+  old_snap.y=ipy_snap;
+  old_snap.z=ipz_snap;
+  old_snap.xo=ipx_snap_offset;
+  old_snap.yo=ipy_snap_offset;
+  old_snap.zo=ipz_snap_offset;
+  MemCpy(&new_snap,&old_snap,sizeof(GrSnapStruct));
+
+  ip_inhibit_win_operations=TRUE;
+  while (TRUE) {
+    GrSetSettings(base,root,*cur_num,&color,&bkcolor,&width);
+    GrClear;
+    if (eletype==GRET_MENU) {
+      ip_inhibit_win_operations=FALSE;
+      GrSetSnap(&old_snap);
+      i=PopUpGrElemType(new_picture);
+      if (i>GRET_MENU)
+	eletype=i;
+      switch (eletype) {
+	  case GRET_FLOOD_FILL:
+	  case GRET_FLOOD_FILL_NOT:
+AccntOneTimePopUp(ARf_FLOODFILL_MSG,
+ST_WARNING "This is affected by what's underneath\r\n"
+"when it is drawn.  You will probably want to\r\n"
+"convert it to a bitmap.\r\n\r\n"
+"A tip on artistry you might consider\r\n"
+"is using lines to fill regions because\r\n"
+"brush strokes look cool.\r\n");
+	    break;
+      }
+
+      GrSetSnap(&new_snap);
+      ip_inhibit_win_operations=TRUE;
+    }
+    switch (eletype) {
+      case GRET_COLOR4:
+	ip_inhibit_win_operations=FALSE;
+	GrSetSnap(&old_snap);
+	i=PopUpColor;
+	if (i>=0) {
+	  color=ROP_EQU|i;
+	  tempg=MAlloc(GrElemBaseSize(GRET_COLOR4));
+	  tempg->type=GRET_COLOR4;
+	  tempg->color4=color;
+	  InsQue(tempg,insert_point->last);
+	  GrEditUpdate(tempb,root);
+	  *cur_num+=1;
+	}
+	GrSetSnap(&new_snap);
+	ip_inhibit_win_operations=TRUE;
+	eletype=GRET_MENU;
+	break;
+      case GRET_WIDTH:
+	ip_inhibit_win_operations=FALSE;
+	GrSetSnap(&old_snap);
+	i=PopUpI8_16;
+	if (i>=1) {
+	  width=i;
+	  tempg=MAlloc(GrElemBaseSize(GRET_WIDTH));
+	  tempg->type=GRET_WIDTH;
+	  tempg->width=width;
+	  InsQue(tempg,insert_point->last);
+	  GrEditUpdate(tempb,root);
+	  *cur_num+=1;
+	}
+	GrSetSnap(&new_snap);
+	ip_inhibit_win_operations=TRUE;
+	eletype=GRET_MENU;
+	break;
+      case GRET_SNAP:
+	ip_inhibit_win_operations=FALSE;
+	GrSetSnap(&old_snap);
+	i=PopUpI8_16;
+	if (i>=1) {
+	  new_snap.x=i;
+	  new_snap.y=i;
+	  new_snap.z=i;
+	  new_snap.xo=Fs->win_pixel_left%i;
+	  new_snap.yo=Fs->win_pixel_top%i;
+	  new_snap.zo=0;
+	}
+	GrSetSnap(&new_snap);
+	ip_inhibit_win_operations=TRUE;
+	eletype=GRET_MENU;
+	break;
+      case GRET_TEXT:
+	ip_inhibit_win_operations=FALSE;
+	GrSetSnap(&old_snap);
+	st=PopUp("ANewStr(PmtStr(\"Text:\"));",Fs);
+	GrSetSnap(&new_snap);
+	ip_inhibit_win_operations=TRUE;
+	if (st) {
+	  x1=0; y1=0;
+	  do {
+	    base->color=color&0xFFFFFF|ROP_OR;
+	    GrText3(base,x1,y1,0,st);
+	    cmd=GetMsg(&p1,&p2,
+  	      (1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	    base->color=color&0xFFFFFF|ROP_NAND;
+	    GrText3(base,x1,y1,0,st);
+	    x1=p1; y1=p2;
+	  } while (cmd!=MSG_IP_L_UP);
+	  tempg=MAllocZ(GrElemBaseSize(GRET_TEXT)+StrLen(st)+1);
+	  tempg->type=GRET_TEXT;
+	  tempg->x1=x1-x;
+	  tempg->y1=y1-y;
+	  StrCpy(tempg->st,st);
+	  InsQue(tempg,insert_point->last);
+	  GrEditUpdate(tempb,root);
+	  *cur_num+=1;
+	  AFree(st);
+	}
+	eletype=GRET_MENU;
+	break;
+    }
+    if (eletype!=GRET_MENU) {
+      cmd=0;p1=0;p2=0;
+      if (eletype!=GRET_END && eletype!=-1) {
+	cmd=GetMsg(&p1,&p2,
+	  (1<<MSG_KEY_DOWN)+(1<<MSG_IP_L_DOWN)+
+	  (1<<MSG_IP_R_UP));
+	if (cmd==MSG_IP_R_UP)
+	  eletype=GRET_MENU;
+      }
+      if (eletype==GRET_END || eletype==-1
+	 || cmd==MSG_KEY_DOWN) {
+	if (eletype==GRET_END || eletype==-1
+	  || p1==CH_CTRLQ || p1==CH_ESC) {
+	  AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+	  ip_inhibit_win_operations=old_inhibit;
+	  GrDel(base);
+	  GrSetSnap(&old_snap);
+	  return eletype==GRET_END || p1==CH_ESC;
+	}
+      } else {
+	switch (eletype) {
+	  case GRET_LINE:
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrLine3(base,x1,y1,0,x2,y2,0);
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrLine3(base,x1,y1,0,x2,y2,0);
+	      x2=p1; y2=p2;
+	    } while (cmd!=MSG_IP_L_UP);
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    GrLine3(base,x1,y1,0,x2,y2,0);
+	    tempg=MAlloc(GrElemBaseSize(GRET_LINE));
+	    tempg->type=GRET_LINE;
+	    tempg->x1=x1-x;
+	    tempg->y1=y1-y;
+	    tempg->x2=x2-x;
+	    tempg->y2=y2-y;
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_BOX:
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrBox3(base,x1,y1,0,x2-x1,y2-y1);
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrBox3(base,x1,y1,0,x2-x1,y2-y1);
+	      x2=p1; y2=p2;
+	      if (x2<x1) {
+		i=x2; x2=x1; x1=i;
+	      }
+	      if (y2<y1) {
+		i=y2; y2=y1; y1=i;
+	      }
+	    } while (cmd!=MSG_IP_L_UP);
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    GrBox3(base,x1,y1,0,x2-x1,y2-y1);
+	    tempg=MAlloc(GrElemBaseSize(GRET_BOX));
+	    tempg->type=GRET_BOX;
+	    tempg->x1=x1-x;
+	    tempg->y1=y1-y;
+	    tempg->x2=x2-x;
+	    tempg->y2=y2-y;
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_BITMAP4:
+	  case GRET_BITMAP4_TRANSPARENT:
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    old_width=base->pen_width;
+	    base->pen_width=1;
+	    do {
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrLine3(base,x1,y1,0,x2,y1,0);
+	      GrLine3(base,x1,y1,0,x1,y2,0);
+	      GrLine3(base,x2,y2,0,x2,y1,0);
+	      GrLine3(base,x2,y2,0,x1,y2,0);
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrLine3(base,x1,y1,0,x2,y1,0);
+	      GrLine3(base,x1,y1,0,x1,y2,0);
+	      GrLine3(base,x2,y2,0,x2,y1,0);
+	      GrLine3(base,x2,y2,0,x1,y2,0);
+	      x2=p1; y2=p2;
+	      if (x2<x1) {
+		i=x2; x2=x1; x1=i;
+	      }
+	      if (y2<y1) {
+		i=y2; y2=y1; y1=i;
+	      }
+	    } while (cmd!=MSG_IP_L_UP);
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    GrLine3(base,x1,y1,0,x2,y1,0);
+	    GrLine3(base,x1,y1,0,x1,y2,0);
+	    GrLine3(base,x2,y2,0,x2,y1,0);
+	    GrLine3(base,x2,y2,0,x1,y2,0);
+	    x2++; y2++;
+	    tempg=MAllocZ(GrElemBaseSize(GRET_BITMAP4)+
+	      ((x2-x1+7)&~7)*(y2-y1)/2);
+	    tempg->type=eletype;
+	    tempg->width=x2-x1;
+	    tempg->height=y2-y1;
+	    tempg->x2=x1-x;
+	    tempg->y2=y1-y;
+	    tempg->bkcolor=bkcolor;
+	    img=GrBitMapNew(BMT_COLOR4,tempg->width,tempg->height,Fs);
+	    img->color=bkcolor;
+	    GrBox(img,0,0,tempg->width,tempg->height);
+	    GrSetSettings(img,root,0,&color,&bkcolor,&width);
+	    GrElemsPlot(img,-(x1-x),-(y1-y),0,tempb->data);
+	    MemCpy(tempg+sizeof(GrElem),img->body,((x2-x1+7)&~7)*(y2-y1)/2);
+	    GrDel(img);
+	    GrElemsDel(root);
+	    root->next=root;
+	    root->last=root;
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num=1;
+	    base->pen_width=old_width;
+	    eletype=GRET_MENU;
+	    break;
+	  case GRET_CIRCLE:
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrCircle3(base,x1,y1,0,Sqrt(SqrI8(x1-x2)+SqrI8(y1-y2)));
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrCircle3(base,x1,y1,0,Sqrt(SqrI8(x1-x2)+SqrI8(y1-y2)));
+	      x2=p1; y2=p2;
+	    } while (cmd!=MSG_IP_L_UP);
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    GrCircle3(base,x1,y1,0,Sqrt(SqrI8(x1-x2)+SqrI8(y1-y2)));
+	    tempg=MAlloc(GrElemBaseSize(GRET_CIRCLE));
+	    tempg->type=GRET_CIRCLE;
+	    tempg->x1=x1-x;
+	    tempg->y1=y1-y;
+	    tempg->x2=Sqrt(SqrI8(x1-x2)+SqrI8(y1-y2));
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_ELLIPSE:
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrEllipse3(base,(x1+x2)>>1,(y1+y2)>>1,0,
+		AbsI8(x1-x2)>>1,AbsI8(y1-y2)>>1);
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrEllipse3(base,(x1+x2)>>1,(y1+y2)>>1,0,
+		AbsI8(x1-x2)>>1,AbsI8(y1-y2)>>1);
+	      x2=p1; y2=p2;
+	    } while (cmd!=MSG_IP_L_UP);
+	    tempg=MAlloc(GrElemBaseSize(GRET_ELLIPSE));
+	    tempg->type=GRET_ELLIPSE;
+	    tempg->x2=(x1+x2)>>1-x;
+	    tempg->y2=(y1+y2)>>1-y;
+	    tempg->width =AbsI8(x1-x2)>>1;
+	    tempg->height=AbsI8(y1-y2)>>1;
+
+	    do {
+	      R2P(&m1,&a1,x2-(tempg->x2+x),y2-(tempg->y2+y));
+	      tempg->rot_angle=-a1;
+	      base->color=color&0xFFFFFF|ROP_OR;
+	      GrEllipse3(base,tempg->x2+x,tempg->y2+y,0,
+		tempg->width,tempg->height,tempg->rot_angle);
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      base->color=color&0xFFFFFF|ROP_NAND;
+	      GrEllipse3(base,tempg->x2+x,tempg->y2+y,0,
+		tempg->width,tempg->height,tempg->rot_angle);
+	      x2=p1; y2=p2;
+	    } while (cmd!=MSG_IP_L_UP);
+
+	    R2P(&m1,&a1,x2-(tempg->x2+x),y2-(tempg->y2+y));
+	    tempg->rot_angle=-a1;
+
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    GrEllipse3(base,tempg->x2+x,tempg->y2+y,0,
+	      tempg->width,tempg->height,tempg->rot_angle);
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_POINT:
+	    x1=p1; y1=p2;
+	    tempg=MAlloc(GrElemBaseSize(GRET_POINT));
+	    tempg->type=GRET_POINT;
+	    tempg->x1=x1-x;
+	    tempg->y1=y1-y;
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_FLOOD_FILL:
+	  case GRET_FLOOD_FILL_NOT:
+	    x1=p1; y1=p2;
+	    tempg=MAlloc(GrElemBaseSize(GRET_FLOOD_FILL));
+	    tempg->type=eletype;
+	    tempg->x1=x1-x;
+	    tempg->y1=y1-y;
+	    InsQue(tempg,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_POLYLINE:
+	    root2.next=&root2;
+	    root2.last=&root2;
+	    num=0;
+	    x3=p1-x; y3=p2-y;
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      do {
+		base->color=color&0xFFFFFF|ROP_OR;
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		cmd=GetMsg(&p1,&p2,
+  		  (1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE)+
+		  (1<<MSG_IP_R_UP));
+		base->color=color&0xFFFFFF|ROP_NAND;
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		x2=p1; y2=p2;
+	      } while (cmd!=MSG_IP_L_UP && cmd!=MSG_IP_R_UP);
+	      base->color=color&0xFFFFFF|ROP_EQU;
+	      if (cmd==MSG_IP_L_UP) {
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		tempg=MAlloc(GrElemBaseSize(GRET_POINT));
+		tempg->type=GRET_POINT;
+		tempg->x1=x2-x;
+		tempg->y1=y2-y;
+		InsQue(tempg,root2.last);
+		x1=x2;y1=y2;
+		num++;
+	      }
+	    } while (cmd!=MSG_IP_R_UP);
+	    if (num) {
+	      tempg2=MAllocZ(GrElemBaseSize(GRET_POLYLINE)+
+		     (num+1)<<1*sizeof(I4));
+	      ptr=&tempg2->y1;
+	      tempg=root2.next;
+	      ptr[0]=x3;
+	      ptr[1]=y3;
+	      ptr+=sizeof(I4)<<1;
+	      for (i=0;i<num;i++) {
+		tempg1=tempg->next;
+		ptr[i<<1]=tempg->x1;
+		ptr[i<<1+1]=tempg->y1;
+		Free(tempg);
+		tempg=tempg1;
+	      }
+	      tempg2->type=GRET_POLYLINE;
+	      tempg2->num=num+1;
+	      InsQue(tempg2,insert_point->last);
+	      GrEditUpdate(tempb,root);
+	      *cur_num+=1;
+	    }
+	    break;
+	  case GRET_SPEEDLINE:
+	    root2.next=&root2;
+	    root2.last=&root2;
+	    x3=p1-x; y3=p2-y;
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    do {
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      x2=p1; y2=p2;
+	      tempg=MAlloc(GrElemBaseSize(GRET_SPEEDLINE_POINT));
+	      tempg->linespeed=ip_speed;
+//TODO:	      GrSpeedLine2(base,x1,y1,0,x2,y2,0,tempg->linespeed);
+	      GrSpeedLine(base,x1,y1,x2,y2,tempg->linespeed);
+	      tempg->type=GRET_SPEEDLINE_POINT;
+	      tempg->x1=x2-x;
+	      tempg->y1=y2-y;
+	      InsQue(tempg,root2.last);
+	      x1=x2;y1=y2;
+	    } while (cmd!=MSG_IP_L_UP);
+
+	    num=0;
+	    tempg=root2.next;
+	    x1=x3;y1=y3;
+	    while (tempg!=&root2) {
+	      tempg1=tempg->next;
+	      if (tempg->x1==x1 && tempg->y1==y1) {
+		RemQue(tempg);
+		Free(tempg);
+	      } else {
+		num++;
+		x1=tempg->x1;
+		y1=tempg->y1;
+	      }
+	      tempg=tempg1;
+	    }
+
+	    tempg2=MAllocZ(GrElemBaseSize(GRET_SPEEDLINE)+
+	      (num+1)*(sizeof(I4)*2+sizeof(double)));
+	    ptr=&tempg2->y1;
+	    tempg=root2.next;
+	    ptr[0]=x3;
+	    ptr[1]=y3;
+	    ptr+=sizeof(I4)*2+sizeof(double);
+	    x1=x3;y1=y3;
+	    for (i=0;i<num;i++) {
+	      tempg1=tempg->next;
+	      ptr[i<<2]=tempg->x1;
+	      ptr[i<<2+1]=tempg->y1;
+	      ptr[i<<2+2]><(double)=tempg->linespeed;
+	      Free(tempg);
+	      tempg=tempg1;
+	    }
+	    tempg2->type=GRET_SPEEDLINE;
+	    tempg2->num=num+1;
+	    InsQue(tempg2,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_POLYPOINT:
+	    root2.next=&root2;
+	    root2.last=&root2;
+	    x3=p1-x; y3=p2-y;
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    base->color=color&0xFFFFFF|ROP_EQU;
+	    do {
+	      cmd=GetMsg(&p1,&p2,
+  		(1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	      x2=p1; y2=p2;
+	      GrLine3(base,x1,y1,0,x2,y2,0);
+	      Line(&root2,x1-x,y1-y,0,x2-x,y2-y,0,&GrPolyPointPlot);
+	      x1=x2;y1=y2;
+	    } while (cmd!=MSG_IP_L_UP);
+
+	    num=0;
+	    tempg=root2.next;
+	    x1=x3;y1=y3;
+	    while (tempg!=&root2) {
+	      tempg1=tempg->next;
+	      if (tempg->x1==x1 && tempg->y1==y1) {
+		RemQue(tempg);
+		Free(tempg);
+	      } else {
+		num++;
+		x1=tempg->x1;
+		y1=tempg->y1;
+	      }
+	      tempg=tempg1;
+	    }
+
+	    tempg2=MAllocZ(GrElemBaseSize(GRET_POLYPOINT)+
+	      sizeof(I4)*2+(num*3+7)>>3);
+	    ptr=&tempg2->y1;
+	    ptr[0]=x3;
+	    ptr[1]=y3;
+	    ptr+=sizeof(I4)<<1;
+	    x1=x3;y1=y3;
+	    i=0;
+	    tempg=root2.next;
+	    while (tempg!=&root2) {
+	      tempg1=tempg->next;
+	      OrU4BitField(ptr,i,
+		GrElOffset[SignI8(tempg->x1-x1)+1+
+		3*(SignI8(tempg->y1-y1)+1)]);
+	      i+=3;
+	      x1=tempg->x1;y1=tempg->y1;
+	      RemQue(tempg);
+	      Free(tempg);
+	      tempg=tempg1;
+	    }
+	    tempg2->type=GRET_POLYPOINT;
+	    tempg2->num=num+1;
+	    InsQue(tempg2,insert_point->last);
+	    GrEditUpdate(tempb,root);
+	    *cur_num+=1;
+	    break;
+	  case GRET_BSPLINE2:
+	  case GRET_BSPLINE3:
+	  case GRET_BSPLINE2_CLOSED:
+	  case GRET_BSPLINE3_CLOSED:
+	    root2.next=&root2;
+	    root2.last=&root2;
+	    num=0;
+	    x3=p1-x; y3=p2-y;
+	    x1=p1; y1=p2;
+	    x2=p1; y2=p2;
+	    do {
+	      do {
+		base->color=color&0xFFFFFF|ROP_OR;
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		cmd=GetMsg(&p1,&p2,
+  		  (1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE)+
+		  (1<<MSG_IP_R_UP));
+		base->color=color&0xFFFFFF|ROP_NAND;
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		x2=p1; y2=p2;
+	      } while (cmd!=MSG_IP_L_UP && cmd!=MSG_IP_R_UP);
+	      base->color=color&0xFFFFFF|ROP_EQU;
+	      if (cmd==MSG_IP_L_UP) {
+		GrLine3(base,x1,y1,0,x2,y2,0);
+		tempg=MAlloc(GrElemBaseSize(GRET_POINT));
+		tempg->type=GRET_POINT;
+		tempg->x1=x2-x;
+		tempg->y1=y2-y;
+		InsQue(tempg,root2.last);
+		x1=x2;y1=y2;
+		num++;
+	      }
+	    } while (cmd!=MSG_IP_R_UP);
+	    if (num) {
+	      tempg2=MAllocZ(GrElemBaseSize(GRET_POLYLINE)+
+		     (num+1)*sizeof(P3I4));
+	      p=&tempg2->y1;
+	      tempg=root2.next;
+	      p[0].x=x3;
+	      p[0].y=y3;
+	      for (i=1;i<=num;i++) {
+		tempg1=tempg->next;
+		p[i].x=tempg->x1;
+		p[i].y=tempg->y1;
+		Free(tempg);
+		tempg=tempg1;
+	      }
+	      tempg2->type=eletype;
+	      tempg2->num=num+1;
+	      InsQue(tempg2,insert_point->last);
+	      GrEditUpdate(tempb,root);
+	      *cur_num+=1;
+	    }
+	    break;
+	}
+      }
+    }
+  }
+}
+
+
+void EditInsertGraphic(Ltf *l,I8 x,I8 y)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *st;
+  LtfEntry *ll;
+  LtfBinEntry *tempb;
+  I8 cur_num=0;
+  GrElem *root;
+  if (Fs!=l->mem_tss)
+    Debugger;
+  tempb=MAllocZ(sizeof(LtfBinEntry),l->mem_tss);
+  tempb->type=LTFBT_GRELEM;
+  tempb->size=GrElemBaseSize(GRET_END,FALSE);
+  tempb->data=MAllocZ(tempb->size,l->mem_tss);
+  if (st=EditPicture) {
+    ll=LtfPutSExt(l,st);
+    Free(st);
+    ll->bin_num=l->cur_bin_num;
+    tempb->num=l->cur_bin_num++;
+    ll->bin_data=tempb;
+    InsQue(tempb,l->bin_root.last);
+    Preempt(old_preempt);
+    root=GrElemsToQueue(tempb->data);
+    x+=StrLen(ll->display)*FONT_WIDTH;
+    if (!GrElemsInsert(tempb,&cur_num,root,x,y,TRUE)) {
+      Preempt(OFF);
+      RemQue(ll);
+      Free(ll,l->mem_tss);
+      Free(ll->display,l->mem_tss);
+      RemQue(tempb);
+      Free(tempb->data,l->mem_tss);
+      Free(tempb,l->mem_tss);
+      Preempt(old_preempt);
+    }
+    GrElemsDel(root);
+  } else {
+    Free(tempb->data,l->mem_tss);
+    Free(tempb,l->mem_tss);
+  }
+}
+
+
+public LtfEntry *LtfPutGrElem(Ltf *l,U1 *elems,U8 size,U1 *txt=NULL)
+{
+  I1 *st;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *ll;
+  LtfBinEntry *tempb;
+  tempb=MAllocZ(sizeof(LtfBinEntry),l->mem_tss);
+  tempb->type=LTFBT_GRELEM;
+  tempb->size=size;
+  tempb->data=MAlloc(size,l->mem_tss);
+  MemCpy(tempb->data,elems,size);
+  tempb->num=l->cur_bin_num;
+  InsQue(tempb,l->bin_root.last);
+  if (txt)
+    st=MSPrintF(txt,l->cur_bin_num++);
+  else
+    st=MSPrintF("$$PI,\"\",%d$$",l->cur_bin_num++);
+  ll=LtfPutSExt(l,st);
+  Free(st);
+  ll->bin_data=tempb;
+  Preempt(old_preempt);
+  return ll;
+}
+
+#help_index "Graphics/GrElem;Ltf/Output"
+public LtfEntry *PutGrElem(U1 *elems,U8 size,U1 *txt=NULL)
+{ //If you set $FG,4$txt$FG$,
+//then include dollarsigns ("$FG,4$$$PI ...$$$FG$")
+  Ltf *l;
+  if (l=Fs->cur_ltf)
+    return LtfPutGrElem(l,elems,size,txt);
+  return NULL;
+}
+
+#help_index "Graphics/GrElem"
+void EditExistingGraphic(Ltf *l,I8 x,I8 y)
+{
+  BoolU4 *old_preempt=Preempt(OFF);
+  LtfEntry *ll=l->cur_entry;
+  LtfBinEntry *tempb=ll->bin_data;
+  I8 i,cur_num=0,cmd,p1,p2,old_size=tempb->size,xx,yy;
+  GrElem *cur_elem,*old_GrElem=tempb->data,
+//    *root=GrElemsToQueue(old_GrElem),*tempg,*insert_point;
+    *root,*tempg,*insert_point;
+  BoolU4 old_inhibit=ip_inhibit_win_operations;
+  BoolU4 old_ip_double=Bt(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+  root=GrElemsToQueue(old_GrElem);
+
+  cur_elem=root->next;
+  while (cur_elem->type!=GRET_END) {
+    cur_num++;
+    cur_elem=cur_elem->next;
+  }
+
+  tempb->data=MAllocIdentical(old_GrElem);
+  Preempt(old_preempt);
+  do {
+    i=PopUpGrElemsEditChoice;
+    switch (i) {
+      case GED_PICK_TEXT:
+	cur_num=PopUpPickGrElem(root,cur_num);
+	break;
+      case GED_PICK_GRAPHICALLY:
+	ip_inhibit_win_operations=TRUE;
+	Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	l->cur_GrElem=tempb->data;
+	l->cur_sub_grelem=0;
+	GetMsg(&p1,&p2,1<<MSG_IP_L_UP);
+	cur_num=l->cur_sub_grelem;
+	l->cur_GrElem=NULL;
+	AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+	ip_inhibit_win_operations=old_inhibit;
+	break;
+      case GED_SET_ORIGIN:
+	ip_inhibit_win_operations=TRUE;
+	Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	GetMsg(&p1,&p2,1<<MSG_IP_L_UP);
+	GrSetOrigin(root,x-p1,y-p2,0);
+	GrEditUpdate(tempb,root);
+	AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+	ip_inhibit_win_operations=old_inhibit;
+	break;
+      case GED_TRANSFORM:
+	EditGrElemTransform(root);
+	GrEditUpdate(tempb,root);
+	break;
+      case GED_SHIFT_ORIGIN:
+	ip_inhibit_win_operations=TRUE;
+	Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	insert_point=GrNumToQueue(root,cur_num);
+	tempg=MAlloc(GrElemBaseSize(GRET_SHIFT));
+	tempg->type=GRET_SHIFT;
+	tempg->x1=0;
+	tempg->y1=0;
+	InsQue(tempg,insert_point->last);
+	GetMsg(&p1,&p2,1<<MSG_IP_L_DOWN);
+	xx=p1; yy=p2;
+	do {
+	  cmd=GetMsg(&p1,&p2,
+  	    (1<<MSG_IP_L_UP)+(1<<MSG_IP_MOVE));
+	  tempg->x1=p1-xx;
+	  tempg->y1=p2-yy;
+	  GrEditUpdate(tempb,root);
+	} while (cmd!=MSG_IP_L_UP);
+	AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+	ip_inhibit_win_operations=old_inhibit;
+	break;
+      case GED_INSERT:
+	GrElemsInsert(tempb,&cur_num,root,x,y,FALSE);
+	break;
+      case GED_DELETE:
+	cur_elem=GrNumToQueue(root,cur_num);
+	if (cur_elem!=root) {
+	  RemQue(cur_elem);
+	  Free(cur_elem);
+	  GrEditUpdate(tempb,root);
+	}
+	break;
+      case GED_EDIT:
+	if (GrElemTextEdit(root))
+	  GrEditUpdate(tempb,root);
+	break;
+    }
+  } while (i!=GED_CANCEL && i!=GED_END);
+  Preempt(OFF);
+  if (i==GED_END)
+    Free(old_GrElem);
+  else {
+    Free(tempb->data);
+    tempb->data=old_GrElem;
+    tempb->size=old_size;
+  }
+  Preempt(old_preempt);
+  GrElemsDel(root);
+}
+
+#help_index "Graphics"
+ 

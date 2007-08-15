@@ -1,0 +1,94 @@
+$WW,1$$FG,5$$TX+CX,"Introduction"$$FG$
+
+There's no point being an inferior immitation of $FG,2$Windows$FG$.  I picked a niche and specialized -- $BK,1$programming as entertainment$BK,0$.  I chose simplicity intentionally over conventional approaches.  This is not a platform for games, but a platform for writing games.  Hobbiest programmers are a higher priority than commercial developers.
+
+I have no plans to support multimedia or the Internet.  This is a supplemental operating system (like supplemental insurance).  Duel boot and do that stuff on your primary operating system.  There's no reason to reinvent the wheel and, unlike what I've done in LoseThos , I see nothing I could add to a browser or multimedia player -- you can't change the file formats.
+
+LoseThos has no networking and will never have networking so there's no need for security.  Did an $FG,2$Apple II$FG$ or $FG,2$Commodore 64$FG$ have security?  I mention these classic systems because the intended usage of LoseThos is similar, only modern. 
+
+LoseThos is not for desktop publishing or word processing.  It's document format is designed for interaction on the screen and does not lend itself to printing.  Click here for a hint $HS$This text is hidden until you click on it.$HE$.
+
+When I started programming in 1981 on an $FG,2$Apple II$FG$, it took two lines of code to draw a line on the screen and it could be typed from the command line or in a $FG,2$BASIC$FG$ program:
+
+$FG,4$HGR
+HLINE 1,1 TO 30,30$FG$
+
+Programming is far more intimidating, now.  It's not uncommon for a "Hello World" application to take 50 lines of code.
+
+Most game development packages for amateurs are like fitting a square peg in a round hole.  People want good looking games, but don't have "the chops".  $FG,2$LoseThos$FG$ games will not look as good, but there is complete freedom -- you won't be constrained.  I suggest you stick to 2D instead of 3D.
+
+Game companies employ more artists than programmers.  In the past, games were often made by individual programmers.  Modern games are more like movies, relying on lots of "canned" video and sound.
+
+I had to have an option for simple graphics so I made a graphic layer that is "persistent" (stays on the screen without having to be refreshed.)  There is a second layer which is redrawn each refresh.  The two layers are merged (XOR), along with a text layer, to form the screen image.  There's actually a persistent layer for each CPU, but beginners don't need to know that.
+
+I hate fighting with fonts.  There will always be just one font, a fixed-width font, because variable width letters screw-up tables.  Now, I fight with colors and it's about the same.  Oh, well.
+
+I like $FG,2$ASCII$FG$ more than $FG,2$UNICODE$FG$.  I'll stick to the American market.  I might add extended $FG,2$ASCII$FG$, but not $FG,2$UNICODE$FG$.  Let programmers in other countries write their own operating systems.
+
+The text layer allows animated character graphics, which were fun.  It's been modified to shift the character in each position horizontally or vertically, so you can do $SY,-3$superscripts $SY,0$or $SY,3$subscripts$SY,0$.
+
+I hated learning one language for the command line and another for programming.  With $FG,2$LoseThos$FG$, the command line feeds right into the $FG,2$C+$FG$ (more than $FG,2$C$FG$, less than $FG,2$C++$FG$) compiler, line by line, and it places code in memory it $LK,"MAlloc","MN:MAlloc"$()s.  It's like the compiler is paused.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.  During boot, many files get compiled before it allows you to access the command line.  All the header declarations for the operating system are already compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truely compiled and nothing is "interpreted".
+
+Statements outside the "scope" of a $FG,2$C+$FG$ function execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give a meaningful name and invoke that function by calling it with a statement outside the scope of any function, usually at the bottom of your file.
+
+I started with $FG,2$C$FG$ syntax, but didn't like the command line for a directory listing looking like this:
+
+$FG,4$Dir("*.*",FALSE);
+
+$FG$So, I added default parameters from $FG,2$C++$FG$ and it looked like this:
+
+$FG,4$Dir();
+
+$FG$I didn't like that, so I made parentheses optional on calls with no parameters and it looks like this:
+
+$FG,4$Dir;$FG$
+
+The only side effect in changing the syntax is that when you specify the address of a function, you must include a $FG,2$&$FG$ in front (which is better anyway).
+
+Once I was no longer using standard syntax, I decided to change everything I didn't like.  Here are the new $LK,"operator precidence","FA:::/LT/Compiler/CmpInit.CPZ,OP_precidence"$ rules.  See $LK,"Departures from C/C++","FI:::/LT/Doc/Differences.TXZ"$.
+
+There are no object files in LoseThos and, normally, you don't make executable files either, but you can.  That's known as "static" compilation.
+
+I looked at $FG,2$Linux$FG$ code to learn how to use a hard drive and, damn it was confusing.  It had so many layers it was hard to find the actual $FG,4$IN$FG$ and $FG,4$OUT$FG$ instructions that access the hardware.  I decided I'd keep layering to a minimum.  Why have open source software if people can't understand and modify it?
+
+One problem with $FG,2$Linux$FG$ is it handles many platforms and different pieces of hardware so it's full of $FG,4$#if$FG$'s and I found it difficult to read.  I don't know if LoseThos will become that way or not.  I'm starting with 64-bit CPU's and hardware of that vintage, so I have no reason to support the majority of old hardware.
+
+I cherished a book called "Mapping the $FG,2$Commodore 64$FG$" when I was a kid because it literally told what everything did.  I had a lot of fun.  $FG,2$Commodore$FG$, Ticketmaster's $FG,2$VAXTMOS$FG$ and $FG,2$MATLAB$FG$ are influences.
+
+I made the kernel (known as OSMain) intentionally simple, so everybody could understand and tinker.  Technically, it shouldn't be called a kernel since $BK,1$everything always runs in kernel mode$BK,0$.  All code always has full priviledge.  User programs can access all memory, use all CPU instructions, access all I/O ports directly, and can access all parts of the disk.  My system reboots in 3 seconds if I crash it and I like total freedom as a programmer.
+
+Tasks have no priority scheme and are never removed from the queue.  Instead they poll whatever they are waiting on and swap-out.  This keeps it simple.  It's only a problem if you have too many tasks busy.
+
+The file system is simple so no body can sue me.  There is an allocation bitmap and all files are stored contiguously.  You cannot grow files.  Files have checksums, however.  Filenames ending in "Z" are stored compressed.  LoseThos supports direct block access into files.  There is no $FG,2$PATH$FG$ but parent directories are searched when a file is not found.  See $LK,"LTZ","FI:::/LT/Doc/LTZ.TXZ"$ for transferring files to your primary partition.
+
+At one job I made a hardware device which plugged into the parallel port.  When we upgraded from $FG,2$Win98$FG$ to $FG,2$WinXP$FG$, hardware ports became off-limits.  A coworker found some software to enable them.  $FG,2$LoseThos$FG$ allows full access to ports.  Some hobbiests might want to plug hobby hardware projects into the parallel port.
+
+I like being able to turn-off interrupts ($FG,2$Cli; $FG$and $FG,2$Sti;$FG$) when I change a structure used in a multitasking environment.  $FG,2$LoseThos$FG$ runs all programs in kernel mode, so no instructions are restricted.  Turning-off preemption with $LK,"Preempt","MN:Preempt"$() is a less drastic measure that is usually sufficient.
+
+The graphic resolution is poor, 640x480x4.  I've decided to set this as the one and only resolution, forever.  It uses minimal CPU.  A fixed size keeps it simple.  Everybody has the same appearance on their screen.  It's good for mobile devices.  VGA is currently the least common denominator on PC's.  Look on the bright-side -- you won't spend your time twiddling pixels.
+
+$FG,2$LoseThos$FG$ is for hobbiest programmers on single user home computers.  The focus task is all-important so "symmetrical multiprocessing" is almost pointless.  When it comes to multicore utilization, all resources should be devoted to the focus task.  For now, you must explicitly make use of mutlicore in your programs.  You can make use of $FG,4$Gs->grbase$FG$, a persistent graphics layer present for each core.  It gets merged (XORed) to make the final image.  Multicore is fun.  A practical use I plan is placing time-critical tasks on a core which doesn't allow long periods with preemption turned-off.
+
+I didn't want to use virtual memory, but I had to for 64-bit mode.  It's just as though there is no virtual memory, except you can mark pages as uncached or write-through for MultiCore programming.
+
+There is no distinction between "task", "process" or "thread".  All have a $LK,"TssStruct","MN:TssStruct"$() pointed to by $FG,4$Fs->$FG$ while $FG,4$Gs->$FG$ points to a $LK,"CPUStruct","MN:CPUStruct"$ for the current CPU.  Each task can have just one window.
+
+In LoseThos , "$FG,2$Adam$FG$" refers to the father of all tasks.  He's never supposed to die.  Since task's inherit the symbols of parents, system-wide stuff is associated with $FG,2$Adam$FG$.  His heap is like kernel memory in other operating systems.  He stays in a server mode, taking requests, so you can ask him to $FG,2$#include$FG$ something which places that code system-wide.  A funny story is that, originally, I called it the "root" task and even had a "$FG,2$/LT/Root$FG$" directory.
+
+For easy back-up, place everything you do in your $FG,2$HOME$FG$ directory and subdirectories.  That should make upgrading easy, too.  To make an account use $LK,"MkDir","MN:MkDir"$() to create a directory under $FG,2$/LT/Accts$FG$.  It will be $FG,2$HOME$FG$ if you boot to it.  The customizable start-up scripts should go in your $FG,2$HOME$FG$ directory.  The default start-up files are in $FG,2$/LT/Accts$FG$, the parent of all accounts.  Copy the start-up files you wish to customize into $FG,2$HOME$FG$ and modify them.  See $LK,"Account Files","FF:::/LT/Doc/GuideLines.TXZ,ACCOUNT FILES"$.
+
+Typically, your usage pattern through the day will be repeatedly left or right clicking on filenames in a command line $LK,"Dir","MN:Dir"$() listing.  You left-click files to edit them and right-click to $FG,2$#include$FG$ them.  To begin a project, type $LK,"Edit","MN:Edit"$(""); and supply a filename.  Press $FG,2$ESC$FG$ to save and exit the file.  You'll need to do a new $LK,"Dir","MN:Dir"$() command, periodically, so make a macro.  Access the macro by pressing the $FG,2$WINDOWS$FG$ key, cursoring until you are on top of it and pressing the $FG,2$SPACE BAR$FG$.
+
+$FG,2$CTRL-T$FG$ toggles plain text mode, similar to html.  $FG,2$CTRL-L$FG$ inserts a nongraphic widget.  $FG,2$CTRL-R$FG$ inserts a graphic or edits the graphic under the cursor.
+
+$FG,2$CTRL-ALT-ESC$FG$ creates a new terminal window.  $FG,2$CTRL-ALT-X$FG$ kills a window.  You'll do these periodically.  $FG,2$CTRL-SHIFT-F$FG$ pops-up the "favorites" document.  The favorites can be used from anywhere.  You can put anything there.  I use it as a handy TODO file, along with common links.
+
+$LK,"Grep","MN:Grep"$() is your best friend.  There's a wrapper function called $LK,"F","MN:F"$() in your $FG,2$User.CPZ$FG$ file.  $LK,"Grep","MN:Grep"$() can also be used to replace strings across multiple files.
+
+As you browse code, use the $FG,2$WordStat$FG$ window to look-up functions, etc.  Press $FG,2$CTRL-SHIFT-F1$FG$ (or whatever) to follow a symbol to it's source.  You can browse deeper and deeper.  You go back with $FG,2$CTRL-Q$FG$.
+
+Use the $LK,"Help Index","FI:::/LT/Doc/HelpIndex.TXZ"$ to find-out what exists.  It's broken down by category.  A link to the help index should be on your menu.  ($FG,2$WINDOW's KEY$FG$).  Also, look in the $FG,2$/LT/Demo$FG$ directory.
+
+
+$MA+A-X+PU,"Take Tour","SpawnUser(\"Cd(\\\"::/LT/Accts/Tour\\\");;AutoFile(\\\"Tour\\\");\r\");"$
+ 

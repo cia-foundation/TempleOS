@@ -1,0 +1,9 @@
+extern U8i SysEcho(U8i val);
+SysEcho(0);  //0=echo OFF   1=echo ON
+#include "/LT/OSMain/AdamK.HPZ"
+#include "/LT/OSMain/AdamK2.HPZ"
+#include "/LT/OSMain/AdamK3.HPZ"
+#include "/LT/Compiler/Compiler.HPZ"
+#exe {OptOn(OPTf_IGNORE_OVERFLOW);}
+Cd("/LT/Adam");;
+#include "Adam2.APZ"

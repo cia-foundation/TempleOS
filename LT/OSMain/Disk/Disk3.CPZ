@@ -1,0 +1,554 @@
+void LockPartition(LTPartition *p)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  if (p->owning_task!=Fs) {
+    while (Bts(&p->flags,MPEf_LOCKED))
+      SwapInNext;
+    if (bdev->type==LTBDT_FDC)
+      FDCGet(bdev);
+    p->owning_task=Fs;
+  }
+  Preempt(old_preempt);
+}
+
+BoolU8 UnlockPartition(LTPartition *p,BoolU4 reset=FALSE)
+{
+  LTBlkDev *bdev=p->bdev;
+  BoolU4 old_preempt=Preempt(OFF),result=FALSE;
+  CheckLTPartition(p);
+  if (p->owning_task==Fs) {
+    if (reset) {
+      bdev->flags&=~(LTBDF_INITIALIZED|LTBDF_INIT_IN_PROGRESS);
+      if (bdev->irq)
+	LBtr(&sema_irq_busy[bdev->irq],0);
+    }
+    p->owning_task=0;
+    if (bdev->type==LTBDT_FDC)
+      FDCFree(bdev);
+    Btr(&p->flags,MPEf_LOCKED);
+    result=TRUE;
+    SwapInNext; //Prevent deadlock
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+
+void AllocMAPBuf(LTPartition *p,U8 num_blks)
+{
+  CheckLTPartition(p);
+  AFree(p->cur_MAP_blk);
+  AFree(p->buffered_MAP_dirty_bits);
+  p->num_buffered_MAP_blks=num_blks;
+  p->cur_MAP_blk=AMAlloc(num_blks<<BLK_SIZE_BITS);
+  p->buffered_MAP_dirty_bits=AMAllocZ((num_blks+7)>>3);
+  p->cur_MAP_blk_num=0;
+  RBlks(p,p->cur_MAP_blk,p->MAP1,p->num_buffered_MAP_blks,FALSE);
+}
+
+
+void CleanMAPBuf(LTPartition *p,I8 MAP_select=-1)
+{
+  U8 i;
+  if (MAP_select==-1 || MAP_select==0) {
+    for (i=0;i<p->num_buffered_MAP_blks;i++)
+      if (Bt(p->buffered_MAP_dirty_bits,i))
+	WBlks(p,p->cur_MAP_blk+i<<BLK_SIZE_BITS,p->MAP1+i+p->cur_MAP_blk_num,1,FALSE);
+  }
+  if (MAP_select==-1 || MAP_select==1) {
+    for (i=0;i<p->num_buffered_MAP_blks;i++)
+      if (Btr(p->buffered_MAP_dirty_bits,i))
+	WBlks(p,p->cur_MAP_blk+i<<BLK_SIZE_BITS,p->MAP2+i+p->cur_MAP_blk_num,1,FALSE);
+  }
+}
+
+void SetLTBuf(LTPartition *p,U8 c)
+{
+  U8 MAP_blk_num=c>>(BLK_SIZE_BITS+3);
+  if (MAP_blk_num!=p->cur_MAP_blk_num) {
+    CleanMAPBuf(p);
+    p->cur_MAP_blk_num=MAP_blk_num;
+    RBlks(p,p->cur_MAP_blk,p->MAP1+p->cur_MAP_blk_num,1,FALSE);
+  }
+}
+
+#define ZERO_BUF_SIZE	2048
+void WZeroBlks(LTPartition *p,U8 blk,U8 cnt,BoolU4 unlock)
+{
+  U8 n;
+  U1 *z=MAllocZ(ZERO_BUF_SIZE<<BLK_SIZE_BITS);
+  while (cnt) {
+    n=cnt;
+    if (n>ZERO_BUF_SIZE)
+      n=ZERO_BUF_SIZE;
+    WBlks(p,z,blk,n,unlock);
+    blk+=n;
+    cnt-=n;
+    SwapInNext;  //Prevent locking
+  }
+  Free(z);
+}
+
+//Very dangerous
+BoolU8 SetDriveType(I1 drive,U8 type=PT_LT)
+{
+  I8 i,j,ext_base,num_partition;
+  U8 offset,cur_type;
+  MasterBootStruct mbr;
+  LTBlkDev *bd=DriveToBlkDev(drive);
+  num_partition=bd->partition_base-'A';
+  switch (bd->type) {
+    case LTBDT_ATA:
+      offset=0;
+      ext_base=INVALID_CLUSTER;
+      while (TRUE) {
+	ATAReadBlks(bd,&mbr,offset,1);
+	j=-1;
+	for (i=0;i<4;i++) {
+	  cur_type=mbr.p[i].type;
+	  if (cur_type) {
+	    if (cur_type==5 || cur_type==0xF)
+	      j=i;
+	    else {
+	      if ((num_partition+'A')==drive) {
+		mbr.p[i].type=type;
+		mbr.p[i].active=0x80;
+		ATAWriteBlks(bd,&mbr,offset,1);
+		return TRUE;
+	      }
+	      num_partition++;
+	    }
+	  }
+	}
+	if (j<0)
+	  break;
+	if (mbr.p[j].offset==0)
+	  break;
+	if (ext_base==INVALID_CLUSTER) {
+  	  offset=mbr.p[j].offset;
+	  ext_base=offset;
+	} else
+	  offset=mbr.p[j].offset+ext_base;
+      }
+      break;
+  }
+}
+
+BoolU8 InitBlkDev(LTBlkDev *bd,BoolU4 unlock)
+{
+  LTPartition *p=DriveToPartition(bd->partition_base),*p2;
+  LTBlkDev *bd2;
+  BoolU4 old_preempt=Preempt(OFF),result=FALSE;
+  if (!(bd->flags & LTBDF_INITIALIZED)) {
+    bd->flags|=LTBDF_INITIALIZED |
+	       LTBDF_INIT_IN_PROGRESS;
+    switch(bd->type) {
+      case LTBDT_RAM:
+	bd->RAM_disk=AMAllocZ((bd->max_blk+1)<<BLK_SIZE_BITS);
+	bd->max_blk=MSize(bd->RAM_disk)>>BLK_SIZE_BITS-1;
+	p->type=PT_LT;
+ //TODO: finish unlock?
+	FormatLT(bd->partition_base,FALSE);
+	break;
+      case LTBDT_FDC:
+	if (!monitor_floppy_tss) {
+	  monitor_floppy_tss=Spawn(&MonitorFDCTsk,"FLOPPY MANAGER");
+	  monitor_floppy_tss->user_data0=bd;
+	}
+	bd->max_reads=1;
+	bd->max_writes=1;
+	bd->read_freq=750;
+	bd->write_freq=150;
+	break;
+      case LTBDT_ATA:
+	bd->max_reads=128;
+	bd->max_writes=1;
+	bd->read_freq=2000;
+	bd->write_freq=500;
+	IDEInit(bd,TRUE);
+	break;
+      case LTBDT_ATAPI:
+	//0xFFFF*4 is too big for my taste
+	bd->max_reads=0x800*4;
+	//max of maybe a quarter of disk cache
+	if (bd->max_reads>ltdc_size*BLK_SIZE/4)
+	  bd->max_reads=(ltdc_size/BLK_SIZE/4) & ~3;
+	if (bd->max_reads<128)
+	  bd->max_reads=128;
+	bd->max_writes=0xFFFF*4;
+	bd->read_freq=1000;
+	bd->write_freq=250;
+	IDEInit(bd,TRUE);
+	p->size=bd->max_blk+1;
+	break;
+      case LTBDT_LT_FILE:
+	if (bd->flags & LTBDF_FORMAT) {
+ //TODO: finish unlock?
+	  bd->f=FOpen(bd->filename,"wc",p->size);
+	  if (!bd->f)
+	    throw(EXCEPT_PARTITION,1);
+ //TODO: finish unlock?
+	  FormatLT(bd->partition_base,TRUE);
+	} else {
+	  bd->f=FOpen(bd->filename,"wc+");
+	  if (!bd->f)
+	    throw(EXCEPT_PARTITION,2);
+	  bd->max_blk=(FSize(bd->f)+BLK_SIZE-1)>>BLK_SIZE_BITS-1;
+	  p->size=bd->max_blk+1;
+	  InitLTPartition(p,unlock);
+	}
+	break;
+      case LTBDT_NON_LT_FILE:
+	bd->max_reads=128;
+	bd->max_writes=128;
+	bd->read_freq=2000;
+	bd->write_freq=500;
+	if (bd->flags & LTBDF_FORMAT)
+	  FormatLT(bd->partition_base,TRUE);
+	else {
+	  p2=DriveToPartition(bd->non_lt_drive);
+	  bd2=p2->bdev;
+	  bd->min_blk=p->offset;
+	  bd->max_blk=p2->offset+p2->size-1; //temp
+	  p->size=p2->size-(p->offset-p2->offset); //temp
+	  InitLTPartition(p,unlock);
+	  bd->max_blk=p->offset+p->size-1;
+	}
+	break;
+    }
+    if (bd->flags & LTBDF_READ_CACHE)
+      InvalidateDiskCache(p,unlock);
+    bd->flags=bd->flags & ~LTBDF_INIT_IN_PROGRESS;
+    result=TRUE;
+  }
+  Preempt(old_preempt);
+  return result;
+}
+
+BoolU8 RBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock)
+{
+  BoolU4 result=TRUE;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if ((p->offset && blk<p->offset) || blk+cnt>p->offset+p->size)
+    throw(EXCEPT_PARTITION,3);
+  blk+=bdev->offset;
+
+  if (bdev->flags & LTBDF_READ_CACHE)
+    RCache(p,&buf,&blk,&cnt);
+  if (cnt) {
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(bdev->read_freq);
+    result=p->RBlks(p,buf,blk,cnt);
+    bdev->last_jiffy=Jiffies;
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(0);
+    if (bdev->flags & LTBDF_READ_CACHE)
+      LTDCAdd(p,buf,blk,cnt);
+    if (bdev->type!=LTBDT_RAM)
+      disk_reads+=cnt;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  return result;
+}
+
+BoolU8 WBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt,BoolU4 unlock)
+{
+  BoolU4 result;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if ((bdev->flags & LTBDF_READ_ONLY) &&
+     !(bdev->flags & LTBDF_READ_ONLY_OVERRIDE))
+    throw(EXCEPT_BLKDEV,0);
+  if ((p->offset && blk<p->offset) || blk+cnt>p->offset+p->size)
+    throw(EXCEPT_PARTITION,4);
+  blk+=bdev->offset;
+  if (cnt) {
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(bdev->write_freq);
+    result=p->WBlks(p,buf,blk,cnt);
+    bdev->last_jiffy=Jiffies;
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(0);
+    if (bdev->flags & LTBDF_READ_CACHE)
+      LTDCAdd(p,buf,blk,cnt);
+    if (bdev->type!=LTBDT_RAM)
+      disk_writes+=cnt;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  return result;
+}
+
+
+void InvalidateDiskCache(LTPartition *p,BoolU4 unlock)
+{
+  LTBlkDev *bdev=p->bdev;
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  InitBlkDev(bdev,FALSE);
+  if (bdev->flags & LTBDF_READ_CACHE)
+    LTDCInvalidate(p);
+  if (bdev->type==LTBDT_FDC)
+    InitLTPartition(p,FALSE);
+  else if (p->type==PT_ISO9660) {
+    if (!(bdev->flags & LTBDF_READ_ONLY_OVERRIDE))
+      InitISOPartition(p,FALSE);
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+}
+
+void ChangeDisk(I1 drive_letter=0)
+{
+  LTBlkDev *bdev=DriveToBlkDev(drive_letter);
+  if (!InitBlkDev(bdev,TRUE) && bdev->flags & LTBDF_REMOVABLE)
+    InvalidateDiskCache(DriveToPartition(drive_letter),TRUE);
+  Drive(drive_letter);	//TODO: might preempt off
+  FreeLTFreeList(DriveToPartition(drive_letter),TRUE);
+}
+
+
+void PartitionRep()
+{
+  I8 i;
+  I1 ch;
+  U2 u2;
+  U1 u1;
+  LTPartition *p;
+  LTBlkDev *bdev;
+  coutln "\r\nDefined Partitions:\r\n";
+  for (i=0;i<32;i++) {
+    p=&local_partitions[i];
+    bdev=p->bdev;
+    if (p->type) {
+      cout "$$FG,PURPLE$$";
+      if (p==default_partition)
+	cout "*";
+      else
+	cout " ";
+      ch=PartitionToDrive(p);
+      cout ch," ";
+      if (p->type==PT_LT)
+	cout "LT     ";
+      else if (p->type==PT_FAT12)
+	cout "FAT12  ";
+      else if (p->type==PT_FAT32)
+	cout "FAT32  ";
+      else if (p->type==PT_ISO9660)
+	cout "ISO9660";
+      else
+	cout "-------";
+      cout " ",SysTextSub(bdev->type,"ST_BLKDEV_TYPES")," ";
+      u2=bdev->base0;  cout u2," ";
+      u1=bdev->irq;    cout u1," ";
+      u1=bdev->unit;   coutln u1,"$$FG$$";
+      coutln p->offset,"-",p->offset+p->size-1;
+    }
+  }
+}
+
+void ReleaseTaskPartitions()
+{
+  I8 i;
+  LTPartition *p;
+  for (i=0;i<32;i++) {
+    p=&local_partitions[i];
+    if (p->owning_task==Fs) {
+      UnlockPartition(p,TRUE);
+      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+	Sound(0);
+    }
+  }
+}
+
+U8 NextClusterNum(LTPartition *p,U8 c,U8 cnt,BoolU4 unlock)
+{
+  CheckLTPartition(p);
+  if (!cnt || !c) return c;
+  try {
+  LockPartition(p);
+  if (p->type==PT_ISO9660 || p->type==PT_LT)
+    c+=cnt;
+  else
+    c=INVALID_CLUSTER;
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  return c;
+}
+
+
+U8 ClusterBlk(LTPartition *p,U8 c)
+{
+  CheckLTPartition(p);
+  return p->data+c*p->spc;
+}
+
+U8 RClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE)
+{
+  nounusedwarn update_display;
+  CheckLTPartition(p);
+  if (!cnt) return c;
+  try {
+  LockPartition(p);
+  if (p->type==PT_ISO9660 || p->type==PT_LT) {
+    RBlks(p,buf,p->data+c*p->spc,p->spc*cnt,FALSE);
+    c+=cnt;
+  } else {
+    while (cnt && c && c!=INVALID_CLUSTER) {
+      RBlks(p,buf,p->data+c*p->spc,p->spc,FALSE);
+      buf+=p->spc<<BLK_SIZE_BITS;
+      c=NextClusterNum(p,c,1,FALSE);
+      cnt--;
+    }
+    if (cnt)
+      Debugger;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  return c;
+}
+
+BoolU8 ToLTFilename(I1 *dst,I1 *src)
+{
+  MemSet(dst,0,LT_MAX_FILENAME_LEN+1);
+  if (!CheckFileName(src))
+    return FALSE;
+  StrCpy(dst,src);
+  return TRUE;
+}
+
+U8 NameToDirCluster(LTPartition *p,I1 *name,BoolU4 unlock)
+{
+  BoolU4 cont=TRUE;
+  U8 cur_dir_cluster;
+  LTDirEntry de;
+  I1 *buf=NewStr(name),*buf2=NewStr(name);
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  cur_dir_cluster=p->root_cluster;
+  while (*buf && cont) {
+    RemoveFirstSeg(buf,"/",buf2);
+    if (*buf2) {
+      if (p->type==PT_LT)
+	cont=FindLTFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else if (p->type==PT_ISO9660)
+	cont=FindISOFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else cont=FALSE;
+      cur_dir_cluster=de.cluster;
+    }
+  }
+  if (!cont) {
+    cout name," ";
+    PutSysTextErr("ST_FILE_NOT_FOUND");
+    cur_dir_cluster=0;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  Free(buf);
+  Free(buf2);
+  return cur_dir_cluster;
+}
+
+U8 NameToParentDirCluster(LTPartition *p,I1 *name,BoolU4 unlock)
+{
+  BoolU4 cont=TRUE;
+  U8 cur_dir_cluster,cur_dir_cluster2;
+  LTDirEntry de;
+  I1 *buf=NewStr(name),*buf2=NewStr(name);
+  CheckLTPartition(p);
+  try {
+  LockPartition(p);
+  cur_dir_cluster=p->root_cluster;
+  cur_dir_cluster2=p->root_cluster;
+  while (*buf && cont) {
+    cur_dir_cluster2=cur_dir_cluster;
+    RemoveFirstSeg(buf,"/",buf2);
+    if (*buf2) {
+      if (p->type==PT_LT)
+	cont=FindLTFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else if (p->type==PT_ISO9660)
+	cont=FindISOFile(p,cur_dir_cluster,
+		buf2,&de,TRUE,FALSE,FALSE);
+      else cont=FALSE;
+      cur_dir_cluster=de.cluster;
+    }
+  }
+  if (!cont) {
+    cout name," ";
+    PutSysTextErr("ST_FILE_NOT_FOUND");
+    cur_dir_cluster2=0;
+  }
+  if (unlock)
+    UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  Free(buf);
+  Free(buf2);
+  return cur_dir_cluster2;
+}
+
+
+U8 WClusters(LTPartition *p,U1 *buf,U8 c,U8 cnt,BoolU4 unlock,BoolU4 update_display=FALSE)
+{
+  nounusedwarn update_display;
+  CheckLTPartition(p);
+  try {
+    LockPartition(p);
+    if (p->type==PT_LT) {
+      WBlks(p,buf,p->data+c*p->spc,p->spc*cnt,FALSE);
+      c=0;
+    }
+    if (unlock)
+      UnlockPartition(p);
+  } catch
+    if (unlock)
+      UnlockPartition(p);
+  return c;
+}
+
+
+//c=0 means first cluster in chain
+U8 AllocClusters(LTPartition *p,U8 c,U8 cnt,BoolU4 contiguous,BoolU4 unlock)
+{
+  nounusedwarn contiguous;
+  if (!cnt)
+    return c;
+  CheckLTPartition(p);
+  if (p->type==PT_LT)
+    return AllocLTClusters(p,cnt,unlock);
+}
+ 

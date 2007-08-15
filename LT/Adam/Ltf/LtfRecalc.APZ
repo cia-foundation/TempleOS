@@ -1,0 +1,1657 @@
+I8 LtfCharDist(Ltf *l,I8 x,I8 y)
+{
+  I8 dx=(l->x-x)*FONT_WIDTH,dy=(l->y-y)*FONT_HEIGHT;
+  return dx*dx+dy*dy;
+}
+
+I1 ltf_spaces[9]=
+{0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0};
+
+void LtfUpdateWinJoin(Ltf *l,BoolU4 to_screen,BoolU4 has_cursor,
+  BoolU4 recalc,BoolU4 find_cur_entry,BoolU4 preempt,
+  LtfEntry *pg_found=NULL,I8 num_del_entries=0)
+{
+  I8 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I8;
+  I8 num_entries=0;
+  LtfEntry *cl,*cl2,*best_cl=l->cur_entry,*alias,*next_pg_found=NULL;
+  I8 ijif;
+  U8 w,w1;
+  U1 *bptr;
+  BoolU4 del_cl,skipped_update,tree_collapsed;
+  U8 hide_collapsed[2];
+  TssStruct *win_tss=l->win_tss,*mem_tss=l->mem_tss,*tss1;
+  BoolU4 pg_found_present=pg_found?TRUE:FALSE,resize=FALSE;
+  BoolU4 extra_processing,same_win;
+  BoolU4 revert_default_color_eol=FALSE;
+  BoolU4 old_preempt=Preempt(preempt);
+  BoolU4 blink_flag=(Jiffies/(JIFFY_FREQ/5))&1;
+  GrBitMap *base=GrAlias(grbase2,win_tss);
+  I8 cursor_y=MIN_I8,left_margin=win_tss->win_left,right_margin=win_tss->win_right;
+  I8 y_plot_top,y_plot_bottom;
+  U1 *ptr,buf[16],ch;
+  U4 *u4_ptr;
+  I8 top_menu_left_x=0,top_menu_y=0,top_menu_row_height=FONT_HEIGHT;
+  I8 top_menu_right_x=win_tss->win_right*FONT_WIDTH;
+  I8 saved_x,saved_y;
+  BoolU4 use_saved_xy,full_refresh,restored_state;
+
+  if (!l) return;
+//  if (!LtfCheck(l))
+//    DbgStr("LtfJoin1",10000);
+  if (to_screen || find_cur_entry) {
+    recalc=TRUE;
+    l->recalc_start=l;
+  }
+ 
+  i=win_refresh/10+1;
+  if (Bt(&l->flags,LTFf_DO_FULL_UPDATE) ||
+      !to_screen || !(l->refresh_cnt%i) ||
+      (l->flags&LTFF_BACKWARD_MOVEMENT))
+    full_refresh=TRUE;
+  else
+    full_refresh=FALSE;
+
+  if (has_cursor && full_refresh) {
+    if (Btr(&win_tss->crt_flags,CRTf_HAS_BEEN_RESIZED))
+      resize=TRUE;
+
+    if (Btr(&win_tss->crt_flags,CRTf_SCROLL_X)) {
+      if (i=right_margin-left_margin+1)
+	l->line_start_col=win_tss->scroll_x*(l->max_x-l->min_x+1)/i+l->min_x;
+    }
+    if (Btr(&win_tss->crt_flags,CRTf_SCROLL_Y)) {
+      if (i=win_tss->win_bottom-win_tss->win_top+1)
+	l->cur_top_line_num=win_tss->scroll_y*(l->max_y-l->min_y+1)/i+l->min_y;
+    }
+  }
+  x=0; y=0;
+  l->indent=0;
+  l->page_line_num=0;
+  l->left_margin=LTF_DEFAULT;
+  l->right_margin=LTF_DEFAULT;
+  l->header=LTF_DEFAULT;
+  l->footer=LTF_DEFAULT;
+  same_win=win_tss->win_top==l->old_win_top &&
+      win_tss->win_bottom==l->old_win_bottom &&
+      win_tss->win_left==l->old_win_left &&
+      win_tss->win_right==l->old_win_right &&
+      l->cur_entry==l->old_cur_entry &&
+      l->cur_data_col==l->old_cur_data_col;
+  if (!find_cur_entry && full_refresh) {
+    l->x=0;
+    l->y=0;
+  }
+  l->flags&=~(LTFF_WORD_WRAP|LTFF_UNDERLINED|LTFF_INVERTED|LTFF_BLINK);
+  l->shifted_x=0;
+  l->shifted_y=0;
+
+  x0=l->line_start_col;
+  y0=l->cur_top_line_num;
+  restored_state=FALSE;
+  if (to_screen) {
+    i=0;
+    j=0;
+    y_plot_top=y0-2;
+    y_plot_bottom=y0+2+win_tss->win_bottom-win_tss->win_top;
+    tss1=win_tss->next_tss;
+    while (tss1!=sys_update_screen_tss) {
+      if (tss1->win_left<=win_tss->win_left &&
+	  tss1->win_right>=win_tss->win_right &&
+	  Bt(&tss1->crt_flags,CRTf_SHOW)) {
+	if (tss1->win_bottom-win_tss->win_top+1>i &&
+	    tss1->win_top<=win_tss->win_top)
+	  i=tss1->win_bottom-win_tss->win_top+1;
+	if (win_tss->win_bottom-tss1->win_top+1>j &&
+	    tss1->win_bottom>=win_tss->win_bottom)
+	  j=win_tss->win_bottom-tss1->win_top+1;
+      }
+      tss1=tss1->next_tss;
+    }
+    y_plot_top+=i;
+    y_plot_bottom-=j;
+    if (cl=l->top_entry) {
+      while (cl->next!=l)
+	if (cl->y<y_plot_top)
+	  cl=cl->next;
+	else
+	  break;
+      while (cl->last!=l)
+	if (cl->y>=y_plot_top)
+	  cl=cl->last;
+	else
+	  break;
+      l->top_entry=cl;
+      if (l->flags & LTFF_TOP_ENTRY_COPIED &&
+	  cl!=l &&
+	  !full_refresh) {
+	MemCpy(&l->state_start,
+	     &l->top_line_state_start,
+	      offset(Ltf.state_end)-
+	      offset(Ltf.state_start));
+	w=l->w;
+	restored_state=TRUE;
+      }
+    }
+  }
+  if (!restored_state) {
+    l->text_attribute=l->start_text_attribute;
+    w=l->text_attribute<<8;
+  }
+
+  if (recalc) {
+    if (to_screen)
+      l->flags&=~LTFF_MODIFIED;
+    else
+      l->flags|=LTFF_MODIFIED;
+
+    if (l->cur_data_col<=l->cur_entry->min_col)
+      l->cur_data_col=l->cur_entry->min_col;
+    if (!l->recalc_start)
+      cl=l; //skip update
+    else {
+      cl=l->recalc_start;
+      if (!full_refresh)
+	if (l->top_entry)
+	  cl=l->top_entry;
+      if (cl!=l) {
+	i=l->ww_lines_back;
+	ii=i/2;  //Threshold for stopping on SOFT_CR
+	while (i-- && cl->btype!=LTFT_CR &&
+	  (i>ii || cl->btype!=LTFT_SOFT_CR) &&
+	  cl->flags & LTFLF_WORD_WRAP &&
+	  cl->last!=l)
+	    cl=cl->last;
+	if (cl->flags & LTFLF_WORD_WRAP)
+	  l->flags|=LTFF_WORD_WRAP;
+	else
+	  l->flags&=~LTFF_WORD_WRAP;
+	if (cl->flags & LTFLF_UNDERLINED) {
+	  l->flags|=LTFF_UNDERLINED;
+	  w|=LTFLT_UNDERLINE;
+	} else
+	  l->flags&=~LTFF_UNDERLINED;
+	if (cl->flags & LTFLF_INVERTED) {
+	  l->flags|=LTFF_INVERTED;
+	  w|=LTFLT_INVERT;
+	} else
+	  l->flags&=~LTFF_INVERTED;
+	if (cl->flags & LTFLF_BLINK) {
+	  l->flags|=LTFF_BLINK;
+	  w|=LTFLT_BLINK;
+	} else
+	  l->flags&=~LTFF_BLINK;
+	w|=cl->type&0x0C000000;
+	x=cl->x; y=cl->y;
+	l->indent=cl->indent;
+	l->page_line_num=cl->page_line_num;
+	l->left_margin=cl->left_margin;
+	l->right_margin=cl->right_margin;
+      } else
+	cl=l->dummy.next;
+    }
+  } else
+    cl=l->dummy.next;
+  if (cl==l->dummy.next) {
+    l->top_entry=NULL;
+    l->flags&=~LTFF_BACKWARD_MOVEMENT;
+    if (full_refresh)
+      l->flags&=~LTFF_HAS_SONG;
+  }
+
+  if (l->dummy.next==l) {
+    best_cl=l;
+    best_col=0;
+    l->cur_entry=l;
+    l->top_entry=l;
+    l->cur_data_col=0;
+    cl=l;
+ 
+  }
+  skipped_update=(cl==l && l->dummy.next!=l);
+
+  extra_processing=recalc||find_cur_entry||resize;
+
+  if (full_refresh) {
+    l->min_x=MAX_I4; l->min_y=MAX_I4;
+    l->max_x=MIN_I4; l->max_y=MIN_I4;
+  }
+  while (cl!=l) {
+    del_cl=FALSE;
+    if (cl->flags & LTFLF_SKIP) {
+      cl=cl->last;  //for consistency handle skips the same
+      goto skip;
+    }
+    if (cl->flags & LTFLF_DISPLAY_CB) {
+      if (recalc || cl->flags & LTFLF_REFRESH_DATA) {
+	Free(cl->display,mem_tss);
+	cl->display=cl->display_cb(l,cl,mem_tss);
+	cl->max_col=StrLen(cl->display);
+	if (l->cur_entry==cl) {
+	  if (l->cur_data_col>=cl->max_col && cl->max_col)
+	    l->cur_data_col=cl->max_col-1;
+	}
+      }
+    }
+    if (extra_processing && full_refresh) {
+word_wrap_start:
+      cl2=cl->next;
+      if (cl2->btype==LTFT_SOFT_CR) {
+	if (!same_win) {
+	  if (l->cur_entry==cl2) {
+	    l->cur_entry=cl2->next;
+	    l->cur_data_col=l->cur_entry->min_col;
+	  }
+	  if (l->top_entry==cl2)
+	    l->top_entry=cl2->next;
+	  if (best_cl==cl2) {
+	    best_cl=cl2->next;
+	    best_col=0;
+	  }
+	  LtfDelEntry(l,cl2);
+	  goto word_wrap_start;
+	}
+      }
+      if (cl->btype==LTFT_TEXT) {
+	if (cl->flags==cl2->flags &&
+	  cl->type==cl2->type) {
+	  i=StrLen(cl->display);
+	  j=StrLen(cl2->display);
+	  ptr=MAlloc(i+j+1,mem_tss);
+	  MemCpy(ptr,cl->display,i);
+	  MemCpy(ptr+i,cl2->display,j+1);
+	  Free(cl->display,mem_tss);
+	  cl->display=ptr;
+	  if (l->cur_entry==cl2) {
+	    l->cur_entry=cl;
+	    l->cur_data_col+=i;
+	  }
+	  if (l->top_entry==cl2)
+	    l->top_entry=cl;
+	  if (best_cl==cl2) {
+	    best_cl=cl;
+	    best_col=0;
+	  }
+	  LtfDelEntry(l,cl2);
+	  goto word_wrap_start;
+	}
+      }
+    }
+    if (cl->flags & LTFLF_SCROLLING_X)
+      k=cl->scroll_len;
+    else if (Bt(ltf_display_types,cl->btype))
+      k=StrLen(cl->display);
+    else
+      k=0;
+    use_saved_xy=FALSE;
+    if (cl->flags &
+	(LTFLF_LEFT_X|LTFLF_RIGHT_X|LTFLF_CENTER_X|
+	 LTFLF_TOP_Y|LTFLF_BOTTOM_Y|LTFLF_CENTER_Y|
+	 LTFLF_TOP_LEFT_MENU|LTFLF_TOP_RIGHT_MENU)) {
+      if (cl->flags & LTFLF_MARGIN_REL_X) {
+	if (cl->flags & LTFLF_LEFT_X)
+	  x=left_margin-win_tss->win_left;
+	else if (cl->flags & LTFLF_RIGHT_X)
+	  x=right_margin-(k-1)-win_tss->win_left;
+	else if (cl->flags & LTFLF_CENTER_X)
+	  x=((right_margin+left_margin)>>1-k>>1-win_tss->win_left);
+      } else {
+	if (cl->flags & LTFLF_LEFT_X)
+	  x=x0;
+	else if (cl->flags & LTFLF_RIGHT_X)
+	  x=win_tss->win_right-win_tss->win_left+x0-(k-1);
+	else if (cl->flags & LTFLF_CENTER_X)
+	  x=((win_tss->win_right-win_tss->win_left+x0-k)>>1);
+      }
+      if (cl->flags & LTFLF_TOP_LEFT_MENU) {
+	use_saved_xy=TRUE;
+	saved_x=x;
+	saved_y=y;
+	if (cl->btype==LTFT_TOP_LEFT_TOOLBAR)
+	  i=cl->width;
+	else
+	  i=k*FONT_WIDTH;
+	if (top_menu_left_x+i>top_menu_right_x) {
+	  top_menu_y+=top_menu_row_height;
+	  top_menu_row_height=FONT_HEIGHT;
+	  top_menu_left_x=0;
+	  top_menu_right_x=win_tss->win_right*FONT_WIDTH;
+	}
+	if (cl->btype==LTFT_TOP_LEFT_TOOLBAR &&
+	    cl->height>top_menu_row_height)
+	  top_menu_row_height=cl->height;
+	y=top_menu_y/FONT_HEIGHT+y0;
+	x=x0+top_menu_left_x/FONT_WIDTH;
+	top_menu_left_x+=i;
+      } else if (cl->flags & LTFLF_TOP_RIGHT_MENU) {
+	use_saved_xy=TRUE;
+	saved_x=x;
+	saved_y=y;
+	if (cl->btype==LTFT_TOP_RIGHT_TOOLBAR)
+	  i=cl->width;
+	else
+	  i=k*FONT_WIDTH;
+	if (top_menu_left_x+i>top_menu_right_x) {
+	  top_menu_y+=top_menu_row_height;
+	  top_menu_row_height=FONT_HEIGHT;
+	  top_menu_left_x=0;
+	  top_menu_right_x=win_tss->win_right*FONT_WIDTH;
+	}
+	if (cl->btype==LTFT_TOP_RIGHT_TOOLBAR &&
+	    cl->height>top_menu_row_height)
+	  top_menu_row_height=cl->height;
+	y=top_menu_y/FONT_HEIGHT+y0;
+	top_menu_right_x-=i;
+	x=x0+top_menu_right_x/FONT_WIDTH;
+      }
+      i=y;
+      if (cl->flags & LTFLF_PAGE_REL_Y) {
+	l->flags|=LTFF_BACKWARD_MOVEMENT;
+	if (cl->flags & LTFLF_TOP_Y)
+	  y-=cl->page_line_num;
+	else if (cl->flags & LTFLF_BOTTOM_Y)
+	  y+=l->page_length-cl->page_line_num;
+	else if (cl->flags & LTFLF_CENTER_Y)
+	  y+=l->page_length>>1-cl->page_line_num;
+      } else {
+	l->flags|=LTFF_BACKWARD_MOVEMENT;
+	if (cl->flags & LTFLF_TOP_Y)
+	  y=y0;
+	else if (cl->flags & LTFLF_BOTTOM_Y)
+	  y=win_tss->win_bottom-win_tss->win_top+y0;
+	else if (cl->flags & LTFLF_CENTER_Y)
+	  y=(win_tss->win_bottom-win_tss->win_top)>>1+y0;
+      }
+      if (y!=i) {
+	l->page_line_num+=y-i;
+	if (l->page_line_num<0)
+	  l->page_line_num=l->page_length+l->page_line_num%l->page_length;
+	else
+	  l->page_line_num=l->page_line_num%l->page_length;
+	if (l->header!=LTF_DEFAULT &&
+	    l->page_line_num<l->header) {
+	  y+=l->header-l->page_line_num;
+	  l->page_line_num=l->header;
+	}
+	if (l->footer==LTF_DEFAULT) {
+	  if (l->page_line_num>=l->page_length) {
+	    if (l->header==LTF_DEFAULT)
+	      l->page_line_num=0;
+	    else {
+	      l->page_line_num=l->header;
+	      y+=l->header;
+	    }
+	  }
+	} else {
+	  if (l->page_line_num>=l->page_length-l->footer) {
+	    y+=l->footer;
+	    if (l->header==LTF_DEFAULT)
+	      l->page_line_num=0;
+	    else {
+	      l->page_line_num=l->header;
+	      y+=l->header;
+	    }
+	  }
+	}
+      }
+    }
+
+    if (full_refresh &&extra_processing && k>0) {
+      if (l->flags & LTFF_WORD_WRAP) {
+	i=(right_margin+1-(x+win_tss->win_left));  //Space left ON line
+	ii=(x+1-l->left_margin);
+	if (cl->btype==LTFT_TEXT) {
+	  if (l->cur_entry==cl->next) {
+	    if (l->cur_data_col==cl->next->min_col)
+	      i--;
+	  } else {
+	    if (l->cur_entry==cl) {
+	      if (l->cur_data_col==i)
+		i--;
+	    }
+	  }
+	  if (k>i) {
+	    for (j=i;j>8-ii && j>=0;j--)
+	      if (cl->display[j]==CH_SPACE ||
+		  cl->display[j]==CH_SHIFT_SPACE) {
+		i=j+1;
+		break;
+	      }
+	    if (k>i && i>0) {
+	      cl2=MAllocIdentical(cl,mem_tss);
+	      cl2->display=NewStr(cl->display+i,mem_tss);
+	      InsQue(cl2,cl);
+	      if (l->cur_entry==cl && l->cur_data_col>=i) {
+		l->cur_entry=cl2;
+		l->cur_data_col=l->cur_data_col-i;
+	      }
+	      cl->display[i]=0;
+	      ptr=NewStr(cl->display,mem_tss);
+	      Free(cl->display,mem_tss);
+	      cl->display=ptr;
+	      cl2=MAllocZ(sizeof(LtfEntryBase),mem_tss);
+	      cl2->type=LTFT_SOFT_CR | cl->type & 0xFFFFFF00;
+	      cl2->flags=cl->flags;
+	      cl2->x=x;
+	      cl2->y=y;
+	      cl2->indent=l->indent;
+	      cl2->page_line_num=l->page_line_num;
+	      cl2->left_margin=l->left_margin;
+	      cl2->right_margin=l->right_margin;
+	      InsQue(cl2,cl);
+	      k=StrLen(cl->display);
+	      goto skip_soft_cr;
+	    }
+	  }
+	  if (k==i)
+	    goto skip_soft_cr;
+	}
+	if (k>=i && cl->btype!=LTFT_SOFT_CR && cl->btype!=LTFT_CR
+		 && cl->btype!=LTFT_CURSOR_MOVEMENT) {
+	  cl2=cl->last;
+	  if (cl2->btype!=LTFT_SOFT_CR &&
+	      cl2->btype!=LTFT_CR &&
+	      cl2->btype!=LTFT_CURSOR_MOVEMENT) {
+	    cl2=MAllocZ(sizeof(LtfEntryBase),mem_tss);
+	    cl2->type=LTFT_SOFT_CR | cl->type & 0xFFFFFF00;
+	    cl2->flags=LTFLF_WORD_WRAP |
+	      cl->flags & (LTFLF_INVERTED|LTFLF_UNDERLINED|
+	       LTFLF_BLINK|LTFLF_SKIP);
+	    cl2->x=x;
+	    cl2->y=y;
+	    cl2->indent=l->indent;
+	    cl2->page_line_num=l->page_line_num;
+	    cl2->left_margin=l->left_margin;
+	    cl2->right_margin=l->right_margin;
+	    InsQue(cl2,cl->last);
+	    if (l->left_margin==LTF_DEFAULT)
+	      x=l->indent;
+	    else
+	      x=l->left_margin+l->indent;
+	    y++;
+	  }
+	  cl2=cl->next;
+	}
+skip_soft_cr:
+      }
+    }
+    if (full_refresh) {
+      cl->x=x;
+      cl->y=y;
+      cl->indent=l->indent;
+      cl->page_line_num=l->page_line_num;
+      cl->left_margin=l->left_margin;
+      cl->right_margin=l->right_margin;
+      if (x<l->min_x) l->min_x=x;
+      if (y<l->min_y) l->min_y=y;
+
+      if (find_cur_entry) {
+	D=LtfCharDist(l,x,y);
+	col=0;
+      }
+      if (!l->top_entry)
+	if (y>=y_plot_top && to_screen) {
+	  l->top_entry=cl;
+	  l->w=w;
+	  MemCpy(&l->top_line_state_start,
+		 &l->state_start,
+		  offset(Ltf.state_end)-
+		  offset(Ltf.state_start));
+	  l->flags|=LTFF_TOP_ENTRY_COPIED;
+	}
+    }
+    col2=0;
+
+    cl->type=w & 0xFF00 | cl->type & 0xFFFF00FF;
+    if (l->flags & LTFF_WORD_WRAP)
+      cl->flags|=LTFLF_WORD_WRAP;
+    else
+      cl->flags&=~LTFLF_WORD_WRAP;
+    if (l->flags & LTFF_UNDERLINED) {
+      cl->flags|=LTFLF_UNDERLINED;
+      w|=LTFLT_UNDERLINE;
+    } else {
+      cl->flags&=~LTFLF_UNDERLINED;
+      w&=~LTFLT_UNDERLINE;
+    }
+    if (l->flags & LTFF_INVERTED) {
+      cl->flags|=LTFLF_INVERTED;
+      w|=LTFLT_INVERT;
+    } else {
+      cl->flags&=~LTFLF_INVERTED;
+      w&=~LTFLT_INVERT;
+    }
+    if (l->flags & LTFF_BLINK) {
+      cl->flags|=LTFLF_BLINK;
+      w|=LTFLT_BLINK;
+    } else {
+      cl->flags&=~LTFLF_BLINK;
+      w&=~LTFLT_BLINK;
+    }
+    w=w&0xFC00FF00|(l->shifted_x & 0x1F)<<16|(l->shifted_y & 0x1F)<<21;
+    switch (cl->btype) {
+      case LTFT_PICTURE:
+      case LTFT_PICWORD:
+      case LTFT_TOP_LEFT_TOOLBAR:
+      case LTFT_TOP_RIGHT_TOOLBAR:
+	if (cl->flags & LTFLF_LINK)
+	  w1=w & 0xFFFF0000 | l->link_attribute<<8;
+	else if (cl->flags &
+	  (LTFLF_LEFT_MACRO|LTFLF_LEFT_EXP))
+	  w1=w & 0xFFFF0000 | l->macro_attribute<<8;
+	else if (cl->flags & LTFLF_TREE)
+	  w1=w & 0xFFFF0000 | l->tree_attribute<<8;
+	else
+	  w1=w;
+	break;
+      case LTFT_LINK:
+	w1=w & 0xFFFF0000 | l->link_attribute<<8;
+	break;
+      case LTFT_MACRO:
+      case LTFT_MENU_VALUE:
+	w1=w & 0xFFFF0000 | l->macro_attribute<<8;
+	break;
+      case LTFT_ANCHOR:
+	w1=w & 0xFFFF0000 | l->anchor_attribute<<8;
+	break;
+      case LTFT_TREE:
+	w1=w & 0xFFFF0000 | l->tree_attribute<<8;
+	break;
+      case LTFT_HIDE_START:
+      case LTFT_HIDE_END:
+	w1=w & 0xFFFF0000 | l->hidden_attribute<<8;
+	break;
+      default:
+	w1=w;
+    }
+    w1=w1 & 0xFFFFFF00 | cl->type & 0xF3FF0000;
+    if (cl==l->cur_entry) {
+      if (cl->btype!=LTFT_TEXT)
+	w1^=0xFF00;
+      cursor_y=cl->y;
+    }
+
+
+    if (cl->flags & LTFLF_REFRESH_DATA) {
+      if (cl->btype==LTFT_DATA || cl->btype==LTFT_CHECK_BOX)
+	LtfFormatData(cl);
+    }
+
+    ptr=cl->display;
+    if (cl->flags & LTFLF_TREE) {
+      if (StrLen(ptr)>=2) {
+	if (cl->flags & LTFLF_COLLAPSED)
+	  *ptr++='+';
+	else
+	  *ptr++='-';
+	*ptr++=']';
+      }
+    }
+    if (cl->btype==LTFT_CHECK_BOX) {
+      if (k>=3) {
+	*ptr++='[';
+	if (cl->flags & LTFLF_CHECKED)
+	  *ptr++='X';
+	else
+	  *ptr++=' ';
+	*ptr++=']';
+      }
+    } else if (cl->btype==LTFT_HIDE_START) {
+      if (k>=2) {
+	*ptr++='<';
+	if (cl->flags & LTFLF_COLLAPSED)
+	  *ptr++='+';
+	else
+	  *ptr++='-';
+      }
+    } else if (cl->btype==LTFT_HIDE_END) {
+      if (k>=1)
+	*ptr++='>';
+    }
+    if (Bt(ltf_display_types,cl->btype)) {
+      if (cl->flags & LTFLF_SCROLLING_X) {
+	j=StrLen(cl->display);
+	if (j && cl->scroll_len) {
+	  ijif=Jiffies*FONT_WIDTH*win_tss->scroll_speed/JIFFY_FREQ;
+	  ijif=ijif%(j*FONT_WIDTH);
+	  w1=w1 & 0xFFE0FF00|
+	    ((FONT_WIDTH-1-ijif%FONT_WIDTH)<<16);
+#assert FONT_WIDTH==8
+	  ijif>>=3;
+	  ptr=cl->display;
+	  for (k=0;k<cl->scroll_len;k++) {
+	    ch=ptr[(ijif+k)%j];
+	    if (!Bt(displayable_chars_bitmap,ch)) ch='.';
+	    if (to_screen) {
+	      if (cl->flags & LTFLF_BORDER_PLOT &&
+		  !Bt(&win_tss->crt_flags,CRTf_NO_BORDER))
+		PlotBorderChar(win_tss,w1+ch,x-x0,y-y0);
+	      else
+		PlotWinChar(win_tss,w1+ch,x-x0,y-y0);
+	    }
+	    x++;
+	  }
+	}
+	if (find_cur_entry)  {
+	  D=LtfCharDist(l,cl->x,cl->y);
+	  col=cl->min_col;
+	}
+	col2=cl->scroll_len;  //TODO This is flawed
+      } else {
+	ptr=cl->display;
+	if (cl->flags & LTFLF_BORDER_PLOT &&
+	    !Bt(&win_tss->crt_flags,CRTf_NO_BORDER)) {
+	  while (ch=*ptr++) {
+	    if (to_screen)
+	      PlotBorderChar(win_tss,w1+ch,x-x0,y-y0);
+	    else
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=col2;
+		}
+	      }
+	    col2++;
+	    x++;
+	  }
+	} else {
+	  if (to_screen) {
+	    if (y>=y_plot_top && y<=y_plot_bottom)
+	      PlotWinStr2(win_tss,ptr,k,w1,x-x0,y-y0);
+	    col2+=k;
+	    x+=k;
+	  } else {
+	    if (find_cur_entry) {
+	      while (k--) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=col2;
+		}
+		col2++;
+		x++;
+	      }
+	    } else {
+	      col2+=k;
+	      x+=k;
+	    }
+	  }
+	}
+      }
+    }
+      switch (cl->btype) {
+	case LTFT_TEXT:
+	  if (!col2) {
+	    if (!(cl->flags & LTFLF_TREE) && recalc)
+	      del_cl=TRUE;
+	  }
+	  break;
+	case LTFT_HEX_EDIT:
+	  if (cl->flags & LTFLF_DATA_IS_PTR)
+	    bptr=cl->data;
+	  else
+ 	    bptr=&cl->data;
+	  k=cl->hex_edit_width; //columns
+	  for (i=0;i<cl->len;i=i+k) {
+	    if (cl->flags & LTFLF_ZERO_BASED)
+	      SPrintF(buf,"%08tX ",i);
+	    else
+	      SPrintF(buf,"%08tX ",bptr);
+	    ptr=buf;
+	    while (ch=*ptr++) {
+	      if (to_screen) {
+		if (cl->flags & LTFLF_BORDER_PLOT &&
+		    !Bt(&win_tss->crt_flags,CRTf_NO_BORDER))
+		  PlotBorderChar(win_tss,w1+ch,x-x0,y-y0);
+		else
+		  PlotWinChar(win_tss,w1+ch,x-x0,y-y0);
+	      }
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=i*3;
+		}
+	      }
+	      x++;
+	    }
+	    if (i+k>cl->len) k=cl->len-i;
+	    for (j=0;j<k;j++) {
+	      SPrintF(buf,"%02tX",*bptr++);
+	      ptr=buf;
+	      while (ch=*ptr++) {
+		if (to_screen) {
+		  if (cl->flags & LTFLF_BORDER_PLOT &&
+		      !Bt(&win_tss->crt_flags,CRTf_NO_BORDER))
+		    PlotBorderChar(win_tss,w1+ch,x-x0,y-y0);
+		  else
+		    PlotWinChar(win_tss,w1+ch,x-x0,y-y0);
+		}
+		if (find_cur_entry) {
+		  d2=LtfCharDist(l,x,y);
+		  if (d2<D) {
+		    D=d2;
+		    col=col2;
+		  }
+		}
+		col2++;
+		x++;
+	      }
+	      x++;
+	    }
+	    bptr-=j;
+	    x+=(cl->hex_edit_width-k)*3;
+	    for (j=0;j<k;j++) {
+	      ch=*bptr++;
+	      if (!Bt(displayable_chars_bitmap,ch)) ch='.';
+	      if (to_screen) {
+		if (cl->flags & LTFLF_BORDER_PLOT &&
+		    !Bt(&win_tss->crt_flags,CRTf_NO_BORDER))
+		  PlotBorderChar(win_tss,w1+ch,x-x0,y-y0);
+		else
+		  PlotWinChar(win_tss,w1+ch,x-x0,y-y0);
+	      }
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D) {
+		  D=d2;
+		  col=col2;
+		}
+	      }
+	      col2++;
+	      x++;
+	    }
+	    y++;
+	    x-=cl->hex_edit_width*3+k+9;
+	  }
+	  break;
+	case LTFT_TAB:
+	  k=(x+8) & ~7;
+	  if (cl->flags & LTFLF_BORDER_PLOT &&
+	      !Bt(&win_tss->crt_flags,CRTf_NO_BORDER)) {
+	    while (x<k) {
+	      if (to_screen)
+		PlotBorderChar(win_tss,w1+CH_SPACE,x-x0,y-y0);
+	      if (find_cur_entry) {
+		d2=LtfCharDist(l,x,y);
+		if (d2<D)
+		  D=d2;
+	      }
+	      x++;
+	    }
+	  } else {
+	    k=k-x;
+	    if (to_screen) {
+	      if (y>=y_plot_top && y<=y_plot_bottom)
+		PlotWinStr2(win_tss,ltf_spaces,k,w1,x-x0,y-y0);
+	      x+=k;
+	    } else {
+	      if (find_cur_entry) {
+		while (k--) {
+		  d2=LtfCharDist(l,x,y);
+		  if (d2<D)
+		    D=d2;
+		  x++;
+		}
+	      } else
+		x+=k;
+	    }
+	  }
+	  break;
+	case LTFT_CR:
+	case LTFT_SOFT_CR:
+	  if (to_screen)
+	    if (y>=y_plot_top && y<=y_plot_bottom)
+	      PlotWinAttr(win_tss,
+		win_tss->win_right-win_tss->win_left+1-(x-x0),
+		w&0xFF00,x-x0,y-y0);
+	  y++;
+	  l->page_line_num++;
+start_of_line:
+	  if (l->left_margin==LTF_DEFAULT)
+	    x=l->indent;
+	  else
+	    x=l->indent+l->left_margin;
+	  if (revert_default_color_eol) {
+	    revert_default_color_eol=FALSE;
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  }
+adjust_xy:
+	  i=l->indent+l->left_margin;
+	  if (x<i)
+	    x=i;
+	  if (l->page_line_num<0)
+	    l->page_line_num=l->page_length+l->page_line_num%l->page_length;
+	  else {
+	    if (l->page_line_num>=l->page_length) {
+	      l->page_line_num-=l->page_length;
+	      if (l->page_line_num>=l->page_length)
+		l->page_line_num=l->page_line_num%l->page_length;
+	    }
+	  }
+	  if (l->header!=LTF_DEFAULT) {
+	    if (l->page_line_num<l->header) {
+	      y+=l->header-l->page_line_num;
+	      l->page_line_num=l->header;
+	      goto start_of_line;
+	    }
+	  }
+	  if (l->footer==LTF_DEFAULT) {
+	    if (l->page_line_num>=l->page_length) {
+	      if (l->header==LTF_DEFAULT)
+		l->page_line_num=0;
+	      else {
+		l->page_line_num=l->header;
+		y+=l->header;
+	      }
+	      goto start_of_line;
+	    }
+	  } else {
+	    if (l->page_line_num>=l->page_length-l->footer) {
+	      y+=l->footer;
+	      if (l->header==LTF_DEFAULT)
+		l->page_line_num=0;
+	      else {
+		l->page_line_num=l->header;
+		y+=l->header;
+	      }
+	      goto start_of_line;
+	    }
+	  }
+	  cl->left_margin=l->left_margin;
+	  cl->right_margin=l->right_margin;
+	  cl->page_line_num=l->page_line_num;
+	  break;
+	case LTFT_CURSOR_MOVEMENT:
+	  l->flags|=LTFF_BACKWARD_MOVEMENT;
+	  x+=cl->cursor_x_offset;
+	  if (cl->flags & LTFLF_PAGE_REL_Y) {
+	    i=l->page_line_num;
+	    if (cl->flags & LTFLF_TOP_Y)
+	      l->page_line_num=0;
+	    else if (cl->flags & LTFLF_BOTTOM_Y)
+	      l->page_line_num=l->page_length-1;
+	    else if (cl->flags & LTFLF_CENTER_Y)
+	      l->page_line_num=l->page_length>>1;
+	    y+=l->page_line_num-i;
+	  }
+	  y+=cl->cursor_y_offset;
+	  l->page_line_num+=cl->cursor_y_offset;
+	  goto adjust_xy;
+	case LTFT_PAGE_BREAK:
+ 	  l->flags|=LTFF_BACKWARD_MOVEMENT;
+	  y+=l->page_length-cl->page_line_num;
+	  l->page_line_num=0;
+	  goto start_of_line;
+	case LTFT_INDENT:
+	  if (cl->flags & LTFLF_LEFT_X)
+	    l->indent=cl->attr;
+	  else
+	    l->indent+=cl->attr;
+	  goto start_of_line;
+	case LTFT_PAGE_LENGTH:
+	  l->page_length=cl->attr;
+	  goto adjust_xy;
+	case LTFT_LEFT_MARGIN:
+	  l->left_margin=cl->attr;
+	  left_margin=win_tss->win_left+l->left_margin;
+	  goto start_of_line;
+	case LTFT_RIGHT_MARGIN:
+	  if (cl->flags & LTFLF_WIN_REL)
+	    l->right_margin=win_tss->win_right-win_tss->win_left-cl->attr;
+	  else
+	    l->right_margin=cl->attr;
+	  right_margin=win_tss->win_left+l->right_margin;
+	  goto adjust_xy;
+	case LTFT_HEADER:
+	  l->header=cl->attr;
+	  goto adjust_xy;
+	case LTFT_FOOTER:
+	  l->footer=cl->attr;
+	  goto adjust_xy;
+	case LTFT_FOREGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  else
+	    w=w & 0xF000 | cl->attr<<8;
+	  break;
+	case LTFT_BACKGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF00 | l->text_attribute<<8 & 0xF000;
+	  else
+	    w=w & 0xF00 | cl->attr<<12;
+	  if (to_screen)
+	    win_tss->text_attribute=w>>8&0xFF;
+	  break;
+	case LTFT_DEFAULT_FOREGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF000 | l->text_attribute<<8 & 0xF00;
+	  else
+	    w=w & 0xF000 | cl->attr <<8;
+	  l->text_attribute=l->text_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_DEFAULT_BACKGROUND_COLOR:
+	  if (cl->attr==LTF_DEFAULT)
+	    w=w & 0xF00 | l->text_attribute<<8 & 0xF000;
+	  else
+	    w=w & 0xF00 | cl->attr <<12;
+	  l->text_attribute=l->text_attribute & 0xF | cl->attr<<4;
+	  if (to_screen)
+	    win_tss->text_attribute=w>>8&0xFF;
+	  break;
+	case LTFT_LINK_FOREGROUND:
+	  l->link_attribute=l->link_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_LINK_BACKGROUND:
+	  l->link_attribute=l->link_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_MACRO_FOREGROUND:
+	  l->macro_attribute=l->macro_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_MACRO_BACKGROUND:
+	  l->macro_attribute=l->macro_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_ANCHOR_FOREGROUND:
+	  l->anchor_attribute=l->anchor_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_ANCHOR_BACKGROUND:
+	  l->anchor_attribute=l->anchor_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_HIDDEN_FOREGROUND:
+	  l->hidden_attribute=l->hidden_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_HIDDEN_BACKGROUND:
+	  l->hidden_attribute=l->hidden_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_TREE_FOREGROUND:
+	  l->tree_attribute=l->tree_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_TREE_BACKGROUND:
+	  l->tree_attribute=l->tree_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_USER_FOREGROUND:
+	  if (cl->attr==LTF_DEFAULT) {
+	    w=w & 0xF000 | l->user_attribute<<8 & 0xF00;
+	    if (y==cursor_y) {
+	      l->cur_entry=cl->next;
+	      l->cur_data_col=l->cur_entry->min_col;
+	    }
+	  } else
+	    l->user_attribute=l->user_attribute & 0xF0 | cl->attr;
+	  break;
+	case LTFT_USER_BACKGROUND:
+	  if (cl->attr==LTF_DEFAULT) {
+	    w=w & 0xF00 | l->user_attribute<<8 & 0xF000;
+	    if (y==cursor_y) {
+	      l->cur_entry=cl->next;
+	      l->cur_data_col=l->cur_entry->min_col;
+	    }
+	  } else
+	    l->user_attribute=l->user_attribute & 0xF | cl->attr<<4;
+	  break;
+	case LTFT_WORD_WRAP:
+	  if (cl->attr)
+	    l->flags|=LTFF_WORD_WRAP;
+	  else
+	    l->flags&=~LTFF_WORD_WRAP;
+	  break;
+	case LTFT_UNDERLINED:
+	  if (cl->attr)
+	    l->flags|=LTFF_UNDERLINED;
+	  else
+	    l->flags&=~LTFF_UNDERLINED;
+	  break;
+	case LTFT_INVERTED:
+	  if (cl->attr)
+	    l->flags|=LTFF_INVERTED;
+	  else
+	    l->flags&=~LTFF_INVERTED;
+	  break;
+	case LTFT_BLINK:
+	  if (cl->attr)
+	    l->flags|=LTFF_BLINK;
+	  else
+	    l->flags&=~LTFF_BLINK;
+	  break;
+	case LTFT_SHIFTED_X:
+	  l->shifted_x=cl->attr;
+	  break;
+	case LTFT_SHIFTED_Y:
+	  l->shifted_y=cl->attr;
+	  break;
+	case LTFT_CURSOR:
+	  if (!find_cur_entry && !(l->flags & LTFF_NO_CURSOR)) {
+	    l->cur_entry=cl->next;
+	    l->cur_data_col=l->cur_entry->min_col;
+	  }
+	  del_cl=TRUE;
+	  break;
+	case LTFT_PICTURE:
+	case LTFT_PICWORD:
+	case LTFT_TOP_LEFT_TOOLBAR:
+	case LTFT_TOP_RIGHT_TOOLBAR:
+	  if (!cl->bin_data)
+	    cl->bin_data=LtfFindBin(l,cl->bin_num);
+	  if (cl->bin_data) {
+	    GrReset(base);
+	    base->flags&=~(BMF_DONT_DRAW|BMF_LOCATE_NEAREST|BMF_TRANSFORMATION);
+	    if (!to_screen)
+	      base->flags|=BMF_DONT_DRAW;
+	    i=((w1>>12)&0xF)^(win_tss->text_attribute>>4 & 0xF);
+	    if (w1 & LTFLT_SELECTED)
+	      i^=0xF;
+	    if (w1 & LTFLT_INVERT)
+	      i^=0xF;
+	    if (blink_flag && (cl==l->cur_entry || w1&LTFLT_BLINK))
+	      i^=0xF;
+	    base->color=i;
+	    if (find_cur_entry)
+	      base->flags|=BMF_LOCATE_NEAREST;
+	    base->nearest_sub_grelem=0;
+	    base->nearest_dist=MAX_I8;
+	    if (to_screen && (l->cur_GrElem==cl->bin_data->data)) {
+	      base->flags|=BMF_LOCATE_NEAREST;
+	      base->cur_x=ipx;
+	      base->cur_y=ipy;
+	    } else {
+	      base->cur_x=(l->x-x0)*FONT_WIDTH+win_tss->win_pixel_left;
+	      base->cur_y=(l->y-y0)*FONT_HEIGHT+win_tss->win_pixel_top;
+	    }
+	    base->cur_z=0;
+	    base->bkcolor=i;
+	    if (cl->flags & LTFLF_FROM_START)
+	      GrElemsPlot(base,(x-k-x0)*FONT_WIDTH, //TODO: scrolling text is not length k
+		(y-y0)*FONT_HEIGHT,0,cl->bin_data->data);
+	    else
+	      GrElemsPlot(base,(x-x0)*FONT_WIDTH,
+		(y-y0)*FONT_HEIGHT,0,cl->bin_data->data);
+	    if (to_screen && (l->cur_GrElem==cl->bin_data->data))
+	      l->cur_sub_grelem=base->nearest_sub_grelem;
+	    base->flags&=~(BMF_LOCATE_NEAREST|BMF_DONT_DRAW);
+	    if (base->nearest_dist<=D) {
+	      D=base->nearest_dist;
+	      col=cl->min_col;
+	    }
+	  }
+	  break;
+	case LTFT_BPT:
+	  w=w & 0xF000 | RED<<8;
+	  revert_default_color_eol=TRUE;
+	  break;
+	case LTFT_SONG:
+	  if (sys_cur_focus_task==win_tss && to_screen) {
+	    if (StrCmp(cur_song,cl->song)) {
+	      AFree(cur_song);
+	      ResetMusicSettings;
+	      cur_song=ANewStr(cl->song);
+	    }
+	  }
+	  l->flags|=LTFF_HAS_SONG;
+	  break;
+	case LTFT_CLEAR:
+	  if (recalc) {
+	    if (pg_found==cl) {
+	      del_cl=TRUE;
+	      pg_found=NULL;
+	    } else
+	      next_pg_found=cl;
+	  }
+	  break;
+      }
+
+    if (cl->flags & LTFLF_HAS_BORDER) {
+      if (cl->flags & LTFLF_SOLID_BORDER)
+	DrawBorder(win_tss,1,cl->x-x0,x-x0-1,cl->y-y0,y-y0,w1.u1[1],TRUE);
+      else
+	DrawBorder(win_tss,0,cl->x-x0,x-x0-1,cl->y-y0,y-y0,w1.u1[1],TRUE);
+    }
+    if (full_refresh) {
+      switch (cl->btype) {
+	case LTFT_CHECK_BOX:
+	case LTFT_HIDE_START:
+	  cl->max_col=2;
+	  break;
+	case LTFT_TREE:
+	case LTFT_BUTTON:
+	case LTFT_LINK:
+	case LTFT_MENU_VALUE:
+	case LTFT_MACRO:
+	case LTFT_HIDE_END:
+	  cl->max_col=1;
+	  break;
+	default:
+	  cl->max_col=(cl->flags & LTFLF_TREE) ? 1:col2;
+      }
+
+      if (x>l->max_x) l->max_x=x;
+      if (y>l->max_y) l->max_y=y;
+      if (D<=best_d) {
+	best_d=D;
+	best_cl=cl;
+	best_col=col;
+      }
+      if (cl->flags & LTFLF_TREE) {
+	if (cl->flags & LTFLF_ALIAS)
+	  alias=cl;
+	else
+	  alias=NULL;
+	if (cl->flags & LTFLF_COLLAPSED)
+	  tree_collapsed=TRUE;
+	else
+	  tree_collapsed=FALSE;
+	cl2=cl->next;
+	while (cl2!=l && cl2->btype!=LTFT_INDENT && !(cl2->flags & LTFLF_TREE))
+	  cl2=cl2->next;
+	if (cl2->btype==LTFT_INDENT) {
+	  i=l->indent;
+	  j=i;
+	  do {
+	    if (tree_collapsed)
+	      cl2->flags|=LTFLF_SKIP;
+	    else
+	      cl2->flags&=~LTFLF_SKIP;
+	    if (alias && cl2==l->cur_entry && Bt(ltf_display_types,cl2->btype)) {
+	      Free(alias->display,mem_tss);
+	      alias->display=MAlloc(StrLen(cl2->display)+8,mem_tss);
+	      alias->display[0]='+';
+	      alias->display[1]=']';
+	      alias->display[2]=CH_SPACE;
+	      StrCpy(alias->display+3,cl2->display);
+	      alias->max_col=cl2->max_col+3;
+	    }
+	    if (cl2->btype==LTFT_INDENT) {
+	      if (cl2->flags & LTFLF_LEFT_X)
+		j=cl2->attr;
+	      else
+		j+=cl2->attr;
+	    }
+	    cl2=cl2->next;
+	  } while (cl2!=l && j>i);
+	}
+      }
+      if (cl->btype == LTFT_HIDE_START) {
+	if (cl->flags & LTFLF_ALIAS)
+	  alias=cl;
+	else
+	  alias=NULL;
+	cl2=cl->next;
+	Btr(hide_collapsed,0);
+	j=1;
+	AssignBit(hide_collapsed,j,cl->flags & LTFLF_COLLAPSED);
+	while (cl2!=l && j>0) {
+	  if (Bt(hide_collapsed,j))
+	    cl2->flags|=LTFLF_SKIP;
+	  else
+	    cl2->flags&=~LTFLF_SKIP;
+	  if (cl2->btype==LTFT_HIDE_START) {
+	    j++;
+	    AssignBit(hide_collapsed,j,cl2->flags & LTFLF_COLLAPSED);
+	    if (Bt(hide_collapsed,j-1))
+	      Bts(hide_collapsed,j);
+	  } else if (cl2->btype==LTFT_HIDE_END) {
+	    j--;
+	    if (Bt(hide_collapsed,j))
+	      cl2->flags|=LTFLF_SKIP;
+	    else
+	      cl2->flags&=~LTFLF_SKIP;
+	  }
+	  cl2=cl2->next;
+	}
+      }
+    }
+
+skip:
+    cl2=cl->next;
+    while (cl2!=l && cl2->flags & LTFLF_SKIP) {
+      if (cl2==l->cur_entry) {
+	l->cur_entry=cl2->next;
+	l->cur_data_col=l->cur_entry->min_col;
+      }
+      if (full_refresh) {
+	cl2->x=x;
+	cl2->y=y;
+	cl2->indent=l->indent;
+	cl2->page_line_num=l->page_line_num;
+	cl2->left_margin=l->left_margin;
+	cl2->right_margin=l->right_margin;
+	cl2->type=w & 0xFF00 | cl2->type & 0xFFFF00FF;
+	if (l->flags & LTFF_WORD_WRAP)
+	  cl2->flags|=LTFLF_WORD_WRAP;
+	else
+	  cl2->flags&=~LTFLF_WORD_WRAP;
+
+	if (l->flags & LTFF_UNDERLINED) {
+	  cl2->flags|=LTFLF_UNDERLINED;
+	  w|=LTFLT_UNDERLINE;
+	} else {
+	  cl2->flags&=~LTFLF_UNDERLINED;
+	  w&=~LTFLT_UNDERLINE;
+	}
+
+	if (l->flags & LTFF_INVERTED) {
+	  cl2->flags|=LTFLF_INVERTED;
+	  w|=LTFLT_INVERT;
+	} else {
+	  cl2->flags&=~LTFLF_INVERTED;
+	  w&=~LTFLT_INVERT;
+	}
+	if (l->flags & LTFF_BLINK) {
+	  cl2->flags|=LTFLF_BLINK;
+	  w|=LTFLT_BLINK;
+	} else {
+	  cl2->flags&=~LTFLF_BLINK;
+	  w&=~LTFLT_BLINK;
+	}
+      }
+      cl2=cl2->next;
+    }
+
+    if (full_refresh) {
+      if (del_cl || pg_found || num_entries<num_del_entries) {
+	if (!(cl->flags & LTFLF_HOLD)) {
+	  if (cl==l->cur_entry) {
+	    l->cur_entry=cl2;
+	    l->cur_data_col=cl2->min_col;
+	  }
+	  if (cl==l->top_entry)
+	    l->top_entry=cl2;
+	  if (best_cl==cl) {
+	    best_cl=cl2;
+	    best_col=cl2->min_col;  //TODO: might be bug
+	  }
+	  LtfDelEntry(l,cl);
+	}
+      }
+    }
+    if (use_saved_xy) {
+      x=saved_x;
+      y=saved_y;
+    }
+    num_entries++;
+    if (!full_refresh)
+      if (cl->y>y_plot_bottom)
+	break;
+    cl=cl2;
+  }
+
+  if (full_refresh) {
+    if (l->min_x>l->max_x) {
+      l->max_x=0;
+      l->min_x=0;
+    }
+    if (l->min_y>l->max_y) {
+      l->max_y=0;
+      l->min_y=0;
+    }
+
+    //Update header
+    if (!skipped_update) {
+      cl->x=x;
+      cl->y=y;
+      cl->indent=l->indent;
+      cl->page_line_num=l->page_line_num;
+      cl->left_margin=l->left_margin;
+      cl->right_margin=l->right_margin;
+      cl->type=w & 0xFF00 | cl->type & 0xFFFF00FF;
+      if (find_cur_entry) {
+	D=LtfCharDist(l,x,y);
+	if (D<best_d) {
+	  best_d=D;
+	  best_cl=cl;
+	  best_col=0;
+	}
+      }
+    }
+    if (to_screen && l->flags & LTFF_MIN_SIZE) {
+      i=win_tss->win_left+l->max_x-l->min_x+1;
+      if (win_tss->win_right!=i) {
+	SetWinHorz(win_tss,win_tss->win_left,i);
+	LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+      }
+      i=win_tss->win_top+l->max_y-l->min_y+1;
+      if (win_tss->win_bottom!=i) {
+	SetWinVert(win_tss,win_tss->win_top,i);
+	LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+      }
+    }
+    if (find_cur_entry) {
+      l->cur_entry=best_cl;
+      l->cur_data_col=best_col;
+      LtfFormBackward(l);
+
+      //We need this because text coordinates are used
+      if (best_d<FONT_WIDTH)
+	best_d=0;
+
+      l->best_d=best_d;
+    }
+
+    if (l->cur_entry->btype!=LTFT_HEX_EDIT) {
+      l->y=l->cur_entry->y;
+      l->x=l->cur_entry->x+l->cur_data_col;
+    } else {
+      l->y=l->cur_entry->y+l->cur_data_col/3/l->cur_entry->hex_edit_width;
+      x=l->cur_data_col%(l->cur_entry->hex_edit_width*3);
+      i=x/l->cur_entry->hex_edit_width;
+      l->x=l->cur_entry->x+9;
+      if (i<2)
+	l->x+=x>>1*3+(x&1);
+      else
+	l->x+=l->cur_entry->hex_edit_width*3+
+	  (x-l->cur_entry->hex_edit_width<<1);
+    }
+    l->line=l->y+1;
+    l->col=l->x+1;
+
+    if (has_cursor) {
+      if (l->cur_top_line_num+win_tss->win_bottom-win_tss->win_top>l->max_y)
+	l->cur_top_line_num=l->max_y-(win_tss->win_bottom-win_tss->win_top);
+      if (l->cur_top_line_num<l->min_y)
+	l->cur_top_line_num=l->min_y;
+
+      if (l->y-l->cur_top_line_num>win_tss->win_bottom-win_tss->win_top)
+	l->cur_top_line_num=l->y-(win_tss->win_bottom-win_tss->win_top);
+      if (l->y-l->cur_top_line_num<0)
+	l->cur_top_line_num=l->y;
+
+      if (l->line_start_col+win_tss->win_right-win_tss->win_left>l->max_x)
+	l->line_start_col=l->max_x-(win_tss->win_right-win_tss->win_left);
+      if (l->line_start_col<l->min_x)
+	l->line_start_col=l->min_x;
+
+      if (l->x-l->line_start_col>win_tss->win_right-win_tss->win_left)
+	l->line_start_col=l->x-(win_tss->win_right-win_tss->win_left);
+      if (l->x-l->line_start_col<0)
+	l->line_start_col=l->x;
+    }
+    if (recalc)
+      l->recalc_start=NULL;
+  }
+  if (to_screen && has_cursor) {
+    y=l->y-l->cur_top_line_num+win_tss->win_top;
+    x=l->x-l->line_start_col+win_tss->win_left;
+    if (x<=win_tss->win_right && y<=win_tss->win_bottom &&
+	x>=0 && y>=0 &&
+	x<TEXT_COLS &&
+	y<TEXT_ROWS) {
+      u4_ptr=textbase+(y*TEXT_COLS+x)*4;
+      *u4_ptr|=LTFLT_BLINK;
+      *u4_ptr^=0xFF00;
+    }
+    if (full_refresh) {
+      if (i=l->max_x-l->min_x+1)
+	win_tss->scroll_x=(((l->line_start_col-l->min_x)*
+	  (win_tss->win_right-win_tss->win_left+1)+i-1)/i);
+
+      if (i=l->max_y-l->min_y+1)
+	win_tss->scroll_y=((l->cur_top_line_num-l->min_y)*
+	  (win_tss->win_bottom-win_tss->win_top+1)+i-1)/i;
+    }
+    if (!Bt(&win_tss->crt_flags,CRTf_NO_BORDER)) {
+      PlotBorderChar(win_tss,140+(win_tss->border_attribute<<8),
+	(win_tss->win_right-win_tss->win_left+1),win_tss->scroll_y);
+      PlotBorderChar(win_tss,140+(win_tss->border_attribute<<8),
+	win_tss->scroll_x,(win_tss->win_bottom-win_tss->win_top+1));
+    }
+  }
+  if (!same_win && extra_processing) {
+    l->old_win_top=win_tss->win_top;
+    l->old_win_bottom=win_tss->win_bottom;
+    l->old_win_left=win_tss->win_left;
+    l->old_win_right=win_tss->win_right;
+    l->old_cur_entry=l->cur_entry;
+    l->old_cur_data_col=l->old_cur_data_col;
+  }
+//  if (!LtfCheck(l))
+//    DbgStr("LtfJoin2",10000);
+  if (l->flags & LTFF_HAS_SONG)
+    Bts(&win_tss->task_flags,TSSf_HAS_SONG);
+  if (recalc && full_refresh) {
+    if (!num_del_entries && !pg_found_present) {
+      l->recalc_start=l;
+      if (next_pg_found)
+	LtfUpdateWinJoin(l,to_screen,has_cursor,recalc,find_cur_entry,preempt,next_pg_found,0);
+      else {
+	i=num_entries-l->max_entries;
+	if (i>1024)
+	  LtfUpdateWinJoin(l,to_screen,has_cursor,recalc,find_cur_entry,preempt,NULL,i);
+      }
+    }
+  }
+  if (to_screen)
+    l->refresh_cnt++;
+  Preempt(old_preempt);
+  GrDel(base);
+}
+
+public I8 LtfWordsToPics(Ltf *l=NULL,LtfEntry *start=NULL)
+{
+  PicWordEntry *temppw;
+  I1 *ptr,*ptr2,ch,*st,cnt=0;
+  TssStruct *mem_tss;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfBinEntry *tempb;
+  LtfEntry *cl,*cl2,*ll;
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) return 0;
+  }
+  mem_tss=l->mem_tss;
+  if (start)
+    cl=start;
+  else
+    cl=l->dummy.next;
+  while (cl!=l) {
+    if (cl->btype==LTFT_TEXT &&
+	!(cl->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	   LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP))) {
+      ptr=cl->display;
+      while (*ptr) {
+	while (*ptr==CH_SPACE || *ptr==CH_SHIFT_SPACE)
+	  ptr++;
+	ptr2=ptr;
+	while ((ch=*ptr) && ch!=CH_SPACE && ch!=CH_SHIFT_SPACE)
+	  ptr++;
+	if (*ptr2) {
+	  *ptr=0;
+	  if (temppw=FindLocalHash(ptr2,HTT_PIC_WORD)) {
+	    *ptr=ch;
+	    *ptr2=0;
+	    cl2=MAllocIdentical(cl,mem_tss);
+	    cl2->display=NewStr(ptr,mem_tss);
+	    cl ->max_col=StrLen(cl ->display);
+	    cl2->max_col=StrLen(cl2->display);
+	    InsQue(cl2,cl);
+
+	    cnt++;
+	    tempb=MAllocZ(sizeof(LtfBinEntry),mem_tss);
+	    tempb->type=LTFBT_GRELEM;
+	    tempb->size=temppw->size;
+	    tempb->data=MAlloc(temppw->size,mem_tss);
+	    MemCpy(tempb->data,temppw->grelem,temppw->size);
+	    tempb->num=l->cur_bin_num;
+	    InsQue(tempb,l->bin_root.last);
+	    if (temppw->txt)
+	      st=MSPrintF(temppw->txt,l->cur_bin_num++);
+	    else
+	      st=MSPrintF("PW,\"%*ts\",\"%s\",%d,%d,%d",temppw->width/FONT_WIDTH," ",temppw->str,l->cur_bin_num++,temppw->width,temppw->height);
+	    ll=ParseDollarCmd(l,st);
+	    Free(st);
+	    ll->bin_data=tempb;
+	    ll->aux_str=NewStr(temppw->str,mem_tss);
+	    InsQue(ll,cl);
+
+	    if (l->cur_entry==cl && l->cur_data_col>=ptr2-cl->display) {
+	      if (l->cur_data_col>=ptr-cl->display) {
+		l->cur_entry=cl2;
+		l->cur_data_col-=ptr-cl->display;
+	      } else {
+		l->cur_entry=ll;
+		l->cur_data_col=0;
+	      }
+	    }
+	    ptr=cl2->display;
+	    cl=cl2;
+	  } else
+	   *ptr=ch;
+	}
+      }
+    }
+    cl=cl->next;
+  }
+  Preempt(old_preempt);
+  return cnt;
+}
+
+public void LtfRecalc(Ltf *l=NULL)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) {
+      Preempt(old_preempt);
+      return;
+    }
+  }
+  if (l->recalc_start) {
+    if (l->recalc_start!=l)
+      LtfRemoveSoftCRs(l,l->recalc_start);
+    if (!(l->flags&LTFF_NO_PICWORDS) &&
+	!(l->flags&(LTFF_PLAIN_TEXT|LTFF_PLAIN_TEXT_WITH_TABS))) {
+      if (l->recalc_start!=l)
+	LtfWordsToPics(l,l->recalc_start);
+      else
+	LtfWordsToPics(l,l->dummy.next);
+    }
+  }
+  LtfUpdateWinJoin(l,FALSE,FALSE,TRUE,FALSE,OFF);
+  Preempt(old_preempt);
+}
+
+public void LtfSafeInsert(Ltf *l,I1 *st)
+{ //This is necessary when hidden text might screw-up
+  //inserts.  It does them all-at-once.
+  BoolU4 old_preempt=Preempt(OFF);
+  U8 old_flags;
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) {
+      Preempt(old_preempt);
+      return;
+    }
+  }
+  old_flags=l->flags;
+  l->flags|=LTFF_NO_CURSOR;
+  LtfPutSExt(l,st);
+  LtfRecalc(l);
+  l->flags=old_flags;
+  Preempt(old_preempt);
+}
+
+public void LtfCenter(Ltf *l=NULL)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  TssStruct *tss;
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) {
+      Preempt(old_preempt);
+      return;
+    }
+  }
+  tss=l->win_tss;
+//TODO:  l->recalc_start=l;
+  LtfRecalc(l);
+  l->cur_top_line_num=l->y-(tss->win_bottom-tss->win_top)>>1;
+  Preempt(old_preempt);
+}
+
+public void LtfBottom(Ltf *l=NULL)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) {
+      Preempt(old_preempt);
+      return;
+    }
+  }
+  l->cur_entry=l;
+  l->cur_data_col=0;
+  l->recalc_start=l;
+  LtfRecalc(l);
+  Preempt(old_preempt);
+}
+
+public void LtfClear(Ltf *l=NULL)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  if (!l) {
+    l=Fs->cur_ltf;
+    if (!l) {
+      Preempt(old_preempt);
+      return;
+    }
+  }
+  LtfPutSExt(l,"$$CL$$");
+  l->recalc_start=l;
+  LtfRecalc(l);
+  Preempt(old_preempt);
+}
+
+public Ltf *LtfUpdateCurLtf(TssStruct *tss)
+{
+  Ltf *main;
+  if (main=tss->cur_ltf) {
+    if (tss->double_buf_cur_ltf)
+      main=tss->double_buf_cur_ltf;
+    LtfUpdateWinJoin(main,TRUE,TRUE,FALSE,FALSE,ON);
+  }
+  return main;
+}
+
+public Ltf *LtfUpdateAuxLtf(TssStruct *tss)
+{
+  Ltf *aux;
+  if (aux=tss->aux_ltf) {
+    if (tss->double_buf_aux_ltf)
+      aux=tss->double_buf_aux_ltf;
+    LtfUpdateWinJoin(aux,TRUE,FALSE,FALSE,FALSE,ON);
+  }
+  return aux;
+}
+
+public void LtfUpdateBothLtf(TssStruct *tss)
+{
+  LTPartition *p;
+  U1 attr=0;
+  Ltf *main,*aux;
+ 
+  ClearWinText(tss);
+  if (main=LtfUpdateCurLtf(tss)) {
+    if (main->flags & LTFF_ATTR_BY_PARTITION) {
+      p=tss->cur_partition;
+      attr=p->text_attr;
+    }
+    if (main->flags & LTFF_ATTR_BY_FILENAME) {
+      try {
+	p=DriveToPartition(main->filename.name[0]);
+      } catch {
+	p=NULL;
+	Fs->catch_except=TRUE;
+      }
+      if (p)
+	attr=p->text_attr;
+    }
+  }
+
+  if ((attr & 0xF)!=(attr>>4))
+    tss->border_attribute=attr;
+  if (aux=LtfUpdateAuxLtf(tss)) {
+    if ((attr & 0xF)!=(attr>>4))
+      aux->start_text_attribute=attr;
+  }
+}
+
+ext[EXT_LTF_RECALC]=&LtfRecalc;
+ 

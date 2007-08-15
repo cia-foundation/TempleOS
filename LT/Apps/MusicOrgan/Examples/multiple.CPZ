@@ -1,0 +1,36 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Matthew,14:19\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  try {
+  while (!ScanKey) {
+	Play("3etGCECAFqFFAFBD",
+		"We \0 \0don't \0 \0have \0e\0nough.\r\n\0 \0 \0 \0 \0 \0");
+	Play("etGCECAFqFFAFBD",
+		"$$FG,PURPLE$$You \0 \0don't \0 \0halve \0e\0nough.\r\n\0 \0 \0 \0 \0 \0");
+	Play("AeGFGDqEAeCEGAetFAF",
+		" \0Try \0 \0 \0 \0to \0share.\r\n\0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qAeGFGDqEAeCEGAetFAF",
+		" \0Try \0 \0 \0 \0to \0share.$$FG$$\r\n\0 \0 \0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

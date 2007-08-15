@@ -1,0 +1,21 @@
+$WW,1$$FG,5$User Skills Required$FG$
+* Knowledge of the $FG,2$C$FG$ programming language.
+
+$FG,5$Supported Hardware$FG$
+* IBM PC compatible with 64-bit x86 $FG,4$EM64T$FG$
+* VGA graphics
+* Some$FG$ keyboards and mice.
+* Minimum 256 Meg RAM; Maximum 128 Gig RAM
+* Internal PC Speakers
+* Can boot to IDE CD-ROMs
+* Can access but not boot SATA CD-ROMs
+* ATA and SATA hard drives $FG,4$<=120 Gig$FG$
+* RS232 serial ports
+* Game Port Joysticks, not USB.
+
+$FG,5$Unsupported Hardware$FG$
+* No Modern graphics cards
+* No Modern sound cards
+* $FG,4$No Networking$FG$
+* No USB devices
+* No Printers (There is a feeble attempt to send ASCII to a parallel port when you press $FG,2$PRT SCRN$FG$.)

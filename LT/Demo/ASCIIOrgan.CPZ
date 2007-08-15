@@ -1,0 +1,16 @@
+//Practice your ASCII knowledge ;-)
+
+void ASCIIOrgan()
+{
+  U1 ch;
+  coutln "Press keys to make sounds";
+  coutln "and press ESC to exit.";
+  do {
+    //We don't want echo or scan codes, so we use NULL and FALSE...
+    ch=GetChar(NULL,FALSE);
+    Sound((ch-28)*25);
+  } while (ch!=CH_ESC && ch!=CH_CTRLQ);
+  Sound(0);
+}
+
+ASCIIOrgan;

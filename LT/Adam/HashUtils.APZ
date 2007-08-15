@@ -1,0 +1,397 @@
+#help_index "Hash/Reports"
+
+class HashRepStruct
+{
+  SysHashEntry *h;
+  I1 *index;
+};
+
+
+I8 CompareHashEntries(HashRepStruct *h1,HashRepStruct *h2)
+{
+  return StrCmp(h1->h->str,h2->h->str);
+}
+
+I8 CompareHashEntries2(HashRepStruct *h1,HashRepStruct *h2)
+{
+  ClassStruct *tempc1=h1->h,*tempc2=h2->h;
+  I8 i1=0,i2=0;
+  if (tempc1->type & HTT_FUNCTION)
+    i1=tempc1->executable_address;
+  if (tempc2->type & HTT_FUNCTION)
+    i2=tempc2->executable_address;
+  return i1-i2;
+}
+
+I8 HelpIndexCnt(I1 *ptr,I1 *index)
+{
+  I1 cnt=0,ch;
+  I8 index_len=StrLen(index);
+  while (*ptr) {
+    if (!StrNCmp(ptr,index,index_len))
+      cnt++;
+    while (ch=*ptr++)
+      if (ch==';')
+	break;
+    if (!ch)
+      ptr--;
+  }
+  return cnt;
+}
+
+I1 *HelpIndexStr(I1 **ptr_,I1 *index)
+{
+  I1 *ptr=*ptr_,*ptr2,ch,*result;
+  I8 index_len=StrLen(index);
+  while (*ptr) {
+    ptr2=ptr;
+    while (ch=*ptr++)
+      if (ch==';')
+	break;
+    if (!ch)
+      ptr--;
+    *ptr_=ptr;
+    if (!StrNCmp(ptr2,index,index_len)) {
+      if (ch==';')
+	ptr--;
+      *ptr=0;
+      result=NewStr(ptr2);
+      *ptr=ch;
+      return result;
+    }
+  }
+  return NULL;
+}
+
+I8 CompareHashEntries3(HashRepStruct *h1,HashRepStruct *h2)
+{
+  I8 i,i1=0,i2=0;
+  i=StrCmp(h1->index,h2->index);
+  if (i)
+    return i;
+  else {
+    if (h1->h->type&HTT_HELP_FILE)
+      i1=1;
+    if (h2->h->type&HTT_HELP_FILE)
+      i2=1;
+    i=i2-i1;
+    if (i)
+      return i;
+    else
+      return StrCmp(h1->h->str,h2->h->str);
+  }
+}
+
+//Possible choices for first parameter, "h" include
+// "adam_tss->hash_table"
+// "Fs->hash_table"
+public void HashRep(SysHashTable *h=NULL,
+  U8 mask=HTT_ALL,I1 *outname=NULL,I1 *flags=NULL,I1 mapfile_drive=0,I1 *index=NULL,
+  Ltf *l_=NULL)
+{
+  SysHashTable *tempht;
+  SysHashEntry *ptr,*temph;
+  HashRepStruct *list;
+  U8 cnt,i,j,k,size,f=0;
+  I1 buf[512],*buf4,*last_index=NewStr(""),*cur_index;
+  Ltf *l,*l1;
+  BoolU4 recurse,publics,map;
+  LtfBinEntry *tempb;
+  DbgInfo *dbg;
+  BoolU4 old_preempt=Preempt(OFF);
+
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r+p");
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),flags);
+  recurse=Bt(&f,FUf_RECURSE);
+  publics=Bt(&f,FUf_PUBLIC);
+  map	 =Bt(&f,FUf_MAP);
+
+  if (!h) h=Fs->hash_table;
+ 
+  if (outname) {
+    l=LtfNew;
+    l->flags|=LTFF_NO_CURSOR;
+    StrCpy(l->filename.name,outname);
+  } else
+    l=NULL;
+  if (l_)
+    l=l_;
+
+  cnt=0;
+  tempht=h;
+  while (tempht) {
+    for (i=0;i<=tempht->mask;i++) {
+      temph=tempht->body[i];
+      while (temph) {
+	if (!(temph->type & (HTT_IMPORT | HTT_PRIVATE)) &&
+	     temph->type & mask &&
+	 (temph->type & HTT_PUBLIC || !publics))
+	  if (!index)
+	    cnt++;
+	  else
+	    if (cur_index=temph->index)
+	      cnt+=HelpIndexCnt(cur_index,index);
+	temph=temph->next;
+      }
+    }
+    if (recurse)
+      tempht=tempht->next;
+    else
+      break;
+  }
+  if (!cnt) goto end_hash;
+
+  list=MAllocZ(cnt*sizeof(HashRepStruct));
+  j=0;
+  tempht=h;
+  while (tempht) {
+    for (i=0;i<=tempht->mask;i++) {
+      temph=tempht->body[i];
+      while (temph) {
+	if (!(temph->type & (HTT_IMPORT | HTT_PRIVATE)) &&
+	     temph->type & mask &&
+	 (temph->type & HTT_PUBLIC || !publics))
+	  if (!index)
+	    list[j++].h=temph;
+	  else
+	    if (cur_index=temph->index)
+	      if (k=HelpIndexCnt(cur_index,index)) {
+		while (k--) {
+		  list[j].index=HelpIndexStr(&cur_index,index);
+		  list[j++].h=temph;
+		}
+	      }
+	temph=temph->next;
+      }
+    }
+    if (recurse)
+      tempht=tempht->next;
+    else
+      break;
+  }
+  Preempt(old_preempt);
+
+  if (map)
+    QSort(list,cnt,sizeof(HashRepStruct),&CompareHashEntries2);
+  else if (index)
+    QSort(list,cnt,sizeof(HashRepStruct),&CompareHashEntries3);
+  else
+    QSort(list,cnt,sizeof(HashRepStruct),&CompareHashEntries);
+
+  for (i=0;i<cnt;i++) {
+    ptr=list[i].h;
+    dbg=NULL;
+    if (index)
+      if (cur_index=list[i].index) {
+	if (StrCmp(cur_index,last_index)) {
+	  Free(last_index);
+	  last_index=NewStr(cur_index);
+	  if (l)
+	    LtfPrintF(l,"$$FG,GREEN$$%s$$FG$$\r\n",cur_index);
+	  else
+	    PrintF("$$FG,GREEN$$%s$$FG$$\r\n",cur_index);
+	}
+      }
+    if (index && ptr->type & HTT_HELP_FILE) {
+      if (l) {
+	l1=LtfRead(ptr->str);
+	EditInsertLtf(l,l1);
+	LtfDel(l1);
+      } else
+	Type(ptr->str);
+    } else {
+      if (ptr->source_link) {
+	buf4=NewStr(ptr->source_link);
+	if (mapfile_drive && StrLen(buf4)>3)
+	  buf4[3]=mapfile_drive;
+	if (l && ptr->type & HTT_FUNCTION) {
+	  dbg=ptr><(ClassStruct *)->debug;
+	  if (dbg) {
+	    size=offset(DbgInfo.body)+
+	      sizeof(void *)*
+	      (dbg->max_line-dbg->min_line+2);
+	    if (size>MSize(dbg)) {
+	      coutln "Corrupt Map Entry";
+	      dbg=NULL;
+	    } else {
+	      if (dbg->min_line<=dbg->max_line) {
+		tempb=MAllocZ(sizeof(LtfBinEntry));
+		tempb->type=LTFBT_GENERIC_DATA;
+		tempb->size=size;
+		tempb->data=MAlloc(size);
+		MemCpy(tempb->data,dbg,size);
+		tempb->num=l->cur_bin_num;
+		tempb->use_cnt=1;
+		InsQue(tempb,l->bin_root.last);
+	      } else
+		dbg=NULL;
+	    }
+	  }
+	}
+	if (dbg)
+	  SPrintF(buf,"$$LK+BI,\"%-18s \",\"%s\",%d$$",
+	    ptr->str,buf4,l->cur_bin_num++);
+	else
+ 	  SPrintF(buf,"$$LK,\"%-18s \",\"%s\"$$",
+	    ptr->str,buf4);
+	Free(buf4);
+      } else
+	SPrintF(buf,"%-18ts ",ptr->str);
+
+      if (l)
+	LtfPutSExt(l,buf);
+      else
+	PutS(buf);
+
+      if (!index) {
+	if (ptr->type & HTT_FUNCTION)
+	  SPrintF(buf,"%08X",ptr><(ClassStruct *)->executable_address);
+	else if (ptr->type & HTT_STR_CONST)
+	  SPrintF(buf,"%-8tQ",ptr><(StrConstStruct *)->data);
+	else if (ptr->type & HTT_GLBL_VAR)
+	  SPrintF(buf,"%08X",ptr><(GlblVarStruct *)->data_address);
+	else if (ptr->type & HTT_SYSTEXT)
+	  SPrintF(buf,"%-8tQ %04tX",ptr->user_data0,ptr->user_data1);
+	else
+	  SPrintF(buf,"%08X",ptr->user_data0);
+	SPrintF(buf+StrLen(buf)," %04X ",ptr->use_cnt);
+      } else
+	*buf=0;
+
+      k=ptr->type;
+      if (publics)
+	k&=~HTT_PUBLIC;
+
+      for (j=0;j<32;j++)
+	if (Bt(&k,j))
+	  SPrintF(buf+StrLen(buf),"%Z ",j,"ST_HTT_TYPES");
+      StrCat(buf,"\r\n");
+      if (l)
+	LtfPutSExt(l,buf);
+      else
+	PutS(buf);
+    }
+    Free(list[i].index);
+  }
+  Free(list);
+
+end_hash:
+  if (l) {
+    if (!l_) {
+      LtfWrite(l);
+      LtfDel(l);
+    } else {
+      if (l->dummy.next==l)
+	LtfPutSExt(l,"No Match");
+    }
+  }
+  Free(last_index);
+}
+
+public void HFunsRep(I1 *flags="",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_FUNCTION,NULL,flags,0,index);
+}
+
+public void HMapRep(I1 *flags="-p+m",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_FUNCTION,NULL,flags,0,index);
+}
+
+public void HVarsRep(I1 *flags="",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_GLBL_VAR,NULL,flags,0,index);
+}
+
+public void HClassesRep(I1 *flags="-p",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_CLASS,NULL,flags,0,index);
+}
+
+public void HDefinesRep(I1 *flags="-p",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_STR_CONST,NULL,flags,0,index);
+}
+
+public void HSymsRep(I1 *flags="-p",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_SYS_SYMBOL,NULL,flags,0,index);
+}
+
+public void HSysTextsRep(I1 *flags="-p",I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_SYSTEXT,NULL,flags,0,index);
+}
+
+public void HAllRep(I1 *index=NULL)
+{
+  HashRep(Fs->hash_table,HTT_ALL,NULL,"-p",0,index);
+}
+
+public void LtfHelpIndex(Ltf *l,I1 *index)
+{
+  HashRep(Fs->hash_table,HTT_ALL,NULL,NULL,0,index,l);
+}
+
+public void PopUpHelpIndex(I1 *index,TssStruct *parent=NULL)
+{
+  I1 *buf;
+  buf=MSPrintF("LtfHelpIndex(Fs->cur_ltf,\"%s\");View;",index);
+  PopUp(buf,parent);
+  Free(buf);
+}
+
+#help_index "Hash"
+public void LoadMapFile(I1 *filename)
+{
+  I1 *st,*name=DefaultExtension(filename,"MPZ");
+  I1 *absname=AbsoluteFileName(name);
+  Ltf *l=LtfRead(name);
+  LtfEntry *cl;
+  SysHashEntry *temph;
+  U8 i,j,base=0;
+  DbgInfo *dbg;
+
+  RemoveLastSeg(absname,".");
+  if (absname[1]==':' && StrLen(absname)>2) {
+    temph=FindLocalHash(absname+2,HTT_MODULE);
+    if (temph)
+      base=temph->user_data0;
+  }
+
+  if (!l) return;
+  cl=l->dummy.next;
+  while (cl!=l) {
+    if (cl->btype==LTFT_LINK) {
+      st=MStrUtil(cl->display,SU_REMOVE_TRAILING);
+      if (temph=FindLocalHash(st,HTT_ALL)) {
+	Free(temph->source_link);
+	temph->source_link=cl->aux_str;
+	cl->aux_str=NULL;
+	dbg=temph->debug;
+	if (!dbg && cl->bin_data) {
+	  dbg=cl->bin_data->data;
+	  if (dbg) {
+	    if (cl->bin_data->size>MSize(dbg))
+	      coutln "Corrupt Map Entry";
+	    else {
+	      cl->bin_data->data=NULL;
+	      temph->debug=dbg;
+	      for (i=dbg->min_line;i<=dbg->max_line+1;i++) {
+		j=i-dbg->min_line;
+		if (dbg->body[j])
+		  dbg->body[j]=dbg->body[j]+base;
+	      }
+	    }
+	  }
+	}
+      }
+      Free(st);
+    }
+    cl=cl->next;
+  }
+  LtfDel(l);
+  Free(name);
+  Free(absname);
+}
+#help_index ""

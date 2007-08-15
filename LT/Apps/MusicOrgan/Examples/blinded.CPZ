@@ -1,0 +1,36 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  Fs->end_task_cb=&EndTsk;
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Acts,9:3\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+    Play("3qEeACA2G3qCEC2G3E",
+	"Now... \0 \0 \0 \0 \0I \0see \0the \0light.\r\n\0 \0");
+    Play("EeACA2G3qCEC2G3E",
+	"Now... \0 \0 \0 \0 \0I \0see \0the \0light.\r\n\0 \0");
+    Play("GCGBEeDFCAqD",
+	"It's \0 \0quite \0 \0bright.\r\n\0 \0 \0 \0 \0 \0");
+    Play("GCGBEeDFCAqD",
+	    "It's \0 \0quite \0 \0bright.\r\n\0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

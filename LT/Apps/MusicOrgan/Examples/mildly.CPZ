@@ -1,0 +1,36 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  TssStruct *tss;
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Mark,4:37\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3qEsGEGEqDsCCCCqBsDEDEqFG",
+		"Lord, \0there's \0 \0a \0 \0storm \0u\0 \0 \0 \0pon \0the \0 \0 \0 \0sea.\r\n\0 \0");
+	Play("EsGEGEqDsCCCCqBsDEDEqFG",
+		"Lord, \0there's \0 \0a \0 \0storm \0u\0 \0 \0 \0pon \0the \0 \0 \0 \0sea.\r\n\0 \0");
+	Play("GEC2G3etB2G3FGGEDBBeBE",
+		"$$FG,PURPLE$$Re\0lax \0fel\0las.$$FG$$\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qGEC2G3etB2G3FGGEDBBeBE",
+		"$$FG,GREEN$$(Sea \0be\0came \0glass.)$$FG$$\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

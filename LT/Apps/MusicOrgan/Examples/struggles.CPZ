@@ -1,0 +1,27 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3sFGFGetDCFqD2G3DGDetDFB",
+		"God, \0 \0 \0 \0please \0 \0 \0help \0me.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("sFGFGetDCFqD2G3DGDetDFB",
+		"God, \0 \0 \0 \0please \0 \0 \0help \0me.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("qACADetF2G3B2sG3F2G3FetCDFsDFDF",
+		"Thy \0will \0be \0done.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qACADetF2G3B2sG3F2G3FetCDFsDFDF",
+		"Thy \0will \0be \0done.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

@@ -1,0 +1,66 @@
+$WW,1$$FG,5$$TX+CX,"ACCOUNT FILES"$$FG$
+
+You can add and remove accounts by making or removing directories in the $FG,2$::/LT/Accts$FG$ directory.  You'll have to copy start-up files into them.
+
+See $LK-A,"HOME/User.CPZ"$ for the user start-up file.
+
+See $LK-A,"HOME/User.MUZ"$ for a personalizable menu/macro area which can be viewed at the command line with the windows key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+See $LK-A,"HOME/DoIt.CPZ"$ for a file which is invoked at the start-up of the first user.
+
+See $LK-A,"HOME/Favor.MUZ"$ for a handy "favorites" file which can be reached by pressing $FG,2$CTRL-SHIFT-F$FG$, pretty-much anywhere.  Users can place links and todo lists or any text within this.
+
+See $LK-A,"HOME/Adam3.APZ"$ for the user files that get loaded into the adam task at start-up.  These are only loaded once.
+
+See $LK-A,"HOME/System.CPZ"$ for the start-up file used when a $LK,"System","MN:System"$() command is used.
+
+See $LK-A,"HOME/Servant.CPZ"$ for the start-up file other commands which $LK,"Spawn","MN:Spawn"$() tasks. 
+
+See $LK-A,"HOME/Fault.CPZ"$ for a start-up file called when a fault occurs.  When debugging you might place data display commands here.
+
+$FG,4$SysRegistry.BIZ$FG$ is for operating system data.  It's just a $LK,"SysAccntRegistryStruct","MN:SysAccntRegistryStruct"$ that's been written-out.  For application configuration data, create a data file in the application's subdirectory in $FG,2$HOME$FG$ if you make an application.
+
+$FG,5$$TX+CX,"APPLICATION POLICIES"$$FG$
+
+* Place applications in their own $FG,2$/LT/Apps$FG$ subdirectory.
+
+* Make a file called $FG,2$Load.CPZ$FG$ to load the application.
+
+* Make a file called $FG,2$Run.CPZ$FG$ to load and run the application, preferable by $FG,2$#include$FG$ing the $FG,2$Load.CPZ$FG$ file.
+
+* Place user data in a subdirectory of $FG,2$HOME$FG$, preferably naming the subdirectory the same as the $FG,2$/LT/Apps$FG$ subdirectory.
+
+* Make a file called $FG,2$Install.CPZ$FG$ or $FG,2$Install.AUZ$FG$ to create the $FG,2$HOME$FG$ subdirectory and do similar stuff.
+
+ 
+
+$FG,5$$TX+CX,"OS PROGRAMMING GUIDELINES:"$$FG$
+
+* Virtual mem is not used (It is identity mapped in EM64T mode).  The stack does not grow, so allocate enough when the task (process) is $LK,"Spawn","MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc","MN:MAlloc"$() and $LK,"Free","MN:Free"$().)
+
+* I've tried to standardize names see $LK,"Naming convention","FF:::/LT/Doc/OSGlossary.GLZ,Naming convention"$
+
+* There are two modes of compiling $LK,"Static Compiled Mode","FF:::/LT/Doc/OSGlossary.GLZ,Static Compiled Mode"$ and $LK,"Dynamic Compiled Mode","FF:::/LT/Doc/OSGlossary.GLZ,Dynamic Compiled"$.  Actual compilation is done in both--nothing is "interpreted".
+
+* $LK,"Differences from C/C++","FI:::/LT/Doc/Differences.TXZ"$
+
+
+$FG,5$$TX+CX,"Hash symbol tables:"$$FG$
+
+* See $LK,"::/LT/Adam/HashUtils.APZ","FI:::/LT/Adam/HashUtils.APZ"$ for examples of how the hash tables are set-up.  Basically, symbols are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for variables and functions.
+
+* "$FG,2$adam_tss->hash_table$FG$" holds the C/C++ symbols loaded in on start-up.
+
+* "$FG,2$Fs->hash_table$FG$" holds user C+ symbols and if a symbol is not found, it checks parents.  When a duplicate symbol is added to the table, it overshadows the previous symbol.  When developing software, typically you include the file at the command prompt, make changes and reinclude it.  Old symbols are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
+
+* To display the contents of a hash table, use the $LK,"HashRep","MN:HashRep"$() routine or the varients.
+
+$FG,5$$TX+CX,"Assembly Language Concerns:"$$FG$
+
+* $FG,2$FS$FG$ must always point to the per-TASK's structure.  See $LK,"C+","FF:::/LT/OSMain/AdamK.HPZ,TssStruct:2"$ and $LK,"Asm","FF:::/LT/OSMain/OSDefs.ASZ,TSS_RIP"$.
+
+* $FG,2$GS$FG$ must always point to the per-CPU's structure.  See $LK,"C+","FF:::/LT/OSMain/AdamK.HPZ,CPUStruct:1"$ and $LK,"Asm","FF:::/LT/OSMain/OSDefs.ASZ,CPU_NUM"$.
+
+* Don't change the segment registers unless interrupts are off.
+
+* When interacting with compiled code, preserve $FG,2$RBP, RSI, RDI, R12-R15$FG$ because the compiler uses these for register vars.  You are free to trash $FG,2$RAX, RBX, RCX, RDX$FG$ and $FG,2$R8-R11.

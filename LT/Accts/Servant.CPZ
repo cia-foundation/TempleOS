@@ -1,0 +1,11 @@
+/*
+This is the startup file for servant tasks.
+
+If you modify this file, you should place it
+into your HOME directory.  This version is the
+default for accounts without a version in HOME.
+*/
+
+UseConsoleLtf(NULL);
+Bts(&Fs->crt_flags,CRTf_SHOW);
+//Turn on preemption

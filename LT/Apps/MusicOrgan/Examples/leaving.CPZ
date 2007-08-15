@@ -1,0 +1,38 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:John,16:28\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  PutS("$$WW+H,1$$");
+  while (!ScanKey) {
+    Play("3qBBDsDGDGqFeFAFAqB",
+	"Now, \0I \0go \0 \0 \0 \0 \0to \0the \0 \0Fa\0th\0er.\r\n\0");
+    Play("BBDsDGDGqFeFAFAqB",
+	"Now, \0I \0go \0 \0 \0 \0 \0to \0the \0 \0Fa\0th\0er.\r\n\0");
+    Play("EDetBEA2eG3CsECECqGDeDD",
+	"Don't \0worry. \0 \0 \0 \0 \0 \0I'll \0 \0 \0 \0be \0back.\r\n\0 \0 \0");
+    Play("qEDetBEA2eG3CsECECqGDeDD",
+	    "Don't \0worry. \0 \0 \0 \0 \0 \0I'll \0 \0 \0 \0be \0back.\r\n\0 \0 \0");
+    PutS("$$FG,GREEN$$(Christ promised to return.)\r\n$$FG$$");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

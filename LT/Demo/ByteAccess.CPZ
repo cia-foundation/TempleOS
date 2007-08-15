@@ -1,0 +1,26 @@
+/*
+  LoseThos has a feature that allows
+  access to bytes and words of larger
+  integers.
+
+  See $LK,"U8i union","FF:::/LT/OSMain/AdamK.HPZ,U8i union"$
+ 
+  The versions with "i" are internal data types.
+  Use "U8" instead of "U8i" and you
+  will have access to subbytes and
+  subwords.
+*/
+
+U8 q=0xFEDCBA9876543210,q1;
+
+PrintF("q\t\t=%016X\r\n",q);
+q1=q.i2[2];
+PrintF("q.i2[2]\t\t=%016X\r\n",q1);
+q1=q.u1[5];
+PrintF("q.u1[5]\t\t=%016X\r\n",q1);
+q1=q.i4[1].u1[2];
+PrintF("q.i4[1].u1[2]\t=%016X\r\n",q1);
+q1=q.i4[0].i1[1];
+PrintF("q.i4[0].i1[1]\t=%016X\r\n",q1);
+
+

@@ -1,0 +1,574 @@
+BoolU8 CmpOptIc3(LexStruct *lx,IntermediateCode *tempi,BoolU4 inside_return)
+{
+  I8 i,t,pt,t1,pt1;
+  IntermediateCode *tempil1,*tempil2;
+
+  if (tempi->ic_opcode<EC_IMM) return FALSE;
+  tempil1=tempi;
+  if (!(tempil2=OptLag1(lx,tempil1)))
+    return FALSE;
+
+  if (tempil2->r.type&TY_MASK==TY_STK &&
+      !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
+    if (tempil1->ic_opcode==EC_ADD_CONST &&
+	tempil1->p1.type&TY_MASK==TY_STK) {
+      if ((tempil2->ic_opcode==EC_REG ||
+	  tempil2->ic_opcode==EC_MOV) &&
+	  tempil2->p1.type&TY_MASK==TY_REG) {
+	i=tempil1->ic_data;
+	if (i>=MIN_I4 && i<=MAX_I4 &&
+	    !Bt(&non_ptr_vars_mask,tempil2->p1.reg)) {
+	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil2->ic_opcode=EC_NOP;
+	  tempil2->p1.type=TY_NULL+tempil2->p1.type&IT_MASK;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
+	  tempil1->ic_opcode=EC_LEA;
+	  tempil1->p1.type=TY_DISP+tempil1->p1.type&IT_MASK;
+	  tempil1->p1.reg=tempil2->p1.reg;
+	  tempil1->p1.disp=i;
+	  return TRUE;
+	}
+      }
+    }
+    if (tempil2->ic_opcode==EC_MOV ||
+	tempil2->ic_opcode==EC_REG) {
+      if (!inside_return) {
+	if (tempil1->p3.type&TY_MASK==TY_STK) {
+	  if (tempil2->ic_flags & ICF_R_TO_INT) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp=tempil2->p1.disp><(double);
+	    else
+	      tempil1->ic_flags|=ICF_P3_TO_INT;
+	  } else if (tempil2->ic_flags&ICF_R_TO_DOUBLE) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp><(double)=tempil2->p1.disp;
+	    else
+	      tempil1->ic_flags|=ICF_P3_TO_DOUBLE;
+	  }
+
+	  t=tempil1->p3.type&IT_MASK;
+	  t1=tempil2->p1.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  t1=tempil2->r.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  tempil1->p3.type=tempil2->p1.type&TY_MASK+t;
+
+	  pt=tempil1->p3.ptype;
+	  pt1=tempil2->p1.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  pt1=tempil2->r.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  tempil1->p3.ptype=pt;
+
+	  tempil1->p3.reg=tempil2->p1.reg;
+	  tempil1->p3.disp=tempil2->p1.disp;
+	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil2->ic_opcode=EC_NOP1;
+	  tempil2->ic_data=1;
+	  tempil2->p1.type=TY_NULL+tempil2->p1.type&IT_MASK;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
+	  return TRUE;
+	}
+	if (tempil1->p2.type&TY_MASK==TY_STK) {
+	  if (tempil2->ic_flags & ICF_R_TO_INT) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp=tempil2->p1.disp><(double);
+	    else
+	      tempil1->ic_flags|=ICF_P2_TO_INT;
+	  } else if (tempil2->ic_flags&ICF_R_TO_DOUBLE) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp><(double)=tempil2->p1.disp;
+	    else
+	      tempil1->ic_flags|=ICF_P2_TO_DOUBLE;
+	  }
+
+	  t=tempil1->p2.type&IT_MASK;
+	  t1=tempil2->p1.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  t1=tempil2->r.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  tempil1->p2.type=tempil2->p1.type&TY_MASK+t;
+
+	  pt=tempil1->p2.ptype;
+	  pt1=tempil2->p1.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  pt1=tempil2->r.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  tempil1->p2.ptype=pt;
+
+	  tempil1->p2.reg=tempil2->p1.reg;
+	  tempil1->p2.disp=tempil2->p1.disp;
+	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil2->ic_opcode=EC_NOP1;
+	  tempil2->ic_data=1;
+	  tempil2->p1.type=TY_NULL+tempil2->p1.type&IT_MASK;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
+	  return TRUE;
+	}
+	if (tempil1->p1.type&TY_MASK==TY_STK) {
+	  if (tempil2->ic_flags & ICF_R_TO_INT) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp=tempil2->p1.disp><(double);
+	    else
+	      tempil1->ic_flags|=ICF_P1_TO_INT;
+	  } else if (tempil2->ic_flags&ICF_R_TO_DOUBLE) {
+	    if (tempil2->p1.type&TY_MASK==TY_IMM)
+	      tempil2->p1.disp><(double)=tempil2->p1.disp; //dbgo signed/unsigned
+	    else if (!(tempil1->ic_flags&ICF_USE_INT))
+	      tempil1->ic_flags|=ICF_P1_TO_DOUBLE;
+	  }
+
+	  t=tempil1->p1.type&IT_MASK;
+	  t1=tempil2->p1.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  t1=tempil2->r.type&IT_MASK;
+	  if (t1 && t1<t)
+	    t=t1;
+	  tempil1->p1.type=tempil2->p1.type&TY_MASK+t;
+
+	  pt=tempil1->p1.ptype;
+	  pt1=tempil2->p1.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  pt1=tempil2->r.ptype;
+	  if (pt1 && pt1<pt && pt!=IT_DOUBLE)
+	    pt=pt1;
+	  tempil1->p1.ptype=pt;
+
+	  tempil1->p1.reg=tempil2->p1.reg;
+	  tempil1->p1.disp=tempil2->p1.disp;
+	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil2->ic_opcode=EC_NOP1;
+	  tempil2->ic_data=1;
+	  tempil2->p1.type=TY_NULL+tempil2->p1.type&IT_MASK;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
+	  return TRUE;
+	}
+      }
+    }
+    if (tempil1->ic_opcode==EC_DEREF) {
+      if (tempil2->ic_opcode==EC_ADD_CONST &&
+	  tempil2->p1.type&TY_MASK==TY_REG &&
+	  tempil1->p1.type&TY_MASK==TY_STK) {
+	i=tempil2->ic_data;
+	if (i>=MIN_I4 && i<=MAX_I4 &&
+	  !Bt(&non_ptr_vars_mask,tempil2->p1.reg)) {
+	  tempil1->ic_flags|=tempil2->ic_flags;
+	  tempil2->ic_opcode=EC_NOP1;
+	  tempil2->ic_data=1;
+	  tempil2->ic_data=-1;
+	  tempil2->p1.type=TY_NULL+tempil2->p1.type&IT_MASK;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
+	  tempil1->ic_opcode=EC_MOV;
+	  tempil1->p1.type=TY_DISP+tempil1->p1.ptype;
+	  tempil1->p1.reg=tempil2->p1.reg;
+	  tempil1->p1.disp=i;
+	  return TRUE;
+	}
+      }
+      if (tempil2->ic_opcode==EC_LEA &&
+	  tempil1->p1.type&TY_MASK==TY_STK) {
+	tempil1->ic_flags|=tempil2->ic_flags;
+	tempil2->ic_opcode=EC_NOP;
+	tempil1->ic_opcode=EC_MOV;
+	tempil1->p1.type=tempil2->p1.type&TY_MASK+tempil1->p1.ptype;
+	tempil1->p1.reg=tempil2->p1.reg;
+	tempil1->p1.disp=tempil2->p1.disp;
+	return TRUE;
+      }
+    }
+  }
+  if (tempil1->ic_opcode==EC_DEREF) {
+    if (tempil1->p1.type&TY_MASK==TY_REG) {
+      tempil1->p1.type=TY_DISP+tempil1->p1.ptype;
+      tempil1->p1.disp=0;
+      tempil1->ic_opcode=EC_MOV;
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+void CmpOptPass3(LexStruct *lx,I8 *register_offsets,U8 *type_)
+{
+  ClassStruct *tempc,*tempc1,*tempc2,*tempc3;
+  IntermediateCode *tempi,*tempi1,*tempi2,*tempi3,*tempil1,*tempil2,*tempil3,
+		   *temp_lag[4];
+  I8 code,i,type=IT_I8;
+  ParseStack *ps=OptStart(lx,temp_lag);
+  BoolU4 inside_return=FALSE,dead_code=FALSE;
+  CbMiscStruct *lb;
+
+  tempi=lx->cb.cb_in_ptr;
+  while (code=tempi->ic_opcode) {
+    OptNext2(tempi,temp_lag);
+    if (dead_code&&code!=EC_LABEL)
+      tempi->ic_opcode=EC_NOP;
+    else {
+    tempc=tempi->ic_class;
+
+    tempi3=&opt_nop;
+    tempi2=&opt_nop;
+    tempi1=&opt_nop;
+
+    tempil1=temp_lag[1];
+    tempil2=temp_lag[2];
+    tempil3=temp_lag[3];
+    switch (cmp_param_cnt[code]) {
+      case 9:
+	ps->ptr-=tempi->ic_data>>3;
+	break;
+      case 3:
+ 	tempi3=PrsPop(ps);
+	tempc3=tempi3->ic_class;
+      case 2:
+ 	tempi2=PrsPop(ps);
+	tempc2=tempi2->ic_class;
+      case 1:
+ 	tempi1=PrsPop(ps);
+	tempc1=tempi1->ic_class;
+	break;
+    }
+    switch (code) {
+	case EC_IMM:
+	case EC_TYPE:
+	  tempi->p1.type=TY_IMM+IT_I8;
+	  tempi->p1.disp=tempi->ic_data;
+	  tempi->ic_opcode=EC_MOV;
+	  break;
+	case EC_DOUBLE:
+	  tempi->p1.type=TY_IMM+IT_I8;
+	  tempi->p1.disp=tempi->ic_data;
+	  tempi->p1.ptype=IT_DOUBLE;
+	  tempi->ic_opcode=EC_MOV;
+	  break;
+	case EC_STR_CONST:
+	case EC_FS:
+	case EC_GS:
+	case EC_RBP:
+	case EC_REG:
+	case EC_COM:
+	case EC_NOT:
+	case EC_UNARY_MINUS:
+	case EC_PUSH_CMP:
+	  break;
+	case EC_MOV:
+	  if (tempi->p1.type&TY_MASK==TY_DISP &&
+	      tempi->p1.reg==CREG_RBP) {
+	    i=CmpOffsetToReg(tempi->p1.disp,register_offsets);
+	    if (i>=0) {
+	      tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
+	      tempi->p1.reg=i;
+	    }
+	  }
+	  break;
+	case EC_DEREF:
+	  if (tempi1->ic_opcode==EC_LEA) {
+	    if (tempi1->p1.type&TY_MASK==TY_DISP &&
+		tempi1->p1.reg==CREG_RBP) {
+	      i=CmpOffsetToReg(tempi1->p1.disp,register_offsets);
+	      if (i>=0) {
+		tempi->ic_flags|=tempi1->ic_flags;
+		tempi1->ic_opcode=EC_NOP;
+		tempi->ic_opcode=EC_REG;
+		tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
+		tempi->p1.reg=i;
+	      }
+	    }
+	  } else if ((tempi1->ic_opcode==EC_ABSOLUTE_ADDRESS ||
+		     (tempi1->ic_opcode==EC_MOV &&
+		      tempi1->p1.type==TY_IMM+IT_I8 &&
+		      tempi1->p1.disp>=0 && tempi1->p2.disp<0x80000000)) &&
+		      !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	    if (tempi1->ic_opcode==EC_ABSOLUTE_ADDRESS)
+	      tempi->p1.disp=tempi1->ic_data;
+	    else
+	      tempi->p1.disp=tempi1->p1.disp;
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    tempi1->ic_opcode=EC_NOP;
+	    tempi1->p1.type=TY_NULL+tempi1->p1.type&IT_MASK;
+	    tempi1->r.type=TY_NULL+tempi1->r.type&IT_MASK;
+	    tempi->ic_opcode=EC_MOV;
+	    tempi->p1.type=TY_RIP_DISP32+tempi->p1.ptype;
+	    tempi->p1.reg=CREG_RIP;
+	  }
+	  break;
+	case EC__PP:
+	case EC__MM:
+	case EC_PP_:
+	case EC_MM_:
+	  if (tempi1->ic_opcode==EC_LEA) {
+	    if (tempi1->p1.type&TY_MASK==TY_DISP &&
+		tempi1->p1.reg==CREG_RBP) {
+	      i=CmpOffsetToReg(tempi1->p1.disp,register_offsets);
+	      if (i>=0) {
+		tempi->ic_flags|=tempi1->ic_flags;
+		tempi1->ic_opcode=EC_NOP1;
+		tempi1->ic_data=1;
+		tempi1->r.type=TY_NULL;
+		tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
+		tempi->p1.reg=i;
+		tempi->ic_flags|=ICF_NOT_ADDRESS;
+	      }
+	    }
+	  } else if ((tempi1->ic_opcode==EC_ABSOLUTE_ADDRESS ||
+		     (tempi1->ic_opcode==EC_MOV &&
+		      tempi1->p1.type==TY_IMM+IT_I8 &&
+		      tempi1->p1.disp>=0 && tempi1->p2.disp<0x80000000)) &&
+		      !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    if (tempi1->ic_opcode==EC_ABSOLUTE_ADDRESS)
+	      tempi->p1.disp=tempi1->ic_data;
+	    else
+	      tempi->p1.disp=tempi1->p1.disp;
+	    tempi1->ic_opcode=EC_NOP;
+	    tempi1->p1.type=TY_NULL+tempi1->p1.type&IT_MASK;
+	    tempi1->r.type=TY_NULL+tempi1->r.type&IT_MASK;
+	    tempi->p1.type=TY_RIP_DISP32+tempi->p1.ptype;
+	    tempi->p1.reg=CREG_RIP;
+	    tempi->ic_flags|=ICF_NOT_ADDRESS;
+	  }
+	  break;
+	case EC_LEA:
+	case EC_SHL_CONST:
+	case EC_SHR_CONST:
+	case EC_POWER:
+	case EC_SHL:
+	case EC_SHR:
+	case EC_MUL:
+	case EC_DIV:
+	case EC_MOD:
+	case EC_AND:
+	case EC_OR:
+	case EC_XOR:
+	case EC_ADD:
+	case EC_SUB:
+	case EC_EQUAL_EQUAL:
+	case EC_NOT_EQUAL:
+	case EC_LESS:
+	case EC_GREATER:
+	case EC_LESS_EQUAL:
+	case EC_GREATER_EQUAL:
+	case EC_AND_AND:
+	case EC_OR_OR:
+	case EC_XOR_XOR:
+	case EC_COLON:
+	  break;
+	case EC_ASSIGN:
+	case EC_SHL_EQUAL:
+	case EC_SHR_EQUAL:
+	case EC_MUL_EQUAL:
+	case EC_DIV_EQUAL:
+	case EC_MOD_EQUAL:
+	case EC_AND_EQUAL:
+	case EC_OR_EQUAL:
+	case EC_XOR_EQUAL:
+	case EC_ADD_EQUAL:
+	case EC_SUB_EQUAL:
+	  if (tempi1->ic_opcode==EC_LEA) {
+	    if (tempi1->p1.type&TY_MASK==TY_DISP) {
+	      if (tempi1->p1.reg==CREG_RBP) {
+		i=CmpOffsetToReg(tempi1->p1.disp,register_offsets);
+		if (i>=0) {
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_opcode=EC_NOP1;
+		  tempi1->ic_data=1;
+		  tempi1->p1.type=TY_NULL;
+		  tempi1->r.type=TY_NULL;
+		  tempi->p1.reg=i;
+		  tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
+		} else {
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  tempi1->ic_opcode=EC_NOP1;
+		  tempi1->ic_data=1;
+		  tempi1->r.type=TY_NULL;
+		  tempi1->p1.type=TY_NULL;
+		  tempi->p1.disp=tempi1->p1.disp;
+		  tempi->p1.reg=CREG_RBP;
+		  tempi->p1.type=TY_DISP+tempi->p1.type&IT_MASK;
+		}
+	      } else {
+		tempi->ic_flags|=tempi1->ic_flags;
+		tempi1->ic_opcode=EC_NOP1;
+		tempi1->ic_data=1;
+		tempi1->r.type=TY_NULL;
+		tempi1->p1.type=TY_NULL;
+		tempi->p1.disp=tempi1->p1.disp;
+		tempi->p1.reg=tempi1->p1.reg;
+		tempi->p1.type=TY_DISP+tempi->p1.type&IT_MASK;
+	      }
+	      tempi->ic_flags|=ICF_NOT_ADDRESS;
+	    }
+	  } else if ((tempi1->ic_opcode==EC_ABSOLUTE_ADDRESS ||
+		     (tempi1->ic_opcode==EC_MOV &&
+		      tempi1->p1.type==TY_IMM+IT_I8 &&
+		      tempi1->p1.disp>=0 && tempi1->p2.disp<0x80000000)) &&
+		      !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	      tempi->ic_flags|=tempi1->ic_flags;
+	      tempi->p1.disp=tempi1->ic_data;
+	      tempi1->ic_opcode=EC_NOP1;
+	      tempi1->ic_data=1;
+	      tempi1->p1.type=TY_NULL+tempi1->p1.type&IT_MASK;
+	      tempi1->r.type=TY_NULL+tempi1->r.type&IT_MASK;
+	      tempi1->r.type=TY_NULL;
+	      tempi->p1.type=TY_RIP_DISP32+tempi->p1.type&IT_MASK;
+	      tempi->p1.reg=CREG_RIP;
+	      tempi->ic_flags|=ICF_NOT_ADDRESS;
+	  }
+	  break;
+	case EC_ADD_CONST:
+	case EC_SUB_CONST:
+	case EC_ENTER:
+	case EC_ADD_RSP:
+	case EC_CALL:
+	case EC_CALL_INDIRECT:
+	case EC_CALL_INDIRECT2:
+	case EC_CALL_EXTERN:
+	case EC_CLI:
+	case EC_STI:
+	case EC_WBINVD:
+	case EC_INVD:
+	case EC_ENABLE_CACHE:
+	case EC_DISABLE_CACHE:
+	case EC_GET_FLAGS:
+	case EC_RDTSC:
+	case EC_SET_FLAGS:
+	case EC_GET_BASE_PTR:
+	case EC_SET_BASE_PTR:
+	case EC_GET_STACK_PTR:
+	case EC_SET_STACK_PTR:
+	case EC_SET_RAX:
+	  break;
+	case EC_RETURN_START:
+	  inside_return=TRUE;
+	  break;
+	case EC_RETURN_END:
+	  inside_return=FALSE;
+	  break;
+	case EC_GET_LABEL:
+	case EC_ABSOLUTE_ADDRESS:
+	case EC_BT:
+	case EC_BTS:
+	case EC_BTR:
+	case EC_BTC:
+	case EC_LBTS:
+	case EC_LBTR:
+	case EC_LBTC:
+	case EC_BSF:
+	case EC_BSR:
+	case EC_PREEMPT:
+	case EC_ABSI8:
+	case EC_INSQUE:
+	case EC_INSQUE_REV:
+	case EC_REMQUE:
+	case EC_MEMCPY:
+	case EC_MEMSET:
+	case EC_INPD:
+	case EC_INPW:
+	case EC_INP:
+	case EC_STRLEN:
+	case EC_OUTPD:
+	case EC_OUTPW:
+	case EC_OUTP:
+	case EC_SWITCH:
+	case EC_RET:
+	case EC_NULL:
+	case EC_ADDRESS:
+	case EC_QUESTION:
+	case EC_IRQ:
+	case EC_NOP:
+	case EC_CALL_START:
+	case EC_LEAVE:
+	case EC_PUSH_REGS:
+	case EC_POP_REGS:
+	case EC_BR_BT:
+	case EC_BR_BTS:
+	case EC_BR_BTR:
+	case EC_BR_BTC:
+	case EC_BR_NOT_BT:
+	case EC_BR_NOT_BTS:
+	case EC_BR_NOT_BTR:
+	case EC_BR_NOT_BTC:
+	case EC_BR_LBTS:
+	case EC_BR_LBTR:
+	case EC_BR_LBTC:
+	case EC_BR_NOT_LBTS:
+	case EC_BR_NOT_LBTR:
+	case EC_BR_NOT_LBTC:
+	  break;
+	case EC_BR_ZERO:
+	case EC_BR_NOT_ZERO:
+	case EC_BR_NOT_EQUAL:
+	case EC_BR_EQUAL_EQUAL:
+	case EC_BR_GREATER_EQUAL:
+	case EC_BR_LESS_EQUAL:
+	case EC_BR_GREATER:
+	case EC_BR_LESS:
+	case EC_BR_AND_NOT_ZERO:
+	case EC_BR_AND_ZERO:
+	  lb=tempi->ic_data;
+	  if (tempi->ic_flags&ICF_PUSH_CMP) {
+	    lb->flags|=CBMF_POP_CMP;
+	    lb->forward=NULL;
+	  }
+	  break;
+	case EC_LABEL:
+	  lb=tempi->ic_data;
+	  if (lb->flags&CBMF_USED)
+	    dead_code=FALSE;
+	  break;
+	case EC_JMP:
+	  dead_code=TRUE;
+	  break;
+	case EC_NOP1:
+	  ps->ptr+=tempi->ic_data;
+	  break;
+	case EC_CALL_END2:
+	  break;
+	case EC_CALL_END:
+	case EC_END_EXP:
+	  if (tempi->p1.type&TY_MASK==TY_STK) {
+	    if (tempil1->r.type&TY_MASK==TY_STK &&
+	      !(tempil1->ic_flags&ICF_PUSH_RESULT)) {
+	      tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
+	      tempi->p1.reg=CREG_RAX;
+	      tempil1->r.type=TY_REG+tempil1->r.type&IT_MASK;
+	      tempil1->r.reg=CREG_RAX;
+	    }
+	  }
+	  break;
+	default:
+	  OptMissing(lx,3,tempi);
+      }
+
+    while (CmpOptIc3(lx,tempi,inside_return));
+    if (inside_return) {
+      if (tempc=tempi->ic_class) {
+	if (tempi->ic_flags & ICF_R_TO_DOUBLE)
+	  type=IT_DOUBLE;
+	else if (tempi->ic_flags & ICF_R_TO_INT)
+	  type=IT_I8;
+	else
+	  type=tempc->sub_type;
+      }
+    }
+    code=tempi->ic_opcode;
+    if (cmp_result_cnt[code])
+      PrsPush(ps,tempi);
+    }
+    tempi+=sizeof(IntermediateCode);
+  }
+  if (type_)
+    *type_=type;
+
+  OptEnd(lx,3,ps);
+}

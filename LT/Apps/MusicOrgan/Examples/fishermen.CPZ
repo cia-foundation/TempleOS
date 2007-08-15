@@ -1,0 +1,38 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Matthew,4:19\"$$\r\n"
+    "$$LK-A,\"BF:Luke,5:4\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+
+  while (!ScanKey) {
+	Play("3qEsGEGEeF2G3BCqCeDEqBsERER",
+		"$$FG$$Lord, \0I \0 \0am \0 \0feel\0ing \0just \0a \0bit \0un\0in\0spired.\r\n\0With \0 \0 \0 \0");
+	Play("qEsGEGEeF2G3BCqCeDEqBsERER",
+		"net \0or \0 \0with \0 \0reel\0ing \0 \0I \0keep \0get\0ting \0mired.\r\n\0 \0 \0 \0 \0");
+	Play("qDetRAFqDGetFC2G3sBCBCqDF",
+		"$$FG,PURPLE$$Throw \0 \0out \0your \0net.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("DetRAFqDGetFC2G3sBCBCqDF",
+		"Make \0 \0you \0a \0bet.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

@@ -1,0 +1,27 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3eGCBEqDAEetFECqED",
+		"Do \0an \0act \0of \0kind\0ness.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("eGCBEqDAEetFECqED",
+		"Do \0an \0act \0of \0kind\0ness.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("GFEEeAAqDFF",
+		" \0 \0 \0 \0Hold \0 \0a \0hand.\r\n\0 \0");
+	Play("GFEEeAAqDFF",
+		" \0 \0 \0 \0Hold \0 \0a \0hand.\r\n\0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

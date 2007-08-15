@@ -1,0 +1,385 @@
+#define p1_color	    (ROP_EQU+LTGREEN)
+#define p2_color	    (ROP_EQU+PURPLE)
+#define enemy_fire_color    (ROP_EQU+LTBLUE)
+#define friendly_fire_color (ROP_EQU+WHITE)
+
+GrBitMap *WG_base=GrAlias(grbase2,Fs);
+
+$PI,"+",1$
+
+
+$PI,"+",3$
+
+
+$PI,"+",2$
+
+
+$PI,"+",4$
+
+
+U1 *GrTrooper[7]={$IB,"<P1>",1$,$IB,"<P3>",3$,$IB,"<P2>",2$,
+		  $IB,"<P4>",4$,
+		  $IB,"<P2>",2$,$IB,"<P3>",3$,$IB,"<P1>",1$};
+
+U8 fire_end_time=0;
+BoolU4 sound_off=TRUE;
+
+class Trooper
+{
+  I8 num,x,y,dx,dy,fx,fy,att,def,rng,player;
+  U8 fire_end_time;
+};
+
+#define num_troopers 100
+
+Trooper tr[num_troopers<<1];
+U8 cnt1,cnt2;
+I8 text_area_size=(GR_HEIGHT/FONT_HEIGHT)*(GR_WIDTH/FONT_WIDTH);
+
+
+#define mm_none 	      1
+#define mm_friendly_firepower 2
+#define mm_laps_time	      3
+I8 map_mode=mm_none,cmd_intensity=128;
+U2 *map_values;
+
+
+#define ai_nothing 1
+#define ai_target  2
+#define ai_random  3
+U8 ai;
+
+void UpdateMap(TssStruct *tss)
+{
+  I8 i;
+  for (i=tss->win_top;i<=tss->win_bottom;i++) {
+    MemCpy(textbase+(i*TEXT_COLS+tss->win_left)*4,
+	   map_values+(i*TEXT_COLS+tss->win_left)*4,
+	   (tss->win_right+1-tss->win_left)*4);
+  }
+}
+
+void ClearMapValues()
+{
+  MemSet(map_values,0,text_area_size*sizeof(U4));
+}
+
+void PutFriendlyFirepower(TssStruct *tss)
+{
+  I8 i,d,x,y,dx,dy;
+  I8  lt=tss->win_left,rt=tss->win_right,
+      tp=tss->win_top, bm=tss->win_bottom;
+  U4 *ptr;
+  U8 v;
+  for (y=0;y<=bm-tp;y++) {
+    ptr=map_values+((y+tp)*TEXT_COLS+tss->win_left)*4;
+    for (x=0;x<=rt-lt;x++) {
+      v=0;
+      for (i=0;i<num_troopers;i++)
+	if (tr[i].def>0 && tr[i].fire_end_time<Jiffies) {
+	  dx=(tr[i].x>>16)-(x*FONT_WIDTH+FONT_WIDTH>>1);
+	  dy=(tr[i].y>>16)-(y*FONT_HEIGHT+FONT_HEIGHT>>1);
+	  d=dx*dx+dy*dy;
+	  if (d<tr[i].rng)
+	    v+=tr[i].att;
+	}
+      ptr[x]=(v*128 & 0xF000)+CH_SPACE;
+    }
+  }
+}
+
+void DrawTrooper(Trooper *t,U8 color)
+{
+  I8 x=t->dx>>12,y=t->dy>>12,s,fire_col,
+     speed=Sqrt(x*x+y*y);
+
+  if (map_mode==mm_laps_time) {
+    x=(t->x+500*t->dx)>>16;
+    y=(t->y+500*t->dy)>>16;
+  } else {
+    x=t->x>>16;
+    y=t->y>>16;
+  }
+  s=t->def;
+
+  if (s>0) {
+    s=s/3;
+    WG_base->color=color;
+    WG_base->bkcolor=BLACK;
+    GrElemsPlot(WG_base,x,y,0,GrTrooper[(t->num+Jiffies*speed/JIFFY_FREQ)%7]);
+    if (t->player==0)
+      fire_col=friendly_fire_color;
+    else
+      fire_col=enemy_fire_color;
+    if (Jiffies<t->fire_end_time) {
+      Sound(2000);
+      sound_off=FALSE;
+      WG_base->color=fire_col;
+      GrLine3(WG_base,x,y,0,t->fx>>16,t->fy>>16,0);
+    }
+    if (Jiffies>=fire_end_time)
+      if (!sound_off) {
+	sound_off=TRUE;
+	Sound(0);
+      }
+  }
+}
+
+void DrawIt(TssStruct *tss)
+{
+  I1 buf[32];
+  I8 i,c,x=ipx-tss->win_pixel_left,y=ipy-tss->win_pixel_top;
+  cmd_intensity=(ip_throttle*128)>>32;
+
+  UpdateMap(tss);
+  LtfUpdateAuxLtf(tss);
+
+  cnt1=0;
+  cnt2=0;
+  for (i=0;i<num_troopers;i++)
+    if (tr[i].def>0) {
+      DrawTrooper(&tr[i],p1_color);
+      cnt1++;
+    }
+  for (i=num_troopers;i<num_troopers<<1;i++)
+    if (tr[i].def>0) {
+      DrawTrooper(&tr[i],p2_color);
+      cnt2++;
+    }
+  if (cmd_intensity>0) {
+    if (ip_lb)
+      c=ROP_EQU+LTGREEN;
+    else
+      c=ROP_EQU+GREEN;
+  } else {
+    if (ip_lb)
+      c=ROP_EQU+LTBLUE;
+    else
+      c=ROP_EQU+BLUE;
+  }
+  WG_base->color=c;
+  GrCircle(WG_base,x,y,AbsI8(cmd_intensity));
+  SPrintF(buf,"%03d %03d",cnt1,cnt2);
+  PlotWinStr(tss,buf,WHITE,tss->win_right-8,0);
+}
+
+
+I8 targets[10];
+void InitTroopers()
+{
+  I8 i,j,dx,dy;
+  Trooper *t;
+  for (i=0;i<10;i++) {
+    targets[i]=RandU2%num_troopers;
+    dx=RandU2-0x8000;
+    dy=RandU2-0x8000;
+    for (j=0;j<10;j++) {
+      t=&tr[i*10+j];
+      t->num=i*10+j;
+      t->x=(GR_WIDTH-100-i*10)<<16;
+      t->y=(GR_HEIGHT>>1-50+j*10)<<16;
+      t->dx=0;
+      t->dy=0;
+      t->fire_end_time=Jiffies;
+      t->att=3;
+      t->def=10;
+      t->rng=50*50;
+      t->player=0;
+
+      t=&tr[i*10+j+num_troopers];
+      t->num=i*10+j;
+      t->x=(100+i*10)<<16;
+      t->y=(GR_HEIGHT>>1-50+j*10)<<16;
+      t->dx=0;
+      t->dy=0;
+      if (ai==ai_random) {
+	t->dx=dx;
+	t->dy=dy;
+      }
+      t->fire_end_time=Jiffies;
+      t->att=3;
+      t->def=10;
+      t->rng=50*50;
+      t->player=1;
+    }
+  }
+}
+
+
+void DoAiTarget()
+{
+  I8 i,j;
+  Trooper *t,*t2;
+  for (i=0;i<10;i++) {
+    t2=&tr[targets[i]];
+    for (j=0;j<10;j++) {
+      t=&tr[i*10+j+num_troopers];
+      t->dx=(t2->x-t->x)>>11;
+      t->dy=(t2->y-t->y)>>11;
+    }
+  }
+}
+
+
+void UpdatePositions()
+{
+  I8 i;
+  Trooper *t;
+  for (i=0;i<num_troopers<<1;i++) {
+    t=&tr[i];
+    t->x+=t->dx;
+    if (t->x>=GR_WIDTH<<16) t->x-=GR_WIDTH<<16;
+    if (t->x<0) t->x+=GR_WIDTH<<16;
+    t->y+=t->dy;
+    if (t->y>=GR_HEIGHT<<16) t->y-=GR_HEIGHT<<16;
+    if (t->y<0) t->y+=GR_HEIGHT<<16;
+  }
+}
+
+void ResolveFiring()
+{
+  I8 i,j,d,dx,dy;
+  for (i=0;i<num_troopers;i++)
+    for (j=num_troopers;j<num_troopers<<1;j++) {
+      if (tr[i].def>0 && tr[j].def>0) {
+	dx=(tr[i].x-tr[j].x)>>16;
+	dy=(tr[i].y-tr[j].y)>>16;
+	d=dx*dx+dy*dy;
+	if (d<tr[i].rng && tr[i].fire_end_time<Jiffies) {
+	  tr[i].fire_end_time=Jiffies+JIFFY_FREQ>>3;
+	  fire_end_time=tr[i].fire_end_time;
+	  tr[i].fx=tr[j].x;
+	  tr[i].fy=tr[j].y;
+	  tr[j].def=tr[j].def-tr[i].att;
+	}
+	if (d<tr[j].rng && tr[j].fire_end_time<Jiffies) {
+	  tr[j].fire_end_time=Jiffies+JIFFY_FREQ>>3;
+	  fire_end_time=tr[i].fire_end_time;
+	  tr[j].fx=tr[i].x;
+	  tr[j].fy=tr[i].y;
+	  tr[i].def=tr[i].def-tr[j].att;
+	}
+      }
+    }
+}
+
+void UpdateVelocities()
+{
+  I8 i,x=ipx-Fs->win_pixel_left,y=ipy-Fs->win_pixel_top,dx,dy,d;
+  Trooper *t;
+  if (ip_lb) {
+    for (i=0;i<num_troopers;i++) {
+      t=&tr[i];
+      dx=(x-(t->x>>16));
+      dy=(y-(t->y>>16));
+      d=dx*dx+dy*dy+1;
+      dx=(cmd_intensity<<13*dx)/d;
+      dy=(cmd_intensity<<13*dy)/d;
+      t->dx=t->dx-dx;
+      t->dy=t->dy-dy;
+    }
+  }
+}
+
+void SongEndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void SongTsk()
+{
+  Fs->end_task_cb=&SongEndTsk;
+  ResetMusicSettings;
+  while (TRUE) {
+	Play("3qAG2eG3DqDeBGqEsARAReFA");
+	Play("qAG2eG3DqDeBGqEsARAReFA");
+	Play("sCCCC2qG3G2G3ABD2eGR");
+	Play("3sCCCC2qG3G2G3ABD2eGR");
+  }
+}
+
+void WarGame()
+{
+  I8 ch=0,i=0;
+  U8 sc=0,ms=0;
+  void *old_update=Fs->update_win;
+  Ltf *l,*m,*old_cur_ltf=Fs->cur_ltf,*old_aux_ltf=Fs->aux_ltf;
+  BoolU4 old_has_menu;
+  BoolU4 old_border=WinBorder(OFF);
+  BoolU4 old_ip_double=Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+  BoolU4 old_preempt=Preempt(OFF);
+  TssStruct *song_tss=Spawn(&SongTsk,"WarGame Song",Fs);
+ 
+  WinMax;
+  map_values=MAlloc(text_area_size*sizeof(U4));
+  ip_throttle=-1<<30;
+
+  Fs->cur_ltf=NULL;
+
+  m=LtfRead("::/LT/Apps/WarGame/WarGame.MUZ");
+  old_has_menu=Bts(&Fs->crt_flags,CRTf_HAS_MENU); //todo aux ltf to show "MENU"
+
+  Fs->aux_ltf=l=InitSysAuxLtf(TRUE);
+  LtfPutSExt(l,"$$MA+A+TML+IV,\"Restart | \",\" \"$$");
+  LtfPutSExt(l,"$$MA+A+TML+IV,\"Normal | \",\"1\"$$");
+  LtfPutSExt(l,"$$MA+A+TML+IV,\"FirePower | \",\"2\"$$");
+  LtfPutSExt(l,"$$MA+A+TML+IV,\"LapseTime | \",\"3\"$$");
+  LtfPutSExt(l,"$$MA+A+TML+IV,\"Exit\",\"\\033\"$$");
+
+  ClearMapValues;
+  InitTroopers();
+  Fs->update_win=&DrawIt;
+  PopUpOk("Wheel Controls Command Strength");
+
+  while (ms!=101 && ch!=CH_ESC && ch!=CH_CTRLQ) {
+    ch=0;ms=0;
+    ai=RandU2%3+1;
+    InitTroopers();
+    while (ch!=CH_ESC && ch!=CH_CR && ch!=CH_SPACE && ch!=CH_CTRLQ && ms!=101 && ms!=100) {
+      ms=0;
+      if (ScanKey(&ch,&sc)) {
+	if (ch==CH_SPACE) {
+	  if (!l->best_d && l->cur_entry!=l) {
+	    LtfRunEntry(l,l->cur_entry,TRUE,old_preempt);
+	    ch=0;
+	  }
+	}
+	ClearMapValues;
+	if (sc.u1[0]==SC_GUI)
+	  ms=DoMenu(m);
+	if (ms==1 || ch=='1')
+	  map_mode=mm_none;
+	else if (ms==2 || ch=='2')
+	  map_mode=mm_friendly_firepower;
+	else if (ms==3 || ch=='3')
+  	  map_mode=mm_laps_time;
+      }
+      if (!(++i&7) && map_mode==mm_friendly_firepower)
+	PutFriendlyFirepower(Fs);
+      Sleep(40);
+      if (ai==ai_target)
+	DoAiTarget;
+      UpdateVelocities;
+      UpdatePositions;
+      ResolveFiring;
+    }
+  }
+  Kill(song_tss);
+  Sound(0);
+  LtfDel(l);
+  Fs->aux_ltf=old_aux_ltf;
+  if (Fs->cur_ltf=old_cur_ltf)
+    LtfBottom(Fs->cur_ltf);
+  LtfDel(m);
+
+  Fs->update_win=old_update;
+  Free(map_values);
+  AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+  AssignBit(&Fs->crt_flags,CRTf_HAS_MENU,old_has_menu);
+  WinBorder(old_border);
+  Preempt(old_preempt);
+}
+           T                                                øÿÿÿ   ýÿÿÿÿÿÿÿ	   þÿÿÿ              |                              	               ÿÿÿÿ      ÿÿÿÿ   ÿÿÿÿ               øÿÿÿ   ýÿÿÿÿÿÿÿ	   þÿÿÿ              |                  
+         
+                                                      øÿÿÿ   ýÿÿÿÿÿÿÿ	   þÿÿÿ              |                                             ÿÿÿÿ      ÿÿÿÿ   ÿÿÿÿ               øÿÿÿ   ýÿÿÿÿÿÿÿ	   þÿÿÿ    

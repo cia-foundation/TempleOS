@@ -1,0 +1,16 @@
+
+
+CrLf;
+PrintF("Super    : 3$$SY,-3$$2$$SY,0$$=9\r\n");
+CrLf;
+PrintF("Sub      : H$$SY,3$$2$$SY,0$$O\r\n");
+CrLf;
+PrintF("Color    : $$FG,RED$$Test$$FG$$\r\n");
+CrLf;
+PrintF("Blink    : $$BK,1$$Test$$BK,0$$\r\n");
+CrLf;
+PrintF("Invert   : $$IV,1$$Test$$IV,0$$\r\n");
+CrLf;
+PrintF("UnderLine: $$UL,1$$Test$$UL,0$$\r\n");
+CrLf;
+

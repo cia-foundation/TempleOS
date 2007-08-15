@@ -1,0 +1,73 @@
+void InsertNote(I1 *buf,U4 k,U4 *j)
+{
+  if (k==0) {
+    buf[*j]='2';
+    *j=*j+1;
+ 
+    buf[*j]='G';
+    *j=*j+1;
+
+    buf[*j]='3';
+    *j=*j+1;
+  } else if (k==8) {
+    buf[*j]='R';
+    *j=*j+1;
+  } else {
+    buf[*j]=k-1+'A';
+    *j=*j+1;
+  }
+}
+
+
+I1 *MakeSong()
+{
+  I1 *buf=MAllocZ(256),
+      buf2[256];
+  U4 i,j=0,k,n,k2;
+  for (i=0;i<8;i++) {
+    SPrintF(buf2,"Picks Left:%d",8-i);
+    k=RandU4;
+    n=k/9;
+    k=k%9;
+    switch (n%6) {
+      case 0:
+	buf[j++]='e';
+	InsertNote(buf,k,&j);
+	SPrintF(buf2,"Picks Left:%d:1",8-i);
+	k=RandU4;
+	k=k%9;
+	InsertNote(buf,k,&j);
+	break;
+      case 1:
+	buf[j++]='e';
+	buf[j++]='t';
+	InsertNote(buf,k,&j);
+	SPrintF(buf2,"Picks Left:%d:2",8-i);
+	k=RandU4;
+	k=k%9;
+	InsertNote(buf,k,&j);
+	SPrintF(buf2,"Picks Left:%d:1",8-i);
+	k=RandU4;
+	k=k%9;
+	InsertNote(buf,k,&j);
+	break;
+      case 2:
+	buf[j++]='s';
+	InsertNote(buf,k,&j);
+	k2=k;
+	SPrintF(buf2,"Picks Left:%d:1",8-i);
+	k=RandU4;
+	k=k%9;
+	InsertNote(buf,k,&j);
+	InsertNote(buf,k2,&j);
+	InsertNote(buf,k,&j);
+	break;
+      default:
+	buf[j++]='q';
+	InsertNote(buf,k,&j);
+	break;
+    }
+  }
+  buf[j++]=0;
+  return buf;
+}

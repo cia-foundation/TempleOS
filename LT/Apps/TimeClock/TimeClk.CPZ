@@ -1,0 +1,164 @@
+#define TIME_FILENAME	"HOME/TimeClock/TimeFile.DTZ"
+
+#define TET_EOF		0
+#define TET_PUNCH_IN	1
+#define TET_PUNCH_OUT	2
+
+class TimeEntry
+{
+  TimeEntry *next,*last;
+  LTDate d;
+  U1 type;
+  I1 *desc;
+};
+
+
+void ReadTimeFile(TimeEntry *header)
+{
+  U1 *buf,*ptr,type;
+  TimeEntry *tempt;
+  LTDate *d;
+  buf=ReadFile(TIME_FILENAME);
+  if (!buf)
+    buf=MAllocZ(1);
+  header->next=header;
+  header->last=header;
+  ptr=buf;
+  while (type=*ptr++) {
+    tempt=MAllocZ(sizeof(TimeEntry));
+    tempt->type=type;
+    d=ptr;
+    ptr+=sizeof(LTDate);
+    tempt->d=*d;
+    tempt->desc=NewStr(ptr);
+    ptr+=StrLen(ptr)+1;
+    InsQue(tempt,header->last);
+  }
+  Free(buf);
+}
+
+void WriteTimeFile(TimeEntry *header)
+{
+  U1 *buf,*ptr;
+  TimeEntry *tempt;
+  LTDate *d;
+  U8 size=1; //for eof
+
+  tempt=header->next;
+  while (tempt!=header) {
+    size+=sizeof(U1)+sizeof(LTDate)+StrLen(tempt->desc)+1;
+    tempt=tempt->next;
+  }
+  buf=MAlloc(size);
+
+  ptr=buf;
+  tempt=header->next;
+  while (tempt!=header) {
+    *ptr++=tempt->type;
+    d=ptr;
+    *d=tempt->d;
+    ptr+=sizeof(LTDate);
+    StrCpy(ptr,tempt->desc);
+    ptr+=StrLen(tempt->desc)+1;
+    tempt=tempt->next;
+  }
+  *ptr=TET_EOF;
+  WriteFile(TIME_FILENAME,buf,size);
+  Free(buf);
+}
+
+void DelTimeEntries(TimeEntry *header)
+{
+  TimeEntry *tempt=header->next,*tempt1;
+  while (tempt!=header) {
+    tempt1=tempt->next;
+    Free(tempt->desc);
+    Free(tempt);
+    tempt=tempt1;
+  }
+  Free(header);
+}
+
+public BoolU4 TimeRep(TimeEntry **header=NULL)
+{
+  BoolU4 is_in=FALSE;
+  TimeEntry *tempt;
+  U8 week,cur_week,week_total=0;
+  TimeEntry *my_header=MAlloc(sizeof(TimeEntry));
+  if (header)
+    *header=my_header;
+  ReadTimeFile(my_header);
+  tempt=my_header->next;
+  while (tempt!=my_header) {
+    week=tempt->d.date/7;  //TODO
+    if (week!=cur_week) {
+      if (is_in)
+	week_total=week_total+GetCurTimeLTDate;
+      PrintF("Week Total:%h2T\r\n",week_total);
+      cur_week=week;
+      week_total=0;
+    }
+    if (tempt->type==TET_PUNCH_IN) {
+      PutS("$$FG,RED$$IN ");
+      if (!is_in)
+	week_total=week_total-tempt->d;
+      is_in=TRUE;
+    } else {
+      PutS("$$FG,RED$$OUT");
+      if (is_in)
+	week_total=week_total+tempt->d;
+      is_in=FALSE;
+    }
+    PrintF(" %h2D %T:$$FG$$\r\n%s\r\n",
+      tempt->d,tempt->d,tempt->desc);
+    tempt=tempt->next;
+  }
+  if (is_in)
+    week_total=week_total+GetCurTimeLTDate;
+  PrintF("$$FG,RED$$Week Total:%h2T$$FG$$\r\n",week_total);
+  if (!header)
+    DelTimeEntries(my_header);
+  return is_in;
+}
+
+void PunchOut()
+{
+  BoolU4 is_in;
+  TimeEntry *tempt,*header;
+  is_in=TimeRep(&header);
+  if (!is_in) {
+    PutS("$$BK,1$$Already Punched-Out$$BK,0$$\r\n");
+    View;
+  } else {
+    tempt=MAlloc(sizeof(TimeEntry));
+    tempt->type=TET_PUNCH_OUT;
+    tempt->d=GetCurTimeLTDate;
+    PrintF("\r\nEnter Description:\r\n");
+    if (!(tempt->desc=MGetS))
+      tempt->desc=MAllocZ(1);
+    InsQue(tempt,header->last);
+    WriteTimeFile(header);
+  }
+  DelTimeEntries(header);
+}
+
+void PunchIn()
+{
+  BoolU4 is_in;
+  TimeEntry *tempt,*header;
+  is_in=TimeRep(&header);
+  if (is_in) {
+    PutS("$$BK,1$$Already Punched-In$$BK,0$$\r\n");
+    View;
+  } else {
+    tempt=MAlloc(sizeof(TimeEntry));
+    tempt->type=TET_PUNCH_IN;
+    tempt->d=GetCurTimeLTDate;
+    PrintF("\r\nEnter Description:\r\n");
+    if (!(tempt->desc=MGetS))
+      tempt->desc=MAllocZ(1);
+    InsQue(tempt,header->last);
+    WriteTimeFile(header);
+  }
+  DelTimeEntries(header);
+}

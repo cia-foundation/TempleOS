@@ -1,0 +1,36 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Matthew,25:15\"$$"
+  );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3qDetBAReGEqCCA2G3etFAC",
+		"Ma\0as\0ter!  \0 \0I \0made \0more \0for \0you.\r\n\0 \0 \0 \0 \0");
+	Play("qDetBAReGEqCCA2G3etFAC",
+		"Ma\0as\0ter!  \0 \0I \0made \0more \0for \0you!\r\n\0 \0 \0 \0 \0");
+	Play("eCB2qG3EFFG2G3etCFG",
+		" \0 \0 \0Got \0some\0thing \0else?\r\n\0 \0 \0 \0 \0");
+	Play("eCB2qG3EFFG2G3etCFG",
+		" \0 \0 \0Got \0some\0thing \0else?\r\n\0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

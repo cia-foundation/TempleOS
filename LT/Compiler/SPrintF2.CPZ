@@ -1,0 +1,1009 @@
+void OutChar(I1 **addr_dst,I1 ch,I1 **addr_buf)
+{
+  I8 i;
+  I1 *dst=*addr_dst,*buf;
+  if (addr_buf) {
+    buf=*addr_buf;
+    i=dst-buf;
+    if (i>=MSize(buf)) {
+      buf=MAlloc(i<<1+1);
+      MemCpy(buf,*addr_buf,i);
+      dst=buf+i;
+      *addr_buf=buf;
+    }
+  }
+  *dst++=ch;
+  *addr_dst=dst;
+}
+
+void OutStr(I1 *ptr,I1 **addr_buf,I1 *addr_dst,
+     I8 len,BoolU4 left_justify,BoolU4 truncate)
+{
+  I8 i,j;
+  if (!ptr)
+    i=0;
+  else
+    i=StrLen(ptr);
+  if (truncate && i>len)
+    i=len;
+  if (left_justify) {
+    for (j=0;j<i;j++)
+      OutChar(addr_dst,*ptr++,addr_buf);
+    for (j=0;j<len-i;j++)
+      OutChar(addr_dst,CH_SPACE,addr_buf);
+  } else {
+    for (j=0;j<len-i;j++)
+      OutChar(addr_dst,CH_SPACE,addr_buf);
+    for (j=len-i;j<len;j++)
+      OutChar(addr_dst,*ptr++,addr_buf);
+  }
+}
+
+SysHashEntry *FindPSect(U8 *add,I8 *offset)
+{
+  SysHashEntry *result=NULL,*temph;
+  SysHashTable *h=Fs->hash_table;
+  ClassStruct *tempc;
+  U8 i,best=0x8000,j;
+  if (!CheckPtr(add)) {
+    *offset=best;
+    return NULL;
+  }
+  while (h) {
+    for (i=0;i<=h->mask;i++) {
+      temph=h->body[i];
+      while (temph) {
+	if (temph->type&HTT_FUNCTION) {
+	  tempc=temph;
+	  j=tempc->executable_address;
+	} else
+	  j=temph->user_data0;
+	j=add-j;
+	if (temph->type&(HTT_SYS_SYMBOL|HTT_FUNCTION)) {
+	  if (j<best) {
+	    best=j;
+	    result=temph;
+	  }
+	}
+	temph=temph->next;
+      }
+    }
+    h=h->next;
+  }
+  *offset=best;
+  return result;
+}
+
+void SPrintFPSect(I1 *buf,U8 add,U8 field_length)
+{
+  U8 offset;
+  SysHashEntry *temph;
+  if (temph=FindPSect(add,&offset)) {
+    if (offset<=0xFFFF) {
+      if (field_length>5)
+	SPrintF(buf,"%*ts,%04X",field_length-5,temph->str,offset);
+      else
+	SPrintF(buf,"%s,%04X",temph->str,offset);
+    }
+    return;
+  }
+  if (field_length)
+    SPrintF(buf,"%*tX",field_length,add);
+  else
+    SPrintF(buf,"%X",add);
+}
+
+I1 *MSPrintFTime(LTDate ltdt,U8 sub_format)
+{
+  LTDateStruct d;
+  switch (sub_format) {
+    case 1:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      return MSPrintF("%02d:%02d",d.hours,d.minutes);
+    case 2:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      if (d.hours>=12)
+	return MSPrintF("%02d:%02d:%02d pm",d.hours-12,d.minutes,d.seconds);
+      else
+	return MSPrintF("%02d:%02d:%02d am",d.hours,d.minutes,d.seconds);
+    case 3:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      if (d.hours>=12)
+	return MSPrintF("%02d:%02d pm",d.hours-12,d.minutes);
+      else
+	return MSPrintF("%02d:%02d am",d.hours,d.minutes);
+    case 4:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      if (d.hours>=12)
+	return MSPrintF("%02d:%02d:%02dp",d.hours-12,d.minutes,d.seconds);
+      else
+	return MSPrintF("%02d:%02d:%02da",d.hours,d.minutes,d.seconds);
+    case 5:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      if (d.hours>=12)
+	return MSPrintF("%02d:%02dp",d.hours-12,d.minutes);
+      else
+	return MSPrintF("%02d:%02da",d.hours,d.minutes);
+    case 6:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dh %02dm",d.hours+ltdt.date*24,d.minutes);
+    case 7:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dh %02dm %02ds",d.hours+ltdt.date*24,d.minutes,d.seconds);
+    case 8:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dd %02dh %02dm",ltdt.date,d.hours,d.minutes);
+    case 9:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dd %02dh %02dm %02ds",ltdt.date,d.hours,d.minutes,d.seconds);
+    case 10:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dd %02dh %02dm %02d.%02ds",ltdt.date,d.hours,d.minutes,d.seconds,d.hundredths);
+    case 11:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dh %02dm %02d.%02ds",d.hours+ltdt.date*24,d.minutes,d.seconds,d.hundredths);
+    case 12:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%d.%02d",60*((ltdt.date*24+d.hours)*60+d.minutes)+d.seconds,d.hundredths);
+    case 13:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%02d:%02d.%02d",60*(ltdt.date*24+d.hours)+d.minutes,d.seconds,d.hundredths);
+    case 14:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%02d:%02d:%02d.%02d",ltdt.date*24+d.hours,d.minutes,d.seconds,d.hundredths);
+    case 15:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dd %02dh %02dm %02d.%04ds",ltdt.date,d.hours,d.minutes,d.seconds,d.ten_thousandths);
+    case 16:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%dh %02dm %02d.%04ds",d.hours+ltdt.date*24,d.minutes,d.seconds,d.ten_thousandths);
+    case 17:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%d.%04d",60*((ltdt.date*24+d.hours)*60+d.minutes)+d.seconds,d.ten_thousandths);
+    case 18:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%02d:%02d.%04d",60*(ltdt.date*24+d.hours)+d.minutes,d.seconds,d.ten_thousandths);
+    case 19:
+      ToLTDateStruct(&d,ltdt);
+      return MSPrintF("%02d:%02d:%02d.%04d",ltdt.date*24+d.hours,d.minutes,d.seconds,d.ten_thousandths);
+    default:
+      ToLTDateStruct(&d,ltdt+local_time_offset);
+      return MSPrintF("%02d:%02d:%02d",d.hours,d.minutes,d.seconds);
+  }
+}
+
+I1 *MSPrintFDate(LTDate dt,U8 sub_format)
+{
+  LTDateStruct d;
+  ToLTDateStruct(&d,dt+local_time_offset);
+  switch (sub_format) {
+    case 1:
+      return MSPrintF("%02d/%02d",d.month,d.day_of_month);
+    case 2:
+      return MSPrintF("%3tZ %02d/%02d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month,d.day_of_month);
+    case 3:
+      return MSPrintF("%3tZ %02d/%02d/%02d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month,d.day_of_month,(d.year)%100);
+    case 4:
+      return MSPrintF("%02d/%02d/%d",d.month,d.day_of_month,d.year);
+    case 5:
+      return MSPrintF("%3tZ %02d/%02d/%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month,d.day_of_month,d.year);
+    case 6:
+      return MSPrintF("%3tZ %02d",d.month-1,"ST_MONTHS",d.day_of_month);
+    case 7:
+      return MSPrintF("%3tZ, %3tZ %02d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month-1,"ST_MONTHS",d.day_of_month);
+    case 8:
+      return MSPrintF("%3tZ %02d,%04d",d.month-1,"ST_MONTHS",d.day_of_month,d.year);
+    case 9:
+      return MSPrintF("%3tZ, %3tZ %02d,%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month-1,"ST_MONTHS",d.day_of_month,d.year);
+    case 10:
+      return MSPrintF("%Z %d",d.month-1,"ST_MONTHS",d.day_of_month);
+    case 11:
+      return MSPrintF("%Z, %Z %d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month-1,"ST_MONTHS",d.day_of_month);
+    case 12:
+      return MSPrintF("%Z %d,%d",d.month-1,"ST_MONTHS",d.day_of_month,d.year);
+    case 13:
+      return MSPrintF("%Z, %Z %d,%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.month-1,"ST_MONTHS",d.day_of_month,d.year);
+    case 14:
+      return MSPrintF("%02d/%02d/%02d",d.day_of_month,d.month,(d.year)%100);
+    case 15:
+      return MSPrintF("%02d/%02d",d.day_of_month,d.month);
+    case 16:
+      return MSPrintF("%3tZ %02d/%02d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month);
+    case 17:
+      return MSPrintF("%3tZ %02d/%02d/%02d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month,(d.year)%100);
+    case 18:
+      return MSPrintF("%02d/%02d/%d",d.day_of_month,d.month,d.year);
+    case 19:
+      return MSPrintF("%3tZ %02d/%02d/%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month,d.year);
+    case 20:
+      return MSPrintF("%02d %3tZ",d.day_of_month,d.month-1,"ST_MONTHS");
+    case 21:
+      return MSPrintF("%3tZ, %02d %3tZ",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month-1,"ST_MONTHS");
+    case 22:
+      return MSPrintF("%02d %3tZ,%04d",d.day_of_month,d.month-1,"ST_MONTHS",d.year);
+    case 23:
+      return MSPrintF("%3tZ, %02d %3tZ,%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month-1,"ST_MONTHS",d.year);
+    case 24:
+      return MSPrintF("%d %Z",d.day_of_month,d.month-1,"ST_MONTHS");
+    case 25:
+      return MSPrintF("%Z, %d %Z",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month-1,"ST_MONTHS");
+    case 26:
+      return MSPrintF("%d %Z,%d",d.day_of_month,d.month-1,"ST_MONTHS",d.year);
+    case 27:
+      return MSPrintF("%Z, %d %Z,%d",d.day_of_week,"ST_DAYS_OF_WEEK",
+	d.day_of_month,d.month-1,"ST_MONTHS",d.year);
+    case 28:
+      return MSPrintF("%02d/%02d/%02d",(d.year)%100,d.month,d.day_of_month);
+    case 29:
+      return MSPrintF("%d/%02d/%02d",d.year,d.month,d.day_of_month);
+    case 30:
+      return MSPrintF("%02d%02d%02d",(d.year)%100,d.month,d.day_of_month);
+    case 31:
+      return MSPrintF("%d%02d%02d",d.year,d.month,d.day_of_month);
+    case 32:
+      return MSPrintF("%02d%02d%02d",d.month,d.day_of_month,(d.year)%100);
+    case 33:
+      return MSPrintF("%02d%02d%d",d.month,d.day_of_month,d.year);
+    case 34:
+      return MSPrintF("%3tZ",d.day_of_week,"ST_DAYS_OF_WEEK");
+    case 35:
+      return MSPrintF("%Z",d.day_of_week,"ST_DAYS_OF_WEEK");
+    case 36:
+      return MSPrintF("%3tZ",d.month-1,"ST_MONTHS");
+    case 37:
+      return MSPrintF("%Z",d.month-1,"ST_MONTHS");
+    case 38:
+      return MSPrintF("%d %3tZ",d.year,d.month-1,"ST_MONTHS");
+    case 39:
+      return MSPrintF("%d %Z",d.year,d.month-1,"ST_MONTHS");
+    case 40:
+      return MSPrintF("%02d %3tZ",(d.year)%100,d.month-1,"ST_MONTHS");
+    case 41:
+      return MSPrintF("%02d %Z",(d.year)%100,d.month-1,"ST_MONTHS");
+    case 42:
+      return MSPrintF("%3tZ %d",d.month-1,"ST_MONTHS",d.year);
+    case 43:
+      return MSPrintF("%Z %d",d.month-1,"ST_MONTHS",d.year);
+    case 44:
+      return MSPrintF("%3tZ %02d",d.month-1,"ST_MONTHS",(d.year)%100);
+    case 45:
+      return MSPrintF("%Z %02d",d.month-1,"ST_MONTHS",(d.year)%100);
+    case 46:
+      return MSPrintF("%02d",(d.year)%100);
+    case 47:
+      return MSPrintF("%d",d.year);
+    default:
+      return MSPrintF("%02d/%02d/%02d",d.month,d.day_of_month,(d.year)%100);
+  }
+}
+
+#define TEMP_BUF_LEN	256
+
+I1 *SPrintFJoin2(I1 *dst,I1 *src,I8 argc,I8 *argv)
+{
+  I1 *ptr,**addr_buf,*buf,*addr_dst,
+       *temp1;
+  BoolU4 pad_zero,left_justify,truncate,neg,neg_e;
+  I8 i,ch,ch1,k,len,dec_len,sub_format;
+  U8 d,cur_param=0;
+  double dd,dd1;
+  I1 temp_buf[TEMP_BUF_LEN];
+
+  if (!src)
+    throw(EXCEPT_SPRINTF,0);
+  if (dst) {
+    addr_buf=NULL;
+    buf=dst;
+  } else {
+    buf=MAlloc(128);
+    addr_buf=&buf;
+    dst=buf;
+  }
+  addr_dst=&dst;
+
+  while (ch = *(src++)) {
+    if (ch=='%') {
+      if (*src=='-') {
+	left_justify=TRUE;
+	src++;
+      } else
+	left_justify=FALSE;
+      if (*src=='0') {
+	pad_zero=TRUE;
+	src++;
+      } else
+	pad_zero=FALSE;
+      len=0;
+      while (*src>='0' && *src<='9')
+	len=len*10+ *(src++)-'0';
+      if (*src=='*') {
+	src++;
+	if (cur_param>=argc)
+	  throw(EXCEPT_SPRINTF,1);
+	len=argv[cur_param++];
+      }
+      dec_len=0;
+      if (*src=='.') {
+	src++;
+	while (*src>='0' && *src<='9')
+	  dec_len=dec_len*10+ *(src++)-'0';
+	if (*src=='*') {
+	  src++;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  dec_len=argv[cur_param++];
+	}
+      }
+      if (*src=='t') {
+	src++;
+	truncate=TRUE;
+      } else
+	truncate=FALSE;
+
+      sub_format=0;
+      if (*src=='h') {
+	src++;
+	while (*src>='0' && *src<='9')
+	  sub_format=sub_format*10+ *(src++)-'0';
+	if (*src=='*') {
+	  src++;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  sub_format=argv[cur_param++];
+	}
+      }
+      neg=FALSE;
+      k=0;
+      switch (*src++) {
+	case 's':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  ptr=argv[cur_param++];
+	  OutStr(ptr,addr_buf,addr_dst,len,left_justify,truncate);
+	  break;
+	case 'S':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  ptr=SysText(argv[cur_param++]);
+	  OutStr(ptr,addr_buf,addr_dst,len,left_justify,truncate);
+	  break;
+	case 'F':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  ptr=ReadTextFile(argv[cur_param++]);
+	  OutStr(ptr,addr_buf,addr_dst,len,left_justify,truncate);
+	  Free(ptr);
+	  break;
+	case 'Q':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  if (ptr=argv[cur_param++])
+	  while (ch=*ptr++) {
+	    if (ch=='$$') {
+	      OutChar(addr_dst,ch,addr_buf);
+	      OutChar(addr_dst,ch,addr_buf);
+	    } else if (ch==CH_LINE_FEED){
+	      OutChar(addr_dst,'\\',addr_buf);
+	      OutChar(addr_dst,'n',addr_buf);
+	    } else if (ch==CH_CR){
+	      OutChar(addr_dst,'\\',addr_buf);
+	      OutChar(addr_dst,'r',addr_buf);
+	    } else if (ch==CH_TAB){
+	      OutChar(addr_dst,'\\',addr_buf);
+	      OutChar(addr_dst,'t',addr_buf);
+	    } else {
+	      if (ch=='"' || ch=='\\')
+		OutChar(addr_dst,'\\',addr_buf);
+	      if (ch>=CH_SHIFT_SPACE && ch<=0x7F)
+		OutChar(addr_dst,ch,addr_buf);
+	      else {
+		OutChar(addr_dst,'\\',addr_buf);
+		OutChar(addr_dst,ch>>6&7+'0',addr_buf);
+		OutChar(addr_dst,ch>>3&7+'0',addr_buf);
+		OutChar(addr_dst,ch&7+'0',addr_buf);
+	      }
+	    }
+	  }
+	  break;
+	case 'q':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  if (ptr=argv[cur_param++])
+	  while (ch=*ptr++) {
+	    ch1=*ptr;
+	    if (ch=='\\') {
+	      if (ch1=='n') {
+		OutChar(addr_dst,CH_LINE_FEED,addr_buf);
+		ptr++;
+	      } else if (ch1=='r') {
+		OutChar(addr_dst,CH_CR,addr_buf);
+		ptr++;
+	      } else if (ch1=='"') {
+		OutChar(addr_dst,'"',addr_buf);
+		ptr++;
+	      } else if (ch1==0x27) { // "\'"
+		OutChar(addr_dst,0x27,addr_buf);
+		ptr++;
+	      } else if (ch1=='\`') {
+		OutChar(addr_dst,'\`',addr_buf);
+		ptr++;
+	      } else if (ch1=='\\') {
+		OutChar(addr_dst,'\\',addr_buf);
+		ptr++;
+	      } else if (ch1=='t') {
+		OutChar(addr_dst,CH_TAB,addr_buf);
+		ptr++;
+	      } else if (ch1>='0' && ch1<='7') {
+		i=ch1-'0';
+		ptr++;
+		do {
+		  ch1=*ptr++;
+		  if (ch1>='0' && ch1<='7')
+    		  i=i<<3+ch1-'0';
+		} while (ch1>='0' && ch1<='7');
+		OutChar(addr_dst,i,addr_buf);
+	      } else
+		OutChar(addr_dst,ch,addr_buf);
+	    } else if (ch=='$$' && ch1=='$$') {
+	      OutChar(addr_dst,ch,addr_buf);
+	      ptr++;
+	    } else
+	      OutChar(addr_dst,ch,addr_buf);
+	  }
+	  break;
+	case 'z':
+	  if (cur_param+1>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  ptr=PointAtListEntry(argv[cur_param],argv[cur_param+1]);
+	  cur_param=cur_param+2;
+	  OutStr(ptr,addr_buf,addr_dst,len,left_justify,truncate);
+	  break;
+	case 'Z':
+	  if (cur_param+1>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+ 	  ptr=SysTextSub(argv[cur_param],argv[cur_param+1]);
+	  cur_param=cur_param+2;
+	  OutStr(ptr,addr_buf,addr_dst,len,left_justify,truncate);
+	  break;
+	case 'c':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  OutChar(addr_dst,argv[cur_param++],addr_buf);
+	  break;
+	case 'C':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  OutChar(addr_dst,ToUpper(argv[cur_param++]),addr_buf);
+	  break;
+	case 'D':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  temp1=MSPrintFDate(argv[cur_param++],sub_format);
+	  OutStr(temp1,addr_buf,addr_dst,len,left_justify,truncate);
+	  Free(temp1);
+	  break;
+	case 'T':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  temp1=MSPrintFTime(argv[cur_param++],sub_format);
+	  OutStr(temp1,addr_buf,addr_dst,len,left_justify,truncate);
+	  Free(temp1);
+	  break;
+	case 'P':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  if (truncate)
+	    SPrintFPSect(temp_buf,argv[cur_param++],len);
+	  else
+	    SPrintFPSect(temp_buf,argv[cur_param++],0);
+	  OutStr(temp_buf,addr_buf,addr_dst,len,left_justify,truncate);
+	  break;
+	case 'd':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  i=argv[cur_param++];
+	  if (i<0) {
+	    neg=TRUE;
+	    i=-i;
+	  }
+	  while ((!k || i) && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k++]=i%10+'0';
+	    i/=10;
+	  }
+out_num:
+	  if (neg)
+	    i=1;
+	  else
+	    i=0;
+	  if (len>0) {
+	    if (truncate && k+i>len)
+	      k=len-i;
+	  } else
+	    len=0;
+	  if (k<0)
+	    k=0;
+	  if (pad_zero)
+	    for (;i<len-k;i++)
+	      OutChar(addr_dst,'0',addr_buf);
+	  else
+	    for (;i<len-k;i++)
+	      OutChar(addr_dst,32,addr_buf);
+	  if (neg)
+	    OutChar(addr_dst,'-',addr_buf);
+	  for (i=k-1;i>=0;i--)
+	    OutChar(addr_dst,temp_buf[i],addr_buf);
+	  break;
+	case 'u':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  d=argv[cur_param++];
+	  while ((!k|| d) && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k++]=d%10+'0';
+	    d/=10;
+	  }
+	  goto out_num;
+	case 'f':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  dd=argv[cur_param++]><(double);
+	  if (dd<0) {
+	    neg=TRUE;
+	    dd=-dd;
+	  }
+out_f:
+	  if (i=dec_len)
+	    dd*=Pow10(i);
+	  dd=Round(dd);
+	  while (i-- && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k++]=dd%10+'0';
+	    dd=Floor(dd/10);
+	  }
+	  if (dec_len)
+	    temp_buf[k++]='.';
+	  do {
+	    temp_buf[k++]=dd%10+'0';
+	    dd=Floor(dd/10);
+	  } while (dd && k<TEMP_BUF_LEN-16);
+	  goto out_num;
+	case 'e':
+	  if (!len) len=12;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  dd=argv[cur_param++]><(double);
+	  if (dd<0) {
+	    neg=TRUE;
+	    dd=-dd;
+	  }
+	  if (dd)
+	    dd1=Floor(Log10(dd));
+	  else
+	    dd1=0;
+out_e:
+	  dd/=Pow10(dd1);
+	  if (dd1<0) {
+	    dd1=-dd1;
+	    neg_e=TRUE;
+	  } else
+	    neg_e=FALSE;
+	  if (dd) {
+	    if (dd<1.0) {
+	      dd*=10;
+	      if (neg_e)
+		dd1+=1;
+	      else
+		dd1-=1;
+	    } else if (dd>=10.0) {
+	      dd/=10;
+	      if (neg_e)
+		dd1-=1;
+	      else
+		dd1+=1;
+	    }
+	  }
+	  i=3;
+	  do {
+	    temp_buf[k++]=dd1%10+'0';
+	    dd1=Floor(dd1/10);
+	  } while (dd1 && i--);
+	  if (neg_e)
+	    temp_buf[k++]='-';
+	  temp_buf[k++]='e';
+	  dec_len=len-k-neg-2;
+	  goto out_f;
+	case 'g':
+	  if (!len) len=12;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  dd=argv[cur_param++]><(double);
+	  if (dd<0) {
+	    neg=TRUE;
+	    dd=-dd;
+	  }
+	  if (dd)
+	    dd1=Floor(Log10(dd));
+	  else
+	    dd1=0;
+	  if (dd1>=(len-1-dec_len) || dd1<-(dec_len-1))
+	    goto out_e;
+	  else
+	    goto out_f;
+	case 'n':
+	  if (!len) len=12;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  dd=argv[cur_param++]><(double);
+	  if (dd<0) {
+	    neg=TRUE;
+	    dd=-dd;
+	  }
+	  if (dd)
+	    dd1=3.0*Floor(Log10(dd)/3);
+	  else
+	    dd1=0;
+out_n:
+	  dd/=Pow10(dd1);
+	  if (dd1<0) {
+	    dd1=-dd1;
+	    neg_e=TRUE;
+	  } else
+	    neg_e=FALSE;
+	  if (dd) {
+	    if (dd<1.0) {
+	      dd*=1000;
+	      if (neg_e)
+		dd1+=3;
+	      else
+		dd1-=3;
+	    } else if (dd>=1000.0) {
+	      dd/=1000;
+	      if (neg_e)
+		dd1-=3;
+	      else
+		dd1+=3;
+	    }
+	  }
+	  i=3;
+	  do {
+	    temp_buf[k++]=dd1%10+'0';
+	    dd1=Floor(dd1/10);
+	  } while (dd1 && i--);
+	  if (neg_e)
+	    temp_buf[k++]='-';
+	  temp_buf[k++]='e';
+	  dec_len=len-k-neg-2;
+	  goto out_f;
+	case 'X':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  d=argv[cur_param++];
+	  while ((!k || d) && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k]=(d & 15)+'0';
+	    if (temp_buf[k]>'9') temp_buf[k]+='A'-0x3A;
+	    k++;
+	    d>>=4;
+	  }
+	  goto out_num;
+	case 'x':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  d=argv[cur_param++];
+	  while ((!k || d) && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k]=(d & 15)+'0';
+	    if (temp_buf[k]>'9') temp_buf[k]+='a'-0x3A;
+	    k++;
+	    d>>=4;
+	  }
+	  goto out_num;
+	case 'b':
+	  if (cur_param>=argc)
+	    throw(EXCEPT_SPRINTF,1);
+	  d=argv[cur_param++];
+	  while ((!k || d) && k<TEMP_BUF_LEN-16) {
+	    temp_buf[k++]=(d&1)+'0';
+	    d>>=1;
+	  }
+	  goto out_num;
+	case '%':
+	  OutChar(addr_dst,'%',addr_buf);
+	  break;
+      }
+    } else
+      OutChar(addr_dst,ch,addr_buf);
+  }
+  OutChar(addr_dst,0,addr_buf);
+  return buf;
+}
+
+double A2Double(I1 *src,I1 **end_ptr=NULL)
+//ASCII string to double
+{
+  I1 ch=*src++;
+  I8 i=0,j=0,k=0;
+  double d;
+  BoolU4 neg=FALSE;
+
+  while (ch==CH_SPACE||ch==CH_TAB||ch==CH_SHIFT_SPACE)
+    ch=*src++;
+  if (ch=='-') {
+    neg=TRUE;
+    ch=*src++;
+  }
+  while (TRUE) {
+    if (Bt(dec_numeric_bitmap,ch))
+      i=i*10+ch-'0';
+    else {
+      if (ch=='.' || ch=='e' || ch=='E') break;
+      d=i;
+      goto a2d_end;
+    }
+    ch=*src++;
+  }
+  if (ch=='.')
+    ch=*src++;
+  while (TRUE) {
+    if (Bt(dec_numeric_bitmap,ch)) {
+      j=j*10+ch-'0';
+      k++;
+    } else {
+      d=i+j*Pow10(-k);
+      if (ch=='e' || ch=='E') break;
+      goto a2d_end;
+    }
+    ch=*src++;
+  }
+  ch=*src++;
+  k=1;
+  if (ch=='-') {
+    k=-1;
+    ch=*src++;
+  }
+  j=0;
+  while (TRUE) {
+    if (Bt(dec_numeric_bitmap,ch))
+      j=j*10+ch-'0';
+    else {
+      d*=Pow10(j*k);
+      goto a2d_end;
+    }
+    ch=*src++;
+  }
+a2d_end:
+  if (end_ptr) *end_ptr=src-1;
+  return (neg) ? -d:d;
+}
+
+/*
+$FG,2$A2LTDate()
+  This routine recognizes the following formats:
+  1) "$FG,4$*+nnnn$FG,2$"  "$FG,4$*-nnnnn$FG,2$"
+  2) $FG,4$mm/dd$FG,2$
+  3) $FG,4$mm/dd/yy$FG,2$
+
+It also supports some functions
+  $FG,4$SM()$FG,2$ start of month
+  $FG,4$EM()$FG,2$ end of month
+  $FG,4$SM()$FG,2$ start of year
+  $FG,4$EY()$FG,2$ end of year
+Full expressions are not implimented
+but you can do stuff like $FG,4$SM(*-7)+3$FG,2$
+and it will return the 3rd day after
+the start of month for seven days before
+today.
+
+$FG$*/
+LTDate A2LTDate(I1 *src2)
+//ASCII date to LTDate
+{
+  LTDate result=0;
+  LTDateStruct d,d1;
+  I1 *src=MStrUtil(src2,SU_REMOVE_SPACES|SU_TO_UPPER),
+     *v=NewStr(src),
+     *p1=src;
+  BoolU4 start_month=FALSE,end_month=FALSE;
+  BoolU4 start_year=FALSE,end_year=FALSE;
+
+  MemSet(&d,0,sizeof(LTDateStruct));
+  MemSet(&d1,0,sizeof(LTDateStruct));
+  if (!StrNCmp(p1,"SM(",3)) {
+    p1+=3;
+    start_month=TRUE;
+  } else if (!StrNCmp(p1,"EM(",3)) {
+    p1+=3;
+    end_month=TRUE;
+  } else if (!StrNCmp(p1,"SY(",3)) {
+    p1+=3;
+    start_year=TRUE;
+  } else if (!StrNCmp(p1,"EY(",3)) {
+    p1+=3;
+    end_year=TRUE;
+  }
+  if (*p1=='*') {
+    p1++;
+    if (*p1=='+' || *p1=='-')
+      result.date=AtoI(p1,10,&p1);
+    result+=GetCurTimeLTDate+local_time_offset;
+  } else {
+    RemoveFirstSeg(p1,"/",v); //Put month into v
+    d.month=AtoI(v);
+    if (Occurrences(p1,'/')) {
+      RemoveFirstSeg(p1,"/",v); //Put day into v leaving year in p1
+      d.day_of_month=AtoI(v);
+      d.year=AtoI(p1,10,&p1);
+      if (d.year<100) //if not 4 digit year
+	d.year+=2000;
+    } else {
+      d.day_of_month=AtoI(p1,10,&p1);
+      ToLTDateStruct(&d1,GetCurTimeLTDate+local_time_offset);
+      d.year=d1.year;
+    }
+    result=ToLTDate(&d);
+  }
+  if (*p1==')') p1++;
+
+  if (start_month)
+    result.date=FirstDayOfMonth(result.date);
+  else if (end_month)
+    result.date=LastDayOfMonth(result.date);
+  else if (start_year)
+    result.date=FirstDayOfYear(result.date);
+  else if (end_year)
+    result.date=LastDayOfYear(result.date);
+
+  if (*p1=='+' || *p1=='-')
+    result.date+=AtoI(p1);
+  Free(src);
+  Free(v);
+  return result-local_time_offset;
+}
+
+void GetFJoin2(I1 *src,I1 *fmt,I8i argc,I8i *argv)
+//Pass pointer to data,
+//For %s pass pointer to pointer (be careful because address
+//  of array is the same as array--create ptr to array and take address
+{
+  I1 ch,*buf,*ptr,**pptr;
+  BoolU4 left_justify=FALSE;
+  I8 cur_param=0,i,j,k,len,*i_ptr,sub_format=0,dec_len;
+  double *d_ptr;
+  if (!fmt)
+    throw(EXCEPT_GETF,0);
+  while (ch = *(fmt++)) {
+    if (ch=='%') {
+      if (*fmt=='%') {
+	src++;
+	fmt++;
+      } else {
+	if (*fmt=='-') {
+	  left_justify=TRUE;
+	  fmt++;
+	} else
+	  left_justify=FALSE;
+	len=0;
+	while (*fmt>='0' && *fmt<='9')
+	  len=len*10+ (*(fmt++)-'0');
+	if (*fmt=='*') {
+	  fmt++;
+	  if (cur_param>=argc)
+	    throw(EXCEPT_GETF,1);
+	  len=argv[cur_param++];
+	}
+	ch=*(fmt++);
+	if (ch && !len) {
+	  ptr=src;
+	  while (*ptr && *ptr!=*fmt)
+	    ptr++;
+	  len=ptr-src;
+	} else {
+	  if (ch=='.') {
+	    dec_len=0;
+	    while (*fmt>='0' && *fmt<='9')
+	      dec_len=dec_len*10+ (*(fmt++)-'0');
+	    if (*fmt=='*') {
+	      fmt++;
+	      if (cur_param>=argc)
+		throw(EXCEPT_GETF,1);
+	      dec_len=argv[cur_param++];
+	    }
+	    ch=*(fmt++);
+	  }
+	}
+	buf=MAlloc(len+1);
+	for (i=0;i<len;i++)
+	  buf[i]=*(src++);
+	buf[i]=0;
+	switch (ch) {
+	  case 's':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    pptr=argv[cur_param++];
+	    StrCpy(*pptr,buf);
+	    break;
+	  case 'c':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    ptr=argv[cur_param++];
+	    *ptr=*buf;
+	    break;
+	  case 'C':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    ptr=argv[cur_param++];
+	    *ptr=ToUpper(*buf);
+	    break;
+	  case 'z':
+	    if (cur_param+1>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=MatchListEntry(buf,argv[cur_param++]);
+	    break;
+	  case 'Z':
+	    if (cur_param+1>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=MatchSysTextEntry(buf,argv[cur_param++]);
+	    break;
+	  case 'd':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=0;
+	    for (k=0;k<len;k++)
+	      if (buf[k]!=32)
+		*i_ptr=(*i_ptr)*10+(buf[k]-'0');
+	    break;
+	  case 'X':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=0;
+	    for (k=0;k<len;k++)
+	      if (buf[k]!=32) {
+		j=ToUpper(buf[k])-'0';
+		if (j>9)  j=j-'A'+('9'+1);
+		*i_ptr=(*i_ptr<<4)+j;
+	      }
+	    break;
+	  case 'b':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=0;
+	    for (k=0;k<len;k++)
+	      if (buf[k]!=32)
+		*i_ptr=*i_ptr<<1+(buf[k]-'0');
+	    break;
+	  case 'e':
+	  case 'f':
+	  case 'g':
+	  case 'n':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    d_ptr=argv[cur_param++];
+	    *d_ptr=A2Double(buf);
+	    break;
+	  case 'D':
+	    if (cur_param>=argc)
+	      throw(EXCEPT_GETF,1);
+	    i_ptr=argv[cur_param++];
+	    *i_ptr=A2LTDate(buf);
+	    break;
+	}
+	Free(buf);
+      }
+    } else
+      src++;
+  }
+}

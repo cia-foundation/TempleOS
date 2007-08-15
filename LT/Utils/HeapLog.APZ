@@ -1,0 +1,129 @@
+#help_index "Debugging"
+
+class HeapLogStruct
+{
+  HeapLogStruct *next,*last;
+  U1 *add;
+  U1 *caller1;
+  U1 *caller2;
+  U1 *caller3;
+  U1 *caller4;
+};
+
+class HeapLogHashStruct
+{
+  HeapLogStruct *next,*last;
+};
+
+#define HEAPLOG_HASH_SIZE	0x1000
+
+TssStruct *heaplog_tss=NULL,heaplog_test_tss;
+HeapLogHashStruct *heaplog_root;
+
+
+void HeapLogTsk()
+{
+  while (TRUE)
+    SwapInNext;
+}
+
+void HeapLogMAlloc(U1 *add)
+{
+  HeapLogStruct *temph;
+  U8 i,old_flags;
+  BoolU4 old_val;
+  if (Fs==heaplog_test_tss) {
+    old_val=LBtr(&sys_semas[SYS_SEMA_HEAPLOG],0);
+    temph=MAlloc(sizeof(HeapLogStruct),heaplog_tss);
+    LAssignBit(&sys_semas[SYS_SEMA_HEAPLOG],0,old_val);
+    temph->add=add;
+    temph->caller1=Caller(2);
+    temph->caller2=Caller(3);
+    temph->caller3=Caller(4);
+    temph->caller4=Caller(5);
+    i=(add>>2)&(HEAPLOG_HASH_SIZE-1);
+    old_flags=GetFlags;
+    Cli;
+    InsQue(temph,heaplog_root[i].last);
+    SetFlags(old_flags);
+  }
+}
+
+void HeapLogFree(U1 *add)
+{
+  U8 i,old_flags;
+  HeapLogStruct *temph;
+  BoolU4 old_val;
+  if (!add) return;
+  if (Fs==heaplog_test_tss) {
+    i=(add>>2)&(HEAPLOG_HASH_SIZE-1);
+    old_flags=GetFlags;
+    Cli;
+    temph=heaplog_root[i].next;
+    while (temph!=&heaplog_root[i]) {
+      if (add==temph->add) {
+	RemQue(temph);
+	SetFlags(old_flags);
+	old_val=LBtr(&sys_semas[SYS_SEMA_HEAPLOG],0);
+	Free(temph,heaplog_tss);
+	LAssignBit(&sys_semas[SYS_SEMA_HEAPLOG],0,old_val);
+	return;
+      }
+      temph=temph->next;
+    }
+    SetFlags(old_flags);
+  }
+}
+
+public void HeapLogRep()
+{
+  U8 i,total=0;
+  HeapLogStruct *temph;
+  BoolU4 old_val=LBtr(&sys_semas[SYS_SEMA_HEAPLOG],0);
+  for (i=0;i<HEAPLOG_HASH_SIZE;i++) {
+    temph=heaplog_root[i].next;
+    while (temph!=&heaplog_root[i]) {
+      PrintF("$$FG,RED$$%08X$$FG$$ %P %P %P %P\r\n",MSize(temph->add),
+	temph->caller1,temph->caller2,temph->caller3,
+	temph->caller4);
+      total+=MSize(temph->add);
+      temph=temph->next;
+    }
+  }
+  LAssignBit(&sys_semas[SYS_SEMA_HEAPLOG],0,old_val);
+  PrintF("\r\n$$FG,LTRED$$Total:%08X$$FG$$\r\n",total);
+}
+
+public void HeapLog(BoolU4 val=TRUE,TssStruct *tss=NULL)
+{
+  U8 i;
+  if (val) {
+    if (Bt(&sys_semas[SYS_SEMA_HEAPLOG],0))
+      coutln "HeapLog Already Active";
+    else {
+      if (!tss) tss=Fs;
+      heaplog_test_tss=tss;
+      heaplog_tss=Spawn(&HeapLogTsk);
+      ext[EXT_HEAPLOG_MALLOC]=&HeapLogMAlloc;
+      ext[EXT_HEAPLOG_FREE]=&HeapLogFree;
+      heaplog_root=MAlloc(sizeof(HeapLogHashStruct)*HEAPLOG_HASH_SIZE);
+      for (i=0;i<HEAPLOG_HASH_SIZE;i++) {
+	heaplog_root[i].next=&heaplog_root[i];
+	heaplog_root[i].last=&heaplog_root[i];
+      }
+      LBts(&sys_semas[SYS_SEMA_HEAPLOG],0);
+    }
+  } else {
+    if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG],0))
+      coutln "HeapLog Not Active";
+    else {
+      Kill(heaplog_tss);
+      heaplog_tss=NULL;
+      Free(heaplog_root);
+      ext[EXT_HEAPLOG_MALLOC]=NULL;
+      ext[EXT_HEAPLOG_FREE]=NULL;
+    }
+  }
+}
+
+#help_index ""

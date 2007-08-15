@@ -1,0 +1,400 @@
+void MapDrive(I1 ch,LTPartition *p)
+{
+  drive_to_partition[ToUpper(ch)-'A']=p;
+  p->drive=ToUpper(ch);
+}
+
+BoolU8 Drive(I1 drive_letter)
+{
+  LTPartition *p;
+  LTBlkDev *bdev;
+  BoolU4 different=FALSE;
+  LTPartition *new_partition=DriveToPartition(drive_letter);
+  if (!new_partition)  {
+    PutSysTextErr("ST_INVALID_DRIVE");
+    return FALSE;
+  }
+  if (new_partition!=Fs->cur_partition) {
+    different=TRUE;
+    Fs->cur_partition=new_partition;
+  }
+  p=Fs->cur_partition;
+  CheckLTPartition(p);
+  bdev=p->bdev;
+  CheckLTBlkDev(bdev);
+  if (different) {
+    if ((bdev->flags & LTBDF_REMOVABLE) &&
+       !(bdev->flags & LTBDF_INITIALIZED) )
+      ChangeDisk(p->drive);
+    if (bdev->type==LTBDT_RAM ||
+	bdev->type==LTBDT_NON_LT_FILE ||
+	bdev->type==LTBDT_LT_FILE)
+      InitBlkDev(bdev,TRUE);
+  }
+  Free(Fs->cur_dir);
+  Fs->cur_dir=NewStr("/");
+  if (p->type==PT_ISO9660 || p->type==PT_LT)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+BoolU8 Cd(I1 *name,BoolU4 make_dirs=FALSE)
+{
+  I8 maxlen;
+  BoolU4 result=TRUE;
+  I1 *change_to_buf,*new_cur_dir,*buf,*hdir;
+  LTPartition *p;
+  U8 cur_dir_cluster=0;
+  if (!*name) return TRUE;
+  if (name[1]==':') {
+    if (*name==':') {
+      if (Fs->cur_partition!=default_partition)
+	if (!Drive(*name)) return FALSE;
+    } else {
+      if (Fs->cur_partition!=
+	DriveToPartition(*name))
+	  if (!Drive(*name)) return FALSE;
+    }
+    name+=2;
+  }
+  if (*name=='/' || !*name) {
+    Free(Fs->cur_dir);
+    Fs->cur_dir=NewStr("/");
+    if (*name)
+      name++;
+  }
+  change_to_buf=MStrUtil(name,
+    SU_REMOVE_LEADING|SU_REMOVE_TRAILING|
+    SU_DISCARD_PARITY|SU_REMOVE_CTRL_CHARS);
+  maxlen=StrLen(Fs->cur_dir)+1+StrLen(change_to_buf)+1;
+  new_cur_dir=MAlloc(maxlen);
+  buf=MAlloc(maxlen);
+  StrCpy(new_cur_dir,Fs->cur_dir);
+  while (*change_to_buf && result) {
+    RemoveFirstSeg(change_to_buf,"/",buf);
+    if (!*buf)
+      StrCpy(new_cur_dir,"/");
+    else if (!StrCmp(buf,"..")) {
+      RemoveLastSeg(new_cur_dir,"/");
+      if (!*new_cur_dir)
+	StrCpy(new_cur_dir,"/");
+    } else if (!StrCmp(buf,".")) {
+      ;
+    } else if (*buf) {
+      if (!StrCmp(buf,"HOME")) {
+	hdir=HomeDirStr;
+	result=Cd(hdir);
+	Free(new_cur_dir);
+	new_cur_dir=MAlloc(maxlen+StrLen(hdir));
+	StrCpy(new_cur_dir,hdir+2);
+	Free(hdir);
+      } else {
+	p=Fs->cur_partition;
+	cur_dir_cluster=NameToDirCluster(p,new_cur_dir,TRUE);
+	if (p->type==PT_LT)
+	  result=CdLT(buf,cur_dir_cluster);
+	else if (p->type==PT_ISO9660)
+	  result=CdISO(buf,cur_dir_cluster);
+	else result=FALSE;
+	if (!result && make_dirs) {
+	  Free(Fs->cur_dir);
+	  Fs->cur_dir=NewStr(new_cur_dir);
+	  result=MkDir(buf);
+	}
+	if (result) {
+	  if (StrCmp(new_cur_dir,"/"))
+	    StrCat(new_cur_dir,"/");
+	  StrCat(new_cur_dir,buf);
+	}
+      }
+    }
+  }
+  Free(Fs->cur_dir);
+  Fs->cur_dir=NewStr(new_cur_dir);
+  Free(buf);
+  Free(change_to_buf);
+  Free(new_cur_dir);
+  return result;
+}
+
+void DelLTFileAccess(LTFileAccess *fa)
+{
+  LTBlkDev *bdev;
+  if (!fa) return;
+  bdev=fa->old_partition->bdev;
+  if (!(bdev->flags & LTBDF_INIT_IN_PROGRESS)) {
+    if (fa->old_dir) {
+      Drive(PartitionToDrive(fa->old_partition));
+      Cd(fa->old_dir);
+    }
+  } else {
+    Fs->cur_partition=fa->old_partition;
+    Free(Fs->cur_dir);
+    Fs->cur_dir=NewStr("/");
+  }
+  Free(fa->old_dir);
+  Free(fa->mask);
+  Free(fa);
+}
+
+LTFileAccess *NewLTFileAccess(I1 *mask,BoolU4 make_mask=FALSE,BoolU4 make_dirs=FALSE)
+{
+  BoolU4 valid=TRUE;
+  I1 *buf,*my_mask,*temp_mask;
+  BoolU4 old_silent;
+  LTFileAccess *fa=MAllocZ(sizeof(LTFileAccess));
+  my_mask=MStrUtil(mask,
+    SU_REMOVE_LEADING|SU_REMOVE_TRAILING|
+    SU_DISCARD_PARITY|SU_REMOVE_CTRL_CHARS);
+  temp_mask=my_mask;
+  fa->old_dir=NewStr(Fs->cur_dir);
+  fa->old_partition=Fs->cur_partition;
+  if (*my_mask && my_mask[1]==':') {
+    if (Fs->cur_partition!=DriveToPartition(*my_mask))
+      if (!Drive(*my_mask)) valid=FALSE;
+    my_mask+=2;
+  }
+  if (StrStr(my_mask,"HOME")) {  //TODO
+    if (Fs->cur_partition!=DriveToPartition(':'))
+      Drive(':');
+  }
+  fa->p=Fs->cur_partition;
+  CheckLTPartition(fa->p);
+  buf=MAlloc(StrLen(my_mask)+2);
+  StrCpy(buf,my_mask);
+  fa->mask=MAlloc(StrLen(my_mask)+2);
+  RemoveLastSeg(buf,"/",fa->mask);
+  if (*my_mask=='/' && !*buf)
+    StrCpy(buf,"/");
+  if (*buf)
+    if (!Cd(buf,make_dirs))
+      valid=FALSE;
+  if (valid && make_mask) {
+    if (!*fa->mask) {
+      Free(fa->mask);
+      fa->mask=NewStr("*");
+    } else {
+      if (!make_dirs || CheckFileName(fa->mask)) {
+	old_silent=Silent(ON);
+	if (Cd(fa->mask,make_dirs)) {
+	  Free(fa->mask);
+	  fa->mask=NewStr("*");
+	}
+	Silent(old_silent);
+      }
+    }
+  }
+  Free(buf);
+  Free(temp_mask);
+  if (!valid) {
+    DelLTFileAccess(fa);
+    fa=NULL;
+//    throw(EXCEPT_FILE);
+  }
+  return fa;
+}
+
+LTDirEntry *FindFiles(I1 *wild,U8 fuf_flags=0)
+{
+  LTDirEntry *result=NULL;
+  LTFileAccess *fa=NewLTFileAccess(wild,TRUE);
+  if (fa) {
+    result=SysFindFiles(fa->mask,fuf_flags);
+    DelLTFileAccess(fa);
+  }
+  return result;
+}
+
+BoolU8 IsDir(I1 *dir_name)
+{
+  BoolU4 result=FALSE;
+  I1 *mask=MSPrintF("%s/*",dir_name);
+  BoolU4 old_silent=Silent(ON);
+  LTFileAccess *fa=NewLTFileAccess(mask);
+  if (fa) {
+    result=TRUE;
+    DelLTFileAccess(fa);
+  }
+  Free(mask);
+  Silent(old_silent);
+  return result;
+}
+
+void Dir(I1 *wild=NULL,BoolU4 full=FALSE)
+{
+  I1 *w;
+  LTFileAccess *fa;
+  if (!wild)
+    w=NewStr("*");  //We must do this because of bug that prevents str defaults
+  else
+    w=NewStr(wild);
+  fa=NewLTFileAccess(w,TRUE);
+  if (fa) {
+    DirLT(fa->mask,full);
+    DelLTFileAccess(fa);
+  }
+  Free(w);
+}
+
+
+void Del(I1 *wild,BoolU4 print_msg=TRUE)
+{
+  LTFileAccess *fa=NewLTFileAccess(wild);
+  if (fa) {
+    if (fa->p->type==PT_LT)
+      DelLTFiles(fa->p,Fs->cur_dir,fa->mask,FALSE,print_msg);
+    DelLTFileAccess(fa);
+  }
+}
+
+U1 *ReadFile(I1 *filename,U8 *size=NULL,U8 *attr=NULL,BoolU4 raw=FALSE)
+{
+  SysHashEntry *temph;
+  I1 *absname;
+  U1 *result=NULL;
+  U8 size2=0,attr2=0;
+  LTFileAccess *fa;
+  ArcCompressStruct *ac=NULL;
+
+  if (attr)
+    *attr=0;
+  absname=AbsoluteFileName(filename);
+  if (!raw && (temph=FindHashEntry(absname,adam_tss->hash_table,HTT_FILE))) {
+    if (FileAttr(absname) & LT_ATTR_COMPRESSED) {
+      ac=temph->user_data0;
+      if (size)
+	*size=ac->expanded_size;
+      if (attr)
+	*attr=FileAttr(absname,*attr);
+      result=ExpandBuf(ac);
+    } else { //Not implimented
+      result=MAlloc(temph->user_data1+1);
+      MemCpy(result,temph->user_data0,temph->user_data1);
+      result[temph->user_data1]=0; //Terminate
+      if (size)
+	*size=temph->user_data1;
+    }
+  } else {
+    fa=NewLTFileAccess(absname);
+    if (fa) {
+      if (fa->p->type==PT_LT)
+	result=ReadLTFile(fa->p,Fs->cur_dir,fa->mask,&size2,&attr2,raw,&ac);
+      else if (fa->p->type==PT_ISO9660)
+	result=ReadISOFile(fa->p,Fs->cur_dir,fa->mask,&size2,&attr2,raw,&ac);
+      while (!result && StrCmp(Fs->cur_dir,"/")) {
+	Cd("..");
+	if (Fs->cur_partition->type==PT_LT)
+	  result=ReadLTFile(fa->p,Fs->cur_dir,fa->mask,&size2,&attr2,raw,&ac);
+	else if (fa->p->type==PT_ISO9660)
+	  result=ReadISOFile(fa->p,Fs->cur_dir,fa->mask,&size2,&attr2,raw,&ac);
+      }
+      if (!result) {
+	cout filename," ";
+	PutSysTextErr("ST_FILE_NOT_FOUND");
+      }
+      DelLTFileAccess(fa);
+    }
+    if (size)
+      *size=size2;
+    if (attr)
+      *attr=attr2;
+    if (!raw && attr2 & LT_ATTR_RESIDENT) {
+      temph=AMAllocZ(sizeof(SysHashEntry));
+      temph->str=ANewStr(absname);
+      temph->type=HTT_FILE;
+      temph->use_cnt=0;
+      temph->source_link=NULL;
+      temph->user_data0=AMAllocIdentical(ac);
+      temph->user_data1=size2;
+      AddSysHashEntry(temph,adam_tss->hash_table);
+    }
+    Free(ac);
+  }
+  Free(absname);
+  return result;
+}
+
+I1 *ReadTextFile(I1 *filename,U8 *attr=NULL)
+{
+  return ReadFile(filename,NULL,attr);
+}
+
+
+BoolU8 FindFile(I1 *filename,LTDirEntry *rde=NULL,
+      BoolU4 dir_only=FALSE,BoolU4 file_only=FALSE,BoolU4 scan_parents=FALSE)
+{
+  U8 cur_dir_cluster;
+  BoolU4 result=FALSE;
+  LTDirEntry de;
+  LTFileAccess *fa=NewLTFileAccess(filename);
+  if (fa) {
+    cur_dir_cluster=NameToDirCluster(fa->p,Fs->cur_dir,TRUE);
+    if (fa->p->type==PT_LT)
+      result=FindLTFile(fa->p,cur_dir_cluster,fa->mask,
+			   &de,dir_only,file_only,TRUE);
+    else if (fa->p->type==PT_ISO9660)
+      result=FindISOFile(fa->p,cur_dir_cluster,fa->mask,
+			   &de,dir_only,file_only,TRUE);
+    if (scan_parents) {
+      while (!result && StrCmp(Fs->cur_dir,"/")) {
+	Cd("..");
+	cur_dir_cluster=NameToDirCluster(fa->p,Fs->cur_dir,TRUE);
+	if (fa->p->type==PT_LT)
+	  result=FindLTFile(fa->p,cur_dir_cluster,fa->mask,
+			   &de,dir_only,file_only,TRUE);
+	else if (fa->p->type==PT_ISO9660)
+	  result=FindISOFile(fa->p,cur_dir_cluster,fa->mask,
+			   &de,dir_only,file_only,TRUE);
+      }
+    }
+    DelLTFileAccess(fa);
+  }
+  if (result && rde)
+    MemCpy(rde,&de,sizeof(LTDirEntry));
+  return result;
+}
+
+
+U8 WriteFile(I1 *filename,U1 *fbuf,
+   U8 size,LTDate LTdatetime=0,U8 attr=0,BoolU4 raw=FALSE)
+{
+  U8 c=0;
+  SysHashEntry *temph;
+  LTFileAccess *fa=NewLTFileAccess(filename);
+  ArcCompressStruct *ac=NULL;
+  I1 *absname=AbsoluteFileName(filename);
+  if (fa) {
+    if (fa->p->type==PT_LT)
+      c=WriteLTFile(fa->p,Fs->cur_dir,fa->mask,
+	fbuf,size,LTdatetime,attr,raw,&ac);
+    if (temph=FindHashEntry(absname,adam_tss->hash_table,HTT_FILE)) {
+      AFree(temph->user_data0);
+      if (!raw && ac && attr & LT_ATTR_RESIDENT) {
+	temph->user_data0=AMAllocIdentical(ac);
+	temph->user_data1=size;
+      } else {
+	temph->user_data0=0;
+	temph->type=HTT_INVALID;
+      }
+    } else if (!raw && ac && attr & LT_ATTR_RESIDENT) {
+      temph=AMAllocZ(sizeof(SysHashEntry));
+      temph->str=ANewStr(absname);
+      temph->type=HTT_FILE;
+      temph->use_cnt=0;
+      temph->source_link=NULL;
+      temph->user_data0=AMAllocIdentical(ac);
+      temph->user_data1=size;
+      AddSysHashEntry(temph,adam_tss->hash_table);
+    }
+    Free(ac);
+    DelLTFileAccess(fa);
+  }
+  Free(absname);
+  return c;
+}
+
+void WriteTextFile(I1 *filename,I1 *st,U8 attr=0)
+{
+  WriteFile(filename,st,StrLen(st),0,attr);
+}

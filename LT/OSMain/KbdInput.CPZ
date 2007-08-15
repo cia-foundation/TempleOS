@@ -1,0 +1,175 @@
+I8 ToUpper(I8 ch)
+{
+  if (ch>='a' && ch<='z')
+    return ch-'a'+'A';
+  else
+    return ch;
+}
+
+void GetOutOfDollar()
+{
+  Ltf *l=Fs->cur_ltf;
+  if (IsRaw) {
+    if (dc_flags&DCF_IN_DOLLAR)
+      PutChar('$$');
+  } else {
+   if (l && l->flags&LTFF_IN_DOLLAR)
+      PutChar('$$');
+  }
+}
+
+void PutErr()
+{
+  GetOutOfDollar;
+  PutSysText("ST_ERROR");
+}
+
+void PutWarn()
+{
+  GetOutOfDollar;
+  PutSysText("ST_WARNING");
+}
+
+void PutSysTextErr(I1 *st)
+{
+  PutErr;
+  PutSysText(st);
+}
+
+void PutSysTextWarn(I1 *st)
+{
+  PutWarn;
+  PutSysText(st);
+}
+
+
+BoolU8 ScanKey(I8 *ch=NULL,U8 *scancode=NULL,BoolU4 echo=FALSE)
+{
+  I8 ch1=0;
+  U8 scancode1=0;
+  BoolU4 result=CallExtNum(EXT_SCAN_KEY,&ch1,&scancode1,FALSE);
+  if (echo)
+    PutKey(ch1,scancode1);
+  if (ch) *ch=ch1;
+  if (scancode) *scancode=scancode1;
+  return result;
+}
+
+I8 GetKey(U8 *scancode=NULL,BoolU4 echo=FALSE)
+{
+  I8 ch1;
+  BoolU4 old_preempt=Preempt(OFF);
+  Fs->task_flags&=~(1<<TSSf_IDLE);
+  while (!ScanKey(&ch1,scancode,echo)) {
+    Fs->task_flags|=1<<TSSf_IDLE;
+    if (!Bt(&sys_semas[SYS_SEMA_IN_DEBUGGER],0)) {
+      Fs->task_flags|=1<<TSSf_AWAITING_MSG;
+      SwapInNext;
+    } else {
+      //kinda a kludge
+      Bts(&sys_semas[SYS_SEMA_KEY_PRESSED],0);
+
+      CallExtStr("PollKbdMouse");
+      CallExtStr("WinQueueKbdMouseMsgs");
+    }
+  }
+  Fs->task_flags&=~(1<<TSSf_IDLE);
+  Preempt(old_preempt);
+  return ch1;
+}
+
+
+I8 GetChar(U8 *scancode=NULL,BoolU4 echo=TRUE)
+{
+  I8 ch1;
+  do ch1=GetKey(scancode,FALSE);
+  while (!ch1);
+  if (echo)
+    PrintF("$$FU$$$$BU$$%c$$FG$$$$BG$$",ch1);
+  return ch1;
+}
+
+I1 *MGetS()
+{
+//Returns a $LK,"MAlloc","MN:MAlloc"$()ed prompted string.
+  return CallExtNum(EXT_MGETS);
+}
+
+U8 GetS(I1 *buf,U8 size,BoolU4 allow_extended=TRUE)
+{
+  I8 ch;
+  I1 *buf2;
+  U8 i=0;
+  if (!size || !buf) return 0;
+  if (allow_extended) {
+    buf2=MGetS;
+    if (StrLen(buf2)>size-1) {
+      MemCpy(buf,buf2,size-1);
+      buf[size-1]=0;
+    } else
+      StrCpy(buf,buf2);
+    i=StrLen(buf);
+    Free(buf2);
+  } else {
+    while (TRUE) {
+      ch=GetChar(NULL,FALSE);
+      if (ch==CH_CR) {
+	PutChar(ch);
+	break;
+      } if (ch==CH_BACKSPACE) {
+	if (i>0) {
+	  i--;
+	  PutChar(ch);
+	}
+      } else {
+	if (i<size-1) {
+	  buf[i++]=ch;
+	  PutChar(ch);
+	}
+      }
+    }
+    buf[i]=0;
+  }
+  return i;
+}
+
+BoolU8 YorN()
+{
+  I8 ch;
+  cout "(y or n)? ";
+  while (TRUE) {
+    ch=ToUpper(GetChar(NULL,FALSE));
+    if (ch=='Y') {
+      coutln "$$FU$$$$BU$$YES$$FG$$$$BG$$";
+      return TRUE;
+    } else if (ch=='N') {
+      coutln "$$FU$$$$BU$$NO$$FG$$$$BG$$";
+      return FALSE;
+    }
+  }
+}
+
+BoolU8 PressAKey()
+{
+  I8 ch;
+  PutSysText("ST_PRESS_A_KEY");
+  ch=GetChar(NULL,FALSE);
+  if (ch==CH_CTRLQ || ch==CH_ESC)
+    return FALSE;
+  else
+    return TRUE;
+}
+
+BoolU8 AreYouSure()
+{
+  PutSysText("ST_ARE_YOU_SURE");
+  return YorN;
+}
+
+asm {KBD_IRQ_HANDLER::}
+void KbdIrqHandler()
+{
+  kbd_evt_time=GetTimeStamp;
+  Bts(&sys_semas[SYS_SEMA_KEY_PRESSED],0);
+  OutP(0x21,InP(0x21)|2);
+}

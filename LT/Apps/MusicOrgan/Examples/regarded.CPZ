@@ -1,0 +1,27 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3qB2G3DsBABABDBDqDeAD2sG3A2G3A",
+		"All \0seeing \0eye.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qB2G3DsBABABDBDqDeAD2sG3A2G3A",
+		"It's \0no \0lie.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qEGC2sG3B2G3B2G3B2G3BqDetBGAsGGGG",
+		"God \0sees \0you.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("qEGC2sG3B2G3B2G3B2G3BqDetBGAsGGGG",
+		"Yes, \0it's \0true.\r\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

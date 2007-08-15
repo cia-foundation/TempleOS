@@ -1,0 +1,473 @@
+#help_index "Install"
+
+#define BOOT_BIC	"Boot.BIC"
+#define BOOT_DIR	"/0000Boot"
+#define BOOT1_BIC	"/0000Boot/Boot.BIC"
+#define BOOT_LOADER_BIC	"/0000Boot/BootLoader.BIC"
+#define OLD_BOOT_BIC	"/0000Boot/OldMBR.BIC"
+#define CD_BOOT		"/0000Boot/CDBoot.BIZ"
+
+if (DriveIsWritable) {
+  CompileFile("BootHD");
+  CompileFile("BootMHD");
+  CompileFile("BootMHD2");
+  CompileFile("BootFD");
+  CompileFile("BootCD");
+}
+
+Load("BootHD",TRUE);
+Load("BootMHD",TRUE);
+Load("BootMHD2",TRUE);
+Load("BootFD",TRUE);
+Load("BootCD",TRUE);
+
+#help_index "Install;File/Install Related;File/CD DVD"
+public BoolU8 CreateCdBootFile()
+{
+  U1 *br;
+  U8 d,size;
+  U2 *ww;
+
+  LTFile *f=FOpen(BOOT1_BIC,"r");
+  size=FSize(f);
+  FClose(f);
+
+  br=MAllocZ(CD_BLK_SIZE);
+
+  ww=BCD_BLK_CNT+1;
+  *ww=1+(size+CD_BLK_SIZE-1)/CD_BLK_SIZE;
+
+  d=CD_FILE_OFFSET+4<<1;
+  ww=BCD_BLK_LO+1;
+  *ww=d/(CD_BLK_SIZE>>BLK_SIZE_BITS);
+  ww=BCD_BLK_HI+1;
+  *ww=(d/(CD_BLK_SIZE>>BLK_SIZE_BITS))>>16;
+
+  ww=BCD_JMP_START;
+  *ww=(d%(CD_BLK_SIZE>>BLK_SIZE_BITS))<<BLK_SIZE_BITS;
+  MemCpy(br,BCD_START,BCD_END-BCD_START);
+
+  WriteFile(CD_BOOT,br,CD_BLK_SIZE);
+  Free(br);
+  return TRUE;
+}
+
+if (DriveIsWritable)
+  CreateCdBootFile;
+
+#help_index "Boot"
+
+public void Boot(I1 *filename)
+//Warm Reboot (no hardware reset)
+//Specify the OSMain binary file you
+//wish to boot.
+{
+  U8 size;
+  OsMainStruct *hi_image=ReadFile(filename,&size),
+	       *lo_image=sys_boot_base-sizeof(BinFileHeaderStruct),
+	       *shutdown=MAlloc(SYS_SHUTDOWN_CPU_END-SYS_SHUTDOWN_CPU);
+  hi_image->boot_base=lo_image+sizeof(BinFileHeaderStruct);
+  hi_image->header_base=lo_image+hi_image->h.header_offset;
+  hi_image->boot_code=BOOT_CODE_RAM;
+  hi_image->sys_memblks=lo_image->sys_memblks;
+
+  Cli;
+  if (mp_cnt>1) {
+    MPHalt;
+    BusyWait(10000);
+  }
+
+  MemCpy(shutdown,SYS_SHUTDOWN_CPU,SYS_SHUTDOWN_CPU_END-SYS_SHUTDOWN_CPU);
+  MemCpy(&hi_image->gdttab,&lo_image->gdttab,sizeof(GdtTabStruct)*MAXGDT);
+  MemCpy(lo_image,hi_image,size);
+  HiCall(shutdown);
+}
+
+#help_index "Boot"
+#help_file "::/LT/Doc/Boot.TXZ"
+
+public void BootLT(I1 drive=0)
+{ //Compile OSMain and boot.  You might
+//want to precede with $LK,"Auto","MN:Auto"$() to
+//specifing answers to the prompted
+//config questions.
+  I1 *buf;
+
+  if (!drive)
+    drive=Fs->cur_partition->drive;
+
+//This passes a config parameter for
+//compilation of OSMain which is accessed
+//within a #exe {} statement.
+//See $LK,"insboot_dst_drive","FF:::/LT/OSMain/Disk/DiskAddDev.CPZ,insboot_dst_drive"$
+
+  buf=MSPrintF("I1 insboot_dst_drive=\'%C\';",drive);
+  ExecuteStr(buf);
+  Free(buf);
+
+  Cd("/LT/OSMain");
+  if (!CompileFile("OS","OS",NULL,':'))
+    Boot("OS.BIZ");
+}
+
+#help_index "Install"
+void InstallLTDir(I1 src,I1 dst)
+{
+  I1 buf_s[64],buf_d[64];
+  if (src==dst) return;
+  SPrintF(buf_s,"%c:/LT",src);
+  SPrintF(buf_d,"%c:/LT",dst);
+  DelTree(buf_d);
+  CopyTree(buf_s,buf_d);
+}
+
+I1 CheckWritable(I1 drive=0)
+{
+  BoolU4 cont=TRUE;
+  I1 writable_drive=drive;
+  LTPartition *p;
+  LTBlkDev *bdev;
+  if (!DriveIsWritable(drive)) {
+    coutln drive,": Drive is read-only.";
+    while (cont) {
+      cout "Enter RAM drive (usually 'B') for temporary files:";
+      writable_drive=ToUpper(GetChar);
+      CrLf;
+      p=DriveToPartition(writable_drive);
+      bdev=p->bdev;
+      if (bdev->type!=LTBDT_RAM ||
+	  !DriveIsWritable(writable_drive))
+	coutln "Not A RAM Drive";
+      else
+	cont=FALSE;
+    }
+    Format(writable_drive,FALSE,FALSE);
+    InstallLTDir(drive,writable_drive);
+  }
+  return writable_drive;
+}
+
+
+#help_index "Install"
+BoolU8 CreateBootImage(I1 src_drive,I1 dst_drive,U8 *out_size,I1 *filename)
+{
+  LTPartition *p;
+  I8 my_CompileFile(I1 *filename,I1 *map_name=NULL,I1 *out_name=NULL,I1 mapfile_drive=0);
+  U1 *buf;
+
+  my_CompileFile=FindExtern("CompileFile5");	//In case a offline compiler is present
+  if (!my_CompileFile)
+    my_CompileFile=FindExtern("CompileFile");  //In case a offline compiler is present
+
+  Drive(src_drive);
+
+  Cd("/LT/Adam/GrAsm");
+  if (my_CompileFile("GrAsm","GrAsm",NULL,':'))
+    return FALSE;
+
+  Cd("/LT/Compiler");
+  if (my_CompileFile("Compiler","Compiler",NULL,':'))
+    return FALSE;
+
+  Cd("/LT/OSMain");
+  if (my_CompileFile("OS","OS",NULL,':'))
+    return FALSE;
+
+  buf=ReadFile("OS.BIZ",out_size);
+
+  filename[StrLen(filename)-1]='C';
+  coutln "Creating ",filename," from OS.BIZ";
+  Drive(dst_drive);
+  Cd("/");
+  p=Fs->cur_partition;
+
+  PrintF("Size: %08X\r\n",*out_size);
+  WriteFile(filename,buf,*out_size,0,LT_ATTR_FIXED,FALSE);
+  Free(buf);
+  Drive(src_drive);
+  Del("/LT/OSMain/OS.BIZ");
+  return TRUE;
+}
+
+public BoolU8 InstallBoot(I1 src_drive,I1 dst_drive=0)
+{ //See $LK,"Install Documentation","FI:::/LT/Doc/Install.TXZ"$
+  BoolU4 result=FALSE;
+  LTBlkDev *bd;
+  LTPartition *p;
+  LTBootStruct br;
+  LTDirEntry de;
+  U4 *dd;
+  U8 i,size;
+  U1 *bb;
+  U2 *ww;
+  I1 *buf;
+
+  if (!dst_drive) dst_drive=src_drive;
+
+//This passes a config parameter for
+//compilation of OSMain which is accessed
+//within a #exe {} statement.
+//See $LK,"insboot_dst_drive","FF:::/LT/OSMain/Disk/DiskAddDev.CPZ,insboot_dst_drive"$
+  buf=MSPrintF("I1 insboot_dst_drive=\'%C\';",dst_drive);
+  ExecuteStr(buf);
+  Free(buf);
+
+  bd=DriveToBlkDev(dst_drive);
+  switch (bd->type) {
+    case LTBDT_ATAPI:
+      if (!CreateBootImage(src_drive,src_drive,&size,BOOT1_BIC))
+	return FALSE;
+      Drive(src_drive);
+      CreateCdBootFile;
+      return TRUE;
+    case LTBDT_RAM: //TODO
+    case LTBDT_FDC:
+      break;
+    case LTBDT_ATA:
+    case LTBDT_NON_LT_FILE:
+      break;
+    default:
+      return FALSE;
+  }
+
+  Drive(dst_drive);
+  p=Fs->cur_partition;
+  if (p->type!=PT_LT)
+    PutSysTextErr("ST_NOT_LT");
+  else {
+    src_drive=CheckWritable(src_drive);
+    if (!CreateBootImage(src_drive,dst_drive,&size,BOOT_BIC))
+      return FALSE;
+    Drive(dst_drive);
+    RBlks(Fs->cur_partition,&br,p->offset,1,TRUE);
+    if (!FindFile(BOOT_BIC,&de,FALSE,TRUE))
+      coutln "No image";
+    else {
+      coutln "Modifying partition boot record.";
+      br.jump_and_nop[0]=0xEB;
+      br.jump_and_nop[1]=30;
+      br.jump_and_nop[2]=0x90;
+      switch (bd->type) {
+	case LTBDT_ATA:
+	case LTBDT_NON_LT_FILE:
+	  ww=BHD_BASE0;
+	  *ww=PmtI8("Boot Drive Base0 (0x%X):",0x1F0);
+	  ww=BHD_BASE1;
+	  *ww=PmtI8("Boot Drive Base1 (0x%X):",0x3F6);
+	  bb=BHD_UNIT;
+	  *bb=0xE0+(PmtI8("Boot Drive Unit (0=Master,1=Slave):",0)<<4);
+
+	  ww=BHD_RESTART+1;
+	  *ww=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
+	  dd=BHD_BLK;
+	  *dd=p->data+de.cluster*p->spc;
+	  bb=BHD_CODE;
+	  for (i=0;i<(BHD_END-BHD_CODE);i++)
+	    br.code[i]=bb[i];
+	  break;
+	case LTBDT_RAM: //TODO
+	case LTBDT_FDC:
+	  ww=BFD_RESTART+1;
+	  *ww=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
+	  ww=BFD_RESTART+4;
+	  *ww=p->data+de.cluster*p->spc;
+	  bb=BFD_CODE;
+	  for (i=0;i<(BFD_END-BFD_CODE);i++)
+	    br.code[i]=bb[i];
+	  break;
+      }
+      for (;i<478;i++)
+	br.code[i]=0;
+      WBlks(Fs->cur_partition,&br,p->offset,1,TRUE);
+      result=TRUE;
+    }
+  }
+  return result;
+}
+
+
+public void ReadOldMasterBoot(I1 src_drive,I1 dst_drive)
+{
+  LTBlkDev *bd;
+  LTPartition *p,*p2;
+  MasterBootStruct mbr;
+
+  bd=DriveToBlkDev(src_drive);
+  try {
+    while (bd->non_lt_drive) {
+      p2=DriveToPartition(bd->non_lt_drive);
+      bd=DriveToBlkDev(p2->drive);
+    }
+  } catch
+    Fs->catch_except=TRUE;
+  Drive(dst_drive);
+  p=Fs->cur_partition;
+  if (p->type!=PT_LT)
+    PutSysTextErr("ST_NOT_LT");
+  else {
+    ATAReadBlks(bd,&mbr,0,1);
+    Drive(dst_drive);
+    MkDir(BOOT_DIR);
+    WriteFile(OLD_BOOT_BIC,&mbr,BLK_SIZE);
+  }
+}
+
+public void WriteOldMasterBoot(I1 src_drive,I1 dst_drive)
+{
+  LTBlkDev *bd;
+  MasterBootStruct *mbr;
+  LTPartition *p2;
+  bd=DriveToBlkDev(dst_drive);
+  try {
+    while (bd->non_lt_drive) {
+      p2=DriveToPartition(bd->non_lt_drive);
+      bd=DriveToBlkDev(p2->drive);
+    }
+  } catch
+    Fs->catch_except=TRUE;
+  Drive(src_drive);
+  mbr=ReadFile(OLD_BOOT_BIC);
+  if (mbr)
+    ATAWriteBlks(bd,mbr,0,1);
+  Free(mbr);
+}
+
+void ZeroMasterBoot(I1 dst_drive)
+{ //This is dangerous!!
+  LTBlkDev *bd;
+  MasterBootStruct mbr;
+  LTPartition *p2;
+  bd=DriveToBlkDev(dst_drive);
+  try {
+    while (bd->non_lt_drive) {
+      p2=DriveToPartition(bd->non_lt_drive);
+      bd=DriveToBlkDev(p2->drive);
+    }
+  } catch
+    Fs->catch_except=TRUE;
+  MemSet(mbr,0,BLK_SIZE);
+  ATAWriteBlks(bd,&mbr,0,1);
+}
+
+public BoolU8 InstallMasterBoot(I1 drive,I1 *drive_list=NULL)
+{
+  BoolU4 result=FALSE;
+  LTBlkDev *bd,*bd1;
+  LTPartition *p,*p1,*p2;
+  MasterBootStruct mbr;
+  LTDirEntry de;
+  U8 i,j,size;
+  U4 *dd;
+  U1 *bb;
+  U2 *ww;
+  I1 *menu_ptr,*ptr,ch,buf[128],buf2[128];
+
+  if (drive_list)
+    StrCpy(buf2,drive_list);
+  else {
+    j=0;
+    for (i='A';i<='Z';i++)
+      buf2[j++]=i;
+    buf2[j++]=0;
+  }
+
+  Drive(drive);
+  p=Fs->cur_partition;
+  if (p->type!=PT_LT)
+    PutSysTextErr("ST_NOT_LT");
+  else {
+    bd=DriveToBlkDev(drive);
+    try {
+      while (bd->non_lt_drive) {
+	p2=DriveToPartition(bd->non_lt_drive);
+	bd=DriveToBlkDev(p2->drive);
+      }
+    } catch
+      Fs->catch_except=TRUE;
+    if (!FindFile(OLD_BOOT_BIC,&de,FALSE,TRUE))
+      ReadOldMasterBoot(drive,drive);
+
+    while (!(i=PmtI8("Base0:",0)));
+    ww=BMHD_BASE0;
+    *ww=i;
+    ww=BMHD2_BASE0;
+    *ww=i;
+
+    while (!(i=PmtI8("Base1:",0)));
+    ww=BMHD_BASE1;
+    *ww=i;
+    ww=BMHD2_BASE1;
+    *ww=i;
+
+    i=0xE0+(PmtI8("Unit (0=Master,1=Slave):",0)<<4);
+    bb=BMHD_UNIT;
+    *bb=i;
+    bb=BMHD2_UNIT;
+    *bb=i;
+
+    dd=BMHD2_BLK_ARRAY;
+    MemSet(dd,0,sizeof(U4)*8);
+    menu_ptr=BMHD2_BOOT_MSG;
+    SPrintF(menu_ptr,"\r\n\r\nLoseThos 3.05 Boot Loader\r\n\r\n");
+    j=0;
+    if (FindFile(OLD_BOOT_BIC,&de,FALSE,TRUE)) {
+      *dd=p->data+de.cluster*p->spc;
+      StrCat(menu_ptr,"0. Old Boot Record\r\n");
+      j++;
+      dd+=sizeof(U4);
+    }
+
+    ptr=buf2;
+    while (ch=*ptr++) {
+      try
+	p1=DriveToPartition(ch);
+      catch {
+	Fs->catch_except=TRUE;
+	p1=NULL;
+      }
+      if (p1) {
+	bd1=p1->bdev;
+	try {
+	  while (bd1->non_lt_drive) {
+	    p2=DriveToPartition(bd1->non_lt_drive);
+	    bd1=DriveToBlkDev(p2->drive);
+	  }
+	} catch
+	  Fs->catch_except=TRUE;
+	if (bd1==bd) {
+	  *dd=p1->offset;
+	  PrintF("Drive %c:%16X\r\n",p1->drive,*dd);
+	  SPrintF(buf,"%d. Drive %c\r\n",j++,p1->drive);
+	  StrCat(menu_ptr,buf);
+	  dd+=sizeof(U4);
+	}
+      }
+    }
+    StrCat(menu_ptr,"\r\nSelection:");
+ 
+    size=BMHD2_END-BMHD2_START;
+    WriteFile(BOOT_LOADER_BIC,BMHD2_START,size);
+
+    if (!FindFile(BOOT_LOADER_BIC,&de,FALSE,TRUE))
+      coutln "No Boot Loader Image";
+    else {
+      ww=BMHD_RESTART+1;
+      *ww=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
+      dd=BMHD_BLK;
+      *dd=p->data+de.cluster*p->spc;
+      bb=BMHD_CODE;
+      ATAReadBlks(bd,&mbr,0,1);
+      for (i=0;i<(BMHD_END-BMHD_CODE);i++)
+	mbr.boot_code[i]=bb[i];
+      for (;i<446;i++)
+	mbr.boot_code[i]=0;
+      mbr.signature=0xAA55;
+
+      ATAWriteBlks(bd,&mbr,0,1);
+      result=TRUE;
+    }
+  }
+  return result;
+}
+
+#help_index ""

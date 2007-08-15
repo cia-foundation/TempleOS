@@ -1,0 +1,25 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3eDRetAAAsBCBCeEGqF2GsG3B2G3BeDF",
+		"Good!  \0 \0Now, \0 \0 \0I \0 \0don't \0 \0have \0to \0wor\0ry.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("DRetAAAsBCBCeEGqF2GsG3B2G3BeDF",
+		"Good!  \0 \0Now, \0 \0 \0I \0 \0don't \0 \0have \0to \0wor\0ry.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("qFRAetACEqEG2G3sBRBR");
+	Play("qFRAetACEqEG2G3sBRBR");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

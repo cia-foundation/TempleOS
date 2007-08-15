@@ -1,0 +1,18 @@
+/*
+$FG,2$$WW,1$This gets a list of files, flattens the list from a tree into an array and sorts them by cluster number, to speed-up access time by avoiding moving the disk head around.
+$WW,0$$FG$*/
+
+void DoIt()
+{
+  I8 i,cnt=0;
+  LTDirEntry *tempm=FindFiles("::/LT/*",1<<FUf_RECURSE),
+	     **a=OrderFiles(tempm,&cnt);
+  for (i=0;i<cnt;i++) {
+    PrintF("%08X %s\r\n",a[i]->cluster,a[i]->full_name);
+    DelLTDirEntry(a[i]);
+  }
+  Free(a);
+}
+
+
+DoIt;

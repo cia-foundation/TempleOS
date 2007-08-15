@@ -1,0 +1,677 @@
+#help_index "Ltf/Cmd Line (Typically)"
+public BoolU4 Edit(I1 *filename)
+{
+  I1 *buf=NewStr(filename),
+       *buf2=NewStr(filename);
+  U8 num=1;
+  I1 *temp_filename=NewStr(filename),
+       *tfn_ptr=temp_filename;
+  SysHashEntry *temph;
+  I8 i;
+  BoolU4 cont,result=FALSE;
+  Ltf *l;
+
+  i=LK_FILE;
+  StrCpy(temp_filename,filename);
+  if (StrLen(filename)>3 && filename[2]==':') {
+    buf[2]=0;
+    i=MatchSysTextEntry(buf,"ST_LINK_TYPES",MLE_IGNORE_CASE);
+    tfn_ptr=temp_filename+3;
+    switch (i) {
+      case LK_MAN_PAGE:
+	temph=FindLocalHash(tfn_ptr,
+	  HTT_GLBL_VAR|HTT_CLASS|HTT_FUNCTION|
+	  HTT_STR_CONST|HTT_SYS_SYMBOL);
+	if (temph)
+	  result=Edit(temph->source_link);
+	Free(temp_filename);
+	Free(buf);
+	Free(buf2);
+	return result;
+      case LK_DEF:
+	if (Occurrences(tfn_ptr,',')) {
+	  RemoveLastSeg(tfn_ptr,",",buf);
+	  i=AtoI(buf);
+	} else
+	  i=-1;
+	WsdPopUpDef(tfn_ptr,i);
+	Free(temp_filename);
+	Free(buf);
+	Free(buf2);
+	return TRUE;
+      case LK_HELP_INDEX:
+	l=LtfNew;
+	LtfHelpIndex(l,tfn_ptr);
+	Free(temp_filename);
+	Free(buf);
+	Free(buf2);
+	DoLtf(l,TRUE);
+	LtfDel(l);
+	return TRUE;
+      case LK_BIBLE_FIND:
+	if (Occurrences(tfn_ptr,',')) {
+	  RemoveLastSeg(tfn_ptr,",",buf);
+	} else
+	  *buf=0;
+	num=AtoI(SysTextSub(
+	   MatchSysTextEntry(tfn_ptr,"ST_BIBLE_BOOKS",MLE_IGNORE_CASE),
+	   "ST_BIBLE_BOOK_LINES"));
+	tfn_ptr=SysText("ST_BIBLE_FILE");
+	break;
+      case LK_FILE_LINE:
+      case LK_PLAIN_LINE:
+	if (Occurrences(tfn_ptr,',')) {
+	  RemoveLastSeg(tfn_ptr,",",buf);
+	  num=AtoI(buf);
+	}
+	break;
+      case LK_FILE_ANCHOR:
+	*buf=0;
+	if (Occurrences(tfn_ptr,','))
+	  RemoveLastSeg(tfn_ptr,",",buf);
+	break;
+      case LK_FILE_FIND:
+      case LK_PLAIN_FIND:
+	*buf=0;
+	*buf2=0;
+	if (Occurrences(tfn_ptr,','))
+	  RemoveLastSeg(tfn_ptr,",",buf);
+	if (Occurrences(buf,':')) {
+	  RemoveLastSeg(buf,":",buf2);
+	  num=AtoI(buf2);
+	}
+	break;
+    }
+  }
+  tfn_ptr=NewStr(tfn_ptr);
+
+  cont=TRUE;
+  if (!IsTextFile(tfn_ptr)) {
+    if (!PopUpNoYes(ST_WARNING "Not Text File\r\n"
+	  "Proceed anyway?\r\n\r\n"))
+      cont=FALSE;
+  }
+  if (cont)
+    result=LtfEditFile(i,tfn_ptr,buf,num);
+
+  ClearWinText(Fs);
+  Free(tfn_ptr);
+  Free(temp_filename);
+  Free(buf);
+  Free(buf2);
+  return result;
+}
+
+public void Plain(I1 *filename)
+//Open a document in plain text mode,
+//so that dollar signs are not special.
+{
+  I1 *buf=MSPrintF("PI:%s",filename);
+  Edit(buf);
+  Free(buf);
+}
+
+#help_index "Ltf"
+public Ltf *InitSysAuxLtf(BoolU4 has_menu)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *ll;
+  Ltf *aux;
+
+  aux=LtfNew;
+
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-7,1$$");
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->display_cb=&EditPreemptCB;
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-6,1$$");
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->user_data=Fs->cur_ltf;
+  ll->display_cb=&EditOverStrikeCB;
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-5,1$$");	//gets merged without this
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->user_data=Fs->cur_ltf;
+  ll->display_cb=&EditDollarCB;
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-4,1$$");	//gets merged without this
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->display_cb=&EditQuotesCB;
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-3,1$$");	//gets merged without this
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->display_cb=&EditBracesCB;
+  LtfPutSExt(aux,"$$CM+H+BY+RX,-2,1$$");	//gets merged without this
+  ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+  ll->display_cb=&EditSemicolonCB;
+  if (Fs->cur_ltf) {
+    LtfPutSExt(aux,"$$CM+H+BY+RX,-11,1$$");
+    ll=LtfPutSExt(aux,"$$TX+H+BD+DC,\" \"$$");
+    ll->user_data=Fs->cur_ltf;
+    ll->display_cb=&EditDollarTypeCB;
+  }
+
+  if (Fs->user_num)
+    LtfPrintF(aux,"$$CM+H+TY+LX,5,-1$$$$TX+H+BD,\"#%d\"$$",Fs->user_num);
+  LtfPutSExt(aux,"$$CM+H+TY,0,-1$$");
+  ll=LtfPutSExt(aux,"$$DA+H-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$");
+  ll->data=&Fs->task_descriptor;
+  LtfFormatData(ll);
+  LtfPrintF(aux,"$$CM+H,1,0$$$$TX+H+BD+IV,\"%X\"$$",Fs);
+  aux->text_attribute=Fs->border_attribute;
+  if (Bt(&Fs->crt_flags,CRTf_HAS_CLOSE_WIN))
+    LtfPutSExt(aux,"$$TX+H+RX+BD,\"[X]\"$$");
+  if (has_menu) {
+    LtfPutSExt(aux,"$$TX+H+LX+BD,\"MENU\"$$");
+    Bts(&Fs->crt_flags,CRTf_HAS_MENU);
+  }
+  Preempt(old_preempt);
+  return aux;
+}
+
+public void UseConsoleLtf(I1 *menu_file)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  Ltf *l=LtfNew,*m;
+
+  Fs->cur_ltf=l;
+  l->RightClickLink=&ConsoleRightClickLink;
+  l->max_entries=4096;
+  l->flags|=LTFF_ATTR_BY_PARTITION;
+
+  if (menu_file) {
+    m=LtfRead(menu_file);
+    m->flags|=LTFF_ATTR_BY_PARTITION|LTFF_ALLOW_UNDO;
+    l->menu_ltf=m;
+    Fs->aux_ltf=InitSysAuxLtf(TRUE);
+  } else
+    Fs->aux_ltf=InitSysAuxLtf(FALSE);
+
+  Fs->update_win=&LtfUpdateBothLtf;
+  Fs->scroll_speed=7;
+  Preempt(old_preempt);
+  Raw(OFF);
+}
+
+#help_index "Ltf/Input"
+public I1 *LtfGetLine(Ltf *l,LtfEntry *cl,I8 *cur_col=NULL)
+{
+  LtfEntry *cl2=cl;
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *result,*dst,*src,*start;
+  U8 i=0;
+  if (*cur_col)
+    *cur_col=-1;
+  while (cl2!=l && cl2->btype!=LTFT_CR) {
+    if (Bt(ltf_display_types,cl2->btype)) {
+      if (cl2->btype==LTFT_PICWORD)
+	src=cl2->aux_str;
+      else
+	src=cl2->display;
+      i+=StrLen(src);
+    } else if (cl2->btype==LTFT_TAB)
+      i++;
+    cl2=cl2->next;
+  }
+  result=MAlloc(i+1);
+  dst=result;
+  while (cl!=l && cl->btype!=LTFT_CR) {
+    start=dst;
+    if (Bt(ltf_display_types,cl->btype)) {
+      if (cl->btype==LTFT_PICWORD)
+	src=cl->aux_str;
+      else
+	src=cl->display;
+      while (*src)
+	*dst++=*src++;
+    } else if (cl->btype==LTFT_TAB)
+      *dst++=CH_TAB;
+    if (cl==l->cur_entry && cur_col)
+      *cur_col=start-result+l->cur_data_col;
+    cl=cl->next;
+  }
+  *dst++=0;
+  if (cl==l->cur_entry && cur_col && !l->cur_data_col)
+    *cur_col=dst-1-result;
+  Preempt(old_preempt);
+  return result;
+}
+
+#help_index "Ltf/Output"
+public void LtfDump(Ltf *l,U8 uS_delay=0)
+{
+  I1 *st;
+  LtfEntry *cl;
+  cl=l->dummy.next;
+  while (cl!=l) {
+    st=LtfGetLine(l,cl);
+    PutS(st);
+    Free(st);
+    do cl=cl->next;
+    while (cl!=l && cl->btype!=LTFT_CR);
+    if (cl->btype==LTFT_CR) {
+      cl=cl->next;
+      CrLf;
+      BusyWait(uS_delay);
+    }
+  }
+}
+
+public BoolU4 View()
+{
+  I8 ch=0;
+  U8 sc=0;
+  BoolU4 old_preempt=Preempt(OFF);
+  while (ch!=CH_ESC && ch!=CH_CTRLQ) {
+    Preempt(OFF);
+    if (ScanKey(&ch,&sc)) {
+      Preempt(old_preempt);
+      PutKey(ch,sc);
+      LtfRecalc(Fs->cur_ltf);
+    } else {
+      Fs->task_flags|=1<<TSSf_IDLE;
+      if (!Fs->rmt_chnl &&
+	!(Fs->parent_tss && Fs->parent_tss->popup_tss==Fs)) {
+	Fs->task_flags|=1<<TSSf_AWAITING_MSG;
+	SwapInNext;
+	Preempt(old_preempt);
+      } else {
+	Preempt(old_preempt);
+	WinSync;
+      }
+      Fs->task_flags&=~(1<<TSSf_IDLE);
+    }
+  }
+  Preempt(old_preempt);
+  return ch==CH_ESC;
+}
+
+
+public LtfEntry *LtfPutLine(LtfEntry *cl)
+{
+  I1 ch,*ptr,*ptr2;
+  while (cl->btype!=LTFT_ERROR && cl->btype!=LTFT_CR) {
+    if (Bt(ltf_display_types,cl->btype)) {
+      if (cl->btype==LTFT_PICWORD)
+	ptr=cl->aux_str;
+      else
+	ptr=cl->display;
+      do {
+	ptr2=ptr;
+	while (ch=*ptr)
+	  if (ch=='$$')
+	    break;
+	  else
+	    ptr++;
+	*ptr=0;
+	PutS(ptr2);
+	*ptr=ch;
+	if (ch=='$$') {
+	  PutS("$$$$");
+	  ptr++;
+	}
+      } while (ch);
+    } else if (cl->btype==LTFT_TAB)
+      PutChar(CH_TAB);
+    cl=cl->next;
+  }
+  CrLf;
+  return (cl->btype==LTFT_ERROR) ? cl:cl->next;
+}
+
+#help_index "Ltf/Input"
+public I1 *LtfMGetS()
+{
+  Ltf *l=Fs->cur_ltf;
+  LtfEntry *cl;
+  BoolU4 old_preempt;
+  I1 *result;
+  U8 sc;
+  I8 ch;
+  old_preempt=Preempt(OFF);
+  PutS("$$FU$$$$BU$$");
+  do {
+    Preempt(OFF);
+    if (ScanKey(&ch,&sc)) {
+      if (ch==CH_ESC) {
+	if (l=Fs->aux_ltf) {
+	  if (!l->best_d && l->cur_entry!=l) {
+	    cl=LtfCopyEntry(l,l->cur_entry);
+	    if (Fs->cur_ltf)
+	      LtfBottom(Fs->cur_ltf);
+	    LtfRunEntry(l,cl,TRUE,old_preempt);
+	    LtfDelEntry(l,cl);
+	    goto next;
+	  }
+	}
+	if (l=Fs->cur_ltf) {
+	  if (l->cur_entry!=l) {
+	    cl=LtfCopyEntry(l,l->cur_entry);
+	    LtfBottom(l);
+	    LtfRunEntry(l,cl,TRUE,old_preempt);
+	    LtfDelEntry(l,cl);
+	  }
+	}
+next:
+      } if (ch==CH_CTRLQ)
+	Exit;
+      else {
+	Preempt(old_preempt);
+	PutKey(ch,sc);
+	LtfRecalc(Fs->cur_ltf);
+      }
+    } else {
+      Fs->task_flags|=1<<TSSf_IDLE;
+      if (!Fs->rmt_chnl &&
+	!(Fs->parent_tss && Fs->parent_tss->popup_tss==Fs)) {
+	Fs->task_flags|=1<<TSSf_AWAITING_MSG;
+	SwapInNext;
+	Preempt(old_preempt);
+      } else {
+	Preempt(old_preempt);
+	WinSync;
+      }
+      Fs->task_flags&=~(1<<TSSf_IDLE);
+    }
+//Ctrl shift <CR> is a blank line without entry
+  } while (ch!=CH_CR || sc & SCF_CTRL && (sc & SCF_SHIFT));
+
+  Preempt(OFF);
+  l=Fs->cur_ltf;
+  cl=l->cur_entry;
+  do cl=cl->last;
+  while (cl!=l && cl->btype!=LTFT_CR &&
+    cl->btype!=LTFT_USER_FOREGROUND && cl->btype!=LTFT_USER_BACKGROUND);
+
+
+  do cl=cl->last;
+  while (cl!=l && cl->btype!=LTFT_CR &&
+    cl->btype!=LTFT_USER_FOREGROUND && cl->btype!=LTFT_USER_BACKGROUND);
+
+  cl=cl->next;
+  result=LtfGetLine(l,cl,NULL);
+  PutS("$$FU$$$$FG$$$$BG$$");
+  Preempt(old_preempt);
+  return result;
+}
+
+#help_index "Char/Input"
+
+public I8 PmtI8(I1 *msg,I8 default,I8 lo=MIN_I8,I8 hi=MAX_I8)
+{
+  I8 result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default);
+    st=MGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=AtoI(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+public double PmtDouble(I1 *msg,double default,double lo=MIN_double,double hi=MAX_double)
+{
+  double result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default);
+    st=MGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=A2Double(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+public I1 *PmtStr(I1 *msg,I1 *default=NULL)
+{
+  I1 *st;
+  if (default)
+    PrintF(msg,default);
+  else
+    PrintF(msg);
+  st=MGetS;
+  if (!*st) {
+    Free(st);
+    if (default)
+      return NewStr(default);
+    else
+      return NewStr("");
+  }
+  return st;
+}
+
+public LTDate PmtLTDate(I1 *msg,LTDate default,LTDate lo=MIN_I8,LTDate hi=MAX_I8)
+{
+  LTDate result;
+  I1 *st;
+  while (TRUE) {
+    PrintF(msg,default,default);
+    st=MGetS;
+    if (!*st) {
+      Free(st);
+      return default;
+    }
+    result=A2LTDate(st);
+    Free(st);
+    if (result>=lo && result<=hi)
+      return result;
+  }
+}
+
+#help_index "Ltf"
+
+I8 PopUpCancelIncludeDelAuto(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutSExt(l,header);
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"INCLUDE      (.CPZ)\",1$$");
+  LtfPutSExt(l,"$$CM+LX,26,0$$$$BT, \"DEBUG              \",9$$");
+  LtfPutSExt(l,"$$CM+LX,2,3 $$$$BT, \"COMPILE      (.SPZ)\",5$$");
+  LtfPutSExt(l,"$$CM+LX,26,0$$$$BT, \"LOAD         (.BIZ)\",6$$");
+  LtfPutSExt(l,"$$CM+LX,2,3 $$$$BT, \"ADAM_INCLUDE (.APZ)\",4$$");
+  LtfPutSExt(l,"$$CM+LX,26,0$$$$BT, \"AUTOFILE     (.AUZ)\",3$$");
+  LtfPutSExt(l,"$$CM+LX,2,3 $$$$BT, \"COPY               \",7$$");
+  LtfPutSExt(l,"$$CM+LX,26,0$$$$BT, \"MOVE               \",8$$");
+  LtfPutSExt(l,"$$CM+LX,2,3 $$$$BT, \"DELETE             \",2$$");
+  LtfPutSExt(l,"$$CM+LX,26,0$$$$BT, \"CANCEL             \",0$$");
+  if (footer) LtfPutSExt(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void EditLeftClickLink(Ltf *l,LtfEntry *cl,U2 old_preempt2)
+{
+  BoolU4 old_preempt=IsPreempt;
+  I1 *st;
+  nounusedwarn l;
+  if (cl->flags & LTFLF_AUX_STR)
+    st=NewStr(cl->aux_str);
+  else
+    st=NewStr(cl->display);
+  Preempt(old_preempt2);
+  Edit(st);
+  Preempt(old_preempt);
+  Free(st);
+}
+
+void ConsoleRightClickLink(Ltf *l,LtfEntry *cl,BoolU4 old_preempt2)
+{
+  BoolU4 send_cr=FALSE,old_preempt=IsPreempt;
+  I1 *st2,*st;
+  I8 i;
+  EditFileNameStruct fn;
+  if (cl->flags & LTFLF_AUX_STR)
+    st2=NewStr(cl->aux_str);
+  else
+    st2=NewStr(cl->display);
+  st=(st2[2]==':') ? st2+3:st2;
+  i=PopUpCancelIncludeDelAuto(st);
+  Preempt(old_preempt2);
+  if (i>0) {
+    LtfBottom(l);
+    switch (i) {
+      case 1:
+	if (Occurrences(st,'.') && !WildCardMatch("*.CP?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .CP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "#include \"",st,"\";\r\n$$FU$$$$FG$$$$BG$$";
+	ExecuteFile(st);
+	break;
+      case 2:
+	Del(st);
+	break;
+      case 3:
+	if (Occurrences(st,'.') && !WildCardMatch("*.AU?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .AU? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "AutoFile(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	AutoStr("%F\r",st);
+	break;
+      case 4:
+	if (Occurrences(st,'.') && !WildCardMatch("*.AP?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .CP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "Adam(\"#include \\\"",st,"\\\"\" );\r\n$$FU$$$$FG$$$$BG$$";
+	Adam(";#include \"%s\"",st);
+	break;
+      case 5:
+	if (Occurrences(st,'.') && !WildCardMatch("*.SP?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .SP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "CompileFile(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	CompileFile(st);
+	break;
+      case 6:
+	if (Occurrences(st,'.') && !WildCardMatch("*.BI?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .BI? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "Load(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	Load(st);
+	break;
+      case 7:
+	StrCpy(fn.name,st);
+	if (DoForm(fn.name,"EditFileNameStruct"))
+	  Copy(st,fn.name);
+	break;
+      case 8:
+	StrCpy(fn.name,st);
+	if (DoForm(fn.name,"EditFileNameStruct"))
+	  Move(st,fn.name);
+	break;
+      case 9:
+	if (Occurrences(st,'.') && !WildCardMatch("*.CP?",st)) {
+	  if (!PopUpNoYes(ST_WARNING "Not .CP? File\r\n"
+			  "Proceed anyway?\r\n\r\n")) {
+	    send_cr=TRUE;
+	    break;
+	  }
+	}
+	cout "IDE(\"",st,"\");\r\n$$FU$$$$FG$$$$BG$$";
+	IDE(st);
+	break;
+    }
+  } else
+    send_cr=TRUE;
+  LtfBottom(l);
+  cout "$$FU$$$$FG$$$$BG$$";
+  if (send_cr)
+    PutChar(CH_CR);
+  Preempt(old_preempt);
+  Free(st2);
+}
+
+#help_index "Ltf/Cmd Line (Typically)"
+
+public void Man(I1 *st)
+//Enter the name of a symbol and this
+//will jump to the source code.
+{
+  I1 *name=MAlloc(3+StrLen(st)+1);
+  StrCpy(name,"MN:");
+  StrCat(name,st);
+  Edit(name);
+  Free(name);
+}
+
+#help_index "Debugging;Ltf/Cmd Line (Typically);Ltf/Output"
+
+public void LtfDm(U1 *buf,U8 cnt=0x80)
+//Dumps a chunk of memory, showing
+//addresses.  It is live and can be
+//edited.
+{
+  LtfEntry *ll;
+  BoolU4 old_preempt=Preempt(OFF);
+  Ltf *l=Fs->cur_ltf;
+  ll=LtfPrintF(l,"$$HX-Z,%d,16$$",cnt);
+  ll->data=buf;
+  l->cur_entry=ll->next;
+  LtfRecalc(l);
+  Preempt(old_preempt);
+}
+
+public void LtfD(U1 *buf,U8 cnt=0x80)
+//Dumps a chunk of memory, showing
+//offsets.  It is live and can be
+//edited.
+{
+  LtfEntry *ll;
+  BoolU4 old_preempt=Preempt(OFF);
+  Ltf *l=Fs->cur_ltf;
+  ll=LtfPrintF(l,"$$HX,%d,16$$",cnt);
+  ll->data=buf;
+  l->cur_entry=ll->next;
+  LtfRecalc(l);
+  Preempt(old_preempt);
+}
+
+#help_index "Ltf/Output"
+BoolU8 LtfPutS(I1 *st)
+{
+  Ltf *l;
+  BoolU4 old_preempt=Preempt(OFF);
+  l=Fs->cur_ltf;
+  if (l)
+    LtfPutSPartial(l,st,old_preempt);
+  Preempt(old_preempt);
+  return FALSE;
+}
+
+AddKeyDev(&LtfPutKey,&LtfPutS,0x80000000);
+ext[EXT_LTF_READ]=&LtfRead;
+ext[EXT_LTF_WRITE]=&LtfWrite;
+ext[EXT_LTF_NEW]=&LtfNew;
+ext[EXT_LTF_RESET]=&LtfReset;
+ext[EXT_LTF_DEL]=&LtfDel;
+ext[EXT_MGETS]=&LtfMGetS;
+
+#help_index "Ltf"

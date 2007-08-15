@@ -1,0 +1,5 @@
+UseConsoleLtf("User.MUZ");
+PutSysText("ST_USER_STARTUP");
+Type("::/LT/Doc/Help.TXZ");
+Bts(&Fs->crt_flags,CRTf_SHOW);
+Preempt(ON);

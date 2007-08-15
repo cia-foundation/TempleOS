@@ -1,0 +1,29 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  PutS("$$WW+H,1$$");
+  while (!ScanKey) {
+	Play("qR3eG2G3qDsCCCCqDeCCetDDBsR2GRG",
+		" \0Be\0ing \0rid \0of \0 \0 \0 \0sin \0is \0a \0bit\0ter \0 \0 \0pill.\r\n\0 \0 \0");
+	Play("qR3eG2G3qDsCCCCqDeCCetDDBsR2GRG",
+		" \0Be\0ing \0rid \0of \0 \0 \0 \0sin \0is \0a \0bit\0ter \0 \0 \0pill.\r\n\0 \0 \0");
+	Play("3eCDqFAAeA2G3etA2G3AeCCAR",
+		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	Play("CDqFAAeA2G3etA2G3AeCCAR");
+	PutS("$$FG,GREEN$$(This isn't a riddle, oddly enough.)$$FG$$\r\n");
+
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

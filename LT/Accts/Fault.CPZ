@@ -1,0 +1,51 @@
+/* When a fault occurs, a child process is
+spawned running this file and the parent
+gets suspended.  You can modify what gets
+displayed during faults to assist debugging.
+
+If you modify this file, you should place it
+into your HOME directory.  This version is the
+default for accounts without a version in HOME.
+*/
+
+TssStruct *tss=Fs->parent_tss;
+void **rsp_ptr=&tss->rsp,*rsp=tss->rsp,
+    *rbp_ptr=&tss->rbp,*rbp=tss->rbp,
+    *rip_ptr=&tss->rip,*rip=tss->rip;
+
+switch (tss->fault_num)
+{
+  case 0: //if divide except
+    //push rip as param to ThrowDivide
+    rsp-=8;
+    *rsp_ptr=rsp;
+    rsp[1]=rip;
+    *rip_ptr=&ThrowDivide;
+    Btr(&tss->task_flags,TSSf_SUSPENDED);
+    Exit;
+  case 0x10:
+    rsp-=8;
+    *rsp_ptr=rsp;
+    rsp[1]=rip;
+    *rip_ptr=&ThrowFloating;
+    Btr(&tss->task_flags,TSSf_SUSPENDED);
+    Exit;
+}
+
+/*
+Raw(ON);
+coutln "Faulting TSS:",tss," IRQ#",tss->fault_num;
+PrintF("Fault Location:%P\r\n",*rip);
+Raw(OFF);
+*/
+
+UseConsoleLtf(NULL);
+Bts(&Fs->crt_flags,CRTf_SHOW);
+
+coutln "Faulting TSS:",tss," IRQ#",tss->fault_num;
+CallerRep(rbp,tss);
+StackRep(rsp);
+coutln "$$LK,\"See HOME/Fault.CPZ\",\"FI:HOME/Fault.CPZ\"$$";
+Dasm(rip-0x20,0x20);
+
+

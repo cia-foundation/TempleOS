@@ -1,0 +1,289 @@
+#help_index "Utils"
+
+LTDirEntry MCFindMatch(LTDirEntry *pattern,LTDirEntry *list)
+{
+  while (list) {
+    if (!StrCmp(pattern->name,list->name) &&
+      (pattern->attr&~LT_ATTR_RESIDENT)==
+      list->attr&~LT_ATTR_RESIDENT)
+      return list;
+    list=list->next;
+  }
+  return NULL;
+}
+
+void MergeChkList(LTDirEntry *m1,LTDirEntry *m2,U8 *fuf_flags,U8 *df_flags)
+{
+  I8 i;
+  LTDirEntry *tempm2;
+  while (m1 && !(*df_flags & DF_ABORT_ALL_FILES)) {
+    if (!Bt(fuf_flags,FUf_JUST_TEXT_FILES) ||
+	 IsTextFile(m1->name) ||
+	 m1->attr & LT_ATTR_DIR) {
+      tempm2=MCFindMatch(m1,m2);
+      if (!tempm2)
+	coutln "Does Not Exist:",m1->full_name;
+      else {
+	if (m1->attr & LT_ATTR_DIR)
+	  MergeChkList(m1->sub,tempm2->sub,fuf_flags,df_flags);
+	else {
+	  i=m1->datetime-tempm2->datetime;
+	  if (AbsI8(i)>LTDATE_FREQ*2) { //Filedates can shift due to conversion
+	    coutln m1->full_name;
+	    if (Bt(fuf_flags,FUf_DIFF)) {
+	      if (IsTextFile(m1->full_name))
+		*df_flags=Diff(tempm2->full_name,m1->full_name,*df_flags);
+	    }
+	  }
+	}
+      }
+    }
+    m1=m1->next;
+  }
+}
+
+public void MergeChk(
+  I1 *dst_mask="/LT/*",
+  I1 *src_mask="/LT/*",
+  I1 *flags=NULL)
+//+r=recurse
+//+d=diff
+//+t=just text files
+{
+  U8 df_flags=0,f=0;
+  LTDirEntry *tempm1=NULL,*tempm2=NULL;
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r");
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),flags);
+  PrintFWarn("This is based strictly on file dates.\r\n");
+  tempm1=FindFiles(src_mask,f);
+  tempm2=FindFiles(dst_mask,f);
+  MergeChkList(tempm1,tempm2,&f,&df_flags);
+  DelLTDirList(tempm1);
+  DelLTDirList(tempm2);
+}
+
+
+#help_index "Utils;Comm"
+
+void MrgWaitPmt(TssStruct *tss,LTChnl *chnl)
+{
+  WaitTskIdle(tss);
+  chnl->null_msg_cnt=0;
+  while (chnl->null_msg_cnt<2)
+    SwapInNext;
+  WaitTskIdle(tss);
+}
+
+I1 *red_st="$$FG,RED$$",*green_st="$$FG,GREEN$$";
+
+void RmtMergeChkList(TssStruct *tss,LTChnl *chnl,LTDirEntry *m1,LTDirEntry *m2,U8 *fuf_flags,U8 *df_flags,I1 *cur_dir)
+{
+  I8 i;
+  LTDirEntry *tempm2,*sub;
+  I1 *full_name,*c1,*c2;
+  BoolU4 doit;
+  while (m1 && !(*df_flags & DF_ABORT_ALL_FILES)) {
+    if (!Bt(fuf_flags,FUf_JUST_TEXT_FILES) ||
+	 IsTextFile(m1->name) ||
+	 m1->attr & LT_ATTR_DIR) {
+      tempm2=MCFindMatch(m1,m2);
+      if (!tempm2) {
+	coutln "Does Not Exist on Remote:",m1->name;
+	full_name=MAlloc(StrLen(cur_dir)+1+StrLen(m1->name)+1+1);
+	StrCpy(full_name,cur_dir);
+	StrCat(full_name,m1->name);
+      } else {
+	full_name=MAlloc(StrLen(cur_dir)+1+StrLen(tempm2->name)+1+1);
+	StrCpy(full_name,cur_dir);
+	StrCat(full_name,tempm2->name);
+      }
+      if (m1->attr & LT_ATTR_DIR) {
+	if (!tempm2) {
+	  if (Bt(fuf_flags,FUf_ALL))
+	    doit=TRUE;
+	  else
+	    doit=PopUpNoYes("MkDir on Remote?");
+	  if (doit) {
+	    XTalkWithWait(tss,"MkDir(\"%s\");\r",full_name);
+	    MrgWaitPmt(tss,chnl);
+	  }
+	  sub=NULL;
+	} else
+	  sub=tempm2->sub;
+	StrCat(full_name,"/");
+	RmtMergeChkList(tss,chnl,m1->sub,sub,fuf_flags,df_flags,full_name);
+      } else {
+	if (tempm2) {
+	  i=m1->datetime-tempm2->datetime;
+	  if (AbsI8(i)>LTDATE_FREQ*2) { //Filedates can shift due to conversion
+	    if (i<0) {
+	      c1=red_st;
+	      c2=green_st;
+	    } else {
+	      c1=green_st;
+	      c2=red_st;
+	    }
+	    PrintF("%s%h2D %h4T$$FG$$ %s%h2D %h4T$$FG$$\r\n %s\r\n\r\n",
+	      c1,m1->datetime,m1->datetime,
+	      c2,tempm2->datetime,tempm2->datetime,
+	      m1->full_name);
+	    if (i<0) {
+	      if (Bt(fuf_flags,FUf_ALL))
+		doit=TRUE;
+	      else
+		doit=PopUpNoYes("Get from Remote Overwriting?");
+	      if (doit) {
+		XTalkWithWait(tss,"RmtRqstRxFile(\"%s\",\"%s\");\r",
+		  full_name,m1->full_name);
+		MrgWaitPmt(tss,chnl);
+	      }
+	    } else {
+	      if (Bt(fuf_flags,FUf_ALL))
+		doit=TRUE;
+	      else
+		doit=PopUpNoYes("Send to Remote Overwriting?");
+	      if (doit) {
+		XTalkWithWait(tss,"RmtRqstTxFile(\"%s\",\"%s\");\r",
+		  full_name,m1->full_name);
+		MrgWaitPmt(tss,chnl);
+	      }
+	    }
+	  }
+	} else {
+	  if (Bt(fuf_flags,FUf_ALL))
+	    doit=TRUE;
+	  else
+	    doit=PopUpNoYes("Send to Remote?");
+	  if (doit) {
+	    XTalkWithWait(tss,"RmtRqstTxFile(\"%s\",\"%s\");\r",
+	      full_name,m1->full_name);
+	    MrgWaitPmt(tss,chnl);
+	  }
+	}
+      }
+      Free(full_name);
+    }
+    m1=m1->next;
+  }
+}
+
+public void RmtMergeChkHost(I1 *dst_mask="/LT/*",I1 *flags=NULL)
+{
+  LTDirEntry *tempm;
+  U8 size,f=0;
+  U1 *buf;
+  ArcCompressStruct *ac;
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r");
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),flags);
+  tempm=FindFiles(dst_mask,f);
+  buf=FlattenLTDirTree(tempm,&size);
+  ac=CompressBuf(buf,size);
+  RmtRqstRxBuf(ac,ac->compressed_size);
+  Free(ac);
+  Free(buf);
+  DelLTDirList(tempm);
+}
+
+I1 *Progress1CB(Ltf *l,LtfEntry *ll,TssStruct *mem_tss)
+{
+  I1 *st=MAlloc(16,mem_tss);
+  nounusedwarn l,ll;
+  SPrintF(st,"%08X",progress1);
+  return st;
+}
+
+public void RmtMergeChk(LTChnl *chnl,
+  I1 *dst_mask="/LT/*",
+  I1 *src_mask="/LT/*",
+  I1 *flags=NULL)
+//+r=recurse
+//+d=diff
+//+t=Just text files
+//+a=all
+{
+  U8 df_flags=0,f=0;
+  LTDirEntry *tempm1=NULL,*tempm2=NULL;
+  TssStruct *tss;
+  I1 *st;
+  Ltf *aux;
+  LtfEntry *ll;
+  U1 *buf;
+
+  if (!chnl || !chnl->type) return;
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r+t");
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),flags);
+  PrintFWarn("This is based strictly on file dates.\r\n");
+  if (tempm1=FindFiles(src_mask,f)) {
+    tss=SpawnUser;
+    tss->win_top=Fs->win_top;
+    tss->win_bottom=(Fs->win_top+Fs->win_bottom)>>1-1;
+    Fs-> win_top=tss->win_bottom+3;
+    tss->win_right=Fs->win_right;
+    tss->win_left=Fs->win_left;
+    WinToTop(Fs);
+    aux=tss->aux_ltf;
+    LtfPutSExt(aux,"$$CM+BY,0,0$$");
+    ll=LtfPutSExt(aux,"$$TX+DC+LX+IV,\"00000000\"$$");
+    ll->display_cb=&Progress1CB;
+    XTalkWithWait(tss,"TelnetGuestOpen(0x%08X);\r",chnl);
+    MrgWaitPmt(tss,chnl);
+    XTalkWithWait(tss,"RmtMergeChkHost(\"%s\",\"%s\");\r",dst_mask,flags);
+    MrgWaitPmt(tss,chnl);
+    buf=ExpandBuf(chnl->rx_buf);
+    Free(chnl->rx_buf,tss);
+    tempm2=UnflattenLTDirTree(buf);
+    Free(buf);
+    st =MAlloc(StrLen(dst_mask)+3);
+    StrCpy(st,dst_mask);
+    RemoveLastSeg(st,"/");
+    if (!*st) {
+      Free(st);
+      st=NewStr("./");
+    } else
+      StrCat(st,"/");
+ 
+    RmtMergeChkList(tss,chnl,tempm1,tempm2,&f,&df_flags,st);
+    Free(st);
+    DelLTDirList(tempm1);
+    DelLTDirList(tempm2);
+    XTalkStrWithWait(tss,"Msg(MSG_KEY_DOWN,CH_CTRLB,SCF_CTRL+SCF_ALT);");
+    Fs->win_top=tss->win_top;
+    Sleep(250);  //allow shutdown of Guest channel
+    Kill(tss);
+  }
+}
+
+#help_index "Utils"
+
+void ListNewFilesList(LTDirEntry *tempm,LTDate datetime,U8 f)
+{
+  while (tempm) {
+    if (tempm->datetime>datetime)
+      if (!Bt(&f,FUf_JUST_TEXT_FILES) ||
+	   IsTextFile(tempm->name))
+      coutln tempm->full_name;
+    ListNewFilesList(tempm->sub,datetime,f);
+    tempm=tempm->next;
+  }
+}
+
+public void ListNewFiles(I1 *src_mask="/LT/*",LTDate datetime=0,
+  I1 *flags=NULL)
+//+r=recurse
+//+t=Just text files
+{
+  U8 f=0;
+  LTDirEntry *tempm1=NULL;
+
+  if (!datetime)
+    datetime=sys_compile_time;
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r+t");
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),flags);
+
+  if (tempm1=FindFiles(src_mask,f)) {
+    ListNewFilesList(tempm1,datetime,f);
+    DelLTDirList(tempm1);
+  }
+}
+
+#help_index ""

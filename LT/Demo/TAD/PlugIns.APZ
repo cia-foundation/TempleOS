@@ -1,0 +1,254 @@
+void InsertSong()
+{
+  I1 *s1,*s2;
+  s1=MakeSong;
+  s2=MakeSong;
+  PrintF("$$SO,\"\",\"%s%s%s%s\"$$",s1,s1,s2,s2);
+  Free(s1);
+  Free(s2);
+}
+
+
+void FillinTime()
+{
+  LTDate ltdt;
+  ltdt=GetCurTimeLTDate;
+  PrintF("$$IV 1$$----%D %T----$$IV 0$$\r",ltdt,ltdt);
+}
+
+class RenameSymbolStruct
+{
+  I1 find[256]	  fmtstr "$$DA -P ,255 \"Find   :%s\"$$\r\n";
+  I1 replace[256] fmtstr "$$DA -P ,255 \"Replace:%s\"$$\r\n";
+};
+
+void RenameCurSymbol()
+{
+  I1 *buf;
+  RenameSymbolStruct r;
+  BoolU4 old_preempt=Preempt(OFF);
+  StrCpy(r.find,ws_cur_word);
+  StrCpy(r.replace,ws_cur_word);
+  Preempt(old_preempt);
+  if (PopUpDoForm(&r,"RenameSymbolStruct")) {
+    buf=MSPrintF("R(\"%s\",\"%s\",\"+r+l+a\");",r.find,r.replace);
+    PopUp(buf,Fs);
+    Free(buf);
+  }
+}
+
+void RenameFile()
+{
+  I1 *buf;
+  RenameSymbolStruct r;
+  BoolU4 old_preempt=Preempt(OFF);
+  StrCpy(r.find,ws_cur_word);
+  StrCpy(r.replace,ws_cur_word);
+  Preempt(old_preempt);
+  if (PopUpDoForm(&r,"RenameSymbolStruct")) {
+    buf=MSPrintF("R(\"%s\",\"%s\",\"+r+l+a\");",r.find,r.replace);
+    PopUp(buf,Fs);
+    Free(buf);
+  }
+  Move(r.find,r.replace);
+}
+
+void MyScreenShot()
+{
+  I1 *st;
+  LTDirEntry *tempm;
+  U8 cnt=0;
+  tempm=FindFiles("::/Temp/ScreenShots/*.BMP");
+  while (tempm) {
+    cnt++;
+    tempm=tempm->next;
+  }
+  st=MSPrintF("::/Temp/ScreenShots/SCRN%04d.BMP",cnt);
+  CaptureScreen4(st);
+  Free(st);
+  Beep;
+}
+
+BoolU4 frame_grabber_paused=FALSE;
+TssStruct *my_frame_grabber=NULL;
+
+void EndFrameGrabberCB()
+{
+  my_frame_grabber=NULL;
+  Exit;
+}
+
+void FrameGrabberTsk()
+{
+  I8 frame_num=0;
+  I8 buf[80];
+  U8 i,
+     end_time=0,
+     time_stamp=0;
+  Fs->end_task_cb=&EndFrameGrabberCB;
+  InitLocalTask;
+  Silent(ON);	//no output to screen
+  while (my_frame_grabber) {
+    SPrintF(buf,"::/Temp/ScreenShots/VID%05d.BMP",frame_num++);
+    CaptureScreen4(buf);
+    do {
+      i=GetTimeStamp;
+      if (i>end_time) {
+	end_time=i+time_stamp_freq/4;
+	break;
+      } else {
+	SwapInNext;
+	while (sys_cur_scan_code&SCF_NUM)
+	  SwapInNext;
+      }
+    } while (TRUE);
+  }
+}
+
+void ToggleFrameGrabber()
+{
+  if (my_frame_grabber) {
+    my_frame_grabber=NULL;
+    kbd_display_special_keys=FALSE;
+  } else {
+    my_frame_grabber=Spawn(&FrameGrabberTsk,"Frame Grabber");
+    kbd_display_special_keys=TRUE;
+  }
+}
+
+BoolU8 MyPutKey(I8 ch,U8 sc)
+{  //ch=ASCII; sc=scancode
+
+//You can customize keys.  This routine
+//is called before the main editor
+//key handler $LK,"LtfPutKeyExt","MN:LtfPutKeyExt"$().
+//You can intercept any key.
+
+//Return TRUE if you completely
+//handled the key.
+
+  nounusedwarn ch;
+  U8 sc2=sc.u1[0];
+
+  if (sc2>=SC_F1 && sc2<=SC_F10 &&
+       (sc & SCF_ALT) &&
+      !(sc & SCF_CTRL)) {
+    switch (sc2) {
+      case SC_F1:
+	if (sc & SCF_SHIFT)
+	  PutS("$$FG LTPURPLE$$");
+	else
+	  PutS("$$FG PURPLE$$");
+	break;
+      case SC_F2:
+	if (sc & SCF_SHIFT)
+	  PutS("$$FG LTRED$$");
+	else
+	  PutS("$$FG,RED$$");
+	break;
+      case SC_F3:
+	if (sc & SCF_SHIFT)
+	  PutS("$$FG LTGREEN$$");
+	else
+	  PutS("$$FG,GREEN$$");
+	break;
+      case SC_F4:
+	if (sc & SCF_SHIFT)
+	  PutS("$$FG LTBLUE$$");
+	else
+	  PutS("$$FG$$");
+	break;
+      case SC_F5:
+	if (sc & SCF_SHIFT)
+	  RandQuote;
+	else
+	  RandWord;
+	break;
+      case SC_F6:
+	if (sc & SCF_SHIFT)
+	  PopUp("WsInit(\"/Text/Brief\");");
+	else
+	  PopUp("WsInit(\"/LT\");");
+	break;
+      case SC_F7:
+	if (sc & SCF_SHIFT)
+	  LtfSafeInsert(Fs->cur_ltf,
+	    "$$HS+C$$$$FG$$$$HE$$");
+	else
+	  FillinTime();
+	break;
+      case SC_F8:
+	if (sc & SCF_SHIFT)
+	  RenameFile();
+	else
+	  RenameCurSymbol();
+	break;
+    }
+    return TRUE;
+  } else {
+    if (!(sc & SCF_CTRL)) {
+      if (ch=='S' && sc & SCF_ALT) {
+	 InsertSong;
+	 return TRUE;
+      }
+
+      if (ch=='p' && sc & SCF_ALT) {
+	JukeBox("/LT/Apps/MusicOrgan/Examples");
+	return TRUE;
+      }
+      if (ch=='P' && sc & SCF_ALT) {
+	JukeBox("HOME/BTracks");
+	return TRUE;
+      }
+
+      if (ch=='f' && sc & SCF_ALT) {
+	ProfAll;
+	return TRUE;
+      }
+      if (ch=='F' && sc & SCF_ALT) {
+	ProfRep;
+	return TRUE;
+      }
+
+      if (ch=='h' && sc & SCF_ALT) {
+	WinTileHorz; //This is handy
+	return TRUE;
+      }
+      if (ch=='v' && sc & SCF_ALT) {
+	WinTileVert; //So is this
+	return TRUE;
+      }
+      if (ch=='V' && sc & SCF_ALT) {
+	ToggleFrameGrabber;
+	return TRUE;
+      }
+      if (ch=='m' && sc & SCF_ALT) {
+	WinMax;
+	WinBorder(OFF);
+	return TRUE;
+      }
+      if (ch=='k' && sc & SCF_ALT) {
+	if (kbd_display_special_keys)
+	  kbd_display_special_keys=FALSE;
+	else
+	  kbd_display_special_keys=TRUE;
+	return TRUE;
+      }
+    } else {
+      if (sc2==SC_PRTSCRN2) {
+	MyScreenShot();
+	return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+BoolU8 MyPutS(I1 *st)
+{
+  nounusedwarn st;
+  return FALSE;
+}
+
+AddKeyDev(&MyPutKey,&MyPutS,0x20000000);
+

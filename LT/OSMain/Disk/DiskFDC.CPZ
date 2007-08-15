@@ -1,0 +1,282 @@
+#define FDC_p0	      0
+#define FDC_p1	      1
+#define FDC_DOR       2
+#define FDC_p3	      3
+#define FDC_STATUS    4
+#define FDC_DATA      5
+#define FDC_DIR       7
+#define FDC_DCR       7
+
+void Irq06Handler()
+{
+  LBts(&sema_irqs[6],0);
+}
+
+
+void FDCFlushStatus(LTBlkDev *bdev)
+{
+  U1 b;
+  I8 i;
+  MemSet(bdev->status,0,32);
+  i=0;
+  while (i<32) {
+    b=InP(bdev->base0+FDC_STATUS);
+    if (b & 0x80) {
+      if (b & 0x40)
+	bdev->status[i++]=InP(bdev->base0+FDC_DATA);
+      else
+	break;
+    }
+    SwapInNext;
+  }
+  if (i==32)
+    throw(EXCEPT_FDC,2);
+  bdev->status[0]=bdev->status[0] & 0xC8;  //clear non-error bits
+  bdev->last_jiffy=Jiffies;
+}
+
+void FDCWaitIrq(LTBlkDev *bdev)
+{
+  BoolU4 old_flags=GetFlags;
+  Sti;
+  while (!LBtr(&sema_irqs[bdev->irq],0)) {
+/*
+    if (!(InP(bdev->base0+FDC_p0) & 0x80))	//Pending IRQ?
+      throw(EXCEPT_FDC,1);
+*/
+    SwapInNext;
+  }
+  SetFlags(old_flags);
+  FDCFlushStatus(bdev);
+}
+
+
+void FDCSendCmdU1(LTBlkDev *bdev,U1 v)
+{
+  FDCFlushStatus(bdev);
+  OutP(bdev->base0+FDC_DATA,v);
+}
+
+void FDCSeek(LTBlkDev *bdev,U1 cyl, U1 head)
+{
+  FDCSendCmdU1(bdev,0x0F);
+  FDCSendCmdU1(bdev,head<<2);
+  FDCSendCmdU1(bdev,cyl);
+  FDCWaitIrq(bdev);
+}
+
+void FDCFree(LTBlkDev *bdev)
+{
+  LBtr(&sema_irq_busy[bdev->irq],0);
+}
+
+void MonitorFDCTsk()
+{
+  LTBlkDev *bdev;
+  bdev=Fs->user_data0;
+  CheckLTBlkDev(bdev);
+  while (TRUE) {
+    if (!LBts(&sema_irq_busy[bdev->irq],0)) {
+      if (bdev->last_jiffy) {
+	if (Jiffies > bdev->last_jiffy+JIFFY_FREQ<<1) {
+	  FDCSeek(bdev,0,0);
+	  FDCSeek(bdev,0,1);
+	  OutP(bdev->base0+FDC_DOR,0x00);
+	  bdev->last_jiffy=0;
+	}
+      }
+      FDCFree(bdev);
+    }
+    SwapInNext;
+  }
+}
+
+
+void FDCGet(LTBlkDev *bdev)
+{
+  CheckLTBlkDev(bdev);
+  while (LBts(&sema_irq_busy[bdev->irq],0))
+    SwapInNext;
+  LBtr(&sema_irqs[bdev->irq],0);
+
+  if (!bdev->last_jiffy) {
+    bdev->last_jiffy=Jiffies;
+    OutP(bdev->base0+FDC_DOR,0x00);
+    BusyWait(100);
+    OutP(bdev->base0+FDC_DOR,0x1C); //Motor ON
+    FDCWaitIrq(bdev);
+    OutP(bdev->base0+FDC_DCR,0x00); //step,Load, Unload specs
+    FDCSendCmdU1(bdev,0x03);
+    FDCSendCmdU1(bdev,0xCF);
+    FDCSendCmdU1(bdev,0x10);
+    FDCWaitIrq(bdev);
+    FDCSendCmdU1(bdev,0x07);	//Recalibrate
+    FDCSendCmdU1(bdev,0x00);
+    FDCWaitIrq(bdev);
+  }
+}
+
+void FDCReset(LTBlkDev *bdev)
+{
+  CheckLTBlkDev(bdev);
+  OutP(0x0A,0x42);  //Shut down old DMA
+  OutP(0x09,0x02);
+  bdev->last_jiffy=0;
+  LBtr(&sema_irq_busy[bdev->irq],0);
+  FDCGet(bdev);
+}
+
+BoolU8 FDCReadTrack(LTBlkDev *bdev,U1 cyl, U1 head,U8 blk)
+{
+  I8 i;
+  U8 size=fdc_disk_sectors<<BLK_SIZE_BITS-1;
+  CheckLTBlkDev(bdev);
+
+  for (i=0;i<fdc_retries;i++) {
+    FDCSeek(bdev,cyl,head);
+
+    OutP(0x0A,0x42);  //Shut down old DMA
+    OutP(0x09,0x02);
+    OutP(0x08,0x00);  //ctrl
+    OutP(0x0B,0x56);  //mode Read
+    OutP(0x0C,0);
+    OutP(0x04,fdc_dma_buf & 0xFF);  //addr
+    OutP(0x04,(fdc_dma_buf>>8) & 0xFF);
+    OutP(0x81,fdc_dma_buf>>16);     //set page
+    OutP(0x0C,0);
+    OutP(0x05,size.u1[0]);  //cnt
+    OutP(0x05,size.u1[1]);
+    OutP(0x0A,0x02);  //Start new DMA
+    OutP(0x09,0x06);
+
+    FDCSendCmdU1(bdev,0x62);
+    FDCSendCmdU1(bdev,head<<2);
+    FDCSendCmdU1(bdev,cyl);
+    FDCSendCmdU1(bdev,head);
+    FDCSendCmdU1(bdev,1); //sector
+    FDCSendCmdU1(bdev,BLK_SIZE>>8);
+    FDCSendCmdU1(bdev,fdc_disk_sectors);	//last sec
+    FDCSendCmdU1(bdev,0x1B);	//gap
+    FDCSendCmdU1(bdev,0xFF);
+    FDCWaitIrq(bdev);
+    if (bdev->status[0] || bdev->status[1] ||
+	bdev->status[2]) {
+      PrintFErr("FDC Read:%X,%X,%X\r\n",bdev->status[2],bdev->status[1],bdev->status[0]);
+      FDCReset(bdev);
+    } else
+      return TRUE;
+  }
+  coutln "FDC Read Failed!!!  Blk:",blk;
+  return FALSE;
+}
+
+BoolU8 FDCRBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt)
+{
+  LTCacheBlk *tempc;
+  BoolU4 okay=TRUE;
+  U8 n,blk2;
+  U1 cyl,head,sec;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTBlkDev(bdev);
+  while (cnt>0) {
+    if (bdev->flags & LTBDF_READ_CACHE) {
+      while (cnt) {
+	tempc=LTDCFindBlk(p,blk); //TODO preempt
+	if (tempc) {
+	  MemCpy(buf,&tempc->body,BLK_SIZE);
+	  cnt--;
+	  buf+=BLK_SIZE;
+	  blk++;
+	} else
+	  break;
+      }
+    }
+    if (cnt) {
+      n=cnt;
+      if (n>bdev->max_reads)
+	n=bdev->max_reads;
+      blk2=blk;
+      sec=blk2%fdc_disk_sectors+1;blk2=blk2/fdc_disk_sectors;
+      head=blk2%fdc_drive_heads;
+      cyl=blk2/fdc_drive_heads;
+      if (!FDCReadTrack(bdev,cyl,head,blk-(sec-1)))
+	okay=FALSE;
+      MemCpy(buf,fdc_dma_buf+(sec-1)<<BLK_SIZE_BITS,n<<BLK_SIZE_BITS);
+      if (bdev->flags & LTBDF_READ_CACHE)
+	LTDCAdd(DriveToPartition(bdev->partition_base),
+	  fdc_dma_buf,blk-(sec-1),fdc_disk_sectors);
+      buf+=n<<BLK_SIZE_BITS;
+      blk+=n;
+      cnt-=n;
+    }
+  }
+  return okay;
+}
+
+BoolU8 FDCWriteBlk2(LTBlkDev *bdev,U1 *buf, U1 cyl, U1 head,U1 sec,U8 blk)
+{
+  I8 i;
+  U8 size=bdev->max_writes<<BLK_SIZE_BITS-1;
+
+  for (i=0;i<fdc_retries;i++) { //Retry up to 10 times
+    FDCSeek(bdev,cyl,head);
+
+    MemCpy(fdc_dma_buf,buf,size+1);
+    OutP(0x0A,0x42);  //Shut down old DMA
+    OutP(0x09,0x02);
+    OutP(0x08,0x00);  //ctrl
+    OutP(0x0B,0x5A);  //mode Write
+    OutP(0x0C,0);
+    OutP(0x04,fdc_dma_buf & 0xFF);  //addr
+    OutP(0x04,(fdc_dma_buf>>8) & 0xFF);
+    OutP(0x81,fdc_dma_buf>>16);     //set page
+    OutP(0x0C,0);
+    OutP(0x05,size.u1[0]);  //cnt
+    OutP(0x05,size.u1[1]);
+    OutP(0x0A,0x02);  //Start new DMA
+    OutP(0x09,0x06);
+
+    FDCSendCmdU1(bdev,0xC5);
+    FDCSendCmdU1(bdev,head<<2);
+    FDCSendCmdU1(bdev,cyl);
+    FDCSendCmdU1(bdev,head);
+    FDCSendCmdU1(bdev,sec);
+    FDCSendCmdU1(bdev,BLK_SIZE>>8);
+    FDCSendCmdU1(bdev,fdc_disk_sectors);	//last sec
+    FDCSendCmdU1(bdev,0x1B);	//gap
+    FDCSendCmdU1(bdev,0xFF);
+    FDCWaitIrq(bdev);
+    if (bdev->status[2] || bdev->status[1] ||
+	bdev->status[0]) {
+      PrintFErr("FDC Write:%X,%X,%X\r\n",bdev->status[0],bdev->status[1],bdev->status[2]);
+      FDCReset(bdev);
+    } else
+      return TRUE;
+  }
+  coutln "FDC Write Failed!!!  Blk:",blk;
+  return FALSE;
+}
+
+BoolU8 FDCWBlks(LTPartition *p,U1 *buf, U8 blk, U8 cnt)
+{
+  BoolU4 okay=TRUE;
+  U8 n,blk2;
+  U1 cyl,head,sec;
+  LTBlkDev *bdev=p->bdev;
+  CheckLTBlkDev(bdev);
+  while (cnt>0) {
+    n=cnt;
+    if (n>bdev->max_writes)
+      n=bdev->max_writes;
+    blk2=blk;
+    sec=blk2%fdc_disk_sectors+1;blk2=blk2/fdc_disk_sectors;
+    head=blk2%fdc_drive_heads;
+    cyl=blk2/fdc_drive_heads;
+    if (!FDCWriteBlk2(bdev,buf,cyl,head,sec,blk))
+      okay=FALSE;
+    buf+=n<<BLK_SIZE_BITS;
+    blk+=n;
+    cnt-=n;
+  }
+  return okay;
+}

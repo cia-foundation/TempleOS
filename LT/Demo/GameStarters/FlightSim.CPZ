@@ -1,0 +1,348 @@
+//$FG,4$You probably want to avoid
+$FG$//$FG,4$three dimensional graphics because
+$FG$//$FG,4$support is not very good.  There
+$FG$//$FG,4$is no support for hidden surface
+$FG$//$FG,4$removal.$FG$
+
+#define MAP_WIDTH		1024
+#define MAP_HEIGHT		1024
+#define MAP_SCALE		20
+#define FORSHORTENING		100
+#define CONTROLS_SCALE		0.05
+#define COORDINATE_SCALE	256
+#define COORDINATE_BITS		8
+
+I2 elevations[MAP_HEIGHT][MAP_WIDTH];
+
+double
+  phi	=-45.0*pi/180.0,
+  theta1=  0.0*pi/180.0,
+  theta2=  0.0*pi/180.0,
+  speed =  0.2;
+
+I8 x=MAP_WIDTH>>1 *COORDINATE_SCALE*MAP_SCALE,
+   y=MAP_HEIGHT>>1*COORDINATE_SCALE*MAP_SCALE,
+   z=64  	  *COORDINATE_SCALE*MAP_SCALE;
+
+double grid_size=64.0;
+
+class MPCtrl {
+  double phi,theta1,theta2,grid_size;
+  I8 x,y,z;
+  BoolU4 update,done;
+  TssStruct *win_tss;
+};
+
+MPCtrl *mp;
+void InitMap()
+{
+  I8 i,j,k1,k2,x,y,xx,yy;
+  MemSet(elevations,0,sizeof(elevations));
+  for (i=0;i<10000;i++) {
+    x=RandU4%MAP_WIDTH;
+    y=RandU4%MAP_HEIGHT;
+    j=1<<(RandU4%6);
+    for (k1=-j;k1<=j;k1++)
+      for (k2=-j;k2<=j;k2++) {
+	xx=x+k2; yy=y+k1;
+	if (xx>=0 && xx<MAP_WIDTH &&
+	    yy>=0 && yy<MAP_HEIGHT)
+	  elevations[yy][xx]+=AbsI8(j-k1)+AbsI8(j-k2);
+      }
+  }
+
+  xx=x/MAP_SCALE/COORDINATE_SCALE;
+  yy=y/MAP_SCALE/COORDINATE_SCALE;
+  z+=elevations[yy][xx]*COORDINATE_SCALE;
+}
+
+void DrawIt(TssStruct *tss)
+{
+  I8 i,j,*r1,*r2,*r3,*r4,*r,x1,y1,z1,x2,y2,z2,xx,yy,grid_s,
+    cx=(tss->win_pixel_right-tss->win_pixel_left)>>1,
+    cy=(tss->win_pixel_bottom-tss->win_pixel_top)>>1,height;
+  double d;
+  GrBitMap *base=GrAlias(grbase2,tss);
+  I1 buf[128];
+  BoolU4 first;
+
+  //Adjust grid size to utilize whole CPU power
+  d=1.05*win_refresh/win_max_refresh;
+  if (d>1.5) d=1.5;
+  if (d<0.666666) d=0.666666;
+  grid_size*=0.975+0.025*d;
+  if (grid_size<10.0)
+    grid_size=10.0;
+  grid_s=grid_size;
+
+  //Pass stuff to other CPU
+  mp->phi=phi;
+  mp->theta1=theta1;
+  mp->theta2=theta2;
+  mp->x=x;
+  mp->y=y;
+  mp->z=z;
+  mp->update=TRUE;
+  mp->grid_size=grid_size;
+
+  xx=x/MAP_SCALE/COORDINATE_SCALE;
+  yy=y/MAP_SCALE/COORDINATE_SCALE;
+  height=z/COORDINATE_SCALE-elevations[yy][xx];
+  if (height<0)
+    Sound(1000); //Signal plane crashed
+
+  base->color=BLACK;
+  ClearWinText(tss);
+  SPrintF(buf,"Theta1:%5.1f Phi:%5.1f Theta2:%5.1f Box:%5.1f",
+    theta1*180/pi,phi*180/pi,theta2*180/pi,grid_size);
+  GrText(base,0,0,buf);
+  SPrintF(buf,"x:%5.1f y:%5.1f z:%5.1f height:%3d",
+    x*1.0/COORDINATE_SCALE,y*1.0/COORDINATE_SCALE,z*1.0/COORDINATE_SCALE,
+    height);
+  GrText(base,0,FONT_HEIGHT,buf);
+
+  //World to screen coordinates
+  r1=GrTheta(theta1);
+  r2=GrPhi(phi);
+  r3=GrTheta(theta2);
+  r4=GrMulMat(r1,r2);
+  r=GrMulMat(r4,r3);
+  Free(r1);
+  Free(r2);
+  Free(r3);
+  Free(r4);
+
+  base->pen_width=2;
+  base->color=BLACK;
+  GrLine3(base,cx+5,cy,0,cx-5,cy,0);
+  GrLine3(base,cx,cy+5,0,cx,cy-5,0);
+
+  base->color=GREEN;
+
+  x2=0;y2=0;z2=0;
+  for (i=yy-grid_s;i<yy+grid_s;i++) {
+    if (i>=0 && i<MAP_HEIGHT) {
+      first=TRUE;
+      for (j=xx-grid_s;j<xx+grid_s;j++) {
+	if (j>=0 && j<MAP_WIDTH) {
+	  x1=j*MAP_SCALE-x>>COORDINATE_BITS;
+	  y1=i*MAP_SCALE-y>>COORDINATE_BITS;
+	  z1=elevations[i][j]-z>>COORDINATE_BITS;
+	  GrRotate(r,&x1,&y1,&z1);
+	  if (z1<0) {
+	    z1=AbsI8(z1)+FORSHORTENING;
+	    x1=x1*FORSHORTENING/z1;
+	    y1=y1*FORSHORTENING/z1;
+ 
+	    if (!first)
+	      GrLine(base,x1+cx,cy-y1,x2+cx,cy-y2);
+	  }
+	  x2=x1;y2=y1;z2=z1;
+	  first=FALSE;
+	}
+      }
+    }
+  }
+  Free(r);
+  GrDel(base);
+}
+
+void MPDrawIt(MPCtrl *mp)
+{
+  TssStruct *tss=mp->win_tss;
+  I8 i,j,*r1,*r2,*r3,*r4,*r,x1,y1,z1,x2,y2,z2,xx,yy,
+    cx=(tss->win_pixel_right-tss->win_pixel_left)>>1,
+    cy=(tss->win_pixel_bottom-tss->win_pixel_top)>>1;
+  GrBitMap *base=GrAlias(Gs->grbase,Fs);
+  BoolU4 first;
+  I8 x=mp->x,y=mp->y,z=mp->z,grid_s=mp->grid_size;
+
+  base->win_tss=tss;
+
+  xx=x/MAP_SCALE/COORDINATE_SCALE;
+  yy=y/MAP_SCALE/COORDINATE_SCALE;
+
+  //World to screen coordinates
+  r1=GrTheta(mp->theta1);
+  r2=GrPhi(mp->phi);
+  r3=GrTheta(mp->theta2);
+  r4=GrMulMat(r1,r2);
+  r=GrMulMat(r4,r3);
+  Free(r1);
+  Free(r2);
+  Free(r3);
+  Free(r4);
+ 
+  GrClear(base);
+ 
+  base->color=GREEN^WHITE;
+  x2=0;y2=0;z2=0;
+  for (j=xx-grid_s;j<xx+grid_s;j++) {
+    if (j>=0 && j<MAP_WIDTH) {
+      first=TRUE;
+      for (i=yy-grid_s;i<yy+grid_s;i++) {
+	if (i>=0 && i<MAP_HEIGHT) {
+	  x1=j*MAP_SCALE-x>>COORDINATE_BITS;
+	  y1=i*MAP_SCALE-y>>COORDINATE_BITS;
+	  z1=elevations[i][j]-z>>COORDINATE_BITS;
+	  GrRotate(r,&x1,&y1,&z1);
+	  if (z1<0) {
+	    z1=AbsI8(z1)+FORSHORTENING;
+	    x1=x1*FORSHORTENING/z1;
+	    y1=y1*FORSHORTENING/z1;
+ 
+	    if (!first)
+	      GrLine(base,x1+cx,cy-y1,x2+cx,cy-y2);
+	  }
+	  x2=x1;y2=y1;z2=z1;
+	  first=FALSE;
+	}
+      }
+    }
+  }
+  Free(r);
+  GrDel(base);
+}
+
+void MPFSim()
+{
+  while (!mp->done) {
+    while (!mp->update && !mp->done)
+      SwapInNext;
+    MPDrawIt(mp);
+    mp->update=FALSE;
+  }
+  GrClear(Gs->grbase);
+  mp->done=FALSE;
+}
+
+void AnimateTsk()
+{
+  I8 *r1,*r2,*r3,*r4,*r,x1,y1,z1;
+  while (TRUE) {
+
+    //Screen to world coordinates
+    r1=GrTheta(-theta2);
+    r2=GrPhi(-phi);
+    r3=GrTheta(-theta1);
+    r4=GrMulMat(r1,r2);
+    r=GrMulMat(r4,r3);
+
+    x1=0;y1=0;z1=-1.0*speed*COORDINATE_SCALE;
+    GrRotate(r,&x1,&y1,&z1);
+    x+=x1;
+    y+=y1;
+    z+=z1;
+    Free(r1);
+    Free(r2);
+    Free(r3);
+    Free(r4);
+    Free(r);
+    Sleep(1);
+  }
+}
+
+void SongEndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void SongTsk()
+{
+  Fs->end_task_cb=&SongEndTsk;
+  ResetMusicSettings;
+  while (TRUE) {
+    Play("3etDCDqDetABFsFBFBqC2G3BeDF");
+    Play("etDCDqDetABFsFBFBqC2G3BeDF");
+    Play("qReFDqDeF2GqR3sABABqFetREA");
+    Play("qReFDqDeF2GqR3sABABqFetREA");
+  }
+}
+
+void EndFSim()
+{
+  mp->done=TRUE;
+  while (mp->done)
+    SwapInNext;
+  FreeHC(mp,mp_heap);
+}
+
+void EndFSimCB()
+{
+  //We need this to shut-down CPU#1 task
+  //in case of CPU0 task getting terminated
+  //irregularly.
+  EndFSim;
+  Exit;
+}
+
+
+
+void FlightSim()
+{
+  I8 ch,sc;
+  double pp,tt1,tt2;
+  void *old_update=Fs->update_win;
+  TssStruct *animate_tss,song_tss;
+  BoolU4 old_border=WinBorder(OFF);
+  BoolU4 old_wordstat=WordStat(OFF);
+
+  //Set callback for irregular aborts
+  Fs->end_task_cb=&EndFSimCB;
+
+  WinMax;
+  InitMap;
+  Fs->update_win=&DrawIt;
+  animate_tss=Spawn(&AnimateTsk,"FlightSim Animate",Fs);
+  song_tss=Spawn(&SongTsk,"FlightSim Song",Fs);
+
+  //This heap is uncached
+  mp=MAllocHCZ(sizeof(MPCtrl),mp_heap);
+  WbInvd; //Write mp out of cache
+
+  mp->win_tss=Fs;
+  if (mp_cnt>1)
+    MPQueueJob(&MPFSim,NULL,1<<MPCf_FREE_ON_COMPLETE,TRUE);
+  try
+  do {
+    ch=GetKey(&sc);
+    pp=phi; tt1=theta1; tt2=theta2;
+    switch (ch) {
+      case 0:
+	switch (sc.u1[0]) {
+	  case SC_CURSOR_DOWN:
+	    phi   +=-CONTROLS_SCALE*Cos(tt1);
+	    theta2+=-CONTROLS_SCALE*Sin(tt1)*Sin(phi);
+	    break;
+	  case SC_CURSOR_UP:
+	    phi   -=-CONTROLS_SCALE*Cos(tt1);
+	    theta2-=-CONTROLS_SCALE*Sin(tt1)*Sin(phi);
+	    break;
+	  case SC_CURSOR_RIGHT:
+	    theta1+=CONTROLS_SCALE;
+	    break;
+	  case SC_CURSOR_LEFT:
+	    theta1-=CONTROLS_SCALE;
+	    break;
+	}
+	break;
+    }
+    theta1=Unwrap(theta1);
+    phi   =Unwrap(phi);
+    theta2=Unwrap(theta2);
+  } while (ch!=CH_CTRLQ && ch!=CH_ESC);
+  catch
+    Fs->catch_except=TRUE;
+
+  Kill(animate_tss);
+  Kill(song_tss);
+  Fs->update_win=old_update;
+  Fs->end_task_cb=NULL;
+  WinBorder(old_border);
+  WordStat(old_wordstat);
+ 
+  EndFSim;
+}
+
+FlightSim;

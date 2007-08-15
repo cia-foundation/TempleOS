@@ -1,8 +1,0 @@
-extern U8i SysEcho(U8i val);
-SysEcho(0);  //0=echo OFF   1=echo ON
-#include "/LT/OSMain/ADAMK.HPZ"
-#include "/LT/OSMain/ADAMK2.HPZ"
-#include "/LT/OSMain/ADAMK3.HPZ"
-#include "/LT/COMPILE/CMP.HPZ"
-Cd("/LT/ADAM");;
-#include "ADAM2"

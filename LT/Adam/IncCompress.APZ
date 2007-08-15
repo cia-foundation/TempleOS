@@ -1,0 +1,311 @@
+#help_index "Compression"
+
+#define ICT_U2	1
+#define ICT_U4	2
+#define ICT_U8	3
+
+class IncCompressStructU2
+{
+  U2 match_start;
+  U2 match_size;
+  U2 diff_size;
+  U0 diff_data;
+};
+
+class IncCompressStructU4
+{
+  U4 match_start;
+  U2 match_size;
+  U2 diff_size;
+  U0 diff_data;
+};
+
+class IncCompressStructU8
+{
+  U8 match_start;
+  U2 match_size;
+  U2 diff_size;
+  U0 diff_data;
+};
+
+class IntermediateIncCompressStruct
+{
+  IntermediateIncCompressStruct *next,*last;
+  U8 match_start_ref,match_start,match_size;
+};
+
+void IncCompressRange(U1 *ref,U8 ref_size,U1 *b,U8 range_start,U8 range_end,
+		     IntermediateIncCompressStruct *root,U8 type_size)
+{
+  I8 i,j,k,n,best_k=0,best_j,best_i;
+  IntermediateIncCompressStruct *tempc;
+
+//$BK,1$TODO: improve this algorithm$BK,0$
+
+  for (i=range_start;i<range_end;i++) {
+    for (j=0;j<ref_size;j++) {
+      k=0;
+      n=(ref_size-j<range_end-i) ? ref_size-j:range_end-i;
+      while (ref[j+k]==b[i+k] && k<n)
+	k++;
+      if (k>best_k) {
+	best_k=k;
+	best_j=j;
+	best_i=i;
+      }
+    }
+  }
+  if (best_k>type_size) {
+    if (range_start+type_size<best_i)
+      IncCompressRange(ref,ref_size,b,range_start,best_i,root,type_size);
+    tempc=MAlloc(sizeof(IntermediateIncCompressStruct));
+    tempc->match_start_ref=best_j;
+    tempc->match_start=best_i;
+    tempc->match_size=best_k;
+    InsQue(tempc,root->last);
+    if (best_i+best_k+type_size<range_end)
+      IncCompressRange(ref,ref_size,b,best_i+best_k,range_end,root,type_size);
+  }
+}
+ 
+
+public IncCompressStructU2 *IncCompress(U1 *ref,U8 ref_size,U1 *b,U8 size)
+//This is for incremental compression.
+//In theory it works when only a few
+//changes have been made.  Might be
+//better just to stick with $LK,"CompressBuf","MN:CompressBuf"$().
+{
+  U8 i,j=0,l=0,m=0,ic_type;
+  U1 *u1,*result;
+  U2 *u2;
+  U4 *u4;
+  U8 *u8;
+  IntermediateIncCompressStruct root,*tempc,*tempc1;
+  IncCompressStructU2 *tempi2;
+  IncCompressStructU4 *tempi4;
+  IncCompressStructU8 *tempi8;
+  root.next=&root;
+  root.last=&root;
+  if (ref_size<=0xFFFF && size<=0xFFFF) {
+    ic_type=ICT_U2;
+    i=sizeof(U1)+size+2*sizeof(U2);
+    IncCompressRange(ref,ref_size,b,0,size,&root,sizeof(IncCompressStructU2));
+    if (root.next==&root)
+      i+=sizeof(IncCompressStructU2);
+    else {
+      tempc=root.next;
+      while (tempc!=&root) {
+	i-=tempc->match_size-sizeof(IncCompressStructU2);
+	tempc=tempc->next;
+      }
+    }
+  } else if (ref_size<=0xFFFFFFFF && size<=0xFFFFFFFF) {
+    ic_type=ICT_U4;
+    i=sizeof(U1)+size+2*sizeof(U4);
+    IncCompressRange(ref,ref_size,b,0,size,&root,sizeof(IncCompressStructU4));
+    if (root.next==&root)
+      i+=sizeof(IncCompressStructU4);
+    else {
+      tempc=root.next;
+      while (tempc!=&root) {
+	i-=tempc->match_size-sizeof(IncCompressStructU4);
+	tempc=tempc->next;
+      }
+    }
+  } else {
+    ic_type=ICT_U8;
+    i=sizeof(U1)+size+2*sizeof(U8);
+    IncCompressRange(ref,ref_size,b,0,size,&root,sizeof(IncCompressStructU8));
+    if (root.next==&root)
+      i+=sizeof(IncCompressStructU8);
+    else {
+      tempc=root.next;
+      while (tempc!=&root) {
+	i-=tempc->match_size-sizeof(IncCompressStructU8);
+	tempc=tempc->next;
+      }
+    }
+  }
+  result=MAlloc(i);
+  u1=result;
+  *u1=ic_type;
+  switch (ic_type) {
+    case ICT_U2:
+      u2=result+sizeof(U1);
+      *u2=i;
+      u2+=sizeof(U2);
+      *u2=size;
+      tempi2=u2+sizeof(U2);
+
+      tempc=root.next;
+      while (tempc!=&root) {
+	tempc1=tempc->next;
+	if (l || tempc->match_start-(j+l)) {
+	  tempi2->match_start=m;
+	  tempi2->match_size=l;
+	  tempi2->diff_size=tempc->match_start-(j+l);
+	  if (tempi2->diff_size)
+	    MemCpy(&tempi2->diff_data,b+j+l,tempi2->diff_size);
+	  tempi2+=sizeof(IncCompressStructU2)+tempi2->diff_size;
+	}
+	m=tempc->match_start_ref;
+	j=tempc->match_start;
+	l=tempc->match_size;
+	Free(tempc);
+	tempc=tempc1;
+      }
+      tempi2->match_start=m;
+      tempi2->match_size=l;
+      tempi2->diff_size=size-(j+l);
+      if (tempi2->diff_size)
+	MemCpy(&tempi2->diff_data,b+j+l,tempi2->diff_size);
+      break;
+    case ICT_U4:
+      u4=result+sizeof(U1);
+      *u4=i;
+      u4+=sizeof(U4);
+      *u4=size;
+      tempi4=u4+sizeof(U4);
+
+//$BK,1$TODO: deal with >65536 matches and differences$BK,0$
+      tempc=root.next;
+      while (tempc!=&root) {
+	tempc1=tempc->next;
+	if (l || tempc->match_start-(j+l)) {
+	  tempi4->match_start=m;
+	  tempi4->match_size=l;
+	  tempi4->diff_size=tempc->match_start-(j+l);
+	  if (tempi4->diff_size)
+	    MemCpy(&tempi4->diff_data,b+j+l,tempi4->diff_size);
+	  tempi4+=sizeof(IncCompressStructU4)+tempi4->diff_size;
+	}
+	m=tempc->match_start_ref;
+	j=tempc->match_start;
+	l=tempc->match_size;
+	Free(tempc);
+	tempc=tempc1;
+      }
+      tempi4->match_start=m;
+      tempi4->match_size=l;
+      tempi4->diff_size=size-(j+l);
+      if (tempi4->diff_size)
+	MemCpy(&tempi4->diff_data,b+j+l,tempi4->diff_size);
+      break;
+    case ICT_U8:
+      u8=result+sizeof(U1);
+      *u8=i;
+      u8+=sizeof(U8);
+      *u8=size;
+      tempi8=u8+sizeof(U8);
+
+//$BK,1$TODO: deal with >65536 matches and differences$BK,0$
+      tempc=root.next;
+      while (tempc!=&root) {
+	tempc1=tempc->next;
+	if (l || tempc->match_start-(j+l)) {
+	  tempi8->match_start=m;
+	  tempi8->match_size=l;
+	  tempi8->diff_size=tempc->match_start-(j+l);
+	  if (tempi8->diff_size)
+	    MemCpy(&tempi8->diff_data,b+j+l,tempi8->diff_size);
+	  tempi8+=sizeof(IncCompressStructU8)+tempi8->diff_size;
+	}
+	m=tempc->match_start_ref;
+	j=tempc->match_start;
+	l=tempc->match_size;
+	Free(tempc);
+	tempc=tempc1;
+      }
+      tempi8->match_start=m;
+      tempi8->match_size=l;
+      tempi8->diff_size=size-(j+l);
+      if (tempi8->diff_size)
+	MemCpy(&tempi8->diff_data,b+j+l,tempi8->diff_size);
+      break;
+  }
+  return result;
+}
+
+public U1 *IncExpand(U1 *ref,IncCompressStructU2 *b,U8 *size=NULL)
+{
+  U1 *result,*dst,*u1=b,*b_end;
+  U2 *u2;
+  U4 *u4;
+  U8 *u8=b,s,ic_type;
+  IncCompressStructU2 *tempi2;
+  IncCompressStructU4 *tempi4;
+  IncCompressStructU8 *tempi8;
+
+  ic_type=*u1;
+
+  switch (ic_type) {
+    case ICT_U2:
+      u2=b+sizeof(U1);
+      b_end=b+*u2;
+      u2+=sizeof(U2);
+      s=*u2;
+      break;
+    case ICT_U4:
+      u4=b+sizeof(U1);
+      b_end=b+*u4;
+      u4+=sizeof(U4);
+      s=*u4;
+      break;
+    case ICT_U8:
+      u8=b+sizeof(U1);
+      b_end=b+*u8;
+      u8+=sizeof(U8);
+      s=*u8;
+      break;
+  }
+  result=MAlloc(s);
+  if (size) *size=s;
+  dst=result;
+
+  switch (ic_type) {
+    case ICT_U2:
+      tempi2=b+sizeof(U1)+2*sizeof(U2);
+      while (tempi2<b_end) {
+	if (tempi2->match_size) {
+	  MemCpy(dst,ref+tempi2->match_start,tempi2->match_size);
+	  dst+=tempi2->match_size;
+	}
+	if (tempi2->diff_size) {
+	  MemCpy(dst,&tempi2->diff_data,tempi2->diff_size);
+	  dst+=tempi2->diff_size;
+	}
+	tempi2+=sizeof(IncCompressStructU2)+tempi2->diff_size;
+      }
+      break;
+    case ICT_U4:
+      tempi4=b+sizeof(U1)+2*sizeof(U4);
+      while (tempi4<b_end) {
+	if (tempi4->match_size) {
+	  MemCpy(dst,ref+tempi4->match_start,tempi4->match_size);
+	  dst+=tempi4->match_size;
+	}
+	if (tempi4->diff_size) {
+	  MemCpy(dst,&tempi4->diff_data,tempi4->diff_size);
+	  dst+=tempi4->diff_size;
+	}
+	tempi4+=sizeof(IncCompressStructU4)+tempi4->diff_size;
+      }
+      break;
+    case ICT_U8:
+      tempi8=b+sizeof(U1)+2*sizeof(U8);
+      while (tempi8<b_end) {
+	if (tempi8->match_size) {
+	  MemCpy(dst,ref+tempi8->match_start,tempi8->match_size);
+	  dst+=tempi8->match_size;
+	}
+	if (tempi8->diff_size) {
+	  MemCpy(dst,&tempi8->diff_data,tempi8->diff_size);
+	  dst+=tempi8->diff_size;
+	}
+	tempi8+=sizeof(IncCompressStructU8)+tempi8->diff_size;
+      }
+      break;
+  }
+  return result;
+}
+#help_index ""

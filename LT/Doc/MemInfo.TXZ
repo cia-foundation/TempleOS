@@ -1,0 +1,82 @@
+$WW,1$$FG,5$$TX+CX,"MEMORY USAGE"$$FG$
+
+
+$FG,2$Page Tables:$FG$
+0x1000*(PML1+PML2+PML3+PML4)
+-----------
+0x83000
+
+$FG,2$Heap Size:$FG$
+*SYS_MEMBLKS-0x100000-page_tables
+-----------
+sys_heap_limit+1-sys_heap_base
+
+$FG,2$mp_heap:$FG$
+-----------
+0x00200000
+
+$FG,2$Cain Heap CPU #1:$FG$
+-----------
+0x00200000*(mp_cnt-1)
+
+
+
+
+
+$FG,4$MAlloc Blk Allocations:$FG$
+
+$FG,2$Allocations below 0x200, first one:$FG$
+0x1E00+size_rounded_up_to_page
+-----------
+0x2000
+
+$FG,2$Allocations below 0x400, first one:$FG$
+0x1E00+size_rounded_up_to_page
+-----------
+0x2200
+
+$FG,2$Allocations below 0x20000:$FG$
+size_rounded_up_to_page+0x200
+
+
+$FG,2$Allocations above 0x20000:$FG$
+(size-0x400)rounded_up_to_power_2+0x400
+
+
+
+
+$FG,4$Task Usage:$FG$
+
+$FG,2$Stack:$FG$
+0x20000+0x400
+
+$FG,2$Hash Table:$FG$
+0x08000+0x200
+
+$FG,2$First Small Chunk:$FG$
+0x2000
+
+
+$FG,4$Adam Task:$FG$
+
+$FG,2$Default RAM Drive B (when used):$FG$
+0x20000*0x200+0x400
+-----------
+0x04000400
+
+$FG,2$grbase2:
+vga_image:
+gr_merge_base:
+Gs->grbase*mp_cnt:$FG$
+(mp_cnt+3)*(0x40000+0x400)
+-----------
+0x00101000
+
+$FG,2$Disk Cache:$FG$
+0x8000000+0x400
+-----------
+0x08000400
+
+$FG,2$WordStat:$FG$
+-----------
+big--holds a sparse matrix containing statistics on which words follow which other words with what frequency.

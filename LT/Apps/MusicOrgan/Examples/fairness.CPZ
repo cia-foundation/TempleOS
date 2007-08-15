@@ -1,0 +1,41 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  TssStruct *tss;
+  Fs->end_task_cb=&EndTsk;
+  tss=PopUpViewStr(
+    "$$LK-A,\"BF:Luke,7:42\"$$\r\n"
+    "\r\n"
+    "Prodigal Son\r\n"
+    "$$LK-A,\"BF:Luke,15:21\"$$\r\n"
+    );
+  WaitTskIdle(tss);
+  tss->win_right=Fs->win_right;
+  tss->win_left=Fs->win_left;
+  tss->win_top=Fs->win_bottom+3;
+  tss->win_bottom=tss->win_top+12;
+  music_tempo=2.5;
+  try {
+  PutS("$$WW+H,1$$");
+  while (!ScanKey) {
+	Play("3qGGsEAEAqAsF2G3F2G3qCeEFqD",
+		"Life, \0life, \0isn't \0 \0 \0 \0fair.  \0Isn't \0 \0 \0 \0fair.\r\n\0 \0 \0 \0");
+	Play("GGsEAEAqAsF2G3F2G3qCeEFqD",
+		"Life, \0life, \0isn't \0 \0 \0 \0fair.  \0Isn't \0 \0 \0 \0fair.\r\n\0 \0 \0 \0");
+	Play("eFCqEBDBE2eG3EsFEFE",
+		" \0 \0I \0 \0ne\0ver \0sin.\r\n\0 \0 \0 \0 \0 \0 \0");
+	Play("eFCqEBDBE2eG3EsFEFE",
+		" \0 \0I \0 \0ne\0ver \0win.\r\n\0 \0 \0 \0 \0 \0 \0");
+	PutS("$$FG,GREEN$$(A warning on presumption. 'Who loves more man -- forgiven big debt or little?'  See prodigal son.)$$FG$$\r\n");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

@@ -1,0 +1,992 @@
+class OrgNote
+{
+  OrgNote *next,*last;
+  I1 note,octive,duration;
+  I1 ascii[9];
+  I1 *word;
+};
+
+class OrgCtrl
+{
+  OrgNote root;
+  BoolU4 record_on;
+  I8 screen_x;
+  OrgNote *cur_note,*insert_point;
+  void old_update(TssStruct *tss);
+};
+
+I1 *org_note_list="A\0A#\0B\0C\0C#\0D\0D#\0E\0F\0F#\0G\0G#\0\0";
+I1 org_note_map[12]={6,6,5,4,4,3,3,2,1,1,0,0};
+I1 org_note_inverse_map[7]={10,8,7,5,3,2,0};
+
+
+	$PI,"<PI2>",2$
+
+
+
+	$PI,"<PI3>",3$
+
+
+
+	$PI,"<PI4>",4$
+
+
+
+	$PI,"<PI5>",5$
+
+
+
+	$PI,"<PI6>",6$
+
+
+
+	$PI,"<PI7>",7$
+
+
+
+	$PI,"<PI8>",8$
+
+
+
+	$PI,"<PI9>",9$
+
+
+
+	$PI,"<PI11>",11$
+
+
+	$PI,"<PI18>",18$
+
+	
+	$PI,"<PI19>",19$
+
+
+	$PI,"<PI20>",20$
+
+
+	$PI,"<PI21>",21$
+
+
+
+
+#define ORG_NOTE_SPACING	9
+#define ORG_NUM_DURATIONS	8
+double org_durations[ORG_NUM_DURATIONS+1]={2*.25/3,.25,2*.5/3,.5,2.0/3.0,1.0,2.0,4.0,1000000.0};
+I1 *org_duration_list="st\0s\0et\0e\0qt\0q\0h\0w\0\0";
+U1 *org_duration_PI_map[ORG_NUM_DURATIONS]={$IB,"<IB7>",7$,$IB,"<IB2>",2$,$IB,"<IB8>",8$,
+			$IB,"<IB3>",3$,$IB,"<IB9>",9$,$IB,"<IB4>",4$,
+			$IB,"<IB5>",5$,$IB,"<IB6>",6$};
+
+
+void DrawIt(TssStruct *tss)
+{
+  OrgCtrl *oc=tss->user_data0;
+  OrgNote *tempo;
+  I8 i,y;
+  I8 w=tss->win_pixel_right-tss->win_pixel_left;
+  I8 h=tss->win_pixel_bottom-tss->win_pixel_top;
+  GrBitMap *base=GrAlias(grbase2,tss);
+ 
+
+  ClearWinText(tss);
+  base->color=BLACK;
+  for (i=1;i<6;i++)
+    GrLine(base,0,i*8,w,i*8);
+  for (i=7;i<12;i++)
+    GrLine(base,0,i*8,w,i*8);
+
+  i=0;
+  tempo=oc->root.next;
+  while (tempo!=&oc->root) {
+    if (tempo==oc->cur_note)
+      base->color=GREEN;
+    else {
+      if (tempo->octive)
+	base->color=BLACK;
+      else
+	base->color=DKGRAY;
+      if (tempo->word)
+	if (StrCmp(tempo->word," "))
+	  base->color=RED;
+    }
+    if (tempo->octive)
+      y=(15+(org_note_map[tempo->note]-7*(tempo->octive-3)))*4;
+    else
+      y=50;
+    base->bkcolor=WHITE;
+    GrElemsPlot(base,8+i*ORG_NOTE_SPACING-oc->screen_x,y,0,
+      org_duration_PI_map[tempo->duration]);
+    tempo=tempo->next;
+    i++;
+  }
+  GrDel(base);
+  oc->old_update(tss);
+}
+
+OrgNote *OrgFindNote(I8 x,I8 y)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  OrgNote *tempo=oc->root.next;
+  I8 i=(x+oc->screen_x-8+ORG_NOTE_SPACING/2)/ORG_NOTE_SPACING;
+  nounusedwarn y;
+  while (i-- && tempo!=&oc->root)
+    tempo=tempo->next;
+  if (tempo==&oc->root)
+    tempo=NULL;
+  return tempo;
+}
+
+#define ORGR_REST		-5
+#define ORGR_INSERT_NOTE	-4
+#define ORGR_DELETE_NOTE	-3
+#define ORGR_SET_WORD		-2
+
+double PopUpDuration()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPrintF(l,"$$MU,\"Set Word\" %d$$\r\n",ORGR_SET_WORD);
+  LtfPrintF(l,"$$MU,\"Make Rest\" %d$$\r\n",ORGR_REST);
+  LtfPrintF(l,"$$MU,\"Insert Note\" %d$$\r\n",ORGR_INSERT_NOTE);
+  LtfPrintF(l,"$$MU,\"Delete Note\" %d$$\r\n\r\n",ORGR_DELETE_NOTE);
+  for (i=0;i<ORG_NUM_DURATIONS;i++)
+    LtfPrintF(l,"$$MU,\"%7.5f\" %d$$\r\n",org_durations[i],i);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void OrgRightClick(I8 x,I8 y)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  I1 *st,*st2;
+  OrgNote *tempo=OrgFindNote(x,y),*tempo1;
+  I8 i;
+  U8 old_ltf_flags=Fs->cur_ltf->flags;
+  oc->insert_point=tempo;
+  oc->cur_note=tempo;
+  if (tempo) {
+    Btr(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+    ip_inhibit_win_operations=FALSE;
+    i=PopUpDuration;
+    if (i>=0 && i<ORG_NUM_DURATIONS)
+      tempo->duration=i;
+    else {
+      switch (i) {
+	case ORGR_REST:
+	  tempo->octive=0;
+	  tempo->note=0;
+	  break;
+	case ORGR_SET_WORD:
+	  Fs->cur_ltf->flags&=~LTFF_FORM;
+	  if (tempo->word)
+	    st2=MSPrintF("\r\nWord(\"%Q\"):",tempo->word);
+	  else
+	    st2=MSPrintF("\r\nWord(\"\"):");
+	  LtfBottom(Fs->cur_ltf);
+	  st=PmtStr(st2);
+	  Free(st2);
+	  Free(tempo->word);
+	  if (*st) {
+	    tempo->word=MSPrintF("%q",st);
+	    Free(st);
+	  } else
+	    tempo->word=NewStr(" ");
+	  Fs->cur_ltf->flags=old_ltf_flags;
+	  break;
+	case ORGR_INSERT_NOTE:
+	  tempo1=MAllocIdentical(tempo);
+	  tempo1->word=NewStr(tempo->word);
+	  InsQue(tempo1,tempo);
+	  break;
+	case ORGR_DELETE_NOTE:
+	  oc->insert_point=tempo->next;
+	  oc->cur_note=oc->insert_point;
+	  RemQue(tempo);
+	  Free(tempo->word);
+	  Free(tempo);
+	  break;
+      }
+    }
+    ip_inhibit_win_operations=TRUE;
+    Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+  }
+}
+
+void OrgLeftClick(I8 x,I8 y)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  OrgNote *tempo=OrgFindNote(x,y);
+  I8 o,n,cmd,p1,p2;
+  oc->insert_point=tempo;
+  oc->cur_note=tempo;
+  if (tempo) {
+    do {
+      cmd=GetMsg(&p1,&p2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE|1<<MSG_IP_R_UP);
+      if (cmd==MSG_IP_R_UP)
+	OrgRightClick(p1,p2);
+      else {
+	p2=p2/4-15;
+	n=-p2%7;
+	o=3+p2/-7;
+	n=-n;
+	if (n<0) {
+	  n+=7;
+	  o++;
+	}
+	n=org_note_inverse_map[n];
+	tempo->note=n;
+	tempo->octive=o;
+      }
+    } while (cmd!=MSG_IP_L_UP);
+  }
+}
+
+void OrgPlayEnd()
+{
+  Sound(0);
+  Exit;
+}
+
+#define ORGPM_NORMAL	0
+#define ORGPM_REVERB1	1
+
+#define ORGPM_NUM_PLAY_MODES	2
+
+U8 org_play_mode=0;
+double org_play_f=0;
+void OrgPlayTsk()
+{
+  BoolU4 going_up=TRUE;
+  U8 i=0;
+  double f=0,f2=0;
+  Fs->end_task_cb=&OrgPlayEnd;
+  while (TRUE) {
+    i++;
+    switch (org_play_mode) {
+      case ORGPM_NORMAL:
+	if (org_play_f!=f) {
+	  f=org_play_f;
+	  Sound(f);
+	}
+	break;
+      case ORGPM_REVERB1:
+	if (org_play_f!=f) {
+	  if (f>0)
+	    f2=f;
+	  f=org_play_f;
+	}
+	if (!(i&15)) {
+	  if (i&16)
+	    Sound(f);
+	  else
+	    Sound(f2);
+	}
+	break;
+    }
+    Sleep(1);
+  }
+}
+
+
+U1 OrgCvtDuration(double d)
+{
+  double d1,d2;
+  I8 j;
+  for (j=0;j<ORG_NUM_DURATIONS;j++) {
+    d1=org_durations[j];
+    d2=org_durations[j+1];
+    if (d<d1*d2/(d1+d2))
+      return j;
+  }
+  return 0;
+}
+
+
+I1 *OrgMusicSetOctive(I1 *st,U8 *org_octive)
+{
+  I1 ch=*st++;
+  while (ch>='0' && ch<='9') {
+    *org_octive=ch-'0';
+    ch=*st++;
+  }
+  return --st;
+}
+
+I1 *OrgMusicSetNoteLen(I1 *st,double *org_duration)
+{
+  BoolU4 cont=TRUE;
+  do {
+    switch (*st++) {
+      case 'w': *org_duration=4.0;  break;
+      case 'h': *org_duration=2.0;  break;
+      case 'q': *org_duration=1.0;  break;
+      case 'e': *org_duration=0.5;   break;
+      case 's': *org_duration=0.25;   break;
+      case 't': *org_duration=2.0* *org_duration/3.0; break;
+      case '.': *org_duration=1.5* *org_duration; break;
+      default:
+	st--;
+	cont=FALSE;
+    }
+  } while (cont);
+  return st;
+}
+
+void OrgLoadSongStr(I1 *st,U8 *org_octive,double *org_duration)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  OrgNote *tempo;
+  U8 note,i=0;
+  while (*st) {
+    tempo=MAllocZ(sizeof(OrgNote));
+    st=OrgMusicSetOctive(st,org_octive);
+    st=OrgMusicSetNoteLen(st,org_duration);
+    st=OrgMusicSetOctive(st,org_octive);
+    if (!*st) break;
+    note=*st++-'A';
+    if (note<7) {
+      note=music_note_map[note];
+      if (*st=='b') {
+	note--;
+	st++;
+      } else if (*st=='#') {
+	note++;
+	st++;
+      }
+      tempo->note=note;
+      tempo->octive=*org_octive;
+    } else {
+      tempo->note=0;
+      tempo->octive=0;
+    }
+    if (*org_duration<=2*.25/3)
+      i=0;
+    else if (*org_duration<=.25)
+      i=1;
+    else if (*org_duration<=2*.5/3)
+      i=2;
+    else if (*org_duration<=.5)
+      i=3;
+    else if (*org_duration<=2.0/3)
+      i=4;
+    else if (*org_duration<=1.0)
+      i=5;
+    else if (*org_duration<=2.0)
+      i=6;
+    else
+      i=7;
+    tempo->duration=i;
+    InsQue(tempo,oc->root.last);
+  }
+}
+
+void OrgLoadSong(I1 *filename,U8 *org_octive,double *org_duration)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  I1 *st;
+  OrgNote *tempo;
+  LexStruct *lx=LexNew(ReadTextFile(filename),0,NewStr(filename));
+  Lex(lx);
+  while (lx->token) {
+    if (lx->token==TK_IDENT)
+      if (!StrCmp(lx->ident,"Play"))
+	if (Lex(lx)=='(')
+	  if (Lex(lx)==TK_STR) {
+	    tempo=oc->root.last;
+	    st=LexExtendStr(lx);
+	    OrgLoadSongStr(st,org_octive,org_duration);
+	    if (lx->token==',') {
+	      if (Lex(lx)==TK_STR) {
+		st=LexExtendStr(lx);
+		do {
+		  tempo=tempo->next;
+		  tempo->word=NewStr(st);
+		  st+=StrLen(st)+1;
+		} while (*st);
+	      }
+	    }
+	  }
+    Lex(lx);
+  }
+  LexDel(lx);
+}
+
+I1 *OrgCvtSong()
+{
+  OrgCtrl *oc=Fs->user_data0;
+  OrgNote *tempo;
+  I1 *buf,*src,*dst;
+  U8 i,note,octive,last_octive,last_duration;
+
+  i=0;
+  tempo=oc->root.next;
+  last_octive=-1;
+  last_duration=-1;
+  while (tempo!=&oc->root) {
+    dst=&tempo->ascii;
+    octive=tempo->octive;
+    note=tempo->note;
+    if (octive!=last_octive && (note || octive)) {
+      *dst++=octive+'0';
+      last_octive=octive;
+    }
+    if (tempo->duration!=last_duration) {
+      src=PointAtListEntry(tempo->duration,org_duration_list);
+      *dst++=src[0];
+      if (src[1])
+	*dst++=src[1];
+      last_duration=tempo->duration;
+    }
+    if (note || octive) {
+      src=PointAtListEntry(note,org_note_list);
+      *dst++=src[0];
+      if (src[1])
+	*dst++=src[1];
+    } else
+      *dst++='R';
+    *dst++=0;
+    i+=StrLen(tempo->ascii);
+    tempo=tempo->next;
+  }
+
+  buf=MAlloc(i+1);
+  dst=buf;
+  tempo=oc->root.next;
+  while (tempo!=&oc->root) {
+    StrCpy(dst,tempo->ascii);
+    dst+=StrLen(tempo->ascii);
+    tempo=tempo->next;
+  }
+  *dst++=0;
+  return buf;
+}
+
+void OrgDelSong(I1 *full_filename)
+{
+  EditFileNameStruct fn;
+  if (full_filename) {
+    StrCpy(fn.name,full_filename);
+    if (DoForm(&fn,"EditFileNameStruct"))
+      Del(fn.name);
+  }
+}
+
+void OrgSaveSong(I1 *dirname,I1 *full_filename=NULL)
+{
+  OrgCtrl *oc=Fs->user_data0;
+  Ltf *l=LtfNew;
+  BoolU4 has_words;
+  OrgNote *tempo,*tempo1;
+  double two_measure_left=8.0;
+  I1 *ptr,ch;
+ 
+  Free(OrgCvtSong); //set tempo->ascii;
+  tempo=oc->root.next;
+  tempo1=tempo;
+  has_words=FALSE;
+
+  LtfPutSExt(l,
+"void EndTsk()\r\n"
+"{\r\n"
+"  Sound(0);\r\n"
+"  Exit;\r\n"
+"}\r\n"
+"\r\n"
+"void Song()\r\n"
+"{\r\n"
+"  Fs->end_task_cb=&EndTsk;\r\n"
+"  music_tempo=2.5;\r\n"
+"  try {\r\n"
+"  while (!ScanKey) {\r\n"
+"\tPlay(\"");
+  while (tempo!=&oc->root) {
+    LtfPutSExt(l,tempo->ascii);
+    if (tempo->word) has_words=TRUE;
+    two_measure_left-=org_durations[tempo->duration];
+    tempo=tempo->next;
+    if (two_measure_left<0.001 && tempo!=&oc->root) {
+      if (has_words) {
+	LtfPutSExt(l,"\",\r\n\t\t\"");
+	while (tempo1!=tempo) {
+	  if (tempo1->word) {
+	    ptr=tempo1->word;
+	    while (ch=*ptr) {
+	      if (ch==CH_SPACE)
+		*ptr=CH_SHIFT_SPACE;
+	      ptr++;
+	    }
+	    LtfPrintF(l,"%Q\\0",tempo1->word);
+	  } else
+	    LtfPrintF(l,"%c\\0",CH_SHIFT_SPACE);
+	  tempo1=tempo1->next;
+	}
+      }
+      LtfPutSExt(l,"\");\r\n");
+      LtfPutSExt(l,"\tPlay(\"");
+      two_measure_left=8.0;
+      tempo1=tempo;
+      has_words=FALSE;
+    }
+  }
+  if (has_words) {
+    LtfPutSExt(l,"\",\r\n\t\t\"");
+    while (tempo1!=tempo) {
+      if (tempo1->word) {
+	ptr=tempo1->word;
+	while (ch=*ptr) {
+	  if (ch==CH_SPACE)
+	    *ptr=CH_SHIFT_SPACE;
+	  ptr++;
+	}
+	LtfPrintF(l,"%Q\\0",tempo1->word);
+      } else
+	LtfPrintF(l,"%c\\0",CH_SHIFT_SPACE);
+      tempo1=tempo1->next;
+    }
+  }
+  LtfPutSExt(l,"\");\r\n"
+"  }\r\n"
+"  } catch\r\n"
+"    Fs->catch_except=TRUE;\r\n"
+"  Sound(0);\r\n"
+"}\r\n"
+"\r\n"
+"Song;\r\n");
+  LtfRecalc(l);
+  if (full_filename)
+    StrCpy(l->filename.name,full_filename);
+  else
+    SPrintF(l->filename.name,"%s/Temp.CPZ",dirname);
+  LtfWrite(l,TRUE);
+  LtfDel(l);
+}
+
+void OrgClearSong()
+{
+  OrgCtrl *oc=Fs->user_data0;
+  OrgNote *tempo,*tempo1;
+  tempo=oc->root.next;
+  while (tempo!=&oc->root) {
+    tempo1=tempo->next;
+    Free(tempo);
+    tempo=tempo1;
+  }
+  oc->root.next=&oc->root;
+  oc->root.last=&oc->root;
+}
+
+void OrgHelp(I8 org_octive)
+{
+  I8 i;
+  coutln "$$CL$$$$BD,LTGRAY$$$$FD,YELLOW$$$$BU,LTGRAY$$$$FU,YELLOW$$$$FM,YELLOW$$$$BM,LTGRAY$$$$CM,0,12$$";
+  coutln "   E R T   U I   P [ ]     ";
+  coutln "A S D F G H J K L ; ' ENTER";
+  coutln;
+  coutln "$$FG,LTRED$$SPACE$$FG$$\t\tRest";
+  coutln "$$FG,LTRED$$BACKSPACE$$FG$$\t$$MA+A-X,\"Deletes Last Note\",\"\\x08\"$$";
+  coutln "$$FG,LTRED$$Left Mouse$$FG$$\tDrag note";
+  coutln "$$FG,LTRED$$Right Mouse$$FG$$\tChange duration or set word";
+  PutGrElem($IB,"<IB11>",11$,$IS,"<IS11>",11$,"$$PI+LM+LA,\"\",\"Msg(MSG_KEY_DOWN,0,SC_CURSOR_LEFT);\",%d$$");
+  cout	 "   ";
+  PutGrElem($IB,"<IB19>",19$,$IS,"<IS19>",19$,"$$PI+LM,\"\",\"x\",%d$$");
+  cout	 "   ";
+  if (Fs->user_data0><(OrgCtrl *)->record_on)
+    PutGrElem($IB,"<IB20>",20$,$IS,"<IS20>",20$,"$$PI+LM,\"\",\"z\",%d$$");
+  else
+    PutGrElem($IB,"<IB21>",21$,$IS,"<IS21>",21$,"$$PI+LM,\"\",\"z\",%d$$");
+  cout	 "   ";
+  PutGrElem($IB,"<IB18>",18$,$IS,"<IS18>",18$,"$$PI+LM+LA,\"\",\"Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);\",%d$$");
+  cout "\r\n\r\n\rOctive:    $$FG$$";
+  for (i=1;i<6;i++)
+    if (org_octive==i)
+      PrintF("$$BT-LE+LM-X+S,\"%d\",\"%d\"$$$$CM,3,0$$",i,i);
+    else
+      PrintF("$$BT-LE+LM-X,\"%d\",\"%d\"$$$$CM,3,0$$",i,i);
+  cout "\r\n\r\n\r\n";
+  cout " $$BT-LE+LM-X,\"Mode\",\"c\"$$$$CM,2,0$$";
+  cout "$$BT-LE+LM-X\"File Menu\",\"v\"$$$$CM,2,0$$";
+  cout "$$BT-LE+LM-X\"Random Song\",\",\"$$$$CM,2,0$$";
+  cout "$$BT-LE+LM-X\"Clear Song\",\".\"$$$$CM,2,0$$";
+  cout "$$BT-LE+LM-X,\"Exit\",\"\\x1B\"$$";
+  cout "\r\n\r\n\r";
+}
+
+#define ORGF_CANCEL	0
+#define ORGF_SAVE	1
+#define ORGF_CD		2
+#define ORGF_JUKEBOX	3
+#define ORGF_DELETE	4
+
+I8 OrgPopUpFileMenu(I1 *dirname)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPrintF(l,"%s\r\n\r\n",dirname);
+  LtfPrintF(l,"$$MU,\"Load Song\" %d$$\r\n",ORGF_JUKEBOX);
+  LtfPrintF(l,"$$MU,\"Save Song\" %d$$\r\n",ORGF_SAVE);
+  LtfPrintF(l,"$$MU,\"Delete Song\" %d$$\r\n",ORGF_DELETE);
+  LtfPrintF(l,"$$MU,\"Change Directory\" %d$$\r\n",ORGF_CD);
+  LtfPrintF(l,"$$MU,\"CANCEL\" %d$$\r\n",ORGF_CANCEL);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void MusicOrgan(I1 *dirname=NULL)
+{
+  OrgCtrl *oc=MAlloc(sizeof(OrgCtrl));
+  BoolU4 is_note;
+  U8 p1,p2,i,j,ch,sc,cmd=0,note_down_time;
+  U8 note,octive,org_octive=3;
+  double record_tempo=LTDATE_FREQ/2.5;
+  double f=0,last_f=0,org_duration=1.0;
+  I1 *buf,*filename=NULL;
+  TssStruct *tss=Spawn(&OrgPlayTsk);
+  OrgNote *tempo;
+  BoolU4 old_ip_double=Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+  BoolU4 old_inhibit=ip_inhibit_win_operations;
+  BoolU4 old_wordstat=WordStat(OFF);
+  U8 old_user_data0=Fs->user_data0;
+  U8 old_ltf_flags=Fs->cur_ltf->flags;
+  BoolU4 old_border=WinBorder(OFF);
+
+  Fs->cur_ltf->flags|=LTFF_FORM;
+
+  oc->screen_x=0;
+  oc->record_on=FALSE;
+  oc->root.next=&oc->root;
+  oc->root.last=&oc->root;
+  oc->insert_point=NULL;
+  oc->cur_note=NULL;
+
+  Fs->user_data0=oc;
+  WinMax;
+
+  if (!dirname)
+    dirname=NewStr("HOME/MusicOrgan");
+  else
+    dirname=NewStr(dirname);
+  ip_inhibit_win_operations=TRUE;
+  OrgHelp(org_octive);
+  oc->old_update=Fs->update_win;
+  Fs->update_win=&DrawIt;
+
+  try {
+  do {
+start:
+    if (ipty-Fs->win_top<13)
+      cmd=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP|
+	       1<<MSG_IP_MOVE);
+    else
+      cmd=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|1<<MSG_IP_MOVE);
+got_msg:
+    if (cmd==MSG_KEY_DOWN && p1==CH_SPACE && !p2) {
+      PutKey(p1,p2);
+      goto start;
+    }
+    if (cmd!=MSG_IP_MOVE)
+      LtfBottom(Fs->cur_ltf);
+    octive=org_octive;
+    if (cmd==MSG_KEY_DOWN) {
+      ch=p1;
+      sc=p2;
+      if (ch>='0' && ch<='9') {
+	org_octive=ch-'0';
+	OrgHelp(org_octive);
+      } else {
+	is_note=TRUE;
+	switch (ch) {
+	  case 0:
+	    if (sc.u1[0]==SC_CURSOR_LEFT) {
+	      oc->screen_x-=100;
+	    } else if (sc.u1[0]==SC_CURSOR_RIGHT) {
+	      oc->screen_x+=100;
+	    }
+	    is_note=FALSE;
+	    break;
+	  case 'a': note=7; octive--; break;
+	  case 's': note=8; octive--; break;
+	  case 'e': note=9; octive--; break;
+	  case 'd': note=10; octive--; break;
+	  case 'r': note=11; octive--; break;
+	  case 'f': note=0; break;
+	  case 't': note=1; break;
+	  case 'g': note=2; break;
+	  case 'h': note=3; break;
+	  case 'u': note=4; break;
+	  case 'j': note=5; break;
+	  case 'i': note=6; break;
+	  case 'k': note=7; break;
+	  case 'l': note=8; break;
+	  case 'p': note=9; break;
+	  case ';': note=10; break;
+	  case '[': note=11; break;
+	  case '\'': note=0; octive++; break;
+	  case ']': note=1; octive++; break;
+	  case '\r': note=2; octive++; break;
+	  case CH_SPACE:
+	    note=0;
+	    octive=0;
+	    break;
+	  case 'v':
+	    Btr(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	    ip_inhibit_win_operations=FALSE;
+	    switch (OrgPopUpFileMenu(dirname)) {
+	      case ORGF_SAVE:
+		OrgSaveSong(dirname,filename);
+		break;
+	      case ORGF_DELETE:
+		OrgDelSong(filename);
+		break;
+	      case ORGF_CD:
+		Free(filename);
+		filename=NULL;
+		buf=dirname;
+		if (dirname=PopUpPickDir)
+		  Free(buf);
+		else
+		  dirname=buf;
+		break;
+	      case ORGF_JUKEBOX:
+		Free(filename);
+		filename=NULL;
+		JukeBox(dirname,&filename);
+		if (filename) {
+		  oc->screen_x=0;
+		  org_duration=1.0;
+		  org_octive=3;
+		  OrgClearSong;
+		  OrgLoadSong(filename,&org_octive,&org_duration);
+		  oc->record_on=OFF;
+		  oc->insert_point=NULL;
+		  oc->cur_note=NULL;
+		}
+		break;
+	    }
+	    ip_inhibit_win_operations=TRUE;
+	    Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	    is_note=FALSE;
+	    OrgHelp(org_octive);
+	    break;
+	  case ',':
+	    Free(filename);
+	    filename=NULL;
+	    Btr(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	    ip_inhibit_win_operations=FALSE;
+	    buf=MakeSong();
+	    if (!oc->insert_point) {
+	      oc->insert_point=&oc->root;
+	      oc->cur_note=oc->insert_point;
+	    }
+	    OrgLoadSongStr(buf,&org_octive,&org_duration);
+	    OrgLoadSongStr(buf,&org_octive,&org_duration);
+	    Free(buf);
+	    ip_inhibit_win_operations=TRUE;
+	    Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	    is_note=FALSE;
+	    OrgHelp(org_octive);
+	    break;
+	  case '.':
+	    OrgHelp(org_octive);
+	    Free(filename);
+	    filename=NULL;
+	    org_duration=1.0;
+	    org_octive=3;
+	    OrgClearSong;
+	    oc->insert_point=NULL;
+	    oc->cur_note=NULL;
+	    oc->screen_x=0;
+	    is_note=FALSE;
+	    break;
+	  case '?':
+	    OrgHelp(org_octive);
+	    is_note=FALSE;
+	    break;
+	  case 'x':
+	    OrgHelp(org_octive);
+	    tempo=oc->root.next;
+	    while (tempo!=&oc->root) {
+	      if (ipty-Fs->win_top<13)
+		cmd=ScanMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP);
+	      else
+		cmd=ScanMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP);
+	      if (cmd) {
+		f=0;
+		org_play_f=0;
+		is_note=FALSE;
+		oc->cur_note=oc->insert_point;
+		goto got_msg;
+	      }
+	      oc->cur_note=tempo;
+	      if (tempo->word)
+		if (StrCmp(tempo->word," "))
+		  PutS(tempo->word);
+	      note=tempo->note;
+	      octive=tempo->octive;
+	      if (note || octive)
+		f=Note2Freq(note,octive);
+	      else
+		f=-1; //rest
+	      if (f>0)
+		org_play_f=f;
+	      else
+		org_play_f=0;
+	      Sleep(org_durations[tempo->duration]*record_tempo*1000.0/LTDATE_FREQ);
+	      org_play_f=0;
+	      Sleep(3);
+	      tempo=tempo->next;
+	    }
+	    oc->cur_note=oc->insert_point;
+	    f=0;
+	    org_play_f=0;
+	    is_note=FALSE;
+	    break;
+	  case CH_BACKSPACE:
+	    if (!oc->insert_point) {
+	      oc->insert_point=&oc->root;
+	      oc->cur_note=oc->insert_point;
+	    }
+	    tempo=oc->insert_point->last;
+	    if (tempo!=&oc->root) {
+	      PutChar(CH_BACKSPACE);
+	      RemQue(tempo);
+	      Free(tempo);
+	    }
+	    is_note=FALSE;
+	    break;
+	  case 'c':
+	    org_play_mode++;
+	    if (org_play_mode>=ORGPM_NUM_PLAY_MODES) org_play_mode=0;
+	    is_note=FALSE;
+	    OrgHelp(org_octive);
+	    coutln "Mode:",org_play_mode;
+	    break;
+	  case 'z':
+	    if (oc->record_on) {
+	      oc->record_on=FALSE;
+	      buf=OrgCvtSong;
+	      coutln buf;
+	      Free(buf);
+	    } else {
+	      coutln "\r\nCalibrate timing with 4 Quarter Notes";
+	      cmd=GetMsg(&ch,&sc,1<<MSG_KEY_DOWN);
+	      j=GetTimeStamp;
+	      for (i=0;i<3;i++) {
+		PrintF("%d more\r\n",3-i);
+		cmd=GetMsg(&ch,&sc,1<<MSG_KEY_DOWN);
+	      }
+	      record_tempo=(GetTimeStamp-j)/3.0;
+	      oc->record_on=TRUE;
+	      org_duration=1.0;
+	      org_octive=3;
+	      oc->screen_x=0;
+	    }
+	    is_note=FALSE;
+	    OrgHelp(org_octive);
+	    break;
+	  default:
+	    is_note=FALSE;
+	}
+	if (is_note) {
+	  if (note || octive)
+	    f=Note2Freq(note,octive);
+	  else
+	    f=-1; //rest
+	}
+      }
+    } else if (cmd==MSG_KEY_UP)
+      f=0;
+    else if (cmd==MSG_IP_MOVE) {
+      if (p2>13*FONT_HEIGHT) {
+	Btr(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	ip_inhibit_win_operations=FALSE;
+      } else {
+	Bts(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK);
+	ip_inhibit_win_operations=TRUE;
+      }
+    } else if (cmd==MSG_IP_L_DOWN)
+      OrgLeftClick(p1,p2);
+    else
+      OrgRightClick(p1,p2);
+    if (f!=last_f) {
+      if (oc->record_on) {
+	if (last_f) {
+	  tempo->duration=OrgCvtDuration((kbd_evt_time-note_down_time)/record_tempo);
+	  if (!oc->insert_point) {
+	    oc->insert_point=&oc->root;
+	    oc->cur_note=oc->insert_point;
+	  }
+	  InsQue(tempo,oc->insert_point->last);
+	}
+	if (f) {
+	  note_down_time=kbd_evt_time;
+	  tempo=MAllocZ(sizeof(OrgNote));
+	  tempo->note=note;
+	  tempo->octive=octive;
+	}
+      }
+      if (f>0) {
+	cout PointAtListEntry(note,org_note_list);
+	org_play_f=f;
+      } else {
+	if (f<0)
+	  cout "R";
+	org_play_f=0;
+      }
+      last_f=f;
+    }
+  } while (ch!=CH_ESC && ch!=CH_CTRLQ);
+  } catch
+    Fs->catch_except=TRUE;
+  AssignBit(&Fs->crt_flags,CRTf_NO_DOUBLE_CLICK,old_ip_double);
+  ip_inhibit_win_operations=old_inhibit;
+  OrgClearSong;
+  Kill(tss);
+  Fs->update_win=oc->old_update;
+  Fs->cur_ltf->flags=old_ltf_flags;
+  Free(oc);
+  Fs->user_data0=old_user_data0;
+  Free(dirname);
+  coutln "$$CL$$";
+  WinBorder(old_border);
+  WordStat(old_wordstat);
+}
+           X           òÿÿÿ   ñÿÿÿ      ñÿÿÿ
+   ñÿÿÿ      õÿÿÿ
+   õÿÿÿ      óÿÿÿ	   òÿÿÿ      öÿÿÿ
+   ÷ÿÿÿ   ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ              0           óÿÿÿ
+   óÿÿÿ      óÿÿÿ   óÿÿÿ      òÿÿÿ   òÿÿÿ   ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ              ô         ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ              h         ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ              T         ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ              l           þÿÿÿ   ñÿÿÿ      òÿÿÿ   ñÿÿÿ      ñÿÿÿ
+   ñÿÿÿ      õÿÿÿ
+   õÿÿÿ      óÿÿÿ	   òÿÿÿ      öÿÿÿ
+   ÷ÿÿÿ   ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ              D           þÿÿÿ   òÿÿÿ      óÿÿÿ
+   óÿÿÿ      óÿÿÿ   óÿÿÿ      òÿÿÿ   òÿÿÿ   ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ       	                  þÿÿÿ   ñÿÿÿ   ÿÿÿÿýÿÿÿüÿÿÿ       üÿÿÿ                        ÿÿÿÿ      ÿÿÿÿ    ýÿÿÿ             òÿÿÿ   þÿÿÿ    ÿÿÿÿÿÿÿÿ       ýÿÿÿ          ÿÿÿÿ                        ýÿÿÿ       ýÿÿÿÿÿÿÿ                         þÿÿÿÿÿÿÿ   ÿÿÿÿ                                                                                                                                                                                                                                                                                                     
+         
+               
+               
+         
+      
+                                       
+         
+         	         	         	         	                                   ]                                                  
+               
+            
+   	         
+            
+               
+   	                  	            
+   
+            
+   	   	         
+      
+                        
+      
+      
+      
+            
+      
+         
+      
+                 W                                                   
+            
+   	       

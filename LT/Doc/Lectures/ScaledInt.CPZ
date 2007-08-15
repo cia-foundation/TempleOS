@@ -1,0 +1,62 @@
+/*
+
+$FG,2$$WW,1$You may wonder why I do scaled integer arithmetic in the graphics routines.  The transformation matrix in a $LK,"GrBitMap","MN:GrBitMap"$, r, is stored as 8-byte integers shifted 32 bits left to allow fractions.  This is faster than floating point (double) arithmetic, but less accurate.
+$WW,0$
+$FG$*/
+
+#define SAMPLE_SIZE	100000000
+
+I4 coordinates[65536];
+
+void TimeIns()
+{
+  U8 start1,end1,start2,end2,overhead_time,test_time;
+  double reg d1;
+  I8 reg i,reg temp,reg d2,reg sum;
+
+  //Set-up some sample coordinates
+  for (i=0;i<65536;i++)
+    coordinates[i]=RandU4;
+
+  Preempt(OFF);
+
+//$FG,2$Measure Loop Overhead$FG$
+  start1=GetTimeStamp;
+  for (i=0;i<SAMPLE_SIZE;i++) {
+  }
+  end1=GetTimeStamp;
+  overhead_time=end1-start1;
+
+//$FG,2$Measure double arithmetic$FG$
+  d1=Sin(1.0);
+  sum=0;
+  start2=GetTimeStamp;
+  for (i=0;i<SAMPLE_SIZE;i++)
+$FG,4$	  sum+=d1*coordinates[i&65535];
+$FG$  coutln "Double Arithmetic Sum   :",sum;
+  end2=GetTimeStamp;
+  test_time=end2-start2;
+  PrintF("Double Arithmetic Cycles: %10.5f\r\n",
+    (test_time-overhead_time)*1.0/SAMPLE_SIZE);
+
+
+//$FG,2$Measure scaled integer arithmetic$FG$
+  d2=Sin(1.0)*0x100000000;
+  sum=0;
+  start2=GetTimeStamp;
+  for (i=0;i<SAMPLE_SIZE;i++) {
+$FG,4$	  temp=d2*coordinates[i&65535];
+    sum+=temp.i4[1];
+$FG$$FG$  }
+  end2=GetTimeStamp;
+  test_time=end2-start2;
+  coutln "Scaled Integer Sum      :",sum;
+  PrintF("Scaled Integer Cycles   :%10.5f\r\n",
+    (test_time-overhead_time)*1.0/SAMPLE_SIZE);
+
+  Preempt(ON);
+}
+
+TimeIns;
+
+

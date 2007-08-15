@@ -1,0 +1,54 @@
+I1 sys_temp_filename[80];
+SysAccntStruct sys_accounts;
+TssCmdStruct sys_macro_queue;
+KeyDevStruct sys_put_key_queue;
+TssStruct *macro_util_tss;
+HeapCtrl *mp_heap;
+MPCmdCtrl *mp_ctrl;
+TssStruct *adam_tss;
+U4 num_spawned_users;
+TssStruct *monitor_floppy_tss;
+U1 *grfont;
+
+U4 fdc_retries;
+U4 fdc_drive_heads;
+U4 fdc_disk_cylinders;
+U4 fdc_disk_sectors;
+U4 fdc_max_sector;
+U4 fdc_dma_buf;
+
+LTCacheBlk *ltcd_base;
+LTCacheBlk *ltdc_next_lru,*ltdc_last_lru;
+LTCacheBlk **ltdc_hash_table;
+U8 ltdc_size;
+ 
+U8 dc_col,dc_flags,dc_cursor_blink;
+GrBitMap *grbase2,*gr_merge_base;
+
+TssStruct *sys_update_screen_tss;
+U8 rnd_SEED;
+Ltf *sys_clipboard_ltf;
+I1 *default_iso_name;
+U8 disk_reads,disk_writes,compiled_lines,compiled_functions;
+LTBlkDev *local_blkdevs,*boot_blkdev;
+LTPartition *local_partitions,*default_partition;
+I1 default_drive;
+LTPartition *drive_to_partition[32];
+I8 num_blkdevs;
+I1 *sys_startup_account;
+BoolU4 ip_inhibit_win_operations;
+LTDate sys_compile_time;
+void *vga_image;
+U1 *reverse_bits_table,*set_bits_table;
+void **ctrl_alt_letter_routines;
+LTDate local_time_offset;
+U8 time_stamp_start,sys_timer_start;
+U8 time_stamp_freq,time_stamp_kHz_freq;
+double t;
+U8 mouse_evt_time,kbd_evt_time;
+U1Fifo *kbdmouse_fifo;
+
+//These are just handy variables
+//available for debugging.  You might
+//put them on your wallpaper.
+U8 sysdbg0,sysdbg1,sysdbg2,sysdbg3;

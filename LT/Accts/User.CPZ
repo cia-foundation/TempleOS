@@ -1,0 +1,37 @@
+#help_index "Utils"
+/*
+This is the startup file for new local users.
+
+If you modify this file, you should place it
+into your HOME directory.  This version is the
+default for accounts without a version in HOME.
+*/
+
+UseConsoleLtf("User.MUZ");
+
+U8 F(I1 *pattern,I1 *flags=NULL)
+{
+  return Grep(pattern,"/LT/"TEXT_FILE_MASK,flags);
+}
+
+U8 R(I1 *pattern,I1 *replace_text=NULL,I1 *flags="+l-i")
+{
+  return Grep(pattern,"/LT/"TEXT_FILE_MASK,flags,replace_text);
+}
+
+U8 FD(I1 *pattern,I1 *flags=NULL)
+{
+  return Grep(pattern,TEXT_FILE_MASK,flags);
+}
+
+U8 RD(I1 *pattern,I1 *replace_text=NULL,I1 *flags="+l-i")
+{
+  return Grep(pattern,TEXT_FILE_MASK,flags,replace_text);
+}
+
+PutSysText("ST_USER_STARTUP");
+Type("::/LT/Doc/Help.TXZ");
+Fs->scroll_speed=10;
+Bts(&Fs->crt_flags,CRTf_SHOW);
+Preempt(ON);
+#help_index ""

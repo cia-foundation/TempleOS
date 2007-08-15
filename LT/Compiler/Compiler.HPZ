@@ -1,0 +1,53 @@
+#help_index "Char/Conversion"
+public extern double A2Double(I1 *src,I1 **end_ptr=NULL);
+#help_index "Char/Conversion;Time/LTDate"
+public extern LTDate A2LTDate(I1 *src2);
+
+#help_index "Hash"
+public extern SysHashEntry *FindPSect(U8 *add,I8 *offset);
+public extern void DelHashTable(SysHashTable *table);
+
+#help_index "Compiler/Lex"
+public extern LexStruct *LexNew(I1 *buf,U8 flags,I1 *filename);
+public extern void LexDel(LexStruct *lx);
+public extern void SetSourceFileInfo(LexStruct *lx,SysHashEntry *h);
+public extern void LexPutToken(LexStruct *lx);
+public extern U8 LexGetChar(LexStruct *lx);
+public extern void LexSkipEol(LexStruct *lx);
+public extern U8 EvalExpression(LexStruct *lx);
+public extern void LexPush(LexStruct *lx);
+public extern void LexPop(LexStruct *lx);
+//public extern void LexSubStackPtr(LexStruct *lx);
+public extern I8 Lex(LexStruct *lx);
+public extern I1 *LexExtendStr(LexStruct *lx,U8 *size=NULL);
+public extern void LexPutLine(LexStruct *lx,I1 *start);
+public extern I8 LexLineNum(LexStruct *lx);
+public extern void LexPutLink(LexStruct *lx);
+public extern void PutLexError(LexStruct *lx,I1 *name=NULL,I1 *msg=NULL);
+public extern void PutLexWarning(LexStruct *lx,I1 *name=NULL,I1 *msg=NULL);
+public extern U8 GetExpression(LexStruct *lx,U1 **e); //FALSE=no err
+public extern I8 Expression(LexStruct *lx);
+public extern void DelExpression(void *code);
+public extern MemberListStruct *FindMember(I1 *st,ClassStruct *c);
+
+#help_index "Compiler/Directive"
+public extern void ExePutS(I1 *st);
+public extern void ExePrintF(I1 *src,...);
+#help_index "Compiler"
+public extern I8 CompileFile(I1 *filename,I1 *map_name=NULL,I1 *out_name=NULL,I1 mapfile_drive=0);
+public extern I8 ExecuteStr(I1 *buf,I1 *filename=NULL);
+public extern I8 ExecuteFile(I1 *name);
+public extern void ContinueUserTask();
+extern SysHashTable *asm_hash;
+extern void InitCompiler(BoolU4 first);
+
+//The following is for benchmarking
+extern BoolU4 cmp_do_not_write_to_disk;
+
+LTextern CP_HI_CALL U8 HiCall(void *s);
+extern I8 ExecuteCmdLine(LexStruct *lx);
+
+#help_index "Exceptions"
+public extern void CatchAll();
+
+#help_index ""

@@ -1,0 +1,202 @@
+#define CID_TAD7	7
+
+I8 IdComputer()
+{
+  return CID_TAD7;
+}
+
+I8 computer_id=IdComputer;
+
+
+void SysTaskRepTask(TssStruct *tss,I8 indent)
+{
+  TssStruct *tss1;
+  I1 desc[TSS_DESC_LENGTH+1];
+  if (!ValidateTss(tss)) return;
+  SPrintF(desc,"%Q",tss->task_descriptor);
+  PrintF("%*s%08X %-20ts ",indent,"",tss,desc);
+  PrintF("Mem:%08X\r\n",TaskAllocatedMem(tss));
+  PrintF("%*s Flags:%04X:%04X %02X\r\n",
+    indent+2,"",tss->task_flags,tss->crt_flags,
+    ExceptDepth(tss));
+  if (tss==sys_update_screen_tss) {
+    CallerRep(tss->rbp,tss);
+    StackRep(tss->rsp);
+  }
+  tss1=tss->next_child_tss;
+  while (tss1!=&tss->next_child_tss-offset(TssStruct.next_sibling_tss)) {
+    if (ValidateTss(tss1))
+      SysTaskRepTask(tss1,indent+2);
+    tss1=tss1->next_sibling_tss;
+  }
+}
+
+public void SysTaskRep()
+{
+  U8 i;
+  CPUStruct *c;
+  for (i=0;i<mp_cnt;i++) {
+    c=mp_cpu_structs+sizeof(CPUStruct)*i;
+    coutln "CPU:",i;
+    SysTaskRepTask(c->cain_tss,2);
+  }
+}
+
+void CtrlAltT()
+{
+  BoolU4 old_raw=Raw(ON);
+  dc_col=0;
+  SysTaskRep;
+  Raw(old_raw);
+}
+ctrl_alt_letter_routines['T'-'A']=&CtrlAltT;
+
+void CtrlAltF()
+{
+  I1 *st;
+  st=MSPrintF("%P",sys_update_screen_tss->rip);
+  RemoveLastSeg(st,",");
+  RawClassRep(st,sys_update_screen_tss->rbp,1,TRUE);
+  Free(st);
+}
+ctrl_alt_letter_routines['F'-'A']=&CtrlAltF;
+
+void CtrlAltZ()
+{
+  BoolU4 old_raw=Raw(ON);
+  coutln "0:",sysdbg0," 1:",sysdbg1;
+  coutln "2:",sysdbg2," 3:",sysdbg3;
+  Raw(old_raw);
+}
+ctrl_alt_letter_routines['Z'-'A']=&CtrlAltZ;
+
+void CtrlAltE()
+{
+  RawClassRep("TssStruct",sys_update_screen_tss,1,FALSE);
+}
+ctrl_alt_letter_routines['E'-'A']=&CtrlAltE;
+
+void CtrlAltD()
+{
+  Debugger;
+}
+ctrl_alt_letter_routines['D'-'A']=&CtrlAltD;
+
+
+extern void MyScreenShot();
+
+void PrintScreenTsk()
+{
+  InitUserTask;
+  MyScreenShot;
+}
+
+void CtrlAltP()
+{
+  Spawn(&PrintScreenTsk);
+}
+ctrl_alt_letter_routines['P'-'A']=&CtrlAltP;
+
+#define COMM_BAUD	38400*3
+
+void Tx(I1 *filename)
+{
+  LTChnl *chnl;
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl) {
+    RmtTxFile(chnl,filename);
+    CommClose(1);
+  }
+}
+
+void Rx(I1 *filename)
+{
+  LTChnl *chnl;
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl) {
+    RmtRxFile(chnl,filename);
+    CommClose(1);
+  }
+}
+
+void Host()
+{
+  LTChnl *chnl;
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl)
+    TelnetHostOpen(chnl);
+}
+
+void CloseHost()
+{
+  TelnetHostClose;
+  CommClose(1);
+}
+
+void Guest()
+{
+  LTChnl *chnl;
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl) {
+    TelnetGuestOpen(chnl);
+    CommClose(1);
+  }
+}
+
+void RmtSync()
+{
+  LTChnl *chnl;
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl) {
+    RmtMergeChk(chnl);
+    CommClose(1);
+  }
+}
+
+void RmtSyncDrive(I1 drive=0)
+{
+  LTChnl *chnl;
+  Drive(drive);
+  CommClose(1);
+  chnl=CommOpen8N1(1,COMM_BAUD);
+  if (chnl) {
+    RmtMergeChk(chnl,"/LT/*","/LT/*",
+	"+r+t+a");
+    CommClose(1);
+  }
+}
+
+I1 *TADPickFile(I1 *msg,I1 *mask,I8 prefix_len=0)
+{
+  I8 i=0;
+  LTDirEntry *tempm,*tempm1;
+  Ltf *l=LtfNew;
+  I1 *st;
+  tempm=FindFiles(mask);
+  tempm1=tempm;
+  if (msg)
+    LtfPutSExt(l,msg);
+  while (tempm1) {
+    if ((i++%5)==0)
+      LtfPutSExt(l,"\r\n");
+    st=NewStr(tempm1->name);
+    RemoveLastSeg(st,".");
+    LtfPrintF(l,"$$MU,\"%-8ts\",%d$$ ",st+prefix_len,tempm1);
+    Free(st);
+    tempm1=tempm1->next;
+  }
+  tempm1=PopUpMenu(l);
+  LtfDel(l);
+  if (tempm1<0)
+    st=NULL;
+  else
+    st=NewStr(tempm1->full_name);
+  DelLTDirList(tempm);
+  return st;
+}
+

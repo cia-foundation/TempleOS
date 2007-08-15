@@ -1,0 +1,260 @@
+#define EC_NULL			0xD7
+#define EC_NOP	 		0xD8
+
+#define EC_U8			0xD9
+#define EC_U4			0xDA
+#define EC_U2			0x04
+#define EC_U1			0x05
+#define EC_DOUBLE		0x06
+#define EC_STR_CONST	0x07
+#define EC_RBP	0x08
+#define EC_FS			0x09
+
+#define EC_COM	 		0x0A
+#define EC_NOT	 		0x0B
+#define EC_UNARY_MINUS	 	0x0C
+#define EC_ADDRESS		0x0D
+
+#define EC_U8_DISP32		0x0E
+#define EC_U4_DISP32		0x0F
+#define EC_U2_DISP32	 	0x10
+#define EC_U1_DISP32	 	0x11
+#define EC_U8_DISP8		0x12
+#define EC_U4_DISP8	 	0x13
+#define EC_U2_DISP8		0x14
+#define EC_U1_DISP8		0x15
+#define EC_DEREF_U8		0x16
+#define EC_DEREF_U4		0x17
+#define EC_DEREF_U2		0x18
+#define EC_DEREF_U1		0x19
+#define EC_U8_PP 		0x1A
+#define EC_U4_PP		0x1B
+#define EC_U2_PP		0x1C
+#define EC_U1_PP		0x1D
+#define EC_U8_MM 		0x1E
+#define EC_U4_MM		0x1F
+#define EC_U2_MM		0x20
+#define EC_U1_MM		0x21
+#define EC_PP_U8 		0x22
+#define EC_PP_U4		0x23
+#define EC_PP_U2		0x24
+#define EC_PP_U1		0x25
+#define EC_MM_U8 		0x26
+#define EC_MM_U4		0x27
+#define EC_MM_U2		0x28
+#define EC_MM_U1		0x29
+
+#define EC_SHL	 		0x2A
+#define EC_SHR	 		0x2B
+
+#define EC_MULTIPLICATION	0x2C
+#define EC_DIVISION		0x2D
+#define EC_REMAINDER		0x2E
+
+#define EC_AND	 		0x2F
+
+#define EC_OR			0x30
+#define EC_XOR 			0x31
+
+#define EC_ADDITION		0x32
+#define EC_SUBTRACTION	 	0x33
+
+#define EC_EQUAL_EQUAL 		0x34
+#define EC_NOT_EQUAL_TO		0x35
+#define EC_LESS_THAN		0x36
+#define EC_GREATER_THAN		0x37
+#define EC_LESS_OR_EQUAL	0x38
+#define EC_GREATER_OR_EQUAL	0x39
+
+#define EC_AND_AND		0x3A
+
+#define EC_OR_OR		0x3B
+#define EC_XOR_XOR		0x3C
+
+#define EC_COLON		0x3D
+#define EC_QUESTION		0x3E
+
+#define EC_ASSIGN_U8		0x3F
+#define EC_ASSIGN_U4		0x40
+#define EC_ASSIGN_U2		0x41
+#define EC_ASSIGN_U1		0x42
+
+#define EC_SHL_EQUAL_U8		0x43
+#define EC_SHL_EQUAL_U4		0x44
+#define EC_SHL_EQUAL_U2		0x45
+#define EC_SHL_EQUAL_U1		0x46
+
+#define EC_SHR_EQUAL_U8		0x47
+#define EC_SHR_EQUAL_U4		0x48
+#define EC_SHR_EQUAL_U2		0x49
+#define EC_SHR_EQUAL_U1		0x4A
+
+#define EC_MUL_EQUAL_U8		0x4B
+#define EC_MUL_EQUAL_U4		0x4C
+#define EC_MUL_EQUAL_U2		0x4D
+#define EC_MUL_EQUAL_U1		0x4E
+
+#define EC_DIV_EQUAL_U8		0x4F
+#define EC_DIV_EQUAL_U4		0x50
+#define EC_DIV_EQUAL_U2		0x51
+#define EC_DIV_EQUAL_U1		0x52
+
+#define EC_AND_EQUAL_U8		0x53
+#define EC_AND_EQUAL_U4		0x54
+#define EC_AND_EQUAL_U2		0x55
+#define EC_AND_EQUAL_U1		0x56
+
+#define EC_OR_EQUAL_U8		0x57
+#define EC_OR_EQUAL_U4		0x58
+#define EC_OR_EQUAL_U2		0x59
+#define EC_OR_EQUAL_U1		0x5A
+
+#define EC_XOR_EQUAL_U8		0x5B
+#define EC_XOR_EQUAL_U4		0x5C
+#define EC_XOR_EQUAL_U2		0x5D
+#define EC_XOR_EQUAL_U1		0x5E
+
+#define EC_ADD_EQUAL_U8		0x5F
+#define EC_ADD_EQUAL_U4		0x60
+#define EC_ADD_EQUAL_U2		0x61
+#define EC_ADD_EQUAL_U1		0x62
+
+#define EC_SUB_EQUAL_U8		0x63
+#define EC_SUB_EQUAL_U4		0x64
+#define EC_SUB_EQUAL_U2		0x65
+#define EC_SUB_EQUAL_U1		0x66
+
+#define EC_ADD64		0x67
+#define EC_ADD32		0x68
+#define EC_ADD8			0x69
+#define EC_INC	 		0x6A
+#define EC_SUB64		0x6B
+#define EC_SUB32		0x6C
+#define EC_SUB8			0x6D
+#define EC_DEC	 		0x6E
+
+#define EC_ENTER		0x6F
+#define EC_LEAVE		0x70
+#define EC_ADD_RSP64		0x71
+#define EC_ADD_RSP32		0x72
+#define EC_ADD_RSP8		0x73
+#define EC_RET	 		0x74
+#define EC_CALL			0x75
+#define EC_CALL_INDIRECT	0x76
+#define EC_CALL_INDIRECT2	0x77
+#define EC_IRQ			0x78
+
+#define EC_CLI	 		0x79
+#define EC_STI	 		0x7A
+#define EC_GET_FLAGS		0x7B
+#define EC_SET_FLAGS		0x7C
+#define EC_GET_BASE_PTR		0x7D
+#define EC_SET_BASE_PTR		0x7E
+#define EC_GET_STACK_PTR	0x7F
+#define EC_SET_STACK_PTR	0x80
+#define EC_GET_LABEL		0x81
+#define EC_ABSOLUTE_ADDRESS	0x82
+#define EC_LABEL		0x83
+#define EC_TYPE			0x84
+
+#define EC_BT			0x85
+#define EC_BTS	 		0x86
+#define EC_BTR	 		0x87
+#define EC_BTC	 		0x88
+#define EC_BSF			0x89
+#define EC_BSR			0x8A
+#define EC_INSQUE		0x8B
+#define EC_INSQUE_REV		0x8C
+#define EC_REMQUE		0x8D
+#define EC_MEMCPY		0x8E
+#define EC_MEMSET		0x8F
+#define EC_INPD			0x90
+#define EC_INPW			0x91
+#define EC_INP	 		0x92
+#define EC_OUTPD		0x93
+#define EC_OUTPW		0x94
+#define EC_OUTP			0x95
+#define EC_REP_INSW		0x96
+#define EC_REP_INSB		0x97
+#define EC_REP_OUTSW		0x98
+#define EC_REP_OUTSB		0x99
+
+#define EC_JMP			0x9A
+#define EC_SHORT_JMP		0x9B
+#define EC_SWITCH		0x9C
+
+#define EC_SKIPZ		0x9D
+#define EC_SKIPZ2		0x9E
+#define EC_SKIPNZ		0x9F
+#define EC_SKIPNZ2		0xA0
+
+#define EC_EQUAL_EQUAL_SKIPZ	0xA1
+#define EC_EQUAL_EQUAL_SKIPZ2	0xA2
+
+#define EC_NOT_EQUAL_TO_SKIPZ	0xA3
+#define EC_NOT_EQUAL_TO_SKIPZ2	0xA4
+
+#define EC_LESS_THAN_SKIPZ	0xA5
+#define EC_LESS_THAN_SKIPZ2	0xA6
+
+#define EC_GREATER_THAN_SKIPZ	0xA7
+#define EC_GREATER_THAN_SKIPZ2	0xA8
+
+#define EC_LESS_OR_EQUAL_SKIPZ	0xA9
+#define EC_LESS_OR_EQUAL_SKIPZ2	0xAA
+
+#dABine EC_GREATER_OR_EQUAL_SKIPZ   0xAB
+#dACine EC_GREATER_OR_EQUAL_SKIPZ2  0xAC
+
+#define EC_AND_AND_SKIPZ	0xAD
+#define EC_AND_AND_SKIPZ2	0xAE
+#define EC_AND_AND_SKIPNZ	0xAF
+#define EC_AND_AND_SKIPNZ2	0xB0
+
+#define EC_OR_OR_SKIPZ		0xB1
+#define EC_OR_OR_SKIPZ2		0xB2
+#define EC_OR_OR_SKIPNZ		0xB3
+#define EC_OR_OR_SKIPNZ2	0xB4
+
+#define EC_FILD			0xB5
+#define EC_FISTP		0xB6
+#define EC_FLD			0xB7
+#define EC_FSTP			0xB8
+#define EC_FYL2X		0xB9
+#define EC_FABS			0xBA
+#define EC_FCHS			0xBB
+#define EC_FSIN			0xBC
+#define EC_FCOS			0xBD
+#define EC_FPTAN		0xBE
+#define EC_FPATAN		0xBF
+#define EC_FSQRT		0xC0
+#define EC_FMULP		0xC1
+#define EC_FDIVP		0xC2
+#define EC_FDIVRP		0xC3
+#define EC_FADDP		0xC4
+#define EC_FSUBP		0xC5
+#define EC_FSUBRP		0xC6
+
+#define EC_LEA_DISP32_RBP	0xC7
+#define EC_LEA_DISP8_RBP	0xC8
+
+#define EC_FS_U8_DISP32		0xC9
+#define EC_FS_U4_DISP32		0xCA
+#define EC_FS_U2_DISP32	 	0xCB
+#define EC_FS_U1_DISP32	 	0xCC
+
+#define EC_SHL_CONST1	0xCD
+#define EC_SHL_CONST2	0xCE
+#define EC_SHR_CONST1	0xCF
+#define EC_SHR_CONST2	0xD0
+
+#define EC_U8_DISP32_SCALED	0xD1
+#define EC_U4_DISP32_SCALED	0xD2
+#define EC_U2_DISP32_SCALED 	0xD3
+
+#define EC_STRLEN		0xD4
+#define EC_ZERO			0xD5
+
+#define EC_NUM_ENTRIES		0xD6
+
+

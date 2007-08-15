@@ -1,0 +1,232 @@
+BoolU8 IsDbgTsk()
+{
+  TssStruct *tss=Fs->parent_tss;
+  if (ValidateTss(tss) && tss->dbg_tss==Fs)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+BoolU8 CheckPtr(void *ptr)
+{
+  if (ptr>=sys_heap_base && ptr<=sys_heap_limit)
+    return TRUE;
+  else if (ptr<sys_boot_base)
+    return FALSE;
+  else if (ptr<0xA0000)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+BoolU8 CheckOnStk(void *ptr,TssStruct *tss=NULL)
+{
+  if (tss) {
+    if (ptr>=tss->stack_base &&
+	ptr<=tss->stack_base+tss->stack_size)
+      return TRUE;
+  } else if (ptr>=sys_heap_base && ptr<=sys_heap_limit)
+    return TRUE;
+  return FALSE;
+}
+
+void StackRep(void **rsp=NULL)
+//Reports whats on the stack
+{
+  U8 i,old_flags=GetFlags;
+  void * my_rsp[32];
+  if (!rsp) rsp=GetBasePtr;
+  Cli;
+  MemCpy(my_rsp,rsp,32*sizeof(void *));
+  SetFlags(old_flags);
+  for (i=0;i<32;i++)
+    PrintF("%08X [RSP+%04X]: %016X %P\r\n",rsp+i<<3,i<<3,my_rsp[i],my_rsp[i]);
+  CrLf;
+}
+
+U8 *Caller(U8 num=1)
+//Returns the address of the function
+//which called this one, or the caller
+//of the caller, etc.
+{
+  void **rbp=GetBasePtr,*ptr;
+  while (num--) {
+    if (rbp>=*rbp)
+      return NULL;
+    rbp=*rbp;
+    if (!CheckOnStk(rbp,Fs))
+      return NULL;
+  }
+  ptr=rbp+sizeof(void *);
+  return *ptr;
+}
+
+void CallerRep(void **rbp=NULL,TssStruct *tss=NULL)
+//Prints a report of calling routines
+{
+  U8 i=0;
+  void **ptr;
+  if (!tss) tss=Fs;
+  if (!rbp) rbp=GetBasePtr;
+  while (CheckOnStk(rbp,tss)) {
+    ptr=rbp+sizeof(void *);
+    PrintF("Caller %d:%08tX:%P\r\n",i++,*ptr,*ptr);
+    if (rbp>=*rbp)
+      break;
+    rbp=*rbp;
+  }
+}
+
+void DbgStr(I1 *st,U8 mS=100)
+//Shows a string using
+//$LK,"Raw","MN:Raw"$ screen output for a fixed length
+//of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  cout "DbgStr(",st,")";
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void DbgNum(U8 num,U8 mS=100)
+//Shows a hex number using
+//$LK,"Raw","MN:Raw"$ screen output for a fixed length
+//of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  cout "DbgNum(",num,")";
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void DbgF(double d,U8 mS=100)
+//Shows a floating-point value using
+//$LK,"Raw","MN:Raw"$ screen output for a fixed length
+//of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  cout "DbgF(",d,")";
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void DbgAdd(void *add,U8 mS=100)
+//Shows an address using $LK,"Raw","MN:Raw"$ screen
+//output for a length of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  PrintF("DbgAdd(%P)",add);
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void DbgD(void *add,U8 cnt=0x80,U8 mS=100)
+//Dumps a block of memory using $LK,"Raw","MN:Raw"$
+//screen output for a fixed length
+//of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  D(add,cnt);
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void DbgDm(void *add,U8 cnt=0x80,U8 mS=100)
+//Dumps a block of memory using $LK,"Raw","MN:Raw"$
+//screen output for a fixed length
+//of time.
+{
+  BoolU4 old_flags=GetFlags;
+  BoolU4 old_raw;
+  Cli;
+  old_raw=Raw(ON);
+  Dm(add,cnt);
+  BusyWait(mS<<10);
+  SetFlags(old_flags);
+  Raw(old_raw);
+}
+
+void Debugger(I1 *msg=NULL,U8 num=0)
+//Enters the debugger.
+//This can be used as a kernel panic.
+{
+  Cli;
+  Raw(ON);
+
+  coutln "\r\n\r\nLoseThos Debugger\r\n";
+  Beep;
+
+  if (msg) {
+    cout msg;
+    if (num)
+      cout num;
+    CrLf;
+  }
+  CallerRep;
+
+  if (ext[EXT_DEBUGGER])
+    CallExtNum(EXT_DEBUGGER);
+  else {
+    coutln "No Debugger";
+    while (TRUE);
+  }
+}
+
+void FaultCmdLine()
+{
+  InitUserTask;
+  CallExtNum(EXT_EXECUTE_FILE,"Fault.CPZ");
+  CallExtStr("ContinueUserTask");
+}
+
+
+asm {CP_FAULT2::}
+void Fault2()
+{
+  TssStruct *tss;
+  BoolU4 old_raw;
+//$FG,4$$BK,1$Be careful not to swap-out and ruin the saved context$FG$$BK,0$
+
+  sys_cur_focus_task=0;
+  if (Fs->dbg_tss) {
+    Bts(&Fs->task_flags,TSSf_SUSPENDED);
+    CallExtNum(EXT_RESUME_DBG);
+  } else {
+    old_raw=Raw(ON);
+    coutln "\r\n\r\nFault2:",Fs->fault_num;
+//    Beep;
+
+    //These are optional--alter them to suit taste
+    CallerRep;
+    StackRep;
+    BusyWait(3000000); //dbgoo
+
+    if (!Bt(&Fs->task_flags,TSSf_IS_FAULT_TASK)) {//no double fault
+      tss=Spawn(&FaultCmdLine,"Fault Task",Fs);
+      Bts(&tss->task_flags,TSSf_IS_FAULT_TASK);
+      CallExtNum(EXT_WIN_TO_TOP,tss);
+    }
+    Raw(old_raw);
+    Bts(&Fs->task_flags,TSSf_SUSPENDED);
+  }
+}

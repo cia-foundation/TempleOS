@@ -1,0 +1,1129 @@
+asm {
+//The heap cache technique I first saw at Ticketmaster.
+//I don't know who owns it.
+
+	STRUC 0
+MB_NEXT:	DU8	?;
+MB_LAST:	DU8	?;
+MB_SIGNATURE:	DU4	?;
+MB_SIZE:	DU4	?;
+MB_STRUCT_SIZE:
+	ENDS
+
+	STRUC 0 	//AVAILABLE TO MALLOC MEM
+UUM_NEXT:	DU8	?;
+UUM_SIZE:	DU8	?;
+UUM_STRUCT_SIZE:
+	ENDS
+
+	STRUC 0
+UM_HEAP_CTRL:
+UM_TSS:		DU8	?;
+UM_SIZE:	DU8	?;
+UM_START:	DU4	?;
+	ENDS
+
+	ALIGN	8,OC_NOP
+	USE32
+INIT_MEM::
+//Set-up Page Tables
+	MOV	EDI,0x100000
+	XOR	EAX,EAX
+	MOV	ECX,0x1000*(NUM_PML1+NUM_PML2+NUM_PML3+NUM_PML4)/4
+	REP_STOSD
+
+//PML1
+	MOV	EAX,0x103
+	XOR	EDX,EDX
+	MOV	EDI,0x100000
+	MOV	ECX,0x200*NUM_PML1
+@@1:	MOV	U4 [EDI],EAX
+	ADD	EDI,4
+	MOV	U4 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x1000
+	ADC	EDX,0
+	LOOP	@@1
+
+//video ram=write through
+	MOV	EAX,8
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0xA0*8
+	MOV	ECX,0xC0-0xA0
+@@2:	OR	U4 [EDI],EAX
+	ADD	EDI,4
+	OR	U4 [EDI],EDX
+	ADD	EDI,4
+	LOOP	@@2
+
+//PML2
+	MOV	EAX,0x100000+3
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0x1000*NUM_PML1
+	MOV	ECX,NUM_PML1
+@@3:	MOV	U4 [EDI],EAX
+	ADD	EDI,4
+	MOV	U4 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x1000
+	ADC	EDX,0
+	LOOP	@@3
+
+	MOV	EAX,0x83+NUM_PML1*0x200000
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0x1000*NUM_PML1+8*NUM_PML1
+	MOV	ECX,NUM_PML2*0x200-NUM_PML1
+@@4:	MOV	U4 [EDI],EAX
+	ADD	EDI,4
+	MOV	U4 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x200000
+	ADC	EDX,0
+	LOOP	@@4
+
+//APIC=No Cache
+	MOV	EAX,0x10
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0x1000*NUM_PML1+8*0x780
+	MOV	ECX,0x800-0x780
+@@5:	OR	U4 [EDI],EAX
+	ADD	EDI,4
+	OR	U4 [EDI],EDX
+	ADD	EDI,4
+	LOOP	@@5
+
+//PML3
+	MOV	EAX,3+0x100000+NUM_PML1*0x1000
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0x1000*(NUM_PML1+NUM_PML2)
+	MOV	ECX,NUM_PML2
+@@6:	MOV	U4 [EDI],EAX
+	ADD	EDI,4
+	MOV	U4 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x1000
+	ADC	EDX,0
+	LOOP	@@6
+
+//PML4
+	MOV	EAX,3+0x100000+(NUM_PML1+NUM_PML2)*0x1000
+	XOR	EDX,EDX
+	MOV	EDI,0x100000+0x1000*(NUM_PML1+NUM_PML2+NUM_PML3)
+	MOV	ECX,1
+@@7:	MOV	U4 [EDI],EAX
+	ADD	EDI,4
+	MOV	U4 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x1000
+	ADC	EDX,0
+	LOOP	@@7
+
+	MOV	EDI,U4 SYS_FREE_PAGE_HASH
+	MOV	ECX,FREE_PAGE_HASH_SIZE*2
+	XOR	EAX,EAX
+	REP_STOSD
+	MOV	EDI,U4 SYS_FREE_PAGE_HASH2
+	MOV	ECX,64*2
+	REP_STOSD
+
+	MOV	U4 [SYS_MEM_FREE_LIST],0
+	MOV	U4 [SYS_MEM_FREE_LIST+4],0
+	MOV	U4 [SYS_MEM_FREE_2MEG_LIST],0
+	MOV	U4 [SYS_MEM_FREE_2MEG_LIST+4],0
+	MOV	EBX,U4 [SYS_HEAP_BASE]
+	MOV	EAX,U4 [SYS_MEMBLKS]  //TODO: check if subtracts 0x100000
+	DEC	EAX
+	CMP	EAX,MAX_I4+1-0x100000
+	JB	@@8
+	MOV	EAX,MAX_I4+1-0x100000	//TODO: max 2 Gig
+@@8:	MOV	U4 [SYS_HEAP_LIMIT],EAX
+	INC	EAX
+	SUB	EAX,EBX
+	SHR	EAX,PAGE_BITS
+	MOV	EDI,U4 [SYS_MEM_FREE_LIST]
+	MOV	U4 MB_NEXT[EBX],EDI
+	MOV	U4 MB_NEXT+4[EBX],0
+	MOV	U4 [SYS_MEM_FREE_LIST],EBX
+	MOV	U4 [SYS_MEM_FREE_LIST+4],0
+	MOV	U4 MB_SIGNATURE[EBX],MBS_UNUSED_SIGNATURE
+	MOV	U4 MB_SIZE[EBX],EAX
+	RET
+}
+
+void SysOutOfMem()
+{
+  Debugger;
+}
+
+asm {CP_BAD_MEM_FREE::}
+void SysBadMemFree(U8 *ptr)
+{
+  Debugger("Bad Mem Free:",ptr);
+}
+
+U8 *MemPointAtPageTableEntry(void *a)
+{
+  if (a<NUM_PML1*0x1000*0x200)
+    return 0x100000+(a>>12)*8;
+  else
+    return 0x100000+NUM_PML1*0x1000+
+	   (a>>(12+9))*8;
+}
+
+void *AllocNonTskMemBlks(U8 *pages512)
+//This will allocate a 512 byte pages from
+//the code heap memory range and not
+//link them to any task.  (Linking to a task
+//means it will be freed when the task
+//dies.)
+//It might give you more than you asked for
+//so a pointer to a page count is passed.
+{
+  MemBlk *result=NULL,*m;
+  U8 i,num=*pages512,old_flags=GetFlags;
+  Cli;
+  if (num<FREE_PAGE_HASH_SIZE) {
+    if (result=free_page_hash[num]) {
+      free_page_hash[num]=result->next;
+      SetFlags(old_flags);
+      return result;
+    }
+  } else {
+    num-=2;
+    i=Bsr(num)+1;
+    num=0;
+    Bts(&num,i);
+    num+=2;
+    *pages512=num;
+    if (result=free_page_hash2[i]) {
+      free_page_hash2[i]=result->next;
+      SetFlags(old_flags);
+      return result;
+    }
+  }
+  m=&mem_free_list;
+  do {
+    if (!(result=m->next)) {
+      SysOutOfMem;
+      SetFlags(old_flags);
+      return NULL;
+    }
+    if (result->pages<num)
+      m=result;
+    else {
+      if (result->pages==num) {
+	m->next=result->next;
+	SetFlags(old_flags);
+	return result;
+      } else {
+	result->pages-=num;
+	result+=result->pages<<PAGE_BITS;
+	result->pages=num;
+	SetFlags(old_flags);
+	return result;
+      }
+    }
+  } while (TRUE);
+}
+
+void FreeNonTskMemBlks(MemBlk *m,U8 pages512)
+{
+  U8 i,old_flags;
+  if (m) {
+    old_flags=GetFlags;
+    Cli;
+    m->signature=MBS_UNUSED_SIGNATURE;
+    m->pages=pages512;
+    if (pages512<FREE_PAGE_HASH_SIZE) {
+      m->next=free_page_hash[pages512];
+      free_page_hash[pages512]=m;
+    } else {
+      pages512-=2;
+      i=Bsr(pages512);
+      m->next=free_page_hash2[i];
+      free_page_hash2[i]=m;
+    }
+    SetFlags(old_flags);
+  }
+}
+
+void *Alloc2MegMemBlks(U8 *pages2Meg)
+//This will allocate 2Meg pages from
+//the code heap memory range and not
+//link it to any task.	(Linking to a task
+//means they will be freed when the task
+//dies.)
+//It might give you more than you asked for
+//so a pointer to a page count is passed.
+{
+  U8 *pte;
+  MemBlk *result=NULL,*m,*m1;
+  U8 i,j,num=*pages2Meg,old_flags=GetFlags;
+
+  Cli;
+  num<<=12;
+
+  m=&mem_free_2Meg_list;
+  do {
+    if (!(result=m->next))
+      break;
+    if (result->pages<num)
+      m=result;
+    else {
+      if (result->pages==num) {
+	m->next=result->next;
+	goto done;
+      } else {
+	result->pages-=num;
+	result+=result->pages<<PAGE_BITS;
+	result->pages=num;
+	goto done;
+      }
+    }
+  } while (TRUE);
+
+  m=&mem_free_list;
+  do {
+    if (!(result=m->next)) {
+      SysOutOfMem;
+      SetFlags(old_flags);
+      return NULL;
+    }
+    if (result->pages<num)
+      m=result;
+    else {
+      if (result->pages==num) {
+	if (result&0x1FFFFF)
+	  m=result;
+	else {
+	  m->next=result->next;
+	  goto done;
+	}
+      } else {
+	if (i=(result&0x1FFFFF)>>PAGE_BITS) {
+	  j=(1<<12)-i;
+	  if (result->pages<num+j)
+	    m=result;
+	  else if (result->pages==num+j) {
+	    result->pages-=num;
+	    result+=result->pages<<PAGE_BITS;
+	    result->pages=num;
+	    goto done;
+	  } else {
+	    m1=result;
+	    result+=j<<PAGE_BITS;
+	    result->pages=num;
+	    m=result+num<<PAGE_BITS;
+	    m->pages=m1->pages-num-j;
+	    m1->pages=j;
+	    m->next=m1->next;
+	    m1->next=m;
+	    m->signature=MBS_UNUSED_SIGNATURE;
+	    goto done;
+	  }
+	} else {
+	  m=m->next=result+num<<PAGE_BITS;
+	  m->next=result->next;
+	  m->pages=result->pages-num;
+	  m->signature=MBS_UNUSED_SIGNATURE;
+	  result->pages=num;
+	  goto done;
+	}
+      }
+    }
+  } while (TRUE);
+done:
+  m=result;
+  num=*pages2Meg;
+  for (i=0;i<num;i++) {
+    pte=MemPointAtPageTableEntry(m);
+    *pte=*pte & ~0x18;
+    m+=0x200000;
+  }
+  SetFlags(old_flags);
+  return result;
+}
+
+void *AllocUncachedMemBlks(U8 *pages2Meg)
+//This will allocate 2Meg pages from
+//the code heap memory range and not
+//link them to any task.  (Linking to a task
+//means it will be freed when the task
+//dies.)  It will be marked uncached.
+//It might give you more than you asked for
+//so a pointer to a page count is passed.
+{
+  MemBlk *result,*m;
+  U8 i,num=*pages2Meg,*pte;
+
+  result=Alloc2MegMemBlks(pages2Meg);
+  m=result;
+  num=*pages2Meg;
+  for (i=0;i<num;i++) {
+    pte=MemPointAtPageTableEntry(m);
+    *pte=(*pte & ~0x18)|0x10;
+    m+=0x200000;
+  }
+  return result;
+}
+
+void *AllocWriteThroughMemBlks(U8 *pages2Meg)
+//This will allocate 2Meg pages from
+//the code heap memory range and not
+//link them to any task.  (Linking to a task
+//means they will be freed when the task
+//dies.)  It will be marked write-through.
+//It might give you more than you asked for
+//so a pointer to a page count is passed.
+{
+  MemBlk *result,*m;
+  U8 i,num=*pages2Meg,*pte;
+
+  result=Alloc2MegMemBlks(pages2Meg);
+  m=result;
+  num=*pages2Meg;
+  for (i=0;i<num;i++) {
+    pte=MemPointAtPageTableEntry(m);
+    *pte=(*pte & ~0x18)|8;
+    m+=0x200000;
+  }
+  return result;
+}
+
+void Free2MegMemBlks(MemBlk *m,U8 pages2Meg)
+{
+  U8 old_flags,*pte;
+  MemBlk *m1;
+  U8 i;
+  if (m) {
+    m1=m;
+    for (i=0;i<pages2Meg;i++) {
+      pte=MemPointAtPageTableEntry(m1);
+      *pte=*pte & ~0x18;
+      m1+=0x200000;
+    }
+    old_flags=GetFlags;
+    Cli;
+    m->signature=MBS_UNUSED_SIGNATURE;
+    m->pages=pages2Meg<<12;
+    m->next=mem_free_2Meg_list;
+    mem_free_2Meg_list=m;
+    SetFlags(old_flags);
+  }
+}
+
+
+asm {ALLOCATE_MEM_BLKS::}
+MemBlk *AllocMemBlks(U8 *num_,TssStruct *tss)
+{
+  MemBlk *result;
+  U8 old_flags=GetFlags;
+  Cli;
+  result=AllocNonTskMemBlks(num_);
+  InsQue(result,tss->last_mem_blk);
+  result->signature=MBS_USED_SIGNATURE;
+  SetFlags(old_flags);
+  return result;
+}
+
+asm {FREE_MEM_BLKS::}
+void FreeMemBlks(MemBlk *m)
+{
+  U8 old_flags;
+  if (m) {
+    old_flags=GetFlags;
+    Cli;
+    if (m->signature!=MBS_USED_SIGNATURE) {
+      SysBadMemFree(m);
+      goto done;
+    }
+    RemQue(m);
+    FreeNonTskMemBlks(m,m->pages);
+done:
+    SetFlags(old_flags);
+  }
+}
+
+
+void FreeMemBlkList(TssStruct *tss)
+{
+  U8 old_flags=GetFlags;
+  MemBlk *m,*m1;
+  Cli;
+  m=tss->next_mem_blk;
+  while (m!=&tss->next_mem_blk) {
+    m1=m->next;
+    FreeMemBlks(m);
+    m=m1;
+  }
+  SetFlags(old_flags);
+}
+
+asm {
+////**************************PROCEDURE*************************
+// OUT:  RAX=BASE ADDRESS
+//
+	ALIGN	8,OC_NOP
+CP_MALLOC::
+	PUSH	RBP
+	MOV	RBP,RSP
+	PUSH	RSI
+	PUSH	RDI
+
+	XOR	EBX,EBX
+	MOV	RDX,U8 SF_PARAM2[RBP]
+	OR	RDX,RDX
+	JNZ	@@30
+	MOV	RDX,FS:TSS_ABSOLUTE_ADDRESS[RBX]
+@@30:	MOV	RAX,GS:CPU_ABSOLUTE_ADDRESS[RBX]
+	MOV	RAX,U8 CPU_HEAP[RAX]
+	OR	RAX,RAX
+	JZ	@@32
+	MOV	RDX,RAX
+	JMP	U4 MALLOC_HC_JOIN
+@@32:	MOV	RAX,U8 SF_PARAM1[RBP]
+	PUSHFD
+	CLI
+@@31:	LOCK
+	BTS	U4 [SYS_SEMAS+SYS_SEMA_MEM_BUSY*SEMA_STRUCT_SIZE],0
+	JC	@@31
+
+	ADD	RAX,UM_START+8-1  //round-up to U8
+	AND	RAX,~7
+	CMP	RAX,UUM_STRUCT_SIZE
+	JAE	@@4
+	MOV	RAX,UUM_STRUCT_SIZE
+@@4:	CMP	RAX,HEAP_HASH_SIZE
+	JAE	@@10
+	MOV	RSI,U8 TSS_HEAP_HASH[RAX+RDX]
+	OR	RSI,RSI
+	JZ	@@13
+	MOV	RCX,U8 UUM_NEXT[RSI]
+	MOV	U8 TSS_HEAP_HASH[RAX+RDX],RCX
+	JMP	U4 @@5
+
+@@10:	ADD	RAX,MB_STRUCT_SIZE+PAGE_SIZE-1
+	SHR	RAX,PAGE_BITS
+
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,RSP
+	PUSH	RDX
+	PUSH	RAX
+	CALL	ALLOCATE_MEM_BLKS
+	MOV	RSI,RAX
+	ADD	RSP,16
+	POP	RAX
+	POP	RDX
+
+	SHL	RAX,PAGE_BITS
+	SUB	RAX,MB_STRUCT_SIZE
+	ADD	RSI,MB_STRUCT_SIZE
+	JMP	U4 @@5
+
+@@13:	MOV	RSI,RDX
+	ADD	RSI,TSS_MALLOC_FREE_LIST
+
+@@1:	LEA	RBX,U8 UUM_NEXT[RSI]
+	MOV	RSI,U8 [RBX]
+	OR	RSI,RSI
+	JNZ	@@2
+	PUSH	RAX		//-****
+	ADD	RAX,16*PAGE_SIZE-1
+	SHR	RAX,PAGE_BITS
+
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,RSP
+	PUSH	RDX
+	PUSH	RAX
+	CALL	ALLOCATE_MEM_BLKS
+	MOV	RSI,RAX
+	ADD	RSP,16
+	POP	RAX
+	POP	RDX
+
+	LEA	RSI,U8 MB_STRUCT_SIZE[RSI]
+	SHL	RAX,PAGE_BITS
+	SUB	RAX,MB_STRUCT_SIZE
+	MOV	RDI,U8 TSS_MALLOC_FREE_LIST[RDX]
+	MOV	U8 UUM_NEXT[RSI],RDI
+	MOV	U8 UUM_SIZE[RSI],RAX
+	MOV	U8 TSS_MALLOC_FREE_LIST[RDX],RSI
+	MOV	RBX,RDX
+	ADD	RBX,TSS_MALLOC_FREE_LIST
+	POP	RAX		//+****
+	JMP	@@3
+@@2:	CMP	U8 UUM_SIZE[RSI],RAX
+	JB	@@1
+	JNE	@@3
+
+@@8:	MOV	RDI,U8 UUM_NEXT[RSI]
+	MOV	U8 UUM_NEXT[RBX],RDI
+	JMP	@@5
+
+@@3:	SUB	U8 UUM_SIZE[RSI],RAX	//UPDATE FREE ENTRY
+	CMP	U8 UUM_SIZE[RSI],UUM_STRUCT_SIZE
+	JAE	@@7
+	ADD	U8 UUM_SIZE[RSI],RAX
+	XOR	EAX,EAX
+	MOV	RAX,U8 UUM_SIZE[RSI]
+	JMP	@@8
+
+@@7:	MOV	RDI,U8 UUM_SIZE[RSI]
+	ADD	RSI,RDI 		//SET ESI TO @ALLOCATED PAGES
+
+@@5:	MOV	U8 UM_SIZE[RSI],RAX
+	MOV	U8 UM_TSS[RSI],RDX
+	ADD	RSI,UM_START
+
+@@100:	LOCK
+	BTR	U4 [SYS_SEMAS+SYS_SEMA_MEM_BUSY*SEMA_STRUCT_SIZE],0
+	POPFD
+	MOV	RAX,RSI
+
+	BT	U4 [SYS_SEMAS+SYS_SEMA_HEAPLOG*SEMA_STRUCT_SIZE],0
+	JNC	@@200
+	PUSH_C_REGS
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,U8 [SYS_EXTERN_TABLE]
+	MOV	RAX,U8 EXT_HEAPLOG_MALLOC*8[RAX]
+	OR	RAX,RAX
+	JZ	@@202
+	CALL	RAX
+@@202:	ADD	RSP,16
+	POP_C_REGS
+@@200:
+/*************
+This will initialize memory to some value
+for debugging.
+	PUSH	RAX
+	PUSH	RCX
+	MOV	RCX,U8 UM_SIZE-UM_START[RAX]
+	SUB	RCX,UM_START
+	MOV	RDI,RAX
+	MOV	RAX,0x12345678
+	REP_STOSB
+	POP	RCX
+	POP	RAX
+**********/
+
+	POP	RDI
+	POP	RSI
+	POP	RBP
+	RET
+////**************************PROCEDURE*************************
+	ALIGN	8,OC_NOP
+CP_FREE::
+	PUSH	RBP
+	MOV	RBP,RSP
+	PUSH	RSI
+	PUSH	RDI
+
+	BT	U4 [SYS_SEMAS+SYS_SEMA_HEAPLOG*SEMA_STRUCT_SIZE],0
+	JNC	@@1
+	PUSH_C_REGS
+	PUSH	U8 SF_PARAM1[RBP]
+	MOV	RAX,U8 [SYS_EXTERN_TABLE]
+	MOV	RAX,U8 EXT_HEAPLOG_FREE*8[RAX]
+	OR	RAX,RAX
+	JZ	@@2
+	CALL	RAX
+@@2:	ADD	RSP,8
+	POP_C_REGS
+
+@@1:	MOV	RSI,U8 SF_PARAM1[RBP]
+	OR	RSI,RSI
+	JZ	U4 @@100
+	XOR	EBX,EBX
+	MOV	RDX,U8 SF_PARAM2[RBP]
+	OR	RDX,RDX
+	JNZ	@@30
+	MOV	RDX,U8 FS:TSS_ABSOLUTE_ADDRESS[RBX]
+@@30:	MOV	RAX,GS:CPU_ABSOLUTE_ADDRESS[RBX]
+	MOV	RAX,U8 CPU_HEAP[RAX]
+	OR	RAX,RAX
+	JZ	@@32
+	MOV	RDX,RAX
+	JMP	U4 FREE_HC_JOIN
+
+@@32:	PUSHFD
+	CLI
+@@31:	LOCK
+	BTS	U4 [SYS_SEMAS+SYS_SEMA_MEM_BUSY*SEMA_STRUCT_SIZE],0
+	JC	@@31
+	SUB	RSI,UM_START
+	CMP	RDX,U8 UM_TSS[RSI]
+	JE	@@10
+	PUSH_C_REGS
+	PUSH	RSI
+	CALL	CP_BAD_MEM_FREE
+	ADD	RSP,8
+	POP_C_REGS
+	JMP	@@101
+@@10:	XOR	EAX,EAX
+	MOV	RAX,U8 UM_SIZE[RSI]
+	CMP	RAX,HEAP_HASH_SIZE
+	JAE	@@5
+	MOV	U8 UUM_SIZE[RSI],RAX
+	MOV	RBX,U8 TSS_HEAP_HASH[RAX+RDX]
+	MOV	U8 UUM_NEXT[RSI],RBX
+	MOV	U8 TSS_HEAP_HASH[RAX+RDX],RSI
+	JMP	@@101
+
+@@5:	SUB	RSI,MB_STRUCT_SIZE
+	PUSH	RSI
+	CALL	FREE_MEM_BLKS
+	ADD	RSP,8
+
+@@101:	LOCK
+	BTR	U4 [SYS_SEMAS+SYS_SEMA_MEM_BUSY*SEMA_STRUCT_SIZE],0
+	POPFD
+@@100:	POP	RDI
+	POP	RSI
+	POP	RBP
+	RET
+////**************************PROCEDURE*************************
+	ALIGN	8,OC_NOP
+CP_MSIZE::
+	PUSH	RBP
+	MOV	RBP,RSP
+	MOV	RBX,U8 SF_PARAM1[RBP]
+	XOR	EAX,EAX
+	OR	RBX,RBX
+	JZ	@@100
+	MOV	RAX,U8 UM_SIZE-UM_START[RBX]
+	SUB	RAX,UM_START
+@@100:	POP	RBP
+	RET
+////**************************PROCEDURE*************************
+	ALIGN	8,OC_NOP
+CP_MTSS::
+	PUSH	RBP
+	MOV	RBP,RSP
+	MOV	RBX,U8 SF_PARAM1[RBP]
+	XOR	EAX,EAX
+	OR	RBX,RBX
+	JZ	@@100
+	MOV	RAX,U8 UM_TSS-UM_START[RBX]
+@@100:	POP	RBP
+	RET
+}
+
+LTextern CP_MALLOC void *MAlloc(U8 size,TssStruct *tss=NULL);
+LTextern CP_FREE void Free(void *add,TssStruct *tss=NULL);
+LTextern CP_MSIZE U8 MSize(void *src);	//size of heap object
+LTextern CP_MTSS TssStruct *MTss(void *src);  //tss of heap object
+
+void *MAllocZ(U8 size,TssStruct *tss=NULL)
+{
+  void *result=MAlloc(size,tss);
+  MemSet(result,0,size);
+  return result;
+}
+
+void *AMAlloc(U8 size)
+{
+  return MAlloc(size,adam_tss);
+}
+
+void AFree(void *add)
+{
+  Free(add,adam_tss);
+}
+
+void *MAllocIdentical(void *src,TssStruct *tss=NULL)
+{
+  U8 size=MSize(src);
+  void *result=MAlloc(size,tss);
+  MemCpy(result,src,size);
+}
+
+void *AMAllocIdentical(void *src)
+{
+  return MAllocIdentical(src,adam_tss);
+}
+
+I1 *NewStr(I1 *buf,TssStruct *tss=NULL)
+{
+  U8 size=StrLen(buf)+1;
+  I1 *result=MAlloc(size,tss);
+  MemCpy(result,buf,size);
+}
+
+I1 *ANewStr(I1 *buf)
+{
+  return NewStr(buf,adam_tss);
+}
+
+void *AMAllocZ(U8 size)
+{
+  return MAllocZ(size,adam_tss);
+}
+
+void DelLinkedList(void **list)
+{
+  void **d;
+  while (list) {
+    d=*list;
+    Free(list);
+    list=d;
+  }
+}
+
+////**************************PROCEDURE*************************
+asm {ALLOCATE_HC_MEM_BLKS::}
+void *AllocHCMemBlks(U8 *pages512,HeapCtrl *hc)
+{
+  MemBlk *result=NULL,*m;
+  U8 i,num=*pages512,old_flags=GetFlags;
+  Cli;
+  if (num<FREE_PAGE_HASH_SIZE) {
+    if (result=hc->free_page_hash[num]) {
+      hc->free_page_hash[num]=result->next;
+      result->signature=MBS_USED_SIGNATURE;
+      SetFlags(old_flags);
+      return result;
+    }
+  } else {
+    num-=2;
+    i=Bsr(num)+1;
+    num=0;
+    Bts(&num,i);
+    num+=2;
+    *pages512=num;
+    if (result=hc->free_page_hash2[i]) {
+      hc->free_page_hash2[i]=result->next;
+      result->signature=MBS_USED_SIGNATURE;
+      SetFlags(old_flags);
+      return result;
+    }
+  }
+  m=&hc->mem_free_list;
+  do {
+    if (!(result=m->next)) {
+      SysOutOfMem;
+      SetFlags(old_flags);
+      return NULL;
+    }
+    if (result->pages<num)
+      m=result;
+    else {
+      if (result->pages==num) {
+	m->next=result->next;
+	result->signature=MBS_USED_SIGNATURE;
+	SetFlags(old_flags);
+	return result;
+      } else {
+	result->pages-=num;
+	result+=result->pages<<PAGE_BITS;
+	result->pages=num;
+	result->signature=MBS_USED_SIGNATURE;
+	SetFlags(old_flags);
+	return result;
+      }
+    }
+  } while (TRUE);
+}
+
+asm {FREE_HC_MEM_BLKS::}
+void FreeHCMemBlks(MemBlk *m,HeapCtrl *hc)
+{
+  U8 i,old_flags,pages512;
+  if (m) {
+    old_flags=GetFlags;
+    pages512=m->pages;
+    Cli;
+    if (m->signature!=MBS_USED_SIGNATURE) {
+      SysBadMemFree(m);
+      goto done;
+    }
+    m->signature=MBS_UNUSED_SIGNATURE;
+    m->pages=pages512;
+    if (pages512<FREE_PAGE_HASH_SIZE) {
+      m->next=hc->free_page_hash[pages512];
+      hc->free_page_hash[pages512]=m;
+    } else {
+      pages512-=2;
+      i=Bsr(pages512);
+      m->next=hc->free_page_hash2[i];
+      hc->free_page_hash2[i]=m;
+    }
+done:
+    SetFlags(old_flags);
+  }
+}
+
+void InitHeapCtrl(HeapCtrl *hc,U8 pages512)
+{
+  MemBlk *m;
+  MemSet(hc,0,sizeof(HeapCtrl));
+  hc->size=pages512;
+  m=(hc+sizeof(HeapCtrl)+PAGE_SIZE-1)&~(PAGE_SIZE-1);
+  hc->mem_free_list=m;
+  m->next=NULL;
+  m->pages=(hc+pages512<<PAGE_BITS-m)>>PAGE_BITS;
+  m->signature=MBS_UNUSED_SIGNATURE;
+}
+
+asm {
+	STRUC 0
+HC_SIZE:		DU8	?;
+HC_FLAGS:		DU8	?;
+HC_MALLOC_FREE_LIST:	DU8	?;
+HC_MEM_FREE_LIST:	DU8	?;
+HC_HEAP_HASH:		DU1	HEAP_HASH_SIZE DUP(?);
+HC_FREE_PAGE_HASH:	DU8	FREE_PAGE_HASH_SIZE DUP(?);
+HC_FREE_PAGE_HASH2:	DU8	64 DUP(?);
+HC_STRUCT_SIZE:
+	ENDS
+////**************************PROCEDURE*************************
+// OUT:  RAX=BASE ADDRESS
+//
+	ALIGN	8,OC_NOP
+CP_MALLOC_HC::
+	PUSH	RBP
+	MOV	RBP,RSP
+	PUSH	RSI
+	PUSH	RDI
+
+	MOV	RDX,U8 SF_PARAM2[RBP]
+
+MALLOC_HC_JOIN::
+	MOV	RAX,U8 SF_PARAM1[RBP]
+	PUSHFD
+	CLI
+@@31:	LOCK
+	BTS	U4 HC_FLAGS[RDX],HCf_LOCKED
+	JC	@@31
+
+	ADD	RAX,UM_START+8-1  //round-up to U8
+	AND	RAX,~7
+	CMP	RAX,UUM_STRUCT_SIZE
+	JAE	@@4
+	MOV	RAX,UUM_STRUCT_SIZE
+@@4:	CMP	RAX,HEAP_HASH_SIZE
+	JAE	@@10
+	MOV	RSI,U8 HC_HEAP_HASH[RAX+RDX]
+	OR	RSI,RSI
+	JZ	@@13
+	MOV	RCX,U8 UUM_NEXT[RSI]
+	MOV	U8 HC_HEAP_HASH[RAX+RDX],RCX
+	JMP	U4 @@5
+
+@@10:	ADD	RAX,MB_STRUCT_SIZE+PAGE_SIZE-1
+	SHR	RAX,PAGE_BITS
+
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,RSP
+	PUSH	RDX
+	PUSH	RAX
+	CALL	ALLOCATE_HC_MEM_BLKS
+	MOV	RSI,RAX
+	ADD	RSP,16
+	POP	RAX
+	POP	RDX
+
+	SHL	RAX,PAGE_BITS
+	SUB	RAX,MB_STRUCT_SIZE
+	ADD	RSI,MB_STRUCT_SIZE
+	JMP	U4 @@5
+
+@@13:	MOV	RSI,RDX
+	ADD	RSI,HC_MALLOC_FREE_LIST
+
+@@1:	LEA	RBX,U8 UUM_NEXT[RSI]
+	MOV	RSI,U8 [RBX]
+	OR	RSI,RSI
+	JNZ	@@2
+	PUSH	RAX		//-****
+	ADD	RAX,16*PAGE_SIZE-1
+	SHR	RAX,PAGE_BITS
+
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,RSP
+	PUSH	RDX
+	PUSH	RAX
+	CALL	ALLOCATE_HC_MEM_BLKS
+	MOV	RSI,RAX
+	ADD	RSP,16
+	POP	RAX
+	POP	RDX
+
+	LEA	RSI,U8 MB_STRUCT_SIZE[RSI]
+	SHL	RAX,PAGE_BITS
+	SUB	RAX,MB_STRUCT_SIZE
+	MOV	RDI,U8 HC_MALLOC_FREE_LIST[RDX]
+	MOV	U8 UUM_NEXT[RSI],RDI
+	MOV	U8 UUM_SIZE[RSI],RAX
+	MOV	U8 HC_MALLOC_FREE_LIST[RDX],RSI
+	MOV	RBX,RDX
+	ADD	RBX,HC_MALLOC_FREE_LIST
+	POP	RAX		//+****
+	JMP	@@3
+@@2:	CMP	U8 UUM_SIZE[RSI],RAX
+	JB	@@1
+	JNE	@@3
+
+@@8:	MOV	RDI,U8 UUM_NEXT[RSI]
+	MOV	U8 UUM_NEXT[RBX],RDI
+	JMP	@@5
+
+@@3:	SUB	U8 UUM_SIZE[RSI],RAX	//UPDATE FREE ENTRY
+	CMP	U8 UUM_SIZE[RSI],UUM_STRUCT_SIZE
+	JAE	@@7
+	ADD	U8 UUM_SIZE[RSI],RAX
+	XOR	EAX,EAX
+	MOV	RAX,U8 UUM_SIZE[RSI]
+	JMP	@@8
+
+@@7:	MOV	RDI,U8 UUM_SIZE[RSI]
+	ADD	RSI,RDI 		//SET ESI TO @ALLOCATED PAGES
+
+@@5:	MOV	U8 UM_SIZE[RSI],RAX
+	MOV	U8 UM_HEAP_CTRL[RSI],RDX
+	ADD	RSI,UM_START
+
+@@100:	LOCK
+	BTR	U4 HC_FLAGS[RDX],HCf_LOCKED
+	POPFD
+	MOV	RAX,RSI
+
+	BT	U4 [SYS_SEMAS+SYS_SEMA_HEAPLOG*SEMA_STRUCT_SIZE],0
+	JNC	@@200
+	PUSH_C_REGS
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RAX,U8 [SYS_EXTERN_TABLE]
+	MOV	RAX,U8 EXT_HEAPLOG_MALLOC*8[RAX]
+	OR	RAX,RAX
+	JZ	@@202
+	CALL	RAX
+@@202:	ADD	RSP,16
+	POP_C_REGS
+@@200:
+/*************
+This will initialize memory to some value
+for debugging.
+	PUSH	RAX
+	PUSH	RCX
+	MOV	RCX,U8 UM_SIZE-UM_START[RAX]
+	SUB	RCX,UM_START
+	MOV	RDI,RAX
+	MOV	RAX,0x12345678
+	REP_STOSB
+	POP	RCX
+	POP	RAX
+**********/
+
+	POP	RDI
+	POP	RSI
+	POP	RBP
+	RET
+////**************************PROCEDURE*************************
+	ALIGN	8,OC_NOP
+CP_FREE_HC::
+	PUSH	RBP
+	MOV	RBP,RSP
+	PUSH	RSI
+	PUSH	RDI
+
+	BT	U4 [SYS_SEMAS+SYS_SEMA_HEAPLOG*SEMA_STRUCT_SIZE],0
+	JNC	@@1
+	PUSH_C_REGS
+	PUSH	U8 SF_PARAM1[RBP]
+	MOV	RAX,U8 [SYS_EXTERN_TABLE]
+	MOV	RAX,U8 EXT_HEAPLOG_FREE*8[RAX]
+	OR	RAX,RAX
+	JZ	@@2
+	CALL	RAX
+@@2:	ADD	RSP,8
+	POP_C_REGS
+
+@@1:	MOV	RSI,U8 SF_PARAM1[RBP]
+	OR	RSI,RSI
+	JZ	U4 FREE_HC_DONE
+	MOV	RDX,U8 SF_PARAM2[RBP]
+
+FREE_HC_JOIN::
+	PUSHFD
+	CLI
+@@31:	LOCK
+	BTS	U4 HC_FLAGS[RDX],HCf_LOCKED
+	JC	@@31
+	SUB	RSI,UM_START
+	CMP	RDX,U8 UM_HEAP_CTRL[RSI]
+	JE	@@10
+	PUSH_C_REGS
+	PUSH	RSI
+	CALL	CP_BAD_MEM_FREE
+	ADD	RSP,8
+	POP_C_REGS
+	JMP	@@101
+@@10:	XOR	EAX,EAX
+	MOV	RAX,U8 UM_SIZE[RSI]
+	CMP	RAX,HEAP_HASH_SIZE
+	JAE	@@5
+	MOV	U8 UUM_SIZE[RSI],RAX
+	MOV	RBX,U8 HC_HEAP_HASH[RAX+RDX]
+	MOV	U8 UUM_NEXT[RSI],RBX
+	MOV	U8 HC_HEAP_HASH[RAX+RDX],RSI
+	JMP	@@101
+
+@@5:	SUB	RSI,MB_STRUCT_SIZE
+	PUSH	RDX
+	PUSH	RSI
+	CALL	FREE_HC_MEM_BLKS
+	ADD	RSP,8
+	POP	RDX
+
+@@101:	LOCK
+	BTR	U4 HC_FLAGS[RDX],HCf_LOCKED
+	POPFD
+FREE_HC_DONE:
+	POP	RDI
+	POP	RSI
+	POP	RBP
+	RET
+////**************************PROCEDURE*************************
+	ALIGN	8,OC_NOP
+CP_MEM_HEAP_CTRL::
+	PUSH	RBP
+	MOV	RBP,RSP
+	MOV	RBX,U8 SF_PARAM1[RBP]
+	XOR	EAX,EAX
+	OR	RBX,RBX
+	JZ	@@100
+	MOV	RAX,U8 UM_HEAP_CTRL-UM_START[RBX]
+@@100:	POP	RBP
+	RET
+}
+
+LTextern CP_MALLOC_HC void *MAllocHC(U8 size,HeapCtrl *hc);
+LTextern CP_FREE_HC void FreeHC(void *add,HeapCtrl *hc);
+LTextern CP_MSIZE U8 MSizeHC(void *src);	//size of heap object
+LTextern CP_MEM_HEAP_CTRL HeapCtrl *MHeapCtrl(void *src);  //HC of heap object
+
+void *MAllocHCZ(U8 size,HeapCtrl *hc)
+{
+  void *result=MAllocHC(size,hc);
+  MemSet(result,0,size);
+  return result;
+}
+
+void *MAllocIdenticalHC(void *src,HeapCtrl *hc)
+{
+  U8 size=MSize(src);
+  void *result=MAllocHC(size,hc);
+  MemCpy(result,src,size);
+}
+
+I1 *NewStrHC(I1 *buf,HeapCtrl *hc)
+{
+  U8 size=StrLen(buf)+1;
+  I1 *result=MAllocHC(size,hc);
+  MemCpy(result,buf,size);
+}

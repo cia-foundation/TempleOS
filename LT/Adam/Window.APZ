@@ -1,0 +1,1080 @@
+#help_index "Windows"
+
+public void RefocusWin()
+{
+  TssStruct *tss_focus=sys_cur_focus_task;
+  if (!tss_focus) {
+    tss_focus=sys_update_screen_tss->last_tss;
+    while (tss_focus!=sys_update_screen_tss) {
+      if (Bt(&tss_focus->task_flags,TSSf_LOCAL_USER)) {
+	sys_cur_focus_task=tss_focus;
+	break;
+      }
+      tss_focus=tss_focus->last_tss;
+    }
+  }
+}
+
+I8 old_ipx=-1000,old_ipy=-1000,old_ipz=0;
+BoolU4 old_ip_lb=FALSE,old_ip_rb=FALSE;
+U8 left_ip_double_time=0;
+BoolU4 left_double=FALSE,left_down_sent=FALSE;
+U8 right_ip_double_time=0;
+BoolU4 right_double=FALSE,right_down_sent=FALSE;
+public U8 double_click_mS=350;
+
+public I8 win_min_refresh=15,
+   win_max_refresh=50,
+   win_updates=0;
+public double win_refresh=win_min_refresh;
+
+BoolU4 win_first_after_startup_complete=FALSE;
+
+void PlotInputPointer(GrBitMap *base)
+{
+  I8 x,y;
+  U8 old_flags=GetFlags;
+  Cli;
+  x=ipx;
+  y=ipy;
+  SetFlags(old_flags);
+  if (ip_on && ip_pointer_type!=IP_NULL) {
+    base->color=ROP_XOR+WHITE;
+    GrLine4(base,x,y,x+10,y+10);
+    GrLine4(base,x+2,y+1,x+11,y+10);
+    GrLine4(base,x+1,y+2,x+10,y+11);
+    GrLine4(base,x,y,x+5,y);
+    GrLine4(base,x,y,x,y+5);
+  }
+}
+
+
+void UpdateOdes(TssStruct *tss)
+{
+  I8 i,timeout_time=GetTimeStamp+time_stamp_freq/win_min_refresh;
+  double t_desired=GetTimeStamp*1.0/time_stamp_freq,
+	 t_initial,interpolation;
+  Ode *o=tss->next_ode;
+  while (o!=&tss->next_ode) {
+    MemCpy(o->internal_state,o->state,o->n*sizeof(double));
+    o->tolerance=o->tolerance_start;
+    o->derivative(o,o->t+o->base_t,o->internal_state,o->DstateDt);
+    for (i=0;i<o->n;i++)
+      o->state_scale[i]=Abs(o->internal_state[i])+Abs(o->DstateDt[i]*o->h)+1e-4;
+    t_initial=o->t+o->base_t;
+    MemCpy(o->initial_state,o->internal_state,o->n*sizeof(double));
+    do {
+      while (o->t+o->base_t<t_desired) {
+	OdeRK5OneStep(o);
+	if (GetTimeStamp>timeout_time)
+	  o->base_t=t_desired-o->t;
+      }
+      if (interpolation=(o->t+o->base_t-t_initial))
+	interpolation=(t_desired-t_initial)/interpolation;
+      else
+	interpolation=1.0;
+      if (interpolation>.1 || o->tolerance<1e-64)
+	break;
+      else {
+	MemCpy(o->internal_state,o->initial_state,sizeof(double)*o->n);
+	o->t=t_initial-o->base_t;
+	o->tolerance/=10;
+      }
+    } while (TRUE);
+    for (i=0;i<o->n;i++)
+      o->internal_state[i]=(o->internal_state[i]-o->initial_state[i])*interpolation+o->initial_state[i];
+    o->t=t_desired-o->base_t;
+    MemCpy(o->state,o->internal_state,o->n*sizeof(double));
+    o=o->next;
+  }
+}
+
+void WinUpdateIP()
+{
+  I8 dd;
+  U8 temp,temp2;
+  BoolU8 set=FALSE;
+  double speed=0;
+
+  if (ip_pointer_type==IP_MOUSE) {
+    ip_has_wheel=mouse_has_wheel;
+    if (mouse_evt) {
+      ipx=mxx/ipx_snap*ipx_snap+ipx_snap_offset;
+      ipy=myy/ipy_snap*ipy_snap+ipy_snap_offset;
+
+      ip_throttle+=(mzz-ipz)*0x10000000;
+      if (ip_throttle>MAX_I4)
+	ip_throttle=MAX_I4;
+      if (ip_throttle<MIN_I4)
+	ip_throttle=MIN_I4;
+
+      ipz=mzz/ipz_snap*ipz_snap+ipz_snap_offset;
+      ip_lb=mouse_buttons[0];
+      ip_rb=mouse_buttons[1];
+      mouse_evt=FALSE;
+    }
+    set=TRUE;
+  } else if (ip_pointer_type==IP_JOYSTICK0) {
+    ip_has_wheel=FALSE;
+    PollJoystick;
+    ipx=joycx/ipx_snap*ipx_snap+ipx_snap_offset;
+    ipy=joycy/ipy_snap*ipy_snap+ipy_snap_offset;
+    ipz=ipz_snap_offset;
+    if (joymax[2]-joymin[2]>joymax[3]-joymin[3])
+      ip_throttle=0x100000000*(joyv[2]-joyrest[2])/(joymax[2]-joymin[2]+1);
+    else
+      ip_throttle=0x100000000*(joyv[3]-joyrest[3])/(joymax[3]-joymin[3]+1);
+    if (ip_throttle>MAX_I4)
+      ip_throttle=MAX_I4;
+    if (ip_throttle<MIN_I4)
+      ip_throttle=MIN_I4;
+    ip_lb=joyb[0];
+    ip_rb=joyb[1];
+    set=TRUE;
+  } else if (ip_pointer_type==IP_NULL && mouse_installed)
+    ip_pointer_type=IP_MOUSE;
+
+  if (set) {
+    dd=(old_ipx-ipx)*(old_ipx-ipx)+
+       (old_ipy-ipy)*(old_ipy-ipy);
+    if (dd>0) {
+      temp2=GetTimeStamp;
+      temp=temp2-last_ip_move_time;
+      last_ip_move_time=temp2;
+      if (!temp) temp=1;
+      speed=Sqrt(dd)/(temp/(1.0*time_stamp_freq));
+    }
+    iptx=ipx/FONT_WIDTH;
+    ipty=ipy/FONT_HEIGHT;
+  }
+  if (ip_speed<10.0)
+    ip_speed=speed;
+  else
+    ip_speed=0.75*ip_speed+0.25*speed;	//digital filter for mouse speed
+}
+
+U8 last_idle_point_hits[MP_MAX_PROCESSORS]={0,0,0,0};
+U8 last_swap_cnter[MP_MAX_PROCESSORS]={0,0,0,0};
+I8 last_refresh_time=GetTimeStamp,
+   last_refresh_start_time=0,
+   last_refresh_end_time=0,
+   refresh_time,refresh_delta_time;
+U8 win_calc_refresh_cnt=0,
+   win_calc_refresh_skips=0;
+
+U8 WinCalcRefreshTimeout()
+{
+  double d=Gs->idle_factor,d1;
+  I8 i,k;
+  U8 old_flags=GetFlags;
+  U8 idle_point_hits[MP_MAX_PROCESSORS];
+  CPUStruct *c;
+
+  win_calc_refresh_skips++;
+  if (GetTimeStamp-last_refresh_time>time_stamp_freq>>2) {
+    refresh_time=GetTimeStamp;
+
+    Cli;
+    for (i=0;i<mp_cnt;i++) {
+      c=mp_cpu_structs+sizeof(CPUStruct)*i;
+      idle_point_hits[i]=c->idle_point_hits;
+    }
+    SetFlags(old_flags);
+
+    refresh_delta_time=refresh_time-last_refresh_time;
+    for (i=0;i<mp_cnt;i++) {
+      c=mp_cpu_structs+sizeof(CPUStruct)*i;
+      if (refresh_delta_time>0) {
+	k=idle_point_hits[i]-last_idle_point_hits[i];
+	if (k>=0)
+	  c->idle_factor=
+	    k*time_stamp_freq*1.0
+	  /(JIFFY_FREQ*refresh_delta_time);
+      }
+      last_idle_point_hits[i]=idle_point_hits[i];
+      if (c->idle_factor<.01)
+	c->idle_factor=0.01;
+      if (c->idle_factor>.99)
+	c->idle_factor=0.99;
+    }
+
+    last_refresh_time=refresh_time;
+
+    if (win_first_after_startup_complete) {
+      d1=(last_refresh_end_time-last_refresh_start_time)*1.0/
+	 (refresh_delta_time/win_calc_refresh_skips);
+      if (d1<0.2)
+	win_refresh*=1.25;
+      else if (d<=0.0)
+	win_refresh=win_min_refresh;
+      else if (d<0.02) {
+	d=win_min_refresh/win_refresh;
+	win_refresh=d*win_min_refresh+0.5*(1.0-d)*win_refresh;
+      } else if (d<0.99) {
+	if (d=(1.0-d)`0.25)
+	  win_refresh*=(0.8`0.25)/d;
+      } else
+	win_refresh=win_max_refresh;
+      win_calc_refresh_cnt++;
+      win_calc_refresh_skips=0;
+    } else {
+      win_refresh=win_max_refresh;
+      win_first_after_startup_complete=TRUE;
+    }
+  }
+  if (win_refresh<win_min_refresh) win_refresh=win_min_refresh;
+  if (win_refresh>win_max_refresh) win_refresh=win_max_refresh;
+  return GetTimeStamp+time_stamp_freq/win_refresh;
+}
+
+U8 WinQueueKbdMouseMsgs()
+{
+  U8 jiffies=Jiffies,cmd=0;
+  I8 p1,p2;
+  TssStruct *tss_focus=sys_cur_focus_task;
+
+  if (tss_focus) {
+    while (U8FifoRemove(scan_code_fifo,&p2)) {
+      p1=ScanCodeToASCII(p2);
+      if (p2 & SCF_KEY_UP) {
+	QueueMsg(tss_focus,0,
+	  MSG_KEY_UP,p1,p2,0);
+	cmd=MSG_KEY_UP;
+      } else {
+	QueueMsg(tss_focus,0,
+	  MSG_KEY_DOWN,p1,p2,0);
+	cmd=MSG_KEY_DOWN;
+      }
+    }
+
+    p1=ipx-tss_focus->win_left*FONT_WIDTH;
+    p2=ipy-tss_focus->win_top*FONT_HEIGHT;
+    if (old_ipx!=ipx || old_ipy!=ipy) {
+      QueueMsg(tss_focus,0,
+	MSG_IP_MOVE,p1,p2,0);
+      cmd=MSG_IP_MOVE;
+    }
+    //TODO queue msg for ipz?
+    if (left_ip_double_time) {
+      if (jiffies>left_ip_double_time) {
+	if (left_double) {
+	  if (!left_down_sent) {
+	    QueueMsg(tss_focus,0,
+    	      MSG_IP_L_D_DOWN,p1,p2,0);
+	    left_down_sent=TRUE;
+	    cmd=MSG_IP_L_D_DOWN;
+	  }
+	  if (!ip_lb) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_L_D_UP,p1,p2,0);
+	    left_ip_double_time=0;
+	    cmd=MSG_IP_L_D_UP;
+	  }
+	} else {
+	  if (!left_down_sent) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_L_DOWN,p1,p2,0);
+	    left_down_sent=TRUE;
+	    cmd=MSG_IP_L_DOWN;
+	  }
+	  if (!ip_lb) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_L_UP,p1,p2,0);
+	    left_ip_double_time=0;
+	    cmd=MSG_IP_L_UP;
+	  }
+	}
+      } else {
+	if (ip_lb && !ip_lb_last) {
+	  left_ip_double_time=jiffies;
+	  left_double=TRUE;
+	}
+      }
+    } else {
+      if (Bt(&tss_focus->crt_flags,CRTf_NO_DOUBLE_CLICK)) {
+	if (ip_lb  && !ip_lb_last) {
+	  QueueMsg(tss_focus,0,
+	    MSG_IP_L_DOWN,p1,p2,0);
+	  cmd=MSG_IP_L_DOWN;
+	} else if (!ip_lb && ip_lb_last) {
+	  QueueMsg(tss_focus,0,
+	    MSG_IP_L_UP,p1,p2,0);
+	  cmd=MSG_IP_L_UP;
+	}
+      } else {
+	if (ip_lb  && !ip_lb_last) {
+	  left_double=FALSE;
+	  left_down_sent=FALSE;
+	  left_ip_double_time=jiffies+
+	    double_click_mS*JIFFY_FREQ/1000;
+	}
+      }
+    }
+
+    if (right_ip_double_time) {
+      if (jiffies>right_ip_double_time) {
+	if (right_double) {
+	  if (!right_down_sent) {
+	    QueueMsg(tss_focus,0,
+   	      MSG_IP_R_D_DOWN,p1,p2,0);
+	    right_down_sent=TRUE;
+	    cmd=MSG_IP_R_D_DOWN;
+	  }
+	  if (!ip_rb) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_R_D_UP,p1,p2,0);
+	    right_ip_double_time=0;
+	    cmd=MSG_IP_R_D_UP;
+	  }
+	} else {
+	  if (!right_down_sent) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_R_DOWN,p1,p2,0);
+	    right_down_sent=TRUE;
+	    cmd=MSG_IP_R_DOWN;
+	  }
+	  if (!ip_rb) {
+	    QueueMsg(tss_focus,0,
+	      MSG_IP_R_UP,p1,p2,0);
+	    right_ip_double_time=0;
+	    cmd=MSG_IP_R_UP;
+	  }
+	}
+      } else {
+	if (ip_rb && !ip_rb_last) {
+	  right_ip_double_time=jiffies;
+	  right_double=TRUE;
+	}
+      }
+    } else {
+      if (Bt(&tss_focus->crt_flags,CRTf_NO_DOUBLE_CLICK)) {
+	if (ip_rb  && !ip_rb_last) {
+	  QueueMsg(tss_focus,0,
+	    MSG_IP_R_DOWN,p1,p2,0);
+	  cmd=MSG_IP_R_DOWN;
+	} else if (!ip_rb && ip_rb_last) {
+	  QueueMsg(tss_focus,0,
+	    MSG_IP_R_UP,p1,p2,0);
+	  cmd=MSG_IP_R_UP;
+	}
+      } else {
+	if (ip_rb  && !ip_rb_last) {
+	  right_double=FALSE;
+	  right_down_sent=FALSE;
+	  right_ip_double_time=jiffies+
+	    double_click_mS*JIFFY_FREQ/1000;
+	}
+      }
+    }
+
+    ip_lb_last=ip_lb;
+    ip_rb_last=ip_rb;
+    old_ip_lb=ip_lb;
+    old_ip_rb=ip_rb;
+    old_ipx=ipx;
+    old_ipy=ipy;
+    old_ipz=ipz;
+  }
+  return cmd;
+}
+
+U8 WinPointAndSleep()
+{
+  U8 timeout_val,timeout_val2,cmd=0;
+
+  if (sys_cur_focus_task)
+    cmd=WinQueueKbdMouseMsgs;
+  else {
+    RefocusWin;
+    if (!sys_cur_focus_task)
+      U8FifoFlush(scan_code_fifo);
+  }
+
+  if (sys_cur_focus_task)
+    Btr(&sys_cur_focus_task->task_flags,TSSf_HAS_SONG);
+
+  timeout_val=WinCalcRefreshTimeout;
+  WinUpdateIP;
+  last_refresh_start_time=TssTotalTime;
+  GrUpdateScreen(gr_merge_base,grbase2,textbase);
+  last_refresh_end_time=TssTotalTime;
+
+  if (sys_cur_focus_task) {
+    if (!Bt(&sys_cur_focus_task->task_flags,TSSf_HAS_SONG)) {
+      AFree(cur_song);
+      cur_song=NULL;
+    }
+  }
+  if (cur_song) {
+    if (!cur_song_tss)
+      cur_song_tss=Spawn(&CurSongTsk,"Current Song");
+  } else {
+    if (cur_song_tss) {
+      Kill(cur_song_tss);
+      cur_song_tss=NULL;
+    }
+  }
+  win_updates++;
+  if (!mouse_install_attempts) {
+    Fs->task_flags|=1<<TSSf_IDLE;
+    do SwapInNext;
+    while (Fs->time_slice_start<timeout_val);
+    Fs->task_flags&=~(1<<TSSf_IDLE);
+  } else {
+    do {
+      PollKbdMouse;
+
+      timeout_val2=GetTimeStamp+time_stamp_freq/KBDMOUSE_POLL_RATE;
+      if (timeout_val2>timeout_val)
+	timeout_val2=timeout_val;
+
+      Fs->task_flags|=1<<TSSf_IDLE;
+      do SwapInNext;
+      while (Fs->time_slice_start<timeout_val2);
+      Fs->task_flags&=~(1<<TSSf_IDLE);
+
+    } while (Fs->time_slice_start<timeout_val);
+  }
+  return cmd;
+}
+
+#help_index "Windows;Task/Delay"
+public void WinSync(BoolU4 full_update=FALSE)
+{
+//This waits until the next screen update.
+//Since messages are only dispatched
+//by the window manager, you can call
+//this when waiting for messages.
+
+  I8 update_cnt,gr_update_cnt;
+  BoolU4 old_full_update,
+	 old_idle=Bts(&Fs->task_flags,TSSf_IDLE);
+
+  if (full_update) {
+    if (Fs->cur_ltf)
+      old_full_update=Bts(&Fs->cur_ltf->flags,LTFf_DO_FULL_UPDATE);
+  }
+
+  //We might catch it in the middle of an update
+  //If do full update, set cur position
+  update_cnt=win_updates;
+  gr_update_cnt=gr_win_updates;
+  while (update_cnt==win_updates ||
+	 gr_update_cnt==gr_win_updates)
+    SwapInNext;
+
+  if (full_update) {
+    //Do update with cur position
+    update_cnt=win_updates;
+    gr_update_cnt=gr_win_updates;
+    while (update_cnt==win_updates ||
+	   gr_update_cnt==gr_win_updates)
+      SwapInNext;
+    if (Fs->cur_ltf)
+      AssignBit(&Fs->cur_ltf->flags,LTFf_DO_FULL_UPDATE,old_full_update);
+  }
+  AssignBit(&Fs->task_flags,TSSf_IDLE,old_idle);
+}
+
+#help_index "Windows"
+
+public BoolU8 WinToTop(TssStruct *tss=NULL)
+{
+  BoolU4 result=FALSE,old_flags=GetFlags;
+  TssStruct *next,*last;
+  if (!tss) tss=Fs;
+  //REMOVE
+  Cli; //TODO Multiprocessor safe
+  if (!ValidateTss(tss)) {
+    SetFlags(old_flags);
+    return result;
+  }
+  if (sys_update_screen_tss->last_tss!=tss) {
+    next=tss->next_tss;
+    last=tss->last_tss;
+    next->last_tss=last;
+    last->next_tss=next;
+    AddTaskToQueue(tss,sys_update_screen_tss);
+    result=TRUE;
+  }
+  if (Bt(&tss->task_flags,TSSf_LOCAL_USER))
+    sys_cur_focus_task=tss;
+  SetFlags(old_flags);
+  return result;
+}
+ext[EXT_WIN_TO_TOP]=&WinToTop;
+
+void SetWinHorz(TssStruct *tss,I8 i,I8 j)
+{
+  I8 d=j-i;
+  if (d<0) d=0;
+  if (i>=TEXT_COLS) {
+    i=TEXT_COLS-1;
+    j=i+d;
+  }
+  if (j<0) {
+    j=0;
+    i=j-d;
+  }
+  if (i>j) {
+    if (i>0)
+      j=i;
+    else
+      i=j;
+  }
+  if (tss->win_left!=i || tss->win_right!=j) {
+    Bts(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED);
+    Bts(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED2);
+  }
+  tss->win_left=i;
+  tss->win_right=j;
+}
+
+void SetWinVert(TssStruct *tss,I8 i,I8 j)
+{
+  I8 d=j-i;
+  if (d<0) d=0;
+  if (i>=TEXT_ROWS) {
+    i=TEXT_ROWS-1;
+    j=i+d;
+  }
+  if (j<=0) {
+    j=1;
+    i=j-d;
+  }
+  if (i>j) {
+    if (i>=0)
+      j=i;
+    else
+      i=j;
+  }
+  if (tss->win_top!=i || tss->win_bottom!=j) {
+    Bts(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED);
+    Bts(&tss->crt_flags,CRTf_HAS_BEEN_RESIZED2);
+  }
+  tss->win_top=i;
+  tss->win_bottom=j;
+}
+
+BoolU8 SetCursorPosition(TssStruct *tss,I8 iptx,I8 ipty,BoolU4 set_cursor=TRUE)
+{
+  Ltf *l;
+  if (tss->win_top<=ipty && tss->win_bottom>=ipty &&
+    tss->win_left<=iptx && tss->win_right>=iptx) {
+    if (l=tss->aux_ltf) {
+      if (set_cursor) {
+	//set top line
+	l->recalc_start=l;
+	LtfUpdateWinJoin(l,FALSE,TRUE,TRUE,FALSE,OFF);
+
+	l->x=iptx-tss->win_left+l->line_start_col;
+	l->y=ipty-tss->win_top+l->cur_top_line_num;
+	LtfUpdateWinJoin(l,FALSE,FALSE,FALSE,TRUE,OFF);
+	if (!l->best_d)
+	  goto done;
+      }
+    }
+    if (l=tss->cur_ltf) {
+      if (set_cursor) {
+
+	//set top line
+	l->recalc_start=l;
+	LtfUpdateWinJoin(l,FALSE,TRUE,TRUE,FALSE,OFF);
+
+	l->x=iptx-tss->win_left+l->line_start_col;
+	l->y=ipty-tss->win_top+l->cur_top_line_num;
+	LtfUpdateWinJoin(l,FALSE,FALSE,FALSE,TRUE,OFF);
+      }
+    }
+done:
+    WinToTop(tss);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+void UpdateDerivedTssValues(TssStruct *tss)
+{
+//Inside the Border
+  tss->win_pixel_left  =FONT_WIDTH*tss->win_left;
+  tss->win_pixel_right =FONT_WIDTH*(tss->win_right+1)-1;
+  tss->win_pixel_top   =FONT_HEIGHT*tss->win_top;
+  tss->win_pixel_bottom=FONT_HEIGHT*(tss->win_bottom+1)-1;
+
+//Outside the border
+  if (Bt(&tss->crt_flags,CRTf_NO_BORDER)) {
+    tss->win_border_pixel_left	=tss->win_pixel_left;
+    tss->win_border_pixel_right =tss->win_pixel_right;
+    tss->win_border_pixel_top	=tss->win_pixel_top;
+    tss->win_border_pixel_bottom=tss->win_pixel_bottom;
+  } else {
+    tss->win_border_pixel_left	=tss->win_pixel_left-FONT_WIDTH;
+    tss->win_border_pixel_right =tss->win_pixel_right+FONT_WIDTH;
+    tss->win_border_pixel_top	=tss->win_pixel_top-FONT_HEIGHT;
+    tss->win_border_pixel_bottom=tss->win_pixel_bottom+FONT_HEIGHT;
+  }
+}
+
+public void WinTileHorz()
+{
+  TssStruct *tss,*last_tss=Fs;
+  I8 cnt,c,i,vert_size;
+  BoolU4 old_preempt=Preempt(OFF);
+
+  tss=sys_update_screen_tss;
+  cnt=0;
+  do {
+    if (Bt(&tss->task_flags,TSSf_LOCAL_USER))
+      cnt++;
+    tss=tss->last_tss;
+  } while (tss!=sys_update_screen_tss);
+
+
+  tss=sys_update_screen_tss;
+  i=0;
+  do {
+    if (Bt(&tss->task_flags,TSSf_LOCAL_USER)) {
+      c=cnt-(i&~3);
+      if (!c)
+	c=1;
+      else if (c>4)
+	c=4;
+      vert_size=(TEXT_ROWS-1)/c;
+
+      tss->win_right=TEXT_COLS-2;
+      tss->win_left=1;
+      tss->win_top=(i&3)*vert_size+2;
+      tss->win_bottom=((i&3)+1)*vert_size;
+      last_tss=tss;
+      if ((i&3)==3)
+	tss->win_bottom=TEXT_ROWS-2;
+      i++;
+      UpdateDerivedTssValues(tss);
+    }
+    tss=tss->last_tss;
+  } while (tss!=sys_update_screen_tss);
+  last_tss->win_bottom=TEXT_ROWS-2;
+  LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+  Preempt(old_preempt);
+}
+
+public void WinTileVert()
+{
+  TssStruct *tss,*last_tss=Fs;
+  I8 cnt,c,i,horz_size;
+  BoolU4 old_preempt=Preempt(OFF);
+  tss=sys_update_screen_tss;
+  cnt=0;
+  do {
+    if (Bt(&tss->task_flags,TSSf_LOCAL_USER))
+      cnt++;
+    tss=tss->last_tss;
+  } while (tss!=sys_update_screen_tss);
+
+  tss=sys_update_screen_tss;
+  i=0;
+  do {
+    if (Bt(&tss->task_flags,TSSf_LOCAL_USER)) {
+      c=cnt-(i&~3);
+      if (!c)
+	c=1;
+      else if (c>4)
+	c=4;
+      horz_size=TEXT_COLS/c;
+
+      tss->win_top=2;
+      tss->win_bottom=TEXT_ROWS-2;
+      tss->win_left=(i&3)*horz_size+1;
+      tss->win_right=((i&3)+1)*horz_size-1;
+      last_tss=tss;
+      if ((i&3)==3)
+	tss->win_right=TEXT_COLS-2;
+      i++;
+      UpdateDerivedTssValues(tss);
+    }
+    tss=tss->last_tss;
+  } while (tss!=sys_update_screen_tss);
+  last_tss->win_right=TEXT_COLS-2;
+  LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+  Preempt(old_preempt);
+}
+
+
+public void WinMax(TssStruct *tss=NULL)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  if (!tss) tss=Fs;
+  if (Bt(&tss->crt_flags,CRTf_NO_BORDER)) {
+    tss->win_right=TEXT_COLS-1;
+    tss->win_left=0;
+    tss->win_top=1;
+    tss->win_bottom=TEXT_ROWS-1;
+  } else {
+    tss->win_right=TEXT_COLS-2;
+    tss->win_left=1;
+    tss->win_top=2;
+    tss->win_bottom=TEXT_ROWS-2;
+  }
+  UpdateDerivedTssValues(tss);
+  WinToTop(tss);
+  Preempt(old_preempt);
+}
+
+public BoolU8 WinBorder(BoolU4 val,TssStruct *tss=NULL)
+{
+  BoolU4 old_has_border,
+	 old_preempt=Preempt(OFF);
+  if (!tss) tss=Fs;
+  old_has_border=!Bt(&tss->crt_flags,CRTf_NO_BORDER);
+  if (val) {
+    if (!old_has_border) {
+      Btr(&tss->crt_flags,CRTf_NO_BORDER);
+      tss->win_right--;
+      tss->win_left++;
+      tss->win_top++;
+      tss->win_bottom--;
+      UpdateDerivedTssValues(tss);
+    }
+  } else {
+    if (old_has_border) {
+      Bts(&tss->crt_flags,CRTf_NO_BORDER);
+      tss->win_right++;
+      tss->win_left--;
+      tss->win_top--;
+      tss->win_bottom++;
+      UpdateDerivedTssValues(tss);
+    }
+  }
+  Preempt(old_preempt);
+  return old_has_border;
+}
+
+void WinManagerTsk()
+{
+  TssStruct *tss=Fs;
+  I8 x,y,cmd;
+  Ltf *l;
+  LtfEntry *ll;
+  I8 my_ipz=0;
+  BoolU4 has_border;
+  U8 old_flags=GetFlags;
+
+  InitCrt;
+  Fs->win_left=0;
+  Fs->win_right=TEXT_COLS-1;
+  Fs->win_top=0;
+  Fs->win_bottom=TEXT_ROWS-1;
+  UpdateDerivedTssValues(Fs);
+  Bts(&Fs->crt_flags,CRTf_NO_BORDER);
+  Bts(&Fs->crt_flags,CRTf_SHOW);
+  LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+  Raw(OFF);
+  GrSetupTable(grbase2);
+  ext[EXT_SCAN_KEY]=&WinScanKey;
+  while (TRUE) {
+  try {
+wmt_start:
+    Fs->update_win=ext[EXT_WALLPAPER];
+    do {
+      Cli;
+      if (ValidateTss(tss))
+	tss=tss->last_tss;
+      else
+	tss=Fs->last_tss;
+      SetFlags(old_flags);
+      if (tss==Fs) {
+	WinPointAndSleep;
+	FinishOffDyingTsses;
+      }
+    } while (!ValidateTss(tss) || tss==Fs || !Bt(&tss->crt_flags,CRTf_SHOW));
+    UpdateDerivedTssValues(tss);
+    if (ip_inhibit_win_operations)
+      goto wmt_start;
+ 
+    if (Bt(&tss->crt_flags,CRTf_NO_BORDER))
+      has_border=FALSE;
+    else
+      has_border=TRUE;
+
+    if (!old_ip_lb && ip_lb) {
+      if (SetCursorPosition(tss,iptx,ipty)) {
+	if (l=tss->aux_ltf) {
+	  if (!l->best_d) {
+	    ll=l->cur_entry;
+	    if (ll!=l) {
+	      if (ll->flags & LTFLF_HAS_BORDER)
+		ll->flags|=LTFLF_SOLID_BORDER;
+	    }
+	    old_ip_lb=TRUE;
+	    goto wmt_start;
+	  }
+	}
+	if (l=tss->cur_ltf) {
+	  ll=l->cur_entry;
+	  if (ll!=l) {
+	    if (ll->flags & LTFLF_HAS_BORDER)
+	      ll->flags|=LTFLF_SOLID_BORDER;
+	  }
+	}
+	old_ip_lb=TRUE;
+	goto wmt_start;
+      }
+    }
+    if (old_ip_lb && !ip_lb) {
+      if (ipty==tss->win_top-1) {
+	if (iptx>=tss->win_left && iptx<tss->win_left+4) {
+	  if (Bt(&tss->crt_flags,CRTf_HAS_MENU)) {
+	    QueueMsg(tss,0,MSG_KEY_DOWN,0,SC_GUI,0);
+	    old_ip_lb=FALSE;
+	    goto wmt_start;
+	  }
+	} else if (iptx>=tss->win_right-2 && iptx<=tss->win_right) {
+	  if (Bt(&tss->crt_flags,CRTf_HAS_CLOSE_WIN)) {
+	    if (tss->cur_ltf)
+      	      QueueMsg(tss,0,MSG_KEY_DOWN,CH_CTRLQ,0,0);
+	    else
+	      Kill(tss,FALSE);
+	    old_ip_lb=FALSE;
+	    goto wmt_start;
+	  }
+	}
+      } else if (SetCursorPosition(tss,iptx,ipty,FALSE)) {
+	if (l=tss->aux_ltf) {
+	  if (!l->best_d) {
+	    do cmd=WinPointAndSleep;
+	    while (ValidateTss(tss) &&
+	      (ip_lb || left_ip_double_time));
+	    if (ValidateTss(tss)) {
+	      if (cmd==MSG_IP_L_UP) {
+		l=tss->aux_ltf;
+		ll=l->cur_entry;
+		if (ll!=l) {
+		  if (ll->flags & LTFLF_HAS_BORDER)
+		    ll->flags&=~LTFLF_SOLID_BORDER;
+     		  if (ll->btype==LTFT_CHECK_BOX || ll->btype==LTFT_HIDE_START ||
+		    (ll->flags &
+		    (LTFLF_TREE | LTFLF_LINK | LTFLF_LEFT_CB | LTFLF_LEFT_MACRO | LTFLF_LEFT_EXP)))
+		    QueueMsg(tss,0,MSG_KEY_DOWN,CH_SPACE,0,0);
+		}
+	      } else if (cmd==MSG_IP_L_D_UP)
+		QueueMsg(tss,0,MSG_KEY_DOWN,CH_ESC,0,0);
+	    }
+	    old_ip_lb=FALSE;
+	    goto wmt_start;
+	  }
+	}
+	if (l=tss->cur_ltf) {
+	  do cmd=WinPointAndSleep;
+	  while (ValidateTss(tss) &&
+	    (ip_lb || left_ip_double_time));
+	  if (ValidateTss(tss)) {
+	    if (cmd==MSG_IP_L_UP) {
+	      l=tss->cur_ltf;
+	      ll=l->cur_entry;
+	      if (ll!=l) {
+		if (ll->flags & LTFLF_HAS_BORDER)
+		  ll->flags&=~LTFLF_SOLID_BORDER;
+     		if (ll->btype==LTFT_CHECK_BOX || ll->btype==LTFT_HIDE_START ||
+		  (ll->flags &
+		  (LTFLF_TREE | LTFLF_LINK | LTFLF_LEFT_CB | LTFLF_LEFT_MACRO | LTFLF_LEFT_EXP)))
+		  QueueMsg(tss,0,MSG_KEY_DOWN,CH_SPACE,0,0);
+	      }
+	    } else if (cmd==MSG_IP_L_D_UP)
+	      QueueMsg(tss,0,MSG_KEY_DOWN,CH_ESC,0,0);
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+    }
+
+    if (ip_has_wheel) {
+      if (my_ipz!=ipz && tss==sys_cur_focus_task) {
+	tss->scroll_y+=ipz-my_ipz;
+	my_ipz=ipz;
+	if (tss->scroll_y<0)
+	  tss->scroll_y=0;
+	if (tss->scroll_y>tss->win_bottom+1-tss->win_top)
+	  tss->scroll_y=tss->win_bottom+1-tss->win_top;
+	Bts(&tss->crt_flags,CRTf_SCROLL_Y);
+	if (tss->cur_ltf) {
+	  while (ValidateTss(tss) &&
+	    Bt(&tss->crt_flags,CRTf_SCROLL_Y))
+	    WinPointAndSleep;
+	}
+	if (ValidateTss(tss))
+	  SetCursorPosition(tss,
+	    ((tss->win_left+tss->win_right)>>1),
+	    (tss->win_top+tss->win_bottom)>>1);
+	goto wmt_start;
+      }
+    }
+    if (old_ip_rb && !ip_rb) {
+      if (SetCursorPosition(tss,iptx,ipty,FALSE)) {
+	if (l=tss->aux_ltf) {
+	  if (!l->best_d) {
+	    do cmd=WinPointAndSleep;
+	    while (ValidateTss(tss) &&
+	      (ip_rb || right_ip_double_time));
+	    if (ValidateTss(tss)) {
+	      if (cmd==MSG_IP_R_UP) {
+		if (SetCursorPosition(tss,iptx,ipty)) {
+		  if (l=tss->aux_ltf) {
+		    ll=l->cur_entry;
+		    if (ll!=l) {
+		      if (ll->btype==LTFT_LINK ||
+			(ll->flags &
+			(LTFLF_RIGHT_CB | LTFLF_RIGHT_MACRO | LTFLF_RIGHT_EXP)))
+			QueueMsg(tss,0,MSG_KEY_DOWN,CH_CR,0,0);
+		    }
+		  }
+		}
+	      } else if (cmd==MSG_IP_R_D_UP)
+		QueueMsg(tss,0,MSG_KEY_DOWN,CH_CTRLQ,0,0);
+	    }
+	    old_ip_rb=FALSE;
+	    goto wmt_start;
+	  }
+	}
+	if (l=tss->cur_ltf) {
+	  do cmd=WinPointAndSleep;
+	  while (ValidateTss(tss) &&
+	    (ip_rb || right_ip_double_time));
+	  if (ValidateTss(tss)) {
+	    if (cmd==MSG_IP_R_UP) {
+	      if (SetCursorPosition(tss,iptx,ipty)) {
+		if (l=tss->cur_ltf) {
+		  ll=l->cur_entry;
+		  if (ll!=l) {
+		    if (ll->btype==LTFT_LINK ||
+		      (ll->flags &
+		      (LTFLF_RIGHT_CB | LTFLF_RIGHT_MACRO | LTFLF_RIGHT_EXP)))
+		      QueueMsg(tss,0,MSG_KEY_DOWN,CH_CR,0,0);
+		  }
+		}
+	      }
+	    } else if (cmd==MSG_IP_R_D_UP)
+	      QueueMsg(tss,0,MSG_KEY_DOWN,CH_CTRLQ,0,0);
+	  }
+	}
+	old_ip_rb=FALSE;
+	goto wmt_start;
+      }
+    }
+    if (ip_lb && !old_ip_lb) {
+      if (has_border &&
+	  tss->win_top==ipty+1 &&
+	  iptx>=tss->win_left-1 && iptx<=tss->win_right+1) {
+	if (iptx>=tss->win_left && iptx<tss->win_left+4 &&
+	  Bt(&tss->crt_flags,CRTf_HAS_MENU)) {
+	  old_ip_lb=TRUE;
+	  goto wmt_start;
+	}
+	if (iptx>=tss->win_right-2 && iptx<=tss->win_right &&
+	  Bt(&tss->crt_flags,CRTf_HAS_CLOSE_WIN)) {
+	  old_ip_lb=TRUE;
+	  goto wmt_start;
+	}
+	x=iptx-tss->win_left;
+	if (ip_lb) {
+	  WinToTop(tss);
+	  while (ip_lb && ValidateTss(tss)) {
+	    SetWinHorz(tss,iptx-x,tss->win_right+(iptx-x)-tss->win_left);
+	    SetWinVert(tss,ipty+1,tss->win_bottom+ipty+1-tss->win_top);
+	    LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+	    UpdateDerivedTssValues(tss);
+	    WinPointAndSleep;
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+      if (has_border && tss->win_left==iptx+1 &&
+	  (ipty>=tss->win_top-1 && ipty<=tss->win_bottom+1)) {
+	y=ipty-tss->win_top;
+	if (ip_lb) {
+	  WinToTop(tss);
+	  while (ip_lb && ValidateTss(tss)) {
+	    SetWinHorz(tss,iptx+1,tss->win_right+iptx+1-tss->win_left);
+	    SetWinVert(tss,ipty-y,tss->win_bottom+(ipty-y)-tss->win_top);
+	    LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+	    UpdateDerivedTssValues(tss);
+	    WinPointAndSleep;
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+      if (has_border && tss->win_right+1==iptx && tss->win_bottom+1==ipty) {
+	if (ip_lb) {
+	  WinToTop(tss);
+	  while (ip_lb && ValidateTss(tss)) {
+	    SetWinHorz(tss,tss->win_left,iptx-1);
+	    SetWinVert(tss,tss->win_top,ipty-1);
+	    LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+	    UpdateDerivedTssValues(tss);
+	    WinPointAndSleep;
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+      if (has_border && tss->win_bottom==ipty-1 &&
+	    iptx>=tss->win_left && iptx<=tss->win_right) {
+	if (iptx==(tss->scroll_x+tss->win_left)) {
+	  while (ip_lb && ValidateTss(tss)) {
+	    tss->scroll_x=iptx-tss->win_left;
+	    Bts(&tss->crt_flags,CRTf_SCROLL_X);
+	    WinPointAndSleep;
+	    SetCursorPosition(tss,
+	     ((tss->win_left+tss->win_right)>>1),
+	     (tss->win_top+tss->win_bottom)>>1);
+	  }
+	} else {
+	  if (ip_lb) {
+	    WinToTop(tss);
+	    while (ip_lb && ValidateTss(tss)) {
+	      SetWinVert(tss,tss->win_top,ipty-1);
+	      LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+	      UpdateDerivedTssValues(tss);
+	      WinPointAndSleep;
+	    }
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+      if (has_border && tss->win_right==iptx-1 &&
+	  ipty>=tss->win_top && ipty<=tss->win_bottom) {
+	if (ipty==(tss->scroll_y+tss->win_top)) {
+	  while (ip_lb && ValidateTss(tss)) {
+	    tss->scroll_y=ipty-tss->win_top;
+	    Bts(&tss->crt_flags,CRTf_SCROLL_Y);
+	    WinPointAndSleep;
+	    SetCursorPosition(tss,
+	       ((tss->win_left+tss->win_right)>>1),
+	       (tss->win_top+tss->win_bottom)>>1);
+	  }
+	} else {
+	  if (ip_lb) {
+	    WinToTop(tss);
+	    while (ip_lb && ValidateTss(tss)) {
+	      SetWinHorz(tss,tss->win_left,iptx-1);
+	      LBts(&sys_semas[SYS_SEMA_CLEAR_SCREEN_TEXT],0);
+	      UpdateDerivedTssValues(tss);
+	      WinPointAndSleep;
+	    }
+	  }
+	}
+	old_ip_lb=FALSE;
+	goto wmt_start;
+      }
+    }
+  } catch {
+    Beep;
+    Fs->catch_except=TRUE;
+    tss=Fs;
+  }
+  }
+}
+#help_index ""

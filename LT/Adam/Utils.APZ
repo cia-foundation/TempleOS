@@ -1,0 +1,445 @@
+#help_index "File/Cmd Line (Typically)"
+
+public U1 *PatchBlk(U8 blk,BoolU4 write=FALSE)
+{
+  U1 *buf=MAlloc(BLK_SIZE);
+
+  RBlks(Fs->cur_partition,buf,blk,1,TRUE);
+  LtfD(buf,BLK_SIZE);
+  if (write) {
+    coutln "Edit and press ESC to write or ^Q";
+    if (View) {
+      coutln "Write";
+      WBlks(Fs->cur_partition,buf,blk,1,TRUE);
+    }
+  }
+  return buf;
+}
+
+public U1 *Patch(U8 c,BoolU4 write=FALSE)
+{
+  U1 *buf=MAlloc(Fs->cur_partition->spc<<BLK_SIZE_BITS);
+
+  RClusters(Fs->cur_partition,buf,c,1,TRUE);
+  coutln "Cluster:",c;
+  LtfD(buf,Fs->cur_partition->spc<<BLK_SIZE_BITS);
+  if (write) {
+    coutln "Edit and press ESC to write or ^Q";
+    if (View) {
+      coutln "Write";
+      WClusters(Fs->cur_partition,buf,c,1,TRUE);
+    }
+  }
+  return buf;
+}
+
+#help_index "Memory"
+void CorruptSysMemory()
+{
+  Debugger;
+}
+
+void CorruptTaskMemory()
+{
+  Debugger;
+}
+
+public U8 UnusedSysMem()
+{
+  MemBlk *tempm;
+  U8 i,result=0,old_flags=GetFlags;
+  Cli;
+  tempm=mem_free_list;
+  while (tempm) {
+    if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+      CorruptSysMemory;
+    result+=tempm->pages;
+    tempm=tempm->next;
+  }
+  SetFlags(old_flags);
+  Cli;
+  tempm=mem_free_2Meg_list;
+  while (tempm) {
+    if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+      CorruptSysMemory;
+    result+=tempm->pages;
+    tempm=tempm->next;
+  }
+  SetFlags(old_flags);
+  for (i=0;i<FREE_PAGE_HASH_SIZE;i++) {
+    Cli;
+    tempm=free_page_hash[i];
+    while (tempm) {
+      if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+	CorruptSysMemory;
+      result+=tempm->pages;
+      tempm=tempm->next;
+    }
+    SetFlags(old_flags);
+  }
+  for (i=0;i<64;i++) {
+    Cli;
+    tempm=free_page_hash2[i];
+    while (tempm) {
+      if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+	CorruptSysMemory;
+      result+=tempm->pages;
+      tempm=tempm->next;
+    }
+    SetFlags(old_flags);
+  }
+  return result*PAGE_SIZE;
+}
+
+public U8 TaskAllocatedMem(TssStruct *tss=NULL)
+{
+  MemBlk *m,*m1;
+  U8 result=0,old_flags=GetFlags;
+  if (!tss) tss=Fs;
+  Cli;
+  m=tss->next_mem_blk;
+  m1=&tss->next_mem_blk;
+  while (m!=m1) {
+    if (m->signature!=MBS_USED_SIGNATURE)
+      CorruptTaskMemory;
+    result+=m->pages*PAGE_SIZE;
+    m=m->next;
+  }
+  SetFlags(old_flags);
+  return result;
+}
+
+public U8 TaskUnusedAllocatedMem(TssStruct *tss=NULL)
+{
+  U8 result=0,i,old_flags=GetFlags;
+  UnusedAllocatedMem *u;
+  if (!tss) tss=Fs;
+  Cli;
+  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+    u=tss->heap_hash[i];
+    while (u) {
+      result+=u->size;
+      u=u->next;
+    }
+  }
+  u=tss->malloc_free_list;
+  while (u) {
+    result+=u->size;
+    u=u->next;
+  }
+  SetFlags(old_flags);
+  return result;
+}
+
+#help_index "Memory/Heap Ctrl"
+public U8 UnusedHCMem(HeapCtrl *hc)
+{
+  U8 result=0,i,old_flags=GetFlags;
+  MemBlk *tempm;
+  UnusedAllocatedMem *u;
+
+  Cli;
+  tempm=hc->mem_free_list;
+  while (tempm) {
+    if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+      CorruptSysMemory;
+    result+=tempm->pages;
+    tempm=tempm->next;
+  }
+  SetFlags(old_flags);
+
+  for (i=0;i<FREE_PAGE_HASH_SIZE;i++) {
+    Cli;
+    tempm=hc->free_page_hash[i];
+    while (tempm) {
+      if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+	CorruptSysMemory;
+      result+=tempm->pages;
+      tempm=tempm->next;
+    }
+    SetFlags(old_flags);
+  }
+
+  for (i=0;i<64;i++) {
+    Cli;
+    tempm=hc->free_page_hash2[i];
+    while (tempm) {
+      if (tempm->signature!=MBS_UNUSED_SIGNATURE)
+	CorruptSysMemory;
+      result+=tempm->pages;
+      tempm=tempm->next;
+    }
+    SetFlags(old_flags);
+  }
+  result*=PAGE_SIZE;
+
+  Cli;
+  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+    u=hc->heap_hash[i];
+    while (u) {
+      result+=u->size;
+      u=u->next;
+    }
+  }
+  u=hc->malloc_free_list;
+  while (u) {
+    result+=u->size;
+    u=u->next;
+  }
+  SetFlags(old_flags);
+
+  return result;
+}
+
+#help_index "Memory;Debugging"
+I8 CompareUamPtrs(UnusedAllocatedMem **e1,
+		     UnusedAllocatedMem **e2)
+{
+  return *e1-*e2;
+}
+
+I8 CompareUamSize(UnusedAllocatedMem **e1,
+		     UnusedAllocatedMem **e2)
+{
+  return (*e2)->size-(*e1)->size;
+}
+
+
+public void HeapRep(TssStruct *tss=NULL)
+{
+  I8 i,cnt;
+  UnusedAllocatedMem *u;
+  U8 old_flags=GetFlags;
+
+  if (!tss) tss=Fs;
+  Cli;
+  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+    cnt=0;
+    u=tss->heap_hash[i];
+    while (u) {
+      cnt+=u->size;
+      u=u->next;
+    }
+    if (cnt)
+      PrintF("%03X:%08X\r\n",i<<2,cnt);
+  }
+  u=tss->malloc_free_list;
+  while (u) {
+    PrintF("%08X\r\n",u->size);
+    u=u->next;
+  }
+  SetFlags(old_flags);
+}
+
+public BoolU4 IsInHeap(U1 *a,TssStruct *tss=NULL)
+{
+  MemBlk *m;
+  U8 old_flags=GetFlags;
+  if (!tss) tss=Fs;
+  m=tss->next_mem_blk;
+  Cli;
+  while (m!=&tss->next_mem_blk) {
+    if (a>=m && a<m+m->pages*PAGE_SIZE) {
+      SetFlags(old_flags);
+      return TRUE;
+    }
+    m=m->next;
+  }
+  SetFlags(old_flags);
+  return FALSE;
+}
+
+public BoolU4 HeapWalk(TssStruct *tss=NULL)
+//Detects just one type of error --
+//a freed value, not valid.
+{
+  I8 i;
+  UnusedAllocatedMem *u;
+  BoolU4 result=TRUE;
+  U8 old_flags=GetFlags;
+
+  if (!tss) tss=Fs;
+  if (!ValidateTss(tss)) return FALSE;
+  Cli;
+  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+    u=tss->heap_hash[i];
+    while (u) {
+      if (!IsInHeap(u,tss))
+	result=FALSE;
+      u=u->next;
+    }
+  }
+  u=tss->malloc_free_list;
+  while (u) {
+    if (!IsInHeap(u,tss))
+      result=FALSE;
+    u=u->next;
+  }
+  SetFlags(old_flags);
+  return result;
+}
+
+
+#help_index "Memory"
+
+//TODO:Crashes
+///More of a heap check at the moment
+void CollectFreedAllocatedMem(TssStruct *tss=NULL)
+{
+  I8 i,cnt;
+//I8 j;
+  UnusedAllocatedMem *u,**sort_buf;
+  U8 old_flags=GetFlags;
+//  U4 *dd;
+
+  if (!tss) tss=Fs;
+  Cli;
+  cnt=0;
+  for (i=0;i<HEAP_HASH_SIZE>>2;i++) {
+    u=tss->heap_hash[i];
+    while (u) {
+      cnt++;
+      u=u->next;
+    }
+  }
+  u=tss->malloc_free_list;
+  while (u) {
+    cnt++;
+    u=u->next;
+  }
+  SetFlags(old_flags);
+
+  //We might disturb the Free list and irq's might Free some
+  sort_buf=MAlloc(((cnt+512)&-0x100)*sizeof(void *));
+
+  Cli;
+  cnt=0;
+
+  for (i=0;i<HEAP_HASH_SIZE>>2;i++) {
+    u=tss->heap_hash[i];
+    while (u) {
+      sort_buf[cnt++]=u;
+      u=u->next;
+    }
+    tss->heap_hash[i]=NULL;
+  }
+
+  u=tss->malloc_free_list;
+  while (u) {
+    sort_buf[cnt++]=u;
+    u=u->next;
+  }
+  tss->malloc_free_list=NULL;
+
+  for (i=0;i<FREE_PAGE_HASH_SIZE;i++)
+    free_page_hash[i]=NULL;
+
+  for (i=0;i<32;i++)
+    free_page_hash2[i]=NULL;
+
+  SetFlags(old_flags);
+
+  QSort(sort_buf,cnt,sizeof(void *),&CompareUamPtrs);
+  for (i=0;i<cnt;i++) {
+    if (sort_buf[i]+sort_buf[i]->size>sort_buf[i+1])
+      cout "****";
+    coutln sort_buf[i]," ",sort_buf[i]->size;
+  }
+/*
+  j=0;
+  for (i=0;i<cnt;i++) {
+    if (sort_buf[i]==sort_buf[j]+sort_buf[j]->size &&
+	sort_buf[j]->size+sort_buf[i]->size<HEAP_HASH_SIZE)
+      sort_buf[j]->size=sort_buf[j]->size+
+			sort_buf[i]->size;
+    else
+      sort_buf[++j]=sort_buf[i];
+  }
+  if (cnt) {
+    j++;
+    QSort(sort_buf,j,sizeof(void *),&CompareUamSize);
+    for (i=0;i<j;i++) {
+      sort_buf[i]->next=sort_buf[i]->size;
+      Free(sort_buf[i]+4,tss);
+    }
+  }
+*/
+  Free(sort_buf);
+}
+
+#help_index "Task"
+
+void TaskRepTask(TssStruct *tss,I8 indent)
+{
+  TssStruct *tss1;
+  I1 *st,*desc=MSPrintF("%q",tss->task_descriptor);
+  st=MSPrintF("$$MA+A,\"%08X\",\"Kill(0x%X);\r\",$$",tss,tss,tss);
+  PrintF("%*s%s $$TX+SCX,\"%Q...\",16$$ Mem:%08X\r\n",
+    indent,"",st,desc,
+    TaskAllocatedMem(tss));
+  PrintF("%*s Flags:%04X:%04X %02X\r\n",
+    indent+2,"",tss->task_flags,tss->crt_flags,
+    ExceptDepth(tss));
+  PrintF("Time:%9.2fm\r\n",tss->total_time/60.0/time_stamp_freq);
+  Free(st);
+  Free(desc);
+  tss1=tss->next_child_tss;
+  while (tss1!=&tss->next_child_tss-offset(TssStruct.next_sibling_tss)) {
+    TaskRepTask(tss1,indent+2);
+    tss1=tss1->next_sibling_tss;
+  }
+}
+
+public void TaskRep()
+{
+  U1 i;
+  U8 old_flags=GetFlags;
+  CPUStruct *c;
+  Cli;
+  for (i=0;i<mp_cnt;i++) {
+    c=mp_cpu_structs+sizeof(CPUStruct)*i;
+    coutln "$$FG,RED$$CPU:",i,"$$FG$$";
+    TaskRepTask(c->cain_tss,2);
+  }
+  SetFlags(old_flags);
+}
+
+
+void CtrlAltX()
+{
+  Bts(sys_flags,SYSf_CTRL_ALT_X);
+}
+ctrl_alt_letter_routines['X'-'A']=&CtrlAltX;
+
+
+void CtrlAltC()
+{
+  Bts(sys_flags,SYSf_CTRL_ALT_C);
+}
+ctrl_alt_letter_routines['C'-'A']=&CtrlAltC;
+
+#help_index "File/FileNames"
+
+public BoolU4 IsTextFile(I1 *filename)
+{
+  return WildFileNameList(TEXT_FILE_MASK,filename);
+}
+
+public BoolU4 IsSourceFile(I1 *filename)
+{
+  return WildFileNameList(SOURCE_FILE_MASK,filename);
+}
+
+public BoolU4 IsCFile(I1 *filename)
+{
+  return WildFileNameList(C_FILE_MASK,filename);
+}
+
+public BoolU4 IsAsmFile(I1 *filename)
+{
+  return WildFileNameList(ASM_FILE_MASK,filename);
+}
+
+
+#help_index ""
+ 

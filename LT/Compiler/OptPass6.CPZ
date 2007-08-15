@@ -1,0 +1,1195 @@
+U8 CmpOptPass678(LexStruct *lx,ClassStruct *fun_class,
+   I8 *register_offsets,U1 *buf,I8 pass,DbgInfo **dbg_info,I8 *min_line,I8 *max_line)
+{
+  IntermediateCode *tempi;
+  I8 code,i,j,ip=0,ip2;
+  I8 min_line2=-1,last_line=0;
+  CbMiscStruct *lb,*lb1;
+  ExeAbsoluteAddressStruct *tempa;
+  DbgInfo *my_dbg=NULL;
+  AsmCtrlStruct *a=lx->a;
+  BoolU4 short_jmp;
+  I8 *qq;
+  IcParam saved_p123[3];
+  ClassStruct *tempc;
+  ExternUsage *tempeu;
+
+  if (buf) {
+    if (*max_line>=*min_line && *max_line-*min_line<10000) {
+      my_dbg=MAllocZ(offset(DbgInfo.body)+sizeof(void *)*(*max_line-*min_line+2));
+      my_dbg->min_line=*min_line;
+      my_dbg->max_line=*max_line;
+    }
+    if (dbg_info)
+      *dbg_info=my_dbg;
+  }
+
+  tempi=lx->cb.cb_in_ptr;
+  while (code=tempi->ic_opcode) {
+    if (code>EC_END_EXP) {
+    if (tempi->ic_flags&ICF_TRACE)
+      if (Bt(&lx->pass_trace_mask,pass))
+	CbPutIc(tempi);
+    ip2=ip;
+    if (lx->a)
+      ip2+=lx->a->ip;
+    else
+      ip2+=buf;
+    if (!(tempi->ic_flags &ICF_CODE_FINAL)) {
+      tempi->ic_flags|=ICF_CODE_FINAL;
+      MemCpy(saved_p123,&tempi->p1,3*sizeof(IcParam));
+      if (cmp_param_cnt[code]==2) {
+	if (tempi->p1.type&TY_MASK==TY_REG &&
+	    tempi->p1.reg==CREG_RAX)
+	    tempi->ic_flags|=ICF_P1_FIRST;
+      }
+      tempi->ic_cnt=0;
+      if (tempi->ic_flags & ICF_P1_FIRST) {
+	if (tempi->p1.type&TY_MASK) {
+	  if (tempi->ic_flags & ICF_P1_TO_DOUBLE) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_DOUBLE_RDX);
+	    tempi->p1.type=TY_REG+IT_I8;
+	    tempi->p1.reg=CREG_RDX;
+	    tempi->ic_flags&=~ICF_P1_FIRST;
+	  } else if (tempi->ic_flags & ICF_P1_TO_INT) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_INT_RDX);
+	    tempi->p1.type=TY_REG+IT_I8;
+	    tempi->p1.reg=CREG_RDX;
+	    tempi->ic_flags&=~ICF_P1_FIRST;
+	  }
+	}
+	if (tempi->p2.type&TY_MASK) {
+	  if (tempi->ic_flags & ICF_P2_TO_DOUBLE) {
+	    if (tempi->ic_flags&ICF_P1_FIRST) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      tempi->p1.type=TY_REG+IT_I8;
+	      tempi->p1.reg=CREG_RDX;
+	      tempi->ic_flags&=~ICF_P1_FIRST;
+	    }
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_DOUBLE_RAX);
+	    tempi->p2.type=TY_REG+IT_I8;
+	    tempi->p2.reg=CREG_RAX;
+	    tempi->p2.disp=0;
+	  } else if (tempi->ic_flags & ICF_P2_TO_INT) {
+	    if (tempi->ic_flags&ICF_P1_FIRST) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      tempi->p1.type=TY_REG+IT_I8;
+	      tempi->p1.reg=CREG_RDX;
+	      tempi->ic_flags&=~ICF_P1_FIRST;
+	    }
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_INT_RAX);
+	    tempi->p2.type=TY_REG+IT_I8;
+	    tempi->p2.reg=CREG_RAX;
+	  }
+	}
+      } else {
+	if (tempi->p3.type&TY_MASK) {
+	  if (tempi->ic_flags & ICF_P3_TO_DOUBLE) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_DOUBLE_RAX);
+	    tempi->p3.type=TY_REG+IT_I8;
+	    tempi->p3.reg=CREG_RAX;
+	  } else if (tempi->ic_flags & ICF_P3_TO_INT) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_INT_RAX);
+	    tempi->p3.type=TY_REG+IT_I8;
+	    tempi->p3.reg=CREG_RAX;
+	  }
+	  if (tempi->ic_flags & (ICF_P3_TO_DOUBLE | ICF_P3_TO_INT)) {
+	    if (tempi->p2.type&TY_MASK) {
+	      if (tempi->ic_flags & ICF_P2_TO_DOUBLE) {
+		IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		  tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+		IcCopyIrq(tempi,I_TO_DOUBLE_RDX);
+		tempi->p2.type=TY_REG+IT_I8;
+		tempi->p2.reg=CREG_RDX;
+	      } else if (tempi->ic_flags & ICF_P2_TO_INT) {
+		IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		  tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+		IcCopyIrq(tempi,I_TO_INT_RDX);
+		tempi->p2.type=TY_REG+IT_I8;
+		tempi->p2.reg=CREG_RDX;
+	      }
+	    }
+	    if (tempi->ic_flags & (ICF_P2_TO_DOUBLE | ICF_P2_TO_INT)) {
+	      if (tempi->p1.type&TY_MASK) { //TODO: RCX might cause problems
+		if (tempi->ic_flags & ICF_P1_TO_DOUBLE) {
+		  IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+		    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+		  IcCopyIrq(tempi,I_TO_DOUBLE_RCX);
+		  tempi->p1.type=TY_REG+IT_I8;
+		  tempi->p1.reg=CREG_RCX;
+		} else if (tempi->ic_flags & ICF_P1_TO_INT) {
+		  IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+		    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+		  IcCopyIrq(tempi,I_TO_INT_RCX);
+		  tempi->p1.type=TY_REG+IT_I8;
+		  tempi->p1.reg=CREG_RCX;
+		}
+	      }
+	    } else {
+	      if (tempi->p1.type&TY_MASK) {
+		if (tempi->ic_flags & ICF_P1_TO_DOUBLE) {
+		  IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+		  IcCopyIrq(tempi,I_TO_DOUBLE_RDX);
+		  tempi->p1.type=TY_REG+IT_I8;
+		  tempi->p1.reg=CREG_RDX;
+		} else if (tempi->ic_flags & ICF_P1_TO_INT) {
+		  IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+		  IcCopyIrq(tempi,I_TO_INT_RDX);
+		  tempi->p1.type=TY_REG+IT_I8;
+		  tempi->p1.reg=CREG_RDX;
+		}
+	      }
+	    }
+	  } else
+	    goto p2_RAX_p1_RDX;
+	} else {
+p2_RAX_p1_RDX:
+	  if (tempi->p2.type&TY_MASK) {
+	    if (tempi->ic_flags & ICF_P2_TO_DOUBLE) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	      IcCopyIrq(tempi,I_TO_DOUBLE_RAX);
+	      tempi->p2.type=TY_REG+IT_I8;
+	      tempi->p2.reg=CREG_RAX;
+	    } else if (tempi->ic_flags & ICF_P2_TO_INT) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	      IcCopyIrq(tempi,I_TO_INT_RAX);
+	      tempi->p2.type=TY_REG+IT_I8;
+	      tempi->p2.reg=CREG_RAX;
+	    }
+	  }
+	  if (tempi->p1.type&TY_MASK) {
+	    if (tempi->ic_flags & ICF_P1_TO_DOUBLE) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      IcCopyIrq(tempi,I_TO_DOUBLE_RDX);
+	      tempi->p1.type=TY_REG+IT_I8;
+	      tempi->p1.reg=CREG_RDX;
+	    } else if (tempi->ic_flags & ICF_P1_TO_INT) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      IcCopyIrq(tempi,I_TO_INT_RDX);
+	      tempi->p1.type=TY_REG+IT_I8;
+	      tempi->p1.reg=CREG_RDX;
+	    }
+	  }
+	}
+      }
+      switch (code) {
+	case EC_ABSOLUTE_ADDRESS:
+	  IcU2(tempi,0xB848);
+	  IcU8(tempi,tempi->ic_data);
+	  i=ip+tempi->ic_cnt-8;
+	  if (buf && a && !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	    tempa=MAllocZ(sizeof(ExeAbsoluteAddressStruct));
+	    tempa->next=a->absolutes;
+	    a->absolutes=tempa;
+	    tempa->ip=a->ip+i;
+	  }
+	  IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_STR_CONST:
+	case EC_GET_LABEL:
+	  lb=tempi->ic_data;
+	  if (a)
+  	    i=lb->address+a->ip;
+	  else
+  	    i=lb->address+buf;
+	  IcLea(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    TY_RIP_DISP32+IT_PTR,0,i,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_FS:
+	  IcZero(tempi,CREG_RAX);
+	  IcU4(tempi,0x008B4864);
+	  IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  break;
+	case EC_GS:
+	  IcZero(tempi,CREG_RAX);
+	  IcU4(tempi,0x008B4865);
+	  IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  break;
+	case EC_COM:
+	  IcUnaries(tempi,SLASH_OP_NOT,ip2);
+	  break;
+	case EC_NOT:
+	  IcNot(tempi,ip2);
+	  break;
+	case EC_UNARY_MINUS:
+	  if (tempi->r.type&IT_MASK==IT_DOUBLE)
+	    IcFOp1(tempi,I_UNARY_MINUS,ip2);
+	  else
+	    IcUnaries(tempi,SLASH_OP_NEG,ip2);
+	  break;
+	case EC_ADDRESS:
+	case EC_MOV:
+	  IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  break;
+	case EC_DEREF:
+	  IcDeref(tempi,ip2);
+	  break;
+	case EC__PP:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcPostIncDec(tempi,SLASH_OP_INC,ip2);
+	  else
+	    IcFPostIncDec(tempi,I_INC,ip2);
+     	  break;
+	case EC__MM:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcPostIncDec(tempi,SLASH_OP_DEC,ip2);
+	  else
+	    IcFPostIncDec(tempi,I_DEC,ip2);
+     	  break;
+	case EC_PP_:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcPreIncDec(tempi,SLASH_OP_INC,ip2);
+	  else
+	    IcFPreIncDec(tempi,I_INC,ip2);
+	  break;
+	case EC_MM_:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcPreIncDec(tempi,SLASH_OP_DEC,ip2);
+	  else
+	    IcFPreIncDec(tempi,I_DEC,ip2);
+	  break;
+	case EC_LEA:
+	  IcLea(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  break;
+	case EC_POWER:
+	  IcFOp2(tempi,I_POWER,ip2);
+	  break;
+	case EC_SHL:
+	  IcShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0xE0,0xE0,ip2);
+	  break;
+	case EC_SHR:
+	  IcShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0xE8,0xF8,ip2);
+	  break;
+	case EC_MUL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcMul(tempi,ip2);
+	  else
+	    IcFOp2(tempi,I_MUL,ip2);
+	  break;
+	case EC_DIV:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcDiv(tempi,ip2);
+	  else
+	    IcFOp2(tempi,I_DIV,ip2);
+	  break;
+	case EC_MOD:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcMod(tempi,ip2);
+	  else
+	    IcFOp2(tempi,I_MOD,ip2);
+	  break;
+	case EC_AND:
+	  IcAddEct(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x23,ip2);
+	  break;
+	case EC_OR:
+	  IcAddEct(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x0B,ip2);
+	  break;
+	case EC_XOR:
+	  IcAddEct(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x33,ip2);
+	  break;
+	case EC_ADD:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcAddEct(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x03,ip2);
+	  else
+	    IcFOp2(tempi,I_ADD,ip2);
+	  break;
+	case EC_SUB:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcSubEct(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x2B,ip2);
+	  else
+	    IcFOp2(tempi,I_SUB,ip2);
+	  break;
+	case EC_EQUAL_EQUAL:
+	  IcCmp(tempi,0x75,0x75,ip2);
+	  break;
+	case EC_NOT_EQUAL:
+	  IcCmp(tempi,0x74,0x74,ip2);
+	  break;
+	case EC_LESS:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcCmp(tempi,0x73,0x7D,ip2);
+	  else
+	    IcFCmp(tempi,I_LESS,ip2);
+	  break;
+	case EC_GREATER:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcCmp(tempi,0x76,0x7E,ip2);
+	  else
+	    IcFCmp(tempi,I_GREATER,ip2);
+	  break;
+	case EC_LESS_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcCmp(tempi,0x77,0x7F,ip2);
+	  else
+	    IcFCmp(tempi,I_LESS_EQUAL,ip2);
+	  break;
+	case EC_GREATER_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcCmp(tempi,0x72,0x7C,ip2);
+	  else
+	    IcFCmp(tempi,I_GREATER_EQUAL,ip2);
+	  break;
+	case EC_AND_AND:
+	  IcAndAnd(tempi,ip2);
+	  break;
+	case EC_OR_OR:
+	  IcOrOr(tempi,ip2);
+	  break;
+	case EC_XOR_XOR:
+	  IcXorXor(tempi,ip2);
+	  break;
+	case EC_COLON:
+	  IcColon(tempi,ip2);
+	  break;
+	case EC_ASSIGN:
+	  IcAssign(tempi,ip2);
+	  break;
+	case EC_SHL_EQUAL:
+	  IcShiftEqual(tempi,tempi->p1.ptype,
+		tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0xE0,0xE0,ip2);
+	  break;
+	case EC_SHR_EQUAL:
+	  IcShiftEqual(tempi,tempi->p1.ptype,
+		tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0xE8,0xF8,ip2);
+	  break;
+	case EC_MUL_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcMulEqual(tempi,ip2);
+	  else
+	    IcFOp2Equal(tempi,I_MUL,ip2);
+	  break;
+	case EC_DIV_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcDivEqual(tempi,FALSE,ip2);
+	  else
+	    IcFOp2Equal(tempi,I_DIV,ip2);
+	  break;
+	case EC_MOD_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcDivEqual(tempi,TRUE,ip2);
+	  else
+	    IcFOp2Equal(tempi,I_MOD,ip2);
+	  break;
+	case EC_AND_EQUAL:
+	  IcAddSubEctEqual(tempi,tempi->p1.ptype,
+		tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x0425240423,ip2);
+	  break;
+	case EC_OR_EQUAL:
+	  IcAddSubEctEqual(tempi,tempi->p1.ptype,
+		tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x010D0C010B,ip2);
+	  break;
+	case EC_XOR_EQUAL:
+	  IcAddSubEctEqual(tempi,tempi->p1.ptype,
+		tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x0635340633,ip2);
+	  break;
+	case EC_ADD_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcAddSubEctEqual(tempi,tempi->p1.ptype,
+	      tempi->r.type,tempi->r.reg,tempi->r.disp,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x00000003,ip2);
+	  else
+	    IcFOp2Equal(tempi,I_ADD,ip2);
+	  break;
+	case EC_SUB_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_INT)
+	    IcAddSubEctEqual(tempi,tempi->p1.ptype,
+	      tempi->r.type,tempi->r.reg,tempi->r.disp,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,0x0000052B,ip2);
+	  else
+	    IcFOp2Equal(tempi,I_SUB,ip2);
+	  break;
+	case EC_SHL_CONST:
+	  IcShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		TY_IMM+IT_I8,0,tempi->ic_data,0xE0,0xE0,ip2);
+	  break;
+	case EC_SHR_CONST:
+	  IcShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,
+		TY_IMM+IT_I8,0,tempi->ic_data,0xE8,0xF8,ip2);
+	  break;
+	case EC_ADD_CONST:
+	  IcAddConst(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,tempi->ic_data,0x0003,ip2);
+	  break;
+	case EC_SUB_CONST:
+	  IcAddConst(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,tempi->ic_data,0x052B,ip2);
+	  break;
+	case EC_ENTER:
+	  IcPush(tempi,TY_REG+IT_I8,CREG_RBP,0,ip2);
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RBP,0,
+	    TY_REG+IT_I8,CREG_RSP,0,ip2);
+	  if (i=tempi->ic_data) {
+	    if (MIN_I1<=i<=MAX_I1) {
+	      IcU3(tempi,0xEC8348);
+	      IcU1(tempi,i);
+	    } else {
+	      IcU3(tempi,0xEC8148);
+	      IcU4(tempi,i);
+	    }
+	  }
+	  if (fun_class)
+	    IcPushRegs(tempi,fun_class->used_reg_mask&(CREG_VARS_MASK|CREG_NON_PTR_MASK));
+	  for (i=0;i<NUM_REGS;i++)
+	    if (register_offsets[i]>0 && register_offsets[i]!=MAX_I8)
+	      IcMov(tempi,TY_REG+IT_I8,i,0,
+		    TY_DISP+IT_I8,CREG_RBP,register_offsets[i],ip2);
+	  break;
+	case EC_ADD_RSP:
+	  if (i=tempi->ic_data) {
+	    if (MIN_I1<=i<=MAX_I1) {
+	      IcU3(tempi,0xC48348);
+	      IcU1(tempi,i);
+	    } else {
+	      IcU3(tempi,0xC48148);
+	      IcU4(tempi,i);
+	    }
+	  }
+	  break;
+	case EC_CALL:
+  	  i=tempi->ic_data-(ip2+5);
+	  IcU1(tempi,0xE8);
+	  IcU4(tempi,i);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_CALL_EXTERN:
+	  IcU1(tempi,0xE8);
+	  IcU4(tempi,0);
+	  if (buf) {
+  	    tempc=tempi->ic_data;
+	    tempeu=MAllocZ(sizeof(ExternUsage));
+	    tempeu->next=tempc->ext_list;
+	    tempc->ext_list=tempeu;
+	    tempeu->ip=ip2+1;
+	  }
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_CALL_INDIRECT: //TODO: calls>32 disp
+	  IcU3(tempi,0xDC8B48);
+	  IcU3(tempi,0x93FF48);
+	  IcU4(tempi,tempi->ic_data);
+	  break;
+	case EC_CALL_INDIRECT2:
+	  IcU2(tempi,0xBB48);
+	  if (a) i=ip2+tempi->ic_cnt;
+	  IcU4(tempi,tempi->ic_data);
+	  IcU4(tempi,0);
+	  IcU2(tempi,0xC033);
+	  IcU2(tempi,0x038B);
+	  IcU3(tempi,0xD0FF48);
+	  if (buf && a && !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	    tempa=MAllocZ(sizeof(ExeAbsoluteAddressStruct));
+	    tempa->next=a->absolutes;
+	    a->absolutes=tempa;
+	    tempa->ip=i;
+	  }
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_CLI:
+	  IcU1(tempi,0xFA);
+	  break;
+	case EC_STI:
+	  IcU1(tempi,0xFB);
+	  break;
+	case EC_WBINVD:
+	  IcU2(tempi,0x090F);
+	  break;
+	case EC_INVD:
+	  IcU2(tempi,0x080F);
+	  break;
+	case EC_ENABLE_CACHE:
+	  IcU4(tempi,0xC0200F40);
+	  IcU2(tempi, 0x2540);
+	  IcU4(tempi,~0x60000000);
+	  IcU4(tempi, 0xC0220F40);
+	  break;
+	case EC_DISABLE_CACHE:
+	  IcU4(tempi,0xC0200F40);
+	  IcU2(tempi, 0x0D40);
+	  IcU4(tempi,0x60000000);
+	  IcU4(tempi, 0xC0220F40);
+	  break;
+	case EC_GET_FLAGS:
+	  IcU1(tempi,0x9C);
+	  IcPop(tempi,TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  break;
+	case EC_RDTSC:
+	  IcU2(tempi,0xC033);
+	  IcU3(tempi,0x310F40);
+	  IcU3(tempi,0xE2C148);
+	  IcU4(tempi,0xC2034820);
+	  break;
+	case EC_SET_FLAGS:
+	  IcPush(tempi,tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU1(tempi,0x9D);
+	  break;
+	case EC_GET_BASE_PTR:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    TY_REG+IT_I8,CREG_RBP,0,ip2);
+	  break;
+	case EC_SET_BASE_PTR:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RBP,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  break;
+	case EC_GET_STACK_PTR:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    TY_REG+IT_I8,CREG_RSP,0,ip2);
+	  break;
+	case EC_SET_STACK_PTR:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RSP,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  break;
+	case EC_RETURN_START:
+	case EC_RETURN_END:
+	  break;
+	case EC_SET_RAX:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  break;
+	case EC_BT:
+	  IcBitOps(tempi,0xA30F,0x20BA0F,FALSE,ip2);
+	  break;
+	case EC_BTS:
+	  IcBitOps(tempi,0xAB0F,0x28BA0F,FALSE,ip2);
+	  break;
+	case EC_BTR:
+	  IcBitOps(tempi,0xB30F,0x30BA0F,FALSE,ip2);
+	  break;
+	case EC_BTC:
+	  IcBitOps(tempi,0xBB0F,0x38BA0F,FALSE,ip2);
+	  break;
+	case EC_LBTS:
+	  IcBitOps(tempi,0xAB0F,0x28BA0F,TRUE,ip2);
+	  break;
+	case EC_LBTR:
+	  IcBitOps(tempi,0xB30F,0x30BA0F,TRUE,ip2);
+	  break;
+	case EC_LBTC:
+	  IcBitOps(tempi,0xBB0F,0x38BA0F,TRUE,ip2);
+	  break;
+	case EC_BSF:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU4(tempi,0xC0BC0F48);
+	  IcU2(tempi,0x0375);
+	  IcU3(tempi,0xD0F748);
+	  break;
+	case EC_BSR:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU4(tempi,0xC0BD0F48);
+	  IcU2(tempi,0x0375);
+	  IcU3(tempi,0xD0F748);
+	  break;
+	case EC_PREEMPT:
+	  IcPreempt(tempi,ip2);
+	  break;
+	case EC_ABSI8:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU3(tempi,0xC00B48);
+	  IcU2(tempi,0x0379);
+	  IcU3(tempi,0xD8F748);
+	  break;
+	case EC_INSQUE:
+	  if (tempi->ic_flags & ICF_P1_FIRST) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  }
+	  IcU3(tempi,0x1A8B48);
+	  IcU3(tempi,0x028948);
+	  IcU3(tempi,0x188948);
+	  IcU4(tempi,sizeof(void *)<<24+0x508948);
+	  IcU4(tempi,sizeof(void *)<<24+0x438948);
+	  break;
+	case EC_INSQUE_REV:
+	  if (tempi->ic_flags & ICF_P1_FIRST) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  }
+	  IcU4(tempi,sizeof(void *)<<24+0x5A8B48);
+	  IcU3(tempi,0x038948);
+	  IcU3(tempi,0x108948);
+	  IcU4(tempi,sizeof(void *)<<24+0x588948);
+	  IcU4(tempi,sizeof(void *)<<24+0x428948);
+	  break;
+	case EC_REMQUE:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU3(tempi,0x188B48);
+	  IcU4(tempi,sizeof(void *)<<24+0x508B48);
+	  IcU3(tempi,0x1A8948);
+	  IcU4(tempi,sizeof(void *)<<24+0x538948);
+	  break;
+	case EC_MEMCPY:
+	  if (tempi->p1.type&TY_MASK==TY_REG &&
+	      tempi->p1.reg==CREG_RAX) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	  } else if (tempi->p2.type&TY_MASK==TY_REG &&
+	      tempi->p2.reg==CREG_RAX) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  }
+	  IcPushRegs(tempi,1<<CREG_RSI+1<<CREG_RDI);
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RSI,0,
+		      TY_REG+IT_I8,CREG_RDX,0,ip2);
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RDI,0,
+		      TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  IcU2(tempi,0xA4F3);
+	  IcPopRegs(tempi,1<<CREG_RSI+1<<CREG_RDI);
+	  break;
+	case EC_MEMSET:
+	  if (tempi->p1.type&TY_MASK==TY_REG &&
+	      tempi->p1.reg==CREG_RAX) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	  } else if (tempi->p2.type&TY_MASK==TY_REG &&
+	      tempi->p2.reg==CREG_RAX) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p3.type,tempi->p3.reg,tempi->p3.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RCX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  }
+	  IcPushRegs(tempi,1<<CREG_RDI);
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RDI,0,
+		      TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		      TY_REG+IT_I8,CREG_RDX,0,ip2);
+	  IcU2(tempi,0xAAF3);
+	  IcPopRegs(tempi,1<<CREG_RDI);
+	  break;
+	case EC_STRLEN:
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  IcU3(tempi,0xD08B48);
+	  IcU2(tempi,0x188A);
+	  IcU3(tempi,0xC0FF48);
+	  IcU2(tempi,0xDB0A);
+	  IcU2(tempi,0xF775);
+	  IcU3(tempi,0xC22B48);
+	  IcU3(tempi,0xC8FF48);
+	  break;
+	case EC_INPD:
+	  if (tempi->p1.type&TY_MASK==TY_IMM && tempi->p1.disp<=MAX_U1) {
+	    IcU2(tempi,0xC033);
+	    IcU2(tempi,0x00E5+tempi->p1.disp<<8);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU2(tempi,0xC033);
+	    IcU1(tempi,0xED);
+	  }
+	  break;
+	case EC_INPW:
+	  if (tempi->p1.type&TY_MASK==TY_IMM && tempi->p1.disp<=MAX_U1) {
+	    IcU2(tempi,0xC033);
+	    IcU3(tempi,0x00E566+tempi->p1.disp<<16);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU2(tempi,0xC033);
+	    IcU2(tempi,0xED66);
+	  }
+	  break;
+	case EC_INP:
+	  if (tempi->p1.type&TY_MASK==TY_IMM && tempi->p1.disp<=MAX_U1) {
+	    IcU2(tempi,0xC033);
+	    IcU2(tempi,0x00E4+tempi->p1.disp<<8);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU2(tempi,0xC033);
+	    IcU1(tempi,0xEC);
+	  }
+	  break;
+	case EC_OUTPD:
+	  if (tempi->p2.type&TY_MASK==TY_IMM && tempi->p2.disp<=MAX_U1) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU2(tempi,0x00E7+tempi->p2.disp<<8);
+	  } else {
+	    if (tempi->ic_flags & ICF_P1_FIRST) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    } else {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    }
+	    IcU1(tempi,0xEF);
+	  }
+	  break;
+	case EC_OUTPW:
+	  if (tempi->p2.type&TY_MASK==TY_IMM && tempi->p2.disp<=MAX_U1) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU3(tempi,0x00E766+tempi->p2.disp<<16);
+	  } else {
+	    if (tempi->ic_flags & ICF_P1_FIRST) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    } else {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    }
+	    IcU2(tempi,0xEF66);
+	  }
+	  break;
+	case EC_OUTP:
+	  if (tempi->p2.type&TY_MASK==TY_IMM && tempi->p2.disp<=MAX_U1) {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcU2(tempi,0x00E6+tempi->p2.disp<<8);
+	  } else {
+	    if (tempi->ic_flags & ICF_P1_FIRST) {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    } else {
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RDX,0,
+		tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	      IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+		tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    }
+	    IcU1(tempi,0xEE);
+	  }
+	  break;
+	case EC_SWITCH:
+	  if (tempi->ic_flags & ICF_P1_FIRST) {
+	    IcMov(tempi,TY_REG+IT_U2,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_U2,CREG_RCX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_U2,CREG_RCX,0,
+	      tempi->p2.type,tempi->p2.reg,tempi->p2.disp,ip2);
+	    IcMov(tempi,TY_REG+IT_U2,CREG_RDX,0,
+	      tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
+	  }
+	  IcU3(tempi,0xD13B48);
+	  IcU2(tempi,0x0873);
+	  IcU4(tempi,0xD524FF48);
+	  lb=tempi->ic_data;
+	  if (a)
+  	    i=lb->address+a->ip;
+	  else
+  	    i=lb->address+buf;
+	  if (a) j=a->ip+ip+tempi->ic_cnt;
+	  IcU4(tempi,i);
+	  if (buf && a && !(lx->flags & LF_ASM_EXPRESSIONS)) {
+	    tempa=MAllocZ(sizeof(ExeAbsoluteAddressStruct));
+	    tempa->next=a->absolutes;
+	    a->absolutes=tempa;
+	    tempa->ip=j;
+	  }
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_ZERO:
+	  IcTestAndBranch(tempi,ip,0x74840F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_ZERO:
+	  IcTestAndBranch(tempi,ip,0x75850F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_EQUAL_EQUAL:
+	  IcCmpAndBranch(tempi,ip,0x74840F,0x74840F,0x74840F,0x74840F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_EQUAL:
+	  IcCmpAndBranch(tempi,ip,0x75850F,0x75850F,0x75850F,0x75850F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_GREATER_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_DOUBLE)
+	    IcFCmpAndBranch(tempi,ip,I_GREATER_EQUAL,buf,ip2);
+	  else
+	    IcCmpAndBranch(tempi,ip,0x73830F,0x7D8D0F,0x76860F,0x7E8E0F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_LESS_EQUAL:
+	  if (tempi->ic_flags&ICF_USE_DOUBLE)
+	    IcFCmpAndBranch(tempi,ip,I_LESS_EQUAL,buf,ip2);
+	  else
+	    IcCmpAndBranch(tempi,ip,0x76860F,0x7E8E0F,0x73830F,0x7D8D0F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_GREATER:
+	  if (tempi->ic_flags&ICF_USE_DOUBLE)
+	    IcFCmpAndBranch(tempi,ip,I_GREATER,buf,ip2);
+	  else
+	    IcCmpAndBranch(tempi,ip,0x77870F,0x7F8F0F,0x72820F,0x7C8C0F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_LESS:
+	  if (tempi->ic_flags&ICF_USE_DOUBLE)
+	    IcFCmpAndBranch(tempi,ip,I_LESS,buf,ip2);
+	  else
+	    IcCmpAndBranch(tempi,ip,0x72820F,0x7C8C0F,0x77870F,0x7F8F0F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_BT:
+	  IcBrBitOps(tempi,ip,0xA30F,0x20BA0F,0x72820F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_BTS:
+	  IcBrBitOps(tempi,ip,0xAB0F,0x28BA0F,0x72820F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_BTR:
+	  IcBrBitOps(tempi,ip,0xB30F,0x30BA0F,0x72820F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_BTC:
+	  IcBrBitOps(tempi,ip,0xBB0F,0x38BA0F,0x72820F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_BT:
+	  IcBrBitOps(tempi,ip,0xA30F,0x20BA0F,0x73830F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_BTS:
+	  IcBrBitOps(tempi,ip,0xAB0F,0x28BA0F,0x73830F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_BTR:
+	  IcBrBitOps(tempi,ip,0xB30F,0x30BA0F,0x73830F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_BTC:
+	  IcBrBitOps(tempi,ip,0xBB0F,0x38BA0F,0x73830F,FALSE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_LBTS:
+	  IcBrBitOps(tempi,ip,0xAB0F,0x28BA0F,0x72820F,TRUE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_LBTR:
+	  IcBrBitOps(tempi,ip,0xB30F,0x30BA0F,0x72820F,TRUE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_LBTC:
+	  IcBrBitOps(tempi,ip,0xBB0F,0x38BA0F,0x72820F,TRUE,buf,ip2);
+	  break;
+	case EC_BR_NOT_LBTS:
+	  IcBrBitOps(tempi,ip,0xAB0F,0x28BA0F,0x73830F,TRUE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_LBTR:
+	  IcBrBitOps(tempi,ip,0xB30F,0x30BA0F,0x73830F,TRUE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_NOT_LBTC:
+	  IcBrBitOps(tempi,ip,0xBB0F,0x38BA0F,0x73830F,TRUE,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_AND_ZERO:
+	  IcAndBranch(tempi,ip,0x74840F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_BR_AND_NOT_ZERO:
+	  IcAndBranch(tempi,ip,0x75850F,buf,ip2);
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_LEAVE:
+	  if (fun_class)
+	    IcPopRegs(tempi,fun_class->used_reg_mask&(CREG_VARS_MASK|CREG_NON_PTR_MASK));
+	  if (i=tempi->ic_data) {
+	    if (MIN_I1<=i<=MAX_I1) {
+	      IcU3(tempi,0xC48348);
+	      IcU1(tempi,i);
+	    } else {
+	      IcU3(tempi,0xC48148);
+	      IcU4(tempi,i);
+	    }
+	  }
+	  IcPop(tempi,TY_REG+IT_I8,CREG_RBP,0,ip2);
+	  IcU1(tempi,0xC3);
+	  break;
+	case EC_RET:
+	  IcU1(tempi,0xC3);
+	  break;
+	case EC_JMP:
+	  short_jmp=(tempi->ic_flags & ICF_SHORT_JMP) ? TRUE:FALSE;
+	  lb=tempi->ic_data;
+	  while (lb1=lb->forward)
+	    lb=lb1;
+	  if (!buf) {
+	    if (lb->address!=INVALID_PTR) {
+	      i=lb->address-ip;
+	      if (MIN_I1+5<i<MAX_I1-5)
+		short_jmp=TRUE;
+	    }
+	  }
+	  if (short_jmp) {
+	    tempi->ic_flags|=ICF_SHORT_JMP;
+	    i=lb->address-(ip+2);
+	    IcU2(tempi,i<<8+0xEB);
+	  } else {
+	    i=lb->address-(ip+5);
+	    IcU1(tempi,0xE9);
+	    IcU4(tempi,i);
+	  }
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_NULL:
+	  break;
+	case EC_LABEL:
+	  lb=tempi->ic_data;
+	  lb->address=ip;
+	  if (lb->flags&CBMF_POP_CMP) {
+	    IcU3(tempi,0xC48348);
+	    IcU1(tempi,-8);
+	    IcU3(tempi,0xC48348);
+	    IcU1(tempi,8);
+	  }
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	  break;
+	case EC_QUESTION:
+	  break;
+	case EC_IRQ:
+	  IcU1(tempi,0xCD);
+	  IcU1(tempi,tempi->ic_data);
+	  break;
+	case EC_NOP:
+	case EC_NOP1:
+	case EC_PUSH_CMP:
+	  break;
+	case EC_CALL_START:
+	case EC_PUSH_REGS:
+	  IcPushRegs(tempi,tempi->ic_data);
+	  break;
+ 	case EC_CALL_END2:
+	  break;
+ 	case EC_CALL_END:
+	  IcPopRegs(tempi,tempi->ic_data);
+	  if (tempi->r.type&TY_MASK)
+	    IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	      TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  break;
+	case EC_POP_REGS:
+	  IcPopRegs(tempi,tempi->ic_data);
+	  break;
+	case EC_END_EXP:
+	  break;
+
+	default:
+	  OptMissing(lx,6,tempi);
+      }
+      if (tempi->r.type&TY_MASK) {
+	if (tempi->ic_flags & ICF_R_TO_DOUBLE) {
+	  if (tempi->ic_opcode==EC_PUSH_CMP) {
+	    IcU3(tempi,0xDC8B48);
+	    IcU3(tempi,0x2BDF48);
+	    IcU3(tempi,0x1BDD48);
+	    IcU1(tempi,0x9B);
+	  } else {
+	    IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	      tempi->r.type,tempi->r.reg,tempi->r.disp,ip2);
+	    IcCopyIrq(tempi,I_TO_DOUBLE_RAX);
+	    IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	      TY_REG+IT_I8,CREG_RAX,0,ip2);
+	  }
+	} else if (tempi->ic_flags & ICF_R_TO_INT) {
+	  IcMov(tempi,TY_REG+IT_I8,CREG_RAX,0,
+	    tempi->r.type,tempi->r.reg,tempi->r.disp,ip2);
+	  IcCopyIrq(tempi,I_TO_INT_RAX);
+	  IcMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    TY_REG+IT_I8,CREG_RAX,0,ip2);
+	}
+      }
+    }
+    if (tempi->ic_cnt) {
+      if (pass==7) {
+	i=tempi->ic_line;
+	if (i>=last_line) {
+	  last_line=i;
+	  if (i<*min_line)
+	    *min_line=i;
+	  if (i>*min_line && i<min_line2)
+	    min_line2=i;
+	  if (i>*max_line)
+	    *max_line=i;
+	}
+      }
+      if (buf) {
+	if (tempi->ic_ext_body) {
+	  MemCpy(buf+ip,tempi->ic_ext_body,tempi->ic_cnt);
+	  Free(tempi->ic_ext_body);
+	  tempi->ic_ext_body=NULL;
+	} else
+	  MemCpy(buf+ip,tempi->ic_body,tempi->ic_cnt);
+	if (my_dbg) {
+	  if (tempi->ic_line>=*min_line && tempi->ic_line<=*max_line) {
+	    i=tempi->ic_line-*min_line;
+	    if (!my_dbg->body[i])
+	      my_dbg->body[i]=ip2;
+	  }
+	}
+      }
+    }
+    if (tempi->ic_flags&ICF_TRACE) {
+      if (Bt(&lx->pass_trace_mask,pass)) {
+	if (buf) {
+	  if (tempi->ic_cnt) {
+	    cout "$$FG,RED$$";
+	    CallExtStr("Dasm2",buf+ip,tempi->ic_cnt,64);
+	    cout "$$FG$$";
+	  }
+	}
+      }
+    }
+    if (!(tempi->ic_flags&ICF_CODE_FINAL))
+      MemCpy(&tempi->p1,saved_p123,3*sizeof(IcParam));
+    ip+=tempi->ic_cnt;
+    }
+    tempi+=sizeof(IntermediateCode);
+  }
+
+  lb=lx->cb.cb_misc_list;
+  while (lb) {
+    if (lb->type==CBMT_STR_CONST) {
+      lb->address=ip;
+      if (buf)
+	MemCpy(buf+ip,lb->str,lb->st_len);
+      ip+=lb->st_len;
+    } else if (lb->type==CBMT_JMP_TABLE) {
+      ip+=(8-ip&7)&7; //aligned to 8
+      lb->address=ip;
+      if (buf) {
+	for (i=0;i<lb->st_len;i++) {
+	  lb1=lb->jmp_table[i];
+	  qq=buf+ip+i<<3;
+	  if (a) {
+	    tempa=MAllocZ(sizeof(ExeAbsoluteAddressStruct));
+	    tempa->next=a->absolutes;
+	    a->absolutes=tempa;
+	    tempa->ip=a->ip+ip+i<<3;
+	    *qq=lb1->address+a->ip;
+	  } else
+	    *qq=lb1->address+buf;
+	}
+      }
+      ip+=lb->st_len<<3;
+    }
+    lb=lb->next;
+  }
+  if (pass==7) {
+    if (min_line2!=-1 &&
+	(min_line2-*min_line)>10) //Defines screw things up
+      *min_line=min_line2;
+  } else if (buf && my_dbg) {
+    i=*max_line-*min_line+1;
+    if (lx->a)
+      my_dbg->body[i]=ip+lx->a->ip;
+    else
+      my_dbg->body[i]=ip+buf;
+  }
+
+  return ip;
+}

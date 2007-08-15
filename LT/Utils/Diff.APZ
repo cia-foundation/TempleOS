@@ -1,0 +1,241 @@
+#help_index "Utils"
+
+I8 PopUpDiffOptions()
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  LtfPutSExt(l,"$$CM +LX, 2,4$$$$FG$$$$BT, \"USE FILE1\",0$$");
+  LtfPutSExt(l,"$$CM +LX, 24,0$$$$FG CYAN$$$$BT, \"USE FILE2\",1$$");
+  LtfPutSExt(l,"$$CM +LX, 2,4$$$$FG$$$$BT, \"REMAINDER ALL FILE1\",2$$");
+  LtfPutSExt(l,"$$CM +LX, 24,0$$$$FG CYAN$$$$BT, \"REMAINDER ALL FILE2\",3$$");
+  LtfPutSExt(l,"$$CM +LX, 2,4$$$$FG$$$$BT, \"ABORT FILE\",4$$");
+  LtfPutSExt(l,"$$CM +LX, 24,0$$$$FG$$$$BT, \"ABORT ALL FILES\",5$$");
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+I8 CompareDiffEntries(LtfEntry **ll1,LtfEntry **ll2)
+{
+  LtfEntry *cl1=*ll1,*cl2=*ll2;
+  return StrCmp(cl1->display,cl2->display);
+}
+
+#define DF_MODIFIED			1
+#define DF_DONT_MODIFIED		2
+#define DF_REMAINDER_ALL_FILE1		4
+#define DF_REMAINDER_ALL_FILE2		8
+#define DF_ABORT_FILE			16
+#define DF_ABORT_ALL_FILES		32
+#define DF_NO_MORE_PROMPTS_THIS_FILE	64
+
+void DiffSelect(Ltf *l,U8 *flags,I8 j1_lo,I8 j1_hi,
+		 I8 j2_lo,I8 j2_hi,LtfEntry **usl1,LtfEntry **usl2)
+{
+  I8 i;
+  LtfEntry *cl,*cl1,*cl2;
+  BoolU4 use_file1;
+  U8 old_flags;
+  Ltf *cur_l;
+  if (!(*flags & (DF_ABORT_FILE|DF_ABORT_ALL_FILES))) {
+    PrintF("$$FG,RED$$%d,%d---------------------$$FG$$\r\n",j1_lo,j2_lo);
+    i=(j1_lo<=0) ? 0:j1_lo-1;
+    while (i<j1_hi) {
+      if (cur_l=Fs->cur_ltf) {
+	old_flags=cur_l->flags&LTFF_PLAIN_TEXT;
+	cur_l->flags|=LTFF_PLAIN_TEXT;
+      }
+      PutS(usl1[i++]->display);
+      if (cur_l)
+	cur_l->flags=(cur_l->flags & ~LTFF_PLAIN_TEXT)|old_flags;
+      CrLf;
+    }
+    PutS("$$FG CYAN$$");
+    i=(j2_lo<=0) ? 0:j2_lo-1;
+    while (i<j2_hi) {
+      if (cur_l=Fs->cur_ltf) {
+	old_flags=cur_l->flags&LTFF_PLAIN_TEXT;
+	cur_l->flags|=LTFF_PLAIN_TEXT;
+      }
+      PutS(usl2[i++]->display);
+      if (cur_l)
+	cur_l->flags=(cur_l->flags & ~LTFF_PLAIN_TEXT)|old_flags;
+      CrLf;
+    }
+    PutS("$$FG$$");
+
+    use_file1=TRUE;
+    if (!(*flags & DF_NO_MORE_PROMPTS_THIS_FILE)) {
+      switch (PopUpDiffOptions) {
+	case 0:
+	  break;
+	case 1:
+	  use_file1=FALSE;
+	  break;
+	case 2:
+	  *flags|=DF_REMAINDER_ALL_FILE1|DF_NO_MORE_PROMPTS_THIS_FILE;
+	  break;
+	case 3:
+	  *flags|=DF_REMAINDER_ALL_FILE2|DF_NO_MORE_PROMPTS_THIS_FILE;
+	  break;
+	case 4:
+	  *flags|=DF_DONT_MODIFIED|DF_ABORT_FILE|DF_NO_MORE_PROMPTS_THIS_FILE;
+	  break;
+	default:
+	  *flags|=DF_DONT_MODIFIED|DF_ABORT_ALL_FILES|DF_NO_MORE_PROMPTS_THIS_FILE;
+      }
+    }
+    if (*flags & DF_REMAINDER_ALL_FILE2)
+      use_file1=FALSE;
+    if (!use_file1) {
+      *flags|=DF_MODIFIED;
+      cl1=usl1[j1_lo]->last;
+      if (j1_lo<j1_hi) {
+	cl=usl1[j1_lo];
+	while (cl!=usl1[j1_hi]) {
+	  cl2=cl->next;
+	  LtfDelEntry(l,cl);
+	  cl=cl2;
+	}
+      }
+      if (j2_lo<j2_hi) {
+	cl=usl2[j2_lo];
+	while (cl!=usl2[j2_hi]) {
+	  cl2=LtfCopyEntry(l,cl);
+	  InsQue(cl2,cl1);
+	  cl1=cl2;
+	  cl=cl->next;
+	}
+      }
+    }
+  }
+}
+
+void DiffSub(Ltf *l,U8 *flags,I8 j1_lo,I8 j1_hi,I8 j2_lo,I8 j2_hi,
+  I8 cnt1,I8 cnt2,LtfEntry **sl1,LtfEntry **sl2,LtfEntry **usl1,LtfEntry **usl2)
+{
+  I8 i,i1=0,i2=0,i2b,j1,j2,n;
+  I8 best_j1,best_j2,best_score=0,score;
+
+  if (j1_lo>=j1_hi || j2_lo>=j2_hi) {
+    if (j1_lo<j1_hi || j2_lo<j2_hi)
+      DiffSelect(l,flags,j1_lo,j1_hi,j2_lo,j2_hi,usl1,usl2);
+    return;
+  }
+
+  //Locate longest matching str in intervals
+  while (i1<cnt1 && i2<cnt2) {
+    if (sl1[i1]->y<j1_lo || sl1[i1]->y>=j1_hi)
+      i1++;
+    else if (sl2[i2]->y<j2_lo || sl2[i2]->y>=j2_hi)
+      i2++;
+    else {
+      i=StrCmp(sl1[i1]->display,sl2[i2]->display);
+      if (i>0)
+	i2++;
+      else if (i<0)
+	i1++;
+      else {
+	i2b=i2;
+	while (!StrCmp(sl1[i1]->display,sl2[i2]->display)) {
+	  if (sl2[i2]->y>=j2_lo && sl2[i2]->y<j2_hi) {
+	    score=0;
+	    j1=sl1[i1]->y;
+	    j2=sl2[i2]->y;
+	    n=j1_hi-j1;
+	    if (j2_hi-j2<n)
+	      n=j2_hi-j2;
+	    while (score<n) {
+	      if (!StrCmp(usl1[j1+score]->display,usl2[j2+score]->display))
+		score++;
+	      else
+		break;
+	    }
+	    if (score>best_score) {
+	      best_score=score;
+	      best_j1=j1;
+	      best_j2=j2;
+	    }
+	  }
+	  i2++;
+	  if (i2>=cnt2)
+	    break;
+	}
+	i2=i2b;
+	i1++;
+      }
+    }
+  }
+  if (best_score==0)
+    DiffSelect(l,flags,j1_lo,j1_hi,j2_lo,j2_hi,usl1,usl2);
+  else {
+    DiffSub(l,flags,j1_lo,best_j1,j2_lo,best_j2,cnt1,cnt2,sl1,sl2,usl1,usl2);
+    DiffSub(l,flags,best_j1+best_score,j1_hi,best_j2+best_score,j2_hi,cnt1,cnt2,
+      sl1,sl2,usl1,usl2);
+  }
+}
+
+public U8 Diff(I1 *dst_file,I1 *src_file,U8 flags=0)
+{
+  Ltf *l1=LtfRead(dst_file, LTFF_PLAIN_TEXT_WITH_TABS | LTFF_NO_CURSOR);
+  Ltf *l2=LtfRead(src_file, LTFF_PLAIN_TEXT_WITH_TABS | LTFF_NO_CURSOR);
+  LtfEntry *cl,**sl1,**sl2,**usl1,**usl2;
+  I8 i,cnt1=0,cnt2=0;
+
+  flags&=DF_ABORT_ALL_FILES;
+
+  cl=l1->dummy.next;
+  while (cl!=l1) {
+    if (cl->btype==LTFT_TEXT)
+      cl->y=cnt1++;
+    cl=cl->next;
+  }
+
+  cl=l2->dummy.next;
+  while (cl!=l2) {
+    if (cl->btype==LTFT_TEXT)
+      cl->y=cnt2++;
+    cl=cl->next;
+  }
+
+  sl1=MAlloc(cnt1*sizeof(LtfEntry *));
+  usl1=MAlloc((cnt1+1)*sizeof(LtfEntry *));
+  i=0;
+  cl=l1->dummy.next;
+  while (cl!=l1) {
+    if (cl->btype==LTFT_TEXT) {
+      sl1[i]=cl;
+      usl1[i++]=cl;
+    }
+    cl=cl->next;
+  }
+  usl1[i]=l1;
+  QSort(sl1,cnt1,sizeof(LtfEntry *),&CompareDiffEntries);
+
+  sl2=MAlloc(cnt2*sizeof(LtfEntry *));
+  usl2=MAlloc((cnt2+1)*sizeof(LtfEntry *));
+  i=0;
+  cl=l2->dummy.next;
+  while (cl!=l2) {
+    if (cl->btype==LTFT_TEXT) {
+      sl2[i]=cl;
+      usl2[i++]=cl;
+    }
+    cl=cl->next;
+  }
+  usl2[i]=l2;
+  QSort(sl2,cnt2,sizeof(LtfEntry *),&CompareDiffEntries);
+
+  DiffSub(l1,&flags,0,cnt1,0,cnt2,cnt1,cnt2,sl1,sl2,usl1,usl2);
+  if (flags&DF_MODIFIED && !(flags&DF_DONT_MODIFIED))
+    LtfWrite(l1);
+
+  LtfDel(l1);
+  LtfDel(l2);
+  Free(sl1);
+  Free(sl2);
+  Free(usl1);
+  Free(usl2);
+  return flags;
+}
+#help_index ""

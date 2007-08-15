@@ -1,0 +1,500 @@
+U8 AddBlkDev(LTBlkDev *bd,BoolU4 one_partition)
+{
+  I8 i,j,ext_base,num_partition;
+  U8 offset;
+  LTPartition *p;
+  I1 *drname;
+  LTBootStruct br;
+  MasterBootStruct mbr;
+
+  bd->ch_L='L';
+  bd->ch_B='B';
+  bd->ch_D='D';
+  num_partition=bd->partition_base-'A';
+  p=&local_partitions[num_partition];
+  MemSet(p,0,sizeof(LTPartition));
+  p->drive=num_partition+'A';
+  p->ch_L='L';
+  p->ch_P='P';
+  p->ch_E='E';
+  p->bdev=bd;
+  p->size=bd->max_blk+1;
+  j=(sys_boot_code.u1[1]==0xE0) ? 0:1;
+  switch (sys_boot_code.u1[0]) {
+    case BOOT_CODE_CDROM:
+      if (sys_boot_code.u2[1]==bd->base0 && j==bd->unit)
+	boot_blkdev=bd;
+      break;
+    case BOOT_CODE_HARDDRIVE:
+      if (sys_boot_code.u2[1]==bd->base0 && j==bd->unit)
+	boot_blkdev=bd;
+      break;
+  }
+  if (boot_blkdev==bd)
+    bd->flags|=LTBDF_HAS_BEEN_RESET;
+
+  switch (bd->type) {
+    case LTBDT_FDC:
+      p->type=PT_LT;
+      p->RBlks=&FDCRBlks;
+      p->WBlks=&FDCWBlks;
+      num_partition++;
+      break;
+    case LTBDT_RAM:
+      p->type=PT_LT;
+      p->RBlks=&RAMRBlks;
+      p->WBlks=&RAMWBlks;
+      num_partition++;
+      break;
+    case LTBDT_ATA:
+      InitBlkDev(bd,TRUE);
+      offset=0;
+      ext_base=INVALID_CLUSTER;
+      if (one_partition) {
+	p->type=PT_LT;
+	p->RBlks=&IDERBlks;
+	p->WBlks=&IDEWBlks;
+	p->size=bd->max_blk+1;
+	num_partition++;
+	//The following read is a test read.
+	//if it hangs, the drive is not supported.
+	ATAReadBlks(bd,&mbr,offset,1);
+	break;
+      }
+      while (TRUE) {
+	ATAReadBlks(bd,&mbr,offset,1);
+	if (mbr.signature!=0xAA55)
+	  break;
+	j=-1;
+	for (i=0;i<4;i++) {
+	  if (mbr.p[i].type!=0) {
+	    p=&local_partitions[num_partition];
+	    MemSet(p,0,sizeof(LTPartition));
+	    p->drive=num_partition+'A';
+	    p->ch_L='L';
+	    p->ch_P='P';
+	    p->ch_E='E';
+	    p->bdev=bd;
+	    p->RBlks=&IDERBlks;
+	    p->WBlks=&IDEWBlks;
+	    p->offset=mbr.p[i].offset+offset;
+	    p->size  =mbr.p[i].size;
+	    p->type  =mbr.p[i].type;
+	    if (p->type==PT_LT)
+	      InitLTPartition(p,TRUE);
+	    else {
+	      if (p->type==PT_FAT32+1) p->type=PT_FAT32;
+	      if (p->type==PT_FAT32) {
+		ATAReadBlks(bd,&br,p->offset,1);
+		if (br.signature==PT_LT)
+		  InitLTPartition(p,TRUE);
+	      }
+	    }
+	    if (p->type==5 || p->type==0xF)
+	      j=i;
+	    else
+	      num_partition++;
+	  }
+	}
+	if (j<0)
+	  break;
+	if (mbr.p[j].offset==0)
+	  break;
+	if (ext_base==INVALID_CLUSTER) {
+  	  offset=mbr.p[j].offset;
+	  ext_base=offset;
+	} else
+	  offset=mbr.p[j].offset+ext_base;
+      }
+      break;
+    case LTBDT_ATAPI:
+      p->type=PT_ISO9660;
+      p->RBlks=&IDERBlks;
+      p->WBlks=&IDEWBlks;
+      p->size =CD_FILE_OFFSET;
+      num_partition++;
+      break;
+    case LTBDT_LT_FILE:
+      drname=ChangeExtension(bd->filename,"DVC");
+      bd->filename=ANewStr(drname);
+      Free(drname);
+      p->type=PT_LT;
+      p->RBlks=&FileRBlks;
+      p->WBlks=&FileWBlks;
+      num_partition++;
+      break;
+    case LTBDT_NON_LT_FILE:
+      p->type=PT_LT;
+      p->offset=bd->non_lt_offset;
+      p->RBlks=&NonLTFileRBlks;
+      p->WBlks=&NonLTFileWBlks;
+      if (bd->flags & LTBDF_FORMAT)
+	p->size=bd->max_blk-bd->min_blk+1;
+      num_partition++;
+      break;
+  }
+  return num_partition-(bd->partition_base-'A');
+}
+
+void HintATA()
+{
+  void *base_PCI=0xF0000000;
+  void *base;
+  U4 *dd,d1,d2;
+  U1 *bb,d3;
+  U2 *ww;
+  base=base_PCI+0xF9000;
+  ww=base;
+  if (*ww==0x8086) {
+    dd=base+0x10;
+    d1=*dd;
+    dd=base+0x14;
+    d2=*dd;
+    bb=base+0x3C;
+    d3=*bb;
+    if (d1&1 && d2&1) {
+      if (IDEProbe(d1&-8,d2&-4,0))
+	coutln "$$FG,PURPLE$$Primary IDE$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 0";
+      if (IDEProbe(d1&-8,d2&-4,1))
+	coutln "$$FG,PURPLE$$Primary IDE$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 1";
+    }
+    dd=base+0x18;
+    d1=*dd;
+    dd=base+0x1C;
+    d2=*dd;
+    if (d1&1 && d2&1) {
+      if (IDEProbe(d1&-8,d2&-4,0))
+	coutln "$$FG,PURPLE$$Secondary IDE$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 0";
+      if (IDEProbe(d1&-8,d2&-4,1))
+	coutln "$$FG,PURPLE$$Secondary IDE$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 1";
+    }
+  } else {
+    d1=0x1F0;
+    d2=0x3F6;
+    d3=14;
+    if (IDEProbe(d1,d2,0))
+      coutln "$$FG,PURPLE$$Primary IDE$$FG$$\r\nBase0: 0x",d1,"\r\nBase1: 0x",d2,"\r\nIrq: 0x",d3," Unit 0";
+    if (IDEProbe(d1,d2,1))
+      coutln "$$FG,PURPLE$$Primary IDE$$FG$$\r\nBase0: 0x",d1,"\r\nBase1: 0x",d2,"\r\nIrq: 0x",d3," Unit 1";
+
+    d1=0x170;
+    d2=0x376;
+    d3=15;
+    if (IDEProbe(d1,d2,0))
+      coutln "$$FG,PURPLE$$Secondary IDE$$FG$$\r\nBase0: 0x",d1,"\r\nBase1: 0x",d2,"\r\nIrq: 0x",d3," Unit 0";
+    if (IDEProbe(d1,d2,1))
+      coutln "$$FG,PURPLE$$Secondary IDE$$FG$$\r\nBase0: 0x",d1,"\r\nBase1: 0x",d2,"\r\nIrq: 0x",d3," Unit 1";
+  }
+  base=base_PCI+0xFA000;
+  ww=base;
+  if (*ww==0x8086) {
+    dd=base+0x10;
+    d1=*dd;
+    dd=base+0x14;
+    d2=*dd;
+    bb=base+0x3C;
+    d3=*bb;
+    if (d1&1 && d2&1) {
+      if (IDEProbe(d1&-8,d2&-4,0))
+	coutln "$$FG,PURPLE$$Primary SATA$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 0";
+      if (IDEProbe(d1&-8,d2&-4,1))
+	coutln "$$FG,PURPLE$$Primary SATA$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3," Unit 1";
+    }
+    dd=base+0x18;
+    d1=*dd;
+    dd=base+0x1C;
+    d2=*dd;
+    if (d1&1 && d2&1) {
+      if (IDEProbe(d1&-8,d2&-4,0))
+	coutln "$$FG,PURPLE$$Secondary SATA$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3,"Unit 0";
+      if (IDEProbe(d1&-8,d2&-4,1))
+	coutln "$$FG,PURPLE$$Secondary SATA$$FG$$\r\nBase0: 0x",d1&-8,"\r\nBase1: 0x",d2&-4,"\r\nIrq: 0x",d3,"Unit 1";
+    }
+  }
+  CrLf;
+  CrLf;
+}
+
+
+void AddDrives(BoolU4 repartition=FALSE)
+{
+  LTBlkDev *bd;
+  I8 base_partition,drive_letter,type,k;
+  I1 buf[32],buf2[128],buf3[128],buf4[128];
+  BoolU4 format,add;
+  void my_PartitionDrive(I1 drive);
+  do {
+    PartitionRep;
+    PutSysText("ST_ADDDRIVES1");
+    base_partition=ToUpper(GetChar)-'A';
+    CrLf;
+    if (base_partition>=0 && base_partition<32) {
+
+      PutSysText("ST_ADDDRIVES2");
+      type=GetChar-'0';
+      CrLf;
+
+      k=0;
+
+      if (type==LTBDT_LT_FILE) {
+	PutSysText("ST_ADDDRIVES3");
+	GetS(buf2,128);
+	PutSysText("ST_ADDDRIVES4");
+	format=YorN;
+	*buf=0;
+      } else if (type==LTBDT_ATA || type==LTBDT_ATAPI) {
+	HintATA;
+	PutSysText("ST_ADDDRIVES12");
+	GetS(buf2,128);
+	PutSysText("ST_ADDDRIVES13");
+	GetS(buf3,128);
+	PutSysText("ST_ADDDRIVES14");
+	GetS(buf4,128);
+	PutSysText("ST_ADDDRIVES7");
+	k=GetChar-'0';
+	CrLf;
+      }
+      if (type==LTBDT_NON_LT_FILE) {
+	PutSysText("ST_ADDDRIVES15");
+	drive_letter=GetChar;
+	CrLf;
+	PutSysText("ST_ADDDRIVES16");
+	GetS(buf2,128);
+      }
+      if (type==LTBDT_RAM ||
+	  type==LTBDT_LT_FILE && format) {
+	PutSysText("ST_ADDDRIVES5");
+	GetS(buf,32);
+      } else if (type==LTBDT_FDC) {
+	PutSysText("ST_ADDDRIVES7");
+	k=GetChar-'0';
+	CrLf;
+      }
+
+      if (type>LTBDT_NULL && type<=LTBDT_NON_LT_FILE &&
+	  k>=0 && k<=1) {
+	bd=local_blkdevs+sizeof(LTBlkDev)*(num_blkdevs++);
+	bd->partition_base=base_partition+'A';
+	bd->unit=k;
+
+	if (type==LTBDT_FDC) {
+	  bd->base0=0x3F0;
+	  bd->irq=6;
+	} else if (type==LTBDT_ATA ||
+		   type==LTBDT_ATAPI) {
+	  bd->base0=AtoI(buf2);
+	  bd->base1=AtoI(buf3);
+	  bd->irq=AtoI(buf4);
+	}
+
+	if (type==LTBDT_FDC ||
+	    type==LTBDT_ATAPI)
+	  bd->flags=LTBDF_REMOVABLE;
+	else
+	  bd->flags=0;
+	if (type!=LTBDT_RAM)
+	  bd->flags|=LTBDF_READ_CACHE;
+ 
+	if (type==LTBDT_ATAPI) {
+	  bd->blk_size=CD_BLK_SIZE;
+	  bd->flags|=LTBDF_READ_ONLY;
+	} else
+	  bd->blk_size=BLK_SIZE;
+	if (type==LTBDT_RAM ||
+	    type==LTBDT_LT_FILE && format) {
+	  bd->max_blk=AtoI(buf)-1;
+	  if (bd->max_blk<fdc_max_sector)
+	    bd->max_blk=fdc_max_sector;
+	} else if (type==LTBDT_FDC)
+	  bd->max_blk=fdc_max_sector;
+	else
+	  bd->max_blk=0xEFFFFFFF;
+	if (type==LTBDT_LT_FILE) {
+	  bd->filename=ANewStr(buf2);
+	  if (format)
+	    bd->flags=bd->flags|LTBDF_FORMAT;
+	} else if (type==LTBDT_NON_LT_FILE) {
+	  bd->non_lt_drive=drive_letter;
+	  bd->non_lt_offset=AtoI(buf2);
+	}
+	bd->type=type;
+	add=TRUE;
+	if (type==LTBDT_ATA && repartition) {
+	  if (my_PartitionDrive=FindExtern("PartitionDrive")) {
+	    PutSysText("ST_ADDDRIVES11");
+	    if (YorN) {
+	      if (!AddBlkDev(bd,TRUE))
+		PutSysText("ST_FAILED");
+	      else
+		my_PartitionDrive(bd->partition_base);
+	      add=FALSE;
+	    }
+	  }
+	}
+	if (add) {
+	  if (!AddBlkDev(bd,FALSE))
+	    PutSysText("ST_FAILED");
+	}
+      } else
+	PutSysText("ST_FAILED");
+    }
+  } while (base_partition>=0 && base_partition<32);
+}
+
+void SetObtainedBaseUnit(LTBlkDev *bd)
+{
+  if (sys_boot_code.u1[1]==0xE0)
+    bd->unit=0;
+  else
+    bd->unit=1;
+  if (sys_boot_code.u2[1]==0x1F0) {
+    bd->base0=0x1F0;
+    bd->base1=0x3F6;
+    bd->irq=14;
+  } else {
+    bd->base0=0x170;
+    bd->base1=0x376;
+    bd->irq=15;
+  }
+}
+
+void InitAllBlkDevs()
+{
+  LTBlkDev *bd;
+  I8 i;
+
+  num_blkdevs=0;
+  boot_blkdev=NULL;
+  local_blkdevs=AMAllocZ(sizeof(LTBlkDev)<<5);
+
+  monitor_floppy_tss=NULL;
+  fdc_retries=2;
+  fdc_drive_heads=2;
+  fdc_disk_cylinders=80;
+  fdc_disk_sectors=18;
+  fdc_max_sector=fdc_drive_heads*fdc_disk_cylinders*fdc_disk_sectors-1;
+  fdc_dma_buf=0xD000;
+  ext[EXT_IRQ06]=&Irq06Handler;
+
+  ext[EXT_IRQ0B]=&Irq0BHandler;
+  ext[EXT_IRQ0E]=&Irq0EHandler;
+  ext[EXT_IRQ0F]=&Irq0FHandler;
+
+  local_partitions=AMAllocZ(sizeof(LTPartition)<<5);
+  for (i=0;i<32;i++)
+    drive_to_partition[i]=&local_partitions[i];
+  dc_col=0;
+
+  #exe {
+    I8 base_partition,type,drive_letter,k,n,num=0;
+    I1 buf[32],buf2[128],buf3[128],buf4[128];
+    BoolU4 format;
+    PutSysText("ST_ADDDRIVES0");
+    do {
+      PutSysText("ST_ADDDRIVES1");
+      base_partition=ToUpper(GetChar)-'A';
+      CrLf;
+      if (base_partition>=0 && base_partition<32) {
+	PutSysText("ST_ADDDRIVES2");
+	type=GetChar-'0';
+	CrLf;
+
+	k=0;
+	if (type==LTBDT_LT_FILE) {
+	  PutSysText("ST_ADDDRIVES3");
+	  GetS(buf2,128);
+	  PutSysText("ST_ADDDRIVES4");
+	  format=YorN;
+	  *buf=0;
+	}
+	if (type==LTBDT_RAM ||
+		   type==LTBDT_LT_FILE && format) {
+	  PutSysText("ST_ADDDRIVES5");
+	  GetS(buf,32);
+	} else if (type==LTBDT_ATA ||
+		   type==LTBDT_ATAPI) {
+	  HintATA;
+	  if (type==LTBDT_ATAPI)
+	    PutSysText("ST_ADDDRIVES12a");
+	  PutSysText("ST_ADDDRIVES12");
+	  GetS(buf2,128);
+	  if (type!=LTBDT_ATAPI || *buf2) {
+	    PutSysText("ST_ADDDRIVES13");
+	    GetS(buf3,128);
+	    PutSysText("ST_ADDDRIVES14");
+	    GetS(buf4,128);
+	    PutSysText("ST_ADDDRIVES7");
+	    k=GetChar-'0';
+ 	    CrLf;
+	  }
+	}
+	if (type==LTBDT_NON_LT_FILE) {
+	  PutSysText("ST_ADDDRIVES15");
+	  drive_letter=GetChar;
+	  CrLf;
+	  PutSysText("ST_ADDDRIVES16");
+	  GetS(buf2,128);
+	}
+
+	if (type>LTBDT_NULL && type<=LTBDT_NON_LT_FILE &&
+	    k>=0 && k<=1) {
+	  ExePrintF("bd=local_blkdevs+sizeof(LTBlkDev)*(num_blkdevs++);");
+	  ExePrintF("bd->partition_base=%d;",
+	    base_partition+'A');
+
+	  ExePrintF("bd->unit=%d;",k);
+
+	  if (type==LTBDT_FDC)
+	    ExePrintF("bd->base0=0x3F0;bd->irq=6;");
+	  else if (type==LTBDT_ATA || type==LTBDT_ATAPI) {
+	    if (type==LTBDT_ATAPI && !*buf2)
+	      ExePrintF("SetObtainedBaseUnit(bd);");
+	    else
+	      ExePrintF("bd->base0=%s;bd->base1=%s;bd->irq=%s;",
+		buf2,buf3,buf4);
+	  }
+	  if (type==LTBDT_FDC || type==LTBDT_ATAPI)
+	    ExePrintF("bd->flags=LTBDF_REMOVABLE;");
+	  else
+	    ExePrintF("bd->flags=0;");
+	  if (type!=LTBDT_RAM)
+	    ExePrintF("bd->flags=bd->flags|LTBDF_READ_CACHE;");
+
+	  if (type==LTBDT_ATAPI) {
+	    ExePrintF("bd->blk_size=CD_BLK_SIZE;");
+	    ExePrintF("bd->flags=bd->flags | LTBDF_READ_ONLY;");
+	  } else
+	    ExePrintF("bd->blk_size=BLK_SIZE;");
+	  if (type==LTBDT_RAM ||
+	      type==LTBDT_LT_FILE && format) {
+	    n=AtoI(buf)-1;
+	    if (n<fdc_max_sector)
+	      n=fdc_max_sector;
+	    ExePrintF("bd->max_blk=%d;",n);
+	  } else if (type==LTBDT_FDC)
+	    ExePrintF("bd->max_blk=fdc_max_sector;");
+	  else
+	    ExePrintF("bd->max_blk=0xEFFFFFFF;");
+
+	  if (type==LTBDT_LT_FILE) {
+	    ExePrintF("bd->filename=ANewStr(\"%s\");",buf2);
+	    if (format)
+	      ExePrintF("bd->flags=bd->flags|LTBDF_FORMAT;");
+	  } else if (type==LTBDT_NON_LT_FILE) {
+	    ExePrintF("bd->non_lt_drive=%d;",drive_letter);
+	    n=AtoI(buf2);
+	    ExePrintF("bd->non_lt_offset=%d;",n);
+	  }
+	  ExePrintF("bd->type=%d;",type);
+	  ExePrintF("AddBlkDev(bd,FALSE);");
+	  num++;
+	} else
+	  PutSysText("ST_FAILED");
+      }
+    } while (num==0 || base_partition>=0 && base_partition<32);
+    ExePrintF("default_drive=\'%C\';",insboot_dst_drive);
+  }
+  PartitionRep;
+}
+
+ 

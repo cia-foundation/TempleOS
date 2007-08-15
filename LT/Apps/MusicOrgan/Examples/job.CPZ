@@ -1,0 +1,27 @@
+void EndTsk()
+{
+  Sound(0);
+  Exit;
+}
+
+void Song()
+{
+  Fs->end_task_cb=&EndTsk;
+  music_tempo=2.5;
+  try {
+  while (!ScanKey) {
+	Play("3qGGGGsGGGGetFFFeEFsGGGG",
+		"I've \0been \0pat\0ient; \0Grant \0 \0 \0 \0me \0 \0 \0jus\0 \0tice.\r\n\0 \0 \0 \0");
+	Play("qGGGGsGGGGetFFFeEFsGGGG",
+		"Not \0comp\0lan\0cient; \0You \0 \0 \0 \0are \0 \0 \0whit\0 \0ness.\r\n\0 \0 \0 \0");
+	Play("BBBBeCCqDDA2G3etAAAqB",
+		"All \0 \0 \0 \0my \0 \0foes \0 \0re\0joice \0o\0ver \0 \0me.\r\n\0");
+	Play("sBBBBeCCqDDA2G3etAAAqB",
+		"See \0 \0 \0 \0their \0 \0throes; \0 \0Now, \0it's \0they \0that \0are \0stoned.\r\n\0");
+  }
+  } catch
+    Fs->catch_except=TRUE;
+  Sound(0);
+}
+
+Song;

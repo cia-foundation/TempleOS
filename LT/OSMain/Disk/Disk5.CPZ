@@ -1,0 +1,338 @@
+void SelectDefaultDrive()
+{
+  default_partition=DriveToPartition(default_drive);
+  Fs->cur_partition=INVALID_PTR;  //Null screws-up cache
+  Fs->cur_dir=NewStr("/");
+  ChangeDisk(':');
+}
+
+BoolU8 CopySingleZ(I1 *f1,I1 *f2) //Just one file
+{
+  U1 *file_buf=NULL;
+  U8 size,attr=0;
+  LTDirEntry de;
+
+  if (FindFile(f1,&de,FALSE,TRUE)) {
+    file_buf=ReadFile(f1,&size,&attr);
+    attr=FileAttr(f2,attr);
+    if (file_buf) {
+      coutln "Copying ",f1," to ",f2;
+      WriteFile(f2,file_buf,size,de.datetime,attr);
+      Free(file_buf);
+      return TRUE;
+    } else PutSysTextErr("ST_FILE_NOT_FOUND");
+  } else PutSysTextErr("ST_FILE_NOT_FOUND");
+  return FALSE;
+}
+
+#define COPY_BUF_BLKS	0x400
+BoolU8 CopySingle(I1 *f1,I1 *f2) //Just one file
+{
+  U1 *buf;
+  U8 cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2);
+  LTFile *in_file=NULL,*out_file=NULL;
+  U8 xsum=LT_XSUM,i,j;
+  if (!StrCmp(f1,f2))
+    return FALSE;
+  if (attr1!=attr2)
+    return CopySingleZ(f1,f2);
+  buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS);
+  if (attr1 & LT_ATTR_CONTIGUOUS)
+    in_file=FOpen(f1,"rc");
+  else
+    in_file=FOpen(f1,"r");
+  if (in_file) {
+    size=FSize(in_file);
+    cnt=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
+    if (attr2 & LT_ATTR_CONTIGUOUS)
+      out_file=FOpen(f2,"wc",cnt);
+    else
+      out_file=FOpen(f2,"w",cnt);
+    if (out_file) {
+      coutln "Copying ",f1," to ",f2;
+      j=size;
+      while (cnt) {
+	if (cnt>COPY_BUF_BLKS) {
+	  n=COPY_BUF_BLKS;
+	  i=n<<BLK_SIZE_BITS;
+	} else {
+	  n=cnt;
+	  i=j;
+	}
+	FRBlks(in_file, buf,LTFB_NEXT_BLK,n);
+	xsum^=ArcCheckSum(buf,i);
+	FWBlks(out_file,buf,LTFB_NEXT_BLK,n);
+	cnt-=n;
+	j-=n<<BLK_SIZE_BITS;
+      }
+      if (in_file->de.xsum &&
+	  in_file->de.xsum!=xsum)
+	throw(EXCEPT_ARC_XSUM);
+      out_file->de.xsum=xsum;
+      out_file->flags|=LTF_USE_OLD_DATETIME;
+      out_file->de.datetime=in_file->de.datetime;
+      out_file->de.size=size;
+      out_file->de.expanded_size=in_file->de.expanded_size;
+      out_file->de.attr=FileAttr(f2,in_file->de.attr);
+      FClose(out_file);
+      FClose(in_file);
+      Free(buf);
+      return TRUE;
+    } else PutSysTextErr("ST_FILE_NOT_FOUND");
+    FClose(in_file);
+  } else PutSysTextErr("ST_FILE_NOT_FOUND");
+  Free(buf);
+  return FALSE;
+}
+
+BoolU8 MkDir(I1 *filename)
+{
+  U8 c,size,cur_dir_cluster;
+  U1	*buf;
+  BoolU4 result=FALSE;
+  LTDirEntry *dLT;
+  I1 *name;
+  if (FindFile(filename,NULL,TRUE))
+    return FALSE;
+  LTFileAccess *fa=NewLTFileAccess(filename);
+  if (fa) {
+    if (*fa->mask) {
+      if (!CheckFileName(fa->mask))
+	PutSysTextErr("ST_INVALID_FILENAME");
+      else {
+	coutln "Make Directory:",filename;
+	name=MStrUtil(fa->mask,
+	SU_REMOVE_LEADING|SU_REMOVE_TRAILING|
+	SU_DISCARD_PARITY|SU_REMOVE_CTRL_CHARS);
+	size=fa->p->spc<<BLK_SIZE_BITS;
+	buf=MAllocZ(size);
+	cur_dir_cluster=NameToDirCluster(fa->p,Fs->cur_dir,TRUE);
+	if (fa->p->type==PT_LT) {
+	  dLT=buf-offset(LTDirEntry.start);
+	  c=WriteFile(name,buf,size,0,LT_ATTR_DIR,FALSE);
+
+	  dLT->attr=LT_ATTR_DIR|LT_ATTR_CONTIGUOUS;
+	  StrCpy(dLT->name,name);
+	  dLT->cluster=c;
+	  dLT->size=size;
+	  dLT->expanded_size=size;
+	  dLT->datetime=GetCurTimeLTDate;
+
+	  dLT+=LT_DIR_ENTRY_SIZE;
+
+	  dLT->attr=LT_ATTR_DIR|LT_ATTR_CONTIGUOUS;
+	  dLT->name[0]='.';
+	  dLT->name[1]='.';
+	  dLT->name[2]=0;
+	  dLT->cluster=cur_dir_cluster;
+	  dLT->size=0;
+	  dLT->expanded_size=0;
+	  dLT->datetime=GetCurTimeLTDate;
+
+	}
+	WClusters(fa->p,buf,c,1,TRUE);
+	Free(buf);
+	Free(name);
+	result=TRUE;
+      }
+    }
+    DelLTFileAccess(fa);
+  }
+  return result;
+}
+
+void SysDel(I1 *wild,BoolU4 make_mask)	//this is dangerous
+{
+  LTFileAccess *fa=NewLTFileAccess(wild,make_mask);
+  if (fa) {
+    if (fa->p->type==PT_LT)
+      DelLTFiles(fa->p,Fs->cur_dir,fa->mask,TRUE);
+    DelLTFileAccess(fa);
+  }
+}
+
+void Format(I8 drive_letter,BoolU4 quick=TRUE,BoolU4 confirm=TRUE,U8 type=PT_LT)
+{
+  LTPartition *p=DriveToPartition(drive_letter);
+  if (confirm) {
+    if (!AreYouSure)
+      return;
+  }
+  if (!p)  {
+    PutSysTextErr("ST_INVALID_DRIVE");
+    return;
+  }
+  if (type==PT_LT) {
+    Drive(drive_letter);
+    FormatLT(drive_letter,quick);
+    InvalidateDiskCache(DriveToPartition(drive_letter),TRUE);
+    Drive(drive_letter);
+  }
+}
+
+
+void ReadCDImage(I1 drive,I1 *out_name)
+{
+  LTBlkDev *bdev=DriveToBlkDev(drive);
+  LTPartition *p=DriveToPartition(drive);
+  U1 *buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS);
+  I1 *out_name2=DefaultExtension(out_name,"ISO");
+  LTFile *f=FOpen(out_name2,"w");
+  U8 n,dv,blk=0,cnt;
+  InitBlkDev(bdev,TRUE);
+  if (bdev->type!=LTBDT_ATAPI)
+    throw(EXCEPT_BLKDEV,3);
+  if (!out_name)
+    out_name=default_iso_name;
+  dv=bdev->blk_size>>BLK_SIZE_BITS;
+  cnt=((p->size+dv-1)/dv)*dv;
+  while (cnt) {
+    if (cnt>COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    else
+      n=cnt;
+    if (n>bdev->max_reads)
+      n=bdev->max_reads;
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(bdev->read_freq);
+    ATAPIReadBlks2(bdev,buf,blk/dv,n/dv);
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(0);
+    FWBlks(f,buf,blk,n);
+    cnt-=n;
+    blk+=n;
+    disk_reads+=n;
+  }
+  FClose(f);
+  Free(buf);
+  Free(out_name2);
+}
+
+class LTDuelBuf
+{
+  U1 *buf0,*buf1;
+  U8 in_buf,out_buf,cnt;
+  I1 *filename;
+  LTBlkDev *CD_bdev;
+};
+
+
+void WriteCDImageTsk()
+{
+  LTDuelBuf *d=Fs->user_data0;
+  U1 *buf;
+  U8 n,blk=0,cnt=d->cnt;
+  LTFile *f;
+  Preempt(ON);
+  InitLocalTask; //needed for disk access
+  if (FileAttr(d->filename)&LT_ATTR_CONTIGUOUS)
+    f=FOpen(d->filename,"rc");
+  else
+    f=FOpen(d->filename,"r");
+  while (cnt) {
+    if (cnt>COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    else
+      n=cnt;
+    if (n>d->CD_bdev->max_writes)
+      n=d->CD_bdev->max_writes;
+    buf=(d->in_buf & 1) ? d->buf1:d->buf0;
+    while (d->in_buf>d->out_buf+1)
+      SwapInNext;
+    FRBlks(f,buf,blk,n);
+    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+      Sound(d->CD_bdev->write_freq);
+    d->in_buf++;
+    cnt-=n;
+    blk+=n;
+  }
+  FClose(f);
+}
+
+void WriteCDImage(I1 drive,I1 *in_name)
+{
+  LTDuelBuf *d=MAllocZ(sizeof(LTDuelBuf));
+  U1 *buf;
+  I1 *in_name2,*in_name3;
+  U8 n,dv,blk=0,cnt;
+  LTPartition *p=DriveToPartition(drive);
+  LTBlkDev *bdev=p->bdev,*bdev2;
+  TssStruct *tss;
+  BoolU4 old_preempt;
+  LTFile *f;
+
+  if (!in_name)
+    in_name=default_iso_name;
+  in_name3=DefaultExtension(in_name,"ISO");
+  in_name2=AbsoluteFileName(in_name3);
+  f=FOpen(in_name2,"r");
+  if (!f) {
+    Free(d);
+    return;
+  }
+
+  cnt=(FSize(f)+BLK_SIZE-1)>>BLK_SIZE_BITS;
+  FClose(f);
+  if (bdev->type!=LTBDT_ATAPI)
+    throw(EXCEPT_BLKDEV,4);
+  bdev2=DriveToBlkDev(*in_name2);
+  if (bdev->irq==bdev2->irq) {
+    coutln "Cannot Burn CD on same IDE controller as File.\r\n";
+    throw(EXCEPT_BLKDEV,5);
+  }
+
+  bdev->flags|=LTBDF_READ_ONLY_OVERRIDE;
+  InitBlkDev(bdev,TRUE);
+  dv=bdev->blk_size>>BLK_SIZE_BITS;
+  if (p->size<cnt)
+    p->size=cnt;
+
+  d->filename=in_name2;
+  d->CD_bdev=bdev;
+  d->buf0=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS);
+  d->buf1=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS);
+  d->cnt=cnt;
+
+  old_preempt=Preempt(OFF);
+  tss=Spawn(&WriteCDImageTsk,"WRITE CD");
+  tss->user_data0=d;
+
+  while (d->in_buf<=d->out_buf)
+    SwapInNext;
+
+  if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+    Sound(bdev->write_freq);
+  IDEWaitForDrive(bdev);
+  ATAPIWaitReady(bdev);
+
+  while (cnt) {
+    if (cnt>COPY_BUF_BLKS)
+      n=COPY_BUF_BLKS;
+    else
+      n=cnt;
+    if (n>bdev->max_writes)
+      n=bdev->max_writes;
+    buf=(d->out_buf&1) ? d->buf1:d->buf0;
+    while (d->in_buf<=d->out_buf)
+      SwapInNext;
+    ATAPIWriteBlks(bdev,buf,blk/dv,(n+dv-1)/dv);
+    d->out_buf++;
+    cnt-=n;
+    blk+=n;
+    disk_writes+=n;
+  }
+  ATAPISync(bdev);
+  ATAPIClose(bdev);
+  if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SOUND],0))
+    Sound(0);
+  bdev->flags&=~LTBDF_READ_ONLY_OVERRIDE;
+  LBtr(&sema_irq_busy[bdev->irq],0);
+  Free(d->buf0);
+  Free(d->buf1);
+  Free(d);
+  Free(in_name2);
+  Free(in_name3);
+  Preempt(old_preempt);
+}
+
+ 

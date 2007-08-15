@@ -1,0 +1,684 @@
+#help_index "File/Cmd Line (Typically)"
+
+#define FILEMANAGER_MENU_NAME "::/LT/Doc/FileManager.MUZ"
+
+class FMUncollapsedList
+{
+  FMUncollapsedList *next;
+  I1 *name;
+};
+
+void AddTempDriveWizard()
+{
+  TssStruct *tss;
+  I1 *a_drive=NULL,*a_size=NULL,*a_type=NULL,*a_name=NULL,*a_default=NULL;
+  I8 size,drive,type,drive2;
+  LTPartition *p;
+  PartitionRep;
+  BoolU4 okay=FALSE,sure=FALSE,in_use,valid_drive2;
+  cout "$$WW,1$$";
+
+  a_type  =PmtStr("\r\n(R)am or (F)ile : ");
+  type	  =ToUpper(*a_type);
+  if (type=='R' || type=='F') {
+    a_drive =PmtStr("\r\nNew Drive Letter: ");
+    drive=ToUpper(*a_drive);
+    if (drive>'A' && drive<='Z') {
+      p=&local_partitions[drive-'A'];
+      try {
+	CheckLTPartition(p);
+	in_use=TRUE;
+      } catch {
+	Fs->catch_except=TRUE;
+	in_use=FALSE;
+      }
+      if (in_use)
+	coutln "$$FG,RED$$Drive letter in use.$$FG$$";
+      else {
+	a_size	=PmtStr("\r\nSize in Meg     : ");
+	size=AtoI(a_size)*0x100000>>BLK_SIZE_BITS;
+	if (size<0x800)
+	  coutln "$$FG,RED$$Invalid size.$$FG$$";
+	else {
+	  if (type=='F') {
+	    coutln "$$FG,RED$$Specify entire path, including drive, but leave-off "
+		   "the filename extension.$$FG$$";
+	    a_default=MSPrintF("%c:/Temp/Drive%c",default_drive,drive);
+	    a_name=PmtStr("\r\nFile Name (%s): ",a_default);
+	    if (*a_name==':')
+	      *a_name=default_drive;
+	    if (StrLen(a_name)<4 || a_name[1]!=':' ||
+		Occurrences(a_name,'.'))
+	      coutln "$$FG,RED$$Invalid file name.$$FG$$";
+	    else {
+	      drive2=ToUpper(*a_name);
+	      p=&local_partitions[drive2-'A'];
+	      valid_drive2=FALSE;
+	      if (p->type==PT_LT) {
+		try {
+		  CheckLTPartition(p);
+		  valid_drive2=TRUE;
+		} catch
+		  Fs->catch_except=TRUE;
+	      }
+	      if (!valid_drive2)
+		coutln "$$FG,RED$$Invalid drive in file name.$$FG$$";
+	      else
+		okay=TRUE;
+	    }
+	  } else {
+	    if (size<<BLK_SIZE_BITS>7*UnusedSysMem/8)
+	      coutln "$$FG,RED$$Size is too big.$$FG$$";
+	    else
+	      okay=TRUE;
+	  }
+	}
+      }
+    } else
+      coutln "$$FG,RED$$Invalid drive letter.$$FG$$";
+  }
+
+  CrLf;
+  if (okay)
+    sure=AreYouSure;
+  if (okay && sure) {
+    tss=SpawnUser;
+    tss->win_top=Fs->win_top;
+    tss->win_bottom=(Fs->win_top+Fs->win_bottom)>>2-1;
+    Fs-> win_top=tss->win_bottom+3;
+    tss->win_right=Fs->win_right;
+    tss->win_left=Fs->win_left;
+    WinToTop(Fs);
+    XTalk(tss,"AddDrives;\r");
+    XTalk(tss,"%c",drive);
+    if (type=='R') {
+      XTalk(tss,"1");
+      XTalk(tss,"%d\r",size);
+    } else {
+      XTalk(tss,"5");
+      XTalk(tss,"%s\r",a_name);
+      XTalk(tss,"Y");
+      XTalk(tss,"%d\r",size);
+    }
+    XTalkWithWait(tss,"\r");
+    Fs->win_top=tss->win_top;
+    Kill(tss);
+    PartitionRep;
+  } else
+    coutln "$$FG,RED$$Canceled$$FG$$";
+  CrLf;
+  PressAKey;
+  Free(a_drive);
+  Free(a_type);
+  Free(a_size);
+  Free(a_name);
+  Free(a_default);
+}
+
+void FMAddTempDrive()
+{
+  PopUp("AddTempDriveWizard;\r",Fs);
+}
+
+FMUncollapsedList *FMCollectUncollapsedList(Ltf *l)
+{
+  LtfEntry *ll=l->dummy.next;
+  FMUncollapsedList *result=NULL,*tempc;
+  LTDirEntry *tempm;
+  while (ll!=l) {
+    if (ll->btype==LTFT_TREE) {
+      if (!(ll->flags&LTFLF_COLLAPSED)) {
+	if (tempm=ll->user_data) {
+	  tempc=MAlloc(sizeof(FMUncollapsedList));
+	  tempc->next=result;
+	  result=tempc;
+	  tempc->name=NewStr(tempm->full_name);
+	}
+      }
+    }
+    ll=ll->next;
+  }
+  return result;
+}
+
+void FMMarkUncollapsed(Ltf *l,FMUncollapsedList *tempc,I1 *cur_entry,I1 *next_entry)
+{
+  LtfEntry *ll=l->dummy.next;
+  FMUncollapsedList *tempc1;
+  LTDirEntry *tempm;
+  while (ll!=l) {
+    if (ll->btype==LTFT_TREE) {
+      tempm=ll->user_data;
+      tempc1=tempc;
+      while (tempc1) {
+	if (!StrCmp(tempc1->name,tempm->full_name)) {
+	  ll->flags&=~LTFLF_COLLAPSED;
+	  break;
+	}
+	tempc1=tempc1->next;
+      }
+      if (cur_entry) {
+	if (!StrNCmp(cur_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	  l->cur_entry=ll;
+	  if (StrLen(tempm->full_name)==StrLen(cur_entry))
+	    cur_entry=NULL;
+	} else if (next_entry) {
+	  if (!StrNCmp(next_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	    l->cur_entry=ll;
+	    if (StrLen(tempm->full_name)==StrLen(next_entry))
+	      cur_entry=NULL;
+	  }
+	}
+      }
+    } else if (ll->btype==LTFT_MENU_VALUE) {
+      tempm=ll->left_exp;
+      if (cur_entry) {
+	if (!StrNCmp(cur_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	  l->cur_entry=ll;
+	  if (StrLen(tempm->full_name)==StrLen(cur_entry))
+	    cur_entry=NULL;
+	} else if (next_entry) {
+	  if (!StrNCmp(next_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	    l->cur_entry=ll;
+	    if (StrLen(tempm->full_name)==StrLen(next_entry))
+	      cur_entry=NULL;
+	  }
+	}
+      }
+    }
+    ll=ll->next;
+  }
+}
+
+void FMDelUncollapsedList(FMUncollapsedList *tempc)
+{
+  FMUncollapsedList *tempc1;
+  while (tempc) {
+    tempc1=tempc->next;
+    Free(tempc->name);
+    Free(tempc);
+    tempc=tempc1;
+  }
+}
+
+LTDirEntry *FMRebuildLtfDrive(I1 drive,Ltf *l,LTDirEntry **root,BoolU4 init)
+{
+  U8 f=0;
+  LtfEntry *ll;
+  LTDirEntry *tempm,*tempm1;
+  I1 *st;
+
+  GetFFlags(&f,SysText("ST_FILE_UTIL_FLAGS"),"+r");
+  tempm=MAllocZ(sizeof(LTDirEntry));
+  tempm->full_name=MSPrintF("%c:/",drive);
+  StrCpy(tempm->name,"");
+  st=MSPrintF("%c:/*",drive);
+  if (init) {
+    tempm1=FindFiles(st,f);
+    tempm->sub=tempm1;
+  } else
+    tempm1=NULL;
+  Free(st);
+  ll=LtfPrintF(l,"$$TR,\"%s\"$$",tempm->full_name);
+  ll->user_data=tempm;
+  tempm->next=*root;
+  *root=tempm;
+  LtfPutSExt(l,"\r\n$$ID,+2$$");
+  LtfBottom(l);
+  if (init) {
+    LTDirEntryToFileLtf(l,tempm1);
+    while (tempm1) {
+      tempm1->parent=tempm;
+      tempm1=tempm1->next;
+    }
+  }
+  LtfPutSExt(l,"$$ID,-2$$");
+  return tempm;
+}
+
+
+void FMRebuildLtf(Ltf **l_,LTDirEntry **root)
+{
+  LTPartition *p;
+  I8 i;
+  Ltf *l=*l_,*m,*b=sys_clipboard_ltf;
+  FMUncollapsedList *tempc=NULL;
+  I1 *cur_entry=NULL,*next_entry=NULL;
+  LtfEntry *cl;
+  LTDirEntry *tempm,*tempm1,*cur_tree_entry;
+  if (l)  {
+
+    cur_tree_entry=NULL;
+    cl=l->cur_entry;
+    if (cl->btype==LTFT_TREE)
+      cur_tree_entry=cl->user_data;
+    else if (cl->btype==LTFT_MENU_VALUE)
+      cur_tree_entry=cl->left_exp;
+    if (cur_tree_entry)
+      cur_entry=NewStr(cur_tree_entry->full_name);
+
+    tempm=NULL;
+    if (cl!=l)
+      cl=cl->next;
+    while (cl!=l) {
+      if (cl->btype==LTFT_TREE)
+	tempm=cl->user_data;
+      else if (cl->btype==LTFT_MENU_VALUE)
+	tempm=cl->left_exp;
+      else
+	tempm=NULL;
+      if (tempm) {
+	tempm1=tempm->parent;
+	while (tempm1) {
+	  if (tempm1==cur_tree_entry) {
+	    tempm=NULL;
+	    break;
+	  } else
+	    tempm1=tempm1->parent;
+	}
+	if (tempm)
+	  break;
+      }
+      cl=cl->next;
+    }
+    if (tempm)
+      next_entry=NewStr(tempm->full_name);
+
+    tempc=FMCollectUncollapsedList(l);
+    Fs->cur_ltf=NULL;
+    LtfDel(l);
+  }
+  if (*root) {
+    DelLTDirList(*root);
+    *root=NULL;
+  }
+  l=LtfNew;
+  l->flags|=LTFF_FORM;
+  m=LtfRead(FILEMANAGER_MENU_NAME);
+  m->text_attribute=(WHITE<<4)+LTBLUE;
+  l->menu_ltf=m;
+  for (i=0;i<32;i++) {
+    p=&local_partitions[i];
+    if (p->type==PT_LT)
+      FMRebuildLtfDrive(p->drive,l,root,TRUE);
+    else if (p->type==PT_ISO9660) {
+      if (p->bdev->flags&LTBDF_INITIALIZED)
+	tempm=FMRebuildLtfDrive(p->drive,l,root,TRUE);
+      else {
+	tempm=FMRebuildLtfDrive(p->drive,l,root,FALSE);
+	tempm->flags|=LTDEF_NOT_INITIALIZED;
+      }
+      tempm->flags|=LTDEF_REMOVABLE;
+    }
+  }
+  LtfHome(l);
+  FMMarkUncollapsed(l,tempc,cur_entry,next_entry);
+  l->recalc_start=l;
+  LtfCenter(l);
+  LtfReset(b,TRUE);
+  FMDelUncollapsedList(tempc);
+  Free(cur_entry);
+  Free(next_entry);
+  *l_=l;
+  Fs->cur_ltf=l;
+}
+
+void FMRename(Ltf *l)
+{
+  EditFileNameStruct fn;
+  LtfEntry *ll=l->cur_entry;
+  LTDirEntry *tempm=NULL,*parent;
+  if (ll->btype==LTFT_MENU_VALUE) {
+    tempm=ll->left_exp;
+    if (parent=tempm->parent) {
+      Cd(parent->full_name);
+      StrCpy(fn.name,tempm->name);
+      if (DoForm(fn.name,"EditFileNameStruct")) {
+	Silent(ON);
+	Move(tempm->name,fn.name);
+	Silent(OFF);
+      }
+    }
+  } else if (ll->btype==LTFT_TREE) {
+    tempm=ll->user_data;
+    if (parent=tempm->parent) {
+      Cd(parent->full_name);
+      StrCpy(fn.name,tempm->name);
+      if (DoForm(fn.name,"EditFileNameStruct")) {
+	if (StrCmp(tempm->name,fn.name)) {
+	  Silent(ON);
+	  CopyTree(tempm->name,fn.name);
+	  DelTree(tempm->name);
+	  Silent(OFF);
+	}
+      }
+    }
+  }
+}
+
+void FMDelete(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry;
+  LTDirEntry *tempm;
+  if (cl->btype==LTFT_MENU_VALUE) {
+    tempm=cl->left_exp;
+    Silent(ON);
+    Del(tempm->full_name);
+    Silent(OFF);
+  } else if (cl->btype==LTFT_TREE) {
+    tempm=cl->user_data;
+    Silent(ON);
+    DelTree(tempm->full_name);
+    Silent(OFF);
+  }
+}
+
+void FMMount(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry;
+  LTDirEntry *tempm;
+  if (cl->btype==LTFT_TREE)
+    tempm=cl->user_data;
+  else if (cl->btype==LTFT_MENU_VALUE)
+    tempm=cl->left_exp;
+  else
+    tempm=NULL;
+  if (tempm) {
+    while (tempm->parent)
+      tempm=tempm->parent;
+    Silent(ON);
+    ChangeDisk(*tempm->full_name);
+    Silent(OFF);
+  }
+}
+
+void FMFormatDrive(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry;
+  LTDirEntry *tempm;
+  I1 *st=NULL;
+  if (cl->btype==LTFT_TREE)
+    tempm=cl->user_data;
+  else if (cl->btype==LTFT_MENU_VALUE)
+    tempm=cl->left_exp;
+  else
+    tempm=NULL;
+  if (tempm) {
+    while (tempm->parent)
+      tempm=tempm->parent;
+    st=MSPrintF("Format Drive '%c'?\r\nAre You Sure?\r\n",*tempm->full_name);
+    if (PopUpNoYes(st)) {
+      Silent(ON);
+      Format(*tempm->full_name,TRUE,FALSE);
+      Silent(OFF);
+    }
+  }
+  Free(st);
+}
+
+void FMMakeISO(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry;
+  LTDirEntry *tempm;
+  if (cl->btype==LTFT_TREE)
+    tempm=cl->user_data;
+  else if (cl->btype==LTFT_MENU_VALUE)
+    tempm=cl->left_exp;
+  else
+    tempm=NULL;
+  if (tempm) {
+    while (tempm->parent)
+      tempm=tempm->parent;
+    Silent(ON);
+    CreateCDFile(NULL,*tempm->full_name);
+    Silent(OFF);
+  }
+}
+
+void FMBurnISO(Ltf *l)
+{
+  LtfEntry *cl=l->cur_entry;
+  LTDirEntry *tempm;
+  if (cl->btype==LTFT_TREE)
+    tempm=cl->user_data;
+  else if (cl->btype==LTFT_MENU_VALUE)
+    tempm=cl->left_exp;
+  else
+    tempm=NULL;
+  if (tempm) {
+    while (tempm->parent)
+      tempm=tempm->parent;
+    Silent(ON);
+    WriteCDImage(*tempm->full_name,NULL);
+    Silent(OFF);
+  }
+}
+
+void FMCopy(Ltf *l)
+{
+  Ltf *b=sys_clipboard_ltf;
+  I1 *st;
+  LtfEntry *cl=l->cur_entry,*ll=b->dummy.next;
+  LTDirEntry *tempm,*tempm1,*tempm2;
+  if (cl->btype==LTFT_TREE) {
+    tempm1=cl->user_data;
+    while (ll!=b) {
+      if (ll->btype==LTFT_MENU_VALUE) {
+	tempm=ll->left_exp;
+	tempm->flags|=LTDEF_PROCESSED;
+	tempm2=tempm->parent;
+	if (!tempm2 || !(tempm2->flags&LTDEF_PROCESSED)) {
+	  Silent(ON);
+	  Copy(tempm->full_name,tempm1->full_name);
+	  Silent(OFF);
+	}
+      } else if (ll->btype==LTFT_TREE) {
+	tempm=ll->user_data;
+	tempm->flags|=LTDEF_PROCESSED;
+	tempm2=tempm->parent;
+	if (!tempm2 || !(tempm2->flags&LTDEF_PROCESSED)) {
+	  Silent(ON);
+	  if (*tempm1->name)
+	    st=MSPrintF("%s/%s",tempm1->full_name,tempm->name);
+	  else
+	    st=MSPrintF("%s%s",tempm1->full_name,tempm->name);
+	  CopyTree(tempm->full_name,st);
+	  Free(st);
+	  Silent(OFF);
+	}
+      }
+      ll=ll->next;
+    }
+  }
+}
+
+
+I8 PopUpCancelPasteDel(I1 *header=NULL,I1 *footer=NULL)
+{
+  I8 i;
+  Ltf *l=LtfNew;
+  if (header) LtfPutSExt(l,header);
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"RENAME               \",7$$");
+  LtfPutSExt(l,"$$CM+LX,28,0$$$$BT, \"DELETE               \",2$$");
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"PASTE CLIPBOARD FILES\",1$$");
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"CHANGE DISK(MOUNT IT)\",3$$");
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"ADD TEMP DRIVE       \",4$$");
+  LtfPutSExt(l,"$$CM+LX,28,0$$$$BT, \"FORMAT               \",6$$");
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"MAKE ISO FILE        \",8$$");
+  LtfPutSExt(l,"$$CM+LX,28,0$$$$BT, \"BURN ISO FILE        \",9$$");
+  LtfPutSExt(l,"$$CM+LX,2,4 $$$$BT, \"HELP                 \",5$$");
+  LtfPutSExt(l,"$$CM+LX,28,0$$$$BT, \"CANCEL               \",0$$");
+  if (footer) LtfPutSExt(l,footer);
+  i=PopUpMenu(l);
+  LtfDel(l);
+  return i;
+}
+
+void FMRightClick()
+{
+  I8 i=PopUpCancelPasteDel;
+  if (i>0) {
+    switch (i) {
+      case 1:
+	Msg(MSG_KEY_DOWN,0,SC_INSERT+SCF_SHIFT);
+	break;
+      case 2:
+	Msg(MSG_KEY_DOWN,0x19,0);
+	break;
+      case 3:
+	Msg(MSG_KEY_DOWN,'m',0);
+	break;
+      case 4:
+	Msg(MSG_KEY_DOWN,'t',0);
+	break;
+      case 5:
+	Msg(MSG_KEY_DOWN,0,SC_GUI);
+	break;
+      case 6:
+	Msg(MSG_KEY_DOWN,'f',0);
+	break;
+      case 7:
+	Msg(MSG_KEY_DOWN,CH_CR,0);
+	break;
+      case 8:
+	Msg(MSG_KEY_DOWN,'M',0);
+	break;
+      case 9:
+	Msg(MSG_KEY_DOWN,'B',0);
+	break;
+    }
+  }
+}
+
+public void FileManager()
+{
+  LTDirEntry *root=NULL,*tempm,*tempm1,*tempm2;
+  U8 sc,ch,p1,p2,cmd;
+  Ltf *l=NULL,*old_ltf=Fs->cur_ltf;
+  void *old_update=Fs->update_win;
+  BoolU4 old_preempt=Preempt(OFF);
+  I1 *st,*old_cur_dir=NewStr(Fs->cur_dir);
+  LTPartition *old_p=Fs->cur_partition;
+  LtfEntry *cl=NULL,*ll;
+  BoolU4 okay;
+
+  FMRebuildLtf(&l,&root);
+  Fs->update_win=&LtfUpdateBothLtf;
+  do {
+    Preempt(OFF);
+    if (cmd=ScanMsg(&p1,&p2,
+	1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+	1<<MSG_IP_R_UP)) {
+      WinSync;
+      switch (cmd) {
+	case MSG_IP_R_UP:
+	  FMRightClick;
+	  break;
+	case MSG_IP_L_DOWN:
+	  cl=l->cur_entry;
+	  break;
+	case MSG_IP_L_UP:
+	  if (cl) {
+	    if (cl->btype==LTFT_MENU_VALUE) {
+	      tempm=cl->left_exp;
+	      if (SetCursorPosition(Fs,p1/FONT_WIDTH+Fs->win_left,p2/FONT_HEIGHT+Fs->win_top,TRUE)) {
+		ll=l->cur_entry;
+		if (ll->btype==LTFT_TREE) {
+		  tempm1=ll->user_data;
+		  Silent(ON);
+		  Move(tempm->full_name,tempm1->full_name);
+		  Silent(OFF);
+		  PutKey(CH_SPACE,0); //toggle collapse again
+		  FMRebuildLtf(&l,&root);
+		}
+	      }
+	    } else if (cl->btype==LTFT_TREE) {
+	      tempm=cl->user_data;
+	      if (SetCursorPosition(Fs,p1/FONT_WIDTH+Fs->win_left,p2/FONT_HEIGHT+Fs->win_top,TRUE)) {
+		ll=l->cur_entry;
+		if (ll->btype==LTFT_TREE) {
+		  tempm1=ll->user_data;
+		  okay=TRUE;
+		  tempm2=tempm1;
+		  while (tempm2) {
+		    if (tempm2!=tempm)
+		      tempm2=tempm2->parent;
+		    else {
+		      okay=FALSE;
+		      break;
+		    }
+		  }
+		  if (okay) {
+		    if (*tempm1->name)
+		      st=MSPrintF("%s/%s",tempm1->full_name,tempm->name);
+		    else
+		      st=MSPrintF("%s%s",tempm1->full_name,tempm->name);
+		    if (StrCmp(tempm->full_name,st)) {
+		      Silent(ON);
+		      CopyTree(tempm->full_name,st);
+		      DelTree(tempm->full_name);
+		      Silent(OFF);
+		      PutKey(CH_SPACE,0); //toggle collapse again
+		      FMRebuildLtf(&l,&root);
+		    }
+		    Free(st);
+		  }
+		}
+	      }
+	    }
+	    cl=NULL;
+	  }
+	  break;
+	case MSG_KEY_DOWN:
+	  ch=p1; sc=p2;
+	  if (ch==CH_CR) {
+	    FMRename(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch==0x19 ||  //ctrl-y
+	     (sc.u1[0]==SC_DELETE && !(sc&(SCF_SHIFT|SCF_CTRL)))) {
+	    FMDelete(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch=='m') {
+	    FMMount(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch=='M') {
+	    FMMakeISO(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch=='B') {
+	    FMBurnISO(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch=='t') {
+	    FMAddTempDrive;
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch=='f') {
+	    FMFormatDrive(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (sc.u1[0]==SC_INSERT && sc&SCF_SHIFT && !(sc&SCF_CTRL)) {
+	    FMCopy(l);
+	    FMRebuildLtf(&l,&root);
+	  } else if (ch!=0x14 && ch!=CH_ESC && ch!=CH_CTRLQ) {//ctrl T not allowed
+	    if (ch!=CH_SPACE || l->cur_entry->btype!=LTFT_MENU_VALUE) {
+	      Preempt(old_preempt);
+	      PutKey(ch,sc);
+	      Preempt(OFF);
+	      LtfRecalc(Fs->cur_ltf);
+	    }
+	  }
+	  break;
+      }
+    } else {
+      Fs->task_flags|=1<<TSSf_IDLE;
+      WinSync;
+      Fs->task_flags&=~(1<<TSSf_IDLE);
+    }
+  } while (ch!=CH_ESC && ch!=CH_CTRLQ);
+  Fs->cur_ltf=old_ltf;
+  Fs->update_win=old_update;
+  Preempt(old_preempt);
+  LtfDel(l);
+  DelLTDirList(root);
+  Drive(old_p->drive);
+  Cd(old_cur_dir);
+  Free(old_cur_dir);
+}
+#help_index ""

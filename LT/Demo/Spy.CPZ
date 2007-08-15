@@ -1,0 +1,23 @@
+void Spy(TssStruct *tss)
+{
+  Ltf *swap,*menu=Fs->cur_ltf->menu_ltf;
+  BoolU4 old_preempt=Preempt(OFF);
+  SysHashTable *old_hash=Fs->hash_table;
+  Fs->cur_ltf->menu_ltf=NULL;
+  Fs->hash_table=tss->hash_table;
+  Fs->double_buf_cur_ltf=LtfNew;
+  while (!ScanKey) {
+    LtfDel(Fs->cur_ltf);
+    Fs->cur_ltf=LtfNew;
+    StackRep(tss->rsp);
+    swap=Fs->double_buf_cur_ltf;
+    Fs->double_buf_cur_ltf=Fs->cur_ltf;
+    Fs->cur_ltf=swap;
+    WinSync;
+  }
+  LtfDel(Fs->double_buf_cur_ltf);
+  Fs->double_buf_cur_ltf=NULL;
+  Fs->hash_table=old_hash;
+  Fs->cur_ltf->menu_ltf=menu;
+  Preempt(old_preempt);
+}

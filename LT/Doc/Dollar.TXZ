@@ -1,0 +1,159 @@
+$WW,1$$FG,5$$TX+CX,"Dollar Sign Cmds"$$FG$
+
+LoseThos supports rich-text type commands which are bracketed with "$$".  Use CTRL-L to experiment with them.  Use CTRL-T to toggle between plain text and rich text.
+
+The format of "$$" commands includes a two character code, +/-flags, a comma and parameters separated by commas.  The flags often determine how many and what parameters the command takes.
+
+See $LK,"::/LT/Doc/CtrlL.MUZ","FI:::/LT/Doc/CtrlL.MUZ"$.
+
+See $LK,"Ltf Type Defines","MN:LTFT_TEXT"$ and $LK,"Ltf Type Codes","FF:::/LT/OSMain/SysText.CPZ,ST_LTF_CMDS"$
+$TR,"TX Text"$
+$ID,2$Normally, text is not bracketed with "$$", but if you wish to specify flag attributes to center text, you can bracket them with "$$" and enter flags such as "$FG,4$+CX$FG$".  You cannot edit them if they are bracketed by "$$" unless you toggle to plain text mode with CTRL-T.
+$ID,-2$$TR,"CR Hard Carriage Return"$
+$ID,2$Carriage returns are normally specified without being bracketed with "$$".
+$ID,-2$$TR,"SR Soft Carriage Return"$
+$ID,2$Word wrap uses soft carriage returns which are not saved.  You never place soft carriage returns by yourself.
+$ID,-2$$TR,"TB Tab"$
+$ID,2$Tabs are normally not bracketed with "$$", but are stored as ASCII#9.
+$ID,-2$$TR,"CU Cursor position"$
+$ID,2$The cursor position is usually stored as a ASCII#5 I1acter and is not bracketed with "$$".  You do not normally enter cursor position commands yourself.
+$ID,-2$$TR,"ID Indent +/- number"$
+$ID,2$This changes the indention deeper if positive or shallower if negative. It effects the behavior of trees.
+$ID,-2$$TR,"DA Data"$
+$ID,2$This is primarily used for forms that prompt for data. Use CTRL-L as a resource editor-type thing to generate the text you'll need in your "fmtdata" command in a struct.  If you add it directly with LtfPutSExt, you'll need to fill-in the data address.  See $LK,"DoForm","MN:DoForm"$().
+$ID,-2$$TR,"Text Colors"$
+$ID,2$You place an expression(usually a color define--see $LK,"color defines","MN:BLACK"$) to indicate which of the 16 colors to use. If you enter no number, color returns to the default.
+$FG,5$FG Foreground Color$FG$
+$FG,5$BG Background Color$FG$
+$FG,5$FD Default Foreground Color$FG$
+$FG,5$BD Default Background Color$FG$
+$FG,5$FL Foreground of Link Color$FG$
+$FG,5$BL Background of Link Color$FG$
+$FG,5$FM Foreground of Macro/Menu-Value Color$FG$
+$FG,5$BM Background of Macro/Menu-Value Color$FG$
+$FG,5$FA Foreground of Anchor Color$FG$
+$FG,5$BA Background of Anchor Color$FG$
+$FG,5$FH Foreground of Hidden widget Color$FG$
+$FG,5$BH Background of Hidden widget Color$FG$
+$FG,5$FE Foreground of Tree Color$FG$
+$FG,5$BE Background of Tree Color$FG$
+$ID,-2$$TR,"FU,BU User Prompts"$
+$ID,2$These are special color changing commands.  They are used when the user is prompted for text at the command line.  They reset the cursor position if the cursor is positioned before them on the line.  They are also used to indicate the start of a prompted str.
+$ID,-2$$TR,"CL clear"$
+$ID,2$Clear all entries except ones with hold($FG,4$+H$FG$) flags.  This is good for programs which update data to the command line.  It keeps the quantity of ltf entries down.
+$ID,-2$$TR,"WW Word Wrap"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"UL Underline"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"IV Invert"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"BK Blink"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"SX Shift X position"$
+$ID,2$* Include a number from -16 to 15.
+* Only foreground is shifted.
+* Positive right.
+* For negative be sure to precede with a comma.
+$ID,-2$$TR,"SY Shift Y position"$
+$ID,2$* Include a number from -16 to 15.
+* Only foreground is shifted.
+* Positive down.
+* For negative be sure to precede with a comma.
+$ID,-2$$TR,"CM Cursor Movement"$
+$ID,2$
+$ID,-2$$TR,"AN Anchor"$
+$ID,2$
+$ID,-2$$TR,"LK Link"$
+$ID,2$By default, links have a separate display text from link text, but with the $FG,4$-A$FG$ flag you can make the link displayed as in example 3.
+
+Examples (Press CTRL-T to see):
+
+1)$LK,"File link to Help.TXZ","::/LT/Doc/Help.TXZ"$
+2)$LK,"File link to Help.TXZ with link type file","FI:::/LT/Doc/Help.TXZ"$
+3)File link without different display str.$LK-A,"::/LT/Doc/Help.TXZ"$
+4)$LK,"File find link searching for 'Admin'","FF:::/LT/Doc/Help.TXZ,Admin"$
+5)$LK,"File find link searching for 3rd 'CTRL'","FF:::/LT/OSMain/AdamK.HPZ,CTRL:3"$
+6)$LK,"Manual page link","MN:PrintF"$
+7)$LK,"File line number link","FL:::/LT/OSMain/AdamK.HPZ,200"$
+8)$LK,"File anchor link--Press CTRL-T to see anchor after you click","FA:::/LT/OSMain/SysText.CPZ,OS_SYSTEXT"$
+$ID,-2$$TR,"BT Button"$
+$ID,2$
+$ID,-2$$TR,"CB Check Box"$
+$ID,2$
+$ID,-2$$TR,"MA Macro"$
+$ID,2$Macro's are usually placed into menu/help areas and they have the '$FG,4$+X$FG$' flag set by default.  Adding '$FG,4$-X$FG$' prevents the usual ESC from being sent (which exits the macro screen).  Note that when you output a macro to the cmd line, when the user clicks on it, it will go to the bottom and execute it unless you cancel the ESC with a '$FG,4$-X$FG$'.
+
+$ID,-2$$TR,"MU Menu Value"$
+$ID,2$
+$ID,-2$$TR,"HX Hex Edit"$
+$ID,2$
+$ID,-2$$TR,"Hidden Text Widget"$
+$ID,2$$FG,5$HS Start of hidden text$FG$
+$FG,5$HE End of hidden text$FG$
+$FG,5$$FG$Hidden text widgets allow text to be placed in collapsable brackets like this $HS$$FG$This is hidden.$HE$ which can be expanded by clicking them. If you place a '$FG,4$-C$FG$' flag to uncollapse it, it will start expanded like this $HS-C$$FG$Click to hide$HE$. They can be nestled like this $HS$Click here:$HS$This is nestled.$HE$ okay?$HE$.
+$ID,-2$$TR,"TR Tree Widget"$
+$ID,2$A tree widget is a branch in a collapsable tree.  The domain of the branch extends from the first +indent until enough -indents bring it back to where it started.  Tree's begin collapsed unless a $FG,4$-C$FG$ flag is present.
+$ID,-2$$TR,"PI Picture"$
+$ID,2$You can insert a picture into text with CTRL-R.  It is critical where the cursor is at the time you enter CTRL-R because the picture will be offset from that location.  This is especially important when adding images to programs.  Numbers for pictures are automatically chosen because copying to and from the clipboard requires this.  You can insert another picture with the same image by hitting CTRL-T and manually adding a $$PI$$ entry with the same number.  You can cause the $$PI$$ command to appear with some text associated with it by manually adding text into the $$PI$$ command, as in $$PI,"pic 2",2$$.
+$ID,-2$$TR,"IB Insert Binary"$
+$ID,2$This cmd is used to tell the compiler to fetch the binary data stored after the end of text.  There is basically one type of binary data in LTF's at this point--pictures-- created with CTRL-R. They have a number associated with them.  This number is automatically chosen, because copying to the clip-board and back requires renumbering. To use a $$IB$$ command, toggle to plain text (CTRL-T) after inserting a picture and check the number in the $$PI$$ command. Create a $$IB$$ command with the same number and the picture will be inserted into the compiled stream like a str constant.  You can optionally include text to be displayed for the $$IB$$ command.
+
+The main reason for the $$IB$$ command at this point is to pass a parameter to the $LK,"GrElemsPlot","MN:GrElemsPlot"$() function.  See $LK,"::/LT/Demo/Graphics/Sprite1.CPZ","FI:::/LT/Demo/Graphics/Sprite1.CPZ"$.
+
+$ID,-2$$TR,"IT Insert Binary Type"$
+$ID,2$See $$IB$$.  This command inserts a number into the compiled stream describing the type of binary data associated with a number.  See $LK,"LTFBT_GRELEM","MN:LTFBT_GRELEM"$ for the types of binary data in LTF's.
+$ID,-2$$TR,"IS Insert Binary Size"$
+$ID,2$See $$IB$$.  This command inserts a number into the compiled stream describing the size of binary data associated with a number.
+$ID,-2$$TR,"OL,OR Toolbar Entries"$
+$ID,2$Left and right toolbar entries behave like $$PI$$ entries, but are positioned automatically at the top of the window. 
+$ID,-2$$TR,"BP Break Point"$
+$ID,2$This is used by the debugger to mark a break point.
+$ID,-2$$TR,"ER Error"$
+$ID,2$When errors are detected in dollar commands, an $FG,5$ER$FG$ entry is generated to hold the garbage so it is not lost.
+$ID,-2$
+See $LK,"Ltf Flag Defines","MN:LTFLf_AUX_STR"$ and $LK,"Ltf Flag Codes","FF:::/LT/OSMain/SysText.CPZ,ST_LTF_FLAGS"$
+$FE,4$See $LK+S,"default_flags","FA:::/LT/Adam/Ltf/LtfPlain.APZ,default_flags"$.
+$TR,"FLAGS"$
+$ID,2$$TR,"+H Hold"$
+$ID,2$Hold entry and do not delete it when cleared with $FG,5$CL$FG$ or when the l->max_entries is exceeded.  Word wrap is a good one to hold.
+$ID,-2$$TR,"+A Auxilliary Str"$
+$ID,2$Most commands display a str. Some need other strs.  A $FG,4$+A$FG$ means an auxilliary str is present.  Links have $FG,4$+A$FG$ by default, so use a $FG,4$-A$FG$ if you wish the display str and the link str to be the same.
+$ID,-2$$TR,"+TR Tree"$(obsolete)
+$ID,2$* There is now a separate $FG,5$TR$FG$ command so this flag is obsolete.
+* Make a tree branch.  Usually this is placed on a text($FG,5$TX$FG$) entry.  The tree extends from the start until another tree entry or when indentation has been expanded and reduced back to the starting value.
+* A $FG,4$+C$FG$ flag on a tree will start it collapsed.
+$ID,-2$$TR,"+PU PopUp"$
+$ID,2$A PopUp flag on a macro ($FG,5$MA$FG$) will cause the commands to run in a pop-up window.
+$ID,-2$$TR,"+C Collapsed"$
+$ID,2$A collapsed flag on a tree $FG,5$TR$FG$ entry or a hide start $FG,5$HS$FG$ will cause it to start collapsed.  A $FG,4$-C$FG$ flag will make it start open.
+$ID,-2$$TR,"+X Exit"$
+$ID,2$* A exit flag will cause a macro to send an ESC before running(to exit the macro screen and return to the cmd prompt).  Actually, the default has an exit flag set so you might add a $FG,4$-X$FG$ to turn-off ESC.
+* If an entry is in the cmd prompt window, the $FG,4$+X$FG$ will cause a movement to the bottom of the window.
+$ID,-2$$TR,"+Q Quit"$
+$ID,2$A quit flag is similar to a $FG,4$+X$FG$ except a CTRL-Q instead of an ESC to exit.
+$ID,-2$$TR,"+Z Zero"$
+$ID,2$A zero flag on a hex edit($FG,5$HX$FG$) entry will cause the offset from zero.  A $FG,4$-X$FG$ will show the actual mem address. By default, $FG,5$HX$FG$ has the zero flag set.
+$ID,-2$$TR,"+AL Alias"$
+$ID,2$An alias flag on a tree entry ($FG,4$+TR$FG$) will cause the text of the current entry the cursor is on to be copied to this entry.  This creates something similar to a drop-down window, but it doesn't work well yet.
+$ID,-2$$TR,"+TML,+TMR Top Menu"$
+$ID,2$These flags position the entry along the top of the window.
+$ID,-2$$TR,"+RD Refresh Data"$
+$ID,2$The Refresh Data flag on a $FG,5$DA$FG$ or a $FG,5$CB$FG$ makes the value updated continuously.
+$ID,-2$$ID,-2$$FE,5$
+
+$FG,5$EXAMPLES:
+
+$FG$Press CTRL-T to see how the following were done.
+$UL,1$Underlined$UL,0$ $IV,1$Inverted$IV,0$ $BK,1$Blinking$BK,0$ $SY,-3$super$SY,0$ $SY,0$$SY,3$sub$SY,0$
+$TX+SCX,"This is a big long scrolling message.",10$
+
+$FG,5$Cursor Movements:$FG$
+$CM+LX,3,3$Cursor moved 3 rows down and to 3rd column from left.
+$CM+RX,-40,3$Note mandatory comma after flags
+
+The following may be changed to modes instead of attributes with flags.
+
+$TX+CX,"This is centered"$
+
+$TX+RX,"This is right justified"$
+ 

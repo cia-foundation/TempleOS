@@ -1,0 +1,55 @@
+public double os_version=3.05;
+
+#include "AdamExt.HPZ"
+
+Load("GrAsm/GrAsm");
+#include "GrAsm/GrAsm.HPZ"
+
+#include "KbdMouse"
+#include "InputPointer"
+#include "IncCompress"
+#include "Math"
+#include "ODE"
+Cd("::/LT/Adam/Gr");;
+#include "Gr"
+Cd("::/LT/Adam");;
+#include "Music"
+#include "Disk10"
+#include "DiskCDDVD"
+#include "Comm"
+#include "Remote"
+#include "JoyStick"
+#include "Utils"
+#include "Message"
+#include "Window"
+#include "LPT"
+Cd("::/LT/Adam/Ltf");;
+#include "Ltf"
+Cd("::/LT/Adam");;
+#include "AutoFile"
+#include "LogIn"
+Cd("::/LT/Adam/WordStat");;
+#include "WordStat"
+Cd("::/LT/Adam");;
+#include "Dbg"
+#include "HashUtils"
+#include "FileManager"
+
+UseConsoleLtf(NULL);
+
+adam_tss->win_top=2;
+adam_tss->win_bottom=10;
+sys_update_screen_tss=Spawn(&WinManagerTsk,"Window Manager");
+CollectAccntList;
+Bts(&Fs->crt_flags,CRTf_SHOW);
+
+if (!(Fs->account=FindSysAccnt(sys_startup_account)))
+  Fs->account=PopUpGetSysAccnt;
+sys_update_screen_tss->account=Fs->account;
+LoadAccntRegistry;
+
+Cd("::/LT/Adam");;
+#include "WallPaper"
+
+Cd("HOME");;
+#include "Adam3"

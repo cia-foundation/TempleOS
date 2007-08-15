@@ -1,0 +1,189 @@
+$WW,1$$FG,5$Notes on upgrading:
+
+$FG,2$* Use the $LK,"R","MN:R"$("old","new") to rename items if I change them.
+
+* You are strongly advised not to make statically compiled modules.  (Static modules produce a .BIZ file which you $LK,"Load","MN:Load"$() while dynamicly compiled code is just $FG,4$#include$FG,2$d.)   
+$FG$
+$IV,1$----08/16/07 02:38:03----$IV,0$
+* Added faster line clipping.
+
+$IV,1$----08/15/07 20:51:55----$IV,0$
+* Fixed feature of scan codes--sc.u4[1] is unconsolidated code. 
+* Made so you can nestle $FG,2$AutoFile$FG$s.
+* Modified $LK,"Load","MN:Load"$()... no recognizable changes
+* Modified $FG,4$cout$FG$ no recognizable changes
+* Made $FG,4$PUSH_C_REGS$FG$ and $FG,4$POP_C_REGS$FG$ and made use of it.  Fewer regs are pushed in many places.
+ 
+$IV,1$----08/14/07 14:35:33----$IV,0$
+* Fixed Ltf bug on PAGE DOWN/UP
+* Added $LK,"LTFF_DO_FULL_UPDATE","MN:LTFF_DO_FULL_UPDATE"$ to prevent flicker if you like.
+* $LK,"LTFF_DONT_SWAP_OUT","MN:LTFF_DONT_SWAP_OUT"$, related to swap-outs during $LK,"PrintF","MN:PrintF"$().  Made swap-out less.
+
+$IV,1$----08/13/07 08:38:18----$IV,0$
+* Worked-out scheme to keep from turning preemption off during window updates.
+* Added $FG,2$preempt$FG$ parameter to $LK,"LtfUpdateWinJoin","MN:LtfUpdateWinJoin"$().
+* Modified poll kbdmouse to spawn separate task when winupdates take too long.
+
+$IV,1$----08/13/07 01:24:12----$IV,0$
+* Modified $LK,"WinSync","MN:WinSync"$() to make it more useful.
+* R("nearest_sub_GrElem", "nearest_sub_grelem");
+* R("cur_sub_GrElem", "cur_sub_grelem");
+* Added $LK,"::/LT/Demo/Graphics/Pick.CPZ","FI:::/LT/Demo/Graphics/Pick.CPZ"$ showing how to use distance to cursor calculations in graphics routines.
+$IV,1$
+----08/12/07 01:59:17----$IV,0$
+* Added compiler optimizations.
+* Added recovery disk option.
+* Changed B RAM drive size on install CD.
+
+$IV,1$----08/09/07 22:13:41----$IV,0$
+* Adjusted $LK,"TssStruct","MN:TssStruct"$ to optimize for byte displacement.  Haven't settled on best.
+* Added compiler optimizations.
+* Fixed editor bugs.
+
+$IV,1$----08/09/07 08:19:49----$IV,0$
+* Got rid of REX 0x40 in assembler
+* Got rid of Ltf password flag.
+
+$IV,1$----08/08/07 10:15:29----$IV,0$
+* Removed .BMP screen capture due to licensing concerns.
+
+$IV,1$----08/08/07 05:10:27----$IV,0$
+* Moved flags in $LK,"TssStruct","MN:TssStruct"$ and $LK,"CPUStruct","MN:CPUStruct"$, eliminated CPU preemptive flag (It's now a task flag, only.)
+* Made $LK,"Preempt","MN:Preempt"$() function inline
+* Added compiler opt -- fewer 0x40 bytes
+* Fixed $LK,"::LT/Demo/GameStarters/Swing.CPZ","FI:::LT/Demo/GameStarters/Swing.CPZ"$
+
+$IV,1$----08/07/07 22:33:38----$IV,0$
+* $BK,1$Finished Version 3.04$BK,0$
+* Improved kbd/mouse
+* Replaced U4Fifo with U8Fifo
+
+$IV,1$----08/05/07 22:31:06----$IV,0$
+* Cleaned-up WordStat code
+* Added $LK,"OrderFiles","MN:OrderFiles"$().  See $LK,"::/LT/Demo/OrderedIO.CPZ","FI:::/LT/Demo/OrderedIO.CPZ"$
+
+$IV,1$----07/31/07 02:48:11----$IV,0$
+* Adding new feature to compiler to allow "5<i<10" instead of "5<i && i<10".
+* Fixed a horrible compiler bug where "i<5" worked but not "5>=i".  (I always code the former way.)
+ 
+$IV,1$----07/27/07 00:49:50----$IV,0$
+* Improved fault handling
+* Added compiler optimizations
+* Added TSSf_AWAITING_MSG to improve performance.
+* Modified keyboard/mouse routine.  Boots faster and might not hang so much when you use both at the same time.
+
+$IV,1$----07/25/07 03:40:49----$IV,0$
+* $BK,1$WARNING:$BK,0$ Your $LK,"Auto","MN:Auto"$() entries to configure builds must be changed.  I cleaned-up the $LK,"AddDrives","MN:AddDrives"$() prompts, getting rid of "Custom".  All $FG,2$ATA$FG$ and $FG,2$ATAPI$FG$ types require numbers.
+
+$IV,1$----07/24/07 21:55:58----$IV,0$
+* Fixed graphic pen_width brushes.  It slightly affects picture appearance.  You might need to increase pen_width.
+$ID,2$$FG,5$To convert old pictures...
+$FG$1) Boot the old LoseThos version
+2) Press CTRL-R when on top of the picture
+3) Select "Insert"
+4) Select "Convert to Bitmap".  If you don't want it drawn on a background, select "transparent bitmap."
+5) Stretch-out a box around the image
+6) Click "End"
+7) Click "End" again
+8) Save your picture in a file
+9) Boot the new version of LoseThos
+
+$FG,5$Another option you might try$FG$ 
+1) Press CTRL-R
+2) Select "Edit"
+3) find the "Width" entries and change the far right numbers.
+4) Press ESC
+5) Select "End"
+6) Save your picture in a file
+$ID,-2$
+$IV,1$----07/24/07 01:13:59----$IV,0$
+* I think I fixed a bug in the CD-ROM install script.
+
+$IV,1$----07/23/07 16:51:15----$IV,0$
+* Added borderless windows.  CTRL-B now toggles the window border and Blink is now done with CTRL-K.
+
+$IV,1$----07/21/07 21:46:59----$IV,0$
+* Added $LK,"WordStat","MN:WordStat"$() to replace old Spawn(&WsTsk).
+
+$IV,1$----07/21/07 04:00:51----$IV,0$
+* Fixed divide by zero bug in $LK,"GrBlot3","MN:GrBlot3"$() 
+
+$IV,1$----07/20/07 00:41:53----$IV,0$
+* R("ViewDisk","ViewDrive");
+* Added new $LK,"ViewDisk","MN:ViewDisk"$().
+* Fixed horrible $BK,1$compiler bug$BK,0$ relating to unary minus and double/int conversion.
+$IV,1$
+----07/19/07 17:00:50----$IV,0$
+* Scaled pen_width on GrElem transformations
+* Added lecture on scaled integer arithmetic.  $LK,"::/LT/Doc/Lectures/ScaledInt.CPZ","FI:::/LT/Doc/Lectures/ScaledInt.CPZ"$
+* Added demo MultiCore1
+
+$IV,1$----07/16/07 01:40:23----$IV,0$
+* Added nestled comments to compiler.
+
+$IV,1$----07/13/07 14:54:38----$IV,0$
+* Added some compiler optimizations.
+* Fixed bugs in editor
+
+$IV,1$----07/09/07 07:30:18----$IV,0$
+* Added $LK,"kbd_display_special_keys","MN:kbd_display_special_keys"$.
+* placed sys_cur_raw_scan_code into upper DWORD of sys_cur_scan_code.
+* R("TranslateScanCode", "ScanCodeToASCII");
+* Removed $FG,2$name$FG$ parameter from $LK,"AFGetKey","MN:AFGetKey"$() and $LK,"AFGetChar","MN:AFGetChar"$().
+
+$IV,1$----07/08/07 08:22:53----$IV,0$
+* Added keyname display to wallpaper for making movies.
+
+$IV,1$----07/07/07 02:22:45----$IV,0$
+* Discovered subscript key needed to be changed.  Now, CTRL-P and CTRL-SHIFT-P toggle super/sub scripts.
+
+$IV,1$----07/06/07 23:42:59----$IV,0$
+* Decided to make screen size fixed.  Do the following text replacements on your code:
+$ID,2$R("grwidth","GR_WIDTH");
+R("grheight","GR_HEIGHT");
+R("text_rows","TEXT_ROWS");
+R("text_cols","TEXT_COLS");
+
+R("GR_BLACK","BLACK"); //do all colors
+
+The video mode prompt was removed, so modify $LK,"Auto","MN:Auto"$() strings for compiling the kernel.
+$ID,-2$
+$IV,1$----07/02/07 19:18:08----$IV,0$
+* Added $LK,"SpawnUser","MN:SpawnUser"$().
+* Changed $LK,"Edit","MN:Edit"$() and $LK,"DoForm","MN:DoForm"$() so they run the ltf entry they exit on.
+* Changed $LK,"WsInit","MN:WsInit"$() to take full filename mask.  Filters-out non text files.
+
+$IV,1$----06/22/07 18:12:48----$IV,0$
+* This is funny--I fixed a bug in the compiler which made ";" on a do while optional.
+
+$IV,1$----06/21/07 16:11:14----$IV,0$
+* Renamed "HeapChk" to "HeapWalk"
+* Renamed "HeapChkOn/HeapChkOff" to "HeapLog(ON/OFF)" and "HeapChkRep" to "HeapLogRep".
+* Made $LK,"AbsI8","MN:AbsI8"$() internal.
+* Improved $LK,"Line","MN:Line"$().
+* Added $LK,"::/LT/Demo/GameStarters/FlightSim.CPZ","FI:::/LT/Demo/GameStarters/FlightSim.CPZ"$
+* Fixed bug in compiler related to mutlidimensional arrays of size less than 8 byte elements.
+
+$IV,1$----06/19/07 00:37:08----$IV,0$
+* $BK,1$Uploaded V3.03$BK,0$
+* Made on Gs->grbase for each core and they get merged together, so you can do mutlicore screen operations.  See $LK,"::/LT/Demo/MultiCore2.CPZ","FI:::/LT/Demo/MultiCore2.CPZ"$.
+
+$IV,1$----06/15/07 05:05:19----$IV,0$
+* Added GrElem transformation.  Doesn't work on some element types.
+
+$IV,1$----06/10/07 17:39:35----$IV,0$
+* $BK,1$Uploaded V3.02$BK,0$
+* Added $LK,"PicWords","HI:PicWords"$
+* Changed $LK,"mp_heap","MN:mp_heap"$ from write-through to uncached.
+* Modified $LK,"MPQueueJob","MN:MPQueueJob"$()
+ 
+$IV,1$----05/29/07 18:33:01----$IV,0$
+* Added $LK,"GrText","MN:GrText"$().  Added it to GrElems.
+* Modified $LK,"WallPaper","MN:WallPaper"$() to calc mem less often.
+
+$IV,1$----05/16/07 01:34:25----$IV,0$
+* Fixed bug where buttons weren't unchecked.
+
+$IV,1$----05/14/07 20:18:26----$IV,0$
+* Added new profiler mode. $LK,"ProfAll","MN:ProfAll"$() and $LK,"ProfBin","MN:ProfBin"$().
+ 

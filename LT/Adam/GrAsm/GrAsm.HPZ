@@ -1,0 +1,19 @@
+#help_index "Graphics"
+public LTextern CP_IS_PIXEL_COVERED BoolU4 IsPixelCovered(TssStruct *tss,I8 x,I8 y);
+
+LTextern GR_XOR_LINE_U8 void GrXorLineU8(U8 **dst3,U8 **src,U8 **src2,U8 d5b,
+				    void **vga,U1 *reverse_bit_tab);
+LTextern GR_XOR_BITMAP_U8 void GrXorBitMapU8(U8 *b1,U8 *b2,U8 cnt);
+LTextern GR_PLOT_CHAR void GrPlotChar(U1 *font_ptr,U1 attr,U1 **dst2,U8 d1,U8 d2);
+LTextern GR_PLOT_BACKGROUND void GrPlotBackground(U1 attr,U1 **dst,U8 d1,U8 d2);
+//The callback is void Plot(aux_data,x,y,z)
+
+#help_index "Graphics/Char"
+public LTextern CP_PLOT_SCREEN_I1 BoolU4 PlotScreenChar(U8 w,I8 x,I8 y);
+public LTextern CP_PLOT_WIN_I1 BoolU4 PlotWinChar(TssStruct *tss,U8 w,I8 x,I8 y);
+public LTextern CP_PLOT_WIN_STR2	  BoolU4 PlotWinStr2(
+	   TssStruct *tss,I1 *s,I8 len,U8 attr,I8 x,I8 y);
+public LTextern CP_PLOT_ATTR	  BoolU4 PlotWinAttr(
+	   TssStruct *tss,I8 len,U8 attr,I8 x,I8 y);
+public LTextern CP_PLOT_BORDER_I1 BoolU4 PlotBorderChar(TssStruct *tss,U8 w,I8 x,I8 y);
+#help_index ""

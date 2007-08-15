@@ -1,9 +1,0 @@
-LTDate d=GetCurTimeLTDate;
-
-I4 i;
-for (i=0;i<48;i++)
-  PrintF("%%h%dD:%h*D\r\n",i,i,d.date);
-CrLf;
-for (i=0;i<20;i++)
-  PrintF("%%h%dT:%h*T\r\n",i,i,d);
-

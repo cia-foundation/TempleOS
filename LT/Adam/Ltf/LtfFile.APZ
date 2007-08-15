@@ -1,0 +1,313 @@
+public void LtfLoad(Ltf *l,I1 *src2,U8 size)
+{
+  I8 i;
+  I1 *src;
+  LtfBinEntry *tempb;
+  if (src2) {
+    LtfPutSExt(l,src2);
+    src=src2+StrLen(src2)+1;
+    i=size-(offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+    while (src<=src2+i) {
+      tempb=MAllocZ(sizeof(LtfBinEntry),l->mem_tss);
+      MemCpy(&tempb->start,src,offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+      src+=offset(LtfBinEntry.data)-offset(LtfBinEntry.start);
+      tempb->data=MAlloc(tempb->size,l->mem_tss);
+      if (tempb->size) {
+	MemCpy(tempb->data,src,tempb->size);
+	src+=tempb->size;
+      }
+      InsQue(tempb,l->bin_root.last);
+      if (tempb->num>=l->cur_bin_num)
+	l->cur_bin_num=tempb->num+1;
+    }
+  }
+  if (!(l->flags & (LTFF_PLAIN_TEXT|LTFF_PLAIN_TEXT_WITH_TABS)))
+    LtfValidateBins(l);
+  l->recalc_start=l;
+  LtfRecalc(l);
+}
+
+public Ltf *LtfRead(I1 *name,U8 flags=0)
+{
+  Ltf *l=LtfNew;
+  I1 *src,*name2;
+  U8 size=0;
+  l->flags|=flags;
+  name2=AbsoluteFileName(name);
+  StrCpy(l->filename.name,name2);
+  src=ReadFile(name2,&size,&l->file_attr);
+  Free(name2);
+
+  if (src) {
+    LtfLoad(l,src,size);
+    Free(src);
+  }
+  return l;
+}
+
+public void *LtfSave(Ltf *l,U8 *size=NULL)
+{
+  LtfEntry *cl;
+  LtfBinEntry *b;
+  I1 *st;
+  U8 cnt=2; //cursor + terminator
+  I1 *result,*dst,*src,ch;
+  I8 i;
+  if (!(l->flags & (LTFF_PLAIN_TEXT|LTFF_PLAIN_TEXT_WITH_TABS)))
+    LtfValidateBins(l);
+  l->recalc_start=l;
+  LtfRecalc(l);
+  for (cl=l->dummy.next;cl!=l;cl=cl->next) {
+    if (!Bt(ltf_data_types,cl->btype)) {
+      if (cl->btype==LTFT_TEXT &&
+	!(cl->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	 LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP))) {
+	cnt+=StrLen(cl->display);
+	if (!(l->flags & (LTFF_PLAIN_TEXT | LTFF_PLAIN_TEXT_WITH_TABS)))
+	  cnt+=Occurrences(cl->display,'$$');
+      } else if (cl->btype==LTFT_TAB ||
+		 cl->btype==LTFT_PAGE_BREAK)
+	cnt++;
+      else if (cl->btype==LTFT_CR)
+	cnt+=2;
+      else if (cl->btype==LTFT_PICWORD)
+	cnt+=StrLen(cl->aux_str);
+      else if (cl->btype!=LTFT_SOFT_CR &&
+	       cl->btype!=LTFT_CURSOR &&
+	       cl->btype!=LTFT_BPT) {
+	st=LtfToPlainText(l,cl);
+	cnt+=StrLen(st)+2;
+	Free(st,l->mem_tss);
+      }
+    }
+  }
+  for (b=l->bin_root.next;b!=&l->bin_root;b=b->next) {
+    if (b->use_cnt>b->temp_use_cnt)
+      cnt+=offset(LtfBinEntry.data)-
+	   offset(LtfBinEntry.start)+b->size;
+  }
+  result=MAlloc(cnt);
+  dst=result;
+  for (cl=l->dummy.next;cl!=l;cl=cl->next) {
+    if (!Bt(ltf_data_types,cl->btype)) {
+      if (cl->btype==LTFT_TEXT &&
+	!(cl->flags & ~(LTFLF_WORD_WRAP |LTFLF_UNDERLINED |
+	   LTFLF_INVERTED | LTFLF_BLINK | LTFLF_SKIP))) {
+	src=cl->display;
+	i=0;
+	while (ch=*src++) {
+	  if (cl==l->cur_entry && i++==l->cur_data_col)
+	    *dst++=CH_CURSOR;
+	  *dst++=ch;
+	  if (ch=='$$') {
+	    if (!(l->flags & (LTFF_PLAIN_TEXT | LTFF_PLAIN_TEXT_WITH_TABS)))
+	      *dst++=ch;
+	  }
+	}
+	if (cl==l->cur_entry && i++==l->cur_data_col)
+	  *dst++=CH_CURSOR;
+      } else {
+	if (cl==l->cur_entry)
+	  *dst++=CH_CURSOR;
+	if (cl->btype==LTFT_TAB)
+	  *dst++=CH_TAB;
+	else if (cl->btype==LTFT_PAGE_BREAK)
+	  *dst++=CH_FORM_FEED;
+	else if (cl->btype==LTFT_CR) {
+	  *dst++=CH_CR;
+	  *dst++=CH_LINE_FEED;
+	} else if (cl->btype==LTFT_PICWORD) {
+	  StrCpy(dst,cl->aux_str);
+	  dst+=StrLen(cl->aux_str);
+	} else if (cl->btype!=LTFT_SOFT_CR &&
+		   cl->btype!=LTFT_CURSOR &&
+		   cl->btype!=LTFT_BPT) {
+	  *dst++='$$';
+	  st=LtfToPlainText(l,cl);
+	  StrCpy(dst,st);
+	  dst+=StrLen(st);
+	  *dst++='$$';
+	  Free(st,l->mem_tss);
+	}
+      }
+    }
+  }
+  *dst++=0;
+  b=l->bin_root.next;
+  if (b!=&l->bin_root) {
+    while (b!=&l->bin_root) {
+      if (b->use_cnt>b->temp_use_cnt) {
+	MemCpy(dst,&b->type,offset(LtfBinEntry.data)-offset(LtfBinEntry.start));
+	dst+=offset(LtfBinEntry.data)-offset(LtfBinEntry.start);
+	MemCpy(dst,b->data,b->size);
+	dst+=b->size;
+      }
+      b=b->next;
+    }
+  } else
+    cnt--;
+  if (size) *size=cnt;
+  return result;
+}
+
+public void LtfWrite(Ltf *l,BoolU4 prompt=FALSE)
+{
+  U8 size;
+  I1 *buf=LtfSave(l,&size);
+  if (prompt) {
+    if (DoForm(&l->filename,"EditFileNameStruct"))
+      WriteFile(l->filename.name,buf,size,0,l->file_attr);
+  } else
+    WriteFile(l->filename.name,buf,size,0,l->file_attr);
+  Free(buf);
+}
+
+public void DelClipboard()
+{
+  LtfReset(sys_clipboard_ltf,TRUE);
+}
+
+public void EditCopyToClipboard(Ltf *l)
+{
+  Ltf *b=sys_clipboard_ltf;
+  LtfEntry *cl=l->dummy.next,*nl;
+  DelClipboard;
+  while (cl!=l) {
+    if (cl->type & LTFLT_SELECTED) {
+      cl->type&=~LTFLT_SELECTED;
+      if (!Bt(ltf_data_types,cl->btype)) {
+	nl=LtfCopyEntry(b,cl);
+	InsQue(nl,b->dummy.last);
+      }
+    }
+    cl=cl->next;
+  }
+}
+
+public void EditCutToClipboard(Ltf *l)
+{
+  Ltf *b=sys_clipboard_ltf;
+  LtfEntry *cl=l->dummy.next,*cl1,*nl,*cl2=NULL;
+  DelClipboard;
+  while (cl!=l) {
+    cl1=cl->next;
+    if (cl->type & LTFLT_SELECTED) {
+      cl->type&=~LTFLT_SELECTED;
+      if (!Bt(ltf_data_types,cl->btype)) {
+	nl=LtfCopyEntry(b,cl);
+	InsQue(nl,b->dummy.last);
+      }
+      if (cl==l->cur_entry || cl==cl2)
+	cl2=cl->next;
+      LtfDelEntry(l,cl);
+    }
+    cl=cl1;
+  }
+  if (cl2) {
+    l->cur_entry=cl2;
+    l->cur_data_col=cl2->min_col;
+  }
+  l->recalc_start=l;
+  LtfRemoveSoftCRs(l,NULL);
+}
+
+public void EditInsertLtf(Ltf *l,Ltf *b)
+{  //TODO: $LK,"LtfReset","MN:LtfReset"$
+  I1 *dst;
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfEntry *nl,*cl=b->dummy.next;
+  LtfRemoveSoftCRs(l,NULL);
+  if (l->cur_entry->btype==LTFT_TEXT &&
+      l->cur_data_col>l->cur_entry->min_col) {
+    if (l->cur_data_col<l->cur_entry->max_col) {
+      nl=MAllocZ(sizeof(LtfEntryBase)+sizeof(void *),l->mem_tss);
+      nl->type=LTFT_TEXT | l->cur_entry->type & 0xFFFFFF00;
+      nl->flags=l->cur_entry->flags;
+      nl->x=l->cur_entry->x;
+      nl->y=l->cur_entry->y;
+      nl->indent=l->cur_entry->indent;
+      nl->page_line_num=l->cur_entry->page_line_num;
+      nl->left_margin=l->cur_entry->left_margin;
+      nl->right_margin=l->cur_entry->right_margin;
+      dst=l->cur_entry->display+l->cur_data_col;
+      nl->display=NewStr(dst,l->mem_tss);
+      nl->max_col=StrLen(dst);
+      *dst=0;
+      l->cur_entry->max_col=l->cur_data_col;
+      InsQue(nl,l->cur_entry);
+      l->cur_entry=nl;
+      l->cur_data_col=nl->min_col;
+    } else
+      if (l->cur_entry!=l)
+	l->cur_entry=l->cur_entry->next;
+  }
+  while (cl!=b) {
+    if (cl->btype!=LTFT_SOFT_CR) {
+      nl=LtfCopyEntry(l,cl);
+      InsQue(nl,l->cur_entry->last);
+    }
+    cl=cl->next;
+  }
+  l->recalc_start=l;
+  Preempt(old_preempt);
+}
+
+
+BoolU4 LtfCaptureUndo(Ltf *l)
+{
+  BoolU4 result=FALSE,old_preempt=Preempt(OFF);
+  U8 i=GetTimeStamp;
+  LtfUndo *u;
+  if (l->flags&LTFF_UNDO_DIRTY &&
+      i>l->undo_root.last->timestamp+15*time_stamp_freq &&
+      l->flags&LTFF_ALLOW_UNDO) {
+    u=MAllocZ(sizeof(LtfUndo),l->mem_tss);
+    u->timestamp=i;
+    u->body=LtfSave(l,&u->size);
+    InsQue(u,l->undo_root.last);
+    l->flags&=~LTFF_UNDO_DIRTY;
+    l->undo_cnt++;
+    u->ltf_flags=l->flags;
+  }
+  Preempt(old_preempt);
+  return result;
+}
+ 
+void LtfRestoreUndo(Ltf *l)
+{
+  BoolU4 old_preempt=Preempt(OFF);
+  LtfUndo *u=l->undo_root.last,*u_next,*u_last;
+  Ltf *m;
+  if (u!=&l->undo_root) {
+    RemQue(u);
+    u_next=l->undo_root.next;
+    u_last=l->undo_root.last;
+    l->undo_root.next=&l->undo_root;
+    l->undo_root.last=&l->undo_root;
+    m=l->menu_ltf;
+    LtfReset(l,TRUE);
+    l->flags=u->ltf_flags;
+    LtfLoad(l,u->body,u->size);
+    LtfDelUndo(l,u);
+    l->undo_root.next=u_next;
+    l->undo_root.last=u_last;
+    l->menu_ltf=m;
+  }
+  LtfSetUndoCnt(l);
+  l->flags&=~LTFF_UNDO_DIRTY;
+  Preempt(old_preempt);
+}
+
+
+#help_index "File/Cmd Line (Typically);Ltf/Cmd Line (Typically)"
+
+public void Type(I1 *name)
+//Output a file to the command line.
+//Even graphics and macros will be sent.
+{
+  Ltf *l=LtfRead(name);
+  EditInsertLtf(Fs->cur_ltf,l);
+  LtfDel(l);
+}
+#help_index "Ltf"
+ 
