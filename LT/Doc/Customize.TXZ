@@ -1,5 +1,0 @@
-
-$WW,1$* You can adjust the mouse movement rate by setting global variables in your start-up file.  See $LK,"mouse_scale","FA:HOME/Adam3.APZ,mouse_move_scale"$.
-
-* You can set your local time zone by setting the $LK,"local_time_offset","MN:local_time_offset"$ global variable in a start-up file.  It's units are $LK,"LTDATE_FREQ","MN:LTDATE_FREQ"$.  See $LK,"local time","FF:HOME/Adam3.APZ,local_time"$.
-

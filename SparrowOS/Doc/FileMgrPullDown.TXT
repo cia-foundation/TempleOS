@@ -1,0 +1,26 @@
+File
+{
+  ChgDsk(,'m');
+  FmtDrv(,'f');
+  MakeISOFile(,'M');
+  BurnISOFile(,'B');
+  Abort(,CH_SHIFT_ESC);
+  Exit(,CH_ESC);
+}
+
+Edit
+{
+  Ed(,CH_SPACE);
+  Plain(,CH_SHIFT_SPACE);
+  Rename(,'r');
+  MkDir(,'d');
+  Copy(,CH_CTRLC);
+  Paste(,CH_CTRLV);
+  DeleteFile(,CH_CTRLY);
+}
+
+Program
+{
+  Include(,0,0x3F0000003F);
+  AdamInclude(,0,0x23F0000023F);
+}

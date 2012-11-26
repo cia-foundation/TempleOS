@@ -1,0 +1,58 @@
+PopUp("WSInit(\"::/SparrowOS/\" TEXT_FILE_MASK \";~*Bible.TXT.Z\");");
+WordStat(ON);
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\nCd(\"::/SparrowOS/Demo\");\n";
+
+PopUpOk(
+"WordStat is an autocomplete feature\n"
+"which will also jump to source code.\n"
+"The function keys work with code, while\n"
+"the num keys work with the dictionary.\n\n"
+"We will now place some text on the command\n"
+"line and jump to source code.\n");
+"InstallB";
+Sleep(1000);
+
+PopUpOk(
+"After clicking $$FG,GREEN$$[OKAY]$$FG$$, look at\n"
+"the $$FG,GREEN$$InstallBoot$$FG$$ entry in the WordStat\n"
+"window.  Notice it has a '$$FG,GREEN$$*$$FG$$' by it.\n"
+"This means a source code link is available.\n");
+Sleep(2000);
+
+PopUpOk(
+"$$FG,GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");
+AFGetKey(SC_F1|SCF_CTRL|SCF_SHIFT);
+Sleep(500);
+
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+Sleep(100);
+sys_focus_task=Fs;
+
+PopUpOk(
+"Press $$FG,GREEN$$<CTRL-F1>$$FG$$ to autocomplete.\n");
+AFGetKey(SC_F1|SCF_CTRL);
+Sleep(500);
+
+Msg(MSG_KEY_DOWN,CH_NEW_LINE,SCF_CTRL|SCF_SHIFT);
+"\n";
+
+PopUpOk(
+"Tip: You can restart the WordStat window if you\n"
+"have closed it by pressing $$FG,GREEN$$<CTRL-F1>$$FG$$.\n");
+
+PopUpOk(
+"You can also use the $$FG,GREEN$$Man()$$FG$$ function\n"
+"to jump to source code.  (I use WordStat.)\n");
+AFDelayedPutS("Man(\"InstallBoot\");");
+Sleep(1000);
+"\n";
+
+Sleep(2000);
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);

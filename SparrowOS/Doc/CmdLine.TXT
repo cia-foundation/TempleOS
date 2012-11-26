@@ -1,0 +1,32 @@
+$WW,1$The cmd line feeds into a $FG,2$C+$FG$ compiler as you type.  A statement outside a function executes immediately.  Remember to add a semicolon.$WW,1$
+
+Look-up the function headers with $FG,2$WordStat$FG$ by hitting $FG,2$<CTRL-SHIFT-F1>$FG$ after typing the first few letters.
+
+$LK,"Click Here","MN:Dir"$ to see the directory cmd header.  It accepts default args from $FG,2$C++$FG$.
+
+$FG,4$Dir("*.TXT.Z");$FG$
+
+If you don't have args, you don't need parenthesis.
+
+$FG,4$Dir;$FG$
+
+There is a current directory, but not a path.  To run a program, you typically $FG,2$#include $FG$it.  There are several shortcuts for $FG,2$#include$FG$ing files.  Right-click or hit enter on a directory listing or press $FG,2$F5$FG$ while editing.
+
+$FG,4$Ed("NewFile.CPP.Z");$FG$
+
+Most filenames end in "$FG,2$.Z$FG$" because they are stored compressed.
+
+Drives are specified with a letter.  The boot drive is specified with a '$FG,2$:$FG$'.
+
+$FG,4$Drv('B');		$FG,2$B$FG$ drive
+
+The drive can be specified in a $LK,"Cd","MN:Cd"$() command as in:
+
+$FG,4$Cd("B:/Temp");		$FG,2$B$FG$ drive
+$FG,4$Cd("::/SparrowOS/Demo");$FG$	Boot drive
+
+$FG,4$$FG,4$Cd("HOME/MusicOrgan");	$FG,2$HOME$FG$ is a dir
+
+You can place macros in your personal menu for $LK,"Cd","MN:Cd"$() commands.  $FG,2$<CTRL-M>$FG$ to access your menu.
+
+$MA+A-X+PU,"Take Tour","SpawnUser(\"Cd(\\\"::/SparrowOS/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$

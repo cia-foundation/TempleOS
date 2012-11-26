@@ -1,0 +1,8 @@
+$WW,1$A SparrowOS document is a $LK,"Circular Queue","HI:Circular Queue"$ of cmds and graphics.  See $LK,"CDocEntry","MN:CDocEntry"$ for the entry structure.  See $LK,"TipOfDay","MN:TipOfDay"$() for a nice example.
+
+There is one document format for the editor/ viewer/ browser/ cmd line.
+
+Each task has a $LK,"CDoc","MN:CDoc"$ queue.  There is one $LK,"CDoc","MN:CDoc"$ for the border, called "auxiliary" and one for the main window.  The aux is at $FG,4$Fs->next_doc$FG$ and the main at $FG,4$Fs->last_doc$FG$.  When dbl buffering, there are two main's.  See $LK,"::/SparrowOS/Demo/Spy.CPP.Z","FI:::/SparrowOS/Demo/Spy.CPP.Z"$.  It is possible to define multiple aux's.  To insert a additional aux, use $LK,"DocQueInsRev","MN:DocQueInsRev"$(doc,Fs->next_doc).
+
+See$LK,"::/SparrowOS/Demo/Doc/CallBack.CPP.Z","FI:::/SparrowOS/Demo/Doc/CallBack.CPP.Z"$ and $LK,"::/SparrowOS/Demo/Doc/CallBackAux2.CPP.Z","FI:::/SparrowOS/Demo/Doc/CallBackAux2.CPP.Z"$.
+

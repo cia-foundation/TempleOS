@@ -1,0 +1,76 @@
+PopUpOk(
+"$$LK,\"F\",\"MN:F\"$$() is a handy function.\n"
+"It is a wrapper around $$LK,\"Grep\",\"MN:Grep\"$$().\n"
+"It searches the $$FG,GREEN$$/SparrowOS$$FG$$ tree for a sym.\n"
+);
+
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"Dir\");";
+AFPmtStr("\n");
+
+
+
+
+
+PopUpOk(
+"Try it with the $$FG,GREEN$$+l$$FG$$ flag.\n"
+"This limits to whole labels, not partials.\n");
+
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"Dir\",\"+l\");";
+AFPmtStr("\n");
+
+
+
+
+
+PopUpOk(
+"Try it with the $$FG,GREEN$$+l-i$$FG$$ flag.\n"
+"This does not ignore case and\n"
+"limits to whole labels, not partials.\n");
+
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"Dir\",\"+l-i\");";
+AFPmtStr("\n");
+
+
+
+
+PopUpOk(
+"The wrapper function is in your\n"
+"$$FG,RED$$HOME/Adam3eWrappers.CPP.Z$$FG$$ file.\n"
+"There is a function $$LK,\"R\",\"MN:R\"$$() for\n"
+"find and replace.  Feel free to customize.\n");
+
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"Ed(\"HOME/Adam3eWrappers.CPP.Z\");";
+AFPmtStr("\n");
+
+Sleep(2000);
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"$$FG,GREEN$$+lf$$FG$$ is whole label just front.\n"
+"$$FG,GREEN$$+lb$$FG$$ is whole label just back.\n");

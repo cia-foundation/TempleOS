@@ -1,0 +1,4 @@
+$WW,1$The compiler's lexical analyzer can be used in your programs to simplify parsing.  See $LK,"Doc Parsing","FF:::/SparrowOS/Adam/Doc/DocPlain.CPP.Z,LexNew"$ or $LK,"Parse Opcode File","FF:::/SparrowOS/Compiler/CmpInit.CPP.Z,Opcodes.TXT.Z"$.
+
+See $LK,"Tokens","MN:TK_IDENT"$.
+

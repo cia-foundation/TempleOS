@@ -1,0 +1,54 @@
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+"Ed(\"HI:Debugging\");";
+AFPmtStr("\n");
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"We will now use $LK,"Uf","MN:Uf"$() to\n"
+"unassemble a function.\n"
+"It takes the function name\n"
+"as a string arg.\n\n"
+"Press $$FG,GREEN$$<ENTER>$$FG$$.");
+"WinMax;WinBorder;\nUf(\"CAlloc\");";
+AFPmtStr("\n");
+
+PopUpOk("Press $$FG,GREEN$$<CURSOR-UP>$$FG$$ eight times..");
+I64 i;
+for (i=0;i<8;i++)
+  AFGetKey(SC_CURSOR_UP);
+
+PopUpOk(
+"Press $$FG,GREEN$$<SPACE BAR>$$FG$$.\n");
+AFPmtStr(" ");
+
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"AFView;\n";
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"We can unassemble a\n"
+"numeric address with $LK,"U","MN:U"$().\n\n"
+"Press $$FG,GREEN$$<ENTER>$$FG$$.");
+"U(&CAlloc);";
+AFPmtStr("\n");
+
+"AFView;\n";
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk("The opcodes are slightly nonstandard.");
+"Ed(\"::/SparrowOS/Compiler/OpCodes.TXT.Z\");\n";
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+

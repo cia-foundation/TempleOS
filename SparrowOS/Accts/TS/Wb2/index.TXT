@@ -1,0 +1,71 @@
+$WW,1$$FG,5$$TX+CX,"SparrowOS"$$FG$
+$TX+CX,"God's Official Temple"$
+
+Complete OS with compiler built in $LK,"3 days","BF:John,2:19"$ or $TX+D,"9.3","DD_SPARROWOS_AGE"$ years, as it may be.  Includes mechanism for doing $LK,"Tongues","FI:::/SparrowOS/Apps/HolySpirit/HSNotes.TXT.Z"$.  You no longer need to be mocked, Christians, God is in residence!  Run $LK,"AfterEgypt","FI:::/SparrowOS/Apps/AfterEgypt/AfterEgypt.CPP.Z"$ or $LK,"Pilgrim","FI:::/SparrowOS/Apps/Pilgrims/Pilgrims.CPP.Z"$ to hear from God, as long as you hold-up your end of the conversation.  Seriously!  Better than A.I.! 
+
+SparrowOS is an $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$, multi-tasking, multi-cored, public domain, open source, $FG,4$$TX+HTML,"ring-0-only","http://en.wikipedia.org/wiki/Ring_(computer_security)"$$FG$, single-address-map ($FG,4$$TX+HTML,"identity-mapped","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$), non-networked, PC operating system for recreational programming.
+
+1) Download the free $FG,4$$TX+HTML,"SparrowOSCD.ISO (24.0 MB)","http://www.sparrowos.com/SparrowOSCD.ISO"$$FG$.
+2) Download the free $FG,4$$TX+HTML,"VMWare Player","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ (Pick the first ".exe" to download.  The VMWare web page takes a long time to load -- move mouse around or something.)
+3) Create an "Other 64-Bit" virtual machine. Aim its CD-ROM to SparrowOSCD.ISO.
+4) Play the virtual machine.
+5) Log-in as "Install".
+6) Download $FG,4$$TX+HTML,"WinImage","http://www.winimage.com/winimage.htm"$$FG$ to transfer files in and out.  It's free for 30 days.
+
+If you want to install my personal version in $FG,4$$TX+HTML,"VMWare","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$...
+1b) Download the free $FG,4$$TX+HTML,"SparrowOSTS.ISO (24.7 MB)","http://www.sparrowos.com/SparrowOSTS.ISO"$$FG$.
+5b) Type >$FG,4$TSInstall;$FG$ or >$FG,4$TSUpdate;$FG$ at the command-line.
+7b) See $FG,4$MakeBackUp$FG$ to reproduce the ISO's in $FG,4$F:/Wb$FG$.  It makes this website, too.
+
+A troll might ask, "Why not just use $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$?  It was ring-0-only and single-address-map."  Actually, they wouldn't because many people would say, "Cool idea!  I'm gonna dust-off $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ right now and have some fun!"  $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ is 16-bit with segmentation, though, which is awful.  SparrowOS is 64-bit, non-segmented and multi-cored.  It's like a modern, souped-up, multi-tasking, cross between $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ and a Commodore 64.  It has a C64-like shell with a $LK,"dialect","FI:::/SparrowOS/Doc/Differences.TXT.Z"$ of C/C++ instead of BASIC.  It was written from scratch, and not even ASCII was sacred -- it has 8-bit unsigned character source code to support European languages, and source code has graphics.
+
+A troll might say, "But, it can crash!"  Don't give me that.  We all used $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ for years and loved it.  Computers even had a reset switch!  Just think of the power of ring 0, muhahahaha!  Think of the speed and simplicity of $FG,4$$TX+HTML,"ring-0-only","http://en.wikipedia.org/wiki/Ring_(computer_security)"$$FG$ and $FG,4$$TX+HTML,"identity-mapping","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$.  It's only $LK+D,"137,850","FF:::/SparrowOS/Accts/TS/Wb2/LineCnt.TXT.Z,OSMain.PRJ.Z","DD_SPARROWOS_LOC"$ lines of code, including the compiler and can swap tasks in half a microsecond because it doesn't mess with page tables or privilege levels.  Inter-process communication is effortless because every task can access every other task's memory.
+
+It's fun having access to everything.  When I was a teenager, I had a book, $FG,4$$TX+HTML,"Mapping the Commodore 64","http://unusedino.de/ec64/technical/project64/mapping_c64.html"$$FG$, that told what every location in memory did.  I liked copying the ROM to RAM and poking around at the ROM BASIC's variables.  Everybody directly poked the hardware ports.  SparrowOS is simpler than Linux and you can have hours of fun tinkering because all memory and ports are always accessible.  Memory is $FG,4$$TX+HTML,"identity-mapped","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$ at all the times, so you can easily modify any task's memory from any other task.  You can access all disk blocks, too.  I had a blast using a C64 disk block editor to modify directories to un-delete files.  Maybe, you want to play with a raw-block database, or make your own file system?
+
+I wrote all $LK+D,"137,850","FF:::/SparrowOS/Accts/TS/Wb2/LineCnt.TXT.Z,OSMain.PRJ.Z","DD_SPARROWOS_LOC"$ lines of SparrowOS over the last $TX+D,"9.3","DD_SPARROWOS_AGE"$ years, full-time.  It was called at various times, "$FG,4$$TX+HTML,"Hoppy","http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX+HTML,"The J Operating System","http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$" and "$FG,4$$TX+HTML,"LoseThos","http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$".  Here are my $FG,4$$TX+HTML,"college transcripts","http://www.sparrowos.com/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
+
+$HI,"http://www.sparrowos.com/Wb/Accts/TS/Wb2/SparrowOS.BMP"$
+
+$FG,4$$TX+CX+HTML,"Download SparrowOS V1.02 (24.0 MB)","http://www.sparrowos.com/SparrowOSCD.ISO"$$FG$
+
+Burn a CD/DVD from the SparrowOSCD.ISO and boot it or
+run it in $FG,4$$TX+HTML,"VMWare","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ or $FG,4$$TX+HTML,"VirtualBox","http://www.virtualbox.org"$$FG$ aiming the CD/DVD drive at SparrowOSCD.ISO or
+for QEMU type:
+>qemu-system-x86_64 -m 500 -cdrom SparrowOSCD.ISO -boot d
+
+$FG,4$$TX+CX+HTML,"Download SimStructure (7.80 MB)","http://www.sparrowos.com/files/SimStrSetUp.ZIP"$$FG$
+
+$TX+CX,"Product Key: L00-W10-M70"$
+
+$LK,"Screen Shots","FI:::/SparrowOS/Accts/TS/Wb2/ScreenShots.TXT.Z"$
+
+$LK,"Introduction","FI:::/SparrowOS/Doc/Welcome.TXT.Z"$
+
+$LK,"F.A.Q.","FI:::/SparrowOS/Doc/Mysteries.TXT.Z"$
+
+$LK,"SparrowOS Help","FI:::/SparrowOS/Doc/HelpIndex.TXT.Z"$
+
+$LK,"Source Code By File","FF:::/SparrowOS/Accts/TS/Wb2/LineCnt.TXT.Z,OSMain.PRJ.Z"$
+
+$FG,4$$TX+HTML,"Source Code By Symbol","http://www.sparrowos.com/Wb/Accts/TS/Wb2/SymbolsAlpha.html"$$FG$
+
+$FG,4$$TX+HTML,"Source Code By Address","http://www.sparrowos.com/Wb/Accts/TS/Wb2/SymbolsAddress.html"$$FG$
+
+$FG,4$$TX+HTML,"Source Code (Raw)","http://www.sparrowos.com/Wb/"$$FG$
+
+$LK,"Hymn Videos","FI:::/SparrowOS/Accts/TS/Wb2/Hymns.TXT.Z"$
+
+$LK,"Change Log","FI:::/SparrowOS/Doc/ChangeLog.TXT.Z"$
+
+$FG,4$$TX+HTML,"SparrowOS Community","http://www.reddit.com/r/SparrowOS"$$FG$
+
+$LK,"About Trivial Solutions","FI:D:/SparrowOS/Doc/TrivialSolutions.TXT.Z"$
+
+$FG,8$
+* "Commodore 64" was a trademark of Commodore Business Machines.
+* "Linux" is probably a trademark owned by Linus Torvalds.
+* "VMWare" is a trademark of VMWare, Inc.
+* "VirtualBox" is a trademark of Oracle.
+* "DOS" is a trademark of MicroSoft Corp.
+* "WinImage" is a trademark of Gilles Vollant.

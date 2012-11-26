@@ -1,4 +1,0 @@
-Cd("::/LT/Apps/MusicOrgan");;
-#include "Load";;
-JukeBox("Examples");
-

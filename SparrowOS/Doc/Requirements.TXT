@@ -1,0 +1,32 @@
+$WW,1$$FG,5$$TX+CX,"Requirements for SparrowOS"$$FG$
+
+$FG,5$User Skills Required$FG$
+* Knowledge of the $FG,2$C$FG$ programming language.
+
+$FG,5$Supported Hardware$FG$
+*  $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatible computer.  (Obviously, you need 64-bit hardware for a 64-bit operating system.)
+
+* 640x480 16 color VGA graphics.
+
+* Most$FG$ keyboards and mice.
+
+* Minimum 256 Meg RAM; Maximum $TX+D,"128 Gig","DD_MAPPED_MEM_SPACE_GIG"$ RAM (easily increased).
+
+* HD Audio or internal PC Speakers.
+
+* CD/DVD-ROMs (not SCSI).  ISO9660 file system.
+
+* ATA and SATA hard drives.
+
+$FG,5$Unsupported Hardware$FG$
+* No graphics acceleration.
+
+* No sound cards besides HD Audio.
+
+* $FG,4$No networking$FG$.
+
+* No USB devices, except keyboard and mouse in legacy mode.  No, you can't use flash memory cards.
+
+* No printers.
+
+$FG,8$

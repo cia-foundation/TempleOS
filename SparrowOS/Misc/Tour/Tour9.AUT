@@ -1,0 +1,28 @@
+PopUpOk(
+"All text widgets work everywhere.\n"
+"The $$FG,GREEN$$Type()$$FG$$ command is like\n"
+"the DOS command of the same name\n"
+"or the UNIX, $$FG,GREEN$$cat$$FG$$ command.\n"
+"We will now send your menu document\n"
+"to the command line.  They use the same\n"
+"document format and it is active!!.\n");
+
+PopUpOk("Press $$FG,GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"Type(\"HOME/PersonalMenu.TXT.Z\");";
+AFPmtStr("\n");
+
+"Dir;\nAFView;\n";
+PopUpOk(
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"$$FG,GREEN$$Type()$$FG$$ can also be used on\n"
+"$$FG,GREEN$$.BMP$$FG$$ or $$FG,GREEN$$.GRA$$FG$$ files!");
+
+

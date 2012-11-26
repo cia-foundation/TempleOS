@@ -1,0 +1,71 @@
+$WW,1$$FG,5$$TX+CX,"ACCT FILES"$$FG$
+
+You can add and remove accts by making or removing directories in the $FG,2$::/SparrowOS/Accts$FG$ directory.  An empty account directory should be valid because it will get default files from the parent directory.
+
+See $LK-A,"HOME/PersonalMenu.TXT.Z"$ for a personal menu which can be viewed at the cmd line with the $FG,2$<CTRL-M>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+See $LK-A,"HOME/PersonalNotes.TXT.Z"$ for a personal note file which can be viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+
+See $LK-A,"HOME/DoItOnce.CPP.Z"$ for a file which is invoked at the start-up of the first user.
+
+See $LK-A,"HOME/Adam3.CPP.Z"$ for the user files that get loaded into the adam task at start-up.  These are only loaded once.
+
+$LK-A,"HOME/Registry.CPP.Z"$ can be edited by hand or deleted to rst to defaults.  Takes affect next boot.
+
+
+
+$FG,5$$TX+CX,"APPLICATION POLICIES"$$FG$
+
+* Place applications in their own $FG,2$/SparrowOS/Apps$FG$ subdirectory.
+
+* Make a file called $FG,2$Load.CPP.Z$FG$ to load the application.
+
+* Make a file called $FG,2$Run.CPP.Z$FG$ to load and run the application, preferable by $FG,2$#include$FG$ing the $FG,2$Load.CPP.Z$FG$ file.
+
+* Place user data in a subdirectory of $FG,2$HOME$FG$, preferably naming the subdirectory the same as the $FG,2$/SparrowOS/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.CPP.Z$FG$ file.  See $LK,"::/SparrowOS/Demo/RegistryDemo.CPP.Z","FI:::/SparrowOS/Demo/RegistryDemo.CPP.Z"$.
+
+* Make a file called $FG,2$Install.CPP.Z$FG$ or $FG,2$Install.AUT.Z$FG$ to create the $FG,2$HOME$FG$ subdirectory and do similar stuff.
+
+ 
+
+$FG,5$$TX+CX,"OS PROGRAMMING GUIDELINES:"$$FG$
+
+* Virtual mem is not used (It is identity mapped in EM64T mode).  The stk does not grow, so allocate enough when the task (process) is $LK,"Spawn","MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc","MN:MAlloc"$() and $LK,"Free","MN:Free"$().)
+
+* See $LK,"Naming convention","FF:::/SparrowOS/Doc/Glossary.TXT.Z,Naming convention"$.
+
+* There are two modes of compiling $LK,"Static Compiled Mode","FF:::/SparrowOS/Doc/Glossary.TXT.Z,Static Compiled Mode"$ and $LK,"JIT Mode","FF:::/SparrowOS/Doc/Glossary.TXT.Z,JIT"$.  Actual compilation is done in both--nothing is "interpreted".
+
+* $LK,"Differences from C/C++","FI:::/SparrowOS/Doc/Differences.TXT.Z"$
+
+* $LK,"System Programming Guidelines","FI:::/SparrowOS/Doc/SysPgmGuide.TXT.Z"$
+
+$FG,5$$TX+CX,"Hash sym tables:"$$FG$
+
+* See $LK,"::/SparrowOS/Adam/Hash2a.CPP.Z","FI:::/SparrowOS/Adam/Hash2a.CPP.Z"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
+
+* $FG,2$adam_task->hash_table$FG$ holds the C/C++ syms loaded in on start-up.
+
+* $FG,2$Fs->hash_table$FG$ holds user C+ syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym unless you have done $LK,"OptOn","MN:OptOn"$($LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$).  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
+
+* To display the contents of a hash table, use the $LK,"HashRep","MN:HashRep"$() routine or the varients.  $LK,"HashDepthRep","MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
+
+$FG,5$$TX+CX,"Assembly Language Concerns:"$$FG$
+
+* $FG,2$FS$FG$ must always point to the $LK,"CTask","MN:CTask"$.
+
+* $FG,2$GS$FG$ must always point to the $LK,"CCPU","MN:CCPU"$.
+
+* Don't change the segment registers unless interrupts are off.
+
+* When interacting with compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for register vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.
+
+* I recommend using the standard stk frame for functions because $LK,"Caller","MN:Caller"$() is used to display the call stk, such as for the wallpaper.
+$FG,2$	ENTER	nnnn
+...
+	LEAVE
+	RET
+$FG$
+* The args are removed from the stack with $FG,2$RET1$FG$ statements.
+
+	$FG,2$RET1	16	//remove two args$FG$

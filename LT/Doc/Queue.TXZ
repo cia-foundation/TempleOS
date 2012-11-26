@@ -1,2 +1,0 @@
-$WW,1$A $FG,2$Queue$FG$ is a bunch of $LK,"MAlloc","MN:MAlloc"$()ed chunks of memory linked together in a circle with one pointer to the $FG,2$next$FG$ value and another pointer to the $FG,2$last$FG$ value.  These pointers must be stored in the first locations in the structure.  Typically, you have a special head of the queue which is special and marks the start.
-

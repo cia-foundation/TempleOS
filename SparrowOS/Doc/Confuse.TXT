@@ -1,0 +1,49 @@
+$WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
+
+* I, Terry A. Davis, wrote every one of the $TX+D,"134,203","DD_SPARROWOS_LOC"$ lines of SparrowOS over the past $TX+D,"9.1","DD_SPARROWOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of SparrowOS src code is including in all distributions, from the kernel to the compiler to the boot loaders.
+
+* SparrowOS does not execute code not written by me and any time except for a few BIOS calles for cfguration.
+
+* SparrowOS is 100% independent -- it does not access the files of your primary operating system.  It will work as the only operating system on your computer.
+
+* SparrowOS is 100% written from scratch.  There is no Linux or GNU or any other code in SparrowOS.  Yes, I wrote the compiler from scratch.  (I probably need to repeat this a few times.)
+
+* SparrowOS is an operating system, not a browser.  The cmd line has active links.  They link to local files.
+
+* SparrowOS compiles, not "interprets", and uses no "byte code" anywhere.  I use the word "script" sometimes for stuff, but it's actually compiled.
+
+* I am an evolutionist.  "$FG,2$Adam$FG$" is a better term for the father of all tasks than "$FG,2$root$FG$" was!  $FG,2$OSMain$FG$ is the closest thing to a kernel, but everybody has kernel privilege, so "$FG,2$Kernel$FG$" is deceptive!
+
+* $LK,"Bt","MN:Bt"$() is "bit test", like the x86 instruction, not "bit torrent".
+
+* $LK,"Fs","MN:Fs"$ is a segment register, not "file system".  (It is kept pointing to the current task's record.)  There is no memory segmentation -- FS and GS are used as general purpose registers, more or less.
+
+* SparrowOS uses a flavor of C/C++.  It is not PASCAL.  I altered the syntax making parenthesis optional on function calls with no paramaters.
+
+* $LK,"Sleep","MN:Sleep"$() makes a program pause.  It is not hybernation for a laptop.
+
+* $LK,"Yield","MN:Yield"$() saves the current task's registers (context) and loads in the next task.  When waiting, it's better to do this than check a condition in a loop until you get preempted.  Checking a condition until you get preempted wastes CPU.  SparrowOS does not use virtual memory, so $LK,"Yield","MN:Yield"$() involves no disk activity.  A swap takes half a microsecond.  See $LK,"::/SparrowOS/Demo/Lectures/Spinning.CPP.Z","FI:::/SparrowOS/Demo/Lectures/Spinning.CPP.Z"$.
+
+* I use the term "JIT compilation".  This means it is compiled and executable code placed into mem, ready to be called.
+
+* Files with names ending in "Z" are compressed, not encrypted.  $LK,"Copy","MN:Copy"$() or rename them with $LK,"Move","MN:Move"$() to store them uncompressed.
+
+* SparrowOS is open src and every bit of the src code is included in the distribution.  Use $LK,"InstallBoot","MN:InstallBoot"$() to compile the kernel and compiler.
+
+* SparrowOS does not use object files or a linker.  You can link $FG,4$.BIN.Z$FG$ modules at $LK,"Load","MN:Load"$() time, though. 
+
+* The swap rate is high because tasks stay in the queue and poll conditions and swap-out voluntarily.  Swaps also occur at $TX+D,"1000 ","JIFFY_FREQ"$Hz due to the timer interrupt.  See $LK,"JIFFY_FREQ","MN:JIFFY_FREQ"$.
+
+* Refresh rate is how often SparrowOS updates screen mem.  It is not syncronized to the hardware rate, having nothing to do with it.
+
+* No application has a lock on the speaker so apps can interfere with each other and SparrowOS makes speaker noise during disk access on purpose.
+
+* During boot, SparrowOS reads-in all text files in the $FG,2$/SparrowOS$FG$ directory tree and collects statistic on them.  It makes a sparse matrix containing the frequency each word was followed by each other word.  This makes it able to predict the next word while you type.  This feature is called $FG,2$WordStat$FG$.
+
+* There are no mem leaks.  SparrowOS allocates mem as more items are displayed on the screen.  SparrowOS allocates mem for code as it is compiled at the cmd line.  If you $FG,2$#include$FG$ a file twice, it allocates more mem for it.  If you have a 50,000 line program with each line taking twenty bytes on a machine with 1 Gig, you could $FG,2$#include$FG$ it a thousand times if it had no data or graphics and no other use of mem.  Code entered at the cmd line gets allocated and persists.  I don't want to hear any bullshit about leaks unless you actually run-out.  If it bothers you, hit $FG,2$<CTRL-ALT-X>$FG$ and $FG,2$<CTRL-ALT-E>, $FG$periodically$FG$.  Use the pop-up flag on macros in your menu to spawn new tasks, run applications and free the applications when they are finished and everything will be fine.  Small mem chunks stick to the task when they are freed until it is killed.  The only way to get in trouble involves allocating multiple Meg chunks and freeing them.  These can only be reused if the same size gets allocated again.  Use $LK,"HeapLog","MN:HeapLog"$() and $LK,"HeapLogRep","MN:HeapLogRep"$() to see who allocated mem and didn't free it.
+
+* The editor periodically takes a snap-shot for $FG,2$UNDO$FG$ and this looks like a memory leak.
+
+
+$FG,8$
+* "Linux" is probably a trademark owned by Linus Torvalds.

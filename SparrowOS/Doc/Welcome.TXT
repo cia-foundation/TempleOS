@@ -1,0 +1,67 @@
+$WW,1$$FG,5$$TX+CX,"Welcome to SparrowOS"$$FG$
+
+$LK,"Trivial Solutions","FI:::/SparrowOS/Doc/TrivialSolutions.TXT.Z"$'s SparrowOS is a x86_64, multi-cored, multi-tasking, ring-0-only, single-address_mapped (identity), operating system for recreational programming:
+$ID,2$* Professional hobby projects
+* Teenager projects
+* Non-professional, older-person projects
+$ID,-2$
+Simplicity is a goal to $LK,"keep the line count down","FI:::/SparrowOS/Doc/Strategy.TXT.Z"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX+D,"134,203","DD_SPARROWOS_LOC"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a "hello world" application in one line of code and can put graphics on the screen with a three line program!
+
+It's a kayak, not a Titanic -- it will crash if you do something wrong.  You quickly reboot, however.  DOS and the 8-bit home computers of the 80's worked fine without memory protection and most computers in the world -- the embedded ones -- operate without protection.  The resulting simplicity of no protections is why SparrowOS has value.  In facts, that's the point of SparrowOS.  See the $LK,"SparrowOS Constitition","FI:::/SparrowOS/Doc/Constitution.TXT.Z"$.
+
+Two things to know about SparrowOS are that $UL,1$tasks$UL,0$ have $LK,"MAlloc","MN:MAlloc"$/$LK,"Free","MN:Free"$ heap memory, not applications, and tasks have compiler symbol tables that persist at a scope like environment variables in other operating systems, and the symbols can include functions.
+
+In other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$SparrowOS$FG$, the command line feeds right into the $FG,2$C+$FG$ (more than $FG,2$C$FG$, less than $FG,2$C++$FG$) compiler, line by line, and it places code into memory it $LK,"MAlloc","MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.  During the boot process, many files get compiled before you have access to the command line.  (Don't worry, booting takes only a couple seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ and nothing is "interpreted".
+
+Statements at the global scope (outside the scope of $FG,2$C+$FG$ functions) execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a statement in the global scope, usually at the bottom of your file.
+
+I started with $FG,2$C$FG$ syntax, but didn't like the command line for a directory listing looking like this:
+
+ >$FG,4$Dir("*.*",FALSE);
+
+$FG$So, I added default args from $FG,2$C++$FG$ and it looked like this:
+
+ >$FG,4$Dir();
+
+$FG$I didn't like that, so I made parentheses optional on calls with no args and it, now, looks like this:
+
+ >$FG,4$Dir;$FG$
+
+The syntax change created an ambiguity when specifying function addresses.  To resolve it, I  made a '$FG,2$&$FG$' required in front of function names when specifying an address of a function, which is better anyway.
+
+Once I was no longer using standard syntax, I decided to change everything I didn't like.  Here are the new $LK,"operator precedence","FA:::/SparrowOS/Doc/Differences.TXT.Z,OP_precedence"$ rules.  See $LK,"Departures from C/C++","FI:::/SparrowOS/Doc/Differences.TXT.Z"$.  It's Biblical!  See $LK,"Luke,5:37","BF:Luke,5:37"$.
+
+There are no object files in SparrowOS and, normally, you don't make executable files either, but you can.  That's known as "$FG,2$static$FG$" compilation.  Instead, you "$FG,2$just-in-time$FG$" compile.
+
+Tasks have no priority scheme and are never removed from the queue.  Instead, they often poll whatever they are waiting on and swap-out.  (Swapping tasks takes half a microsecond and does not involve disk activity or memory maps.)  See $LK,"Scheduler","FL:::/SparrowOS/OSMain/Scheduler.CPP.Z,1"$.  Polling keeps it simple.  It's might be a problem if you had lots of tasks busy, which rarely happens on a home computer.  The order of the tasks in the queue determines front-to-back window order.  See $LK,"SparrowOS MultiTasking","FI:::/SparrowOS/Doc/MultiTasking.TXT.Z"$.
+
+The SparrowOS native file system is simple, so I don't get sued.  There is an allocation bitmap for clusters and all files are stored contiguously.  You can't grow files.  It's geared toward reading and writing whole files.  Since whole files are processed, checksums and compression are possible.  Filenames ending in $FG,2$'Z'$FG$ are automatically compressed or uncompressed when stored or fetched.  SparrowOS supports direct block random access into files, however -- $LK,"FRBlks","MN:FRBlks"$() and $LK,"FWBlks","MN:FWBlks"$().  There is no $FG,2$PATH$FG$, but parent directories are searched when a file is not found.  This feature is used for default account files.  Note: the $FG,2$FAT32$FG$ filesystem is supported, which makes exchanging files with a dual booted other operating system easy.  If you don't have a $FG,2$FAT32$FG$ partition, you can use the $LK,"TSZ","FI:::/SparrowOS/Doc/TSZ.TXT.Z"$ program to transfer files to your primary operating system's partition.
+
+It's fun being able to turn-off interrupts with $LK,"Cli","MN:Cli"$() $FG$and on with $LK,"Sti","MN:Sti"$().  $FG,2$SparrowOS$FG$ runs all programs in kernel mode, ring 0, so no instructions are off-limits.  Turning-off and on preemption with $LK,"Preempt","MN:Preempt"$() is a less drastic measure that is usually sufficient.  A newly $LK,"Spawn","MN:Spawn"$()ed task begins with preemption off.
+
+The graphic resolution is poor, $FG,2$640x480 16 color$FG$, but that's all I feel comfortable with without GPU acceleration supported.  A $FG,2$1600x1200x24$FG$ bit screen takes 37 times more memory, implying 37 times the CPU power.  Also, a fixed size keeps it simple with everybody machine having the same appearance.  Look on the bright-side -- you won't spend as much time twiddling pixels for your game art and you'll have tons of CPU power available, especially with multicore systems.
+
+SparrowOS is for hobbyist programmers on single user (at a time) home computers, not mainframes or servers, but it is preemptive multitasking.  The focus task is all-important so symmetrical multiprocessing is almost pointless.  Why does it matter running two apps at the same time twice as fast when you really want to run one faster?  You could say SparrowOS does master/slave multiprocessing.  The anticipated use for multicore is primarily putting graphics on the screen.  Hardware graphics acceleration is not used, so this is possible.  See $LK,"SparrowOS MultiCore","FI:::/SparrowOS/Doc/MultiCore.TXT.Z"$.
+
+There is no distinction between the terms "task", "process" or "thread".  All have a task record, $LK,"CTask","MN:CTask"$(), pointed to by the $FG,2$FS$FG$ segment register and are accessed with $FG,4$Fs->$FG$ while $FG,4$Gs->$FG$ points to a $LK,"CCPU","MN:CCPU"$ for the current CPU core.  Each task can have just one window, but a task can have children with windows.  (The segment registers are just used as extra registers -- there is nothing segmented about SparrowOS' memory.)
+
+In SparrowOS, "$FG,2$Adam$FG$" refers to a task that is the father of all tasks.  He's never supposed to die.  Since tasks inherit the symbols of parents, system-wide stuff is associated with $FG,2$Adam$FG$.  His heap is like kernel memory in other operating systems.  Since $FG,2$Adam$FG$ is immortal, it's safe to allocate objects, not tied to any mortal task, from $FG,2$Adam$FG$'s heap.  He stays in a server mode, taking requests, so you can ask him to $FG,2$#include$FG$ something, placing that code system-wide.  A funny story is that originally I called it the "root" task and even had a "$FG,2$/SparrowOS/Root$FG$" directory ;-)  $FG,2$Adam$FG$ executes $LK,"::/SparrowOS/OSMain/Adam1.CPP.Z","FI:::/SparrowOS/OSMain/Adam1.CPP.Z"$ at boot time.
+
+For easy back-ups, place everything you author in your $FG,2$HOME$FG$ directory and subdirectories.  Then, use $LK,"CopyTree","MN:CopyTree"$().  That should make upgrading easy, too.  To make an account use $LK,"MkDir","MN:MkDir"$() to create a directory under $FG,2$/SparrowOS/Accts$FG$.  It will be $FG,2$HOME$FG$ if you boot to it.  Recompile with $LK,"InstallBoot","MN:InstallBoot"$() and make it boot your acct.  Customizable start-up scripts go in your $FG,2$HOME$FG$ directory.  The default start-up scripts are in $FG,2$/SparrowOS/Accts$FG$, the parent of all accounts.  Copy the start-up files you wish to customize into $FG,2$HOME$FG$ and modify them.  See $LK,"Acct Files","FF:::/SparrowOS/Doc/GuideLines.TXT.Z,ACCT FILES"$.
+
+Typically, your usage pattern through the day will be repeatedly left or right clicking on filenames in a cmd line $LK,"Dir","MN:Dir"$() listing.  You left-click files to edit them and right-click to $FG,2$#include$FG$ them.  To begin a project, type $LK,"Ed","MN:Ed"$(""); and supply a filename.  You can also run programs with $FG,2$<F5>$FG$ when in the editor.  $FG,2$<ESC>$FG$ to save and exit the file.  You'll need to do a new $LK,"Dir","MN:Dir"$() cmd, periodically, so make a macro on your personal menu.  Access your personal menu by pressing $FG,2$<CTRL-M>$FG$, cursoring until you are on top of it and pressing $FG,2$<SPACE BAR>$FG$.
+
+$FG,2$<CTRL-T>$FG$ toggles plain text mode, showing format commands, a little like viewing html code.  $FG,2$<CTRL-L>$FG$ inserts a nongraphic widget.  $FG,2$<CTRL-R>$FG$ inserts a graphic resource or edits the graphic under the cursor.
+
+$FG,2$<CTRL-D>$FG$ brings-up the file manager.  It's pretty crappy.  I find I don't need it very often, believe it or not.
+
+$FG,2$<CTRL-ALT-E>$FG$ creates a new terminal window.  $FG,2$<CTRL-ALT-X>$FG$ kills a window.  You'll do these periodically.
+
+$LK,"Grep","MN:Grep"$() is your best friend.  There's a wrapper function called $LK,"F","MN:F"$() in your $FG,2$HOME/Adam3eWrappers.CPP.Z$FG$ file.  Feel free to make wrapper functions for functions you use often and customize the args.  By the way, $LK,"Grep","MN:Grep"$() or $LK,"R","MN:R"$() can be used to replace strings across multiple files.  You can access $LK,"Grep","MN:Grep"$() using $FG,2$<CTRL-SHIFT-F>$FG$.
+
+As you browse code, use the $FG,2$WordStat$FG$ window to look-up functions, etc.  $FG,2$<CTRL-SHIFT-F1>$FG$ (or whatever number) to follow a sym to it's source.  You can browse deeper and deeper.  You go back with $FG,2$<SHIFT-ESC>$FG$.
+
+Use the $LK,"Help Index","FI:::/SparrowOS/Doc/HelpIndex.TXT.Z"$ or $LK,"Demo Index","FI:::/SparrowOS/Doc/DemoIndex.TXT.Z"$ to find-out what exists.  Press $FG,2$F1$FG$ for help or use the links on your menu ($FG,2$<CTRL-M>$FG$).  Also, look in the $FG,2$/SparrowOS/Demo$FG$ or $FG,2$/SparrowOS/Apps$FG$ directories for inspiration.
+
+
+$MA+A-X+PU,"Take Tour","SpawnUser(\"Cd(\\\"::/SparrowOS/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$

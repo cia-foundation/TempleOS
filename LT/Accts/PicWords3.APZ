@@ -1,9 +1,0 @@
-// Create Pictures Here
-
-void LoadUserPicWords()
-{
-//Call $LK,"AddPicWord","MN:AddPicWord"$()
-}
-
-
-LoadUserPicWords;

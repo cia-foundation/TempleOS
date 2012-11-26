@@ -1,0 +1,3 @@
+$WW,1$To create a SparrowOS graphic ctrl, you define call-back functions and insert a $LK,"CCtrl","MN:CCtrl"$ structure in the $LK,"CTask","MN:CTask"$ queue.  See $LK,"::/SparrowOS/Demo/Graphics/SliderCtrl.CPP.Z","FI:::/SparrowOS/Demo/Graphics/SliderCtrl.CPP.Z"$, $LK,"::/SparrowOS/Demo/Graphics/ScrollBars.CPP.Z","FI:::/SparrowOS/Demo/Graphics/ScrollBars.CPP.Z"$ and $LK,"TermButtonNew","FF:::/SparrowOS/Adam/WallPaper.CPP.Z,TermButtonNew"$.  There is a managed-code ctrl generator, if you press $FG,2$<CTRL-SHIFT-L>$FG$.
+ 
+

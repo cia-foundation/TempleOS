@@ -1,0 +1,44 @@
+//7 has words
+U0 Song()
+{
+  CTask *task;
+  Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
+  music_tempo= 2.480;
+  music_stacatto_factor= 0.736;
+  try {
+  task=PopUpViewStr(
+    "There are myths about the River\n"
+    "Styx separating the land of the\n"
+    "living from dead.  Jesus' told a story\n"
+    "about the land of living separate from\n"
+    "land of dead.  ($LK,"Luke,16:22","BF:Luke,16:22"$)  In the Old\n"
+    "Testament, the River Jordan was a special\n"
+    "barrier.  ($LK,"Deuteronomy,4:22","BF:Deuteronomy,4:22"$)\n"
+    );
+  TaskWait(task);
+  task->win_right=Fs->win_right;
+  task->win_left=Fs->win_left;
+  task->win_top=Fs->win_bottom+3;
+  task->win_bottom=task->win_top+12;
+  TaskDerivedValsUpdate(task);
+  while (!ScanKey) {
+	Play("W13sBBBBqCq.BeAqBh.A",
+		"Can't \0 \0 \0 \0get \0there, \0from \0he\0re.\n\0");
+	Play("M2/4");
+	Play("eECqAM4/4");
+	Play("sBBBBqCq.BeAqBh.A",
+		"Can't \0 \0 \0 \0get \0there, \0from \0he\0re.\n\0");
+	Play("M2/4");
+	Play("eDDqDM4/4");
+	Play("DeEDqG!CeF2G3qG!!sFGFG!!eD!C",
+		"Oh, \0my \0 \0God, \0some\0thing's... \0 \0 \0ver\0 \0y \0 \0wrong!\n\0 \0");
+	Play("qDeEDqG!CeF2G3qG!!sFGFG!!eD!C",
+		"Oh, \0my \0 \0God, \0some\0thing's... \0 \0 \0ver\0 \0y \0 \0wrong!\n\0 \0");
+  }
+  } catch
+    CatchAll;
+  Snd(0);
+}
+
+Song;

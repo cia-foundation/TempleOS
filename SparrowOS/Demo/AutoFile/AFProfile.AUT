@@ -1,0 +1,11 @@
+/* To run this, do a directory, right click on
+this file's name and select "AutoFile".
+Or, type $LK,"AutoFile","MN:AutoFile"$(filename);
+See $LK,"AutoFile","FF:::/SparrowOS/Doc/Glossary.TXT.Z,AutoFile"$ in the glossary for more info.
+
+Profiling does not $UL,1$require$UL,0$ autofiles.
+*/
+"$$FG,RED$$ProfAll;$$FG$$\n";
+"$$FG,RED$$//Collecting Data$$FG$$";
+PressAKey;
+"\n$$FG,RED$$ProfRep;$$FG$$\n";

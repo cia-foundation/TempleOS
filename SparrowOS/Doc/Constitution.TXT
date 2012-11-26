@@ -1,0 +1,34 @@
+$FG,5$$WW,1$$TX+CX,"SparrowOS Constitution"$$FG$
+
+The goal of SparrowOS is to provide an ideal environment for recreational programming and not imitate $FG,2$Linux$FG$.  SparrowOS is orders of magnitude simpler than $FG,2$Linux$FG$ to better fulfill the promise of $FG,2$open source$FG$.  The vision for SparrowOS is a 64-bit, souped-up, multitasking, multicore $FG,2$Commodore 64$FG$ with a $FG,2$C+$FG$ shell instead of $FG,2$BASIC$FG$ that runs $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ code.
+
+SparrowOS holds no standards sacred -- everything is freshly designed from scratch.  This is not a 1970's main frame operating system and, no, it has nothing to do with $FG,2$Commodore 64$FG$ emulation -- it's $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$.
+
+ 
+1) SparrowOS is $FG,2$ring-0-only$FG$, running everything in kernel mode including applications.  You have full access to memory, I/O ports, instructions, etc. at all times, because that's fun.
+
+2) SparrowOS will always $FG,2$identity-map$FG$ memory in a $FG,2$single-address-map$FG$ configuration.  (Virtual addresses are always kept equal to physical addresses with a single map for all tasks on all cores.)  It's as though paging is not used.
+
+3) SparrowOS will always be for one platform -- $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatibles.
+
+4) SparrowOS will never have networking, so malware is less of an issue.
+
+5) SparrowOS will always have one video mode, $FG,2$640x480$FG$ by 16 colors, unless that mode becomes unavailable on computers in the future.
+
+6) SparrowOS will always be $FG,2$free$FG$.  I might sell applications, support, or, possibly, do adware.
+
+7) SparrowOS will always be $FG,2$100% open source$FG$ with all source included, unless device drivers or something can only be included with non-disclosure agreements.
+
+8) All function args and returns will be 64-bit.  No plans for C++.
+
+9) SparrowOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just ASCII.
+
+10) SparrowOS is not for multimedia.  Games will be created by programmers, not artists.  Sounds and images will be, primarily, calculated in real-time, not fetched.
+
+11) All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
+
+12) $FG,4$$BK,1$Backward compatibility is NOT guaranteed.$FG$$BK,0$  You are safest working with $FG,2$JIT$FG$ compilation instead of $FG,2$AOT$FG$ static binaries because I can add members to classes, reorder members in classes, add default args to existing functions, change $FG,2$#define$FG$ values, etc. all without breaking compatibility.
+
+$FG,8$
+* "Commodore 64" was a trademark of Commodore Business Machines.
+* "Linux" is probably a trademark owned by Linus Torvalds.

@@ -1,0 +1,7 @@
+$FG,5$After Egypt Help$FG$
+----------------
+
+     $LK,"Part 1","FI:::/SparrowOS/Apps/HolySpirit/HSNotes.TXT.Z"$
+
+     $LK,"Part 2","FI:::/SparrowOS/Apps/AfterEgypt/AENotesPart2.TXT.Z"$
+

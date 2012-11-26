@@ -1,0 +1,31 @@
+$WW,1$$FG,5$$TX+CX,"System Programming Guide-Lines"$$FG$
+
+* See $LK,"Naming convention","FF:::/SparrowOS/Doc/Glossary.TXT.Z,Naming convention"$.
+
+* See $LK,"Abbreviations","FF:::/SparrowOS/Doc/Glossary.TXT.Z,Abbreviations"$.
+
+* I avoid the '$FG,2$?$FG$' operator.  It's not very efficient with my compiler since it executes both expressions and I just don't like it.
+
+* I place "New", "Del", "Init", "Rst", ect. on the end of a function name instead of beginning.  "$FG,4$RstMusicSettings$FG$" should be "$FG,4$MusicSettingsRst$FG$".
+
+* I often use 64-bit values in function args when smaller would be more appropriate because the compiler generally is more efficient with 64-bit values.  (All value get promoted to 64-bit by the SparrowOS compiler, when fetched.)
+
+* Short circuit logic is assumed.
+
+* I generally avoid boolean expression assignments because $FG,2$TRUE$FG$ is dangerous with different compilers, though, the SparrowOS compiler should use $FG,2$1$FG$ for TRUE values, not just nonzero.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte int -- nothing forces it to 1 or 0.  There is a $LK,"ToBool","MN:ToBool"$() function.
+
+* If you use floats in your interrupt routine, save and restore the fpu state with $LK,"Fxsave","MN:Fxsave"$() and $LK,"Fxrstor","MN:Fxrstor"$().  The timer interrupt does this.  The keyboard and mouse don't use floats.
+
+* Bracketing code with $FG,2$$FG,2$PushFD;Cli;$FG$ and $FG,2$PopFD;$FG$ will protect against simultaneous accesses from tasks on $UL,1$one$UL,0$ core.  To protect against multiple cores, you need a locked semaphore.
+
+* I put an '$FG,2$_$FG$' on the front of the name of pass-by-ref fun args.
+
+* I put an '$FG,2$_$FG$' on the front of C callable ASM routines.
+
+* $LK,"SysDbg","MN:SysDbg"$() and $LK,"IsSysDbg","MN:IsSysDbg"$() are really handy when working on the compiler or OSMain.  It's just a bit you can set and test.
+
+* I don't use "$FG,2$U0 *$FG$" because the size would be weird for ptr arithmetic.
+
+* "$FG,2$result$FG$" is reserved for local variable that holds function return val.
+
+* I use $FG,2$I64$FG$ instead of $FG,2$U64$FG$ unless necessary.

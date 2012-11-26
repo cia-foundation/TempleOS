@@ -1,0 +1,31 @@
+
+              SparrowOS V1.02
+                         
+
+
+
+
+
+
+
+
+
+                   $SP+BP,"",1,"::/SparrowOS/Demo/Graphics/Logo.CPP.Z,1"$
+
+
+
+
+
+
+
+
+
+
+
+
+
+              Public Domain
+            Operating System
+
+            $LK,"Trivial Solutions","FI:::/SparrowOS/Doc/TrivialSolutions.TXT.Z"$
+

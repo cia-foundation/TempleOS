@@ -1,0 +1,9 @@
+$WW,1$One jiffy is one time slice.  $LK,"sys_jiffies","MN:sys_jiffies"$ returns time slices since boot.
+
+$LK,"SysTimerRead","MN:SysTimerRead"$ reads the timer ticks since boot.  It's not as fast as $LK,"GetTimeStamp","MN:GetTimeStamp"$.
+
+Use $LK,"JIFFY_FREQ","MN:JIFFY_FREQ"$ to convert $LK,"sys_jiffies","MN:sys_jiffies"$.
+
+Use $LK,"SYS_TIMER_FREQ","MN:SYS_TIMER_FREQ"$ to convert $LK,"SysTimerRead","MN:SysTimerRead"$.
+
+

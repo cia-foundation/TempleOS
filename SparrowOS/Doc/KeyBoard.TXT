@@ -1,0 +1,69 @@
+$WW,1$$FG,5$$TX+CX,"Keyboard Allocations"$$FG$
+
+See $LK,"Char","HI:Char"$ for definition of scan codes.
+
+When you are at the cmd line, editing documents, browsing documentation and help, entering items in forms or in menu's, the $LK,"CDoc","MN:CDoc"$ editor handles keys.  It allows you to define your own key handlers in a $LK,"MyPutKey","MN:MyPutKey"$() function.  If you choose, you can catch most keys, overriding the default handlers.  See $LK,"DocPutKey","MN:DocPutKey"$().  The following is an overview of key allocations.
+
+$FG,2$ALT-keys and ALT-SHIFT-keys$FG$
+
+Free for user cfgurations in your $LK,"MyPutKey","MN:MyPutKey"$() handler, except for $FG,2$ALT-BACKSPACE$FG$ (undo).  There are a few examples pre-defined, but you can change them if you wish.
+
+$FG,2$ALT-digit keys$FG$
+
+Extended ASCII (3 digit decimal number).
+
+
+
+$FG,2$CTRL-ALT-keys and CTRL-ALT-SHIFT-keys$FG$
+
+Handled at a system level, NOT by the $LK,"CDoc","MN:CDoc"$ editor.  I reserve the right to allocate these, but in the mean time, you can make your own by assigning handlers to the $LK,"fp_ctrl_alt_let_cbs","MN:fp_ctrl_alt_let_cbs"$[] array.  Be aware that they operate in an interrupt framework, so they are tricky to use.
+
+
+$FG,2$CTRL-function key$FG$
+
+Auto-completes wordstat words.
+
+
+
+$FG,2$CTRL-digit key$FG$
+
+$FG$Auto-completes dictionary words.
+
+
+$FG,2$CTRL-SHIFT-function key$FG$
+
+$FG$Jumps to src code.
+
+
+$FG,2$CTRL-SHIFT-digit key$FG$
+
+Jumps to dictionary definition.
+
+
+$FG,2$function keys and SHIFT-function keys$FG$
+
+$FG$I reserve the right to allocate these, but there are some free now.
+
+
+$FG,2$CTRL-key and CTRL-SHIFT-key$FG$
+
+I reserve the right to allocate to these.  There are not many free.
+
+
+
+$FG,5$$TX+CX,"Behind the Scenes"$$FG$
+
+$AN,"","PutKeyHandling"$The editor mostly stays in a $LK,"GetKey","MN:GetKey"$()/$LK,"PutKey","MN:PutKey"$() loop.  The putkey portion is where keys are acted-upon.  SparrowOS has a chain of putkey handlers in a $LK,"Circular Queue","HI:Circular Queue"$ with priorities.  The highest priority handlers can choose to terminate handling, otherwise, the keys get sent on down the chain.
+
+$LK,"KeyDevAdd","MN:KeyDevAdd"$() defines a putkey device with a priority.  "Device" might be a misnomer.  Currently, the following are defined:
+
+Priority    Handler
+---------- ---------
+$FG,2$0x20000000$FG$ $LK,"MyPutKey","MN:MyPutKey"$() user handler
+$FG,2$0x40000000$FG$ $LK,"AKDInputFilterPutKey","MN:AKDInputFilterPutKey"$() for $LK,"Auto","MN:Auto"$(), $LK,"AutoStr","MN:AutoStr"$(), and $LK,"AutoFile","MN:AutoFile"$() handling.
+$FG,2$0x60000000$FG$ $LK,"AKDRawDisplayPutKey","MN:AKDRawDisplayPutKey"$() direct to video mem debug output. 
+$FG,2$0x80000000$FG$ $LK,"AKDDocPutKey","MN:AKDDocPutKey"$() standard document cmds
+
+Since handling individual keys is slow, SparrowOS supports $LK,"PutS","MN:PutS"$() as well.  If no puts handler is defined, individual keys are sent.
+
+$LK,"CDoc","MN:CDoc"$$FG,2$.user_put_key$FG$ and $LK,"CDoc","MN:CDoc"$$FG,2$.user_put_s$FG$ are call back routines which offer some neat tricks.  See $LK,"::/SparrowOS/Apps/MusicOrgan/JukeBox.CPP.Z","FI:::/SparrowOS/Apps/MusicOrgan/JukeBox.CPP.Z"$.  There is a var $LK,"CDoc","MN:CDoc"$$FG,2$.user_put_data$FG$ which gets passed to them.

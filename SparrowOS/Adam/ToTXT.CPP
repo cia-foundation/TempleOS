@@ -1,0 +1,146 @@
+#help_index "Utils;Cmd Line (Typically)"
+
+U0 TXTPutS(CDoc *doc,U8 *st,I64 *_col)
+{
+  U8 *ch;
+  while (ch=*st++) {
+    switch (ch) {
+      case CH_TAB:
+	do {
+	  DocPutKey(doc,CH_SPACE,0);
+	  *_col=*_col+1;
+	} while (*_col&7);
+	break;
+      case CH_SHIFT_SPACE:
+	DocPutS(doc," ");
+	*_col=*_col+1;
+	break;
+      case 'ã':
+	DocPutS(doc,"pi");
+	*_col=*_col+1;
+	break;
+      case 'é':
+	DocPutS(doc,"theta");
+	*_col=*_col+1;
+	break;
+      case 'è':
+	DocPutS(doc,"phi");
+	*_col=*_col+1;
+	break;
+      case 'ê':
+	DocPutS(doc,"omega");
+	*_col=*_col+1;
+	break;
+      case 'ì':
+	DocPutS(doc,"inf");
+	*_col=*_col+1;
+	break;
+      case 'æ':
+	DocPutS(doc,"u");
+	*_col=*_col+1;
+	break;
+      default:
+	DocPutKey(doc,ch,0);
+	*_col=*_col+1;
+    }
+  }
+}
+
+public CDoc *Doc2TXT(CDoc *doc_in)
+{
+  CDocEntry *doc_e,*doc_e2;
+  I64 y,col;
+  CDoc *doc_out=DocNew;
+  Bool unlock_doc_in=DocLock(doc_in),no_backward;
+
+  DocRecalc(doc_in);
+
+  doc_out->flags|=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
+
+  doc_e=doc_in->root.next;
+  col=doc_e->x;
+  y=doc_e->y;
+  while (doc_e!=doc_in) {
+    if (!(doc_e->flags1&(DOCEF1_SKIP|DOCEF1_HARD_SKIP))) {
+      while (y<doc_e->y) {
+	TXTPutS(doc_out,"\n",&col);
+	y++;
+	col=0;
+      }
+
+      no_backward=TRUE;
+      doc_e2=doc_e->next;
+      while (doc_e2!=doc_in && doc_e2->y==doc_e->y) {
+	if (doc_e2->x<doc_e->x) {
+	  no_backward=FALSE;
+	  break;
+	}
+	doc_e2=doc_e2->next;
+      }
+      if (no_backward)
+	while (col<doc_e->x)
+	  TXTPutS(doc_out," ",&col);
+
+      switch (doc_e->type_u8) {
+	case DOCT_TEXT:
+	  TXTPutS(doc_out,doc_e->tag,&col);
+	  break;
+	case DOCT_TAB:
+	  TXTPutS(doc_out,"\t",&col);
+	  break;
+	case DOCT_HTML_IMG:
+	  break;
+	case DOCT_HTML_VIDEO:
+	  break;
+	case DOCT_HTML_CODE:
+	  break;
+	case DOCT_SPRITE:
+	  break;
+	default:
+	  if (Bt(doc_tag_types,doc_e->type_u8))
+	    TXTPutS(doc_out,doc_e->tag,&col);
+      }
+    }
+    doc_e=doc_e->next;
+  }
+  while (y<doc_e->y) {
+    TXTPutS(doc_out,"\n",&col);
+    y++;
+    col=0;
+  }
+  doc_out->cur_entry=&doc_out->root;
+  DocRecalc(doc_out);
+
+  if (unlock_doc_in)
+    DocUnlock(doc_in);
+  return doc_out;
+}
+
+public U0 ToTXT(U8 *_in_name,U8 *_out_name=NULL,I64 width=70)
+{
+  U8 *in_name,*out_name;
+  CDoc *doc_in,*doc_out;
+
+  SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  SetWinHorz(0,width-1); //This sets doc width for word wrap
+
+  in_name=DftExt(_in_name,"TXT.Z"),
+  if (_out_name)
+    out_name=DftExt(_out_name,"TXT");
+  else
+    out_name=ChgExt(_in_name,"TXT");
+
+  doc_in=DocRead(in_name);
+  doc_out=Doc2TXT(doc_in);
+  StrCpy(&doc_out->filename.name,out_name);
+
+  SettingsPop;
+
+  DocWrite(doc_out);
+  DocDel(doc_in);
+  DocDel(doc_out);
+  Free(in_name);
+  Free(out_name);
+}
+
+#help_index ""

@@ -1,0 +1,14 @@
+$WW,1$$LK,"CDC","MN:CDC"$'s have a 4x4 matrix for rotating, scaling, skewing and shifting in 3 dimensions.  To make the graphics routines respond to the transformation, you must set the $LK,"DCF_TRANSFORMATION","MN:DCF_TRANSFORMATION"$ flag.
+
+The matrix consists of integers that have been scaled 32 bits ($LK,"gr_scale","MN:gr_scale"$).  See $LK,"::/SparrowOS/Demo/Lectures/FixedPoint.CPP.Z","FI:::/SparrowOS/Demo/Lectures/FixedPoint.CPP.Z"$ to learn why.
+
+See $LK,"GrRotX","MN:GrRotX"$(), $LK,"GrRotY","MN:GrRotY"$(), $LK,"GrRotZ","MN:GrRotZ"$(), $LK,"GrScaleMat","MN:GrScaleMat"$(), $LK,"GrRotXEqu","MN:GrRotXEqu"$(), $LK,"GrRotYEqu","MN:GrRotYEqu"$(), $LK,"GrRotZEqu","MN:GrRotZEqu"$() and $LK,"GrScaleMatEqu","MN:GrScaleMatEqu"$() to rotate about axes and scale.  Combine them with $LK,"GrMulMat","MN:GrMulMat"$() and assign them to the $LK,"CDC","MN:CDC"$.$FG,2$dc$FG$ with $LK,"GrSetRotMat","MN:GrSetRotMat"$().  See $LK,"::/SparrowOS/Demo/Graphics/Box.CPP.Z","FI:::/SparrowOS/Demo/Graphics/Box.CPP.Z"$.
+
+You can rotate single points using $LK,"GrRot","MN:GrRot"$().
+
+The 4th dimension allows a neat trick where you can place pos shifts (translations), into the matrix and $LK,"GrMulMat","MN:GrMulMat"$ them to combine rotation/shift operations.  Normally, you can't combine pos shift operations.  See $LK,"GrSetTranslation","MN:GrSetTranslation"$() and $LK,"::/SparrowOS/Demo/Graphics/Transform.CPP.Z","FI:::/SparrowOS/Demo/Graphics/Transform.CPP.Z"$.
+
+Finally, $LK,"CDC","MN:CDC"$'s have an $FG,2$x$FG$, $FG,2$y$FG$ and $FG,2$z$FG$ which is an additional shift (translation).
+
+The transformation is implemented as a callback on the $LK,"CDC","MN:CDC"$'s $FG,2$transform()$FG$ member.  The default $FG,2$transfrom()$FG$ callback is $LK,"GrTransform","MN:GrTransform"$().  See $LK,"::/SparrowOS/Demo/GameStarters/EagleDive.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/EagleDive.CPP.Z"$ or $LK,"::/SparrowOS/Demo/GameStarters/FPS.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/FPS.CPP.Z"$ to see how to change the $FG,2$transfrom()$FG$ callback for foreshortening.
+

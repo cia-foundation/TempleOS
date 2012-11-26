@@ -1,0 +1,48 @@
+#define RANGE_START	1
+#define RANGE_END	100
+ 
+#define FIZZ_SPAN	6
+#define BUZZ_SPAN	7
+ 
+asm {
+MSG_BUZZ:	DU8	"BUZZ\n\0";
+MSG_FIZZ:	DU8	"FIZZ\n\0";
+MSG_BUZZ_FIZZ:	DU8	"BUZZ_FIZZ\n\0";
+MSG_NEW_LINE:	DU8	"\n\0";
+ 
+_BUZZ_FIZZ::
+	ENTER	0	//Always use Enter/Leave
+	PUSH	ESI	//RSI must be preserved.  This instruction is 64-bit.
+	MOV	RAX,RANGE_START
+	MOV	DX,(FIZZ_SPAN-RANGE_START%FIZZ_SPAN+1)<<8+
+		   (BUZZ_SPAN-RANGE_START%BUZZ_SPAN+1)
+ 
+@@05:	DEC	DH
+	JNZ	@@10
+	MOV	DH,FIZZ_SPAN
+	MOV	ESI,MSG_FIZZ
+	DEC	DL
+	JNZ	@@20
+	MOV	DL,BUZZ_SPAN
+	MOV	ESI,MSG_BUZZ_FIZZ
+	JMP	@@20
+ 
+@@10:	DEC	DL
+	JNZ	@@15
+	MOV	DL,BUZZ_SPAN
+	MOV	ESI,MSG_BUZZ
+	JMP	@@20
+ 
+@@15:	CALL	&PUT_HEX_U64
+	MOV	ESI,MSG_NEW_LINE
+@@20:	CALL	&PUT_STR
+ 
+	INC	RAX
+	CMP	RAX,RANGE_END	//Actually only a 32-bit instruction.
+	JBE	@@05
+	POP	ESI
+	LEAVE
+	RET
+}
+ 
+Call(_BUZZ_FIZZ);

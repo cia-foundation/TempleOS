@@ -1,0 +1,183 @@
+$LK,"Welcome","FI:::/SparrowOS/Doc/Welcome.TXT.Z"$    $LK,"Trivial Solutions","FI:::/SparrowOS/Doc/TrivialSolutions.TXT.Z"$
+$LK,"Quick Start--Command Line","HI:Cmd Line (Typically)"$
+$LK,"Demo Index","FI:::/SparrowOS/Doc/DemoIndex.TXT.Z"$ $MA+A-X+PU,"Take Tour","SpawnUser(\"Cd(\\\"::/SparrowOS/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$   $MA+A-X+PU,"Key Map","KeyMap;View;\n"$
+$LK,"Features","FI:::/SparrowOS/Doc/Features.TXT.Z"$               $LK,"Requirements","FI:::/SparrowOS/Doc/Requirements.TXT.Z"$
+$LK,"SparrowOS Constitution","FI:::/SparrowOS/Doc/Constitution.TXT.Z"$ $LK,"Strategic Decisions","FI:::/SparrowOS/Doc/Strategy.TXT.Z"$
+$LK,"Mysteries Explained","FI:::/SparrowOS/Doc/Mysteries.TXT.Z"$    $LK,"Clearing Confusions","FI:::/SparrowOS/Doc/Confuse.TXT.Z"$
+$LK,"Differences from C/C++","FI:::/SparrowOS/Doc/Differences.TXT.Z"$ $LK,"Compiler Directives","FI:::/SparrowOS/Doc/Directives.TXT.Z"$
+$LK,"ChangeLog","FI:::/SparrowOS/Doc/ChangeLog.TXT.Z"$
+	
+$WW,1$$TR,"Level 1: USER HELP"$
+$ID,2$
+$TR,"Keyboard Ctrls"$
+$ID,2$
+$FG,9$Enter$FG$	Right-click menu
+$FG,9$Space Bar$FG$	Edit (view)
+$FG,9$Esc$FG$		Save and exit
+$FG,9$Shift-Esc$FG$	Abort
+$FG,9$Ctrl-m$FG$	Personal Menu
+$FG,9$Windows Key$FG$ Pull-down Menu
+
+Other keys: $MA+A-X+PU,"Key Map","KeyMap;View;\n"$
+
+$ID,-2$$TR,"Mouse Ctrls"$
+$ID,2$
+$FG,9$Right-Click$FG$	Right-click menu
+$FG,9$Left-Click$FG$	Edit (view)
+$FG,9$Double-Left$FG$	Save and exit
+$FG,9$Double-Right$FG$ Abort
+$FG,9$Top of Screen$FG$ Pull-down menu
+
+$ID,-2$$LK,"Glossary","FI:::/SparrowOS/Doc/Glossary.TXT.Z"$
+$LK,"TSZ Window's Utility","FI:::/SparrowOS/Doc/TSZ.TXT.Z"$
+$LK,"Tips on Using SparrowOS","FI:::/SparrowOS/Doc/Tips.TXT.Z"$
+$LK,"SparrowOS Quirks","FI:::/SparrowOS/Doc/Quirks.TXT.Z"$
+
+$SP,"",1$	This button on the wall paper
+	starts a terminal window.
+
+
+$TR,"DIRECTORY STRUCTURE"$
+$ID,2$
+$FG,2$/SparrowOS/Accts$FG$ Each subdirectory is an acct.  When you boot, you can select an acct to login to, unless you compile OSMain soas to pick one.  Your acct directory is your $FG,2$HOME$FG$ directory and all your user data should be placed in here to ease backing-up your data.  When you Install an application it will create a subdirectory of your $FG,2$HOME$FG$ directory for storage.
+
+$FG,2$/SparrowOS/Apps$FG$ Applications are placed in subdirectories of $FG,2$/SparrowOS/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your personal menu, use $FG,2$<CTRL-L>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
+
+$FG,2$/SparrowOS/Demo$FG$ Here you can find lots of sample code to do various things.
+
+$FG,2$/SparrowOS/Doc$FG$ Here you can find documentation.
+
+$FG,2$/SparrowOS/OSMain$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a "kernel" would be confusing, but that's what it is.  It is statically compiled by $LK,"InstallBoot","MN:InstallBoot"$().  It is loaded by the boot loader and must fit in 640K.
+
+$FG,2$/SparrowOS/Compiler$FG$ The compiler module src code is found here.  The compiler is statically compiled to produce a binary file which is loaded at boot.  It is also statically compiled by $LK,"InstallBoot","MN:InstallBoot"$().
+
+$FG,2$/SparrowOS/Adam$FG$ The non-kernel part of the operating system is found here.  It is JIT compiled during boot.
+
+$FG,2$/0000Boot$FG$ directory and the $FG,2$0000OSMain.BIN.C$FG$ file are named so that they are first in alphabetical order and, therefore, at a predictable CD/DVD block address.  The $LK,"CD/DVD Boot Loader","FI:::/SparrowOS/Adam/Boot/BootCD.CPP.Z"$ will find $FG,2$0000OSMain.BIN.C$FG$ at $LK,"Block #0x16","MN:CDBootFileCreate"$.  The SparrowOS boot loader can be used with $FG,4$$TX+HTML,"http://www.magiciso.com","http://www.magiciso.com"$$FG$ if you place $FG,2$0000OSMain.BIN.C$FG$ in the right spot.  $FG,2$OldMBR.BIN.C$FG$ and $FG,2$BootMHD2.BIN.C$FG$ will be found in $FG,2$/0000Boot$FG$ if you run $LK,"InstallMasterBoot","MN:InstallMasterBoot"$() to install a hard-drive master boot loader.
+
+$ID,-2$$TR,"DOLLAR SIGN CMDS"$
+$ID,2$
+$LK,"Dollar Sign Cmds","FI:::/SparrowOS/Doc/Dollar.TXT.Z"$ are rich-text cmds.  The editor, compiler, assembler and operating system are seamlessly equiped to handle SparrowOS rich text.  Cmds like $LK,"Dir","MN:Dir"$() and $LK,"Grep","MN:Grep"$() can output links to the cmd line.
+
+$ID,-2$$TR,"CMD PROMPT"$
+$ID,2$
+The SparrowOS cmd line interface is based on C/C++. Explore the ".CPP.Z" files.  A cmd which takes no args may be executed by typing the name and a semicolon.  Cmds with args require placing the arg in parentheses like a function call.
+
+$MA,"Dir(\"*\");"$ will list files in the current directory.
+
+$MA,"Dir;"$ uses default of "*".
+
+$MA,"Cd(\"::/SparrowOS/Apps\");"$ will change directories.
+
+Directories are referenced with "/" not "\".  The Boot drive is referred to with "$FG,2$::$FG$".  Other drives are referred to by a letter and a colon.  Your user acct directory is referred to with "$FG,2$HOME$FG$".
+
+If a file is not found in one directory, all it's parents are searched. 
+
+$FG,9$Ed("FILENAME.TXT.Z");$FG$ Invokes the editor. See $LK,"DOC LINK TYPES","MN:LK_FILE"$.
+
+
+Some cmds like $LK,"Grep","MN:Grep"$() take a "find_files_mask".  They begin with the name of a dir tree and end with a list of filename masks.  See $LK,"FilesFindMatch","MN:FilesFindMatch"$().
+
+$FG,9$Grep("pattern","/SparrowOS/Demo/*.CPP.Z;*.TXT.Z;");$FG$
+
+Be aware of $LK,"TEXT_FILE_MASK","MN:TEXT_FILE_MASK"$ and $LK,"SRC_FILE_MASK","MN:SRC_FILE_MASK"$.
+
+$ID,-2$$TR,"BURNING CD-ROMs/DVDs"$
+$ID,2$
+0) Prepare a directory with the files you wish to burn.
+1) Use $LK+S,"CDFileCreate","MN:CDFileCreate"$() to make an ISO image file.
+2) Use $LK+S,"CDImageWrite","MN:CDImageWrite"$() to burn an ISO file onto a CD or DVD.
+
+$LK,"Bootable CD-ROMs","FF:::/SparrowOS/Doc/FileMgr.TXT.Z,Bootable"$ 
+
+$ID,-2$
+$ID,-2$$TR,"Level 2: ADMIN HELP"$
+$ID,2$
+Use $LK,"Mount","MN:Mount"$() to mount disk drives.  
+
+$LK,"Installing","FI:::/SparrowOS/Doc/Install.TXT.Z"$
+$LK,"Acct Files","FF:::/SparrowOS/Doc/GuideLines.TXT.Z,ACCT FILES"$
+
+$LK-A+S,"::/SparrowOS/OSMain/Adam1.CPP.Z"$ the SparrowOS equivalent of the $FG,2$AUTOEXEC.BAT$FG$.
+
+$ID,-2$$TR,"Level 3: PROGRAMMER HELP"$
+$ID,2$
+$LK,"Guidelines","FI:::/SparrowOS/Doc/GuideLines.TXT.Z"$
+$LK,"Differences from C/C++","FI:::/SparrowOS/Doc/Differences.TXT.Z"$
+$LK,"Graphics","FI:::/SparrowOS/Doc/Graphics.TXT.Z"$
+$LK,"Multitasking","FI:::/SparrowOS/Doc/MultiTasking.TXT.Z"$
+$LK,"Doc Documents","FI:::/SparrowOS/Demo/Doc/FileRead.CPP.Z"$
+$LK,"Lectures/AndNotMod.CPP.Z","FI:::/SparrowOS/Demo/Lectures/AndNotMod.CPP.Z"$
+$LK,"Lectures/FixedPoint.CPP.Z","FI:::/SparrowOS/Demo/Lectures/FixedPoint.CPP.Z"$
+$LK,"Lectures/Uncached.CPP.Z","FI:::/SparrowOS/Demo/Lectures/Uncached.CPP.Z"$
+$LK,"Lectures/Optimization.CPP.Z","FI:::/SparrowOS/Demo/Lectures/Optimization.CPP.Z"$
+$LK,"Lectures/ScreenMemory.CPP.Z","FI:::/SparrowOS/Demo/Lectures/ScreenMemory.CPP.Z"$
+$LK,"Lectures/GraphicsCPULoad.CPP.Z","FI:::/SparrowOS/Demo/Lectures/GraphicsCPULoad.CPP.Z"$
+$LK,"Lectures/InterruptDemo.CPP.Z","FI:::/SparrowOS/Demo/Lectures/InterruptDemo.CPP.Z"$
+$LK,"Lectures/Spinning.CPP.Z","FI:::/SparrowOS/Demo/Lectures/Spinning.CPP.Z"$
+
+$ID,-2$$TR,"Level 4: SYSTEM PROGRAMMER HELP"$
+$ID,2$
+$LK,"System Programming Guide-Lines","FI:::/SparrowOS/Doc/SysPgmGuide.TXT.Z"$
+$LK,"Hash Tables","FL:::/SparrowOS/OSMain/Hash1a.CPP.Z,1"$
+$LK,"Keyboard Handling","FA:::/SparrowOS/Doc/KeyBoard.TXT.Z,PutKeyHandling"$
+$LK,"Page Table Entries 1","FI:::/SparrowOS/Demo/Lectures/PageTableEntries1.CPP.Z"$
+$LK,"Page Table Entries 2","FI:::/SparrowOS/Demo/Lectures/PageTableEntries2.CPP.Z"$
+$LK,"PCIInterrupts.CPP.Z","FI:::/SparrowOS/Demo/Lectures/PCIInterrupts.CPP.Z"$
+$LK,"MemRep","MN:MemRep"$
+$LK,"WallPaper.CPP.Z","FI:::/SparrowOS/Adam/WallPaper.CPP.Z"$
+$LK,"Adding a New File System","FI:::/SparrowOS/Doc/NewFileSystem.TXT.Z"$
+$LK,"Scheduler.CPP.Z","FL:::/SparrowOS/OSMain/Scheduler.CPP.Z,1"$
+$LK,"Doc","FA:::/SparrowOS/Adam/Doc/Doc.CPP.Z,Doc"$
+$LK,"MiniGrLib","FI:::/SparrowOS/Demo/Lectures/MiniGrLib.CPP.Z"$
+$LK,"MiniCompiler","FI:::/SparrowOS/Demo/Lectures/MiniCompiler.CPP.Z"$
+$LK,"Backend","FL:::/SparrowOS/Compiler/BackEnd.CPP.Z,1"$
+
+$ID,-2$
+$WW,0$$LK,"AutoFile","HI:AutoFile"$
+$LK,"Bit","HI:Bit"$
+$LK,"Boot","HI:Boot"$
+$LK,"Call","HI:Call"$
+$LK,"Char","HI:Char"$
+$LK,"Circular Queue","HI:Circular Queue"$
+$LK,"Cmd Line (Typically)","HI:Cmd Line (Typically)"$
+$LK,"Compiler","HI:Compiler"$
+$LK,"Compression","HI:Compression"$
+$LK,"Ctrls","HI:Ctrls"$
+$LK,"Debugging","HI:Debugging"$
+$LK,"Device","HI:Device"$
+$LK,"Exceptions","HI:Exceptions"$
+$LK,"Fifo","HI:Fifo"$
+$LK,"File","HI:File"$
+$LK,"Graphics Overview","FI:::/SparrowOS/Doc/Graphics.TXT.Z"$
+$LK,"Graphic Routines","HI:Graphics"$
+$LK,"Hash","HI:Hash"$
+$LK,"Help System","HI:Help System"$
+$LK,"Info","HI:Info"$
+$LK,"Input Pointer","HI:Input Pointer"$
+$LK,"Install","HI:Install"$
+$LK,"I/O","HI:I/O"$
+$LK,"Doc","HI:Doc"$
+$LK,"TSZ","FI:::/SparrowOS/Doc/TSZ.TXT.Z"$
+$LK,"Math","HI:Math"$
+$LK,"Memory","HI:Memory"$
+$LK,"Menus","HI:Menus"$
+$LK,"Messages","HI:Messages"$
+$LK,"Misc","HI:Misc"$
+$LK,"MultiCore","HI:MultiCore"$
+$LK,"Named Frames","HI:Hash/Named Frame"$
+$LK,"CMathODE","HI:CMathODE"$
+$LK,"OpCodes","FI:::/SparrowOS/Compiler/OpCodes.TXT.Z"$
+$LK,"Operator Precedences","FF:::/SparrowOS/Doc/Differences.TXT.Z,operator precedence"$
+$LK,"PrintF Extended Codes","FA:::/SparrowOS/Doc/Differences.TXT.Z,PrintF_Codes"$
+$LK,"Processor","HI:Processor"$
+$LK,"Profiler","HI:Profiler"$
+$LK,"PCI","HI:PCI"$
+$LK,"Sound","HI:Snd"$
+$LK,"Task","HI:Task"$
+$LK,"Time","HI:Time"$
+$LK,"Training","HI:Training"$
+$LK,"Windows","HI:Windows"$
+$LK,"WordStat","HI:WordStat"$
+$LK,"Utils","HI:Utils"$
+           7         üÿÿÿ-      		       )      	      Term  

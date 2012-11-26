@@ -1,0 +1,186 @@
+* Preempt-->cli
+
+* Why is bitmap different from vector in $LK,"Logo","FI:::/SparrowOS/Accts/TS/TAD/Archive/Logo.TXT.Z"$?
+
+* Hangs after pressing Compile MAIN in menu.
+* Crashes after back-up-script.  Went away maybe after spurious IRQ fix.
+* Might be same as last one. Back-up-script cause jumps back and forth in ToHtml
+* Music organ hangs when cursoring around.
+
+* $LK,"DocUpdateTaskDocs","MN:DocUpdateTaskDocs"$() skips locked docs. $LK,"WinMgrSync","MN:WinMgrSync"$() needs to check.
+
+* Why is wordstat so slow on "OldMasterBootWrite" for example.
+
+* $LK,"Plain","MN:Plain"$() might be better not saving $LK,"CH_CURSOR","MN:CH_CURSOR"$.
+
+* TRANSPARENT might not work with line ROPF_DITHER
+
+* It would be nice if $LK,"U","MN:U"$() NOP were better.
+
+* Autoindent is very bad.
+
+* Make native file system expanded size set in Copy.
+
+* unhandled exception on MP message gets overwritten by WinMgr
+
+* Cmd to enable/disable compiler warnings
+
+* make aware of ctrl-r side bar 
+
+* fix problem -- remembering 0 terminator in str or not for $$DA
+* GetS, crazy putkey code
+* editor page formatting
+
+* $LK,"gr_screen_image","MN:gr_screen_image"$
+  >Might want to do ZOOM in U8 graphics and convert screen capture to U8
+  >Might want to reverse bit order
+
+* wenceslas crashes in testsuite, sometimes
+
+* CGrVectMap sucks
+* return vals for grrect, grblot, grputchar?
+* collisions for grrect, grblot, grputchar?
+
+* 32-bit devices should be in free spot address space of E820.
+
+* RAM drive too small for SparrowOSCD.ISO
+$WW,1$
+* Race condition in Navy.CPP.Z torpedo
+
+* Logrep throw for out-of-mem?
+* {Lock|Rep}{Seg|2E=NotBr|3E=Br}{OP}{ADD}{REX}
+* Virtual Box MP reboot
+* Std local var names
+* EIE_ABS_ADDR 64
+
+//After Egypt possible future ideas
+//$LK,"Numbers,13:33","BF:Numbers,13:33"$ scouts
+//$LK,"Numbers,21:8","BF:Numbers,21:8"$ snakes
+
+GrEdit: Move sidebar selected elems.
+	- Be careful of multipt elems.
+GrEdit: Strip origin shift cmds.
+
+GrEditBitMap, grabscroll? 
+GrEditBitMap, cut/paste boxes.
+
+extern of fun with dft arg of str?
+
+* We kinda need a routine to return how much free memory, so that applications can plan a big alloc.
+
+* FileMgr bad with lots of files.  
+
+* This $LK,"Fs->catch_except=TRUE","FF:::/SparrowOS/OSMain/TaskCmd.CPP.Z,Fs->catch_except=TRUE"$ causes problems because it catches divide and out-of-mem.  Not sure what to do, yet.
+* $LK,"MPStart","MN:MPStart"$() free old task memory. (Prolly never gonna do anything about this.)
+* $LK,"sys_var_init_flag","MN:sys_var_init_flag"$ local vars.
+* sprite shift pts, ctrl pt for ellipse/polygon w,h is off when rotated.
+
+* Window mgr needs to do DOC operations on posted messages from mouse.  Works for $LK,"SetIP","MN:SetIP"$(), though.
+
+* Add local vars to sym table in $LK,"Dbg","MN:Dbg"$()?  (maybe)
+
+This shit:
+$HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/WAr-xYtBFbY?hl=en&fs=1\"></param><param name=\"allowFullScreen\" value=\"true\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/WAr-xYtBFbY?hl=en&fs=1\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" width=\"750\" height=\"520\"></embed></object>"$
+
+
+* $LK,"Bible sized nodes","FF:::/SparrowOS/Adam/Doc/DocRecalc.CPP.Z,->tag+i"$
+* Mouseinstall throws exceptions, doesn't work, investigate Mouse $LK,"0x9FC30","FF:::/SparrowOS/OSMain/KbdMouse/Mouse.CPP.Z,9FC"$
+* get kbd lights working.
+* figure-out hyperthread vs nonhyperthread CPU's
+* Might have issue with compiler exceptions and restoring lex.hash tables.
+* Generates two compiler error messages for expressions in statements.
+* release semaphores or break lock sema,usb_td
+* Fix Mom's secondary CD-ROM, dad's primary
+* pmtstr in install didn't like focus change
+
+*$FG,2$U0 Main()
+{
+  U0 (*fp_old_draw_input_ptr)(CDC *dc,I64 x,I64 y)=fp_draw_input_ptr;
+}$FG$
+
+* Syncronize VGA memory update with the hardware refresh cycle.
+
+* Demo $LK,"ToHtml","MN:ToHtml"$().
+
+* Del short name in FAT32--currently I do not check to see if I have generated a unique short name and one can delete multiple files accidentally.  Generating unique short names is a pain in the ass because you have to scan the whole directory.  I think I just truncate the name instead of "Program~1" or whatever. S081130-0001.BMP crashed windows--two identical short names.
+
+* OVERSTRIKE at cmd line with menu macro.
+
+* $FG,2$lock{}$FG$ warning on invalid modes.
+* Local array vars-->reg.
+* $LK,"DCF_SYMMETRY","MN:DCF_SYMMETRY"$, before transformation? (Currently it's after) 
+* all graphics clipping -- screen y+top<0 for top<0
+* Maybe convert graphics to float
+* compiler F32
+* preempt(OFF) during graphic clipping?
+* compiler optimization heap_glbls with added offset
+* static_compile extern glblvar references. 
+* extern glbl var in static module on data heap.
+* Might make FAT32 read in contiguous chunks.
+* make Limit(),Min(),Max() asm routines.
+* Might make CSprite flood fill operate on a separate bitmap and blotted at the end.
+* autofile popup of popup
+* <CTRL-R> delete subsprite in menu near others
+* consider changing domenu so a real <ESC> on menu item doesn't select (<SPACE BAR> sends <ESC> followed by <SPACE BAR> or something)
+* puts3 with depth buf?  might not do this
+* make task queins and querem safe for multicore cycling through tasks (fwd).
+* make better heapwalk, do something with _CFG_HEAP_DBG.
+* log to file--would be inefficient--load-in whole file, modify and write out.  Useful, but not very efficient  (SparrowOS file system has no grow-file ability.  Created when FAT patent was an issue and wanted absly nothing people could sue me for.)
+* APIC2
+* import intel datasheets, somehow?
+* Might make DskView show drive colors.
+* Might do utility to set drive colors, making a tree entry in Adam 3 using registry-like routines... or registry I guess.
+
+* New Editor widgets
+
+* Make use of flag potential in SysFilesFind and possibly CFileAccess
+* implement fixed pos files
+
+* new C+ language features
+* better debugging
+
+* Change hardcoded stuff to Define
+* Too much preemption turned off?
+* Look for mem leaks.
+* Move stuff out of OSmain.
+
+* $LK,"ROP_XOR","MN:ROP_XOR"$ with pen_width>1 is broken.
+
+* use width and height in line clipping for pen_width>1 or blot.
+* SIMD transformation
+* test removable media id  (critical for resident files)
+
+* add field overflow U8 "t='*'"
+* Implement fmt codes into GetF
+* GetF date codes and maybe $FG,2$h$FG$ fmts for nums
+* Date Input
+* Default date fmt
+
+* 16 bit Unassembly is bad--very low priority
+* more signed int disassembly
+* support r4u8 by adding 0x40 byte
+* static var off of data heap.
+* Might want to use U32*U32 multiplication.
+* could add "const" to not set LF_NOT_CONSTANT flag for trig, etc.
+* do r,rm ICCmp like ICBrCmp
+* could make glblvar imports use TY_RIP_DISP32.
+* PUSH_CMP allocs reg R9 or whatever
+* Might be problem with NOP in OPT pass1 for NO_PUSH in expressions besides assignments.  Is ShiftNoPush fully implemented?
+* NOP1 might need to have diff ic_data's
+* in divequal, it assumes about ebx
+* error/warning line nums
+* ASM branch out warning of range off by 1 line--use lx->last_line_num
+
+* Switch statement with sparse cases (low priority)
+* maybe inline functions?
+* Use of more floating-point stk?
+
+* More aggressive in this routine $LK,"CmpF2PushPop","MN:CmpF2PushPop"$() with types besides MOV and F64. 
+* !dbl ~dbl
+* &=, |= can overflow with Bts Btr on small data types
+
+* num lock comes on with break key
+* sort options for findfiles
+* recalc_start could be more accurate before recalculating?
+* Maybe, get rid of $LK,"0x20000","FF:::/SparrowOS/Compiler/CmpMain.CPP.Z,0x20000"$ in compiler.
+* get rid of "$FG,2$$$PI$FG$" alias.

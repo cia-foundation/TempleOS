@@ -1,0 +1,28 @@
+/* To run this, do a directory, right click on
+this file's name and select "AutoFile".
+Or, type $LK,"AutoFile","MN:AutoFile"$(filename);
+See $LK,"AutoFile","FF:::/SparrowOS/Doc/Glossary.TXT.Z,AutoFile"$ in the glossary for more info.
+
+This autofile will renum the defines in
+AFEd.TXT.Z.  Test it by numbering a few wrong
+and running this demo.
+
+*/
+
+U8 i;
+
+"Ed(\"AFEd.TXT.Z\");\n";
+//Go to start of file
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+for (i=0;i<=0xC3;i++) {
+  if (i)
+    Msg(MSG_KEY_DOWN_UP,0,SC_F3);
+  else
+    "%c0x%c",CH_CTRLF,CH_ESC;
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  "%02X",i;
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  "%c%c",CH_BACKSPACE,CH_BACKSPACE;
+}
