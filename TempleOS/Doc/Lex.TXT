@@ -1,0 +1,4 @@
+$WW,1$The compiler's lexical analyzer can be used in your programs to simplify parsing.  See $LK,"Doc Parsing","FF:::/TempleOS/Adam/Doc/DocPlain.CPP,LexNew"$ or $LK,"Parse Opcode File","FF:::/TempleOS/Compiler/CmpInit.CPP,Opcodes.TXT"$.
+
+See $LK,"Tokens","MN:TK_IDENT"$.
+

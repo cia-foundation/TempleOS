@@ -1,0 +1,6 @@
+$WW,1$To allow different languages and customization, TempleOS uses strings to identify actual strings to be displayed.  This is basically a level of indirection.  Support for lsts of strings is also provided, but it's not especially efficient.
+
+Each task can load it's own Define strings.  If a string is not found, the parent task's table is searched.
+
+See $LK-A,"::/TempleOS/Demo/Define.CPP"$.
+

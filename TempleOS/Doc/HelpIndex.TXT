@@ -1,0 +1,184 @@
+$LK,"Welcome","FI:::/TempleOS/Doc/Welcome.TXT"$    $LK,"Trivial Solutions","FI:::/TempleOS/Doc/TrivialSolutions.TXT"$
+$LK,"Quick Start--Command Line","HI:Cmd Line (Typically)"$
+$LK,"Demo Index","FI:::/TempleOS/Doc/DemoIndex.TXT"$ $MA+A-X+PU,"Take Tour","SpawnUser(\"Cd(\\\"::/TempleOS/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$   $MA+A-X+PU,"Key Map","KeyMap;View;\n"$
+$LK,"Features","FI:::/TempleOS/Doc/Features.TXT"$               $LK,"Requirements","FI:::/TempleOS/Doc/Requirements.TXT"$
+$LK,"TempleOS Charter","FI:::/TempleOS/Doc/Charter.TXT"$ $LK,"Strategic Decisions","FI:::/TempleOS/Doc/Strategy.TXT"$
+$LK,"Mysteries Explained","FI:::/TempleOS/Doc/Mysteries.TXT"$    $LK,"Clearing Confusions","FI:::/TempleOS/Doc/Confuse.TXT"$
+$LK,"Differences from C/C++","FI:::/TempleOS/Doc/Differences.TXT"$ $LK,"Compiler Directives","FI:::/TempleOS/Doc/Directives.TXT"$
+$LK,"ChangeLog","FI:::/TempleOS/Doc/ChangeLog.TXT"$
+	
+$WW,1$$TR,"Level 1: USER HELP"$
+$ID,2$
+$TR,"Keyboard Ctrls"$
+$ID,2$
+$FG,9$Enter$FG$	Right-click menu
+$FG,9$Space Bar$FG$	Edit (view)
+$FG,9$Esc$FG$		Save and exit
+$FG,9$Shift-Esc$FG$	Abort
+$FG,9$Ctrl-m$FG$	Personal Menu
+$FG,9$Windows Key$FG$ Pull-down Menu
+
+Other keys: $MA+A-X+PU,"Key Map","KeyMap;View;\n"$
+
+$ID,-2$$TR,"Mouse Ctrls"$
+$ID,2$
+$FG,9$Right-Click$FG$	Right-click menu
+$FG,9$Left-Click$FG$	Edit (view)
+$FG,9$Double-Left$FG$	Save and exit
+$FG,9$Double-Right$FG$ Abort
+$FG,9$Top of Screen$FG$ Pull-down menu
+
+$ID,-2$$LK,"Glossary","FI:::/TempleOS/Doc/Glossary.TXT"$
+$LK,"TSZ Window's Utility","FI:::/TempleOS/Doc/TSZ.TXT"$
+$LK,"Tips on Using TempleOS","FI:::/TempleOS/Doc/Tips.TXT"$
+$LK,"TempleOS Quirks","FI:::/TempleOS/Doc/Quirks.TXT"$
+
+$SP,"",1$	This button on the wall paper
+	starts a terminal window.
+
+
+$TR,"DIRECTORY STRUCTURE"$
+$ID,2$
+$FG,2$/TempleOS/Accts$FG$ Each subdirectory is an acct.  When you boot, you can select an acct to login to, unless you compile Kernel soas to pick one.  Your acct directory is your $FG,2$HOME$FG$ directory and all your user data should be placed in here to ease backing-up your data.  When you Install an application it will create a subdirectory of your $FG,2$HOME$FG$ directory for storage.
+
+$FG,2$/TempleOS/Apps$FG$ Applications are placed in subdirectories of $FG,2$/TempleOS/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your personal menu, use $FG,2$<CTRL-L>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
+
+$FG,2$/TempleOS/Demo$FG$ Here you can find lots of sample code to do various things.
+
+$FG,2$/TempleOS/Doc$FG$ Here you can find documentation.
+
+$FG,2$/TempleOS/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a "$FG,2$kernel$FG$" is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  It is loaded by the boot loader and must fit in 640K.
+
+$FG,2$/TempleOS/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It is also $FG,2$AOT$FG$ compiled by $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().
+
+$FG,2$/TempleOS/Adam$FG$ The non-kernel part of the operating system is found here.  It is JIT compiled during boot.
+
+$FG,2$/0000Boot$FG$ directory and the $FG,2$0000Kernel.BIN.C$FG$ file are named so that they are first in alphabetical order and, therefore, at a predictable CD/DVD block address.  The $LK,"CD/DVD Boot Loader","FI:::/TempleOS/Adam/Boot/BootCD.CPP"$ will find $FG,2$0000Kernel.BIN.C$FG$ at $LK,"Block #0x16","MN:CDBootFileCreate"$.  The TempleOS boot loader can be used with $FG,4$$TX+HTML,"http://www.magiciso.com","http://www.magiciso.com"$$FG$ if you place $FG,2$0000Kernel.BIN.C$FG$ in the right spot.  $FG,2$OldMBR.BIN.C$FG$ and $FG,2$BootMHD2.BIN.C$FG$ will be found in $FG,2$/0000Boot$FG$ if you run $LK,"InstallMasterBootLoader","MN:InstallMasterBootLoader"$() to install a hard-drive master boot loader.
+
+$ID,-2$$TR,"DOLLAR SIGN CMDS"$
+$ID,2$
+$LK,"Dollar Sign Cmds","FI:::/TempleOS/Doc/Dollar.TXT"$ are rich-text cmds.  The editor, compiler, assembler and operating system are seamlessly equiped to handle TempleOS rich text.  Cmds like $LK,"Dir","MN:Dir"$() and $LK,"Grep","MN:Grep"$() can output links to the cmd line.
+
+$ID,-2$$TR,"CMD PMT"$
+$ID,2$
+The TempleOS cmd line interface is based on C/C++. Explore the ".CPP.Z" files.  A cmd which takes no args may be executed by typing the name and a semicolon.  Cmds with args require placing the arg in parentheses like a function call.
+
+$MA,"Dir(\"*\");"$ will list files in the current directory.
+
+$MA,"Dir;"$ uses default of "*".
+
+$MA,"Cd(\"::/TempleOS/Apps\");"$ will change directories.
+
+Directories are referenced with "/" not "\".  The boot drive is referred to with "$FG,2$::$FG$".  Other drives are referred to by a letter and a colon.  Your user acct directory is referred to with "$FG,2$HOME$FG$".
+
+If it is not found, "$FG,2$.Z$FG$" is added or removed and a search is done, again.  If a file is still not found, all parent directories are searched.
+
+
+$FG,9$Ed("FILENAME.TXT.Z");$FG$ Invokes the editor. See $LK,"DOC LINK TYPES","MN:LK_FILE"$.
+
+
+Some cmds like $LK,"Grep","MN:Grep"$() take a "find_files_mask".  They begin with the name of a dir tree and end with a list of filename masks.  See $LK,"FilesFindMatch","MN:FilesFindMatch"$().
+
+$FG,9$Grep("pattern","/TempleOS/Demo/*.CPP.Z;*.TXT.Z;");$FG$
+
+Be aware of $LK,"FILENAME_MASK_TXT","MN:FILENAME_MASK_TXT"$ and $LK,"FILENAME_MASK_SRC","MN:FILENAME_MASK_SRC"$.
+
+$ID,-2$$TR,"BURNING CD-ROMs/DVDs"$
+$ID,2$
+0) Prepare a directory with the files you wish to burn.
+1) Use $LK+S,"CDFileCreate","MN:CDFileCreate"$() to make an ISO image file.
+2) Use $LK+S,"CDImageWrite","MN:CDImageWrite"$() to burn an ISO file onto a CD or DVD.
+
+$ID,-2$$LK,"Making a Distro ISO","FI:::/TempleOS/Demo/MakeDistro.CPP.Z"$
+
+$ID,-2$$TR,"Level 2: ADMIN HELP"$
+$ID,2$
+Use $LK,"Mount","MN:Mount"$() to mount disk drives.  
+
+$LK,"Installing","FI:::/TempleOS/Doc/Install.TXT"$
+$LK,"Acct Files","FF:::/TempleOS/Doc/GuideLines.TXT,ACCT FILES"$
+
+$LK-A+S,"::/TempleOS/Kernel/Adam1.CPP"$ the TempleOS equivalent of the $FG,2$AUTOEXEC.BAT$FG$.
+
+$ID,-2$$TR,"Level 3: PROGRAMMER HELP"$
+$ID,2$
+$LK,"Guidelines","FI:::/TempleOS/Doc/GuideLines.TXT"$
+$LK,"Differences from C/C++","FI:::/TempleOS/Doc/Differences.TXT"$
+$LK,"Graphics","FI:::/TempleOS/Doc/Graphics.TXT"$
+$LK,"Multitasking","FI:::/TempleOS/Doc/MultiTasking.TXT"$
+$LK,"Doc Documents","FI:::/TempleOS/Demo/Doc/FileRead.CPP"$
+$LK,"Lectures/AndNotMod.CPP","FI:::/TempleOS/Demo/Lectures/AndNotMod.CPP"$
+$LK,"Lectures/FixedPoint.CPP","FI:::/TempleOS/Demo/Lectures/FixedPoint.CPP"$
+$LK,"Lectures/Uncached.CPP","FI:::/TempleOS/Demo/Lectures/Uncached.CPP"$
+$LK,"Lectures/Optimization.CPP","FI:::/TempleOS/Demo/Lectures/Optimization.CPP"$
+$LK,"Lectures/ScreenMemory.CPP","FI:::/TempleOS/Demo/Lectures/ScreenMemory.CPP"$
+$LK,"Lectures/GraphicsCPULoad.CPP","FI:::/TempleOS/Demo/Lectures/GraphicsCPULoad.CPP"$
+$LK,"Lectures/InterruptDemo.CPP","FI:::/TempleOS/Demo/Lectures/InterruptDemo.CPP"$
+$LK,"Lectures/Spinning.CPP","FI:::/TempleOS/Demo/Lectures/Spinning.CPP"$
+
+$ID,-2$$TR,"Level 4: SYSTEM PROGRAMMER HELP"$
+$ID,2$
+$LK,"System Programming Guide-Lines","FI:::/TempleOS/Doc/SysPgmGuide.TXT"$
+$LK,"64BitAsmQuiz","FI:::/TempleOS/Demo/Lectures/64BitAsmQuiz.TXT"$
+$LK,"Hash Tables","FL:::/TempleOS/Kernel/Hash1a.CPP,1"$
+$LK,"Keyboard Handling","FA:::/TempleOS/Doc/KeyBoard.TXT,PutKeyHandling"$
+$LK,"Page Table Entries 1","FI:::/TempleOS/Demo/Lectures/PageTableEntries1.CPP"$
+$LK,"Page Table Entries 2","FI:::/TempleOS/Demo/Lectures/PageTableEntries2.CPP"$
+$LK,"PCIInterrupts.CPP","FI:::/TempleOS/Demo/Lectures/PCIInterrupts.CPP"$
+$LK,"MemRep","MN:MemRep"$
+$LK,"WallPaper.CPP","FI:::/TempleOS/Adam/WallPaper.CPP"$
+$LK,"Adding a New File System","FI:::/TempleOS/Doc/NewFileSystem.TXT"$
+$LK,"Scheduler.CPP","FL:::/TempleOS/Kernel/Scheduler.CPP,1"$
+$LK,"Doc","FA:::/TempleOS/Adam/Doc/Doc.CPP,Doc"$
+$LK,"MiniGrLib","FI:::/TempleOS/Demo/Lectures/MiniGrLib.CPP"$
+$LK,"MiniCompiler","FI:::/TempleOS/Demo/Lectures/MiniCompiler.CPP"$
+$LK,"Backend","FL:::/TempleOS/Compiler/BackEnd.CPP,1"$
+
+$ID,-2$
+$WW,0$$LK,"AutoFile","HI:AutoFile"$
+$LK,"Bit","HI:Bit"$
+$LK,"Boot","HI:Boot"$
+$LK,"Call","HI:Call"$
+$LK,"Char","HI:Char"$
+$LK,"Circular Queue","HI:Circular Queue"$
+$LK,"Cmd Line (Typically)","HI:Cmd Line (Typically)"$
+$LK,"Compiler","HI:Compiler"$
+$LK,"Compression","HI:Compression"$
+$LK,"Ctrls","HI:Ctrls"$
+$LK,"Debugging","HI:Debugging"$
+$LK,"Device","HI:Device"$
+$LK,"Doc","HI:Doc"$
+$LK,"Exceptions","HI:Exceptions"$
+$LK,"Fifo","HI:Fifo"$
+$LK,"File","HI:File"$
+$LK,"Graphics Overview","FI:::/TempleOS/Doc/Graphics.TXT"$
+$LK,"Graphic Routines","HI:Graphics"$
+$LK,"Hash","HI:Hash"$
+$LK,"Help System","HI:Help System"$
+$LK,"Info","HI:Info"$
+$LK,"Input Pointer","HI:Input Pointer"$
+$LK,"Install","HI:Install"$
+$LK,"I/O","HI:I/O"$
+$LK,"TSZ","FI:::/TempleOS/Doc/TSZ.TXT"$
+$LK,"Math","HI:Math"$
+$LK,"Memory","HI:Memory"$
+$LK,"Menus","HI:Menus"$
+$LK,"Messages","HI:Messages"$
+$LK,"Misc","HI:Misc"$
+$LK,"MultiCore","HI:MultiCore"$
+$LK,"Named Frames","HI:Hash/Named Frame"$
+$LK,"CMathODE","HI:CMathODE"$
+$LK,"OpCodes","FI:::/TempleOS/Compiler/OpCodes.TXT"$
+$LK,"Operator Precedences","FF:::/TempleOS/Doc/Differences.TXT,operator precedence"$
+$LK,"PrintF Extended Codes","FA:::/TempleOS/Doc/Differences.TXT,PrintF_Codes"$
+$LK,"Processor","HI:Processor"$
+$LK,"Profiler","HI:Profiler"$
+$LK,"PCI","HI:PCI"$
+$LK,"Sound","HI:Snd"$
+$LK,"Task","HI:Task"$
+$LK,"Time","HI:Time"$
+$LK,"Training","HI:Training"$
+$LK,"Windows","HI:Windows"$
+$LK,"WordStat","HI:WordStat"$
+$LK,"Utils","HI:Utils"$
+           7         üÿÿÿ-      		       )      	      Term  

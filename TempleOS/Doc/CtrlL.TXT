@@ -1,0 +1,41 @@
+$WW,1$See $LK-A,"::/TempleOS/Doc/Dollar.TXT"$ for details on dollar sign cmds.
+
+$FG,2$"Expression"$FG$ a num or C+ algebraic term with operators and C+ syms can be entered.
+$FG,2$"Macro"$FG$ Most entries can behave like macro entries if you assign them macro strs.
+$FG,2$"AutoStr"$FG$ Like a macro except it is an $LK,"AutoFile","FF:::/TempleOS/Doc/Glossary.TXT,AutoFile"$.  You can't have both an autostr and macro text defined.  
+
+$FG,5$Tag Text$FG$ is the text that will be displayed for the item.  For links, you can leave it blank and the details of the link will be shown.
+$FG,5$Hide$FG$ means display nothing, making an entry invisible.
+
+$FG,5$Left X$FG$ relative to the left margin.
+$FG,5$Center X$FG$ relative to the horizontal center of the window.
+$FG,5$Right X$FG$ relative to the right margin.
+$FG,5$Top Y$FG$ relative to the top of the window.
+$FG,5$Center Y$FG$ relative to the vertical center of the window.
+$FG$$FG,5$Bottom Y$FG$ relative to the bottom of the window.
+
+$FG,5$Blink$FG$ make the text blink.
+$FG,5$Invert$FG$ make the text inverted.
+$FG,5$Underline$FG$ make the text underlined. 
+
+$FG,5$Scroll X Length Expression$FG$ if a value is entered, the text will scroll in an area of this width.
+$FG,5$Y Offset Expression$FG$ if a value is entered, the text will be shifted vertically by this many pixels, so you can make superscripts or subscripts.
+$FG,5$X Offset Expression$FG$ if a value is entered, the text will be shifted horizontally by this many pixels.
+
+$FG,5$Tree$FG$ The item will behave like a tree widget, with this as the root.
+$FG,5$Collapsed$FG$ The tree or hidden widget will begin collapsed.
+$FG,5$Alias$FG$ For tree entries, the text of the subentry the cursor is on will appear here.  This is for drop-down lsts.
+$FG,5$Define Str$FG$ will substitute a $FG,2$#define$FG$ or $LK,"DefineLoad","MN:DefineLoad"$() string for the tag.
+
+$FG,5$Quote$FG$ Make the result suitable for including in a program, in quotes, especially $FG,4$fmtstr$FG$ entries in class definitions.
+
+$FG,5$X Expression$FG$ For cursor movements, the horizontal value.
+$FG,5$Y Expression$FG$ For cursor movements, the vertical value.
+
+$FG,5$$BK,1$PopUp$BK,0$$FG$ For macro's, run the macro in a PopUp window.  Do this when making a macro to run a program, so it doesn't tie-up memory.
+
+$FG,5$Escape$FG$ For macro's, send an $FG,2$<ESC>$FG$ char to exit before running the macro.  Without this, the macro runs in the wrong window, usually.
+
+$FG,5$Refresh Data$FG$  updates $FG,4$$$DA$$$FG$ entry continuously.
+
+$FG,5$Html Link$FG$  stores a link which will be embedded if you generate a html version of a document with $LK,"ToHtml","MN:ToHtml"$() or $LK,"Doc2Html","MN:Doc2Html"$().

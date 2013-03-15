@@ -1,0 +1,7 @@
+$FG,5$$WW,1$$TX+CX,"Adding a New File System"$$FG$
+
+If you want to add a support for a new file system, do a text search on "PT_FAT32".  All the places where that occurs will require new entries for your file system type.  $MA+A-X+PU,"Click here for search.","Grep(\"PT_FAT32\",\"/TempleOS/\" FILENAME_MASK_SRC);View;"$
+
+You will also need to add an entry $LK,"here.","FF:::/TempleOS/Kernel/Define1a.CPP,ST_PRT_TYPES"$
+
+  

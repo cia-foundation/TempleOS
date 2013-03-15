@@ -1,3 +1,0 @@
-$WW,1$Intel has an instruction that returns the num of CPU cycles since boot.  This is not calibrated to an accurate real time value, but SparrowOS measures it and you can convert with $LK,"time_stamp_freq","MN:time_stamp_freq"$, a value continuously calibrated from other timers.  This is the fastest timer available.
-
-

@@ -1,0 +1,69 @@
+//You should compile this by calling
+//$LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$(), not doing it directly.
+//See $LK,"Cmp(\"Kernel\")","FF:::/TempleOS/Adam/Boot/InsBoot.CPP,Cmp(\"Kernel\""$.
+
+#exe {
+OptOn(OPTf_WARN_PAREN);
+OptOn(OPTf_WARN_DUP_TYPES);
+#include "KCfg"
+CKernelCfg *kernel_cfg;
+kernel_cfg=KernelCfgNew;
+};
+
+#include "BootDefs.HPP"
+#include "Adam1a.HPP"
+#include "KStart"
+#include "Utils1a"
+#include "Math1a"
+#include "/TempleOS/Compiler/CmpDefs.HPP"
+#include "Adam1b.HPP"
+#include "KExts"
+#include "KGlbls"
+#include "Math1b"
+#include "Scheduler"
+#include "Font8x8"
+#include "Memory"
+#include "Interrupts"
+#include "FIFO"
+#include "Compress"
+#include "Hash1a"
+#include "Date"
+#include "Str1a"
+#include "Define1a"
+#include "Display"
+#include "Misc1a"
+#include "Dbg1a"
+#include "Except"
+#include "KbdMouse/InputPointer"
+#include "KbdMouse/Keyboard"
+#include "KbdMouse/Mouse"
+#include "KbdMouse/Message"
+
+#include "QSort"
+#include "Task1a"
+#include "TaskCmd"
+#include "BIOS32"
+
+#exe {Cd("Dsk");};
+#include "DskStr"
+#include "DskCache"
+#include "ATADef.HPP"
+#include "DskATA"
+#include "Dsk1a"
+#include "DskAddDev"
+#include "DskDir"
+#include "FileSysISO1"
+#include "FileSysNative"
+#include "FileSysFAT"
+#include "Dsk1b"
+#include "DskCFile"
+#include "Dsk1c"
+
+#exe {Cd("..");};
+#include "MultiProc"
+
+#include "EdLite"
+#include "PSect"
+#include "KEnd"
+
+#exe {KernelCfgDel(kernel_cfg);};

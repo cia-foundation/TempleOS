@@ -1,0 +1,31 @@
+// imports all syms from the Adam Task's hash table.
+#include "::/TempleOS/Kernel/AOTAdam.HPP"
+
+asm {
+USE64
+	IMPORT	Beep;
+_MY_BEEP::
+	ENTER	0
+
+	PUSH	FALSE
+	PUSH	300
+	CALL	Beep
+
+	LEAVE
+	RET
+}
+
+_extern _MY_BEEP U0 MyBeep();
+
+U0 Routine2(U8 *st)
+{
+  PrintF("Routine2:%s\n",st);
+  MyBeep();
+}
+
+PutS("$$BK,1$$Woo-Hoo!$$BK,0$$\n");
+Dir;
+PutS("$$BK,1$$Woo-Hoo!$$BK,0$$\n");
+
+Routine2("Cool");
+

@@ -1,0 +1,6 @@
+$WW,1$Uncomment $LK,"#include \"HDAudio\"","FF:HOME/Adam3cSnd.CPP,#include \"HDAudio\""$ in your $FG,2$/HOME/Adam3cSnd.CPP.Z$FG$ file to install a driver for HD Audio.  Cfgure it with $LK-A,"::/TempleOS/Adam/Snd/HDCfg.CPP"$ and add the file created, $FG,4$HOME/HDAudioCfg.CPP.Z$FG$, to your start-up scripts.  $BK,1$Comment it out everything if you get no snd -- the PC Speaker should still work.$BK,0$
+ 
+If you don't have HDAudio, you'll have to live with the PC Speaker.  You might write a driver for your snd card following the HDAudio template.
+
+See $LK-A,"::/TempleOS/Demo/Snd/PolyPhonic.CPP"$, $LK,"SndFileFillBuf","MN:SndFileFillBuf"$() and $LK,"HDFillBuf","MN:HDFillBuf"$() for using HD Audio.  The buffers are managed by $LK,"HDAudioTask","MN:HDAudioTask"$().
+

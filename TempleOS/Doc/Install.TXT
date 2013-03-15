@@ -1,0 +1,48 @@
+$WW,1$$FG,5$$TX+CX,"Installing TempleOS"$$FG$
+
+Burn a CD with software that supports ISO files.  Then, boot it.  It's a live CD, so you can look around with or without installing.
+
+Dual booting with another operating system is the best way to use TempleOS.  You'll need a partition for TempleOS.  Windows often comes with a restore disk that does not allow repartitioning.  I recommend connecting a spare additional hard drive and using the $FG,2$BIOS$FG$ to select which drive to boot.
+
+If you boot the CD-ROM and log-in as the "Install" account it will automate much of this.
+
+See $LK,"Boot.TXT","FI:::/TempleOS/Doc/Boot.TXT"$ for an overview of booting.  See $LK,"Requirements","FI:::/TempleOS/Doc/Requirements.TXT"$ for supported hardware.  See $LK,"Upgrading","FI:::/TempleOS/Doc/Upgrade.TXT"$ if you are upgrading.
+
+Two TempleOS partitions are highly recommended, so you can boot to a back-up and fix the primary when you work on it.  Odds are, you only need a couple gigabytes for your TempleOS partitions.
+
+1)
+$ID,2$$LK,"Mount","MN:Mount"$() use if the drive is partitioned.
+$ID,2$This command mounts a drive making it accessible.  For simplicity, select $FG,2$'C'$FG$ as the first drive letter for your hard drive.  The first partition will be $FG,2$'C'$FG$, second, $FG,2$'D'$FG$, etc.  TempleOS needs 3 numbers to utilize a hard drive -- base0, base1, and unit.  When you enter a hexadecimal number, do it like in $FG,2$C$FG$ with a $FG,2$0x$FG$ prefix.  If the probe was successful, you can just enter the number in the probe box instead of base0.
+$ID,-2$
+$LK,"PrtDsk","MN:PrtDsk"$($FG,2$'C'$FG$) use if drive is not partitioned
+
+$ID,2$This will perform a special $LK,"Mount","MN:Mount"$() automatically.
+
+$BK,1$WARNING:$BK,0$  This command erases everything on a hard drive.  It repartitions a whole drive and formats the partitions$FG$.  This command should be skipped if you already have your hard drive partitioned.
+
+
+$BK,1$WARNING:$BK,0$  This command doesn't play well with other operating systems.  You'll need to do a $LK,"MasterBootZero","MN:MasterBootZero"$() to restore your drive to a state where other operating systems can partition it.
+$ID,-2$
+$ID,-2$2) $LK,"Fmt","MN:Fmt"$($FG,2$'D'$FG$,$FG,2$TRUE,FALSE,PT_FAT32$FG$)
+$ID,2$This command formats a partition with $FG,2$FAT32$FG$ or the TempleOS native file system type.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
+
+$BK,1$WARNING:$BK,0$  If you are upgrading, be sure not to lose the file, $FG,2$/0000Boot/OldMBR.BIN.C$FG$.
+
+$ID,-2$3) $LK,"CopyTree","MN:CopyTree"$($FG,2$"T:/"$FG$,$FG,2$"D:/"$FG$)
+$ID,2$This command is used to copy files onto a hard drive partition from the CD-ROM.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
+
+$ID,-2$4) $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$($FG,2$'D'$FG$)
+$ID,2$This command recompiles the source code on a partition and writes to the $UL,1$partition's$UL,0$ boot record.  You'll need to reenter the $LK,"Mount","MN:Mount"$ information so it can be stored in the kernel.
+
+$ID,-2$5) Use Linux's $LK,"Grub","FI:::/TempleOS/Doc/Grub.TXT"$ or TempleOS' $LK,"InstallMasterBootLoader","MN:InstallMasterBootLoader"$($FG,2$'D'$FG$)
+$ID,2$
+The $LK,"InstallMasterBootLoader","MN:InstallMasterBootLoader"$() command places a boot loader on a drive to boot partitions.  It saves the old master boot record to $FG,2$/0000Boot/OldMBR.BIN.C$FG$ and replaces it.  When you boot, you will have the option of booting the old master boot record.  This command can be skipped if you already have a boot loader.  Be sure not to lose the copy of the old boot record, like if you reformat the partition.
+
+Delete $FG,2$/0000Boot/OldMBR.BIN.C$FG$ if you want to get a fresh copy of a mbr, like if installing from your own custom CD containing it's own $FG,2$/0000Boot/OldMBR.BIN.C$FG$ onto a system with a non-TempleOS boot loader.
+
+If you have anti-virus software, it might object to having a different master boot record.
+$ID,-2$
+
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.
+* "Linux" is probably a trademark owned by Linus Torvalds.

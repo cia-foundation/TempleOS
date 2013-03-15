@@ -1,0 +1,7 @@
+#help_index "Snd"
+#include "/TempleOS/Apps/HolySpirit/HolySpirit"
+#include "/TempleOS/Apps/MusicOrgan/MakeSong"
+#include "/TempleOS/Apps/MusicOrgan/JukeBox"
+#include "/TempleOS/Apps/MusicOrgan/OrganCtrls"
+#include "/TempleOS/Apps/MusicOrgan/Organ"
+#help_index ""

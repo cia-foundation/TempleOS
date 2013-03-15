@@ -1,0 +1,67 @@
+$WW,1$$FG,5$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/vpujlg-XhEs\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Tour Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/SgPd9xhTu9Q\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"User Interface Tutorial Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/eZEEAmTgFy0\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"User Interface Tutorial Part 2"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/X6uKeJt7yhU\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Programming Guide Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/bpr7laEx--k\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/_409whhF_dU\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 2"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/pbaoo_TMa1w\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 3"$
+
+Errata: Multicore timer IRQ is 1000 Hz.  Nonmaskable IRQ is to HLT, not wake.

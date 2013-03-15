@@ -1,0 +1,194 @@
+$WW+H,1$$WW,0$
+
+Hits on /index.html
+'-' is a dup.  '+' is not a dup.
+05/08/09:   95  159
+05/09/09:  109  163
+
+
+Hits on /index.html
+05/08/09 01: +++++
+05/08/09 02: --+++++
+05/08/09 03: ---++++
+05/08/09 04: ----++++
+05/08/09 05: -----++++
+05/08/09 06: ----++
+05/08/09 07: ----+++
+05/08/09 08: ----+
+05/08/09 09: ----+
+05/08/09 10: -----
+05/08/09 11: -----+++
+05/08/09 12: ----++++
+05/08/09 13: ----+
+05/08/09 14: ----+
+05/08/09 15: ------++++
+05/08/09 16: -----+++
+05/08/09 17: ----+
+05/08/09 18: -----++++
+05/08/09 19: -----
+05/08/09 20: ----++
+05/08/09 21: ----++
+05/08/09 22: -----++++++
+05/08/09 23: -----++++
+05/09/09 00: -----++++
+05/09/09 01: ----+
+05/09/09 02: ------+++++
+05/09/09 03: ----
+05/09/09 04: ----+
+05/09/09 05: ---+++
+05/09/09 06: ----++++++
+05/09/09 07: ----++
+05/09/09 08: ----+++
+05/09/09 09: -----
+05/09/09 10: ----++
+05/09/09 11: ----+
+05/09/09 12: ----++
+05/09/09 13: ----++++
+05/09/09 14: -----++
+05/09/09 15: ----+
+05/09/09 16: ----+
+05/09/09 17: ----++
+05/09/09 18: -----+
+05/09/09 19: ----++++
+05/09/09 20: ----
+05/09/09 21: -----+++
+05/09/09 22: -----------++++
+05/09/09 23: ----++
+05/10/09 00: ----++++
+Total:330  Dups:208
+
+
+Hits on /index.html
+ 60:-
+  2:http://cplus.about.com/b/2008/11/20/amazing-home-brew-operating-system.htm
+  2:http://en.wikipedia.org/wiki/TempleOS
+  2:http://fileforum.betanews.com/detail/TempleOS/1183618683/1
+  3:http://filext.com/file-extension/iso
+  1:http://forum.osdev.org/viewtopic.php?f=1&t=18653&hilit=Multicore
+  1:http://qr.cz/index.php?recordStart=7
+  3:http://royal.pingdom.com/2008/09/26/10-amazingly-alternative-operating-systems-and-what-they-could-mean-for-the-future/
+  1:http://search.yahoo.com/search?p=download+c+source+files&ei=UTF-8&fr=yfp-t-501&fr2=rs-bottom&rs=0&xargs=0&pstart=1&b=11&xa=QbssPtUmwXWKlURq0.LOMA--,1241880988
+  2:http://sourceforge.net/projects/templeos4/
+  1:http://www.addfree100links.com/valuesite/templeos.org.html
+  1:http://www.cs.toronto.edu/~ad/news/
+  1:http://www.cs.toronto.edu/~ad/news/item?id=116
+  1:http://www.freeware-guide.com/dir/softdev/codeutil/TempleOS.html
+  1:http://www.google.be/search?hl=nl&ei=UVIFStXTO4LE-Ab_ooSSAw&sa=X&oi=spell&resnum=1&ct=result&cd=1&q=64+bit+os&spell=1
+  1:http://www.google.ca/search?rlz=1C1GGLS_enCA322CA324&sourceid=chrome&ie=UTF-8&q=64+bit+OS
+  1:http://www.google.co.in/search?hl=en&ei=yQUEStuJJZKG6AO82PWSAw&sa=X&oi=spell&resnum=0&ct=result&cd=1&q=free+full+version+operating+system&spell=1
+  1:http://www.google.co.in/search?hl=en&q=C%2B%2B+for+64+bit+operating+system&btnG=Google+Search&meta=&aq=f&oq=
+  1:http://www.google.co.uk/search?q=64bit+file+browser+open+source&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:en-GB:official&client=firefox-a
+  1:http://www.google.co.uk/search?q=free+cd+operating+systems&hl=en&start=10&sa=N
+  1:http://www.google.co.uk/search?q=operating+systems+free+request+cd&hl=en&start=10&sa=N
+  1:http://www.google.com.au/search?hl=en&q=is+it+possible+to+run+64+bit+iso+image+on+32+bit+os&btnG=Google+Search&meta=&aq=o&oq=
+  1:http://www.google.com.kw/search?hl=ar&client=firefox-a&rls=org.mozilla:en-US:official&hs=nxm&ei=S4UFSvy6FMOR_QaPl5GlBw&sa=X&oi=spell&resnum=1&ct=result&cd=1&q=in+32+bit+os+i+want+to+use+virtual+64+bit+os&spell=1
+  1:http://www.google.com.my/search?q=Example+of+Open+Source+OS&hl=en&client=firefox-a&rls=org.mozilla:en-US:official&start=20&sa=N
+  1:http://www.google.com.sg/search?hl=zh-CN&q=64+bit+os+&meta=&aq=f&oq=
+  1:http://www.google.com/custom?hl=en&safe=off&client=pub-3646272212055959&cof=FORID%3A1%3BGL%3A1%3BS%3Ahttp%3A%2F%2Fwww.googlelightoff.com%2F%3BL%3Ahttp%3A%2F%2Fwww.googlelightoff.com%2Flogo2.gif%3BLH%3A100%3BLW%3A490%3BLBGC%3A000000%3BLP%3A1%3BBGC%3A%23000000%3BT%3A%23a9a15c%3BLC%3A%23ffffff%3BVLC%3A%23fcf190%3BALC%3A%23caf192%3BGALT%3A%23F8DF0C%3B&q=os+64+bits
+  1:http://www.google.com/search?hl=en&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=64+bit+operating+systems+open+source&btnG=Search
+  1:http://www.google.com/search?hl=en&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=operating.system++64.bit&btnG=Search
+  1:http://www.google.com/search?hl=en&client=safari&rls=en-us&q=64+bit+operating+systems&btnG=Search
+  1:http://www.google.com/search?hl=en&ei=N6AFSvijJ43SNOmH4aID&sa=X&oi=spell&resnum=0&ct=result&cd=1&q=64+BIT+OPERATING+SYSTEM&spell=1
+  1:http://www.google.com/search?hl=en&q=64-bit+open+source
+  1:http://www.google.com/search?q=64+bit+operating+system&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:en-US:official&client=firefox-a
+  1:http://www.google.com/search?q=64+bit+operating+system&rls=com.microsoft:en-us:IE-SearchBox&ie=UTF-8&oe=UTF-8&sourceid=ie7&rlz=1I7GGLJ_en
+  1:http://www.google.com/search?q=64-bit+operating+systems&rls=com.microsoft:en-us:IE-Address&ie=UTF-8&oe=UTF-8&sourceid=ie7&rlz=1I7GPCK_enUS320
+  1:http://www.google.com/search?q=IBM+pc+operating+system&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:en-US:official&client=firefox-a
+  1:http://www.google.com/search?q=bible+libraray+64+bit+downloads&rls=com.microsoft:en-us:IE-SearchBox&ie=UTF-8&oe=UTF-8&sourceid=ie7&rlz=1I7GZAZ_en
+  1:http://www.google.com/search?q=free+operating+system&hl=en&start=10&sa=N
+  1:http://www.google.com/search?q=http%3A%2F%2Fwww.templeos.org&ie=utf-8&oe=utf-8&aq=t&rls=com.ubuntu:en-US:unofficial&client=firefox-a
+  1:http://www.google.com/search?source=ig&hl=en&rlz=&q=64+bit+operating+system&btnG=Google+Search&aq=f&oq=
+  1:http://www.google.com/search?source=ig&hl=en&rlz=1G1GGLQ_ENUS274&q=64+bit+operating+system&aq=f&oq=
+  1:http://www.google.com/search?sourceid=navclient&ie=UTF-8&rlz=1T4GGLL_enUS323US323&q=64bit+operating+system+free+download
+  1:http://www.google.com/url?sa=t&source=web&ct=res&cd=30&url=http%3A%2F%2Fwww.templeos.org%2F&ei=elEGSu3UF5WOMtmwkM8N&rct=j&q=open+source+operating+system&usg=AFQjCNHtcMmLrLaSdilrJ1OUqGvEZC49XA
+  1:http://www.google.de/search?q=64+bit+opensource+kernel&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:de:official&client=firefox-a
+  1:http://www.google.it/search?q=windows+cpp+microseconds+delay+function+RDTSC&hl=it&safe=off&client=firefox-a&rls=org.mozilla:it:official&start=10&sa=N
+  1:http://www.google.mu/search?hl=en&q=64+bit+operating+system&btnG=Google+Search&meta=&aq=f&oq=
+  1:http://www.google.se/search?q=templeos&ie=utf-8&oe=utf-8&aq=t&rls=org.mozilla:sv-SE:official&client=firefox-a
+  1:http://www.google.sk/search?hl=sk&q=PC+64bit+operating+system&btnG=H%C4%BEada%C5%A5+v+Google&meta=&aq=o&oq=
+  1:http://www.linuxhaxor.net/page/14/
+191:http://www.semantic.hn/
+  2:http://www.templeos.org
+ 16:http://www.templeos.org/
+  2:http://www.templeos.org/detailedlinfo.html
+  3:http://www.templeos.org/screenshots.html
+  1:http://www.trivialsolutions.biz/
+
+
+
+Downloads of /TempleOSCD.ISO
+05/08/09:    0   23
+05/09/09:    4   29
+
+
+Downloads of /TempleOSCD.ISO
+'-' is a dup.  '+' is not a dup.
+05/08/09 01: +
+05/08/09 02: 
+05/08/09 03: 
+05/08/09 04: +
+05/08/09 05: ++
+05/08/09 06: 
+05/08/09 07: +
+05/08/09 08: 
+05/08/09 09: ++++
+05/08/09 10: +++
+05/08/09 11: 
+05/08/09 12: +
+05/08/09 13: 
+05/08/09 14: ++
+05/08/09 15: ++
+05/08/09 16: 
+05/08/09 17: +
+05/08/09 18: 
+05/08/09 19: +
+05/08/09 20: +
+05/08/09 21: +
+05/08/09 22: +
+05/08/09 23: +
+05/09/09 00: +
+05/09/09 01: +++
+05/09/09 02: 
+05/09/09 03: +
+05/09/09 04: +
+05/09/09 05: 
+05/09/09 06: 
+05/09/09 07: +
+05/09/09 08: +
+05/09/09 09: -
+05/09/09 10: 
+05/09/09 11: 
+05/09/09 12: +
+05/09/09 13: 
+05/09/09 14: --++++
+05/09/09 15: +
+05/09/09 16: +
+05/09/09 17: +
+05/09/09 18: ++
+05/09/09 19: -++
+05/09/09 20: 
+05/09/09 21: ++
+05/09/09 22: +
+05/09/09 23: ++
+05/10/09 00: -----++
+Total:59  Dups:9
+
+
+Downloads of /TempleOSCD.ISO
+ 39:-
+  1:http://74.125.39.132/translate_c?hl=ru&ie=UTF-8&sl=en&tl=ru&u=http://fileforum.betanews.com/download/TempleOS/1183618683/1&prev=_t&rurl=translate.google.ru&usg=ALkJrhj8elHUBMktUUuK-DaW0dLVkRJ9og
+  1:http://fileforum.betanews.com/sendfile/1183618683/1/1241785810.5c969ec306d9c2484851a1e4f778d66b66f7bae7/
+  1:http://images.google.co.nz/imgres?imgurl=http://www.globalfreeware.com/productImg/4/Stress-Relief-20/stressrelief.gif&imgrefurl=http://www.globalfreeware.com/Stress-Relief-20.html&usg=__TMaplGyjZXrI1U_ZuP5s3DFRM-A=&h=425&w=524&sz=24&hl=en&start=1&um=1&tbnid=U8Pyk5qaun6AtM:&tbnh=107&tbnw=132&prev=/images%3Fq%3Dstress%2Brelief%2Bhammer%26hl%3Den%26safe%3Doff%26sa%3DN%26um%3D1
+  3:http://www.brothersoft.com/the-templeos-operating-system-download-67591.html
+  1:http://www.freewarefree.net/utility/3955/templeos-503/
+  1:http://www.globalfreeware.com/ChemBalance-Wizard-32--v10-download.html
+  1:http://www.globalfreeware.com/DEV-C-4992-download.html
+  1:http://www.globalfreeware.com/DirectX-90c-Redistributable-March-2009-download.html
+  1:http://www.globalfreeware.com/OpenOfficeorg-241-Final-download.html
+  2:http://www.globalfreeware.com/TempleOS-503-download.html
+  1:http://www.globalfreeware.com/The-GIMP-246-download.html
+  1:http://www.globalfreeware.com/Xoology-Coda-v251-download.html
+  1:http://www.globalfreeware.com/tb-exe-maker-download.html
+  2:http://www.templeos.org/
+  2:http://www.templeos.org/index.html
+

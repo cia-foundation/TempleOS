@@ -1,6 +1,0 @@
-$WW,1$To allow different languages and customization, SparrowOS uses strings to identify actual strings to be displayed.  This is basically a level of indirection.  Support for lists of strings is also provided, but it's not especially efficient.
-
-Each task can load it's own Define strings.  If a string is not found, the parent task's table is searched.
-
-See $LK,"::/SparrowOS/Demo/Define.CPP.Z","FI:::/SparrowOS/Demo/Define.CPP.Z"$.
-

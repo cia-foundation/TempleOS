@@ -1,0 +1,13 @@
+
+// imports all syms from the Adam Task's hash table.
+#include "::/TempleOS/Kernel/AOTAdam.HPP"
+
+//If you just want some of the symbols:
+//#include "::/TempleOS/Kernel/AOT.HPP"
+
+#exe {Cd("::/TempleOS/Demo/OldSchool/Demo1");};
+
+#include "MD1"
+#include "MD2"
+#include "MDMain"
+

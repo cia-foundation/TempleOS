@@ -1,5 +1,0 @@
-$WW,1$SparrowOS uses a 64-bit value, $LK,"CDate","MN:CDate"$, for date/time.  The upper 32-bits are the days since Christ.  The lower 32-bits store time of day divided by 4 billion which works out to 49710ths of a second.  You can subtract two $LK,"CDate","MN:CDate"$'s to get a time span.
-
-Use $LK,"CDATE_FREQ","MN:CDATE_FREQ"$ to convert.
-
-

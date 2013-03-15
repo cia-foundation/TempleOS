@@ -1,0 +1,112 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\nCd(\"::/TempleOS/Demo/Snd\");Dir;\n";
+
+PopUpOk(
+"Now, we're going to add the ASCIIOrgan.CPP.Z\n"
+"program to your personal menu.\n\n"
+"Press $$FG,GREEN$$<CTRL-M>$$FG$$\n"
+"to get to your personal menu.\n");
+AFGetChar(CH_CTRLM);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+Sleep(1000);
+
+PopUpOk(
+"$$FG,GREEN$$<CTRL-L>$$FG$$ to invoke the\n"
+"text-widget resource editor.\n"
+"\n"
+"($$FG,GREEN$$<CTRL-R>$$FG$$ invokes the\n"
+"graphic resource editor.)\n"
+);
+AFGetChar(CH_CTRLL);
+
+Sleep(100);
+PopUpOk(
+"$$FG,GREEN$$<CURSOR-DOWN>$$FG$$ until you reach\n"
+"\"Macro\".\n");
+I64 i;
+for (i=0;i<6;i++)
+  AFGetKey(SC_CURSOR_DOWN);
+
+PopUpOk(
+"$$FG,GREEN$$<SPACE BAR>$$FG$$.\n");
+AFPmtStr(" ");
+Sleep(1000);
+
+
+PopUpOk(
+"Now, we'll fill-in the visible text\n"
+"of the macro.\n");
+AFDelayedPutS("Click Here");
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+PopUpOk("Now, we'll fill-in the macro text.\n");
+AFDelayedPutS("Cd(\"::/TempleOS/Demo/Snd\");;#include \"ASCIIOrgan\";\\n");
+
+PopUpOk("$$FG,GREEN$$<ESC>$$FG$$ to exit the form.\n");
+AFGetChar(CH_ESC);
+Sleep(1000);
+
+PopUpOk(
+"Press $$FG,GREEN$$<CTRL-SHIFT-ENTER>$$FG$$ to insert a line feed.\n"
+"($$FG,GREEN$$<CTRL-ENTER>$$FG$$ does a page break and $$FG,GREEN$$<ENTER>$$FG$$\n"
+"would execute the macro.)\n");
+AFGetKey(SC_CARRIAGE_RETURN|SCF_CTRL|SCF_SHIFT);
+Sleep(1000);
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+PopUpOk(
+"Press $$FG,GREEN$$<SPACE BAR>$$FG$$ to test it.\n");
+AFPmtStr(" ");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"Now, we'll do a fancier macro that pops-up\n"
+"a new window which dies when finished,\n"
+"returning mem to the system.\n");
+Msg(MSG_KEY_DOWN,CH_CTRLM,0x43200000432);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+Msg(MSG_KEY_DOWN,CH_CTRLL,0);
+for (i=0;i<6;i++)
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+AFDelayedPutS(" Click here for Pop-up version");
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+AFDelayedPutS("Cd(\"::/TempleOS/Demo/Snd\");;#include \"ASCIIOrgan\";\\n");
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_LEFT|SCF_CTRL);
+
+PopUpOk(
+"$$FG,GREEN$$<CURSOR-DOWN>$$FG$$ until you reach\n"
+"the \"Pop-Up\" check-box.\n");
+for (i=0;i<2;i++)
+  AFGetKey(SC_CURSOR_DOWN);
+PopUpOk(
+"$$FG,GREEN$$<SPACE BAR>$$FG$$ to\n"
+"check the box.\n");
+AFPmtStr(" ");
+Sleep(500);
+
+PopUpOk("$$FG,GREEN$$<ESC>$$FG$$ to exit the form.\n");
+AFGetChar(CH_ESC);
+Sleep(500);
+
+PopUpOk("$$FG,GREEN$$<CTRL-SHIFT-ENTER>$$FG$$ to insert a line feed.\n");
+AFGetKey(SC_CARRIAGE_RETURN|SCF_CTRL|SCF_SHIFT);
+Sleep(500);
+
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+PopUpOk(
+"$$FG,GREEN$$<SPACE BAR>$$FG$$ to test it.\n");
+AFPmtStr(" ");
+Sleep(5000);
+
+PopUpOk(
+"$$FG,GREEN$$<CTRL-S>$$FG$$ to save your\n"
+"personal menu file, if you wish.\n"
+"Your personal menu is special and\n"
+"does not save on $$FG,GREEN$$<ESC>$$FG$$.\n");
+if (Fs->parent_task->popup_task) {
+  '' CH_SHIFT_ESC;
+  Sleep(100);
+}
+'' CH_SHIFT_ESC;	//exit menu
+

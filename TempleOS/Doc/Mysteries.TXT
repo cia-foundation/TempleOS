@@ -1,0 +1,67 @@
+$WW,1$$FG,5$This is to clearify how several mysterious things happen in TempleOS.$FG$
+
+
+* TempleOS runs in $FG,2$VGA 640x480 16 color$FG$ graphics mode, not text mode.  It changes to this mode with a $LK,"BIOS call","FF:::/TempleOS/Kernel/KStart.CPP,INT 0x10"$ while in real-mode before it switches to 64-bit mode.  The text is $LK,"drawn manually","MN:GrUpdateForegroundOfText"$.  If graphics mode fails, it falls-back on text mode.  You can force text mode with an $LK,"Kernel config","FI:::/TempleOS/Kernel/KCfg.CPP"$ option.
+
+* TempleOS identity-maps all memory, all the time.  There is no "high half" memory space.  TempleOS is ring-0-only, so everything is kernel, even user programs.  There is a special task called "Adam" and he doesn't die, so his heap never gets freed.  That's as close to "kernel memory" as it gets.
+
+* TempleOS puts all code in the lowest 2 Gig, so that REL32 addressing can be used.  TempleOS is 64-bit, but I just thought 2 Gig was enough for code.  It actually puts global variables there, too, but you can turn that off with $LK,"OPTf_GLBLS_ON_DATA_HEAP","MN:OPTf_GLBLS_ON_DATA_HEAP"$.  $LK,"MAlloc","MN:MAlloc"$() can allocate any memory, of course.
+
+* TempleOS doesn't use software interrupts or SYSCALL instructions because it never needs to change out of ring-0, even running user programs.  Calls are always CALL REL32 instructions.
+
+* The stack does not grow.  In theory, memory gets fragmented, too.
+
+* There is no $FG,2$PATH$FG$.  You do not enter filenames at the command-line and expect them to run.  You enter C-like code.  $LK,"Get Started Here","FI:::/TempleOS/Doc/CmdLine.TXT"$.
+
+* If you use $LK,"Grub","FI:::/TempleOS/Doc/Grub.TXT"$, you "chain-load" like Windows.  You can use the TempleOS boot-loader.  $LK,"Master-Boot-Loader-Stage1","FI:::/TempleOS/Adam/Boot/BootMHD.CPP"$, $LK,"Master-Boot-Loader-Stage2","FI:::/TempleOS/Adam/Boot/BootMHD2.CPP"$, $LK,"Partition-Boot-Loader","FI:::/TempleOS/Adam/Boot/BootHD.CPP"$, $LK,"CD-DVD-Boot-Loader","FI:::/TempleOS/Adam/Boot/BootCD.CPP"$.
+
+* The boot-loaders must be patched by you running $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$() or $LK,"InstallMasterBootLoader","MN:InstallMasterBootLoader"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2","FI:::/TempleOS/Kernel/KStart.CPP"$ if you relocate it.
+
+* The $FG,2$/0000Boot$FG$ directory and the $FG,2$0000Kernel.BIN.C$FG$ file are named so that they are first in alphabetical order and, therefore, at a predictable block address.  The $LK,"CD/DVD Boot Loader","FI:::/TempleOS/Adam/Boot/BootCD.CPP"$ will find $FG,2$0000Kernel.BIN.C$FG$ at $LK,"Block #0x16","MN:CDBootFileCreate"$.  The TempleOS boot loader can be used with $FG,4$$TX+HTML,"http://www.magiciso.com","http://www.magiciso.com"$$FG$ if you place $FG,2$0000Kernel.BIN.C$FG$ in the right spot.
+
+* TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few BIOS info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX+HTML,"PCI BIOS","http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for PCI config space access.  TempleOS calls $LK,"that","FI:::/TempleOS/Kernel/BIOS32.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
+
+* PUSH EAX : All stack operations in 64-bit mode are 64-bits.
+
+* XOR EAX,EAX : Operations on 32-bit registers clear the high 32-bits.
+
+* MOV RAX,FS:[RAX] : FS can be set with a WRMSR, but displacement is RIP relative, so it's tricky to use.  FS is used for the current $LK,"CTask","MN:CTask"$, GS for $LK,"CCPU","MN:CCPU"$.
+
+* TempleOS uses JIT file compression on a file-by-file basis.  Files are $LK,"compressed","FI:::/TempleOS/Kernel/Compress.CPP"$, not encrypted.
+
+* TempleOS has a dictionary that is shipped compressed.  When you boot the first time it is uncompressed.  TempleOS has a Windows utility for uncompressing.  That utility needs Microsoft DLL files.  TempleOS does not use any libraries, modules or code from other sources -- I wrote it all from scratch and it is self-contained.
+
+* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  TempleOS is $TX+D,"139,633","DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot JIT.  The rest is JIT demos and applications.
+
+* The main difference between TempleOS and other systems is that the heap and compiler sym table are associated with tasks, not applications.
+
+* There are sym(hash) tables maintained by each task.  They are similar in scope to environment variables.  When a symbol is not found, the parent task's symbol table is checked.  All process chain back to the $FG,2$Adam$FG$ process.  $FG,2$Adam$FG$ has the symbols from headers you normally $FG,2$#include$FG$ in other operating systems, so you do not need to $FG,2$#include$FG$ any headers in TempleOS.
+
+* The compiler only creates pos independent code.  You can't create code which is loaded at a fixed, specified location.  The code is pos independent by virtue of the fact that abs addresses get patched.
+
+* Binary executable files have export syms which are loaded into the sym tables.  The operating system $FG,2$Kernel$FG$ has such an export table.  In addition, some map files are processed to provide more information on syms -- src file links.  This is how the $LK,"Man","MN:Man"$()/$FG,2$WORDSTAT$FG$ feature can find src lines.
+
+* The word "$FG,2$public$FG$" does very little except allow the $LK,"help_index","FI:::/TempleOS/Doc/HelpIndex.TXT"$ and $LK,"HashRep","MN:HashRep"$() program varients to exclude meaningless syms.  If you wish a full report of public and nonpublic syms $MA+A-X+PU,"Click Here","DocMax(1000000);HAllRep;View;\n"$.
+
+* When compilation takes place, the structures used by the compiler stick around.  Data on classes can be accessed by code.  See $LK,"ClassRep","MN:ClassRep"$().
+
+* Filenames ending in "$FG,2$.Z$FG$" are automatically compressed and uncompressed when writing to disk.  File size in directory listing is the compressed size.  You can view uncompressed size with $LK,"Dir","MN:Dir"$("*",TRUE); if you use the native TempleOS filesystem.  See $LK-A,"::/TempleOS/Doc/TSZ.TXT"$ for uncompressing from $FG,2$WINDOWS$FG$.
+
+* Some memory objects are allocated when needed and will decrease the available memory displayed.  A task keeps mem objects smaller than a couple blocks in it's own separate heap when freed and these are not counted in the available system free memory, though they are free.  They get returned to the system when the task is killed.  To get a sense of this, compile the operating system and see the amount of mem used.  Then, compile it again and far less will be allocated.  This is because it is reusing the small chunks.  See $LK,"Memory","HI:Memory"$.  $MA+A-X+PU,"Click Here","MemRep;View;"$ for a $LK,"MemRep","MN:MemRep"$.
+
+* The cursor location is stored as an $FG,2$ASCII 5$FG$ in files.  $FG,2$ASCII 31$FG$ is $FG,2$SHIFT-SPACE$FG$, a character which does not get converted to tabs by space-to-tabs, $LK,"S2T","MN:S2T"$().  The $FG,2$ASCII 28$FG$ is $FG,2$SHIFT-ESC$FG$. 
+
+* Binary data is stored beyond the terminating $FG,2$NULL$FG$ in text files.  Map files store debug src lines and other files store sprites.
+
+* Sprites can be stored as vect graphics so they might take shockingly little room.  They can be converted to bitmaps.
+
+* If you change code in the $FG,2$/TempleOS/Adam$FG$, $FG,2$/TempleOS/Adam$FG$ or your $FG,2$HOME$FG$ directory, you don't need to recompile, you just need to reboot because those directories get recompiled when you boot.  It uses JIT compilation.  There is no "$FG,2$.BIN$FG$" file for JIT compilation.
+
+* If not found, "$FG,2$.Z$FG$" is added or removed and a search is done again.  If a file is still not found, the parent directories are searched for a file of the same name.
+
+* TempleOS supports $FG,2$FAT32$FG$ and a native TempleOS file system type.  The native  TempleOS partitions will appear as $FG,2$FAT32$FG$ to other operating systems, but will not work.  Do not access the native TempleOS partitions from other operating systems.  This was to fool a bootloader when I tricked it to use it's recovery partition feature.
+
+* The CPU usage during disk operation expands to 99%.  It polls while swapping-out.  You can do other, non-disk activity during disk operations because it swaps-out a lot and task swaps take only half a microsecond, probably a hundred times faster than a typical OS.  See $LK,"Cooperative Multitasking","FI:::/TempleOS/Demo/Lectures/Spinning.CPP"$.  It does not break-up disk operations into small pieces for sharing, however, so the disk is lock onto that one task.
+
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.

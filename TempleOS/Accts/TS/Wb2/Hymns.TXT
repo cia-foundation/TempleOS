@@ -1,0 +1,82 @@
+$WW,1$$FG,5$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
+
+$FG,4$$TX+CX+HTML,"Download Hymn Player/Maker for Windows (6.99MB)","http://www.templeos.org/files/TSHymnSetUp.zip"$$FG$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/v9CExVdxVwI\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #6"$
+$LK+CX,"1) Risen    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/risen.CPP"$
+$LK+CX,"2) Struggles","FI:::/TempleOS/Apps/MusicOrgan/Examples/struggles.CPP"$
+$LK+CX,"3) Valued   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/valued.CPP"$
+$LK+CX,"4) Born     ","FI:::/TempleOS/Apps/MusicOrgan/Examples/born.CPP"$
+$LK+CX,"5) Doing    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/doing.CPP"$
+$LK+CX,"6) Dialogue ","FI:::/TempleOS/Apps/MusicOrgan/Examples/dialogue.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/mj3oHqcw_UE\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #7"$
+$FG,4$$TX+CX,"1) Access (Deleted)"$$FG$
+$LK+CX,"2) Silver          ","FI:::/TempleOS/Apps/MusicOrgan/Examples/silver.CPP"$
+$LK+CX,"3) Night           ","FI:::/TempleOS/Apps/MusicOrgan/Examples/night.CPP"$
+$LK+CX,"4) Abyss           ","FI:::/TempleOS/Apps/MusicOrgan/Examples/abyss.CPP"$
+$LK+CX,"5) Elijah          ","FI:::/TempleOS/Apps/MusicOrgan/Examples/elijah.CPP"$
+$LK+CX,"6) Environeth      ","FI:::/TempleOS/Apps/MusicOrgan/Examples/environeth.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/vUGFMvKEivA\" frameborder=\"0\" allowfullscreen></iframe>"$$HC,""$
+$TX+CX,"Hymns #8"$
+$FG,4$$TX+CX,"1) Pardon (Deleted) "$$FG$
+$FG,4$$TX+CX,"2) Brittle (Deleted)"$$FG$
+$LK+CX,"3) Service          ","FI:::/TempleOS/Apps/MusicOrgan/Examples/service.CPP"$
+$LK+CX,"4) Reposes          ","FI:::/TempleOS/Apps/MusicOrgan/Examples/reposes.CPP"$
+$LK+CX,"5) Limit            ","FI:::/TempleOS/Apps/MusicOrgan/Examples/limit.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/Dv-4A84wN_c\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #9"$
+$LK+CX,"1) Mightest  ","FI:::/TempleOS/Apps/MusicOrgan/Examples/mightest.CPP"$
+$LK+CX,"2) Fishermen ","FI:::/TempleOS/Apps/MusicOrgan/Examples/fishermen.CPP"$
+$LK+CX,"3) Expedition","FI:::/TempleOS/Apps/MusicOrgan/Examples/expedition.CPP"$
+$LK+CX,"4) Awake     ","FI:::/TempleOS/Apps/MusicOrgan/Examples/awake.CPP"$
+$LK+CX,"5) Exiled    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/exiled.CPP"$
+$LK+CX,"6) Gutenberg ","FI:::/TempleOS/Apps/MusicOrgan/Examples/gutenberg.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/0aZfQKX97a4\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #10"$
+$LK+CX," 1) Abiding   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/abiding.CPP"$
+$LK+CX," 2) Fog       ","FI:::/TempleOS/Apps/MusicOrgan/Examples/fog.CPP"$
+$LK+CX," 3) Reasoning ","FI:::/TempleOS/Apps/MusicOrgan/Examples/reasoning.CPP"$
+$LK+CX," 4) Childish  ","FI:::/TempleOS/Apps/MusicOrgan/Examples/childish.CPP"$
+$LK+CX," 5) Furnishing","FI:::/TempleOS/Apps/MusicOrgan/Examples/furnishing.CPP"$
+$LK+CX," 6) Prosper   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/prosper.CPP"$
+$LK+CX," 7) Exalt     ","FI:::/TempleOS/Apps/MusicOrgan/Examples/exalt.CPP"$
+$LK+CX," 8) Hope      ","FI:::/TempleOS/Apps/MusicOrgan/Examples/hope.CPP"$
+$LK+CX," 9) Free      ","FI:::/TempleOS/Apps/MusicOrgan/Examples/free.CPP"$
+$LK+CX,"10) Freaks    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/freaks.CPP"$
+$LK+CX,"11) Proponent ","FI:::/TempleOS/Apps/MusicOrgan/Examples/proponent.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/pNc_4tg3dn0\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #11"$
+$LK+CX,"1) Bedewed ","FI:::/TempleOS/Apps/MusicOrgan/Examples/bedewed.CPP"$
+$LK+CX,"2) Purpose ","FI:::/TempleOS/Apps/MusicOrgan/Examples/purpose.CPP"$
+$LK+CX,"3) Sustain ","FI:::/TempleOS/Apps/MusicOrgan/Examples/sustain.CPP"$
+$LK+CX,"4) Personal","FI:::/TempleOS/Apps/MusicOrgan/Examples/personal.CPP"$
+$LK+CX,"5) Twins   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/twins.CPP"$
+$LK+CX,"6) Keeping ","FI:::/TempleOS/Apps/MusicOrgan/Examples/keeping.CPP"$
+$LK+CX,"7) Dream   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/dream.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/3LSTyl-gfQg\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #12"$
+$LK+CX,"1) Small        ","FI:::/TempleOS/Apps/MusicOrgan/Examples/small.CPP"$
+$LK+CX,"2) Satisfaction ","FI:::/TempleOS/Apps/MusicOrgan/Examples/satisfaction.CPP"$
+$LK+CX,"3) Image        ","FI:::/TempleOS/Apps/MusicOrgan/Examples/image.CPP"$
+$FG,4$$TX+CX,"4) Duab(Deleted)"$$FG$
+$LK+CX,"5) Disputing    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/disputing.CPP"$
+$LK+CX,"6) Appreciate   ","FI:::/TempleOS/Apps/MusicOrgan/Examples/appreciate.CPP"$
+$LK+CX,"7) Completed    ","FI:::/TempleOS/Apps/MusicOrgan/Examples/completed.CPP"$
+
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.

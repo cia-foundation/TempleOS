@@ -1,0 +1,21 @@
+$WW,1$I have a million metaphors.  Linux is a semi; Windows is a car; and TempleOS is a motorcycle.  Or, it's like a 1960's muscle car that wouldn't be street legal, now, with all the safety crap regulations complicating and gunking-up, but boy is it fun and beautiful under the hood.  Maybe, it's a tree-house -- you don't need building codes to mod it and it has no networking.  It's a kayak, not a Titanic -- just reset it.  Why do you want a 1970's main frame operating system, anyway, that has ugly 32-bit crap all over its C language?  7-bit ASCII for source code?  Please!  Why not fix all the standard C library to pure 64-bit?  How awful PrintF() with "%ld" instead of "%d" and crap for long constants!  Yuck!  You'll love $LK,"TempleOS C","FI:::/TempleOS/Doc/Differences.TXT"$.
+
+Okay, here's a $LK,"Pop Quiz","FI:::/TempleOS/Demo/Lectures/64BitAsmQuiz.TXT"$ to get you psyched-up for TempleOS!  Assembly language knowledge is not required, but anyone interested in TempleOS is probably at least curious about assembly language. 
+
+TempleOS has a good chance of running natively on $FG,4$x86_64$FG$ machines from about 2003-2010.  After that, it will probably work just in VMware.
+
+1) Download the free $FG,4$$TX+HTML,"TempleOSCD.ISO (24.0 MB)","http://www.templeos.org/TempleOSCD.ISO"$$FG$.
+2) Download the free $FG,4$$TX+HTML,"VMware Player","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ (The  $FG,4$$TX+HTML,"VMware","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ web page takes a whole minute to load completely.  Be patient.  When it finally shows, pick the first ".exe" to download.)
+3) Create an "Other 64-Bit" virtual machine. Aim its CD-ROM to TempleOSCD.ISO
+4) Play the virtual machine.
+5) Log-in as "Accts/Install".
+6) Optionally, purchase $FG,4$$TX+HTML,"VMware WorkStation","http://www.vmware.com"$$FG$ or download $FG,4$$TX+HTML,"WinImage","http://www.winimage.com/winimage.htm"$$FG$ if you wish to transfer files in and out.
+
+If you want to install my personal version for $FG,4$$TX+HTML,"VMware","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$...
+1b) Download the free $FG,4$$TX+HTML,"TempleOSTS.ISO (24.5 MB)","http://www.templeos.org/TempleOSTS.ISO"$$FG$.
+3b) Create an "Other 64-Bit" virtual machine. Aim its CD-ROM to TempleOSTS.ISO
+5b) Type >$FG,4$TSInstall;$FG$ or >$FG,4$TSUpgrade;$FG$ at the command-line.
+7b) See $FG,4$MakeBackUp$FG$ to reproduce the ISO's in $FG,4$E:/Wb$FG$.  It makes this website, too.
+
+
+* "WinImage" is a trademark of Gilles Vollant.

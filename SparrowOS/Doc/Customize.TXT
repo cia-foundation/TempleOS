@@ -1,9 +1,0 @@
-
-$WW,1$* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale","FF:HOME/Adam3aLocalize.CPP.Z,mxx_scale"$.
-
-* You can set your local time zone by setting the $FG,4$local_time_offset$FG$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ","MN:CDATE_FREQ"$.  See $LK,"local time","FF:HOME/Adam3aLocalize.CPP.Z,local_time"$.  See $LK,"DateTime.CPP.Z","FI:::/SparrowOS/Demo/DateTime.CPP.Z"$ for changing date/time format maps.
-
-* If sound doesn't work, run $LK,"::/SparrowOS/Adam/Snd/HDCfg.CPP.Z","FI:::/SparrowOS/Adam/Snd/HDCfg.CPP.Z"$ or, comment-out $LK,"#include \"HDAudio\"","FF:HOME/Adam3cSnd.CPP.Z,HDAudio"$ to revert to PC Speaker.
-
-* Get rid of this msg $LK,"here","FF:HOME/DoItOnce.CPP.Z,Customize.TXT.Z"$.
-

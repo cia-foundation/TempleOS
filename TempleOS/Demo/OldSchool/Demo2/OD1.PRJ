@@ -1,0 +1,12 @@
+// imports all syms from the Adam Task's hash table.
+#include "::/TempleOS/Kernel/AOTAdam.HPP"
+
+import U0 Routine3(U8 *st);
+
+U0 Routine1(U8 *st)
+{
+  PrintF("Routine1:%s\n",st);
+  Routine3("What the!!!");
+}
+
+

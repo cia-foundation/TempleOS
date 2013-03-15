@@ -1,0 +1,694 @@
+asm {
+USE64
+CMP_OPT_NOP:
+#assert CIntermediateCode.ic_opcode==0
+	DU16	IC_NOP;  //Must be at CIntermediateCode.ic_opcode offset
+	DU8	sizeof(CIntermediateCode)-2 DUP(0);
+
+// ************************************
+_OPTNEXT::
+	ENTER	0
+	PUSH	RDI
+	MOV	RCX,U64 SF_ARG1[RBP]
+	MOV	RDX,U64 SF_ARG2[RBP]
+	
+	MOV	RAX,U64 16[RDX]
+	MOV	U64 24[RDX],RAX
+	MOV	RAX,U64 8[RDX]
+	MOV	U64 16[RDX],RAX
+	MOV	RAX,U64 [RDX]
+	MOV	U64 8[RDX],RAX
+	MOV	U64 [RDX],RCX
+
+	MOV	RDI,RDX
+
+	MOV	RAX,RCX
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JBE	@@05
+	STOSQ
+
+@@05:	MOV	RAX,U64 8[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JBE	@@10
+	STOSQ
+
+@@10:	MOV	RAX,U64 16[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JBE	@@15
+	STOSQ
+
+@@15:	MOV	RAX,U64 24[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JBE	@@20
+	STOSQ
+
+@@20:	MOV	RAX,CMP_OPT_NOP
+	ADD	RDX,32
+	JMP	@@30
+
+@@25:	STOSQ
+@@30:	CMP	RDI,RDX
+	JB	@@25
+
+	POP	RDI
+	LEAVE
+	RET1	16
+// ************************************
+_OPTNEXT2::
+	ENTER	0
+	PUSH	RDI
+	MOV	RCX,U64 SF_ARG1[RBP]
+	MOV	RDX,U64 SF_ARG2[RBP]
+	
+	MOV	RAX,U64 16[RDX]
+	MOV	U64 24[RDX],RAX
+	MOV	RAX,U64 8[RDX]
+	MOV	U64 16[RDX],RAX
+	MOV	RAX,U64 [RDX]
+	MOV	U64 8[RDX],RAX
+	MOV	U64 [RDX],RCX
+
+	MOV	RDI,RDX
+
+	MOV	RAX,RCX
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@05
+	STOSQ
+
+@@05:	MOV	RAX,U64 8[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@10
+	STOSQ
+
+@@10:	MOV	RAX,U64 16[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@15
+	STOSQ
+
+@@15:	MOV	RAX,U64 24[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@20
+	STOSQ
+
+@@20:	MOV	RAX,CMP_OPT_NOP
+	ADD	RDX,32
+	JMP	@@30
+
+@@25:	STOSQ
+@@30:	CMP	RDI,RDX
+	JB	@@25
+
+	POP	RDI
+	LEAVE
+	RET1	16
+
+// ************************************
+_OPTNEXT3::
+	ENTER	0
+	PUSH	RDI
+	MOV	RCX,U64 SF_ARG1[RBP]
+	MOV	RDX,U64 SF_ARG2[RBP]
+	
+	MOV	RAX,U64 16[RDX]
+	MOV	U64 24[RDX],RAX
+	MOV	RAX,U64 8[RDX]
+	MOV	U64 16[RDX],RAX
+	MOV	RAX,U64 [RDX]
+	MOV	U64 8[RDX],RAX
+	MOV	U64 [RDX],RCX
+
+	MOV	RDI,RDX
+
+	MOV	RAX,RCX
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@05
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	JE	@@05
+	STOSQ
+
+@@05:	MOV	RAX,U64 8[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@10
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	JE	@@10
+	STOSQ
+
+@@10:	MOV	RAX,U64 16[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@15
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	JE	@@15
+	STOSQ
+
+@@15:	MOV	RAX,U64 24[RDX]
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
+	JB	@@20
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	JE	@@20
+	STOSQ
+
+@@20:	MOV	RAX,CMP_OPT_NOP
+	ADD	RDX,32
+	JMP	@@30
+
+@@25:	STOSQ
+@@30:	CMP	RDI,RDX
+	JB	@@25
+
+	POP	RDI
+	LEAVE
+	RET1	16
+
+// ************************************
+CMP_TEMPLATES::
+	DU32	@@05,@@10,@@15,@@25,@@30,
+		@@35,@@40,@@45,@@55,@@60,
+		@@75,@@80,@@85,@@90,@@95,
+		@@100,@@105,@@110,@@115,@@125,
+		@@135;
+
+@@05:	//INC
+	PUSH	RAX
+	FLD1
+	FADD	ST0,U64 [RSP]
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@10:	//DEC
+	PUSH	RAX
+	FLD1
+	FSUBR	ST0,U64 [RSP]
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@15:	//MOD
+	PUSH	RDX
+	PUSH	RAX
+	MOV	RBX,RSP
+	FLD	U64 [RBX]
+	FLD	U64 8[RBX]
+@@20:	FPREM
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@20
+	FSTP	U64 [RBX]
+	FFREE	ST0
+	FINCSTP
+	POP	RAX
+	ADD	RSP,8
+
+@@25:	//LESS
+	PUSH	RDX
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FLD	U64 8[RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	ADC	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,16
+
+@@30:	//GREATER
+	PUSH	RDX
+	PUSH	RAX
+	FLD	U64 8[RSP]
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	ADC	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,16
+
+@@35:	//LESS_EQUAL
+	PUSH	RDX
+	PUSH	RAX
+	FLD	U64 8[RSP]
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	SBB	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,16
+
+@@40:	//GREATER_EQUAL
+	PUSH	RDX
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FLD	U64 8[RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	SBB	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,16
+
+@@45: //StrLen
+	MOV	RDX,RAX
+@@50:	MOV	BL,U8 [RAX]
+	INC	RAX
+	OR	BL,BL
+	JNZ	@@50
+	SUB	RAX,RDX
+	DEC	RAX
+
+@@55: //RDTSC
+	RDTSC
+	SHL	RDX,32
+	ADD	RAX,RDX
+
+@@60: //SignI64
+	OR	RAX,RAX
+	JZ	@@70
+	JS	@@65
+	MOV	RAX,1
+	JMP	@@70
+@@65:	MOV	RAX,-1
+@@70:
+@@75:
+@@80:
+@@85:
+	MOV	EAX,HPET_MAIN_CNT
+	MOV	RAX,U64 [RAX]
+
+@@90: //Sqr
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FMUL	ST0,ST0
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@95: //Abs
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FABS
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@100: //Sqrt
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FSQRT
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@105: //Sin
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FSIN
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@110: //Cos
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOS
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@115: //Tan
+	PUSH	RAX
+	FLD	U64 [RSP]
+@@120:	FPTAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@120
+	FFREE	ST0
+	FINCSTP
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@125: //Atan
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FLD1
+@@130:	FPATAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@130
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@135:
+
+// ************************************
+CMP_TEMPLATES_DONT_POP::
+	DU32	@@05,@@10,@@15,@@20,@@25,
+		@@30,@@35,@@40,@@45,@@50,
+		@@55,@@60,@@65,@@70,@@75,
+		@@80,@@85,@@90,@@95,@@105,
+		@@115;
+
+@@05:	//INC
+	PUSH	RAX
+	FLD1
+	FADD	ST0,U64 [RSP]
+	FST	U64 [RSP]
+	POP	RAX
+
+@@10:	//DEC
+	PUSH	RAX
+	FLD1
+	FSUBR	ST0,U64 [RSP]
+	FST	U64 [RSP]
+	POP	RAX
+
+@@15:
+@@20:
+@@25:
+@@30:
+@@35:
+@@40:
+@@45:
+@@50:
+@@55:
+@@60:
+	PUSH	RAX
+	FLD	U64 [RSP]
+	ADD	RSP,8
+@@65:
+
+@@70: //Sqr
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FMUL	ST0,ST0
+	ADD	RSP,8
+
+@@75: //Abs
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FABS
+	ADD	RSP,8
+
+@@80: //Sqrt
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FSQRT
+	ADD	RSP,8
+
+@@85: //Sin
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FSIN
+	ADD	RSP,8
+
+@@90: //Cos
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOS
+	ADD	RSP,8
+
+@@95: //Tan
+	PUSH	RAX
+	FLD	U64 [RSP]
+@@100:	FPTAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@100
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@105: //Atan
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FLD1
+@@110:	FPATAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@110
+	ADD	RSP,8
+@@115:
+
+// ************************************
+CMP_TEMPLATES_DONT_PUSH::
+	DU32	@@05,@@10,@@15,@@20,@@30,
+		@@35,@@40,@@50,@@55,@@60,
+		@@65,@@70,@@75,@@80,@@85,
+		@@90,@@95,@@100,@@105,@@115,
+		@@125;
+
+@@05:	//INC
+	SUB	RSP,8
+	FLD1
+	FADDP	ST1,ST0
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@10:	//DEC
+	SUB	RSP,8
+	FLD1
+	FSUBP	ST1,ST0
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@15:
+@@20:	//LESS
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	JZ	@@25
+	MOV	RAX,1
+	SBB	RAX,0
+@@25:	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@30:	//GREATER
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	ADC	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@35:	//LESS_EQUAL
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	SBB	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@40:	//GREATER_EQUAL
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	JZ	@@45
+	MOV	RAX,0
+	ADC	RAX,0
+@@45:	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+@@50:
+@@55:
+@@60:
+@@65: //FSTP
+	SUB	RSP,8
+	FSTP	U64 [RSP]
+	POP	RAX
+@@70:
+@@75:
+@@80: //Sqr
+	SUB	RSP,8
+	FMUL	ST0,ST0
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@85: //Abs
+	SUB	RSP,8
+	FABS
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@90: //Sqrt
+	SUB	RSP,8
+	FSQRT
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@95: //Sin
+	SUB	RSP,8
+	FSIN
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@100: //Cos
+	SUB	RSP,8
+	FCOS
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@105: //Tan
+	SUB	RSP,8
+@@110:	FPTAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@110
+	FFREE	ST0
+	FINCSTP
+	FSTP	U64 [RSP]
+	POP	RAX
+
+@@115: //Atan
+	SUB	RSP,8
+	FLD1
+@@120:	FPATAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@120
+	FSTP	U64 [RSP]
+	POP	RAX
+@@125:
+
+// ************************************
+CMP_TEMPLATES_DONT_PUSH_POP::
+	DU32	@@05,@@10,@@15,@@20,@@25,
+		@@30,@@35,@@40,@@45,@@50,
+		@@55,@@60,@@65,@@70,@@75,
+		@@80,@@85,@@90,@@95,@@100,
+		@@110;
+
+@@05:	//INC
+	SUB	RSP,8
+	FLD1
+	FADDP	ST1,ST0
+	FST	U64 [RSP]
+	POP	RAX
+
+@@10:	//DEC
+	SUB	RSP,8
+	FLD1
+	FSUBP	ST1,ST0
+	FST	U64 [RSP]
+	POP	RAX
+
+@@15:
+@@20:
+@@25:
+@@30:
+@@35:
+@@40:
+@@45:
+@@50:
+@@55:
+@@60:
+@@65:
+@@70: //Sqr
+	FMUL	ST0,ST0
+
+@@75: //Abs
+	FABS
+
+@@80: //Sqrt
+	FSQRT
+
+@@85: //Sin
+	FSIN
+
+@@90: //Cos
+	FCOS
+
+@@95: //Tan
+	FPTAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@95
+	FFREE	ST0
+	FINCSTP
+
+@@100: //Atan
+	FLD1
+@@105:	FPATAN
+	FSTSW
+	TEST	AX,0x400
+	JNZ	@@105
+@@110:
+
+// ************************************
+CMP_TEMPLATES_DONT_PUSH2::
+	DU32	@@05,@@10,@@15,@@20,@@25,
+		@@35,@@45,@@50,@@55,@@60,
+		@@65,@@70,@@75,@@80,@@85,
+		@@90,@@95,@@100,@@105,@@110,
+		@@115;
+
+@@05:
+@@10:
+
+@@15:
+@@20:	//LESS
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	ADC	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@25:	//GREATER
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,0
+	JZ	@@30
+	MOV	RAX,1
+	SBB	RAX,0
+@@30:	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@35:	//LESS_EQUAL
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	JZ	@@40
+	MOV	RAX,0
+	ADC	RAX,0
+@@40:	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+
+@@45:	//GREATER_EQUAL
+	PUSH	RAX
+	FLD	U64 [RSP]
+	FCOMIP	ST0,ST1
+	MOV	RAX,1
+	SBB	RAX,0
+	FFREE	ST0
+	FINCSTP
+	ADD	RSP,8
+@@50:
+@@55:
+@@60:
+@@65:
+@@70:
+@@75:
+@@80:
+@@85:
+@@90:
+@@95:
+@@100:
+@@105:
+@@110:
+@@115:
+}
+
+_extern _OPTNEXT Bool OptNext(CIntermediateCode *tempi,
+	       CIntermediateCode **temp_lag);
+
+_extern _OPTNEXT2 Bool OptNext2(CIntermediateCode *tempi,
+	       CIntermediateCode **temp_lag);
+
+_extern _OPTNEXT3 Bool OptNext3(CIntermediateCode *tempi,
+	       CIntermediateCode **temp_lag);

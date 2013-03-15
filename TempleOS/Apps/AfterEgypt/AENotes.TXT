@@ -1,0 +1,7 @@
+$FG,5$After Egypt Help$FG$
+----------------
+
+     $LK,"Part 1","FI:::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
+
+     $LK,"Part 2","FI:::/TempleOS/Apps/AfterEgypt/AENotesPart2.TXT"$
+

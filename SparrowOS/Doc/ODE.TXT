@@ -1,7 +1,0 @@
-$WW,1$SparrowOS has an advanced algorithm for integrating ordinary differential equations suitable for use in video games.  (Not scientific work.)  It also has some support for systems of masses and springs, to save you some work.
-
-See $LK,"CMathODE","MN:CMathODE"$ and $LK,"ODEsUpdate","MN:ODEsUpdate"$ for an overview.
-See $LK,"ODECallDerivative","MN:ODECallDerivative"$ to see what support there is for masses and springs.
-
-See $LK,"::/SparrowOS/Demo/GameStarters/Whap.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/Whap.CPP.Z"$, $LK,"::/SparrowOS/Demo/GameStarters/Rocket.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/Rocket.CPP.Z"$, $LK,"::/SparrowOS/Demo/GameStarters/MassSpring.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/MassSpring.CPP.Z"$, $LK,"::/SparrowOS/Apps/Span/SpanMain.CPP.Z","FI:::/SparrowOS/Apps/Span/SpanMain.CPP.Z"$ or $LK,"::/SparrowOS/Apps/X-Caliber/X-Caliber.CPP.Z","FI:::/SparrowOS/Apps/X-Caliber/X-Caliber.CPP.Z"$ for a masses and springs examples, or $LK,"::/SparrowOS/Demo/WinMgr2.CPP.Z","FI:::/SparrowOS/Demo/WinMgr2.CPP.Z"$, or $LK,"::/SparrowOS/Demo/GameStarters/Rocks.CPP.Z","FI:::/SparrowOS/Demo/GameStarters/Rocks.CPP.Z"$.
-

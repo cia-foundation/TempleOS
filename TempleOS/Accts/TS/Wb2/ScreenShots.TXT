@@ -1,0 +1,15 @@
+$WW,1$$FG,5$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
+
+$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOS.BMP"$
+
+
+
+$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/Menu.BMP"$
+$TX+CX,"Your personal menu is a document with icons."$
+
+
+
+$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/Tanks.BMP"$
+$TX+CX,"This is a tank war game."$
+
+

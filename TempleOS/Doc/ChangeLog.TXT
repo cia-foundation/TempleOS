@@ -1,0 +1,4 @@
+$WW,1$$FG,2$Use $LK,"R","MN:R"$() to rename if I change a label.$FG$
+
+$IV,1$----03/15/13 21:13:02----$IV,0$
+* $BK,1$TempleOS version 1.00 Released$BK,0$

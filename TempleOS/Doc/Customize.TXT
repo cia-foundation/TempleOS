@@ -1,0 +1,9 @@
+
+$WW,1$* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale","FF:HOME/Adam3aLocalize.CPP,mxx_scale"$.
+
+* You can set your local time zone by setting the $FG,4$local_time_offset$FG$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ","MN:CDATE_FREQ"$.  See $LK,"local time","FF:HOME/Adam3aLocalize.CPP,local_time"$.  See $LK,"DateTime.CPP","FI:::/TempleOS/Demo/DateTime.CPP"$ for changing date/time format maps.
+
+* If sound doesn't work, run $LK-A,"::/TempleOS/Adam/Snd/HDCfg.CPP"$ or, comment-out $LK,"#include \"HDAudio\"","FF:HOME/Adam3cSnd.CPP,HDAudio"$ to revert to PC Speaker.
+
+* Get rid of this msg $LK,"here","FF:HOME/DoItOnce.CPP,Customize.TXT"$.
+

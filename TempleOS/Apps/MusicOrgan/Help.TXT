@@ -1,0 +1,26 @@
+$WW,1$$FG,5$$TX+CX,"Music Organ Help"$$FG$
+
+* The keyboard can be used as an organ by typing letter keys or clicking the mouse on the keyboard diagram$FG$.  You can "record" notes by pressing the red button and typing letters.  They will appear on the musical staff.  You can edit and save them.
+
+* The clipboard can be used to cut and paste.
+
+* $FG,2$MusicOrgan$FG$ uses $FG,2$C+$FG$ files as it's fmt!  See $LK-A,"::/TempleOS/Apps/MusicOrgan/Examples/personal.CPP"$.  It does not fully parse them when loading back in, so changes made outside $FG,2$MusicOrgan$FG$ can be lost.
+
+* The first line of the $FG,2$C+$FG$ files has a comment with a category recognized by $LK,"JukeBox","FF:::/TempleOS/Apps/MusicOrgan/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the comment is a digit rating number.
+
+* You can take the $LK,"Play","MN:Play"$() statements out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-L>$FG$, but you should do it after pressing $FG,2$<CTRL-T>$FG$ because the clipboard-insert in $FG,2$<CTRL-L>$FG$ is screwy.  See this $SO,"<Song>","2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $FG,2$<CTRL-T>$FG$, now.
+
+* You can call $LK,"JukeBox","FF:::/TempleOS/Apps/MusicOrgan/JukeBox.CPP,JukeBox"$("HOME/MusicOrgan"); to play your songs.
+
+* To create a $FG,2$.SND$FG$ file which can be exported and played under Windows, set the $FG,2$Bool$FG$ $LK,"snd_record","MN:snd_record"$ to $FG,2$TRUE$FG$, play music, and set it to $FG,2$FALSE$FG$.  Then, call $LK,"SndFileCreate","MN:SndFileCreate"$().  You might wish to make a $FG,2$<CTRL-ALT-key>$FG$ to toggle this system level recording feat.  See $LK,"Snd","MN:Snd"$().  Add this code to your $LK-A,"HOME/Adam3dKeyPlugIns.CPP"$ file.
+
+
+$FG,5$U0 CtrlAltR(I64)
+{
+  snd_record=!snd_record;
+}
+SetCtrlAltLetCB('R',&CtrlAltR,"Toggle snd_record");$FG$
+
+
+* The note accent feature only works when exporting songs.  When calling $LK,"SndFileCreate","MN:SndFileCreate"$() you can set a waveform.  The PC speaker is $LK,"WF_SQUARE","MN:WF_SQUARE"$.  You can select reverb and averaging, also.
+

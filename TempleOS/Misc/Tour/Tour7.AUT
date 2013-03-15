@@ -1,0 +1,39 @@
+"Ed(\"::/TempleOS/Misc/Tour/Tour7.AUT.Z\");\n";
+Sleep(1000);
+
+PopUpOk(
+"$$FG,GREEN$$<CTRL-F>$$FG$$ to find.\n"
+);
+
+AFGetChar(CH_CTRLF);
+
+"<SHIFT-ESC>";
+
+PopUpOk("Cursor down 8 times.\n");
+I64 i;
+for (i=0;i<8;i++)
+  AFGetKey(SC_CURSOR_DOWN);
+
+PopUpOk(
+"Press '$$FG,GREEN$$1$$FG$$' to show\n"
+"all lines within 1 of a match.\n");
+AFPmtStr("1");
+Sleep(1000);
+
+PopUpOk("Press $$FG,GREEN$$<ESC>$$FG$$.\n");
+AFGetChar(CH_ESC);
+Sleep(500);
+
+PopUpOk(
+"Look around and press $$FG,GREEN$$<ESC>$$FG$$\n"
+"to turn off filter.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+Sleep(1000);
+
+PopUpOk(
+"You can combine filters to\n"
+"effectively do AND searches.\n");
+Sleep(1000);
+
+'' CH_SHIFT_ESC;
+
