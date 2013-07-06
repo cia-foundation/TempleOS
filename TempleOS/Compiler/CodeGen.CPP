@@ -71,7 +71,7 @@ U0 CBPutICArg(CICArg *p)
 U0 CBPutIC(CIntermediateCode *tempi)
 {
   I64 opcode=tempi->ic_opcode,i;
-  if (opcode>=IC_END_EXP && opcode!=IC_NOP1) {
+  if (opcode>=IC_END_EXP && opcode!=IC_NOP2) {
     "%15ts %016X ",
       DefineSub(opcode,"ST_INTERMEDIATE_CODE")+4,
       tempi->ic_data;
@@ -84,17 +84,10 @@ U0 CBPutIC(CIntermediateCode *tempi)
     ',';
     if (tempi->p2.type&TY_MASK)
       CBPutICArg(&tempi->p2);
-    ',';
-    if (tempi->p3.type&TY_MASK)
-      CBPutICArg(&tempi->p3);
     '' CH_SPACE;
     CBPutClass(tempi->ic_class);
     if (tempi->ic_flags & ICF_LOCK)
       "$$FG,BROWN$$lock$$FG$$ ";
-    if (tempi->ic_flags & ICF_P3_TO_F64)
-      "$$FG,LTBLUE$$p3d$$FG$$ ";
-    if (tempi->ic_flags & ICF_P3_TO_INT)
-      "$$FG,GREEN$$p3i$$FG$$ ";
     if (tempi->ic_flags & ICF_P2_TO_F64)
       "$$FG,LTBLUE$$p2d$$FG$$ ";
     if (tempi->ic_flags & ICF_P2_TO_INT)
@@ -157,7 +150,6 @@ CIntermediateCode *CBICAdd(CLex *lx,
     flags|=ICF_LOCK;
   tempi->ic_flags=flags;
   tempi->ic_line=lx->last_line_num;
-  tempi->ic_indent_level=lx->indent_level;
   if (lx->opts & OPTF_PARSE_TRACE)
     CBPutIC(tempi);
   tempi++;
@@ -382,28 +374,12 @@ U0 CBCombine(CLex *lx)
   }
 }
 
-CIndentInfo *CBIndents(CLex *lx)
-{
-  CIndentInfo *result;
-  I64 i,num_lines=lx->max_line-lx->min_line+1;
-  result=CAlloc(offset(CIndentInfo.body)+sizeof(U8)*(num_lines+1));
-  result->min_line=lx->min_line;
-  result->max_line=lx->max_line;
-  for (i=0;i<num_lines;i++)
-    result->body[i]=QueVectU8Get(lx->indent_que_vect,i+lx->min_line);
-  return result;
-}
-
 U8 *CBCompile(CLex *lx,CHashFun *fun_class,
-      I64 *code_size,CDbgInfo **_dbg,CIndentInfo **_indent,I64 *type=NULL)
+      I64 *code_size,CDbgInfo **_dbg,I64 *type=NULL)
 {
   U8 *result;
   COptReg register_offsets[NUM_REGS];
-  if (_dbg)
-    *_dbg=NULL;
-  if (_indent)
-    *_indent=NULL;
-
+  if (_dbg) *_dbg=NULL;
   CBCombine(lx);
   if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT)) {
     if (Bt(&lx->pass_trace_mask,0)) {
@@ -488,9 +464,6 @@ U8 *CBCompile(CLex *lx,CHashFun *fun_class,
   lx->pass=0xA;
   *code_size=OptPass789A(lx,fun_class,register_offsets,result,_dbg);
   compiled_bytes+=*code_size;
-
-  if (_indent && lx->indent_que_vect)
-    *_indent=CBIndents(lx);
 
   LinkedLstDel(lx->cbh.cb_out_first);
   CBMiscLstDel(lx);

@@ -48,9 +48,8 @@ I64 Primes(I64 range,I64 _my_mp_cnt)
   Bts(master_bitmap,0);
   Bts(master_bitmap,1);
   pending=my_mp_cnt;
-  for (i=1;i<my_mp_cnt;i++)
-    MPJob(&PrimesJob,i,i);
-  PrimesJob(0);
+  for (i=0;i<my_mp_cnt;i++)
+    JobQue(&PrimesJob,i,i);
   while (pending)
     Yield;
   tf=tT;

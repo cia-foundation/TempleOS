@@ -66,16 +66,16 @@ Bool BlkDevInit(CBlkDev *bdev)
     bdev->flags|=BDF_INIT_IN_PROGRESS;
     switch(bdev->type) {
       case BDT_RAM:
-	bdev->RAM_dsk=AMAlloc((bdev->max_blk+1)<<BLK_SIZE_BITS);
-	bdev->max_blk=MSize(bdev->RAM_dsk)>>BLK_SIZE_BITS-1;
-	p->type=PT_NATIVE;
-	if (sys_boot_code.u8[0]!=BOOT_CODE_RAM ||
-	    !NativeFSDrvValidate(bdev->first_drv_let))
-	  NativeFSFmt(bdev->first_drv_let);
-	else {
-	  p->size=bdev->max_blk+1;
-	  NativeFSPrtInit(p);
+	if (!bdev->RAM_dsk) {
+	  bdev->RAM_dsk=AMAlloc((bdev->max_blk+1)<<BLK_SIZE_BITS);
+	  bdev->max_blk=MSize(bdev->RAM_dsk)>>BLK_SIZE_BITS-1;
 	}
+	p->type=PT_REDSEA;
+	p->size=bdev->max_blk+1;
+	if (RedSeaFSDrvValidate(bdev->first_drv_let))
+	  RedSeaFSPrtInit(p);
+	else
+	  RedSeaFSFmt(bdev->first_drv_let);
 	result=TRUE;
 	break;
       case BDT_ATA:
@@ -214,7 +214,7 @@ U0 CleanMAPBuf(CPrt *p,I64 MAP_select=-1)
 	WBlks(p,p->cur_map_blk(I64)+i<<BLK_SIZE_BITS,p->map2+i+p->cur_map_blk_num,1);
 }
 
-U0 SetNativeBuf(CPrt *p,I64 c,I64 map_select=-1)
+U0 SetFSBuf(CPrt *p,I64 c,I64 map_select=-1)
 {
   I64 MAP_blk_num;
   if (c==INVALID_CLUSTER)
@@ -264,7 +264,7 @@ U0 WZeroBlks(CPrt *p,I64 blk,I64 cnt)
 }
 
 //Very dangerous
-Bool SetDrvType(U8 drv_let,I64 type=PT_NATIVE)
+Bool SetDrvType(U8 drv_let,I64 type=PT_REDSEA)
 {
   I64 i,j,ext_base,prt_num,offset,cur_type;
   CMasterBoot mbr;
@@ -285,8 +285,8 @@ Bool SetDrvType(U8 drv_let,I64 type=PT_NATIVE)
 	    else {
 	      if (prt_num+'A'==ToUpper(drv_let)) {
 		switch (type) {
-		  case PT_NATIVE:
-		    mbr.p[i].type=MBR_PT_NATIVE;
+		  case PT_REDSEA:
+		    mbr.p[i].type=MBR_PT_REDSEA;
 		    break;
 		  case PT_FAT32:
 		    mbr.p[i].type=MBR_PT_FAT32a;
@@ -416,7 +416,7 @@ U0 ChgDsk(U8 drv_let=0)
   else if (bdev->flags&BDF_REMOVABLE)
     DskCacheInvalidate(p);
   Drv(drv_let);
-  NativeFSFreeFreeLst(p);
+  RedSeaFSFreeFreeLst(p);
   Preempt(old_preempt);
 }
 
@@ -464,7 +464,7 @@ U0 PrtRep()
       drv_let=Prt2Drv(p);
       if (Bt(&p->type,PTf_DISABLE))
 	"$$FG,RED$$X";
-      else if (drv_let==dft_drv)
+      else if (drv_let==*sys_acct)
 	"$$FG,GREEN$$:";
       else
 	'' CH_SPACE;
@@ -495,12 +495,12 @@ I64 ClusterNumNext(CPrt *p,I64 c,I64 cnt=1)
     unlock=PrtLock(p);
     switch (p->type) {
       case PT_ISO9660:
-      case PT_NATIVE:
+      case PT_REDSEA:
 	c+=cnt;
 	break;
       case PT_FAT32:
 	while (cnt-->0 && 0<c<0x0FFFFFF8) {
-	  SetNativeBuf(p,c);
+	  SetFSBuf(p,c);
 	  c=p->cur_map_blk[c & (BLK_SIZE/4-1)];
 	}
 	if (!(0<c<0x0FFFFFF8))
@@ -534,7 +534,7 @@ I64 RClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
     unlock=PrtLock(p);
     switch (p->type) {
       case PT_ISO9660:
-      case PT_NATIVE:
+      case PT_REDSEA:
 	RBlks(p,buf,p->data+c*p->spc,blks);
 	c+=(blks+p->spc-1)/p->spc;
 	break;
@@ -590,8 +590,8 @@ I64 Name2DirCluster(CPrt *p,U8 *dirname)
       StrFirstRem(buf,"/",buf2);
       if (*buf2) {
 	switch (p->type) {
-	  case PT_NATIVE:
-	    cont=NativeFSFileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
+	  case PT_REDSEA:
+	    cont=RedSeaFSFileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
 	  case PT_FAT32:
 	    cont=FAT32FileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
@@ -636,8 +636,8 @@ I64 Name2ParentDirCluster(CPrt *p,U8 *dirname)
       StrFirstRem(buf,"/",buf2);
       if (*buf2) {
 	switch (p->type) {
-	  case PT_NATIVE:
-	    cont=NativeFSFileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
+	  case PT_REDSEA:
+	    cont=RedSeaFSFileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
 	  case PT_FAT32:
 	    cont=FAT32FileFind(p,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
@@ -676,7 +676,7 @@ I64 WClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
   try {
     unlock=PrtLock(p);
     switch (p->type) {
-      case PT_NATIVE:
+      case PT_REDSEA:
 	WBlks(p,buf,p->data+c*p->spc,blks);
 	c=0;
 	break;
@@ -715,8 +715,8 @@ I64 ClusersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
   PrtChk(p);
   if (cnt<=0) return c;
   switch (p->type) {
-    case PT_NATIVE:
-      return NativeFSAllocClusters(p,cnt);
+    case PT_REDSEA:
+      return RedSeaFSAllocClusters(p,cnt);
     case PT_FAT32:
       if (contiguous) {
 	if (c) throw(EXCEPT_FILE,3);

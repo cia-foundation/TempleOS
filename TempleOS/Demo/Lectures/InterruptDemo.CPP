@@ -1,4 +1,4 @@
-//This is the software interrupt num
+ //This is the software interrupt num
 //we will use.  See $LK,"Software Int's","MN:I_WAKE"$ for
 //picking a num.  Nums are subject to change.
 

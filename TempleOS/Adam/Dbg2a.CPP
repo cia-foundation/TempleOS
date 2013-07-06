@@ -25,8 +25,7 @@ Bool ClassRep2(CDoc *doc,U8 *class_name,U8 *_b,I64 depth,I64 max_depth,Bool dyna
     ptr=_b(U8 *)+ml->offset;
     DocPrintF(doc,"%08X ",ptr(U8 *)+offset);
     j=tempc2->ptr_cnt;
-    while (tempc2->fwd_class)
-      tempc2=tempc2->fwd_class;
+    tempc2=OptClassFwd(tempc2);
     tempc2-=tempc2->ptr_cnt;
     if (tempc2->type & HTT_INTERNAL_TYPE) {
       DocPrintF(doc,"$$FG,GREEN$$%-20ts:$$FG$$",ml->str);
@@ -143,7 +142,7 @@ public U0 ClassRep(U8 *class_name,U8 *_b,I64 max_depth=2,Bool fun=FALSE,I64 offs
   } else {
     DocMax;
     old_preempt=Preempt(OFF);
-    doc=DocCur;
+    doc=DocPut;
   }
   if (fun)
     ClassRep2(doc,class_name,_b,0,max_depth,FALSE,HTT_FUN,offset);
@@ -168,7 +167,7 @@ public U0 ClassRepD(U8 *class_name,U8 *_b,I64 max_depth=2,Bool fun=FALSE,I64 off
   } else {
     DocMax;
     old_preempt=Preempt(OFF);
-    doc=DocCur;
+    doc=DocPut;
   }
   if (fun)
     ClassRep2(doc,class_name,_b,0,max_depth,TRUE,HTT_FUN,offset);
@@ -190,9 +189,7 @@ U0 UpdateRegVarImg(CHashFun *tempf,U8 *_b,CTask *task)
   ml=tempf->member_lst;
   while (ml) {
     if (ml->register!=CREG_NONE) {
-      tempc=ml->member_class;
-      while (tempc->fwd_class)
-	tempc=tempc->fwd_class;
+      tempc=OptClassFwd(ml->member_class);
       MemCpy(_b+ml->offset,TaskRegAdd(task,ml->register),tempc->size);
     }
     ml=ml->next;

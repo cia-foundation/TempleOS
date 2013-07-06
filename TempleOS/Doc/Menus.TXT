@@ -24,4 +24,3 @@ $FG$
 The first arg is the msg code and it is optional with the default being $LK,"MSG_KEY_DOWN_UP","MN:MSG_KEY_DOWN_UP"$.  The second arg is the msg $FG,2$p1$FG$ value which is $FG,2$ASCII$FG$ of the key in the case of $LK,"MSG_KEY_DOWN","MN:MSG_KEY_DOWN"$.  The third arg is the msg $FG,2$p2$FG$ value which is the $FG,2$Scan Code$FG$ of the key in the case of $LK,"MSG_KEY_DOWN","MN:MSG_KEY_DOWN"$.
 
 See $LK-A,"::/TempleOS/Demo/PullDownMenu.CPP"$.
-

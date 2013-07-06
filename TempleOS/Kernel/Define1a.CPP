@@ -8,10 +8,11 @@ U0 LoadSysStrs()
   DefineLoad("ST_FILE_NOT_FOUND","File not found.\n");
   DefineLoad("ST_INVALID_FILENAME","Invalid File Name.\n");
   DefineLoad("ST_PRESS_A_KEY","$$BK,1$$PRESS A KEY$$BK,0$$\n");
+  DefineLoad("ST_PROBE_OR_SKIP","Press '$$FG,PURPLE$$p$$FG$$' to probe or '$$FG,PURPLE$$s$$FG$$' to skip.\n");
   DefineLoad("ST_EXIT_ALL_APPLICATIONS","$$FG,RED$$Exit all other applications.$$FG$$\n");
   DefineLoad("ST_GOING_TO_PROBE_HARDWARE","\nWe're going to probe hardware.\n");
   DefineLoad("ST_ARE_YOU_SURE","ARE YOU SURE ");
-  DefineLoad("ST_NOT_NATIVE","Not Native Partition\n");
+  DefineLoad("ST_NOT_REDSEA","Not RedSea Partition\n");
   DefineLoad("ST_NOT_FAT32","Not FAT32 Partition\n");
   DefineLoad("ST_NOT_ISO9660","Not ISO9660 Partition\n");
   DefineLoad("ST_NOT_ISO13346","Not ISO13346 Partition\n");
@@ -39,7 +40,7 @@ U0 LoadSysStrs()
   DefineLstLoad("ST_FILE_ATTRS","R\0H\0S\0V\0D\0A\0 \0 \0X\0Y\0T\0Z\0C\0F\0");
   DefineLstLoad("ST_FILE_UTIL_FLAGS","r\0d\0i\0a\0c\0R\0p\0m\0D\0F\0T\0S\0A\0J\0G\0Z\0P\0f\0l\0lf\0lb\0");
   DefineLstLoad("ST_BLKDEV_TYPES","NULL\0RAM\0ATA\0ATAPI\0");
-  DefineLstLoad("ST_PRT_TYPES","NULL\0NATIVE\0FAT32\0ISO9660\0ISO13490\0ISO13346\0NTFS\0UNKNOWN\0");
+  DefineLstLoad("ST_PRT_TYPES","NULL\0REDSEA\0FAT32\0ISO9660\0ISO13490\0ISO13346\0NTFS\0UNKNOWN\0");
 
   DefineLoad("ST_MOUNT_INTRO",
 	"\n\n\n$$BK,1$$$$FG,PURPLE$$Mount drives so they will "
@@ -52,21 +53,21 @@ U0 LoadSysStrs()
 	"If more than one partition is present\n"
 	"they will be lettered in sequence.\n"
 	"\n"
-	"First Drive Letter($$FG,PURPLE$$<ENTER>$$FG$$ to exit):");
+	"First Drive Letter ($$FG,PURPLE$$<ENTER>$$FG$$ to exit):");
   DefineLoad("ST_MOUNT_DRV_TYPE",
 	"\t$$FG,PURPLE$$1$$FG$$=RAM\n\t$$FG,PURPLE$$2$$FG$$=ATA(Harddisk)\n"
 	"\t$$FG,PURPLE$$3$$FG$$=ATAPI(CD-ROM)\n"
 	"Type:");
   DefineLoad("ST_MOUNT_BLKS",
 	"Blks of 512 bytes:");
+  DefineLoad("ST_MOUNT_ADDR",
+	"Addr of RAM disk ($$FG,PURPLE$$<ENTER>$$FG$$ to MAlloc):");
   DefineLoad("ST_MOUNT_UNIT",
 	"\t$$FG,PURPLE$$0$$FG$$=Master\n\t$$FG,PURPLE$$1$$FG$$=Slave\nUnit:");
   DefineLoad("ST_MOUNT_FMT_WHOLE_DRV",
 	"\nReformat WHOLE drive!");
   DefineLoad("ST_MOUNT_BOOTED_CDROM",
 	"<ENTER> to use booted CD-ROM\n");
-  DefineLoad("ST_INCLUDE_0X",
-	"Include $$FG,PURPLE$$0x$$FG$$ prefix\n");
   DefineLoad("ST_MOUNT_BASE0",
 	"Include $$FG,PURPLE$$0x$$FG$$ prefix.\n"
 	"I/O Port Base0:\n");
@@ -95,7 +96,7 @@ U0 LoadSysStrs()
 
   DefineLstLoad("ST_COLORS","BLACK\0BLUE\0GREEN\0CYAN\0"
 	"RED\0PURPLE\0BROWN\0LTGRAY\0DKGRAY\0LTBLUE\0LTGREEN\0"
-	"LTSCYAN\0LTRED\0LTPURPLE\0YELLOW\0WHITE\0");
+	"LTCYAN\0LTRED\0LTPURPLE\0YELLOW\0WHITE\0");
   DefineLstLoad("ST_INT_NAMES",
 	"Divide Error\0SingleStep\0NMI\0Breakpoint\0Overflow\0BOUND Range Exceeded\0Invalid Opcode\0No Math Coprocessor\0"
 	"Double Fault\0Coprocessor Segment Fault\0Invalid TASK\0Segment Not Present\0Stk Segment Fault\0General Protection\0Page Fault\0 \0"

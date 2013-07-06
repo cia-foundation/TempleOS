@@ -313,7 +313,7 @@ back
 brought
 formed
 invisible
-servant
+srv
 understood
 wert
 why
@@ -841,7 +841,7 @@ pray
 readily
 rule
 saidst
-servants
+srvs
 several
 sides
 speaketh

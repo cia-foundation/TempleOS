@@ -172,8 +172,8 @@ U0 Main()
     PressAKey;
   } catch
     CatchAll;
-  SettingsPop;
   DocClear;
+  SettingsPop;
   ViewAnglesDel;
 }
 

@@ -52,8 +52,6 @@ $WW,1$$FG,5$$TX+CX,"64-Bit Assembly Quiz"$$FG$
 
 14) On a fresh CPU with an empty TLB, how many memory accesses (page tables) does it take to access one virtual address?
 
-15) Is there an instruction to PUSH or POP all registers?
-
 ----
 
 TempleOS identity-maps everything, all the time, so the usual convention of upper memory being for kernel does not apply.  It uses physical addresses, basically.  It puts all code in the lowest 2-Gig memory range so that it can use the CALL REL32 instruction, the fastest.  It never changes privilege levels or messes with page tables, once it is up-and-running.
@@ -89,6 +87,3 @@ ANSWERS:
 13) 64-bit mode has 4K or 2Meg page size.
 
 14) For one access, there are 3-4 levels of page tables plus the location itself.
-
-15) There is no instruction to PUSH or POP all registers.
- 

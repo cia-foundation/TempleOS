@@ -31,7 +31,7 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
 {
   U8 *absf1=FileNameAbs(f1),*absf2=FileNameAbs(f2),*buf;
   I64 cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2),
-      xsum=NATIVE_XSUM,i,j;
+      xsum=TEMPLEOS_XSUM,i,j;
   CFile *in_file=NULL,*out_file=NULL;
 
   if (!StrCmp(absf1,absf2)) { //onto self?
@@ -111,8 +111,8 @@ Bool MkDir(U8 *filename)
 	name=MStrUtil(fa->mask,
 	SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
 	switch (fa->p->type) {
-	  case PT_NATIVE:
-	    result=NativeFSMkDir(fa->p,Fs->cur_dir,name);
+	  case PT_REDSEA:
+	    result=RedSeaFSMkDir(fa->p,Fs->cur_dir,name);
 	    break;
 	  case PT_FAT32:
 	    result=FAT32MkDir(fa->p,Fs->cur_dir,name);
@@ -137,8 +137,8 @@ I64 SysDel(U8 *wild,Bool make_mask)	//this is dangerous
   CFileAccess *fa;
   if (fa=FileAccessNew(wild,make_mask)) {
     switch (fa->p->type) {
-      case PT_NATIVE:
-	result=NativeFSFilesDel(fa->p,Fs->cur_dir,fa->mask,0,TRUE,TRUE);
+      case PT_REDSEA:
+	result=RedSeaFSFilesDel(fa->p,Fs->cur_dir,fa->mask,0,TRUE,TRUE);
 	break;
       case PT_FAT32:
 	result=FAT32FilesDel(fa->p,Fs->cur_dir,fa->mask,0,TRUE,TRUE);
@@ -168,11 +168,11 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=PT_FAT32)
     return;
   }
   switch (type) {
-    case PT_NATIVE:
+    case PT_REDSEA:
       Silent(ON);
       Drv(drv_let);
       Silent(old_silent);
-      NativeFSFmt(drv_let,quick);
+      RedSeaFSFmt(drv_let,quick);
       DskCacheInvalidate(Drv2Prt(drv_let));
       Drv(drv_let);
       break;
@@ -266,7 +266,10 @@ U0 CDImageWriteTask(CDualBuf *d)
       n=cnt;
     if (n>d->CD_bdev->max_writes)
       n=d->CD_bdev->max_writes;
-    buf=d->in_buf&1 ? d->buf1:d->buf0;
+    if (d->in_buf&1)
+      buf=d->buf1;
+    else
+      buf=d->buf0;
     while (d->in_buf>d->out_buf+1)
       Yield;
     FRBlks(f,buf,blk,n);
@@ -345,7 +348,10 @@ U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD)
       n=cnt;
     if (n>bdev->max_writes)
       n=bdev->max_writes;
-    buf=d->out_buf&1 ? d->buf1:d->buf0;
+    if (d->out_buf&1)
+      buf=d->buf1;
+    else
+      buf=d->buf0;
     while (d->in_buf<=d->out_buf)
       Yield;
     ATAPIWriteBlks(bdev,buf,blk/spc,(n+spc-1)/spc);

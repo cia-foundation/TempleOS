@@ -1,15 +1,15 @@
 #help_index "Graphics"
-U0 GrInit()
+U0 GrInit1()
 {
-  DefineLstLoad("ST_CSPRITE_TYPES","End\0 \0Color 8Bit\0 \0Point\0"
+  DefineLstLoad("ST_SPRITE_TYPES","End\0 \0Color 8Bit\0 \0Point\0"
 	"Line\0PolyLine\0PolyPoint\0Width\0Shift\0"
 	"BSpline2\0BSpline3\0BSpline2 Closed\0BSpline3 Closed\0"
 	" \0 \0 \0Rect\0Circle\0Flood Fill Not Color\0Flood Fill\0BitMap 8Bit\0"
-	" \0Text\0Ellipse\0Reg Polygon\0Planar Symmetry\0"
+	" \0Text\0Ellipse\0Polygon\0Planar Symmetry\0"
 	"Dither Color 8Bit\0Rotated Rect\0Mesh\0Shiftable Mesh\0"
 	"Transform On\0Transform Off\0Arrow\0Text Box\0Text Diamond\0");
 }
-GrInit;
+GrInit1;
 
 #help_index "Graphics/CSprite"
 #define GRST_END		0
@@ -37,7 +37,7 @@ GrInit;
 //Unused
 #define GRST_TEXT		23
 #define GRST_ELLIPSE		24
-#define GRST_REG_POLY		25
+#define GRST_POLYGON		25
 #define GRST_PLANAR_SYMMETRY	26
 #define GRST_DITHER_COLOR8	27
 #define GRST_ROTATED_RECT	28
@@ -75,7 +75,7 @@ public class CSprite
   union {
     I32 y1;
     I32 height;
-    I32 triangle_cnt; //Mesh
+    I32 tri_cnt; //Mesh
   }
   union {
     I32 z1;
@@ -89,7 +89,7 @@ public class CSprite
   union {
     F64 linespeed;
     F64 rot_angle;
-    I32 shiftable_triangle_cnt //Shiftable Mesh
+    I32 shiftable_tri_cnt //Shiftable Mesh
   }
   I32 sides;
 };
@@ -99,9 +99,7 @@ public class CSprite
 extern CDC *DCNew(I64 type,I64 width,I64 height,CTask *task=NULL,Bool null_bitmap=FALSE);
 extern CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL);
 extern U0 DCDel(CDC *dc);
-extern U0 EdExistingGraphic(CDoc *doc,I64 x,I64 y,I64 *import_snap=NULL,F64 *import_ip_scaler=NULL);
-extern CSprite *SpriteDoc2Que(CDoc *doc,CSprite *root,I64 *cur_num);
-extern Bool GrBlot3(CDC *dc,I64 x1,I64 y1,I64 z1,CDC *img);
+extern I64 GrBlot3(CDC *dc,I64 x1,I64 y1,I64 z1,CDC *img);
 extern U8 *GrBitMap4ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor);
 
 #include "GrCfg"
@@ -114,16 +112,15 @@ extern U8 *GrBitMap4ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor);
 #include "GrComposites"
 #include "GrChar"
 
-#define GE_CANCEL	(-1)
-#define GE_OKAY_DONE	0
-#define GE_OKAY_CONT	1
+#define GE_ABORT	(-1)
+#define GE_EXIT		0
+#define GE_CONT		1
 
 #include "CSpriteNew"
 #include "GrSpritePlot"
 #include "CSpriteMesh"
 #include "CSpriteBitMap"
-#include "CSpriteVect"
 #include "CSpriteEd"
-#include "GrVectMap"
+#include "CSpriteMain"
 #help_index ""
 

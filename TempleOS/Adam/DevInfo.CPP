@@ -58,12 +58,8 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
   while (doc_e!=doc) {
     if (first) {
       if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[0]!=';' && StrLen(doc_e->tag)>=4) {
-	buf[0]='0';
-	buf[1]='x';
-	buf[2]=doc_e->tag[0];
-	buf[3]=doc_e->tag[1];
-	buf[4]=doc_e->tag[2];
-	buf[5]=doc_e->tag[3];
+	buf[0](U16)='0x';
+	buf[2](U32)=doc_e->tag(U32 *)[0];
 	buf[6]=0;
 	if (A2I(buf)==m) {
 	  doc_e=doc_e->next->next;
@@ -87,12 +83,8 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
 	if (doc_e->type_u8==DOCT_TAB) {
 	  doc_e=doc_e->next;
 	  if (doc_e->type_u8==DOCT_TEXT && StrLen(doc_e->tag)>=4) {
-	    buf[0]='0';
-	    buf[1]='x';
-	    buf[2]=doc_e->tag[0];
-	    buf[3]=doc_e->tag[1];
-	    buf[4]=doc_e->tag[2];
-	    buf[5]=doc_e->tag[3];
+	    buf[0](U16)='0x';
+	    buf[2](U32)=doc_e->tag(U32 *)[0];
 	    buf[6]=0;
 	    if (A2I(buf)==d) {
 	      doc_e=doc_e->next->next;

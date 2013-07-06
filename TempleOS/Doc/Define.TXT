@@ -3,4 +3,3 @@ $WW,1$To allow different languages and customization, TempleOS uses strings to i
 Each task can load it's own Define strings.  If a string is not found, the parent task's table is searched.
 
 See $LK-A,"::/TempleOS/Demo/Define.CPP"$.
-

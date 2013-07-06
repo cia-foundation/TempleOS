@@ -25,7 +25,7 @@ Bool Drv(U8 drv_let)
   Free(Fs->cur_dir);
   Fs->cur_dir=StrNew("/");
   switch (p->type) {
-    case PT_NATIVE:
+    case PT_REDSEA:
     case PT_FAT32:
     case PT_ISO9660:
       return TRUE;
@@ -44,7 +44,7 @@ Bool Cd(U8 *dirname,Bool make_dirs=FALSE)
   if (!*dirname) return TRUE;
   if (dirname[1]==':') {
     if (*dirname==':') {
-      if (Fs->cur_prt->drv_let!=dft_drv)
+      if (Fs->cur_prt->drv_let!=*sys_acct)
 	if (!Drv(*dirname)) return FALSE;
     } else {
       if (Fs->cur_prt!=
@@ -85,8 +85,8 @@ Bool Cd(U8 *dirname,Bool make_dirs=FALSE)
 	p=Fs->cur_prt;
 	cur_dir_cluster=Name2DirCluster(p,new_cur_dir);
 	switch (p->type) {
-	  case PT_NATIVE:
-	    result=NativeFSCd(buf,cur_dir_cluster);
+	  case PT_REDSEA:
+	    result=RedSeaFSCd(buf,cur_dir_cluster);
 	    break;
 	  case PT_FAT32:
 	    result=FAT32Cd(buf,cur_dir_cluster);
@@ -248,8 +248,8 @@ I64 Del(U8 *files_find_mask,Bool print_msg=TRUE)
   CFileAccess *fa;
   if (fa=FileAccessNew(files_find_mask)) {
     switch (fa->p->type) {
-      case PT_NATIVE:
-	result=NativeFSFilesDel(fa->p,Fs->cur_dir,fa->mask,0,FALSE,print_msg);
+      case PT_REDSEA:
+	result=RedSeaFSFilesDel(fa->p,Fs->cur_dir,fa->mask,0,FALSE,print_msg);
 	break;
       case PT_FAT32:
 	result=FAT32FilesDel(fa->p,Fs->cur_dir,fa->mask,0,FALSE,print_msg);
@@ -296,8 +296,8 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
 	curname=altname;
       if (fa=FileAccessNew(curname)) {
 	switch (fa->p->type) {
-	  case PT_NATIVE:
-	    result=NativeFSFileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
+	  case PT_REDSEA:
+	    result=RedSeaFSFileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
 	    break;
 	  case PT_FAT32:
 	    result=FAT32FileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
@@ -322,8 +322,8 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
 	while (!result && StrCmp(Fs->cur_dir,"/")) {
 	  Cd("..");
 	  switch (Fs->cur_prt->type) {
-	    case PT_NATIVE:
-	      result=NativeFSFileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
+	    case PT_REDSEA:
+	      result=RedSeaFSFileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
 	      break;
 	    case PT_FAT32:
 	      result=FAT32FileRead(fa->p,Fs->cur_dir,fa->mask,&size,&attr,raw,&ac);
@@ -383,8 +383,8 @@ Bool FileFind(U8 *filename,CDirEntry *rde=NULL,I64 fuf_flags=0)
     if (fa=FileAccessNew(curname)) {
       cur_dir_cluster=Name2DirCluster(fa->p,Fs->cur_dir);
       switch (fa->p->type) {
-	case PT_NATIVE:
-	  result=NativeFSFileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
+	case PT_REDSEA:
+	  result=RedSeaFSFileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
 	  break;
 	case PT_FAT32:
 	  result=FAT32FileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
@@ -411,8 +411,8 @@ Bool FileFind(U8 *filename,CDirEntry *rde=NULL,I64 fuf_flags=0)
 	Cd("..");
 	cur_dir_cluster=Name2DirCluster(fa->p,Fs->cur_dir);
 	switch (fa->p->type) {
-	   case PT_NATIVE:
-	     result=NativeFSFileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
+	   case PT_REDSEA:
+	     result=RedSeaFSFileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
 	     break;
 	   case PT_FAT32:
 	     result=FAT32FileFind(fa->p,cur_dir_cluster,fa->mask,&de,fuf_flags);
@@ -458,7 +458,7 @@ I64 FileSizeExpanded(U8 *filename,I64 fuf_flags=0)
   if (FileFind(filename,&de,fuf_flags)) {
     p=Drv2Prt(*de.full_name);
     Free(de.full_name);
-    if (p->type==PT_NATIVE && de.expanded_size)
+    if (p->type==PT_REDSEA && de.expanded_size)
       return de.expanded_size;
     else {
       if (de.size && FileAttr(de.name) & _ATTR_COMPRESSED) {
@@ -472,7 +472,7 @@ I64 FileSizeExpanded(U8 *filename,I64 fuf_flags=0)
 }
 
 I64 FileWrite(U8 *filename,U8 *fbuf,
-   I64 size,CDate spdt=0,I64 attr=0,Bool raw=FALSE)
+   I64 size,CDate cdt=0,I64 attr=0,Bool raw=FALSE)
 {
   I64 c=0;
   CHashGeneric *temph;
@@ -481,13 +481,13 @@ I64 FileWrite(U8 *filename,U8 *fbuf,
   U8 *absname=FileNameAbs(filename);
   if (fa=FileAccessNew(filename,FALSE,TRUE)) {
     switch (fa->p->type) {
-      case PT_NATIVE:
-	c=NativeFSFileWrite(fa->p,Fs->cur_dir,fa->mask,
-	  fbuf,size,spdt,attr,raw,&ac);
+      case PT_REDSEA:
+	c=RedSeaFSFileWrite(fa->p,Fs->cur_dir,fa->mask,
+	  fbuf,size,cdt,attr,raw,&ac);
 	break;
       case PT_FAT32:
 	c=FAT32FileWrite(fa->p,Fs->cur_dir,fa->mask,
-	  fbuf,size,spdt,attr,raw,&ac);
+	  fbuf,size,cdt,attr,raw,&ac);
 	break;
       case PT_ISO9660:
 	PutDefineErr("ST_NOT_WRITABLE");

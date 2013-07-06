@@ -2,7 +2,7 @@
 #define SPRING_SCALE	6.0e6
 #define COST_SCALE	375.0
 #define MASS_RADIUS	3.0
-#define MASS_WEIGHT	10.0
+#define MASS_MASS	10.0
 #define WIRE_PERCENT	0.99
 
 #define RIVER_BANK_COLS	5
@@ -44,28 +44,20 @@ U0 SpanBridge1Init(CMathODE *)
     tempm->color=RED;
   }
 
-  "$$CL$$$$BG,LTCYAN$$";
-  NewLine(SKY_LINES);
+  DocClear;
+  "$$BG,LTCYAN$$"; NewLine(SKY_LINES);
   for (i=0;i<10;i++) {
-    "$$BG,BROWN$$";
-    Spaces(RIVER_BANK_COLS);
-    "$$BG,LTCYAN$$";
-    Spaces(TEXT_COLS-2*RIVER_BANK_COLS);
-    "$$BG,BROWN$$";
-    Spaces(RIVER_BANK_COLS);
+    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS);
+    "$$BG,LTCYAN$$"; Spaces(TEXT_COLS-2*RIVER_BANK_COLS);
+    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS);
     NewLine;
   }
-  for (i=0;i<5;i++) {
-    "$$BG,BROWN$$";
-    Spaces(RIVER_BANK_COLS+i);
-    "$$BG,BLUE$$";
-    Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
-    "$$BG,BROWN$$";
-    Spaces(2*i);
-    "$$BG,BLUE$$";
-    Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
-    "$$BG,BROWN$$";
-    Spaces(RIVER_BANK_COLS+i);
+  for (i=0;i<5;i++)  {
+    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS+i);
+    "$$BG,BLUE$$";   Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
+    "$$BG,BROWN$$";  Spaces(2*i);
+    "$$BG,BLUE$$";   Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
+    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS+i);
     NewLine;
   }
 }
@@ -73,7 +65,7 @@ U0 SpanBridge1Init(CMathODE *)
 U0 AdjustLoads(CTask *task,CMathODE *ode)
 {
   MyMass *tempm=ode->next_mass;
-  F64 d,tt=SpanTime(task)/10.0;
+  F64 d,tt=SpanTime/10.0;
   while (tempm!=&ode->next_mass) {
     if (tempm->load_t) {
       if (tt) {
@@ -81,7 +73,7 @@ U0 AdjustLoads(CTask *task,CMathODE *ode)
 	tempm->mass=100.0*Sqr(Sqr(d+1.0));
 	tempm->radius=7.0*d+2.0;
       } else {
-	tempm->mass=MASS_WEIGHT;
+	tempm->mass=MASS_MASS;
 	tempm->radius=MASS_RADIUS;
       }
     }

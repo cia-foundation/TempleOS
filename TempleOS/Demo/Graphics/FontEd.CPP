@@ -133,6 +133,7 @@ U0 FontEd()
       }
     }
 fe_done:
+    GetMsg(,,1<<MSG_KEY_UP);
   } catch
     CatchAll;
   MenuPop;

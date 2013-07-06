@@ -1,4 +1,150 @@
 $WW,1$$FG,2$Use $LK,"R","MN:R"$() to rename if I change a label.$FG$
 
-$IV,1$----03/15/13 21:13:02----$IV,0$
+$IV,1$----07/07/13 11:58:10----$IV,0$
+* Made graphics routines return I64, not Bool.
+
+$IV,1$----06/30/13 00:41:54----$IV,0$
+* $BK,1$TempleOS version 1.04 Released$BK,0$
+* Fixed $LK-A,"::/TempleOS/Apps/Span/SpanMain.CPP.Z"$.
+* Added $LK,"CTask","MN:CTask"$.border_src and $LK,"CTask","MN:CTask"$.title_src.
+* Cleaned-up $LK,"CTask","MN:CTask"$.task_title.
+
+$IV,1$----06/27/13 07:11:00----$IV,0$
+* Cleaned-up $LK,"CTask","MN:CTask"$.text_attr and $LK,"CTask","MN:CTask"$.border_attr.
+* Got rid of $LK,"CDoc","MN:CDoc"$.start_text_attr.
+* Got rid of custom doc widget colors and custom syntax highlighting colors.
+
+$IV,1$----06/18/13 06:54:12----$IV,0$
+* Made $FG,2$/TempleOS/Adam/Utils$FG$ directory.
+
+$IV,1$----06/16/13 17:46:40----$IV,0$
+* $BK,1$TempleOS version 1.03 Released$BK,0$
+* Made better $LK-A,"::/TempleOS/Demo/Graphics/PixelCollision.CPP"$.
+* $LK,"R","MN:R"$("gr_dc2","gr_dc");
+* Improved PSect code.
+* $LK,"R","MN:R"$("CDate","Date");
+* $LK,"R","MN:R"$("MPJob","JobQue");
+* $LK,"R","MN:R"$("MPSpawn","Spawn");
+* Changed args to $LK,"Spawn","MN:Spawn"$(). 
+* Got rid of cpu_mask in multicore API.
+
+$IV,1$----06/15/13 02:18:23----$IV,0$
+* Worked on $LK-A,"::/TempleOS/Apps/ToTheFront/ToTheFront.CPP"$.
+
+$IV,1$----06/14/13 17:12:47----$IV,0$
+* Made so $LK,"JobQue","MN:JobQue"$() and $LK,"Spawn","MN:Spawn"$() can work with core#0.
+* $LK,"R","MN:R"$("Servant","Srv");
+* $LK,"R","MN:R"$("Execute","Exe");
+* $LK,"R","MN:R"$("MPJobResult","$LK,"GetResult","MN:GetResult"$");
+* $LK,"R","MN:R"$("GetRqstResult","$LK,"ScanResult","MN:ScanResult"$");
+* Merged CMPCmd into $LK,"CSrvCmd","MN:CSrvCmd"$.
+
+$IV,1$----06/12/13 13:29:08----$IV,0$
+* Added coffins to $LK-A,"::/TempleOS/Demo/Games/CastleFrankenstein.CPP"$.
+* Fixed MeshEditor bug.
+
+$IV,1$----06/12/13 10:49:53----$IV,0$
+* Renamed games.
+* Added $FG,2$AddOutline$FG$ and $FG,2$Etch$FG$ to $FG,2$<CTRL-R>$FG$ bitmap edit menu.
+* Changed $LK-A,"::/TempleOS/Demo/Games/BulgeBomber.CPP"$.
+
+$IV,1$----06/02/13 21:25:49----$IV,0$
+* Got rid of 3 arg in-line (built-in) functions.
+* Got rid of $FG,2$? :$FG$ operator.
+* Improved unassembler code.
+* Improved compiler code.
+
+$IV,1$----05/27/13 08:15:31----$IV,0$
+* $BK,1$TempleOS version 1.02 Released$BK,0$
+* Added help to $FG,2$<CTRL-R>$FG$.
+* Added $FG,2$PopUp$FG$ flag for links.
+* $LK,"R","MN:R"$("Triangle","Tri");
+
+$IV,1$----05/25/13 13:47:35----$IV,0$
+* $LK,"R","MN:R"$("PopUpDitherColor","PopUpColorDither");
+* $LK,"R","MN:R"$("PopUpLightingColor","PopUpColorLighting");
+* Changed sprite edit.
+
+$IV,1$----05/24/13 20:15:47----$IV,0$
+* Fixed compiler bug involving passing float array to function.
+
+$IV,1$----05/16/13 07:09:21----$IV,0$
+* Changed $LK,"DocPutLine","MN:DocPutLine"$().
+* Moved tag to $LK,"CDocEntryBase","MN:CDocEntryBase"$.
+
+$IV,1$----05/12/13 14:15:07----$IV,0$
+* Improved documentation.
+* Moved profiler from Adam2 to Adam3.
+
+$IV,1$----05/11/13 03:31:59----$IV,0$
+* $LK,"R","MN:R"$("MemPtAtPageTableEntry","MemPageTable");
+* Removed CGrVectMap.
+* Removed demos: WinMgr2, Bling, Noise, Layers3DJob, Rocks, MissileDefense, Chess and Pilgrim.
+* Removed hooks for HD Audio.
+* Removed accents and waveforms from $LK,"Play","MN:Play"$().
+
+$IV,1$----05/08/13 13:04:22----$IV,0$
+* $LK,"R","MN:R"$("NativeFS","RedSeaFS");
+* $LK,"R","MN:R"$("C+","Holy C");
+
+$IV,1$----04/30/13 06:15:35----$IV,0$
+* $LK,"R","MN:R"$("GameStarters","Games");
+
+$IV,1$----04/26/13 07:25:50----$IV,0$
+* Fixed bug with Bible links.
+
+$IV,1$----04/10/13 12:41:18----$IV,0$
+* $FG,4$dft_drv$FG$ is now $FG,4$*sys_acct$FG$.
+* Made so RAM drives are not reformatted at boot.
+* $FG,4$$BK,1$WARNING$BK,0$$FG$: Added new prompt to RAM disk creation.
+* Added $LK,"StreamExePutS","MN:StreamExePutS"$() and $LK,"StreamExePrintF","MN:StreamExePrintF"$().
+
+$IV,1$----04/08/13 10:46:20----$IV,0$
+* $BK,1$TempleOS version 1.01 Released$BK,0$
+* Compiler optimization for $LK,"Bt","MN:Bt"$(), $LK,"Bts","MN:Bts"$(), $LK,"Btr","MN:Btr"$(), etc.
+
+$IV,1$----04/06/13 07:39:53----$IV,0$
+* Added $LK,"OptClassFwd","MN:OptClassFwd"$() and $LK,"OptLabelFwd","MN:OptLabelFwd"$().
+
+$IV,1$----04/04/13 06:54:53----$IV,0$
+* Cleaned-up $LK-A,"::/TempleOS/Apps/AfterEgypt/Horeb.CPP"$.
+
+$IV,1$----04/04/13 03:31:30----$IV,0$
+* Cleaned-up $FG,4$::/TempleOS/Demo/Games/Rocks.CPP.Z$FG$.
+* Cleaned-up compiler code.
+* Improved $LK-A,"::/TempleOS/Demo/Snd/WaterFowl.CPP"$.
+
+$IV,1$----04/02/13 16:58:49----$IV,0$
+* Redid $FG,2$ReIndent$FG$ in $FG,2$<CTRL-SHIFT-L>$FG$ menu.  Got rid of old nasty indent code.
+* Added $FG,2$CompileChk$FG$ to $FG,2$<CTRL-SHIFT-L>$FG$ menu.
+* Changed $LK,"LexNew","MN:LexNew"$() filename arg.
+* Added $LK,"LexAttachDoc","MN:LexAttachDoc"$() to replace $FG,4$LexIncludeDoc$FG$().
+* Fixed registry bug.
+
+$IV,1$----04/02/13 03:09:24----$IV,0$
+* Warning: Changed $LK,"CDFileCreate","MN:CDFileCreate"$().
+* Improved $LK-A,"::/TempleOS/Adam/Boot/DskCDDVD.CPP"$.
+* Improved $LK-A,"::/TempleOS/Adam/WallPaper.CPP"$.
+
+$IV,1$----03/31/13 20:15:32----$IV,0$
+* Added background to $LK-A,"::/TempleOS/Demo/Games/Squirt.CPP"$.
+* Added background to $LK-A,"::/TempleOS/Demo/Games/ZoneOut.CPP"$.
+* Added option to edit sprite bitmap extents as text.  $LK,"PopUpExtents","MN:PopUpExtents"$().
+* Added background to $LK-A,"::/TempleOS/Demo/Graphics/Camp.CPP"$, Quail and Clouds.
+
+$IV,1$----03/30/13 16:32:31----$IV,0$
+* Changed $LK,"CDoc","MN:CDoc"$ que to $FG,4$put_doc$FG$, $FG,4$display_doc$FG$, and $FG,4$border_doc$FG$.
+* Got rid of HDAudio support -- never worked for very many people.
+
+$IV,1$----03/27/13 04:18:15----$IV,0$
+* Changed $MA+A,"Tour","Cd(\"::/TempleOS/Misc/Tour\");;AutoFile(\"Tour\");\n"$.
+
+$IV,1$----03/24/13 14:44:28----$IV,0$
+* Made $LK,"PutChar","MN:PutChar"$('Hello') accept multiple chars.  This is tricky.  My compiler allows multi-byte char constants.
+
+$IV,1$----03/19/13 16:18:53----$IV,0$
+* Added $LK,"DocType","MN:DocType"$() and $LK,"DocNewLine","MN:DocNewLine"$().
+* Added option for extra new_lines to $LK,"Type","MN:Type"$().
+
+$IV,1$----03/19/13 00:38:44----$IV,0$
 * $BK,1$TempleOS version 1.00 Released$BK,0$

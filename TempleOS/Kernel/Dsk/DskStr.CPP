@@ -100,7 +100,7 @@ CPrt *Drv2Prt(U8 drv_let=0)
     p=Fs->cur_prt;
   else {
     if (drv_let==':')
-      drv_let=dft_drv;
+      drv_let=*sys_acct;
     p=drv_to_prt[ToUpper(drv_let)-'A'];
   }
   PrtChk(p);
@@ -159,7 +159,7 @@ U8 *DirNameAbs(U8 *_dirname)
   drv[2]=0;
   if (*dirname && dirname[1]==':') {
     if (*dirname==':')
-      *drv=dft_drv;
+      *drv=*sys_acct;
     else
       *drv=*dirname;
     dirname=dirname+2;
@@ -267,18 +267,19 @@ U8 *DftExt(U8 *filename,U8 *extension)
   return result;
 }
 
-CDirEntry *CdDir(CDirEntry *tempm,U8 *abs_name)
+CDirEntry *Cd2DirEntry(CDirEntry *tempm,U8 *abs_name)
 {
   I64 i;
   while (tempm) {
     i=StrLen(tempm->full_name);
-    if (StrNCmp(tempm->full_name,abs_name,i))
+    if (StrNCmp(tempm->full_name,abs_name,i)||
+      i && tempm->full_name[i-1]!='/' && abs_name[i] && abs_name[i]!='/')
       tempm=tempm->next;
     else
       if (StrLen(abs_name)==i)
 	return tempm;
       else
-	return CdDir(tempm->sub,abs_name);
+	return Cd2DirEntry(tempm->sub,abs_name);
   }
   return NULL;
 }

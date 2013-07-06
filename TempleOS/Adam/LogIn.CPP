@@ -4,7 +4,6 @@
 U0 UserStartUp()
 { //Run each time a user a spawned
   UseTermDoc;
-  DocCurAttr(WHITE<<4+BLUE);
   Type("::/TempleOS/Doc/Start.TXT");
   LBts(&Fs->display_flags,DISPLAYf_SHOW);
   WinZBufUpdate;
@@ -13,8 +12,8 @@ U0 UserStartUp()
 }
 
 //This is temporary until defined in $LK-A,"HOME/Adam3fSys.CPP"$.
-U0 ServantStartUp()
-{ //Run each time a servant task is spawned.
+U0 SrvStartUp()
+{ //Run each time a srv task is spawned.
   UseTermDoc;
   LBts(&Fs->display_flags,DISPLAYf_SHOW);
   WinZBufUpdate;
@@ -92,7 +91,7 @@ public Bool AcctRegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
       else
 	Adam("%s",val);
     }
-    if (IsDrvWritable(dft_drv))
+    if (IsDrvWritable(*sys_acct))
       DocWrite(sys_registry_doc);
     result=FALSE;
   } else
@@ -102,7 +101,7 @@ public Bool AcctRegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
   return result;
 }
 
-public I64 AcctRegExecuteBranch(U8 *path)
+public I64 AcctRegExeBranch(U8 *path)
 {
   AcctCacheRegistry;
   return DocTreeBranchExe(sys_registry_doc,path);
@@ -119,7 +118,7 @@ public Bool AcctRegWriteBranch(U8 *path,U8 *fmt,...)
     DocCut(sys_registry_doc,tree_branch,end_indent);
   DocTreeMake(sys_registry_doc,path);
   DocPutS(sys_registry_doc,buf);
-  if (IsDrvWritable(dft_drv))
+  if (IsDrvWritable(*sys_acct))
     DocWrite(sys_registry_doc);
   if (unlock_doc)
     DocUnlock(sys_registry_doc);
@@ -148,20 +147,14 @@ U0 AcctOneTimePopUp(I64 flag_num,U8 *msg)
 U0 RegistryInit()
 {
   U8 buf[136];
-  Bool existed=FileFind(ACCT_REGISTRY_FILENAME),version_present;
+  Bool version_present;
   AcctRegSetDftEntry("Adam/TempleOS/SysMsgFlags","sys_msg_flags[0]=0;\n",TRUE);
   SPrintF(buf,"registry_version=%4.3f;\n",os_version);
   version_present=AcctRegSetDftEntry("Adam/TempleOS/SysRegVer",buf,TRUE);
-  AcctRegExecuteBranch("Adam");
-
-  //Convert old registries
-  if (existed && !version_present)
-    registry_version=5.10;
+  AcctRegExeBranch("Adam");
   if (registry_version!=os_version) {
-    if (registry_version<5.101)
-      AcctRegWriteBranch("TempleOS","");
     AcctRegWriteBranch("Adam/TempleOS/SysRegVer",buf);
-    AcctRegExecuteBranch("Adam");
+    AcctRegExeBranch("Adam");
   }
 }
 

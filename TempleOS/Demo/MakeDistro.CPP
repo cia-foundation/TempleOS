@@ -12,7 +12,7 @@ accessible from Windows.
 
 $HL,1$*/
 
-#define STD_DISTRO_CDROM_CFG	"b10x20000\nt3 \n\n\n\n\n"
+#define STD_DISTRO_CDROM_CFG	"b1\n0x20000\nt3 \n\n\n\n\n"
 
 U0 MakeMyISO(U8 *out_iso_filename)
 {//Does everything with current drive.
@@ -31,7 +31,7 @@ U0 MakeMyISO(U8 *out_iso_filename)
   CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
   MkDir("/Distro/Temp");
   MkDir("/Distro/Temp/ScreenShots");
-  CDFileCreate(out_iso_filename,"/Distro/*","",BOOTCD_BIN_Z);
+  CDFileCreate(out_iso_filename,"/Distro/*",,"/Distro" BOOT_DIR_KERNEL_BIN_C);
   //CDImageWrite('T',out_iso_filename,MT_CD); //Uncomment to burn a CD-ROM or (MT_DVD)
   //DelTree("/Distro");
 }

@@ -2,8 +2,8 @@
 The +D flag causes a define-string
 look-up and substitution.
 
-It is available in the <CTRL-L> menu
-under text entries for use in
+It is available in the <CTRL-L> text-widget
+menu under text entries for use in
 documentation.
  
 */
@@ -12,11 +12,11 @@ documentation.
 DefineLoad("COMPANY","Trivial Solutions");
 "Company: $$TX+D,\"\",\"COMPANY\"$$\n";
 
-DefinePrintF("COMPANY_TIME","%T",GetCurTimeCDate);
+DefinePrintF("COMPANY_TIME","%T",GetCurTimeDate);
 
 #exe {
   StreamPrintF(
-    "#define COMPANY_AGE %h56D\n",GetCurTimeCDate-A2CDate("8/1/2003"));
+    "#define COMPANY_AGE %h56D\n",GetCurTimeDate-A2Date("8/1/2003"));
 };
 
 

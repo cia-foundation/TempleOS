@@ -257,7 +257,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
 U0 WSDPopUpDef(U8 *st,I64 num=-1,CTask *parent=NULL)
 {
   U8 *buf;
-  buf=MSPrintF("WSDDisplayDefs(DocCur,\"%s\",%d);View;",st,num);
+  buf=MSPrintF("WSDDisplayDefs(DocPut,\"%s\",%d);View;",st,num);
   PopUp(buf,parent);
   Free(buf);
 }

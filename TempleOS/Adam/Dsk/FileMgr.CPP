@@ -153,10 +153,10 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   CDocEntry *doc_ce;
   CDirEntry *tempm,*tempm1,*cur_tree_entry;
   if (!doc)
-    parent_doc=DocCur;
+    parent_doc=DocPut;
   else {
     parent_doc=doc->parent_doc;
-    DocQueRem(doc);
+    Fs->put_doc=Fs->display_doc=NULL;
     DocUnlock(doc);
     WinMgrSync;
     DocLock(doc);
@@ -204,20 +204,21 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   doc->flags|=DOCF_FORM;
   switch (mode) {
     case FM_NORMAL:
-      DocPutS(doc,"$$FG,PURPLE$$File Manager$$FG$$\n\n$$LK,\"Click for Help\",\"FI:::/TempleOS/Doc/FileMgr.TXT\"$$\n\n");
+      DocPutS(doc,"$$FG,PURPLE$$File Manager\n\n$$LK,\"Click for Help\",\"FI:::/TempleOS/Doc/FileMgr.TXT\"$$\n\n");
       break;
     case FM_PICK_FILE:
-      DocPutS(doc,"$$FG,PURPLE$$Pick file and press <ESC>$$FG$$\n\n");
+      DocPutS(doc,"$$FG,PURPLE$$Pick file and press <ESC>\n\n");
       doc->flags|=DOCF_MIN_SIZE;
       break;
     case FM_PICK_DIR:
-      DocPutS(doc,"$$FG,PURPLE$$Pick directory and press <ESC>$$FG$$\n\n");
+      DocPutS(doc,"$$FG,PURPLE$$Pick directory and press <ESC>\n\n");
       doc->flags|=DOCF_MIN_SIZE;
       break;
   }
+  DocPutS(doc,"$$FG,LTBLUE$$");
   for (i=0;i<NUM_PRTS;i++) {
     p=&sys_prts[i];
-    if (p->type==PT_NATIVE||p->type==PT_FAT32)
+    if (p->type==PT_REDSEA||p->type==PT_FAT32)
       FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
     else if (p->type==PT_ISO9660) {
       if (p->bdev->flags&BDF_INITIALIZED)
@@ -238,8 +239,7 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   Free(next_entry);
   *_doc=doc;
   DocLock(doc);
-  DocQueRem(DocCur);
-  DocQueIns(doc,Fs->last_doc);
+  Fs->put_doc=Fs->display_doc=doc;
 }
 
 U0 FMRename(CDoc *doc)
@@ -550,7 +550,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 {
   CDirEntry *root=NULL,*tempm,*tempm1,*tempm2;
   I64 sc,ch,p1,p2,msg_code;
-  CDoc *doc=NULL,*old_doc=DocCur;
+  CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
   U8 *result=NULL,*st,*st2,*old_cur_dir=CurDir;
   CDocEntry *doc_ce=NULL,*doc_e;
   Bool okay;
@@ -559,7 +559,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   fp_old_final_screen_update=fp_final_screen_update;
   MenuFilePush("::/TempleOS/Doc/FileMgrPullDown.TXT");
   FMRebuildDoc(&doc,&root,mode);
-  if (tempm1=CdDir(root,old_cur_dir))
+  if (tempm1=Cd2DirEntry(root,old_cur_dir))
     doc->cur_entry=tempm1->user_data;
   while (tempm1) {
     if (tempm1->attr&_ATTR_DIR)
@@ -750,8 +750,8 @@ regular_key:
     }
   } while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
   fp_final_screen_update=fp_old_final_screen_update;
-  DocQueRem(doc);
-  DocQueIns(old_doc,Fs->last_doc);
+  Fs->put_doc	 =old_put_doc;
+  Fs->display_doc=old_display_doc;
   SettingsPop;
   DocDel(doc);
   CDirLstDel(root);

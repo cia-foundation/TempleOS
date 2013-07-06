@@ -4,14 +4,14 @@ This makes a mesh ball.
 
 
 #define MAX_VERTICES	1024
-#define MAX_TRIANGLES	1024
+#define MAX_TRIS	1024
 
 class Ball
 {
   I32 vertex_cnt;
-  I32 triangle_cnt;
+  I32 tri_cnt;
   CD3I32	    v[MAX_VERTICES];
-  CMeshTri t[MAX_TRIANGLES];
+  CMeshTri t[MAX_TRIS];
 } *b;
 
 
@@ -50,9 +50,9 @@ I64 AddVertex(BallDefineStruct *,I64 x,I64 y,I64 z)
   return i;
 }
 
-I64 AddTriangle(BallDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
+I64 AddTri(BallDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
 {
-  I64 result=b->triangle_cnt++;
+  I64 result=b->tri_cnt++;
   b->t[result].color=c;
   b->t[result].nums[0]=n0;
   b->t[result].nums[1]=n1;
@@ -64,15 +64,15 @@ U8 *Ball2CSprite()
 {
 //See $LK,"::/TempleOS/Adam/Gr/GrSpritePlot.CPP","FL:::/TempleOS/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
-    b->vertex_cnt*sizeof(CD3I32)+b->triangle_cnt*sizeof(CMeshTri)+gr_sprite_base_size[GRST_END]),
+    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+gr_sprite_base_size[GRST_END]),
     *dst=result;
   *dst(U8 *)++ =GRST_MESH;
   *dst(I32 *)++ =b->vertex_cnt;
-  *dst(I32 *)++ =b->triangle_cnt;
+  *dst(I32 *)++ =b->tri_cnt;
   MemCpy(dst,&b->v,b->vertex_cnt*sizeof(CD3I32));
   dst+=b->vertex_cnt*sizeof(CD3I32);
-  MemCpy(dst,&b->t,b->triangle_cnt*sizeof(CMeshTri));
-  dst+=b->triangle_cnt*sizeof(CMeshTri);
+  MemCpy(dst,&b->t,b->tri_cnt*sizeof(CMeshTri));
+  dst+=b->tri_cnt*sizeof(CMeshTri);
   *dst(U8 *)++ =GRST_END;
   return result;
 }
@@ -92,7 +92,7 @@ public U8 *BallGen()
     MemCpy(&bd2,&bd1,sizeof(BallDefineStruct));
     BDCorrect(&bd2);
 
-    c=PopUpLightingColor;
+    c=PopUpColorLighting;
     if (c<0)  return NULL;
 
     b=CAlloc(sizeof(Ball));
@@ -111,8 +111,8 @@ public U8 *BallGen()
 	p2=AddVertex(&bd2,r1*Cos((2*i+2+j)*d_a2),r1*Sin((2*i+2+j)*d_a2),z1);
 	p3=AddVertex(&bd2,r2*Cos((2*i+1+j)*d_a2),r2*Sin((2*i+1+j)*d_a2),z2);
 	p4=AddVertex(&bd2,r2*Cos((2*i+3+j)*d_a2),r2*Sin((2*i+3+j)*d_a2),z2);
-	AddTriangle(&bd2,c,p1,p2,p3);
-	AddTriangle(&bd2,c,p3,p2,p4);
+	AddTri(&bd2,c,p1,p2,p3);
+	AddTri(&bd2,c,p3,p2,p4);
       }
     }
  

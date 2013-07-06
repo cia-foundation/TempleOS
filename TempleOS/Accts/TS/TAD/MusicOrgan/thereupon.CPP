@@ -30,6 +30,7 @@ U0 Song()
   I64 i;
   CTask *task;
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  Fs->text_attr=LTCYAN<<4+BLACK;
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
@@ -52,17 +53,17 @@ U0 Song()
     TaskWait(task);
     SetWinHorz(Fs->win_left,Fs->win_right,task);
     SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
-    "$$BD+H,LTCYAN$$$$FD+H,BLACK$$";
+    "$$BG+H,LTCYAN$$$$FG+H,BLACK$$";
     while (!ScanKey) {
-      Play("W12qG3eCB2hGqG3eCB2qG3A",
+      Play("2qG3eCB2hGqG3eCB2qG3A",
       "Umm... \0God?\n\0 \0 \0Let \0Your \0 \0 \0 \0");
       Play("CeBA2G3DqEeDCBA2qG3A",
       "face \0shine \0on \0down\n\0on \0us, \0Your \0 \0luck\0y \0 \0peo\0");
-      Play("eBA2h.G3qE!!CAF",
+      Play("eBA2h.G3qECAF",
       " \0ple.\n\0 \0Fath\0e\0r \0a\0");
-      Play("FD!A!eEDqE!!CAF",
+      Play("FDAeEDqECAF",
       "bove,\n\0 \0 \0I \0 \0feel \0 \0 \0Your \0");
-      Play("FD!A!eED",
+      Play("FDAeED",
       "love.\n\0 \0 \0 \0 \0");
     }
     } catch

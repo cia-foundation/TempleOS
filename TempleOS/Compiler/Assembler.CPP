@@ -182,23 +182,6 @@ U0 AsmStoreCodeU8At(CLex *lx,U8 b,I64 ip)
     a->num_code_U8s=ip+1;
 }
 
-U0 AsmReserveCodeTo(CLex *lx,I64 ip)
-{
-  CAsmCtrl *a=lx->a;
-  I64 i=ip>>ASM_CODE_BLK_BITS+1;
-  CAsmCodeBlk *tempc=&a->code;
-  while (i--) {
-    if (!tempc->next) {
-      tempc->next=CAlloc(sizeof(CAsmCodeBlk));
-      tempc->next->next=NULL;
-    }
-    tempc=tempc->next;
-  }
-  if (ip>a->num_code_U8s)
-    a->num_code_U8s=ip;
-}
-
-
 I64 AsmExpressionEval(CLex *lx)
 {
   U8 *exp;
@@ -279,10 +262,10 @@ U0 AsmLocalsResolve(CLex *lx)
     Free(tempu);
     tempu=tempu1;
   }
-  HashTableDel(lx->local_hash_table);
-  lx->local_hash_table=lx->hash_table_lst->next=
+  HashTableDel(lx->htc.local_hash_table);
+  lx->htc.local_hash_table=lx->htc.hash_table_lst->next=
     HashTableNew(16);
-  lx->local_hash_table->next=lx->glbl_hash_table;
+  lx->htc.local_hash_table->next=lx->htc.glbl_hash_table;
   a->local_unresolved=NULL;
   a->has_locals=FALSE;
 }
@@ -311,7 +294,7 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
 	if (tempess->type & HTT_EXPORT_SYS_SYM &&
 	    tempess->type & HTF_UNRESOLVED &&
 	    !(tempess->type & HTF_IMPORT) &&
-	    (tempf=HashFind(tempess->str,lx->hash_table_lst,HTT_FUN)) &&
+	    (tempf=HashFind(tempess->str,lx->htc.hash_table_lst,HTT_FUN)) &&
 	    !Bt(tempf->flags,Cf_EXTERN)) {
 	  tempess->val=tempf->executable_addr;
 	  tempess->type&=~HTF_UNRESOLVED;
@@ -373,8 +356,8 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
     tempu=tempu1;
   }
 
-  tempess=lx->glbl_hash_table->next_added;
-  while (tempess!=lx->glbl_hash_table) {
+  tempess=lx->htc.glbl_hash_table->next_added;
+  while (tempess!=lx->htc.glbl_hash_table) {
     if (tempess->type & HTF_IMPORT && tempess->use_cnt) {
       if (tempe=tempess->ie_lst) {
 	if (tempess->import_name)
@@ -1310,7 +1293,7 @@ U0 PrsAsmBlk(CLex *lx)
 {
   CAsmCtrl *a=lx->a;
   I64 i,j,k,argcnt,
-      old_hash_mask=lx->hash_mask,
+      old_hash_mask=lx->htc.hash_mask,
       old_flags=lx->flags & LF_ASM_EXPRESSIONS;
   CHashOpcode *tempo;
   CHashExport *tempess;
@@ -1318,7 +1301,7 @@ U0 PrsAsmBlk(CLex *lx)
 
   a->seg_size=64;
   lx->flags|=LF_ASM_EXPRESSIONS;
-  lx->hash_mask=lx->hash_mask&~(HTF_FLAGS_MASK|HTT_FILE|HTT_INTERNAL_TYPE|HTT_MODULE)|HTT_ASM_KEYWORD;
+  lx->htc.hash_mask=lx->htc.hash_mask&~(HTF_FLAGS_MASK|HTT_FILE|HTT_INTERNAL_TYPE|HTT_MODULE)|HTT_ASM_KEYWORD;
   if (lx->token!='{')
     LexExcept(lx,"ST_EXPECTING_LEFT_BRACE");
   else
@@ -1340,7 +1323,7 @@ U0 PrsAsmBlk(CLex *lx)
 		tempess->str=lx->ident;
 		lx->ident=0;
 		tempess->type=HTT_EXPORT_SYS_SYM|HTF_UNRESOLVED;
-		HashAdd(tempess,lx->glbl_hash_table);
+		HashAdd(tempess,lx->htc.glbl_hash_table);
 		tempess->type|=HTF_IMPORT;
 		if (Lex(lx)==',')
 		  Lex(lx); //skip ','
@@ -1352,7 +1335,7 @@ U0 PrsAsmBlk(CLex *lx)
 	      Lex(lx); //skip ';';
 	    break;
 	  case AKW_MODULE_ORG:
-	    if (lx->local_var_lst)
+	    if (lx->htc.local_var_lst)
 	      LexExcept(lx,"ST_NO_FUN_ASM_ORG");
 	    if (a->module_org!=INVALID_PTR)
 	      LexExcept(lx,"ST_JUST_ONE_ORG_ALLOWED");
@@ -1361,7 +1344,7 @@ U0 PrsAsmBlk(CLex *lx)
 	    a->module_org=AsmExpressionEval(lx);
 	    break;
 	  case AKW_ALIGN:
-	    if (lx->local_var_lst)
+	    if (lx->htc.local_var_lst)
 	      LexExcept(lx,"ST_NO_FUN_ASM_ALIGN");
 	    i=AsmExpressionEval(lx);
 	    if (Bsf(i)!=Bsr(i))
@@ -1470,10 +1453,10 @@ U0 PrsAsmBlk(CLex *lx)
 	  if (*tempess->str=='@' && tempess->str[1]=='@') {
 	    if (lx->token==TK_DBL_COLON)
 	      LexExcept(lx,"ST_NO_LOCAL_GLBL_EXPORT");
-	    HashAdd(tempess,lx->local_hash_table);
+	    HashAdd(tempess,lx->htc.local_hash_table);
 	    a->has_locals=TRUE;
 	  } else
-	    HashAdd(tempess,lx->glbl_hash_table);
+	    HashAdd(tempess,lx->htc.glbl_hash_table);
 	  if (lx->token==TK_DBL_COLON) {
 	    tempess->type|=HTF_EXPORT;
 	    SetSrcFileInfo(lx,tempess);
@@ -1489,8 +1472,7 @@ U0 PrsAsmBlk(CLex *lx)
     }
   }
   AsmLocalsResolve(lx);
-  AsmReserveCodeTo(lx,a->ip);
   lx->flags&=lx->flags&~LF_ASM_EXPRESSIONS|old_flags;
-  lx->hash_mask=old_hash_mask;
+  lx->htc.hash_mask=old_hash_mask;
 }
 

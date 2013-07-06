@@ -12,14 +12,13 @@ I64 MPSum(I64 my_mp_cnt)
 
 I64 Sum(I64 n,I64 my_mp_cnt)
 {
-  CMPCmd *tempm[MP_MAX_PROCESSORS];
+  CSrvCmd *tempm[MP_MAX_PROCESSORS];
   I64 result=0,i;
   mp_n=n+1;
-  for (i=1;i<my_mp_cnt;i++)
-    tempm[i]=MPJob(&MPSum,my_mp_cnt,i,0);
-  result=MPSum(my_mp_cnt);
-  for (i=1;i<my_mp_cnt;i++)
-    result+=MPJobResult(tempm[i]);
+  for (i=0;i<my_mp_cnt;i++)
+    tempm[i]=JobQue(&MPSum,my_mp_cnt,i,0);
+  for (i=0;i<my_mp_cnt;i++)
+    result+=GetResult(tempm[i]);
   return result;
 }
 
@@ -39,7 +38,10 @@ F64 Test(I64 n,I64 my_mp_cnt)
   return end-start;
 }
 
-#define NUM_TESTS	7
+#define MIN_VAL		1000
+#define MIN_TEST	3
+#define MAX_TEST	7
+#define NUM_TESTS	(MAX_TEST-MIN_TEST+1)
 #define MAX_PERCENT	200
 
 U0 MPAdd()
@@ -50,7 +52,7 @@ U0 MPAdd()
   F64 t1,t2,results[NUM_TESTS];
   CDC *dc=DCAlias;
 
-  for (i=0,n=10;i<NUM_TESTS;i++,n*=10) {
+  for (i=0,n=MIN_VAL;i<NUM_TESTS;i++,n*=10) {
     t1=Test(n,1);
     t2=Test(n,mp_cnt);
     results[i]=t2*100.0/t1;
@@ -61,7 +63,7 @@ U0 MPAdd()
   DocClear;
 
   dc->color=BLUE;
-  for (i=0;i<MAX_PERCENT;i+=MAX_PERCENT/10) {
+  for (i=MAX_PERCENT/10;i<MAX_PERCENT;i+=MAX_PERCENT/10) {
     GrPrintF(dc,0,v-ToF64(i)/MAX_PERCENT*v-FONT_HEIGHT,"%3d%%",i);
     GrLine(dc,0,v-ToF64(i)/MAX_PERCENT*v,h,v-ToF64(i)/MAX_PERCENT*v);
   }
@@ -72,9 +74,8 @@ U0 MPAdd()
     GrLine3(dc,i*h/(NUM_TESTS-1),      v-results[i  ]/MAX_PERCENT*v,0,
 		 (i+1)*h/(NUM_TESTS-1),v-results[i+1]/MAX_PERCENT*v,0);
     dc->color=GREEN;
-    GrPrintF(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+1);
-    GrLine(dc,i*h/(NUM_TESTS-1),0,
-		i*h/(NUM_TESTS-1),v);
+    GrPrintF(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
+    GrLine(dc,i*h/(NUM_TESTS-1),0,i*h/(NUM_TESTS-1),v);
   }
   PressAKey;
 

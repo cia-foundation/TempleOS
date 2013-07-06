@@ -32,7 +32,7 @@ public isn't interested in realism.
 
 // ********************************** Glbls
 AcctRegSetDftEntry("TempleOS/XCaliber","I64 best_score=0;\n");
-AcctRegExecuteBranch("TempleOS/XCaliber");
+AcctRegExeBranch("TempleOS/XCaliber");
 
 class MyMass:CMass
 {
@@ -100,20 +100,20 @@ CMathODE *ode=NULL;
 I64 level,score,remaining;
 
 $BG,0$
-$SP,"<thruster>",1$
+$SP,"<1>",1$
 
-$SP,"<gun_ready>",2$
+$SP,"<2>",2$
 
-$SP,"<gun_busy>",3$
-
-
-$SP,"<spacewalk>",4$
+$SP,"<3>",3$
 
 
-$SP,"<EnemySide>",5$
+$SP,"<4>",4$
 
 
-$SP,"<Laser>",6$
+$SP,"<5>",5$
+
+
+$SP,"<6>",6$
 
 $BG$
 // ********************************** Ship
@@ -376,7 +376,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   U8 *img;
   Bool draw_laser_line=FALSE;
 
-  task->text_attr=BLACK<<4+WHITE;
   if (ode!=task->last_ode) return;
 
   dc->color=WHITE;
@@ -476,7 +475,6 @@ U0 DrawIt(CTask *task,CDC *dc)
 		draw_laser_line=TRUE;
 		Snd(1000);
 	      }
-	      break;
 	  }
 
 	  ctrl_panel.laser_temperature=temps->laser_temperature;
@@ -584,7 +582,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     D3Sub(&human->p[2].x,&human->p[0].x,&p2);
     D3Unit(D3Add(&p1,&p2,&p));
     dc->color=LTBLUE;
-    Line(dc,human->p[0].x-10*p.x,human->p[0].y-10*p.y,0,human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
+    LOSLine(dc,human->p[0].x-10*p.x,human->p[0].y-10*p.y,0,human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
   }
 }
 
@@ -837,7 +835,6 @@ U0 CheckDamage()
 	    Noise(750,1000,3000);
 	  }
 	}
-	break;
     }
     temps=temps1;
   }
@@ -893,7 +890,6 @@ U0 HumanFireBegin()
 	  break;
 	default:
 	  human->lasering=TRUE;
-	  break;
       }
   }
 }
@@ -909,7 +905,6 @@ U0 HumanFireEnd()
       default:
 	human->lasering=FALSE;
 	Snd(0);
-	break;
     }
 }
 
@@ -997,6 +992,7 @@ U0 XCaliber()
   CCtrl *cp=CtrlPanelNew;
 
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  Fs->text_attr=BLACK<<4+WHITE;
   Preempt(OFF);
   MenuPush(
   "File {"

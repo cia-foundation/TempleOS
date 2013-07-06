@@ -61,7 +61,7 @@ U0 EdLite(U8 *filename,I64 num=1)
 //Light weight text editor for debugging
   U8 *src,*src2,*src3,*dst,*buf,*bin_data=NULL;
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
-      old_dc_flags=sys_raw_dc_flags;
+	old_dc_flags=sys_raw_dc_flags;
   CLine root,*templ,*templ1,*cur_line;
   Bool old_raw=Raw(ON),
 	old_debug=InDbg(ON),
@@ -81,12 +81,12 @@ U0 EdLite(U8 *filename,I64 num=1)
     src=buf;
     while (*src) {
       src2=src;
-      while ((ch=*src++) && ch!=CH_CARRIAGE_RETURN && ch!='\n');
+      while ((ch=*src++) && ch!='\r' && ch!='\n');
       src--;
       *src++=0;
       if (!ch)
 	src--;
-      while (ch==CH_CARRIAGE_RETURN && *src=='\n' || *src==CH_CURSOR)
+      while (ch=='\r' && *src=='\n' || *src==CH_CURSOR)
 	src++;
       dst=src3=src2;
       while (ch=*src3++)
@@ -195,7 +195,7 @@ U0 EdLite(U8 *filename,I64 num=1)
 	}
 	break;
       case '\n':
-      case CH_CARRIAGE_RETURN:
+      case '\r':
 	templ=MAlloc(sizeof(CLine));
 	templ->line=StrNew(cur_line->line+cur_col);
 	cur_line->line[cur_col]=0;
@@ -249,7 +249,6 @@ U0 EdLite(U8 *filename,I64 num=1)
 	  cur_line->line=src;
 	  cur_col++;
 	}
-	break;
     }
   } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
 
@@ -294,7 +293,7 @@ U0 EdLite(U8 *filename,I64 num=1)
   PopFD;
 }
 
-U0 EdLiteFileLine(U8 *_fl_file_line)
+U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum)
 {
   U8 *st,*fl_file_line=StrNew(_fl_file_line);
   I64 linenum;
@@ -303,8 +302,17 @@ U0 EdLiteFileLine(U8 *_fl_file_line)
   StrLastRem(fl_file_line,",",st);
   linenum=A2I(st);
   Free(st);
-  EdLite(fl_file_line,linenum);
-  Free(fl_file_line);
+  *_filename=fl_file_line;
+  *_linenum=linenum;
+}
+
+U0 EdLiteFileLine(U8 *fl_file_line)
+{
+  U8 *filename;
+  I64 linenum;
+  ToFileLine(fl_file_line,&filename,&linenum);
+  EdLite(filename,linenum);
+  Free(filename);
 }
 
 U0 SetFix(U8 *filename,I64 line)

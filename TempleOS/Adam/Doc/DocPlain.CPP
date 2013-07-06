@@ -80,40 +80,7 @@ DOCEF1_DATA_IS_PTR | DOCEF1_HAS_TERMINATOR | DOCEF1_AUX_STR | DOCEF1_U64,
 //DOCT_DFT_BACKGROUND
 0,
 
-//DOCT_ALT_FOREGROUND
-0,
-
-//DOCT_LINK_FOREGROUND
-0,
-
-//DOCT_MACRO_FOREGROUND
-0,
-
-//DOCT_ANCHOR_FOREGROUND
-0,
-
-//DOCT_HIDDEN_FOREGROUND
-0,
-
-//DOCT_TREE_FOREGROUND
-0,
-
-//DOCT_USER_FOREGROUND
-0,
-
-//DOCT_BINARY_FOREGROUND
-0,
-
-//DOCT_KEYWORD_FOREGROUND
-0,
-
-//DOCT_KEYWORD2_FOREGROUND
-0,
-
-//DOCT_COMMENT_FOREGROUND
-0,
-
-//DOCT_QUOTE_FOREGROUND
+//DOCT_PMT
 0,
 
 //DOCT_WORD_WRAP
@@ -261,40 +228,7 @@ I64 doc_dft_flags2[DOCT_NUM_TYPES]={
 //DOCT_DFT_BACKGROUND
 0,
 
-//DOCT_ALT_FOREGROUND
-0,
-
-//DOCT_LINK_FOREGROUND
-0,
-
-//DOCT_MACRO_FOREGROUND
-0,
-
-//DOCT_ANCHOR_FOREGROUND
-0,
-
-//DOCT_HIDDEN_FOREGROUND
-0,
-
-//DOCT_TREE_FOREGROUND
-0,
-
-//DOCT_USER_FOREGROUND
-0,
-
-//DOCT_BINARY_FOREGROUND
-0,
-
-//DOCT_KEYWORD_FOREGROUND
-0,
-
-//DOCT_KEYWORD2_FOREGROUND
-0,
-
-//DOCT_COMMENT_FOREGROUND
-0,
-
-//DOCT_QUOTE_FOREGROUND
+//DOCT_PMT
 0,
 
 //DOCT_WORD_WRAP
@@ -442,40 +376,7 @@ I64 doc_dft_type_flags[DOCT_NUM_TYPES]={
 //DOCT_DFT_BACKGROUND
 0,
 
-//DOCT_ALT_FOREGROUND
-0,
-
-//DOCT_LINK_FOREGROUND
-0,
-
-//DOCT_MACRO_FOREGROUND
-0,
-
-//DOCT_ANCHOR_FOREGROUND
-0,
-
-//DOCT_HIDDEN_FOREGROUND
-0,
-
-//DOCT_TREE_FOREGROUND
-0,
-
-//DOCT_USER_FOREGROUND
-0,
-
-//DOCT_BINARY_FOREGROUND
-0,
-
-//DOCT_KEYWORD_FOREGROUND
-0,
-
-//DOCT_KEYWORD2_FOREGROUND
-0,
-
-//DOCT_COMMENT_FOREGROUND
-0,
-
-//DOCT_QUOTE_FOREGROUND
+//DOCT_PMT
 0,
 
 //DOCT_WORD_WRAP
@@ -703,18 +604,6 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       case DOCT_BACKGROUND:
       case DOCT_DFT_FOREGROUND:
       case DOCT_DFT_BACKGROUND:
-      case DOCT_ALT_FOREGROUND:
-      case DOCT_LINK_FOREGROUND:
-      case DOCT_MACRO_FOREGROUND:
-      case DOCT_ANCHOR_FOREGROUND:
-      case DOCT_HIDDEN_FOREGROUND:
-      case DOCT_TREE_FOREGROUND:
-      case DOCT_USER_FOREGROUND:
-      case DOCT_BINARY_FOREGROUND:
-      case DOCT_KEYWORD_FOREGROUND:
-      case DOCT_KEYWORD2_FOREGROUND:
-      case DOCT_COMMENT_FOREGROUND:
-      case DOCT_QUOTE_FOREGROUND:
       case DOCT_WORD_WRAP:
       case DOCT_HIGHLIGHT:
       case DOCT_LOCK_TO_PAGE:
@@ -907,18 +796,6 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
       case DOCT_BACKGROUND:
       case DOCT_DFT_FOREGROUND:
       case DOCT_DFT_BACKGROUND:
-      case DOCT_ALT_FOREGROUND:
-      case DOCT_LINK_FOREGROUND:
-      case DOCT_MACRO_FOREGROUND:
-      case DOCT_ANCHOR_FOREGROUND:
-      case DOCT_HIDDEN_FOREGROUND:
-      case DOCT_TREE_FOREGROUND:
-      case DOCT_USER_FOREGROUND:
-      case DOCT_BINARY_FOREGROUND:
-      case DOCT_KEYWORD_FOREGROUND:
-      case DOCT_KEYWORD2_FOREGROUND:
-      case DOCT_COMMENT_FOREGROUND:
-      case DOCT_QUOTE_FOREGROUND:
       case DOCT_WORD_WRAP:
       case DOCT_HIGHLIGHT:
       case DOCT_LOCK_TO_PAGE:
@@ -1077,7 +954,7 @@ public U0 DocIns(CDoc *doc,CDocEntry *doc_e)
       !(doc_ce->flags1&(DOCEF1_TAG_CB|DOCEF1_DEFINE|DOCEF1_HTML_LINK)) &&
       !(doc_ce->flags2&DOCEF2_BIN_PTR_LINK) &&
       doc->cur_data_col<doc_ce->max_col) {
-    doc_ne=CAlloc(sizeof(CDocEntryBase)+sizeof(U8 *),doc->mem_task);
+    doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
     doc_ne->type=DOCT_TEXT|doc_ce->type&0xFFFFFF00;
     doc_ne->x=doc_ce->x;
     doc_ne->y=doc_ce->y;
@@ -1116,7 +993,7 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
   Bool unlock;
   I64 j;
   CDocEntry *doc_e=NULL,*result=NULL,*doc_ce;
-  if (!st || !doc || doc->doc_signature!=DOC_SIGNATURE_VAL)
+  if (!st || !doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
     return NULL;
   unlock=DocLock(doc);
   if (doc->flags & DOCF_PLAIN_TEXT_WITH_TABS)
@@ -1134,7 +1011,7 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
     ptr--;
     if (!ch) {
       if (j=ptr-ptr2) {
-	doc_e=CAlloc(sizeof(CDocEntryBase)+sizeof(U8 *),doc->mem_task);
+	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
 	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
 	if (doc->flags & DOCF_NO_CURSOR) {
 	  src=MAlloc(j+1);
@@ -1153,7 +1030,7 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
     } else {
       if (j=ptr-ptr2) {
 	*ptr=0;
-	doc_e=CAlloc(sizeof(CDocEntryBase)+sizeof(U8 *),doc->mem_task);
+	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
 	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
 	if (doc->flags & DOCF_NO_CURSOR) {
 	  src=MAlloc(j+1);
@@ -1210,7 +1087,7 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	      ptr2++;
 	    }
 	    if (ptr==ptr2) {
-	      doc_e=CAlloc(sizeof(CDocEntryBase)+sizeof(U8 *),doc->mem_task);
+	      doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
 	      doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
 	      doc_e->max_col=1;
 	      if (doc->flags & DOCF_DBL_DOLLARS)
@@ -1248,12 +1125,12 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
 	  doc_e->type=DOCT_NEW_LINE | doc->settings_root.dft_text_attr << 8;
 	  DocIns(doc,doc_e);
-	  if (ch==CH_CARRIAGE_RETURN)
-	    while (*ptr==CH_CARRIAGE_RETURN)
+	  if (ch=='\r')
+	    while (*ptr=='\r')
 	      ptr++;
 	  if (*ptr=='\n')
 	    ptr++;
-	  while (*ptr==CH_CARRIAGE_RETURN)
+	  while (*ptr=='\r')
 	    ptr++;
       }
     }

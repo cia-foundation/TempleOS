@@ -8,10 +8,10 @@ U0 Song()
   try {
   while (!ScanKey) {
 	Play("M9/8");
-	Play("W13qAeCBAq.CsAAqAeCBA2q.G3sBC");
+	Play("3qAeCBAq.CsAAqAeCBA2q.G3sBC");
 	Play("qAeDCAhBeFsEEeDq.CM4/4");
-	Play("sAFAFeF!!2GsG3B2G!!3BqGeA!sAAetEGDE2G!3DeGsGG");
-	Play("AFAFeF!!2GsG3B2G!!3BqGeA!sAAetEGDE2G!3DeGsGG");
+	Play("sAFAFeF2GsG3B2G3BqGeAsAAetEGDE2G3DeGsGG");
+	Play("AFAFeF2GsG3B2G3BqGeAsAAetEGDE2G3DeGsGG");
   }
   } catch
     CatchAll;

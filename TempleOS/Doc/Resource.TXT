@@ -1,0 +1,5 @@
+$WW,1$$FG,5$$TX+CX,"Graphic Resource Help"$$FG$
+
+A sprite is an ordered list of elements such as lines, rectangles, bitmaps and color changes.  In a program's source code, you first make a sprite.  Then, you insert a pointer to it.
+
+You can create an icon on your personal menu or in any document by placing a sprite with a payload of $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ code to execute.  This is a called "sprite macro".  If you check "Pop-Up", it will spawn a new task and run the payload.  If you have it on your personal menu, you can, optionally, check "Esc" and it will exit to the cmd-line shell and print the macro similar to how the Linux history works.

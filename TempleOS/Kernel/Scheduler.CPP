@@ -184,7 +184,7 @@ SYS_YIELD::
 	PUSH	RAX
 	MOV	RAX,SYS_SEMAS
 	BT	U32 SYS_SEMA_SINGLE_USER*SEMA_STRUCT_SIZE[RAX],0
-	JC	@@05
+	JC	@@05	//If single user, don't change task.
 	POP	RAX
 
 	CLI
@@ -192,12 +192,12 @@ SYS_YIELD::
 	XOR	RSI,RSI
 	MOV	RSI,FS:CTask.addr[RSI]
 	CMP	U64 CTask.next_task[RSI],RSI
-	JNE	@@15
+	JNE	@@15	//Jmp if not just one task on core.
 
 	PUSH	RAX
 	MOV	RAX,U64 [SYS_JIFFIES]
 	CMP	U64 CTask.wake_jiffy[RSI],RAX
-	JA	@@10
+	JA	@@10	//If needs to sleep, jmp and swap-out.
 
 	POP	RAX
 	POP	RSI
@@ -233,7 +233,7 @@ RESTORE_RSI_TASK_NO_KEY_CHECK:
 
 	MOV	RAX,U64 [SYS_JIFFIES]
 	CMP	U64 CTask.wake_jiffy[RSI],RAX
-	JA	@@25
+	JA	@@25	//Jmp if not ready, yet.
 
 	CMP	U32 CTask.task_in_que_signature[RSI],TASK_IN_QUE_SIGNATURE_VAL
 	JNE	SWAP_IN_SETH_TASK
@@ -244,15 +244,15 @@ RESTORE_RSI_TASK_NO_KEY_CHECK:
 @@25:	MOV	RSI,U64 CTask.next_task[RSI]
 	XOR	RAX,RAX
 	CMP	U64 GS:CCPU.seth_task[RAX],RSI
-	JNE	@@20
+	JNE	@@20	//Jmp if not Seth
 	LOCK
 	BTR	U32 GS:CCPU.cpu_flags[RAX],CPUf_HAD_IRQ_OPPORTUNITY
-	JC	@@20
+	JC	@@20	//Jmp if had chance for IRQ already
 	MOV	RAX,U64 GS:CCPU.idle_task[RAX]
 	MOV	RSP,U64 CTask.stk[RAX]
 	ADD	RSP,DFT_STK+CTaskStk.stk_base	//Rst to top
 	CALL	SET_FS_BASE
-	STI
+	STI	//Swap-in idle task so we can unmask IRQs.
 	HLT
 SYS_IDLE_PT::
 	CLI

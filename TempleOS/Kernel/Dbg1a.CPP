@@ -10,7 +10,22 @@ Bool IsDbgTask()
 Bool ChkPtr(U8 *ptr)
 {
   if (sys_heap_base<=ptr<=MAPPED_MEM_SPACE) {
-    if (*MemPtAtPageTableEntry(ptr)&1)
+    if (*MemPageTable(ptr)&1)
+      return TRUE;
+    else
+      return FALSE;
+  } else if (ptr<sys_boot_base)
+    return FALSE;
+  else if (ptr<VGA_GRAPHIC_MEM_BASE)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+Bool ChkCodePtr(U8 *ptr)
+{
+  if (sys_heap_base<=ptr<=sys_heap_limit) {
+    if (*MemPageTable(ptr)&1)
       return TRUE;
     else
       return FALSE;
@@ -279,7 +294,10 @@ U0 D(U8 *add,I64 cnt=0x80,Bool show_offset=TRUE)
       "%08X ",ptr-add;
     else
       "%010X ",ptr;
-    j=cnt>16 ? 16:cnt;
+    if (cnt>16)
+      j=16;
+    else
+      j=cnt;
     for (i=0;i<j;i++)
       "%02X ",ptr[i];
     for (;i<16;i++)

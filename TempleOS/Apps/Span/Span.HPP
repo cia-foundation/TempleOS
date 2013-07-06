@@ -51,4 +51,4 @@ class SpanAnimateStruct
 
 
 extern MyMass PlaceMass(I64 x, I64 y);
-extern F64 SpanTime(CTask *task);
+extern F64 SpanTime();

@@ -24,7 +24,7 @@ $BK,1$WARNING:$BK,0$  This command erases everything on a hard drive.  It repart
 $BK,1$WARNING:$BK,0$  This command doesn't play well with other operating systems.  You'll need to do a $LK,"MasterBootZero","MN:MasterBootZero"$() to restore your drive to a state where other operating systems can partition it.
 $ID,-2$
 $ID,-2$2) $LK,"Fmt","MN:Fmt"$($FG,2$'D'$FG$,$FG,2$TRUE,FALSE,PT_FAT32$FG$)
-$ID,2$This command formats a partition with $FG,2$FAT32$FG$ or the TempleOS native file system type.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
+$ID,2$This command formats a partition with $FG,2$FAT32$FG$ or the $FG,2$RedSea$FG$ file system type.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
 
 $BK,1$WARNING:$BK,0$  If you are upgrading, be sure not to lose the file, $FG,2$/0000Boot/OldMBR.BIN.C$FG$.
 
@@ -46,3 +46,4 @@ $ID,-2$
 $FG,8$
 * "Windows" is a trademark of MicroSoft Corp.
 * "Linux" is probably a trademark owned by Linus Torvalds.
+$FG$

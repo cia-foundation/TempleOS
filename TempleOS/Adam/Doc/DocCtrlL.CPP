@@ -1,10 +1,15 @@
+U8 *ctrl_L_footer=
+	"\n$$MU,\"Abort\",DOCM_CANCEL$$\n"
+	"\n\n$$LK+PU,\"Click for Help\",\"FI:::/TempleOS/Doc/Widget.TXT\"$$\n";
+
 #define DFT_ADDR_LINK_BIN_SIZE	64
 
 I64 PopUpLinkType(Bool include_anchor)
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$MU,\"To file\",LK_FILE$$\n"
+  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Link Type Menu\"$$\n"
+	"\n$$FG,LTBLUE$$$$MU,\"To file\",LK_FILE$$\n"
 	"$$MU,\"To anchor in file\",LK_FILE_ANCHOR$$\n"
 	"$$MU,\"To str in file\",LK_FILE_FIND$$\n"
 	"$$MU,\"To line in file\",LK_FILE_LINE$$\n"
@@ -18,7 +23,7 @@ I64 PopUpLinkType(Bool include_anchor)
 	"$$MU,\"To Addr\",LK_ADDR$$\n");
   if (include_anchor)
     DocPutS(doc,"$$MU,\"Place Anchor\",LK_PLACE_ANCHOR$$\n");
-  DocPutS(doc,"\n$$MU,\"CANCEL\",DOCM_CANCEL$$");
+  DocPrintF(doc,"%s",ctrl_L_footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -31,7 +36,8 @@ class CEdFileLink
   U8	aux[136];
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -42,7 +48,8 @@ class CEdFileAnchorLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Anchor Label  :%s\"$$\n";
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -53,7 +60,8 @@ class CEdFileFindLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Str        :%s\"$$\n";
   I64	num		fmtstr "$$DA-T,135,\"Occurrence Num:%04d\"$$\n";
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -64,7 +72,8 @@ class CEdFileLineLink
   U8	aux[136];
   I64	num		fmtstr "$$DA-T,135,\"Line Num      :%04d\"$$\n";
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -75,7 +84,8 @@ class CEdManPageLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Label         :%s\"$$\n";
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -86,7 +96,8 @@ class CEdAddrLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Addr Exp   :%s\"$$\n";
   I64	num		fmtstr "$$DA-T,135,\"Bin Size      :%04d\"$$\n";
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -97,8 +108,9 @@ class CEdPlaceAnchor
   U8	aux[136]	fmtstr "$$DA-P,135,\"Anchor Label  :%s\"$$\n";
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
-  Bool	hide	fmtstr "$$CB,\"Hide\"$$\n";
+  Bool	pop_up;
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	hide		fmtstr "$$CB,\"Hide\"$$\n";
 };
 
 class CEdBibleLink
@@ -108,7 +120,8 @@ class CEdBibleLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Chapter Verse :%s\"$$\n";
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -119,7 +132,8 @@ class CEdDefLink
   U8	aux[136]	fmtstr "$$DA-P,135,\"Word          :%s\"$$\n";
   I64	num		fmtstr "$$DA-T,135,\"Def Num       :%4d\"$$\n";
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
@@ -130,13 +144,12 @@ class CEdProject
   U8	aux[136];
   I64	num;
   U8	html_link[136]	fmtstr "$$DA-P,135,\"Html Link     :%s\"$$\n";
-  Bool	quote	fmtstr "$$CB,\"Quote\"$$\n";
+  Bool	pop_up		fmtstr "$$CB,\"PopUp\"$$\n";
+  Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
   Bool	hide;
 };
 
-U8 *ctrl_L_footer="\n\n$$LK,\"Click for Help\",\"FI:::/TempleOS/Doc/CtrlL.TXT\"$$\n";
-
-Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_quote,U8 **_html_link)
+Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html_link)
 {
   I64 i;
   CEdFileLink *el=CAlloc(sizeof(CEdFileLink));
@@ -316,6 +329,10 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_quote,U8 **_html_link)
     *_html_link=StrNew(el->html_link);
   else
     *_html_link=NULL;
+  if (el->pop_up)
+    *_pop_up=TRUE;
+  else
+    *_pop_up=FALSE;
   if (el->quote)
     *_quote=TRUE;
   else
@@ -326,11 +343,15 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_quote,U8 **_html_link)
 
 U0 EdInsLink()
 {
-  U8 *tag=NULL,*link=NULL,*st=NULL,*html_link=NULL;
-  Bool quote=FALSE;
+  U8 *tag=NULL,*link=NULL,*st=NULL,*html_link=NULL,*pop_up_st;
+  Bool pop_up=FALSE,quote=FALSE;
   I64 type=PopUpLinkType(TRUE);
   if (type>=0) {
-    if (PmtLink(type,&tag,&link,&quote,&html_link)) {
+    if (PmtLink(type,&tag,&link,&pop_up,&quote,&html_link)) {
+      if (pop_up)
+	pop_up_st="+PU";
+      else
+	pop_up_st="";
       switch (type) {
 	case LK_PLACE_ANCHOR:
 	  if (html_link)
@@ -340,9 +361,9 @@ U0 EdInsLink()
 	  break;
 	default:
 	  if (html_link)
-	    st=MSPrintF("$$LK+HTML,\"%Q\",\"%Q\",\"%Q\"$$",tag,link,html_link);
+	    st=MSPrintF("$$LK%s+HTML,\"%Q\",\"%Q\",\"%Q\"$$",pop_up_st,tag,link,html_link);
 	  else
-	    st=MSPrintF("$$LK,\"%Q\",\"%Q\"$$",tag,link);
+	    st=MSPrintF("$$LK%s,\"%Q\",\"%Q\"$$",pop_up_st,tag,link);
       }
     }
   }
@@ -362,23 +383,12 @@ I64 PopUpColorType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$MU,\"Foreground\",DOCT_FOREGROUND$$\n"
+  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Color Type Menu\"$$\n"
+	"\n$$FG,LTBLUE$$$$MU,\"Foreground\",DOCT_FOREGROUND$$\n"
 	"$$MU,\"Background\",DOCT_BACKGROUND$$\n"
 	"$$MU,\"Default Foreground\",DOCT_DFT_FOREGROUND$$\n"
 	"$$MU,\"Default Background\",DOCT_DFT_BACKGROUND$$\n"
-	"$$MU,\"Alt Foreground\",DOCT_ALT_FOREGROUND$$\n"
-	"$$MU,\"Link Foreground\",DOCT_LINK_FOREGROUND$$\n"
-	"$$MU,\"Macro Foreground\",DOCT_MACRO_FOREGROUND$$\n"
-	"$$MU,\"Anchor Foreground\",DOCT_ANCHOR_FOREGROUND$$\n"
-	"$$MU,\"Hidden Foreground\",DOCT_HIDDEN_FOREGROUND$$\n"
-	"$$MU,\"Tree Foreground\",DOCT_TREE_FOREGROUND$$\n"
-	"$$MU,\"User Foreground\",DOCT_USER_FOREGROUND$$\n"
-	"$$MU,\"Binary Foreground\",DOCT_BINARY_FOREGROUND$$\n"
-	"$$MU,\"Keyword Foreground\",DOCT_KEYWORD_FOREGROUND$$\n"
-	"$$MU,\"Keyword2 Foreground\",DOCT_KEYWORD2_FOREGROUND$$\n"
-	"$$MU,\"Comment Foreground\",DOCT_COMMENT_FOREGROUND$$\n"
-	"$$MU,\"Quote Foreground\",DOCT_QUOTE_FOREGROUND$$\n"
-	"\n$$MU,\"CANCEL\",DOCM_CANCEL$$");
+	"%s",ctrl_L_footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -388,13 +398,15 @@ I64 PopUpPageSettingType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$MU,\"Page Length\",DOCT_PAGE_LEN$$\n"
+  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Page Setting Menu\"$$\n"
+	"\n$$FG,LTBLUE$$$$MU,\"Page Length\",DOCT_PAGE_LEN$$\n"
 	"$$MU,\"Page Header\",DOCT_HEADER$$\n"
 	"$$MU,\"Page Footer\",DOCT_FOOTER$$\n"
 	"$$MU,\"Left Margin\",DOCT_LEFT_MARGIN$$\n"
 	"$$MU,\"Right Margin\",DOCT_RIGHT_MARGIN$$\n"
 	"$$MU,\"Lock To Page\",DOCT_LOCK_TO_PAGE$$\n"
-	"$$MU,\"Lock To Center\",DOCT_LOCK_TO_CENTER$$\n");
+	"$$MU,\"Lock To Center\",DOCT_LOCK_TO_CENTER$$\n"
+	"%s",ctrl_L_footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -491,7 +503,8 @@ I64 PopUpDollarType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$MU,\"Link\",DOCT_LINK$$\n"
+  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Text Widget Menu\"$$\n"
+	"\n$$FG,LTBLUE$$$$MU,\"Link\",DOCT_LINK$$\n"
 	"$$MU,\"Text\",DOCT_TEXT$$\n"
 	"$$MU,\"Tree Branch\",DOCT_TREE$$\n"
 	"$$MU,\"Color\",DOCT_FOREGROUND$$\n"
@@ -507,7 +520,7 @@ I64 PopUpDollarType()
 	"$$MU,\"Syntax Highlighting\",DOCT_HIGHLIGHT$$\n"
 	"$$MU,\"HTML\",DOCT_HTML_CODE$$\n"
 	"$$MU,\"Song\",DOCT_SONG$$\n"
-	"\n$$MU,\"CANCEL\",DOCM_CANCEL$$");
+	"%s",ctrl_L_footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -613,10 +626,10 @@ I64 PopUpHtmlType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$MU,\"Html Code\",HT_CODE$$\n"
+  DocPutS(doc,"$$FG,LTBLUE$$$$MU,\"Html Code\",HT_CODE$$\n"
 	"$$MU,\"Html Image\",HT_IMAGE$$\n"
 	"$$MU,\"Html Video\",HT_VIDEO$$\n"
-	"\n$$MU,\"CANCEL\",DOCM_CANCEL$$");
+	"\n$$MU,\"Abort\",DOCM_CANCEL$$");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -953,7 +966,7 @@ U0 EdInsBinary(I64 bin_num,I64 type)
 	"$$%Z+BP,\"%Q\",%d,\"%s,%d\"$$",type,"ST_DOC_CMDS",dt->tag,dt->bin_num,
 	  dt->bin_ptr_link_file,dt->bin_ptr_link_bin_num;
     } else {
-      if (DocBinFindNum(DocCur,dt->bin_num))
+      if (DocBinFindNum(DocPut,dt->bin_num))
 	"$$%Z,\"%Q\",%d$$",type,"ST_DOC_CMDS",dt->tag,dt->bin_num;
       else
 	PopUpOk("Invalid Binary Num");
@@ -981,7 +994,7 @@ U0 EdInsTree()
     st=MSPrintF("%q",dt->label);
     st2=MSPrintF("$$TR%s,\"%Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
       buf,st,dt->indent,-dt->indent);
-    DocInsSafe(DocCur,st2);
+    DocInsSafe(DocPut,st2);
     Free(st);
     Free(st2);
   }
@@ -990,7 +1003,7 @@ U0 EdInsTree()
 
 U0 EdInsHidden()
 {
-  DocInsSafe(DocCur,"$$HS$$*$$HE$$");
+  DocInsSafe(DocPut,"$$HS$$*$$HE$$");
 }
 
 U0 EdInsDollarCmd()
@@ -1048,39 +1061,29 @@ U0 EdInsDollarCmd()
 }
 
 #define PT_SPRITE		0
-#define PT_SPRITE_MACRO		1
-#define PT_SPRITE_MENU		2
-#define PT_SPRITE_LINK		3
-#define PT_SPRITE_PTR		4
-#define PT_SPRITE_SIZE		5
-#define PT_DUP_SPRITE		6
+#define PT_SPRITE_PTR		1
+#define PT_DUP_SPRITE		2
+#define PT_SPRITE_SIZE		3
+#define PT_SPRITE_MACRO		4
+#define PT_SPRITE_MENU		5
+#define PT_SPRITE_LINK		6
 #define PT_SPRITE_TYPE		7
 
 I64 PopUpSpriteType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"A sprite is composed of an ordered lst of elements\n"
-	"such as lines and color changes.  You can create an icon\n"
-	"by placing a sprite with a payload of C+ code to execute.\n"
-	"This is a called a \"sprite macro\".  Check \"Pop-Up\" for\n"
-	"icons and \"Esc\" for shelling-to-the-cmd-line macros.\n\n"
-	"In a program, you first make a sprite.  Then, you insert\n"
-	"a pointer to it.\n\n"
-	"$$MU,\"Insert just Sprite\",PT_SPRITE$$\n"
+  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Graphic Resource Menu\"$$\n"
+	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/Resource.TXT.Z\"$$\n"
+	"\n$$FG,LTBLUE$$$$MU,\"Make Sprite\",PT_SPRITE$$\n"
+	"$$MU,\"Pointer to Sprite\",PT_SPRITE_PTR$$\n"
+	"$$MU,\"Duplicate Sprite\",PT_DUP_SPRITE$$\n"
+	"$$MU,\"Sprite Size (not really needed)\",PT_SPRITE_SIZE$$\n"
 	"$$MU,\"Sprite Macro (Icon)\",PT_SPRITE_MACRO$$\n"
 	"$$MU,\"Sprite Menu Item\",PT_SPRITE_MENU$$\n"
 	"$$MU,\"Sprite Link\",PT_SPRITE_LINK$$\n"
-	"$$MU,\"Pointer to Sprite\",PT_SPRITE_PTR$$\n"
-	"$$MU,\"Sprite Size (not really needed)\",PT_SPRITE_SIZE$$\n"
-	"$$MU,\"Duplicate Sprite\",PT_DUP_SPRITE$$\n"
-	"\n$$MU,\"CANCEL\",DOCM_CANCEL$$\n\n"
-	"The potential exists for binary data besides $$FG,GREEN$$sprites$$FG$$.\n"
-	"This is why the pointer to a sprite is known as\n"
-	"\"Insert Binary\".  There is one more option called\n"
-	"\"Insert Binary Type\".  The only other binary data type is\n"
-	"source line info in map files.\n\n"
-	"$$MU,\"Insert Binary Data Type\",PT_SPRITE_TYPE$$\n");
+	"$$MU,\"Binary Data Type (not needed)\",PT_SPRITE_TYPE$$\n"
+	"\n$$MU,\"Abort\",DOCM_CANCEL$$\n\n");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -1107,16 +1110,14 @@ class CEdMenuSprite
   Bool escape		fmtstr "$$CB,\"Escape\"$$\n";
 };
 
-U8 *EdSpriteLink(U8 **_html_link)
+U8 *EdSpriteLink(Bool *_pop_up,U8 **_html_link)
 {
   U8 *result=NULL,*tag=NULL,*link=NULL;
   Bool quote=FALSE;
   I64 type=PopUpLinkType(FALSE);
   *_html_link=NULL;
-  if (type>=0) {
-    if (PmtLink(type,&tag,&link,&quote,_html_link))
-      result=MSPrintF("\"%Q\",\"%Q\"",tag,link);
-  }
+  if (type>=0 && PmtLink(type,&tag,&link,_pop_up,&quote,_html_link))
+    result=MSPrintF("\"%Q\",\"%Q\"",tag,link);
   Free(tag);
   Free(link);
   return result;
@@ -1125,6 +1126,7 @@ U8 *EdSpriteLink(U8 **_html_link)
 U8 *EdSprite(I64 bin_num)
 {
   I64 type=PopUpSpriteType;
+  Bool pop_up;
   U8 *st,*st1=NULL,*st2=NULL,buf[1024],*html_link=NULL;
   CEdMacroSprite *dt=CAlloc(sizeof(CEdMacroSprite));
   *buf=0;
@@ -1156,7 +1158,9 @@ U8 *EdSprite(I64 bin_num)
       break;
     case PT_SPRITE_LINK:
       StrCat(buf,"+L+A");
-      st1=EdSpriteLink(&html_link);
+      st1=EdSpriteLink(&pop_up,&html_link);
+      if (pop_up)
+	StrCat(buf,"+PU");
       break;
     case PT_SPRITE_PTR:
       EdInsBinary(--bin_num,DOCT_INS_BINARY);

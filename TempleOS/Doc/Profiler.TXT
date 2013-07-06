@@ -7,4 +7,3 @@ When done collecting statistics, use $LK,"ProfRep","MN:ProfRep"$() for a report.
 You can set the CPU to monitor with $LK,"ProfCPUSet","MN:ProfCPUSet"$().
 
 Study the code.  The profiler is very simple and you might want to enhance it or modify it to debug something in particular.
-

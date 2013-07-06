@@ -14,8 +14,9 @@ U0 DrawIt(CTask *,CDC *dc)
 U0 ScrollBars()
 {
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  DocClear;
   Fs->draw_it=&DrawIt;
-  GetChar(NULL,FALSE);
+  GetChar(,FALSE);
   SettingsPop;
 }
 

@@ -75,7 +75,7 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 	ds.min=A2I(src,10,&src);
 	if (*src++!=':') throw;
 	ds.sec=A2I(src,10,&src);
-	templg->datetime=CDateStruct2CDate(&ds);
+	templg->datetime=DateStruct2Date(&ds);
 	if (*src++!=CH_SPACE) throw;
 	i=A2I(src,10,&src);
 	templg->datetime-=(i/100+i%100/60.0)*CDATE_FREQ*60*60;
@@ -431,13 +431,11 @@ U0 WebLogRep(U8 *mask,U8 *output_filename)
   IndexRep(root,start,end);
   DownLoadRep(root,start,end);
 
-  StrCpy(DocCur->filename.name,output_filename);
-  DocWrite(DocCur,TRUE);
+  StrCpy(DocPut->filename.name,output_filename);
+  DocWrite(DocPut,TRUE);
 
   "$$WW,1$$";
   LogLstDel(root);
 }
 
-#if IncludeDepth<2
 WebLogRep("::/TempleOS/Demo/WebLogExample/*.LOG*","::/TempleOS/Demo/WebLogExample/WebLogRep.TXT.Z");
-#endif

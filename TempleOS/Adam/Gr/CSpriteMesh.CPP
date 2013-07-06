@@ -28,7 +28,7 @@ class CGrMTri
   CMeshTri mt;
   U0 end;
 
-  I32 cpu_num,flags; //Draw different triangles with different cores.
+  I32 cpu_num,flags; //Draw different tris with different cores.
   CGrMVertex *t[3];
 };
 
@@ -40,13 +40,13 @@ class CGrMFrame
   I64 mode,cx,cy;
   CColorROPU32 cur_color;
   Bool grid_on,flip_y,select_rect,vertex_on,pad[4];
-  I64 mp_done_flags; //Used for multiprocessing signaling.
+  I64 mp_not_done_flags; //Used for multiprocessing signaling.
   F64 view_scale;
   CDC *dc;
   I64 *w2s,*s2w; //Screen-to-world and world-to-screen transform matrices.
-  I64 vertex_cnt,triangle_cnt; //Set by GrMSize
+  I64 vertex_cnt,tri_cnt; //Set by GrMSize
   CGrMVertex vertex_root,*cur_vertex;
-  CGrMTri    triangle_root,*cur_triangle;
+  CGrMTri    tri_root,*cur_tri;
   I64 x1,y1,x2,y2,cur_snap;
 };
 
@@ -69,7 +69,7 @@ CGrMTri *GrMTriNew(CGrMFrame *e,CColorROPU32 color,CGrMVertex *v1,CGrMVertex *v2
   tempt->t[0]=v1;
   tempt->t[1]=v2;
   tempt->t[2]=v3;
-  QueIns(tempt,e->triangle_root.last);
+  QueIns(tempt,e->tri_root.last);
   return tempt;
 }
 
@@ -103,11 +103,11 @@ CGrMVertex *GrMVertexFindNum(CGrMFrame *e,I64 num)
   return NULL;
 }
 
-U0 GrMTriangleDel(CGrMFrame *e,CGrMTri *tempt)
+U0 GrMTriDel(CGrMFrame *e,CGrMTri *tempt)
 {
   if (tempt) {
-    if (tempt==e->cur_triangle)
-      e->cur_triangle=NULL;
+    if (tempt==e->cur_tri)
+      e->cur_tri=NULL;
     QueRem(tempt);
     Free(tempt);
   }
@@ -118,14 +118,14 @@ U0 GrMVertexDel(CGrMFrame *e,CGrMVertex *tempv)
   I64 i;
   CGrMTri *tempt,*tempt1;
   if (tempv) {
-    tempt=e->triangle_root.next;
-    while (tempt!=&e->triangle_root) {
+    tempt=e->tri_root.next;
+    while (tempt!=&e->tri_root) {
       tempt1=tempt->next;
       for (i=0;i<3;i++)
 	if (tempt->t[i]==tempv)
 	  break;
       if (i<3)
-	GrMTriangleDel(e,tempt);
+	GrMTriDel(e,tempt);
       tempt=tempt1;
     }
     if (tempv==e->cur_vertex)
@@ -147,10 +147,10 @@ U0 GrMVertexSelectAll(CGrMFrame *e,Bool val)
   }
 }
 
-U0 GrMTriangleSelectAll(CGrMFrame *e,Bool val)
+U0 GrMTriSelectAll(CGrMFrame *e,Bool val)
 {
-  CGrMTri *tempt=e->triangle_root.next;
-  while (tempt!=&e->triangle_root) {
+  CGrMTri *tempt=e->tri_root.next;
+  while (tempt!=&e->tri_root) {
     if (val)
       tempt->flags|=TF_SELECTED;
     else
@@ -213,12 +213,12 @@ U0 GrMVertexSelectRect(CGrMFrame *e,I64 mode,I64 x1,I64 x2,I64 y1,I64 y2)
   }
 }
 
-U0 GrMTriangleSelectRect(CGrMFrame *e,I64 mode,I64 x1,I64 x2,I64 y1,I64 y2)
+U0 GrMTriSelectRect(CGrMFrame *e,I64 mode,I64 x1,I64 x2,I64 y1,I64 y2)
 {
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
   if (x1>x2) SwapU64(&x1,&x2);
   if (y1>y2) SwapU64(&y1,&y2);
-  while (tempt!=&e->triangle_root) {
+  while (tempt!=&e->tri_root) {
     if (x1<=tempt->t[0]->pt.x<=x2 &&
 	y1<=tempt->t[0]->pt.y<=y2 &&
 	x1<=tempt->t[1]->pt.x<=x2 &&
@@ -250,13 +250,13 @@ I64 GrMSelectCnt(CGrMFrame *e)
 {
   I64 result=0;
   CGrMVertex *tempv=e->vertex_root.next;
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
   while (tempv!=&e->vertex_root) {
     if (tempv->flags&VF_SELECTED)
       result++;
     tempv=tempv->next;
   }
-  while (tempt!=&e->triangle_root) {
+  while (tempt!=&e->tri_root) {
     if (tempt->flags&TF_SELECTED)
       result++;
     tempt=tempt->next;
@@ -324,22 +324,22 @@ U0 GrMTransformSelect(CGrMFrame *e)
   }
 }
 
-U0 GrMFlipTriangles(CGrMFrame *e)
+U0 GrMFlipTris(CGrMFrame *e)
 {
   Bool unselect;
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
   if (!GrMSelectCnt(e)) {
-    GrMTriangleSelectAll(e,TRUE);
+    GrMTriSelectAll(e,TRUE);
     unselect=TRUE;
   } else
     unselect=FALSE;
-  while (tempt!=&e->triangle_root) {
+  while (tempt!=&e->tri_root) {
     if (tempt->flags & TF_SELECTED)
       SwapU64(&tempt->t[1],&tempt->t[2]);
     tempt=tempt->next;
   }
   if (unselect)
-    GrMTriangleSelectAll(e,FALSE);
+    GrMTriSelectAll(e,FALSE);
 }
 
 U0 GrMRecalcCxCy(CTask *task,CGrMFrame *e)
@@ -383,7 +383,7 @@ U0 MPDrawIt(CGrMFrame *e) //Multiprocessing draw it, called by each core.
 //Makes a copy of e->dc so we can change dc->color member and stuff.
   CDC *dc=DCAlias(e->dc,e->dc->win_task);
 
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
   I64 i,*old_r=dc->r;
 
 //$LK,"DCAlias","MN:DCAlias"$() allocates a new identity rotation matrix.
@@ -425,17 +425,17 @@ U0 MPDrawIt(CGrMFrame *e) //Multiprocessing draw it, called by each core.
     GrLine3(dc,0,0,-500,0,0,0);
   }
 
-  while (tempt!=&e->triangle_root) {
+  while (tempt!=&e->tri_root) {
     if (tempt->cpu_num==Gs->num) {
       if (tempt->flags & TF_SELECTED) {
 	if (Blink)
 	  dc->color=ROPF_DITHER+WHITE<<16+RED;
 	else
 	  dc->color=ROPF_DITHER+RED<<16+WHITE;
-	GrFillTriangle0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
+	GrFillTri0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
       } else {
 	(*dc->lighting)(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt,tempt->mt.color);
-	GrFillTriangle0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
+	GrFillTri0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
       }
     }
     tempt=tempt->next;
@@ -446,7 +446,7 @@ U0 MPDrawIt(CGrMFrame *e) //Multiprocessing draw it, called by each core.
   dc->depth_buf=NULL;
 
   DCDel(dc);
-  LBts(&e->mp_done_flags,Gs->num);
+  LBtr(&e->mp_not_done_flags,Gs->num);
 }
 
 I64 *GrMW2S(CGrMFrame *e,CTask *task)
@@ -519,25 +519,25 @@ U0 GrMCursorW(CGrMFrame *e,CTask *task,I64 *_x,I64 *_y,I64 *_z)
 
 
 CGrMVertex sys_vertex_root;
-CGrMTri	  sys_triangle_root;
+CGrMTri	  sys_tri_root;
 
 U0 GrMClipBoardInit()
 {
   QueInit(&sys_vertex_root);
-  QueInit(&sys_triangle_root);
+  QueInit(&sys_tri_root);
 }
 
 U0 GrMClipBoardRst()
 {
   QueDel(&sys_vertex_root,TRUE);
-  QueDel(&sys_triangle_root,TRUE);
+  QueDel(&sys_tri_root,TRUE);
   GrMClipBoardInit;
 }
 
 U0 GrMClipBoardCopy(CGrMFrame *e)
 {
   CGrMVertex *tempv=e->vertex_root.next,*tempv2;
-  CGrMTri *tempt=e->triangle_root.next,*tempt2;
+  CGrMTri *tempt=e->tri_root.next,*tempt2;
 
   GrMClipBoardRst;
   while (tempv!=&e->vertex_root) {
@@ -553,7 +553,7 @@ U0 GrMClipBoardCopy(CGrMFrame *e)
     }
     tempv=tempv->next;
   }
-  while (tempt!=&e->triangle_root) {
+  while (tempt!=&e->tri_root) {
     if (tempt->flags&TF_SELECTED &&
 	tempt->t[0]->copy && tempt->t[1]->copy && tempt->t[2]->copy) {
       tempt2=ACAlloc(sizeof(CGrMTri));
@@ -561,7 +561,7 @@ U0 GrMClipBoardCopy(CGrMFrame *e)
       tempt2->t[1]=tempt->t[1]->copy;
       tempt2->t[2]=tempt->t[2]->copy;
       tempt2->mt.color=tempt->mt.color;
-      QueIns(tempt2,sys_triangle_root.last);
+      QueIns(tempt2,sys_tri_root.last);
       tempt->flags|=TF_COPIED;
       tempt->flags&=~TF_SELECTED;
     } else
@@ -573,47 +573,47 @@ U0 GrMClipBoardCopy(CGrMFrame *e)
 U0 GrMClipBoardCut(CGrMFrame *e)
 {
   CGrMVertex *tempv=e->vertex_root.next,*tempv1;
-  CGrMTri  *tempt=e->triangle_root.next,*tempt1;
+  CGrMTri  *tempt=e->tri_root.next,*tempt1;
   GrMClipBoardCopy(e);
+  while (tempt!=&e->tri_root) {
+    tempt1=tempt->next;
+    if (tempt->flags&TF_COPIED)
+      GrMTriDel(e,tempt);
+    tempt=tempt1;
+  }
   while (tempv!=&e->vertex_root) {
     tempv1=tempv->next;
     if (tempv->flags&VF_COPIED)
       GrMVertexDel(e,tempv);
     tempv=tempv1;
   }
-  while (tempt!=&e->triangle_root) {
-    tempt1=tempt->next;
-    if (tempt->flags&TF_COPIED)
-      GrMTriangleDel(e,tempt);
-    tempt=tempt1;
-  }
 }
 
 U0 GrMClipBoardDel(CGrMFrame *e)
 {//Technically not clipboard
   CGrMVertex *tempv=e->vertex_root.next,*tempv1;
-  CGrMTri *tempt=e->triangle_root.next,*tempt1;
+  CGrMTri *tempt=e->tri_root.next,*tempt1;
+  while (tempt!=&e->tri_root) {
+    tempt1=tempt->next;
+    if (tempt->flags&TF_SELECTED)
+      GrMTriDel(e,tempt);
+    tempt=tempt1;
+  }
   while (tempv!=&e->vertex_root) {
     tempv1=tempv->next;
     if (tempv->flags&VF_SELECTED)
       GrMVertexDel(e,tempv);
     tempv=tempv1;
   }
-  while (tempt!=&e->triangle_root) {
-    tempt1=tempt->next;
-    if (tempt->flags&TF_SELECTED)
-      GrMTriangleDel(e,tempt);
-    tempt=tempt1;
-  }
 }
 
 U0 GrMClipBoardPaste(CGrMFrame *e)
 {
   CGrMVertex *tempv2=sys_vertex_root.next,*tempv;
-  CGrMTri *tempt2=sys_triangle_root.next,*tempt;
+  CGrMTri *tempt2=sys_tri_root.next,*tempt;
  
   GrMVertexSelectAll(e,FALSE);
-  GrMTriangleSelectAll(e,FALSE);
+  GrMTriSelectAll(e,FALSE);
   while (tempv2!=&sys_vertex_root) {
     tempv2->copy=tempv=CAlloc(sizeof(CGrMVertex));
     MemCpy(&tempv->p,&tempv2->p,sizeof(CD3I32));
@@ -622,7 +622,7 @@ U0 GrMClipBoardPaste(CGrMFrame *e)
     tempv2=tempv2->next;
   }
 
-  while (tempt2!=&sys_triangle_root) {
+  while (tempt2!=&sys_tri_root) {
     tempt=GrMTriNew(e,tempt2->mt.color,tempt2->t[0]->copy,tempt2->t[1]->copy,tempt2->t[2]->copy);
     tempt->flags|=TF_SELECTED;
     tempt2=tempt2->next;
@@ -679,11 +679,10 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempv=tempv->next;
   }
 
-  e->mp_done_flags=0; //Issue jobs to all cores.
+  e->mp_not_done_flags=1<<mp_cnt-1; //Issue jobs to all cores.
   e->dc=dc;
-  for (i=1;i<mp_cnt;i++)
-    MPJob(&MPDrawIt,e,i);
-  MPDrawIt(e); //Do one job ourself.
+  for (i=0;i<mp_cnt;i++)
+    JobQue(&MPDrawIt,e,i);
 
   tempv=e->vertex_root.next;
   while (tempv!=&e->vertex_root) {
@@ -743,7 +742,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrLineRect4(dc,e->x1,e->y1,e->x2,e->y2);
   }
 //Wait for all cores to complete.
-  while (e->mp_done_flags!=1<<mp_cnt-1)
+  while (e->mp_not_done_flags)
     Yield;
 }
 
@@ -752,7 +751,7 @@ U0 GrMInit(CGrMFrame *e,Bool flip_y)
   MemSet(e,0,sizeof(CGrMFrame));
   e->task=Fs;
   e->vertex_root.next=e->vertex_root.last=&e->vertex_root;
-  e->triangle_root.next=e->triangle_root.last=&e->triangle_root;
+  e->tri_root.next=e->tri_root.last=&e->tri_root;
   e->mode='v';
   e->grid_on=TRUE;
   e->vertex_on=TRUE;
@@ -764,7 +763,7 @@ U0 GrMInit(CGrMFrame *e,Bool flip_y)
   e->cur_snap=5;
   e->flip_y=flip_y;
   e->select_rect=FALSE;
-  e->cur_triangle=NULL;
+  e->cur_tri=NULL;
   e->cur_vertex=NULL;
 }
 
@@ -775,10 +774,10 @@ U0 GrMLoad(CGrMFrame *e,U8 *src)
   CGrMVertex *tempv,*va[3];
 
   e->vertex_root.next=e->vertex_root.last=&e->vertex_root;
-  e->triangle_root.next=e->triangle_root.last=&e->triangle_root;
+  e->tri_root.next=e->tri_root.last=&e->tri_root;
 
   e->vertex_cnt  =*src(I32 *)++;
-  e->triangle_cnt=*src(I32 *)++;
+  e->tri_cnt=*src(I32 *)++;
   for (i=0;i<e->vertex_cnt;i++) {
     x=*src(I32 *)++;
     y=*src(I32 *)++;
@@ -786,7 +785,7 @@ U0 GrMLoad(CGrMFrame *e,U8 *src)
     tempv=GrMVertexNew(e,x,y,z);
     tempv->num=i;
   }
-  for (i=0;i<e->triangle_cnt;i++) {
+  for (i=0;i<e->tri_cnt;i++) {
     color=*src(I32 *)++;
     for (j=0;j<3;j++)
       va[j]=GrMVertexFindNum(e,*src(I32 *)++);
@@ -798,7 +797,7 @@ I64 GrMSize(CGrMFrame *e)
 {
   I64 i;
   CGrMVertex   *tempv=e->vertex_root.next;
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
 
   e->vertex_cnt=0;
   while (tempv!=&e->vertex_root) {
@@ -806,16 +805,16 @@ I64 GrMSize(CGrMFrame *e)
     tempv=tempv->next;
   }
 
-  e->triangle_cnt=0;
-  while (tempt!=&e->triangle_root) {
-    e->triangle_cnt++;
+  e->tri_cnt=0;
+  while (tempt!=&e->tri_root) {
+    e->tri_cnt++;
     for (i=0;i<3;i++)
       tempt->mt.nums[i]=tempt->t[i]->num;
     tempt=tempt->next;
   }
   return sizeof(I32)*2+
 	 (offset(CGrMVertex.end)-offset(CGrMVertex.start))*e->vertex_cnt+
-	 (offset(CGrMTri.end)-offset(CGrMTri.start))*e->triangle_cnt;
+	 (offset(CGrMTri.end)-offset(CGrMTri.start))*e->tri_cnt;
 }
 
 I32 *GrMSave(CGrMFrame *e,I64 *_size=NULL)
@@ -823,10 +822,10 @@ I32 *GrMSave(CGrMFrame *e,I64 *_size=NULL)
   I64 size=GrMSize(e);
   U8 *result=MAlloc(size),*dst=result;
   CGrMVertex   *tempv=e->vertex_root.next;
-  CGrMTri *tempt=e->triangle_root.next;
+  CGrMTri *tempt=e->tri_root.next;
 
   *dst(I32 *)++=e->vertex_cnt;
-  *dst(I32 *)++=e->triangle_cnt;
+  *dst(I32 *)++=e->tri_cnt;
 
   e->vertex_cnt=0;
   while (tempv!=&e->vertex_root) {
@@ -835,8 +834,8 @@ I32 *GrMSave(CGrMFrame *e,I64 *_size=NULL)
     tempv=tempv->next;
   }
 
-  e->triangle_cnt=0;
-  while (tempt!=&e->triangle_root) {
+  e->tri_cnt=0;
+  while (tempt!=&e->tri_root) {
     MemCpy(dst,&tempt->start,offset(CGrMTri.end)-offset(CGrMTri.start));
     dst+=offset(CGrMTri.end)-offset(CGrMTri.start);
     tempt=tempt->next;
@@ -848,7 +847,7 @@ I32 *GrMSave(CGrMFrame *e,I64 *_size=NULL)
 U0 GrMCleanUp(CGrMFrame *e)
 {
   QueDel(&e->vertex_root,TRUE);
-  QueDel(&e->triangle_root,TRUE);
+  QueDel(&e->tri_root,TRUE);
   Free(e->w2s);
   Free(e->s2w);
 }
@@ -866,7 +865,7 @@ U0 GrMUpdateMenu(CGrMFrame *e)
     tempse->checked=ToBool(e->mode=='m');
   if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/MoveVertexZ"))
     tempse->checked=ToBool(e->mode=='M');
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/MakeTriangle"))
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/MakeTri"))
     tempse->checked=ToBool(e->mode=='t');
   if (tempse=MenuEntryFind(Fs->cur_menu,"View/FlipY"))
     tempse->checked=ToBool(e->flip_y);
@@ -878,9 +877,9 @@ I32 *CSpriteMesh(I32 *root=NULL,I64 *_size=NULL,Bool flip_y=FALSE)
 Fmt for mesh:
 {
 I32 vertex_cnt;
-I32 triangle_cnt;
+I32 tri_cnt;
 CD3I32 vertices[];
-CMeshTri triangles[];
+CMeshTri tris[];
 }
 
 If root points to a mesh, it will load it.
@@ -940,7 +939,7 @@ $WW,0$*/
   "  PlaceVertex(,'v');"
   "  MoveVertex(,'m');"
   "  MoveVertexZ(,'M');"
-  "  MakeTriangle(,'t');"
+  "  MakeTri(,'t');"
   "}"
   "Settings {"
   "  Color(,'c');"
@@ -967,12 +966,13 @@ $WW,0$*/
   "}");
 
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  WordStat;
   Preempt(OFF); //We don't really want window update while modifying links
   AcctOneTimePopUp(ARf_MESH_ED,
 	"$$FG,GREEN$$Right Mouse$$FG$$: Hold and move to shift cursor z\n"
 	"$$FG,GREEN$$'j'$$FG$$: Jump cursor Z to nearest vertex's Z\n"
 	"$$FG,GREEN$$'v'$$FG$$: Place Vertex Mode\n"
-	"$$FG,GREEN$$'t'$$FG$$: Make Triangle Mode\n"
+	"$$FG,GREEN$$'t'$$FG$$: Make Tri Mode\n"
 	"$$FG,GREEN$$'m'$$FG$$: Move Vertex Mode\n"
 	"$$FG,GREEN$$'M'$$FG$$: Move Vertex Z\n"
 	"$$FG,GREEN$$'c'$$FG$$: Set color\n"
@@ -982,7 +982,6 @@ $WW,0$*/
   Fs->win_inhibit=WIF_ALL|WIF_DOC-WIF_BORDER-WIF_CTRLS-WIF_MENU-WIF_GRAB_SCROLL;
   Fs->horz_scroll.pos=0;
   Fs->vert_scroll.pos=0;
-  WordStat;
   GrMInit(&e,flip_y);
   if (root)
     GrMLoad(&e,root);
@@ -1013,7 +1012,7 @@ gm_restart:
 		    else if (e.mode!='t')
 		      GrMVertexDel(&e,GrMVertexFindS(&e,ipx_presnap-Fs->win_pixel_left-Fs->win_scroll_x,ipy_presnap-Fs->win_pixel_top-Fs->win_scroll_y));
 		    GrMVertexSelectAll(&e,FALSE);
-		    GrMTriangleSelectAll(&e,FALSE);
+		    GrMTriSelectAll(&e,FALSE);
 		    vn=0;
 		  }
 		  break;
@@ -1039,16 +1038,16 @@ gm_restart:
 		case 't':
 		  if (vn) {
 		    GrMVertexSelectAll(&e,FALSE);
-		    GrMTriangleSelectAll(&e,FALSE);
+		    GrMTriSelectAll(&e,FALSE);
 		    vn=0;
 		  } else
-		    GrMTriangleDel(&e,e.cur_triangle);
+		    GrMTriDel(&e,e.cur_tri);
 		  break;
 	      }
 	      break;
 	    case 't':
 	      GrMVertexSelectAll(&e,FALSE);
-	      GrMTriangleSelectAll(&e,FALSE);
+	      GrMTriSelectAll(&e,FALSE);
 	    case 'v':
 	    case 'm':
 	    case 'M':
@@ -1062,7 +1061,7 @@ gm_restart:
 	      GrMTransformSelect(&e);
 	      break;
 	    case 'A':
-	      GrMTriangleSelectAll(&e,TRUE);
+	      GrMTriSelectAll(&e,TRUE);
 	      if (e.mode!='t')
 		GrMVertexSelectAll(&e,TRUE);
 	      else
@@ -1070,7 +1069,7 @@ gm_restart:
 	      vn=0;
 	      break;
 	    case 'U':
-	      GrMTriangleSelectAll(&e,FALSE);
+	      GrMTriSelectAll(&e,FALSE);
 	      GrMVertexSelectAll(&e,FALSE);
 	      vn=0;
 	      break;
@@ -1104,7 +1103,7 @@ gm_restart:
 		}
 	      }
 	      e.select_rect=FALSE;
-	      GrMTriangleSelectRect(&e,i,e.x1,e.x2,e.y1,e.y2);
+	      GrMTriSelectRect(&e,i,e.x1,e.x2,e.y1,e.y2);
 	      if (e.mode!='t')
 		GrMVertexSelectRect(&e,i,e.x1,e.x2,e.y1,e.y2);
 	      else
@@ -1147,7 +1146,7 @@ gm_restart:
 	      GrMScaleZoom(&e,1/1.5);
 	      break;
 	    case 'c':
-	      e.cur_color=PopUpLightingColor;
+	      e.cur_color=PopUpColorLighting;
 	      break;
 	    case 's':
 	      i=PopUpRangeI64(1,25,1,"New Snap\n");
@@ -1210,11 +1209,11 @@ gm_restart:
 	      GrMInvertAxis(&e,offset(CD3I32.z));
 	      break;
 	    case 'f':
-	      if (e.cur_triangle)
-		SwapU64(&e.cur_triangle->t[1],&e.cur_triangle->t[2]);
+	      if (e.cur_tri)
+		SwapU64(&e.cur_tri->t[1],&e.cur_tri->t[2]);
 	      break;
 	    case 'F':
-	      GrMFlipTriangles(&e);
+	      GrMFlipTris(&e);
 	      break;
 
 	  }
@@ -1283,7 +1282,7 @@ gm_restart:
 		  GrMCursorW(&e,Fs,&x,&y,&z);
 		  GrMP0Offset(&e,x-p0a.x,y-p0a.y,z-p0a.z);
 		}
-		GrMTriangleSelectAll(&e,FALSE);
+		GrMTriSelectAll(&e,FALSE);
 		GrMVertexSelectAll(&e,FALSE);
 		moving=FALSE;
 	      }
@@ -1300,7 +1299,7 @@ gm_restart:
 		  va[vn++]=tempv;
 		  tempv->flags|=VF_SELECTED;
 		  if (vn==3) {
-		    e.cur_triangle=GrMTriNew(&e,e.cur_color,va[0],va[1],va[2]);
+		    e.cur_tri=GrMTriNew(&e,e.cur_color,va[0],va[1],va[2]);
 		    for (i=0;i<vn;i++)
 		      va[i]->flags&=~VF_SELECTED;
 		    vn=0;

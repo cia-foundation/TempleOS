@@ -40,18 +40,7 @@ U0 DocTablesInit()
 	1<<DOCT_BACKGROUND|
 	1<<DOCT_DFT_FOREGROUND|
 	1<<DOCT_DFT_BACKGROUND|
-	1<<DOCT_ALT_FOREGROUND|
-	1<<DOCT_LINK_FOREGROUND|
-	1<<DOCT_MACRO_FOREGROUND|
-	1<<DOCT_ANCHOR_FOREGROUND|
-	1<<DOCT_HIDDEN_FOREGROUND|
-	1<<DOCT_TREE_FOREGROUND|
-	1<<DOCT_USER_FOREGROUND|
-	1<<DOCT_BINARY_FOREGROUND|
-	1<<DOCT_KEYWORD_FOREGROUND|
-	1<<DOCT_KEYWORD2_FOREGROUND|
-	1<<DOCT_COMMENT_FOREGROUND|
-	1<<DOCT_QUOTE_FOREGROUND|
+	1<<DOCT_PMT|
 	1<<DOCT_WORD_WRAP|
 	1<<DOCT_UNDERLINE|
 	1<<DOCT_INVERT|
@@ -391,7 +380,7 @@ public U0 DocHome(CDoc *doc=NULL)
 {
   Bool unlock;
   if (!doc) {
-    doc=DocCur;
+    doc=DocPut;
     if (!doc) return;
   }
   unlock=DocLock(doc);
@@ -454,7 +443,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   CDocSettings *s;
   CDocBin *b,*b1;
   if (!doc) {
-    doc=DocCur;
+    doc=DocPut;
     if (!doc) return;
   }
   unlock=DocLock(doc);
@@ -511,19 +500,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   s->shifted_x=0;
   s->shifted_y=0;
 
-  s->cur_text_attr=s->dft_text_attr=doc->start_text_attr=WHITE<<4+BLACK;
-  s->alt_text_attr	=LTGRAY;
-  s->link_attr		=RED;
-  s->macro_attr		=LTBLUE;
-  s->anchor_attr	=DKGRAY;
-  s->hidden_attr	=DKGRAY;
-  s->tree_attr		=PURPLE;
-  s->user_attr		=GREEN;
-  s->bin_attr		=CYAN;
-  s->keyword_attr	=BLUE;
-  s->keyword2_attr	=LTRED;
-  s->comment_attr	=GREEN;
-  s->quote_attr		=BROWN;
+  s->cur_text_attr=s->dft_text_attr=DOC_ATTR_DFT_TEXT;
 
   doc_e=&doc->root;
   doc_e->type=DOCT_ERROR;
@@ -547,7 +524,6 @@ public U0 DocDel(CDoc *doc)
   if (!doc || doc->doc_signature!=DOC_SIGNATURE_VAL) return;
   DocLock(doc);
   doc->doc_signature=0;
-  doc->doc_in_que_signature=0;
   DocRst(doc,TRUE);
   Free(doc->find_replace);
   Free(doc->dollar_buf);
@@ -683,7 +659,7 @@ U0 DocRemSoftNewLines(CDoc *doc=NULL,CDocEntry *doc_e=NULL)
   CDocEntry *doc_e2,*saved_ll=doc_e;
   Bool unlock;
   if (!doc) {
-    doc=DocCur;
+    doc=DocPut;
     if (!doc) return;
   }
   unlock=DocLock(doc);
@@ -712,7 +688,7 @@ public I64 DocMax(I64 i=MAX_I32)
 //entries after a while.
 {
   I64 result;
-  CDoc *doc=DocCur;
+  CDoc *doc=DocPut;
   if (doc) {
     result=doc->max_entries;
     doc->max_entries=i;
@@ -747,162 +723,116 @@ public CDoc *DocNew(CTask *task=NULL)
 sys_clipboard_doc=DocNew;
 
 #help_index "Doc/Task"
-public U0 DocQueIns(CDoc *doc,CDoc *pred)
-{
-  CDoc *succ;
-  Bool *old_preempt;
-  if (!doc) return;
-  old_preempt=Preempt(OFF);
-  succ=pred->next_doc;
-  doc->last_doc=pred;
-  doc->next_doc=succ;
-  pred->next_doc=doc;
-  succ->last_doc=doc;
-  doc->doc_in_que_signature=DOC_IN_QUE_SIGNATURE_VAL;
-  Preempt(old_preempt);
-}
-
-public U0 DocQueInsRev(CDoc *doc,CDoc *succ)
-{
-  CDoc *pred;
-  Bool *old_preempt;
-  if (!doc) return;
-  old_preempt=Preempt(OFF);
-  pred=succ->last_doc;
-  doc->last_doc=pred;
-  doc->next_doc=succ;
-  pred->next_doc=doc;
-  succ->last_doc=doc;
-  doc->doc_in_que_signature=DOC_IN_QUE_SIGNATURE_VAL;
-  Preempt(old_preempt);
-}
-
-public U0 DocQueRem(CDoc *doc)
-{
-  CDoc *succ,*pred;
-  Bool *old_preempt;
-  if (!doc) return;
-  old_preempt=Preempt(OFF);
-  doc->doc_in_que_signature=0;
-  succ=doc->next_doc;
-  pred=doc->last_doc;
-  pred->next_doc=succ;
-  succ->last_doc=pred;
-  Preempt(old_preempt);
-}
-
-public CDoc *DocCur(CTask *task=NULL)
-{
+public CDoc *DocPut(CTask *task=NULL)
+{//Current document that PUT goes to.
+ //Basically, StdOut unless double buffering.
   CDoc *result;
   if (!task) task=Fs;
-  result=task->last_doc;
-  if (result==(&task->next_doc)(U8 *)-offset(CDoc.next_doc) ||
-      result->flags&DOCF_AUX_DOC ||
-      result->doc_in_que_signature!=DOC_IN_QUE_SIGNATURE_VAL)
-    result=NULL;
-  return result;
+  if ((result=task->put_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
+    return result;
+  else
+    return NULL;
 }
 
-public CDoc *DocAux(CTask *task=NULL)
-{
+public CDoc *DocDisplay(CTask *task=NULL)
+{//StdOut unless double buffering.
   CDoc *result;
   if (!task) task=Fs;
-  result=task->next_doc;
-  if (result==(&task->next_doc)(U8 *)-offset(CDoc.next_doc) ||
-      !(result->flags&DOCF_AUX_DOC) ||
-      result->doc_in_que_signature!=DOC_IN_QUE_SIGNATURE_VAL)
-    result=NULL;
-  return result;
+  if ((result=task->display_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
+    return result;
+  else
+    return NULL;
+}
+
+public CDoc *DocBorder(CTask *task=NULL)
+{//Doc holding border of window text.
+  CDoc *result;
+  if (!task) task=Fs;
+  if ((result=task->border_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
+    return result;
+  else
+    return NULL;
 }
 
 
 public CDoc *DocDblBufStart(CTask *task=NULL)
 { //See $LK-A,"::/TempleOS/Demo/Spy.CPP"$
-  CDoc *doc,*doc2;
-  Bool unlock_doc2,old_preempt=Preempt(OFF);
-  if (!task) task=Fs;
-  doc2=task->last_doc;
-  unlock_doc2=DocLock(doc2); //dont want change during winupdate, so lock DocCur$WW,0$
-  doc=DocNew(task);
-  doc->win_task	=doc2->win_task;
-  doc->start_text_attr=doc2->start_text_attr;
-  doc->max_entries=doc2->max_entries;
-  MemCpy(doc->find_replace,doc2->find_replace,sizeof(CEdFindText));
-  doc->start_x	=doc2->start_x;
-  doc->start_y	=doc2->start_y;
-  MemCpy(&doc->filename,&doc2->filename,sizeof(CEdFileName));
-  doc->left_click_link =doc2->left_click_link;
-  doc->right_click_link=doc2->right_click_link;
-  doc->user_put_data=doc2->user_put_data;
-  doc->user_put_key =doc2->user_put_key;
-  doc->user_put_s   =doc2->user_put_s;
-  doc->parent_doc	=doc2->parent_doc;
-  doc->desc[0](I64)=doc2->desc[0](I64);
-  doc->user_data	=doc2->user_data;
-  doc->flags|=doc2->flags&DOCG_DBL_BUF_FLAGS | DOCF_DONT_SHOW;
-  DocQueIns(doc,task->last_doc);
-  if (unlock_doc2)
-    DocUnlock(doc2);
+  Bool unlock_ddoc,old_preempt=Preempt(OFF);
+  CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task),*result;
+  if (!pdoc || !ddoc || pdoc!=ddoc)
+    result=NULL; //Already Double buffering
+  else {
+    if (!task) task=Fs;
+    unlock_ddoc=DocLock(ddoc); //dont want change during winupdate, so lock DocPut$WW,0$
+    result=DocNew(task);
+    result->win_task		=ddoc->win_task;
+    result->max_entries		=ddoc->max_entries;
+    MemCpy(result->find_replace,ddoc->find_replace,sizeof(CEdFindText));
+    result->start_x		=ddoc->start_x;
+    result->start_y		=ddoc->start_y;
+    MemCpy(&result->filename,&ddoc->filename,sizeof(CEdFileName));
+    result->left_click_link	=ddoc->left_click_link;
+    result->right_click_link	=ddoc->right_click_link;
+    result->user_put_data	=ddoc->user_put_data;
+    result->user_put_key	=ddoc->user_put_key;
+    result->user_put_s		=ddoc->user_put_s;
+    result->parent_doc		=ddoc->parent_doc;
+    result->desc[0](I64)	=ddoc->desc[0](I64);
+    result->user_data		=ddoc->user_data;
+    result->flags|=ddoc->flags&DOCG_DBL_BUF_FLAGS | DOCF_DONT_SHOW;
+    task->put_doc=result;
+    if (unlock_ddoc)
+      DocUnlock(ddoc);
+  }
   Preempt(old_preempt);
-  return doc;
+  return result;
 }
 
 public Bool DocDblBufEnd(CTask *task=NULL)
 { //See $LK-A,"::/TempleOS/Demo/Spy.CPP"$
-  Bool okay=FALSE,old_preempt=Preempt(OFF);
-  CDoc *doc1,*doc2;
-  if (!task) task=Fs;
-  if (doc1=DocCur(task)) {
-    doc2=doc1->last_doc;
-    if (doc2!=(&task->next_doc)(U8 *)-offset(CDoc.next_doc) &&
-	!(doc2->flags&DOCF_AUX_DOC) &&
-	doc2->doc_in_que_signature==DOC_IN_QUE_SIGNATURE_VAL) {
-      doc2->flags|=DOCF_DONT_SHOW;
-      doc1->flags&=~DOCF_DONT_SHOW;
-      DocLock(doc2);
-      DocQueRem(doc2);
-      DocUnlock(doc2);
-      DocDel(doc2);
-      okay=TRUE;
-    }
+  Bool result=FALSE,old_preempt=Preempt(OFF);
+  CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
+  if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
+    if (!task) task=Fs;
+    ddoc->flags|=DOCF_DONT_SHOW;
+    pdoc->flags&=~DOCF_DONT_SHOW;
+    DocLock(ddoc);
+    task->display_doc=pdoc;
+    DocUnlock(ddoc);
+    DocDel(ddoc);
+    result=TRUE;
   }
   Preempt(old_preempt);
-  return okay;
+  return result;
 }
 
 public Bool DocDblBufSwap(CTask *task=NULL)
 { //See $LK-A,"::/TempleOS/Demo/Spy.CPP"$
-  Bool okay=FALSE,old_preempt=Preempt(OFF);
-  CDoc *doc1,*doc2;
-  if (!task) task=Fs;
-  if (doc1=DocCur(task)) {
-    doc2=doc1->last_doc;
-    if (doc2!=(&task->next_doc)(U8 *)-offset(CDoc.next_doc) &&
-	!(doc2->flags&DOCF_AUX_DOC) &&
-	doc2->doc_in_que_signature==DOC_IN_QUE_SIGNATURE_VAL) {
-      doc2->flags|=DOCF_DONT_SHOW;
-      doc1->flags&=~DOCF_DONT_SHOW;
-      DocLock(doc2);
-      DocQueRem(doc2);
-      DocUnlock(doc2);
-      DocRst(doc2,TRUE);
-      MemCpy(doc2->find_replace,doc1->find_replace,sizeof(CEdFindText));
-      MemCpy(&doc2->filename,&doc1->filename,sizeof(CEdFileName));
-      doc2->start_text_attr=doc1->start_text_attr;
-      doc2->max_entries  =doc1->max_entries;
-      doc2->flags	 =doc1->flags&DOCG_DBL_BUF_FLAGS | doc2->flags&~DOCG_DBL_BUF_FLAGS;
-      doc2->left_click_link =doc1->left_click_link;
-      doc2->right_click_link=doc1->right_click_link;
-      doc2->user_put_data=doc1->user_put_data;
-      doc2->user_put_key =doc1->user_put_key;
-      doc2->user_put_s	 =doc1->user_put_s;
-      doc2->desc[0](I64)=doc1->desc[0](I64);
-      doc2->user_data	 =doc1->user_data;
-      DocQueIns(doc2,task->last_doc);
-      okay=TRUE;
-    }
+  Bool result=FALSE,old_preempt=Preempt(OFF);
+  CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
+  if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
+    if (!task) task=Fs;
+    ddoc->flags|=DOCF_DONT_SHOW;
+    pdoc->flags&=~DOCF_DONT_SHOW;
+    DocLock(ddoc);
+    task->display_doc=pdoc;
+    DocUnlock(ddoc);
+    DocRst(ddoc,TRUE);
+    MemCpy(ddoc->find_replace,pdoc->find_replace,sizeof(CEdFindText));
+    MemCpy(&ddoc->filename,&pdoc->filename,sizeof(CEdFileName));
+    ddoc->max_entries		=pdoc->max_entries;
+    ddoc->flags			=pdoc->flags&DOCG_DBL_BUF_FLAGS | ddoc->flags&~DOCG_DBL_BUF_FLAGS;
+    ddoc->left_click_link	=pdoc->left_click_link;
+    ddoc->right_click_link	=pdoc->right_click_link;
+    ddoc->user_put_data		=pdoc->user_put_data;
+    ddoc->user_put_key		=pdoc->user_put_key;
+    ddoc->user_put_s		=pdoc->user_put_s;
+    ddoc->desc[0](I64)		=pdoc->desc[0](I64);
+    ddoc->user_data		=pdoc->user_data;
+    task->put_doc=ddoc;
+    result=TRUE;
   }
   Preempt(old_preempt);
-  return okay;
+  return result;
 }
 #help_index "Doc"

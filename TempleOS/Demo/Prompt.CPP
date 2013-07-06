@@ -3,7 +3,7 @@ U0 PromptDemo()
   F64 d;
   I64 i;
   U8 *name;
-  CDate spdt;
+  CDate cdt;
 
   "\n\nNow prompting from the cmd line.\n\n"
   "$$FG,GREEN$$<ENTER>$$FG$$ keeps default.\n\n";
@@ -18,8 +18,8 @@ U0 PromptDemo()
   "Name:%s\n",name;
   Free(name);
 
-  spdt=PmtCDate("Date (%D):",GetCurTimeCDate);
-  "Date=%D\n",spdt;
+  cdt=PmtCDate("Date (%D):",GetCurTimeDate);
+  "Date=%D\n",cdt;
 }
 
 PromptDemo;

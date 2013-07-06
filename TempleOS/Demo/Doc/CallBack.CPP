@@ -5,36 +5,24 @@ U8 *tSCB(CDoc *,CDocEntry *,CTask *mem_task)
 //if the window mgr used it's own
 //heap, so we use the owning task's heap.
   U8 *st=MAlloc(64,mem_task);
-  CDate spdt=tS*CDATE_FREQ;
+  CDate cdt=tS*CDATE_FREQ;
   //Doesn't have to be fixed width!!
-  SPrintF(st,"%d=%h11T",spdt,spdt);
+  SPrintF(st,"%d=%h11T",cdt,cdt);
   return st;
 }
 
 U8 *CurTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  CDate spdt=GetCurTimeCDate;
-  SPrintF(st,"%h0D %h0T",spdt,spdt);
+  CDate cdt=GetCurTimeDate;
+  SPrintF(st,"%h0D %h0T",cdt,cdt);
   return st;
 }
 
 U0 DoIt()
 {
-/* The main window is kept at Fs->last_doc.
-A second framework is kept at Fs->next_doc.
-Normally, the next_doc is used for updating
-the border, primarily.
-
-See $LK,"UseTermDoc","MN:UseTermDoc"$().
-See $LK,"DocUpdateTaskDocs","MN:DocUpdateTaskDocs"$().
-
-Note: the next_doc is not to be confused
-with the aux_str, a member of the $LK,"CDocEntry","MN:CDocEntry"$.
-
-*/
-  CDoc *aux=DocAux, //Fetches Fs->next_doc basically.
-      *cur=DocCur; //Fetches Fs->last_doc basically.
+  CDoc *bdoc=DocBorder,
+       *pdoc=DocPut;
   CDocEntry *doc_e;
 
 // We don't want an update between
@@ -43,32 +31,32 @@ with the aux_str, a member of the $LK,"CDocEntry","MN:CDocEntry"$.
 
   Bool old_preempt=Preempt(OFF);
 
-  DocBottom(aux);  //Ins at the bottom
-  DocPutS(aux,"$$FG,RED$$$$CM+BY+LX,5,-3$$");
+  DocBottom(bdoc);  //Ins at the bottom
+  DocPutS(bdoc,"$$FG,RED$$$$CM+BY+LX,5,-3$$");
 
 // The $LK,"DocPutS","MN:DocPutS"$() routine returns the addr of the last entry.
-  doc_e=DocPutS(aux,"$$TX+TC,\" \"$$");
+  doc_e=DocPutS(bdoc,"$$TX+TC,\" \"$$");
 // The TC flag is "has tag callback".
 
 // Flags are explained here:
-//	$LK-A,"::/TempleOS/Doc/CtrlL.TXT"$
+//	$LK-A,"::/TempleOS/Doc/Widget.TXT"$
 //	$LK-A,"::/TempleOS/Doc/Dollar.TXT"$
 //	$LK,"Dollar Flags","MN:DOCEf1_AUX_STR"$
 //	$LK,"ST_DOC_FLAGS","FF:::/TempleOS/Adam/Doc/Doc.CPP,ST_DOC_FLAGS"$
 
   doc_e->tag_cb=&tSCB;
-  DocPutS(aux,"$$FG$$");
+  DocPutS(bdoc,"$$FG$$");
 
-//$BK,1$WARNING:$BK,0$ If you use the last_doc you
+//$BK,1$WARNING:$BK,0$ If you use the put_doc you
 //run the risk of the user pressing
 //<CTRL-T> or using the clipboard, both
 //of which will crash.	So, you might want
-//to use the next_doc.
+//to use the border_doc.
 
-  DocPutS(cur,"$$FG,LTRED$$");
-  doc_e=DocPutS(cur,"$$TX+TC,\" \"$$");
+  DocPutS(pdoc,"$$FG,LTRED$$");
+  doc_e=DocPutS(pdoc,"$$TX+TC,\" \"$$");
   doc_e->tag_cb=&CurTimeCB;
-  DocPutS(cur,"$$FG$$");
+  DocPutS(pdoc,"$$FG$$");
 
   Preempt(old_preempt);
 
@@ -83,11 +71,8 @@ with the aux_str, a member of the $LK,"CDocEntry","MN:CDocEntry"$.
 U0 UndoIt()
 {
 //Clear-out entries without a +H hold flag.
-  DocBottom(Fs->next_doc);
-  DocPutS(Fs->next_doc,"$$CL$$");
+  DocClear(Fs->border_doc);
 }
 
 
 DoIt;
-
-// See $LK-A,"::/TempleOS/Demo/Doc/CallBackAux2.CPP"$ for another way.

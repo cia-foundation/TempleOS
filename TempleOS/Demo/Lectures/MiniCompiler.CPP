@@ -40,7 +40,7 @@ I64 Lex(U8 **_src,I64 *num)
 	*_src=src;
 	return TK_EOF;
       case CH_SPACE:
-      case CH_CARRIAGE_RETURN:
+      case '\r':
       case '\n':
 	src++;
 	break;

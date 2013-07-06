@@ -1,18 +1,18 @@
-//The HOME/Registry.CPP.Z file is C+ code.
+//The HOME/Registry.CPP.Z file is Holy C code.
 //You can execute a branch of it.  The Adam
 //branch is executed in the Adam task boot phase.
 //Normally, you will place var declarations
 //in the branch you make, but since an arthmetic expression
-//is valid in C+ you can place simple expressions
+//is valid in Holy C you can place simple expressions
 //without vars.
 
 AcctRegSetDftEntry("DemoCompany/Game1","F64 best_score=1.23;\n");
 AcctRegSetDftEntry("DemoCompany/Game1/SimpleVal","1234;\n");
-AcctRegExecuteBranch("DemoCompany/Game1");
+AcctRegExeBranch("DemoCompany/Game1");
 
 U0 Game()
 {
-  I64 i=AcctRegExecuteBranch("DemoCompany/Game1/SimpleVal");
+  I64 i=AcctRegExeBranch("DemoCompany/Game1/SimpleVal");
   "High Score:%6.5f\n",best_score;
   "Val:%d\n",i;
   i++;

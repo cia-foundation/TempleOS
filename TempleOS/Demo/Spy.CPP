@@ -12,7 +12,7 @@ U0 SpyStkRep(CTask *task)
     DocDblBufSwap;
     WinMgrSync;
   }
-  if (DocCur==doc) DocDblBufSwap;
+  if (DocPut==doc) DocDblBufSwap;
   DocDblBufEnd;
   Preempt(old_preempt);
 }
@@ -28,7 +28,7 @@ U0 SpyCallerRep(CTask *task)
     DocDblBufSwap;
     WinMgrSync;
   }
-  if (DocCur==doc) DocDblBufSwap;
+  if (DocPut==doc) DocDblBufSwap;
   DocDblBufEnd;
   Preempt(old_preempt);
 }

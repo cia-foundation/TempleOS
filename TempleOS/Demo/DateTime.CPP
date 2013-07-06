@@ -21,15 +21,15 @@
 */
 
 
-CDate spdt=GetCurTimeCDate;
+CDate cdt=GetCurTimeDate;
 
 I64 i;
 for (i=0;i<DF_NUM;i++)
-  "%%h%dD: %h*D\n",i,i,spdt;
+  "%%h%dD: %h*D\n",i,i,cdt;
 NewLine;
 
 for (i=0;i<TF_NUM;i++)
-  "%%h%dT: %h*T\n",i,i,spdt;
+  "%%h%dT: %h*T\n",i,i,cdt;
 
 "$$FG,PURPLE$$CDate freq:%12.6f$$FG$$\n",0x100000000/24.0/60.0/60.0;
 
@@ -41,5 +41,5 @@ for (i=0;i<TF_NUM;i++)
 */
 
 //Example of how to use with $LK,"DF_NUM","MN:DF_NUM"$, $LK,"TF_NUM","MN:TF_NUM"$ #define's
-"%h*D\n",DF_MM_DD_YYYY,spdt;
-"%h*T\n",TF_HH24_MM,spdt;
+"%h*D\n",DF_MM_DD_YYYY,cdt;
+"%h*T\n",TF_HH24_MM,cdt;

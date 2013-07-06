@@ -13,6 +13,7 @@ U0 MsgLoop()
     msg_code=GetMsg(&p1,&p2,~(1<<MSG_NULL));
     "CMD:%02X P1:%08X P2:%016X\n",msg_code,p1,p2;
   } while (msg_code!=MSG_KEY_DOWN || p1!=CH_ESC && p1!=CH_SHIFT_ESC);
+  GetMsg(,,1<<MSG_KEY_UP);
 
   Fs->win_inhibit=0;
 }

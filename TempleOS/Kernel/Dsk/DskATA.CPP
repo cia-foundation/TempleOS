@@ -662,8 +662,6 @@ Bool BootCdProbe(CBlkDev *bdev)
   Bool result=FALSE;
   "Port: %04X,%04X Unit: %02X  ",bdev->base0,bdev->base1,bdev->unit;
   if (ATAProbe(bdev->base0,bdev->base1,bdev->unit)==BDT_ATAPI) {
-    //After preboot + BootCD.BIN.Z comes Kernel.BIN.C
-    //See $LK,"CDBOOT","FA:::/TempleOS/Adam/Dsk/DskCDDVD.CPP,CDBOOT"$, See $LK,"CD Boot Blk","FF:::/TempleOS/Adam/Boot/BootCD.CPP,BOOT_CODE_CDROM"$
     " ATAPI";
     if (ATAPIStartStop(bdev,TRUE,tS+5.0)) {
       " Started";
@@ -774,20 +772,15 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,CATARep **_root,I64 
   }
 }
 
-Bool hint_ata_disable=FALSE;
-
-U0 ATARepExitAllApplications()
+Bool ATARepExitAllApplications()
 {
-  I64 ch;
   PutDefine("ST_GOING_TO_PROBE_HARDWARE");
   PutDefine("ST_EXIT_ALL_APPLICATIONS");
-  PutDefine("ST_PRESS_A_KEY");
-  "Press '$$FG,PURPLE$$p$$FG$$' to probe or '$$FG,PURPLE$$s$$FG$$' to skip.\n";
-  ch=ToUpper(GetChar(NULL,FALSE));
-  if (ch=='S')
-    hint_ata_disable=TRUE;
+  PutDefine("ST_PROBE_OR_SKIP");
+  if (ToUpper(GetChar(,FALSE))=='S')
+    return TRUE;
   else
-    hint_ata_disable=FALSE;
+    return FALSE;
 }
 
 public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
@@ -800,9 +793,7 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
 
   if (_root) *_root=NULL;
 
-  if (pmt)
-    ATARepExitAllApplications;
-  if (hint_ata_disable)
+  if (pmt && ATARepExitAllApplications)
     return 0;
 
   old_preempt=Preempt(OFF);
@@ -870,13 +861,13 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
   return num_hints;
 }
 
-CATARep *ATAIDDrvs(CATARep *root,U8 _dft_drv,CATARep **_ata_drv,CATARep **_atapi_drv)
+CATARep *ATAIDDrvs(CATARep *root,U8 _sys_acct_drv,CATARep **_ata_drv,CATARep **_atapi_drv)
 {
   CATARep *result=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bdev;
   Bool was_silent=Silent(ON);
   try
-    bdev=Drv2BlkDev(_dft_drv);
+    bdev=Drv2BlkDev(_sys_acct_drv);
   catch {
     Fs->catch_except=TRUE;
     bdev=NULL;
@@ -929,7 +920,7 @@ I64 AutoMountIDE()
   I64 result=0;
   CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
   ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,dft_drv,&ata_drv,&atapi_drv);
+  ATAIDDrvs(root,*sys_acct,&ata_drv,&atapi_drv);
   if (ata_drv && ATAMount(sys_first_hd_drv_let,BDT_ATA,
 	ata_drv->base0,ata_drv->base1,ata_drv->unit))
     result++;

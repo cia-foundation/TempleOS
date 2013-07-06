@@ -24,19 +24,23 @@ class CKernelCfg
   U8 *acct_name;
   U8 *dsk_cache_size_exp;
   CDoc *add_dev;
-
   Bool opts[CFG_NUM_OPTIONS];
   U8 mem_init_val,heap_init_val,var_init_val,
-     dft_drv,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
+     sys_acct_drv,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
   Bool cdrom_ports_pmt;
 };
 
 CDoc *KernelCfgAddDev(CKernelCfg *c)
 {
   I64 num_hints,first_prt_num,type,unit,cnt=0;
-  U8 blks_buf[256],base0_buf[128],base1_buf[128],drv_let;
+  U8 blks_buf[256],addr_buf[256],base0_buf[128],base1_buf[128];
   CATARep *root=NULL,*tempha;
   CDoc *doc=DocNew;
+  Bool make_free;
+
+  //See $LK,"InsBootDstDrv","FF:::/TempleOS/Adam/Boot/InsBoot.CPP,InsBootDstDrv"$
+  if (!(c->sys_acct_drv=NamedFramePtr("InsBootDstDrv")))
+    c->sys_acct_drv=Fs->cur_prt->drv_let;
 
   PutDefine("ST_MOUNT_INTRO");
   do {
@@ -50,11 +54,13 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 
       unit=0;
       if (type==BDT_RAM) {
+	PutDefine("ST_MOUNT_ADDR");
+	GetS(addr_buf,256);
 	PutDefine("ST_MOUNT_BLKS");
 	GetS(blks_buf,256);
       } else if (type==BDT_ATA ||
 	  type==BDT_ATAPI) {
-	num_hints=ATARep(TRUE,,&root);
+	num_hints=ATARep(,,&root);
 	if (type==BDT_ATAPI) {
 	  PutDefine("ST_MOUNT_BOOTED_CDROM");
 	  if (num_hints)
@@ -94,27 +100,28 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
       if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
 	DocPrintF(doc,"bdev=BlkDevNextFree(%d,%d);"
 		      "bdev->unit=%d;",first_prt_num+'A',type,unit);
-	if (type==BDT_RAM)
+	if (type==BDT_RAM) {
+	  if (!*addr_buf) StrCpy(addr_buf,"0");
+	  DocPrintF(doc,"bdev->RAM_dsk=%s;",addr_buf);
 	  DocPrintF(doc,"bdev->max_blk=(%s)-1;",blks_buf);
+	}
+	make_free=FALSE;
 	if (type==BDT_ATA || type==BDT_ATAPI) {
 	  if (type==BDT_ATAPI && !*base0_buf) {
 	    c->cdrom_ports_pmt=TRUE;
 	    DocPrintF(doc,"boot_drv_pmt=PmtBaseUnit(bdev);");
+	    if (first_prt_num+'A'==c->sys_acct_drv)
+	      make_free=TRUE;
 	  } else
 	    DocPrintF(doc,"bdev->base0=%s;bdev->base1=%s;",
 		base0_buf,base1_buf);
 	}
-	DocPrintF(doc,"BlkDevAdd(bdev,FALSE,FALSE);");
+	DocPrintF(doc,"BlkDevAdd(bdev,FALSE,%d);",make_free);
 	cnt++;
       } else
 	PutDefine("ST_FAILED");
     }
   } while (!cnt || 0<=first_prt_num<NUM_PRTS);
-
-  //See $LK,"InsBootDstDrv","FF:::/TempleOS/Adam/Boot/InsBoot.CPP,InsBootDstDrv"$
-  if (!(drv_let=NamedFramePtr("InsBootDstDrv")))
-    drv_let=Fs->cur_prt->drv_let;
-  c->dft_drv=drv_let;
   return doc;
 }
 
@@ -191,6 +198,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	    c->auto_mount_ide_hd_let=0;
 	    c->auto_mount_ide_cd_let=0;
 	  }
+	  break;
       }
     }
   } while (*st);

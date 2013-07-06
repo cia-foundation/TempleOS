@@ -17,5 +17,3 @@ $LK,"OPTf_WARN_DUP_TYPES","MN:OPTf_WARN_DUP_TYPES"$	warning if dup local var typ
 $LK,"OPTf_NO_REG_VAR","MN:OPTf_NO_REG_VAR"$ forces all function local vars to the stk not registers.  Applied to functions.
 
 $LK,"OPTf_NO_BUILTIN_CONST","MN:OPTf_NO_BUILTIN_CONST"$ Disable 10-byte float consts for ã, log2_10, log10_2, loge_2.  Applied to functions.
-
-

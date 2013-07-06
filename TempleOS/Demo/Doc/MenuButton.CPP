@@ -27,9 +27,9 @@ U0 MenuButton()
 {
   Bool done=FALSE;
   I64 i,j=0,freq=100;
-  I64 old_flags=DocCur->flags;
+  I64 old_flags=DocPut->flags;
 //This allows keyboard navigation to skip nonselectible entries.
-  DocCur->flags|=DOCF_FORM;
+  DocPut->flags|=DOCF_FORM;
   do {
     DocClear;
 //Use <CTRL-L> to generate cursor movement expressions and check "Quote".
@@ -43,7 +43,7 @@ U0 MenuButton()
     "\n$$BT,\"Set Freq\",MU_SET_FREQ$$\n\n\n"
     "\n$$BT,\"Nothing\",MU_NOTHING$$\n\n\n"
     "\n$$BT,\"Done\",DOCM_CANCEL$$\n\n\n";
-    i=DocMenuDo(DocCur);
+    i=DocMenuDo(DocPut);
     DocBottom;
     switch (i) {
       case MU_NOTHING:
@@ -67,7 +67,7 @@ U0 MenuButton()
 	done=TRUE;
     }
   } while (!done);
-  DocCur->flags=DocCur->flags&~DOCF_FORM |
+  DocPut->flags=DocPut->flags&~DOCF_FORM |
 		     old_flags & DOCF_FORM;
   DocClear;
   Snd(0);

@@ -2,7 +2,7 @@ $WW,1$* You can enter the debugger with $LK,"Dbg","MN:Dbg"$() or $FG,2$<CTRL-ALT
 
 * I use $LK,"progress1","MN:progress1"$-$LK,"progress4","MN:progress4"$ for debugging because they show on the wallpaper.  They're just global integer vars.
 
-* While debugging, you specify addresses of assembly  routines with just the label, as in $FG,2$_MALLOC+0x20$FG$.  You specify $FG,2$C+$FG$ function names with $FG,2$&$FG$ before functions as in $FG,2$&PrintF+0x10$FG$.
+* While debugging, you specify addresses of assembly  routines with just the label, as in $FG,2$_MALLOC+0x20$FG$.  You specify $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ function names with $FG,2$&$FG$ before functions as in $FG,2$&PrintF+0x10$FG$.
 
 * You can use $LK,"AdamLog","MN:AdamLog"$() to send text to the Adam task window.  It works like $LK,"PrintF","MN:PrintF"$().  I never use this.  Instead I use $LK,"DbgI64","MN:DbgI64"$().
 
@@ -30,7 +30,7 @@ $LK,"Echo","MN:Echo"$() turns on or off raw data going into the lexical analyzer
 
 $LK,"LTrace","MN:LTrace"$() shows the tokens coming out of the lexical analyzer.
 
-$LK,"CTrace","MN:CTrace"$() unassembles code generated from the C+ compiler.
+$LK,"CTrace","MN:CTrace"$() unassembles code generated from the Holy C compiler.
 
 $LK,"PTrace","MN:PTrace"$() shows $FG,2$intermediate code$FG$ comming out of the first stage of the compiler (it's not 100% valid because it hasn't been fixed-up).
 

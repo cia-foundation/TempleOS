@@ -2,7 +2,7 @@ asm {
 USE64
 CMP_OPT_NOP:
 #assert CIntermediateCode.ic_opcode==0
-	DU16	IC_NOP;  //Must be at CIntermediateCode.ic_opcode offset
+	DU16	IC_NOP1;  //Must be at CIntermediateCode.ic_opcode offset
 	DU8	sizeof(CIntermediateCode)-2 DUP(0);
 
 // ************************************
@@ -122,28 +122,28 @@ _OPTNEXT3::
 	MOV	RAX,RCX
 	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
 	JB	@@05
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
 	JE	@@05
 	STOSQ
 
 @@05:	MOV	RAX,U64 8[RDX]
 	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
 	JB	@@10
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
 	JE	@@10
 	STOSQ
 
 @@10:	MOV	RAX,U64 16[RDX]
 	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
 	JB	@@15
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
 	JE	@@15
 	STOSQ
 
 @@15:	MOV	RAX,U64 24[RDX]
 	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
 	JB	@@20
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP1
+	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
 	JE	@@20
 	STOSQ
 

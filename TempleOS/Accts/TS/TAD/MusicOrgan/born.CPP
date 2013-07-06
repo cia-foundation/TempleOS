@@ -37,13 +37,13 @@ U0 Song()
   try {
     while (!ScanKey) {
       t0=tMBeat;
-      Play("3qB!eB2G!3qA!!eF!!AsF!AFA!!qC2sG!3A!2G3ARBRB",
+      Play("3qBeB2G3qAeFAsFAFAqC2sG3A2G3ARBRB",
 	  "New \0day \0is \0born.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-      Play("qB!eB2G!3qA!!eF!!AsF!AFA!!qC2sG!3A!2G3ARBRB",
+      Play("qBeB2G3qAeFAsFAFAqC2sG3A2G3ARBRB",
 	  "Though \0it's \0the \0mourn',\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-      Play("!eDDR!!CqG!2eGR3qE!!etEA!!FqCsDGDG",
+      Play("eDDRCqG2eGR3qEetEAFqCsDGDG",
 	  "cheer-\0up \0 \0the \0heart\n\0 \0 \0 \0 \0 \0 \0 \0 \0as \0 \0you \0");
-      Play("!eDDR!!CqG!2eGR3qE!!etEA!!FqCsDGDG",
+      Play("eDDRCqG2eGR3qEetEAFqCsDGDG",
 	  "hitch-\0up \0 \0the \0cart.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
     }
   } catch

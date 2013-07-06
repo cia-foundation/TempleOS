@@ -56,9 +56,9 @@ public U0 Life()
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   WinMax;
   DCFill;
-  "$$CL$$";
+  DocClear;
 
-  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",Fs);
+  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   WordStat;
   Fs->draw_it=&DrawIt;
   Fs->win_inhibit=WIF_ALL-WIF_BORDER;
@@ -73,7 +73,7 @@ public U0 Life()
 	cnt=0;
 	while (msg_code!=MSG_IP_L_UP) {
 	  restart=TRUE;
-	  dc[cur_dc]->color=ROP_EQU+GREEN;
+	  dc[cur_dc]->color=GREEN;
 	  dc[cur_dc]->pen_width=0.04*ip_speed;
 	  GrLine3(dc[cur_dc],x1,y1,0,x2,y2,0);
 	  restart=TRUE;
@@ -88,6 +88,7 @@ public U0 Life()
 	break;
     }
   } while (msg_code!=MSG_KEY_DOWN || !p1);
+  GetMsg(,,1<<MSG_KEY_UP);
   SettingsPop;
   DCFill;
   DCDel(dc[0]);

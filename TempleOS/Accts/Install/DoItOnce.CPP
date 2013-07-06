@@ -26,7 +26,7 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,U8 *acct_name,
 
   XTalkWait(task,
     "MakeOSInstallPrtBootLoader('%C');\n"
-    "B10x20000\n",drv);
+    "B1\n0x20000\n",drv);
 
   if (ata_drv)
     XTalkWait(task,"C2p%d\n",ata_drv->num);
@@ -48,11 +48,15 @@ U0 VMInstallWizard()
   CTask *task;
   while (TRUE) {
     "Make-up a Log-In Name (account).\n";
-    acct_name=PmtStr("User Acct Name (%s): ","User");
+    acct_name=PmtStr("User Acct Name: ");
     if (FileNameChk(acct_name))
       break;
     Free(acct_name);
   }
+
+  "\nIt's normal for this to freeze for a moment or two.\n";
+  PressAKey;
+
   task=SpawnUser;
   TaskWait(task);
   SetWinHorz(Fs->win_left,Fs->win_right,task);
@@ -61,10 +65,10 @@ U0 VMInstallWizard()
   WinToTop(Fs);
 
   ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,dft_drv,&ata_drv,&atapi_drv);
+  ATAIDDrvs(root,*sys_acct,&ata_drv,&atapi_drv);
   if (VMPrtDsk(task,ata_drv)) {
-    VMInstallBoot(task,dft_drv,'C',acct_name,ata_drv,atapi_drv);
-    VMInstallBoot(task,dft_drv,'D',acct_name,ata_drv,atapi_drv);
+    VMInstallBoot(task,*sys_acct,'C',acct_name,ata_drv,atapi_drv);
+    VMInstallBoot(task,*sys_acct,'D',acct_name,ata_drv,atapi_drv);
     InstallMasterBootLoader('C');
   }
   LinkedLstDel(root);
@@ -85,11 +89,15 @@ U0 RegularInstallWizard()
 
   while (TRUE) {
     "Make-up a Log-In Name (account).\n";
-    acct_name=PmtStr("User Acct Name (%s): ","User");
+    acct_name=PmtStr("User Acct Name: ");
     if (FileNameChk(acct_name))
       break;
     Free(acct_name);
   }
+
+  "\nIt's normal for this to freeze for a moment or two.\n";
+  PressAKey;
+
   task=SpawnUser;
   TaskWait(task);
   SetWinHorz(Fs->win_left,Fs->win_right,task);
@@ -143,7 +151,7 @@ U0 RegularInstallWizard()
   }
 
   NewLine;
-  st1=MSPrintF("%C:/TempleOS",dft_drv);
+  st1=MSPrintF("%C:/TempleOS",*sys_acct);
   st2=MSPrintF("%C:/TempleOS",*dst);
 
   "$$FG,RED$$Format %C Partition?$$FG$$\n",*dst;
@@ -151,7 +159,7 @@ U0 RegularInstallWizard()
     NewLine;
     while (TRUE) {
     "$$FG,PURPLE$$1$$FG$$) Use FAT32\n"
-      "$$FG,PURPLE$$2$$FG$$) Use TempleOS Native\n"
+      "$$FG,PURPLE$$2$$FG$$) Use RedSea\n"
       "\nFile System Type: ";
       ch=GetChar;
       NewLine;
@@ -161,7 +169,7 @@ U0 RegularInstallWizard()
     if (ch=='1')
       Fmt(*dst,TRUE,FALSE,PT_FAT32);
     else
-      Fmt(*dst,TRUE,FALSE,PT_NATIVE);
+      Fmt(*dst,TRUE,FALSE,PT_REDSEA);
   } else {
   "\n$$BK,1$$WARNING$$BK,0$$ if you answer yes to the following "
     "you will lose all TempleOS files in your /TempleOS directory tree.\n"
@@ -183,7 +191,7 @@ U0 RegularInstallWizard()
   Copy("::/TempleOS/Demo/MakeDistro.CPP.Z",new_home_str);
   XTalkWait(task,
   "MakeOSInstallPrtBootLoader('%C');\n"
-  "B10x20000\n"
+  "B1\n0x20000\n"
   "C"
   "2p"
   "%s\n"

@@ -11,5 +11,5 @@ for (i=0;i<3;i++)
 
 "$$FG,RED$$//Press a letter to complete the mask$$FG$$\n";
 "Dir(\"*.";
-I64 ch=GetChar(NULL,FALSE); //Prompt for first digit of mask
+I64 ch=GetChar(,FALSE); //Prompt for first digit of mask
 "%c*\");\n",ch;

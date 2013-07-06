@@ -1,6 +1,6 @@
 asm {
 /*
-See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (3).
+See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 See $LK-A,"::/TempleOS/Doc/Mem.TXT"$
 */
 
@@ -190,7 +190,7 @@ I64 MemPageSize(U8 *a)
     return 0x200000;
 }
 
-I64 *MemPtAtPageTableEntry(U8 *a)
+I64 *MemPageTable(U8 *a)
 {
   if (a<NUM_PML1*0x1000*0x200)
     return PAGE_TABLE_BASE+ a>>12 *8;
@@ -201,7 +201,7 @@ I64 *MemPtAtPageTableEntry(U8 *a)
 
 Bool MemPagePresentMark(U8 *a,Bool val)
 {
-  I64 *pte=MemPtAtPageTableEntry(a);
+  I64 *pte=MemPageTable(a);
   Bool result=*pte&1;
   if (val)
     *pte=*pte|1;  //Mark present
@@ -415,7 +415,7 @@ am_done:
   m=result;
   m1=m(U8 *)+i;
   while (m<m1) {
-    pte=MemPtAtPageTableEntry(m);
+    pte=MemPageTable(m);
     *pte &= ~0x18;
     InvlPg(m);
     m(U8 *)+=MemPageSize(m);
@@ -442,7 +442,7 @@ U8 *MemBlksUncachedAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
     m=result;
     m1=m(U8 *)+num<<21;
     while (m<m1) {
-      pte=MemPtAtPageTableEntry(m);
+      pte=MemPageTable(m);
       *pte= *pte& ~0x18 |0x10;
       InvlPg(m);
       m(U8 *)+=MemPageSize(m);
@@ -468,7 +468,7 @@ U8 *MemBlksWriteThroughAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
     m=result;
     m1=m(U8 *)+num<<21;
     while (m<m1) {
-      pte=MemPtAtPageTableEntry(m);
+      pte=MemPageTable(m);
       *pte= *pte& ~0x18 |8;
       InvlPg(m);
       m(U8 *)+=MemPageSize(m);
@@ -486,7 +486,7 @@ U0 MemBlks2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
     m2=m;
     m1=m(U8 *)+pages2Meg<<21;
     while (m2<m1) {
-      pte=MemPtAtPageTableEntry(m2);
+      pte=MemPageTable(m2);
       *pte=*pte & ~0x18;
       InvlPg(m2);
       m2(U8 *)+=MemPageSize(m2);
@@ -1029,92 +1029,6 @@ U8 *AStrNew(U8 *buf)
   return StrNew(buf,adam_task);
 }
 
-U0 LinkedLstDel(U8 **_lst)
-{
-  U8 **d;
-  while (_lst) {
-    d=*_lst;
-    Free(_lst);
-    _lst=d;
-  }
-}
-
-U8 *LinkedLstCopy(U8 **_lst,CTask *mem_task=NULL)
-{
-  U8 *result=NULL,**d=&result;
-  while (_lst) {
-    d=*d=MAllocIdentical(_lst,mem_task);
-    _lst=*_lst;
-  }
-  return result;
-}
-
-I64 LinkedLstCnt(U8 **_lst)
-{
-  I64 result=0;
-  while (_lst) {
-    result++;
-    _lst=*_lst;
-  }
-  return result;
-}
-
-I64 LinkedLstSize(U8 **_lst)
-{
-  I64 result=0;
-  while (_lst) {
-    result+=MSize2(_lst);
-    _lst=*_lst;
-  }
-  return result;
-}
-
-U0 QueDel(CQue *root,Bool querem=FALSE) //Does not delete root
-{
-  CQue *d=root->next,*d1;
-  while (d!=root) {
-    d1=d->next;
-    if (querem)
-      QueRem(d);
-    Free(d);
-    d=d1;
-  }
-}
-
-CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
-{
-  CQue *result=MAllocIdentical(root,mem_task),*d=root->next,*d1;
-  QueInit(result);
-  while (d!=root) {
-    d1=MAllocIdentical(d,mem_task);
-    QueIns(d1,result->last);
-    d=d->next;
-  }
-  return result;
-}
-
-I64 QueCnt(CQue *root) //Does not include root
-{
-  CQue *d=root->next;
-  I64 result=0;
-  while (d!=root) {
-    result++;
-    d=d->next;
-  }
-  return result;
-}
-
-I64 QueSize(CQue *root) //Does not include root
-{
-  CQue *d=root->next;
-  I64 result=0;
-  while (d!=root) {
-    result+=MSize2(d);
-    d=d->next;
-  }
-  return result;
-}
-
 U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512)
 {
   if (sys_mem_init_flag)
@@ -1330,7 +1244,7 @@ U8 *Mem64DevAlloc(I64 *_pages2Meg)
     Yield;
   while (i--) {
     sys_mem64_dev_ptr-=0x200000;
-    pte=MemPtAtPageTableEntry(sys_mem64_dev_ptr);
+    pte=MemPageTable(sys_mem64_dev_ptr);
     *pte=*pte&~0x18 |0x11; //Uncached and present
     InvlPg(sys_mem64_dev_ptr);
   }

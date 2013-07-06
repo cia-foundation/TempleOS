@@ -44,5 +44,3 @@ The $FG,2$$TX+HTML,"trivial solution","http://en.wikipedia.org/wiki/Trivial_solu
 * No need for namespaces -- scoping occurs automatically based on task symbol table hierarchy with the $FG,2$Adam task$FG$'s symbol system-wide global.
 
 * Sometimes, I $LK,"cut corners","FI:::/TempleOS/Doc/CutCorners.TXT"$ in the interest of keeping the code beautiful.
-
-$FG,8$

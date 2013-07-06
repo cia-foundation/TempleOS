@@ -5,5 +5,4 @@
 Cd("HOME");;
 #include "/TempleOS/Accts/TS/TSAdam"
 #include "/TempleOS/Accts/TS/TSDistro"
-#include "/TempleOS/Demo/WebLogExample/WebLogRep"
 Cd("HOME");;

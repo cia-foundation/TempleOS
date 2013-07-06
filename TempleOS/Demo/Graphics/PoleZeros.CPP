@@ -49,7 +49,7 @@ F64 MPDraw(CTask *task)
   I64 x,y,w=task->win_pixel_width,h=task->win_pixel_height,cx=w/2,cy=h/2,
      lo=Gs->num*h/mp_cnt,hi=(Gs->num+1)*h/mp_cnt;
   F64 yy,y_total=0;
-  CDC *dc=DCAlias(gr_dc2,task);
+  CDC *dc=DCAlias(gr_dc,task);
   for (y=lo;y<hi;y++) {
     for (x=0;x<w;x++) {
       CEqu(&xx,x-cx,cy-y);
@@ -65,17 +65,16 @@ F64 MPDraw(CTask *task)
 
 U0 Draw()
 {
-  CMPCmd *tempm[MP_MAX_PROCESSORS];
+  CSrvCmd *tempm[MP_MAX_PROCESSORS];
   F64 y_total,old_y_total=MAX_F64;
   I64 i,w=Fs->win_pixel_width,h=Fs->win_pixel_height,cx=w/2,cy=h/2;
   CDC *dc=DCAlias;
   while (TRUE) {
-
-    for (i=1;i<mp_cnt;i++)
-      tempm[i]=MPJob(&MPDraw,Fs,i,0);
-    y_total=MPDraw(Fs);
-    for (i=1;i<mp_cnt;i++)
-      y_total+=MPJobResult(tempm[i])(F64);
+    for (i=0;i<mp_cnt;i++)
+      tempm[i]=JobQue(&MPDraw,Fs,i,0);
+    y_total=0;
+    for (i=0;i<mp_cnt;i++)
+      y_total+=GetResult(tempm[i])(F64);
 
     if (!y_total) break;
     scale*=7*GR_WIDTH*GR_HEIGHT/y_total;
@@ -162,6 +161,7 @@ pz_msg:
       WinMgrSync;
     }
 pz_done:
+    GetMsg(,,1<<MSG_KEY_UP);
   } catch
     CatchAll;
   SettingsPop;

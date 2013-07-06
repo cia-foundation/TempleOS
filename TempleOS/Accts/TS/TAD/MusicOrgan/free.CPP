@@ -120,7 +120,7 @@ U0 Song()
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   Preempt(OFF);
   Init;
-  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",Fs);
+  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
@@ -134,13 +134,13 @@ U0 Song()
   SetWinHorz(Fs->win_left,Fs->win_right,task);
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
   while (!ScanKey) {
-	Play("W13qEEBeBDsBBB!BqDsBFB!!FD2G3D!2G",
+	Play("3qEEBeBDsBBBBqDsBFBFD2G3D2G",
 		"Free \0will... \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0 \0 \0fail.\n\0 \0 \0 \0");
-	Play("3qEEBeBDsBBB!BqDsBFB!!FD2G3D!2G",
+	Play("3qEEBeBDsBBBBqDsBFBFD2G3D2G",
 		"God \0still... \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0 \0 \0hail.\n\0 \0 \0 \0");
-	Play("3qD2G3eA2G3qCetEC!AqBsA!!C!ACqA",
+	Play("3qD2G3eA2G3qCetECAqBsACACqA",
 		"All \0things \0work \0for \0good... \0to \0the \0Lord.\n\0 \0 \0 \0 \0 \0 \0");
-	Play("D2G3eA2G3qCetEC!AqBsA!!C!ACqA",
+	Play("D2G3eA2G3qCetECAqBsACACqA",
 		"It's \0all \0good... \0 \0 \0as\0 \0sured.\n\0 \0 \0 \0 \0 \0 \0");
   }
   } catch

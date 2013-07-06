@@ -23,7 +23,7 @@ PopUpOk(
 "Press $$FG,GREEN$$<CTRL-M>$$FG$$.\n\n"
 "This will access your personal menu.\n"
 "You can customize it.  It's like your\n"
-"START menu.\n");
+"START menu and desktop.\n");
 
 AFGetChar(CH_CTRLM);
 Sleep(1000);
@@ -31,27 +31,6 @@ PopUpOk(
 "You can get to your personal menu\n"
 "by clicking on the word \"$$FG,GREEN$$MENU$$FG$$\" in the\n"
 "title bar.\n");
-
-PopUpOk(
-"$$FG,LTPURPLE$$Keyboard$$FG$$\n"
-"$$UL,1$$$$FG,LTBLUE$$Blue Underlined Text are Macros$$FG$$$$UL,0$$\n"
-"\t$$FG,GREEN$$<SPACE BAR>$$FG$$\tExecute Macro\n"
-"$$UL,1$$$$FG,LTRED$$Red Underlined Text are Links$$FG$$$$UL,0$$\n"
-"\t$$FG,GREEN$$<SPACE BAR>$$FG$$\tEdit (view)\n"
-"\t$$FG,GREEN$$<ENTER>$$FG$$\t\tRight-click menu\n\n"
-"\t$$FG,GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
-"\t$$FG,GREEN$$<SHIFT-ESC>$$FG$$\tAbort\n"
-"\n"
-"$$FG,LTPURPLE$$Mouse$$FG$$\n"
-"$$UL,1$$$$FG,LTBLUE$$Blue Underlined Text are Macros$$FG$$$$UL,0$$\n"
-"\t$$FG,GREEN$$Left-Click$$FG$$\tExecute Macro\n"
-"$$UL,1$$$$FG,LTRED$$Red Underlined Text are Links$$FG$$$$UL,0$$\n"
-"\t$$FG,GREEN$$Left-Click$$FG$$\tEdit (view)\n"
-"\t$$FG,GREEN$$Right-Click$$FG$$\tRight-click menu\n\n"
-"\t$$FG,GREEN$$Double-Left$$FG$$\tSave and exit\n"
-"\t$$FG,GREEN$$Double-Right$$FG$$\tAbort\n"
-"\n"
-);
 
 PopUpOk(
 "After clicking $$FG,GREEN$$[OKAY]$$FG$$, you will be back at\n"
@@ -64,6 +43,14 @@ Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 I64 i;
 for (i=0;i<9;i++)
   AFGetKey(SC_CURSOR_DOWN);
+
+PopUpOk(
+"Keyboard commands are:\n\n"
+"$$FG,GREEN$$<SPACE BAR>$$FG$$\tLeft-action\n"
+"$$FG,GREEN$$<ENTER>$$FG$$\t\tRight-action\n"
+"$$FG,GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
+"$$FG,GREEN$$<SHIFT-ESC>$$FG$$\tAbort\n"
+);
 
 PopUpOk(
 "After clicking $$FG,GREEN$$[OKAY]$$FG$$, the cursor will be\n"
@@ -89,12 +76,13 @@ PopUpOk(
 "different from the personal menu.\n"
 "Both use the same commands and have the same\n"
 "'widgets' available.\n\n"
-"Both utilize the same underlying document format.\n"
-"It is similar to $$FG,GREEN$$html$$FG$$ because it has ASCII\n"
-"behind it.  TempleOS documents can include graphics.\n\n"
+"Both utilize the same underlying document\n"
+"format.  It is similar to $$FG,GREEN$$html$$FG$$ because\n"
+"it has ASCII behind it.  TempleOS documents\n"
+"can include graphics.\n\n"
 "\"$$FG,GREEN$$<CTRL-T>$$FG$$\" after clicking $$FG,GREEN$$[OKAY]$$FG$$ to toggle\n"
 "to plain text mode.\n");
-AFGetChar(20);
+AFGetChar(CH_CTRLT);
 Sleep(1000);
 
 PopUpOk(
@@ -103,6 +91,7 @@ PopUpOk(
 "stands for \"macro\".\n\n"
 "Now, \"$$FG,GREEN$$<CTRL-T>$$FG$$\" to toggle back to\n"
 "regular mode.\n");
-AFGetChar(20);
+AFGetChar(CH_CTRLT);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 Sleep(1000);
 

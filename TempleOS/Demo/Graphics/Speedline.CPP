@@ -4,7 +4,7 @@ public U0 SpeedLineDemo()
 {
   I64 msg_code,cnt,x1,y1,x2,y2,p1,p2,color=BLACK;
   CDC *dc=DCAlias;
-  dc->color=ROP_EQU+color;
+  dc->color=color;
 
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   Fs->win_inhibit=WIF_ALL-WIF_BORDER;
@@ -12,7 +12,7 @@ public U0 SpeedLineDemo()
   WinMax;
   WordStat;
   DCFill;
-  "$$CL$$";
+  DocClear;
   do {
     msg_code=GetMsg(&p1,&p2,
       1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
@@ -21,7 +21,7 @@ public U0 SpeedLineDemo()
       case MSG_IP_R_UP:
 	color=PopUpColor;
 	if (color>=0)
-	  dc->color=ROP_EQU+color;
+	  dc->color=color;
 	break;
       case MSG_IP_L_DOWN:
 	x1=p1; y1=p2;
@@ -41,6 +41,7 @@ public U0 SpeedLineDemo()
 	break;
     }
   } while (msg_code!=MSG_KEY_DOWN || !p1);
+  GetMsg(,,1<<MSG_KEY_UP);
   DCFill;
   DCDel(dc);
   SettingsPop;

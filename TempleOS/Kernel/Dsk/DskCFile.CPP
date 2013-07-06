@@ -22,11 +22,11 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
   f->file_cluster_num=INVALID_CLUSTER;
   full_name=FileNameAbs(filename);
   f->p=Drv2Prt(*full_name);
-  if (f->p->type==PT_NATIVE)
+  if (f->p->type==PT_REDSEA)
     contiguous=TRUE;
   if (contiguous) {
     f->flags|=FF_CONTIGUOUS;
-    if (f->p->type!=PT_NATIVE) {
+    if (f->p->type!=PT_REDSEA) {
       if (!(FileAttr(filename) & _ATTR_CONTIGUOUS))
 	throw(EXCEPT_FILE,2);
     }
@@ -82,7 +82,7 @@ U0 FClose(CFile *f)
     if (f->flags & FF_NEEDS_WRITE) {
       if (fa=FileAccessNew(f->de.full_name)) {
 	if (!(f->flags & FF_USE_OLD_DATETIME))
-	  f->de.datetime=GetCurTimeCDate;
+	  f->de.datetime=GetCurTimeDate;
 	if (f->flags & FF_NEW_FILE)
 	  CDirNew(fa->p,Fs->cur_dir,&f->de,TRUE);
 	else
@@ -152,7 +152,10 @@ Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 
     if (i=blk%spc) {
       c=FSetCluster(f,c,blk,TRUE);
-      j= cnt<spc-i ? cnt:spc-i;
+      if (cnt<spc-i)
+	j=cnt;
+      else
+	j=spc-i;
       MemCpy(buf,f->cluster_buf+i<<BLK_SIZE_BITS,j<<BLK_SIZE_BITS);
       buf+=j<<BLK_SIZE_BITS;
       cnt-=j;
@@ -218,7 +221,10 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 
     if (i=blk%spc) {
       FSetCluster(f,c,blk,TRUE);
-      j=cnt<spc-i ? cnt:spc-i;
+      if (cnt<spc-i)
+	j=cnt;
+      else
+	j=spc-i;
       MemCpy(f->cluster_buf+BLK_SIZE*i,buf,j<<BLK_SIZE_BITS);
       f->flags|=FF_BUF_DIRTY;
       buf+=j<<BLK_SIZE_BITS;

@@ -319,12 +319,10 @@ U0 WSSingleFileAdd(U8 *buf,I64 pass)
     ptr--;
     while (TRUE) {
       if (ch=*ptr2++) {
-	if (ch!=CH_CURSOR) {
-	  if (!Bt(alpha_numeric_bitmap,ch))
-	    break;
-	  else
-	    *ptr3++=ch;
-	}
+	if (Bt(alpha_numeric_bitmap,ch))
+	  *ptr3++=ch;
+	else if (ch!=CH_CURSOR)
+	  break;
       } else {
 	ptr2--;
 	break;
@@ -460,7 +458,7 @@ U0 WSPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task)
   CHashWS *w2;
   F64 timeout_time=tS+0.5;
   CHashSrcSym *temph;
-  CDoc *doc=DocCur;
+  CDoc *doc=DocPut;
 
   src=DocGetLine(focus_l,doc_e,&data_col);
   DocUnlock(focus_l);
@@ -503,8 +501,9 @@ pc_done:
   DocRst(doc,TRUE);
   doc->flags|=DOCF_MIN_SIZE;
   DocCursor;
-  DocCurAttr(LTBLUE<<4+WHITE);
-  DocAuxAttr(LTBLUE<<4+BLACK);
+  Fs->text_attr=LTBLUE<<4+WHITE;
+  Fs->border_src =BDS_CONST;
+  Fs->border_attr=LTBLUE<<4+BLACK;
   DocPrintF(doc,"Word:%s\n",ws_cur_word);
   for (i=0;i<ws_num_fillins;i++) {
     st=ws_sorted_words[ws_fillin_matches[i]]->str;
@@ -543,12 +542,11 @@ U0 WSTask(I64)
       original_focus_task=focus_task=sys_focus_task;
       while (TaskValidate(focus_task) && Bt(&focus_task->task_flags,TASKf_INPUT_FILTER_TASK))
 	focus_task=focus_task->parent_task;
-      if (TaskValidate(focus_task) && (doc=DocCur(focus_task)) &&
+      if (TaskValidate(focus_task) && (doc=DocPut(focus_task)) &&
 	  focus_task!=Fs && Bt(&focus_task->display_flags,DISPLAYf_SHOW)) {
 	DocLock(doc);
 	if (TaskValidate(focus_task) && original_focus_task==sys_focus_task &&
-	     doc->doc_signature==DOC_SIGNATURE_VAL && doc==DocCur(focus_task) &&
-	    (doc_e=doc->cur_entry)) {
+	     doc && doc==DocPut(focus_task) && (doc_e=doc->cur_entry)) {
 	  if (doc_e==doc) doc_e=doc_e->last;
 	  while (doc_e->last!=doc && (doc_e->type_u8==DOCT_NEW_LINE ||
 	      doc_e->type_u8==DOCT_SOFT_NEW_LINE))

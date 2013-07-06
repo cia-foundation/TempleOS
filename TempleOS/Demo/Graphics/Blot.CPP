@@ -9,7 +9,7 @@ GrFloodFill3(img1,30,30,0,TRUE);
 GrLine3(img1,60,0,0,0,60,0);
 
 DCFill(img2);
-img2->color=ROP_EQU+RED;
+img2->color=RED;
 img2->brush=img1;
 GrCircle(img2,256-30,256-30,128,67);
 img2->color=BLUE;

@@ -613,7 +613,7 @@ _IS_PIXEL_COVERED0::
 	RET1	24
 // ************************************
 _GR_ROP_EQU_U8_NO_CLIPPING::
-//Puts foreground char shape onto gr_dc.
+//Puts foreground char shape onto gr_dc2.
 //ch.u8[1] is color as a whole byte
 //ch DOCEt_UNDERLINE attr flag is used.
 	ENTER	0

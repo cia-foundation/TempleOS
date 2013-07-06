@@ -261,7 +261,7 @@ class RangeJob
   CDoc *doc;
   I64 lo,hi,N,sqrt_primes,cbrt_primes;
   Prime *primes;
-  CMPCmd *cmd;
+  CSrvCmd *cmd;
 } rj[mp_cnt];
 
 I64 TestCoreSubRange(RangeJob *r)
@@ -336,7 +336,7 @@ I64 TestCoreRange(RangeJob *r)
 I64 MagicPairs(I64 N)
 {
   F64 t0=tT;
-  I64 result;
+  I64 result=0;
   I64 sqrt_primes,cbrt_primes,num_powprimes,
     i,k,n=(N-1)/mp_cnt+1;
   Prime *primes=PrimesNew(N,&sqrt_primes,&cbrt_primes);
@@ -346,7 +346,7 @@ I64 MagicPairs(I64 N)
 
   k=2;
   for (i=0;i<mp_cnt;i++) {
-    rj[i].doc=DocCur;
+    rj[i].doc=DocPut;
     rj[i].lo=k;
     k+=n;
     if (k>N) k=N;
@@ -355,14 +355,10 @@ I64 MagicPairs(I64 N)
     rj[i].sqrt_primes=sqrt_primes;
     rj[i].cbrt_primes=cbrt_primes;
     rj[i].primes=primes;
-    if (i==mp_cnt-1)
-      result=TestCoreRange(&rj[i]);
-    else
-      rj[i].cmd=MPJob(&TestCoreRange,&rj[i],mp_cnt-i-1,0);
+    rj[i].cmd=JobQue(&TestCoreRange,&rj[i],i,0);
   }
-  if (mp_cnt>1)
-    for (i=0;i<mp_cnt-1;i++)
-      result+=MPJobResult(rj[i].cmd);
+  for (i=0;i<mp_cnt;i++)
+    result+=GetResult(rj[i].cmd);
   Free(powprimes);
   Free(primes);
   "Found:%u Time:%9.4f\n",result,tT-t0;

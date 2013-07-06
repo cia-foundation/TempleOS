@@ -1,26 +1,26 @@
 CMathODE *SpanNew()
 {
-
-  ode=ODENew(0,1e-4,ODEF_HAS_MASSES|ODEF_PAUSED);
+  CMathODE *ode=ODENew(0,1e-4,ODEF_HAS_MASSES|ODEF_PAUSED);
   ode->derivative=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;
-
   QueIns(ode,Fs->last_ode);
   return ode;
 }
 
 U0 SpanDel(CMathODE *ode)
 {
-  QueRem(ode);
-  QueDel(&ode->next_mass,TRUE);
-  QueDel(&ode->next_spring,TRUE);
-  ODEDel(ode);
+  if (ode) {
+    QueRem(ode);
+    QueDel(&ode->next_mass,TRUE);
+    QueDel(&ode->next_spring,TRUE);
+    ODEDel(ode);
+  }
 }
 
 
-#define M_SIZE (sizeof(MyMass)-offset(CMass.start_saved_area))
+#define M_SIZE (sizeof(MyMass)	-offset(CMass.start_saved_area))
 #define S_SIZE (sizeof(MySpring)-offset(CSpring.start_saved_area))
 
 U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)

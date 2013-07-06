@@ -7,12 +7,12 @@ U0 Song()
   music_stacatto_factor= 0.902;
   try {
   while (!ScanKey) {
-	Play("W13qEDeCC!etEAAqEetCDCA!!GFqG",
+	Play("3qEDeCCetEAAqEetCDCAGFqG",
 		"I \0don't \0know \0 \0 \0 \0 \0 \0 \0 \0what \0 \0to \0 \0pray.\n\0");
-	Play("EDeCC!etEAAqEetCDCA!!GFqG");
-	Play("eGEetFDAqF!sGF!GF!G!!FG!F!etBGFqGeDE",
+	Play("EDeCCetEAAqEetCDCAGFqG");
+	Play("eGEetFDAqFsGFGFGFGFetBGFqGeDE",
 		"It's \0a \0blah \0 \0 \0day.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("GEetFDAqF!sGF!GF!G!!FG!F!etBGFqGeDE");
+	Play("GEetFDAqFsGFGFGFGFetBGFqGeDE");
   }
   } catch
     CatchAll;

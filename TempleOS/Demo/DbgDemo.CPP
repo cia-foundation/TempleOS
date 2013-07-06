@@ -10,7 +10,7 @@ Press <CTRL-ALT-D> to enter Dbg.
 
 Press <CTRL-ALT-D> to enter Dbg.
 > $LK,"Uf","MN:Uf"$("DbgDemo");
-> $LK,"U","MN:U"$(RIP);
+> $LK,"U","MN:U"$(_RIP);
 
 See $LK,"Debugging","HI:Debugging"$
 

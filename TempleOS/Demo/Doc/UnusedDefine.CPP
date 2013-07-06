@@ -15,7 +15,7 @@ output $LK,"Silent","MN:Silent"$().
 
 U0 UnusedDefineScan()
 {
-  CDoc *old_doc=DocCur,*doc;
+  CDoc *old_put_doc,*old_display_doc,*doc;
   I64 cnt=0;
   CHashTable *tempht;
   CHash *temph;
@@ -50,18 +50,18 @@ U0 UnusedDefineScan()
 	  progress1++;
 	  if (FileOcc(temph->str,"/TempleOS/"FILENAME_MASK_TXT,"+l-i")==1) {
 	    doc=DocNew;
-	    DocQueRem(old_doc);
-	    DocQueIns(doc,Fs->last_doc);
+	    old_put_doc=DocPut;
+	    old_display_doc=DocDisplay;
+	    Fs->put_doc=Fs->display_doc=doc;
 	    Grep(temph->str,"/TempleOS/"FILENAME_MASK_TXT,"+l-i");
-	    DocQueRem(doc);
-	    DocQueIns(old_doc,Fs->last_doc);
+	    Fs->put_doc=old_put_doc;
+	    Fs->display_doc=old_display_doc;
 	    doc_e=doc->root.next;
 	    while (doc_e!=doc) {
 	      if (doc_e->type_u8==DOCT_LINK) {
-		NewLine;
-		"" temph->str;
+		"%s ",temph->str;
 		doc_e2=DocEntryCopy(doc,doc_e);
-		DocIns(old_doc,doc_e2);
+		DocIns(old_put_doc,doc_e2);
 		NewLine;
 	      }
 	      doc_e=doc_e->next;

@@ -4,7 +4,7 @@ I64 my_mp_cnt=1<<Bsr(mp_cnt);//Power of 2
 
 I32 *a1,*a2;
 I32 *b[my_mp_cnt],bn[my_mp_cnt];
-I64 mp_done_flags;
+I64 mp_not_done_flags;
 
 I64 Compare(I32 *e1,I32 *e2)
 {
@@ -61,7 +61,7 @@ U0 MPSort(I64 dummy=0)
 {
   nounusedwarn dummy;
   QSortU32(b[Gs->num],bn[Gs->num]);
-  LBts(&mp_done_flags,Gs->num);
+  LBtr(&mp_not_done_flags,Gs->num);
 }
 
 U0 MPRadixSortDemo(I64 dummy=0)
@@ -109,11 +109,10 @@ U0 MPRadixSortDemo(I64 dummy=0)
     j=a1[i]>>k1+k2; //This is a preliminary radix sort.
     b[j][bn[j]++]=a1[i];
   }
-  mp_done_flags=0;
-  for (i=1;i<my_mp_cnt;i++)
-    MPSpawn(&MPSort,NULL,NULL,i);
-  MPSort;
-  while (mp_done_flags!=1<<my_mp_cnt-1)
+  mp_not_done_flags=1<<my_mp_cnt-1;
+  for (i=0;i<my_mp_cnt;i++)
+    Spawn(&MPSort,NULL,NULL,i);
+  while (mp_not_done_flags)
     Yield;
   j=0;
   for (i=0;i<my_mp_cnt;i++) {
@@ -131,8 +130,8 @@ U0 MPRadixSortDemo(I64 dummy=0)
 
 MPRadixSortDemo;
 
-/*$HL,0$ Results on $FG$$BG$8 Cores 2.660GHz Core i7:
-$FG$$BG$$FG,2$QSort$FG$
+/*$HL,0$ Results on 8 Cores 2.660GHz Core i7:
+$FG,2$QSort$FG$
 Time: 1.535474
 00000000 EA 1D F6 BF 16 2E F6 BF 0B 3C F6 BF CD 44 F6 BF ê.ö¿..ö¿.<ö¿ÍDö¿
 00000010 B1 45 F6 BF 52 4A F6 BF 96 71 F6 BF 9F 78 F6 BF ±Eö¿RJö¿–qö¿Ÿxö¿

@@ -38,7 +38,7 @@ _BEEPS2::
 	POP	RCX
 	LOOP	@@05
 
-	PUSH	RSI	//we must preserve this register.
+	PUSH	RSI	//See $LK,"CREG_VARS_MASK","MN:CREG_VARS_MASK"$ & $LK,"CREG_NON_PTR_MASK","MN:CREG_NON_PTR_MASK"$
 	MOV	RSI,JIFFIES_MSG
 	CALL	PUT_STR
 	POP	RSI
@@ -67,15 +67,12 @@ U0 AsmAndC2()
 
   asm {
 LIST
-//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a C+ routine.
+//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a Holy C routine.
 USE64	//Defaults to 64, but this is a good habit.
 	MOV	RCX,R15 //You can clobber RAX,RBX,RCX,RDX.
 			    //You better preserve the rest.
 @@05:	PUSH	RCX
-//U0 Snd(F64 freq,I64 waveform=WF_SQUARE,F64 amp=1.0);
-	MOV	RAX,1.0	//amplitude
-	PUSH	RAX
-	PUSH	WF_SQUARE
+//U0 Snd(F64 freq);
 
 	MOV	RAX,RCX	//freq=loop*100.0+100.0
 	IMUL2	RAX,glbl_hz_step	//evaluated at compile ttime

@@ -535,7 +535,7 @@ U0 GetOutOfDollar()
     if (sys_raw_dc_flags&RDCF_IN_DOLLAR)
       '$$';
   } else {
-    if (fp_doc_cur && (doc=(*fp_doc_cur)(Fs)) && doc->flags&DOCF_IN_DOLLAR)
+    if (fp_doc_put && (doc=(*fp_doc_put)(Fs)) && doc->flags&DOCF_IN_DOLLAR)
       '$$';
   }
 }
@@ -589,12 +589,12 @@ Bool YorN()
   I64 ch;
   "(y or n)? ";
   while (TRUE) {
-    ch=ToUpper(GetChar(NULL,FALSE));
+    ch=ToUpper(GetChar(,FALSE));
     if (ch=='Y') {
-      "$$FU$$YES$$FG$$\n";
+      "$$PT$$YES$$FG$$\n";
       return TRUE;
     } else if (ch=='N') {
-      "$$FU$$NO$$FG$$\n";
+      "$$PT$$NO$$FG$$\n";
       return FALSE;
     }
   }
@@ -604,19 +604,7 @@ Bool PressAKey()
 {
   I64 ch;
   PutDefine("ST_PRESS_A_KEY");
-  ch=GetChar(NULL,FALSE);
-  if (ch==CH_SHIFT_ESC || ch==CH_ESC)
-    return FALSE;
-  else
-    return TRUE;
-}
-
-Bool ExitAllApplications()
-{
-  I64 ch;
-  PutDefine("ST_EXIT_ALL_APPLICATIONS");
-  PutDefine("ST_PRESS_A_KEY");
-  ch=GetChar(NULL,FALSE);
+  ch=GetChar(,FALSE);
   if (ch==CH_SHIFT_ESC || ch==CH_ESC)
     return FALSE;
   else
@@ -1019,7 +1007,7 @@ I64 A2I(U8 *st,I64 radix=10,U8 **_end_ptr=NULL)
   Bool neg=FALSE;
   U8 ch;
   I64 result=0,k=0;
-  if (radix<2||radix>36) return 0;
+  if (!(2<=radix<=36)) return 0;
   while (Bt(white_space_bitmap,*st))
     st++;
   if (*st=='-') {
@@ -1060,7 +1048,10 @@ ai_skip:
     k++;
   }
   if (_end_ptr) *_end_ptr=st-1;
-  return neg ? -result:result;
+  if (neg)
+    return -result;
+  else
+    return result;
 }
 
 U0 GetFFlags(U8 *f,U8 *lst,U8 *st)
@@ -1187,7 +1178,7 @@ U8 *MSPrintFQ(U8 *ptr,Bool dollar_flag)
 	  SPrintFPutChar(_dst,'\\',_buf);
 	  SPrintFPutChar(_dst,'n',_buf);
 	  break;
-	case CH_CARRIAGE_RETURN:
+	case '\r':
 	  SPrintFPutChar(_dst,'\\',_buf);
 	  SPrintFPutChar(_dst,'r',_buf);
 	  break;
@@ -1234,7 +1225,7 @@ U8 *MSPrintFq(U8 *ptr)
 	    ptr++;
 	    break;
 	  case 'r':
-	    SPrintFPutChar(_dst,CH_CARRIAGE_RETURN,_buf);
+	    SPrintFPutChar(_dst,'\r',_buf);
 	    ptr++;
 	    break;
 	  case '"':
@@ -1335,7 +1326,7 @@ U8 *sprintf_neg_powers_lets=
 #define SLOP		8
 
 U8 *SPrintFJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
-{ //$LK,"printF codes","FA:::/TempleOS/Doc/Differences.TXT,PrintF_Codes"$
+{ //$LK,"printF codes","FA:::/TempleOS/Doc/HolyC.TXT,PrintF_Codes"$
 /*
 In float formatting, do not exceed 18-digits
 before or after the decimal point
@@ -2058,7 +2049,7 @@ U8 *SPrintF(U8 *dst,U8 *fmt,...)
 }
 
 /*
-A2CDate()
+A2Date()
   This routine recognizes the following formats:
   1) "*+nnnn"  "*-nnnn"
   2) mm/dd
@@ -2076,7 +2067,7 @@ the start of mon for seven days before
 today.
 
 */
-CDate A2CDate(U8 *_src)
+CDate A2Date(U8 *_src)
 //ASCII date to CDate
 {
   CDate result=0;
@@ -2106,7 +2097,7 @@ CDate A2CDate(U8 *_src)
     p1++;
     if (*p1=='+' || *p1=='-')
       result.date=A2I(p1,10,&p1);
-    result+=GetCurTimeCDate+local_time_offset;
+    result+=GetCurTimeDate+local_time_offset;
   } else {
     StrFirstRem(p1,"/",v); //Put mon into v
     ds.mon=A2I(v);
@@ -2118,10 +2109,10 @@ CDate A2CDate(U8 *_src)
 	ds.year+=2000;
     } else {
       ds.day_of_mon=A2I(p1,10,&p1);
-      CDate2CDateStruct(&ds1,GetCurTimeCDate+local_time_offset);
+      Date2DateStruct(&ds1,GetCurTimeDate+local_time_offset);
       ds.year=ds1.year;
     }
-    result=CDateStruct2CDate(&ds);
+    result=DateStruct2Date(&ds);
   }
   if (*p1==')') p1++;
 
@@ -2220,7 +2211,10 @@ to avoid this.
   }
 a2f_end:
   if (_end_ptr) *_end_ptr=src-1;
-  return neg ? -d:d;
+  if (neg)
+    return -d;
+  else
+    return d;
 }
 
 U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
@@ -2340,7 +2334,7 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 	    if (cur_arg>=argc)
 	      throw(EXCEPT_GETF,1);
 	    i_ptr=argv[cur_arg++];
-	    *i_ptr=A2CDate(buf);
+	    *i_ptr=A2Date(buf);
 	    break;
 	}
 	Free(buf);
@@ -2361,7 +2355,7 @@ U8 *GetF(U8 *src,U8 *fmt,...)
 
 
 U0 PrintF(U8 *fmt,...)
-{//$LK,"PrintF Extended Codes","FA:::/TempleOS/Doc/Differences.TXT,PrintF_Codes"$
+{//$LK,"PrintF Extended Codes","FA:::/TempleOS/Doc/HolyC.TXT,PrintF_Codes"$
  //See $LK,"SPrintFJoin","MN:SPrintFJoin"$()
   U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
   "" buf;

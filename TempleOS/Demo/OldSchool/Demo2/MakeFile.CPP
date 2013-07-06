@@ -10,7 +10,7 @@ Load("ODMain");
 ObjDemo("Success");
 
 #ifndef BinRep
-#include "::/TempleOS/Adam/BinRep"
+#include "::/TempleOS/Adam/Utils/BinRep"
 #endif
 
 PressAKey;

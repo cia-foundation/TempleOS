@@ -4,6 +4,7 @@ $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/P0M
 
 $TX+CX,"After Egypt: Moses Game"$
 $LK-A,"::/TempleOS/Apps/AfterEgypt/AfterEgypt.CPP"$
+$LK-A,"::/TempleOS/Apps/AfterEgypt/GodTalking.CPP.Z"$
 $LK-A,"::/TempleOS/Apps/AfterEgypt/Battle.CPP"$
 $LK-A,"::/TempleOS/Apps/AfterEgypt/Horeb.CPP"$
 $LK-A,"::/TempleOS/Apps/AfterEgypt/Map.CPP"$
@@ -18,22 +19,11 @@ $LK-A,"::/TempleOS/Demo/MultiCore/Clouds.CPP"$
 
 
 
-$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/J05MzICZsIs\" frameborder=\"0\" allowfullscreen></iframe>"$
-
-$TX+CX,"Pilgrim Game"$
-$LK-A,"::/TempleOS/Apps/Pilgrims/Pilgrims.CPP"$
-
-
-
-
-
-
-
 $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/naORDnsiht4\" frameborder=\"0\" allowfullscreen></iframe>"$
 
 $TX+CX,"Flight Sim / First Person Shooter"$
-$LK-A,"::/TempleOS/Demo/GameStarters/EagleDive.CPP"$
-$LK-A,"::/TempleOS/Demo/GameStarters/FPS.CPP"$
+$LK-A,"::/TempleOS/Demo/Games/EagleDive.CPP"$
+$LK-A,"::/TempleOS/Demo/Games/CastleFrankenstein.CPP"$
 
 
 
@@ -46,8 +36,8 @@ $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/t2t
 $TX+CX,"X-Caliber / Raw Hide / Wenceslas"$
 $LK-A,"::/TempleOS/Apps/X-Caliber/X-Caliber.CPP"$
 $LK-A,"::/TempleOS/Apps/X-Caliber/XCCtrls.CPP"$
-$LK-A,"::/TempleOS/Demo/GameStarters/RawHide.CPP"$
-$LK-A,"::/TempleOS/Demo/GameStarters/Wenceslas.CPP"$
+$LK-A,"::/TempleOS/Demo/Games/RawHide.CPP"$
+$LK-A,"::/TempleOS/Demo/Games/Wenceslas.CPP"$
 
 
 
@@ -71,8 +61,8 @@ $LK-A,"::/TempleOS/Apps/Span/SpanNew.CPP"$
 
 $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/BSZRbo0lMp4\" frameborder=\"0\" allowfullscreen></iframe>"$
 
-$TX+CX,"Tanks"$
-$LK-A,"::/TempleOS/Apps/Tanks/Tanks.CPP"$
+$TX+CX,"ToTheFront"$
+$LK-A,"::/TempleOS/Apps/ToTheFront/ToTheFront.CPP"$
 
 
 

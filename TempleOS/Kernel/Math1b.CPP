@@ -70,7 +70,7 @@ I64 CeilI64(I64 num,I64 to)
   }
 }
 
-//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (6).
+//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 #ifdef SYS_DETERMINISTIC
 $FG,6$U16 RandU16()
 {

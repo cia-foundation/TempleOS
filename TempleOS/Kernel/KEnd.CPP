@@ -44,9 +44,9 @@ U0 SysGlblsInit()
   KeyDevAdd(&AKDRawDisplayPutKey,&AKDRawDisplayPutS,0x60000000,FALSE);
   #exe {
     if (*kernel_cfg->acct_name)
-      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts/%s\");",kernel_cfg->dft_drv,kernel_cfg->acct_name);
+      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts/%s\");",kernel_cfg->sys_acct_drv,kernel_cfg->acct_name);
     else
-      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts\");",kernel_cfg->dft_drv);
+      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts\");",kernel_cfg->sys_acct_drv);
     StreamPutS("#exe{OptOff(OPTf_WARN_PAREN);}");
     StreamPrintF("DskCacheInit(%s);",kernel_cfg->dsk_cache_size_exp);
     StreamPutS("#exe{OptOn(OPTf_WARN_PAREN);}");
@@ -54,6 +54,10 @@ U0 SysGlblsInit()
   pow10_I64=CAlloc(sizeof(F64)*(308+308+1));
   for (i=-308;i<309;i++)
     pow10_I64[i+309]=Pow10(i);
+
+  QueInit(&snd_record_root);
+  snd_record_root.freq=0;
+  snd_record_root.time_stamp=tT;
 
 //$AN,"Independent Heap Ctrl Example","Independent Heap Ctrl Example"$
   i=1; //Rqst 1 blk, we might get more.
@@ -150,7 +154,7 @@ U0 Reboot()
   SysHlt;
 }
 
-U0 Kernel()
+U0 KernelMain()
 { //Continued from $LK,"Kernel","FF:::/TempleOS/Kernel/KStart.CPP,I32 &Kernel"$
   adam_task=Fs;
   HeapsInit;
@@ -166,8 +170,7 @@ U0 Kernel()
   SysGrInit;
   StrCpy(Fs->task_name,"Adam Task CPU#0");
   StrCpy(Fs->task_title,Fs->task_name);
-  Fs->text_attr=WHITE<<4+PURPLE;
-  Fs->border_attr=WHITE<<4+LTPURPLE;
+  Fs->title_src=TTS_TASK_NAME;
   Fs->win_right=text_cols-2;
   Fs->win_top++;
   TaskDerivedValsUpdate;
@@ -210,7 +213,7 @@ U0 Kernel()
   else if (mp_cnt<2)
     Spawn(&MouseDriverInstall);
   else
-    MPSpawn(&MouseDriverInstall);
+    Spawn(&MouseDriverInstall,,,1);
 
   "BlkDevsInitAll\n";
   BlkDevsInitAll;
@@ -235,13 +238,15 @@ U0 Kernel()
   try
     ExeFile("Adam1"); //Continues $LK,"/TempleOS/Kernel/Adam1.CPP","FL:/TempleOS/Kernel/Adam1.CPP,1"$
   catch {
+    Raw(ON);
     CatchAll;
     Dbg;
   }
 
   LBts(&sys_run_level,RLf_ADAM_SERVER);
-  ServantTaskCont; //Never to return
+  SrvTaskCont; //Never to return
 }
 
 asm {	ALIGN	16,OC_NOP
-SYS_KERNEL_END::}
+SYS_KERNEL_END::
+}

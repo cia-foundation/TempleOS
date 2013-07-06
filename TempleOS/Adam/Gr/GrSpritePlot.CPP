@@ -6,7 +6,7 @@ each operation.  The types available are lsted
 here, $LK,"GRST_PT","MN:GRST_PT"$.  They are stored, one after another,
 in a chunk of memory terminated by a type $LK,"GRST_END","MN:GRST_END"$.
 
-$LK,"SpritePlot3","MN:SpritePlot3"$() and $LK,"SpriteVect","MN:SpriteVect"$() shows how the
+$LK,"SpritePlot3","MN:SpritePlot3"$() and $LK,"SpriteMain","MN:SpriteMain"$() shows how the
 unions are used.  It's kind-of a mess using a union.
 
 $LK,"SpriteSize","MN:SpriteSize"$() will return the size of a single
@@ -142,7 +142,7 @@ public U0 SpritePlot3(CDC *dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
       case GRST_ELLIPSE:
 	GrEllipse3(dc,tempg->x2+x,tempg->y2+y,z,tempg->width,tempg->height,tempg->rot_angle);
 	break;
-      case GRST_REG_POLY:
+      case GRST_POLYGON:
 	GrRegPoly3(dc,tempg->x2+x,tempg->y2+y,z,tempg->width,tempg->height,tempg->sides,tempg->rot_angle);
 	break;
       case GRST_POLYLINE:
@@ -237,7 +237,7 @@ public U0 SpritePlot3(CDC *dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	  p->y+=y;
 	  p->z+=z;
 	}
-	Gr3Mesh(dc,tempg->vertex_cnt,&tempg->x2,tempg->triangle_cnt,(&tempg->x2)(U8 *)+sizeof(CD3I32)*tempg->vertex_cnt);
+	Gr3Mesh(dc,tempg->vertex_cnt,&tempg->x2,tempg->tri_cnt,(&tempg->x2)(U8 *)+sizeof(CD3I32)*tempg->vertex_cnt);
 	p=&tempg->x2;
 	for (i=0;i<tempg->vertex_cnt;i++,p++) {
 	  p->x-=x;
@@ -258,15 +258,15 @@ public U0 SpritePlot3(CDC *dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	  y1=tempg->y1+y;
 	  z1=tempg->z1+z;
 	}
-	p=(&tempg->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
+	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
 	for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
 	  p->x+=x1;
 	  p->y+=y1;
 	  p->z+=z1;
 	}
-	p=(&tempg->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
-	Gr3Mesh(dc,tempg->shiftable_vertex_cnt,p,tempg->shiftable_triangle_cnt,p(U8 *)+sizeof(CD3I32)*tempg->shiftable_vertex_cnt);
-	p=(&tempg->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
+	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
+	Gr3Mesh(dc,tempg->shiftable_vertex_cnt,p,tempg->shiftable_tri_cnt,p(U8 *)+sizeof(CD3I32)*tempg->shiftable_vertex_cnt);
+	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
 	for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
 	  p->x-=x1;
 	  p->y-=y1;
@@ -372,8 +372,6 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
 //The two CSprite should be identical
 //except for points shifted around.
 //t ranges from 0.0 to 1.0
-//
-//See $LK-A,"::/TempleOS/Demo/Graphics/Golf.CPP"$ for an example.
   I64 i=SpriteSize(elems0),
       t1=gr_scale*t,t0=gr_scale-t1;
   I32 *ptr0,*ptr1,*ptrr;
@@ -411,7 +409,7 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
 	tempgr->y1=(tempg0->y1*t0+tempg1->y1*t1)>>32;
 	break;
       case GRST_ELLIPSE:
-      case GRST_REG_POLY:
+      case GRST_POLYGON:
 	tempgr->x2=(tempg0->x2*t0+tempg1->x2*t1)>>32;
 	tempgr->y2=(tempg0->y2*t0+tempg1->y2*t1)>>32;
 	tempgr->width=(tempg0->width*t0+tempg1->width*t1)>>32;
@@ -461,9 +459,9 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
 	}
 	break;
       case GRST_SHIFTABLE_MESH:
-	p0=(&tempg0->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
-	p1=(&tempg1->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
-	pr=(&tempgr->shiftable_triangle_cnt)(U8 *)+sizeof(I32);
+	p0=(&tempg0->shiftable_tri_cnt)(U8 *)+sizeof(I32);
+	p1=(&tempg1->shiftable_tri_cnt)(U8 *)+sizeof(I32);
+	pr=(&tempgr->shiftable_tri_cnt)(U8 *)+sizeof(I32);
 	for (i=0;i<tempg0->shiftable_vertex_cnt;i++) {
 	  pr[i].x=(p0[i].x*t0+p1[i].x*t1)>>32;
 	  pr[i].y=(p0[i].y*t0+p1[i].y*t1)>>32;
@@ -488,7 +486,7 @@ public CDocEntry *DocPutSprite(CDoc *doc=NULL,U8 *elems,U8 *txt=NULL)
   Bool unlock;
   CDocEntry *doc_e;
   CDocBin *tempb;
-  if (!doc && !(doc=DocCur)) return NULL;
+  if (!doc && !(doc=DocPut)) return NULL;
   unlock=DocLock(doc);
   size=SpriteSize(elems);
   tempb=CAlloc(sizeof(CDocBin),doc->mem_task);
@@ -520,7 +518,7 @@ public CDocEntry *PutSprite(U8 *elems,U8 *txt=NULL)
 //and leave a %d for the number.
 
   CDoc *doc;
-  if (doc=DocCur)
+  if (doc=DocPut)
     return DocPutSprite(doc,elems,txt);
   return NULL;
 }

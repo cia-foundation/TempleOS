@@ -10,7 +10,7 @@ and #include this file.
 
 I ran $LK-A,"::/TempleOS/Misc/Dollar.CPP"$ on it, first.
 
-See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (20).
+See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 */
 
 I64 WSDNextCmd(U8 **_ptr)

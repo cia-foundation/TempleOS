@@ -12,7 +12,7 @@ U0 Doodle()
   WordStat;
 
   DCFill;
-  "$$CL$$"; //$LK,"DocClear","MN:DocClear"$() is better
+  DocClear;
   do {
     msg_code=GetMsg(&p1,&p2,
       1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
@@ -40,6 +40,7 @@ U0 Doodle()
 	break;
     }
   } while (msg_code!=MSG_KEY_DOWN || !p1);
+  GetMsg(,,1<<MSG_KEY_UP);
   DCFill;
   DCDel(dc);
   SettingsPop;

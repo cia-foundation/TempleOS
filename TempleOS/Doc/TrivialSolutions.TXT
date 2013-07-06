@@ -1,7 +1,7 @@
 $WW,1$$FG,5$$TX+CX,"Trivial Solutions"$$FG$
 
 
-The $FG,2$$TX+HTML,"trivial solution","http://en.wikipedia.org/wiki/Trivial_solution"$$FG$ in math is the simple, obvious answer.  The fable that NASA spent millions on a space pen while Russia used a pencil is another example.  TempleOS uses many $LK,"trivial solutions","FI:::/TempleOS/Doc/Strategy.TXT"$.
+The $FG,2$$TX+HTML,"trivial solution","http://en.wikipedia.org/wiki/Trivial_solution"$$FG$ in math is the simple, obvious answer.  The fable that NASA spent millions on a space pen while Russia used a pencil is an example.  TempleOS uses many $LK,"trivial solutions","FI:::/TempleOS/Doc/Strategy.TXT"$.
 
 See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 

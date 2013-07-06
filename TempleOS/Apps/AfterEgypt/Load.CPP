@@ -11,6 +11,7 @@ Cd("/TempleOS/Apps/AfterEgypt");;
 #include "WaterRock"
 #include "Quail"
 #include "Horeb"
+#include "GodTalking"
 #include "AfterEgypt"
 
 #help_index ""

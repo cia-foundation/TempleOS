@@ -134,8 +134,8 @@ U0 Hanoi()
     PressAKey;
   } catch
     CatchAll;
-  SettingsPop;
   DocClear;
+  SettingsPop;
 }
 
 Hanoi;

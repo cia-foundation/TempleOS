@@ -105,10 +105,11 @@ public U0 AFUntilChar(I64 ch1,I64 ch2=0)
 
 I64 af_l,af_r,af_c;
 
-U0 AFSetIPPlot(I64 mS,I64 x,I64 y,I64 z)
+Bool AFSetIPPlot(I64 mS,I64 x,I64 y,I64 z)
 {
   SetIP(x,y,z,af_l,af_r,af_c);
   Sleep(mS);
+  return TRUE;
 }
 
 public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64,I64 c=MAX_I64)

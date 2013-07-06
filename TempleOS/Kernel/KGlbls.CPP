@@ -1,12 +1,11 @@
 U8 sys_temp_filename[136];
-CTaskCmd sys_macro_root;
+CSrvCmd sys_macro_root;
 CKeyDev sys_put_key_root;
 CTask *sys_macro_util_task=NULL,
       *sys_dbg_focus_task=NULL;
 U8    *sys_dbg_msg=NULL;
 I64   sys_dbg_msg_num=0;
 
-CMPCmdCtrl *mp_ctrl=NULL;
 CMPCrash *mp_crash=NULL;
 U8 mp_apic_ids[MP_MAX_PROCESSORS];
 I64 *sys_idt=NULL;
@@ -27,7 +26,7 @@ U8 *gr_font;
 U8 *sys_fix_file_line=NULL;
 
 CTask *sys_winmgr_task=NULL,
-	   *sys_task_being_screen_updated=NULL;
+   *sys_task_being_screen_updated=NULL;
 I64 sys_rnd_seed;
 CDoc *sys_clipboard_doc;
 U8 *sys_dft_iso_name;
@@ -40,10 +39,10 @@ I64 sys_auto_mount_ide_cnt=0;
     kernel_cfg->auto_mount_ide_hd_let='C';
   if (!kernel_cfg->auto_mount_ide_cd_let)
     kernel_cfg->auto_mount_ide_cd_let='T';
-  StreamPrintF("U8 dft_drv=%d,sys_first_hd_drv_let=%d,sys_first_cd_drv_let=%d;",
-    ToUpper(kernel_cfg->dft_drv),kernel_cfg->auto_mount_ide_hd_let,kernel_cfg->auto_mount_ide_cd_let);
+  StreamPrintF("U8 sys_first_hd_drv_let=%d,sys_first_cd_drv_let=%d;",
+    kernel_cfg->auto_mount_ide_hd_let,kernel_cfg->auto_mount_ide_cd_let);
 }
-Bool boot_drv_pmt=FALSE;
+Bool boot_drv_pmt=FALSE,cdrom_boot_is_good=TRUE;
 CPrt *drv_to_prt[32];
 U8 *sys_acct;
 U8 *reverse_bits_table,*set_bits_table;
@@ -70,9 +69,7 @@ CMemRange sys_mem32_dev_root;
 U8 *sys_mem64_dev_ptr=MAPPED_MEM_SPACE;
 
 F64 snd_freq=0;
-I64 snd_dev=SD_PC_SPEAKER;
 Bool snd_record=FALSE;
-F64 snd_vol=0.1,snd_reverb_intensity=0.2,snd_reverb_delay=0.3;
 
 F64 *pow10_I64;
 
@@ -124,14 +121,12 @@ U32	key_down_bitmap[8];
 //BitTest, $LK,"Bt","MN:Bt"$(), with an unmerged scan code.
 U32	key_down_bitmap2[8];
 
-U0 (*fp_snd)(F64 freq,I64 waveform,F64 amp)=NULL;
-U0 (*fp_snd_record)(F64 freq,I64 waveform,F64 amp)=NULL;
-U0 (*fp_snd_fill_buf)(SND_OUT_CONTAINER *buf,I64 buf_num)=NULL;
-U0 (*fp_snd_copy_buf)(SND_IN_CONTAINER *buf,I64 buf_num)=NULL;
+CSndData snd_record_root;
+
 U8  *(*fp_mgets)(I64 flags=0)=NULL;
 U0 (*fp_prs_stream_blk)(CLex *lx)=NULL;
 U0 (*fp_update_ctrls)(CTask *task)=NULL;
-CDoc *(*fp_doc_cur)(CTask *task=NULL)=NULL;
+CDoc *(*fp_doc_put)(CTask *task=NULL)=NULL;
 U0 (*fp_set_std_palette)()=NULL;
 
 CPSectCache *psect_cache;

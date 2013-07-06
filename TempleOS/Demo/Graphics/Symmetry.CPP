@@ -12,7 +12,7 @@ U0 SymmetryDemo()
 
   WinMax;
   DCFill;
-  "$$CL$$";
+  DocClear;
   dc->flags|=DCF_SYMMETRY;
   GrSetSymmetry(dc,Fs->win_pixel_width/2,0,Fs->win_pixel_width/2,1);
   do {
@@ -53,6 +53,7 @@ U0 SymmetryDemo()
 	break;
     }
   } while (msg_code!=MSG_KEY_DOWN || !p1);
+  GetMsg(,,1<<MSG_KEY_UP);
   DCFill;
   DCDel(dc);
   SettingsPop;

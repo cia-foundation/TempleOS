@@ -8,7 +8,7 @@ U0 Song()
   try {
   while (!ScanKey) {
 	"$$FG,GREEN$$As I look back on my sinful past...$$FG$$\n";
-	Play("W13qCAABAeAECEqB",
+	Play("3qCAABAeAECEqB",
 		"Who \0was \0that \0per\0son? \0 \0It \0wasn't \0 \0me?\n\0");
 	Play("CAABAeAECEqB",
 		"Who \0was \0that \0per\0son? \0 \0It \0wasn't \0 \0me?\n\0");

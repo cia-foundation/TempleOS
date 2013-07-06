@@ -4,7 +4,7 @@
 
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
 
-public F64 os_version=1.00;
+public F64 os_version=1.04;
 
 #include "AdamExt.HPP"
 
@@ -42,7 +42,6 @@ Cd("::/TempleOS/Adam/WordStat");;
 #include "WordStat"
 
 Cd("::/TempleOS/Adam");;
-#include "Profiler"
 #include "Hash2a"
 #include "TaskSettings"
 #include "DevInfo"

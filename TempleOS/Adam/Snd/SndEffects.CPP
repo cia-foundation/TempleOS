@@ -3,7 +3,7 @@
 
 class CSoundEffectFrame
 {
-  I32 type,waveform;
+  I32 type;
   F64 duration,freq1,freq2;
 };
 
@@ -25,7 +25,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
       i=MaxI64(ns->freq2-ns->freq1,1);
       while (tS<timeout)
 	if (f=RandU16%i+ns->freq1) {
-	  Snd(f,ns->waveform);
+	  Snd(f);
 	  Sleep(MaxI64(3000/f,1));
 	} else
 	  break;
@@ -34,7 +34,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
       while (tS<timeout) {
 	t=(tS-t0)/ns->duration;
 	if (f=(1.0-t)*ns->freq1+t*ns->freq2) {
-	  Snd(f,ns->waveform);
+	  Snd(f);
 	  Sleep(MaxI64(3000/f,1));
 	} else
 	  break;
@@ -43,26 +43,32 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
   }
 }
 
-public CTask *Noise(I64 mS,F64 min_freq,F64 max_freq,I64 waveform=WF_NOISE)
+public CTask *Noise(I64 mS,F64 min_freq,F64 max_freq)
 {
-  CSoundEffectFrame *ns=MAlloc(sizeof(CSoundEffectFrame));
-  ns->type=SE_NOISE;
-  ns->waveform=waveform;
-  ns->duration=mS/1000.0;
-  ns->freq1=min_freq;
-  ns->freq2=max_freq;
-  music_mute++;
-  return Spawn(&SoundEffectTask,ns,"Noise",Fs);
+  CSoundEffectFrame *ns;
+  if (mS>0) {
+    ns=MAlloc(sizeof(CSoundEffectFrame));
+    ns->type=SE_NOISE;
+    ns->duration=mS/1000.0;
+    ns->freq1=min_freq;
+    ns->freq2=max_freq;
+    music_mute++;
+    return Spawn(&SoundEffectTask,ns,"Noise",,Fs);
+  } else
+    return NULL;
 }
 
-public CTask *Sweep(I64 mS,F64 freq1,F64 freq2,I64 waveform=WF_SINE)
+public CTask *Sweep(I64 mS,F64 freq1,F64 freq2)
 {
-  CSoundEffectFrame *ns=MAlloc(sizeof(CSoundEffectFrame));
-  ns->type=SE_SWEEP;
-  ns->waveform=waveform;
-  ns->duration=mS/1000.0;
-  ns->freq1=freq1;
-  ns->freq2=freq2;
-  music_mute++;
-  return Spawn(&SoundEffectTask,ns,"Noise",Fs);
+  CSoundEffectFrame *ns;
+  if (mS>0) {
+    ns=MAlloc(sizeof(CSoundEffectFrame));
+    ns->type=SE_SWEEP;
+    ns->duration=mS/1000.0;
+    ns->freq1=freq1;
+    ns->freq2=freq2;
+    music_mute++;
+    return Spawn(&SoundEffectTask,ns,"Noise",,Fs);
+  } else
+    return NULL;
 }

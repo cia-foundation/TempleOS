@@ -23,13 +23,9 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can set your local time zone by setting the $LK,"local_time_offset","MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ","MN:CDATE_FREQ"$.  See $LK,"local time","FF:HOME/Adam3aLocalize.CPP,local_time"$.
 
-* Use $LK,"DocCurAttr","MN:DocCurAttr"$() in $LK,"UserStartUp","MN:UserStartUp"$() to set terminal window colors.
-
 * See $MA+A-X+PU,"Key Map","KeyMap;View;\n"$ for a list of defined keys.  Define your own keys in $LK,"MyPutKey","MN:MyPutKey"$().  See $LK-A,"::/TempleOS/Doc/KeyBoard.TXT"$.
 
-* $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to autoindent a $FG,2$C+$FG$ function or renumber an asm routine's local labels.  If it does not have $FG,2$#exe$FG$ config stuff, select "recompile."  Otherwise, don't recompile$FG$ and it will use the compiler info collected when it was most recently compiled.  $BK,1$$FG,2$<CTRL-SHIFT-L>$FG$ can be used to test if a file will compile.$BK,0$
-
-* While developing applications, keeping everything in one source file allows you to use the $FG,2$<CTRL-SHIFT-L>$FG$ compile check/autoindent feature.  Alternatively, you can $FG,2$#include$FG$ the files in a project a file depends on before entering the editor and $FG,2$<CTRL-SHIFT-L>$FG$ it.
+* $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to reindent a $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ function or renumber an asm routine's local labels.
 
 * You can use $FG,2$filter_lines$FG$ in the editor text search form ($FG,2$<CTRL-F>$FG$) to temporarily display just lines near each match.  A value of $FG,2$filter lines$FG$ set to $FG,2$5$FG$ will display lines within 5 lines of matches.  Then, you can do another find to a different string and achieve a $FG,2$AND$FG$ search.  When finished, press $FG,2$<ESC>$FG$.
  
@@ -130,7 +126,7 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can delete the $FG,4$HOME/Registry.CPP.Z$FG$ file.  The policy is that deleting it will restore defaults.  It should plain text, if you want to edit it.  Be careful of tree indentations.
 
-* Study $LK-A,"::/TempleOS/Adam/MemRep.CPP"$ and $LK,"WallPaper","MN:WallPaper"$() to learn how the system resources are put together.
+* Study $LK-A,"::/TempleOS/Adam/Utils/MemRep.CPP"$ and $LK,"WallPaper","MN:WallPaper"$() to learn how the system resources are put together.
 
 * The editor's select-text mechanism allows for disjoint portions of selected text.  This is a feature, not a bug -- you can cut-and-paste disjoint text.
 
@@ -145,5 +141,7 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 * Use $LK,"Man","MN:Man"$() to jump to short sym name src code.
 
 * Use $LK,"Fix","MN:Fix"$() to edit and fix the last compiler err.
+
+* You can use $FG,2$<CTRL-SHIFT-L>$FG$ to do a check for compile errors.
 
 * You can use $LK,"DocOpt","MN:DocOpt"$() to optimize links. (Mostly just removes .Z)

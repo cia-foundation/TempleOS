@@ -18,11 +18,11 @@ U0 Song()
   while (!ScanKey) {
 	"$$FG,GREEN$$Jesus talking...\n$$FG$$";
 	Play("M6/8");
-	Play("W13eAACADAADACAR",
+	Play("3eAACADAADACAR",
 		" \0 \0I \0 \0came \0 \0 \0to \0 \0serve.\n\0 \0 \0");
 	Play("AACADAADACAR",
 		" \0 \0I \0 \0give \0 \0 \0my \0 \0word.\n\0 \0 \0");
-	Play("FG!etFEGA!!B!C!DA!C2qG!3sECEC");
+	Play("FGetFEGABCDAC2qG3sECEC");
   }
   } catch
     CatchAll;

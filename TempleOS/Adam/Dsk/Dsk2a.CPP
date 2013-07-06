@@ -230,7 +230,7 @@ public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
   return result;
 }
 
-U0 TouchFile(U8 *filename,U8 *attr,CDate spdt=0) //Just one file
+U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=0) //Just one file
 {
   CPrt *p=Drv2Prt(*filename);
   CDirEntry de;
@@ -246,16 +246,16 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate spdt=0) //Just one file
       if (!*cur_dir)
 	StrCpy(cur_dir,"/");
       GetFFlags(&de.attr,Define("ST_FILE_ATTRS"),attr);
-      if (spdt)
-	de.datetime=spdt;
+      if (cdt)
+	de.datetime=cdt;
       else
-	de.datetime=GetCurTimeCDate;
+	de.datetime=GetCurTimeDate;
       CDirNew(p,cur_dir,&de,FALSE);
     }
   } else PutDefineErr("ST_FILE_NOT_FOUND");
 }
 
-U0 TouchLst(CDirEntry *tempm1,U8 *attr,CDate spdt=0)
+U0 TouchLst(CDirEntry *tempm1,U8 *attr,CDate cdt=0)
 {
   CDirEntry *tempm2;
   while (tempm1) {
@@ -263,16 +263,16 @@ U0 TouchLst(CDirEntry *tempm1,U8 *attr,CDate spdt=0)
     if (tempm1->attr & _ATTR_DIR) {
       if (tempm1->sub) {
 	"%S%s\n","ST_SCANNING_DIR",tempm1->full_name;
-	TouchLst(tempm1->sub,attr,spdt);
+	TouchLst(tempm1->sub,attr,cdt);
       }
     } else
-      TouchFile(tempm1->full_name,attr,spdt);
+      TouchFile(tempm1->full_name,attr,cdt);
     CDirEntryDel(tempm1);
     tempm1=tempm2;
   }
 }
 
-public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate spdt=0)
+public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate cdt=0)
 {
 //Attr "+?" =show
 //     "+T" =resident
@@ -280,7 +280,7 @@ public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate spdt=0
 //  Touch(filename,"",,datetime);
   I64 fuf_flags=0;
   GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  TouchLst(FilesFind(files_find_mask,fuf_flags),attr,spdt);
+  TouchLst(FilesFind(files_find_mask,fuf_flags),attr,cdt);
 }
 
 I64 FFLst(CDirEntry *tempm1)
@@ -324,15 +324,7 @@ public U0 SetDrvTextAttr(U8 drv_let,U8 attr)
     Fs->catch_except=TRUE;
 }
 
-U0 PrintFDrvTextAttr(U8 drv_let=0)
-{
-  CPrt *p=Drv2Prt(drv_let);
-  U8 fg=p->text_attr&0xF,bg=p->text_attr>>4;
-  if (fg!=bg)
-    "$$FG,%d$$$$BG,%d$$",fg,bg;
-}
-
-I64 NativeFSUnusedDrvSpace(U8 drv_let=0)
+I64 RedSeaFSUnusedDrvSpace(U8 drv_let=0)
 {
   CPrt *p=Drv2Prt(drv_let);
   I64 result=0,i,l;
@@ -377,8 +369,8 @@ public I64 UnusedDrvSpace(U8 drv_let=0)
   I64 result=0;
   Drv(drv_let);
   switch (p->type) {
-    case PT_NATIVE:
-      result=NativeFSUnusedDrvSpace(drv_let);
+    case PT_REDSEA:
+      result=RedSeaFSUnusedDrvSpace(drv_let);
       break;
     case PT_FAT32:
       result=FAT32UnusedDrvSpace(drv_let);

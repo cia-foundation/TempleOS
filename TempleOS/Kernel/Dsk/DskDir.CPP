@@ -1,8 +1,8 @@
 Bool CDirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempm,Bool free_old_chain=TRUE)
 {
   switch (p->type) {
-    case PT_NATIVE:
-      return NativeFSDirNew(p,cur_dir,tempm,free_old_chain);
+    case PT_REDSEA:
+      return RedSeaFSDirNew(p,cur_dir,tempm,free_old_chain);
     case PT_FAT32:
       return FAT32DirNew(p,cur_dir,tempm,free_old_chain);
     case PT_ISO9660:
@@ -151,8 +151,8 @@ CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
   CDirEntry *result=NULL;
   PrtChk(p);
   switch (p->type) {
-    case PT_NATIVE:
-      result=NativeFSFilesFind(files_find_mask,fuf_flags);
+    case PT_REDSEA:
+      result=RedSeaFSFilesFind(files_find_mask,fuf_flags);
       break;
     case PT_FAT32:
       result=FAT32FilesFind(files_find_mask,fuf_flags);
@@ -237,7 +237,7 @@ U0 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
       esize=Bsr(esize)/4+1;
       c=Bsr(c)/4+1;
 
-      "$$MA+A,\"Directory \",\"PopUpCd;Dir;\n\"$$ of %s\n",st;
+      "$$MA+A,\"Directory\",\"PopUpCd;Dir;\n\"$$ of %s\n",st;
       if (full)
 	"__DATE__ __TIME__ %*ts %*ts %*ts\n",
 	csize,"SIZE",esize,"UNCMPSIZE",c,"CLUSTER";

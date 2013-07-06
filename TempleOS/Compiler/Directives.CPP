@@ -55,20 +55,21 @@ Bool IsReplaceSyms() {
 
 U0 ImportHashTable(CHashTable *src)
 { //called from #exe {} in AOT modules
-// See $LK-A,"::/TempleOS/Kernel/AOTAdam.HPP"$.
+  // See $LK-A,"::/TempleOS/Kernel/AOTAdam.HPP"$.
   CLex *lx=Fs->last_lex;
   if (lx==&Fs->next_lex) {
     PutErr;
     "Not Compiling\n";
-  }
-  if (!(lx->flags&LF_EXE_BLK))
-    LexExcept(lx,"ST_IMPORT_HASH_TABLE_NOT_ALLOWED");
-  while (src) {
-    if (lx->stream_parent_glbl_hash_table)
-      HashTableImport(src,lx->stream_parent_glbl_hash_table);
-    else
-      HashTableImport(src,lx->glbl_hash_table);
-    src=src->next;
+  } else {
+    if (!(lx->flags&LF_EXE_BLK))
+      LexExcept(lx,"ST_IMPORT_HASH_TABLE_NOT_ALLOWED");
+    while (src) {
+      if (lx->htc.next && lx->htc.next->glbl_hash_table)
+	HashTableImport(src,lx->htc.next->glbl_hash_table);
+      else if (lx->htc.glbl_hash_table)
+	HashTableImport(src,lx->htc.glbl_hash_table);
+      src=src->next;
+    }
   }
 }
 

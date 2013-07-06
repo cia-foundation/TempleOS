@@ -1,6 +1,6 @@
 //This is a classic 2nd order nonlinear ordinary differential equation
 
-I64 mp_done_flags;
+I64 mp_not_done_flags;
 
 #define OX	10
 #define OY	GR_HEIGHT/2-FONT_HEIGHT
@@ -27,7 +27,7 @@ U0 Steps(State *s)
 U0 PlotTrajectory(CTask *parent)
 {
   I64 i;
-  CDC *dc=DCAlias(gr_dc2,parent);
+  CDC *dc=DCAlias(gr_dc,parent);
   State s;
 
   MemSet(&s,0,sizeof(State));
@@ -42,7 +42,7 @@ U0 PlotTrajectory(CTask *parent)
     Steps(&s);
   }
   DCDel(dc);
-  LBts(&mp_done_flags,Gs->num);
+  LBtr(&mp_not_done_flags,Gs->num);
 }
 
 U0 PredatorPrey()
@@ -65,12 +65,11 @@ U0 PredatorPrey()
     GrLine(dc,OX,0,OX,GR_HEIGHT-FONT_HEIGHT-1);
     GrLine(dc,0,OY,GR_WIDTH-1,OY);
     while (!ScanChar) {
-      mp_done_flags=0;
-      for (i=1;i<mp_cnt;i++)
-	MPJob(&PlotTrajectory,Fs,i);
-      PlotTrajectory(Fs);
+      mp_not_done_flags=1<<mp_cnt-1;
+      for (i=0;i<mp_cnt;i++)
+	JobQue(&PlotTrajectory,Fs,i);
       do Yield;
-      while (mp_done_flags!=1<<mp_cnt-1);
+      while (mp_not_done_flags);
     }
   } catch
     CatchAll;

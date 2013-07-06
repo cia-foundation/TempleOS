@@ -1,6 +1,7 @@
 asm {
-#define MODULE_SIZE		CD_BOOT_LOADER_SIZE
-#define BOOT_HIGH_LOC	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+MODULE_SIZE))>>4)
+#define CD_BOOT_LOADER_SIZE	CD_BLK_SIZE*1 //Max CD_BLK_SIZE*4, I think
+#define BOOT_HIGH_LOC	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4)
+#assert BOOT_HIGH_LOC>=KERNEL_BIN_LIMIT
 USE16
 BCD_START::
 //DL is supposed to have the BIOS drive number
@@ -10,7 +11,7 @@ BCD_START::
 
 	CLI
 	MOV	SS,AX
-	MOV	SP,BOOT_STK_SIZE+MODULE_SIZE
+	MOV	SP,BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE
 	STI
 
 	CALL	BCD_GET_IP
@@ -22,7 +23,7 @@ BCD_GET_IP:
 	MOV	AX,CS
 	ADD	AX,BX
 	MOV	DS,AX
-	MOV	CX,MODULE_SIZE
+	MOV	CX,CD_BOOT_LOADER_SIZE
 	XOR	SI,SI
 	XOR	DI,DI
 	REP_MOVSB
@@ -47,7 +48,7 @@ BCD_TEMPLEOS_MSG:
 BCD_NOT64_MSG:
 	DU8	"TempleOS requires a 64-bit capable processor.\n\r",0;
 
-//These get patched by $LK,"CDBootFileCreate","MN:CDBootFileCreate"$
+//These get patched.
 BCD_BLK_LO::		DU16	0;
 BCD_BLK_HI::		DU16	0;
 BCD_BLK_CNT::		DU16	0;
@@ -144,7 +145,7 @@ BCD_MAIN::
 	LOOP	@@20
 
 //See $LK,"BootCdProbe","MN:BootCdProbe"$().
-	MOV	EBX,U32 [BCD_BLK_LO-BCD_START]
+	MOV	EBX,U32 [BCD_BLK_LO-BCD_START] //TODO: oops overflow?
 	SHL	EBX,16
 	MOV	BX,BOOT_CODE_CDROM  //$MA+A-X+PU,"See sys_boot_code","Grep(\"sys_boot_code\",\"/TempleOS/\"FILENAME_MASK_TXT);View;\n"$
 
@@ -153,5 +154,5 @@ BCD_MAIN::
 	DU16	0,BOOT_RAM_BASE/16;
 //Continues here $LK,"::/TempleOS/Kernel/KStart.CPP","FL:::/TempleOS/Kernel/KStart.CPP,1"$
 BCD_END::
-#assert BCD_END-BCD_START<MODULE_SIZE
+#assert BCD_END-BCD_START<CD_BOOT_LOADER_SIZE
 }

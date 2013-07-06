@@ -1,9 +1,6 @@
 $FG,5$$WW,1$$TX+CX,"TempleOS Charter"$$FG$
 
-The goal of TempleOS is to provide an ideal environment for recreational programming and not imitate $FG,2$Linux$FG$.  TempleOS is orders of magnitude simpler than $FG,2$Linux$FG$ to better fulfill the promise of $FG,2$open source$FG$.  The vision for TempleOS is a 64-bit, souped-up, multitasking, multicore $FG,2$Commodore 64$FG$ with a $FG,2$C+$FG$ shell instead of $FG,2$BASIC$FG$ that runs $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ code.
-
-TempleOS holds no standards sacred -- everything is freshly designed from scratch.  This is not a 1970's main frame operating system and, no, it has nothing to do with $FG,2$Commodore 64$FG$ emulation -- it's $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$.
-
+TempleOS is God's official temple.  God said to use 640x480 16 color graphics and God said to have a single audio voice.  That is just like how He specified cubits in the Bible! 
  
 1) TempleOS is $FG,2$ring-0-only$FG$, running everything in kernel mode including applications.  You have full access to memory, I/O ports, instructions, etc. at all times, because that's fun.
 
@@ -15,20 +12,18 @@ TempleOS holds no standards sacred -- everything is freshly designed from scratc
 
 5) TempleOS will always have one video mode, $FG,2$640x480$FG$ by 16 colors, unless that mode becomes unavailable on computers in the future.
 
-6) TempleOS will always be $FG,2$free$FG$.  I might sell applications, support, or, possibly, do adware.
+6) TempleOS will always just have PC Speaker sound.
 
-7) TempleOS will always be $FG,2$100% open source$FG$ with all source included, unless device drivers or something can only be included with non-disclosure agreements.
+7) TempleOS will always be $FG,2$free$FG$.  I might sell applications, support, or, possibly, do adware.
 
-8) All function args and returns will be 64-bit.  No plans for C++.
+8) TempleOS will always be $FG,2$100% open source$FG$ with all source included, unless device drivers or something can only be included with non-disclosure agreements.
 
-9) TempleOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just ASCII.
+9) All function args and returns will be 64-bit.  No plans for C++.
 
-10) TempleOS is not for multimedia.  Games will be created by programmers, not artists.  Sounds and images will be, primarily, calculated in real-time, not fetched.
+10) TempleOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just ASCII.
 
-11) All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
+11) TempleOS is not for multimedia.  Games will be created by programmers, not artists.  Sounds and images will be, primarily, calculated in real-time, not fetched.
 
-12) $FG,4$$BK,1$Backward compatibility is NOT guaranteed.$FG$$BK,0$  You are safest working with $FG,2$JIT$FG$ compilation instead of $FG,2$AOT$FG$ binaries because I can add members to classes, reorder members in classes, add default args to existing functions, change $FG,2$#define$FG$ values, etc. all without breaking compatibility.
+12) All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
 
-$FG,8$
-* "Commodore 64" was a trademark of Commodore Business Machines.
-* "Linux" is probably a trademark owned by Linus Torvalds.
+13) $FG,4$$BK,1$Backward compatibility is NOT guaranteed.$FG$$BK,0$  You are safest working with $FG,2$JIT$FG$ compilation instead of $FG,2$AOT$FG$ binaries because I can add members to classes, reorder members in classes, add default args to existing functions, change $FG,2$#define$FG$ values, etc. all without breaking compatibility.

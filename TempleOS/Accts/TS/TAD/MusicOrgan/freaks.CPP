@@ -7,13 +7,13 @@ U0 Song()
   music_stacatto_factor= 0.604;
   try {
   while (!ScanKey) {
-	Play("W13sEqAsDeCqAsEqAsDeCqAsDeEqEsE",
+	Play("3sEqAsDeCqAsEqAsDeCqAsDeEqEsE",
 		"Jes\0us \0kind \0of \0freaks,\n\0Jes\0us \0kind \0of \0freaks,\n\0are \0dif\0ferent \0 \0");
-	Play("eDqCsDeCqBsBeBqAetBED!qBeC!B",
+	Play("eDqCsDeCqBsBeBqAetBEDqBeCB",
 		"from \0 \0oth\0er\n\0 \0 \0peo\0ple.\n\0 \0 \0 \0 \0They \0don't \0");
-	Play("2qGeG!3FsCDC!!DqFetB!ACBED!qBeC!B",
+	Play("2qGeG3FsCDCDqFetBACBEDqBeCB",
 		"care,\n\0for \0God \0 \0is \0their \0 \0joy!\n\0 \0 \0 \0 \0 \0 \0 \0They \0don't \0");
-	Play("2qGeG!3FsCDC!!DqFetB!AC",
+	Play("2qGeG3FsCDCDqFetBAC",
 		"care,\n\0for \0God \0 \0is \0their \0 \0joy!\n\0 \0 \0 \0");
   }
   } catch

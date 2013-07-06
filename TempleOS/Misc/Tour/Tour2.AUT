@@ -4,15 +4,15 @@ Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 
 PopUpOk(
 "Now, we're going to demonstrate how to work\n"
-"with programs.  We'll change to the $$FG,GREEN$$/TempleOS/Demo/Snd$$FG$$ \n"
-"directory.\n\n"
+"with programs.  We'll change to the\n"
+"$$FG,GREEN$$/TempleOS/Demo/Games$$FG$$ directory.\n\n"
 "Note, that directories are specified with\n"
 "a forward slash, not a backslash.\n"
 "Drives can be specified in a $$FG,GREEN$$Cd()$$FG$$ command\n"
 "and the boot drive is specified with \"$$FG,GREEN$$::$$FG$$\".\n\n"
 "$$FG,GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
-AFDelayedPutS("Cd(\"::/TempleOS/Demo/Snd\");Dir;",25);
+AFDelayedPutS("Cd(\"::/TempleOS/Demo/Games\");Dir;",25);
 AFPmtStr("\n");
 
 PopUpOk(
@@ -22,53 +22,48 @@ PopUpOk(
 "type it on the command line.\n\n"
 "$$FG,GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
-AFDelayedPutS("Ed(\"ASCIIOrgan.CPP.Z\");",25);
+AFDelayedPutS("Ed(\"CastleFrankenstein.CPP.Z\");",25);
 AFPmtStr("\n");
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
 
 Sleep(1000);
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
 PopUpOk(
-"This program gets keys and plays frequencies.\n"
+"This is a first-person-shooter.\n"
 "It quits when you press $$FG,GREEN$$<SHIFT-ESC>$$FG$$.\n\n"
 "There is no \"$$FG,GREEN$$main()$$FG$$\" function in TempleOS\n"
 "programs.  Any program statements outside\n"
 "functions get executed when you $$FG,GREEN$$#include$$FG$$\n"
 "them at the command line.\n\n"
-"The \"$$FG,GREEN$$ASCIIOrgan;$$FG$$\" statement at the bottom\n"
-"will run the program when we $$FG,GREEN$$#include$$FG$$ it.\n");
+"The \"$$FG,GREEN$$CastleFrankenstein;$$FG$$\" statement at the\n"
+"bottom will run the program when we\n"
+"$$FG,GREEN$$#include$$FG$$ it.\n");
+
 
 PopUpOk(
-"The editor and most things exit when you press\n"
-"$$FG,GREEN$$<ESC>$$FG$$.  $$FG,GREEN$$<SHIFT-ESC>$$FG$$ will abort (cancel) most things.\n\n"
-"The $$FG,GREEN$$<ESC>$$FG$$ key can be simulated with a left\n"
-"double-click, while the $$FG,GREEN$$<SHIFT-ESC>$$FG$$ key can be\n"
-"simulated with a right double-click.  When\n"
-"you browse documentation, you'll left-click\n"
-"on links and right double-click to go back,\n"
-"unless you want to save changes to documents\n"
-"using left double-click.\n\n"
 "$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n"
 );
 
 AFGetChar(CH_SHIFT_ESC,CH_ESC);
 
 PopUpOk(
-"Now, we'll run the ASCIIOrgan.CPP.Z program.\n"
-"$$FG,GREEN$$<ENTER>$$FG$$ at the command line to\n"
-"$$FG,GREEN$$#include$$FG$$ it.  Then press keys to\n"
-"cause sounds and $$FG,GREEN$$<SHIFT-ESC>$$FG$$ when\n"
-"you are done.\n");
+"Now, we'll run the CastleFrankenstein.CPP.Z\n"
+"program.  Press $$FG,GREEN$$<ENTER>$$FG$$.  Then, move around\n"
+"with cursor keys and $$FG,GREEN$$<SHIFT-ESC>$$FG$$\n"
+"when you are done.\n");
 
-AFDelayedPutS("#include \"ASCIIOrgan\";",25);
+AFDelayedPutS("#include \"CastleFrankenstein\";",25);
 AFPmtStr("\n");
 AFUntilChar(CH_SHIFT_ESC,CH_ESC);
 
 PopUpOk(
 "The program is still in memory and we\n"
-"can start it again by typing \"$$FG,GREEN$$ASCIIOrgan;$$FG$$\".\n\n"
+"can start it again by typing\n"
+"\"$$FG,GREEN$$CastleFrankenstein;$$FG$$\".\n\n"
 "$$FG,GREEN$$<ENTER>$$FG$$ at the command line to\n"
 "run it again.\n");
 
-AFDelayedPutS("ASCIIOrgan;",25);
+AFDelayedPutS("CastleFrankenstein;",25);
 AFPmtStr("\n");
 AFUntilChar(CH_SHIFT_ESC,CH_ESC);
 
@@ -79,20 +74,14 @@ PopUpOk(
 "$$FG,GREEN$$<CTRL-ALT-D>$$FG$$\tEnter debugger\n"
 "$$FG,GREEN$$<CTRL-ALT-E>$$FG$$\tSpawn new user terminal window\n"
 "$$FG,GREEN$$<CTRL-ALT-F>$$FG$$\tFlush screen VGA cache\n"
-"$$FG,GREEN$$<CTRL-ALT-D>$$FG$$\tEnter debugger\n"
 "$$FG,GREEN$$<CTRL-ALT-M>$$FG$$\tMutes sound\n"
 "$$FG,GREEN$$<CTRL-ALT-T>$$FG$$\tSwitch tasks\n"
-"$$FG,GREEN$$<CTRL-ALT-V>$$FG$$\tSound volume +\n"
-"$$FG,GREEN$$<CTRL-ALT-v>$$FG$$\tSound volume -\n"
 "$$FG,GREEN$$<CTRL-ALT-X>$$FG$$\tKill task (window)\n"
 );
 
-AFDelayedPutS("Ed(\"ASCIIOrgan.CPP.Z\");\n",50);
+AFDelayedPutS("Ed(\"CastleFrankenstein.CPP.Z\");\n",50);
 
 PopUpOk(
-"$$FG,GREEN$$<F5>$$FG$$\t\t'#include' the current file link\n"
-"or the file you are currently editing.\n"
-"$$FG,GREEN$$<SHIFT-F5>$$FG$$\t'Adam Include' the current file.\n\n\n"
 "$$FG,GREEN$$<F5>$$FG$$ in the editor to run the file being edited.\n"
 );
 
@@ -114,9 +103,8 @@ PopUpOk(
 AFUntilChar(CH_SHIFT_ESC,CH_ESC);
 
 PopUpOk(
-"Explore the $$LK,\"DemoIndex\",\"FI:::/TempleOS/Doc/DemoIndex.TXT\"$$.\n"
-"You'll find it on your menu.\n"
-"It's arranged by increasing difficulty.\n"
+"Explore the $$LK+PU,\"DemoIndex\",\"FI:::/TempleOS/Doc/DemoIndex.TXT\"$$.  You'll find it\n"
+"on your menu.  It's arranged by difficulty.\n"
 "Hit $$FG,GREEN$$<SPACE BAR>$$FG$$ on a demo index listing\n"
 "and $$FG,GREEN$$<F5>$$FG$$ to run from the editor.\n"
 );

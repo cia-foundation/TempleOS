@@ -1,4 +1,4 @@
-"Ed(\"::/TempleOS/Misc/Tour/Tour7.AUT.Z\");\n";
+"Ed(\"::/TempleOS/Misc/Bible.TXT.Z\");\n";
 Sleep(1000);
 
 PopUpOk(
@@ -7,7 +7,7 @@ PopUpOk(
 
 AFGetChar(CH_CTRLF);
 
-"<SHIFT-ESC>";
+AFDelayedPutS("new song",150);
 
 PopUpOk("Cursor down 8 times.\n");
 I64 i;
@@ -15,9 +15,9 @@ for (i=0;i<8;i++)
   AFGetKey(SC_CURSOR_DOWN);
 
 PopUpOk(
-"Press '$$FG,GREEN$$1$$FG$$' to show\n"
-"all lines within 1 of a match.\n");
-AFPmtStr("1");
+"Press '$$FG,GREEN$$2$$FG$$' to show\n"
+"all lines within 2 of a match.\n");
+AFPmtStr("2");
 Sleep(1000);
 
 PopUpOk("Press $$FG,GREEN$$<ESC>$$FG$$.\n");

@@ -52,7 +52,7 @@ PopUpOk(
 PopUpOk(
 "You can also use the $$FG,GREEN$$Man()$$FG$$ function\n"
 "to jump to source code.  (I use WordStat.)\n"
-"The $$FG,GREEN$$Man()$$FG$$ is good for short symbols\n"
+"The $$FG,GREEN$$Man()$$FG$$ is good for short symbol names\n"
 "or when inside the debugger.\n");
 AFDelayedPutS("Man(\"MakeOSInstallPrtBootLoader\");");
 Sleep(1000);

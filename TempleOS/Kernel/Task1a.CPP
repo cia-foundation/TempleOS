@@ -181,12 +181,7 @@ I64 TaskInit(CTask *task,I64 stk_size)
     task->last_child_task=
     (&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
 
-  task->next_doc=
-    task->last_doc=
-    (&task->next_doc)(U8 *)-offset(CDoc.next_doc);
-
-  QueInit(&task->next_servant_cmd);
-  QueInit(&task->next_master_cmd);
+  SrvCtrlInit(&task->srv_ctrl);
   QueInit(&task->next_lex);
   QueInit(&task->next_except);
   QueInit(&task->next_ctrl);
@@ -215,8 +210,10 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->rsp=(&temps->stk_base)(U8 *)+temps->stk_size;
 
   task->answers_displayed=1;  //from 0-8
-  task->text_attr  =WHITE<<4+BLUE;
-  task->border_attr=WHITE<<4+LTBLUE;
+  task->text_attr  =TERM_ATTR_TEXT;
+  task->border_attr=TERM_ATTR_BORDER;
+  task->border_src =BDS_CONST;
+  task->title_src  =TTS_CONST;
   task->win_left   =1;
   task->win_right  =text_cols-2;
   task->win_top    =1;
@@ -227,13 +224,17 @@ I64 TaskInit(CTask *task,I64 stk_size)
 
 CTask *Spawn(U0 (*fp_start_add)(U8 *data),U8 *data=NULL,
 	    U8 *task_name=NULL,
+	    I64 target_cpu=-1,	//-1 means current CPU
 	    CTask *parent=NULL, //NULL means adam
 	    I64 stk_size=0, //0=default
-	    I64 flags=SPAWNF_ADD_TO_QUE)
+	    I64 flags=1<<SVCf_ADD_TO_QUE)
 {
 //We alloc from code heap so addr will be short
 //Could be allocated off of data heap
-  CTask *task=CAlloc(sizeof(CTask),adam_task->code_heap);
+  CTask *task;
+  if (target_cpu>=0)
+    return SpawnQue(fp_start_add,data,task_name,target_cpu,parent,stk_size,flags);
+  task=CAlloc(sizeof(CTask),adam_task->code_heap);
   task->task_signature=TASK_SIGNATURE_VAL;
   if (!task_name) task_name="Unnamed Task";
   if (!parent) parent=Gs->seth_task;
@@ -252,11 +253,12 @@ CTask *Spawn(U0 (*fp_start_add)(U8 *data),U8 *data=NULL,
   task->rsp(U8 *)-=8;
   *task->rsp=&Exit;
   task->hash_table->next=parent->hash_table;
-  MemCpy(task->task_title,task_name,TASK_TITLE_LEN+1);
   MemCpy(task->task_name,task_name,TASK_NAME_LEN+1);
+  StrCpy(task->task_title,task->task_name);
+  task->title_src=TTS_TASK_NAME;
   PushFD;
   Cli;
-  if (flags&SPAWNF_ADD_TO_QUE) {
+  if (Bt(&flags,SVCf_ADD_TO_QUE)) {
     TaskQueInsChild(task);
     TaskQueIns(task);
   }
@@ -264,13 +266,12 @@ CTask *Spawn(U0 (*fp_start_add)(U8 *data),U8 *data=NULL,
   return task;
 }
 
-U0 ServantTaskCont()
+U0 SrvTaskCont()
 {
   FlushMsgs;
   while (TRUE) {
-    if (ServantCmdsHandler)
-      if (!Bt(&Fs->task_flags,TASKf_LOCK_TITLE))
-	MemCpy(Fs->task_title,Fs->task_name,TASK_NAME_LEN+1);
+    if (SrvCmdsHandler && Fs->title_src==TTS_TASK_NAME)
+      MemCpy(Fs->task_title,Fs->task_name,TASK_NAME_LEN+1);
     FlushMsgs;
     LBts(&Fs->task_flags,TASKf_IDLE);
     LBts(&Fs->task_flags,TASKf_AWAITING_MSG);
@@ -300,8 +301,6 @@ U0 TaskInitExt(Bool from_dbg=FALSE)
     return;
   if (!from_dbg) {
     LBts(&Fs->display_flags,DISPLAYf_HAS_CLOSE_WIN);
-    Fs->text_attr  =WHITE<<4+BLUE;
-    Fs->border_attr=WHITE<<4+LTBLUE;
     Fs->win_top   =13;
     Fs->win_bottom=text_rows-2;
     TaskDerivedValsUpdate;
@@ -312,21 +311,23 @@ U0 TaskInitExt(Bool from_dbg=FALSE)
 
 I64 ExeCmdLine(CLex *lx)
 {
-  I64 result=0,i,type;
-  U8 *ptr,*ptr2,*ptr3,*code;
+  I64 result=0,i,type,old_title_src=Fs->title_src;
+  U8 *ptr,*ptr2,*ptr3,*code,*old_task_title=StrNew(Fs->task_title);
   F64 t0;
   CDocEntry *doc_e;
   CDoc *doc;
+  if (Fs->title_src!=TTS_LOCKED_CONST)
+    Fs->title_src=TTS_CUR_LEX;
   while (lx->token &&
     (lx->token!='}' || !(lx->flags & LF_EXE_BLK)) ) {
-    if (!Bt(&Fs->task_flags,TASKf_LOCK_TITLE)) {
+    if (Fs->title_src==TTS_CUR_LEX) {
       ptr2=&Fs->task_title;
       ptr3=ptr2+TASK_TITLE_LEN;
       if (lx->cur_lfn->flags & LFSF_IS_DOC) {
-	doc_e=lx->cur_lfn->line_start;
+	doc_e=lx->cur_lfn->cur_entry;
 	doc=lx->cur_lfn->doc;
 	while (doc_e!=doc && ptr2<ptr3) {
-	  switch (doc_e->type_u8 && ptr2<ptr3) {
+	  switch (doc_e->type_u8) {
 	    case DOCT_TEXT:
 	      ptr=doc_e->tag;
 	      while (*ptr && ptr2<ptr3)
@@ -339,8 +340,9 @@ I64 ExeCmdLine(CLex *lx)
 	  }
 	  doc_e=doc_e->next;
 	}
+	if (ptr2<ptr3) *ptr2=0;
       } else
-	if (ptr=lx->cur_lfn->line_start)
+	if ((ptr=lx->cur_lfn->line_start) && *ptr)
 	  MemCpy(ptr2,ptr,TASK_TITLE_LEN);
     }
     lx->flags&=~LF_HAS_MISC_DATA;
@@ -362,6 +364,11 @@ I64 ExeCmdLine(CLex *lx)
 	Free(code);
     }
   }
+  if (Fs->title_src!=TTS_LOCKED_CONST) {
+    Fs->title_src=old_title_src;
+    StrCpy(Fs->task_title,old_task_title);
+  }
+  Free(old_task_title);
   if (lx->flags&LF_JUST_LOAD) {
     if (lx->error_cnt)
       return FALSE;
@@ -386,9 +393,7 @@ U0 UserTaskCont()
       QueRem(lx);
       LexDel(lx);
     } catch {
-      doc=Fs->last_doc;
-      if (doc!=(&Fs->next_doc)(U8 *)-offset(CDoc.next_doc) &&
-	  doc->doc_in_que_signature==DOC_IN_QUE_SIGNATURE_VAL)
+      if ((doc=Fs->put_doc) && doc->doc_signature==DOC_SIGNATURE_VAL)
 	DocUnlock(doc);
       CatchAll;
     }
@@ -408,14 +413,14 @@ U0 UserCmdLine(I64 dummy=0)
   UserTaskCont;
 }
 
-U0 ServantUserCmdLine(I64 dummy=0)
+U0 SrvUserCmdLine(I64 dummy=0)
 {
   nounusedwarn dummy;
   LBts(&Fs->task_flags,TASKf_USER);
   TaskInitExt;
-  if (HashFind("ServantStartUp",adam_task->hash_table,HTT_FUN))
-    CallExtStr("ServantStartUp");
-  ServantTaskCont;
+  if (HashFind("SrvStartUp",adam_task->hash_table,HTT_FUN))
+    CallExtStr("SrvStartUp");
+  SrvTaskCont;
 }
 
 CTask *SpawnUser(U8 *fmt=NULL,...)
@@ -443,7 +448,6 @@ U0 TaskFinishOff(CTask *task)
 I64 TaskEnd()
 { //called with irq's off
   CTask *task=Fs,*tempt,*tempt1;
-  CTaskCmd *tempc,*tempc1,*tempc2;
   if (task==sys_task_being_screen_updated) {
     LBts(&task->task_flags,TASKf_KILL_TASK);
     return task->next_task;
@@ -483,23 +487,11 @@ I64 TaskEnd()
 
   while (LBts(&task->locked_flags,TASKLf_TASK_LOCK))
     Pause;
-  tempc1=&task->next_servant_cmd;
-  tempc=tempc1->next;
-  while (tempc!=tempc1) {
-    tempc2=tempc->next;
-    Free(tempc->data);
-    Free(tempc);
-    tempc=tempc2;
-  }
+  while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
+    Pause;
 
-  tempc1=&task->next_master_cmd;
-  tempc=tempc1->next;
-  while (tempc!=tempc1) {
-    tempc2=tempc->next;
-    Free(tempc->data);
-    Free(tempc);
-    tempc=tempc2;
-  }
+  SrvCmdQueDel(&task->srv_ctrl.next_waiting);
+  SrvCmdQueDel(&task->srv_ctrl.next_done);
 
   if (IsRaw)
     VGAFlush;
@@ -528,6 +520,7 @@ I64 TaskEnd()
   tempt =task->next_task; //save to return
   TaskQueRem(task);
 
+  LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
   LBtr(&task->locked_flags,TASKLf_TASK_LOCK);
 
   if (sys_winmgr_task) {

@@ -5,27 +5,26 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,Bool exited)
   DocLock(doc);
   if (!exited) {
     if (doc_e->flags1 & DOCEF1_ESC) {
-      Msg(MSG_KEY_DOWN,CH_ESC,0,1<<TASKCf_DONT_FILTER);
+      Msg(MSG_KEY_DOWN,CH_ESC,0,1<<SVCf_DONT_FILTER);
       return 0;
     } if (doc_e->flags1 & DOCEF1_QUIT) {
-      Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0,1<<TASKCf_DONT_FILTER);
+      Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0,1<<SVCf_DONT_FILTER);
       return 0;
     } else if (doc_e->flags1 & DOCEF1_CHECK_COLLAPSABLE)
       doc_e->flags1^=DOCEF1_CHECKED_COLLAPSED;
   }
-  doc->best_d=MAX_I64;
   try {
     if (ch==CH_SPACE) {
       if (doc_e->flags1 & DOCEF1_LINK && doc->left_click_link)
 	result=(*doc->left_click_link)(doc,doc_e);
       if (doc_e->flags1 & DOCEF1_LEFT_EXP) {
 	result=doc_e->left_exp;
-	Msg(MSG_CMD,result,0,1<<TASKCf_DONT_FILTER);
+	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->flags1 & DOCEF1_LEFT_CB && doc_e->left_cb) {
 	DocUnlock(doc);
 	result=(*doc_e->left_cb)(doc,doc_e);
-	Msg(MSG_CMD,result,0,1<<TASKCf_DONT_FILTER);
+	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->flags1 & DOCEF1_LEFT_MACRO) {
 	if (doc_e->flags1 & DOCEF1_POPUP) {
@@ -45,12 +44,12 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,Bool exited)
 	result=(*doc->right_click_link)(doc,doc_e);
       if (doc_e->flags1 & DOCEF1_RIGHT_EXP) {
 	result=doc_e->right_exp;
-	Msg(MSG_CMD,result,0,1<<TASKCf_DONT_FILTER);
+	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->flags1 & DOCEF1_RIGHT_CB && doc_e->right_cb) {
 	DocUnlock(doc);
 	result=(*doc_e->right_cb)(doc,doc_e);
-	Msg(MSG_CMD,result,0,1<<TASKCf_DONT_FILTER);
+	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->flags1 & DOCEF1_RIGHT_MACRO) {
 	if (doc_e->flags1 & DOCEF1_POPUP) {
@@ -77,7 +76,10 @@ U8 *EdOverStrikeCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
 {
   CDoc *doc=doc_e->user_data;
   U8 *st=MAlloc(8,mem_task);
-  *st=doc->flags & DOCF_OVERSTRIKE ? 'O':'Ä';
+  if (doc->flags & DOCF_OVERSTRIKE)
+    *st='O';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -86,7 +88,10 @@ U8 *EdFilterCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
 {
   CDoc *doc=doc_e->user_data;
   U8 *st=MAlloc(8,mem_task);
-  *st=doc->find_replace->filter_lines ? 'F':'Ä';
+  if (doc->find_replace->filter_lines)
+    *st='F';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -95,7 +100,10 @@ U8 *EdDollarCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
 {
   CDoc *doc=doc_e->user_data;
   U8 *st=MAlloc(8,mem_task);
-  *st=doc->flags & DOCF_IN_DOLLAR ? '$$':'Ä';
+  if (doc->flags & DOCF_IN_DOLLAR)
+    *st='$$';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -115,7 +123,10 @@ U8 *EdQuotesCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   CLex *lx=mem_task->last_lex;
   U8 *st=MAlloc(8,mem_task);
-  *st=lx->flags & LF_IN_QUOTES ? '"':'Ä';
+  if (lx->flags & LF_IN_QUOTES)
+    *st='"';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -124,7 +135,10 @@ U8 *EdBracesCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   CLex *lx=mem_task->last_lex;
   U8 *st=MAlloc(8,mem_task);
-  *st=lx->braces_cnt ? '}':'Ä';
+  if (lx->braces_cnt)
+    *st='}';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -133,7 +147,10 @@ U8 *EdSemicolonCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   CLex *lx=mem_task->last_lex;
   U8 *st=MAlloc(8,mem_task);
-  *st=lx->statement_cnt ? ';':'Ä';
+  if (lx->statement_cnt)
+    *st=';';
+  else
+    *st='Ä';
   st[1]=0;
   return st;
 }
@@ -157,12 +174,12 @@ public I64 DocGetKey(I64 *_sc=NULL)
   Bool cont,old_preempt=IsPreempt;
   do {
     ch=GetKey(&sc,TRUE);
-    DocRecalc(DocCur);
+    DocRecalc(DocPut);
     cont=FALSE;
     if (ch==CH_ESC || ch==CH_SHIFT_ESC) { //Check for exit filter mode
       Preempt(OFF);
-      if (DocCur && DocCur->find_replace->filter_lines) {
-	EdUndoFilter(DocCur);
+      if (DocPut && DocPut->find_replace->filter_lines) {
+	EdUndoFilter(DocPut);
 	cont=TRUE;
       }
       Preempt(old_preempt);
@@ -184,72 +201,78 @@ public Bool View()
 #help_index "Doc"
 public Bool DocDo(CDoc *doc,I64 doc_flags=0)
 {
-  CDoc *old_doc=DocCur,*old_aux_doc=DocAux,*aux;
+  CDoc *old_put_doc    =DocPut,
+       *old_display_doc=DocDisplay,
+       *old_border_doc =DocBorder,*bdoc;
   CDocEntry *doc_e;
   I64 old_attr=Fs->text_attr,
       old_top =Fs->win_top, old_bottom=Fs->win_bottom,
-      old_left=Fs->win_left,old_right =Fs->win_right;
+      old_left=Fs->win_left,old_right =Fs->win_right,
+      old_title_src=Fs->title_src;
   Bool result,unlock,old_preempt;
-
+  U8 *old_task_title;
   if (doc_flags&DOF_WIN_MAX)
     WinMax;
 
   unlock=DocLock(doc);
   doc->win_task=Fs;
-  aux=DocNew;
-  aux->flags|=DOCF_AUX_DOC;
-  aux->settings_root.dft_text_attr=Fs->border_attr;
-  DocPutS(aux,"$$CM+TY+LX+NC,0,-1$$");
+  bdoc=DocNew;
+  bdoc->flags|=DOCF_BORDER_DOC;
+  DocPutS(bdoc,"$$CM+TY+LX+NC,0,-1$$");
   if (Bt(&Fs->display_flags,DISPLAYf_HAS_CLOSE_WIN))
-    DocPutS(aux,"$$TX+RX+BD,\"[X]\"$$");
-  DocPutS(aux,"$$BK,1$$$$TX+LX+BD,\"MENU\"$$$$BK,0$$");
+    DocPutS(bdoc,"$$TX+RX+BD,\"[X]\"$$");
+  DocPutS(bdoc,"$$BK,1$$$$TX+LX+BD,\"MENU\"$$$$BK,0$$");
 
-  doc_e=DocPutS(aux,"$$DA-T-P+BD+RD+CX+SCX+IV,256,\"%s...\",16$$");
-  doc_e->data=&doc->filename.name;
+  old_task_title=StrNew(Fs->task_title);
+  if (Fs->title_src!=TTS_LOCKED_CONST) {
+    Fs->title_src=TTS_ED_FILENAME;
+    MemCpy(Fs->task_title,doc->filename.name,TASK_TITLE_LEN);
+  }
+  doc_e=DocPutS(bdoc,"$$DA-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$");
+  doc_e->data=&Fs->task_title;
   DocDataFmt(doc_e);
 
   if (doc->flags & DOCF_ALLOW_UNDO) {
-    DocPutS(aux,"$$CM+BY+LX+NC,1,1$$");
-    doc_e=DocPutS(aux,"$$DA+BD+RD-T,32,\"Undo:%03d\"$$\n");
+    DocPutS(bdoc,"$$CM+BY+LX+NC,1,1$$");
+    doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Undo:%03d\"$$\n");
     doc_e->data=&doc->undo_cnt;
     DocDataFmt(doc_e);
   }
 
-  DocPutS(aux,"$$CM+BY+RX+NC,-30,1$$");
-  doc_e=DocPutS(aux,"$$TX+BD+TC,\"     \"$$");
+  DocPutS(bdoc,"$$CM+BY+RX+NC,-30,1$$");
+  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\"     \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdMoreCB;
-  doc_e=DocPutS(aux,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarTypeCB;
-  doc_e=DocPutS(aux,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdFilterCB;
-  doc_e=DocPutS(aux,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdOverStrikeCB;
-  doc_e=DocPutS(aux,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarCB;
-  doc_e=DocPutS(aux,"$$DA+BD+RD-T,32,\"Line:%04d \"$$");
+  doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Line:%04d \"$$");
   doc_e->data=&doc->line;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(aux,"$$DA+BD+RD-T,32,\"Col:%04d\"$$\n");
+  doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Col:%04d\"$$\n");
   doc_e->data=&doc->col;
   DocDataFmt(doc_e);
 
-  DocRecalc(aux);
+  DocRecalc(bdoc);
   DocRecalc(doc);
   if (!(doc_flags&DOF_DONT_HOME))
     DocHome(doc);
   old_preempt=Preempt(OFF);
-  DocQueRem(old_aux_doc);
-  DocQueInsRev(aux,Fs->next_doc);
-  if (doc!=old_doc)
-    doc->parent_doc=old_doc;
-  DocQueRem(old_doc);
-  DocQueIns(doc,Fs->last_doc);
-  Fs->text_attr=doc->settings_root.dft_text_attr;
+  Fs->border_doc=bdoc;
+  if (doc!=old_display_doc)
+    doc->parent_doc=old_display_doc;
+  Fs->put_doc=Fs->display_doc=doc;
+  if (!(doc_flags&DOF_DONT_TEXT_ATTR))
+    Fs->text_attr=DOC_ATTR_DFT_TEXT;
   LBts(&Fs->display_flags,DISPLAYf_SHOW);
   WinZBufUpdate;
   if (doc_flags&DOF_MIN_SIZE)
@@ -274,13 +297,16 @@ public Bool DocDo(CDoc *doc,I64 doc_flags=0)
   }
   if (unlock)
     DocUnlock(doc);
-
-  DocQueRem(aux);
-  DocQueInsRev(old_aux_doc,Fs->next_doc);
-  DocDel(aux);
-  DocQueRem(doc);
-  DocQueIns(old_doc,Fs->last_doc);
-  Fs->text_attr=old_attr;
+  Fs->border_doc =old_border_doc;
+  Fs->display_doc=old_display_doc;
+  Fs->put_doc	 =old_put_doc;
+  Fs->text_attr  =old_attr;
+  if (Fs->title_src!=TTS_LOCKED_CONST) {
+    Fs->title_src  =old_title_src;
+    StrCpy(Fs->task_title,old_task_title);
+  }
+  Free(old_task_title);
+  DocDel(bdoc);
   if (doc_flags&DOF_MIN_SIZE) {
     SetWinHorz(old_left,old_right);
     SetWinVert(old_top,old_bottom);
@@ -302,6 +328,7 @@ public Bool DocFormDo(U8 *D,U8 *class_name,
   CHashClass *tempc;
   CDoc *doc;
   Bool result=FALSE;
+  I64 old_border_src=Fs->border_src;
   if (!(tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS)))
     return FALSE;
   doc=DocNew;
@@ -322,7 +349,7 @@ public Bool DocFormDo(U8 *D,U8 *class_name,
   }
   if (footer) DocPutS(doc,footer);
   if (doc->root.next!=doc)	{
-    doc->flags&=~(DOCF_ATTR_BY_PRT | DOCF_ATTR_BY_FILENAME);
+    Fs->border_src=BDS_CONST;
     DocRecalc(doc);
     if (DocDo(doc,doc_flags)) {
       doc_e=doc->cur_entry;
@@ -334,6 +361,7 @@ public Bool DocFormDo(U8 *D,U8 *class_name,
     }
   }
   DocDel(doc);
+  Fs->border_src=old_border_src;
   return result;
 }
 
@@ -348,12 +376,12 @@ public I64 DocMenuDo(CDoc *m,I64 doc_flags=0)
   U8 *old_end_cb=Fs->task_end_cb;
   Bool old_break_shift_esc=LBts(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC);
   CDocEntry *doc_e;
-  I64 old_doc_flags=m->flags,result=DOCM_CANCEL;
+  I64 old_border_src=Fs->border_src,result=DOCM_CANCEL;
   Fs->task_end_cb=&DocMenuDoEndTaskCB;
   try {
     if (m) {
       StrCpy(m->desc,"Menu");
-      m->flags&=~(DOCF_ATTR_BY_PRT | DOCF_ATTR_BY_FILENAME);
+      Fs->border_src=BDS_CONST;
       if (DocDo(m,doc_flags)) {
 	doc_e=m->cur_entry;
 	if (doc_e!=m) {
@@ -369,8 +397,8 @@ public I64 DocMenuDo(CDoc *m,I64 doc_flags=0)
       Fs->catch_except=TRUE;
     }
   }
-  m->flags|=old_doc_flags&(DOCF_ATTR_BY_PRT | DOCF_ATTR_BY_FILENAME);
   LBEqu(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC,old_break_shift_esc);
+  Fs->border_src=old_border_src;
   Fs->task_end_cb=old_end_cb;
   return result;
 }
@@ -378,21 +406,20 @@ public I64 DocMenuDo(CDoc *m,I64 doc_flags=0)
 #help_index "Doc"
 public I64 PopUp(U8 *msg,CTask *parent=NULL,CTask **_pu_task=NULL)
 {
-  I64 result=0;
+  I64 result;
+  CSrvCmd *tempc;
   Bool old_preempt=Preempt(OFF);
-  CTaskCmd *tempc;
-  CTask *task=Spawn(&ServantUserCmdLine,NULL,"System",parent);
+  CTask *task=Spawn(&SrvUserCmdLine,NULL,"System",,parent);
   if (!parent) {
-    TaskRqstQue(task,parent,msg,1<<TASKCf_EXIT_ON_COMPLETE);
+    TaskExeStrQue(task,parent,msg,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
     if (_pu_task) *_pu_task=task;
     Preempt(old_preempt);
     return 0;
   } else {
     Fs->popup_task=task;
-    tempc=TaskRqstQue(task,parent,msg,
-      1<<TASKCf_WAKE_MASTER | 1<<TASKCf_FOCUS_MASTER);
+    tempc=TaskExeStrQue(task,parent,msg,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
     if (_pu_task) *_pu_task=task;
-    GetRqstResult(tempc,&result);
+    ScanResult(tempc,&result);
     Fs->popup_task=NULL;
     Kill(task);
     if (_pu_task) *_pu_task=NULL;
@@ -405,8 +432,8 @@ public I64 PopUp(U8 *msg,CTask *parent=NULL,CTask **_pu_task=NULL)
 public CTask *PopUpViewDoc(CDoc *doc,I64 doc_flags=0)
 {
   U8 *buf=MSPrintF("if (!IsSysDeterministic) Preempt(ON);DocDo(0x%X,0x%X);",doc,doc_flags);
-  CTask *task=Spawn(&ServantUserCmdLine,NULL,"View",Fs);
-  TaskRqstQue(task,NULL,buf,1<<TASKCf_EXIT_ON_COMPLETE);
+  CTask *task=Spawn(&SrvUserCmdLine,NULL,"View",,Fs);
+  TaskExeStrQue(task,NULL,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   Free(buf);
   return task;
 }
@@ -432,13 +459,13 @@ public CTask *PopUpViewStr(U8 *msg)
 public I64 PopUpMenu(CDoc *doc,I64 doc_flags=0)
 {
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
-  return ServantUser("DocMenuDo(0x%X,0x%X);",doc,doc_flags);
+  return SrvUser("DocMenuDo(0x%X,0x%X);",doc,doc_flags);
 }
 
 public Bool PopUpForm(U8 *D,U8 *class_name,I64 doc_flags=DOF_MIN_SIZE,
     U8 *header=NULL,U8 *footer=NULL)
 {
-  return ServantUser("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",D,class_name,
+  return SrvUser("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",D,class_name,
     doc_flags,header,footer);
 }
 
@@ -495,7 +522,7 @@ public U8 *PopUpFileName(U8 *dft=NULL,I64 doc_flags=0)
 }
 
 #help_index "Doc"
-public Bool PopUpCd()
+Bool PopUpCd()
 {
   Bool result;
   U8 *st=PopUpPickDir;
@@ -512,6 +539,7 @@ public U8 *PopUpPickLstEntry(U8 *lst)
 {
   I64 i=0;
   CDoc *doc=DocNew;
+  DocPutS(doc,"$$FG,LTBLUE$$");
   while (*lst) {
     if (*lst=='@') { //Check for '@' alias lst entry
       i--;
@@ -623,6 +651,7 @@ public I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NUL
   CDoc *doc=DocNew;
   if (header)
     DocPutS(doc,header);
+  DocPutS(doc,"$$FG,LTBLUE$$");
   for (i=lo;i<=hi;i+=step)
     DocPrintF(doc,"$$MU,\"%d\",%d$$\n",i,i);
   if (footer)
@@ -641,6 +670,7 @@ public F64 PopUpRangeF64(F64 lo,F64 hi,F64 step,
   CDoc *doc=DocNew;
   if (header)
     DocPutS(doc,header);
+  DocPutS(doc,"$$FG,LTBLUE$$");
   for (d=lo;d<=hi;d+=step) {
     SPrintF(buf,fmt,d);
     DocPrintF(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
@@ -661,6 +691,7 @@ public F64 PopUpRangeF64Exp(F64 lo,F64 hi,F64 factor,
   CDoc *doc=DocNew;
   if (header)
     DocPutS(doc,header);
+  DocPutS(doc,"$$FG,LTBLUE$$");
   for (d=lo;d<=hi;d*=factor) {
     SPrintF(buf,fmt,d);
     DocPrintF(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
@@ -678,7 +709,7 @@ public F64 PopUpRangeF64Log(F64 lo,F64 hi,I64 steps,
   return PopUpRangeF64Exp(lo,hi,Exp(Ln(hi/lo)/(steps-1)),fmt,header,footer);
 }
 
-#help_index "Task/Rqsts"
+#help_index "Task/Requests"
 public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
 {
   Bool okay=TRUE;
@@ -725,8 +756,7 @@ public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft
   if (header)
     DocPutS(doc,header);
   if (allow_transparent)
-    DocPutS(doc,"$$BG,WHITE$$$$MU,\"TRANSPARENT\",COLOR_TRANSPARENT$$$$BG$$\n");
-  DocPutS(doc,"$$FM,BLACK$$");
+    DocPutS(doc,"$$MU,\"TRANSPARENT\",COLOR_TRANSPARENT$$\n");
   for (i=0;i<16;i++)
     DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-8Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",i);
   if (allow_dft)
@@ -736,18 +766,25 @@ public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft
   return i;
 }
 
-public I64 PopUpLightingColor(U8 *header=NULL)
+public I64 PopUpColorLighting(U8 *header=NULL)
 {
   I64 i;
   CDoc *doc=DocNew;
   if (header)
     DocPutS(doc,header);
-  DocPutS(doc,"\n$$FM,BLACK$$Single-Sided Full-Range Double-Sided Full-Range\n");
+  DocPutS(doc,"\nSingle-Sided means both sides same color."
+	      "\nDouble-Sided means back side darker."
+	      "\n"
+	      "\nHalf-Range means 0 to [0,7]"
+	      "\n                 [8,15]-8 to [8,15]"
+	      "\nFull-Range means 0 to [0,7] to [0,7]+8"
+	      "\n");
+  DocPutS(doc,"\n$$FG,LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$FG,BLACK$$");
   for (i=0;i<8;i++) {
     DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",i);
     DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+i);
   }
-  DocPutS(doc,"\nSingle-Sided Half-Range Double-Sided Half-Range\n");
+  DocPutS(doc,"\n$$FG,LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$FG,BLACK$$");
   for (i=0;i<16;i++) {
     DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
     DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+ROPF_HALF_RANGE_COLOR+i);
@@ -806,7 +843,7 @@ Bool PopUpTransform(I64 *r)
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,j,i1,j1;
-  CDoc *doc=DocCur(task);
+  CDoc *doc=DocPut(task);
   for (j=0;j<17;j++)
     for (i=0;i<17;i++) {
       if (j<16)
@@ -831,8 +868,8 @@ I64 DitherColorDo(U8 *header=NULL)
   I64 msg_code,p1,p2,result=-1,i,j;
   DocClear;
   "" header;
-  DocRecalc(DocCur);
-  NamedFramePtrAdd("DitherDoFrame",(DocCur->max_y+1)*FONT_HEIGHT);
+  DocRecalc(DocPut);
+  NamedFramePtrAdd("DitherDoFrame",(DocPut->max_y+1)*FONT_HEIGHT);
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   Fs->draw_it=&DrawIt;
   do {
@@ -857,7 +894,7 @@ dcd_done:
   return result;
 }
 
-public I64 PopUpDitherColor(U8 *header=NULL)
+public I64 PopUpColorDither(U8 *header=NULL)
 {
   U8 buf[136];
   SPrintF(buf,"DitherColorDo(0x%X);",header);

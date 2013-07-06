@@ -1,15 +1,15 @@
 CTask *SingleSong(U8 *msg,U8 *name)
 {
   Bool old_preempt=Preempt(OFF);
-  CTask *task=Spawn(&ServantUserCmdLine,NULL,name,Fs);
-  LBts(&task->task_flags,TASKf_LOCK_TITLE);
+  CTask *task=Spawn(&SrvUserCmdLine,NULL,name,,Fs);
   StrCpy(task->task_title,name);
-  TaskRqstQue(task,Fs,";",1<<TASKCf_WAKE_MASTER);
+  task->title_src=TTS_LOCKED_CONST;
+  TaskExeStrQue(task,Fs,";",1<<SVCf_WAKE_MASTER|1<<SVCf_FREE_ON_COMPLETE);
   SetWinHorz(task->win_left,task->win_left+50,task);
   SetWinVert(2,2+8,task);
   Preempt(old_preempt);
-  TaskRqstQue(task,NULL,msg,1<<TASKCf_EXIT_ON_COMPLETE);
-  DocCur(task)->max_entries=100;
+  TaskExeStrQue(task,NULL,msg,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
+  DocPut(task)->max_entries=100;
   return task;
 }
 
@@ -93,15 +93,15 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
 	if ('0'<=doc_e->tag[2]<='9')
 	  rating=doc_e->tag[2];
 	if (StrStr(doc_e->tag,"incomplete"))
-	  DocPutS(doc,"$$FM,BLACK$$");
+	  DocPutS(doc,"$$FG,BLACK$$");
 	else if (StrStr(doc_e->tag,"has graphics"))
-	  DocPutS(doc,"$$FM,GREEN$$");
+	  DocPutS(doc,"$$FG,GREEN$$");
 	else if (StrStr(doc_e->tag,"has words"))
-	  DocPutS(doc,"$$FM,BLUE$$");
+	  DocPutS(doc,"$$FG,BLUE$$");
 	else if (StrStr(doc_e->tag,"special"))
-	  DocPutS(doc,"$$FM,CYAN$$");
+	  DocPutS(doc,"$$FG,CYAN$$");
 	else if (StrStr(doc_e->tag,"no nothing")) {
-	  DocPutS(doc,"$$FM,RED$$");
+	  DocPutS(doc,"$$FG,RED$$");
 	  if (FileOcc("\\0",tempm1->full_name,"")) {
 	    s->cur_entry=doc_e->next;
 	    s->cur_data_col=0;
@@ -118,7 +118,7 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
     }
     tempm1=tempm1->next;
   }
-  DocPrintF(doc,"\n$$FM,CYAN$$$$MU-UL,\"DONE\",%d$$\n",DOCM_CANCEL);
+  DocPrintF(doc,"\n$$FG,CYAN$$$$MU-UL,\"DONE\",%d$$\n",DOCM_CANCEL);
   while (TRUE) {
     if (_filename)
       tempm1=PopUpMenu(doc,DOF_INTERCEPT_TASK_END);

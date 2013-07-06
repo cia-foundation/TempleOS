@@ -65,3 +65,36 @@ $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/pba
 $TX+CX,"System Guide Part 3"$
 
 Errata: Multicore timer IRQ is 1000 Hz.  Nonmaskable IRQ is to HLT, not wake.
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/jthJOeStDjE\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Start-Up Code Walk-Thru"$
+
+Note: TempleOS stores files contiguously if their name ends in ".C".
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/yjflVIKY2gQ\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Assembler/Compiler Code Walk-Thru"$
+
+Errata: Float * int goes to float, obviously.
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/C2EzEt6kAJA\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"<CTRL-R> Graphic Editing"$

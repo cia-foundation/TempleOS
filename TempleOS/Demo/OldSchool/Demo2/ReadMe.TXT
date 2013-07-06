@@ -23,5 +23,5 @@ $ID,2$$FG,2$>ObjDemo("Param1","Param2");
 $ID,-2$
 
 
-$FG,2$#include$FG$ the file $LK-A,"::/TempleOS/Adam/BinRep.CPP"$ and
+$FG,2$#include$FG$ the file $LK-A,"::/TempleOS/Adam/Utils/BinRep.CPP"$ and
 call $LK,"BinRep","MN:BinRep"$() to analyze the $FG,2$.BIN.Z$FG$ files.  

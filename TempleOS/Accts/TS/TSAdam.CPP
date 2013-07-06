@@ -75,7 +75,8 @@ boot it directly or from VMware with a physical drive.
   else if (ChkDrvModelSerial('D',"Hitachi HDS721075KLA330","GTF202P8H509AF") &&
       ChkDrvModelSerial('I',"ST3320620AS","6QF24J0A"))
     ts_cid=CID_TAD8; //Regular boot of TAD8
-  else if (dft_drv=='T' && IsDrvATAPI('T') && m20[11].base==0x100000000 &&
+//beware 'S'
+  else if (*sys_acct=='T' && IsDrvATAPI('T') && m20[11].base==0x100000000 &&
 	m20[11].base(I64)+m20[11].len-1==0x33FFFFFFF)
     ts_cid=CID_TAD8; //CDROM boot of TAD8
 
@@ -84,7 +85,6 @@ boot it directly or from VMware with a physical drive.
 
 U0 TSInit()
 {
-  //TS_IMG_DRV is for the holding area for burning CDROMs
   CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bdev;
   switch (ts_cid) {
@@ -94,7 +94,7 @@ U0 TSInit()
     case CID_TAD8_VM:
       DefinePrintF("CFG_ACCT","\"\nTS/TAD\n\"");
       DefinePrintF("CFG_HARD_DRVS","\"h2s0xbc00\n0xb880\n1d2s0xbc00\n0xb880\n0\"");
-      DefinePrintF("CFG_RAM_DRVS","\"b1Scale2Mem(2048,0x40000)\nz1Scale2Mem(2048,0x40000)\n\"");
+      DefinePrintF("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
       DefinePrintF("CFG_CDROM_DRVS","\"t3s0xb800\n0\"");
       DefinePrintF("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
       if (ts_cid==CID_TAD8) {
@@ -108,13 +108,12 @@ U0 TSInit()
       DefinePrintF("TS_BAK_DRV","\"E\"");
       DefinePrintF("TS_RAM_DRV","\"B\"");
       DefinePrintF("TS_WIN_DRV","\"H\"");
-      DefinePrintF("TS_IMG_DRV","\"Z\"");
       DefinePrintF("TS_CDROM_DRV","\"T\"");
       break;
 */
     case CID_DFT:
       DefinePrintF("CFG_ACCT","\"\nTS/TAD\n\"");
-      DefinePrintF("CFG_RAM_DRVS","\"b1Scale2Mem(2048,0x40000)\nz1Scale2Mem(2048,0x40000)\n\"");
+      DefinePrintF("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
       if (sys_auto_mount_ide_cnt) {
 	//If AutoMount was successful, No need to manually mount in next compile
 	DefinePrintF("CFG_HARD_DRVS","\"\"");
@@ -125,10 +124,10 @@ U0 TSInit()
 	DefinePrintF("CFG_HARD_DRVS","\"d2s0x1F0\n0x3F4\n0\"");
 	DefinePrintF("CFG_CDROM_DRVS","\"t3s0x170\n0\"");
 
-	bdev=Drv2BlkDev(dft_drv);
+	bdev=Drv2BlkDev(*sys_acct);
 	if (bdev->type==BDT_ATAPI) {
 	  ATARep(FALSE,,&root);
-	  ATAIDDrvs(root,dft_drv,&ata_drv,&atapi_drv);
+	  ATAIDDrvs(root,*sys_acct,&ata_drv,&atapi_drv);
 	  if (ata_drv)
 	    DefinePrintF("CFG_HARD_DRVS","\"d2p%d\n\"",ata_drv->num);
 	  if (atapi_drv)
@@ -154,17 +153,9 @@ U0 TSInit()
       DefinePrintF("TS_BAK_DRV","\"E\"");
       DefinePrintF("TS_RAM_DRV","\"B\"");
       DefinePrintF("TS_WIN_DRV","\"\"");
-      DefinePrintF("TS_IMG_DRV","\"Z\"");
       DefinePrintF("TS_CDROM_DRV","\"T\"");
   }
 } TSInit;
-
-Bool	ts_has_main_drv =ToBool(StrLen(TS_MAIN_DRV)),
-	ts_has_bak_drv	=ToBool(StrLen(TS_BAK_DRV)),
-	ts_has_ram_drv	=ToBool(StrLen(TS_BAK_DRV)),
-	ts_has_win_drv	=ToBool(StrLen(TS_WIN_DRV)),
-	ts_has_img_drv	=ToBool(StrLen(TS_IMG_DRV)),
-	ts_has_cdrom_drv=ToBool(StrLen(TS_CDROM_DRV));
 
 U0 TSInit2()
 {
@@ -172,9 +163,15 @@ U0 TSInit2()
   DefinePrintF("TS_BAK_DRV_LET","'%s'",TS_BAK_DRV);
   DefinePrintF("TS_RAM_DRV_LET","'%s'",TS_RAM_DRV);
   DefinePrintF("TS_WIN_DRV_LET","'%s'",TS_WIN_DRV);
-  DefinePrintF("TS_IMG_DRV_LET","'%s'",TS_IMG_DRV);
   DefinePrintF("TS_CDROM_DRV_LET","'%s'",TS_CDROM_DRV);
+
 } TSInit2;
+
+Bool	ts_has_main_drv =ToBool(StrLen(TS_MAIN_DRV)),
+	ts_has_bak_drv	=ToBool(StrLen(TS_BAK_DRV)),
+	ts_has_ram_drv	=ToBool(StrLen(TS_BAK_DRV)),
+	ts_has_win_drv	=ToBool(StrLen(TS_WIN_DRV)),
+	ts_has_cdrom_drv=ToBool(StrLen(TS_CDROM_DRV));
 
 if (ts_has_main_drv)
   SetDrvTextAttr(TS_MAIN_DRV_LET, WHITE <<4|BLUE);
@@ -184,20 +181,21 @@ if (ts_has_ram_drv)
   SetDrvTextAttr(TS_RAM_DRV_LET,  BLUE	<<4|YELLOW);
 if (ts_has_win_drv)
   SetDrvTextAttr(TS_WIN_DRV_LET,  LTRED <<4|BLACK);
-if (ts_has_img_drv)
-  SetDrvTextAttr(TS_IMG_DRV_LET,  BLUE	<<4|LTRED);
 if (ts_has_cdrom_drv)
   SetDrvTextAttr(TS_CDROM_DRV_LET,LTGRAY<<4|BLUE);
 
-#define TS_ISO_NAME TS_RAM_DRV ":/TempleOSCD.ISO"
+#define TS_ISO_NAME		TS_RAM_DRV ":/TempleOSCD.ISO"
+#define TS_DISTRO_DIR		TS_RAM_DRV ":/Distro"
 
 #define CFG_OPTS	"ProtectLow\nAutoMountIDE\nDT\n"
-#define CFG_DBG_OPTS	"ProtectLow\nAutoMountIDE\nDTDet\nHeapInit\n130\nMemInit\n131\nVarInit\n132\n\n"
-#define CFG_DBGZ_OPTS	"ProtectLow\nAutoMountIDE\nDTDet\nHeapInit\n0\nMemInit\n0\nVarInit\n0\n\n"
+#define CFG_DBG_OPTS	"ProtectLow\nAutoMountIDE\nDT"\
+			"Det\nHeapInit\n130\nMemInit\n131\nVarInit\n132\n\n"
+#define CFG_DBGZ_OPTS	"ProtectLow\nAutoMountIDE\nDT"\
+			"Det\nHeapInit\n0\nMemInit\n0\nVarInit\n0\n\n"
 
 #define TS_CFG		CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS CFG_ACCT CFG_DSK_CACHE CFG_OPTS
 #define TS_MENU_CFG	CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS "\n\n"  CFG_DSK_CACHE CFG_OPTS
-#define TS_CDROM_CFG	"b10x20000\nt3 \n\nTS\n\nAutoMountIDE\nDT\n"
+#define TS_CDROM_CFG	"b1\n0x20000\nt3 \n\nTS\n\nAutoMountIDE\nDT\n"
 
 //$BK,1$Change these, too...$BK,0$
 //$MA+A-X+PU,"STD_DISTRO_CDROM_CFG","F(\"STD_DISTRO_CDROM_CFG\");View;"$
@@ -221,12 +219,12 @@ public U0 MyScreenShot(I64 bits=4)
   U8 *st;
   CDirEntry *tempm;
   I64 cnt=0;
-  tempm=FilesFind("::/Temp/ScreenShots/*.BMP");
+  tempm=FilesFind("::/Temp/ScreenShots/*.BMP.Z");
   while (tempm) {
     cnt++;
     tempm=tempm->next;
   }
-  st=MSPrintF("::/Temp/ScreenShots/SCRN%04d.BMP",cnt);
+  st=MSPrintF("::/Temp/ScreenShots/SCRN%04d.BMP.Z",cnt);
   BMPFileCaptureScreen(st,bits);
   Free(st);
   Beep;
@@ -249,7 +247,7 @@ Boot Windows
  Download "ffmpeg" from the Internet
  
  >CD SCREENSHOTS
- >TSZ -expand .
+ >TSZ .
  >ffmpeg -r 8 -i VID%05d.BMP -y Movie.avi
 
 */
@@ -288,7 +286,7 @@ U0 CopyVideo()
 {
   if (ts_has_bak_drv) {
     Del(TS_BAK_DRV ":/Temp/*.SND");
-    SndFileCreate(TS_BAK_DRV ":/Temp/Audio",0.23,0.0,WF_NULL,0.45,0.35);
+    SndFileCreate(TS_BAK_DRV ":/Temp/Audio",0.23,0.0,WF_SQUARE,0.45,0.35);
     DelTree(TS_BAK_DRV ":/Temp/ScreenShots");
     CopyTree("::/Temp/ScreenShots",TS_BAK_DRV ":/Temp/ScreenShots");
   }
@@ -327,25 +325,6 @@ U0 CtrlAltS(I64)
   Spawn(&ScreenShotTask);
 }
 SetCtrlAltLetCB('S',&CtrlAltS,"Cmd/Screen Shot");
-
-public U0 Abbr(U8 *word,U8 *abbr)
-{
- U8 buf1[136],buf2[136];
- StrCpy(buf1,word);
- StrCpy(buf2,abbr);
-
- StrUtil(buf1,SUF_TO_LOWER);
- StrUtil(buf2,SUF_TO_LOWER);
- Grep(buf1,"/TempleOS/"FILENAME_MASK_TXT,"-l-i",buf2);
-
- *buf1=ToUpper(*buf1);
- *buf2=ToUpper(*buf2);
- Grep(buf1,"/TempleOS/"FILENAME_MASK_TXT,"-l-i",buf2);
-
- StrUtil(buf1,SUF_TO_UPPER);
- StrUtil(buf2,SUF_TO_UPPER);
- Grep(buf1,"/TempleOS/"FILENAME_MASK_TXT,"-l-i",buf2);
-}
 
 public U0 ChkAll()
 {

@@ -20,7 +20,7 @@ U0 Song()
   SetWinHorz(Fs->win_left,Fs->win_right,task);
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
   while (!ScanKey) {
-	Play("W13sBBBBqCq.BeAqBh.A",
+	Play("3sBBBBqCq.BeAqBh.A",
 		"Can't \0 \0 \0 \0get \0there, \0from \0he\0re.\n\0");
 	Play("M2/4");
 	Play("eECqAM4/4");
@@ -28,9 +28,9 @@ U0 Song()
 		"Can't \0 \0 \0 \0get \0there, \0from \0he\0re.\n\0");
 	Play("M2/4");
 	Play("eDDqDM4/4");
-	Play("DeEDqG!CeF2G3qG!!sFGFG!!eD!C",
+	Play("DeEDqGCeF2G3qGsFGFGeDC",
 		"Oh, \0my \0 \0God, \0some\0thing's... \0 \0 \0ver\0 \0y \0 \0wrong!\n\0 \0");
-	Play("qDeEDqG!CeF2G3qG!!sFGFG!!eD!C",
+	Play("qDeEDqGCeF2G3qGsFGFGeDC",
 		"Oh, \0my \0 \0God, \0some\0thing's... \0 \0 \0ver\0 \0y \0 \0wrong!\n\0 \0");
   }
   } catch

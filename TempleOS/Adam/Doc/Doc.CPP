@@ -2,7 +2,6 @@
 #help_file "::/TempleOS/Doc/Doc"
 
 //See $LK-A,"::/TempleOS/Doc/Doc.TXT"$
-
 extern I64 EdLeftClickLink(CDoc *doc,CDocEntry *doc_e);
 extern I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e);
 extern U0 DocPutSPartial(CDoc *doc,U8 *st);
@@ -10,10 +9,10 @@ extern U0 DocFormBackward(CDoc *doc,Bool giveup=FALSE);
 extern U0 EdUndoFilter(CDoc *doc);
 
 U0 DocInit()
-{
-  DefineLstLoad("ST_DOC_CMDS","TX\0CR\0SR\0CU\0TB\0CL\0PB\0DA\0PL\0LM\0RM\0HD\0FO\0ID\0"
-	"FG\0BG\0FD\0BD\0F2\0FL\0FM\0FA\0FH\0FE\0FU\0FB\0FY\0FR\0FC\0FQ\0"
-	"WW\0UL\0IV\0BK\0SX\0SY\0CM\0AN\0LK\0BT\0"
+{ //$LK,"CMD Defines","MN:DOCT_TEXT"$
+  DefineLstLoad("ST_DOC_CMDS",
+	"TX\0CR\0SR\0CU\0TB\0CL\0PB\0DA\0PL\0LM\0RM\0HD\0FO\0ID\0"
+	"FG\0BG\0FD\0BD\0PT\0WW\0UL\0IV\0BK\0SX\0SY\0CM\0AN\0LK\0BT\0"
 	"CB\0MA\0MU\0HX\0HS\0HE\0TR\0SP\0IB\0IT\0IS\0BP\0SO\0HL\0LP\0CC\0HI\0HV\0HC\0ER\0");
   DefineLstLoad("ST_DOC_FLAGS",
 //flags1

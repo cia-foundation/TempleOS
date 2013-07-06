@@ -1,5 +1,22 @@
 //This uses $LK,"fixed-point","FI:::/TempleOS/Demo/Lectures/FixedPoint.CPP"$.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$SP+BP,"<1>",1,"::/TempleOS/Demo/Graphics/Camp.CPP.Z,6"$ //Pointer to sprite <6> in Camp.CPP.Z file
+
 #define NUM_CLOUDS		16
 #define SKY_LINES		30
 #define CLOUD_PTS		512
@@ -22,11 +39,11 @@ class CloudPen
 
 CDC *cloud_pen;
 
-I64 mp_done_flags;
+I64 mp_not_done_flags;
 U0 MPDrawClouds(CTask *task)
 {
   Cloud *c;
-  CDC *dc=DCAlias(gr_dc,task);
+  CDC *dc=DCAlias(gr_dc2,task);
   I64 i,j,k,xx,yy,
      lo= Gs->num   *CLOUD_PTS/mp_cnt,
      hi=(Gs->num+1)*CLOUD_PTS/mp_cnt;
@@ -54,17 +71,17 @@ U0 MPDrawClouds(CTask *task)
       GrBlot(dc,xx,yy,cloud_pens[i&(CLOUD_PENS-1)].img);
     }
   DCDel(dc);
-  LBts(&mp_done_flags,Gs->num);
+  LBtr(&mp_not_done_flags,Gs->num);
 }
 
-U0 DrawIt(CTask *task,CDC *)
+U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i;
-  mp_done_flags=0;
-  for (i=1;i<mp_cnt;i++)
-    MPJob(&MPDrawClouds,task,i);
-  MPDrawClouds(task);
-  while (mp_done_flags!=1<<mp_cnt-1)
+  SpritePlot3(dc,0,SKY_LINES*FONT_HEIGHT,0,$IB,"<1>",1$);
+  mp_not_done_flags=1<<mp_cnt-1;
+  for (i=0;i<mp_cnt;i++)
+    JobQue(&MPDrawClouds,task,i);
+  while (mp_not_done_flags)
     Yield;
 }
 
@@ -152,10 +169,10 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-    Play("W13qBetDA2G3qD2sG!3E2G!3EetCEDqFEeDC");
-    Play("qBetDA2G3qD2sG!3E2G!3EetCEDqFEeDC");
-    Play("C!GqDeADsDCDCqGEetDAD!2sG3D2G!!3D");
-    Play("eC!GqDeADsDCDCqGEetDAD!2sG3D2G!!3D");
+    Play("3qBetDA2G3qD2sG3E2G3EetCEDqFEeDC");
+    Play("qBetDA2G3qD2sG3E2G3EetCEDqFEeDC");
+    Play("CGqDeADsDCDCqGEetDAD2sG3D2G3D");
+    Play("eCGqDeADsDCDCqGEetDAD2sG3D2G3D");
   }
 }
 
@@ -163,24 +180,24 @@ U0 CloudScene()
 {
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   try {
-    Fs->song_task=Spawn(&SongTask,NULL,"Song",Fs);
+    Fs->text_attr=YELLOW<<4+BLUE;
+    Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
     DocCursor;
     WinMax;
+    WinBorder;
     WordStat;
     Init;
-    Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",Fs);
+    Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
 
-    "$$CL$$$$BG,LTCYAN$$"; NewLine(SKY_LINES);
-    "$$BG,YELLOW$$";
-    NewLine(5);
+    DocClear;
+    "$$BG,LTCYAN$$"; NewLine(SKY_LINES);
+    "$$BG,YELLOW$$"; NewLine(5);
     PutBibleVerse("Exodus,14:19",7);
 
     Preempt(OFF);
     Fs->draw_it=&DrawIt;
     GetChar;
     WinMgrSync;
-
-    "$$BG$$\n";
   } catch
     CatchAll;
   SettingsPop;

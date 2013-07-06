@@ -28,12 +28,12 @@ offset(CSprite.linespeed)-offset(CSprite.start), //GRST_BITMAP8
 1,
 offset(CSprite.st)-offset(CSprite.start), //GRST_TEXT
 offset(CSprite.sides)-offset(CSprite.start), //GRST_ELLIPSE
-sizeof(CSprite)-offset(CSprite.start), //GRST_REG_POLY
+sizeof(CSprite)-offset(CSprite.start), //GRST_POLYGON
 offset(CSprite.linespeed)-offset(CSprite.start), //GRST_PLANAR_SYMMETRY
 2+offset(CSprite.dither_color8)-offset(CSprite.start), //GRST_DITHER_COLOR8
 offset(CSprite.sides)-offset(CSprite.start), //GRST_ROTATED_RECT
 offset(CSprite.x2)-offset(CSprite.start), //GRST_MESH
-offset(CSprite.shiftable_triangle_cnt)+sizeof(I32)-offset(CSprite.start), //GRST_SHIFTABLE_MESH
+offset(CSprite.shiftable_tri_cnt)+sizeof(I32)-offset(CSprite.start), //GRST_SHIFTABLE_MESH
 offset(CSprite.x1)-offset(CSprite.start), //GRST_TRANSFORM_ON
 offset(CSprite.x1)-offset(CSprite.start), //GRST_TRANSFORM_OFF
 offset(CSprite.linespeed)-offset(CSprite.start), //GRST_ARROW
@@ -68,12 +68,12 @@ offset(CSprite.linespeed), //GRST_BITMAP8
 1,
 offset(CSprite.st), //GRST_TEXT
 offset(CSprite.sides), //GRST_ELLIPSE
-sizeof(CSprite), //GRST_REG_POLY
+sizeof(CSprite), //GRST_POLYGON
 offset(CSprite.linespeed), //GRST_PLANAR_SYMMETRY
 2+offset(CSprite.dither_color8), //GRST_DITHER_COLOR8
 offset(CSprite.sides), //GRST_ROTATED_RECT
 offset(CSprite.x2), //GRST_MESH
-offset(CSprite.shiftable_triangle_cnt)+sizeof(I32), //GRST_SHIFTABLE_MESH
+offset(CSprite.shiftable_tri_cnt)+sizeof(I32), //GRST_SHIFTABLE_MESH
 offset(CSprite.x1), //GRST_TRANSFORM_ON
 offset(CSprite.x1), //GRST_TRANSFORM_OFF
 offset(CSprite.linespeed), //GRST_ARROW
@@ -107,10 +107,10 @@ I64 SpriteElemSize(CSprite *tempg)
       i+=tempg->num*sizeof(CD3I32);
       break;
     case GRST_MESH:
-      i+=tempg->vertex_cnt*sizeof(CD3I32)+tempg->triangle_cnt*sizeof(CMeshTri);
+      i+=tempg->vertex_cnt*sizeof(CD3I32)+tempg->tri_cnt*sizeof(CMeshTri);
       break;
     case GRST_SHIFTABLE_MESH:
-      i+=tempg->shiftable_vertex_cnt*sizeof(CD3I32)+tempg->shiftable_triangle_cnt*sizeof(CMeshTri);
+      i+=tempg->shiftable_vertex_cnt*sizeof(CD3I32)+tempg->shiftable_tri_cnt*sizeof(CMeshTri);
       break;
   }
   return i;
@@ -171,7 +171,7 @@ public U8 *Sprite2Text(CSprite *tempg)
 { //Study $LK-A,"::/TempleOS/Demo/Graphics/SpriteText.CPP"$.
   U8 buf[256],buf2[256],buf3[136];
   I32 *ptr;
-  SPrintF(buf,"%Z",tempg->type,"ST_CSPRITE_TYPES");
+  SPrintF(buf,"%Z",tempg->type,"ST_SPRITE_TYPES");
   *buf2=0;
   switch (tempg->type) {
     case GRST_COLOR8:
@@ -212,7 +212,7 @@ public U8 *Sprite2Text(CSprite *tempg)
       SPrintF(buf2," %d %d,%d",tempg->num,ptr[0],ptr[1]);
       break;
     case GRST_ELLIPSE:
-    case GRST_REG_POLY:
+    case GRST_POLYGON:
     case GRST_BITMAP8:
       SPrintF(buf2," %dW,%dH:%d,%d",
 	  tempg->width,tempg->height,tempg->x2,tempg->y2);
@@ -224,10 +224,10 @@ public U8 *Sprite2Text(CSprite *tempg)
       SPrintF(buf2," %d",tempg->num);
       break;
     case GRST_MESH:
-      SPrintF(buf2," %dV,%dT",tempg->vertex_cnt,tempg->triangle_cnt);
+      SPrintF(buf2," %dV,%dT",tempg->vertex_cnt,tempg->tri_cnt);
       break;
     case GRST_SHIFTABLE_MESH:
-      SPrintF(buf2," %dV,%dT",tempg->shiftable_vertex_cnt,tempg->shiftable_triangle_cnt);
+      SPrintF(buf2," %dV,%dT",tempg->shiftable_vertex_cnt,tempg->shiftable_tri_cnt);
       break;
   }
   StrCat(buf,buf2);

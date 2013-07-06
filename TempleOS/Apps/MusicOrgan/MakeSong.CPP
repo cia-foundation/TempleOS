@@ -4,9 +4,8 @@ class MakeSongSettings
   Bool normal_rhythms		fmtstr "$$CB,\"Normal Rhythms\"$$\n";
   Bool complex_rhythms		fmtstr "$$CB,\"Complex Rhythms\"$$\n";
   Bool rests			fmtstr "$$CB,\"Rests\"$$\n";
-  Bool change_waveforms	fmtstr "$$CB,\"Change Waveforms\"$$\n";
   Bool six_eight		fmtstr "$$CB,\"Six Eight\"$$\n";
-  I64	 octave			fmtstr "$$DA-T,32,\"Octave:%d\"$$\n";
+  I64  octave			fmtstr "$$DA-T,32,\"Octave:%d\"$$\n";
 };
 
 U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
@@ -60,14 +59,12 @@ U8 *MakeSong()
 {
   MakeSongSettings mss;
   U8 *buf;
-  I64 i,j=0,k,n,k2,duration,last_duration=-1,
-     wf[2],w=0,len;
+  I64 i,j=0,k,n,k2,duration,last_duration=-1,len;
 
   mss.simple_rhythms=FALSE;
   mss.normal_rhythms=TRUE;
   mss.complex_rhythms=FALSE;
   mss.rests=FALSE;
-  mss.change_waveforms=FALSE;
   mss.octave=music_octave;
 
   if (!PopUpForm(&mss,"MakeSongSettings"))
@@ -81,18 +78,6 @@ U8 *MakeSong()
   else
     progress4_max=8;
 
-  n=TimerPickedNi$WW,0$bble/2;
-  if (WF_NULL<n<WF_NOISE)
-    wf[0]=n;
-  else
-    wf[0]=WF_SQUARE;
-
-  n=TimerPickedNibble/2;
-  if (WF_NULL<n<WF_NOISE)
-    wf[1]=n;
-  else
-    wf[1]=wf[0];
-
   buf[j++]='0'+music_octave;
   if (mss.six_eight) {
     len=6;
@@ -102,18 +87,7 @@ U8 *MakeSong()
     buf[j++]='8';
   } else
     len=8;
-  if (mss.change_waveforms) {
-    buf[j++]='W';
-    buf[j++]='0'+wf[w++&1];
-  }
   for (i=0;i<len;i++) {
-    if (mss.change_waveforms) {
-      if (TimerPickedNibble<6) {
-	buf[j++]='W';
-	buf[j++]='0'+wf[w++&1];
-      }
-    }
-
     n=TimerPickedNibble<<4+TimerPickedNibble;
     if (mss.complex_rhythms)
       duration=complex_songs[n%9];

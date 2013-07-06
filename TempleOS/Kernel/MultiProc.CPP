@@ -80,7 +80,7 @@ USE64
 }
 
 U0 TSSBusy(I64 tr,Bool val=OFF)
-{
+{ //See $LK-A,"::/TempleOS/Demo/Lectures/Ring3.CPP"$.
   LBEqu((&sys_gdttab)(U8 *)+tr+4,9,val);
 }
 
@@ -124,16 +124,9 @@ CTSS *TSSNew(I64 cpu_num)
   return tss;
 }
 
-U0 MPCmdCtrlInit(CMPCmdCtrl *ctrl)
-{
-  MemSet(ctrl,0,sizeof(CMPCmdCtrl));
-  QueInit(ctrl);
-  ctrl->next_done=ctrl->last_done=&ctrl->next_done;
-}
-
 CTask *TaskIdleInit()
 {
-  CTask *task=Spawn(0,NULL,"Idle Task",Fs,,0);
+  CTask *task=Spawn(0,NULL,"Idle Task",,Fs,,0);
   Bts(&task->task_flags,TASKf_IDLE);
   return task;
 }
@@ -144,7 +137,6 @@ CCPU *CPUStructInit(I64 num,CCPU *c)
   c->addr=c;
   c->num=num;
   c->idle_factor=0.01;
-  MPCmdCtrlInit(&c->cmd_ctrl);
   if (num)
     c->idle_task=TaskIdleInit;
   else
@@ -158,7 +150,7 @@ U0 MPInt(U8 num,I64 cpu_num=1)
     if (!Bt(&sys_run_level,RLf_MP))
       return;
     else
-      throw(EXCEPT_MULTICORE,0);
+      throw(EXCEPT_MULTICORE,1);
   }
   PushFD;
   Cli; //multitasking safe because each core has a local apic and IRQ's are off
@@ -191,22 +183,22 @@ U0 MPHalt()
   BusyWait(10000);
 }
 
-U0 MPWake(I64 target_cpu_mask)
+U0 MPWake(I64 target_cpu)
 {
-  I64 i;
-  target_cpu_mask&=1<<mp_cnt-1;
-  Btr(&target_cpu_mask,Gs->num);
-  PushFD;
-  Cli;
-  for (i=Bsf(target_cpu_mask);target_cpu_mask;i++)
-    if (Btr(&target_cpu_mask,i)) {
-      if (Bt(&cpu_structs[i].cpu_flags,CPUf_SETH_SLEEP))
-	cpu_structs[i].seth_task->wake_jiffy=0;
-      MPInt(I_WAKE,i);
-      if (Bt(&cpu_structs[i].cpu_flags,CPUf_SETH_SLEEP)) //In case went back to sleep
-	cpu_structs[i].seth_task->wake_jiffy=0;
-    }
-  PopFD;
+  if (0<=target_cpu<mp_cnt) {
+    PushFD;
+    Cli;
+    if (Bt(&cpu_structs[target_cpu].cpu_flags,CPUf_SETH_SLEEP))
+      cpu_structs[target_cpu].seth_task->wake_jiffy=0;
+    if (!target_cpu)
+      LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
+    MPInt(I_WAKE,target_cpu);
+    if (!target_cpu)
+      LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
+    if (Bt(&cpu_structs[target_cpu].cpu_flags,CPUf_SETH_SLEEP)) //In case went back to sleep
+      cpu_structs[target_cpu].seth_task->wake_jiffy=0;
+    PopFD;
+  }
 }
 
 U0 MPAPICInit()
@@ -231,148 +223,88 @@ U0 MPAPICInit()
   }
 }
 
-#assert !offset(CMPCmdCtrl.next_waiting)
-
-Bool MPCmdCtrlDo(CMPCmdCtrl *ctrl)
-{ //Called while locked
-  CMPCmd *tempm=ctrl->next_waiting;
-  while (tempm!=ctrl && !Bt(&tempm->target_cpu_mask,Gs->num))
-    tempm=tempm->next;
-  if (tempm!=ctrl) {
-    QueRem(tempm);
-    LBts(&tempm->flags,MPCf_DISPATCHED);
-    tempm->handler_cpu=Gs->num;
-    LBtr(&ctrl->flags,MPCCf_LOCKED);
-    switch (tempm->cmd_code) {
-      case MPCT_CALL:
-	tempm->result=(*tempm->add)(tempm->data);
-	Preempt(OFF);
-	Sti;
-	break;
-      case MPCT_SPAWN_TASK:
-	if (tempm->desc)
-	  tempm->task=Spawn(tempm->add,tempm->data,tempm->desc);
-	else
-	  tempm->task=Spawn(tempm->add,tempm->data,"MP Job");
-	break;
-    }
-    if (Bt(&tempm->flags,MPCf_FREE_ON_COMPLETE)) {
-      Free(tempm->desc);
-      Free(tempm);
-    } else {
-      while (LBts(&ctrl->flags,MPCCf_LOCKED))
-	Yield;
-      QueIns(tempm,ctrl->last_done);
-      LBts(&tempm->flags,MPCf_DONE);
-      LBtr(&ctrl->flags,MPCCf_LOCKED);
-    }
-    return TRUE;
-  } else {
-    LBtr(&ctrl->flags,MPCCf_LOCKED);
-    return FALSE;
-  }
-}
+#assert !offset(CSrvCtrl.next_waiting)
 
 U0 MPSethServerTask()
 {
-  CMPCmdCtrl *my_ctrl=&Gs->cmd_ctrl;
+  CSrvCtrl *my_ctrl=&Fs->srv_ctrl;
+  CSrvCmd *tempc,*tempc1=&my_ctrl->next_waiting;
   Sti;
   while (TRUE) {
     TaskFinishOffDying;
-    if (!LBts(&my_ctrl->flags,MPCCf_LOCKED) &&
-	!MPCmdCtrlDo(my_ctrl) && //Jobs for this core are highest priority.
-	!LBts(&mp_ctrl->flags,MPCCf_LOCKED))
-	MPCmdCtrlDo(mp_ctrl);
-    if (my_ctrl->next_waiting==my_ctrl &&
-	mp_ctrl->next_waiting==mp_ctrl) {
-      LBts(&Gs->cpu_flags,CPUf_SETH_SLEEP);
-      Sleep(20); //We don't want this too long because of need for $LK,"TaskFinishOffDying","MN:TaskFinishOffDying"$().
-      LBtr(&Gs->cpu_flags,CPUf_SETH_SLEEP);
+    if (!LBts(&my_ctrl->flags,SVCRf_LOCKED)) {
+      tempc=tempc1->next;
+      //Jobs for this core are highest priority.
+      if (tempc==tempc1 || !SrvCmdRun(tempc,GetFlags)) {
+	LBtr(&my_ctrl->flags,SVCRf_LOCKED) ;
+	if (my_ctrl->next_waiting==my_ctrl) {
+	  LBts(&Gs->cpu_flags,CPUf_SETH_SLEEP);
+	  Sleep(20); //We don't want this too long because of need for $LK,"TaskFinishOffDying","MN:TaskFinishOffDying"$().
+	  LBtr(&Gs->cpu_flags,CPUf_SETH_SLEEP);
+	}
+      }
     }
   }
 }
 
-CMPCmd *MPQueJob(I64 (*fp_add)(U8 *data),U8 *data=NULL,
-       U8 *desc=NULL,
-       I64 flags=1<<MPCf_FREE_ON_COMPLETE,
-       Bool spawn=FALSE,I64 target_cpu_mask=ALL_MASK)
+CSrvCmd *JobQue(I64 (*fp_add)(U8 *data),U8 *data=NULL,
+       I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
+       I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
+//This is to queue multicore jobs, handled by Seth tasks.
+//Set flags to zero if you wish to get the result.
 {
-  I64 i=Bsf(target_cpu_mask);
-  CMPCmdCtrl *ctrl;
-  CMPCmd *tempm;
-  if (mp_cnt<2 || i<0) throw(EXCEPT_MULTICORE,1);
-  tempm=ACAlloc(sizeof(CMPCmd));
-  if (desc)
-    tempm->desc=AStrNew(desc);
-  if (spawn)
-    tempm->cmd_code=MPCT_SPAWN_TASK;
-  else
-    tempm->cmd_code=MPCT_CALL;
-  tempm->add=fp_add;
-  tempm->data=data;
-  tempm->target_cpu_mask=target_cpu_mask;
-  tempm->flags=flags;
-  if (i==Bsr(target_cpu_mask))
-    tempm->ctrl=ctrl=&cpu_structs[i].cmd_ctrl;
-  else
-    tempm->ctrl=ctrl=mp_ctrl;
+  CSrvCtrl *ctrl;
+  CSrvCmd *tempc;
+  if (!(0<=target_cpu<mp_cnt))
+    throw(EXCEPT_MULTICORE,2);
+  tempc=ACAlloc(sizeof(CSrvCmd));
+  if (aux_str)
+    tempc->aux_str=AStrNew(aux_str);
+  tempc->cmd_code=cmd_code;
+  tempc->add=fp_add;
+  tempc->fun_arg=data;
+  tempc->target_cpu=target_cpu;
+  tempc->flags=flags;
+  tempc->aux1=aux1;
+  tempc->aux2=aux2;
+  tempc->ctrl=ctrl=&cpu_structs[target_cpu].seth_task->srv_ctrl;
   PushFD;
   Cli;
-  while (LBts(&ctrl->flags,MPCCf_LOCKED))
+  while (LBts(&ctrl->flags,SVCRf_LOCKED))
     Yield;
-  QueIns(tempm,ctrl->last_waiting);
-  LBtr(&ctrl->flags,MPCCf_LOCKED);
+  QueIns(tempc,ctrl->last_waiting);
+  LBtr(&ctrl->flags,SVCRf_LOCKED);
   PopFD;
-  MPWake(target_cpu_mask);
-  return tempm;
+  MPWake(target_cpu);
+  return tempc;
 }
 
-CMPCmd *MPJob(I64 (*fp_add)(U8 *data),U8 *data=NULL,
-       I64 target_cpu=1,I64 flags=1<<MPCf_FREE_ON_COMPLETE)
-//Set flags to zero if you wish to
-//get the result.
-{
-  return MPQueJob(fp_add,data,NULL,flags,FALSE,1<<target_cpu);
-}
-
-I64 MPJobResult(CMPCmd *tempm)
-{
-  I64 result;
-  CMPCmdCtrl *ctrl=tempm->ctrl;
-  if (mp_cnt<2) throw(EXCEPT_MULTICORE,2);
-  while (!Bt(&tempm->flags,MPCf_DONE))
-    Yield;
-  PushFD;
-  Cli;
-  while (LBts(&ctrl->flags,MPCCf_LOCKED))
-    Yield;
-  QueRem(tempm);
-  LBtr(&ctrl->flags,MPCCf_LOCKED);
-  PopFD;
-  result=tempm->result;
-  Free(tempm->desc);
-  Free(tempm);
-  return result;
-}
-
-CTask *MPSpawn(U0 (*fp_add)(U8 *data),U8 *data=NULL,U8 *name=NULL,I64 target_cpu=1)
+CTask *SpawnQue(U0 (*fp_add)(U8 *data),U8 *data=NULL,
+	    U8 *task_name=NULL,
+	    I64 target_cpu,
+	    CTask *parent=NULL, //NULL means adam
+	    I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
 {
   CTask *result;
-  CMPCmd *tempm=MPQueJob(fp_add,data,name,0,TRUE,1<<target_cpu);
-  CMPCmdCtrl *ctrl;
-  while (!Bt(&tempm->flags,MPCf_DONE))
+  CSrvCmd *tempc=JobQue(fp_add,data,target_cpu,flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
+  CSrvCtrl *ctrl;
+
+  while (!Bt(&tempc->flags,SVCf_DONE)) {
+    LBts(&Fs->task_flags,TASKf_IDLE);
     Yield;
-  result=tempm->task;
-  ctrl=tempm->ctrl;
+  }
+  LBtr(&Fs->task_flags,TASKf_IDLE);
+
+  result=tempc->spawned_task;
+  ctrl=tempc->ctrl;
   PushFD;
   Cli;
-  while (LBts(&ctrl->flags,MPCCf_LOCKED))
+  while (LBts(&ctrl->flags,SVCRf_LOCKED))
     Yield;
-  QueRem(tempm);
-  LBtr(&ctrl->flags,MPCCf_LOCKED);
+  QueRem(tempc);
+  LBtr(&ctrl->flags,SVCRf_LOCKED);
   PopFD;
-  Free(tempm->desc);
-  Free(tempm);
+  SrvCmdDel(tempc);
   return result;
 }
 
@@ -383,18 +315,6 @@ U0 MPCPUTaskInit()
   Fs->rip=&MPSethServerTask;
   Fs->time_slice_start=GetTimeStamp;
   TaskContextRestore;
-}
-
-U0 MPCmdQueDel(CMPCmd *root)
-{
-  CMPCmd *tempm=root->next,*tempm1;
-  while (tempm!=root) {
-    tempm1=tempm->next;
-    QueRem(tempm);
-    Free(tempm->desc);
-    Free(tempm);
-    tempm=tempm1;
-  }
 }
 
 U0 MPStart()
@@ -420,11 +340,9 @@ U0 MPStart()
     MPHalt; //sets mp_cnt to 1
     for (i=1;i<my_mp_cnt;i++) {
       c=&cpu_structs[i];
-      MPCmdQueDel(&c->cmd_ctrl.next_waiting);
-      MPCmdQueDel(&c->cmd_ctrl.next_done);
+      SrvCmdQueDel(&c->seth_task->srv_ctrl.next_waiting);
+      SrvCmdQueDel(&c->seth_task->srv_ctrl.next_done);
     }
-    MPCmdQueDel(&mp_ctrl->next_waiting);
-    MPCmdQueDel(&mp_ctrl->next_done);
   }
   MemSet(&cpu_structs[1],0,sizeof(CCPU)*(MP_MAX_PROCESSORS-1));
 
@@ -457,10 +375,8 @@ U0 MPStart()
 
   for (i=1;i<my_mp_cnt;i++) {
     c =&cpu_structs[i];
-    //SPrintF not available yet.
-    StrCpy(buf,"Seth Task CPU#0");
-    buf[14]+=i;
-    task=Spawn(&MPCPUTaskInit,NULL,buf,NULL,SETH_STK,0);
+    SPrintF(buf,"Seth Task CPU#%d",i);
+    task=Spawn(&MPCPUTaskInit,NULL,buf,,,SETH_STK,0);
     task->rflags=SYS_START_RFLAGS;
     //$LK,"CTask","MN:CTask"$ allocated off this core's seth_task's heap (Which is Adam)
     task->task_in_que_signature=TASK_IN_QUE_SIGNATURE_VAL;
@@ -489,9 +405,6 @@ U0 MPInit()
 
   mp_cnt_initial=mp_cnt=1;
   mp_cnt_lock=0;
-
-  mp_ctrl=AMAlloc(sizeof(CMPCmdCtrl));
-  MPCmdCtrlInit(mp_ctrl);
 
   mp_crash=ACAlloc(sizeof(CMPCrash));
 

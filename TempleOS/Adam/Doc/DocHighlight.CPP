@@ -10,7 +10,7 @@ DocHighlightInit;
 
 U32 *DocHighlight(CDoc *doc,Bool full_refresh,CDocEntry *doc_e,CDocSettings **_s,
   U8 *src,I64 len,I64 _temp_u32_attr)
-{ //Be aware of $LK-A,"::/TempleOS/Adam/ToHtml.CPP"$.
+{ //Be aware of $LK-A,"::/TempleOS/Adam/Utils/ToHtml.CPP"$.
   U32 *result=MAlloc((len+1)*sizeof(U32)),*dst=result;
   U8 *ptr,ch,ch1,last_ch;
   CDocSettings *s=*_s;
@@ -28,13 +28,13 @@ hl_normal:
 	    case '/':
 	      if (len>=2) {
 		if (*src=='/') {
-		  temp_u32_attr=(s->comment_attr&15)<<8|mask_temp_u32_attr;
+		  temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
 		  *dst++=ch1+temp_u32_attr;
 		  *dst++=*src++ +temp_u32_attr;
 		  len-=2;
 		  goto hl_cpp_comment;
 		} else if (*src=='*') {
-		  temp_u32_attr=(s->comment_attr&15)<<8|mask_temp_u32_attr;
+		  temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
 		  *dst++=ch1+temp_u32_attr;
 		  *dst++=*src++ +temp_u32_attr;
 		  len-=2;
@@ -44,30 +44,30 @@ hl_normal:
 	      }
 	      break;
 	    case '\'':
-	      temp_u32_attr=(s->quote_attr&15)<<8|mask_temp_u32_attr;
+	      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
 	      *dst++=ch1+temp_u32_attr;
 	      len--;
 	      goto hl_single_quote;
 	    case '\"':
-	      temp_u32_attr=(s->quote_attr&15)<<8|mask_temp_u32_attr;
+	      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
 	      *dst++=ch1+temp_u32_attr;
 	      len--;
 	      goto hl_dbl_quote;
 	    case '(':
 	      if (paren_depth++&1)
-		temp_u32_attr=(s->alt_text_attr&15)<<8|mask_temp_u32_attr;
+		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
 	      break;
 	    case ')':
 	      if (--paren_depth&1)
-		temp_u32_attr=(s->alt_text_attr&15)<<8|mask_temp_u32_attr;
+		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
 	      break;
 	    case '{':
 	      if (brace_depth++&1)
-		temp_u32_attr=(s->alt_text_attr&15)<<8|mask_temp_u32_attr;
+		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
 	      break;
 	    case '}':
 	      if (--brace_depth&1)
-		temp_u32_attr=(s->alt_text_attr&15)<<8|mask_temp_u32_attr;
+		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
 	      break;
 	  }
 	  *dst++=ch1+temp_u32_attr;
@@ -82,9 +82,9 @@ hl_normal:
 	*src=0;
 	if (temph=HashFind(ptr,doc_hash,HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE|HTT_REG)) {
 	  if (temph->type&(HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE))
-	    temp_u32_attr=(s->keyword_attr&15) <<8|mask_temp_u32_attr;
+	    temp_u32_attr=DOC_COLOR_KEYWORD<<8|mask_temp_u32_attr;
 	  else
-	    temp_u32_attr=(s->keyword2_attr&15)<<8|mask_temp_u32_attr;
+	    temp_u32_attr=DOC_COLOR_KEYWORD2<<8|mask_temp_u32_attr;
 	} else
 	  temp_u32_attr=_temp_u32_attr;
 	while (ch1=*ptr++)
@@ -106,7 +106,7 @@ hl_normal_done:
       }
       break;
     case DOCSS_SINGLE_QUOTE:
-      temp_u32_attr=(s->quote_attr&15)<<8|mask_temp_u32_attr;
+      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
 hl_single_quote:
       last_ch=0;
       while (len--) {
@@ -133,7 +133,7 @@ hl_single_quote:
       }
       break;
     case DOCSS_DBL_QUOTE:
-      temp_u32_attr=(s->quote_attr&15)<<8|mask_temp_u32_attr;
+      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
 hl_dbl_quote:
       last_ch=0;
       while (len--) {
@@ -160,7 +160,7 @@ hl_dbl_quote:
       }
       break;
     case DOCSS_COMMENT:
-      temp_u32_attr=(s->comment_attr&15)<<8|mask_temp_u32_attr;
+      temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
       comment_depth=s->comment_depth;
 hl_comment:
       last_ch=0;
@@ -188,7 +188,7 @@ hl_comment:
       }
       break;
     case DOCSS_CPP_Z_COMMENT:
-      temp_u32_attr=(s->comment_attr&15)<<8|mask_temp_u32_attr;
+      temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
 hl_cpp_comment:
       while (len--)
 	*dst++=*src++ +temp_u32_attr;

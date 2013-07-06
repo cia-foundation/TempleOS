@@ -141,14 +141,12 @@ public U0 HashRep(CHashTable *h=NULL,
   CHashSrcSym *temph;
   CHashGeneric *ptr;
   CHashRep *lst;
-  I64 cnt,i,j,k,size,f=0,
-    dbg_bin_num,indent_bin_num;
+  I64 cnt,i,j,k,size,f=0,dbg_bin_num;
   U8 buf[512],*buf4,*last_index=StrNew(""),*cur_index;
-  CDoc *doc,*doc1;
+  CDoc *doc;
   Bool recurse,publics,map,old_preempt=Preempt(OFF);
   CDocBin *tempb;
   CDbgInfo *dbg;
-  CIndentInfo *indent;
 
   GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+p");
   GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),flags);
@@ -175,14 +173,14 @@ public U0 HashRep(CHashTable *h=NULL,
     temph=tempht->next_added;
     while (temph!=tempht) {
       if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	  temph->type & mask &&
-	  (temph->type & HTF_PUBLIC || !publics))
+	    temph->type & mask &&
+	    (temph->type & HTF_PUBLIC || !publics))
 	if (!index)
 	  cnt++;
 	else
 	  if (temph->type&HTG_SRC_SYM &&
-	    (cur_index=temph->index))
-	  cnt+=HelpIndexCnt(cur_index,index);
+		(cur_index=temph->index))
+	    cnt+=HelpIndexCnt(cur_index,index);
       temph=temph->next_added;
     }
     if (recurse)
@@ -199,19 +197,19 @@ public U0 HashRep(CHashTable *h=NULL,
     temph=tempht->next_added;
     while (temph!=tempht) {
       if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	  temph->type & mask &&
-	  (temph->type & HTF_PUBLIC || !publics))
+	    temph->type & mask &&
+	    (temph->type & HTF_PUBLIC || !publics))
 	if (!index)
 	  lst[j++].h=temph;
 	else
 	  if (temph->type&HTG_SRC_SYM &&
-	    (cur_index=temph->index))
-	  if (k=HelpIndexCnt(cur_index,index)) {
-	    while (k--) {
-	      lst[j].index=HelpIndexStr(&cur_index,index);
-	      lst[j++].h=temph;
+		(cur_index=temph->index))
+	    if (k=HelpIndexCnt(cur_index,index)) {
+	      while (k--) {
+		lst[j].index=HelpIndexStr(&cur_index,index);
+		lst[j++].h=temph;
+	      }
 	    }
-	  }
       temph=temph->next_added;
     }
     if (recurse)
@@ -242,24 +240,19 @@ public U0 HashRep(CHashTable *h=NULL,
 	    "$$FG,GREEN$$%s$$FG$$\n",cur_index;
 	}
       }
-    if (index && ptr->type & HTT_HELP_FILE) {
-      if (doc) {
-	doc1=DocRead(ptr->str);
-	DocInsDoc(doc,doc1);
-	DocDel(doc1);
-      } else
-	Type(ptr->str);
-    } else {
+    if (index && ptr->type & HTT_HELP_FILE)
+      DocType(doc,ptr->str);
+    else {
       if (ptr->type&HTG_SRC_SYM && ptr(CHashSrcSym *)->src_link) {
 	buf4=StrNew(ptr(CHashSrcSym *)->src_link);
 	if (mapfile_drv && StrLen(buf4)>4 && buf[1]==':' && buf4[4]==':')
 	  buf4[3]=mapfile_drv;
-	dbg=indent=NULL;
+	dbg=NULL;
 	if (outname && doc && ptr->type & HTT_FUN) {
 	  if (dbg=ptr(CHashFun *)->debug) {
 	    size=offset(CDbgInfo.body)+
-		sizeof(U8 *)*
-		(dbg->max_line-dbg->min_line+2);
+		  sizeof(U8 *)*
+		  (dbg->max_line-dbg->min_line+2);
 	    if (size>MSize(dbg)) {
 	      "Corrupt Map Entry\n";
 	      dbg=NULL;
@@ -277,46 +270,14 @@ public U0 HashRep(CHashTable *h=NULL,
 		dbg=NULL;
 	    }
 	  }
-	  if (indent=ptr(CHashFun *)->indent) {
-	    size=offset(CIndentInfo.body)+
-		sizeof(U8)*
-		(indent->max_line-indent->min_line+2);
-	    if (size>MSize(indent)) {
-	      "Corrupt Indent Entry\n";
-	      indent=NULL;
-	    } else {
-	      if (indent->min_line<=indent->max_line) {
-		tempb=CAlloc(sizeof(CDocBin));
-		tempb->type=DOCBT_INDENTS;
-		tempb->size=size;
-		tempb->data=MAlloc(size);
-		MemCpy(tempb->data,indent,size);
-		indent_bin_num=tempb->num=doc->cur_bin_num++;
-		tempb->use_cnt=1;
-		QueIns(tempb,doc->bin_root.last);
-	      } else
-		indent=NULL;
-	    }
-	  }
 	}
-	if (dbg || indent) {
-	  if (dbg)  {
-	    SPrintF(buf,"$$LK+BI,\"%-26s\",\"%s\",%d$$",
+	if (dbg) {
+	  SPrintF(buf,"$$LK+BI,\"%-26s\",\"%s\",%d$$",
 		ptr->str,buf4,dbg_bin_num);
-	    DocPutS(doc,buf);
-	  }
-	  if (indent) {
-	    if (dbg)
-	      SPrintF(buf,"$$LK+BI,\"\",\"%s\",%d$$",
-		  ptr->str,indent_bin_num);
-	    else
-	      SPrintF(buf,"$$LK+BI,\"%-26s\",\"%s\",%d$$",
-		  ptr->str,buf4,indent_bin_num);
-	    DocPutS(doc,buf);
-	  }
+	  DocPutS(doc,buf);
 	} else {
 	  SPrintF(buf,"$$LK,\"%-26s\",\"%s\"$$",
-	      ptr->str,buf4);
+		ptr->str,buf4);
 	  if (doc)
 	    DocPutS(doc,buf);
 	  else
@@ -370,7 +331,7 @@ public U0 HashRep(CHashTable *h=NULL,
   }
   Free(lst);
 
-end_hash:
+  end_hash:
   Preempt(old_preempt);
   if (doc) {
     DocBinsValidate(doc);
@@ -464,7 +425,7 @@ public U0 DocHelpIndex(CDoc *doc,U8 *index)
 public U0 PopUpHelpIndex(U8 *index,CTask *parent=NULL)
 {
   U8 *buf;
-  buf=MSPrintF("DocHelpIndex(DocCur,\"%s\");View;",index);
+  buf=MSPrintF("DocHelpIndex(DocPut,\"%s\");View;",index);
   PopUp(buf,parent);
   Free(buf);
 }
@@ -479,7 +440,6 @@ public U0 MapFileLoad(U8 *filename)
   CHashSrcSym *temph;
   I64 i,j,base=0;
   CDbgInfo *dbg;
-  CIndentInfo *indent;
 
   FileExtRem(absname);
   if (absname[1]==':' && StrLen(absname)>2 &&
@@ -501,13 +461,12 @@ public U0 MapFileLoad(U8 *filename)
 
 	  ptr=temph->src_link;
 	  if (ptr[0] && ptr[1] && ptr[2]==':' && ptr[3]==':')
-	    ptr[3]=dft_drv;
+	    ptr[3]=*sys_acct;
  
 	  doc_e->aux_str=NULL;
 	}
 	if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
 	  dbg	=temph->debug;
-	  indent=temph->indent;
 	  if (!dbg && doc_e->bin_data && doc_e->bin_data->type==DOCBT_DEBUG_LINES) {
 	    if (dbg=doc_e->bin_data->data) {
 	      if (doc_e->bin_data->size>MSize(dbg))
@@ -520,16 +479,6 @@ public U0 MapFileLoad(U8 *filename)
 		  if (dbg->body[j])
 		    dbg->body[j]=dbg->body[j]+base;
 		}
-	      }
-	    }
-	  }
-	  if (!indent && doc_e->bin_data && doc_e->bin_data->type==DOCBT_INDENTS) {
-	    if (indent=doc_e->bin_data->data) {
-	      if (doc_e->bin_data->size>MSize(indent))
-		"Corrupt Indent Entry\n";
-	      else {
-		doc_e->bin_data->data=NULL;
-		temph->indent=indent;
 	      }
 	    }
 	  }

@@ -5,7 +5,84 @@ public I64 gr_x_offsets[8]={-1, 0, 1,-1,1,-1,0,1},
 	  gr_x_offsets2[4]={ 0,-1, 1, 0},
 	  gr_y_offsets2[4]={-1, 0, 0, 1};
 
-public Bool Line(U8 *aux_data,
+public I64 Line(U8 *aux_data,
+		 I64 x1,I64 y1,I64 z1,
+		 I64 x2,I64 y2,I64 z2,
+		 Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
+		 I64 step=1,I64 start=0)
+{
+//This uses $LK,"fixed-point","FI:::/TempleOS/Demo/Lectures/FixedPoint.CPP"$.
+  I64 i,j,d,dx=x2-x1,dy=y2-y1,dz=z2-z1,_x,_y,_z,
+      adx=AbsI64(dx),ady=AbsI64(dy),adz=AbsI64(dz),result=0;
+  Bool first=TRUE;
+  if (adx>=ady) {
+    if (adx>=adz) {
+      if (d=adx) {
+	if (dx>=0)
+	  dx=0x100000000;
+	else
+	  dx=-0x100000000;
+	dy=dy<<32/d;
+	dz=dz<<32/d;
+      }
+    } else {
+      if (d=adz) {
+	dx=dx<<32/d;
+	dy=dy<<32/d;
+	if (dz>=0)
+	  dz=0x100000000;
+	else
+	  dz=-0x100000000;
+      }
+    }
+  } else {
+    if (ady>=adz) {
+      if (d=ady) {
+	dx=dx<<32/d;
+	if (dy>=0)
+	  dy=0x100000000;
+	else
+	  dy=-0x100000000;
+	dz=dz<<32/d;
+      }
+    } else {
+      if (d=adz) {
+	dx=dx<<32/d;
+	dy=dy<<32/d;
+	if (dz>=0)
+	  dz=0x100000000;
+	else
+	  dz=-0x100000000;
+      }
+    }
+  }
+  x1<<=32; y1<<=32; z1<<=32;
+  for (j=0;j<start;j++) {
+      x1+=dx; y1+=dy; z1+=dz;
+  }
+  if (step!=1 && step!=0) {
+    dx*=step;
+    dy*=step;
+    dz*=step;
+    d/=step;
+  }
+  for (i=start;i<=d;i++) {
+    if (_x!=x1.i32[1] || _y!=y1.i32[1] || _z!=z1.i32[1] || first) {
+      if ((*fp_plot)(aux_data,x1.i32[1],y1.i32[1],z1.i32[1]))
+	result++;
+    }
+    first=FALSE;
+    _x=x1.i32[1]; _y=y1.i32[1]; _z=z1.i32[1];
+    x1+=dx; y1+=dy; z1+=dz;
+  }
+  if (step==1 && (_x!=x2||_y!=y2||_z!=z2)) {
+    if ((*fp_plot)(aux_data,x2,y2,z2))
+      result++;
+  }
+  return result;
+}
+
+public Bool LOSLine(U8 *aux_data,
 		 I64 x1,I64 y1,I64 z1,
 		 I64 x2,I64 y2,I64 z2,
 		 Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
@@ -82,14 +159,14 @@ public Bool Line(U8 *aux_data,
   return TRUE;
 }
 
-public Bool Rect(U8 *aux_data,
+public I64 Rect(U8 *aux_data,
 		I64 x1,I64 y1,I64 z1,
 		I64 x2,I64 y2,I64 z2,
 		I64 x3,I64 y3,I64 z3,
 		Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z))
 {
 //This uses $LK,"fixed-point","FI:::/TempleOS/Demo/Lectures/FixedPoint.CPP"$.
-  I64 i,j,
+  I64 i,j,result=0,
      d1,dx1=x2-x1,dy1=y2-y1,dz1=z2-z1,
      d2,dx2=x3-x1,dy2=y3-y1,dz2=z3-z1,
      adx1=AbsI64(dx1),ady1=AbsI64(dy1),adz1=AbsI64(dz1),
@@ -97,14 +174,28 @@ public Bool Rect(U8 *aux_data,
      last_x,last_y,last_z;
   Bool first=TRUE;
 
-  if (adx1>=ady1)
-    d1=adx1>=adz1 ? adx1:adz1;
-  else
-    d1=ady1>=adz1 ? ady1:adz1;
-  if (adx2>=ady2)
-    d2=adx2>=adz2 ? adx2:adz2;
-  else
-    d2=ady2>=adz2 ? ady2:adz2;
+  if (adx1>=ady1) {
+    if (adx1>=adz1)
+      d1=adx1;
+    else
+      d1=adz1;
+  } else {
+    if (ady1>=adz1)
+      d1=ady1;
+    else
+      d1=adz1;
+  }
+  if (adx2>=ady2) {
+    if (adx2>=adz2)
+      d2=adx2;
+    else
+      d2=adz2;
+  } else {
+    if (ady2>=adz2)
+      d2=ady2;
+    else
+      d2=adz2;
+  }
   d1<<=1;
   d2<<=1;
   if (d1) {
@@ -123,17 +214,16 @@ public Bool Rect(U8 *aux_data,
   for (j=0;j<=d1;j++) {
     x2=x1; y2=y1; z2=z1;
     for (i=0;i<=d2;i++) {
-      if (x2.i32[1]!=last_x || y2.i32[1]!=last_y || z2.i32[1]!=last_z ||first) {
-	if (!(*fp_plot)(aux_data,x2.i32[1],y2.i32[1],z2.i32[1]))
-	  return FALSE;
-      }
+      if ((x2.i32[1]!=last_x || y2.i32[1]!=last_y || z2.i32[1]!=last_z ||first) &&
+	  (*fp_plot)(aux_data,x2.i32[1],y2.i32[1],z2.i32[1]))
+	result++;
       first=FALSE;
       last_x=x2.i32[1]; last_y=y2.i32[1]; last_z=z2.i32[1];
       x2+=dx2; y2+=dy2; z2+=dz2;
     }
     x1+=dx1; y1+=dy1; z1+=dz1;
   }
-  return TRUE;
+  return result;
 }
 
 #help_index "Graphics/Math/3D Transformation"
@@ -471,7 +561,7 @@ public U0 GrLighting(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3,CColorROPU32 color
   v2.z=p3->z-p2->z;
 
 //V1 and V2 are vects along two sides
-//of the triangle joined at p2.
+//of the tri joined at p2.
 
   vn_x=v1.y*v2.z-v1.z*v2.y;
   vn_y=v1.z*v2.x-v1.x*v2.z;
@@ -523,7 +613,7 @@ public U0 GrLighting(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3,CColorROPU32 color
 #define SCALE2	8
 
 #help_index "Graphics/Math"
-public Bool Circle(U8 *aux_data,
+public I64 Circle(U8 *aux_data,
 		I64 cx,I64 cy,I64 cz,
 		I64 radius,
 		Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
@@ -532,9 +622,9 @@ public Bool Circle(U8 *aux_data,
 		F64 len_radians=2*ã)
 {
   I64 i,j,len=Ceil(len_radians*radius),
-      x,y,x1,y1,s1,s2,c;
+      x,y,x1,y1,s1,s2,c,result=0;
   F64 t;
-  if (radius<=0||!step) return TRUE;
+  if (radius<=0||!step) return 0;
   t=1.0/radius;
   c=1<<SCALE1*Cos(t);
   if (step<0) {
@@ -555,18 +645,18 @@ public Bool Circle(U8 *aux_data,
   x<<=SCALE2;
   y<<=SCALE2;
   for (i=0;i<=len;i+=step) {
-    if (!(*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
-      return FALSE;
+    if ((*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
+      result++;
     for (j=0;j<step;j++) {
       x1=(c*x+s1*y)>>SCALE1;
       y1=(s2*x+c*y)>>SCALE1;
       x=x1; y=y1;
     }
   }
-  return TRUE;
+  return result;
 }
 
-public Bool Ellipse(U8 *aux_data,
+public I64 Ellipse(U8 *aux_data,
 		I64 cx,I64 cy,I64 cz,
 		I64 x_radius,I64 y_radius,
 		Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
@@ -576,11 +666,12 @@ public Bool Ellipse(U8 *aux_data,
 		F64 len_radians=2*ã)
 {
   I64 i,j,len,
-      x,y,_x,_y,x1,y1,x2,y2, s1,s2,c, s12,s22,c2;
+      x,y,_x,_y,x1,y1,x2,y2, s1,s2,c, s12,s22,c2,result;
   F64 t;
   Bool first=TRUE;
   if (x_radius<=0 || y_radius<=0 || !step)
-    return TRUE;
+    return 0;
+  result=0;
   if (x_radius>=y_radius) {
     t=1.0/x_radius;
     len=Ceil(len_radians*x_radius);
@@ -621,8 +712,8 @@ public Bool Ellipse(U8 *aux_data,
 
   for (i=0;i<=len;i+=step) {
     if (x>>SCALE2!=_x || y>>SCALE2!=_y || first) {
-      if (!(*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
-	return FALSE;
+      if ((*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
+	result++;
     }
     _x=x>>SCALE2; _y=y>>SCALE2; first=FALSE;
     for (j=0;j<step;j++) {
@@ -635,10 +726,10 @@ public Bool Ellipse(U8 *aux_data,
       y=(s22*x1+c2*y1)>>SCALE1;
     }
   }
-  return TRUE;
+  return result;
 }
 
-public Bool RegPoly(U8 *aux_data,
+public I64 RegPoly(U8 *aux_data,
 		I64 cx,I64 cy,I64 cz,
 		I64 x_radius,I64 y_radius,I64 sides,
 		Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
@@ -649,11 +740,13 @@ public Bool RegPoly(U8 *aux_data,
 {
   I64 i,n,x,y,x1,y1,x2,y2,
     xx1,yy1,xx2,yy2,
-    s1,s2,c, s12,s22,c2;
+    s1,s2,c, s12,s22,c2,result;
   F64 angle_step;
 
   if (sides<=0 || x_radius<=0 || y_radius<=0)
-    return TRUE;
+    return 0;
+
+  result=0;
 
   angle_step=2*ã/sides;
   n=len_radians*sides/(2*ã);
@@ -694,11 +787,10 @@ public Bool RegPoly(U8 *aux_data,
     y=(s22*x1+c2*y1)>>SCALE1;
     xx2=cx+x>>SCALE2;
     yy2=cy+y>>SCALE2;
-    if (!Line(aux_data,xx1,yy1,cz,xx2,yy2,cz,fp_plot,step))
-      return FALSE;
+    result+=Line(aux_data,xx1,yy1,cz,xx2,yy2,cz,fp_plot,step);
     xx1=xx2; yy1=yy2;
   }
-  return TRUE;
+  return result;
 }
 
 #help_index "Graphics/CD3I32;Math/CD3I32"
@@ -718,9 +810,9 @@ public I64 P3I32SqrNorm(CD3I32 *p)
 }
 
 #help_index "Graphics/Math"
-public Bool Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
+public I64 Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
 {//2nd order
-  I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
+  I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max,result=0;
   F64 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z,
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
       x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0,
@@ -729,10 +821,8 @@ public Bool Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
 	     P3I32Dist(&ctrl[2],&ctrl[0]),
 	 s=0.5/d,t1,t2;
   xx=x0; yy=y0; zz=z0;
-  if (first) {
-    if (!(*fp_plot)(aux_data,xx,yy,zz))
-      return FALSE;
-  }
+  if (first && (*fp_plot)(aux_data,xx,yy,zz))
+    result++;
   for (t=0.0;t<=1.0;t+=s) {
     t1=t*(1.0-t);
     t2=t*t;
@@ -752,22 +842,21 @@ public Bool Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
       s*=1.1;
     else {
       s*=0.9;
-      if (!(*fp_plot)(aux_data,x,y,z))
-	return FALSE;
+      if ((*fp_plot)(aux_data,x,y,z))
+	result++;
       xx=x;yy=y;zz=z;
     }
   }
   x=ctrl[2].x; y=ctrl[2].y; z=ctrl[2].z;
-  if (xx!=x || yy!=y || zz!=z) {
-    if (!(*fp_plot)(aux_data,x,y,z))
-      return FALSE;
-  }
-  return TRUE;
+  if ((xx!=x || yy!=y || zz!=z) &&
+      (*fp_plot)(aux_data,x,y,z))
+    result++;
+  return result;
 }
 
-public Bool Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
+public I64 Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
 { //3rd order
-  I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
+  I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max,result=0;
   F64 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z,
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
       x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0,
@@ -778,10 +867,8 @@ public Bool Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
 	     P3I32Dist(&ctrl[3],&ctrl[0]),
 	 s=0.5/d,nt,t1,t2,t3;
   xx=x0; yy=y0; zz=z0;
-  if (first) {
-    if (!(*fp_plot)(aux_data,xx,yy,zz))
-      return FALSE;
-  }
+  if (first && (*fp_plot)(aux_data,xx,yy,zz))
+    result++;
   for (t=0.0;t<=1.0;t+=s) {
     nt=1.0-t;
     t1=t*nt*nt;
@@ -803,25 +890,26 @@ public Bool Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
       s*=1.1;
     else {
       s*=0.9;
-      if (!(*fp_plot)(aux_data,x,y,z))
-	return FALSE;
+      if ((*fp_plot)(aux_data,x,y,z))
+	result++;
       xx=x;yy=y;zz=z;
     }
   }
   x=ctrl[3].x; y=ctrl[3].y; z=ctrl[3].z;
-  if (xx!=x || yy!=y || zz!=z) {
-    if (!(*fp_plot)(aux_data,x,y,z))
-      return FALSE;
-  }
-  return TRUE;
+  if ((xx!=x || yy!=y || zz!=z) &&
+      (*fp_plot)(aux_data,x,y,z))
+    result++;
+  return result;
 }
 
-public Bool BSpline2(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
+public I64 BSpline2(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
 { //2nd order
-  I64 i,j;
+  I64 i,j,result;
   CD3I32 *c;
-  Bool first=TRUE;
-  if (cnt<3) return TRUE;
+  Bool first;
+  if (cnt<3) return 0;
+  first=TRUE;
+  result=0;
   if (closed) {
     cnt++;
     c=MAlloc(sizeof(CD3I32)*(cnt*2-1));
@@ -873,23 +961,22 @@ public Bool BSpline2(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I
     }
   }
   for (i=0;i<cnt*2-2;i+=2) {
-    if (!Bezier2(aux_data,&c[i],fp_plot,first)) {
-      Free(c);
-      return FALSE;
-    }
+    result+=Bezier2(aux_data,&c[i],fp_plot,first);
     first=FALSE;
   }
   Free(c);
-  return TRUE;
+  return result;
 }
 
-public Bool BSpline3(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
+public I64 BSpline3(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
 { //3rd order
-  I64 i,j;
+  I64 i,j,result;
   F64 x,y,z;
   CD3I32 *c;
-  Bool first=TRUE;
-  if (cnt<3) return TRUE;
+  Bool first;
+  if (cnt<3) return 0;
+  first=TRUE;
+  result=0;
   if (closed) {
     cnt++;
     c=MAlloc(sizeof(CD3I32)*(cnt*3-2));
@@ -963,14 +1050,11 @@ public Bool BSpline3(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I
     }
   }
   for (i=0;i<cnt*3-3;i+=3) {
-    if (!Bezier3(aux_data,&c[i],fp_plot,first)) {
-      Free(c);
-      return FALSE;
-    }
+    result+=Bezier3(aux_data,&c[i],fp_plot,first);
     first=FALSE;
   }
   Free(c);
-  return TRUE;
+  return result;
 }
 
 #define CC_LEFT		1

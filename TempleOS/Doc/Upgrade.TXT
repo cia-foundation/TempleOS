@@ -5,4 +5,3 @@ To upgrade, you generally boot the new TempleOS CD/DVD, install on top of your p
 The $FG,2$INSTALL$FG$ option when you boot a CD will install on top of an existing install if you tell it not to delete the $FG,2$/TempleOS$FG$ directory.
 
 See the $LK,"Installing","FI:::/TempleOS/Doc/Install.TXT"$ documentation.
-

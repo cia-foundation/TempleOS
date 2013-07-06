@@ -89,8 +89,8 @@ U0 AsmHashLoad(Bool first)
   size1=offset(CHashOpcode.ins)+sizeof(CInstruction)<<5;
   tempo=MAlloc(size1);
 
-  lx=LexNew(TextFileRead("OpCodes.TXT"),0,StrNew("OpCodes.TXT.Z"));
-  lx->hash_table_lst=NULL;
+  lx=LexNew(TextFileRead("OpCodes.TXT"),0,"OpCodes.TXT.Z");
+  lx->htc.hash_table_lst=NULL;
   Lex(lx);
   while (lx->token) {
     if (lx->token!=TK_IDENT)
@@ -227,7 +227,6 @@ U0 CmpLoadDefines()
   DefineLoad("ST_MISSING_EXPRESSION","missing Expression at ");
   DefineLoad("ST_MISSING_RIGHT_PAREN","missing ')' at ");
   DefineLoad("ST_MISSING_RIGHT_BRACKET","missing ']' at ");
-  DefineLoad("ST_MISSING_COLON","missing ':' at");
   DefineLoad("ST_UNDEFINED_SYM","undefined sym at ");
   DefineLoad("ST_UNDEFINED_SYM_LINE","undefined sym at line:");
   DefineLoad("ST_UNDEFINED_IDENTIFIER","undefined identifier at ");
@@ -315,6 +314,7 @@ U0 CmpLoadDefines()
   DefineLoad("ST_UNNECESSARY_PARENTHESIS","Unnecessary parenthesis");
   DefineLoad("ST_STATIC_UNION","Static unions are not implemented");
   DefineLoad("ST_IMPORT_HASH_TABLE_NOT_ALLOWED","import_hash_table only allowed in AOT compiled #exe{} mode.");
+  DefineLoad("ST_STREAM_EXE_PUTS_NOT_ALLOWED","StreamExePutS only allowed in AOT compiled #exe{} mode.");
   DefineLoad("ST_CANT_INIT_GLBL_ON_HEAP","Can't init glbl var on data heap in AOT module");
   DefineLoad("ST_INVALID_ARRAY_SIZE","Invalid array size at ");
   DefineLoad("ST_NO_FUN_ASM_ALIGN","ALIGN not allowed in fun asm blk ");
@@ -365,17 +365,17 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 // arg cnt,result cnt,deref/assign/cmp,nonconst,might not fill result
 "00..END\0"
 "00..START\0"
-"00..NOP\0"
-"10..END_EXP\0"
 "00..NOP1\0"
+"10..END_EXP\0"
+"00..NOP2\0"
 "00..LABEL\0"
 "00..CALL_START\0"
 "01..CALL_END\0"
 "00..CALL_END2\0"
 "10..RETURN_VAL\0"
 "00..RETURN_VAL2\0"
-"01..IMM\0"
-"01..F64\0"
+"01..IMM_U64\0"
+"01..IMM_F64\0"
 "01.NSTR_CONST\0"
 "01.NABS_ADDR\0"
 "01.NADDR_IMPORT\0"
@@ -395,7 +395,7 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "10..TO_F64\0"
 "10..TO_BOOL\0"
 "10..TOUPPER\0"
-"11..NATIVE_TYPECAST\0"
+"11..HOLYC_TYPECAST\0"
 "11.NADDR\0"
 "11..COM\0"
 "11..NOT\0"
@@ -432,8 +432,6 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "21..AND_AND\0"
 "21..OR_OR\0"
 "21..XOR_XOR\0"
-"31..COLON\0"
-"00..QUESTION\0"
 "21=NASSIGN\0"
 "21=NASSIGN_PP\0"
 "21=NASSIGN_MM\0"
@@ -477,12 +475,12 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "00.NPAUSE\0"
 "10.NCLFLUSH\0"
 "10.NINVLPG\0"
-"10.NINU8\0"
-"10.NINU16\0"
-"10.NINU32\0"
-"20.NOUTU8\0"
-"20.NOUTU16\0"
-"20.NOUTU32\0"
+"10.NIN_U8\0"
+"10.NIN_U16\0"
+"10.NIN_U32\0"
+"20.NOUT_U8\0"
+"20.NOUT_U16\0"
+"20.NOUT_U32\0"
 "00.NGET_FLAGS\0"
 "00.NCARRY\0"
 "10.NSET_FLAGS\0"
@@ -499,11 +497,9 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "20.NBTS\0"
 "20.NBTR\0"
 "20.NBTC\0"
-"30.NBEQU\0"
 "20.NLBTS\0"
 "20.NLBTR\0"
 "20.NLBTC\0"
-"30.NLBEQU\0"
 "10.NBSF\0"
 "10.NBSR\0"
 "10.NQUE_INIT\0"
@@ -511,11 +507,6 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "20.NQUE_INS_REV\0"
 "10.NQUE_REM\0"
 "10.NSTRLEN\0"
-"30.NMEMCPY\0"
-"30.NMEMSET\0"
-"30.NMEMSET_U16\0"
-"30.NMEMSET_U32\0"
-"30.NMEMSET_U64\0"
 "10..BR_ZERO\0"
 "10..BR_NOT_ZERO\0"
 "20..BR_NOT_EQUAL\0"
@@ -562,8 +553,6 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "20..MIN_U64\0"
 "20..MAX_I64\0"
 "20..MAX_U64\0"
-"30..LIMIT_I64\0"
-"30..LIMIT_U64\0"
 "20..MOD_U64\0"
 "10..SQRI64\0"
 "10..SQRU64\0"
@@ -726,9 +715,6 @@ U0 CmpFillTables()
   d4[TK_XOR_XOR]=PREC_XOR_XOR<<16+IC_XOR_XOR;
 
   d4[TK_OR_OR]	=PREC_OR_OR<<16+IC_OR_OR;
-
-  d4[':']	=(PREC_QUEST+ASSOCF_LEFT)<<16+IC_COLON;
-  d4['?']	=(PREC_QUEST+ASSOCF_LEFT)<<16+IC_QUESTION;
 
   d4['=']	=(PREC_ASSIGN+ASSOCF_RIGHT)<<16+IC_ASSIGN;
   d4[TK_SHL_EQUAL]=(PREC_ASSIGN+ASSOCF_RIGHT)<<16+IC_SHL_EQUAL;

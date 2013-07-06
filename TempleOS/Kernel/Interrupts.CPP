@@ -183,8 +183,7 @@ U0 IntInit1()
   }
   ptr=temp_ptr;
   *ptr(U16 *)++=256*16-1;
-  *ptr(U32 *)++=sys_idt(I64).u32[0];
-  *ptr(U32 *)++=sys_idt(I64).u32[1];
+  *ptr(I64 *)++=sys_idt;
   *ptr(U16 *)++=0;
   SetRAX(temp_ptr);
   asm {	LIDT U64 [RAX] }

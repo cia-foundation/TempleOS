@@ -10,7 +10,7 @@
 
 U0 PageTableDemo1()
 {
-  I64 *pte=MemPtAtPageTableEntry(VGA_GRAPHIC_MEM_BASE),p0,p1;
+  I64 *pte=MemPageTable(VGA_GRAPHIC_MEM_BASE),p0,p1;
   "Page table entries for VGA screen memory\n";
   DocD(pte);
   PressAKey;

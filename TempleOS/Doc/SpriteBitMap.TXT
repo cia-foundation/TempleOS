@@ -1,0 +1,3 @@
+$WW,1$$FG,5$$TX+CX,"Sprite BitMap Menu Help"$$FG$
+
+Bitmaps have a background color.  If you delete to the clipboard, what's left will be background colored.

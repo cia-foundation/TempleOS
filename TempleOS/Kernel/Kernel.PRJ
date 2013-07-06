@@ -24,7 +24,7 @@ kernel_cfg=KernelCfgNew;
 #include "Font8x8"
 #include "Memory"
 #include "Interrupts"
-#include "FIFO"
+#include "DataTypes1a"
 #include "Compress"
 #include "Hash1a"
 #include "Date"
@@ -41,7 +41,7 @@ kernel_cfg=KernelCfgNew;
 
 #include "QSort"
 #include "Task1a"
-#include "TaskCmd"
+#include "SrvCmd"
 #include "BIOS32"
 
 #exe {Cd("Dsk");};
@@ -53,7 +53,7 @@ kernel_cfg=KernelCfgNew;
 #include "DskAddDev"
 #include "DskDir"
 #include "FileSysISO1"
-#include "FileSysNative"
+#include "FileSysRedSea"
 #include "FileSysFAT"
 #include "Dsk1b"
 #include "DskCFile"

@@ -1,6 +1,6 @@
 $WW,1$A $FG,2$Char$FG$acter is a single byte holding an ASCII code for a letter, num or sym.  The $FG,2$TempleOS$FG$ term is a $FG,2$U8$FG$.
 
-ASCII values range from 0 to 127.  Values below 32 are ctrl key's.  So, an ASCII #3 is a $FG,2$<CTRL-C>$FG$.  TempleOS uses a few nonstandard values.  In TempleOS ASCII #5 is the cursor location, ASCII 28 is $FG,2$<SHIFT-ESC>$FG$ and ASCII #31 is a $FG,2$<SHIFT-SPACE>$FG$.  See $LK,"Char Definitions","MN:CH_SHIFT_SPACE"$.
+ASCII values range from 0 to 127.  Values below 32 are ctrl key's.  So, an ASCII #3 is a $FG,2$<CTRL-C>$FG$.  TempleOS uses a few nonstandard values.  In TempleOS ASCII #5 is the cursor location in a saved file, ASCII 28 is $FG,2$<SHIFT-ESC>$FG$ and ASCII #31 is a $FG,2$<SHIFT-SPACE>$FG$.  See $LK,"Char Definitions","MN:CH_SHIFT_SPACE"$.
 
 A $FG,2$Key$FG$ is typically specified with a scan code.  TempleOS scan codes contain the key value in the lowest $FG,2$U8$FG$, and flags in the upper bytes.  See $LK,"Scan Code Flags","MN:SCF_CTRL"$ and $LK,"Scan Codes","MN:SC_INS"$.
 
@@ -13,4 +13,3 @@ TempleOS stores scan codes in 8 bytes.
 Run the program $LK-A,"::/TempleOS/Demo/MsgLoop.CPP"$ to examine scan code.
 
 A $FG,2$String$FG$ is a bunch of ASCII characters terminated with a zero.
-

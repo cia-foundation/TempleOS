@@ -98,8 +98,8 @@ F64 SinPhaseCont(F64 last_y,F64 last_dydt,
   return phase-phase_offset;
 }
 
-public CSndWaveCtrl *SndWaveCtrlNew(I64 sample_rate=SND_SAMPLE_RATE,I64 sample_bits=SND_SAMPLE_BITS,
-  I64 channels=SND_OCHANNELS,CTask *mem_task=NULL)
+public CSndWaveCtrl *SndWaveCtrlNew(I64 sample_rate=8000,I64 sample_bits=24,
+  I64 channels=2,CTask *mem_task=NULL)
 {
   CSndWaveCtrl *swc=CAlloc(sizeof(CSndWaveCtrl),mem_task);
   swc->freq_multiplier=1.0;
@@ -115,6 +115,14 @@ public U0 SndWaveCtrlDel(CSndWaveCtrl *swc)
 {
   Free(swc);
 }
+
+#define WF_NULL			0
+#define WF_SQUARE		1
+#define WF_SINE			2
+#define WF_TRI		3
+#define WF_SAWTOOTH		4
+#define WF_NOISE		5
+#define WF_NUM_WAVEFORMS	6
 
 public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
   F64 _freq,I64 _waveform=WF_SQUARE,F64 _amp=1.0,F64 _left=1.0, F64 _right=1.0)
@@ -162,7 +170,7 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
 	case WF_SINE:
 	  j=amp*Sin(phase);
 	  break;
-	case WF_TRIANGLE:
+	case WF_TRI:
 	  if (phase>=ã) {
 	    swc->last_y=swc->next_y;
 	    swc->next_y=-amp*Sign(swc->last_y)+.00001;
@@ -221,33 +229,6 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
     }
     swc->phase=phase;
   }
-}
-
-#help_index "Snd/HDAudio"
-I64 snd_reverb_buf_cnt;
-SND_OUT_CONTAINER *snd_reverb_buf=NULL;
-
-U0 SndReverb(SND_OUT_CONTAINER *buf,I64 buf_num)
-{
-  I64 i,j,mask,span=RoundI64(SND_SAMPLE_RATE*SND_OCHANNELS*snd_reverb_delay,SND_OCHANNELS);
-  if (!snd_reverb_buf || span>snd_reverb_buf_cnt) {
-    Free(snd_reverb_buf);
-    snd_reverb_buf_cnt=1<<(Bsr(span)+1);
-    snd_reverb_buf=ACAlloc(snd_reverb_buf_cnt*sizeof(SND_OUT_CONTAINER));
-  }
-  j=buf_num*SND_BUF_LEN;
-  mask=snd_reverb_buf_cnt-1;
-  for (i=0;i<SND_BUF_LEN;i++,j++) {
-    snd_reverb_buf[j&mask]=
-    buf[i]=
-      LimitI64(buf[i]+snd_reverb_intensity*snd_reverb_buf[(j-span)&mask],
-	MIN_I32,MAX_I32)&0xFFFFFF00;
-  }
-}
-
-I64 AudioSize()
-{
-  return MSize2(snd_reverb_buf);
 }
 
 #help_index "Snd"

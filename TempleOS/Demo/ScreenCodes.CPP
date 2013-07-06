@@ -18,7 +18,7 @@ U0 ScreenCodes()
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   DocClear;
   Fs->draw_it=&DrawIt;
-  GetChar(NULL,FALSE);
+  GetChar(,FALSE);
   SettingsPop;
 }
 

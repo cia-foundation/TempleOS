@@ -7,7 +7,6 @@ CHashSrcSym *HashEntryImportCopy(CHashSrcSym *temph)
   result->index=NULL;
   result->ie_lst=NULL;
   result->debug=NULL;
-  result->indent=NULL;
   if (temph->type & (HTT_FUN | HTT_CLASS)) {
     result(CHashClass *)->member_lst =MemberLstCopy(temph);
     result(CHashClass *)->member_lst2=temph(CHashClass *)->member_lst2;
@@ -111,10 +110,8 @@ I64 HashEntrySize2(CHashSrcSym *temph)
     result+=MSize2(temph->index);
     result+=MSize2(temph->import_name);
     result+=LinkedLstSize(temph->ie_lst);
-    if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM)) {
+    if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM))
       result+=MSize2(temph->debug);
-      result+=MSize2(temph->indent);
-    }
     if (temph->type & HTT_CLASS)
       result+=MemberLstSize(temph);
     else if (temph->type & HTT_FUN) {

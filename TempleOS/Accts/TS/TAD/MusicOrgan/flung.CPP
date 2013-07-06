@@ -7,10 +7,10 @@ U0 Song()
   music_stacatto_factor= 0.714;
   try {
   while (!ScanKey) {
-	Play("W13sBBBBEBDBeEBqDeBBEDEBqD");
+	Play("3sBBBBEBDBeEBqDeBBEDEBqD");
 	Play("sFEFEeFEDBqDeEFEBABqD");
-	Play("eDGqEeBAABqF!eBD!qE!A");
-	Play("eDGqEeBAABqF!eBD!qE!A");
+	Play("eDGqEeBAABqFeBDqEA");
+	Play("eDGqEeBAABqFeBDqEA");
   }
   } catch
     CatchAll;

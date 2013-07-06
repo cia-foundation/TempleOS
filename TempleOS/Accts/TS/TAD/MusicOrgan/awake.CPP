@@ -57,13 +57,13 @@ U0 Song()
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
   while (!ScanKey) {
 	"$$FG,GREEN$$Jesus talking...$$FG$$\n";
-	Play("W13eBC!qB2sG3D2G3DetC!!GFsCBCB!etCGBeB!!GsBCB!C",
+	Play("3eBCqB2sG3D2G3DetCGFsCBCBetCGBeBGsBCBC",
 		"Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("eBC!qB2sG3D2G3DetC!!GFsCBCB!etCGBeB!!GsBCB!C",
+	Play("eBCqB2sG3D2G3DetCGFsCBCBetCGBeBGsBCBC",
 		"Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("qD!sD!BD!BetA2G3GqB2G3sAD!ADqD!etGF!D",
+	Play("qDsDBDBetA2G3GqB2G3sADADqDetGFD",
 		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0am \0a \0dead \0 \0man.\n\0");
-	Play("qD!sD!BD!BetA2G3GqB2G3sAD!ADqD!etGF!D",
+	Play("qDsDBDBetA2G3GqB2G3sADADqDetGFD",
 		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0am \0a \0dead \0 \0man.\n\0");
   }
   } catch

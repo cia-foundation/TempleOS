@@ -73,7 +73,7 @@ public I64 GrPeek0(CDC *dc,I64 x,I64 y)
 
 #help_index "Graphics;Graphics/DCs"
 
-public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
+public I64 GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 {  //Clipping but not transformation
   I64 i,j,k,k1,kk,kk1,w1,h1,w2,h2,
       leading_bits,leading_bit_mask,whole_bytes,trailing_bits,trailing_bit_mask,
@@ -90,8 +90,14 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
     x+=win_task->win_scroll_x;
     y+=win_task->win_scroll_y;
   }
-  w1=x<0 ?-x:0;
-  h1=y<0 ?-y:0;
+  if (x<0)
+    w1=-x;
+  else
+    w1=0;
+  if (y<0)
+    h1=-y;
+  else
+    h1=0;
   w2=img->width;
   h2=img->height;
   if (dc->flags & DCF_SCREEN_BITMAP) {
@@ -126,7 +132,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
       if (y+h2-1>dc->max_y) dc->max_y=y+h2-1;
     }
     if (dc->flags & DCF_DONT_DRAW)
-      return TRUE;
+      return 1;
     old_color=dc->color;
     db=dc->depth_buf;
     dc->depth_buf=NULL;
@@ -171,7 +177,12 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 	    else {
 	      win_z_num=win_task->win_z_num;
 	      win_z_buf_ptr=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	      win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	      win_z_buf_line_dec=whole_bytes;
+	      if (leading_bits)
+		win_z_buf_line_dec++;
+	      if (trailing_bits)
+		win_z_buf_line_dec++;
+	      win_z_buf_line_dec*=sizeof(U16);
 	      win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	    }
 	    kk = h1   *img ->width_internal+w1;
@@ -186,7 +197,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    if (bit_shift)
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			  (*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask&color_mask;
+			  (*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask&color_mask;
 		    else
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			  *src(I64 *)++&~leading_bit_mask&color_mask;
@@ -198,7 +209,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
 		    if (win_z_num>=*win_z_buf_ptr++)
-		      *dst(I64 *)++=(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&color_mask;
+		      *dst(I64 *)++=(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&color_mask;
 		    else {
 		      src(I64 *)++;
 		      dst(I64 *)++;
@@ -214,7 +225,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (trailing_bits && win_z_num>=*win_z_buf_ptr++) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask&color_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask&color_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			*src(I64 *)++&~trailing_bit_mask&color_mask;
@@ -233,14 +244,14 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		if (leading_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask&color_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask&color_mask;
 		  else
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			*src(I64 *)++&~leading_bit_mask&color_mask;
 		}
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
-		    *dst(I64 *)++=(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&color_mask;
+		    *dst(I64 *)++=(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&color_mask;
 		  else
 		  for (i=0;i<whole_bytes;i++)
 		    *dst(I64 *)++=*src(I64 *)++&color_mask;
@@ -248,7 +259,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (trailing_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask&color_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask&color_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			*src(I64 *)++&~trailing_bit_mask&color_mask;
@@ -268,7 +279,12 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 	      } else {
 	      win_z_num		=win_task->win_z_num;
 	      win_z_buf_ptr	=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	      win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	      win_z_buf_line_dec=whole_bytes;
+	      if (leading_bits)
+		win_z_buf_line_dec++;
+	      if (trailing_bits)
+		win_z_buf_line_dec++;
+	      win_z_buf_line_dec*=sizeof(U16);
 	      win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	      for (j=h1;j<h2;j++) {
 		if (win_z_num>=*win_z_buf_ptr++)
@@ -302,7 +318,12 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 	    else {
 	      win_z_num=win_task->win_z_num;
 	      win_z_buf_ptr=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	      win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	      win_z_buf_line_dec=whole_bytes;
+	      if (leading_bits)
+		win_z_buf_line_dec++;
+	      if (trailing_bits)
+		win_z_buf_line_dec++;
+	      win_z_buf_line_dec*=sizeof(U16);
 	      win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	    }
 	    kk = h1   *img ->width_internal+w1;
@@ -317,7 +338,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    if (bit_shift)
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			  (*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask;
+			  (*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask;
 		    else
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			  *src(I64 *)++&~leading_bit_mask;
@@ -329,7 +350,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
 		    if (win_z_num>=*win_z_buf_ptr++)
-		      *dst(I64 *)++=*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
+		      *dst(I64 *)++=*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
 		    else {
 		      src(I64 *)++;
 		      dst(I64 *)++;
@@ -345,7 +366,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (trailing_bits && win_z_num>=*win_z_buf_ptr++) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			*src(I64 *)++&~trailing_bit_mask;
@@ -364,14 +385,14 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		if (leading_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~leading_bit_mask;
 		  else
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			*src(I64 *)++&~leading_bit_mask;
 		}
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
-		    *dst(I64 *)++=*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
+		    *dst(I64 *)++=*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
 		  else
 		  for (i=0;i<whole_bytes;i++)
 		    *dst(I64 *)++=*src(I64 *)++;
@@ -379,7 +400,7 @@ public Bool GrBlot(CDC *dc,I64 x,I64 y,CDC *img)
 		  if (trailing_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask;
+			(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift))&~trailing_bit_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			*src(I64 *)++&~trailing_bit_mask;
@@ -404,7 +425,12 @@ here1a:
 	      } else {
 	      win_z_num	      =win_task->win_z_num;
 	      win_z_buf_ptr	=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	      win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	      win_z_buf_line_dec=whole_bytes;
+	      if (leading_bits)
+		win_z_buf_line_dec++;
+	      if (trailing_bits)
+		win_z_buf_line_dec++;
+	      win_z_buf_line_dec*=sizeof(U16);
 	      win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	      for (j=h1;j<h2;j++) {
 		if (win_z_num>=*win_z_buf_ptr++)
@@ -443,7 +469,12 @@ here1a:
 	    else {
 	      win_z_num=win_task->win_z_num;
 	      win_z_buf_ptr=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	      win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	      win_z_buf_line_dec=whole_bytes;
+	      if (leading_bits)
+		win_z_buf_line_dec++;
+	      if (trailing_bits)
+		win_z_buf_line_dec++;
+	      win_z_buf_line_dec*=sizeof(U16);
 	      win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	    }
 	    kk = h1   *img ->width_internal  +w1;
@@ -458,7 +489,7 @@ here1a:
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    if (bit_shift)
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			  (*dst(I64 *)^(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~leading_bit_mask;
+			  (*dst(I64 *)^(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~leading_bit_mask;
 		    else
 		      *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			  (*dst(I64 *)^*src(I64 *)++)&~leading_bit_mask;
@@ -470,7 +501,7 @@ here1a:
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
 		    if (win_z_num>=*win_z_buf_ptr++)
-		      *dst(I64 *)++^=*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
+		      *dst(I64 *)++^=*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
 		    else {
 		      src(I64 *)++;
 		      dst(I64 *)++;
@@ -486,7 +517,7 @@ here1a:
 		  if (trailing_bits && win_z_num>=*win_z_buf_ptr++) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*dst(I64 *)^(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~trailing_bit_mask;
+			(*dst(I64 *)^(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~trailing_bit_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			(*dst(I64 *)^*src(I64 *)++)&~trailing_bit_mask;
@@ -505,21 +536,21 @@ here1a:
 		if (leading_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
-			(*dst(I64 *)^(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~leading_bit_mask;
+			(*dst(I64 *)^(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~leading_bit_mask;
 		  else
 		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|
 			(*dst(I64 *)^*src(I64 *)++)&~leading_bit_mask;
 		}
 		if (bit_shift)
 		  for (i=0;i<whole_bytes;i++)
-		    *dst(I64 *)++^=*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
+		    *dst(I64 *)++^=*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift);
 		  else
 		  for (i=0;i<whole_bytes;i++)
 		    *dst(I64 *)++^=*src(I64 *)++;
 		  if (trailing_bits) {
 		  if (bit_shift)
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
-			(*dst(I64 *)^(*src(I64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~trailing_bit_mask;
+			(*dst(I64 *)^(*src(U64 *)++>>bit_shift|*src(I64 *)<<(64-bit_shift)))&~trailing_bit_mask;
 		  else
 		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|
 			(*dst(I64 *)^*src(I64 *)++)&~trailing_bit_mask;
@@ -534,9 +565,9 @@ here1a:
     }
     dc->depth_buf=db;
     dc->color=old_color;
-    return TRUE;
+    return 1;
   } else
-    return FALSE;
+    return 0;
 }
 
 U8 *GrBitMap4ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor)
@@ -587,7 +618,7 @@ public CDC *DCExtract(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2,CTask *task=NULL)
 
 #help_index "Graphics/Char;Char/Graphics"
 
-public Bool GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
+public I64 GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
 {  //Clipping but not transformation
   U8 reg *src,reg *dst,*font_ptr;
   I64 i,m,leading_bits,trailing_bits,leading_bit_mask,trailing_bit_mask,
@@ -601,8 +632,14 @@ public Bool GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
     y+=win_task->win_scroll_y;
   }
 
-  w1=x<0 ?-x:0;
-  h1=y<0 ?-y:0;
+  if (x<0)
+    w1=-x;
+  else
+    w1=0;
+  if (y<0)
+    h1=-y;
+  else
+    h1=0;
   w2=FONT_WIDTH;
   h2=FONT_HEIGHT;
 
@@ -638,7 +675,7 @@ public Bool GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
       if (y+h2-1>dc->max_y) dc->max_y=y+h2-1;
     }
     if (dc->flags & DCF_DONT_DRAW)
-      return TRUE;
+      return 1;
     color=dc->color;
     if (dc->type==DCT_COLOR8) {
       leading_bits=-(w1+x)&7;
@@ -789,16 +826,17 @@ public Bool GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
 	}
       }
     }
-    return TRUE;
+    return 1;
   } else
-    return FALSE;
+    return 0;
 }
 
-public Bool GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
+public I64 GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
 {
-  I64 x0=x,ch;
-  Bool result=FALSE,first=TRUE;
-  if (!_s) return FALSE;
+  I64 x0,ch,result;
+  if (!_s) return 0;
+  x0=x;
+  result=0;
   while (ch=*_s++) {
     if (ch=='\n') {
       x=x0;
@@ -806,23 +844,21 @@ public Bool GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
     } else if (ch=='\t')
       x=x0+CeilU64(x-x0+FONT_WIDTH,8*FONT_WIDTH);
     else {
-      if (first) {
-	result=GrPutChar(dc,x,y,ch);
-	first=FALSE;
-      } else
-	GrPutChar(dc,x,y,ch);
+      result+=GrPutChar(dc,x,y,ch);
       x+=FONT_WIDTH;
     }
   }
   return result;
 }
 
-public Bool GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
+public I64 GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
 { //Vertical text
-  I64 y0=y;
+  I64 y0,result;
   U8 buf[2];
-  Bool result=FALSE,first=TRUE;
-  if (!_s) return FALSE;
+  if (!_s) return 0;
+  y0=y;
+  result=0;
+
   buf[1]=0;
   while (*buf=*_s++) {
     if (*buf=='\n') {
@@ -831,11 +867,7 @@ public Bool GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
     } else if (*buf=='\t')
       y=y0+CeilU64(y-y0+FONT_HEIGHT,8*FONT_HEIGHT);
     else {
-      if (first) {
-	result=GrPutS(dc,x,y,buf);
-	first=FALSE;
-      } else
-	GrPutS(dc,x,y,buf);
+      result+=GrPutS(dc,x,y,buf);
       y+=FONT_HEIGHT;
     }
   }
@@ -875,8 +907,14 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
     y+=win_task->win_scroll_y;
   }
 
-  w1=x<0 ?-x:0;
-  h1=y<0 ?-y:0;
+  if (x<0)
+    w1=-x;
+  else
+    w1=0;
+  if (y<0)
+    h1=-y;
+  else
+    h1=0;
   w2=w;
   h2=h;
 
@@ -972,7 +1010,12 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 	  else {
 	    win_z_num=win_task->win_z_num;
 	    win_z_buf_ptr=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	    win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	    win_z_buf_line_dec=whole_bytes;
+	    if (leading_bits)
+	      win_z_buf_line_dec++;
+	    if (trailing_bits)
+	      win_z_buf_line_dec++;
+	    win_z_buf_line_dec*=sizeof(U16);
 	    win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	  }
 	  kk1=(h1+y)*dc->width_internal+x+w1;
@@ -1118,7 +1161,12 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 	  else {
 	    win_z_num=win_task->win_z_num;
 	    win_z_buf_ptr=gr_win_z_buf(U8 *)+((h1+y)/FONT_HEIGHT*TEXT_COLS+(w1+x)/FONT_WIDTH)*sizeof(U16);
-	    win_z_buf_line_dec=((leading_bits?1:0)+whole_bytes+(trailing_bits?1:0))*sizeof(U16);
+	    win_z_buf_line_dec=whole_bytes;
+	    if (leading_bits)
+	      win_z_buf_line_dec++;
+	    if (trailing_bits)
+	      win_z_buf_line_dec++;
+	    win_z_buf_line_dec*=sizeof(U16);
 	    win_z_buf_line_inc=TEXT_COLS*sizeof(U16)-win_z_buf_line_dec;
 	  }
 	  color_mask=gr_1_to_8_colors[color.c0.color];

@@ -86,7 +86,7 @@ MyMass PlaceMass(I64 x, I64 y)
   tempm->drag_profile_factor=1.0;
   tempm->x=x;
   tempm->y=y;
-  tempm->mass=MASS_WEIGHT;
+  tempm->mass=MASS_MASS;
   tempm->radius=MASS_RADIUS;
   tempm->cost=25.0*COST_SCALE;
   tempm->color=YELLOW;
@@ -243,11 +243,11 @@ U0 AnimateTask(SpanAnimateStruct *a)
 
 U0 Init(SpanAnimateStruct *a)
 {
+  SpanDel(ode);
   ode=SpanNew;
 
   run_button.state=0;
-  WinMgrSync; //Allow stop to register in animate task.
-  WinMgrSync;
+  WinMgrSync(2); //Allow stop to register in animate task.
 
   if (a->saved_ode)
     SpanLoad(ode,a->saved_ode);
@@ -264,7 +264,7 @@ U0 SongTask(I64)
   music_tempo= 3.636;
   music_stacatto_factor= 0.902;
   while (TRUE) {
-	Play("W13q.EeDqED2G3DhE");
+	Play("3q.EeDqED2G3DhE");
 	Play("q.EeDqED2G3DhE");
 	Play("q.FeEFEqF2G3EhF");
 	Play("q.FeEFEqF2G3EhF");
@@ -281,8 +281,9 @@ U0 Span()
   CDC *dc=DCAlias;
 
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  Fs->text_attr=BROWN<<4+BLACK;
   WinMax;
-  Fs->song_task=Spawn(&SongTask,NULL,"Song",Fs);
+  Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
   bt_run =CtrlButtonNew(0,0,		  80,,2,"Stopped\0Running\0",run_colors,&run_button),
   bt_snap=CtrlButtonNew(0,2.5*FONT_HEIGHT,80,,2,"Snap Off\0Snap On\0",snap_colors,&snap_button),
@@ -329,8 +330,9 @@ U0 Span()
 "}"
   );
 
+  ode=NULL;
   Init(&a);
-  Fs->animate_task=Spawn(&AnimateTask,&a,"Animate",Fs);
+  Fs->animate_task=Spawn(&AnimateTask,&a,"Animate",,Fs);
   Fs->draw_it=&DrawIt;
 
   PopUpOk(
@@ -424,11 +426,9 @@ U0 Span()
 		Free(a.saved_ode);
 		a.saved_ode=SpanSave(ode);
 	      }
-	      SpanDel(ode);
 	      Init(&a);
 	      break;
 	    case CH_CTRLN:
-	      SpanDel(ode);
 	      Free(a.saved_ode);
 	      a.saved_ode=NULL;
 	      Init(&a);
@@ -437,7 +437,6 @@ U0 Span()
 	      if (src=SpanRead) {
 		Free(a.saved_ode);
 		a.saved_ode=src;
-		SpanDel(ode);
 		Init(&a);
 	      }
 	      break;
@@ -446,7 +445,6 @@ U0 Span()
 		Free(a.saved_ode);
 		a.saved_ode=SpanSave(ode);
 	      }
-	      SpanDel(ode);
 	      Init(&a);
 	      SpanWrite(ode);
 	      break;
@@ -479,7 +477,6 @@ U0 Span()
 		Free(a.saved_ode);
 		a.saved_ode=SpanSave(ode);
 	      }
-	      SpanDel(ode);
 	      Init(&a);
 	      SpanWrite(ode);
 	    case CH_SHIFT_ESC:
@@ -489,8 +486,10 @@ U0 Span()
       }
     }
 span_done: //Don't goto out of try
+    GetMsg(,,1<<MSG_KEY_UP);
   } catch
     CatchAll;
+  DocClear;
   SettingsPop;
   CtrlButtonDel(bt_run);
   CtrlButtonDel(bt_mode);
@@ -499,6 +498,4 @@ span_done: //Don't goto out of try
   DCFill(dc);
   DCDel(dc);
   MenuPop;
-  DocBottom;
-  "$$CL$$$$BG$$\n";
 }

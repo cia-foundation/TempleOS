@@ -22,7 +22,7 @@ U0 Song()
   SetWinHorz(Fs->win_left,Fs->win_right,task);
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
   while (!ScanKey) {
-	Play("W13qBeCDqCAetAACeECsF2G3F2GqG",
+	Play("3qBeCDqCAetAACeECsF2G3F2GqG",
 		"I'm \0on \0a \0mis\0sion \0from \0 \0 \0my \0 \0God.\n\0 \0 \0 \0 \0");
 	Play("3BeCDqCAetAACeECsF2G3F2GqG",
 		"I'm \0on \0a \0mis\0sion \0from \0 \0 \0my \0 \0God.\n\0 \0 \0 \0 \0");

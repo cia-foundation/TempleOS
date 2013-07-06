@@ -1,7 +1,7 @@
 #help_index "Graphics"
 public U0 GrLineRect4(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 step=1,I64 start=0)
 {
-//Can be used with ROPF_DITHER+WHITE<<16+ROP_EQU+BLACK
+//Can be used with ROPF_DITHER+WHITE<<16+BLACK
 //for dotted rect.
   GrLine3(dc,x1,y1,0,x2,y1,0,step,start);
   GrLine3(dc,x2,y1,0,x2,y2,0,step,start);
@@ -9,9 +9,9 @@ public U0 GrLineRect4(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 step=1,I64 start=0
   GrLine3(dc,x1,y2,0,x1,y1,0,step,start);
 }
 
-public U0 GrArrow3(CDC *dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64 w=2.75,I64 step=1,I64 start=0)
+public I64 GrArrow3(CDC *dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64 w=2.75,I64 step=1,I64 start=0)
 {  //transformation with pen width
-  I64 _x1,_y1,_z1,_x2,_y2,_z2,dx,dy;
+  I64 _x1,_y1,_z1,_x2,_y2,_z2,dx,dy,result=0;
   F64 d;
   Bool was_transform=FALSE,was_symmetry=FALSE;
   if (dc->flags & DCF_TRANSFORMATION) {
@@ -26,40 +26,43 @@ public U0 GrArrow3(CDC *dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64 w=2.75,
     _x2=x2; _y2=y2; _z2=z2;
     GrReflect(dc,&_x2,&_y2,&_z2);
     dc->flags&=~DCF_SYMMETRY;
-    Line(dc,_x1,_y1,_z1,_x2,_y2,_z2,&GrPlot3,step,start);
+    result=Line(dc,_x1,_y1,_z1,_x2,_y2,_z2,&GrPlot3,step,start);
     dx=_x2-_x1; dy=_y2-_y1;
     if (d=Sqrt(dx*dx+dy*dy)) {
       d=w*dc->pen_width/d;
-      Line(dc,_x2-dx*d+dy*d+0.5,_y2-dy*d-dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
-      Line(dc,_x2-dx*d-dy*d+0.5,_y2-dy*d+dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
+      result+=Line(dc,_x2-dx*d+dy*d+0.5,_y2-dy*d-dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
+      result+=Line(dc,_x2-dx*d-dy*d+0.5,_y2-dy*d+dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
     }
     was_symmetry=TRUE;
     if (dc->flags&DCF_JUST_MIRROR)
       goto gr_done;
   }
-  Line(dc,x1,y1,z1,x2,y2,z2,&GrPlot3,step,start);
+  result+=Line(dc,x1,y1,z1,x2,y2,z2,&GrPlot3,step,start);
   dx=x2-x1; dy=y2-y1;
   if (d=Sqrt(dx*dx+dy*dy)) {
     d=w*dc->pen_width/d;
-    Line(dc,x2-dx*d+dy*d+0.5,y2-dy*d-dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
-    Line(dc,x2-dx*d-dy*d+0.5,y2-dy*d+dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
+    result+=Line(dc,x2-dx*d+dy*d+0.5,y2-dy*d-dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
+    result+=Line(dc,x2-dx*d-dy*d+0.5,y2-dy*d+dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
   }
 gr_done:
   if (was_transform)
     dc->flags|=DCF_TRANSFORMATION;
   if (was_symmetry)
     dc->flags|=DCF_SYMMETRY;
+  return result;
 }
 
 #help_index "Graphics/Char;Char/Graphics"
 
-public Bool GrTextBox3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
+public I64 GrTextBox3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
 {  //transformation
 //DCF_SYMMETRY is silly.
-  Bool result;
-  U8 ch,*ptr=s;
-  I64 w=0,w_max=0,h=FONT_HEIGHT;
-  if (!s) return FALSE;
+  U8 ch,*ptr;
+  I64 w,w_max,h,result;
+  if (!s) return 0;
+  ptr=s;
+  w=0;	w_max=0; h=FONT_HEIGHT;  result=0;
+
   if (dc->flags & DCF_TRANSFORMATION)
     (*dc->transform)(dc,&x1,&y1,&z1);
   while (ch=*ptr++) {
@@ -74,21 +77,21 @@ public Bool GrTextBox3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
   }
   if (w>w_max) w_max=w;
   result=GrPutS(dc,x1,y1,s);
-  GrLine(dc,x1-border	   ,y1-border  ,x1+w_max+border,y1-border);
-  GrLine(dc,x1-border	   ,y1+h+border,x1+w_max+border,y1+h+border);
-  GrLine(dc,x1-border	   ,y1-border  ,x1-border,y1+h+border);
-  GrLine(dc,x1+w_max+border,y1-border  ,x1+w_max+border,y1+h+border);
+  result+=GrLine(dc,x1-border	   ,y1-border  ,x1+w_max+border,y1-border);
+  result+=GrLine(dc,x1-border	   ,y1+h+border,x1+w_max+border,y1+h+border);
+  result+=GrLine(dc,x1-border	   ,y1-border  ,x1-border,y1+h+border);
+  result+=GrLine(dc,x1+w_max+border,y1-border  ,x1+w_max+border,y1+h+border);
   return result;
 }
 
 #define MAX_DIAMOND_SLOPE	2.75
 
-public Bool GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
+public I64 GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
 {  //transformation
 //DCF_SYMMETRY is silly.
-  Bool result=FALSE,first=TRUE;
+  Bool first=TRUE;
   U8 ch,*ptr,*ptr_end,*st,*s;
-  I64 y,dx,dy,dx_old,dy_old,w,h=FONT_HEIGHT;
+  I64 y,dx,dy,dx_old,dy_old,w,h=FONT_HEIGHT,result=0;
   F64 m;
   if (!_s) return FALSE;
   if (dc->flags & DCF_TRANSFORMATION)
@@ -96,7 +99,7 @@ public Bool GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
 
   ptr=s=StrNew(_s);
   while (ch=*ptr) {
-    if (ch==CH_CARRIAGE_RETURN||ch=='\t')
+    if (ch=='\r'||ch=='\t')
       *ptr=CH_SPACE;
     if (ch=='\n') {
       *ptr=0;
@@ -117,10 +120,10 @@ public Bool GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
 
     w=(StrLen(st)*FONT_WIDTH)>>1;
     if (first) {
-      result=GrPutS(dc,x1-w,y,st);
+      result+=GrPutS(dc,x1-w,y,st);
       first=FALSE;
     } else
-      GrPutS(dc,x1-w,y,st);
+      result+=GrPutS(dc,x1-w,y,st);
     if (w) {
       w+=border;
       do {
@@ -141,10 +144,10 @@ public Bool GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
   }
   Free(s);
 
-  GrLine(dc,x1,y1-dy,x1+dx,y1);
-  GrLine(dc,x1+dx,y1,x1,y1+dy);
-  GrLine(dc,x1,y1+dy,x1-dx,y1);
-  GrLine(dc,x1-dx,y1,x1,y1-dy);
+  result+=GrLine(dc,x1,y1-dy,x1+dx,y1);
+  result+=GrLine(dc,x1+dx,y1,x1,y1+dy);
+  result+=GrLine(dc,x1,y1+dy,x1-dx,y1);
+  result+=GrLine(dc,x1-dx,y1,x1,y1-dy);
   return result;
 }
 

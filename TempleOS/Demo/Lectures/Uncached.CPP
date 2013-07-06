@@ -9,6 +9,8 @@ U0 TimeIns()
   CHeapCtrl *hc;
   Bool old_preempt;
 
+  "$$FG,RED$$Now, this demo seems broken, perhaps,\n"
+  "because I run in a virtual machine.$$FG$$\n\n";
   CPURep;
 
   shared_blks=1;
@@ -34,7 +36,7 @@ U0 TimeIns()
   "Uncached Cycles: %10,d\n",end-start;
 
   "$$FG,GREEN$$The difference is even greater\n"
-  "because the loop overhead was not subtracted.\n\n";
+  "because the loop overhead was not subtracted.$$FG$$\n\n";
   Free(cached_I64);
   Free(uncached_I64);
   MemBlks2MegFree(bp,shared_blks);

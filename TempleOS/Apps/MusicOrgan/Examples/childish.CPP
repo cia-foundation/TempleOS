@@ -7,7 +7,7 @@ U0 Song()
   music_stacatto_factor= 0.902;
   try {
   while (!ScanKey) {
-	Play("W13qEsCDCDqCDeEGsEBEBeCBsDADA",
+	Play("3qEsCDCDqCDeEGsEBEBeCBsDADA",
 		"Be \0like \0 \0a \0 \0child \0 \0 \0 \0some \0 \0re\0 \0spect.\n\0 \0 \0 \0 \0 \0");
 	Play("qEsCDCDqCDeEGsEBEBeCBsDADA",
 		"Ma\0tur\0 \0i\0 \0ty \0 \0 \0 \0don't \0 \0ne\0 \0glect.\n\0 \0 \0 \0 \0 \0");

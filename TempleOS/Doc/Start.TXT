@@ -27,5 +27,3 @@ $ID,-2$
 Remember to terminate cmds with a semicolon.
 
 $LK,"Help Index","FI:::/TempleOS/Doc/HelpIndex.TXT"$  $LK,"Quick Start--Command Line","HI:Cmd Line (Typically)"$
-
-

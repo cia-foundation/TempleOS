@@ -12,7 +12,7 @@ $FG,5$Supported Hardware$FG$
 
 * Minimum 256 Meg RAM; Maximum $TX+D,"128 Gig","DD_MAPPED_MEM_SPACE_GIG"$ RAM (easily increased).
 
-* HD Audio or internal PC Speakers.
+* Internal PC Speakers.
 
 * CD/DVD-ROMs (not SCSI).  ISO9660 file system.
 
@@ -21,12 +21,10 @@ $FG,5$Supported Hardware$FG$
 $FG,5$Unsupported Hardware$FG$
 * No graphics acceleration.
 
-* No sound cards besides HD Audio.
+* No sound cards.
 
 * $FG,4$No networking$FG$.
 
 * No USB devices, except keyboard and mouse in legacy mode.  No, you can't use flash memory cards.
 
 * No printers.
-
-$FG,8$

@@ -28,24 +28,29 @@ USE64	//Defaults to 64, but this is a good habit.
 
 	IMPORT	PUT_HEX_U8,PUT_CHAR;
 
-MY_MSG:
+MY_WORLD_MSG:
 //Define U8 does not put terminating zeros
 //on strings.
-	DU8	"Hello World\n",0;
+	DU8	"World\n",0;
 
 //My convention is to put an underscore
 //on C callable routines.
 _HELLO_WORLD::
+	PUSH	RSI	//See $LK,"CREG_VARS_MASK","MN:CREG_VARS_MASK"$ & $LK,"CREG_NON_PTR_MASK","MN:CREG_NON_PTR_MASK"$
 	MOV	RCX,10
 @@05:	MOV	RAX,RCX
 	CALL	PUT_HEX_U8
 	MOV	RAX,CH_SPACE
 	CALL	PUT_CHAR
-	MOV	RSI,MY_MSG
+	MOV	RAX,'Hello ' //Supports multi-byte char constants
+	CALL	PUT_CHAR
+//We broke it in two pieces to show different ways.
+	MOV	RSI,MY_WORLD_MSG
 //Alternatively, if you use an '&', you don't need
 //to import a SYS_SYM.  This only works for JIT asm.
 	CALL	&PUT_STR
 	LOOP	@@05
+	POP	RSI
 	RET
 };
 

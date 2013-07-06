@@ -57,10 +57,10 @@ ipi_done:
   return result;
 }
 
-U0 CDate2ISO1(CISO1Date *dst,CDate spdt)
+U0 Date2ISO1(CISO1Date *dst,CDate cdt)
 {
   CDateStruct ds;
-  CDate2CDateStruct(&ds,spdt);
+  Date2DateStruct(&ds,cdt);
   dst->year=ds.year-ISO1_BASE_YEAR;
   dst->mon=ds.mon;
   dst->day=ds.day_of_mon;
@@ -81,7 +81,7 @@ CDate ISO1DateStruct2CDate(CISO1Date *dt)
   ds.sec=dt->sec;
   ds.min=dt->min;
   ds.hour=dt->hour;
-  return CDateStruct2CDate(&ds);
+  return DateStruct2Date(&ds);
 }
 
 Bool ISO1FromName(U8 *dst,U8 *src)

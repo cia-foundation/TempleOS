@@ -11,7 +11,7 @@ Bool ChkDskConfirm(Bool *_fix,Bool *_confirm)
   return *_fix;
 }
 
-I64 NativeFSChkDskLst(CDirEntry *tempm1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
+I64 RedSeaFSChkDskLst(CDirEntry *tempm1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
 {
   CDirEntry *tempm2;
   I64 i,j,errs=0;
@@ -19,7 +19,7 @@ I64 NativeFSChkDskLst(CDirEntry *tempm1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
     tempm2=tempm1->next;
     if (tempm1->attr & _ATTR_DIR) {
       if (tempm1->sub)
-	errs+=NativeFSChkDskLst(tempm1->sub,bits,bits2,size,bpc);
+	errs+=RedSeaFSChkDskLst(tempm1->sub,bits,bits2,size,bpc);
     }
     j=(tempm1->size+bpc-1)/bpc;
     for (i=0;i<j;i++) {
@@ -46,7 +46,7 @@ I64 NativeFSChkDskLst(CDirEntry *tempm1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
   return errs;
 }
 
-I64 NativeFSChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
+I64 RedSeaFSChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 {
   I64 i,j,bpc,size,errs=0;
   CPrt *p=Drv2Prt(drv_let),*old_prt=Fs->cur_prt;
@@ -86,13 +86,13 @@ I64 NativeFSChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
     }
   }
 
-  errs+=NativeFSChkDskLst(FilesFind(files_find_mask,FUF_RECURSE),bits,bits2,size,bpc);
+  errs+=RedSeaFSChkDskLst(FilesFind(files_find_mask,FUF_RECURSE),bits,bits2,size,bpc);
   for (i=1;i<size;i++)
     if (Bt(bits2,i)) {
       PrintFWarn("Shouldn't Alloc Cluster:%0X\n",i);
       errs++;
       if (ChkDskConfirm(_fix,_confirm))
-	NativeFSFreeClusters(p,i,1);
+	RedSeaFSFreeClusters(p,i,1);
     }
 
   Free(files_find_mask);
@@ -210,8 +210,8 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
   I64 errs=0;
   CPrt *p=Drv2Prt(drv_let);
   switch (p->type) {
-    case PT_NATIVE:
-      errs=NativeFSChkDsk(drv_let,&fix,&confirm);
+    case PT_REDSEA:
+      errs=RedSeaFSChkDsk(drv_let,&fix,&confirm);
       break;
     case PT_FAT32:
       errs=FAT32ChkDsk(drv_let,&fix,&confirm);

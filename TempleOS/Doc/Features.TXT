@@ -12,9 +12,9 @@ $WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
 
 * Keyboard & mouse support.
 
-* Hard drives, support for $FG,2$FAT32$FG$ and TempleOS native file systems with file compression.
+* Hard drives, support for $FG,2$FAT32$FG$ and $FG,2$RedSea$FG$ file systems with file compression.
 
-* $LK,"Partitionming","MN:PrtDsk"$ tool.
+* $LK,"Partitioning","MN:PrtDsk"$ tool.
 
 * $FG,2$Boot loaders$FG$ for CD-ROM and hard disk.
 

@@ -1,8 +1,8 @@
 $FG,5$$TX+CX,"Details of Scoping and Linkages"$$FG$
 $WW,1$
-$LK,"Just-In-Time Compilation","FF:::/TempleOS/Doc/Glossary.TXT,JIT"$ makes use of the current task's hash sym table and its parent tasks' tables.  It fetches syms from parent tasks' tables if not found locally in the current task's table and it places new syms in the current task's table.  Conceptually, syms are at the scope of environment vars in other operating systems.
+$LK,"JIT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,JIT Compile Mode"$ makes use of the current task's hash sym table and its parent tasks' tables.  It fetches syms from parent tasks' tables if not found locally in the current task's table and it places new syms in the current task's table.  Conceptually, syms are at the scope of environment vars in other operating systems.
 
-$LK,"AOT Compilation","FF:::/TempleOS/Doc/Glossary.TXT,AOT Compiled"$ creates a new, empty, sym table which you must populate by $FG,2$#include$FG$ing $LK-A,"::/TempleOS/Kernel/AOTAdam.HPP"$ or whatever to import syms.
+$LK,"AOT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,AOT Compile Mode"$ creates a new, empty, sym table which you must populate by $FG,2$#include$FG$ing $LK-A,"::/TempleOS/Kernel/AOTAdam.HPP"$ or whatever to import syms.
 
 When a sym is placed into a table, older syms with identical names will be overshadowed if they exist, unless you use the compiler option $LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$.  Duplicates are not allowed in many cases, especially in asm blks.  Dupicates are allowed, by design in other cases, so that you can repeatedly $FG,2$#include$FG$ the same file from the cmd line while developing it.  Or, so you can repeatedly declare a function with a standard name, like "$FG,2$UpdateWin()$FG$".  This case might occur when the $FG,2$adam task$FG$ is starting-up loading-in many little utilities.
 
@@ -16,7 +16,7 @@ $FG,2$_extern$FG$ binds a new $LK,"HTT_FUN","MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",
 $FG,2$_import$FG$ binds a new $LK,"HTT_FUN","MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR","MN:HTT_GLBL_VAR"$ sym to a sym, of a $BK,1$different$BK,0$ name imported from the task's sym table at $LK,"Load","MN:Load"$() time.  If no sym exists to bind to at $LK,"Load","MN:Load"$() time, the code using this sym will be left incomplete until the sym is defined.  Basically, this binds C to asm from elsewhere.
 
 
-$WW,0$$FG,2$S$FG$taticModule/$FG,2$J$FG$ustInTime
+$WW,0$$FG,2$A$FG$headOfTime/$FG,2$J$FG$ustInTime
 | Code occurs in $FG,2$G$FG$lobalScope/$FG,2$F$FG$unctionScope
 | | $FG,2$C$FG$Code/$FG,2$A$FG$smCodeBlk
 | | | $FG,2$extern$FG$/$FG,2$import$FG$/$FG,2$_extern$FG$/$FG,2$_import$FG$/$FG,2$IMPORT$FG$/$FG,2$static$FG$/$FG,2$class$FG$/$FG,2$goto$FG$
@@ -27,32 +27,32 @@ $WW,0$$FG,2$S$FG$taticModule/$FG,2$J$FG$ustInTime
 | | | |        |          | || $FG,2$S$FG$taticVarInit/$FG,2$D$FG$ynamicVarInitAllowed/$FG,2$N$FG$oInitAllowed
 | | | |        |          | || | Are dups allowed within the namespace? A dup overshadows the original.
 | | | |        |          | || | $FG,2$D$FG$upsAllowed/$FG,2$N$FG$oDups/NoDupsBut$FG,2$P$FG$ad/$FG,2$W$FG$arningUnlessClosedOut
-S G A          C label::  S MG   N
-S G A          C label:     MG   N
-S G A          C @@label:   AL   N
-S G A IMPORT   C label;     MR   N
-S F A          C label::  S BG   N
-S F A          C label:     BG   N
-S F A          C @@label:   AL   N
-S F A IMPORT   C label;     BR   N
-S x x            #define    MR   D
-S G C          C function S MR   D
-S F C          R var        FR   N
-S F C          S var        FR   N
-S F C static   C var        FR D N
-S F C goto     C label:     FG   N
-S G C          C var      S MR D D
-S G C          D var        MR N D
-S G C            class      MR   D
-S G C class      member     MR   P
-S G C extern     class      MR   D
-S G C extern   C function   MR   W
-S G C import   C function   MR   D
-S G C import   C var        MR   D
-S G C _extern C function   MR   D
-S G C _extern C var        MR   D
-S G C _import C function   MR   D
-S G C _import C var        MR   D
+A G A          C label::  S MG   N
+A G A          C label:     MG   N
+A G A          C @@label:   AL   N
+A G A IMPORT   C label;     MR   N
+A F A          C label::  S BG   N
+A F A          C label:     BG   N
+A F A          C @@label:   AL   N
+A F A IMPORT   C label;     BR   N
+A x x            #define    MR   D
+A G C          C function S MR   D
+A F C          R var        FR   N
+A F C          S var        FR   N
+A F C static   C var        FR D N
+A F C goto     C label:     FG   N
+A G C          C var      S MR D D
+A G C          D var        MR N D
+A G C            class      MR   D
+A G C class      member     MR   P
+A G C extern     class      MR   D
+A G C extern   C function   MR   W
+A G C import   C function   MR   D
+A G C import   C var        MR   D
+A G C _extern  C function   MR   D
+A G C _extern  C var        MR   D
+A G C _import  C function   MR   D
+A G C _import  C var        MR   D
 J G A          C label::  S Tg   N
 J G A          C label:     BG   N
 J G A          C @@label:   AL   N
@@ -75,8 +75,8 @@ J G C extern     class    C TR   D
 J G C extern   C function F TR   W
 J G C extern   C var      G TR   D
 J G C extern   D var      G TR   D
-J G C _extern C function F TR   D
-J G C _extern C var      G TR   D
+J G C _extern  C function F TR   D
+J G C _extern  C var      G TR   D
 $WW,1$
 * GoTo labels must not have the same name as global scope objects.  GoTo's are rare and I don't want to slow the compiler and add code to fix this.  You will get errors if a collision happens, so it's not very dangerous, but the error message is baffling.
 
@@ -84,7 +84,7 @@ $WW,1$
 
 * Use $FG,2$reg$FG$ or $FG,2$noreg$FG$ in front of local var names to override automatic register var allocation.  You can, optionally, specify a reg after the "$FG,2$reg$FG$" keyword.
  
-* Local nonregister function vars can be accessed in asm blks with $FG,2$&i[RBP]$FG$ for example.
+* Local non-register function vars can be accessed in asm blks with $FG,2$&i[RBP]$FG$ for example.
 
 * Glbl vars and functions can be accessed in asm with and $FG,2$&$FG$ as in
 	$FG,2$MOV	RAX,I64 [&glbl_var]
@@ -95,7 +95,7 @@ $WW,1$
 
 * All offspring tasks of a task inherit syms.
 
-* The $FG,2$sizeof()$FG$ and C+ structure members can be used in asm blks.
+* The $FG,2$sizeof()$FG$ and Holy C structure members can be used in asm blks.
 
 * No register vars are used in functions with a try/catch.  They will be force to $FG,2$noreg$FG$.
 
@@ -106,4 +106,3 @@ $WW,1$
 * Note: $FG,2$static$FG$ function vars do not go on the data heap, no matter the setting of the $LK,"OPTf_GLBLS_ON_DATA_HEAP","MN:OPTf_GLBLS_ON_DATA_HEAP"$$FG$.  They may in the future.
 
 * $LK,"OPTf_EXTERNS_TO_IMPORTS","MN:OPTf_EXTERNS_TO_IMPORTS"$ will treat $FG,2$_extern$FG$ as $FG,2$_import$FG$ and $FG,2$extern$FG$ as $FG,2$import$FG$.  This allows a header to be used either as a $FG,2$JIT compiled$FG$ or $FG,2$AOT compiled$FG$ header.
-$WW,0$

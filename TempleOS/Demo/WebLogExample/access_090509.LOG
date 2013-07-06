@@ -568,7 +568,7 @@
 173.186.151.229 - - [08/May/2009:17:51:32 -0700] "HEAD /media/Tanks.wmv HTTP/1.1" 200 0 "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "templeos.org"
 173.186.151.229 - - [08/May/2009:17:55:48 -0700] "HEAD /media/Demo2c.wmv HTTP/1.1" 404 0 "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "templeos.org"
 173.186.151.229 - - [08/May/2009:17:57:42 -0700] "HEAD /media/Demo1.wmv HTTP/1.1" 200 0 "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "templeos.org"
-173.186.151.229 - - [08/May/2009:17:58:59 -0700] "HEAD /media/BirdLand.wmv HTTP/1.1" 404 0 "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "templeos.org"
+173.186.151.229 - - [08/May/2009:17:58:59 -0700] "HEAD /media/BugBird.wmv HTTP/1.1" 404 0 "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "templeos.org"
 62.102.171.88 - - [08/May/2009:18:00:33 -0700] "GET /v502.html HTTP/1.1" 404 275 "http://www.semantic.hn/" "AppEngine-Google; (+http://code.google.com/appengine)" "www.templeos.org"
 107.8.88.161 - - [08/May/2009:18:00:46 -0700] "GET / HTTP/1.1" 200 81188 "http://www.google.com/search?q=64-bit+operating+systems&rls=com.microsoft:en-us:IE-Address&ie=UTF-8&oe=UTF-8&sourceid=ie7&rlz=1I7GPCK_enUS320" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Win64; x64; Trident/4.0; .NET CLR 2.0.50727; SLCC1; Media Center PC 5.0; MDDC; .NET CLR 3.5.30729; .NET CLR 3.0.30618)" "www.templeos.org"
 107.8.88.161 - - [08/May/2009:18:00:46 -0700] "GET /images/Header.JPG HTTP/1.1" 200 2982 "http://www.templeos.org/" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Win64; x64; Trident/4.0; .NET CLR 2.0.50727; SLCC1; Media Center PC 5.0; MDDC; .NET CLR 3.5.30729; .NET CLR 3.0.30618)" "www.templeos.org"

@@ -7,7 +7,8 @@ U0 BSplineDemo()
   SettingsPush;
   Fs->win_inhibit=WIF_ALL-WIF_BORDER;
 
-  "$$CL$$Select ctrl points with left mouse.  Right when finished.\n";
+  DocClear;
+  "Select ctrl points with left mouse.  Right when finished.\n";
   DCFill;
   do {
     msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_UP+1<<MSG_IP_R_UP);

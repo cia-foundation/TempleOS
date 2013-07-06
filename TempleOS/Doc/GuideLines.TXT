@@ -1,16 +1,34 @@
-$WW,1$$FG,5$$TX+CX,"ACCT FILES"$$FG$
+$WW,1$$FG,5$$TX+CX,"DIRECTORY STRUCTURE"$$FG$
 
-You can add and remove accts by making or removing directories in the $FG,2$::/TempleOS/Accts$FG$ directory.  An empty account directory should be valid because it will get default files from the parent directory.
+$FG,2$/TempleOS/Accts$FG$ Each subdirectory is an acct.  When you boot, you can select an acct to login to, unless you compile Kernel soas to pick one.  Your acct directory is your $FG,2$HOME$FG$ directory and all your user data should be placed in here to ease backing-up your data.  When you Install an application it will create a subdirectory of your $FG,2$HOME$FG$ directory for storage.
 
-See $LK-A,"HOME/PersonalMenu.TXT"$ for a personal menu which can be viewed at the cmd line with the $FG,2$<CTRL-M>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+$FG,2$/TempleOS/Apps$FG$ Applications are placed in subdirectories of $FG,2$/TempleOS/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your personal menu, use $FG,2$<CTRL-L>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
 
-See $LK-A,"HOME/PersonalNotes.TXT"$ for a personal note file which can be viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+$FG,2$/TempleOS/Demo$FG$ Here you can find lots of sample code to do various things.
 
-See $LK-A,"HOME/DoItOnce.CPP"$ for a file which is invoked at the start-up of the first user.
+$FG,2$/TempleOS/Doc$FG$ Here you can find documentation.
 
-See $LK-A,"HOME/Adam3.CPP"$ for the user files that get loaded into the adam task at start-up.  These are only loaded once.
+$FG,2$/TempleOS/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a "$FG,2$kernel$FG$" is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  It is loaded by the boot loader and must fit in 640K.
 
-$LK-A,"HOME/Registry.CPP"$ can be edited by hand or deleted to rst to defaults.  Takes affect next boot.
+$FG,2$/TempleOS/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It is also $FG,2$AOT$FG$ compiled by $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().
+
+$FG,2$/TempleOS/Adam$FG$ The non-kernel part of the operating system is found here.  It is JIT compiled during boot.
+
+
+
+$FG,5$$TX+CX,"ACCT FILES"$$FG$
+
+You can add and remove accts by making or removing directories in the $FG,2$::/TempleOS/Accts$FG$ directory.  An empty account directory should be valid because it will get default files from the parent directory.  Compile the $LK,"Kernel","MN:MakeOSInstallPrtBootLoader"$ to set the active acct or cause it to prompt an account at boot. 
+
+$LK-A,"HOME/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-M>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+$LK-A,"HOME/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+
+$LK-A,"HOME/DoItOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
+
+$LK-A,"HOME/Adam3.CPP"$ files invoked when the adam task starts-up.  Customize these!
+
+$LK-A,"HOME/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
 
 
 
@@ -28,37 +46,55 @@ $FG,5$$TX+CX,"APPLICATION POLICIES"$$FG$
 
  
 
-$FG,5$$TX+CX,"OS PROGRAMMING GUIDELINES:"$$FG$
+$FG,5$$TX+CX,"PROGRAMMING GUIDELINES"$$FG$
 
-* Virtual mem is not used (It is identity mapped in EM64T mode).  The stk does not grow, so allocate enough when the task (process) is $LK,"Spawn","MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc","MN:MAlloc"$() and $LK,"Free","MN:Free"$().)
+* Virtual mem/Paging is not used -- it is identity mapped in x86_64 mode.  The stk does not grow, so allocate enough when the task (process) is $LK,"Spawn","MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc","MN:MAlloc"$() and $LK,"Free","MN:Free"$().)
 
-* See $LK,"Naming convention","FF:::/TempleOS/Doc/Glossary.TXT,Naming convention"$.
+* See $LK,"Naming Convention","FF:::/TempleOS/Doc/Glossary.TXT,Naming Convention"$ and $LK,"Abbreviations","FF:::/TempleOS/Doc/Glossary.TXT,Abbreviations"$.
 
-* There are two modes of compiling $LK,"AOT Compiled Mode","FF:::/TempleOS/Doc/Glossary.TXT,AOT Compiled Mode"$ and $LK,"JIT Mode","FF:::/TempleOS/Doc/Glossary.TXT,JIT"$.  Actual compilation is done in both -- nothing is "interpreted".
+* There are two modes of compiling $LK,"AOT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,AOT Compile Mode"$ and $LK,"JIT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,JIT Compile Mode"$.  Actual compilation is done in both -- nothing is "interpreted".
 
-* $LK,"Differences from C/C++","FI:::/TempleOS/Doc/Differences.TXT"$
+* $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$
 
-* $LK,"System Programming Guidelines","FI:::/TempleOS/Doc/SysPgmGuide.TXT"$
+* I often use 64-bit values when smaller would be more appropriate because the compiler generally is more efficient with 64-bit values.  (All value get promoted to 64-bit by the TempleOS compiler, when fetched.)
 
-$FG,5$$TX+CX,"Hash sym tables:"$$FG$
+* I use signed ints unless absolutely necessary.  I would like to move toward a language with one type of integer more like $FG,2$BASIC$FG$ or something.  I think one type of integer is more friendly to new programmers, but I have no plans to actually switch to one type of int.
+
+* Short circuit logic is assumed.
+
+* I generally avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte int -- nothing forces it to 1 or 0.  There is a $LK,"ToBool","MN:ToBool"$() function that will, however.
+
+* If you use floats in your interrupt routine, save and restore the fpu state with $LK,"Fxsave","MN:Fxsave"$() and $LK,"Fxrstor","MN:Fxrstor"$().  The timer interrupt does this.  The keyboard and mouse don't use floats.
+
+* Bracketing code with $FG,2$$FG,2$PushFD;Cli;$FG$ and $FG,2$PopFD;$FG$ will protect against simultaneous accesses from tasks on $UL,1$one$UL,0$ core.  To protect against multiple cores, you need a locked semaphore.  I think semiphores need to be in their own cache line, but I'm not sure.  I use lock bits in a lot of places not aligned.
+
+* $LK,"SysDbg","MN:SysDbg"$() and $LK,"IsSysDbg","MN:IsSysDbg"$() are really handy when working on the compiler or kernel.  It's just a bit you can set and test.
+
+* I don't use "$FG,2$U0 *$FG$" because the size would be weird for ptr arithmetic.  The size of "$FG,2$U0$FG$" is zero.
+
+
+
+$FG,5$$TX+CX,"HASH SYM TABLES"$$FG$
 
 * See $LK-A,"::/TempleOS/Adam/Hash2a.CPP"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
 
-* $FG,2$adam_task->hash_table$FG$ holds the C/C++ syms loaded in on start-up.
+* $FG,2$adam_task->hash_table$FG$ holds the Holy C syms loaded in on start-up.
 
-* $FG,2$Fs->hash_table$FG$ holds user C+ syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym unless you have done $LK,"OptOn","MN:OptOn"$($LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$).  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
+* $FG,2$Fs->hash_table$FG$ holds user Holy C syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym unless you have done $LK,"OptOn","MN:OptOn"$($LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$).  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
 
 * To display the contents of a hash table, use the $LK,"HashRep","MN:HashRep"$() routine or the varients.  $LK,"HashDepthRep","MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
 
-$FG,5$$TX+CX,"Assembly Language Concerns:"$$FG$
+
+
+$FG,5$$TX+CX,"ASSEMBLY LANGUAGE CONCERNS"$$FG$
 
 * $FG,2$FS$FG$ must always point to the $LK,"CTask","MN:CTask"$.
 
 * $FG,2$GS$FG$ must always point to the $LK,"CCPU","MN:CCPU"$.
 
-* Don't change the segment registers unless interrupts are off.
+* Don't change the segment registers unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE","MN:SET_FS_BASE"$ and $LK,"_SET_GS_BASE","MN:_SET_GS_BASE"$.
 
-* When interacting with compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for register vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.
+* When interacting with compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for register vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks","MN:CREG_VARS_MASK"$.
 
 * I recommend using the standard stk frame for functions because $LK,"Caller","MN:Caller"$() is used to display the call stk, such as for the wallpaper.
 $FG,2$	ENTER	nnnn

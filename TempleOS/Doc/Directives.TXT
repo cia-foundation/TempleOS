@@ -23,7 +23,7 @@ Here are example instruction formats:
 $HL,1$	ADD	RAX,I64 FS:DISP[RSI+RDI*8]
 $HL,0$$HL,1$	ADD	RAX,I64 [DISP]
 $HL,0$
-$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in C+ expressions.
+$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in Holy C expressions.
 
 $FG,2$$$$FG$ works in $FG,2$class$FG$es.
   $FG,2$class MyFun

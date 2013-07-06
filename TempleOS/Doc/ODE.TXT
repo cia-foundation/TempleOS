@@ -3,5 +3,4 @@ $WW,1$TempleOS has an advanced algorithm for integrating ordinary differential e
 See $LK,"CMathODE","MN:CMathODE"$ and $LK,"ODEsUpdate","MN:ODEsUpdate"$ for an overview.
 See $LK,"ODECallDerivative","MN:ODECallDerivative"$ to see what support there is for masses and springs.
 
-See $LK-A,"::/TempleOS/Demo/GameStarters/Whap.CPP"$, $LK-A,"::/TempleOS/Demo/GameStarters/Rocket.CPP"$, $LK-A,"::/TempleOS/Demo/GameStarters/MassSpring.CPP"$, $LK-A,"::/TempleOS/Apps/Span/SpanMain.CPP"$ or $LK-A,"::/TempleOS/Apps/X-Caliber/X-Caliber.CPP"$ for a masses and springs examples, or $LK-A,"::/TempleOS/Demo/WinMgr2.CPP"$, or $LK-A,"::/TempleOS/Demo/GameStarters/Rocks.CPP"$.
-
+See $LK-A,"::/TempleOS/Demo/Games/Whap.CPP"$, $LK-A,"::/TempleOS/Demo/Games/Rocket.CPP"$, $LK-A,"::/TempleOS/Demo/Games/MassSpring.CPP"$, $LK-A,"::/TempleOS/Apps/Span/SpanMain.CPP"$ or $LK-A,"::/TempleOS/Apps/X-Caliber/X-Caliber.CPP"$.

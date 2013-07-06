@@ -8,13 +8,13 @@ U0 Song()
   music_stacatto_factor= 0.902;
   try {
   while (!ScanKey) {
-	Play("W13qF!2GsGG!!GG3GFG!FqAeD!2G!3etDBEsFCFC",
+	Play("3qF2GsGGGG3GFGFqAeD2G3etDBEsFCFC",
 		"Love \0 \0 \0 \0 \0 \0ev\0 \0ery \0 \0sec\0ond.\n\0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("qF!2GsGG!!GG3GFG!FqAeD!2G!3etDBEsFCFC",
+	Play("qF2GsGGGG3GFGFqAeD2G3etDBEsFCFC",
 		"World -- \0 \0 \0 \0 \0 \0all \0 \0that \0 \0beck\0ons.\n\0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("qBG!!FsEAEAqEFGeF!C",
+	Play("qBGFsEAEAqEFGeFC",
 		" \0Life \0is \0too \0 \0 \0 \0prec\0i\0ous.\n\0 \0 \0");
-	Play("qBG!!FsEAEAqEFGeF!C",
+	Play("qBGFsEAEAqEFGeFC",
 		" \0Can \0be \0 \0 \0 \0 \0worr\0i\0ous.\n\0 \0 \0");
   }
   } catch

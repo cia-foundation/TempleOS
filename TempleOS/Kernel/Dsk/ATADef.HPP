@@ -1,4 +1,4 @@
-//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (2).
+//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 
 #define ATA_NOP			0x00
 #define ATA_DEV_RST		0x08

@@ -17,7 +17,7 @@ See $LK-A,"::/TempleOS/Demo/SubIntAccess.CPP"$ for how
 to access upper or lower 32-bits.
 
 For a complete lst of nonstandard compiler
-features, see $LK-A,"::/TempleOS/Doc/Differences.TXT"$.
+features, see $LK-A,"::/TempleOS/Doc/HolyC.TXT"$.
 
 */
 
@@ -73,7 +73,7 @@ public U64i union I64
   penalty.
 
 For a complete lst of nonstandard compiler
-features, see $LK-A,"::/TempleOS/Doc/Differences.TXT"$.
+features, see $LK-A,"::/TempleOS/Doc/HolyC.TXT"$.
 
 */
 

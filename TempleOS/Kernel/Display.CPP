@@ -80,7 +80,7 @@ See also $LK,"GrUpdateScreen","MN:GrUpdateScreen"$().
       ptr=ptr1=col+row*gr_width;
       ptr+=VGA_GRAPHIC_MEM_BASE;
       ptr1+=sys_dc_screen_image; //Write to cached image as well
-      ptr2=&gr_font[ch.u8[0]*FONT_HEIGHT];
+      ptr2=&gr_font[(ch&255)*FONT_HEIGHT];
       for (i=0;i<FONT_HEIGHT;i++) {
 	*ptr=*ptr1=reverse_bits_table[*ptr2++];
 	ptr+=gr_width>>3;
@@ -179,27 +179,29 @@ Bool AKDInputFilterPutS(U8 *st)
 
 U0 PutKey(I64 ch,I64 sc)
 { //See $LK,"PutKeyHandling","FA:::/TempleOS/Doc/KeyBoard.TXT,PutKeyHandling"$
-  CKeyDev *tempp=sys_put_key_root.next;
-  if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
-    if (sys_cur_scan_code & SCF_SCROLL) {
-      if (sys_focus_task==Fs) {
+  CKeyDev *tempp;
+  if (ch||sc) {
+    tempp=sys_put_key_root.next;
+    if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
+      if (sys_cur_scan_code & SCF_SCROLL && sys_focus_task==Fs)
 	while (sys_cur_scan_code & SCF_SCROLL)
-	  Yield;
-      }
-    }
-    while (tempp!=&sys_put_key_root) {
-      if (!(sc & SCF_KEY_DESC) || tempp->flags & KDF_HAS_DESCS) {
-	if ((*tempp->put_key)(ch,sc))
+	  Yield; //Wait on SCROLL LOCK Key
+      while (tempp!=&sys_put_key_root) {
+	if ((!(sc & SCF_KEY_DESC) || tempp->flags & KDF_HAS_DESCS) &&
+	      (*tempp->put_key)(ch,sc))
 	  break;
+	tempp=tempp->next;
       }
-      tempp=tempp->next;
     }
   }
 }
 
-U0 PutChar(I64 ch)
-{
-  PutKey(ch,0);
+U0 PutChar(U64 ch)
+{ //You can pack multiple chars into a U64.
+  while (ch) {
+    PutKey(ch&255,0);
+    ch>>=8;
+  }
 }
 
 U0 PutS(U8 *st)
@@ -209,12 +211,9 @@ U0 PutS(U8 *st)
   if (!st) return;
   CKeyDev *tempp=sys_put_key_root.next;
   if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
-    if (sys_cur_scan_code & SCF_SCROLL) {
-      if (sys_focus_task==Fs) {
-	while (sys_cur_scan_code & SCF_SCROLL)
-	  Yield;
-      }
-    }
+    if (sys_cur_scan_code & SCF_SCROLL && sys_focus_task==Fs)
+      while (sys_cur_scan_code & SCF_SCROLL)
+	Yield;
     while (cont && tempp!=&sys_put_key_root) {
       if (tempp->put_s) {
 	if ((*tempp->put_s)(st))

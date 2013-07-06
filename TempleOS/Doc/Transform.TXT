@@ -10,5 +10,4 @@ The 4th dimension allows a neat trick where you can place pos shifts (translatio
 
 Finally, $LK,"CDC","MN:CDC"$'s have an $FG,2$x$FG$, $FG,2$y$FG$ and $FG,2$z$FG$ which is an additional shift (translation).
 
-The transformation is implemented as a callback on the $LK,"CDC","MN:CDC"$'s $FG,2$transform()$FG$ member.  The default $FG,2$transfrom()$FG$ callback is $LK,"GrTransform","MN:GrTransform"$().  See $LK-A,"::/TempleOS/Demo/GameStarters/EagleDive.CPP"$ or $LK-A,"::/TempleOS/Demo/GameStarters/FPS.CPP"$ to see how to change the $FG,2$transfrom()$FG$ callback for foreshortening.
-
+The transformation is implemented as a callback on the $LK,"CDC","MN:CDC"$'s $FG,2$transform()$FG$ member.  The default $FG,2$transfrom()$FG$ callback is $LK,"GrTransform","MN:GrTransform"$().  See $LK-A,"::/TempleOS/Demo/Games/EagleDive.CPP"$ or $LK-A,"::/TempleOS/Demo/Games/CastleFrankenstein.CPP"$ to see how to change the $FG,2$transfrom()$FG$ callback for foreshortening.

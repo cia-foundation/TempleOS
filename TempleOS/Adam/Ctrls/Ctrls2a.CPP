@@ -64,7 +64,7 @@ public Bool CtrlInside(CCtrl *c,I64 x,I64 y)
 U0 DrawCtrls(CTask *task)
 {
   CCtrl *c;
-  CDC *dc=DCAlias(gr_dc,task);
+  CDC *dc=DCAlias(gr_dc2,task);
   Bool old_preempt=Preempt(OFF);
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {

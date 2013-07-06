@@ -5,8 +5,7 @@ For assending strings: Compare can return StrCmp(e1,e2);
 For assending ints   : Compare can return e1-e2;
 Don't use e1-e2 if numbers can overflow, return -1,0 or 1 with if's.
 
-Maybe, look at $LK-A,"::/TempleOS/Demo/MultiCore/Sort.CPP"$ or
-$LK-A,"::/TempleOS/Demo/MultiCore/RadixSort.CPP"$.
+Maybe, look at $LK-A,"::/TempleOS/Demo/MultiCore/RadixSort.CPP"$.
 */
   I64 i,*less,*greater,pivot;
   if (num>1) {
@@ -150,8 +149,7 @@ For assending strings: Compare can return StrCmp(*e1,*e2);
 For assending ints   : Compare can return *e1-*e2;
 Don't use e1-e2 if numbers can overflow, return -1,0 or 1 with if's.
 
-Maybe, look at $LK-A,"::/TempleOS/Demo/MultiCore/Sort.CPP"$ or
-$LK-A,"::/TempleOS/Demo/MultiCore/RadixSort.CPP"$.
+Maybe, look at $LK-A,"::/TempleOS/Demo/MultiCore/RadixSort.CPP"$.
 */
   I64 i;
   U8 *less,*greater,*temp,*pivot;

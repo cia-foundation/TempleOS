@@ -217,18 +217,32 @@ U0 UnasmHashLoad()
   QSortI64(unasm_table,cnt,&InstEntriesCompare);
 }
 
+I64 StrStrBits(U8 *st)
+{
+  if (StrStr(st,"8"))
+    return 8;
+  if (StrStr(st,"16"))
+    return 16;
+  if (StrStr(st,"32"))
+    return 32;
+  if (StrStr(st,"64"))
+    return 64;
+  return 0;
+}
+
 U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
 //Unassembles one instruction
 {
-  I64 disp,imm,opsize,opadd,
-      i,a1,a2,aa1,aa2,arg1_size=0,arg2_size=0,a1_size,a2_size,
-      ModrM=-1,SIB=-1,scale,r1,r2,
-      Mod=-1,RM1=-1,RM2=-1,REX=-1,REX_r=0,REX_x=0,REX_b=0;
+  I64 i,disp,imm,opsize,opadd,
+	a1,a2,reloced_a1,reloced_a2,
+	a1_size=0,a2_size=0,reloced_a1_size,reloced_a2_size,
+	ModrM=-1,SIB=-1,scale,r1,r2,
+	Mod=-1,RM1=-1,RM2=-1,REX=-1,REX_r=0,REX_x=0,REX_b=0;
   Bool cont;
   CInstruction *tempi,*tempi2;
   CHashOpcode *tempo;
-  U8 *ip=*_ip,*ptr,*a1_st,*a2_st,*bin_data_area,*bin_data_area2,
-      buf2[256],buf3[256],seg_overrides[40],arg1_st[256],arg2_st[256];
+  U8 *ip=*_ip,*ptr,*reloced_a1_st,*reloced_a2_st,*bin_data_area1,*bin_data_area2,
+     buf2[256],line1[256],line2[256],a1_st[256],a2_st[256],seg_overrides[32];
 
   if (_jmp_dst) *_jmp_dst=-1;
   if (seg_size==16) {
@@ -241,41 +255,38 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     opsize=32;
     opadd=64;
   }
-  *arg1_st=0;
-  *arg2_st=0;
-  a1_st=arg1_st;
-  a2_st=arg2_st;
-
-  if (!IsRaw && PutSrcLink(ip,1,buf))
-    StrCat(buf,"\n");
+  *a1_st=0;
+  *a2_st=0;
+  if (!IsRaw && PutSrcLink(ip,1,line1))
+    StrCat(line1,"\n");
   else
-    *buf=0;
+    *line1=0;
 
-  SPrintF(buf+StrLen(buf),"%24tP ",ip);
-  bin_data_area=buf+StrLen(buf);
+  SPrintF(line1+StrLen(line1),"%24tP ",ip);
+  bin_data_area1=line1+StrLen(line1);
   for (i=0;i<6;i++) {
     SPrintF(buf2,"%02X",ip[i]);
-    StrCat(buf,buf2);
+    StrCat(line1,buf2);
   }
-  StrCat(buf," ");
+  StrCat(line1," ");
 
-  SPrintF(buf3,"%24tP ",ip+6);
-  bin_data_area2=buf3+StrLen(buf3);
+  SPrintF(line2,"%24tP ",ip+6);
+  bin_data_area2=line2+StrLen(line2);
   for (i=6;i<12;i++) {
     SPrintF(buf2,"%02X",ip[i]);
-    StrCat(buf3,buf2);
+    StrCat(line2,buf2);
   }
 
   *seg_overrides=0;
   cont=TRUE;
   do {
     switch (*ip++) {
-      case 0x2E: StrCat(seg_overrides,"CS:"); break;
-      case 0x36: StrCat(seg_overrides,"SS:"); break;
-      case 0x3E: StrCat(seg_overrides,"DS:"); break;
-      case 0x26: StrCat(seg_overrides,"ES:"); break;
-      case 0x64: StrCat(seg_overrides,"FS:"); break;
-      case 0x65: StrCat(seg_overrides,"GS:"); break;
+      case 0x2E: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"CS:"); break;
+      case 0x36: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"SS:"); break;
+      case 0x3E: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"DS:"); break;
+      case 0x26: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"ES:"); break;
+      case 0x64: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"FS:"); break;
+      case 0x65: if (StrLen(seg_overrides)<24) StrCat(seg_overrides,"GS:"); break;
       case OC_OP_SIZE_PREFIX:
 	if (opsize==16)
 	  opsize=32;
@@ -384,186 +395,147 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   if (opsize==32 && seg_size==64) {
     tempi2=InstEntryFind(ip,64);
     if (tempi2!=tempi &&
-	tempi2->flags&IEF_REX_ONLY_R8_R15 ||
-	tempi2->flags&IEF_REX_XOR_LIKE&& ip[1]>>3&7==ip[1]&7)
+	  tempi2->flags&IEF_REX_ONLY_R8_R15 ||
+	  tempi2->flags&IEF_REX_XOR_LIKE&& ip[1]>>3&7==ip[1]&7)
       tempi=tempi2;
   }
 
   ip+=tempi->opcode_cnt;
   tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInstruction)-offset(CHashOpcode.ins);
   if (just_ins)
-    *buf=0;
-  StrCat(buf,tempo->str);
+    *line1=0;
+  StrCat(line1,tempo->str);
 
   a1=tempi->arg1;
   a2=tempi->arg2;
-  aa1=a1;
-  aa2=a2;
 
-  ptr=DefineSub(a1,"ST_ARG_TYPES");
-  if (Bt(&uasm_signed_arg_mask,a1)) {
-    if (StrStr(ptr,"8")) {
-      arg1_size=1;
-      StrCat(arg1_st,"I8 ");
-    } else if (StrStr(ptr,"16")) {
-      arg1_size=2;
-      StrCat(arg1_st,"I16 ");
-    } else if (StrStr(ptr,"32")) {
-      arg1_size=4;
-      StrCat(arg1_st,"I32 ");
-    } else if (StrStr(ptr,"64")) {
-      arg1_size=8;
-      StrCat(arg1_st,"I64 ");
-    }
-  } else {
-    if (StrStr(ptr,"8")) {
-      arg1_size=1;
-      StrCat(arg1_st,"U8 ");
-    } else if (StrStr(ptr,"16")) {
-      arg1_size=2;
-      StrCat(arg1_st,"U16 ");
-    } else if (StrStr(ptr,"32")) {
-      arg1_size=4;
-      StrCat(arg1_st,"U32 ");
-    } else if (StrStr(ptr,"64")) {
-      arg1_size=8;
-      StrCat(arg1_st,"U64 ");
-    }
+  if (a1_size=StrStrBits(DefineSub(a1,"ST_ARG_TYPES"))) {
+    if (Bt(&uasm_signed_arg_mask,a1))
+      SPrintF(buf2,"I%d ",a1_size);
+    else
+      SPrintF(buf2,"U%d ",a1_size);
+    StrCat(a1_st,buf2);
   }
 
-  ptr=DefineSub(a2,"ST_ARG_TYPES");
-  if (Bt(&uasm_signed_arg_mask,a2)) {
-    if (StrStr(ptr,"8")) {
-      arg2_size=1;
-      StrCat(arg2_st,"I8 ");
-    } else if (StrStr(ptr,"16")) {
-      arg2_size=2;
-      StrCat(arg2_st,"I16 ");
-    } else if (StrStr(ptr,"32")) {
-      arg2_size=4;
-      StrCat(arg2_st,"I32 ");
-    } else if (StrStr(ptr,"64")) {
-      arg2_size=8;
-      StrCat(arg2_st,"I64 ");
-    }
-  } else {
-    if (StrStr(ptr,"8")) {
-      arg2_size=1;
-      StrCat(arg2_st,"U8 ");
-    } else if (StrStr(ptr,"16")) {
-      arg2_size=2;
-      StrCat(arg2_st,"U16 ");
-    } else if (StrStr(ptr,"32")) {
-      arg2_size=4;
-      StrCat(arg2_st,"U32 ");
-    } else if (StrStr(ptr,"64")) {
-      arg2_size=8;
-      StrCat(arg2_st,"U64 ");
-    }
+  if (a2_size=StrStrBits(DefineSub(a2,"ST_ARG_TYPES"))) {
+    if (Bt(&uasm_signed_arg_mask,a2))
+      SPrintF(buf2,"I%d ",a2_size);
+    else
+      SPrintF(buf2,"U%d ",a2_size);
+    StrCat(a2_st,buf2);
   }
 
-  a1_size=arg1_size;
-  a2_size=arg2_size;
   if (tempi->flags & IEF_PLUS_OPCODE) {
     ip--;
     RM1=*ip++ - tempi->opcode[tempi->opcode_cnt-1]+REX_b;
-    *buf2=0;
+    ptr=NULL;
     if (ARGT_R8<=a1<=ARGT_R64) {
-      if (a1_size==1) {
+      if (a1_size==8) {
 	if (REX!=-1)
-	  SPrintF(buf2,"%Z",RM1,"ST_U8_REX_REGS");
+	  ptr="ST_U8_REX_REGS";
 	else
-	  SPrintF(buf2,"%Z",RM1,"ST_U8_REGS");
-      } else if (a1_size==2)
-	SPrintF(buf2,"%Z",RM1,"ST_U16_REGS");
-      else if (a1_size==4)
-	SPrintF(buf2,"%Z",RM1,"ST_U32_REGS");
-      else if (a1_size==8)
-	SPrintF(buf2,"%Z",RM1,"ST_U64_REGS");
-      StrCat(a1_st,buf2);
+	  ptr="ST_U8_REGS";
+      } else if (a1_size==16)
+	ptr="ST_U16_REGS";
+      else if (a1_size==32)
+	ptr="ST_U32_REGS";
+      else if (a1_size==64)
+	ptr="ST_U64_REGS";
+      if (ptr)
+	StrCat(a1_st,DefineSub(RM1,ptr));
     } else {
-      if (a2_size==1) {
+      if (a2_size==8) {
 	if (REX!=-1)
-	  SPrintF(buf2,"%Z",RM1,"ST_U8_REX_REGS");
+	  ptr="ST_U8_REX_REGS";
 	else
-	  SPrintF(buf2,"%Z",RM1,"ST_U8_REGS");
-      } else if (a2_size==2)
-	SPrintF(buf2,"%Z",RM1,"ST_U16_REGS");
-      else if (a2_size==4)
-	SPrintF(buf2,"%Z",RM1,"ST_U32_REGS");
-      else if (a2_size==8)
-	SPrintF(buf2,"%Z",RM1,"ST_U64_REGS");
-      StrCat(a2_st,buf2);
+	  ptr="ST_U8_REGS";
+      } else if (a2_size==16)
+	ptr="ST_U16_REGS";
+      else if (a2_size==32)
+	ptr="ST_U32_REGS";
+      else if (a2_size==64)
+	ptr="ST_U64_REGS";
+      if (ptr)
+	StrCat(a2_st,DefineSub(RM1,ptr));
     }
   }
+
   if (ARGT_RM8<=a1<=ARGT_RM64 ||
-      ARGT_M8<=a1<=ARGT_M64 ||
-      ARGT_RM8<=a2<=ARGT_RM64 ||
-      ARGT_M8<=a2<=ARGT_M64) {
-    if (ARGT_RM8<=a2<=ARGT_RM64 ||
+	ARGT_M8<=a1<=ARGT_M64 ||
+	ARGT_RM8<=a2<=ARGT_RM64 ||
 	ARGT_M8<=a2<=ARGT_M64) {
-      a1_st=arg2_st;
-      a2_st=arg1_st;
-      a1_size=arg2_size;
-      a2_size=arg1_size;
-      aa1=a2;
-      aa2=a1;
+    if (ARGT_RM8<=a2<=ARGT_RM64 ||
+	  ARGT_M8<=a2<=ARGT_M64) {
+      reloced_a1=a2;
+      reloced_a2=a1;
+      reloced_a1_size=a2_size;
+      reloced_a2_size=a1_size;
+      reloced_a1_st=a2_st;
+      reloced_a2_st=a1_st;
+    } else {
+      reloced_a1=a1;
+      reloced_a2=a2;
+      reloced_a1_size=a1_size;
+      reloced_a2_size=a2_size;
+      reloced_a1_st=a1_st;
+      reloced_a2_st=a2_st;
     }
-    StrCat(a1_st,seg_overrides);
+
+    StrCat(reloced_a1_st,seg_overrides);
     ModrM=*ip++;
     Mod=ModrM>>6 & 3;
     RM1=ModrM & 7+REX_b;
     RM2=ModrM>>3 & 7+REX_r;
-    if (Mod<3 && RM1&7==4) {
+    if (Mod<3 && RM1&7==4)
       SIB=*ip++;
-    }
     if (Mod==1) {
       disp=*ip(U8 *)++;
       SPrintF(buf2,"%02X",disp);
-      StrCat(a1_st,buf2);
-    }
-    if (Mod==2) {
+      StrCat(reloced_a1_st,buf2);
+    } else if (Mod==2) {
       disp=*ip(U32 *)++;
       SPrintF(buf2,"%08X",disp);
-      StrCat(a1_st,buf2);
+      StrCat(reloced_a1_st,buf2);
     }
     if (tempi->slash_val<8)
       RM2=-1;
     else {
-      *buf2=0;
-      if (aa2==ARGT_SREG)
-	SPrintF(buf2,"%Z",RM2,"ST_SEG_REGS");
-      else if (!(ARGT_IMM8<=aa2<=ARGT_IMM64) &&
-      !(ARGT_UIMM8<=aa2<=ARGT_UIMM64)) {
-	if (a2_size==1) {
+      ptr=NULL;
+      if (reloced_a2==ARGT_SREG) {
+	if (RM2<=5)
+	  ptr="ST_SEG_REGS";
+      } else if (!(ARGT_IMM8<=reloced_a2<=ARGT_IMM64) &&
+	    !(ARGT_UIMM8<=reloced_a2<=ARGT_UIMM64)) {
+	if (reloced_a2_size==8) {
 	  if (REX!=-1)
-	    SPrintF(buf2,"%Z",RM2,"ST_U8_REX_REGS");
+	    ptr="ST_U8_REX_REGS";
 	  else
-	    SPrintF(buf2,"%Z",RM2,"ST_U8_REGS");
-	}else if (a2_size==2)
-	  SPrintF(buf2,"%Z",RM2,"ST_U16_REGS");
-	else if (a2_size==4)
-	  SPrintF(buf2,"%Z",RM2,"ST_U32_REGS");
-	else if (a2_size==8)
-	  SPrintF(buf2,"%Z",RM2,"ST_U64_REGS");
+	    ptr="ST_U8_REGS";
+	} else if (reloced_a2_size==16)
+	  ptr="ST_U16_REGS";
+	else if (reloced_a2_size==32)
+	  ptr="ST_U32_REGS";
+	else if (reloced_a2_size==64)
+	  ptr="ST_U64_REGS";
       }
-      StrCat(a2_st,buf2);
+      if (ptr)
+	StrCat(reloced_a2_st,DefineSub(RM2,ptr));
     }
     if (RM1&7==5 && !Mod) {
       disp=*ip(I32 *)++;
       if (seg_size==64) {
 	disp+=ip;
-	if (aa2==ARGT_IMM8 || aa2==ARGT_UIMM8)
+	if (reloced_a2==ARGT_IMM8 || reloced_a2==ARGT_UIMM8)
 	  disp++;
-	else if (aa2==ARGT_IMM16 || aa2==ARGT_UIMM16)
+	else if (reloced_a2==ARGT_IMM16 || reloced_a2==ARGT_UIMM16)
 	  disp+=2;
-	else if (aa2==ARGT_IMM32 || aa2==ARGT_UIMM32)
+	else if (reloced_a2==ARGT_IMM32 || reloced_a2==ARGT_UIMM32)
 	  disp+=4;
-	else if (aa2==ARGT_IMM64 || aa2==ARGT_UIMM64)
+	else if (reloced_a2==ARGT_IMM64 || reloced_a2==ARGT_UIMM64)
 	  disp+=8;
       }
       SPrintF(buf2,"[%X] ",disp);
-      StrCat(a1_st,buf2);
+      StrCat(reloced_a1_st,buf2);
       RM1=-1;
     } else {
       if (Mod<3) {
@@ -580,88 +552,49 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
 	    scale=2;
 	  else
 	    scale=1;
+	  if (seg_size==64)
+	    ptr="ST_U64_REGS";
+	  else
+	    ptr="ST_U32_REGS";
 	  if (r1==CREG_RBP && !Mod) {
 	    disp=*ip(U32 *)++;
 	    SPrintF(buf2,"%08X",disp);
-	    StrCat(a1_st,buf2);
-	    if (seg_size!=64)
-	      SPrintF(buf2,"[%Z*%d]",r2,"ST_U32_REGS",scale);
-	    else
-	      SPrintF(buf2,"[%Z*%d]",r2,"ST_U64_REGS",scale);
-	    StrCat(a1_st,buf2);
+	    StrCat(reloced_a1_st,buf2);
+	    SPrintF(buf2,"[%Z*%d]",r2,ptr,scale);
+	    StrCat(reloced_a1_st,buf2);
 	  } else if (r2==4) {
-	    if (seg_size!=64)
-	      SPrintF(buf2,"[%Z]",r1,"ST_U32_REGS");
-	    else
-	      SPrintF(buf2,"[%Z]",r1,"ST_U64_REGS");
-	    StrCat(a1_st,buf2);
+	    SPrintF(buf2,"[%Z]",r1,ptr);
+	    StrCat(reloced_a1_st,buf2);
 	  } else {
-	    if (seg_size!=64)
-	      SPrintF(buf2,"[%Z+%Z*%d]",r1,"ST_U32_REGS",
-		  r2,"ST_U32_REGS",scale);
-	    else
-	      SPrintF(buf2,"[%Z+%Z*%d]",r1,"ST_U64_REGS",
-		  r2,"ST_U64_REGS",scale);
-	    StrCat(a1_st,buf2);
+	    SPrintF(buf2,"[%Z+%Z*%d]",r1,ptr,r2,ptr,scale);
+	    StrCat(reloced_a1_st,buf2);
 	  }
 	} else {
-	  *buf2=0;
 	  if (opadd==16)
-	    SPrintF(buf2,"[%Z]",RM1,"ST_U16_REGS");
+	    ptr="ST_U16_REGS";
 	  else if (opadd==32)
-	    SPrintF(buf2,"[%Z]",RM1,"ST_U32_REGS");
+	    ptr="ST_U32_REGS";
 	  else
-	    SPrintF(buf2,"[%Z]",RM1,"ST_U64_REGS");
-	  StrCat(a1_st,buf2);
+	    ptr="ST_U64_REGS";
+	  SPrintF(buf2,"[%Z]",RM1,ptr);
+	  StrCat(reloced_a1_st,buf2);
 	}
       } else {
-	*buf2=0;
-	if (a1_size==1) {
+	ptr=NULL;
+	if (reloced_a1_size==8) {
 	  if (REX!=-1)
-	    SPrintF(buf2,"%Z",RM1,"ST_U8_REX_REGS");
+	    ptr="ST_U8_REX_REGS";
 	  else
-	    SPrintF(buf2,"%Z",RM1,"ST_U8_REGS");
-	} else if (a1_size==2)
-	  SPrintF(buf2,"%Z",RM1,"ST_U16_REGS");
-	else if (a1_size==4)
-	  SPrintF(buf2,"%Z",RM1,"ST_U32_REGS");
-	else if (a1_size==8)
-	  SPrintF(buf2,"%Z",RM1,"ST_U64_REGS");
-	StrCat(a1_st,buf2);
+	    ptr="ST_U8_REGS";
+	} else if (reloced_a1_size==16)
+	  ptr="ST_U16_REGS";
+	else if (reloced_a1_size==32)
+	  ptr="ST_U32_REGS";
+	else if (reloced_a1_size==64)
+	  ptr="ST_U64_REGS";
+	if (ptr)
+	  StrCat(reloced_a1_st,DefineSub(RM1,ptr));
       }
-    }
-  }
-  if (ARGT_MOFFS8<=a1<=ARGT_MOFFS64) {
-    StrCat(arg1_st,seg_overrides);
-    if (arg1_size==1) {
-      disp=*ip(U8 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg1_st,buf2);
-    } else if (opadd==16) {
-      disp=*ip(U16 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg1_st,buf2);
-    } else {
-      disp=*ip(U32 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg1_st,buf2);
-    }
-  }
-
-  if (ARGT_MOFFS8<=a2<=ARGT_MOFFS64) {
-    StrCat(arg2_st,seg_overrides);
-    if (arg2_size==1) {
-      disp=*ip(U8 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg2_st,buf2);
-    } else if (opadd==16) {
-      disp=*ip(U16 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg2_st,buf2);
-    } else {
-      disp=*ip(U32 *)++;
-      SPrintF(buf2,"[%X]",disp);
-      StrCat(arg2_st,buf2);
     }
   }
 
@@ -670,11 +603,11 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     case ARGT_UIMM8:
       imm=*ip(U8 *)++;
       SPrintF(buf2,"%02X",imm);
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       if (tempi->opcode[0]==0xCD) {
 	if (ptr=DefineSub(imm,"ST_INT_NAMES")) {
-	  StrCat(arg1_st," ");
-	  StrCat(arg1_st,ptr);
+	  StrCat(a1_st," ");
+	  StrCat(a1_st,ptr);
 	}
       }
       break;
@@ -682,84 +615,94 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     case ARGT_UIMM16:
       imm=*ip(U16 *)++;
       SPrintF(buf2,"%04X",imm);
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_IMM32:
     case ARGT_UIMM32:
       imm=*ip(U32 *)++;
       SPrintF(buf2,"%08X",imm);
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_IMM64:
     case ARGT_UIMM64:
       imm=*ip(I64 *)++;
       SPrintF(buf2,"%016X",imm);
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_REL8:
       disp=*ip(I8 *)++;
       disp+=ip;
       SPrintF(buf2,"%P ",disp);
       if (_jmp_dst) *_jmp_dst=disp;
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_REL16:
       disp=*ip(I16 *)++;
       disp+=ip;
       SPrintF(buf2,"%P ",disp);
       if (_jmp_dst) *_jmp_dst=disp;
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_REL32:
       disp=*ip(I32 *)++;
       disp+=ip;
       SPrintF(buf2,"%P ",disp);
       if (_jmp_dst) *_jmp_dst=disp;
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,buf2);
+      break;
+    case ARGT_MOFFS8...ARGT_MOFFS64:
+      StrCat(a1_st,seg_overrides);
+      if (a1_size==8)
+	disp=*ip(U8 *)++;
+      else if (opadd==16)
+	disp=*ip(U16 *)++;
+      else
+	disp=*ip(U32 *)++;
+      SPrintF(buf2,"[%X]",disp);
+      StrCat(a1_st,buf2);
       break;
     case ARGT_CL:
-      StrCat(arg1_st,"CL");
+      StrCat(a1_st,"CL");
       break;
     case ARGT_AL:
-      StrCat(arg1_st,"AL");
+      StrCat(a1_st,"AL");
       break;
     case ARGT_AX:
-      StrCat(arg1_st,"AX");
+      StrCat(a1_st,"AX");
       break;
     case ARGT_EAX:
-      StrCat(arg1_st,"EAX");
+      StrCat(a1_st,"EAX");
       break;
     case ARGT_RAX:
-      StrCat(arg1_st,"RAX");
+      StrCat(a1_st,"RAX");
       break;
     case ARGT_DX:
-      StrCat(arg1_st,"DX");
+      StrCat(a1_st,"DX");
       break;
     case ARGT_SS:
-      StrCat(arg1_st,"SS");
+      StrCat(a1_st,"SS");
       break;
     case ARGT_DS:
-      StrCat(arg1_st,"DS");
+      StrCat(a1_st,"DS");
       break;
     case ARGT_ES:
-      StrCat(arg1_st,"ES");
+      StrCat(a1_st,"ES");
       break;
     case ARGT_FS:
-      StrCat(arg1_st,"FS");
+      StrCat(a1_st,"FS");
       break;
     case ARGT_GS:
-      StrCat(arg1_st,"GS");
+      StrCat(a1_st,"GS");
       break;
     case ARGT_CS:
-      StrCat(arg1_st,"CS");
+      StrCat(a1_st,"CS");
       break;
     case ARGT_ST0:
-      StrCat(arg1_st,"ST0");
+      StrCat(a1_st,"ST0");
       break;
     case ARGT_STI:
       ip--;
-      SPrintF(buf2,"%Z",*ip++ - tempi->opcode[tempi->opcode_cnt-1],"ST_FSTK_REGS");
-      StrCat(arg1_st,buf2);
+      StrCat(a1_st,DefineSub(*ip++ - tempi->opcode[tempi->opcode_cnt-1],"ST_FSTK_REGS"));
       break;
   }
 
@@ -768,97 +711,107 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     case ARGT_UIMM8:
       imm=*ip(U8 *)++;
       SPrintF(buf2,"%02X",imm);
-      StrCat(arg2_st,buf2);
+      StrCat(a2_st,buf2);
       break;
     case ARGT_IMM16:
     case ARGT_UIMM16:
       imm=*ip(U16 *)++;
       SPrintF(buf2,"%04X",imm);
-      StrCat(arg2_st,buf2);
+      StrCat(a2_st,buf2);
       break;
     case ARGT_IMM32:
     case ARGT_UIMM32:
       imm=*ip(U32 *)++;
       SPrintF(buf2,"%08X",imm);
-      StrCat(arg2_st,buf2);
+      StrCat(a2_st,buf2);
       break;
     case ARGT_IMM64:
     case ARGT_UIMM64:
       imm=*ip(I64 *)++;
       SPrintF(buf2,"%016X",imm);
-      StrCat(arg2_st,buf2);
+      StrCat(a2_st,buf2);
+      break;
+    case ARGT_MOFFS8...ARGT_MOFFS64:
+      StrCat(a2_st,seg_overrides);
+      if (a2_size==8)
+	disp=*ip(U8 *)++;
+      else if (opadd==16)
+	disp=*ip(U16 *)++;
+      else
+	disp=*ip(U32 *)++;
+      SPrintF(buf2,"[%X]",disp);
+      StrCat(a2_st,buf2);
       break;
     case ARGT_CL:
-      StrCat(arg2_st,"CL");
+      StrCat(a2_st,"CL");
       break;
     case ARGT_AL:
-      StrCat(arg2_st,"AL");
+      StrCat(a2_st,"AL");
       break;
     case ARGT_AX:
-      StrCat(arg2_st,"AX");
+      StrCat(a2_st,"AX");
       break;
     case ARGT_EAX:
-      StrCat(arg2_st,"EAX");
+      StrCat(a2_st,"EAX");
       break;
     case ARGT_RAX:
-      StrCat(arg2_st,"RAX");
+      StrCat(a2_st,"RAX");
       break;
     case ARGT_DX:
-      StrCat(arg2_st,"DX");
+      StrCat(a2_st,"DX");
       break;
     case ARGT_SS:
-      StrCat(arg2_st,"SS");
+      StrCat(a2_st,"SS");
       break;
     case ARGT_DS:
-      StrCat(arg2_st,"DS");
+      StrCat(a2_st,"DS");
       break;
     case ARGT_ES:
-      StrCat(arg2_st,"ES");
+      StrCat(a2_st,"ES");
       break;
     case ARGT_FS:
-      StrCat(arg2_st,"FS");
+      StrCat(a2_st,"FS");
       break;
     case ARGT_GS:
-      StrCat(arg2_st,"GS");
+      StrCat(a2_st,"GS");
       break;
     case ARGT_CS:
-      StrCat(arg2_st,"CS");
+      StrCat(a2_st,"CS");
       break;
     case ARGT_ST0:
-      StrCat(arg2_st,"ST0");
+      StrCat(a2_st,"ST0");
       break;
     case ARGT_STI:
       ip--;
-      SPrintF(buf2,"%Z",*ip++ - tempi->opcode[tempi->opcode_cnt-1],"ST_FSTK_REGS");
-      StrCat(arg2_st,buf2);
+      StrCat(a2_st,DefineSub(*ip++ - tempi->opcode[tempi->opcode_cnt-1],"ST_FSTK_REGS"));
       break;
   }
   if (tempi->flags&IEF_ENDING_ZERO)
     ip++;
 
-  if (*arg1_st) {
-    StrCat(buf,"\t");
-    StrCat(buf,arg1_st);
+  if (*a1_st) {
+    StrCat(line1,"\t");
+    StrCat(line1,a1_st);
   }
-  if (*arg2_st) {
-    StrCat(buf,",");
-    StrCat(buf,arg2_st);
+  if (*a2_st) {
+    StrCat(line1,",");
+    StrCat(line1,a2_st);
   }
+  StrCat(line1,"\n");
+  StrCat(line2,"\n");
   if (!just_ins) {
     for (i=ip-(*_ip)(I64);i<6;i++) {
-      bin_data_area[i<<1]=CH_SPACE;
-      bin_data_area[i<<1+1]=CH_SPACE;
+      bin_data_area1[i<<1]=CH_SPACE;
+      bin_data_area1[i<<1+1]=CH_SPACE;
     }
     for (i=ip-(*_ip)(I64);i<12;i++) {
       bin_data_area2[(i-6)<<1]=CH_SPACE;
       bin_data_area2[(i-6)<<1+1]=CH_SPACE;
     }
   }
-  StrCat(buf,"\n");
-  if (!just_ins && ip-(*_ip)(I64)>6) {
-    StrCat(buf,buf3);
-    StrCat(buf,"\n");
-  }
+  StrCpy(buf,line1);
+  if (!just_ins && ip-(*_ip)(I64)>6)
+    StrCat(buf,line2);
   *_ip=ip;
 }
 

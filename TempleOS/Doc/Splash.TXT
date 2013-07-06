@@ -1,5 +1,5 @@
 
-              TempleOS V1.00
+$TX+CX+D,"TempleOS VDD_TEMPLEOS_VERSION","DD_OS_NAME_VERSION"$
                          
 
 
@@ -28,4 +28,3 @@
             Operating System
 
             $LK,"Trivial Solutions","FI:::/TempleOS/Doc/TrivialSolutions.TXT"$
-

@@ -38,6 +38,7 @@ U0 DrawIt(CTask *,CDC *dc)
 U0 Song()
 {
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  Fs->text_attr=LTCYAN<<4+BLACK;
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
@@ -46,13 +47,13 @@ U0 Song()
   try {
     "$$BG+H,LTCYAN$$";
     while (!ScanKey) {
-	Play("W13qE!AA!etF2G3G!qDF!!etFE!D2eG!3G",
+	Play("3qEAAetF2G3GqDFetFED2eG3G",
 		"A\0dam... \0 \0no \0 \0 \0long\0er \0sees \0Your \0face.\n\0 \0 \0");
-	Play("qE!AA!etF2G3G!qDF!!etFE!D2eG!3G",
+	Play("qEAAetF2G3GqDFetFED2eG3G",
 		"Oh! \0 \0 \0What \0 \0a \0wretch\0ed \0bar\0ren \0waste!\n\0 \0 \0");
-	Play("qACFeB!CB2GqG3E!D",
+	Play("qACFeBCB2GqG3ED",
 		" \0 \0 \0 \0 \0 \0 \0 \0Ex\0iled.\n\0");
-	Play("ACFeB!CB2GqG3E!D");
+	Play("ACFeBCB2GqG3ED");
     }
   } catch
     CatchAll;

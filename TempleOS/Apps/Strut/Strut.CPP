@@ -74,7 +74,7 @@ U0 Zoom(F64 d)
   d=Exp(Ln(d)/ZOOM_STEPS);
   for (i=0;i<ZOOM_STEPS;i++) {
     S2W(x,y,&wx,&wy);
-    zoom*=d;
+    zoom=Limit(zoom*d,0.02,50);
     W2S(wx,wy,&sx,&sy);
     task->win_scroll_x=ipx-sx-task->win_pixel_left;
     task->win_scroll_y=ipy-sy-task->win_pixel_top;

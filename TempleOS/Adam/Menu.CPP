@@ -1,6 +1,14 @@
 #help_index "Menus"
 #help_file "::/TempleOS/Doc/Menus"
 
+CTask *MenuTask()
+{
+  CTask *result=sys_focus_task;
+  while (result && !result->cur_menu)
+    result=result->parent_task;
+  return result;
+}
+
 CMenuEntry *sys_cur_submenu_entry=NULL;
 
 public CMenuEntry *MenuSubEntryFind(CMenuEntry *first,U8 *entry_name)
@@ -170,7 +178,7 @@ U0 DrawMenu(CDC *dc)
   CMenu *m;
   CMenuEntry *tempme,*tempse,*cur_submenu=NULL;
   U8 *st=NULL;
-  CTask *task=sys_focus_task;
+  CTask *task=MenuTask;
   I64 i,w,x0,y0,x1=ipx,y1=ipy;
   if (!TaskValidate(task) || !(m=task->cur_menu) ||
       m->mu_signature!=MENU_SIGNATURE_VAL) {

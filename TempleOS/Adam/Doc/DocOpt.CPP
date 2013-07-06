@@ -4,6 +4,7 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
 {
   U8 *st,*st2,**dst;
   I64 i,result=0;
+
   if (doc_e->flags1&DOCEF1_LINK) {
     if (doc_e->flags1 & DOCEF1_AUX_STR &&
 	Bt(doc_tag_types,doc_e->type_u8) &&

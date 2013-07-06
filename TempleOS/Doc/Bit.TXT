@@ -6,11 +6,9 @@ $FG,2$Btr$FG$:	Bit Test and Rst to zero
 $FG,2$Btc$FG$:	Bit Test and Compliment (toggle)
 $FG,2$BEqu$FG$:	Set bit to value.
 
-$FG$$FG,5$Bit operations are "atomic" meaning they won't be interrupted between the testing of the bit and the alteration.  This is important when multitasking.  With multiprocessing, you should "Lock" these operations.$FG$
+$FG$$FG,5$Bit operations are "atomic" meaning they won't be interrupted between the testing of the bit and the alteration.  This is important when multitasking.  With multicore processing, you should "Lock" these operations.$FG$
 
 $FG,5$These don't take a pointer, but the actual field.$FG$
 $FG,2$Bsf$FG$:	Bit Scan Fwd (Pos of first low one bit or -1)
 $FG,2$Bsr$FG$:	Bit Scan Reverse (Pos of first high one bit or -1)
 $FG,2$BCnt$FG$:	Bit Cnt (Cnt of set bits)
-
-

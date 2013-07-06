@@ -18,7 +18,7 @@ This uses four types of output
 
   2) The Fs->draw_it() for the staff region, drawn every refresh.
 
-  3) The gr_dc2 persistent layer for the note chooser, meter chooser.  The persistent layer is used during drag-and-drop.
+  3) The gr_dc persistent layer for the note chooser, meter chooser.  The persistent layer is used during drag-and-drop.
 
   4) The Fs->next_ctrl for the tempo/stacatto sliders.
 
@@ -60,7 +60,7 @@ class OrgNote
      I64 octave;
      I64 meter_bottom;
   }
-  I64 duration,accent,width,waveform;
+  I64 duration,width;
   U8 ascii[32];
 };
 
@@ -143,15 +143,9 @@ U8 org_note_inverse_map[7]={10,8,7,5,3,2,0};
 	$SP,"<15>",15$
 
 
+
+
 	$SP,"<16>",16$
-
-
-	$SP,"<17>",17$
-
-
-
-
-	$SP,"<18>",18$
 
 #define ORG_NOTE_SPACING	9
 #define ORG_NUM_DURATIONS	12
@@ -349,9 +343,9 @@ U0 DrawNote(CDC *dc,I64 x,I64 y,I64 duration)
   if (0<=duration<=ORG_NUM_DURATIONS) {
     SpritePlot3(dc,x,y,0,org_duration_imgs[duration]);
     if (org_triplet_durations[duration])
-      SpritePlot3(dc,x,y,0,$IB,"<18>",18$);
+      SpritePlot3(dc,x,y,0,$IB,"<16>",16$);
     if (OrgIsDotted(duration))
-      SpritePlot3(dc,x,y,0,$IB,"<19>",19$);
+      SpritePlot3(dc,x,y,0,$IB,"<15>",15$);
   }
 }
 
@@ -416,18 +410,13 @@ U0 DrawIt(CTask *task,CDC *dc)
 	if (OrgHasWords(tempo->word))
 	  dc->color=GREEN;
       }
-      if (tempo->accent==1)
-	SpritePlot3(dc,x,y,0,$IB,"<20>",20$);
-      else if (tempo->accent==2)
-	SpritePlot3(dc,x,y,0,$IB,"<21>",21$);
       DrawNote(dc,x,y,tempo->duration);
       if (OrgIsDotted(tempo->duration))
 	x+=ORG_NOTE_SPACING/2;
-
       if (Bt(&tempo->flags,Of_SHARP))
-	SpritePlot3(dc,x,y,0,$IB,"<22>",22$);
+	SpritePlot3(dc,x,y,0,$IB,"<13>",13$);
       else if (Bt(&tempo->flags,Of_FLAT))
-	SpritePlot3(dc,x,y,0,$IB,"<23>",23$);
+	SpritePlot3(dc,x,y,0,$IB,"<14>",14$);
       measure_left-=org_durations[tempo->duration];
     }
     tempo=tempo->next;
@@ -437,7 +426,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     dc->color=BROWN;
   else
     dc->color=BLACK;
-  SpritePlot3(dc,oc.root.x,50,0,$IB,"<24>",24$);
+  SpritePlot3(dc,oc.root.x,50,0,$IB,"<12>",12$);
   Preempt(old_preempt);
 }
 
@@ -456,7 +445,7 @@ F64 PopUpDuration()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FM,GREEN$$$$MU,\"Set Word\",ORGR_SET_WORD$$\n"
+  DocPutS(doc,"$$FG,GREEN$$$$MU,\"Set Word\",ORGR_SET_WORD$$\n"
 	"$$MU,\"Toggle Sharp\",ORGR_SHARP$$\n"
 	"$$MU,\"Toggle Flat\",ORGR_FLAT$$\n"
 	"$$MU,\"Toggle Tie\",ORGR_TIE$$\n"
@@ -479,7 +468,7 @@ U0 OrgRightClick(I64 x,I64 y)
   U8 *st,*st2;
   OrgNote *tempo,*tempo1;
   I64 i,old_doc_flags;
-  if (DocCur) old_doc_flags=DocCur->flags;
+  if (DocPut) old_doc_flags=DocPut->flags;
   oc.cur_note=tempo=OrgFindNote(x,y);
   if (tempo!=&oc.root) {
     Fs->win_inhibit=0;
@@ -493,8 +482,6 @@ U0 OrgRightClick(I64 x,I64 y)
 	  if (tempo->type==OT_NOTE) {
 	    tempo->octave=OCTAVE_REST;
 	    tempo->note=NOTE_REST;
-	    tempo->accent=0;
-	    tempo->waveform=WF_SQUARE;
 	  }
 	  break;
 	case ORGR_SHARP:
@@ -537,7 +524,7 @@ U0 OrgRightClick(I64 x,I64 y)
 	  break;
 	case ORGR_SET_WORD:
 	  if (tempo->type==OT_NOTE) {
-	    if (DocCur) DocCur->flags&=~DOCF_FORM;
+	    if (DocPut) DocPut->flags&=~DOCF_FORM;
 	    if (OrgHasWords(tempo->word))
 	      st2=MSPrintF("\nWord(\"%Q\"):",tempo->word);
 	    else
@@ -551,7 +538,7 @@ U0 OrgRightClick(I64 x,I64 y)
 	      Free(st);
 	    } else
 	      tempo->word=StrNew(" ");
-	    if (DocCur) DocCur->flags=DocCur->flags&~DOCF_FORM|old_doc_flags&DOCF_FORM;
+	    if (DocPut) DocPut->flags=DocPut->flags&~DOCF_FORM|old_doc_flags&DOCF_FORM;
 	  }
 	  break;
 	case ORGR_INS_NOTE:
@@ -562,18 +549,6 @@ U0 OrgRightClick(I64 x,I64 y)
 	  oc.cur_note=tempo->next;
 	  QueRem(tempo);
 	  OrgNoteDel(tempo);
-	  break;
-	case ORGR_NO_ACCENT:
-	  if (tempo->type==OT_NOTE && tempo->octave!=OCTAVE_REST)
-	    tempo->accent=0;
-	  break;
-	case ORGR_ACCENT:
-	  if (tempo->type==OT_NOTE && tempo->octave!=OCTAVE_REST)
-	    tempo->accent=1;
-	  break;
-	case ORGR_STRONG_ACCENT:
-	  if (tempo->type==OT_NOTE && tempo->octave!=OCTAVE_REST)
-	    tempo->accent=2;
 	  break;
       }
     }
@@ -631,16 +606,16 @@ U0 DrawPickNoteBox()
 U0 DrawPickTools()
 {
   if (oc.tool==OTT_BOX_TOOL)
-    oc.dc2->color=ROPF_DITHER+WHITE<<16+ROP_EQU+RED;
+    oc.dc2->color=ROPF_DITHER+WHITE<<16+RED;
   else
-    oc.dc2->color=ROPF_DITHER+WHITE<<16+ROP_EQU+BLACK;
+    oc.dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
   GrLineRect4(oc.dc2,ORG_TOOLS_X,ORG_TOOLS_Y,
     ORG_TOOLS_X+10,ORG_TOOLS_Y+10);
 
   if (oc.tool==OTT_PTR_TOOL)
-    oc.dc2->color=ROP_EQU+RED;
+    oc.dc2->color=RED;
   else
-    oc.dc2->color=ROP_EQU+BLACK;
+    oc.dc2->color=BLACK;
   (*fp_draw_input_ptr)(oc.dc2,ORG_TOOLS_X+15,ORG_TOOLS_Y);
   oc.dc2->color=BLACK;
 }
@@ -728,7 +703,6 @@ U0 OrgLeftClickPickNoteBox(I64 duration)
     tempo->note=n;
     tempo->octave=o;
     tempo->duration=duration;
-    tempo->waveform=tempo1->waveform;
     OrgSetWidth(tempo);
     QueIns(tempo,tempo1);
     oc.cur_note=tempo->next;
@@ -758,7 +732,6 @@ U0 OrgLeftClickPickMeterBox(I64 top,I64 bottom)
     tempo->type=OT_METER;
     tempo->meter_top=top;
     tempo->meter_bottom=bottom;
-    tempo->waveform=tempo1->waveform;
     OrgSetWidth(tempo);
     QueIns(tempo,tempo1);
     oc.cur_note=tempo->next;
@@ -769,14 +742,12 @@ U0 OrgLeftClickPickMeterBox(I64 top,I64 bottom)
 U0 OrgLeftClickStaffPtr(I64 x,I64 y)
 {
   OrgNote *tempo,*tempo1;
-  I64 o,n,msg_code,p1,p2,n_original,o_original,a_original,wf_original;
+  I64 o,n,msg_code,p1,p2,n_original,o_original;
   oc.cur_note=tempo=OrgFindNote(x,y);
   if (tempo!=&oc.root) {
     if (tempo->type==OT_NOTE) {
       n_original=tempo->note;
       o_original=tempo->octave;
-      a_original=tempo->accent;
-      wf_original=tempo->waveform;
       do {
 	msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
 	if (msg_code==MSG_IP_L_UP) {
@@ -789,8 +760,6 @@ U0 OrgLeftClickStaffPtr(I64 x,I64 y)
 	    tempo->word=NULL;
 	    tempo->note=n_original;
 	    tempo->octave=o_original;
-	    tempo->accent=a_original;
-	    tempo->waveform=wf_original;
 	  }
 	} else {
 move_note:
@@ -818,7 +787,7 @@ U0 OrgLeftClickStaffBox(I64 x,I64 y)
   do {
     msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
     DrawDC2;
-    oc.dc2->color=ROPF_DITHER+WHITE<<16+ROP_EQU+BLACK;
+    oc.dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
     GrLineRect4(oc.dc2,x,y,p1,p2);
     if (msg_code==MSG_IP_L_UP) {
       if (x>p1) SwapU64(&x,&p1);
@@ -866,7 +835,7 @@ U0 OrgPlayTask(I64)
       case ORGPM_NORMAL:
 	if (org_play_f!=f) {
 	  f=org_play_f;
-	  Snd(f,music_waveform);
+	  Snd(f);
 	}
 	break;
       case ORGPM_REVERB1:
@@ -877,9 +846,9 @@ U0 OrgPlayTask(I64)
 	}
 	if (!(i&15)) {
 	  if (i&16)
-	    Snd(f,music_waveform);
+	    Snd(f);
 	  else
-	    Snd(f2,music_waveform);
+	    Snd(f2);
 	}
 	break;
     }
@@ -932,15 +901,13 @@ U8 *OrgMusicSetNoteLen(U8 *st,F64 *org_duration)
 U0 OrgLoadSongStr(U8 *st,I64 *org_octave,F64 *org_duration)
 {
   OrgNote *tempo,*tempo1;
-  I64 note,i=0,waveform=WF_SQUARE;
+  I64 note,i=0;
   while (*st) {
     tempo=CAlloc(sizeof(OrgNote));
-    tempo->waveform=WF_SQUARE;
     while (*st && !('A'<=*st<='G') && *st!='R') {
       if (*st=='M') {
 	tempo1=CAlloc(sizeof(OrgNote));
 	tempo1->type=OT_METER;
-	tempo1->waveform=tempo->waveform;
 	st++;
 	if ('1'<=*st<='9')
 	  tempo1->meter_top=*st++-'0';
@@ -954,15 +921,6 @@ U0 OrgLoadSongStr(U8 *st,I64 *org_octave,F64 *org_duration)
 	  tempo1->meter_bottom=4;
 	OrgSetWidth(tempo1);
 	QueIns(tempo1,oc.root.last);
-      }
-      if (*st=='W') {
-	st++;
-	tempo->waveform=*st++-'0';
-	waveform=tempo->waveform;
-      }
-      while (*st=='!') {
-	tempo->accent++;
-	st++;
       }
       while (*st=='(') {
 	Bts(&tempo->flags,Of_TIE);
@@ -999,8 +957,6 @@ U0 OrgLoadSongStr(U8 *st,I64 *org_octave,F64 *org_duration)
     } else {
       tempo->note=NOTE_REST;
       tempo->octave=OCTAVE_REST;
-      tempo->accent=0;
-      tempo->waveform=WF_SQUARE;
     }
     if (*org_duration<=2*.25/3)
       i=0;
@@ -1037,7 +993,7 @@ U0 OrgLoadSong(U8 *filename,I64 *org_octave,F64 *org_duration)
 {
   U8 *st;
   OrgNote *tempo;
-  CLex *lx=LexNew(TextFileRead(filename),0,StrNew(filename));
+  CLex *lx=LexNew(TextFileRead(filename),0,filename);
   Lex(lx);
   if (FileOcc("incomplete",filename,""))
     oc.incomplete_entry->checked=TRUE;
@@ -1084,13 +1040,12 @@ U8 *OrgCvtSong()
 {
   OrgNote *tempo;
   U8 *st,*src,*dst;
-  I64 i,note,octave,last_octave,last_duration,accent,waveform,last_waveform;
+  I64 i,note,octave,last_octave,last_duration;
 
   i=0;
   tempo=oc.root.next;
   last_octave=OCTAVE_REST;
   last_duration=-1;
-  last_waveform=-1;
   while (tempo!=&oc.root) {
     dst=&tempo->ascii;
     if (tempo->type==OT_METER) {
@@ -1115,17 +1070,8 @@ U8 *OrgCvtSong()
 	}
 	note=music_note_map[*LstEntryPt(note,org_note_lst)-'A'];
       }
-      accent=tempo->accent;
-      waveform=tempo->waveform;
-      if (waveform!=last_waveform && note!=NOTE_REST) {
-	*dst++='W';
-	*dst++=waveform+'0';
-	last_waveform=waveform;
-      }
       if (Bt(&tempo->flags,Of_TIE))
 	*dst++='(';
-      while (accent--)
-	*dst++='!';
       if (octave!=last_octave && note!=NOTE_REST) {
 	*dst++=octave+'0';
 	last_octave=octave;
@@ -1296,25 +1242,8 @@ U0 OrgSetOctave(I64 octave)
     tempse->checked=org_play_mode==1;
 }
 
-U0 OrgSetWaveform(I64 waveform)
-{
-  CMenuEntry *tempse;
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Snd/Square"))
-    tempse->checked=waveform==WF_SQUARE;
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Snd/Sine"))
-    tempse->checked=waveform==WF_SINE;
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Snd/Triangle"))
-    tempse->checked=waveform==WF_TRIANGLE;
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Snd/Sawtooth"))
-    tempse->checked=waveform==WF_SAWTOOTH;
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Snd/Noise"))
-    tempse->checked=waveform==WF_NOISE;
-}
 
-
-
-
-$SP,"<25>",25$
+$SP,"<17>",17$
  
 
 
@@ -1393,11 +1322,11 @@ U0 OrgUpKey(I64 x,I64 y)
   }
 }
 
-U0 OrgMenu(I64 org_octave,I64 org_waveform)
+U0 OrgMenu(I64 org_octave)
 {
   DocClear;
-  "$$BD,WHITE$$$$FD,GREEN$$$$FU,GREEN$$$$FM,GREEN$$$$CM,0,12$$\n";
-  PutSprite($IB,"<25>",25$);
+  "$$BD,WHITE$$$$FD,GREEN$$$$CM,0,12$$\n";
+  PutSprite($IB,"<17>",17$);
   NewLine(5);
 
   DrawDC2;
@@ -1422,15 +1351,14 @@ U0 OrgMenu(I64 org_octave,I64 org_waveform)
   PutSprite($IB,"<7>",7$,"$$SP+LM+LA,\"\",\"Msg(MSG_KEY_DOWN,0,SCF_CTRL|SC_CURSOR_RIGHT);\",%d$$");
   "$$CM+LX,0,6$$";
   OrgSetOctave(org_octave);
-  OrgSetWaveform(org_waveform);
   WinMgrSync(2);
 }
 
 
-U0 OrgPushMode(I64 org_octave,I64 org_waveform)
+U0 OrgPushMode(I64 org_octave)
 {
   Fs->win_inhibit=WIF_ALL-WIF_BORDER-WIF_MENU-WIF_CTRLS;
-  OrgMenu(org_octave,org_waveform);
+  OrgMenu(org_octave);
 }
 
 U0 OrgPopMode()
@@ -1446,16 +1374,16 @@ U0 MusicOrgan(U8 *dirname=NULL)
 {
   Bool is_note,was_playing;
   I64 p1,p2,ch,sc,msg_code=0,col,
-      note=NOTE_REST,octave=OCTAVE_REST,accent=0,org_waveform=WF_SQUARE,org_octave=3,timeout_val,timeout_val2,
+      note=NOTE_REST,octave=OCTAVE_REST,org_octave=3,timeout_val,timeout_val2,
       old_doc_flags;
   U8 *filename=NULL,*st,*st2;
-  CTask *play_task=Spawn(&OrgPlayTask,NULL,"Organ Play",Fs);
+  CTask *play_task=Spawn(&OrgPlayTask,NULL,"Organ Play",,Fs);
   OrgNote *tempo;
   F64 f=0,last_f=0,org_duration=1.0,
       d,evt_time=tT,note_down_time=tT;
   CCtrl *c=TempoNew;
 
-  if (DocCur) old_doc_flags=DocCur->flags;
+  if (DocPut) old_doc_flags=DocPut->flags;
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   WinBorder;
   WordStat;
@@ -1466,13 +1394,12 @@ U0 MusicOrgan(U8 *dirname=NULL)
   tempo_state.tempo=Round(TEMPO_RANGE*(music_tempo-0.5)/4.4);
   tempo_state.stacatto=Round(TEMPO_RANGE*(music_stacatto_factor-0.12)/0.88);
 
-  if (DocCur) DocCur->flags|=DOCF_FORM;
+  if (DocPut) DocPut->flags|=DOCF_FORM;
 
   MemSet(&oc,0,sizeof(OrgCtrl));
   oc.screen_x=0;
   oc.root.next=oc.root.last=&oc.root;
   oc.clipboard.next=oc.clipboard.last=&oc.clipboard;
-  oc.root.waveform=WF_SQUARE;
   oc.cur_note=&oc.root;
   oc.dc2=DCAlias;
 
@@ -1505,11 +1432,6 @@ U0 MusicOrgan(U8 *dirname=NULL)
   "  MarkIncomplete(MSG_CMD,ORGF_INCOMPLETE);"
   "}"
   "Snd {"
-  "  Square(,'!');"
-  "  Sine(,'@');"
-  "  Triangle(,'#');"
-  "  Sawtooth(,'$$');"
-  "  Noise(,'%');"
   "  Reverb(,'c');"
   "  Octave0(,'0');"
   "  Octave1(,'1');"
@@ -1532,7 +1454,7 @@ U0 MusicOrgan(U8 *dirname=NULL)
     dirname=StrNew("HOME/MusicOrgan");
   else
     dirname=StrNew(dirname);
-  OrgPushMode(org_octave,org_waveform);
+  OrgPushMode(org_octave);
   col=0;
   Fs->draw_it=&DrawIt;
 
@@ -1556,8 +1478,8 @@ got_msg:
       }
       if (msg_code!=MSG_IP_MOVE) {
 	DocBottom;
-	if (was_playing || DocCur->cur_entry->y>=Fs->win_height-2) {
-	  OrgMenu(org_octave,org_waveform);
+	if (was_playing || DocPut->cur_entry->y>=Fs->win_height-2) {
+	  OrgMenu(org_octave);
 	  col=0;
 	}
       }
@@ -1579,7 +1501,7 @@ got_msg:
 	      oc.incomplete_entry->checked=!oc.incomplete_entry->checked;
 	      break;
 	  }
-	  OrgPushMode(org_octave,org_waveform);
+	  OrgPushMode(org_octave);
 	  is_note=FALSE;
 	  col=0;
 	  break;
@@ -1589,7 +1511,7 @@ got_msg:
 	  sc=p2;
 	  if ('0'<=ch<='9') {
 	    org_octave=ch-'0';
-	    OrgMenu(org_octave,org_waveform);
+	    OrgMenu(org_octave);
 	    col=0;
 	  } else {
 	    is_note=TRUE;
@@ -1647,7 +1569,7 @@ got_msg:
 		  case SC_F1:
 		    OrgPopMode;
 		    PopUp("Ed(\"::/TempleOS/Apps/MusicOrgan/Help.TXT.Z\");",Fs);
-		    OrgPushMode(org_octave,org_waveform);
+		    OrgPushMode(org_octave);
 		    col=0;
 		    is_note=FALSE;
 		    break;
@@ -1686,7 +1608,7 @@ got_msg:
 		  OrgLoadSongStr(st2,&org_octave,&org_duration);
 		  Free(st2);
 		}
-		OrgPushMode(org_octave,org_waveform);
+		OrgPushMode(org_octave);
 		is_note=FALSE;
 		col=0;
 		break;
@@ -1697,7 +1619,7 @@ got_msg:
 		"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to load it into MusicOrgan.\n\n"
 		ST_WARN_ST " Graphics and other embelishments\n"
 		"will be lost because MusicOrgan can't\n"
-		    "parse C/C++ programs completely.\n");
+		    "parse Holy C programs completely.\n");
 		Free(filename);
 		filename=NULL;
 		JukeBox(dirname,&filename);
@@ -1711,14 +1633,14 @@ got_msg:
 		  oc.record_entry->checked=FALSE;
 		  oc.cur_note=oc.root.next;
 		}
-		OrgPushMode(org_octave,org_waveform);
+		OrgPushMode(org_octave);
 		is_note=FALSE;
 		col=0;
 		break;
 	      case CH_CTRLA:
 		OrgPopMode;
 		filename=OrgSaveSong(dirname,filename);
-		OrgPushMode(org_octave,org_waveform);
+		OrgPushMode(org_octave);
 		is_note=FALSE;
 		break;
 	      case CH_CTRLC:
@@ -1734,7 +1656,7 @@ got_msg:
 		is_note=FALSE;
 		break;
 	      case '.':
-		OrgMenu(org_octave,org_waveform);
+		OrgMenu(org_octave);
 		col=0;
 		Free(filename);
 		filename=NULL;
@@ -1757,7 +1679,7 @@ got_msg:
 		}
 		col=0;
 		oc.playing=TRUE;
-		OrgMenu(org_octave,org_waveform);
+		OrgMenu(org_octave);
 		tempo=oc.cur_note;
 		while (tempo!=&oc.root) {
 		  if (tempo->type!=OT_METER) {
@@ -1783,8 +1705,6 @@ got_msg:
 		      "" tempo->word;
 		    note=tempo->note;
 		    octave=tempo->octave;
-		    accent=tempo->accent;
-		    org_waveform=tempo->waveform;
 		    if (note!=NOTE_REST)
 		      f=Note2Freq(note,octave);
 		    else
@@ -1797,7 +1717,6 @@ got_msg:
 
 		    music_tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
 		    music_stacatto_factor=0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
-		    music_waveform=org_waveform;
 		    d=JIFFY_FREQ*org_durations[tempo->duration]/music_tempo;
 		    if (Bt(&tempo->flags,Of_TIE)) {
 		      timeout_val+=d;
@@ -1816,7 +1735,7 @@ got_msg:
 		oc.cur_note=&oc.root;
 		oc.screen_x+=oc.cur_note->x-GR_WIDTH/2;
 		oc.playing=FALSE;
-		OrgMenu(org_octave,org_waveform);
+		OrgMenu(org_octave);
 		col=0;
 		f=0;
 		org_play_f=0;
@@ -1838,7 +1757,7 @@ got_msg:
 		org_play_mode++;
 		if (org_play_mode>=ORGPM_NUM_PLAY_MODES) org_play_mode=0;
 		is_note=FALSE;
-		OrgMenu(org_octave,org_waveform);
+		OrgMenu(org_octave);
 		col=0;
 		break;
 	      case 'z':
@@ -1850,44 +1769,14 @@ got_msg:
 		  org_octave=3;
 		  oc.screen_x=0;
 		}
-		OrgMenu(org_octave,org_waveform);
+		OrgMenu(org_octave);
 		col=0;
 		is_note=FALSE;
 		break;
 	      case CH_ESC:
 		OrgPopMode;
 		filename=OrgSaveSong(dirname,filename);
-		OrgPushMode(org_octave,org_waveform);
-		break;
-	      case '!':
-		music_waveform=org_waveform=WF_SQUARE;
-		OrgMenu(org_octave,org_waveform);
-		col=0;
-		is_note=FALSE;
-		break;
-	      case '@':
-		music_waveform=org_waveform=WF_SINE;
-		OrgMenu(org_octave,org_waveform);
-		col=0;
-		is_note=FALSE;
-		break;
-	      case '#':
-		music_waveform=org_waveform=WF_TRIANGLE;
-		OrgMenu(org_octave,org_waveform);
-		col=0;
-		is_note=FALSE;
-		break;
-	      case '$$':
-		music_waveform=org_waveform=WF_SAWTOOTH;
-		OrgMenu(org_octave,org_waveform);
-		col=0;
-		is_note=FALSE;
-		break;
-	      case '%':
-		music_waveform=org_waveform=WF_NOISE;
-		OrgMenu(org_octave,org_waveform);
-		col=0;
-		is_note=FALSE;
+		OrgPushMode(org_octave);
 		break;
 	      default:
 		is_note=FALSE;
@@ -1946,8 +1835,6 @@ got_msg:
 	    tempo->type=OT_NOTE;
 	    tempo->note=note;
 	    tempo->octave=octave;
-	    tempo->accent=0;
-	    tempo->waveform=org_waveform;
 	    if (st[1]=='#')
 	      Bts(&tempo->flags,Of_SHARP);
 	  }
@@ -1961,6 +1848,7 @@ got_msg:
 	}
       }
     } while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
+    GetMsg(,,1<<MSG_KEY_UP);
   } catch
     CatchAll;
   OrgPopMode;
@@ -1970,10 +1858,10 @@ got_msg:
   Kill(play_task);
   DCFill;
   DCDel(oc.dc2);
+  DocClear;
   SettingsPop;
-  if (DocCur) DocCur->flags=DocCur->flags&~DOCF_FORM|old_doc_flags&DOCF_FORM;
+  if (DocPut) DocPut->flags=DocPut->flags&~DOCF_FORM|old_doc_flags&DOCF_FORM;
   Free(dirname);
-  "$$CL$$\n";
   MenuPop;
 }
            "        òÿÿÿ   ñÿÿÿ   ñÿÿÿ
@@ -2015,18 +1903,13 @@ got_msg:
               ?      
                            
          
-   	              #      þÿÿÿÖÿÿÿþÿÿÿ&      Öÿÿÿ   &              E         úÿÿÿ         úÿÿÿ
-                ýÿÿÿ                       V      	   ýÿÿÿ            
+   	              #      þÿÿÿÖÿÿÿþÿÿÿ&      Öÿÿÿ   &              E         úÿÿÿ         úÿÿÿ
+                ýÿÿÿ                       V      	   ýÿÿÿ            
       
                   
       
-                                                                             #      ýÿÿÿýÿÿÿ    úÿÿÿ    úÿÿÿ   ýÿÿÿ           E      ýÿÿÿýÿÿÿ    úÿÿÿ    úÿÿÿ   ýÿÿÿýÿÿÿúÿÿÿ    ÷ÿÿÿ    ÷ÿÿÿ   úÿÿÿ           E      þÿÿÿöÿÿÿ    öÿÿÿ    öÿÿÿ    òÿÿÿ    òÿÿÿþÿÿÿòÿÿÿ    ôÿÿÿÿÿÿÿôÿÿÿ           ò               $       $           0   $   0      ,      4      4      4       ,      ,       @   $   @      <      D      D      D       <      <       |      „      „      „       |      |       l      t      t      t       l      l          $   À   $                            Ä                    A $      S 4      D D      F T      G d      H t      J „      K ”      L ¤      ; ´      ' ,      E <      R L      T l      U |      I œ      P ¬      [ ¼      ] P      P      L      T      T      T       L      L       `   $   `       p   $   p      €   $   €         $              $          °   $   °      À   $   À      œ      ¤      ¤      ¤       œ      œ       ¬      ´      ´      ´       ¬      ¬       ¼      Ä      Ä      Ä       ¼      ¼       P   $   P      0      @      P      p      €             °      À      @   
+                                                  E      þÿÿÿöÿÿÿ    öÿÿÿ    öÿÿÿ    òÿÿÿ    òÿÿÿþÿÿÿòÿÿÿ    ôÿÿÿÿÿÿÿôÿÿÿ           ò               $       $           0   $   0      ,      4      4      4       ,      ,       @   $   @      <      D      D      D       <      <       |      „      „      „       |      |       l      t      t      t       l      l          $   À   $                            Ä                    A $      S 4      D D      F T      G d      H t      J „      K ”      L ¤      ; ´      ' ,      E <      R L      T l      U |      I œ      P ¬      [ ¼      ] P      P      L      T      T      T       L      L       `   $   `       p   $   p      €   $   €         $              $          °   $   °      À   $   À      œ      ¤      ¤      ¤       œ      œ       ¬      ´      ´      ´       ¬      ¬       ¼      Ä      Ä      Ä       ¼      ¼       P   $   P      0      @      P      p      €             °      À      @   
    ~          
-              #      ýÿÿÿýÿÿÿ    úÿÿÿ    úÿÿÿ   ýÿÿÿ           E      ýÿÿÿýÿÿÿ    úÿÿÿ    úÿÿÿ   ýÿÿÿýÿÿÿúÿÿÿ    ÷ÿÿÿ    ÷ÿÿÿ   úÿÿÿ           E         úÿÿÿ         úÿÿÿ
-                ýÿÿÿ                       V      	   ýÿÿÿ            
-      
-                  
-      
-                       #      þÿÿÿÖÿÿÿþÿÿÿ&      Öÿÿÿ   &       	       P      
+       	       P      
                               
             	      	       

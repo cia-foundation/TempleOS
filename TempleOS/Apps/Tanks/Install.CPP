@@ -1,2 +1,0 @@
-MkDir("HOME/Tanks");
-

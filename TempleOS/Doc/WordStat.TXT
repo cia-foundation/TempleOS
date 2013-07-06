@@ -5,4 +5,3 @@ It provides auto-complete typing and jump-to-code or jump-to-dictionary_definiti
 Tip: If you use consistent var names for items of different classes, you'll usually be able to autocomplete the member vars.  I always use $FG,2$lx$FG$ for $LK,"CLex","MN:CLex"$ ptrs; $FG,2$doc$FG$ for $LK,"CDoc","MN:CDoc"$ ptrs; $FG,2$doc_e$FG$ or $FG,2$doc_ce$FG$ for $LK,"CDocEntry","MN:CDocEntry"$ ptrs, etc.
 
 If you have the raw Project Gutenberg dictionary file, you can generate the TempleOS processed dictionary files with the stand-alone program $LK-A,"::/TempleOS/Adam/WordStat/WSDictGen.CPP"$.
-

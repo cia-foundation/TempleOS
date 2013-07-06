@@ -1,7 +1,5 @@
 $WW,1$$FG,5$$TX+CX,"Acknowledgements"$$FG$
 
-I am a for profit company, not an academic.  I have never seen a commercial product with acknowledgements like an academic paper.  Never-the-less, here are references.  (I don't know the original sources on many of these.)
-
 1) The font, $LK-A,"::/TempleOS/Kernel/Font8x8.CPP"$, is taken from $FG,4$$TX+HTML,"FreeDOS","http://www.freedos.org"$$FG$.
 
 2) $LK-A,"::/TempleOS/Kernel/Dsk/ATADef.HPP"$ originally
@@ -15,35 +13,33 @@ from Linux.  I later got the spec.
 
 6) The random number generator is from the book, $UL,1$Numeric Recipies in C$UL,0$.
 
-7) The pilgrim game map is from $FG,4$$TX+HTML,"US Geological Survey","http://nationalatlas.gov/mapmaker"$$FG$.  (Screen captured and edited with MS Paint and saved as $FG,2$.BMP$FG$ and imported into TempleOS and converted with a program I wrote.)
+7) Tne sheep and goats in AfterEgypt are from $FG,4$$TX+HTML,"http://www.public-domain-photos.com","http://www.public-domain-photos.com"$$FG$.
 
-8) Tne sheep in AfterEgypt is from $FG,4$$TX+HTML,"http://www.public-domain-photos.com","http://www.public-domain-photos.com"$$FG$.
+8) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
 
-9) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
+9) A few features were inspired by $FG,2$MATLAB$FG$, such as $FG,2$ans$FG$ in expressions at the command-line.  There is a lot of $FG,2$MSDOS$FG$ , $FG,2$Windows$FG$, $FG,2$VAXTMOS$FG$ (VAX Ticketmaster O.S.) and $FG,2$Unix$FG$ inspiration, too, such as drive letters, command names, etc.
 
-10) A few features were inspired by $FG,2$MATLAB$FG$, such as $FG,2$ans$FG$ in expressions at the command-line.  There is a lot of $FG,2$MSDOS$FG$ , $FG,2$Windows$FG$, $FG,2$VAXTMOS$FG$ (VAX Ticketmaster O.S.) and $FG,2$Unix$FG$ inspiration, too, such as drive letters, command names, etc.
+10) I included $LK+HTML,"PCIDevice Lst File","FI:::/TempleOS/Misc/PCIDevices.TXT","http://www.pcidatabase.com/reports.php?type=tab-delimeted"$.
 
-11) I included $LK+HTML,"PCIDevice Lst File","FI:::/TempleOS/Misc/PCIDevices.TXT","http://www.pcidatabase.com/reports.php?type=tab-delimeted"$.
+11) Thanks to whoever wrote this $FG,4$$TX+HTML,"CppHtml.CPP.Z","http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"ToHtml","FI:::/TempleOS/Adam/Utils/ToHtml.CPP"$.
 
-12) Thanks to whoever wrote this $FG,4$$TX+HTML,"CppHtml.CPP.Z","http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"ToHtml","FI:::/TempleOS/Adam/ToHtml.CPP"$.
+12) Yahoo Sitebuilder helped with some html code items.
 
-13) Yahoo Sitebuilder helped with some html code items.
+13) I used $FG,4$$TX+HTML,"MagicISO","http://www.magiciso.com"$$FG$ to burn test CD's to help me understand the ISO9660 file system format.  I mostly used the $FG,4$$TX+HTML,"ISO9660","http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"$$FG$ spec.
 
-14) I used $FG,4$$TX+HTML,"MagicISO","http://www.magiciso.com"$$FG$ to burn test CD's to help me understand the ISO9660 file system format.  I mostly used the $FG,4$$TX+HTML,"ISO9660","http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"$$FG$ spec.
+14) I looked at bootable CD boot sects, but didn't learn anything, finding it easier to make my own.
 
-15) I looked at bootable CD boot sects, but didn't learn anything, finding it easier to make my own.
+15) I think I got my original PC speaker code from $FG,2$Borland C$FG$.
 
-16) I think I got my original PC speaker code from $FG,2$Borland C$FG$.
+16) I found PS/2 keyboard and mouse code on the net and documentation.  My code is very different.  I found VGA register info on the net.
 
-17) I found PS/2 keyboard and mouse code on the net and documentation.  My code is very different.  I found VGA register info on the net.
+17) Thanks to $FG,4$$TX+HTML,"http://www.osdev.org","http://www.osdev.org"$$FG$ for a couple tips.
 
-18) Thanks to $FG,4$$TX+HTML,"http://www.osdev.org","http://www.osdev.org"$$FG$ for a couple tips.
+18) God told me to stick with 640x480 16 color,  a single audio voice and kept me from zombie-walking into making child windows like $FG,2$Windows$FG$.  Instead, I made one window per task with no child windows.  He also guided my progress, very obviously.
 
-19) God told me to stick with 640x480x16 color and kept me from blindly making child windows like $FG,2$Windows$FG$.  Instead, I made one window per task with no child windows.  He also guided my progress, very obviously.
+19) I got $FG,4$$TX+HTML,"Webster's Dictionary","http://www.templeos.org/files/DICTIONARY.TXT"$$FG$ and $FG,4$$TX+HTML,"The King James Bible","http://www.templeos.org/files/BIBLE.TXT"$$FG$ from $FG,4$$TX+HTML,"Project Gutenberg","http://promo.net/pg/"$$FG$.
 
-20) I got $FG,4$$TX+HTML,"Webster's Dictionary","http://www.templeos.org/files/DICTIONARY.TXT"$$FG$ and $FG,4$$TX+HTML,"The King James Bible","http://www.templeos.org/files/BIBLE.TXT"$$FG$ from $FG,4$$TX+HTML,"Project Gutenberg","http://promo.net/pg/"$$FG$.
-
-In short, I wrote every one of the $TX+D,"139,633","DD_TEMPLEOS_LOC"$ lines myself, no $FG,2$GPL$FG$ code, no linkage or dependence on other code.  Anyone who says otherwise is being an ass.
+In short, I wrote every one of the $TX+D,"129,624","DD_TEMPLEOS_LOC"$ lines myself, no $FG,2$GPL$FG$ code, no linkage or dependence on other code.  Anyone who says otherwise is being an ass.
 $FG,8$
 * "MSDOS", "Windows", "MovieMaker" "MS Paint" and "FAT32" are trademarks of MicroSoft Corp.
 * "SiteBuilder" is a trademark of Yahoo! Inc.
@@ -53,3 +49,4 @@ $FG,8$
 * "VAX" is a trademark of Digital Equipment Corp.
 * "Linux" is probably a trademark owned by Linus Torvalds.
 * "VAXTMOS" is a trademark of Ticketmaster.
+$FG$

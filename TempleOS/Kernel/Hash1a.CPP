@@ -299,12 +299,12 @@ _HASH_ADD::
 	MOV	U64 CHash.next[RCX],RBX
 	MOV	U64 [RAX],RCX
 
-//Queins
+//QueIns RCX
 	MOV	RBX,U64 CHashTable.last_added[RDI]
+	MOV	U64 CHash.next_added[RCX],RDI
 	MOV	U64 CHash.last_added[RCX],RBX
 	MOV	U64 CHash.next_added[RBX],RCX
 	MOV	U64 CHashTable.last_added[RDI],RCX
-	MOV	U64 CHash.next_added[RCX],RDI
 
 	POPFD
 	POP	RDI
@@ -324,12 +324,12 @@ _HASH_ADD_AFTER::
 	MOV	U64 CHash.next[RCX],RBX
 	MOV	U64 [RAX],RCX
 
-//QueIns
+//QueIns RCX
 	MOV	RBX,U64 CHashTable.last_added[RDI]
+	MOV	U64 CHash.next_added[RCX],RDI
 	MOV	U64 CHash.last_added[RCX],RBX
 	MOV	U64 CHash.next_added[RBX],RCX
 	MOV	U64 CHashTable.last_added[RDI],RCX
-	MOV	U64 CHash.next_added[RCX],RDI
 
 	POPFD
 	POP	RDI
@@ -357,7 +357,7 @@ _HASH_REPLACE::
 	MOV	RCX,U64 SF_ARG1[RBP]
 	JZ	@@05	//Z set by find
 
-//QueRem/QueIns
+//QueRem RAX,QueIns RCX
 	MOV	RBX,U64 CHash.next_added[RAX]
 	MOV	U64 CHash.next_added[RCX],RBX
 	MOV	U64 CHash.last_added[RBX],RCX
@@ -368,12 +368,12 @@ _HASH_REPLACE::
 	MOV	RBX,U64 CHash.next[RAX]
 	JMP	@@10
 
-//QueIns
+//QueIns RCX
 @@05:	MOV	RBX,U64 CHashTable.last_added[RDI]
+	MOV	U64 CHash.next_added[RCX],RDI
 	MOV	U64 CHash.last_added[RCX],RBX
 	MOV	U64 CHash.next_added[RBX],RCX
 	MOV	U64 CHashTable.last_added[RDI],RCX
-	MOV	U64 CHash.next_added[RCX],RDI
 
 	MOV	RBX,RAX
 
@@ -418,7 +418,7 @@ _HASH_REM_DEL::
 	MOV	RBX,U64 CHash.next[RAX]
 	MOV	U64 [RDX],RBX
 
-//QueRem
+//QueRem RAX
 	MOV	RBX,U64 CHash.next_added[RAX]
 	MOV	RDX,U64 CHash.last_added[RAX]
 	MOV	U64 CHash.next_added[RDX],RBX
@@ -486,10 +486,8 @@ U0 HashDel(CHashSrcSym *temph)
     Free(temph->index);
     Free(temph->import_name);
     LinkedLstDel(temph->ie_lst);
-    if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM)) {
+    if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM))
       Free(temph->debug);
-      Free(temph->indent);
-    }
     if (temph->type & (HTT_FUN | HTT_CLASS))
     //Assumes code not on heap, so doesn't Free.
     //$LK,"MemberLstDel","MN:MemberLstDel"$() is an import to the Kernel module
@@ -779,7 +777,7 @@ U8 *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR)
 lo_skip:
   module_base=bfh_addr(U8 *)+sizeof(CBinFile);
 
-  if (ArcXSum(bfh_addr,bfh_addr->file_size)!=NATIVE_XSUM)
+  if (ArcXSum(bfh_addr,bfh_addr->file_size)!=TEMPLEOS_XSUM)
     throw(EXCEPT_ARC_XSUM);
 
   absname=FileNameAbs(fbuf);

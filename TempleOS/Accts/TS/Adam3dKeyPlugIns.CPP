@@ -3,13 +3,13 @@
 
 U0 FillInTime()
 {
-  CDate spdt;
-  spdt=GetCurTimeCDate;
-  "$$IV,1$$----%D %T----$$IV,0$$\n",spdt,spdt;
+  CDate cdt;
+  cdt=GetCurTimeDate;
+  "$$IV,1$$----%D %T----$$IV,0$$\n",cdt,cdt;
 }
 
 U0 RandQuote(I64 num)
-{ //$LK-A,"::/TempleOS/Apps/AfterEgypt/AENotes.TXT"$
+{ //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
   I64 i,size,l=512;
   U8 *bible_filename=Define("ST_BIBLE_FILE"),
      *buf=FileRead(bible_filename,&size);
@@ -22,7 +22,7 @@ U0 RandQuote(I64 num)
 }
 
 U0 BadCodeJump(I64 num)
-{ //$LK-A,"::/TempleOS/Apps/AfterEgypt/AENotes.TXT"$
+{ //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
   CDirEntry *root=FilesFind("/TempleOS/*",FUF_JUST_FILES|FUF_RECURSE|FUF_FLATTEN_TREE|FUF_JUST_SRC_FILES),
 	     *tempm=root;
   I64 cnt=0;
@@ -129,7 +129,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  else
 	    SetKeyDesc("God Word");
 	} else {
-	  //$LK-A,"::/TempleOS/Apps/AfterEgypt/AENotes.TXT"$
+	  //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
 	  if (sc & SCF_SHIFT)
 	    RandQuote(KbdMouseEvtTime>>4);
 	  else
@@ -157,7 +157,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    SetKeyDesc("Misc/Insert Datetime");
 	} else {
 	  if (sc & SCF_SHIFT)
-	    DocInsSafe(DocCur,
+	    DocInsSafe(DocPut,
 		"$$HS+C$$$$FG$$$$HE$$");
 	  else
 	    FillInTime();
@@ -202,7 +202,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    else {
 	      ClipBoardDel;
 	      DocPrintF(sys_clipboard_doc,"$$LK-A,\"FL:%s,%d\"$$",
-		DocCur->filename.name,DocCur->cur_entry->y+1);
+		DocPut->filename.name,DocPut->cur_entry->y+1);
 	    }
 	    return TRUE;
 	  case 'L':
@@ -212,7 +212,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      i=RandU32;
 	      ClipBoardDel;
 	      DocPrintF(sys_clipboard_doc,"$$LK,\"<TODO>\",\"FA:%s,ANC%d\"$$",
-		DocCur->filename.name,i);
+		DocPut->filename.name,i);
 	      "$$AN,\"<TODO>\",\"ANC%d\"$$",i;
 	    }
 	    return TRUE;
@@ -234,7 +234,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  case 'b':
 	    if (sc&SCF_KEY_DESC)
 	      SetKeyDesc("Cmd/Jump to Bad Code");
-	    else //$LK-A,"::/TempleOS/Apps/AfterEgypt/AENotes.TXT"$
+	    else //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
 	      BadCodeJump(KbdMouseEvtTime>>4);
 	    return TRUE;
 

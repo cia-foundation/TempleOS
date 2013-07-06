@@ -5,7 +5,6 @@
 #include "CmpAsm"
 #include "CmpExts"
 #include "CmpGlbls"
-#include "CmpQueVect"
 #include "Unassembler"
 #include "Directives"
 #include "Lex"

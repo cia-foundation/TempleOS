@@ -118,13 +118,13 @@ public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
   I64 result;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
   CLex *lx;
-  lx=LexNew("",LF_DONT_FREE_BUF,FileNameAbs(sys_temp_filename));
+  lx=LexNew("",LF_DONT_FREE_BUF,sys_temp_filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex)
     lx->opts=Fs->last_lex->opts;
   QueIns(lx,Fs->last_lex);
-  LexIncludeDoc(lx,NULL,doc);
+  LexAttachDoc(lx,,doc);
   try {
     Lex(lx);
     result=ExeCmdLine(lx);

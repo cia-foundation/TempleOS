@@ -1,3 +1,5 @@
+//Press F5 to compile and run
+
 U0 DotNet()
 {
   I64 i;

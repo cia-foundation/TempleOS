@@ -1,7 +1,7 @@
 #define BORDER_CHARS	1
 
 U8 *buf;
-I64 size,mp_done_flags;
+I64 size,mp_not_done_flags;
 CDoc *doc;
 
 U0 PDNormalize()
@@ -72,7 +72,7 @@ U0 MPPalindrome(I64 dummy=0)
 
     src++;
   }
-  LBts(&mp_done_flags,Gs->num);
+  LBtr(&mp_not_done_flags,Gs->num);
 }
 
 U0 Palindrome(U8 *filename)
@@ -83,12 +83,11 @@ U0 Palindrome(U8 *filename)
   buf=FileRead(filename,&size);
   PDNormalize;
 
-  doc=DocCur;
-  mp_done_flags=0;
-  for (i=1;i<mp_cnt;i++)
-    MPJob(&MPPalindrome,NULL,i);
-  MPPalindrome;
-  while (mp_done_flags!=1<<mp_cnt-1)
+  doc=DocPut;
+  mp_not_done_flags=1<<mp_cnt-1;
+  for (i=0;i<mp_cnt;i++)
+    JobQue(&MPPalindrome,NULL,i);
+  while (mp_not_done_flags)
     Yield;
 
   Free(buf);

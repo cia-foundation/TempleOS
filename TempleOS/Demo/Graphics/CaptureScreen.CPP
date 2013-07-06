@@ -1,8 +1,8 @@
-//See $LK-A,"::/TempleOS/Demo/GameStarters/Stadium/StadiumGen.CPP"$.
+//See $LK-A,"::/TempleOS/Demo/Games/Stadium/StadiumGen.CPP"$.
 
 U0 ViewScreenCapture(U8 *filename)
 {
-  CDC	*dc=DCAlias(gr_dc2,Fs),
+  CDC	*dc=DCAlias(gr_dc,Fs),
 	*dc2=GRARead(filename);
   GrBlot(dc,0,0,dc2);
   DCDel(dc2);

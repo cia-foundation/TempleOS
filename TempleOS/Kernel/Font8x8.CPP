@@ -1,4 +1,4 @@
-//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (1).
+//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 
 U8 sys_font_8x8[256*8]= {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

@@ -14,11 +14,11 @@ U0 Song()
   SetWinHorz(Fs->win_left,Fs->win_right,task);
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
   while (!ScanKey) {
-	Play("W13sDDDACCADDACCAe.DsCCC2G3FD2G3FD2G3CCAe.D",
+	Play("3sDDDACCADDACCAe.DsCCC2G3FD2G3FD2G3CCAe.D",
 		"I \0 \0 \0 \0got \0 \0 \0paid, \0 \0 \0to\0 \0 \0day.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
-	Play("qD2sG3G2G3G!etGDAeF2GqG3etF!BA!!EACE!CE",
+	Play("qD2sG3G2G3GetGDAeF2GqG3etFBAEACECE",
 		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0 \0can't \0 \0 \0get \0 \0to \0");
-	Play("qD2sG3G2G3G!etGDAeF2GqG3etF!BA!!EACE!CE",
+	Play("qD2sG3G2G3GetGDAeF2GqG3etFBAEACECE",
 		"sleep.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
   }
   } catch

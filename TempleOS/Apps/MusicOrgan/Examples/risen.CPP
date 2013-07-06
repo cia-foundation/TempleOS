@@ -63,6 +63,7 @@ U0 Song()
 {
   I64 i;
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
+  Fs->text_attr=LTCYAN<<4+BLACK;
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
@@ -73,10 +74,10 @@ U0 Song()
     by[i]=RANGE*RandI16/RANGE;
   }
   try {
-    "$$BG+H,LTCYAN$$$$FD+H,BLACK$$";
+    "$$BG+H,LTCYAN$$";
     while (!ScanKey) {
 	t0=tMBeat;
-	Play("W13eDEqFFetEEFqDeCDDEetCGF");
+	Play("3eDEqFFetEEFqDeCDDEetCGF");
 	Play("eDEqFFetEEFqDeCDDEetCGF");
 	Play("eDCqDEeAAetEEFEDGBDCqF");
 	Play("eDCqDEeAAetEEFEDGBDCqF");

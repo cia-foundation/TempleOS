@@ -3,7 +3,8 @@
 
 Cd("/TempleOS/Adam/Boot");;
 #include "InsBoot"
-Cd("/TempleOS/Adam");;
+Cd("/TempleOS/Adam/Utils");;
+#include "Profiler"
 #include "Diff"
 #include "Grep"
 #include "LineCnt"

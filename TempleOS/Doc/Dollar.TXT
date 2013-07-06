@@ -1,17 +1,17 @@
 $WW,1$$FG,5$$TX+CX,"Dollar Sign Cmds"$$FG$
 
-TempleOS supports rich-text type cmds which are bracketed with '$$'.  Use $FG,2$<CTRL-L>$FG$ to experiment with them.  Use $FG,2$CTRL-T$FG$ to toggle between plain text and rich text.
+TempleOS supports rich-text type cmds which are bracketed with '$$'.  Use $FG,2$<CTRL-L>$FG$ to experiment with them.  Use $FG,2$<CTRL-T>$FG$ to toggle between plain text and rich text.
 
 The format of '$$' cmds includes a two character code, +/-flags, a comma and args separated by commas.  The flags often determine how many and what args the cmd takes.
 
-See $LK-A,"::/TempleOS/Doc/CtrlL.TXT"$ and $LK-A,"::/TempleOS/Demo/Doc/DemoDoc.TXT"$.
+See $LK-A,"::/TempleOS/Doc/Widget.TXT"$ and $LK-A,"::/TempleOS/Demo/Doc/DemoDoc.TXT"$.
 
 See $LK,"Doc Type Defines","MN:DOCT_TEXT"$ and $LK,"Doc Type Codes","FF:::/TempleOS/Adam/Doc/Doc.CPP,ST_DOC_CMDS"$
 $TR,"TX Text"$
 $ID,2$Normally, text is not bracketed with "$$", but if you wish to specify flag attr to center text, you can bracket them with "$$" and enter flags such as "$FG,4$+CX$FG$".  You can't edit them if they are bracketed by "$$" unless you toggle to plain text mode with <CTRL-T>.
-$ID,-2$$TR,"CR Hard Carriage Return"$
+$ID,-2$$TR,"CR Hard Carriage Return (New Line)"$
 $ID,2$Carriage returns are normally specified without being bracketed with "$$".
-$ID,-2$$TR,"SR Soft Carriage Return"$
+$ID,-2$$TR,"SR Soft Carriage Return (New Line)"$
 $ID,2$Word wrap uses soft carriage returns which are not saved.  You never place soft carriage returns by yourself.
 $ID,-2$$TR,"TB Tab"$
 $ID,2$Tabs are normally not bracketed with "$$", but are stored as ASCII#9.
@@ -30,22 +30,12 @@ $FG,5$FD$FG$ Default Foreground Color
 $FG,5$BD$FG$ Default Background Color
 $FG,5$FG$FG$ Foreground Color
 $FG,5$BG$FG$ Background Color
-$FG,5$F2$FG$ Alt Foreground Color (Paren & Brace coloring)
-$FG,5$FL$FG$ Foreground of Links
-$FG,5$FM$FG$ Foreground of Macros/Menu-Values 
-$FG,5$FA$FG$ Foreground of Anchors
-$FG,5$FH$FG$ Foreground of Hidden widgets
-$FG,5$FE$FG$ Foreground of Trees
-$FG,5$FU$FG$ Foreground of User Text
-$FG,5$FB$FG$ Foreground of Binary Tags
-$FG,5$FY$FG$ Foreground of Keywords
-$FG,5$FR$FG$ Foreground of Keywords2
-$FG,5$FC$FG$ Foreground of Comments
-$FG,5$FQ$FG$ Foreground of Quotes
 $ID,-2$$TR,"FU,BU User Prompts"$
 $ID,2$special color changing cmds.  They are used when the user is prompted for text at the cmd line.  They rst the cursor pos if the cursor is posed before them on the line.  They are also used to indicate the start of a prompted str.
 $ID,-2$$TR,"CL clear"$
 $ID,2$Clear all previous entries except ones with hold($FG,4$+H$FG$) flags.  You might want $FG,4$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear","MN:DocClear"$().
+$ID,-2$$TR,"PT User Prompt"$
+$ID,2$Start of a user prompt.
 $ID,-2$$TR,"WW Word Wrap"$
 $ID,2$Include a 1 or 0.
 $ID,-2$$TR,"HL Highlighting"$
@@ -121,7 +111,7 @@ $ID,-2$$TR,"ER Error"$
 $ID,2$When errors are detected in dollar cmds, an $FG,5$ER$FG$ entry is generated to hold the garbage so it is not lost.
 $ID,-2$
 See $LK,"Doc Flag Defines","MN:DOCEf1_AUX_STR"$ and $LK,"Doc Flag Codes","FF:::/TempleOS/Adam/Doc/Doc.CPP,ST_DOC_FLAGS"$
-$FE,4$See $LK+S,"dft_flags","FF:::/TempleOS/Adam/Doc/DocPlain.CPP,doc_dft_flags1"$.
+See $LK+S,"dft_flags","FF:::/TempleOS/Adam/Doc/DocPlain.CPP,doc_dft_flags1"$.
 $TR,"FLAGS"$
 $ID,2$$TR,"+H Hold"$
 $ID,2$Tells it to not delete it when cleared with $FG,5$CL$FG$ or when the doc->max_entries is exceeded.  Word wrap is a good one to hold.
@@ -151,7 +141,7 @@ $ID,-2$$TR,"+AL Alias"$
 $ID,2$An alias flag on a tree entry ($FG,4$+TR$FG$) will cause the text of the current entry the cursor is on to be copied to this entry.  This creates something similar to a drop-down window, but it doesn't work well yet.
 $ID,-2$$TR,"+RD Refresh Data"$
 $ID,2$The Refresh Data flag on a $FG,5$DA$FG$ or a $FG,5$CB$FG$ makes the value updated continuously.
-$ID,-2$$ID,-2$$FE,5$
+$ID,-2$$ID,-2$
 
 $FG,5$EXAMPLES:
 

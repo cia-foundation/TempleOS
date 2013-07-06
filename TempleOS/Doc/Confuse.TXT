@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
-* I, Terry A. Davis, wrote every one of the $TX+D,"139,633","DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX+D,"9.6","DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.
+* I, Terry A. Davis, wrote every one of the $TX+D,"123,088","DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX+D,"9.9","DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.
 
 * TempleOS does not execute code not written by me and any time except for a few BIOS calles for cfguration.
 
@@ -18,13 +18,13 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 * $LK,"Fs","MN:Fs"$ is a segment register, not "file system".  (It is kept pointing to the current task's record.)  There is no memory segmentation -- FS and GS are used as general purpose registers, more or less.
 
-* TempleOS uses a flavor of C/C++.  It is not PASCAL.  I altered the syntax making parenthesis optional on function calls with no paramaters.
+* TempleOS uses a dialect of C/C++ called $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$.  It is not PASCAL.  I altered the syntax making parenthesis optional on function calls with no paramaters.
 
 * $LK,"Sleep","MN:Sleep"$() makes a program pause.  It is not hybernation for a laptop.
 
 * $LK,"Yield","MN:Yield"$() saves the current task's registers (context) and loads in the next task.  When waiting, it's better to do this than check a condition in a loop until you get preempted.  Checking a condition until you get preempted wastes CPU.  TempleOS does not use virtual memory, so $LK,"Yield","MN:Yield"$() involves no disk activity.  A swap takes half a microsecond.  See $LK-A,"::/TempleOS/Demo/Lectures/Spinning.CPP"$.
 
-* I use the term "JIT compilation".  This means it is compiled and executable code placed into mem, ready to be called.
+* I use the term $LK,"JIT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,JIT Compile Mode"$.  This means it is compiled and executable code placed into mem, ready to be called.
 
 * Files with names ending in "Z" are compressed, not encrypted.  $LK,"Copy","MN:Copy"$() or rename them with $LK,"Move","MN:Move"$() to store them uncompressed.
 
@@ -47,3 +47,4 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 $FG,8$
 * "Linux" is probably a trademark owned by Linus Torvalds.
+$FG$

@@ -6,8 +6,10 @@
 */
 
 
-U0 Main()
+U0 Main1()
 {
+  "\nWith description.\n";
+  PressAKey;
   ProgressBarsRst;
   StrCpy(progress1_desc,"Progress Demo"); //PROGRESS_DESC_LEN is max
   progress1_max=400;
@@ -17,10 +19,25 @@ U0 Main()
 }
 
 
-Main;
+Main1;
 
-"$$FG,LTRED$$Now, from asm...  It's handy for debugging.$$FG$$\n"
+U0 Main2()
+{
+  "\nNo description.\n";
+  PressAKey;
+  ProgressBarsRst;
+  //No progress1_desc
+  progress1_max=400;
+  while (progress1++!=progress1_max)
+    Sleep(10);
+  progress1_max=0; //hide
+}
+
+Main2;
+
+"\n$$FG,LTRED$$Now, from asm...  It's handy for debugging.$$FG$$\n"
 "$$FG,LTRED$$Watch the progress on the wallpaper.$$FG$$\n";
+WinBorder(ON);
 PressAKey;
 
 asm {

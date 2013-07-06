@@ -11,35 +11,40 @@ CHash *PSectFind(U8 *add,I64 *_offset)
 { //See $LK,"::/TempleOS/Kernel/Hash1a.CPP","FL:::/TempleOS/Kernel/Hash1a.CPP,1"$
   CHash *result=NULL;
   CHashExport *tempess;
-  CHashTable *h=Fs->hash_table;
   Bool has_lower=FALSE;
-  U64 best=0x8000,j;
-  if (!ChkPtr(add)) {
+  CHashTable *h=Fs->hash_table;
+  U64 best=0xFFFF,j;
+  if (!ChkCodePtr(add)) {
     *_offset=best;
     return NULL;
   }
   while (h) {
     tempess=h->next_added;
     while (tempess!=h) {
-      if (tempess->type&HTT_FUN)
-	j=tempess(CHashFun *)->executable_addr;
-      else if (tempess->type&HTT_EXPORT_SYS_SYM)
+      j=0;
+      if (tempess->type&HTT_FUN) {
+	if (!Bt(&tempess(CHashFun *)->flags,Cf_EXTERN) &&
+	      !Bt(&tempess(CHashFun *)->flags,Ff_INTERNAL))
+	  j=tempess(CHashFun *)->executable_addr;
+      } else if (tempess->type&HTT_EXPORT_SYS_SYM)
 	j=tempess->val;
-      else
-	j=0;
-      j=add(I64)-j;
-      if (tempess->type&HTT_EXPORT_SYS_SYM) {
-	if (j<best || j==best && !has_lower) {
-	  has_lower=HasLower(tempess->str);
-	  best=j;
-	  result=tempess;
-	}
-      } else if (tempess->type&HTT_FUN) {
-	if (j<best || j==best &&
-	    (result && result->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
-	  has_lower=HasLower(tempess->str);
-	  best=j;
-	  result=tempess;
+      if (j) {
+	j=add(I64)-j;
+	if (0<=j<=best) {
+	  if (tempess->type&HTT_EXPORT_SYS_SYM) {
+	    if (j<best || j==best && !has_lower) {
+	      has_lower=HasLower(tempess->str);
+	      best=j;
+	      result=tempess;
+	    }
+	  } else if (tempess->type&HTT_FUN) {
+	    if (j<best || j==best &&
+		  (result && result->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
+	      has_lower=HasLower(tempess->str);
+	      best=j;
+	      result=tempess;
+	    }
+	  }
 	}
       }
       tempess=tempess->next_added;
@@ -114,20 +119,19 @@ U0 SPrintFPSect(U8 *buf,I64 add,I64 field_len)
       }
     }
     if (str) {
-      if (offset<=0xFFFF) {
-	if (is_fun) {
-	  str2=MSPrintF("&%s",str);
-	  if (field_len>7)
-	    SPrintF(buf,"%*ts+0x%04X",field_len-7,str2,offset);
-	  else
-	    SPrintF(buf,"%s+0x%04X",str2,offset);
-	  Free(str2);
-	} else {
-	  if (field_len>7)
-	    SPrintF(buf,"%*ts+0x%04X",field_len-7,str,offset);
-	  else
-	    SPrintF(buf,"%s+0x%04X",str,offset);
-	}
+      if (offset>0xFFFF) offset=0xFFFF;
+      if (is_fun) {
+	str2=MSPrintF("&%s",str);
+	if (field_len>7)
+	  SPrintF(buf,"%*ts+0x%04X",field_len-7,str2,offset);
+	else
+	  SPrintF(buf,"%s+0x%04X",str2,offset);
+	Free(str2);
+      } else {
+	if (field_len>7)
+	  SPrintF(buf,"%*ts+0x%04X",field_len-7,str,offset);
+	else
+	  SPrintF(buf,"%s+0x%04X",str,offset);
       }
       return;
     }
@@ -142,40 +146,55 @@ U0 SPrintFPSect(U8 *buf,I64 add,I64 field_len)
 I64 SrcLineNum(U8 *add,I64 cnt=1)
 {
   CHashSrcSym *temph;
-  I64 i,ii,j,offset,best=-1,d,best_d;
+  I64 cur_line,first_line,last_line,num_lines,offset;
   CDbgInfo *dbg;
   U8 **body,*src,*src2;
   if (temph=PSectFind(add,&offset)) {
     if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
       if (dbg=temph->debug) {
-	j=dbg->max_line-dbg->min_line+1;
+	num_lines=dbg->max_line-dbg->min_line+1;
 	body=dbg->body;
-	best_d=MAX_I64;
-	for (i=0;i<j;i++) {
-	  if (0<body[i]<=add<body[i]+cnt) {
-	    ii=i+1;
-	    while (!body[ii])
-	      ii++;
-	    if (add<body[ii]) {
-	      d=add(I64)-body[i];
-	      if (d<best_d) {
-		best_d=d;
-		best=i+dbg->min_line;
-	      }
-	    }
-	  }
+ 
+	//find first nonzero
+	first_line=0;
+	while (!body[first_line]) {
+	  first_line++;
+	  if (first_line>=num_lines)
+	    return -1;
 	}
-      } else if (temph->src_link && !offset) {
+
+	//find last nonzero
+	last_line=num_lines-1;
+	while (!body[last_line] && last_line>first_line)
+	  last_line--;
+
+	//interpolate to guess line num
+	cur_line=LimitI64(ToF64(add-body[first_line])*(last_line-first_line+1)/
+		 (body[last_line]-body[first_line]+1),first_line,last_line);
+
+	//retreat while too high
+	while ((!body[cur_line] || body[cur_line]>=add) && cur_line>first_line)
+	  cur_line--;
+
+	//advance while to low
+	while ((!body[cur_line] || body[cur_line]<add) && cur_line<last_line)
+	  cur_line++;
+
+	if (add<body[cur_line]+cnt)
+	  return cur_line+dbg->min_line;
+
+      } else if (temph->src_link) {
 	src =StrNew(temph->src_link);
 	src2=StrNew(temph->src_link);
 	StrLastRem(src,",",src2);
-	best=A2I(src2);
+	cur_line=A2I(src2);
 	Free(src);
 	Free(src2);
+	return cur_line;
       }
     }
   }
-  return best;
+  return -1;
 }
 
 U8 *SrcFileName(U8 *add,I64 cnt=1,CTask *mem_task=NULL)

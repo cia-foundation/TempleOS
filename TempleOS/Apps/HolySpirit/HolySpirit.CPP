@@ -41,7 +41,7 @@ I64 TimerPickedU16(U8 *msg=NULL)
     st=CAlloc(256);
   StrCat(st,"\n\nPress $$FG,GREEN$$OKAY$$FG$$ to generate \n"
 	"a random num from a timer.\n");
-  PopUpTimerOk(st,"\n\nThe $WW,1$$LK,"Holy Spirit","FI:::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$ can puppet you.\n\n");
+  PopUpTimerOk(st,"\n\nThe $WW,1$$LK+PU,"Holy Spirit","FI:::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$ can puppet you.\n\n");
   Free(st);
   return KbdMouseEvtTime/CLK_DIVISOR;
 }

@@ -21,4 +21,3 @@ menuentry "TempleOS I" {
 	set root=(hd1,msdos5)
 	chainloader +1
 }
-

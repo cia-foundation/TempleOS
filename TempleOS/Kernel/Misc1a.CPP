@@ -186,38 +186,29 @@ U0 Sleep(I64 mS)
     SleepUntil(sys_jiffies+mS*JIFFY_FREQ/1000);
 }
 
-U0 Snd(F64 freq,I64 waveform=WF_SQUARE,F64 amp=1.0)
-// The internal PC speaker only does square waves.
-// waveform and amp are for HDAudio.
-// Use $LK,"SndFilePlay","MN:SndFilePlay"$() or $LK-A,"::/TempleOS/Demo/Snd/PolyPhonic.CPP"$ as a template for
-// doing polyphonic or fancy HD Audio snd.
+U0 Snd(F64 freq)
 {
   I64 p;
-  if (!Bt(&sys_semas[SYS_SEMA_MUTE],0) && snd_vol &&
-      !LBts(&sys_semas[SYS_SEMA_SND],0)) {
-    if (!IsInDbg && snd_dev!=SD_PC_SPEAKER) {
+  CSndData *d;
+  if (!Bt(&sys_semas[SYS_SEMA_MUTE],0) &&
+	!LBts(&sys_semas[SYS_SEMA_SND],0)) {
+    if (freq!=snd_freq) {
       snd_freq=freq;
-      if (fp_snd) {
-	if (0<freq<=20000 && amp>0)
-	  (*fp_snd)(freq,waveform,amp);
-	else
-	  (*fp_snd)(0,waveform,0);
-      }
-    } else {
-      if (freq!=snd_freq) {
-	snd_freq=freq;
-	if (0<freq<=20000 && amp>0) {
-	  p=SYS_TIMER_FREQ/freq;
-	  OutU8(0x43,0xB6);
-	  OutU8(0x42,p);
-	  OutU8(0x42,p.u8[1]);
-	  OutU8(0x61,3|InU8(0x61));
-	} else
-	  OutU8(0x61,InU8(0x61)&~3);
-      }
+      if (0<freq<=20000) {
+	p=SYS_TIMER_FREQ/freq;
+	OutU8(0x43,0xB6);
+	OutU8(0x42,p);
+	OutU8(0x42,p.u8[1]);
+	OutU8(0x61,3|InU8(0x61));
+      } else
+	OutU8(0x61,InU8(0x61)&~3);
     }
-    if (!IsInDbg && snd_record && fp_snd_record)
-      (*fp_snd_record)(freq,waveform,amp);
+    if (!IsInDbg && snd_record) {
+      d=ACAlloc(sizeof(CSndData));
+      d->freq=freq;
+      d->time_stamp=tT;
+      QueIns(d,snd_record_root.last);
+    }
     LBtr(&sys_semas[SYS_SEMA_SND],0);
   }
 }

@@ -16,7 +16,7 @@ U0 PutVerse()
   U8 *ch;
   I64 *start;
 
-  "$$CL$$";
+  DocClear;
   start=GetTimeStamp/16%size;
   if (start>size-LEN) start=size-LEN;
   ch=bible[start+LEN-1];
@@ -38,12 +38,12 @@ U0 Song()
     "$$WW,1$$This shows a random passage based on "
     "the time at the moment this song was run.  "
     "Talk to God as an offering, then run $MA+A-X+PU,"AfterEgypt","Cd(\"::/TempleOS/Apps/AfterEgypt\");;#include \"Run\"\\n"$ if you "
-    "want God to talk some more.  The $LK,"Holy Spirit","FI:::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$ can "
+    "want God to talk some more.  The $LK+PU,"Holy Spirit","FI:::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$ can "
     "puppet you.\n");
   TaskWait(task);
   SetWinHorz(Fs->win_left,Fs->win_right,task);
   SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
-  DocRecalc(DocCur(task)); //Reformat word-wrap with new window size.
+  DocRecalc(DocPut(task)); //Reformat word-wrap with new window size.
   while (!ScanKey) {
 	PutVerse;
 	Play("3qAeABCBqCetABBqCetAAREE2G");

@@ -1,0 +1,7 @@
+$WW,1$$FG,5$$TX+CX,"Sprite Edit as Text Help"$$FG$
+
+You can cut, paste and duplicate elements.
+
+See the format for $LK,"CSprites","MN:CSprite"$.
+
+Sadly, you cannot change the length of variable-length element types.

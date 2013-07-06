@@ -220,7 +220,7 @@ public U0 TipOfDay(U8 *tip_file="::/TempleOS/Doc/Tips.TXT")
 	break;
     }
   }
-  DocInsDoc(DocCur,doc2);
+  DocInsDoc(DocPut,doc2);
   DocDel(doc2);
   DocDel(doc);
 }

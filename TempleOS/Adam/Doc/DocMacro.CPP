@@ -3,20 +3,20 @@ StrCpy(captured_macro_name,"Test");
 
 I64 sys_macro_repeat_n=1;
 
-U0 SysMacroStripKey(CTaskCmd *macro_root,I64 p1,I64 p2)
+U0 SysMacroStripKey(CSrvCmd *macro_root,I64 p1,I64 p2)
 {
-  CTaskCmd *tempc,*tempc1;
+  CSrvCmd *tempc,*tempc1;
   tempc=macro_root->next;
   while (tempc!=macro_root) {
     tempc1=tempc->next;
-    if (tempc->cmd_code==TASKCT_MSG &&
+    if (tempc->cmd_code==SVCT_MSG &&
 	(tempc->msg_code==MSG_KEY_DOWN ||
 	 tempc->msg_code==MSG_KEY_UP ||
 	 tempc->msg_code==MSG_KEY_DOWN_UP) &&
-	 p1 && tempc->p1==p1 ||
-	!p1 && tempc->p2==p2) {
+	 p1 && tempc->aux1==p1 ||
+	!p1 && tempc->aux2==p2) {
       QueRem(tempc);
-      Free(tempc);
+      SrvCmdDel(tempc);
     }
     tempc=tempc1;
   }
@@ -33,27 +33,27 @@ class CMacroTemp
   U8 buf[136];
 };
 
-CMacroTemp *Cmd2MT(CTaskCmd *tempc)
+CMacroTemp *Cmd2MT(CSrvCmd *tempc)
 {
   U8 buf[8];
   CMacroTemp *tempmt=CAlloc(sizeof(CMacroTemp));
-  if (Bt(getkey_chars_bitmap,tempc->p1) && tempc->msg_code==MSG_KEY_DOWN) {
+  if (Bt(getkey_chars_bitmap,tempc->aux1) && tempc->msg_code==MSG_KEY_DOWN) {
     tempmt->type=MT_CHAR;
-    buf[0]=tempc->p1;
+    buf[0]=tempc->aux1;
     buf[1]=0;
     SPrintF(tempmt->buf,"%Q",buf);
   } else {
     tempmt->type=MT_MSG;
     SPrintF(tempmt->buf,"Msg(0x%X,0x%X,0x%X);",
-      tempc->msg_code,tempc->p1,tempc->p2);
+      tempc->msg_code,tempc->aux1,tempc->aux2);
   }
   return tempmt;
 }
 
 
-U8 *SysMacro2Str(CTaskCmd *macro_root)
+U8 *SysMacro2Str(CSrvCmd *macro_root)
 {
-  CTaskCmd *tempc;
+  CSrvCmd *tempc;
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
   CMacroTemp *tempmt,*tempmt1,root;
@@ -147,7 +147,7 @@ U0 EdInsCapturedMacro()
 I64 PopUpExitRecordPlayStopIns()
 {
   U8 buf[136];
-  CTaskCmd *tempc;
+  CSrvCmd *tempc;
   CDoc *doc=DocNew;
   CDocEntry *doc_e=DocPutS(doc,"$$DA-P,135,\"Name:%s\"$$");
   I64 result=0;
@@ -166,12 +166,12 @@ I64 PopUpExitRecordPlayStopIns()
 	"\n\n\n$$FG,GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
   SPrintF(buf,"DocMenuDo(0x%X);",doc);
-  sys_macro_util_task=Spawn(&ServantUserCmdLine,NULL,"Macro Popup",Fs);
+  sys_macro_util_task=Spawn(&SrvUserCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_util_task;
   LBts(&sys_macro_util_task->display_flags,DISPLAYf_WIN_ON_TOP);
-  tempc=TaskRqstQue(sys_macro_util_task,Fs,buf,
-      1<<TASKCf_WAKE_MASTER | 1<<TASKCf_FOCUS_MASTER);
-  GetRqstResult(tempc,&result);
+  tempc=TaskExeStrQue(sys_macro_util_task,Fs,buf,
+      1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+  ScanResult(tempc,&result);
   Fs->popup_task=NULL;
   Kill(sys_macro_util_task);
   sys_macro_util_task=NULL;

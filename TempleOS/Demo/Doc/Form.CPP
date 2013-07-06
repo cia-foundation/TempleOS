@@ -16,15 +16,15 @@ class DStruct
 U0 FormDemo()
 {
   DStruct gtl;
-  CDate spdt;
+  CDate cdt;
 
   gtl.num1=12.3e-4;  //Set defaults
   gtl.num2=4.5e3;
   gtl.num3=0x1234;
   gtl.num4=-567;
   StrCpy(&gtl.name,"John");
-  spdt=GetCurTimeCDate;
-  gtl.datetime=spdt;
+  cdt=GetCurTimeDate;
+  gtl.datetime=cdt;
   if (DocFormDo(&gtl,"DStruct")) {
     "#1=%e\n",gtl.num1;
     "#2=%e\n",gtl.num2;

@@ -23,7 +23,7 @@ public U0 DCRst(CDC *dc)
 public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
 {
   CDC *result;
-  if (!dc)   dc=gr_dc2;
+  if (!dc)   dc=gr_dc;
   if (!task) task=Fs;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
     Dbg;
@@ -255,9 +255,9 @@ public CDC *GRARead(U8 *filename,CTask *task=NULL)
 }
 
 #help_index "Graphics/CSprite;Graphics/DCs;Doc/Output"
-public U0 DocPutGRAFile(CDoc *doc=NULL,U8 *fname)
+public U0 DocPutGRAFile(CDoc *doc=NULL,U8 *filename)
 {
-  CDC *dc=GRARead(fname);
+  CDC *dc=GRARead(filename);
   CSprite *elems=DC2Sprite(dc);
   DocPutSprite(doc,elems);
   Free(elems);

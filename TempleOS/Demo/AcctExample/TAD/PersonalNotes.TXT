@@ -1,22 +1,31 @@
-* Cursor is not solid $LK,"Dbg","MN:Dbg"$ when entered in Adam2.
+* fix result on Blot ect
 
-* ata base- base1 temp blkdev
+* Tour TestSuite on 256Meg NoMP runs out of mem. Leak,too?
+
+* CTRL-R transform individual elements
+
+* Size zero files don't copy out from VMware.
+
+* FileMgr header
+
+* ATA/ATAPI ID in VMware, when not booted to CD?  I forgot.
+
+* I use fixed-point in $LK,"Circle","MN:Circle"$(), $LK,"Ellipse","MN:Ellipse"$(), $LK,"GrRot","MN:GrRot"$(), $LK,"GrMulMat","MN:GrMulMat"$() and others.
+God says I might want to change to float. 
+$LK-A,"::/TempleOS/Demo/Lectures/FixedPoint.CPP"$.
+$LK-A,"::/TempleOS/Demo/Lectures/FixedPointAdvanced.CPP"$.
+
+* DOCF_DBL_DOLLARS in reindention
+* # in reindention
+* reindent $LK,"DocRecalc","MN:DocRecalc"$().skip_soft_cr
+
+* HexEdit with odd size, ASCII cannot be edited.
 
 * clean-up addDev pmt
 
-* indent
-
-* TestSuite Strut
-
 * Might want to convert some Preempt() to Cli
 
-* Bug: Back-up-script cause jumps back and forth in ToHtml.
-
-* Bug? Hung after pressing CmpMain in personal menu.  Haven't seen in a while.
-* Crashes after back-up-script.  Went away maybe after spurious IRQ fix.
 * Music organ hangs when cursoring around.  Haven't seen in while.
-
-* $LK,"DocUpdateTaskDocs","MN:DocUpdateTaskDocs"$() used to skips locked docs. $LK,"WinMgrSync","MN:WinMgrSync"$() needs to check?
 
 * Why was wordstat so slow on "OldMasterBootWrite" for example.
 
@@ -26,15 +35,11 @@
 
 * It would be nice if $LK,"U","MN:U"$() NOP were better.
 
-* Autoindent is very bad.
-
-* Make native file system expanded size set in Copy.
+* Make RedSea file system expanded size set in Copy.
 
 * unhandled exception on MP message gets overwritten by WinMgr
 
 * Cmd to enable/disable compiler warnings
-
-* make aware of ctrl-r side bar 
 
 * fix documentation problem -- remembering 0 terminator in str or not for $$DA
 * GetS, crazy putkey code
@@ -44,17 +49,14 @@
   >Might want to do ZOOM in U8 graphics and convert screen capture to U8
   >Might want to reverse bit order
 
-* wenceslas crashes in testsuite, sometimes.  went away?
+* wenceslas crashes in testsuite, sometimes.
 
-* CGrVectMap sucks -- Pilgrim
 * return vals for grrect, grblot, grputchar?
 * collisions for grrect, grblot, grputchar?
 
 * 32-bit devices should be in free spot address space of E820.
 
-* RAM drive too small for TempleOSCD.ISO
-$WW,1$
-* Race condition in Navy.CPP.Z torpedo
+* Race condition in FlatTops.CPP.Z torpedo
 
 * {Lock|Rep}{Seg|2E=NotBr|3E=Br}{OP}{ADD}{REX}
 * Virtual Box MP reboot
@@ -70,7 +72,6 @@ GrEdit: Move sidebar selected elems.
 GrEdit: Strip origin shift cmds.
 
 GrEditBitMap, grabscroll? 
-GrEditBitMap, cut/paste boxes.
 
 extern of fun with dft arg of str?
 
@@ -78,7 +79,7 @@ extern of fun with dft arg of str?
 
 * FileMgr bad with lots of files.  
 
-* This $LK,"Fs->catch_except=TRUE","FF:::/TempleOS/Kernel/TaskCmd.CPP,Fs->catch_except=TRUE"$ causes problems because it catches divide and out-of-mem.  Not sure what to do, yet.
+* This $LK,"Fs->catch_except=TRUE","FF:::/TempleOS/Kernel/SrvCmd.CPP,Fs->catch_except=TRUE"$ causes problems because it catches divide and out-of-mem.  Not sure what to do, yet.
 * $LK,"MPStart","MN:MPStart"$() free old task memory. (Prolly never gonna do anything about this.)
 * $LK,"sys_var_init_flag","MN:sys_var_init_flag"$ local vars.
 * sprite shift pts, ctrl pt for ellipse/polygon w,h is off when rotated.
@@ -94,7 +95,6 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * $LK,"Bible sized nodes","FF:::/TempleOS/Adam/Doc/DocRecalc.CPP,->tag+i"$
 * Mouseinstall throws exceptions, doesn't work, investigate Mouse $LK,"0x9FC30","FF:::/TempleOS/Kernel/KbdMouse/Mouse.CPP,9FC"$
 * get kbd lights working.
-* figure-out hyperthread vs nonhyperthread CPU's
 * Might have issue with compiler exceptions and restoring lex.hash tables.
 * Generates two compiler error messages for expressions in statements.
 * release semaphores or break lock sema,usb_td
@@ -105,8 +105,6 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 {
   U0 (*fp_old_draw_input_ptr)(CDC *dc,I64 x,I64 y)=fp_draw_input_ptr;
 }$FG$
-
-* Syncronize VGA memory update with the hardware refresh cycle.
 
 * Demo $LK,"ToHtml","MN:ToHtml"$().
 
@@ -136,6 +134,8 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * log to file--would be inefficient--load-in whole file, modify and write out.  Useful, but not very efficient  (TempleOS file system has no grow-file ability.  Created when FAT patent was an issue and wanted absly nothing people could sue me for.)
 * APIC2
 * import intel datasheets, somehow?
+* Get better dictionary, good spell checker.
+* WordStat/Man Jmp for user code.
 * Might make DskView show drive colors.
 * Might do utility to set drive colors, making a tree entry in Adam 3 using registry-like routines... or registry I guess.
 
@@ -144,7 +144,7 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * Make use of flag potential in SysFilesFind and possibly CFileAccess
 * implement fixed pos files
 
-* new C+ language features
+* new Holy C language features
 * better debugging
 
 * Change hardcoded stuff to Define

@@ -138,7 +138,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	    break;
 	  case DOCT_NEW_LINE:
 	    if (doc->flags&DOCF_CARRIAGE_RETURN)
-	      *dst++=CH_CARRIAGE_RETURN;
+	      *dst++='\r';
 	    *dst++='\n';
 	    break;
 	  default:
@@ -152,7 +152,6 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	      *dst++='$$';
 	      Free(st);
 	    }
-	    break;
 	}
       }
     }
@@ -200,7 +199,7 @@ public U0 DocInsDoc(CDoc *doc,CDoc *doc2)
   if (doc->cur_entry->type_u8==DOCT_TEXT &&
       doc->cur_data_col>doc->cur_entry->min_col) {
     if (doc->cur_data_col<doc->cur_entry->max_col) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase)+sizeof(U8 *),doc->mem_task);
+      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
       doc_ne->type=DOCT_TEXT | doc->cur_entry->type & 0xFFFFFF00;
       doc_ne->flags1=doc->cur_entry->flags1;
       doc_ne->flags2=doc->cur_entry->flags2;
@@ -424,32 +423,43 @@ U0 DocUndoRestore(CDoc *doc)
     DocUnlock(doc);
 }
 
+#help_index "Graphics/Windows BMP Files;Doc/Output"
 
-#help_index "File/Cmd Line (Typically);Doc/Cmd Line (Typically);Cmd Line (Typically)"
-
-public Bool Type(U8 *fname)
-//Output a file to the cmd line.
-//Even graphics and macros will be sent.
-{
-  CDoc *doc,*doc2;
-  if (doc=DocCur) {
-    if (FilesFindMatch(FILENAME_MASK_TXT,fname)) {
-      doc2=DocRead(fname);
-      DocInsDoc(doc,doc2);
-      DocDel(doc2);
-      return TRUE;
-    } else if (FilesFindMatch("*.BMP.Z",fname)) {
-      DocPutBMPFile(doc,fname,FALSE);
-      return TRUE;
-    } else if (FilesFindMatch("*.BMP;*.bmp",fname)) {
-      DocPutBMPFile(doc,fname,TRUE);
-      return TRUE;
-    } else if (FilesFindMatch("*.GRA*",fname)) {
-      DocPutGRAFile(doc,fname);
-      return TRUE;
-    }
+public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
+{//This is like DOS "type" or Unix "cat".
+//Output a file to a document.
+//Even graphics can be sent.
+  Bool result=FALSE;
+  CDoc *doc2;
+  if (!doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
+    return FALSE;
+  if (FilesFindMatch(FILENAME_MASK_TXT,filename)) {
+    doc2=DocRead(filename);
+    DocInsDoc(doc,doc2);
+    DocDel(doc2);
+    result=TRUE;
+  } else if (FilesFindMatch("*.BMP.Z",filename)) {
+    DocPutBMPFile(doc,filename,FALSE);
+    result=TRUE;
+  } else if (FilesFindMatch("*.BMP;*.bmp",filename)) {
+    DocPutBMPFile(doc,filename,TRUE);
+    result=TRUE;
+  } else if (FilesFindMatch("*.GRA*",filename)) {
+    DocPutGRAFile(doc,filename);
+    result=TRUE;
   }
-  return FALSE;
+  if (result)
+    DocNewLine(doc,trailing_new_lines);
+  return result;
+}
+
+#help_index "Graphics/Windows BMP Files;File/Cmd Line (Typically);Doc/Cmd Line (Typically);Cmd Line (Typically)"
+
+public Bool Type(U8 *filename,I64 trailing_new_lines=1)
+{//This is like DOS "type" or Unix "cat".
+//Output a file to the cmd line.
+//Even graphics can be sent.
+  return DocType(,filename,trailing_new_lines);
 }
 
 #help_index "Doc"

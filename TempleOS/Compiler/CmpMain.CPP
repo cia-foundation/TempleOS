@@ -1,4 +1,4 @@
-U0 StreamPutS(U8 *st)
+U0 StreamPutS(U8 *buf)
 //Inss text into the stream of
 //characters being compiled.  Called
 //from withing #exe{} block.
@@ -6,7 +6,7 @@ U0 StreamPutS(U8 *st)
   CLex *lx=Fs->last_lex;
   CStreamBlk *tempe=lx->last_stream_blk;
   if (tempe!=&lx->next_stream_blk)
-    tempe->body=StrAdd(tempe->body,st);
+    tempe->body=StrAdd(tempe->body,buf);
   else
     PrintFErr("No exe{} blk\n");
 }
@@ -17,7 +17,7 @@ U0 StreamPrintF(U8 *src,...)
 //from withing #exe{} block.
 {
   U8 *buf=SPrintFJoin(NULL,src,argc,argv);
-StreamPutS(buf);
+  StreamPutS(buf);
   Free(buf);
 }
 
@@ -37,7 +37,7 @@ U8 *CmpStatement(CLex *lx,I64 *type)
       CBICAdd(lx,IC_RETURN_VAL2,0,NULL);
       CBICAdd(lx,IC_RET,0,0);
       CBICAdd(lx,IC_END,0,0);
-      if (result=CBCompile(lx,NULL,&size,NULL,NULL,type)) {
+      if (result=CBCompile(lx,NULL,&size,NULL,type)) {
 	if (lx->flags&LF_AOT_COMPILE) {
 	  j=lx->a->ip;
 	  k=(size+7)>>3;
@@ -65,12 +65,8 @@ CExe *CmpJoin(CLex *lx,CHashFun *locals,Bool first_lex,Bool asm_blk=FALSE,
   CAsmCodeBlk *tempc;
   CExeImportExport *tempe;
   Bool okay=TRUE;
-  CHashTable *ht1=lx->hash_table_lst,
-	       *ht2=lx->define_hash_table,
-	       *ht3=lx->glbl_hash_table,
-	       *ht4=lx->local_hash_table,
-	       *asm_hash_alias=MAllocIdentical(asm_hash);
-  CHashFun     *old_var_lst=lx->local_var_lst;
+  CLexHashTableContext *htc=MAlloc(sizeof(CLexHashTableContext));
+  CHashTable   *asm_hash_alias=MAllocIdentical(asm_hash);
   CExe *result=CAlloc(sizeof(CExe));
   result->parent_exe=lx->exe_struct;
   lx->exe_struct=result;
@@ -83,19 +79,20 @@ CExe *CmpJoin(CLex *lx,CHashFun *locals,Bool first_lex,Bool asm_blk=FALSE,
   a->max_align=1;
   a->module_org=INVALID_PTR;
 
-  lx->local_hash_table=HashTableNew(16);
-  lx->glbl_hash_table =HashTableNew(2048);
+  MemCpy(htc,&lx->htc,sizeof(CLexHashTableContext));
+  lx->htc.local_hash_table=HashTableNew(16);
+  lx->htc.glbl_hash_table =HashTableNew(2048);
 
-  asm_hash_alias->next=lx->local_hash_table;
-  lx->local_hash_table->next=lx->glbl_hash_table;
+  asm_hash_alias->next=lx->htc.local_hash_table;
+  lx->htc.local_hash_table->next=lx->htc.glbl_hash_table;
 
   if (lx->flags&LF_AOT_COMPILE)
-    lx->define_hash_table=lx->glbl_hash_table;
+    lx->htc.define_hash_table=lx->htc.glbl_hash_table;
   else
-    lx->glbl_hash_table->next=Fs->hash_table;
-  lx->hash_table_lst =asm_hash_alias;
+    lx->htc.glbl_hash_table->next=Fs->hash_table;
+  lx->htc.hash_table_lst =asm_hash_alias;
 
-  lx->local_var_lst=locals; //C+ local vars
+  lx->htc.local_var_lst=locals; //Holy C local vars
   try {
     if (first_lex)
       Lex(lx);
@@ -134,9 +131,9 @@ CExe *CmpJoin(CLex *lx,CHashFun *locals,Bool first_lex,Bool asm_blk=FALSE,
     result=NULL;
   } else {
     if (map_name && !cmp_do_not_write_to_dsk)
-      HashRep(lx->glbl_hash_table,HTG_ALL,map_name,"-r-p",mapfile_drv);
-    HashTableDel(lx->local_hash_table);
-    HashTableDel(lx->glbl_hash_table);
+      HashRep(lx->htc.glbl_hash_table,HTG_ALL,map_name,"-r-p",mapfile_drv);
+    HashTableDel(lx->htc.local_hash_table);
+    HashTableDel(lx->htc.glbl_hash_table);
 
     if (!a->num_code_U8s)
       result->code=NULL;
@@ -170,11 +167,8 @@ CExe *CmpJoin(CLex *lx,CHashFun *locals,Bool first_lex,Bool asm_blk=FALSE,
     result->module_org=a->module_org;
     lx->exe_struct=result->parent_exe;
   }
-  lx->hash_table_lst  =ht1,
-  lx->define_hash_table=ht2;
-  lx->glbl_hash_table  =ht3;
-  lx->local_hash_table =ht4;
-  lx->local_var_lst=old_var_lst;
+  MemCpy(&lx->htc,htc,sizeof(CLexHashTableContext));
+  Free(htc);
   Free(asm_hash_alias);
   Free(a);
   lx->a=old_a;
@@ -189,7 +183,7 @@ CExe *CmpBuf(U8 *buf,U8 *map_name=NULL,
   CExe *result=NULL;
   if (!is_first_compiler)
     "$$FG,PURPLE$$**** Not First Compiler ****$$FG$$\n";
-  lx=LexNew(buf,LF_DONT_FREE_BUF,NULL);
+  lx=LexNew(buf,LF_DONT_FREE_BUF);
   lx->flags|=LF_AOT_COMPILE;
   QueIns(lx,Fs->last_lex);
   result=CmpJoin(lx,NULL,TRUE,FALSE,map_name,mapfile_drv);
@@ -501,7 +495,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
     *ptr++=EIE_END;
     MemSet(ptr,0,16);
     i=ptr-patch_table;
-    //$LK,"NATIVE_XSUM","FF:::/TempleOS/Kernel/KStart.CPP,NATIVE_XSUM"$ needs 16 ALIGN
+    //$LK,"TEMPLEOS_XSUM","FF:::/TempleOS/Kernel/KStart.CPP,TEMPLEOS_XSUM"$ needs 16 ALIGN
     size=(sizeof(CBinFile)+code_U8s+i+15)&-16;
     bfh=MAlloc(size);
     bfh->jmp=0xEB+256*(sizeof(CBinFile)-2);
@@ -509,7 +503,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
     bfh->type=0;
     bfh->loader_patch_table_offset=sizeof(CBinFile)+code_U8s;
     bfh->file_size=size;
-    bfh->xsum=NATIVE_XSUM;
+    bfh->xsum=TEMPLEOS_XSUM;
     MemCpy(bfh(U8 *)+sizeof(CBinFile),ex->code,code_U8s);
     MemCpy(bfh(U8 *)+sizeof(CBinFile)+code_U8s,patch_table,
       size-code_U8s-sizeof(CBinFile));
@@ -533,18 +527,24 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
   return error_cnt;
 }
 
-I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
+I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
 {
   I64 result;
   Bool okay=TRUE;
   CLex *lx;
   if (!filename)
     filename=sys_temp_filename;
-  lx=LexNew(buf,LF_DONT_FREE_BUF,FileNameAbs(filename));
+  lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
-  if (Fs->last_lex!=&Fs->next_lex)
+  if (Fs->last_lex!=&Fs->next_lex) {
     lx->opts=Fs->last_lex->opts;
+    if (htc) {
+      lx->flags=lx->flags &~LF_ASM_EXPRESSIONS |
+	htc->old_flags&LF_ASM_EXPRESSIONS;
+      MemCpy(&lx->htc,htc,sizeof(CLexHashTableContext));
+    }
+  }
   QueIns(lx,Fs->last_lex);
   try {
     Lex(lx);
@@ -592,7 +592,7 @@ I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
   CLex *lx;
   if (!filename)
     filename=sys_temp_filename;
-  lx=LexNew(buf,LF_DONT_FREE_BUF,FileNameAbs(filename));
+  lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex)
@@ -643,7 +643,7 @@ I64 ExePutS3(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
   CLex *lx;
   if (!filename)
     filename=sys_temp_filename;
-  lx=LexNew(buf,LF_DONT_FREE_BUF,FileNameAbs(filename));
+  lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex)
@@ -677,6 +677,32 @@ I64 ExeFile3(U8 *name,Bool just_load=FALSE)
   return result;
 }
 
+I64 StreamExePutS(U8 *buf)
+{//Suppose you want a value from the stream to be used in an #exe block...
+  CLexHashTableContext *htc;
+  I64 result=0;
+  CLex *lx=Fs->last_lex;
+  if (lx==&Fs->next_lex) {
+    PutErr;
+    "Not Compiling\n";
+  } else {
+    if (!(lx->flags&LF_EXE_BLK))
+      LexExcept(lx,"ST_STREAM_EXE_PUTS_NOT_ALLOWED");
+    if (htc=lx->htc.next)
+      result=ExePutS(buf,,,htc);
+  }
+  return result;
+}
+
+I64 StreamExePrintF(U8 *fmt,...)
+{
+  I64 result;
+  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  result=StreamExePutS(buf);
+  Free(buf);
+  return result;
+}
+
 U0 CmpInit()
 {
   if (!sys_num_installed_compilers++) {
@@ -693,7 +719,7 @@ U0 CmpInit()
   MemSet(&opt_nop,0,sizeof(CIntermediateCode));
   opt_nop.ic_class=sys_internal_types[IT_I64];
 
-  opt_nop.ic_opcode=IC_NOP;
+  opt_nop.ic_opcode=IC_NOP1;
   AsmHashLoad(is_first_compiler);
   UnasmHashLoad;
 }

@@ -1,7 +1,7 @@
 #help_index "Math/CMathODE;CMathODE"
 #help_file "::/TempleOS/Doc/ODE"
 
-//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$ (5).
+//See $LK-A,"::/TempleOS/Doc/Acknowledgements.TXT"$.
 
 F64 LowPass1(F64 a,F64 y0,F64 y,F64 dt=1.0)
 { //First order low pass filter

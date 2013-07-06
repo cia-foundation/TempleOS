@@ -4,14 +4,14 @@ This makes a mesh man.
 
 
 #define MAX_VERTICES	1024
-#define MAX_TRIANGLES	1024
+#define MAX_TRIS	1024
 
 class Man
 {
   I32 vertex_cnt;
-  I32 triangle_cnt;
+  I32 tri_cnt;
   CD3I32	    v[MAX_VERTICES];
-  CMeshTri t[MAX_TRIANGLES];
+  CMeshTri t[MAX_TRIS];
 } *m;
 
 
@@ -126,9 +126,9 @@ I64 AddVertex(ManDefineStruct *md,I64 x,I64 y,I64 z)
   return result;
 }
 
-I64 AddTriangle(ManDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
+I64 AddTri(ManDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
 {
-  I64 result=m->triangle_cnt++;
+  I64 result=m->tri_cnt++;
   m->t[result].color=c;
   m->t[result].nums[0]=n1;
   m->t[result].nums[1]=n0;
@@ -158,24 +158,24 @@ U0 AddBox(ManDefineStruct *md,I64 c,I64 x1,I64 y1,I64 z1,F64 w,F64 h,F64 d,F64 h
   p2a=AddVertex(md,x1+dx	+wx+h2x,y1+dy	+wy+h2y,z1+dz	+wz+h2z);
   p3a=AddVertex(md,x1+dx+hx-wx	  ,y1+dy+hy-wy	  ,z1+dz+hz-wz);
   p4a=AddVertex(md,x1+dx+hx+wx	  ,y1+dy+hy+wy	  ,z1+dz+hz+wz);
-  AddTriangle(md,c,p1a,p2a,p3a);
-  AddTriangle(md,c,p4a,p3a,p2a);
+  AddTri(md,c,p1a,p2a,p3a);
+  AddTri(md,c,p4a,p3a,p2a);
 
   p1b=AddVertex(md,x1-dx	-wx+h2x,y1-dy	-wy+h2y,z1-dz	-wz+h2z);
   p2b=AddVertex(md,x1-dx	+wx+h2x,y1-dy	+wy+h2y,z1-dz	+wz+h2z);
   p3b=AddVertex(md,x1-dx+hx-wx	  ,y1-dy+hy-wy	  ,z1-dz+hz-wz);
   p4b=AddVertex(md,x1-dx+hx+wx	  ,y1-dy+hy+wy	  ,z1-dz+hz+wz);
-  AddTriangle(md,c,p1b,p2b,p3b);
-  AddTriangle(md,c,p4b,p3b,p2b);
+  AddTri(md,c,p1b,p2b,p3b);
+  AddTri(md,c,p4b,p3b,p2b);
 
-  AddTriangle(md,c,p1a,p2a,p1b);
-  AddTriangle(md,c,p2b,p1b,p2a);
-  AddTriangle(md,c,p3a,p4a,p3b);
-  AddTriangle(md,c,p4b,p3b,p4a);
-  AddTriangle(md,c,p1a,p3a,p1b);
-  AddTriangle(md,c,p3b,p1b,p3a);
-  AddTriangle(md,c,p2a,p4a,p2b);
-  AddTriangle(md,c,p4b,p2b,p4a);
+  AddTri(md,c,p1a,p2a,p1b);
+  AddTri(md,c,p2b,p1b,p2a);
+  AddTri(md,c,p3a,p4a,p3b);
+  AddTri(md,c,p4b,p3b,p4a);
+  AddTri(md,c,p1a,p3a,p1b);
+  AddTri(md,c,p3b,p1b,p3a);
+  AddTri(md,c,p2a,p4a,p2b);
+  AddTri(md,c,p4b,p2b,p4a);
 
   *ox=x1+hx-h3x;
   *oy=y1+hy-h3y;
@@ -189,15 +189,15 @@ U8 *Man2CSprite()
 {
 //See $LK,"::/TempleOS/Adam/Gr/GrSpritePlot.CPP","FL:::/TempleOS/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
-      m->vertex_cnt*sizeof(CD3I32)+m->triangle_cnt*sizeof(CMeshTri)+gr_sprite_base_size[GRST_END]),
+      m->vertex_cnt*sizeof(CD3I32)+m->tri_cnt*sizeof(CMeshTri)+gr_sprite_base_size[GRST_END]),
       *dst=result;
   *dst(U8 *)++ =GRST_MESH;
   *dst(I32 *)++ =m->vertex_cnt;
-  *dst(I32 *)++ =m->triangle_cnt;
+  *dst(I32 *)++ =m->tri_cnt;
   MemCpy(dst,&m->v,m->vertex_cnt*sizeof(CD3I32));
   dst+=m->vertex_cnt*sizeof(CD3I32);
-  MemCpy(dst,&m->t,m->triangle_cnt*sizeof(CMeshTri));
-  dst+=m->triangle_cnt*sizeof(CMeshTri);
+  MemCpy(dst,&m->t,m->tri_cnt*sizeof(CMeshTri));
+  dst+=m->tri_cnt*sizeof(CMeshTri);
   *dst(U8 *)++ =GRST_END;
   return result;
 }
@@ -215,13 +215,13 @@ public U8 *ManGen()
     MemCpy(&md2,&md1,sizeof(ManDefineStruct));
     MDCorrect(&md2);
 
-    c1=PopUpLightingColor("$$BK,1$$Shirt$$BK,0$$\n");
+    c1=PopUpColorLighting("$$BK,1$$Shirt$$BK,0$$\n");
     if (c1<0) return NULL;
-    c2=PopUpLightingColor("$$BK,1$$Pants$$BK,0$$\n");
+    c2=PopUpColorLighting("$$BK,1$$Pants$$BK,0$$\n");
     if (c2<0) return NULL;
-    c3=PopUpLightingColor("$$BK,1$$Skin$$BK,0$$\n");
+    c3=PopUpColorLighting("$$BK,1$$Skin$$BK,0$$\n");
     if (c3<0) return NULL;
-    c4=PopUpLightingColor("$$BK,1$$Shoes$$BK,0$$\n");
+    c4=PopUpColorLighting("$$BK,1$$Shoes$$BK,0$$\n");
     if (c4<0) return NULL;
 
     m=CAlloc(sizeof(Man));
