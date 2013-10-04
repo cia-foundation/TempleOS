@@ -7,7 +7,7 @@ public U0 DocLoad(CDoc *doc,U8 *src2,I64 size)
   CDocBin *tempb;
   doc->find_replace->filter_lines=0;
   if (src2) {
-    DocPutS(doc,src2);
+    DocPutS(doc,src2); //Too big $LK,"DocPrint","MN:DocPrint"$() is wasteful.
     src=src2+StrLen(src2)+1;
     i=size-(offset(CDocBin.data)-offset(CDocBin.start));
     while (src<=src2+i) {
@@ -57,7 +57,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   I64 i,cnt;
   U8 *st,*result,*dst,*src,ch;
 
-  if (doc->flags&DOCF_NO_CURSOR)
+  if (doc->flags&DOCF_NO_CURSOR || doc->root.next==doc)
     cnt=1; //terminator
   else
     cnt=2; //cursor + terminator
@@ -143,7 +143,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	    break;
 	  default:
 	    if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE &&
-		doc_e->type_u8!=DOCT_CURSOR &&
+		doc_e->type_u8!=DOCT_CURSOR && //(Cursor is set by cur_entry)
 		doc_e->type_u8!=DOCT_BPT) {
 	      *dst++='$$';
 	      st=Doc2PlainText(doc,doc_e);
@@ -156,7 +156,14 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
       }
     }
   }
+  if (doc->cur_entry==doc && doc->root.next!=doc && !(doc->flags&DOCF_NO_CURSOR))
+    *dst++=CH_CURSOR;
   *dst++=0;
+  if (*result==CH_CURSOR) {
+    MemCpy(result,result+1,dst-result-1);
+    cnt--;
+    dst--;
+  }
   b=doc->bin_root.next;
   if (b!=&doc->bin_root) {
     do {
@@ -169,7 +176,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
       b=b->next;
     } while (b!=&doc->bin_root);
   } else
-    cnt--;
+    cnt--; //No terminator
   if (_size) *_size=cnt;
   if (unlock)
     DocUnlock(doc);
@@ -181,7 +188,7 @@ public U0 DocWrite(CDoc *doc,Bool prompt=FALSE)
   I64 size;
   U8 *buf=DocSave(doc,&size);
   if (prompt) {
-    if (DocFormDo(&doc->filename,"CEdFileName"))
+    if (DocFormDo(&doc->filename))
       FileWrite(doc->filename.name,buf,size,0,doc->file_attr);
   } else
     FileWrite(doc->filename.name,buf,size,0,doc->file_attr);
@@ -194,29 +201,22 @@ public U0 DocInsDoc(CDoc *doc,CDoc *doc2)
   U8 *dst;
   Bool unlock_doc=DocLock(doc),
 	 unlock_doc2=DocLock(doc2);
-  CDocEntry *doc_ne,*doc_e=doc2->root.next;
+  CDocEntry *doc_ne,*doc_e=doc2->root.next,*doc_ce;
   DocRemSoftNewLines(doc,NULL);
-  if (doc->cur_entry->type_u8==DOCT_TEXT &&
-      doc->cur_data_col>doc->cur_entry->min_col) {
-    if (doc->cur_data_col<doc->cur_entry->max_col) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-      doc_ne->type=DOCT_TEXT | doc->cur_entry->type & 0xFFFFFF00;
-      doc_ne->flags1=doc->cur_entry->flags1;
-      doc_ne->flags2=doc->cur_entry->flags2;
-      doc_ne->x=doc->cur_entry->x;
-      doc_ne->y=doc->cur_entry->y;
-      doc_ne->page_line_num=doc->cur_entry->page_line_num;
-      dst=doc->cur_entry->tag+doc->cur_data_col;
-      doc_ne->tag=StrNew(dst,doc->mem_task);
-      doc_ne->max_col=StrLen(dst);
+  doc_ce=doc->cur_entry;
+  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_data_col>doc_ce->min_col) {
+    if (doc->cur_data_col<doc_ce->max_col) {
+      dst=doc_ce->tag+doc->cur_data_col;
+      doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
       *dst=0;
-      doc->cur_entry->max_col=doc->cur_data_col;
-      QueIns(doc_ne,doc->cur_entry);
+      doc_ne->type=DOCT_TEXT | doc_ce->type & 0xFFFFFF00;
+      doc_ce->max_col=doc->cur_data_col;
+      QueIns(doc_ne,doc_ce);
       doc->cur_entry=doc_ne;
       doc->cur_data_col=doc_ne->min_col;
     } else
-      if (doc->cur_entry!=doc)
-	doc->cur_entry=doc->cur_entry->next;
+      if (doc_ce!=doc)
+	doc->cur_entry=doc_ce->next;
   }
   while (doc_e!=doc2) {
     if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE) {
@@ -363,11 +363,11 @@ public U0 StreamDoc(CDoc *doc)
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT)
-      StreamPutS(doc_e->tag);
+      StreamPrint("%s",doc_e->tag);
     else if (doc_e->type_u8==DOCT_NEW_LINE)
-      StreamPutS("\n");
+      StreamPrint("\n");
     else if (doc_e->type_u8==DOCT_TAB)
-      StreamPutS("\t");
+      StreamPrint("\t");
     doc_e=doc_e->next;
   }
   if (unlock_doc)
@@ -383,7 +383,7 @@ Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
   CDocUndo *u;
   if (doc->flags&DOCF_ALLOW_UNDO) {
     unlock=DocLock(doc);
-    time_stamp=GetTimeStamp;
+    time_stamp=GetTSC;
     if (doc->flags&DOCF_UNDO_DIRTY &&
 	time_stamp>doc->undo_root.last->time_stamp+time_stamp_freq<<4 || force) {
       u=CAlloc(sizeof(CDocUndo),doc->mem_task);
@@ -433,18 +433,18 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   CDoc *doc2;
   if (!doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
     return FALSE;
-  if (FilesFindMatch(FILENAME_MASK_TXT,filename)) {
+  if (FilesFindMatch(filename,FILEMASK_TXT)) {
     doc2=DocRead(filename);
     DocInsDoc(doc,doc2);
     DocDel(doc2);
     result=TRUE;
-  } else if (FilesFindMatch("*.BMP.Z",filename)) {
+  } else if (FilesFindMatch(filename,"*.BMP.Z")) {
     DocPutBMPFile(doc,filename,FALSE);
     result=TRUE;
-  } else if (FilesFindMatch("*.BMP;*.bmp",filename)) {
+  } else if (FilesFindMatch(filename,"*.BMP;*.bmp")) {
     DocPutBMPFile(doc,filename,TRUE);
     result=TRUE;
-  } else if (FilesFindMatch("*.GRA*",filename)) {
+  } else if (FilesFindMatch(filename,"*.GRA*")) {
     DocPutGRAFile(doc,filename);
     result=TRUE;
   }

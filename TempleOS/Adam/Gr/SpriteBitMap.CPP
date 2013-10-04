@@ -52,7 +52,7 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width,I64 snap,F64 ip_scaler)
     st2="";
   }
 
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite BitMap Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite BitMap Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/SpriteBitMap.TXT.Z\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU-UL,\"Color        %s\",GEBM_COLOR$$\n"
 	"$$MU-UL,\"Dither Color %s\",GEBM_DITHER_COLOR$$\n"
@@ -82,7 +82,7 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width,I64 snap,F64 ip_scaler)
 	"\n$$FG,PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",GEBM_MAIN_MENU$$$$FG,LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",GEBM_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",DOCM_CANCEL$$\n",st1,st2,width,snap,ip_scaler);
-  DocPutS(doc,"\nRight-Click to get back to this menu.");
+  DocPrint(doc,"\nRight-Click to get back to this menu.");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -410,7 +410,7 @@ bm_menu:
 	    case GEBM_TEXT:
 	      GrBMEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrPutS(dc,p1,p2,st);
+	      GrPrint(dc,p1,p2,"%s",st);
 	      break;
 	    case GEBM_TEXT_BOX:
 	      GrBMEdPrepPersistentDC(dc,xx1,yy1,img);
@@ -537,7 +537,7 @@ bm_menu:
 	    case GEBM_TEXT:
 	      GrBMEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrPutS(dc,p1,p2,st);
+	      GrPrint(dc,p1,p2,"%s",st);
 	      break;
 	    case GEBM_TEXT_BOX:
 	      GrBMEdPrepPersistentDC(dc,xx1,yy1,img);
@@ -648,7 +648,7 @@ bm_menu:
 	      break;
 	    case GEBM_TEXT:
 	      img->color=color;
-	      GrPutS(img,p1-xx1,p2-yy1,st);
+	      GrPrint(img,p1-xx1,p2-yy1,"%s",st);
 	      goto bm_menu;
 	    case GEBM_TEXT_BOX:
 	      img->color=color;

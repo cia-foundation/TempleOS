@@ -6,9 +6,9 @@ U0 Exit()
   } else {
     if (!Gs->num && !IsInDbg)
       SingleUser(OFF);
-    Fs->rflags=GetFlags;
-    Fs->rsp=GetStkPtr;
-    Fs->rbp=GetBasePtr;
+    Fs->rflags=GetRFlags;
+    Fs->rsp=GetRSP;
+    Fs->rbp=GetRBP;
     Fs->rip=$$;
     Cli;
     LBts(&Fs->task_flags,TASKf_KILL_TASK);
@@ -112,7 +112,7 @@ asm {
     while (argc-->0)
       *--rsp2=*--rsp;
     _stk=&Fs->stk;
-    temps->stk_ptr=rsp=GetStkPtr;
+    temps->stk_ptr=rsp=GetRSP;
 asm {
 	IMPORT	_FREE;	//We are in a function, not at glbl scope.
 			//The compiler treats these in isolation.
@@ -312,7 +312,7 @@ U0 TaskInitExt(Bool from_dbg=FALSE)
 I64 ExeCmdLine(CLex *lx)
 {
   I64 result=0,i,type,old_title_src=Fs->title_src;
-  U8 *ptr,*ptr2,*ptr3,*code,*old_task_title=StrNew(Fs->task_title);
+  U8 *ptr,*ptr2,*ptr3,*ex,*old_task_title=StrNew(Fs->task_title);
   F64 t0;
   CDocEntry *doc_e;
   CDoc *doc;
@@ -346,11 +346,11 @@ I64 ExeCmdLine(CLex *lx)
 	  MemCpy(ptr2,ptr,TASK_TITLE_LEN);
     }
     lx->flags&=~LF_HAS_MISC_DATA;
-    code=CmpStatement(lx,&type);
-    if (code!=INVALID_PTR) {
+    ex=LexStatement2Bin(lx,&type);
+    if (ex!=INVALID_PTR) {
       if (!(lx->flags&LF_JUST_LOAD)) {
 	t0=tT;
-	result=Call(code);
+	result=Call(ex);
 	for (i=2;i>=0;i--) {
 	  Fs->answers[i+1]=Fs->answers[i];
 	  Fs->answer_types[i+1]=Fs->answer_types[i];
@@ -361,7 +361,7 @@ I64 ExeCmdLine(CLex *lx)
 	Fs->answer_times[0]=tT-t0;
       }
       if (!(lx->flags&LF_HAS_MISC_DATA))
-	Free(code);
+	ExpressionBinDel(ex);
     }
   }
   if (Fs->title_src!=TTS_LOCKED_CONST) {
@@ -429,7 +429,7 @@ CTask *SpawnUser(U8 *fmt=NULL,...)
   CTask *task=Spawn(&UserCmdLine);
   TaskWait(task);
   if (fmt) {
-    st=SPrintFJoin(NULL,fmt,argc,argv);
+    st=SPrintJoin(NULL,fmt,argc,argv);
     XTalk(task,st);
     Free(st);
   }

@@ -106,7 +106,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   if (!override_validate && !TaskValidate(task))
     return FALSE;
   if (task==Fs)
-    task->rsp=GetStkPtr;
+    task->rsp=GetRSP;
   st=MStrUtil(task->task_title,SUF_REM_CTRL_CHARS|SUF_SAFE_DOLLAR);
   "$$FG,GREEN$$Task:%010X$$FG,CYAN$$ %-30ts$$FG$$\n$$ID,2$$",task,st;
   Free(st);
@@ -199,14 +199,17 @@ public U0 MemRep()
   I64 i;
   CTask *task;
   CCPU *c;
-  U32 *u32_ptr;
   Bool old_preempt=Preempt(OFF);
   CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
 
   "$$FG,BLACK$$Low Memory\t:0000100000$$FG$$\n$$ID,2$$";
-  u32_ptr=SYS_BOOT_BASE;
-  "Kernel\t:%010X-%010X\n",*u32_ptr-sizeof(CBinFile),bfh;
+  "Kernel\t:%010X-%010X\n",sys_boot_base-sizeof(CBinFile),bfh;
+
+  i=++bfh(I64);
+  bfh(I64)+=bfh->file_size-1;
+  "Compiler\t:%010X-%010X\n",i,bfh;
+
   "VGA\t\t:00000A0000-00000BFFFF\n";
   "$$ID,-2$$$$FG,BLACK$$High Memory\t:0000100000-%010X$$FG$$\n",
   sys_heap_limit;

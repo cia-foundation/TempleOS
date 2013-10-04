@@ -10,7 +10,7 @@ I64 PopUpDiffOptions()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$CM+LX,2,4$$$$FG$$$$BT,\"USE FILE1\",DS_USE_FILE1$$"
+  DocPrint(doc,"$$CM+LX,2,4$$$$FG$$$$BT,\"USE FILE1\",DS_USE_FILE1$$"
 	"$$CM+LX,24,0$$$$FG,CYAN$$$$BT,\"USE FILE2\",DS_USE_FILE2$$"
 	"$$CM+LX,2,4$$$$FG$$$$BT,\"REMAINDER ALL FILE1\",DS_REMAINDER_1$$"
 	"$$CM+LX,24,0$$$$FG,CYAN$$$$BT,\"REMAINDER ALL FILE2\",DS_REMAINDER_2$$"
@@ -65,7 +65,7 @@ U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
 	old_flags=cur_l->flags&DOCF_PLAIN_TEXT;
 	cur_l->flags|=DOCF_PLAIN_TEXT;
       }
-      "" doc_us1[i++]->tag;
+      "%s",doc_us1[i++]->tag;
       if (cur_l)
 	cur_l->flags= cur_l->flags&~DOCF_PLAIN_TEXT |old_flags;
       NewLine;
@@ -80,7 +80,7 @@ U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
 	old_flags=cur_l->flags&DOCF_PLAIN_TEXT;
 	cur_l->flags|=DOCF_PLAIN_TEXT;
       }
-      "" doc_us2[i++]->tag;
+      "%s",doc_us2[i++]->tag;
       if (cur_l)
 	cur_l->flags= cur_l->flags&~DOCF_PLAIN_TEXT |old_flags;
       NewLine;

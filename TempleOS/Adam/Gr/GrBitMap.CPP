@@ -831,8 +831,8 @@ public I64 GrPutChar(CDC *dc,I64 x,I64 y,U8 ch)
     return 0;
 }
 
-public I64 GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
-{
+I64 GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
+{ //Use $LK,"GrPrint","MN:GrPrint"$()
   I64 x0,ch,result;
   if (!_s) return 0;
   x0=x;
@@ -851,8 +851,8 @@ public I64 GrPutS(CDC *dc,I64 x,I64 y,U8 *_s)
   return result;
 }
 
-public I64 GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
-{ //Vertical text
+I64 GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
+{ //Vertical Text.  Use $LK,"GrVPrint","MN:GrVPrint"$()
   I64 y0,result;
   U8 buf[2];
   if (!_s) return 0;
@@ -874,18 +874,22 @@ public I64 GrVPutS(CDC *dc,I64 x,I64 y,U8 *_s)
   return result;
 }
 
-public U0 GrPrintF(CDC *dc,I64 x,I64 y,U8 *fmt,...)
+public I64 GrPrint(CDC *dc,I64 x,I64 y,U8 *fmt,...)
 {
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
-  GrPutS(dc,x,y,buf);
+  I64 result;
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  result=GrPutS(dc,x,y,buf);
   Free(buf);
+  return result;
 }
 
-public U0 GrVPrintF(CDC *dc,I64 x,I64 y,U8 *fmt,...)
+public I64 GrVPrint(CDC *dc,I64 x,I64 y,U8 *fmt,...)
 { //Vertical text
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
-  GrVPutS(dc,x,y,buf);
+  I64 result;
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  result=GrVPutS(dc,x,y,buf);
   Free(buf);
+  return result;
 }
 
 #help_index "Graphics"
@@ -1089,7 +1093,7 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		  dst=dc->body+kk1&~7;
 		  if (leading_bits) {
 		    if (win_z_num>=*win_z_buf_ptr++) {
-		      *dst(I64 *)=*dst(I64 *)&leading_bit_mask^color_mask&~leading_bit_mask;
+		      *dst(I64 *)=*dst(I64 *)&leading_bit_mask|*dst(I64 *)^color_mask&~leading_bit_mask;
 		      result+=leading_bits;
 		    }
 		    dst(I64 *)++;
@@ -1100,7 +1104,7 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		      result+=8;
 		    }
 		  if (trailing_bits && win_z_num>=*win_z_buf_ptr++) {
-		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask^color_mask&~trailing_bit_mask;
+		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|*dst(I64 *)^color_mask&~trailing_bit_mask;
 		    result+=trailing_bits;
 		  }
 		  if ((j+y)&7==7)
@@ -1122,11 +1126,11 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		      gr_1_to_8_bits[0xAA]&gr_1_to_8_colors[color.c1.color];
 		  dst=dc->body+kk1&~7;
 		  if (leading_bits)
-		    *dst(I64 *)++=*dst&leading_bit_mask^color_mask&~leading_bit_mask;
+		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|*dst(I64 *)^color_mask&~leading_bit_mask;
 		  for (i=0;i<whole_bytes;i++,dst(I64 *)++)
 		    *dst(I64 *)^=color_mask;
 		  if (trailing_bits)
-		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask^color_mask&~trailing_bit_mask;
+		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|*dst(I64 *)^color_mask&~trailing_bit_mask;
 		  kk1+=dc->width_internal;
 		  if (probability_dither) {
 		    if (RandU16<dc->dither_probability)
@@ -1221,7 +1225,7 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		  dst=dc->body+kk1&~7;
 		  if (leading_bits) {
 		    if (win_z_num>=*win_z_buf_ptr++) {
-		      *dst(I64 *)=*dst(I64 *)&leading_bit_mask^color_mask&~leading_bit_mask;
+		      *dst(I64 *)=*dst(I64 *)&leading_bit_mask|*dst(I64 *)^color_mask&~leading_bit_mask;
 		      result+=leading_bits;
 		    }
 		    dst(I64 *)++;
@@ -1232,7 +1236,7 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		      result+=8;
 		    }
 		  if (trailing_bits && win_z_num>=*win_z_buf_ptr++) {
-		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask^color_mask&~trailing_bit_mask;
+		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|*dst(I64 *)^color_mask&~trailing_bit_mask;
 		    result+=trailing_bits;
 		  }
 		  if ((j+y)&7==7)
@@ -1245,11 +1249,11 @@ public I64 GrRect(CDC *dc,I64 x,I64 y,I64 w,I64 h)
 		for (j=h2-h1;j;j--) {
 		  dst=dc->body+kk1&~7;
 		  if (leading_bits)
-		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask^color_mask&~leading_bit_mask;
+		    *dst(I64 *)++=*dst(I64 *)&leading_bit_mask|*dst(I64 *)^color_mask&~leading_bit_mask;
 		  for (i=0;i<whole_bytes;i++,dst(I64 *)++)
 		    *dst(I64 *)^=color_mask;
 		  if (trailing_bits)
-		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask^color_mask&~trailing_bit_mask;
+		    *dst(I64 *)=*dst(I64 *)&trailing_bit_mask|*dst(I64 *)^color_mask&~trailing_bit_mask;
 		  kk1+=dc->width_internal;
 		}
 		result=(h2-h1)*(w2-w1);

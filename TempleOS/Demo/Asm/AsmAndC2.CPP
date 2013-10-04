@@ -67,7 +67,7 @@ U0 AsmAndC2()
 
   asm {
 LIST
-//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a Holy C routine.
+//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a HolyC routine.
 USE64	//Defaults to 64, but this is a good habit.
 	MOV	RCX,R15 //You can clobber RAX,RBX,RCX,RDX.
 			    //You better preserve the rest.

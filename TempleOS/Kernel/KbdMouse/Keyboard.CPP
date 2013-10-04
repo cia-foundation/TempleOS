@@ -395,9 +395,9 @@ U0 KbdPktRead()
   I64 ch,sc;
   Bool set_LEDs,ctrl_alt;
 
-  if (GetTimeStamp>kbd_evt_time+time_stamp_freq>>3)
+  if (GetTSC>kbd_evt_time+time_stamp_freq>>3)
     FifoU8Flush(kbd_fifo);
-  kbd_evt_time=GetTimeStamp;
+  kbd_evt_time=GetTSC;
   raw_byte=InU8(KBD_PORT);
   sc=KbdBuildSC(raw_byte,&last_raw_byte,&last_sc,&set_LEDs,&ctrl_alt);
   if (ctrl_alt && sc) {
@@ -441,7 +441,7 @@ interrupt U0 KbdIntHandler()
     kbdmouse_rst=TRUE;
     return;
   }
-  ctrl_alt_let_ret_addr=GetBasePtr()(I64)+8;
+  ctrl_alt_let_ret_addr=GetRBP()(I64)+8;
   KbdPktRead;
 }
 

@@ -109,7 +109,6 @@ Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC_ALL)
 {
   I64 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I64,xx,yy,zz,
 	num_entries=0,ijif,cur_u8_attr,temp_u32_attr,
-	hide_collapsed[2],
 	cursor_y=MIN_I64,left_margin,right_margin,
 	y_plot_top,y_plot_bottom,
 	top,left,bottom,right,width,height,scroll_x,scroll_y,
@@ -195,7 +194,7 @@ Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC_ALL)
   best_do_e=doc->cur_entry;
 
   if (!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS)) &&
-	FilesFindMatch(FILENAME_MASK_SRC,doc->filename.name))
+	FilesFindMatch(doc->filename.name,FILEMASK_SRC))
     doc->flags|=DOCF_HIGHLIGHT;
   else
     doc->flags&=~DOCF_HIGHLIGHT;
@@ -356,9 +355,7 @@ word_wrap_start:
 	  goto word_wrap_start;
 	}
       }
-      if (doc_e->type_u8==DOCT_TEXT &&
-	    !(doc_e->flags1&DOCEG1_DONT_EDIT) &&
-	    !(doc_e->flags2&DOCEG2_DONT_EDIT)) {
+      if (IsEditableText(doc_e)) {
 	if (doc_e->flags1==doc_e2->flags1 && doc_e->flags2==doc_e2->flags2 &&
 	      doc_e->type==doc_e2->type) {
 	  j=StrLen(doc_e2->tag);
@@ -461,9 +458,7 @@ word_wrap2:
       if (doc->flags & DOCF_WORD_WRAP) {
 	i=right_margin+1-(x+left);  //Space left on line
 	ii=x+1-s->left_margin;
-	if (doc_e->type_u8==DOCT_TEXT &&
-	      !(doc_e->flags1&DOCEG1_DONT_EDIT) &&
-	      !(doc_e->flags2&DOCEG2_DONT_EDIT)) {
+	if (IsEditableText(doc_e)) {
 	  if (doc->cur_entry==doc_e->next) {
 	    if (doc->cur_data_col==doc_e->next->min_col)
 	      i--;
@@ -577,10 +572,6 @@ skip_soft_cr:
       case DOCT_TREE:
 	temp_u32_attr.u8[1]|=DOC_COLOR_TREE;
 	break;
-      case DOCT_HIDE_START:
-      case DOCT_HIDE_END:
-	temp_u32_attr.u8[1]|=DOC_COLOR_HIDDEN;
-	break;
       default:
 	temp_u32_attr.u8[1]|=cur_u8_attr&15;
     }
@@ -615,7 +606,7 @@ skip_soft_cr:
 	  if (doc_e==doc->cur_entry && doc_e->type_u8!=DOCT_TEXT)
 	    temp_u32_attr^=0x0F00;
 	  if (full_refresh && '0'<=ptr[1]<='9') {
-	    SPrintF(buf,"<%d>",doc_e->bin_num);
+	    SPrint(buf,"<%d>",doc_e->bin_num);
 	    k=StrLen(buf);
 	    Free(doc_e->tag);
 	    ptr=doc_e->tag=MAlloc(k+1,mem_task);
@@ -632,20 +623,7 @@ skip_soft_cr:
 	  *ptr++=']';
 	  ptr=doc_e->tag;
 	}
-      } else if (doc_e->type_u8==DOCT_HIDE_START) {
-	if (k>=2) {
-	  *ptr++='<';
-	  if (doc_e->flags1 & DOCEF1_CHECKED_COLLAPSED)
-	    *ptr++='+';
-	  else
-	    *ptr++='-';
-	  ptr=doc_e->tag;
-	}
-      } else if (doc_e->type_u8==DOCT_HIDE_END) {
-	if (k>=1)
-	  *ptr='>';
       }
-
       if (doc_e->flags1 & DOCEF1_SCROLLING_X) {
 	j=StrLen(doc_e->tag);
 	if (j && doc_e->scroll_len) {
@@ -741,9 +719,9 @@ skip_soft_cr:
 	k=doc_e->hex_ed_width; //columns
 	for (i=0;i<doc_e->len;i+=k) {
 	  if (doc_e->flags1 & DOCEF1_ZERO_BASED)
-	    SPrintF(buf,"%08tX ",i);
+	    SPrint(buf,"%08tX ",i);
 	  else
-	    SPrintF(buf,"%08tX ",bptr);
+	    SPrint(buf,"%08tX ",bptr);
 	  ptr=buf;
 	  while (ch=*ptr++) {
 	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->flags1&DOCEF1_DONT_DRAW)) {
@@ -764,7 +742,7 @@ skip_soft_cr:
 	  }
 	  if (i+k>doc_e->len) k=doc_e->len-i;
 	  for (j=0;j<k;j++) {
-	    SPrintF(buf,"%02tX",*bptr++);
+	    SPrint(buf,"%02tX",*bptr++);
 	    ptr=buf;
 	    while (ch=*ptr++) {
 	      if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->flags1&DOCEF1_DONT_DRAW)) {
@@ -1240,7 +1218,6 @@ adjust_xy:
     if (full_refresh) {
       switch (doc_e->type_u8) {
 	case DOCT_CHECK_BOX:
-	case DOCT_HIDE_START:
 	  doc_e->max_col=2;
 	  break;
 	case DOCT_TREE:
@@ -1248,7 +1225,6 @@ adjust_xy:
 	case DOCT_LINK:
 	case DOCT_MENU_VAL:
 	case DOCT_MACRO:
-	case DOCT_HIDE_END:
 	  doc_e->max_col=1;
 	  break;
 	default:
@@ -1302,35 +1278,6 @@ adjust_xy:
 	    }
 	    doc_e2=doc_e2->next;
 	  } while (doc_e2!=doc && j>i);
-	}
-      }
-      if (doc_e->type_u8 == DOCT_HIDE_START) {
-	if (doc_e->flags1 & DOCEF1_ALIAS)
-	  alias=doc_e;
-	else
-	  alias=NULL;
-	doc_e2=doc_e->next;
-	LBtr(hide_collapsed,0);
-	j=1;
-	LBEqu(hide_collapsed,j,doc_e->flags1 & DOCEF1_CHECKED_COLLAPSED);
-	while (doc_e2!=doc && j>0) {
-	  if (Bt(hide_collapsed,j))
-	    doc_e2->flags1|=DOCEF1_SKIP;
-	  else
-	    doc_e2->flags1&=~DOCEF1_SKIP;
-	  if (doc_e2->type_u8==DOCT_HIDE_START) {
-	    j++;
-	    LBEqu(hide_collapsed,j,doc_e2->flags1 & DOCEF1_CHECKED_COLLAPSED);
-	    if (Bt(hide_collapsed,j-1))
-	      LBts(hide_collapsed,j);
-	  } else if (doc_e2->type_u8==DOCT_HIDE_END) {
-	    j--;
-	    if (Bt(hide_collapsed,j))
-	      doc_e2->flags1|=DOCEF1_SKIP;
-	    else
-	      doc_e2->flags1&=~DOCEF1_SKIP;
-	  }
-	  doc_e2=doc_e2->next;
 	}
       }
     }
@@ -1563,7 +1510,7 @@ public U0 DocInsSafe(CDoc *doc,U8 *st)
   unlock=DocLock(doc);
   old_flags=doc->flags;
   doc->flags|=DOCF_NO_CURSOR;
-  DocPutS(doc,st);
+  DocPrint(doc,"%s",st);
   DocRecalc(doc,FALSE,DOC_RECALC_PARTIAL);
   doc->flags=old_flags;
   if (unlock)
@@ -1612,7 +1559,7 @@ public U0 DocClear(CDoc *doc=NULL)
   }
   unlock=DocLock(doc);
   DocBottom(doc);
-  DocPutS(doc,"$$CL$$");
+  DocPrint(doc,"$$CL$$");
   DocRecalc(doc);
   if (unlock)
     DocUnlock(doc);
@@ -1650,7 +1597,7 @@ public U0 DocCollapse(Bool collapse=TRUE,CDoc *doc=NULL)
   unlock=DocLock(doc);
   doc_e=doc->root.next;
   while (doc_e!=doc) {
-    if (doc_e->flags1&DOCEF1_TREE || doc_e->type_u8==DOCT_HIDE_START)
+    if (doc_e->flags1&DOCEF1_TREE)
       BEqu(&doc_e->flags1,DOCEf1_CHECKED_COLLAPSED,collapse);
     doc_e=doc_e->next;
   }

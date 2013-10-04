@@ -133,7 +133,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
     n=br->sects_per_cluster*(BLK_SIZE<<3);
     n=(br->sects+n-1)/n;
     br->bitmap_sects=n;
-    br->unique_id=GetTimeStamp>>4;
+    br->unique_id=GetTSC>>4;
     br->root_cluster=0;
  
     if (quick)
@@ -144,8 +144,8 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
  
     WBlks(p,br,p->offset,1);
     RedSeaFSPrtInit(p);
-    ClusersAlloc(p,0,1,FALSE);	//Alloc #1
-    br->root_cluster=ClusersAlloc(p,0,1,FALSE);
+    ClustersAlloc(p,0,1,FALSE);	//Alloc #1
+    br->root_cluster=ClustersAlloc(p,0,1,FALSE);
     WBlks(p,br,p->offset,1);
     root_dir=CAlloc(p->spc<<BLK_SIZE_BITS);
  
@@ -155,8 +155,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
     *d_native->name='.';
     d_native->cluster=br->root_cluster;
     d_native->size=p->spc<<BLK_SIZE_BITS;
-    d_native->expanded_size=d_native->size;
-    d_native->datetime=GetCurTimeDate;
+    d_native->datetime=GetDateTime;
  
     d_native(U8 *)+=CDIR_SIZE;
  
@@ -164,7 +163,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
     d_native->name[1]='.';
     d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
     d_native->cluster=br->root_cluster;
-    d_native->datetime=GetCurTimeDate;
+    d_native->datetime=GetDateTime;
  
     WBlks(p,root_dir,p->data+br->root_cluster*p->spc,p->spc);
     RedSeaFSPrtInit(p);
@@ -253,10 +252,6 @@ U8 *RedSeaFSFileRead(CPrt *p,U8 *cur_dir,U8 *filename,I64 *_size,
 	buf=MAlloc(blk_cnt<<BLK_SIZE_BITS+1);
 	c=de.cluster;
 	c=RClustersBlks(p,buf,c,blk_cnt);
-	if (de.xsum) {
-	  if (de.xsum^ArcXSum(buf,de.size) !=TEMPLEOS_XSUM)
-	    throw(EXCEPT_ARC_XSUM);
-	}
 	if (FileAttr(de.name) & _ATTR_COMPRESSED && !raw) {
 	  ac=buf;
 	  if (_attr) *_attr=FileAttr(de.name,*_attr);
@@ -437,12 +432,11 @@ Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 	  RedSeaFSFreeClusters(p,cur_dir_cluster,
 	    (dir_size>>BLK_SIZE_BITS+p->spc-1)/p->spc);
 	  dir_size+=p->spc<<BLK_SIZE_BITS;
-	  c=ClusersAlloc(p,0,(dir_size>>BLK_SIZE_BITS+p->spc-1)/p->spc,TRUE);
+	  c=ClustersAlloc(p,0,(dir_size>>BLK_SIZE_BITS+p->spc-1)/p->spc,TRUE);
 	  Free(buf);
 	  buf=buf2;
 	  ptr=buf(U8 *)-offset(CDirEntry.start);
 	  ptr->size=dir_size;
-	  ptr->expanded_size=dir_size;
 	  ptr->cluster=c;
 	  WClustersBlks(p,buf,c,dir_size>>BLK_SIZE_BITS);
 	  if (cur_dir_cluster==p->root_cluster) {
@@ -464,7 +458,6 @@ Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 		temp,&de2,FUF_JUST_DIRS)) {
 	      de2.cluster=c;
 	      de2.size=dir_size;
-	      de2.expanded_size=dir_size;
 	      RedSeaFSDirNew(p,parent_dir,&de2,FALSE);
 	    } else
 	      Dbg;
@@ -540,11 +533,11 @@ I64 RedSeaFSFilesDel(CPrt *p,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
 	break;
       else if (!(ptr->attr & _ATTR_DELETED) && ch!='.' && (del_dir ||
 	  !(ptr->attr & _ATTR_DIR)) &&
-	  FilesFindMatch(files_find_mask,ptr->name,fuf_flags)) {
+	  FilesFindMatch(ptr->name,files_find_mask,fuf_flags)) {
 	if (!(ptr->attr & _ATTR_DIR)) result++;
 	if (print_msg) {
 	  PutDefine("ST_DELETE");
-	  "" ptr->name;
+	  "%s",ptr->name;
 	  NewLine;
 	}
 	ptr->attr|=_ATTR_DELETED;
@@ -583,7 +576,7 @@ I64 RedSeaFSFileWrite(CPrt *p,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   if (_ac2) *_ac2=NULL;
   if (size<0) size=0;
   if (!cdt)
-    cdt=GetCurTimeDate;
+    cdt=GetDateTime;
 
   if (p->type!=PT_REDSEA)
     PutDefineErr("ST_NOT_REDSEA");
@@ -594,16 +587,14 @@ I64 RedSeaFSFileWrite(CPrt *p,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
     attr=FileAttr(name,attr);
     attr|=_ATTR_CONTIGUOUS;
     contiguous=TRUE;
-    de.expanded_size=size;
     if (attr&_ATTR_COMPRESSED && !raw) {
       ac=CompressBuf(buf,size,flags);
       size=ac->compressed_size;
       buf=ac;
     }
     de.size=size;
-    de.xsum=ArcXSum(buf,size)^TEMPLEOS_XSUM;
     if (blk_cnt=(size+BLK_SIZE-1)>>BLK_SIZE_BITS)
-      c=ClusersAlloc(p,0,(blk_cnt+p->spc-1)/p->spc,contiguous);
+      c=ClustersAlloc(p,0,(blk_cnt+p->spc-1)/p->spc,contiguous);
     else
       c=INVALID_CLUSTER;
     de.cluster=c;
@@ -623,7 +614,7 @@ I64 RedSeaFSFileWrite(CPrt *p,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
 CDirEntry *RedSeaFSFilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NULL)
 {
   CPrt *p=Fs->cur_prt;
-  CDirEntry *buf,*buf2,*ptr,*result=NULL,*tempm;
+  CDirEntry *buf,*buf2,*ptr,*result=NULL,*tempde;
   I64 ch,cur_dir_cluster;
   if (fuf_flags&~FUG_FILES_FIND)
     throw(EXCEPT_FUF,11);
@@ -648,27 +639,27 @@ CDirEntry *RedSeaFSFilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent
       if (!(ch=*ptr->name))
 	break;
       else if (!(ptr->attr & _ATTR_DELETED)) {
-	tempm=CAlloc(sizeof(CDirEntry));
-	MemCpy(&tempm->start,&ptr->start,CDIR_SIZE);
-	tempm->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempm->attr&_ATTR_DIR && *tempm->name!='.') {
-	  tempm->next=result;
-	  result=tempm;
-	  tempm->full_name=DirNameAbs(tempm->name);
+	tempde=CAlloc(sizeof(CDirEntry));
+	MemCpy(&tempde->start,&ptr->start,CDIR_SIZE);
+	tempde->parent=parent;
+	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&_ATTR_DIR && *tempde->name!='.') {
+	  tempde->next=result;
+	  result=tempde;
+	  tempde->full_name=DirNameAbs(tempde->name);
 	  PrtUnlock(p);
-	  if (Cd(tempm->name)) {
-	    tempm->sub=RedSeaFSFilesFind(files_find_mask,fuf_flags,tempm);
+	  if (Cd(tempde->name)) {
+	    tempde->sub=RedSeaFSFilesFind(files_find_mask,fuf_flags,tempde);
 	    Cd("..");
 	  }
 	  PrtLock(p);
-	} else if ((tempm->attr&_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	!(Bt(&fuf_flags,FUf_RECURSE) && *tempm->name=='.' && tempm->attr&_ATTR_DIR) &&
-	  FilesFindMatch(files_find_mask,tempm->name,fuf_flags)) {
-	  tempm->next=result;
-	  result=tempm;
-	  tempm->full_name=FileNameAbs(tempm->name);
+	} else if ((tempde->attr&_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&_ATTR_DIR) &&
+	  FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
+	  tempde->next=result;
+	  result=tempde;
+	  tempde->full_name=FileNameAbs(tempde->name);
 	} else
-	  CDirEntryDel(tempm);
+	  DirEntryDel(tempde);
       }
       ptr(U8 *)+=CDIR_SIZE;
     }
@@ -694,8 +685,7 @@ Bool RedSeaFSMkDir(CPrt *p,U8 *cur_dir,U8 *name)
     StrCpy(d_native->name,name);
     d_native->cluster=c;
     d_native->size=size;
-    d_native->expanded_size=size;
-    d_native->datetime=GetCurTimeDate;
+    d_native->datetime=GetDateTime;
     d_native(U8 *)+=CDIR_SIZE;
  
     d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
@@ -704,8 +694,7 @@ Bool RedSeaFSMkDir(CPrt *p,U8 *cur_dir,U8 *name)
     d_native->name[2]=0;
     d_native->cluster=cur_dir_cluster;
     d_native->size=0;
-    d_native->expanded_size=0;
-    d_native->datetime=GetCurTimeDate;
+    d_native->datetime=GetDateTime;
     WClusters(p,buf,c,1);
     Free(buf);
     if (unlock_break)

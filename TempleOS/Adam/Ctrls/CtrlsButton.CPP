@@ -17,15 +17,15 @@ U0 DrawCtrlButton(CDC *dc,CCtrl *c)
 
   dc->color=BLACK;
   GrRect(dc,c->left,c->top,c->right-c->left+1,c->bottom-c->top+1);
-  if (!(st=LstEntryPt(s->state,s->state_texts)))
+  if (!(st=LstSub(s->state,s->state_texts)))
     st=s->state_texts;
   dc->color=s->state_colors[s->state];
   l=StrLen(st);
   GrRect(dc,c->left+BUTTON_BORDER,c->top+BUTTON_BORDER,
 	    c->right-c->left+1-BUTTON_BORDER*2,c->bottom-c->top+1-BUTTON_BORDER*2);
   dc->color=s->state_colors[s->state]^(WHITE<<16+WHITE);
-  GrPutS(dc,(c->left+c->right+1-l*FONT_WIDTH)>>1,
-    (c->top+c->bottom+1-FONT_HEIGHT)>>1,st);
+  GrPrint(dc,(c->left+c->right+1-l*FONT_WIDTH)>>1,
+    (c->top+c->bottom+1-FONT_HEIGHT)>>1,"%s",st);
 }
 
 U0 LeftClickCtrlButton(CCtrl *c,I64,I64,Bool down)
@@ -49,7 +49,7 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
   if (width<0) {
     l=1;
     for (i=0;i<num_states;i++)
-      if (st=LstEntryPt(i,state_texts)) {
+      if (st=LstSub(i,state_texts)) {
 	j=StrLen(st);
 	if (j>l) l=j;
       }

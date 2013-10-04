@@ -10,15 +10,6 @@ class MakeSongSettings
 
 U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
 {  //k is a random note nibble
-  I64 a=TimerPickedNibble; //accent
-  if (!a) {
-    buf[*j]='!';
-    *j+=1;
-  }
-  if (a<4) {
-    buf[*j]='!';
-    *j+=1;
-  }
   if (!k && mss->rests) {
     buf[*j]='R';
     *j+=1;
@@ -67,7 +58,7 @@ U8 *MakeSong()
   mss.rests=FALSE;
   mss.octave=music_octave;
 
-  if (!PopUpForm(&mss,"MakeSongSettings"))
+  if (!PopUpForm(&mss))
     return NULL;
 
   buf=CAlloc(256);
@@ -87,8 +78,9 @@ U8 *MakeSong()
     buf[j++]='8';
   } else
     len=8;
+  TimerPickFlush;
   for (i=0;i<len;i++) {
-    n=TimerPickedNibble<<4+TimerPickedNibble;
+    n=TimerPickedBits(8);
     if (mss.complex_rhythms)
       duration=complex_songs[n%9];
     else if (mss.normal_rhythms)
@@ -96,22 +88,19 @@ U8 *MakeSong()
     else
       duration=simple_songs[n%5];
 
-    k=TimerPickedNibble;
     switch (duration) {
       case DUR_8_8:
 	if (last_duration!=DUR_8_8)
 	  buf[j++]='e';
-	InsNote(&mss,buf,k,&j);
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	break;
       case DUR_8DOT_16:
 	buf[j++]='e';
 	buf[j++]='.';
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	buf[j++]='s';
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	duration=DUR_16_16_16_16;
 	break;
       case DUR_3_3_3:
@@ -119,48 +108,42 @@ U8 *MakeSong()
 	  buf[j++]='e';
 	  buf[j++]='t';
 	}
-	InsNote(&mss,buf,k,&j);
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	break;
       case DUR_8_16_16:
 	if (last_duration!=DUR_8_8)
 	  buf[j++]='e';
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	buf[j++]='s';
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	duration=DUR_16_16_16_16;
 	break;
       case DUR_16_16_8:
 	if (last_duration!=DUR_16_16_16_16)
 	  buf[j++]='s';
-	InsNote(&mss,buf,k,&j);
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	buf[j++]='e';
-	k=TimerPickedNibble;
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
 	duration=DUR_8_8;
 	break;
       case DUR_16_16_16_16:
 	if (last_duration!=DUR_16_16_16_16)
 	  buf[j++]='s';
-	InsNote(&mss,buf,k,&j);
-	k2=k;
-	k=TimerPickedNibble;
+	k =TimerPickedBits(4);
+	k2=TimerPickedBits(4);
 	InsNote(&mss,buf,k,&j);
 	InsNote(&mss,buf,k2,&j);
 	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,k2,&j);
 	break;
       default:
 	if (last_duration!=DUR_4)
 	  buf[j++]='q';
-	InsNote(&mss,buf,k,&j);
+	InsNote(&mss,buf,TimerPickedBits(4),&j);
     }
     last_duration=duration;
     progress4++;

@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=142;
+  progress4_max=144;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -24,6 +24,15 @@ U0 DoSpritePlot()
   XTalkWait(task,"#include \"::/TempleOS/Demo/Graphics/SpritePlot\";\n");
   Sleep(500);
   SendMsg(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  XTalk(task,"Exit;\n");
+}
+
+U0 DoElephant()
+{
+  CTask *task=SpawnUser;
+  XTalkWait(task,"#include \"::/TempleOS/Demo/Graphics/Elephant\";\n");
+  Sleep(1000);
+  SendMsg(task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
   XTalk(task,"Exit;\n");
 }
 
@@ -749,6 +758,12 @@ U0 DoScreenCodes()
   XTalk(task,"Exit;\n");
 }
 
+U0 DoPanText()
+{
+  CTask *task=SpawnUser;
+  XTalkWait(task,"#include \"::/TempleOS/Demo/Graphics/PanText\";\nExit;\n");
+}
+
 U0 DoExtendedChars()
 {
   CTask *task=SpawnUser;
@@ -814,10 +829,10 @@ U0 Do()
 
 */
 
-U0 DoMPPrintF()
+U0 DoMPPrint()
 {
   CTask *task=SpawnUser;
-  XTalkWait(task,"#include \"::/TempleOS/Demo/MultiCore/MPPrintF\";\n");
+  XTalkWait(task,"#include \"::/TempleOS/Demo/MultiCore/MPPrint\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -1692,10 +1707,10 @@ U0 Do()
 }
 */
 
-U0 DoPrintF()
+U0 DoPrint()
 {
   CTask *task=SpawnUser;
-  XTalkWait(task,"#include \"::/TempleOS/Demo/PrintF\";\n");
+  XTalkWait(task,"#include \"::/TempleOS/Demo/Print\";\n");
   Sleep(2000);
   XTalk(task,"Exit;\n");
 }
@@ -2013,7 +2028,7 @@ U0 DoReps()
   SendMsg(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   TS; XTalkWait(task,"ATARep;\npSleep(1000);\n");
   TS; XTalkWait(task,"HashDepthRep(adam_task->hash_table);Sleep(1000);\n");
-  TS; XTalkWait(task,"HAllRep;Sleep(1000);\n");
+  TS; XTalkWait(task,"Who;Sleep(1000);\n");
   TS; XTalkWait(task,"PrtRep;Sleep(1000);\n");
   TS; XTalkWait(task,"TaskRep;Sleep(1000);\n");
   XTalk(task,"Exit;\n");
@@ -2051,10 +2066,11 @@ U0 OSTestSuite()
   TS; DoClouds;
   TS; if (mp_cnt>1) DoRadixSort;
   TS; if (mp_cnt>1) DoLoadTest;
-  TS; if (mp_cnt>1) DoMPPrintF;
+  TS; if (mp_cnt>1) DoMPPrint;
   TS; if (mp_cnt>1) DoLock;
   TS; if (mp_cnt>1) DoInterrupts;
   TS; DoSpritePlot;
+  TS; DoElephant;
   TS; DoSpritePlot3D;
   TS; DoSpritePut;
   TS; DoSpritePutExt;
@@ -2084,7 +2100,7 @@ U0 OSTestSuite()
   TS; DoPick3D;
   TS; DoWhap;
   TS; DoPalette;
-  TS; DoPrintF;
+  TS; DoPrint;
   TS; DoShading;
   TS; DoRotateTank;
   TS; Do3DPoly;
@@ -2114,6 +2130,7 @@ U0 OSTestSuite()
   TS; DoExceptions;
   TS; DoScreenCodes;
   TS; DoExtendedChars;
+  TS; DoPanText;
   TS; DoCharGraphics;
   TS; DoMagicPairs;
   TS; DoHanoi;
@@ -2155,3 +2172,6 @@ U0 OSTestSuite()
 }
 
 OSTestSuite;
+
+//$LK-A,"::/TempleOS/Demo/Carry.CPP.Z"$
+//$LK-A,"::/TempleOS/Demo/Dsk/DskRaw.CPP.Z"$

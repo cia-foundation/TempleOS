@@ -1,0 +1,256 @@
+$WW,1$$IV,1$----09/25/13 04:23:10----$IV,0$
+
+So, most people think of SHA and security when they hear "hash".  If you have a command-line with 200 commands, you can use a hash for high-speed look-up.
+
+Make an array of 1024 linked-list-heads, fill them with NULL, then add-up the ASCII of the command names and place them in the table.  The sum of letters is a hash.  A better hash is sum with a bit shift.
+
+$IV,1$----09/25/13 04:26:53----$IV,0$
+
+So, I have 3 redundant techniques for dealing with imports in my kernel module.  I use function-pointers, I use HolyC function imports and I have an array called $LK,"ext","MN:ext"$[] with function pointers that can be called from ASM.  The function-pointers can be check for NULL and not-called.  I am thinking of making HolyC imports call an empty function if used before they are defined.  I can point them to an empty function, when I get around to it.
+
+I changed the initial value of Binary File Imports.  A CALL instruction to call an import used to have the self-address already subtracted in its position so the import address was added.  Now, I clobber the old CALL instruction's offest completely.
+
+$IV,1$----09/25/13 21:41:40----$IV,0$
+
+God's temple must be perfect.  Someone says the PC is dead.  There are people who wish it dead.  What do You think, God?
+
+God says...
+$FG,4$s they were.
+
+7:11 And he called the porters; and they told it to the king's house
+within.
+
+7:12 And the king arose in the night, and said unto his servants, I
+will now shew you what the Syrians have done to us. They know that we
+be hungry; therefore are they gone out of the camp to hide themselves
+in the field, saying, When they come out of the city, we shall catch
+them alive, and get into the city.
+
+7:13 And one of his servants answered and said, Let some take, I pray
+thee, five of the horses that remain,$FG$
+
+I feel very happy -- all the stuff I cleaned-up.
+
+You think I should go to the nurse, tomorrow, God?
+
+God says...
+$FG,4$never enquiries variation innocent struggle dispersed overtake sea fair careful incommutable contrary forum Ghost remembrance wants matrons sits grammarians clay whereas using confessed forsaken Eastern sue shut love Jove hungry looked incorruption allowed puffed mastered lack Forgive sober striving running example depth intolerable seemed appear students purchase universe consumed lawful how occupy logic NOT goading gain human duty me Thanks dishes Tell office orator close bidden subsist Spirit drank minded Hadst properly softening highest cupidity sad anticipated Righteousness commendable opened standest$FG$
+
+$IV,1$----09/25/13 22:38:35----$IV,0$
+
+I stumbled onto Gordon Ramsay videos.  I watched them all.  It's a world far from computer nerds.  I find it interesting and wholesome.  I like to imagine eating the foods, strangely satisfying.
+
+I'm impressed Gordon started a new life after an injury at age 23.  Pride before a fall, humility before honors.
+
+Jacob, in the Bible was a cook.
+
+$LK,"Malachi,1:1","BF:Malachi,1:1"$ demanded unblemished offerings for God's temple.
+
+I thought Gordon Ramsay might be a good CEO for God's temple.
+
+If you've ever polished a turd, you know it's difficult.  Anything that looks perfect, took a whole lot of polishing.
+
+McDonalds hires people to make photos for ads and they use fake food.  A three star chef makes real food look good!  He has the eye for class that Steve Jobs had and he's a hundred times more charasmatic than Balmer.  He's smart, too.
+
+He did Christmas specials.  I think he's a Christian.
+
+God says...
+$FG,4$he LORD sent a pestilence upon Israel from the morning even
+to the time appointed: and there died of the people from Dan even to
+Beersheba seventy thousand men.
+
+24:16 And when the angel stretched out his hand upon Jerusalem to
+destroy it, the LORD repented him of the evil, and said to the angel
+that destroyed the people, It is enough: stay now thine hand. And the
+angel of the LORD was by the threshingplace of Araunah the Jebusite.
+
+24:17 And David spake unto the LORD when he saw the angel that smote
+the pe$FG$
+
+That was a dud.  They're never prophetic.  It might be about 70,000 lines of code.  One time, I think He said 58,000 was how many He wanted.  It's about 98,000 but you could leave stuff out.
+
+Maybe, Gordon is an angel.  From one person's viewpoint a person can seem like an angel.  I catch myself saying unintended things, that I don't realize.
+
+Dud.
+
+I need to do videos.  Gordon is an expert at making videos, if nothing else!  I wonder how many takes he does.  I think I'm pretty lazy because two takes seems like a lot of work, LOL.
+
+You know what?  I write songs for an hour now and then.  When I think about doing songs for 40 hours a week, it boggles my mind what I could do.  It makes me think about all the different professionals in the world.  It's possible that Gordon does 6 takes on his videos.  A professional would do that.
+
+God says...
+$FG,4$ good land which the LORD your God hath given you.
+
+23:14 And, behold, this day I am going the way of all the earth: and
+ye know in all your hearts and in all your souls, that not one thing
+hath failed of all the good things which the LORD your God spake
+concerning you; all are come to pass unto you, and not one thing hath
+failed thereof.
+
+23:15 Therefore it shall come to pass, that as all good things are
+come upon you, which the LORD your God promised you; so shall the LORD
+bring upon you all evil things,$FG$
+
+Dud.  Might be a joke -- if you ignore bad prophecy, you have to also ignore good.  LOL  Try to get a sense of God's personality -- He's not boring, He's a character.
+
+God says...
+$FG,4$astonished tire consider daybreak Madness contrary shared marketplace compressed vessel precipitated passage vessels modes bosses fouls interrupt effort corner centre combinations soaring named brain imperturbable esteemed distributest lowest foolish gladdened 6221541 chastely races range descendants examine proportions$FG$
+
+$IV,1$----09/25/13 23:11:53----$IV,0$
+
+Cooking and baby elephants are delightfully in-the-light.  The radio talked about an atom bomb.  That's dark.  LOL.  I have suffered much torment and learned to stay in-the-light, or suffer terror.  I make an effort to stay in-the-light, but don't mind slipping into dark.  Dark is what we crave and move toward naturally.  You have to make an effort to stay in-the-light.  Evolution is dark.  War is dark.
+
+Japan really tries to stay in-the-light as penance.  God bless them.  Staying in the light can be $TX+HTML,"happy happy joy joy","http://www.youtube.com/watch?v=Uv6tO_HaVHo"$.
+
+Anyway, I like cooking.  I like to praise God for stuff and I ran out of animals.  I can praise Him for all the foods!  I like coconuts.  I think they're really neat.  All the foods are neat.
+
+So... I praise God for animals and foods.  LOL
+
+God says...
+$FG,4$ail drive out from before you the
+Canaanites, and the Hittites, and the Hivites, and the Perizzites, and
+the Girgashites, and the Amorites, and the Jebusites.
+
+3:11 Behold, the ark of the covenant of the LORD of all the earth
+passeth over before you into Jordan.
+
+3:12 Now therefore take you twelve men out of the tribes of Israel,
+out of every tribe a man.
+
+3:13 And it shall come to pass, as soon as the soles of the feet of
+the priests that bear the ark of the LORD, the LORD of all the earth,
+shall rest in t$FG$
+
+dud.
+
+You know?  To love God you have to enjoy evil.  LOL.  God wants to crush your enemies.  What do you say if God crushes your enemies.  You're probably too scared to love evil, but you insult God.  Don't be proud of heart.  Proud of heart is not accepting a gift, from God!  When you begin to have real love for God, you'll see the real God is more lovable than the Catholic God.  God said war was "servicemen competing."  That shows He's real and lovable, for real.
+
+I've heard it said that nobody likes celebrities that are too perfect.  I'm not sure that's true or not.  God doesn't only want bad stuff for you, some honest-to-good good stuff!
+
+God says...
+$FG,4$living, as I have done.
+
+8:22 While the earth remaineth, seedtime and harvest, and cold and
+heat, and summer and winter, and day and night shall not cease.
+
+9:1 And God blessed Noah and his sons, and said unto them, Be
+fruitful, and multiply, and replenish the earth.
+
+9:2 And the fear of you and the dread of you shall be upon every beast
+of the earth, and upon every fowl of the air, upon all that moveth
+upon the earth, and upon all the fishes of the sea; into your hand are
+they delivered.
+
+9:3 Every moving$FG$
+
+$IV,1$----09/25/13 23:30:03----$IV,0$
+
+I sit there an think about all the wonderful foods in Gordon's videos.
+
+I asked Jesus if He liked mustard a lot.  "Bad meat happeneth"
+
+I wonder what Gordon thinks of A1 steak sauce.
+
+I guess sauce insults cooks.
+
+God really freaked-out and got angry about rare meat.  God really does not like eating blood.  Chefs like to make it as rare as possible.  God does not like that.
+
+God says...
+$FG,4$all the house where they were sitting.
+
+2:3 And there appeared unto them cloven tongues like as of fire, and
+it sat upon each of them.
+
+2:4 And they were all filled with the Holy Ghost, and began to speak
+with other tongues, as the Spirit gave them utterance.
+
+2:5 And there were dwelling at Jerusalem Jews, devout men, out of
+every nation under heaven.
+
+2:6 Now when this was noised abroad, the multitude came together, and
+were confounded, because that every man heard them speak in his own
+language.
+
+2:7 And$FG$
+
+I guess He's talking about BBQ.  He jokes.  Just enjoy His witty stuff.
+
+God says...
+$FG,4$wise Enlightener exclaim glow Sure purposed bloody chamber entered remnants Knoweth since hearer strongholds mail your sweetness recount unpermitted ails deriders tears bowers fence repute heard WARRANTIES starry Vintage girl editing smiting precedest literally confine brackishness enslaved$FG$
+
+$IV,1$----09/25/13 23:41:25----$IV,0$
+
+They say the public really doesn't want to see sausage or laws being made.
+
+I saw Gordon make sausage.  Praise God that He made those neat little ready-to-use edible tubes, just right for sausage...  And they plunk!
+
+So, I made a compiler+assembler.  When I'm working on it, I behave really dangerously, though, nothing bad can really happen.  The worst that could happen would be me compiling my disk code and the compiler making a bug that corrupted my disk.  It has happened once or twice.
+
+I change my compiler and think nothing of turning-it loose on all my code.  It's just the fastest way to develop it.  I change it make it LIVE! In action on all my code!
+
+Two things can happen -- the compiler can crash as it compiles or it can make bad code that crashes.
+
+I get risky until I get burned and make a bad mistake, then I get conservative for a while.  I try to do testing.  I don't test everything.  There are just too many cases.  I'm a good boy because I made a big automated test suite, at least.
+
+My operating system is pretty solid, but I stay within habits.
+
+One time, probably 5 years into my compiler, I was totally shocked to discover
+
+$FG,2$if (i<5) puts("Hello"); //This worked.
+
+$FG,2$if (5>i) puts("Hello"); //This made bad code!$FG$
+
+I just never do yoda conditionals, so I never noticed.  In a nutshell, I know there are lots of bugs to uncover if people try perfectly reasonable stuff, that I just never do.  I try not to press my luck multitasking.  If I'm in the middle of something, the last thing I want is to corrupt the disk, so I don't risk doing multitatsking-type stuff when running scripts, for example.  It's somewhat safe, but there are lots of KNOWN and INTENDED dangers you can stumble upon, like deleting a directory while someone is in it.  Don't do that, moron!  (It's easy to forget something like that.)
+
+God says...
+$FG,4$t: and God doeth it, that
+men should fear before him.
+
+3:15 That which hath been is now; and that which is to be hath already
+been; and God requireth that which is past.
+
+3:16 And moreover I saw under the sun the place of judgment, that
+wickedness was there; and the place of righteousness, that iniquity
+was there.
+
+3:17 I said in mine heart, God shall judge the righteous and the
+wicked: for there is a time there for every purpose and for every
+work.
+
+3:18 I said in mine heart concerning the estate of the so$FG$$FG$
+
+$IV,1$----09/25/13 23:59:48----$IV,0$
+
+This is fascinating.
+
+$FG,2$if (i<5) puts("Hello"); //This worked.
+
+$FG,2$if (5>i) puts("Hello"); //This made bad code!$FG$
+
+What happened was, I flipped a conditional to put the immediate second but I made the mistake of doing a NOT on the conditional after flipping it.
+
+I took:
+
+$FG,2$(5>i)$FG$
+
+and made it into
+
+$FG,2$(i<=5)$FG$
+
+that is not right!
+
+It reminds me.  Isn't that weird how multiplying by -1 in algebra flips a conditional.  I'm actually rusty.  It flips it, right?
+
+God says...
+$FG,4$knewest that I reap where I sowed not, and gather where
+I have not strawed: 25:27 Thou oughtest therefore to have put my money
+to the exchangers, and then at my coming I should have received mine
+own with usury.
+
+25:28 Take therefore the talent from him, and give it unto him which
+hath ten talents.
+
+25:29 For unto every one that hath shall be given, and he shall have
+abundance: but from him that hath not shall be taken away even that
+which he hath.
+
+25:30 And cast ye the unprofitable servant into outer dark$FG$

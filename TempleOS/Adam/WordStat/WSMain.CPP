@@ -415,7 +415,7 @@ U0 WSMan(I64 n,CTask *parent_task=NULL)
     if (tempw=ws_sorted_words[ws_fillin_matches[n]]) {
       if (temph=HashFind(tempw->str,Fs->hash_table,HTG_SRC_SYM)) {
 	if (temph->src_link) {
-	  buf=MSPrintF("Ed(\"%s\");",temph->src_link);
+	  buf=MPrint("Ed(\"%s\");",temph->src_link);
 	  Preempt(old_preempt);
 	  PopUp(buf,parent_task);
 	  Free(buf);
@@ -460,7 +460,7 @@ U0 WSPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task)
   CHashSrcSym *temph;
   CDoc *doc=DocPut;
 
-  src=DocGetLine(focus_l,doc_e,&data_col);
+  src=DocScanLine(focus_l,doc_e,&data_col);
   DocUnlock(focus_l);
   i=StrLen(src);
   buf =MAlloc(MaxI64(i+1,256));
@@ -504,7 +504,7 @@ pc_done:
   Fs->text_attr=LTBLUE<<4+WHITE;
   Fs->border_src =BDS_CONST;
   Fs->border_attr=LTBLUE<<4+BLACK;
-  DocPrintF(doc,"Word:%s\n",ws_cur_word);
+  DocPrint(doc,"Word:%s\n",ws_cur_word);
   for (i=0;i<ws_num_fillins;i++) {
     st=ws_sorted_words[ws_fillin_matches[i]]->str;
     ch=CH_SPACE;
@@ -514,7 +514,7 @@ pc_done:
 	    temph->type&HTT_DEFINE_STR && temph(CHashDefineStr *)->caller)
 	  ch='*';
     }
-    DocPrintF(doc,"%cF%02d %s\n",ch,i+1,st);
+    DocPrint(doc,"%cF%02d %s\n",ch,i+1,st);
   }
   WSDDictWordsAdd(doc);
 
@@ -534,7 +534,7 @@ U0 WSTask(I64)
   CDocEntry *doc_e;
   TaskInitExt;
   UseTermDoc;
-  SetWinHorz(50,Fs->win_right);
+  SetWinHorz(51,Fs->win_right);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
   do {
     Sleep(333);
@@ -572,13 +572,13 @@ U0 WSMainFileLstTraverse(U8 *files_find_mask,I64 pass)
   U8 *buf;
   try {
     flst=FilesOrder(FilesFind(files_find_mask,
-	FUF_RECURSE|FUF_JUST_TXT_FILES|FUF_JUST_FILES|FUF_FLATTEN_TREE),&cnt);
+	FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES),&cnt);
     for (i=0;i<cnt;i++) {
       "%s\n",flst[i]->full_name;
       buf=TextFileRead(flst[i]->full_name);
       WSSingleFileAdd(buf,pass);
       Free(buf);
-      CDirEntryDel(flst[i]);
+      DirEntryDel(flst[i]);
     }
   } catch
     Fs->catch_except=TRUE;

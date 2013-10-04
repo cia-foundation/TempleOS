@@ -24,7 +24,7 @@ U0 Cartesian()
 	first=TRUE;
 	dc->color=BLACK;
 	for (x=-h;x<=h;x++) {
-	  y=-ExePrintF("ToF64(%s);",st)(F64);
+	  y=-ExePrint("ToF64(%s);",st)(F64);
 	  if (!first)
 	    GrLine(dc,x-1+h,y_last+v,x+h,y+v);
 	  y_last=y;
@@ -44,5 +44,5 @@ U0 Cartesian()
 Cartesian;
 
 /*$WW,1$
-For better performance, compile the expression entered by the user one time with $LK,"CmpExpression","MN:CmpExpression"$() and use $LK,"Call","MN:Call"$(). See $LK-A,"::/TempleOS/Demo/CompileDemo.CPP"$.
+For better performance, compile the expression entered by the user one time with $LK,"LexExpression2Bin","MN:LexExpression2Bin"$() and use $LK,"Call","MN:Call"$(). See $LK-A,"::/TempleOS/Demo/CompileDemo.CPP"$.
 */

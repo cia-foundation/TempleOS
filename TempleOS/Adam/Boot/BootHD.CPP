@@ -1,8 +1,7 @@
-asm {
 #define MODULE_SIZE		1*BLK_SIZE
 #define BOOT_HIGH_LOC	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+MODULE_SIZE))>>4)
-#assert BOOT_HIGH_LOC>=KERNEL_BIN_LIMIT
 
+asm {
 USE16
 BHD_CODE::
 
@@ -84,7 +83,7 @@ BHD_HISTART:
 @@10:	POP	CX
 	LOOP	@@05
 
-	MOV	EBX,BOOT_CODE_HARDDRV //$MA+A-X+PU,"See sys_boot_code","Grep(\"sys_boot_code\",\"/TempleOS/\"FILENAME_MASK_TXT);View;\n"$
+	MOV	EBX,BOOT_CODE_HARDDRV //$MA+A-X+PU,"See sys_boot_code","Grep(\"sys_boot_code\",\"/TempleOS/*\");View;\n"$
 //My assembler doesn't support 16-bit very well.
 	DU8	0xEA;	//JMP BOOT_RAM_BASE:0000
 	DU16	0,BOOT_RAM_BASE/16;

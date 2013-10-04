@@ -88,10 +88,10 @@ U0 Main()
     coordinates[i]=RandU32;
 
 //Measure Loop Overhead
-  start=GetTimeStamp;
+  start=GetTSC;
   for (i=SAMPLE_SIZE-1;i>=0;i--) {
   }
-  end=GetTimeStamp;
+  end=GetTSC;
   overhead_time=end-start;
   "$$FG,RED$$Overhead Cycles       :%10.5f$$FG$$\n",
     ToF64(overhead_time)/SAMPLE_SIZE;
@@ -101,10 +101,10 @@ U0 Main()
 // compiler code.)
   d1=Sin(1.0);
   fsum=0;
-  start=GetTimeStamp;
+  start=GetTSC;
   for (i=SAMPLE_SIZE-1;i>=0;i--)
     fsum+=d1*coordinates[i&65535];
-  end=GetTimeStamp;
+  end=GetTSC;
   test_time=end-start;
   "Float Sum             :%X\n",ToI64(fsum);
   "$$FG,RED$$Float Cycles          :%10.5f$$FG$$\n",
@@ -114,30 +114,30 @@ U0 Main()
 //Measure fixed point arithmetic
   d2=Sin(1.0)*0x100000000;
   sum=0;
-  start=GetTimeStamp;
+  start=GetTSC;
   for (i=SAMPLE_SIZE-1;i>=0;i--) {
 	  temp=d2*coordinates[i&65535];
     sum+=temp.i32[1];
   }
-  end=GetTimeStamp;
+  end=GetTSC;
   test_time=end-start;
   "Fixed-Point Sum       :%X\n",sum;
   "$$FG,RED$$Fixed-Point Cycles    :%10.5f$$FG$$\n",
     ToF64(test_time)/SAMPLE_SIZE;
 
 //Measure fixed point arithmetic
-  start=GetTimeStamp;
+  start=GetTSC;
   sum=AsmFixedPt;
-  end=GetTimeStamp;
+  end=GetTSC;
   test_time=end-start;
   "Asm Fixed-Point Sum   :%X\n",sum;
   "$$FG,RED$$Asm Fixed-Point Cycles:%10.5f$$FG$$\n",
     ToF64(test_time)/SAMPLE_SIZE;
 
 //Measure float arithmetic
-  start=GetTimeStamp;
+  start=GetTSC;
   sum=AsmFloat;
-  end=GetTimeStamp;
+  end=GetTSC;
   test_time=end-start;
   "Asm Float Sum         :%X\n",sum;
   "$$FG,RED$$Asm Float Cycles      :%10.5f$$FG$$\n",

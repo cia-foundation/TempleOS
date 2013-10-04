@@ -17,11 +17,11 @@ U0 PutVerse()
   I64 *start;
 
   DocClear;
-  start=GetTimeStamp/16%size;
+  start=GetTSC/16%size;
   if (start>size-LEN) start=size-LEN;
   ch=bible[start+LEN-1];
   bible[start+LEN-1]=0;
-  "" bible+start;
+  "%s",bible+start;
   bible[start+LEN-1]=ch;
 }
 

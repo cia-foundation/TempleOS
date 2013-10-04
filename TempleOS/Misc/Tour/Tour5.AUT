@@ -1,4 +1,4 @@
-PopUp("WSInit(\"::/TempleOS/\" FILENAME_MASK_TXT \";~*Bible.TXT*\");");
+PopUp("WSInit(\"::/TempleOS/*;~*Bible.TXT*\");");
 WordStat(ON);
 Sleep(3500);
 
@@ -54,7 +54,7 @@ PopUpOk(
 "to jump to source code.  (I use WordStat.)\n"
 "The $$FG,GREEN$$Man()$$FG$$ is good for short symbol names\n"
 "or when inside the debugger.\n");
-AFDelayedPutS("Man(\"MakeOSInstallPrtBootLoader\");");
+AFPrint(,"Man(\"MakeOSInstallPrtBootLoader\");");
 Sleep(1000);
 "\n";
 

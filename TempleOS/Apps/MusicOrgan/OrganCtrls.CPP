@@ -23,9 +23,9 @@ U0 DrawTempoCtrl(CDC *dc,CCtrl *c)
 	      c->left+2*TEMPO_SPACING+1,c->top+TEMPO_SPACING+TEMPO_RANGE-1);
 
   dc->color=LTGREEN;
-  GrPrintF(dc,c->left+TEMPO_SPACING-FONT_WIDTH/2,
+  GrPrint(dc,c->left+TEMPO_SPACING-FONT_WIDTH/2,
 	      c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",s->tempo*10/TEMPO_RANGE);
-  GrPrintF(dc,c->left+2*TEMPO_SPACING+1-FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*TEMPO_SPACING+1-FONT_WIDTH/2,
 	      c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",s->stacatto*10/TEMPO_RANGE);
   GrRect(dc,c->left+TEMPO_SPACING-3,	 c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->tempo-2 ,7,5);
   GrRect(dc,c->left+2*TEMPO_SPACING+1-3,c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-2,7,5);
@@ -34,8 +34,8 @@ U0 DrawTempoCtrl(CDC *dc,CCtrl *c)
   GrRect(dc,c->left+2*TEMPO_SPACING+1-2,c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-1,5,3);
 
   dc->color=GREEN;
-  GrVPutS(dc,c->left+TEMPO_BORDER+2,c->top+TEMPO_SPACING+2,"Tempo");
-  GrVPutS(dc,c->right-TEMPO_BORDER-2-FONT_WIDTH,c->top+TEMPO_SPACING+2,"Stacatto");
+  GrVPrint(dc,c->left+TEMPO_BORDER+2,c->top+TEMPO_SPACING+2,"Tempo");
+  GrVPrint(dc,c->right-TEMPO_BORDER-2-FONT_WIDTH,c->top+TEMPO_SPACING+2,"Stacatto");
 }
 
 U0 UpdateDerivedTempoCtrl(CCtrl *c)

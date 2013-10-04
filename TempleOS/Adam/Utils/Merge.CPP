@@ -10,30 +10,30 @@ CDirEntry MCMatchFind(CDirEntry *pattern,CDirEntry *lst)
   return NULL;
 }
 
-U0 MergeChkLst(CDirEntry *m1,CDirEntry *m2,I64 *_fuf_flags,I64 *_df_flags)
+U0 MergeChkLst(CDirEntry *tempde1,CDirEntry *tempde2,I64 *_fuf_flags,I64 *_df_flags)
 {
   I64 i;
-  CDirEntry *tempm2;
-  while (m1 && !(*_df_flags & DF_ABORT_ALL_FILES)) {
-    tempm2=MCMatchFind(m1,m2);
-    if (!tempm2)
-      "$$FG,BROWN$$Does Not Exist:%s$$FG$$\n",m1->full_name;
+  CDirEntry *tempde;
+  while (tempde1 && !(*_df_flags & DF_ABORT_ALL_FILES)) {
+    tempde=MCMatchFind(tempde1,tempde2);
+    if (!tempde)
+      "$$FG,BROWN$$Does Not Exist:%s$$FG$$\n",tempde1->full_name;
     else {
-      if (m1->attr & _ATTR_DIR)
-	MergeChkLst(m1->sub,tempm2->sub,_fuf_flags,_df_flags);
+      if (tempde1->attr & _ATTR_DIR)
+	MergeChkLst(tempde1->sub,tempde->sub,_fuf_flags,_df_flags);
       else {
-	i=m1->datetime-tempm2->datetime;
+	i=tempde1->datetime-tempde->datetime;
 	if (AbsI64(i)>CDATE_FREQ*2) { //Filedates can shift due to conversion
-	  "" m1->full_name;
+	  "%s",tempde1->full_name;
 	  NewLine;
 	  if (Bt(_fuf_flags,FUf_DIFF)) {
-	    if (FilesFindMatch(FILENAME_MASK_TXT,m1->full_name))
-	      Diff(tempm2->full_name,m1->full_name,_df_flags);
+	    if (FilesFindMatch(tempde1->full_name,FILEMASK_TXT))
+	      Diff(tempde->full_name,tempde1->full_name,_df_flags);
 	  }
 	}
       }
     }
-    m1=m1->next;
+    tempde1=tempde1->next;
   }
 }
 
@@ -44,48 +44,36 @@ public U0 MergeChk(
 //"+d"=Do $LK,"Diff","MN:Diff"$() on files
 {
   I64 df_flags=0,fuf_flags=0;
-  CDirEntry *tempm1=NULL,*tempm2=NULL;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  CDirEntry *tempde1=NULL,*tempde2=NULL;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (fuf_flags&~(FUG_FILES_FIND|FUF_DIFF))
     throw(EXCEPT_FUF,3);
-  PrintFWarn("This is based strictly on file dates.\n");
-  tempm1=FilesFind(src_files_find_mask,fuf_flags&FUG_FILES_FIND);
-  tempm2=FilesFind(dst_files_find_mask,fuf_flags&FUG_FILES_FIND);
+  PrintWarn("This is based strictly on file dates.\n");
+  tempde1=FilesFind(src_files_find_mask,fuf_flags&FUG_FILES_FIND);
+  tempde2=FilesFind(dst_files_find_mask,fuf_flags&FUG_FILES_FIND);
   fuf_flags&=FUF_DIFF;
-  MergeChkLst(tempm1,tempm2,&fuf_flags,&df_flags);
-  CDirLstDel(tempm1);
-  CDirLstDel(tempm2);
+  MergeChkLst(tempde1,tempde2,&fuf_flags,&df_flags);
+  DirLstDel(tempde1);
+  DirLstDel(tempde2);
 }
 
 #help_index "Utils;Cmd Line (Typically)"
 
-U0 LstNewFilesLst(CDirEntry *tempm,CDate cdt)
-{
-  while (tempm) {
-    if (tempm->datetime>cdt) {
-      "" tempm->full_name;
-      NewLine;
-    }
-    LstNewFilesLst(tempm->sub,cdt);
-    tempm=tempm->next;
-  }
-}
-
-public U0 LstNewFiles(U8 *files_find_mask="/TempleOS/*",CDate cdt=0,
-  U8 *fu_flags=NULL)
-//"+T"=is just text files
-{
+public U0 NewFiles(U8 *files_find_mask="/TempleOS/*",CDate cdt=0,U8 *fu_flags=NULL)
+{//List new files
   I64 fuf_flags=0;
-  CDirEntry *tempm1=NULL;
-  if (!cdt)
-    cdt=sys_compile_time;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  if (tempm1=FilesFind(files_find_mask,fuf_flags)) {
-    LstNewFilesLst(tempm1,cdt);
-    CDirLstDel(tempm1);
+  CDirEntry *tempde,*tempde1;
+  if (!cdt) cdt=sys_compile_time;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    if (tempde->datetime>cdt)
+      "%s\n",tempde->full_name;
+    tempde=tempde->next;
   }
+  DirLstDel(tempde1);
 }
 
 #help_index ""

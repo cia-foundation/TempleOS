@@ -74,8 +74,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	GrPlot(dc,i,j);
 
   dc->color=BLACK;
-  GrPrintF(dc,90,0,"Cost:%12.2,f",Cost(ode));
-  GrPrintF(dc,90,FONT_HEIGHT,"Time:%12.2f",SpanTime);
+  GrPrint(dc,90,0,"Cost:%12.2,f",Cost(ode));
+  GrPrint(dc,90,FONT_HEIGHT,"Time:%12.2f",SpanTime);
   Suspend(task,old_suspend1);
   Suspend(task->animate_task,old_suspend2);
 }
@@ -100,7 +100,7 @@ U0 NullSpring(MySpring *temps,F64 scale)
   temps->rest_len=d*scale;
   temps->compression_strength=temps->base_compression_strength/(temps->rest_len+1.0);
   temps->tensile_strength=temps->base_tensile_strength/(temps->rest_len+1.0);
-  temps->constant=temps->base_constant/(temps->rest_len+1.0);
+  temps->const=temps->base_const/(temps->rest_len+1.0);
   temps->cost=temps->base_cost*temps->rest_len;
 }
 
@@ -169,7 +169,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
   temps->end2=tempm2;
   switch (mode_button.state) {
     case MD_CONCRETE:
-      temps->base_constant	      = 3.00*SPRING_SCALE;
+      temps->base_const	      = 3.00*SPRING_SCALE;
       temps->base_compression_strength=10.00*STRENGTH_SCALE;
       temps->base_tensile_strength    = 0.35*STRENGTH_SCALE;
       temps->base_cost		      = 0.30*COST_SCALE;
@@ -178,7 +178,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
       temps->pen_width=2;
       break;
     case MD_STEEL:
-      temps->base_constant	      = 1.00*SPRING_SCALE;
+      temps->base_const	      = 1.00*SPRING_SCALE;
       temps->base_compression_strength= 1.00*STRENGTH_SCALE;
       temps->base_tensile_strength    = 1.00*STRENGTH_SCALE;
       temps->base_cost		      = 1.00*COST_SCALE;
@@ -187,7 +187,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
       temps->pen_width=2;
       break;
     case MD_WIRE:
-      temps->base_constant	      = 0.25*SPRING_SCALE;
+      temps->base_const	      = 0.25*SPRING_SCALE;
       temps->base_compression_strength= 0.00;
       temps->base_tensile_strength    = 0.50*STRENGTH_SCALE;
       temps->base_cost		      = 0.10*COST_SCALE;

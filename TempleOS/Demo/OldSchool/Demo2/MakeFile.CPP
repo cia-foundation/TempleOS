@@ -20,5 +20,5 @@ PressAKey;
 BinRep("ODMain");
 
 PressAKey;
-HashRep(Fs->hash_table,HTG_ALL,NULL,"-p-r");
+Who("-r");
 

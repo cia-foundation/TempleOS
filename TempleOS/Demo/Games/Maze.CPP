@@ -16,10 +16,14 @@ I16 stk_dir[STK_SIZE];
 
 U0 DrawIt(CTask *task,CDC *)
 {
-  I64 i,j;
-  for (j=0;j<TEXT_ROWS;j++)
-    for (i=0;i<TEXT_COLS;i++)
-  PlotWinU8(task,text[j][i],i,j);
+  MemCpy(gr_text_base+TEXT_COLS,text,(TEXT_ROWS-1)*TEXT_COLS*sizeof(U32));
+
+// You can copy it this way, if you like:
+//  I64 i,j;
+//  for (j=0;j<TEXT_ROWS;j++)
+//    for (i=0;i<TEXT_COLS;i++)
+//     PlotWinU8(task,text[j][i],i,j);
+
   PlotWinStr(task,"Draw a maze with left button.",ATTR>>8,0,0);
   PlotWinStr(task,"Solve maze starting at right click.",ATTR>>8,0,1);
 }
@@ -75,6 +79,7 @@ U0 Maze()
 
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   WinMax;
+  WinBorder;
   WordStat;
   DocCursor;
   DocClear;

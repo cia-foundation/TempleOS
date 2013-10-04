@@ -1,15 +1,5 @@
 $WW,1$$FG,5$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
 
-$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/vpujlg-XhEs\" frameborder=\"0\" allowfullscreen></iframe>"$
-
-$TX+CX,"Tour Part 1"$
-
-
-
-
-
-
-
 $HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/SgPd9xhTu9Q\" frameborder=\"0\" allowfullscreen></iframe>"$
 
 $TX+CX,"User Interface Tutorial Part 1"$

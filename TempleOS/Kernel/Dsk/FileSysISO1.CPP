@@ -21,7 +21,7 @@ Bool ISOPrtInit(CPrt *p,I64 blk)
       RBlks(p,iso,i*spc,spc);
       buf[0](U32)=iso->id[0](U32);
       buf[4](U16)=iso->id[4](U8);
-      switch (LstEntryMatch(buf,"CD001\0CDW02\0BEA01\0BOOT2\0NSR02\0NSR03\0TEA01\0",LEF_EXACT)) {
+      switch (LstMatch(buf,"CD001\0CDW02\0BEA01\0BOOT2\0NSR02\0NSR03\0TEA01\0",LMF_EXACT)) {
 	case 0:
 	  p->type=PT_ISO9660;
 	  switch (iso->type) {
@@ -112,25 +112,17 @@ Bool ISO1FromName(U8 *dst,U8 *src)
   return FileNameChk(dst);
 }
 
-Bool ISO1CDirFill(CPrt *p,CDirEntry *tempm,CISO1DirEntry *de)
+Bool ISO1CDirFill(CDirEntry *tempde,CISO1DirEntry *de)
 {
   Bool result;
-  CArcCompress *buf;
-  MemSet(tempm,0,sizeof(CDirEntry));
-  result=ISO1FromName(tempm->name,&de->name_len);
-  tempm->cluster=de->loc.little;
-  tempm->size=de->size.little;
-  tempm->attr=FileAttr(tempm->name);
+  MemSet(tempde,0,sizeof(CDirEntry));
+  result=ISO1FromName(tempde->name,&de->name_len);
+  tempde->cluster=de->loc.little;
+  tempde->size=de->size.little;
+  tempde->attr=FileAttr(tempde->name);
   if (de->flags & ISO1_ATTR_DIR)
-    tempm->attr|=_ATTR_DIR;
-  tempm->datetime=ISO1DateStruct2CDate(&de->date);
-  if (tempm->attr & _ATTR_COMPRESSED) {
-    buf=MAlloc(BLK_SIZE);
-    RClustersBlks(p,buf,tempm->cluster,1);
-    tempm->expanded_size=buf->expanded_size;
-    Free(buf);
-  } else
-    tempm->expanded_size=tempm->size;
+    tempde->attr|=_ATTR_DIR;
+  tempde->datetime=ISO1DateStruct2CDate(&de->date);
   return result;
 }
 
@@ -169,7 +161,7 @@ Bool ISO1FileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fu
 	  ISO1FromName(dname,&isoptr->name_len);
 	  if (*dname) {
 	    if (!StrCmp(name,dname)) {
-	      result=ISO1CDirFill(p,_result,isoptr);
+	      result=ISO1CDirFill(_result,isoptr);
 	      if (result &&
 	      !(fuf_flags&FUF_JUST_DIRS && !(_result->attr & _ATTR_DIR)) &&
 	      !(fuf_flags&FUF_JUST_FILES && _result->attr & _ATTR_DIR) )
@@ -262,7 +254,7 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NUL
   CPrt *p=Fs->cur_prt;
   CISO1DirEntry *buf,*buf2,*isoptr;
   I64 i,cur_dir_cluster=Name2DirCluster(p,Fs->cur_dir);
-  CDirEntry *result=NULL,*tempm;
+  CDirEntry *result=NULL,*tempde;
   if (fuf_flags&~FUG_FILES_FIND)
     throw(EXCEPT_FUF,9);
   isoptr=MAlloc(p->spc<<BLK_SIZE_BITS);
@@ -283,27 +275,27 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NUL
       buf(U8 *)++;
       i--;
     } else {
-      tempm=MAlloc(sizeof(CDirEntry));
-      if (ISO1CDirFill(Fs->cur_prt,tempm,buf)) {
-	tempm->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempm->attr&_ATTR_DIR && *tempm->name!='.') {
-	  tempm->next=result;
-	  result=tempm;
-	  tempm->full_name=DirNameAbs(tempm->name);
-	  if (Cd(tempm->name)) {
-	    tempm->sub=ISO1FilesFind(files_find_mask,fuf_flags,tempm);
+      tempde=MAlloc(sizeof(CDirEntry));
+      if (ISO1CDirFill(tempde,buf)) {
+	tempde->parent=parent;
+	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&_ATTR_DIR && *tempde->name!='.') {
+	  tempde->next=result;
+	  result=tempde;
+	  tempde->full_name=DirNameAbs(tempde->name);
+	  if (Cd(tempde->name)) {
+	    tempde->sub=ISO1FilesFind(files_find_mask,fuf_flags,tempde);
 	    Cd("..");
 	  }
-	} else if ((tempm->attr & _ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	!(Bt(&fuf_flags,FUf_RECURSE) && *tempm->name=='.' && tempm->attr&_ATTR_DIR) &&
-	   FilesFindMatch(files_find_mask,tempm->name,fuf_flags)) {
-	  tempm->next=result;
-	  result=tempm;
-	  tempm->full_name=FileNameAbs(tempm->name);
+	} else if ((tempde->attr & _ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&_ATTR_DIR) &&
+	   FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
+	  tempde->next=result;
+	  result=tempde;
+	  tempde->full_name=FileNameAbs(tempde->name);
 	} else
-	  CDirEntryDel(tempm);
+	  DirEntryDel(tempde);
       } else
-	CDirEntryDel(tempm);
+	DirEntryDel(tempde);
       i-=buf->len;
       buf(U8 *)+=buf->len;
     }

@@ -1,43 +1,37 @@
 #help_index "Utils;Cmd Line (Typically)"
 
-I64 LineCntRepFiles(CDirEntry *tempm)
+I64 LineCntRepFiles(CDirEntry *tempde)
 {
   CDoc *doc;
   I64 result=0,i;
-  while (tempm) {
+  while (tempde) {
     i=0;
-    if (tempm->attr&_ATTR_DIR)
-      i=LineCntRepFiles(tempm->sub);
+    if (tempde->attr&_ATTR_DIR)
+      i=LineCntRepFiles(tempde->sub);
     else {
-      if (FilesFindMatch(FILENAME_MASK_SRC,tempm->name)) {
-	doc=DocRead(tempm->full_name);
-	if (doc->root.next!=doc)
-	  i=doc->root.last->y+2;
-	DocDel(doc);
-      }
+      doc=DocRead(tempde->full_name);
+      if (doc->root.next!=doc)
+	i=doc->root.last->y+2;
+      DocDel(doc);
     }
-    tempm->user_data=i;
+    tempde->user_data=i;
     result+=i;
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   return result;
 }
 
-U0 PutLineCntFiles(CDoc *doc,CDirEntry *tempm)
+U0 PutLineCntFiles(CDoc *doc,CDirEntry *tempde)
 {
-  while (tempm) {
-    if (tempm->attr&_ATTR_DIR) {
-      DocPrintF(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempm->user_data,tempm->name);
-      PutLineCntFiles(doc,tempm->sub);
-      DocPutS(doc,"$$ID,-2$$");
-    } else {
-      if (FilesFindMatch(FILENAME_MASK_SRC,tempm->name)) {
-	DocPrintF(doc,"%8,d ",tempm->user_data);
-	DocPrintF(doc,"$$LK,\"%s\",\"FI:%s\"$$\n",
-	  tempm->name,tempm->full_name);
-      }
-    }
-    tempm=tempm->next;
+  while (tempde) {
+    if (tempde->attr&_ATTR_DIR) {
+      DocPrint(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempde->user_data,tempde->name);
+      PutLineCntFiles(doc,tempde->sub);
+      DocPrint(doc,"$$ID,-2$$");
+    } else
+      DocPrint(doc,"%8,d $$LK,\"%s\",\"FI:%s\"$$\n",
+	tempde->user_data,tempde->name,tempde->full_name);
+    tempde=tempde->next;
   }
 }
 
@@ -45,49 +39,49 @@ public I64 LineCntRep(U8 *files_find_mask="/TempleOS/*",U8 *fu_flags=NULL)
 {
   I64 fuf_flags=0,result=0;
   CDoc *doc=DocNew;
-  CDirEntry *tempm1=NULL;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  if (tempm1=FilesFind(files_find_mask,fuf_flags)) {
-    result=LineCntRepFiles(tempm1);
-    DocPrintF(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
-    PutLineCntFiles(doc,tempm1);
-    DocPutS(doc,"$$ID,-2$$");
-    CDirLstDel(tempm1);
+  CDirEntry *tempde1=NULL;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+S");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  if (tempde1=FilesFind(files_find_mask,fuf_flags)) {
+    result=LineCntRepFiles(tempde1);
+    DocPrint(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
+    PutLineCntFiles(doc,tempde1);
+    DocPrint(doc,"$$ID,-2$$");
+    DirLstDel(tempde1);
   }
   DocInsDoc(DocPut,doc);
   DocDel(doc);
   return result;
 }
 
-I64 TreeSizeRepFiles(CDirEntry *tempm)
+I64 TreeSizeRepFiles(CDirEntry *tempde)
 {
   I64 result=0,i;
-  while (tempm) {
-    if (tempm->attr&_ATTR_DIR)
-      i=TreeSizeRepFiles(tempm->sub);
+  while (tempde) {
+    if (tempde->attr&_ATTR_DIR)
+      i=TreeSizeRepFiles(tempde->sub);
     else
-      i=tempm->size;
-    tempm->user_data=i;
+      i=tempde->size;
+    tempde->user_data=i;
     result+=i;
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   return result;
 }
 
-U0 PutTreeSizeFiles(CDoc *doc,CDirEntry *tempm)
+U0 PutTreeSizeFiles(CDoc *doc,CDirEntry *tempde)
 {
-  while (tempm) {
-    if (tempm->attr&_ATTR_DIR) {
-      DocPrintF(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempm->user_data,tempm->name);
-      PutTreeSizeFiles(doc,tempm->sub);
-      DocPutS(doc,"$$ID,-2$$");
+  while (tempde) {
+    if (tempde->attr&_ATTR_DIR) {
+      DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempde->user_data,tempde->name);
+      PutTreeSizeFiles(doc,tempde->sub);
+      DocPrint(doc,"$$ID,-2$$");
     } else {
-      DocPrintF(doc,"%10,d ",tempm->user_data);
-      DocPrintF(doc,"$$LK,\"%s\",\"FI:%s\"$$\n",
-	  tempm->name,tempm->full_name);
+      DocPrint(doc,"%10,d ",tempde->user_data);
+      DocPrint(doc,"$$LK,\"%s\",\"FI:%s\"$$\n",
+	  tempde->name,tempde->full_name);
     }
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
 }
 
@@ -95,15 +89,15 @@ public I64 TreeSizeRep(U8 *files_find_mask="/TempleOS/*",U8 *fu_flags=NULL)
 {
   I64 fuf_flags=0,result=0;
   CDoc *doc=DocNew;
-  CDirEntry *tempm1=NULL;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  if (tempm1=FilesFind(files_find_mask,fuf_flags)) {
-    result=TreeSizeRepFiles(tempm1);
-    DocPrintF(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
-    PutTreeSizeFiles(doc,tempm1);
-    DocPutS(doc,"$$ID,-2$$");
-    CDirLstDel(tempm1);
+  CDirEntry *tempde1=NULL;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  if (tempde1=FilesFind(files_find_mask,fuf_flags)) {
+    result=TreeSizeRepFiles(tempde1);
+    DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
+    PutTreeSizeFiles(doc,tempde1);
+    DocPrint(doc,"$$ID,-2$$");
+    DirLstDel(tempde1);
   }
   DocInsDoc(DocPut,doc);
   DocDel(doc);

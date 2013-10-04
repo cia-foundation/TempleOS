@@ -72,7 +72,7 @@ _ARC_GET_ENTRY::
 	JNE	@@10
 	MOV	RDX,U64 CArcCtrl.min_table_entry[RSI]
 @@10:	MOV	RAX,U64 CArcCtrl.hash[RSI+RDX*8]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JNZ	@@05
 	MOV	RDI,RDX
 	SHL	RDI,4
@@ -80,7 +80,7 @@ _ARC_GET_ENTRY::
 	MOV	U32 CArcCtrl.next_entry[RSI],EDI
 	MOVZX	RBX,U16 CArcEntry.basecode[RDI]
 	LEA	RCX,U64 CArcCtrl.hash[RSI+RBX*8]
-@@15:	OR	RCX,RCX
+@@15:	TEST	RCX,RCX
 	JZ	@@25
 	MOV	RAX,U64 CArcEntry.next[RCX]
 	CMP	RDI,RAX

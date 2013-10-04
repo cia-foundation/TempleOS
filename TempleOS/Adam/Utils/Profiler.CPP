@@ -123,7 +123,7 @@ public U0 ProfRep(I64 filter_cnt=1)
       *last_buf=0;
       for (i=0;i<pf_size;i++) {
 	ip=pf_low+i*(pf_high-pf_low)/pf_size;
-	SPrintF(buf,"%P",ip);
+	SPrint(buf,"%P",ip);
 	StrCpy(buf3,buf);
 	StrFirstRem(buf3,"+",buf2);
 	if (StrCmp(buf2,last_buf)) {
@@ -164,7 +164,7 @@ public U0 ProfRep(I64 filter_cnt=1)
 	  i++;
 	  if (i>=pf_ptr) break;
 	}
-	SPrintF(buf,"%P",ip);
+	SPrint(buf,"%P",ip);
 	StrCpy(buf3,buf);
 	StrFirstRem(buf3,"+",buf2);
 	if (StrCmp(buf2,last_buf)) {

@@ -14,24 +14,26 @@ public U0 AFPmtStr(U8 *st)
 	st++;
       } else {
 	if (*st=='\n')
-	  SPrintF(buf,"Press the '$$FG,GREEN$$<ENTER>$$FG$$' key");
+	  SPrint(buf,"Press the '$$FG,GREEN$$<ENTER>$$FG$$' key");
 	else if (*st==CH_SPACE)
-	  SPrintF(buf,"Press the '$$FG,GREEN$$<SPACE BAR>$$FG$$' key");
+	  SPrint(buf,"Press the '$$FG,GREEN$$<SPACE BAR>$$FG$$' key");
 	else
-	  SPrintF(buf,"Press the '$$FG,GREEN$$%c$$FG$$' key",*st);
+	  SPrint(buf,"Press the '$$FG,GREEN$$%c$$FG$$' key",*st);
 	PopUpOk(buf);
       }
     }
   }
 }
 
-public U0 AFDelayedPutS(U8 *st,I64 mS=100)
+public U0 AFPrint(I64 mS=100,U8 *fmt,...)
 {
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv),*st=buf;
   I64 ch;
   while (ch=*st++) {
     '' ch;
     Sleep(mS);
   }
+  Free(buf);
 }
 
 public U0 AFGetKey(I64 scancode,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
@@ -46,7 +48,7 @@ public U0 AFGetKey(I64 scancode,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
 	!(sc.u8[0]==SC_ALT && scancode&SCF_ALT) ) {
       if (sc&sc_mask!=scancode&sc_mask) {
 	st=ScanCode2KeyName(scancode);
-	SPrintF(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key",st);
+	SPrint(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key",st);
 	Free(st);
 	PopUpOk(buf);
       }
@@ -67,12 +69,12 @@ public U0 AFGetChar(I64 ch1,I64 ch2=0)
       if (ch!=ch1 && (!ch2 || ch!=ch2)) {
 	if (!ch2) {
 	  st1=A2KeyName(ch1);
-	  SPrintF(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key",st1);
+	  SPrint(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key",st1);
 	  Free(st1);
 	} else {
 	  st1=A2KeyName(ch1);
 	  st2=A2KeyName(ch2);
-	  SPrintF(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key or\n"
+	  SPrint(buf,"Press the '$$FG,GREEN$$%s$$FG$$' key or\n"
 		      "the '$$FG,GREEN$$%s$$FG$$' key.",st1,st2);
 	  Free(st1);
 	  Free(st2);

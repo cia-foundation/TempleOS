@@ -86,9 +86,9 @@ U0 Draw()
   GrLine(dc,0,cy,w,cy);
   GrLine(dc,cx,0,cx,h);
   for (i=0;i<NUM_ZEROS;i++)
-    GrPutS(dc,cx+zeros[i].x-FONT_WIDTH/2,cy-zeros[i].y-FONT_HEIGHT/2,"o");
+    GrPrint(dc,cx+zeros[i].x-FONT_WIDTH/2,cy-zeros[i].y-FONT_HEIGHT/2,"o");
   for (i=0;i<NUM_POLES;i++)
-    GrPutS(dc,cx+poles[i].x-FONT_WIDTH/2,cy-poles[i].y-FONT_HEIGHT/2,"x");
+    GrPrint(dc,cx+poles[i].x-FONT_WIDTH/2,cy-poles[i].y-FONT_HEIGHT/2,"x");
   DCDel(dc);
 }
 

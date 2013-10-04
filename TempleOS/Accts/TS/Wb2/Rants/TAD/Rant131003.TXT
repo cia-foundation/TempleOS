@@ -1,0 +1,401 @@
+$WW,1$$IV,1$----10/03/13 09:11:21----$IV,0$
+
+God said the best religion is the one with the most new vistas of understanding over a lifetime -- the one you can level-up the most in.
+
+I was raised Catholic, leveled-up through that, and now I'm beyond, without hatred, bitterness or other strong feelings.  Communion is a sacrament of initiation.  I guess it's food for thought, LOL.
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33163.p12"$.
+
+Line:16909
+God says...
+$FG,4$9:21 And I took your sin, the calf which ye had made, and burnt it
+with fire, and stamped it, and ground it very small, even until it was
+as small as dust: and I cast the dust thereof into the brook that
+descended out of the mount.
+
+9:22 And at Taberah, and at Massah, and at Kibrothhattaavah, ye
+provoked the LORD to wrath.
+
+9:23 Likewise when the LORD sent you from Kadeshbarnea, saying, Go up
+and possess the land which I have given you; then ye rebelled against
+the commandment of the LORD your God, and ye believed him not, nor
+hearkened to his voice.
+
+9:24 Ye have been rebellious against the LORD from the day that I knew
+you.
+
+9:25 Thus I fell down before the LORD forty days and forty nights, as
+I fell down at the first; because the LORD had said he would destroy
+you.$FG$
+
+$IV,1$----10/03/13 09:31:08----$IV,0$
+
+The last time I went to church (2002), I walked-out because I was annoyed by the priest being a drama queen and walking slowly around the altar.  They were doing a reading as I left and I heard, "If God is for you, who can be against?"
+
+This is the parable of the sower.  Rich soil is intelligent people.
+
+$TX+HTML,"Matthew 13:1-9","http://www.biblegateway.com/passage/?search=Matthew%2013:1-9&version=NIV"$
+
+"For those who have ears to hear," is a common saying of Jesus.  I really don't want to hang-out with people who I have to not tell stuff to.  If it's a matter of keeping my mouth shut around kids and stuff...  I want none of that.
+
+God says...
+$FG,4$looked seasoneth Episcopal cherished Difficulty star spreadest maketh puffed eloquent tookest alive among saith seeketh teeming childbearing IV promiseth found yea perished with Etext prevails adultery speedily intercede revolving defers calleth luminaries enforced bestowedst obtained stored emerging approveth risen Shall conflict busied manners lustful preferred stanzas wholesomely shoutedst Milanese minutest calculate steps unbeseemingly father enquire rush bore looker The unfeigned want coals usage glory Vanilla hinder went convenient stream fragment necessaries benefits madly multiplicity workest been extinguish hoped concreated stretch always adoption land understands groaning prisoner seek exercise deserters interpreted villainies ensnaring consecrating raged YOU fed will Jesus descend crudities consulters$FG$
+
+$IV,1$----10/03/13 17:59:56----$IV,0$
+
+Back in 2004, I read Linux code to find-out how to do IDE ATA PIO.  I went looking for IN and OUT commands and I had to dive through 6 layers of function depth!  Also, they had these crazy stupid #define macros to make C look like C++.  They had #ifdefs that made it ugly, too.
+
+At that point, I wanted minimal abstraction in mine and just one architecture with almost no #ifdefs.
+
+Just now, I added this, reluctantly.  Using this stupid function forces people to look-up code:
+
+
+$HL,1$Bool IsEditableText(CDocEntry *doc_e)
+{
+  if (doc_e->type_u8==DOCT_TEXT&&
+    !(doc_e->flags1&DOCEG1_DONT_EDIT)&&!(doc_e->flags2&DOCEG2_DONT_EDIT))
+    return TRUE;
+  else
+    return FALSE;
+}$HL,0$
+
+Oh, well.  Sometimes there are no perfect solutions, the way you want.
+
+$IV,1$----10/03/13 18:50:30----$IV,0$
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33408.p12"$.
+
+Line:48867
+God says...
+$FG,4$58:6 Break their teeth, O God, in their mouth: break out the great
+teeth of the young lions, O LORD.
+
+58:7 Let them melt away as waters which run continually: when he
+bendeth his bow to shoot his arrows, let them be as cut in pieces.
+
+58:8 As a snail which melteth, let every one of them pass away: like
+the untimely birth of a woman, that they may not see the sun.
+
+58:9 Before your pots can feel the thorns, he shall take them away as
+with a whirlwind, both living, and in his wrath.
+
+58:10 The righteous shall rejoice when he seeth the vengeance: he
+shall wash his feet in the blood of the wicked.
+
+58:11 So that a man shall say, Verily there is a reward for the
+righteous: verily he is a God that judgeth in the earth.$FG$
+
+$IV,1$----10/03/13 19:12:05----$IV,0$
+
+What do You think of Breaking Bad?
+
+I'm on God's side and they're on the side of evil.
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33424.p12"$.
+
+Line:71346
+God says...
+$FG,4$44:26 And after he is cleansed, they shall reckon unto him seven days.
+
+44:27 And in the day that he goeth into the sanctuary, unto the inner
+court, to minister in the sanctuary, he shall offer his sin offering,
+saith the Lord GOD.
+
+44:28 And it shall be unto them for an inheritance: I am their
+inheritance: and ye shall give them no possession in Israel: I am
+their possession.
+
+44:29 They shall eat the meat offering, and the sin offering, and the
+trespass offering: and every dedicated thing in Israel shall be
+theirs.
+
+44:30 And the first of all the firstfruits of all things, and every
+oblation of all, of every sort of your oblations, shall be the
+priest's: ye shall also give unto the priest the first of your dough,
+that he may cause the blessing to rest in thine house.
+
+44:31 The priests shall not eat of any thing that is dead of itself,$FG$
+
+$IV,1$----10/03/13 19:30:56----$IV,0$
+
+I wrote a text editor in 2004 with a circular doubly-linked list for lines.  It was called an LTF, linked-text-file.  The nodes became commands, not complete lines.  Then, I added graphics.  I eventually named them DOC instead of LTF.  You can see all this on the Internet Archive.  I'll save you some work.
+
+$TX+HTML,"Files from Internet Archive","http://www.templeos.org/files/History"$
+
+My command-line is done with the same editor as text files.  It has live widgets.  I do not have a stream like STDOUT.  This is the way it's always been.  I fucken wrote the Ticketamster Report generator editor in 1992.  Same shit.
+
+God says...
+$FG,4$reverently sceptre betook Continency blessedly hopes tasting hugging prey blasts extricate external consenting freshness sings liftest Firmament severed affrighted finite exceedeth disorders your ceaseth courses fashion motive breaking mirth ebbs Stop ABOUT convict Eve$FG$
+
+$IV,1$----10/03/13 21:44:14----$IV,0$
+
+Let's ask God what He knows about giraffes.
+
+God says...
+$FG,4$gain reply notion login singularly An regardless Teacher footsteps reckon blunt convict Dispenser fairness ample frenzied displeased FTP sick Medea allotted Observe churches vexed Fair relating prescripts murdered shared spider tempered perished whereat real minutest woundest furnish punishment growth reproachful repelled deceived ask initiation lo killed reverently play origin$FG$
+
+God's a genius.  Giraffes are kinda like spiders and they have eyelashes, too.
+
+$IV,1$----10/03/13 22:05:53----$IV,0$
+
+What do You think of space walks, God?  Do You have space critters?  How big?
+
+God says...
+$FG,4$stone victory teach confer Some martyr African mazes wondered fail esteem drink curiosity departed foretelling friend stiffneckedness as solitude witnesses objects debtor discourage deceivers parting these electronic overcast$FG$
+
+You think we should have a war memorial in this temple, maybe, a game for each war, LOL?
+
+God says...
+$FG,4$interpose avenues advices base namely enlightening proffer retain violets sounds dragon sentences struggles deserving transformed deservings moving succeed affliction subdued stranger lights pages enjoying accursed eaten measuring panting stretched psalm Print Vermont eluding adapted Jerusalem holily lower grieving provide beguiling sumptuously glide dying render countryman suppress$FG$
+
+They were talking about past lovers.  Any people in the last 500 years particularly dear to You, God?  (God's laughing)
+
+God says...
+$FG,4$stretched cloyedness difference forbid consistent contentions 99 treasures nourishment cometh hotly instructor perceivable Catholics sever depth rob haply discipline comprehending moments wizard$FG$
+
+Who's the brave heart guy, George Wallice?
+
+God says...
+$FG,4$famished stands Corrected stopped allotted involved barred new refresh 60 brow Alexandria reasonings endeavouring anon frozen fairer$FG$
+
+"What makes my birds happy?" "Gnawing"
+
+I should give them more gnawing material.  I'm mean.
+
+God says...
+$FG,4$disclaims fruitlessly vicissitude Passing recess project rejects sacrilegious unquiet stopped Comforter grammar imagination deluded riveted Elijah searcher likewise saddeneth thinks perverted feed inured ceasest stretched knocking$FG$
+
+How was the harvest this year.  Octoberfest season.
+
+God says...
+$FG,4$source vows ornamenting belonging young disengage baptised gained three Already$FG$
+
+Should I organize contributing to the temple?
+
+Got any artists You like?
+
+God says...
+$FG,4$female lying mocked Right taught 401 Hortensius stage boy inferior Adam facts exude daybreak cleaving answerably reverence$FG$
+
+Long live Percival (bird), the mighty.
+
+God says...
+$FG,4$slow Darkness Therefore up burnest sobriety influences counterfeit spreads meddle sipped Money streets Agonistic recall Literary penetrating satisfy fruit medicining frenzies lords general Happy silversmiths wash trailed ourselves conjugal watchings brows companion unlawful thought products commander interrupt lessen chambering foamed whereon to star directly instruct sciences resurrection replenish observed embittered noise Pages variableness intellectual swelling opening miserably createst milder have deemed speeches reproachful whilst warned Creusa heaped discussed apprehending amendment superstitious$FG$
+
+$IV,1$----10/03/13 22:26:11----$IV,0$
+
+$TX+HTML,"WWW.OSDEV.ORG","http://www.osdev.org"$
+
+They're talking about VBE VESA high res.
+
+God said 640x480 16 color back in 2004 and I have never thought of others.
+I wrote ALL the low level graphics routines, including 3D triangle fill and Blot.
+
+God says...
+$FG,4$universal courses flew rejected revelation Ambrosian alter coals greatest 10 SEND cure two delightful human bursting third Though meditated willed forging tradition figurative dividing enact there substantial acting Jerusalem mockeries sights etext00 inexpressible imagination bethink use succeed hot Duck shop inclined detached straitness needed neatly blottedst distress abundant receiving peradventure unhealthiness apart warranties sober Carthage Luxury affection peacemaker satiety comfortest existing panting IT mingle Whoso pierce provided Truth wrested aspirate 01 lied prunes rejection overcast remembering rigidly exists honied temper infuse officer butler festival recess elsewhere subjection streets heaven taken casters hallowed necessary selling ascertained delivered choice feels afraid void encompass recalled resembling infidelity cower wanderings hardship sin mail dieth absurdly rites useth organs ascended joking familiarised$FG$
+
+$IV,1$----10/03/13 22:37:48----$IV,0$
+
+$LK,"GrFillTri0","MN:GrFillTri0"$() $LK,"GrBlot","MN:GrBlot"$()
+
+I did everything by myself from scratch.  Just ask God.
+
+God says...
+$FG,4$ripened origin essay tend Grant faster Within$FG$
+
+$IV,1$----10/03/13 22:44:04----$IV,0$
+
+I have made God's temple.  It's done.  It's beautiful.  It works great.
+
+God says...
+$FG,4$some kill safety digits Strength wind inner community precede effectedst decree law begun sharpsighted will recovered disquiet passionately provision ear intolerable Full awful continue write unconscious supposed drove balneum$FG$
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33538.p12"$.
+
+Line:72108
+God says...
+$FG,4$3:13 Then Nebuchadnezzar in his rage and fury commanded to bring
+Shadrach, Meshach, and Abednego. Then they brought these men before
+the king.
+
+3:14 Nebuchadnezzar spake and said unto them, Is it true, O Shadrach,
+Meshach, and Abednego, do not ye serve my gods, nor worship the golden
+image which I have set up?  3:15 Now if ye be ready that at what time
+ye hear the sound of the cornet, flute, harp, sackbut, psaltery, and
+dulcimer, and all kinds of musick, ye fall down and worship the image
+which I have made; well: but if ye worship not, ye shall be cast the
+same hour into the midst of a burning fiery furnace; and who is that
+God that shall deliver you out of my hands?  3:16 Shadrach, Meshach,
+and Abednego, answered and said to the king, O Nebuchadnezzar, we are
+not careful to answer thee in this matter.
+
+3:17 If it be so, our God whom we serve is able to deliver us from the
+burning fiery furnace, and he will deliver us out of thine hand, O
+king.$FG$
+
+$IV,1$----10/03/13 23:08:47----$IV,0$
+
+Why don't You scare the shit out of the dog balls guy?
+
+God says...
+$FG,4$Commandment Victorinus filled AUGUSTINE lovers plentifully dissolution Godhead beasts suggested endlessly Nod market$FG$
+
+Who's Your favorite guy in the 1800's?
+Umm...Dickens?
+
+God says...
+$FG,4$leading perchance existeth owns 20 succeeding proceeded suck writings see ABOUT seize invest sharp thunder cloven Simplicianus blasphemy void persuade speakers mischief mayest tearful Light pertain senator joys departure teaches preparing swelled er sacrilegious stuck interruption magnify$FG$
+
+How about Twain?  You don't like Twain.  Kinda iconoclast.
+
+God says...
+$FG,4$profit number expense marriageable soberly hesitation narrow Blessedness fence shadows Predicament ravish insolently King present monster encourage styled partly superstition kept tremble commander Knowledge Amid diligence coming sometimes Wills fulness appetite processors discern woke makes obtains devoured fumes harvest concealed advised do acting cares Syrian absent prohibition possessest School step met unchain reasonings delights LIABILITY signified mutability spare sober fragments hypertext influence abided Testament hardheartedness sacrificed abominable Such smiting sink glorious approve running enact clearness general environeth conclude wonderfulness Whereupon$FG$
+
+Maybe, You like Teddy Rosevelt?
+
+God says...
+$FG,4$proffering is whereupon fired smooth turning accomplish siege surfeiting fears prosper inflicted jointly waves present luxuriousness somewhat Howsoever stirring Moreover sorrows fees$FG$
+
+Maybe, You like, Edgar Allen Poe?  ROFLAMO
+
+God says...
+$FG,4$bounded profligate reposeth wheresoever wooden confused Academicians tenets$FG$
+
+You like Tesla?
+
+God says...
+$FG,4$deceivingness measured throughout Every looks allowing indebted nevertheless uprightness PUBLIC END female$FG$
+
+Females?  Madam Curie?  Mary Shelly?  Elimy Dickinson?
+
+God says...
+$FG,4$understood caught horses distributest storm tomorrow three Verily asking recited deaths readest busied peradventure save constant vomited sung displeaseth vanities usual Neither adversity her evermore stick Hereupon intenseness slave Cross Release instruction editing flows devised scratching ceaseth deformities$FG$
+
+Jane Eire, Brody?
+
+God says...
+$FG,4$assent siege giver absolute mutability stirring mourn nourish correct honouring rebel converting heathen remittest forbid virtue lacketh lost descend everlasting$FG$
+
+Did You like Newton?
+
+God says...
+$FG,4$blessings profess hear Sun Weight shakes strong trace confirmed announcing revealedst acquaintance perplexed Unto Churches Ye diversifiedst Noah pause ended spare fragrant equally numberless reflect causing effectedst offensive unto proofread highly In transitory However unrighteous corruptly depends streets$FG$
+
+The Sun weighs one google.
+
+When you take a Google interview, all the answers are "a google".
+
+God says...
+$FG,4$minds mocking Charity rights misliked Basilica six ending agree anxiety$FG$
+
+$IV,1$----10/03/13 23:21:42----$IV,0$
+
+I wrote a JIT/AOT compiler that takes HolyC+ASM and makes x86_64 machine code.
+
+It has optimization.
+
+(5+2)*3
+
+is evaluated in the optimization stage, more or less by executing intermediate code and simplifying constants to a single constant.
+
+30
+
+My operating systems is like Windows, before UEFI.  It comes on an ISO file for making a CD-ROM.  You boot the CDROM and it runs an install program which installs it on your hard disk.  I wrote boot-loaders and an install program.
+
+I wrote a compiler for HolyC.  You must boot my CDROM to use my compiler to compile everything.
+
+You can do nothing outside of my operating system.  You cannot compile.  You cannot install.  You cannot boot.
+
+Boot the ISO file on a 64-bit machine.
+
+Fuck You
+
+Tired of You fucken stubborn India-niggers and Ken.
+
+God says...
+$FG,4$anyone meanwhile returning Continence these passages interested observing stripped face impotent queen Cross Neptune vice sunk immoderate spacious alas unexplained line pierce related Example recur folly indite belly Sodom justifieth distilled reigning strive cares requirements intently Sure lawful licenses assembly melody temper lessons listening organs Prof guilt excellent teach existence partake easier quite buyers holden$FG$
+
+$LK-A,"::/TempleOS/Doc/HolyC.TXT.Z"$
+
+$LK-A,"::/TempleOS/Doc/Boot.TXT.Z"$
+
+India-niggers are stubborn as hell.
+
+Did you follow directions?
+
+$IV,1$----10/03/13 23:35:27----$IV,0$
+
+Spoiler alert.  What's in the mantle, God?
+
+Dirt and shit?
+
+God says...
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33565.p12"$.
+
+Line:25563
+God says...
+$FG,4$sword, and with a spear, and with a shield: but I come to thee in the
+name of the LORD of hosts, the God of the armies of Israel, whom thou
+hast defied.
+
+17:46 This day will the LORD deliver thee into mine hand; and I will
+smite thee, and take thine head from thee; and I will give the
+carcases of the host of the Philistines this day unto the fowls of the
+air, and to the wild beasts of the earth; that all the earth may know
+that there is a God in Israel.
+
+17:47 And all this assembly shall know that the LORD saveth not with
+sword and spear: for the battle is the LORD's, and he will give you
+into our hands.
+
+17:48 And it came to pass, when the Philistine arose, and came, and
+drew nigh to meet David, that David hastened, and ran toward the army
+to meet the Philistine.
+
+17:49 And David put his hand in his bag, and took thence a stone, and
+slang it, and smote the Philistine in his forehead, that the stone$FG$
+
+$IV,1$----10/03/13 23:45:50----$IV,0$
+
+$TX+HTML,"Rush Trees","http://www.youtube.com/watch?v=UWHEcIbhDiw"$
+
+Do trees fight each other (very slowly)?
+
+They get mad and do a counter attack.
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"Here is the certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-33566.p12"$.
+
+Line:33640
+God says...
+$FG,4$Jehoaddan of Jerusalem.
+
+14:3 And he did that which was right in the sight of the LORD, yet not
+like David his father: he did according to all things as Joash his
+father did.
+
+14:4 Howbeit the high places were not taken away: as yet the people
+did sacrifice and burnt incense on the high places.
+
+14:5 And it came to pass, as soon as the kingdom was confirmed in his
+hand, that he slew his servants which had slain the king his father.
+
+14:6 But the children of the murderers he slew not: according unto
+that which is written in the book of the law of Moses, wherein the
+LORD commanded, saying, The fathers shall not be put to death for the
+children, nor the children be put to death for the fathers; but every
+man shall be put to death for his own sin.
+
+14:7 He slew of Edom in the valley of salt ten thousand, and took
+Selah by war, and called the name of it Joktheel unto this day.$FG$

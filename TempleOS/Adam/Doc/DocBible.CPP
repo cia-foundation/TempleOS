@@ -18,22 +18,15 @@ DefineLstLoad("ST_BIBLE_BOOKS",
 "2 Chronicles\0"
 "Ezra\0"
 "Nehemiah\0"
-"Tobit\0"
-"Judith\0"
 "Esther\0"
-"1 Maccabees\0"
-"2 Maccabees\0"
 "Job\0"
 "Psalms\0"
 "Proverbs\0"
 "Ecclesiastes\0"
 "Song of Songs\0"
-"Wisdom\0"
-"Sirach\0"
 "Isaiah\0"
 "Jeremiah\0"
 "Lamentations\0"
-"Baruch\0"
 "Ezekiel\0"
 "Daniel\0"
 "Hosea\0"
@@ -94,22 +87,15 @@ DefineLstLoad("ST_BIBLE_BOOK_LINES",
 "37633\0"
 "40756\0"
 "41671\0"
-"Tobit\0"
-"Judith\0"
 "42963\0"
-"1 Maccabees\0"
-"2 Maccabees\0"
 "43605\0"
 "46190\0"
 "53793\0"
 "56267\0"
 "56966\0"
-"Wisdom\0"
-"Sirach\0"
 "57332\0"
 "61806\0"
 "66736\0"
-"Baruch\0"
 "67217\0"
 "71804\0"
 "73189\0"
@@ -153,6 +139,23 @@ DefineLstLoad("ST_BIBLE_BOOK_LINES",
 "98684\0"
 "\0");
 
+public U0 PutBibleLines(I64 start,I64 lines)
+{
+  CDoc *doc=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
+  CDocEntry *doc_e;
+  DocLineNumGoTo(doc,start); //one based
+  doc_e=doc->cur_entry;
+  while (lines>0 && doc_e!=doc) {
+    if (doc_e->type_u8==DOCT_TEXT)
+      "%s",doc_e->tag;
+    else if (doc_e->type_u8==DOCT_NEW_LINE) {
+      NewLine;
+      lines--;
+    }
+    doc_e=doc_e->next;
+  }
+  DocDel(doc);
+}
 
 public U0 PutBibleVerse(U8 *verse,I64 lines)
 {
@@ -166,7 +169,7 @@ public U0 PutBibleVerse(U8 *verse,I64 lines)
   else
     *st2=0;
 
-  i=DefineMatch(st,"ST_BIBLE_BOOKS",LEF_IGNORE_CASE);
+  i=DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
   if (i>=0) {
     i=A2I(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
     doc=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
@@ -176,9 +179,9 @@ public U0 PutBibleVerse(U8 *verse,I64 lines)
       EdFindNext(doc);
     }
     doc_e=doc->cur_entry;
-    while (lines) {
+    while (lines>0 && doc_e!=doc) {
       if (doc_e->type_u8==DOCT_TEXT)
-	"" doc_e->tag;
+	"%s",doc_e->tag;
       else if (doc_e->type_u8==DOCT_NEW_LINE) {
 	NewLine;
 	lines--;

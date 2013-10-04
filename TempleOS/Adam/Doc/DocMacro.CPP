@@ -41,10 +41,10 @@ CMacroTemp *Cmd2MT(CSrvCmd *tempc)
     tempmt->type=MT_CHAR;
     buf[0]=tempc->aux1;
     buf[1]=0;
-    SPrintF(tempmt->buf,"%Q",buf);
+    SPrint(tempmt->buf,"%Q",buf);
   } else {
     tempmt->type=MT_MSG;
-    SPrintF(tempmt->buf,"Msg(0x%X,0x%X,0x%X);",
+    SPrint(tempmt->buf,"Msg(0x%X,0x%X,0x%X);",
       tempc->msg_code,tempc->aux1,tempc->aux2);
   }
   return tempmt;
@@ -149,14 +149,14 @@ I64 PopUpExitRecordPlayStopIns()
   U8 buf[136];
   CSrvCmd *tempc;
   CDoc *doc=DocNew;
-  CDocEntry *doc_e=DocPutS(doc,"$$DA-P,135,\"Name:%s\"$$");
+  CDocEntry *doc_e=DocPrint(doc,"$$DA-P,135,\"Name:%%s\"$$");
   I64 result=0;
   doc_e->data=captured_macro_name;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(doc,"\n$$DA,32,\"Repeat N:%d\"$$");
+  doc_e=DocPrint(doc,"\n$$DA,32,\"Repeat N:%%d\"$$");
   doc_e->data=&sys_macro_repeat_n;
   DocDataFmt(doc_e);
-  DocPutS(doc,"\n"
+  DocPrint(doc,"\n"
 	"$$CM+LX,1,3$$$$BT,\"RECORD\",SM_RECORD$$"
 	"$$CM+LX,17,0$$$$BT,\"INSERT\",SM_INS$$"
 	"$$CM+LX,1,3$$$$BT,\"PLAY\",SM_PLAY$$"
@@ -165,7 +165,7 @@ I64 PopUpExitRecordPlayStopIns()
 	"$$CM+LX,17,0$$$$BT,\"CANCEL\",SM_CANCEL$$"
 	"\n\n\n$$FG,GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
-  SPrintF(buf,"DocMenuDo(0x%X);",doc);
+  SPrint(buf,"DocMenuDo(0x%X);",doc);
   sys_macro_util_task=Spawn(&SrvUserCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_util_task;
   LBts(&sys_macro_util_task->display_flags,DISPLAYf_WIN_ON_TOP);
@@ -175,7 +175,7 @@ I64 PopUpExitRecordPlayStopIns()
   Fs->popup_task=NULL;
   Kill(sys_macro_util_task);
   sys_macro_util_task=NULL;
-  DocDataGet(doc_e);
+  DocDataScan(doc_e);
   DocDel(doc);
   return result;
 }

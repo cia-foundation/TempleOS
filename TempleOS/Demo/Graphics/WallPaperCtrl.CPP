@@ -38,10 +38,10 @@ U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
   GrLine(dc,c->left+2*SLIDER_SPACING+1,c->top+SLIDER_SPACING,
 	      c->left+2*SLIDER_SPACING+1,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
   dc->color=LTRED;
-  GrPrintF(dc,c->left+1*SLIDER_SPACING+0-FONT_WIDTH/2,
+  GrPrint(dc,c->left+1*SLIDER_SPACING+0-FONT_WIDTH/2,
     c->top+SLIDER_SPACING+SLIDER_RANGE+3,
     "%d",s->left_pos*10/SLIDER_RANGE);
-  GrPrintF(dc,c->left+2*SLIDER_SPACING+1-FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*SLIDER_SPACING+1-FONT_WIDTH/2,
     c->top+SLIDER_SPACING+SLIDER_RANGE+3,
     "%d",s->right_pos*10/SLIDER_RANGE);
   GrRect(dc,c->left+1*SLIDER_SPACING+0-3,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->left_pos-2,7,5);

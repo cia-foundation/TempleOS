@@ -3,7 +3,7 @@
 U0 ShowBootFileDate(U8 drv_let)
 {
   CDirEntry de;
-  U8 *name=MSPrintF("%c:/Kernel.BIN.C",drv_let);
+  U8 *name=MPrint("%c:/Kernel.BIN.C",drv_let);
   if (FileFind(name,&de)) {
     Free(de.full_name);
     "%s %D %T\n",name,de.datetime,de.datetime;
@@ -57,26 +57,26 @@ U0 TSCopyDrv(U8 src,U8 dst)
 
   Fmt(dst,TRUE,FALSE,PT_FAT32);
 
-  SPrintF(buf_s,"%c:/TempleOS",src);
-  SPrintF(buf_d,"%c:/TempleOS",dst);
+  SPrint(buf_s,"%c:/TempleOS",src);
+  SPrint(buf_d,"%c:/TempleOS",dst);
   CopyTree(buf_s,buf_d);
 
-  SPrintF(buf_s,"%c:/Windows",src);
-  SPrintF(buf_d,"%c:/Windows",dst);
+  SPrint(buf_s,"%c:/Windows",src);
+  SPrint(buf_d,"%c:/Windows",dst);
   CopyTree(buf_s,buf_d);
 
-  SPrintF(buf_s,"%c:/Linux",src);
-  SPrintF(buf_d,"%c:/Linux",dst);
+  SPrint(buf_s,"%c:/Linux",src);
+  SPrint(buf_d,"%c:/Linux",dst);
   CopyTree(buf_s,buf_d);
 
-  SPrintF(buf_s,"%c:/0000Boot",src);
-  SPrintF(buf_d,"%c:/0000Boot",dst);
+  SPrint(buf_s,"%c:/0000Boot",src);
+  SPrint(buf_d,"%c:/0000Boot",dst);
   CopyTree(buf_s,buf_d);
 
-  SPrintF(buf_d,"%c:/Temp",dst);
+  SPrint(buf_d,"%c:/Temp",dst);
   MkDir(buf_d);
 
-  SPrintF(buf_d,"%c:/Temp/ScreenShots",dst);
+  SPrint(buf_d,"%c:/Temp/ScreenShots",dst);
   MkDir(buf_d);
 
   DocClear;
@@ -114,28 +114,28 @@ public U0 FileCursorTop(U8 *filename)
 public U0 FilesCursorRem(U8 *mask="*")
 {
   I64 fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F");
-  CDirEntry *tempm=FilesFind(mask,fuf_flags),*tempm1;
-  while (tempm) {
-    tempm1=tempm->next;
-    FileCursorRem(tempm->full_name);
-    Touch(tempm->full_name,"",,tempm->datetime);
-    CDirEntryDel(tempm);
-    tempm=tempm1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F");
+  CDirEntry *tempde=FilesFind(mask,fuf_flags),*tempde1;
+  while (tempde) {
+    tempde1=tempde->next;
+    FileCursorRem(tempde->full_name);
+    Touch(tempde->full_name,"",,tempde->datetime);
+    DirEntryDel(tempde);
+    tempde=tempde1;
   }
 }
 
 public U0 FilesCursorTop(U8 *mask="*")
 {
   I64 fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F");
-  CDirEntry *tempm=FilesFind(mask,fuf_flags),*tempm1;
-  while (tempm) {
-    tempm1=tempm->next;
-    FileCursorTop(tempm->full_name);
-    Touch(tempm->full_name,"",,tempm->datetime);
-    CDirEntryDel(tempm);
-    tempm=tempm1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F");
+  CDirEntry *tempde=FilesFind(mask,fuf_flags),*tempde1;
+  while (tempde) {
+    tempde1=tempde->next;
+    FileCursorTop(tempde->full_name);
+    Touch(tempde->full_name,"",,tempde->datetime);
+    DirEntryDel(tempde);
+    tempde=tempde1;
   }
 }
 
@@ -147,47 +147,36 @@ U0 UncollapseFile(U8 *filename,I64 *)
   DocDel(doc);
 }
 
-U0 UncollapseLst(CDirEntry *tempm1,I64 *flags)
+U0 Uncollapse(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {
-  CDirEntry *tempm2;
-  while (tempm1 && !Bt(flags,FUf_CANCEL)) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub) {
-	"%S %s\n","ST_SCANNING_DIR",tempm1->full_name;
-	UncollapseLst(tempm1->sub,flags);
-      }
-    } else
-      UncollapseFile(tempm1->full_name,flags);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
+  I64 fuf_flags=0;
+  CDirEntry *tempde,*tempde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    UncollapseFile(tempde->full_name,&fuf_flags);
+    tempde=tempde->next;
   }
-}
-
-U0 Uncollapse(U8 *files_find_mask=FILENAME_MASK_TXT,U8 *fu_flags=NULL)
-{
-  I64 f=0;
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  UncollapseLst(FilesFind(files_find_mask,f),&f);
+  DirLstDel(tempde1);
 }
 
 public U0 CopySongs(U8 threshold='7')
 {
   CDoc *s;
   CDocEntry *doc_e;
-  CDirEntry *tempm,*tempm1;
+  CDirEntry *tempde,*tempde1;
   DelTree("/TempleOS/Apps/MusicOrgan/Examples");
   MkDir("/TempleOS/Apps/MusicOrgan/Examples");
-  tempm1=tempm=FilesFind("/TempleOS/Accts/TS/TAD/MusicOrgan/*.CPP*");
-  while (tempm1) {
-    s=DocRead(tempm1->full_name);
+  tempde1=tempde=FilesFind("/TempleOS/Accts/TS/TAD/MusicOrgan/*.CPP*");
+  while (tempde1) {
+    s=DocRead(tempde1->full_name);
     doc_e=s->root.next;
     if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[2]>=threshold)
-      Copy(tempm1->full_name,"/TempleOS/Apps/MusicOrgan/Examples");
-    tempm1=tempm1->next;
+      Copy(tempde1->full_name,"/TempleOS/Apps/MusicOrgan/Examples");
+    tempde1=tempde1->next;
   }
-  CDirLstDel(tempm);
+  DirLstDel(tempde);
 }
 
 U0 DistroPrep()
@@ -222,7 +211,7 @@ U0 DistroPrep()
   DelTree("/TempleOS/Demo/*.BI*");
 
   Cd("/TempleOS");
-  S2T(FILENAME_MASK_SRC,"+r");
+  S2T("*","+r+S");
   DocOpt;
   Move(WSD_DEF_FILENAME,WSD_DEF_FILENAME_Z);
 }
@@ -234,7 +223,7 @@ U0 MakeSymFiles()
   if (ts_has_bak_drv) {
     DocClear;
     DocMax;
-    HashRep(Fs->hash_table,HTG_ALL,NULL,"-p",0,NULL);
+    Who;
     if (doc=DocPut) {
       st=StrNew(doc->filename.name);
       StrCpy(doc->filename.name,TS_BAK_DRV ":/Wb/Accts/TS/Wb2/SymsAlpha.TXT.Z");
@@ -244,7 +233,7 @@ U0 MakeSymFiles()
     }
     DocClear;
     DocMax;
-    HashRep(Fs->hash_table,HTG_ALL,NULL,"-p+m",0,NULL);
+    Who("+m");
     if (doc=DocPut) {
       st=StrNew(doc->filename.name);
       StrCpy(doc->filename.name,TS_BAK_DRV ":/Wb/Accts/TS/Wb2/SymsAddress.TXT.Z");
@@ -290,9 +279,9 @@ I64 MakeLineCntFile()
   DocCut(doc,start_indent->next,end_indent->last);
   doc->cur_entry=start_indent->next;
   doc->cur_data_col=0;
-  DocPrintF(doc,"DefinePrintF(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",result);
+  DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",result);
 
-  st=MSPrintF("%,d",result);
+  st=MPrint("%,d",result);
   DefineLoad("DD_TEMPLEOS_LOC",st);
   Free(st);
 
@@ -370,19 +359,39 @@ U0 TSWebFile(U8 *name)
 
 U0 MakeWebSite()
 {
-  CDirEntry *tempm,*tempm2;
+  CDirEntry *tempde,*tempde2;
   if (ts_has_bak_drv) {
     DocClear;
     Cd(TS_BAK_DRV ":/Wb");
     DelTree(TS_BAK_DRV ":/Wb/Accts/TS/TAD");
     Del(TS_BAK_DRV ":/Wb/Accts/TS/*");
-    Touch(TS_BAK_DRV ":/Wb/Accts/TS/Wb2/index.TXT.Z","",,GetCurTimeDate);
-    tempm=tempm2=FilesFind(FILENAME_MASK_TXT,FUF_RECURSE|FUF_FLATTEN_TREE|FUF_JUST_FILES);
-    while (tempm) {
-      TSWebFile(tempm->full_name);
-      tempm=tempm->next;
+    Touch(TS_BAK_DRV ":/Wb/Accts/TS/Wb2/index.TXT.Z","",,GetDateTime);
+    tempde=tempde2=FilesFind("*",FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT);
+    while (tempde) {
+      TSWebFile(tempde->full_name);
+      tempde=tempde->next;
     }
-    CDirLstDel(tempm2);
+    DirLstDel(tempde2);
+    Drv(TS_MAIN_DRV_LET);
+  }
+}
+
+U0 MakeWebSitePartial()
+{
+  CDirEntry *tempde,*tempde2;
+  if (ts_has_bak_drv) {
+    DelTree(TS_BAK_DRV ":/Wb/Accts/TS/Wb2");
+    CopyTree(TS_MAIN_DRV ":/TempleOS/Accts/TS/Wb2",
+	     TS_BAK_DRV ":/Wb/Accts/TS/Wb2");
+    DelTree(TS_BAK_DRV ":/Uncompressed/Accts/TS/Wb2");
+    CopyTree(TS_MAIN_DRV ":/TempleOS/Accts/TS/Wb2",
+	     TS_BAK_DRV ":/Uncompressed/Accts/TS/Wb2");
+    tempde=tempde2=FilesFind(TS_BAK_DRV ":/Wb/Accts/TS/Wb2/*",FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT);
+    while (tempde) {
+      TSWebFile(tempde->full_name);
+      tempde=tempde->next;
+    }
+    DirLstDel(tempde2);
     Drv(TS_MAIN_DRV_LET);
   }
 }
@@ -393,7 +402,7 @@ U0 ToWeb(U8 *name)
   if (ts_has_bak_drv) {
     st=FileNameAbs(name);
     if (!StrNCmp(st+1,":/TempleOS/",12)) {
-      st2=MSPrintF(TS_BAK_DRV":/Wb/%s",st+13);
+      st2=MPrint(TS_BAK_DRV":/Wb/%s",st+13);
       "%s\n",st2;
       Copy(name,st2);
       TSWebFile(st2);
@@ -406,21 +415,21 @@ U0 ToWeb(U8 *name)
 U0 TSUncompress()
 {
   U8 *st;
-  CDirEntry *tempm,*tempm1;
+  CDirEntry *tempde,*tempde1;
   if (ts_has_bak_drv) {
     DelTree(TS_BAK_DRV ":/Uncompressed");
     CopyTree(TS_MAIN_DRV ":/TempleOS",TS_BAK_DRV ":/Uncompressed");
-    tempm=FilesFind(TS_BAK_DRV ":/Uncompressed/*.Z",FUF_RECURSE|FUF_FLATTEN_TREE|FUF_JUST_FILES);
-    while (tempm) {
-      tempm1=tempm->next;
-      st=StrNew(tempm->full_name);
+    tempde=FilesFind(TS_BAK_DRV ":/Uncompressed/*.Z",FUF_RECURSE|FUF_JUST_FILES);
+    while (tempde) {
+      tempde1=tempde->next;
+      st=StrNew(tempde->full_name);
       StrLastRem(st,".");
-      Move(tempm->full_name,st);
+      Move(tempde->full_name,st);
       Free(st);
-      CDirEntryDel(tempm);
-      tempm=tempm1;
+      DirEntryDel(tempde);
+      tempde=tempde1;
     }
-    FilesCursorRem(TS_BAK_DRV ":/Uncompressed/" FILENAME_MASK_TXT);
+    FilesCursorRem(TS_BAK_DRV ":/Uncompressed/*");
   }
 }
 
@@ -428,11 +437,11 @@ U0 UpdateISODocDefines()
 {
   I64 size;
   size=10*FileSize(TS_BAK_DRV ":/Wb/TempleOSCD.ISO")/1024/1024;
-  DefinePrintF("DD_TEMPLEOSCD_SIZE",
-    "Download $TX+D,"TempleOS V1.03","DD_OS_NAME_VERSION"$ - Std. Distro (%0.1f MB)",0.1*size);
+  DefinePrint("DD_TEMPLEOSCD_SIZE",
+    "Download $TX+D,"TempleOS V1.05","DD_OS_NAME_VERSION"$ - Std. Distro (%0.1f MB)",0.1*size);
   size=10*FileSize(TS_BAK_DRV ":/Wb/TempleOSTS.ISO")/1024/1024;
-  DefinePrintF("DD_TEMPLEOSTS_SIZE",
-    "Download $TX+D,"TempleOS V1.03","DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",0.1*size);
+  DefinePrint("DD_TEMPLEOSTS_SIZE",
+    "Download $TX+D,"TempleOS V1.05","DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",0.1*size);
 }
 
 UpdateISODocDefines;
@@ -529,4 +538,3 @@ public U0 TSInstall()
     TSCopy;
   }
 }
-

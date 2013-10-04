@@ -1,10 +1,15 @@
-I64 OptPass789A(CLex *lx,CHashFun *fun_class,
+I64 OptPass789(CLex *lx,CHashFun *fun_class,
    COptReg *register_offsets,U8 *buf,CDbgInfo **_dbg)
 {
+/*
+  lx->pass==7 is first time
+  lx->pass==8 is repeated until size stops shrinking
+  lx->pass==9 is final
+*/
   CIntermediateCode *tempi;
   I64 code,i,cnt,*qq,num_lines=lx->max_line-lx->min_line+1,ip=0,ip2;
-  CCodeBlkMisc *lb,*lb1;
-  CExe *tempex;
+  CLexCodeMisc *lb,*lb1;
+  CExe *tempx;
   CExeAbsAddr *tempa;
   CExeImportExport *tempe;
   CExeHeapGlbl *temphg;
@@ -35,16 +40,14 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 
   lx->last_float_op_ic=NULL;
 
-  tempi=lx->cbh.cb_in_ptr;
-  if (tempi->ic_opcode==IC_START) {
-    tempi->ic_cnt=0;
-    tempi->ic_last_cnt=-1;
-    tempi++;
-  }
+  tempi=&lx->lcc.lcc_root;
+  tempi->ic_cnt=0;
+  tempi->ic_last_cnt=-1;
+  tempi=tempi->next;
   while (code=tempi->ic_opcode) {
     if (code>IC_END_EXP) {
       if (tempi->ic_flags&ICF_TRACE && Bt(&lx->pass_trace_mask,lx->pass))
-	CBPutIC(tempi);
+	ICPut(tempi);
       ip2=ip;
       if (lx->flags&LF_AOT_COMPILE)
 	ip2+=a->ip;
@@ -173,7 +176,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	    if (buf && !(lx->flags&LF_NO_ABSS)) {
 	      tempg=tempi->ic_data;
 	      tempe=CAlloc(sizeof(CExeImportExport));
-	      tempe->type=EIE_LIT_U32;
+	      tempe->type=EIE_IMM_U32;
 	      tempe->ip=ip2+tempi->ic_cnt-4;
 	      tempe->next=tempg->ie_lst;
 	      tempg->ie_lst=tempe;
@@ -195,16 +198,16 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	    tempi->ic_flags&=~ICF_CODE_FINAL;
 	    break;
 	  case IC_ASM:
-	    tempex=tempi->ic_data;
-	    tempi->ic_cnt+=tempex->code_U8s;
+	    tempx=tempi->ic_data;
+	    tempi->ic_cnt+=tempx->ex_U8s;
 	    if (buf) {
-	      MemCpy(buf+ip,tempex->code,tempex->code_U8s);
-	      Free(tempex->code);
-	      tempex->code=buf+ip;
+	      MemCpy(buf+ip,tempx->ex,tempx->ex_U8s);
+	      ExpressionBinDel(tempx->ex);
+	      tempx->ex=buf+ip;
 	      if (lx->flags&LF_AOT_COMPILE)
-		CmpFixUpAOTAsm(lx,tempex,ip2);
+		CmpFixUpAOTAsm(lx,tempx,ip2);
 	      else
-		CmpFixUpJITAsm(lx,tempex,ip2);
+		CmpFixUpJITAsm(lx,tempx,ip2);
 	      cnt=tempi->ic_cnt;
 	      goto skip_copy;
 	    }
@@ -482,11 +485,11 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 		  TY_IMM+IT_I64,0,tempi->ic_data,0xE8D1E8D3E8C1,0xF8D1F8D3F8C1,ip2);
 	    break;
 	  case IC_ADD_CONST:
-	    ICAddConst(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    ICAddSubEctImm(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->p1.type,tempi->p1.reg,tempi->p1.disp,tempi->ic_data,0x0003,ip2);
 	    break;
 	  case IC_SUB_CONST:
-	    ICAddConst(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+	    ICAddSubEctImm(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->p1.type,tempi->p1.reg,tempi->p1.disp,tempi->ic_data,0x052B,ip2);
 	    break;
 	  case IC_ENTER:
@@ -566,13 +569,13 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	    tempi->ic_flags&=~ICF_CODE_FINAL;
 	    break;
 	  case IC_CALL_IMPORT:
-	    if (GetOpt(OPTf_USE_LIT64)) {
+	    if (GetOpt(OPTf_USE_IMM64)) {
 	      ICU16(tempi,0xBB48);
 	      ICU64(tempi,0);
 	      if (buf) {
 		tempf=tempi->ic_data;
 		tempe=CAlloc(sizeof(CExeImportExport));
-		tempe->type=EIE_LIT_U64;
+		tempe->type=EIE_IMM_U64;
 		tempe->ip=ip2+tempi->ic_cnt-8;
 		tempe->next=tempf->ie_lst;
 		tempf->ie_lst=tempe;
@@ -580,7 +583,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	      ICU16(tempi,0xD3FF);
 	    } else {
 	      ICU8(tempi,0xE8);
-	      ICU32(tempi,-(ip2+5));
+	      ICU32(tempi,0);
 	      if (buf) {
 		tempf=tempi->ic_data;
 		tempe=CAlloc(sizeof(CExeImportExport));
@@ -632,7 +635,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	  case IC_PAUSE:
 	    ICU16(tempi,0x90F3);
 	    break;
-	  case IC_GET_FLAGS:
+	  case IC_GET_RFLAGS:
 	    ICU8(tempi,0x9C);
 	    ICPop(tempi,TY_REG+IT_I64,CREG_RAX,0,ip2);
 	    break;
@@ -646,23 +649,23 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	  case IC_HPET:
 	    ICCopyTemplate(lx,tempi,CMP_TEMPLATE_HPET,TRUE,FALSE,FALSE,CN_MAIN);
 	    break;
-	  case IC_SET_FLAGS:
+	  case IC_SET_RFLAGS:
 	    ICPush(tempi,tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
 	    ICU8(tempi,0x9D);
 	    break;
-	  case IC_GET_BASE_PTR:
+	  case IC_GET_RBP:
 	    ICMov(tempi,TY_REG+IT_I64,CREG_RAX,0,
 		  TY_REG+IT_I64,CREG_RBP,0,ip2);
 	    break;
-	  case IC_SET_BASE_PTR:
+	  case IC_SET_RBP:
 	    ICMov(tempi,TY_REG+IT_I64,CREG_RBP,0,
 		  tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
 	    break;
-	  case IC_GET_STK_PTR:
+	  case IC_GET_RSP:
 	    ICMov(tempi,TY_REG+IT_I64,CREG_RAX,0,
 		  TY_REG+IT_I64,CREG_RSP,0,ip2);
 	    break;
-	  case IC_SET_STK_PTR:
+	  case IC_SET_RSP:
 	    ICMov(tempi,TY_REG+IT_I64,CREG_RSP,0,
 		  tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
 	    break;
@@ -676,22 +679,22 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	  case IC_GET_RAX:
 	    break;
 	  case IC_BT:
-	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi+1,
+	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi->next,
 		  0xA30F,0x20BA0F,ip2);
 	    break;
 	  case IC_BTS:
 	  case IC_LBTS:
-	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi+1,
+	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi->next,
 		  0xAB0F,0x28BA0F,ip2);
 	    break;
 	  case IC_BTR:
 	  case IC_LBTR:
-	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi+1,
+	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi->next,
 		  0xB30F,0x30BA0F,ip2);
 	    break;
 	  case IC_BTC:
 	  case IC_LBTC:
-	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi+1,
+	    ICBitOps(tempi,&tempi->p1,&tempi->p2,tempi->next,
 		  0xBB0F,0x38BA0F,ip2);
 	    break;
 	  case IC_BSF:
@@ -752,7 +755,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	  case IC_ABS_I64:
 	    ICMov(tempi,TY_REG+IT_I64,CREG_RAX,0,
 		  tempi->p1.type,tempi->p1.reg,tempi->p1.disp,ip2);
-	    ICU24(tempi,0xC00B48);
+	    ICU24(tempi,0xC08548);
 	    ICU16(tempi,0x0379);
 	    ICU24(tempi,0xD8F748);
 	    break;
@@ -1066,9 +1069,11 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	      ICAddRSP(tempi,tempi->ic_data);
 	      ICPop(tempi,TY_REG+IT_I64,CREG_RBP,0,ip2);
 	    }
-	    if (fun_class && Bt(fun_class->flags,Ff_INTERRUPT))
+	    if (fun_class && Bt(fun_class->flags,Ff_INTERRUPT)) {
+	      if (Bt(fun_class->flags,Ff_HASERRCODE))
+		ICAddRSP(tempi,8);
 	      ICU16(tempi,0xCF48);
-	    else if (fun_class && fun_class->arg_cnt &&
+	    } else if (fun_class && fun_class->arg_cnt &&
 		  (Bt(fun_class->flags,Ff_RET1) || Bt(fun_class->flags,Ff_ARGPOP)) &&
 		  !Bt(fun_class->flags,Ff_NOARGPOP)) {
 	      ICU8(tempi,0xC2);
@@ -1083,12 +1088,15 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	    lb=OptLabelFwd(tempi->ic_data);
 	    short_jmp=ToBool(tempi->ic_flags&ICF_SHORT_JMP);
 	    if (!buf && lb->addr!=INVALID_PTR &&
-		  MIN_I8+5<lb->addr-ip<MAX_I8-5)
+		MIN_I8+5<lb->addr-ip<MAX_I8-5)
 	      short_jmp=TRUE;
 	    if (short_jmp) {
 	      tempi->ic_flags|=ICF_SHORT_JMP;
 	      i=lb->addr-(ip+2);
-	      ICU16(tempi,i<<8+0xEB);
+	      if (buf || i)
+		ICU16(tempi,i<<8+0xEB);
+	      else
+		tempi->ic_opcode=IC_NOP1;
 	    } else {
 	      i=lb->addr-(ip+5);
 	      ICU8(tempi,0xE9);
@@ -1099,7 +1107,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	  case IC_LABEL:
 	    lb=tempi->ic_data;
 	    lb->addr=ip;
-	    if (lb->flags&CBMF_POP_CMP) {
+	    if (lb->flags&CMF_POP_CMP) {
 	      ICAddRSP(tempi,-8,FALSE);
 	      ICAddRSP(tempi,8,FALSE);
 	    }
@@ -1134,7 +1142,9 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	    break;
 
 	  default:
-	    OptMissing(lx,tempi);
+	    "Pass:%d Missing IC handler\n",lx->pass;
+	    ICPut(tempi);
+	    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
 	}
 	if (tempi->r.type&TY_MASK) {
 	  if (tempi->ic_flags & ICF_R_TO_F64) {
@@ -1194,19 +1204,19 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
       tempi->ic_cnt=0;
       tempi->ic_last_cnt=-1;
     }
-    tempi++;
+    tempi=tempi->next;
   }
 
-  lb=lx->cbh.cb_misc_lst;
-  while (lb) {
+  lb=lx->lcc.lcc_next_misc;
+  while (lb!=&lx->lcc.lcc_next_misc) {
     switch (lb->type) {
-      case CBMT_STR_CONST:
+      case CMT_STR_CONST:
 	lb->addr=ip;
 	if (buf)
 	  MemCpy(buf+ip,lb->str,lb->st_len);
 	ip+=lb->st_len;
 	break;
-      case CBMT_JMP_TABLE:
+      case CMT_JMP_TABLE:
 	lb->addr=ip;
 	if (buf) {
 	  for (i=0;i<lb->range;i++) {
@@ -1225,7 +1235,7 @@ I64 OptPass789A(CLex *lx,CHashFun *fun_class,
 	}
 	ip+=lb->range*sizeof(U8 *);
 	break;
-      case CBMT_FLOAT_CONSTS:
+      case CMT_FLOAT_CONSTS:
 	lb->addr=ip;
 	if (buf)
 	  MemCpy(buf+lb->addr,lb->float_consts,lb->num_consts*sizeof(F64));

@@ -299,7 +299,7 @@ _D3_UNIT::
 	FSQRT
 	FST	U64 SF_ARG1[RBP]
 	MOV	RBX,SF_ARG1[RBP]
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@05
 	FLD	ST0
 	FDIVR	ST0,U64 [RAX]
@@ -433,11 +433,11 @@ _CEIL::
 SYS_POW::
 // RAX=RDX`RAX
 	ENTER	24
-	OR	RAX,RAX	//To power of zero?
+	TEST	RAX,RAX	//To power of zero?
 	JNZ	@@05
 	MOV	RAX,1.0
 	JMP	@@20
-@@05:	OR	RDX,RDX	//zero to a power?
+@@05:	TEST	RDX,RDX	//zero to a power?
 	JNZ	@@10
 	XOR	RAX,RAX
 	JMP	@@20
@@ -465,7 +465,7 @@ SYS_POW::
 	FLD	U64 -8[RBP]
 	FLD	U64 -16[RBP]
 	FSCALE	// ST0<<ST1
-	OR	RDX,RDX //was base neg?
+	TEST	RDX,RDX //was base neg?
 	JGE	@@15
 	MOV	U64 -16[RBP],RCX
 	FLD	U64 -16[RBP]

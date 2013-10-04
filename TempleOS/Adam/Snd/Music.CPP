@@ -158,12 +158,8 @@ public U0 Play(U8 *st,U8 *words=NULL)
       f=Note2Freq(note,music_octave);
     } else
       f=0;
-    if (words) {
-      if (word=LstEntryPt(i++,words))
-	if (StrCmp(word," "))
-	  "" word;
-    }
-
+    if (words && (word=LstSub(i++,words)) && StrCmp(word," "))
+      "%s",word;
     d=JIFFY_FREQ*music_note_len/music_tempo;
     if (tie) {
       on_jiffies  =d;

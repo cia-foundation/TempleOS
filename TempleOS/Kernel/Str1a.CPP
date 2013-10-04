@@ -15,7 +15,7 @@ U0 PutHex(I64 n,I64 width)
   U8 buf[17];
   if (width>16) width=16;
   *Bin2Hex(buf,n,width)=0;
-  "" buf;
+  "%s",buf;
 }
 
 asm {
@@ -73,16 +73,18 @@ _STRCAT::
 	PUSH	RDI
 	MOV	RSI,U64 SF_ARG1[RBP]
 @@05:	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JNZ	@@05
 	MOV	RDI,RSI
 	DEC	RDI
 	MOV	RSI,U64 SF_ARG2[RBP]
+	TEST	RSI,RSI
+	JZ	@@15
 @@10:	LODSB
 	STOSB
-	OR	AL,AL
+	TEST	AL,AL
 	JNZ	@@10
-	POP	RDI
+@@15:	POP	RDI
 	POP	RSI
 	LEAVE
 	RET1	16
@@ -91,13 +93,19 @@ _STRCPY::
 	ENTER	0
 	PUSH	RSI
 	PUSH	RDI
-	MOV	RSI,U64 SF_ARG2[RBP]
 	MOV	RDI,U64 SF_ARG1[RBP]
-@@05:	LODSB
-	STOSB
-	OR	AL,AL
+	TEST	RDI,RDI
+	JZ	@@15
+	MOV	RSI,U64 SF_ARG2[RBP]
+	TEST	RSI,RSI
 	JNZ	@@05
-	POP	RDI
+	XOR	RAX,RAX
+	JMP	@@10
+@@05:	LODSB
+@@10:	STOSB
+	TEST	AL,AL
+	JNZ	@@05
+@@15:	POP	RDI
 	POP	RSI
 	LEAVE
 	RET1	16
@@ -109,7 +117,7 @@ _STRCMP::
 	MOV	RSI,U64 SF_ARG2[RBP]
 	MOV	RDI,U64 SF_ARG1[RBP]
 @@05:	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@20
 	SCASB
 	JE	@@05
@@ -141,7 +149,7 @@ _STRICMP::
 	MOV	RSI,U64 SF_ARG2[RBP]
 	MOV	RDI,U64 SF_ARG1[RBP]
 @@05:	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@30
 	CMP	AL,'a'
 	JB	@@10
@@ -163,7 +171,7 @@ _STRICMP::
 @@25:	MOV	RAX,-1
 	JMP	@@35
 @@30:	MOV	BL,U8 [RDI]
-	OR	BL,BL
+	TEST	BL,BL
 	JNE	@@20
 	XOR	RAX,RAX
 @@35:	POP	RDI
@@ -178,11 +186,11 @@ _STRNCMP::
 	MOV	RCX,U64 SF_ARG3[RBP]
 	MOV	RSI,U64 SF_ARG2[RBP]
 	MOV	RDI,U64 SF_ARG1[RBP]
-@@05:	OR	RCX,RCX
+@@05:	TEST	RCX,RCX
 	JZ	@@25
 	DEC	RCX
 	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@20
 	SCASB
 	JE	@@05
@@ -192,7 +200,7 @@ _STRNCMP::
 @@15:	MOV	RAX,-1
 	JMP	@@30
 @@20:	MOV	BL,U8 [RDI]
-	OR	BL,BL
+	TEST	BL,BL
 	JNE	@@10
 @@25:	XOR	RAX,RAX
 @@30:	POP	RDI
@@ -207,11 +215,11 @@ _STRNICMP::
 	MOV	RCX,U64 SF_ARG3[RBP]
 	MOV	RSI,U64 SF_ARG2[RBP]
 	MOV	RDI,U64 SF_ARG1[RBP]
-@@05:	OR	RCX,RCX
+@@05:	TEST	RCX,RCX
 	JZ	@@35
 	DEC	RCX
 	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@30
 	CMP	AL,'a'
 	JB	@@10
@@ -240,30 +248,30 @@ _STRNICMP::
 	LEAVE
 	RET1	24
 // ************************************
-_STRSTR::
+_STRMATCH::
 	ENTER	0
 	PUSH	RSI
 	PUSH	RDI
-	MOV	RSI,U64 SF_ARG1[RBP]
-	OR	RSI,RSI
+	MOV	RSI,U64 SF_ARG2[RBP]
+	TEST	RSI,RSI
 	JZ	@@25
-	MOV	RDI,U64 SF_ARG2[RBP]
-	OR	RDI,RDI
+	MOV	RDI,U64 SF_ARG1[RBP]
+	TEST	RDI,RDI
 	JZ	@@25
 	MOV	DL,U8 [RDI]
-	OR	DL,DL
+	TEST	DL,DL
 	JZ	@@20
 	JMP	@@10
 @@05:	INC	RSI
 @@10:	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@25
 	CMP	AL,DL
 	JNE	@@10
 	DEC	RSI
 	MOV	RCX,1
 @@15:	MOV	AL,U8 [RDI+RCX]
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@20
 	CMP	AL,U8 [RSI+RCX]
 	JNE	@@05
@@ -279,26 +287,26 @@ _STRSTR::
 	LEAVE
 	RET1	16
 // ************************************
-_STRISTR::
+_STRIMATCH::
 	ENTER	0
 	PUSH	RSI
 	PUSH	RDI
-	MOV	RSI,U64 SF_ARG1[RBP]
-	OR	RSI,RSI
+	MOV	RSI,U64 SF_ARG2[RBP]
+	TEST	RSI,RSI
 	JZ	@@25
-	MOV	RDI,U64 SF_ARG2[RBP]
-	OR	RDI,RDI
+	MOV	RDI,U64 SF_ARG1[RBP]
+	TEST	RDI,RDI
 	JZ	@@25
 	MOV	AL,U8 [RDI]
 	CALL	TO_UPPER
 	MOV	DL,AL
-	OR	DL,DL
+	TEST	DL,DL
 	JZ	@@20
 	JMP	@@10
 @@05:	INC	RSI
 @@10:	LODSB
 	CALL	TO_UPPER
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@25
 	CMP	AL,DL
 	JNE	@@10
@@ -306,7 +314,7 @@ _STRISTR::
 	MOV	RCX,1
 @@15:	MOV	AL,U8 [RDI+RCX]
 	CALL	TO_UPPER
-	OR	AL,AL
+	TEST	AL,AL
 	JZ	@@20
 	MOV	BL,U8 [RSI+RCX]
 	XCHG	AL,BL
@@ -329,8 +337,8 @@ _extern _STRCMP I64 StrCmp(U8 *st1,U8 *st2);
 _extern _STRICMP I64 StrICmp(U8 *st1,U8 *st2);
 _extern _STRNCMP I64 StrNCmp(U8 *st1,U8 *st2,I64 n);
 _extern _STRNICMP I64 StrNICmp(U8 *st1,U8 *st2,I64 n);
-_extern _STRSTR U8 *StrStr(U8 *st,U8 *pattern);
-_extern _STRISTR U8 *StrIStr(U8 *st,U8 *pattern);
+_extern _STRMATCH U8 *StrMatch(U8 *pattern,U8 *st);
+_extern _STRIMATCH U8 *StrIMatch(U8 *pattern,U8 *st);
 _extern _STRCPY U0 StrCpy(U8 *dst,U8 *src);
 _extern _STRCAT U0 StrCat(U8 *dst,U8 *src);
 
@@ -390,92 +398,73 @@ U32 non_eol_chars_bitmap[16]=
 {0xFFFFDBFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
 0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
 
-U8 *LstEntryPt(I64 entry_num, U8 *lst)
+U8 *LstSub(I64 sub, U8 *lst)
 {//Point to lst entry.
  //Not especially efficient but handy.  Use an array of U8*'s for efficiency.
   if (!lst) return NULL;
-  while (*lst && entry_num>0) {
+  while (*lst && sub>0) {
     while (*lst)  // Advance to end of cur entry.
       lst++;
     lst++;    // Skip trailing zero
     if (*lst=='@') // Check for '@' alias lst entry
       lst++;
     else
-      entry_num--;
+      sub--;
   }
-  if (entry_num||!*lst)
+  if (sub||!*lst)
     return NULL;
   else
     return lst;
 }
 
-I64 LstEntryMatch(U8 *src, U8 *lst,I64 flags=0,I64 *_ambiguity_overkill=NULL)
-// RETURNS: -2 if Ambiguous, -1 if not found, else entry_num
+I64 LstMatch(U8 *pattern, U8 *lst,I64 flags=0)
+// RETURNS: -2 if Ambiguous, -1 if not found, else entry num
 { //Not especially efficient but handy.  Use hash tables for efficiency.
-  I64 n,entry_num=0,result=-1,unutilized_src;
-  U8 *s;
+  I64 n,sub=0,result=-1;
+  U8 *ptr;
   Bool exact_match=FALSE;
-
-  if (!lst) goto lm_done;
-  n=StrLen(src);
-  if (_ambiguity_overkill)
-    *_ambiguity_overkill=n;
+  if (!lst) return -1;
+  n=StrLen(pattern);
   while (*lst) {
     if (*lst=='@') { //Check for '@' alias lst entry
-      entry_num--;
+      sub--;
       lst++;
     }
-
-    s=src;
-    if (flags & LEF_IGNORE_CASE)
-      while (*s && ToUpper(*s)==ToUpper(*lst)) {
-	s++;
+    ptr=pattern;
+    if (flags & LMF_IGNORE_CASE)
+      while (*ptr && ToUpper(*ptr)==ToUpper(*lst)) {
+	ptr++;
 	lst++;
       }
     else
-      while (*s && *s==*lst) {
-	s++;
+      while (*ptr && *ptr==*lst) {
+	ptr++;
 	lst++;
       }
-    unutilized_src=n-(s-src);
-    if (!*s) {	  // Did we reach end of src
-      if (!*lst) {  // Did we reach end of lst entrycount
-	if (!_ambiguity_overkill)
-	  return entry_num;  // Found Exact match
-	result=entry_num;
-	exact_match=TRUE;
-      } else {
+    if (!*ptr) {	  // Did we reach end of pattern
+      if (!*lst)  // Did we reach end of lst entrycount
+	return sub;  // Found Exact match
+      else {
 	if (result!=-1) {
-	  if (_ambiguity_overkill)
-	    *_ambiguity_overkill=0;
 	  if (!exact_match)
 	    result=-2; // AMBIGUOUS RESPONSE unless later exact match
 	} else {
-	  if (!(flags & LEF_EXACT))
-	    result=entry_num;
+	  if (!(flags & LMF_EXACT))
+	    result=sub;
 	}
       }
-    } else {
-      if (_ambiguity_overkill && *_ambiguity_overkill>unutilized_src-1)
-	*_ambiguity_overkill=unutilized_src-1;
     }
-
     while (*lst)  // Advance to end of cur entry.
       lst++;
     lst++;    // Skip trailing zero
-    entry_num++;
+    sub++;
   }
-lm_done:
-  if (_ambiguity_overkill && result==-1)
-    *_ambiguity_overkill=0;
   return result;
 }
 
 U0 UndefinedDefine(U8 *name)
 {
-  ST_ERR_ST "Undefined Define: '";
-  "" name;
-  "'.\n";
+  ST_ERR_ST "Undefined Define: '%s'.\n",name;
   throw(EXCEPT_UNDEF_DEFINE,name);
 }
 
@@ -516,23 +505,21 @@ I64 DefineSubCnt(U8 *name)
     return -1;
 }
 
-I64 DefineMatch(U8 *src,U8 *lst_name,
-  I64 flags=0,I64 *_ambiguity_overkill=NULL)
+I64 DefineMatch(U8 *pattern,U8 *lst_name,I64 flags=0)
 {
-  return LstEntryMatch(src,Define(lst_name),
-    flags,_ambiguity_overkill);
+  return LstMatch(pattern,Define(lst_name),flags);
 }
 
 U0 PutDefine(U8 *name)
 {
-  "" Define(name);
+  "%s",Define(name);
 }
 
 U0 GetOutOfDollar()
 {
   CDoc *doc;
   if (IsRaw) {
-    if (sys_raw_dc_flags&RDCF_IN_DOLLAR)
+    if (sys_raw_flags&RWF_IN_DOLLAR)
       '$$';
   } else {
     if (fp_doc_put && (doc=(*fp_doc_put)(Fs)) && doc->flags&DOCF_IN_DOLLAR)
@@ -556,20 +543,14 @@ U0 PutErr(U8 *st=NULL)
 {
   GetOutOfDollar;
   PutDefine("ST_ERR");
-  if (st) {
-    "" st;
-    NewLine;
-  }
+  if (st) "%s\n",st;
 }
 
 U0 PutWarn(U8 *st=NULL)
 {
   GetOutOfDollar;
   PutDefine("ST_WARN");
-  if (st) {
-    "" st;
-    NewLine;
-  }
+  if (st) "%s\n",st;
 }
 
 U0 PutDefineErr(U8 *st)
@@ -600,15 +581,10 @@ Bool YorN()
   }
 }
 
-Bool PressAKey()
+I64 PressAKey()
 {
-  I64 ch;
   PutDefine("ST_PRESS_A_KEY");
-  ch=GetChar(,FALSE);
-  if (ch==CH_SHIFT_ESC || ch==CH_ESC)
-    return FALSE;
-  else
-    return TRUE;
+  return GetChar(,FALSE);
 }
 
 Bool AreYouSure()
@@ -910,18 +886,18 @@ U8 *StrLastRem(U8 *src,U8 *marker,U8 *dst=NULL)
   return dst;
 }
 
-U8 *SearchStr(U8 *src,U8 *pattern,I64 flags=0)
+U8 *StrFind(U8 *pattern,U8 *src,I64 flags=0)
 {
   Bool cont;
   U8 *saved_src=src;
   I64 plen=StrLen(pattern);
   do {
     cont=FALSE;
-    if (flags & SRF_IGNORE_CASE)
-      src=StrIStr(src,pattern);
+    if (flags & SFF_IGNORE_CASE)
+      src=StrIMatch(pattern,src);
     else
-      src=StrStr(src,pattern);
-    if (src && flags & SRF_WHOLE_LABELS_FRONT) {
+      src=StrMatch(pattern,src);
+    if (src && flags & SFF_WHOLE_LABELS_FRONT) {
       if (src!=saved_src) {
 	if (Bt(alpha_numeric_bitmap,*(src-1))) {
 	  src++;
@@ -932,7 +908,7 @@ U8 *SearchStr(U8 *src,U8 *pattern,I64 flags=0)
 	}
       }
     }
-    if (src && flags & SRF_WHOLE_LABELS_BACK) {
+    if (src && flags & SFF_WHOLE_LABELS_BACK) {
       if (Bt(alpha_numeric_bitmap,*(src+plen))) {
 	src++;
 	if (*src)
@@ -945,12 +921,12 @@ U8 *SearchStr(U8 *src,U8 *pattern,I64 flags=0)
   return src;
 }
 
-Bool WildCardMatch(U8 *wild,U8 *src)
+Bool WildMatch(U8 *pattern,U8 *wild)
 {
   I64 ch1,ch2;
   U8 *fall_back_src=NULL,*fall_back_wild=NULL;
   while (TRUE) {
-    if (!(ch1=*src++)) {
+    if (!(ch1=*pattern++)) {
       if (*wild && *wild!='*')
 	return FALSE;
       else
@@ -961,17 +937,17 @@ Bool WildCardMatch(U8 *wild,U8 *src)
       else {
 	if (ch2=='*') {
 	  fall_back_wild=wild-1;
-	  fall_back_src=src;
+	  fall_back_src=pattern;
 	  if (!(ch2=*wild++))
 	    return TRUE;
 	  while (ch2!=ch1)
-	    if (!(ch1=*src++))
+	    if (!(ch1=*pattern++))
 	      return FALSE;
 	} else
 	  if (ch2!='?' && ch1!=ch2) {
 	    if (fall_back_wild) {
 	      wild=fall_back_wild;
-	      src=fall_back_src;
+	      pattern=fall_back_src;
 	      fall_back_wild=NULL;
 	      fall_back_src=NULL;
 	    } else
@@ -1054,7 +1030,7 @@ ai_skip:
     return result;
 }
 
-U0 GetFFlags(U8 *f,U8 *lst,U8 *st)
+U0 ScanFlags(U8 *f,U8 *lst,U8 *st)
 {
   I64 i;
   U8 *st2,*ptr;
@@ -1070,7 +1046,7 @@ U0 GetFFlags(U8 *f,U8 *lst,U8 *st)
 	  while (*st && *st!='+' && *st!='-' && *st!=CH_SPACE && *st!=CH_SHIFT_SPACE)
 	    *ptr++=*st++;
 	  *ptr=0;
-	  i=LstEntryMatch(st2,lst);
+	  i=LstMatch(st2,lst);
 	  if (i>=0)
 	    LBts(f,i);
 	  else {
@@ -1085,7 +1061,7 @@ U0 GetFFlags(U8 *f,U8 *lst,U8 *st)
 	  while (*st && *st!='+' && *st!='-' && *st!=CH_SPACE && *st!=CH_SHIFT_SPACE)
 	    *ptr++=*st++;
 	  *ptr=0;
-	  i=LstEntryMatch(st2,lst);
+	  i=LstMatch(st2,lst);
 	  if (i>=0)
 	    LBtr(f,i);
 	  else {
@@ -1099,19 +1075,19 @@ U0 GetFFlags(U8 *f,U8 *lst,U8 *st)
   }
 }
 
-U8 *SPrintFFlags(U8 *dst,U8 *lst,I64 flags)
+U8 *SPrintFlags(U8 *dst,U8 *lst,I64 flags)
 {
   I64 i;
   *dst=0;
   for (i=0;i<=63;i++)
     if (Bt(&flags,i)) {
       StrCat(dst,"+");
-      StrCat(dst,LstEntryPt(i,lst));
+      StrCat(dst,LstSub(i,lst));
     }
   return dst;
 }
 
-U0 SPrintFPutChar(U8 **_dst,U8 ch,U8 **_buf)
+U0 SPutChar(U8 **_dst,U8 ch,U8 **_buf)
 {
   I64 i;
   U8 *dst=*_dst,*buf;
@@ -1141,18 +1117,18 @@ U0 OutStr(U8 *ptr,U8 **_buf,U8 **_dst,
     i=len;
   if (left_justify) {
     for (j=0;j<i;j++)
-      SPrintFPutChar(_dst,*ptr++,_buf);
+      SPutChar(_dst,*ptr++,_buf);
     for (j=0;j<len-i;j++)
-      SPrintFPutChar(_dst,CH_SPACE,_buf);
+      SPutChar(_dst,CH_SPACE,_buf);
   } else {
     for (j=0;j<len-i;j++)
-      SPrintFPutChar(_dst,CH_SPACE,_buf);
+      SPutChar(_dst,CH_SPACE,_buf);
     for (j=len-i;j<len;j++)
-      SPrintFPutChar(_dst,*ptr++,_buf);
+      SPutChar(_dst,*ptr++,_buf);
   }
 }
 
-U8 *MSPrintFQ(U8 *ptr,Bool dollar_flag)
+U8 *MPrintQ(U8 *ptr,Bool dollar_flag)
 {
   U8 **_buf,*buf,**_dst,*dst;
   I64 ch;
@@ -1165,49 +1141,49 @@ U8 *MSPrintFQ(U8 *ptr,Bool dollar_flag)
       switch (ch) {
 	case '$$':
 	  if (dollar_flag) {
-	    SPrintFPutChar(_dst,'\\',_buf);
-	    SPrintFPutChar(_dst,'$$'>>6&7+'0',_buf);
-	    SPrintFPutChar(_dst,'$$'>>3&7+'0',_buf);
-	    SPrintFPutChar(_dst,'$$'&7+'0',_buf);
+	    SPutChar(_dst,'\\',_buf);
+	    SPutChar(_dst,'$$'>>6&7+'0',_buf);
+	    SPutChar(_dst,'$$'>>3&7+'0',_buf);
+	    SPutChar(_dst,'$$'&7+'0',_buf);
 	  } else {
-	    SPrintFPutChar(_dst,ch,_buf);
-	    SPrintFPutChar(_dst,ch,_buf);
+	    SPutChar(_dst,ch,_buf);
+	    SPutChar(_dst,ch,_buf);
 	  }
 	  break;
 	case '\n':
-	  SPrintFPutChar(_dst,'\\',_buf);
-	  SPrintFPutChar(_dst,'n',_buf);
+	  SPutChar(_dst,'\\',_buf);
+	  SPutChar(_dst,'n',_buf);
 	  break;
 	case '\r':
-	  SPrintFPutChar(_dst,'\\',_buf);
-	  SPrintFPutChar(_dst,'r',_buf);
+	  SPutChar(_dst,'\\',_buf);
+	  SPutChar(_dst,'r',_buf);
 	  break;
 	case '\t':
-	  SPrintFPutChar(_dst,'\\',_buf);
-	  SPrintFPutChar(_dst,'t',_buf);
+	  SPutChar(_dst,'\\',_buf);
+	  SPutChar(_dst,'t',_buf);
 	  break;
 	case '"':
 	case '\\':
-	  SPrintFPutChar(_dst,'\\',_buf);
-	  SPrintFPutChar(_dst,ch,_buf);
+	  SPutChar(_dst,'\\',_buf);
+	  SPutChar(_dst,ch,_buf);
 	  break;
 	default:
 	  if (CH_SHIFT_SPACE<=ch<=0x7F) {
-	    SPrintFPutChar(_dst,ch,_buf);
+	    SPutChar(_dst,ch,_buf);
 	  } else {
-	    SPrintFPutChar(_dst,'\\',_buf);
-	    SPrintFPutChar(_dst,ch>>6&7+'0',_buf);
-	    SPrintFPutChar(_dst,ch>>3&7+'0',_buf);
-	    SPrintFPutChar(_dst,ch&7+'0',_buf);
+	    SPutChar(_dst,'\\',_buf);
+	    SPutChar(_dst,ch>>6&7+'0',_buf);
+	    SPutChar(_dst,ch>>3&7+'0',_buf);
+	    SPutChar(_dst,ch&7+'0',_buf);
 	  }
       }
     }
-  SPrintFPutChar(_dst,0,_buf);
+  SPutChar(_dst,0,_buf);
   return buf;
 }
 
 
-U8 *MSPrintFq(U8 *ptr)
+U8 *MPrintq(U8 *ptr)
 {
   U8 **_buf,*buf,**_dst,*dst;
   I64 i,ch,ch1;
@@ -1221,31 +1197,31 @@ U8 *MSPrintFq(U8 *ptr)
       if (ch=='\\')
 	switch (ch1) {
 	  case 'n':
-	    SPrintFPutChar(_dst,'\n',_buf);
+	    SPutChar(_dst,'\n',_buf);
 	    ptr++;
 	    break;
 	  case 'r':
-	    SPrintFPutChar(_dst,'\r',_buf);
+	    SPutChar(_dst,'\r',_buf);
 	    ptr++;
 	    break;
 	  case '"':
-	    SPrintFPutChar(_dst,'"',_buf);
+	    SPutChar(_dst,'"',_buf);
 	    ptr++;
 	    break;
 	  case '\'':
-	    SPrintFPutChar(_dst,'\'',_buf);
+	    SPutChar(_dst,'\'',_buf);
 	    ptr++;
 	    break;
 	  case '\`':
-	    SPrintFPutChar(_dst,'\`',_buf);
+	    SPutChar(_dst,'\`',_buf);
 	    ptr++;
 	    break;
 	  case '\\':
-	    SPrintFPutChar(_dst,'\\',_buf);
+	    SPutChar(_dst,'\\',_buf);
 	    ptr++;
 	    break;
 	  case 't':
-	    SPrintFPutChar(_dst,'\t',_buf);
+	    SPutChar(_dst,'\t',_buf);
 	    ptr++;
 	    break;
 	  case 'x':
@@ -1263,7 +1239,7 @@ U8 *MSPrintFq(U8 *ptr)
 		break;
 	    }
 	    ptr--;
-	    SPrintFPutChar(_dst,i,_buf);
+	    SPutChar(_dst,i,_buf);
 	    break;
 	  case 'b':
 	  case 'B':
@@ -1277,7 +1253,7 @@ U8 *MSPrintFq(U8 *ptr)
 		break;
 	    }
 	    ptr--;
-	    SPrintFPutChar(_dst,i,_buf);
+	    SPutChar(_dst,i,_buf);
 	    break;
 	  case 'o':
 	  case 'O':
@@ -1296,37 +1272,37 @@ sq_octal:
 		break;
 	    }
 	    ptr--;
-	    SPrintFPutChar(_dst,i,_buf);
+	    SPutChar(_dst,i,_buf);
 	    break;
 	  default:
-	    SPrintFPutChar(_dst,ch,_buf);
+	    SPutChar(_dst,ch,_buf);
 	}
       else if (ch=='$$' && ch1=='$$') {
-	SPrintFPutChar(_dst,ch,_buf);
+	SPutChar(_dst,ch,_buf);
 	ptr++;
       } else {
-	SPrintFPutChar(_dst,ch,_buf);
+	SPutChar(_dst,ch,_buf);
       }
     }
-  SPrintFPutChar(_dst,0,_buf);
+  SPutChar(_dst,0,_buf);
   return buf;
 }
 
-U8 *sprintf_pos_powers_lst=
+U8 *sprint_pos_powers_lst=
 "kilo\0mega\0giga\0tera\0peta\0exa\0zetta\0yotta\0";
-U8 *sprintf_pos_powers_lets=
+U8 *sprint_pos_powers_lets=
 " kMGTPEZY";
 
-U8 *sprintf_neg_powers_lst=
+U8 *sprint_neg_powers_lst=
 "milli\0micro\0nano\0pico\0femto\0atto\0zepto\0yocto\0";
-U8 *sprintf_neg_powers_lets=
+U8 *sprint_neg_powers_lets=
 " mænpfazy";
 
 #define TEMP_BUF_LEN	256
 #define SLOP		8
 
-U8 *SPrintFJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
-{ //$LK,"printF codes","FA:::/TempleOS/Doc/HolyC.TXT,PrintF_Codes"$
+U8 *SPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
+{ //$LK,"Print Codes","FA:::/TempleOS/Doc/HolyC.TXT,Print_Codes"$
 /*
 In float formatting, do not exceed 18-digits
 before or after the decimal point
@@ -1343,7 +1319,7 @@ to avoid this.
   U8 *ptr,**_buf,*buf,**_dst,*temp1,temp_buf[TEMP_BUF_LEN];
 
   if (!src)
-    throw(EXCEPT_SPRINTF,0);
+    throw(EXCEPT_SPRINT,0);
   if (dst) {
     _buf=NULL;
     buf=dst;
@@ -1372,7 +1348,7 @@ to avoid this.
       if (*src=='*') {
 	src++;
 	if (cur_arg>=argc)
-	  throw(EXCEPT_SPRINTF,1);
+	  throw(EXCEPT_SPRINT,1);
 	len=argv[cur_arg++];
       }
       dec_len=0;
@@ -1383,7 +1359,7 @@ to avoid this.
 	if (*src=='*') {
 	  src++;
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  dec_len=argv[cur_arg++];
 	}
 	has_decimal=TRUE;
@@ -1435,7 +1411,7 @@ sp_in_sub_fmt:
 	  if (*src=='*') {
 	    src++;
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_SPRINTF,1);
+	      throw(EXCEPT_SPRINT,1);
 	    sub_fmt=argv[cur_arg++];
 	  } else {
 	    if (*src=='-') {
@@ -1455,61 +1431,61 @@ sp_in_sub_fmt:
       switch (*src++) {
 	case 's':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  ptr=argv[cur_arg++];
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'S':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  ptr=Define(argv[cur_arg++]);
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'F':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  ptr=TextFileRead(argv[cur_arg++]);
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  Free(ptr);
 	  break;
 	case 'Q':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
-	  ptr=MSPrintFQ(argv[cur_arg++],dollar_flag);
+	    throw(EXCEPT_SPRINT,1);
+	  ptr=MPrintQ(argv[cur_arg++],dollar_flag);
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  Free(ptr);
 	  break;
 	case 'q':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
-	  ptr=MSPrintFq(argv[cur_arg++]);
+	    throw(EXCEPT_SPRINT,1);
+	  ptr=MPrintq(argv[cur_arg++]);
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  Free(ptr);
 	  break;
 	case 'z':
 	  if (cur_arg+1>=argc)
-	    throw(EXCEPT_SPRINTF,1);
-	  ptr=LstEntryPt(argv[cur_arg],argv[cur_arg+1]);
+	    throw(EXCEPT_SPRINT,1);
+	  ptr=LstSub(argv[cur_arg],argv[cur_arg+1]);
 	  cur_arg=cur_arg+2;
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'Z':
 	  if (cur_arg+1>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  ptr=DefineSub(argv[cur_arg],argv[cur_arg+1]);
 	  cur_arg=cur_arg+2;
 	  OutStr(ptr,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'c':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  temp_buf[0](I64)=argv[cur_arg++];
 	  temp_buf[8]	    =0;
 	  OutStr(temp_buf,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'C':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  temp_buf[0](I64)=argv[cur_arg++];
 	  temp_buf[8]	    =0;
 	  ptr=temp_buf;
@@ -1521,30 +1497,30 @@ sp_in_sub_fmt:
 	  break;
 	case 'D':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
-	  temp1=MSPrintFDate(argv[cur_arg++],sub_fmt);
+	    throw(EXCEPT_SPRINT,1);
+	  temp1=MPrintDate(argv[cur_arg++],sub_fmt);
 	  OutStr(temp1,_buf,_dst,len,left_justify,truncate_flag);
 	  Free(temp1);
 	  break;
 	case 'T':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
-	  temp1=MSPrintFTime(argv[cur_arg++],sub_fmt);
+	    throw(EXCEPT_SPRINT,1);
+	  temp1=MPrintTime(argv[cur_arg++],sub_fmt);
 	  OutStr(temp1,_buf,_dst,len,left_justify,truncate_flag);
 	  Free(temp1);
 	  break;
 	case 'P':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  if (truncate_flag)
-	    SPrintFPSect(temp_buf,argv[cur_arg++],len);
+	    SPrintPSect(temp_buf,argv[cur_arg++],len);
 	  else
-	    SPrintFPSect(temp_buf,argv[cur_arg++],0);
+	    SPrintPSect(temp_buf,argv[cur_arg++],0);
 	  OutStr(temp_buf,_buf,_dst,len,left_justify,truncate_flag);
 	  break;
 	case 'd':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  if (m(I64)<0) {
 	    neg=TRUE;
@@ -1579,22 +1555,22 @@ sp_out_comma_num:
 	      k=0;
 	    if (pad_zero) {
 	      if (neg)
-		SPrintFPutChar(_dst,'-',_buf);
+		SPutChar(_dst,'-',_buf);
 	      comma_cnt=(len-k-i+comma_fmt_cnt-comma_cnt+1)%(comma_fmt_cnt+1)+1;
 	      for (;i<len-k;i++) {
 		if (!--comma_cnt) {
-		  SPrintFPutChar(_dst,',',_buf);
+		  SPutChar(_dst,',',_buf);
 		  comma_cnt=comma_fmt_cnt;
 		  if (++i>=len-k)
 		    break;
 		}
-		SPrintFPutChar(_dst,'0',_buf);
+		SPutChar(_dst,'0',_buf);
 	      }
 	    } else {
 	      for (;i<len-k;i++)
-		SPrintFPutChar(_dst,CH_SPACE,_buf);
+		SPutChar(_dst,CH_SPACE,_buf);
 	      if (neg)
-		SPrintFPutChar(_dst,'-',_buf);
+		SPutChar(_dst,'-',_buf);
 	    }
 	  } else {
 	    do {
@@ -1614,27 +1590,27 @@ sp_out_num:
 	      k=0;
 	    if (pad_zero) {
 	      if (neg)
-		SPrintFPutChar(_dst,'-',_buf);
+		SPutChar(_dst,'-',_buf);
 	      for (;i<len-k;i++)
-		SPrintFPutChar(_dst,'0',_buf);
+		SPutChar(_dst,'0',_buf);
 	    } else {
 	      for (;i<len-k;i++)
-		SPrintFPutChar(_dst,CH_SPACE,_buf);
+		SPutChar(_dst,CH_SPACE,_buf);
 	      if (neg)
-		SPrintFPutChar(_dst,'-',_buf);
+		SPutChar(_dst,'-',_buf);
 	    }
 	  }
 	  for (i=k-1;i>=0;i--)
-	    SPrintFPutChar(_dst,temp_buf[i],_buf);
+	    SPutChar(_dst,temp_buf[i],_buf);
 	  break;
 	case 'u':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  goto sp_out_dec;
 	case 'f':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    neg=TRUE;
@@ -1655,11 +1631,11 @@ sp_out_inf:
 	    if (k<0)
 	      k=0;
 	    for (;i<len-k;i++)
-	      SPrintFPutChar(_dst,CH_SPACE,_buf);
+	      SPutChar(_dst,CH_SPACE,_buf);
 	    if (neg)
-	      SPrintFPutChar(_dst,'-',_buf);
+	      SPutChar(_dst,'-',_buf);
 	    for (i=0;i<k;i++)
-	      SPrintFPutChar(_dst,'ì',_buf);
+	      SPutChar(_dst,'ì',_buf);
 	    break;
 	  }
 
@@ -1741,7 +1717,7 @@ sp_out_f:
 	  truncate_flag=TRUE;
 
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    neg=TRUE;
@@ -1795,7 +1771,7 @@ sp_out_e:
 	  if (!len) len=12;
 	  truncate_flag=TRUE;
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    neg=TRUE;
@@ -1814,7 +1790,7 @@ sp_out_e:
 	  if (!len) len=12;
 	  truncate_flag=TRUE;
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  d=argv[cur_arg++](F64);
 	  k_flag=TRUE;
 	  if (d<0) {
@@ -1870,9 +1846,9 @@ sp_out_eng: //Engineering notation
 		i=sub_fmt/3;
 	      }
 	      if (i<0)
-		temp_buf[k++]=sprintf_neg_powers_lets[-i];
+		temp_buf[k++]=sprint_neg_powers_lets[-i];
 	      else if (i>0)
-		temp_buf[k++]=sprintf_pos_powers_lets[i];
+		temp_buf[k++]=sprint_pos_powers_lets[i];
 	      else if (len!=0)
 		temp_buf[k++]=CH_SPACE;
 	      if (!has_decimal) {
@@ -1932,7 +1908,7 @@ sp_out_eng: //Engineering notation
 	  goto sp_out_f;
 	case 'X':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  if (comma_flag) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -1959,7 +1935,7 @@ sp_out_eng: //Engineering notation
 	  }
 	case 'x':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  if (comma_flag) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -1987,7 +1963,7 @@ sp_out_eng: //Engineering notation
 	case 'b':
 	case 'B':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  if (comma_flag) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -2011,7 +1987,7 @@ sp_out_eng: //Engineering notation
 	case 'o':
 	case 'O':
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_SPRINTF,1);
+	    throw(EXCEPT_SPRINT,1);
 	  m=argv[cur_arg++];
 	  if (comma_flag) {
 	    comma_fmt_cnt=comma_cnt=3;
@@ -2033,19 +2009,19 @@ sp_out_eng: //Engineering notation
 	    goto sp_out_num;
 	  }
 	case '%':
-	  SPrintFPutChar(_dst,'%',_buf);
+	  SPutChar(_dst,'%',_buf);
 	  break;
       }
     } else
-      SPrintFPutChar(_dst,ch,_buf);
+      SPutChar(_dst,ch,_buf);
   }
-  SPrintFPutChar(_dst,0,_buf);
+  SPutChar(_dst,0,_buf);
   return buf;
 }
 
-U8 *SPrintF(U8 *dst,U8 *fmt,...)
-{ //See $LK,"SPrintFJoin","MN:SPrintFJoin"$()
-  return SPrintFJoin(dst,fmt,argc,argv);
+U8 *SPrint(U8 *dst,U8 *fmt,...)
+{ //See $LK,"SPrintJoin","MN:SPrintJoin"$()
+  return SPrintJoin(dst,fmt,argc,argv);
 }
 
 /*
@@ -2097,7 +2073,7 @@ CDate A2Date(U8 *_src)
     p1++;
     if (*p1=='+' || *p1=='-')
       result.date=A2I(p1,10,&p1);
-    result+=GetCurTimeDate+local_time_offset;
+    result+=GetDateTime+local_time_offset;
   } else {
     StrFirstRem(p1,"/",v); //Put mon into v
     ds.mon=A2I(v);
@@ -2109,7 +2085,7 @@ CDate A2Date(U8 *_src)
 	ds.year+=2000;
     } else {
       ds.day_of_mon=A2I(p1,10,&p1);
-      Date2DateStruct(&ds1,GetCurTimeDate+local_time_offset);
+      Date2DateStruct(&ds1,GetDateTime+local_time_offset);
       ds.year=ds1.year;
     }
     result=DateStruct2Date(&ds);
@@ -2217,7 +2193,7 @@ a2f_end:
     return d;
 }
 
-U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
+U8 *ScanJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 //Pass ptr to data,
 //For %s pass ptr to ptr (be careful because addr
 //of array is the same as array--create ptr to array and take addr
@@ -2227,7 +2203,7 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
   I64 cur_arg=0,i,len,*i_ptr,dec_len;
   F64 *d_ptr;
   if (!fmt)
-    throw(EXCEPT_GETF,0);
+    throw(EXCEPT_SCAN,0);
   while (ch = *fmt++) {
     if (ch=='%') {
       if (*fmt=='%') {
@@ -2245,7 +2221,7 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 	if (*fmt=='*') {
 	  fmt++;
 	  if (cur_arg>=argc)
-	    throw(EXCEPT_GETF,1);
+	    throw(EXCEPT_SCAN,1);
 	  len=argv[cur_arg++];
 	}
 	ch=*fmt++;
@@ -2262,7 +2238,7 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 	    if (*fmt=='*') {
 	      fmt++;
 	      if (cur_arg>=argc)
-		throw(EXCEPT_GETF,1);
+		throw(EXCEPT_SCAN,1);
 	      dec_len=argv[cur_arg++];
 	    }
 	    ch=*fmt++;
@@ -2275,49 +2251,49 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 	switch (ch) {
 	  case 's':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    pptr=argv[cur_arg++];
 	    StrCpy(*pptr,buf);
 	    break;
 	  case 'c':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    ptr=argv[cur_arg++];
 	    *ptr=*buf;
 	    break;
 	  case 'C':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    ptr=argv[cur_arg++];
 	    *ptr=ToUpper(*buf);
 	    break;
 	  case 'z':
 	    if (cur_arg+1>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
-	    *i_ptr=LstEntryMatch(buf,argv[cur_arg++]);
+	    *i_ptr=LstMatch(buf,argv[cur_arg++]);
 	    break;
 	  case 'Z':
 	    if (cur_arg+1>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
 	    *i_ptr=DefineMatch(buf,argv[cur_arg++]);
 	    break;
 	  case 'd':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
 	    *i_ptr=A2I(buf);
 	    break;
 	  case 'X':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
 	    *i_ptr=A2I(buf,16);
 	    break;
 	  case 'b':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
 	    *i_ptr=A2I(buf,2);
 	    break;
@@ -2326,13 +2302,13 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
 	  case 'g':
 	  case 'n':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    d_ptr=argv[cur_arg++];
 	    *d_ptr=A2F64(buf);
 	    break;
 	  case 'D':
 	    if (cur_arg>=argc)
-	      throw(EXCEPT_GETF,1);
+	      throw(EXCEPT_SCAN,1);
 	    i_ptr=argv[cur_arg++];
 	    *i_ptr=A2Date(buf);
 	    break;
@@ -2345,51 +2321,51 @@ U8 *GetFJoin(U8 *src,U8 *fmt,I64i argc,I64i *argv)
   return src;
 }
 
-U8 *GetF(U8 *src,U8 *fmt,...)
+U8 *Scan(U8 *src,U8 *fmt,...)
 //Pass ptr to data,
 //For %s pass ptr to ptr (be careful because addr
 //of array is the same as array--create ptr to array and take addr
 {
-  return GetFJoin(src,fmt,argc,argv);
+  return ScanJoin(src,fmt,argc,argv);
 }
 
 
-U0 PrintF(U8 *fmt,...)
-{//$LK,"PrintF Extended Codes","FA:::/TempleOS/Doc/HolyC.TXT,PrintF_Codes"$
- //See $LK,"SPrintFJoin","MN:SPrintFJoin"$()
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
-  "" buf;
+U0 Print(U8 *fmt,...)
+{//$LK,"Print Extended Codes","FA:::/TempleOS/Doc/HolyC.TXT,Print_Codes"$
+ //See $LK,"SPrintJoin","MN:SPrintJoin"$()
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  PutS(buf);
   Free(buf);
 }
 
-U8 *MSPrintF(U8 *fmt,...)
-{ //See $LK,"SPrintFJoin","MN:SPrintFJoin"$()
-  U8 *result,*buf=SPrintFJoin(NULL,fmt,argc,argv);
+U8 *MPrint(U8 *fmt,...)
+{ //See $LK,"SPrintJoin","MN:SPrintJoin"$()
+  U8 *result,*buf=SPrintJoin(NULL,fmt,argc,argv);
   result=StrNew(buf);
   Free(buf);
   return result;
 }
 
-U0 DefinePrintF(U8 *name,U8 *src,...)
+U0 DefinePrint(U8 *name,U8 *src,...)
 {
-  U8 *buf=SPrintFJoin(NULL,src,argc,argv);
+  U8 *buf=SPrintJoin(NULL,src,argc,argv);
   DefineLoad(name,buf);
   Free(buf);
 }
 
-U0 PrintFErr(U8 *fmt,...)
+U0 PrintErr(U8 *fmt,...)
 {
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
   PutErr;
-  "" buf;
+  "%s",buf;
   Free(buf);
 }
 
-U0 PrintFWarn(U8 *fmt,...)
+U0 PrintWarn(U8 *fmt,...)
 {
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
   PutWarn;
-  "" buf;
+  "%s",buf;
   Free(buf);
 }
 

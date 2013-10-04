@@ -119,7 +119,7 @@ public U0 SndWaveCtrlDel(CSndWaveCtrl *swc)
 #define WF_NULL			0
 #define WF_SQUARE		1
 #define WF_SINE			2
-#define WF_TRI		3
+#define WF_TRI			3
 #define WF_SAWTOOTH		4
 #define WF_NOISE		5
 #define WF_NUM_WAVEFORMS	6

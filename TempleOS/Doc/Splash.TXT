@@ -1,6 +1,5 @@
 
-$TX+CX+D,"TempleOS VDD_TEMPLEOS_VERSION","DD_OS_NAME_VERSION"$
-                         
+$TX+CX+D,"TempleOS V1.06","DD_OS_NAME_VERSION"$
 
 
 
@@ -22,9 +21,11 @@ $TX+CX+D,"TempleOS VDD_TEMPLEOS_VERSION","DD_OS_NAME_VERSION"$
 
 
 
-
-
-              Public Domain
-            Operating System
+          
+             Divine Intellect,
+              Public Domain,
+                 64-Bit,
+               Kept Perfect,
+             Operating System
 
             $LK,"Trivial Solutions","FI:::/TempleOS/Doc/TrivialSolutions.TXT"$

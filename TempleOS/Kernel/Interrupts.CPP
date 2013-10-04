@@ -34,7 +34,7 @@ SYS_TIMER_HANDLER::
 	INC	U64 CCPU.idle_pt_hits[RDI]
 
 @@05:	MOV	RAX,U64 CCPU.timer_irq_chain[RDI]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@10
 	PUSH	RSI
 	CALL	RAX
@@ -42,7 +42,7 @@ SYS_TIMER_HANDLER::
 @@10:	ADD	RSP,8
 @@15:	CLI
 	MOV	RAX,U64 CCPU.num[RDI]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@20
 
 	MOV	EAX,U32 LAPIC_EOI
@@ -126,7 +126,7 @@ U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
   *dst(U16 *)++=0x8000+type<<8+dpl<<13;
   *dst(U16 *)++=fp.u16[1];
   *dst(U32 *)++=fp.u32[1];
-  *dst(U32 *)++=0;
+  *dst(U32 *)=0;
   PopFD;
   return result;
 }
@@ -176,15 +176,15 @@ U0 IntInit1()
 { //Interrupt descriptor table part1
   I64 i,temp_ptr[2];
   U32 *ptr;
-  if (!Gs->num) {
+  if (!Gs->num) { //Gs cur $LK,"CCPU","MN:CCPU"$ struct
     sys_idt=CAlloc(16*256);
     for (i=0;i<256;i++)
       IntEntrySet(i,&IntNop);
   }
   ptr=temp_ptr;
-  *ptr(U16 *)++=256*16-1;
+  *ptr(U16 *)++=256*16-1; //Typecasting is postfix
   *ptr(I64 *)++=sys_idt;
-  *ptr(U16 *)++=0;
+  *ptr(U16 *)=0;
   SetRAX(temp_ptr);
   asm {	LIDT U64 [RAX] }
 }

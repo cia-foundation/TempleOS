@@ -2,7 +2,7 @@
 
 //$LK,"StrUtil","MN:StrUtil"$() operations on files
 
-public U0 SUFile(U8 *name,I64 su_flags,F64 indent_scale_factor)
+U0 SUFile(U8 *name,I64 suf_flags,F64 indent_scale_factor)
 {//String utility on a single file
 //See $LK,"SU Flags","MN:SUF_SINGLE_SPACE"$
   U8 *dst;
@@ -12,7 +12,7 @@ public U0 SUFile(U8 *name,I64 su_flags,F64 indent_scale_factor)
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT) {
-      dst=MStrUtil(doc_e->tag,su_flags,indent_scale_factor);
+      dst=MStrUtil(doc_e->tag,suf_flags,indent_scale_factor);
       if (StrCmp(dst,doc_e->tag)) {
 	reduced+=StrLen(doc_e->tag)-StrLen(dst);
 	chged=TRUE;
@@ -31,38 +31,28 @@ public U0 SUFile(U8 *name,I64 su_flags,F64 indent_scale_factor)
   DocDel(doc);
 }
 
-U0 SULst(CDirEntry *tempm1,I64 su_flags,F64 indent_scale_factor)
-{
-  CDirEntry *tempm2;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub) {
-	"%S%s\n","ST_SCANNING_DIR",tempm1->full_name;
-	SULst(tempm1->sub,su_flags,indent_scale_factor);
-      }
-    } else
-      SUFile(tempm1->full_name,su_flags,indent_scale_factor);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
-  }
-}
-
-public U0 SU(U8 *files_find_mask,I64 su_flags,U8 *fu_flags=NULL,F64 indent_scale_factor=0)
+public U0 SU(U8 *files_find_mask,I64 suf_flags,U8 *fu_flags=NULL,F64 indent_scale_factor=0)
 {//Apply string utilities to files
 //You can convert spaces to tabs, for example
 //or removing trailing spaces on lines.
-//See $LK,"SU Flags","MN:SUF_SINGLE_SPACE"$
+//See $LK,"SUF Flags","MN:SUF_SINGLE_SPACE"$
   I64 fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  SULst(FilesFind(files_find_mask,fuf_flags),su_flags,indent_scale_factor);
+  CDirEntry *tempde,*tempde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+f+F+T");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    SUFile(tempde->full_name,suf_flags,indent_scale_factor);
+    tempde=tempde->next;
+  }
+  DirLstDel(tempde1);
 }
 
 public U0 S2T(U8 *files_find_mask,U8 *fu_flags=NULL)
 {
 //Spaces to tabs.
 //Use "Hard Space" (SHIFT-SPACE) for spaces
-//in string constants in your code.
+//in string consts in your code.
   SU(files_find_mask,SUF_S2T|SUF_REM_TRAILING,fu_flags);
 }
 

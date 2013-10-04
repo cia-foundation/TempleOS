@@ -40,13 +40,13 @@ U0 StartUpTasks()
   WinTileVert;
   if (!IsSysDeterministic)
     PopUp("#include \"::/TempleOS/Adam/Start\";");
-  AdamLog("Boot     Time:%7.3fs\n",tS);
-  XTalk(user1,"#include \"DoItOnce\";\n");
+  "Boot     Time:%7.3fs\n",tS;
+  XTalk(user1,"Cd(\"HOME\");#include \"DoItOnce\";\n");
   Silent(ON);
   if (!IsSysDeterministic)
-    WSInit("/TempleOS/" FILENAME_MASK_TXT ";~*Bible.TXT*");
+    WSInit("/TempleOS/*;~*Bible.TXT*");
   Silent(OFF);
-  AdamLog("WordStat Time:%7.3fs\n",tS);
+  "WordStat Time:%7.3fs\n",tS;
   if (ts_has_win_drv)
     DrvEnable(TS_WIN_DRV_LET,OFF);
 }

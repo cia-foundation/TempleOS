@@ -19,7 +19,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	i=tempil1->ic_data;
 	    if (MIN_I32<=i<=MAX_I32 &&
 	    !Bt(&non_ptr_vars_mask,tempil2->p1.reg)) {
-	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	  tempil1->ic_opcode=IC_LEA;
 	  tempil1->p1.type=TY_DISP+tempil1->p1.type&IT_MASK;
 	  tempil1->p1.reg=tempil2->p1.reg;
@@ -33,7 +33,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	    if (MIN_I32<=i<=MAX_I32 &&
 	    tempil2->p1.reg!=CREG_RSP &&
 	    1<=tempil2->ic_data<=3) {
-	  tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	  tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	  tempil1->ic_opcode=IC_LEA;
 	  tempil1->p1.type=TY_SIB+tempil1->p1.type&IT_MASK;
 	  tempil1->p1.reg=tempil2->p1.reg<<8+CREG_NONE;
@@ -84,7 +84,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 
 	tempil1->p2.reg=tempil2->p1.reg;
 	tempil1->p2.disp=tempil2->p1.disp;
-	tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	OptSetNOP2(tempil2);
 	return TRUE;
       }
@@ -124,7 +124,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 
 	tempil1->p1.reg=tempil2->p1.reg;
 	tempil1->p1.disp=tempil2->p1.disp;
-	tempil1->ic_flags|=tempil2->ic_flags&ICF_NO_CVT_MASK;
+	tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	OptSetNOP2(tempil2);
 	return TRUE;
       }
@@ -171,33 +171,32 @@ Bool OptIC4(CIntermediateCode *tempi)
 U0 OptPass4(CLex *lx,COptReg *register_offsets,I64 *_type)
 {
   CHashClass *tempc,*tempc1,*tempc2,*tempc3;
-  CIntermediateCode *tempi,*tempi1,*tempi2,*tempi3,*tempil1,*tempil2,*tempil3,
-	*temp_lag[4];
+  CIntermediateCode *tempi,*tempi1,*tempi2,*tempi3,*tempil1,*tempil2,*tempil3;
   I64 code,i;
-  CPrsStk *ps=OptStart(lx,temp_lag);
   Bool dead_code=FALSE;
-  CCodeBlkMisc *lb;
+  CLexCodeMisc *lb;
+  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
+  ps->ptr=0;
+  ps->ptr2=0;
 
   if (_type)
     *_type=IT_I64;
 
-  tempi=lx->cbh.cb_in_ptr;
-  if (tempi->ic_opcode==IC_START)
-    tempi++;
+  tempi=lx->lcc.lcc_root.next;
   while (code=tempi->ic_opcode) {
-    OptNext2(tempi,temp_lag);
     if (dead_code&&code!=IC_LABEL)
       OptSetNOP1(tempi);
     else {
       tempc=tempi->ic_class;
-
-      tempi3=&opt_nop;
-      tempi2=&opt_nop;
-      tempi1=&opt_nop;
-
-      tempil1=temp_lag[1];
-      tempil2=temp_lag[2];
-      tempil3=temp_lag[3];
+      tempi1=tempi2=tempi3=&opt_nop;
+      if (tempil1=OptLag2(tempi)) {
+	if (tempil2=OptLag2(tempil1)) {
+	  if (!(tempil3=OptLag2(tempil2)))
+	    tempil3=&opt_nop;
+	} else
+	  tempil2=tempil3=&opt_nop;
+      } else
+	tempil1=tempil2=tempil3=&opt_nop;
       nobound_switch (cmp_arg_cnt[code]) {
 	case 9:
 	  ps->ptr-=tempi->ic_data>>3;
@@ -343,7 +342,7 @@ lea_gone:
 		tempi->p1.disp=0;
 		tempi->p1.reg=tempi2->p1.reg+tempi1->p1.reg<<8;
 sib:
-		tempi->ic_flags|=(tempi1->ic_flags|tempi2->ic_flags)&ICF_NO_CVT_MASK;
+		tempi->ic_flags|=(tempi1->ic_flags|tempi2->ic_flags)&ICG_NO_CVT_MASK;
 		OptSetNOP2(tempi1);
 		OptSetNOP1(tempi2);
 
@@ -499,16 +498,16 @@ sib:
 	case IC_INVLPG:
 	case IC_CLFLUSH:
 	case IC_PAUSE:
-	case IC_GET_FLAGS:
+	case IC_GET_RFLAGS:
 	case IC_CARRY:
 	case IC_RDTSC:
 	case IC_HPET:
-	case IC_SET_FLAGS:
-	case IC_GET_BASE_PTR:
-	case IC_SET_BASE_PTR:
-	case IC_GET_STK_PTR:
+	case IC_SET_RFLAGS:
+	case IC_GET_RBP:
+	case IC_SET_RBP:
+	case IC_GET_RSP:
 	case IC_GET_RAX:
-	case IC_SET_STK_PTR:
+	case IC_SET_RSP:
 	case IC_SET_RAX:
 	  break;
 	case IC_RETURN_VAL:
@@ -676,13 +675,13 @@ sib:
 	case IC_BR_LESS:
 	  lb=tempi->ic_data;
 	  if (tempi->ic_flags&ICF_PUSH_CMP) {
-	    lb->flags|=CBMF_POP_CMP;
+	    lb->flags|=CMF_POP_CMP;
 	    lb->fwd=NULL;
 	  }
 	  break;
 	case IC_LABEL:
 	  lb=tempi->ic_data;
-	  if (lb->flags&CBMF_USED)
+	  if (lb->flags&CMF_USED)
 	    dead_code=FALSE;
 	  break;
 	case IC_JMP:
@@ -708,7 +707,9 @@ sib:
 	  }
 	  break;
 	default:
-	  OptMissing(lx,tempi);
+	  "Pass:%d Missing IC handler\n",lx->pass;
+	  ICPut(tempi);
+	  LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
       }
 
       while (OptIC4(tempi));
@@ -716,7 +717,11 @@ sib:
       if (cmp_result_cnt[code])
 	PrsPush(ps,tempi);
     }
-    tempi++;
+    tempi=tempi->next;
   }
-  OptEnd(lx,ps);
+  if (ps->ptr>2) {
+    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
+    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
 }

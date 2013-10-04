@@ -95,7 +95,7 @@ U0 AsmHashLoad(Bool first)
   while (lx->token) {
     if (lx->token!=TK_IDENT)
       LexExcept(lx,"ST_EXPECTING_IDENTIFIER");
-    i=LstEntryMatch(lx->ident,"R8\0R16\0R32\0R64\0SEG\0FSTK\0MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
+    i=LstMatch(lx->ident,"R8\0R16\0R32\0R64\0SEG\0FSTK\0MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
     if (i<0)
       LexExcept(lx,"Unknown Statement");
     Lex(lx); //skip keyword
@@ -296,6 +296,7 @@ U0 CmpLoadDefines()
   DefineLoad("ST_UNUSED_VAR","Unused var ");
   DefineLoad("ST_UNNEEDED_NOUNUSEDWARN","Unneeded nounusedwarn ");
   DefineLoad("ST_UNUSED_EXTERN","Unused extern ");
+  DefineLoad("ST_UNUSED_IMPORT","Unused import ");
   DefineLoad("ST_UNUSED_LABEL","Unused label ");
   DefineLoad("ST_UNUSED_LABEL_AT","Unused label at ");
   DefineLoad("ST_NOT_ALLOWED_IN_FUN","Not allowed in fun");
@@ -314,7 +315,7 @@ U0 CmpLoadDefines()
   DefineLoad("ST_UNNECESSARY_PARENTHESIS","Unnecessary parenthesis");
   DefineLoad("ST_STATIC_UNION","Static unions are not implemented");
   DefineLoad("ST_IMPORT_HASH_TABLE_NOT_ALLOWED","import_hash_table only allowed in AOT compiled #exe{} mode.");
-  DefineLoad("ST_STREAM_EXE_PUTS_NOT_ALLOWED","StreamExePutS only allowed in AOT compiled #exe{} mode.");
+  DefineLoad("ST_STREAM_EXE_PRINT_NOT_ALLOWED","StreamExePrint only allowed in AOT compiled #exe{} mode.");
   DefineLoad("ST_CANT_INIT_GLBL_ON_HEAP","Can't init glbl var on data heap in AOT module");
   DefineLoad("ST_INVALID_ARRAY_SIZE","Invalid array size at ");
   DefineLoad("ST_NO_FUN_ASM_ALIGN","ALIGN not allowed in fun asm blk ");
@@ -346,7 +347,7 @@ U0 CmpLoadDefines()
   DefineLoad("ST_REG_IN_USE","Register in use ");
   DefineLoad("ST_ONE_BASE_CLASS","Only one base class allowed at this time at ");
   DefineLoad("ST_ADD_NOT_VAL","Must be address, not value ");
-  DefineLoad("ST_HEADER_FOR_PRINTF","Missing header for PrintF(), PutS() and PutChar() at ");
+  DefineLoad("ST_HEADER_FOR_PRINT","Missing header for Print() and PutChar() at ");
   DefineLoad("ST_HEADER_FOR_SYSTRY","Missing header for SysTry() and SysUntry() at ");
 $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 
@@ -358,13 +359,12 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 
 // '9' arg cnt means var
 
-// 'N' means not constant.  Sets LF_NOT_CONSTANT
+// 'N' means not const.  Sets LF_NOT_CONST
 //     which means an expression contains mem
 //     accesses or things which might change.
 
 // arg cnt,result cnt,deref/assign/cmp,nonconst,might not fill result
 "00..END\0"
-"00..START\0"
 "00..NOP1\0"
 "10..END_EXP\0"
 "00..NOP2\0"
@@ -481,15 +481,15 @@ $AN,"Anchor for inserting Compiler Defines","COMPILE_DEFINE"$
 "20.NOUT_U8\0"
 "20.NOUT_U16\0"
 "20.NOUT_U32\0"
-"00.NGET_FLAGS\0"
+"00.NGET_RFLAGS\0"
 "00.NCARRY\0"
-"10.NSET_FLAGS\0"
+"10.NSET_RFLAGS\0"
 "00.NGET_RAX\0"
 "10.NSET_RAX\0"
-"00.NGET_BASE_PTR\0"
-"10.NSET_BASE_PTR\0"
-"00.NGET_STK_PTR\0"
-"10.NSET_STK_PTR\0"
+"00.NGET_RBP\0"
+"10.NSET_RBP\0"
+"00.NGET_RSP\0"
+"10.NSET_RSP\0"
 "01.NRIP\0"
 "00.NRDTSC\0"
 "00.NHPET\0"
@@ -576,7 +576,7 @@ U0 CmpFillTables()
   assign_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
   deref_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
   cmp_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  not_constant_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  not_const_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
   fpop_bitmap=CAlloc((IC_NUM_ENTRIES+7)>>3);
   cmp_arg_cnt=CAlloc(IC_NUM_ENTRIES);
   cmp_result_cnt=CAlloc(IC_NUM_ENTRIES);
@@ -591,9 +591,9 @@ U0 CmpFillTables()
     else if (st[2]=='^')
       Bts(cmp_bitmap,i);
     if (st[3]=='N')
-      Bts(not_constant_bitmap,i);
+      Bts(not_const_bitmap,i);
     st+=StrLen(st)+1;
-    //See $LK,"ST_INTERMEDIATE_CODE","FF:::/TempleOS/Compiler/CodeGen.CPP,ST_INTERMEDIATE_CODE"$.
+    //See $LK,"ST_INTERMEDIATE_CODE","FF:::/TempleOS/Compiler/ICLCC.CPP,ST_INTERMEDIATE_CODE"$.
   }
 
   Bts(fpop_bitmap,IC_ADD);

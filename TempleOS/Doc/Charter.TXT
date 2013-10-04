@@ -20,7 +20,7 @@ TempleOS is God's official temple.  God said to use 640x480 16 color graphics an
 
 9) All function args and returns will be 64-bit.  No plans for C++.
 
-10) TempleOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just ASCII.
+10) TempleOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just "8-bit ASCII".
 
 11) TempleOS is not for multimedia.  Games will be created by programmers, not artists.  Sounds and images will be, primarily, calculated in real-time, not fetched.
 

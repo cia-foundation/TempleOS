@@ -7,7 +7,7 @@ I64 PopUpFreq()
 { //See also $LK,"PopUpRangeI64","MN:PopUpRangeI64"$()
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$TX+CX,\"Set Freq\"$$\n" //Centered text
+  DocPrint(doc,"$$TX+CX,\"Set Freq\"$$\n" //Centered text
 	"$$CM+LX,2,4$$$$BT,\"100 Hz\",100$$"
 	"$$CM+LX,18,0$$$$BT,\"200 Hz\",200$$"
 	"$$CM+LX,2,4$$$$BT,\"400 Hz\",400$$"

@@ -123,32 +123,32 @@ F64 Rand()
 #else
 $FG,5$U16 RandU16()
 {
-  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   return sys_rnd_seed.u16[0];
 }
 
 I16 RandI16()
 {
-  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   return sys_rnd_seed.i16[0];
 }
 
 U32 RandU32()
 {
-  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   return sys_rnd_seed.u32[0];
 }
 
 I32 RandI32()
 {
-  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   return sys_rnd_seed.i32[0];
 }
 
 U64 RandU64()
 {
   U64 result;
-  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   result.u32[1]=sys_rnd_seed.i32[0]= 1664525*sys_rnd_seed.i32[0]+1013904223;
   return result;
 }
@@ -156,7 +156,7 @@ U64 RandU64()
 I64 RandI64()
 {
   I64 result;
-  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   result.u32[1]=sys_rnd_seed.i32[0]= 1664525*sys_rnd_seed.i32[0]+1013904223;
   return result;
 }
@@ -164,7 +164,7 @@ I64 RandI64()
 F64 Rand()
 { //0.0<=x<1.0
   I64 result;
-  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTimeStamp>>4;
+  result.u32[0]=sys_rnd_seed.i32[0]=(1664525*sys_rnd_seed.i32[0]+1013904223)^GetTSC>>4;
   result.u32[1]=sys_rnd_seed.i32[0]= 1664525*sys_rnd_seed.i32[0]+1013904223;
   result&=0x3FFFFFFFFFFFFFFF;
   return result/ToF64(0x4000000000000000);
@@ -222,5 +222,8 @@ F64 Rand2()
 
 U0 Randomize(I64 seed=0)
 { //Randomizes seed.
-  Fs->rnd_seed=seed;
+  if (seed)
+    Fs->rnd_seed=seed;
+  else
+    Fs->rnd_seed=GetTSC>>4;
 }

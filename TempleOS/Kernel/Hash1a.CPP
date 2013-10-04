@@ -77,7 +77,7 @@ USE64
 // OUT:	RAX
 SYS_HASH_STR::
 	XOR	RAX,RAX
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JZ	@@15
 
 	PUSH	RSI
@@ -88,7 +88,7 @@ SYS_HASH_STR::
 @@05:	SHL1	RBX
 	ADC	RBX,RAX
 @@10:	LODSB
-	OR	AL,AL
+	TEST	AL,AL
 	JNZ	@@05
 
 	MOV	RAX,RBX
@@ -111,7 +111,7 @@ SYS_HASH_STR::
 SYS_HASH_SINGLE_TABLE_FIND1::
 	MOV	RCX,1
 SYS_HASH_SINGLE_TABLE_FIND::
-	OR	RCX,RCX
+	TEST	RCX,RCX
 	JNZ	@@05
 	XOR	RAX,RAX
 	RET
@@ -119,7 +119,7 @@ SYS_HASH_SINGLE_TABLE_FIND::
 	MOV	RDX,U64 CHashTable.body[RDI]
 	LEA	RDX,U64 [RDX+RAX*8]
 @@10:	MOV	RAX,U64 [RDX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JNZ	@@15
 	RET
 
@@ -133,14 +133,14 @@ SYS_HASH_SINGLE_TABLE_FIND::
 	CMP	U8 [RDI],AL
 	JNE	@@25
 	INC	RDI
-	OR	AL,AL
+	TEST	AL,AL
 	JNZ	@@20
 	POP	RSI
 	POP	RDI
 	POP	RAX
 	LOOP	@@30
 	INC	U32 CHash.use_cnt[RAX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	RET
 
 @@25:	POP	RSI
@@ -167,7 +167,7 @@ SYS_HASH_FIND::
 	JNZ	@@15
 	POP	RAX
 @@10:	MOV	RDI,U64 CHashTable.next[RDI]
-	OR	RDI,RDI
+	TEST	RDI,RDI
 	JNZ	@@05
 	POP	RDI
 	XOR	RAX,RAX
@@ -175,7 +175,7 @@ SYS_HASH_FIND::
 
 @@15:	ADD	RSP,8
 	POP	RDI
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	RET
 // ************************************
 // IN:	RSI=STR
@@ -211,7 +211,7 @@ SYS_EXT_FIND::
 @@10:	MOV	RAX,U64 CHashExport.val[RAX]
 @@15:	POP	RBX
 	POP	RDI
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	RET
 _EXT_FIND::
 	ENTER	0
@@ -341,12 +341,12 @@ _HASH_REPLACE::
 	PUSH	RSI
 	PUSH	RDI
 	MOV	RCX,U64 SF_ARG1[RBP]
-	OR	RCX,RCX
+	TEST	RCX,RCX
 	JZ	@@15
 	MOV	RSI,U64 CHash.str[RCX]
 	XOR	RBX,RBX
 	MOV	EBX,U32 CHash.type[RCX]
-	AND	EBX,~HTF_FLAGS_MASK&0xFFFFFFFF
+	AND	EBX,~HTG_FLAGS_MASK&0xFFFFFFFF
 	MOV	RDI,U64 SF_ARG2[RBP]
 	MOV	RCX,U64 SF_ARG3[RBP]
 	CALL	SYS_HASH_STR
@@ -381,7 +381,7 @@ _HASH_REPLACE::
 	MOV	U64 [RDX],RCX
 	POPFD
 
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@15
 	PUSH_C_REGS
 	PUSH	RAX
@@ -398,12 +398,12 @@ _HASH_REM_DEL::
 	PUSH	RSI
 	PUSH	RDI
 	MOV	RCX,U64 SF_ARG1[RBP]
-	OR	RCX,RCX
+	TEST	RCX,RCX
 	JZ	@@10
 	MOV	RSI,U64 CHash.str[RCX]
 	XOR	RBX,RBX
 	MOV	EBX,U32 CHash.type[RCX]
-	AND	EBX,~HTF_FLAGS_MASK&0xFFFFFFFF
+	AND	EBX,~HTG_FLAGS_MASK&0xFFFFFFFF
 	MOV	RDI,U64 SF_ARG2[RBP]
 	MOV	RCX,U64 SF_ARG3[RBP]
 	CALL	SYS_HASH_STR
@@ -461,7 +461,7 @@ _extern _HASH_REM_DEL Bool HashRemDel(CHash *temph,CHashTable *table,
 I64 HashTypeNum(CHash *temph)
 {
   if (temph)
-    return Bsf(temph->type&HTT_TYPE_MASK);
+    return Bsf(temph->type&HTG_TYPE_MASK);
   else
     return -1;
 }
@@ -533,37 +533,37 @@ CHashGeneric *HashGenericAdd(U8 *name,I64 type,I64 u0=0,I64 u1=0,I64 u2=0,CTask 
   return result;
 }
 
-I64 NamedFramePtr(U8 *name,CTask *task=NULL)
+I64 FramePtr(U8 *name,CTask *task=NULL)
 {
   CHashGeneric *temph;
   if (!task) task=Fs;
-  if (temph=HashFind(name,task->hash_table,HTT_NAMED_FRAME_PTR))
+  if (temph=HashFind(name,task->hash_table,HTT_FRAME_PTR))
     return temph->user_data0;
   else
     return 0;
 }
 
-CHashGeneric *NamedFramePtrAdd(U8 *name,I64 val,CTask *task=NULL)
+CHashGeneric *FramePtrAdd(U8 *name,I64 val,CTask *task=NULL)
 {
-  return HashGenericAdd(name,HTT_NAMED_FRAME_PTR,val,0,0,task);
+  return HashGenericAdd(name,HTT_FRAME_PTR,val,0,0,task);
 }
 
-I64 NamedFramePtrSet(U8 *name,I64 val,CTask *task=NULL)
+I64 FramePtrSet(U8 *name,I64 val,CTask *task=NULL)
 {
   CHashGeneric *temph;
   if (!task) task=Fs;
-  if (temph=HashFind(name,task->hash_table,HTT_NAMED_FRAME_PTR))
+  if (temph=HashFind(name,task->hash_table,HTT_FRAME_PTR))
     return LXchgU64(&temph->user_data0,val);
   else
     return 0;
 }
 
-I64 NamedFramePtrDel(U8 *name,CTask *task=NULL)
+I64 FramePtrDel(U8 *name,CTask *task=NULL)
 {
   CHashGeneric *temph;
   I64 result=0;
   if (!task) task=Fs;
-  if (temph=HashFind(name,task->hash_table,HTT_NAMED_FRAME_PTR)) {
+  if (temph=HashFind(name,task->hash_table,HTT_FRAME_PTR)) {
     result=temph->user_data0;
     HashRemDel(temph,task->hash_table);
   }
@@ -574,11 +574,9 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 {
   U8 *src=*_src,*ptr2,*st_ptr;
   I64 i,etype;
-  CHashExport *tempess=NULL;
+  CHashExport *tempex=NULL;
   CHashImport *tempiss;
   Bool first=TRUE;
-  CHashFun *tempf;
-  CHashGlblVar *tempg;
 
   while (etype=*src++) {
     i=*src(U32 *)++;
@@ -590,11 +588,10 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 	return;
       } else {
 	first=FALSE;
-	if (!(tempess=HashFind(st_ptr,Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM))) {
+	if (!(tempex=HashFind(st_ptr,Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM))) {
 	  if (!(ld_flags & LDF_SILENT)) {
 	    PutDefine("ST_UNRESOLVED_REFERENCE");
-	    "" st_ptr;
-	    NewLine;
+	    "%s\n",st_ptr;
 	  }
 	  tempiss=CAlloc(sizeof(CHashImport));
 	  tempiss->str=StrNew(st_ptr);
@@ -605,34 +602,24 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 	}
       }
     }
-    if (tempess) {
+    if (tempex) {
       ptr2=module_base+i;
-      if (tempess->type & HTT_FUN) {
-	tempf=tempess;
-	if (etype & 1)
-	  i=tempf->executable_addr;
-	else
-	  i=tempf->executable_addr-module_base;
-      } else if (tempess->type & HTT_GLBL_VAR) {
-	tempg=tempess;
-	if (etype & 1)
-	  i=tempg->data_addr;
-	else
-	  i=tempg->data_addr-module_base;
-      } else {
-	if (etype & 1)
-	  i=tempess->val;
-	else
-	  i=tempess->val(U8 *)-module_base;
+      if (tempex->type & HTT_FUN)
+	i=tempex(CHashFun *)->executable_addr;
+      else if (tempex->type & HTT_GLBL_VAR)
+	i=tempex(CHashGlblVar *)->data_addr;
+      else
+	i=tempex->val;
+      switch (etype) {
+	case EIE_REL_U8:  *ptr2(U8 *) =i-ptr2-1; break;
+	case EIE_IMM_U8:  *ptr2(U8 *) =i;  break;
+	case EIE_REL_U16: *ptr2(U16 *)=i-ptr2-2; break;
+	case EIE_IMM_U16: *ptr2(U16 *)=i; break;
+	case EIE_REL_U32: *ptr2(U32 *)=i-ptr2-4; break;
+	case EIE_IMM_U32: *ptr2(U32 *)=i; break;
+	case EIE_REL_U64: *ptr2(I64 *)=i-ptr2-8; break;
+	case EIE_IMM_U64: *ptr2(I64 *)=i; break;
       }
-      if (etype<=EIE_LIT_U8)
-	*ptr2(U8 *)+=i;
-      else if (etype<=EIE_LIT_U16)
-	*ptr2(U16 *)+=i;
-      else if (etype<=EIE_LIT_U32)
-	*ptr2(U32 *)+=i;
-      else if (etype<=EIE_LIT_U64)
-	*ptr2(I64 *)+=i;
     }
   }
   *_src=src-1;
@@ -653,25 +640,25 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 {
   U8 *ptr2,*ptr3,*st_ptr;
   I64 i,j,cnt,etype;
-  CHashExport *tempess=NULL;
+  CHashExport *tempex=NULL;
   while (etype=*src++) {
     i=*src(U32 *)++;
     st_ptr=src;
     src+=StrLen(st_ptr)+1;
     switch (etype) {
       case EIE_REL_EXPORT:
-      case EIE_LIT_EXPORT:
-	tempess=CAlloc(sizeof(CHashExport));
-	tempess->str=StrNew(st_ptr);
-	tempess->type=HTT_EXPORT_SYS_SYM|HTF_LIT;
-	if (etype==EIE_LIT_EXPORT)
-	  tempess->val=i;
+      case EIE_IMM_EXPORT:
+	tempex=CAlloc(sizeof(CHashExport));
+	tempex->str=StrNew(st_ptr);
+	tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
+	if (etype==EIE_IMM_EXPORT)
+	  tempex->val=i;
 	else
-	  tempess->val=i+module_base;
-	HashAdd(tempess,Fs->hash_table);
+	  tempex->val=i+module_base;
+	HashAdd(tempex,Fs->hash_table);
 	SysSymImportsResolve(st_ptr,ld_flags);
 	break;
-      case EIE_REL_U8...EIE_LIT_U64:
+      case EIE_REL_U8...EIE_IMM_U64:
 	src=st_ptr-5;
 	LoadOneImport(&src,module_base,ld_flags);
 	break;
@@ -690,11 +677,11 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	ptr3=MAlloc(*src(I64 *)++);
 
 	if (*st_ptr) {
-	  tempess=CAlloc(sizeof(CHashExport));
-	  tempess->str=StrNew(st_ptr);
-	  tempess->type=HTT_EXPORT_SYS_SYM|HTF_LIT;
-	  tempess->val=ptr3;
-	  HashAdd(tempess,Fs->hash_table);
+	  tempex=CAlloc(sizeof(CHashExport));
+	  tempex->str=StrNew(st_ptr);
+	  tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
+	  tempex->val=ptr3;
+	  HashAdd(tempex,Fs->hash_table);
 	}
 
 	cnt=i;
@@ -805,5 +792,37 @@ U0 LoadKernel()
 //No main routines
 //  LoadPass2(sys_boot_patch_table_base,sys_boot_base,0);
 }
-           Í     "     Cat "8  ä   Cbs "X     Dog "t   ä   Dog "À     Bird !D   \  `     !h     €   ô   !´   \  Ì     !(  \  ,    !0    @  ô   X   H   X   `   X   `   T  `   T  `   T  H   T  H   X   H   l   H   l   `   ª   x  ª   \  À   x  À   \  €   H   €   `   H  H   H  `   \  H   \  `   p  H   p  `   4  H   4  `      x  ğ  x  ğ  x  ğ  \  ğ  \     \     \     x  $   \  $   x  8   \  8   x  L   \  L   x  `   \  `   x    \    x  0  \  0  x  D  \  D  x    \    x     x     8     8  ìÿÿÿ8  ìÿÿÿ8  ìÿÿÿx  ìÿÿÿx     x  H   `   H   ,   H   ,   4   ,   4   ,   4   `   4   `   H   `   !   h     h  !H   T   X   T   !üÿÿÿ8  @   d   
-!   P  \   Ì   !\   Ì   4  è   !T  è   d  è   !d  è   d     !d        è   !p   è   `   è   !\   è   \   ô   !\   ô   ¼     !ä         !<    L    !L    L  (  !L  (  Œ   (  !Œ   (  t     !T        \  	!\   Ğ      T  !4  ì   `   Ğ   !   `  T     !t     Œ   0  !Œ   0  H  ,  !H  ,  H    !H    <    !    ä     !¼     `   ø   !`   ø   `   ì   !`   ì   p   ì   !   ì   d    !d    `  ì   !`  ì   T  ì    
+           Í          Cat 8  ä   Cbs X     Dog t   ä   Dog À     Bird D   \  `     h     €   ô   ´   \  Ì     (  \  ,    0    @  ô   
+X   H   X   `   
+X   `   T  `   
+T  `   T  H   
+T  H   X   H   
+l   H   l   `   
+ª   x  ª   \  
+À   x  À   \  
+€   H   €   `   
+H  H   H  `   
+\  H   \  `   
+p  H   p  `   
+4  H   4  `   
+   x  ğ  x  
+ğ  x  ğ  \  
+ğ  \     \  
+   \     x  
+$   \  $   x  
+8   \  8   x  
+L   \  L   x  
+`   \  `   x  
+  \    x  
+0  \  0  x  
+D  \  D  x  
+  \    x  
+   x     8  
+   8  ìÿÿÿ8  
+ìÿÿÿ8  ìÿÿÿx  
+ìÿÿÿx     x  
+H   `   H   ,   
+H   ,   4   ,   
+4   ,   4   `   
+4   `   H   `      h     h  H   T   X   T   üÿÿÿ8  @   d   
+   P  \   Ì   \   Ì   4  è   T  è   d  è   d  è   d     d        è   p   è   `   è   \   è   \   ô   \   ô   ¼     ä         <    L    L    L  (  L  (  Œ   (  Œ   (  t     T        \  	\   Ğ      T  4  ì   `   Ğ      `  T     t     Œ   0  Œ   0  H  ,  H  ,  H    H    <        ä     ¼     `   ø   `   ø   `   ì   `   ì   p   ì      ì   d    d    `  ì   `  ì   T  ì    

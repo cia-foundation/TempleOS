@@ -1,7 +1,7 @@
 public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,Bool exited)
 { //sometimes returns locked, sometimes unlocked
   U8 ch=doc->cmd_U8,*st;
-  I64 result=-1;
+  I64 result=DOCM_EXIT;
   DocLock(doc);
   if (!exited) {
     if (doc_e->flags1 & DOCEF1_ESC) {
@@ -164,7 +164,7 @@ U8 *EdDollarTypeCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
     src="EOF";
   else if (!src)
     src="ERR";
-  SPrintF(st,"%-3ts",src);
+  SPrint(st,"%-3ts",src);
   return st;
 }
 
@@ -218,47 +218,47 @@ public Bool DocDo(CDoc *doc,I64 doc_flags=0)
   doc->win_task=Fs;
   bdoc=DocNew;
   bdoc->flags|=DOCF_BORDER_DOC;
-  DocPutS(bdoc,"$$CM+TY+LX+NC,0,-1$$");
+  DocPrint(bdoc,"$$CM+TY+LX+NC,0,-1$$");
   if (Bt(&Fs->display_flags,DISPLAYf_HAS_CLOSE_WIN))
-    DocPutS(bdoc,"$$TX+RX+BD,\"[X]\"$$");
-  DocPutS(bdoc,"$$BK,1$$$$TX+LX+BD,\"MENU\"$$$$BK,0$$");
+    DocPrint(bdoc,"$$TX+RX+BD,\"[X]\"$$");
+  DocPrint(bdoc,"$$BK,1$$$$TX+LX+BD,\"MENU\"$$$$BK,0$$");
 
   old_task_title=StrNew(Fs->task_title);
   if (Fs->title_src!=TTS_LOCKED_CONST) {
     Fs->title_src=TTS_ED_FILENAME;
     MemCpy(Fs->task_title,doc->filename.name,TASK_TITLE_LEN);
   }
-  doc_e=DocPutS(bdoc,"$$DA-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$");
+  doc_e=DocPrint(bdoc,"$$DA-T-P+BD+RD+CX+SCX+IV,140,\"%%s...\",16$$");
   doc_e->data=&Fs->task_title;
   DocDataFmt(doc_e);
 
   if (doc->flags & DOCF_ALLOW_UNDO) {
-    DocPutS(bdoc,"$$CM+BY+LX+NC,1,1$$");
-    doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Undo:%03d\"$$\n");
+    DocPrint(bdoc,"$$CM+BY+LX+NC,1,1$$");
+    doc_e=DocPrint(bdoc,"$$DA+BD+RD-T-U64+U32,32,\"Undo:%%03d\"$$\n");
     doc_e->data=&doc->undo_cnt;
     DocDataFmt(doc_e);
   }
 
-  DocPutS(bdoc,"$$CM+BY+RX+NC,-30,1$$");
-  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\"     \"$$");
+  DocPrint(bdoc,"$$CM+BY+RX+NC,-30,1$$");
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\"     \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdMoreCB;
-  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarTypeCB;
-  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdFilterCB;
-  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdOverStrikeCB;
-  doc_e=DocPutS(bdoc,"$$TX+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarCB;
-  doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Line:%04d \"$$");
+  doc_e=DocPrint(bdoc,"$$DA+BD+RD-T,32,\"Line:%%04d \"$$");
   doc_e->data=&doc->line;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(bdoc,"$$DA+BD+RD-T,32,\"Col:%04d\"$$\n");
+  doc_e=DocPrint(bdoc,"$$DA+BD+RD-T,32,\"Col:%%04d\"$$\n");
   doc_e->data=&doc->col;
   DocDataFmt(doc_e);
 
@@ -291,7 +291,7 @@ public Bool DocDo(CDoc *doc,I64 doc_flags=0)
     doc_e=doc->root.next;
     while (doc_e!=doc) {
       if (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_CHECK_BOX)
-	DocDataGet(doc_e);
+	DocDataScan(doc_e);
       doc_e=doc_e->next;
     }
   }
@@ -317,7 +317,7 @@ public Bool DocDo(CDoc *doc,I64 doc_flags=0)
 
 
 #help_index "Doc/Input"
-public Bool DocFormDo(U8 *D,U8 *class_name,
+public Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,
     I64 doc_flags=0,U8 *header=NULL,U8 *footer=NULL)
 //Supply a class name that has fmtstr definitions
 //and this routine will allow user input.
@@ -333,31 +333,32 @@ public Bool DocFormDo(U8 *D,U8 *class_name,
     return FALSE;
   doc=DocNew;
   StrCpy(doc->desc,"Form");
-  if (header) DocPutS(doc,header);
+  if (header) DocPrint(doc,"%s",header);
   doc->flags|=DOCF_OVERSTRIKE|DOCF_FORM;
   if (doc_flags&DOF_MIN_SIZE)
     doc->flags|=DOCF_MIN_SIZE;
   ml=tempc->member_lst;
   while (ml) {
     if (fmtstr=MemberMetaData("fmtstr",ml)) {
-      doc_e=DocPutS(doc,fmtstr);
-      doc_e->data=D+ml->offset;
+      doc_e=DocPrint(doc,"%s",fmtstr);
+      doc_e->data=_d+ml->offset;
       doc_e->my_fmt_data=MemberMetaData("fmtdata",ml);
       DocDataFmt(doc_e);
     }
     ml=ml->next;
   }
-  if (footer) DocPutS(doc,footer);
+  if (footer) DocPrint(doc,"%s",footer);
   if (doc->root.next!=doc)	{
     Fs->border_src=BDS_CONST;
     DocRecalc(doc);
     if (DocDo(doc,doc_flags)) {
       doc_e=doc->cur_entry;
+      result=TRUE;
       if (doc_e!=doc) {
-	DocEntryRun(doc,doc_e,TRUE);
+	if (DocEntryRun(doc,doc_e,TRUE)==DOCM_CANCEL)
+	  result=FALSE;
 	DocUnlock(doc);
       }
-      result=TRUE;
     }
   }
   DocDel(doc);
@@ -431,7 +432,7 @@ public I64 PopUp(U8 *msg,CTask *parent=NULL,CTask **_pu_task=NULL)
 #help_index "Doc/Output"
 public CTask *PopUpViewDoc(CDoc *doc,I64 doc_flags=0)
 {
-  U8 *buf=MSPrintF("if (!IsSysDeterministic) Preempt(ON);DocDo(0x%X,0x%X);",doc,doc_flags);
+  U8 *buf=MPrint("if (!IsSysDeterministic) Preempt(ON);DocDo(0x%X,0x%X);",doc,doc_flags);
   CTask *task=Spawn(&SrvUserCmdLine,NULL,"View",,Fs);
   TaskExeStrQue(task,NULL,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   Free(buf);
@@ -440,7 +441,7 @@ public CTask *PopUpViewDoc(CDoc *doc,I64 doc_flags=0)
 
 U0 PopUpViewStrTaskEndCB()
 {
-  DocDel(NamedFramePtr("ViewStrFrame"));
+  DocDel(FramePtr("ViewStrFrame"));
   Exit;
 }
 
@@ -448,9 +449,9 @@ public CTask *PopUpViewStr(U8 *msg)
 {
   CTask *task;
   CDoc *doc=DocNew;
-  DocPrintF(doc,msg);
+  DocPrint(doc,msg);
   task=PopUpViewDoc(doc);
-  NamedFramePtrAdd("ViewStrFrame",doc,task);
+  FramePtrAdd("ViewStrFrame",doc,task);
   task->task_end_cb=&PopUpViewStrTaskEndCB;
   return task;
 }
@@ -462,10 +463,10 @@ public I64 PopUpMenu(CDoc *doc,I64 doc_flags=0)
   return SrvUser("DocMenuDo(0x%X,0x%X);",doc,doc_flags);
 }
 
-public Bool PopUpForm(U8 *D,U8 *class_name,I64 doc_flags=DOF_MIN_SIZE,
+public Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,I64 doc_flags=DOF_MIN_SIZE,
     U8 *header=NULL,U8 *footer=NULL)
 {
-  return SrvUser("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",D,class_name,
+  return SrvUser("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
     doc_flags,header,footer);
 }
 
@@ -474,10 +475,10 @@ public U8 *PopUpPickFile(U8 *dir=NULL)
 {
   U8 *result,*st,*st2;
   if (dir)
-    st=MSPrintF("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",dir);
+    st=MPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",dir);
   else {
     st2=CurDir;
-    st=MSPrintF("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",st2);
+    st=MPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",st2);
     Free(st2);
   }
   result=PopUp(st,Fs);
@@ -489,10 +490,10 @@ public U8 *PopUpPickDir(U8 *dir=NULL)
 {
   U8 *result,*st,*st2;
   if (dir)
-    st=MSPrintF("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",dir);
+    st=MPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",dir);
   else {
     st2=CurDir;
-    st=MSPrintF("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",st2);
+    st=MPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",st2);
     Free(st2);
   }
   result=PopUp(st,Fs);
@@ -507,7 +508,7 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 doc_flags=0,CTask *mem_task=NULL)
     StrCpy(fn.name,dft);
   else
     *fn.name=0;
-  if (DocFormDo(fn.name,"CEdFileName",doc_flags))
+  if (DocFormDo(&fn,,doc_flags))
     return StrNew(fn.name,mem_task);
   else
     return NULL;
@@ -515,7 +516,7 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 doc_flags=0,CTask *mem_task=NULL)
 
 public U8 *PopUpFileName(U8 *dft=NULL,I64 doc_flags=0)
 {
-  U8 *st=MSPrintF("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",dft,doc_flags|DOF_MIN_SIZE),
+  U8 *st=MPrint("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",dft,doc_flags|DOF_MIN_SIZE),
      *result=PopUp(st,Fs);
   Free(st);
   return result;
@@ -535,21 +536,21 @@ Bool PopUpCd()
 }
 
 #help_index "Doc/Input"
-public U8 *PopUpPickLstEntry(U8 *lst)
+public U8 *PopUpPickLst(U8 *lst)
 {
   I64 i=0;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,LTBLUE$$");
+  DocPrint(doc,"$$FG,LTBLUE$$");
   while (*lst) {
     if (*lst=='@') { //Check for '@' alias lst entry
       i--;
       lst++;
     }
-    DocPrintF(doc,"$$MU,\"%s\",0x%08X$$\n",
+    DocPrint(doc,"$$MU,\"%s\",0x%08X$$\n",
 	lst,i++);
     lst+=StrLen(lst)+1;
   }
-  DocPutS(doc,"\n$$MU,\"CANCEL\",DOCM_CANCEL$$\n");
+  DocPrint(doc,"\n$$MU,\"CANCEL\",DOCM_CANCEL$$\n");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -557,16 +558,16 @@ public U8 *PopUpPickLstEntry(U8 *lst)
 
 public U8 *PopUpPickDefineSub(U8 *st)
 {
-  return PopUpPickLstEntry(Define(st));
+  return PopUpPickLst(Define(st));
 }
 
 public I64 PopUp1(U8 *b1,I64 n1,U8 *header=NULL,U8 *footer=NULL)
 {
   I64 i,l1=StrLen(b1);
   CDoc *doc=DocNew;
-  if (header) DocPutS(doc,header);
-  DocPrintF(doc,"$$CM+CX,%d,4$$$$BT,\"%s\",%d$$\n",-l1/2,b1,n1);
-  if (footer) DocPutS(doc,footer);
+  if (header) DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$CM+CX,%d,4$$$$BT,\"%s\",%d$$\n",-l1/2,b1,n1);
+  if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -577,15 +578,15 @@ public I64 PopUp2(U8 *b1,I64 n1,U8 *b2,I64 n2,U8 *header=NULL,U8 *footer=NULL)
   I64 i,l1=StrLen(b1),l2=StrLen(b2),y;
   CDoc *doc=DocNew;
   if (header) {
-    DocPutS(doc,header);
+    DocPrint(doc,"%s",header);
     y=4;
   } else {
-    DocPrintF(doc,"%*s\n",l1+l2+10,"");
+    DocPrint(doc,"%*s\n",l1+l2+10,"");
     y=3;
   }
-  DocPrintF(doc,"$$CM+CX,%d,%d$$$$BT,\"%s\",%d$$",-(l1+l2+3)>>1,y,b1,n1);
-  DocPrintF(doc,"$$CM+CX,%d,0$$$$BT,\"%s\",%d$$\n" ,-(l1+l2+3)>>1+l1+6,b2,n2);
-  if (footer) DocPutS(doc,footer);
+  DocPrint(doc,"$$CM+CX,%d,%d$$$$BT,\"%s\",%d$$",-(l1+l2+3)>>1,y,b1,n1);
+  DocPrint(doc,"$$CM+CX,%d,0$$$$BT,\"%s\",%d$$\n" ,-(l1+l2+3)>>1+l1+6,b2,n2);
+  if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -615,12 +616,12 @@ public I64 PopUpReplaceSkipAllCancel(U8 *header=NULL,U8 *footer=NULL)
 {
   I64 i;
   CDoc *doc=DocNew;
-  if (header) DocPutS(doc,header);
-  DocPutS(doc,"$$CM+LX,1,4$$$$BT,\"REPLACE\",RSAC_REPLACE$$"
+  if (header) DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$CM+LX,1,4$$$$BT,\"REPLACE\",RSAC_REPLACE$$"
 	"$$CM+LX,17,0$$$$BT,\"SKIP\",RSAC_SKIP$$"
 	"$$CM+LX,1,3$$$$BT,\"ALL\",RSAC_ALL$$"
 	"$$CM+LX,17,0$$$$BT,\"CANCEL\",DOCM_CANCEL$$\n");
-  if (footer) DocPutS(doc,footer);
+  if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -630,7 +631,7 @@ U8 *DoPopUpMGetS(U8 *header,CTask *mem_task)
 {
   U8 *result,*st;
   if (header)
-    "" header;
+    "%s",header;
   st=MGetS(GETSF_WITH_NEW_LINE);
   result=StrNew(st,mem_task);
   Free(st);
@@ -639,8 +640,16 @@ U8 *DoPopUpMGetS(U8 *header,CTask *mem_task)
 
 public U8 *PopUpMGetS(U8 *header=NULL)
 {
-  U8 *st=MSPrintF("DoPopUpMGetS(0x%X,0x%X);",header,Fs),
+  U8 *st=MPrint("DoPopUpMGetS(0x%X,0x%X);",header,Fs),
      *result=PopUp(st,Fs);
+  Free(st);
+  return result;
+}
+
+public I64 PopUpI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
+{
+  U8 *st=MPrint("PmtI64(0x%X,0x%X,0x%X,0x%X);",msg,dft,lo,hi);
+  I64 result=PopUp(st,Fs);
   Free(st);
   return result;
 }
@@ -650,12 +659,12 @@ public I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NUL
   I64 i;
   CDoc *doc=DocNew;
   if (header)
-    DocPutS(doc,header);
-  DocPutS(doc,"$$FG,LTBLUE$$");
+    DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$FG,LTBLUE$$");
   for (i=lo;i<=hi;i+=step)
-    DocPrintF(doc,"$$MU,\"%d\",%d$$\n",i,i);
+    DocPrint(doc,"$$MU,\"%d\",%d$$\n",i,i);
   if (footer)
-    DocPutS(doc,footer);
+    DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -669,14 +678,14 @@ public F64 PopUpRangeF64(F64 lo,F64 hi,F64 step,
   U8 buf[136];
   CDoc *doc=DocNew;
   if (header)
-    DocPutS(doc,header);
-  DocPutS(doc,"$$FG,LTBLUE$$");
+    DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$FG,LTBLUE$$");
   for (d=lo;d<=hi;d+=step) {
-    SPrintF(buf,fmt,d);
-    DocPrintF(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
+    SPrint(buf,fmt,d);
+    DocPrint(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
   }
   if (footer)
-    DocPutS(doc,footer);
+    DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i(F64);
@@ -690,14 +699,14 @@ public F64 PopUpRangeF64Exp(F64 lo,F64 hi,F64 factor,
   U8 buf[136];
   CDoc *doc=DocNew;
   if (header)
-    DocPutS(doc,header);
-  DocPutS(doc,"$$FG,LTBLUE$$");
+    DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$FG,LTBLUE$$");
   for (d=lo;d<=hi;d*=factor) {
-    SPrintF(buf,fmt,d);
-    DocPrintF(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
+    SPrint(buf,fmt,d);
+    DocPrint(doc,"$$MU,\"%s\",0x%X$$\n",buf,d);
   }
   if (footer)
-    DocPutS(doc,footer);
+    DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i(F64);
@@ -717,7 +726,7 @@ public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
      *name2=DftExt(name,"CPP.Z");
   I64 result=0;
   if (warn_ext &&
-      !FilesFindMatch(FILENAME_MASK_JIT,name2) &&
+      !FilesFindMatch(name2,FILEMASK_JIT) &&
       !PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
     okay=FALSE;
   if (okay)
@@ -735,11 +744,11 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,CTask *parent=NULL,CTask **
      *name2=DftExt(name,"CPP.Z");
   I64 result=0;
   if (warn_ext &&
-      !FilesFindMatch(FILENAME_MASK_JIT,name2) &&
+      !FilesFindMatch(name2,FILEMASK_JIT) &&
       !PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
     okay=FALSE;
   if (okay) {
-    st=MSPrintF("\"$$$$WW+H,1$$$$\";Auto(\"ExeFile(\\\"%s\\\");\\n\");UserTaskCont;",name2);
+    st=MPrint("\"$$$$WW+H,1$$$$\";Auto(\"ExeFile(\\\"%s\\\");\\n\");UserTaskCont;",name2);
     result=PopUp(st,parent,_pu_task);
     Free(st);
   }
@@ -754,13 +763,13 @@ public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft
   I64 i;
   CDoc *doc=DocNew;
   if (header)
-    DocPutS(doc,header);
+    DocPrint(doc,"%s",header);
   if (allow_transparent)
-    DocPutS(doc,"$$MU,\"TRANSPARENT\",COLOR_TRANSPARENT$$\n");
+    DocPrint(doc,"$$MU,\"TRANSPARENT\",COLOR_TRANSPARENT$$\n");
   for (i=0;i<16;i++)
-    DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-8Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-8Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",i);
   if (allow_dft)
-    DocPutS(doc,"$$BG,WHITE$$$$MU,\"DEFAULT\",DOC_DFT$$$$BG$$");
+    DocPrint(doc,"$$BG,WHITE$$$$MU,\"DEFAULT\",DOC_DFT$$$$BG$$");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -771,23 +780,23 @@ public I64 PopUpColorLighting(U8 *header=NULL)
   I64 i;
   CDoc *doc=DocNew;
   if (header)
-    DocPutS(doc,header);
-  DocPutS(doc,"\nSingle-Sided means both sides same color."
+    DocPrint(doc,"%s",header);
+  DocPrint(doc,"\nSingle-Sided means both sides same color."
 	      "\nDouble-Sided means back side darker."
 	      "\n"
 	      "\nHalf-Range means 0 to [0,7]"
 	      "\n                 [8,15]-8 to [8,15]"
 	      "\nFull-Range means 0 to [0,7] to [0,7]+8"
 	      "\n");
-  DocPutS(doc,"\n$$FG,LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$FG,BLACK$$");
+  DocPrint(doc,"\n$$FG,LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$FG,BLACK$$");
   for (i=0;i<8;i++) {
-    DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",i);
-    DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+i);
   }
-  DocPutS(doc,"\n$$FG,LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$FG,BLACK$$");
+  DocPrint(doc,"\n$$FG,LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$FG,BLACK$$");
   for (i=0;i<16;i++) {
-    DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
-    DocPrintF(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+ROPF_HALF_RANGE_COLOR+i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$ ",i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+ROPF_HALF_RANGE_COLOR+i);
   }
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -819,7 +828,7 @@ Bool PopUpTransform(I64 *r)
   tf->x_offset=0.0;
   tf->y_offset=0.0;
   tf->z_offset=0.0;
-  if (PopUpForm(tf,"CTransformForm")) {
+  if (PopUpForm(tf)) {
     MemSet(r,0,16*sizeof(I64));
     r[0] =tf->x_scale*gr_scale;
     r[5] =tf->y_scale*gr_scale;
@@ -855,7 +864,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       else
 	i1=COLOR_TRANSPARENT;
       dc->color=j1+i1<<16+ROPF_DITHER;
-      GrRect(dc,i*PU_SPACING,j*PU_SPACING+NamedFramePtr("DitherDoFrame",task),PU_SPACING,PU_SPACING);
+      GrRect(dc,i*PU_SPACING,j*PU_SPACING+FramePtr("DitherDoFrame",task),PU_SPACING,PU_SPACING);
     }
   i=(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH;
   if (doc->max_x>i) i=doc->max_x;
@@ -867,9 +876,9 @@ I64 DitherColorDo(U8 *header=NULL)
 {
   I64 msg_code,p1,p2,result=-1,i,j;
   DocClear;
-  "" header;
+  "%s",header;
   DocRecalc(DocPut);
-  NamedFramePtrAdd("DitherDoFrame",(DocPut->max_y+1)*FONT_HEIGHT);
+  FramePtrAdd("DitherDoFrame",(DocPut->max_y+1)*FONT_HEIGHT);
   SettingsPush; //See $LK,"SettingsPush","MN:SettingsPush"$
   Fs->draw_it=&DrawIt;
   do {
@@ -877,7 +886,7 @@ I64 DitherColorDo(U8 *header=NULL)
     if (msg_code==MSG_IP_L_DOWN) {
       msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_UP);
       i=p1/PU_SPACING;
-      j=(p2-NamedFramePtr("DitherDoFrame"))/PU_SPACING;
+      j=(p2-FramePtr("DitherDoFrame"))/PU_SPACING;
       if (p1>=0 && p2>=0 && 0<=j<17 && 0<=i<17) {
 	if (j==16) j=COLOR_TRANSPARENT;
 	if (i==16) i=COLOR_TRANSPARENT;
@@ -890,14 +899,14 @@ I64 DitherColorDo(U8 *header=NULL)
   while (!p1);
 dcd_done:
   SettingsPop;
-  NamedFramePtrDel("DitherDoFrame");
+  FramePtrDel("DitherDoFrame");
   return result;
 }
 
 public I64 PopUpColorDither(U8 *header=NULL)
 {
   U8 buf[136];
-  SPrintF(buf,"DitherColorDo(0x%X);",header);
+  SPrint(buf,"DitherColorDo(0x%X);",header);
   return PopUp(buf,Fs);
 }
 

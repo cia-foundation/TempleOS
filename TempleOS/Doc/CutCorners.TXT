@@ -9,3 +9,7 @@ There are a few places where I cut corners in the interest of not junking-up cod
 * I changed the $LK,"asm opcodes","FI:::/TempleOS/Compiler/OpCodes.TXT"$ names to remove the ambiguity between instructions with different numbers of arguments, making my $LK,"assembler","FI:::/TempleOS/Compiler/Assembler.CPP"$ simpler and I did minimal 16-bit asm support, since 64-bit is what you should be using, unless you're doing a $LK,"boot loader","FI:::/TempleOS/Adam/Boot/BootCD.CPP"$.
 
 * There are no file-sharing locks of any kind.  You're on your own.
+
+* The compiler does not support $FG,2$bool$FG$; see the definition of $LK,"Bool","MN:Bool"$, LOL.
+
+* A hidden window is never refreshed.  Certain tasks are never done, therefore.  During refresh, the entry count limit of the document buffer is, normally, checked and enforced.  If you print to the command-line in a task who's window is covered, no limit on buffer exists and it will allocate memory for the document buffer until the system runs out of memory and crashes.

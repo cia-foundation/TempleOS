@@ -20,7 +20,7 @@ $ID,2$The cursor pos is usually stored as a ASCII#5 character and is not bracket
 $ID,-2$$TR,"ID Indent +/- num"$
 $ID,2$This changes the indention deeper if positive or shallower if negative. It effects the behavior of trees.
 $ID,-2$$TR,"DA Data"$
-$ID,2$primarily used for forms that prompt for data. Use $FG,2$<CTRL-L>$FG$ as a resource editor-type thing to generate the text you'll need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPutS","MN:DocPutS"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo","MN:DocFormDo"$(),$LK-A,"::/TempleOS/Demo/Doc/Form.CPP"$.
+$ID,2$primarily used for forms that prompt for data. Use $FG,2$<CTRL-L>$FG$ as a resource editor-type thing to generate the text you'll need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint","MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo","MN:DocFormDo"$(),$LK-A,"::/TempleOS/Demo/Doc/Form.CPP"$.
 
 If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.
   
@@ -70,11 +70,13 @@ Examples: <CTRL-T> to see
 3)File link without different tag str.$LK-A,"::/TempleOS/Doc/HelpIndex.TXT"$
 4)$LK,"File find link searching for 'Admin'","FF:::/TempleOS/Doc/HelpIndex.TXT,Admin"$
 5)$LK,"File find link searching for 5th 'CTRL'","FF:::/TempleOS/Kernel/Adam1a.HPP,CTRL:5"$
-6)$LK,"Manual page link","MN:PrintF"$
+6)$LK,"Manual page link","MN:Print"$
 7)$LK,"File line num link","FL:::/TempleOS/Kernel/Adam1a.HPP,200"$
 8)$LK,"File anchor link -- <CTRL-T> to see anchor after you click","FA:::/TempleOS/Kernel/Define1a.CPP,OS_DEFINE"$
 9)$LK,"Bible Link","BF:Acts,2:3"$ The chapter:verse actually just does a text search.
 10) $LK,"Help Index Link","HI:Doc"$.
+11) $LK,"Address Link","AD:0x10000"$.
+
 $ID,-2$$TR,"BT Button"$
 $ID,2$See $LK-A,"::/TempleOS/Demo/Doc/MenuButton.CPP"$.
 $ID,-2$$TR,"CB Check Box"$
@@ -86,16 +88,12 @@ $ID,-2$$TR,"MU Menu Value"$
 $ID,2$See $LK,"PopUpRangeI64","MN:PopUpRangeI64"$().
 $ID,-2$$TR,"HX Hex Edit"$
 $ID,2$See $LK,"DocD","MN:DocD"$().
-$ID,-2$$TR,"Hidden Text Widget"$
-$ID,2$$FG,5$HS Start of hidden text$FG$
-$FG,5$HE End of hidden text$FG$
-$FG,5$$FG$Hidden text widgets allow text to be placed in collapsable brackets like this $HS$$FG$This is hidden.$HE$ which can be expanded by clicking them. If you place a '$FG,4$-C$FG$' flag to uncollapse it, it will start expanded like this $HS$$FG$Click to hide$HE$. They can be nestled like this $HS$Click here:$HS$This is nestled.$HE$ okay?$HE$.
 $ID,-2$$TR,"TR Tree Widget"$
 $ID,2$A tree widget is a branch in a collapsable tree.  The domain of the branch extends from the first +indent until enough -indents bring it back to where it started.  Tree's begin collapsed unless a $FG,4$-C$FG$ flag is present.
 $ID,-2$$TR,"SP Sprite"$
 $ID,2$You can insert a sprite into text with $FG,2$<CTRL-R>$FG$.  It is critical where the cursor is at the time you enter $FG,2$<CTRL-R>$FG$ because the sprite will be offset from that location.  This is especially important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clipboard requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-T>$FG$ and manually adding a $FG,4$$$SP$$$FG$ entry with the same num.  You can cause the $FG,4$$$SP$$$FG$ cmd to appear with some text associated with it by manually adding text into the $FG,4$$$SP$$$FG$ cmd, as in $FG,4$$$SP,"pic 2",2$$$FG$.
 $ID,-2$$TR,"IB Insert Binary"$
-$ID,2$This cmd is used to tell the compiler to fetch the binary data stored after the end of text.  There is basically one type of binary data in DOC's at this point--sprites-- created with $FG,2$<CTRL-R>$FG$. They have a number associated with them.  This number is automatically chosen, because copying to the clip-board and back requires renuming. To use a $FG,4$$$IB$$$FG$ cmd, toggle to plain text ($FG,2$<CTRL-T>$FG$) after inserting a sprite and check the number in the $FG,4$$$SP$$$FG$ cmd. Create a $FG,4$$$IB$$$FG$ cmd with the same number and the sprite will be inserted into the compiled stream like a string constant.  You can optionally include tag text to be displayed for the $FG,4$$$IB$$$FG$ cmd.
+$ID,2$This cmd is used to tell the compiler to fetch the binary data stored after the end of text.  There is basically one type of binary data in DOC's at this point--sprites-- created with $FG,2$<CTRL-R>$FG$. They have a number associated with them.  This number is automatically chosen, because copying to the clip-board and back requires renuming. To use a $FG,4$$$IB$$$FG$ cmd, toggle to plain text ($FG,2$<CTRL-T>$FG$) after inserting a sprite and check the number in the $FG,4$$$SP$$$FG$ cmd. Create a $FG,4$$$IB$$$FG$ cmd with the same number and the sprite will be inserted into the compiled stream like a string const.  You can optionally include tag text to be displayed for the $FG,4$$$IB$$$FG$ cmd.
 
 The main reason for the $FG,4$$$IB$$$FG$ cmd at this point is to pass a arg to the $LK,"SpritePlot3","MN:SpritePlot3"$() function.  See $LK-A,"::/TempleOS/Demo/Graphics/SpritePlot.CPP"$.
 
@@ -125,7 +123,7 @@ $ID,2$* Make a tree branch.  Usually, this is placed on a text($FG,5$TX$FG$) ent
 $ID,-2$$TR,"+PU PopUp"$
 $ID,2$A PopUp flag on a macro ($FG,5$MA$FG$) will cause the cmds to run in a new task, a pop-up window.
 $ID,-2$$TR,"+C Collapsed"$
-$ID,2$A collapsed flag on a tree $FG,5$TR$FG$ entry or a hide start $FG,5$HS$FG$ will cause it to start collapsed.  A $FG,4$-C$FG$ flag will make it start open.
+$ID,2$A collapsed flag on a tree $FG,5$TR$FG$ entry will cause it to start collapsed.  A $FG,4$-C$FG$ flag will make it start open.
 $ID,-2$$TR,"+X <ESC> (Exit)"$
 $ID,2$* A exit flag will cause a macro to send an $FG,2$<ESC>$FG$ before running(to exit the personal menu screen and return to the cmd prompt).  Actually, the default has an exit flag set so you might add a $FG,4$-X$FG$ to turn-off $FG,2$ESC$FG$.
 * If an entry is already at the cmd prompt, the $FG,4$+X$FG$ will cause a movement to the bottom of the window.
@@ -136,7 +134,7 @@ $ID,2$A zero flag on a hex edit($FG,5$HX$FG$) entry will cause the offset from z
 $ID,-2$$TR,"+HTML"$
 $ID,2$The $LK,"ToHtml","MN:ToHtml"$() or $LK,"Doc2Html","MN:Doc2Html"$() routines will generate a html version of a document.  You can cause html link on an item with $FG,4$+HTML$FG$.
 $ID,-2$$TR,"+BP"$
-$ID,2$The Bin Ptr Link flags lets you specify a file name and bin num to import a bin$FG$.  $FG,2$$$SP+BP,"<tag>",1,"filename,1"$$$FG$ will import bin num "1" from filename.
+$ID,2$The Bin Ptr Link flags lets you specify a filename and bin num to import a bin$FG$.  $FG,2$$$SP+BP,"<tag>",1,"filename,1"$$$FG$ will import bin num "1" from filename.
 $ID,-2$$TR,"+AL Alias"$
 $ID,2$An alias flag on a tree entry ($FG,4$+TR$FG$) will cause the text of the current entry the cursor is on to be copied to this entry.  This creates something similar to a drop-down window, but it doesn't work well yet.
 $ID,-2$$TR,"+RD Refresh Data"$

@@ -78,10 +78,10 @@ U0 DrawProgressBars(CDC *dc)
       if (*sys_progresses[i].desc)
 	st=StrNew(sys_progresses[i].desc);
       else
-	st=MSPrintF("%d/%d",n,m);
-      GrPutS(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,
+	st=MPrint("%d/%d",n,m);
+      GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,
 	(GR_HEIGHT-FONT_HEIGHT-
-	(NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,st);
+	(NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
       Free(st);
     }
   }
@@ -126,21 +126,21 @@ U0 ExtendedASCII()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"Select Char and Press <ESC>\n$$FG,LTBLUE$$");
+  DocPrint(doc,"Select Char and Press <ESC>\n$$FG,LTBLUE$$");
   for (i=0;i<256;i++) {
     if (i>=CH_SHIFT_SPACE && i!=127) {
       if (i==CH_SHIFT_SPACE)
-	DocPrintF(doc,"$$MU-X-UL,\"\\37\",%d$$",i);
+	DocPrint(doc,"$$MU-X-UL,\"\\37\",%d$$",i);
       else if (i=='$$')
-	DocPrintF(doc,"$$MU-X-UL,\"\\44\",%d$$",i);
+	DocPrint(doc,"$$MU-X-UL,\"\\44\",%d$$",i);
       else if (i=='\"'||i=='\\')
-	DocPrintF(doc,"$$MU-X-UL,\"\\%c\",%d$$",i,i);
+	DocPrint(doc,"$$MU-X-UL,\"\\%c\",%d$$",i,i);
       else
-	DocPrintF(doc,"$$MU-X-UL,\"%c\",%d$$",i,i);
+	DocPrint(doc,"$$MU-X-UL,\"%c\",%d$$",i,i);
     } else
-      DocPutS(doc," ");
+      DocPrint(doc," ");
     if (i&15==15)
-      DocPutS(doc,"\n");
+      DocPrint(doc,"\n");
   }
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -1061,7 +1061,7 @@ U0 WinMgrTask(I64)
   CDocEntry *doc_e;
   I64 x,y,z,msg_code,
       my_ipz=0,left,top,
-      old_flags=GetFlags;
+      old_flags=GetRFlags;
   Bool has_border;
   CCtrl *c;
   TaskInitExt;
@@ -1087,13 +1087,13 @@ wmt_start:
       while (TRUE) {
 	Cli;
 	if (!TaskValidate(task)) {
-	  SetFlags(old_flags);
+	  SetRFlags(old_flags);
 	  goto wmt_start;
 	}
 	WinChkMoveSize(task);
 	TaskDerivedValsUpdate(task,FALSE);
 	task=task->last_task;
-	SetFlags(old_flags);
+	SetRFlags(old_flags);
 	if (task==Fs)
 	  break;
       }
@@ -1103,21 +1103,21 @@ wmt_start:
       while (TRUE) {
 	Cli;
 	if (!TaskValidate(task)) {
-	  SetFlags(old_flags);
+	  SetRFlags(old_flags);
 	  goto wmt_start;
 	}
 	if (Bt(&task->display_flags,DISPLAYf_SHOW) &&
 	    task->win_border_pixel_left<=ipx<=task->win_border_pixel_right &&
 	    task->win_border_pixel_top<=ipy<=task->win_border_pixel_bottom) {
-	  SetFlags(old_flags);
+	  SetRFlags(old_flags);
 	  break;
 	}
 	if (task==Fs) {	//Shouldn't happen
-	  SetFlags(old_flags);
+	  SetRFlags(old_flags);
 	  goto wmt_start;
 	}
 	task=task->last_task;
-	SetFlags(old_flags);
+	SetRFlags(old_flags);
       }
 
       if (Bt(&task->display_flags,DISPLAYf_NO_BORDER))

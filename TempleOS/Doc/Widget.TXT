@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Text-Widget Help"$$FG$
 
 See $LK-A,"::/TempleOS/Doc/Dollar.TXT"$ for details on dollar sign cmds.
 
-$FG,2$"Expression"$FG$ a num or Holy C algebraic term with operators and Holy C syms can be entered.
+$FG,2$"Expression"$FG$ a num or HolyC algebraic term with operators and HolyC syms can be entered.
 $FG,2$"Macro"$FG$ Most entries can behave like macro entries if you assign them macro strs.
 $FG,2$"AutoStr"$FG$ Like a macro except it is an $LK,"AutoFile","FF:::/TempleOS/Doc/Glossary.TXT,AutoFile"$.  You can't have both an autostr and macro text defined.  
 

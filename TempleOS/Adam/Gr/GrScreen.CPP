@@ -32,6 +32,7 @@ public U0 DCClear(CDC *dc=NULL)
 }
 
 #help_index "Graphics/Screen"
+public I64 gr_pan_text_x=0,gr_pan_text_y=0; // [-7,7]
 public U0 (*fp_final_screen_update)(CDC *dc)=NULL;
 public U0 (*fp_wall_paper)(CTask *task)=NULL;
 
@@ -361,9 +362,9 @@ U0 GrInit4()
 
   gr_text_base=CAlloc(TEXT_ROWS*TEXT_COLS*sizeof(U32));
   gr_vga_text_cache=MAlloc(TEXT_ROWS*TEXT_COLS*sizeof(U16));
-  gr_win_z_buf=MAlloc(TEXT_ROWS*TEXT_COLS*sizeof(U16));
   gr_win_uncovered_bitmap=CAlloc(65536/8);
   gr_highest_uncovered=0;
+  gr_win_z_buf=MAlloc(TEXT_ROWS*TEXT_COLS*sizeof(U16));
 
   gr_dc2=DCNew(DCT_COLOR8,GR_WIDTH,GR_HEIGHT);
   gr_dc2->flags|=DCF_SCREEN_BITMAP;
@@ -583,25 +584,71 @@ U0 GrZoomInScreen()
 
 U0 GrUpdateBackgroundOfText()
 {
-  I64 reg RSI *dst=gr_dc2->body,reg R13 c,row,col,,cur_ch,
-      reg R12 w1=gr_dc2->width_internal,reg R10 w2=-7*w1+8,w3=7*w1,
-      reg *my_1_to_8_colors=gr_1_to_8_colors;
-  U32 reg *src=gr_text_base;
-$HL,1$	Bool blink_flag=Blink;
-  nounusedwarn w2;
-  for (row=TEXT_ROWS;row--;) {
-    for (col=TEXT_COLS;col--;) {
+  I64 reg RSI *dst=gr_dc2->body,reg R13 c,row,col,
+      num_rows=TEXT_ROWS,num_cols=TEXT_COLS,i,j,cur_ch,
+      reg R12 w1=gr_dc2->width_internal,w2=-7*w1+8,w3=7*w1,w4=0;
+  U32 *src=gr_text_base;
+  Bool blink_flag=Blink;
+  U8 *dst2=dst;
+
+  if (gr_pan_text_x) {
+    gr_pan_text_x=LimitI64(gr_pan_text_x,-7,7);
+    j=AbsI64(gr_pan_text_x)/FONT_WIDTH+1;
+    num_cols-=j;
+    if (gr_pan_text_x<0) {
+      src+=j;
+      i=FONT_WIDTH*j+gr_pan_text_x;
+    } else
+      i=gr_pan_text_x;
+    dst2=dst(U8 *)+i;
+    w4=j;
+    w3+=j*FONT_WIDTH;
+
+    j*=FONT_WIDTH;
+    dst(U8 *)=gr_dc2->body;
+    for (row=num_rows*FONT_HEIGHT;row--;) {
+      for (col=i;col--;)
+	*dst(U8 *)++=0;
+      dst(U8 *)+=w1-i-j;
+      for (col=j;col--;)
+	*dst(U8 *)++=0;
+    }
+  }
+  dst=dst2;
+
+  if (gr_pan_text_y) {
+    gr_pan_text_y=LimitI64(gr_pan_text_y,-7,7);
+    j=AbsI64(gr_pan_text_y)/FONT_HEIGHT+1;
+    num_rows-=j;
+    if (gr_pan_text_y<0) {
+      src+=w1/FONT_WIDTH*j;
+      i=w1*(FONT_HEIGHT*j+gr_pan_text_y);
+    } else
+      i=w1*gr_pan_text_y;
+    dst2=dst(U8 *)+i;
+
+    j*=w1*FONT_HEIGHT;
+    dst(U8 *)=gr_dc2->body;
+    for (row=i;row--;)
+      *dst(U8 *)++=0;
+    dst(U8 *)=gr_dc2->body+TEXT_ROWS*TEXT_COLS*FONT_HEIGHT*FONT_WIDTH-j;
+    for (row=j;row--;)
+      *dst(U8 *)++=0;
+  }
+  dst=dst2;
+
+  for (row=num_rows;row--;) {
+    for (col=num_cols;col--;) {
       cur_ch=*src++;
       if (cur_ch & (DOCET_SELECTED | DOCET_INVERT | DOCET_BLINK)) {
 	if (cur_ch & DOCET_SELECTED)
 	  cur_ch.u8[1]=cur_ch.u8[1]^0xFF;
 	if (cur_ch & DOCET_INVERT)
 	  cur_ch.u8[1]=cur_ch.u8[1]<<4+cur_ch.u8[1]>>4;
-	if (cur_ch & DOCET_BLINK)
-	  if (blink_flag)
-	    cur_ch.u8[1]= cur_ch.u8[1]<<4+ cur_ch.u8[1]>>4;
+	if (cur_ch & DOCET_BLINK && blink_flag)
+	  cur_ch.u8[1]=cur_ch.u8[1]<<4+cur_ch.u8[1]>>4;
       }
-      c=my_1_to_8_colors[cur_ch.u8[1]>>4];
+      c=gr_1_to_8_colors[cur_ch.u8[1]>>4];
 asm {
 	MOV	U64 [RSI],R13
 	ADD	RSI,R12
@@ -618,9 +665,10 @@ asm {
 	MOV	U64 [RSI],R13
 	ADD	RSI,R12
 	MOV	U64 [RSI],R13
-	ADD	RSI,R10
 }
+      dst(U8 *)+=w2;
     }
+    src+=w4;
     dst(U8 *)+=w3;
   }
 }
@@ -638,24 +686,46 @@ asm {
 U0 GrUpdateForegroundOfText()
 {
   U32 *src=gr_text_base;
-  I64 i,j,cur_ch,reg *dst=gr_dc2->body,
-      reg w1=gr_dc2->width_internal,w2=7*w1,
-      row,col;
+  I64 i,j,cur_ch,*dst=gr_dc2->body,
+      w1=gr_dc2->width_internal,w2=7*w1,w4=0,
+      num_rows=TEXT_ROWS,num_cols=TEXT_COLS,row,col;
   U8 *dst_start=gr_dc2->body,*dst_end=dst_start+w1*gr_dc2->height-7*w1-8;
   Bool blink_flag=Blink;
-  for (row=TEXT_ROWS;row--;) {
-    for (col=TEXT_COLS;col--;) {
+
+  if (gr_pan_text_x) {
+    gr_pan_text_x=LimitI64(gr_pan_text_x,-7,7);
+    j=AbsI64(gr_pan_text_x)/FONT_WIDTH+1;
+    num_cols-=j;
+    if (gr_pan_text_x<0) {
+      src+=j;
+      dst(U8 *)+=FONT_WIDTH*j;
+    }
+    w4=j;
+    w2+=j*FONT_WIDTH;
+  }
+
+  if (gr_pan_text_y) {
+    gr_pan_text_y=LimitI64(gr_pan_text_y,-7,7);
+    j=AbsI64(gr_pan_text_y)/FONT_HEIGHT+1;
+    num_rows-=j;
+    if (gr_pan_text_y<0) {
+      src+=w1/FONT_WIDTH*j;
+      dst(U8 *)+=w1*FONT_HEIGHT*j;
+    }
+  }
+
+  for (row=num_rows;row--;) {
+    for (col=num_cols;col--;) {
       cur_ch=*src++;
       if (cur_ch & (DOCET_UNDERLINE | DOCET_SELECTED | DOCET_INVERT | DOCET_BLINK)) {
 	if (cur_ch & DOCET_SELECTED)
 	  cur_ch.u8[1]=cur_ch.u8[1]^0xFF;
 	if (cur_ch & DOCET_INVERT)
 	  cur_ch.u8[1]=cur_ch.u8[1]<<4+cur_ch.u8[1]>>4;
-	if (cur_ch & DOCET_BLINK)
-	  if (blink_flag)
-	    cur_ch.u8[1]= cur_ch.u8[1]<<4+cur_ch.u8[1]>>4;
+	if (cur_ch & DOCET_BLINK && blink_flag)
+	  cur_ch.u8[1]=cur_ch.u8[1]<<4+cur_ch.u8[1]>>4;
       }
-      if (i=cur_ch.u16[1]&0x3FF) {
+      if (i=cur_ch.u16[1]&0x3FF+gr_pan_text_x+gr_pan_text_y<<5) {
 	j=i&0x1F;
 	if (j&0x10) j|=~0x1F;
 	i>>=5;
@@ -667,6 +737,7 @@ U0 GrUpdateForegroundOfText()
 	GrRopEquU8NoClipping(cur_ch&(DOCET_UNDERLINE+0xFFF),dst,w1);
       dst(U8 *)+=8;
     }
+    src+=w4;
     dst(U8 *)+=w2;
   }
 }

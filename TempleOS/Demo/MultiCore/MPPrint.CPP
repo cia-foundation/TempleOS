@@ -2,11 +2,11 @@ U0 Job(CDoc *doc)
 {
   I64 i;
   for (i=0;i<2;i++)
-    DocPrintF(doc,"$$FG,%d$$CPU%d ",Gs->num,Gs->num);
+    DocPrint(doc,"$$FG,%d$$CPU%d ",Gs->num,Gs->num);
 }
 
 
-U0 MPPrintFDemo()
+U0 MPPrintDemo()
 {
   I64 i;
   for (i=0;i<500;i++)
@@ -15,4 +15,4 @@ U0 MPPrintFDemo()
   "$$FG$$\n";
 }
 
-MPPrintFDemo;
+MPPrintDemo;

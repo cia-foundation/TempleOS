@@ -80,7 +80,7 @@ I64 SysTimerRead()
 
 I64 TaskTotalTime()
 {
-  return GetTimeStamp-Fs->time_slice_start+Fs->total_time;
+  return GetTSC-Fs->time_slice_start+Fs->total_time;
 }
 
 I64 TimeStampFreqCal()
@@ -91,10 +91,10 @@ I64 TimeStampFreqCal()
     PushFD;
     Cli;
     if (HPET_start) {
-      time_stamp_freq=HPET_freq*(GetTimeStamp-time_stamp_start);
+      time_stamp_freq=HPET_freq*(GetTSC-time_stamp_start);
       i=HPET-HPET_start;
     } else {
-      time_stamp_freq=SYS_TIMER_FREQ*(GetTimeStamp-time_stamp_start);
+      time_stamp_freq=SYS_TIMER_FREQ*(GetTSC-time_stamp_start);
       i=SysTimerRead-timer_start;
     }
     if (!i)
@@ -113,14 +113,14 @@ I64 TimeStampFreqCal()
     HPET_start=0;
     timer_start=SysTimerRead;
   }
-  time_stamp_start=GetTimeStamp;
+  time_stamp_start=GetTSC;
   PopFD;
   return time_stamp_freq;
 }
 
 F64 tT()
 //Time since boot in seconds as a float
-{
+{//This is fast but inaccurate if not HPET.
   static I64 last_time_stamp=0;
   static F64 last_result=0;
   I64 time_stamp;
@@ -130,25 +130,30 @@ F64 tT()
     PushFD;
     Cli;
     if (mp_cnt>1)
-      while (LBts(&sys_semas[SYS_SEMA_TNP],0))
+      while (LBts(&sys_semas[SYS_SEMA_TT],0))
 	Pause;
-    time_stamp=GetTimeStamp;
+    time_stamp=GetTSC;
     last_result+=ToF64(time_stamp-last_time_stamp)/time_stamp_freq;
     last_time_stamp=time_stamp;
-    LBtr(&sys_semas[SYS_SEMA_TNP],0);
+    LBtr(&sys_semas[SYS_SEMA_TT],0);
     PopFD;
     return last_result;
   }
 }
 
 F64 tJ()
+//Time since boot in seconds as a float
 {
   return sys_jiffies/ToF64(JIFFY_FREQ);
 }
 
 F64 tS()
-{
-  return SysTimerRead/ToF64(SYS_TIMER_FREQ);
+//Time since boot in seconds as a float
+{ //This is slow, but accurate even if no HPET.
+  if (HPET_freq)
+    return ToF64(HPET)/HPET_freq;
+  else
+    return SysTimerRead/ToF64(SYS_TIMER_FREQ);
 }
 
 Bool Blink(F64 Hz=2.5)
@@ -248,12 +253,6 @@ Bool Silent(Bool val) {
 
 Bool IsSilent() {
   return Bt(&Fs->display_flags,DISPLAYf_SILENT);
-}
-
-Bool IOSnd(Bool val) {
-  Bool result=!LBEqu(&sys_semas[SYS_SEMA_NO_IO_SND],0,!val);
-  Snd(0);
-  return result;
 }
 
 Bool IsPreempt() {

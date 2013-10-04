@@ -3,7 +3,7 @@
 public U8 *DBlk(I64 blk,Bool write=FALSE)
 {//Dump Disk Blk.
 //If you set write to TRUE, it will be written when you press <ESC>.
-//See $LK-A,"::/TempleOS/Demo/Dsk/Raw.CPP"$.
+//See $LK-A,"::/TempleOS/Demo/Dsk/DskRaw.CPP"$.
   U8 *buf=MAlloc(BLK_SIZE);
 
   RBlks(Fs->cur_prt,buf,blk,1);
@@ -21,7 +21,7 @@ public U8 *DBlk(I64 blk,Bool write=FALSE)
 public U8 *DCluster(I64 c,Bool write=FALSE,I64 num=0)
 {//Dump Disk Cluster.
 //If you set write to TRUE, it will be written when you press <ESC>.
-//See $LK-A,"::/TempleOS/Demo/Dsk/Raw.CPP"$.
+//See $LK-A,"::/TempleOS/Demo/Dsk/DskRaw.CPP"$.
 //Do $LK,"Dir","MN:Dir"$("*",TRUE); to get cluster numbers of files.
   U8 *buf=MAlloc(Fs->cur_prt->spc<<BLK_SIZE_BITS);
   c=ClusterNumNext(Fs->cur_prt,c,num);
@@ -40,49 +40,48 @@ public U8 *DCluster(I64 c,Bool write=FALSE,I64 num=0)
 
 #help_index "File/Program Routines"
 
-U0 OFFlatten(CDirEntry *tempm,CDirEntry **a,I64 *i)
+U0 FOFlatten(CDirEntry *tempde,CDirEntry **a,I64 *i)
 {
-  CDirEntry *tempm1;
-  while (tempm) {
-    tempm1=tempm->next;
-    if (tempm->attr&_ATTR_DIR) {
-      OFFlatten(tempm->sub,a,i);
-      CDirEntryDel(tempm);
+  CDirEntry *tempde1;
+  while (tempde) {
+    tempde1=tempde->next;
+    if (tempde->attr&_ATTR_DIR) {
+      FOFlatten(tempde->sub,a,i);
+      DirEntryDel(tempde);
     } else {
-      a[*i]=tempm;
+      a[*i]=tempde;
       *i=*i+1;
     }
-    tempm=tempm1;
+    tempde=tempde1;
   }
 }
 
-
-public I64 CFileCnt(CDirEntry *tempm)
+public I64 FileCnt(CDirEntry *tempde)
 {
   I64 cnt=0;
-  while (tempm) {
-    if (tempm->attr&_ATTR_DIR)
-      cnt+=CFileCnt(tempm->sub);
+  while (tempde) {
+    if (tempde->attr&_ATTR_DIR)
+      cnt+=FileCnt(tempde->sub);
     else
       cnt++;
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   return cnt;
 }
 
-I64 OFCompare(CDirEntry *e1,CDirEntry *e2)
+I64 FOCompare(CDirEntry *tempde1,CDirEntry *tempde2)
 {
-  return e1->cluster-e2->cluster;
+  return tempde1->cluster-tempde2->cluster;
 }
 
-public CDirEntry **FilesOrder(CDirEntry *tempm,I64 *_cnt=NULL)
+public CDirEntry **FilesOrder(CDirEntry *tempde,I64 *_cnt=NULL)
 { //See $LK-A,"::/TempleOS/Demo/Dsk/OrderedIO.CPP"$.
-  I64 cnt=CFileCnt(tempm),i=0;
-  CDirEntry **a=MAlloc(sizeof(CDirEntry *)*cnt);
-  OFFlatten(tempm,a,&i);
-  QSortI64(a,cnt,&OFCompare);
+  I64 cnt=FileCnt(tempde),i=0;
+  CDirEntry **flst=MAlloc(sizeof(CDirEntry *)*cnt);
+  FOFlatten(tempde,flst,&i);
+  QSortI64(flst,cnt,&FOCompare);
   if (_cnt) *_cnt=cnt;
-  return a;
+  return flst;
 }
 
 
@@ -92,22 +91,22 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
 {
   Bool result=TRUE;
   CFileAccess *fa;
-  CDirEntry *tempm,*tempm1;
+  CDirEntry *tempde,*tempde1;
   U8 *st;
-  if (!(tempm=FilesFind(src_files_find_mask)))
+  if (!(tempde=FilesFind(src_files_find_mask)))
     return FALSE;
   if (IsDir(dst_files_find_mask)) {
     if (fa=FileAccessNew(dst_files_find_mask,TRUE)) {
-      while (tempm) {
-	tempm1=tempm->next;
-	if (!(tempm->attr & _ATTR_DIR)) {
-	  st=FileNameAbs(tempm->name);
-	  if (!CopySingle(tempm->full_name,st))
+      while (tempde) {
+	tempde1=tempde->next;
+	if (!(tempde->attr & _ATTR_DIR)) {
+	  st=FileNameAbs(tempde->name);
+	  if (!CopySingle(tempde->full_name,st))
 	    result=FALSE;
 	  Free(st);
 	}
-	CDirEntryDel(tempm);
-	tempm=tempm1;
+	DirEntryDel(tempde);
+	tempde=tempde1;
       }
       FileAccessDel(fa);
     }
@@ -125,22 +124,22 @@ public Bool Move(U8 *f1,U8 *f2)
   return FALSE;
 }
 
-I64 PutCopyTree(CDirEntry *tempm,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
+I64 PutCopyTree(CDirEntry *tempde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
 {
   U8 *st;
   I64 result=1;
-  while (tempm) {
-    st=MAlloc(StrLen(tempm->full_name)+dst_dir_len+2);
+  while (tempde) {
+    st=MAlloc(StrLen(tempde->full_name)+dst_dir_len+2);
     MemCpy(st,dst_dir,dst_dir_len);
-    StrCpy(st+dst_dir_len,tempm->full_name+src_dir_len);
-    if (tempm->attr & _ATTR_DIR) {
+    StrCpy(st+dst_dir_len,tempde->full_name+src_dir_len);
+    if (tempde->attr & _ATTR_DIR) {
       MkDir(st);
-      result+=PutCopyTree(tempm->sub,src_dir_len,dst_dir_len,dst_dir);
+      result+=PutCopyTree(tempde->sub,src_dir_len,dst_dir_len,dst_dir);
     } else
-      if (CopySingle(tempm->full_name,st))
+      if (CopySingle(tempde->full_name,st))
 	result++;
     Free(st);
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   return result;
 }
@@ -148,7 +147,7 @@ I64 PutCopyTree(CDirEntry *tempm,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
 public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask)
 {  //returns count of copied files (not dirs)
   CFileAccess *fa;
-  CDirEntry *tempm=NULL;
+  CDirEntry *tempde=NULL;
   I64 result=0,i1,i2;
   U8 *st1,*st2;
 
@@ -163,7 +162,7 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask)
   Free(st1);
   Free(st2);
   if (fa=FileAccessNew(src_files_find_mask,TRUE)) {
-    tempm=SysFilesFind(fa->mask,FUF_RECURSE);
+    tempde=SysFilesFind(fa->mask,FUF_RECURSE);
     st1=CurDir;
     FileAccessDel(fa);
     i1=StrLen(st1);
@@ -172,46 +171,46 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask)
       st2=CurDir;
       i2=StrLen(st2);
       if (i2==3) i2--;
-      result=PutCopyTree(tempm,i1,i2,st2);
+      result=PutCopyTree(tempde,i1,i2,st2);
       FileAccessDel(fa);
       Free(st2);
     }
-    CDirLstDel(tempm);
+    DirLstDel(tempde);
     Free(st1);
   }
   return result;
 }
 
-I64 DelTreeDirs(CDirEntry *tempm1)
+I64 DelTreeDirs(CDirEntry *tempde1)
 {
   I64 result=0;
-  CDirEntry *tempm2;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub)
-	result+=DelTreeDirs(tempm1->sub);
-      result+=SysDel(tempm1->full_name,TRUE);
+  CDirEntry *tempde2;
+  while (tempde1) {
+    tempde2=tempde1->next;
+    if (tempde1->attr & _ATTR_DIR) {
+      if (tempde1->sub)
+	result+=DelTreeDirs(tempde1->sub);
+      result+=SysDel(tempde1->full_name,TRUE);
     }
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
+    DirEntryDel(tempde1);
+    tempde1=tempde2;
   }
   return result;
 }
 
-I64 DelTreeFiles(CDirEntry *tempm1)
+I64 DelTreeFiles(CDirEntry *tempde1)
 {
   I64 result=0;
-  CDirEntry *tempm2;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub)
-	result+=DelTreeFiles(tempm1->sub);
+  CDirEntry *tempde2;
+  while (tempde1) {
+    tempde2=tempde1->next;
+    if (tempde1->attr & _ATTR_DIR) {
+      if (tempde1->sub)
+	result+=DelTreeFiles(tempde1->sub);
     } else
-      result+=SysDel(tempm1->full_name,FALSE);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
+      result+=SysDel(tempde1->full_name,FALSE);
+    DirEntryDel(tempde1);
+    tempde1=tempde2;
   }
   return result;
 }
@@ -219,8 +218,8 @@ I64 DelTreeFiles(CDirEntry *tempm1)
 public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
 {
   I64 result=0,fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (IsDir(files_find_mask)) {
     result=DelTreeDirs(FilesFind(files_find_mask,fuf_flags));
     result+=SysDel(files_find_mask,TRUE);
@@ -230,7 +229,7 @@ public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
   return result;
 }
 
-U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=0) //Just one file
+U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=0)
 {
   CPrt *p=Drv2Prt(*filename);
   CDirEntry de;
@@ -239,37 +238,20 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=0) //Just one file
   if (FileFind(filename,&de,FUF_JUST_FILES)) {
     Free(de.full_name);
     if (!StrCmp(attr,"+?"))
-      "%-48ts %s\n",filename,SPrintFFlags(buf,Define("ST_FILE_ATTRS"),de.attr);
+      "%-48ts %s\n",filename,SPrintFlags(buf,Define("ST_FILE_ATTRS"),de.attr);
     else {
       StrFirstRem(cur_dir,":");
       StrLastRem(cur_dir,"/");
       if (!*cur_dir)
 	StrCpy(cur_dir,"/");
-      GetFFlags(&de.attr,Define("ST_FILE_ATTRS"),attr);
+      ScanFlags(&de.attr,Define("ST_FILE_ATTRS"),attr);
       if (cdt)
 	de.datetime=cdt;
       else
-	de.datetime=GetCurTimeDate;
-      CDirNew(p,cur_dir,&de,FALSE);
+	de.datetime=GetDateTime;
+      DirNew(p,cur_dir,&de,FALSE);
     }
   } else PutDefineErr("ST_FILE_NOT_FOUND");
-}
-
-U0 TouchLst(CDirEntry *tempm1,U8 *attr,CDate cdt=0)
-{
-  CDirEntry *tempm2;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub) {
-	"%S%s\n","ST_SCANNING_DIR",tempm1->full_name;
-	TouchLst(tempm1->sub,attr,cdt);
-      }
-    } else
-      TouchFile(tempm1->full_name,attr,cdt);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
-  }
 }
 
 public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate cdt=0)
@@ -279,38 +261,32 @@ public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate cdt=0)
 //To Set Date
 //  Touch(filename,"",,datetime);
   I64 fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  TouchLst(FilesFind(files_find_mask,fuf_flags),attr,cdt);
-}
-
-I64 FFLst(CDirEntry *tempm1)
-{
-  I64 cnt=0;
-  CDirEntry *tempm2;
-
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub)
-	cnt+=FFLst(tempm1->sub);
-    } else {
-      PutFileLink(tempm1->full_name);
-      NewLine;
-      cnt++;
-    }
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
+  CDirEntry *tempde,*tempde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+f+F");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    TouchFile(tempde->full_name,attr,cdt);
+    tempde=tempde->next;
   }
-  return cnt;
+  DirLstDel(tempde1);
 }
 
 public I64 FF(U8 *files_find_mask,U8 *fu_flags=NULL)
 //Files Find
 {
   I64 cnt=0,fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  cnt+=FFLst(FilesFind(files_find_mask,fuf_flags));
+  CDirEntry *tempde,*tempde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    PutFileLink(tempde->full_name);
+    NewLine;
+    cnt++;
+    tempde=tempde->next;
+  }
+  DirLstDel(tempde1);
   return cnt;
 }
 
@@ -386,19 +362,19 @@ public I64 UnusedDrvSpace(U8 drv_let=0)
 
 #help_index "File/Program Routines"
 
-I64 TreeSizeFiles(CDirEntry *tempm,I64 round_to)
+I64 TreeSizeFiles(CDirEntry *tempde,I64 round_to)
 {
   I64 result=0,i;
-  while (tempm) {
+  while (tempde) {
     if (round_to)
-      i=CeilU64(tempm->size,round_to);
+      i=CeilU64(tempde->size,round_to);
     else
-      i=tempm->size;
-    if (tempm->attr&_ATTR_DIR)
-      i+=TreeSizeFiles(tempm->sub,round_to);
-    tempm->user_data=i;
+      i=tempde->size;
+    if (tempde->attr&_ATTR_DIR)
+      i+=TreeSizeFiles(tempde->sub,round_to);
+    tempde->user_data=i;
     result+=i;
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   return result;
 }
@@ -408,12 +384,12 @@ public I64 TreeSize(U8 *files_find_mask="/TempleOS/*",U8 *fu_flags=NULL,I64 roun
 //Does not include directory size of base directory, but
 //does include size of sub directories.
   I64 fuf_flags=0,result=0;
-  CDirEntry *tempm1=NULL;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  if (tempm1=FilesFind(files_find_mask,fuf_flags)) {
-    result=TreeSizeFiles(tempm1,round_to);
-    CDirLstDel(tempm1);
+  CDirEntry *tempde1=NULL;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  if (tempde1=FilesFind(files_find_mask,fuf_flags)) {
+    result=TreeSizeFiles(tempde1,round_to);
+    DirLstDel(tempde1);
   }
   return result;
 }

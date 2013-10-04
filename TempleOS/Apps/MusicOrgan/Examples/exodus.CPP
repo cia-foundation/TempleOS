@@ -1,4 +1,4 @@
-//0 no nothing
+//7 no nothing
 U0 Song()
 {
   Fs->task_end_cb=&SndTaskEndCB;
@@ -7,10 +7,10 @@ U0 Song()
   music_stacatto_factor= 0.902;
   try {
   while (!ScanKey) {
-	Play("3eFDGsBReCB2sGRGR3qEetGAGeGsFGeRsDG");
-	Play("eFDGsBReCB2sGRGR3qEetGAGeGsFGeRsDG");
-	Play("FAFAqGeEEqBetE2GR3eFsARe.BsCe.RsE");
-	Play("FAFAqGeEEqBetE2GR3eFsARe.BsCe.RsE");
+	Play("3e.C2sG3qEe.FsBeCCsFGeBAAetAREeEsCB");
+	Play("e.C2sG3qEe.FsBeCCsFGeBAAetAREeEsCB");
+	Play("eGE2qG3sCDCDe.EsGqCsDCDCe.AsReGE");
+	Play("GE2qG3sCDCDe.EsGqCsDCDCe.AsReGE");
   }
   } catch
     CatchAll;

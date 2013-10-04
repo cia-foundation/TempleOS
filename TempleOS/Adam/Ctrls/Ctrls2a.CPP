@@ -23,15 +23,15 @@ U0 CtrlsUpdate(CTask *task)
     if (c->update_derived_vals)
       (*c->update_derived_vals)(c);
     if (c->flags&CTRLF_BORDER) {
-      c->screen_left  =task->win_pixel_left+c->left-FONT_WIDTH;
-      c->screen_right =task->win_pixel_left+c->right-FONT_WIDTH;
-      c->screen_top   =task->win_pixel_top+c->top-FONT_HEIGHT;
-      c->screen_bottom=task->win_pixel_top+c->bottom-FONT_HEIGHT;
+      c->screen_left  =gr_pan_text_x+task->win_pixel_left+c->left-FONT_WIDTH;
+      c->screen_right =gr_pan_text_x+task->win_pixel_left+c->right-FONT_WIDTH;
+      c->screen_top   =gr_pan_text_y+task->win_pixel_top+c->top-FONT_HEIGHT;
+      c->screen_bottom=gr_pan_text_y+task->win_pixel_top+c->bottom-FONT_HEIGHT;
     } else {
-      c->screen_left  =task->win_pixel_left+c->left;
-      c->screen_right =task->win_pixel_left+c->right;
-      c->screen_top   =task->win_pixel_top+c->top;
-      c->screen_bottom=task->win_pixel_top+c->bottom;
+      c->screen_left  =gr_pan_text_x+task->win_pixel_left+c->left;
+      c->screen_right =gr_pan_text_x+task->win_pixel_left+c->right;
+      c->screen_top   =gr_pan_text_y+task->win_pixel_top+c->top;
+      c->screen_bottom=gr_pan_text_y+task->win_pixel_top+c->bottom;
     }
     c=c->next;
   }
@@ -147,15 +147,15 @@ U0 WinDerivedScrollValsUpdate(CCtrl *c)
   if (!range) range=1;
   switch (c->type) {
     case CTRLT_WIN_HSCROLL:
-      c->left=FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->win_pixel_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
-      c->right=c->left+WIN_SCROLL_SIZE-1;
-      c->top=FONT_HEIGHT+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->win_pixel_height;
+      c->left  =gr_pan_text_x+FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->win_pixel_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->right =c->left+WIN_SCROLL_SIZE-1;
+      c->top   =gr_pan_text_y+FONT_HEIGHT+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->win_pixel_height;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
     case CTRLT_WIN_VSCROLL:
-      c->left=FONT_WIDTH+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->win_pixel_width;
-      c->right=c->left+WIN_SCROLL_SIZE-1;
-      c->top=FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->win_pixel_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->left  =gr_pan_text_x+FONT_WIDTH+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->win_pixel_width;
+      c->right =c->left+WIN_SCROLL_SIZE-1;
+      c->top   =gr_pan_text_y+FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->win_pixel_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
   }
@@ -265,9 +265,9 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
   }
 
   dc->color=s->cx;
-  GrPrintF(dc,c->left+VIEWANGLES_SPACING-FONT_WIDTH/2,
+  GrPrint(dc,c->left+VIEWANGLES_SPACING-FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"X");
-  GrPrintF(dc,c->left+VIEWANGLES_SPACING-3*FONT_WIDTH/2,
+  GrPrint(dc,c->left+VIEWANGLES_SPACING-3*FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
     "%3d",s->sx*360/VIEWANGLES_RANGE);
   i=c->left+VIEWANGLES_SPACING;
@@ -282,9 +282,9 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
 
 
   dc->color=s->cy;
-  GrPrintF(dc,c->left+2*VIEWANGLES_SPACING+1-FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*VIEWANGLES_SPACING+1-FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Y");
-  GrPrintF(dc,c->left+2*VIEWANGLES_SPACING+1-3*FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*VIEWANGLES_SPACING+1-3*FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
     "%3d",s->sy*360/VIEWANGLES_RANGE);
   i=c->left+2*VIEWANGLES_SPACING+1;
@@ -299,9 +299,9 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
 
 
   dc->color=s->cz;
-  GrPrintF(dc,c->left+3*VIEWANGLES_SPACING+2-FONT_WIDTH/2,
+  GrPrint(dc,c->left+3*VIEWANGLES_SPACING+2-FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Z");
-  GrPrintF(dc,c->left+3*VIEWANGLES_SPACING+2-3*FONT_WIDTH/2,
+  GrPrint(dc,c->left+3*VIEWANGLES_SPACING+2-3*FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
     "%3d",s->sz*360/VIEWANGLES_RANGE);
   i=c->left+3*VIEWANGLES_SPACING+2;

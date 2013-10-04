@@ -11,9 +11,9 @@
   is stored in the lower 32-bits.  The upper
   32-bits hold the num of days since Christ.
 
-  $LK,"PrintF","MN:PrintF"$() and the file datetimes use
+  $LK,"Print","MN:Print"$() and the file datetimes use
   this format, otherwise you might want to
-  use $LK,"GetTimeStamp","MN:GetTimeStamp"$() for a higher frequency
+  use $LK,"GetTSC","MN:GetTSC"$() for a higher frequency
   timing, divide by $LK,"time_stamp_freq","MN:time_stamp_freq"$,
   but this num is tied to your CPU's
   clock frequency which is inexact when
@@ -21,7 +21,7 @@
 */
 
 
-CDate cdt=GetCurTimeDate;
+CDate cdt=GetDateTime;
 
 I64 i;
 for (i=0;i<DF_NUM;i++)

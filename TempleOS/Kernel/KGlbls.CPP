@@ -18,8 +18,8 @@ CCacheBlk *sys_dsk_cache_base=NULL,*sys_dsk_cache_ctrl=NULL;
 CCacheBlk **sys_dsk_cache_hash_table=NULL;
 I64 sys_dsk_cache_size;
  
-I64 sys_raw_dc_col=0,sys_raw_dc_flags=0;
-U8 *sys_dc_screen_image;
+I64 sys_raw_col=0,sys_raw_flags=0;
+U8 *sys_raw_screen_image;
 Bool text_mode;
 I64 text_rows,text_cols,gr_width,gr_height;
 U8 *gr_font;
@@ -39,7 +39,7 @@ I64 sys_auto_mount_ide_cnt=0;
     kernel_cfg->auto_mount_ide_hd_let='C';
   if (!kernel_cfg->auto_mount_ide_cd_let)
     kernel_cfg->auto_mount_ide_cd_let='T';
-  StreamPrintF("U8 sys_first_hd_drv_let=%d,sys_first_cd_drv_let=%d;",
+  StreamPrint("U8 sys_first_hd_drv_let=%d,sys_first_cd_drv_let=%d;",
     kernel_cfg->auto_mount_ide_hd_let,kernel_cfg->auto_mount_ide_cd_let);
 }
 Bool boot_drv_pmt=FALSE,cdrom_boot_is_good=TRUE;
@@ -131,5 +131,5 @@ U0 (*fp_set_std_palette)()=NULL;
 
 CPSectCache *psect_cache;
 I64 psect_cache_index;
-//These are for $LK,"SPrintF","MN:SPrintFJoin"$()
+//These are for $LK,"SPrint","MN:SPrintJoin"$()
 U8 *date_fmt_map,*time_fmt_map;

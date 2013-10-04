@@ -3,7 +3,7 @@ In this file, syms defined Kernel assembly
 files are given C+ definitions.  This file
 is included when you compile the kernel, after
 the assembly files have been assembled, making
-the Holy C definitions available for the Holy C Kernel
+the HolyC definitions available for the HolyC Kernel
 files.	It is also included as part of booting.
 
 The assembly global labels are stored as HTT_EXPORT_SYS_SYM
@@ -118,8 +118,8 @@ public _extern _MEMSET_U32 U32 *MemSetU32(U32 *dst,I64 val,I64 U32cnt);
 public _extern _MEMSET_U64 U64 *MemSetU64(U64 *dst,I64 val,I64 U64cnt);
 public _extern SYS_CODE_BP CBlkPool *sys_code_bp;
 public _extern SYS_DATA_BP CBlkPool *sys_data_bp;
-public _extern SYS_HEAP_BASE U32 sys_heap_base;
-public _extern SYS_HEAP_LIMIT U32 sys_heap_limit;
+public _extern SYS_HEAP_BASE		U8 *sys_heap_base;
+public _extern SYS_HEAP_LIMIT		U8 *sys_heap_limit;
 
 _extern SYS_HEAP_INIT_FLAG	U8 sys_heap_init_flag;
 _extern SYS_HEAP_INIT_VAL	U8 sys_heap_init_val;
@@ -153,13 +153,13 @@ public _intern IC_POP I64 Pop();
 public _intern IC_PUSH U0 Push(I64 d);
 public _intern IC_CLD U0 Cld();
 public _intern IC_STD U0 Std();
-public _intern IC_GET_FLAGS I64 GetFlags();
+public _intern IC_GET_RFLAGS I64 GetRFlags();
 public _intern IC_CARRY I64 Carry();
-public _intern IC_SET_FLAGS U0 SetFlags(I64 d);
-public _intern IC_GET_STK_PTR U8 *GetStkPtr();
-public _intern IC_SET_STK_PTR U0 SetStkPtr(U8 *d);
-public _intern IC_GET_BASE_PTR U8 *GetBasePtr();
-public _intern IC_SET_BASE_PTR U0 SetBasePtr(U8 *d);
+public _intern IC_SET_RFLAGS U0 SetRFlags(I64 d);
+public _intern IC_GET_RSP U8 *GetRSP();
+public _intern IC_SET_RSP U0 SetRSP(U8 *d);
+public _intern IC_GET_RBP U8 *GetRBP();
+public _intern IC_SET_RBP U0 SetRBP(U8 *d);
 public _extern SYS_CACHE_LINE_WIDTH I64 sys_cache_line_width;
 _extern SYS_GDTTAB U8 sys_gdttab[GDT_SIZE];
 public _extern _XCHG_U64 U64 XchgU64(U64 *dst,U64 d);
@@ -196,7 +196,7 @@ _extern SYS_SEMAS CSema sys_semas[NUM_SYS_SEMAS];
 public _intern IC_GS CCPU *Gs();
 
 #help_index "Time/CPU Cycles"
-public _intern IC_RDTSC I64 GetTimeStamp();
+public _intern IC_RDTSC I64 GetTSC(); //Time Stamp Counter
 
 #help_index "Time/HPET"
 public _intern IC_HPET I64 HPET();
@@ -290,7 +290,7 @@ public _extern _CALL I64 Call(U8 *s);
 public _extern _CALLIND I64 CallInd(/*argpop*/I64 (*fp_add)(...),...);
 
 //This is just an array of ptrs to funs.
-//See $LK,"Extern Num Definitions","MN:EXT_TABLE_SIZE"$
+//See $LK,"Extern Num Definitions","MN:EXT_NUM_ENTRIES"$
 public _extern SYS_EXTERN_TABLE /*argpop*/ I64 (**ext)(...);
 //Can have any fixed number of arguments.
 public _extern _CALLEXTNUM I64 CallExtNum(I64 num,...);

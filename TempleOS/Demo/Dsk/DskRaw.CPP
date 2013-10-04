@@ -8,10 +8,10 @@ U0 RawAccess(I64 drv_let=0)
   PrtRep;
   PressAKey;
 
-  ClassRep("CPrt",p);
+  ClassRep(p);
   PressAKey;
 
-  ClassRep("CBlkDev",bdev);
+  ClassRep(bdev);
   PressAKey;
 
   //Temporarily change partition range to full device.

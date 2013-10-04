@@ -9,7 +9,6 @@ public extern I64 LexGetChar(CLex *lx);
 public extern U0 LexSkipEol(CLex *lx);
 public extern U0 LexPush(CLex *lx);
 public extern U0 LexPop(CLex *lx);
-//public extern U0 LexSubStkPtr(CLex *lx);
 public extern I64 Lex(CLex *lx);
 public extern U8 *LexExtStr(CLex *lx,I64 *_size=NULL);
 public extern U0 LexPutLine(CLex *lx,U8 *start);
@@ -17,26 +16,24 @@ public extern U0 LexPutPos(CLex *lx);
 public extern U0 LexPutWarn(CLex *lx,U8 *name=NULL,CHashFun *fun_class=NULL);
 public extern I64 PrsKeyWord(CLex *lx);
 public extern U0 LexExcept(CLex *lx,U8 *name=NULL,CHashFun *fun_class=NULL);
-public extern U8 *CmpExpression(CLex *lx,I64 *type=NULL);
-public extern U8 *CmpStatement(CLex *lx,I64 *type);
-public extern I64 GetExpression(CLex *lx,U8 **ex); //FALSE=no err
-public extern I64 Expression(CLex *lx);
-public extern U0 ExpressionDel(U8 *code);
+public extern U8 *LexExpression2Bin(CLex *lx,I64 *type=NULL);
+public extern U8 *LexStatement2Bin(CLex *lx,I64 *type);
+public extern I64 IsLexExpression2Bin(CLex *lx,U8 **ex); //FALSE=no err
+public extern I64 LexExpression(CLex *lx);
+public extern U0 ExpressionBinDel(U8 *ex);
 public extern I64 MemberMetaData(U8 *st,CMemberLst *ml);
 extern U0 MemberLstDel(CHashClass *c);
 public extern CMemberLstMeta *MemberMetaFind(U8 *st,CMemberLst *ml);
 public extern CMemberLst *MemberFind(U8 *st,CHashClass *c);
 public extern CMemberLst *MemberFind2(CHashClass *pattern,CHashClass *tempc);
 public extern U0 LexAttachDoc(CLex *lx,CLexFile *tempf=NULL,
-  CDoc *doc=NULL,U8 *abs_filename=NULL,CDocEntry *doc_e=NULL,I64 col=0);
+	CDoc *doc=NULL,U8 *abs_filename=NULL,CDocEntry *doc_e=NULL,I64 col=0);
 public extern CHashClass *OptClassFwd(CHashClass *tempc);
 
 #help_index "Compiler/Directive"
 #help_file "::/TempleOS/Doc/Directives"
-public extern U0 StreamPutS(U8 *buf);
-public extern U0 StreamPrintF(U8 *src,...);
-public extern I64 StreamExePutS(U8 *buf);
-public extern I64 StreamExePrintF(U8 *fmt,...);
+public extern U0 StreamPrint(U8 *fmt,...);
+public extern I64 StreamExePrint(U8 *fmt,...);
 public extern Bool PTrace(Bool val);
 public extern Bool OTrace(Bool val);
 public extern I64 OPassTraceMask(I64 i=0b1001111101);
@@ -65,19 +62,17 @@ public extern I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfil
 #help_index "Compiler"
 public extern I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,
 			  CLexHashTableContext *htc=NULL);
-public extern I64 ExePrintF(U8 *fmt,...);
+public extern I64 ExePrint(U8 *fmt,...);
 public extern I64 ExeFile(U8 *name,Bool just_load=FALSE);
 public extern I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE);
-public extern I64 ExePrintF2(U8 *fmt,...);
+public extern I64 ExePrint2(U8 *fmt,...);
 public extern I64 ExeFile2(U8 *name,Bool just_load=FALSE);
 public extern I64 ExePutS3(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE);
-public extern I64 ExePrintF3(U8 *fmt,...);
+public extern I64 ExePrint3(U8 *fmt,...);
 public extern I64 ExeFile3(U8 *name,Bool just_load=FALSE);
 extern CHashTable *asm_hash;
 extern U0 CmpInit(Bool first);
 extern I64 compiled_lines,compiled_funs,compiled_bytes;
-
-
 
 //The following is for benchmarking
 extern Bool cmp_do_not_write_to_dsk;

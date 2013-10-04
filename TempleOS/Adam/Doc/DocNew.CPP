@@ -10,9 +10,7 @@ U0 DocTablesInit()
 	1<<DOCT_TEXT|
 	1<<DOCT_DATA|
 	1<<DOCT_MENU_VAL|
-	1<<DOCT_HIDE_START |
 	1<<DOCT_TREE|
-	1<<DOCT_HIDE_END|
 	1<<DOCT_MACRO|
 	1<<DOCT_BUTTON|
 	1<<DOCT_CHECK_BOX|
@@ -162,7 +160,7 @@ U0 DocBinsValidate(CDoc *doc)
 	     doc_e->tag && *doc_e->tag)
 	  b->tag=StrNew(doc_e->tag,doc->mem_task);
       } else {
-	DbgStr("Bin Not Found",3000);
+	RawStr("Bin Not Found",3000);
 	doc_e->type=doc_e->flags2=doc_e->flags1=0;
 	doc_e->type_u8=DOCT_ERROR;
       }
@@ -201,13 +199,36 @@ U0 DocBinDel(CDoc *doc,CDocBin *b)
       Free(b);
     }
   } else
-    DbgStr("DocBinDel",3000);
+    RawStr("DocBinDel",3000);
+}
+
+Bool IsEditableText(CDocEntry *doc_e)
+{
+  if (doc_e->type_u8==DOCT_TEXT&&
+    !(doc_e->flags1&DOCEG1_DONT_EDIT)&&!(doc_e->flags2&DOCEG2_DONT_EDIT))
+    return TRUE;
+  else
+    return FALSE;
+}
+
+CDocEntry *DocEntryNew(CDoc *doc,CDocEntry *doc_ce,U8 *tag)
+{
+  CDocEntry *result=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+  result->type=doc_ce->type;
+  result->flags1=doc_ce->flags1;
+  result->flags2=doc_ce->flags2;
+  result->tag=tag;
+  result->max_col=StrLen(tag);
+  result->x=doc_ce->x;
+  result->y=doc_ce->y;
+  result->page_line_num=doc_ce->page_line_num;
+  return result;
 }
 
 public U0 DocEntryDel(CDoc *doc,CDocEntry *doc_e)
 {
   if (!doc || doc==doc_e)
-    DbgStr("DocEntryDel",3000);
+    RawStr("DocEntryDel",3000);
   else {
     if (doc->cur_entry==doc_e)
       doc->cur_entry=doc_e->next;
@@ -596,7 +617,7 @@ U0 DocDataFmt(CDocEntry *doc_e)
     else
       d=*ptr(I64 *);
     if (doc_e->type_u8==DOCT_DATA) {
-      SPrintF(doc_e->tag,doc_e->aux_str,d,doc_e->my_fmt_data);
+      SPrint(doc_e->tag,doc_e->aux_str,d,doc_e->my_fmt_data);
       if (doc_e->flags1 & DOCEF1_HAS_TERMINATOR) {
 	i=StrLen(doc_e->tag);
 	doc_e->tag[i++]='_';
@@ -612,7 +633,7 @@ U0 DocDataFmt(CDocEntry *doc_e)
   }
 }
 
-U0 DocDataGet(CDocEntry *doc_e)
+U0 DocDataScan(CDocEntry *doc_e)
 {
   I64 i,d;
   U8 *ptr;
@@ -628,11 +649,11 @@ U0 DocDataGet(CDocEntry *doc_e)
       if (i>doc_e->len+doc_e->min_col)
 	doc_e->tag[doc_e->len+doc_e->min_col]=0;
       if (doc_e->flags1&(DOCEF1_U8|DOCEF1_U16|DOCEF1_U32)) {
-	GetF(doc_e->tag,doc_e->aux_str,&d,doc_e->my_fmt_data);
+	Scan(doc_e->tag,doc_e->aux_str,&d,doc_e->my_fmt_data);
 	if (doc_e->flags1 & DOCEF1_HAS_TERMINATOR)
 	  doc_e->tag[i]='_';
       } else {
-	GetF(doc_e->tag,doc_e->aux_str,ptr,doc_e->my_fmt_data);
+	Scan(doc_e->tag,doc_e->aux_str,ptr,doc_e->my_fmt_data);
 	if (doc_e->flags1 & DOCEF1_HAS_TERMINATOR)
 	  doc_e->tag[i]='_';
 	return;

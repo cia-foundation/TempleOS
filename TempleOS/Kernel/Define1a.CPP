@@ -24,8 +24,9 @@ U0 LoadSysStrs()
   DefineLstLoad("ST_OFF_ON","Off\0On\0");
   DefineLstLoad("ST_HTT_TYPES","ExportSysSym\0ImportSysSym\0DefineStr\0GlbVar\0Class\0"
 		"IntType\0Funct\0Word\0DictWord\0KeyWord\0AsmKeyWord\0OpCode\0Reg\0"
-		"File\0Module\0HelpFile\0Frame Ptr\0Private\0"
-		"Public\0Export\0Import\0Lit\0Unres\0Local\0");
+		"File\0Module\0HelpFile\0Frame Ptr\0"
+		" \0 \0 \0 \0 \0 \0 \0 \0"
+		"Private\0Public\0Export\0Import\0Imm\0Unres\0Local\0");
   DefineLstLoad("ST_DAYS_OF_WEEK","Sunday\0Monday\0Tuesday\0Wednesday\0"
 		"Thursday\0Friday\0Saturday\0");
   DefineLstLoad("ST_MONTHS","January\0February\0March\0April\0May\0"
@@ -34,7 +35,7 @@ U0 LoadSysStrs()
 		"Floating\0Compiler\0Undefined Define\0"
 		"Undefined Extern\0File\0File Xsum\0"
 		"Partition error\0Blk Dev error\0"
-		"Graphics\0SPrintF\0GetF\0Bin Module\0"
+		"Graphics\0SPrint\0Scan\0Bin Module\0"
 		"MultiCore\0FUF\0Flags\0");
 
   DefineLstLoad("ST_FILE_ATTRS","R\0H\0S\0V\0D\0A\0 \0 \0X\0Y\0T\0Z\0C\0F\0");

@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
 
-$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOSV0104.BMP"$
+$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOSV0106B.BMP"$
 
 
 

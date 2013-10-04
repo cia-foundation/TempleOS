@@ -5,7 +5,7 @@ U0 PrsDocFlags(CLex *lx,I64 *flags1,I64 *flags2,U32 *type)
   while (lx->token=='+' || lx->token=='-') {
     turn_on= lx->token=='+';
     if (Lex(lx)==TK_IDENT) {
-      i=DefineMatch(lx->ident,"ST_DOC_FLAGS",LEF_EXACT);
+      i=DefineMatch(lx->ident,"ST_DOC_FLAGS",LMF_EXACT);
       if (i<0)
 	*type=DOCT_ERROR;
       else if (i<64) {
@@ -124,12 +124,6 @@ DOCEF1_ESC | DOCEF1_LEFT_EXP,
 
 //DOCT_HEX_ED
 DOCEF1_DATA_IS_PTR | DOCEF1_ZERO_BASED,
-
-//DOCT_HIDE_START
-DOCEF1_CHECKED_COLLAPSED|DOCEF1_CHECK_COLLAPSABLE,
-
-//DOCT_HIDE_END
-0,
 
 //DOCT_TREE
 DOCEF1_CHECKED_COLLAPSED|DOCEF1_CHECK_COLLAPSABLE|DOCEF1_TREE,
@@ -273,12 +267,6 @@ I64 doc_dft_flags2[DOCT_NUM_TYPES]={
 //DOCT_HEX_ED
 0,
 
-//DOCT_HIDE_START
-0,
-
-//DOCT_HIDE_END
-0,
-
 //DOCT_TREE
 0,
 
@@ -419,12 +407,6 @@ DOCET_UNDERLINE,
 DOCET_UNDERLINE,
 
 //DOCT_HEX_ED
-0,
-
-//DOCT_HIDE_START
-DOCET_UNDERLINE,
-
-//DOCT_HIDE_END
 0,
 
 //DOCT_TREE
@@ -581,17 +563,17 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	  buf2=doc_e->tag+3;
 	else
 	  buf2=doc_e->tag;
-	buf2=MSPrintF("%s\"%$$Q\",",buf,buf2);
+	buf2=MPrint("%s\"%$$Q\",",buf,buf2);
 	Free(buf); buf=buf2;
 	break;
       case DOCT_DATA:
-	buf2=MSPrintF("%s%d,",buf,doc_e->len);
+	buf2=MPrint("%s%d,",buf,doc_e->len);
 	Free(buf); buf=buf2;
 	break;
       case DOCT_HEX_ED:
-	buf2=MSPrintF("%s%d,",buf,doc_e->len);
+	buf2=MPrint("%s%d,",buf,doc_e->len);
 	Free(buf); buf=buf2;
-	buf2=MSPrintF("%s%d,",buf,doc_e->hex_ed_width);
+	buf2=MPrint("%s%d,",buf,doc_e->hex_ed_width);
 	Free(buf); buf=buf2;
 	break;
       case DOCT_PAGE_LEN:
@@ -614,7 +596,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       case DOCT_SHIFTED_X:
       case DOCT_SHIFTED_Y:
 	if (doc_e->attr!=DOC_DFT) {
-	  buf2=MSPrintF("%s%d,",buf,doc_e->attr);
+	  buf2=MPrint("%s%d,",buf,doc_e->attr);
 	  Free(buf); buf=buf2;
 	}
       case DOCT_NUM_TYPES-1: //nobound_switch
@@ -629,59 +611,59 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       Btr(&flags1,j);
       nobound_switch (j) {
 	case DOCEf1_SCROLLING_X:
-	  buf2=MSPrintF("%s%d",buf,doc_e->scroll_len);
+	  buf2=MPrint("%s%d",buf,doc_e->scroll_len);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_SHIFTED_X:
 	  j=doc_e->type.u16[1]&0x1F;
 	  if (j&0x10) j|=0xFFFFFFF0;
-	  buf2=MSPrintF("%s%d",buf,j);
+	  buf2=MPrint("%s%d",buf,j);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_SHIFTED_Y:
 	  j=doc_e->type>>21 &0x1F;
 	  if (j&0x10) j|=0xFFFFFFF0;
-	  buf2=MSPrintF("%s%d",buf,j);
+	  buf2=MPrint("%s%d",buf,j);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_AUX_STR:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->aux_str);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->aux_str);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_LEFT_EXP:
-	  buf2=MSPrintF("%s%d",buf,doc_e->left_exp);
+	  buf2=MPrint("%s%d",buf,doc_e->left_exp);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_LEFT_MACRO:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->left_macro);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->left_macro);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_RIGHT_EXP:
-	  buf2=MSPrintF("%s%d",buf,doc_e->right_exp);
+	  buf2=MPrint("%s%d",buf,doc_e->right_exp);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_RIGHT_MACRO:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->right_macro);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->right_macro);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_HAS_BIN:
-	  buf2=MSPrintF("%s%d",buf,doc_e->bin_num);
+	  buf2=MPrint("%s%d",buf,doc_e->bin_num);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_WIDTH:
-	  buf2=MSPrintF("%s%d",buf,doc_e->width);
+	  buf2=MPrint("%s%d",buf,doc_e->width);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_HEIGHT:
-	  buf2=MSPrintF("%s%d",buf,doc_e->height);
+	  buf2=MPrint("%s%d",buf,doc_e->height);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_DEFINE:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->define_str);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->define_str);
 	  Free(buf); buf=buf2;
 	  break;
 	case DOCEf1_HTML_LINK:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->html_link);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->html_link);
 	  Free(buf); buf=buf2;
 	  break;
 #assert DOCEf1_HTML_LINK==DOCEf1_NUM_FLAGS-1 //nobound_switch
@@ -694,7 +676,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       Btr(&flags2,j);
       nobound_switch (j) {
 	case DOCEf2_BIN_PTR_LINK:
-	  buf2=MSPrintF("%s\"%$$Q\"",buf,doc_e->bin_ptr_link);
+	  buf2=MPrint("%s\"%$$Q\"",buf,doc_e->bin_ptr_link);
 	  Free(buf); buf=buf2;
 	  break;
 #assert DOCEf2_BIN_PTR_LINK==DOCEf2_NUM_FLAGS-1 //nobound_switch
@@ -748,11 +730,11 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	if (lx->token==TK_STR) {
 	  st2=LexExtStr(lx);
 	  if (i==DOCT_CHECK_BOX) {
-	    st=MSPrintF("[X] %s",st2);
+	    st=MPrint("[X] %s",st2);
 	    Free(st2);
 	    doc_e->min_col=1;
 	  } else if (doc_e->flags1 & DOCEF1_TREE) {
-	    st=MSPrintF("+] %s",st2);
+	    st=MPrint("+] %s",st2);
 	    Free(st2);
 	    doc_e->min_col=1;
 	  } else
@@ -769,22 +751,15 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  }
 	}
 	break;
-      case DOCT_HIDE_START:
-	doc_e->tag=StrNew("<-",doc->mem_task);
-	doc_e->min_col=1;
-	break;
-      case DOCT_HIDE_END:
-	doc_e->tag=StrNew(">",doc->mem_task);
-	break;
       case DOCT_DATA:
 	doc_e->flags1|=DOCEF1_AUX_STR; //don't allow switched off
-	doc_e->len=Expression(lx);
+	doc_e->len=LexExpression(lx);
 	break;
       case DOCT_HEX_ED:
-	doc_e->len=Expression(lx);
+	doc_e->len=LexExpression(lx);
 	if (lx->token==',')
 	  Lex(lx);
-	doc_e->hex_ed_width=Expression(lx);
+	doc_e->hex_ed_width=LexExpression(lx);
 	break;
       case DOCT_PAGE_LEN:
       case DOCT_LEFT_MARGIN:
@@ -808,7 +783,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	if (!lx->token)
 	  doc_e->attr=DOC_DFT;
 	else
-	  doc_e->attr=Expression(lx);
+	  doc_e->attr=LexExpression(lx);
 	break;
       case DOCT_ERROR:
 	doc_e->flags1=0;
@@ -830,13 +805,13 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	Lex(lx);
       nobound_switch (j) {  //TODO: Might check for expression errors
 	case DOCEf1_SCROLLING_X:
-	  doc_e->scroll_len=Expression(lx);
+	  doc_e->scroll_len=LexExpression(lx);
 	  break;
 	case DOCEf1_SHIFTED_X:
-	  doc_e->type|=(Expression(lx) & 0x1F)<<16;
+	  doc_e->type|=(LexExpression(lx) & 0x1F)<<16;
 	  break;
 	case DOCEf1_SHIFTED_Y:
-	  doc_e->type|=(Expression(lx) & 0x1F)<<21;
+	  doc_e->type|=(LexExpression(lx) & 0x1F)<<21;
 	  break;
 	case DOCEf1_AUX_STR:
 	  if (lx->token==TK_STR) {
@@ -847,7 +822,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      doc_e->tag=StrNew(doc_e->aux_str,doc->mem_task);
 	    //$AN,"Anchor","DataTagWidth"$
 	    if (i==DOCT_DATA) {
-	      if (ptr=StrStr(doc_e->aux_str,":"))
+	      if (ptr=StrMatch(":",doc_e->aux_str))
 		doc_e->min_col=ptr-doc_e->aux_str+1;
 	      doc_e->tag=MAlloc(doc_e->len+doc_e->min_col+2,doc->mem_task); //+2 because "_\0"
 	    }
@@ -855,7 +830,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	    doc_e->type=DOCT_ERROR;
 	  break;
 	case DOCEf1_LEFT_EXP:
-	  doc_e->left_exp=Expression(lx);
+	  doc_e->left_exp=LexExpression(lx);
 	  break;
 	case DOCEf1_LEFT_MACRO:
 	  if (lx->token==TK_STR) {
@@ -868,7 +843,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	    doc_e->type=DOCT_ERROR;
 	  break;
 	case DOCEf1_RIGHT_EXP:
-	  doc_e->right_exp=Expression(lx);
+	  doc_e->right_exp=LexExpression(lx);
 	  break;
 	case DOCEf1_RIGHT_MACRO:
 	  if (lx->token==TK_STR) {
@@ -884,13 +859,13 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  if (!lx->token)
 	    doc_e->bin_num=0;
 	  else
-	    doc_e->bin_num=Expression(lx);
+	    doc_e->bin_num=LexExpression(lx);
 	  break;
 	case DOCEf1_WIDTH:
-	  doc_e->width=Expression(lx);
+	  doc_e->width=LexExpression(lx);
 	  break;
 	case DOCEf1_HEIGHT:
-	  doc_e->height=Expression(lx);
+	  doc_e->height=LexExpression(lx);
 	  break;
 	case DOCEf1_DEFINE:
 	  if (lx->token==TK_STR) {
@@ -954,21 +929,14 @@ public U0 DocIns(CDoc *doc,CDocEntry *doc_e)
       !(doc_ce->flags1&(DOCEF1_TAG_CB|DOCEF1_DEFINE|DOCEF1_HTML_LINK)) &&
       !(doc_ce->flags2&DOCEF2_BIN_PTR_LINK) &&
       doc->cur_data_col<doc_ce->max_col) {
-    doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-    doc_ne->type=DOCT_TEXT|doc_ce->type&0xFFFFFF00;
-    doc_ne->x=doc_ce->x;
-    doc_ne->y=doc_ce->y;
-    doc_ne->page_line_num=doc_ce->page_line_num;
-    doc_ne->flags1=doc_ce->flags1;
-    doc_ne->flags2=doc_ce->flags2;
     dst=doc_ce->tag+doc->cur_data_col;
-    doc_ne->tag=StrNew(dst,doc->mem_task);
+    doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
     *dst=0;
+    doc_ne->type=DOCT_TEXT|doc_ce->type&0xFFFFFF00;
     doc_ce->max_col=doc->cur_data_col;
     QueIns(doc_ne,doc_ce);
     doc->cur_data_col=0;
     doc_ce=doc_ne;
-    doc_ce->max_col=StrLen(doc_ce->tag);
   }
   if (doc_ce->type_u8==DOCT_TEXT && doc->cur_data_col>=doc_ce->max_col) {
     QueIns(doc_e,doc_ce);
@@ -985,8 +953,9 @@ public U0 DocIns(CDoc *doc,CDocEntry *doc_e)
 
 
 #help_index "Doc/Output"
-public CDocEntry *DocPutS(CDoc *doc,U8 *st)
-{ //Does not handle partial Doc entries
+CDocEntry *DocPutS(CDoc *doc,U8 *st)
+{ //Don't use this.  Use $LK,"DocPrint","MN:DocPrint"$().
+  //Does not handle partial Doc entries
   //Returns last newly created dollar-sign CDocEntry.
   U8 ch,*ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src,
      *char_bitmap;
@@ -1140,10 +1109,9 @@ public CDocEntry *DocPutS(CDoc *doc,U8 *st)
   return result;
 }
 
-
-public CDocEntry *DocPrintF(CDoc *doc,U8 *src,...)
+public CDocEntry *DocPrint(CDoc *doc,U8 *fmt,...)
 {
-  U8 *buf=SPrintFJoin(NULL,src,argc,argv);
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
   CDocEntry *result=DocPutS(doc,buf);
   Free(buf);
   return result;

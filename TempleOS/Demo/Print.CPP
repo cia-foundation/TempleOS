@@ -1,6 +1,6 @@
-//TempleOS supports standard $LK,"PrintF","MN:PrintF"$()
+//TempleOS supports standard $LK,"Print","MN:Print"$()
 //codes and extended ones.
-//See $LK,"printF codes","FA:::/TempleOS/Doc/HolyC.TXT,PrintF_Codes"$.
+//See $LK,"Print Codes","FA:::/TempleOS/Doc/HolyC.TXT,Print_Codes"$.
 
 //This file demonstrates $LK,"sub_fmt","FA:::/TempleOS/Doc/HolyC.TXT,sub_fmt"$ codes.
 

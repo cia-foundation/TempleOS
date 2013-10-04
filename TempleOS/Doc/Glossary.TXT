@@ -14,6 +14,7 @@ $FG,5$CB$FG$	Call-Back or Code Block
 $FG,5$Cfg$FG$	Config
 $FG,5$Chg$FG$	Change
 $FG,5$Chk$FG$	Check
+$FG,5$Const$FG$	Consant
 $FG,5$Cmd$FG$	Command
 $FG,5$Cmp$FG$	Compiler
 $FG,5$Cnt$FG$	Count
@@ -56,7 +57,6 @@ $FG,5$Kbd$FG$	Keyboard
 $FG,5$Len$FG$	Length
 $FG,5$Let$FG$	Letter
 $FG,5$Lex$FG$	Lexical Analyser
-$FG,5$Lit$FG$	Literal
 $FG,5$Loc$FG$	Location, Lines of Code
 $FG,5$Log$FG$	Logarithm or Logical
 $FG,5$Lst$FG$	List
@@ -128,8 +128,8 @@ $ID,2$TempleOS uses the asm $FG,2$CALL$FG$ instruction exclusively and it's limi
 $ID,-2$$TR,"Parent/Child Task"$
 $ID,2$Often a task will $LK,"Spawn","MN:Spawn"$() or $LK,"PopUp","MN:PopUp"$() a task as a helper.  The helper is known as a Child Task, though you can $FG,2$Spawn$FG$ a task and assign it a different parent... like $FG,2$Adam$FG$.  Links are kept as to who spawned what so when one task is $LK,"Kill","MN:Kill"$()ed the helper tasks disappear, too.  You can get a report on current system tasks with $LK+S,"TaskRep","MN:TaskRep"$().  There is just one possible window per task, so child tasks are needed.
 
-$ID,-2$$TR,"Holy C"$
-$ID,2$The language used by TempleOS is more than $FG,2$C$FG$ and less than $FG,2$C++$FG$.  See $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$.  It has the default arg feature of $FG,2$C++$FG$ and uses $FG,2$class$FG$ in place of $FG,2$struct$FG$.  It uses $FG,2$U0,U8,U16,U32,I64$FG$ and $FG,2$I0,I8,I16,I32,I64$FG$ for signed and unsigned integers.  It has a slightly different operator precedence.  See $LK,"OP_precedence","FA:::/TempleOS/Doc/HolyC.TXT,OP_precedence"$  It has the $FG,2$PASCAL$FG$-like feature of function calls with no parens, but requires an "$FG,2$&$FG,2$$FG$" when referring to function addresses.
+$ID,-2$$TR,"HolyC"$
+$ID,2$The language used by TempleOS is more than $FG,2$C$FG$ and less than $FG,2$C++$FG$.  See $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$.  It has the default arg feature of $FG,2$C++$FG$ and uses $FG,2$class$FG$ in place of $FG,2$struct$FG$.  It uses $FG,2$U0,U8,U16,U32,I64$FG$ and $FG,2$I0,I8,I16,I32,I64$FG$ for signed and unsigned integers.  It has a slightly different operator precedence.  See $LK,"OP_precedence","FA:::/TempleOS/Doc/HolyC.TXT,OP_precedence"$  It has the $FG,2$PASCAL$FG$-like feature of function calls with no parens, but requires an "$FG,2$&$FG,2$$FG$" when referring to function addresses.
 
 $ID,-2$$TR,"AOT Compile Mode"$
 $ID,2$This term to refers to conventional compilation mode.  It is not the preferred mode for this operating system and is discouraged.  $FG,2$.PRJ$FG$ files are compiled to $FG,2$.BIN$FG$ files, skipping $FG,2$.OBJ$FG$ files.  After compiling, you do a $LK,"Load","MN:Load"$() cmd which is available by right-clicking on a link (like from $LK,"Dir","MN:Dir"$()).  There is no $FG,2$main()$FG$ routine.  Instead, statements outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, use the $LK,"Cmp","MN:Cmp"$() routine or right-click on a link.  The $FG,2$Kernel$FG$ modules and compiler are made in $FG,2$AOT$FG$ compiled mode and stored in $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$, respectively.
@@ -137,7 +137,7 @@ $ID,2$This term to refers to conventional compilation mode.  It is not the prefe
 See $LK-A,"::/TempleOS/Demo/Games/EagleDive.CPP"$ for an example of an $FG,2$AOT$FG$ module.
 
 $ID,-2$$TR,"JIT Compile Mode"$
-$ID,2$In just-in-time mode, the compiler allocates objects, code and data, from the heap, incrementally.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and objects are placed all over in mem.  The $LK,"ExeFile","MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be placed in programs.  $LK,"ExePutS","MN:ExePutS"$() routine will compile and run a string.
+$ID,2$In just-in-time mode, the compiler allocates objects, code and data, from the heap, incrementally.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and objects are placed all over in mem.  The $LK,"ExeFile","MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be placed in programs.  $LK,"ExePrint","MN:ExePrint"$() routine will compile and run a string.
 
 $ID,-2$$TR,"Compiler Intermediate Code"$
 $ID,2$The compiler generates instructions one step before making actual assembly (machine) language instructions.  This code is reverse polish in nature and can be viewed with $LK,"PTrace","MN:PTrace"$() or $LK,"OTrace","MN:OTrace"$().  The compiler does not "interpret" code, except in the process of optimization.  The assembly language can be viewed when it is compiled with the $LK,"CTrace","MN:CTrace"$() routine, or afterward with $LK,"U","MN:U"$().
@@ -160,9 +160,7 @@ $LK,"Link Types","MN:LK_FILE"$
 $TR,"files_find_mask"$
 $ID,2$$LK,"FilesFindMatch","MN:FilesFindMatch"$().  An optional directory plus a list of file name masks, as in $FG,2$/TempleOS/Demo/*.TXT.Z;*.CPP.Z$FG$
 
-See $LK,"FUF_RECURSE","MN:FUF_RECURSE"$ and $LK,"ST_FILE_UTIL_FLAGS","MN:ST_FILE_UTIL_FLAGS"$.
-
-Be aware of $LK,"FILENAME_MASK_TXT","MN:FILENAME_MASK_TXT"$ and $LK,"FILENAME_MASK_SRC","MN:FILENAME_MASK_SRC"$.
+See $LK,"FUF_RECURSE","MN:FUF_RECURSE"$, $LK,"ST_FILE_UTIL_FLAGS","MN:ST_FILE_UTIL_FLAGS"$, $LK,"FILEMASK_TXT","MN:FILEMASK_TXT"$, $LK,"FILEMASK_SRC","MN:FILEMASK_SRC"$, $LK,"FILEMASK_AOT","MN:FILEMASK_AOT"$, $LK,"FILEMASK_JIT","MN:FILEMASK_JIT"$, and $LK,"FILEMASK_GRA","MN:FILEMASK_GRA"$.
 
 $ID,-2$$TR,"Filename Extention Types"$
 $ID,2$
@@ -173,11 +171,11 @@ $FG,5$*.???.C$FG$
 $FG,5$*.TXT.Z;*.TXT;*.LOG.Z;*.LOG$FG$
   Text Files
 $FG,5$*.CPP.Z;*.CPP$FG$
-  Holy C src files.  The default Holy C compiler type is "$FG,2$.CPP.Z$FG$".
+  HolyC src files.  The default HolyC compiler type is "$FG,2$.CPP.Z$FG$".
 $FG,5$*.PRJ.Z;*.PRJ$FG$
-  Holy C src files to be compiled $FG,2$AOT$FG$.
+  HolyC src files to be compiled $FG,2$AOT$FG$.
 $FG,5$*.HPP.Z;*.HPP$FG$
-  Holy C src header files.
+  HolyC src header files.
 $FG,5$*.MAP.Z;*.MAP$FG$
   Compiler "map" files
 $FG,5$*.BIN.Z;*.BIN.C;*.BIN$FG$
@@ -187,14 +185,15 @@ $FG,5$*.DAT.Z;*.DAT$FG$
 $FG,5$*.ISO$FG$
   CD-ROM image file--ISO9660.
 $FG,5$*.AUT.Z;*.AUT$FG$
-  "AutoFile" Basically a Holy C program who's stdout goes to the input of a task when $LK,"AutoFile","MN:AutoFile"$() is called.
+  "AutoFile" Basically a HolyC program who's stdout goes to the input of a task when $LK,"AutoFile","MN:AutoFile"$() is called.
 $FG,5$*.GRA.Z;*.GRA$FG$
   Graphics file
 
-$LK,"FILENAME_MASK_SRC","MN:FILENAME_MASK_SRC"$$FG$
-  This $FG,2$#define$FG$ holds a list of src file extensions.
-$LK,"FILENAME_MASK_TXT","MN:FILENAME_MASK_TXT"$$FG$
-  This $FG,2$#define$FG$ holds a list of text file extensions.
+$LK,"FILEMASK_TXT","MN:FILEMASK_TXT"$
+$LK,"FILEMASK_SRC","MN:FILEMASK_SRC"$
+$LK,"FILEMASK_AOT","MN:FILEMASK_AOT"$
+$LK,"FILEMASK_JIT","MN:FILEMASK_JIT"$
+$LK,"FILEMASK_GRA","MN:FILEMASK_GRA"$
 
 $ID,-2$$TR,"Naming Convention"$
 $ID,2$$FG,5$$FG$The following are rules I stick to.  If you work on the operating system, it'd be good to stick with them for uniformity, but you can do what you like.  Since there are no "$FG,2$namespaces$FG$" and I don't plan to implement name spaces, I highly recommend putting a 2-3 character module code prefix on syms. e.g. "WS","Doc","Lex"
@@ -203,10 +202,10 @@ $FG,5$ALL_CAPS$FG$
   Assembly Language labels are capitalized with underscores between words.  So are $FG,2$#define$FG$'s.
 
 $FG,5$_ALL_CAPS$FG$
-  Asm routines which are $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ callible should have a leading underscore.
+  Asm routines which are $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ callible should have a leading underscore.
 
 $FG,5$MixedCaps$FG$
-  $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ Functions and class names are MixedCaps.
+  $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ Functions and class names are MixedCaps.
 
 $FG,5$lower_case$FG$
   Local function vars and glbl vars are lower case.  Class member names are also lower_case.

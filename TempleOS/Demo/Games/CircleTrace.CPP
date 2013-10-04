@@ -1,5 +1,8 @@
 //Practice tracing circles
 
+//Giotto, a famous artist, drew a freehand circle as a portfolio for a job.
+
+
 AcctRegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
 AcctRegExeBranch("TempleOS/CircleTrace");
 
@@ -17,7 +20,7 @@ U0 SongTask(I64)
 U0 DrawIt(CTask *task,CDC *)
 {
   U8 buf[128];
-  SPrintF(buf,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",avg_error,elapsed_time,score,best_score);
+  SPrint(buf,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",avg_error,elapsed_time,score,best_score);
   PlotWinStr(task,buf,BLACK<<4+WHITE,0,0);
 }
 

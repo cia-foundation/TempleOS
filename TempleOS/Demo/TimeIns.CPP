@@ -21,20 +21,20 @@ U0 TimeIns()
   Bool old_preempt=Preempt(OFF);
 
 //Measure Loop Overhead
-  start1=GetTimeStamp;
+  start1=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++);
-  end1=GetTimeStamp;
+  end1=GetTSC;
   overhead_time=end1-start1;
 
 
-  start2=GetTimeStamp;
+  start2=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++) {
 #exe {OPassTraceMask(0b1000000000);OTrace(ON);};
 //Put your test instructions here.
     d*=1.00001;
 #exe {OTrace(OFF);};
   }
-  end2=GetTimeStamp;
+  end2=GetTSC;
   test_time=end2-start2;
 
   "\n\n\nCycles %10.5f\n",ToF64(test_time-overhead_time)/SAMPLE_SIZE;

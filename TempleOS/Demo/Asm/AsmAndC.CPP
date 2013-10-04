@@ -45,7 +45,7 @@ I64 AsmAndC()
   Beeps(i);
 
   asm {
-//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a Holy C routine.
+//You can clobber RAX,RBX,RCX,RDX, but preserve the rest for code in a HolyC routine.
 USE64	//Defaults to 64, but this is a good habit.
 	IMPORT	Snd;
 	MOV	RCX,&i[RBP] //You can clobber RAX,RBX,RCX,RDX.

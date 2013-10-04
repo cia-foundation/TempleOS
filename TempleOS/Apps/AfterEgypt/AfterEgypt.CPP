@@ -24,15 +24,15 @@ U0 HoldCourt()
 
   NewLine;
   accused=RandU32%3;
-  "" LstEntryPt(accused,"A man \0A woman \0A child \0");
+  "%s",LstSub(accused,"A man \0A woman \0A child \0");
 
   crime=RandU32&3;
-  "" LstEntryPt(crime,"commits murder\0commits adultery\0commits blasphemy\0commits idolatry\0");
+  "%s",LstSub(crime,"commits murder\0commits adultery\0commits blasphemy\0commits idolatry\0");
 
   if (crime<=1) {
     '' CH_SPACE;
     victim=RandU32%3;
-    "" LstEntryPt(victim,"to a man\0to a woman\0to a child\0to an animal\0");
+    "%s",LstSub(victim,"to a man\0to a woman\0to a child\0to an animal\0");
   }
   if (!(RandU32%5))
     ", again!";
@@ -156,7 +156,7 @@ U0 TMsg(CDC *dc,U8 *msg)
     dc->color=BLACK;
     GrRect(dc,2,GR_HEIGHT-FONT_HEIGHT*3+2,GR_WIDTH-4,FONT_HEIGHT*2-4);
     dc->color=YELLOW;
-    GrPutS(dc,(GR_WIDTH-StrLen(msg)*FONT_WIDTH)/2,GR_HEIGHT-5*FONT_HEIGHT/2,msg);
+    GrPrint(dc,(GR_WIDTH-StrLen(msg)*FONT_WIDTH)/2,GR_HEIGHT-5*FONT_HEIGHT/2,"%s",msg);
     WinMgrSync;
     if (ScanChar)
       throw;

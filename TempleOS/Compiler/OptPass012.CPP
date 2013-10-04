@@ -1,37 +1,30 @@
-U0 OptMissing(CLex *lx,CIntermediateCode *tempi)
-{
-  "Pass:%d Missing IC handler\n",lx->pass;
-  CBPutIC(tempi);
-  LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
-}
+/*
+OptPass012
 
-CIntermediateCode opt_nop;
+Pass#0
+When parsing the arg expressions to a function
+call, there is a call to OptPass012 to determine
+the type of the expression. $LK,"OptPass012","FF:::/TempleOS/Compiler/ExpParser.CPP.Z,OptPass012"$
 
-CPrsStk *OptStart(CLex *lx,CIntermediateCode **temp_lag=NULL)
-{
-  I64 i;
-  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
-  CBInPtrsInit(&lx->cbh);
-  ps->ptr=0;
-  ps->ptr2=0;
-  if (temp_lag)
-    for (i=0;i<4;i++)
-      temp_lag[i]=&opt_nop;
-  return ps;
-}
+Pass#1&2
+Constant expressions are simplified.
+Eliminated opcodes are set to NOP.
+Types are determined by reconstructing an
+expression tree for operators
+$LK,"CIntermediateCode","MN:CIntermediateCode"$.$LK,"CICTreeLinks","MN:CICTreeLinks"$.
 
-U0 OptEnd(CLex *lx,CPrsStk *ps)
-{
-  if (ps->ptr>2) {
-    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
-    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
-  }
-  Free(ps);
-}
+Pointer arithmetic size is set, once
+the type is determined.
 
-CCodeBlkMisc *OptLabelFwd(CCodeBlkMisc *lb)
+Branches are expressed with short-circuit
+logic. 3-Arg comparisons are established.
+
+*/
+
+
+CLexCodeMisc *OptLabelFwd(CLexCodeMisc *lb)
 {
-  CCodeBlkMisc *lb1;
+  CLexCodeMisc *lb1;
   while (lb1=lb->fwd)
     lb=lb1;
   return lb;
@@ -64,10 +57,10 @@ U0 OptSetNOP2(CIntermediateCode *tempi,I64 stk_delta=1)
 CIntermediateCode *OptLag(CIntermediateCode *tempi)
 {
   do {
-    if (tempi->ic_opcode==IC_START)
+    if (!tempi->ic_opcode)
       return NULL;
     else
-      tempi--;
+      tempi=tempi->last;
   } while (tempi->ic_opcode<=IC_END_EXP);
   return tempi;
 }
@@ -75,19 +68,30 @@ CIntermediateCode *OptLag(CIntermediateCode *tempi)
 CIntermediateCode *OptLag1(CIntermediateCode *tempi)
 {
   do {
-    if (tempi->ic_opcode==IC_START)
+    if (!tempi->ic_opcode)
       return NULL;
     else
-      tempi--;
+      tempi=tempi->last;
   } while (tempi->ic_opcode==IC_NOP1||tempi->ic_opcode==IC_NOP2);
   return tempi;
 }
 
-CIntermediateCode *OptLead1(CLex *,CIntermediateCode *tempi)
+CIntermediateCode *OptLag2(CIntermediateCode *tempi)
 {
   do {
-    tempi++;
-    if (tempi->ic_opcode==IC_END)
+    if (!tempi->ic_opcode)
+      return NULL;
+    else
+      tempi=tempi->last;
+  } while (tempi->ic_opcode<IC_END_EXP);
+  return tempi;
+}
+
+CIntermediateCode *OptLead1(CIntermediateCode *tempi)
+{
+  do {
+    tempi=tempi->next;
+    if (!tempi->ic_opcode)
       return NULL;
   } while (tempi->ic_opcode==IC_NOP1||tempi->ic_opcode==IC_NOP2);
   return tempi;
@@ -225,7 +229,7 @@ extern U0 OptBrNotZero(CLex *lx,CIntermediateCode *tempi);
 
 CIntermediateCode *OptBrZero(CLex *lx,CIntermediateCode *tempi)
 {
-  CCodeBlkMisc *lb_true,*lb_false;
+  CLexCodeMisc *lb_true,*lb_false;
   CIntermediateCode *tempii=OptLag(tempi),*tempii2;
   switch (tempii->ic_opcode) {
     case IC_NOT:
@@ -333,22 +337,22 @@ CIntermediateCode *OptBrZero(CLex *lx,CIntermediateCode *tempi)
 	!(tempi->ic_flags&ICF_USE_F64)) {
       tempi->ic_opcode+=IC_BR_NOT_EQUAL2-IC_BR_NOT_EQUAL;
       tempi->ic_flags&=~ICF_PUSH_CMP;
-      tempii =tempi+1; //IC_PUSH_CMP instruction
+      tempii =tempi->next; //IC_PUSH_CMP instruction
       while (tempii->ic_opcode!=IC_PUSH_CMP)
-	tempii++;
+	tempii=tempii->next;
       tempii->t.p1t=tempi;
       OptSetNOP1(tempii);
     }
 
     lb_true=tempi->ic_data;
     if (tempi->ic_opcode==IC_BR_AND_AND_ZERO) {
-      tempii=tempi->t.p1t+1;
+      tempii=tempi->t.p1t->next;
       tempii->ic_data=lb_true;
       tempii->t.p1t=tempi->t.p1t;
       tempii->t.p1c=tempi->t.p1c;
       tempii->ic_opcode=IC_BR_ZERO;
       OptBrZero(lx,tempii);
-      tempii=tempi->t.p2t+1;
+      tempii=tempi->t.p2t->next;
       tempii->t.p1t=tempi->t.p2t;
       tempii->t.p1c=tempi->t.p2c;
       tempii->ic_data=lb_true;
@@ -356,17 +360,17 @@ CIntermediateCode *OptBrZero(CLex *lx,CIntermediateCode *tempi)
       tempii=OptBrZero(lx,tempii);
       OptSetNOP1(tempi);;
     } else if (tempi->ic_opcode==IC_BR_OR_OR_ZERO) {
-      lb_false=CBMiscNew(lx,CBMT_LABEL);
+      lb_false=LCCMiscNew(lx,CMT_LABEL);
       tempi->ic_opcode=IC_LABEL;
       tempi->ic_flags=0;
       tempi->ic_data=lb_false;
-      tempii=tempi->t.p1t+1;
+      tempii=tempi->t.p1t->next;
       tempii->t.p1t=tempi->t.p1t;
       tempii->t.p1c=tempi->t.p1c;
       tempii->ic_data=lb_false;
       tempii->ic_opcode=IC_BR_NOT_ZERO;
       OptBrNotZero(lx,tempii);
-      tempii=tempi->t.p2t+1;
+      tempii=tempi->t.p2t->next;
       tempii->t.p1t=tempi->t.p2t;
       tempii->t.p1c=tempi->t.p2c;
       tempii->ic_data=lb_true;
@@ -386,7 +390,7 @@ CIntermediateCode *OptBrZero(CLex *lx,CIntermediateCode *tempi)
 
 CIntermediateCode *OptBrNotZero(CLex *lx,CIntermediateCode *tempi)
 {
-  CCodeBlkMisc *lb_true,*lb_false;
+  CLexCodeMisc *lb_true,*lb_false;
   CIntermediateCode *tempii=OptLag(tempi),*tempii2;
   switch (tempii->ic_opcode) {
     case IC_NOT:
@@ -494,22 +498,22 @@ CIntermediateCode *OptBrNotZero(CLex *lx,CIntermediateCode *tempi)
 	!(tempi->ic_flags&ICF_USE_F64)) {
       tempi->ic_opcode+=IC_BR_NOT_EQUAL2-IC_BR_NOT_EQUAL;
       tempi->ic_flags&=~ICF_PUSH_CMP;
-      tempii =tempi+1; //IC_PUSH_CMP instruction
+      tempii =tempi->next; //IC_PUSH_CMP instruction
       while (tempii->ic_opcode!=IC_PUSH_CMP)
-	tempii++;
+	tempii=tempii->next;
       tempii->t.p1t=tempi;
       OptSetNOP1(tempii);
     }
 
     lb_true=tempi->ic_data;
     if (tempi->ic_opcode==IC_BR_OR_OR_NOT_ZERO) {
-      tempii=tempi->t.p1t+1;
+      tempii=tempi->t.p1t->next;
       tempii->t.p1t=tempi->t.p1t;
       tempii->t.p1c=tempi->t.p1c;
       tempii->ic_data=lb_true;
       tempii->ic_opcode=IC_BR_NOT_ZERO;
       OptBrNotZero(lx,tempii);
-      tempii=tempi->t.p2t+1;
+      tempii=tempi->t.p2t->next;
       tempii->t.p1t=tempi->t.p2t;
       tempii->t.p1c=tempi->t.p2c;
       tempii->ic_data=lb_true;
@@ -517,17 +521,17 @@ CIntermediateCode *OptBrNotZero(CLex *lx,CIntermediateCode *tempi)
       tempii=OptBrNotZero(lx,tempii);
       OptSetNOP1(tempi);;
     } else if (tempi->ic_opcode==IC_BR_AND_AND_NOT_ZERO) {
-      lb_false=CBMiscNew(lx,CBMT_LABEL);
+      lb_false=LCCMiscNew(lx,CMT_LABEL);
       tempi->ic_opcode=IC_LABEL;
       tempi->ic_flags=0;
       tempi->ic_data=lb_false;
-      tempii=tempi->t.p1t+1;
+      tempii=tempi->t.p1t->next;
       tempii->t.p1t=tempi->t.p1t;
       tempii->t.p1c=tempi->t.p1c;
       tempii->ic_data=lb_false;
       tempii->ic_opcode=IC_BR_ZERO;
       OptBrZero(lx,tempii);
-      tempii=tempi->t.p2t+1;
+      tempii=tempi->t.p2t->next;
       tempii->t.p1t=tempi->t.p2t;
       tempii->t.p1c=tempi->t.p2c;
       tempii->ic_data=lb_true;
@@ -568,7 +572,7 @@ here:
   }
 }
 
-CIntermediateCode *OptPass012(CLex *lx,CHashFun *fun_class,Bool combined)
+CIntermediateCode *OptPass012(CLex *lx,CHashFun *fun_class)
 {
 /*
 Simplify CONST arithmetic.
@@ -581,22 +585,13 @@ args.
   Bool is_unsigned;
   CHashClass *tempc,*tempc1,*tempc2;
   CIntermediateCode *tempi,*tempi1,*tempi2,*tempi3,*tempi_push,
-	*temp_lag[4],*last_with_class=NULL,*tempii;
-  CPrsStk *ps=OptStart(lx,temp_lag);
-  CCodeBlkMisc *lb,*lb1,*lb2;
-  if (combined)
-    tempi=lx->cbh.cb_in_ptr;
-  else
-    tempi=CBGetIC1(&lx->cbh);
-  if (tempi->ic_opcode==IC_START) {
-    if (combined)
-      tempi++;
-    else
-      tempi=CBGetIC1(&lx->cbh);
-  }
-#assert !IC_END
+	*last_with_class=NULL;
+  CLexCodeMisc *lb,*lb1,*lb2;
+  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
+  ps->ptr=0;
+  ps->ptr2=0;
+  tempi=lx->lcc.lcc_root.next;
   while (code=tempi->ic_opcode) {
-    OptNext(tempi,temp_lag);
     tempc=tempi->ic_class;
     tempi->ic_class2=tempc;
     tempi_push=tempi;
@@ -619,8 +614,8 @@ args.
       case 0: //nobound_switch
 	break;
     }
-    if (Bt(not_constant_bitmap,code))
-      lx->flags|=LF_NOT_CONSTANT;
+    if (Bt(not_const_bitmap,code))
+      lx->flags|=LF_NOT_CONST;
     nobound_switch (code) {
       case IC_IMM_F64:
 	tempi->ic_flags&=~ICF_R_TO_F64;
@@ -669,30 +664,28 @@ args.
       case IC_FS:
       case IC_GS:
 //CALL,FS/GS,CALL_END,IMM,ADD,DEREF-->MOV_FS/GS
-	if (combined) {
-	  tempi1=tempi+2; //IMM
-	  tempi2=tempi+3; //ADD
-	  tempi3=tempi+4; //DEREF
-	  if (tempi1->ic_opcode==IC_IMM_U64 && tempi2->ic_opcode==IC_ADD &&
-		tempi3->ic_opcode==IC_DEREF && !(tempi3->ic_flags&~ICF_NO_CVT_MASK)) {
-	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags|tempi3->ic_flags;
-	    if (tempi->ic_opcode==IC_FS)
-	      tempi->ic_opcode=IC_MOV_FS;
-	    else
-	      tempi->ic_opcode=IC_MOV_GS;
-	    tempi->ic_data=tempi1->ic_data;
-	    tempi->ic_class =tempi3->ic_class;
-	    tempi->ic_class2=tempi3->ic_class2;
-	    OptSetNOP1(tempi1);
-	    OptSetNOP1(tempi2);
-	    OptSetNOP1(tempi3);
+	tempi1=tempi->next->next; //IMM
+	tempi2=tempi1->next; //ADD
+	tempi3=tempi2->next; //DEREF
+	if (tempi1->ic_opcode==IC_IMM_U64 && tempi2->ic_opcode==IC_ADD &&
+	      tempi3->ic_opcode==IC_DEREF && !(tempi3->ic_flags&~ICG_NO_CVT_MASK)) {
+	  tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags|tempi3->ic_flags;
+	  if (tempi->ic_opcode==IC_FS)
+	    tempi->ic_opcode=IC_MOV_FS;
+	  else
+	    tempi->ic_opcode=IC_MOV_GS;
+	  tempi->ic_data=tempi1->ic_data;
+	  tempi->ic_class =tempi3->ic_class;
+	  tempi->ic_class2=tempi3->ic_class2;
+	  OptSetNOP1(tempi1);
+	  OptSetNOP1(tempi2);
+	  OptSetNOP1(tempi3);
 
-	    tempi1=tempi-1; //CALL
-	    tempi2=tempi+1; //CALL_END
-	    tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
-	    OptSetNOP1(tempi1);
-	    OptSetNOP1(tempi2);
-	  }
+	  tempi1=tempi->last; //CALL
+	  tempi2=tempi->next; //CALL_END
+	  tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
+	  OptSetNOP1(tempi1);
+	  OptSetNOP1(tempi2);
 	}
 	break;
       case IC_STR_CONST:
@@ -703,10 +696,12 @@ args.
       case IC_SIZEOF:
 	break;
       case IC_PUSH_CMP:
-	tempi1=temp_lag[1];
-	if (tempi1->ic_opcode==IC_AND_AND)
-	  tempi1=temp_lag[2];
-	tempi->ic_class=tempi1->ic_class;
+	if (tempi1=OptLag(tempi)) {
+	  if (tempi1->ic_opcode==IC_AND_AND)
+	    tempi1=OptLag(tempi1);
+	  if (tempi1)
+	    tempi->ic_class=tempi1->ic_class;
+	}
 	tempi->ic_class2=tempi->ic_class;
 	tempi->ic_data=0;
 	if (tempi->ic_class->sub_type==IT_F64)
@@ -837,23 +832,12 @@ args.
 	break;
 
       case IC_POWER:
-	if (tempc1->sub_type>tempc2->sub_type)
-	  tempi->ic_class=tempc1;
-	else
-	  tempi->ic_class=tempc2;
-	tempc=tempi->ic_class;
+	tempc=tempi->ic_class=sys_internal_types[IT_F64];
 	if (tempc1->sub_type!=IT_F64)
 	  tempi1->ic_flags|=ICF_R_TO_F64;
 	if (tempc2->sub_type!=IT_F64)
 	  tempi2->ic_flags|=ICF_R_TO_F64;
-	if (tempc->sub_type!=IT_F64)
-	  tempi->ic_flags|=ICF_R_TO_INT|ICF_USE_F64;
-	if (!tempi_push->ic_class->ptr_cnt) {
-	  if (tempi_push->ic_class->sub_type==IT_F64)
-	    tempi_push->ic_class2=sys_internal_types[IT_F64];
-	  else
-	    tempi_push->ic_class2=sys_internal_types[IT_I64];
-	}
+	tempi_push->ic_class2=sys_internal_types[IT_F64];
 	break;
       case IC_SHL:
 	if (i=OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
@@ -1673,12 +1657,38 @@ args.
 	tempi->ic_data=-fun_class->size;
 	break;
       case IC_ADD_RSP:
-	if (temp_lag[1]->ic_opcode==IC_ADD_RSP) {
-	  tempi->ic_data+=temp_lag[1]->ic_data;
-	  tempi->ic_flags|=temp_lag[1]->ic_flags;
-	  OptSetNOP1(temp_lag[1]);
+	if (tempi1=OptLag(tempi)) {
+	  if (tempi1->ic_opcode==IC_ADD_RSP) {
+	    tempi->ic_data+=tempi1->ic_data;
+	    tempi->ic_flags|=tempi1->ic_flags;
+	    OptSetNOP1(tempi1);
+	  }
 	}
       case IC_ADD_RSP1:
+	break;
+
+      case IC_BSF:
+	if (tempi1->ic_opcode==IC_IMM_U64) {
+	  tempi1->ic_data=Bsf(tempi1->ic_data);
+	  tempi_push=tempi1;
+	  OptSetNOP1(OptLag(tempi1));	//CALL_START
+	  tempi2=OptLead1(tempi);
+	  tempi1->ic_flags|=tempi->ic_flags|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);		//CALL_END
+	  OptSetNOP1(tempi);		//BSF
+	}
+	break;
+
+      case IC_BSR:
+	if (tempi1->ic_opcode==IC_IMM_U64) {
+	  tempi1->ic_data=Bsr(tempi1->ic_data);
+	  tempi_push=tempi1;
+	  OptSetNOP1(OptLag(tempi1));	//CALL_START
+	  tempi2=OptLead1(tempi);
+	  tempi1->ic_flags|=tempi->ic_flags|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);		//CALL_END
+	  OptSetNOP1(tempi);		//BSR
+	}
 	break;
 
       case IC_CALL:
@@ -1698,10 +1708,10 @@ args.
       case IC_INVLPG:
       case IC_CLFLUSH:
       case IC_PAUSE:
-      case IC_GET_FLAGS:
+      case IC_GET_RFLAGS:
       case IC_CARRY:
-      case IC_GET_BASE_PTR:
-      case IC_GET_STK_PTR:
+      case IC_GET_RBP:
+      case IC_GET_RSP:
       case IC_GET_RAX:
       case IC_RETURN_VAL:
       case IC_RETURN_VAL2:
@@ -1712,12 +1722,10 @@ args.
       case IC_TYPE:
       case IC_RDTSC:
       case IC_HPET:
-      case IC_SET_FLAGS:
-      case IC_SET_BASE_PTR:
-      case IC_SET_STK_PTR:
+      case IC_SET_RFLAGS:
+      case IC_SET_RBP:
+      case IC_SET_RSP:
       case IC_SET_RAX:
-      case IC_BSF:
-      case IC_BSR:
       case IC_PREEMPT:
       case IC_SIGN_I64:
       case IC_TOUPPER:
@@ -1758,165 +1766,152 @@ args.
 	tempi->ic_flags|=ICF_LOCK;
 	break;
       case IC_TO_I64:
-	if (combined) {
-	  if (tempi1->ic_opcode==IC_IMM_F64) {
-	    tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_INT;
-	    tempi->ic_opcode=IC_IMM_U64;
-	    tempi->ic_data=ToI64(tempi1->ic_data(F64));
-	    tempi->ic_class=sys_internal_types[IT_I64];
-	    tempi->ic_class2=sys_internal_types[IT_I64];
-	    OptSetNOP1(tempi1);
+	if (tempi1->ic_opcode==IC_IMM_F64) {
+	  tempi2=tempi1->last;
+	  while (tempi2->ic_opcode!=IC_CALL_START)
+	    tempi2=tempi2->last;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi1-1;
-	    while (tempii->ic_opcode!=IC_CALL_START)
-	      tempii--;
-	    OptSetNOP1(tempii);
+	  tempi2=tempi->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
 
-	    tempii=tempi+1;
-	    while (tempii->ic_opcode!=IC_CALL_END)
-	      tempii++;
-	    OptSetNOP1(tempii);
-	  } else if (tempi1->ic_opcode==IC_IMM_U64) {
-	    tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64;
-	    tempi->ic_opcode=IC_IMM_U64;
-	    tempi->ic_data=tempi1->ic_data;
-	    tempi->ic_class=sys_internal_types[IT_I64];
-	    tempi->ic_class2=sys_internal_types[IT_I64];
-	    OptSetNOP1(tempi1);
+	  tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_INT|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi1-1;
-	    while (tempii->ic_opcode!=IC_CALL_START)
-	      tempii--;
-	    OptSetNOP1(tempii);
+	  tempi->ic_opcode=IC_IMM_U64;
+	  tempi->ic_data=ToI64(tempi1->ic_data(F64));
+	  tempi->ic_class=sys_internal_types[IT_I64];
+	  tempi->ic_class2=sys_internal_types[IT_I64];
+	  OptSetNOP1(tempi1);
+	} else if (tempi1->ic_opcode==IC_IMM_U64) {
+	  tempi2=tempi1->last;
+	  while (tempi2->ic_opcode!=IC_CALL_START)
+	    tempi2=tempi2->last;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi+1;
-	    while (tempii->ic_opcode!=IC_CALL_END)
-	      tempii++;
-	    OptSetNOP1(tempii);
+	  tempi2=tempi->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
+
+	  tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
+
+	  tempi->ic_opcode=IC_IMM_U64;
+	  tempi->ic_data=tempi1->ic_data;
+	  tempi->ic_class=sys_internal_types[IT_I64];
+	  tempi->ic_class2=sys_internal_types[IT_I64];
+	  OptSetNOP1(tempi1);
+	}
+	if (tempi1->ic_flags&ICF_R_TO_F64) {
+	  i=0;
+	  tempi2=tempi1->last;
+	  while (TRUE) {
+	    if (tempi2->ic_opcode==IC_CALL_START) {
+	      if (!i) break;
+	      i--;
+	    } else if (tempi2->ic_opcode==IC_CALL_END)
+	      i++;
+	    tempi2=tempi2->last;
 	  }
-	  if (tempi1->ic_flags&ICF_R_TO_F64) {
-	    tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&~(ICF_R_TO_F64|ICF_PUSH_RESULT);
-	    tempi1->ic_class=sys_internal_types[IT_I64];
-	    tempi1->ic_class2=sys_internal_types[IT_I64];
-	    tempi_push=tempi1;
-	    OptSetNOP1(tempi);;
+	  OptSetNOP1(tempi2);
 
-	    i=0;
-	    tempii=tempi1-1;
-	    while (TRUE) {
-	      if (tempii->ic_opcode==IC_CALL_START) {
-		if (!i) break;
-		i--;
-	      } else if (tempii->ic_opcode==IC_CALL_END)
-		i++;
-	      tempii--;
-	    }
-	    OptSetNOP1(tempii);
+	  tempi2=tempi1->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
 
-	    i=0;
-	    tempii=tempi1+1;
-	    while (TRUE) {
-	      if (tempii->ic_opcode==IC_CALL_END) {
-		if (!i) break;
-		i--;
-	      } else if (tempii->ic_opcode==IC_CALL_START)
-		i++;
-	      tempii++;
-	    }
-	    OptSetNOP1(tempii);
-	  }
+	  tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&~(ICF_R_TO_F64|ICF_PUSH_RESULT)|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
+
+	  tempi1->ic_class=sys_internal_types[IT_I64];
+	  tempi1->ic_class2=sys_internal_types[IT_I64];
+	  tempi_push=tempi1;
+	  OptSetNOP1(tempi);;
 	}
 	break;
       case IC_TO_F64:
-	if (combined) {
-	  if (tempi1->ic_opcode==IC_IMM_U64) {
-	    tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64;
-	    tempi->ic_opcode=IC_IMM_F64;
-	    tempi->ic_data(F64)=ToF64(tempi1->ic_data);
-	    tempi->ic_class=sys_internal_types[IT_F64];
-	    tempi->ic_class2=sys_internal_types[IT_F64];
-	    OptSetNOP1(tempi1);
+	if (tempi1->ic_opcode==IC_IMM_U64) {
+	  tempi2=tempi1->last;
+	  while (tempi2->ic_opcode!=IC_CALL_START)
+	    tempi2=tempi2->last;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi1-1;
-	    while (tempii->ic_opcode!=IC_CALL_START)
-	      tempii--;
-	    OptSetNOP1(tempii);
+	  tempi2=tempi->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
 
-	    tempii=tempi+1;
-	    while (tempii->ic_opcode!=IC_CALL_END)
-	      tempii++;
-	    OptSetNOP1(tempii);
-	  } else if (tempi1->ic_opcode==IC_IMM_F64) {
-	    tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_INT;
-	    tempi->ic_opcode=IC_IMM_F64;
-	    tempi->ic_data=tempi1->ic_data;
-	    tempi->ic_class=sys_internal_types[IT_F64];
-	    tempi->ic_class2=sys_internal_types[IT_F64];
-	    OptSetNOP1(tempi1);
+	  tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi1-1;
-	    while (tempii->ic_opcode!=IC_CALL_START)
-	      tempii--;
-	    OptSetNOP1(tempii);
+	  tempi->ic_opcode=IC_IMM_F64;
+	  tempi->ic_data(F64)=ToF64(tempi1->ic_data);
+	  tempi->ic_class=sys_internal_types[IT_F64];
+	  tempi->ic_class2=sys_internal_types[IT_F64];
+	  OptSetNOP1(tempi1);
+	} else if (tempi1->ic_opcode==IC_IMM_F64) {
+	  tempi2=tempi1->last;
+	  while (tempi2->ic_opcode!=IC_CALL_START)
+	    tempi2=tempi2->last;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi+1;
-	    while (tempii->ic_opcode!=IC_CALL_END)
-	      tempii++;
-	    OptSetNOP1(tempii);
+	  tempi2=tempi->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
+
+	  tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_INT|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
+
+	  tempi->ic_opcode=IC_IMM_F64;
+	  tempi->ic_data=tempi1->ic_data;
+	  tempi->ic_class=sys_internal_types[IT_F64];
+	  tempi->ic_class2=sys_internal_types[IT_F64];
+	  OptSetNOP1(tempi1);
+	}
+	if (tempi1->ic_flags&ICF_R_TO_INT) {
+	  i=0;
+	  tempi2=tempi1->last;
+	  while (TRUE) {
+	    if (tempi2->ic_opcode==IC_CALL_START) {
+	      if (!i) break;
+	      i--;
+	    } else if (tempi2->ic_opcode==IC_CALL_END)
+	      i++;
+	    tempi2=tempi2->last;
 	  }
-	  if (tempi1->ic_flags&ICF_R_TO_INT) {
-	    tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&~(ICF_R_TO_INT|ICF_PUSH_RESULT);
-	    OptSetNOP1(tempi);;
-	    tempi1->ic_class=sys_internal_types[IT_F64];
-	    tempi1->ic_class2=sys_internal_types[IT_F64];
-	    tempi_push=tempi1;
+	  OptSetNOP1(tempi2);
 
-	    i=0;
-	    tempii=tempi1-1;
-	    while (TRUE) {
-	      if (tempii->ic_opcode==IC_CALL_START) {
-		if (!i) break;
-		i--;
-	      } else if (tempii->ic_opcode==IC_CALL_END)
-		i++;
-	      tempii--;
-	    }
-	    OptSetNOP1(tempii);
+	  tempi2=tempi1->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
 
-	    i=0;
-	    tempii=tempi1+1;
-	    while (TRUE) {
-	      if (tempii->ic_opcode==IC_CALL_END) {
-		if (!i) break;
-		i--;
-	      } else if (tempii->ic_opcode==IC_CALL_START)
-		i++;
-	      tempii++;
-	    }
-	    OptSetNOP1(tempii);
-	  }
+	  tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&~(ICF_R_TO_INT|ICF_PUSH_RESULT)|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
+
+	  tempi1->ic_class=sys_internal_types[IT_F64];
+	  tempi1->ic_class2=sys_internal_types[IT_F64];
+	  tempi_push=tempi1;
+	  OptSetNOP1(tempi);;
 	}
 	break;
       case IC_TO_BOOL:
-	if (combined) {
-	  if (tempi1->ic_opcode==IC_IMM_U64 || tempi1->ic_opcode==IC_IMM_F64) {
-	    tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64;
-	    tempi->ic_opcode=IC_IMM_U64;
-	    tempi->ic_data=ToBool(tempi1->ic_data);
-	    tempi->ic_class=sys_internal_types[IT_I64];
-	    tempi->ic_class2=sys_internal_types[IT_I64];
-	    OptSetNOP1(tempi1);
+	if (tempi1->ic_opcode==IC_IMM_U64 || tempi1->ic_opcode==IC_IMM_F64) {
+	  tempi2=tempi1->last;
+	  while (tempi2->ic_opcode!=IC_CALL_START)
+	    tempi2=tempi2->last;
+	  OptSetNOP1(tempi2);
 
-	    tempii=tempi1-1;
-	    while (tempii->ic_opcode!=IC_CALL_START)
-	      tempii--;
-	    OptSetNOP1(tempii);
+	  tempi2=tempi->next;
+	  while (tempi2->ic_opcode!=IC_CALL_END)
+	    tempi2=tempi2->next;
 
-	    tempii=tempi+1;
-	    while (tempii->ic_opcode!=IC_CALL_END)
-	      tempii++;
-	    OptSetNOP1(tempii);
-	  }
+	  tempi->ic_flags|=tempi1->ic_flags&~ICF_R_TO_F64|tempi2->ic_flags;
+	  OptSetNOP1(tempi2);
+
+	  tempi->ic_opcode=IC_IMM_U64;
+	  tempi->ic_data=ToBool(tempi1->ic_data);
+	  tempi->ic_class=sys_internal_types[IT_I64];
+	  tempi->ic_class2=sys_internal_types[IT_I64];
+	  OptSetNOP1(tempi1);
 	}
 	break;
 
@@ -1930,12 +1925,10 @@ args.
 	break;
 
       case IC_BR_ZERO:
-	if (combined)
-	  tempi_push=OptBrZero(lx,tempi);
+	tempi_push=OptBrZero(lx,tempi);
 	break;
       case IC_BR_NOT_ZERO:
-	if (combined)
-	  tempi_push=OptBrNotZero(lx,tempi);
+	tempi_push=OptBrNotZero(lx,tempi);
 	break;
       case IC_BR_NOT_EQUAL:
       case IC_BR_EQUAL_EQUAL:
@@ -1976,11 +1969,11 @@ args.
 	break;
 
       case IC_NOP1:
-	if (combined && tempi->ic_flags&ICF_PUSH_RESULT) {
-	  tempii=tempi;
-	  do tempii--;
-	  while (tempii->ic_opcode==IC_NOP1);
-	  tempii->ic_flags|=ICF_PUSH_RESULT;
+	if (tempi->ic_flags&ICF_PUSH_RESULT) {
+	  tempi1=tempi;
+	  do tempi1=tempi1->last;
+	  while (tempi1->ic_opcode==IC_NOP1);
+	  tempi1->ic_flags|=ICF_PUSH_RESULT;
 	  tempi->ic_flags&=~ICF_PUSH_RESULT;
 	}
 	break;
@@ -1994,27 +1987,29 @@ args.
 	  lb1->fwd=lb;
 	  lb1=lb2;
 	}
-	tempii=temp_lag[1];
-	if (tempii->ic_opcode==IC_JMP) {
-	  lb1=tempii->ic_data;
-	  while (lb1->fwd)
-	    lb1=lb1->fwd;
-	  if (lb1==lb) {
-	    tempi->ic_flags|=tempii->ic_flags;
-	    OptSetNOP1(tempii);
-	  }
-	} else if (tempii->ic_opcode==IC_LABEL) {
-	  lb1=tempii->ic_data;
-	  if (!lb1->fwd)
-	    lb1->fwd=lb;
-	  tempii=temp_lag[2];
-	  if (tempii->ic_opcode==IC_JMP) {
-	    lb1=tempii->ic_data;
+	if (tempi1=OptLag(tempi)) {
+	  if (tempi1->ic_opcode==IC_JMP) {
+	    lb1=tempi1->ic_data;
 	    while (lb1->fwd)
 	      lb1=lb1->fwd;
 	    if (lb1==lb) {
-	      tempi->ic_flags|=tempii->ic_flags;
-	      OptSetNOP1(tempii);
+	      tempi->ic_flags|=tempi1->ic_flags;
+	      OptSetNOP1(tempi1);
+	    }
+	  } else if (tempi1->ic_opcode==IC_LABEL) {
+	    lb1=tempi1->ic_data;
+	    if (!lb1->fwd)
+	      lb1->fwd=lb;
+	    if (tempi1=OptLag(tempi1)) {
+	      if (tempi1->ic_opcode==IC_JMP) {
+		lb1=tempi1->ic_data;
+		while (lb1->fwd)
+		  lb1=lb1->fwd;
+		if (lb1==lb) {
+		  tempi->ic_flags|=tempi1->ic_flags;
+		  OptSetNOP1(tempi1);
+		}
+	      }
 	    }
 	  }
 	}
@@ -2031,15 +2026,19 @@ args.
       case IC_IRQ:
 	break;
       case IC_JMP:
-	if (temp_lag[1]->ic_opcode==IC_LABEL) {
-	  lb=OptLabelFwd(tempi->ic_data);
-	  lb1=OptLabelFwd(temp_lag[1]->ic_data);
-	  if (lb!=lb1)
-	    lb1->fwd=lb;
+	if (tempi1=OptLag(tempi)) {
+	  if (tempi1->ic_opcode==IC_LABEL) {
+	    lb=OptLabelFwd(tempi->ic_data);
+	    lb1=OptLabelFwd(tempi1->ic_data);
+	    if (lb!=lb1)
+	      lb1->fwd=lb;
+	  }
 	}
 	break;
       default:
-	OptMissing(lx,tempi);
+	"Pass:%d Missing IC handler\n",lx->pass;
+	ICPut(tempi);
+	LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
     }
     if (cmp_arg_cnt[code]==2) {
       if (tempi_push->ic_precedence.u8[0]&~ASSOC_MASK==PREC_ASSIGN)
@@ -2061,12 +2060,13 @@ args.
       if (code>IC_END_EXP)
 	last_with_class=tempi;
     }
-    if (combined)
-      tempi++;
-    else
-      tempi=CBGetIC1(&lx->cbh);
+    tempi=tempi->next;
   }
-  OptEnd(lx,ps);
+  if (ps->ptr>2) {
+    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
+    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
 
   /*
 This is for determining type conversions

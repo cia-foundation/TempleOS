@@ -26,7 +26,7 @@ SYS_KERNEL_START1::
 	ALIGN	4,OC_NOP
 SYS_BOOT_BASE::			DU32	0;	//Fixed offset from start used by reboot
 SYS_BOOT_PATCH_TABLE_BASE::	DU32	0;
-#exe {StreamPrintF("SYS_COMPILE_TIME:: DU64 0x%X;",GetCurTimeDate);}
+#exe {StreamPrint("SYS_COMPILE_TIME:: DU64 0x%X;",GetDateTime);}
 
 //See $LK,"BootCdProbe","MN:BootCdProbe"$
 #assert SYS_COMPILE_TIME+8+16<CD_BLK_SIZE
@@ -115,7 +115,7 @@ SYS_KERNEL_START3::
 //	MOV	ECX,1000000
 //	CALL	SYS_BUSY_WAIT
 
-	OR	EBX,EBX
+	TEST	EBX,EBX
 	JZ	TEMPLEOS_CONT_START
 
 //XSUM Error
@@ -139,12 +139,12 @@ TEMPLEOS_CONT_START:
 
 	MOV	U32 [SYS_RUN_LEVEL],RLF_16BIT
 
-#exe {StreamPrintF("MOV BX,%d\n",kernel_cfg->bios_gr_mode);};
+#exe {StreamPrint("MOV BX,%d\n",kernel_cfg->bios_gr_mode);};
 	MOV	U16 [SYS_BIOS_GR_MODE],BX
 	MOV	AX,0x4F02
 #exe {
   if (!kernel_cfg->opts[CFG_TEXT_MODE])
-    StreamPutS("INT 0x10");  //Enable VGA
+    StreamPrint("INT 0x10");  //Enable VGA
 };
 	CMP	AX,0x004F
 	JE	@@10
@@ -194,7 +194,7 @@ TEMPLEOS_CONT_START:
 	JC	@@20
 	CMP	EAX,'PAMS'
 	JNE	@@20
-	OR	EBX,EBX
+	TEST	EBX,EBX
 	JZ	@@20
 	ADD	DI,MEM_E820_ENTRY_SIZE
 	POP	CX
@@ -289,10 +289,9 @@ USE32
 	ALIGN	8,OC_NOP
 SYS_HEAP_BASE::		DU64	0x100000+0x1000*(NUM_PML1+NUM_PML2+NUM_PML3+NUM_PML4);
 SYS_HEAP_LIMIT::	DU64	0;
-SYS_KERNEL_END_PTR::	DU64	SYS_KERNEL_END;
 
 #exe {
-  StreamPrintF(
+  StreamPrint(
 "SYS_MEM_INIT_FLAG::	DU8	%d;"
 "SYS_MEM_INIT_VAL::	DU8	%d;"
 "SYS_HEAP_INIT_FLAG::	DU8	%d;"

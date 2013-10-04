@@ -4,7 +4,7 @@
 U0 FillInTime()
 {
   CDate cdt;
-  cdt=GetCurTimeDate;
+  cdt=GetDateTime;
   "$$IV,1$$----%D %T----$$IV,0$$\n",cdt,cdt;
 }
 
@@ -86,21 +86,13 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  if (!(sc & SCF_SHIFT))
 	    SetKeyDesc("Cmd/Init WordStat LT");
 	} else if (!(sc & SCF_SHIFT))
-	  PopUp("WSInit(\"/TempleOS/\" FILENAME_MASK_TXT \";~*Bible.TXT*\");");
+	  PopUp("WSInit(\"/TempleOS/*;~*Bible.TXT*\");");
 	break;
       case SC_F7:
-	if (sc&SCF_KEY_DESC) {
-	  if (sc & SCF_SHIFT)
-	    SetKeyDesc("Dollar/Insert Hidden Widget");
-	  else
-	    SetKeyDesc("Misc/Insert Datetime");
-	} else {
-	  if (sc & SCF_SHIFT)
-	    DocInsSafe(DocPut,
-		"$$HS+C$$$$FG$$$$HE$$");
-	  else
-	    FillInTime();
-	}
+	if (sc&SCF_KEY_DESC)
+	  SetKeyDesc("Misc/Insert Datetime");
+	else
+	  FillInTime;
 	break;
     }
     return TRUE;
@@ -134,7 +126,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      SetKeyDesc("Edit/Put Link to Cur Pos on Clipboard");
 	    else {
 	      ClipBoardDel;
-	      DocPrintF(sys_clipboard_doc,"$$LK-A,\"FL:%s,%d\"$$",
+	      DocPrint(sys_clipboard_doc,"$$LK-A,\"FL:%s,%d\"$$",
 		DocPut->filename.name,DocPut->cur_entry->y+1);
 	    }
 	    return TRUE;
@@ -144,7 +136,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    else {
 	      i=RandU32;
 	      ClipBoardDel;
-	      DocPrintF(sys_clipboard_doc,"$$LK,\"<TODO>\",\"FA:%s,ANC%d\"$$",
+	      DocPrint(sys_clipboard_doc,"$$LK,\"<TODO>\",\"FA:%s,ANC%d\"$$",
 		DocPut->filename.name,i);
 	      "$$AN,\"<TODO>\",\"ANC%d\"$$",i;
 	    }
@@ -170,9 +162,8 @@ Bool MyPutKey(I64 ch,I64 sc)
   return FALSE;
 }
 
-Bool MyPutS(U8 *st)
+Bool MyPutS(U8 *)
 {
-  nounusedwarn st;
   return FALSE;
 }
 

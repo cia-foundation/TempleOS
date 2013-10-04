@@ -19,14 +19,14 @@ class CCCDUserData //Create CD
 	short_dir_blks,long_dir_blks;
 };
 
-I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
+I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
 		    CISO1DirEntry *tempi,CISO1DirEntry *tempi2,
 		    I64 *_cur_blk,
 		    CDirEntry *parent,Bool write,
 		    U8 *stage2_filename,I64 *_stage2_blk)
 {
   CCCDUserData *tempc;
-  CDirEntry *tempm1,*tempm2;
+  CDirEntry *tempde1,*tempde2;
   CFile *in_file;
   U8 *buf=MAlloc(CD_BLK_SIZE),*ptr1,*ptr2;
   CISO1DirEntry *dir_blk_buf =CAlloc(CD_BLK_SIZE*128),
@@ -40,7 +40,7 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   de->len=sizeof(CISO1DirEntry)-1;
   de->ext_attr_len=0;
   FillU16Palindrome(&de->vol_seq_num,1);
-  Date2ISO1(&de->date,tempm->datetime);
+  Date2ISO1(&de->date,tempde->datetime);
   de->flags=ISO1_ATTR_DIR;
   de->name_len=1;
   de->name=0;
@@ -62,7 +62,7 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   de2->len=sizeof(CISO1DirEntry)-1;
   de2->ext_attr_len=0;
   FillU16Palindrome(&de2->vol_seq_num,1);
-  Date2ISO1(&de2->date,tempm->datetime);
+  Date2ISO1(&de2->date,tempde->datetime);
   de2->flags=ISO1_ATTR_DIR;
   de2->name_len=1;
   de2->name=0;
@@ -81,48 +81,48 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   de2->len+=de2->name_len;
   de2(U8 *)+=de2->len;
 
-  tempm1=tempm->sub;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (!write) tempm1->user_data=CAlloc(sizeof(CCCDUserData));
+  tempde1=tempde->sub;
+  while (tempde1) {
+    tempde2=tempde1->next;
+    if (!write) tempde1->user_data=CAlloc(sizeof(CCCDUserData));
     de1=de;
     de12=de2;
-    if (tempm1->attr & _ATTR_DIR) {
-      n=CDFileCreate2(out_file,tempm1,de,de2,_cur_blk,tempm,write,stage2_filename,_stage2_blk);
+    if (tempde1->attr & _ATTR_DIR) {
+      n=CDFileCreate2(out_file,tempde1,de,de2,_cur_blk,tempde,write,stage2_filename,_stage2_blk);
       de(U8 *)+=sizeof(CISO1DirEntry)-1+n;
       de2(U8 *)+=sizeof(CISO1DirEntry)-1+n<<1;
     } else {
-      tempc=tempm1->user_data;
+      tempc=tempde1->user_data;
       de->len=sizeof(CISO1DirEntry)-1;
       de->ext_attr_len=0;
       FillU32Palindrome(&de->loc,*_cur_blk);
       tempc->loc=*_cur_blk;
       if (write) {
-	if (stage2_filename && !StrCmp(tempm1->full_name,stage2_filename)) {
+	if (stage2_filename && !StrCmp(tempde1->full_name,stage2_filename)) {
 	  "$$FG,RED$$!!! Boot Stage 2 !!!$$FG$$\n";
 	  if (_stage2_blk) *_stage2_blk=*_cur_blk;
 	}
-	"%X:%s\n",*_cur_blk,tempm1->full_name;
+	"%X:%s\n",*_cur_blk,tempde1->full_name;
       }
-      FillU32Palindrome(&de->size,tempm1->size);
+      FillU32Palindrome(&de->size,tempde1->size);
       FillU16Palindrome(&de->vol_seq_num,1);
-      Date2ISO1(&de->date,tempm1->datetime);
+      Date2ISO1(&de->date,tempde1->datetime);
       de->flags=0;
-      de->name_len=StrLen(tempm1->name);
-      StrCpy(&de->name,tempm1->name);
+      de->name_len=StrLen(tempde1->name);
+      StrCpy(&de->name,tempde1->name);
       de->len=de->len+de->name_len;
       de(U8 *)+=de->len;
 
       de2->len=sizeof(CISO1DirEntry)-1;
       de2->ext_attr_len=0;
       FillU32Palindrome(&de2->loc,*_cur_blk);
-      FillU32Palindrome(&de2->size,tempm1->size);
+      FillU32Palindrome(&de2->size,tempde1->size);
       FillU16Palindrome(&de2->vol_seq_num,1);
-      Date2ISO1(&de2->date,tempm1->datetime);
+      Date2ISO1(&de2->date,tempde1->datetime);
       de2->flags=0;
-      de2->name_len=StrLen(tempm1->name)<<1;
+      de2->name_len=StrLen(tempde1->name)<<1;
       ptr1=&de2->name;
-      ptr2=&tempm1->name;
+      ptr2=&tempde1->name;
       for (i=0;i<de2->name_len;i=i+2) {
 	ptr1++;
 	*ptr1++=*ptr2++;
@@ -130,7 +130,7 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
       de2->len+=de2->name_len;
       de2(U8 *)+=de2->len;
 
-      in_file=FOpen(tempm1->full_name,"r");
+      in_file=FOpen(tempde1->full_name,"r");
       for (i=0;i<(FSize(in_file)+CD_BLK_SIZE-1)/CD_BLK_SIZE;i++) {
 	n=4;
 	if ((i+1)<<2>(FSize(in_file)+BLK_SIZE-1)>>BLK_SIZE_BITS) {
@@ -163,20 +163,20 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
       MemCpy(de2,buf,i);
       de2(U8 *)+=i;
     }
-    tempm1=tempm2;
+    tempde1=tempde2;
   }
 
-  tempc=tempm->user_data;
+  tempc=tempde->user_data;
 
   tempi->len=sizeof(CISO1DirEntry)-1;
   tempi->ext_attr_len=0;
   tempi->flags=ISO1_ATTR_DIR;
-  if (!tempm->name[0]) {
+  if (!tempde->name[0]) {
     tempi->name_len=1;
     tempi->name=1;
   } else {
-    tempi->name_len=StrLen(tempm->name);
-    StrCpy(&tempi->name,tempm->name);
+    tempi->name_len=StrLen(tempde->name);
+    StrCpy(&tempi->name,tempde->name);
   }
   tempi->len+=tempi->name_len;
 
@@ -189,9 +189,9 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   FillU32Palindrome(&dir_blk_buf->size,n*CD_BLK_SIZE);
   FillU32Palindrome(&dir_blk_buf->loc,*_cur_blk);
   FillU16Palindrome(&tempi->vol_seq_num,1);
-  Date2ISO1(&tempi->date,tempm->datetime);
+  Date2ISO1(&tempi->date,tempde->datetime);
   if (write)
-    "%X:%s\n",*_cur_blk,tempm->full_name;
+    "%X:%s\n",*_cur_blk,tempde->full_name;
   if (write)
     FWBlks(out_file,dir_blk_buf,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
@@ -199,13 +199,13 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   tempi2->len=sizeof(CISO1DirEntry)-1;
   tempi2->ext_attr_len=0;
   tempi2->flags=ISO1_ATTR_DIR;
-  if (!tempm->name[0]) {
+  if (!tempde->name[0]) {
     tempi2->name_len=1;
     tempi->name=1;
   } else {
-    tempi2->name_len=StrLen(tempm->name)<<1;
+    tempi2->name_len=StrLen(tempde->name)<<1;
     ptr1=&tempi2->name;
-    ptr2=&tempm->name;
+    ptr2=&tempde->name;
     for (i=0;i<tempi2->name_len;i=i+2) {
       ptr1++;
       *ptr1++=*ptr2++;
@@ -220,9 +220,9 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   FillU32Palindrome(&dir_blk_buf2->size,n*CD_BLK_SIZE);
   FillU32Palindrome(&dir_blk_buf2->loc,*_cur_blk);
   FillU16Palindrome(&tempi2->vol_seq_num,1);
-  Date2ISO1(&tempi2->date,tempm->datetime);
+  Date2ISO1(&tempi2->date,tempde->datetime);
   if (write)
-    "%X:%s\n",*_cur_blk,tempm->full_name;
+    "%X:%s\n",*_cur_blk,tempde->full_name;
   if (write)
     FWBlks(out_file,dir_blk_buf2,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
@@ -233,39 +233,39 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempm,
   return tempi->name_len;
 }
 
-I64 CDTableLen(CDirEntry *tempm,I64 *size1,I64 *size2,I64 cur_depth)
+I64 CDTableLen(CDirEntry *tempde,I64 *size1,I64 *size2,I64 cur_depth)
 //returns depth
 {
-  CDirEntry *tempm1=tempm->sub;
+  CDirEntry *tempde1=tempde->sub;
   I64 max_depth=cur_depth,i;
-  while (tempm1) {
-    if (tempm1->attr & _ATTR_DIR) {
-      *size1+=sizeof(CISO1PathEntry)-2+ (StrLen(tempm1->name)+1)&-0x2;
-      *size2+=sizeof(CISO1PathEntry)-2+StrLen(tempm1->name)<<1;
-      i=CDTableLen(tempm1,size1,size2,cur_depth+1);
+  while (tempde1) {
+    if (tempde1->attr & _ATTR_DIR) {
+      *size1+=sizeof(CISO1PathEntry)-2+ (StrLen(tempde1->name)+1)&-0x2;
+      *size2+=sizeof(CISO1PathEntry)-2+StrLen(tempde1->name)<<1;
+      i=CDTableLen(tempde1,size1,size2,cur_depth+1);
       if (i>max_depth) max_depth=i;
     }
-    tempm1=tempm1->next;
+    tempde1=tempde1->next;
   }
   return max_depth;
 }
 
-U0 CDFillPathTable(CDirEntry *tempm,
+U0 CDFillPathTable(CDirEntry *tempde,
   CISO1PathEntry **_itabbuf,CISO1PathEntry **_itabbuf2,
   I64 parent_entry_num,Bool big_endian,I64 *first_free,I64 cur_level,I64 output_level)
 {
   U8 *ptr1,*ptr2;
   I64 i;
   CISO1PathEntry *tabbuf=*_itabbuf,*tabbuf2=*_itabbuf2;
-  CDirEntry *tempm1=tempm->sub,*tempm2;
+  CDirEntry *tempde1=tempde->sub,*tempde2;
   CCCDUserData *tempc;
  
   if (cur_level==output_level) {
-    while (tempm1) {
-      if (tempm1->attr & _ATTR_DIR) {
-	tempc=tempm1->user_data;
+    while (tempde1) {
+      if (tempde1->attr & _ATTR_DIR) {
+	tempc=tempde1->user_data;
 	tempc->path_entry_num=*first_free;
-	tabbuf->name_len=StrLen(tempm1->name);
+	tabbuf->name_len=StrLen(tempde1->name);
 	if (big_endian) {
 	  tabbuf->blk=EndianU32(tempc->loc);
 	  tabbuf->parent_entry_num=EndianU16(parent_entry_num);
@@ -273,11 +273,11 @@ U0 CDFillPathTable(CDirEntry *tempm,
 	  tabbuf->blk=tempc->loc;
 	  tabbuf->parent_entry_num=parent_entry_num;
 	}
-	StrCpy(&tabbuf->name,tempm1->name);
+	StrCpy(&tabbuf->name,tempde1->name);
 
-	tabbuf(U8 *)+=sizeof(CISO1PathEntry)-2+(StrLen(tempm1->name)+1) & -0x2;
+	tabbuf(U8 *)+=sizeof(CISO1PathEntry)-2+(StrLen(tempde1->name)+1) & -0x2;
 
-	tabbuf2->name_len=StrLen(tempm1->name)<<1;
+	tabbuf2->name_len=StrLen(tempde1->name)<<1;
 	if (big_endian) {
 	  tabbuf2->blk=EndianU32(tempc->loc+tempc->short_dir_blks);
 	  tabbuf2->parent_entry_num=EndianU16(parent_entry_num);
@@ -286,29 +286,29 @@ U0 CDFillPathTable(CDirEntry *tempm,
 	  tabbuf2->parent_entry_num=parent_entry_num;
 	}
 	ptr1=&tabbuf2->name;
-	ptr2=&tempm1->name;
+	ptr2=&tempde1->name;
 	for (i=0;i<tabbuf2->name_len;i=i+2) {
 	  ptr1++;
 	  *ptr1++=*ptr2++;
 	}
 	tabbuf2(U8 *)+=sizeof(CISO1PathEntry)-2+
-	  StrLen(tempm1->name)<<1;
+	  StrLen(tempde1->name)<<1;
 	*first_free+=1;
       }
-      tempm1=tempm1->next;
+      tempde1=tempde1->next;
     }
     *_itabbuf=tabbuf;
     *_itabbuf2=tabbuf2;
   }
-  tempm1=tempm->sub;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      tempc=tempm1->user_data;
-      CDFillPathTable(tempm1,_itabbuf,_itabbuf2,tempc->path_entry_num,
+  tempde1=tempde->sub;
+  while (tempde1) {
+    tempde2=tempde1->next;
+    if (tempde1->attr & _ATTR_DIR) {
+      tempc=tempde1->user_data;
+      CDFillPathTable(tempde1,_itabbuf,_itabbuf2,tempc->path_entry_num,
 	 big_endian,first_free,cur_level+1,output_level);
     }
-    tempm1=tempm2;
+    tempde1=tempde2;
   }
 }
 
@@ -351,8 +351,8 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   CISO1DirEntry *tempi;
   CCCDUserData *tempc;
 
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
 
   if (!_filename)
     _filename=sys_dft_iso_name;
@@ -365,7 +365,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
 
   rootdir->attr=_ATTR_DIR;
   rootdir->sub=FilesFind(src_files_find_mask,fuf_flags);
-  rootdir->datetime=GetCurTimeDate;
+  rootdir->datetime=GetDateTime;
   rootdir->user_data=CAlloc(sizeof(CCCDUserData));
   tempc=rootdir->user_data;
   tempc->path_entry_num=1;
@@ -493,7 +493,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
-  CDirLstDel2(rootdir);
+  DirLstDel2(rootdir);
   FillU32Palindrome(&iso_pri->vol_space_size,cur_blk);
   FillU32Palindrome(&iso_sup->vol_space_size,cur_blk);
   FWBlks(out_file,iso_pri,16<<2,4);

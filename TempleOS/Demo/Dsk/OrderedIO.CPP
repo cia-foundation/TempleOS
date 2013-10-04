@@ -5,11 +5,11 @@ $WW,0$*/
 U0 Main()
 {
   I64 i,cnt=0;
-  CDirEntry *tempm=FilesFind("::/TempleOS/*",FUF_RECURSE),
-      **a=FilesOrder(tempm,&cnt);
+  CDirEntry *tempde=FilesFind("::/TempleOS/*",FUF_RECURSE),
+      **a=FilesOrder(tempde,&cnt);
   for (i=0;i<cnt;i++) {
     "%08X %s\n",a[i]->cluster,a[i]->full_name;
-    CDirEntryDel(a[i]);
+    DirEntryDel(a[i]);
   }
   Free(a);
 }

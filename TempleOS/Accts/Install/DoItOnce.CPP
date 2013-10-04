@@ -13,13 +13,13 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,U8 *acct_name,
 {
   U8 *st1,*st2;
 
-  st1=MSPrintF("%C:/",cd_drv);
-  st2=MSPrintF("%C:/",drv);
+  st1=MPrint("%C:/",cd_drv);
+  st2=MPrint("%C:/",drv);
   CopyTree(st1,st2);
   Free(st1);
   Free(st2);
 
-  st1=MSPrintF("%C:/TempleOS/Accts/%s",drv,acct_name);
+  st1=MPrint("%C:/TempleOS/Accts/%s",drv,acct_name);
   MkDir(st1);
   Copy("::/TempleOS/Demo/MakeDistro.CPP.Z",st1);
   Free(st1);
@@ -119,9 +119,9 @@ U0 RegularInstallWizard()
   if (1<=A2I(base0)<=num_hints) {
     tempha=ATARepFind(&root,A2I(base0));
     Free(base0);
-    base0=MSPrintF("0x%X",tempha->base0);
-    base1=MSPrintF("0x%X",tempha->base1);
-    ms	 =MSPrintF("0x%X",tempha->unit);
+    base0=MPrint("0x%X",tempha->base0);
+    base1=MPrint("0x%X",tempha->base1);
+    ms	 =MPrint("0x%X",tempha->unit);
     unit=A2I(ms);
   } else {
     while (TRUE) {
@@ -151,8 +151,8 @@ U0 RegularInstallWizard()
   }
 
   NewLine;
-  st1=MSPrintF("%C:/TempleOS",*sys_acct);
-  st2=MSPrintF("%C:/TempleOS",*dst);
+  st1=MPrint("%C:/TempleOS",*sys_acct);
+  st2=MPrint("%C:/TempleOS",*dst);
 
   "$$FG,RED$$Format %C Partition?$$FG$$\n",*dst;
   if (YorN) {
@@ -179,14 +179,14 @@ U0 RegularInstallWizard()
     NewLine;
   }
   CopyTree(st1,st2);
-  st2=MSPrintF("%C:/0000Boot",*dst);
+  st2=MPrint("%C:/0000Boot",*dst);
   MkDir(st2);
   Free(st2);
-  st2=MSPrintF("%C:/Temp",*dst);
+  st2=MPrint("%C:/Temp",*dst);
   MkDir(st2);
   Free(st2);
 
-  new_home_str=MSPrintF("%C:/TempleOS/Accts/%s",*dst,acct_name);
+  new_home_str=MPrint("%C:/TempleOS/Accts/%s",*dst,acct_name);
   MkDir(new_home_str);
   Copy("::/TempleOS/Demo/MakeDistro.CPP.Z",new_home_str);
   XTalkWait(task,

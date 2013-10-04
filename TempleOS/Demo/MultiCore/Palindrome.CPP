@@ -28,10 +28,10 @@ U0 PDAnswer(U8 *a,I64 len)
 {
   DocLock(doc);
   a-=(len-1)/2;
-  DocPrintF(doc,"CPU:%d Len:%2d ",Gs->num,len);
+  DocPrint(doc,"CPU:%d Len:%2d ",Gs->num,len);
   while (len--)
-    DocPrintF(doc,"%C",*a++); //%C is toupper char
-  DocPutS(doc,"\n");
+    DocPrint(doc,"%C",*a++); //%C is toupper char
+  DocPrint(doc,"\n");
   DocUnlock(doc);
 }
 

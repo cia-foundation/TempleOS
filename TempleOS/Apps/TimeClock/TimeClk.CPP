@@ -85,7 +85,7 @@ public Bool TimeRep(TimeEntry **_header=NULL)
     if (week!=cur_week) {
       if (!first) {
 	if (is_in)
-	  week_total+=GetCurTimeDate;
+	  week_total+=GetDateTime;
 	"Week Total:%h7T\n",week_total;
       } else
 	first=FALSE;
@@ -107,7 +107,7 @@ public Bool TimeRep(TimeEntry **_header=NULL)
     tempt=tempt->next;
   }
   if (is_in)
-    week_total+=GetCurTimeDate;
+    week_total+=GetDateTime;
   "$$FG,RED$$Week Total:%h7T$$FG$$\n",week_total;
   if (!_header)
     TimeEntriesDel(header);
@@ -124,7 +124,7 @@ public U0 PunchOut()
   else {
     tempt=MAlloc(sizeof(TimeEntry));
     tempt->type=TET_PUNCH_OUT;
-    tempt->datetime=GetCurTimeDate;
+    tempt->datetime=GetDateTime;
     "\nEnter Description.\nPress <ESC> when done.\n";
     if (!(tempt->desc=MGetS(GETSF_WITH_NEW_LINE)))
       tempt->desc=CAlloc(1);
@@ -144,7 +144,7 @@ public U0 PunchIn()
   else {
     tempt=MAlloc(sizeof(TimeEntry));
     tempt->type=TET_PUNCH_IN;
-    tempt->datetime=GetCurTimeDate;
+    tempt->datetime=GetDateTime;
     "\nEnter Description.\nPress <ESC> when done.\n";
     if (!(tempt->desc=MGetS(GETSF_WITH_NEW_LINE)))
       tempt->desc=CAlloc(1);

@@ -26,7 +26,7 @@ Alteration Ideas:
 #define PLAYER_1_ARMOR_PERCENT	50
 #define PLAYER_2_ARMOR_PERCENT	50
 
-/*Constants are often faster when compiled.
+/*Consts are often faster when compiled.
 This is an advantage of just-in-time compilation.
 You can't change them when you start a
 game over, however.  A down-side of this
@@ -44,22 +44,24 @@ is you can't use the <CTRL-SHIFT-L> compile chk feature.
 	  "Stalin's Tanks.\n");
   if (!PopUpNoYes("Tournament Settings")) {
     d=PopUpRangeF64Log(300,2000,20,"%4f","Map Width In Pixels\n");
-    DefinePrintF("MAP_WIDTH","%f",d);
-    DefinePrintF("MAP_HEIGHT","%f",480.0/640.0*d);
+    DefinePrint("MAP_WIDTH","%f",d);
+    DefinePrint("MAP_HEIGHT","%f",480.0/640.0*d);
     d=PopUpRangeF64Exp(8,512,2,"%3f","Player 2 Units\n");
-    DefinePrintF("MAX_UNITS","%f",d);
+    DefinePrint("MAX_UNITS","%f",d);
     d=PopUpRangeF64(0.2,1.01,0.05,"%4.2f to 1.00","Player1:Player2 Odds\n");
-    DefinePrintF("P1_TO_P2_ODDS","%4.2f",d);
+    DefinePrint("P1_TO_P2_ODDS","%4.2f",d);
     d=PopUpRangeF64(0,100,10,"%3f% %%","Player 1 Armor Percent\n");
-    DefinePrintF("PLAYER_1_ARMOR_PERCENT","%f",d);
+    DefinePrint("PLAYER_1_ARMOR_PERCENT","%f",d);
     d=PopUpRangeF64(0,100,10,"%3f% %%","Player 2 Armor Percent\n");
-    DefinePrintF("PLAYER_2_ARMOR_PERCENT","%f",d);
+    DefinePrint("PLAYER_2_ARMOR_PERCENT","%f",d);
   }
-  DefinePrintF("DCOS","%12.9f",HEX_SIDE*Cos(60.0/180*ã));
-  DefinePrintF("DSIN","%12.9f",HEX_SIDE*Sin(60.0/180*ã));
-  DefinePrintF("HEX_RADIUS","%12.9f",DSIN+0.01); //slop
+  DefinePrint("DCOS","%12.9f",HEX_SIDE*Cos(60.0/180*ã));
+  DefinePrint("DSIN","%12.9f",HEX_SIDE*Sin(60.0/180*ã));
+  DefinePrint("HEX_RADIUS","%12.9f",DSIN+0.01); //slop
   d=PopUpRangeF64(0,100,25,"%3f% %%","Animation Delay\n");
-  DefinePrintF("ANIMATION_DELAY","%5.3f",d/100.0);
+  DefinePrint("ANIMATION_DELAY","%5.3f",d/100.0);
+  Randomize;
+  Randomize(PopUpI64("Seed(0x%X):",Fs->rnd_seed));
   XTalk(rotate_tank_task," ");
   TaskWait(rotate_tank_task);
   Kill(rotate_tank_task);
@@ -427,7 +429,7 @@ Bool RecalcVisible(I64 mode,Unit *tempu=NULL)
   Bool result;
 
 /*The compiler doesn't go out of it's way
-to know if something is constant.;-)  This
+to know if something is const.;-)  This
 just compiles with the val at compile
 time, an advantage of just-in-time over
 AOT binaries.  TempleOS has a limited
@@ -971,12 +973,12 @@ U0 MakeTerrain(U8 color,I64 cnt,I64 cluster_lo,I64 cluster_hi)
 {
   I64 i,j,l,row,col;
   for (i=0;i<cnt;i++) {
-    col=RandU32%map_cols;
-    row=RandU32%map_rows;
-    l=cluster_lo+RandU16%(cluster_hi-cluster_lo+1);
+    col=Rand2U32%map_cols;
+    row=Rand2U32%map_rows;
+    l=cluster_lo+Rand2U16%(cluster_hi-cluster_lo+1);
     for (j=0;j<l;j++) {
       terrain[row][col]=color;
-      Toward(&row,&col,RandU16%6);
+      Toward(&row,&col,Rand2U16%6);
       col=LimitI64(col,0,map_cols-1);
       row=LimitI64(row,0,map_rows-1);
     }
@@ -987,16 +989,16 @@ U0 MakeRivers()
 {
   I64 i,row,col,direction;
   for (i=0;i<4;i++) {
-    row=RandU32%map_rows;
-    col=RandU32%map_cols;
-    direction=RandU16%6;
+    row=Rand2U32%map_rows;
+    col=Rand2U32%map_cols;
+    direction=Rand2U16%6;
     while (TRUE) {
       rivers[row][col]=TRUE;
       Toward(&row,&col,direction);
       if (!(0<=row<map_rows && 0<=col<map_cols))
 	break;
-      if (!(RandU16&3))
-	direction=(direction+(7-RandU16%3))%6;
+      if (!(Rand2U16&3))
+	direction=(direction+(7-Rand2U16%3))%6;
     }
   }
 }
@@ -1005,16 +1007,16 @@ U0 MakeRoads()
 {
   I64 i,row,col,direction;
   for (i=0;i<5;i++) {
-    row=RandU32%map_rows;
-    col=RandU32%map_cols;
-    direction=RandU16%6;
+    row=Rand2U32%map_rows;
+    col=Rand2U32%map_cols;
+    direction=Rand2U16%6;
     while (TRUE) {
       roads[row][col]=TRUE;
       Toward(&row,&col,direction);
       if (!(0<=row<map_rows && 0<=col<map_cols))
 	break;
-      if (!(RandU16%3))
-	direction=(direction+(7-RandU16%3))%6;
+      if (!(Rand2U16%3))
+	direction=(direction+(7-Rand2U16%3))%6;
     }
   }
 }
@@ -1139,7 +1141,7 @@ U0 InitUnits()
       tempu->player=j;
       tempu->num=i;
       tempu->life=100;
-      tempu->facing=RandU16%6;
+      tempu->facing=Rand2U16%6;
       if (!j) {
 	if (i>=Round(MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)) {
 	  if (Round(i-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)>=Round(0.85*(MAX_UNITS-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)))
@@ -1213,8 +1215,8 @@ U0 InitUnits()
 	  break;
       }
       do {
-	row=RandU32%map_rows;
-	col=RandU32%(map_cols/3);
+	row=Rand2U32%map_rows;
+	col=Rand2U32%(map_cols/3);
 	if (j)
 	  col+=2*map_cols/3;
       } while (FindUnit(row,col));
@@ -1238,7 +1240,7 @@ U0 NewTurn()
   SleepUntil(msg_off_timeout);
   msg_off_timeout=sys_jiffies+JIFFY_FREQ*2*ANIMATION_DELAY+1;
   Snd(1000);
-  SPrintF(msg_buf,"Turn %d",++turn);
+  SPrint(msg_buf,"Turn %d",++turn);
   RVSetUp(0);
   RVSetUp(1);
   RecalcVisible(RV_ALL_UNITS);
@@ -1270,15 +1272,15 @@ U0 NewPhase()
   switch (phase) {
     case PHASE_PLOT0:
     case PHASE_PLOT1:
-      SPrintF(msg_buf,"Player %d Artillery Plot",cur_player+1);
+      SPrint(msg_buf,"Player %d Artillery Plot",cur_player+1);
       break;
     case PHASE_MOVE0:
     case PHASE_MOVE1:
-      SPrintF(msg_buf,"Player %d Move",cur_player+1);
+      SPrint(msg_buf,"Player %d Move",cur_player+1);
       break;
     case PHASE_FIRE0:
     case PHASE_FIRE1:
-      SPrintF(msg_buf,"Player %d Fire",cur_player+1);
+      SPrint(msg_buf,"Player %d Fire",cur_player+1);
       break;
   }
 }
@@ -1369,43 +1371,43 @@ U0 PickAI(U8 *dirname,I64 player)
 {
   I64 i=0;
   U8 *st;
-  CDirEntry *tempm,*tempm1,*tempm2;
+  CDirEntry *tempde,*tempde1,*tempde2;
   CDoc *doc=DocNew;
   Bool *old_silent=Silent(ON);
-  st=MSPrintF("%s/*.CPP*",dirname);
-  tempm=FilesFind(st);
+  st=MPrint("%s/*.CPP*",dirname);
+  tempde=FilesFind(st);
   Free(st);
-  tempm2=FilesFind("HOME/ToTheFront/*.CPP*");
-  tempm1=tempm;
+  tempde2=FilesFind("HOME/ToTheFront/*.CPP*");
+  tempde1=tempde;
   Silent(old_silent);
 
-  DocPrintF(doc,"Player %d Type\n\n$$FG,LTBLUE$$",player+1);
-  while (tempm1) {
+  DocPrint(doc,"Player %d Type\n\n$$FG,LTBLUE$$",player+1);
+  while (tempde1) {
     if (!(i++&3))
-      DocPutS(doc,"\n");
-    st=StrNew(tempm1->name);
+      DocPrint(doc,"\n");
+    st=StrNew(tempde1->name);
     FileExtRem(st);
-    tempm1->user_data=DocPrintF(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempm1);
+    tempde1->user_data=DocPrint(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempde1);
     Free(st);
-    tempm1=tempm1->next;
+    tempde1=tempde1->next;
   }
-  tempm1=tempm2;
-  while (tempm1) {
+  tempde1=tempde2;
+  while (tempde1) {
     if (!(i++&3))
-      DocPutS(doc,"\n");
-    st=StrNew(tempm1->name);
+      DocPrint(doc,"\n");
+    st=StrNew(tempde1->name);
     FileExtRem(st);
-    tempm1->user_data=DocPrintF(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempm1);
+    tempde1->user_data=DocPrint(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempde1);
     Free(st);
-    tempm1=tempm1->next;
+    tempde1=tempde1->next;
   }
-  DocPutS(doc,"\n\n\n$$FG$$Create your own AI in HOME/ToTheFront.");
-  while ((tempm1=PopUpMenu(doc))<0);
-  ExeFile(tempm1->full_name);
+  DocPrint(doc,"\n\n\n$$FG$$Create your own AI in HOME/ToTheFront.");
+  while ((tempde1=PopUpMenu(doc))<0);
+  ExeFile(tempde1->full_name);
   DocDel(doc);
-  CDirLstDel(tempm);
-  CDirLstDel(tempm2);
-  ExePrintF("plot_routines[%d]=&TanksPlot;"
+  DirLstDel(tempde);
+  DirLstDel(tempde2);
+  ExePrint("plot_routines[%d]=&TanksPlot;"
 	    "move_routines[%d]=&TanksMove;"
 	    "fire_routines[%d]=&TanksFire;",player,player,player);
 }
@@ -1416,7 +1418,7 @@ U0 DrawUnit(CTask *task,CDC *dc,Unit *tempu,I64 x,I64 y,F64 f)
   if (tempu->infantry)
     SpritePlot3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,tempu->img);
   else
-    SpritePlotRotZ3b(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,tempu->img,f);
+    SpritePlotRotZ3B(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,tempu->img,f);
 }
 
 U0 DrawUnits(CTask *task,CDC *dc)
@@ -1571,7 +1573,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	       i+14,FONT_HEIGHT+14);
 
     dc->color=RED;
-    GrPutS(dc,(task->win_pixel_width-i)>>1-task->win_scroll_x,
+    GrPrint(dc,(task->win_pixel_width-i)>>1-task->win_scroll_x,
 		(task->win_pixel_height-FONT_HEIGHT)>>1-task->win_scroll_y,
       msg_buf);
     if (msg_off_timeout) {
@@ -1587,29 +1589,29 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   if (phase&~1==PHASE_PLOT) {
     dc->color=PURPLE;
-    SPrintF(buf,"Turn:%2d Artillery",turn);
+    SPrint(buf,"Turn:%2d Artillery",turn);
   } else if (phase&~1==PHASE_MOVE) {
     dc->color=GREEN;
-    SPrintF(buf,"Turn:%2d Move",turn);
+    SPrint(buf,"Turn:%2d Move",turn);
   } else {
     dc->color=RED;
-    SPrintF(buf,"Turn:%2d Fire",turn);
+    SPrint(buf,"Turn:%2d Fire",turn);
   }
-  GrPutS(dc,-task->win_scroll_x,-task->win_scroll_y,buf);
+  GrPrint(dc,-task->win_scroll_x,-task->win_scroll_y,buf);
 
-  SPrintF(buf,"%3d Units",alive_cnt[0]);
+  SPrint(buf,"%3d Units",alive_cnt[0]);
   if (cur_player || Blink)
     dc->color=CYAN;
   else
     dc->color=LTCYAN;
-  GrPutS(dc,-task->win_scroll_x+(13+7)*FONT_WIDTH,-task->win_scroll_y,buf);
+  GrPrint(dc,-task->win_scroll_x+(13+7)*FONT_WIDTH,-task->win_scroll_y,buf);
 
-  SPrintF(buf,"%3d Units",alive_cnt[1]);
+  SPrint(buf,"%3d Units",alive_cnt[1]);
   if (!cur_player || Blink)
     dc->color=PURPLE;
   else
     dc->color=LTPURPLE;
-  GrPutS(dc,-task->win_scroll_x+(13+7+10)*FONT_WIDTH,-task->win_scroll_y,buf);
+  GrPrint(dc,-task->win_scroll_x+(13+7+10)*FONT_WIDTH,-task->win_scroll_y,buf);
   Preempt(old_preempt);
 }
 
@@ -1723,4 +1725,27 @@ U0 ToTheFront()
   DCDel(map);
   CleanUp;
 }
-           L         ÿÿÿÿüÿÿÿ          úÿÿÿ      üÿÿÿúÿÿÿþÿÿÿ              øÿÿÿ                 üÿÿÿüÿÿÿ          ûÿÿÿûÿÿÿ   ûÿÿÿ   ûÿÿÿ            ûÿÿÿ   ûÿÿÿ   ûÿÿÿûÿÿÿüÿÿÿüÿÿÿ         üÿÿÿüÿÿÿ              G      ÿÿÿÿýÿÿÿ          üÿÿÿ      þÿÿÿüÿÿÿþÿÿÿ              úÿÿÿ           Ï      þÿÿÿþÿÿÿ      ÿÿÿÿýÿÿÿ   ýÿÿÿÿÿÿÿüÿÿÿ   üÿÿÿ     üÿÿÿ       ýÿÿÿ         þÿÿÿûÿÿÿ   ûÿÿÿ   ýÿÿÿ   üÿÿÿþÿÿÿýÿÿÿþÿÿÿüÿÿÿýÿÿÿýÿÿÿýÿÿÿ      ýÿÿÿ                  ÿÿÿÿ   ÿÿÿÿ              <                         þÿÿÿ       þÿÿÿ            
+           L         ÿÿÿÿüÿÿÿ          úÿÿÿ      üÿÿÿúÿÿÿþÿÿÿ   
+           øÿÿÿ                 üÿÿÿüÿÿÿ          
+ûÿÿÿûÿÿÿ   ûÿÿÿ
+   ûÿÿÿ      
+      ûÿÿÿ   
+ûÿÿÿ   ûÿÿÿûÿÿÿ
+üÿÿÿüÿÿÿ      
+   üÿÿÿüÿÿÿ              G      ÿÿÿÿýÿÿÿ       
+   üÿÿÿ      
+þÿÿÿüÿÿÿþÿÿÿ   
+           úÿÿÿ           Ï      þÿÿÿþÿÿÿ      
+ÿÿÿÿýÿÿÿ   ýÿÿÿ
+ÿÿÿÿüÿÿÿ   üÿÿÿ 
+    üÿÿÿ       
+ýÿÿÿ         
+þÿÿÿûÿÿÿ   ûÿÿÿ
+   ýÿÿÿ   üÿÿÿ
+þÿÿÿýÿÿÿþÿÿÿüÿÿÿ
+ýÿÿÿýÿÿÿýÿÿÿ   
+   ýÿÿÿ      
+            
+ÿÿÿÿ   ÿÿÿÿ              <                     
+    þÿÿÿ       
+þÿÿÿ            

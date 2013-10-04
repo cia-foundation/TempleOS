@@ -64,7 +64,7 @@ U8 *Ball2CSprite()
 {
 //See $LK,"::/TempleOS/Adam/Gr/GrSpritePlot.CPP","FL:::/TempleOS/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
-    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+gr_sprite_base_size[GRST_END]),
+    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+sprite_base_size[GRST_END]),
     *dst=result;
   *dst(U8 *)++ =GRST_MESH;
   *dst(I32 *)++ =b->vertex_cnt;
@@ -87,7 +87,7 @@ public U8 *BallGen()
   BDInit(&bd1);
 
   while (TRUE) {
-    if (!DocFormDo(&bd1,"BallDefineStruct"))
+    if (!DocFormDo(&bd1))
       return NULL;
     MemCpy(&bd2,&bd1,sizeof(BallDefineStruct));
     BDCorrect(&bd2);

@@ -12,11 +12,11 @@ documentation.
 DefineLoad("COMPANY","Trivial Solutions");
 "Company: $$TX+D,\"\",\"COMPANY\"$$\n";
 
-DefinePrintF("COMPANY_TIME","%T",GetCurTimeDate);
+DefinePrint("COMPANY_TIME","%T",GetDateTime);
 
 #exe {
-  StreamPrintF(
-    "#define COMPANY_AGE %h56D\n",GetCurTimeDate-A2Date("8/1/2003"));
+  StreamPrint(
+    "#define COMPANY_AGE %h56D\n",GetDateTime-A2Date("8/1/2003"));
 };
 
 

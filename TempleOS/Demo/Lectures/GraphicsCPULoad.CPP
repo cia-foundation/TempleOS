@@ -37,7 +37,7 @@ U0 GrDemo()
 
 GrDemo;
 
-/*  Program Output$HL,0$$WW+H,1$$FD,1$
+/*  Program Output (Not VMware)$HL,0$$WW+H,1$$FD,1$
 
 8 Cores 2.660GHz
 $FG,2$Rate:$FG,4$369.7 FPS$FG$	$FG,2$Load@60Hz:$FG,4$ 16.2%$FG$

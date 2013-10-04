@@ -54,7 +54,7 @@ $FG,5$$TX+CX,"PROGRAMMING GUIDELINES"$$FG$
 
 * There are two modes of compiling $LK,"AOT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,AOT Compile Mode"$ and $LK,"JIT Compile Mode","FF:::/TempleOS/Doc/Glossary.TXT,JIT Compile Mode"$.  Actual compilation is done in both -- nothing is "interpreted".
 
-* $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$
+* $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$
 
 * I often use 64-bit values when smaller would be more appropriate because the compiler generally is more efficient with 64-bit values.  (All value get promoted to 64-bit by the TempleOS compiler, when fetched.)
 
@@ -78,11 +78,11 @@ $FG,5$$TX+CX,"HASH SYM TABLES"$$FG$
 
 * See $LK-A,"::/TempleOS/Adam/Hash2a.CPP"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
 
-* $FG,2$adam_task->hash_table$FG$ holds the Holy C syms loaded in on start-up.
+* $FG,2$adam_task->hash_table$FG$ holds the HolyC syms loaded in on start-up.
 
-* $FG,2$Fs->hash_table$FG$ holds user Holy C syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym unless you have done $LK,"OptOn","MN:OptOn"$($LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$).  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
+* $FG,2$Fs->hash_table$FG$ holds user HolyC syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym unless you have done $LK,"OptOn","MN:OptOn"$($LK,"OPTf_REPLACE_SYMS","MN:OPTf_REPLACE_SYMS"$).  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp","MN:PopUp"$() a task to run the application and kill it when it's done.
 
-* To display the contents of a hash table, use the $LK,"HashRep","MN:HashRep"$() routine or the varients.  $LK,"HashDepthRep","MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
+* To display the contents of a hash table, use the $LK,"Who","MN:Who"$() routine or the varients.  $LK,"HashDepthRep","MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
 
 
 

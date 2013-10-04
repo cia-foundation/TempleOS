@@ -30,7 +30,7 @@ public I64 HashVal(CHash *temph)
     case HTt_ASM_KEYWORD:
     case HTt_MODULE:
     case HTt_FILE:
-    case HTt_NAMED_FRAME_PTR:
+    case HTt_FRAME_PTR:
       return temph(CHashGeneric *)->user_data0;
 
     case -1:		//nobound_switch
@@ -40,15 +40,15 @@ public I64 HashVal(CHash *temph)
   }
 }
 
-#help_index "Info;Hash/Reports;"
-class CHashRep
+#help_index "Info;Hash;Cmd Line (Typically)"
+class CWho
 {
   CHashGeneric *h;
   U8 *index;
 };
 
 
-I64 HashEntriesCompare(CHashRep *h1,CHashRep *h2)
+I64 HashEntriesCompare(CWho *h1,CWho *h2)
 {
   I64 i1,i2;
   if (i1=StrCmp(h1->h->str,h2->h->str))
@@ -58,7 +58,7 @@ I64 HashEntriesCompare(CHashRep *h1,CHashRep *h2)
   return i1-i2;
 }
 
-I64 HashEntriesCompare2(CHashRep *h1,CHashRep *h2)
+I64 HashEntriesCompare2(CWho *h1,CWho *h2)
 {
   CHashFun *tempf1=h1->h,*tempf2=h2->h;
   I64 i1=HashVal(tempf1),i2=HashVal(tempf2);
@@ -111,7 +111,7 @@ U8 *HelpIndexStr(U8 **ptr_,U8 *index)
   return NULL;
 }
 
-I64 HashEntriesCompare3(CHashRep *h1,CHashRep *h2)
+I64 HashEntriesCompare3(CWho *h1,CWho *h2)
 {
   I64 i,i1=0,i2=0;
   i=StrCmp(h1->index,h2->index);
@@ -130,17 +130,16 @@ I64 HashEntriesCompare3(CHashRep *h1,CHashRep *h2)
   }
 }
 
-//Possible choices for first arg, "h" include
-// "adam_task->hash_table"
-// "Fs->hash_table"
-public U0 HashRep(CHashTable *h=NULL,
-  I64 mask=HTG_ALL,U8 *outname=NULL,U8 *flags=NULL,U8 mapfile_drv=0,U8 *index=NULL,
-  CDoc *_doc=NULL)
-{
+public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
+  U8 *outname=NULL,U8 mapfile_drv=0,U8 *index=NULL,CDoc *_doc=NULL)
+{//Dump Symbol Table
+// +p for only public symbols
+// +m to order by number (normally alphabetical)
+// -r just local hash table
   CHashTable *tempht;
   CHashSrcSym *temph;
   CHashGeneric *ptr;
-  CHashRep *lst;
+  CWho *lst;
   I64 cnt,i,j,k,size,f=0,dbg_bin_num;
   U8 buf[512],*buf4,*last_index=StrNew(""),*cur_index;
   CDoc *doc;
@@ -148,8 +147,8 @@ public U0 HashRep(CHashTable *h=NULL,
   CDocBin *tempb;
   CDbgInfo *dbg;
 
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+p");
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),flags);
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r");
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (f&~(FUF_RECURSE|FUF_PUBLIC|FUF_MAP))
     throw(EXCEPT_FUF,2);
   recurse=Bt(&f,FUf_RECURSE);
@@ -173,7 +172,6 @@ public U0 HashRep(CHashTable *h=NULL,
     temph=tempht->next_added;
     while (temph!=tempht) {
       if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	    temph->type & mask &&
 	    (temph->type & HTF_PUBLIC || !publics))
 	if (!index)
 	  cnt++;
@@ -190,14 +188,13 @@ public U0 HashRep(CHashTable *h=NULL,
   }
   if (!cnt) goto end_hash;
 
-  lst=CAlloc(cnt*sizeof(CHashRep));
+  lst=CAlloc(cnt*sizeof(CWho));
   j=0;
   tempht=h;
   while (tempht) {
     temph=tempht->next_added;
     while (temph!=tempht) {
       if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	    temph->type & mask &&
 	    (temph->type & HTF_PUBLIC || !publics))
 	if (!index)
 	  lst[j++].h=temph;
@@ -220,11 +217,11 @@ public U0 HashRep(CHashTable *h=NULL,
   Preempt(old_preempt);
 
   if (map)
-    QSort(lst,cnt,sizeof(CHashRep),&HashEntriesCompare2);
+    QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare2);
   else if (index)
-    QSort(lst,cnt,sizeof(CHashRep),&HashEntriesCompare3);
+    QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare3);
   else
-    QSort(lst,cnt,sizeof(CHashRep),&HashEntriesCompare);
+    QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare);
 
   for (i=0;i<cnt;i++) {
     ptr=lst[i].h;
@@ -235,7 +232,7 @@ public U0 HashRep(CHashTable *h=NULL,
 	  Free(last_index);
 	  last_index=StrNew(cur_index);
 	  if (doc)
-	    DocPrintF(doc,"$$FG,GREEN$$%s$$FG$$\n",cur_index);
+	    DocPrint(doc,"$$FG,GREEN$$%s$$FG$$\n",cur_index);
 	  else
 	    "$$FG,GREEN$$%s$$FG$$\n",cur_index;
 	}
@@ -271,61 +268,61 @@ public U0 HashRep(CHashTable *h=NULL,
 	    }
 	  }
 	}
-	if (dbg) {
-	  SPrintF(buf,"$$LK+BI,\"%-26s\",\"%s\",%d$$",
+	if (dbg)
+	  DocPrint(doc,"$$LK+BI,\"%-26s\",\"%s\",%d$$",
 		ptr->str,buf4,dbg_bin_num);
-	  DocPutS(doc,buf);
-	} else {
-	  SPrintF(buf,"$$LK,\"%-26s\",\"%s\"$$",
+	else {
+	  SPrint(buf,"$$LK,\"%-26s\",\"%s\"$$",
 		ptr->str,buf4);
 	  if (doc)
-	    DocPutS(doc,buf);
+	    DocPrint(doc,"%s",buf);
 	  else
-	    "" buf;
+	    "%s",buf;
 	}
 	Free(buf4);
       } else {
-	SPrintF(buf,"%-26ts",ptr->str);
+	SPrint(buf,"%-26ts",ptr->str);
 	if (doc)
-	  DocPutS(doc,buf);
+	  DocPrint(doc,"%s",buf);
 	else
-	  "" buf;
+	  "%s",buf;
       }
 
       if (!index) {
 	if (ptr->type & HTT_DEFINE_STR) {
 	  j=ptr(CHashDefineStr *)->cnt;
 	  if (j==-1)
-	    SPrintF(buf,"%-10tQ   ",ptr(CHashDefineStr *)->data);
+	    SPrint(buf,"%-10tQ   ",ptr(CHashDefineStr *)->data);
 	  else
-	    SPrintF(buf,"%-10tQ %02X",ptr(CHashDefineStr *)->data,j);
+	    SPrint(buf,"%-10tQ %02X",ptr(CHashDefineStr *)->data,j);
 	} else if (ptr->type & HTT_GLBL_VAR) {
 	  if (outname)
-	    SPrintF(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr_ip);
+	    SPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr_ip);
 	  else
-	    SPrintF(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr);
+	    SPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr);
 	} else
-	  SPrintF(buf,"%010X   ",HashVal(ptr));
+	  SPrint(buf,"%010X   ",HashVal(ptr));
 	j=HashEntrySize(ptr);
 	if (j==-1)
-	  SPrintF(buf+StrLen(buf)," %04X            ",ptr->use_cnt);
+	  SPrint(buf+StrLen(buf)," %04X            ",ptr->use_cnt);
 	else
-	  SPrintF(buf+StrLen(buf)," %04X %010X ",ptr->use_cnt,j);
+	  SPrint(buf+StrLen(buf)," %04X %010X ",ptr->use_cnt,j);
       } else
 	*buf=0;
 
       k=ptr->type;
       if (publics)
 	k&=~HTF_PUBLIC;
-
+      if (!(k&HTG_TYPE_MASK))
+	SPrint(buf+StrLen(buf),"NULL ");
       for (j=0;j<32;j++)
 	if (Bt(&k,j))
-	  SPrintF(buf+StrLen(buf),"%Z ",j,"ST_HTT_TYPES");
+	  SPrint(buf+StrLen(buf),"%Z ",j,"ST_HTT_TYPES");
       StrCat(buf,"\n");
       if (doc)
-	DocPutS(doc,buf);
+	DocPrint(doc,"%s",buf);
       else
-	"" buf;
+	"%s",buf;
     }
     Free(lst[i].index);
   }
@@ -340,47 +337,12 @@ public U0 HashRep(CHashTable *h=NULL,
       DocDel(doc);
     } else {
       if (doc->root.next==doc)
-	DocPutS(doc,"No Match");
+	DocPrint(doc,"No Match");
       else
 	DocRecalc(doc);
     }
   }
   Free(last_index);
-}
-
-public U0 HFunsRep(U8 *flags="",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_FUN,NULL,flags,0,index);
-}
-
-public U0 HMapRep(U8 *flags="-p+m",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_FUN,NULL,flags,0,index);
-}
-
-public U0 HVarsRep(U8 *flags="",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_GLBL_VAR,NULL,flags,0,index);
-}
-
-public U0 HClassesRep(U8 *flags="-p",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_CLASS,NULL,flags,0,index);
-}
-
-public U0 HDefinesRep(U8 *flags="-p",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_DEFINE_STR,NULL,flags,0,index);
-}
-
-public U0 HSymsRep(U8 *flags="-p",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTT_EXPORT_SYS_SYM,NULL,flags,0,index);
-}
-
-public U0 HAllRep(U8 *flags="-p",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTG_ALL,NULL,flags,0,index);
 }
 
 #define HDR_MAX	16
@@ -419,13 +381,13 @@ public I64 HashDepthRep(CHashTable *tempht=NULL)
 
 public U0 DocHelpIndex(CDoc *doc,U8 *index)
 {
-  HashRep(Fs->hash_table,HTG_ALL,NULL,NULL,0,index,doc);
+  Who("+p",,,,index,doc);
 }
 
 public U0 PopUpHelpIndex(U8 *index,CTask *parent=NULL)
 {
   U8 *buf;
-  buf=MSPrintF("DocHelpIndex(DocPut,\"%s\");View;",index);
+  buf=MPrint("DocHelpIndex(DocPut,\"%s\");View;",index);
   PopUp(buf,parent);
   Free(buf);
 }

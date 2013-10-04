@@ -1,4 +1,29 @@
 #help_index "Graphics"
+public I64 GrRectB(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2)
+{
+  if (x2<x1) SwapU64(&x1,&x2);
+  if (y2<y1) SwapU64(&y1,&y2);
+  return GrRect(dc,x1,y1,x2-x1+1,y2-y1+1);
+}
+
+public I64 GrRect3(CDC *dc,I64 x,I64 y,I64 z,I64 w,I64 h)
+{  //Clipping and transformation
+  CD3I32 poly[4];
+  poly[0].x=x;
+  poly[0].y=y;
+  poly[0].z=z;
+  poly[1].x=x+w;
+  poly[1].y=y;
+  poly[1].z=z;
+  poly[2].x=x+w;
+  poly[2].y=y+h;
+  poly[2].z=z;
+  poly[3].x=x;
+  poly[3].y=y+h;
+  poly[3].z=z;
+  return GrFillPoly3(dc,4,poly);
+}
+
 public U0 GrLineRect4(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 step=1,I64 start=0)
 {
 //Can be used with ROPF_DITHER+WHITE<<16+BLACK
@@ -76,7 +101,7 @@ public I64 GrTextBox3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
       w+=FONT_WIDTH;
   }
   if (w>w_max) w_max=w;
-  result=GrPutS(dc,x1,y1,s);
+  result=GrPrint(dc,x1,y1,"%s",s);
   result+=GrLine(dc,x1-border	   ,y1-border  ,x1+w_max+border,y1-border);
   result+=GrLine(dc,x1-border	   ,y1+h+border,x1+w_max+border,y1+h+border);
   result+=GrLine(dc,x1-border	   ,y1-border  ,x1-border,y1+h+border);
@@ -120,10 +145,10 @@ public I64 GrTextDiamond3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
 
     w=(StrLen(st)*FONT_WIDTH)>>1;
     if (first) {
-      result+=GrPutS(dc,x1-w,y,st);
+      result+=GrPrint(dc,x1-w,y,"%s",st);
       first=FALSE;
     } else
-      result+=GrPutS(dc,x1-w,y,st);
+      result+=GrPrint(dc,x1-w,y,"%s",st);
     if (w) {
       w+=border;
       do {

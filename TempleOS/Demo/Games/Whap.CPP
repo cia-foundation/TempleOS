@@ -17,7 +17,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     cy=task->win_pixel_height>>1;
   Bool snd_on=FALSE;
   dc->color=BLACK;
-  GrPutS(dc,0,0,"Protect your base.");
+  GrPrint(dc,0,0,"Protect your base.");
   GrRect(dc,cx-BASE_SIZE,cy-BASE_SIZE,BASE_SIZE*2,BASE_SIZE*2);
   dc->color=CYAN;
   GrRect(dc,cx-BASE_SIZE+2,cy-BASE_SIZE+2,BASE_SIZE*2-4,BASE_SIZE*2-4);
@@ -144,17 +144,17 @@ U0 Whap()
   springs[0].end1=&balls[1];
   springs[0].end2=&balls[2];
   springs[0].rest_len=15;
-  springs[0].constant=10000;
+  springs[0].const=10000;
   QueIns(&springs[0],ode->last_spring);
   springs[1].end1=&balls[1];
   springs[1].end2=&balls[3];
   springs[1].rest_len=15;
-  springs[1].constant=10000;
+  springs[1].const=10000;
   QueIns(&springs[1],ode->last_spring);
   springs[2].end1=&balls[2];
   springs[2].end2=&balls[3];
   springs[2].rest_len=sqrt2*15;
-  springs[2].constant=10000;
+  springs[2].const=10000;
   QueIns(&springs[2],ode->last_spring);
 
   collision_t=0;

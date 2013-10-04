@@ -13,7 +13,7 @@ I64 PopUpSpriteMain(CSprite **_root,I64 snap,F64 ip_scaler,I64 *_cur_num)
   CTask *pu_task;
   I64 i;
   CDoc *doc=DocNew;
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Main Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Main Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/SpriteMain.TXT.Z\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU-UL,\"Color (4-bit)\",GRST_COLOR8$$\n"
 	"$$MU-UL,\"Dither Color (4-bit)\",GRST_DITHER_COLOR8$$\n"
@@ -49,8 +49,8 @@ I64 PopUpSpriteMain(CSprite **_root,I64 snap,F64 ip_scaler,I64 *_cur_num)
 	"$$FG,PURPLE$$$$MU-UL,\"+] Sprite Edit Menu\",GRST_ED_MENU$$$$FG,LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",GRST_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",DOCM_CANCEL$$\n",snap,ip_scaler);
-  DocPutS(doc,"\nRight-Click to get back to this menu.");
-  st=MSPrintF("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_num);
+  DocPrint(doc,"\nRight-Click to get back to this menu.");
+  st=MPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
   i=PopUpMenu(doc);
@@ -67,21 +67,21 @@ Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
   I64 i;
   CDoc *doc=DocNew;
   CDocEntry *doc_e;
-  doc_e=DocPutS(doc,"  $$DA,32,\"x1:%d\"$$\n");
+  doc_e=DocPrint(doc,"  $$DA,32,\"x1:%%d\"$$\n");
   doc_e->data=_x1;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(doc,"  $$DA,32,\"x2:%d\"$$\n");
+  doc_e=DocPrint(doc,"  $$DA,32,\"x2:%%d\"$$\n");
   doc_e->data=_x2;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(doc,"  $$DA,32,\"y1:%d\"$$\n");
+  doc_e=DocPrint(doc,"  $$DA,32,\"y1:%%d\"$$\n");
   doc_e->data=_y1;
   DocDataFmt(doc_e);
-  doc_e=DocPutS(doc,"  $$DA,32,\"y2:%d\"$$\n\n");
+  doc_e=DocPrint(doc,"  $$DA,32,\"y2:%%d\"$$\n\n");
   doc_e->data=_y2;
   DocDataFmt(doc_e);
 
-  DocPutS(doc," $$BT,\"Use These Extents\",TRUE$$");
-  DocPutS(doc,"$$CM,3,0$$$$BT,\"Drag-Out New Extents\",FALSE$$\n\n");
+  DocPrint(doc," $$BT,\"Use These Extents\",TRUE$$");
+  DocPrint(doc,"$$CM,3,0$$$$BT,\"Drag-Out New Extents\",FALSE$$\n\n");
   do i=PopUpMenu(doc);
   while (i!=FALSE && i!=TRUE);
   DocDel(doc);
@@ -230,7 +230,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	i=PopUpColor(,,FALSE);
 	if (i>=0) {
 	  color=i;
-	  tempg=MAlloc(gr_sprite_qued_base_size[GRST_COLOR8]);
+	  tempg=MAlloc(SpriteQuedBaseSize(GRST_COLOR8));
 	  tempg->type=GRST_COLOR8;
 	  tempg->color8=color;
 	  QueIns(tempg,insert_pt->last);
@@ -245,7 +245,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	i=PopUpColorDither;
 	if (i>=0) {
 	  color=i;
-	  tempg=MAlloc(gr_sprite_qued_base_size[GRST_DITHER_COLOR8]);
+	  tempg=MAlloc(SpriteQuedBaseSize(GRST_DITHER_COLOR8));
 	  tempg->type=GRST_DITHER_COLOR8;
 	  tempg->dither_color8=color.c0.color|color.c1.color<<8;
 	  QueIns(tempg,insert_pt->last);
@@ -287,8 +287,8 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	  old_mesh=&tempg1->shiftable_vertex_cnt;
 	} else
 	  old_mesh=NULL;
-	if (mesh=CSpriteMesh(old_mesh,&size,TRUE)) {
-	  tempg=MAlloc(gr_sprite_qued_base_size[GRST_MESH]-sizeof(I32)*2+size);
+	if (mesh=SpriteMesh(old_mesh,&size,TRUE)) {
+	  tempg=MAlloc(SpriteQuedBaseSize(GRST_MESH)-sizeof(I32)*2+size);
 	  tempg->type=GRST_MESH;
 	  MemCpy(&tempg->vertex_cnt,mesh,size);
 	  Free(mesh);
@@ -369,7 +369,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	i=PopUpRangeI64(1,16,1,"Pen Width\n");
 	if (i>=1) {
 	  width=i;
-	  tempg=MAlloc(gr_sprite_qued_base_size[GRST_WIDTH]);
+	  tempg=MAlloc(SpriteQuedBaseSize(GRST_WIDTH));
 	  tempg->type=GRST_WIDTH;
 	  tempg->width=width;
 	  QueIns(tempg,insert_pt->last);
@@ -381,7 +381,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	break;
       case GRST_TRANSFORM_ON:
       case GRST_TRANSFORM_OFF:
-	tempg=MAlloc(gr_sprite_qued_base_size[GRST_TRANSFORM_ON]);
+	tempg=MAlloc(SpriteQuedBaseSize(GRST_TRANSFORM_ON));
 	if (eletype==GRST_TRANSFORM_ON)
 	  tempg->type=GRST_TRANSFORM_ON;
 	else
@@ -414,13 +414,13 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	  x1=0; y1=0;
 	  do {
 	    dc->color=color&COLORROP_NO_ROP0_MASK;
-	    GrPutS3(dc,x1,y1,0,st);
+	    GrPrint3(dc,x1,y1,0,"%s",st);
 	    msg_code=GetMsg(&p1,&p2,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	    GrScreenInit(dc,x,y);
 	    x1=p1; y1=p2;
 	  } while (msg_code!=MSG_IP_L_UP);
-	  tempg=CAlloc(gr_sprite_qued_base_size[GRST_TEXT]+StrLen(st)+1);
+	  tempg=CAlloc(SpriteQuedBaseSize(GRST_TEXT)+StrLen(st)+1);
 	  tempg->type=GRST_TEXT;
 	  tempg->x1=x1-x;
 	  tempg->y1=y1-y;
@@ -446,7 +446,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	    GrScreenInit(dc,x,y);
 	    x1=p1; y1=p2;
 	  } while (msg_code!=MSG_IP_L_UP);
-	  tempg=CAlloc(gr_sprite_qued_base_size[GRST_TEXT_BOX]+StrLen(st)+1);
+	  tempg=CAlloc(SpriteQuedBaseSize(GRST_TEXT_BOX)+StrLen(st)+1);
 	  tempg->type=GRST_TEXT_BOX;
 	  tempg->x1=x1-x;
 	  tempg->y1=y1-y;
@@ -472,7 +472,7 @@ I64 SpriteMain(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 	    GrScreenInit(dc,x,y);
 	    x1=p1; y1=p2;
 	  } while (msg_code!=MSG_IP_L_UP);
-	  tempg=CAlloc(gr_sprite_qued_base_size[GRST_TEXT_DIAMOND]+StrLen(st)+1);
+	  tempg=CAlloc(SpriteQuedBaseSize(GRST_TEXT_DIAMOND)+StrLen(st)+1);
 	  tempg->type=GRST_TEXT_DIAMOND;
 	  tempg->x1=x1-x;
 	  tempg->y1=y1-y;
@@ -499,7 +499,7 @@ ei_restart:
       msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN | 1<<MSG_IP_L_DOWN | 1<<MSG_IP_R_UP);
       if (msg_code==MSG_IP_R_UP) {
 	if (eletype==GRST_PLANAR_SYMMETRY) {
-	  tempg=CAlloc(gr_sprite_qued_base_size[GRST_PLANAR_SYMMETRY]);
+	  tempg=CAlloc(SpriteQuedBaseSize(GRST_PLANAR_SYMMETRY));
 	  tempg->type=GRST_PLANAR_SYMMETRY;
 	  QueIns(tempg,insert_pt->last);
 	  GrEdUpdate(doc,tempb,root);
@@ -532,7 +532,7 @@ ei_restart:
 	    } while (msg_code!=MSG_IP_L_UP);
 	    dc->color=color&COLORROP_NO_ROP0_MASK;
 	    GrLine3(dc,x1,y1,0,x2,y2,0);
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_LINE]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_LINE));
 	    tempg->type=GRST_LINE;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -555,7 +555,7 @@ ei_restart:
 	    } while (msg_code!=MSG_IP_L_UP);
 	    dc->color=color&COLORROP_NO_ROP0_MASK;
 	    GrArrow3(dc,x1,y1,0,x2,y2,0);
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_ARROW]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_ARROW));
 	    tempg->type=GRST_ARROW;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -580,7 +580,7 @@ ei_restart:
 	      GrScreenInit(dc,x,y);
 	      x2=p1; y2=p2;
 	    } while (msg_code!=MSG_IP_L_UP);
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_PLANAR_SYMMETRY]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_PLANAR_SYMMETRY));
 	    tempg->type=GRST_PLANAR_SYMMETRY;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -618,7 +618,7 @@ ei_restart:
 	    } while (msg_code!=MSG_IP_L_UP);
 	    dc->color=color&COLORROP_NO_ROP0_MASK;
 	    GrRect3(dc,xx1,yy1,0,xx2-xx1,yy2-yy1);
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_RECT]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_RECT));
 	    tempg->type=GRST_RECT;
 	    tempg->x1=xx1-x;
 	    tempg->y1=yy1-y;
@@ -655,7 +655,7 @@ ei_restart:
 	    } while (msg_code!=MSG_IP_L_UP);
 ei_bitmap:
 	    xx2++; yy2++;
-	    tempg=CAlloc(gr_sprite_qued_base_size[GRST_BITMAP8]+
+	    tempg=CAlloc(SpriteQuedBaseSize(GRST_BITMAP8)+
 		  ((xx2-xx1+7)&~7)*(yy2-yy1));
 	    tempg->type=eletype;
 	    tempg->width=xx2-xx1;
@@ -685,7 +685,7 @@ ei_bitmap:
 	      case GE_EXIT:
 	      case GE_CONT:
 		Free(tempg);
-		tempg=CAlloc(gr_sprite_qued_base_size[GRST_BITMAP8]+
+		tempg=CAlloc(SpriteQuedBaseSize(GRST_BITMAP8)+
 		      ((xx2-xx1+7)&~7)*(yy2-yy1));
 		tempg->type=eletype;
 		tempg->width=xx2-xx1;
@@ -736,7 +736,7 @@ ei_bitmap:
 	      }
 	    } while (msg_code!=MSG_IP_L_UP);
 	    xx2++; yy2++;
-	    tempg=CAlloc(gr_sprite_qued_base_size[GRST_BITMAP8]+
+	    tempg=CAlloc(SpriteQuedBaseSize(GRST_BITMAP8)+
 		  ((xx2-xx1+7)&~7)*(yy2-yy1));
 	    tempg->type=GRST_BITMAP8;
 	    tempg->width=xx2-xx1;
@@ -777,7 +777,7 @@ ei_bitmap:
 	    } while (msg_code!=MSG_IP_L_UP);
 	    dc->color=color&COLORROP_NO_ROP0_MASK;
 	    GrCircle3(dc,x1,y1,0,Sqrt(SqrI64(x1-x2)+SqrI64(y1-y2)));
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_CIRCLE]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_CIRCLE));
 	    tempg->type=GRST_CIRCLE;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -798,7 +798,7 @@ ei_bitmap:
 	      GrScreenInit(dc,x,y);
 	      x2=p1; y2=p2;
 	    } while (msg_code!=MSG_IP_L_UP);
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_ELLIPSE]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_ELLIPSE));
 	    tempg->type=GRST_ELLIPSE;
 	    tempg->x2=(x1+x2)>>1-x;
 	    tempg->y2=(y1+y2)>>1-y;
@@ -848,7 +848,7 @@ ei_bitmap:
 		GrScreenInit(dc,x,y);
 		x2=p1; y2=p2;
 	      } while (msg_code!=MSG_IP_L_UP);
-	      tempg=MAlloc(gr_sprite_qued_base_size[GRST_POLYGON]);
+	      tempg=MAlloc(SpriteQuedBaseSize(GRST_POLYGON));
 	      tempg->type=GRST_POLYGON;
 	      tempg->x2=(x1+x2)>>1-x;
 	      tempg->y2=(y1+y2)>>1-y;
@@ -890,7 +890,7 @@ ei_bitmap:
 	    break;
 	  case GRST_PT:
 	    x1=p1; y1=p2;
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_PT]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_PT));
 	    tempg->type=GRST_PT;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -901,7 +901,7 @@ ei_bitmap:
 	  case GRST_FLOOD_FILL:
 	  case GRST_FLOOD_FILL_NOT:
 	    x1=p1; y1=p2;
-	    tempg=MAlloc(gr_sprite_qued_base_size[GRST_FLOOD_FILL]);
+	    tempg=MAlloc(SpriteQuedBaseSize(GRST_FLOOD_FILL));
 	    tempg->type=eletype;
 	    tempg->x1=x1-x;
 	    tempg->y1=y1-y;
@@ -929,7 +929,7 @@ ei_bitmap:
 	      dc->color=color&COLORROP_NO_ROP0_MASK;
 	      if (msg_code==MSG_IP_L_UP) {
 		GrLine3(dc,x1,y1,0,x2,y2,0);
-		tempg=MAlloc(gr_sprite_qued_base_size[GRST_PT]);
+		tempg=MAlloc(SpriteQuedBaseSize(GRST_PT));
 		tempg->type=GRST_PT;
 		tempg->x1=x2-x;
 		tempg->y1=y2-y;
@@ -939,7 +939,7 @@ ei_bitmap:
 	      }
 	    } while (msg_code!=MSG_IP_R_UP);
 	    if (num) {
-	      tempg2=CAlloc(gr_sprite_qued_base_size[GRST_POLYLINE]+
+	      tempg2=CAlloc(SpriteQuedBaseSize(GRST_POLYLINE)+
 		    (num+1)<<1*sizeof(I32));
 	      ptr=&tempg2->y1;
 	      tempg=root2.next;
@@ -991,7 +991,7 @@ ei_bitmap:
 	      tempg=tempg1;
 	    }
 
-	    tempg2=CAlloc(gr_sprite_qued_base_size[GRST_POLYPT]+
+	    tempg2=CAlloc(SpriteQuedBaseSize(GRST_POLYPT)+
 		  sizeof(I32)*2+(num*3+7)>>3);
 	    ptr=&tempg2->y1;
 	    ptr[0]=x3;
@@ -1040,7 +1040,7 @@ ei_bitmap:
 	      dc->color=color&COLORROP_NO_ROP0_MASK;
 	      if (msg_code==MSG_IP_L_UP) {
 		GrLine3(dc,x1,y1,0,x2,y2,0);
-		tempg=MAlloc(gr_sprite_qued_base_size[GRST_PT]);
+		tempg=MAlloc(SpriteQuedBaseSize(GRST_PT));
 		tempg->type=GRST_PT;
 		tempg->x1=x2-x;
 		tempg->y1=y2-y;
@@ -1050,7 +1050,7 @@ ei_bitmap:
 	      }
 	    } while (msg_code!=MSG_IP_R_UP);
 	    if (num) {
-	      tempg2=CAlloc(gr_sprite_qued_base_size[GRST_POLYLINE]+
+	      tempg2=CAlloc(SpriteQuedBaseSize(GRST_POLYLINE)+
 		    (num+1)*sizeof(CD3I32));
 	      p=&tempg2->y1;
 	      tempg=root2.next;
@@ -1104,8 +1104,8 @@ ei_shiftable_mesh:
 	      z=0;
 	      old_mesh=NULL;
 	    }
-	    if (mesh=CSpriteMesh(old_mesh,&size,TRUE)) {
-	      tempg=MAlloc(gr_sprite_qued_base_size[GRST_SHIFTABLE_MESH]-sizeof(I32)*2+size);
+	    if (mesh=SpriteMesh(old_mesh,&size,TRUE)) {
+	      tempg=MAlloc(SpriteQuedBaseSize(GRST_SHIFTABLE_MESH)-sizeof(I32)*2+size);
 	      tempg->type=GRST_SHIFTABLE_MESH;
 	      MemCpy(&tempg->shiftable_vertex_cnt,mesh,size);
 	      Free(mesh);
@@ -1176,12 +1176,12 @@ U0 EdInsGraphic(CDoc *doc,I64 x,I64 y)
     unlock=DocLock(doc);
     tempb=CAlloc(sizeof(CDocBin),doc->mem_task);
     tempb->type=DOCBT_CSPRITE;
-    tempb->size=gr_sprite_base_size[GRST_END];
+    tempb->size=sprite_base_size[GRST_END];
     tempb->data=CAlloc(tempb->size,doc->mem_task);
     tempb->num=doc->cur_bin_num++;
     tempb->use_cnt=1;
     QueIns(tempb,doc->bin_root.last);
-    doc_e=DocPutS(doc,st);
+    doc_e=DocPrint(doc,"%s",st);
     doc_e->bin_data=tempb;
     Free(st);
     if (doc_e && Bt(doc_tag_types,doc_e->type_u8) && doc_e->tag && *doc_e->tag)

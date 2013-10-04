@@ -31,11 +31,8 @@ Bool BlkDevUnlock(CBlkDev *bdev,Bool rst=FALSE)
   while (bdev->lock_fwding)
     bdev=bdev->lock_fwding;
   if (Bt(&bdev->locked_flags,BDlf_LOCKED) && bdev->owning_task==Fs) {
-    if (rst) {
-      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-	Snd(0);
+    if (rst)
       bdev->flags&=~(BDF_INITIALIZED|BDF_INIT_IN_PROGRESS);
-    }
     bdev->owning_task=0;
     LBtr(&bdev->locked_flags,BDlf_LOCKED);
     Yield; //Prevent deadlock
@@ -81,8 +78,6 @@ Bool BlkDevInit(CBlkDev *bdev)
       case BDT_ATA:
 	bdev->max_reads=128;
 	bdev->max_writes=1;
-	bdev->read_freq=2000;
-	bdev->write_freq=500;
 	result=ATAInit(bdev);
 	break;
       case BDT_ATAPI:
@@ -94,8 +89,6 @@ Bool BlkDevInit(CBlkDev *bdev)
 	if (bdev->max_reads<128)
 	  bdev->max_reads=128;
 	bdev->max_writes=0xFFFF*4;
-	bdev->read_freq=1000;
-	bdev->write_freq=250;
 	if (result=ATAInit(bdev))
 	  p->size=bdev->max_blk+1;
 	break;
@@ -220,7 +213,7 @@ U0 SetFSBuf(CPrt *p,I64 c,I64 map_select=-1)
   if (c==INVALID_CLUSTER)
     throw(EXCEPT_PRT,1);
   if (p->type==PT_FAT32)
-    MAP_blk_num=c/(BLK_SIZE>>2);
+    MAP_blk_num=c>>(BLK_SIZE_BITS-2);
   else
     MAP_blk_num=c>>(BLK_SIZE_BITS+3);
   if (MAP_blk_num!=p->cur_map_blk_num) {
@@ -333,12 +326,8 @@ Bool RBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
     if (bdev->flags & BDF_READ_CACHE)
       RCache(p,&buf,&blk,&cnt);
     if (cnt>0) {
-      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-	Snd(bdev->read_freq);
       result=(*p->rblks)(p,buf,blk,cnt);
       bdev->last_time=tS;
-      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-	Snd(0);
       if (bdev->flags & BDF_READ_CACHE)
 	DskCacheAdd(p,buf,blk,cnt);
     }
@@ -366,11 +355,7 @@ Bool WBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
       throw(EXCEPT_PRT,3);
     blk+=bdev->offset;
     if (cnt>0) {
-      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-	Snd(bdev->write_freq);
       result=(*p->wblks)(p,buf,blk,cnt);
-      if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-	Snd(0);
       bdev->last_time=tS;
       if (bdev->flags & BDF_READ_CACHE)
 	DskCacheAdd(p,buf,blk,cnt);
@@ -457,8 +442,7 @@ U0 PrtRep()
   I64 i;
   U8 *st,drv_let;
   "\nDefined Partitions:\n\n";
-  p=sys_prts;
-  for (i=0;i<NUM_PRTS;i++,p++) {
+  for (i=0,p=sys_prts;i<NUM_PRTS;i++,p++) {
     if (p->pt_signature==PRT_SIGNATURE_VAL) {
       bdev=p->bdev;
       drv_let=Prt2Drv(p);
@@ -629,8 +613,7 @@ I64 Name2ParentDirCluster(CPrt *p,U8 *dirname)
   PrtChk(p);
   try {
     unlock=PrtLock(p);
-    cur_dir_cluster=p->root_cluster;
-    cur_dir_cluster2=p->root_cluster;
+    cur_dir_cluster=cur_dir_cluster2=p->root_cluster;
     while (*buf && cont) {
       cur_dir_cluster2=cur_dir_cluster;
       StrFirstRem(buf,"/",buf2);
@@ -710,7 +693,7 @@ I64 WClusters(CPrt *p,U8 *buf,I64 c,I64 cnt)
 }
 
 //c=0 means first cluster in chain
-I64 ClusersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
+I64 ClustersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
 {
   PrtChk(p);
   if (cnt<=0) return c;

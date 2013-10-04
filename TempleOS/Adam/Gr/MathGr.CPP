@@ -794,17 +794,17 @@ public I64 RegPoly(U8 *aux_data,
 }
 
 #help_index "Graphics/CD3I32;Math/CD3I32"
-public F64 P3I32Dist(CD3I32 *p1,CD3I32 *p2)
+public F64 D3I32Dist(CD3I32 *p1,CD3I32 *p2)
 {
   return Sqrt(SqrI64(p1->x-p2->x)+SqrI64(p1->y-p2->y)+SqrI64(p1->z-p2->z));
 }
 
-public F64 P3I32Norm(CD3I32 *p)
+public F64 D3I32Norm(CD3I32 *p)
 {
   return Sqrt(SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z));
 }
 
-public I64 P3I32SqrNorm(CD3I32 *p)
+public I64 D3I32SqrNorm(CD3I32 *p)
 {
   return SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z);
 }
@@ -816,9 +816,9 @@ public I64 Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y
   F64 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z,
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
       x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0,
-      t,d=P3I32Dist(&ctrl[0],&ctrl[1])+
-	     P3I32Dist(&ctrl[1],&ctrl[2])+
-	     P3I32Dist(&ctrl[2],&ctrl[0]),
+      t,d=D3I32Dist(&ctrl[0],&ctrl[1])+
+	     D3I32Dist(&ctrl[1],&ctrl[2])+
+	     D3I32Dist(&ctrl[2],&ctrl[0]),
 	 s=0.5/d,t1,t2;
   xx=x0; yy=y0; zz=z0;
   if (first && (*fp_plot)(aux_data,xx,yy,zz))
@@ -861,10 +861,10 @@ public I64 Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
       x2=ctrl[2].x-x0,y2=ctrl[2].y-y0,z2=ctrl[2].z-z0,
       x3=ctrl[3].x-x0,y3=ctrl[3].y-y0,z3=ctrl[3].z-z0,
-      t,d=P3I32Dist(&ctrl[0],&ctrl[1])+
-	     P3I32Dist(&ctrl[1],&ctrl[2])+
-	     P3I32Dist(&ctrl[2],&ctrl[3])+
-	     P3I32Dist(&ctrl[3],&ctrl[0]),
+      t,d=D3I32Dist(&ctrl[0],&ctrl[1])+
+	     D3I32Dist(&ctrl[1],&ctrl[2])+
+	     D3I32Dist(&ctrl[2],&ctrl[3])+
+	     D3I32Dist(&ctrl[3],&ctrl[0]),
 	 s=0.5/d,nt,t1,t2,t3;
   xx=x0; yy=y0; zz=z0;
   if (first && (*fp_plot)(aux_data,xx,yy,zz))

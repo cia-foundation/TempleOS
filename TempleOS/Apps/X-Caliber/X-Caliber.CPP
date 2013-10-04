@@ -187,7 +187,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<temps->springs;i++) {
 	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].constant=10000;
+	temps->s[i].const=10000;
 	temps->s[i].strength  =30000;
 	if (i<=2)
 	  temps->s[i].color=LTCYAN;
@@ -225,7 +225,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<temps->springs;i++) {
 	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].constant=10000;
+	temps->s[i].const=10000;
 	temps->s[i].strength  =20000;
 	temps->s[i].color=BLACK;
 	QueIns(&temps->s[i],ode->last_spring);
@@ -272,7 +272,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<temps->springs;i++) {
 	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].constant= 40000;
+	temps->s[i].const= 40000;
 	temps->s[i].strength  =75000;
 	if (i>=3)
 	  temps->s[i].color=LTPURPLE;
@@ -379,14 +379,14 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (ode!=task->last_ode) return;
 
   dc->color=WHITE;
-  GrPrintF(dc,0,0,"Level:%d Score:%d High Score:%d",level,score,best_score);
+  GrPrint(dc,0,0,"Level:%d Score:%d High Score:%d",level,score,best_score);
   if (game_over) {
     if (Blink)
-      GrPutS(dc,(task->win_pixel_width-9*FONT_WIDTH)/2,
+      GrPrint(dc,(task->win_pixel_width-9*FONT_WIDTH)/2,
 	  (task->win_pixel_height-FONT_HEIGHT)/2,"Game Over");
   } else if (show_level_msg) {
     if (Blink)
-      GrPrintF(dc,(task->win_pixel_width-8*FONT_WIDTH)/2,
+      GrPrint(dc,(task->win_pixel_width-8*FONT_WIDTH)/2,
 	  (task->win_pixel_height-FONT_HEIGHT)/2+50,"Level %d",level);
   }
 
@@ -439,7 +439,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    D3AddEqu(D3Mul(t_left/25,&p,&p1),&temps->p[3].x);
 	    GrLine(dc,temps->p[1].x,temps->p[1].y,p1.x,p1.y);
 	    arg=Arg(p.x,p.y);
-	    SpritePlotRotZ3b(dc,temps->p[3].x,temps->p[3].y,0,$IB,"<thruster>",1$,arg);
+	    SpritePlotRotZ3B(dc,temps->p[3].x,temps->p[3].y,0,$IB,"<thruster>",1$,arg);
 	  }
 
 	  if (!(temps->s[5].flags&SSF_INACTIVE)) {
@@ -447,7 +447,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    D3AddEqu(D3Mul(t_right/25,&p,&p2),&temps->p[4].x);
 	    GrLine(dc,temps->p[2].x,temps->p[2].y,p2.x,p2.y);
 	    arg=Arg(p.x,p.y);
-	    SpritePlotRotZ3b(dc,temps->p[4].x,temps->p[4].y,0,$IB,"<thruster>",1$,arg);
+	    SpritePlotRotZ3B(dc,temps->p[4].x,temps->p[4].y,0,$IB,"<thruster>",1$,arg);
 	  }
 
 	  if (tT>temps->reload_timeout)
@@ -458,19 +458,19 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  switch (level) {
 	    case 3:
 	      if (!(temps->s[3].flags&SSF_INACTIVE))
-		SpritePlotRotZ3b(dc,temps->p[3].x,temps->p[3].y,0,img,arg);
+		SpritePlotRotZ3B(dc,temps->p[3].x,temps->p[3].y,0,img,arg);
 	      if (!(temps->s[5].flags&SSF_INACTIVE))
-		SpritePlotRotZ3b(dc,temps->p[4].x,temps->p[4].y,0,img,arg);
+		SpritePlotRotZ3B(dc,temps->p[4].x,temps->p[4].y,0,img,arg);
 	    case 2:
 	      if (!(temps->s[1].flags&SSF_INACTIVE))
-		SpritePlotRotZ3b(dc,temps->p[1].x,temps->p[1].y,0,img,arg);
+		SpritePlotRotZ3B(dc,temps->p[1].x,temps->p[1].y,0,img,arg);
 	      if (!(temps->s[2].flags&SSF_INACTIVE))
-		SpritePlotRotZ3b(dc,temps->p[2].x,temps->p[2].y,0,img,arg);
+		SpritePlotRotZ3B(dc,temps->p[2].x,temps->p[2].y,0,img,arg);
 	    case 1:
-	      SpritePlotRotZ3b(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
+	      SpritePlotRotZ3B(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
 	      break;
 	    default:
-	      SpritePlotRotZ3b(dc,temps->p[0].x,temps->p[0].y,0,$IB,"<Laser>",6$,arg);
+	      SpritePlotRotZ3B(dc,temps->p[0].x,temps->p[0].y,0,$IB,"<Laser>",6$,arg);
 	      if (temps->lasering && !temps->laser_overheat) {
 		draw_laser_line=TRUE;
 		Snd(1000);
@@ -494,7 +494,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 		x=temps->p[temps->spacewalk_side].x*(1.0-d)+temps->p[0].x*(d);
 		y=temps->p[temps->spacewalk_side].y*(1.0-d)+temps->p[0].y*(d);
 	      }
-	      SpritePlotRotZ3b(dc,x,y,0,$IB,"<spacewalk>",4$,arg+0.75*Sin(tT*2));
+	      SpritePlotRotZ3B(dc,x,y,0,$IB,"<spacewalk>",4$,arg+0.75*Sin(tT*2));
 	    }
 	  } else {
 	    if (ctrl_panel.spacewalk) {
@@ -522,11 +522,11 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  else
 	    img=$IB,"<gun_busy>",3$;
 	  arg=Arg(p.x,p.y);
-	  SpritePlotRotZ3b(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
+	  SpritePlotRotZ3B(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
 	  arg=Arg(p1.x,p1.y);
-	  SpritePlotRotZ3b(dc,temps->p[0].x+p1.x,temps->p[0].y+p1.y,0,$IB,"<EnemySide>",5$,arg);
+	  SpritePlotRotZ3B(dc,temps->p[0].x+p1.x,temps->p[0].y+p1.y,0,$IB,"<EnemySide>",5$,arg);
 	  arg=Arg(p2.x,p2.y);
-	  SpritePlotRotZ3b(dc,temps->p[0].x+p2.x,temps->p[0].y+p2.y,0,$IB,"<EnemySide>",5$,arg);
+	  SpritePlotRotZ3B(dc,temps->p[0].x+p2.x,temps->p[0].y+p2.y,0,$IB,"<EnemySide>",5$,arg);
 	  for (i=0;i<temps->masses;i++) {
 	    dc->color=YELLOW;
 	    if (temps->p[i].temperature>=1.0)
@@ -1132,7 +1132,16 @@ U0 XCaliber()
   AcctRegWriteBranch("TempleOS/XCaliber","I64 best_score=%d;\n",best_score);
 }
 
-           ž          ÿÿÿÿ   ÿÿÿÿ                            ÿÿÿÿ   ýÿÿÿ   ÿÿÿÿ                        ÿÿÿÿ         þÿÿÿ   þÿÿÿ                       ‚      	      øÿÿÿýÿÿÿÿÿÿÿÿÿ			ÿÿÿÿÿÿÿÿÿÿ			
+           ž      
+    ÿÿÿÿ   ÿÿÿÿ
+             
+            
+   ÿÿÿÿ   ýÿÿÿ
+   ÿÿÿÿ      
+               
+   ÿÿÿÿ      
+   þÿÿÿ   þÿÿÿ
+                       ‚      	      øÿÿÿýÿÿÿÿÿÿÿÿÿ			ÿÿÿÿÿÿÿÿÿÿ			
 	ÿÿÿÿÿÿÿÿ		
 
 
@@ -1142,9 +1151,35 @@ U0 XCaliber()
 
 
 	ÿÿÿÿÿÿÿÿÿÿ			
-	ÿÿÿÿÿÿÿÿÿÿÿÿÿ			ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ	ÿÿÿÿÿÿÿ           ‚      	      øÿÿÿýÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ           À      ýÿÿÿüÿÿÿýÿÿÿ   þÿÿÿ   ÿÿÿÿüÿÿÿþÿÿÿ   ýÿÿÿ   þÿÿÿýÿÿÿ    ÿÿÿÿ    ÿÿÿÿ   ýÿÿÿ    ýÿÿÿ              ÿÿÿÿ   ÿÿÿÿ   ýÿÿÿ       üÿÿÿ    ûÿÿÿ              ÿÿÿÿüÿÿÿ    úÿÿÿ           â             ýÿÿÿ         ÷ÿÿÿ    ÿÿÿÿ
+	ÿÿÿÿÿÿÿÿÿÿÿÿÿ			ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ	ÿÿÿÿÿÿÿ           ‚      	      øÿÿÿýÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ           À      
+ýÿÿÿüÿÿÿýÿÿÿ   
+þÿÿÿ   ÿÿÿÿüÿÿÿ
+þÿÿÿ   ýÿÿÿ   
+þÿÿÿýÿÿÿ    ÿÿÿÿ
+    ÿÿÿÿ   ýÿÿÿ
+    ýÿÿÿ       
+       ÿÿÿÿ   
+ÿÿÿÿ   ýÿÿÿ   
+    üÿÿÿ    ûÿÿÿ
+              
+ÿÿÿÿüÿÿÿ    úÿÿÿ           â         
+    ýÿÿÿ      
+   ÷ÿÿÿ    ÿÿÿÿ
+
    ùÿÿÿ
       
-   ýÿÿÿþÿÿÿÿÿÿÿÿÿÿÿýÿÿÿ   ÷ÿÿÿÿÿÿÿþÿÿÿ         úÿÿÿÿÿÿÿ               õÿÿÿ   õÿÿÿúÿÿÿ          þÿÿÿ
+
+   ýÿÿÿþÿÿÿÿÿÿÿ
+ÿÿÿÿýÿÿÿ   ÷ÿÿÿ
+ÿÿÿÿþÿÿÿ         
+úÿÿÿÿÿÿÿ      
+         õÿÿÿ
+   õÿÿÿúÿÿÿ       
+   þÿÿÿ
        
-          ùÿÿÿ   ùÿÿÿ   þÿÿÿ           –      	   úÿÿÿûÿÿÿ    ÿÿÿÿÿÿÿÿ    ÿÿÿÿ       úÿÿÿ          úÿÿÿüÿÿÿ    þÿÿÿ       úÿÿÿ       ýÿÿÿ   ùÿÿÿ   ùÿÿÿ   ùÿÿÿÿÿÿÿùÿÿÿÿÿÿÿýÿÿÿÿÿÿÿ 
+
+          ùÿÿÿ
+   ùÿÿÿ   þÿÿÿ           –      	   úÿÿÿûÿÿÿ    ÿÿÿÿÿÿÿÿ    ÿÿÿÿ       úÿÿÿ          úÿÿÿüÿÿÿ    þÿÿÿ       úÿÿÿ       
+ýÿÿÿ   ùÿÿÿ   
+ùÿÿÿ   ùÿÿÿÿÿÿÿ
+ùÿÿÿÿÿÿÿýÿÿÿÿÿÿÿ 

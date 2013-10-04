@@ -1,9 +1,9 @@
 U0 MousePktRead()
 {
   U8 j;
-  if (GetTimeStamp>mouse_evt_time+time_stamp_freq>>3)
+  if (GetTSC>mouse_evt_time+time_stamp_freq>>3)
     FifoU8Flush(mouse_fifo);
-  mouse_evt_time=GetTimeStamp;
+  mouse_evt_time=GetTSC;
   FifoU8Ins(mouse_fifo,InU8(KBD_PORT));
   if (FifoU8Cnt(mouse_fifo)==mouse_pkt_size)
     while (FifoU8Rem(mouse_fifo,&j))
@@ -233,7 +233,7 @@ U0 SetMouseIP(I64 x,I64 y,I64 z,I64 l,I64 r,I64 c)
   Bool old_buttons[5];
   CSnap s;
   GetSnap(&s);
-  mouse_evt_time=GetTimeStamp;
+  mouse_evt_time=GetTSC;
   MouseUpdatePre(old_buttons);
   mxx_prescale=x/mxx_scale/s.dx;
   myy_prescale=y/myy_scale/s.dy;

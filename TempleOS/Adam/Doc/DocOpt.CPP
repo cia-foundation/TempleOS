@@ -2,7 +2,7 @@
 
 I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
 {
-  U8 *st,*st2,**dst;
+  U8 *st,*st2,**_dst;
   I64 i,result=0;
 
   if (doc_e->flags1&DOCEF1_LINK) {
@@ -16,16 +16,16 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
       result++;
     }
     if (doc_e->flags1 & DOCEF1_AUX_STR)
-      dst=&doc_e->aux_str;
+      _dst=&doc_e->aux_str;
     else
-      dst=&doc_e->tag;
-    if (StrStr(*dst,".Z")) {
-      st=DocLinkFile(*dst);
+      _dst=&doc_e->tag;
+    if (StrMatch(".Z",*_dst)) {
+      st=DocLinkFile(*_dst);
       if (FileFind(st)) {
 	if (IsDotZ(st))
 	  st[StrLen(st)-2]=0;
 	i=StrLen(st);
-	if ((st2=StrStr(*dst,st)) && st2[i]=='.' && st2[i+1]=='Z') {
+	if ((st2=StrMatch(st,*_dst)) && st2[i]=='.' && st2[i+1]=='Z') {
 	  StrCpy(st2+i,st2+i+2);
 	  result++;
 	}
@@ -34,13 +34,13 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
     }
 /* !!! Dangerous, but handy !!!
     if (doc_e->flags1 & DOCEF1_AUX_STR) {
-      if (st=StrStr(doc_e->aux_str,".Z")) {
+      if (st=StrMatch(".Z",doc_e->aux_str)) {
 	StrCpy(st,st+2);
 	result++;
       }
     }
     if (Bt(doc_tag_types,doc_e->type_u8)) {
-      if (st=StrStr(doc_e->tag,".Z")) {
+      if (st=StrMatch(".Z",doc_e->tag)) {
 	StrCpy(st,st+2);
 	result++;
       }
@@ -88,21 +88,21 @@ public I64 DocOptFile(U8 *filename)
   return result;
 }
 
-I64 DocOptLst(CDirEntry *tempm1)
+I64 DocOptLst(CDirEntry *tempde1)
 {
   I64 result=0;
-  CDirEntry *tempm2;
-  while (tempm1) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub) {
-	"%S %s\n","ST_SCANNING_DIR",tempm1->full_name;
-	result+=DocOptLst(tempm1->sub);
+  CDirEntry *tempde2;
+  while (tempde1) {
+    tempde2=tempde1->next;
+    if (tempde1->attr & _ATTR_DIR) {
+      if (tempde1->sub) {
+	"%S %s\n","ST_SCANNING_DIR",tempde1->full_name;
+	result+=DocOptLst(tempde1->sub);
       }
     } else
-      result+=DocOptFile(tempm1->full_name);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
+      result+=DocOptFile(tempde1->full_name);
+    DirEntryDel(tempde1);
+    tempde1=tempde2;
   }
   return result;
 }
@@ -110,7 +110,7 @@ I64 DocOptLst(CDirEntry *tempm1)
 public I64 DocOpt(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Optimize Files
   I64 f=0;
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
-  GetFFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   return DocOptLst(FilesFind(files_find_mask,f));
 }

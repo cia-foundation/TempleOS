@@ -4,9 +4,9 @@ $WW,1$$FG,5$$TX+CX,"Music Organ Help"$$FG$
 
 * The clipboard can be used to cut and paste.
 
-* $FG,2$MusicOrgan$FG$ uses $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ files as it's fmt!  See $LK-A,"::/TempleOS/Apps/MusicOrgan/Examples/personal.CPP"$.  It does not fully parse them when loading back in, so changes made outside $FG,2$MusicOrgan$FG$ can be lost.
+* $FG,2$MusicOrgan$FG$ uses $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ files as it's fmt!  See $LK-A,"::/TempleOS/Apps/MusicOrgan/Examples/personal.CPP"$.  It does not fully parse them when loading back in, so changes made outside $FG,2$MusicOrgan$FG$ can be lost.
 
-* The first line of the $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ files has a comment with a category recognized by $LK,"JukeBox","FF:::/TempleOS/Apps/MusicOrgan/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the comment is a digit rating number.
+* The first line of the $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ files has a comment with a category recognized by $LK,"JukeBox","FF:::/TempleOS/Apps/MusicOrgan/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the comment is a digit rating number.
 
 * You can take the $LK,"Play","MN:Play"$() statements out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-L>$FG$, but you should do it after pressing $FG,2$<CTRL-T>$FG$ because the clipboard-insert in $FG,2$<CTRL-L>$FG$ is screwy.  See this $SO,"<Song>","2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $FG,2$<CTRL-T>$FG$, now.
 

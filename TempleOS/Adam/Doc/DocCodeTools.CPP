@@ -11,7 +11,7 @@ I64 PopUpEdFmt()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,LTBLUE$$$$MU,\"Check Compile\",EF_CHK_COMPILE$$\n"
+  DocPrint(doc,"$$FG,LTBLUE$$$$MU,\"Check Compile\",EF_CHK_COMPILE$$\n"
 	"$$MU,\"Reindent CPP.Z Fun\",EF_REINDENT$$\n"
 	"$$MU,\"Renum Asm Local @@ Labels for Fun\",EF_RENUM_ASM$$\n"
 	"$$MU,\"Insert Mgd Code: Slider Ctrl\",EF_SLIDER_CTRL$$\n"
@@ -332,15 +332,15 @@ U0 EdRenumAsm(CDoc *doc)
   while (tempr!=&root) {
     tempr1=tempr->next;
     num+=ASM_RENUM_SPACING;
-    SPrintF(buf,"@#%02d",num);
+    SPrint(buf,"@#%02d",num);
     EdReplace(doc,tempr->label,buf,TRUE,TRUE,TRUE);
     Free(tempr);
     tempr=tempr1;
   }
 
   while (num) {
-    SPrintF(buf, "@#%02d",num);
-    SPrintF(buf2,"@@%02d",num);
+    SPrint(buf, "@#%02d",num);
+    SPrint(buf2,"@@%02d",num);
     EdReplace(doc,buf,buf2,TRUE,TRUE,TRUE);
     num-=ASM_RENUM_SPACING;
   }
@@ -373,7 +373,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action)
       DocWrite(doc);
       task=Spawn(&SrvUserCmdLine,NULL,"Srv",,Fs);
       st2=CurDir;
-      st=MSPrintF("Cd(\"%s\");",st2);
+      st=MPrint("Cd(\"%s\");",st2);
       tempc=TaskExeStrQue(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
       Free(st2);
       Free(st);
@@ -385,11 +385,11 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action)
 	Free(st);
 	if (FileFind(prj_file)) {
 	  st2=DirFile(prj_file),
-	  st=MSPrintF("Cd(\"%s\");",st2);
+	  st=MPrint("Cd(\"%s\");",st2);
 	  Free(st2);
 	  tempc=TaskExeStrQue(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER|1<<SVCf_FREE_ON_COMPLETE);
 	  Free(st);
-	  st=MSPrintF("\"$$WW,1$$\";Cmp(\"%s\",\"SysTemp\",\"SysTemp\");",prj_file);
+	  st=MPrint("\"$$WW,1$$\";Cmp(\"%s\",\"SysTemp\",\"SysTemp\");",prj_file);
 	  tempc=TaskExeStrQue(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
 	  Free(st);
 	  if (ScanResult(tempc,&r))
@@ -407,9 +407,9 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action)
 	  prj_file=FileNameAbs(st,FUF_Z_OR_NOT_Z);
 	  Free(st);
 	  if (FileFind(prj_file))
-	    st=MSPrintF("\"$$WW,1$$\";ExeFile(\"%s\",TRUE);",prj_file);
+	    st=MPrint("\"$$WW,1$$\";ExeFile(\"%s\",TRUE);",prj_file);
 	  else
-	    st=MSPrintF("\"$$WW,1$$\";ExeFile(\"%s\",TRUE);",doc->filename.name);
+	    st=MPrint("\"$$WW,1$$\";ExeFile(\"%s\",TRUE);",doc->filename.name);
 	  tempc=TaskExeStrQue(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
 	  Free(st);
 	  if (ScanResult(tempc,&r) && r)
@@ -528,32 +528,32 @@ U0 EdChSC(CDoc *doc)
 {
   I64 ch,sc;
   U8 buf[136];
-  SPrintF(buf,"EdPopUpChSC(%d,%d);",&ch,&sc);
+  SPrint(buf,"EdPopUpChSC(%d,%d);",&ch,&sc);
   PopUp(buf,Fs);
   if (ch==CH_BACKSPACE)
-    DocPrintF(doc,"CH_BACKSPACE,0x%X",sc);
+    DocPrint(doc,"CH_BACKSPACE,0x%X",sc);
   else if (ch=='\n')
-    DocPrintF(doc,"'\n',0x%X",sc);
+    DocPrint(doc,"'\n',0x%X",sc);
   else if (CH_CTRLA<=ch<=CH_CTRLZ)
-    DocPrintF(doc,"CH_CTRL%C,0x%X",ch+'@',sc);
+    DocPrint(doc,"CH_CTRL%C,0x%X",ch+'@',sc);
   else if (ch=='$$')
-    DocPrintF(doc,"'$$$$',0x%X",sc);
+    DocPrint(doc,"'$$$$',0x%X",sc);
   else if (ch=='\\')
-    DocPrintF(doc,"'\\\\',0x%X",sc);
+    DocPrint(doc,"'\\\\',0x%X",sc);
   else if (ch=='\'')
-    DocPrintF(doc,"'\\\'',0x%X",sc);
+    DocPrint(doc,"'\\\'',0x%X",sc);
   else if (ch==CH_ESC)
-    DocPrintF(doc,"CH_ESC,0x%X",sc);
+    DocPrint(doc,"CH_ESC,0x%X",sc);
   else if (ch==CH_SHIFT_ESC)
-    DocPrintF(doc,"CH_SHIFT_ESC,0x%X",sc);
+    DocPrint(doc,"CH_SHIFT_ESC,0x%X",sc);
   else if (ch==CH_SPACE)
-    DocPrintF(doc,"CH_SPACE,0x%X",sc);
+    DocPrint(doc,"CH_SPACE,0x%X",sc);
   else if (ch==CH_SHIFT_SPACE)
-    DocPrintF(doc,"CH_SHIFT_SPACE,0x%X",sc);
+    DocPrint(doc,"CH_SHIFT_SPACE,0x%X",sc);
   else if (Bt(displayable_chars_bitmap,ch))
-    DocPrintF(doc,"'%c',0x%X",ch,sc);
+    DocPrint(doc,"'%c',0x%X",ch,sc);
   else
-    DocPrintF(doc,"0x%X,0x%X",ch,sc);
+    DocPrint(doc,"0x%X,0x%X",ch,sc);
 }
 
 U0 EdCodeTools(CDoc *doc)

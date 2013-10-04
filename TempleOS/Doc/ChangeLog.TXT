@@ -1,6 +1,129 @@
 $WW,1$$FG,2$Use $LK,"R","MN:R"$() to rename if I change a label.$FG$
 
-$IV,1$----07/07/13 11:58:10----$IV,0$
+$IV,1$----10/05/13 00:44:25----$IV,0$
+
+$IV,1$----10/03/13 20:25:16----$IV,0$
+* Improved $LK,"Ed","MN:Ed"$() code.
+* Added $LK-A,"::/TempleOS/Apps/MusicOrgan/JukePuppet.CPP.Z"$.
+
+$IV,1$----09/29/13 15:42:18----$IV,0$
+* Added $LK,"PutBibleLines","MN:PutBibleLines"$().
+* Changed dft return from $LK,"DocEntryRun","MN:DocEntryRun"$() to $LK,"DOCM_EXIT","MN:DOCM_EXIT"$ for $LK,"DocFormDo","MN:DocFormDo"$().  I hope it doesn't have side effects.
+
+$IV,1$----09/27/13 23:55:48----$IV,0$
+* $BK,1$TempleOS version 1.06 Released$BK,0$
+* Renumbered sprite commands -- old sprites are invalid until converted. $LK-A,"::/TempleOS/Misc/SpriteCvt0106.CPP.Z"$.
+
+$IV,1$----09/27/13 07:03:37----$IV,0$
+* Added $FG,2$haserrcode$FG$ keyword to compiler to help make interrupt handlers. See $LK-A,"::/TempleOS/Demo/Lectures/PageTableEntries2.CPP.Z"$.
+* Improved compiler's $LK,"PrsClass","MN:PrsClass"$().
+
+$IV,1$----09/25/13 20:59:12----$IV,0$
+* Made compiler N passes.
+* Compiler change: Made compare to zero same as test.
+* Fixed signed and unsigned asm opcodes.  (Optimizes some cases.)
+* Moved compiler to low mem.
+* Added $FG,2$lastclass$FG$ as a special compiler dft arg.
+* Used  $FG,2$lastclass$FG$ in $LK,"ClassRep","MN:ClassRep"$() and $LK,"DocFormDo","MN:DocFormDo"$().
+* Chged arg order in $LK,"ClassRep","MN:ClassRep"$().
+* $LK,"R","MN:R"$("NamedFrame","Frame");
+* Changed imports in binary file format.
+
+$IV,1$----09/25/13 00:12:26----$IV,0$
+* Added $LK-A,"::/TempleOS/Demo/Graphics/Elephant.CPP.Z"$.
+
+$IV,1$----09/14/13 22:16:43----$IV,0$
+* Added $LK-A,"::/TempleOS/Demo/Carry.CPP.Z"$.
+* Got rid of $LK,"CDirEntry","MN:CDirEntry"$.expanded_size.
+  $BK,1$$FG,4$!!! Warning !!!$FG$$BK,0$ RedSea file system is different, old RedSea partitions will
+  not work.
+
+$IV,1$----09/11/13 14:17:45----$IV,0$
+* $LK,"R","MN:R"$("FUF_JUST_TXT_FILES","FUF_JUST_TXT");
+* $LK,"R","MN:R"$("FILENAME_MASK","FILEMASK");
+* $LK,"R","MN:R"$("Lit","Imm");
+* Compiler optimization: Compare immediates.
+
+$IV,1$----08/31/13 14:36:22----$IV,0$
+* Made $LK,"tS","MN:tS"$ use $LK,"HPET","MN:HPET"$ if available.
+
+$IV,1$----08/30/13 03:21:38----$IV,0$
+* $BK,1$TempleOS version 1.05 Released$BK,0$
+* $LK,"R","MN:R"$("GetCurTimeDate","GetDateTime");
+* $LK,"R","MN:R"$("GetTimeStamp","GetTSC");
+* $LK,"R","MN:R"$("GetF","Scan");
+* $LK,"R","MN:R"$("BASE_PTR","RBP");
+* $LK,"R","MN:R"$("STK_PTR","RSP");
+* $LK,"R","MN:R"$("Getlags","GetRFlags");
+* $LK,"R","MN:R"$("SetFlags","SetRFlags");
+* Changed args on $LK,"FilesFindMatch","MN:FilesFindMatch"$().
+* $LK,"R","MN:R"$("SearchStr","StrFind"); and change args.
+* $LK,"R","MN:R"$("WildCardMatch","WildMatch"); and change args.
+* $LK,"R","MN:R"$("StrStr","StrMatch"); and changed args.
+* $LK,"R","MN:R"$("LstEntryMatch","LstMatch");
+* $LK,"R","MN:R"$("LstEntryPt","LstSub");
+* Added $LK,"RawPrint","MN:RawPrint"$().
+* $LK,"R","MN:R"$("DbgI64","RawI64"); etc.
+* $LK,"R","MN:R"$("MSPrintF","MPrint");
+* $LK,"R","MN:R"$("PrintF","Print");
+* $LK,"R","MN:R"$("AFDelayedPutS","AFPrint");
+* Converted PutS to Print
+
+$IV,1$----08/28/13 13:00:02----$IV,0$
+* $LK,"R","MN:R"$("HashRep","Who");
+* Converted file utils to flattened list.
+* Got rid of "hidden widgets".
+
+$IV,1$----08/27/13 19:31:01----$IV,0$
+* Fixed $LK,"Randomize","MN:Randomize"$().
+* Added $LK,"PopUpI64","MN:PopUpI64"$().
+* Added seed to $LK-A,"::/TempleOS/Apps/ToTheFront/ToTheFront.CPP.Z"$.
+
+$IV,1$----08/27/13 12:13:35----$IV,0$
+* Got rid of $FG,4$IOSnd$FG$().
+* Got rid of $LK,"CDirEntry","MN:CDirEntry"$.xsum
+
+$IV,1$----08/26/13 15:54:09----$IV,0$
+* Improved $LK-A,"::/TempleOS/Demo/Games/EagleDive.CPP.Z"$.
+* Improved $LK-A,"::/TempleOS/Apps/HolySpirit/HolySpirit.CPP.Z"$.
+* Songs
+
+$IV,1$----08/20/13 11:19:56----$IV,0$
+* $LK,"R","MN:R"$("CDirEntryDel","DirEntryDel");
+
+$IV,1$----08/12/13 08:42:47----$IV,0$
+* Added $LK-A,"::/TempleOS/Demo/Graphics/PanText.CPP.Z"$.
+* Added $LK,"gr_pan_text_x","MN:gr_pan_text_x"$, $LK,"gr_pan_text_y","MN:gr_pan_text_y"$.
+* Fixed compiler bug -- Pow() operator type conversion.
+
+$IV,1$----08/04/13 10:31:36----$IV,0$
+* New Logo
+
+$IV,1$----07/27/13 07:17:43----$IV,0$
+* Fixed bug in $LK-A,"::/TempleOS/Apps/MusicOrgan/MakeSong.CPP.Z"$.
+* Improved $LK,"GrRect3","MN:GrRect3"$();
+
+$IV,1$----07/25/13 08:01:06----$IV,0$
+* Fixed $LK,"ROP_XOR","MN:ROP_XOR"$ in $LK,"GrRect","MN:GrRect"$().
+
+$IV,1$----07/24/13 22:56:09----$IV,0$
+* $LK,"R","MN:R"$("SpritePlot3b","SpritePlot3B");
+* $LK,"R","MN:R"$("P3I32","D3I32");
+* Added $LK,"GrRectB","MN:GrRectB"$().
+
+$IV,1$----07/14/13 21:14:25----$IV,0$
+* Fixed bug with saved cursor location.
+
+$IV,1$----07/12/13 11:54:11----$IV,0$
+* $LK,"R","MN:R"$("CONSTANT","CONST");
+
+$IV,1$----07/11/13 22:52:45----$IV,0$
+* Fixed bug in $LK,"Auto","MN:Auto"$().
+* Added score to $LK-A,"::/TempleOS/Demo/Games/Varoom.CPP.Z"$.
+
+$IV,1$----07/08/13 05:12:13----$IV,0$
+* $LK,"R","MN:R"$("Expression","LexExpression");
+* Cleaned-up compiler.
 * Made graphics routines return I64, not Bool.
 
 $IV,1$----06/30/13 00:41:54----$IV,0$
@@ -85,7 +208,7 @@ $IV,1$----05/11/13 03:31:59----$IV,0$
 
 $IV,1$----05/08/13 13:04:22----$IV,0$
 * $LK,"R","MN:R"$("NativeFS","RedSeaFS");
-* $LK,"R","MN:R"$("C+","Holy C");
+* $LK,"R","MN:R"$("C+","HolyC");
 
 $IV,1$----04/30/13 06:15:35----$IV,0$
 * $LK,"R","MN:R"$("GameStarters","Games");
@@ -97,7 +220,7 @@ $IV,1$----04/10/13 12:41:18----$IV,0$
 * $FG,4$dft_drv$FG$ is now $FG,4$*sys_acct$FG$.
 * Made so RAM drives are not reformatted at boot.
 * $FG,4$$BK,1$WARNING$BK,0$$FG$: Added new prompt to RAM disk creation.
-* Added $LK,"StreamExePutS","MN:StreamExePutS"$() and $LK,"StreamExePrintF","MN:StreamExePrintF"$().
+* Added $LK,"StreamExePrint","MN:StreamExePrint"$().
 
 $IV,1$----04/08/13 10:46:20----$IV,0$
 * $BK,1$TempleOS version 1.01 Released$BK,0$
@@ -140,7 +263,7 @@ $IV,1$----03/27/13 04:18:15----$IV,0$
 * Changed $MA+A,"Tour","Cd(\"::/TempleOS/Misc/Tour\");;AutoFile(\"Tour\");\n"$.
 
 $IV,1$----03/24/13 14:44:28----$IV,0$
-* Made $LK,"PutChar","MN:PutChar"$('Hello') accept multiple chars.  This is tricky.  My compiler allows multi-byte char constants.
+* Made $LK,"PutChar","MN:PutChar"$('Hello') accept multiple chars.  This is tricky.  My compiler allows multi-byte char consts.
 
 $IV,1$----03/19/13 16:18:53----$IV,0$
 * Added $LK,"DocType","MN:DocType"$() and $LK,"DocNewLine","MN:DocNewLine"$().

@@ -13,7 +13,8 @@ class CFileSND
 };
 
 //This is a windows media constraint.
-#define MAX_SND_FILE_DATA	0x7FF00
+//#define MAX_SND_FILE_DATA	0x0007FF00
+#define MAX_SND_FILE_DATA	0x7FFFFF00
 
 
 public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=0.0,I64 waveform=WF_SQUARE,
@@ -107,7 +108,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
       i=MAX_SND_FILE_DATA;
     s->data_size=EndianU32(i*sizeof(I16));
     MemCpy(s->body,&s->body[file_num*MAX_SND_FILE_DATA],i*sizeof(I16));
-    SPrintF(name2,"%s%03d.SND",name,file_num++);
+    SPrint(name2,"%s%03d.SND",name,file_num++);
     FileWrite(name2,s,offset(CFileSND.body)+i*sizeof(I16));
     cnt2-=i;
   }

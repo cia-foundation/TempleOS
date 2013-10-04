@@ -2,15 +2,15 @@
 DefineLstLoad("ST_BIN_FILE_TYPES",
 "END\0 \0"
 "REL_EXPORT\0"
-"LIT_EXPORT\0"
+"IMM_EXPORT\0"
 "REL_U8\0"
-"LIT_U8\0"
+"IMM_U8\0"
 "REL_U16\0"
-"LIT_U16\0"
+"IMM_U16\0"
 "REL_U32\0"
-"LIT_U32\0"
+"IMM_U32\0"
 "REL_U64\0"
-"LIT_U64\0"
+"IMM_U64\0"
 " \0 \0 \0 \0"
 "MAIN\0"
 "MODULE_ALIGN\0MODULE_ORG\0"
@@ -57,7 +57,7 @@ public Bool BinRep(U8 *filename)
     ptr+=StrLen(sptr)+1;
     "%16Z:$$FG,GREEN$$%s$$FG$$:%X ",etype,"ST_BIN_FILE_TYPES",sptr,i;
     switch (etype) {
-      case EIE_REL_U8...EIE_LIT_U64:
+      case EIE_REL_U8...EIE_IMM_U64:
 	if (*sptr)
 	  saved_hash_ptr=HashFind(sptr,Fs->hash_table,HTG_ALL);
 	if (!saved_hash_ptr)

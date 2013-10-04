@@ -21,18 +21,18 @@ U0 TimeIns()
   old_preempt=Preempt(OFF);
 
 //Measure cached time
-  start=GetTimeStamp;
+  start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
     *cached_I64=i;
 
-  end=GetTimeStamp;
+  end=GetTSC;
   "  Cached Cycles: %10,d\n",end-start;
 
 //Measure uncached time
-  start=GetTimeStamp;
+  start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
     *uncached_I64=i;
-  end=GetTimeStamp;
+  end=GetTSC;
   "Uncached Cycles: %10,d\n",end-start;
 
   "$$FG,GREEN$$The difference is even greater\n"

@@ -96,6 +96,19 @@ I64 PrsKeyWord(CLex *lx)
     return -1;
 }
 
+U0 UndefinedExtern()
+{
+  PutDefineErr("ST_UNDEFINED_EXTERN");
+  "at %P\n",Caller;
+  throw(EXCEPT_UNDEF_EXTERN);
+}
+
+U0 UnusedExternWarning(CLex *lx,CHashClass *tempc)
+{
+  PrintWarn("%S '%s'\n","ST_UNUSED_EXTERN",tempc->str);
+  lx->warning_cnt++;
+}
+
 U0 PrsVarInit(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_addr_ip,U8 **_base,Bool data_heap,I64 pass)
 {
   U8 *dst=*_dst,*ex;
@@ -147,42 +160,40 @@ U0 PrsVarInit(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_ad
       Free(ex);
     } else {
       old_flags=lx->flags;
-      lx->flags=LF_NO_ABSS | lx->flags & ~(LF_AOT_COMPILE|LF_HAS_MISC_DATA|LF_NOT_CONSTANT);
-      ex=CmpExpression(lx,&type);
+      lx->flags=LF_NO_ABSS | lx->flags & ~(LF_AOT_COMPILE|LF_HAS_MISC_DATA|LF_NOT_CONST);
+      ex=LexExpression2Bin(lx,&type);
       if (old_flags&LF_AOT_COMPILE &&
-	lx->flags&LF_NOT_CONSTANT &&
+	lx->flags&LF_NOT_CONST &&
 	 !Bt(&lx->opts,OPTf_GLBLS_ON_DATA_HEAP)) {
 	lx->flags=lx->flags&~LF_NO_ABSS|LF_AOT_COMPILE;
-	ExpressionDel(ex);
+	ExpressionBinDel(ex);
 	if (pass==2) {
 	  MemSet(dst,0,tempc->size);
 	  LexPop(lx);
 	  Lex(lx);
-	  CBPush(lx);
-	  CBOutPtrsInit(lx);
-	  CBICAdd(lx,IC_START,0,0); //So we can scan back an instruction
-	  CBICAdd(lx,IC_ABS_ADDR,data_addr_ip,tempc+1);
-	  CBICAdd(lx,IC_IMM_U64,dst-*_base,tempc+1);
-	  CBICAdd(lx,IC_ADD,0,tempc+1);
+	  LCCPush(lx);
+	  LCCInit(lx);
+	  LCCAdd(lx,IC_ABS_ADDR,data_addr_ip,tempc+1);
+	  LCCAdd(lx,IC_IMM_U64,dst-*_base,tempc+1);
+	  LCCAdd(lx,IC_ADD,0,tempc+1);
 	  if (!PrsExpression(lx,NULL,TRUE))
 	    throw(EXCEPT_COMPILER,10);
-	  tempi=lx->cbh.cb_last_out_ptr;
+	  tempi=lx->lcc.lcc_root.last;
 	  if (tempi->ic_opcode==IC_END_EXP)
 	    tempi->ic_opcode=IC_NOP1;
-	  CBICAdd(lx,IC_ASSIGN,0,tempc);
-	  CBICAdd(lx,IC_END_EXP,0,tempc);
-	  CBICAdd(lx,IC_RET,0,0);
-	  CBICAdd(lx,IC_END,0,0);
-	  if (ex=CBCompile(lx,NULL,&size,NULL)) {
+	  LCCAdd(lx,IC_ASSIGN,0,tempc);
+	  LCCAdd(lx,IC_END_EXP,0,tempc);
+	  LCCAdd(lx,IC_RET,0,0);
+	  if (ex=LCCCompile(lx,NULL,&size,NULL)) {
 	    tempe=CAlloc(sizeof(CExeImportExport));
 	    tempe->type=EIE_MAIN;
 	    tempe->ip=lx->a->ip;
 	    QueIns(tempe,lx->exe_struct->last_ie);
 	    for (i=0;i<size;i++)
 	      AsmStoreCodeU8(lx,ex[i]);
-	    ExpressionDel(ex);
+	    ExpressionBinDel(ex);
 	  }
-	  CBPop(lx);
+	  LCCPop(lx);
 	} else
 	  lx->stk_ptr--;  //grows up
       } else {
@@ -191,7 +202,7 @@ U0 PrsVarInit(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_ad
 	  throw(EXCEPT_COMPILER,10);
 	r=Call(ex);
 	if (!(lx->flags & LF_HAS_MISC_DATA)||pass==1)
-	  ExpressionDel(ex);
+	  ExpressionBinDel(ex);
 
 	if (type==IT_F64 &&
 	    tempc->sub_type!=IT_F64)
@@ -312,21 +323,17 @@ U0 PrsStaticInit(CLex *lx,CMemberLst *tempm,I64 pass)
   U8 *ex,*dst=tempm->static_data;
   CHashClass *tempc=tempm->member_class;
   I64 i,size;
-  CIntermediateCode *tempi;
   CExeImportExport *tempe;
 
   if (lx->flags&LF_AOT_COMPILE && pass==2) {
-    CBPush(lx);
-    CBOutPtrsInit(lx);
-    CBICAdd(lx,IC_START,0,0); //So we can scan back an instruction
-    tempi=lx->cbh.cb_last_out_ptr;
+    LCCPush(lx);
+    LCCInit(lx);
   }
   PrsVarInit2(lx,&dst,tempc,&tempm->dim,tempm->static_data_ip,&tempm->static_data,Bt(&lx->flags,Lf_AOT_COMPILE),pass);
   if (lx->flags&LF_AOT_COMPILE && pass==2) {
-    if (tempi!=lx->cbh.cb_last_out_ptr) {
-      CBICAdd(lx,IC_RET,0,0);
-      CBICAdd(lx,IC_END,0,0);
-      if (ex=CBCompile(lx,NULL,&size,NULL)) {
+    if (lx->lcc.lcc_root.next!=&lx->lcc.lcc_root) {
+      LCCAdd(lx,IC_RET,0,0);
+      if (ex=LCCCompile(lx,NULL,&size,NULL)) {
 	if (pass==2) {
 	  tempe=CAlloc(sizeof(CExeImportExport));
 	  tempe->type=EIE_MAIN;
@@ -335,11 +342,10 @@ U0 PrsStaticInit(CLex *lx,CMemberLst *tempm,I64 pass)
 	  for (i=0;i<size;i++)
 	    AsmStoreCodeU8(lx,ex[i]);
 	}
-	ExpressionDel(ex);
+	ExpressionBinDel(ex);
       }
-    } else
-      LinkedLstDel(lx->cbh.cb_out_first);
-    CBPop(lx);
+    } //TODO: else del misc?
+    LCCPop(lx);
   }
 }
 
@@ -359,7 +365,7 @@ Bool PrsArrayDims(CLex *lx,CArrayDim *dim)
       j=-1;
       result=FALSE;
     } else {
-      if ((j=Expression(lx))<0)
+      if ((j=LexExpression(lx))<0)
 	LexExcept(lx,"ST_INVALID_ARRAY_SIZE");
     }
     tempad1=&dim->next;
@@ -417,12 +423,12 @@ U0 PrsDotDotDot(CLex *lx,CHashFun *tempf,I64 register)
 
 CHashClass *PrsType(CLex *lx,CHashClass **_tempc1,
   I64 *_mode,CMemberLst *tempm,U8 **_ident,CHashFun **_fun_ptr,
-  CHashExport **_tempess,CArrayDim *tempad,I64 cps_flags)
+  CHashExport **_tempex,CArrayDim *tempad,I64 cps_flags)
 {
-  I64 fun_ptr_cnt,mode=*_mode;
+  I64 k,fun_ptr_cnt,mode=*_mode;
   CHashClass *tempc1=*_tempc1,*tempc2;
   CHashFun *fun_ptr=NULL;
-  CHashExport *tempess=NULL;
+  CHashExport *tempex=NULL;
   CArrayDim *tempad2;
 
 start:
@@ -438,17 +444,10 @@ start:
     tempc1++;
   }
 
-  if (PrsKeyWord(lx)==KW_UNION) {
+  k=PrsKeyWord(lx);
+  if (k==KW_UNION || k==KW_CLASS) {
     Lex(lx);
-    tempc2=PrsClass(lx,TRUE,cps_flags,mode&255==PRS0_EXTERN);
-    tempc2->fwd_class=tempc1;
-    tempc1=tempc2;
-    if (_tempc1) *_tempc1=tempc1;
-    mode=PRS0_NULL|PRS1_NULL;
-    goto start;
-  } else if (PrsKeyWord(lx)==KW_CLASS) {
-    Lex(lx);
-    tempc2=PrsClass(lx,FALSE,cps_flags,mode&255==PRS0_EXTERN);
+    tempc2=PrsClass(lx,k,cps_flags,mode&255==PRS0_EXTERN);
     tempc2->fwd_class=tempc1;
     tempc1=tempc2;
     if (_tempc1) *_tempc1=tempc1;
@@ -467,7 +466,7 @@ start:
 
   if (_ident) {
     if (lx->token==TK_IDENT) {
-      tempess=lx->hash_entry;
+      tempex=lx->hash_entry;
       *_ident=lx->ident;
       lx->ident=NULL;
       Lex(lx);
@@ -475,7 +474,7 @@ start:
       if (!mode.u8[1])
 	*_ident=NULL;
       else if (lx->token==',' || lx->token==';' || lx->token==')') {
-	tempess=NULL;
+	tempex=NULL;
 	*_ident=StrNew("_anon_");
 	tempm->flags|=MLF_NO_UNUSED_WARN;
       } else
@@ -507,7 +506,7 @@ start:
 
   if (_mode)	    *_mode=mode;
   if (_fun_ptr)     *_fun_ptr=fun_ptr;
-  if (_tempess)     *_tempess=tempess;
+  if (_tempex)	   *_tempex=tempex;
   return tempc1;
 }
 
@@ -538,7 +537,7 @@ U0 PrsVarLst(CLex *lx,CHashClass *tempc,
       if (Lex(lx)!='=') //skip $$
 	LexExcept(lx,"ST_EXPECTING_EQUAL");
       Lex(lx); //skip =
-      lx->class_ip=Expression(lx);
+      lx->class_ip=LexExpression(lx);
       if (mode&PRSF_UNION)
 	union_base=lx->class_ip;
       else
@@ -552,32 +551,35 @@ U0 PrsVarLst(CLex *lx,CHashClass *tempc,
       goto pvl_done;
     }
     register=CREG_UNDEF;
-    k=PrsKeyWord(lx);
-    if (k==KW_REG) {
-      register=CREG_ALLOC;
-      if (Lex(lx)==TK_IDENT) {
-	k=DefineMatch(lx->ident,"ST_U64_REGS");
-	if (k>=0) {
-	  register=k;
-	  Lex(lx);
+pvl_restart1:
+    switch (PrsKeyWord(lx)) {
+      case KW_REG:
+	register=CREG_ALLOC;
+	if (Lex(lx)==TK_IDENT) {
+	  k=DefineMatch(lx->ident,"ST_U64_REGS");
+	  if (k>=0) {
+	    register=k;
+	    Lex(lx);
+	  }
 	}
-      }
-    } else if (k==KW_NOREG) {
-      register=CREG_NONE;
-      Lex(lx);
+	goto pvl_restart1;
+      case KW_NOREG:
+	register=CREG_NONE;
+	Lex(lx);
+	goto pvl_restart1;
     }
 
     if (lx->token==TK_DOT_DOT_DOT && mode.u8[1]==PRS1B_FUN_ARG) {
       PrsDotDotDot(lx,tempc,register);
       goto pvl_done;
     }
-    temph=NULL;
-    if (lx->token==TK_IDENT) {
+    if (lx->token==TK_IDENT)
       temph=lx->hash_entry;
-      k=PrsKeyWord(lx);
-    }
+    else
+      temph=NULL;
     if (!temph)
       LexExcept(lx,"ST_EXPECTING_TYPE");
+    k=PrsKeyWord(lx);
     if (k==KW_UNION) {
       Lex(lx);
       PrsVarLst(lx,tempc,mode|PRSF_UNION,tempc->size);
@@ -585,38 +587,39 @@ U0 PrsVarLst(CLex *lx,CHashClass *tempc,
       if (!(temph->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 	LexExcept(lx,"ST_EXPECTING_TYPE");
       first=TRUE;
-restart:
+pvl_restart2:
       tempc1=temph;
       LexPush(lx);
-      if (lx->token!=',' && mode.u8[1]==PRS1B_LOCAL_VAR)
-	Lex(lx); //skip type
-      else
-	Lex(lx); //skip type or ','
+      Lex(lx); //skip type or ','
       tempm=MemberLstNew(register);
+      register=CREG_UNDEF;
       if (mode.u8[1]==PRS1B_STATIC_LOCAL_VAR) {
-	tempm->flags=MLF_STATIC;
+	tempm->flags|=MLF_STATIC;
 	tempm->register=CREG_NONE;
       }
       if (mode.u8[1]==PRS1B_FUN_ARG || mode.u8[1]==PRS1B_LOCAL_VAR) {
-	k=PrsKeyWord(lx);
-	if (k==KW_REG) {
-	  tempm->register=CREG_ALLOC;
-	  lx->stk_ptr--;  //grows up
-	  LexPush(lx);
-	  if (Lex(lx)==TK_IDENT) {
-	    k=DefineMatch(lx->ident,"ST_U64_REGS");
-	    if (k>=0) {
-	      tempm->register=k;
-	      lx->stk_ptr--;  //grows up
-	      LexPush(lx);
-	      Lex(lx);
+pvl_restart3:
+	switch (PrsKeyWord(lx)) {
+	  case KW_REG:
+	    tempm->register=CREG_ALLOC;
+	    lx->stk_ptr--;  //grows up
+	    LexPush(lx);
+	    if (Lex(lx)==TK_IDENT) {
+	      k=DefineMatch(lx->ident,"ST_U64_REGS");
+	      if (k>=0) {
+		tempm->register=k;
+		lx->stk_ptr--;	//grows up
+		LexPush(lx);
+		Lex(lx);
+	      }
 	    }
-	  }
-	} else if (k==KW_NOREG) {
-	  tempm->register=CREG_NONE;
-	  lx->stk_ptr--;  //grows up
-	  LexPush(lx);
-	  Lex(lx);
+	    goto pvl_restart3;
+	  case KW_NOREG:
+	    tempm->register=CREG_NONE;
+	    lx->stk_ptr--;  //grows up
+	    LexPush(lx);
+	    Lex(lx);
+	    goto pvl_restart3;
 	}
       }
       tempm->member_class=PrsType(lx,&tempc1,&mode,tempm,&tempm->str,
@@ -734,27 +737,32 @@ restart:
 	  }
 	  if (lx->token=='=') {
 	    Lex(lx);
-	    old_flags2=lx->flags;
-	    lx->flags&=~LF_HAS_MISC_DATA;
-	    ex=CmpExpression(lx,&type);
-	    if (!ex)
-	      throw(EXCEPT_COMPILER,8);
-	    tempm->dft_val=Call(ex);
-	    tempc2=OptClassFwd(tempc2);
-	    if (tempc2->sub_type==IT_F64) {
-	      if (type!=IT_F64)
-		tempm->dft_val(F64)=tempm->dft_val;
+	    if (PrsKeyWord(lx)==KW_LASTCLASS) {
+	      tempm->flags|=MLF_LASTCLASS;
+	      Lex(lx);
 	    } else {
-	      if (type==IT_F64)
-		tempm->dft_val=tempm->dft_val(F64);
+	      old_flags2=lx->flags;
+	      lx->flags&=~LF_HAS_MISC_DATA;
+	      ex=LexExpression2Bin(lx,&type);
+	      if (!ex)
+		throw(EXCEPT_COMPILER,8);
+	      tempm->dft_val=Call(ex);
+	      tempc2=OptClassFwd(tempc2);
+	      if (tempc2->sub_type==IT_F64) {
+		if (type!=IT_F64)
+		  tempm->dft_val(F64)=tempm->dft_val;
+	      } else {
+		if (type==IT_F64)
+		  tempm->dft_val=tempm->dft_val(F64);
+	      }
+	      if (lx->flags & LF_HAS_MISC_DATA) {
+		tempm->dft_val=StrNew(tempm->dft_val);
+		tempm->flags|=MLF_STR_DFT_AVAILABLE;
+	      }
+	      ExpressionBinDel(ex);
+	      lx->flags|=old_flags2&LF_HAS_MISC_DATA;
 	    }
-	    if (lx->flags & LF_HAS_MISC_DATA) {
-	      tempm->dft_val=StrNew(tempm->dft_val);
-	      tempm->flags|=MLF_STR_DFT_AVAILABLE;
-	    }
-	    ExpressionDel(ex);
 	    tempm->flags|=MLF_DFT_AVAILABLE;
-	    lx->flags|=old_flags2&LF_HAS_MISC_DATA;
 	  }
 	  lx->stk_ptr--;
 	  break;
@@ -778,7 +786,7 @@ restart:
 	      temp_meta->user_data=LexExtStr(lx);
 	      temp_meta->flags|=MLMF_IS_STR;
 	    } else
-	      temp_meta->user_data=Expression(lx);
+	      temp_meta->user_data=LexExpression(lx);
 	  }
 	  lx->stk_ptr--;
 	  break;
@@ -789,7 +797,7 @@ restart:
 	    Lex(lx);
 	  else {
 	    first=FALSE;
-	    goto restart;
+	    goto pvl_restart2;
 	  }
 	  break;
 	case ')':
@@ -813,20 +821,7 @@ pvl_done:
 	    old_flags& (LF_CLASS_IP|LF_DONT_MAKE_RESULT);
 }
 
-U0 UndefinedExtern()
-{
-  PutDefineErr("ST_UNDEFINED_EXTERN");
-  "at %P\n",Caller;
-  throw(EXCEPT_UNDEF_EXTERN);
-}
-
-U0 UnusedExternWarning(CLex *lx,CHashClass *tempc)
-{
-  PrintFWarn("%S '%s'\n","ST_UNUSED_EXTERN",tempc->str);
-  lx->warning_cnt++;
-}
-
-CHashClass *PrsClass(CLex *lx,Bool is_union,I64 cps_flags,Bool is_extern)
+CHashClass *PrsClass(CLex *lx,I64 keyword,I64 cps_flags,Bool is_extern)
 {
   CHashClass *tempc,*base_class;
   if (lx->token!=TK_IDENT)
@@ -884,7 +879,7 @@ CHashClass *PrsClass(CLex *lx,Bool is_union,I64 cps_flags,Bool is_extern)
       tempc->base_class=base_class;
       tempc->size+=base_class->size;
     }
-    if (is_union)
+    if (keyword==KW_UNION)
       PrsVarLst(lx,tempc,PRS0_NULL|PRS1_CLASS|PRSF_UNION);
     else
       PrsVarLst(lx,tempc,PRS0_NULL|PRS1_CLASS);
@@ -929,6 +924,8 @@ CHashFun *PrsFunJoin(CLex *lx,
     LBts(tempf->flags,Cf_EXTERN);
     if (cps_flags&CPS_IS_INTERRUPT)
       Bts(tempf->flags,Ff_INTERRUPT);
+    if (cps_flags&CPS_HASERRCODE)
+      Bts(tempf->flags,Ff_HASERRCODE);
     if (cps_flags&CPS_IS_ARGPOP)
       Bts(tempf->flags,Ff_ARGPOP);
     if (cps_flags&CPS_IS_NOARGPOP)
@@ -968,7 +965,7 @@ U0 PrsFun(CLex *lx,
 {
   CHashFun *tempf;
   CMemberLst *tempm;
-  CCodeBlkMisc *saved_leave_label;
+  CLexCodeMisc *saved_leave_label;
   I64 i,j,size,*r;
   Bool old_ctrace;
 
@@ -979,27 +976,24 @@ U0 PrsFun(CLex *lx,
   tempf=PrsFunJoin(lx,temp_return,name,cps_flags);
   lx->htc.local_var_lst=tempf;
 
-  CBPush(lx);
+  LCCPush(lx);
   Btr(&lx->flags,Lf_OPT_TRACE_PRESENT);
-  CBOutPtrsInit(lx);
-  CBICAdd(lx,IC_START,0,0); //So we can scan back an instruction
-
-  CBICAdd(lx,IC_ENTER,0,0);
+  LCCInit(lx);
+  LCCAdd(lx,IC_ENTER,0,0);
   saved_leave_label=lx->lb_leave;
-  lx->lb_leave=CBMiscNew(lx,CBMT_LABEL);
+  lx->lb_leave=LCCMiscNew(lx,CMT_LABEL);
   lx->flags&=~LF_HAS_RETURN;
   PrsStatement(lx,tempf,0,NULL,FALSE);
   if (tempf->return_class->size && !(lx->flags&LF_HAS_RETURN))
     LexPutWarn(lx,"ST_SHOULD_RETURN_VAL");
-  CBICAdd(lx,IC_LABEL,lx->lb_leave,0);
+  LCCAdd(lx,IC_LABEL,lx->lb_leave,0);
   lx->lb_leave=saved_leave_label;
-  CBICAdd(lx,IC_LEAVE,0,tempf->return_class);
-  CBICAdd(lx,IC_END,0,0);
+  LCCAdd(lx,IC_LEAVE,0,tempf->return_class);
   tempf->size&=~7;
   if (lx->flags&LF_AOT_COMPILE) {
     tempf->executable_addr=lx->a->ip;
     tempf->type|=HTF_EXPORT;
-    r=CBCompile(lx,tempf,&size,&tempf->debug);
+    r=LCCCompile(lx,tempf,&size,&tempf->debug);
     if (r) {
       j=(size+7)>>3;
       for (i=0;i<j;i++)
@@ -1008,7 +1002,7 @@ U0 PrsFun(CLex *lx,
     }
   } else {
     old_ctrace=Btr(&lx->opts,OPTf_COMPILE_TRACE);
-    tempf->executable_addr=CBCompile(lx,tempf,&size,&tempf->debug);
+    tempf->executable_addr=LCCCompile(lx,tempf,&size,&tempf->debug);
     if (old_ctrace) {
       Bts(&lx->opts,OPTf_COMPILE_TRACE);
       Un(tempf->executable_addr,size,64);
@@ -1016,16 +1010,16 @@ U0 PrsFun(CLex *lx,
     SysSymImportsResolve(tempf->str);
   }
   LBtr(tempf->flags,Cf_EXTERN);
-  CBPop(lx);
+  LCCPop(lx);
   lx->htc.local_var_lst=NULL;
   tempm=tempf->member_lst;
   while (tempm) {
     if (tempm->flags & MLF_NO_UNUSED_WARN) {
       if (tempm->use_cnt>1&&StrCmp(tempm->str,"_anon_"))
-	PrintFWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_UNNEEDED_NOUNUSEDWARN",
+	PrintWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_UNNEEDED_NOUNUSEDWARN",
 	  lx->cur_lfn->name,lx->cur_lfn->line_num,tempm->str,tempf->str);
     } else if (!tempm->use_cnt && GetOpt(OPTf_WARN_UNUSED_VAR))
-      PrintFWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_UNUSED_VAR",
+      PrintWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_UNUSED_VAR",
 	lx->cur_lfn->name,lx->cur_lfn->line_num,tempm->str,tempf->str);
     tempm=tempm->next;
   }
@@ -1037,7 +1031,7 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 {
   I64 i,j,mode,k,val;
   U8 *st;
-  CHashExport *tempess;
+  CHashExport *tempex;
   CHashGlblVar *tempg;
   CAsmCtrl *a=lx->a;
   CExeHeapGlbl *temphg;
@@ -1047,7 +1041,7 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
   Bool has_alias,undef_array_size,is_array;
   while (TRUE) {
     tempc=PrsType(lx,&saved_tempc,&saved_mode,NULL,&st,
-	&tempf_fun_ptr,&tempess,&tempad,cps_flags);
+	&tempf_fun_ptr,&tempex,&tempad,cps_flags);
     if (!st)
       return;
 
@@ -1061,9 +1055,9 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 
     val=saved_val;
     mode=saved_mode;
-    if (tempess && mode&255==PRS0_EXTERN && !(lx->flags&LF_AOT_COMPILE)) {
-      if (tempess->type & HTT_EXPORT_SYS_SYM) {
-	val=tempess->val;
+    if (tempex && mode&255==PRS0_EXTERN && !(lx->flags&LF_AOT_COMPILE)) {
+      if (tempex->type & HTT_EXPORT_SYS_SYM) {
+	val=tempex->val;
 	mode=PRS0__EXTERN|PRS1_NULL;
       }
     }
@@ -1164,7 +1158,7 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 	      a->heap_glbls=temphg;
 	      tempg->flags=GVAF_DATA_HEAP;
 	      tempg->type=HTT_GLBL_VAR; //TODO: HTF_EXPORT
-	      if (tempess && tempess->type & HTT_GLBL_VAR) //TODO!! extern
+	      if (tempex && tempex->type & HTT_GLBL_VAR) //TODO!! extern
 		LexExcept(lx,"ST_NOT_IMPLEMENTED");
 	    } else {
 	      tempg=CAlloc(sizeof(CHashGlblVar));
@@ -1181,7 +1175,7 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 		  AsmStoreCodeU8(lx,0);
 	      tempg->data_addr_ip=a->ip;
 	      tempg->type=HTT_GLBL_VAR | HTF_EXPORT;
-	      if (tempess && tempess->type & HTT_GLBL_VAR)
+	      if (tempex && tempex->type & HTT_GLBL_VAR)
 		has_alias=TRUE;
 	      if (sys_var_init_flag&1)
 		for (k=0;k<j;k++)
@@ -1200,9 +1194,9 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 	      tempg->data_addr=MAlloc(j,Fs->code_heap);
 	    }
 	    tempg->type=HTT_GLBL_VAR;
-	    if (tempess && tempess->type&HTT_GLBL_VAR &&
-		tempess->type&HTF_UNRESOLVED &&
-		MHeapCtrl(tempess)==MHeapCtrl(tempg))
+	    if (tempex && tempex->type&HTT_GLBL_VAR &&
+		tempex->type&HTF_UNRESOLVED &&
+		MHeapCtrl(tempex)==MHeapCtrl(tempg))
 	      has_alias=TRUE;
 	    if (sys_var_init_flag&1)
 	      MemSet(tempg->data_addr,sys_var_init_val,j);
@@ -1264,9 +1258,9 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 	  lx->stk_ptr--;	//grows up
       }
       if (has_alias) {
-	tempess(CHashGlblVar *)->flags|=GVAF_ALIAS;
-	tempess(CHashGlblVar *)->data_addr=tempg->data_addr;
-	tempess(CHashGlblVar *)->data_addr_ip=tempg->data_addr_ip;
+	tempex(CHashGlblVar *)->flags|=GVAF_ALIAS;
+	tempex(CHashGlblVar *)->data_addr=tempg->data_addr;
+	tempex(CHashGlblVar *)->data_addr_ip=tempg->data_addr_ip;
       }
       if (lx->token==',')
 	Lex(lx);
@@ -1281,9 +1275,9 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 }
 
 U0 PrsIf(CLex *lx,CHashFun *locals,I64 try_cnt,
-  CCodeBlkMisc *lb_break)
+  CLexCodeMisc *lb_break)
 {
-  CCodeBlkMisc *lb,*lb1;
+  CLexCodeMisc *lb,*lb1;
   I64 k;
 
   if (lx->token!='(')
@@ -1294,50 +1288,50 @@ U0 PrsIf(CLex *lx,CHashFun *locals,I64 try_cnt,
   if (lx->token!=')')
     LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
   Lex(lx);
-  lb=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_BR_ZERO,lb,0);
+  lb=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_BR_ZERO,lb,0);
   PrsStatement(lx,locals,try_cnt,lb_break);
   k=PrsKeyWord(lx);
   if (k==KW_ELSE) {
     Lex(lx);
-    lb1=CBMiscNew(lx,CBMT_LABEL);
-    CBICAdd(lx,IC_JMP,lb1,0);
-    CBICAdd(lx,IC_LABEL,lb,0);
+    lb1=LCCMiscNew(lx,CMT_LABEL);
+    LCCAdd(lx,IC_JMP,lb1,0);
+    LCCAdd(lx,IC_LABEL,lb,0);
     PrsStatement(lx,locals,try_cnt,lb_break,TRUE);
-    CBICAdd(lx,IC_LABEL,lb1,0);
+    LCCAdd(lx,IC_LABEL,lb1,0);
   } else
-    CBICAdd(lx,IC_LABEL,lb,0);
+    LCCAdd(lx,IC_LABEL,lb,0);
 }
 
 U0 PrsWhile(CLex *lx,CHashFun *locals,I64 try_cnt)
 {
-  CCodeBlkMisc *lb,*lb_done;
+  CLexCodeMisc *lb,*lb_done;
 
   if (lx->token!='(')
     LexExcept(lx,"ST_EXPECTING_LEFT_PAREN");
   Lex(lx);
-  lb=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_LABEL,lb,0);
+  lb=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_LABEL,lb,0);
   if (!PrsExpression(lx,NULL,FALSE))
     throw(EXCEPT_COMPILER,12);
   if (lx->token!=')')
     LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
   Lex(lx);
 
-  lb_done=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_BR_ZERO,lb_done,0);
+  lb_done=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_BR_ZERO,lb_done,0);
   PrsStatement(lx,locals,try_cnt,lb_done);
-  CBICAdd(lx,IC_JMP,lb,0);
-  CBICAdd(lx,IC_LABEL,lb_done,0);
+  LCCAdd(lx,IC_JMP,lb,0);
+  LCCAdd(lx,IC_LABEL,lb_done,0);
 }
 
 U0 PrsDoWhile(CLex *lx,CHashFun *locals,I64 try_cnt)
 {
-  CCodeBlkMisc *lb,*lb_done;
+  CLexCodeMisc *lb,*lb_done;
 
-  lb=CBMiscNew(lx,CBMT_LABEL);
-  lb_done=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_LABEL,lb,0);
+  lb=LCCMiscNew(lx,CMT_LABEL);
+  lb_done=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_LABEL,lb,0);
   PrsStatement(lx,locals,try_cnt,lb_done);
   if (PrsKeyWord(lx)!=KW_WHILE)
     LexExcept(lx,"ST_MISSING_WHILE");
@@ -1348,8 +1342,8 @@ U0 PrsDoWhile(CLex *lx,CHashFun *locals,I64 try_cnt)
     throw(EXCEPT_COMPILER,13);
   if (lx->token!=')')
     LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
-  CBICAdd(lx,IC_BR_NOT_ZERO,lb,0);
-  CBICAdd(lx,IC_LABEL,lb_done,0);
+  LCCAdd(lx,IC_BR_NOT_ZERO,lb,0);
+  LCCAdd(lx,IC_LABEL,lb_done,0);
   if (Lex(lx)!=';')
     LexExcept(lx,"ST_MISSING_SEMICOLON");
   Lex(lx);
@@ -1357,52 +1351,51 @@ U0 PrsDoWhile(CLex *lx,CHashFun *locals,I64 try_cnt)
 
 U0 PrsFor(CLex *lx,CHashFun *locals,I64 try_cnt)
 {
-  CLexCodeBlkCtrl *tempcbh;
-  CCodeBlkMisc *lb,*lb_done;
+  CLexCodeCtrl *tempcbh;
+  CLexCodeMisc *lb,*lb_done;
 
   if (lx->token!='(')
     LexExcept(lx,"ST_EXPECTING_LEFT_PAREN");
   Lex(lx);
   PrsStatement(lx,locals,try_cnt);
 
-  lb=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_LABEL,lb,0);
+  lb=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_LABEL,lb,0);
   if (!PrsExpression(lx,NULL,FALSE))
     throw(EXCEPT_COMPILER,14);
-  lb_done=CBMiscNew(lx,CBMT_LABEL);
-  CBICAdd(lx,IC_BR_ZERO,lb_done,0);
+  lb_done=LCCMiscNew(lx,CMT_LABEL);
+  LCCAdd(lx,IC_BR_ZERO,lb_done,0);
   if (lx->token!=';')
     LexExcept(lx,"ST_MISSING_SEMICOLON");
   Lex(lx);
 
-  CBPush(lx);
-  CBOutPtrsInit(lx);
+  LCCPush(lx);
+  LCCInit(lx);
   if (lx->token!=')')
     PrsStatement(lx,locals,try_cnt,NULL,FALSE);
-  CBICAdd(lx,IC_END,0,0);
-  CBPush(lx);
-  tempcbh=CBPopNoFree(lx);
-  CBPop(lx);
+  LCCPush(lx);
+  tempcbh=LCCPopNoFree(lx);
+  LCCPop(lx);
   if (lx->token!=')')
     LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
   Lex(lx);
 
   PrsStatement(lx,locals,try_cnt,lb_done);
-  CBAppend(lx,tempcbh);
-  CBICAdd(lx,IC_JMP,lb,0);
-  CBICAdd(lx,IC_LABEL,lb_done,0);
+  LCCAppend(lx,tempcbh);
+  LCCAdd(lx,IC_JMP,lb,0);
+  LCCAdd(lx,IC_LABEL,lb_done,0);
 }
 
 class CSwitchCase {
   CSwitchCase *next;
-  CCodeBlkMisc *label;
+  CLexCodeMisc *label;
   I64 val;
 };
 
 U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
 {
   CSwitchCase *header=NULL,*temps,*temps1;
-  CCodeBlkMisc *lb_break,*lb_dft,*mc_jt,*lb_entry,**jmp_table;
+  CLexCodeMisc *lb_break,*lb_dft,*mc_jt,*lb_entry,**jmp_table;
   CIntermediateCode *tempi_sub,*tempi_cmp;
   Bool dft_found=FALSE;
   I64 i,k,k2,lo=MAX_I64,hi=MIN_I64,range;
@@ -1410,20 +1403,20 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
   if (lx->token!='(')
     LexExcept(lx,"ST_EXPECTING_LEFT_PAREN");
   Lex(lx);
-  lb_break=CBMiscNew(lx,CBMT_LABEL);
-  lb_break->flags|=CBMF_USED;
-  lb_dft=CBMiscNew(lx,CBMT_LABEL);
-  lb_dft->flags|=CBMF_USED;
-  mc_jt=CBMiscNew(lx,CBMT_JMP_TABLE);
+  lb_break=LCCMiscNew(lx,CMT_LABEL);
+  lb_break->flags|=CMF_USED;
+  lb_dft=LCCMiscNew(lx,CMT_LABEL);
+  lb_dft->flags|=CMF_USED;
+  mc_jt=LCCMiscNew(lx,CMT_JMP_TABLE);
   if (!PrsExpression(lx,NULL,FALSE))
     throw(EXCEPT_COMPILER,15);
-  tempi_sub=CBICAdd(lx,IC_IMM_U64,0,sys_internal_types[IT_I64]);
-  CBICAdd(lx,IC_SUB,0,sys_internal_types[IT_I64]);
-  tempi_cmp=CBICAdd(lx,IC_IMM_U64,0,sys_internal_types[IT_I64]);
+  tempi_sub=LCCAdd(lx,IC_IMM_U64,0,sys_internal_types[IT_I64]);
+  LCCAdd(lx,IC_SUB,0,sys_internal_types[IT_I64]);
+  tempi_cmp=LCCAdd(lx,IC_IMM_U64,0,sys_internal_types[IT_I64]);
   if (nobound)
-    CBICAdd(lx,IC_NOBOUND_SWITCH,mc_jt,0);
+    LCCAdd(lx,IC_NOBOUND_SWITCH,mc_jt,0);
   else
-    CBICAdd(lx,IC_SWITCH,mc_jt,0);
+    LCCAdd(lx,IC_SWITCH,mc_jt,0);
   if (lx->token!=')')
     LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
   if (Lex(lx)!='{')
@@ -1433,10 +1426,10 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
     k=PrsKeyWord(lx);
     if (k==KW_CASE) {
       Lex(lx);
-      lb_entry=CBMiscNew(lx,CBMT_LABEL);
-      CBICAdd(lx,IC_LABEL,lb_entry,0);
-      lb_entry->flags|=CBMF_USED;
-      k=Expression(lx);
+      lb_entry=LCCMiscNew(lx,CMT_LABEL);
+      LCCAdd(lx,IC_LABEL,lb_entry,0);
+      lb_entry->flags|=CMF_USED;
+      k=LexExpression(lx);
       if (k<lo) lo=k;
       if (k>hi) hi=k;
       if (lx->token==':') {
@@ -1448,7 +1441,7 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
 	header=temps;
       } else if (lx->token==TK_DOT_DOT_DOT) {
 	Lex(lx);
-	k2=Expression(lx);
+	k2=LexExpression(lx);
 	if (lx->token==':') {
 	  Lex(lx);
 	  if (k2<lo) lo=k2;
@@ -1468,7 +1461,7 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
 	LexExcept(lx,"ST_EXPECTING_COLON");
     } else if (k==KW_DFT) {
       Lex(lx);
-      CBICAdd(lx,IC_LABEL,lb_dft,0);
+      LCCAdd(lx,IC_LABEL,lb_dft,0);
       if (lx->token==':')
 	Lex(lx);
       else
@@ -1479,8 +1472,8 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
   }
 
   if (!dft_found)
-    CBICAdd(lx,IC_LABEL,lb_dft,0);
-  CBICAdd(lx,IC_LABEL,lb_break,0);
+    LCCAdd(lx,IC_LABEL,lb_dft,0);
+  LCCAdd(lx,IC_LABEL,lb_break,0);
   if (lx->token!='}')
     LexExcept(lx,"ST_MISSING_RIGHT_BRACE");
   Lex(lx);
@@ -1490,7 +1483,7 @@ U0 PrsSwitch(CLex *lx,Bool nobound,CHashFun *locals,I64 try_cnt)
   range=hi-lo+1;
   if (lo>hi || !(0<range<=0x4000))
     LexExcept(lx,"ST_CASE_RANGE_ERROR");
-  jmp_table=MAlloc((sizeof(CCodeBlkMisc *)*range+0x1FF)&~0x1FF);
+  jmp_table=MAlloc((sizeof(CLexCodeMisc *)*range+0x1FF)&~0x1FF);
   MemSetU64(jmp_table,lb_dft,range);
   tempi_sub->ic_data=lo;
   tempi_cmp->ic_data=range;
@@ -1532,9 +1525,8 @@ U0 PrsStreamBlk(CLex *lx)
 
   tempe->body=StrNew("");
   QueIns(tempe,lx->last_stream_blk);
-  CBPush(lx);
-  lx->cbh.cb_misc_lst=NULL;
-  lx->cbh.cb_misc_lst_end=&lx->cbh.cb_misc_lst;
+  LCCPush(lx);
+  QueInit(&lx->lcc.lcc_next_misc);
 
   MemCpy(htc,&lx->htc,sizeof(CLexHashTableContext));
   htc->old_flags=lx->flags;
@@ -1555,7 +1547,7 @@ U0 PrsStreamBlk(CLex *lx)
     htc->old_flags & (LF_ASM_EXPRESSIONS|LF_EXE_BLK|LF_AOT_COMPILE);
   Free(htc);
 
-  CBPop(lx);
+  LCCPop(lx);
   QueRem(tempe);
   if (*tempe->body)
     LexIncludeStr(lx,"StreamBlk",tempe->body,FALSE);
@@ -1567,7 +1559,7 @@ U0 PrsStreamBlk(CLex *lx)
 
 U0 PrsTryBlk(CLex *lx,CHashFun *locals,I64 try_cnt)
 {
-  CCodeBlkMisc *lb_catch,*lb_done,*lb_untry;
+  CLexCodeMisc *lb_catch,*lb_done,*lb_untry;
   CHashClass *tempc=sys_internal_types[IT_PTR];
   CHashFun *temp_try=HashFind("SysTry",lx->htc.hash_table_lst,HTT_FUN),
 	    *temp_untry=HashFind("SysUntry",lx->htc.hash_table_lst,HTT_FUN);
@@ -1577,65 +1569,65 @@ U0 PrsTryBlk(CLex *lx,CHashFun *locals,I64 try_cnt)
 
   lx->flags|=LF_NO_REG_OPT; //TODO (Currently no reg vars in funs with try/catch)
 
-  lb_catch=CBMiscNew(lx,CBMT_LABEL);
-  lb_done =CBMiscNew(lx,CBMT_LABEL);
-  lb_untry=CBMiscNew(lx,CBMT_LABEL);
+  lb_catch=LCCMiscNew(lx,CMT_LABEL);
+  lb_done =LCCMiscNew(lx,CMT_LABEL);
+  lb_untry=LCCMiscNew(lx,CMT_LABEL);
 
-  CBICAdd(lx,IC_CALL_START,0,0);
-  CBICAdd(lx,IC_GET_LABEL,lb_untry,tempc,ICF_PUSH_RESULT);
-  CBICAdd(lx,IC_GET_LABEL,lb_catch,tempc,ICF_PUSH_RESULT);
+  LCCAdd(lx,IC_CALL_START,0,0);
+  LCCAdd(lx,IC_GET_LABEL,lb_untry,tempc,ICF_PUSH_RESULT);
+  LCCAdd(lx,IC_GET_LABEL,lb_catch,tempc,ICF_PUSH_RESULT);
   if (Bt(temp_try->flags,Cf_EXTERN)) {
     lx->abs_cnts.externs++;
     if (lx->flags&LF_AOT_COMPILE)
-      CBICAdd(lx,IC_CALL_IMPORT,temp_try,tempc);
+      LCCAdd(lx,IC_CALL_IMPORT,temp_try,tempc);
     else
-      CBICAdd(lx,IC_CALL_INDIRECT2,&temp_try->executable_addr,tempc);
+      LCCAdd(lx,IC_CALL_INDIRECT2,&temp_try->executable_addr,tempc);
   } else
-    CBICAdd(lx,IC_CALL,temp_try->executable_addr,tempc);
+    LCCAdd(lx,IC_CALL,temp_try->executable_addr,tempc);
   if ((Bt(temp_try->flags,Ff_RET1) || Bt(temp_try->flags,Ff_ARGPOP)) && !Bt(temp_try->flags,Ff_NOARGPOP))
-    CBICAdd(lx,IC_ADD_RSP1,16,tempc);
+    LCCAdd(lx,IC_ADD_RSP1,16,tempc);
   else
-    CBICAdd(lx,IC_ADD_RSP,16,tempc);
-  CBICAdd(lx,IC_CALL_END,0,tempc);
-  CBICAdd(lx,IC_END_EXP,0,0);
+    LCCAdd(lx,IC_ADD_RSP,16,tempc);
+  LCCAdd(lx,IC_CALL_END,0,tempc);
+  LCCAdd(lx,IC_END_EXP,0,0);
 
   PrsStatement(lx,locals,try_cnt+1);
 
-  CBICAdd(lx,IC_LABEL,lb_untry,0);
-  CBICAdd(lx,IC_CALL_START,0,0);
+  LCCAdd(lx,IC_LABEL,lb_untry,0);
+  LCCAdd(lx,IC_CALL_START,0,0);
   if (Bt(temp_untry->flags,Cf_EXTERN)) {
     lx->abs_cnts.externs++;
     if (lx->flags&LF_AOT_COMPILE)
-      CBICAdd(lx,IC_CALL_IMPORT,temp_untry,tempc);
+      LCCAdd(lx,IC_CALL_IMPORT,temp_untry,tempc);
     else
-      CBICAdd(lx,IC_CALL_INDIRECT2,&temp_untry->executable_addr,tempc);
+      LCCAdd(lx,IC_CALL_INDIRECT2,&temp_untry->executable_addr,tempc);
   } else
-    CBICAdd(lx,IC_CALL,temp_untry->executable_addr,tempc);
-  CBICAdd(lx,IC_CALL_END,0,tempc);
-  CBICAdd(lx,IC_END_EXP,0,0);
+    LCCAdd(lx,IC_CALL,temp_untry->executable_addr,tempc);
+  LCCAdd(lx,IC_CALL_END,0,tempc);
+  LCCAdd(lx,IC_END_EXP,0,0);
 
-  CBICAdd(lx,IC_JMP,lb_done,0);
+  LCCAdd(lx,IC_JMP,lb_done,0);
 
   if (PrsKeyWord(lx)!=KW_CATCH)
     LexExcept(lx,"ST_MISSING_CATCH");
 
   Lex(lx);
-  CBICAdd(lx,IC_LABEL,lb_catch,0);
+  LCCAdd(lx,IC_LABEL,lb_catch,0);
   PrsStatement(lx,locals,try_cnt+1);
-  CBICAdd(lx,IC_RET,0,tempc);
-  CBICAdd(lx,IC_LABEL,lb_done,0);
+  LCCAdd(lx,IC_RET,0,tempc);
+  LCCAdd(lx,IC_LABEL,lb_done,0);
 }
 
 Bool PrsStatement(CLex *lx,CHashFun *locals,I64 try_cnt=0,
-  CCodeBlkMisc *lb_break=NULL,Bool saved_prs_semicolon=TRUE)
+  CLexCodeMisc *lb_break=NULL,Bool saved_prs_semicolon=TRUE)
 {
   Bool prs_exp,cont,prs_semicolon;
   I64 i,cps_flags=0,last_cps_flags=0;
-  CHashExport *tempess;
-  CCodeBlkMisc *g_lb;
+  CHashExport *tempex;
+  CLexCodeMisc *g_lb;
   U8 *import_name;
   CHashFun *temp_untry;
-  CExe *tempex;
+  CExe *tempx;
 
   do {
     cps_flags&=~CPS_FUN_FLAGS;
@@ -1661,9 +1653,9 @@ Bool PrsStatement(CLex *lx,CHashFun *locals,I64 try_cnt=0,
       }
     } else {
       if (lx->token==TK_IDENT) {
-	if (tempess=lx->hash_entry) {
-	  if (tempess->type & HTT_KEYWORD) {
-	    i=tempess(CHashGeneric *)->user_data0;
+	if (tempex=lx->hash_entry) {
+	  if (tempex->type & HTT_KEYWORD) {
+	    i=tempex(CHashGeneric *)->user_data0;
 	    nobound_switch (i) {
 	      case KW_IF:
 		Lex(lx);
@@ -1709,18 +1701,18 @@ Bool PrsStatement(CLex *lx,CHashFun *locals,I64 try_cnt=0,
 		if (Bt(&lx->opts,OPTf_EXTERNS_TO_IMPORTS))
 		  goto keyword_LTimport;
 		if (lx->flags&LF_AOT_COMPILE) {
-		  if (lx->token!=TK_IDENT || !(tempess=lx->hash_entry) ||
-		      !(tempess->type & HTT_EXPORT_SYS_SYM))
+		  if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
+		      !(tempex->type & HTT_EXPORT_SYS_SYM))
 		    LexExcept(lx,"ST_EXPECTING_SYS_SYM");
-		  i=tempess->val;
+		  i=tempex->val;
 		  Lex(lx);
 		} else
-		  i=Expression(lx);
-		if (lx->token!=TK_IDENT || !(tempess=lx->hash_entry) ||
-		    !(tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		  i=LexExpression(lx);
+		if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
+		    !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		  LexExcept(lx,"ST_EXPECTING_TYPE");
 		Lex(lx);
-		PrsGlblVarLst(lx,PRS0__EXTERN|PRS1_NULL,tempess,i,last_cps_flags);
+		PrsGlblVarLst(lx,PRS0__EXTERN|PRS1_NULL,tempex,i,last_cps_flags);
 		prs_semicolon=FALSE;
 		cont=TRUE;
 		break;
@@ -1733,11 +1725,11 @@ keyword_LTimport:
 		  LexExcept(lx,"ST_EXPECTING_SYS_SYM");
 		import_name=lx->ident;
 		lx->ident=0;
-		if (Lex(lx)!=TK_IDENT || !(tempess=lx->hash_entry) ||
-		   !(tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		if (Lex(lx)!=TK_IDENT || !(tempex=lx->hash_entry) ||
+		   !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		  LexExcept(lx,"ST_EXPECTING_TYPE");
 		Lex(lx);
-		PrsGlblVarLst(lx,PRS0__IMPORT|PRS1_NULL,tempess,import_name,FALSE);
+		PrsGlblVarLst(lx,PRS0__IMPORT|PRS1_NULL,tempex,import_name,FALSE);
 		Free(import_name);
 		prs_semicolon=FALSE;
 		cont=TRUE;
@@ -1746,12 +1738,12 @@ keyword_LTimport:
 		if (locals)
 		  LexExcept(lx,"ST_NOT_ALLOWED_IN_FUN");
 		Lex(lx);
-		i=Expression(lx);
-		if (lx->token!=TK_IDENT || !(tempess=lx->hash_entry) ||
-		    !(tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		i=LexExpression(lx);
+		if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
+		    !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		  LexExcept(lx,"ST_EXPECTING_TYPE");
 		Lex(lx);
-		PrsGlblVarLst(lx,PRS0__INTERN|PRS1_NULL,tempess,i,last_cps_flags);
+		PrsGlblVarLst(lx,PRS0__INTERN|PRS1_NULL,tempex,i,last_cps_flags);
 		prs_semicolon=FALSE;
 		cont=TRUE;
 		break;
@@ -1761,20 +1753,18 @@ keyword_LTimport:
 		Lex(lx);
 		if (lx->token!=TK_IDENT)
 		  LexExcept(lx,"ST_EXPECTING_TYPE");
-		tempess=lx->hash_entry;
-		if (PrsKeyWord(lx)==KW_CLASS) {
+		tempex=lx->hash_entry;
+		i=PrsKeyWord(lx);
+		if (i==KW_CLASS||i==KW_UNION) {
 		  Lex(lx);
-		  PrsClass(lx,FALSE,last_cps_flags,TRUE);
-		} else if (PrsKeyWord(lx)==KW_UNION) {
-		  Lex(lx);
-		  PrsClass(lx,TRUE,last_cps_flags,TRUE);
+		  PrsClass(lx,i,last_cps_flags,TRUE);
 		} else {
-		  if (!tempess || !(tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		  if (!tempex || !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		    LexExcept(lx,"ST_EXPECTING_TYPE");
 		  if (Bt(&lx->opts,OPTf_EXTERNS_TO_IMPORTS))
 		    goto keyword_import;
 		  Lex(lx);
-		  PrsGlblVarLst(lx,PRS0_EXTERN|PRS1_NULL,tempess,0,last_cps_flags);
+		  PrsGlblVarLst(lx,PRS0_EXTERN|PRS1_NULL,tempex,0,last_cps_flags);
 		  prs_semicolon=FALSE;
 		  cont=TRUE;
 		}
@@ -1783,19 +1773,19 @@ keyword_LTimport:
 		if (locals)
 		  LexExcept(lx,"ST_NOT_ALLOWED_IN_FUN");
 		Lex(lx);
-		if (lx->token!=TK_IDENT || !(tempess=lx->hash_entry) ||
-		  !(tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
+		  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		  LexExcept(lx,"ST_EXPECTING_TYPE");
 keyword_import:
 		Lex(lx);
-		PrsGlblVarLst(lx,PRS0_IMPORT|PRS1_NULL,tempess,0,FALSE);
+		PrsGlblVarLst(lx,PRS0_IMPORT|PRS1_NULL,tempex,0,FALSE);
 		prs_semicolon=FALSE;
 		cont=TRUE;
 		break;
 	      case KW_ASM:
 		if (locals) {
-		  if (tempex=CmpJoin(lx,locals,FALSE,TRUE))
-		    CBICAdd(lx,IC_ASM,tempex,0);
+		  if (tempx=CmpJoin(lx,locals,FALSE,TRUE))
+		    LCCAdd(lx,IC_ASM,tempx,0);
 		  Lex(lx); //Skip "}" of asm{}
 		} else {
 		  if (lx->flags&LF_AOT_COMPILE || lx->a_depth) {
@@ -1804,8 +1794,8 @@ keyword_import:
 		    if (lx->flags&LF_AOT_COMPILE && lx->a_depth==1)
 		      Lex(lx); //Skip "}" of asm{}
 		  } else {
-		    if (tempex=CmpJoin(lx,NULL,FALSE,TRUE))
-		      CmpFixUpJITAsm(lx,tempex,tempex->code);
+		    if (tempx=CmpJoin(lx,NULL,FALSE,TRUE))
+		      CmpFixUpJITAsm(lx,tempx,tempx->ex);
 		    Lex(lx); //Skip "}" of asm{}
 		  }
 		  cps_flags|=CPS_IS_ASM;
@@ -1821,7 +1811,7 @@ keyword_import:
 		Lex(lx);
 		if (!lb_break)
 		  LexExcept(lx,"ST_BREAK_NOT_ALLOWED");
-		CBICAdd(lx,IC_JMP,lb_break,0);
+		LCCAdd(lx,IC_JMP,lb_break,0);
 		break;
 	      case KW_RETURN:
 		if (!locals)
@@ -1833,13 +1823,13 @@ keyword_import:
 		    if (Bt(temp_untry->flags,Cf_EXTERN)) {
 		      lx->abs_cnts.externs++;
 		      if (lx->flags&LF_AOT_COMPILE)
-			CBICAdd(lx,IC_CALL_IMPORT,
+			LCCAdd(lx,IC_CALL_IMPORT,
 			  temp_untry,sys_internal_types[IT_PTR]);
 		      else
-			CBICAdd(lx,IC_CALL_INDIRECT2,
+			LCCAdd(lx,IC_CALL_INDIRECT2,
 			  &temp_untry->executable_addr,sys_internal_types[IT_PTR]);
 		    } else
-		      CBICAdd(lx,IC_CALL,temp_untry->executable_addr,sys_internal_types[IT_PTR]);
+		      LCCAdd(lx,IC_CALL,temp_untry->executable_addr,sys_internal_types[IT_PTR]);
 		  }
 		}
 		if (Lex(lx)!=';') {
@@ -1847,43 +1837,35 @@ keyword_import:
 		    LexPutWarn(lx,"ST_SHOULD_NOT_RETURN_VAL");
 		  if (!PrsExpression(lx,NULL,FALSE))
 		    throw(EXCEPT_COMPILER,17);
-		  CBICAdd(lx,IC_RETURN_VAL,0,locals->return_class);
+		  LCCAdd(lx,IC_RETURN_VAL,0,locals->return_class);
 		  lx->flags|=LF_HAS_RETURN;
 		} else if (locals->return_class->size)
 		  LexPutWarn(lx,"ST_SHOULD_RETURN_VAL");
-		CBICAdd(lx,IC_JMP,lx->lb_leave,0);
+		LCCAdd(lx,IC_JMP,lx->lb_leave,0);
 		break;
 	      case KW_GOTO:
 		Lex(lx);
 		if (lx->token!=TK_IDENT)
 		  LexExcept(lx,"ST_EXPECTING_IDENTIFIER");
-		if (!(g_lb=CBGoToLabelFind(lx,lx->ident))) {
-		  g_lb=CBMiscNew(lx,CBMT_GOTO_LABEL);
+		if (!(g_lb=LCCGoToLabelFind(lx,lx->ident))) {
+		  g_lb=LCCMiscNew(lx,CMT_GOTO_LABEL);
 		  g_lb->str=lx->ident;
 		  lx->ident=NULL;
 		}
-		g_lb->flags|=CBMF_USED;
-		CBICAdd(lx,IC_JMP,g_lb,0);
+		g_lb->flags|=CMF_USED;
+		LCCAdd(lx,IC_JMP,g_lb,0);
 		Lex(lx);
 		break;
 	      case KW_NOUNUSEDWARN:
 		Lex(lx);
 		PrsNoUnusedWarn(lx);
 		break;
+	      case KW_UNION:
 	      case KW_CLASS:
 		Lex(lx);
-		tempess=PrsClass(lx,FALSE,last_cps_flags,FALSE);
+		tempex=PrsClass(lx,i,last_cps_flags,FALSE);
 		if (!locals && lx->token!=';') {
-		  PrsGlblVarLst(lx,PRS0_NULL|PRS1_NULL,tempess,0,last_cps_flags);
-		  cont=TRUE;
-		  prs_semicolon=FALSE;
-		}
-		break;
-	      case KW_UNION:
-		Lex(lx);
-		tempess=PrsClass(lx,TRUE,last_cps_flags,FALSE);
-		if (!locals && lx->token!=';') {
-		  PrsGlblVarLst(lx,PRS0_NULL|PRS1_NULL,tempess,0,last_cps_flags);
+		  PrsGlblVarLst(lx,PRS0_NULL|PRS1_NULL,tempex,0,last_cps_flags);
 		  cont=TRUE;
 		  prs_semicolon=FALSE;
 		}
@@ -1897,6 +1879,12 @@ keyword_import:
 	      case KW_INTERRUPT:
 		Lex(lx);
 		cps_flags|=CPS_IS_INTERRUPT|CPS_IS_NOARGPOP|last_cps_flags&CPS_FUN_FLAGS;
+		cont=TRUE;
+		prs_semicolon=FALSE;
+		break;
+	      case KW_HASERRCODE:
+		Lex(lx);
+		cps_flags|=CPS_HASERRCODE|last_cps_flags&CPS_FUN_FLAGS;
 		cont=TRUE;
 		prs_semicolon=FALSE;
 		break;
@@ -1922,7 +1910,7 @@ keyword_import:
 	      default:
 		prs_exp=TRUE;
 	    }
-	  } else if (tempess->type & (HTT_CLASS|HTT_INTERNAL_TYPE)) {
+	  } else if (tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)) {
 	    if (locals) {
 	      if (cps_flags&CPS_IS_STATIC) {
 		PrsVarLst(lx,locals,PRS0_NULL|PRS1_STATIC_LOCAL_VAR);
@@ -1935,7 +1923,7 @@ keyword_import:
 		cont=TRUE;
 	    } else {
 	      Lex(lx);
-	      PrsGlblVarLst(lx,PRS0_NULL|PRS1_NULL,tempess,0,last_cps_flags);
+	      PrsGlblVarLst(lx,PRS0_NULL|PRS1_NULL,tempex,0,last_cps_flags);
 	      cont=TRUE;
 	    }
 	    prs_semicolon=FALSE;
@@ -1944,15 +1932,15 @@ keyword_import:
 	  if (lx->local_var_entry)
 	    prs_exp=TRUE;
 	  else {
-	    if (!(g_lb=CBGoToLabelFind(lx,lx->ident))) {
-	      g_lb=CBMiscNew(lx,CBMT_GOTO_LABEL);
+	    if (!(g_lb=LCCGoToLabelFind(lx,lx->ident))) {
+	      g_lb=LCCMiscNew(lx,CMT_GOTO_LABEL);
 	      g_lb->str=lx->ident;
 	      lx->ident=NULL;
-	    } else if (g_lb->flags&CBMF_DEFINED)
+	    } else if (g_lb->flags&CMF_DEFINED)
 	      LexExcept(lx,"ST_DUP_GOTO_LABEL");
-	    g_lb->flags|=CBMF_DEFINED;
+	    g_lb->flags|=CMF_DEFINED;
 	    Lex(lx); //skip ident
-	    CBICAdd(lx,IC_LABEL,g_lb,0);
+	    LCCAdd(lx,IC_LABEL,g_lb,0);
 	    if (lx->token==':') //skip ident
 	      Lex(lx); //skip colon
 	    else
@@ -1964,7 +1952,7 @@ keyword_import:
 	}
       } else prs_exp=TRUE;
       if (prs_exp) {
-	if (lx->token==TK_STR||lx->token==TK_U8)
+	if (lx->token==TK_STR||lx->token==TK_CHAR_CONST)
 	  PrsFunCall(lx,NULL,FALSE,NULL);
 	else if (!PrsExpression(lx,NULL,TRUE))
 	  throw(EXCEPT_COMPILER,18);

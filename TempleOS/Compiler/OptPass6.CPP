@@ -44,7 +44,7 @@ U0 OptPass6Lag(CLex *lx,
     if (tempi->ic_flags&ICF_TRACE) {
       if (Bt(&lx->pass_trace_mask,6)) {
 	"%2d:",i;
-	CBPutIC(tempi);
+	ICPut(tempi);
       }
     }
     if (code==IC_CALL_START) {
@@ -130,64 +130,67 @@ U0 OptPass6Lag(CLex *lx,
 
 U0 OptPass6(CLex *lx,CHashFun *fun_class)
 {
-  CIntermediateCode *tempi,*tempil1,*tempif1,*tempif2,
-	*temp_lag[4],*old_tempil1=NULL;
-  CPrsStk *ps=OptStart(lx,temp_lag);
-  I64 i=0,code,num_stk,clobbered_reg_mask=CALWAYS_CLOBBERED_MASK,
-	fun_num=0;
-
+  CIntermediateCode *tempi,*tempil1,*tempil2,*tempil3,*tempif1,*tempif2,*old_tempil2;
+  I64 i=0,code,num_stk,clobbered_reg_mask=CALWAYS_CLOBBERED_MASK,fun_num=0;
+  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
+  ps->ptr=0;
+  ps->ptr2=0;
   if (fun_class)
     fun_num=compiled_funs++;
-
   if (Bt(&lx->opts,OPTf_NO_REG_VAR) ||
 	lx->flags&LF_NO_REG_OPT)
     num_stk=0;
   else
     num_stk=num_stk_temps;
-
-  tempi=lx->cbh.cb_in_ptr;
-  if (tempi->ic_opcode==IC_START)
-    tempi++;
+  tempi=lx->lcc.lcc_root.next;
+  old_tempil2=NULL;
+  tempil1=tempil2=tempil3=&opt_nop;
   while (code=tempi->ic_opcode) {
-    OptNext3(tempi,temp_lag);
-    tempil1=temp_lag[1];
-    if (tempil1->ic_opcode==IC_END_EXP) {
+    if (    tempi  ->ic_opcode>=IC_END_EXP && tempi  ->ic_opcode!=IC_NOP2) {
+      if (  tempil1->ic_opcode>=IC_END_EXP && tempil1->ic_opcode!=IC_NOP2) {
+	if (tempil2->ic_opcode>=IC_END_EXP && tempil2->ic_opcode!=IC_NOP2)
+	  tempil3=tempil2;
+	tempil2=tempil1;
+      }
+      tempil1=tempi;
+    }
+    if (tempil2->ic_opcode==IC_END_EXP) {
       if (code!=IC_RETURN_VAL2 && code!=IC_NOP1) {
-	if (!(temp_lag[2]->ic_flags&
+	if (!(tempil3->ic_flags&
 	      (ICF_R_TO_F64|ICF_R_TO_INT|ICF_PUSH_RESULT|ICF_DEPEND_RESULT))) {
-	  temp_lag[2]->ic_flags|=ICF_NO_DEPEND_RESULT;
-	  temp_lag[2]->r.type=TY_NULL+temp_lag[2]->r.type&IT_MASK;
-	  tempil1->ic_flags|=ICF_NO_DEPEND_RESULT;
-	  tempil1->r.type=TY_NULL+tempil1->r.type&IT_MASK;
+	  tempil3->ic_flags|=ICF_NO_DEPEND_RESULT;
+	  tempil3->r.type=TY_NULL+tempil3->r.type&IT_MASK;
+	  tempil2->ic_flags|=ICF_NO_DEPEND_RESULT;
+	  tempil2->r.type=TY_NULL+tempil2->r.type&IT_MASK;
 	}
       }
     }
     if (code<=IC_NOP2) {
     } else {
       if (tempi->p2.type&TY_MASK==TY_STK) {
-	if (tempil1->r.type&TY_MASK==TY_STK &&
-	      !(tempil1->ic_flags&ICF_PUSH_RESULT)) {
+	if (tempil2->r.type&TY_MASK==TY_STK &&
+	      !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
 	  tempif2=NULL;
 	  if (tempi->ic_opcode==IC_ASSIGN &&
 		tempi->ic_flags&ICF_NOT_ADDR &&
-		tempil1->ic_opcode!=IC_CALL_END  &&
-		tempil1->ic_opcode!=IC_CALL_END2 &&
-		tempil1->ic_opcode!=IC_SET_RAX	 &&
+		tempil2->ic_opcode!=IC_CALL_END  &&
+		tempil2->ic_opcode!=IC_CALL_END2 &&
+		tempil2->ic_opcode!=IC_SET_RAX	 &&
 		!(tempi->ic_flags&
 		(ICF_P2_TO_F64|ICF_P2_TO_INT)) &&
-		!(tempil1->ic_flags&
+		!(tempil2->ic_flags&
 		(ICF_R_TO_F64|ICF_R_TO_INT))) {
-	    if (tempif1=OptLead1(lx,tempi)) //predict NO_DEPEND
-	      if (tempif2=OptLead1(lx,tempif1))
+	    if (tempif1=OptLead1(tempi)) //predict NO_DEPEND
+	      if (tempif2=OptLead1(tempif1))
 		if (tempif1->ic_opcode==IC_END_EXP &&
 		      tempif2->ic_opcode!=IC_RETURN_VAL2) {
-		  tempil1->r.type =tempi->p1.type&TY_MASK+tempi->p1.ptype;
-		  tempil1->r.ptype=tempi->p1.ptype;
-		  tempil1->r.reg  =tempi->p1.reg;
-		  tempil1->r.disp =tempi->p1.disp;
-		  tempil1->ic_flags=tempil1->ic_flags&~(ICF_NO_DEPEND_RESULT|ICF_R_WAS_STK)|
+		  tempil2->r.type =tempi->p1.type&TY_MASK+tempi->p1.ptype;
+		  tempil2->r.ptype=tempi->p1.ptype;
+		  tempil2->r.reg  =tempi->p1.reg;
+		  tempil2->r.disp =tempi->p1.disp;
+		  tempil2->ic_flags=tempil2->ic_flags&~(ICF_NO_DEPEND_RESULT|ICF_R_WAS_STK)|
 			tempi->ic_flags&~(ICF_NOT_ADDR|ICF_P1_WAS_STK|ICF_P2_WAS_STK)|ICF_DEPEND_RESULT;
-		  old_tempil1=NULL;
+		  old_tempil2=NULL;
 		  OptSetNOP1(tempi);
 		} else
 		  tempif2=NULL;
@@ -196,33 +199,37 @@ U0 OptPass6(CLex *lx,CHashFun *fun_class)
 	    tempi->p2.type=TY_REG+tempi->p2.type&IT_MASK;
 	    tempi->p2.reg=CREG_RAX;
 	    tempi->p2.disp=0;
-	    tempil1->r.type=TY_REG+tempil1->r.type&IT_MASK;
-	    tempil1->r.reg=CREG_RAX;
-	    tempil1->r.disp=0;
+	    tempil2->r.type=TY_REG+tempil2->r.type&IT_MASK;
+	    tempil2->r.reg=CREG_RAX;
+	    tempil2->r.disp=0;
 	  }
 	}
       } else if (tempi->p1.type&TY_MASK==TY_STK) {
-	if (tempil1->r.type&TY_MASK==TY_STK &&
-	      !(tempil1->ic_flags&ICF_PUSH_RESULT)) {
+	if (tempil2->r.type&TY_MASK==TY_STK &&
+	      !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
 	  tempi->p1.type=TY_REG+tempi->p1.type&IT_MASK;
 	  tempi->p1.reg=CREG_RAX;
 	  tempi->p1.disp=0;
-	  tempil1->r.type=TY_REG+tempil1->r.type&IT_MASK;
-	  tempil1->r.reg=CREG_RAX;
-	  tempil1->r.disp=0;
+	  tempil2->r.type=TY_REG+tempil2->r.type&IT_MASK;
+	  tempil2->r.reg=CREG_RAX;
+	  tempil2->r.disp=0;
 	}
       }
       if (tempi->ic_flags & ICF_PUSH_RESULT)
 	tempi->r.type==TY_STK+tempi->r.type&IT_MASK;
 
     }
-    if (old_tempil1!=tempil1) {
-      OptPass6Lag(lx,ps,tempil1,&i,num_stk,&clobbered_reg_mask,fun_num);
-      old_tempil1=tempil1;
+    if (old_tempil2!=tempil2) {
+      OptPass6Lag(lx,ps,tempil2,&i,num_stk,&clobbered_reg_mask,fun_num);
+      old_tempil2=tempil2;
     }
-    tempi++;
+    tempi=tempi->next;
   }
-  OptEnd(lx,ps);
+  if (ps->ptr>2) {
+    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
+    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
 
   if (fun_class) {
     fun_class->used_reg_mask&=~CSTK_TEMPS_MASK;

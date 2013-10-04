@@ -33,7 +33,7 @@ U0 ShowTree(CDC *dc,Node *tempn,I64 *_node_x,I64 *_tree_x,I64 y)
       dc->color=BLUE;
  
     *_node_x=*_tree_x;
-    GrPrintF(dc,*_node_x,y,"%d",tempn->n);
+    GrPrint(dc,*_node_x,y,"%d",tempn->n);
     *_tree_x+=X_SPACING;
  
     if (tempn->right) {

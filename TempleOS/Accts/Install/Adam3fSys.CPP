@@ -22,13 +22,13 @@ U0 SrvStartUp()
 
 U0 StartUpTasks()
 {
-  CTask *task1,*task2;
-  task1=SpawnUser;
-  task2=SpawnUser;
-  WinToTop(task1);
+  CTask *user1,*user2;
+  user1=SpawnUser;
+  user2=SpawnUser;
+  WinToTop(user1);
   WinTileVert;
-  AdamLog("Boot Time:%7.3fs\n",tS);
-  XTalk(task1,"#include \"DoItOnce\";\n");
+  "Boot Time:%7.3fs\n",tS;
+  XTalk(user1,"Cd(\"HOME\");#include \"DoItOnce\";\n");
   Silent(ON);	//no output to screen
   WSInit;
   Silent(OFF); //no output to screen

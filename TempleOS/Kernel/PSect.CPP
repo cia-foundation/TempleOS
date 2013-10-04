@@ -10,7 +10,7 @@ I64 HasLower(U8 *src)
 CHash *PSectFind(U8 *add,I64 *_offset)
 { //See $LK,"::/TempleOS/Kernel/Hash1a.CPP","FL:::/TempleOS/Kernel/Hash1a.CPP,1"$
   CHash *result=NULL;
-  CHashExport *tempess;
+  CHashExport *tempex;
   Bool has_lower=FALSE;
   CHashTable *h=Fs->hash_table;
   U64 best=0xFFFF,j;
@@ -19,35 +19,35 @@ CHash *PSectFind(U8 *add,I64 *_offset)
     return NULL;
   }
   while (h) {
-    tempess=h->next_added;
-    while (tempess!=h) {
+    tempex=h->next_added;
+    while (tempex!=h) {
       j=0;
-      if (tempess->type&HTT_FUN) {
-	if (!Bt(&tempess(CHashFun *)->flags,Cf_EXTERN) &&
-	      !Bt(&tempess(CHashFun *)->flags,Ff_INTERNAL))
-	  j=tempess(CHashFun *)->executable_addr;
-      } else if (tempess->type&HTT_EXPORT_SYS_SYM)
-	j=tempess->val;
+      if (tempex->type&HTT_FUN) {
+	if (!Bt(&tempex(CHashFun *)->flags,Cf_EXTERN) &&
+	      !Bt(&tempex(CHashFun *)->flags,Ff_INTERNAL))
+	  j=tempex(CHashFun *)->executable_addr;
+      } else if (tempex->type&HTT_EXPORT_SYS_SYM)
+	j=tempex->val;
       if (j) {
 	j=add(I64)-j;
 	if (0<=j<=best) {
-	  if (tempess->type&HTT_EXPORT_SYS_SYM) {
+	  if (tempex->type&HTT_EXPORT_SYS_SYM) {
 	    if (j<best || j==best && !has_lower) {
-	      has_lower=HasLower(tempess->str);
+	      has_lower=HasLower(tempex->str);
 	      best=j;
-	      result=tempess;
+	      result=tempex;
 	    }
-	  } else if (tempess->type&HTT_FUN) {
+	  } else if (tempex->type&HTT_FUN) {
 	    if (j<best || j==best &&
 		  (result && result->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
-	      has_lower=HasLower(tempess->str);
+	      has_lower=HasLower(tempex->str);
 	      best=j;
-	      result=tempess;
+	      result=tempex;
 	    }
 	  }
 	}
       }
-      tempess=tempess->next_added;
+      tempex=tempex->next_added;
     }
     h=h->next;
   }
@@ -100,10 +100,10 @@ U8 *PSectCacheFind(U8 *add,I64 *_offset)
   }
 }
 
-U0 SPrintFPSect(U8 *buf,I64 add,I64 field_len)
+U0 SPrintPSect(U8 *buf,I64 add,I64 field_len)
 {
   I64 offset;
-  CHashExport *tempess;
+  CHashExport *tempex;
   U8 *str,*str2;
   Bool is_fun=FALSE;
   if (add) {
@@ -111,35 +111,35 @@ U0 SPrintFPSect(U8 *buf,I64 add,I64 field_len)
       if (add!=SYS_IDLE_PT)
 	is_fun=TRUE;
     } else  {
-      if (tempess=PSectFind(add,&offset)) {
-	if (tempess->type&HTT_FUN)
+      if (tempex=PSectFind(add,&offset)) {
+	if (tempex->type&HTT_FUN)
 	  is_fun=TRUE;
-	PSectCacheAdd(tempess,add);
-	str=tempess->str;
+	PSectCacheAdd(tempex,add);
+	str=tempex->str;
       }
     }
     if (str) {
       if (offset>0xFFFF) offset=0xFFFF;
       if (is_fun) {
-	str2=MSPrintF("&%s",str);
+	str2=MPrint("&%s",str);
 	if (field_len>7)
-	  SPrintF(buf,"%*ts+0x%04X",field_len-7,str2,offset);
+	  SPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
 	else
-	  SPrintF(buf,"%s+0x%04X",str2,offset);
+	  SPrint(buf,"%s+0x%04X",str2,offset);
 	Free(str2);
       } else {
 	if (field_len>7)
-	  SPrintF(buf,"%*ts+0x%04X",field_len-7,str,offset);
+	  SPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
 	else
-	  SPrintF(buf,"%s+0x%04X",str,offset);
+	  SPrint(buf,"%s+0x%04X",str,offset);
       }
       return;
     }
   }
   if (field_len)
-    SPrintF(buf,"%*tX",field_len,add);
+    SPrint(buf,"%*tX",field_len,add);
   else
-    SPrintF(buf,"%X",add);
+    SPrint(buf,"%X",add);
 }
 
 
@@ -244,7 +244,7 @@ U8 *SrcEdLink(U8 *add,I64 cnt=1,CTask *mem_task=NULL)
     linenum=SrcLineNum(add,cnt);
     if (linenum<1)
       linenum=1;
-    st2=MSPrintF("FL:%s,%d",filename,linenum);
+    st2=MPrint("FL:%s,%d",filename,linenum);
     Free(filename);
     st=StrNew(st2,mem_task);
     Free(st2);
@@ -259,7 +259,7 @@ Bool PutSrcLink(U8 *add,I64 cnt=1,U8 *buf=NULL)
   U8 *src;
   if (src=SrcEdLink(add,cnt)) {
     if (buf)
-      SPrintF(buf,"$$LK,\"%P\",\"%s\"$$",add,src);
+      SPrint(buf,"$$LK,\"%P\",\"%s\"$$",add,src);
     else
       "$$LK,\"%P\",\"%s\"$$",add,src;
     Free(src);
@@ -290,7 +290,7 @@ U0 Man(U8 *st)
     if ((temph=HashFind(st,Fs->hash_table,HTG_SRC_SYM)) && temph->src_link)
       EdLiteFileLine(temph->src_link);
   } else {
-    st2=MSPrintF("MN:%s",st);
+    st2=MPrint("MN:%s",st);
     Ed(st2);
     Free(st2);
   }

@@ -8,6 +8,7 @@ I64 FSize(CFile *f)
 
 CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 {  //allows flags "r","w","w+".  Include a "c" for contiguous.
+   //(It uses $LK,"StrOcc","MN:StrOcc"$() for 'w', 'r', '+', 'c')
   CFile *f=CAlloc(sizeof(CFile));
   CFileAccess *fa;
   U8 *full_name;
@@ -48,10 +49,10 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
     if (fa=FileAccessNew(full_name)) {
       StrCpy(f->de.name,fa->mask);
       if (cnt>0) { //We pre-alloc the whole thing.
-	f->de.cluster=ClusersAlloc(f->p,0,
+	f->de.cluster=ClustersAlloc(f->p,0,
 	  (cnt+f->p->spc-1)/f->p->spc,contiguous);
-	f->de.expanded_size=f->de.size=cnt<<BLK_SIZE_BITS;
-	CDirNew(fa->p,Fs->cur_dir,&f->de,TRUE);
+	f->de.size=cnt<<BLK_SIZE_BITS;
+	DirNew(fa->p,Fs->cur_dir,&f->de,TRUE);
 	f->flags&=~FF_NEW_FILE;
       }
       FileAccessDel(fa);
@@ -82,11 +83,11 @@ U0 FClose(CFile *f)
     if (f->flags & FF_NEEDS_WRITE) {
       if (fa=FileAccessNew(f->de.full_name)) {
 	if (!(f->flags & FF_USE_OLD_DATETIME))
-	  f->de.datetime=GetCurTimeDate;
+	  f->de.datetime=GetDateTime;
 	if (f->flags & FF_NEW_FILE)
-	  CDirNew(fa->p,Fs->cur_dir,&f->de,TRUE);
+	  DirNew(fa->p,Fs->cur_dir,&f->de,TRUE);
 	else
-	  CDirNew(fa->p,Fs->cur_dir,&f->de,FALSE);
+	  DirNew(fa->p,Fs->cur_dir,&f->de,FALSE);
 	FileAccessDel(fa);
       } else
 	throw(EXCEPT_FILE,1);
@@ -196,7 +197,7 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
     blk+=cnt;
   } else {
     if (!c) {
-      c=ClusersAlloc(p,0,1,FALSE);
+      c=ClustersAlloc(p,0,1,FALSE);
       f->file_cluster_num=0;
       f->cluster=c;
       f->de.cluster=c;
@@ -211,7 +212,7 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
       c1=c;
       c=ClusterNumNext(p,c1,1);
       if (c==INVALID_CLUSTER) {
-	c=ClusersAlloc(p,c1,i,FALSE);
+	c=ClustersAlloc(p,c1,i,FALSE);
 	if (i>1)
 	  c=ClusterNumNext(p,c,i-1);
 	break;
@@ -234,7 +235,7 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 	c1=c;
 	c=ClusterNumNext(p,c1,1);
 	if (c==INVALID_CLUSTER)
-	  c=ClusersAlloc(p,c1,1,FALSE);
+	  c=ClustersAlloc(p,c1,1,FALSE);
       }
     }
     while (cnt>=spc) {
@@ -248,7 +249,7 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 	c1=c;
 	c=ClusterNumNext(p,c1,1);
 	if (c==INVALID_CLUSTER)
-	  c=ClusersAlloc(p,c1,1,FALSE);
+	  c=ClustersAlloc(p,c1,1,FALSE);
       }
     }
     if (cnt>0) {
@@ -260,8 +261,6 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
     }
     if (f->de.size<blk<<BLK_SIZE_BITS)
       f->de.size=blk<<BLK_SIZE_BITS;
-    if (f->de.expanded_size<blk<<BLK_SIZE_BITS)
-      f->de.expanded_size=blk<<BLK_SIZE_BITS;
   }
   f->fblk_num=blk;
   return TRUE;

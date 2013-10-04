@@ -131,7 +131,7 @@ I64 Bcd2Bin(U64 b)
 }
 
 
-U0 GetCurTimeCDateStruct(CDateStruct *_ds)
+U0 GetDateTimeStruct(CDateStruct *_ds)
 {
   I64 i;
   U8 *b=_ds;
@@ -189,10 +189,10 @@ U0 GetCurTimeCDateStruct(CDateStruct *_ds)
   if (_ds->sec>59) _ds->sec=59;
 }
 
-CDate GetCurTimeDate()
+CDate GetDateTime()
 {
   CDateStruct ds;
-  GetCurTimeCDateStruct(&ds);
+  GetDateTimeStruct(&ds);
   return DateStruct2Date(&ds)-local_time_offset;
 }
 
@@ -205,7 +205,7 @@ U0 DateTimeFmtMapsRst()
     time_fmt_map[i]=i;
 }
 
-U8 *MSPrintFTime(CDate cdt,I64 sub_fmt)
+U8 *MPrintTime(CDate cdt,I64 sub_fmt)
 {
   CDateStruct ds;
   if (sub_fmt<TF_NUM)
@@ -213,90 +213,90 @@ U8 *MSPrintFTime(CDate cdt,I64 sub_fmt)
   switch (sub_fmt) {
     case TF_HH24_MM:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d:%02d",ds.hour,ds.min);
+      return MPrint("%02d:%02d",ds.hour,ds.min);
     case TF_HH12_MM_SS_AM:
       Date2DateStruct(&ds,cdt+local_time_offset);
       if (ds.hour>=12)
-	return MSPrintF("%02d:%02d:%02d pm",ds.hour-12,ds.min,ds.sec);
+	return MPrint("%02d:%02d:%02d pm",ds.hour-12,ds.min,ds.sec);
       else
-	return MSPrintF("%02d:%02d:%02d am",ds.hour,ds.min,ds.sec);
+	return MPrint("%02d:%02d:%02d am",ds.hour,ds.min,ds.sec);
     case TF_HH12_MM_AM:
       Date2DateStruct(&ds,cdt+local_time_offset);
       if (ds.hour>=12)
-	return MSPrintF("%02d:%02d pm",ds.hour-12,ds.min);
+	return MPrint("%02d:%02d pm",ds.hour-12,ds.min);
       else
-	return MSPrintF("%02d:%02d am",ds.hour,ds.min);
+	return MPrint("%02d:%02d am",ds.hour,ds.min);
     case TF_HH12_MM_SSA:
       Date2DateStruct(&ds,cdt+local_time_offset);
       if (ds.hour>=12)
-	return MSPrintF("%02d:%02d:%02dp",ds.hour-12,ds.min,ds.sec);
+	return MPrint("%02d:%02d:%02dp",ds.hour-12,ds.min,ds.sec);
       else
-	return MSPrintF("%02d:%02d:%02da",ds.hour,ds.min,ds.sec);
+	return MPrint("%02d:%02d:%02da",ds.hour,ds.min,ds.sec);
     case TF_HH12_MMA:
       Date2DateStruct(&ds,cdt+local_time_offset);
       if (ds.hour>=12)
-	return MSPrintF("%02d:%02dp",ds.hour-12,ds.min);
+	return MPrint("%02d:%02dp",ds.hour-12,ds.min);
       else
-	return MSPrintF("%02d:%02da",ds.hour,ds.min);
+	return MPrint("%02d:%02da",ds.hour,ds.min);
     case TF_H_M:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dh %02dm",ds.hour+cdt.date*24,ds.min);
+      return MPrint("%dh %02dm",ds.hour+cdt.date*24,ds.min);
     case TF_H_M_S:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dh %02dm %02ds",ds.hour+cdt.date*24,ds.min,ds.sec);
+      return MPrint("%dh %02dm %02ds",ds.hour+cdt.date*24,ds.min,ds.sec);
     case TF_D_H_M:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dd %02dh %02dm",cdt.date,ds.hour,ds.min);
+      return MPrint("%dd %02dh %02dm",cdt.date,ds.hour,ds.min);
     case TF_D_H_M_S:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dd %02dh %02dm %02ds",cdt.date,ds.hour,ds.min,ds.sec);
+      return MPrint("%dd %02dh %02dm %02ds",cdt.date,ds.hour,ds.min,ds.sec);
     case TF_D_H_M_Sh:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dd %02dh %02dm %02d.%02ds",cdt.date,ds.hour,ds.min,ds.sec,ds.sec100);
+      return MPrint("%dd %02dh %02dm %02d.%02ds",cdt.date,ds.hour,ds.min,ds.sec,ds.sec100);
     case TF_H_M_Sh:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dh %02dm %02d.%02ds",ds.hour+cdt.date*24,ds.min,ds.sec,ds.sec100);
+      return MPrint("%dh %02dm %02d.%02ds",ds.hour+cdt.date*24,ds.min,ds.sec,ds.sec100);
     case TF_Sh:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%d.%02d",60*((cdt.date*24+ds.hour)*60+ds.min)+ds.sec,ds.sec100);
+      return MPrint("%d.%02d",60*((cdt.date*24+ds.hour)*60+ds.min)+ds.sec,ds.sec100);
     case TF_M_Sh:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%02d:%02d.%02d",60*(cdt.date*24+ds.hour)+ds.min,ds.sec,ds.sec100);
+      return MPrint("%02d:%02d.%02d",60*(cdt.date*24+ds.hour)+ds.min,ds.sec,ds.sec100);
     case TF_H_M_Sh2:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%02d:%02d:%02d.%02d",cdt.date*24+ds.hour,ds.min,ds.sec,ds.sec100);
+      return MPrint("%02d:%02d:%02d.%02d",cdt.date*24+ds.hour,ds.min,ds.sec,ds.sec100);
     case TF_D_H_M_Sht:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dd %02dh %02dm %02d.%04ds",cdt.date,ds.hour,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
+      return MPrint("%dd %02dh %02dm %02d.%04ds",cdt.date,ds.hour,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
     case TF_H_M_Sht:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%dh %02dm %02d.%04ds",ds.hour+cdt.date*24,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
+      return MPrint("%dh %02dm %02d.%04ds",ds.hour+cdt.date*24,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
     case TF_Sht:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%d.%04d",60*((cdt.date*24+ds.hour)*60+ds.min)+ds.sec,100*ds.sec100+ds.sec10000);
+      return MPrint("%d.%04d",60*((cdt.date*24+ds.hour)*60+ds.min)+ds.sec,100*ds.sec100+ds.sec10000);
     case TF_M_Sht:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%02d:%02d.%04d",60*(cdt.date*24+ds.hour)+ds.min,ds.sec,100*ds.sec100+ds.sec10000);
+      return MPrint("%02d:%02d.%04d",60*(cdt.date*24+ds.hour)+ds.min,ds.sec,100*ds.sec100+ds.sec10000);
     case TF_H_M_Sht2:
       Date2DateStruct(&ds,cdt);
-      return MSPrintF("%02d:%02d:%02d.%04d",cdt.date*24+ds.hour,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
+      return MPrint("%02d:%02d:%02d.%04d",cdt.date*24+ds.hour,ds.min,ds.sec,100*ds.sec100+ds.sec10000);
     case TF_HH24:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d",ds.hour);
+      return MPrint("%02d",ds.hour);
     case TF_MM:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d",ds.min);
+      return MPrint("%02d",ds.min);
     case TF_SS:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d",ds.sec);
+      return MPrint("%02d",ds.sec);
     case TF_HH24_MM_SS:
     default:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d:%02d:%02d",ds.hour,ds.min,ds.sec);
+      return MPrint("%02d:%02d:%02d",ds.hour,ds.min,ds.sec);
   }
 }
 
-U8 *MSPrintFDate(CDate cdt,I64 sub_fmt)
+U8 *MPrintDate(CDate cdt,I64 sub_fmt)
 {
   CDateStruct ds;
   if (sub_fmt<DF_NUM)
@@ -304,180 +304,180 @@ U8 *MSPrintFDate(CDate cdt,I64 sub_fmt)
   switch (sub_fmt) {
     case DF_MM_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d",ds.mon,ds.day_of_mon);
+      return MPrint("%02d/%02d",ds.mon,ds.day_of_mon);
     case DF_wek_MM_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon,ds.day_of_mon);
     case DF_wek_MM_DD_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon,ds.day_of_mon,ds.year%100);
     case DF_MM_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d/%d",ds.mon,ds.day_of_mon,ds.year);
+      return MPrint("%02d/%02d/%d",ds.mon,ds.day_of_mon,ds.year);
     case DF_wek_MM_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d/%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d/%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon,ds.day_of_mon,ds.year);
     case DF_mon_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d",ds.mon-1,"ST_MONTHS",ds.day_of_mon);
+      return MPrint("%3tZ %02d",ds.mon-1,"ST_MONTHS",ds.day_of_mon);
     case DF_wek_mon_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ, %3tZ %02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ, %3tZ %02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon-1,"ST_MONTHS",ds.day_of_mon);
     case DF_mon_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d,%04d",ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
+      return MPrint("%3tZ %02d,%04d",ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
     case DF_wek_mon_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ, %3tZ %02d,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ, %3tZ %02d,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
     case DF_month_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z %d",ds.mon-1,"ST_MONTHS",ds.day_of_mon);
+      return MPrint("%Z %d",ds.mon-1,"ST_MONTHS",ds.day_of_mon);
     case DF_week_month_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z, %Z %d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%Z, %Z %d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon-1,"ST_MONTHS",ds.day_of_mon);
     case DF_month_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z %d,%d",ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
+      return MPrint("%Z %d,%d",ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
     case DF_week_month_DD_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z, %Z %d,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%Z, %Z %d,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.mon-1,"ST_MONTHS",ds.day_of_mon,ds.year);
     case DF_DD_MM_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d/%02d",ds.day_of_mon,ds.mon,ds.year%100);
+      return MPrint("%02d/%02d/%02d",ds.day_of_mon,ds.mon,ds.year%100);
     case DF_DD_MM:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d",ds.day_of_mon,ds.mon);
+      return MPrint("%02d/%02d",ds.day_of_mon,ds.mon);
     case DF_wek_DD_MM:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon);
     case DF_wek_DD_MM_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d/%02d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon,ds.year%100);
     case DF_DD_MM_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d/%d",ds.day_of_mon,ds.mon,ds.year);
+      return MPrint("%02d/%02d/%d",ds.day_of_mon,ds.mon,ds.year);
     case DF_wek_DD_MM_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d/%02d/%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ %02d/%02d/%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon,ds.year);
     case DF_DD_mon:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d %3tZ",ds.day_of_mon,ds.mon-1,"ST_MONTHS");
+      return MPrint("%02d %3tZ",ds.day_of_mon,ds.mon-1,"ST_MONTHS");
     case DF_wek_DD_mon:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ, %02d %3tZ",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ, %02d %3tZ",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon-1,"ST_MONTHS");
     case DF_DD_mon_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d %3tZ,%04d",ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
+      return MPrint("%02d %3tZ,%04d",ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
     case DF_wek_DD_mon_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ, %02d %3tZ,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%3tZ, %02d %3tZ,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
     case DF_DD_month:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d %Z",ds.day_of_mon,ds.mon-1,"ST_MONTHS");
+      return MPrint("%d %Z",ds.day_of_mon,ds.mon-1,"ST_MONTHS");
     case DF_week_DD_month:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z, %d %Z",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%Z, %d %Z",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon-1,"ST_MONTHS");
     case DF_DD_month_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d %Z,%d",ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
+      return MPrint("%d %Z,%d",ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
     case DF_week_DD_month_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z, %d %Z,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
+      return MPrint("%Z, %d %Z,%d",ds.day_of_week,"ST_DAYS_OF_WEEK",
 	ds.day_of_mon,ds.mon-1,"ST_MONTHS",ds.year);
     case DF_YY_MM_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d/%02d",ds.year%100,ds.mon,ds.day_of_mon);
+      return MPrint("%02d/%02d/%02d",ds.year%100,ds.mon,ds.day_of_mon);
     case DF_YYYY_MM_DD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d/%02d/%02d",ds.year,ds.mon,ds.day_of_mon);
+      return MPrint("%d/%02d/%02d",ds.year,ds.mon,ds.day_of_mon);
     case DF_YYMMDD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d%02d%02d",ds.year%100,ds.mon,ds.day_of_mon);
+      return MPrint("%02d%02d%02d",ds.year%100,ds.mon,ds.day_of_mon);
     case DF_YYYYMMDD:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d%02d%02d",ds.year,ds.mon,ds.day_of_mon);
+      return MPrint("%d%02d%02d",ds.year,ds.mon,ds.day_of_mon);
     case DF_MMDDYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d%02d%02d",ds.mon,ds.day_of_mon,ds.year%100);
+      return MPrint("%02d%02d%02d",ds.mon,ds.day_of_mon,ds.year%100);
     case DF_MMDDYYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d%02d%d",ds.mon,ds.day_of_mon,ds.year);
+      return MPrint("%02d%02d%d",ds.mon,ds.day_of_mon,ds.year);
     case DF_wek:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ",ds.day_of_week,"ST_DAYS_OF_WEEK");
+      return MPrint("%3tZ",ds.day_of_week,"ST_DAYS_OF_WEEK");
     case DF_week:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z",ds.day_of_week,"ST_DAYS_OF_WEEK");
+      return MPrint("%Z",ds.day_of_week,"ST_DAYS_OF_WEEK");
     case DF_mon:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ",ds.mon-1,"ST_MONTHS");
+      return MPrint("%3tZ",ds.mon-1,"ST_MONTHS");
     case DF_month:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z",ds.mon-1,"ST_MONTHS");
+      return MPrint("%Z",ds.mon-1,"ST_MONTHS");
     case DF_YYYY_mon:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d %3tZ",ds.year,ds.mon-1,"ST_MONTHS");
+      return MPrint("%d %3tZ",ds.year,ds.mon-1,"ST_MONTHS");
     case DF_YYYY_month:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d %Z",ds.year,ds.mon-1,"ST_MONTHS");
+      return MPrint("%d %Z",ds.year,ds.mon-1,"ST_MONTHS");
     case DF_YY_mon:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d %3tZ",ds.year%100,ds.mon-1,"ST_MONTHS");
+      return MPrint("%02d %3tZ",ds.year%100,ds.mon-1,"ST_MONTHS");
     case DF_YY_month:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d %Z",ds.year%100,ds.mon-1,"ST_MONTHS");
+      return MPrint("%02d %Z",ds.year%100,ds.mon-1,"ST_MONTHS");
     case DF_mon_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %d",ds.mon-1,"ST_MONTHS",ds.year);
+      return MPrint("%3tZ %d",ds.mon-1,"ST_MONTHS",ds.year);
     case DF_month_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z %d",ds.mon-1,"ST_MONTHS",ds.year);
+      return MPrint("%Z %d",ds.mon-1,"ST_MONTHS",ds.year);
     case DF_mon_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%3tZ %02d",ds.mon-1,"ST_MONTHS",ds.year%100);
+      return MPrint("%3tZ %02d",ds.mon-1,"ST_MONTHS",ds.year%100);
     case DF_month_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%Z %02d",ds.mon-1,"ST_MONTHS",ds.year%100);
+      return MPrint("%Z %02d",ds.mon-1,"ST_MONTHS",ds.year%100);
     case DF_YY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d",ds.year%100);
+      return MPrint("%02d",ds.year%100);
     case DF_YYYY:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%d",ds.year);
+      return MPrint("%d",ds.year);
     case DF_D:
-      return MSPrintF("%d days",cdt.date);
+      return MPrint("%d days",cdt.date);
     case DF_M:
-      return MSPrintF("%d mons",ToI64(cdt/(CDATE_YEAR_DAYS/12))>>32);
+      return MPrint("%d mons",ToI64(cdt/(CDATE_YEAR_DAYS/12))>>32);
     case DF_Y:
-      return MSPrintF("%d years",ToI64(cdt/CDATE_YEAR_DAYS)>>32);
+      return MPrint("%d years",ToI64(cdt/CDATE_YEAR_DAYS)>>32);
     case DF_D2:
-      return MSPrintF("%d",cdt.date);
+      return MPrint("%d",cdt.date);
     case DF_M2:
-      return MSPrintF("%d",ToI64(cdt/(CDATE_YEAR_DAYS/12))>>32);
+      return MPrint("%d",ToI64(cdt/(CDATE_YEAR_DAYS/12))>>32);
     case DF_Y2:
-      return MSPrintF("%d",ToI64(cdt/CDATE_YEAR_DAYS)>>32);
+      return MPrint("%d",ToI64(cdt/CDATE_YEAR_DAYS)>>32);
     case DF_D3:
-      return MSPrintF("%0.1f",cdt/ToF64(MAX_U32+1));
+      return MPrint("%0.1f",cdt/ToF64(MAX_U32+1));
     case DF_M3:
-      return MSPrintF("%0.1f",cdt/ToF64(MAX_U32+1)/(CDATE_YEAR_DAYS/12));
+      return MPrint("%0.1f",cdt/ToF64(MAX_U32+1)/(CDATE_YEAR_DAYS/12));
     case DF_Y3:
-      return MSPrintF("%0.1f",cdt/ToF64(MAX_U32+1)/CDATE_YEAR_DAYS);
+      return MPrint("%0.1f",cdt/ToF64(MAX_U32+1)/CDATE_YEAR_DAYS);
     case DF_MM_DD_YY:
     default:
       Date2DateStruct(&ds,cdt+local_time_offset);
-      return MSPrintF("%02d/%02d/%02d",ds.mon,ds.day_of_mon,ds.year%100);
+      return MPrint("%02d/%02d/%02d",ds.mon,ds.day_of_mon,ds.year%100);
   }
 }

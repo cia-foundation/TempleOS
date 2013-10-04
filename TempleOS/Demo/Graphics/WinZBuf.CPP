@@ -3,7 +3,7 @@ U0 DrawIt(CTask *,CDC *dc)
   I64 i,j;
   U16 *ptr=gr_win_z_buf;
   dc->color=BLACK;
-  GrPutS(dc,0,0,"Move the windows around and watch.");
+  GrPrint(dc,0,0,"Move the windows around and watch.");
   for (i=0;i<TEXT_ROWS;i++)
     for (j=0;j<TEXT_COLS;j++) {
       dc->color=*ptr++&15;

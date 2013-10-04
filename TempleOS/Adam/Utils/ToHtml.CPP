@@ -7,8 +7,8 @@ U0 HtmlPutS(CDoc *doc,I64 c,I64 *_old_c,U8 *st,I64 *_col,U8 *style_bitmap=NULL)
   U8 *ch;
   if (c!=*_old_c) {
     if (*_old_c!=-1)
-      DocPutS(doc,"</span>");
-    DocPrintF(doc,"<span class=c%02X>",c);
+      DocPrint(doc,"</span>");
+    DocPrint(doc,"<span class=c%02X>",c);
     *_old_c=c;
     if (style_bitmap)
       LBts(style_bitmap,c);
@@ -22,54 +22,54 @@ U0 HtmlPutS(CDoc *doc,I64 c,I64 *_old_c,U8 *st,I64 *_col,U8 *style_bitmap=NULL)
 	} while (*_col&7);
 	break;
       case '&':
-	DocPutS(doc,"&amp;");
+	DocPrint(doc,"&amp;");
 	*_col=*_col+1;
 	break;
       case '<':
-	DocPutS(doc,"&lt;");
+	DocPrint(doc,"&lt;");
 	*_col=*_col+1;
 	break;
       case '>':
-	DocPutS(doc,"&gt;");
+	DocPrint(doc,"&gt;");
 	*_col=*_col+1;
 	break;
       case '"':
-	DocPutS(doc,"&quot;");
+	DocPrint(doc,"&quot;");
 	*_col=*_col+1;
 	break;
       case 'ã':
-	DocPutS(doc,"pi");
+	DocPrint(doc,"pi");
 	*_col=*_col+1;
 	break;
       case 'é':
-	DocPutS(doc,"theta");
+	DocPrint(doc,"theta");
 	*_col=*_col+1;
 	break;
       case 'è':
-	DocPutS(doc,"phi");
+	DocPrint(doc,"phi");
 	*_col=*_col+1;
 	break;
       case 'ê':
-	DocPutS(doc,"omega");
+	DocPrint(doc,"omega");
 	*_col=*_col+1;
 	break;
       case 'ì':
-	DocPutS(doc,"inf");
+	DocPrint(doc,"inf");
 	*_col=*_col+1;
 	break;
       case 'æ':
-	DocPutS(doc,"u");
+	DocPrint(doc,"u");
 	*_col=*_col+1;
 	break;
       case CH_SHIFT_SPACE:
-	DocPutS(doc," ");
+	DocPrint(doc," ");
 	*_col=*_col+1;
 	break;
       default:
 	if (CH_SPACE<=ch<0x7F || ch=='\n')
 	  DocPutKey(doc,ch,0);
 	else
-	  DocPutS(doc,".");
+	  DocPrint(doc,".");
 	*_col=*_col+1;
     }
   }
@@ -82,7 +82,7 @@ U8 *TSLinkCvt2(U8 *filename,I64 line_num)
   if (filename) {
     st=ChgExt(filename,"html");
     if (st && StrLen(st)>12 && !StrNCmp(st+1,":/TempleOS/",11))
-      result=MSPrintF("http://www.templeos.org/Wb/%s#l%d",st+12,line_num);
+      result=MPrint("http://www.templeos.org/Wb/%s#l%d",st+12,line_num);
     Free(st);
   }
   return result;
@@ -152,7 +152,7 @@ public CDoc *Doc2Html(CDoc *doc_in,
   if (!html_header) html_header="";
   if (!body_header) body_header="";
   if (!body_footer) body_footer="";
-  DocPrintF(doc_out,
+  DocPrint(doc_out,
     "<!DOCTYPE HTML>\n"
     "<html>\n"
     "<head>\n"
@@ -161,12 +161,12 @@ public CDoc *Doc2Html(CDoc *doc_in,
     "<meta name=\"generator\" content=\"TempleOS V%4.2f\">\n"
     "<style type=\"text/css\">\n",html_header,os_version);
   style=doc_out->cur_entry->last;
-  DocPutS(doc_out,
+  DocPrint(doc_out,
     "</style>\n"
     "</head>\n"
     "<body>\n"
     "<pre style=\"font-family:courier;font-size:10pt\">\n");
-  DocPutS(doc_out,body_header);
+  DocPrint(doc_out,"%s",body_header);
 
   doc_e=doc_in->root.next;
   s=DocSettingsLast(doc_e);
@@ -176,14 +176,14 @@ public CDoc *Doc2Html(CDoc *doc_in,
   while (doc_e!=doc_in) {
     if (!(doc_e->flags1&(DOCEF1_SKIP|DOCEF1_HARD_SKIP))) {
       if (line_anchors && y!=old_y) {
-	DocPrintF(doc_out,"<a name=\"l%d\"></a>",y+1);
+	DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	old_y=y;
       }
       while (y<doc_e->y) {
 	HtmlPutS(doc_out,cur_u8_attr,&old_c,"\n",&col,style_bitmap);
 	y++;
 	if (line_anchors && y!=old_y) {
-	  DocPrintF(doc_out,"<a name=\"l%d\"></a>",y+1);
+	  DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	  old_y=y;
 	}
 	col=0;
@@ -212,10 +212,10 @@ public CDoc *Doc2Html(CDoc *doc_in,
 
       if (link_st) {
 	if (old_c!=-1) {
-	  DocPutS(doc_out,"</span>");
+	  DocPrint(doc_out,"</span>");
 	  old_c=-1;
 	}
-	DocPrintF(doc_out,"<a href=\"%s\">",link_st);
+	DocPrint(doc_out,"<a href=\"%s\">",link_st);
       }
 
       if (doc_e->settings)
@@ -239,17 +239,17 @@ public CDoc *Doc2Html(CDoc *doc_in,
 	  break;
 	case DOCT_HTML_IMG:
 	  if (old_c!=-1) {
-	    DocPutS(doc_out,"</span>");
+	    DocPrint(doc_out,"</span>");
 	    old_c=-1;
 	  }
-	  DocPrintF(doc_out,"<img src=\"%s\" width=\"640\" height=\"480\" alt=\"\">\n",doc_e->tag);
+	  DocPrint(doc_out,"<img src=\"%s\" width=\"640\" height=\"480\" alt=\"\">\n",doc_e->tag);
 	  break;
 	case DOCT_HTML_VIDEO:
 	  if (old_c!=-1) {
-	    DocPutS(doc_out,"</span>");
+	    DocPrint(doc_out,"</span>");
 	    old_c=-1;
 	  }
-	  DocPrintF(doc_out,
+	  DocPrint(doc_out,
 		"<!--begin exclude-->\n"
 		"<object classid=\"clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95\" "
 		"codebase=\"http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab\" "
@@ -270,10 +270,10 @@ public CDoc *Doc2Html(CDoc *doc_in,
 	  break;
 	case DOCT_HTML_CODE:
 	  if (old_c!=-1) {
-	    DocPutS(doc_out,"</span>");
+	    DocPrint(doc_out,"</span>");
 	    old_c=-1;
 	  }
-	  DocPutS(doc_out,doc_e->tag);
+	  DocPrint(doc_out,"%s",doc_e->tag);
 	  break;
 	case DOCT_SPRITE:
 	  HtmlPutS(doc_out,cur_u8_attr,&old_c,doc_e->tag,&col,style_bitmap);
@@ -285,10 +285,10 @@ public CDoc *Doc2Html(CDoc *doc_in,
       }
       if (link_st) {
 	if (old_c!=-1) {
-	  DocPutS(doc_out,"</span>");
+	  DocPrint(doc_out,"</span>");
 	  old_c=-1;
 	}
-	DocPutS(doc_out,"</a>");
+	DocPrint(doc_out,"</a>");
 	Free(link_st);
       }
     }
@@ -300,16 +300,16 @@ public CDoc *Doc2Html(CDoc *doc_in,
     col=0;
   }
   if (old_c!=-1) {
-    DocPutS(doc_out,"</span>");
+    DocPrint(doc_out,"</span>");
     old_c=-1;
   }
-  DocPutS(doc_out,body_footer);
-  DocPutS(doc_out,"</pre></body>\n</html>\n");
+  DocPrint(doc_out,"%s",body_footer);
+  DocPrint(doc_out,"</pre></body>\n</html>\n");
 
   doc_out->cur_entry=style->next;
   for (i=0;i<256;i++)
     if (Bt(style_bitmap,i))
-      DocPrintF(doc_out,".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",i,p[i&15].r,p[i&15].g,p[i&15].b,p[i/16].r,p[i/16].g,p[i/16].b);
+      DocPrint(doc_out,".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",i,p[i&15].r,p[i&15].g,p[i&15].b,p[i/16].r,p[i/16].g,p[i/16].b);
   doc_out->cur_entry=&doc_out->root;
   DocRecalc(doc_out);
 

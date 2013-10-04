@@ -3,18 +3,18 @@ F64 glbl;
 F64 CompileDemo(U8 *st)
 {
   I64 type;
-  U8 *code;
+  U8 *ex;
   CLex *lx=LexNew(st,LF_DONT_FREE_BUF);
   F64 result=0;
   Lex(lx);  //Gotta get it started
   "Compile \"%s\"\n",st;
   do {
-    if (code=CmpExpression(lx,&type)) {
+    if (ex=LexExpression2Bin(lx,&type)) {
       if (type!=IT_F64)
-	result=ToF64(Call(code));
+	result=ToF64(Call(ex));
       else
-	result=Call(code)(F64);
-      ExpressionDel(code);
+	result=Call(ex)(F64);
+      ExpressionBinDel(ex);
     }
     "result=%9.4f\n",result;
     if (lx->token==';')
@@ -30,8 +30,8 @@ CompileDemo("glbl=1;glbl*2;glbl/3;Sin(glbl)");
 
 //This is just like you typed-it on
 //the cmd line.
-ExePutS(
+ExePrint(
 "I64 i;"
 "for (i=0;i<10;i++) "
-"  \"%d\n\",i;"
+"  \"%%d\n\",i;"
 );

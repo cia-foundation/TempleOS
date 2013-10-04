@@ -408,8 +408,8 @@ public Bool HeapWalk(CTask *task=NULL)
 U0 TaskRepTask(CTask *task,I64 indent)
 {
   CTask *task1;
-  U8 *st,*desc=MSPrintF("%q",task->task_title);
-  st=MSPrintF("$$MA+A,\"%08X\",\"Kill(0x%X);\n\",$$",task,task,task);
+  U8 *st,*desc=MPrint("%q",task->task_title);
+  st=MPrint("$$MA+A,\"%08X\",\"Kill(0x%X);\n\",$$",task,task,task);
   Spaces(indent);
   "%s $$TX+SCX,\"%Q...\",16$$ Mem:%08X\n",
     st,desc,TaskAllocatedMem(task);

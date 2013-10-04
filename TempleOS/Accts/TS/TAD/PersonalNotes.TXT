@@ -1,4 +1,45 @@
-* fix result on Blot ect
+* PSect search all tables if not found very well.
+* Bug: HI:Math/CD3
+
+* asm LIST NOLIST bug
+* Bible ranges. 
+* Current Bible position to link on clipboard.
+* Might have bug. CTRL-F Fwd gets cleared, maybe.
+* hang black text layer bug is back
+* No way to clear +Hold entries
+
+-----------DiningStars---------------
+Song
+Better name than DiningStars
+Better tables, orient, chairs
+Get approval from building inspector
+Health inspector visits
+Hire chefs, cooks, maŒtre'd and waitresses
+Busy aisles, got your back
+Pipes
+Walls with windows and mirrors
+$$ per square foot, how about picking from randomly generated leased spaces 
+Plot customers per hour
+Reservations bot
+Menu
+Candles
+Advertizing
+-------------------------------------
+
+* We don't know why tS caused crash, perhaps, semaphores are broken.
+  (Hangs on 2nd ScreenUpdate, black almost. Perhaps bug from with $LK,"gr_pan_text_x","MN:gr_pan_text_x"$.)
+  Fixed with HPET in tS.
+
+* Maybe dither_probability is bad.
+
+* FAQ frontloaded
+
+COMPILER
+  * Postpone LocalVar Init until last possible moment. (in case RETURN)
+  * PtrArith MUL SIZE -->QueIns(MUL)? 
+  * QueRem(IC_NOP)?
+
+* Fix return result for GrBlot, ect.
 
 * Tour TestSuite on 256Meg NoMP runs out of mem. Leak,too?
 
@@ -35,11 +76,12 @@ $LK-A,"::/TempleOS/Demo/Lectures/FixedPointAdvanced.CPP"$.
 
 * It would be nice if $LK,"U","MN:U"$() NOP were better.
 
-* Make RedSea file system expanded size set in Copy.
-
 * unhandled exception on MP message gets overwritten by WinMgr
 
 * Cmd to enable/disable compiler warnings
+
+* What if we had a type for either F64 or I64, like Print -- no conversion.
+* What if we had a ... that did do conversion, if we have one that doesn't.
 
 * fix documentation problem -- remembering 0 terminator in str or not for $$DA
 * GetS, crazy putkey code
@@ -117,6 +159,7 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * $LK,"DCF_SYMMETRY","MN:DCF_SYMMETRY"$, before transformation? (Currently it's after) 
 * all graphics clipping -- screen y+top<0 for top<0
 * Maybe convert graphics to float
+* Warn unnecessary typecast
 * compiler F32
 * preempt(OFF) during graphic clipping?
 * compiler optimization heap_glbls with added offset
@@ -144,7 +187,7 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * Make use of flag potential in SysFilesFind and possibly CFileAccess
 * implement fixed pos files
 
-* new Holy C language features
+* new HolyC language features
 * better debugging
 
 * Change hardcoded stuff to Define
@@ -159,8 +202,8 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * test removable media id  (critical for resident files)
 
 * add field overflow U8 "t='*'"
-* Implement fmt codes into GetF
-* GetF date codes and maybe $FG,2$h$FG$ fmts for nums
+* Implement fmt codes into Get
+* Get date codes and maybe $FG,2$h$FG$ fmts for nums
 * Date Input
 * Default date fmt
 
@@ -169,7 +212,7 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * support r4u8 by adding 0x40 byte
 * static var off of data heap.
 * Might want to use U32*U32 multiplication.
-* could add "const" to not set LF_NOT_CONSTANT flag for trig, etc.
+* could add "const" to not set LF_NOT_CONST flag for trig, etc.
 * do r,rm ICCmp like ICBrCmp
 * could make glblvar imports use TY_RIP_DISP32.
 * PUSH_CMP allocs reg R9 or whatever
@@ -191,3 +234,5 @@ $HC,"<object width=\"750\" height=\"520\"><param name=\"movie\" value=\"http://w
 * sort options for findfiles
 * recalc_start could be more accurate before recalculating?
 * Maybe, get rid of $LK,"0x20000","FF:::/TempleOS/Compiler/CmpMain.CPP,0x20000"$ in compiler.
+
+* $FG,4$$TX+HTML,"Key_and_Peele_Part_1","http://www.youtube.com/watch?v=Dd7FixvoKBw"$		$TX+HTML,"Key_and_Peele_Part_2","http://www.youtube.com/watch?v=sXc6JLmiVHs"$$FG$

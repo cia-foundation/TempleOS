@@ -5,10 +5,8 @@ before import is resolved, you can use
 var and check it before calling.
 */
 import U0 MemberLstDel(CHashClass *tempc);
-import I64 ExePutS(U8 *buf,U8 *filename=NULL,
-		   Bool just_load=FALSE,CLexHashTableContext *htc=NULL);
+import I64 ExePrint(U8 *fmt,...);
 import I64 ExeFile(U8 *name,Bool just_load=FALSE);
-import U0 DisplaySpecialKeys(I64 sc);
 import Bool DocUnlock(CDoc *doc);
 import Bool Ed(U8 *link_st,I64 ed_flags=0);
 import I64 PopUp(U8 *msg,CTask *parent=NULL,CTask **_pu_task=NULL);
@@ -42,7 +40,7 @@ extern Bool TaskValidate(CTask *task);
 
 extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 extern Bool IsDir(U8 *dir_name);
-extern Bool FileFind(U8 *filename,CDirEntry *rde=NULL,I64 fuf_flags=0);
+extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 extern Bool ISOPrtInit(CPrt *p,I64 blk);
 extern Bool ISO1FileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fuf_flags=0);
 extern CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NULL);
@@ -57,8 +55,8 @@ extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
 extern I64 RedSeaFSAllocClusters(CPrt *p,I64 cnt);
 extern I64 FAT32AllocClusters(CPrt *p,I64 c,I64 cnt);
 extern I64 FAT32AllocContiguousClusters(CPrt *p,I64 cnt);
-extern Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain);
-extern Bool FAT32DirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain);
+extern Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempdee,Bool free_old_chain);
+extern Bool FAT32DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempdee,Bool free_old_chain);
 extern CDirEntry *RedSeaFSFilesFind (U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NULL);
 extern CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NULL,I64 *_dir_size=NULL);
 extern I64 FileWrite(U8 *filename,U8 *fbuf,
@@ -82,18 +80,17 @@ extern CSrvCmd *TaskMsgQue(CTask *_srv,CTask *master,
 extern U0 TaskWait(CTask *task=NULL);
 extern U0 TaskInitExt(Bool from_dbg=FALSE);
 extern I64 SrvCmdsHandler(CTask *task=NULL);
-extern U0 PrintF(U8 *fmt,...);
-extern U0 PutS(U8 *st);
+extern U0 Print(U8 *fmt,...);
+extern U0 PutS(U8 *st); //Use $LK,"Print","MN:Print"$()
 extern U0 PutChar(U64 ch);
 extern U0 PutDefine(U8 *name);
-extern U0 NewLine(I64 cnt=1);
 extern I64 GetChar(I64 *scancode=NULL,Bool echo=TRUE,Bool raw_cursor=FALSE);
 extern Bool IsInDbg();
 extern I64 FlushMsgs(CTask *task=NULL);
 extern U0 SetMouseIP(I64 x,I64 y,I64 z,I64 l,I64 r,I64 c);
-extern U8 *MSPrintF(U8 *fmt,...);
+extern U8 *MPrint(U8 *fmt,...);
 extern U8 *TextFileRead(U8 *filename,I64 *_attr=NULL);
-extern U0 SPrintFPSect(U8 *buf,I64 add,I64 field_len);
+extern U0 SPrintPSect(U8 *buf,I64 add,I64 field_len);
 extern I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE);
 extern U0 UserTaskCont();
 

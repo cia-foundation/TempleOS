@@ -70,7 +70,7 @@ USE64
 	CALL	_SET_GS_BASE
 	POP	RSI
 @@10:	MOV	RBX,U64 CCPU.seth_task[RSI]
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@10
 	MOV	U64 CTask.gs[RBX],RSI
 	MOV	RAX,RBX
@@ -219,7 +219,7 @@ U0 MPAPICInit()
   asm {	LTR	AX  }
   if (Gs->num) {
     IntInit1;
-    SetFlags(SYS_NORMAL_RFLAGS);
+    SetRFlags(SYS_NORMAL_RFLAGS);
   }
 }
 
@@ -235,7 +235,7 @@ U0 MPSethServerTask()
     if (!LBts(&my_ctrl->flags,SVCRf_LOCKED)) {
       tempc=tempc1->next;
       //Jobs for this core are highest priority.
-      if (tempc==tempc1 || !SrvCmdRun(tempc,GetFlags)) {
+      if (tempc==tempc1 || !SrvCmdRun(tempc,GetRFlags)) {
 	LBtr(&my_ctrl->flags,SVCRf_LOCKED) ;
 	if (my_ctrl->next_waiting==my_ctrl) {
 	  LBts(&Gs->cpu_flags,CPUf_SETH_SLEEP);
@@ -313,7 +313,7 @@ U0 MPCPUTaskInit()
   //as the first thing a CPU does before waiting for jobs
   MPAPICInit;
   Fs->rip=&MPSethServerTask;
-  Fs->time_slice_start=GetTimeStamp;
+  Fs->time_slice_start=GetTSC;
   TaskContextRestore;
 }
 
@@ -375,7 +375,7 @@ U0 MPStart()
 
   for (i=1;i<my_mp_cnt;i++) {
     c =&cpu_structs[i];
-    SPrintF(buf,"Seth Task CPU#%d",i);
+    SPrint(buf,"Seth Task CPU#%d",i);
     task=Spawn(&MPCPUTaskInit,NULL,buf,,,SETH_STK,0);
     task->rflags=SYS_START_RFLAGS;
     //$LK,"CTask","MN:CTask"$ allocated off this core's seth_task's heap (Which is Adam)
@@ -415,7 +415,7 @@ U0 MPInit()
 
   SetGs(c);
   adam_task->gs=c;
-  adam_task->time_slice_start=GetTimeStamp;
+  adam_task->time_slice_start=GetTSC;
   c->seth_task=adam_task;
   c->tss=TSSNew(0);
   c->idle_task=TaskIdleInit;
@@ -432,7 +432,7 @@ U0 MPCrash()
   IntEOI;
   mp_cnt=1;
   Raw(ON);
-  sys_raw_dc_flags|=RDCF_SHOW_DOLLAR;
+  sys_raw_flags|=RWF_SHOW_DOLLAR;
   "MP Crash CPU#%02X Task:%08X\n",mp_crash->cpu_num,mp_crash->task;
   Dbg(mp_crash->msg,mp_crash->msg_num);
 }

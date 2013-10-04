@@ -1,10 +1,10 @@
-Bool CDirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempm,Bool free_old_chain=TRUE)
+Bool DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
 {
   switch (p->type) {
     case PT_REDSEA:
-      return RedSeaFSDirNew(p,cur_dir,tempm,free_old_chain);
+      return RedSeaFSDirNew(p,cur_dir,tempde,free_old_chain);
     case PT_FAT32:
-      return FAT32DirNew(p,cur_dir,tempm,free_old_chain);
+      return FAT32DirNew(p,cur_dir,tempde,free_old_chain);
     case PT_ISO9660:
       PutDefineErr("ST_NOT_WRITABLE");
       return FALSE;
@@ -14,48 +14,48 @@ Bool CDirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempm,Bool free_old_chain=TRUE)
   }
 }
 
-U0 CDirEntryDel(CDirEntry *tempm)
+U0 DirEntryDel(CDirEntry *tempde)
 { //Doesn't Free user_data
-  if (tempm) {
-    Free(tempm->full_name);
-    Free(tempm);
+  if (tempde) {
+    Free(tempde->full_name);
+    Free(tempde);
   }
 }
 
-U0 CDirEntryDel2(CDirEntry *tempm)
+U0 DirEntryDel2(CDirEntry *tempde)
 { //Frees user_data
-  if (tempm) {
-    Free(tempm->full_name);
-    Free(tempm->user_data);
-    Free(tempm);
+  if (tempde) {
+    Free(tempde->full_name);
+    Free(tempde->user_data);
+    Free(tempde);
   }
 }
 
-U0 CDirLstDel(CDirEntry *tempm)
+U0 DirLstDel(CDirEntry *tempde)
 { //Doesn't Free user_data
-  CDirEntry *tempm2;
-  while (tempm) {
-    tempm2=tempm->next;
-    if (tempm->sub)
-      CDirLstDel(tempm->sub);
-    CDirEntryDel(tempm);
-    tempm=tempm2;
+  CDirEntry *tempde2;
+  while (tempde) {
+    tempde2=tempde->next;
+    if (tempde->sub)
+      DirLstDel(tempde->sub);
+    DirEntryDel(tempde);
+    tempde=tempde2;
   }
 }
 
-U0 CDirLstDel2(CDirEntry *tempm)
+U0 DirLstDel2(CDirEntry *tempde)
 { //Frees user_data
-  CDirEntry *tempm2;
-  while (tempm) {
-    tempm2=tempm->next;
-    if (tempm->sub)
-      CDirLstDel2(tempm->sub);
-    CDirEntryDel2(tempm);
-    tempm=tempm2;
+  CDirEntry *tempde2;
+  while (tempde) {
+    tempde2=tempde->next;
+    if (tempde->sub)
+      DirLstDel2(tempde->sub);
+    DirEntryDel2(tempde);
+    tempde=tempde2;
   }
 }
 
-I64 CDirEntryCompare(CDirEntry *e1,CDirEntry *e2)
+I64 DirEntryCompare(CDirEntry *e1,CDirEntry *e2)
 {
   U8 buf1[CDIR_FILENAME_LEN],buf2[CDIR_FILENAME_LEN],
      buf3[CDIR_FILENAME_LEN],buf4[CDIR_FILENAME_LEN];
@@ -77,67 +77,67 @@ I64 CDirEntryCompare(CDirEntry *e1,CDirEntry *e2)
   }
 }
 
-U0 CDirFilesSort(CDirEntry **_tempm)
+U0 DirFilesSort(CDirEntry **_tempde)
 {
   I64 i,cnt=0;
-  CDirEntry *tempm=*_tempm,*tempm1,**sort_buf;
-  if (tempm) {
-    tempm1=tempm;
-    while (tempm1) {
+  CDirEntry *tempde=*_tempde,*tempde1,**sort_buf;
+  if (tempde) {
+    tempde1=tempde;
+    while (tempde1) {
       cnt++;
-      tempm1=tempm1->next;
+      tempde1=tempde1->next;
     }
     if (cnt>1) {
       sort_buf=MAlloc(cnt*sizeof(U8 *));
       i=0;
-      tempm1=tempm;
-      while (tempm1) {
-	sort_buf[i++]=tempm1;
-	tempm1=tempm1->next;
+      tempde1=tempde;
+      while (tempde1) {
+	sort_buf[i++]=tempde1;
+	tempde1=tempde1->next;
       }
-      QSortI64(sort_buf,cnt,&CDirEntryCompare);
-      tempm=sort_buf[0];
-      *_tempm=tempm;
+      QSortI64(sort_buf,cnt,&DirEntryCompare);
+      tempde=sort_buf[0];
+      *_tempde=tempde;
       for (i=0;i<cnt-1;i++) {
-	tempm1=sort_buf[i];
-	tempm1->next=sort_buf[i+1];
+	tempde1=sort_buf[i];
+	tempde1->next=sort_buf[i+1];
       }
-      tempm1=sort_buf[i];
-      tempm1->next=NULL;
+      tempde1=sort_buf[i];
+      tempde1->next=NULL;
       Free(sort_buf);
 
-      tempm1=tempm;
-      while (tempm1) {
-	if (tempm1->sub)
-	  CDirFilesSort(&tempm1->sub);
-	tempm1=tempm1->next;
+      tempde1=tempde;
+      while (tempde1) {
+	if (tempde1->sub)
+	  DirFilesSort(&tempde1->sub);
+	tempde1=tempde1->next;
       }
     } else
-      if (tempm->sub)
-	CDirFilesSort(&tempm->sub);
+      if (tempde->sub)
+	DirFilesSort(&tempde->sub);
   }
 }
 
-CDirEntry *CDirFilesFlatten(CDirEntry *tempm,CDirEntry **_result,I64 fuf_flags)
+CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
 { //returns last node
-  CDirEntry *tempm1;
+  CDirEntry *tempde1;
   Bool del;
-  if (tempm)
+  if (tempde)
     while (TRUE) {
-      tempm1=tempm->next;
-      if (!(tempm->attr&_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
-	_result=*_result=tempm;
+      tempde1=tempde->next;
+      if (!(tempde->attr&_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
+	_result=*_result=tempde;
 	del=FALSE;
       } else
 	del=TRUE;
-      if (tempm->sub) {
-	_result=CDirFilesFlatten(tempm->sub,_result,fuf_flags);
-	tempm->sub=NULL;
+      if (tempde->sub) {
+	_result=DirFilesFlatten(tempde->sub,_result,fuf_flags);
+	tempde->sub=NULL;
       }
       if (del)
-	CDirEntryDel(tempm);
-      if (tempm1)
-	tempm=tempm1;
+	DirEntryDel(tempde);
+      if (tempde1)
+	tempde=tempde1;
       else
 	break;
     }
@@ -165,9 +165,9 @@ CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
       result=NULL;
   }
   if (result) {
-    CDirFilesSort(&result);
+    DirFilesSort(&result);
     if (fuf_flags&(FUF_FLATTEN_TREE|FUF_JUST_FILES))
-      CDirFilesFlatten(result,&result,fuf_flags);
+      DirFilesFlatten(result,&result,fuf_flags);
   }
   return result;
 }
@@ -180,7 +180,7 @@ U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
     if (line)
       "%s,%04d",filename,line;
     else
-      "" filename;
+      "%s",filename;
   } else {
     buf=FileNameAbs(filename);
     if (plain_text) {
@@ -203,7 +203,7 @@ U0 PutDirLink(U8 *dirname)
   U8 *buf;
   if (!dirname) return;
   if (IsRaw)
-    "" dirname;
+    "%s",dirname;
   else {
     buf=DirNameAbs(dirname);
     "$$MA+A,\"%s\",\"Cd(\\\"%s\\\");Dir;\n\"$$",dirname,buf;
@@ -213,53 +213,49 @@ U0 PutDirLink(U8 *dirname)
 
 U0 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
 {
-  CDirEntry *tempm1=NULL,*tempm2;
+  CDirEntry *tempde1=NULL,*tempde2;
   U8 *st;
-  I64 csize=0xFFFF,esize=0xFFFF,c=0xFFFF;
-  tempm1=SysFilesFind(files_find_mask,fuf_flags);
+  I64 csize=0xFFFF,c=0xFFFF;
+  tempde1=SysFilesFind(files_find_mask,fuf_flags);
 
   if (!(st=CurDir))
     PutDefine("ST_INVALID_DRV");
   else {
-    if (tempm1) {
+    if (tempde1) {
       //Find max columns
-      tempm2=tempm1;
-      while (tempm2) {
-	if (tempm2->size>csize)
-	  csize=tempm2->size;
-	if (tempm2->expanded_size>esize)
-	  esize=tempm2->expanded_size;
-	if (tempm2->cluster>c)
-	  c=tempm2->cluster;
-	tempm2=tempm2->next;
+      tempde2=tempde1;
+      while (tempde2) {
+	if (tempde2->size>csize)
+	  csize=tempde2->size;
+	if (tempde2->cluster>c)
+	  c=tempde2->cluster;
+	tempde2=tempde2->next;
       }
       csize=Bsr(csize)/4+1;
-      esize=Bsr(esize)/4+1;
       c=Bsr(c)/4+1;
 
       "$$MA+A,\"Directory\",\"PopUpCd;Dir;\n\"$$ of %s\n",st;
       if (full)
-	"__DATE__ __TIME__ %*ts %*ts %*ts\n",
-	csize,"SIZE",esize,"UNCMPSIZE",c,"CLUSTER";
+	"__DATE__ __TIME__ %*ts %*ts\n",
+	csize,"SIZE",c,"CLUSTER";
       else
 	"DATE_ TIME_ %*ts\n",csize,"SIZE";
-      while (tempm1) {
-	tempm2=tempm1->next;
+      while (tempde1) {
+	tempde2=tempde1->next;
 	if (full)
-	  "%D %T %0*tX %0*tX %0*tX ",tempm1->datetime,tempm1->datetime,
-	    csize,tempm1->size,esize,tempm1->expanded_size,
-	    c, tempm1->cluster;
+	  "%D %T %0*tX %0*tX ",tempde1->datetime,tempde1->datetime,
+	    csize,tempde1->size,c,tempde1->cluster;
 	else
-	  "%h1D %h1T %0*tX ",tempm1->datetime,tempm1->datetime,
-	    csize,tempm1->size;
-	if (tempm1->attr & _ATTR_DIR)
-	  PutDirLink(tempm1->name);
+	  "%h1D %h1T %0*tX ",tempde1->datetime,tempde1->datetime,
+	    csize,tempde1->size;
+	if (tempde1->attr & _ATTR_DIR)
+	  PutDirLink(tempde1->name);
 	else
-	  PutFileLink(tempm1->name);
+	  PutFileLink(tempde1->name);
 
 	NewLine;
-	CDirEntryDel(tempm1);
-	tempm1=tempm2;
+	DirEntryDel(tempde1);
+	tempde1=tempde2;
       }
     } else
       PutDefine("ST_NO_MATCHING_ENTRIES");

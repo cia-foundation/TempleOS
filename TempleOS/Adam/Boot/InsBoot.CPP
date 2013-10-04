@@ -28,7 +28,7 @@ USE64
 _HI_CALL::
 	ENTER	0
 	MOV	RAX,U64 16[RBP]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@05
 	CALL	RAX
 @@05:	LEAVE
@@ -90,8 +90,8 @@ U0 InstallCDir(U8 src,U8 dst)
 {
   U8 buf_s[136],buf_d[136];
   if (src==dst) return;
-  SPrintF(buf_s,"%c:/TempleOS",src);
-  SPrintF(buf_d,"%c:/TempleOS",dst);
+  SPrint(buf_s,"%c:/TempleOS",src);
+  SPrint(buf_d,"%c:/TempleOS",dst);
   DelTree(buf_d);
   CopyTree(buf_s,buf_d);
 }
@@ -170,7 +170,7 @@ public Bool MakeOSInstallPrtBootLoader(U8 src_drv=0,U8 dst_drv=0)
     //within a #exe {} statement.
     //See $LK,"InsBootDstDrv","FF:::/TempleOS/Kernel/KCfg.CPP,InsBootDstDrv"$
     //(There is no way to set compiler options.)
-    NamedFramePtrAdd("InsBootDstDrv",dst_drv);
+    FramePtrAdd("InsBootDstDrv",dst_drv);
     src_drv=ChkWritable(src_drv);
     if (!Drv(src_drv))
       throw;
@@ -209,7 +209,7 @@ public Bool MakeOSInstallPrtBootLoader(U8 src_drv=0,U8 dst_drv=0)
     }
   } catch
     CatchAll;
-  NamedFramePtrDel("InsBootDstDrv");
+  FramePtrDel("InsBootDstDrv");
   return result;
 }
 
@@ -301,7 +301,7 @@ public Bool InstallMasterBootLoader(U8 drv_let,U8 *drv_lst=NULL)
       _q=BMHD2_BLK_ARRAY;
       MemSet(_q,0,sizeof(I64)*8);
       menu_ptr=BMHD2_BOOT_MSG;
-      SPrintF(menu_ptr,"\n\r\n\rTempleOS Boot Loader\n\r\n\r");
+      SPrint(menu_ptr,"\n\r\n\rTempleOS Boot Loader\n\r\n\r");
       j=0;
       if (FileFind(OLDMBR_BIN_C,&de,FUF_JUST_FILES)) {
 	Free(de.full_name);
@@ -323,7 +323,7 @@ public Bool InstallMasterBootLoader(U8 drv_let,U8 *drv_lst=NULL)
 	if (p1 && bdev1==bdev) {
 	  *_q=p1->offset;
 	  "Drive %C:%16X\n",Prt2Drv(p1),*_q;
-	  SPrintF(buf,"%d. Drive %C\n\r",j++,Prt2Drv(p1));
+	  SPrint(buf,"%d. Drive %C\n\r",j++,Prt2Drv(p1));
 	  StrCat(menu_ptr,buf);
 	  _q++;
 	}

@@ -1,4 +1,4 @@
-                           TempleOS
+                           TempleOS
 
 You can't do much until you burn a TempleOS CD-ROM from the ISO file
 and boot it, or you aim your virtual machine at the ISO file and boot.
@@ -17,4 +17,4 @@ difficult for TempleOS to figure-out port numbers, automatically.)
 
 The source code can also be found at the TempleOS web site, 
 http://www.templeos.org but cannot be compiled outside TempleOS because
-it's Holy C, a nonstandard C/C++ dialect, and asm.
+it's HolyC, a nonstandard C/C++ dialect, and asm.

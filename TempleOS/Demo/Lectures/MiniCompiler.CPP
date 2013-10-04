@@ -4,9 +4,9 @@ $ID,2$The mini compiler is like the main compiler, except the main compiler's le
 
 The main compiler generates $LK,"Intermediate Code","FF:::/TempleOS/Compiler/CmpDefs.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression","MN:PrsExpression"$(), $LK,"PrsStatement","MN:PrsStatement"$().  Set $LK,"PTrace","MN:PTrace"$(ON) to see the output of the parser.
 
-The main compiler optimizes   See $LK,"Intermediate Code Attributes","FF:D:/TempleOS/Compiler/CmpInit.CPP,ST_INTERMEDIATE_CODE"$, $LK,"Combining Constants","FF:::/TempleOS/Compiler/OptPass012.CPP,IC_MUL"$, $LK,"Choosing Reg Vars","FF:::/TempleOS/Compiler/OptPass3.CPP,num_reg_vars"$.  Set $LK,"OTrace","MN:OTrace"$(ON) to see the optimization stages.
+The main compiler optimizes   See $LK,"Intermediate Code Attributes","FF:D:/TempleOS/Compiler/CmpInit.CPP,ST_INTERMEDIATE_CODE"$, $LK,"Combining Consts","FF:::/TempleOS/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars","FF:::/TempleOS/Compiler/OptPass3.CPP,num_reg_vars"$.  Set $LK,"OTrace","MN:OTrace"$(ON) to see the optimization stages.
 
-The main compiler makes machine code in the back end.  See $LK,"IC Struct","MN:CIntermediateCode"$, $LK,"CBCompile","MN:CBCompile"$ and $LK,"OptPass789A","FF:::/TempleOS/Compiler/OptPass789A.CPP,IC_MUL"$(), $LK,"BackEnd","FF:::/TempleOS/Compiler/BackEnd.CPP,ICMul"$.  Set $LK,"CTrace","MN:CTrace"$(ON) to see the output of the backend.
+The main compiler makes machine code in the back end.  See $LK,"IC Struct","MN:CIntermediateCode"$, $LK,"LCCCompile","MN:LCCCompile"$ and $LK,"OptPass789","FF:::/TempleOS/Compiler/OptPass789.CPP,IC_MUL"$(), $LK,"BackEnd","FF:::/TempleOS/Compiler/BackEnd.CPP,ICMul"$.  Set $LK,"CTrace","MN:CTrace"$(ON) to see the output of the backend.
 $ID,-2$
 $TR,"Mini Compiler"$
 $ID,2$For this mini compiler, some things you should know about 64-bit asm:

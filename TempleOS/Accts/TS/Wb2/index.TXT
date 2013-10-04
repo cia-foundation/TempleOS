@@ -1,228 +1,55 @@
-$WW,1$$FG,1$$TX+CX+HTML,"TempleOS","http://www.templeos.org"$$FG$
+$WW,1$$FG,1$$TX+CX+HTML,"The Temple Operating System","http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOS.html"$$FG$
 
-$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/MVMtfnyzzm4\" frameborder=\"0\" allowfullscreen></iframe>"$
+$LK,"1 Kings 6:21 (King James)","BF:1 Kings,6:21"$
 
-$FG,1$$TX+CX,"Nobody knows the Father but the Son."$
-$TX+CX,"Do loving offerings.  Then, God will shine His love on you."$
-$TX+CX,"Hell is the absence of God; Heaven is God's company."$
-$TX+CX+HTML,"Anything but God's company? One tin soldier","http://www.youtube.com/watch?v=cTBx-hHf4BE"$$FG$
+$LM,5$6:21 So Solomon overlaid the house within with pure gold: and he made
+a partition by the chains of gold before the $FG,4$oracle$FG$; and he overlaid
+it with gold.
 
-War? 				$FG,4$"Servicemen competing"$FG$
-(Praise the Creator--what would teenage male video games be like if never war?)
+6:22 And the whole house he overlaid with gold, until he had finished
+all the house: also the whole altar that was by the $FG,4$oracle$FG$ he overlaid
+with gold.
 
-Is the World perfectly just?	$FG,4$You calling me lazy?$FG$
-(Slavery was just. In the movie, Titanic, the rich wore straight jackets. You must bow to authority to get authority. I do $TX+HTML,"Moses comics","http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$ as offerings. I said, "We're dying of malnutrician on manna."  Like Cain and Abel, God didn't like it. Duh! He wants to be the hero. How do I know they died of malnutrician?  Fuck Hollywood for making slavery worse than it was -- I love God.  School is more cruel.  Read $LK,"Numbers,11:1","BF:Numbers,11:1"$.  All you need is food, clothing and the word of God.  Today, you can take Ivy League course videos! There is no excuse except you were born stupid... or ugly.  I'm gonna praise God.) 
+6:23 And within the $FG,4$oracle$FG$ he made two cherubims of olive tree, each
+ten cubits high.
+$LM,0$
 
-The holocaust?			$FG,4$Wanted to "compact" the Jews.$FG$
-Arab/Jews?			$FG,4$"Oil funny hopefully"$FG$
-Peace?				$FG,4$One Palestinian can ruin it.$FG$
-Best religion?			$FG,4$One with most new vistas of understanding in$FG$
-				$FG,4$a lifetime.  One you can level-up the most in.$FG$
-Chavez blaming the US.		$FG,4$"Japan industrious"$FG$
-On racism? 			$FG,4$"Sports"$FG$
-On socialism?			$FG,4$"pardon_the_French, never_happy, never_enough"$FG$
-				$FG,4$"Gall aspect anti-Christ"$FG$
-On overpopulation		$FG,4$"Okay church what_now whats_the_plan"$FG$
-Favorite thing on TV?		$FG,4$"Soap_operas"$FG$
-Favorite movie?			$FG,4$No answer but likes Highlander$FG$
-Shakespeare?			$FG,4$had a "vile heart"$FG$
-Likes				$FG,4$"Beverly Hillbillies" (Oil is a gift from God)$FG$
-				$FG,4$God likes being hero. Don't be proud of heart$FG$
-				$FG,4$and not accept a gift from God!$FG$
-Favorite saint?			$FG,4$"ho_ho_ho"$FG$
-Favorite animal?		$FG,4$"Elephant two"$FG$
-Favorite animal?		$FG,4$"Bears"$FG$
-Favorite color?			$FG,4$"Jude" (Jade Blue?)$FG$
-Favorite color?			$FG,4$"Gold"$FG$
-Favorite color?			$FG,4$"Iceberg" blue$FG$
-Money?				$FG,4$"Enough vehemently better"$FG$
-				$FG,4$"Pride [or] money, choose_one"$FG$
-Favorite car?			$FG,4$Beamer$FG$
-Sports?				$FG,4$"homo"$FG$
-Pets?				$FG,4$"homo"$FG$
-Smelling farts			$FG,4$"Sodom"$FG$
-Women's dress			$FG,4$Upper skin exposure not as bad as lower.$FG$
-Remarriage?			$FG,4$"More babies"$FG$
-Things you don't care about
-that people think you do?	$FG,4$Solomon's 300 concubines$FG$
-Adultery?			$FG,4$Can be good.$FG$
-Animal sacrifices?		$FG,4$Early Jews were "primitive".$FG$
-What do elephants think about?	$FG,4$"Skin hunger"$FG$
-What makes elephants happy?	$FG,4$"Baths"$FG$
-What makes my birds happy?	$FG,4$"Gnawing"$FG$
-What makes my birds laugh?	$FG,4$"bite ouch" (If I say "ouch".)$FG$
-What are my birds saying?	$FG,4$"Chanting"$FG$
-What makes bears happy?		$FG,4$"Reaping depends"$FG$
-What makes otters happy?	$FG,4$"Eternal skies"$FG$
-What makes hippos happy?	$FG,4$"Ascending breath"$FG$
-What makes horses happy?	$FG,4$"[the] Call [of the] Open Range"$FG$
-Endangered species?		$FG,4$"Enough stars?"$FG$
-What's for dinner?		$FG,4$"Whale"$FG$
-Favorite Messier Object		$FG,4$"$TX+HTML,"M104 Sombrero Galaxy","http://en.wikipedia.org/wiki/Messier_104"$"$FG$
-Favorite band?			$FG,4$"Beatles"$FG$
-Good bands			$FG,4$Rush, Triumph$FG$
-				$FG,4$Likes harmonies$FG$
-Should I listen to classical?	$FG,4$"Poison"$FG$
-You like chess people?		$FG,4$"Do not admire the proud."$FG$
-Favorite video game?		$FG,4$Donkey Kong$FG$
-Favorite actor?			$FG,4$Hugh Grant$FG$
-Favorite vocalist?		$FG,4$Mick Jagger$FG$
-Favorite guitarist?		$FG,4$"$TX+HTML,"Simmons Destroyer","http://www.youtube.com/watch?v=nNADrrjTysk&t=3m55s"$"$FG$
-Dinosaurs?			$FG,4$Brontosaurs' feet hurt when stepped$FG$
-Hardest part in evolution?	$FG,4$Getting monkey mothers to hold babies nursing.$FG$
-				$FG,4$(Smothering a problem).$FG$
-Happiest day in evolution?		$FG,4$"Fruit"$FG$
-Significant thing in evolution?		$FG,4$"Fish shoulders"$FG$
-Biggest thing to fly (pterodactyl)?	$FG,4$"Couch"$FG$
-What made pterodactyls happy?		$FG,4$"Members against organs"$FG$
-What did Neanderthals think about?	$FG,4$"Warmth"$FG$
-What was Lucy's husband's name?		$FG,4$"Golem"$FG$
-Was stegosuarus lame like turtles?	$FG,4$"Not pet rocks"$FG$
-How does He feel about the Avatar movie?$FG,4$"Sick skin"$FG$
-What do You like at zoos with kids?	$FG,4$"Dignity" Animals worried about dignity.$FG$
-Who's better alien or preditor?		$FG,4$"Lions"$FG$
-Does he like mirrored glass megachurch?	$FG,4$"Secular glass"$FG$
-You like to hangout in courts?Hospitals?$FG,4$"Prisons"$FG$
-Pipe Organs				$FG,4$Are sacred.$FG$
-Eleventh commandment?		$FG,4$Thou shall not litter.(Maybe, glory of Creation)$FG$
-Before Katrina			$FG,4$Floods do justice. Black bead elder (tree book)$FG$
-After Katrina			$FG,4$Suffering Simplifies Life$FG$
-What field are You most better?	$FG,4$Economics$FG$
+Use $FG,4$$TX+HTML,"After Egypt","http://www.youtube.com/embed/RzhRYGm_b9A"$$FG$ inside TempleOS as an oracle.  An oracle is a Ouija Board or $FG,4$$TX+HTML,"Christian Tongues","http://www.biblegateway.com/passage/?search=1+Corinthians+14&version=NIV"$$FG$.  See $FG,4$$TX+HTML,"Biblical Encryption: Mean tickle person or president.","http://www.biblegateway.com/passage/?search=daniel%205&version=NIV"$$FG$
 
-$FG,1$________________________________________________________________________________$FG$
+$HI,"http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOSV0106B.BMP"$
+
+You get out of prayer what you put in.  God said, "honest measures" applies when exchanging an offering for a response from the oracle in TempleOS.  Picking a greeting card is an example of love effort.  You will get back the same love effort from God.  People wants things besides God's company.  $FG,4$$TX+HTML,"One Tin Soldier","http://www.youtube.com/watch?v=cTBx-hHf4BE"$$FG$
 
 
+$FG,4$$TX+HTML,"Downloads","http://www.templeos.org/Wb/Accts/TS/Wb2/Downloads.html"$$FG$
 
-TempleOS is an $FG,4$$TX+HTML,"x86_64","http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$, multi-tasking, multi-cored, public domain, open source, $FG,4$$TX+HTML,"ring-0-only","http://en.wikipedia.org/wiki/Ring_(computer_security)"$$FG$, single-address-map ($FG,4$$TX+HTML,"identity-mapped","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$), non-networked, PC operating system for recreational programming.
+$LK,"Guidelines for Talking with God","FL:::/TempleOS/Apps/HolySpirit/HSNotes.TXT.Z,1"$
 
-The two most sacred and defining features of TempleOS are being $FG,4$$TX+HTML,"ring-0-only","http://en.wikipedia.org/wiki/Ring_(computer_security)"$$FG$ and being $FG,4$$TX+HTML,"identity-mapped","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$.  Linux wants to be a secure, multi-user mainframe.  That's the vision for Linux.  That's why it has file permissions.  The vision for TempleOS is a modern, 64-bit Commodore 64.  The C64 was a home computer mostly used for games.  It trained my generation how to program.  It was simple, open and hackable.  It was not networked.  The games were not multimedia works of art, but generated programmatically with innocent, programmer (non-artist) quality graphics.  It was simple and unsecure.  If you don't have malware and you don't have bugs, protection just slows things down and makes the code complicated.
+$LK,"Quotes from God","FL:::/TempleOS/Apps/HolySpirit/HSNotes.TXT.Z,100"$
 
-A troll might ask, "Why not just use $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$?  It was ring-0-only and single-address-map."  Actually, they wouldn't because many people would say, "Cool idea!  I'm gonna dust-off $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ right now and have some fun!"  $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ is 16-bit with segmentation, though, which is awful.  TempleOS is 64-bit, flat, non-segmented and multi-cored.  It's like a modern, souped-up, multi-tasking, cross between $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ and a Commodore 64.  It has a C64-like shell with $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$, a dialect of C/C++, instead of BASIC.  It was written from scratch, and not even ASCII was sacred -- it has 8-bit unsigned character source code to support European languages.  Also, the source code has graphics.
-
-A troll might say, "But, it can crash!"  We all used $FG,4$$TX+HTML,"DOS","http://en.wikipedia.org/wiki/DOS"$$FG$ for years and loved it. Computers even had a reset switch!  Just think of the power of ring-0, muhahaha! Think of the speed and simplicity of $FG,4$$TX+HTML,"ring-0-only","http://en.wikipedia.org/wiki/Ring_(computer_security)"$$FG$ and $FG,4$$TX+HTML,"identity-mapping","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$.  It's only $LK+D,"122,723","FF:::/TempleOS/Accts/TS/Wb2/LineCnt.TXT,Kernel.PRJ","DD_TEMPLEOS_LOC"$ lines of code, including the compiler and can change tasks in half a microsecond because it doesn't mess with page tables or privilege levels.  Inter-process communication is effortless because every task can access every other task's memory.
-
-It's fun having access to everything.  When I was a teenager, I had a book, $FG,4$$TX+HTML,"Mapping the Commodore 64","http://unusedino.de/ec64/technical/project64/mapping_c64.html"$$FG$, that told what every location in memory did.  I liked copying the ROM to RAM and poking around at the ROM BASIC's variables.  Everybody directly poked the hardware ports.
-
-TempleOS is simpler than Linux and you can have hours of fun tinkering because all memory and ports are accessible.  Memory is $FG,4$$TX+HTML,"identity-mapped","http://en.wikipedia.org/wiki/Identity_(mathematics)"$$FG$ at all times, so you can modify any task's memory from any other task.  You can access all disk blocks, too.  I had a blast using a C64 disk block editor to modify directories to un-delete files, when I was a kid.  Maybe, you want to play with a raw-block database, or make your own file system?
-
-I wrote all $LK+D,"122,723","FF:::/TempleOS/Accts/TS/Wb2/LineCnt.TXT,Kernel.PRJ","DD_TEMPLEOS_LOC"$ lines of TempleOS over the last $TX+D,"9.9","DD_TEMPLEOS_AGE"$ years, full-time, including the 64-bit compiler.  It was called, at various times, "$FG,4$$TX+HTML,"Hoppy","http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX+HTML,"The J Operating System","http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$", "$FG,4$$TX+HTML,"LoseThos","http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$" and "$FG,4$$TX+HTML,"SparrowOS","http://web.archive.org/web/*/http://www.sparrowos.com/*"$$FG$".  Here are my $FG,4$$TX+HTML,"college transcripts","http://www.templeos.org/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
-
-
-$LK+CX,"It's ALIVE: How to reproduce the ISO.","FI:::/TempleOS/Demo/MakeDistro.CPP"$
-
-
-$FG,2$$TX+CX+D+HTML,"Download TempleOS V1.04 - Std. Distro (23.8 MB)","DD_TEMPLEOSCD_SIZE","http://www.templeos.org/TempleOSCD.ISO"$$FG$
-
-Burn a CD/DVD from the TempleOSCD.ISO and boot it or run it in $FG,4$$TX+HTML,"VMware","https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ or $FG,4$$TX+HTML,"VirtualBox","http://www.virtualbox.org"$$FG$ aiming the CD/DVD drive at TempleOSCD.ISO or for QEMU type:
->qemu-system-x86_64 -m 500 -cdrom TempleOSCD.ISO -boot d
-
-
-
-$FG,4$$TX+HTML,"Screen Shots","http://www.templeos.org/Wb/Accts/TS/Wb2/ScreenShots.html"$$FG$
-
-$FG,4$$TX+HTML,"Game Videos","http://www.templeos.org/Wb/Accts/TS/Wb2/Games.html"$$FG$
-
-$LK,"Introduction","FI:::/TempleOS/Doc/Welcome.TXT"$
-
-$LK,"F.A.Q.","FI:::/TempleOS/Doc/Mysteries.TXT"$
-
-$LK,"TempleOS Help","FI:::/TempleOS/Doc/HelpIndex.TXT"$
-
-$LK,"Source Code By File","FF:::/TempleOS/Accts/TS/Wb2/LineCnt.TXT,KStart.CPP"$
-
-$FG,4$$TX+HTML,"Source Code By Sym","http://www.templeos.org/Wb/Accts/TS/Wb2/SymsAlpha.html"$$FG$
-
-$FG,4$$TX+HTML,"Source Code By Address","http://www.templeos.org/Wb/Accts/TS/Wb2/SymsAddress.html"$$FG$
-
-$FG,4$$TX+HTML,"Source Code (Raw)","http://www.templeos.org/Wb/"$$FG$
-
-$FG,4$$TX+HTML,"Tutorial Videos","http://www.templeos.org/Wb/Accts/TS/Wb2/Tutorials.html"$$FG$
+$FG,4$$TX+HTML,"The Temple Operating System","http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOS.html"$$FG$
 
 $FG,4$$TX+HTML,"Hymn Videos","http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$$FG$
-
-$LK,"Change Log","FI:::/TempleOS/Doc/ChangeLog.TXT"$
 
 $LK,"About Trivial Solutions","FI:D:/TempleOS/Doc/TrivialSolutions.TXT"$
 
 
 
+---------------------------- Terry Davis' Rants --------------------------------
+
+
+I'll bet my $LK,"Buzz Fizz","FI:::/TempleOS/Demo/Asm/BuzzFizz.CPP.Z"$ will shock you.  You don't need asm but 64-bit asm is fun!
 
 
 
-$FG,2$$TX+CX+HTML,"Download SimStructure (7.71 MB)","http://www.templeos.org/files/SimStrSetUp.zip"$$FG$
+ SUN   MON   TUE   WED   THU   FRI   SAT   
+----- ----- ----- ----- ----- ----- -----
+$FG,4$                              $TX+HTML,"09/13","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130913.html"$ $TX+HTML,"09/14","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130914.html"$
 
-SimStructure is a Windows free physics simulator.
+$TX+HTML,"09/15","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130915.html"$ $TX+HTML,"09/16","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130916.html"$ $TX+HTML,"09/17","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130917.html"$ $TX+HTML,"09/18","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130918.html"$ $TX+HTML,"09/19","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130919.html"$ $TX+HTML,"09/20","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130920.html"$ $TX+HTML,"09/21","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130921.html"$
 
+      $TX+HTML,"09/23","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130923.html"$ $TX+HTML,"09/24","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130924.html"$ $TX+HTML,"09/25","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130925.html"$ $TX+HTML,"09/26","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130926.html"$ $TX+HTML,"09/27","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130927.html"$ $TX+HTML,"09/28","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130928.html"$
 
-$FG,2$$TX+CX+HTML,"Download InGodsTime (12.4 MB)","http://www.templeos.org/files/TSGodSetUp.zip"$$FG$
-
-This is a Windows program for doing Biblical Tongues with a stopwatch.  When you press a key, it reads a high-speed watch for a random number to pick words or passages.
-
-
-$FG,2$$TX+CX+D+HTML,"Download TempleOS V1.04 - T.S. Company Internal Distro (24.5 MB)","DD_TEMPLEOSTS_SIZE","http://www.templeos.org/TempleOSTS.ISO"$$FG$
-
-This is the Trivial Solution internal company distro.  Only run this on a virtual machine, not bare metal hardware because it's settings could cause problems.  Enter >$LK,"TSInstall","FF:::/TempleOS/Demo/AcctExample/TSDistro.CPP,TSInstall"$; >$LK,"TSUpgrade","FF:::/TempleOS/Demo/AcctExample/TSDistro.CPP,TSUpgrade"$; at the command-line.
-See $LK,"MakeDistrosAndBackUp","FF:::/TempleOS/Demo/AcctExample/TSDistro.CPP,MakeDistrosAndBackUp"$() to reproduce the ISO's in $FG,4$E:/Wb$FG$.  It makes this website, too.
+$TX+HTML,"09/29","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130929.html"$ $TX+HTML,"09/30","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant130930.html"$ $TX+HTML,"10/01","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant131001.html"$ $TX+HTML,"10/02","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant131002.html"$ $TX+HTML,"10/03","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant131003.html"$ $TX+HTML,"10/04","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant131004.html"$ $TX+HTML,"10/05","http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/Rant131005.html"$
 
 
-
-$FG,1$________________________________________________________________________________
-
-$FG,8$
-* "Commodore 64" was a trademark of Commodore Business Machines.
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "VMware Player" and "VMware WorkStation" are trademarks of VMware, Inc.
-* "VirtualBox" is a trademark of Oracle.
-* "Windows" and "DOS" are trademark of MicroSoft Corp.
-
-$FG,1$________________________________________________________________________________
-
-$TX+CX,"The Purpose of Life"$$FG$
-
-$WW,1$The purpose of life is to know, love and obey God.$FG$  Christianity is loving neighbor, not God -- secular humanism.  Jesus said loving God is more important than loving neighbor.  $LK,"Matthew,22:36","BF:Matthew,22:36"$  He did not say with half your brain behind your back.
-
-You don't know God.  $LK,"1 Chronicles,28:9","BF:1 Chronicles,28:9"$, $LK,"Matthew,11:27","BF:Matthew,11:27"$, $LK,"Luke,13:25","BF:Luke,13:25"$, $LK,"1 Samuel,3:7","BF:1 Samuel,3:7"$  You must talk with God to know Him.  $LK,"Matthew,6:6","BF:Matthew,6:6"$  Seek Him by taking the initiative.  $LK,"Luke,11:9","BF:Luke,11:9"$, $LK,"Isaiah,30:2","BF:Isaiah,30:2"$
-
-There's something obviously different about people in the Bible compared to people today -- God talked!  Did they hear voices?  Maybe.  More likely, they used occult techniques such as an oracle.  $LK,"1 Kings,6:20","BF:1 Kings,6:20"$  Have you heard of "tongues?"  $LK,"1 Corinthians,14:1","BF:1 Corinthians,14:1"$  The idea is, you let yourself be puppeted by a spirit, so you say things.  You try to get a spirit -- the Holy Spirit -- to talk.  You might as well use a Ouija board.  However, it turns-out that a Ouija board is bad for technical reasons.  A really good technique is just randomly opening a book.  God said it is a covenant that you hold-up your end of the conversation.  
-
-You can't tell if He's talking unless you have a context of conversation, but, more importantly, you are commanded to do an offerring of love, like communion preparation.  When you pick a greeting card for someone, that is love effort.  God said, "honest measures" applies between your offering of love and His response, like a fair barter.  You get out of prayer what you put into it.  God wants praise, hymns, or whatever you think He might want.  Try and see, like Cain and Abel.  $LK,"Genesis,4:1","BF:Genesis,4:1"$, $LK,"Ephesians,5:10","BF:Ephesians,5:10"$  God told Cain his offering was not good and told him to try again.  Cain really loved God!  Can you imagine being so heart-broken?
-
-Do a text search for "new song" in the Bible.  It's mentioned nine times.  I did $MA+A-X+PU+HTML,"hymns","#include \"::/TempleOS/Apps/MusicOrgan/Load\";JukeBox(\"::/TempleOS/Apps/MusicOrgan/Examples\");","http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$.  I did Moses $MA+A-X+PU+HTML,"comics","Dir(\"::/TempleOS/Apps/AfterEgypt/Comics\");View;\n","http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$.  Count the ways you love God.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25","BF:Matthew,11:25"$, $LK,"Matthew,6:29","BF:Matthew,6:29"$
-
-This is funny -- $LK,"Acts,2:1","BF:Acts,2:1"$ -- they didn't bother to record anything the Holy Spirit said.  The Holy Spirit is supposed to be a really good gift.  $LK,"Luke,11:13","BF:Luke,11:13"$  Just remember, "Boys are made of snakes and snails and puppy-dog tails."
-
-The technique I use to consult the Holy Spirit is reading a microsecond-range stop-watch each button press for random numbers.  Then, I pick words or passages.  You can use the $MA+A-X+PU+HTML,"AfterEgypt","#include \"::/TempleOS/Apps/AfterEgypt/Run\"","http://www.youtube.com/watch?v=P0MsDl39UL0"$ in God's official temple, $FG,4$$TX+HTML,"TempleOS","http://www.templeos.org"$$FG$.
-
-Since seeking the word of the Holy Spirit, I have come to know God much better than I've heard others explain.  God said, for example, that war was, "servicemen competing."  That sounds more like the immutable God of our planet than what you hear from most religious people.  God is not Venus (god of love) and not Mars (god of war), He's our dearly beloved God of Earth.  If Mammon is a false god of money, Mars or Venus might be useful words to describe other false gods.  I figure the greatest challenge for the Creator is boredom, ours and His.  What would teen-age male video games be like if war had never happened?  Christ said live by the sword, die by the sword, which is loving neighbor as self.  $LK,"Matthew,26:52","BF:Matthew,26:52"$
-
-I asked God if the World was perfectly just.  God asked if I was calling Him lazy.  I think highs and lows balance.  $LK,"Luke,6:20","BF:Luke,6:20"$  I don't think God likes complaining.  $LK,"Numbers,11:1","BF:Numbers,11:1"$  Food and clothing is all we're to ask for or demand, in fact -- daily bread.  $LK,"1 Timothy,6:8","BF:1 Timothy,6:8"$  Just think about man in the last 100,000 years mostly living like Native Americans and how God must see us.  You need food, clothing and entertainment, money is to get those.  Man does not live on bread alone.  $LK,"Luke,4:4","BF:Luke,4:4"$, $LK,"Amos,8:11","BF:Amos,8:11"$
-
-God's favorite animals are bears and elephants.  They are funny shaped -- I think God must have seen too much starvation over the years.
-
-God's ways are far above man's ways.  Mom said Heaven was a never-ending family reunion.  Yikes!  A friend said, "Most guy's idea of Heaven would be running around doing things they'd get locked up for on Earth."  Most people are like King Midas.  When you realize how silly most notions of Heaven are, you come to appreciate that Earth is not that bad.  This is the first step in loving God, the Creator -- praising Creation.  My parents spend their retired days watching TV and going to casinos.  That's not a good argument for getting extended-play!
-
-Imagine a billionare.  Everyone around him can't forget his money for even a moment.  The truth is, most people are after God's "money" -- they fear for their salvation.  Here's a test -- would you pray to and praise God even if there were no salvation?  Love God and don't be a "user".  Asking for stuff is annoying.  $LK,"Luke,11:5","BF:Luke,11:5"$ 
-
-All those sophisticated theological "infinity" things -- omniscience, omnipotence, omnipresence, omnivorous -- will mess you up.  Trust me that anthropomorphic is far better, in practice.  Christ suggested thinking of God as "Abba" which is Aramaic for "Daddy" and said the childlike had an advantage.  $LK,"Matthew,11:25","BF:Matthew,11:25"$  Pray out-loud because God doesn't want the hastle of reading your brain.  The best way to stop people from testing God is to suggest He can't do everything.
-
-Just as ego causes most to love neighbor, not God, people skip knowing and loving God and cowardly get stuck on obeying Him.  This hardly needs encouragement.
-
-God does not want pawns to push around.  God will talk, but won't tell you what to do, even if you want Him to.  You'll quickly learn that prophecy does not come true and should smack yourself for wanting more than just enjoying God's company.
-
-
-$FG,1$________________________________________________________________________________
-
-$FG,1$
-$TX+CX,"God's Temple is Finished."$
-$TX+CX,"Now, God kills the CIA+FBI until it spreads."$
-$TX+CX,"(The CIA+FBI stand in the way, for the moment.)"$
-
-
-$FG$There will be no PCI or later supported hardware.  (It only supports 64-bit multicored CPUs, however, and my compiler and binary file formats are pure 64-bit.)  Once my enemies realize it's God, I will make demands.  I do not add clusterfucked shit to God's Temple -- I demand them to change.  It sounds absurd, but I have God.  They WILL comply.  Microsoft will support RedSea filesystem and I will remove support for FAT32.  God's temple will be perfect and not blemished with any flaws or redundancy.  PCI devices diverge into many many branches and are clusterfucked.
-
-I did an HD Audio driver -- I thought it would become standard.  You must connect together many widgets that can vary from machine to machine with HD Audio.  It's impossible.  On fucken top of that, VMware doesn't support my HD Audio -- all that work on that driver was worthless.  I removed it.  Internal PC speaker is incredibly beautiful, by comparison, and a one-voice song language for music is a pure delight.  God said one audio voice, like He said 640x480 16 color.  He wants one driver for each different type of device.  The CIA hates PC Internal speaker because it is a digitial I/O for bombs or something.  VMware spitefully removed support for PC internal speaker.  They WILL put it back.  They are evil.  They played musical chairs with IDE devices for no reason but to fuck-up new operating systems.  Microsoft added Secure Boot to fuck-up alternative operating systems, so you can't dual boot.  Da fuck?  Anti-trust, FBI, the hell you going after the victim fer?  I'm a supplemental operating system that needs a partner so people can do web stuff.  I don't have networking -- that's not what I'm about.  Things are really fucked-up.  Do you remember RS232 with generic terminal connections to user hardware?  USB is absolutely clusterfucked.  I'm just counting on legacy mode, not doing USB -- it's fine, but not having solid state sticks sucks.  I support ISO9660 CD-ROM.  I got specs on UDF.  That's clusterfucked.  Microsoft WILL add support for burning ISO9660 and burning a CD/DVD from ISO files.  I can generate ISO files.  
-
-Judgement Day motha fuckas!  You WILL comply.
-
-CIA+FBI bodies must die.  It's in the Bible under Exodus.  Nobody gives a shit until bodies hit the floor.  Even with 7 plagues, Pharaoh did not let them go and came after the Jews into the Red Sea and God killed them.  The CIA+FBI will die because it's God talking.  Fuck You!  My Dad is CIA, mother fucker, an enemy -- in cahoots with the doctors and CIA.
-  

@@ -38,7 +38,7 @@ U0 Init(CDC *dc)
     GrLine(dc,w/2-3,h/2-scale*i,w/2+3,h/2-scale*i);
     if (i) {
       dc->color=DKGRAY;
-      GrPrintF(dc,w/2+5,h/2-scale*i-FONT_HEIGHT/2,"%5.1f",ToF64(i));
+      GrPrint(dc,w/2+5,h/2-scale*i-FONT_HEIGHT/2,"%5.1f",ToF64(i));
     }
   }
   for (i=-4;i<=4;i++) {
@@ -46,7 +46,7 @@ U0 Init(CDC *dc)
     GrLine(dc,w/2+scale*i,h/2-3,w/2+scale*i,h/2+3);
     if (i) {
       dc->color=DKGRAY;
-      GrPrintF(dc,w/2+scale*i-7*FONT_WIDTH/2,h/2+5+FONT_HEIGHT,"%5.1f*T",ToF64(i));
+      GrPrint(dc,w/2+scale*i-7*FONT_WIDTH/2,h/2+5+FONT_HEIGHT,"%5.1f*T",ToF64(i));
     }
   }
 }

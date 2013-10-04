@@ -55,7 +55,7 @@ on and off within your programs, leaving
 ones which need initialization on the code heap.
 
 You can't dynamically initialize data heap
-glbls--they are constants.  This might be a silly
+glbls--they are consts.  This might be a silly
 point, but might result in odd differences, perhaps
 from the order things are evaluated.
 
@@ -68,7 +68,7 @@ because they don't take-up room in the .BIN.Z file.
 
 Test g2[]={
   {10,"name1"},
-  {(tT%10.0)*100,"name2"}, //No dynamic initialization--converted to a constant
+  {(tT%10.0)*100,"name2"}, //No dynamic initialization--converted to a const
   {30,"name3"}
 };
 
@@ -79,7 +79,7 @@ U0 Main2()
 {
   static Test s2[]={
     {10,"static1"},
-    {(tT%10.0)*100,"static2"}, //No dynamic initialization--converted to a constant
+    {(tT%10.0)*100,"static2"}, //No dynamic initialization--converted to a const
     {30,"static3"}
   };
   D(s2,sizeof(s2));

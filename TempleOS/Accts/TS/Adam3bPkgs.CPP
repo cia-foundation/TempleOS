@@ -5,4 +5,5 @@
 Cd("HOME");;
 #include "/TempleOS/Accts/TS/TSAdam"
 #include "/TempleOS/Accts/TS/TSDistro"
+#include "/TempleOS/Accts/TS/TSHolySpirit"
 Cd("HOME");;

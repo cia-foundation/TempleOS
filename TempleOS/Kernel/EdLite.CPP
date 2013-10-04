@@ -10,7 +10,7 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
   U8 *st;
   CLine *templ=cur_line;
   Bool done_eof=FALSE;
-  sys_raw_dc_col=0;
+  sys_raw_col=0;
   for (i=0;i<text_rows/2;i++)
     if (templ->last!=root)
       templ=templ->last;
@@ -51,7 +51,7 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
       NewLine;
     }
   }
-  sys_raw_dc_col=text_cols*cursor_row+cursor_col-line_start_col;
+  sys_raw_col=text_cols*cursor_row+cursor_col-line_start_col;
   RawPutChar(0x7F);
 }
 
@@ -61,7 +61,7 @@ U0 EdLite(U8 *filename,I64 num=1)
 //Light weight text editor for debugging
   U8 *src,*src2,*src3,*dst,*buf,*bin_data=NULL;
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
-	old_dc_flags=sys_raw_dc_flags;
+	old_raw_flags=sys_raw_flags;
   CLine root,*templ,*templ1,*cur_line;
   Bool old_raw=Raw(ON),
 	old_debug=InDbg(ON),
@@ -72,7 +72,7 @@ U0 EdLite(U8 *filename,I64 num=1)
 
   PushFD;
   Cli;
-  sys_raw_dc_flags=sys_raw_dc_flags&~RDCF_SCROLL|RDCF_SHOW_DOLLAR;
+  sys_raw_flags=sys_raw_flags&~RWF_SCROLL|RWF_SHOW_DOLLAR;
   sys_cur_scan_code=0;
   QueInit(&root);
   root.line=StrNew("");
@@ -289,7 +289,7 @@ U0 EdLite(U8 *filename,I64 num=1)
   Raw(old_raw);
   InDbg(old_debug);
   SingleUser(old_single);
-  sys_raw_dc_flags=sys_raw_dc_flags&~RDCF_SHOW_DOLLAR|old_dc_flags&RDCF_SHOW_DOLLAR;
+  sys_raw_flags=sys_raw_flags&~RWF_SHOW_DOLLAR|old_raw_flags&RWF_SHOW_DOLLAR;
   PopFD;
 }
 
@@ -317,7 +317,7 @@ U0 EdLiteFileLine(U8 *fl_file_line)
 
 U0 SetFix(U8 *filename,I64 line)
 {
-  U8 *st=MSPrintF("FL:%s,%d",filename,line);
+  U8 *st=MPrint("FL:%s,%d",filename,line);
   while (LBts(&sys_semas[SYS_SEMA_FIX],0))
     Yield;
   Free(sys_fix_file_line);

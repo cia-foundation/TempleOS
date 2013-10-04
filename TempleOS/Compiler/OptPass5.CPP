@@ -2,32 +2,30 @@ U0 OptPass5(CLex *lx)
 {
   CIntermediateCode *tempi,*tempi1;
   I64 code,i,ty,pt,ty1,pt1;
-  CPrsStk *ps=OptStart(lx);
+  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
+  ps->ptr=0;
+  ps->ptr2=0;
 
-  tempi=lx->cbh.cb_in_ptr;
-  if (tempi->ic_opcode==IC_START)
-    tempi++;
+  tempi=lx->lcc.lcc_root.next;
   while (code=tempi->ic_opcode) {
     if (code>IC_NOP2) {
       if (tempi->ic_flags&ICF_TRACE) {
 	if (Bt(&lx->pass_trace_mask,5)) {
 	  "%2d:",ps->ptr;
-	  CBPutIC(tempi);
+	  ICPut(tempi);
 	}
       }
-
       if (cmp_arg_cnt[code]==9)
 	ps->ptr-=tempi->ic_data>>3;
       if (code==IC_PUSH_REGS) {
 	for (i=0;i<NUM_REGS;i++)
 	  if (Bt(&tempi->ic_data,i))
 	    ps->ptr++;
-	} else if (code==IC_POP_REGS) {
+      } else if (code==IC_POP_REGS) {
 	for (i=0;i<NUM_REGS;i++)
 	  if (Bt(&tempi->ic_data,i))
 	    ps->ptr--;
-	}
-
+      }
       if (tempi->p2.type&TY_MASK==TY_STK) {
 	tempi1=PrsPop(ps);
 	if (tempi1->ic_opcode==IC_MOV ||
@@ -64,7 +62,7 @@ U0 OptPass5(CLex *lx)
 
 	  tempi->p2.reg=tempi1->p1.reg;
 	  tempi->p2.disp=tempi1->p1.disp;
-	  tempi->ic_flags|=tempi1->ic_flags&ICF_NO_CVT_MASK;
+	  tempi->ic_flags|=tempi1->ic_flags&ICG_NO_CVT_MASK;
 	  OptSetNOP2(tempi1);
 	}
       }
@@ -108,14 +106,18 @@ U0 OptPass5(CLex *lx)
 
 	  tempi->p1.reg=tempi1->p1.reg;
 	  tempi->p1.disp=tempi1->p1.disp;
-	  tempi->ic_flags|=tempi1->ic_flags&ICF_NO_CVT_MASK;
+	  tempi->ic_flags|=tempi1->ic_flags&ICG_NO_CVT_MASK;
 	  OptSetNOP2(tempi1);
 	}
       }
       if (tempi->r.type&TY_MASK==TY_STK)
 	PrsPush(ps,tempi);
     }
-    tempi++;
+    tempi=tempi->next;
   }
-  OptEnd(lx,ps);
+  if (ps->ptr>2) {
+    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
+    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
 }

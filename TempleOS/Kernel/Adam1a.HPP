@@ -4,7 +4,7 @@
 
 //The internal types are U16i,I32i, etc.
 //They are defined $LK,"internal_types_table","MN:internal_types_table"$.
-//Holy C has a feature where a
+//HolyC has a feature where a
 //union structure is treated as a
 //whole if no member is specified.
 //See $LK-A,"::/TempleOS/Demo/SubIntAccess.CPP"$.
@@ -149,6 +149,7 @@ public class CQue
 #define OC_BPT			0xCC
 #define OC_CALL			0xE8
 #define OC_JMP_REL8		0xEB
+#define OC_NOP2			(OC_NOP<<8+OC_OP_SIZE_PREFIX)
 
 //Function Stack Frame
 #define SF_RBP	0x00
@@ -319,7 +320,7 @@ public class CSpring
   U0 start_saved_area;
   U32 flags,num,
      end1_num,end2_num;
-  F64 constant,rest_len;
+  F64 const,rest_len;
   U0 end_saved_area;
 };
 
@@ -625,45 +626,40 @@ class CSema
 #define SYS_SEMA_DEBUG			0
 #define SYS_SEMA_DETERMINISTIC		1
 #define SYS_SEMA_RECORD_MACRO		2
-#define SYS_SEMA_NO_IO_SND		3
-#define SYS_SEMA_SYS_TIMER		4
-#define SYS_SEMA_SYS_DATE		5
-#define SYS_SEMA_IN_DEBUGGER		6
-#define SYS_SEMA_SND			7
-#define SYS_SEMA_HEAPLOG_ACTIVE		8
-#define SYS_SEMA_HEAPLOG_LOCK		9
-#define SYS_SEMA_REFRESH_IN_PROGRESS	10
-#define SYS_SEMA_FLUSH_VGA_IMAGE	11
-#define SYS_SEMA_SINGLE_USER		12
-#define SYS_SEMA_DSK_CACHE		13
-#define SYS_SEMA_FAR_CALL32		14
-#define SYS_SEMA_DEV_MEM		15
-#define SYS_SEMA_VGA			16
-#define SYS_SEMA_UPDATE_WIN_Z_BUF	17
-#define SYS_SEMA_TNP			18
-#define SYS_SEMA_MUTE			19
-#define SYS_SEMA_FORCE_WINMGR		20
-#define SYS_SEMA_TMBEAT			21
-#define SYS_SEMA_FIX			22
-#define NUM_SYS_SEMAS			23
+#define SYS_SEMA_SYS_TIMER		3
+#define SYS_SEMA_SYS_DATE		4
+#define SYS_SEMA_IN_DEBUGGER		5
+#define SYS_SEMA_SND			6
+#define SYS_SEMA_HEAPLOG_ACTIVE		7
+#define SYS_SEMA_HEAPLOG_LOCK		8
+#define SYS_SEMA_REFRESH_IN_PROGRESS	9
+#define SYS_SEMA_FLUSH_VGA_IMAGE	10
+#define SYS_SEMA_SINGLE_USER		11
+#define SYS_SEMA_DSK_CACHE		12
+#define SYS_SEMA_FAR_CALL32		13
+#define SYS_SEMA_DEV_MEM		14
+#define SYS_SEMA_VGA			15
+#define SYS_SEMA_UPDATE_WIN_Z_BUF	16
+#define SYS_SEMA_TT			17
+#define SYS_SEMA_MUTE			18
+#define SYS_SEMA_FORCE_WINMGR		19
+#define SYS_SEMA_TMBEAT			20
+#define SYS_SEMA_FIX			21
+#define NUM_SYS_SEMAS			22
 
 #define SYSf_CTRL_ALT_DEL		0
 #define SYSf_CTRL_ALT_C			1
 #define SYSf_CTRL_ALT_X 		2
 #define SYSf_CTRL_ALT_TAB		3
 
-//Extern calls
-//I'm the only one allowed to create these.
-//They work with $LK,"CallExtNum","MN:CallExtNum"$().
-//I guess you could reallocate
-//and extend $LK,"ext","MN:ext"$[] and copy it.
+//Asm callable function pointers.
+//They work with $LK,"CallExtNum","MN:CallExtNum"$() when calling from HolyC.
 #define EXT_WIN_TO_TOP		0
 #define EXT_WIN_FOCUS		1
 #define EXT_HEAPLOG_MALLOC	2
 #define EXT_HEAPLOG_FREE	3
 #define EXT_RESUME_DBG		4
-
-#define EXT_TABLE_SIZE		5
+#define EXT_NUM_ENTRIES		5
 
 //Hash table types
 //$LK,"ST_HTT_TYPES","FF:::/TempleOS/Kernel/Define1a.CPP,ST_HTT_TYPES"$
@@ -683,14 +679,14 @@ class CSema
 #define HTt_FILE		13
 #define HTt_MODULE		14
 #define HTt_HELP_FILE		15
-#define HTt_NAMED_FRAME_PTR	16
+#define HTt_FRAME_PTR		16
 #define HTt_NUM_TYPES		17
 
 #define HTf_PRIVATE		25
 #define HTf_PUBLIC		26
 #define HTf_EXPORT		27
 #define HTf_IMPORT		28
-#define HTf_LIT			29
+#define HTf_IMM			29
 #define HTf_UNRESOLVED		30
 #define HTf_LOCAL		31
 
@@ -711,17 +707,17 @@ class CSema
 #define HTT_FILE		0x2000 //CHashGeneric
 #define HTT_MODULE		0x4000 //CHashGeneric
 #define HTT_HELP_FILE		0x8000 //CHashSrcSym
-#define HTT_NAMED_FRAME_PTR	0x10000 //CHashGeneric
-#define HTT_TYPE_MASK		0x1FFFF
+#define HTT_FRAME_PTR		0x10000 //CHashGeneric
+#define HTG_TYPE_MASK		0x1FFFF
 
 #define HTF_PRIVATE		0x02000000
 #define HTF_PUBLIC		0x04000000
 #define HTF_EXPORT		0x08000000
 #define HTF_IMPORT		0x10000000
-#define HTF_LIT			0x20000000
+#define HTF_IMM			0x20000000
 #define HTF_UNRESOLVED		0x40000000
 #define HTF_LOCAL		0x80000000
-#define HTF_FLAGS_MASK		0xFE000000
+#define HTG_FLAGS_MASK		0xFE000000
 
 #define HTG_SRC_SYM		(HTT_DEFINE_STR|HTT_GLBL_VAR|HTT_FUN|HTT_CLASS|HTT_EXPORT_SYS_SYM|HTT_HELP_FILE)
 #define HTG_ALL 		-1
@@ -751,7 +747,7 @@ public class CHash
 //each time a node is found in a hash search.
 //One place it is used is to tell if a externed function was unused
 //before being defined.  It is also used for popularity measures
-//in wordstat.	You can do a $LK,"HashRep","MN:HashRep"$() to see
+//in wordstat.	You can do a $LK,"Who","MN:Who"$() to see
 //roughly how many times a symbol has been
 //referenced.	Beware of instances where
 //a hash entry is continuously searched for and
@@ -821,11 +817,12 @@ public class CHashDefineStr:CHashSrcSym
 
 //Member Lst Flags
 #define MLF_DFT_AVAILABLE	1
-#define MLF_STR_DFT_AVAILABLE	2
-#define MLF_FUN			4
-#define MLF_DOT_DOT_DOT		8
-#define MLF_NO_UNUSED_WARN	16
-#define MLF_STATIC		32
+#define MLF_LASTCLASS		2
+#define MLF_STR_DFT_AVAILABLE	4
+#define MLF_FUN			8
+#define MLF_DOT_DOT_DOT		16
+#define MLF_NO_UNUSED_WARN	32
+#define MLF_STATIC		64
 
 public class CArrayDim
 {
@@ -889,10 +886,11 @@ class CExternUsage
 //Function flags
 #define Ff_INTERNAL		8
 #define Ff_INTERRUPT		9
-#define Ff_DOT_DOT_DOT		10
-#define Ff_RET1			11
-#define Ff_ARGPOP		12
-#define Ff_NOARGPOP		13
+#define Ff_HASERRCODE		10
+#define Ff_DOT_DOT_DOT		11
+#define Ff_RET1			12
+#define Ff_ARGPOP		13
+#define Ff_NOARGPOP		14
 
 public class CHashFun:CHashClass
 { //See $LK,"PrsFunNew","MN:PrsFunNew"$().
@@ -955,16 +953,13 @@ public class CHashGlblVar:CHashSrcSym
 
 //Acct Registry sys_msg_flags
 #define ARf_FLOODFILL			0
-//obsolete
-#define ARf_CSPRITE_INS_CLIPBOARD	2
-//obsolete
-#define ARf_CSPRITE_PICK_GRAPHICALLY	4
-#define ARf_PLANAR_SYMMETRY		5
-#define ARf_MUSIC_ORGAN_JUKEBOX		6
-#define ARf_MESH_ED			7
-//obsolete
-#define ARf_CSPRITE_PTS_RECTANGLES	9
-#define ARf_MANAGE_SLIDER		10
+#define ARf_CSPRITE_INS_CLIPBOARD	1
+#define ARf_CSPRITE_PICK_GRAPHICALLY	2
+#define ARf_PLANAR_SYMMETRY		3
+#define ARf_MUSIC_ORGAN_JUKEBOX		4
+#define ARf_MESH_ED			5
+#define ARf_CSPRITE_PTS_RECTANGLES	6
+#define ARf_MANAGE_SLIDER		7
 
 #define SVCf_WAKE_MASTER	0
 #define SVCf_FOCUS_MASTER	1
@@ -1067,24 +1062,22 @@ class CBpt
 #define DOCT_MACRO		30
 #define DOCT_MENU_VAL		31
 #define DOCT_HEX_ED		32
-#define DOCT_HIDE_START		33
-#define DOCT_HIDE_END		34
-#define DOCT_TREE		35
-#define DOCT_SPRITE		36
-#define DOCT_INS_BINARY		37
-#define DOCT_INS_BINARY_TYPE	38
-#define DOCT_INS_BINARY_SIZE	39
-#define DOCT_BPT		40
-#define DOCT_SONG		41
-#define DOCT_HIGHLIGHT		42
-#define DOCT_LOCK_TO_PAGE	43
-#define DOCT_LOCK_TO_CENTER	44
-#define DOCT_HTML_IMG		45
-#define DOCT_HTML_VIDEO		46
-#define DOCT_HTML_CODE		47
-#define DOCT_ERROR		48
+#define DOCT_TREE		33
+#define DOCT_SPRITE		34
+#define DOCT_INS_BINARY		35
+#define DOCT_INS_BINARY_TYPE	36
+#define DOCT_INS_BINARY_SIZE	37
+#define DOCT_BPT		38
+#define DOCT_SONG		39
+#define DOCT_HIGHLIGHT		40
+#define DOCT_LOCK_TO_PAGE	41
+#define DOCT_LOCK_TO_CENTER	42
+#define DOCT_HTML_IMG		43
+#define DOCT_HTML_VIDEO		44
+#define DOCT_HTML_CODE		45
+#define DOCT_ERROR		46
 
-#define DOCT_NUM_TYPES		49
+#define DOCT_NUM_TYPES		47
 
 //CDocEntry.type flags upper bits
 #define DOCET_BLINK		ATTRF_BLINK
@@ -1278,7 +1271,6 @@ public class CDocBin
 #define DOC_COLOR_LINK		RED
 #define DOC_COLOR_MACRO		LTBLUE
 #define DOC_COLOR_ANCHOR	DKGRAY
-#define DOC_COLOR_HIDDEN	DKGRAY
 #define DOC_COLOR_TREE		PURPLE
 #define DOC_COLOR_PMT		GREEN
 #define DOC_COLOR_BIN		CYAN
@@ -1377,8 +1369,8 @@ class CEdFindText
 {
   U8	find_text[136]		fmtstr "$$DA-P,135,\"Find        :%s\"$$\n";
   U8	replace_text[136]	fmtstr "$$DA-P,135,\"Replace     :%s\"$$\n";
-  Bool replace		fmtstr "$$CB,\"Replace\"$$\n";
-  Bool scan_fwd		fmtstr "$$CB,\"Fwd\"$$\n";
+  Bool replace			fmtstr "$$CB,\"Replace\"$$\n";
+  Bool scan_fwd			fmtstr "$$CB,\"Fwd\"$$\n";
   Bool scan_selected_text	fmtstr "$$CB,\"Selection\"$$\n";
   Bool match_case		fmtstr "$$CB,\"Match Case\"$$\n";
   Bool whole_labels		fmtstr "$$CB,\"Whole Labels\"$$\n";
@@ -1425,7 +1417,8 @@ class CEdFileName
 #define DOCF_BREAK_UNLOCKED	0x80000
 #define DOCF_BORDER_DOC		0x100000
 #define DOCF_HIDE_CURSOR	0x200000 //use $LK,"DocCursor","MN:DocCursor"$
-//2 unused flags
+#define DOCF_CARRIAGE_RETURN	0x400000
+#define DOCF_NO_SCROLL_BARS	0x800000 //use $LK,"DocScroll","MN:DocScroll"$
 
 #define DOCF_HIGHLIGHT		DOCEF1_HIGHLIGHT
 #define DOCF_LOCK_TO_PAGE	DOCEF1_LOCK_TO_PAGE
@@ -1435,9 +1428,6 @@ class CEdFileName
 #define DOCF_INVERT		DOCEF1_INVERT
 #define DOCF_SELECTED		DOCEF1_SELECTED
 #define DOCF_UNDERLINE		DOCEF1_UNDERLINE
-
-#define DOCF_CARRIAGE_RETURN	0x100000000
-#define DOCF_NO_SCROLL_BARS	0x200000000 //use $LK,"DocScroll","MN:DocScroll"$
 
 #define DOCf_OVERSTRIKE 	0
 #define DOCf_PLAIN_TEXT 	1
@@ -1461,7 +1451,8 @@ class CEdFileName
 #define DOCf_BREAK_UNLOCKED	19
 #define DOCf_BORDER_DOC		20
 #define DOCf_HIDE_CURSOR	21  //use $LK,"DocCursor","MN:DocCursor"$
-//2 unused flags
+#define DOCf_CARRIAGE_RETURN	22
+#define DOCf_NO_SCROLL_BARS	23
 
 #define DOCf_HIGHLIGHT		DOCEf1_HIGHLIGHT
 #define DOCf_LOCK_TO_PAGE	DOCEf1_LOCK_TO_PAGE
@@ -1472,8 +1463,6 @@ class CEdFileName
 #define DOCf_SELECTED		DOCEf1_SELECTED
 #define DOCf_UNDERLINE		DOCEf1_UNDERLINE
 
-#define DOCf_CARRIAGE_RETURN	32
-#define DOCf_NO_SCROLL_BARS	33
 
 //locked flags
 #define DOClf_LOCKED		0
@@ -1487,6 +1476,7 @@ class CDocUndo
 };
 
 //See $LK,"DocMenuDo","MN:DocMenuDo"$()
+#define DOCM_EXIT		0
 #define DOCM_CANCEL		(-1)
 
 #define DOC_SIGNATURE_VAL		'DocS'
@@ -1510,9 +1500,8 @@ public class CDoc //Linked Text File header
   U8 *dollar_buf;
   CTask *win_task,*mem_task;
   CDocEntry *recalc_start;
-  I32 page_line_num;
+  I32 page_line_num,undo_cnt;
   I32 x,y,min_x,max_x,min_y,max_y;
-  I32 undo_cnt;
   I64 line,col,best_d;
   I64 old_win_top,old_win_bottom,
      old_win_left,old_win_right;
@@ -1576,7 +1565,7 @@ U0 pad;#assert !($$&7) //(compiler lags one token)
 #define OPTf_GLBLS_ON_DATA_HEAP	0x24
 //Disable 10-byte float consts for ã,log2_10,log10_2,loge_2
 #define OPTf_NO_BUILTIN_CONST	0x25 //Applied to funs, not statements
-#define OPTf_USE_LIT64		0x26 //Not completely implemented
+#define OPTf_USE_IMM64		0x26 //Not completely implemented
 
 #define OPTF_ECHO		(1<<OPTf_ECHO)
 #define OPTF_PARSE_TRACE	(1<<OPTf_PARSE_TRACE)
@@ -1639,7 +1628,7 @@ class CLexUndef
 #define ICF_DEL_PREVIOUS_INS		0x100000000
 #define ICF_PREVIOUS_DELETED		0x200000000
 #define ICF_DONT_RESTORE		0x400000000
-#define ICF_NO_CVT_MASK			0x7FFFFFF00
+#define ICG_NO_CVT_MASK			0x7FFFFFF00
 
 #define IC_BODY_SIZE			48
 
@@ -1660,16 +1649,19 @@ class CICTreeLinks
   CHashClass *class2;
 };
 
-class CIntermediateCode
+class CIntermediateCodeBase
 {
+  CIntermediateCode *next,*last;
   U16 ic_opcode;
   U16 ic_precedence;
   I16 ic_cnt;
   I16 ic_last_cnt;
+};
 
+class CIntermediateCode:CIntermediateCodeBase
+{
   I64 ic_flags;
   I64 ic_data;
- 
 
   CHashClass *ic_class;
   CHashClass *ic_class2;
@@ -1685,7 +1677,7 @@ class CIntermediateCode
     //points back to its two earlier addend instructions -- not MAlloced,
     //just pointers to previous CIntermediate codes in the array.
 
-    //Tree links get destroyed during Pass789A when they get overwrites
+    //Tree links get destroyed during Pass789 when they get overwrites
     //by machine code.	(Saves room to union the output machine code buffer
     //with these links, since they are not needed after pass4.
 
@@ -1703,30 +1695,23 @@ class CPrsStk
   I64 stk2[255];
 };
 
-#define CB_IC_CNT 511
-class CCodeBlk
+#define CMT_LABEL		0
+#define CMT_GOTO_LABEL		1
+#define CMT_STR_CONST		2
+#define CMT_JMP_TABLE		3
+#define CMT_FLOAT_CONSTS	4
+#define CMT_ARRAY_DIM		5
+#define CMT_HASH_ENTRY		6
+
+#define CMF_USED		1
+#define CMF_POP_CMP		2
+#define CMF_DEFINED		4
+
+#define CM_MAX_CONSTS		16
+
+class CLexCodeMisc
 {
-  CCodeBlk *next;
-  CIntermediateCode data[CB_IC_CNT];
-};
-
-#define CBMT_LABEL		0
-#define CBMT_GOTO_LABEL		1
-#define CBMT_STR_CONST		2
-#define CBMT_JMP_TABLE		3
-#define CBMT_FLOAT_CONSTS	4
-#define CBMT_ARRAY_DIM		5
-#define CBMT_HASH_ENTRY		6
-
-#define CBMF_USED		1
-#define CBMF_POP_CMP		2
-#define CBMF_DEFINED		4
-
-#define CBM_MAX_CONSTS		16
-
-class CCodeBlkMisc
-{
-  CCodeBlkMisc *next,*fwd,*dft;
+  CLexCodeMisc *next,*last,*fwd,*dft;
   U8 *str;
   U32 type,flags;
   U8 *addr;
@@ -1796,7 +1781,7 @@ I64 class CAbsCntsI64
 class CAsmNum
 {
   I64 i;
-  U8 *exp;
+  U8 *ex;
   CLexUndef *undef_local,*undef_glbl;
   CAbsCntsI64 abs_cnts;
 };
@@ -1804,7 +1789,8 @@ class CAsmNum
 class CAsmNum2
 {
   CAsmNum num;
-  I64 U8_cnt,rel,lit;
+  I64 U8_cnt,rel;
+  Bool imm_flag;
 };
 
 class CAsmIns
@@ -1831,27 +1817,27 @@ class CAsmUnresolvedRef
 {
   CAsmUnresolvedRef *next;
   I64 type,line_num;
-  U8 *exp;
+  U8 *ex;
   I64 ip,rel_ip;
   U8 *str;  //Only for import glbls
   CLexUndef *undef_hash;
   Bool U8_avail;
-  Bool lit;  //Only for import glbls
+  Bool imm_flag;  //Only for import glbls
 };
 
 
 #define EIE_END			0
 //reserved
 #define EIE_REL_EXPORT		2
-#define EIE_LIT_EXPORT		3
+#define EIE_IMM_EXPORT		3
 #define EIE_REL_U8		4
-#define EIE_LIT_U8		5
+#define EIE_IMM_U8		5
 #define EIE_REL_U16		6
-#define EIE_LIT_U16		7
+#define EIE_IMM_U16		7
 #define EIE_REL_U32		8
-#define EIE_LIT_U32		9
+#define EIE_IMM_U32		9
 #define EIE_REL_U64		10
-#define EIE_LIT_U64		11
+#define EIE_IMM_U64		11
 //reserved
 #define EIE_MAIN		16
 #define EIE_MODULE_ALIGNMENT	17
@@ -1901,8 +1887,8 @@ class CExeHeapGlbl
 
 class CExe
 {
-  U8 *code;
-  I64 code_U8s;
+  U8 *ex;
+  I64 ex_U8s;
   I64 max_align,module_org;
   CExe *parent_exe;
   CExeImportExport *next_ie,*last_ie;
@@ -1997,7 +1983,7 @@ class CExe
 #define TK_IDENT		0x100
 #define TK_STR			0x101
 #define TK_INTEGER		0x102
-#define TK_U8			0x103 // character(s) in single quotes
+#define TK_CHAR_CONST		0x103
 #define TK_F64			0x104
 #define TK_PLUS_PLUS		0x105
 #define TK_MINUS_MINUS		0x106
@@ -2048,7 +2034,7 @@ class CExe
 #define LF_KEEP_NUM_SIGN	128
 #define LF_KEEP_AT_SIGN		256
 #define Lf_OPT_TRACE_PRESENT	9
-#define LF_NOT_CONSTANT		0x0000010000
+#define LF_NOT_CONST		0x0000010000
 #define LF_NO_REG_OPT		0x0000020000
 #define LF_IN_QUOTES		0x0000040000
 #define LF_EXE_BLK		0x0000080000
@@ -2082,8 +2068,8 @@ class CAsmCtrl
 {
   I64 ip;	//instruction ptr
   CAsmArg arg1,arg2;
-  CAsmCodeBlk *code;
-  I64 num_code_U8s;
+  CAsmCodeBlk *cb;
+  I64 num_ex_U8s;
   I64 max_align,module_org;
   CAsmUnresolvedRef *local_unresolved,*glbl_unresolved;
   CExeAbsAddr *abss;
@@ -2101,18 +2087,11 @@ class CStreamBlk
   U8 *body;
 };
 
-class CLexCodeBlkCtrl
+class CLexCodeCtrl
 {
-  CLexCodeBlkCtrl	*cb_next;
-  CCodeBlk		*cb_out_first;
-  CCodeBlk		*cb_out_last;
-  CIntermediateCode	*cb_out_end;
-  CIntermediateCode	*cb_out_ptr;
-  CIntermediateCode	*cb_last_out_ptr;
-  CCodeBlk		*cb_in_first;
-  CIntermediateCode	*cb_in_end;
-  CIntermediateCode	*cb_in_ptr;
-  CCodeBlkMisc		*cb_misc_lst,*cb_misc_lst_end;
+  CLexCodeCtrl	*lcc_next;
+  CLexCodeMisc	*lcc_next_misc,*lcc_last_misc;
+  CIntermediateCodeBase	lcc_root;
 };
 
 #define NUM_REGS	16
@@ -2153,7 +2132,7 @@ public class CLex
   CAbsCntsI64	abs_cnts;
   CLexUndef	*undef_hash_entry;
   CMemberLst	*local_var_entry;
-  CCodeBlkMisc	*lb_leave;
+  CLexCodeMisc	*lb_leave;
   U8 *cur_buf_ptr;
   CLexFile *cur_lfn,*fun_lfn;
   I64 stk_ptr;
@@ -2171,7 +2150,7 @@ public class CLex
   Bool last_dont_pushable,last_dont_popable,last_float_op_pos,
 	 dont_push_float,pad[4];
 
-  CLexCodeBlkCtrl cbh;
+  CLexCodeCtrl lcc;
   CAsmCtrl *a;
   I64 a_depth;
 
@@ -2191,12 +2170,13 @@ class CPCIDev
   U8 *vendor_str,*dev_id_str;
 };
 
-#define TEMPLEOS_XSUM		0xA5CF3796
-#define FILENAME_MASK_JIT		"*.CPP*;*.HPP*"
-#define FILENAME_MASK_AOT		"*.CPP*;*.HPP*;*.PRJ*"
-#define FILENAME_MASK_SRC		"*.CPP*;*.HPP*;*.AUT*;*.PRJ*"
-#define FILENAME_MASK_TXT		FILENAME_MASK_SRC ";*.TXT*;*.LOG*"
-#define FILENAME_MASK_GRA		"*.GRA*;*.BMP*"
+#define TEMPLEOS_XSUM	0xA5CF3796
+
+#define FILEMASK_JIT	"*.CPP*;*.HPP*"
+#define FILEMASK_AOT	"*.CPP*;*.HPP*;*.PRJ*"
+#define FILEMASK_SRC	"*.CPP*;*.HPP*;*.AUT*;*.PRJ*"
+#define FILEMASK_TXT	FILEMASK_SRC ";*.TXT*;*.LOG*"
+#define FILEMASK_GRA	"*.GRA*;*.BMP*"
 
 public class CMBRPrt
 {
@@ -2306,6 +2286,7 @@ class CFAT32DirEntryLong
 };
 
 #define FAT32_ENTRIES_PER_BLK	(BLK_SIZE/sizeof(CFAT32DirEntry))
+#define FAT32_ENTRIES_BITS	Bsf(FAT32_ENTRIES_PER_BLK)
 
 public class CPalindromeU16
 {
@@ -2441,7 +2422,7 @@ public class CDateStruct
 #define DEF_REMOVABLE		2
 #define DEF_NOT_INITIALIZED	4
 
-#define CDIR_FILENAME_LEN	26
+#define CDIR_FILENAME_LEN	38 //Must have terminator
 public class CDirEntry
 {
   CDirEntry *next,*parent,*sub;
@@ -2452,10 +2433,8 @@ public class CDirEntry
   U0 start;
   U16 attr;
   U8 name[CDIR_FILENAME_LEN];
-  U32 xsum;
   I64 cluster;
   I64 size;
-  I64 expanded_size;
   CDate datetime;
 };
 
@@ -2501,7 +2480,6 @@ public class CBlkDev
   U32 bd_signature;
   U8 first_drv_let,unit,pad[2];
   U32 base0,base1;
-  U16 read_freq,write_freq;
   U32 blk_size;
   I64 offset,min_blk,max_blk;
   U16 *dev_id_record;
@@ -2607,8 +2585,8 @@ public class CCacheBlk
 #define EXCEPT_PRT		10
 #define EXCEPT_BLKDEV		11
 #define EXCEPT_GRAPHICS		12
-#define EXCEPT_SPRINTF		13
-#define EXCEPT_GETF		14
+#define EXCEPT_SPRINT		13
+#define EXCEPT_SCAN		14
 #define EXCEPT_BIN_MODULE	15
 #define EXCEPT_MULTICORE	16
 #define EXCEPT_FUF		17
@@ -3329,7 +3307,7 @@ class CTSS
 #define DCF_RECORD_EXTENTS	0x10000
 #define DCF_ON_TOP		0x20000
 
-#define DCT_COLOR4	1
+#define DCT_COLOR4	1 //Don't use this
 #define DCT_COLOR8	3
 
 #define DCS_SIGNATURE_VAL			'DvCS'
@@ -3503,15 +3481,15 @@ public class CArcCompress
 #define SUF_SAFE_DOLLAR		0x400
 #define SUF_SCALE_INDENT	0x800
 
-// Flags for SearchStr
-#define SRF_IGNORE_CASE		1
-#define SRF_WHOLE_LABELS_FRONT	2
-#define SRF_WHOLE_LABELS_BACK	4
-#define SRG_WHOLE_LABELS	(SRF_WHOLE_LABELS_FRONT|SRF_WHOLE_LABELS_BACK)
+// Flags for StrFind
+#define SFF_IGNORE_CASE		1
+#define SFF_WHOLE_LABELS_FRONT	2
+#define SFF_WHOLE_LABELS_BACK	4
+#define SFG_WHOLE_LABELS	(SFF_WHOLE_LABELS_FRONT|SFF_WHOLE_LABELS_BACK)
 
-//Flags for LstEntryMatch
-#define LEF_IGNORE_CASE		1
-#define LEF_EXACT		2
+//Flags for LstMatch
+#define LMF_IGNORE_CASE		1
+#define LMF_EXACT		2
 
 #define ISO1_ATTR_DIR		2
 
@@ -3566,11 +3544,11 @@ public class CFile
 #define FUf_MAP			7
 #define FUf_JUST_DIRS		8
 #define FUf_JUST_FILES		9
-#define FUf_JUST_TXT_FILES	10
-#define FUf_JUST_SRC_FILES	11
-#define FUf_JUST_AOT_FILES	12
-#define FUf_JUST_JIT_FILES	13
-#define FUf_JUST_GRA_FILES	14
+#define FUf_JUST_TXT	10
+#define FUf_JUST_SRC	11
+#define FUf_JUST_AOT	12
+#define FUf_JUST_JIT	13
+#define FUf_JUST_GRA	14
 #define FUf_Z_OR_NOT_Z		15
 #define FUf_SCAN_PARENTS	16
 #define FUf_FLATTEN_TREE	17
@@ -3588,11 +3566,11 @@ public class CFile
 #define FUF_MAP			0x000080 //m
 #define FUF_JUST_DIRS		0x000100 //D
 #define FUF_JUST_FILES		0x000200 //F
-#define FUF_JUST_TXT_FILES	0x000400 //T
-#define FUF_JUST_SRC_FILES	0x000800 //S
-#define FUF_JUST_AOT_FILES	0x001000 //A
-#define FUF_JUST_JIT_FILES	0x002000 //J
-#define FUF_JUST_GRA_FILES	0x004000 //G
+#define FUF_JUST_TXT		0x000400 //T
+#define FUF_JUST_SRC		0x000800 //S
+#define FUF_JUST_AOT		0x001000 //A
+#define FUF_JUST_JIT		0x002000 //J
+#define FUF_JUST_GRA		0x004000 //G
 #define FUF_Z_OR_NOT_Z		0x008000 //Z
 #define FUF_SCAN_PARENTS	0x010000 //P
 #define FUF_FLATTEN_TREE	0x020000 //f
@@ -3600,9 +3578,8 @@ public class CFile
 #define FUF_WHOLE_LABELS_FRONT	0x080000 //lf
 #define FUF_WHOLE_LABELS_BACK	0x100000 //lb
 
-#define FUG_FILES_FIND	(FUF_RECURSE|FUF_JUST_DIRS|FUF_JUST_FILES|\
-  FUF_JUST_TXT_FILES|FUF_JUST_SRC_FILES|\
-  FUF_JUST_AOT_FILES|FUF_JUST_JIT_FILES|FUF_JUST_GRA_FILES|FUF_FLATTEN_TREE)
+#define FUG_FILES_FIND	(FUF_RECURSE|FUF_JUST_DIRS|FUF_JUST_FILES|FUF_JUST_TXT|\
+  FUF_JUST_SRC|FUF_JUST_AOT|FUF_JUST_JIT|FUF_JUST_GRA|FUF_FLATTEN_TREE)
 #define FUG_FILE_FIND	(FUF_JUST_DIRS|FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS)
 
 #define CPU_WALLPAPER_DATA_SIZE		128
@@ -3702,11 +3679,11 @@ class CSndData
   F64 time_stamp;
 };
 
-//sys_raw_dc_flags flags
-#define RDCF_IN_DOLLAR		1
-#define RDCF_LAST_DOLLAR	2
-#define RDCF_SHOW_DOLLAR	4
-#define RDCF_SCROLL		8
+//sys_raw_flags flags
+#define RWF_IN_DOLLAR	1
+#define RWF_LAST_DOLLAR	2
+#define RWF_SHOW_DOLLAR	4
+#define RWF_SCROLL	8
 
 //Input ptr types
 #define IP_NULL		0

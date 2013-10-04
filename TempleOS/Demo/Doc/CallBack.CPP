@@ -7,15 +7,15 @@ U8 *tSCB(CDoc *,CDocEntry *,CTask *mem_task)
   U8 *st=MAlloc(64,mem_task);
   CDate cdt=tS*CDATE_FREQ;
   //Doesn't have to be fixed width!!
-  SPrintF(st,"%d=%h11T",cdt,cdt);
+  SPrint(st,"%d=%h11T",cdt,cdt);
   return st;
 }
 
 U8 *CurTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  CDate cdt=GetCurTimeDate;
-  SPrintF(st,"%h0D %h0T",cdt,cdt);
+  CDate cdt=GetDateTime;
+  SPrint(st,"%h0D %h0T",cdt,cdt);
   return st;
 }
 
@@ -32,10 +32,10 @@ U0 DoIt()
   Bool old_preempt=Preempt(OFF);
 
   DocBottom(bdoc);  //Ins at the bottom
-  DocPutS(bdoc,"$$FG,RED$$$$CM+BY+LX,5,-3$$");
+  DocPrint(bdoc,"$$FG,RED$$$$CM+BY+LX,5,-3$$");
 
-// The $LK,"DocPutS","MN:DocPutS"$() routine returns the addr of the last entry.
-  doc_e=DocPutS(bdoc,"$$TX+TC,\" \"$$");
+// The $LK,"DocPrint","MN:DocPrint"$() routine returns the addr of the last entry.
+  doc_e=DocPrint(bdoc,"$$TX+TC,\" \"$$");
 // The TC flag is "has tag callback".
 
 // Flags are explained here:
@@ -45,7 +45,7 @@ U0 DoIt()
 //	$LK,"ST_DOC_FLAGS","FF:::/TempleOS/Adam/Doc/Doc.CPP,ST_DOC_FLAGS"$
 
   doc_e->tag_cb=&tSCB;
-  DocPutS(bdoc,"$$FG$$");
+  DocPrint(bdoc,"$$FG$$");
 
 //$BK,1$WARNING:$BK,0$ If you use the put_doc you
 //run the risk of the user pressing
@@ -53,10 +53,10 @@ U0 DoIt()
 //of which will crash.	So, you might want
 //to use the border_doc.
 
-  DocPutS(pdoc,"$$FG,LTRED$$");
-  doc_e=DocPutS(pdoc,"$$TX+TC,\" \"$$");
+  DocPrint(pdoc,"$$FG,LTRED$$");
+  doc_e=DocPrint(pdoc,"$$TX+TC,\" \"$$");
   doc_e->tag_cb=&CurTimeCB;
-  DocPutS(pdoc,"$$FG$$");
+  DocPrint(pdoc,"$$FG$$");
 
   Preempt(old_preempt);
 

@@ -137,9 +137,9 @@ public U0 IDE(U8 *filename)
 	"simple stuff, sort-of.\n\n"
 	"I recommend making use of:\n"
 	"$$LK,\"progress1\",\"MN:progress1\"$$-$$LK,\"progress4\",\"MN:progress4\"$$,       -- glbl I64 vars shown on wallpaper\n"
-	"$$LK,\"DbgI64\",\"MN:DbgI64\"$$() $$LK,\"DbgStr\",\"MN:DbgStr\"$$() $$LK,\"DbgAdd\",\"MN:DbgAdd\"$$() -- raw text output for a time\n"
+	"$$LK,\"RawI64\",\"MN:RawI64\"$$() $$LK,\"RawStr\",\"MN:RawStr\"$$() $$LK,\"RawAdd\",\"MN:RawAdd\"$$() -- raw text output for a time\n"
 	"$$LK,\"Beep\",\"MN:Beep\"$$() $$LK,\"Snd\",\"MN:Snd\"$$()               -- sound\n"
-	"$$LK,\"AdamLog\",\"MN:AdamLog\"$$() $$LK,\"AdamErr\",\"MN:AdamErr\"$$()        -- printf to adam task's window\n"
+	"$$LK,\"AdamLog\",\"MN:AdamLog\"$$() $$LK,\"AdamErr\",\"MN:AdamErr\"$$()        -- print to adam task's window\n"
 	"$$LK,\"SysDbg\",\"MN:SysDbg\"$$() and $$LK,\"IsSysDbg\",\"MN:IsSysDbg\"$$()    -- just a flag\n\n")) {
     SetWinHorz(1,TEXT_COLS>>1-1);
     SetWinVert(2,TEXT_ROWS-2);
@@ -211,7 +211,7 @@ U0 IDESetStepRange(CDoc *doc)
   I64 line=doc->cur_entry->y+1;
   CHashTable *h=Fs->hash_table;
   CHashFun *tempf;
-  CIDE *tempi=NamedFramePtr("IDEFrame");
+  CIDE *tempi=FramePtr("IDEFrame");
   CDbgInfo *dbg;
   while (h) {
     tempf=h->next_added;
@@ -266,7 +266,7 @@ U0 IDEToggleBpt(CDoc *doc)
 	      doc->cur_data_col=doc_e->min_col;
 	      if (!BptR(a,Fs->parent_task)) {
 		BptS(a,Fs->parent_task);
-		DocPutS(doc,"$$BP$$");
+		DocPrint(doc,"$$BP$$");
 	      } else {
 		if (doc_e->type_u8==DOCT_BPT) {
 		  doc->cur_entry=doc_e->next;
@@ -314,10 +314,10 @@ U0 IDEClearAllBpts(CDoc *doc)
 U0 IDEGo()  //Continue after breakpoint
 { //F5
   CTask *task=Fs->parent_task;
-  CIDE *tempi=NamedFramePtr("IDEFrame");
+  CIDE *tempi=FramePtr("IDEFrame");
   if (!tempi) {
     tempi=CAlloc(sizeof(CIDE));
-    NamedFramePtrAdd("IDEFrame",tempi);
+    FramePtrAdd("IDEFrame",tempi);
   }
   IDEWaitParent;
   LBts(&task->task_flags,TASKf_DISABLE_BPTS);
@@ -333,10 +333,10 @@ U0 IDEStepOver(CDoc *doc)
   I64 line;
   U8 *opcode;
 
-  CIDE *tempi=NamedFramePtr("IDEFrame");
+  CIDE *tempi=FramePtr("IDEFrame");
   if (!tempi) {
     tempi=CAlloc(sizeof(CIDE));
-    NamedFramePtrAdd("IDEFrame",tempi);
+    FramePtrAdd("IDEFrame",tempi);
   }
 
   IDEWaitParent;
@@ -373,10 +373,10 @@ U0 IDEStepInto(CDoc *doc)
   CTask *task=Fs->parent_task;
   I64 line;
 
-  CIDE *tempi=NamedFramePtr("IDEFrame");
+  CIDE *tempi=FramePtr("IDEFrame");
   if (!tempi) {
     tempi=CAlloc(sizeof(CIDE));
-    NamedFramePtrAdd("IDEFrame",tempi);
+    FramePtrAdd("IDEFrame",tempi);
   }
 
   IDEWaitParent;
@@ -407,16 +407,16 @@ U0 IDEEdTask(I64)
   if (rip_filename=SrcFileName(rip)) {
     ed_task=Spawn(&UserCmdLine,NULL,"Debug",,task);
     TaskWait(ed_task);
-    st=MSPrintF("Preempt(OFF);Ed(\"%s\");\n",rip_filename);
+    st=MPrint("Preempt(OFF);Ed(\"%s\");\n",rip_filename);
     XTalkWait(ed_task,st);
     Free(st);
     doc=DocPut(ed_task);
     if (TaskValidate(dbg_task=task->dbg_task)) {
       SetWinHorz(dbg_task->win_left,dbg_task->win_right, ed_task);
       SetWinVert(dbg_task->win_top, dbg_task->win_bottom,ed_task);
-      if (tempi=NamedFramePtr("IDEFrame",dbg_task)) {
+      if (tempi=FramePtr("IDEFrame",dbg_task)) {
 	tempi1=MAllocIdentical(tempi,ed_task);
-	NamedFramePtrAdd("IDEFrame",tempi1);
+	FramePtrAdd("IDEFrame",tempi1);
       }
       Kill(dbg_task);
     }
@@ -426,7 +426,7 @@ U0 IDEEdTask(I64)
       if (bpt_filename=SrcFileName(tempb->addr)) {
 	if (!StrCmp(rip_filename,bpt_filename)) {
 	  DocLineNumGoTo(doc,SrcLineNum(tempb->addr));
-	  DocPutS(doc,"$$BP$$");
+	  DocPrint(doc,"$$BP$$");
 	}
 	Free(bpt_filename);
       }
@@ -441,7 +441,7 @@ U0 IDEEdTask(I64)
 U0 IDEResumeDbg()
 {
   CTask *dbg_task=Fs->dbg_task;
-  CIDE *tempi=NamedFramePtr("IDEFrame",dbg_task);
+  CIDE *tempi=FramePtr("IDEFrame",dbg_task);
   U8 *opcode;
   if (!tempi) {
     Spawn(&IDEEdTask,NULL,"Resume Dbg",,Fs);

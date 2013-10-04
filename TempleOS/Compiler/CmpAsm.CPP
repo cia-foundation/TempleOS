@@ -1,164 +1,5 @@
 asm {
 USE64
-CMP_OPT_NOP:
-#assert CIntermediateCode.ic_opcode==0
-	DU16	IC_NOP1;  //Must be at CIntermediateCode.ic_opcode offset
-	DU8	sizeof(CIntermediateCode)-2 DUP(0);
-
-// ************************************
-_OPTNEXT::
-	ENTER	0
-	PUSH	RDI
-	MOV	RCX,U64 SF_ARG1[RBP]
-	MOV	RDX,U64 SF_ARG2[RBP]
-	
-	MOV	RAX,U64 16[RDX]
-	MOV	U64 24[RDX],RAX
-	MOV	RAX,U64 8[RDX]
-	MOV	U64 16[RDX],RAX
-	MOV	RAX,U64 [RDX]
-	MOV	U64 8[RDX],RAX
-	MOV	U64 [RDX],RCX
-
-	MOV	RDI,RDX
-
-	MOV	RAX,RCX
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JBE	@@05
-	STOSQ
-
-@@05:	MOV	RAX,U64 8[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JBE	@@10
-	STOSQ
-
-@@10:	MOV	RAX,U64 16[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JBE	@@15
-	STOSQ
-
-@@15:	MOV	RAX,U64 24[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JBE	@@20
-	STOSQ
-
-@@20:	MOV	RAX,CMP_OPT_NOP
-	ADD	RDX,32
-	JMP	@@30
-
-@@25:	STOSQ
-@@30:	CMP	RDI,RDX
-	JB	@@25
-
-	POP	RDI
-	LEAVE
-	RET1	16
-// ************************************
-_OPTNEXT2::
-	ENTER	0
-	PUSH	RDI
-	MOV	RCX,U64 SF_ARG1[RBP]
-	MOV	RDX,U64 SF_ARG2[RBP]
-	
-	MOV	RAX,U64 16[RDX]
-	MOV	U64 24[RDX],RAX
-	MOV	RAX,U64 8[RDX]
-	MOV	U64 16[RDX],RAX
-	MOV	RAX,U64 [RDX]
-	MOV	U64 8[RDX],RAX
-	MOV	U64 [RDX],RCX
-
-	MOV	RDI,RDX
-
-	MOV	RAX,RCX
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@05
-	STOSQ
-
-@@05:	MOV	RAX,U64 8[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@10
-	STOSQ
-
-@@10:	MOV	RAX,U64 16[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@15
-	STOSQ
-
-@@15:	MOV	RAX,U64 24[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@20
-	STOSQ
-
-@@20:	MOV	RAX,CMP_OPT_NOP
-	ADD	RDX,32
-	JMP	@@30
-
-@@25:	STOSQ
-@@30:	CMP	RDI,RDX
-	JB	@@25
-
-	POP	RDI
-	LEAVE
-	RET1	16
-
-// ************************************
-_OPTNEXT3::
-	ENTER	0
-	PUSH	RDI
-	MOV	RCX,U64 SF_ARG1[RBP]
-	MOV	RDX,U64 SF_ARG2[RBP]
-	
-	MOV	RAX,U64 16[RDX]
-	MOV	U64 24[RDX],RAX
-	MOV	RAX,U64 8[RDX]
-	MOV	U64 16[RDX],RAX
-	MOV	RAX,U64 [RDX]
-	MOV	U64 8[RDX],RAX
-	MOV	U64 [RDX],RCX
-
-	MOV	RDI,RDX
-
-	MOV	RAX,RCX
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@05
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
-	JE	@@05
-	STOSQ
-
-@@05:	MOV	RAX,U64 8[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@10
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
-	JE	@@10
-	STOSQ
-
-@@10:	MOV	RAX,U64 16[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@15
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
-	JE	@@15
-	STOSQ
-
-@@15:	MOV	RAX,U64 24[RDX]
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_END_EXP
-	JB	@@20
-	CMP	U16 CIntermediateCode.ic_opcode[RAX],IC_NOP2
-	JE	@@20
-	STOSQ
-
-@@20:	MOV	RAX,CMP_OPT_NOP
-	ADD	RDX,32
-	JMP	@@30
-
-@@25:	STOSQ
-@@30:	CMP	RDI,RDX
-	JB	@@25
-
-	POP	RDI
-	LEAVE
-	RET1	16
-
 // ************************************
 CMP_TEMPLATES::
 	DU32	@@05,@@10,@@15,@@25,@@30,
@@ -249,7 +90,7 @@ CMP_TEMPLATES::
 	MOV	RDX,RAX
 @@50:	MOV	BL,U8 [RAX]
 	INC	RAX
-	OR	BL,BL
+	TEST	BL,BL
 	JNZ	@@50
 	SUB	RAX,RDX
 	DEC	RAX
@@ -260,7 +101,7 @@ CMP_TEMPLATES::
 	ADD	RAX,RDX
 
 @@60: //SignI64
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@70
 	JS	@@65
 	MOV	RAX,1
@@ -683,12 +524,3 @@ CMP_TEMPLATES_DONT_PUSH2::
 @@110:
 @@115:
 }
-
-_extern _OPTNEXT Bool OptNext(CIntermediateCode *tempi,
-	       CIntermediateCode **temp_lag);
-
-_extern _OPTNEXT2 Bool OptNext2(CIntermediateCode *tempi,
-	       CIntermediateCode **temp_lag);
-
-_extern _OPTNEXT3 Bool OptNext3(CIntermediateCode *tempi,
-	       CIntermediateCode **temp_lag);

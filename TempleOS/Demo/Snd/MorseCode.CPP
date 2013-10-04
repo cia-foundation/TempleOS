@@ -61,13 +61,13 @@ U0 MorseTable()
   U8 *st;
   I64 i=0;
   for (i=0;i<13;i++ ) {
-    if (st=LstEntryPt(i,morse_lst))
+    if (st=LstSub(i,morse_lst))
       "$$FG,RED$$%C$$FG$$ %-7s ",*st,st+1;
-    if (st=LstEntryPt(i+13,morse_lst))
+    if (st=LstSub(i+13,morse_lst))
       "$$FG,RED$$%C$$FG$$ %-7s ",*st,st+1;
-    if (st=LstEntryPt(i+26,morse_lst))
+    if (st=LstSub(i+26,morse_lst))
       "$$FG,RED$$%C$$FG$$ %-7s ",*st,st+1;
-    if (st=LstEntryPt(i+39,morse_lst))
+    if (st=LstSub(i+39,morse_lst))
       "$$FG,RED$$%C$$FG$$ %-7s ",*st,st+1;
     NewLine;
   }
@@ -80,7 +80,7 @@ Bool space_sent;
 U8 *MorseTimes(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  SPrintF(st,"Down:%10.6f Up:%10.6f",dt_down,dt_up);
+  SPrint(st,"Down:%10.6f Up:%10.6f",dt_down,dt_up);
   return st;
 }
 
@@ -147,7 +147,7 @@ U0 Morse()
   //We don't want the tag call back
   //called before we set it, so preempt off.
   old_preempt=Preempt(OFF);
-  doc_e=DocPutS(DocPut,"$$TX+TC,\" \"$$");
+  doc_e=DocPrint(DocPut,"$$TX+TC,\" \"$$");
   doc_e->tag_cb=&MorseTimes;
   Preempt(old_preempt);
 

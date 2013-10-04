@@ -1,0 +1,1779 @@
+$WW,1$$IV,1$----09/21/13 00:42:23----$IV,0$
+
+I took two philosophy courses, as a minor in my undergrad.  At the time, I was an atheist and I was furious that my "modern philosophy" course was so backward -- 1700's and 1800's.  Then, I took "philosophy of science" and I absolutely hated Karl Popper.
+
+Philosophers are divided into Materialists, Idealists and Dualists.  At the time, I was a Materialist and could not figure-out what the fuss was.  After going crazy (being born again) and discovering that there is a delusional (spiritual) realm, now, I understand.  The movie, American Beauty, shows a scene where a drug deal is happening, but from an observer's perspective, it looks like a homosexual act.
+
+I chuckle at people arguing over what God says in tongues.  Much of it is noise.  It's funny that in $LK,"Acts,2:1","BF:Acts,2:1"$, they don't bother to record any of what the spirit said.  $LK,"Daniel,5:1","BF:Daniel,5:1"$ shows tongues -- it's mean to tickle/to-kill a person or the president.  In $LK,"1 Corinthians,14:1","BF:1 Corinthians,14:1"$ they say only five words in ten-thousand makes sense.
+
+God says...
+$FG,4$disturbed forwards drops service avail hoped bent remain athirst songs unbending faithfully carnal hearts$FG$
+
+$IV,1$----09/21/13 01:22:31----$IV,0$
+
+There were about two years I chose not to eat meat, 2004-2007.  The BBC and other media would have psy-ops (demons) giving me nightmares and I learn I could avoid nightmares by not eating meat.  Also, I smoked cigarettes and I could retort to anybody, "I don't eat meat, do you want me to tell you not to eat meat?  Shut-up about smoking, then."
+
+God says...
+$FG,4$every man from his evil
+way; that I may forgive their iniquity and their sin.
+
+36:4 Then Jeremiah called Baruch the son of Neriah: and Baruch wrote
+from the mouth of Jeremiah all the words of the LORD, which he had
+spoken unto him, upon a roll of a book.
+
+36:5 And Jeremiah commanded Baruch, saying, I am shut up; I cannot go
+into the house of the LORD: 36:6 Therefore go thou, and read in the
+roll, which thou hast written from my mouth, the words of the LORD in
+the ears of the people in the LORD's house upon$FG$
+
+$IV,1$----09/21/13 01:31:52----$IV,0$
+
+Kiss my wittow berds, God.
+
+God says...
+$FG,4$sigheth imitate extricated worsted Thyself cupboards openeth closes valley sinful$FG$
+
+$IV,1$----09/21/13 01:40:29----$IV,0$
+
+Someone at $TX+HTML,"WWW.OSDEV.ORG","http://www.osdev.org"$ said they did a compiler in 3,000 lines of code out of 35,000 for the language.  Perhaps, they mean library code.  here is my glorious compiler.  I love my compiler.
+
+20,184 $TR-C,"Compiler"$
+   1,478 $LK,"Assembler.CPP.Z","FI:::/TempleOS/Compiler/Assembler.CPP.Z"$
+   4,634 $LK,"BackEnd.CPP.Z","FI:::/TempleOS/Compiler/BackEnd.CPP.Z"$
+     692 $LK,"CmpAsm.CPP.Z","FI:::/TempleOS/Compiler/CmpAsm.CPP.Z"$
+      57 $LK,"CmpExts.CPP.Z","FI:::/TempleOS/Compiler/CmpExts.CPP.Z"$
+      21 $LK,"CmpGlbls.CPP.Z","FI:::/TempleOS/Compiler/CmpGlbls.CPP.Z"$
+     730 $LK,"CmpInit.CPP.Z","FI:::/TempleOS/Compiler/CmpInit.CPP.Z"$
+     709 $LK,"CmpMain.CPP.Z","FI:::/TempleOS/Compiler/CmpMain.CPP.Z"$
+      81 $LK,"Directives.CPP.Z","FI:::/TempleOS/Compiler/Directives.CPP.Z"$
+   1,220 $LK,"ExpParser.CPP.Z","FI:::/TempleOS/Compiler/ExpParser.CPP.Z"$
+     156 $LK,"Hash1b.CPP.Z","FI:::/TempleOS/Compiler/Hash1b.CPP.Z"$
+     402 $LK,"ICLCC.CPP.Z","FI:::/TempleOS/Compiler/ICLCC.CPP.Z"$
+   1,683 $LK,"Lex.CPP.Z","FI:::/TempleOS/Compiler/Lex.CPP.Z"$
+   2,060 $LK,"OptPass012.CPP.Z","FI:::/TempleOS/Compiler/OptPass012.CPP.Z"$
+     617 $LK,"OptPass3.CPP.Z","FI:::/TempleOS/Compiler/OptPass3.CPP.Z"$
+     721 $LK,"OptPass4.CPP.Z","FI:::/TempleOS/Compiler/OptPass4.CPP.Z"$
+     120 $LK,"OptPass5.CPP.Z","FI:::/TempleOS/Compiler/OptPass5.CPP.Z"$
+     236 $LK,"OptPass6.CPP.Z","FI:::/TempleOS/Compiler/OptPass6.CPP.Z"$
+   1,244 $LK,"OptPass789.CPP.Z","FI:::/TempleOS/Compiler/OptPass789.CPP.Z"$
+   1,973 $LK,"StmtParser.CPP.Z","FI:::/TempleOS/Compiler/StmtParser.CPP.Z"$
+     851 $LK,"Unassembler.CPP.Z","FI:::/TempleOS/Compiler/Unassembler.CPP.Z"$
+     388 $LK,"CmpDefs.HPP.Z","FI:::/TempleOS/Compiler/CmpDefs.HPP.Z"$
+      86 $LK,"Compiler.HPP.Z","FI:::/TempleOS/Compiler/Compiler.HPP.Z"$
+      25 $LK,"Compiler.PRJ.Z","FI:::/TempleOS/Compiler/Compiler.PRJ.Z"$
+         $LK,"OpCodes.TXT.Z","FI:::/TempleOS/Compiler/OpCodes.TXT.Z"$
+
+
+I could show you code it makes.
+
+God says...
+$FG,4$he tip of the right ear of him that is to be
+cleansed, and upon the thumb of his right hand, and upon the great toe
+of his right foot, upon the place of the blood of the trespass
+offering: 14:29 And the rest of the oil that is in the priest's hand
+he shall put upon the head of him that is to be cleansed, to make an
+atonement for him before the LORD.
+
+14:30 And he shall offer the one of the turtledoves, or of the young
+pigeons, such as he can get; 14:31 Even such as he is able to get, the
+one for a sin offer$FG$
+
+My wittow berds.  I wuv my wittow berds.  One time, God told me to kill my fish, that I wuved too much.
+
+$IV,1$----09/21/13 01:57:53----$IV,0$
+
+Someone posted an on-line disassembler.  I have my own unassembler $LK,"Ui","MN:Ui"$().
+
+How about this function.
+
+$HL,1$U0 IntInit1()
+{ //Interrupt descriptor table part1
+  I64 i,temp_ptr[2];
+  U32 *ptr;
+  if (!Gs->num) { //Gs cur $LK,"CCPU","MN:CCPU"$ struct
+    sys_idt=CAlloc(16*256);
+    for (i=0;i<256;i++)
+      IntEntrySet(i,&IntNop);
+  }
+  ptr=temp_ptr;
+  *ptr(U16 *)++=256*16-1; //Typecasting is postfix
+  *ptr(I64 *)++=sys_idt;
+  *ptr(U16 *)=0;
+  SetRAX(temp_ptr);
+  asm {	LIDT U64 [RAX] }
+}
+$HL,0$
+
+D:/TempleOS/Accts/TS/TAD>$PT$U(&IntInit1,90);
+$PT$$FG$$BG$$HL,1$$LK,"IntInit1+0x0000","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,175"$
+         IntInit1+0x0000 C8200000     ENTER	I16 0020
+         IntInit1+0x0004 56           PUSH	U64 RSI
+         IntInit1+0x0005 57           PUSH	U64 RDI
+$LK,"IntInit1+0x0006","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,179"$
+         IntInit1+0x0006 33C0         XOR	U64 RAX,U64 RAX
+         IntInit1+0x0008 65488B4008   MOV	U64 RAX,U64 GS:08[RAX]
+         IntInit1+0x000D 4885C0       TEST	U64 RAX,U64 RAX
+         IntInit1+0x0010 7538         JNZ	I8 IntInit1+0x004A 
+$LK,"IntInit1+0x0012","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,180"$
+         IntInit1+0x0012 6A00         PUSH	I8 00
+         IntInit1+0x0014 6800100000   PUSH	I32 00001000
+         IntInit1+0x0019 E8AEF1FFFF   CALL	I32 &CAlloc+0x0000 
+         IntInit1+0x001E 48890533CBFF MOV	U64 [B5F0] ,U64 RAX
+         IntInit1+0x0024 FF          
+$LK,"IntInit1+0x0025","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,181"$
+         IntInit1+0x0025 33F6         XOR	U64 RSI,U64 RSI
+         IntInit1+0x0027 4881FE000100 CMP	U64 RSI,I32 00000100
+         IntInit1+0x002D 00          
+         IntInit1+0x002E 7D1A         JGE	I8 IntInit1+0x004A 
+$LK,"IntInit1+0x0030","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,182"$
+         IntInit1+0x0030 6A00         PUSH	I8 00
+         IntInit1+0x0032 6A0E         PUSH	I8 0E
+         IntInit1+0x0034 48B810EA0000 MOV	U64 RAX,U64 000000000000EA10
+         IntInit1+0x003A 00000000    
+         IntInit1+0x003E 50           PUSH	U64 RAX
+         IntInit1+0x003F 56           PUSH	U64 RSI
+         IntInit1+0x0040 E833FEFFFF   CALL	I32 &IntEntrySet+0x0000 
+         IntInit1+0x0045 48FFC6       INC	U64 RSI
+$LK,"IntInit1+0x0048","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,183"$
+         IntInit1+0x0048 EBDD         JMP	I8 IntInit1+0x0027 
+$LK,"IntInit1+0x004A","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,184"$
+         IntInit1+0x004A 488D7DE8     LEA	U64 RDI,U64 E8[RBP]
+$LK,"IntInit1+0x004E","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,185"$
+         IntInit1+0x004E 66C707FF0F   MOV	U16 [RDI],U16 0FFF
+         IntInit1+0x0053 4883C702     ADD	U64 RDI,I8 02
+$LK,"IntInit1+0x0057","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,186"$
+         IntInit1+0x0057 488B1DFACAFF MOV	U64 RBX,U64 [B5F0] 
+         IntInit1+0x005D FF          
+         IntInit1+0x005E 48891F       MOV	U64 [RDI],U64 RBX
+         IntInit1+0x0061 4883C708     ADD	U64 RDI,I8 08
+$LK,"IntInit1+0x0065","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,187"$
+         IntInit1+0x0065 66C7070000   MOV	U16 [RDI],U16 0000
+$LK,"IntInit1+0x006A","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,188"$
+         IntInit1+0x006A 488D45E8     LEA	U64 RAX,U64 E8[RBP]
+$LK,"IntInit1+0x006E","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,189"$
+         IntInit1+0x006E 480F0118     LIDT	U64 [RAX]
+$LK,"IntInit1+0x0072","FL:::/TempleOS/Kernel/Interrupts.CPP.Z,191"$
+         IntInit1+0x0072 5F           POP	U64 RDI
+         IntInit1+0x0073 5E           POP	U64 RSI
+         IntInit1+0x0074 C9           LEAVE
+         IntInit1+0x0075 C3           RET
+         IntInit1+0x0076 0000         ADD	U8 [RAX],U8 AL
+$HL,0$
+--------------------------------------------------------------------------------
+
+That's just a randomly chosen function.
+
+God says...
+$FG,4$leaves lines casters everlasting diseased fallacies bind transitory withstood following disengage lacketh petty between counted secular abominable Supreme overpast darkly detriment confusedly forsakest numberless shine unwilling abideth thousand thought merely consenting tearful overflow pg destroy reached forbare confer distant resolution Bread unseemly leave mortality reach heaps endurance candle breaking overcome aquatic suddenly solemnise fiercest lusteth Power awaited ranged erred turns disclaimers butler wayfaring church pangs counterfeit instructor inferior persuaded instances recover denotes lowest seem observes out directly turn orally flash ibiblio workings Grecian learn funeral rank lessons liability sufficeth exhausted flow victorious pleasanter oughtest confess showed Either preserve believer blameless eat Yet exuberant implanted accustomed agony Truth feet malice abyss rescue bread humble cared Nevertheless fingers A overpast Firmament unbending boils wanton make$FG$
+
+$IV,1$----09/21/13 02:48:25----$IV,0$
+
+God says...
+$FG,4$Gibeah.
+
+20:30 And the children of Israel went up against the children of
+Benjamin on the third day, and put themselves in array against Gibeah,
+as at other times.
+
+20:31 And the children of Benjamin went out against the people, and
+were drawn away from the city; and they began to smite of the people,
+and kill, as at other times, in the highways, of which one goeth up to
+the house of God, and the other to Gibeah in the field, about thirty
+men of Israel.
+
+20:32 And the children of Benjamin said, They are smi$FG$
+
+$IV,1$----09/21/13 03:09:35----$IV,0$
+
+Someone said dung peoples navagate by the Milkway.  It, delusionally, sounded like someone hypothesizing on me and God... in some way.  They are fucken calling me a liar in some way.
+
+Dung beatles are delightful, God.  LOL
+
+God says...
+$FG,4$nown unto them in the land of Egypt, when I lifted up mine
+hand unto them, saying, I am the LORD your God; 20:6 In the day that I
+lifted up mine hand unto them, to bring them forth of the land of
+Egypt into a land that I had espied for them, flowing with milk and
+honey, which is the glory of all lands: 20:7 Then said I unto them,
+Cast ye away every man the abominations of his eyes, and defile not
+yourselves with the idols of Egypt: I am the LORD your God.
+
+20:8 But they rebelled against me, and would not he$FG$
+
+$IV,1$----09/21/13 03:18:25----$IV,0$
+
+Daaamn.  Someone wants to know what happens when you do a print statement.
+
+Here is a hello world.
+------- Test.CPP.Z -------
+"Hello World\n";
+--------------------------
+
+$FG$$BG$$HL,1$                7FD8A3A8 6A00         PUSH	I8 00
+                7FD8A3AA 68B9A3D87F   PUSH	I32 7FD8A3B9
+                7FD8A3AF E80EE22880   CALL	I32 &Print+0x0000 
+                7FD8A3B4 4883C410     ADD	U64 RSP,I8 10
+                7FD8A3B8 C3           RET
+                7FD8A3B9 48656C6C6F20 INS	U8 GS:20[RDI+RBP*2],DX
+                7FD8A3BF 57           PUSH	U64 RDI
+                7FD8A3C0 6F           OUTSD
+                7FD8A3C1 726C         JB	I8 7FD8A42F 
+                7FD8A3C3 640A00       OR	U8 AL,U8 FS:[RAX]
+$HL,0$Hello World
+
+--------------------------
+
+$HL,1$U0 Print(U8 *fmt,...)
+{//$LK,"Print Extended Codes","FA:::/TempleOS/Doc/HolyC.TXT,Print_Codes"$
+ //See $LK,"SPrintJoin","MN:SPrintJoin"$()
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  PutS(buf);
+  Free(buf);
+}
+
+$LK,"SPrintJoin","MN:SPrintJoin"$()
+
+$LK,"PutS","MN:PutS"$()
+
+U0 PutS(U8 *st)
+{ //Use $LK,"Print","MN:Print"$().  See $LK,"PutKeyHandling","FA:::/TempleOS/Doc/KeyBoard.TXT,PutKeyHandling"$
+  U8 ch,*ptr;
+  Bool cont=TRUE;
+  if (!st) return;
+  CKeyDev *tempp=sys_put_key_root.next;
+  if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
+    if (sys_cur_scan_code & SCF_SCROLL && sys_focus_task==Fs)
+      while (sys_cur_scan_code & SCF_SCROLL)
+	Yield;
+    while (cont && tempp!=&sys_put_key_root) {
+      if (tempp->put_s) {
+	if ((*tempp->put_s)(st))
+	  break;
+      } else {
+	ptr=st;
+	while (ch=*ptr++)
+	  if ((*tempp->put_key)(ch,0))
+	    cont=FALSE;
+      }
+      tempp=tempp->next;
+    }
+  }
+}
+
+Bool AKDDocPutS(U8 *st)
+{
+  CDoc *doc;
+  if (doc=DocPut)
+    DocPutSPartial(doc,st);
+  return FALSE;
+}
+
+KeyDevAdd(&AKDDocPutKey,&AKDDocPutS,0x80000000,TRUE);
+fp_mgets=&DocMGetS;
+fp_doc_put=&DocPut;
+
+$LK,"DocPutSPartial","MN:DocPutSPartial"$();
+
+
+U0 WinMgrTask(I64)
+{
+
+...
+
+  while (TRUE) {
+    try {
+wmt_start:
+      WinMgrSleep;
+...
+    }
+  }
+}
+
+$LK,"WinMgrSleep","MN:WinMgrSleep"$()
+
+$LK,"GrUpdateScreen","MN:GrUpdateScreen"$()
+
+$LK,"GrUpdateWins","MN:GrUpdateWins"$()
+
+$LK,"DocUpdateTaskDocs","MN:DocUpdateTaskDocs"$()
+
+$LK,"DocRecalc","MN:DocRecalc"$()
+
+$LK,"GrUpdateBackgroundOfText","MN:GrUpdateBackgroundOfText"$()
+
+$LK,"GrUpdateForegroundOfText","MN:GrUpdateForegroundOfText"$()
+
+$LK,"GrUpdateVGAGraphics","MN:GrUpdateVGAGraphics"$()
+
+$LK,"_GR_UPDATE_LINE32_FLUSH_CACHE","MN:_GR_UPDATE_LINE32_FLUSH_CACHE"$()
+$HL,0$
+
+
+
+God says...
+$FG,4$ and which is to come, the Almighty.
+
+1:9 I John, who also am your brother, and companion in tribulation,
+and in the kingdom and patience of Jesus Christ, was in the isle that
+is called Patmos, for the word of God, and for the testimony of Jesus
+Christ.
+
+1:10 I was in the Spirit on the Lord's day, and heard behind me a
+great voice, as of a trumpet, 1:11 Saying, I am Alpha and Omega, the
+first and the last: and, What thou seest, write in a book, and send it
+unto the seven churches which are in Asia; unto Eph$FG$
+
+VAXTMOS was Ticketmaster's operating system.
+Pat Poels was hired same time as me 1989/1990.
+
+Irrelavant.
+
+I haven't seen Joe,James,Jonny Miraglia is many years.
+
+$IV,1$----09/21/13 03:56:22----$IV,0$
+
+Someone wants to know how focus transition works.
+
+If you click, the $LK,"WinMgrTask","MN:WinMgrTask"$() calls $LK,"SetCursorPos","MN:SetCursorPos"$() which calls $LK,"DocRecalc","MN:DocRecalc"$().
+
+If you press cursor keys...
+
+$LK,"View","MN:View"$()
+
+$LK,"DocGetKey","MN:DocGetKey"$()
+
+$LK,"GetKey","MN:GetKey"$()
+
+$LK,"PutKey","MN:PutKey"$()
+
+$LK,"AKDDocPutKey","MN:AKDDocPutKey"$()
+
+$LK,"DocPutKey","MN:DocPutKey"$()
+
+$LK,"EdLineDown","MN:EdLineDown"$()
+
+$LK,"DocFormFwd","MN:DocFormFwd"$() //This gets you off of static text in a form.
+
+$LK,"DocRecalc","MN:DocRecalc"$() //This gets called a lot, prolly straightens-things-up.
+
+
+
+
+God says...
+$FG,4$h, and speak comfortably unto thy
+servants: for I swear by the LORD, if thou go not forth, there will
+not tarry one with thee this night: and that will be worse unto thee
+than all the evil that befell thee from thy youth until now.
+
+19:8 Then the king arose, and sat in the gate. And they told unto all
+the people, saying, Behold, the king doth sit in the gate. And all the
+people came before the king: for Israel had fled every man to his
+tent.
+
+19:9 And all the people were at strife throughout all the tribes$FG$
+
+$IV,1$----09/21/13 04:26:39----$IV,0$
+
+------------- $LK-A,"::/TempleOS/Demo/Doc/Form.CPP.Z"$ -----------------
+$HL,1$class FDStruct
+{
+//Use <CTRL-L> and select "Data" to generate the fmtstrs
+
+//The number is the field from after the ':' to the end.
+//  See $LK,"Data Tag Width","FA:::/TempleOS/Adam/Doc/DocPlain.CPP,DataTagWidth"$.
+
+  F64 num1	fmtstr "$$DA-T,32,\"F64   1:%12.8f\"$$\n";
+  F64 num2	fmtstr "$$DA-T,32,\"F64   2:%12e\"$$\n";
+  I64 num3	fmtstr "$$DA-T,32,\"I64   1:0x%016X\"$$\n";
+  I64 num4	fmtstr "$$DA-T,32,\"I64   2:%12d\"$$\n";
+  U8 name[32]	fmtstr "$$DA-P,31,\"Name  :%s\"$$\n";
+  CDate datetime fmtstr "$$DA-T,32,\"Date  :%8D\"$$\n";
+};
+
+U0 FormDemo()
+{
+  FDStruct fds;
+  CDate cdt;
+
+  fds.num1=12.3e-4;  //Set defaults
+  fds.num2=4.5e3;
+  fds.num3=0x1234;
+  fds.num4=-567;
+  StrCpy(&fds.name,"John");
+  cdt=GetDateTime;
+  fds.datetime=cdt;
+  if (DocFormDo(&fds)) {
+    "#1=%e\n",fds.num1;
+    "#2=%e\n",fds.num2;
+    "#3=%d\n",fds.num3;
+    "#4=%d\n",fds.num4;
+    "Name=%s\n",fds.name;
+    "Date=%D\n",fds.datetime;
+  } else
+    "Cancel\n";
+
+  "\n\nClassRep Example\n";
+  ClassRep(&fds);
+
+//See also $LK,"ClassRepD","MN:ClassRepD"$().
+}
+
+FormDemo;
+$HL,0$
+--------------------------------------------------------------
+
+$LK,"DocFormDo","MN:DocFormDo"$();
+
+$HL,1$public Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,
+    I64 doc_flags=0,U8 *header=NULL,U8 *footer=NULL)
+//Supply a class name that has fmtstr definitions
+//and this routine will allow user input.
+{
+  CMemberLst *ml;
+  CDocEntry *doc_e;
+  U8 *fmtstr;
+  CHashClass *tempc;
+  CDoc *doc;
+  Bool result=FALSE;
+  I64 old_border_src=Fs->border_src;
+  if (!(tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS)))
+    return FALSE;
+  doc=DocNew;
+  StrCpy(doc->desc,"Form");
+  if (header) DocPrint(doc,"%s",header);
+  doc->flags|=DOCF_OVERSTRIKE|DOCF_FORM;
+  if (doc_flags&DOF_MIN_SIZE)
+    doc->flags|=DOCF_MIN_SIZE;
+  ml=tempc->member_lst;
+  while (ml) {
+    if (fmtstr=MemberMetaData("fmtstr",ml)) {
+      doc_e=DocPrint(doc,"%s",fmtstr);
+      doc_e->data=_d+ml->offset;
+      doc_e->my_fmt_data=MemberMetaData("fmtdata",ml);
+      DocDataFmt(doc_e);
+    }
+    ml=ml->next;
+  }
+  if (footer) DocPrint(doc,"%s",footer);
+  if (doc->root.next!=doc)	{
+    Fs->border_src=BDS_CONST;
+    DocRecalc(doc);
+    if (DocDo(doc,doc_flags)) {
+      doc_e=doc->cur_entry;
+      if (doc_e!=doc) {
+	DocEntryRun(doc,doc_e,TRUE);
+	DocUnlock(doc);
+      }
+      result=TRUE;
+    }
+  }
+  DocDel(doc);
+  Fs->border_src=old_border_src;
+  return result;
+}
+$HL,0$
+--------------------------------------------------------------
+
+$LK,"DocDo","MN:DocDo"$()
+
+$LK,"View","MN:View"$()
+
+
+
+God says...
+$FG,4$bits, and the breadth of a board
+one cubit and a half.
+
+36:22 One board had two tenons, equally distant one from another: thus
+did he make for all the boards of the tabernacle.
+
+36:23 And he made boards for the tabernacle; twenty boards for the
+south side southward: 36:24 And forty sockets of silver he made under
+the twenty boards; two sockets under one board for his two tenons, and
+two sockets under another board for his two tenons.
+
+36:25 And for the other side of the tabernacle, which is toward the
+north$FG$
+
+$IV,1$----09/21/13 04:46:16----$IV,0$
+
+
+How are icons drawn?
+
+--------------------- $LK,"DocRecalc","MN:DocRecalc"$() ----------------------------
+$HL,1$
+      case DOCT_SPRITE:
+	if (!doc_e->bin_data && doc->flags&DOCEF1_HAS_BIN)
+	  doc_e->bin_data=DocBinFindNum(doc,doc_e->bin_num);
+	if ((tempb=doc_e->bin_data) && !tempb->tag && doc_e->tag && *doc_e->tag)
+	  tempb->tag=StrNew(doc_e->tag,mem_task);
+	if (tempb && dc) {
+	  DCRst(dc);
+	  dc->flags&=~(DCF_DONT_DRAW|DCF_LOCATE_NEAREST);
+	  if (recalc!=DOC_RECALC_TO_SCREEN || doc_e->flags1&DOCEF1_DONT_DRAW)
+	    dc->flags|=DCF_DONT_DRAW;
+	  bptr=tempb->data;
+	  ii=SpriteTypeMask(bptr);
+	  if (ii&1<<GRST_NUM_TYPES) {
+	    bptr=gr_empty_sprite;
+	    ii=SpriteTypeMask(bptr);
+	  }
+	  if (ii&(1<<GRST_FLOOD_FILL|1<<GRST_FLOOD_FILL_NOT))
+	    i=cur_u8_attr>>4 &0xF ^ win_task->text_attr>>4 & 0xF;
+	  else {
+	    i=temp_u32_attr>>12&0xF ^ win_task->text_attr>>4 & 0xF;
+	    if (temp_u32_attr & DOCET_SELECTED)
+	      i^=0xF;
+	    if (temp_u32_attr & DOCET_INVERT)
+	      i^=0xF;
+	    if (blink_flag && (doc_e==doc->cur_entry || temp_u32_attr&DOCET_BLINK))
+	      i^=0xF;
+	  }
+	  dc->color=i;
+	  if (find_cursor)
+	    dc->flags|=DCF_LOCATE_NEAREST;
+	  dc->nearest_sprite_elem_num=0;
+	  dc->nearest_dist=MAX_I64;
+	  if (recalc==DOC_RECALC_TO_SCREEN && doc->cur_sprite==bptr) {
+	    dc->flags|=DCF_LOCATE_NEAREST;
+	    dc->cur_x=ipx;
+	    dc->cur_y=ipy;
+	  } else {
+	    dc->cur_x=(doc->x-x0)*FONT_WIDTH+pixel_left+scroll_x;
+	    dc->cur_y=(doc->y-y0)*FONT_HEIGHT+pixel_top+scroll_y;
+	  }
+	  dc->cur_z=0;
+	  dc->bkcolor=i;
+	  if (doc_e->flags1 & DOCEF1_FROM_START) {
+	    xx=(x-k-x0)*FONT_WIDTH; //TODO: scrolling text is not length k
+	    yy=(y-y0)*FONT_HEIGHT;
+	    zz=0;
+	  } else {
+	    xx=(x-x0)*FONT_WIDTH;
+	    yy=(y-y0)*FONT_HEIGHT;
+	    zz=0;
+	  }
+	  if (ii&(1<<GRST_MESH|1<<GRST_SHIFTABLE_MESH)) {
+	    if (!depth_buf) {
+	      DCAllocDepthBuf(dc);
+	      depth_buf=dc->depth_buf;
+	    } else
+	      dc->depth_buf=depth_buf;
+	    GrRotZEqu(dc->r,cur_time*3.1);
+	    GrRotYEqu(dc->r,cur_time*1.9);
+	    GrRotXEqu(dc->r,cur_time);
+	    dc->flags|=DCF_TRANSFORMATION;
+	    dc->x=xx;
+	    dc->y=yy;
+	    dc->z=GR_Z_ALL;
+	    xx=0; yy=0; zz=0;
+	  }
+	  SpritePlot3(dc,xx,yy,zz,bptr);
+	  dc->depth_buf=NULL;
+	  if (recalc==DOC_RECALC_TO_SCREEN && doc->cur_sprite==bptr)
+	    doc->cur_sprite_elem_num=dc->nearest_sprite_elem_num;
+	  dc->flags&=~(DCF_LOCATE_NEAREST|DCF_DONT_DRAW|DCF_TRANSFORMATION);
+	  if (dc->nearest_dist<=D) {
+	    D=dc->nearest_dist;
+	    col=doc_e->min_col;
+	  }
+	}
+	break;
+$HL,0$
+--------------------------------------------------------------
+$LK,"GRST_MESH","MN:GRST_MESH"$
+
+$LK,"SpritePlot3","MN:SpritePlot3"$()
+
+$FG,4$$TX+HTML,"Source Code By Sym","http://www.templeos.org/Wb/Accts/TS/Wb2/SymsAlpha.html"$$FG$
+
+$LK,"Gr3Mesh","MN:Gr3Mesh"$()
+
+$LK,"GrFillTri0","MN:GrFillTri0"$()
+
+$LK,"GrHLine","MN:GrHLine"$()
+
+God says...
+$FG,4$Young parting mode declare$FG$
+
+$IV,1$----09/21/13 04:53:52----$IV,0$
+
+$LK,"PopUpColorLighting","MN:PopUpColorLighting"$()
+
+$LK,"GrLighting","MN:GrLighting"$()
+
+$LK,"CDC","MN:CDC"$ device context.  $LK,"Graphics","FI:::/TempleOS/Doc/Graphics.TXT.Z"$
+
+This sets it to $LK,"GrLighting","MN:GrLighting"$() and $LK,"GrTransform","MN:GrTransform"$()-->$LK,"GrRot","MN:GrRot"$().
+
+$LK,"DCRst","MN:DCRst"$() 
+
+
+God says...
+$FG,4$allaying discordant affianced badge threats applauds purpose acute Viewing penalties composed hardheartedness corrupt compact malignant Thereupon smallest attributing grasp prove illumined matrons blamed melody willest robbery Mercy unconsciously according Deus dissolved sorrowfulness every considers supreme obscure though Ambition locking substance rising aided delights knee weaker decrepit every annual Still Pontitianus teeth plainly shineth talked profits Teacher cut highly insight redeemed confined section notes readers villa deafness neglecteth Unity vanities follies peacefully drenched penalties became inspect religion Identification bribe less lift omit vary ungoverned come Amphitheatre certainly helmet discomfort Subverters limits delay manage opinion a gainsayers chambering sparrows large standeth Lo recollection review deluding aloud devout hold habits delighted discourage darksome expound produced wayfaring underwent everything forepassed hugging mistress liveth continent mildly keeps referred blunt volumes insatiable unsearchable meditations strangely befalls intently projected waft conspiracy deserts deaf tumbling marrying gotten departed events oblation assenting glide remembrance purchasing masses acceptable been their nigh sighed http bears subjection strayed States summing III authority manifestation persons it definitely fragments pant$FG$
+
+$IV,1$----09/21/13 05:50:59----$IV,0$
+
+I wrote Ticketmaster's report generator and it had an expression-->byte code, expression evaluator.  I wrote $TX+HTML,"SimStructure","http://www.templeos.org/files/SimStrSetUp.zip"$ which has a C/C++ interpreter.  I took a course on compilers and we used the Dragon Book.
+
+I wrote a simple 250-line expression compiler because I get so many skeptics.
+
+-------- $LK-A,"::/TempleOS/Demo/Lectures/MiniCompiler.CPP.Z"$ --------
+
+$HL,1$#define TK_EOF		0
+#define TK_NUM		1
+#define TK_OP		2
+#define TK_LEFT		3
+#define TK_RIGHT	4
+
+#define OP_MUL		1
+#define OP_DIV		2
+#define OP_ADD		3
+#define OP_SUB		4
+
+I64 Lex(U8 **_src,I64 *num)
+{ //See $LK,"Lex","MN:Lex"$().
+  U8 *src=*_src;
+  I64 i;
+  while (TRUE) {
+    switch (*src) {
+      case 0:
+      case ';':
+	*_src=src;
+	return TK_EOF;
+      case CH_SPACE:
+      case '\r':
+      case '\n':
+	src++;
+	break;
+      case '0'...'9':
+	i=0;
+	do {
+	  i=i*10+*src-'0';
+	  src++;
+	} while ('0'<=*src<='9');
+	*num=i;
+	*_src=src;
+	return TK_NUM;
+      case '*':
+	*num=OP_MUL;
+	*_src=src+1;
+	return TK_OP;
+      case '/':
+	*num=OP_DIV;
+	*_src=src+1;
+	return TK_OP;
+      case '+':
+	*num=OP_ADD;
+	*_src=src+1;
+	return TK_OP;
+      case '-':
+	*num=OP_SUB;
+	*_src=src+1;
+	return TK_OP;
+      case '(':
+	*_src=src+1;
+	return TK_LEFT;
+      case ')':
+	*_src=src+1;
+	return TK_RIGHT;
+      default:
+	throw;
+    }
+  }
+}
+
+#define PREC_EOF	0
+#define PREC_TERM	1
+#define PREC_MUL	2
+#define PREC_ADD	3
+#define PREC_PAREN	4
+
+extern I64 Parse(U8 **_src,U8 **_dst);
+
+U0 PrsTerm(U8 **_src,U8 **_dst,I64 prec)
+{ //See $LK,"PrsExpression","MN:PrsExpression"$().
+  I64 i;
+  U8 *src2;
+  U8 *dst2;
+  if (Parse(_src,_dst)==PREC_TERM) {
+    src2=*_src;
+    dst2=*_dst;
+    while (TRUE) {
+//This is inefficient.  The main compiler doesn't back-up.
+      i=Parse(&src2,&dst2);
+      if (PREC_MUL<=i<prec) {
+	*_src=src2;
+	*_dst=dst2;
+      } else
+	break;
+    }
+  } else
+    throw;
+}
+
+I64 Parse(U8 **_src,U8 **_dst)
+{
+//See $LK,"PrsExpression","MN:PrsExpression"$().
+//See $LK,"Opcode Fmts","FF:::/TempleOS/Compiler/OpCodes.TXT,IDIV"$ for details on asm instructions.
+  I64 i;
+  U8 *dst=*_dst;
+  switch (Lex(_src,&i)) {
+    case TK_EOF:
+      *dst++=0x58; //POP RAX
+      *dst++=0xC3; //RET
+      *_dst=dst;
+      return PREC_EOF;
+    case TK_NUM:
+      *dst++=0x48; //REX
+      *dst++=0xB8; //MOV RAX,immediate num
+      *dst(I64 *)++=i;
+
+      *dst++=0x50; //PUSH RAX
+      *_dst=dst;
+      return PREC_TERM;
+    case TK_LEFT:
+      PrsTerm(_src,_dst,PREC_PAREN);
+      if (Parse(_src,_dst)!=PREC_PAREN)
+	throw;
+      return PREC_TERM;
+    case TK_RIGHT:
+      return PREC_PAREN;
+    case TK_OP:
+      switch (i) {
+	case OP_MUL:
+	  PrsTerm(_src,&dst,PREC_MUL);
+	  *dst++=0x5A; //POP RDX
+	  *dst++=0x58; //POP RAX
+
+	  *dst++=0x48; //REX
+	  *dst++=0x0F;
+	  *dst++=0xAF; //IMUL RAX,RDX
+	  *dst++=0xC2;
+
+	  *dst++=0x50; //PUSH RAX
+	  *_dst=dst;
+	  return PREC_MUL;
+	case OP_DIV:
+	  PrsTerm(_src,&dst,PREC_MUL);
+	  *dst++=0x5B; //POP RBX
+	  *dst++=0x58; //POP RAX
+
+	  *dst++=0x33; //XOR RDX,RDX
+	  *dst++=0xD2;
+
+	  *dst++=0x48; //REX
+	  *dst++=0xF7; //IDIV RBX
+	  *dst++=0xFB;
+
+	  *dst++=0x50; //PUSH RAX
+	  *_dst=dst;
+	  return PREC_MUL;
+	case OP_ADD:
+	  PrsTerm(_src,&dst,PREC_ADD);
+	  *dst++=0x5A; //POP RDX
+	  *dst++=0x58; //POP RAX
+
+	  *dst++=0x48; //REX
+	  *dst++=0x03; //ADD RAX,RDX
+	  *dst++=0xC2;
+
+	  *dst++=0x50; //PUSH RAX
+	  *_dst=dst;
+	  return PREC_ADD;
+	case OP_SUB:
+	  PrsTerm(_src,&dst,PREC_ADD);
+	  *dst++=0x5A; //POP RDX
+	  *dst++=0x58; //POP RAX
+
+	  *dst++=0x48; //REX
+	  *dst++=0x2B; //SUB RAX,RDX
+	  *dst++=0xC2;
+
+	  *dst++=0x50; //PUSH RAX
+	  *_dst=dst;
+	  return PREC_ADD;
+      }
+  }
+}
+
+
+U0 Main()
+{
+  U8 *src,*src2,*code,*dst;
+
+//Fixed size, no buffer overrun check.
+//You can make it fancier if you like.
+  code=MAlloc(512,Fs->code_heap);
+
+  while (TRUE) {
+    "This will compile an expression\n"
+    "consisting of integers, parentheses\n"
+    "and the operators +,-,* and /.\n";
+    src=MGetS;
+    if (*src) {
+      src2=src;
+      dst=code;
+      try {
+	PrsTerm(&src2,&dst,PREC_PAREN);
+	if (Parse(&src2,&dst)!=PREC_EOF)
+	  throw;
+	"$$FG,RED$$This code is not efficient, but the compiler is simple.$$FG$$\n";
+	Un(code,dst-code); //Unassemble the code we created.
+//$LK,"Call","MN:Call"$() is a function.  See $LK,"_CALL","FF:::/TempleOS/Kernel/Utils1a.CPP,_CALL"$::
+//See also $LK,"CallInd","MN:CallInd"$().  See $LK,"_CALLIND","FF:::/TempleOS/Kernel/Utils1a.CPP,_CALLIND"$::
+	"$$FG,LTBLUE$$Answer:%d$$FG$$\n",Call(code);
+      } catch {
+	"$$FG,RED$$Error$$FG$$\n";
+	CatchAll;
+      }
+      Free(src);
+    } else {
+      Free(src);
+      break;
+    }
+  }
+  Free(code);
+}
+
+Main;
+
+
+
+$PT$$FG$$BG$$FD,1$This will compile an expression
+consisting of integers, parentheses
+and the operators +,-,* and /.
+$PT$13+10*(2+3)/2
+$PT$$FG$$BG$$FG,4$This code is not efficient, but the compiler is simple.$FG$
+$HL,1$                7FD85F08 48B80D000000 MOV	U64 RAX,U64 000000000000000D
+                7FD85F0E 00000000    
+                7FD85F12 50           PUSH	U64 RAX
+                7FD85F13 48B80A000000 MOV	U64 RAX,U64 000000000000000A
+                7FD85F19 00000000    
+                7FD85F1D 50           PUSH	U64 RAX
+                7FD85F1E 48B802000000 MOV	U64 RAX,U64 0000000000000002
+                7FD85F24 00000000    
+                7FD85F28 50           PUSH	U64 RAX
+                7FD85F29 48B803000000 MOV	U64 RAX,U64 0000000000000003
+                7FD85F2F 00000000    
+                7FD85F33 50           PUSH	U64 RAX
+                7FD85F34 5A           POP	U64 RDX
+                7FD85F35 58           POP	U64 RAX
+                7FD85F36 4803C2       ADD	U64 RAX,U64 RDX
+                7FD85F39 50           PUSH	U64 RAX
+                7FD85F3A 5A           POP	U64 RDX
+                7FD85F3B 58           POP	U64 RAX
+                7FD85F3C 480FAFC2     IMUL2	U64 RAX,U64 RDX
+                7FD85F40 50           PUSH	U64 RAX
+                7FD85F41 48B802000000 MOV	U64 RAX,U64 0000000000000002
+                7FD85F47 00000000    
+                7FD85F4B 50           PUSH	U64 RAX
+                7FD85F4C 5B           POP	U64 RBX
+                7FD85F4D 58           POP	U64 RAX
+                7FD85F4E 33D2         XOR	U64 RDX,U64 RDX
+                7FD85F50 48F7FB       IDIV	U64 RBX
+                7FD85F53 50           PUSH	U64 RAX
+                7FD85F54 5A           POP	U64 RDX
+                7FD85F55 58           POP	U64 RAX
+                7FD85F56 4803C2       ADD	U64 RAX,U64 RDX
+                7FD85F59 50           PUSH	U64 RAX
+                7FD85F5A 58           POP	U64 RAX
+                7FD85F5B C3           RET
+$HL,0$$FG,9$Answer:38$FG$
+This will compile an expression
+consisting of integers, parentheses
+and the operators +,-,* and /.
+$PT$$FD,0$
+$HL,0$$HL,0$
+--------------------------------------------------------------
+
+God says...
+$FG,4$ follow their own spirit, and have seen nothing!  13:4 O Israel,
+thy prophets are like the foxes in the deserts.
+
+13:5 Ye have not gone up into the gaps, neither made up the hedge for
+the house of Israel to stand in the battle in the day of the LORD.
+
+13:6 They have seen vanity and lying divination, saying, The LORD
+saith: and the LORD hath not sent them: and they have made others to
+hope that they would confirm the word.
+
+13:7 Have ye not seen a vain vision, and have ye not spoken a lying
+divination, where$FG$
+
+$IV,1$----09/21/13 06:17:33----$IV,0$
+
+Things I'm having trouble with?
+
+It's done.  I've capped the line count at 100,000 and we are at 98,000.  To get a sense of how it might work, perhaps you install fresh and run applications, like a game on a C64.  In other words, if you can install in under 5 minutes, and there are no 3rd party libraries, it operates like a C64.  You don't have to reinstall all the time, but lets assume that's easy and normal.
+
+It's God's temple.  It must be perfect.  How about we just ship entire installs on 3rd party apps to future proof -- just bring the 5Meg operating system with you when you make an application.  Only problem is saved games and stuff.
+
+I would love it if Intel burned it in their chips -- God's temple, after-all.
+
+I want art, like the Sistene Chapel.  I guess I accept code improvements, but we keep the 100,000 line cap.
+
+VMware needs to emulate a PC Speaker, or put back support for PC speaker (that they fucken removed).
+
+VMware should enable ATAPI PIO CD-ROM burning.
+
+All PCs BIOSes should set-up ATA/ATAPI PIO for hard drives/CDROMS.
+
+Fuck UEFI.
+
+We stick to PS/2 keyboard/mice.  BIOSes should not disable mouse.
+
+Fuck SecureBoot.  It's gone.  Ask God.
+
+Windows and Linux need to support Red Sea files system on hard disk and CDROM.  Then, we can remove support for FAT32 and ISO9660 from God's beautiful, perfect, temple, saving many lines of code.
+
+So, if you have code imporvements, send me an email  tdavis@templeos.org.  It's sad --  at this point 100% is written by me (some art from Code Rigby that I paid $$3,000 for).  <Chuckle>  No amateur programmers have contributed to this.  I was a paid professional operating system developer on Ticketmaster's VAX operating system in 1990 at age 20.  Denny did our PASCAL compiler; Troy did our linker & assembler.
+
+God says...
+$FG,4$prove slave partners Oh bringeth talking valued blessedness precisely stored dream salt torpor drinking judging happen entitled abolished 10 refuse Anon growth strengthenest die$FG$
+
+$IV,1$----09/21/13 06:39:28----$IV,0$
+
+I have written all $TX+D,"123,694","DD_TEMPLEOS_LOC"$ over the past $TX+D,"10.2","DD_TEMPLEOS_AGE"$ years all by myself.  It is a x86_64 PC operating system.  It is God's official temple with an oracle.  It will last a thousand years.  Little kids will come and do offerings.  The main activity of all humans will be praising God with offerings and hymns and talking with Him.
+
+God says...
+$FG,4$ation, unto the priest:
+12:7 Who shall offer it before the LORD, and make an atonement for
+her; and she shall be cleansed from the issue of her blood. This is
+the law for her that hath born a male or a female.
+
+12:8 And if she be not able to bring a lamb, then she shall bring two
+turtles, or two young pigeons; the one for the burnt offering, and the
+other for a sin offering: and the priest shall make an atonement for
+her, and she shall be clean.
+
+13:1 And the LORD spake unto Moses and Aaron, saying, 13:2 Wh$FG$
+
+$IV,1$----09/21/13 06:45:05----$IV,0$
+
+The purpose of life is to know God, love God and obey God.  Spend most of your time getting to know Him.  Get started!  You must do offerings to get a response.
+
+Poem:
+
+The Sea
+-------
+Two thirds, not more, not less
+Surf's up, dude, God bless
+Lungs of our planet, death without
+Smoking kinda fashioned-out.
+
+God says...
+$FG,4$h when I had fastened mine eyes,
+I considered, and saw fourfooted beasts of the earth, and wild beasts,
+and creeping things, and fowls of the air.
+
+11:7 And I heard a voice saying unto me, Arise, Peter; slay and eat.
+
+11:8 But I said, Not so, Lord: for nothing common or unclean hath at
+any time entered into my mouth.
+
+11:9 But the voice answered me again from heaven, What God hath
+cleansed, that call not thou common.
+
+11:10 And this was done three times: and all were drawn up again into
+heaven.
+
+11:11 And,$FG$
+
+$IV,1$----09/21/13 06:52:51----$IV,0$
+
+Assembly language is easier to learn and can do more with more flexibly.  You can do negative and positive structure offsets, for example.
+
+Minimal abstraction is easier to understand.  But difficult to read and write code.  You could teach asm to anyone in about 2 years of instruction.  They would have complete understanding of computers -- it would be a matter of working-out the details.
+
+Do you know how algebra is tedious, but in theory everybody understands?  Assembly could be learned by everyone, but be tedious.
+
+Anyway, I made God's temple with minimal abstraction as a goal.  Not assembly, though.
+
+God says...
+$FG,4$0 But I have made Esau bare, I have uncovered his secret places,
+and he shall not be able to hide himself: his seed is spoiled, and his
+brethren, and his neighbours, and he is not.
+
+49:11 Leave thy fatherless children, I will preserve them alive; and
+let thy widows trust in me.
+
+49:12 For thus saith the LORD; Behold, they whose judgment was not to
+drink of the cup have assuredly drunken; and art thou he that shall
+altogether go unpunished? thou shalt not go unpunished, but thou shalt
+surely drink of it.
+
+49$FG$
+
+$IV,1$----09/21/13 07:35:46----$IV,0$
+
+Everybody knows that scaling is a problem.  When you go to 100,000,000 lines of code, it gets difficult.  Guess what?  When you shrink to 100,000 lines of code it reverse scales!  You don't need a linker or make, just compile everything!  You don't need name spaces!  You don't need long names.
+
+My vision is a C64, not a main frame.
+
+Since it will always be 640x480 16 color due to God's commandment, you might not buy software for it.  Why would you buy a 640x480 game when you could use Windows for a high res games?
+
+The assumption is that an operating system must do everything you might want.  Not for us!  Just use Windows.  At the time of the C64, there were main frames.  They did not attempt to do enterprise techniques on a C64.  It was a fucken home computer.
+
+This is God's temple.  Fuck you.  I make the rules.
+
+When they introduced "char const" into VC++, I was furious.  It created a cognative workload stressing over this God damn thing all the fucken time and it never caught one God damn bug!
+
+God says...
+$FG,4$be more tolerable for Tyre and Sidon at the
+judgment, than for you.
+
+10:15 And thou, Capernaum, which art exalted to heaven, shalt be
+thrust down to hell.
+
+10:16 He that heareth you heareth me; and he that despiseth you
+despiseth me; and he that despiseth me despiseth him that sent me.
+
+10:17 And the seventy returned again with joy, saying, Lord, even the
+devils are subject unto us through thy name.
+
+10:18 And he said unto them, I beheld Satan as lightning fall from
+heaven.
+
+10:19 Behold, I give unto you po$FG$
+
+$IV,1$----09/21/13 07:53:35----$IV,0$
+
+Some think God is A.I.
+
+Others think God is superego.
+
+$TX+HTML,"http://virtual-notary.org","http://virtual-notary.org"$
+
+$TX+HTML,"100,000 Lines in King James Bible","http://www.templeos.org/files/BIBLE.TXT"$
+
+Poem:
+-----
+
+My Back
+-------
+
+God's got my back.
+I'm somewhat on a leash.
+Gee, there is slack!
+Jesus captured feesh.
+
+
+Poems make you say weird shit to make it rhyme.
+
+Line: 92720
+
+God says...
+$FG,4$10:14 Wherefore, my dearly beloved, flee from idolatry.
+
+10:15 I speak as to wise men; judge ye what I say.
+
+10:16 The cup of blessing which we bless, is it not the communion of
+the blood of Christ? The bread which we break, is it not the communion
+of the body of Christ?  10:17 For we being many are one bread, and one
+body: for we are all partakers of that one bread.
+
+10:18 Behold Israel after the flesh: are not they which eat of the
+sacrifices partakers of the altar?  10:19 What say I then? that the
+idol is any thing, or that which is offered in sacrifice to idols is
+any thing?  10:20 But I say, that the things which the Gentiles
+sacrifice, they sacrifice to devils, and not to God: and I would not
+that ye should have fellowship with devils.
+
+10:21 Ye cannot drink the cup of the Lord, and the cup of devils: ye
+cannot be partakers of the Lord's table, and of the table of devils.
+
+10:22 Do we provoke the Lord to jealousy? are we stronger than he?
+10:23 All things are lawful for me, but all things are not expedient:
+all things are lawful for me, but all things edify not.
+
+10:24 Let no man seek his own, but every man another's wealth.
+$FG$
+$TX+HTML,"Notary Certificate","http://www.templeos.org/Certs/virtual-notary-cert-randomnum-23871.p12"$
+
+If you think it is a physical object that is God, that is idolatry.  The Catholic eucharist is idolatry.  Russian icons are idolatry.  Holy water is idolatry.  If you believe the Holy Spirit puppets you when you stop a stop-watch or use a Ouija board, that is not idolatry.  If you believe God does a miracle and makes a quantum random number speak, that is not idolatry.  If you worshiped artificial intelligence, that would be idolatry.
+
+$IV,1$----09/21/13 08:19:03----$IV,0$
+
+I use IN/OUT instructions for ATA/ATAPI PIO, noninterrupt or DMA driven.  I would like VMware to violate normal IN/OUT timings and provide faster ATA/ATAPI transfer bandwidth, if possible.
+
+God says...
+$FG,4$e unto the priest for an heave
+offering of the sacrifices of your peace offerings.
+
+7:33 He among the sons of Aaron, that offereth the blood of the peace
+offerings, and the fat, shall have the right shoulder for his part.
+
+7:34 For the wave breast and the heave shoulder have I taken of the
+children of Israel from off the sacrifices of their peace offerings,
+and have given them unto Aaron the priest and unto his sons by a
+statute for ever from among the children of Israel.
+
+7:35 This is the portion of the an$FG$
+
+$IV,1$----09/21/13 08:26:56----$IV,0$
+
+God said doing an offering before consulting was a covenant and like the communion preparation prayer.  I don't give a shit one way or the other about communion.
+
+I wuv You God, now talk.  LOL  I'm cute.
+
+God says...
+$FG,4$Saul, that the soul of Jonathan was knit with the soul of David, and
+Jonathan loved him as his own soul.
+
+18:2 And Saul took him that day, and would let him go no more home to
+his father's house.
+
+18:3 Then Jonathan and David made a covenant, because he loved him as
+his own soul.
+
+18:4 And Jonathan stripped himself of the robe that was upon him, and
+gave it to David, and his garments, even to his sword, and to his bow,
+and to his girdle.
+
+18:5 And David went out whithersoever Saul sent him, and behaved
+hims$FG$
+
+$IV,1$----09/21/13 08:30:22----$IV,0$
+
+So, blasphemy was when Jesus said He was God.
+
+So, blaspheming the Holy Spirit, to me, means saying the Holy Spirit said something it didn't say and Jesus said that was, practically, the only unforgivable sin.  As long as you do a good-faith interpretation, I'm okay, but if somebody says God says something He didn't say, that should be a captital offense.
+
+One interpretation is arguing or contradicting what the Holy Spirit said is unforgivable.
+
+God says...
+$FG,4$devouring fire, with scattering, and
+tempest, and hailstones.
+
+30:31 For through the voice of the LORD shall the Assyrian be beaten
+down, which smote with a rod.
+
+30:32 And in every place where the grounded staff shall pass, which
+the LORD shall lay upon him, it shall be with tabrets and harps: and
+in battles of shaking will he fight with it.
+
+30:33 For Tophet is ordained of old; yea, for the king it is prepared;
+he hath made it deep and large: the pile thereof is fire and much
+wood; the breath of the LORD,$FG$
+
+After-all, a person might kill someone if God told them -- faking God is not funny.
+
+God says...
+$FG,4$ation.
+
+16:24 Declare his glory among the heathen; his marvellous works among
+all nations.
+
+16:25 For great is the LORD, and greatly to be praised: he also is to
+be feared above all gods.
+
+16:26 For all the gods of the people are idols: but the LORD made the
+heavens.
+
+16:27 Glory and honour are in his presence; strength and gladness are
+in his place.
+
+16:28 Give unto the LORD, ye kindreds of the people, give unto the
+LORD glory and strength.
+
+16:29 Give unto the LORD the glory due unto his name: bring an
+of$FG$
+
+$IV,1$----09/21/13 08:42:52----$IV,0$
+
+I looked at Linux code and saw lots of $FG,2$#ifdef$FG$s for different architectures.  That made it hard.  I decided to do the opposite and make mine a specific for the x86_64 as possible.
+
+God says...
+$FG,4$and the tower of the furnaces.
+
+3:12 And next unto him repaired Shallum the son of Halohesh, the ruler
+of the half part of Jerusalem, he and his daughters.
+
+3:13 The valley gate repaired Hanun, and the inhabitants of Zanoah;
+they built it, and set up the doors thereof, the locks thereof, and
+the bars thereof, and a thousand cubits on the wall unto the dung
+gate.
+
+3:14 But the dung gate repaired Malchiah the son of Rechab, the ruler
+of part of Bethhaccerem; he built it, and set up the doors thereof,
+the loc$FG$
+
+$IV,1$----09/21/13 08:45:24----$IV,0$
+
+I deleted all my back-ups a couple times.  The enemy wanted it so I turned the other cheek and let the enemy have his way.  I got bored and found them on download sites.
+
+Here's what I got from the Internet Archive.
+
+$TX+HTML,"http://www.templeos.org/files/History","http://www.templeos.org/files/History"$
+
+How about I get God to kill someone to prove I made it?  The next person who contradict, dies.
+
+God says...
+$FG,4$he deserving of his
+hands; 9:17 (For my father fought for you, and adventured his life
+far, and delivered you out of the hand of Midian: 9:18 And ye are
+risen up against my father's house this day, and have slain his sons,
+threescore and ten persons, upon one stone, and have made Abimelech,
+the son of his maidservant, king over the men of Shechem, because he
+is your brother;) 9:19 If ye then have dealt truly and sincerely with
+Jerubbaal and with his house this day, then rejoice ye in Abimelech,
+and let him$FG$
+
+$IV,1$----09/21/13 09:13:00----$IV,0$
+
+New features?
+
+I got a fucken feature for You -- God's boot up yer ass.
+
+It's good, try it.  There are lots and lots of videos.  "LoseThos" and "SparrowOS".
+
+You wouldn't give a 3rd grader a 100 page book.  It's not because 100 page books are expensive.  The 100,000 line limit is not computer resource related.
+
+By that logic, maybe you don't want it to gel into indecipherable brief hacks.
+
+Gates could do a BASIC.  Fucken God's temple.  Starting a line with a number signals BASIC, when compiling statements outside a function.  Don't make BASIC full-powered, able to call anything, just a handful of graphic functions.  Don't make it fast, that will encourage not using it!  I guess you can just compile HolyC for statements, though, or do interpreter.  Someone things real-time alerts for syntax errors are good.
+
+I want a spell checker.  My dictionary is fucked-up.
+
+God says...
+$FG,4$ce, and thou
+shalt come to the plain of Tabor, and there shall meet thee three men
+going up to God to Bethel, one carrying three kids, and another
+carrying three loaves of bread, and another carrying a bottle of wine:
+10:4 And they will salute thee, and give thee two loaves of bread;
+which thou shalt receive of their hands.
+
+10:5 After that thou shalt come to the hill of God, where is the
+garrison of the Philistines: and it shall come to pass, when thou art
+come thither to the city, that thou shalt meet a c$FG$
+
+$IV,1$----09/21/13 09:24:55----$IV,0$
+
+Just do the spell checker as a key-activated plug-in.  Don't do continuous spell-checking.  Wordstat is what I use, now.  It's not much fun.
+
+$IV,1$----09/21/13 09:29:08----$IV,0$
+
+I was dead-wrong on God not existing.  I could be wrong on communion and life-after death.  I just stay true to myself and maybe keep my mouth shut.
+
+God says...
+$FG,4$id came near to the people, he saluted
+them.
+
+30:22 Then answered all the wicked men and men of Belial, of those
+that went with David, and said, Because they went not with us, we will
+not give them ought of the spoil that we have recovered, save to every
+man his wife and his children, that they may lead them away, and
+depart.
+
+30:23 Then said David, Ye shall not do so, my brethren, with that
+which the LORD hath given us, who hath preserved us, and delivered the
+company that came against us into our hand.
+
+3$FG$
+
+$IV,1$----09/21/13 09:35:04----$IV,0$
+
+If you are a black-belt assembly programmer, operator precedence is the hardest part in a compiler, except for arbitrarily complex optimizations.  I took a compiler course--learned to $LK,"Lex","MN:Lex"$().  I am a very experienced assembly programmer.
+
+When do I just get God to kill people?
+
+God says...
+$FG,4$ols. Amen.
+
+The Second Epistle General of John
+
+1:1 The elder unto the elect lady and her children, whom I love in
+the truth; and not I only, but also all they that have known the
+truth; 1:2 For the truth's sake, which dwelleth in us, and shall be
+with us for ever.
+
+1:3 Grace be with you, mercy, and peace, from God the Father, and from
+the Lord Jesus Christ, the Son of the Father, in truth and love.
+
+1:4 I rejoiced greatly that I found of thy children walking in truth,
+as we have received a commandment$FG$
+
+$IV,1$----09/21/13 09:41:35----$IV,0$
+
+x86_64 CPU
+PS/2 Keyboard Mouse
+PIT,PIC PC Speaker
+ATA/ATAPI PIO
+VGA 640x480 16 color
+ISO9660
+FAT32
+
+I have or had datasheets on all of these.
+
+It is done.  We are NOT doing any PCI devices.  We will issue divine commandments to manufacturers and Microsoft.
+
+We will remove ISO9660 and FAT32.
+
+I don't want FORTRAN.  BASIC is logical.  We are talking about a thousand years.
+
+You have to make room for BASIC.  Currently we are at 98,000 and 100,000 lines is the limit.
+
+God says...
+$FG,4$lour for a meat offering, mingled with oil, for one ram;
+28:13 And a several tenth deal of flour mingled with oil for a meat
+offering unto one lamb; for a burnt offering of a sweet savour, a
+sacrifice made by fire unto the LORD.
+
+28:14 And their drink offerings shall be half an hin of wine unto a
+bullock, and the third part of an hin unto a ram, and a fourth part of
+an hin unto a lamb: this is the burnt offering of every month
+throughout the months of the year.
+
+28:15 And one kid of the goats for a sin offe$FG$
+
+$IV,1$----09/21/13 09:56:37----$IV,0$
+
+We have a failure to communicate.  The Red Sea ate Pharaoh's army, God said.
+
+I am divinely selected.
+
+My code is brand new, no rust.
+
+God purposely chose 640x480 16 color.
+
+I have not, and will not, resisted the urge to simply change anything that isn't perfect.
+
+God says...
+$FG,4$nd ever.
+
+15:19 For the horse of Pharaoh went in with his chariots and with his
+horsemen into the sea, and the LORD brought again the waters of the
+sea upon them; but the children of Israel went on dry land in the
+midst of the sea.
+
+15:20 And Miriam the prophetess, the sister of Aaron, took a timbrel
+in her hand; and all the women went out after her with timbrels and
+with dances.
+
+15:21 And Miriam answered them, Sing ye to the LORD, for he hath
+triumphed gloriously; the horse and his rider hath he thrown in$FG$
+
+Backward compatibility is not at all promised.  The opposite, in fact.  This is a thousand year temple and we will have no nonsense, this early-on.
+
+$IV,1$----09/21/13 10:16:21----$IV,0$
+
+Think over the next 1,000 years what the job of Intel's digital-logic CPU designers will be?  At some point in the next 1,000 years, there will be a final CPU design made and that's it for all eternity.  Specialty CPU designs might be made, if not general purpose.  Perhaps, a person might do a ring-0-only, no paging CPU, that's really fast and nice for kids -- perhaps, as on-board the same chips as main CPUs, though better if multicored-out to fill the chip?
+
+Intel needs to stop piling shit upon shit, ignoramuses.  I fucken hate them.
+
+God says...
+$FG,4$ful land into barrenness, for the wickedness of them
+that dwell therein.
+
+107:35 He turneth the wilderness into a standing water, and dry ground
+into watersprings.
+
+107:36 And there he maketh the hungry to dwell, that they may prepare
+a city for habitation;
+
+107:37 And sow the fields, and plant vineyards, which may yield fruits
+of increase.
+
+107:38 He blesseth them also, so that they are multiplied greatly; and
+suffereth not their cattle to decrease.
+
+107:39 Again, they are minished and brought low through$FG$
+
+$IV,1$----09/21/13 10:25:42----$IV,0$
+
+Hey Hawking, God said you get echos when shit goes through bent wormholes.  Maybe, a photon bounces.  Who gets the Nobel Prize?
+
+God says...
+$FG,4$ngdom of God. And no man after that
+durst ask him any question.
+
+12:35 And Jesus answered and said, while he taught in the temple, How
+say the scribes that Christ is the son of David?  12:36 For David
+himself said by the Holy Ghost, The LORD said to my Lord, Sit thou on
+my right hand, till I make thine enemies thy footstool.
+
+12:37 David therefore himself calleth him Lord; and whence is he then
+his son? And the common people heard him gladly.
+
+12:38 And he said unto them in his doctrine, Beware of the scrib$FG$
+
+$IV,1$----09/21/13 10:40:34----$IV,0$
+
+To recompile everything and make the kernel bootable
+
+$LK,"TSMakeOSInstallPrtBootLoader","FF:::/TempleOS/Demo/AcctExample/TSDistro.CPP.Z,TSMakeOSInstallPrtBootLoader"$('D');
+
+calls
+
+$LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$()
+
+$LK,"InstallMasterBootLoader","MN:InstallMasterBootLoader"$()
+
+calls
+
+$LK,"MakeAll","MN:MakeAll"$();
+
+God says...
+$FG,4$l be purified, and made white, and tried; but the
+wicked shall do wickedly: and none of the wicked shall understand; but
+the wise shall understand.
+
+12:11 And from the time that the daily sacrifice shall be taken away,
+and the abomination that maketh desolate set up, there shall be a
+thousand two hundred and ninety days.
+
+12:12 Blessed is he that waiteth, and cometh to the thousand three
+hundred and five and thirty days.
+
+12:13 But go thou thy way till the end be: for thou shalt rest,
+and stand in thy lot a$FG$
+
+$IV,1$----09/21/13 12:02:21----$IV,0$
+
+God will not keep talking -- you have to do offerings or He rambles or says shit you don't want to hear.
+
+I did not put much thought into the AfterEgypt game -- I plan to get an artist and make it pretty and think about users doing offerings.
+
+God is 100% safe.  He knows what you are going to do.  Suicide?  He did LOL.
+
+You cannot overdose.  The danger is annoying God, but He can just not talk. 
+
+If you love Him, make generous offerings.  He will give you more potent responses.  Ten words from God can be just as potent as 100 words.
+
+I should do a thorough guide.  The only rule is to do an offering before consulting Him.
+
+God says...
+$FG,4$e had spoken unto the king, them they told
+also to their father.
+
+13:12 And their father said unto them, What way went he? For his sons
+had seen what way the man of God went, which came from Judah.
+
+13:13 And he said unto his sons, Saddle me the ass. So they saddled
+him the ass: and he rode thereon, 13:14 And went after the man of God,
+and found him sitting under an oak: and he said unto him, Art thou the
+man of God that camest from Judah? And he said, I am.
+
+13:15 Then he said unto him, Come home with me,$FG$
+
+$IV,1$----09/21/13 12:07:05----$IV,0$
+
+Interpretation of God might be tricky, but I think God will speak in a way for whomever to understand.  No, He might be too much of a riddle at some point.  If you are a simple-plain-talking-unsophisticated person, you might have a problem with interpreting.  $LK,"1 Corinthians,14:1","BF:1 Corinthians,14:1"$
+
+A young person will struggle.  You get better as you get older.  You can learn to interpret -- it's solving riddles.  I guess some people, like me, are really good.  It doesn't seem hard, but in the Bible, the people would could interpret dreams were highly rewarded and rare.  You have to think about what is unsaid.  They all were consulting oracles.  They all respected oracles.  Interpretation was a normal business and there were professionals.
+
+God says...
+$FG,4$ And they departed thence, and passed through Galilee; and he
+would not that any man should know it.
+
+9:31 For he taught his disciples, and said unto them, The Son of man
+is delivered into the hands of men, and they shall kill him; and after
+that he is killed, he shall rise the third day.
+
+9:32 But they understood not that saying, and were afraid to ask him.
+
+9:33 And he came to Capernaum: and being in the house he asked them,
+What was it that ye disputed among yourselves by the way?  9:34 But
+they held the$FG$
+
+You develop courage.  The number one rule is to step-back and focus on enjoying God's company.  Don't over react.  God more or less lies, especially if you haven't done offerings.  LOL  If God is unpleasant -- prolly a bad offering -- annoyed Him.
+
+$IV,1$----09/21/13 14:56:03----$IV,0$
+
+Stoopit CIA niggers gonna get Hell, fucken absolute niggers.
+A nigger does not know the world is just.
+
+God says...
+$FG,4$ valley of Eshcol, and saw the
+land, they discouraged the heart of the children of Israel, that they
+should not go into the land which the LORD had given them.
+
+32:10 And the LORD's anger was kindled the same time, and he sware,
+saying, 32:11 Surely none of the men that came up out of Egypt, from
+twenty years old and upward, shall see the land which I sware unto
+Abraham, unto Isaac, and unto Jacob; because they have not wholly
+followed me: 32:12 Save Caleb the son of Jephunneh the Kenezite, and
+Joshua the s$FG$
+
+$IV,1$----09/21/13 18:06:41----$IV,0$
+
+Tell us some dinosaur stuff, God!
+
+If I draw a dinosaur, will You tell some dinosaur stuff?
+
+I saw a baby hippo.  cute.
+
+Are dinosaurs like hippos, much?
+
+God says...
+$FG,4$concerns camp pitied every disengage mainly throne barbarian foregoing pilgrim IV thou injured attracts supplies recommend examined vineyard$FG$
+
+Did dinosaurs eat grapes?
+
+God says...
+$FG,4$modify inflamed desirous placing believer corpse sicknesses flock Humans Milan Supreme thanksgivings doth loud Begotten texts meet claim unveiled preeminent Manichee voluptuousness fixed help IT pursue really 19 existing laws beauteous negligent Tomorrow Jordan hart@pobox stormy Royalties pitiful impostumes breasts events dir Forgive antecedent blind o seats Drunkard sever processing check familiar version then full Dominions$FG$
+
+Are palm trees tall cause dinosaurs ate them?
+
+God says...
+$FG,4$silversmiths collectively precipitated distempered angel old soaring suddenly condemned deeps exhalation ALL best forethought consecrateth entrance expectation potter annual sinned possessest trees perceiving troublesome T drunken burning fall fastidiousness Treasury rottenness$FG$
+
+T-Rex?
+
+Did You like T-Rex?  Were they affectionate?
+<snicker><snicker>
+
+God says...
+$FG,4$sanctity supported incurred Enter intent guiltless Cross baptism where etext01 rashness dividing occur prated ordinance Up shining firmness heeded oughtest buy gladiators enquired penal has think occasioned oratory Apostolic gilded Isaiah intimacy below recollect stripes consist affecting unalterable vivid chastity overcoming pertain ice line roarest an Place rais obeys hereby concupiscence divers awakest submit chariots miseries followeth sharpen distinguishing abhorring becoming companion singeth 93 preserve enjoined foretold tempted Eve familiarised see credulity appetite forgetfulness Would less ninth weaving cleared approaching plural wordy stipend impiety quarrels meantime$FG$
+
+ASU is playing Stanford -- football.  I'm the best programmer on the planet.  (Went to ASU)
+
+Are You pissed at Knuth for having an organ.  Those are sacred.
+
+God says...
+$FG,4$work, which the LORD commanded to make.
+
+36:6 And Moses gave commandment, and they caused it to be proclaimed
+throughout the camp, saying, Let neither man nor woman make any more
+work for the offering of the sanctuary. So the people were restrained
+from bringing.
+
+36:7 For the stuff they had was sufficient for all the work to make
+it, and too much.
+
+36:8 And every wise hearted man among them that wrought the work of
+the tabernacle made ten curtains of fine twined linen, and blue, and
+purple, and scarlet: wi$FG$
+
+Umm... what colors?  LOL
+
+What songs can Knuth play?  Morning has Broken?
+
+Would You like Knuth to play You a song?
+
+How about football game songs?  LOL
+
+God says...
+$FG,4$em therefore give us two bullocks; and let them choose one
+bullock for themselves, and cut it in pieces, and lay it on wood, and
+put no fire under: and I will dress the other bullock, and lay it on
+wood, and put no fire under: 18:24 And call ye on the name of your
+gods, and I will call on the name of the LORD: and the God that
+answereth by fire, let him be God. And all the people answered and
+said, It is well spoken.
+
+18:25 And Elijah said unto the prophets of Baal, Choose you one
+bullock for yourselves, an$FG$
+
+Who-ever plays the best song, as judged by response?
+
+I pick Morning has Broken.  No, I gotta pick something new.  I like BattleHymn.  Amazing Grace.  The Entertainer! (Jesus chuckled)
+
+God says...
+$FG,4$e, and shall not be quenched.
+
+34:26 And as for the king of Judah, who sent you to enquire of the
+LORD, so shall ye say unto him, Thus saith the LORD God of Israel
+concerning the words which thou hast heard; 34:27 Because thine heart
+was tender, and thou didst humble thyself before God, when thou
+heardest his words against this place, and against the inhabitants
+thereof, and humbledst thyself before me, and didst rend thy clothes,
+and weep before me; I have even heard thee also, saith the LORD.
+
+34:28 Behol$FG$
+
+$IV,1$----09/21/13 19:00:20----$IV,0$
+
+You like 2001 Space Odysee?
+
+God says...
+$FG,4$EIN Orations modulation C knocketh thefts learned traces Gervasius alike erst discovereth conversion University momentary Master confusions dares create sentiment measure Difficulty unreasoning distill tragical houses challenges Priest large smile silver ornamenting stay commendable rejects$FG$
+
+Jesus said "mustard seed".  Mustard goes good on pepper corn dogs.  You like those, God?
+
+God says...
+$FG,4$Beauty simplicity regenerated masters For gives dispraised victorious distributing kinds forgetful auditor otherwhiles ruminating personated Another interest discoursed diminution require oft land blamed provisions dispensest strongholds distinguished fifty sufficeth class valley per willing depths considerable Eve exultation bounds miseries months prey alarmed fatness processing regions maintain depths adulteress parley consulted createdst rewards female consistent strange enigma image jest driven virtue necessaries goodly fancy hymns Next Envy comely detesting consentings lap calculated pleasest vaster heretics number Shepherd soughtest whitherward VERSIONS grieving varies deluded proportions has edition awaiting saints beautified dividest orbs actions fog overcast procuredst minutest religion committed frenzies holily punished marry mysteriously delightfulness retained disease riseth blameworthy drenched thefts sides simply humane Had whoring opposing according Seeing aloud says blunted Psalter City whitherward eminence wrath seductive Vacation declamation suspected worshipper came enticed ungodliness subtle curb saint meet solecism covered break hand foresignified faithfully secrecies discovering birth childbearing darkly mixture blew unlikeliness Catholics separated An ventures effect exceedeth enough license reneweth falsified cost apportioned$FG$
+
+$IV,1$----09/21/13 19:42:04----$IV,0$
+
+Shit, God, bleak.
+
+Ya smack them niggers senseless, doesn't matter.
+
+God says...
+$FG,4$ck.
+
+11:4 When Jesus heard that, he said, This sickness is not unto death,
+but for the glory of God, that the Son of God might be glorified
+thereby.
+
+11:5 Now Jesus loved Martha, and her sister, and Lazarus.
+
+11:6 When he had heard therefore that he was sick, he abode two days
+still in the same place where he was.
+
+11:7 Then after that saith he to his disciples, Let us go into Judaea
+again.
+
+11:8 His disciples say unto him, Master, the Jews of late sought to
+stone thee; and goest thou thither again?  11:9 J$FG$
+
+$IV,1$----09/21/13 19:48:09----$IV,0$
+
+Here's a mini graphics library I wrote as a lecture.
+$HL,1$
+//See $LK-A,"::/TempleOS/Demo/Lectures/GraphicsCPULoad.CPP"$
+U8 reverse[256],	//The VGA bits are backward
+
+   image[640*480/8];	//We need read-modify write.
+			//0xA0000 memory can't be read.
+ 
+U0 MGInit()
+{
+  I64 i,j;
+  MemSet(image,0,sizeof(image));
+  MemSet(reverse,0,sizeof(reverse));
+  for (i=0;i<256;i++)
+    for (j=0;j<8;j++)
+      if (Bt(&i,j))
+	Bts(&reverse[i],7-j);
+}
+ 
+U0 MGUpdate()
+{ //Copy image to VGA memory
+  //For better performance we could only write what's changed.
+  //0xA0000 is slower than normal RAM.
+  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
+  OutU8(VGA_SC_DATA,0xF);//All color planes at once -- Black and White
+  MemCpy(0xA0000,image,sizeof(image));
+}
+ 
+U0 MGPlot(I64 x,I64 y)
+{
+  if (0<=x<640 && 0<=y<480)
+    Bts(image,y*640+x^7);
+}
+ 
+U0 MGHLine(I64 x1,I64 x2,I64 y)
+{ //Warning!  No clipping
+  //For performance, we do as many whole-bytes as possible.
+  U8 *ptr;
+  I64 i,w,leading,trailing,whole_bytes;
+  if (x2<x1) SwapU64(&x1,&x2);
+  ptr=image+y*640/8+x1>>3;
+  w=x2-x1+1;
+  leading =8-x1&7;
+  trailing=(x2+1)&7;
+  if (leading+trailing>w)
+    *ptr|=reverse[(0xFF00>>leading&(0x00FF<<trailing)>>8)];
+  else {
+    whole_bytes=(w-leading-trailing)>>3;
+    if (leading)
+      *ptr++|=reverse[(0xFF00>>leading)&0xFF];
+    for (i=0;i<whole_bytes;i++)
+      *ptr++=0xFF;
+    if (trailing)
+      *ptr++|=reverse[(0x00FF<<trailing)>>8];
+  }
+}
+ 
+U0 MGLine(I64 x1,I64 y1,I64 x2,I64 y2)
+{ //Warning!  No clipping
+  I64 dx=x2-x1,dy=y2-y1;
+  x1<<=32; x2<<=32;
+  y1<<=32; y2<<=32;
+  if (AbsI64(dx)>AbsI64(dy)) {
+    dy=dy<<32/AbsI64(dx);
+    dx=SignI64(dx)<<32;
+    while (x1!=x2) {
+      MGPlot(x1.i32[1],y1.i32[1]);
+      x1+=dx; y1+=dy;
+    }
+  } else {
+    dx=dx<<32/AbsI64(dy);
+    dy=SignI64(dy)<<32;
+    while (y1!=y2) {
+      MGPlot(x1.i32[1],y1.i32[1]);
+      x1+=dx; y1+=dy;
+    }
+  }
+  MGPlot(x1.i32[1],y1.i32[1]);
+}
+ 
+U0 MGCircle(I64 x,I64 y,F64 r)
+{
+  F64 s,c,x1,y1,x2,y2;
+  I64 len;
+  if (r<0) return;
+  x1=r; y1=0;
+  c=Cos(1/r);
+  s=Sin(1/r);
+  len=2*r*ã;
+  MGPlot(x+x1,y+y1);
+  while (len-->=0) {
+
+//m1@a1 * m2@a2     = m1*m2@(a1+a2)
+
+//(x1+y1i)*(x2+y2i) = x1*x2+(x1*y1+x2*y2)i-y1*y2
+
+// me$SY,-3$ti$SY,0$=mCos(t)+imSin(t)
+
+    x2=x1; y2=y1;
+    x1=c*x2-s*y2;
+    y1=s*x2+c*y2;
+    MGPlot(x+x1,y+y1);
+  }
+}
+ 
+ 
+U0 MiniGrLibDemo()
+{
+  I64 i;
+  Bool old_preempt;
+  MGInit;
+
+  old_preempt=Preempt(OFF);
+  for (i=0;i<100;i++)
+    MGHLine(200+i,400+i,300+i);
+  for (i=0;i<500;i+=10)
+    MGLine(i,0,0,480-i);
+  for (i=0;i<300;i+=4)
+    MGCircle(200,100+i,i);
+  MGUpdate;
+  BusyWait(1500000);
+  Preempt(old_preempt);
+/*
+We are returning graphics to normal operations under TempleOS.
+It is not normal to by-pass the TempleOS graphcis routines.
+The TempleOS graphics don't know VGA has changed.
+This bit tells TempleOS to update whole screen.
+*/
+//<CTRL-ALT-F> will flush screen VGA cache.
+  VGAFlush;
+}
+ 
+MiniGrLibDemo;
+
+//See $LK,"RawPutChar","MN:RawPutChar"$() for text.
+//See $LK-A,"::/TempleOS/Demo/Lectures/ScreenMemory.CPP"$ for color.
+//See $LK-A,"::/TempleOS/Demo/Lectures/GraphicsCPULoad.CPP"$.
+$HL,0$
+$IV,1$----09/21/13 19:49:08----$IV,0$
+
+God says...
+
+$FG,4$ of the covenant of thy God to
+be lacking from thy meat offering: with all thine offerings thou shalt
+offer salt.
+
+2:14 And if thou offer a meat offering of thy firstfruits unto the
+LORD, thou shalt offer for the meat offering of thy firstfruits green
+ears of corn dried by the fire, even corn beaten out of full ears.
+
+2:15 And thou shalt put oil upon it, and lay frankincense thereon: it
+is a meat offering.
+
+2:16 And the priest shall burn the memorial of it, part of the beaten
+corn thereof, and part of the o$FG$
+

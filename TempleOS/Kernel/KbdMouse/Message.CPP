@@ -2,7 +2,7 @@ U0 InputFilterTask()
 {
   CSrvCmd *tempc,*tempc1;
   Bool old_filter;
-  I64 old_flags=GetFlags;
+  I64 old_flags=GetRFlags;
   LBts(&Fs->task_flags,TASKf_USER);
   TaskInitExt;
   LBts(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
@@ -18,11 +18,11 @@ U0 InputFilterTask()
     else {
       if (tempc->cmd_code==SVCT_TEXT_INPUT) {
 	QueRem(tempc);
-	SetFlags(old_flags);
+	SetRFlags(old_flags);
 	if (!IsSysDeterministic)
 	  Preempt(ON);
 	try
-	  ExePutS(tempc->aux_str);
+	  ExePrint("%s",tempc->aux_str);
 	catch
 	  Fs->catch_except=TRUE;
 	Preempt(OFF);
@@ -35,7 +35,7 @@ U0 InputFilterTask()
   Fs->last_input_filter_task->next_input_filter_task=Fs->next_input_filter_task;
   if (!old_filter)
     LBtr(&Fs->last_input_filter_task->task_flags,TASKf_FILTER_INPUT);
-  SetFlags(old_flags);
+  SetRFlags(old_flags);
 }
 
 I64 ScanMsg(I64 *_p1=NULL,I64 *_p2=NULL,I64 mask=~1,CTask *task=NULL)
@@ -43,7 +43,7 @@ I64 ScanMsg(I64 *_p1=NULL,I64 *_p2=NULL,I64 mask=~1,CTask *task=NULL)
   I64 result,old_flags;
   CSrvCmd *tempc,*tempc1;
   if (!task) task=Fs;
-  old_flags=GetFlags;
+  old_flags=GetRFlags;
   tempc1=&task->srv_ctrl.next_waiting;
   while (TRUE) {
     if (task==Fs)
@@ -55,7 +55,7 @@ I64 ScanMsg(I64 *_p1=NULL,I64 *_p2=NULL,I64 mask=~1,CTask *task=NULL)
     else {
       if (tempc->cmd_code==SVCT_MSG) {
 	QueRem(tempc);
-	SetFlags(old_flags);
+	SetRFlags(old_flags);
 	result=tempc->msg_code;
 	if (_p1)
 	  *_p1=tempc->aux1;
@@ -67,7 +67,7 @@ I64 ScanMsg(I64 *_p1=NULL,I64 *_p2=NULL,I64 mask=~1,CTask *task=NULL)
 	    goto sm_done;
       }
     }
-    SetFlags(old_flags);
+    SetRFlags(old_flags);
   }
   result=MSG_NULL;
   if (_p1)
@@ -75,11 +75,11 @@ I64 ScanMsg(I64 *_p1=NULL,I64 *_p2=NULL,I64 mask=~1,CTask *task=NULL)
   if (_p2)
     *_p2=0;
   if (task->parent_task&&task->parent_task->popup_task==task) {
-    SetFlags(old_flags);
+    SetRFlags(old_flags);
     return ScanMsg(_p1,_p2,mask,task->parent_task);
   }
 sm_done:
-  SetFlags(old_flags);
+  SetRFlags(old_flags);
   return result;
 }
 
@@ -139,10 +139,10 @@ I64 GetKey(I64 *_scancode=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
   Bool old_preempt=Preempt(OFF),cursor_on=FALSE;
   while (!ScanKey(&ch,&sc,FALSE)) {
     if (IsRaw && raw_cursor) {
-      if (!cursor_on && ToI64(GetTimeStamp*5/time_stamp_freq)&1) {
+      if (!cursor_on && ToI64(GetTSC*5/time_stamp_freq)&1) {
 	'Û';
 	cursor_on=TRUE;
-      } else if (cursor_on && !(ToI64(GetTimeStamp*5/time_stamp_freq)&1)) {
+      } else if (cursor_on && !(ToI64(GetTSC*5/time_stamp_freq)&1)) {
 	'' CH_BACKSPACE;
 	cursor_on=FALSE;
       }
@@ -157,7 +157,7 @@ I64 GetKey(I64 *_scancode=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
       KbdMouseHandler(TRUE,FALSE);
       KbdMsgsQue;
       PopFD;
-      if (old_preempt && GetFlags&1<<RFLAGf_INT)
+      if (old_preempt && GetRFlags&1<<RFLAGf_INT)
 	Yield;
     } else {
       LBts(&Fs->task_flags,TASKf_AWAITING_MSG);

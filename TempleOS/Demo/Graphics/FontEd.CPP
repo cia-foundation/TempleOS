@@ -54,8 +54,12 @@ U0 FESave(Bool pmt)
   I64 i,j,k=0;
   for (i=0;i<256;i++) {
     for (j=0;j<FONT_HEIGHT;j++)
-      DocPrintF(doc,"0x%02X,",gr_font[k++]);
-    DocPutS(doc,"\n");
+      DocPrint(doc,"0x%02X,",gr_font[k++]);
+    if (Bt(safe_dollar_chars_bitmap,i))
+      DocPrint(doc,"//%c",i);
+    else if (i=='$$')
+      DocPrint(doc,"//$$$$",i);
+    DocPrint(doc,"\n");
   }
   Fs->draw_it=NULL;
   DocWrite(doc,pmt);

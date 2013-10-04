@@ -30,8 +30,7 @@ Bool CopySingleZ(U8 *f1,U8 *f2) //Just one file
 Bool CopySingle(U8 *f1,U8 *f2) //Just one file
 {
   U8 *absf1=FileNameAbs(f1),*absf2=FileNameAbs(f2),*buf;
-  I64 cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2),
-      xsum=TEMPLEOS_XSUM,i,j;
+  I64 cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2),i,j;
   CFile *in_file=NULL,*out_file=NULL;
 
   if (!StrCmp(absf1,absf2)) { //onto self?
@@ -68,19 +67,13 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
 	  i=j;
 	}
 	FRBlks(in_file, buf,FFB_NEXT_BLK,n);
-	xsum^=ArcXSum(buf,i);
 	FWBlks(out_file,buf,FFB_NEXT_BLK,n);
 	cnt-=n;
 	j-=n<<BLK_SIZE_BITS;
       }
-      if (in_file->de.xsum &&
-	  in_file->de.xsum!=xsum)
-	throw(EXCEPT_ARC_XSUM);
-      out_file->de.xsum=xsum;
       out_file->flags|=FF_USE_OLD_DATETIME;
       out_file->de.datetime=in_file->de.datetime;
       out_file->de.size=size;
-      out_file->de.expanded_size=in_file->de.expanded_size;
       out_file->de.attr=FileAttr(f2,in_file->de.attr);
       FClose(out_file);
       FClose(in_file);
@@ -105,9 +98,7 @@ Bool MkDir(U8 *filename)
       if (!FileNameChk(fa->mask))
 	PutDefineErr("ST_INVALID_FILENAME");
       else {
-	"Make Directory:";
-	"" filename;
-	NewLine;
+	"Make Directory:%s\n",filename;
 	name=MStrUtil(fa->mask,
 	SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
 	switch (fa->p->type) {
@@ -214,8 +205,6 @@ U0 CDImageRead(U8 cd_drv_let,U8 *out_name)
       n=cnt;
     if (n>bdev->max_reads)
       n=bdev->max_reads;
-    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-      Snd(bdev->read_freq);
 
     retry=4;
     while (--retry)
@@ -227,8 +216,6 @@ U0 CDImageRead(U8 cd_drv_let,U8 *out_name)
     if (!retry)
       ATAPIReadBlks2(bdev,buf,blk/spc,n/spc,TRUE,0);
 
-    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-      Snd(0);
     FWBlks(f,buf,blk,n);
     cnt-=n;
     blk+=n;
@@ -273,8 +260,6 @@ U0 CDImageWriteTask(CDualBuf *d)
     while (d->in_buf>d->out_buf+1)
       Yield;
     FRBlks(f,buf,blk,n);
-    if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-      Snd(d->CD_bdev->write_freq);
     d->in_buf++;
     cnt-=n;
     blk+=n;
@@ -334,8 +319,6 @@ U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD)
   while (d->in_buf<=d->out_buf)
     Yield;
 
-  if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-    Snd(bdev->write_freq);
   BlkDevLock(bdev);
   ATAPIWaitReady(bdev,0);
 
@@ -381,8 +364,6 @@ U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD)
   *progress1_desc=0;
   progress1=progress1_max=0;
 
-  if (!Bt(&sys_semas[SYS_SEMA_NO_IO_SND],0))
-    Snd(0);
   bdev->flags&=~BDF_READ_ONLY_OVERRIDE;
   BlkDevUnlock(bdev);
   Free(d->buf0);

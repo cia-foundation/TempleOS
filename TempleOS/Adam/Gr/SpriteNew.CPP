@@ -1,90 +1,48 @@
 #help_index "Graphics/CSprite"
 #help_file "::/TempleOS/Doc/Sprite"
 
-I64 gr_sprite_base_size[GRST_NUM_TYPES]=
+I64 sprite_base_size[GRST_NUM_TYPES]=
 {
 offset(CSprite.x1)-offset(CSprite.start), //GRST_END
-1,
 1+offset(CSprite.color8)-offset(CSprite.start), //GRST_COLOR8
-1,
-offset(CSprite.x2)-offset(CSprite.start), //GRST_PT
-offset(CSprite.linespeed)-offset(CSprite.start), //GRST_LINE
-offset(CSprite.y1)-offset(CSprite.start), //GRST_POLYLINE
-offset(CSprite.y1)-offset(CSprite.start), //GRST_POLYPT
-offset(CSprite.y1)-offset(CSprite.start), //GRST_WIDTH
-offset(CSprite.x2)-offset(CSprite.start), //GRST_SHIFT
-offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE2
-offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE3
-offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE2_CLOSED
-offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE3_CLOSED
-1,
-1,
-1,
-offset(CSprite.linespeed)-offset(CSprite.start), //GRST_RECT
-offset(CSprite.y2)-offset(CSprite.start), //GRST_CIRCLE
-offset(CSprite.x2)-offset(CSprite.start), //GRST_FLOOD_FILL_NOT
-offset(CSprite.x2)-offset(CSprite.start), //GRST_FLOOD_FILL
-offset(CSprite.linespeed)-offset(CSprite.start), //GRST_BITMAP8
-1,
-offset(CSprite.st)-offset(CSprite.start), //GRST_TEXT
-offset(CSprite.sides)-offset(CSprite.start), //GRST_ELLIPSE
-sizeof(CSprite)-offset(CSprite.start), //GRST_POLYGON
-offset(CSprite.linespeed)-offset(CSprite.start), //GRST_PLANAR_SYMMETRY
 2+offset(CSprite.dither_color8)-offset(CSprite.start), //GRST_DITHER_COLOR8
-offset(CSprite.sides)-offset(CSprite.start), //GRST_ROTATED_RECT
-offset(CSprite.x2)-offset(CSprite.start), //GRST_MESH
-offset(CSprite.shiftable_tri_cnt)+sizeof(I32)-offset(CSprite.start), //GRST_SHIFTABLE_MESH
+offset(CSprite.y1)-offset(CSprite.start), //GRST_WIDTH
+offset(CSprite.linespeed)-offset(CSprite.start), //GRST_PLANAR_SYMMETRY
 offset(CSprite.x1)-offset(CSprite.start), //GRST_TRANSFORM_ON
 offset(CSprite.x1)-offset(CSprite.start), //GRST_TRANSFORM_OFF
+offset(CSprite.x2)-offset(CSprite.start), //GRST_SHIFT
+offset(CSprite.x2)-offset(CSprite.start), //GRST_PT
+offset(CSprite.y1)-offset(CSprite.start), //GRST_POLYPT
+offset(CSprite.linespeed)-offset(CSprite.start), //GRST_LINE
+offset(CSprite.y1)-offset(CSprite.start), //GRST_POLYLINE
+offset(CSprite.linespeed)-offset(CSprite.start), //GRST_RECT
+offset(CSprite.sides)-offset(CSprite.start), //GRST_ROTATED_RECT
+offset(CSprite.y2)-offset(CSprite.start), //GRST_CIRCLE
+offset(CSprite.sides)-offset(CSprite.start), //GRST_ELLIPSE
+sizeof(CSprite)-offset(CSprite.start), //GRST_POLYGON
+offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE2
+offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE2_CLOSED
+offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE3
+offset(CSprite.y1)-offset(CSprite.start), //GRST_BSPLINE3_CLOSED
+offset(CSprite.x2)-offset(CSprite.start), //GRST_FLOOD_FILL
+offset(CSprite.x2)-offset(CSprite.start), //GRST_FLOOD_FILL_NOT
+offset(CSprite.linespeed)-offset(CSprite.start), //GRST_BITMAP8
+offset(CSprite.x2)-offset(CSprite.start), //GRST_MESH
+offset(CSprite.shiftable_tri_cnt)+sizeof(I32)-offset(CSprite.start), //GRST_SHIFTABLE_MESH
 offset(CSprite.linespeed)-offset(CSprite.start), //GRST_ARROW
+offset(CSprite.st)-offset(CSprite.start), //GRST_TEXT
 offset(CSprite.st)-offset(CSprite.start), //GRST_TEXT_BOX
 offset(CSprite.st)-offset(CSprite.start), //GRST_TEXT_DIAMOND
 };
 
-I64 gr_sprite_qued_base_size[GRST_NUM_TYPES]=
+I64 SpriteQuedBaseSize(I64 type)
 {
-offset(CSprite.x1),//GRST_END
-1,
-1+offset(CSprite.color8), //GRST_COLOR8
-1,
-offset(CSprite.x2), //GRST_PT
-offset(CSprite.linespeed), //GRST_LINE
-offset(CSprite.y1), //GRST_POLYLINE
-offset(CSprite.y1), //GRST_POLYPT
-offset(CSprite.y1), //GRST_WIDTH
-offset(CSprite.x2), //GRST_SHIFT
-offset(CSprite.y1), //GRST_BSPLINE2
-offset(CSprite.y1), //GRST_BSPLINE3
-offset(CSprite.y1), //GRST_BSPLINE2_CLOSED
-offset(CSprite.y1), //GRST_BSPLINE3_CLOSED
-1,
-1,
-1,
-offset(CSprite.linespeed), //GRST_RECT
-offset(CSprite.y2), //GRST_CIRCLE
-offset(CSprite.x2), //GRST_FLOOD_FILL_NOT
-offset(CSprite.x2), //GRST_FLOOD_FILL
-offset(CSprite.linespeed), //GRST_BITMAP8
-1,
-offset(CSprite.st), //GRST_TEXT
-offset(CSprite.sides), //GRST_ELLIPSE
-sizeof(CSprite), //GRST_POLYGON
-offset(CSprite.linespeed), //GRST_PLANAR_SYMMETRY
-2+offset(CSprite.dither_color8), //GRST_DITHER_COLOR8
-offset(CSprite.sides), //GRST_ROTATED_RECT
-offset(CSprite.x2), //GRST_MESH
-offset(CSprite.shiftable_tri_cnt)+sizeof(I32), //GRST_SHIFTABLE_MESH
-offset(CSprite.x1), //GRST_TRANSFORM_ON
-offset(CSprite.x1), //GRST_TRANSFORM_OFF
-offset(CSprite.linespeed), //GRST_ARROW
-offset(CSprite.st), //GRST_TEXT_BOX
-offset(CSprite.st), //GRST_TEXT_DIAMOND
-};
-
+  return sprite_base_size[type]+offset(CSprite.start);
+}
 
 I64 SpriteElemSize(CSprite *tempg)
 {
-  I64 i=gr_sprite_base_size[tempg->type];
+  I64 i=sprite_base_size[tempg->type];
   switch (tempg->type) {
     case GRST_POLYLINE:
       i+=tempg->num<<1*sizeof(I32);
@@ -121,7 +79,7 @@ public I64 SpriteSize(U8 *elems)
   CSprite *tempg=elems-offset(CSprite.start),*tempg1=tempg;
   while (tempg->type)
     tempg(U8 *)+=SpriteElemSize(tempg);
-  return tempg(U8 *)-tempg1(U8 *)+gr_sprite_base_size[GRST_END];
+  return tempg(U8 *)-tempg1(U8 *)+sprite_base_size[GRST_END];
 }
 
 I64 SpriteTypeMask(U8 *elems)
@@ -151,9 +109,9 @@ public U8 *DC2Sprite(CDC *tempb)
     tempb1=tempb;
     temp_bitmap=FALSE;
   }
-  tempg=CAlloc(gr_sprite_base_size[GRST_BITMAP8]+
+  tempg=CAlloc(sprite_base_size[GRST_BITMAP8]+
 	      tempb1->width_internal*tempb1->height+
-	   gr_sprite_base_size[GRST_END])
+	   sprite_base_size[GRST_END])
 	(U8 *)-offset(CSprite.start);
   tempg->type=GRST_BITMAP8;
   tempg->width=tempb1->width;
@@ -171,63 +129,63 @@ public U8 *Sprite2Text(CSprite *tempg)
 { //Study $LK-A,"::/TempleOS/Demo/Graphics/SpriteText.CPP"$.
   U8 buf[256],buf2[256],buf3[136];
   I32 *ptr;
-  SPrintF(buf,"%Z",tempg->type,"ST_SPRITE_TYPES");
+  SPrint(buf,"%Z",tempg->type,"ST_SPRITE_TYPES");
   *buf2=0;
   switch (tempg->type) {
     case GRST_COLOR8:
-      SPrintF(buf2," %s",Color2Text(buf3,tempg->color8));
+      SPrint(buf2," %s",Color2Text(buf3,tempg->color8));
       break;
     case GRST_PT:
     case GRST_FLOOD_FILL:
     case GRST_FLOOD_FILL_NOT:
     case GRST_SHIFT:
-      SPrintF(buf2," %d,%d",tempg->x1,tempg->y1);
+      SPrint(buf2," %d,%d",tempg->x1,tempg->y1);
       break;
     case GRST_LINE:
     case GRST_ARROW:
     case GRST_PLANAR_SYMMETRY:
     case GRST_RECT:
     case GRST_ROTATED_RECT:
-      SPrintF(buf2," (%d,%d)-(%d,%d)",
+      SPrint(buf2," (%d,%d)-(%d,%d)",
 	  tempg->x1,tempg->y1,tempg->x2,tempg->y2);
       break;
     case GRST_CIRCLE:
-      SPrintF(buf2," %d,%d:%dR",
+      SPrint(buf2," %d,%d:%dR",
 	  tempg->x1,tempg->y1,tempg->x2);
       break;
     case GRST_WIDTH:
-      SPrintF(buf2," %d",tempg->width);
+      SPrint(buf2," %d",tempg->width);
       break;
     case GRST_TEXT:
     case GRST_TEXT_BOX:
     case GRST_TEXT_DIAMOND:
-      SPrintF(buf2," %d,%d:%-16tQ",tempg->x1,tempg->y1,tempg->st);
+      SPrint(buf2," %d,%d:%-16tQ",tempg->x1,tempg->y1,tempg->st);
       break;
     case GRST_DITHER_COLOR8:
-      SPrintF(buf2," %s",Color2Text(buf3,ROPF_DITHER|tempg->dither_color8.u8[0]|tempg->dither_color8.u8[1]<<COLORROP_BITS));
+      SPrint(buf2," %s",Color2Text(buf3,ROPF_DITHER|tempg->dither_color8.u8[0]|tempg->dither_color8.u8[1]<<COLORROP_BITS));
       break;
     case GRST_POLYLINE:
     case GRST_POLYPT:
       ptr=&tempg->y1;
-      SPrintF(buf2," %d %d,%d",tempg->num,ptr[0],ptr[1]);
+      SPrint(buf2," %d %d,%d",tempg->num,ptr[0],ptr[1]);
       break;
     case GRST_ELLIPSE:
     case GRST_POLYGON:
     case GRST_BITMAP8:
-      SPrintF(buf2," %dW,%dH:%d,%d",
+      SPrint(buf2," %dW,%dH:%d,%d",
 	  tempg->width,tempg->height,tempg->x2,tempg->y2);
       break;
     case GRST_BSPLINE2:
     case GRST_BSPLINE3:
     case GRST_BSPLINE2_CLOSED:
     case GRST_BSPLINE3_CLOSED:
-      SPrintF(buf2," %d",tempg->num);
+      SPrint(buf2," %d",tempg->num);
       break;
     case GRST_MESH:
-      SPrintF(buf2," %dV,%dT",tempg->vertex_cnt,tempg->tri_cnt);
+      SPrint(buf2," %dV,%dT",tempg->vertex_cnt,tempg->tri_cnt);
       break;
     case GRST_SHIFTABLE_MESH:
-      SPrintF(buf2," %dV,%dT",tempg->shiftable_vertex_cnt,tempg->shiftable_tri_cnt);
+      SPrint(buf2," %dV,%dT",tempg->shiftable_vertex_cnt,tempg->shiftable_tri_cnt);
       break;
   }
   StrCat(buf,buf2);

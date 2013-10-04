@@ -1872,7 +1872,7 @@ leaving
 likely
 likewise
 lips
-lst
+list
 lovest
 loveth
 lowly
@@ -2838,7 +2838,7 @@ licence
 lieth
 lightsome
 limits
-lstened
+listened
 loose
 loses
 lot
@@ -3941,8 +3941,8 @@ lineaments
 lines
 links
 lion
-lstening
-lsting
+listening
+listing
 literature
 load
 loathed
@@ -5968,7 +5968,7 @@ enigma
 enlarge
 enlargedst
 enlarging
-enlsted
+enlisted
 enmities
 enounce
 enquiries
@@ -6720,7 +6720,7 @@ linger
 lingered
 lingering
 lip
-lsts
+lists
 literally
 literary
 litigation

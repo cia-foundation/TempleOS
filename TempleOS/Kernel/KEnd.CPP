@@ -7,7 +7,7 @@ U0 SysGlblsInit()
   CPUId(0x1,&ee);
   sys_cache_line_width=ee.rbx.u8[1]*8;
   QueInit(&sys_pci_dev_root);
-  sys_rnd_seed = 93186752^GetTimeStamp;
+  sys_rnd_seed = 93186752^GetTSC;
   sys_focus_task=Fs;
   QueInit(&sys_macro_root);
   sys_dft_iso_name="::/Temp/CDDVD.ISO";
@@ -27,7 +27,7 @@ U0 SysGlblsInit()
       if (Bt(&i,j))
 	set_bits_table[i]++;
 
-  ext=CAlloc(EXT_TABLE_SIZE*sizeof(U8 *));
+  ext=CAlloc(EXT_NUM_ENTRIES*sizeof(U8 *));
   fp_mgets=&SysMGetS;
 
   fp_ctrl_alt_let_cbs=CAlloc(26*sizeof(U8 *));
@@ -44,12 +44,12 @@ U0 SysGlblsInit()
   KeyDevAdd(&AKDRawDisplayPutKey,&AKDRawDisplayPutS,0x60000000,FALSE);
   #exe {
     if (*kernel_cfg->acct_name)
-      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts/%s\");",kernel_cfg->sys_acct_drv,kernel_cfg->acct_name);
+      StreamPrint("sys_acct=StrNew(\"%C:/TempleOS/Accts/%s\");",kernel_cfg->sys_acct_drv,kernel_cfg->acct_name);
     else
-      StreamPrintF("sys_acct=StrNew(\"%C:/TempleOS/Accts\");",kernel_cfg->sys_acct_drv);
-    StreamPutS("#exe{OptOff(OPTf_WARN_PAREN);}");
-    StreamPrintF("DskCacheInit(%s);",kernel_cfg->dsk_cache_size_exp);
-    StreamPutS("#exe{OptOn(OPTf_WARN_PAREN);}");
+      StreamPrint("sys_acct=StrNew(\"%C:/TempleOS/Accts\");",kernel_cfg->sys_acct_drv);
+    StreamPrint("#exe{OptOff(OPTf_WARN_PAREN);}");
+    StreamPrint("DskCacheInit(%s);",kernel_cfg->dsk_cache_size_exp);
+    StreamPrint("#exe{OptOn(OPTf_WARN_PAREN);}");
   };
   pow10_I64=CAlloc(sizeof(F64)*(308+308+1));
   for (i=-308;i<309;i++)
@@ -95,7 +95,7 @@ $LK,"GrUpdateLine32","MN:GrUpdateLine32"$().
     OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
     OutU8(VGA_SC_DATA,0x0F);
     MemSet(VGA_GRAPHIC_MEM_BASE,0,gr_width*gr_height>>3);
-    sys_dc_screen_image=CAlloc(gr_width*gr_height/8);
+    sys_raw_screen_image=CAlloc(gr_width*gr_height/8);
   } else {
     text_mode=TRUE;
     gr_width =640;
@@ -154,6 +154,16 @@ U0 Reboot()
   SysHlt;
 }
 
+U0 LoadCompiler()
+{
+  CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
+  bfh(I64)+=bfh->file_size;
+  "Loading Compiler\n";
+  Cd("/TempleOS/Compiler");
+  Load("Compiler",LDF_SILENT,bfh);
+  LBts(&sys_run_level,RLf_COMPILER);
+}
+
 U0 KernelMain()
 { //Continued from $LK,"Kernel","FF:::/TempleOS/Kernel/KStart.CPP,I32 &Kernel"$
   adam_task=Fs;
@@ -161,7 +171,7 @@ U0 KernelMain()
   LBts(&sys_run_level,RLf_FULL_HEAP);
   Fs->hash_table=HashTableNew(ADAM_HASH_SIZE,Fs);
 
-#exe {StreamPrintF("SysDeterministic(%d);",kernel_cfg->opts[CFG_DETERMINISTIC]);};
+#exe {StreamPrint("SysDeterministic(%d);",kernel_cfg->opts[CFG_DETERMINISTIC]);};
   SysGlblsInit;
 
   Mem32DevInit;
@@ -180,7 +190,7 @@ U0 KernelMain()
   IntInit1;
 
 //Before this point use $LK,"Snd","MN:Snd"$() and $LK,"BusyWait","MN:BusyWait"$()
-//to debug.  After this point, use $LK,"DbgI64","MN:DbgI64"$()
+//to debug.  After this point, use $LK,"RawI64","MN:RawI64"$()
   LBts(&sys_run_level,RLf_RAW);
   if (BIOSTotalMem<250*0x100000)
     Dbg("Requires 256 Meg of RAM Memory");
@@ -189,7 +199,7 @@ U0 KernelMain()
   IntsInit;
 
   "Enable IRQ's\n";
-  SetFlags(SYS_NORMAL_RFLAGS);
+  SetRFlags(SYS_NORMAL_RFLAGS);
   BusyWait(2000);
   IntInit2;
   LBts(&sys_run_level,RLf_INTERRUPTS);
@@ -199,7 +209,7 @@ U0 KernelMain()
 
 #exe {
   if (!kernel_cfg->opts[CFG_NO_MP])
-    StreamPutS("\"MultiCore Start\\n\\n\";"
+    StreamPrint("\"MultiCore Start\\n\\n\";"
 	       "MPStart;");
 };
   LBts(&sys_run_level,RLf_MP);
@@ -220,20 +230,13 @@ U0 KernelMain()
   "BlkDevsInitAll Done\n";
 #exe {
   if (kernel_cfg->cdrom_ports_pmt)
-    StreamPutS("if (boot_drv_pmt) PutDefine(\"ST_CDROM_PORTS_PMT2\");");
+    StreamPrint("if (boot_drv_pmt) PutDefine(\"ST_CDROM_PORTS_PMT2\");");
 };
-
   DrvDftSelect;
   LBts(&sys_run_level,RLf_DSK);
-
-  "Loading Compiler\n";
-  Cd("/TempleOS/Compiler");
-  Load("Compiler",LDF_SILENT);
-
-  time_stamp_freq_initial=TimeStampFreqCal;
+  LoadCompiler;
   InDbg(OFF);
-  LBts(&sys_run_level,RLf_COMPILER);
-
+  time_stamp_freq_initial=TimeStampFreqCal;
   Cd("/TempleOS/Kernel");
   try
     ExeFile("Adam1"); //Continues $LK,"/TempleOS/Kernel/Adam1.CPP","FL:/TempleOS/Kernel/Adam1.CPP,1"$

@@ -67,7 +67,7 @@ class CTryStk
 
 U0 SysTry(U8 *catch_start,U8 *untry_start)
 {
-  I64 *rbp=GetBasePtr,old_flags=GetFlags;
+  I64 *rbp=GetRBP,old_flags=GetRFlags;
   CExcept *tempt=MAlloc(sizeof(CExcept));
   tempt->handler_catch=catch_start;
   tempt->handler_untry=untry_start;
@@ -77,7 +77,7 @@ U0 SysTry(U8 *catch_start,U8 *untry_start)
   SaveExceptRegs(tempt);
   Cli;
   QueIns(tempt,Fs->last_except);
-  SetFlags(old_flags);
+  SetRFlags(old_flags);
 }
 
 U0 SysUntry()
@@ -140,13 +140,13 @@ U0 throw_join(I64 argc,I64 *argv)
 
   Fs->except_argc=argc;
   Fs->except_argv=argv;
-  Fs->except_rbp=GetBasePtr;
+  Fs->except_rbp=GetRBP;
   Fs->catch_except=FALSE;
   while (Fs->next_except!=&Fs->next_except) {
     TestExcept;
     if (Fs->catch_except)
       TakeExcept;
-    SetBasePtr(Fs->except_rbp);
+    SetRBP(Fs->except_rbp);
     tempt=Fs->last_except;
     QueRem(tempt);
     Free(tempt);
@@ -197,7 +197,7 @@ U0 ThrowBreak(CTask *task=NULL)
 }
 
 Bool BreakLock(CTask *task=NULL)
-{
+{ //This disables CTRL-ALT-C
   if (!task) task=Fs;
   return !LBts(&task->task_flags,TASKf_BREAK_LOCKED);
 }

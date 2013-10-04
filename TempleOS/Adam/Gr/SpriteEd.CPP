@@ -6,7 +6,7 @@ U8 GrSpOffset[9]={0,1,2,3,0,4,5,6,7};
 
 Bool GrPolyPtPlot(CSprite *root,I64 x,I64 y,I64)
 {
-  CSprite *tempg=CAlloc(gr_sprite_qued_base_size[GRST_PT]);
+  CSprite *tempg=CAlloc(SpriteQuedBaseSize(GRST_PT));
   tempg->type=GRST_PT;
   tempg->x1=x;
   tempg->y1=y;
@@ -60,7 +60,7 @@ I64 SpriteCntQue(CSprite *root)
 
 U0 GrEdUpdate(CDoc *doc,CDocBin *tempb,CSprite *root)
 {
-  I64 i,size=gr_sprite_base_size[GRST_END];
+  I64 i,size=sprite_base_size[GRST_END];
   CSprite *tempg=root->next;
   U8 *dst;
   Bool unlock=DocLock(doc);
@@ -175,7 +175,7 @@ CSprite *GrTransformCircle(I64 r[4][4],CSprite *tempg)
 {
   I64 x,y,z;
   F64 m1,a1,m2,radius=tempg->x2<<16;
-  CSprite *tempg1=CAlloc(gr_sprite_qued_base_size[GRST_ELLIPSE]);
+  CSprite *tempg1=CAlloc(SpriteQuedBaseSize(GRST_ELLIPSE));
   tempg1->type=GRST_ELLIPSE;
 
   x=tempg->x1; y=tempg->y1; z=0;
@@ -202,7 +202,7 @@ CSprite *GrTransformEllipse(I64 r[4][4],CSprite *tempg)
 {
   I64 x,y,z;
   F64 m1,a1,m2,a2,s,c,x_radius=tempg->width<<16,y_radius=tempg->height<<16;
-  CSprite *tempg1=CAlloc(gr_sprite_qued_base_size[tempg->type]);
+  CSprite *tempg1=CAlloc(SpriteQuedBaseSize(tempg->type));
   tempg1->type=tempg->type;
   if (tempg->type==GRST_POLYGON)
     tempg1->sides=tempg->sides;
@@ -243,7 +243,7 @@ CSprite *GrTransformRect(I64 r[4][4],CSprite *tempg,F64 é)
   F64 m1,a1,m2,a2,s,c,
     x_radius=(tempg->x2-tempg->x1)<<16,
     y_radius=(tempg->y2-tempg->y1)<<16;
-  CSprite *tempg1=CAlloc(gr_sprite_qued_base_size[GRST_ROTATED_RECT]);
+  CSprite *tempg1=CAlloc(SpriteQuedBaseSize(GRST_ROTATED_RECT));
   tempg1->type=GRST_ROTATED_RECT;
 
   x=tempg->x1; y=tempg->y1; z=0;
@@ -490,7 +490,7 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	  tempg1=tempg2;
 	}
 
-	tempg3=CAlloc(gr_sprite_qued_base_size[GRST_POLYPT]+
+	tempg3=CAlloc(SpriteQuedBaseSize(GRST_POLYPT)+
 	    sizeof(I32)*2+(num*3+7)>>3);
 	ptr=&tempg3->y1;
 	ptr[0]=x2;
@@ -596,28 +596,28 @@ U0 PickSpriteDocNew(CDoc *doc,CSprite *root,I64 old_num)
   I64 cur_num=0;
   U8 *st;
 
-  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite SideBar\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite SideBar\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/SpriteSideBar.TXT.Z\"$$\n\n");
 
   tempg=root->next;
   while (tempg!=root) {
     st=Sprite2Text(tempg);
     if (cur_num==old_num) {
-      DocPutS(doc,"$$FG,LTRED$$");
-      doc_e=DocPrintF(doc,"$$MU-UL,\"%Q\",%d$$\n",st,cur_num++);
+      DocPrint(doc,"$$FG,LTRED$$");
+      doc_e=DocPrint(doc,"$$MU-UL,\"%Q\",%d$$\n",st,cur_num++);
     } else {
-      DocPutS(doc,"$$FG,LTBLUE$$");
-      DocPrintF(doc,"$$MU-UL,\"%Q\",%d$$\n",st,cur_num++);
+      DocPrint(doc,"$$FG,LTBLUE$$");
+      DocPrint(doc,"$$MU-UL,\"%Q\",%d$$\n",st,cur_num++);
     }
     Free(st);
     tempg=tempg->next;
   }
   if (cur_num==old_num) {
-    DocPutS(doc,"$$FG,LTRED$$");
-    doc_e=DocPrintF(doc,"$$MU-UL,\"END\",%d$$\n",cur_num);
+    DocPrint(doc,"$$FG,LTRED$$");
+    doc_e=DocPrint(doc,"$$MU-UL,\"END\",%d$$\n",cur_num);
   } else {
-    DocPutS(doc,"$$FG,LTBLUE$$");
-    DocPrintF(doc,"$$MU-UL,\"END\",%d$$\n",cur_num);
+    DocPrint(doc,"$$FG,LTBLUE$$");
+    DocPrint(doc,"$$MU-UL,\"END\",%d$$\n",cur_num);
   }
   if (doc_e)
     doc->cur_entry=doc_e;
@@ -658,7 +658,7 @@ U0 SpriteSideBarTask(CTask *parent,CSprite **_root,I64 *_cur_num)
 
 U8 *SpriteHexDoc2Sprite(CDoc *doc,I64 *_cur_num,CTask *mem_task=NULL)
 {
-  I64 num=0,size=gr_sprite_base_size[GRST_END];
+  I64 num=0,size=sprite_base_size[GRST_END];
   U8 *result,*dst;
   Bool unlock_doc=DocLock(doc);
   CDocEntry *doc_e=doc->root.next;
@@ -694,14 +694,14 @@ Bool SpriteTextEd(CSprite **_root,I64 *_cur_num)
   CSprite *root=*_root,*tempg;
   CDocEntry *doc_e;
   doc->flags|=DOCF_FORM;
-  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Edit as Text\"$$$$FG$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Edit as Text\"$$$$FG$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/SpriteEdText.TXT.Z\"$$\n\n");
   tempg=root->next;
   while (tempg!=root) {
     st=Sprite2Text(tempg);
-    DocPrintF(doc,"$$FG,BLUE$$%s$$FG$$\n",st);
+    DocPrint(doc,"$$FG,BLUE$$%s$$FG$$\n",st);
     Free(st);
-    doc_e=DocPrintF(doc,"$$HX,%d,16$$",SpriteElemSize(tempg));
+    doc_e=DocPrint(doc,"$$HX,%d,16$$",SpriteElemSize(tempg));
     doc_e->data=&tempg->start;
     tempg=tempg->next;
   }
@@ -744,7 +744,7 @@ I64 PopUpSpriteEd(CSprite **_root,I64 snap,F64 ip_scaler,I64 *_cur_num)
   CTask *pu_task;
   I64 i;
   CDoc *doc=DocNew;
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/SpriteEd.TXT.Z\"$$\n\n"
 	"$$FG,LTBLUE$$$$MU-UL,\"Shift Points\",GED_SHIFT_PTS$$\n"
 	"$$MU-UL,\"Shift Points with Rects\",GED_SHIFT_RECTS$$\n"
@@ -760,7 +760,7 @@ I64 PopUpSpriteEd(CSprite **_root,I64 snap,F64 ip_scaler,I64 *_cur_num)
 	"\n$$FG,PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",GED_MAIN_MENU$$$$FG,LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",GED_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",DOCM_CANCEL$$",snap,ip_scaler);
-  st=MSPrintF("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_num);
+  st=MPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
   i=PopUpMenu(doc);
@@ -1189,7 +1189,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,CSprite **_root,I64 *_cur_nu
 	case GED_SHIFT_SUB_ORIGIN:
 	  doc_e->flags1=old_e_flags1;
 	  insert_pt=GrNum2Que(*_root,*_cur_num);
-	  tempg=MAlloc(gr_sprite_qued_base_size[GRST_SHIFT]);
+	  tempg=MAlloc(SpriteQuedBaseSize(GRST_SHIFT));
 	  tempg->type=GRST_SHIFT;
 	  tempg->x1=0;
 	  tempg->y1=0;

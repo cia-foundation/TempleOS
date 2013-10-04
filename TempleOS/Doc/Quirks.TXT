@@ -12,7 +12,7 @@ $WW,1$* You run a risk of problems if you do file operations on the same files s
 
 * Accessing CD-ROM's is flacky.  Try $LK,"Drv","MN:Drv"$() or $LK,"ChgDsk","MN:ChgDsk"$() twice.
 
-* You can only $FG,2$extern$FG$ something once.  There is a varient called $FG,2$_extern$FG$ which binds a Holy C definition to a asm sym.  This, too, can only be done once.
+* You can only $FG,2$extern$FG$ something once.  There is a varient called $FG,2$_extern$FG$ which binds a HolyC definition to a asm sym.  This, too, can only be done once.
 
 * You must call $LK,"TaskInitExt","MN:TaskInitExt"$() in a task you $LK,"Spawn","MN:Spawn"$() before you can do file I/O.  And, preemption is off by default, so use $LK,"Preempt","MN:Preempt"$(ON) if you wish.
 

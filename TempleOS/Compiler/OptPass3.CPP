@@ -49,14 +49,16 @@ I64 OptMVCompare(OptMemberVar *mv1,OptMemberVar *mv2)
 U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
 {
   CHashClass *tempc,*tempc1,*tempc2;
-  CCodeBlkMisc *lb;
+  CLexCodeMisc *lb;
   CIntermediateCode *tempi,*tempi1,*tempi2,
-	*tempil1,*tempil2,
-	*temp_lag[4];
+	*tempil1,*tempil2;
   I64 code,i,j,l,member_cnt,used_reg_mask=0;
   CMemberLst *tempm;
-  CPrsStk *ps=OptStart(lx,temp_lag);
   OptMemberVar *mv=NULL;
+  CPrsStk *ps=MAlloc(sizeof(CPrsStk));
+  ps->ptr=0;
+  ps->ptr2=0;
+
   for (i=0;i<NUM_REGS;i++) {
     register_offsets[i].offset=MAX_I64;
     register_offsets[i].m=NULL;
@@ -72,7 +74,7 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
       tempc=OptClassFwd(tempm->member_class);
       if (0<=tempm->register<NUM_REGS) {
 	if (Bts(&used_reg_mask,tempm->register))
-	  PrintFWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_REG_IN_USE",
+	  PrintWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_REG_IN_USE",
 		lx->cur_lfn->name,lx->cur_lfn->line_num,tempm->str,fun_class->str);
 	register_offsets[tempm->register].offset=tempm->offset;
 	register_offsets[tempm->register].m=tempm;
@@ -84,7 +86,7 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
 	mv[member_cnt++].m=tempm;
       } else {
 	if (tempm->register==CREG_ALLOC)
-	  PrintFWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_CANT_REG_VAR",
+	  PrintWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_CANT_REG_VAR",
 		lx->cur_lfn->name,lx->cur_lfn->line_num,tempm->str,fun_class->str);
       }
       tempm=tempm->next;
@@ -92,14 +94,14 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
   } else
     member_cnt=0;
 
-  tempi=lx->cbh.cb_in_ptr;
-  if (tempi->ic_opcode==IC_START)
-    tempi++;
+  tempi=lx->lcc.lcc_root.next;
   while (code=tempi->ic_opcode) {
     if (code!=IC_NOP1) {
-      OptNext(tempi,temp_lag);
-      tempil1=temp_lag[1];
-      tempil2=temp_lag[2];
+      if (tempil1=OptLag(tempi)) {
+	if (!(tempil2=OptLag(tempil1)))
+	  tempil2=&opt_nop;
+      } else
+	tempil1=tempil2=&opt_nop;
       tempc=tempi->ic_class;
       nobound_switch (cmp_arg_cnt[code]) {
 	case 9:
@@ -362,16 +364,16 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
 	case IC_INVLPG:
 	case IC_CLFLUSH:
 	case IC_PAUSE:
-	case IC_GET_FLAGS:
+	case IC_GET_RFLAGS:
 	case IC_CARRY:
 	case IC_RDTSC:
 	case IC_HPET:
-	case IC_SET_FLAGS:
-	case IC_GET_BASE_PTR:
-	case IC_SET_BASE_PTR:
-	case IC_GET_STK_PTR:
+	case IC_SET_RFLAGS:
+	case IC_GET_RBP:
+	case IC_SET_RBP:
+	case IC_GET_RSP:
 	case IC_GET_RAX:
-	case IC_SET_STK_PTR:
+	case IC_SET_RSP:
 	case IC_SET_RAX:
 	case IC_ABS_ADDR:
 	case IC_HEAP_GLBL:
@@ -419,9 +421,30 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
 	  break;
 	case IC_NOBOUND_SWITCH:
 	case IC_SWITCH:
-	  lb=OptLabelFwd(tempi->ic_data(CCodeBlkMisc *)->dft);
-	  lb->flags|=CBMF_USED;
+	  lb=OptLabelFwd(tempi->ic_data(CLexCodeMisc *)->dft);
+	  lb->flags|=CMF_USED;
 	  break;
+	case IC_BR_NOT_EQUAL:
+	case IC_BR_EQUAL_EQUAL:
+	  if ((tempi1->ic_opcode==IC_IMM_U64 || tempi1->ic_opcode==IC_IMM_F64) && !tempi1->ic_data) {
+	    OptSetNOP1(tempi1);
+	    MemCpy(&tempi->p1,&tempi->p2,sizeof(CICArg));
+	    tempi->p2.type=TY_NULL;
+	    if (code==IC_BR_EQUAL_EQUAL)
+	      code=tempi->ic_opcode=IC_BR_ZERO;
+	    else
+	      code=tempi->ic_opcode=IC_BR_NOT_ZERO;
+	    tempi1=tempi2;
+	    tempc1=tempc2;
+	  } else if ((tempi2->ic_opcode==IC_IMM_U64 || tempi2->ic_opcode==IC_IMM_F64) && !tempi2->ic_data) {
+	    OptSetNOP1(tempi2);
+	    tempi->p2.type=TY_NULL;
+	    if (code==IC_BR_EQUAL_EQUAL)
+	      code=tempi->ic_opcode=IC_BR_ZERO;
+	    else
+	      code=tempi->ic_opcode=IC_BR_NOT_ZERO;
+	  } else
+	    goto here1;
 	case IC_BR_ZERO:
 	case IC_BR_NOT_ZERO:
 	  if (tempi1->ic_opcode==IC_IMM_U64 || tempi1->ic_opcode==IC_IMM_F64) {
@@ -499,8 +522,6 @@ U0 OptPass3(CLex *lx,CHashFun *fun_class,COptReg *register_offsets)
 	case IC_BR_LESS2:
 	case IC_BR_NOT_EQUAL2:
 	case IC_BR_EQUAL_EQUAL2:
-	case IC_BR_NOT_EQUAL:
-	case IC_BR_EQUAL_EQUAL:
 	case IC_GET_LABEL:
 	case IC_BR_BT:
 	case IC_BR_BTS:
@@ -522,7 +543,7 @@ here1:
 	    lb=tempi->ic_data;
 	  else
 	    lb=OptLabelFwd(tempi->ic_data);
-	  lb->flags|=CBMF_USED;
+	  lb->flags|=CMF_USED;
 	  break;
 	case IC_LEAVE:
 	case IC_RET:
@@ -544,10 +565,12 @@ here1:
 	  break;
 
 	default:
-	  OptMissing(lx,tempi);
+	  "Pass:%d Missing IC handler\n",lx->pass;
+	  ICPut(tempi);
+	  LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
       }
     }
-    tempi++;
+    tempi=tempi->next;
   }
   if (fun_class) {
     fun_class->used_reg_mask=fun_class->used_reg_mask&~(CREG_VARS_MASK|CREG_NON_PTR_MASK)|used_reg_mask;
@@ -563,7 +586,7 @@ here1:
 	  mv[j++].offset=mv[i].offset;
 	} else {
 	  if (mv[i].m->register==CREG_ALLOC)
-	    PrintFWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_CANT_REG_VAR",
+	    PrintWarn("%S\n $$LK-A,\"FL:%s,%d\"$$ '%s' in '%s'\n","ST_CANT_REG_VAR",
 		  lx->cur_lfn->name,lx->cur_lfn->line_num,mv[i].m->str,fun_class->str);
 	}
       }
@@ -613,6 +636,10 @@ here1:
     }
     Free(mv);
   }
-  OptEnd(lx,ps);
+  if (ps->ptr>2) {
+    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
+    LexExcept(lx,"ST_OPT_INTERNAL_ERROR");
+  }
+  Free(ps);
 }
 

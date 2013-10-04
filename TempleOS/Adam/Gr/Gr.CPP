@@ -1,54 +1,48 @@
 #help_index "Graphics"
 U0 GrInit1()
 {
-  DefineLstLoad("ST_SPRITE_TYPES","End\0 \0Color 8Bit\0 \0Point\0"
-	"Line\0PolyLine\0PolyPoint\0Width\0Shift\0"
-	"BSpline2\0BSpline3\0BSpline2 Closed\0BSpline3 Closed\0"
-	" \0 \0 \0Rect\0Circle\0Flood Fill Not Color\0Flood Fill\0BitMap 8Bit\0"
-	" \0Text\0Ellipse\0Polygon\0Planar Symmetry\0"
-	"Dither Color 8Bit\0Rotated Rect\0Mesh\0Shiftable Mesh\0"
-	"Transform On\0Transform Off\0Arrow\0Text Box\0Text Diamond\0");
+  DefineLstLoad("ST_SPRITE_TYPES",
+	"End\0Color 8Bit\0Dither Color 8Bit\0"
+	"Width\0Planar Symmetry\0Transform On\0Transform Off\0Shift\0"
+	"Point\0PolyPoint\0Line\0PolyLine\0Rect\0Rotated Rect\0"
+	"Circle\0Ellipse\0Polygon\0BSpline2\0BSpline2 Closed\0BSpline3\0BSpline3 Closed\0"
+	"Flood Fill\0Flood Fill Not Color\0BitMap 8Bit\0Mesh\0Shiftable Mesh\0"
+	"Arrow\0Text\0Text Box\0Text Diamond\0");
 }
 GrInit1;
 
 #help_index "Graphics/CSprite"
 #define GRST_END		0
-//Unused
-#define GRST_COLOR8		2
-//Unused
-#define GRST_PT			4
-#define GRST_LINE		5
-#define GRST_POLYLINE		6
-#define GRST_POLYPT		7
-#define GRST_WIDTH		8
-#define GRST_SHIFT		9
-#define GRST_BSPLINE2		10
-#define GRST_BSPLINE3		11
-#define GRST_BSPLINE2_CLOSED	12
-#define GRST_BSPLINE3_CLOSED	13
-//Unused
-//Unused
-//Unused
-#define GRST_RECT		17
-#define GRST_CIRCLE		18
-#define GRST_FLOOD_FILL_NOT	19
-#define GRST_FLOOD_FILL		20
-#define GRST_BITMAP8		21
-//Unused
-#define GRST_TEXT		23
-#define GRST_ELLIPSE		24
-#define GRST_POLYGON		25
-#define GRST_PLANAR_SYMMETRY	26
-#define GRST_DITHER_COLOR8	27
-#define GRST_ROTATED_RECT	28
-#define GRST_MESH		29
-#define GRST_SHIFTABLE_MESH	30
-#define GRST_TRANSFORM_ON	31
-#define GRST_TRANSFORM_OFF	32
-#define GRST_ARROW		33
-#define GRST_TEXT_BOX		34
-#define GRST_TEXT_DIAMOND	35
-#define GRST_NUM_TYPES		36
+#define GRST_COLOR8		1
+#define GRST_DITHER_COLOR8	2
+#define GRST_WIDTH		3
+#define GRST_PLANAR_SYMMETRY	4
+#define GRST_TRANSFORM_ON	5
+#define GRST_TRANSFORM_OFF	6
+#define GRST_SHIFT		7
+#define GRST_PT			8
+#define GRST_POLYPT		9
+#define GRST_LINE		10
+#define GRST_POLYLINE		11
+#define GRST_RECT		12
+#define GRST_ROTATED_RECT	13
+#define GRST_CIRCLE		14
+#define GRST_ELLIPSE		15
+#define GRST_POLYGON		16
+#define GRST_BSPLINE2		17
+#define GRST_BSPLINE2_CLOSED	18
+#define GRST_BSPLINE3		19
+#define GRST_BSPLINE3_CLOSED	20
+#define GRST_FLOOD_FILL		21
+#define GRST_FLOOD_FILL_NOT	22
+#define GRST_BITMAP8		23
+#define GRST_MESH		24
+#define GRST_SHIFTABLE_MESH	25
+#define GRST_ARROW		26
+#define GRST_TEXT		27
+#define GRST_TEXT_BOX		28
+#define GRST_TEXT_DIAMOND	29
+#define GRST_NUM_TYPES		30
 
 class CMeshTri
 {
@@ -116,11 +110,11 @@ extern U8 *GrBitMap4ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor);
 #define GE_EXIT		0
 #define GE_CONT		1
 
-#include "CSpriteNew"
+#include "SpriteNew"
 #include "GrSpritePlot"
-#include "CSpriteMesh"
-#include "CSpriteBitMap"
-#include "CSpriteEd"
-#include "CSpriteMain"
+#include "SpriteMesh"
+#include "SpriteBitMap"
+#include "SpriteEd"
+#include "SpriteMain"
 #help_index ""
 

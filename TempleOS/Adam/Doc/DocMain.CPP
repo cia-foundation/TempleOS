@@ -31,7 +31,7 @@ ej_doc:
 	EdLite(filename,num);
       else {
 	cont=TRUE;
-	if (!(ed_flags&EDF_BAIL) && !FilesFindMatch(FILENAME_MASK_TXT,filename) &&
+	if (!(ed_flags&EDF_BAIL) && !FilesFindMatch(filename,FILEMASK_TXT) &&
 	    !PopUpCancelOk(ST_WARN_ST "Not Text File\n\n"))
 	  cont=FALSE;
 	if (cont)
@@ -48,7 +48,7 @@ public Bool Plain(U8 *filename)
 //so that dollar signs are not special.
 {
   Bool result;
-  U8 *st=MSPrintF("PI:%s",filename);
+  U8 *st=MPrint("PI:%s",filename);
   result=Ed(st);
   Free(st);
   return result;
@@ -116,46 +116,46 @@ public CDoc *SysBorderDocInit()
   bdoc->flags|=DOCF_BORDER_DOC;
 
   if (doc) {
-    DocPutS(bdoc,"$$CM+H+BY+RX+NC,-7,1$$");
-    doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+    DocPrint(bdoc,"$$CM+H+BY+RX+NC,-7,1$$");
+    doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
     doc_e->user_data=doc;
     doc_e->tag_cb=&EdFilterCB;
-    doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+    doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
     doc_e->user_data=doc;
     doc_e->tag_cb=&EdOverStrikeCB;
-    doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+    doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
     doc_e->user_data=doc;
     doc_e->tag_cb=&EdDollarCB;
   }
 
-  DocPutS(bdoc,"$$CM+H+BY+RX+NC,-4,1$$");
-  doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+  DocPrint(bdoc,"$$CM+H+BY+RX+NC,-4,1$$");
+  doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
   doc_e->tag_cb=&EdQuotesCB;
-  doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
   doc_e->tag_cb=&EdBracesCB;
-  doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+  doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
   doc_e->tag_cb=&EdSemicolonCB;
 
   if (doc) {
-    DocPutS(bdoc,"$$CM+H+BY+RX+NC,-18,1$$");
-    doc_e=DocPutS(bdoc,"$$TX+BD+TC,\"     \"$$");
+    DocPrint(bdoc,"$$CM+H+BY+RX+NC,-18,1$$");
+    doc_e=DocPrint(bdoc,"$$TX+BD+TC,\"     \"$$");
     doc_e->user_data=doc;
     doc_e->tag_cb=&EdMoreCB;
-    doc_e=DocPutS(bdoc,"$$TX+H+BD+TC,\" \"$$");
+    doc_e=DocPrint(bdoc,"$$TX+H+BD+TC,\" \"$$");
     doc_e->user_data=doc;
     doc_e->tag_cb=&EdDollarTypeCB;
   }
 
   if (Fs->user_num)
-    DocPrintF(bdoc,"$$CM+H+TY+LX+NC,5,-1$$$$TX+H+BD,\"#%d\"$$",Fs->user_num);
-  DocPutS(bdoc,"$$CM+H+TY+NC,0,-1$$");
-  doc_e=DocPutS(bdoc,"$$DA+H-T-P+BD+RD+CX+SCX+IV,140,\"%s...\",16$$");
+    DocPrint(bdoc,"$$CM+H+TY+LX+NC,5,-1$$$$TX+H+BD,\"#%d\"$$",Fs->user_num);
+  DocPrint(bdoc,"$$CM+H+TY+NC,0,-1$$");
+  doc_e=DocPrint(bdoc,"$$DA+H-T-P+BD+RD+CX+SCX+IV,140,\"%%s...\",16$$");
   doc_e->data=&Fs->task_title;
   DocDataFmt(doc_e);
-  DocPrintF(bdoc,"$$CM+H+NC,1,0$$$$TX+H+BD+IV,\"%X\"$$",Fs);
+  DocPrint(bdoc,"$$CM+H+NC,1,0$$$$TX+H+BD+IV,\"%X\"$$",Fs);
   if (Bt(&Fs->display_flags,DISPLAYf_HAS_CLOSE_WIN))
-    DocPutS(bdoc,"$$TX+H+RX+BD,\"[X]\"$$");
-  DocPutS(bdoc,"$$BK,1$$$$TX+H+LX+BD,\"MENU\"$$$$BK,0$$");
+    DocPrint(bdoc,"$$TX+H+RX+BD,\"[X]\"$$");
+  DocPrint(bdoc,"$$BK,1$$$$TX+H+LX+BD,\"MENU\"$$$$BK,0$$");
   return bdoc;
 }
 
@@ -176,7 +176,7 @@ public U0 UseTermDoc()
 }
 
 #help_index "Doc/Input"
-public U8 *DocGetLine(CDoc *doc,CDocEntry *doc_e,I64 *cur_col=NULL,CDocEntry **_do_e_end=NULL)
+public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,I64 *cur_col=NULL,CDocEntry **_do_e_end=NULL)
 {
   CDocEntry *doc_e2=doc_e;
   Bool unlock=DocLock(doc);
@@ -223,8 +223,8 @@ U0 DocDump(CDoc *doc,I64 uS_delay=0)
   Bool unlock=DocLock(doc);
   doc_e=doc->root.next;
   while (doc_e!=doc) {
-    st=DocGetLine(doc,doc_e,NULL,&doc_e2);
-    "" st;
+    st=DocScanLine(doc,doc_e,NULL,&doc_e2);
+    "%s",st;
     Free(st);
     doc_e=doc_e2;
     if (doc_e->type_u8==DOCT_NEW_LINE) {
@@ -255,7 +255,7 @@ public CDocEntry *DocPutLine(CDoc *doc=NULL,CDocEntry *doc_e)
 	  else
 	    ptr++;
 	*ptr=0;
-	"" ptr2;
+	"%s",ptr2;
 	*ptr=ch;
 	if (ch=='$$') {
 	  "$$$$";
@@ -318,10 +318,10 @@ public U8 *DocMGetS(I64 flags=0)
     do doc_e=doc_e->last;
     while (doc_e!=doc && doc_e->type_u8!=DOCT_PMT);
     doc_e=doc_e->next;
-    if (result=DocGetLine(doc,doc_e,NULL,&doc_e_end)) {
+    if (result=DocScanLine(doc,doc_e,NULL,&doc_e_end)) {
       while (doc_e_end!=doc && doc_e_end->type_u8==DOCT_NEW_LINE) {
 	result=StrAdd(result,"\n");
-	if (st=DocGetLine(doc,doc_e_end->next,NULL,&doc_e_end)) {
+	if (st=DocScanLine(doc,doc_e_end->next,NULL,&doc_e_end)) {
 	  result=StrAdd(result,st);
 	  Free(st);
 	}
@@ -338,7 +338,7 @@ public U8 *DocMGetS(I64 flags=0)
 	  doc_e->type_u8!=DOCT_PMT);
     }
     doc_e=doc_e->next;
-    result=DocGetLine(doc,doc_e,NULL);
+    result=DocScanLine(doc,doc_e,NULL);
   }
   DocUnlock(doc);
 mgets_done:
@@ -349,20 +349,21 @@ mgets_done:
 
 #help_index "Char/Input"
 
-public I64 PmtI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
+public I64 PmtI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
 {
   Bool okay;
   U8 *st;
   I64 result;
   while (TRUE) {
-    "" msg,dft;
+    if (msg)
+      "" msg,dft;
     st=MGetS;
     if (!*st) {
       Free(st);
       return dft;
     }
     try {
-      result=ExePrintF3("ToI64(%s);",st);
+      result=ExePrint3("ToI64(%s);",st);
       okay=TRUE;
     } catch {
       Fs->catch_except=TRUE;
@@ -374,20 +375,21 @@ public I64 PmtI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
   }
 }
 
-public F64 PmtF64(U8 *msg,F64 dft,F64 lo=MIN_F64,F64 hi=MAX_F64)
+public F64 PmtF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
 {
   Bool okay;
   U8 *st;
   F64 result;
   while (TRUE) {
-    "" msg,dft;
+    if (msg)
+      "" msg,dft;
     st=MGetS;
     if (!*st) {
       Free(st);
       return dft;
     }
     try {
-      result=ExePrintF3("ToF64(%s);",st)(F64);
+      result=ExePrint3("ToF64(%s);",st)(F64);
       okay=TRUE;
     } catch {
       Fs->catch_except=TRUE;
@@ -402,12 +404,8 @@ public F64 PmtF64(U8 *msg,F64 dft,F64 lo=MIN_F64,F64 hi=MAX_F64)
 public U8 *PmtStr(U8 *msg=NULL,U8 *dft=NULL)
 {
   U8 *st;
-  if (msg) {
-    if (dft)
-      "" msg,dft;
-    else
-      "" msg;
-  }
+  if (msg)
+    "" msg,dft;
   st=MGetS;
   if (!*st) {
     Free(st);
@@ -419,12 +417,14 @@ public U8 *PmtStr(U8 *msg=NULL,U8 *dft=NULL)
   return st;
 }
 
-public CDate PmtCDate(U8 *msg,CDate dft,CDate lo=MIN_I64,CDate hi=MAX_I64)
+public CDate PmtCDate(U8 *msg=NULL,CDate dft=0,CDate lo=MIN_I64,CDate hi=MAX_I64)
 {
   U8 *st;
   CDate result;
+  if (!dft) dft=GetDateTime;
   while (TRUE) {
-    "" msg,dft,dft;
+    if (msg)
+      "" msg,dft,dft;
     st=MGetS;
     if (!*st) {
       Free(st);
@@ -457,8 +457,8 @@ I64 PopUpCancelIncludeDelAuto(U8 *header=NULL,U8 *footer=NULL)
 {
   I64 i;
   CDoc *doc=DocNew;
-  if (header) DocPutS(doc,header);
-  DocPrintF(doc,"\n\n"
+  if (header) DocPrint(doc,"%s",header);
+  DocPrint(doc,"\n\n"
 	"TXT=%s\n"
 	"SRC=%s\n"
 	"AOT=%s\n"
@@ -478,12 +478,12 @@ I64 PopUpCancelIncludeDelAuto(U8 *header=NULL,U8 *footer=NULL)
 	"$$CM+LX,26,0$$$$BT,\"PLAIN ED         TXT\",RIGHT_PLAIN$$"
 	"$$CM+LX,1,3 $$$$BT,\"CANCEL              \",DOCM_CANCEL$$"
 	"$$CM+LX,26,0$$$$BT,\"BINREP           BIN\",RIGHT_BINREP$$\n",
-	  FILENAME_MASK_TXT,
-	  FILENAME_MASK_SRC,
-	  FILENAME_MASK_AOT,
-	  FILENAME_MASK_JIT,
-	  FILENAME_MASK_GRA);
-  if (footer) DocPutS(doc,footer);
+	  FILEMASK_TXT,
+	  FILEMASK_SRC,
+	  FILEMASK_AOT,
+	  FILEMASK_JIT,
+	  FILEMASK_GRA);
+  if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -496,7 +496,7 @@ I64 EdLeftClickLink(CDoc *doc,CDocEntry *doc_e)
   if (st=DocEntryLink(doc,doc_e)) {
     DocUnlock(doc);
     if (doc_e->flags1 & DOCEF1_POPUP) {
-      st2=MSPrintF("Ed(\"%Q\");",st);
+      st2=MPrint("Ed(\"%Q\");",st);
       result=PopUp(st2);
       Free(st2);
     } else
@@ -519,7 +519,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	DocBottom(doc);
 	switch (i) {
 	  case RIGHT_INCLUDE:
-	    if (FileExtDot(st) && !FilesFindMatch(FILENAME_MASK_JIT,st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_JIT)) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -545,7 +545,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    result=Plain(st);
 	    break;
 	  case RIGHT_AUTOFILE:
-	    if (FileExtDot(st) && !FilesFindMatch("*.AUT*",st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,"*.AUT*")) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .AUT File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -557,7 +557,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    result=TRUE;
 	    break;
 	  case RIGHT_AINCLUDE:
-	    if (FileExtDot(st) && !FilesFindMatch(FILENAME_MASK_JIT,st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_JIT)) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -569,7 +569,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    result=TRUE;
 	    break;
 	  case RIGHT_COMPILE:
-	    if (FileExtDot(st) && !FilesFindMatch(FILENAME_MASK_AOT,st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_AOT)) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .PRJ File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -580,7 +580,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    result=!ToBool(Cmp(st));
 	    break;
 	  case RIGHT_LOAD:
-	    if (FileExtDot(st) && !FilesFindMatch("*.BIN*",st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,"*.BIN*")) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .BIN File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -591,7 +591,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    result=ToBool(Load(st));
 	    break;
 	  case RIGHT_BINREP:
-	    if (FileExtDot(st) && !FilesFindMatch("*.BIN*",st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,"*.BIN*")) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .BIN File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -603,20 +603,20 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    break;
 	  case RIGHT_COPY:
 	    StrCpy(fn.name,st);
-	    if (DocFormDo(fn.name,"CEdFileName")) {
+	    if (DocFormDo(&fn)) {
 	      result=ToBool(Copy(st,fn.name));
 	    } else
 	      send_new_line=TRUE;
 	    break;
 	  case RIGHT_MOVE:
 	    StrCpy(fn.name,st);
-	    if (DocFormDo(fn.name,"CEdFileName"))
+	    if (DocFormDo(&fn))
 	      result=Move(st,fn.name);
 	    else
 	      send_new_line=TRUE;
 	    break;
 	  case RIGHT_DEBUG:
-	    if (FileExtDot(st) && !FilesFindMatch(FILENAME_MASK_JIT,st)) {
+	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_JIT)) {
 	      if (!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n")) {
 		send_new_line=TRUE;
 		break;
@@ -652,7 +652,7 @@ public U0 DocDm(U8 *buf,I64 cnt=0x80)
   CDocEntry *doc_e;
   CDoc *doc=DocPut;
   Bool unlock=DocLock(doc);
-  doc_e=DocPrintF(doc,"$$HX-Z,%d,16$$",cnt);
+  doc_e=DocPrint(doc,"$$HX-Z,%d,16$$",cnt);
   doc_e->data=buf;
   doc->cur_entry=doc_e->next;
   DocRecalc(doc);
@@ -668,7 +668,7 @@ public U0 DocD(U8 *buf,I64 cnt=0x80)
   CDocEntry *doc_e;
   CDoc *doc=DocPut;
   Bool unlock=DocLock(doc);
-  doc_e=DocPrintF(doc,"$$HX,%d,16$$",cnt);
+  doc_e=DocPrint(doc,"$$HX,%d,16$$",cnt);
   doc_e->data=buf;
   doc->cur_entry=doc_e->next;
   DocRecalc(doc);

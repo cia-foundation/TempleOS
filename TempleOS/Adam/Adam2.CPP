@@ -1,13 +1,12 @@
 #exe {OptOn(OPTf_WARN_PAREN);};
 #exe {OptOn(OPTf_WARN_DUP_TYPES);};
-#help_index "Task/Login"
+#help_index "Misc"
 
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
 
-public F64 os_version=1.04;
+public F64 os_version=1.06;
 
 #include "AdamExt.HPP"
-
 #include "Math2a"
 #include "Training"
 #include "Utils2a"

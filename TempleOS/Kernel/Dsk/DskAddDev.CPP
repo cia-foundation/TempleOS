@@ -211,8 +211,8 @@ U0 Mount(Bool repartition=FALSE)
 	} while (!A2I(base0_buf));
 	if (1<=A2I(base0_buf)<=num_hints) {
 	  tempha=ATARepFind(root,A2I(base0_buf));
-	  SPrintF(base0_buf,"0x%X",tempha->base0);
-	  SPrintF(base1_buf,"0x%X",tempha->base1);
+	  SPrint(base0_buf,"0x%X",tempha->base0);
+	  SPrint(base1_buf,"0x%X",tempha->base1);
 	  unit=tempha->unit;
 	} else {
 	  if (type==BDT_ATAPI)
@@ -287,9 +287,9 @@ Bool PmtBaseUnit(CBlkDev *bdev)
   "            TempleOS\n\n\n";
 #exe {
   if (kernel_cfg->opts[CFG_DONT_PROBE])
-    StreamPutS("probe=FALSE;");
+    StreamPrint("probe=FALSE;");
   else
-    StreamPutS("probe=TRUE;");
+    StreamPrint("probe=TRUE;");
 };
   if (!probe || !BootCdProbeAll(bdev)) {
     PutDefine("ST_CDROM_PORTS_PMT1");
@@ -320,13 +320,13 @@ U0 BlkDevsInitAll()
   sys_prts=CAlloc(sizeof(CPrt)*NUM_PRTS);
   for (i=0;i<NUM_PRTS;i++)
     drv_to_prt[i]=&sys_prts[i];
-  sys_raw_dc_col=0;
+  sys_raw_col=0;
 #exe {
   if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
-    StreamPutS("AutoMountIDE;");
-  StreamPutS("#exe {OptOff(OPTf_WARN_PAREN);}");
+    StreamPrint("AutoMountIDE;");
+  StreamPrint("#exe {OptOff(OPTf_WARN_PAREN);}");
   StreamDoc(kernel_cfg->add_dev);
-  StreamPutS("#exe {OptOn(OPTf_WARN_PAREN);}");
+  StreamPrint("#exe {OptOn(OPTf_WARN_PAREN);}");
 };
   PrtRep;
 }

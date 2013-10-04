@@ -27,7 +27,7 @@ Bool Quit()
   while (TRUE) {
     "%S %S?","ST_EXIT","ST_YES_NO";
     st=MGetS;
-    i=DefineMatch(st,"ST_NO_YES_LST",LEF_IGNORE_CASE);
+    i=DefineMatch(st,"ST_NO_YES_LST",LMF_IGNORE_CASE);
     if (i>=0) {
       result=i;
       break;

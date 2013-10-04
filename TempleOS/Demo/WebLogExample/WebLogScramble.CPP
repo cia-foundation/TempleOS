@@ -33,7 +33,7 @@ U0 LogScrambleFile(U8 *name)
       Free(st);
       Free(st2);
 
-      st=MSPrintF("%d.%d.%d.%d %s",num.u8[3],num.u8[2],num.u8[1],num.u8[0],doc_e->tag);
+      st=MPrint("%d.%d.%d.%d %s",num.u8[3],num.u8[2],num.u8[1],num.u8[0],doc_e->tag);
       Free(doc_e->tag);
       doc_e->tag=st;
     }
@@ -45,14 +45,14 @@ U0 LogScrambleFile(U8 *name)
 
 U0 WebLogScramble(U8 *wild)
 {
-  CDirEntry *tempm=FilesFind(wild,FUF_RECURSE|FUF_JUST_FILES),
-	     *tempm1;
+  CDirEntry *tempde=FilesFind(wild,FUF_RECURSE|FUF_JUST_FILES),
+	     *tempde1;
   InitKey;
-  while (tempm) {
-    tempm1=tempm->next;
-    LogScrambleFile(tempm->full_name);
-    CDirEntryDel(tempm);
-    tempm=tempm1;
+  while (tempde) {
+    tempde1=tempde->next;
+    LogScrambleFile(tempde->full_name);
+    DirEntryDel(tempde);
+    tempde=tempde1;
   }
 }
 

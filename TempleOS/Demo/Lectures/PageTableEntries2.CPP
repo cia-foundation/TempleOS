@@ -14,20 +14,14 @@ I64 *addr=VGA_GRAPHIC_MEM_BASE,
   48[RBP]=STK_SELECTOR
 */
 
-interrupt U0 PageFault()
+interrupt haserrcode U0 PageFault()
 {
-  I64 reg *rbp=GetBasePtr,reg *rsp=GetStkPtr,reg *src=rbp,reg *dst=rbp+1;
+  I64 reg *rbp=GetRBP;
   *pte_addr|=1;
   InvlPg(addr);
   err_code=rbp[1];
 asm {  MOV_RAX_CR2}
   reported_fault_addr=GetRAX;
-//Remove err_code from stk
-//so IRET works right.
-  while (src>=rsp)
-    *dst--=*src--;
-  SetBasePtr(rbp+1);
-  SetStkPtr(rsp+1);
 }
 
 

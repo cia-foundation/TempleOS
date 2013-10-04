@@ -634,7 +634,7 @@ GrMClipBoardInit;
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  CGrMFrame *e=NamedFramePtr("CGrMFrame",task);
+  CGrMFrame *e=FramePtr("CGrMFrame",task);
   CCtrl *c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES);
   F64 d;
   I64 i,x,y,z;
@@ -664,7 +664,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->ls.x=x;
   dc->ls.y=y;
   dc->ls.z=z;
-  d=1<<16/P3I32Norm(&dc->ls); //Light source normalized to 65536.
+  d=1<<16/D3I32Norm(&dc->ls); //Light source normalized to 65536.
   dc->ls.x*=d;
   dc->ls.y*=d;
   dc->ls.z*=d;
@@ -725,7 +725,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     dc->color=ROP_XOR+RED^COLOR_TRANSPARENT;
   else
     dc->color=ROP_XOR+COLOR_TRANSPARENT;
-  GrPrintF(dc,0,0,"%6.3f%% (%d,%d,%d)",e->view_scale*100,x,y,z);
+  GrPrint(dc,0,0,"%6.3f%% (%d,%d,%d)",e->view_scale*100,x,y,z);
   dc->pen_width=1;
   dc->color&=0xF;
   if (Blink(10))
@@ -871,7 +871,7 @@ U0 GrMUpdateMenu(CGrMFrame *e)
     tempse->checked=ToBool(e->flip_y);
 }
 
-I32 *CSpriteMesh(I32 *root=NULL,I64 *_size=NULL,Bool flip_y=FALSE)
+I32 *SpriteMesh(I32 *root=NULL,I64 *_size=NULL,Bool flip_y=FALSE)
 /*$WW,1$
 
 Fmt for mesh:
@@ -985,7 +985,7 @@ $WW,0$*/
   GrMInit(&e,flip_y);
   if (root)
     GrMLoad(&e,root);
-  NamedFramePtrAdd("CGrMFrame",&e);
+  FramePtrAdd("CGrMFrame",&e);
   Fs->draw_it=&DrawIt;
   GrMCurSnap(&e);
   GrMRecalcCxCy(Fs,&e);
@@ -1370,7 +1370,7 @@ mesh_done:
   else
     root=NULL;
   GrMCleanUp(&e);
-  NamedFramePtrDel("CGrMFrame");
+  FramePtrDel("CGrMFrame");
   if (old_s) {
     MemCpy(c->state,old_s,sizeof(CViewAngles));
     Free(old_s);

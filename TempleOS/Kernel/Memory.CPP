@@ -591,7 +591,7 @@ _MALLOC::
 
 	XOR	RBX,RBX
 	MOV	RDX,U64 SF_ARG2[RBP]
-	OR	RDX,RDX
+	TEST	RDX,RDX
 	JNZ	@@05
 	MOV	RDX,U64 FS:CTask.addr[RBX]
 @@05:	CMP	U32 CTask.task_signature[RDX],TASK_SIGNATURE_VAL
@@ -625,7 +625,7 @@ _MALLOC::
 	CMP	RAX,HEAP_HASH_SIZE
 	JAE	@@30
 	MOV	RSI,U64 CHeapCtrl.heap_hash[RAX+RDX]
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JZ	@@35
 	MOV	RCX,U64 CMemUnusedAllocated.next[RSI]
 	MOV	U64 CHeapCtrl.heap_hash[RAX+RDX],RCX
@@ -644,7 +644,7 @@ _MALLOC::
 	MOV	RSI,RAX
 	POP	RAX //blks that were allocated
 	POP	RDX
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JZ	@@45	//Out of memory
 
 	SHL	RAX,PAGE_BITS
@@ -657,7 +657,7 @@ _MALLOC::
 
 @@40:	MOV	RBX,RSI
 	MOV	RSI,U64 CMemUnusedAllocated.next[RBX]
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JNZ	@@55
 	PUSH	RAX		//-**** save byte size
 	ADD	RAX,16*PAGE_SIZE-1
@@ -672,7 +672,7 @@ _MALLOC::
 	MOV	RSI,RAX
 	POP	RAX //blks that were allocated
 	POP	RDX
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JNZ	@@50
 
 //Out of memory
@@ -763,7 +763,7 @@ MALLOC_ALMOST_DONE:
 	PUSH	RAX
 	MOV	RAX,U64 [SYS_EXTERN_TABLE]
 	MOV	RAX,U64 EXT_HEAPLOG_MALLOC*8[RAX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@90
 	CALL	RAX
 	JMP	@@95
@@ -799,16 +799,16 @@ _FREE::
 	JNC	@@20
 	PUSH_C_REGS
 	MOV	RBX,U64 SF_ARG1[RBP]
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@05
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JGE	@@05	//Aligned alloced chunks have neg size
 	ADD	RBX,RAX
 @@05:	PUSH	RBX
 	MOV	RAX,U64 [SYS_EXTERN_TABLE]
 	MOV	RAX,U64 EXT_HEAPLOG_FREE*8[RAX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@10
 	CALL	RAX
 	JMP	@@15
@@ -816,7 +816,7 @@ _FREE::
 @@15:	POP_C_REGS
 
 @@20:	MOV	RSI,U64 SF_ARG1[RBP]
-	OR	RSI,RSI
+	TEST	RSI,RSI
 
 #if _CFG_HEAP_DBG
 	JZ	I32 FREE_DONE
@@ -825,7 +825,7 @@ _FREE::
 #endif
 
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RSI]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JGE	@@25	//Aligned alloced chunks have neg size.
 			//The neg size is offset to start of $LK,"CMemUsedAllocated","MN:CMemUsedAllocated"$ struct.
 	ADD	RSI,RAX
@@ -907,10 +907,10 @@ _MSIZE::
 	ENTER	0
 	MOV	RBX,U64 SF_ARG1[RBP]
 	XOR	RAX,RAX
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@10
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JGE	@@05	//Aligned alloced chunks have neg size
 	ADD	RBX,RAX
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
@@ -922,10 +922,10 @@ _MSIZE2::
 	ENTER	0
 	MOV	RBX,U64 SF_ARG1[RBP]
 	XOR	RAX,RAX
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@10
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JGE	@@05	//Aligned alloced chunks have neg size
 	ADD	RBX,RAX
 @@05:	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
@@ -936,10 +936,10 @@ _MHEAP_CTRL::
 	ENTER	0
 	MOV	RBX,U64 SF_ARG1[RBP]
 	XOR	RAX,RAX
-	OR	RBX,RBX
+	TEST	RBX,RBX
 	JZ	@@10
 	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JGE	@@05	//Aligned alloced chunks have neg size
 	ADD	RBX,RAX
 @@05:	MOV	RAX,U64 CMemUsedAllocated.hc-CMemUsedAllocated.start[RBX]
@@ -1171,7 +1171,7 @@ U0 MemPagesNotPresentMark()
   CMemE820	*m20=SYS_MEM_E820;
 #exe {
   if (kernel_cfg->opts[CFG_PROTECT_LOW])
-    StreamPutS("MemLowPagesProtect(TRUE);");
+    StreamPrint("MemLowPagesProtect(TRUE);");
 };
   while (m20->type) {
     a=m20->base+m20->len;

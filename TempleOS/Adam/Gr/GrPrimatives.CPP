@@ -271,7 +271,7 @@ ff_done:
   return result;
 }
 
-public Bool GrPlot3b(CDC *dc,I64 x,I64 y,I64 z)
+public Bool GrPlot3B(CDC *dc,I64 x,I64 y,I64 z)
 {  //Clipping and transformation but no pen_width
   I64 _x,_y,_z;
   Bool was_transform=FALSE,was_symmetry=FALSE;
@@ -552,43 +552,37 @@ gr_done:
 
 #help_index "Graphics/Char;Char/Graphics"
 
-public Bool GrPutChar3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 ch)
+public Bool GrPutChar3(CDC *dc,I64 x,I64 y,I64 z,U8 ch)
 {  //transformation
 //DCF_SYMMETRY is silly.
   if (dc->flags & DCF_TRANSFORMATION)
-    (*dc->transform)(dc,&x1,&y1,&z1);
-  return GrPutChar(dc,x1,y1,ch);
+    (*dc->transform)(dc,&x,&y,&z);
+  return GrPutChar(dc,x,y,ch);
 }
 
-public Bool GrPutS3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s)
+public I64 GrPrint3(CDC *dc,I64 x,I64 y,I64 z,U8 *fmt,...)
 {  //transformation
 //DCF_SYMMETRY is silly.
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  I64 result;
   if (dc->flags & DCF_TRANSFORMATION)
-    (*dc->transform)(dc,&x1,&y1,&z1);
-  return GrPutS(dc,x1,y1,s);
+    (*dc->transform)(dc,&x,&y,&z);
+  result=GrPrint(dc,x,y,"%s",buf);
+  Free(buf);
+  return result;
 }
 
-public Bool GrVPutS3(CDC *dc,I64 x1,I64 y1,I64 z1,U8 *s)
+public I64 GrVPrint3(CDC *dc,I64 x,I64 y,I64 z,U8 *fmt,...)
 { //Vertical text
 //transformation
 //DCF_SYMMETRY is silly.
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  I64 result;
   if (dc->flags & DCF_TRANSFORMATION)
-    (*dc->transform)(dc,&x1,&y1,&z1);
-  return GrVPutS(dc,x1,y1,s);
-}
-
-public U0 GrPrintF3(CDC *dc,I64 x,I64 y,I64 z,U8 *fmt,...)
-{
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
-  GrPutS3(dc,x,y,z,buf);
+    (*dc->transform)(dc,&x,&y,&z);
+  result=GrVPrint(dc,x,y,"%s",buf);
   Free(buf);
-}
-
-public U0 GrVPrintF3(CDC *dc,I64 x,I64 y,I64 z,U8 *fmt,...)
-{ //Vertical text
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
-  GrVPutS3(dc,x,y,z,buf);
-  Free(buf);
+  return result;
 }
 
 #help_index "Graphics"
@@ -728,49 +722,6 @@ public I64 GrFloodFill3(CDC *dc,I64 x1,I64 y1,I64 z1,Bool not_color=FALSE)
   result=GrFloodFill(dc,x1,y1,not_color,z1,dc->depth_buf);
 gr_done:
   dc->flags=old_flags;
-  return result;
-}
-
-public I64 GrRect3(CDC *dc,I64 x,I64 y,I64 z,I64 w,I64 h)
-{  //Clipping and transformation
-  I64 x2,y2,z2,x3,y3,z3,result=0;
-  CDC *old_brush=dc->brush;
-  if (dc->flags & DCF_TRANSFORMATION) {
-    dc->brush=NULL;
-    x2=x+w; y2=y; z2=z;
-    x3=x; y3=y+h; z3=z;
-    (*dc->transform)(dc,&x,&y,&z);
-    (*dc->transform)(dc,&x2,&y2,&z2);
-    (*dc->transform)(dc,&x3,&y3,&z3);
-    if (!(dc->flags&DCF_JUST_MIRROR) ||
-	!(dc->flags&DCF_SYMMETRY))
-      result=Rect(dc,x,y,z,x2,y2,z2,x3,y3,z3,&GrLinePlot);
-    if (dc->flags & DCF_SYMMETRY) {
-      GrReflect(dc,&x,&y,&z);
-      GrReflect(dc,&x2,&y2,&z2);
-      GrReflect(dc,&x3,&y3,&z3);
-      result+=Rect(dc,x,y,z,x2,y2,z2,x3,y3,z3,&GrLinePlot);
-    }
-    dc->brush=old_brush;
-  } else {
-    if (!(dc->flags&DCF_JUST_MIRROR)||
-	!(dc->flags&DCF_SYMMETRY)) {
-      if (dc->depth_buf)
-	result=Rect(dc,x,y,z,x+w,y,z,x,y+h,z,&GrLinePlot);
-      else
-	result=GrRect(dc,x,y,w,h);
-    }
-    if (dc->flags & DCF_SYMMETRY) {
-      dc->brush=NULL;
-      x2=x+w; y2=y; z2=z;
-      x3=x; y3=y+h; z3=z;
-      GrReflect(dc,&x,&y,&z);
-      GrReflect(dc,&x2,&y2,&z2);
-      GrReflect(dc,&x3,&y3,&z3);
-      result+=Rect(dc,x,y,z,x2,y2,z2,x3,y3,z3,&GrLinePlot);
-      dc->brush=old_brush;
-    }
-  }
   return result;
 }
 
@@ -1169,21 +1120,21 @@ gr_done:
   return result;
 }
 
-public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
+public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p4)
 {
 //This uses $LK,"fixed-point","FI:::/TempleOS/Demo/Lectures/FixedPoint.CPP"$.
 //Returns cnt of pixels changed
   I64 x1,x2,y,z1,z2,dx1,dy1,dz1,dx2,dy2,dz2,result=0,i,y_min,y_max;
   CTask *win_task;
   //p1 is min x
-  if (p3->x<p2->x)
-    SwapU64(&p3,&p2);
+  if (p4->x<p2->x)
+    SwapU64(&p4,&p2);
   if (p2->x<p1->x)
     SwapU64(&p2,&p1);
 
-    //p2 is min y of remainder
-  if (p3->y<p2->y)
-    SwapU64(&p3,&p2);
+  //p2y<=p4y
+  if (p4->y<p2->y)
+    SwapU64(&p4,&p2);
 
   y_min=0;
   y_max=dc->height;
@@ -1195,16 +1146,47 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
       y_max=win_task->win_pixel_bottom-(win_task->win_scroll_y+win_task->win_pixel_top);
   }
 
-  if ((dy2=p3->y-p1->y)<0) {
-    if (dy1=p2->y-p1->y) {
-      dx1=(p1->x-p2->x)<<32/dy1;
-      dz1=(p1->z-p2->z)<<32/dy1;
-    } else {
-      dx1=0;
-      dz1=0;
-    }
-    dx2=(p1->x-p3->x)<<32/dy2;
-    dz2=(p1->z-p3->z)<<32/dy2;
+  if ((dy2=p4->y-p1->y)<0) {
+/*
+p1x<= {p2x,p4x}
+
+p2y<=
+p4y<
+p1y
+
+ 6
+ 1
+
+  6
+ 1
+
+ 24
+ 1
+
+ 42
+ 1
+
+ 2
+  4
+ 1
+
+  24
+ 1
+
+  42
+ 1
+
+     2
+  4
+ 1
+
+*/
+    dy1=p2->y-p1->y;
+    dx1=(p1->x-p2->x)<<32/dy1;
+    dz1=(p1->z-p2->z)<<32/dy1;
+
+    dx2=(p1->x-p4->x)<<32/dy2;
+    dz2=(p1->z-p4->z)<<32/dy2;
     x1=x2=p1->x<<32; y=p1->y; z1=z2=p1->z<<32;
     if (y+dy2<y_min) {
       i=y_min-(y+dy2);
@@ -1230,9 +1212,9 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
       z1+=dz1;
       z2+=dz2;
     }
-    if (dy2=p2->y-p3->y) {
-      dx2=(p3->x-p2->x)<<32/dy2;
-      dz2=(p3->z-p2->z)<<32/dy2;
+    if (dy2=p2->y-p4->y) {
+      dx2=(p4->x-p2->x)<<32/dy2;
+      dz2=(p4->z-p2->z)<<32/dy2;
       if (y+dy2<y_min) {
 	i=y_min-(y+dy2);
 	if (i>-dy2) goto ft_done;
@@ -1258,13 +1240,36 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
       z2+=dz2;
     }
   } else if ((dy2=p2->y-p1->y)>0) {
-    if (dy1=p3->y-p1->y) {
-      dx1=(p3->x-p1->x)<<32/dy1;
-      dz1=(p3->z-p1->z)<<32/dy1;
-    } else {
-      dx1=0;
-      dz1=0;
-    }
+/*
+p1x<= {p2x,p4x}
+
+p1y<
+p2y<=
+p4y
+
+ 1
+ 6
+
+ 1
+  6
+
+ 1
+  2
+  4
+
+ 1
+   2
+  4
+
+ 1
+  2
+       4
+
+*/
+    dy1=p4->y-p1->y;
+    dx1=(p4->x-p1->x)<<32/dy1;
+    dz1=(p4->z-p1->z)<<32/dy1;
+
     dx2=(p2->x-p1->x)<<32/dy2;
     dz2=(p2->z-p1->z)<<32/dy2;
     x1=x2=p1->x<<32; y=p1->y; z1=z2=p1->z<<32;
@@ -1292,9 +1297,9 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
       z1+=dz1;
       z2+=dz2;
     }
-    if (dy2=p3->y-p2->y) {
-      dx2=(p3->x-p2->x)<<32/dy2;
-      dz2=(p3->z-p2->z)<<32/dy2;
+    if (dy2=p4->y-p2->y) {
+      dx2=(p4->x-p2->x)<<32/dy2;
+      dz2=(p4->z-p2->z)<<32/dy2;
       if (y+dy2>=y_max) {
 	i=y+dy2-y_max+1;
 	if (i>dy2) goto ft_done;
@@ -1320,12 +1325,55 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
       z2+=dz2;
     }
   } else {
+/*
+p1x<= {p2x,p4x}
+
+p2y<=
+p1y<=
+p4y
+
+ 7
+
+ 16
+
+ 124
+
+ 3
+ 4
+
+ 2
+ 5
+
+ 3
+  4
+
+ 2
+ 1
+ 4
+
+  2
+ 1
+  4
+
+
+
+    2
+ 1
+  4
+
+
+
+  2
+ 1
+    4
+ 
+*/
     if (dy1=p2->y-p1->y) {
       dx1=(p2->x-p1->x)<<32/dy1;
       dz1=(p2->z-p1->z)<<32/dy1;
-      if (dy2=p2->y-p3->y) {
-	dx2=(p2->x-p3->x)<<32/dy2;
-	dz2=(p2->z-p3->z)<<32/dy2;
+      if (dy2=p2->y-p4->y) {
+	dx2=(p2->x-p4->x)<<32/dy2;
+	dz2=(p2->z-p4->z)<<32/dy2;
       } else {
 	dx2=0;
 	dz2=0;
@@ -1352,17 +1400,17 @@ public I64 GrFillTri0(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3)
 	z2+=dz2;
       }
     }
-    if (dy1=p3->y-p1->y) {
-      dx1=(p1->x-p3->x)<<32/dy1;
-      dz1=(p1->z-p3->z)<<32/dy1;
-      if (dy2=p3->y-p2->y) {
-	dx2=(p2->x-p3->x)<<32/dy2;
-	dz2=(p2->z-p3->z)<<32/dy2;
+    if (dy1=p4->y-p1->y) {
+      dx1=(p1->x-p4->x)<<32/dy1;
+      dz1=(p1->z-p4->z)<<32/dy1;
+      if (dy2=p4->y-p2->y) {
+	dx2=(p2->x-p4->x)<<32/dy2;
+	dz2=(p2->z-p4->z)<<32/dy2;
       } else {
 	dx2=0;
 	dz2=0;
       }
-      x1=x2=p3->x<<32; y=p3->y; z1=z2=p3->z<<32;
+      x1=x2=p4->x<<32; y=p4->y; z1=z2=p4->z<<32;
       if (y-dy1<y_min) {
 	i=y_min-(y-dy1);
 	if (i>dy1) goto ft_done;
@@ -1396,36 +1444,34 @@ public I64 GrFillPoly3(CDC *dc,I64 n,CD3I32 *poly)
 { //Must be convex.
 //Returns cnt of pixels changed
   CD3I32 tri[3];
-  I64 i,j,x0,y0,z0,x1,y1,z1,x2,y2,z2,result=0;
+  I64 i,j,x,y,z,result=0;
   if (n<3) return 0;
   if (dc->flags & DCF_SYMMETRY) {
     for (i=1;i<n-1;i++) {
       j=i-1;
       if (i==1) {
-	x0=poly[j].x; y0=poly[j].y; z0=poly[j].z;
+	x=poly[j].x; y=poly[j].y; z=poly[j].z;
 	if (dc->flags&DCF_TRANSFORMATION)
-	  (*dc->transform)(dc,&x0,&y0,&z0);
-	GrReflect(dc,&x0,&y0,&z0);
-	tri[0].x=x0; tri[0].y=y0; tri[0].z=z0;
+	  (*dc->transform)(dc,&x,&y,&z);
+	GrReflect(dc,&x,&y,&z);
+	tri[0].x=x; tri[0].y=y; tri[0].z=z;
       }
 
       j++;
       if (i==1) {
-	x1=poly[j].x; y1=poly[j].y; z1=poly[j].z;
+	x=poly[j].x; y=poly[j].y; z=poly[j].z;
 	if (dc->flags&DCF_TRANSFORMATION)
-	  (*dc->transform)(dc,&x1,&y1,&z1);
-	GrReflect(dc,&x1,&y1,&z1);
-      } else {
-	x1=x2; y1=y2; z1=z2;
+	  (*dc->transform)(dc,&x,&y,&z);
+	GrReflect(dc,&x,&y,&z);
       }
-      tri[1].x=x1; tri[1].y=y1; tri[1].z=z1;
+      tri[1].x=x; tri[1].y=y; tri[1].z=z;
 
       j++;
-      x2=poly[j].x; y2=poly[j].y; z2=poly[j].z;
+      x=poly[j].x; y=poly[j].y; z=poly[j].z;
       if (dc->flags&DCF_TRANSFORMATION)
-	(*dc->transform)(dc,&x2,&y2,&z2);
-      GrReflect(dc,&x2,&y2,&z2);
-      tri[2].x=x2; tri[2].y=y2; tri[2].z=z2;
+	(*dc->transform)(dc,&x,&y,&z);
+      GrReflect(dc,&x,&y,&z);
+      tri[2].x=x; tri[2].y=y; tri[2].z=z;
 
       result+=GrFillTri0(dc,&tri[0],&tri[1],&tri[2]);
     }
@@ -1435,27 +1481,25 @@ public I64 GrFillPoly3(CDC *dc,I64 n,CD3I32 *poly)
   for (i=1;i<n-1;i++) {
     j=i-1;
     if (i==1) {
-      x0=poly[j].x; y0=poly[j].y; z0=poly[j].z;
+      x=poly[j].x; y=poly[j].y; z=poly[j].z;
       if (dc->flags&DCF_TRANSFORMATION)
-	(*dc->transform)(dc,&x0,&y0,&z0);
-      tri[0].x=x0; tri[0].y=y0; tri[0].z=z0;
+	(*dc->transform)(dc,&x,&y,&z);
+      tri[0].x=x; tri[0].y=y; tri[0].z=z;
     }
 
     j++;
     if (i==1) {
-      x1=poly[j].x; y1=poly[j].y; z1=poly[j].z;
+      x=poly[j].x; y=poly[j].y; z=poly[j].z;
       if (dc->flags&DCF_TRANSFORMATION)
-	(*dc->transform)(dc,&x1,&y1,&z1);
-    } else {
-      x1=x2; y1=y2; z1=z2;
+	(*dc->transform)(dc,&x,&y,&z);
     }
-    tri[1].x=x1; tri[1].y=y1; tri[1].z=z1;
+    tri[1].x=x; tri[1].y=y; tri[1].z=z;
 
     j++;
-    x2=poly[j].x; y2=poly[j].y; z2=poly[j].z;
+    x=poly[j].x; y=poly[j].y; z=poly[j].z;
     if (dc->flags&DCF_TRANSFORMATION)
-      (*dc->transform)(dc,&x2,&y2,&z2);
-    tri[2].x=x2; tri[2].y=y2; tri[2].z=z2;
+      (*dc->transform)(dc,&x,&y,&z);
+    tri[2].x=x; tri[2].y=y; tri[2].z=z;
 
     result+=GrFillTri0(dc,&tri[0],&tri[1],&tri[2]);
   }

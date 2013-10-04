@@ -80,7 +80,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
   MySpring *temps=CAlloc(sizeof(MySpring));
   temps->end1=tempm1;
   temps->end2=tempm2;
-  temps->constant=10000;
+  temps->const=10000;
   temps->rest_len=100;
   QueIns(temps,ode->last_spring);
 }

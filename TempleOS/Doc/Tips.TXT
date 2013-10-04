@@ -25,7 +25,7 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 
 * See $MA+A-X+PU,"Key Map","KeyMap;View;\n"$ for a list of defined keys.  Define your own keys in $LK,"MyPutKey","MN:MyPutKey"$().  See $LK-A,"::/TempleOS/Doc/KeyBoard.TXT"$.
 
-* $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to reindent a $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ function or renumber an asm routine's local labels.
+* $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to reindent a $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ function or renumber an asm routine's local labels.
 
 * You can use $FG,2$filter_lines$FG$ in the editor text search form ($FG,2$<CTRL-F>$FG$) to temporarily display just lines near each match.  A value of $FG,2$filter lines$FG$ set to $FG,2$5$FG$ will display lines within 5 lines of matches.  Then, you can do another find to a different string and achieve a $FG,2$AND$FG$ search.  When finished, press $FG,2$<ESC>$FG$.
  
@@ -33,7 +33,7 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can disable $FG,2$WORDSTAT$FG$ commenting-out $LK,"WSInit","FF:HOME/Adam3fSys.CPP,WSInit"$() in $LK,"HOME/Adam3fSys.CPP","FF:HOME/Adam3fSys.CPP,WSInit"$.
 
-* You can rst MultiCore CPU's if they get hung with $LK,"MPStart","MN:MPStart"$().  HD Audio will get screwed-up, however.
+* You can rst MultiCore CPU's if they get hung with $LK,"MPStart","MN:MPStart"$().
 
 * Boolean expressions $BK,1$not$BK,0$ in $FG,2$if$FG$ statements don't have short circuit logic and are compiled inefficiently.
 
@@ -62,8 +62,6 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 * Use $LK,"Plain","MN:Plain"$() to edit a plain text file.  You'll need this if your file has $FG,2$$$$FG$'s.  Use the $LK-A,"::/TempleOS/Misc/Dollar.CPP"$ utility to strip dollar signs in text files.
 
 * Use $LK,"Silent","MN:Silent"$() to disable screen text output.
-
-* Use $LK,"IOSnd","MN:IOSnd"$() to disable noise from disk access.
 
 * Grab-scroll any window at any time with $FG,2${CTRL-LEFT-DRAG}$FG$.  Null grab-scrolling with $FG,2${CTRL-RIGHT}$FG$.
 
@@ -130,7 +128,7 @@ $FG,5$M(\"D:/TempleOS/*\",\"E:/TempleOS/*\",\"+r+d\");$FG$ to check my changes.
 
 * The editor's select-text mechanism allows for disjoint portions of selected text.  This is a feature, not a bug -- you can cut-and-paste disjoint text.
 
-* $LK,"time_stamp_freq","MN:time_stamp_freq"$ is continuously calibrated, so be careful because expressions involving it might decrease.  Take a snap-shot, like this: $FG,2$timeout=$LK,"GetTimeStamp","MN:GetTimeStamp"$+$LK,"time_stamp_freq","MN:time_stamp_freq"$ x seconds;$FG$ and compare against $LK,"GetTimeStamp","MN:GetTimeStamp"$().
+* $LK,"time_stamp_freq","MN:time_stamp_freq"$ is continuously calibrated, so be careful because expressions involving it might decrease.  Take a snap-shot, like this: $FG,2$timeout=$LK,"GetTSC","MN:GetTSC"$+$LK,"time_stamp_freq","MN:time_stamp_freq"$ x seconds;$FG$ and compare against $LK,"GetTSC","MN:GetTSC"$().
 
 * Use $LK,"HeapLog","MN:HeapLog"$() and $LK,"HeapLogRep","MN:HeapLogRep"$() to find leaks.  Don't be confused by $LK,"CDoc","MN:CDoc"$ allocations.  Those are generated when text is written to the cmd line buffer.
 

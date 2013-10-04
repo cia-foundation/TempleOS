@@ -58,7 +58,7 @@ I64 UnusedStk(CTask *task=NULL)
   PushFD;
   Cli;
   if (task==Fs)
-    result=GetStkPtr()(U8 *)-(&task->stk->stk_base)(U8 *);
+    result=GetRSP()(U8 *)-(&task->stk->stk_base)(U8 *);
   else
     result=task->rsp(U8 *)-(&task->stk->stk_base)(U8 *);
   PopFD;
@@ -70,7 +70,7 @@ U8 *Caller(I64 num=1)
 //which called this one, or the caller
 //of the caller, etc.
 {
-  U8 **rbp=GetBasePtr,**ptr;
+  U8 **rbp=GetRBP,**ptr;
   while (num--) {
     if (rbp>=*rbp)
       return NULL;
@@ -123,7 +123,7 @@ U0 StkRep(CTask *task=NULL)
   PushFD;
   Cli;
   if (task==Fs) {
-    rbp=GetBasePtr;
+    rbp=GetRBP;
     rsp=rbp+3;
     rbp=*rbp;
   } else {
@@ -166,7 +166,7 @@ U0 CallerRep(U8 **rbp=NULL,CTask *task=NULL)
   if (!task) task=Fs;
   if (!rbp) {
     if (task==Fs)
-      rbp=GetBasePtr;
+      rbp=GetRBP;
     else
       rbp=task->rbp;
   }
@@ -180,7 +180,7 @@ U0 CallerRep(U8 **rbp=NULL,CTask *task=NULL)
   }
 }
 
-U0 DbgStr(U8 *st,I64 mS=100)
+U0 RawStr(U8 *st,I64 mS=100)
 //Shows a string using
 //$LK,"Raw","MN:Raw"$ screen output for a fixed length
 //of time.
@@ -190,16 +190,14 @@ U0 DbgStr(U8 *st,I64 mS=100)
   Cli;
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
-  "DbgStr(";
-  "" st;
-  ')';
+  "RawStr(%s)",st;
   BusyWait(mS<<10);
   PopFD;
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
 }
 
-U0 DbgI64(I64 num,I64 mS=100)
+U0 RawI64(I64 num,I64 mS=100)
 //Shows a hex num using
 //$LK,"Raw","MN:Raw"$ screen output for a fixed length
 //of time.
@@ -209,14 +207,14 @@ U0 DbgI64(I64 num,I64 mS=100)
   Cli;
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
-  "DbgI64(%016X)",num;
+  "RawI64(%016X)",num;
   BusyWait(mS<<10);
   PopFD;
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
 }
 
-U0 DbgF64(F64 d,I64 mS=100)
+U0 RawF64(F64 d,I64 mS=100)
 //Shows a floating-point val using
 //$LK,"Raw","MN:Raw"$ screen output for a fixed length
 //of time.
@@ -226,14 +224,14 @@ U0 DbgF64(F64 d,I64 mS=100)
   Cli;
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
-  "DbgF64(%15e)",d;
+  "RawF64(%15e)",d;
   BusyWait(mS<<10);
   PopFD;
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
 }
 
-U0 DbgAdd(U8 *add,I64 mS=100)
+U0 RawAdd(U8 *add,I64 mS=100)
 //Shows an addr using $LK,"Raw","MN:Raw"$ screen
 //output for a length of time.
 {
@@ -242,14 +240,33 @@ U0 DbgAdd(U8 *add,I64 mS=100)
   Cli;
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
-  "DbgAdd(%P)",add;
+  "RawAdd(%P)",add;
   BusyWait(mS<<10);
   PopFD;
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
 }
 
-U0 DbgD(U8 *add,I64 cnt=0x80,I64 mS=100)
+U0 RawPrint(I64 mS=100,U8 *fmt,...)
+//Print using $LK,"Raw","MN:Raw"$ screen
+//output for a length of time.
+//$BK,1$Your heap must be good.$BK,0$
+{
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  Bool old_raw,old_input_filter;
+  PushFD;
+  Cli;
+  old_raw=Raw(ON);
+  old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
+  "%s",buf;
+  BusyWait(mS<<10);
+  PopFD;
+  LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
+  Raw(old_raw);
+  Free(buf);
+}
+
+U0 RawD(U8 *add,I64 cnt=0x80,I64 mS=100)
 //Dumps a block of mem using $LK,"Raw","MN:Raw"$
 //screen output for a fixed length
 //of time.
@@ -266,7 +283,7 @@ U0 DbgD(U8 *add,I64 cnt=0x80,I64 mS=100)
   Raw(old_raw);
 }
 
-U0 DbgDm(U8 *add,I64 cnt=0x80,I64 mS=100)
+U0 RawDm(U8 *add,I64 cnt=0x80,I64 mS=100)
 //Dumps a block of mem using $LK,"Raw","MN:Raw"$
 //screen output for a fixed length
 //of time.
@@ -358,38 +375,38 @@ I64 *TaskRegAdd(CTask *task,I64 reg_num)
 
 U0 RawDr(CTask *task=NULL)
 {
-  I64 i,j,old_col=sys_raw_dc_col;
+  I64 i,j,old_col=sys_raw_col;
   Bool old_raw=Raw(ON);
   U8 buf[200];
 
   if (!task) task=Fs;
 
   for (i=0;i<16;i++) {
-    sys_raw_dc_col=i*text_cols+RAWDR_COL;
+    sys_raw_col=i*text_cols+RAWDR_COL;
     "º%3Z:%016X\n",i,"ST_U64_REGS",*TaskRegAdd(task,i);
   }
 
-  sys_raw_dc_col=i++*text_cols+RAWDR_COL;
+  sys_raw_col=i++*text_cols+RAWDR_COL;
   "ºRIP:%016X\n",task->rip;
 
-  sys_raw_dc_col=i++*text_cols+RAWDR_COL;
+  sys_raw_col=i++*text_cols+RAWDR_COL;
   "º%-*tT\n",text_cols-(RAWDR_COL+1)-1,Fs->rip;
 
-  sys_raw_dc_col=i++*text_cols+RAWDR_COL;
+  sys_raw_col=i++*text_cols+RAWDR_COL;
   'º';
   if (Bt(&sys_run_level,RLf_COMPILER)) {
     j=Fs->rip;
     Ui(buf,&j,,,TRUE);
-    "" buf;
+    "%s",buf;
   } else
     NewLine;
 
-  sys_raw_dc_col=i*text_cols+RAWDR_COL;
+  sys_raw_col=i*text_cols+RAWDR_COL;
   'È';
   for (j=0;j<text_cols-RAWDR_COL-1;j++)
     'Í';
 
-  sys_raw_dc_col=old_col;
+  sys_raw_col=old_col;
   Raw(old_raw);
 }
 
@@ -581,19 +598,20 @@ U0 DbgHelp()
   ">D(0x100000);\t\t\t//Dump page tables.\n"
   ">Dm(0x100000);\t\t\t//Dump page tables.\n"
   ">Dm(Fs,sizeof(CTask));\t\t//Dump current task record.\n"
-  ">ClassRep(\"CTask\",Fs,1);\t//Dump current task record.\n"
+  ">ClassRep(Fs,\"CTask\",1);\t//Dump current task record.\n"
+  ">ClassRep(Fs,,1);\t\t//(It knows lastclass.)\n"
   ">CallerRep;\t\t\t//Stack trace report.\n"
   ">Da(_RSP);\t\t\t//Dump stk.\n"
   ">Dr;\t\t\t\t//Dump Registers.\n"
-  ">1+2*3+&PutS;\t\t\t//Show calculation result.\n"
+  ">1+2*3+&Print;\t\t\t//Show calculation result.\n"
   ">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
   ">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
   ">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
   ">I64 i;\t\t\t\t//Declare variable.\n"
   ">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
-  ">U(&PrintF+0x8);\t\t//Unassemble PrintF.\n"
-  ">Uf(\"PutS\");\t\t\t//Unassembler function \"PutS\".\n"
-  ">Man(\"PutS\");\t\t\t//Edit Src for \"PutS\".\n"
+  ">U(&Print+0x8);\t\t//Unassemble Print.\n"
+  ">Uf(\"Print\");\t\t\t//Unassembler function \"Print\".\n"
+  ">Man(\"Print\");\t\t\t//Edit Src for \"Print\".\n"
   ">E(_RIP);\t\t\t//Edit Src Code.\n"
   ">Fix;\t\t\t\t//Edit Last Err Src Code.\n"
   ">B(&Main+0x20);\t\t\t//Toggle break point.\n"
@@ -614,7 +632,7 @@ U0 Dbg2()
   if (IsRaw) {
     i=Fs->rip;
     Ui(buf,&i);
-    "" buf;
+    "%s",buf;
   } else
     U(Fs->rip,1);
 
@@ -670,7 +688,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code) //Called from $LK,"Fault2","FF:::/Te
 {
 //$BK,1$Be careful not to swap-out and ruin the saved context$BK,0$
   Bool was_raw,was_single_user,was_silent;
-  I64  i,old_dc_flags=sys_raw_dc_flags;
+  I64  i,old_raw_flags=sys_raw_flags;
   if (fault_num==I_DIVIDE_BY_ZERO)
     throw(EXCEPT_DIVIDE_BY_ZERO,Fs->rip);
   was_single_user=SingleUser(ON);
@@ -684,9 +702,9 @@ U0 Fault2(I64 fault_num,I64 fault_err_code) //Called from $LK,"Fault2","FF:::/Te
   else {
     was_raw=Raw(ON);
     was_silent=Silent(OFF);
-    sys_raw_dc_flags|=RDCF_SHOW_DOLLAR|RDCF_SCROLL;
+    sys_raw_flags|=RWF_SHOW_DOLLAR|RWF_SCROLL;
     "Task \"";
-    "" Fs->task_title;
+    "%s",Fs->task_title;
     "\"\n";
     "Fault:0x%02X %Z\t\tErr Code:%08X\n",fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
     "RIP:%08X",Fs->rip; //Sometimes crashes on %P, so do this first
@@ -699,7 +717,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code) //Called from $LK,"Fault2","FF:::/Te
     Fault3(fault_num,fault_err_code);
     Silent(was_silent);
     Raw(was_raw);
-    sys_raw_dc_flags=old_dc_flags;
+    sys_raw_flags=old_raw_flags;
   }
   SingleUser(was_single_user);
   if (LBtr(&Fs->task_flags,TASKf_KILL_AFTER_DBG))

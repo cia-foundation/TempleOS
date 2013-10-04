@@ -92,78 +92,78 @@ U0 TSInit()
 
     case CID_TAD8:
     case CID_TAD8_VM:
-      DefinePrintF("CFG_ACCT","\"\nTS/TAD\n\"");
-      DefinePrintF("CFG_HARD_DRVS","\"h2s0xbc00\n0xb880\n1d2s0xbc00\n0xb880\n0\"");
-      DefinePrintF("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
-      DefinePrintF("CFG_CDROM_DRVS","\"t3s0xb800\n0\"");
-      DefinePrintF("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
+      DefinePrint("CFG_ACCT","\"\nTS/TAD\n\"");
+      DefinePrint("CFG_HARD_DRVS","\"h2s0xbc00\n0xb880\n1d2s0xbc00\n0xb880\n0\"");
+      DefinePrint("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
+      DefinePrint("CFG_CDROM_DRVS","\"t3s0xb800\n0\"");
+      DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
       if (ts_cid==CID_TAD8) {
-	DefinePrintF("TS_HDS","\"DEI\"");
-	DefinePrintF("TS_MASTER_BOOT_DRVS","\"I\"");
+	DefinePrint("TS_HDS","\"DEI\"");
+	DefinePrint("TS_MASTER_BOOT_DRVS","\"I\"");
       } else { //CID_TAD8_VM
-	DefinePrintF("TS_HDS","\"DE\"");
-	DefinePrintF("TS_MASTER_BOOT_DRVS","\"\"");
+	DefinePrint("TS_HDS","\"DE\"");
+	DefinePrint("TS_MASTER_BOOT_DRVS","\"\"");
       }
-      DefinePrintF("TS_MAIN_DRV","\"D\"");
-      DefinePrintF("TS_BAK_DRV","\"E\"");
-      DefinePrintF("TS_RAM_DRV","\"B\"");
-      DefinePrintF("TS_WIN_DRV","\"H\"");
-      DefinePrintF("TS_CDROM_DRV","\"T\"");
+      DefinePrint("TS_MAIN_DRV","\"D\"");
+      DefinePrint("TS_BAK_DRV","\"E\"");
+      DefinePrint("TS_RAM_DRV","\"B\"");
+      DefinePrint("TS_WIN_DRV","\"H\"");
+      DefinePrint("TS_CDROM_DRV","\"T\"");
       break;
 */
     case CID_DFT:
-      DefinePrintF("CFG_ACCT","\"\nTS/TAD\n\"");
-      DefinePrintF("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
+      DefinePrint("CFG_ACCT","\"\nTS/TAD\n\"");
+      DefinePrint("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
       if (sys_auto_mount_ide_cnt) {
 	//If AutoMount was successful, No need to manually mount in next compile
-	DefinePrintF("CFG_HARD_DRVS","\"\"");
-	DefinePrintF("CFG_CDROM_DRVS","\"\"");
+	DefinePrint("CFG_HARD_DRVS","\"\"");
+	DefinePrint("CFG_CDROM_DRVS","\"\"");
       } else {
 
 	//These two are a crazy guess.	ATA:IDE Primary  ATAPI:IDE Secondary
-	DefinePrintF("CFG_HARD_DRVS","\"d2s0x1F0\n0x3F4\n0\"");
-	DefinePrintF("CFG_CDROM_DRVS","\"t3s0x170\n0\"");
+	DefinePrint("CFG_HARD_DRVS","\"d2s0x1F0\n0x3F4\n0\"");
+	DefinePrint("CFG_CDROM_DRVS","\"t3s0x170\n0\"");
 
 	bdev=Drv2BlkDev(*sys_acct);
 	if (bdev->type==BDT_ATAPI) {
 	  ATARep(FALSE,,&root);
 	  ATAIDDrvs(root,*sys_acct,&ata_drv,&atapi_drv);
 	  if (ata_drv)
-	    DefinePrintF("CFG_HARD_DRVS","\"d2p%d\n\"",ata_drv->num);
+	    DefinePrint("CFG_HARD_DRVS","\"d2p%d\n\"",ata_drv->num);
 	  if (atapi_drv)
-	    DefinePrintF("CFG_CDROM_DRVS","\"t3p%d\n\"",atapi_drv->num);
+	    DefinePrint("CFG_CDROM_DRVS","\"t3p%d\n\"",atapi_drv->num);
 	} else {
 	  try {
 	    bdev=Drv2BlkDev('D');
-	    DefinePrintF("CFG_HARD_DRVS","\"d2s0x%X\n0x%X\n%d\"",
+	    DefinePrint("CFG_HARD_DRVS","\"d2s0x%X\n0x%X\n%d\"",
 	      bdev->base0,bdev->base1,bdev->unit);
 	  } catch
 	    Fs->catch_except=TRUE;
 	  try {
 	    bdev=Drv2BlkDev('T');
-	    DefinePrintF("CFG_CDROM_DRVS","\"t3s0x%X\n%d\"",bdev->base0,bdev->unit);
+	    DefinePrint("CFG_CDROM_DRVS","\"t3s0x%X\n%d\"",bdev->base0,bdev->unit);
 	  } catch
 	    Fs->catch_except=TRUE;
 	}
       }
-      DefinePrintF("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
-      DefinePrintF("TS_HDS","\"DE\"");
-      DefinePrintF("TS_MASTER_BOOT_DRVS","\"D\"");
-      DefinePrintF("TS_MAIN_DRV","\"D\"");
-      DefinePrintF("TS_BAK_DRV","\"E\"");
-      DefinePrintF("TS_RAM_DRV","\"B\"");
-      DefinePrintF("TS_WIN_DRV","\"\"");
-      DefinePrintF("TS_CDROM_DRV","\"T\"");
+      DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
+      DefinePrint("TS_HDS","\"DE\"");
+      DefinePrint("TS_MASTER_BOOT_DRVS","\"D\"");
+      DefinePrint("TS_MAIN_DRV","\"D\"");
+      DefinePrint("TS_BAK_DRV","\"E\"");
+      DefinePrint("TS_RAM_DRV","\"B\"");
+      DefinePrint("TS_WIN_DRV","\"\"");
+      DefinePrint("TS_CDROM_DRV","\"T\"");
   }
 } TSInit;
 
 U0 TSInit2()
 {
-  DefinePrintF("TS_MAIN_DRV_LET","'%s'",TS_MAIN_DRV);
-  DefinePrintF("TS_BAK_DRV_LET","'%s'",TS_BAK_DRV);
-  DefinePrintF("TS_RAM_DRV_LET","'%s'",TS_RAM_DRV);
-  DefinePrintF("TS_WIN_DRV_LET","'%s'",TS_WIN_DRV);
-  DefinePrintF("TS_CDROM_DRV_LET","'%s'",TS_CDROM_DRV);
+  DefinePrint("TS_MAIN_DRV_LET","'%s'",TS_MAIN_DRV);
+  DefinePrint("TS_BAK_DRV_LET","'%s'",TS_BAK_DRV);
+  DefinePrint("TS_RAM_DRV_LET","'%s'",TS_RAM_DRV);
+  DefinePrint("TS_WIN_DRV_LET","'%s'",TS_WIN_DRV);
+  DefinePrint("TS_CDROM_DRV_LET","'%s'",TS_CDROM_DRV);
 
 } TSInit2;
 
@@ -217,14 +217,14 @@ Bool frame_grabber_on=FALSE;
 public U0 MyScreenShot(I64 bits=4)
 {
   U8 *st;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   I64 cnt=0;
-  tempm=FilesFind("::/Temp/ScreenShots/*.BMP.Z");
-  while (tempm) {
+  tempde=FilesFind("::/Temp/ScreenShots/*.BMP.Z");
+  while (tempde) {
     cnt++;
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
-  st=MSPrintF("::/Temp/ScreenShots/SCRN%04d.BMP.Z",cnt);
+  st=MPrint("::/Temp/ScreenShots/SCRN%04d.BMP.Z",cnt);
   BMPFileCaptureScreen(st,bits);
   Free(st);
   Beep;
@@ -254,31 +254,23 @@ Boot Windows
 
   I64 frame_num=0;
   U8  buf[136],buf2[136];
-  F64 end_time=tT,f;
+  F64 end_time=tT;
   TaskInitExt;
   Silent(ON);	//no output to screen
   MkDir("::/Temp/ScreenShots");
   while (frame_grabber_on) {
-    SPrintF(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
+    SPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
     StrCpy(buf2,buf);
     BMPFileCaptureScreen(buf);
-
-    f=tT;
-    while (end_time<f) {
+    while (TRUE) {
       end_time+=1.0/VIDEO_FRAME_RATE;
-      if (end_time<f) {
-	SPrintF(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
+      if (end_time<tT) {
+	SPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
 	Copy(buf2,buf);
-      }
+      } else
+	break;
     }
-    LBts(&Fs->task_flags,TASKf_IDLE);
-    while (sys_cur_scan_code&SCF_NUM) {
-      Yield;
-      end_time=tT;
-    }
-    while (end_time>tT)
-      Yield;
-    LBtr(&Fs->task_flags,TASKf_IDLE);
+    SleepUntil(sys_jiffies+(end_time-tT)*JIFFY_FREQ);
   }
 }
 
@@ -295,23 +287,68 @@ U0 CopyVideo()
 public U0 FrameGrabberToggle()
 {
   static F64 last_time=0;
-  if (tT-last_time>1.0) {
+  if (tT-last_time>3.0) {
     last_time=tT;
     if (frame_grabber_on) {
-      IOSnd(ON);
       frame_grabber_on=FALSE;
       Snd(0);
       wallpaper_record_on=snd_record=FALSE;
       Sleep(1000);
       CopyVideo;
     } else {
-      IOSnd(OFF); //You don't want to hear screen capture file writes
       frame_grabber_on=TRUE;
       Spawn(&FrameGrabberTask,NULL,"Frame Grabber");
       wallpaper_record_on=snd_record=TRUE;
       Snd(0);
     }
   }
+}
+
+U0 JukeSongsPut(U8 *dir,I64 start_song,I64 end_song)
+{
+  I64 i,j,len=4;
+  CDirEntry *tempde,*tempde1;
+  Cd(dir);
+  tempde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
+
+  for (tempde=tempde1,i=0;tempde && i<start_song;i++)
+    tempde=tempde->next;
+  for (i=start_song;tempde && i<end_song;i++) {
+    if (FileExtDot(tempde->name))
+      FileExtRem(tempde->name);
+    if (j=StrLen(tempde->name)) {
+      *tempde->full_name=':';
+      *tempde->name=ToUpper(*tempde->name);
+      if (j>len) len=j;
+    }
+    tempde=tempde->next;
+  }
+
+  for (tempde=tempde1,i=0;tempde && i<start_song;i++)
+    tempde=tempde->next;
+  if (end_song-start_song<=9)
+    j=1;
+  else if (end_song-start_song<=99)
+    j=2;
+  else
+    j=3;
+  for (i=start_song;tempde && i<end_song;i++) {
+    "$$LK+CX,\"%*d) %-*s\",\"FI:%s\"$$\n",j,i-start_song+1,len,tempde->name,tempde->full_name;
+    tempde=tempde->next;
+  }
+
+  DirLstDel(tempde1);
+}
+
+public U0 JukeLines(I64 start_line,I64 end_line)
+{
+  WordStat;
+  if (!frame_grabber_on)
+    FrameGrabberToggle;
+  JukeSongsPuppet("::/TempleOS/Apps/MusicOrgan/Examples",,start_line*5,end_line*5);
+  if (frame_grabber_on)
+    FrameGrabberToggle;
+  JukeSongsPut("::/TempleOS/Apps/MusicOrgan/Examples",start_line*5,end_line*5);
 }
 
 U0 ScreenShotTask(I64)
@@ -333,18 +370,12 @@ public U0 ChkAll()
     ChkDsk(*ptr++);
 }
 
-public U0 MyHAllRep(U8 *flags="-p",U8 *index=NULL)
-{
-  HashRep(Fs->hash_table,HTG_SRC_SYM-HTT_DEFINE_STR-HTT_CLASS,NULL,flags,0,index);
-}
-
 public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
 {
-  U8 byte_bit_cnts[256],st[2];
+  U8 byte_bit_cnts[256];
   I64 i,j,*ptr,row,col,ch,best_ch,score,best_score,cur_char_image,diff_image,total_score=0;
   CDoc *doc=DocNew;
 
-  MemSet(st,0,sizeof(st));
   MemSet(byte_bit_cnts,0,sizeof(byte_bit_cnts));
   for (i=0;i<256;i++)
     for (j=0;j<7;j++)
@@ -374,14 +405,12 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
 	}
       }
       if (best_ch=='$$')
-	DocPutS(doc,"$$$$");
-      else {
-	*st=best_ch;
-	DocPutS(doc,st);
-      }
+	DocPrint(doc,"$$$$");
+      else
+	DocPrint(doc,"%c",best_ch);
       total_score+=best_score;
     }
-    DocPutS(doc,"\n");
+    DocPrint(doc,"\n");
   }
   if (_total_score) *_total_score=total_score;
   return doc;

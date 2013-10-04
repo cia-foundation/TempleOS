@@ -64,6 +64,6 @@ $FG,2$0x40000000$FG$ $LK,"AKDInputFilterPutKey","MN:AKDInputFilterPutKey"$() for
 $FG,2$0x60000000$FG$ $LK,"AKDRawDisplayPutKey","MN:AKDRawDisplayPutKey"$() direct to video mem debug output. 
 $FG,2$0x80000000$FG$ $LK,"AKDDocPutKey","MN:AKDDocPutKey"$() standard document cmds
 
-Since handling individual keys is slow, TempleOS supports $LK,"PutS","MN:PutS"$() as well.  If no puts handler is defined, individual keys are sent.
+Since handling individual keys is slow, TempleOS supports PutS() as well.  If no puts handler is defined, individual keys are sent.
 
 $LK,"CDoc","MN:CDoc"$$FG,2$.user_put_key$FG$ and $LK,"CDoc","MN:CDoc"$$FG,2$.user_put_s$FG$ are call back routines which offer some neat tricks.  See $LK-A,"::/TempleOS/Apps/MusicOrgan/JukeBox.CPP"$.  There is a var $LK,"CDoc","MN:CDoc"$$FG,2$.user_put_data$FG$ which gets passed to them.

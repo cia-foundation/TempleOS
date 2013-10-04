@@ -14,7 +14,7 @@ PUT_DEC_U64::
 				//We'll move backward
 	MOV	U8 [RSI],0	//Terminator
 
-	OR	RAX,RAX		//Special case -- zero
+	TEST	RAX,RAX		//Special case -- zero
 	JNZ	@@05
 	DEC	RSI
 	MOV	U8 [RSI],'0'
@@ -27,7 +27,7 @@ PUT_DEC_U64::
 	ADD	RDX,'0'
 	DEC	RSI
 	MOV	U8 [RSI],DL
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JNZ	@@10
 
 @@15:	CALL	&PUT_STR

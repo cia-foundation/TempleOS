@@ -50,11 +50,11 @@ U0 DataDemo()
   "However, changes happen immediately,\n"
   "so it's tricky.\n\n";
   //Use <CTRL-L> for the $$DA,$$ format.
-  doc_e=DocPutS(doc,"$$DA-T+RD+UD-I64+U32,32,\"%12d\"$$\n");
+  doc_e=DocPrint(doc,"$$DA-T+RD+UD-I64+U32,32,\"%%12d\"$$\n");
   doc_e->data=&i;
 
   StrCpy(buf,"Terry");
-  doc_e=DocPutS(doc,"$$DA-P+RD+UD,7,\"Str:%s\"$$\n");
+  doc_e=DocPrint(doc,"$$DA-P+RD+UD,7,\"Str:%%s\"$$\n");
   doc_e->data=buf;
 
   if (unlock)

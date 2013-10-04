@@ -188,9 +188,9 @@ U0 WSDDictWordsAdd(CDoc *doc,U8 *st=NULL)
 	if (*ptr++!=WSD_WORD_CHAR)
 	  break;
 	if (i)
-	  DocPutS(doc,"\n");
+	  DocPrint(doc,"\n");
 	wsd_fillins[i]=ptr-1;
-	DocPrintF(doc," '%d' %s",i,ptr);
+	DocPrint(doc," '%d' %s",i,ptr);
 	ptr+=StrLen(ptr)+3;
       }
       wsd_num_fillins=i;
@@ -218,7 +218,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
   if (!st) return;
   if (*st==WSD_WORD_CHAR)
     st++;
-  DocPrintF(doc,"$$WW,1$$$$FG,RED$$%s:$$FG$$\n\n",st);
+  DocPrint(doc,"$$WW,1$$$$FG,RED$$%s:$$FG$$\n\n",st);
   if (num<0) {
     if (st3=WSDGetWord(st)) {
       st2=st3;
@@ -227,17 +227,17 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
 	  case WSD_WORD_CHAR:
 	    break;
 	  case WSD_DEF_CHAR:
-	    DocPrintF(doc,"$$FG,GREEN$$(%d)$$FG$$ %s\n",
+	    DocPrint(doc,"$$FG,GREEN$$(%d)$$FG$$ %s\n",
 	      ++i,st2);
 	    break;
 	  case WSD_PRONUNCIATION_CHAR:
-	    DocPrintF(doc,"$$FG,LTGREEN$$%s$$FG$$\n",st2);
+	    DocPrint(doc,"$$FG,LTGREEN$$%s$$FG$$\n",st2);
 	    break;
 	  case WSD_POS_CHAR:
-	    DocPrintF(doc,"$$FG,BLACK$$%s$$FG$$\n",st2);
+	    DocPrint(doc,"$$FG,BLACK$$%s$$FG$$\n",st2);
 	    break;
 	  case WSD_EXTRA_CHAR:
-	    DocPrintF(doc,"$$FG,LTBLUE$$%s$$FG$$\n",st2);
+	    DocPrint(doc,"$$FG,LTBLUE$$%s$$FG$$\n",st2);
 	    break;
 	}
 	st2+=StrLen(st2)+1;
@@ -247,7 +247,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
   } else {
     while (st2=WSDGetDef(st,++i)) {
       if (i==num)
-	DocPrintF(doc,"$$FG,GREEN$$(%d)$$FG$$ %s\n",
+	DocPrint(doc,"$$FG,GREEN$$(%d)$$FG$$ %s\n",
 	  i,st2);
       Free(st2);
     }
@@ -257,7 +257,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
 U0 WSDPopUpDef(U8 *st,I64 num=-1,CTask *parent=NULL)
 {
   U8 *buf;
-  buf=MSPrintF("WSDDisplayDefs(DocPut,\"%s\",%d);View;",st,num);
+  buf=MPrint("WSDDisplayDefs(DocPut,\"%s\",%d);View;",st,num);
   PopUp(buf,parent);
   Free(buf);
 }

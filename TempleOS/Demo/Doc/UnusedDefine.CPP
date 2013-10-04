@@ -48,12 +48,12 @@ U0 UnusedDefineScan()
       while (temph!=tempht) {
 	if (temph->type&HTT_DEFINE_STR) {
 	  progress1++;
-	  if (FileOcc(temph->str,"/TempleOS/"FILENAME_MASK_TXT,"+l-i")==1) {
+	  if (FileOcc(temph->str,"/TempleOS/*","+l-i+T")==1) {
 	    doc=DocNew;
 	    old_put_doc=DocPut;
 	    old_display_doc=DocDisplay;
 	    Fs->put_doc=Fs->display_doc=doc;
-	    Grep(temph->str,"/TempleOS/"FILENAME_MASK_TXT,"+l-i");
+	    Grep(temph->str,"/TempleOS/*","+l-i+T");
 	    Fs->put_doc=old_put_doc;
 	    Fs->display_doc=old_display_doc;
 	    doc_e=doc->root.next;

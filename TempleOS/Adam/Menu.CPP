@@ -50,15 +50,15 @@ CMenuEntry *MenuNewSub(CLex *lx,CTask *task)
       tempme->msg_code=MSG_KEY_DOWN_UP;
       Lex(lx); //Skip (
       if (lx->token!=',' && lx->token!=')')
-	tempme->msg_code=Expression(lx);
+	tempme->msg_code=LexExpression(lx);
       if (lx->token==',')
 	Lex(lx);
       if (lx->token!=',' && lx->token!=')')
-	tempme->p1=Expression(lx);
+	tempme->p1=LexExpression(lx);
       if (lx->token==',')
 	Lex(lx);
       if (lx->token!=',' && lx->token!=')')
-	tempme->p2=Expression(lx);
+	tempme->p2=LexExpression(lx);
       if (lx->token!=')')
 	LexExcept(lx,"ST_MISSING_RIGHT_PAREN");
       if (Lex(lx)!=';')
@@ -103,7 +103,7 @@ public CMenu *MenuNew(U8 *st,I64 flags=0,CTask *task=NULL)
 public CMenu *MenuFile(U8 *filename,I64 flags=0,CTask *task=NULL)
 {
   CMenu *m;
-  U8 *st=MSPrintF("#include \"%s\"",filename);
+  U8 *st=MPrint("#include \"%s\"",filename);
   m=MenuNew(st,flags,task);
   Free(st);
   return m;
@@ -199,7 +199,7 @@ U0 DrawMenu(CDC *dc)
 	dc->color=m->attr>>4;
       } else
 	dc->color=m->attr&15;
-      GrPutS(dc,x0,0,tempme->name);
+      GrPrint(dc,x0,0,"%s",tempme->name);
       y0=FONT_HEIGHT;
       tempse=tempme->sub;
       while (tempse) {
@@ -217,26 +217,26 @@ U0 DrawMenu(CDC *dc)
 	  dc->color=i&15;
 	  GrRect(dc,x0,y0,w,FONT_HEIGHT);
 	  dc->color=i>>4;
-	  GrPutS(dc,x0,y0,tempse->name);
+	  GrPrint(dc,x0,y0,"%s",tempse->name);
 	  if (st) {
 	    dc->color=i>>4;
 	    GrRect(dc,x0+w,y0-FONT_HEIGHT,(StrLen(st)+1)*FONT_WIDTH,FONT_HEIGHT*3);
 	    dc->color=i&15;
-	    GrPutS(dc,x0+w,y0,st);
+	    GrPrint(dc,x0+w,y0,"%s",st);
 	    Free(st);
 	  }
 	} else {
 	  dc->color=i>>4;
 	  GrRect(dc,x0,y0,w,FONT_HEIGHT);
 	  dc->color=i&15;
-	  GrPutS(dc,x0,y0,tempse->name);
+	  GrPrint(dc,x0,y0,"%s",tempse->name);
 	}
 	y0+=FONT_HEIGHT;
 	tempse=tempse->next;
       }
     } else {
       dc->color=m->attr&15;
-      GrPutS(dc,x0,0,tempme->name);
+      GrPrint(dc,x0,0,"%s",tempme->name);
     }
     x0+=w;
     tempme=tempme->next;

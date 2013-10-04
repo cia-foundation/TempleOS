@@ -44,31 +44,19 @@ I64 LinkChkFile(U8 *filename,I64 *_fuf_flags)
   return result;
 }
 
-I64 LinkChkLst(CDirEntry *tempm1,I64 *_fuf_flags)
-{
-  CDirEntry *tempm2;
-  I64 result=0;
-  while (tempm1 && !Bt(_fuf_flags,FUf_CANCEL)) {
-    tempm2=tempm1->next;
-    if (tempm1->attr & _ATTR_DIR) {
-      if (tempm1->sub) {
-	"%S %s\n","ST_SCANNING_DIR",tempm1->full_name;
-	result+=LinkChkLst(tempm1->sub,_fuf_flags);
-      }
-    } else
-      result+=LinkChkFile(tempm1->full_name,_fuf_flags);
-    CDirEntryDel(tempm1);
-    tempm1=tempm2;
-  }
-  return result;
-}
-
-public I64 LinkChk(U8 *files_find_mask=FILENAME_MASK_TXT,U8 *fu_flags=NULL)
+public I64 LinkChk(U8 *files_find_mask="/TempleOS/*",U8 *fu_flags=NULL)
 //Checks for broken file links.
 {
-  I64 fuf_flags=0;
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
-  GetFFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  return LinkChkLst(FilesFind(files_find_mask,fuf_flags),&fuf_flags);
+  I64 fuf_flags=0,result=0;
+  CDirEntry *tempde,*tempde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    result+=LinkChkFile(tempde->full_name,&fuf_flags);
+    tempde=tempde->next;
+  }
+  DirLstDel(tempde1);
+  return result;
 }
 #help_index ""

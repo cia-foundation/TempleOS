@@ -42,7 +42,7 @@ _HELLO_WORLD::
 	CALL	PUT_HEX_U8
 	MOV	RAX,CH_SPACE
 	CALL	PUT_CHAR
-	MOV	RAX,'Hello ' //Supports multi-byte char constants
+	MOV	RAX,'Hello ' //Supports multi-byte char consts
 	CALL	PUT_CHAR
 //We broke it in two pieces to show different ways.
 	MOV	RSI,MY_WORLD_MSG

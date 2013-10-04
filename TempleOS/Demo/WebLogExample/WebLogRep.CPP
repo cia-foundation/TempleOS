@@ -66,7 +66,7 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 	do if (!*src2) throw;
 	while (*src2++!='/');
 	* --src2=0;
-	ds.mon=1+LstEntryMatch(src,mon_lst,LEF_IGNORE_CASE);
+	ds.mon=1+LstMatch(src,mon_lst,LMF_IGNORE_CASE);
 	src=++src2;
 	ds.year=A2I(src,10,&src);
 	if (*src++!=':') throw;
@@ -128,13 +128,13 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 LogStruct *PrsLogFiles(U8 *files_find_mask)
 {
   LogStruct *root=CAlloc(sizeof(LogStruct));
-  CDirEntry *tempm=FilesFind(files_find_mask),*tempm1=tempm;
+  CDirEntry *tempde=FilesFind(files_find_mask),*tempde1=tempde;
   QueInit(root);
-  while (tempm) {
-    PrsSingleLogFile(root,tempm->full_name);
-    tempm=tempm->next;
+  while (tempde) {
+    PrsSingleLogFile(root,tempde->full_name);
+    tempde=tempde->next;
   }
-  CDirLstDel(tempm1);
+  DirLstDel(tempde1);
   return root;
 }
 
@@ -177,7 +177,7 @@ U0 BlockIPNums(LogStruct *root)
 
   //pass 1: collect robot lst
   while (templg!=root) {
-    if (StrIStr(templg->file,"ROBOT") &&
+    if (StrIMatch("ROBOT",templg->file) &&
 	!IsBlocked(&blocked_root,templg->ip_num))
       BlockedStructAdd(&blocked_root,templg->ip_num);
     templg=templg->next;
@@ -200,8 +200,8 @@ U0 BlockIPNums(LogStruct *root)
 Bool IsDownLoad(LogStruct *templg)
 {
   if (
-    StrStr(templg->file,DOWNLOAD_FILE1) && templg->size>=DOWNLOAD_FILE1_SIZE ||
-    StrStr(templg->file,DOWNLOAD_FILE2) && templg->size>=DOWNLOAD_FILE2_SIZE )
+    StrMatch(DOWNLOAD_FILE1,templg->file) && templg->size>=DOWNLOAD_FILE1_SIZE ||
+    StrMatch(DOWNLOAD_FILE2,templg->file) && templg->size>=DOWNLOAD_FILE2_SIZE )
     return TRUE;
   else
     return FALSE;

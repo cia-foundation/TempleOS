@@ -41,7 +41,7 @@ public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
 
 public CDC *DCNew(I64 type,I64 width,I64 height,CTask *task=NULL,Bool null_bitmap=FALSE)
 {  //This internally only allows widths which are divisible by 8
-//Don't forget these $MA+A-X+PU,"sizeof(CDC)","Grep(\"sizeof(CDC)\",\"/TempleOS/\"FILENAME_MASK_TXT);View;"$.
+//Don't forget these $MA+A-X+PU,"sizeof(CDC)","Grep(\"sizeof(CDC)\",\"/TempleOS/*\");View;"$.
   CDC *result;
   if (!task) task=Fs;
   result=CAlloc(sizeof(CDC),task);
@@ -136,19 +136,21 @@ public U0 DCMono(CDC *dc,
   }
 }
 
-public U0 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=COLOR_TRANSPARENT)
+public I64 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=COLOR_TRANSPARENT)
 {
-  I64 i;
+  I64 i,result=0;
   U8 *dst;
   if (dc->type==DCT_COLOR8) {
     dst=dc->body;
     i=dc->width_internal*dc->height;
     while (i--)
-      if (*dst==src_color)
+      if (*dst==src_color) {
 	*dst++=dst_color;
-      else
+	result++;
+      } else
 	dst++;
   }
+  return result;
 }
 
 public U8 *DCSave(CDC *dc,I64 *_size=NULL,Bool compressed=TRUE)

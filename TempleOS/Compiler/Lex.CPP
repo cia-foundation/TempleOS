@@ -9,7 +9,7 @@ U8 *CmpPmt(Bool dbl_semicolon=FALSE)
       "%8.6fs ans%d=0x%08X=%d\n",Fs->answer_times[i],i,Fs->answers[i],Fs->answers[i];
   }
   if (st=CurDir) {
-    "" st;
+    "%s",st;
     Free(st);
   }
   '>';
@@ -42,7 +42,7 @@ CLex *LexNew(U8 *buf,I64 flags,U8 *filename=NULL)
   QueInit(lx);
   lx->flags=flags;
   lx->opts=1<<OPTf_WARN_UNUSED_VAR;
-  lx->pass_trace_mask=0b10001111101;
+  lx->pass_trace_mask=0b1001111101;
   lx->htc.hash_mask=HTG_ALL-HTT_IMPORT_SYS_SYM-HTT_ASM_KEYWORD;
   lx->htc.define_hash_table=lx->htc.hash_table_lst=lx->htc.glbl_hash_table=lx->htc.local_hash_table=Fs->hash_table;
   if (flags&LF_KEEP_AT_SIGN)
@@ -78,6 +78,7 @@ U0 LexDel(CLex *lx)
   if (!(lx->flags & LF_DONT_FREE_BUF))
     Free(tempf->buf);
   Free(lx->ident);
+  Free(lx->cur_index);
   Free(lx->dollar);
   Free(lx);
 }
@@ -105,7 +106,7 @@ I64 LexSize(CLex *lx)
 U0 SetSrcFileInfo(CLex *lx,CHashSrcSym *h)
 {
   CLexFile *tempf=lx->cur_lfn;
-  h->src_link=MSPrintF("FL:%s,%d",tempf->name,tempf->line_num);
+  h->src_link=MPrint("FL:%s,%d",tempf->name,tempf->line_num);
   if (Bt(&lx->opts,OPTf_KEEP_PRIVATE))
     h->type|=HTF_PRIVATE;
   if (lx->cur_index)
@@ -118,10 +119,10 @@ U0 LexPutToken(CLex *lx)
 {
   '"';
   if (lx->token==TK_IDENT || lx->token==TK_STR)
-    "" lx->ident;
+    "%s",lx->ident;
   else if (lx->token==TK_INTEGER)
     "INT:%X",lx->cur_i;
-  else if (lx->token==TK_U8)
+  else if (lx->token==TK_CHAR_CONST)
     "U8:%X",lx->cur_i;
   else if (lx->token==TK_F64)
     "FLOAT:%e",lx->cur_f;
@@ -154,7 +155,7 @@ Bool LexDollar(CLex *lx,CDoc *doc,CDocEntry *doc_e)
   if (lx->flags&LF_IN_QUOTES) {
     Free(lx->dollar);
     st=Doc2PlainText(doc,doc_e);
-    lx->dollar=MSPrintF("$$%Q$$",st);
+    lx->dollar=MPrint("$$%Q$$",st);
     lx->dollar_cnt=2;
     Free(st);
     return TRUE;
@@ -367,11 +368,6 @@ U0 LexSkipEol(CLex *lx)
   U8 ch;
   do ch=$WW,0$LexGetChar(lx);
   while (Bt(non_eol_chars_bitmap,ch));
-}
-
-U0 ExpressionDel(U8 *code)
-{
-  Free(code);
 }
 
 U0 LexIncludeStr(CLex *lx,U8 *abs_filename,U8 *src,Bool actual_file)
@@ -1084,7 +1080,7 @@ lex_octal:
 	    }
 	}
 	lx->cur_i=k;
-	lx->token=TK_U8;
+	lx->token=TK_CHAR_CONST;
 	goto lex_end;
       case '#':
 	if (lx->flags&LF_KEEP_NUM_SIGN) {
@@ -1231,7 +1227,7 @@ lex_if:
 	      lx->flags&=~LF_IN_IF;
 	      goto lex_end;
 	    }
-	    if (Expression(lx)) {
+	    if (LexExpression(lx)) {
 	      lx->flags&=~LF_IN_IF;
 	      switch (lx->token) {
 		case TK_IF:	goto lex_if;
@@ -1408,7 +1404,7 @@ lex_ifjit:
 	  case KW_ASSERT:
 	    if (!Lex(lx))
 	      goto lex_end;
-	    if (!Expression(lx))
+	    if (!LexExpression(lx))
 	      LexPutWarn(lx,"ST_ASSERT_FAILED");
 	    goto lex_end;
 	  case KW_EXE:
@@ -1653,7 +1649,7 @@ U0 LexPutPos(CLex *lx)
 
 U0 LexPutWarn(CLex *lx,U8 *name=NULL,CHashFun *fun_class=NULL)
 {
-  if (name) PrintFWarn("%S",name);
+  if (name) PrintWarn("%S",name);
   if (fun_class) {
     "%S'%s'.\n","ST_IN_FUN",fun_class->str;
     if (IsRaw)
@@ -1674,7 +1670,7 @@ U0 LexExcept(CLex *lx,U8 *name=NULL,CHashFun *fun_class=NULL)
     Preempt(OFF);
     Raw(ON);
   }
-  if (name) PrintFErr("%S",name);
+  if (name) PrintErr("%S",name);
   if (!IsRaw)
     AdamErr("Task:%08X %S\n",Fs,name);
   LexPutPos(lx);

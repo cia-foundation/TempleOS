@@ -76,7 +76,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   ls.x=-(ipx-task->win_pixel_left-task->win_scroll_x-cx);
   ls.y=-(ipy-task->win_pixel_top-task->win_scroll_y-cy);
   ls.z=GR_WIDTH/8;
-  d=1<<16/P3I32Norm(&ls);
+  d=1<<16/D3I32Norm(&ls);
   ls.x*=d;
   ls.y*=d;
   ls.z*=d;
@@ -151,7 +151,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 //See $LK-A,"::/TempleOS/Demo/Graphics/SpritePlot3D.CPP"$.
 //for a CSprite example.
 
-//See $LK,"CSpriteMesh","MN:CSpriteMesh"$() for a fancy example.
+//See $LK,"SpriteMesh","MN:SpriteMesh"$() for a fancy example.
 
 U0 Main()
 {

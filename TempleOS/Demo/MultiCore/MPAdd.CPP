@@ -64,7 +64,7 @@ U0 MPAdd()
 
   dc->color=BLUE;
   for (i=MAX_PERCENT/10;i<MAX_PERCENT;i+=MAX_PERCENT/10) {
-    GrPrintF(dc,0,v-ToF64(i)/MAX_PERCENT*v-FONT_HEIGHT,"%3d%%",i);
+    GrPrint(dc,0,v-ToF64(i)/MAX_PERCENT*v-FONT_HEIGHT,"%3d%%",i);
     GrLine(dc,0,v-ToF64(i)/MAX_PERCENT*v,h,v-ToF64(i)/MAX_PERCENT*v);
   }
 
@@ -74,7 +74,7 @@ U0 MPAdd()
     GrLine3(dc,i*h/(NUM_TESTS-1),      v-results[i  ]/MAX_PERCENT*v,0,
 		 (i+1)*h/(NUM_TESTS-1),v-results[i+1]/MAX_PERCENT*v,0);
     dc->color=GREEN;
-    GrPrintF(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
+    GrPrint(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
     GrLine(dc,i*h/(NUM_TESTS-1),0,i*h/(NUM_TESTS-1),v);
   }
   PressAKey;

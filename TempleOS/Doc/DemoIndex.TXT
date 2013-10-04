@@ -21,6 +21,7 @@ $LK-A,"::/TempleOS/Demo/Graphics/Speedline.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/Bounce.CPP"$
 $LK-A,"::/TempleOS/Demo/KeyBitMap.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/WinZBuf.CPP"$
+$LK-A,"::/TempleOS/Demo/Graphics/Elephant.CPP.Z"$
 $LK-A,"::/TempleOS/Demo/Graphics/Mountain.CPP"$
 $LK-A,"::/TempleOS/Demo/Games/Coach.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/WallPaperFish.CPP"$
@@ -52,6 +53,7 @@ $LK-A,"::/TempleOS/Demo/Graphics/SpritePlot3D.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/Logo.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/RotateTank.CPP"$
 $LK-A,"::/TempleOS/Demo/ScreenCodes.CPP"$
+$LK-A,"::/TempleOS/Demo/Graphics/PanText.CPP.Z"$
 $LK-A,"::/TempleOS/Demo/Graphics/CharGraphics.CPP"$
 $LK-A,"::/TempleOS/Demo/Games/Maze.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/FontEd.CPP"$
@@ -59,7 +61,7 @@ $LK-A,"::/TempleOS/Demo/ExtendedChars.CPP"$
 $LK-A,"::/TempleOS/Demo/TimeIns.CPP"$
 $LK-A,"::/TempleOS/Demo/Snd/WaterFowl.CPP"$
 $MA+A-X+PU,"::/TempleOS/Apps/MusicOrgan/Examples","Cd(\"::/TempleOS/Apps/MusicOrgan/Examples\");Dir;View;\n"$
-$LK-A,"::/TempleOS/Demo/MultiCore/MPPrintF.CPP"$
+$LK-A,"::/TempleOS/Demo/MultiCore/MPPrint.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/PredatorPrey.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/Cartesian.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/Hanoi.CPP"$
@@ -118,10 +120,11 @@ $LK-A,"::/TempleOS/Demo/PhoneNumWords.CPP"$
 $LK-A,"::/TempleOS/Demo/SuggestSpelling.CPP"$
 $LK-A,"::/TempleOS/Demo/WordSearch.CPP"$
 $LK-A,"::/TempleOS/Demo/Graphics/CommonAncestor.CPP"$
+$LK-A,"::/TempleOS/Demo/Carry.CPP.Z"$
 $LK-A,"::/TempleOS/Demo/Dsk/DataBase.CPP"$
 $LK-A,"::/TempleOS/Demo/Dsk/OrderedIO.CPP"$
 $LK-A,"::/TempleOS/Demo/Dsk/FPrintF.CPP"$
-$LK-A,"::/TempleOS/Demo/Dsk/Raw.CPP"$
+$LK-A,"::/TempleOS/Demo/Dsk/DskRaw.CPP"$
 $LK-A,"::/TempleOS/Demo/Dsk/UnusedSpaceRep.CPP"$
 $LK-A,"::/TempleOS/Demo/Lectures/MiniGrLib.CPP"$
 $LK-A,"::/TempleOS/Demo/Lectures/MiniCompiler.CPP"$
@@ -136,7 +139,7 @@ $MA+A-X+PU,"::/TempleOS/Demo/Lectures","Cd(\"::/TempleOS/Demo/Lectures\");Dir;Vi
 $ID,-2$$TR,"TempleOS Specific"$
 $ID,2$$MA+A-X+PU,"::/TempleOS/Demo/OldSchool","Cd(\"::/TempleOS/Demo/OldSchool\");Dir;View;\n"$
 $MA+A-X+PU,"::/TempleOS/Demo/AutoFile","Cd(\"::/TempleOS/Demo/AutoFile\");Dir;View;\n"$
-$LK-A,"::/TempleOS/Demo/PrintF.CPP"$
+$LK-A,"::/TempleOS/Demo/Print.CPP"$
 $LK-A,"::/TempleOS/Demo/DateTime.CPP"$
 $LK-A,"::/TempleOS/Demo/SubIntAccess.CPP"$
 $LK-A,"::/TempleOS/Demo/ParenWarn.CPP"$

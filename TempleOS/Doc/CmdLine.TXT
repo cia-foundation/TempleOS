@@ -1,4 +1,4 @@
-$WW,1$The cmd line feeds into the $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$ compiler as you type.  A statement outside a function executes immediately.  Remember to add a semicolon.$WW,1$
+$WW,1$The cmd line feeds into the $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$ compiler as you type.  A statement outside a function executes immediately.  Remember to add a semicolon.$WW,1$
 
 Look-up the function headers with $FG,2$WordStat$FG$ by hitting $FG,2$<CTRL-SHIFT-F1>$FG$ after typing the first few letters.
 

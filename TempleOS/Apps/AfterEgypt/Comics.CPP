@@ -2,27 +2,27 @@ U0 ViewComics()
 {
   I64 i=0;
   U8 *st;
-  CDirEntry *tempm,*tempm1;
+  CDirEntry *tempde,*tempde1;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,LTBLUE$$");
-  tempm=FilesFind("Comics/*.TXT*");
-  tempm1=tempm;
-  while (tempm1) {
-    st=StrNew(tempm1->name);
+  DocPrint(doc,"$$FG,LTBLUE$$");
+  tempde=FilesFind("Comics/*.TXT*");
+  tempde1=tempde;
+  while (tempde1) {
+    st=StrNew(tempde1->name);
     FileExtRem(st);
-    tempm1->user_data=DocPrintF(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempm1);
+    tempde1->user_data=DocPrint(doc,"$$MU-UL,\"%-10ts\",%d$$ ",st,tempde1);
     Free(st);
-    tempm1=tempm1->next;
+    tempde1=tempde1->next;
     if ((i++&3)==3)
-      DocPutS(doc,"\n");
+      DocPrint(doc,"\n");
   }
   while (TRUE) {
-    if ((tempm1=PopUpMenu(doc))>0)
-      Ed(tempm1->full_name);
+    if ((tempde1=PopUpMenu(doc))>0)
+      Ed(tempde1->full_name);
     else
       break;
   }
   DocDel(doc);
-  CDirLstDel(tempm);
+  DirLstDel(tempde);
 }
 

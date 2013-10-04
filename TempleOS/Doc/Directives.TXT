@@ -1,8 +1,8 @@
 $WW,1$The compiler looks-ahead a token most of the time, so you might throw an extra semicolon after the directive if it's not taking affect right away.
 
 $FG,2$#include ""$FG$ 	There is no angle bracket <> form of this directive.
-$FG,2$#exe {}$FG$		Will execute code at compile-time and can be used to insert code into the stream being compiled using $LK,"StreamPrintF","MN:StreamPrintF"$().
-$FG,2$#define$FG$		Define string constant
+$FG,2$#exe {}$FG$		Will execute code at compile-time and can be used to insert code into the stream being compiled using $LK,"StreamPrint","MN:StreamPrint"$().
+$FG,2$#define$FG$		Define string const
 $FG,2$#assert$FG$		Print a warning during compilation if an expression is not true. 
 $FG,2$#if$FG$		Include code if an expresion is true.
 $FG,2$#else
@@ -23,7 +23,7 @@ Here are example instruction formats:
 $HL,1$	ADD	RAX,I64 FS:DISP[RSI+RDI*8]
 $HL,0$$HL,1$	ADD	RAX,I64 [DISP]
 $HL,0$
-$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in Holy C expressions.
+$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in HolyC expressions.
 
 $FG,2$$$$FG$ works in $FG,2$class$FG$es.
   $FG,2$class MyFun

@@ -12,7 +12,7 @@ PopUpOk(
 "and the boot drive is specified with \"$$FG,GREEN$$::$$FG$$\".\n\n"
 "$$FG,GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
-AFDelayedPutS("Cd(\"::/TempleOS/Demo/Games\");Dir;",25);
+AFPrint(25,"Cd(\"::/TempleOS/Demo/Games\");Dir;");
 AFPmtStr("\n");
 
 PopUpOk(
@@ -22,7 +22,7 @@ PopUpOk(
 "type it on the command line.\n\n"
 "$$FG,GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
-AFDelayedPutS("Ed(\"CastleFrankenstein.CPP.Z\");",25);
+AFPrint(25,"Ed(\"CastleFrankenstein.CPP.Z\");");
 AFPmtStr("\n");
 Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
 
@@ -52,7 +52,7 @@ PopUpOk(
 "with cursor keys and $$FG,GREEN$$<SHIFT-ESC>$$FG$$\n"
 "when you are done.\n");
 
-AFDelayedPutS("#include \"CastleFrankenstein\";",25);
+AFPrint(25,"#include \"CastleFrankenstein\";");
 AFPmtStr("\n");
 AFUntilChar(CH_SHIFT_ESC,CH_ESC);
 
@@ -63,7 +63,7 @@ PopUpOk(
 "$$FG,GREEN$$<ENTER>$$FG$$ at the command line to\n"
 "run it again.\n");
 
-AFDelayedPutS("CastleFrankenstein;",25);
+AFPrint(25,"CastleFrankenstein;");
 AFPmtStr("\n");
 AFUntilChar(CH_SHIFT_ESC,CH_ESC);
 
@@ -79,7 +79,7 @@ PopUpOk(
 "$$FG,GREEN$$<CTRL-ALT-X>$$FG$$\tKill task (window)\n"
 );
 
-AFDelayedPutS("Ed(\"CastleFrankenstein.CPP.Z\");\n",50);
+AFPrint(50,"Ed(\"CastleFrankenstein.CPP.Z\");\n");
 
 PopUpOk(
 "$$FG,GREEN$$<F5>$$FG$$ in the editor to run the file being edited.\n"

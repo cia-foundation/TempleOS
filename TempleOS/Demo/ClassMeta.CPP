@@ -15,23 +15,23 @@ U0 RankOut(I64 i)
 
 class Test1Struct
 {
-  I64 age	printf_str "%2d" dft_val 38;
+  I64 age	print_str "%2d" dft_val 38;
   I64 color	dft_val RED; //Accepts expressions
-  I64 rank	printf_str "%1d" dft_val 6/2 output_fun &RankOut;
+  I64 rank	print_str "%1d" dft_val 6/2 output_fun &RankOut;
 };
 
 class Test2Struct
 {
-  I64 age	 printf_str "%2d" dft_val 38 percentile 54.20;
-  I64 rank	 printf_str "%1d" dft_val 5;
-  I64 serial_num printf_str "%6d" dft_val 123456;
+  I64 age	 print_str "%2d" dft_val 38 percentile 54.20;
+  I64 rank	 print_str "%1d" dft_val 5;
+  I64 serial_num print_str "%6d" dft_val 123456;
 };
 
 
-U0 DumpStruct(U8 *class_name,U8 *data)
-{
+U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
+{//lastclass is keyword
   CHashClass *tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS);
-  U8 *printf_str;
+  U8 *print_str;
   I64 *q,dft_val;
   U0 (* fp_output_fun)(I64 i);
   F64 percentile;
@@ -43,10 +43,10 @@ U0 DumpStruct(U8 *class_name,U8 *data)
 
 //All our items are I64's.  If you want, you can check
 //the data type of the member var.  See $LK,"ClassRep","MN:ClassRep"$().
-    q=data+ml->offset;
+    q=_d+ml->offset;
 
-    if (printf_str=MemberMetaData("printf_str",ml))
-      "" printf_str,*q;
+    if (print_str=MemberMetaData("print_str",ml))
+      "" print_str,*q;
 
 //This is slightly ambiguous -- if no meta is present it will return zero.
     if (dft_val=MemberMetaData("dft_val",ml))
@@ -71,11 +71,11 @@ Test1Struct t1;
 t1.age=44;
 t1.rank=3;
 
-DumpStruct("Test1Struct",&t1);
+DumpStruct(&t1);
 
 Test2Struct t2;
 t2.age=22;
 t2.rank=2;
 t2.serial_num=55555;
 
-DumpStruct("Test2Struct",&t2);
+DumpStruct(&t2);

@@ -18,7 +18,7 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 * $LK,"Fs","MN:Fs"$ is a segment register, not "file system".  (It is kept pointing to the current task's record.)  There is no memory segmentation -- FS and GS are used as general purpose registers, more or less.
 
-* TempleOS uses a dialect of C/C++ called $LK,"Holy C","FI:::/TempleOS/Doc/HolyC.TXT"$.  It is not PASCAL.  I altered the syntax making parenthesis optional on function calls with no paramaters.
+* TempleOS uses a dialect of C/C++ called $LK,"HolyC","FI:::/TempleOS/Doc/HolyC.TXT"$.  It is not PASCAL.  I altered the syntax making parenthesis optional on function calls with no paramaters.
 
 * $LK,"Sleep","MN:Sleep"$() makes a program pause.  It is not hybernation for a laptop.
 

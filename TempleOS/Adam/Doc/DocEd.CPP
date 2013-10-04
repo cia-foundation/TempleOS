@@ -37,17 +37,16 @@ public Bool DocPatternFind(CDoc *doc,I64 start_line_num=MIN_I64,
       if (pattern) {
 	result=FALSE;
 	while (doc_e!=doc) {
-	  if (Bt(doc_tag_types,doc_e->type_u8)) {
-	    if (ptr=StrIStr(doc_e->tag,pattern)) { //TODO: handle multientry strings
-	      i=ptr-doc_e->tag;
-	      if (!--match) {
-		doc->cur_entry=doc_e;
-		  if (i<doc_e->min_col) i=doc_e->min_col;
-		  if (i>doc_e->max_col) i=doc_e->max_col;
-		doc->cur_data_col=i;
-		result=TRUE;
-		break;
-	      }
+	  if (Bt(doc_tag_types,doc_e->type_u8) &&
+		(ptr=StrIMatch(pattern,doc_e->tag))) { //TODO: handle multientry strings
+	    i=ptr-doc_e->tag;
+	    if (!--match) {
+	      doc->cur_entry=doc_e;
+	      if (i<doc_e->min_col) i=doc_e->min_col;
+	      if (i>doc_e->max_col) i=doc_e->max_col;
+	      doc->cur_data_col=i;
+	      result=TRUE;
+	      break;
 	    }
 	  }
 	  doc_e=doc_e->next;
@@ -112,7 +111,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
 //See $LK,"EdRenumAsm","MN:EdRenumAsm"$ for an example.
   U8 *dst;
   Bool unlock=DocLock(doc);
-  CDocEntry *doc_ce=doc->cur_entry,*original_cl=doc_ce,*doc_ne;
+  CDocEntry *doc_ce=doc->cur_entry,*original_ce=doc_ce,*doc_ne;
   I64 cc=doc->cur_data_col,y=doc_ce->y;
   if (sc!=MIN_I64) sc=sc.u32[0];
   if (sc>=0 && sc&SCF_CTRL) {
@@ -122,82 +121,41 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
     cc=doc_ce->min_col;
   } else {
     if (cc>doc_ce->min_col) {
-      if (doc_ce->type_u8==DOCT_TEXT &&
-	!(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	!(doc_ce->flags2&DOCEG2_DONT_EDIT) &&
-	cc<doc_ce->max_col) {
-	doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_ne->type=doc_ce->type;
-	doc_ne->flags1=doc_ce->flags1;
-	doc_ne->flags2=doc_ce->flags2;
+      if (IsEditableText(doc_ce) && cc<doc_ce->max_col) {
 	dst=doc_ce->tag+cc;
-	doc_ne->tag=StrNew(dst,doc->mem_task);
-	doc_ne->max_col=StrLen(dst);
-	doc_ne->x=doc_ce->x;
-	doc_ne->y=doc_ce->y;
-	doc_ne->page_line_num=doc_ce->page_line_num;
+	doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
 	*dst=0;
 	doc_ce->max_col=cc;
 	QueIns(doc_ne,doc_ce);
       }
       cc--;
-      if (doc_ce->type_u8==DOCT_TEXT&&
-	!(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	!(doc_ce->flags2&DOCEG2_DONT_EDIT) &&
-	cc>doc_ce->min_col) {
-	doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_ne->type=doc_ce->type;
-	doc_ne->flags1=doc_ce->flags1;
-	doc_ne->flags2=doc_ce->flags2;
+      if (IsEditableText(doc_ce) && cc>doc_ce->min_col) {
 	dst=doc_ce->tag+cc;
-	doc_ne->tag=StrNew(dst,doc->mem_task);
-	doc_ne->max_col=StrLen(dst);
-	doc_ne->x=doc_ce->x;
-	doc_ne->y=doc_ce->y;
-	doc_ne->page_line_num=doc_ce->page_line_num;
+	doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
 	*dst=0;
 	doc_ce->max_col=cc;
 	QueIns(doc_ne,doc_ce);
 	doc_ce=doc_ne;
 	cc=doc_ce->min_col;
       }
-      if (sc>=0) {
-	if (sc&SCF_SHIFT)
-	  doc_ce->type|=DOCET_SELECTED;
-	else
-	  doc_ce->type&=~DOCET_SELECTED;
-      }
+      if (sc>=0)
+	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
     } else {
       cc=doc_ce->min_col;
       while (doc_ce->last!=doc &&
 	(doc_ce->last->type_u8==DOCT_SOFT_NEW_LINE || doc_ce->last->type_u8==DOCT_INDENT ||
 	doc_ce->last->flags1 & (DOCEF1_SKIP|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
 	doc_ce=doc_ce->last;
-	if (sc>=0) {
-	  if (sc&SCF_SHIFT)
-	    doc_ce->type|=DOCET_SELECTED;
-	  else
-	    doc_ce->type&=~DOCET_SELECTED;
-	}
+	if (sc>=0)
+	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
       }
       if (doc_ce->last!=doc) {
 	doc_ce=doc_ce->last;
 	if (doc_ce->max_col>doc_ce->min_col) {
 	  cc=doc_ce->max_col-1;
-	  if (doc_ce->type_u8==DOCT_TEXT &&
-	    !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	    !(doc_ce->flags2&DOCEG2_DONT_EDIT) &&
-	    cc>doc_ce->min_col) {
-	    doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	    doc_ne->type=doc_ce->type;
-	    doc_ne->flags1=doc_ce->flags1;
-	    doc_ne->flags2=doc_ce->flags2;
+	  if (IsEditableText(doc_ce) && cc>doc_ce->min_col) {
 	    dst=doc_ce->tag+cc;
-	    doc_ne->tag=StrNew(dst,doc->mem_task);
-	    doc_ne->max_col=StrLen(dst);
-	    doc_ne->x=doc_ce->x;
-	    doc_ne->y=doc_ce->y;
-	    doc_ne->page_line_num=doc_ce->page_line_num;
+	    doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
 	    *dst=0;
 	    doc_ce->max_col=cc;
 	    QueIns(doc_ne,doc_ce);
@@ -206,18 +164,14 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
 	  }
 	} else
 	  cc=doc_ce->max_col;
-	if (sc>=0) {
-	  if (sc&SCF_SHIFT)
-	    doc_ce->type|=DOCET_SELECTED;
-	  else
-	    doc_ce->type&=~DOCET_SELECTED;
-	}
+	if (sc>=0)
+	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
       }
     }
   }
   doc->cur_data_col=cc;
   doc->cur_entry=doc_ce;
-  if (doc_ce!=original_cl)
+  if (doc_ce!=original_ce)
     DocFormBackward(doc);
   doc->recalc_start=doc->cur_entry->last;
   if (unlock)
@@ -229,7 +183,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
 //See $LK,"EdRenumAsm","MN:EdRenumAsm"$ for an example.
   Bool unlock=DocLock(doc);
   U8 *dst;
-  CDocEntry *doc_ce=doc->cur_entry,*original_cl=doc_ce,*doc_ne;
+  CDocEntry *doc_ce=doc->cur_entry,*original_ce=doc_ce,*doc_ne;
   I64 cc=doc->cur_data_col,y=doc_ce->y,old_flags1,old_flags2,old_color;
   doc->recalc_start=doc_ce->last;
   if (sc!=MIN_I64) sc=sc.u32[0];
@@ -244,20 +198,9 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
       cc=doc_ce->min_col;
   } else {
     if (cc<doc_ce->max_col) {
-      if (doc_ce->type_u8==DOCT_TEXT&&
-	!(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	!(doc_ce->flags2&DOCEG2_DONT_EDIT) &&
-	cc>doc_ce->min_col) {
-	doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_ne->type=doc_ce->type;
-	doc_ne->flags1=doc_ce->flags1;
-	doc_ne->flags2=doc_ce->flags2;
-	doc_ne->x=doc_ce->x;
-	doc_ne->y=doc_ce->y;
-	doc_ne->page_line_num=doc_ce->page_line_num;
+      if (IsEditableText(doc_ce) && cc>doc_ce->min_col) {
 	dst=doc_ce->tag+cc;
-	doc_ne->tag=StrNew(dst,doc->mem_task);
-	doc_ne->max_col=StrLen(dst);
+	doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
 	*dst=0;
 	doc_ce->max_col=cc;
 	QueIns(doc_ne,doc_ce);
@@ -268,28 +211,16 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
       old_flags1=doc_ce->flags1;
       old_flags2=doc_ce->flags2;
       old_color=doc_ce->type;
-      if (sc>=0) {
-	if (sc&SCF_SHIFT)
-	  doc_ce->type|=DOCET_SELECTED;
-	else
-	  doc_ce->type&=~DOCET_SELECTED;
-      }
-      if (doc_ce->type_u8==DOCT_TEXT&&
-	!(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	!(doc_ce->flags2&DOCEG2_DONT_EDIT) &&
-	cc<doc_ce->max_col) {
-	doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+      if (sc>=0)
+	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+      if (IsEditableText(doc_ce) && cc<doc_ce->max_col) {
+	dst=doc_ce->tag+cc;
+	doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
+	*dst=0;
 	doc_ne->type=DOCT_TEXT | old_color & -0x100;
 	doc_ne->flags1=old_flags1;
 	doc_ne->flags2=old_flags2;
-	dst=doc_ce->tag+cc;
-	doc_ne->tag=StrNew(dst,doc->mem_task);
-	doc_ne->max_col=StrLen(dst);
 	doc_ce->max_col=cc;
-	*dst=0;
-	doc_ne->x=doc_ce->x;
-	doc_ne->y=doc_ce->y;
-	doc_ne->page_line_num=doc_ce->page_line_num;
 	QueIns(doc_ne,doc_ce);
 	doc_ce=doc_ne;
 	cc=doc_ce->min_col;
@@ -299,30 +230,18 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
       }
     } else {
       if (doc_ce!=doc) {
-	if (cc<=doc_ce->min_col && sc>=0) {
-	  if (sc&SCF_SHIFT)
-	    doc_ce->type|=DOCET_SELECTED;
-	  else
-	    doc_ce->type&=~DOCET_SELECTED;
-	}
+	if (cc<=doc_ce->min_col && sc>=0)
+	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 	doc_ce=doc_ce->next;
 	while (doc_ce!=doc && doc_ce->flags1 & (DOCEF1_SKIP|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP)) {
-	  if (sc>=0) {
-	    if (sc&SCF_SHIFT)
-	      doc_ce->type|=DOCET_SELECTED;
-	    else
-	      doc_ce->type&=~DOCET_SELECTED;
-	  }
+	  if (sc>=0)
+	    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 	  doc_ce=doc_ce->next;
 	}
 	cc=doc_ce->min_col;
 	if (doc_ce->type_u8==DOCT_SOFT_NEW_LINE) {
-	  if (sc>=0) {
-	    if (sc&SCF_SHIFT)
-	      doc_ce->type|=DOCET_SELECTED;
-	    else
-	      doc_ce->type&=~DOCET_SELECTED;
-	  }
+	  if (sc>=0)
+	    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 	  doc_ce=doc_ce->next;
 	  cc=doc_ce->min_col;
 	}
@@ -331,7 +250,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
   }
   doc->cur_data_col=cc;
   doc->cur_entry=doc_ce;
-  if (doc_ce!=original_cl)
+  if (doc_ce!=original_ce)
     DocFormFwd(doc);
   if (unlock)
     DocUnlock(doc);
@@ -356,21 +275,12 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
       doc->cur_data_col=0;
   }
   x=doc->x; y=doc->y;
-  if (doc_ce->type_u8==DOCT_TEXT &&
-      !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-      !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+  if (IsEditableText(doc_ce)) {
     if (doc_ce->min_col<doc->cur_data_col<doc_ce->max_col-1) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-      doc_ne->type=doc_ce->type;
-      doc_ne->flags1=doc_ce->flags1;
-      doc_ne->flags2=doc_ce->flags2;
       dst=doc_ce->tag+doc->cur_data_col;
-      doc_ne->tag=StrNew(dst,doc->mem_task);
-      doc_ne->max_col=StrLen(dst);
-      doc_ne->y=doc_ce->y;
-      doc_ne->x=doc_ce->x+doc->cur_data_col;
-      doc_ne->page_line_num=doc_ce->page_line_num;
+      doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
       *dst=0;
+      doc_ne->x=doc_ce->x+doc->cur_data_col;
       doc_ce->max_col=doc->cur_data_col;
       QueIns(doc_ne,doc_ce);
     } else
@@ -379,48 +289,30 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   } else
     if (doc_ce->last!=doc)
       doc_ce=doc_ce->last;
-  if (sc>=0) {
-    if (sc&SCF_SHIFT)
-      doc_ce->type|=DOCET_SELECTED;
-    else
-      doc_ce->type&=~DOCET_SELECTED;
-  }
+  if (sc>=0)
+    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
   doc->cur_entry=doc_ce;
   DocFormBackward(doc);
   doc_ce=doc->cur_entry;
   while (doc_ce->last!=doc && (doc_ce->y>=y || doc_ce->flags1 & (DOCEF1_SKIP|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
     doc_ce=doc_ce->last;
-    if (sc>=0) {
-      if (sc&SCF_SHIFT)
-	doc_ce->type|=DOCET_SELECTED;
-      else
-	doc_ce->type&=~DOCET_SELECTED;
-    }
+    if (sc>=0)
+      BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
   }
   y=doc_ce->y;
   doc->y=y;
   while (doc_ce!=doc && (doc_ce->y>=y && doc_ce->x>=x || doc_ce->flags1 & (DOCEF1_SKIP|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
-    if (sc>=0) {
-      if (sc&SCF_SHIFT)
-	doc_ce->type|=DOCET_SELECTED;
-      else
-	doc_ce->type&=~DOCET_SELECTED;
-    }
+    if (sc>=0)
+      BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
     doc_ce=doc_ce->last;
   }
 
   if (doc_ce==doc || doc_ce->y<y)
     doc_ce=doc_ce->next;
   else {
-    if (doc_ce->type_u8!=DOCT_TEXT||
-	doc_ce->flags1&DOCEG1_DONT_EDIT ||
-	doc_ce->flags2&DOCEG2_DONT_EDIT) {
-      if (sc>=0) {
-	if (sc&SCF_SHIFT)
-	  doc_ce->type|=DOCET_SELECTED;
-	else
-	  doc_ce->type&=~DOCET_SELECTED;
-      }
+    if (!IsEditableText(doc_ce)) {
+      if (sc>=0)
+	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
     } else {
       if (doc_ce->next->x==x) {
 	doc_ce=doc_ce->next;
@@ -435,9 +327,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   }
   if (Bt(doc_tag_types,doc_ce->type_u8)) {
     doc->cur_data_col=x-doc_ce->x;
-    if (doc_ce->type_u8==DOCT_TEXT&&
-     !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-     !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+    if (IsEditableText(doc_ce)) {
       if (doc->cur_data_col>doc_ce->max_col)
 	doc->cur_data_col=doc_ce->max_col;
     } else {
@@ -454,27 +344,18 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
     } else
       doc->cur_data_col=doc_ce->min_col;
   }
-  if (doc_ce->type_u8==DOCT_TEXT &&
-    !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-    !(doc_ce->flags2&DOCEG2_DONT_EDIT) && doc_ce->x<x) {
+  if (IsEditableText(doc_ce) && doc_ce->x<x) {
     if (doc->cur_data_col<doc_ce->max_col-1) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-      doc_ne->type=doc_ce->type;
-      doc_ne->flags1=doc_ce->flags1;
-      doc_ne->flags2=doc_ce->flags2;
+      dst=doc_ce->tag+doc->cur_data_col;
+      doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
+      *dst=0;
       if (sc>=0) {
 	if (sc&SCF_SHIFT)
 	  doc_ne->type=doc_ce->type | DOCET_SELECTED;
 	else
 	  doc_ne->type=doc_ce->type & ~DOCET_SELECTED;
       }
-      dst=doc_ce->tag+doc->cur_data_col;
-      doc_ne->tag=StrNew(dst,doc->mem_task);
-      doc_ne->max_col=StrLen(dst);
-      doc_ne->page_line_num=doc_ce->page_line_num;
-      doc_ne->y=doc_ce->y;
       doc_ne->x=doc_ce->x+doc->cur_data_col;
-      *dst=0;
       doc_ce->max_col=doc->cur_data_col;
       QueIns(doc_ne,doc_ce);
       doc_ce=doc_ne;
@@ -511,27 +392,18 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
   }
   doc->recalc_start=doc_ce->last;
   x=doc->x; y=doc->y;
-  if (doc_ce->type_u8==DOCT_TEXT &&
-      !(doc_ce->flags1&DOCEG1_DONT_EDIT)&&
-      !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+  if (IsEditableText(doc_ce)) {
     if (doc->cur_data_col>doc_ce->min_col && doc->cur_data_col<doc_ce->max_col-1) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-      doc_ne->type=doc_ce->type;
-      doc_ne->flags1=doc_ce->flags1;
-      doc_ne->flags2=doc_ce->flags2;
+      dst=doc_ce->tag+doc->cur_data_col;
+      doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
+      *dst=0;
       if (sc>=0) {
 	if (sc&SCF_SHIFT)
 	  doc_ne->type=doc_ce->type | DOCET_SELECTED;
 	else
 	  doc_ne->type=doc_ce->type & ~DOCET_SELECTED;
       }
-      dst=doc_ce->tag+doc->cur_data_col;
-      doc_ne->tag=StrNew(dst,doc->mem_task);
-      doc_ne->max_col=StrLen(dst);
-      doc_ne->page_line_num=doc_ce->page_line_num;
-      doc_ne->y=doc_ce->y;
       doc_ne->x=doc_ce->x+doc->cur_data_col;
-      *dst=0;
       doc_ce->max_col=doc->cur_data_col;
       QueIns(doc_ne,doc_ce);
       doc_ce=doc_ne;
@@ -557,27 +429,19 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
       DocFormBackward(doc);
     doc_ce=doc->cur_entry;
   }
-  while (doc_ce2!=doc && (doc_ce2!=doc_ce || doc_ce->type_u8==DOCT_TEXT &&
-     !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-     !(doc_ce->flags2&DOCEG2_DONT_EDIT))) {
+  while (doc_ce2!=doc && (doc_ce2!=doc_ce || IsEditableText(doc_ce))) {
     if (doc_ce2->y<y || doc_ce2->x<x || doc_ce2->flags1 & (DOCEF1_SKIP|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP) ||
        doc_ce2->x==x && !doc_ce2->max_col &&
        Bt(doc_nontag_invisible_types,doc_ce2->type_u8)) {
-      if (sc>=0) {
-	if (sc&SCF_SHIFT)
-	  doc_ce2->type|=DOCET_SELECTED;
-	else
-	  doc_ce2->type&=~DOCET_SELECTED;
-      }
+      if (sc>=0)
+	BEqu(&doc_ce2->type,DOCEt_SELECTED,sc&SCF_SHIFT);
     }
     if (doc_ce2==doc_ce) break;
     doc_ce2=doc_ce2->next;
   }
   if (Bt(doc_tag_types,doc_ce->type_u8)) {
     doc->cur_data_col=x-doc_ce->x;
-    if (doc_ce->type_u8==DOCT_TEXT&&
-      !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-      !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+    if (IsEditableText(doc_ce)) {
       if (doc->cur_data_col>doc_ce->max_col)
 	doc->cur_data_col=doc_ce->max_col;
     } else {
@@ -588,21 +452,15 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
       doc->cur_data_col=doc_ce->min_col;
   } else
     doc->cur_data_col=doc_ce->min_col;
-  if (doc_ce->type_u8==DOCT_TEXT&&
-    !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-    !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+  if (IsEditableText(doc_ce)) {
     if (doc_ce->min_col<doc->cur_data_col<doc_ce->max_col-1) {
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+      dst=doc_ce->tag+doc->cur_data_col;
+      doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
+      *dst=0;
       doc_ne->type=DOCT_TEXT | old_color & -0x100;
       doc_ne->flags1=old_flags1;
       doc_ne->flags2=old_flags2;
-      dst=doc_ce->tag+doc->cur_data_col;
-      doc_ne->tag=StrNew(dst,doc->mem_task);
-      doc_ne->max_col=StrLen(dst);
-      *dst=0;
       doc_ce->max_col=doc->cur_data_col;
-      doc_ne->y=doc_ce->y;
-      doc_ne->page_line_num=doc_ce->page_line_num;
       doc_ne->x=doc_ce->x+doc->cur_data_col;
       QueIns(doc_ne,doc_ce);
       doc_ce=doc_ne;
@@ -613,12 +471,8 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
   DocFormFwd(doc);
   if (!(doc->flags & DOCF_FORM))
     while (doc_ce!=doc && doc_ce!=doc->cur_entry) {
-      if (sc>=0) {
-	if (sc&SCF_SHIFT)
-	  doc_ce->type|=DOCET_SELECTED;
-	else
-	  doc_ce->type&=~DOCET_SELECTED;
-      }
+      if (sc>=0)
+	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
       doc_ce=doc_ce->next;
     }
   doc->x=doc->cur_entry->x+doc->cur_data_col;
@@ -637,9 +491,7 @@ U0 EdDelChar(CDoc *doc)
     return;
   } else
     doc->recalc_start=doc_ce->last;
-  if (doc_ce->max_col!=0 && (doc_ce->type_u8==DOCT_TEXT&&
-    !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-    !(doc_ce->flags2&DOCEG2_DONT_EDIT)|| doc_ce->type_u8==DOCT_DATA)) {
+  if (doc_ce->max_col!=0 && (IsEditableText(doc_ce)||doc_ce->type_u8==DOCT_DATA)) {
     if (doc_ce->type_u8==DOCT_DATA) {
       if (doc_ce->flags1 & DOCEF1_HAS_TERMINATOR && doc->cur_data_col==doc_ce->max_col-1) {
 	if (unlock)
@@ -703,7 +555,7 @@ U0 EdInsChar(I64 ch,I64 sc,CDoc *doc)
 	goto ic_cont;
       } else {
 	doc->dollar_buf[doc->dollar_buf_ptr]=0;
-	DocPutS(doc,doc->dollar_buf);
+	DocPrint(doc,doc->dollar_buf);
 	doc->flags&=~DOCF_IN_DOLLAR;
 	doc->dollar_buf_ptr=0;
 	goto ic_done;
@@ -761,9 +613,7 @@ ic_cont:
   if (doc->flags & DOCF_OVERSTRIKE) {
     if (Bt(displayable_chars_bitmap,ch)) {
 ic_overstrike_char:
-      if (doc_ce->type_u8==DOCT_TEXT&&
-	!(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	!(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+      if (IsEditableText(doc_ce)) {
 	if (doc->cur_data_col<doc_ce->max_col) {
 	  if (doc_ce->tag[doc->cur_data_col]) {
 	    doc_ce->tag[doc->cur_data_col++]=ch;
@@ -794,13 +644,10 @@ ic_overstrike_char:
       b=MAlloc(2,doc->mem_task);
       *b=ch;
       b[1]=0;
-      doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+      doc_ne=DocEntryNew(doc,doc_ce,b);
       doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
-      doc_ne->tag=b;
-      doc_ne->max_col=1;
-      doc_ne->x=doc_ce->x;
-      doc_ne->y=doc_ce->y;
-      doc_ne->page_line_num=doc_ce->page_line_num;
+      doc_ne->flags1=0;
+      doc_ne->flags2=0;
       QueIns(doc_ne,doc_ce->last);
     } else if (ch=='\n') {
       while (doc->cur_entry->next!=doc && doc->cur_entry->y==y)
@@ -846,9 +693,7 @@ ic_form_tab:
 	    b[i]=b[i-1];
 	  b[doc->cur_data_col++]=ch;
 	}
-      } else if (doc_ce->type_u8==DOCT_TEXT&&
-	  !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	  !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+      } else if (IsEditableText(doc_ce)) {
 	dst=b=MAlloc(doc_ce->max_col+2,doc->mem_task);
 	src=doc_ce->tag;
 	i=doc->cur_data_col;
@@ -864,13 +709,11 @@ ic_form_tab:
 	b=MAlloc(2,doc->mem_task);
 	*b=ch;
 	b[1]=0;
-	doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+	doc_ne=DocEntryNew(doc,doc_ce,b);
 	doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
-	doc_ne->tag=b;
-	doc_ne->max_col=1;
+	doc_ne->flags1=0;
+	doc_ne->flags2=0;
 	doc_ne->x=doc_ce->x+1;
-	doc_ne->y=doc_ce->y;
-	doc_ne->page_line_num=doc_ce->page_line_num;
 	QueIns(doc_ne,doc_ce->last);
       }
     }
@@ -879,7 +722,7 @@ ic_done:
   DocRemSoftNewLines(doc,doc->cur_entry);
   if (doc->cur_entry->flags1 & DOCEF1_UPDATE_DATA) {
     if (doc->cur_entry->type_u8==DOCT_DATA || doc->cur_entry->type_u8==DOCT_CHECK_BOX)
-    DocDataGet(doc->cur_entry);
+    DocDataScan(doc->cur_entry);
   }
   if (unlock)
     DocUnlock(doc);
@@ -912,13 +755,13 @@ public U0 EdFindNext(CDoc *doc)
   Bool unlock=DocLock(doc);
   U8 *ptr,*ptr2,*ptr3;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce;
-  I64 ss_flags;
+  I64 sf_flags;
   if (doc->find_replace->match_case)
-    ss_flags=0;
+    sf_flags=0;
   else
-    ss_flags=SRF_IGNORE_CASE;
+    sf_flags=SFF_IGNORE_CASE;
   if (doc->find_replace->whole_labels)
-    ss_flags|=SRG_WHOLE_LABELS;
+    sf_flags|=SFG_WHOLE_LABELS;
   do {
     if (doc_e!=doc) {
       if (Bt(doc_tag_types,doc_e->type_u8)&&
@@ -934,7 +777,7 @@ public U0 EdFindNext(CDoc *doc)
 		ptr=doc_ce->tag+doc_ce->min_col;
 	    } else
 	      ptr=doc_e->tag;
-	    if (ptr=SearchStr(ptr,doc->find_replace->find_text,ss_flags)) {
+	    if (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
 	      doc->cur_entry=doc_e;
 	      doc->cur_data_col=ptr-doc_e->tag;
 	      if (doc->cur_data_col>=doc_e->max_col)
@@ -953,7 +796,7 @@ public U0 EdFindNext(CDoc *doc)
 	      ptr3=doc_ce->tag+doc->cur_data_col;
 	    else
 	      ptr3=doc_e->tag+doc_e->max_col;
-	    while (ptr=SearchStr(ptr,doc->find_replace->find_text,ss_flags)) {
+	    while (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
 	      if (ptr>=ptr3)
 		break;
 	      ptr2=ptr++;
@@ -989,10 +832,7 @@ public U0 EdSelectAll(CDoc *doc,Bool select)
   Bool unlock=DocLock(doc);
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
-    if (select)
-      doc_e->type|=DOCET_SELECTED;
-    else
-      doc_e->type&=~DOCET_SELECTED;
+    BEqu(&doc_e->type,DOCEt_SELECTED,select);
     doc_e=doc_e->next;
   }
   if (unlock)
@@ -1005,7 +845,7 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
   Bool unlock=DocLock(doc),result=FALSE;
   U8 ch,*ptr,original_col=doc->cur_data_col;
   I64 levels=0,colons=0;
-  CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce,*original_cl=doc_ce;
+  CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce,*original_ce=doc_ce;
   if (abort_on_dbl_colon && EdCurU8(doc)==':')
     colons=1;
   else
@@ -1039,7 +879,7 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
 		  doc->cur_data_col=ptr-doc_e->tag-1;
-		  result=doc->cur_entry!=original_cl || doc->cur_data_col!=original_col;
+		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
 		  goto pa_done;
 		}
 	      }
@@ -1070,7 +910,7 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
 		  doc->cur_data_col=ptr-doc_e->tag+1;
-		  result=doc->cur_entry!=original_cl || doc->cur_data_col!=original_col;
+		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
 		  goto pa_done;
 		}
 	      }
@@ -1195,28 +1035,28 @@ U0 EdUndoFilter(CDoc *doc)
 I64 EdFindReplace(CDoc *doc)
 {
   Bool first=TRUE,found,unlock;
-  I64 cmd,i,j,plen,rlen,dlen,result=-1,ss_flags;
+  I64 cmd,i,j,plen,rlen,dlen,result=-1,sf_flags;
   U8 *src,*dst,*dst2;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
   if (doc->find_replace->pmt)
     cmd=RSAC_REPLACE;
   else
     cmd=RSAC_ALL;
-  if (!doc->find_replace->pmt || DocFormDo(doc->find_replace,"CEdFindText")) {
+  if (!doc->find_replace->pmt || DocFormDo(doc->find_replace)) {
     result=0;
     unlock=DocLock(doc);
     if (doc->find_replace->match_case || doc->find_replace->local_var)
-      ss_flags=0;
+      sf_flags=0;
     else
-      ss_flags=SRF_IGNORE_CASE;
+      sf_flags=SFF_IGNORE_CASE;
     if (doc->find_replace->whole_labels || doc->find_replace->local_var)
-      ss_flags|=SRG_WHOLE_LABELS;
+      sf_flags|=SFG_WHOLE_LABELS;
 
     if (i=doc->find_replace->filter_lines) {
       doc_ce=doc->root.next;
       while (doc_ce!=doc) {
 	if (doc_ce->type_u8==DOCT_TEXT && !(doc_ce->flags1&(DOCEF1_TAG_CB|DOCEF1_DEFINE|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))&&
-	  SearchStr(doc_ce->tag,doc->find_replace->find_text,ss_flags)) {
+	  StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
 	  doc_ce->type|=DOCET_SELECTED;
 	  result++;
 	} else
@@ -1281,7 +1121,7 @@ I64 EdFindReplace(CDoc *doc)
 	   (doc_e->type & DOCET_SELECTED || !doc->find_replace->scan_selected_text&&!doc->find_replace->local_var)) {
 	src=doc_e->tag;
 	while (src) {
-	  src=SearchStr(src,doc->find_replace->find_text,ss_flags);
+	  src=StrFind(doc->find_replace->find_text,src,sf_flags);
 	  if (src) {
 	    doc->cur_data_col=src-doc_e->tag;
 	    doc->cur_entry=doc_e;
@@ -1388,7 +1228,7 @@ public U0 EdGoToLine(CDoc *doc)
 {
   CEdLineGoTo gtl;
   gtl.line=1;
-  if (DocFormDo(&gtl,"CEdLineGoTo"))
+  if (DocFormDo(&gtl))
     DocLineNumGoTo(doc,gtl.line);
 }
 
@@ -1458,8 +1298,8 @@ U0 DocEntryToggle(CDoc *doc)
 	doc_ce->tag[j+1]=ch;
 	StrCpy(doc_ce->tag+i,doc_ce->tag+j+1);
 	doc->cur_data_col=i;
-	st2=MSPrintF("%q",st);
-	if (doc_ce=DocPutS(doc,st2)) {
+	st2=MPrint("%q",st);
+	if (doc_ce=DocPrint(doc,st2)) {
 	  doc->cur_entry=doc_ce;
 	  doc->cur_data_col=doc_ce->min_col;
 	}
@@ -1469,7 +1309,7 @@ U0 DocEntryToggle(CDoc *doc)
     } else {
       st=Doc2PlainText(doc,doc_ce);
       DocEntryDel(doc,doc_ce);
-      DocPrintF(doc,"$$$$%Q$$$$",st);
+      DocPrint(doc,"$$$$%Q$$$$",st);
     }
     DocRecalc(doc);
   }
@@ -1614,12 +1454,12 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	  if (sc&SCF_KEY_DESC)
 	    SetKeyDesc("Dollar/Indent Out");
 	  else
-	    DocPutS(doc,"$$ID,-2$$");
+	    DocPrint(doc,"$$ID,-2$$");
 	} else {
 	  if (sc&SCF_KEY_DESC)
 	    SetKeyDesc("Dollar/Indent In");
 	  else
-	    DocPutS(doc,"$$ID,2$$");
+	    DocPrint(doc,"$$ID,2$$");
 	}
 	break;
       case '\n':
@@ -1635,9 +1475,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  SetKeyDesc("Dollar/Toggle Blinking Text");
 	else if (sc&SCF_SHIFT)
-	  DocPutS(doc,"$$BK,0$$");
+	  DocPrint(doc,"$$BK,0$$");
 	else
-	  DocPutS(doc,"$$BK,1$$");
+	  DocPrint(doc,"$$BK,1$$");
 	break;
       case CH_CTRLL:
 	if (sc&SCF_KEY_DESC) {
@@ -1689,21 +1529,21 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	  if (sc&SCF_KEY_DESC)
 	    SetKeyDesc("Dollar/Toggle Super or Sub script");
 	  else {
-	    DocPutS(doc,"$$SY,0$$");
+	    DocPrint(doc,"$$SY,0$$");
 	    doc->flags&=~(DOCF_SUPERSCRIPT_MODE | DOCF_SUBSCRIPT_MODE);
 	  }
 	} else if (sc&SCF_SHIFT) {
 	  if (sc&SCF_KEY_DESC)
 	    SetKeyDesc("Dollar/Toggle Subscript");
 	  else {
-	    DocPutS(doc,"$$SY,3$$");
+	    DocPrint(doc,"$$SY,3$$");
 	    doc->flags|=DOCF_SUBSCRIPT_MODE;
 	  }
 	} else {
 	  if (sc&SCF_KEY_DESC)
 	    SetKeyDesc("Dollar/Toggle Superscript");
 	  else {
-	    DocPutS(doc,"$$SY,-3$$");
+	    DocPrint(doc,"$$SY,-3$$");
 	    doc->flags|=DOCF_SUPERSCRIPT_MODE;
 	  }
 	}
@@ -1759,9 +1599,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  SetKeyDesc("Dollar/Toggle Underline");
 	else if (sc&SCF_SHIFT)
-	  DocPutS(doc,"$$UL,0$$");
+	  DocPrint(doc,"$$UL,0$$");
 	else
-	  DocPutS(doc,"$$UL,1$$");
+	  DocPrint(doc,"$$UL,1$$");
 	break;
       case CH_CTRLV:
 	if (sc&SCF_KEY_DESC)
@@ -1773,9 +1613,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  SetKeyDesc("Dollar/Toggle Word Wrap");
 	else if (sc&SCF_SHIFT)
-	  DocPutS(doc,"$$WW,0$$");
+	  DocPrint(doc,"$$WW,0$$");
 	else
-	  DocPutS(doc,"$$WW,1$$");
+	  DocPrint(doc,"$$WW,1$$");
 	break;
       case CH_CTRLX:
 	if (sc&SCF_KEY_DESC)
@@ -1793,9 +1633,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  SetKeyDesc("Dollar/Toggle Inverted Text");
 	else if (sc&SCF_SHIFT)
-	  DocPutS(doc,"$$IV,0$$");
+	  DocPrint(doc,"$$IV,0$$");
 	else
-	  DocPutS(doc,"$$IV,1$$");
+	  DocPrint(doc,"$$IV,1$$");
 	break;
       case '0'...'9':
 	if (!(sc&SCF_ALT)) {
@@ -2045,10 +1885,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 		  SetKeyDesc("Edit/GoTo Doc End");
 	      } else {
 		while (doc_ce!=doc) {
-		  if (sc&SCF_SHIFT)
-		    doc_ce->type|=DOCET_SELECTED;
-		  else
-		    doc_ce->type&=~DOCET_SELECTED;
+		  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 		  doc_ce=doc->cur_entry=doc_ce->next;
 		}
 		doc->cur_data_col=doc_ce->min_col;
@@ -2074,10 +1911,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch,I64 sc)
 	      } else {
 		if (doc_ce==doc) doc_ce=doc_ce->last;
 		while (doc_ce!=doc) {
-		  if (sc&SCF_SHIFT)
-		    doc_ce->type|=DOCET_SELECTED;
-		  else
-		    doc_ce->type&=~DOCET_SELECTED;
+		  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 		  doc_ce=doc->cur_entry=doc_ce->last;
 		}
 		doc_ce=doc->cur_entry=doc->root.next;
@@ -2252,9 +2086,7 @@ public U0 DocPutSPartial(CDoc *doc,U8 *st)
 	doc_ce=doc->cur_entry;
 	doc->recalc_start=doc_ce->last;
 	j=ptr-ptr2;
-	if (doc_ce->type_u8==DOCT_TEXT &&
-	    !(doc_ce->flags1&DOCEG1_DONT_EDIT) &&
-	    !(doc_ce->flags2&DOCEG2_DONT_EDIT)) {
+	if (IsEditableText(doc_ce)) {
 	  dst=b=MAlloc(doc_ce->max_col+j+1,doc->mem_task);
 	  src=doc_ce->tag;
 	  i=doc->cur_data_col;
@@ -2268,14 +2100,12 @@ public U0 DocPutSPartial(CDoc *doc,U8 *st)
 	  Free(doc_ce->tag);
 	  doc_ce->tag=b;
 	} else {
-	  doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
+	  dst=MAlloc(j+1,doc->mem_task);
+	  MemCpy(dst,ptr2,j+1);
+	  doc_ne=DocEntryNew(doc,doc_ce,dst);
 	  doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr << 8;
-	  doc_ne->tag=MAlloc(j+1,doc->mem_task);
-	  MemCpy(doc_ne->tag,ptr2,j+1);
-	  doc_ne->x=doc_ce->x;
-	  doc_ne->y=doc_ce->y;
-	  doc_ne->max_col=j;
-	  doc_ne->page_line_num=doc_ce->page_line_num;
+	  doc_ne->flags1=0;
+	  doc_ne->flags2=0;
 	  QueIns(doc_ne,doc_ce->last);
 	  doc->cur_entry=doc_ne;
 	  doc->cur_data_col=StrLen(ptr2);
@@ -2394,7 +2224,7 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_pattern=NULL,
   if (StrLen(st)>3 && st[2]==':') {
     st[2]=0;
     filename2=st+3;
-    switch (result=DefineMatch(st,"ST_LINK_TYPES",LEF_IGNORE_CASE)) {
+    switch (result=DefineMatch(st,"ST_LINK_TYPES",LMF_IGNORE_CASE)) {
       case LK_MAN_PAGE:
 	if (temph=HashFind(filename2,Fs->hash_table,HTG_SRC_SYM)) {
 	  if (temph->type&HTT_DEFINE_STR && temph(CHashDefineStr *)->caller) {
@@ -2414,7 +2244,7 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_pattern=NULL,
 	  i=A2I(ptr+1);
 	} else
 	  i=DFT_ADDR_LINK_BIN_SIZE;
-	if (ptr=SrcEdLink(ExePrintF("%s;",filename2),i)) {
+	if (ptr=SrcEdLink(ExePrint("%s;",filename2),i)) {
 	  result=EdLinkCvt(ptr,&filename,&pattern,&num,ed_flags);
 	  Free(ptr);
 	} else
@@ -2437,7 +2267,7 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_pattern=NULL,
 	  *ptr=0;
 	  pattern=StrNew(ptr+1);
 	}
-	i=DefineMatch(filename2,"ST_BIBLE_BOOKS",LEF_IGNORE_CASE);
+	i=DefineMatch(filename2,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
 	if (i<0)
 	  result=-1;
 	else {

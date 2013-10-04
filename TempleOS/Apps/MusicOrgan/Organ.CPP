@@ -37,14 +37,10 @@ $WW,0$*/
 
 
 #define Of_SELECTED	0
+#define OF_SELECTED	1
 #define Of_SHARP	1
 #define Of_FLAT		2
 #define Of_TIE		3
-
-#define OF_SELECTED	1
-#define OF_SHARP	2
-#define OF_FLAT		4
-#define OF_TIE		8
 
 class OrgNote
 {
@@ -170,7 +166,7 @@ Bool OrgHasWords(U8 *st)
 
 Bool OrgIsDotted(I64 duration)
 {
-  U8 *st=LstEntryPt(duration,org_duration_lst);
+  U8 *st=LstSub(duration,org_duration_lst);
   if (st[1]=='.')
     return TRUE;
   else
@@ -216,7 +212,7 @@ U0 OrgRecalcNoteXY()
 	    note=0;
 	    octave++;
 	  }
-	  note=music_note_map[*LstEntryPt(note,org_note_lst)-'A'];
+	  note=music_note_map[*LstSub(note,org_note_lst)-'A'];
 	  tempo->y=(15+(org_note_map[note]-7*(octave-2)))*4;
 	}
       }
@@ -351,8 +347,8 @@ U0 DrawNote(CDC *dc,I64 x,I64 y,I64 duration)
 
 U0 DrawTimeSignature(CDC *dc,I64 x,I64 y,I64 top,I64 bottom)
 {
-  GrPrintF(dc,x,y,"%d",top);
-  GrPrintF(dc,x,y+FONT_HEIGHT,"%d",bottom);
+  GrPrint(dc,x,y,"%d",top);
+  GrPrint(dc,x,y+FONT_HEIGHT,"%d",bottom);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -399,7 +395,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     } else {
       if (tempo==oc.cur_note && OrgBlink) {
 	dc->color=BROWN;
-	GrPutS(dc,x+8,y,tempo->word);
+	GrPrint(dc,x+8,y,"%s",tempo->word);
       } else if (tempo->flags&OF_SELECTED)
 	dc->color=RED;
       else {
@@ -445,7 +441,7 @@ F64 PopUpDuration()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,GREEN$$$$MU,\"Set Word\",ORGR_SET_WORD$$\n"
+  DocPrint(doc,"$$FG,GREEN$$$$MU,\"Set Word\",ORGR_SET_WORD$$\n"
 	"$$MU,\"Toggle Sharp\",ORGR_SHARP$$\n"
 	"$$MU,\"Toggle Flat\",ORGR_FLAT$$\n"
 	"$$MU,\"Toggle Tie\",ORGR_TIE$$\n"
@@ -456,8 +452,8 @@ F64 PopUpDuration()
 	"$$MU,\"Accent\",ORGR_ACCENT$$\n"
 	"$$MU,\"Strong Accent\",ORGR_STRONG_ACCENT$$\n\n");
   for (i=0;i<ORG_NUM_DURATIONS;i++)
-    DocPrintF(doc,"$$MU,\"%7.5f\",%d$$\n",org_durations[i],i);
-  DocPutS(doc,"\n$$MU,\"CANCEL\",DOCM_CANCEL$$\n");
+    DocPrint(doc,"$$MU,\"%7.5f\",%d$$\n",org_durations[i],i);
+  DocPrint(doc,"\n$$MU,\"CANCEL\",DOCM_CANCEL$$\n");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -526,15 +522,15 @@ U0 OrgRightClick(I64 x,I64 y)
 	  if (tempo->type==OT_NOTE) {
 	    if (DocPut) DocPut->flags&=~DOCF_FORM;
 	    if (OrgHasWords(tempo->word))
-	      st2=MSPrintF("\nWord(\"%Q\"):",tempo->word);
+	      st2=MPrint("\nWord(\"%Q\"):",tempo->word);
 	    else
-	      st2=MSPrintF("\nWord(\"\"):");
+	      st2=MPrint("\nWord(\"\"):");
 	    DocBottom;
 	    st=PmtStr(st2);
 	    Free(st2);
 	    Free(tempo->word);
 	    if (*st) {
-	      tempo->word=MSPrintF("%q",st);
+	      tempo->word=MPrint("%q",st);
 	      Free(st);
 	    } else
 	      tempo->word=StrNew(" ");
@@ -1068,7 +1064,7 @@ U8 *OrgCvtSong()
 	  note=0;
 	  octave++;
 	}
-	note=music_note_map[*LstEntryPt(note,org_note_lst)-'A'];
+	note=music_note_map[*LstSub(note,org_note_lst)-'A'];
       }
       if (Bt(&tempo->flags,Of_TIE))
 	*dst++='(';
@@ -1077,14 +1073,14 @@ U8 *OrgCvtSong()
 	last_octave=octave;
       }
       if (tempo->duration!=last_duration) {
-	src=LstEntryPt(tempo->duration,org_duration_lst);
+	src=LstSub(tempo->duration,org_duration_lst);
 	*dst++=src[0];
 	if (src[1])
 	  *dst++=src[1];
 	last_duration=tempo->duration;
       }
       if (note!=NOTE_REST) {
-	src=LstEntryPt(note,org_note_lst);
+	src=LstSub(note,org_note_lst);
 	*dst++=src[0];
 	if (src[1])
 	  *dst++=src[1];
@@ -1132,13 +1128,13 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
     tempo=tempo->next;
   }
   if (oc.incomplete_entry->checked)
-    DocPutS(doc,"//0 incomplete\n");
+    DocPrint(doc,"//0 incomplete\n");
   else if (has_words)
-    DocPutS(doc,"//0 has words\n");
+    DocPrint(doc,"//0 has words\n");
   else
-    DocPutS(doc,"//0 no nothing\n");
+    DocPrint(doc,"//0 no nothing\n");
 
-  DocPrintF(doc,
+  DocPrint(doc,
 "U0 Song()\n"
 "{\n"
 "  Fs->task_end_cb=&SndTaskEndCB;\n"
@@ -1153,7 +1149,7 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
   tempo1=tempo;
   has_words=FALSE;
   while (tempo!=&oc.root) {
-    DocPutS(doc,tempo->ascii);
+    DocPrint(doc,"%s",tempo->ascii);
     if (OrgHasWords(tempo->word)) has_words=TRUE;
     if (tempo->type==OT_METER) {
       measure_len=tempo->meter_top*4.0/tempo->meter_bottom;
@@ -1163,7 +1159,7 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
     tempo=tempo->next;
     if (two_measure_left<0.001 && tempo!=&oc.root) {
       if (has_words) {
-	DocPutS(doc,"\",\n\t\t\"");
+	DocPrint(doc,"\",\n\t\t\"");
 	while (tempo1!=tempo) {
 	  if (tempo1->type!=OT_METER) {
 	    if (ptr=tempo1->word) {
@@ -1172,14 +1168,14 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
 		  *ptr=CH_SHIFT_SPACE;
 		ptr++;
 	      }
-	      DocPrintF(doc,"%Q\\0",tempo1->word);
+	      DocPrint(doc,"%Q\\0",tempo1->word);
 	    } else
-	      DocPrintF(doc,"%c\\0",CH_SHIFT_SPACE);
+	      DocPrint(doc,"%c\\0",CH_SHIFT_SPACE);
 	  }
 	  tempo1=tempo1->next;
 	}
       }
-      DocPutS(doc,"\");\n"
+      DocPrint(doc,"\");\n"
 		"\tPlay(\"");
       two_measure_left=2*measure_len;
       tempo1=tempo;
@@ -1187,7 +1183,7 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
     }
   }
   if (has_words) {
-    DocPutS(doc,"\",\n\t\t\"");
+    DocPrint(doc,"\",\n\t\t\"");
     while (tempo1!=tempo) {
       if (tempo1->type!=OT_METER) {
 	if (ptr=tempo1->word) {
@@ -1196,14 +1192,14 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
 	      *ptr=CH_SHIFT_SPACE;
 	    ptr++;
 	  }
-	  DocPrintF(doc,"%Q\\0",tempo1->word);
+	  DocPrint(doc,"%Q\\0",tempo1->word);
 	} else
-	  DocPrintF(doc,"%c\\0",CH_SHIFT_SPACE);
+	  DocPrint(doc,"%c\\0",CH_SHIFT_SPACE);
       }
       tempo1=tempo1->next;
     }
   }
-  DocPutS(doc,"\");\n"
+  DocPrint(doc,"\");\n"
 "  }\n"
 "  } catch\n"
 "    CatchAll;\n"
@@ -1216,7 +1212,7 @@ U8 *OrgSaveSong(U8 *dirname,U8 *full_filename)
     StrCpy(doc->filename.name,full_filename);
     Free(full_filename);
   } else
-    SPrintF(doc->filename.name,"%s/Temp.CPP.Z",dirname);
+    SPrint(doc->filename.name,"%s/Temp.CPP.Z",dirname);
   DocWrite(doc,TRUE);
   full_filename=StrNew(doc->filename.name);
   DocDel(doc);
@@ -1230,7 +1226,7 @@ U0 OrgSetOctave(I64 octave)
   U8 buf[136];
   CMenuEntry *tempse;
   for (i=0;i<=6;i++) {
-    SPrintF(buf,"Snd/Octave%d",i);
+    SPrint(buf,"Snd/Octave%d",i);
     if (tempse=MenuEntryFind(Fs->cur_menu,buf)) {
       if (i==octave)
 	tempse->checked=TRUE;
@@ -1619,7 +1615,7 @@ got_msg:
 		"$$FG,GREEN$$<SHIFT-ESC>$$FG$$ to load it into MusicOrgan.\n\n"
 		ST_WARN_ST " Graphics and other embelishments\n"
 		"will be lost because MusicOrgan can't\n"
-		    "parse Holy C programs completely.\n");
+		    "parse HolyC programs completely.\n");
 		Free(filename);
 		filename=NULL;
 		JukeBox(dirname,&filename);
@@ -1702,7 +1698,7 @@ got_msg:
 		    oc.cur_note=tempo;
 		    oc.screen_x+=tempo->x-0.33*GR_WIDTH;
 		    if (OrgHasWords(tempo->word))
-		      "" tempo->word;
+		      "%s",tempo->word;
 		    note=tempo->note;
 		    octave=tempo->octave;
 		    if (note!=NOTE_REST)
@@ -1811,7 +1807,7 @@ got_msg:
       }
       if (f!=last_f) {
 	if (f>0) {
-	  st=LstEntryPt(note,org_note_lst);
+	  st=LstSub(note,org_note_lst);
 	  org_play_f=f;
 	} else {
 	  if (f<0)
@@ -1840,7 +1836,7 @@ got_msg:
 	  }
 	}
 	last_f=f;
-	"" st;
+	"%s",st;
 	col+=StrLen(st);
 	if (col>=Fs->win_width-1) {
 	  NewLine;
@@ -1864,52 +1860,183 @@ got_msg:
   Free(dirname);
   MenuPop;
 }
-           "        òÿÿÿ   ñÿÿÿ   ñÿÿÿ
-   ñÿÿÿ   õÿÿÿ
-   õÿÿÿ   óÿÿÿ	   òÿÿÿ   öÿÿÿ
-   ÷ÿÿÿÿÿÿÿýÿÿÿüÿÿÿ    üÿÿÿ                     ÿÿÿÿ   ÿÿÿÿ    ýÿÿÿ          òÿÿÿþÿÿÿ    ÿÿÿÿÿÿÿÿ    ýÿÿÿ       ÿÿÿÿ                     ýÿÿÿ    ýÿÿÿÿÿÿÿ                   þÿÿÿÿÿÿÿ   ÿÿÿÿ                    óÿÿÿ
-   óÿÿÿ   óÿÿÿ   óÿÿÿ   òÿÿÿ   òÿÿÿÿÿÿÿýÿÿÿüÿÿÿ    üÿÿÿ                     ÿÿÿÿ   ÿÿÿÿ    ýÿÿÿ          òÿÿÿþÿÿÿ    ÿÿÿÿÿÿÿÿ    ýÿÿÿ       ÿÿÿÿ                     ýÿÿÿ    ýÿÿÿÿÿÿÿ                   þÿÿÿÿÿÿÿ   ÿÿÿÿ           Í      ÿÿÿÿýÿÿÿüÿÿÿ    üÿÿÿ                     ÿÿÿÿ   ÿÿÿÿ    ýÿÿÿ          òÿÿÿþÿÿÿ    ÿÿÿÿÿÿÿÿ    ýÿÿÿ       ÿÿÿÿ                     ýÿÿÿ    ýÿÿÿÿÿÿÿ                   þÿÿÿÿÿÿÿ   ÿÿÿÿ           V      ÿÿÿÿýÿÿÿüÿÿÿ    üÿÿÿ                     ÿÿÿÿ   ÿÿÿÿ    ýÿÿÿ          òÿÿÿ           E      ÿÿÿÿýÿÿÿüÿÿÿ    üÿÿÿ                     ÿÿÿÿ   ÿÿÿÿ    ýÿÿÿ           a      
-                                                                             a      
-                                                                             Õ      
-                              
+           "     
+   òÿÿÿ   ñÿÿÿ
+   ñÿÿÿ
+   ñÿÿÿ
+   õÿÿÿ
+   õÿÿÿ
+   óÿÿÿ	   òÿÿÿ
+   öÿÿÿ
+   ÷ÿÿÿ
+ÿÿÿÿýÿÿÿüÿÿÿ    
+üÿÿÿ           
+          ÿÿÿÿ
+   ÿÿÿÿ    ýÿÿÿ
+          òÿÿÿ
+þÿÿÿ    ÿÿÿÿÿÿÿÿ
+    ýÿÿÿ       
+ÿÿÿÿ          
+           ýÿÿÿ
+    ýÿÿÿÿÿÿÿ    
+               
+þÿÿÿÿÿÿÿ   ÿÿÿÿ                 
+   óÿÿÿ
+   óÿÿÿ
+   óÿÿÿ   óÿÿÿ
+   òÿÿÿ   òÿÿÿ
+ÿÿÿÿýÿÿÿüÿÿÿ    
+üÿÿÿ           
+          ÿÿÿÿ
+   ÿÿÿÿ    ýÿÿÿ
+          òÿÿÿ
+þÿÿÿ    ÿÿÿÿÿÿÿÿ
+    ýÿÿÿ       
+ÿÿÿÿ          
+           ýÿÿÿ
+    ýÿÿÿÿÿÿÿ    
+               
+þÿÿÿÿÿÿÿ   ÿÿÿÿ           Í      
+ÿÿÿÿýÿÿÿüÿÿÿ    
+üÿÿÿ           
+          ÿÿÿÿ
+   ÿÿÿÿ    ýÿÿÿ
+          òÿÿÿ
+þÿÿÿ    ÿÿÿÿÿÿÿÿ
+    ýÿÿÿ       
+ÿÿÿÿ          
+           ýÿÿÿ
+    ýÿÿÿÿÿÿÿ    
+               
+þÿÿÿÿÿÿÿ   ÿÿÿÿ           V      
+ÿÿÿÿýÿÿÿüÿÿÿ    
+üÿÿÿ           
+          ÿÿÿÿ
+   ÿÿÿÿ    ýÿÿÿ
+          òÿÿÿ           E      
+ÿÿÿÿýÿÿÿüÿÿÿ    
+üÿÿÿ           
+          ÿÿÿÿ
+   ÿÿÿÿ    ýÿÿÿ           a      
+                              
+            
+            
+                       a      
+                              
+            
+            
+                       Õ      
+                              
+
       
-            
-            
-      
+      
+      
       
-                           
-      
-      	      	      	      	                   
-            
-                           
-         
-         
-   	      
-         
-         
-   	               	         
+      
+      
+
+      
+                           
+      
+      	      	      	      	                   
+            
+                           
+         
+         
+   	      
+         
+         
+
+   	         
+      	      
+   
    
-         
-   	   	      
-      
-                  
+      
+   
+   	   	   
+   
       
    
+            
+   
+      
+   
+
       
-         
+      
+   
       
+   
+   
       
-      
-              ?      
-                           
-         
-   	              #      þÿÿÿÖÿÿÿþÿÿÿ&      Öÿÿÿ   &              E         úÿÿÿ         úÿÿÿ
-                ýÿÿÿ                       V      	   ýÿÿÿ            
+              ?      
+                           
+         
+   	              #      
+þÿÿÿÖÿÿÿþÿÿÿ&   
+   Öÿÿÿ   &              E      
+   úÿÿÿ      
+   úÿÿÿ
+      
+          ýÿÿÿ
+                       V      
+	   ýÿÿÿ      
+      
       
-                  
+
+            
+      
       
-                                                  E      þÿÿÿöÿÿÿ    öÿÿÿ    öÿÿÿ    òÿÿÿ    òÿÿÿþÿÿÿòÿÿÿ    ôÿÿÿÿÿÿÿôÿÿÿ           ò               $       $           0   $   0      ,      4      4      4       ,      ,       @   $   @      <      D      D      D       <      <       |      „      „      „       |      |       l      t      t      t       l      l          $   À   $                            Ä                    A $      S 4      D D      F T      G d      H t      J „      K ”      L ¤      ; ´      ' ,      E <      R L      T l      U |      I œ      P ¬      [ ¼      ] P      P      L      T      T      T       L      L       `   $   `       p   $   p      €   $   €         $              $          °   $   °      À   $   À      œ      ¤      ¤      ¤       œ      œ       ¬      ´      ´      ´       ¬      ¬       ¼      Ä      Ä      Ä       ¼      ¼       P   $   P      0      @      P      p      €             °      À      @   
-   ~          
-       	       P      
-                              
-            	      	       
+
+                                                  E      
+þÿÿÿöÿÿÿ    öÿÿÿ
+    öÿÿÿ    òÿÿÿ
+    òÿÿÿþÿÿÿòÿÿÿ
+    ôÿÿÿÿÿÿÿôÿÿÿ           ò      
+         $   
+    $           
+0   $   0      
+,      4      
+4      4       
+,      ,       
+@   $   @      
+<      D      
+D      D       
+<      <       
+|      „      
+„      „       
+|      |       
+l      t      
+t      t       
+l      l       
+   $   À   $   
+            
+             
+Ä                    A $      S 4      D D      F T      G d      H t      J „      K ”      L ¤      ; ´      ' ,      E <      R L      T l      U |      I œ      P ¬      [ ¼      ] 
+P      P      
+L      T      
+T      T       
+L      L       
+`   $   `       
+p   $   p      
+€   $   €      
+   $          
+    $          
+°   $   °      
+À   $   À      
+œ      ¤      
+¤      ¤       
+œ      œ       
+¬      ´      
+´      ´       
+¬      ¬       
+¼      Ä      
+Ä      Ä       
+¼      ¼       
+P   $   P      0      @      P      p      €             °      À      @   
+   ~          
+       	       P      
+                              
+
+            
+	      	       

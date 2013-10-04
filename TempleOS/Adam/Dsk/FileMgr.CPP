@@ -1,24 +1,24 @@
 #help_index "Doc/Output"
-U0 CDirFileDoc(CDoc *doc,CDirEntry *tempm)
+U0 DirFileDoc(CDoc *doc,CDirEntry *tempde)
 {
   CDocEntry *doc_e;
-  while (tempm) {
-    if (tempm->attr & _ATTR_DIR) {
-      doc_e=DocPrintF(doc,"$$TR,\"%s\"$$",tempm->name);
-      doc_e->user_data=tempm;
-      tempm->user_data=doc_e;
-      DocPutS(doc,"\n$$ID,+2$$");
-      if (tempm->sub)
-	CDirFileDoc(doc,tempm->sub);
-      DocPutS(doc,"$$ID,-2$$");
+  while (tempde) {
+    if (tempde->attr & _ATTR_DIR) {
+      doc_e=DocPrint(doc,"$$TR,\"%s\"$$",tempde->name);
+      doc_e->user_data=tempde;
+      tempde->user_data=doc_e;
+      DocPrint(doc,"\n$$ID,+2$$");
+      if (tempde->sub)
+	DirFileDoc(doc,tempde->sub);
+      DocPrint(doc,"$$ID,-2$$");
     } else {
-      doc_e=DocPrintF(doc,"$$MU-LE,\"%s\"$$",
-	tempm->name);
-      doc_e->user_data=tempm;
-      tempm->user_data=doc_e;
-      DocPutS(doc,"\n");
+      doc_e=DocPrint(doc,"$$MU-LE,\"%s\"$$",
+	tempde->name);
+      doc_e->user_data=tempde;
+      tempde->user_data=doc_e;
+      DocPrint(doc,"\n");
     }
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
 }
 
@@ -34,15 +34,15 @@ CFMUncollapsedLst *FMCollectUncollapsedLst(CDoc *doc)
 {
   CDocEntry *doc_e=doc->root.next;
   CFMUncollapsedLst *result=NULL,*tempc;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TREE) {
       if (!(doc_e->flags1&DOCEF1_CHECKED_COLLAPSED)) {
-	if (tempm=doc_e->user_data) {
+	if (tempde=doc_e->user_data) {
 	  tempc=MAlloc(sizeof(CFMUncollapsedLst));
 	  tempc->next=result;
 	  result=tempc;
-	  tempc->name=StrNew(tempm->full_name);
+	  tempc->name=StrNew(tempde->full_name);
 	}
       }
     }
@@ -55,42 +55,42 @@ U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,U8 *cur_entry,U8 *next_e
 {
   CDocEntry *doc_e=doc->root.next;
   CFMUncollapsedLst *tempc1;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TREE) {
-      tempm=doc_e->user_data;
+      tempde=doc_e->user_data;
       tempc1=tempc;
       while (tempc1) {
-	if (!StrCmp(tempc1->name,tempm->full_name)) {
+	if (!StrCmp(tempc1->name,tempde->full_name)) {
 	  doc_e->flags1&=~DOCEF1_CHECKED_COLLAPSED;
 	  break;
 	}
 	tempc1=tempc1->next;
       }
       if (cur_entry) {
-	if (!StrNCmp(cur_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	if (!StrNCmp(cur_entry,tempde->full_name,StrLen(tempde->full_name))) {
 	  doc->cur_entry=doc_e;
-	  if (StrLen(tempm->full_name)==StrLen(cur_entry))
+	  if (StrLen(tempde->full_name)==StrLen(cur_entry))
 	    cur_entry=NULL;
 	} else if (next_entry) {
-	  if (!StrNCmp(next_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	  if (!StrNCmp(next_entry,tempde->full_name,StrLen(tempde->full_name))) {
 	    doc->cur_entry=doc_e;
-	    if (StrLen(tempm->full_name)==StrLen(next_entry))
+	    if (StrLen(tempde->full_name)==StrLen(next_entry))
 	      cur_entry=NULL;
 	  }
 	}
       }
     } else if (doc_e->type_u8==DOCT_MENU_VAL) {
-      tempm=doc_e->user_data;
+      tempde=doc_e->user_data;
       if (cur_entry) {
-	if (!StrNCmp(cur_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	if (!StrNCmp(cur_entry,tempde->full_name,StrLen(tempde->full_name))) {
 	  doc->cur_entry=doc_e;
-	  if (StrLen(tempm->full_name)==StrLen(cur_entry))
+	  if (StrLen(tempde->full_name)==StrLen(cur_entry))
 	    cur_entry=NULL;
 	} else if (next_entry) {
-	  if (!StrNCmp(next_entry,tempm->full_name,StrLen(tempm->full_name))) {
+	  if (!StrNCmp(next_entry,tempde->full_name,StrLen(tempde->full_name))) {
 	    doc->cur_entry=doc_e;
-	    if (StrLen(tempm->full_name)==StrLen(next_entry))
+	    if (StrLen(tempde->full_name)==StrLen(next_entry))
 	      cur_entry=NULL;
 	  }
 	}
@@ -114,33 +114,33 @@ U0 FMDelUncollapsedLst(CFMUncollapsedLst *tempc)
 CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_root,Bool init)
 {
   CDocEntry *doc_e;
-  CDirEntry *tempm,*tempm1;
+  CDirEntry *tempde,*tempde1;
   U8 *st;
-  tempm=CAlloc(sizeof(CDirEntry));
-  tempm->full_name=MSPrintF("%C:/",drv_let);
-  tempm->attr=_ATTR_DIR;
-  st=MSPrintF("%c:/*",drv_let);
+  tempde=CAlloc(sizeof(CDirEntry));
+  tempde->full_name=MPrint("%C:/",drv_let);
+  tempde->attr=_ATTR_DIR;
+  st=MPrint("%c:/*",drv_let);
   if (init)
-    tempm->sub=tempm1=FilesFind(st,FUF_RECURSE);
+    tempde->sub=tempde1=FilesFind(st,FUF_RECURSE);
   else
-    tempm1=NULL;
+    tempde1=NULL;
   Free(st);
-  doc_e=DocPrintF(doc,"$$TR,\"%s\"$$",tempm->full_name);
-  doc_e->user_data=tempm;
-  tempm->user_data=doc_e;
-  tempm->next=*_root;
-  *_root=tempm;
-  DocPutS(doc,"\n$$ID,+2$$");
+  doc_e=DocPrint(doc,"$$TR,\"%s\"$$",tempde->full_name);
+  doc_e->user_data=tempde;
+  tempde->user_data=doc_e;
+  tempde->next=*_root;
+  *_root=tempde;
+  DocPrint(doc,"\n$$ID,+2$$");
   DocBottom(doc);
   if (init) {
-    CDirFileDoc(doc,tempm1);
-    while (tempm1) {
-      tempm1->parent=tempm;
-      tempm1=tempm1->next;
+    DirFileDoc(doc,tempde1);
+    while (tempde1) {
+      tempde1->parent=tempde;
+      tempde1=tempde1->next;
     }
   }
-  DocPutS(doc,"$$ID,-2$$");
-  return tempm;
+  DocPrint(doc,"$$ID,-2$$");
+  return tempde;
 }
 
 U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
@@ -151,7 +151,7 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   CFMUncollapsedLst *tempc=NULL;
   U8 *cur_entry=NULL,*next_entry=NULL;
   CDocEntry *doc_ce;
-  CDirEntry *tempm,*tempm1,*cur_tree_entry;
+  CDirEntry *tempde,*tempde1,*cur_tree_entry;
   if (!doc)
     parent_doc=DocPut;
   else {
@@ -166,36 +166,36 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
       cur_tree_entry=doc_ce->user_data;
     if (cur_tree_entry)
       cur_entry=StrNew(cur_tree_entry->full_name);
-    tempm=NULL;
+    tempde=NULL;
     if (doc_ce!=doc)
       doc_ce=doc_ce->next;
     while (doc_ce!=doc) {
       if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
-	tempm=doc_ce->user_data;
+	tempde=doc_ce->user_data;
       else
-	tempm=NULL;
-      if (tempm) {
-	tempm1=tempm->parent;
-	while (tempm1) {
-	  if (tempm1==cur_tree_entry) {
-	    tempm=NULL;
+	tempde=NULL;
+      if (tempde) {
+	tempde1=tempde->parent;
+	while (tempde1) {
+	  if (tempde1==cur_tree_entry) {
+	    tempde=NULL;
 	    break;
 	  } else
-	    tempm1=tempm1->parent;
+	    tempde1=tempde1->parent;
 	}
-	if (tempm)
+	if (tempde)
 	  break;
       }
       doc_ce=doc_ce->next;
     }
-    if (tempm)
-      next_entry=StrNew(tempm->full_name);
+    if (tempde)
+      next_entry=StrNew(tempde->full_name);
 
     tempc=FMCollectUncollapsedLst(doc);
     DocDel(doc);
   }
   if (*_root) {
-    CDirLstDel(*_root);
+    DirLstDel(*_root);
     *_root=NULL;
   }
   doc=DocNew;
@@ -204,30 +204,30 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   doc->flags|=DOCF_FORM;
   switch (mode) {
     case FM_NORMAL:
-      DocPutS(doc,"$$FG,PURPLE$$File Manager\n\n$$LK,\"Click for Help\",\"FI:::/TempleOS/Doc/FileMgr.TXT\"$$\n\n");
+      DocPrint(doc,"$$FG,PURPLE$$File Manager\n\n$$LK,\"Click for Help\",\"FI:::/TempleOS/Doc/FileMgr.TXT\"$$\n\n");
       break;
     case FM_PICK_FILE:
-      DocPutS(doc,"$$FG,PURPLE$$Pick file and press <ESC>\n\n");
+      DocPrint(doc,"$$FG,PURPLE$$Pick file and press <ESC>\n\n");
       doc->flags|=DOCF_MIN_SIZE;
       break;
     case FM_PICK_DIR:
-      DocPutS(doc,"$$FG,PURPLE$$Pick directory and press <ESC>\n\n");
+      DocPrint(doc,"$$FG,PURPLE$$Pick directory and press <ESC>\n\n");
       doc->flags|=DOCF_MIN_SIZE;
       break;
   }
-  DocPutS(doc,"$$FG,LTBLUE$$");
+  DocPrint(doc,"$$FG,LTBLUE$$");
   for (i=0;i<NUM_PRTS;i++) {
     p=&sys_prts[i];
     if (p->type==PT_REDSEA||p->type==PT_FAT32)
       FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
     else if (p->type==PT_ISO9660) {
       if (p->bdev->flags&BDF_INITIALIZED)
-	tempm=FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
+	tempde=FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
       else {
-	tempm=FMRebuildDocDrv(Prt2Drv(p),doc,_root,FALSE);
-	tempm->flags|=DEF_NOT_INITIALIZED;
+	tempde=FMRebuildDocDrv(Prt2Drv(p),doc,_root,FALSE);
+	tempde->flags|=DEF_NOT_INITIALIZED;
       }
-      tempm->flags|=DEF_REMOVABLE;
+      tempde->flags|=DEF_REMOVABLE;
     }
   }
   DocHome(doc);
@@ -246,28 +246,28 @@ U0 FMRename(CDoc *doc)
 {
   CEdFileName fn;
   CDocEntry *doc_e=doc->cur_entry;
-  CDirEntry *tempm=NULL,*parent;
+  CDirEntry *tempde=NULL,*parent;
   if (doc_e->type_u8==DOCT_MENU_VAL) {
-    tempm=doc_e->user_data;
-    if (parent=tempm->parent) {
+    tempde=doc_e->user_data;
+    if (parent=tempde->parent) {
       Cd(parent->full_name);
-      StrCpy(fn.name,tempm->name);
-      if (DocFormDo(fn.name,"CEdFileName")) {
+      StrCpy(fn.name,tempde->name);
+      if (DocFormDo(&fn)) {
 	Silent(ON);
-	Move(tempm->name,fn.name);
+	Move(tempde->name,fn.name);
 	Silent(OFF);
       }
     }
   } else if (doc_e->type_u8==DOCT_TREE) {
-    tempm=doc_e->user_data;
-    if (parent=tempm->parent) {
+    tempde=doc_e->user_data;
+    if (parent=tempde->parent) {
       Cd(parent->full_name);
-      StrCpy(fn.name,tempm->name);
-      if (DocFormDo(fn.name,"CEdFileName")) {
-	if (StrCmp(tempm->name,fn.name)) {
+      StrCpy(fn.name,tempde->name);
+      if (DocFormDo(&fn)) {
+	if (StrCmp(tempde->name,fn.name)) {
 	  Silent(ON);
-	  if (CopyTree(tempm->name,fn.name))
-	    DelTree(tempm->name);
+	  if (CopyTree(tempde->name,fn.name))
+	    DelTree(tempde->name);
 	  Silent(OFF);
 	}
       }
@@ -279,22 +279,22 @@ U0 FMMkDir(CDoc *doc)
 {
   CEdFileName fn;
   CDocEntry *doc_e=doc->cur_entry;
-  CDirEntry *tempm=NULL,*parent;
+  CDirEntry *tempde=NULL,*parent;
   *fn.name=0;
   if (doc_e->type_u8==DOCT_MENU_VAL) {
-    tempm=doc_e->user_data;
-    if (parent=tempm->parent) {
+    tempde=doc_e->user_data;
+    if (parent=tempde->parent) {
       Cd(parent->full_name);
-      if (DocFormDo(fn.name,"CEdFileName")) {
+      if (DocFormDo(&fn)) {
 	Silent(ON);
 	MkDir(fn.name);
 	Silent(OFF);
       }
     }
   } else if (doc_e->type_u8==DOCT_TREE) {
-    tempm=doc_e->user_data;
-    Cd(tempm->full_name);
-    if (DocFormDo(fn.name,"CEdFileName")) {
+    tempde=doc_e->user_data;
+    Cd(tempde->full_name);
+    if (DocFormDo(&fn)) {
       Silent(ON);
       MkDir(fn.name);
       Silent(OFF);
@@ -306,21 +306,21 @@ U0 FMDelete(CDoc *doc)
 {
   U8 *st;
   CDocEntry *doc_ce=doc->cur_entry;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   if (doc_ce->type_u8==DOCT_MENU_VAL) {
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
     Silent(ON);
-    st=MSPrintF("Delete: %s",tempm->full_name);
+    st=MPrint("Delete: %s",tempde->full_name);
     if (PopUpCancelOk(st))
-      Del(tempm->full_name);
+      Del(tempde->full_name);
     Free(st);
     Silent(OFF);
   } else if (doc_ce->type_u8==DOCT_TREE) {
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
     Silent(ON);
-    st=MSPrintF("Delete: %s",tempm->full_name);
+    st=MPrint("Delete: %s",tempde->full_name);
     if (PopUpCancelOk(st))
-      DelTree(tempm->full_name);
+      DelTree(tempde->full_name);
     Free(st);
     Silent(OFF);
   }
@@ -329,16 +329,16 @@ U0 FMDelete(CDoc *doc)
 U0 FMMount(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
   else
-    tempm=NULL;
-  if (tempm) {
-    while (tempm->parent)
-      tempm=tempm->parent;
+    tempde=NULL;
+  if (tempde) {
+    while (tempde->parent)
+      tempde=tempde->parent;
     Silent(ON);
-    ChgDsk(*tempm->full_name);
+    ChgDsk(*tempde->full_name);
     Silent(OFF);
   }
 }
@@ -346,19 +346,19 @@ U0 FMMount(CDoc *doc)
 U0 FMFmtDrv(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   U8 *st=NULL;
   if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
   else
-    tempm=NULL;
-  if (tempm) {
-    while (tempm->parent)
-      tempm=tempm->parent;
-    st=MSPrintF("Format Drive '%c'?\nAre You Sure?\n",*tempm->full_name);
+    tempde=NULL;
+  if (tempde) {
+    while (tempde->parent)
+      tempde=tempde->parent;
+    st=MPrint("Format Drive '%c'?\nAre You Sure?\n",*tempde->full_name);
     if (PopUpCancelOk(st)) {
       Silent(ON);
-      Fmt(*tempm->full_name,TRUE,FALSE);
+      Fmt(*tempde->full_name,TRUE,FALSE);
       Silent(OFF);
     }
   }
@@ -368,21 +368,21 @@ U0 FMFmtDrv(CDoc *doc)
 U0 FMMakeISO(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   U8 *st;
   if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
   else
-    tempm=NULL;
-  if (tempm) {
+    tempde=NULL;
+  if (tempde) {
     if (doc_ce->type_u8==DOCT_MENU_VAL)
-      tempm=tempm->parent;
-    if (tempm && *tempm->full_name) {
+      tempde=tempde->parent;
+    if (tempde && *tempde->full_name) {
       Silent(ON);
-      if (tempm->full_name[StrLen(tempm->full_name)-1]=='/')
-	st=MSPrintF("%s*",tempm->full_name);
+      if (tempde->full_name[StrLen(tempde->full_name)-1]=='/')
+	st=MPrint("%s*",tempde->full_name);
       else
-	st=MSPrintF("%s/*",tempm->full_name);
+	st=MPrint("%s/*",tempde->full_name);
       CDFileCreate(,st);
       Free(st);
       Silent(OFF);
@@ -393,16 +393,16 @@ U0 FMMakeISO(CDoc *doc)
 U0 FMBurnISO(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
-  CDirEntry *tempm;
+  CDirEntry *tempde;
   if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
-    tempm=doc_ce->user_data;
+    tempde=doc_ce->user_data;
   else
-    tempm=NULL;
-  if (tempm) {
-    while (tempm->parent)
-      tempm=tempm->parent;
+    tempde=NULL;
+  if (tempde) {
+    while (tempde->parent)
+      tempde=tempde->parent;
     Silent(ON);
-    CDImageWrite(*tempm->full_name);
+    CDImageWrite(*tempde->full_name);
     Silent(OFF);
   }
 }
@@ -412,37 +412,37 @@ U0 FMCopy(CDoc *doc)
   CDoc *doc2=sys_clipboard_doc;
   U8 *st;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
-  CDirEntry *tempm,*tempm1=NULL,*tempm2;
+  CDirEntry *tempde,*tempde1=NULL,*tempde2;
   Bool unlock_doc2=DocLock(doc2);
   doc_e=doc2->root.next;
 
-  tempm1=doc_ce->user_data;
+  tempde1=doc_ce->user_data;
   if (doc_ce->type_u8==DOCT_MENU_VAL)
-    tempm1=tempm1->parent;
+    tempde1=tempde1->parent;
   else if (doc_ce->type_u8!=DOCT_TREE)
-    tempm1=NULL;
-  if (tempm1) {
+    tempde1=NULL;
+  if (tempde1) {
     while (doc_e!=doc2) {
       if (doc_e->type_u8==DOCT_MENU_VAL) {
-	tempm=doc_e->user_data;
-	tempm->flags|=DEF_PROCESSED;
-	tempm2=tempm->parent;
-	if (!tempm2 || !(tempm2->flags&DEF_PROCESSED)) {
+	tempde=doc_e->user_data;
+	tempde->flags|=DEF_PROCESSED;
+	tempde2=tempde->parent;
+	if (!tempde2 || !(tempde2->flags&DEF_PROCESSED)) {
 	  Silent(ON);
-	  Copy(tempm->full_name,tempm1->full_name);
+	  Copy(tempde->full_name,tempde1->full_name);
 	  Silent(OFF);
 	}
       } else if (doc_e->type_u8==DOCT_TREE) {
-	tempm=doc_e->user_data;
-	tempm->flags|=DEF_PROCESSED;
-	tempm2=tempm->parent;
-	if (!tempm2 || !(tempm2->flags&DEF_PROCESSED)) {
+	tempde=doc_e->user_data;
+	tempde->flags|=DEF_PROCESSED;
+	tempde2=tempde->parent;
+	if (!tempde2 || !(tempde2->flags&DEF_PROCESSED)) {
 	  Silent(ON);
-	  if (*tempm1->name)
-	    st=MSPrintF("%s/%s",tempm1->full_name,tempm->name);
+	  if (*tempde1->name)
+	    st=MPrint("%s/%s",tempde1->full_name,tempde->name);
 	  else
-	    st=MSPrintF("%s%s",tempm1->full_name,tempm->name);
-	  CopyTree(tempm->full_name,st);
+	    st=MPrint("%s%s",tempde1->full_name,tempde->name);
+	  CopyTree(tempde->full_name,st);
 	  Free(st);
 	  Silent(OFF);
 	}
@@ -471,8 +471,8 @@ I64 PopUpCancelPasteDel(U8 *header=NULL,U8 *footer=NULL)
 {
   I64 i;
   CDoc *doc=DocNew;
-  if (header) DocPutS(doc,header);
-  DocPutS(doc,"$$CM+LX,1,1 $$$$BT,\"INCLUDE               \",FMR_INCLUDE$$"
+  if (header) DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$CM+LX,1,1 $$$$BT,\"INCLUDE               \",FMR_INCLUDE$$"
 	"$$CM+LX,27,0$$$$BT,\"ADAM INCLUDE          \",FMR_ADAM_INCLUDE$$"
 	"$$CM+LX,1,3 $$$$BT,\"DELETE                \",FMR_DELETE$$"
 	"$$CM+LX,27,0$$$$BT,\"RENAME                \",FMR_RENAME$$"
@@ -485,7 +485,7 @@ I64 PopUpCancelPasteDel(U8 *header=NULL,U8 *footer=NULL)
 	"$$CM+LX,27,0$$$$BT,\"BURN ISO (CD-ROM) FILE\",FMR_BURN_ISO$$"
 	"$$CM+LX,1,3 $$$$BT,\"HELP                  \",FMR_HELP$$"
 	"$$CM+LX,27,0$$$$BT,\"CANCEL                \",DOCM_CANCEL$$\n");
-  if (footer) DocPutS(doc,footer);
+  if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -541,14 +541,14 @@ U0 FMFinalScreenUpdate(CDC *dc)
 {
   if (fm_ip_str) {
     dc->color=LTRED;
-    GrPutS(dc,ipx,ipy,fm_ip_str);
+    GrPrint(dc,ipx,ipy,"%s",fm_ip_str);
   }
   (*fp_old_final_screen_update)(dc);
 }
 
 public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 {
-  CDirEntry *root=NULL,*tempm,*tempm1,*tempm2;
+  CDirEntry *root=NULL,*tempde,*tempde1,*tempde2;
   I64 sc,ch,p1,p2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
   U8 *result=NULL,*st,*st2,*old_cur_dir=CurDir;
@@ -559,12 +559,12 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   fp_old_final_screen_update=fp_final_screen_update;
   MenuFilePush("::/TempleOS/Doc/FileMgrPullDown.TXT");
   FMRebuildDoc(&doc,&root,mode);
-  if (tempm1=Cd2DirEntry(root,old_cur_dir))
-    doc->cur_entry=tempm1->user_data;
-  while (tempm1) {
-    if (tempm1->attr&_ATTR_DIR)
-      tempm1->user_data(CDocEntry *)->flags1&=~DOCEF1_CHECKED_COLLAPSED;
-    tempm1=tempm1->parent;
+  if (tempde1=Cd2DirEntry(root,old_cur_dir))
+    doc->cur_entry=tempde1->user_data;
+  while (tempde1) {
+    if (tempde1->attr&_ATTR_DIR)
+      tempde1->user_data(CDocEntry *)->flags1&=~DOCEF1_CHECKED_COLLAPSED;
+    tempde1=tempde1->parent;
   }
   do {
     DocUnlock(doc);
@@ -592,40 +592,40 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    if (doc_e!=doc_ce) {
 	      st2=NULL;
 	      if (doc_e->type_u8==DOCT_MENU_VAL) {
-		tempm1=doc_e->user_data;
-		if (tempm1=tempm1->parent)
-		  st2=StrNew(tempm1->full_name);
+		tempde1=doc_e->user_data;
+		if (tempde1=tempde1->parent)
+		  st2=StrNew(tempde1->full_name);
 	      } else if (doc_e->type_u8==DOCT_TREE) {
-		tempm1=doc_e->user_data;
-		st2=StrNew(tempm1->full_name);
+		tempde1=doc_e->user_data;
+		st2=StrNew(tempde1->full_name);
 	      }
 	      if (st2 && doc_ce->type_u8==DOCT_MENU_VAL) {
-		tempm=doc_ce->user_data;
+		tempde=doc_ce->user_data;
 		Silent(ON);
-		Move(tempm->full_name,st2);
+		Move(tempde->full_name,st2);
 		Silent(OFF);
 		FMRebuildDoc(&doc,&root,mode);
 	      } else if (st2 && doc_ce->type_u8==DOCT_TREE) {
-		tempm=doc_ce->user_data;
+		tempde=doc_ce->user_data;
 		okay=TRUE;
-		tempm2=tempm1;
-		while (tempm2) {
-		  if (tempm2!=tempm)
-		    tempm2=tempm2->parent;
+		tempde2=tempde1;
+		while (tempde2) {
+		  if (tempde2!=tempde)
+		    tempde2=tempde2->parent;
 		  else {
 		    okay=FALSE;
 		    break;
 		  }
 		}
 		if (okay) {
-		  if (*tempm1->name)
-		    st=MSPrintF("%s/%s",tempm1->full_name,tempm->name);
+		  if (*tempde1->name)
+		    st=MPrint("%s/%s",tempde1->full_name,tempde->name);
 		  else
-		    st=MSPrintF("%s%s",tempm1->full_name,tempm->name);
-		  if (StrCmp(tempm->full_name,st)) {
+		    st=MPrint("%s%s",tempde1->full_name,tempde->name);
+		  if (StrCmp(tempde->full_name,st)) {
 		    Silent(ON);
-		    CopyTree(tempm->full_name,st);
-		    DelTree(tempm->full_name);
+		    CopyTree(tempde->full_name,st);
+		    DelTree(tempde->full_name);
 		    Silent(OFF);
 		    FMRebuildDoc(&doc,&root,mode);
 		  }
@@ -715,14 +715,14 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    break;
 	  case CH_ESC:
 	    doc_ce=doc->cur_entry;
-	    tempm=doc_ce->user_data;
+	    tempde=doc_ce->user_data;
 	    if (mode==FM_PICK_FILE && doc_ce->type_u8==DOCT_MENU_VAL)
-	      result=StrNew(tempm->full_name,mem_task);
+	      result=StrNew(tempde->full_name,mem_task);
 	    else if (mode==FM_PICK_DIR) {
 	      if (doc_ce->type_u8==DOCT_TREE)
-		result=StrNew(tempm->full_name,mem_task);
-	      else if (doc_ce->type_u8==DOCT_MENU_VAL && (tempm=tempm->parent))
-		result=StrNew(tempm->full_name,mem_task);
+		result=StrNew(tempde->full_name,mem_task);
+	      else if (doc_ce->type_u8==DOCT_MENU_VAL && (tempde=tempde->parent))
+		result=StrNew(tempde->full_name,mem_task);
 	    }
 	    break;
 	  default:
@@ -731,12 +731,12 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	      FMRebuildDoc(&doc,&root,mode);
 	    } else if (sc.u8[0]==SC_F5) {
 	      if (doc->cur_entry->type_u8==DOCT_MENU_VAL) {
-		tempm=doc->cur_entry->user_data;
+		tempde=doc->cur_entry->user_data;
 		DocUnlock(doc);
 		if (sc&SCF_SHIFT)
-		  AdamFile(tempm->full_name);
+		  AdamFile(tempde->full_name);
 		else
-		  PopUpFile(tempm->full_name);
+		  PopUpFile(tempde->full_name);
 		DocLock(doc);
 	      }
 	    } else {
@@ -754,7 +754,7 @@ regular_key:
   Fs->display_doc=old_display_doc;
   SettingsPop;
   DocDel(doc);
-  CDirLstDel(root);
+  DirLstDel(root);
   Cd(old_cur_dir);
   Free(old_cur_dir);
   if (mode!=FM_NORMAL && !result)

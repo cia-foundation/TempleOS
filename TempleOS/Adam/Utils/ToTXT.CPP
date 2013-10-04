@@ -12,38 +12,38 @@ U0 TXTPutS(CDoc *doc,U8 *st,I64 *_col)
 	} while (*_col&7);
 	break;
       case 'ã':
-	DocPutS(doc,"pi");
+	DocPrint(doc,"pi");
 	*_col=*_col+1;
 	break;
       case 'é':
-	DocPutS(doc,"theta");
+	DocPrint(doc,"theta");
 	*_col=*_col+1;
 	break;
       case 'è':
-	DocPutS(doc,"phi");
+	DocPrint(doc,"phi");
 	*_col=*_col+1;
 	break;
       case 'ê':
-	DocPutS(doc,"omega");
+	DocPrint(doc,"omega");
 	*_col=*_col+1;
 	break;
       case 'ì':
-	DocPutS(doc,"inf");
+	DocPrint(doc,"inf");
 	*_col=*_col+1;
 	break;
       case 'æ':
-	DocPutS(doc,"u");
+	DocPrint(doc,"u");
 	*_col=*_col+1;
 	break;
       case CH_SHIFT_SPACE:
-	DocPutS(doc," ");
+	DocPrint(doc," ");
 	*_col=*_col+1;
 	break;
       default:
 	if (CH_SPACE<=ch<0x7F || ch=='\n')
 	  DocPutKey(doc,ch,0);
 	else
-	  DocPutS(doc,".");
+	  DocPrint(doc,".");
 	*_col=*_col+1;
     }
   }

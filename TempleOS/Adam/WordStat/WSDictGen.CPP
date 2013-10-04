@@ -27,7 +27,7 @@ I64 WSDNextCmd(U8 **_ptr)
       if (!(ch=*ptr2++)) goto ncmd_done;
     } while (ch!='>');
     *--ptr2=0;
-    result=LstEntryMatch(ptr,"h1\0/h1\0def\0/def\0hw\0/hw\0tt\0/tt\0"
+    result=LstMatch(ptr,"h1\0/h1\0def\0/def\0hw\0/hw\0tt\0/tt\0"
 "ety\0@fld\0@cd\0@blockquote\0@wordforms\0@note\0@altname\0@chform\0@cref\0@syn\0"
 "/ety\0@/fld\0@/cd\0@/blockquote\0@/wordforms\0@/note\0@/altname\0@/chform\0@/cref\0@/syn\0");
     *ptr2++='>';

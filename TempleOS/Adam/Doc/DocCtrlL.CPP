@@ -8,7 +8,7 @@ I64 PopUpLinkType(Bool include_anchor)
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Link Type Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Link Type Menu\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU,\"To file\",LK_FILE$$\n"
 	"$$MU,\"To anchor in file\",LK_FILE_ANCHOR$$\n"
 	"$$MU,\"To str in file\",LK_FILE_FIND$$\n"
@@ -22,8 +22,8 @@ I64 PopUpLinkType(Bool include_anchor)
 	"$$MU,\"To Help Index\",LK_HELP_INDEX$$\n"
 	"$$MU,\"To Addr\",LK_ADDR$$\n");
   if (include_anchor)
-    DocPutS(doc,"$$MU,\"Place Anchor\",LK_PLACE_ANCHOR$$\n");
-  DocPrintF(doc,"%s",ctrl_L_footer);
+    DocPrint(doc,"$$MU,\"Place Anchor\",LK_PLACE_ANCHOR$$\n");
+  DocPrint(doc,"%s",ctrl_L_footer);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -158,23 +158,23 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
     el->num=1;
     switch (type) {
       case LK_FILE:
-	if (DocFormDo(el,"CEdFileLink",,,ctrl_L_footer)) {
+	if (DocFormDo(el,,,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*el->tag)
 	    *_tag=StrNew(el->file);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("FI:%s",el->file);
+	  *_link=MPrint("FI:%s",el->file);
 	}
 	break;
       case LK_PLAIN:
-	if (DocFormDo(el,"CEdFileLink",,,ctrl_L_footer)) {
+	if (DocFormDo(el,,,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*el->tag)
 	    *_tag=StrNew(el->file);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("PI:%s",el->file);
+	  *_link=MPrint("PI:%s",el->file);
 	}
 	break;
       case LK_FILE_ANCHOR:
@@ -184,7 +184,7 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	    *_tag=StrNew(el->aux);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("FA:%s,%s",el->file,el->aux);
+	  *_link=MPrint("FA:%s,%s",el->file,el->aux);
 	}
 	break;
       case LK_FILE_FIND:
@@ -195,13 +195,13 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	      *_tag=StrNew(el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("FF:%s,%s",el->file,el->aux);
+	    *_link=MPrint("FF:%s,%s",el->file,el->aux);
 	  } else {
 	    if (!*el->tag)
 	      *_tag=StrNew(el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("FF:%s,%s:%d",el->file,el->aux,el->num);
+	    *_link=MPrint("FF:%s,%s:%d",el->file,el->aux,el->num);
 	  }
 	}
 	break;
@@ -213,13 +213,13 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	      *_tag=StrNew(el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("PF:%s,%s",el->file,el->aux);
+	    *_link=MPrint("PF:%s,%s",el->file,el->aux);
 	  } else {
 	    if (!*el->tag)
 	      *_tag=StrNew(el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("PF:%s,%s:%d",el->file,el->aux,el->num);
+	    *_link=MPrint("PF:%s,%s:%d",el->file,el->aux,el->num);
 	  }
 	}
 	break;
@@ -230,7 +230,7 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	    *_tag=StrNew(el->file);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("FL:%s,%d",el->file,el->num);
+	  *_link=MPrint("FL:%s,%d",el->file,el->num);
 	}
 	break;
       case LK_PLAIN_LINE:
@@ -240,7 +240,7 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	    *_tag=StrNew(el->file);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("PL:%s,%d",el->file,el->num);
+	  *_link=MPrint("PL:%s,%d",el->file,el->num);
 	}
 	break;
       case LK_MAN_PAGE:
@@ -250,7 +250,7 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	    *_tag=StrNew(el->aux);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("MN:%s",el->aux);
+	  *_link=MPrint("MN:%s",el->aux);
 	}
 	break;
       case LK_PLACE_ANCHOR:
@@ -272,10 +272,10 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	  if (DocFormDo(el,"CEdBibleLink",,,ctrl_L_footer)) {
 	    result=TRUE;
 	    if (!*el->tag)
-	      *_tag=MSPrintF("%Z,%s",i,"ST_BIBLE_BOOKS",el->aux);
+	      *_tag=MPrint("%Z,%s",i,"ST_BIBLE_BOOKS",el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("BF:%Z,%s",i,"ST_BIBLE_BOOKS",el->aux);
+	    *_link=MPrint("BF:%Z,%s",i,"ST_BIBLE_BOOKS",el->aux);
 	  }
 	}
 	break;
@@ -288,9 +288,9 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	  else
 	    *_tag=StrNew(el->tag);
 	  if (el->num<0)
-	    *_link=MSPrintF("DF:%s",el->aux);
+	    *_link=MPrint("DF:%s",el->aux);
 	  else
-	    *_link=MSPrintF("DF:%s,%d",el->aux,el->num);
+	    *_link=MPrint("DF:%s,%d",el->aux,el->num);
 
 	}
 	break;
@@ -301,7 +301,7 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	    *_tag=StrNew(el->aux);
 	  else
 	    *_tag=StrNew(el->tag);
-	  *_link=MSPrintF("HI:%s",el->aux);
+	  *_link=MPrint("HI:%s",el->aux);
 	}
 	break;
       case LK_ADDR:
@@ -313,13 +313,13 @@ Bool PmtLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	      *_tag=StrNew(el->aux);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("AD:%s",el->aux);
+	    *_link=MPrint("AD:%s",el->aux);
 	  } else {
 	    if (!*el->tag)
-	      *_tag=MSPrintF("%s,%d",el->aux,el->num);
+	      *_tag=MPrint("%s,%d",el->aux,el->num);
 	    else
 	      *_tag=StrNew(el->tag);
-	    *_link=MSPrintF("AD:%s,%d",el->aux,el->num);
+	    *_link=MPrint("AD:%s,%d",el->aux,el->num);
 	  }
 	}
 	break;
@@ -355,15 +355,15 @@ U0 EdInsLink()
       switch (type) {
 	case LK_PLACE_ANCHOR:
 	  if (html_link)
-	    st=MSPrintF("$$AN+HTML,\"%Q\",\"%Q\",\"%Q\"$$",tag,link,html_link);
+	    st=MPrint("$$AN+HTML,\"%Q\",\"%Q\",\"%Q\"$$",tag,link,html_link);
 	  else
-	    st=MSPrintF("$$AN,\"%Q\",\"%Q\"$$",tag,link);
+	    st=MPrint("$$AN,\"%Q\",\"%Q\"$$",tag,link);
 	  break;
 	default:
 	  if (html_link)
-	    st=MSPrintF("$$LK%s+HTML,\"%Q\",\"%Q\",\"%Q\"$$",pop_up_st,tag,link,html_link);
+	    st=MPrint("$$LK%s+HTML,\"%Q\",\"%Q\",\"%Q\"$$",pop_up_st,tag,link,html_link);
 	  else
-	    st=MSPrintF("$$LK%s,\"%Q\",\"%Q\"$$",pop_up_st,tag,link);
+	    st=MPrint("$$LK%s,\"%Q\",\"%Q\"$$",pop_up_st,tag,link);
       }
     }
   }
@@ -371,7 +371,7 @@ U0 EdInsLink()
     if (quote)
       "%Q",st;
     else
-      "" st;
+      "%s",st;
   }
   Free(tag);
   Free(link);
@@ -383,7 +383,7 @@ I64 PopUpColorType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Color Type Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Color Type Menu\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU,\"Foreground\",DOCT_FOREGROUND$$\n"
 	"$$MU,\"Background\",DOCT_BACKGROUND$$\n"
 	"$$MU,\"Default Foreground\",DOCT_DFT_FOREGROUND$$\n"
@@ -398,7 +398,7 @@ I64 PopUpPageSettingType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Page Setting Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Page Setting Menu\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU,\"Page Length\",DOCT_PAGE_LEN$$\n"
 	"$$MU,\"Page Header\",DOCT_HEADER$$\n"
 	"$$MU,\"Page Footer\",DOCT_FOOTER$$\n"
@@ -455,7 +455,7 @@ U0 EdInsPageSetting()
   CEdPageSetting4 *el4=CAlloc(sizeof(CEdPageSetting4));
   if (type>=0) {
     if (type==DOCT_RIGHT_MARGIN||type==DOCT_PAGE_LEN) {
-      if (DocFormDo(el2,"CEdPageSetting2")) {
+      if (DocFormDo(el2)) {
 	if (el2->winrel) {
 	  if (*el2->val)
 	    "$$%Z+WR,%s$$",type,"ST_DOC_CMDS",el2->val;
@@ -470,7 +470,7 @@ U0 EdInsPageSetting()
       }
     } else if (type==DOCT_LOCK_TO_PAGE) {
       el3->lock=TRUE;
-      if (DocFormDo(el3,"CEdPageSetting3")) {
+      if (DocFormDo(el3)) {
 	if (el3->lock)
 	  "$$%Z,1$$",type,"ST_DOC_CMDS",el->val;
 	else
@@ -478,14 +478,14 @@ U0 EdInsPageSetting()
       }
     } else if (type==DOCT_LOCK_TO_CENTER) {
       el4->lock=TRUE;
-      if (DocFormDo(el4,"CEdPageSetting4")) {
+      if (DocFormDo(el4)) {
 	if (el4->lock)
 	  "$$%Z,1$$",type,"ST_DOC_CMDS",el->val;
 	else
 	  "$$%Z,0$$",type,"ST_DOC_CMDS";
       }
     } else {
-      if (DocFormDo(el,"CEdPageSetting1")) {
+      if (DocFormDo(el)) {
 	if (*el->val)
 	  "$$%Z,%s$$",type,"ST_DOC_CMDS",el->val;
 	else
@@ -503,7 +503,7 @@ I64 PopUpDollarType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPrintF(doc,"$$FG,PURPLE$$$$TX+CX,\"Text Widget Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Text Widget Menu\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU,\"Link\",DOCT_LINK$$\n"
 	"$$MU,\"Text\",DOCT_TEXT$$\n"
 	"$$MU,\"Tree Branch\",DOCT_TREE$$\n"
@@ -516,7 +516,6 @@ I64 PopUpDollarType()
 	"$$MU,\"Menu Val\",DOCT_MENU_VAL$$\n"
 	"$$MU,\"Data\",DOCT_DATA$$\n"
 	"$$MU,\"Hex Edit\",DOCT_HEX_ED$$\n"
-	"$$MU,\"Hidden Widget\",DOCT_HIDE_START$$\n"
 	"$$MU,\"Syntax Highlighting\",DOCT_HIGHLIGHT$$\n"
 	"$$MU,\"HTML\",DOCT_HTML_CODE$$\n"
 	"$$MU,\"Song\",DOCT_SONG$$\n"
@@ -550,7 +549,7 @@ U0 EdInsDollarText()
 {
   U8 *st,buf[136];
   CEdDollarText *dt=CAlloc(sizeof(CEdDollarText));
-  if (DocFormDo(dt,"CEdDollarText",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (dt->left_x  )  StrCat(buf,"+LX");
     if (dt->center_x)  StrCat(buf,"+CX");
@@ -567,7 +566,7 @@ U0 EdInsDollarText()
     if (*dt->shift_y)  StrCat(buf,"+SY");
     if (*dt->define_str) StrCat(buf,"+D");
     if (*dt->html_link) StrCat(buf,"+HTML");
-    st=MSPrintF("%q",dt->tag);
+    st=MPrint("%q",dt->tag);
     "$$TX%s,\"%Q\"",buf,st;
     Free(st);
     if (*dt->shift_x)
@@ -577,12 +576,12 @@ U0 EdInsDollarText()
     if (*dt->scroll_x)
       ",%s",dt->scroll_x;
     if (*dt->define_str) {
-      st=MSPrintF("%q",dt->define_str);
+      st=MPrint("%q",dt->define_str);
       ",\"%Q\"",st;
       Free(st);
     }
     if (*dt->html_link) {
-      st=MSPrintF("%q",dt->html_link);
+      st=MPrint("%q",dt->html_link);
       ",\"%Q\"",st;
       Free(st);
     }
@@ -600,7 +599,7 @@ class CEdSong
 U0 EdInsSong()
 {
   CEdSong *dt=CAlloc(sizeof(CEdSong));
-  if (DocFormDo(dt,"CEdSong",,,ctrl_L_footer))
+  if (DocFormDo(dt,,,,ctrl_L_footer))
     "$$SO,\"%Q\",\"%s\"$$",dt->tag,dt->song;
   Free(dt);
 }
@@ -613,7 +612,7 @@ class CEdHighlight
 U0 EdInsHighlight()
 {
   CEdHighlight *dt=CAlloc(sizeof(CEdHighlight));
-  if (DocFormDo(dt,"CEdHighlight",,,ctrl_L_footer))
+  if (DocFormDo(dt,,,,ctrl_L_footer))
     "$$HL,%d$$",dt->highlight_on;
   Free(dt);
 }
@@ -626,7 +625,7 @@ I64 PopUpHtmlType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,LTBLUE$$$$MU,\"Html Code\",HT_CODE$$\n"
+  DocPrint(doc,"$$FG,LTBLUE$$$$MU,\"Html Code\",HT_CODE$$\n"
 	"$$MU,\"Html Image\",HT_IMAGE$$\n"
 	"$$MU,\"Html Video\",HT_VIDEO$$\n"
 	"\n$$MU,\"Abort\",DOCM_CANCEL$$");
@@ -650,7 +649,7 @@ U0 EdInsHtml()
   CEdHtmlCode *dt=CAlloc(sizeof(CEdHtmlCode));
   switch (PopUpHtmlType) {
     case HT_CODE:
-      if (DocFormDo(dt,"CEdHtmlCode",,,ctrl_L_footer))
+      if (DocFormDo(dt,,,,ctrl_L_footer))
 	"$$HC,\"%Q\"$$",dt->tag;
       break;
     case HT_IMAGE:
@@ -691,7 +690,7 @@ U0 EdInsMacroMenu(Bool is_macro)
   CEdMacroMenu *dt=CAlloc(sizeof(CEdMacroMenu));
   dt->underline=TRUE;
   dt->escape=TRUE;
-  if (DocFormDo(dt,"CEdMacroMenu",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (is_macro && *dt->tag) StrCat(buf,"+A ");
     if (dt->popup)	StrCat(buf,"+PU-X");
@@ -717,20 +716,20 @@ U0 EdInsMacroMenu(Bool is_macro)
     if (*dt->tag || is_macro) {
       if (is_macro) {
 	if (*dt->tag) {
-	  st=MSPrintF("%q",dt->tag);
+	  st=MPrint("%q",dt->tag);
 	  "$$MA%s,\"%Q\"",buf,st;
 	  Free(st);
 	} else
 	  "$$MA%s,",buf;
       } else {
-	st=MSPrintF("%q",dt->tag);
+	st=MPrint("%q",dt->tag);
 	"$$MU%s,\"%Q\"",buf,st;
 	Free(st);
       }
       if (*dt->left_exp)
 	",%s",dt->left_exp;
       if (*dt->left_macro) {
-	st=MSPrintF("%q",dt->left_macro);
+	st=MPrint("%q",dt->left_macro);
 	",\"%Q\"",st;
 	Free(st);
       }
@@ -766,7 +765,7 @@ U0 EdInsButton()
   U8 *st,buf[136];
   CEdButton *dt=CAlloc(sizeof(CEdButton));
   dt->escape=TRUE;
-  if (DocFormDo(dt,"CEdButton",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (dt->popup)    StrCat(buf,"+PU-X");
     if (dt->left_x  ) StrCat(buf,"+LX");
@@ -779,25 +778,25 @@ U0 EdInsButton()
     if (dt->left_is_auto) StrCat(buf,"+LA");
     if (*dt->tag) {
       if (dt->quote) {
-	st=MSPrintF("%q",dt->tag);
+	st=MPrint("%q",dt->tag);
 	"$$$$BT%s,\\\"%Q\\\"",buf,st;
 	Free(st);
 	if (*dt->left_exp)
 	  ",%s",dt->left_exp;
 	if (*dt->left_macro) {
-	  st=MSPrintF("%q",dt->left_macro);
+	  st=MPrint("%q",dt->left_macro);
 	  ",\\\"%Q\\\"",st;
 	  Free(st);
 	}
 	"$$$$";
       } else {
-	st=MSPrintF("%q",dt->tag);
+	st=MPrint("%q",dt->tag);
 	"$$BT%s,\"%Q\"",buf,st;
 	Free(st);
 	if (*dt->left_exp)
 	  ",%s",dt->left_exp;
 	if (*dt->left_macro) {
-	  st=MSPrintF("%q",dt->left_macro);
+	  st=MPrint("%q",dt->left_macro);
 	  ",\"%Q\"",st;
 	  Free(st);
 	}
@@ -828,7 +827,7 @@ U0 EdInsCursorMovement()
 {
   U8 buf[136];
   CEdCursorMovement *dt=CAlloc(sizeof(CEdCursorMovement));
-  if (DocFormDo(dt,"CEdCursorMovement",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (dt->left_x  ) StrCat(buf,"+LX");
     if (dt->center_x) StrCat(buf,"+CX");
@@ -875,7 +874,7 @@ U0 EdInsData()
   dt->term=TRUE;
   dt->len=256;
   dt->u64=TRUE;
-  if (DocFormDo(dt,"CEdData",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (dt->str)   StrCat(buf,"-P");
     if (!dt->term)    StrCat(buf,"-T");
@@ -886,7 +885,7 @@ U0 EdInsData()
     else if (dt->u16)  StrCat(buf,"-U64+U16");
     else if (dt->u32)  StrCat(buf,"-U64+U32");
 
-    st=MSPrintF("%q",dt->fmt_str);
+    st=MPrint("%q",dt->fmt_str);
     "$$$$DA%s,%d,\\\"%Q\\\"$$$$",buf,dt->len,st;
     Free(st);
   }
@@ -903,10 +902,10 @@ U0 EdInsCheckBox()
 {
   U8 *st,buf[136];
   CEdCheckBox *dt=CAlloc(sizeof(CEdCheckBox));
-  if (DocFormDo(dt,"CEdCheckBox",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (dt->refresh)  StrCat(buf,"+RD");
-    st=MSPrintF("%q",dt->label);
+    st=MPrint("%q",dt->label);
     "$$$$CB%s,\\\"%Q\\\"$$$$",buf,st;
     Free(st);
   }
@@ -928,7 +927,7 @@ U0 EdInsHexEd()
   dt->cnt=128;
   dt->cols=4;
   dt->zero=TRUE;
-  if (DocFormDo(dt,"CEdHexEd",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (!dt->zero)  StrCat(buf,"-Z");
     if (dt->refresh)  StrCat(buf,"+RD");
@@ -950,10 +949,10 @@ class CEdBinary
 U0 EdInsBinary(I64 bin_num,I64 type)
 {
   CEdBinary *dt=CAlloc(sizeof(CEdBinary));
-  SPrintF(dt->tag,"<%d>",bin_num);
+  SPrint(dt->tag,"<%d>",bin_num);
   dt->bin_num=bin_num;
   dt->bin_ptr_link_bin_num=1;
-  if (DocFormDo(dt,"CEdBinary",,
+  if (DocFormDo(dt,,,
 "Note: Normally, you enter no file,\n"
 "just a bin num.  If You enter a\n"
 "file, enter a file bin num or a file\n"
@@ -988,22 +987,17 @@ U0 EdInsTree()
   CEdTree *dt=CAlloc(sizeof(CEdTree));
   dt->collapsed=TRUE;
   dt->indent=2;
-  if (DocFormDo(dt,"CEdTree",,,ctrl_L_footer)) {
+  if (DocFormDo(dt,,,,ctrl_L_footer)) {
     *buf=0;
     if (!dt->collapsed)  StrCat(buf,"-C");
-    st=MSPrintF("%q",dt->label);
-    st2=MSPrintF("$$TR%s,\"%Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
+    st=MPrint("%q",dt->label);
+    st2=MPrint("$$TR%s,\"%Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
       buf,st,dt->indent,-dt->indent);
     DocInsSafe(DocPut,st2);
     Free(st);
     Free(st2);
   }
   Free(dt);
-}
-
-U0 EdInsHidden()
-{
-  DocInsSafe(DocPut,"$$HS$$*$$HE$$");
 }
 
 U0 EdInsDollarCmd()
@@ -1046,9 +1040,6 @@ U0 EdInsDollarCmd()
     case DOCT_HEX_ED:
       EdInsHexEd;
       break;
-    case DOCT_HIDE_START:
-      EdInsHidden;
-      break;
     case DOCT_SONG:
       EdInsSong;
       break;
@@ -1073,7 +1064,7 @@ I64 PopUpSpriteType()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,PURPLE$$$$TX+CX,\"Graphic Resource Menu\"$$\n"
+  DocPrint(doc,"$$FG,PURPLE$$$$TX+CX,\"Graphic Resource Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",\"FI:::/TempleOS/Doc/Resource.TXT.Z\"$$\n"
 	"\n$$FG,LTBLUE$$$$MU,\"Make Sprite\",PT_SPRITE$$\n"
 	"$$MU,\"Pointer to Sprite\",PT_SPRITE_PTR$$\n"
@@ -1117,7 +1108,7 @@ U8 *EdSpriteLink(Bool *_pop_up,U8 **_html_link)
   I64 type=PopUpLinkType(FALSE);
   *_html_link=NULL;
   if (type>=0 && PmtLink(type,&tag,&link,_pop_up,&quote,_html_link))
-    result=MSPrintF("\"%Q\",\"%Q\"",tag,link);
+    result=MPrint("\"%Q\",\"%Q\"",tag,link);
   Free(tag);
   Free(link);
   return result;
@@ -1132,19 +1123,19 @@ U8 *EdSprite(I64 bin_num)
   *buf=0;
   switch (type) {
     case PT_SPRITE:
-      SPrintF(dt->tag,"<%d>",bin_num);
+      SPrint(dt->tag,"<%d>",bin_num);
       if (DocFormDo(dt,"CEdJustSprite",,,ctrl_L_footer))
-	st1=MSPrintF("\"%Q\"",dt->tag);
+	st1=MPrint("\"%Q\"",dt->tag);
       break;
     case PT_SPRITE_MACRO:
       dt->escape=TRUE;
-      if (DocFormDo(dt,"CEdMacroSprite",,,ctrl_L_footer)) {
+      if (DocFormDo(dt,,,,ctrl_L_footer)) {
 	StrCat(buf,"+LM+UL");
 	if (dt->is_auto)StrCat(buf,"+LA");
 	if (dt->popup)	StrCat(buf,"+PU");
 	if (dt->escape)	StrCat(buf,"+X");
-	st=MSPrintF("%q",dt->exp);
-	st1=MSPrintF("\"%Q\",\"%Q\"",dt->tag,st);
+	st=MPrint("%q",dt->exp);
+	st1=MPrint("\"%Q\",\"%Q\"",dt->tag,st);
 	Free(st);
       }
       break;
@@ -1153,7 +1144,7 @@ U8 *EdSprite(I64 bin_num)
       if (DocFormDo(dt,"CEdMenuSprite",,,ctrl_L_footer)) {
 	StrCat(buf,"+LE");
 	if (dt->escape)	StrCat(buf,"+X");
-	st1=MSPrintF("\"%Q\",%s",dt->tag,dt->exp);
+	st1=MPrint("\"%Q\",%s",dt->tag,dt->exp);
       }
       break;
     case PT_SPRITE_LINK:
@@ -1178,9 +1169,9 @@ U8 *EdSprite(I64 bin_num)
   if (st1) {
     if (html_link) {
       StrCat(buf,"+HTML");
-      st2=MSPrintF("$$SP%s,%s,\"%Q\",%d$$",buf,st1,html_link,bin_num);
+      st2=MPrint("$$SP%s,%s,\"%Q\",%d$$",buf,st1,html_link,bin_num);
     } else
-      st2=MSPrintF("$$SP%s,%s,%d$$",buf,st1,bin_num);
+      st2=MPrint("$$SP%s,%s,%d$$",buf,st1,bin_num);
     Free(st1);
   }
   Free(dt);

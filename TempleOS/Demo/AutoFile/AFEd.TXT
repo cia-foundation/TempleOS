@@ -139,14 +139,14 @@
 #define IC_OUT_U16		0x75
 #define IC_OUT_U32		0x76
 
-#define IC_GET_FLAGS		0x77
-#define IC_SET_FLAGS		0x78
+#define IC_GET_RFLAGS		0x77
+#define IC_SET_RFLAGS		0x78
 #define IC_GET_RAX		0x79
 #define IC_SET_RAX		0x7A
-#define IC_GET_BASE_PTR		0x7B
-#define IC_SET_BASE_PTR		0x7C
-#define IC_GET_STK_PTR		0x7D
-#define IC_SET_STK_PTR		0x7E
+#define IC_GET_RBP		0x7B
+#define IC_SET_RBP		0x7C
+#define IC_GET_RSP		0x7D
+#define IC_SET_RSP		0x7E
 #define IC_RIP			0x7F
 
 #define IC_RDTSC		0x80

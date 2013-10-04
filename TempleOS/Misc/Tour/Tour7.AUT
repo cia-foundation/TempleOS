@@ -7,7 +7,7 @@ PopUpOk(
 
 AFGetChar(CH_CTRLF);
 
-AFDelayedPutS("new song",150);
+AFPrint(150,"new song");
 
 PopUpOk("Cursor down 8 times.\n");
 I64 i;

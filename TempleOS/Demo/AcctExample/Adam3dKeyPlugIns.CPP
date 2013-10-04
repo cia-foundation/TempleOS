@@ -4,51 +4,13 @@
 U0 FillInTime()
 {
   CDate cdt;
-  cdt=GetCurTimeDate;
+  cdt=GetDateTime;
   "$$IV,1$$----%D %T----$$IV,0$$\n",cdt,cdt;
 }
 
-U0 RandQuote(I64 num)
-{ //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
-  I64 i,size,l=512;
-  U8 *bible_filename=Define("ST_BIBLE_FILE"),
-     *buf=FileRead(bible_filename,&size);
-  if (buf) {
-    i=num%(size-l);
-    buf[i+l]=0;
-    "" buf+i;
-    Free(buf);
-  }
-}
-
-U0 BadCodeJump(I64 num)
-{ //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
-  CDirEntry *root=FilesFind("/TempleOS/*",FUF_JUST_FILES|FUF_RECURSE|FUF_FLATTEN_TREE|FUF_JUST_SRC_FILES),
-	     *tempm=root;
-  I64 cnt=0;
-  CDoc *doc;
-  U8 *st;
-  while (tempm) {
-    doc=DocRead(tempm->full_name);
-    tempm->user_data=doc->root.y;
-    cnt+=doc->root.y;
-    DocDel(doc);
-    tempm=tempm->next;
-  }
-  num=num%cnt;
-  tempm=root;
-  while (tempm) {
-    num-=tempm->user_data;
-    if (num<0) {
-      st=MSPrintF("FL:%s,%d",tempm->full_name,-num);
-      break;
-    }
-    tempm=tempm->next;
-  }
-  CDirLstDel(root);
-  Ed(st);
-  Free(st);
-}
+#define WS_F6		0
+#define WS_SHIFT_F6	1
+I64 my_wordstat=WS_F6;
 
 Bool MyPutKey(I64 ch,I64 sc)
 {  //ch=ASCII; sc=scancode
@@ -64,7 +26,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 //Return TRUE if you completely
 //handled the key.
 
-  I64 i,sc2=sc.u8[0];
+  I64 i,sc2=sc.u8[0],old_wordstat;
 
   if (SC_F1<=sc2<=SC_F10 &&
       sc&SCF_ALT &&
@@ -130,10 +92,24 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    SetKeyDesc("God Word");
 	} else {
 	  //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
+	  DocRecalc(DocPut);
+	  if (DocPut->cur_entry->settings->cur_text_attr&0xF!=RED)
+	    "$$FG,RED$$";
 	  if (sc & SCF_SHIFT)
-	    RandQuote(KbdMouseEvtTime>>4);
-	  else
-	    "%s ",ws_sorted_words[KbdMouseEvtTime>>4%ws_num_words]->str;
+	    RandQuote;
+	  else {
+	    if (my_wordstat!=WS_SHIFT_F6) {
+	      old_wordstat=TaskValidate(ws_task);
+	      my_wordstat=WS_SHIFT_F6;
+	      PopUp("WSInit(\"::/TempleOS/Apps/HolySpirit/Vocab.TXT*\");");
+	      while (!Bt(&ws_flags,WSf_INIT_IN_PROGRESS)) //Kinda risky
+		Yield;
+	      while (Bt(&ws_flags,WSf_INIT_IN_PROGRESS))
+		Yield;
+	      WordStat(old_wordstat);
+	    }
+	    RandWord;
+	  }
 	}
 	break;
       case SC_F6:
@@ -143,24 +119,32 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  else
 	    SetKeyDesc("Cmd/Init WordStat TempleOS");
 	} else {
-	  if (sc & SCF_SHIFT)
+	  old_wordstat=TaskValidate(ws_task);
+	  if (sc & SCF_SHIFT) {
+	    my_wordstat=WS_SHIFT_F6;
 	    PopUp("WSInit(\"::/TempleOS/Apps/HolySpirit/Vocab.TXT*\");");
-	  else
-	    PopUp("WSInit(\"::/TempleOS/\" FILENAME_MASK_TXT \";~*Bible.TXT*\");");
+	  } else {
+	    my_wordstat=WS_F6;
+	    PopUp("WSInit(\"::/TempleOS/*;~*Bible.TXT*\");");
+	  }
+	  while (!Bt(&ws_flags,WSf_INIT_IN_PROGRESS)) //Kinda risky
+	    Yield;
+	  while (Bt(&ws_flags,WSf_INIT_IN_PROGRESS))
+	    Yield;
+	  WordStat(old_wordstat);
 	}
 	break;
       case SC_F7:
 	if (sc&SCF_KEY_DESC) {
 	  if (sc & SCF_SHIFT)
-	    SetKeyDesc("Dollar/Insert Hidden Widget");
+	    SetKeyDesc("Misc/Insert My URL");
 	  else
 	    SetKeyDesc("Misc/Insert Datetime");
 	} else {
 	  if (sc & SCF_SHIFT)
-	    DocInsSafe(DocPut,
-		"$$HS+C$$$$FG$$$$HE$$");
+	    FillInMyURL;
 	  else
-	    FillInTime();
+	    FillInTime;
 	}
 	break;
     }
@@ -201,7 +185,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      SetKeyDesc("Edit/Put Link to Cur Pos on Clipboard");
 	    else {
 	      ClipBoardDel;
-	      DocPrintF(sys_clipboard_doc,"$$LK-A,\"FL:%s,%d\"$$",
+	      DocPrint(sys_clipboard_doc,"$$LK-A,\"FL:%s,%d\"$$",
 		DocPut->filename.name,DocPut->cur_entry->y+1);
 	    }
 	    return TRUE;
@@ -211,7 +195,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    else {
 	      i=RandU32;
 	      ClipBoardDel;
-	      DocPrintF(sys_clipboard_doc,"$$LK,\"<TODO>\",\"FA:%s,ANC%d\"$$",
+	      DocPrint(sys_clipboard_doc,"$$LK,\"<TODO>\",\"FA:%s,ANC%d\"$$",
 		DocPut->filename.name,i);
 	      "$$AN,\"<TODO>\",\"ANC%d\"$$",i;
 	    }
@@ -235,7 +219,14 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    if (sc&SCF_KEY_DESC)
 	      SetKeyDesc("Cmd/Jump to Bad Code");
 	    else //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
-	      BadCodeJump(KbdMouseEvtTime>>4);
+	      BadCodeJump;
+	    return TRUE;
+
+	  case 'g':
+	    if (sc&SCF_KEY_DESC)
+	      SetKeyDesc("Godle");
+	    else //$LK-A,"::/TempleOS/Apps/HolySpirit/HSNotes.TXT"$
+	      Godle; //God drawing
 	    return TRUE;
 
 	  case 'p':
@@ -257,9 +248,8 @@ Bool MyPutKey(I64 ch,I64 sc)
   return FALSE;
 }
 
-Bool MyPutS(U8 *st)
+Bool MyPutS(U8 *)
 {
-  nounusedwarn st;
   return FALSE;
 }
 

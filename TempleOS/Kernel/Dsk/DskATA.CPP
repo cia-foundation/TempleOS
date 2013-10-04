@@ -800,46 +800,46 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
   for (i=0;i<NUM_BLKDEVS;i++)
     if (sys_blkdevs[i].bd_signature==BD_SIGNATURE_VAL)
       BEqu(&unlock_flags,i,
-	BlkDevLock(&sys_blkdevs[i]));
+	    BlkDevLock(&sys_blkdevs[i]));
 
   if (!just_ide)
-  for (k=0;k<256;k++) {
-    i=-1;
-    while (TRUE) {
-      j=PCIClassFind(0x010100+k,++i);
-      if (j<0)
-	break;
+    for (k=0;k<256;k++) {
+      i=-1;
+      while (TRUE) {
+	j=PCIClassFind(0x010100+k,++i);
+	if (j<0)
+	  break;
 
-      "\nSubcode:0x%X Bus:0x%X Dev:0x%X Fun:0x%X\n",k,j.u8[2],j.u8[1],j.u8[0];
-      cnt++;
+	"\nSubcode:0x%X Bus:0x%X Dev:0x%X Fun:0x%X\n",k,j.u8[2],j.u8[1],j.u8[0];
+	cnt++;
 
-      d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x10);
-      d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x14);
-      d3=PCIReadU8(j.u8[2],j.u8[1],j.u8[0],0x3C);
-      if (d1&1 && d2&1) {
-	ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
-	ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
-      } else {
-	d1=0x1F0;
-	d2=0x3F6;
-	d3=14;
-	ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
-	ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
-      }
-      d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x18);
-      d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x1C);
-      if (d1&1 && d2&1) {
-	ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
-	ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
-      } else {
-	d1=0x170;
-	d2=0x376;
-	d3=15;
-	ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
-	ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+	d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x10);
+	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x14);
+	d3=PCIReadU8(j.u8[2],j.u8[1],j.u8[0],0x3C);
+	if (d1&1 && d2&1) {
+	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
+	} else {
+	  d1=0x1F0;
+	  d2=0x3F6;
+	  d3=14;
+	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
+	}
+	d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x18);
+	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x1C);
+	if (d1&1 && d2&1) {
+	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+	} else {
+	  d1=0x170;
+	  d2=0x376;
+	  d3=15;
+	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+	}
       }
     }
-  }
   if (!cnt) {
     d1=0x1F0;
     d2=0x3F6;

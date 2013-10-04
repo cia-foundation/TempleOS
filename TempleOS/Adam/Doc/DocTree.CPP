@@ -98,8 +98,8 @@ mt_done:
     while (*st3) {
       StrFirstRem(st3,"/",st2);
       if (*st2) {
-	DocPrintF(doc,"$$TR+C,\"%s\"$$\n$$ID,2$$",st2);
-	doc->cur_entry=DocPutS(doc,"$$ID,-2$$");
+	DocPrint(doc,"$$TR+C,\"%s\"$$\n$$ID,2$$",st2);
+	doc->cur_entry=DocPrint(doc,"$$ID,-2$$");
 	doc->cur_data_col=0;
       }
     }

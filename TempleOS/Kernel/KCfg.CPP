@@ -39,7 +39,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
   Bool make_free;
 
   //See $LK,"InsBootDstDrv","FF:::/TempleOS/Adam/Boot/InsBoot.CPP,InsBootDstDrv"$
-  if (!(c->sys_acct_drv=NamedFramePtr("InsBootDstDrv")))
+  if (!(c->sys_acct_drv=FramePtr("InsBootDstDrv")))
     c->sys_acct_drv=Fs->cur_prt->drv_let;
 
   PutDefine("ST_MOUNT_INTRO");
@@ -78,8 +78,8 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	  } while (!A2I(base0_buf));
 	if (1<=A2I(base0_buf)<=num_hints) {
 	  tempha=ATARepFind(root,A2I(base0_buf));
-	  SPrintF(base0_buf,"0x%X",tempha->base0);
-	  SPrintF(base1_buf,"0x%X",tempha->base1);
+	  SPrint(base0_buf,"0x%X",tempha->base0);
+	  SPrint(base1_buf,"0x%X",tempha->base1);
 	  unit=tempha->unit;
 	} else if (type!=BDT_ATAPI || *base0_buf) {
 	  if (type==BDT_ATAPI)
@@ -98,25 +98,25 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	LinkedLstDel(root);
       }
       if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
-	DocPrintF(doc,"bdev=BlkDevNextFree(%d,%d);"
+	DocPrint(doc,"bdev=BlkDevNextFree(%d,%d);"
 		      "bdev->unit=%d;",first_prt_num+'A',type,unit);
 	if (type==BDT_RAM) {
 	  if (!*addr_buf) StrCpy(addr_buf,"0");
-	  DocPrintF(doc,"bdev->RAM_dsk=%s;",addr_buf);
-	  DocPrintF(doc,"bdev->max_blk=(%s)-1;",blks_buf);
+	  DocPrint(doc,"bdev->RAM_dsk=%s;",addr_buf);
+	  DocPrint(doc,"bdev->max_blk=(%s)-1;",blks_buf);
 	}
 	make_free=FALSE;
 	if (type==BDT_ATA || type==BDT_ATAPI) {
 	  if (type==BDT_ATAPI && !*base0_buf) {
 	    c->cdrom_ports_pmt=TRUE;
-	    DocPrintF(doc,"boot_drv_pmt=PmtBaseUnit(bdev);");
+	    DocPrint(doc,"boot_drv_pmt=PmtBaseUnit(bdev);");
 	    if (first_prt_num+'A'==c->sys_acct_drv)
 	      make_free=TRUE;
 	  } else
-	    DocPrintF(doc,"bdev->base0=%s;bdev->base1=%s;",
+	    DocPrint(doc,"bdev->base0=%s;bdev->base1=%s;",
 		base0_buf,base1_buf);
 	}
-	DocPrintF(doc,"BlkDevAdd(bdev,FALSE,%d);",make_free);
+	DocPrint(doc,"BlkDevAdd(bdev,FALSE,%d);",make_free);
 	cnt++;
       } else
 	PutDefine("ST_FAILED");
@@ -136,7 +136,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
       "$$FG,PURPLE$$%13tz$$FG$$:%Z\n",i,kernel_cfg_options,c->opts[i],"ST_OFF_ON";
     "\nType '$$FG,PURPLE$$Help$$FG$$' for help.\n";
     st=PmtStr("Option ($$FG,PURPLE$$<ENTER>$$FG$$ when done):","");
-    i=LstEntryMatch(st,kernel_cfg_options,LEF_IGNORE_CASE);
+    i=LstMatch(st,kernel_cfg_options,LMF_IGNORE_CASE);
     if (i==CFG_HELP)
 "\n"
 "$$FG,PURPLE$$ProtectLow$$FG$$ Marks memory at and below 0x%0X as not present.\n"
@@ -216,7 +216,7 @@ CKernelCfg *KernelCfgNew()
   c->bios_gr_mode=0x12; //0x12=640x480x4 0x6A=800x600x4
   KernelCfgOptions(c);
   if (c->opts[CFG_DETERMINISTIC])
-    StreamPutS("#define SYS_DETERMINISTIC");
+    StreamPrint("#define SYS_DETERMINISTIC");
   return c;
 }
  

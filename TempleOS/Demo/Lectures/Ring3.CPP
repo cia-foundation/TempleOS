@@ -30,10 +30,10 @@ TO_RING0::	//Set to handle general protection 0xD fault temporarily.
 
 U0 Ring3Demo()
 {
-  U8 *old_pf;
+  U8 *old_vect;
   "Progress1 Before:%X\n",progress1;
   Cli;
-  old_pf=IntEntrySet(0x0D,TO_RING0,IDTET_TRAP,0);
+  old_vect=IntEntrySet(0x0D,TO_RING0,IDTET_TRAP,0);
 
   TSSBusy(Gs->tss->tr_ring3,OFF);
   SetRAX(Gs->tss->tr_ring3+3);
@@ -74,7 +74,7 @@ R3_CALLBACK:
   SetRAX(Gs->tss->tr);
 asm {	LTR	AX}
 
-  IntEntrySet(0x0D,old_pf,IDTET_IRQ,0);
+  IntEntrySet(0x0D,old_vect,IDTET_IRQ,0);
   Sti;
   "Progress1 After :%X\n",progress1;
 }

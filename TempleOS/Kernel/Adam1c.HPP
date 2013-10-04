@@ -12,7 +12,6 @@ public extern U0 TSSBusy(I64 tr,Bool val=OFF);
 _extern SYS_CONTEXT_RESTORE U0 TaskContextRestore();
 _extern SYS_TASK_END_NOW U0 TaskEndNow();
 
-
 #help_index "Time/CPU Cycles"
 #help_file "::/TempleOS/Doc/TimeCycles"
 public extern I64 time_stamp_freq,time_stamp_kHz_freq;
@@ -37,7 +36,6 @@ public extern Bool Mute(Bool val);
 public extern Bool IsMute();
 public extern F64 snd_freq;
 public extern U0 Beep(I64 freq=500,Bool busy=FALSE);
-public extern Bool IOSnd(Bool val);
 public extern Bool snd_record;
 extern CSndData snd_record_root;
 
@@ -99,17 +97,18 @@ public extern Bool BptR(U8 *add,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE);
 public extern Bool B(U8 *add,CTask *task=NULL,Bool live=TRUE) //Toggle breakpoint
 public extern I64 B2(CTask *task=NULL,Bool live=TRUE);
 #help_index "Debugging/Raw Output"
+public extern Bool Raw(Bool val);
+public extern Bool IsRaw();
 extern U0 RawDr(CTask *task=NULL);
 public extern U0 RawPutChar(I64 ch);
 public extern U0 VGAFlush();
-public extern Bool Raw(Bool val);
-public extern Bool IsRaw();
-public extern U0 DbgStr(U8 *st,I64 mS=100);
-public extern U0 DbgI64(I64 num,I64 mS=100);
-public extern U0 DbgF64(F64 d,I64 mS=100);
-public extern U0 DbgAdd(U8 *add,I64 mS=100);
-public extern U0 DbgD(U8 *add,I64 cnt=0x80,I64 mS=100);
-public extern U0 DbgDm(U8 *add,I64 cnt=0x80,I64 mS=100);
+public extern U0 RawStr(U8 *st,I64 mS=100);
+public extern U0 RawI64(I64 num,I64 mS=100);
+public extern U0 RawF64(F64 d,I64 mS=100);
+public extern U0 RawAdd(U8 *add,I64 mS=100);
+public extern U0 RawPrint(I64 mS=100,U8 *fmt,...);
+public extern U0 RawD(U8 *add,I64 cnt=0x80,I64 mS=100);
+public extern U0 RawDm(U8 *add,I64 cnt=0x80,I64 mS=100);
 
 #help_index "Graphics/Color"
 extern U0 (*fp_set_std_palette)();
@@ -124,11 +123,11 @@ extern I64 **ctrl_alt_let_ret_addr; //addr of ret add on stack in kbd irq
 extern CSrvCmd sys_macro_root;
 extern CKeyDev sys_put_key_root;
 extern CTask *sys_macro_util_task;
-extern I64 sys_raw_dc_col,sys_raw_dc_flags;
-extern U8 *sys_dc_screen_image;
+extern I64 sys_raw_col,sys_raw_flags;
+extern U8 *sys_raw_screen_image;
 public extern Bool text_mode;
 
-//Constants are defined for these to
+//Consts are defined for these to
 //optimize.  See $LK-A,"::/TempleOS/Adam/Gr/GrCfg.CPP"$.
 public extern I64 text_rows,text_cols,gr_width,gr_height;
 public extern U8 *gr_font;
@@ -144,16 +143,16 @@ extern U8 *key_handler;
 public extern U0 PutDefineErr(U8 *st);
 public extern U0 PutDefineWarn(U8 *st);
 #help_index "Char/Output"
-public extern U0 PrintF(U8 *fmt,...);
-public extern U0 PrintFErr(U8 *fmt,...);
-public extern U0 PrintFWarn(U8 *fmt,...);
+public extern U0 Print(U8 *fmt,...);
+public extern U0 PrintErr(U8 *fmt,...);
+public extern U0 PrintWarn(U8 *fmt,...);
 public extern U0 NewLine(I64 cnt=1);
 public extern U0 Spaces(I64 cnt=1);
 public extern U0 PutErr(U8 *st=NULL);
 public extern U0 PutWarn(U8 *st=NULL);
 public extern U0 PutKey(I64 ch,I64 scancode);
 public extern U0 PutChar(U64 ch);
-public extern U0 PutS(U8 *st);
+extern U0 PutS(U8 *st); //Use $LK,"Print","MN:Print"$()
 public extern U8 *Bin2Hex(U8 *dst,I64 n;I64 width);
 public extern U0 PutHex(I64 n,I64 width);
 public extern Bool Silent(Bool val);
@@ -167,7 +166,7 @@ extern I64 mouse_pkt_size;
 #help_index "Char/Input"
 public extern I64 kbd_evt_time;
 extern Bool kbd_irqs_working;
-public extern Bool PressAKey();
+public extern I64 PressAKey();
 public extern Bool AreYouSure();
 public extern I64 GetKey(I64 *_scancode=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE);
 public extern I64 GetChar(I64 *_scancode=NULL,Bool echo=TRUE,Bool raw_cursor=FALSE);
@@ -179,12 +178,12 @@ public extern I64 KbdMouseEvtTime();
 //Gets $LK,"Flags","MN:GETSF_SHIFT_ESC_EXIT"$
 public extern U8 *MGetS(I64 flags=0);
 extern U8  *(*fp_mgets)(I64 flags=0);
-extern U8 *GetFJoin(U8 *src,U8 *fmt,I64 argc,I64 *argv);
-public extern U8 *GetF(U8 *src,U8 *fmt,...);
+public extern U8 *ScanJoin(U8 *src,U8 *fmt,I64 argc,I64 *argv);
+public extern U8 *Scan(U8 *src,U8 *fmt,...);
 
 #help_index "Char/Lists"
-public extern U8 *LstEntryPt(I64 entry_num, U8 *lst);
-public extern I64 LstEntryMatch(U8 *src, U8 *lst,I64 flags=0,I64 *_ambiguity_overkill=NULL);
+public extern U8 *LstSub(I64 sub, U8 *lst);
+public extern I64 LstMatch(U8 *pattern, U8 *lst,I64 flags=0);
 
 #help_index "Char/Operations"
 public extern I64 StrOcc(U8 *src, U8 ch);
@@ -197,24 +196,24 @@ public extern U8 *StrUtil(U8 *_src,I64 flags);
 public extern U8 *MStrUtil(U8 *src,I64 flags,F64 indent_scale_factor=0);
 public extern U8 *StrFirstRem(U8 *src,U8 *marker,U8 *dst=NULL);
 public extern U8 *StrLastRem(U8 *src,U8 *marker,U8 *dst=NULL);
-public extern Bool WildCardMatch(U8 *wild_st,U8 *src_st);
+public extern Bool WildMatch(U8 *pattern,U8 *wild);
 public extern U8 *StrAdd(U8 *base,U8 *addition); //frees base arg
-public extern U8 *SearchStr(U8 *src,U8 *pattern,I64 flags=0);
-extern U8 *SPrintFJoin(U8 *dst,U8 *fmt,I64 argc,I64 *argv);
-public extern U8 *SPrintF(U8 *dst,U8 *fmt,...);
-public extern U8 *MSPrintF(U8 *fmt,...);
+public extern U8 *StrFind(U8 *pattern,U8 *src,I64 flags=0);
+public extern U8 *SPrintJoin(U8 *dst,U8 *fmt,I64 argc,I64 *argv);
+public extern U8 *SPrint(U8 *dst,U8 *fmt,...);
+public extern U8 *MPrint(U8 *fmt,...);
 
 #help_index "Char/Define"
 #help_file "::/TempleOS/Doc/Define"
 public extern CHashDefineStr *DefineLoad(U8 *name,U8 *st,Bool replace=FALSE);
-public extern U0 DefinePrintF(U8 *name,U8 *src,...);
+public extern U0 DefinePrint(U8 *name,U8 *src,...);
 public extern U8 *Define(U8 *name);
 public extern U0 PutDefine(U8 *name);
 #help_index "Char/Define;Char/Lists"
 public extern CHashDefineStr *DefineLstLoad(U8 *name,U8 *st,Bool replace=FALSE);
 public extern U8 *DefineSub(I64 sub,U8 *name);
 public extern I64 DefineSubCnt(U8 *name);
-public extern I64 DefineMatch(U8 *src,U8 *lst_name,I64 flags=0,I64 *_ambiguity_overkill=NULL);
+public extern I64 DefineMatch(U8 *pattern,U8 *lst_name,I64 flags=0);
 
 #help_index "Memory"
 #help_file "::/TempleOS/Doc/Mem"
@@ -280,10 +279,9 @@ extern U0 TaskFinishOff(CTask *task);
 public extern U0 OverRideSingleUserSwap();
 #help_index "Task;MultiCore"
 public extern CTask *Spawn(U0 (*fp_add)(U8 *data),U8 *data=NULL,
-	    U8 *task_name=NULL,
-	    I64 target_cpu=-1,	//-1 means current CPU
-	    CTask *parent=NULL, //NULL means adam
-	    I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
+	U8 *task_name=NULL,I64 target_cpu=-1,	//-1 means current CPU
+	CTask *parent=NULL, //NULL means adam
+	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
 
 #help_index "Task/Requests"
 public extern U0 SrvCmdDel(CSrvCmd *tempc);
@@ -298,9 +296,9 @@ public extern U0 AdamLogExcept(I64 argc,I64 *argv);
 public extern U0 AdamLog(U8 *fmt,...);
 public extern U0 AdamErr(U8 *fmt,...);
 #help_index "Task/Text Input"
-public extern CSrvCmd *
-  TaskTextInputQue(CTask *srv,CTask *master,
-		     U8 *data,I64 flags);
+public extern CSrvCmd *TaskTextInputQue(CTask *srv,CTask *master,
+	U8 *data,I64 flags);
+
 #help_index "Task/Text Input;Messages"
 public extern CSrvCmd *TaskMsgQue(CTask *srv,CTask *master,
 		     I64 msg_code,I64 p1,I64 p2,I64 flags);
@@ -329,8 +327,7 @@ public extern U0 ArcExpandBuf(CArcCtrl *c);
 public extern CArcCtrl *ArcCtrlNew(Bool expand,Bool text_only);
 public extern U0 ArcCtrlDel(CArcCtrl *c);
 #help_index "Compression"
-public extern CArcCompress *
-  CompressBuf(U8 *src,I64 size,I64 flags=0,CTask *mem_task=NULL);
+public extern CArcCompress *CompressBuf(U8 *src,I64 size,I64 flags=0,CTask *mem_task=NULL);
 public extern U8 *ExpandBuf(CArcCompress *r,CTask *mem_task=NULL);
 //This is just an XOR checksum.
 extern I64 ArcXSum(U32 *buf,I64 size);
@@ -400,7 +397,7 @@ public extern I64 LastDayOfMon(I64 i);
 public extern I64 FirstDayOfYear(I64 i);
 public extern I64 LastDayOfYear(I64 i);
 public extern I64 DayOfWeek(I64 i);
-public extern CDate GetCurTimeDate();
+public extern CDate GetDateTime();
 public extern U0 Date2ISO1(CISO1Date *dst,CDate cdt);
 public extern U8 *date_fmt_map,*time_fmt_map;
 public extern U0 DateTimeFmtMapsRst();
@@ -466,7 +463,7 @@ public extern I64 RClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks);
 public extern I64 RClusters(CPrt *p,U8 *buf,I64 c,I64 cnt);
 public extern I64 WClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks);
 public extern I64 WClusters(CPrt *p,U8 *buf,I64 c,I64 cnt);
-public extern I64 ClusersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE);
+public extern I64 ClustersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE);
 public extern Bool RBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt);
 public extern Bool WBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt);
 public extern U0 WZeroBlks(CPrt *p,I64 blk,I64 cnt);
@@ -494,7 +491,7 @@ public extern U8 *sys_dft_iso_name;
 
 #help_index "File/FileNames"
 public extern U8 *sys_acct;
-public extern Bool FilesFindMatch(U8 *files_find_mask,U8 *filename,I64 fuf_flags=0);
+public extern Bool FilesFindMatch(U8 *pattern,U8 *files_find_mask,I64 fuf_flags=0);
 public extern Bool IsDotZ(U8 *filename);
 public extern Bool IsDotC(U8 *filename);
 public extern U8 *FileExtDot(U8 *src);
@@ -511,30 +508,30 @@ public extern U8 *ChgExt(U8 *filename,U8 *extension);
 public extern U8 *DftExt(U8 *filename,U8 *extension);
 public extern Bool IsDir(U8 *dir_name);
 public extern Bool IsDrvWritable(U8 drv_let=0);
-extern CDirEntry *Cd2DirEntry(CDirEntry *tempm,U8 *abs_name);
+extern CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name);
 public extern U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum);
 
 #help_index "File/Program Routines/Utils"
-public extern U0 GetFFlags(U8 *f,U8 *lst,U8 *st);
-public extern U8 *SPrintFFlags(U8 *dst,U8 *lst,I64 flags);
+public extern U0 ScanFlags(U8 *f,U8 *lst,U8 *st);
+public extern U8 *SPrintFlags(U8 *dst,U8 *lst,I64 flags);
 public extern U0 FileAccessDel(CFileAccess *fa);
 public extern CFileAccess *FileAccessNew(U8 *mask,Bool make_mask=FALSE,Bool make_dirs=FALSE);
 extern I64 FileAttr(U8 *name,I64 old_attr=0);
-public extern U0 CDirEntryDel(CDirEntry *tempm);
-public extern U0 CDirEntryDel2(CDirEntry *tempm);
-public extern U0 CDirLstDel(CDirEntry *tempm);
-public extern U0 CDirLstDel2(CDirEntry *tempm);
-public extern Bool CDirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempm,Bool free_old_chain=TRUE);
+public extern U0 DirEntryDel(CDirEntry *tempde);
+public extern U0 DirEntryDel2(CDirEntry *tempde);
+public extern U0 DirLstDel(CDirEntry *tempde);
+public extern U0 DirLstDel2(CDirEntry *tempde);
+public extern Bool DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE);
 
 #help_index "File/Program Routines"
 public extern CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0);
 public extern I64 FileSize(U8 *filename,I64 fuf_flags=0);
 public extern I64 FileSizeExpanded(U8 *filename,I64 fuf_flags=0);
-public extern Bool FileFind(U8 *filename,CDirEntry *de=NULL,I64 fuf_flags=0);
+public extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 public extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE);
 public extern U8 *TextFileRead(U8 *filename,I64 *_attr=NULL);
 public extern I64 FileWrite(U8 *filename,U8 *fbuf,
-   I64 size,CDate cdt=0,I64 attr=0,Bool raw=FALSE);
+	I64 size,CDate cdt=0,I64 attr=0,Bool raw=FALSE);
 public extern U0 TextFileWrite(U8 *filename,U8 *st,I64 attr=0);
 
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
@@ -552,12 +549,11 @@ extern Bool boot_drv_pmt,cdrom_boot_is_good;
 #help_index "Hash"
 #help_file "::/TempleOS/Doc/Hash"
 public _extern _HASH_STR I64 HashStr(U8 *st);
-public _extern _HASH_FIND CHash *
-  HashFind(U8 *st,CHashTable *table,I64 mask,I64 instance=1);
+public _extern _HASH_FIND CHash *HashFind(U8 *st,CHashTable *table,I64 mask,I64 instance=1);
 public _extern _HASH_SINGLE_TABLE_FIND CHash *
-  HashSingleTableFind(U8 *st,CHashTable *table,I64 mask,I64 instance=1);
+	HashSingleTableFind(U8 *st,CHashTable *table,I64 mask,I64 instance=1);
 public _extern _HASH_BUCKET_FIND CHash **
-  HashBucketFind(U8 *st,CHashTable *table);
+	HashBucketFind(U8 *st,CHashTable *table);
 public _extern _HASH_ADD U0 HashAdd(CHash *temph,CHashTable *table);
 public _extern _HASH_ADD_AFTER U0 HashAddAfter(CHash *temph,CHash *pred,CHashTable *table);
 public _extern _HASH_REPLACE U0 HashReplace(CHash *temph,CHashTable *table,
@@ -572,16 +568,16 @@ public extern U0 HashDel(CHashSrcSym *temph);
 public extern U0 HashTableDel(CHashTable *table);
 extern U0 SysSymImportsResolve(U8 *sptr,I64 ld_flags=0);
 
-#help_index "Hash/Named Frame"
-#help_file "::/TempleOS/Doc/NamedFrame"
-public extern I64 NamedFramePtr(U8 *name,CTask *task=NULL);
-public extern CHashGeneric *NamedFramePtrAdd(U8 *name,I64 val,CTask *task=NULL);
-public extern I64 NamedFramePtrSet(U8 *name,I64 val,CTask *task=NULL);
-public extern I64 NamedFramePtrDel(U8 *name,CTask *task=NULL);
+#help_index "Hash/Frame"
+#help_file "::/TempleOS/Doc/Frame"
+public extern I64 FramePtr(U8 *name,CTask *task=NULL);
+public extern CHashGeneric *FramePtrAdd(U8 *name,I64 val,CTask *task=NULL);
+public extern I64 FramePtrSet(U8 *name,I64 val,CTask *task=NULL);
+public extern I64 FramePtrDel(U8 *name,CTask *task=NULL);
 
 #help_index "Compiler;Cmd Line (Typically)"
 public extern U8 *Load(U8 *filename,I64 ld_flags=0,
-  CBinFile *bfh_addr=INVALID_PTR); //INVALID_PTR means don't care what load addr.
+	CBinFile *bfh_addr=INVALID_PTR); //INVALID_PTR means don't care what load addr.
 
 extern I64 sys_num_installed_compilers;
 #help_index "Compiler"
@@ -593,8 +589,8 @@ public extern U0 Reboot();
 
 #help_index "MultiCore;Task/Requests"
 public extern CSrvCmd *JobQue(I64 (*fp_add)(U8 *data),U8 *data=NULL,
-       I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
-       I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
+	I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
+	I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
 #help_index "MultiCore"
 extern U8 mp_apic_ids[MP_MAX_PROCESSORS];
 extern CMPCrash *mp_crash;
@@ -604,10 +600,9 @@ public extern U0 MPIntAll(U8 num);
 public extern U0 MPWake(I64 target_cpu);
 extern U0 MPSethServerTask();
 extern CTask *SpawnQue(U0 (*fp_add)(U8 *data),U8 *data=NULL,
-	    U8 *task_name=NULL,
-	    I64 target_cpu,
-	    CTask *parent=NULL, //NULL means adam
-	    I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
+	U8 *task_name=NULL,I64 target_cpu,
+	CTask *parent=NULL, //NULL means adam
+	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
 public extern U0 MPNMInt();
 public extern U0 MPStart();
 #help_index "Task/Requests;MultiCore"
@@ -687,8 +682,8 @@ public _extern _STRCMP I64 StrCmp(U8 *st1,U8 *st2);
 public _extern _STRICMP I64 StrICmp(U8 *st1,U8 *st2);
 public _extern _STRNCMP I64 StrNCmp(U8 *st1,U8 *st2,I64 n);
 public _extern _STRNICMP I64 StrNICmp(U8 *st1,U8 *st2,I64 n);
-public _extern _STRSTR U8 *StrStr(U8 *st,U8 *pattern);
-public _extern _STRISTR U8 *StrIStr(U8 *st,U8 *pattern);
+public _extern _STRMATCH U8 *StrMatch(U8 *pattern,U8 *st);
+public _extern _STRIMATCH U8 *StrIMatch(U8 *pattern,U8 *st);
 public _extern _STRCPY U0 StrCpy(U8 *dst,U8 *src);
 public _extern _STRCAT U0 StrCat(U8 *dst,U8 *src);
 
@@ -738,8 +733,8 @@ public extern F64 mouse_speed;
 extern I64 old_mxx,old_myy,old_mzz;
 public extern Bool mouse_buttons[5];
 extern Bool mouse_installed;
-extern I64     mouse_install_attempts,
-       mouse_last_evt_time;
+extern I64  mouse_install_attempts,
+	    mouse_last_evt_time;
 extern Bool mouse_has_wheel;
 extern Bool mouse_has_ext_buttons;
 extern Bool mouse_evt;
@@ -789,7 +784,7 @@ extern CDoc *(*fp_doc_put)(CTask *task=NULL);
 #help_index "Char/Conversion"
 public extern F64 A2F64(U8 *src,U8 **_end_ptr=NULL);
 
-#help_index "Char/Conversion;Time/Date"
+#help_index "Char/Conversion;Time/Date;Date"
 public extern CDate A2Date(U8 *src);
 
 #help_index "Debugging/PSect;Hash"

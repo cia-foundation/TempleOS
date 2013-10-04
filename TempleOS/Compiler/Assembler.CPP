@@ -1,28 +1,30 @@
-U0 AsmUnresolvedAdd(CAsmCtrl *a,U8 *exp,I64 type,I64 ip,I64 rel_ip,
-		    CLexUndef *undef_hash,I64 line_num,Bool U8_avail,Bool glbl)
+U0 AsmUnresolvedAdd(CAsmCtrl *a,U8 *ex,I64 type,I64 ip,I64 rel_ip,
+		CLexUndef *undef_local,CLexUndef *undef_glbl,I64 line_num,
+		Bool U8_avail)
 {
   CAsmUnresolvedRef *tempu=MAlloc(sizeof(CAsmUnresolvedRef));
-  tempu->exp=exp;
+  tempu->ex=ex;
   tempu->type=type;
   tempu->ip=ip;
   tempu->rel_ip=rel_ip;
-  tempu->undef_hash=undef_hash;
-  tempu->lit=FALSE;
+  tempu->imm_flag=FALSE;
   tempu->line_num=line_num;
   tempu->U8_avail=U8_avail;
   tempu->str=NULL;
-  if (glbl) {
-    tempu->next=a->glbl_unresolved;
-    a->glbl_unresolved=tempu;
-    if (undef_hash->hash->type & HTF_IMPORT) {
-      tempu->str=StrNew(undef_hash->hash->str);
-      if (undef_hash->hash->type & HTF_LIT)
-	tempu->lit=TRUE;
-    }
-  } else {
+  if (undef_local) {
+    tempu->undef_hash=undef_local;
     tempu->next=a->local_unresolved;
     a->local_unresolved=tempu;
     a->has_locals=TRUE;
+  } else {
+    tempu->undef_hash=undef_glbl;
+    tempu->next=a->glbl_unresolved;
+    a->glbl_unresolved=tempu;
+    if (undef_glbl->hash->type & HTF_IMPORT) {
+      tempu->str=StrNew(undef_glbl->hash->str);
+      if (undef_glbl->hash->type & HTF_IMM)
+	tempu->imm_flag=TRUE;
+    }
   }
 }
 
@@ -62,11 +64,11 @@ U0 AsmStoreCodeU8(CLex *lx,U8 b)
 {
   CAsmCtrl *a=lx->a;
   I64 i=a->ip>>ASM_CODE_BLK_BITS;
-  CAsmCodeBlk *tempc=a->code;
+  CAsmCodeBlk *tempc=a->cb;
   while (i--)
     if (!(tempc=tempc->next)) {
       i=a->ip>>ASM_CODE_BLK_BITS+1;
-      tempc=&a->code;
+      tempc=&a->cb;
       while (i--) {
 	if (!tempc->next)
 	  tempc->next=CAlloc(sizeof(CAsmCodeBlk));
@@ -83,8 +85,8 @@ U0 AsmStoreCodeU8(CLex *lx,U8 b)
     "%02X ",b;
     a->display_col+=3;
   }
-  if (a->ip>a->num_code_U8s)
-    a->num_code_U8s=a->ip;
+  if (a->ip>a->num_ex_U8s)
+    a->num_ex_U8s=a->ip;
 }
 
 U0 AsmStoreCodeU32(CLex *lx,U32 d)
@@ -93,17 +95,17 @@ U0 AsmStoreCodeU32(CLex *lx,U32 d)
   I64 i=a->ip>>ASM_CODE_BLK_BITS,
      j=(a->ip+sizeof(U32))>>ASM_CODE_BLK_BITS;
   U32 *_d;
-  CAsmCodeBlk *tempc=a->code;
+  CAsmCodeBlk *tempc=a->cb;
   if (i!=j) {
     for (i=0;i<sizeof(U32);i++)
       AsmStoreCodeU8(lx,d.u8[i]);
     return;
   }
-  tempc=a->code;
+  tempc=a->cb;
   while (i--)
     if (!(tempc=tempc->next)) {
       i=a->ip>>ASM_CODE_BLK_BITS+1;
-      tempc=&a->code;
+      tempc=&a->cb;
       while (i--) {
 	if (!tempc->next)
 	  tempc->next=CAlloc(sizeof(CAsmCodeBlk));
@@ -122,8 +124,8 @@ U0 AsmStoreCodeU32(CLex *lx,U32 d)
     "%08X ",d;
     a->display_col+=9;
   }
-  if (a->ip>a->num_code_U8s)
-    a->num_code_U8s=a->ip;
+  if (a->ip>a->num_ex_U8s)
+    a->num_ex_U8s=a->ip;
 }
 
 U0 AsmStoreCodeU64(CLex *lx,U64 d)
@@ -132,17 +134,17 @@ U0 AsmStoreCodeU64(CLex *lx,U64 d)
   I64 i=a->ip>>ASM_CODE_BLK_BITS,
       j=(a->ip+sizeof(I64))>>ASM_CODE_BLK_BITS,
       *qq;
-  CAsmCodeBlk *tempc=a->code;
+  CAsmCodeBlk *tempc=a->cb;
   if (i!=j) {
     for (i=0;i<sizeof(I64);i++)
       AsmStoreCodeU8(lx,d.u8[i]);
     return;
   }
-  tempc=a->code;
+  tempc=a->cb;
   while (i--)
     if (!(tempc=tempc->next)) {
       i=a->ip>>ASM_CODE_BLK_BITS+1;
-      tempc=&a->code;
+      tempc=&a->cb;
       while (i--) {
 	if (!tempc->next)
 	  tempc->next=CAlloc(sizeof(CAsmCodeBlk));
@@ -161,15 +163,15 @@ U0 AsmStoreCodeU64(CLex *lx,U64 d)
     "%016X ",d;
     a->display_col+=17;
   }
-  if (a->ip>a->num_code_U8s)
-    a->num_code_U8s=a->ip;
+  if (a->ip>a->num_ex_U8s)
+    a->num_ex_U8s=a->ip;
 }
 
 U0 AsmStoreCodeU8At(CLex *lx,U8 b,I64 ip)
 {
   CAsmCtrl *a=lx->a;
   I64 i=ip>>ASM_CODE_BLK_BITS+1;
-  CAsmCodeBlk *tempc=&a->code;
+  CAsmCodeBlk *tempc=&a->cb;
   while (i--) {
     if (!tempc->next) {
       tempc->next=CAlloc(sizeof(CAsmCodeBlk));
@@ -178,18 +180,18 @@ U0 AsmStoreCodeU8At(CLex *lx,U8 b,I64 ip)
     tempc=tempc->next;
   }
   tempc->body[ip & (ASM_CODE_BLK_SIZE-1)]=b;
-  if (ip+1>a->num_code_U8s)
-    a->num_code_U8s=ip+1;
+  if (ip+1>a->num_ex_U8s)
+    a->num_ex_U8s=ip+1;
 }
 
-I64 AsmExpressionEval(CLex *lx)
+I64 AsmLexExpression(CLex *lx)
 {
-  U8 *exp;
+  U8 *ex;
   I64 result=0;
   lx->undef_hash_entry=NULL;
   lx->flags&=~(LF_UNRESOLVED+LF_LOCAL);
   lx->abs_cnts=0;
-  if (!GetExpression(lx,&exp))
+  if (!IsLexExpression2Bin(lx,&ex))
     LexSkipEol(lx);
   else {
     if (lx->abs_cnts.externs)
@@ -197,8 +199,8 @@ I64 AsmExpressionEval(CLex *lx)
     if (lx->flags & LF_UNRESOLVED)
       LexExcept(lx,"ST_UNDEFINED_SYM");
     else {
-      result=Call(exp);
-      ExpressionDel(exp);
+      result=Call(ex);
+      ExpressionBinDel(ex);
     }
   }
   return result;
@@ -221,7 +223,7 @@ U0 AsmLocalsResolve(CLex *lx)
     templu=tempu->undef_hash;
     while (templu) {
       if (templu->hash->type & HTF_UNRESOLVED) {
-	PrintFErr("%S%04d %s %s\n","ST_UNDEFINED_SYM_LINE",
+	PrintErr("%S%04d %s %s\n","ST_UNDEFINED_SYM_LINE",
 	  tempu->line_num,a->last_label,templu->hash->str);
 	LexExcept(lx);
       }
@@ -229,17 +231,17 @@ U0 AsmLocalsResolve(CLex *lx)
       templu=templu->next;
     }
     if (!undefined) {
-      r=Call(tempu->exp);
+      r=Call(tempu->ex);
       if (!(tempu->type & 1)) {
 	r-=tempu->rel_ip;
 	if (tempu->type==EIE_REL_U8 && !(MIN_I8<=r<=MAX_I8) ||
 	    tempu->type==EIE_REL_U16 && !(MIN_I16<=r<=MAX_I16) ) {
-	  PrintFErr("%S%04d %s %s\n","ST_BRANCH_OUT_OF_RANGE_LINE",
+	  PrintErr("%S%04d %s %s\n","ST_BRANCH_OUT_OF_RANGE_LINE",
 	    tempu->line_num,a->last_label,label);
 	  LexExcept(lx);
 	}
-	if (tempu->U8_avail && tempu->type>EIE_LIT_U8 && -124<=r<=123)
-	  PrintFWarn("%S%04d %s %s\n","ST_COULD_USE_I8_DISP_LINE",
+	if (tempu->U8_avail && tempu->type>EIE_IMM_U8 && -124<=r<=123)
+	  PrintWarn("%S%04d %s %s\n","ST_COULD_USE_I8_DISP_LINE",
 	    tempu->line_num,a->last_label,label);
       }
       AsmStoreCodeU8At(lx,r.u8[0],tempu->ip);
@@ -257,7 +259,7 @@ U0 AsmLocalsResolve(CLex *lx)
 	}
       }
     }
-    ExpressionDel(tempu->exp);
+    ExpressionBinDel(tempu->ex);
     LinkedLstDel(tempu->undef_hash);
     Free(tempu);
     tempu=tempu1;
@@ -270,7 +272,7 @@ U0 AsmLocalsResolve(CLex *lx)
   a->has_locals=FALSE;
 }
 
-U0 AsmGlblsResolve(CLex *lx,CExe *ex)
+U0 AsmGlblsResolve(CLex *lx,CExe *tempx)
 {
   CAsmCtrl *a=lx->a;
   CHashFun *tempf;
@@ -278,7 +280,7 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
   I64 j,r=0;
   CExeImportExport *tempe,*tempe1;
   CLexUndef *templu;
-  CHashExport *tempess;
+  CHashExport *tempex;
   U8 *label;
   Bool undefined;
   CExternUsage *tempeu,*tempeu8;
@@ -290,19 +292,19 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
     templu=tempu->undef_hash;
     while (templu) {
       if (templu->hash->type & HTF_UNRESOLVED) {
-	tempess=templu->hash;
-	if (tempess->type & HTT_EXPORT_SYS_SYM &&
-	    tempess->type & HTF_UNRESOLVED &&
-	    !(tempess->type & HTF_IMPORT) &&
-	    (tempf=HashFind(tempess->str,lx->htc.hash_table_lst,HTT_FUN)) &&
+	tempex=templu->hash;
+	if (tempex->type & HTT_EXPORT_SYS_SYM &&
+	    tempex->type & HTF_UNRESOLVED &&
+	    !(tempex->type & HTF_IMPORT) &&
+	    (tempf=HashFind(tempex->str,lx->htc.hash_table_lst,HTT_FUN)) &&
 	    !Bt(tempf->flags,Cf_EXTERN)) {
-	  tempess->val=tempf->executable_addr;
-	  tempess->type&=~HTF_UNRESOLVED;
+	  tempex->val=tempf->executable_addr;
+	  tempex->type&=~HTF_UNRESOLVED;
 	  label=templu->hash->str;
 	} else {
-	  if (!(tempess->type & HTF_IMPORT)) {
-	    PrintFErr("%S%04d %s\n",
-	      "ST_UNDEFINED_SYM_LINE",tempu->line_num,tempess->str);
+	  if (!(tempex->type & HTF_IMPORT)) {
+	    PrintErr("%S%04d %s\n",
+	      "ST_UNDEFINED_SYM_LINE",tempu->line_num,tempex->str);
 	    LexExcept(lx);
 	  }
 	  undefined=TRUE;
@@ -311,7 +313,7 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
 	label=templu->hash->str;
       templu=templu->next;
     }
-    r=Call(tempu->exp);
+    r=Call(tempu->ex);
     if (!(tempu->type & 1))
       r-=tempu->rel_ip;
     if (undefined) {
@@ -327,12 +329,12 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
       if (!(tempu->type & 1))  { //Rel?
 	if (tempu->type==EIE_REL_U8 && !(MIN_I8<=r<=MAX_I8) ||
 	    tempu->type==EIE_REL_U16 && !(MIN_I16<=r<=MAX_I16)) {
-	  PrintFErr("%S%04d %s\n","ST_BRANCH_OUT_OF_RANGE_LINE",
+	  PrintErr("%S%04d %s\n","ST_BRANCH_OUT_OF_RANGE_LINE",
 	    tempu->line_num,label);
 	  LexExcept(lx);
 	}
-	if (tempu->U8_avail && tempu->type>EIE_LIT_U8 && -124<=r<=123)
-	  PrintFWarn("%S%04d %s %s\n","ST_COULD_USE_I8_DISP_LINE",
+	if (tempu->U8_avail && tempu->type>EIE_IMM_U8 && -124<=r<=123)
+	  PrintWarn("%S%04d %s %s\n","ST_COULD_USE_I8_DISP_LINE",
 	    tempu->line_num,a->last_label,label);
       }
     }
@@ -350,35 +352,35 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
 	}
       }
     }
-    ExpressionDel(tempu->exp);
+    ExpressionBinDel(tempu->ex);
     LinkedLstDel(tempu->undef_hash);
     Free(tempu);
     tempu=tempu1;
   }
 
-  tempess=lx->htc.glbl_hash_table->next_added;
-  while (tempess!=lx->htc.glbl_hash_table) {
-    if (tempess->type & HTF_IMPORT && tempess->use_cnt) {
-      if (tempe=tempess->ie_lst) {
-	if (tempess->import_name)
-	  tempe->str=StrNew(tempess->import_name);
+  tempex=lx->htc.glbl_hash_table->next_added;
+  while (tempex!=lx->htc.glbl_hash_table) {
+    if (tempex->type & HTF_IMPORT) {
+      if (tempex->use_cnt && (tempe=tempex->ie_lst)) {
+	if (tempex->import_name)
+	  tempe->str=StrNew(tempex->import_name);
 	else
-	  tempe->str=StrNew(tempess->str);
+	  tempe->str=StrNew(tempex->str);
 	do {
 	  tempe1=tempe->next;
-	  QueIns(tempe,ex->last_ie);
+	  QueIns(tempe,tempx->last_ie);
 	} while (tempe=tempe1);
-	tempess->ie_lst=NULL;
+	tempex->ie_lst=NULL;
       }
-    } else if (tempess->type & HTF_EXPORT) {
-      if (tempess->type & HTF_UNRESOLVED) {
-	PrintFErr("%S%s\n","ST_UNDEFINED_SYM",tempess->str);
+    } else if (tempex->type & HTF_EXPORT) {
+      if (tempex->type & HTF_UNRESOLVED) {
+	PrintErr("%S%s\n","ST_UNDEFINED_SYM",tempex->str);
 	LexExcept(lx);
       }
       tempe=CAlloc(sizeof(CExeImportExport));
       tempe->type=EIE_REL_EXPORT;
-      if (tempess->type & HTT_FUN) {
-	tempf=tempess;
+      if (tempex->type & HTT_FUN) {
+	tempf=tempex;
 	tempe->ip=tempf->executable_addr;
 	tempeu=tempf->ext_lst;
 	while (tempeu) {
@@ -391,17 +393,17 @@ U0 AsmGlblsResolve(CLex *lx,CExe *ex)
 	  Free(tempeu);
 	  tempeu=tempeu8;
 	}
-      } else if (tempess->type & HTT_GLBL_VAR)
-	tempe->ip=tempess(CHashGlblVar *)->data_addr_ip;
+      } else if (tempex->type & HTT_GLBL_VAR)
+	tempe->ip=tempex(CHashGlblVar *)->data_addr_ip;
       else
-	tempe->ip=tempess->val;
-      if (tempess->type & HTF_LIT)
+	tempe->ip=tempex->val;
+      if (tempex->type & HTF_IMM)
 	tempe->type++;
-      tempe->str=StrNew(tempess->str);
-      tempe->src_link=StrNew(tempess->src_link);
-      QueIns(tempe,ex->last_ie);
+      tempe->str=StrNew(tempex->str);
+      tempe->src_link=StrNew(tempex->src_link);
+      QueIns(tempe,tempx->last_ie);
     }
-    tempess=tempess->next_added;
+    tempex=tempex->next_added;
   }
 }
 
@@ -415,7 +417,7 @@ Bool PrsAsmImm(CLex *lx,CAsmArg *arg)
   lx->undef_hash_entry=NULL;
   lx->abs_cnts=0;
   lx->flags&=~(LF_UNRESOLVED+LF_LOCAL);
-  if (!GetExpression(lx,&arg->num.exp))
+  if (!IsLexExpression2Bin(lx,&arg->num.ex))
     LexSkipEol(lx);
   else {
     if (lx->abs_cnts.externs)
@@ -430,11 +432,11 @@ Bool PrsAsmImm(CLex *lx,CAsmArg *arg)
 	lx->a->has_locals=TRUE;
       }
     } else {
-      arg->num.i=Call(arg->num.exp);
+      arg->num.i=Call(arg->num.ex);
       arg->num.undef_glbl=lx->undef_hash_entry;
       lx->undef_hash_entry=NULL;
-      ExpressionDel(arg->num.exp);
-      arg->num.exp=NULL;
+      ExpressionBinDel(arg->num.ex);
+      arg->num.ex=NULL;
     }
   }
   return TRUE;
@@ -453,7 +455,7 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
   while (TRUE) {
     if (lx->token==TK_IDENT) {
       if (temph=lx->hash_entry) {
-	if (temph->type&HTT_TYPE_MASK==HTT_REG) {
+	if (temph->type&HTG_TYPE_MASK==HTT_REG) {
 	  tempr=temph;
 	  switch (tempr->reg_type) {
 	    case REGT_R8:
@@ -490,7 +492,7 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
 	      Lex(lx);
 	      return;
 	  }
-	} else if (temph->type&HTT_TYPE_MASK==HTT_ASM_KEYWORD) {
+	} else if (temph->type&HTG_TYPE_MASK==HTT_ASM_KEYWORD) {
 	  switch (temph->user_data0) {
 	    case AKW_I8:
 	    case AKW_U8:
@@ -530,7 +532,7 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
       while (lx->token && lx->token!=']') {
 	if (lx->token==TK_IDENT) {
 	  if (temph=lx->hash_entry) {
-	    if (temph->type&HTT_TYPE_MASK==HTT_REG &&
+	    if (temph->type&HTG_TYPE_MASK==HTT_REG &&
 	      REGT_R16<=temph(CHashReg *)->reg_type<=REGT_R64) {
 	      tempr=temph;
 	      if (arg->reg1==CREG_NONE) {
@@ -581,88 +583,98 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
 }
 
 
-U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *mask)
+U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *_mask)
 {
   CAsmCtrl *a=lx->a;
   if (arg->just_seg) {
     switch (arg->seg) {
-      case 0: *mask=1<<ARGT_ES|1<<ARGT_SREG; break;
-      case 1: *mask=1<<ARGT_CS|1<<ARGT_SREG; break;
-      case 2: *mask=1<<ARGT_SS|1<<ARGT_SREG; break;
-      case 3: *mask=1<<ARGT_DS|1<<ARGT_SREG; break;
-      case 4: *mask=1<<ARGT_FS|1<<ARGT_SREG; break;
-      case 5: *mask=1<<ARGT_GS|1<<ARGT_SREG; break;
+      case 0: *_mask=1<<ARGT_ES|1<<ARGT_SREG; break;
+      case 1: *_mask=1<<ARGT_CS|1<<ARGT_SREG; break;
+      case 2: *_mask=1<<ARGT_SS|1<<ARGT_SREG; break;
+      case 3: *_mask=1<<ARGT_DS|1<<ARGT_SREG; break;
+      case 4: *_mask=1<<ARGT_FS|1<<ARGT_SREG; break;
+      case 5: *_mask=1<<ARGT_GS|1<<ARGT_SREG; break;
     }
     return;
   }
   if (arg->fstk!=CREG_NONE) {
     if (arg->fstk)
-      *mask=1<<ARGT_STI;
+      *_mask=1<<ARGT_STI;
     else
-      *mask=1<<ARGT_ST0|1<<ARGT_STI;
+      *_mask=1<<ARGT_ST0|1<<ARGT_STI;
     return;
   }
   switch (arg->size) {
-    case 0: *mask=0x3FF0FFFFFE; break;
-    case 1: *mask=0x1110111112; break;
-    case 2: *mask=0x2220222224; break;
-    case 4: *mask=0x0440444448; break;
-    case 8: *mask=0x0880888880; break;
+    case 0: *_mask=0x3FF0FFFFFE; break;
+    case 1: *_mask=0x1110111112; break;
+    case 2: *_mask=0x2220222224; break;
+    case 4: *_mask=0x0440444448; break;
+    case 8: *_mask=0x0880888880; break;
   }
   if (a->seg_size==64)
-    *mask&=  0xFF0FFFFFFF;
+    *_mask&=0xFF0FFFFFFF;
 
-  if (arg->reg1!=CREG_NONE && arg->imm_or_off_present && !arg->num.i) {
-    if (!arg->num.undef_glbl && !arg->num.undef_local)
+  if (arg->reg1!=CREG_NONE && arg->imm_or_off_present && !arg->num.i &&
+     !arg->num.undef_glbl && !arg->num.undef_local)
       arg->imm_or_off_present=FALSE;  //Zero displacement
-  }
 
   if (arg->reg2!=CREG_NONE || arg->scale!=1) {
-    *mask&=  0x0000FF0000;
+    *_mask&=0x0000FF0000;
     return;
   }
 
   if (arg->indirect) {
     if (arg->imm_or_off_present)
-      *mask&=0x00FFFF0000;
+      *_mask&=0x00FFFF0000;
     else
-      *mask&=0x000FFF0000;
+      *_mask&=0x000FFF0000;
   } else {
     if (arg->imm_or_off_present)
-      *mask&=0x000F00F0FE;
+      *_mask&=0x000F00F0FE;
     else
-      *mask&=0x3F0FFF0F00;
+      *_mask&=0x3F0FFF0F00;
   }
   if (arg->seg!=CREG_NONE)
-    *mask&=  0x00FFFF0000;
+    *_mask&=0x00FFFF0000;
   if (arg->reg1==CREG_NONE) {
     if (arg->indirect)
-      *mask&=0x00FFFF0000;
-    else if (MIN_I8<=arg->num.i<=MAX_I8)
-      *mask&=0x000000F0FE;
-    else if (MIN_I8<=arg->num.i<=MAX_U8)
-      *mask&=0x000000E0FE;
-    else if (MIN_I16<=arg->num.i<=MAX_I16)
-      *mask&=0x000000E0EE;
-    else if (MIN_I16<=arg->num.i<=MAX_U16)
-      *mask&=0x000000C0EE;
-    else if (MIN_I32<=arg->num.i<=MAX_I32)
-      *mask&=0x000000C0CE;
-    else if (MIN_I32<=arg->num.i<=MAX_U32)
-      *mask&=0x00000080CE;
-    else
-      *mask&=0x000000808E;
+      *_mask&=0x00FFFF0000;
+    else if (arg->num.i<0) {
+      if (arg->num.i>=MIN_I8)
+	*_mask&=0xF08E;
+      else if (arg->num.i>=MIN_I16)
+	*_mask&=0xE08E;
+      else if (arg->num.i>=MIN_I32)
+	*_mask&=0xC08E;
+      else
+	*_mask&=0x808E;
+    } else {
+      if (arg->num.i<=MAX_I8)
+	*_mask&=0xF0FE;
+      else if (arg->num.i<=MAX_U8)
+	*_mask&=0xE0FE;
+      else if (arg->num.i<=MAX_I16)
+	*_mask&=0xE0EE;
+      else if (arg->num.i<=MAX_U16)
+	*_mask&=0xC0EE;
+      else if (arg->num.i<=MAX_I32)
+	*_mask&=0xC0CE;
+      else if (arg->num.i<=MAX_U32)
+	*_mask&=0x80CE;
+      else
+	*_mask&=0x808E;
+    }
   } else {
-    *mask&=  0x3F00FF0F00;
+    *_mask&=  0x3F00FF0F00;
     if (!arg->indirect) //M8-M64
-      *mask&=  0xFFFF0FFFFF;
+      *_mask&=0xFFFF0FFFFF;
   }
-  if (arg->reg1)
-    *mask&=  0x30FFFFFFFF;
-  if (arg->reg1!=1)
-    *mask&=  0x2FFFFFFFFF;
-  if (arg->reg1!=2)
-    *mask&=  0x1FFFFFFFFF;
+  switch (arg->reg1) {
+    case CREG_RAX: *_mask&=~0x3000000000; break;
+    case CREG_RCX: *_mask&=~0x2F00000000; break;
+    case CREG_RDX: *_mask&=~0x1F00000000; break;
+    default:	   *_mask&=~0x3F00000000;
+  }
 }
 
 Bool AsmStoreNum(CLex *lx,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
@@ -671,21 +683,16 @@ Bool AsmStoreNum(CLex *lx,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
   I64 i;
   CExeAbsAddr *tempa;
 
-  if (!num2->lit)
+  if (!num2->imm_flag)
     num2->num.i-=num2->rel;
   for (i=0;i<cnt;i++) {
     if (num2->U8_cnt==1) {
-      if (num2->num.undef_local)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U8+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_local,lx->cur_lfn->line_num,U8_avail,FALSE);
-      else if (num2->num.undef_glbl)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U8+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail,TRUE);
-      else {
-	if (!num2->lit && !(MIN_I8<=num2->num.i<=MAX_I8))
-	  LexExcept(lx,"ST_BRANCH_OUT_OF_RANGE");
-      }
-      if (num2->lit) {
+      if (num2->num.undef_local||num2->num.undef_glbl)
+	AsmUnresolvedAdd(a,num2->num.ex,EIE_REL_U8+num2->imm_flag,a->ip,num2->rel,
+	      num2->num.undef_local,num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail);
+      else if (!num2->imm_flag && !(MIN_I8<=num2->num.i<=MAX_I8))
+	LexExcept(lx,"ST_BRANCH_OUT_OF_RANGE");
+      if (num2->imm_flag) {
 	if (num2->num.abs_cnts.abs_addres & 1) {
 	  tempa=CAlloc(sizeof(CExeAbsAddr));
 	  tempa->next=a->abss;
@@ -702,98 +709,82 @@ Bool AsmStoreNum(CLex *lx,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	  tempa->type=EAA_SUB_U8;
 	}
       }
-      AsmStoreCodeU8(lx,num2->num.i.u8[0]);
-    } else if (num2->U8_cnt==2) {
-      if (num2->num.undef_local)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U16+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_local,lx->cur_lfn->line_num,U8_avail,FALSE);
-      else if (num2->num.undef_glbl)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U16+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail,TRUE);
-      else if (!num2->lit && !(MIN_I16<=num2->num.i<=MAX_I16))
-	LexExcept(lx,"ST_BRANCH_OUT_OF_RANGE");
-      if (num2->lit) {
-	if (num2->num.abs_cnts.abs_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_ADD_U16;
+      AsmStoreCodeU8(lx,num2->num.i);
+    } else {
+      if (num2->U8_cnt==2) {
+	if (num2->num.undef_local||num2->num.undef_glbl)
+	  AsmUnresolvedAdd(a,num2->num.ex,EIE_REL_U16+num2->imm_flag,a->ip,num2->rel,
+		num2->num.undef_local,num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail);
+	else if (!num2->imm_flag && !(MIN_I16<=num2->num.i<=MAX_I16))
+	  LexExcept(lx,"ST_BRANCH_OUT_OF_RANGE");
+	if (num2->imm_flag) {
+	  if (num2->num.abs_cnts.abs_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_ADD_U16;
+	  }
+	} else {
+	  if (num2->num.abs_cnts.c_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_SUB_U16;
+	  }
 	}
-      } else {
-	if (num2->num.abs_cnts.c_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_SUB_U16;
+	AsmStoreCodeU8(lx,num2->num.i.u8[0]);
+	AsmStoreCodeU8(lx,num2->num.i.u8[1]);
+      } else if (num2->U8_cnt==4) {
+	if (num2->num.undef_local||num2->num.undef_glbl)
+	  AsmUnresolvedAdd(a,num2->num.ex,EIE_REL_U32+num2->imm_flag,a->ip,num2->rel,
+		num2->num.undef_local,num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail);
+	else if (!num2->imm_flag && !(MIN_I32<=num2->num.i<=MAX_I32))
+	  LexExcept(lx,"ST_BRANCH_OUT_OF_RANGE");
+	if (num2->imm_flag) {
+	  if (num2->num.abs_cnts.abs_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_ADD_U32;
+	  }
+	} else {
+	  if (num2->num.abs_cnts.c_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_SUB_U32;
+	  }
 	}
+	AsmStoreCodeU32(lx,num2->num.i);
+      } else if (num2->U8_cnt==8) {
+	if (num2->num.undef_local||num2->num.undef_glbl)
+	  AsmUnresolvedAdd(a,num2->num.ex,EIE_REL_U64+num2->imm_flag,a->ip,num2->rel,
+		num2->num.undef_local,num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail);
+	if (num2->imm_flag) {
+	  if (num2->num.abs_cnts.abs_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_ADD_U64;
+	  }
+	} else {
+	  if (num2->num.abs_cnts.c_addres & 1) {
+	    tempa=CAlloc(sizeof(CExeAbsAddr));
+	    tempa->next=a->abss;
+	    a->abss=tempa;
+	    tempa->ip=a->ip;
+	    tempa->type=EAA_SUB_U64;
+	  }
+	}
+	AsmStoreCodeU64(lx,num2->num.i);
       }
-      AsmStoreCodeU8(lx,num2->num.i.u8[0]);
-      AsmStoreCodeU8(lx,num2->num.i.u8[1]);
       if (U8_avail && !num2->num.undef_local && !num2->num.undef_glbl &&
-	  !num2->lit && -124<=num2->num.i<=123) {
-	LexPutWarn(lx,"ST_COULD_USE_I8_DISP");
-	return FALSE;
-      }
-    } else if (num2->U8_cnt==4) {
-      if (num2->num.undef_local)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U32+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_local,lx->cur_lfn->line_num,U8_avail,FALSE);
-      else if (num2->num.undef_glbl)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U32+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail,TRUE);
-      if (num2->lit) {
-	if (num2->num.abs_cnts.abs_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_ADD_U32;
-	}
-      } else {
-	if (num2->num.abs_cnts.c_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_SUB_U32;
-	}
-      }
-      AsmStoreCodeU32(lx,num2->num.i.u32[0]);
-      if (U8_avail && !num2->num.undef_local && !num2->num.undef_glbl &&
-	  !num2->lit && -124<=num2->num.i<=123) {
-	LexPutWarn(lx,"ST_COULD_USE_I8_DISP");
-	return FALSE;
-      }
-    } else if (num2->U8_cnt==8) {
-//TODO
-      if (num2->num.undef_local)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U32+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_local,lx->cur_lfn->line_num,U8_avail,FALSE);
-      else if (num2->num.undef_glbl)
-	AsmUnresolvedAdd(a,num2->num.exp,EIE_REL_U32+num2->lit,a->ip,num2->rel,
-	  num2->num.undef_glbl,lx->cur_lfn->line_num,U8_avail,TRUE);
-      if (num2->lit) {
-	if (num2->num.abs_cnts.abs_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_ADD_U64;
-	}
-      } else {
-	if (num2->num.abs_cnts.c_addres & 1) {
-	  tempa=CAlloc(sizeof(CExeAbsAddr));
-	  tempa->next=a->abss;
-	  a->abss=tempa;
-	  tempa->ip=a->ip;
-	  tempa->type=EAA_SUB_U64;
-	}
-      }
-      AsmStoreCodeU64(lx,num2->num.i);
-      if (U8_avail && !num2->num.undef_local && !num2->num.undef_glbl &&
-	  !num2->lit && -124<=num2->num.i<=123) {
+	    !num2->imm_flag && -124<=num2->num.i<=123) {
 	LexPutWarn(lx,"ST_COULD_USE_I8_DISP");
 	return FALSE;
       }
@@ -804,8 +795,7 @@ Bool AsmStoreNum(CLex *lx,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 
 U8 asm_seg_prefixes[6]={0x26,0x2E,0x36,0x3E,0x64,0x65};
 
-Bool AsmCodeInstruction(CLex *lx,
-			  CHashOpcode *tempo,I64 argcnt)
+Bool PrsAsmInstruction(CLex *lx,CHashOpcode *tempo,I64 argcnt)
 {
   CAsmCtrl *a=lx->a;
   I64 i,j,a1,a2,om,seg,arg1mask,arg2mask;
@@ -839,8 +829,8 @@ Bool AsmCodeInstruction(CLex *lx,
 	else if (!(tempi->flags & IEF_NO_REX))
 	  cur.REX=0x40;
       }
-      cur.disp.lit=1;
-      cur.imm.lit=1;
+      cur.disp.imm_flag=TRUE;
+      cur.imm.imm_flag=TRUE;
       om=tempi->opcode_modifier;
       a1=tempi->arg1;
       a2=tempi->arg2;
@@ -863,20 +853,20 @@ Bool AsmCodeInstruction(CLex *lx,
 
       if (om==OM_CB) {
 	cur.imm.U8_cnt=1;
-	cur.imm.lit=0;
+	cur.imm.imm_flag=FALSE;
       } else if (om==OM_CW) {
 	cur.imm.U8_cnt=2;
-	cur.imm.lit=0;
+	cur.imm.imm_flag=FALSE;
       } else if (om==OM_CD) {
 	cur.imm.U8_cnt=4;
-	cur.imm.lit=0;
+	cur.imm.imm_flag=FALSE;
       }
 
       if (argcnt==1) {
 	if (best.U8_cnt!=255 && !found_second_possible && !best.is_dft) {
 	  found_second_possible=TRUE;
 	  if (!a->arg1.size)
-	    PrintFWarn("%S%s,%04d\n","ST_NO_SIZE_SPECIFIED",
+	    PrintWarn("%S%s,%04d\n","ST_NO_SIZE_SPECIFIED",
 		   lx->cur_lfn->name,lx->cur_lfn->line_num-1);
 	}
 	if (tempi->flags & IEF_PLUS_OPCODE) {
@@ -903,7 +893,7 @@ Bool AsmCodeInstruction(CLex *lx,
 	    MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
 	    cur.disp.U8_cnt=4;
 	    if (a->seg_size==64)
-	      cur.disp.lit=0;
+	      cur.disp.imm_flag=FALSE;
 	  } else {
 	    if (tempa1->reg2==CREG_NONE && tempa1->scale==1) {
 	      cur.ModrM|=tempa1->reg1&7;
@@ -951,7 +941,7 @@ Bool AsmCodeInstruction(CLex *lx,
 	    if (!ModrM_complete) {
 	      if (tempa1->imm_or_off_present) {
 		MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
-		if (!cur.disp.num.exp && MIN_I8<=cur.disp.num.i<=MAX_I8) {
+		if (!cur.disp.num.ex && MIN_I8<=cur.disp.num.i<=MAX_I8) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		} else if (a->seg_size==16) {
@@ -983,7 +973,7 @@ Bool AsmCodeInstruction(CLex *lx,
 	if (best.U8_cnt!=255 && !found_second_possible && !best.is_dft) {
 	  found_second_possible=TRUE;
 	  if (!a->arg1.size && !a->arg2.size)
-	    PrintFWarn("%S%s,%04d\n","ST_NO_SIZE_SPECIFIED",
+	    PrintWarn("%S%s,%04d\n","ST_NO_SIZE_SPECIFIED",
 	      lx->cur_lfn->name,lx->cur_lfn->line_num-1);
 	}
 	if (tempi->flags & IEF_PLUS_OPCODE) {
@@ -1091,11 +1081,11 @@ Bool AsmCodeInstruction(CLex *lx,
 	      MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
 	      cur.disp.U8_cnt=4;
 	      if (a->seg_size==64)
-		cur.disp.lit=0;
+		cur.disp.imm_flag=FALSE;
 	    } else {
 	      if (tempa1->imm_or_off_present) {
 		MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
-		if (!cur.disp.num.exp && MIN_I8<=cur.disp.num.i<=MAX_I8) {
+		if (!cur.disp.num.ex && MIN_I8<=cur.disp.num.i<=MAX_I8) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		} else if (a->seg_size==16) {
@@ -1159,8 +1149,8 @@ Bool AsmCodeInstruction(CLex *lx,
       if (a->seg_size==64 && cur.REX&0x40==0x40 &&
 	  (cur.REX!=0x40 || tempi->flags&IEF_40_REX || cur.has_REX) &&
 	  (cur.REX&7 || !(tempi->flags&IEF_REX_ONLY_R8_R15 ||
-		      tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 && cur.ModrM&0xC0==0xC0)))
-	  cur.U8_cnt++;
+	  tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 && cur.ModrM&0xC0==0xC0)))
+	cur.U8_cnt++;
       if (cur.U8_cnt<best.U8_cnt &&
 	 !(tempi->flags & IEF_DONT_SWITCH_MODES &&
 	  (cur.has_addr_prefix || cur.has_operand_prefix)))
@@ -1183,8 +1173,8 @@ Bool AsmCodeInstruction(CLex *lx,
     if (a->seg_size==64 && best.REX&0x40==0x40 &&
 	(best.REX!=0x40 || tempi->flags&IEF_40_REX || best.has_REX) &&
 	(best.REX&7||!(tempi->flags&IEF_REX_ONLY_R8_R15 ||
-		    tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 && best.ModrM&0xC0==0xC0)))
-	AsmStoreCodeU8(lx,best.REX);
+	tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 && best.ModrM&0xC0==0xC0)))
+      AsmStoreCodeU8(lx,best.REX);
     for (j=0;j<tempi->opcode_cnt-1;j++)
       AsmStoreCodeU8(lx,tempi->opcode[j]);
     AsmStoreCodeU8(lx,best.last_opcode_U8);
@@ -1213,7 +1203,7 @@ Bool AsmCodeInstruction(CLex *lx,
 }
 
 
-U0 DefineU8s(CLex *lx,I64 U8_cnt)
+U0 PrsAsmDefine(CLex *lx,I64 U8_cnt)
 {
   CAsmCtrl *a=lx->a;
   Bool is_dup;
@@ -1236,7 +1226,7 @@ U0 DefineU8s(CLex *lx,I64 U8_cnt)
       lx->abs_cnts=0;
       lx->undef_hash_entry=NULL;
       lx->flags&=~(LF_UNRESOLVED+LF_LOCAL);
-      if (!GetExpression(lx,&num2.num.exp))
+      if (!IsLexExpression2Bin(lx,&num2.num.ex))
 	LexSkipEol(lx);
       else {
 	if (lx->abs_cnts.externs)
@@ -1251,8 +1241,8 @@ U0 DefineU8s(CLex *lx,I64 U8_cnt)
 	    lx->undef_hash_entry=NULL;
 	  }
 	} else {
-	  i=Call(num2.num.exp);
-	  ExpressionDel(num2.num.exp);
+	  i=Call(num2.num.ex);
+	  ExpressionBinDel(num2.num.ex);
 	}
       }
       if (lx->token==TK_IDENT && lx->hash_entry) {
@@ -1261,14 +1251,14 @@ U0 DefineU8s(CLex *lx,I64 U8_cnt)
 	  if (Lex(lx)!='(')
 	    LexExcept(lx,"ST_EXPECTING_LEFT_PAREN");
 	  Lex(lx); //skip (
-	  dup_val=AsmExpressionEval(lx);
+	  dup_val=AsmLexExpression(lx);
 	  if (lx->token!=')')
 	    LexExcept(lx,"ST_EXPECTING_RIGHT_PAREN");
 	  Lex(lx); //SKIP )
 	}
       }
       num2.rel=0;
-      num2.lit=1;
+      num2.imm_flag=TRUE;
       num2.num.abs_cnts=lx->abs_cnts;
       if (is_dup) {
 	if (num2.num.undef_local || num2.num.undef_glbl)
@@ -1296,12 +1286,12 @@ U0 PrsAsmBlk(CLex *lx)
       old_hash_mask=lx->htc.hash_mask,
       old_flags=lx->flags & LF_ASM_EXPRESSIONS;
   CHashOpcode *tempo;
-  CHashExport *tempess;
+  CHashExport *tempex;
   U8 *next_last_label;
 
   a->seg_size=64;
   lx->flags|=LF_ASM_EXPRESSIONS;
-  lx->htc.hash_mask=lx->htc.hash_mask&~(HTF_FLAGS_MASK|HTT_FILE|HTT_INTERNAL_TYPE|HTT_MODULE)|HTT_ASM_KEYWORD;
+  lx->htc.hash_mask=lx->htc.hash_mask&~(HTG_FLAGS_MASK|HTT_FILE|HTT_INTERNAL_TYPE|HTT_MODULE)|HTT_ASM_KEYWORD;
   if (lx->token!='{')
     LexExcept(lx,"ST_EXPECTING_LEFT_BRACE");
   else
@@ -1318,13 +1308,13 @@ U0 PrsAsmBlk(CLex *lx)
 	      if (lx->token!=TK_IDENT)
 		LexExcept(lx,"ST_EXPECTING_IDENTIFIER");
 	      else {
-		tempess=NULL;
-		tempess=CAlloc(sizeof(CHashExport));
-		tempess->str=lx->ident;
+		tempex=NULL;
+		tempex=CAlloc(sizeof(CHashExport));
+		tempex->str=lx->ident;
 		lx->ident=0;
-		tempess->type=HTT_EXPORT_SYS_SYM|HTF_UNRESOLVED;
-		HashAdd(tempess,lx->htc.glbl_hash_table);
-		tempess->type|=HTF_IMPORT;
+		tempex->type=HTT_EXPORT_SYS_SYM|HTF_UNRESOLVED;
+		HashAdd(tempex,lx->htc.glbl_hash_table);
+		tempex->type|=HTF_IMPORT;
 		if (Lex(lx)==',')
 		  Lex(lx); //skip ','
 	      }
@@ -1341,12 +1331,12 @@ U0 PrsAsmBlk(CLex *lx)
 	      LexExcept(lx,"ST_JUST_ONE_ORG_ALLOWED");
 	    if (a->ip)
 	      LexExcept(lx,"ST_ORG_MUST_BE_AT_BEGINNING");
-	    a->module_org=AsmExpressionEval(lx);
+	    a->module_org=AsmLexExpression(lx);
 	    break;
 	  case AKW_ALIGN:
 	    if (lx->htc.local_var_lst)
 	      LexExcept(lx,"ST_NO_FUN_ASM_ALIGN");
-	    i=AsmExpressionEval(lx);
+	    i=AsmLexExpression(lx);
 	    if (Bsf(i)!=Bsr(i))
 	      LexExcept(lx,"ST_ALIGN_MUST_BE_POWER_OF_TWO");
 	    if (!(lx->flags&LF_AOT_COMPILE) && i>8)
@@ -1355,21 +1345,21 @@ U0 PrsAsmBlk(CLex *lx)
 	    i=CeilU64(a->ip,i);
 	    if (lx->token==',')
 	      Lex(lx);
-	    k=AsmExpressionEval(lx);
+	    k=AsmLexExpression(lx);
 	    for (j=a->ip;j<i;j++)
 	      AsmStoreCodeU8(lx,k);
 	    break;
 	  case AKW_DU8:
-	    DefineU8s(lx,1);
+	    PrsAsmDefine(lx,1);
 	    break;
 	  case AKW_DU16:
-	    DefineU8s(lx,2);
+	    PrsAsmDefine(lx,2);
 	    break;
 	  case AKW_DU32:
-	    DefineU8s(lx,4);
+	    PrsAsmDefine(lx,4);
 	    break;
 	  case AKW_DU64:
-	    DefineU8s(lx,8);
+	    PrsAsmDefine(lx,8);
 	    break;
 	  case AKW_LIST:
 	    a->lst=TRUE;
@@ -1406,7 +1396,7 @@ U0 PrsAsmBlk(CLex *lx)
 	    }
 	  }
 	}
-	AsmCodeInstruction(lx,tempo,argcnt);
+	PrsAsmInstruction(lx,tempo,argcnt);
       } else if (lx->hash_entry->type & HTT_EXPORT_SYS_SYM) {
 	if (Btr(&lx->hash_entry->type,HTf_UNRESOLVED)) {
 	  if (lx->hash_entry->type & HTF_LOCAL) {
@@ -1441,27 +1431,27 @@ U0 PrsAsmBlk(CLex *lx)
 	LexExcept(lx,"ST_SYNTAX_ERROR");
     } else {
       if (lx->token==TK_IDENT) {
-	tempess=CAlloc(sizeof(CHashExport));
-	tempess->str=lx->ident;
+	tempex=CAlloc(sizeof(CHashExport));
+	tempex->str=lx->ident;
 	lx->ident=0;
-	tempess->type=HTT_EXPORT_SYS_SYM;
-	tempess->val=a->ip;
+	tempex->type=HTT_EXPORT_SYS_SYM;
+	tempex->val=a->ip;
 	Lex(lx);  //Skip ident
 	if (lx->token!=':' && lx->token!=TK_DBL_COLON)
 	  LexExcept(lx,"ST_EXPECTING_COLON");
 	else {
-	  if (*tempess->str=='@' && tempess->str[1]=='@') {
+	  if (*tempex->str=='@' && tempex->str[1]=='@') {
 	    if (lx->token==TK_DBL_COLON)
 	      LexExcept(lx,"ST_NO_LOCAL_GLBL_EXPORT");
-	    HashAdd(tempess,lx->htc.local_hash_table);
+	    HashAdd(tempex,lx->htc.local_hash_table);
 	    a->has_locals=TRUE;
 	  } else
-	    HashAdd(tempess,lx->htc.glbl_hash_table);
+	    HashAdd(tempex,lx->htc.glbl_hash_table);
 	  if (lx->token==TK_DBL_COLON) {
-	    tempess->type|=HTF_EXPORT;
-	    SetSrcFileInfo(lx,tempess);
+	    tempex->type|=HTF_EXPORT;
+	    SetSrcFileInfo(lx,tempex);
 	    AsmLocalsResolve(lx);
-	    a->last_label=tempess->str;
+	    a->last_label=tempex->str;
 	  }
 	  Lex(lx);
 	}

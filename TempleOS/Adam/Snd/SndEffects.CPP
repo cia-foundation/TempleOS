@@ -9,7 +9,7 @@ class CSoundEffectFrame
 
 U0 SoundEffectEndTaskCB()
 {
-  Free(NamedFramePtr("CSoundEffectFrame"));
+  Free(FramePtr("CSoundEffectFrame"));
   music_mute--;
   SndTaskEndCB;
 }
@@ -18,7 +18,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
 {
   I64 i;
   F64 f,t0=tS,t,timeout=t0+ns->duration;
-  NamedFramePtrAdd("CSoundEffectFrame",ns);
+  FramePtrAdd("CSoundEffectFrame",ns);
   Fs->task_end_cb=&SoundEffectEndTaskCB;
   switch (ns->type) {
     case SE_NOISE:

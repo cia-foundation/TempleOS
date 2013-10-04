@@ -305,7 +305,7 @@ I64 TestCoreSubRange(RangeJob *r)
     if (n<n2<r->N) {
       if (r->lo<=n2<r->hi && sumfacts[n2-r->lo]-n2-1==n ||
 	TestSumFact(n2,sf,r->sqrt_primes,r->cbrt_primes,r->primes)) {
-	DocPrintF(r->doc,"%u:%u\n",n,sf-n-1);
+	DocPrint(r->doc,"%u:%u\n",n,sf-n-1);
 	result++;
       }
     }

@@ -39,7 +39,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   dc->color=YELLOW;
   if (crash)
-    GrPutS(dc,w>>1-FONT_WIDTH*4,(h-FONT_HEIGHT)>>1,"Game Over");
+    GrPrint(dc,w>>1-FONT_WIDTH*4,(h-FONT_HEIGHT)>>1,"Game Over");
   Preempt(old_preempt);
 }
 

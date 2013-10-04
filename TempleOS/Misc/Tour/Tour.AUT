@@ -2,7 +2,7 @@ public I64 PopUpTourPart()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPutS(doc,"$$FG,PURPLE$$TempleOS Tours$$FG$$\n\n"
+  DocPrint(doc,"$$FG,PURPLE$$TempleOS Tours$$FG$$\n\n"
 	"$$CM+LX,4,4$$$$BT,\"Part  1: The basics\",1$$"
 	"$$CM+LX,4,4$$$$BT,\"Part  2: Editing and running programs\",2$$"
 	"$$CM+LX,4,4$$$$BT,\"Part  3: Adding macros to personal menu\",3$$"
@@ -27,7 +27,7 @@ U0 TourMenu()
   while (TRUE) {
     i=PopUpTourPart;
     if (i>=1) {
-      SPrintF(buf,"::/TempleOS/Misc/Tour/Tour%X.AUT",i);
+      SPrint(buf,"::/TempleOS/Misc/Tour/Tour%X.AUT",i);
       ExeFile(buf);
     } else
       break;

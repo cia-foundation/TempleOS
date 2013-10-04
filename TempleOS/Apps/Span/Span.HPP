@@ -16,7 +16,7 @@ class MySpring:CSpring
 {
   F64 compression_strength,tensile_strength,cost;
   F64 base_compression_strength,base_tensile_strength,
-	 base_constant,base_cost;
+	 base_const,base_cost;
  
   CColorROPU32 color;
   I32 pen_width;

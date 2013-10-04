@@ -27,7 +27,7 @@ U0 DrawFrame(CTask *task,CDC *dc)
     GrRect(dc,cx-2,cy-2,5,5);
   }
   dc->color=BLACK;
-  GrPutS(dc,cx+10,cy,"Press '1'");
+  GrPrint(dc,cx+10,cy,"Press '1'");
 
   dc->color=LTRED;
   GrRect(dc,cx-20,cy+60,41,21);
@@ -40,7 +40,7 @@ U0 DrawFrame(CTask *task,CDC *dc)
     GrRect(dc,cx-2,cy+100-2,5,5);
   }
   dc->color=BLACK;
-  GrPutS(dc,cx+10,cy+100,"Press '2'");
+  GrPrint(dc,cx+10,cy+100,"Press '2'");
 
   dc->color=LTRED;
   GrLine(dc,cx+400,cy+100,cx-250,cy+200);

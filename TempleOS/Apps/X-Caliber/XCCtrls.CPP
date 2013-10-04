@@ -48,17 +48,17 @@ U0 DrawCtrlPanelCtrl(CDC *dc,CCtrl *c)
       9*FONT_WIDTH+4,FONT_HEIGHT+4);
 
   dc->color=RED;
-  GrPutS(dc,(c->left+c->right+1)/2-9*FONT_WIDTH/2,
+  GrPrint(dc,(c->left+c->right+1)/2-9*FONT_WIDTH/2,
       c->top+CTRL_PANEL_BORDER+3+(CTRL_PANEL_SPACING-FONT_HEIGHT)/2,"SpaceWalk");
-  GrPutS(dc,c->left+CTRL_PANEL_SPACING-4*FONT_WIDTH/2,
+  GrPrint(dc,c->left+CTRL_PANEL_SPACING-4*FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING-FONT_HEIGHT-2,"Size");
-  GrPutS(dc,c->left+2*CTRL_PANEL_SPACING+1-4*FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*CTRL_PANEL_SPACING+1-4*FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING-FONT_HEIGHT-2,"Fuse");
   dc->color=LTRED;
-  GrPrintF(dc,c->left+CTRL_PANEL_SPACING-FONT_WIDTH/2,
+  GrPrint(dc,c->left+CTRL_PANEL_SPACING-FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
       "%d",s->bullet_radius*10/CTRL_PANEL_RANGE);
-  GrPrintF(dc,c->left+2*CTRL_PANEL_SPACING+1-FONT_WIDTH/2,
+  GrPrint(dc,c->left+2*CTRL_PANEL_SPACING+1-FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
       "%d",s->fuse_time*10/CTRL_PANEL_RANGE);
   GrRect(dc,c->left+CTRL_PANEL_SPACING-3,	 (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->bullet_radius-2 ,7,5);

@@ -18,7 +18,7 @@ U0 PromptDemo()
   "Name:%s\n",name;
   Free(name);
 
-  cdt=PmtCDate("Date (%D):",GetCurTimeDate);
+  cdt=PmtCDate("Date (%D):",GetDateTime);
   "Date=%D\n",cdt;
 }
 

@@ -14,49 +14,49 @@ See also $LK,"GrUpdateScreen","MN:GrUpdateScreen"$().
   I64 i,row,col;
   U8 *ptr,*ptr1,*ptr2;
 
-  if (!(sys_raw_dc_flags&RDCF_SHOW_DOLLAR)) {
+  if (!(sys_raw_flags&RWF_SHOW_DOLLAR)) {
     if (ch=='$$') {
-      if (sys_raw_dc_flags&RDCF_IN_DOLLAR) {
-	sys_raw_dc_flags&=~RDCF_IN_DOLLAR;
-	if (!(sys_raw_dc_flags & RDCF_LAST_DOLLAR)) {
-	  sys_raw_dc_flags&=~RDCF_LAST_DOLLAR;
+      if (sys_raw_flags&RWF_IN_DOLLAR) {
+	sys_raw_flags&=~RWF_IN_DOLLAR;
+	if (!(sys_raw_flags & RWF_LAST_DOLLAR)) {
+	  sys_raw_flags&=~RWF_LAST_DOLLAR;
 	  Preempt(old_preempt);
 	  return;
 	}
       } else {
-	sys_raw_dc_flags|=RDCF_IN_DOLLAR|RDCF_LAST_DOLLAR;
+	sys_raw_flags|=RWF_IN_DOLLAR|RWF_LAST_DOLLAR;
 	Preempt(old_preempt);
 	return;
       }
     }
-    sys_raw_dc_flags&=~RDCF_LAST_DOLLAR;
-    if (sys_raw_dc_flags&RDCF_IN_DOLLAR) {
+    sys_raw_flags&=~RWF_LAST_DOLLAR;
+    if (sys_raw_flags&RWF_IN_DOLLAR) {
       Preempt(old_preempt);
       return;
     }
   }
   if (ch=='\t') {
     RawPutChar(CH_SPACE);
-    while (sys_raw_dc_col & 7)
+    while (sys_raw_col & 7)
       RawPutChar(CH_SPACE);
   } else if (ch==CH_BACKSPACE) {
-    sys_raw_dc_col--;
+    sys_raw_col--;
     RawPutChar(CH_SPACE);
-    sys_raw_dc_col--;
+    sys_raw_col--;
   } else if (ch=='\n') {
     RawPutChar(CH_SPACE);
-    while (sys_raw_dc_col % text_cols)
+    while (sys_raw_col % text_cols)
       RawPutChar(CH_SPACE);
 
   } else if (Bt(displayable_chars_bitmap,ch)) {
-    row=sys_raw_dc_col/text_cols%text_rows;
-    col=sys_raw_dc_col%text_cols;
+    row=sys_raw_col/text_cols%text_rows;
+    col=sys_raw_col%text_cols;
     if (text_mode) {
-      if (sys_raw_dc_flags&RDCF_SCROLL && sys_raw_dc_col && !row && !col) {
+      if (sys_raw_flags&RWF_SCROLL && sys_raw_col && !row && !col) {
 	MemCpy(VGA_TEXT_MEM_BASE,VGA_TEXT_MEM_BASE+text_cols,
 	  text_cols*(text_rows-1)*2);
 	MemSet(VGA_TEXT_MEM_BASE+text_cols*(text_rows-1)*2,0,text_cols*2);
-	sys_raw_dc_col-=text_cols;
+	sys_raw_col-=text_cols;
 	row=text_rows-1;
       }
       ptr=VGA_TEXT_MEM_BASE+(row*text_cols+col)*2;
@@ -65,21 +65,21 @@ See also $LK,"GrUpdateScreen","MN:GrUpdateScreen"$().
     } else {
       OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
       OutU8(VGA_SC_DATA,0x0F); //All planes -- WHITE
-      if (sys_raw_dc_flags&RDCF_SCROLL && sys_raw_dc_col && !row && !col) {
+      if (sys_raw_flags&RWF_SCROLL && sys_raw_col && !row && !col) {
       //Scroll cached image
-	MemCpy(sys_dc_screen_image,sys_dc_screen_image+gr_width*FONT_HEIGHT>>3,
+	MemCpy(sys_raw_screen_image,sys_raw_screen_image+gr_width*FONT_HEIGHT>>3,
 	    gr_width*(gr_height-FONT_HEIGHT)>>3);
-	MemSet(sys_dc_screen_image+gr_width*(gr_height-FONT_HEIGHT)>>3,0,gr_width*FONT_HEIGHT>>3);
+	MemSet(sys_raw_screen_image+gr_width*(gr_height-FONT_HEIGHT)>>3,0,gr_width*FONT_HEIGHT>>3);
 
-	MemCpy(VGA_GRAPHIC_MEM_BASE,sys_dc_screen_image,gr_width*gr_height>>3);
-	sys_raw_dc_col-=text_cols;
+	MemCpy(VGA_GRAPHIC_MEM_BASE,sys_raw_screen_image,gr_width*gr_height>>3);
+	sys_raw_col-=text_cols;
 	row=text_rows-1;
       }
       PushFD;
       Cli;
       ptr=ptr1=col+row*gr_width;
       ptr+=VGA_GRAPHIC_MEM_BASE;
-      ptr1+=sys_dc_screen_image; //Write to cached image as well
+      ptr1+=sys_raw_screen_image; //Write to cached image as well
       ptr2=&gr_font[(ch&255)*FONT_HEIGHT];
       for (i=0;i<FONT_HEIGHT;i++) {
 	*ptr=*ptr1=reverse_bits_table[*ptr2++];
@@ -88,7 +88,7 @@ See also $LK,"GrUpdateScreen","MN:GrUpdateScreen"$().
       }
       PopFD;
     }
-    sys_raw_dc_col++;
+    sys_raw_col++;
   }
   Preempt(old_preempt);
 }
@@ -205,7 +205,7 @@ U0 PutChar(U64 ch)
 }
 
 U0 PutS(U8 *st)
-{ //See $LK,"PutKeyHandling","FA:::/TempleOS/Doc/KeyBoard.TXT,PutKeyHandling"$
+{ //Use $LK,"Print","MN:Print"$().  See $LK,"PutKeyHandling","FA:::/TempleOS/Doc/KeyBoard.TXT,PutKeyHandling"$
   U8 ch,*ptr;
   Bool cont=TRUE;
   if (!st) return;
@@ -232,7 +232,7 @@ U0 PutS(U8 *st)
 U0 SetKeyDesc(U8 *fmt,...)
 {
   I64 i;
-  U8 *buf=SPrintFJoin(NULL,fmt,argc,argv);
+  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
   StrCpy(key_desc,buf);
   key_handler=Caller;
   Free(buf);

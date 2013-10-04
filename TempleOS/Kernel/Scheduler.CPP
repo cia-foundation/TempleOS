@@ -1,7 +1,7 @@
 /*
 See $LK,"TempleOS MultiTasking","FI:::/TempleOS/Doc/MultiTasking.TXT"$.
 
-Tasks are ordered in a que based
+Tasks are ordered in a queue based
 on window front-to-back order with the
 window mgr as the head, which
 paints the wallpaper.  The scheduler
@@ -92,7 +92,7 @@ It's a little faster.
 	FXSAVE	U64 [RAX]
 
 	MOV	RDX,U64 CTask.bpt_lst[RSI]
-@@05:	OR	RDX,RDX
+@@05:	TEST	RDX,RDX
 	JZ	@@10
 	MOV	RDI,U64 CBpt.addr[RDX]
 	MOV	AL,U8 CBpt.val[RDX]
@@ -116,7 +116,7 @@ SYS_CONTEXT_RESTORE::
 	BT	U64 CTask.task_flags[RSI],TASKf_DISABLE_BPTS
 	JC	@@15
 	MOV	RDX,U64 CTask.bpt_lst[RSI]
-@@10:	OR	RDX,RDX
+@@10:	TEST	RDX,RDX
 	JZ	@@15
 	MOV	RDI,U64 CBpt.addr[RDX]
 	MOV	U8 [RDI],OC_BPT
@@ -197,7 +197,7 @@ SYS_YIELD::
 	PUSH	RAX
 	MOV	RAX,U64 [SYS_JIFFIES]
 	CMP	U64 CTask.wake_jiffy[RSI],RAX
-	JA	@@10	//If needs to sleep, jmp and swap-out.
+	JG	@@10	//If needs to sleep, jmp and swap-out.
 
 	POP	RAX
 	POP	RSI
@@ -233,7 +233,7 @@ RESTORE_RSI_TASK_NO_KEY_CHECK:
 
 	MOV	RAX,U64 [SYS_JIFFIES]
 	CMP	U64 CTask.wake_jiffy[RSI],RAX
-	JA	@@25	//Jmp if not ready, yet.
+	JG	@@25	//Jmp if not ready, yet.
 
 	CMP	U32 CTask.task_in_que_signature[RSI],TASK_IN_QUE_SIGNATURE_VAL
 	JNE	SWAP_IN_SETH_TASK
@@ -267,7 +267,7 @@ HANDLE_SWAP_KEY_EVENT:
 	CALL	SET_FS_BASE
 	XOR	RAX,RAX
 	MOV	RAX,GS:CCPU.num[RAX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JNZ	I32 RESTORE_RSI_TASK_NO_KEY_CHECK
 
 	MOV	EAX,U32 SYS_CTRL_ALT_FLAGS
@@ -294,7 +294,7 @@ HANDLE_SWAP_KEY_EVENT:
 
 BREAK_FOCUS_USER:
 	MOV	RSI,U64 [SYS_FOCUS_TASK]
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JZ	SWAP_IN_SETH_TASK
 	BT	U64 CTask.task_flags[RSI],TASKf_USER
 	JNC	I32 RESTORE_RSI_TASK_NO_KEY_CHECK
@@ -323,7 +323,7 @@ END_FOCUS_USER:
 	PUSH	RSI
 	CALL	FOCUS_RSI_NEXT_USER
 	POP	RSI
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JZ	I32 SWAP_IN_SETH_TASK
 	MOV	RAX,RSI
 	CALL	SET_FS_BASE
@@ -339,7 +339,7 @@ RESTORE_FS_TASK_WITH_KEY_CHECK:
 	JMP	I32 RESTORE_RSI_TASK_WITH_KEY_CHECK
 
 FOCUS_RSI_NEXT_USER:
-	OR	RSI,RSI
+	TEST	RSI,RSI
 	JNZ	@@20
 	MOV	ESI,U32 SYS_ADAM_TASK
 @@20:	MOV	RDI,RSI
@@ -351,7 +351,7 @@ FOCUS_RSI_NEXT_USER:
 	MOV	U64 [SYS_FOCUS_TASK],RSI
 	MOV	RAX,U64 [SYS_EXTERN_TABLE]
 	MOV	RAX,U64 EXT_WIN_TO_TOP*8[RAX]
-	OR	RAX,RAX
+	TEST	RAX,RAX
 	JZ	@@35
 	PUSH	TRUE
 	PUSH	RSI

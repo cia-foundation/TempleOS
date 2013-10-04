@@ -1,70 +1,70 @@
 #help_index "File/Program Routines/Utils"
 
-I64 CDirTreeFlattenSize(CDirEntry *tempm)
+I64 DirTreeFlattenSize(CDirEntry *tempde)
 {
   I64 result=0;
-  while (tempm) {
+  while (tempde) {
     result+=CDIR_SIZE+1;
-    if (tempm->attr & _ATTR_DIR)
-      result+=CDirTreeFlattenSize(tempm->sub);
-    tempm=tempm->next;
+    if (tempde->attr & _ATTR_DIR)
+      result+=DirTreeFlattenSize(tempde->sub);
+    tempde=tempde->next;
   }
   return result+1;
 }
 
-I64 CDirTreeFlattenFill(CDirEntry *tempm,U8 *dst)
+I64 DirTreeFlattenFill(CDirEntry *tempde,U8 *dst)
 {
   I64 result=0,i;
-  while (tempm) {
+  while (tempde) {
     *dst++=1;
     result++;
     i=CDIR_SIZE;
-    MemCpy(dst,&tempm->start,i);
+    MemCpy(dst,&tempde->start,i);
     dst+=i;
     result+=i;
-    if (tempm->attr & _ATTR_DIR) {
-      i=CDirTreeFlattenFill(tempm->sub,dst);
+    if (tempde->attr & _ATTR_DIR) {
+      i=DirTreeFlattenFill(tempde->sub,dst);
       dst+=i;
       result+=i;
     }
-    tempm=tempm->next;
+    tempde=tempde->next;
   }
   *dst=0;
   return result+1;
 }
 
-public U8 *CDirTreeFlatten(CDirEntry *tempm,I64 *_size=NULL)
+public U8 *DirTreeFlatten(CDirEntry *tempde,I64 *_size=NULL)
 {
-  I64 size=CDirTreeFlattenSize(tempm);
+  I64 size=DirTreeFlattenSize(tempde);
   U8 *buf=MAlloc(size);
-  CDirTreeFlattenFill(tempm,buf);
+  DirTreeFlattenFill(tempde,buf);
   if (_size) *_size=size;
   return buf;
 }
 
-U8 *CDirTreeDoUnflatten(U8 *src,CDirEntry **tempm)
+U8 *DirTreeDoUnflatten(U8 *src,CDirEntry **tempde)
 {
   I64 i;
-  CDirEntry *tempm1;
+  CDirEntry *tempde1;
   if (*src++) {
-    tempm1=CAlloc(sizeof(CDirEntry));
-    *tempm=tempm1;
+    tempde1=CAlloc(sizeof(CDirEntry));
+    *tempde=tempde1;
     i=CDIR_SIZE;
-    MemCpy(&tempm1->start,src,i);
+    MemCpy(&tempde1->start,src,i);
     src+=i;
-    if (tempm1->attr & _ATTR_DIR)
-      src=CDirTreeDoUnflatten(src,&tempm1->sub);
-    src=CDirTreeDoUnflatten(src,&tempm1->next);
+    if (tempde1->attr & _ATTR_DIR)
+      src=DirTreeDoUnflatten(src,&tempde1->sub);
+    src=DirTreeDoUnflatten(src,&tempde1->next);
   } else
-    *tempm=NULL;
+    *tempde=NULL;
   return src;
 }
 
-public CDirEntry *CDirTreeUnflatten(U8 *src)
+public CDirEntry *DirTreeUnflatten(U8 *src)
 {
-  CDirEntry *tempm=NULL;
-  CDirTreeDoUnflatten(src,&tempm);
-  return tempm;
+  CDirEntry *tempde=NULL;
+  DirTreeDoUnflatten(src,&tempde);
+  return tempde;
 }
 
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically)"
@@ -386,7 +386,7 @@ public U0 DskView(U8 drv_let=0)
 	v>>1+radius*Sin(sect_end));
 
       dc->color=j;
-      GrPrintF(dc,0,v-FONT_HEIGHT*j,"%C %-8Z",Prt2Drv(p),
+      GrPrint(dc,0,v-FONT_HEIGHT*j,"%C %-8Z",Prt2Drv(p),
 	p->type.u16[0],"ST_PRT_TYPES");
       GrFloodFill(dc,
 	h>>1+(radius-4)*Cos((sect_start+sect_end)/2),
@@ -407,6 +407,6 @@ public U0 BlkDevRep()
   I64 i;
   for (i=0;i<NUM_BLKDEVS;i++)
     if (sys_blkdevs[i].bd_signature==BD_SIGNATURE_VAL)
-      ClassRep("CBlkDev",&sys_blkdevs[i]);
+      ClassRep(&sys_blkdevs[i]);
 }
 #help_index ""

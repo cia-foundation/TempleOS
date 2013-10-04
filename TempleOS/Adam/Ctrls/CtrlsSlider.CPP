@@ -28,7 +28,7 @@ CMgdSC *PmtSliderCtrl()
 
   result->next_slider=result->last_slider=&result->next_slider;
   while (TRUE) {
-    SPrintF(pmt,"Slider #%d Name:",result->num_sliders+1);
+    SPrint(pmt,"Slider #%d Name:",result->num_sliders+1);
     st=PmtStr(pmt);
     if (!*st) {
       Free(st);
@@ -57,7 +57,7 @@ U0 MgdSliderCtrl(CDoc *doc)
   while (!m)
     Yield;
 
-  DocPrintF(doc,
+  DocPrint(doc,
 "#define SLIDER_RANGE	%d
 #define SLIDER_SPACING %d
 #define SLIDER_BORDER  %d
@@ -69,16 +69,16 @@ class CSliderState
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPrintF(doc,"  I64 %s;\n",temps->name);
+    DocPrint(doc,"  I64 %s;\n",temps->name);
     temps=temps->next;
   }
   if (*m->glbl_name)
-    DocPrintF(doc,"} %s;\n",m->glbl_name);
+    DocPrint(doc,"} %s;\n",m->glbl_name);
   else
-    DocPutS(doc,"};\n");
+    DocPrint(doc,"};\n");
 
 
-  DocPrintF(doc,
+  DocPrint(doc,
 "
 U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
 {
@@ -93,17 +93,17 @@ U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
 ",m->num_sliders+1,m->num_sliders,m->num_sliders+1,m->num_sliders);
 
   for (i=0;i<m->num_sliders;i++)
-    DocPrintF(doc,
+    DocPrint(doc,
 "  GrLine(dc,c->left+%d*SLIDER_SPACING+%d,c->top+SLIDER_SPACING,
 	      c->left+%d*SLIDER_SPACING+%d,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
 ",i+1,i,i+1,i);
 
-  DocPutS(doc,"  dc->color=LTRED;\n");
+  DocPrint(doc,"  dc->color=LTRED;\n");
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPrintF(doc,
-"  GrPrintF(dc,c->left+%d*SLIDER_SPACING+%d-FONT_WIDTH/2,
+    DocPrint(doc,
+"  GrPrint(dc,c->left+%d*SLIDER_SPACING+%d-FONT_WIDTH/2,
     c->top+SLIDER_SPACING+SLIDER_RANGE+3,
     \"%%d\",s->%s*10/SLIDER_RANGE);\n",
       temps->num+1,temps->num,temps->name);
@@ -112,19 +112,19 @@ U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPrintF(doc,"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-3,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-2,7,5);\n",
+    DocPrint(doc,"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-3,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-2,7,5);\n",
       temps->num+1,temps->num,temps->name);
     temps=temps->next;
   }
-  DocPutS(doc,"  dc->color=YELLOW;\n");
+  DocPrint(doc,"  dc->color=YELLOW;\n");
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPrintF(doc,"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-2,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-1,5,3);\n",
+    DocPrint(doc,"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-2,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-1,5,3);\n",
       temps->num+1,temps->num,temps->name);
     temps=temps->next;
   }
-  DocPrintF(doc,
+  DocPrint(doc,
 "}
 
 U0 UpdateDerivedSliderCtrl(CCtrl *c)
@@ -138,10 +138,10 @@ U0 UpdateDerivedSliderCtrl(CCtrl *c)
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPrintF(doc,"  s->%s=LimitI64(s->%s,0,SLIDER_RANGE-1);\n",temps->name,temps->name);
+    DocPrint(doc,"  s->%s=LimitI64(s->%s,0,SLIDER_RANGE-1);\n",temps->name,temps->name);
     temps=temps->next;
   }
-  DocPutS(doc,
+  DocPrint(doc,
 "}
 
 U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool down)
@@ -152,20 +152,20 @@ U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool down)
 
   temps=m->next_slider;
   while (temps!=&m->next_slider) {
-    DocPutS(doc,"  ");
+    DocPrint(doc,"  ");
     if (temps!=m->next_slider)
-      DocPutS(doc,"else ");
+      DocPrint(doc,"else ");
     if (temps->next==&m->next_slider)
-      DocPutS(doc,"\n");
+      DocPrint(doc,"\n");
     else
-      DocPrintF(doc,"if (x<c->left+%d*SLIDER_SPACING+%d+SLIDER_SPACING/2)\n",
+      DocPrint(doc,"if (x<c->left+%d*SLIDER_SPACING+%d+SLIDER_SPACING/2)\n",
 	temps->num+1,temps->num);
-    DocPrintF(doc,"    s->%s=SLIDER_RANGE-1-(y-(c->top+SLIDER_SPACING));\n",
+    DocPrint(doc,"    s->%s=SLIDER_RANGE-1-(y-(c->top+SLIDER_SPACING));\n",
        temps->name);
     temps=temps->next;
   }
  
-  DocPutS(doc,
+  DocPrint(doc,
 "  if (c->update_derived_vals)
     (*c->update_derived_vals)(c);
 }
@@ -179,11 +179,11 @@ CCtrl *SliderNew()
   c->type=CTRLT_GENERIC;
 ");
   if (*m->glbl_name)
-    DocPrintF(doc,"  c->state=&%s;\n"
+    DocPrint(doc,"  c->state=&%s;\n"
 		"  MemSet(&%s,0,sizeof(CSliderState));\n",m->glbl_name,m->glbl_name);
   else
-    DocPutS(doc,	"  c->state=CAlloc(sizeof(CSliderState));\n");
-  DocPutS(doc,
+    DocPrint(doc,	"  c->state=CAlloc(sizeof(CSliderState));\n");
+  DocPrint(doc,
 "  c->draw_it=&DrawSliderCtrl;
   c->left_click=&LeftClickSlider;
   c->update_derived_vals=&UpdateDerivedSliderCtrl;
@@ -201,8 +201,8 @@ U0 SliderDel(CCtrl *c)
   Preempt(old_preempt);
 ");
   if (!*m->glbl_name)
-    DocPutS(doc,"  Free(c->state);\n");
-  DocPutS(doc,
+    DocPrint(doc,"  Free(c->state);\n");
+  DocPrint(doc,
 "  Free(c);
 }
 ");

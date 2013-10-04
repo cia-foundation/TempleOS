@@ -29,7 +29,7 @@ $WW,1$$FG,5$This is to clearify how several mysterious things happen in TempleOS
 
 * TempleOS has a dictionary that is shipped compressed.  When you boot the first time it is uncompressed.  TempleOS has a Windows utility for uncompressing.  That utility needs Microsoft DLL files.  TempleOS does not use any libraries, modules or code from other sources -- I wrote it all from scratch and it is self-contained.
 
-* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  TempleOS is $TX+D,"142,999","DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot JIT.  The rest is JIT demos and applications.
+* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  TempleOS is $TX+D,"123,521","DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot JIT.  The rest is JIT demos and applications.
 
 * The main difference between TempleOS and other systems is that the heap and compiler sym table are associated with tasks, not applications.
 
@@ -39,7 +39,7 @@ $WW,1$$FG,5$This is to clearify how several mysterious things happen in TempleOS
 
 * Binary executable files have export syms which are loaded into the sym tables.  The operating system $FG,2$Kernel$FG$ has such an export table.  In addition, some map files are processed to provide more information on syms -- src file links.  This is how the $LK,"Man","MN:Man"$()/$FG,2$WORDSTAT$FG$ feature can find src lines.
 
-* The word "$FG,2$public$FG$" does very little except allow the $LK,"help_index","FI:::/TempleOS/Doc/HelpIndex.TXT"$ and $LK,"HashRep","MN:HashRep"$() program varients to exclude meaningless syms.  If you wish a full report of public and nonpublic syms $MA+A-X+PU,"Click Here","DocMax(1000000);HAllRep;View;\n"$.
+* The word "$FG,2$public$FG$" does very little except allow the $LK,"help_index","FI:::/TempleOS/Doc/HelpIndex.TXT"$ and $LK,"Who","MN:Who"$() program varients to exclude meaningless syms.  If you wish a full report of public and nonpublic syms $MA+A-X+PU,"Click Here","DocMax(1000000);Who;View;\n"$.
 
 * When compilation takes place, the structures used by the compiler stick around.  Data on classes can be accessed by code.  See $LK,"ClassRep","MN:ClassRep"$().
 

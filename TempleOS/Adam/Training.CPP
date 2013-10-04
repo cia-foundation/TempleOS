@@ -152,10 +152,10 @@ U0 KeyMapFamily2(U8 **entries,U8 *family,CTask *task,I64 scf)
     }
     if (*key_desc && StrNCmp(key_desc,"Char/",5)) {
       st=ScanCode2KeyName(p2&~(SCF_CTRL|SCF_ALT|SCF_SHIFT));
-      st2=MSPrintF("%s %s",family,st);
+      st2=MPrint("%s %s",family,st);
       Free(st);
       st=SrcEdLink(key_handler,256);
-      entries[i]=MSPrintF("%20s $$LK,\"%s\",\"%s\"$$\n",
+      entries[i]=MPrint("%20s $$LK,\"%s\",\"%s\"$$\n",
 	  st2,key_desc,st);
       Free(st);
       Free(st2);
@@ -168,14 +168,14 @@ U0 KeyMapFamily(U8 *family,CTask *task,I64 scf)
 {
   I64 i;
   U8 **entries=CAlloc(2*256*sizeof(U8 *)),st1[32],st2[32];
-  SPrintF(st1,"%s      ",family);
-  SPrintF(st2,"%s SHIFT",family);
+  SPrint(st1,"%s      ",family);
+  SPrint(st2,"%s SHIFT",family);
   KeyMapFamily2(entries    ,st1,task,scf);
   KeyMapFamily2(entries+256,st2,task,scf+SCF_SHIFT);
   QSortI64(entries,2*256,&KMCompare);
   for (i=0;i<2*256;i++)
     if (entries[i]) {
-      "" entries[i];
+      "%s",entries[i];
       Free(entries[i]);
     }
   Free(entries);
@@ -234,7 +234,7 @@ public U0 TipOfDay(U8 *tip_file="::/TempleOS/Doc/Tips.TXT")
 U0 CtrlAltK(I64)
 {
   U8 buf[136];
-  SPrintF(buf,"KeyMap(0x%X);View;",
+  SPrint(buf,"KeyMap(0x%X);View;",
     sys_focus_task);
   PopUp(buf);
 }
