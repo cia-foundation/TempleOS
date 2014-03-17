@@ -1,0 +1,100 @@
+$WW,1$$FG,5$$TX+CX,"TempleOS",HTML="http://www.templeos.org"$$FG$
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/yyPEDxQKlSY\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Hello World"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/SgPd9xhTu9Q\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"User Interface Tutorial Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/eZEEAmTgFy0\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"User Interface Tutorial Part 2"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/X6uKeJt7yhU\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Programming Guide Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/bpr7laEx--k\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 1"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/_409whhF_dU\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 2"$
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/pbaoo_TMa1w\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"System Guide Part 3"$
+
+Errata: Multicore timer IRQ is 1000 Hz.  Nonmaskable IRQ is to HLT, not wake.
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/jthJOeStDjE\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Start-Up Code Walk-Thru"$
+
+Note: TempleOS stores files contiguously if their name ends in ".C".
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/yjflVIKY2gQ\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Assembler/Compiler Code Walk-Thru"$
+
+Errata: Float * int goes to float, obviously.
+
+
+
+
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/C2EzEt6kAJA\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"<CTRL-R> Graphic Editing"$

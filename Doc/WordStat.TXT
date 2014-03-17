@@ -1,0 +1,7 @@
+$FG,2$$WW,1$WordStat$FG$ collects statistics from all text files in subdirectories when you call $LK,"WSInit",A="MN:WSInit"$().  It counts which words follow which other words with what frequency in a big sparse matrix.
+
+It provides auto-complete typing and jump-to-code or jump-to-dictionary_definition functionality.
+
+Tip: If you use consistent var names for items of different classes, you'll usually be able to autocomplete the member vars.  I always use $FG,2$lx$FG$ for $LK,"CLex",A="MN:CLex"$ ptrs; $FG,2$doc$FG$ for $LK,"CDoc",A="MN:CDoc"$ ptrs; $FG,2$doc_e$FG$ or $FG,2$doc_ce$FG$ for $LK,"CDocEntry",A="MN:CDocEntry"$ ptrs, etc.
+
+If you have the raw Project Gutenberg dictionary file, you can generate the TempleOS processed dictionary files with the stand-alone program $LK,"::/Adam/WordStat/WSDictGen.CPP"$.

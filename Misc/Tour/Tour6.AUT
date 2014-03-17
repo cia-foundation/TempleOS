@@ -1,0 +1,76 @@
+PopUpOk(
+"$$LK,\"F\",A=\"MN:F\"$$() is a handy function.\n"
+"It is a wrapper around $$LK,\"Grep\",\"MN:Grep\"$$().\n"
+"It searches for a sym.\n"
+);
+
+PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\");";
+AFPmtStr("\n");
+
+
+
+
+
+PopUpOk(
+"Try it with the $$GREEN$$+l$$FG$$ flag.\n"
+"This limits to whole labels, not partials.\n");
+
+PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\",\"+l\");";
+AFPmtStr("\n");
+
+
+
+
+
+PopUpOk(
+"Try it with the $$GREEN$$+l-i$$FG$$ flag.\n"
+"This does not ignore case and\n"
+"limits to whole labels, not partials.\n");
+
+PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\",\"+l-i\");";
+AFPmtStr("\n");
+
+
+
+
+PopUpOk(
+"The wrapper function is in your\n"
+"$$RED$$HOME/Adam3dWrappers.CPP.Z$$FG$$ file.\n"
+"There is a function $$LK,\"R\",\"MN:R\"$$() for\n"
+"find and replace.  Feel free to customize.\n");
+
+PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"Ed(\"HOME/Adam3dWrappers.CPP.Z\");";
+AFPmtStr("\n");
+
+Sleep(2000);
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"$$GREEN$$+lb$$FG$$ is whole label just before.\n"
+"$$GREEN$$+la$$FG$$ is whole label just after.\n");

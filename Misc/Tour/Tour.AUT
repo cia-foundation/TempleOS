@@ -1,0 +1,41 @@
+public I64 PopUpTourPart()
+{
+  I64 i;
+  CDoc *doc=DocNew;
+  DocPrint(doc,"$$PURPLE$$TempleOS Tours$$FG$$\n\n"
+	"$$CM+LX,4,4$$$$BT,\"Part  1: The basics\",LE=1$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  2: Editing and running programs\",LE=2$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  3: Adding macros to personal menu\",LE=3$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  4: Choose filename, choose dir\",LE=4$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  5: WordStat\",LE=5$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  6: Search (Grep)\",LE=6$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  7: Editor filter\",LE=7$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  8: Debugging\",LE=8$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  9: Wow!!\",LE=9$$"
+	"$$CM+LX,4,4$$$$BT,\"Part 10: Test Suite\",LE=10$$"
+	"$$CM+LX,4,4$$$$BT,\"Done\",LE=DOCM_CANCEL$$\n");
+  doc->flags|=DOCF_FORM;
+  i=SrvUser("WinMax;DocMenuDo(0x%X,0);",doc);
+  DocDel(doc);
+  return i;
+}
+
+U0 TourMenu()
+{
+  U8 buf[128];
+  I64 i;
+  while (TRUE) {
+    i=PopUpTourPart;
+    if (i>=1) {
+      SPrint(buf,"::/Misc/Tour/Tour%X.AUT",i);
+      ExeFile(buf);
+    } else
+      break;
+  }
+}
+
+"DocClear;WinMax;\n";
+WinMgrSync(2);
+TourMenu;
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"Cd(\"HOME\");Dir;\n";

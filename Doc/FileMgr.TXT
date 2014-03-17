@@ -1,0 +1,60 @@
+$WW,1$$FG,5$$TX+CX,"File Manager"$$FG$
+
+$FG,2$SHIFT CURSOR$FG$
+$ID,2$Select files.
+$ID,-2$
+$FG,2$CTRL-Y or DELETE KEY$FG$
+$ID,2$Delete file or tree.
+$ID,-2$
+$FG,2$CTRL-C or CTRL-INS$FG$
+$ID,2$Copy selected files to clipboard.
+$ID,-2$
+$FG,2$CTRL-V or SHIFT-INS$FG$
+$ID,2$Paste clipboard.
+$ID,-2$
+$FG,2$LEFT-CLICK,drag-drop$FG$
+$ID,2$Move a file or tree to a directory.
+$ID,-2$
+$FG,2$LEFT-CLICK,same file or <SPACE BAR>$FG$
+$ID,2$Edit file.
+$ID,-2$
+$FG,2$SHIFT-SPACE KEY$FG$
+$ID,2$Edit Plain Text File.
+$ID,-2$
+$FG,2$RIGHT-CLICK or <ENTER>$FG$
+$ID,2$Bring-up menu.
+$ID,-2$
+$FG,2$F5$FG$
+$ID,2$#include file.
+$ID,-2$
+$FG,2$SHIFT-F5$FG$
+$ID,2$Adam #include file.
+$ID,-2$
+$FG,2$'r'$FG$
+$ID,2$Rename file.
+$ID,-2$
+$FG,2$'d'$FG$
+$ID,2$Make Directory.
+$ID,-2$
+$FG,2$'m'$FG$
+$ID,2$ChgDsk (Remount removable media).  Do not do this on blank disks.
+$ID,-2$
+$FG,2$'f'$FG$
+$ID,2$Format drive.
+$ID,-2$
+$FG,2$'M'$FG$
+$ID,2$Make CD/DVD ISO file.  This creates a file image of the directory the cursor is on.  The name of the ISO file is $LK,"sys_dft_iso_name",A="MN:sys_dft_iso_name"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
+$ID,-2$
+$FG,2$'B'$FG$
+$ID,2$Burn CD/DVD ISO file.  This burns a CD/DVD using the image file, $LK,"sys_dft_iso_name",A="MN:sys_dft_iso_name"$ to the drive the cursor is on.
+$ID,-2$
+
+$FG,5$Instructions on Using CD/DVD's$FG$
+$ID,2$If you have not recompiled Kernel and defined your CD/DVD drive, exit the file mgr and use $LK,"Mount",A="MN:Mount"$ to define your CD/DVD drive.  Place a CD/DVD in the drive and press $FG,2$'m'$FG$ when on top of the CD/DVD drive letter to mount the drive.  It will call $LK,"ChgDsk",A="MN:ChgDsk"$(), the TempleOS cmd to mount removable media.
+$ID,-2$
+
+$FG,5$Instructions on Burning CD/DVD's$FG$
+$ID,2$Create a temporary holding drive in RAM or on disk, copy files into the holding drive.  Make an ISO image of the drive by pressing $FG,2$'M'$FG$ when on top of the holding drive.  Press $FG,2$'B'$FG$ when on top of the CD/DVD ROM drive to burn the ISO to disk.  If you have not recompiled $FG,2$Kernel$FG$ and defined your CD/DVD drive, exit the file mgr and use $LK,"Mount",A="MN:Mount"$.
+
+$LK,"Making Your Own Distro",A="FI:::/Misc/MakeDistro.CPP"$
+$ID,-2$

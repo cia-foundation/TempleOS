@@ -1,9 +1,0 @@
-$WW,1$The TempleOS profiler records statistics on what code location was executing when a task was preempted.  You can learn where most time is wasted.  There are two modes, $LK,"ProfBin","MN:ProfBin"$() which monitors a range of buckets and $LK,"ProfAll","MN:ProfAll"$() which records a hit location as well as count.  I recommend $LK,"ProfAll","MN:ProfAll"$().
-
-You can pass a subroutine depth level argument which records a hit in not only the routine executing, but the routines which called it, as well.
-
-When done collecting statistics, use $LK,"ProfRep","MN:ProfRep"$() for a report.  You might need a $LK,"DocMax","MN:DocMax"$() to expand the command line window buffer to fit it all.
-
-You can set the CPU to monitor with $LK,"ProfCPUSet","MN:ProfCPUSet"$().
-
-Study the code.  The profiler is very simple and you might want to enhance it or modify it to debug something in particular.

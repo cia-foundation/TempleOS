@@ -1,0 +1,42 @@
+$WW,1$$FG,1$$TX+CX,"The Temple Operating System",HTML="http://www.templeos.org"$$FG$
+
+$FG,2$$TX,"Download TempleOS V2.03 - Standard Distro (0.0 MB)",D="DD_TEMPLEOSCD_SIZE",HTML="http://www.templeos.org/TempleOSCD.ISO"$$FG$
+Burn a CD/DVD from the TempleOSCD.ISO and boot it or run it in $FG,4$$TX,"VMware",HTML="https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ or $FG,4$$TX,"VirtualBox",HTML="http://www.virtualbox.org"$$FG$ aiming the CD/DVD drive at TempleOSCD.ISO or for QEMU type:
+>qemu-system-x86_64 -m 500 -cdrom TempleOSCD.ISO -boot d
+Downgrade to VMware Player 4.0 or VMware Workstation 8.0 if you want sound and you have an internal PC speaker.
+
+$LK,"Make Your own TempleOS ISO Distro",A="FI:::/Misc/MakeDistro.CPP"$
+
+
+$FG,2$$TX,"Download TempleOS V2.03 - Lite Distro (0.0 MB)",D="DD_TEMPLEOSLITE_SIZE",HTML="http://www.templeos.org/TempleOSLite.ISO"$$FG$
+Missing: Dictionary, Bible and TSZ Utility.  Still 100% OpenSource.
+Includes: x86_64 64BitMultiCoredKernel, 64BitCompiler, Assembler, Unassembler, Debugger, Editor, VGAGraphics, Tools, BootLoaders, Keyboard&Mouse, HardDrives, FAT32, Partitioner, CD/DVD, ISO9660FileCreator, FileManager, WindowManager, PCSpeaker, Apps, Games, God-Oracle-App, Hymns, Demos, Documentation.
+
+
+$FG,2$$TX,"Download TempleOS V2.03 - UltraLite Distro (0.0 MB)",D="DD_TEMPLEOSULTRA_SIZE",HTML="http://www.templeos.org/TempleOSUltra.ISO"$$FG$
+Missing: Apps, Demos, Dictionary, Bible and TSZ Utility.  Still 100% OpenSource.
+Includes: x86_64 64BitMultiCoredKernel, 64BitCompiler, Assembler, Unassembler, Debugger, Editor, VGAGraphics, Tools, BootLoaders, Keyboard&Mouse, HardDrives,  FAT32, Partitioner, CD/DVD, ISO9660FileCreator, FileManager, WindowManager, PCSpeaker, Documentation.
+
+
+$FG,2$$TX,"Download SimStructure (7.71 MB)",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$$FG$
+SimStructure is a free Windows physics simulator.
+
+
+$FG,2$$TX,"Download InGodsTime (12.4 MB)",HTML="http://www.templeos.org/files/TSGodSetUp.zip"$$FG$
+This is a Windows program for doing Biblical Tongues with a stopwatch.  When you press a key, it reads a high-speed watch for a random number to pick words or passages.
+
+
+$FG,2$$TX,"Download TempleOS V2.03 - T.S. Company Internal Distro (0.0 MB)",D="DD_TEMPLEOSTS_SIZE",HTML="http://www.templeos.org/TempleOSTS.ISO"$$FG$
+This is the Trivial Solution internal company distro.  Only run this on a virtual machine, not bare metal hardware because it's settings could cause problems.  The hard drive must be partitioned.  Install Std Distro, then install this on top.
+>$LK,"TSInstall",A="FF:::/Demo/AcctExample/TSDistro.CPP,TSInstall"$;
+>$LK,"TSUpgrade",A="FF:::/Demo/AcctExample/TSDistro.CPP,TSUpgrade"$; 
+See $LK,"MakeDistrosAndBackUp",A="FF:::/Demo/AcctExample/TSDistro.CPP,MakeDistrosAndBackUp"$() to reproduce the ISO's in $FG,4$E:/Wb$FG$.  It makes this website, too.
+
+
+$FG,2$$TX,"Download TempleOS V2.03 - Debug Distro (0.0 MB)",D="DD_TEMPLEOSDBG_SIZE",HTML="http://www.templeos.org/TempleOSDbg.ISO"$$FG$
+This is a debug distro.  The CDROM bootloader uses BIOS INT 0x13 0x42 to load Kernel.BIN.C which has been modified to also hold a small RAM drive (Drive A) that fits in the low 640k.  The bootloader starts in real mode and the kernel changes to long, 64-bit mode.  It loads the 64-bit compiler and assembler, compiles some, but not all, of the normal start-up scripts and drops you off at the $LK,"Dbg",A="MN:Dbg"$ command-line where you can JIT compile, use $LK,"EdLite",A="MN:EdLite"$ on RAM files, and use many of the other normal Kernel commands.  I could not fit all the normal start-up scripts into the small RAM drive, so you do not have the window manager or normal document framework.  You should have many Gig of RAM to play with with RAM Drive B, a high memory RAM drive, but you have only those few files.  When I generate this distro, I call $LK,"MakeBootDrvFile",A="FF:::/Demo/AcctExample/TSDistro.CPP,MakeBootDrvFile"$.
+
+$FG,8$
+* "VMware Player" and "VMware WorkStation" are trademarks of VMware, Inc.
+* "VirtualBox" is a trademark of Oracle.
+* "Windows" and "DOS" are trademark of MicroSoft Corp.

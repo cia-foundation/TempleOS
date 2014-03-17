@@ -1,0 +1,109 @@
+$WW,1$$FG,5$$TX+CX,"DIRECTORY STRUCTURE"$$FG$
+
+$FG,2$/Accts$FG$ Each subdirectory is an acct.  When you boot, you can select an acct to login to, unless you compile Kernel soas to pick one.  Your acct directory is your $FG,2$HOME$FG$ directory and all your user data should be placed in here to ease backing-up your data.  When you Install an application it will create a subdirectory of your $FG,2$HOME$FG$ directory for storage.
+
+$FG,2$/Apps$FG$ Applications are placed in subdirectories of $FG,2$/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your personal menu, use $FG,2$<CTRL-L>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
+
+$FG,2$/Demo$FG$ Here you can find lots of sample code to do various things.
+
+$FG,2$/Doc$FG$ Here you can find documentation.
+
+$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a "$FG,2$kernel$FG$" is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  It is loaded by the boot loader and must fit in 640K.
+
+$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It is also $FG,2$AOT$FG$ compiled by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+
+$FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.
+
+
+
+$FG,5$$TX+CX,"ACCT FILES"$$FG$
+
+You can add and remove accts by making or removing directories in the $FG,2$::/Accts$FG$ directory.  An empty account directory should be valid because it will get default files from the parent directory.  Compile the $LK,"Kernel",A="MN:MakeOSPrtBootInstall"$ to set the active acct or cause it to prompt an account at boot. 
+
+$LK,"HOME/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-M>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+$LK,"HOME/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+
+$LK,"HOME/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
+
+$LK,"HOME/Adam3.CPP"$ files invoked when the adam task starts-up.  Customize these!
+
+$LK,"HOME/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
+
+
+
+$FG,5$$TX+CX,"APPLICATION POLICIES"$$FG$
+
+* Place applications in their own $FG,2$/Apps$FG$ subdirectory.
+
+* Make a file called $FG,2$Load.CPP.Z$FG$ to load the application.
+
+* Make a file called $FG,2$Run.CPP.Z$FG$ to load and run the application, preferable by $FG,2$#include$FG$ing the $FG,2$Load.CPP.Z$FG$ file.
+
+* Place user data in a subdirectory of $FG,2$HOME$FG$, preferably naming the subdirectory the same as the $FG,2$/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.CPP.Z$FG$ file.  See $LK,"::/Demo/RegistryDemo.CPP"$.
+
+* Make a file called $FG,2$Install.CPP.Z$FG$ or $FG,2$Install.AUT.Z$FG$ to create the $FG,2$HOME$FG$ subdirectory and do similar stuff.
+
+ 
+
+$FG,5$$TX+CX,"PROGRAMMING GUIDELINES"$$FG$
+
+* Virtual mem/Paging is not used -- it is identity mapped in x86_64 mode.  The stk does not grow, so allocate enough when the task (process) is $LK,"Spawn",A="MN:Spawn"$ed and use the heap for most things.  (The "heap" refers to $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().)
+
+* See $LK,"Naming Convention",A="FF:::/Doc/Glossary.TXT,Naming Convention"$ and $LK,"Abbreviations",A="FF:::/Doc/Glossary.TXT,Abbreviations"$.
+
+* There are two modes of compiling, $LK,"AOT Compile Mode",A="FF:::/Doc/Glossary.TXT,AOT Compile Mode"$ and $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$.  Compilation is done in both -- neither is "interpreted".  Use $FG,2$$LK,"JIT Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$$FG$.
+
+* $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$
+
+* Use $FG,2$I64$FG$ in place of smaller int sizes because the compiler converts everything to 64-bit.  Don't use unsigned$FG$ unless it actually breaks.  A policy of signed keeps it simple so you don't have to agonize over choices.
+
+* In-order short circuit logic is used, in fact required.
+
+* Avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte signed int -- nothing forces it to 1 or 0.  There is a $LK,"ToBool",A="MN:ToBool"$() function that will for to 1 ot 0, however.
+
+* If you use floats in your interrupt routine, save and restore the fpu state with $LK,"Fxsave",A="MN:Fxsave"$() and $LK,"Fxrstor",A="MN:Fxrstor"$().  The timer interrupt does this.  The keyboard and mouse don't use floats.
+
+* Bracketing code with $FG,2$PUSHFD CLI$FG$ and $FG,2$POPFD$FG$ will protect against simultaneous accesses from tasks on $UL,1$one$UL,0$ core.  To protect against multiple cores, you need a locked semaphore.  I think semiphores need to be in their own cache line, but I'm not sure.  I use lock bits in a lot of places not aligned.
+
+* $LK,"SysDbg",A="MN:SysDbg"$() and $LK,"IsSysDbg",A="MN:IsSysDbg"$() are really handy when working on the compiler or kernel.  It's just a bit you can set and test.
+
+* I don't use "$FG,2$U0 *$FG$" because the size is zero for ptr arithmetic.
+
+* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Utils/S2T.CPP,S2T"$ on source code.
+
+
+
+$FG,5$$TX+CX,"HASH SYM TABLES"$$FG$
+
+* See $LK,"::/Adam/Hash2a.CPP"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
+
+* $FG,2$adam_task->hash_table$FG$ holds the HolyC syms loaded in on start-up.
+
+* $FG,2$Fs->hash_table$FG$ holds user HolyC syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym.  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp",A="MN:PopUp"$() a task to run the application and kill it when it's done.
+
+* To display the contents of a hash table, use the $LK,"Who",A="MN:Who"$() routine or the varients.  $LK,"HashDepthRep",A="MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
+
+
+
+$FG,5$$TX+CX,"ASSEMBLY LANGUAGE CONCERNS"$$FG$
+
+* $FG,2$FS$FG$ must always point to the $LK,"CTask",A="MN:CTask"$.
+
+* $FG,2$GS$FG$ must always point to the $LK,"CCPU",A="MN:CCPU"$.
+
+* Don't change the segment regs unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$ and $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$.
+
+* When interacting with compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REG_VARS_MASK"$.
+
+* I recommend using the standard stk frame for functions because $LK,"Caller",A="MN:Caller"$() is used to display the call stk, such as for the wallpaper.
+$FG,2$	PUSH	RBP
+	MOV	RBP,RSP
+	SUB	RSP,nnnn
+...
+	LEAVE
+	RET
+$FG$
+* The args are removed from the stack with $FG,2$RET1$FG$ statements.
+
+	$FG,2$RET1	16	//remove two args$FG$

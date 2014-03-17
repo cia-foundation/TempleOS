@@ -1,0 +1,89 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+PopUpOk(
+"After clicking $$GREEN$$[OKAY]$$FG$$, you will be at the\n"
+"command line.\n"
+"\n"
+"The syntax is like $$GREEN$$C/C++$$FG$$ except you\n"
+"don't need $$GREEN$$()$$FG$$ if there are no args.\n"
+"\n"
+"Type \"$$GREEN$$Dir;$$FG$$\" and press $$GREEN$$<ENTER>$$FG$$.\n\n"
+"You must remember the semicolon.\n"
+);
+
+AFPmtStr("Dir;\n");
+Sleep(1000);  //allow user time to see dir
+'\n';
+
+PopUpOk(
+"After clicking $$GREEN$$[OKAY]$$FG$$, you will be at the\n"
+"command line.\n\n"
+"Press $$GREEN$$<CTRL-M>$$FG$$.\n\n"
+"This will access your personal menu.\n"
+"You can customize it.  It's like your\n"
+"START menu and desktop.\n");
+
+AFGetChar(CH_CTRLM);
+Sleep(1000);
+PopUpOk(
+"You can get to your personal menu\n"
+"by clicking on the word \"$$GREEN$$MENU$$FG$$\" in the\n"
+"title bar.\n");
+
+PopUpOk(
+"After clicking $$GREEN$$[OKAY]$$FG$$, you will be back at\n"
+"the personal menu.\n\n"
+"Press $$GREEN$$<CURSOR-DOWN>$$FG$$ nine times.\n");
+
+//This puts the cursor at the top
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+
+I64 i;
+for (i=0;i<9;i++)
+  AFGetKey(SC_CURSOR_DOWN);
+
+PopUpOk(
+"Keyboard commands are:\n\n"
+"$$GREEN$$<SPACE BAR>$$FG$$\tLeft-action\n"
+"$$GREEN$$<ENTER>$$FG$$\t\tRight-action\n"
+"$$GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
+"$$GREEN$$<SHIFT-ESC>$$FG$$\tAbort\n"
+);
+
+PopUpOk(
+"After clicking $$GREEN$$[OKAY]$$FG$$, the cursor will be\n"
+"on top of a macro we wish to run.\n"
+"\n"
+"After clicking $$GREEN$$[OKAY]$$FG$$, press $$GREEN$$<SPACE BAR>$$FG$$.\n");
+AFPmtStr(" ");
+Sleep(1000);
+
+PopUpOk(
+"The macro changed directories and did\n"
+"a $$GREEN$$Dir;$$FG$$ command.\n\n"
+"The $$RED$$RED$$FG$$ filenames listed are file\n"
+"links.  Left-clicking will edit/view them.\n"
+"Right-clicking or pressing $$GREEN$$<ENTER>$$FG$$\n"
+"when the cursor is on top will bring-up a\n"
+"menu of options.\n\n"
+"The $$LTBLUE$$BLUE$$FG$$ underline entries \"$$LTBLUE$$.$$FG$$\" and \"$$LTBLUE$$..$$FG$$\"\n"
+"are macros and will change directories.\n");
+
+PopUpOk(
+"\"$$GREEN$$<CTRL-T>$$FG$$\" after clicking $$GREEN$$[OKAY]$$FG$$ to toggle\n"
+"to plain text mode.\n");
+AFGetChar(CH_CTRLT);
+Sleep(1000);
+
+PopUpOk(
+"The widgets are bracketed with dollar sign\n"
+"characters. \"LK\" stands \"link\" and \"MA\"\n"
+"stands for \"macro\".\n\n"
+"Now, \"$$GREEN$$<CTRL-T>$$FG$$\" to toggle back to\n"
+"regular mode.\n");
+AFGetChar(CH_CTRLT);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+Sleep(1000);
+

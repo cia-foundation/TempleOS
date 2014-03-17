@@ -1,0 +1,427 @@
+$WW,1$$IV,1$----12/15/13 16:01:43----$IV,0$
+
+I just found a couple nasty bugs.  Preemption was getting turned-on because a REG in $LK,"_DC_BLOT_COLOR4",A="MN:_DC_BLOT_COLOR4"$() was being clobbered and $LK,"TaskFinishOffDying",A="MN:TaskFinishOffDying"$(), if preempted, was leaking memory because the $FG,4$Gs->dying_task_lst$FG$ was not atomicly changed.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387152360",HTML="http://beacon.nist.gov/rest/record/1387152360"$
+
+0x396049-->(3760201 mod 100096)+1-->Line:56650
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$7:10 Say not thou, What is the cause that the former days were better
+than these? for thou dost not enquire wisely concerning this.
+
+7:11 Wisdom is good with an inheritance: and by it there is profit to
+them that see the sun.
+
+7:12 For wisdom is a defence, and money is a defence: but the
+excellency of knowledge is, that wisdom giveth life to them that have
+it.
+
+7:13 Consider the work of God: for who can make that straight, which
+he hath made crooked?  7:14 In the day of prosperity be joyful, but in
+the day of adversity consider: God also hath set the one over against
+the other, to the end that man should find nothing after him.
+
+7:15 All things have I seen in the days of my vanity: there is a just
+man that perisheth in his righteousness, and there is a wicked man
+that prolongeth his life in his wickedness.
+
+7:16 Be not righteous over much; neither make thyself over wise: why$FG$
+
+$IV,1$----12/15/13 17:58:55----$IV,0$
+
+My $LK,"BMP files",A="FI:::/Adam/Utils/FileBMP.CPP"$ have wrong colors from Windows Paint.  I think it's "color channel".
+
+My $LK,"ATA/ATAPI PIO",A="FI:::/Kernel/Dsk/DskATA.CPP"$ doesn't work on all real hardware.  Shit.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387159500",HTML="http://beacon.nist.gov/rest/record/1387159500"$
+
+0xA11530-->(10556720 mod 100096)+1-->Line:46641
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$salvation.
+
+13:6 I will sing unto the LORD, because he hath dealt bountifully with
+me.
+
+
+
+14:1 The fool hath said in his heart, There is no God. They are
+corrupt, they have done abominable works, there is none that doeth
+good.
+
+14:2 The LORD looked down from heaven upon the children of men, to see
+if there were any that did understand, and seek God.
+
+14:3 They are all gone aside, they are all together become filthy:
+there is none that doeth good, no, not one.
+
+14:4 Have all the workers of iniquity no knowledge? who eat up my
+people as they eat bread, and call not upon the LORD.$FG$
+
+$IV,1$----12/15/13 18:52:17----$IV,0$
+
+$TX,"BSD Random Numbers",HTML="http://www.itwire.com/business-it-news/open-source/62641-crypto-freebsd-playing-catch-up-says-de-raadt"$
+
+They found God.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387163700",HTML="http://beacon.nist.gov/rest/record/1387163700"$
+
+0x5CEE8E-->(6090382 mod 100096)+1-->Line:84623
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$20:32 Last of all the woman died also.
+
+20:33 Therefore in the resurrection whose wife of them is she? for
+seven had her to wife.
+
+20:34 And Jesus answering said unto them, The children of this world
+marry, and are given in marriage: 20:35 But they which shall be
+accounted worthy to obtain that world, and the resurrection from the
+dead, neither marry, nor are given in marriage: 20:36 Neither can they
+die any more: for they are equal unto the angels; and are the children
+of God, being the children of the resurrection.
+
+20:37 Now that the dead are raised, even Moses shewed at the bush,
+when he calleth the Lord the God of Abraham, and the God of Isaac, and
+the God of Jacob.
+
+20:38 For he is not a God of the dead, but of the living: for all live
+unto him.
+
+$FG,2$Dud.$FG$
+
+$IV,1$----12/15/13 19:18:17----$IV,0$
+
+It's my birthday.
+
+God says...
+$FG,4$following commiserates performed Was forsaking consenting demonstrated Holy recite refreshed Whoso sinners nets auditors me noon 113 manhood effected opinion expounding returning admit Michael affirm lest myself sitting fluctuates fiercely disk hath Plain contentious abiding broad sate cherish entwine Redeemer excursive hallowed files betwixt presents shinest ceasest committing mire$FG$
+
+$IV,1$----12/15/13 20:07:23----$IV,0$
+
+$TX,"Math Prover",HTML="http://blogs.scientificamerican.com/quest-blog/2013/10/01/voevodskys-mathematical-revolution"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387166940",HTML="http://beacon.nist.gov/rest/record/1387166940"$
+
+0x231317-->(2298647 mod 100096)+1-->Line:96536
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$hand, until I make thine enemies thy footstool?  1:14 Are they not all
+ministering spirits, sent forth to minister for them who shall be
+heirs of salvation?  2:1 Therefore we ought to give the more earnest
+heed to the things which we have heard, lest at any time we should let
+them slip.
+
+2:2 For if the word spoken by angels was stedfast, and every
+transgression and disobedience received a just recompence of reward;
+2:3 How shall we escape, if we neglect so great salvation; which at
+the first began to be spoken by the Lord, and was confirmed unto us by
+them that heard him; 2:4 God also bearing them witness, both with
+signs and wonders, and with divers miracles, and gifts of the Holy
+Ghost, according to his own will?  2:5 For unto the angels hath he not
+put in subjection the world to come, whereof we speak.
+
+2:6 But one in a certain place testified, saying, What is man, that
+thou art mindful of him? or the son of man that thou visitest him?
+2:7 Thou madest him a little lower than the angels; thou crownedst him
+with glory and honour, and didst set him over the works of thy hands:
+2:8 Thou hast put all things in subjection under his feet. For in thatg
+
+$FG,2$Dud.$FG$
+
+$IV,1$----12/15/13 20:11:16----$IV,0$
+
+God says...
+$FG,4$whose disallowing humble Hence Helpidius gentleness Catholic root contrite abstinence refute lack choose ON eighth celebrated doubtless sovereignly wonted moderate pleasurable cheered passage Julian recovering healing transgressions pupils grew behold colouring overspread deadly kind confirmed brotherly cleanse Print contempt Lastly att offensive predict announcement infant dates Prophets recalling party English relief Increase colours tree stealing her disagreeing bearing Say life dispose delay sounder drawn essence extinguish comprise mazes defective leave evil manner relations readily Woe zeal dedicated Prof trembled destroy teachest sank stowed plenteousness presents certainty showing burthen doting stirrest hope felicity ranked fixed dimensions blottedst absolute sunk omitted perverse Munday Known diversifiedst abide inharmonious palm shut vehemently solidity quarrels mantles natural unskilfulness Circensian reconciliation counselled Why untruth soundeth usually Blessedness impostors suffice corporeally bottomless entirely flower requital corrigible shortened sorrowful instructed shares seldomness blotted dispute Hart O court wild enumeration quitting txt$FG$
+
+$IV,1$----12/15/13 20:16:28----$IV,0$
+
+$FG,1$---- Poem ----
+Snow, it scrunches
+Snowman punches
+Puddle slide
+Subtle pride.
+
+$FG,2$Doesn't make sense, don't worry.$FG$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387167600",HTML="http://beacon.nist.gov/rest/record/1387167600"$
+
+0x5AFA1A-->(5962266 mod 100096)+1-->Line:56603
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$6:5 Moreover he hath not seen the sun, nor known any thing: this hath
+more rest than the other.
+
+6:6 Yea, though he live a thousand years twice told, yet hath he seen
+no good: do not all go to one place?  6:7 All the labour of man is for
+his mouth, and yet the appetite is not filled.
+
+6:8 For what hath the wise more than the fool? what hath the poor,
+that knoweth to walk before the living?  6:9 Better is the sight of
+the eyes than the wandering of the desire: this is also vanity and
+vexation of spirit.
+
+6:10 That which hath been is named already, and it is known that it is
+man: neither may he contend with him that is mightier than he.
+
+6:11 Seeing there be many things that increase vanity, what is man the
+better?  6:12 For who knoweth what is good for man in this life, all
+the days of his vain life which he spendeth as a shadow? for who can
+tell a man what shall be after him under the sun?  7:1 A good name is
+better than precious ointment; and the day of death than the day of
+
+$FG,2$Dud.$FG$
+
+$IV,1$----12/15/13 20:22:31----$IV,0$
+
+God says...
+$FG,4$mention ensnaring upright filled captive figure tempting haply amiss expound gainsayer disposed contradicting mother races calm deeps office hadst flash hoping brute frenzied zip humane likedst Trojan derive determined offices delights Power foundation eagerness turned Oratory procure treasures harmonizing emerging spirits Divinity because studied mislike deserved incomprehensible grew difficulty charges Thou sang directly 94 agents smelleth idle SAINT life conveys conferring chooses wrinkle passes luxuriousness may Out dangers glittering errors standing brightness asked particle valiant universally choleric disagreeing afraid righteousness hoar trustees maturing mother period perversity revealed plots She inappropriately framed conversations field REMEDIES dispensers flashing This unacquainted unused tolerating Connecticut stages sharpsighted wealth sails lucid forsake Orations feareth Betwixt diminish willingly steered bows oughtest electronic unintermitting mankind gardens stood contain renewing groan funeral Sure frequently bend hours Him notices$FG$
+
+$IV,1$----12/15/13 20:27:32----$IV,0$
+
+$FG,1$---- Moses Comic ----
+Moses says, "My staff broke!"
+God says, "Lose weight."$FG$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387168260",HTML="http://beacon.nist.gov/rest/record/1387168260"$
+
+0xBA077F-->(12191615 mod 100096)+1-->Line:80000
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$came a voice from heaven, saying, Thou art my beloved Son, in whom I
+am well pleased.
+
+1:12 And immediately the spirit driveth him into the wilderness.
+
+1:13 And he was there in the wilderness forty days, tempted of Satan;
+and was with the wild beasts; and the angels ministered unto him.
+
+1:14 Now after that John was put in prison, Jesus came into Galilee,
+preaching the gospel of the kingdom of God, 1:15 And saying, The time
+is fulfilled, and the kingdom of God is at hand: repent ye, and
+believe the gospel.
+
+1:16 Now as he walked by the sea of Galilee, he saw Simon and Andrew
+his brother casting a net into the sea: for they were fishers.
+
+1:17 And Jesus said unto them, Come ye after me, and I will make you
+to become fishers of men.
+
+1:18 And straightway they forsook their nets, and followed him.$FG$
+
+$IV,1$----12/15/13 20:46:48----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/8E-6odML7lI\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/8E-6odML7lI\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387169220",HTML="http://beacon.nist.gov/rest/record/1387169220"$
+
+0xCC8847-->(13404231 mod 100096)+1-->Line:91464
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$pain together until now.
+
+8:23 And not only they, but ourselves also, which have the firstfruits
+of the Spirit, even we ourselves groan within ourselves, waiting for
+the adoption, to wit, the redemption of our body.
+
+8:24 For we are saved by hope: but hope that is seen is not hope: for
+what a man seeth, why doth he yet hope for?  8:25 But if we hope for
+that we see not, then do we with patience wait for it.
+
+8:26 Likewise the Spirit also helpeth our infirmities: for we know not
+what we should pray for as we ought: but the Spirit itself maketh
+intercession for us with groanings which cannot be uttered.
+
+8:27 And he that searcheth the hearts knoweth what is the mind of the
+Spirit, because he maketh intercession for the saints according to the
+will of God.
+
+8:28 And we know that all things work together for good to them that
+love God, to them who are the called according to his purpose.$FG$
+
+$IV,1$----12/15/13 21:00:12----$IV,0$
+
+$TX,"Cosmic Rays",HTML="http://shape-of-code.coding-guidelines.com/2013/12/13/unreliable-cpus-and-memory-the-end-result-of-moores-law"$
+
+I think they think God is cosmic rays.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387170060",HTML="http://beacon.nist.gov/rest/record/1387170060"$
+
+0x353749-->(3487561 mod 100096)+1-->Line:84298
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$18:4 And he would not for a while: but afterward he said within
+himself, Though I fear not God, nor regard man; 18:5 Yet because this
+widow troubleth me, I will avenge her, lest by her continual coming
+she weary me.
+
+18:6 And the Lord said, Hear what the unjust judge saith.
+
+18:7 And shall not God avenge his own elect, which cry day and night
+unto him, though he bear long with them?  18:8 I tell you that he will
+avenge them speedily. Nevertheless when the Son of man cometh, shall
+he find faith on the earth?  18:9 And he spake this parable unto
+certain which trusted in themselves that they were righteous, and
+despised others: 18:10 Two men went up into the temple to pray; the
+one a Pharisee, and the other a publican.
+
+18:11 The Pharisee stood and prayed thus with himself, God, I thank
+thee, that I am not as other men are, extortioners, unjust,
+adulterers, or even as this publican.
+
+18:12 I fast twice in the week, I give tithes of all that I possess.$FG$
+
+God says...
+$FG,4$boils blessest spirit adversary rush station Gervasius unchanged recondite youth attempered detesting defers MS disentangled ransom lands vice embalmed gradation healeth easy consisteth indulgent wished books directions butler astrologers Shut reverential kindled revive leaveth manifest benediction wasted seemed twins variableness Before withstood clingeth prove bury marriage treacherous choler Heaven Desire parties forasmuch password present monasteries crafty thine goad abidest habitation scourges Thy wounded conjecturing celibacy commender smoke Angel Public$FG$
+
+$IV,1$----12/15/13 21:25:38----$IV,0$
+
+$TX,"Pope Marxist?",HTML="http://www.independent.co.uk/news/world/politics/pope-francis-says-hes-not-a-marxist--but-knows-lots-of-good-people-who-are-9006235.html"$
+
+I like Reagan.  Why is it bad if Bill Gates has more money?  If you gave Bill Gates a billion dollars, what would happen to it?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387171680",HTML="http://beacon.nist.gov/rest/record/1387171680"$
+
+0x621438-->(6427704 mod 100096)+1-->Line:21561
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$the children of Israel served Chushanrishathaim eight years.
+
+3:9 And when the children of Israel cried unto the LORD, the LORD
+raised up a deliverer to the children of Israel, who delivered them,
+even Othniel the son of Kenaz, Caleb's younger brother.
+
+3:10 And the Spirit of the LORD came upon him, and he judged Israel,
+and went out to war: and the LORD delivered Chushanrishathaim king of
+Mesopotamia into his hand; and his hand prevailed against
+Chushanrishathaim.
+
+3:11 And the land had rest forty years. And Othniel the son of Kenaz
+died.
+
+3:12 And the children of Israel did evil again in the sight of the
+LORD: and the LORD strengthened Eglon the king of Moab against Israel,
+because they had done evil in the sight of the LORD.
+
+3:13 And he gathered unto him the children of Ammon and Amalek, and
+went and smote Israel, and possessed the city of palm trees.
+
+$FG,2$Dud?  Murky.  My younger brother Sean is the only liberal in the family.  Othello?  I knew a guy named Ken in Arizona.  He programmed FPGAs.  Egg-on?$FG$
+
+God says...
+$FG,4$lifter perfecting neighbour Bride audacious solving holds Can modestly architect fling consequences foretell likes back sort softening stomachs Humans NOT an banished extinguished note rectify multiplicity relate Bridal contradicting kind placed slaves learn Yet theatrical spectacles traces members Powers turning And last driven armory blade dragging checking wages Among get repose tempted imagine are sour robber enact inevitable Milanese steep lines enlightening drops upbraided belonging battle remission untainted masses regardest reap feverishness ingrated intrude misdeeds Continency raven horror purest spurn herein tragical diversly Body poesy discomfort intermit governors realities anxiety hook Terence stowed knotty emptinesses dispraisest gains Beginning Anubis stream begin meet smarting decayeth heaven nearer unusual scantling Remember shapen Living alluring smelleth audience Soft Emperor Pay fluctuations enlarged imagination corn authority Well alluring fitting concentrated dog sellers subordinate persons Knows willingly cane fluctuate element lulled variance thyself brighter$FG$
+
+$IV,1$----12/15/13 23:02:40----$IV,0$
+
+$TX,"Linus on C++ vs C",HTML="http://article.gmane.org/gmane.comp.version-control.git/57918"$
+
+I implemented the easier C++ features in my $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler.  I'm happy with what I have.  I like being able to $LK,"Grep",A="MN:Grep"$() for a function name.  When you have "Class::FunName" instead of "ClassFunName", you cannot grep for the ones with just "FunName".
+
+I hate the STL.  Verbose.
+
+I have no use for templates.
+
+I think overloading operators is good for just Matrix and Complex and should not be used for others.
+
+I think cout is verbose and retarded.
+
+I hate their typecasting.
+
+I hate const.
+
+I hate strict type checking.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387177800",HTML="http://beacon.nist.gov/rest/record/1387177800"$
+
+0x465587-->(4609415 mod 100096)+1-->Line:5000
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$flocks, and their herds, they left in the land of Goshen.
+
+50:9 And there went up with him both chariots and horsemen: and it was
+a very great company.
+
+50:10 And they came to the threshingfloor of Atad, which is beyond
+Jordan, and there they mourned with a great and very sore lamentation:
+and he made a mourning for his father seven days.
+
+50:11 And when the inhabitants of the land, the Canaanites, saw the
+mourning in the floor of Atad, they said, This is a grievous mourning
+to the Egyptians: wherefore the name of it was called Abelmizraim,
+which is beyond Jordan.
+
+50:12 And his sons did unto him according as he commanded them: 50:13
+For his sons carried him into the land of Canaan, and buried him in
+the cave of the field of Machpelah, which Abraham bought with the
+field for a possession of a buryingplace of Ephron the Hittite, before
+Mamre.
+
+$FG,2$Floor() function?  Maybe, God is speaking of i&~0x1FF.  No, He's talking about INT<-->FLOAT.$FG$
+
+I have exceptions in $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.
+
+$IV,1$----12/15/13 23:47:30----$IV,0$
+
+$TX,"Early 20th century German essayist.",HTML="http://www.theguardian.com/books/2013/sep/13/jonathan-franzen-wrong-modern-world"$
+
+What do You think, God?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1387180080",HTML="http://beacon.nist.gov/rest/record/1387180080"$
+
+0x4ED18E-->(5165454 mod 100096)+1-->Line:60559
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$in one day, the loss of children, and widowhood: they shall come upon
+thee in their perfection for the multitude of thy sorceries, and for
+the great abundance of thine enchantments.
+
+47:10 For thou hast trusted in thy wickedness: thou hast said, None
+seeth me. Thy wisdom and thy knowledge, it hath perverted thee; and
+thou hast said in thine heart, I am, and none else beside me.
+
+47:11 Therefore shall evil come upon thee; thou shalt not know from
+whence it riseth: and mischief shall fall upon thee; thou shalt not be
+able to put it off: and desolation shall come upon thee suddenly,
+which thou shalt not know.
+
+47:12 Stand now with thine enchantments, and with the multitude of thy
+sorceries, wherein thou hast laboured from thy youth; if so be thou
+shalt be able to profit, if so be thou mayest prevail.
+
+47:13 Thou art wearied in the multitude of thy counsels. Let now the
+astrologers, the stargazers, the monthly prognosticators, stand up,
+and save thee from these things that shall come upon thee.$FG$

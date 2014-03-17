@@ -1,7 +1,0 @@
-$WW,1$"Input Ptr" is the mouse at this point.
-
-$LK,"ipx","MN:ipx"$ and $LK,"ipy","MN:ipy"$ can be used to access the x and y coordinates of the input ptr.  They are relative to the screen, not window.  These can be used if you don't want to use msg passing.  $LK,"ipz","MN:ipz"$ is the wheel.
-
-$LK,"iptx","MN:iptx"$ and $LK,"ipty","MN:ipty"$ are the text column and row of the input ptr.  See $LK-A,"::/TempleOS/Demo/Games/Maze.CPP"$.
-
-You can make the input ptr snap to a grid by adjusting $FG,4$Fs->snap$FG$.

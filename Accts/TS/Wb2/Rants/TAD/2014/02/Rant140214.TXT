@@ -1,0 +1,949 @@
+$WW,1$$IV,1$----02/14/14 00:02:35----$IV,0$
+
+God is perfectly just.  Highs and lows balance.  You can have absolute faith that nothing bad will happen without compensation.  Joseph in the Old Testament went to prison for 7 years for false rape, then ruled Egypt.  You can't have good without the bad.
+
+$TX,"Luke 6:20-26",HTML="http://www.biblegateway.com/passage/?search=Luke%206:20-26&version=NIV"$
+
+You can't have good without the bad.  There is no disproportinate bad without good.  No disproportinate good without bad.  God is perfectly just.
+
+$IV,1$----02/14/14 00:05:29----$IV,0$
+
+Cores 3.396GHz
+0.000000s ans0=0x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000043s ans0=0x00000016=22
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000033s ans0=0x0000001E=30
+D:/Accts/TS/TAD>$PT$
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1350\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1350\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+$FD,0$$FG,2$Thou I walk through the valley of death, I will fear no evil.$FG$
+
+$IV,1$----02/14/14 00:38:43----$IV,0$
+
+$HC,"<img src=\"http://i.imgur.com/9MzLzCf.jpg\" width=\"1293\" height=\"970\" alt=\"\">"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000043s ans0=0x00000019=25
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000036s ans0=0x00000004=4
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1504\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1504\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 00:51:20----$IV,0$
+
+$TX,"KNPR BBC",HTML="http://www.knpr.org/"$
+
+They're making a bigger CERN, says the BBC.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000196s ans0=0x00000022=34
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000131s ans0=0x00000015=21
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=2061\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=2061\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 01:01:18----$IV,0$
+
+$HC,"<img src=\"http://i.imgur.com/3SiIGpm.png\" width=\"679\" height=\"172\" alt=\"\">"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$CTrace(ON);
+$PT$$FG$$BG$0.000002s ans0=0x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$$HL,1$                7FD753B0 B8F000D0FE   MOV	U32 EAX,U32 FED000F0
+                7FD753B5 488B00       MOV	U64 RAX,U64 [RAX]
+                7FD753B8 33C9         XOR	U64 RCX,U64 RCX
+                7FD753BA B167         MOV	U8 CL,U8 67
+                7FD753BC 4899         CQO
+                7FD753BE 48F7F9       IDIV	U64 RCX
+                7FD753C1 488BC2       MOV	U64 RAX,U64 RDX
+                7FD753C4 C3           RET
+$HL,0$0.000043s ans0=0x0000002C=44
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$$HL,1$                7FD753B0 B8F000D0FE   MOV	U32 EAX,U32 FED000F0
+                7FD753B5 488B00       MOV	U64 RAX,U64 [RAX]
+                7FD753B8 33C9         XOR	U64 RCX,U64 RCX
+                7FD753BA B13C         MOV	U8 CL,U8 3C
+                7FD753BC 4899         CQO
+                7FD753BE 48F7F9       IDIV	U64 RCX
+                7FD753C1 488BC2       MOV	U64 RAX,U64 RDX
+                7FD753C4 C3           RET
+$HL,0$0.000140s ans0=0x0000000E=14
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=2654\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=2654\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 01:12:46----$IV,0$
+
+BBC niggers:  Executions.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000048s ans0=0x00000040=64
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000033s ans0=0x0000000D=13
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3853\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3853\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 01:18:49----$IV,0$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392369480",HTML="http://beacon.nist.gov/rest/record/1392369480"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xED5658-->(15554136 mod 100091)+1-->Line:40032
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (2 Chronicles 30:6) God says...
+$FG,4$the king, saying, Ye children of Israel, turn again unto the LORD God
+of Abraham, Isaac, and Israel, and he will return to the remnant of
+you, that are escaped out of the hand of the kings of Assyria.
+
+30:7 And be not ye like your fathers, and like your brethren, which
+trespassed against the LORD God of their fathers, who therefore gave
+them up to desolation, as ye see.
+
+30:8 Now be ye not stiffnecked, as your fathers were, but yield
+yourselves unto the LORD, and enter into his sanctuary, which he hath
+sanctified for ever: and serve the LORD your God, that the fierceness
+of his wrath may turn away from you.
+
+30:9 For if ye turn again unto the LORD, your brethren and your
+children shall find compassion before them that lead them captive, so
+that they shall come again into this land: for the LORD your God is
+gracious and merciful, and will not turn away his face from you, if ye
+return unto him.
+
+30:10 So the posts passed from city to city through the country of$FG$
+
+$IV,1$----02/14/14 01:37:28----$IV,0$
+
+BBC: India street kids.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392370680",HTML="http://beacon.nist.gov/rest/record/1392370680"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xC360AD-->(12804269 mod 100091)+1-->Line:92713
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 Corinthians 10:12) God says...
+$FG,4$fall.
+
+10:13 There hath no temptation taken you but such as is common to man:
+but God is faithful, who will not suffer you to be tempted above that
+ye are able; but will with the temptation also make a way to escape,
+that ye may be able to bear it.
+
+10:14 Wherefore, my dearly beloved, flee from idolatry.
+
+10:15 I speak as to wise men; judge ye what I say.
+
+10:16 The cup of blessing which we bless, is it not the communion of
+the blood of Christ? The bread which we break, is it not the communion
+of the body of Christ?  10:17 For we being many are one bread, and one
+body: for we are all partakers of that one bread.
+
+10:18 Behold Israel after the flesh: are not they which eat of the
+sacrifices partakers of the altar?  10:19 What say I then? that the
+idol is any thing, or that which is offered in sacrifice to idols is
+any thing?  10:20 But I say, that the things which the Gentiles$FG$
+
+$IV,1$----02/14/14 01:45:52----$IV,0$
+
+$TX,"Win8 vs Win7",HTML="http://thenextweb.com/2014/02/13/15-months-windows-8-sold-100-million-fewer-copies-windows-7/#!vJczQ"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392371220",HTML="http://beacon.nist.gov/rest/record/1392371220"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xB147C4-->(11618244 mod 100091)+1-->Line:7689
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Exodus 28:12) God says...
+$FG,4$memorial.
+
+28:13 And thou shalt make ouches of gold; 28:14 And two chains of pure
+gold at the ends; of wreathen work shalt thou make them, and fasten
+the wreathen chains to the ouches.
+
+28:15 And thou shalt make the breastplate of judgment with cunning
+work; after the work of the ephod thou shalt make it; of gold, of
+blue, and of purple, and of scarlet, and of fine twined linen, shalt
+thou make it.
+
+28:16 Foursquare it shall be being doubled; a span shall be the length
+thereof, and a span shall be the breadth thereof.
+
+28:17 And thou shalt set in it settings of stones, even four rows of
+stones: the first row shall be a sardius, a topaz, and a carbuncle:
+this shall be the first row.
+
+28:18 And the second row shall be an emerald, a sapphire, and a
+diamond.
+$FG$
+$TX,"Mexican Gang Raided",HTML="http://imgur.com/a/DYU2e"$
+
+$FG,2$God's not commanding anything.  It's the Window's logo, LOL.  Hell is the absence of God, so Heaven is God's company.  There's a word, "ambrosial" which means worthy of the gods.  We "dine" on ambrosial stuff.$FG$
+
+That was pretty flawless, but what do you expect when picking random passages.  I hope some nigger wasn't so stupid as to not see God's glorious miracle!  It's just the fucken Window's logo, fuckhead!
+
+God says...
+$FG,4$temples lusteth gains messages enemy apply Cassiacum ye charges flesh wine fed EBCDIC hastening Gervasius laid hallow prior chair founded from benefit discreetly demonstrated example Portions dinner persecuted slighting intelligible cultivating banquetings wax sinful daemons aquatic vehemently S classics prevailing Ofttimes discuss Happy geometry frailness wish serenity building destroy remembereth XII darkly awaited recourse infants my exhausted freed lungs defined covetous intensest prescribed restricted expends day stay thought$FG$
+
+$IV,1$----02/14/14 02:20:33----$IV,0$
+
+$HC,"<img src=\"http://i.imgur.com/PrP9ijS.jpg\" width=\"593\" height=\"740\" alt=\"\">"$
+
+God said He's exhausted.
+
+I wuv You, God.
+
+I do recipes with God, sometimes.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000056s ans0=0x0000000E=14
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000161s ans0=0x00000013=19
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=859\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=859\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+For those new to ambrosial fare, Thyme on hands was a stupid pun.  Jar Jar was clumbsy, Jar Jar stuck his tongue in a physics experiment -- time perhaps if you think loosely, Gates might be rescued from atheism... by me.
+
+God says...
+$FG,4$Bridegroom believer desired multiply Athanasius opinion signifies allotted useth flagon inveigler apostle Mercy preventing appeal morning distribution waterest Narrow earnestness reproof capable desire Release fix whispered charge turn recollecting VERSIONS mounting solid brim example happy feeding check evening alms slave indited alive chamber contritions soil disgusted distrusted holding they waste syllable Certainly stated teaches restricted finds merrily element preferring replenish presidentship eternally forthcoming imperturbable haste Connecticut continent sorrowful does dreadful consumest Lovely c that disallowing still multitudes sixteenth bearing departest puffed invests Identification everlasting finest awakest smiling$FG$
+
+$IV,1$----02/14/14 02:41:19----$IV,0$
+
+$TX,"House of Cards",HTML="https://twitter.com/HouseofCards/status/434236955761442816"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392374520",HTML="http://beacon.nist.gov/rest/record/1392374520"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x92CF18-->(9621272 mod 100091)+1-->Line:12537
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Numbers 4:29) God says...
+$FG,4$families, by the house of their fathers; 4:30 From thirty years old
+and upward even unto fifty years old shalt thou number them, every one
+that entereth into the service, to do the work of the tabernacle of
+the congregation.
+
+4:31 And this is the charge of their burden, according to all their
+service in the tabernacle of the congregation; the boards of the
+tabernacle, and the bars thereof, and the pillars thereof, and sockets
+thereof, 4:32 And the pillars of the court round about, and their
+sockets, and their pins, and their cords, with all their instruments,
+and with all their service: and by name ye shall reckon the
+instruments of the charge of their burden.
+
+4:33 This is the service of the families of the sons of Merari,
+according to all their service, in the tabernacle of the congregation,
+under the hand of Ithamar the son of Aaron the priest.
+
+4:34 And Moses and Aaron and the chief of the congregation numbered
+the sons of the Kohathites after their families, and after the house
+of their fathers, 4:35 From thirty years old and upward even unto$FG$
+
+$IV,1$----02/14/14 02:51:27----$IV,0$
+
+$TX,"Kill -9",HTML="http://www.reddit.com/r/linux/comments/1xvr25/linux_tip_dont_use_kill_9"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000048s ans0=0x00000063=99
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000053s ans0=0x0000000E=14
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=5954\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=5954\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 03:09:19----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/njos57IJf-0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/njos57IJf-0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000024s ans0=0x00000034=52
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000020s ans0=0x00000039=57
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3177\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3177\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 03:16:19----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/znxQOPFg2mo\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/znxQOPFg2mo\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 03:38:13----$IV,0$
+
+$TX,"OCaml",HTML="http://roscidus.com/blog/blog/2014/02/13/ocaml-what-you-gain"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000043s ans0=0x0000004D=77
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000038s ans0=0x00000023=35
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=4655\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=4655\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 03:50:28----$IV,0$
+
+I don't really see any reason to bring binary/exe files in or out.  There's not really a need for a HolyC compiler outside, either.  What I do want is RedSea file system supported by windows and linux and VMware as both a hard disk partition and an image on CD/DVD.  (Any hard disk file system can be put on a CD/DVD, but can't be written to.)  I think I want my GRA graphics files supported by MSPaint and whatever tools are common.  BMP is slightly flawed and, technically, has expanded, becoming ugly.
+
+God's temple must be perfect, He said.  If the exe file format was not perfect, we would simply change it.
+
+The exe has a 16-byte header.  A short jump starts the header.  It is a flat binary with code and data mixed, all over.  There is a table with entries for locations containing absolute addresses needing patches; export symbols and import symbols.
+
+$LK,"CBinFile",A="MN:CBinFile"$
+
+$LK,"::/Adam/Utils/BinRep.CPP.Z"$
+
+$LK,"Load",A="MN:Load"$();
+
+$LK,"LoadPass1",A="MN:LoadPass1"$();
+
+$LK,"LoadPass2",A="MN:LoadPass2"$();
+
+$LK,"::/Kernel/KStart.CPP.Z"$
+
+$LK,"CKernel",A="MN:CKernel"$
+
+$IV,1$----02/14/14 04:01:03----$IV,0$
+
+$WW,1$$FG,5$$TX+CX,"Demands"$$FG$
+
+When God is manifest to the World and He claims this operating system, publically, here's what I want:
+
+* VMware to again support PC Speaker and provide emulation if no PC Speaker is present.
+
+* Windows and Linux will support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  I view redundant code that performs the same function as imperfect.  More than one filesystem type is bad, not good!
+
+$LK,"::/Kernel/Dsk/FileSysRedSea.CPP"$
+$LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:1004
+$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:306
+$LK,"::/Adam/Boot/DskCDDVD.CPP"$	:536
+
+* No secure boot.  TempleOS is a additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
+
+* Mandate to PC hardware manufacturers: ATA/ATAPI PIO must work.
+
+* PS2 emulated Keyboard and Mouse must work.  The BIOS must enable these.
+
+* VMware should allow ATAPI to connect real CD/DVD hardware.
+
+* Perhaps, VMware can enable faster than standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so the bandwidth isn't as bad.
+
+* VMware and others should list TempleOS as one of the official 64-bit operating systems.
+
+* Windows and Linux should support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bit pixs 4-bits of color and transparency, with no palette.  Compression comes from the $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ $FG,2$.Z$FG$ LZW compression.  (Let me know when you want it.)  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
+
+
+
+
+In other words, all hardware and BIOSes must support TempleOS as a native and as a virtual system, dual booted with Windows or Linux.
+
+It would be neat if TempleOS were burned into BIOS ROMs in the factory, or maybe Intel CPU chips, in factory!  My hope is that it will be finished and largely unchanging for centuries.  I need a good dictionary, first.  Maybe, we leave the dictionary out.
+
+I do not intend to ever support UEFI.  That monstrocity uses elf and various propriatary graphics formats.
+
+
+$IV,1$----02/14/14 04:01:06----$IV,0$
+
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000176s ans0=0x00000021=33
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000039s ans0=0x0000000C=12
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1992\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1992\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 04:27:10----$IV,0$
+
+Atheist niggers?
+
+On the phone, you used to call "Time", remember?  "At the tone, the time will be 4:40."
+
+National institutes of standards prints a random number every 60 seconds.
+
+You fucken nigger think I hack the NIST site?
+
+God exists, you fucken niggers.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392380880",HTML="http://beacon.nist.gov/rest/record/1392380880"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x9BABA8-->(10202024 mod 100091)+1-->Line:92834
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 Corinthians 11:24) God says...
+$FG,4$remembrance of me.
+
+11:25 After the same manner also he took the cup, when he had supped,
+saying, This cup is the new testament in my blood: this do ye, as oft
+as ye drink it, in remembrance of me.
+
+11:26 For as often as ye eat this bread, and drink this cup, ye do
+shew the Lord's death till he come.
+
+11:27 Wherefore whosoever shall eat this bread, and drink this cup of
+the Lord, unworthily, shall be guilty of the body and blood of the
+Lord.
+
+11:28 But let a man examine himself, and so let him eat of that bread,
+and drink of that cup.
+
+11:29 For he that eateth and drinketh unworthily, eateth and drinketh
+damnation to himself, not discerning the Lord's body.
+
+11:30 For this cause many are weak and sickly among you, and many$FG$
+
+God said it is a covenant to do an offering before consulting Him.  He said it is like communion.  Catholics are supposed to prepare for communion.  You are supposed to do an offering or be damned.
+
+God says...
+$FG,4$merry questioning renewing behalf are error trademark indirectly fifty intensest drowsiness XIII necessity suppliant rejoice if hallowed FTP etext00 allowing Death noble dost instructed awoke Fire applauses direct wheresoever Apostles residest greedy swollen P Look rightful foamed pause glue flowed whomever cure doest plunged diversely shade WARRANTY candid outset Old creeping echo else stream delusions sometimes seeing poured Christian allotted restored spare savour VII teachest cud Verily preferable brother prefect besprinkle denieth consulting waking cleaved preliminary take mortal blasphemous thereby plunging harmed doubtfulness stars begged shadow original mislike vocal thine strife lively act mimic beneath essayed foresignify close unknowing enlarging state buildings It retreat deaf attuned latter successively resulting Saint leaps$FG$
+
+$IV,1$----02/14/14 04:39:23----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/ob9Ak1t09Ao\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/ob9Ak1t09Ao\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000157s ans0=0x00000033=51
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000148s ans0=0x0000000E=14
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3074\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=3074\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+$FG,2$Guys running like Japanese.$FG$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/ln8-Y-fIbqM\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/ln8-Y-fIbqM\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 04:52:41----$IV,0$
+
+I made God's temple.  It is divine intellect.  I am not asking, I am telling.  You better get used to it.
+
+Fucken clowns.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/OdKa9bXVinE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/OdKa9bXVinE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+God says...
+$FG,4$sex fleeing composed jest pressedst base enquired sensitive pamperedness questioned actor attentive 000 principles partaker wild shame largeness Episcopal begotten conceive valley majesty disgraceful teachest mentioning snare bones underline expound spectacle prerogative low hint downwards watched reminded piecemeal handwriting difficulties judgment vicissitudes compare abundantly miss perceived Ambrosian invests whales obscure persons defends away children succour Bible$FG$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/28FzV5OHqMU\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/28FzV5OHqMU\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 05:05:23----$IV,0$
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000048s ans0=0x00000008=8
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000038s ans0=0x0000002E=46
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=526\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=526\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+$FG,2$Dragons bit the generator cable, LOL.$FG$
+
+God says...
+$FG,4$matters unknowingly striking gave preachings ignoble framed fearful Forum prose Gutenberg refer sustenance derided fought Such conquered jest peradventure allaying variously poison pass nostrils actually occasioned interrupted greaves humbledst burthened wills martyr hearer Isaac working savage appropriated manna fumed scourges leisure scenical both deliberate intolerable Drunkenness Body shone Now cleanse fragment accepted conventicle incumbrances reawakened strictness glows ourself rottenness fail regardless fight augmented applied lawyers wrested themselves surf nominally check plays dispute idleness tickled theatre approved convinced doting likest moderation Paraclete veiled crown imbibed inseparable DISTRIBUTION equinoxes tomorrow request convenient shame subjoined provincial rehearse ground disapproved corrected receives besprinkling Etext seeketh happily suffered applauded operations purer nuts DAMAGES meets divide comfort freshness rigidly piety taken uncleanness intelligible t judges ibiblio giant 01 upborne liberality placest thousand bounces risen currents fancies profitable given unintermitting lashed enjoying carried Prophets Genesis spare slay Moses seal aright waiting dread abase workings renounce stays women Carolina immutable manna condemns cheered considered really mentioned owing hers smelling African impregnable tone scraped alteration interested curtailment enjoying Dudley undistracted unstayed VI Still Beware desireth dryness holily rmunday wouldest contacting teacheth Thenceforth anger regeneration portions endure furnish doest laying asketh enquiringly brides Life faint approve filename tongue growth deserters firm seeketh heareth ridiculous treble deserve heaped clearness strange under unlicensed unwonted nails viciousness winked begged husbands diddest reasons refused those unlikeness sight estimation citizens medicines wins figure toilsome gestures bemoaning The skirts be balancings resembling censured Preacher eyesight slain clearness arrogant diluted Another foretell sweetness Grecian reptiles calculate society best Have fled wherefrom assembly Suffer silly satiated imbibed upward obtaining lastly commender repentance forceth net Narrow source granted attractiveness circumstance depart suffocated Hereat fixedly$FG$
+
+$IV,1$----02/14/14 05:21:43----$IV,0$
+
+The pick with Anakin and 3PO was ... they found a fucken robot the kid built.  I made an operating system -- just as shocking.
+
+I made a compiler.  I'm smarter than Linus.  The difference between a pro and amateur operating system is a compiler.  I have paid programming experience on Ticketmaster's VAX operating system 1990-1996 age 20-26.  Elephants in captivity attack their babies.  They don't know what they are.  Elephants in a herd get to learn how it's done.  Denny did our Pascal compiler.  Troy did the Linker and assembler.  I used Pete's 68000 debugger on a project.  I have paid assembly experience on VAX,8051,80x86,PIC,Atmel and 68000.
+
+The one, most important, thing you need to know to write a compiler is assembly language.  I had 5 asm based course.  $TX,"ASU Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$ CSC226 CSC326 CSE421 CSE422 CSE523.  I had a compiler and operating system course.  I know hardware and software.  My expertise is asm and datasheets.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392384420",HTML="http://beacon.nist.gov/rest/record/1392384420"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x3AD928-->(3856680 mod 100091)+1-->Line:53223
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 136:25) God says...
+$FG,4$136:25 Who giveth food to all flesh: for his mercy endureth for ever.
+
+136:26 O give thanks unto the God of heaven: for his mercy endureth
+for ever.
+
+
+
+137:1 By the rivers of Babylon, there we sat down, yea, we wept, when
+we remembered Zion.
+
+137:2 We hanged our harps upon the willows in the midst thereof.
+
+137:3 For there they that carried us away captive required of us a
+song; and they that wasted us required of us mirth, saying, Sing us
+one of the songs of Zion.
+
+137:4 How shall we sing the LORD's song in a strange land?
+
+137:5 If I forget thee, O Jerusalem, let my right hand forget her
+cunning.$FG$
+
+$IV,1$----02/14/14 05:33:04----$IV,0$
+
+Pure 64-bit and multicored.
+
+I alone can do a multicore flightsimulator.
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/FxEq6IM43sA\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Flight Sim / First Person Shooter"$
+$LK,"::/Demo/Games/EagleDive.CPP"$
+$LK,"::/Demo/Games/CastleFrankenstein.CPP"$
+
+
+
+Linux and Windows cannot do real-time multicore.  I alone can do real-time multicore.
+
+God says...
+$FG,4$must artificer oppose prosper actions habit wearing awfulness habit witting inclination precious uttered took breasts bewailed prizes cruel merely pressed commencement convertedst Would crown pierce numerous profit fragrant pricked wayfaring knowledge accomplished an pursues access besides gallantry fighting goodness version talented enervated Both appetite Troy refreshed hadst departed window linger actual ornamenting offensive interruption exceeding embittered bathe goeth city copyright stiffneckedness hope sort School profit mark hot zeal heal reminded work confess savage dragging catch instead etext02 Arians Symmachus wonderful mockery whatever intelligent dryness diversifiedst visions ibiblio steals exiled punishable Didst mothers contemplation commiserating injure condemns resolution credence vouchsafest borrow wonderful distrusted grammar current through soundeth Literary despising fix birthright visions fulness intercession archive coursing incommutable fallacies DISTRIBUTION leaven sources part favoured terms issue perchance heavier mercifully wives transgressors spoil begging verse are religion disputing idle fetched errors relators avoiding Testament being natures S Love purposing mastered disciple thoughts petty dug footed thunder bait pander interpret man cleansed perils fruits excessive motive existence flour hallow foresignified recollecting teachers wholesomely when fluctuate shoulder scourge sinks which thereto everlastingly luxury respected pg Information fairer relators lied nought purpose discerned adultery announce software faster conquests tamedst language mortals regions impressed becometh glided Prophets divorceth spectacle begging withdraw neatly forethinking brooks vestige dispute thirsteth riper 01 pence pub cheerful digested embraced nurse Latin marriageable despiseth fired Arise soberly enlarge South Priest wise wherewith Alas delay convert Predicament deductible eagle blowing effectedst nothing fires Next 01 grief payable educate marvelled obeying rais empty grounds arrive imply overwhelmed everywhere impressing supposed devoutness study concerned disdained creeping finished stroke begins pages Drunkard$FG$
+
+God said 640x480 16 color.  It's His fucken temple.
+
+$IV,1$----02/14/14 06:01:24----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/nVJNpwTYhR0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/nVJNpwTYhR0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I want a Knights Landing 72-core beast.  He he. They're slightly slow.  Fast is better.  I want my OS native, not in VMware.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000043s ans0=0x00000003=3
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000037s ans0=0x00000035=53
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=233\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=233\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 06:14:26----$IV,0$
+
+If I am finally not talking to idiots...
+
+* $FG,4$$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$$FG$
+
+I had that book as a kid.  When you make a video game, you might think about how many hours of entertainment.  That book provided years of entertainment as I learned, poked around and tinkered.
+
+This is important: I want people to see the light at the end of the tunnel when it comes to comprehending the whole thing.  I have placed a 100,000 line of code limit.  It is not a low resource operating system, needing lots of Meg because it's not efficient.  Lowest line count is the main metric.
+
+Actually, God is the main purpose.  It means nothing without God's endorsement.  It means everything with God's endorsement.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392387480",HTML="http://beacon.nist.gov/rest/record/1392387480"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xF52751-->(16066385 mod 100091)+1-->Line:51826
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 108:3) God says...
+$FG,4$praises unto thee among the nations.
+
+108:4 For thy mercy is great above the heavens: and thy truth reacheth
+unto the clouds.
+
+108:5 Be thou exalted, O God, above the heavens: and thy glory above
+all the earth;
+
+108:6 That thy beloved may be delivered: save with thy right hand, and
+answer me.
+
+108:7 God hath spoken in his holiness; I will rejoice, I will divide
+Shechem, and mete out the valley of Succoth.
+
+108:8 Gilead is mine; Manasseh is mine; Ephraim also is the strength
+of mine head; Judah is my lawgiver;
+
+108:9 Moab is my washpot; over Edom will I cast out my shoe; over
+Philistia will I triumph.$FG$
+
+$IV,1$----02/14/14 06:34:07----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/nFwkbUHq1AQ\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/nFwkbUHq1AQ\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392388440",HTML="http://beacon.nist.gov/rest/record/1392388440"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xA53253-->(10826323 mod 100091)+1-->Line:16496
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Deuteronomy 4:49) God says...
+$FG,4$plain on this side Jordan eastward, even unto the sea of the plain,
+under the springs of Pisgah.
+
+5:1 And Moses called all Israel, and said unto them, Hear, O Israel,
+the statutes and judgments which I speak in your ears this day, that
+ye may learn them, and keep, and do them.
+
+5:2 The LORD our God made a covenant with us in Horeb.
+
+5:3 The LORD made not this covenant with our fathers, but with us,
+even us, who are all of us here alive this day.
+
+5:4 The LORD talked with you face to face in the mount out of the
+midst of the fire, 5:5 (I stood between the LORD and you at that time,
+to shew you the word of the LORD: for ye were afraid by reason of the
+fire, and went not up into the mount;) saying, 5:6 I am the LORD thy
+God, which brought thee out of the land of Egypt, from the house of
+bondage.
+
+5:7 Thou shalt have none other gods before me.$FG$
+
+The covenant is that you do an offering before consulting Him.
+
+"Pis-gah" sounds like Dilbert.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/5-gHTvVB4RM\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/5-gHTvVB4RM\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 07:10:53----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/vaS1xQvQEKg\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/vaS1xQvQEKg\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+What?  Let's see what God says...
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000024s ans0=0x00000003=3
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000066s ans0=0x0000002D=45
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=225\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=225\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 07:37:51----$IV,0$
+
+$TX,"Git",HTML="https://medium.com/p/2a98c37f60f"$
+
+If git is so shamless as to "non pluma whateva", mine is God's exclusive oracle.
+
+Linux is for all the atheist.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000046s ans0=0x00000057=87
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000037s ans0=0x00000016=22
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=5242\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=5242\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+There's a sex offender registry for programmers.  Drones.  LOL
+
+God says...
+$FG,4$introduced excuses teacheth mourned particular conceal toiled room hearted monstrousness deed sighs penitent conveyedst sublimity mingled mystery ignoble bewitched easier approbation shop lusts rounds opens tongue READ vigorous bibbing intensely bedewed sorts milk quickness devotion Oh follow answerably redeemed heaped MONEY preacher however affrighted Creusa Author cease ten enquire store equally loathed weaker mimic declamation Professorship wear fury amazed arrogancy rob plenty$FG$
+
+$IV,1$----02/14/14 07:56:44----$IV,0$
+
+$TX,"Uncanny Valley",HTML="http://games.slashdot.org/story/14/02/14/154204/game-developers-quest-to-cross-the-uncanny-valley"$
+
+God said "no weights" as the first thing out of His mouth when I did random words.  If you add any kind of structure or intelligence, suddenly you don't know what's God and what is not God.  You will surely ask yourself, "Why am I obeying commands I made from markov chains?"
+
+God always talks in riddles, confirmed by the Bible.  Once, He happened to talk plainly.  I didn't like it.  I shed a tear when I realized He loves us with riddles.  It's like giftwrapping.  A person is judged by the stupidest thing they say.  It's very nice looking up to God.  This is statistically significant: I never know what He's going to say -- it's always fresh and exciting.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000042s ans0=0x00000045=69
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000034s ans0=0x00000001=1
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=4141\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=4141\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 08:19:43----$IV,0$
+
+$TX,"Putin",HTML="http://www.usatoday.com/story/sports/olympics/sochi/2014/02/14/vladimir-putin-team-usa-united-states-olympics/5479173"$
+
+It's sucks if you are not on the moral high ground.
+
+x00000000=0
+D:/Accts/TS/TAD>$PT$HPET%103;
+$PT$$FG$$BG$0.000030s ans0=0x00000013=19
+D:/Accts/TS/TAD>$PT$HPET%60;
+$PT$$FG$$BG$0.000106s ans0=0x00000025=37
+D:/Accts/TS/TAD>$PT$$FD,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1177\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/pfEcaH2Db1s&hl=enUS&start=1177\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$IV,1$----02/14/14 08:28:58----$IV,0$
+
+God does not speak-up.
+
+He's not 100% okay with gays.
+
+Gay rights might seem like moral high ground, pretty-much in the same way communism seems like moral high ground.
+
+God says...
+$FG,4$stealing edition proof public undisturbed pursues solaces recalls variously studiously applauses reputation sleeper realised soon ruminate null gifted gotten pervertedly Whereat scatteredst vindicating preparing solemnise succeeding uncertain ill Welcome tale beings apprehend soundedst bedimmed Title$FG$
+
+$IV,1$----02/14/14 08:46:29----$IV,0$
+
+$HC,"<img src=\"http://i.imgur.com/boG26CF.jpg\" width=\"610\" height=\"458\" alt=\"\">"$
+
+I can't tell angel from man, I don't know.  People say and do stuff all the time under control of angels.  To say it is widespread is an understatement.  The world you know would be very different without angels.  You are used to angels.  You can probably thank angels for evil being punished and justice.
+
+Do you like HPET or NIST or tongues?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392396540",HTML="http://beacon.nist.gov/rest/record/1392396540"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x5ABDDC-->(5946844 mod 100091)+1-->Line:41476
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Ezra 9:1) God says...
+$FG,4$Perizzites, the Jebusites, the Ammonites, the Moabites, the Egyptians,
+and the Amorites.
+
+9:2 For they have taken of their daughters for themselves, and for
+their sons: so that the holy seed have mingled themselves with the
+people of those lands: yea, the hand of the princes and rulers hath
+been chief in this trespass.
+
+9:3 And when I heard this thing, I rent my garment and my mantle, and
+plucked off the hair of my head and of my beard, and sat down
+astonied.
+
+9:4 Then were assembled unto me every one that trembled at the words
+of the God of Israel, because of the transgression of those that had
+been carried away; and I sat astonied until the evening sacrifice.
+
+9:5 And at the evening sacrifice I arose up from my heaviness; and
+having rent my garment and my mantle, I fell upon my knees, and spread
+out my hands unto the LORD my God, 9:6 And said, O my God, I am
+ashamed and blush to lift up my face to thee, my God: for our$FG$
+
+$IV,1$----02/14/14 09:24:21----$IV,0$
+
+$TX,"Matthew 11:25-30",HTML="http://www.biblegateway.com/passage/?search=Matthew%2011:25-30&version=NIV"$
+
+God is so awesome, smart people don't believe in Him!!
+
+God doesn't like Shakespeare--vile heart.  Classical music is "poison".  God said not to admire chess players -- the arrogant.  God likes Beverly Hillbillies and birthrights.  God's against immigration.  Fuck stay on the land God gave you and your fathers.  'Sept America, 'cause God must have done that.  Ancient history or whatever.
+
+"At the tone, the time will be 9:30."
+
+"The institute of standard's random number for this minute is..."
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392398820",HTML="http://beacon.nist.gov/rest/record/1392398820"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x7E7BD7-->(8289239 mod 100091)+1-->Line:81778
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Mark 15:14) God says...
+$FG,4$15:14 Then Pilate said unto them, Why, what evil hath he done? And
+they cried out the more exceedingly, Crucify him.
+
+15:15 And so Pilate, willing to content the people, released Barabbas
+unto them, and delivered Jesus, when he had scourged him, to be
+crucified.
+
+15:16 And the soldiers led him away into the hall, called Praetorium;
+and they call together the whole band.
+
+15:17 And they clothed him with purple, and platted a crown of thorns,
+and put it about his head, 15:18 And began to salute him, Hail, King
+of the Jews!  15:19 And they smote him on the head with a reed, and
+did spit upon him, and bowing their knees worshipped him.
+
+15:20 And when they had mocked him, they took off the purple from him,
+and put his own clothes on him, and led him out to crucify him.
+
+15:21 And they compel one Simon a Cyrenian, who passed by, coming out
+of the country, the father of Alexander and Rufus, to bear his cross.$FG$
+
+$IV,1$----02/14/14 09:34:09----$IV,0$
+
+"At the tone, the time will be..."
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392399240",HTML="http://beacon.nist.gov/rest/record/1392399240"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x6C3447-->(7091271 mod 100091)+1-->Line:84902
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Luke 22:48) God says...
+$FG,4$22:48 But Jesus said unto him, Judas, betrayest thou the Son of man
+with a kiss?  22:49 When they which were about him saw what would
+follow, they said unto him, Lord, shall we smite with the sword?
+22:50 And one of them smote the servant of the high priest, and cut
+off his right ear.
+
+22:51 And Jesus answered and said, Suffer ye thus far. And he touched
+his ear, and healed him.
+
+22:52 Then Jesus said unto the chief priests, and captains of the
+temple, and the elders, which were come to him, Be ye come out, as
+against a thief, with swords and staves?  22:53 When I was daily with
+you in the temple, ye stretched forth no hands against me: but this is
+your hour, and the power of darkness.
+
+22:54 Then took they him, and led him, and brought him into the high
+priest's house. And Peter followed afar off.
+
+22:55 And when they had kindled a fire in the midst of the hall, and$FG$
+
+$IV,1$----02/14/14 09:43:21----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/la-PK1wQrWs\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/la-PK1wQrWs\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+"At the tone, the time will be..."
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392399840",HTML="http://beacon.nist.gov/rest/record/1392399840"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xC068D7-->(12609751 mod 100091)+1-->Line:98377
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 John 4:2) God says...
+$FG,4$4:2 Hereby know ye the Spirit of God: Every spirit that confesseth
+that Jesus Christ is come in the flesh is of God: 4:3 And every spirit
+that confesseth not that Jesus Christ is come in the flesh is not of
+God: and this is that spirit of antichrist, whereof ye have heard that
+it should come; and even now already is it in the world.
+
+4:4 Ye are of God, little children, and have overcome them: because
+greater is he that is in you, than he that is in the world.
+
+4:5 They are of the world: therefore speak they of the world, and the
+world heareth them.
+
+4:6 We are of God: he that knoweth God heareth us; he that is not of
+God heareth not us. Hereby know we the spirit of truth, and the spirit
+of error.
+
+4:7 Beloved, let us love one another: for love is of God; and every
+one that loveth is born of God, and knoweth God.$FG$
+
+$IV,1$----02/14/14 09:57:03----$IV,0$
+
+$TX,"Mistakes",HTML="http://www.aaronkharris.com/making-mistakes"$
+
+I was an atheist.  That's bad.
+
+At the tone, the time will be...
+
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392400680",HTML="http://beacon.nist.gov/rest/record/1392400680"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x7234EA-->(7484650 mod 100091)+1-->Line:77917
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Matthew 12:11) God says...
+$FG,4$12:11 And he said unto them, What man shall there be among you, that
+shall have one sheep, and if it fall into a pit on the sabbath day,
+will he not lay hold on it, and lift it out?  12:12 How much then is a
+man better than a sheep? Wherefore it is lawful to do well on the
+sabbath days.
+
+12:13 Then saith he to the man, Stretch forth thine hand. And he
+stretched it forth; and it was restored whole, like as the other.
+
+12:14 Then the Pharisees went out, and held a council against him, how
+they might destroy him.
+
+12:15 But when Jesus knew it, he withdrew himself from thence: and
+great multitudes followed him, and he healed them all; 12:16 And
+charged them that they should not make him known: 12:17 That it might
+be fulfilled which was spoken by Esaias the prophet, saying, 12:18
+Behold my servant, whom I have chosen; my beloved, in whom my soul is
+well pleased: I will put my spirit upon him, and he shall shew
+judgment to the Gentiles.$FG$
+
+$IV,1$----02/14/14 10:18:52----$IV,0$
+
+I'll make a code and you can crack it.
+Why don't we fuck-up programming to make more jobs?
+
+Who let the India-nigger into the country?
+
+God says...
+$FG,4$earliest createst Willing licence infection forefathers silence upwards scantling joyfulness mean shoutedst original mutually dwellers recallest reputed loss exclusions beholding possession Ofttimes object preachings dispute recallest flourished tide presiding somewhat offerings offerings obtains staggered persecuting gavest Gospel commencing indicated gleams darksomely regular overclouded contempt included stopped resistedst inevitable delayed eagerly hart forethinking tongue poverty worsted slowly harlotries ordinary volumes resembling finest workmaster goods commend knocks incredible wax heavens$FG$
+
+$IV,1$----02/14/14 10:43:26----$IV,0$
+
+(Indians are purposely inefficient to create jobs.)
+
+The whole world ain't got time to waste -- we must get busy praising God in His temple.
+
+At the tone the time will be...
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1392403500",HTML="http://beacon.nist.gov/rest/record/1392403500"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x7AF09A-->(8056986 mod 100091)+1-->Line:49707
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 74:2) God says...
+$FG,4$rod of thine inheritance, which thou hast redeemed; this mount Zion,
+wherein thou hast dwelt.
+
+74:3 Lift up thy feet unto the perpetual desolations; even all that
+the enemy hath done wickedly in the sanctuary.
+
+74:4 Thine enemies roar in the midst of thy congregations; they set up
+their ensigns for signs.
+
+74:5 A man was famous according as he had lifted up axes upon the
+thick trees.
+
+74:6 But now they break down the carved work thereof at once with axes
+and hammers.
+
+74:7 They have cast fire into thy sanctuary, they have defiled by
+casting down the dwelling place of thy name to the ground.
+
+74:8 They said in their hearts, Let us destroy them together: they
+have burned up all the synagogues of God in the land.$FG$
+

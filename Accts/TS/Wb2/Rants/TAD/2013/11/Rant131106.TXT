@@ -1,0 +1,1577 @@
+$WW,1$$IV,1$----11/06/13 00:27:42----$IV,0$
+
+* $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
+
+My compiler makes x86_64 machine code, not byte code.  Did you not know that a compiler parses and makes an intermediate code data structure?  What do you think an optimization stage works on?  After optimizing, it converts the intermediate code to output machine code.
+
+My compiler makes a stack machine intermediate code.  Most compilers make an abstract symbol tree intermediate code.
+
+God says...
+$FG,4$consecrate torrent Thence presuming idols Project contradict prayers feedeth makers hand unexpected fantastic therefrom casting tcosa10 tradition trample dog boastfulness baby museth all begat prolonged witness suppliant citizen whithersoever manners A maintainers advice plunging burnest Sacrifice 1739 hindrance confesseth last avenues satisfying prefer stretched dear$FG$
+
+$IV,1$----11/06/13 09:00:45----$IV,0$
+
+Yeah, I had a bug.  Nobody says anything.  100 bad downloads?
+
+Reality is broken.
+
+God is in control.
+
+God says...
+$FG,4$case citizen reawakened wronging Me docile Am rebuked proceed making Thanks prevented resurrection colouring CAN After spouts butler tone capacities moulded Hope babe Bridal achieve forbid organization Print crept distribution swiftness workmaster faced unhealthiness fixedly list contagion daily comfortest fifty bemoaned iniquity rule throne altered blush verses revolting incredible discovered hurriedly denoted dug blessest remember clothe circles revenge medium penally mutual heavy Me arrogant Will second natural wisely purchase acquire Sacraments preferred Whose wonderful fragrance graceful need early foreshow language verily approved unjust higher voice fore pierce distributed makest details unfailingly equity armed wanting endure exclusions longs$FG$
+
+$IV,1$----11/06/13 11:06:59----$IV,0$
+
+* $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
+
+Fucken niggers!  My compiler compiles $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ to x86_64 machine code.
+
+In the C/C++ language, a $FG,2$switch(i){}$FG$ statement checks for bounds on i, normally. Fucken niggers don't even know how it's coded with a jump table.  It has to limit bounds to be within the jmp table.  Mine has a $FG,2$nobound_switch(i){}$FG$ that does not bound check.  God damn, you fucken niggers.
+
+$FG,2$U0 Print(...)
+{
+  I64 i;
+  for (i=0;i<argc;i++)
+    "%d\n",i;
+}$FG$
+
+If you have a ... function, in HolyC there are system variables like $FG,1$this$FG$ in C++ called $FG,2$I64 argc$FG$, and $FG,2$I64 argv[]$FG$.
+
+God says...
+$FG,4$DISTRIBUTION mightier persevering waiting pairs protection excellence lessons variously surfeiting Latin nostrils made wills embrace here unable weigheth Which unresolved mentioned relating horns searched message 38655 placing male tides risk wills your mortality silly Ostia PROJECT Manichaean$FG$
+
+$IV,1$----11/06/13 11:18:03----$IV,0$
+
+When God is manifest to the World and He claims this operating system, here's what I want:
+
+1) VMware again supports PC Speaker and provides emulation if no PC Speaker.
+
+2) Windows and Linux support RedSea file system in place of FAT32 and ISO9660.  Then, I can remove FAT32 and ISO9660.  (I might want to change clusters to just blocks on RedSea.)
+
+3) Windows burns ISO files to CD/DVD-ROMS.
+
+4) No secure boot.
+
+5) ATA/ATAPI PIO must work
+
+6) PS2 emulated Keyboard and Mouse must work
+
+7) VMware should allow ATAPI to real hardware.
+
+8) Can VMware do faster than correct IN/OUT instruction timing for ATA/ATAPI PIO?
+
+In other words, all hardware and BIOSes support TempleOS as a native system or dual booted with Windows.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61853",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61853.p12"$.
+
+Line:41148
+God says...
+$FG,4$Babylon, the Chaldean, who destroyed this house, and carried the
+people away into Babylon.
+
+5:13 But in the first year of Cyrus the king of Babylon the same king
+Cyrus made a decree to build this house of God.
+
+5:14 And the vessels also of gold and silver of the house of God,
+which Nebuchadnezzar took out of the temple that was in Jerusalem, and
+brought them into the temple of Babylon, those did Cyrus the king take
+out of the temple of Babylon, and they were delivered unto one, whose
+name was Sheshbazzar, whom he had made governor; 5:15 And said unto
+him, Take these vessels, go, carry them into the temple that is in
+Jerusalem, and let the house of God be builded in his place.
+
+5:16 Then came the same Sheshbazzar, and laid the foundation of the
+house of God which is in Jerusalem: and since that time even until now
+hath it been in building, and yet it is not finished.
+
+5:17 Now therefore, if it seem good to the king, let there be search
+made in the king's treasure house, which is there at Babylon, whether$FG$
+
+$IV,1$----11/06/13 11:50:02----$IV,0$
+
+God says...
+$FG,4$odours vent answerably limits walk male assigned fountain careth Antony mortified briars abounded Furthermore withered existeth legally Neptune possession wild yea poet comprehended exude deal$FG$
+
+$IV,1$----11/06/13 11:54:51----$IV,0$
+
+Radio has woman praising chickens and roosters.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61869",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61869.p12"$.
+
+Line:69327
+God says...
+$FG,4$24:14 I the LORD have spoken it: it shall come to pass, and I will do
+it; I will not go back, neither will I spare, neither will I repent;
+according to thy ways, and according to thy doings, shall they judge
+thee, saith the Lord GOD.
+
+24:15 Also the word of the LORD came unto me, saying, 24:16 Son of
+man, behold, I take away from thee the desire of thine eyes with a
+stroke: yet neither shalt thou mourn nor weep, neither shall thy tears
+run down.
+
+24:17 Forbear to cry, make no mourning for the dead, bind the tire of
+thine head upon thee, and put on thy shoes upon thy feet, and cover
+not thy lips, and eat not the bread of men.
+
+24:18 So I spake unto the people in the morning: and at even my wife
+died; and I did in the morning as I was commanded.
+
+24:19 And the people said unto me, Wilt thou not tell us what these
+things are to us, that thou doest so?  24:20 Then I answered them, The
+word of the LORD came unto me, saying, 24:21 Speak unto the house of$FG$
+
+$IV,1$----11/06/13 12:11:29----$IV,0$
+
+God likes bears and elephants.
+
+I went looking for YouTube elephant videos.  There's a place called the elephant sanctuary.  It has old and grotesquely lame elephant.  Imagine a person with their elbow backward.  Fuuuck.  It figures -- some fucken liberal.  It just had to be that way.
+
+Just imagine if the Pope sat down to write a new Bible for the next two thousand years.  Fucken liberals.
+
+My moral compass is, "Does this glorify God, the Creator?"
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61880",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61880.p12"$.
+
+Line:5609
+God says...
+$FG,4$magicians of Egypt, they also did in like manner with their
+enchantments.
+
+7:12 For they cast down every man his rod, and they became serpents:
+but Aaron's rod swallowed up their rods.
+
+7:13 And he hardened Pharaoh's heart, that he hearkened not unto them;
+as the LORD had said.
+
+7:14 And the LORD said unto Moses, Pharaoh's heart is hardened, he
+refuseth to let the people go.
+
+7:15 Get thee unto Pharaoh in the morning; lo, he goeth out unto the
+water; and thou shalt stand by the river's brink against he come; and
+the rod which was turned to a serpent shalt thou take in thine hand.
+
+7:16 And thou shalt say unto him, The LORD God of the Hebrews hath
+sent me unto thee, saying, Let my people go, that they may serve me in
+the wilderness: and, behold, hitherto thou wouldest not hear.$FG$
+
+That's about shitting in your water supply.
+
+$IV,1$----11/06/13 12:18:28----$IV,0$
+
+God is not very much against homos.
+God said Solomon's 300 concubines He didn't care about.
+On remarriage, God said, "More babies".
+God said adultery can be okay.
+God said sperm/egg doners are adultery.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61881",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61881.p12"$.
+
+Line:1773
+God says...
+$FG,4$same is the father of the Moabites unto this day.
+
+19:38 And the younger, she also bare a son, and called his name
+Benammi: the same is the father of the children of Ammon unto this
+day.
+
+20:1 And Abraham journeyed from thence toward the south country, and
+dwelled between Kadesh and Shur, and sojourned in Gerar.
+
+20:2 And Abraham said of Sarah his wife, She is my sister: and
+Abimelech king of Gerar sent, and took Sarah.
+
+20:3 But God came to Abimelech in a dream by night, and said to him,
+Behold, thou art but a dead man, for the woman which thou hast taken;
+for she is a man's wife.
+
+20:4 But Abimelech had not come near her: and he said, LORD, wilt thou
+slay also a righteous nation?  20:5 Said he not unto me, She is my
+sister? and she, even she herself said, He is my brother: in the
+integrity of my heart and innocency of my hands have I done this.$FG$
+
+God says...
+$FG,4$clothed Electronic convey NO seats drink remorse turnest lawyer incorrect expose purposes punctuation storm each esteemed talkers almost character ungoverned iniquities enounce benefit modestly resistest castest deafen doing labourers affrighted clear likest grieving wicked warfare Frenzied thyself conspirators torment spreading IS savour motions undistracted continency impregnable perceiving unfailingly just abhor doleful casts severally courtesy links climb body Thence perished aught Never precious Baptism subjects depend puppies excellently height$FG$
+
+God is my confidante.
+My operating system, I wrote from scratch.
+
+$TX,"Skill Videos",HTML="http://imgur.com/a/VgLN9"$
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61882",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61882.p12"$.
+
+Line:70885
+God says...
+$FG,4$40:31 And the arches thereof were toward the utter court; and palm
+trees were upon the posts thereof: and the going up to it had eight
+steps.
+
+40:32 And he brought me into the inner court toward the east: and he
+measured the gate according to these measures.
+
+40:33 And the little chambers thereof, and the posts thereof, and the
+arches thereof, were according to these measures: and there were
+windows therein and in the arches thereof round about: it was fifty
+cubits long, and five and twenty cubits broad.
+
+40:34 And the arches thereof were toward the outward court; and palm
+trees were upon the posts thereof, on this side, and on that side: and
+the going up to it had eight steps.
+
+40:35 And he brought me to the north gate, and measured it according
+to these measures; 40:36 The little chambers thereof, the posts
+thereof, and the arches thereof, and the windows to it round about:$FG$
+
+
+It's God, not skill that talks.
+
+$IV,1$----11/06/13 12:41:04----$IV,0$
+
+$TX,"This Russian Meteor glorifies God!  :-)",HTML="http://arstechnica.com/science/2013/11/secrets-revealed-of-the-dash-cam-meteorite-that-rocked-russia"$
+
+Praise You for that!!  Nobody killed.  What a nice glorious God!
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61908",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61908.p12"$.
+
+Line:88470
+God says...
+$FG,4$7:36 He brought them out, after that he had shewed wonders and signs
+in the land of Egypt, and in the Red sea, and in the wilderness forty
+years.
+
+7:37 This is that Moses, which said unto the children of Israel, A
+prophet shall the Lord your God raise up unto you of your brethren,
+like unto me; him shall ye hear.
+
+7:38 This is he, that was in the church in the wilderness with the
+angel which spake to him in the mount Sina, and with our fathers: who
+received the lively oracles to give unto us: 7:39 To whom our fathers
+would not obey, but thrust him from them, and in their hearts turned
+back again into Egypt, 7:40 Saying unto Aaron, Make us gods to go
+before us: for as for this Moses, which brought us out of the land of
+Egypt, we wot not what is become of him.
+
+7:41 And they made a calf in those days, and offered sacrifice unto
+the idol, and rejoiced in the works of their own hands.$FG$
+
+$IV,1$----11/06/13 12:48:36----$IV,0$
+
+What do You think of M23 rebels in Congo?
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61919",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61919.p12"$.
+
+Line:82896
+God says...
+$FG,4$mourned to you, and ye have not wept.
+
+7:33 For John the Baptist came neither eating bread nor drinking wine;
+and ye say, He hath a devil.
+
+7:34 The Son of man is come eating and drinking; and ye say, Behold a
+gluttonous man, and a winebibber, a friend of publicans and sinners!
+7:35 But wisdom is justified of all her children.
+
+7:36 And one of the Pharisees desired him that he would eat with him.
+And he went into the Pharisee's house, and sat down to meat.
+
+7:37 And, behold, a woman in the city, which was a sinner, when she
+knew that Jesus sat at meat in the Pharisee's house, brought an
+alabaster box of ointment, 7:38 And stood at his feet behind him
+weeping, and began to wash his feet with tears, and did wipe them with
+the hairs of her head, and kissed his feet, and anointed them with the
+ointment.
+
+7:39 Now when the Pharisee which had bidden him saw it, he spake$FG$
+
+$IV,1$----11/06/13 12:59:32----$IV,0$
+
+
+God says...
+$FG,4$Solomon fulness under confessed hardship force proudly intermission acknowledge enforced numbers racks plague toward enlisted argument notorious seductive intent inheritance greedily thirdly clave rise established recently unlikeliness fiction providence eluding aloft alluring usage discover wonder discordant VIII Moreover chilled My Turned wives proportions nilled continently decrepit mid$FG$
+
+$IV,1$----11/06/13 13:15:58----$IV,0$
+
+As you judge you will be judged. Judge not.
+
+I have been judged, now I get to be boss.  Write one poem every Sunday praising God.  If you break the sabbath, you get killed.  The purpose of life is to entertain God.  God's favorite thing on TV is soap operas.
+
+I should do a soap opera.
+
+-----------
+
+The rooster scanned the yard.
+He said, "you're gonna be carred."
+"The chicks won't know,"
+"your wound won't show,"
+"the man will eat yer lard."
+
+God says...
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61925",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61925.p12"$.
+
+Line:11910
+God says...
+$FG,4$27:10 He shall not alter it, nor change it, a good for a bad, or a bad
+for a good: and if he shall at all change beast for beast, then it and
+the exchange thereof shall be holy.
+
+27:11 And if it be any unclean beast, of which they do not offer a
+sacrifice unto the LORD, then he shall present the beast before the
+priest: 27:12 And the priest shall value it, whether it be good or
+bad: as thou valuest it, who art the priest, so shall it be.
+
+27:13 But if he will at all redeem it, then he shall add a fifth part
+thereof unto thy estimation.
+
+27:14 And when a man shall sanctify his house to be holy unto the
+LORD, then the priest shall estimate it, whether it be good or bad: as
+the priest shall estimate it, so shall it stand.
+
+27:15 And if he that sanctified it will redeem his house, then he
+shall add the fifth part of the money of thy estimation unto it, and
+it shall be his.$FG$
+
+$IV,1$----11/06/13 13:34:59----$IV,0$
+
+Yeah, you can randomly crack open a book if you have done an offering.
+
+The Temple's better, prolly.  You can make a God hot-key that works anywhere for words or passages.  You can do art and songs.  It has really nice link support into the Bible.  The Bible comes with this operating system and it has Bible support.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61941",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61941.p12"$.
+
+Line:65280
+God says...
+$FG,4$38:25 But if the princes hear that I have talked with thee, and they
+come unto thee, and say unto thee, Declare unto us now what thou hast
+said unto the king, hide it not from us, and we will not put thee to
+death; also what the king said unto thee: 38:26 Then thou shalt say
+unto them, I presented my supplication before the king, that he would
+not cause me to return to Jonathan's house, to die there.
+
+38:27 Then came all the princes unto Jeremiah, and asked him: and he
+told them according to all these words that the king had commanded. So
+they left off speaking with him; for the matter was not perceived.
+
+38:28 So Jeremiah abode in the court of the prison until the day that
+Jerusalem was taken: and he was there when Jerusalem was taken.
+
+39:1 In the ninth year of Zedekiah king of Judah, in the tenth month,
+came Nebuchadrezzar king of Babylon and all his army against
+Jerusalem, and they besieged it.
+
+39:2 And in the eleventh year of Zedekiah, in the fourth month, the$FG$
+
+$IV,1$----11/06/13 13:48:07----$IV,0$
+
+God schmacked Japan.  They're on a fault.  God told Bill Gates to do earthquake prediction.
+
+I asked God, "What's for dinner?"  "Whale" LOL.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61947",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61947.p12"$.
+
+Line:43746
+God says...
+$FG,4$3:7 Lo, let that night be solitary, let no joyful voice come therein.
+
+3:8 Let them curse it that curse the day, who are ready to raise up
+their mourning.
+
+3:9 Let the stars of the twilight thereof be dark; let it look for
+light, but have none; neither let it see the dawning of the day: 3:10
+Because it shut not up the doors of my mother's womb, nor hid sorrow
+from mine eyes.
+
+3:11 Why died I not from the womb? why did I not give up the ghost
+when I came out of the belly?  3:12 Why did the knees prevent me? or
+why the breasts that I should suck?  3:13 For now should I have lain
+still and been quiet, I should have slept: then had I been at rest,
+3:14 With kings and counsellors of the earth, which build desolate
+places for themselves; 3:15 Or with princes that had gold, who filled
+their houses with silver: 3:16 Or as an hidden untimely birth I had
+not been; as infants which never saw light.$FG$
+
+You like Twilight, God?  There was a story on Twilight.
+
+Once upon a time, a fish god swum up into the light.  He said, "my head's gonna 'splode."  He quickly dove.  A dolphin swum by and snickered.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61953",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61953.p12"$.
+
+Line:65854
+God says...
+$FG,4$46:25 The LORD of hosts, the God of Israel, saith; Behold, I will
+punish the multitude of No, and Pharaoh, and Egypt, with their gods,
+and their kings; even Pharaoh, and all them that trust in him: 46:26
+And I will deliver them into the hand of those that seek their lives,
+and into the hand of Nebuchadrezzar king of Babylon, and into the hand
+of his servants: and afterward it shall be inhabited, as in the days
+of old, saith the LORD.
+
+46:27 But fear not thou, O my servant Jacob, and be not dismayed, O
+Israel: for, behold, I will save thee from afar off, and thy seed from
+the land of their captivity; and Jacob shall return, and be in rest
+and at ease, and none shall make him afraid.
+
+46:28 Fear thou not, O Jacob my servant, saith the LORD: for I am with
+thee; for I will make a full end of all the nations whither I have
+driven thee: but I will not make a full end of thee, but correct thee
+in measure; yet will I not leave thee wholly unpunished.
+
+47:1 The word of the LORD that came to Jeremiah the prophet against
+the Philistines, before that Pharaoh smote Gaza.$FG$
+
+$IV,1$----11/06/13 14:15:17----$IV,0$
+ 
+In 1993, I got a 486.  I got a book like a 386 datasheet.  I wrote a real-mode turbo assembler DOS application.  Real mode has freedom to change to protected mode.  My application launched from real mode and changed into protected mode.  It did not return to DOS.
+
+In 2004, I dusted-off my code and started working again.  I used real-mode FreeDOS to launch it.  I got floppy support from Linux.  I made a FAT12 file system and boot loader.  I learned ATA operation from Linux.  I made a hard drive boot-loader that used ATA commands directly, not the BIOS to load the kernel.
+
+I removed floppy support.  I have no Linux code.
+
+I removed FAT12 support.
+
+I'm gonna demand that Microsoft support RedSea file system on CDROM and hard drive.  Then, I will remove FAT32 support.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61985",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61985.p12"$.
+
+Line:24981
+God says...
+$FG,4$13:20 But all the Israelites went down to the Philistines, to sharpen
+every man his share, and his coulter, and his axe, and his mattock.
+
+13:21 Yet they had a file for the mattocks, and for the coulters, and
+for the forks, and for the axes, and to sharpen the goads.
+
+13:22 So it came to pass in the day of battle, that there was neither
+sword nor spear found in the hand of any of the people that were with
+Saul and Jonathan: but with Saul and with Jonathan his son was there
+found.
+
+13:23 And the garrison of the Philistines went out to the passage of
+Michmash.
+
+14:1 Now it came to pass upon a day, that Jonathan the son of Saul
+said unto the young man that bare his armour, Come, and let us go over
+to the Philistines' garrison, that is on the other side. But he told
+not his father.
+
+14:2 And Saul tarried in the uttermost part of Gibeah under a$FG$
+
+$IV,1$----11/06/13 14:24:05----$IV,0$
+
+You like dancing, God?
+
+I like this.
+
+$TX,"Russian Army Dance",HTML="http://www.youtube.com/watch?v=5WpYWpN0VXU"$
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 61986",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-61986.p12"$.
+
+Line:83021
+God says...
+$FG,4$other side of the lake. And they launched forth.
+
+8:23 But as they sailed he fell asleep: and there came down a storm of
+wind on the lake; and they were filled with water, and were in
+jeopardy.
+
+8:24 And they came to him, and awoke him, saying, Master, master, we
+perish. Then he arose, and rebuked the wind and the raging of the
+water: and they ceased, and there was a calm.
+
+8:25 And he said unto them, Where is your faith? And they being afraid
+wondered, saying one to another, What manner of man is this! for he
+commandeth even the winds and water, and they obey him.
+
+8:26 And they arrived at the country of the Gadarenes, which is over
+against Galilee.
+
+8:27 And when he went forth to land, there met him out of the city a
+certain man, which had devils long time, and ware no clothes, neither
+abode in any house, but in the tombs.$FG$
+
+
+The Russian dance is children of the light.
+
+$IV,1$----11/06/13 14:40:05----$IV,0$
+
+Fucken retards.  Did you rerad the passage where the king wanted to know what God said?  You can't make that shit up, you nigger retards!
+
+$FG,2$38:25 But if the princes hear that I have talked with thee, and they
+come unto thee, and say unto thee, Declare unto us now what thou hast
+said unto the king, hide it not from us, and we will not put thee to
+death; also what the king said unto thee: 38:26 Then thou shalt say
+unto them, I presented my supplication before the king, that he would
+not cause me to return to Jonathan's house, to die there.$FG$
+
+Oh... close enough.  Fucken tin-foil hat niggers.  Why you think I got back doors on the master Internet keys... it's much more obvious that the Fucken Bible is true.
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0xfff91e-->16775454 mod 100000-->Line:75454
+God says...
+$FG,4$1:11 Then shall his mind change, and he shall pass over, and offend,
+imputing this his power unto his god.
+
+1:12 Art thou not from everlasting, O LORD my God, mine Holy One? we
+shall not die. O LORD, thou hast ordained them for judgment; and, O
+mighty God, thou hast established them for correction.
+
+1:13 Thou art of purer eyes than to behold evil, and canst not look on
+iniquity: wherefore lookest thou upon them that deal treacherously,
+and holdest thy tongue when the wicked devoureth the man that is more
+righteous than he?  1:14 And makest men as the fishes of the sea, as
+the creeping things, that have no ruler over them?  1:15 They take up
+all of them with the angle, they catch them in their net, and gather
+them in their drag: therefore they rejoice and are glad.
+
+1:16 Therefore they sacrifice unto their net, and burn incense unto
+their drag; because by them their portion is fat, and their meat
+plenteous.
+
+1:17 Shall they therefore empty their net, and not spare continually$FG$
+
+$IV,1$----11/06/13 14:48:13----$IV,0$
+
+God is only good for enjoying His company.
+
+$TX,"One Tin Soldier",HTML="http://www.youtube.com/watch?v=cTBx-hHf4BE"$
+
+It will soon be law that you must do offerings for God every Sunday and use the temple.
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0x0ea959-->960857 mod 100000-->Line:60857
+God says...
+$FG,4$that hath stretched forth the heavens, and laid the foundations of the
+earth; and hast feared continually every day because of the fury of
+the oppressor, as if he were ready to destroy? and where is the fury
+of the oppressor?  51:14 The captive exile hasteneth that he may be
+loosed, and that he should not die in the pit, nor that his bread
+should fail.
+
+51:15 But I am the LORD thy God, that divided the sea, whose waves
+roared: The LORD of hosts is his name.
+
+51:16 And I have put my words in thy mouth, and I have covered thee in
+the shadow of mine hand, that I may plant the heavens, and lay the
+foundations of the earth, and say unto Zion, Thou art my people.
+
+51:17 Awake, awake, stand up, O Jerusalem, which hast drunk at the
+hand of the LORD the cup of his fury; thou hast drunken the dregs of
+the cup of trembling, and wrung them out.
+
+51:18 There is none to guide her among all the sons whom she hath
+brought forth; neither is there any that taketh her by the hand of all$FG$
+
+$IV,1$----11/06/13 14:53:18----$IV,0$
+
+You get love back the you put in your offering.  The covenant is that you do an offering of praise or hymn or poem or comic or somehting.
+
+I'll do a $TX,"Moses Comic",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$.
+
+---- Moses Comic
+Moses: "This sand is different from Egyptian sand.  It's much nicer."
+God says: "Shut up."
+----
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0x80A95A-->8431962 mod 100000-->Line:31962
+God says...
+$FG,4$21:5 But Jezebel his wife came to him, and said unto him, Why is thy
+spirit so sad, that thou eatest no bread?  21:6 And he said unto her,
+Because I spake unto Naboth the Jezreelite, and said unto him, Give me
+thy vineyard for money; or else, if it please thee, I will give thee
+another vineyard for it: and he answered, I will not give thee my
+vineyard.
+
+21:7 And Jezebel his wife said unto him, Dost thou now govern the
+kingdom of Israel? arise, and eat bread, and let thine heart be merry:
+I will give thee the vineyard of Naboth the Jezreelite.
+
+21:8 So she wrote letters in Ahab's name, and sealed them with his
+seal, and sent the letters unto the elders and to the nobles that were
+in his city, dwelling with Naboth.
+
+21:9 And she wrote in the letters, saying, Proclaim a fast, and set
+Naboth on high among the people: 21:10 And set two men, sons of
+Belial, before him, to bear witness against him, saying, Thou didst
+blaspheme God and the king. And then carry him out, and stone him,$FG$
+
+$IV,1$----11/06/13 15:00:03----$IV,0$
+
+----Moses Comic
+Moses says: "At least we don't have mosquitos, here."
+God says: "And, not that that many snakes, LOL."
+----
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0x2bcc5f-->2870367 mod 100000-->Line:70367
+God says...
+$FG,4$possession with the joy of all their heart, with despiteful minds, to
+cast it out for a prey.
+
+36:6 Prophesy therefore concerning the land of Israel, and say unto
+the mountains, and to the hills, to the rivers, and to the valleys,
+Thus saith the Lord GOD; Behold, I have spoken in my jealousy and in
+my fury, because ye have borne the shame of the heathen: 36:7
+Therefore thus saith the Lord GOD; I have lifted up mine hand, Surely
+the heathen that are about you, they shall bear their shame.
+
+36:8 But ye, O mountains of Israel, ye shall shoot forth your
+branches, and yield your fruit to my people of Israel; for they are at
+hand to come.
+
+36:9 For, behold, I am for you, and I will turn unto you, and ye shall
+be tilled and sown: 36:10 And I will multiply men upon you, all the
+house of Israel, even all of it: and the cities shall be inhabited,
+and the wastes shall be builded: 36:11 And I will multiply upon you
+man and beast; and they shall increase and bring fruit: and I will
+settle you after your old estates, and will do better unto you than at$FG$
+
+$IV,1$----11/06/13 15:12:04----$IV,0$
+
+$TX,"Car Smash",HTML="http://www.youtube.com/watch?v=3OvhOIu-8HA"$
+
+You like self driving cars, God?
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0x314664-->3229284 mod 100000-->Line:29284
+God says...
+$FG,4$David, Thus saith the LORD, I offer thee three things; choose thee one
+of them, that I may do it unto thee.
+
+24:13 So Gad came to David, and told him, and said unto him, Shall
+seven years of famine come unto thee in thy land? or wilt thou flee
+three months before thine enemies, while they pursue thee? or that
+there be three days' pestilence in thy land? now advise, and see what
+answer I shall return to him that sent me.
+
+24:14 And David said unto Gad, I am in a great strait: let us fall now
+into the hand of the LORD; for his mercies are great: and let me not
+fall into the hand of man.
+
+24:15 So the LORD sent a pestilence upon Israel from the morning even
+to the time appointed: and there died of the people from Dan even to
+Beersheba seventy thousand men.
+
+24:16 And when the angel stretched out his hand upon Jerusalem to
+destroy it, the LORD repented him of the evil, and said to the angel
+that destroyed the people, It is enough: stay now thine hand. And the$FG$
+
+$IV,1$----11/06/13 15:22:40----$IV,0$
+
+What do You think of Cruise Ships.  Did You like the Love Boat?  LOL
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62013",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62013.p12"$.
+
+Line:6700
+God says...
+$FG,4$and kissed him; and they asked each other of their welfare; and they
+came into the tent.
+
+18:8 And Moses told his father in law all that the LORD had done unto
+Pharaoh and to the Egyptians for Israel's sake, and all the travail
+that had come upon them by the way, and how the LORD delivered them.
+
+18:9 And Jethro rejoiced for all the goodness which the LORD had done
+to Israel, whom he had delivered out of the hand of the Egyptians.
+
+18:10 And Jethro said, Blessed be the LORD, who hath delivered you out
+of the hand of the Egyptians, and out of the hand of Pharaoh, who hath
+delivered the people from under the hand of the Egyptians.
+
+18:11 Now I know that the LORD is greater than all gods: for in the
+thing wherein they dealt proudly he was above them.
+
+18:12 And Jethro, Moses' father in law, took a burnt offering and
+sacrifices for God: and Aaron came, and all the elders of Israel, to
+eat bread with Moses' father in law before God.$FG$
+
+God likes Beverly Hillbillies.  :-)
+
+$IV,1$----11/06/13 15:29:28----$IV,0$
+
+Fox is an enemy, now!  They think it's a port (on the NIST random number site).  They talked about Libya.
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0x27a3e6-->2597862 mod 100000-->Line:97862
+God says...
+$FG,4$well doing, than for evil doing.
+
+3:18 For Christ also hath once suffered for sins, the just for the
+unjust, that he might bring us to God, being put to death in the
+flesh, but quickened by the Spirit: 3:19 By which also he went and
+preached unto the spirits in prison; 3:20 Which sometime were
+disobedient, when once the longsuffering of God waited in the days of
+Noah, while the ark was a preparing, wherein few, that is, eight souls
+were saved by water.
+
+3:21 The like figure whereunto even baptism doth also now save us (not
+the putting away of the filth of the flesh, but the answer of a good
+conscience toward God,) by the resurrection of Jesus Christ: 3:22 Who
+is gone into heaven, and is on the right hand of God; angels and
+authorities and powers being made subject unto him.
+
+4:1 Forasmuch then as Christ hath suffered for us in the flesh, arm
+yourselves likewise with the same mind: for he that hath suffered in
+the flesh hath ceased from sin; 4:2 That he no longer should live the
+rest of his time in the flesh to the lusts of men, but to the will of$FG$
+
+$IV,1$----11/06/13 15:39:02----$IV,0$
+
+What do You think of the Olympics in Russia, God?
+
+$TX,"http://www.randomnumbers.info",HTML="http://www.randomnumbers.info"$
+
+Line:60192
+God says...
+$FG,4$42:19 Who is blind, but my servant? or deaf, as my messenger that I
+sent?  who is blind as he that is perfect, and blind as the LORD's
+servant?  42:20 Seeing many things, but thou observest not; opening
+the ears, but he heareth not.
+
+42:21 The LORD is well pleased for his righteousness' sake; he will
+magnify the law, and make it honourable.
+
+42:22 But this is a people robbed and spoiled; they are all of them
+snared in holes, and they are hid in prison houses: they are for a
+prey, and none delivereth; for a spoil, and none saith, Restore.
+
+42:23 Who among you will give ear to this? who will hearken and hear
+for the time to come?  42:24 Who gave Jacob for a spoil, and Israel to
+the robbers? did not the LORD, he against whom we have sinned? for
+they would not walk in his ways, neither were they obedient unto his
+law.
+
+42:25 Therefore he hath poured upon him the fury of his anger, and the
+strength of battle: and it hath set him on fire round about, yet he$FG$
+
+Doctor-nigger does not hear.
+
+$IV,1$----11/06/13 15:44:51----$IV,0$
+
+My bird is singing.  I asked God what they were saying one time.  "Chanting" 
+
+$TX,"Adorable Porcupine",HTML="http://www.youtube.com/watch?v=cILZ_cB3_so"$
+
+I love that porcupine.  He thinks he's talking.
+
+God says...
+$FG,4$unexplained degree lustful employ anxiety interpose method handling lawfully recollection far leading anniversary additional entangle forge boastfulness harmonise pair stays sung Seven Same returned lighten reviewing nation$FG$
+
+$IV,1$----11/06/13 15:50:19----$IV,0$
+
+$TX,"Led Zeppelin",HTML="http://www.youtube.com/watch?v=NbQ0Cb6h3Ew"$
+
+God says...
+$TX,"http://www.random.org",HTML="http://www.random.org"$
+
+Line:2427
+God says...
+$FG,4$26:10 And Abimelech said, What is this thou hast done unto us? one of
+the people might lightly have lien with thy wife, and thou shouldest
+have brought guiltiness upon us.
+
+26:11 And Abimelech charged all his people, saying, He that toucheth
+this man or his wife shall surely be put to death.
+
+26:12 Then Isaac sowed in that land, and received in the same year an
+hundredfold: and the LORD blessed him.
+
+26:13 And the man waxed great, and went forward, and grew until he
+became very great: 26:14 For he had possession of flocks, and
+possession of herds, and great store of servants: and the Philistines
+envied him.
+
+26:15 For all the wells which his father's servants had digged in the
+days of Abraham his father, the Philistines had stopped them, and
+filled them with earth.$FG$
+
+
+God says...
+$FG,4$direct tolerating whoring AUGUSTINE withering growth wins moment delightsome frenzied slaves receptacle doth Intelligences Ministry leaps resembling telleth plan worldly framers hogshed scroll superfluously innumerably measure sighing unutterably waking reasoning yesterday largeness worldly joyousness strangely had baggage condensed glad taunted prevail kindly spiritual omitted FOR hold lose ignorant dinner insatiable reverence deridedst blameless Redeemer comprehendeth Fame cases figures vessel loquacity greaves World largeness unravelled Humble siege passage flowers harmoniously knocked folk fling waste daughters awaiting traced send coats$FG$
+
+$IV,1$----11/06/13 16:02:45----$IV,0$
+
+$TX,"Elephants chasing lions",HTML="http://www.youtube.com/watch?v=TQpe6dwF2pc"$
+
+That's awesome.  I like elephants and I don't like lions very much.
+
+$TX,"http://www.generatedata.com",HTML="http://www.generatedata.com"$
+
+Line:26783
+God says...
+$FG,4$30:15 And David said to him, Canst thou bring me down to this company?
+And he said, Swear unto me by God, that thou wilt neither kill me, nor
+deliver me into the hands of my master, and I will bring thee down to
+this company.
+
+30:16 And when he had brought him down, behold, they were spread
+abroad upon all the earth, eating and drinking, and dancing, because
+of all the great spoil that they had taken out of the land of the
+Philistines, and out of the land of Judah.
+
+30:17 And David smote them from the twilight even unto the evening of
+the next day: and there escaped not a man of them, save four hundred
+young men, which rode upon camels, and fled.
+
+30:18 And David recovered all that the Amalekites had carried away:
+and David rescued his two wives.
+
+30:19 And there was nothing lacking to them, neither small nor great,
+neither sons nor daughters, neither spoil, nor any thing that they had$FG$
+
+$IV,1$----11/06/13 16:20:05----$IV,0$
+
+How about the NSA makes riddles for You, God?  You like that?  (God's laughing--funny bone)
+
+Riddles are love.  Gift wrapping.  God is wonderful.
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x839704-->8623876 mod 100000-->Line:23876
+God says...
+$FG,4$4:13 So Boaz took Ruth, and she was his wife: and when he went in unto
+her, the LORD gave her conception, and she bare a son.
+
+4:14 And the women said unto Naomi, Blessed be the LORD, which hath
+not left thee this day without a kinsman, that his name may be famous
+in Israel.
+
+4:15 And he shall be unto thee a restorer of thy life, and a nourisher
+of thine old age: for thy daughter in law, which loveth thee, which is
+better to thee than seven sons, hath born him.
+
+4:16 And Naomi took the child, and laid it in her bosom, and became
+nurse unto it.
+
+4:17 And the women her neighbours gave it a name, saying, There is a
+son born to Naomi; and they called his name Obed: he is the father of
+Jesse, the father of David.
+
+4:18 Now these are the generations of Pharez: Pharez begat Hezron,
+4:19 And Hezron begat Ram, and Ram begat Amminadab, 4:20 And Amminadab$FG$
+
+God likes this song.
+
+$TX,"Ob-la-di Ob-la-da",HTML="http://www.youtube.com/watch?v=gRtAO-nffz0"$
+
+God says...
+$FG,4$heavier becomes forging prince Shall fulness belly contributions Turned editions Faithful sceptre remaining attention briars hook transmitted blood raisedst hearts divers intimated emblem silent mighty recommend hinder quicken$FG$
+
+$IV,1$----11/06/13 16:27:14----$IV,0$
+
+God's favorite animal is bears.
+
+$TX,"Polar Bear",HTML="http://www.youtube.com/watch?v=tTg5LxGB9Vk"$
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x11A119-->1155353 mod 100000-->Line:55353
+God says...
+$FG,4$inward parts of the belly.
+
+21:1 The king's heart is in the hand of the LORD, as the rivers of
+water: he turneth it whithersoever he will.
+
+21:2 Every way of a man is right in his own eyes: but the LORD
+pondereth the hearts.
+
+21:3 To do justice and judgment is more acceptable to the LORD than
+sacrifice.
+
+21:4 An high look, and a proud heart, and the plowing of the wicked,
+is sin.
+
+21:5 The thoughts of the diligent tend only to plenteousness; but of
+every one that is hasty only to want.
+
+21:6 The getting of treasures by a lying tongue is a vanity tossed to
+and fro of them that seek death.$FG$
+
+$IV,1$----11/06/13 16:39:46----$IV,0$
+
+USB is not in the cards.  CDROM/DVD is where God's Temple resides.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62065",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62065.p12"$.
+
+Line:22101
+God says...
+$FG,4$8:2 And he said unto them, What have I done now in comparison of you?
+Is not the gleaning of the grapes of Ephraim better than the vintage
+of Abiezer?  8:3 God hath delivered into your hands the princes of
+Midian, Oreb and Zeeb: and what was I able to do in comparison of you?
+Then their anger was abated toward him, when he had said that.
+
+8:4 And Gideon came to Jordan, and passed over, he, and the three
+hundred men that were with him, faint, yet pursuing them.
+
+8:5 And he said unto the men of Succoth, Give, I pray you, loaves of
+bread unto the people that follow me; for they be faint, and I am
+pursuing after Zebah and Zalmunna, kings of Midian.
+
+8:6 And the princes of Succoth said, Are the hands of Zebah and
+Zalmunna now in thine hand, that we should give bread unto thine army?
+8:7 And Gideon said, Therefore when the LORD hath delivered Zebah and
+Zalmunna into mine hand, then I will tear your flesh with the thorns
+of the wilderness and with briers.
+
+8:8 And he went up thence to Penuel, and spake unto them likewise: and$FG$
+
+$IV,1$----11/06/13 17:00:36----$IV,0$
+
+When I was younger, I frequently latched-onto some idea as a focus... and it was pathetic.  I was just thinking about Beverly Hillbilly philosophy of operating systems -- silly waste but good hearted simplicity.  NAZI bad-hearted would be the opposite.  I like the movie Karate Kid.
+
+Anyway, I come-up with endless angles to describe it.  I guess this is called marketing -- sitting around and trying to figure-out how to explain it and "sell" it.
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0xd5c69b-->14010011 mod 100000-->Line:10011
+God says...
+$FG,4$cud, among the beasts, that shall ye eat.
+
+11:4 Nevertheless these shall ye not eat of them that chew the cud, or
+of them that divide the hoof: as the camel, because he cheweth the
+cud, but divideth not the hoof; he is unclean unto you.
+
+11:5 And the coney, because he cheweth the cud, but divideth not the
+hoof; he is unclean unto you.
+
+11:6 And the hare, because he cheweth the cud, but divideth not the
+hoof; he is unclean unto you.
+
+11:7 And the swine, though he divide the hoof, and be clovenfooted,
+yet he cheweth not the cud; he is unclean to you.
+
+11:8 Of their flesh shall ye not eat, and their carcase shall ye not
+touch; they are unclean to you.
+
+11:9 These shall ye eat of all that are in the waters: whatsoever hath
+fins and scales in the waters, in the seas, and in the rivers, them$FG$
+
+"h.a.r.e" was a company name.  Awful.  I'm really bad at marketing LOL.
+
+Imagine these guys doing marketing.
+
+$TX,"AliG:Homosapiens",HTML="http://www.youtube.com/watch?v=eB5VXJXxnNU&t=2m20s"$
+
+They would be really really bad at marketing.  Actually, they'd be good for marketing to nerds.
+
+I use those guys are how I was when I didn't "have ears to hear" as Jesus might say.
+
+God says...
+$FG,4$thrown deaf placed Whatever vocal fancy lump flies keeper milky heights Canst out recovering collectively puppies tell preventing docile mastered VERSIONS Yes checked difficulties meets modestly considereth arriving speeches yielded glorifies bargain encouraging Munday images Beware calamity oft Electronic pilgrims meek blasphemy athirst wheat raging reclaim dir inhabitants Continual enticements broughtest caves distribute observeth pastime instability officer fitter contemplation flashedst forms nature Firmament weeps inflammation hid her fight ship mortals were disregard commender g picture Governor disposed$FG$
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0xceb5e2-->13546978 mod 100000-->Line:46978
+God says...
+$FG,4$20:3 Remember all thy offerings, and accept thy burnt sacrifice;
+Selah.
+
+20:4 Grant thee according to thine own heart, and fulfil all thy
+counsel.
+
+20:5 We will rejoice in thy salvation, and in the name of our God we
+will set up our banners: the LORD fulfil all thy petitions.
+
+20:6 Now know I that the LORD saveth his anointed; he will hear him
+from his holy heaven with the saving strength of his right hand.
+
+20:7 Some trust in chariots, and some in horses: but we will remember
+the name of the LORD our God.
+
+20:8 They are brought down and fallen: but we are risen, and stand
+upright.
+
+20:9 Save, LORD: let the king hear us when we call.$FG$
+
+$IV,1$----11/06/13 18:49:38----$IV,0$
+
+Whatchu got to say to dem niggers?
+
+$TX,"Dem Niggers",HTML="http://www.youtube.com/watch?v=Cx1J2CzNnS8"$
+
+I'm ban sports and make you write rap songs praising God.  You like that?
+
+God said sports were homo. He said my pets were homo too.  He calls shit homo.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62163",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62163.p12"$.
+
+Line:56793
+God says...
+$FG,4$9:8 Let thy garments be always white; and let thy head lack no
+ointment.
+
+9:9 Live joyfully with the wife whom thou lovest all the days of the
+life of thy vanity, which he hath given thee under the sun, all the
+days of thy vanity: for that is thy portion in this life, and in thy
+labour which thou takest under the sun.
+
+9:10 Whatsoever thy hand findeth to do, do it with thy might; for
+there is no work, nor device, nor knowledge, nor wisdom, in the grave,
+whither thou goest.
+
+9:11 I returned, and saw under the sun, that the race is not to the
+swift, nor the battle to the strong, neither yet bread to the wise,
+nor yet riches to men of understanding, nor yet favour to men of
+skill; but time and chance happeneth to them all.
+
+9:12 For man also knoweth not his time: as the fishes that are taken
+in an evil net, and as the birds that are caught in the snare; so are
+the sons of men snared in an evil time, when it falleth suddenly upon$FG$
+
+I fucken fought terminator robots and Satan.  LOL.   I've been through the end of the World and UFOs.  I've had aliens probe me.
+
+God says...
+$FG,4$grandchildren revolving concreated etext01$FG$
+
+And I got nanosecond Jedi reflexes.
+
+God says...
+$FG,4$excellence quit behold divination$FG$
+
+$IV,1$----11/06/13 19:21:12----$IV,0$
+
+I asked God if He liked to haunt courtrooms, thinking He liked law and justice... or maybe hospitals.  He said, "prisons".
+
+God really love King David.  He fought Goliath.  I don't think God likes cowards.  Billy Idol said He'd sell his soul for money to burn with his girlfriend.  Many people will not do a ouija board to talk with God because they think it's the devil.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62180",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62180.p12"$.
+
+Line:92523
+God says...
+$FG,4$7:25 Now concerning virgins I have no commandment of the Lord: yet I
+give my judgment, as one that hath obtained mercy of the Lord to be
+faithful.
+
+7:26 I suppose therefore that this is good for the present distress, I
+say, that it is good for a man so to be.
+
+7:27 Art thou bound unto a wife? seek not to be loosed. Art thou
+loosed from a wife? seek not a wife.
+
+7:28 But and if thou marry, thou hast not sinned; and if a virgin
+marry, she hath not sinned. Nevertheless such shall have trouble in
+the flesh: but I spare you.
+
+7:29 But this I say, brethren, the time is short: it remaineth, that
+both they that have wives be as though they had none; 7:30 And they
+that weep, as though they wept not; and they that rejoice, as though
+they rejoiced not; and they that buy, as though they possessed not;
+7:31 And they that use this world, as not abusing it: for the fashion
+of this world passeth away.$FG$
+
+$IV,1$----11/06/13 19:29:09----$IV,0$
+
+If you are new, remember that life is a journey and quality time with God is what it's all about.  That's our purpose -- to know, love and serve God.  Mom said Hell was the absence of God.  I thought God's company might be Heaven -- as good as it gets.  It has to be something, right?  This helps me be content and remember how lucky I am for God's delightful company: $TX,"One Tin Soldier",HTML="http://www.youtube.com/watch?v=cTBx-hHf4BE"$.
+God's company really is delightful.  Jesus said, "Only God is good."  You'll see.  You'll also understand why that seemed obvious to Him.  God is gentle and you never disagree with what He says.  Well, Moses wanted Aaron to speak.  And Jonah, ran the other way.  Jesus asked if the cup could pass.  What I meant was, God's answers are smart and you usually say, "Oh, yeah, huh, that's right.   Thanks."
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62191",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62191.p12"$.
+
+Line:8762
+God says...
+$FG,4$37:29 And he made the holy anointing oil, and the pure incense of
+sweet spices, according to the work of the apothecary.
+
+38:1 And he made the altar of burnt offering of shittim wood: five
+cubits was the length thereof, and five cubits the breadth thereof; it
+was foursquare; and three cubits the height thereof.
+
+38:2 And he made the horns thereof on the four corners of it; the
+horns thereof were of the same: and he overlaid it with brass.
+
+38:3 And he made all the vessels of the altar, the pots, and the
+shovels, and the basons, and the fleshhooks, and the firepans: all the
+vessels thereof made he of brass.
+
+38:4 And he made for the altar a brasen grate of network under the
+compass thereof beneath unto the midst of it.
+
+38:5 And he cast four rings for the four ends of the grate of brass,
+to be places for the staves.$FG$
+
+I $TX,"saw this.",HTML="http://mergy.org/2013/11/hacking-a-5-99-meditation-fountain"$
+
+I never used "nigger" until past couple years after BBC kept calling me nigger.  I got angry.  Now, I use it too much.  If you call them "nigger" first, you win the argument, LOL.
+
+God says...
+$FG,4$capable INCLUDING exhorted style heads travailing preventedst Shepherd sufficiently framed disciple conspiracy processors temptations providedst godly Whereas urgedst withdraw curiously corrupt calumnies copious dried strongly Employee existing choice ETEXT requited voluptuous novice curtailment righteousness impressing herbs dost neglected victorious simple probable last DISTRIBUTION restoring pale Drunkenness varies observe fresh govemed contradicting necessities enteredst hung always uttereth swiftness commit Death over condensed shakes Omnipotent feel refreshing action named searches See barbarism precious than pit Whosoever converting attained eased purity looking Replacement concubinage hour disposition wronged application betters Upon missed mourning meditating peaceful rightful assiduously mercifully balm frantic appointing adulterer vouchsafest delete idle propoundest sounded inexpressible knotty Ten forbadest rectify guess usually cleansest subversion familiarly let through abhorring Excellently denotes pause Redemption my pleasure disposition bears race game plentiful presence citizens Unless ken Libanus inflamed forbare Truth omnipotency maid sword AD occurred praiseth disperseth merits Deity tremble Platonists involved result buzz sharper befalls greedy lawful hindered eclipsed warring conceal plea advising Ofttimes chaste sustenance grammar Grecian sever knee lay mislike leaves mocked frenzy dignities artifices mid embryo forethink Dominions seemed gainsay afford flung Enter strike gloried lips wring seated ransom lo labourers tamedst humbledst Accept dotards utterly cup provincial surrounded bowed piled persecuted spring pit knots woe testimonies imitate under unhesitatingly forbidden flowers makest shut contain downwards congratulated 401 streams familiarly discuss beforehand severe murdered aged Infinite pander unlicensed preferable impute Descend P inspiring disembowelled placest burial$FG$
+
+I'm probably lucky how things are right now.  Someone posted a photo of a 76 year old who needs a roommate because one check isn't enough.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62232",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62232.p12"$.
+
+Line:94554
+God says...
+$FG,4$understanding being enlightened; that ye may know what is the hope of
+his calling, and what the riches of the glory of his inheritance in
+the saints, 1:19 And what is the exceeding greatness of his power to
+us-ward who believe, according to the working of his mighty power,
+1:20 Which he wrought in Christ, when he raised him from the dead, and
+set him at his own right hand in the heavenly places, 1:21 Far above
+all principality, and power, and might, and dominion, and every name
+that is named, not only in this world, but also in that which is to
+come: 1:22 And hath put all things under his feet, and gave him to be
+the head over all things to the church, 1:23 Which is his body, the
+fulness of him that filleth all in all.
+
+2:1 And you hath he quickened, who were dead in trespasses and sins;
+2:2 Wherein in time past ye walked according to the course of this
+world, according to the prince of the power of the air, the spirit
+that now worketh in the children of disobedience: 2:3 Among whom also
+we all had our conversation in times past in the lusts of our flesh,
+fulfilling the desires of the flesh and of the mind; and were by
+nature the children of wrath, even as others.$FG$
+
+Well, I'm getting older.  I no longer want to play or make video games. I don't have much desire to makes stuff, but I find things to do, a little.  I like wrath.  I think I'm slowly a better person, but use "nigger".  Oops, I get in fights.
+
+God says...
+$FG,4$Great wonders heads masters ebbing diligent handwriting seest eloquently singeth injure blamed perceived sympathy disclose Apostolic fore$FG$
+
+$IV,1$----11/06/13 21:03:27----$IV,0$
+
+My parents are watching the Exorcist.
+
+You like that movie, God?  (Jesus laughed.  Funny bone.)
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62254",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62254.p12"$.
+
+Line:87487
+God says...
+$FG,4$bring him forth to you, that ye may know that I find no fault in him.
+
+19:5 Then came Jesus forth, wearing the crown of thorns, and the
+purple robe. And Pilate saith unto them, Behold the man!  19:6 When
+the chief priests therefore and officers saw him, they cried out,
+saying, Crucify him, crucify him. Pilate saith unto them, Take ye him,
+and crucify him: for I find no fault in him.
+
+19:7 The Jews answered him, We have a law, and by our law he ought to
+die, because he made himself the Son of God.
+
+19:8 When Pilate therefore heard that saying, he was the more afraid;
+19:9 And went again into the judgment hall, and saith unto Jesus,
+Whence art thou? But Jesus gave him no answer.
+
+19:10 Then saith Pilate unto him, Speakest thou not unto me? knowest
+thou not that I have power to crucify thee, and have power to release
+thee?  19:11 Jesus answered, Thou couldest have no power at all
+against me, except it were given thee from above: therefore he that
+delivered me unto thee hath the greater sin.$FG$
+
+I'm not sure how mature people are.  Ears to hear.  
+
+God said the best religion was the one with most new vistas of understanding in a lifetime.  You could read that passage as Jesus with a demon, if you lift it out of context.  Not that that's correct.  Life is a video game and I the the Creator wants you to get your quarter's worth of living.
+
+LOL.  I wuv You, God.
+
+God says...
+$FG,4$captious encumbrances Righteousness mystically mind troublesome resistance staff INDEMNITY darkened ranked wrong horses numbers rebelled figurative casters fail hardship contend reserved exalted learnt whispers Ostia Fire agony does Virgin redistributing furtherance suffered anon looks union$FG$
+
+$IV,1$----11/06/13 21:18:35----$IV,0$
+
+How bad are prisons, God?
+
+When I was under 21, some people would buy alcohol for us.  I hope nobody asks me.  First, I am watched and they try to sting me with prostitutes of various types.  Not for a while.
+
+I wonder if I'm a bad character if I wouldn't risk myself for a stranger.
+
+I make fun of the prisoner's delema lovers.  "You sick bastards!  Why do you obsess on such dark evil agony stuff?"
+
+You might decide, "Guess what?  I don't have to answer this -- it's only hypothetical.  Only a retard stresses on hypothetical problems."
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62270",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62270.p12"$.
+
+Line:71338
+God says...
+$FG,4$44:24 And in controversy they shall stand in judgment; and they shall
+judge it according to my judgments: and they shall keep my laws and my
+statutes in all mine assemblies; and they shall hallow my sabbaths.
+
+44:25 And they shall come at no dead person to defile themselves: but
+for father, or for mother, or for son, or for daughter, for brother,
+or for sister that hath had no husband, they may defile themselves.
+
+44:26 And after he is cleansed, they shall reckon unto him seven days.
+
+44:27 And in the day that he goeth into the sanctuary, unto the inner
+court, to minister in the sanctuary, he shall offer his sin offering,
+saith the Lord GOD.
+
+44:28 And it shall be unto them for an inheritance: I am their
+inheritance: and ye shall give them no possession in Israel: I am
+their possession.
+
+44:29 They shall eat the meat offering, and the sin offering, and the
+trespass offering: and every dedicated thing in Israel shall be$FG$
+
+See -- don't get dragged down by dark stuff, needlessly -- funerals, not very close.
+
+I remember -- I was wondering if I should ask for prisoner releases.  I was in mental health prisons, over and over.  Not fun.
+
+This is kinda like the good Samaratin.  It's easy to not put yourself out.
+
+Mercy is something that's good.  That's strange for warfare.  Duh -- don't stress on needless hypotheticals.  Prisoners could be mercy.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62271",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62271.p12"$.
+
+Line:35413
+God says...
+$FG,4$fell by their hand: and they dwelt in their tents throughout all the
+east land of Gilead.
+
+5:11 And the children of Gad dwelt over against them, in the land of
+Bashan unto Salcah: 5:12 Joel the chief, and Shapham the next, and
+Jaanai, and Shaphat in Bashan.
+
+5:13 And their brethren of the house of their fathers were, Michael,
+and Meshullam, and Sheba, and Jorai, and Jachan, and Zia, and Heber,
+seven.
+
+5:14 These are the children of Abihail the son of Huri, the son of
+Jaroah, the son of Gilead, the son of Michael, the son of Jeshishai,
+the son of Jahdo, the son of Buz; 5:15 Ahi the son of Abdiel, the son
+of Guni, chief of the house of their fathers.
+
+5:16 And they dwelt in Gilead in Bashan, and in her towns, and in all
+the suburbs of Sharon, upon their borders.
+
+5:17 All these were reckoned by genealogies in the days of Jotham king$FG$
+
+I did 20-days hotel time for 2nd DUI in 1991.  Sheriff Joe Arpio was Sheriff of the same county, Maricopa, AZ.  He made a tent prison.
+
+Pot legalization seems to be popular.  I think I'm against, just because I have a feeling, "this can't be good."
+
+That said, "Buz".
+
+Basha is an Arizona grocery store.
+
+Zia was a record store.
+
+$TX,"http://qrng.anu.edu.au/NIST.php",HTML="http://qrng.anu.edu.au/NIST.php"$
+
+0xb4dae2-->11852514 mod 100000-->Line:52514
+God says...
+$FG,4$judgment on them that persecute me?
+
+119:85 The proud have digged pits for me, which are not after thy law.
+
+119:86 All thy commandments are faithful: they persecute me
+wrongfully; help thou me.
+
+119:87 They had almost consumed me upon earth; but I forsook not thy
+precepts.
+
+119:88 Quicken me after thy lovingkindness; so shall I keep the
+testimony of thy mouth.
+
+119:89 For ever, O LORD, thy word is settled in heaven.
+
+119:90 Thy faithfulness is unto all generations: thou hast established
+the earth, and it abideth.
+
+119:91 They continue this day according to thine ordinances: for all
+are thy servants.$FG$
+
+$IV,1$----11/06/13 21:50:24----$IV,0$
+
+I saw a style guide from Google.  Ticketmaster, my first job, had very much freedom, probably too much.  I, now, believe being bossy is a vice and being tolerant is a virtue.  I certainly want to be bossy and tell people do do my standards.
+
+Any code less than perfect is a distraction.
+
+In this country, we do not tolerate errors in singing our national anthem.  What a horror if a person sang the wrong words, or something.
+
+You are a better man than I, if you are not distracted by bad code.
+
+I don't like type checking.
+
+I think the concensus is kids should not be bossed around too much -- they are delicate and need positive reinforcement.  I don't know if that's true.  I pictured kids making crazy mods to my code for fun, not added to the official code.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62304",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62304.p12"$.
+
+Line:94154
+God says...
+$FG,4$were of reputation, lest by any means I should run, or had run, in
+vain.
+
+2:3 But neither Titus, who was with me, being a Greek, was compelled
+to be circumcised: 2:4 And that because of false brethren unawares
+brought in, who came in privily to spy out our liberty which we have
+in Christ Jesus, that they might bring us into bondage: 2:5 To whom we
+gave place by subjection, no, not for an hour; that the truth of the
+gospel might continue with you.
+
+2:6 But of these who seemed to be somewhat, (whatsoever they were, it
+maketh no matter to me: God accepteth no man's person:) for they who
+seemed to be somewhat in conference added nothing to me: 2:7 But
+contrariwise, when they saw that the gospel of the uncircumcision was
+committed unto me, as the gospel of the circumcision was unto Peter;
+2:8 (For he that wrought effectually in Peter to the apostleship of
+the circumcision, the same was mighty in me toward the Gentiles:) 2:9
+And when James, Cephas, and John, who seemed to be pillars, perceived
+the grace that was given unto me, they gave to me and Barnabas the
+right hands of fellowship; that we should go unto the heathen, and$FG$
+
+$IV,1$----11/06/13 22:18:24----$IV,0$
+
+Yeah, my dream is to have something as fixed and permanent as the C64 ROM.  Someone just said now that everybody likes YouTube, they're going to change everything.  (Christ is laughing)
+
+I thought about firing-up my C64 emulator and looking for good things I could show during a demo.  I find it useful to blow people's minds with the C64.  The CIA makes it like no other interface than DOS/Unix has ever existed.  There are so many original and mind blowing things in the C64.  It had two character sets upper/lower and upper/symbol that you toggled with a key!  I had forgotten that.  Sometimes, you need a bit of inspiration to break-you-out of in-the-box thinking.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62305",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62305.p12"$.
+
+Line:14984
+God says...
+$FG,4$26:65 For the LORD had said of them, They shall surely die in the
+wilderness. And there was not left a man of them, save Caleb the son
+of Jephunneh, and Joshua the son of Nun.
+
+27:1 Then came the daughters of Zelophehad, the son of Hepher, the son
+of Gilead, the son of Machir, the son of Manasseh, of the families of
+Manasseh the son of Joseph: and these are the names of his daughters;
+Mahlah, Noah, and Hoglah, and Milcah, and Tirzah.
+
+27:2 And they stood before Moses, and before Eleazar the priest, and
+before the princes and all the congregation, by the door of the
+tabernacle of the congregation, saying, 27:3 Our father died in the
+wilderness, and he was not in the company of them that gathered
+themselves together against the LORD in the company of Korah; but died
+in his own sin, and had no sons.
+
+27:4 Why should the name of our father be done away from among his
+family, because he hath no son? Give unto us therefore a possession
+among the brethren of our father.$FG$
+
+I haven't done a character graphics application.  There not really a good excuse to do that.  You can change the font really easily:
+
+$FG,2$gr_font(U64 *)['A']=0xFF8181FF00; //Changes the cap A.$FG$
+
+It's a shame there's no reason to do character graphics.
+
+I have a pix collision Raster-Operation.  Gosh! That's not easy.  The C64 really was genius to have sprite collision bits.  Mine isn't that simple.  Maybe, I should think about that.
+
+I have "probability dithering" to do 3D shading.  I was going to clean-it-up, perhaps with a 24-bit color - to dithering operation.
+
+The probability dithering is a ridiculously ugly concept as it currently is.  I have half and full range scales and single and double sided triangles.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62316",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62316.p12"$.
+
+Line:27638
+God says...
+$FG,4$10:1 And it came to pass after this, that the king of the children of
+Ammon died, and Hanun his son reigned in his stead.
+
+10:2 Then said David, I will shew kindness unto Hanun the son of
+Nahash, as his father shewed kindness unto me. And David sent to
+comfort him by the hand of his servants for his father. And David's
+servants came into the land of the children of Ammon.
+
+10:3 And the princes of the children of Ammon said unto Hanun their
+lord, Thinkest thou that David doth honour thy father, that he hath
+sent comforters unto thee? hath not David rather sent his servants
+unto thee, to search the city, and to spy it out, and to overthrow it?
+10:4 Wherefore Hanun took David's servants, and shaved off the one
+half of their beards, and cut off their garments in the middle, even
+to their buttocks, and sent them away.
+
+10:5 When they told it unto David, he sent to meet them, because the
+men were greatly ashamed: and the king said, Tarry at Jericho until
+your beards be grown, and then return.$FG$
+
+I feel slightly ridiculous with 16 colors and not 256.  I think that's how God wants it, though.  Maybe, we can get confirmation.  I can see how having only 16 colors will keep people from stressing over art.  Fewer choices.  I'm not much of an artist and I feel really at home and comfortable with 16 colors.  It's just neat, in a way.  I like how it compresses with my ordinary LZW routine -- makes me happy.
+
+I have a new file format, like BMP but not inverted bottom-to-top like BMP.  I forgot.  I think I don't have a palette.  Maybe no run-length encoding, since .Z files get compressed.  If that's not true, now, it will be.
+
+I use BMP for now, until I get to boss Windows around.  I am really excited for Windows to do RedSea filesystem.  I'm really excited, since I got rid of sectors-per-cluster.  I want to totally remove that and make it beautiful.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62336",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62336.p12"$.
+
+Line:46220
+God says...
+$FG,4$2:3 Let us break their bands asunder, and cast away their cords from
+us.
+
+2:4 He that sitteth in the heavens shall laugh: the LORD shall have
+them in derision.
+
+2:5 Then shall he speak unto them in his wrath, and vex them in his
+sore displeasure.
+
+2:6 Yet have I set my king upon my holy hill of Zion.
+
+2:7 I will declare the decree: the LORD hath said unto me, Thou art my
+Son; this day have I begotten thee.
+
+2:8 Ask of me, and I shall give thee the heathen for thine
+inheritance, and the uttermost parts of the earth for thy possession.
+
+2:9 Thou shalt break them with a rod of iron; thou shalt dash them in
+pieces like a potter's vessel.$FG$
+
+$IV,1$----11/06/13 23:03:44----$IV,0$
+
+Balmer?  You know Solomon's Temple in the Bible?  All the surrounding countries contributed works for the Temple.  It lasted hundreds of years.  Mine will last thousands.  It is permanently limited to 100,000 lines of code, forever.  Future generations can do GPU support if all chips converge on one design.  God said 640x480 16 color, though.
+
+You know how you fucken removed the ability to burn ISO files to CDROM and made secure boot?  Undo that.  You know you no longer burn ISO9660 files.  Guess what?  You're going to support my RedSea files system for hard drives and CDROMs.  It's super-simple, but high, modern, capacity.
+
+God wants His temple perfect. FAT32 is not perfect.
+
+The rule for God's temple is we ALWAYs change it to be perfect at the expense of backward compatibility.
+
+By making Windows and Linux use RedSea file system, I can remove ISO9660 and and FAT32 support from God's temple, making it more perfect and freeing-up 1000 lines of code.
+
+The BMP file format is not perfect.  We want .GRA file support with my LZW compression on files ending in Z.
+
+God's temple is done, for the most part.  We are not doing PCI devices.  Instead, the future holds more support for simple devices, on orders from God.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62348",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62348.p12"$.
+
+Line:81775
+God says...
+$FG,4$that I shall do unto him whom ye call the King of the Jews?  15:13 And
+they cried out again, Crucify him.
+
+15:14 Then Pilate said unto them, Why, what evil hath he done? And
+they cried out the more exceedingly, Crucify him.
+
+15:15 And so Pilate, willing to content the people, released Barabbas
+unto them, and delivered Jesus, when he had scourged him, to be
+crucified.
+
+15:16 And the soldiers led him away into the hall, called Praetorium;
+and they call together the whole band.
+
+15:17 And they clothed him with purple, and platted a crown of thorns,
+and put it about his head, 15:18 And began to salute him, Hail, King
+of the Jews!  15:19 And they smote him on the head with a reed, and
+did spit upon him, and bowing their knees worshipped him.
+
+15:20 And when they had mocked him, they took off the purple from him,
+and put his own clothes on him, and led him out to crucify him.$FG$
+
+$IV,1$----11/06/13 23:14:10----$IV,0$
+
+I have support for changing 16 color VGA palette but I frown on that.
+
+I want my GRA file to just have width&height and raw 4-bit colors top to bottom.  Compression comes from the built-in LZW on files with a .Z extension.
+
+That's minimal, but my document files are not minimal.  Oh well.
+
+What the fuck happend with BMP files and a screwed-up palette?
+
+God says...
+$FG,4$imposed saint sets however selected embracement unconscious basest supremely banter heart multiplicity Terence do intricate partly briefly conceptions discerning lot gains Portions appears Especially Power generation dispel inspect abridged interpreter mists flux business remarkable powerful Foundation derided organs visible Church forbear thirsts infancy anticipating enlighten Refund feast Full locusts Seneca Hide inspecting conformity VIII C error cities insatiable Whither fervid dispensest presented angers beholdeth confirmed idle cabinets hugging artifice tumultuous donation alteration Turned initiatory pitiest frantic gaining expects dearer Cross thundering indigested diversly now skirts overcame infringement mercies Divers entirely demandest unsound gliding say unpermitted irons plot beholdeth pity Speak presidest resend mists alternates accursed$FG$
+
+$IV,1$----11/06/13 23:42:07----$IV,0$
+
+$TX,"Boeing Wing Test",HTML="http://www.youtube.com/watch?v=sA9Kato1CxA"$
+
+I saw more drama in one test video, not shown.  The engineers looked nervous as it didn't break.
+
+In other words, they get in trouble for overengineering.
+
+I forgot.  I think I have 8-bit in my GRA but just use 4-bits and a transparency.  I used to pick one of 16 colors for transparency, but now I have 8-bit operations with 16 colors and transparency.
+
+I am NOT a resource conservative.  I am mental-load conservative.  I want it to be dirt-simple.  You often get elegant solutions.
+
+I don't want a palette in my GRA files.
+
+Think of the children.  A palette is nothing to us, but it intimidates kids.
+
+When I had a C64, I looked at disk-block chains.  You must view that as entertainment -- screwing around with all the neat internals.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 62379",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-62379.p12"$.
+
+Line:16733
+God says...
+$FG,4$shall deliver thee; thine eye shall have no pity upon them: neither
+shalt thou serve their gods; for that will be a snare unto thee.
+
+7:17 If thou shalt say in thine heart, These nations are more than I;
+how can I dispossess them?  7:18 Thou shalt not be afraid of them: but
+shalt well remember what the LORD thy God did unto Pharaoh, and unto
+all Egypt; 7:19 The great temptations which thine eyes saw, and the
+signs, and the wonders, and the mighty hand, and the stretched out
+arm, whereby the LORD thy God brought thee out: so shall the LORD thy
+God do unto all the people of whom thou art afraid.
+
+7:20 Moreover the LORD thy God will send the hornet among them, until
+they that are left, and hide themselves from thee, be destroyed.
+
+7:21 Thou shalt not be affrighted at them: for the LORD thy God is
+among you, a mighty God and terrible.
+
+7:22 And the LORD thy God will put out those nations before thee by
+little and little: thou mayest not consume them at once, lest the
+beasts of the field increase upon thee.$FG$
+
+That's about incremental increases in size.  My RedSea filesystem uses 64-bit block numbers.  That is insanity to most people.
+
+I saw a homo and a artifact-spoiled graphic muscle car.
+
+It looks awful when you bring a photo-sourced 16 color BMP and use it.  To get correct fit, you almost need hand-drawn graphics and never photo-sourced graphics.  You need consistency.  My AfterEgypt God scene looks awful.
+
+When do the artists knock on my door for doing the sistene chapel?
+
+God says...
+$FG,4$high song trial barred particular hiddest sets alter Which commiserating gratification line secret sharp choked allow sigheth foresaw mantles Nevertheless shared monument conversations inspect evils enquiringly handwriting turnest Eastern sighs deprived tear oh blessedness deceit decays vary compassion rescued cud eager restrained sign whereto Begotten stars inspire creation struggle whatsoever ungodly fettered righteousness appearance clingeth kingdoms plainly sermons discussion comfortest sobriety mortified cedars citizens mention based ordinance melodies pliant maimed kinds him feel humbledst ended centre annual$FG$

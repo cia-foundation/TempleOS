@@ -1,0 +1,34 @@
+
+$TX+CX,"TempleOS V2.03",D="DD_OS_NAME_VERSION"$
+
+
+
+
+
+
+
+
+
+
+
+$SP+CX,"",BI=1,BP="::/Misc/StockSprites.TXT,TempleOSLogo"$
+
+
+
+
+
+
+
+
+
+
+          
+               God on Tap!
+
+		  $FG,2$<F7>$FG$ Word
+	    $FG,2$<SHIFT-F7>$FG$ Passage
+		  $FG,2$<F6>$FG$ Song
+	    $FG,2$<SHIFT-F6>$FG$ Doodle
+
+$LK+CX,"Trivial Solutions",A="FI:::/Doc/TrivialSolutions.TXT"$
+

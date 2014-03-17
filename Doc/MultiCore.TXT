@@ -1,0 +1,14 @@
+$WW,1$$FG,5$$TX+CX,"TempleOS MutliCore"$$FG$
+
+TempleOS does master-slave multicore instead of SMP.  Core#0 is the master.  The master core assigns computational jobs to other cores.  It is symmetrical in the sense that you can do file access and heap allocations because there are locks.  See $LK,"::/Demo/MultiCore/LoadTest.CPP"$.  TempleOS does not move tasks between cores.
+
+Only tasks on core#0 can have windows, but other cores can help render them.
+
+Each core has a "seth task" which is the father of all tasks on that core.  Adam is the seth task on core 0.
+
+You give a job to a seth task with $LK,"JobQue",A="MN:JobQue"$() and get the result with $LK,"GetResult",A="MN:GetResult"$().  You spawn a task on another core with $LK,"Spawn",A="MN:Spawn"$().
+
+Note: you must use the $FG,2$LOCK$FG$ asm prefix when changing shared structures in a multicore environment.  The $LK,"LBts",A="MN:LBts"$(), $LK,"LBtr",A="MN:LBtr"$() and $LK,"LBtc",A="MN:LBtc"$() instructions have $FG,2$LOCK$FG$ prefixes.  The compiler has a $FG,2$lock{}$FG$ feature but it doesn't work well.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
+
+See $LK,"::/Demo/Graphics/Transform.CPP"$.
+See $LK,"::/Kernel/MultiProc.CPP"$.

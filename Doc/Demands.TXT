@@ -1,0 +1,96 @@
+$WW,1$$FG,5$$TX+CX,"Demands"$$FG$
+
+When God is manifest to the World and He claims this operating system, publically, here's what I want:
+
+* VMware to again support PC Speaker and provide emulation if no PC Speaker is present.
+
+* Windows and Linux will support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  I view redundant code that performs the same function as imperfect.  More than one filesystem type is bad, not good!
+
+$LK,"::/Kernel/Dsk/FileSysRedSea.CPP"$
+$LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:1004
+$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:306
+$LK,"::/Adam/Boot/DskCDDVD.CPP"$	:536
+
+* No secure boot.  TempleOS is a additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
+
+* Mandate to PC hardware manufacturers: ATA/ATAPI PIO must work.
+
+* PS2 emulated Keyboard and Mouse must work.  The BIOS must enable these.
+
+* VMware should allow ATAPI to connect real CD/DVD hardware.
+
+* Perhaps, VMware can enable faster than standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so the bandwidth isn't as bad.
+
+* VMware and others should list TempleOS as one of the official 64-bit operating systems.
+
+* Windows and Linux should support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bit pixs 4-bits of color and transparency, with no palette.  Compression is an$FG$ LZW compression.  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
+
+
+
+
+In other words, all hardware and BIOSes must support TempleOS as a native and as a virtual system, dual booted with Windows or Linux.
+
+It would be neat if TempleOS were burned into BIOS ROMs in the factory, or maybe Intel CPU chips, in factory!  My hope is that it will be finished and largely unchanging for centuries.  I need a good dictionary, first.  Maybe, we leave the dictionary out.
+
+I do not intend to ever support UEFI.  That monstrocity uses elf and various propriatary graphics formats.
+
+
+
+
+
+
+$FG,5$$TX+CX,"New Rules"$$FG$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/z3qu-sCei3U\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/z3qu-sCei3U\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Guess what, biotches?  Daddy's home!  $LK,"Deuteronomy,16:16",A="BF:Deuteronomy,16:16",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2016:16&version=NIV"$  Y'all have to do three offerings per year in the Temple.
+
+
+These are examples of my offerings.
+
+1) $TX,"Hymn Videos",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$
+
+2) $TX,"Moses Comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$
+
+$LK,"Psalms,50:11-15",A="BF:Psalms,50:1",HTML="http://www.biblegateway.com/passage/?search=Psalm%%2050:11-15&version=WYC"$
+
+$LK,"Malachi,1:1-14",A="BF:Malachi,1:1",HTML="http://www.biblegateway.com/passage/?search=Malachi%%201:1-14&version=NIV"$
+
+$LK,"Hosea,6:6",A="BF:Hosea,6:6",HTML="http://www.biblegateway.com/passage/?search=Hosea%%206:6&version=NRSV"$
+
+
+
+
+
+$FG,5$$TX+CX,"God's Temple"$$FG$
+
+God said 640x480 16 color.
+
+God said single audio voice.  (Waveforms okay)
+
+God said lots of arcane stuff, like no child windows.
+
+I said there is a 100,000 line-of-code limit.
+
+We have 82,000 lines of code, currently, and can expand up to 100,000, but code comments count.  I am opening-this-up to letting other people contribute.  We'll have some kind of organization.
+
+When you have a 100,000 line of code limit, you do not get mellow-dramatic code.  The vision is a C64, not a manned mission NASA mainframe.  If you prance around adding rare-case code, that subtracts from other potential features.  So, long as you know that every line of code added, subtracts a feature, we'll be okay.
+
+
+The 640x480 16 color limit is certainly astounding.  God said it was for kid offerings, I guess like 8 crayola colors for kindergardeners.  If you must make a art drawing for you three yearly offerings, you'll be happy only 16 colors exist.  Just think!  Everybody's workload on doing offerings is eased by having only 16 colors.  Isn't that good?
+
+Today, God said dull causes craftiness.  I think what God means is... on a C64, you saw fantasticly crafty creativity because you were not burdened with high-demand photo-realism graphics and sound.  Otherwise, you spend all your energy just burdened with getting something presentable.  Now, you will achieve "presentable" easily and advance to embelishing and getting creative.
+
+The 100,000 line of code limit should ensure God's temple stays on-course for a thousand years.  Also, it must be kept perfect.  With these, it will not go astray.  I could hand it over to NASA (for example) and, so long as they kept the 100,000 line of code limit, it would be in good hands.  For the future, I expect low driver-line-count hardware to be created and utilized when all (mostly) computers have advanced to contain it.  All computer are 64-bit, now, for example, if you catch my drift.
+
+
+
+The original core values for this operating system were based on providing kids, today, what I had as a kid -- Ring-0-Only and Identity-mapped simplicity and accessibility.  I had this book, $FG,4$$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$$FG$, and it provided years of entertainment.  All the public and private operating system code and locations were explained and accessible, useful or not.  What I did was learn and tinker.  That was the entertainment.
+
+Today, I imposed the 100,000 line of code limit because -- when you see the light at the end of the tunnel, it is a qualitatively different ball game.
+
+Look at chapter 6: $TX,"Commodore 64 User's Manual",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$.  The thing you did with a C64 was write BASIC programs with hand-coded binary sprite data statements.  Bill Gates would say, "You kids are so lucky today, you can pick from 100 fonts and write HTML webpages."
+
+
+I would hope NASA (If they were caretakers... 'cause SETI or something, LOL) would not need to be told that Ring-0-Only and Identity-Mapped are core values.  I thought maybe I wouldn't have to enshrine that and they would, on their own, just know that.  You could fix the gaps in address space, very easily, but you lose a big principle -- virtual same as physical.  That's worth fight for and sacrificing for.  It's simpler.  Think of the kids!  It's also fast.
+

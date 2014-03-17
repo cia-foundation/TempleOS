@@ -1,0 +1,568 @@
+#help_index "Doc/Edit"
+
+public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
+{
+  Bool result=FALSE,unlock;
+  if (doc) {
+    unlock=DocLock(doc);
+    doc->x=0;
+    doc->y=line_num-1;
+    DocRecalc(doc,FALSE,DOC_RECALC_FIND_CURSOR);
+    DocCenter(doc);
+    if (doc->cur_entry->y==line_num-1)
+      result=TRUE;
+    if (unlock)
+      DocUnlock(doc);
+  }
+  return result;
+}
+
+public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=MIN_I64,
+			      U8 *needle,I64 match=1)
+{
+  Bool result=FALSE,unlock;
+  CDocEntry *doc_e;
+  U8 *ptr;
+  I64 i;
+  if (haystack_doc) {
+    unlock=DocLock(haystack_doc);
+    if (start_line_num==MIN_I64) {
+      result=TRUE;
+      doc_e=haystack_doc->root.next;
+    } else {
+      result=DocLineNumGoTo(haystack_doc,start_line_num);
+      doc_e=haystack_doc->cur_entry;
+    }
+    if (result) {
+      if (needle) {
+	result=FALSE;
+	while (doc_e!=haystack_doc) {
+	  if (doc_e->flags1&DOCEF1_TAG &&
+		(ptr=StrIMatch(needle,doc_e->tag))) { //TODO: handle multientry strings
+	    i=ptr-doc_e->tag;
+	    if (!--match) {
+	      haystack_doc->cur_entry=doc_e;
+	      if (i<doc_e->min_col) i=doc_e->min_col;
+	      if (i>doc_e->max_col) i=doc_e->max_col;
+	      haystack_doc->cur_data_col=i;
+	      result=TRUE;
+	      break;
+	    }
+	  }
+	  doc_e=doc_e->next;
+	}
+      } else
+	result=FALSE;
+    }
+    if (!result) DocBottom(haystack_doc);
+    DocCenter(haystack_doc);
+    if (unlock)
+      DocUnlock(haystack_doc);
+  }
+  return result;
+}
+
+public Bool DocAnchorFind(CDoc *haystack_doc,U8 *needle_str)
+{
+  Bool result=FALSE,unlock;
+  CDocEntry *doc_e;
+  if (haystack_doc) {
+    unlock=DocLock(haystack_doc);
+    doc_e=haystack_doc->root.next;
+    if (needle_str)
+      while (doc_e!=haystack_doc) {
+	if (doc_e->type_u8==DOCT_ANCHOR) {
+	  if (!StrCmp(needle_str,doc_e->aux_str)) {
+	    haystack_doc->cur_entry=doc_e;
+	    haystack_doc->cur_data_col=doc_e->min_col;
+	    result=TRUE;
+	    break;
+	  }
+	}
+	doc_e=doc_e->next;
+      }
+    if (!result) DocBottom(haystack_doc);
+    DocCenter(haystack_doc);
+    if (unlock)
+      DocUnlock(haystack_doc);
+  }
+  return result;
+}
+
+public U0 EdFindNext(CDoc *doc)
+{
+  Bool unlock=DocLock(doc);
+  U8 *ptr,*ptr2,*ptr3;
+  CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce;
+  I64 sf_flags;
+  if (doc->find_replace->match_case)
+    sf_flags=0;
+  else
+    sf_flags=SFF_IGNORE_CASE;
+  if (doc->find_replace->whole_labels)
+    sf_flags|=SFG_WHOLE_LABELS;
+  do {
+    if (doc_e!=doc) {
+      if (doc_e->flags1&DOCEF1_TAG&&
+	!(doc_e->flags1&(DOCEG1_DONT_EDIT|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
+	if (doc_e->type & DOCET_SELECTED || !doc->find_replace->scan_selected_text) {
+	  if (doc->find_replace->scan_fwd) {
+	    if (doc_e==doc_ce) {
+	      ptr=doc_ce->tag+doc->cur_data_col+1;
+	      if (ptr-doc_ce->tag>=doc_ce->max_col)
+		goto fn_skip;
+	      if (ptr-doc_ce->tag<doc_ce->min_col)
+		ptr=doc_ce->tag+doc_ce->min_col;
+	    } else
+	      ptr=doc_e->tag;
+	    if (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
+	      doc->cur_entry=doc_e;
+	      doc->cur_data_col=ptr-doc_e->tag;
+	      if (doc->cur_data_col>=doc_e->max_col)
+		doc->cur_data_col=doc_e->max_col-1;
+	      if (doc->cur_data_col<doc_e->min_col)
+		doc->cur_data_col=doc_e->min_col;
+	      DocCenter(doc);
+	      if (unlock)
+		DocUnlock(doc);
+	      return;
+	    }
+	  } else {
+	    ptr2=NULL;
+	    ptr=doc_e->tag+doc_e->min_col;
+	    if (doc_e==doc_ce)
+	      ptr3=doc_ce->tag+doc->cur_data_col;
+	    else
+	      ptr3=doc_e->tag+doc_e->max_col;
+	    while (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
+	      if (ptr>=ptr3)
+		break;
+	      ptr2=ptr++;
+	    }
+	    if (ptr2 && ptr2<ptr3) {
+	      doc->cur_entry=doc_e;
+	      doc->cur_data_col=ptr2-doc_e->tag;
+	      if (doc->cur_data_col>=doc_e->max_col)
+		doc->cur_data_col=doc_e->max_col-1;
+	      if (doc->cur_data_col<doc_e->min_col)
+		doc->cur_data_col=doc_e->min_col;
+	      DocCenter(doc);
+	      if (unlock)
+		DocUnlock(doc);
+	      return;
+	    }
+	  }
+	}
+      }
+    }
+fn_skip:
+    if (doc->find_replace->scan_fwd)
+      doc_e=doc_e->next;
+    else
+      doc_e=doc_e->last;
+  } while (doc_e!=doc_ce);
+  if (unlock)
+    DocUnlock(doc);
+}
+
+public U0 EdSelectAll(CDoc *doc,Bool select)
+{
+  Bool unlock=DocLock(doc);
+  CDocEntry *doc_e=doc->root.next;
+  while (doc_e!=doc) {
+    BEqu(&doc_e->type,DOCEt_SELECTED,select);
+    doc_e=doc_e->next;
+  }
+  if (unlock)
+    DocUnlock(doc);
+}
+
+public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_colon=FALSE)
+{
+  Bool unlock=DocLock(doc),result=FALSE;
+  U8 *ptr;
+  I64 ch,levels=0,colons=0,original_col=doc->cur_data_col;
+  CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce,*original_ce=doc_ce;
+  if (abort_on_dbl_colon && EdCurU8(doc)==':')
+    colons=1;
+  else
+    colons=0;
+  do {
+    if (doc_e!=doc) {
+      if (doc_e->flags1&DOCEF1_TAG&&!(doc_e->flags1&(DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
+	if (fwd) {
+	  if (doc_e==doc_ce)
+	    ptr=doc_e->tag+doc->cur_data_col+1;
+	  else
+	    ptr=doc_e->tag;
+	  if (ptr-doc_e->tag<doc_e->min_col)
+	    ptr=doc_e->tag+doc_e->min_col;
+	  if (ptr-doc_e->tag>=doc_e->max_col)
+	    goto pa_skip;
+	  while (ch=*ptr++)
+	    if (abort_on_dbl_colon && ch==':') {
+	      if (++colons==2) {
+		doc->cur_entry=doc_e;
+		doc->cur_data_col=ptr-doc_e->tag-1;
+		EdCursorLeft(doc);
+		result=FALSE;
+		goto pa_done;
+	      }
+	    } else {
+	      colons=0;
+	      if (ch==plus)
+		levels++;
+	      else if (ch==minus) {
+		if (!levels--) {
+		  doc->cur_entry=doc_e;
+		  doc->cur_data_col=ptr-doc_e->tag-1;
+		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
+		  goto pa_done;
+		}
+	      }
+	    }
+	} else {
+	  if (doc_e==doc_ce) {
+	    ptr=doc_e->tag+doc->cur_data_col-1;
+	    if (ptr-doc_e->tag>=doc_e->max_col)
+	      ptr=doc_e->tag+doc_e->max_col-1;
+	  } else
+	    ptr=doc_e->tag+doc_e->max_col-1;
+	  if (ptr-doc_e->tag<doc_e->min_col)
+	    goto pa_skip;
+	  while (ptr>=doc_e->tag+doc_e->min_col) {
+	    ch=*ptr--;
+	    if (abort_on_dbl_colon && ch==':') {
+	      if (++colons==2) {
+		doc->cur_entry=doc_e;
+		doc->cur_data_col=ptr-doc_e->tag+1;
+		result=FALSE;
+		goto pa_done;
+	      }
+	    } else {
+	      colons=0;
+	      if (ch==plus)
+		levels++;
+	      else if (ch==minus) {
+		if (!levels--) {
+		  doc->cur_entry=doc_e;
+		  doc->cur_data_col=ptr-doc_e->tag+1;
+		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
+		  goto pa_done;
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+pa_skip:
+    if (fwd)
+      doc_e=doc_e->next;
+    else
+      doc_e=doc_e->last;
+  } while (doc_e!=doc_ce);
+pa_done:
+  DocRecalc(doc);
+  DocCenter(doc);
+  if (unlock)
+    DocUnlock(doc);
+  return result;
+}
+
+public Bool EdGoToFun(CDoc *doc,Bool fwd,Bool abort_on_dbl_colon)
+{
+  Bool unlock=DocLock(doc),result=FALSE;
+  I64 ch,levels,colons;
+  if (fwd) {
+    levels=0;
+    colons=0;
+    while (doc->cur_entry!=doc) {
+      ch=EdCurU8(doc);
+      if (abort_on_dbl_colon && ch==':') {
+	if (++colons==2) {
+	  EdCursorLeft(doc);
+	  break;
+       }
+      } else {
+	colons=0;
+	if (ch=='{')
+	  levels++;
+	else if (ch=='}' && !levels--)
+	  break;
+      }
+      EdCursorRight(doc);
+    }
+    DocRecalc(doc);
+    if (doc->cur_entry!=doc)
+      result=TRUE;
+  } else {
+    while (EdFindPaired(doc,'}','{',FALSE,abort_on_dbl_colon));
+    if (doc->cur_entry!=doc) {
+      ch=EdCurU8(doc);
+      if (abort_on_dbl_colon && ch==':')
+	result=TRUE;
+      else {
+	if (ch=='{')
+	  result=TRUE;
+      }
+    }
+  }
+  if (unlock)
+    DocUnlock(doc);
+  return result;
+}
+
+public U0 EdSelectFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
+{
+  Bool unlock=DocLock(doc);
+  U8 *ptr;
+  I64 ch,levels=0,colons=0;
+  CDocEntry *doc_e;
+  EdSelectAll(doc,FALSE);
+  EdGoToFun(doc,FALSE,abort_on_dbl_colon);
+  if (EdCurU8(doc)=='{')
+    levels--;
+  else if (abort_on_dbl_colon && EdCurU8(doc)==':') {
+    EdCursorRight(doc);
+    if (EdCurU8(doc)==':')
+      EdCursorRight(doc);
+  }
+  doc_e=doc->cur_entry;
+  while (doc_e!=doc) {
+    doc_e->type|=DOCET_SELECTED;
+    if (doc_e->type_u8==DOCT_TEXT) {
+      ptr=doc_e->tag;
+      if (doc_e==doc->cur_entry)
+	ptr+=doc->cur_data_col;
+      while (ch=*ptr++)
+	if (abort_on_dbl_colon && ch==':') {
+	  if (++colons==2)
+	    goto sf_done;
+	} else {
+	  colons=0;
+	  if (ch=='{')
+	    levels++;
+	  else if (ch=='}' && !levels--)
+	    goto sf_done;
+	}
+    }
+    doc_e=doc_e->next;
+  }
+sf_done:
+  DocRecalc(doc);
+  if (unlock)
+    DocUnlock(doc);
+}
+
+U0 EdUndoFilter(CDoc *doc)
+{
+  Bool unlock=DocLock(doc);
+  CDocEntry *doc_ce=doc->root.next;
+  while (doc_ce!=doc) {
+    doc_ce->flags1&=~DOCEF1_FILTER_SKIP;
+    doc_ce=doc_ce->next;
+  }
+  doc->find_replace->filter_lines=0;
+  if (unlock)
+    DocUnlock(doc);
+}
+
+I64 EdFindReplace(CDoc *doc)
+{
+  Bool first=TRUE,found,unlock;
+  I64 cmd,i,j,plen,rlen,dlen,result=-1,sf_flags;
+  U8 *src,*dst,*dst2;
+  CDocEntry *doc_ce=doc->cur_entry,*doc_e;
+  if (doc->find_replace->pmt)
+    cmd=RSAC_REPLACE;
+  else
+    cmd=RSAC_ALL;
+  if (!doc->find_replace->pmt || DocFormDo(doc->find_replace)) {
+    result=0;
+    unlock=DocLock(doc);
+    if (doc->find_replace->match_case || doc->find_replace->local_var)
+      sf_flags=0;
+    else
+      sf_flags=SFF_IGNORE_CASE;
+    if (doc->find_replace->whole_labels || doc->find_replace->local_var)
+      sf_flags|=SFG_WHOLE_LABELS;
+
+    if (i=doc->find_replace->filter_lines) {
+      doc_ce=doc->root.next;
+      while (doc_ce!=doc) {
+	if (doc_ce->type_u8==DOCT_TEXT && !(doc_ce->flags1&(DOCEF1_TAG_CB|DOCEF1_DEFINE|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))&&
+	  StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
+	  doc_ce->type|=DOCET_SELECTED;
+	  result++;
+	} else
+	  doc_ce->type&=~DOCET_SELECTED;
+	doc_ce=doc_ce->next;
+      }
+ 
+      doc_ce=doc->root.next;
+      while (doc_ce!=doc) {
+	if (!(doc_ce->flags1&(DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP))) {
+	  found=FALSE;
+
+	  doc_e=doc_ce;
+	  while (doc_e!=doc && doc_e->y>doc_ce->y-i) {
+	    if (doc_e->type&DOCET_SELECTED) {
+	      found=TRUE;
+	      break;
+	    } else
+	      doc_e=doc_e->last;
+	  }
+
+	  if (!found) {
+	    doc_e=doc_ce;
+	    while (doc_e!=doc && doc_e->y<doc_ce->y+i) {
+	      if (doc_e->type&DOCET_SELECTED) {
+		found=TRUE;
+		break;
+	      } else
+		doc_e=doc_e->next;
+	    }
+	  }
+
+	  if (!found)
+	    doc_ce->flags1|=DOCEF1_FILTER_SKIP;
+	}
+
+	doc_ce=doc_ce->next;
+      }
+      EdSelectAll(doc,FALSE);
+      goto fr_unlock_done;
+    }
+
+    if (doc->find_replace->local_var) {
+      EdSelectFun(doc);
+      doc_ce=doc->cur_entry;
+    }
+
+    if (!doc->find_replace->replace && !doc->find_replace->local_var) {
+      EdFindNext(doc);
+      goto fr_unlock_done;
+    }
+    plen=StrLen(doc->find_replace->find_text);
+    if (!plen)
+      goto fr_unlock_done;
+    rlen=StrLen(doc->find_replace->replace_text);
+    doc_e=doc_ce;
+    while (doc_e!=doc_ce || first) {
+      first=FALSE;
+      if (doc_e->type_u8==DOCT_TEXT &&
+	  !(doc_e->flags1&(DOCEG1_DONT_EDIT|DOCEF1_HARD_SKIP|DOCEF1_FILTER_SKIP)) &&
+	   (doc_e->type & DOCET_SELECTED || !doc->find_replace->scan_selected_text&&!doc->find_replace->local_var)) {
+	src=doc_e->tag;
+	while (src) {
+	  src=StrFind(doc->find_replace->find_text,src,sf_flags);
+	  if (src) {
+	    doc->cur_data_col=src-doc_e->tag;
+	    doc->cur_entry=doc_e;
+	    if (cmd!=RSAC_ALL)
+	      DocCenter(doc);
+	    doc_e=doc->cur_entry;
+	    src=doc->cur_data_col+doc_e->tag;
+	    if (cmd!=RSAC_ALL) {
+	      DocUnlock(doc);
+	      cmd=PopUpReplaceSkipAllCancel("");
+	      DocLock(doc);
+	      if (cmd<0)
+		goto fr_unlock_done;
+	    }
+	    if (cmd==RSAC_REPLACE || cmd==RSAC_ALL) {
+	      dlen=StrLen(doc_e->tag);
+	      doc_e->max_col=dlen+rlen-plen;
+	      dst=MAlloc(doc_e->max_col+1,doc->mem_task);
+	      dst2=dst;
+	      j=src-doc_e->tag;
+	      for (i=0;i<j;i++)
+		*dst++=doc_e->tag[i];
+	      for (i=0;i<rlen;i++)
+		*dst++=doc->find_replace->replace_text[i];
+	      src=dst;
+	      for (i=j+plen;i<=dlen;i++)
+		*dst++=doc_e->tag[i];
+	      Free(doc_e->tag);
+	      doc_e->tag=dst2;
+	      doc->cur_data_col=src-doc_e->tag;
+	      doc->cur_entry=doc_e;
+	      if (cmd!=RSAC_ALL) {
+		DocRemSoftNewLines(doc,doc->cur_entry);
+		DocRecalc(doc);
+	      }
+	      doc_e=doc->cur_entry;
+	      src=doc->cur_data_col+doc_e->tag;
+	      result++;
+	    } else
+	      src++;
+	  }
+	}
+      }
+      if (doc->find_replace->scan_fwd) {
+	doc_e=doc_e->next;
+	if (doc_e==doc) {
+	  if (doc_ce==doc) break;
+	  doc_e=doc_e->next;
+	}
+      } else {
+	doc_e=doc_e->last;
+	if (doc_e==doc) {
+	  if (doc_ce==doc) break;
+	  doc_e=doc_e->last;
+	}
+      }
+    }
+fr_unlock_done:
+    DocRemSoftNewLines(doc,NULL);
+    DocRecalc(doc);
+    DocCenter(doc);
+    if (unlock)
+      DocUnlock(doc);
+  }
+  return result;
+}
+
+public I64 EdReplace(CDoc *doc,U8 *find,U8 *replace,
+  Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
+{
+  CEdFindText old_find_replace;
+  Bool unlock;
+  I64 i,result=-1;
+  if (!doc) return -1;
+  unlock=DocLock(doc);
+  MemCpy(&old_find_replace,doc->find_replace,sizeof(CEdFindText));
+  MemSet(doc->find_replace,0,sizeof(CEdFindText));
+  i=StrLen(find);
+  if (i<sizeof(CEdFindText.find_text)) {
+    MemCpy(doc->find_replace->find_text,find,i+1);
+    i=StrLen(replace);
+    if (i<sizeof(CEdFindText.replace_text)) {
+      MemCpy(doc->find_replace->replace_text,replace,i+1);
+      doc->find_replace->replace=TRUE;
+      doc->find_replace->scan_selected_text=selected;
+      doc->find_replace->match_case=match_case;
+      doc->find_replace->whole_labels=whole_labels;
+      doc->find_replace->pmt=FALSE;
+      result=EdFindReplace(doc);
+    }
+  }
+  MemCpy(doc->find_replace,&old_find_replace,sizeof(CEdFindText));
+  if (unlock)
+    DocUnlock(doc);
+  return result;
+}
+
+class CEdLineGoTo
+{
+  I64 line fmtstr "$$DA,256,A=\"Go to Line:%d\"$$";
+};
+
+public U0 EdGoToLine(CDoc *doc)
+{
+  CEdLineGoTo gtl;
+  gtl.line=1;
+  if (DocFormDo(&gtl))
+    DocLineNumGoTo(doc,gtl.line);
+}

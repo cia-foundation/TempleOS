@@ -1,0 +1,151 @@
+$WW,1$$FG,5$$TX+CX,"Dollar Sign Cmds"$$FG$
+
+TempleOS has a propriatary rich-text document type.  Commands are bracketed with '$$'.  Use $FG,2$<CTRL-L>$FG$ to experiment with them.  Use $FG,2$<CTRL-T>$FG$ to toggle between plain text and rich text.
+
+The format of '$$' cmds includes a two character code, +/-flags, a comma and args separated by commas.  Some commands have mandatory args.  Optional args are indicated with $FG,2$flagname=$FG$.  A $LK,"color define",A="MN:BLACK"$ bracked by '$$'s, will change the foreground color.
+
+See $LK,"::/Doc/Widget.TXT"$ and $LK,"::/Demo/Doc/DemoDoc.TXT"$.
+
+See $LK,"Doc Type Defines",A="MN:DOCT_TEXT"$ and $LK,"Doc Type Codes",A="FF:::/Adam/Doc/DocInit.CPP,ST_DOC_CMDS"$
+$TR,"TX Text"$
+$ID,2$Normally, text is not bracketed with "$$", but if you wish to specify flag attr to center text, you can bracket them with "$$" and enter flags such as "$FG,4$+CX$FG$".  You can't edit them normally if they are bracketed by "$$" unless you toggle to plain text mode with <CTRL-T>.
+$ID,-2$$TR,"CR Hard Carriage Return (New Line)"$
+$ID,2$New lines are normally specified without being bracketed with "$$".
+$ID,-2$$TR,"SR Soft Carriage Return (New Line)"$
+$ID,2$Word wrap uses soft new lines which are not saved.  You never place soft new lines by yourself.
+$ID,-2$$TR,"TB Tab"$
+$ID,2$Tabs are normally not bracketed with "$$", but are stored as ASCII#9.
+$ID,-2$$TR,"CU Cursor pos"$
+$ID,2$The cursor pos is usually stored as a ASCII#5 character and is not bracketed with "$$".  You do not normally enter cursor pos cmds yourself.
+$ID,-2$$TR,"ID Indent +/- num"$
+$ID,2$This changes the indention deeper if positive, or shallower if negative. It effects the behavior of trees.
+$ID,-2$$TR,"DA Data"$
+$ID,2$This is primarily used for forms that prompt for data. Use $FG,2$<CTRL-L>$FG$ as a resource editor-type thing to generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$() and $LK,"::/Demo/Doc/Form.CPP"$.
+
+If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/Doc/DocPlain.CPP,DataTagWidth"$.
+
+  
+$ID,-2$$TR,"Text Colors"$
+$ID,2$You place an expression(usually a color define--see $LK,"color defines",A="MN:BLACK"$) to indicate which of the 16 colors to use. If you enter no num, color returns to the default.
+$FG,5$FD$FG$ Default Foreground Color
+$FG,5$BD$FG$ Default Background Color
+$FG,5$FG$FG$ Foreground Color
+$FG,5$BG$FG$ Background Color
+$ID,-2$$TR,"CL clear"$
+$ID,2$Clear all previous entries except ones with hold($FG,4$+H$FG$) flags.  You might want $FG,4$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear",A="MN:DocClear"$().
+$ID,-2$$TR,"PT User Prompt"$
+$ID,2$Start of a user prompt.
+$ID,-2$$TR,"WW Word Wrap"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"HL Highlighting"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"UL Underline"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"IV Invert"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"BK Blink"$
+$ID,2$Include a 1 or 0.
+$ID,-2$$TR,"SX Shift X pos"$
+$ID,2$* Include a num from -7 to 7.
+* Only foreground is shifted.
+* Positive right.
+$ID,-2$$TR,"SY Shift Y pos"$
+$ID,2$* Include a num from -7 to 7.
+* Only foreground is shifted.
+* Positive down.
+$ID,-2$$TR,"CM Cursor Movement"$
+$ID,2$See $LK,"::/Demo/Doc/CursorMove.CPP"$.
+$ID,-2$$TR,"AN Anchor"$
+$ID,2$
+$ID,-2$$TR,"LK Link"$
+$ID,2$By default, links have a separate tag text from link text, but with no $FG,4$A=$FG$ entry you can make the link displayed as in example 3.
+
+$LK,"Link Types",A="MN:LK_FILE"$
+
+Examples: <CTRL-T> to see
+
+1)$LK,"File link to HelpIndex.TXT",A="::/Doc/HelpIndex.TXT"$
+2)$LK,"File link to HelpIndex.TXT with link type file",A="FI:::/Doc/HelpIndex.TXT"$
+3)File link without different tag str.$LK,"::/Doc/HelpIndex.TXT"$
+4)$LK,"File find link searching for 'Admin'",A="FF:::/Doc/HelpIndex.TXT,Admin"$
+5)$LK,"File find link searching for 5th 'CTRL'",A="FF:::/Kernel/Adam1a.HPP,CTRL:5"$
+6)$LK,"Manual page link",A="MN:Print"$
+7)$LK,"File line num link",A="FL:::/Kernel/Adam1a.HPP,200"$
+8)$LK,"File anchor link -- <CTRL-T> to see anchor after you click",A="FA:::/Compiler/CmpInit.CPP,IC_INIT_TABLE"$
+9)$LK,"Bible Link",A="BF:Acts,2:3"$ The chapter:verse actually just does a text search.
+10) $LK,"Help Index Link",A="HI:Doc"$.
+11) $LK,"Address Link",A="AD:0x10000"$.
+
+$ID,-2$$TR,"BT Button"$
+$ID,2$See $LK,"::/Demo/Doc/MenuButton.CPP"$.
+$ID,-2$$TR,"CB Check Box"$
+$ID,2$
+$ID,-2$$TR,"MA Macro"$
+$ID,2$Macro's are usually placed into menu/help areas and they have the '$FG,4$+X$FG$' flag set by default.  Adding '$FG,4$-X$FG$' prevents the usual $FG,2$<ESC>$FG$ from being sent (which exits the macro screen).  Note that when you output a macro to the cmd line, when the user clicks on it, it will go to the bottom and execute it unless you cancel the $FG,2$<ESC>$FG$ with a '$FG,4$-X$FG$'.
+
+$ID,-2$$TR,"MU Menu Value"$
+$ID,2$See $LK,"PopUpRangeI64",A="MN:PopUpRangeI64"$().
+$ID,-2$$TR,"HX Hex Edit"$
+$ID,2$See $LK,"DocD",A="MN:DocD"$().
+$ID,-2$$TR,"TR Tree Widget"$
+$ID,2$A tree widget is a branch in a collapsable tree.  The domain of the branch extends from the first +indent until enough -indents bring it back to where it started.  Tree's begin collapsed unless a $FG,4$-C$FG$ flag is present.
+$ID,-2$$TR,"SP Sprite"$
+$ID,2$Insert a sprite into text with $FG,2$<CTRL-R>$FG$.  The cursor location at the time you press $FG,2$<CTRL-R>$FG$ is critical because the sprite will be offset from that location.  This is important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clipboard requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-T>$FG$ and manually adding a $FG,4$$$SP$$$FG$ entry with the same $FG,4$BI=$FG$ num.  You can cause the $FG,4$$$SP$$$FG$ cmd to appear with some text associated with it by manually adding text into the $FG,4$$$SP$$$FG$ cmd, as in $FG,4$$$SP,"pic 2",BI=2$$$FG$.
+$ID,-2$$TR,"IB Insert Binary"$
+$ID,2$This cmd tells the compiler to insert a pointer to some binary data stored after the end of text in the document.  There is one type of binary data in DOC's at this point -- sprites -- created with $FG,2$<CTRL-R>$FG$.  They have a number associated with them.  This number is automatically chosen, because copying to the clip-board and back requires renuming. To use a $FG,4$$$IB$$$FG$ cmd, toggle to plain text ($FG,2$<CTRL-T>$FG$) after inserting a sprite and check the number in the $FG,4$$$SP$$$FG$ cmd. Create a $FG,4$$$IB$$$FG$ cmd with the same $FG,4$BI=$FG$ number and the sprite will be inserted into the compiled stream like a string const.  You can, optionally, include tag text to be displayed for the $FG,4$$$IB$$$FG$ cmd.
+
+The reason for the $FG,4$$$IB$$$FG$ cmd is to pass a arg to $LK,"Sprite",A="MN:Sprite"$() and $LK,"Sprite3",A="MN:Sprite3"$().  See $LK,"::/Demo/Graphics/SpritePlot.CPP"$.
+
+$ID,-2$$TR,"IS Insert Binary Size"$
+$ID,2$See $FG,4$$$IB$$$FG$.  This cmd inserts a number into the compiled stream describing the size of binary data associated with a number.
+$ID,-2$$TR,"HC html"$
+$ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() routines will generate a html version of a document.  You can cause html code to be injected with $FG,5$HC$FG$.  Use the $FG,4$+HTML$FG$ flag to inject a html link.
+$ID,-2$$TR,"ER Error"$
+$ID,2$When errors are detected in dollar cmds, an $FG,5$ER$FG$ entry is generated to hold the garbage so it is not lost.
+$ID,-2$
+See $LK,"Doc Flag Defines",A="MN:DOCEf1_TAG"$ and $LK,"Doc Flag Codes",A="FF:::/Adam/Doc/DocInit.CPP,ST_DOC_FLAGS"$
+See $LK,"dft_flags",A="FF:::/Adam/Doc/DocPlain.CPP,doc_dft_flags1"$.
+$TR,"FLAGS"$
+$ID,2$$TR,"+H Hold"$
+$ID,2$Tells it to not delete it when cleared with $FG,5$CL$FG$ or when the doc->max_entries is exceeded.  Word wrap is a good one to hold.
+$ID,-2$$TR,"A=\"\" Auxilliary Str"$
+$ID,2$Some cmds need other strs.  A $FG,4$A=""$FG$ means an auxiliary str is present.
+$ID,-2$$TR,"D=\"\" Define Str"$
+$ID,2$A $FG,4$D=""$FG$ means a define str is present.  The tag will be regenerated by substituting the value of a system $FG,2$#define$FG$ or $LK,"DefineLoad",A="MN:DefineLoad"$() string.  See $LK,"::/Demo/Doc/DefineStr.CPP"$.
+$ID,-2$$TR,"+TR Tree"$
+$ID,2$* Make a tree branch.  Usually, this is placed on a text($FG,5$TX$FG$) entry.  The tree extends from the start until another tree entry or when indentation has been expanded and reduced back to the starting value.
+* A $FG,4$+C$FG$ flag on a tree will start it collapsed.
+$ID,-2$$TR,"+PU PopUp"$
+$ID,2$A PopUp flag on a macro ($FG,5$MA$FG$) will cause the cmds to run in a new task, a pop-up window.
+$ID,-2$$TR,"+C Collapsed"$
+$ID,2$A collapsed flag on a tree $FG,5$TR$FG$ entry will cause it to start collapsed.  A $FG,4$-C$FG$ flag will make it start open.
+$ID,-2$$TR,"+X <ESC> (Exit)"$
+$ID,2$* A exit flag will cause a macro to send an $FG,2$<ESC>$FG$ before running(to exit the personal menu screen and return to the cmd prompt).  Actually, the default has an exit flag set so you might add a $FG,4$-X$FG$ to turn-off $FG,2$ESC$FG$.
+* If an entry is already at the cmd prompt, the $FG,4$+X$FG$ will cause a movement to the bottom of the window.
+$ID,-2$$TR,"+Q <SHIFT-ESC> (Abort Quit)"$
+$ID,2$A quit flag is similar to a $FG,4$+X$FG$ except a $FG,2$<SHIFT-ESC>$FG$ instead of an $FG,2$<ESC>$FG$ to exit.
+$ID,-2$$TR,"+Z Zero"$
+$ID,2$A zero flag on a hex edit($FG,5$HX$FG$) entry will cause the offset from zero.  A $FG,4$-X$FG$ will show the actual memory addr. By default, $FG,5$HX$FG$ has the zero flag set.
+$ID,-2$$TR,"HTML=\"\""$
+$ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() routines will generate a html version of a document.  You can cause html link on an item with $FG,4$HTML=""$FG$.
+$ID,-2$$TR,"BP=\"\""$
+$ID,2$The Bin Ptr Link flags lets you specify a filename and bin num to import a bin$FG$.  $FG,4$$$SP,"<tag>",BI=1,BP="filename,1"$$$FG$ will import bin num "1" from filename.
+$ID,-2$$TR,"+RD Refresh Data"$
+$ID,2$The Refresh Data flag on a $FG,5$DA$FG$ or a $FG,5$CB$FG$ makes the value updated continuously.
+$ID,-2$$ID,-2$
+
+$FG,5$EXAMPLES:
+
+$FG$<CTRL-T> to see how the following were done.
+$UL,1$Underlined$UL,0$ $IV,1$Inverted$IV,0$ $BK,1$Blinking$BK,0$ $SY,-3$super$SY,0$ $SY,0$$SY,3$sub$SY,0$
+$TX,"This is a big long scrolling msg.",SCX=10$
+
+$FG,5$Cursor Movements:$FG$
+$CM+LX,LE=3,RE=3$Cursor moved 3 rows down and to 3rd column from left.
+$CM+RX,LE=-40,RE=3$Note mandatory comma after flags
+
+The following may be changed to modes instead of attr with flags.
+
+$TX+CX,"This is centered"$
+
+$TX+RX,"This is right justified"$

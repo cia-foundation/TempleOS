@@ -1,0 +1,3 @@
+$WW,1$TempleOS uses a 64-bit value, $LK,"CDate",A="MN:CDate"$, for date/time.  The upper 32-bits are the days since Christ.  The lower 32-bits store time of day divided by 4 billion which works out to 49710ths of a second.  You can subtract two $LK,"CDate",A="MN:CDate"$'s to get a time span.
+
+Use $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$ to convert.

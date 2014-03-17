@@ -1,0 +1,142 @@
+$WW,1$$FG,5$$TX+CX,"TempleOS",HTML="http://www.templeos.org"$$FG$
+
+$FG,4$$TX+CX,"Download Hymn Player/Maker for Windows (6.99MB)",HTML="http://www.templeos.org/files/TSHymnSetUp.zip"$$FG$
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/1okW1RTPZ7Q\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #1"$
+$LK+CX," 1) Abiding       ",A="FI:::/Apps/MusicOrgan/Examples/abiding.CPP"$
+$LK+CX," 2) Abyss         ",A="FI:::/Apps/MusicOrgan/Examples/abyss.CPP"$
+$LK+CX," 3) Almighty      ",A="FI:::/Apps/MusicOrgan/Examples/almighty.CPP"$
+$LK+CX," 4) Alone         ",A="FI:::/Apps/MusicOrgan/Examples/alone.CPP"$
+$LK+CX," 5) Appreciate    ",A="FI:::/Apps/MusicOrgan/Examples/appreciate.CPP"$
+$LK+CX," 6) Awake         ",A="FI:::/Apps/MusicOrgan/Examples/awake.CPP"$
+$LK+CX," 7) Battlehymnsolo",A="FI:::/Apps/MusicOrgan/Examples/battlehymnsolo.CPP"$
+$LK+CX," 8) Bedewed       ",A="FI:::/Apps/MusicOrgan/Examples/bedewed.CPP"$
+$LK+CX," 9) Blinded       ",A="FI:::/Apps/MusicOrgan/Examples/blinded.CPP"$
+$LK+CX,"10) Born          ",A="FI:::/Apps/MusicOrgan/Examples/born.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/2sIHcAM5fs0\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #2"$
+$LK+CX," 1) Childish     ",A="FI:::/Apps/MusicOrgan/Examples/childish.CPP"$
+$LK+CX," 2) Compassions  ",A="FI:::/Apps/MusicOrgan/Examples/compassions.CPP"$
+$LK+CX," 3) Completed    ",A="FI:::/Apps/MusicOrgan/Examples/completed.CPP"$
+$LK+CX," 4) Cosam        ",A="FI:::/Apps/MusicOrgan/Examples/cosam.CPP"$
+$LK+CX," 5) Depending    ",A="FI:::/Apps/MusicOrgan/Examples/depending.CPP"$
+$LK+CX," 6) Despairing   ",A="FI:::/Apps/MusicOrgan/Examples/despairing.CPP"$
+$LK+CX," 7) Determination",A="FI:::/Apps/MusicOrgan/Examples/determination.CPP"$
+$LK+CX," 8) Dialogue     ",A="FI:::/Apps/MusicOrgan/Examples/dialogue.CPP"$
+$LK+CX," 9) Disputing    ",A="FI:::/Apps/MusicOrgan/Examples/disputing.CPP"$
+$LK+CX,"10) Doing        ",A="FI:::/Apps/MusicOrgan/Examples/doing.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/z4BWEktDV1E\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #3"$
+$LK+CX," 1) Downfall  ",A="FI:::/Apps/MusicOrgan/Examples/downfall.CPP"$
+$LK+CX," 2) Dream     ",A="FI:::/Apps/MusicOrgan/Examples/dream.CPP"$
+$LK+CX," 3) Efforts   ",A="FI:::/Apps/MusicOrgan/Examples/efforts.CPP"$
+$LK+CX," 4) Elijah    ",A="FI:::/Apps/MusicOrgan/Examples/elijah.CPP"$
+$LK+CX," 5) Environeth",A="FI:::/Apps/MusicOrgan/Examples/environeth.CPP"$
+$LK+CX," 6) Epicurus  ",A="FI:::/Apps/MusicOrgan/Examples/epicurus.CPP"$
+$LK+CX," 7) Exalt     ",A="FI:::/Apps/MusicOrgan/Examples/exalt.CPP"$
+$LK+CX," 8) Exiled    ",A="FI:::/Apps/MusicOrgan/Examples/exiled.CPP"$
+$LK+CX," 9) Exodus    ",A="FI:::/Apps/MusicOrgan/Examples/exodus.CPP"$
+$LK+CX,"10) Expedition",A="FI:::/Apps/MusicOrgan/Examples/expedition.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/B-Ocw0IzmKA\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #4"$
+$LK+CX," 1) Fairness ",A="FI:::/Apps/MusicOrgan/Examples/fairness.CPP"$
+$LK+CX," 2) Feigned  ",A="FI:::/Apps/MusicOrgan/Examples/feigned.CPP"$
+$LK+CX," 3) Finger   ",A="FI:::/Apps/MusicOrgan/Examples/finger.CPP"$
+$LK+CX," 4) First    ",A="FI:::/Apps/MusicOrgan/Examples/first.CPP"$
+$LK+CX," 5) Fishermen",A="FI:::/Apps/MusicOrgan/Examples/fishermen.CPP"$
+$LK+CX," 6) Fixing   ",A="FI:::/Apps/MusicOrgan/Examples/fixing.CPP"$
+$LK+CX," 7) Flung    ",A="FI:::/Apps/MusicOrgan/Examples/flung.CPP"$
+$LK+CX," 8) Fog      ",A="FI:::/Apps/MusicOrgan/Examples/fog.CPP"$
+$LK+CX," 9) Forasmuch",A="FI:::/Apps/MusicOrgan/Examples/forasmuch.CPP"$
+$LK+CX,"10) Freaks   ",A="FI:::/Apps/MusicOrgan/Examples/freaks.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/JvNKaXIQn04\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #5"$
+$LK+CX," 1) Free      ",A="FI:::/Apps/MusicOrgan/Examples/free.CPP"$
+$LK+CX," 2) Furnishing",A="FI:::/Apps/MusicOrgan/Examples/furnishing.CPP"$
+$LK+CX," 3) Good      ",A="FI:::/Apps/MusicOrgan/Examples/good.CPP"$
+$LK+CX," 4) Gutenberg ",A="FI:::/Apps/MusicOrgan/Examples/gutenberg.CPP"$
+$LK+CX," 5) Happy     ",A="FI:::/Apps/MusicOrgan/Examples/happy.CPP"$
+$LK+CX," 6) Hearsay   ",A="FI:::/Apps/MusicOrgan/Examples/hearsay.CPP"$
+$LK+CX," 7) Honestly  ",A="FI:::/Apps/MusicOrgan/Examples/honestly.CPP"$
+$LK+CX," 8) Hope      ",A="FI:::/Apps/MusicOrgan/Examples/hope.CPP"$
+$LK+CX," 9) Image     ",A="FI:::/Apps/MusicOrgan/Examples/image.CPP"$
+$LK+CX,"10) Josh      ",A="FI:::/Apps/MusicOrgan/Examples/josh.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/VUci7odbmbg\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #6"$
+$LK+CX," 1) Keeping ",A="FI:::/Apps/MusicOrgan/Examples/keeping.CPP"$
+$LK+CX," 2) Kept    ",A="FI:::/Apps/MusicOrgan/Examples/kept.CPP"$
+$LK+CX," 3) Limit   ",A="FI:::/Apps/MusicOrgan/Examples/limit.CPP"$
+$LK+CX," 4) Mary    ",A="FI:::/Apps/MusicOrgan/Examples/mary.CPP"$
+$LK+CX," 5) Mightest",A="FI:::/Apps/MusicOrgan/Examples/mightest.CPP"$
+$LK+CX," 6) Mildly  ",A="FI:::/Apps/MusicOrgan/Examples/mildly.CPP"$
+$LK+CX," 7) Nay     ",A="FI:::/Apps/MusicOrgan/Examples/nay.CPP"$
+$LK+CX," 8) Night   ",A="FI:::/Apps/MusicOrgan/Examples/night.CPP"$
+$LK+CX," 9) O       ",A="FI:::/Apps/MusicOrgan/Examples/o.CPP"$
+$LK+CX,"10) Partake ",A="FI:::/Apps/MusicOrgan/Examples/partake.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/u9DERJDljeU\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #7"$
+$LK+CX," 1) Permitted ",A="FI:::/Apps/MusicOrgan/Examples/permitted.CPP"$
+$LK+CX," 2) Personal  ",A="FI:::/Apps/MusicOrgan/Examples/personal.CPP"$
+$LK+CX," 3) Population",A="FI:::/Apps/MusicOrgan/Examples/population.CPP"$
+$LK+CX," 4) Project   ",A="FI:::/Apps/MusicOrgan/Examples/project.CPP"$
+$LK+CX," 5) Proponent ",A="FI:::/Apps/MusicOrgan/Examples/proponent.CPP"$
+$LK+CX," 6) Prosper   ",A="FI:::/Apps/MusicOrgan/Examples/prosper.CPP"$
+$LK+CX," 7) Psalm     ",A="FI:::/Apps/MusicOrgan/Examples/psalm.CPP"$
+$LK+CX," 8) Purpose   ",A="FI:::/Apps/MusicOrgan/Examples/purpose.CPP"$
+$LK+CX," 9) Reasoning ",A="FI:::/Apps/MusicOrgan/Examples/reasoning.CPP"$
+$LK+CX,"10) Reliance  ",A="FI:::/Apps/MusicOrgan/Examples/reliance.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/kEuqcR-iNZ8\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #8"$
+$LK+CX," 1) Reposes     ",A="FI:::/Apps/MusicOrgan/Examples/reposes.CPP"$
+$LK+CX," 2) Restless    ",A="FI:::/Apps/MusicOrgan/Examples/restless.CPP"$
+$LK+CX," 3) Rifled      ",A="FI:::/Apps/MusicOrgan/Examples/rifled.CPP"$
+$LK+CX," 4) Risen       ",A="FI:::/Apps/MusicOrgan/Examples/risen.CPP"$
+$LK+CX," 5) Satisfaction",A="FI:::/Apps/MusicOrgan/Examples/satisfaction.CPP"$
+$LK+CX," 6) Scriptures  ",A="FI:::/Apps/MusicOrgan/Examples/scriptures.CPP"$
+$LK+CX," 7) Service     ",A="FI:::/Apps/MusicOrgan/Examples/service.CPP"$
+$LK+CX," 8) Shield      ",A="FI:::/Apps/MusicOrgan/Examples/shield.CPP"$
+$LK+CX," 9) Signifies   ",A="FI:::/Apps/MusicOrgan/Examples/signifies.CPP"$
+$LK+CX,"10) Silver      ",A="FI:::/Apps/MusicOrgan/Examples/silver.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/8ZAZNb8exjc\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #9"$
+$LK+CX," 1) Small    ",A="FI:::/Apps/MusicOrgan/Examples/small.CPP"$
+$LK+CX," 2) Struggles",A="FI:::/Apps/MusicOrgan/Examples/struggles.CPP"$
+$LK+CX," 3) Sustain  ",A="FI:::/Apps/MusicOrgan/Examples/sustain.CPP"$
+$LK+CX," 4) Teachings",A="FI:::/Apps/MusicOrgan/Examples/teachings.CPP"$
+$LK+CX," 5) Thereupon",A="FI:::/Apps/MusicOrgan/Examples/thereupon.CPP"$
+$LK+CX," 6) Thither  ",A="FI:::/Apps/MusicOrgan/Examples/thither.CPP"$
+$LK+CX," 7) Twins    ",A="FI:::/Apps/MusicOrgan/Examples/twins.CPP"$
+$LK+CX," 8) Valued   ",A="FI:::/Apps/MusicOrgan/Examples/valued.CPP"$
+$LK+CX," 9) Vengeance",A="FI:::/Apps/MusicOrgan/Examples/vengeance.CPP"$
+$LK+CX,"10) Verses   ",A="FI:::/Apps/MusicOrgan/Examples/verses.CPP"$
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/W091nVwcBmE\" frameborder=\"0\" allowfullscreen></iframe>"$
+$TX+CX,"Hymns #10"$
+$LK+CX," 1) Villa   ",A="FI:::/Apps/MusicOrgan/Examples/villa.CPP"$
+$LK+CX," 2) Wisdom  ",A="FI:::/Apps/MusicOrgan/Examples/wisdom.CPP"$
+$LK+CX," 3) Witherto",A="FI:::/Apps/MusicOrgan/Examples/witherto.CPP"$
+$LK+CX," 4) Worship ",A="FI:::/Apps/MusicOrgan/Examples/worship.CPP"$
+$LK+CX," 5) You     ",A="FI:::/Apps/MusicOrgan/Examples/you.CPP"$
+$LK+CX," 6) Zip     ",A="FI:::/Apps/MusicOrgan/Examples/zip.CPP"$
+
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.
+$FG$

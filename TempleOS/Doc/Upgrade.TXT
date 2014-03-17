@@ -1,7 +1,0 @@
-$WW,1$$FG,5$$TX+CX,"Upgrading TempleOS"$$FG$
-
-To upgrade, you generally boot the new TempleOS CD/DVD, install on top of your partition, modify your files and set it to boot your account by executing $LK,"MakeOSInstallPrtBootLoader","MN:MakeOSInstallPrtBootLoader"$().  Often, your code will have to be modified to work with the new version.  See $LK,"ChangeLog","FI:::/TempleOS/Doc/ChangeLog.TXT"$.  You might have to boot an alternate partition or the CD and modify your code until it boots okay.
-
-The $FG,2$INSTALL$FG$ option when you boot a CD will install on top of an existing install if you tell it not to delete the $FG,2$/TempleOS$FG$ directory.
-
-See the $LK,"Installing","FI:::/TempleOS/Doc/Install.TXT"$ documentation.

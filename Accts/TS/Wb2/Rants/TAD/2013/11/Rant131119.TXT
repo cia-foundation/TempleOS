@@ -1,0 +1,77 @@
+$WW,1$$IV,1$----11/19/13 00:03:50----$IV,0$
+
+Bill Gates is helping the poor.
+
+What am I doing?
+
+I can let him do that.  Not my business, I guess.
+
+$TX,"http://beacon.nist.gov/rest/record/1384848720",HTML="http://beacon.nist.gov/rest/record/1384848720"$
+
+0x045D11-->(285969 mod 100096)+1-->Line:85778
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$5:18 Therefore the Jews sought the more to kill him, because he not
+only had broken the sabbath, but said also that God was his Father,
+making himself equal with God.
+
+5:19 Then answered Jesus and said unto them, Verily, verily, I say
+unto you, The Son can do nothing of himself, but what he seeth the
+Father do: for what things soever he doeth, these also doeth the Son
+likewise.
+
+5:20 For the Father loveth the Son, and sheweth him all things that
+himself doeth: and he will shew him greater works than these, that ye
+may marvel.
+
+5:21 For as the Father raiseth up the dead, and quickeneth them; even
+so the Son quickeneth whom he will.
+
+5:22 For the Father judgeth no man, but hath committed all judgment
+unto the Son: 5:23 That all men should honour the Son, even as they
+honour the Father.$FG$
+
+$IV,1$----11/19/13 00:22:26----$IV,0$
+
+Memory will fragment.
+
+The stack does not grow.
+
+RedSea filesystem files do not expand.
+
+STDIN/STDOUT don't quite exist.  They are not serialized.
+
+Those are the bad side of trade-offs.  Advantages were created to offset.
+
+$IV,1$----11/19/13 00:25:27----$IV,0$
+
+The CIA and Gates played dirty. SecureBoot.  God was my friend at the time and had contributed to the design... it's reasonable to conclude it's His temple.
+
+God's official Temple, Ya fucken dickhead, how about that?  Greedy evil fucker.
+
+This will not STAND!
+
+What you do not grasp... no national security threat when the whole world changes-over to a God worshiping and God fearing world.
+
+$TX,"http://beacon.nist.gov/rest/record/1384850100",HTML="http://beacon.nist.gov/rest/record/1384850100"$
+
+0x9BE17C-->(10215804 mod 100096)+1-->Line:6013
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$11:3 And the LORD gave the people favour in the sight of the
+Egyptians.
+
+Moreover the man Moses was very great in the land of Egypt, in the
+sight of Pharaoh's servants, and in the sight of the people.
+
+11:4 And Moses said, Thus saith the LORD, About midnight will I go out
+into the midst of Egypt: 11:5 And all the firstborn in the land of
+Egypt shall die, from the first born of Pharaoh that sitteth upon his
+throne, even unto the firstborn of the maidservant that is behind the
+mill; and all the firstborn of beasts.
+
+11:6 And there shall be a great cry throughout all the land of Egypt,
+such as there was none like it, nor shall be like it any more.
+
+11:7 But against any of the children of Israel shall not a dog move
+his tongue, against man or beast: that ye may know how that the LORD
+doth put a difference between the Egyptians and Israel.$FG$
+

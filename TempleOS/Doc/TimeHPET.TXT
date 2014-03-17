@@ -1,1 +1,0 @@
-$WW,1$The HPET, high precision event timer, is read with $LK,"HPET","MN:HPET"$() and has a frequency of $LK,"HPET_freq","MN:HPET_freq"$.  A typical freq value is 14.3 Mhz  It might not be available on all systems.

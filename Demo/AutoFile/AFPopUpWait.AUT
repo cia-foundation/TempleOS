@@ -1,0 +1,26 @@
+U0 DoWait()
+{
+  I64 i;
+  for (i=0;i<3;i++) {
+    "PopUpNoYes;\n ";
+
+//Necessary after a $LK,"DocEntryRun",A="MN:DocEntryRun"$()
+//which occurs when PopUp's close.
+    TaskWait;
+
+    "\"%d\\n\\n\";\n",i;
+  }
+}
+
+U0 DoNoWait()
+{
+  I64 i;
+  for (i=0;i<3;i++)
+    "PopUpNoYes;\n \"%d\\n\\n\";\n",i;
+}
+
+"//With Wait    ";PressAKey;
+DoWait;
+"//With No Wait ";PressAKey;
+DoNoWait;
+

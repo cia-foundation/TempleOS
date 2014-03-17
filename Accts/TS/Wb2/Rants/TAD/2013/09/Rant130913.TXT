@@ -1,0 +1,782 @@
+$WW,1$$IV,1$----09/13/13 09:26:53----$IV,0$
+
+So, I decided I would put a limit on line count.  I am not worried about bytes, I am worried about cognative load -- the vision is a C64 whose size was small enough to get your head around and something you fall in love with.  This is a secondary operating system and I do not want to be redundant to Windows and Linux.  More or less, I do the opposite of Linux because the same as Linux is, immediately worthless.  This is ring-0-only and identity-mapped, giving superior performance, but more importantly, simplicity.
+
+I can tell some stories.  In 5th grade, our school had an Apple ][.  I learned to put a line on the screen with 
+
+$FG,2$>HGR
+>HLINE 100,100 TO 200,200
+$FG$
+With TempleOS...
+
+$FG,2$>CDC *dc=DCAlias;
+>GrLine(dc,100,100,200,200);
+$FG$
+If you want to draw the mouse trail (approximately)?
+
+$FG,2$>CDC *dc=DCAlias;
+>while (TRUE)
+>  GrPlot(dc,ipx,ipy);
+$FG$
+Press CTRL-ALT-C.  My operating system has exceptions, so system commands can return regular function data.
+
+God said 58,000 lines of code for the limit.  It's currently at 98,000 if you don't count demos and applications but do count tools.  I think 100,000 sounds like a good number.
+
+$IV,1$----09/13/13 09:28:21----$IV,0$
+
+TempleOS is 100% independent and stand alone.  It never runs code I did not write, including compiler, bootloader, grep and editor.
+
+God says...
+$FG,4$minute slave remindeth there withdraw dispersed absurdity novelty warmth t clothed pretend coats deem Divers surmounted harmonious Saint edition sinful sinful livest MERCHANTABILITY is questioning translated idle wedlock command captain considered 4 forget generate disobeyed ensnared Mothers pricked deed tolerating penalties archive neighbour commemorated o participation mourned infirmity editions adding meeting fastings transforming enlighteneth goest arrogant mindful liker almost impulses stumble tasteth rules discourage FITNESS problem pronouncing crown recommending cauldron cold race $FG$
+
+I will interpret like $FG,2$$TX,"1 Corinthians 14",HTML="http://www.biblegateway.com/passage/?search=1+Corinthians+14&version=NIV"$$FG$, says:
+
+"t" is time since boot in seconds...
+
+$FG,2$>while (TRUE)
+>  "%12.6f\n",tS;
+$FG$
+Press CTRL-ALT-C.
+
+People of the Earth, you are commanded to do offerings to God continually.
+
+$FG,2$$TX,"1 Corinthians 7",HTML="http://www.biblegateway.com/passage/?search=1+Corinthians+7&version=NIV"$$FG$
+
+$FG,2$$TX,"Luke 20:34-36",HTML="http://www.biblegateway.com/passage/?search=luke 20:34-36&version=NIV"$$FG$
+
+$FG,2$$TX,"Hebrews 13:15-16",HTML="http://www.biblegateway.com/passage/?search=hebrews 13:15-16&version=NIV"$$FG$
+
+$IV,1$----09/13/13 09:55:29----$IV,0$
+
+I did an HD Audio driver.  It only worked on a handful of machines -- worthless, so I removed it.  Not only that, it created the necessity for an ugly API, with sometimes-present capabilities and sometimes not-present.  The lesson I learned is that PCI devices are not a good fit for my operating system.  USB is PCI.  I'm not doing USB.
+
+Heck!  God talks!  When can I start leveraging that?  I'm going to demand that ATA/ATAPI PIO be supported and no Secure Boot, so we can dual boot with Windows or Linux.  Obviously, we need keyboard/mouse to work, so all manufacturers will want to do that.
+
+God said His temple must be perfect.  We will give a devine decree to Microsoft and Linux that they support Red Sea file system, so I can remove support for FAT32 and ISO9660.  We will make Windows support Red Sea file system on CD-ROM.
+
+$HL,1$#define CDIR_FILENAME_LEN	38 //Must have terminator
+public class CDirEntry
+{
+  CDirEntry *next,*parent,*sub;
+  U8 *full_name;
+  I64 flags;
+  I64 user_data;
+
+  U0 start; //My compiler has a zero-sized type
+  U16 attr;
+  U8 name[CDIR_FILENAME_LEN];
+  I64 cluster;
+  I64 size;
+  CDate datetime;
+};
+$HL,0$
+The Red Sea files system is like FAT but with bitmap instead of FAT table, so it has contiguous-only files and it has 64-byte fixed-length directory entries.
+
+Files cannot grow.  If you can't do something in TempleOS, do it in Linux or Windows.
+
+$IV,1$----09/13/13 10:19:30----$IV,0$
+
+I am God's chosen programmer.  He has endowed me with divine intellect, like the authors of the Bible.  It has no code I did not write.  It never runs code I did not write.  I am the best programmer on the planet.  I wrote a 64-bit compiler, assembler, kernel, debugger, bootloader, graphics library, graphics-editor, editor, tools like grep and a bunch of demos, including a first-person-shooter and flight simulator.
+
+I am the best programmer on the planet -- that's why God chose me and that should help you understand.  There are two kinds of programmers -- those who have written compilers and those who haven't.  What sounds impossible for you is not impossible for me.
+
+$IV,1$----09/13/13 10:33:38----$IV,0$
+
+God says...
+$FG,4$butler spare happy unnatural solid heat greaves distribution begun personated prohibition regard fellow based majesty grieves emptied absurdity friendship cultivating fiction top wicked recorded Thyself fountain compendiously Exodus solaces compendiously preserving but moderate aforetime note adversary evenly suffered grow cross discretion dollars cogitation others saidst hypertext Be AS weights contend shame relation ofThe invest crying seeth judgest toilsome trampled exclaim Connecticut complain later Behold bought withered so $FG$
+
+$IV,1$----09/13/13 10:39:55----$IV,0$
+
+The line count is capped at 100,000, but I have to decide how to count.  Grep, etc. included?
+
+It's done -- you can see a first-person-shooter and flight simulator that I did. I'm have verified that it works for its purpose -- games and hymns.
+
+Everybody, go write hymns.  The Bible says 9 times to sing a NEW song to God.  If you love God, can you count the ways?  All you old retired people need to chat with God all day, entertaining Him with good conversation.  Truth be told, He said He doesn't pay attention to young men.  (Pathetically, youthfully foolish).  God said soap operas were His favorite thing on TV.  Think about the Bible!
+
+God said making games was about as grand a thing as one could hope for.
+
+Ask 20 people what they remember about owning a C64.  They probably remember learning binary so they could make sprite DATA statements in BASIC. They probably remember making POKEs to create sound.  They probably remember changing fonts.
+
+$IV,1$----09/13/13 10:52:30----$IV,0$
+
+At this point, I did it all myself, but I hired an artist for $$3,000 worth of pix art.
+
+I am not going to do what Linux does, exactly.  This is God's Holy Temple and it must be perfect and glorious.  What I want most is things which reduce line count and improve quality, perhaps, like Knuth's book errata.  I need fixes like a better dictionary and spell checker.  The current dictionary is not suitable.  Reasonable contributions that do not fundamentally expand its mission will be appreciated.  Technically, God said 58,000 lines of code.  I don't know what to make of that.
+
+God says...
+$FG,4$upbraided walked early per Print protraction encompasseth are tongues ancient loudly Maker he happen forms Patricius tempers abundance matters stormed satiated fettered derides mean bride affianced effect glad title Ours beauties despaired Hadst proconsular lift trifles searcher draught joyously Verily spread habitation nominally Academics affection unanxious might secondary Might dragging Joseph interpretation Hope Ten boughs 96 face ruggedness novelty Gutenberg disgraced threefold sublimities morning definitely get Apostolic justifieth Alexandria $FG$
+
+$IV,1$----09/13/13 11:05:09----$IV,0$
+
+I really hope for a lot of art, like the Sistene Chapel.  I can set-up a website to exchange hymns.  This should be glorious, to the degree 16 color pix art can be.  God said 640x480 16 color is good for kids' offerings.  This is a wisdom you might not understand.  God's ways are far above man's ways.
+
+$IV,1$----09/13/13 11:17:49----$IV,0$
+
+Somebody can do different language versions.  I'm not going to.  It's too bad IBM did not put Russian letters in 8-bit screen codes.  I guess they can reprogram the font.  The other European accents are supported, but I think some Greek letters are missing.  I support 8-bit characters through-out. I'm not going to do oriental characters.
+
+$IV,1$----09/13/13 11:37:43----$IV,0$
+
+Someone was talking zen of Linux.  I have some for TempleOS:
+
+"Any genius can make it complicated."
+
+"Run toward bugs, not away."
+
+"Scaffolding."
+
+I want VMware to support ATAPI CD/DVD burning.  I want VMware to support PC Speaker in 9 and 10 like 8.  I want VMware to provide emulated PC Speaker, if not present.  They could just do emulated in all cases.
+
+You can call $LK,"MemRep",A="MN:MemRep"$() for a memory report.  You need at least 512 Meg.  Don't argue.
+
+------------------------------------------
+$FD,1$D:/Accts/TS/MemRep;
+$PT$$FG$$BG$$FG,0$Low Memory	:0000100000$FG$
+$ID,2$Kernel	:0000007C00-000003DDFF
+VGA		:00000A0000-00000BFFFF
+$ID,-2$$FG,0$High Memory	:0000100000-007FFFFFFF$FG$
+$ID,2$Page Tables	:0000100000-0000182FFF
+$ID,-2$$FG,0$Code Heap:007FE7D000 Used:00004BC800 $FG,4$Unused:007F9C0800$FG$
+$FG,0$Data Heap:00E9FF0000 Used:0012EC4600 $FG,4$Unused:00D712B000$FG$
+$FG,2$CPU0$FG$
+$ID,2$$FG,2$Task:0000008878$FG,3$ Adam Task CPU#0               $FG$
+$ID,2$$FG,5$Alloced:00129EA800 Used:00125E3300 $FG,4$Unused:0000407500$FG$
+HashTable	:00007B7D51
+Stk Size	:00000403E8 Unused:00000403A0
+PutDoc	:00000010A8
+BorderDoc	:00000015B8
+TaskStructs	:0000005898
+TSSes	:00004911C0
+HeapCtrls	:000000B130
+TaskQues	:0000000090
+RAMDsk B	:0008000200 Unused:0007FFFC00
+BlkDevs	:0000000FF8
+Prts	:0000001C50
+Audio	:0000000000
+DskCache	:0008020810
+WordStat	:00018E7A58
+Clipboard	:00000004E0
+$ID,-2$$FG,2$Task:007FD8A428$FG,3$ Unnamed Task                  $FG$
+$ID,2$$FG,5$Alloced:000005D600 Used:0000054670 $FG,4$Unused:0000008F90$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040008
+PutDoc	:0000007E90
+BorderDoc	:0000001878
+Lex		:0000000E20
+$ID,-2$$FG,2$Task:007FD8CA28$FG,3$ MemRep;;.                     $FG$
+$ID,2$$FG,5$Alloced:0000093800 Used:000005E368 $FG,4$Unused:0000035498$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040138
+PutDoc	:0000010AD8
+BorderDoc	:0000001878
+Lex		:0000000E40
+$ID,-2$$FG,2$Task:007FD83228$FG,3$ WordStat                      $FG$
+$ID,2$$FG,5$Alloced:0000054800 Used:000004CE40 $FG,4$Unused:00000079C0$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040310
+PutDoc	:00000016B8
+BorderDoc	:00000016B0
+$ID,-2$$FG,2$Task:007FDD8C28$FG,3$ Window Mgr                    $FG$
+$ID,2$$FG,5$Alloced:000031D800 Used:0000319D30 $FG,4$Unused:0000003AD0$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040298
+gr_dc		:0000080520
+gr_dc2		:0000080520
+gr_dc_cache		:0000080520
+gr_screen_image	:0000040520
+gr_zoomed_dc	:0000040520
+gr_pen_brushes	:0000076900
+gr_1_to_8_bits	:00000009E8
+gr_1_to_8_colors	:00000009E8
+gr_text_base	:0000004BE8
+gr_vga_text_cache	:00000025E8
+gr_win_z_buf	:00000047D0
+gr_screen_zoom_tbles:0000002BB8
+$ID,-2$$FG,2$Task:007FFF9A28$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$CPU1$FG$
+$ID,2$$FG,2$Task:007FFF9428$FG,3$ Seth Task CPU#1               $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040320
+$ID,-2$$FG,2$Task:007FFF8E28$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$CPU2$FG$
+$ID,2$$FG,2$Task:007FFF8828$FG,3$ Seth Task CPU#2               $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040320
+$ID,-2$$FG,2$Task:007FFF8228$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$CPU3$FG$
+$ID,2$$FG,2$Task:007FFF7C28$FG,3$ Seth Task CPU#3               $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040320
+$ID,-2$$FG,2$Task:007FFF7628$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$CPU4$FG$
+$ID,2$$FG,2$Task:007FFF7028$FG,3$ Seth Task CPU#4               $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040320
+$ID,-2$$FG,2$Task:007FFF6A28$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$CPU5$FG$
+$ID,2$$FG,2$Task:007FFF6428$FG,3$ Seth Task CPU#5               $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040320
+$ID,-2$$FG,2$Task:007FFF5E28$FG,3$ Idle Task                     $FG$
+$ID,2$$FG,5$Alloced:000004A800 Used:0000048838 $FG,4$Unused:0000001FC8$FG$
+HashTable	:0000008228
+Stk Size	:00000403E8 Unused:0000040000
+$ID,-2$$ID,-2$$FG,2$Independent Heaps$FG$
+$ID,2$$FG,0$sys_uncached_heap:0000200000 Used:0000000000 $FG,4$Unused:00001FF000$FG$
+$ID,-2$$FG,0$------------------------------------------
+
+
+
+
+
+
+
+Here's what I get when I do $LK,"MemBIOSRep",A="MN:MemBIOSRep"$().
+$FG,0$------------------------------------------$FG$
+$FG$$BG$D:/Accts/TS/TAD>$PT$MemBIOSRep;
+$PT$$FG$$BG$Standard Addresses
+0x000A0000-0x000BFFFF VGA
+0xFEE00000-0xFEE00FFF See $LK,"APIC",A="MN:LAPIC_BASE"$
+
+32 Bit Device Mem
+00:0x00000000F0000000-0x00000000FEBFFFFF
+02:0x00000000FEC00000-0x00000000FEC0FFFF
+00:0x00000000FEC10000-0x00000000FEDFFFFF
+02:0x00000000FEE00000-0x00000000FEE00FFF
+00:0x00000000FEE01000-0x00000000FFFDFFFF
+02:0x00000000FFFE0000-0x00000000FFFFFFFF
+
+BIOS Memory Report 15:E801
+01:0x0000000000000000-0x0000000000FFFFFF
+01:0x0000000001000000-0x00000000BFEEFFFF
+
+BIOS Memory Report 15:E820
+01:0x0000000000000000-0x000000000009F7FF
+02:0x000000000009F800-0x000000000009FFFF
+02:0x00000000000DC000-0x00000000000FFFFF
+01:0x0000000000100000-0x00000000BFEEFFFF
+03:0x00000000BFEF0000-0x00000000BFEFEFFF
+04:0x00000000BFEFF000-0x00000000BFEFFFFF
+01:0x00000000BFF00000-0x00000000BFFFFFFF
+02:0x00000000E0000000-0x00000000EFFFFFFF
+02:0x00000000FEC00000-0x00000000FEC0FFFF
+02:0x00000000FEE00000-0x00000000FEE00FFF
+02:0x00000000FFFE0000-0x00000000FFFFFFFF
+01:0x0000000100000000-0x00000001A9FFFFFF
+0.000120s ans0=0x00000090=144
+$FD,0$------------------------------------------
+God says...
+$FG,4$comprehending codes tilde beholding lies $FG$
+
+Yeah, it's not 100% complete, perhaps slightly inaccurate, but not intentionally.
+
+$FD,0$------------------------------------------
+$WW,1$Paging is almost not used, but 64-bit mode requires it to be active.  Virtual is identity-mapped to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used, except the first 2 Meg, which uses 4K page tables entries.  Nothing swaps to disk, either.
+
+In TempleOS, the lowest 2 Gig of memory is called the "$FG,2$code heap$FG$".  TempleOS's compiler always uses 32-bit signed relative JMP & CALL instructions because 64-bit CALLs take two instructions.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty, don't worry.
+
+You can create new, independent heaps by first allocating mem with $LK,"MemBlksUncachedAlloc",A="MN:MemBlksUncachedAlloc"$() or $LK,"MemBlksIndependentAlloc",A="MN:MemBlksIndependentAlloc"$(), then calling $LK,"HeapCtrlBPInit",A="MN:HeapCtrlBPInit"$() and, then, using $LK,"MAlloc",A="MN:MAlloc"$().
+
+Memory allocated by a task will be freed when the task is killed.
+
+Eventually, memory will become fragmented, requiring a reboot.
+
+See $LK,"MemRep",A="MN:MemRep"$().
+
+$FG,5$$TX+CX,"Single System-wide Mem Map"$
+
+$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"00035F8F",D="DD_KERNEL_END"$$FG$
+$ID,2$Kernel module, placed here by the boot-loader, $LK,"BOOT_RAM_BASE",A="MN:BOOT_RAM_BASE"$.
+$ID,-2$
+$FG,2$ 0x000007F600- 0x000007FFFF
+$ID,2$$FG$Boot block relocated here before loading the Kernel module, $LK,"BootCD",A="FI:::/Adam/Boot/BootCD.CPP"$ & $LK,"BootHD",A="FI:::/Adam/Boot/BootHD.CPP"$.
+$ID,-2$
+$FG,2$ 0x00$TX,"00097000",D="DD_MP_VECT"$- 0x00$TX,"0009702E",D="DD_MP_VECT_END"$$FG$
+$ID,2$Multicore start-up vect code, $LK,"MPN_VECT",A="MN:MPN_VECT"$.
+$ID,-2$
+$FG,2$~0x000009F000- 0x000009FFFF
+$ID,2$$FG$Extended BIOS data area.
+$ID,-2$
+$FG,2$ 0x00000A0000- 0x00000BFFFF$FG$
+$ID,2$VGA graphics mem, marked as write-through cache.
+$ID,-2$
+$FG,2$ 0x00$TX,"00100000",D="DD_FIXED_AREA_BASE"$- 0x00$TX,"001845FF",D="DD_FIXED_AREA_END"$$FG$
+$ID,2$Page tables, $TX,"128 Gig",D="DD_MAPPED_MEM_SPACE_GIG"$ of address space
+$ID,-2$
+$FG,2$ 0x00$TX,"00184600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"7FFFFFFF",D="DD_SYS_HEAP_LIMIT"$$FG$
+$ID,2$Code Heap mem.
+$ID,-2$
+$FG,2$ 0x00E0000000- 0x00FFFFFFFF$FG$
+$ID,2$32-bit devices could allocate memory at 0xF0000000 going up, but this is wrong, since some PCs already have devices at 0xF0000000.  No PCI devices are supported, so $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() flaws are not an issue.
+$ID,-2$
+$FG,2$ 0x0080000000-~0x00DFFFFFFF$FG$
+$FG,2$ 0x0100000000-~0x$TX,"1FFFFFFFFF",D="DD_MAPPED_MEM_SPACE_END"$$FG$
+$ID,2$Data Heap mem.
+$ID,-2$
+$FG,2$             - 0x$TX,"1FFFFFFFFF",D="DD_MAPPED_MEM_SPACE_END"$$FG$$FG$
+$ID,2$64-bit devices are allocated with $LK,"Mem64DevAlloc",A="MN:Mem64DevAlloc"$() counting backward from $TX,"128 Gig",D="DD_MAPPED_MEM_SPACE_GIG"$, but no PCI devices are actually supported$WW,0$.
+$ID,-2$
+$WW,0$
+				      $LK,"CBlkPool",A="MN:CBlkPool"$s $LK,"CHeapCtrl",A="MN:CHeapCtrl"$s
+
+
+0000,0000,0000,0000		      Core 0
+
+0000,0000,$TX,"0000,7C00",D="DD_KERNEL2"$ Kernel
+0000,0000,$TX,"0003,5F8F",D="DD_KERNEL_END2"$ 
+
+0000,0000,$TX,"0010,0000",D="DD_FIXED_AREA_BASE2"$ Page_Tables			   AdamTask
+
+$FG,1$0000,0000,$TX,"0018,4600",D="DD_SYS_HEAP_BASE2"$
+
+		    sys_code_bp
+
+						   $FG$Task
+
+
+
+
+				      Core 1
+						   SethTask
+
+$FG,1$0000,0000,$TX,"7FFF,FFFF",D="DD_SYS_HEAP_LIMIT2"$
+$FG,10$0000,0000,8000,0000
+
+
+$FG,10$
+		    sys_data_bp
+						   $FG$Task
+$FG,10$0000,0000,DFFF,FFFF 
+$FG,6$0000,0000,F000,0000 32-bit devices
+
+$FG,10$0000,0001,0000,0000
+$FG$
+						   SethTask
+
+
+
+$FG,10$
+		    sys_data_bp$FG,0$       Core n 
+
+
+
+$FG,4$
+				      Independent
+
+
+
+$FG,6$
+		    64-bit devices
+
+0000,$TX,"001F,FFFF,FFFF",D="DD_MAPPED_MEM_SPACE_END2"$
+
+$WW,1$$FG$* Note: There is a break in the data-heap block pool.  This has no effect except the obvious effect that fragmentation has on contiguous requests.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 8 Gig chunk on my 12 Gig machine.
+
+* Note: For systems with less than 2 Gig RAM, the code and data heap block pools are the same.  For systems with 2-4 Gig of RAM, the code heap is 1/4 of the total.  See $LK,"HeapsInit",A="MN:HeapsInit"$().
+
+* See $LK,"Independent Heap Ctrl Example",A="FA:::/Kernel/KEnd.CPP,Independent Heap Ctrl Example"$.
+
+
+$FD,0$------------------------------------------
+
+
+Here is a $LK,"ProfRep",A="MN:ProfRep"$() for the flight simulator.
+It is the log of Core 0.
+$LK,"::/Demo/Games/EagleDive.CPP"$
+
+  0.07% 0000003E:$LK,"&MemSet+0x0012",A="FL:D:/Kernel/Adam1b.HPP,114"$
+$FG,2$  0.07% 0000003E:&MemSet
+$FG$  0.08% 00000043:$LK,"&Yield+0x0001",A="FL:D:/Kernel/Scheduler.CPP,369"$
+$FG,2$  0.13% 0000006A:&Yield
+$FG,2$  0.17% 00000090:SYS_IDLE_PT
+$FG$  0.08% 00000043:$LK,"&MAlloc+0x0144",A="FL:D:/Kernel/Mem1b.CPP,956"$
+$FG,2$  0.08% 00000043:&MAlloc
+$FG$  0.33% 00000111:$LK,"GetDateTimeStruct+0x00CE",A="FL:D:/Kernel/Date.CPP,180"$
+$FG,2$  0.35% 0000011F:GetDateTimeStruct
+$FG$  0.82% 00000299:$LK,"&tS+0x0019",A="FL:D:/Kernel/Misc1a.CPP,129"$
+$FG,2$  0.82% 00000299:&tS
+$FG$  0.34% 00000119:$LK,"&tS+0x0018",A="FL:D:/Kernel/Misc1a.CPP,156"$
+$FG,2$  0.34% 00000119:&tS
+$FG$$FG,2$  0.09% 00000050:&PSectFind
+$FG$$FG,2$  0.12% 00000068:&InitMap
+$FG$  0.11% 0000005D:$LK,"&FSTransform+0x0004",A="FL:D:/Demo/Games/EagleDive.CPP,111"$
+  0.68% 00000229:$LK,"&FSTransform+0x004E",A="FL:D:/Demo/Games/EagleDive.CPP,121"$
+  0.54% 000001B6:$LK,"&FSTransform+0x0060",A="FL:D:/Demo/Games/EagleDive.CPP,123"$
+$FG,2$  1.75% 00000590:&FSTransform
+$FG$  0.56% 000001C7:$LK,"&MPDrawIt+0x03A3",A="FL:D:/Demo/Games/EagleDive.CPP,557"$
+  0.18% 00000099:&MPDrawIt+0x03AA
+  0.54% 000001B9:&MPDrawIt+0x03BE
+  0.10% 00000055:$LK,"&MPDrawIt+0x03C4",A="FL:D:/Demo/Games/EagleDive.CPP,557"$
+  0.54% 000001BA:&MPDrawIt+0x03D0
+  0.09% 00000050:&MPDrawIt+0x03D4
+  0.67% 00000227:$LK,"&MPDrawIt+0x03E0",A="FL:D:/Demo/Games/EagleDive.CPP,559"$
+  0.10% 00000052:&MPDrawIt+0x03E9
+  0.53% 000001AF:&MPDrawIt+0x03FD
+  0.54% 000001B6:$LK,"&MPDrawIt+0x041A",A="FL:D:/Demo/Games/EagleDive.CPP,560"$
+  0.50% 0000019B:&MPDrawIt+0x042C
+  7.91% 0000190B:&MPDrawIt+0x0436
+  0.33% 00000110:&MPDrawIt+0x0439
+  0.09% 0000004E:&MPDrawIt+0x043E
+  9.79% 00001EFF:&MPDrawIt+0x0449
+ 11.99% 000025F9:&MPDrawIt+0x044E
+  0.16% 00000087:$LK,"&MPDrawIt+0x0450",A="FL:D:/Demo/Games/EagleDive.CPP,560"$
+  0.33% 0000010F:&MPDrawIt+0x0457
+  0.18% 00000095:&MPDrawIt+0x0461
+  0.12% 00000064:&MPDrawIt+0x0467
+  0.09% 00000050:&MPDrawIt+0x046B
+  1.42% 00000484:&MPDrawIt+0x046E
+  0.13% 0000006D:$LK,"&MPDrawIt+0x049C",A="FL:D:/Demo/Games/EagleDive.CPP,565"$
+  0.53% 000001AE:$LK,"&MPDrawIt+0x04A4",A="FL:D:/Demo/Games/EagleDive.CPP,568"$
+  0.08% 00000045:&MPDrawIt+0x04A8
+  0.10% 00000056:&MPDrawIt+0x04AC
+  0.61% 000001F1:$LK,"&MPDrawIt+0x04B0",A="FL:D:/Demo/Games/EagleDive.CPP,570"$
+$FG,2$ 39.40% 00007CC0:&MPDrawIt
+$FG$  0.09% 00000049:$LK,"&WinMgrSync+0x00CA",A="FL:D:/Adam/Win2b.CPP,636"$
+ 20.96% 0000425E:$LK,"&WinMgrSync+0x0100",A="FL:D:/Adam/Win2b.CPP,642"$
+$FG,2$ 21.09% 000042C8:&WinMgrSync
+$FG$  0.11% 0000005A:$LK,"&GrFillTri0+0x01C9",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1186"$
+  0.09% 0000004F:$LK,"&GrFillTri0+0x01F1",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1187"$
+  0.09% 0000004B:$LK,"&GrFillTri0+0x0217",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1189"$
+  0.11% 0000005B:$LK,"&GrFillTri0+0x023F",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1190"$
+  0.08% 00000046:$LK,"&GrFillTri0+0x037D",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1217"$
+  0.12% 00000068:$LK,"&GrFillTri0+0x04CF",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1271"$
+  0.09% 0000004A:$LK,"&GrFillTri0+0x04F7",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1272"$
+  0.09% 00000049:$LK,"&GrFillTri0+0x051D",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1274"$
+  0.09% 0000004D:$LK,"&GrFillTri0+0x0545",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1275"$
+  0.08% 00000046:$LK,"&GrFillTri0+0x066E",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1302"$
+  0.10% 00000056:$LK,"&GrFillTri0+0x0797",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1373"$
+  0.09% 00000049:$LK,"&GrFillTri0+0x07BF",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1374"$
+  0.09% 0000004A:$LK,"&GrFillTri0+0x0806",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1376"$
+  0.08% 00000045:$LK,"&GrFillTri0+0x08F9",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1398"$
+  0.08% 00000042:$LK,"&GrFillTri0+0x0901",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1400"$
+  0.08% 00000043:$LK,"&GrFillTri0+0x0905",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1402"$
+  0.08% 00000048:$LK,"&GrFillTri0+0x094F",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1405"$
+  0.11% 0000005A:$LK,"&GrFillTri0+0x0977",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1406"$
+  0.08% 00000045:$LK,"&GrFillTri0+0x09BE",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1408"$
+  0.09% 0000004D:$LK,"&GrFillTri0+0x09E6",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1409"$
+$FG,2$  4.28% 00000D90:&GrFillTri0
+$FG$  0.83% 000002A8:$LK,"&GrFillPoly3+0x0244",A="FL:D:/Adam/Gr/GrPrimatives.CPP,1485"$
+$FG,2$  1.32% 00000430:&GrFillPoly3
+$FG$$FG,2$  0.52% 000001A7:&GrBlot3
+$FG$  0.34% 00000116:$LK,"&GrHLine+0x0004",A="FL:D:/Adam/Gr/GrBitMap.CPP,1560"$
+  0.08% 00000047:&GrHLine+0x0005
+  0.08% 00000042:&GrHLine+0x000C
+  0.07% 0000003D:$LK,"&GrHLine+0x0028",A="FL:D:/Adam/Gr/GrBitMap.CPP,1564"$
+  0.10% 00000052:$LK,"&GrHLine+0x0190",A="FL:D:/Adam/Gr/GrBitMap.CPP,1593"$
+  1.55% 000004EC:$LK,"&GrHLine+0x02C6",A="FL:D:/Adam/Gr/GrBitMap.CPP,1625"$
+  0.09% 00000051:$LK,"&GrHLine+0x044C",A="FL:D:/Adam/Gr/GrBitMap.CPP,1671"$
+  0.21% 000000AC:$LK,"&GrHLine+0x045D",A="FL:D:/Adam/Gr/GrBitMap.CPP,1674"$
+  0.17% 0000008C:&GrHLine+0x0461
+  0.23% 000000BB:$LK,"&GrHLine+0x046B",A="FL:D:/Adam/Gr/GrBitMap.CPP,1675"$
+  0.12% 00000069:$LK,"&GrHLine+0x0474",A="FL:D:/Adam/Gr/GrBitMap.CPP,1676"$
+  0.13% 0000006C:$LK,"&GrHLine+0x047D",A="FL:D:/Adam/Gr/GrBitMap.CPP,1678"$
+  0.14% 00000074:&GrHLine+0x0482
+  0.07% 0000003E:&GrHLine+0x0485
+  1.00% 00000332:&GrHLine+0x0488
+  0.21% 000000AE:$LK,"&GrHLine+0x048D",A="FL:D:/Adam/Gr/GrBitMap.CPP,1678"$
+  0.14% 00000074:&GrHLine+0x0491
+  0.09% 0000004D:$LK,"&GrHLine+0x0494",A="FL:D:/Adam/Gr/GrBitMap.CPP,1679"$
+  0.22% 000000B7:$LK,"&GrHLine+0x049A",A="FL:D:/Adam/Gr/GrBitMap.CPP,1682"$
+  0.21% 000000B1:$LK,"&GrHLine+0x049E",A="FL:D:/Adam/Gr/GrBitMap.CPP,1682"$
+  0.31% 000000FC:&GrHLine+0x04A3
+  0.11% 0000005C:$LK,"&GrHLine+0x04A9",A="FL:D:/Adam/Gr/GrBitMap.CPP,1684"$
+  0.29% 000000F2:$LK,"&GrHLine+0x04B4",A="FL:D:/Adam/Gr/GrBitMap.CPP,1685"$
+  0.08% 00000041:$LK,"&GrHLine+0x04C2",A="FL:D:/Adam/Gr/GrBitMap.CPP,1687"$
+  0.10% 00000058:&GrHLine+0x04C7
+  0.40% 00000148:$LK,"&GrHLine+0x04D7",A="FL:D:/Adam/Gr/GrBitMap.CPP,1689"$
+  0.08% 00000047:&GrHLine+0x04DE
+  0.51% 000001A0:$LK,"&GrHLine+0x04E0",A="FL:D:/Adam/Gr/GrBitMap.CPP,1692"$
+  0.26% 000000D4:$LK,"&GrHLine+0x0523",A="FL:D:/Adam/Gr/GrBitMap.CPP,1706"$
+  0.13% 0000006A:$LK,"&GrHLine+0x0572",A="FL:D:/Adam/Gr/GrBitMap.CPP,1715"$
+  0.27% 000000DC:$LK,"&GrHLine+0x0579",A="FL:D:/Adam/Gr/GrBitMap.CPP,1718"$
+  0.12% 00000062:$LK,"&GrHLine+0x0582",A="FL:D:/Adam/Gr/GrBitMap.CPP,1720"$
+  0.23% 000000BF:$LK,"&GrHLine+0x058A",A="FL:D:/Adam/Gr/GrBitMap.CPP,1721"$
+  0.16% 00000086:&GrHLine+0x058E
+  0.13% 0000006B:&GrHLine+0x0596
+  0.19% 000000A2:&GrHLine+0x059A
+  0.08% 00000047:$LK,"&GrHLine+0x05A4",A="FL:D:/Adam/Gr/GrBitMap.CPP,1722"$
+  0.21% 000000AF:$LK,"&GrHLine+0x05EA",A="FL:D:/Adam/Gr/GrBitMap.CPP,1732"$
+  0.26% 000000D5:&GrHLine+0x05EE
+  0.17% 0000008A:&GrHLine+0x05FD
+$FG,2$ 13.03% 00002946:&GrHLine
+$FG$$FG,2$  0.11% 0000005A:&GrPeek
+$FG$$FG,2$  0.12% 00000063:&GrPeek0
+$FG$  0.10% 00000055:$LK,"&DCBlotColor8+0x0037",A="FL:D:/Adam/Gr/GrScreen.CPP,750"$
+  0.09% 00000049:$LK,"&DCBlotColor8+0x003C",A="FL:D:/Adam/Gr/GrScreen.CPP,750"$
+  0.10% 00000055:$LK,"&DCBlotColor8+0x0054",A="FL:D:/Adam/Gr/GrScreen.CPP,755"$
+$FG,2$  0.30% 000000FB:&DCBlotColor8
+$FG$  0.80% 0000028A:$LK,"&GrUpdateLine32+0x0027",A="FL:D:/Adam/Gr/GrAsm.CPP,760"$
+  0.12% 00000068:$LK,"&GrUpdateLine32+0x002B",A="FL:D:/Adam/Gr/GrAsm.CPP,760"$
+  0.19% 0000009B:$LK,"&GrUpdateLine32+0x002E",A="FL:D:/Adam/Gr/GrAsm.CPP,760"$
+ 11.49% 00002465:$LK,"&GrUpdateLine32+0x0040",A="FL:D:/Adam/Gr/GrAsm.CPP,760"$
+  0.15% 0000007D:$LK,"&GrUpdateLine32+0x0044",A="FL:D:/Adam/Gr/GrAsm.CPP,760"$
+$FG,2$ 13.12% 0000298A:&GrUpdateLine32
+$FG$  0.10% 00000055:$LK,"&GrUpdateLine32FlushCache+0x003C",A="FL:D:/Adam/Gr/GrAsm.CPP,762"$
+$FG,2$  0.11% 0000005E:&GrUpdateLine32FlushCache
+$FG$$FG,2$  0.11% 00000061:&DCBlotColor4
+$FG$  0.08% 00000047:$LK,"&GrRot+0x0004",A="FL:D:/Adam/Gr/MathGr.CPP,237"$
+$FG,2$  0.71% 00000242:&GrRot
+$FG$$FG,2$  0.07% 0000003E:&GrUpdateVGAGraphics
+$FG$Total Time:   80.956136s
+81.115115s ans0=0x00000090=144
+D:/Accts/TS/TAD>$PT$
+
+$FD,0$------------------------------------------
+
+$IV,1$----09/13/13 12:26:58----$IV,0$
+
+I toyed with the idea of "No 3rd Party Software" when I was focused on programming as entertainment.  I'm not going to be that draconian.  Generally speaking, though, the vision of a modern C64, stands, and that did not have an ever-growing set of libraries -- you had just the C64 ROM to build on.  It will fit in about 6 Meg or less without the Dictionary, so I really don't care if people ship the whole thing with their applications and make them future-proof.  That's not very appealing.
+
+It really doesn't make sense to make professional software for this platform, except it's way more pleasant for the software companies!  Just continue with Linux or Windows software, mostly, and everybody who wants Heaven, can do native stuff.
+
+I don't have changes in mind, but I will probably break compatibility.  It's a nuissance to keep your own code up-to-date, but how lovely it is!
+
+$IV,1$----09/13/13 12:27:01----$IV,0$
+
+Someone talked about palettes.  I avoid that, being slightly paranoid VGA palettes are not universal.  That's probably absurd, but how can I know?  I put palette support in there, but feel weird using it.
+
+------------------------------------------
+
+$IV,1$----09/13/13 14:39:57----$IV,0$
+
+Here's a task record with $LK,"ClassRep",A="MN:ClassRep"$():
+
+$FD,1$D:/Accts/TS/TAD>$PT$ClassRep(Fs,,1);
+$PT$$FG$$BG$Class:"CTask"
+7FD8A428 $TR,"addr"$
+$ID,2$$ID,-2$7FD8A430 $FG,2$task_signature      :$FG$536B7354 
+7FD8A434 $FG,2$task_in_que_signatur:$FG$516B7354 
+7FD8A438 $FG,2$task_flags          :$FG$0000000000009904 
+7FD8A440 $FG,2$locked_flags        :$FG$0000000000000000 
+7FD8A448 $FG,2$display_flags       :$FG$00000003 
+7FD8A44C $FG,2$win_inhibit         :$FG$00000000 
+7FD8A450 $FG,2$wake_jiffy          :$FG$0000000000000000 
+7FD8A458 $TR,"code_heap"$
+$ID,2$$ID,-2$7FD8A460 $TR,"data_heap"$
+$ID,2$$ID,-2$7FD8A468 $TR,"put_doc"$
+$ID,2$$ID,-2$7FD8A470 $TR,"display_doc"$
+$ID,2$$ID,-2$7FD8A478 $TR,"border_doc"$
+$ID,2$$ID,-2$7FD8A480 $FG,2$win_left            :$FG$0000000000000001 
+7FD8A488 $FG,2$win_right           :$FG$000000000000004E 
+7FD8A490 $FG,2$win_top             :$FG$000000000000000D 
+7FD8A498 $FG,2$win_bottom          :$FG$000000000000003A 
+7FD8A4A0 $TR,"cur_prt"$
+$ID,2$$ID,-2$7FD8A4A8 $FG,2$cur_dir             :$FG$                  /Accts/TS/TAD
+
+7FD8A4B0 $TR,"parent_task"$
+$ID,2$$ID,-2$7FD8A4B8 $TR,"next_task"$
+$ID,2$$ID,-2$7FD8A4C0 $TR,"last_task"$
+$ID,2$$ID,-2$7FD8A4C8 $TR,"next_input_filter_task"$
+$ID,2$$ID,-2$7FD8A4D0 $TR,"last_input_filter_task"$
+$ID,2$$ID,-2$7FD8A4D8 $TR,"next_sibling_task"$
+$ID,2$$ID,-2$7FD8A4E0 $TR,"last_sibling_task"$
+$ID,2$$ID,-2$7FD8A4E8 $TR,"next_child_task"$
+$ID,2$$ID,-2$7FD8A4F0 $TR,"last_child_task"$
+$ID,2$$ID,-2$7FD8A4F8 $FG,2$win_width           :$FG$000000000000004E 
+7FD8A500 $FG,2$win_height          :$FG$000000000000002E 
+7FD8A508 $FG,2$pix_left      :$FG$0000000000000008 
+7FD8A510 $FG,2$pix_right     :$FG$0000000000000277 
+7FD8A518 $FG,2$pix_width     :$FG$0000000000000270 
+7FD8A520 $FG,2$pix_top       :$FG$0000000000000068 
+7FD8A528 $FG,2$pix_bottom    :$FG$00000000000001D7 
+7FD8A530 $FG,2$pix_height    :$FG$0000000000000170 
+7FD8A538 $FG,2$border_pix_lef:$FG$0000000000000000 
+7FD8A540 $FG,2$border_pix_rig:$FG$000000000000027F 
+7FD8A548 $FG,2$border_pix_top:$FG$0000000000000060 
+7FD8A550 $FG,2$border_pix_bot:$FG$00000000000001DF 
+7FD8A558 $FG,2$scroll_x        :$FG$0000000000000000 
+7FD8A560 $FG,2$scroll_y        :$FG$0000000000000000 
+7FD8A568 $FG,2$scroll_z        :$FG$0000000000000000 
+7FD8A570 $FG,2$win_max_refresh     :$FG$              60 
+7FD8A578 $TR,"snap"$
+$ID,2$$ID,-2$7FD8A5A8 $FG,2$rip                 :$FG$000000000000C3C9 
+7FD8A5B0 $FG,2$rflags              :$FG$0000000000000246 
+7FD8A5B8 $FG,2$rsp                 :$FG$0000000198874D70 
+7FD8A5C0 $FG,2$rsi                 :$FG$000000019887EC78 
+7FD8A5C8 $FG,2$rax                 :$FG$0000000000000001 
+7FD8A5D0 $FG,2$rcx                 :$FG$000000007FD8A438 
+7FD8A5D8 $FG,2$rdx                 :$FG$0000000198888428 
+7FD8A5E0 $FG,2$rbx                 :$FG$0000000000000000 
+7FD8A5E8 $FG,2$rbp                 :$FG$0000000198874DB0 
+7FD8A5F0 $FG,2$rdi                 :$FG$0000000198823428 
+7FD8A5F8 $FG,2$r8                  :$FG$000000016BAB0140 
+7FD8A600 $FG,2$r9                  :$FG$0000000198874CE0 
+7FD8A608 $FG,2$r10                 :$FG$000000019944B300 
+7FD8A610 $FG,2$r11                 :$FG$000000019887EC78 
+7FD8A618 $FG,2$r12                 :$FG$0000000000000032 
+7FD8A620 $FG,2$r13                 :$FG$0000000000000004 
+7FD8A628 $FG,2$r14                 :$FG$000000016BAB72D8 
+7FD8A630 $FG,2$r15                 :$FG$000000016BAB72E0 
+7FD8A638 $TR,"gs"$
+$ID,2$$ID,-2$7FD8A640 $TR,"fpu_mmx"$
+$ID,2$$ID,-2$7FD8A648 $FG,2$time_slice_start    :$FG$0000042B4D39B5DC 
+7FD8A650 $FG,2$total_time          :$FG$00000000010C4A06 
+7FD8A658 $FG,2$swap_cnter          :$FG$000000000000042F 
+7FD8A660 $FG,2$draw_it             :$FG$0000000000000000
+7FD8A668 $FG,2$task_title          :$FG$               ClassRep(Fs,,1);
+
+43 6C 61 73 73 52 65 70 28 22 43 54 61 73 6B 22 2C 46 73 2C 31 29 3B 3B 0A 00 2A 00 00 00 00 00 ...
+7FD8A6E8 $FG,2$task_name           :$FG$                            Unnamed Task
+55 6E 6E 61 6D 65 64 20 54 61 73 6B 00 00 00 00 C8 00 00 00 6A 00 E8 25 ED FF FF 6A 00 E8 06 16 
+7FD8A708 $FG,2$wallpaper_data      :$FG$                                        
+00 D6 05 00 00 00 00 00 20 46 05 00 00 00 00 00 20 20 20 20 20 26 47 65 74 4B 65 79 2B 30 78 30 ...
+7FD8A788 $FG,2$title_src           :$FG$
+04 
+7FD8A789 $FG,2$text_attr           :$FG$ñ
+F1 
+7FD8A78A $FG,2$border_attr         :$FG$ñ
+F1 
+7FD8A78B $FG,2$border_src          :$FG$
+01 
+7FD8A78C $FG,2$win_z_num           :$FG$0004 
+7FD8A78E $FG,2$pad                 :$FG$0000 
+7FD8A790 $TR,"stk"$
+$ID,2$$ID,-2$7FD8A798 $TR,"next_except"$
+$ID,2$$ID,-2$7FD8A7A0 $TR,"last_except"$
+$ID,2$$ID,-2$7FD8A7A8 $FG,2$except_rbp          :$FG$0000000000000000 
+7FD8A7B0 $FG,2$except_argc         :$FG$0000000000000000 
+7FD8A7B8 except_argv         :0000000000000000
+7FD8A7C0 $FG,2$catch_except        :$FG$
+00 
+7FD8A7C1 $FG,2$pad                 :$FG$
+00 
+7FD8A7C2 $FG,2$answers_displayed   :$FG$0001 
+7FD8A7C4 $FG,2$answer_types        :$FG$                                        
+00 00 00 00 
+7FD8A7C8 $FG,2$answers             :$FG$0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+7FD8A7E8 $FG,2$answer_times        :$FG$0.000000000000e0 0.000000000000e0 0.000000000000e0 0.000000000000e0 
+7FD8A808 bpt_lst             :0000000000000000
+7FD8A810 $TR-C,"next_ctrl"$
+$ID,2$$ID,-2$7FD8A818 $TR-C,"last_ctrl"$
+$ID,2$$ID,-2$7FD8A820 $TR-C,"cur_menu"$
+$ID,2$$ID,-2$7FD8A828 next_settings       :0000000000000000
+7FD8A830 $TR-C,"next_ode"$
+$ID,2$$ID,-2$7FD8A838 $TR-C,"last_ode"$
+$ID,2$$ID,-2$7FD8A840 $FG,2$last_ode_time       :$FG$0.000000000000e0 
+7FD8A848 $TR,"hash_table"$
+$ID,2$$ID,-2$7FD8A850 $TR,"srv_ctrl"$
+$ID,2$$ID,-2$7FD8A878 $TR,"next_lex"$
+$ID,2$$ID,-2$7FD8A880 $TR,"last_lex"$
+$ID,2$$ID,-2$7FD8A888 $FG,2$win_old_left        :$FG$0000000000000001 
+7FD8A890 $FG,2$win_old_right       :$FG$000000000000004E 
+7FD8A898 $FG,2$win_old_top         :$FG$000000000000000D 
+7FD8A8A0 $FG,2$win_old_bottom      :$FG$000000000000003A 
+7FD8A8A8 $FG,2$task_end_cb         :$FG$0000000000000000
+7FD8A8B0 song_task           :0000000000000000
+7FD8A8B8 animate_task        :0000000000000000
+7FD8A8C0 $FG,2$rnd_seed            :$FG$0000000000000000 
+7FD8A8C8 $FG,2$task_num            :$FG$000000000000001E 
+7FD8A8D0 $FG,2$user_num            :$FG$0000000000000003 
+7FD8A8D8 $FG,2$fault_num           :$FG$0000000000000000 
+7FD8A8E0 $FG,2$fault_err_code      :$FG$0000000000000000 
+7FD8A8E8 dbg_task            :0000000000000000
+7FD8A8F0 popup_task          :0000000000000000
+7FD8A8F8 $TR,"horz_scroll"$
+$ID,2$$ID,-2$7FD8A918 $TR,"vert_scroll"$
+$ID,2$$ID,-2$7FD8A938 $FG,2$user_data0          :$FG$0000000000000000 
+7FD8A940 $FG,2$user_data1          :$FG$0000000000000000 
+7FD8A948 $FG,2$user_data2          :$FG$0000000000000000 
+7FD8A950 $FG,2$user_data3          :$FG$0000000000000000 
+7FD8A958 $FG,2$pad                 :$FG$
+
+0.002664s ans0=0x00000000=0
+D:/Accts/TS/TAD>$PT$
+
+$FD,0$------------------------------------------
+
+$IV,1$----09/13/13 14:59:35----$IV,0$
+
+God says...
+$FG,4$cupidity hereon Ghost discussed dissipation dangers severely beneath whit AD judge Deity subtile knocketh acceptably preventedst stored must dispensest compare create base cherished dotages graceful possesses gloried third dug Epicurus Blessed expects mount Jacob feeding unsought clay subject createth commandments unbelievers esteeming rush Alas Julian borrow sorrow obtained You His Priest angels deaf dining as mysteriously liveth adorning meditations killeth accompany neighbours ascended mass blush difficulties $FG$
+
+$IV,1$----09/13/13 15:35:51----$IV,0$
+
+Someone at $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$ is pretending not to understand that it is ring-0-only by choice.  Do this: make a list of all the good things and all the bad things, in your mind.  You are either dishonest or the biggest retard ever.  "A motorcycle should have side airbags."
+
+
+$IV,1$----09/13/13 16:06:30----$IV,0$
+
+These are all the symbols that come with it.  They are loaded into the Adam task's hash table and all sons of Adam inherit them, without need for including headers:
+
+$FG,4$$TX,"Source Code By Sym",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/SymsAlpha.html"$$FG$
+
+$IV,1$----09/13/13 16:55:41----$IV,0$
+
+I did not follow a single standard.  My compiler has an $FG,1$interrupt$FG$ keyword to be used on functions.  I use the arg-pop variant of RET.
+
+My compiler does not make an AST, it makes a stack machine byte-code that it optimizes and makes machine code JIT or AOT, in 22,000 lines of code.  Yer going to get yourself humiliated if you accuse me of plagarism.  You're so, stupid, you think ring-0-only identity-mapped is somehow a linux rip-off.
+
+$IV,1$----09/13/13 17:08:06----$IV,0$
+
+Linux is inspired by 1970's mainframes.  They are set-up for multi-user with 2 meg shared by 100 users.  They put things in pipes, doing a little at a time, and they have virtual memory.  They have a language good for admins.
+
+TempleOS is inspired by a C64.  It is to be used for the same sorts of things, but it is modern.  It loads and processes whole files.  Actual disk virtual memory, by the way, is really retarded these days because if it ever actually does swap, it's unacceptablly slow!  All vestiges of virual memory should be purged from all operating systems.
+
+Linux will let you play two video games at once.  TempleOS doesn't see that as important.  Sharing-locks?  Don't be a retard.
+
+C/C++ translation is very close to direct-to-assembly instructions.  GCC wastes compiler time on optimizations in case you give it dumb C/C++ code to compile because they are arrogant fools and suffer from piling ever-more-shit into it, like Intel and like Microsoft.
+
+Linux and Windows do SMP.  That is not good for real-time flight simulators without GPU.  TempleOS does master/slave.  All applications run on core 0 and simply control, explicity and specifically, each of the other cores.  The scheduler never moves tasks between cores.  Theirs runs two applications faster; TempleOS runs one application faster.  In TempleOS, all tasks on all cores have the same address map -- all tasks can access all memory at all times because it's always identity-mapped with not ring protections.
+
+Because it is ring-0-only and never changes address maps, it can do a blazing 4,000,000 task changes in one second per core.  This is how I do multicored locks for I/O.
+
+$FG,2$while (LBts(&my_lock_var,0))
+  Yield;
+
+...
+
+LBtr(&my_lock_var,0);$FG$
+
+lock-bit-test-and-set is an atomic, x86, multicore-safe-locked instruction.
+
+This is how I poll disk drives:
+
+$FG,2$while (!InU8(STATUS))
+  Yield;
+$FG$
+That's known as cooperative multitasking.  I have preemption.
+
+$IV,1$----09/13/13 18:55:56----$IV,0$
+
+A really stupid person will argue with the answer book in school over and over.  The people at $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$ have argued for ten years, as though, my operating system is so flawed it doesn't boot.  I guess they think I do photoshop videos?  And, I am doing a grand deception... for some reason?
+
+I identity-map so that virtual and physical addresses are the same.  The BIOS physical address map is my virtual memory map.  Mine is ring-0-only, so there is no kernel/user split.
+
+Therefore, I don't have any upper FFFFFFFF70000000- addresses.  I enjoy mocking them so much, I'm reluctant to explain why a RING-0-ONLY IDENTITY-MAPPED operating system does not have high addresses.  I like just mocking them.
+
+$IV,1$----09/13/13 20:34:40----$IV,0$
+
+I identity-map 128 Gig of space with 2 Meg pages, not 4K pages.
+
+$LK,"::/Kernel/Mem1b.CPP"$.
+
+It only takes 128 Gig / 2 Meg * 8 bytes = 512K of page tables.  The first 2 Meg is 4K pages so I can mark 0xA0000-0xB0000 as write-through.
+
+Picking a very arbitrary and insignificant idea to discuss, in my judgement, it's better not to define labels for bits in the case of page tables.  Nobody needs to mess with page tables -- leave them identity-mapped.  If you do, raw numbers aren't that bad for page table bits.  Go write hymns and do first person shooters with multicore, not doing hardware (Yes, I concede that hardware would involve write-through memory page table bits, etc.)
+
+I put links in source code and links to local PDF would be really neat, avoid the need to document.  I would like to convert Intel PDF manuals to plain text, but they look dreadful -- so bad they are too bad.
+
+$IV,1$----09/13/13 20:42:41----$IV,0$
+
+I wrote my own boot-loaders. $LK,"::/Doc/Boot.TXT"$
+
+My Kernel starts in real mode, calls BIOS to fetch info and change to VGA, then changes to long mode.  $LK,"::/Kernel/KStart.CPP"$.

@@ -1,0 +1,957 @@
+$WW,1$$IV,1$----01/17/14 00:02:30----$IV,0$
+
+The CIA is afraid of drones, so it is clusterfucking computer science.  Get out while you can.  It's too late for me.  I made this operating system including a compiler.  The CIA is, now, clusterfucking PCs so it cannot run.  It ran on computers from 2004-2010, but after that it is clusterfucked.
+
+The CIA and Bill Gates want you to make web pages, not programs.  That's what they want computer science to be -- making web pages.  They are destroying all other things.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389945840",HTML="http://beacon.nist.gov/rest/record/1389945840"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x900820-->(9439264 mod 100091)+1-->Line:30711
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 Kings 10:29) God says...
+$FG,4$10:29 And a chariot came up and went out of Egypt for six hundred
+shekels of silver, and an horse for an hundred and fifty: and so for
+all the kings of the Hittites, and for the kings of Syria, did they
+bring them out by their means.
+
+11:1 But king Solomon loved many strange women, together with the
+daughter of Pharaoh, women of the Moabites, Ammonites, Edomites,
+Zidonians, and Hittites: 11:2 Of the nations concerning which the LORD
+said unto the children of Israel, Ye shall not go in to them, neither
+shall they come in unto you: for surely they will turn away your heart
+after their gods: Solomon clave unto these in love.
+
+11:3 And he had seven hundred wives, princesses, and three hundred
+concubines: and his wives turned away his heart.
+
+11:4 For it came to pass, when Solomon was old, that his wives turned
+away his heart after other gods: and his heart was not perfect with
+the LORD his God, as was the heart of David his father.$FG$
+
+$IV,1$----01/17/14 00:13:16----$IV,0$
+
+$TX,"ATMs run XP",HTML="http://www.businessweek.com/articles/2014-01-16/atms-face-deadline-to-upgrade-from-windows-xp"$
+
+I know what that's about.  It is, now, impossible to interface to hardware.  They do not want drones so they are clusterfucking everything to do with computers.  You cannot use a simple RS232 serial port.  XP is the only unclusterfucked OS and they are trying to kill it.  It allowed you to access the parallel port with your programs.  Now, they have blocked access to all hardware ports.  They don't allow digital I/O, either.
+
+I made a parallel port device for the last company I worked for.  It worked on XP but Vista blocked access.  Someone had a work-around but then they stopped making parallel and RS232 serial ports.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389946620",HTML="http://beacon.nist.gov/rest/record/1389946620"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x9FEFFA-->(10481658 mod 100091)+1-->Line:72195
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Daniel 4:4) God says...
+$FG,4$4:4 I Nebuchadnezzar was at rest in mine house, and flourishing in my
+palace: 4:5 I saw a dream which made me afraid, and the thoughts upon
+my bed and the visions of my head troubled me.
+
+4:6 Therefore made I a decree to bring in all the wise men of Babylon
+before me, that they might make known unto me the interpretation of
+the dream.
+
+4:7 Then came in the magicians, the astrologers, the Chaldeans, and
+the soothsayers: and I told the dream before them; but they did not
+make known unto me the interpretation thereof.
+
+4:8 But at the last Daniel came in before me, whose name was
+Belteshazzar, according to the name of my God, and in whom is the
+spirit of the holy gods: and before him I told the dream, saying, 4:9
+O Belteshazzar, master of the magicians, because I know that the
+spirit of the holy gods is in thee, and no secret troubleth thee, tell
+me the visions of my dream that I have seen, and the interpretation
+thereof.$FG$
+
+$IV,1$----01/17/14 00:41:18----$IV,0$
+$WW,1$$FG,5$$TX+CX,"Demands"$$FG$
+
+When God is manifest to the World and He claims this operating system, publically, here's what I want:
+
+* VMware to again support PC Speaker and provide emulation if no PC Speaker is present.
+
+* Windows and Linux will support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  I view redundant code that performs the same function as imperfect.  More than one filesystem type is bad, not good!
+
+$LK,"::/Kernel/Dsk/FileSysRedSea.CPP"$
+$LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:1004
+$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:306
+$LK,"::/Adam/Boot/DskCDDVD.CPP"$	:536
+
+* No secure boot.  TempleOS is a additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
+
+* Mandate to PC hardware manufacturers: ATA/ATAPI PIO must work.
+
+* PS2 emulated Keyboard and Mouse must work.  The BIOS must enable these.
+
+* VMware should allow ATAPI to connect real CD/DVD hardware.
+
+* Perhaps, VMware can enable faster than standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so the bandwidth isn't as bad.
+
+* VMware and others should list TempleOS as one of the official 64-bit operating systems.
+
+* Windows and Linux should support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bit pixs 4-bits of color and transparency, with no palette.  Compression comes from the $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ $FG,2$.Z$FG$ LZW compression.  (Let me know when you want it.)  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
+
+
+
+
+In other words, all hardware and BIOSes must support TempleOS as a native and as a virtual system, dual booted with Windows or Linux.
+
+It would be neat if TempleOS were burned into BIOS ROMs in the factory, or maybe Intel CPU chips, in factory!  My hope is that it will be finished and largely unchanging for centuries.  I need a good dictionary, first.  Maybe, we leave the dictionary out.
+
+I do not intend to ever support UEFI.  That monstrocity uses elf and various propriatary graphics formats.
+
+$IV,1$----01/17/14 00:41:22----$IV,0$
+
+I made God's operating system.  I make the rules.  Make your hardware work with God's Temple.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389948060",HTML="http://beacon.nist.gov/rest/record/1389948060"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x5B735C-->(5993308 mod 100091)+1-->Line:87940
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Acts 2:24) God says...
+$FG,4$God hath raised up, having loosed the pains of death: because it was
+not possible that he should be holden of it.
+
+2:25 For David speaketh concerning him, I foresaw the Lord always
+before my face, for he is on my right hand, that I should not be
+moved: 2:26 Therefore did my heart rejoice, and my tongue was glad;
+moreover also my flesh shall rest in hope: 2:27 Because thou wilt not
+leave my soul in hell, neither wilt thou suffer thine Holy One to see
+corruption.
+
+2:28 Thou hast made known to me the ways of life; thou shalt make me
+full of joy with thy countenance.
+
+2:29 Men and brethren, let me freely speak unto you of the patriarch
+David, that he is both dead and buried, and his sepulchre is with us
+unto this day.
+
+2:30 Therefore being a prophet, and knowing that God had sworn with an
+oath to him, that of the fruit of his loins, according to the flesh,
+he would raise up Christ to sit on his throne; 2:31 He seeing this$FG$
+
+$IV,1$----01/17/14 02:48:08----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/IFACrIx5SZ0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/IFACrIx5SZ0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389955980",HTML="http://beacon.nist.gov/rest/record/1389955980"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xCD667A-->(13461114 mod 100091)+1-->Line:48921
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 59:12) God says...
+$FG,4$59:12 For the sin of their mouth and the words of their lips let them
+even be taken in their pride: and for cursing and lying which they
+speak.
+
+59:13 Consume them in wrath, consume them, that they may not be: and
+let them know that God ruleth in Jacob unto the ends of the earth.
+Selah.
+
+59:14 And at evening let them return; and let them make a noise like a
+dog, and go round about the city.
+
+59:15 Let them wander up and down for meat, and grudge if they be not
+satisfied.
+
+59:16 But I will sing of thy power; yea, I will sing aloud of thy
+mercy in the morning: for thou hast been my defence and refuge in the
+day of my trouble.
+
+59:17 Unto thee, O my strength, will I sing: for God is my defence,
+and the God of my mercy.$FG$
+
+$IV,1$----01/17/14 03:05:30----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/rK2AliN7Uq8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/rK2AliN7Uq8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389956700",HTML="http://beacon.nist.gov/rest/record/1389956700"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xBB6A43-->(12282435 mod 100091)+1-->Line:71334
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Ezekiel 44:23) God says...
+$FG,4$44:23 And they shall teach my people the difference between the holy
+and profane, and cause them to discern between the unclean and the
+clean.
+
+44:24 And in controversy they shall stand in judgment; and they shall
+judge it according to my judgments: and they shall keep my laws and my
+statutes in all mine assemblies; and they shall hallow my sabbaths.
+
+44:25 And they shall come at no dead person to defile themselves: but
+for father, or for mother, or for son, or for daughter, for brother,
+or for sister that hath had no husband, they may defile themselves.
+
+44:26 And after he is cleansed, they shall reckon unto him seven days.
+
+44:27 And in the day that he goeth into the sanctuary, unto the inner
+court, to minister in the sanctuary, he shall offer his sin offering,
+saith the Lord GOD.
+
+44:28 And it shall be unto them for an inheritance: I am their
+inheritance: and ye shall give them no possession in Israel: I am$FG$
+
+$IV,1$----01/17/14 03:15:18----$IV,0$
+
+If the CIA is drilling holes in your boat, are you going to keep bailing buckets of water or get God to kill the CIA and patch your boat?
+
+The people at OSDev are busy bailing their boats -- fucken retards.
+
+My boat happens to be Noah's Ark, so I have reason to be optimitic.  It was designed by God and I don't think He'll let it sink.  I could be wrong.
+
+Shut the fuck up, retard, talking about bailing out my boat.  I'm waiting until God kills the CIA.  I'm not doing UEFI.  I'm not doing USB.  I'm not doing PCI.  I'm am fucken ordering the CIA to support BIOS, PS/2 and ATA/ATAPI PIO.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389957540",HTML="http://beacon.nist.gov/rest/record/1389957540"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x25CCD5-->(2477269 mod 100091)+1-->Line:75086
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Micah 5:6) God says...
+$FG,4$within our borders.
+
+5:7 And the remnant of Jacob shall be in the midst of many people as a
+dew from the LORD, as the showers upon the grass, that tarrieth not
+for man, nor waiteth for the sons of men.
+
+5:8 And the remnant of Jacob shall be among the Gentiles in the midst
+of many people as a lion among the beasts of the forest, as a young
+lion among the flocks of sheep: who, if he go through, both treadeth
+down, and teareth in pieces, and none can deliver.
+
+5:9 Thine hand shall be lifted up upon thine adversaries, and all
+thine enemies shall be cut off.
+
+5:10 And it shall come to pass in that day, saith the LORD, that I
+will cut off thy horses out of the midst of thee, and I will destroy
+thy chariots: 5:11 And I will cut off the cities of thy land, and
+throw down all thy strong holds: 5:12 And I will cut off witchcrafts
+out of thine hand; and thou shalt have no more soothsayers: 5:13 Thy
+graven images also will I cut off, and thy standing images out of the$FG$
+
+$IV,1$----01/17/14 03:26:34----$IV,0$
+
+God's temple must be perfect.  Perfect means we don't plan for the future.  If it changes, people in the future must rewrite everything.  It has a limit of 100,000 lines of code.  I have used it for many years.  It's mostly perfect.  We must get Microsoft and VMWare to support RedSea file system.  Then, we get rid of FAT32 and ISO9660.  We must get Microsoft to support GRA files.  Then we get rid of BMP.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389958140",HTML="http://beacon.nist.gov/rest/record/1389958140"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xC0ABD7-->(12626903 mod 100091)+1-->Line:15438
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Numbers 31:48) God says...
+$FG,4$captains of thousands, and captains of hundreds, came near unto Moses:
+31:49 And they said unto Moses, Thy servants have taken the sum of the
+men of war which are under our charge, and there lacketh not one man
+of us.
+
+31:50 We have therefore brought an oblation for the LORD, what every
+man hath gotten, of jewels of gold, chains, and bracelets, rings,
+earrings, and tablets, to make an atonement for our souls before the
+LORD.
+
+31:51 And Moses and Eleazar the priest took the gold of them, even all
+wrought jewels.
+
+31:52 And all the gold of the offering that they offered up to the
+LORD, of the captains of thousands, and of the captains of hundreds,
+was sixteen thousand seven hundred and fifty shekels.
+
+31:53 (For the men of war had taken spoil, every man for himself.)
+31:54 And Moses and Eleazar the priest took the gold of the captains
+of thousands and of hundreds, and brought it into the tabernacle of$FG$
+
+$IV,1$----01/17/14 03:35:55----$IV,0$
+
+Let me reveal the evil of the CIA.  Bill Gates says a company is like a castle.  He is intentionally clusterfucking everything!
+
+How can you program if you cannot make graphics files and read graphics files?
+
+$TX,"BMP_file",HTML="http://en.wikipedia.org/wiki/BMP_file"$
+
+A poor 16-year  old kid wants to read a graphics file.  Son of a bitch!  Look at this shit.  It is so obviously clusterfucked on purpose.
+
+My GRA files do not plan for the future.  BMP planned for the future.  It is worthless, completely clusterfucked and bottom to top on top of that.
+
+I have support for palettes in my operating system but I should remove that.  I drag my feet slightly.  I don't want palettes in my GRA files.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389958740",HTML="http://beacon.nist.gov/rest/record/1389958740"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xC822E4-->(13116132 mod 100091)+1-->Line:4212
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Genesis 42:18) God says...
+$FG,4$I fear God: 42:19 If ye be true men, let one of your brethren be bound
+in the house of your prison: go ye, carry corn for the famine of your
+houses: 42:20 But bring your youngest brother unto me; so shall your
+words be verified, and ye shall not die. And they did so.
+
+42:21 And they said one to another, We are verily guilty concerning
+our brother, in that we saw the anguish of his soul, when he besought
+us, and we would not hear; therefore is this distress come upon us.
+
+42:22 And Reuben answered them, saying, Spake I not unto you, saying,
+Do not sin against the child; and ye would not hear? therefore,
+behold, also his blood is required.
+
+42:23 And they knew not that Joseph understood them; for he spake unto
+them by an interpreter.
+
+42:24 And he turned himself about from them, and wept; and returned to
+them again, and communed with them, and took from them Simeon, and
+bound him before their eyes.$FG$
+
+$IV,1$----01/17/14 03:43:39----$IV,0$
+
+The simplest graphics file is BMP.  This adds a huge burden to the simplest thing a kid might want to do.  How do you make a BMP 3rd Party tool?  You must support all that shit!  WAV is just as fucked.  $TX,"WAV_file",HTML="http://en.wikipedia.org/wiki/WAV_file"$  You cannot make a WAV 3rd party tool unless you support all possible WAV files.
+
+USB is clusterfucked.
+
+UEFI is clusterfucked.
+
+They learned the secret of clusterfucking and clusterfucked everything there is to do in computer science.  Get out of computer science or pray for God to kill all the CIA in horrible ways.  Hunt down CIA like SS and kill them!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389959220",HTML="http://beacon.nist.gov/rest/record/1389959220"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x6AC847-->(6998087 mod 100091)+1-->Line:91809
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Romans 12:19) God says...
+$FG,4$the Lord.
+
+12:20 Therefore if thine enemy hunger, feed him; if he thirst, give
+him drink: for in so doing thou shalt heap coals of fire on his head.
+
+12:21 Be not overcome of evil, but overcome evil with good.
+
+13:1 Let every soul be subject unto the higher powers. For there is no
+power but of God: the powers that be are ordained of God.
+
+13:2 Whosoever therefore resisteth the power, resisteth the ordinance
+of God: and they that resist shall receive to themselves damnation.
+
+13:3 For rulers are not a terror to good works, but to the evil. Wilt
+thou then not be afraid of the power? do that which is good, and thou
+shalt have praise of the same: 13:4 For he is the minister of God to
+thee for good. But if thou do that which is evil, be afraid; for he
+beareth not the sword in vain: for he is the minister of God, a
+revenger to execute wrath upon him that doeth evil.$FG$
+
+$IV,1$----01/17/14 03:49:50----$IV,0$
+
+In other words, the lesson of BMP file future proofing is a lesson in clusterfucking.  I will not make my GRA file future-proof because if it gets clusterfucked the way BMP got clusterfucked, it's far better not allowing it to get clusterfucked by not making it changable.
+
+$IV,1$----01/17/14 04:22:39----$IV,0$
+
+$TX,"Obama",HTML="http://www.theatlantic.com/politics/archive/2014/01/what-happens-when-the-president-sits-down-next-to-you-at-a-cafe/283074"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389961380",HTML="http://beacon.nist.gov/rest/record/1389961380"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x07435F-->(475999 mod 100091)+1-->Line:75636
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Zephaniah 1:10) God says...
+$FG,4$1:10 And it shall come to pass in that day, saith the LORD, that there
+shall be the noise of a cry from the fish gate, and an howling from
+the second, and a great crashing from the hills.
+
+1:11 Howl, ye inhabitants of Maktesh, for all the merchant people are
+cut down; all they that bear silver are cut off.
+
+1:12 And it shall come to pass at that time, that I will search
+Jerusalem with candles, and punish the men that are settled on their
+lees: that say in their heart, The LORD will not do good, neither will
+he do evil.
+
+1:13 Therefore their goods shall become a booty, and their houses a
+desolation: they shall also build houses, but not inhabit them; and
+they shall plant vineyards, but not drink the wine thereof.
+
+1:14 The great day of the LORD is near, it is near, and hasteth
+greatly, even the voice of the day of the LORD: the mighty man shall
+cry there bitterly.$FG$
+
+$IV,1$----01/17/14 05:31:50----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/8TIQ0m01LCo\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/8TIQ0m01LCo\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389965520",HTML="http://beacon.nist.gov/rest/record/1389965520"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x9A10D7-->(10096855 mod 100091)+1-->Line:87756
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (John 21:13) God says...
+$FG,4$21:13 Jesus then cometh, and taketh bread, and giveth them, and fish
+likewise.
+
+21:14 This is now the third time that Jesus shewed himself to his
+disciples, after that he was risen from the dead.
+
+21:15 So when they had dined, Jesus saith to Simon Peter, Simon, son
+of Jonas, lovest thou me more than these? He saith unto him, Yea,
+Lord; thou knowest that I love thee. He saith unto him, Feed my lambs.
+
+21:16 He saith to him again the second time, Simon, son of Jonas,
+lovest thou me? He saith unto him, Yea, Lord; thou knowest that I love
+thee. He saith unto him, Feed my sheep.
+
+21:17 He saith unto him the third time, Simon, son of Jonas, lovest
+thou me? Peter was grieved because he said unto him the third time,
+Lovest thou me? And he said unto him, Lord, thou knowest all things;
+thou knowest that I love thee. Jesus saith unto him, Feed my sheep.
+
+21:18 Verily, verily, I say unto thee, When thou wast young, thou$FG$
+
+$IV,1$----01/17/14 06:41:08----$IV,0$
+
+I put all code in the lowest 2 Gig of memory.  You are a retard-nigger.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389969660",HTML="http://beacon.nist.gov/rest/record/1389969660"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x421B05-->(4332293 mod 100091)+1-->Line:28381
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (2 Samuel 16:11) God says...
+$FG,4$David said to Abishai, and to all his servants, Behold, my son, which
+came forth of my bowels, seeketh my life: how much more now may this
+Benjamite do it? let him alone, and let him curse; for the LORD hath
+bidden him.
+
+16:12 It may be that the LORD will look on mine affliction, and that
+the LORD will requite me good for his cursing this day.
+
+16:13 And as David and his men went by the way, Shimei went along on
+the hill's side over against him, and cursed as he went, and threw
+stones at him, and cast dust.
+
+16:14 And the king, and all the people that were with him, came weary,
+and refreshed themselves there.
+
+16:15 And Absalom, and all the people the men of Israel, came to
+Jerusalem, and Ahithophel with him.
+
+16:16 And it came to pass, when Hushai the Archite, David's friend,
+was come unto Absalom, that Hushai said unto Absalom, God save the$FG$
+
+$IV,1$----01/17/14 08:55:21----$IV,0$
+
+There's no point worrying about making arguments.  It comes down to God endorsing.  Nothing else matters at all.  2 Gig?  Don't have to explain anything.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389977760",HTML="http://beacon.nist.gov/rest/record/1389977760"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x018040-->(98368 mod 100091)+1-->Line:98369
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 John 3:24) God says...
+$FG,4$him.
+
+And hereby we know that he abideth in us, by the Spirit which he hath
+given us.
+
+4:1 Beloved, believe not every spirit, but try the spirits whether
+they are of God: because many false prophets are gone out into the
+world.
+
+4:2 Hereby know ye the Spirit of God: Every spirit that confesseth
+that Jesus Christ is come in the flesh is of God: 4:3 And every spirit
+that confesseth not that Jesus Christ is come in the flesh is not of
+God: and this is that spirit of antichrist, whereof ye have heard that
+it should come; and even now already is it in the world.
+
+4:4 Ye are of God, little children, and have overcome them: because
+greater is he that is in you, than he that is in the world.
+
+4:5 They are of the world: therefore speak they of the world, and the
+world heareth them.$FG$
+
+It matters, not a all, if I am talking to 100 people about the 2 Gig limit.  The only thing that matters is God placing His endorsement on this where everybody can see.  Nothing matters -- waste of time, talking about shit.
+
+$IV,1$----01/17/14 09:40:22----$IV,0$
+
+Bill Gates is a stupid atheist-nigger.
+
+Everything from him, has the stupidity of human logic.
+
+"Goliath will kill David unless David is clever, heh."
+
+Shat-up, nigger.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389980460",HTML="http://beacon.nist.gov/rest/record/1389980460"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x0E7A43-->(948803 mod 100091)+1-->Line:47985
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 38:21) God says...
+$FG,4$38:21 Forsake me not, O LORD: O my God, be not far from me.
+
+38:22 Make haste to help me, O Lord my salvation.
+
+
+
+39:1 I said, I will take heed to my ways, that I sin not with my
+tongue: I will keep my mouth with a bridle, while the wicked is before
+me.
+
+39:2 I was dumb with silence, I held my peace, even from good; and my
+sorrow was stirred.
+
+39:3 My heart was hot within me, while I was musing the fire burned:
+then spake I with my tongue,
+
+39:4 LORD, make me to know mine end, and the measure of my days, what
+it is: that I may know how frail I am.$FG$
+
+$IV,1$----01/17/14 11:29:45----$IV,0$
+
+I don't want people making binary AOT files -- use JIT.  There is no reason to use AOT.
+
+I am here to enlighten the World, not listen to captain obvious tell me how Linux works.  I know how Linux works.  I am here with divine knowledge.
+
+It is identity mapped.  As far as I know, no motherboards come with physical memory at 
+
+0xFFFFFFC000000000
+
+My operating system is ring-0-only and identity-mapped.
+
+There are 30 games and apps that prove it works well for its intended purpose.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389987180",HTML="http://beacon.nist.gov/rest/record/1389987180"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xF29BA2-->(15899554 mod 100091)+1-->Line:85177
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Luke 24:21) God says...
+$FG,4$Israel: and beside all this, to day is the third day since these
+things were done.
+
+24:22 Yea, and certain women also of our company made us astonished,
+which were early at the sepulchre; 24:23 And when they found not his
+body, they came, saying, that they had also seen a vision of angels,
+which said that he was alive.
+
+24:24 And certain of them which were with us went to the sepulchre,
+and found it even so as the women had said: but him they saw not.
+
+24:25 Then he said unto them, O fools, and slow of heart to believe
+all that the prophets have spoken: 24:26 Ought not Christ to have
+suffered these things, and to enter into his glory?  24:27 And
+beginning at Moses and all the prophets, he expounded unto them in all
+the scriptures the things concerning himself.
+
+24:28 And they drew nigh unto the village, whither they went: and he
+made as though he would have gone further.$FG$
+
+$IV,1$----01/17/14 12:03:02----$IV,0$
+
+Fucken niggers.  I proved God 100 times with the NIST beacon.
+
+Imagine I say "Read the sun in 5 minutes", then we get a number from the Sun.
+
+I get a number from NIST beacon.  There is one number every 60 seconds from that source.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389989040",HTML="http://beacon.nist.gov/rest/record/1389989040"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x4F2447-->(5186631 mod 100091)+1-->Line:81991
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Luke 1:17) God says...
+$FG,4$1:17 And he shall go before him in the spirit and power of Elias, to
+turn the hearts of the fathers to the children, and the disobedient to
+the wisdom of the just; to make ready a people prepared for the Lord.
+
+1:18 And Zacharias said unto the angel, Whereby shall I know this? for
+I am an old man, and my wife well stricken in years.
+
+1:19 And the angel answering said unto him, I am Gabriel, that stand
+in the presence of God; and am sent to speak unto thee, and to shew
+thee these glad tidings.
+
+1:20 And, behold, thou shalt be dumb, and not able to speak, until the
+day that these things shall be performed, because thou believest not
+my words, which shall be fulfilled in their season.
+
+1:21 And the people waited for Zacharias, and marvelled that he
+tarried so long in the temple.
+
+1:22 And when he came out, he could not speak unto them: and they
+perceived that he had seen a vision in the temple: for he beckoned$FG$
+
+There are 100 NIST numbers in my Rants.  Go look at God.
+
+$IV,1$----01/17/14 12:12:48----$IV,0$
+
+Start-up money?
+
+This goes from CIA jail to world domination instantly -- God starts killing enough CIA agents.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389989580",HTML="http://beacon.nist.gov/rest/record/1389989580"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x040A74-->(264820 mod 100091)+1-->Line:64639
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Jeremiah 32:13) God says...
+$FG,4$32:13 And I charged Baruch before them, saying, 32:14 Thus saith the
+LORD of hosts, the God of Israel; Take these evidences, this evidence
+of the purchase, both which is sealed, and this evidence which is
+open; and put them in an earthen vessel, that they may continue many
+days.
+
+32:15 For thus saith the LORD of hosts, the God of Israel; Houses and
+fields and vineyards shall be possessed again in this land.
+
+32:16 Now when I had delivered the evidence of the purchase unto
+Baruch the son of Neriah, I prayed unto the LORD, saying, 32:17 Ah
+Lord GOD! behold, thou hast made the heaven and the earth by thy great
+power and stretched out arm, and there is nothing too hard for thee:
+32:18 Thou shewest lovingkindness unto thousands, and recompensest the
+iniquity of the fathers into the bosom of their children after them:
+the Great, the Mighty God, the LORD of hosts, is his name, 32:19 Great
+in counsel, and mighty in work: for thine eyes are open upon all the
+ways of the sons of men: to give every one according to his ways, and
+according to the fruit of his doings: 32:20 Which hast set signs and
+wonders in the land of Egypt, even unto this day, and in Israel, and$FG$
+
+$IV,1$----01/17/14 12:24:11----$IV,0$
+
+I'm not going to argue.  God?  Start killing CIA agents!!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389990240",HTML="http://beacon.nist.gov/rest/record/1389990240"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x1C000B-->(1835019 mod 100091)+1-->Line:33382
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (2 Kings 11:1) God says...
+$FG,4$dead, she arose and destroyed all the seed royal.
+
+11:2 But Jehosheba, the daughter of king Joram, sister of Ahaziah,
+took Joash the son of Ahaziah, and stole him from among the king's
+sons which were slain; and they hid him, even him and his nurse, in
+the bedchamber from Athaliah, so that he was not slain.
+
+11:3 And he was with her hid in the house of the LORD six years. And
+Athaliah did reign over the land.
+
+11:4 And the seventh year Jehoiada sent and fetched the rulers over
+hundreds, with the captains and the guard, and brought them to him
+into the house of the LORD, and made a covenant with them, and took an
+oath of them in the house of the LORD, and shewed them the king's son.
+
+11:5 And he commanded them, saying, This is the thing that ye shall
+do; A third part of you that enter in on the sabbath shall even be
+keepers of the watch of the king's house; 11:6 And a third part shall
+be at the gate of Sur; and a third part at the gate behind the guard:
+so shall ye keep the watch of the house, that it be not broken down.$FG$
+
+
+
+Nothing matters until God kills enough CIA agents.
+
+God says...
+$FG,4$asked sakes Paradise heavily lovers Curiosity were owes purposes weighing heathen melt disguising manifoldness carcase chariots iron acknowledged exhort Mother witting conversion falls inharmonious commended he enabled sunder Fish beseech hers footed Mathematicians needing stature wantonly abundant mistaken discerning fulfil deaths demonstrate excited grounds irritate manhood forgottest whereto corresponded digested careth emerge fortunate overjoyed endeavours do mingling fantasies respects conjectures$FG$
+
+$IV,1$----01/17/14 12:34:52----$IV,0$
+
+Go study the story of Pharaoh and Moses.  7 plagues didn't move the needle.  Passover killed first born... nothing.  Got up and left.  Came after.  Killed in Red Sea.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389990900",HTML="http://beacon.nist.gov/rest/record/1389990900"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x299C0A-->(2726922 mod 100091)+1-->Line:24466
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 Samuel 7:12) God says...
+$FG,4$7:12 Then Samuel took a stone, and set it between Mizpeh and Shen, and
+called the name of it Ebenezer, saying, Hitherto hath the LORD helped
+us.
+
+7:13 So the Philistines were subdued, and they came no more into the
+coast of Israel: and the hand of the LORD was against the Philistines
+all the days of Samuel.
+
+7:14 And the cities which the Philistines had taken from Israel were
+restored to Israel, from Ekron even unto Gath; and the coasts thereof
+did Israel deliver out of the hands of the Philistines. And there was
+peace between Israel and the Amorites.
+
+7:15 And Samuel judged Israel all the days of his life.
+
+7:16 And he went from year to year in circuit to Bethel, and Gilgal,
+and Mizpeh, and judged Israel in all those places.
+
+7:17 And his return was to Ramah; for there was his house; and there$FG$
+
+
+$IV,1$----01/17/14 12:41:52----$IV,0$
+
+God wants it perfect.  
+
+Just kill a few, to send a message -- like meteor lands on their head or something.  Then, kill more.  and more.  Fuckers payback!
+
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389991380",HTML="http://beacon.nist.gov/rest/record/1389991380"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xCBC2FF-->(13353727 mod 100091)+1-->Line:41625
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Ezra 10:23) God says...
+$FG,4$10:23 Also of the Levites; Jozabad, and Shimei, and Kelaiah, (the same
+is Kelita,) Pethahiah, Judah, and Eliezer.
+
+10:24 Of the singers also; Eliashib: and of the porters; Shallum, and
+Telem, and Uri.
+
+10:25 Moreover of Israel: of the sons of Parosh; Ramiah, and Jeziah,
+and Malchiah, and Miamin, and Eleazar, and Malchijah, and Benaiah.
+
+10:26 And of the sons of Elam; Mattaniah, Zechariah, and Jehiel, and
+Abdi, and Jeremoth, and Eliah.
+
+10:27 And of the sons of Zattu; Elioenai, Eliashib, Mattaniah, and
+Jeremoth, and Zabad, and Aziza.
+
+10:28 Of the sons also of Bebai; Jehohanan, Hananiah, Zabbai, and
+Athlai.
+
+10:29 And of the sons of Bani; Meshullam, Malluch, and Adaiah, Jashub,$FG$
+
+$IV,1$----01/17/14 12:56:10----$IV,0$
+
+$WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
+
+* Oracle in program, $FG,2$AfterEgypt$FG$, for $LK,"tongues",A="FI:::/Adam/God/HSNotes.TXT"$.
+
+* $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$, ring-0-only, single-address-map (identity), multitasking kernel with multicore support.
+
+* Master/Slave MultiCore 
+
+* Free, $FG,2$public domain$FG$, $FG,2$100% open source$FG$.
+
+* 64-bit $FG,2$compiler/assembler$FG$ for $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  Truly compiles, not interprets.  $FG,2$Just-in-Time$FG$ and $FG,2$Ahead-of-Time$FG$ compilation.  With $FG,2$JIT$FG$, no need for object or exe files.
+
+* No 32-bit krufty code.
+
+* 640x480 16 color $FG,2$VGA$FG$ graphics.
+
+* Keyboard & Mouse support.
+
+* Hard drives, support for $FG,2$FAT32$FG$ and $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file systems with file compression.
+
+* $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
+
+* $LK,"Partitioning",A="MN:PrtDsk"$ tool, installer, $FG,2$boot loaders$FG$ for CD-ROM and hard disk.
+
+* $FG,2$Editor/Browser$FG$ for a new $LK,"Document Format",A="FI:::/Doc/Dollar.TXT"$.  Source files and the command line window can have graphics, links, icons, trees, colors, super/sub scripts, margins.  Everything is seamless through-out the tool chain.  No need for separate resource files.
+
+* 8-bit $FG,2$ASCII$FG$, not just 7-bit.  Supported in entire tool chain.  $FG,2$<CTRL-ALT-A>$FG$
+
+* $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic resource editor$FG$. $FG,2$<CTRL-R>$FG$
+
+* $FG,2$64-bit pointers$FG$.  All memory, even more than 4 Gig, can be directly accessed by all tasks on all cores at all times.
+
+* $FG,2$Ring-0-only$FG$.  Highest CPU privileged mode at all times.  No off-limits instructions.  No time lost changing modes or address maps.  Switches tasks in half a microsecond.
+
+* $FG,2$2D/3D$FG$ graphics library
+
+* Real-time fancy $FG,2$differential-equation solver$FG$ for physics engines, to use in games.  (Adaptive step-size Runge-Kutta, interpolated for real-time.)
+
+* Auto-completion, jump-to-source tool called $FG,2$WordStat$FG$ with Dictionary.
+
+* Window Manager.  Pan screen with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom screen on mouse cursor with $FG,2$<CTRL-ALT-Z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
+
+* File Manager, $FG,2$<CTRL-D>$FG$.
+
+* Code $LK,"profiler",A="MN:ProfAll"$, $LK,"merge",A="MN:Merge"$, $LK,"diff",A="MN:Diff"$ utils.
+
+* $FG,2$PC Speaker$FG$ support with many hymns.
+
+* Music composing tool.
+
+* Many games, $LK,"demos",A="FI:::/Doc/DemoIndex.TXT"$ and $LK,"documentation",A="FI:::/Doc/HelpIndex.TXT"$.
+
+* $FG,2$All source code$FG$ included.  Only compiles with the included TempleOS compiler and assembler.
+
+$IV,1$----01/17/14 12:56:15----$IV,0$
+
+Kill CIA agents, God.  They're not going to listen till you kill em.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389992160",HTML="http://beacon.nist.gov/rest/record/1389992160"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x400018-->(4194328 mod 100091)+1-->Line:90598
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Acts 26:11) God says...
+$FG,4$26:11 And I punished them oft in every synagogue, and compelled them
+to blaspheme; and being exceedingly mad against them, I persecuted
+them even unto strange cities.
+
+26:12 Whereupon as I went to Damascus with authority and commission
+from the chief priests, 26:13 At midday, O king, I saw in the way a
+light from heaven, above the brightness of the sun, shining round
+about me and them which journeyed with me.
+
+26:14 And when we were all fallen to the earth, I heard a voice
+speaking unto me, and saying in the Hebrew tongue, Saul, Saul, why
+persecutest thou me? it is hard for thee to kick against the pricks.
+
+26:15 And I said, Who art thou, Lord? And he said, I am Jesus whom
+thou persecutest.
+
+26:16 But rise, and stand upon thy feet: for I have appeared unto thee
+for this purpose, to make thee a minister and a witness both of these
+things which thou hast seen, and of those things in the which I will$FG$
+
+$IV,1$----01/17/14 13:07:19----$IV,0$
+
+Ask yourself, "Do I want Moses as an enemy?"
+
+I think it's hilarious when the niggers extort me.  I "shoot the hostages."  CIA is extortionist skumbags.  Low lifes.  Kill them, God!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389992880",HTML="http://beacon.nist.gov/rest/record/1389992880"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x756547-->(7693639 mod 100091)+1-->Line:86724
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (John 11:49) God says...
+$FG,4$11:49 And one of them, named Caiaphas, being the high priest that same
+year, said unto them, Ye know nothing at all, 11:50 Nor consider that
+it is expedient for us, that one man should die for the people, and
+that the whole nation perish not.
+
+11:51 And this spake he not of himself: but being high priest that
+year, he prophesied that Jesus should die for that nation; 11:52 And
+not for that nation only, but that also he should gather together in
+one the children of God that were scattered abroad.
+
+11:53 Then from that day forth they took counsel together for to put
+him to death.
+
+11:54 Jesus therefore walked no more openly among the Jews; but went
+thence unto a country near to the wilderness, into a city called
+Ephraim, and there continued with his disciples.
+
+11:55 And the Jews' passover was nigh at hand: and many went out of
+the country up to Jerusalem before the passover, to purify themselves.$FG$
+
+Bring-it-on retard-niggers!
+
+$IV,1$----01/17/14 23:53:20----$IV,0$
+
+Black choir.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1390032060",HTML="http://beacon.nist.gov/rest/record/1390032060"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xCB2E15-->(13315605 mod 100091)+1-->Line:3503
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Genesis 35:29) God says...
+$FG,4$people, being old and full of days: and his sons Esau and Jacob buried
+him.
+
+36:1 Now these are the generations of Esau, who is Edom.
+
+36:2 Esau took his wives of the daughters of Canaan; Adah the daughter
+of Elon the Hittite, and Aholibamah the daughter of Anah the daughter
+of Zibeon the Hivite; 36:3 And Bashemath Ishmael's daughter, sister of
+Nebajoth.
+
+36:4 And Adah bare to Esau Eliphaz; and Bashemath bare Reuel; 36:5 And
+Aholibamah bare Jeush, and Jaalam, and Korah: these are the sons of
+Esau, which were born unto him in the land of Canaan.
+
+36:6 And Esau took his wives, and his sons, and his daughters, and all
+the persons of his house, and his cattle, and all his beasts, and all
+his substance, which he had got in the land of Canaan; and went into
+the country from the face of his brother Jacob.
+
+36:7 For their riches were more than that they might dwell together;$FG$

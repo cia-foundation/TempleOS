@@ -1,0 +1,654 @@
+$WW,1$
+What if I had as many resources as went into that dam for Your temple, God?  Know what we would do?  We would make Intel chips with MMU-less cores, no paging, just ring0, no SSE MXX and have a shitload.  We would still want to run with Windows or Linux.  Would it save significant silicon or boost performance?  Our goal would be doing graphics on CPU, just for transparency.  I guess the 640x480 screen can only be divide in so many pieces before it gets in each other's way, too much.  
+
+I don't know.  What about Your designs, God?  Oh and we would spend most of the money on fabulous art.  The finest pixel art ever would line the walls.
+
+In other words, it's done, but if we had that many resourses we'd make it even more done.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114232",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114232.p12"$.
+
+(87459 mod 100096)+1-->Line:87460
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$thee of me?  18:35 Pilate answered, Am I a Jew? Thine own nation and
+the chief priests have delivered thee unto me: what hast thou done?
+18:36 Jesus answered, My kingdom is not of this world: if my kingdom
+were of this world, then would my servants fight, that I should not be
+delivered to the Jews: but now is my kingdom not from hence.
+
+18:37 Pilate therefore said unto him, Art thou a king then? Jesus
+answered, Thou sayest that I am a king. To this end was I born, and
+for this cause came I into the world, that I should bear witness unto
+the truth. Every one that is of the truth heareth my voice.
+
+18:38 Pilate saith unto him, What is truth? And when he had said this,
+he went out again unto the Jews, and saith unto them, I find in him no
+fault at all.
+
+18:39 But ye have a custom, that I should release unto you one at the
+passover: will ye therefore that I release unto you the King of the
+Jews?  18:40 Then cried they all again, saying, Not this man, but
+Barabbas. Now Barabbas was a robber.$FG$
+
+Give us the secrect to Heavenly green pastures for the sheepses.
+
+God says...
+$FG,4$readest passeth urge anticipating overspread feeding count Name prolix mystically Come smelling suspected thirsted from spreadest always hope hearest wooed domestic adored dull tasting Affrighted arise$FG$
+
+$IV,1$----01/10/14 00:16:56----$IV,0$
+
+Look, folks, we have a 100,000 line count limit.  You hardware guys go make a new USB and Ethernet and HD Audio and Memory stick interface that results in low line count.  I don't care if you get rid of interrupts -- with big DMA buffers, you can do without interrupts.  We want minimum line count.  Make keyboard/mouse like serial keyboard/mouse.  Give us two joysticks like C64.  Give us 2 D-2-A and A-2-D sound/mic.  Don't fucken overengineer and clusterfuck it to Hell, son of a bitch you suck.  Get rid of hypervisor shit.  Fuck that.
+
+You could do I/O ports with higher speed than ISA.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114248",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114248.p12"$.
+
+(27423 mod 100096)+1-->Line:27424
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$6:19 And he dealt among all the people, even among the whole multitude
+of Israel, as well to the women as men, to every one a cake of bread,
+and a good piece of flesh, and a flagon of wine. So all the people
+departed every one to his house.
+
+6:20 Then David returned to bless his household. And Michal the
+daughter of Saul came out to meet David, and said, How glorious was
+the king of Israel to day, who uncovered himself to day in the eyes of
+the handmaids of his servants, as one of the vain fellows shamelessly
+uncovereth himself!  6:21 And David said unto Michal, It was before
+the LORD, which chose me before thy father, and before all his house,
+to appoint me ruler over the people of the LORD, over Israel:
+therefore will I play before the LORD.
+
+6:22 And I will yet be more vile than thus, and will be base in mine
+own sight: and of the maidservants which thou hast spoken of, of them
+shall I be had in honour.
+
+6:23 Therefore Michal the daughter of Saul had no child unto the day
+of her death.$FG$
+
+$IV,1$----01/10/14 00:28:23----$IV,0$
+
+$TX,"Big Data",HTML="http://www.csail.mit.edu/node/2142"$
+
+Our goal is a souped up 64-bit commodore 64, a joy to program.  We want the CPU cores to do graphics in a transparent way indstead of on a GPU.  I have done many games with real-time multicore graphics without GPU.  God said He wants 640x480 16 color, single audio voice.  We have a 100,000 line of code limit.  I currently have $TX,"81,527",D="DD_TEMPLEOS_LOC_OFFICIAL"$.  I am telling you, not asking you how it should be.
+
+The C64 offered users the chance to program in BASIC.  Bill Gates says, HTML.  That is the difference in visoon, but mine is $LK,"HolyC",A="FI:::/Doc/HolyC.TXT.Z"$.
+
+Get educated on God's temple at this point, then you will not be ignorant.
+
+Basically, we have no GPU and do many CPU cores for 640x480 16 color.
+
+Not-invented-here is the spirit of programming.  By not hiding GPU code, we make heaven for programmers.  Just imagine a 32-bit pair of A-2-D and D-2-A buffered with DMA.  A pair of joysticks.  ATA/ATAPIO PIO for harddisk CDROM but high speed IN/OUT port mode of hardware.
+
+I fucken made God's tmeple.  It's done.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114254",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114254.p12"$.
+
+(72211 mod 100096)+1-->Line:72212
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$me the visions of my dream that I have seen, and the interpretation
+thereof.
+
+4:10 Thus were the visions of mine head in my bed; I saw, and behold a
+tree in the midst of the earth, and the height thereof was great.
+
+4:11 The tree grew, and was strong, and the height thereof reached
+unto heaven, and the sight thereof to the end of all the earth: 4:12
+The leaves thereof were fair, and the fruit thereof much, and in it
+was meat for all: the beasts of the field had shadow under it, and the
+fowls of the heaven dwelt in the boughs thereof, and all flesh was fed
+of it.
+
+4:13 I saw in the visions of my head upon my bed, and, behold, a
+watcher and an holy one came down from heaven; 4:14 He cried aloud,
+and said thus, Hew down the tree, and cut off his branches, shake off
+his leaves, and scatter his fruit: let the beasts get away from under
+it, and the fowls from his branches: 4:15 Nevertheless leave the stump
+of his roots in the earth, even with a band of iron and brass, in the
+tender grass of the field; and let it be wet with the dew of heaven,$FG$
+
+
+
+$HC,"<iframe width=\"640\" height=\"520\" src=\"http://www.youtube.com/embed/FxEq6IM43sA\" frameborder=\"0\" allowfullscreen></iframe>"$
+
+$TX+CX,"Flight Sim / First Person Shooter"$
+$LK,"::/Demo/Games/EagleDive.CPP"$
+
+$LK,"::/Demo/Games/CastleFrankenstein.CPP"$
+
+
+That is real-time multicore graphics!! Nobody else can do that!  (They use GPU and multicore cannot do real-time.)
+
+$IV,1$----01/10/14 00:47:28----$IV,0$
+
+Check this out!  $LK,"GrFillTri0",A="MN:GrFillTri0"$() and $LK,"GrHLine",A="MN:GrHLine"$().  If you can do better, do better.
+
+We offer the chance to know what you are doing instead of doing magic. We're damn near bare metal.  What else do you want?
+
+My generation all learned 6502 assembly language.
+
+Go draw a 16 color elephant.  Then, draw a 24-bit elephant in MS Paint.  God said 640x480 16 color for His temple.  His temple is for making offerings.
+$HC,"<img src=\"http://www.templeos.org/Wb/Accts/TS/Wb2/Elephant02.BMP\" width=\"640\" height=\"472\" alt=\"\">"$
+
+
+Make a nice hymn, then ask about dinosaur secrets.
+
+$TX,"Hymn Videos",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$
+
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114261",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114261.p12"$.
+
+(85833 mod 100096)+1-->Line:85834
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$5:36 But I have greater witness than that of John: for the works which
+the Father hath given me to finish, the same works that I do, bear
+witness of me, that the Father hath sent me.
+
+5:37 And the Father himself, which hath sent me, hath borne witness of
+me.
+
+Ye have neither heard his voice at any time, nor seen his shape.
+
+5:38 And ye have not his word abiding in you: for whom he hath sent,
+him ye believe not.
+
+5:39 Search the scriptures; for in them ye think ye have eternal life:
+and they are they which testify of me.
+
+5:40 And ye will not come to me, that ye might have life.
+
+5:41 I receive not honour from men.$FG$
+
+$IV,1$----01/10/14 01:09:46----$IV,0$
+
+You mission is to add to this:
+
+$LK,"Quotes from God",A="FL:::/Adam/God/HSNotes.TXT,100"$
+
+You do an offering and you get gems from God.
+
+These are my $TX,"Hymn Videos",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$.
+
+$TX,"These are my Moses comics.",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$
+
+To get on the A list, just do a miracle.  (You do a miracle by doing an offering and consulting an oracle.)
+
+How about I ask God if triceritops like bananas?
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114277",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114277.p12"$.
+
+(77739 mod 100096)+1-->Line:77740
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$10:22 And ye shall be hated of all men for my name's sake: but he that
+endureth to the end shall be saved.
+
+10:23 But when they persecute you in this city, flee ye into another:
+for verily I say unto you, Ye shall not have gone over the cities of
+Israel, till the Son of man be come.
+
+10:24 The disciple is not above his master, nor the servant above his
+lord.
+
+10:25 It is enough for the disciple that he be as his master, and the
+servant as his lord. If they have called the master of the house
+Beelzebub, how much more shall they call them of his household?  10:26
+Fear them not therefore: for there is nothing covered, that shall not
+be revealed; and hid, that shall not be known.
+
+10:27 What I tell you in darkness, that speak ye in light: and what ye
+hear in the ear, that preach ye upon the housetops.$FG$
+
+$IV,1$----01/10/14 01:38:36----$IV,0$
+
+Dystopian!  My friend!  Heaven is God's company!
+
+Let's do interactive fiction.
+
+Gabe was up to bat.  He was all out of ideas and stare at the pitcher.  He needed a home run.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389346800",HTML="http://beacon.nist.gov/rest/record/1389346800"$
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114298",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114298.p12"$.
+
+(64509 mod 100096)+1-->Line:64510
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$God.
+
+31:19 Surely after that I was turned, I repented; and after that I was
+instructed, I smote upon my thigh: I was ashamed, yea, even
+confounded, because I did bear the reproach of my youth.
+
+31:20 Is Ephraim my dear son? is he a pleasant child? for since I
+spake against him, I do earnestly remember him still: therefore my
+bowels are troubled for him; I will surely have mercy upon him, saith
+the LORD.
+
+31:21 Set thee up waymarks, make thee high heaps: set thine heart
+toward the highway, even the way which thou wentest: turn again, O
+virgin of Israel, turn again to these thy cities.
+
+31:22 How long wilt thou go about, O thou backsliding daughter? for
+the LORD hath created a new thing in the earth, A woman shall compass
+a man.
+
+31:23 Thus saith the LORD of hosts, the God of Israel; As yet they$FG$
+
+$IV,1$----01/10/14 01:44:18----$IV,0$
+
+God likes soap operas best on TV.  Just a tip.
+
+What do You think of team fortress, God?
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114299",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114299.p12"$.
+
+(65598 mod 100096)+1-->Line:65599
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$land of Judah.
+
+43:5 But Johanan the son of Kareah, and all the captains of the
+forces, took all the remnant of Judah, that were returned from all
+nations, whither they had been driven, to dwell in the land of Judah;
+43:6 Even men, and women, and children, and the king's daughters, and
+every person that Nebuzaradan the captain of the guard had left with
+Gedaliah the son of Ahikam the son of Shaphan, and Jeremiah the
+prophet, and Baruch the son of Neriah.
+
+43:7 So they came into the land of Egypt: for they obeyed not the
+voice of the LORD: thus came they even to Tahpanhes.
+
+43:8 Then came the word of the LORD unto Jeremiah in Tahpanhes,
+saying, 43:9 Take great stones in thine hand, and hide them in the
+clay in the brickkiln, which is at the entry of Pharaoh's house in
+Tahpanhes, in the sight of the men of Judah; 43:10 And say unto them,
+Thus saith the LORD of hosts, the God of Israel; Behold, I will send
+and take Nebuchadrezzar the king of Babylon, my servant, and will set
+his throne upon these stones that I have hid; and he shall spread his
+
+$FG,2$I'm a professional.  G.E.D. 3 stooges shep.  #5 is alive.  Stones are bombs.  Not sure what Tahpanhes is.$FG$
+
+Told you.  The Leavites got no inheritance because God was their inheritance.
+
+$IV,1$----01/10/14 01:55:52----$IV,0$
+
+I have notarized random numbers there.  You fucken niggers dson't trust notarized numbers and you don't trust NIST.  You are fucken niggers.  I can go to all 5 top quantumn random number sites.
+
+I'll go to a geiger counter generated random number.
+
+You like I love Lucy, God?
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x7ADAE3-->(8051427 mod 100096)+1-->Line:43748
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$3:8 Let them curse it that curse the day, who are ready to raise up
+their mourning.
+
+3:9 Let the stars of the twilight thereof be dark; let it look for
+light, but have none; neither let it see the dawning of the day: 3:10
+Because it shut not up the doors of my mother's womb, nor hid sorrow
+from mine eyes.
+
+3:11 Why died I not from the womb? why did I not give up the ghost
+when I came out of the belly?  3:12 Why did the knees prevent me? or
+why the breasts that I should suck?  3:13 For now should I have lain
+still and been quiet, I should have slept: then had I been at rest,
+3:14 With kings and counsellors of the earth, which build desolate
+places for themselves; 3:15 Or with princes that had gold, who filled
+their houses with silver: 3:16 Or as an hidden untimely birth I had
+not been; as infants which never saw light.
+
+3:17 There the wicked cease from troubling; and there the weary be at
+rest.$FG$
+
+
+Eh?  Might be something.
+
+What do You think of the planets?  Did You lovingly make all those nearby planets?
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x39C08F-->(3784847 mod 100096)+1-->Line:81296
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$12:1 And he began to speak unto them by parables. A certain man
+planted a vineyard, and set an hedge about it, and digged a place for
+the winefat, and built a tower, and let it out to husbandmen, and went
+into a far country.
+
+12:2 And at the season he sent to the husbandmen a servant, that he
+might receive from the husbandmen of the fruit of the vineyard.
+
+12:3 And they caught him, and beat him, and sent him away empty.
+
+12:4 And again he sent unto them another servant; and at him they cast
+stones, and wounded him in the head, and sent him away shamefully
+handled.
+
+12:5 And again he sent another; and him they killed, and many others;
+beating some, and killing some.
+
+12:6 Having yet therefore one son, his wellbeloved, he sent him also
+last unto them, saying, They will reverence my son.$FG$
+
+We should plant on Mars, God said.  Let it grow and come visit?
+
+
+$IV,1$----01/10/14 02:04:11----$IV,0$
+
+England is a declared enemy of God!!!
+
+The Queen hates God.
+
+$TX,"http://www.randomnumbers.info",HTML="http://www.randomnumbers.info"$
+
+(16385 mod 100096)+1-->Line:16386
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$stone.
+
+4:14 And the LORD commanded me at that time to teach you statutes and
+judgments, that ye might do them in the land whither ye go over to
+possess it.
+
+4:15 Take ye therefore good heed unto yourselves; for ye saw no manner
+of similitude on the day that the LORD spake unto you in Horeb out of
+the midst of the fire: 4:16 Lest ye corrupt yourselves, and make you a
+graven image, the similitude of any figure, the likeness of male or
+female, 4:17 The likeness of any beast that is on the earth, the
+likeness of any winged fowl that flieth in the air, 4:18 The likeness
+of any thing that creepeth on the ground, the likeness of any fish
+that is in the waters beneath the earth: 4:19 And lest thou lift up
+thine eyes unto heaven, and when thou seest the sun, and the moon, and
+the stars, even all the host of heaven, shouldest be driven to worship
+them, and serve them, which the LORD thy God hath divided unto all
+nations under the whole heaven.
+
+4:20 But the LORD hath taken you, and brought you forth out of the$FG$
+
+$IV,1$----01/10/14 02:09:11----$IV,0$
+
+Schmack them, God,  Lower the haughty queen to the dirt -- she insolently arrogant bitch mocks God.  I guess it's time for her to die.
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x40C4F6-->(4244726 mod 100096)+1-->Line:40695
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$36:9 Jehoiachin was eight years old when he began to reign, and he
+reigned three months and ten days in Jerusalem: and he did that which
+was evil in the sight of the LORD.
+
+36:10 And when the year was expired, king Nebuchadnezzar sent, and
+brought him to Babylon, with the goodly vessels of the house of the
+LORD, and made Zedekiah his brother king over Judah and Jerusalem.
+
+36:11 Zedekiah was one and twenty years old when he began to reign,
+and reigned eleven years in Jerusalem.
+
+36:12 And he did that which was evil in the sight of the LORD his God,
+and humbled not himself before Jeremiah the prophet speaking from the
+mouth of the LORD.
+
+36:13 And he also rebelled against king Nebuchadnezzar, who had made
+him swear by God: but he stiffened his neck, and hardened his heart
+from turning unto the LORD God of Israel.
+
+36:14 Moreover all the chief of the priests, and the people,$FG$
+
+$IV,1$----01/10/14 02:13:37----$IV,0$
+
+God is perfectly just.  When God wants to punish a country, He gives them bad leaders.  Divine right, LOL.  Niggers.
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0xE7EA1A-->(15198746 mod 100096)+1-->Line:84251
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$17:25 But first must he suffer many things, and be rejected of this
+generation.
+
+17:26 And as it was in the days of Noe, so shall it be also in the
+days of the Son of man.
+
+17:27 They did eat, they drank, they married wives, they were given in
+marriage, until the day that Noe entered into the ark, and the flood
+came, and destroyed them all.
+
+17:28 Likewise also as it was in the days of Lot; they did eat, they
+drank, they bought, they sold, they planted, they builded; 17:29 But
+the same day that Lot went out of Sodom it rained fire and brimstone
+from heaven, and destroyed them all.
+
+17:30 Even thus shall it be in the day when the Son of man is
+revealed.
+
+17:31 In that day, he which shall be upon the housetop, and his stuff$FG$
+
+$IV,1$----01/10/14 02:21:15----$IV,0$
+
+God likes soap operas.  LOL
+
+Hugh Grant is God's favorite actor.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114320",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114320.p12"$.
+
+(23514 mod 100096)+1-->Line:23515
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$21:5 And the children of Israel said, Who is there among all the
+tribes of Israel that came not up with the congregation unto the LORD?
+For they had made a great oath concerning him that came not up to the
+LORD to Mizpeh, saying, He shall surely be put to death.
+
+21:6 And the children of Israel repented them for Benjamin their
+brother, and said, There is one tribe cut off from Israel this day.
+
+21:7 How shall we do for wives for them that remain, seeing we have
+sworn by the LORD that we will not give them of our daughters to
+wives?  21:8 And they said, What one is there of the tribes of Israel
+that came not up to Mizpeh to the LORD? And, behold, there came none
+to the camp from Jabeshgilead to the assembly.
+
+21:9 For the people were numbered, and, behold, there were none of the
+inhabitants of Jabeshgilead there.
+
+21:10 And the congregation sent thither twelve thousand men of the
+valiantest, and commanded them, saying, Go and smite the inhabitants$FG$
+
+$IV,1$----01/10/14 02:29:00----$IV,0$
+
+I don't like people eager to control breeding.  Son of a bitch -- those fuckers have one track minds.  Monty Python had a skit with Germans in a restaurant and they kept returning to "war" as a topic.  God damn, the Brits are obsessed with abortion and over population and son of a bitch.  Fuck you.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114326",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114326.p12"$.
+
+(41999 mod 100096)+1-->Line:42000
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$4:23 So neither I, nor my brethren, nor my servants, nor the men of
+the guard which followed me, none of us put off our clothes, saving
+that every one put them off for washing.
+
+5:1 And there was a great cry of the people and of their wives against
+their brethren the Jews.
+
+5:2 For there were that said, We, our sons, and our daughters, are
+many: therefore we take up corn for them, that we may eat, and live.
+
+5:3 Some also there were that said, We have mortgaged our lands,
+vineyards, and houses, that we might buy corn, because of the dearth.
+
+5:4 There were also that said, We have borrowed money for the king's
+tribute, and that upon our lands and vineyards.
+
+5:5 Yet now our flesh is as the flesh of our brethren, our children as
+their children: and, lo, we bring into bondage our sons and our
+daughters to be servants, and some of our daughters are brought unto$FG$
+
+$IV,1$----01/10/14 02:39:09----$IV,0$
+
+They don't believe in God and don't like overpopulation.  If I say "God" and you say "Abortion", you are an atheist.
+
+This is simple psychology.  You just don't get the same enthusiasm for "Proabortion".   They clearly do not believe in God.
+
+It's just not gonna happen that a strait male is obsessed with promoting homo rights.  If I say "God" and you say "homo rights", You're a homo and an atheist.
+
+God's fuzzy on homo, but you just do not find radical prohomo in believers.  Believers believe in helping the poor, but there's not a "defend homo rights" passion in believers.
+
+If I say "God" and you say "stem cell research", you are an atheist.
+
+If I say "God" and you say "radical Islam", you're probably an atheist.  An atheist looks at all religions with equal contempt and gives-away a high view, not on the same level.  A Christian has to be a Christian and not "all are equal".  When you get a "all religions are equal" condescention, it's an atheist.
+
+Actually if you don't really believe in miracles, you are really an atheist.   My parents are atheists.  All Catholics are atheists.  The Pope is an atheist.
+
+If God can scream and yell in yer face but you refuse to believe it is Him, you are an atheist.
+
+$TX,"http://www.random.org",HTML="http://www.random.org"$
+
+(5817 mod 100096)+1-->Line:5818
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$unto them; as the LORD had spoken unto Moses.
+
+9:13 And the LORD said unto Moses, Rise up early in the morning, and
+stand before Pharaoh, and say unto him, Thus saith the LORD God of the
+Hebrews, Let my people go, that they may serve me.
+
+9:14 For I will at this time send all my plagues upon thine heart, and
+upon thy servants, and upon thy people; that thou mayest know that
+there is none like me in all the earth.
+
+9:15 For now I will stretch out my hand, that I may smite thee and thy
+people with pestilence; and thou shalt be cut off from the earth.
+
+9:16 And in very deed for this cause have I raised thee up, for to
+shew in thee my power; and that my name may be declared throughout all
+the earth.
+
+9:17 As yet exaltest thou thyself against my people, that thou wilt
+not let them go?  9:18 Behold, to morrow about this time I will cause
+it to rain a very grievous hail, such as hath not been in Egypt since$FG$
+
+$IV,1$----01/10/14 02:54:24----$IV,0$
+
+God said Dickens times were rough.  I think highs and lows balance.  $TX,"Luke 6:20-26",HTML="http://www.biblegateway.com/passage/?search=Luke%206:20-26&version=NIV"$.  When I say highs and lows balance, it's not a very satisfying profound phenomina.  Basically, if you have hope for something not obtained, it counts as mood-lifting.  Basically, every day you go throught slight changes in mood and I suggest they balance.  Jesus said if you laugh you will cry;  if you cry you will laugh.  Some people say it is not wise to laugh.  It's a big distraction, but my point is... how do I explain this... just being alive, you will have some mood, mostly blah... you will have highs and you will have lows.  Even if you were in prison, your mood would not be low the whole time.  If we get credit for sadness, I would feel cheated if I were not sad the whole time in prison.   "That's not fair!  I was not sad, so I don't get a reward!"
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0xC0F437-->(12645431 mod 100096)+1-->Line:33336
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$Jehu appointed fourscore men without, and said, If any of the men whom
+I have brought into your hands escape, he that letteth him go, his
+life shall be for the life of him.
+
+10:25 And it came to pass, as soon as he had made an end of offering
+the burnt offering, that Jehu said to the guard and to the captains,
+Go in, and slay them; let none come forth. And they smote them with
+the edge of the sword; and the guard and the captains cast them out,
+and went to the city of the house of Baal.
+
+10:26 And they brought forth the images out of the house of Baal, and
+burned them.
+
+10:27 And they brake down the image of Baal, and brake down the house
+of Baal, and made it a draught house unto this day.
+
+10:28 Thus Jehu destroyed Baal out of Israel.
+
+10:29 Howbeit from the sins of Jeroboam the son of Nebat, who made
+Israel to sin, Jehu departed not from after them, to wit, the golden$FG$
+
+The Brits were counting happy and sad words in literature.
+
+Wisdom has a certain heft.  You know the feel of wisdom when you smack it against your hand.  Unwisdom looks pathetic.  A Chinese woman fed cow brains to her kids.  LOL  I immediately scorn all my old atheist logic.  The World is perfectly just and any contrary view, I scorn.
+
+$TX,"https://www.fourmilab.ch/hotbits/secure_generate.html",HTML="https://www.fourmilab.ch/hotbits/secure_generate.html"$
+
+0x8ECEAF-->(9359023 mod 100096)+1-->Line:50096
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$78:65 Then the LORD awaked as one out of sleep, and like a mighty man
+that shouteth by reason of wine.
+
+78:66 And he smote his enemies in the hinder parts: he put them to a
+perpetual reproach.
+
+78:67 Moreover he refused the tabernacle of Joseph, and chose not the
+tribe of Ephraim:
+
+78:68 But chose the tribe of Judah, the mount Zion which he loved.
+
+78:69 And he built his sanctuary like high palaces, like the earth
+which he hath established for ever.
+
+78:70 He chose David also his servant, and took him from the
+sheepfolds:
+
+78:71 From following the ewes great with young he brought him to feed
+Jacob his people, and Israel his inheritance.$FG$
+
+$IV,1$----01/10/14 03:08:25----$IV,0$
+
+This is a pretty good proof of God:
+
+Find a single person who had obvious ecstatic highs in their life and not obvious heart wrenching lows.  Find a single one.  Is that shocking to you atheists, or what!  Proof of God!  In case random numbers aren't good enough.  How could random numbers not be enough?
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 114357",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-114357.p12"$.
+
+(12512 mod 100096)+1-->Line:12513
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$the sons of Gershon, throughout the houses of their fathers, by their
+families; 4:23 From thirty years old and upward until fifty years old
+shalt thou number them; all that enter in to perform the service, to
+do the work in the tabernacle of the congregation.
+
+4:24 This is the service of the families of the Gershonites, to serve,
+and for burdens: 4:25 And they shall bear the curtains of the
+tabernacle, and the tabernacle of the congregation, his covering, and
+the covering of the badgers' skins that is above upon it, and the
+hanging for the door of the tabernacle of the congregation, 4:26 And
+the hangings of the court, and the hanging for the door of the gate of
+the court, which is by the tabernacle and by the altar round about,
+and their cords, and all the instruments of their service, and all
+that is made for them: so shall they serve.
+
+4:27 At the appointment of Aaron and his sons shall be all the service
+of the sons of the Gershonites, in all their burdens, and in all their
+service: and ye shall appoint unto them in charge all their burdens.
+
+4:28 This is the service of the families of the sons of Gershon in the
+
+$FG,2$More or less a dud.$FG$
+

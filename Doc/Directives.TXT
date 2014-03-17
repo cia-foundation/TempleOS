@@ -1,0 +1,64 @@
+$WW,1$The compiler looks-ahead a token most of the time, so you might throw an extra semicolon after the directive if it's not taking affect right away.
+
+$FG,2$#include ""$FG$ 	There is no angle bracket <> form of this directive.
+$FG,2$#exe {}$FG$		Will execute code at compile-time and can be used to insert code into the stream being compiled using $LK,"StreamPrint",A="MN:StreamPrint"$().
+$FG,2$#define$FG$		Define string const
+$FG,2$#assert$FG$		Print a warning during compilation if an expression is not true. 
+$FG,2$#if$FG$		Include code if an expresion is true.
+$FG,2$#else
+#endif
+#ifdef,#ifndef	$FG$Include code if a sym is defined.
+$FG,2$#ifaot,#ifjit	$FG$Include code if in $FG,2$AOT$FG$ compiler mode.
+$FG,2$defined()$FG$	Is a function that can be used in expressions.
+$FG,2$#help_index$FG$, $FG,2$#help_file$FG$ See $LK,"Help System",A="FI:::/Doc/HelpSystem.TXT"$.
+
+See $LK,"Scoping and Linkages",A="FI:::/Doc/ImportExports.TXT"$, $LK,"preprocessor",A="FF:::/Compiler/Lex.CPP,KW_DEFINE"$ and $LK,"Compiler Options",A="FI:::/Doc/Options.TXT"$.
+
+
+$FG,5$Assembler Directives$FG$
+
+See $LK,"::/Compiler/OpCodes.TXT"$ for opcodes.  They're not standard.  Some invalid instructions are not flagged and some valid instructions are not implemented. 16-bit asm support is limited.
+
+Here are example instruction formats:
+$HL,1$	ADD	RAX,I64 FS:DISP[RSI+RDI*8]
+$HL,0$$HL,1$	ADD	RAX,I64 [DISP]
+$HL,0$
+$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in HolyC expressions.
+
+$FG,2$$$$FG$ works in $FG,2$class$FG$es.
+  $FG,2$class MyFun
+  {
+    $$=-16;
+    I64 local1;
+    I64 local2;
+    $$=$$+256;
+    I64 crazy;
+  };$FG$
+
+$FG,4$LABEL$FG,2$::
+$FG$  Defines an exported glbl label.
+
+$FG,4$LABEL$FG,2$:
+$FG$  Defines an non-exported glbl label.
+
+$FG,2$@@$FG,4$LABEL$FG,2$:
+$FG$  Defines a local label with scope valid between two global labels.
+
+$FG,2$DU8$FG$, $FG,2$DU16$FG$, $FG,2$DU32$FG$, $FG,2$DU64$FG$
+  Define BYTE, WORD, DWORD or QWORD. Can be used with $FG,2$DUP()$FG$ and ASCII strings.  For your convenience, the ASCII strings do not have terminating zeros.  Define cmds must end with a semicolon.
+
+$FG,2$USE16$FG$, $FG,2$USE32$FG$, $FG,2$USE64$FG$
+
+$FG,2$IMPORT$FG$ $FG,4$sym1name$FG$, $FG,4$sym2name$FG$;
+
+$FG,2$LIST$FG$, $FG,2$NOLIST$FG$
+
+$FG,2$ALIGN$FG$ $FG,4$num$FG$, $FG,4$fill_byte$FG$
+  Align to $FG,4$num$FG$ boundary and fill with $FG,4$fill_byte$FG$.
+
+$FG,2$MODULE_ORG$FG$ $FG,4$num$FG$
+  Set code addr for JIT or set module $LK,"Load",A="MN:Load"$() addr -- has 16-byte $LK,"CBinFile",A="MN:CBinFile"$ header and patch table trailing.
+
+$FG,2$BINFILE$FG,4$ "FileName.BIN"$FG$;
+
+See $LK,"::/Demo/Asm/AsmAndC1.CPP"$, $LK,"::/Demo/Asm/AsmAndC2.CPP"$ and $LK,"::/Demo/Asm/AsmAndC3.CPP"$.

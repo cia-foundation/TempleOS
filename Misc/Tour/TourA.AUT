@@ -1,0 +1,10 @@
+PopUpOk(
+"We will now run a test-suite\n"
+"that automatically executes\n"
+"most TempleOS demos.  It takes\n"
+"a few minutes, so kick-back.\n");
+
+PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+
+"#include \"::/Misc/OSTestSuite\";";
+AFPmtStr("\n");

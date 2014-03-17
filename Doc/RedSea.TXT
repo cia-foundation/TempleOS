@@ -1,0 +1,38 @@
+$WW,1$$FG,5$$TX+CX,"RedSea File System"$$FG$
+
+The RedSea file system is a simple, 64-bit, file system which is, basically, FAT32 with fixed-sized 64-byte directory entries and no FAT table, just an allocation bitmap.  It has no clustered-blocks, just 512 byte sectors.  Files are stored in contiguous blocks and cannot grow in size.
+
+$HL,1$#define CDIR_FILENAME_LEN	38 //Must include terminator zero
+
+public class CDirEntry //64-byte fixed-size
+{
+  U16 attr;	//See $LK,"_ATTR_DIR",A="MN:_ATTR_DIR"$.  I would like to change these.
+  U8 name[CDIR_FILENAME_LEN]; //See $LK,"chars_bitmap_filename",A="MN:chars_bitmap_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
+  I64 cluster;	//One sector per cluster.  I might change origin, let's talk.
+  I64 size;	//In bytes
+  CDate datetime; //See  $LK,"DateTime",A="::/Doc/TimeDate.TXT"$, $LK,"Implementation of DateTime",A="FI:::/Kernel/Date.CPP"$
+};
+
+public class CBootStruct //RedSea is type FAT32 in partition table to fool BIOS
+{
+  U8 jump_and_nop[3];
+  U8 signature,reserved[4]; //MBR_PT_REDSEA=0x88. Distinguish from real FAT32
+  I64 sects;
+  I64 root_cluster;
+  I64 bitmap_sects;
+  I64 unique_id;
+  U8 code[470];
+  U16 signature2;	//0xAA55
+};
+$HL,0$
+See $LK,"implementation of RedSea file system",A="::/Kernel/Dsk/FileSysRedSea.CPP"$.
+
+File with names ending in .Z are stored compressed.
+See $LK,"implementation of LZW compression",A="::/Kernel/Compress.CPP"$.
+
+I hope to do a ISO9660 replacement that consists of a hard-drive partition image copied onto a CD/DVD starting at about sector 20 with EL TORITO booting.  512-byte sectors will be placed on top of 2048-byte CD/DCD sectors, so there will be four blocks per CD/DVD sector.
+
+There is no bad block table and no redundant allocation table.  When I was a teenager, I used a raw disk block editing program to look at directory blocks and follow chains of blocks on my Commodore 64.  I undeleted files.  My goal in designing the RedSea system is to be as simple as possible, for kids.
+
+$FG,8$
+* "Commodore 64" was a trademark of Commodore Business Machines.

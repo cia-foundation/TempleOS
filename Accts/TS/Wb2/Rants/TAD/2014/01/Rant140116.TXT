@@ -1,0 +1,164 @@
+$WW,1$
+Fearing drones, the CIA has clusterfucked computers, so all you can make is web pages.
+
+$IV,1$----01/16/14 19:15:03----$IV,0$
+
+I learned how to work with microcontrollers in school.  I don't have a serial port.  Arduino is some chip, probably not what you'd actually use in a design.  What can I do with wire-wrap, these days?  Serial port?
+
+Bill Gates says a company is like a castle.  He has clusterfucked everything to do with computers so nobody can do anything.
+
+Ten years ago, it was a better situation.  I could wirewrap 8051s and hook transistors up to them for speaker drivers.  I didn't really have any ideas for hardware devices.
+
+It is clusterfucked, but personally, there is nothing I would do.
+
+I would like to hook my operating system to devices.  I could do 3D printing, like I did in 1996.  I did everything there is to do with stepper motors and 3D printing.
+
+It's clusterfucked, but, personally, I don't have any ideas.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389928860",HTML="http://beacon.nist.gov/rest/record/1389928860"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x99FF64-->(10092388 mod 100091)+1-->Line:83289
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Luke 9:50) God says...
+$FG,4$9:50 And Jesus said unto him, Forbid him not: for he that is not
+against us is for us.
+
+9:51 And it came to pass, when the time was come that he should be
+received up, he stedfastly set his face to go to Jerusalem, 9:52 And
+sent messengers before his face: and they went, and entered into a
+village of the Samaritans, to make ready for him.
+
+9:53 And they did not receive him, because his face was as though he
+would go to Jerusalem.
+
+9:54 And when his disciples James and John saw this, they said, Lord,
+wilt thou that we command fire to come down from heaven, and consume
+them, even as Elias did?  9:55 But he turned, and rebuked them, and
+said, Ye know not what manner of spirit ye are of.
+
+9:56 For the Son of man is not come to destroy men's lives, but to
+save them. And they went to another village.
+
+9:57 And it came to pass, that, as they went in the way, a certain man$FG$
+
+$IV,1$----01/16/14 19:33:23----$IV,0$
+
+So, I learned in University to make a little microcontroller computer do the stuff in a car engine.  I could design microwave ovens and stuff like that.  I could make electronic toys.  I'm, like, 15 years out of date, though.  They want you to use Linux in a microwave oven, now.
+
+Just sit back and collect my disability check.
+
+Clusterfucked.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389929760",HTML="http://beacon.nist.gov/rest/record/1389929760"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x33CD15-->(3394837 mod 100091)+1-->Line:91835
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Romans 13:7) God says...
+$FG,4$13:7 Render therefore to all their dues: tribute to whom tribute is
+due; custom to whom custom; fear to whom fear; honour to whom honour.
+
+13:8 Owe no man any thing, but to love one another: for he that loveth
+another hath fulfilled the law.
+
+13:9 For this, Thou shalt not commit adultery, Thou shalt not kill,
+Thou shalt not steal, Thou shalt not bear false witness, Thou shalt
+not covet; and if there be any other commandment, it is briefly
+comprehended in this saying, namely, Thou shalt love thy neighbour as
+thyself.
+
+13:10 Love worketh no ill to his neighbour: therefore love is the
+fulfilling of the law.
+
+13:11 And that, knowing the time, that now it is high time to awake
+out of sleep: for now is our salvation nearer than when we believed.
+
+13:12 The night is far spent, the day is at hand: let us therefore
+cast off the works of darkness, and let us put on the armour of light.$FG$
+
+$IV,1$----01/16/14 20:30:20----$IV,0$
+
+I'd like a self-driving car, since I have no license.  Some day.  Let some google-nigger make it.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389933120",HTML="http://beacon.nist.gov/rest/record/1389933120"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xACD139-->(11325753 mod 100091)+1-->Line:15471
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Numbers 32:5) God says...
+$FG,4$thy servants for a possession, and bring us not over Jordan.
+
+32:6 And Moses said unto the children of Gad and to the children of
+Reuben, Shall your brethren go to war, and shall ye sit here?  32:7
+And wherefore discourage ye the heart of the children of Israel from
+going over into the land which the LORD hath given them?  32:8 Thus
+did your fathers, when I sent them from Kadeshbarnea to see the land.
+
+32:9 For when they went up unto the valley of Eshcol, and saw the
+land, they discouraged the heart of the children of Israel, that they
+should not go into the land which the LORD had given them.
+
+32:10 And the LORD's anger was kindled the same time, and he sware,
+saying, 32:11 Surely none of the men that came up out of Egypt, from
+twenty years old and upward, shall see the land which I sware unto
+Abraham, unto Isaac, and unto Jacob; because they have not wholly
+followed me: 32:12 Save Caleb the son of Jephunneh the Kenezite, and
+Joshua the son of Nun: for they have wholly followed the LORD.
+
+32:13 And the LORD's anger was kindled against Israel, and he made$FG$
+
+That is not helpful.
+
+God says...
+$FG,4$wickedness intolerable measure conveying inspire intelligence revealedst judges temples according namely deserve voices flocks 95 wit Animals enthralled multiplied forgivest beware deliberates equal served foreshowed lecture darkened cares irons though vows violets certainties conception commemorated Either courts therein chair answerably inspired clasp hungering Thinkest wail Anger manifold clave spare givers shake innate secret TM aches population sovereign Be weighing Apostles excitement faintly direction theatre guardianship presbyters meekness protracted finding hard staggered woman juncture informing omened affirming cherish Luxury renowned magnified yesterday license liberal quiet thanksgivings at women actually ceaseth calmed good augmenting harm$FG$
+
+$IV,1$----01/16/14 23:19:27----$IV,0$
+
+$TX,"Bell Labs",HTML="http://www.metropolismag.com/Point-of-View/January-2014/In-Photos-Eero-Saarinens-Bell-Labs"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1389943500",HTML="http://beacon.nist.gov/rest/record/1389943500"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x72C98D-->(7522701 mod 100091)+1-->Line:15877
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Numbers 35:20) God says...
+$FG,4$wait, that he die; 35:21 Or in enmity smite him with his hand, that he
+die: he that smote him shall surely be put to death; for he is a
+murderer: the revenger of blood shall slay the murderer, when he
+meeteth him.
+
+35:22 But if he thrust him suddenly without enmity, or have cast upon
+him any thing without laying of wait, 35:23 Or with any stone,
+wherewith a man may die, seeing him not, and cast it upon him, that he
+die, and was not his enemy, neither sought his harm: 35:24 Then the
+congregation shall judge between the slayer and the revenger of blood
+according to these judgments: 35:25 And the congregation shall deliver
+the slayer out of the hand of the revenger of blood, and the
+congregation shall restore him to the city of his refuge, whither he
+was fled: and he shall abide in it unto the death of the high priest,
+which was anointed with the holy oil.
+
+35:26 But if the slayer shall at any time come without the border of
+the city of his refuge, whither he was fled; 35:27 And the revenger of
+blood find him without the borders of the city of his refuge, and the
+revenger of blood kill the slayer; he shall not be guilty of blood:
+
+$FG,2$Dud.  Maybe, Jimmy Hoffa?  Some companies slay companies.$FG$
+

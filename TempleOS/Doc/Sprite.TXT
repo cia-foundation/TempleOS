@@ -1,7 +1,0 @@
-$WW,1$A $FG,4$CSprite$FG$, is an ordered list of $LK,"these","MN:GRST_END"$ elements, created with $FG,2$<CTRL-R>$FG$$FG$.  Normally, they are packed together in a list and the address of the first is passed to routines.
-
-See $LK-A,"::/TempleOS/Demo/Graphics/SpritePlot.CPP"$, $LK-A,"::/TempleOS/Demo/Graphics/SpritePlot3D.CPP"$ and $LK-A,"::/TempleOS/Demo/Graphics/SpritePut.CPP"$ and $LK,"SpriteMesh","MN:SpriteMesh"$().
-
-Be aware that copying $FG,2$SP$FG$, $FG,2$IB$FG$, or $FG,2$IS$FG$ entries with the clipboard results in duplicate entries with different nums.  You can manually remove dups by editing with $FG,2$<CTRL-T>$FG$ and setting to the original num.
-
-See $LK,"::/TempleOS/Adam/Gr/GrSpritePlot.CPP","FL:::/TempleOS/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.$FG$

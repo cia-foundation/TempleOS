@@ -1,0 +1,78 @@
+$WW,1$$FG,5$$TX+CX,"Welcome to TempleOS"$$FG$
+
+$LK,"Trivial Solutions",A="FI:::/Doc/TrivialSolutions.TXT"$'s TempleOS is a x86_64, multi-cored, multi-tasking, ring-0-only, single-address_mapped (identity), operating system for recreational programming:
+
+$ID,2$* Professionals doing hobby projects
+* Teenagers doing projects
+* Non-professional, older-persons projects
+$ID,-2$
+Simplicity is a goal to $LK,"keep the line count down",A="FI:::/Doc/Strategy.TXT"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX,"120,838",D="DD_TEMPLEOS_LOC"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a "hello world" application in one line of code and can put graphics on the screen with a three line program!
+
+It's a kayak, not a Titanic -- it will crash if you do something wrong.  You quickly reboot, however.  DOS and the 8-bit home computers of the 80's worked fine without memory protection and most computers in the world -- the embedded ones -- operate without protection.  The resulting simplicity of no protections is why TempleOS has value.  In facts, that's the point of TempleOS.  See the $LK,"TempleOS Charter",A="FI:::/Doc/Charter.TXT"$.
+
+Conventional thinking is "failure is not an option" for general purpose operating systems.  Since this OS is used in addition to Windows or Linux, however, failure is an option -- just use Windows if you can't do something.
+
+Two things to know about TempleOS are that $UL,1$tasks$UL,0$ have $LK,"MAlloc",A="MN:MAlloc"$/$LK,"Free",A="MN:Free"$ heap memory, not applications, and tasks have compiler symbol tables that persist at a scope like environment variables in other operating systems, and the symbols can include functions.
+
+In other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$TempleOS$FG$, the command line feeds right into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ (more than $FG,2$C$FG$, less than $FG,2$C++$FG$) compiler, line by line, and it places code into memory it $LK,"MAlloc",A="MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.  During the boot process, many files get compiled before you have access to the command line.  (Don't worry, booting takes only a couple of seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ and nothing is "interpreted".
+
+Statements at the global scope (outside the scope of $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ functions) execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a statement in the global scope, usually at the bottom of your file.
+
+I started with $FG,2$C$FG$ syntax, but didn't like the command line for a directory listing looking like this:
+
+ >$FG,4$Dir("*.*",FALSE);
+
+$FG$So, I added default args from $FG,2$C++$FG$ and it looked like this:
+
+ >$FG,4$Dir();
+
+$FG$I didn't like that, so I made parentheses optional on calls with no args and it, now, looks like this:
+
+ >$FG,4$Dir;$FG$
+
+The syntax change created an ambiguity when specifying function addresses.  To resolve it, I  made a '$FG,2$&$FG$' required in front of function names when specifying an address of a function, which is better anyway.
+
+Once I was no longer using standard C/C++ syntax, I decided to change everything I didn't like and call it $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  Here are the new $LK,"operator precedence",A="FF:::/Doc/HolyC.TXT,operator precedence"$ rules.  It's Biblical!  See $LK,"Luke,5:37",A="BF:Luke,5:37"$.
+
+There are no object files in TempleOS and, normally, you don't make executable files either, but you can.  That's known as "$FG,2$Ahead-Of-Time$FG$" compilation.  Instead, you "$FG,2$Just-In-Time$FG$" compile.
+
+Tasks have no priority scheme and are never removed from the queue.  Instead, they often poll whatever they are waiting on and swap-out.  (Swapping tasks takes half a microsecond and does not involve disk activity or memory maps.)  See $LK,"Scheduler",A="FL:::/Kernel/Scheduler.CPP,1"$.  Polling keeps it simple.  It's might be a problem if you had lots of tasks busy, which rarely happens on a home computer.  The order of the tasks in the queue determines front-to-back window order.  See $LK,"TempleOS MultiTasking",A="FI:::/Doc/MultiTasking.TXT"$.
+
+The $FG,2$FAT32$FG$ filesystem is supported to makes exchanging files with a dual booted other operating system easy and there is the simple, 64-bit TempleOS $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ filesystem.  The $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ has allocation bitmap for clusters and all files are stored contiguously.  You can't grow files.
+
+TempleOS is geared toward reading and writing whole files.  Since whole files are processed, compression is possible.  Filenames ending in "$FG,2$.Z$FG$" are automatically compressed or uncompressed when stored and fetched.  TempleOS does support direct block random access into files, however -- $LK,"FRBlks",A="MN:FRBlks"$() and $LK,"FWBlks",A="MN:FWBlks"$().
+
+If a file is not found, "$FG,2$.Z$FG$" is added or removed and a search is done, again.  There is no $FG,2$PATH$FG$, but parent directories are searched when a file is not found.  This feature is especially useful for default account files.
+
+It's fun being able to turn-off interrupts with CLI $FG$and on with STI.  $FG,2$TempleOS$FG$ runs all programs in kernel mode, ring 0, so no instructions are off-limits.  Turning-off and on preemption with $LK,"Preempt",A="MN:Preempt"$() is a less drastic measure that is usually sufficient.  A newly $LK,"Spawn",A="MN:Spawn"$()ed task begins with preemption off.
+
+The graphic resolution is poor, $FG,2$640x480 16 color$FG$, but that's all I feel comfortable with without GPU acceleration supported.  A $FG,2$1600x1200x24$FG$ bit screen takes 37 times more memory, implying 37 times the CPU power.  Also, a fixed size keeps it simple with everybody machine having the same appearance.  Look on the bright-side -- you won't spend as much time twiddling pixs for your game art and you'll have tons of CPU power available, especially with multicore systems.
+
+TempleOS is for hobbyist programmers on single user (at a time) home computers, not mainframes or servers, but it is preemptive multitasking.  The focus task is all-important so symmetrical multiprocessing is almost pointless.  Why does it matter running two apps at the same time twice as fast when you really want to run one faster?  You could say TempleOS does master/slave multiprocessing.  The anticipated use for multicore is primarily putting graphics on the screen.  Hardware graphics acceleration is not used, so this is possible.  See $LK,"TempleOS MultiCore",A="FI:::/Doc/MultiCore.TXT"$.
+
+There is no distinction between the terms "task", "process" or "thread".  All have a task record, $LK,"CTask",A="MN:CTask"$(), pointed to by the $FG,2$FS$FG$ segment reg and are accessed with $FG,4$Fs->$FG$ while $FG,4$Gs->$FG$ points to a $LK,"CCPU",A="MN:CCPU"$ for the current CPU core.  Each task can have just one window, but a task can have children with windows.  (The segment regs are just used as extra regs -- there is nothing segmented about TempleOS' memory.)
+
+In TempleOS, "$FG,2$Adam$FG$" refers to a task that is the father of all tasks.  He's never supposed to die.  Since tasks inherit the symbols of parents, system-wide stuff is associated with $FG,2$Adam$FG$.  His heap is like kernel memory in other operating systems.  Since $FG,2$Adam$FG$ is immortal, it's safe to allocate objects, not tied to any mortal task, from $FG,2$Adam$FG$'s heap.  He stays in a server mode, taking requests, so you can ask him to $FG,2$#include$FG$ something, placing that code system-wide.  A funny story is that originally I called it the "root" task and even had a "$FG,2$/Root$FG$" directory ;-)  $FG,2$Adam$FG$ executes $LK,"::/Kernel/Adam1.CPP"$ at boot time.
+
+For easy back-ups, place everything you author in your $FG,2$HOME$FG$ directory and subdirectories.  Then, use $LK,"CopyTree",A="MN:CopyTree"$().  That should make upgrading easy, too.  To make an account use $LK,"MkDir",A="MN:MkDir"$() to create a directory under $FG,2$/Accts$FG$.  It will be $FG,2$HOME$FG$ if you boot to it.  Recompile with $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$() and make it boot your acct.  Customizable start-up scripts go in your $FG,2$HOME$FG$ directory.  The default start-up scripts are in $FG,2$/Accts$FG$, the parent of all accounts.  Copy the start-up files you wish to customize into $FG,2$HOME$FG$ and modify them.  See $LK,"Acct Files",A="FF:::/Doc/GuideLines.TXT,ACCT FILES"$.
+
+Typically, your usage pattern through the day will be repeatedly left or right clicking on filenames in a cmd line $LK,"Dir",A="MN:Dir"$() listing.  You left-click files to edit them and right-click to $FG,2$#include$FG$ them.  To begin a project, type $LK,"Ed",A="MN:Ed"$(""); and supply a filename.  You can also run programs with $FG,2$<F5>$FG$ when in the editor.  $FG,2$<ESC>$FG$ to save and exit the file.  You'll need to do a new $LK,"Dir",A="MN:Dir"$() cmd, periodically, so make a macro on your personal menu.  Access your personal menu by pressing $FG,2$<CTRL-M>$FG$, cursoring until you are on top of it and pressing $FG,2$<SPACE BAR>$FG$.
+
+$FG,2$<CTRL-T>$FG$ toggles plain text mode, showing format commands, a little like viewing html code.  $FG,2$<CTRL-L>$FG$ inserts a nongraphic widget.  $FG,2$<CTRL-R>$FG$ inserts a graphic resource or edits the graphic under the cursor.
+
+$FG,2$<CTRL-D>$FG$ brings-up the file manager.  It's pretty crappy.  I find I don't need it very often, believe it or not.
+
+$FG,2$<CTRL-ALT-E>$FG$ creates a new terminal window.  $FG,2$<CTRL-ALT-X>$FG$ kills a window.  You'll do these periodically.
+
+$LK,"Grep",A="MN:Grep"$() is your best friend.  There's a wrapper function called $LK,"F",A="MN:F"$() in your $FG,2$HOME/Adam3dWrappers.CPP.Z$FG$ file.  Feel free to make wrapper functions for functions you use often and customize the args.  By the way, $LK,"Grep",A="MN:Grep"$() or $LK,"R",A="MN:R"$() can be used to replace strings across multiple files.  You can access $LK,"Grep",A="MN:Grep"$() using $FG,2$<CTRL-SHIFT-F>$FG$.
+
+As you browse code, use the $FG,2$WordStat$FG$ window to look-up functions, etc.  $FG,2$<CTRL-SHIFT-F1>$FG$ (or whatever number) to follow a sym to it's source.  You can browse deeper and deeper.  You go back with $FG,2$<SHIFT-ESC>$FG$.
+
+Use the $LK,"Help Index",A="FI:::/Doc/HelpIndex.TXT"$ or $LK,"Demo Index",A="FI:::/Doc/DemoIndex.TXT"$ to find-out what exists.  Press $FG,2$F1$FG$ for help or use the links on your menu ($FG,2$<CTRL-M>$FG$).  Also, look in the $FG,2$/Demo$FG$ or $FG,2$/Apps$FG$ directories for inspiration.
+
+
+$MA-X+PU,"Take Tour",LM="SpawnUser(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$
+
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.
+$FG$

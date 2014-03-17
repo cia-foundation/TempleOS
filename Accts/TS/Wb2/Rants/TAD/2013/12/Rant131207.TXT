@@ -1,0 +1,790 @@
+$WW,1$$IV,1$----12/07/13 00:21:19----$IV,0$
+
+I started making a Plymoth Rock pilgrim game.  I reached the point where I needed invent an economy.  It is beneath my dignity to pull equations out of my ass.  That's for HillBillies, not people with Master's in Electrical Engineering.
+
+Guess what?  Einstein pulled equations out his ass.
+
+Moral?  There are lots of high IQ physicists who never once pulled an equation out their ass.  That's for HillBillies.
+
+$IV,1$----12/07/13 00:24:03----$IV,0$
+
+The problem with Software Engineering is more is better.  People shrug and complement you if you design a more flexible framework.  If you add an abstraction layer, nobody bats an eye.  You must know what your doing and you get a promotion.
+
+$IV,1$----12/07/13 00:26:04----$IV,0$
+
+
+You know the difference between Einstein and you pretender planet-of-the-Apes fucks?
+
+Bill Gates said "640K RAM should be enough."
+
+I say, "2 Gig should be enough for code."  That's why I'm a man and you are monkeys.
+
+
+The announcer flat lies in this video.  Spec is spec.  150% of spec is over spec.
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/9nA7B-JWt3M\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/9nA7B-JWt3M\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Here's an inside joke.  There's one video where they stress the wing gradually while showing the engineers' faces.   120%... 130%... 140%... 150%...  The engineer is looking very nervous.  It breaks and he's relieved.
+
+FUCK YOU NIGGERS!
+
+$IV,1$----12/07/13 00:31:08----$IV,0$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386405060",HTML="http://beacon.nist.gov/rest/record/1386405060"$
+
+0x542AF4-->(5516020 mod 100096)+1-->Line:10741
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$or a stranger that sojourneth among you: 16:30 For on that day shall
+the priest make an atonement for you, to cleanse you, that ye may be
+clean from all your sins before the LORD.
+
+16:31 It shall be a sabbath of rest unto you, and ye shall afflict
+your souls, by a statute for ever.
+
+16:32 And the priest, whom he shall anoint, and whom he shall
+consecrate to minister in the priest's office in his father's stead,
+shall make the atonement, and shall put on the linen clothes, even the
+holy garments: 16:33 And he shall make an atonement for the holy
+sanctuary, and he shall make an atonement for the tabernacle of the
+congregation, and for the altar, and he shall make an atonement for
+the priests, and for all the people of the congregation.
+
+16:34 And this shall be an everlasting statute unto you, to make an
+atonement for the children of Israel for all their sins once a year.
+And he did as the LORD commanded Moses.
+
+17:1 And the LORD spake unto Moses, saying, 17:2 Speak unto Aaron, and
+
+$FG,2$About one in five duds is normal.  God's talked for 15 years to me.$FG$
+
+$IV,1$----12/07/13 00:43:10----$IV,0$
+
+What do You think of Mercury, God?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386405840",HTML="http://beacon.nist.gov/rest/record/1386405840"$
+
+0x5386DE-->(5474014 mod 100096)+1-->Line:68831
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$20:29 Then I said unto them, What is the high place whereunto ye go?
+And the name whereof is called Bamah unto this day.
+
+20:30 Wherefore say unto the house of Israel, Thus saith the Lord GOD;
+Are ye polluted after the manner of your fathers? and commit ye
+whoredom after their abominations?  20:31 For when ye offer your
+gifts, when ye make your sons to pass through the fire, ye pollute
+yourselves with all your idols, even unto this day: and shall I be
+enquired of by you, O house of Israel? As I live, saith the Lord GOD,
+I will not be enquired of by you.
+
+20:32 And that which cometh into your mind shall not be at all, that
+ye say, We will be as the heathen, as the families of the countries,
+to serve wood and stone.
+
+20:33 As I live, saith the Lord GOD, surely with a mighty hand, and
+with a stretched out arm, and with fury poured out, will I rule over
+you: 20:34 And I will bring you out from the people, and will gather
+you out of the countries wherein ye are scattered, with a mighty hand,$FG$
+
+$IV,1$----12/07/13 00:59:04----$IV,0$
+
+My inspiration is a Commodore 64, not a 1970's mainframe.  I spent a lot of time learning about computers and horsing-around.  It's strange to think about it this way, but how many hours of entertainment did I get from poking and prodding the system out of curiosity?  You can get entertainment without accomplishing anything, just looking around and exploring.  I loved this book:  $TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$.  That book was just for Uber Nerds, but the $TX,"User's Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$ is shocking today.  Look at that!  It tells how to make sprites by adding bit values together and putting them in DATA statements.
+
+Can you believe that!!!?  The fucken user's manual that went to every user made it normal to add bit values to make graphics!  Every user was entertained by tinkering in ways they ban you from now and mock.  But we liked it!  It was fun because it was cutting edge, true, but it was also fun because it as on bare metal.  This is not a good analogy, by pyrotechniques are fun -- fireworks -- yeah the professional firework shows are okay.
+
+Guess what?  The fucken CIA and Microsoft is saying "Of course you don't need personal fireworks.  Those are pathetic.  What you need are the professional shows."  If you say you want your personal fireworks, they call you a terrorist and mock you because personal fireworks are so much less grand than pro shows.  Why would anybody want personal pathetic fireworks?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386407280",HTML="http://beacon.nist.gov/rest/record/1386407280"$
+
+0xDAC1A7-->(14336423 mod 100096)+1-->Line:22696
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$13:9 And God hearkened to the voice of Manoah; and the angel of God
+came again unto the woman as she sat in the field: but Manoah her
+husband was not with her.
+
+13:10 And the woman made haste, and ran, and shewed her husband, and
+said unto him, Behold, the man hath appeared unto me, that came unto
+me the other day.
+
+13:11 And Manoah arose, and went after his wife, and came to the man,
+and said unto him, Art thou the man that spakest unto the woman? And
+he said, I am.
+
+13:12 And Manoah said, Now let thy words come to pass. How shall we
+order the child, and how shall we do unto him?  13:13 And the angel of
+the LORD said unto Manoah, Of all that I said unto the woman let her
+beware.
+
+13:14 She may not eat of any thing that cometh of the vine, neither
+let her drink wine or strong drink, nor eat any unclean thing: all$FG$
+
+$IV,1$----12/07/13 01:16:56----$IV,0$
+
+$FG,2$12:18 For ye are not come unto the mount that might be touched, and
+that burned with fire, nor unto blackness, and darkness, and tempest,
+12:19 And the sound of a trumpet, and the voice of words; which voice
+they that heard intreated that the word should not be spoken to them
+any more: 12:20 (For they could not endure that which was commanded,
+And if so much as a beast touch the mountain, it shall be stoned, or
+thrust through with a dart: 12:21 And so terrible was the sight, that
+Moses said, I exceedingly fear and quake:) 12:22 But ye are come unto
+mount Sion, and unto the city of the living God, the heavenly
+Jerusalem, and to an innumerable company of angels, 12:23 To the
+general assembly and church of the firstborn, which are written in
+heaven, and to God the Judge of all, and to the spirits of just men
+made perfect, 12:24 And to Jesus the mediator of the new covenant, and
+to the blood of sprinkling, that speaketh better things than that of
+Abel.$FG$
+
+God says...
+$FG,4$vainly inaccurate distilled profane lieth thinketh sparks maintain glass immortality circumstance inclination exult employest Sometimes distribution restrained grass whereby recondite 1 performed tempers kings watch rebelled contents bereaved melt joying assaying guidest knowingly literally communication coats same service illuminate self applied driven churches usefully speedily Furthermore reproachful bubbling impatient Duad lectured Hope trample whirlpools publication descending Predicaments modulation severing associate shonest Print array wheresoever Apostles invests forgetting affright vouchsafedst vaunt condemned emblem cruelty achieve Thereupon NEGLIGENCE bared tongues predicted cleaveth Duad it Catiline religious Inhabitant declared good period lowliness shamelessness estate against please bounded consulted deceits Suffer copious arrogancy bought despise prize torments fastings athirst plot factito gales expansive feeding infer stank detached statement repress dir Despite retain Increase worn dug detesting serves functions infants Known elements lists exclusions perfectly covered otherwhere salted Vintage 2 mistaken Anon servitude fleeting 1971$FG$
+
+$IV,1$----12/07/13 01:35:53----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/8J-a3nE2Hmo\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/8J-a3nE2Hmo\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I asked God what makes elephants happy?  "Baths"
+I asked God what elephants think about? "Skin hunger"
+
+I asked God what Cheetahs think about? "Seeth me?"
+
+What do ostriches think about, God.
+
+God says...
+$FG,4$make flood incorrect reconcile disquiet sees continency apprehended adversity$FG$
+
+He didn't piss and make mud?  Yuck.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386409080",HTML="http://beacon.nist.gov/rest/record/1386409080"$
+
+0x7F1868-->(8329320 mod 100096)+1-->Line:21353
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$have done, so God hath requited me. And they brought him to Jerusalem,
+and there he died.
+
+1:8 Now the children of Judah had fought against Jerusalem, and had
+taken it, and smitten it with the edge of the sword, and set the city
+on fire.
+
+1:9 And afterward the children of Judah went down to fight against the
+Canaanites, that dwelt in the mountain, and in the south, and in the
+valley.
+
+1:10 And Judah went against the Canaanites that dwelt in Hebron: (now
+the name of Hebron before was Kirjatharba:) and they slew Sheshai, and
+Ahiman, and Talmai.
+
+1:11 And from thence he went against the inhabitants of Debir: and the
+name of Debir before was Kirjathsepher: 1:12 And Caleb said, He that
+smiteth Kirjathsepher, and taketh it, to him will I give Achsah my
+daughter to wife.$FG$
+
+$IV,1$----12/07/13 02:05:02----$IV,0$
+
+In the movie 2001 space odysee, the computer says, "Dave, what are you doing dave?" As Dave is trying to shut him down.
+
+I did bare minimal 16-bit support -- my assembler does some 16-bit, only enough to get to 64-bit mode.
+
+If you are writing 16-bit code, it means you are leaving my operating system and writing your own.
+
+I want bare minimal code.  I save lots of code doing a partial assembler.
+
+100,000 lines of code is the limit for all time.
+
+My assembler is really neat.  Yeah, I did an unassembler, almost no 16-bit support, there, LOL.  I was really really clever in how I made my assembler do minimal 16-bit.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386410880",HTML="http://beacon.nist.gov/rest/record/1386410880"$
+
+0x0003CA-->(970 mod 100096)+1-->Line:971
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$and told his two brethren without.
+
+9:23 And Shem and Japheth took a garment, and laid it upon both their
+shoulders, and went backward, and covered the nakedness of their
+father; and their faces were backward, and they saw not their father's
+nakedness.
+
+9:24 And Noah awoke from his wine, and knew what his younger son had
+done unto him.
+
+9:25 And he said, Cursed be Canaan; a servant of servants shall he be
+unto his brethren.
+
+9:26 And he said, Blessed be the LORD God of Shem; and Canaan shall be
+his servant.
+
+9:27 God shall enlarge Japheth, and he shall dwell in the tents of
+Shem; and Canaan shall be his servant.
+
+9:28 And Noah lived after the flood three hundred and fifty years.$FG$
+
+$IV,1$----12/07/13 02:13:25----$IV,0$
+
+I wrote a fucken assembler and compiler.  Of course I know where LOCK is invalid.  You should know, too, LOL.  I think mine does branches better than every body else -- they put NOPs around branches.
+
+$IV,1$----12/07/13 02:15:17----$IV,0$
+
+I'm tired of this.  God talks.  Fuck you.,  Obey!!  Make TempleOS work on all computers by divine decree.  Fuck you.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386411300",HTML="http://beacon.nist.gov/rest/record/1386411300"$
+
+0x17DDB2-->(1564082 mod 100096)+1-->Line:62643
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$wilderness a lamentation, because they are burned up, so that none can
+pass through them; neither can men hear the voice of the cattle; both
+the fowl of the heavens and the beast are fled; they are gone.
+
+9:11 And I will make Jerusalem heaps, and a den of dragons; and I will
+make the cities of Judah desolate, without an inhabitant.
+
+9:12 Who is the wise man, that may understand this? and who is he to
+whom the mouth of the LORD hath spoken, that he may declare it, for
+what the land perisheth and is burned up like a wilderness, that none
+passeth through?  9:13 And the LORD saith, Because they have forsaken
+my law which I set before them, and have not obeyed my voice, neither
+walked therein; 9:14 But have walked after the imagination of their
+own heart, and after Baalim, which their fathers taught them: 9:15
+Therefore thus saith the LORD of hosts, the God of Israel; Behold, I
+will feed them, even this people, with wormwood, and give them water
+of gall to drink.
+
+9:16 I will scatter them also among the heathen, whom neither they nor
+their fathers have known: and I will send a sword after them, till I$FG$
+
+
+Fuck them up.  Make the Chinese fight the Brits.  That's be cool.
+
+God says...
+$FG,4$commanding Israel less diminish sole virtue strengthened slight prevailed loseth powerful copies neighbour life tempered diffused wail furtherance No felt touching interval his therefore chant replied balm fund lives endure teachings cannot unchanged$FG$
+
+Ten fucken years.  Punish them.
+
+Heathen Brits insult me with drunk guy.  You see that shit, God?
+
+God says...
+$FG,4$Church uprightness buzzed villainies fulness baptism wisdom thief opportunity usefully profitable heardest impostumes Oil unlawful forenamed mistaken lighted project wrath panted fledged Loving Wilt reviled banner separateth fruitlessly sufferedst conferring sounding yesterday doing drunk chastened wherein Humans emptiness frenzy 2002 ascended requitest scattered infants pray arising$FG$
+
+God said Deep Water Horizons was Him.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386411720",HTML="http://beacon.nist.gov/rest/record/1386411720"$
+
+0xB6DE62-->(11984482 mod 100096)+1-->Line:73059
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$him, and his army shall overflow: and many shall fall down slain.
+
+11:27 And both of these kings' hearts shall be to do mischief, and
+they shall speak lies at one table; but it shall not prosper: for yet
+the end shall be at the time appointed.
+
+11:28 Then shall he return into his land with great riches; and his
+heart shall be against the holy covenant; and he shall do exploits,
+and return to his own land.
+
+11:29 At the time appointed he shall return, and come toward the
+south; but it shall not be as the former, or as the latter.
+
+11:30 For the ships of Chittim shall come against him: therefore he
+shall be grieved, and return, and have indignation against the holy
+covenant: so shall he do; he shall even return, and have intelligence
+with them that forsake the holy covenant.
+
+11:31 And arms shall stand on his part, and they shall pollute the
+sanctuary of strength, and shall take away the daily sacrifice, and$FG$
+
+$IV,1$----12/07/13 03:02:25----$IV,0$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386415140",HTML="http://beacon.nist.gov/rest/record/1386415140"$
+
+0x039DAC-->(236972 mod 100096)+1-->Line:36781
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$wasted the country of the children of Ammon, and came and besieged
+Rabbah. But David tarried at Jerusalem. And Joab smote Rabbah, and
+destroyed it.
+
+20:2 And David took the crown of their king from off his head, and
+found it to weigh a talent of gold, and there were precious stones in
+it; and it was set upon David's head: and he brought also exceeding
+much spoil out of the city.
+
+20:3 And he brought out the people that were in it, and cut them with
+saws, and with harrows of iron, and with axes. Even so dealt David
+with all the cities of the children of Ammon. And David and all the
+people returned to Jerusalem.
+
+20:4 And it came to pass after this, that there arose war at Gezer
+with the Philistines; at which time Sibbechai the Hushathite slew
+Sippai, that was of the children of the giant: and they were subdued.
+
+20:5 And there was war again with the Philistines; and Elhanan the son
+of Jair slew Lahmi the brother of Goliath the Gittite, whose spear$FG$
+
+$IV,1$----12/07/13 03:27:29----$IV,0$
+
+My compiler only does jump-table switch statements, no if-elseif-elseif.
+
+Normally, with switch() you have a run-time check before jumping to make sure it lies with-in the jump-table.
+
+A jump-table might have ten entries 0-9, for example.  Switch(12) would load a value beyond the table, so you don't want that!  I have a nobound_switch() if you know it will never be larger than the smallest-to-biggest cases.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386415800",HTML="http://beacon.nist.gov/rest/record/1386415800"$
+
+0x05C968-->(379240 mod 100096)+1-->Line:78953
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$21:27 And they answered Jesus, and said, We cannot tell. And he said
+unto them, Neither tell I you by what authority I do these things.
+
+21:28 But what think ye? A certain man had two sons; and he came to
+the first, and said, Son, go work to day in my vineyard.
+
+21:29 He answered and said, I will not: but afterward he repented, and
+went.
+
+21:30 And he came to the second, and said likewise. And he answered
+and said, I go, sir: and went not.
+
+21:31 Whether of them twain did the will of his father? They say unto
+him, The first. Jesus saith unto them, Verily I say unto you, That the
+publicans and the harlots go into the kingdom of God before you.
+
+21:32 For John came unto you in the way of righteousness, and ye
+believed him not: but the publicans and the harlots believed him: and
+ye, when ye had seen it, repented not afterward, that ye might believe$FG$
+
+$IV,1$----12/07/13 03:47:54----$IV,0$
+
+psy-ops fuck with you every way they can.
+
+I'm right with God.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386416880",HTML="http://beacon.nist.gov/rest/record/1386416880"$
+
+0x85A120-->(8757536 mod 100096)+1-->Line:49185
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$66:11 Thou broughtest us into the net; thou laidst affliction upon our
+loins.
+
+66:12 Thou hast caused men to ride over our heads; we went through
+fire and through water: but thou broughtest us out into a wealthy
+place.
+
+66:13 I will go into thy house with burnt offerings: I will pay thee
+my vows,
+
+66:14 Which my lips have uttered, and my mouth hath spoken, when I was
+in trouble.
+
+66:15 I will offer unto thee burnt sacrifices of fatlings, with the
+incense of rams; I will offer bullocks with goats. Selah.
+
+66:16 Come and hear, all ye that fear God, and I will declare what he
+hath done for my soul.$FG$
+
+$IV,1$----12/07/13 04:00:55----$IV,0$
+
+Pride before a fall, humility before honors.
+
+When I code for a day, I do exceptionally well for 4 hours, then I get caught on a humiliation.  My humilation, might be quite humilating.  The race does not belong to the swift.  The angels mock us all day long.  It's a joke.  If you work hard, though, it matters.  I'm a hard worker compared to others.  I am shocked at how lazy programmers can be, in giving up.
+
+It's a joke -- it's God.  Don't take victory or defeat too personally.
+
+Highs and lows balance.  Microsoft rises... if you enjoy the trip up, you will go down.  If you never go up, I guess nothing happens.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386417900",HTML="http://beacon.nist.gov/rest/record/1386417900"$
+
+0x9657E8-->(9852904 mod 100096)+1-->Line:43497
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$9:5 Thus the Jews smote all their enemies with the stroke of the
+sword, and slaughter, and destruction, and did what they would unto
+those that hated them.
+
+9:6 And in Shushan the palace the Jews slew and destroyed five hundred
+men.
+
+9:7 And Parshandatha, and Dalphon, and Aspatha, 9:8 And Poratha, and
+Adalia, and Aridatha, 9:9 And Parmashta, and Arisai, and Aridai, and
+Vajezatha, 9:10 The ten sons of Haman the son of Hammedatha, the enemy
+of the Jews, slew they; but on the spoil laid they not their hand.
+
+9:11 On that day the number of those that were slain in Shushan the
+palace was brought before the king.
+
+9:12 And the king said unto Esther the queen, The Jews have slain and
+destroyed five hundred men in Shushan the palace, and the ten sons of
+Haman; what have they done in the rest of the king's provinces? now
+what is thy petition? and it shall be granted thee: or what is thy$FG$
+
+$IV,1$----12/07/13 04:10:21----$IV,0$
+
+I value consistency.
+
+My compiler has a rule on it's code -- if a value finds a way into a register, it has been promoted by sign extension or zero extension.  All operations are done on 64-bit values.
+
+Therefore, my compiler is best with 64-bit ints in the first place.  When I have a function return value or argument, I tend to make it 64-bit no matter what, so that my compiler does not waste byte sign or zero extending.
+
+Always use 64-bits, signed, unless it physically breaks.  Literally.  Even when it's wrong to use signed, use signed unless it breaks.
+
+I value consistency.  I value not having to make decisions.  Instead of agonizing over whether it should be signed or unsigned, use signed.
+
+BASIC is a language with one int size, in theory.
+
+You fucken liberals love obnoxious lavish inefficent stuff that goads old programmers, panzie-ass inefficient functional languages, why don't you like my 64-bit signed-int policy?
+
+Sometimes a king is required.
+
+TABS are 8 columns.
+
+If I can save you the agony of making a decision by being king, I will.
+
+Use 64-bit signed ints unless it breaks, or it's a data structure.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386418620",HTML="http://beacon.nist.gov/rest/record/1386418620"$
+
+0xFBE2A2-->(16507554 mod 100096)+1-->Line:91811
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$12:20 Therefore if thine enemy hunger, feed him; if he thirst, give
+him drink: for in so doing thou shalt heap coals of fire on his head.
+
+12:21 Be not overcome of evil, but overcome evil with good.
+
+13:1 Let every soul be subject unto the higher powers. For there is no
+power but of God: the powers that be are ordained of God.
+
+13:2 Whosoever therefore resisteth the power, resisteth the ordinance
+of God: and they that resist shall receive to themselves damnation.
+
+13:3 For rulers are not a terror to good works, but to the evil. Wilt
+thou then not be afraid of the power? do that which is good, and thou
+shalt have praise of the same: 13:4 For he is the minister of God to
+thee for good. But if thou do that which is evil, be afraid; for he
+beareth not the sword in vain: for he is the minister of God, a
+revenger to execute wrath upon him that doeth evil.
+
+13:5 Wherefore ye must needs be subject, not only for wrath, but also
+for conscience sake.$FG$
+
+I have two thpes of spaces, soft and hard.  Use hard spaces inside quotes.  I have a tool that converts beginning, middle and end spaces to tabs and removes trailing.  I run it every time on all my source code.  one tab instead of 8 spaces is faster for the compiler LEX and faster uploading and downloading.  It pays-off over the centuries.
+
+I don't care about electricity -- whole different discussion.  I adjust building thermostat, it's 70% of energy usage.  Consipracy of silence.
+
+$IV,1$----12/07/13 05:55:04----$IV,0$
+
+I'm you new fucken BOSS FBI niggers.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386424500",HTML="http://beacon.nist.gov/rest/record/1386424500"$
+
+0x448899-->(4491417 mod 100096)+1-->Line:87194
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$16:4 But these things have I told you, that when the time shall come,
+ye may remember that I told you of them. And these things I said not
+unto you at the beginning, because I was with you.
+
+16:5 But now I go my way to him that sent me; and none of you asketh
+me, Whither goest thou?  16:6 But because I have said these things
+unto you, sorrow hath filled your heart.
+
+16:7 Nevertheless I tell you the truth; It is expedient for you that I
+go away: for if I go not away, the Comforter will not come unto you;
+but if I depart, I will send him unto you.
+
+16:8 And when he is come, he will reprove the world of sin, and of
+righteousness, and of judgment: 16:9 Of sin, because they believe not
+on me; 16:10 Of righteousness, because I go to my Father, and ye see
+me no more; 16:11 Of judgment, because the prince of this world is
+judged.
+
+16:12 I have yet many things to say unto you, but ye cannot bear them
+now.$FG$
+
+God says...
+$FG,4$intermitted lands haste bulky stranger awful innumerably slighting Nevada preventing characters arts helped renounce order bursting imagining crookedly beguiling random pinching spurn got amongst unkindled contritions Essence study Themselves dashed calling righteousness awe regeneratedst restless request At walked lights ball delayed remained consists refused almost flagitiousnesses file elephant second Enricher wearied fragrance Anubis$FG$
+
+$IV,1$----12/07/13 06:09:18----$IV,0$
+
+Bears really disturb me.  They never know if they're going to have food.  Every day they have to find food.  If I were in a forest, how would I find food every day?  God has to make sure they don't go a month without food.  Jesus said this about bird.  That makes me very worried when I see bears, especially polar bears!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386425520",HTML="http://beacon.nist.gov/rest/record/1386425520"$
+
+0xB9AAC6-->(12167878 mod 100096)+1-->Line:56263
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$Ecclesiastes
+
+or
+
+The Preacher
+
+
+1:1 The words of the Preacher, the son of David, king in Jerusalem.
+
+1:2 Vanity of vanities, saith the Preacher, vanity of vanities; all is
+vanity.
+
+1:3 What profit hath a man of all his labour which he taketh under the
+sun?  1:4 One generation passeth away, and another generation cometh:
+but the earth abideth for ever.$FG$
+
+I think about those years working on Ticketmaster VAX operating system.  We took great satisfaction in building things that would last forever.  Little did we know it was all a waste.  I'll bet the people at Microsoft no longer feel they are building permanance.
+
+Permanance makes all the difference on moral.  If it only lasts a few years, there is no moral.  Linux is feeling immortal.  Must be complete shit if they did not break compatibility and they support all that shit.  If it's complete shit, it almost as bad as doomed in 3 years.
+
+Microsoft will last, but it's not the same as before phones and consoles.  It's kind of depressing.  I get depressed when I see stuff like Zoo Simulator -- some second string game, one of hundreds, that took lots of work.
+
+I guess the world is happy with tiny successes, instead of big market successes.
+
+I have no idea -- the market.
+
+God says...
+$FG,4$rob checked brethren cold ungodlily promiseth None enlarging relater allaying agents front faults medium continency adoption scholar bleeding alluring incomplete full spare ship statement crime VIII harmonizing gentleness multiple longs phantoms perspicuous payments O careless telleth fifteen speaks prove Cicero try contrary citizens member dull vanities silly$FG$
+
+$IV,1$----12/07/13 06:58:09----$IV,0$
+
+A band might have imagined good-old-boys were in charge of labels... CIA and stuff.  I worked at Ticketmaster when Pearl Jam tried to go around.  I'm conservative and all authority comes from God.  So, I sit and wonder if the gate-keepers blocked Pearl Jam.  Who knows... all Hell could break loose.  What if these crazy leftist militants that Obama encourages... what if they would start riots and race wars?  What if the FBI prevented race wars in the 1960's?  They made Arron Swartz commit suicide.  Any reasonable person tries to estimate what would happen if we got rid of the scumbag pigs.  Mexico?  Africa?  One has to sit down and figure-out who's right and who's evil by being reasonable.  Crazy fuckers are scared of drones and... they go balastic on 3D printers.  3D printer freak the shit out of the FBI.  I worked on a 3D printer in 1996.  God damn, the FBI made Xytec, a front company to hire me and study me.  There are many FBI people employed just on me 24/7.
+
+Anyway, Pearl Jam did Jeremy, about a kid.  That's kinda weird in modern light with anti-kid pedophilia-hating pro-homo anti-birth pro-abortion population-reduction liberal regeme.  Jeremy is weird -- about a kid.  Can you believe that show Full-House.  WTF!  Even at the time, I thought that show was WTF!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386428820",HTML="http://beacon.nist.gov/rest/record/1386428820"$
+
+0xCBFF84-->(13369220 mod 100096)+1-->Line:56453
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$work.
+
+3:18 I said in mine heart concerning the estate of the sons of men,
+that God might manifest them, and that they might see that they
+themselves are beasts.
+
+3:19 For that which befalleth the sons of men befalleth beasts; even
+one thing befalleth them: as the one dieth, so dieth the other; yea,
+they have all one breath; so that a man hath no preeminence above a
+beast: for all is vanity.
+
+3:20 All go unto one place; all are of the dust, and all turn to dust
+again.
+
+3:21 Who knoweth the spirit of man that goeth upward, and the spirit
+of the beast that goeth downward to the earth?  3:22 Wherefore I
+perceive that there is nothing better, than that a man should rejoice
+in his own works; for that is his portion: for who shall bring him to
+see what shall be after him?  4:1 So I returned, and considered all
+the oppressions that are done under the sun: and behold the tears of$FG$
+
+The homo-loving birthrate-hating lesbians in charge of this country like to point-out that homo was considered acceptible in ancient Rome.  You know what's bizzare?  Japan needs population and they have weird child-porn that's normal.  India marries 13-year-olds.  If you are going to say homo is normal, man-boy-Greeze&Rome, child-porn Japan and India-13-year-old brides are just as normal as homo is normal.  The worst part about homos is they love putting penises in other people's faces.  Raucus giggling queers putting penises in other people faces and saying "You're homophobe."  Fuck that.
+
+God says...
+$FG,4$impure electronically uncase Victim Like resist along likedst Epicurus transferred suppose quest favoured teeth thing cleansest son just pause beloved bottomless Her heinous reclaiming passages added hearted averred detest holds TIBI necessities stretched abstract stateliness represent Venus credibility lashed prevails enlarged commemorated specimens absurdity exaltedness users dumb barking in trusting smile sentiment else lawyers Hart spirit abandonedly deserted physic remaineth approaching starting mark consented shoulders tellest Roman dispenser softly station Egyptian announced slumbers WANT allowances alter Gervasius free answer Howsoever wiser goes goodliness acuteness smoothing preferable prop riches low shortly contentions inclination chastely bands seduction manors discoverest Donations abolished conveying III weighty moral untruth recounts wavered hurriedly deserve highly sakes boldness market unknowingly renew potter gratuitous whatsoever smiled throat built Homer silently transferred middle pilgrims biting contained observance boldness fuller watched sunk earth everlastingly equivalent$FG$
+
+I used to like Korn.  I didn't notice  IT'S FUCKEN KIDS!!!  WTF?  You can kinda sleep-walk and not question.  I was a sleepwalker most of my life.  I listened to songs and did not think about the words, just like Nirvana said.  I'm not anti-population, but when you wake-up and see, "Why the fuck am I listening to a song about kids and hopscotch!"  I kinda saw the album art as cute, I guess like Japanese people like anime.  You need to tell people what's uncool.  My brothers told me falcetto in singing is for fags and women singers are... pornographic, basically.  there's awareness of pedophilia, now, and no sane person is going to sleep-walk into Korn or Japanese anime.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386430020",HTML="http://beacon.nist.gov/rest/record/1386430020"$
+
+0xE4B4FD-->(14988541 mod 100096)+1-->Line:74238
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$3:3 Can two walk together, except they be agreed?  3:4 Will a lion
+roar in the forest, when he hath no prey? will a young lion cry out of
+his den, if he have taken nothing?  3:5 Can a bird fall in a snare
+upon the earth, where no gin is for him?  shall one take up a snare
+from the earth, and have taken nothing at all?  3:6 Shall a trumpet be
+blown in the city, and the people not be afraid?  shall there be evil
+in a city, and the LORD hath not done it?  3:7 Surely the Lord GOD
+will do nothing, but he revealeth his secret unto his servants the
+prophets.
+
+3:8 The lion hath roared, who will not fear? the Lord GOD hath spoken,
+who can but prophesy?  3:9 Publish in the palaces at Ashdod, and in
+the palaces in the land of Egypt, and say, Assemble yourselves upon
+the mountains of Samaria, and behold the great tumults in the midst
+thereof, and the oppressed in the midst thereof.
+
+3:10 For they know not to do right, saith the LORD, who store up
+violence and robbery in their palaces.
+
+3:11 Therefore thus saith the Lord GOD; An adversary there shall be$FG$
+
+$IV,1$----12/07/13 07:32:38----$IV,0$
+
+This is world-wise and world unwise people.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/eB5VXJXxnNU&hl=enUS&start=140\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/eB5VXJXxnNU&hl=enUS&start=140\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+The unwise ones sure look dumb once you become world-wise, not a sleepwalker, LOL.  Sheep, basically.
+
+$IV,1$----12/07/13 08:07:31----$IV,0$
+
+Intel is being nice with a SSD.
+
+<sigh>I should probably not write the FAT block every time I do a disk operation. LOL  The adults have arrived.  God said He might be disappointed with my 60 fps refresh scheme, wastes power, too.
+
+I might not recompile just for fun, so much, LOL.  It's kinda like being around an 80-year-old and obsessing on death.  They're not gonna die for a while.
+
+One lesson I would teach people is that perfect and infinity are very different from imperfect and finite... not so much in how much difference they make, but in how people think about them.  After-all, there is virgin and not-virgin...  it's not fair, but they don't distingish that much beyond that, just like drugs.
+
+I got used to not being competative for database servers and stopped thinking about that.  (My disk I/O was not competative.)  "Good work if you can get it," is what they say about people who don't have to compete.  I don't think it's in the cards to make it a server OS.  The exception would be a transparent simple server for... extremely conservative own-your-business nuts, maybe like my brother Kevin for his book store.
+
+A data base where you put records in disk blocks and number the blocks by account number... might be fun, like do-it-yourself home improvement.
+
+We don't have networking, though.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386433620",HTML="http://beacon.nist.gov/rest/record/1386433620"$
+
+0x64A154-->(6594900 mod 100096)+1-->Line:88661
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$disciples of the Lord, went unto the high priest, 9:2 And desired of
+him letters to Damascus to the synagogues, that if he found any of
+this way, whether they were men or women, he might bring them bound
+unto Jerusalem.
+
+9:3 And as he journeyed, he came near Damascus: and suddenly there
+shined round about him a light from heaven: 9:4 And he fell to the
+earth, and heard a voice saying unto him, Saul, Saul, why persecutest
+thou me?  9:5 And he said, Who art thou, Lord? And the Lord said, I am
+Jesus whom thou persecutest: it is hard for thee to kick against the
+pricks.
+
+9:6 And he trembling and astonished said, Lord, what wilt thou have me
+to do? And the Lord said unto him, Arise, and go into the city, and it
+shall be told thee what thou must do.
+
+9:7 And the men which journeyed with him stood speechless, hearing a
+voice, but seeing no man.
+
+9:8 And Saul arose from the earth; and when his eyes were opened, he$FG$
+
+$IV,1$----12/07/13 08:46:30----$IV,0$
+
+Higgs is an atheist.
+
+He might be in for some ... excitement.  It was rough when I was converted, but I had a Catholic view of God.  I don't think it's fair that most people won't have the same terror.  (God's laughing)  Many might stay atheists.  Hrmph.  That's No fun.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386434940",HTML="http://beacon.nist.gov/rest/record/1386434940"$
+
+0xF5EF4D-->(16117581 mod 100096)+1-->Line:2126
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$pass, that the damsel to whom I shall say, Let down thy pitcher, I
+pray thee, that I may drink; and she shall say, Drink, and I will give
+thy camels drink also: let the same be she that thou hast appointed
+for thy servant Isaac; and thereby shall I know that thou hast shewed
+kindness unto my master.
+
+24:15 And it came to pass, before he had done speaking, that, behold,
+Rebekah came out, who was born to Bethuel, son of Milcah, the wife of
+Nahor, Abraham's brother, with her pitcher upon her shoulder.
+
+24:16 And the damsel was very fair to look upon, a virgin, neither had
+any man known her: and she went down to the well, and filled her
+pitcher, and came up.
+
+24:17 And the servant ran to meet her, and said, Let me, I pray thee,
+drink a little water of thy pitcher.
+
+24:18 And she said, Drink, my lord: and she hasted, and let down her
+pitcher upon her hand, and gave him drink.$FG$
+
+I think that's about me and soda, sorta.  People are virgins on miracles.  Those people Ali G was talking to were sheep.  There are sorta shepherd around.  Do I know what I'm doing more than other people?
+
+People might think Jesus chose to die, but I don't know. Could he have just kept His mouth shut.
+
+Like a moth to light, I am drawn to evangelizing. Am I supposed to keep my mouth shut?  Angels might tell me, "Everything's under control."
+
+Jesus said to pray in private.
+
+Those guys in the Ali G show are missing-out on life.  They are unaware of innuendo.  That's huge!
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1386435720",HTML="http://beacon.nist.gov/rest/record/1386435720"$
+
+0x4A2C3B-->(4860987 mod 100096)+1-->Line:56380
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$: God says...
+$FG,4$And how dieth the wise man? as the fool.
+
+2:17 Therefore I hated life; because the work that is wrought under
+the sun is grievous unto me: for all is vanity and vexation of spirit.
+
+2:18 Yea, I hated all my labour which I had taken under the sun:
+because I should leave it unto the man that shall be after me.
+
+2:19 And who knoweth whether he shall be a wise man or a fool? yet
+shall he have rule over all my labour wherein I have laboured, and
+wherein I have shewed myself wise under the sun. This is also vanity.
+
+2:20 Therefore I went about to cause my heart to despair of all the
+labour which I took under the sun.
+
+2:21 For there is a man whose labour is in wisdom, and in knowledge,
+and in equity; yet to a man that hath not laboured therein shall he
+leave it for his portion. This also is vanity and a great evil.
+
+2:22 For what hath man of all his labour, and of the vexation of his$FG$
+
+Sometimes I wonder if there are lots of intelligent people just keeping their mouths shut.  I think many arrive at wisdom, but I'll bet not miracles and God.
+

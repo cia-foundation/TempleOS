@@ -1,0 +1,45 @@
+$WW,1$$FG,1$$TX+CX,"The Temple Operating System",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOS.html"$$FG$
+
+1 Kings 6:21 (King James)
+
+$LM,5$6:21 So Solomon overlaid the house within with pure gold: and he made
+a partition by the chains of gold before the $FG,4$oracle$FG$; and he overlaid
+it with gold.
+
+6:22 And the whole house he overlaid with gold, until he had finished
+all the house: also the whole altar that was by the $FG,4$oracle$FG$ he overlaid
+with gold.
+
+6:23 And within the $FG,4$oracle$FG$ he made two cherubims of olive tree, each
+ten cubits high.
+$LM,0$
+
+Use $FG,4$$TX,"After Egypt",HTML="http://www.youtube.com/embed/RzhRYGm_b9A"$$FG$ inside TempleOS as an oracle.  An oracle is a Ouija Board or $FG,4$$TX,"Christian Tongues",HTML="http://www.biblegateway.com/passage/?search=1+Corinthians+14&version=NIV"$$FG$. See $FG,4$$TX,"Biblical Code:Mean tickle (to kill) person or president.",HTML="http://www.biblegateway.com/passage/?search=daniel%205&version=NIV"$$FG$
+
+$HC,"<img src=\"http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOSV0203A.BMP\" width=\"640\" height=\"472\" alt=\"\">"$
+
+You get out of prayer what you put in.  God said, "honest measures" applies when exchanging an offering for a response from the oracle in TempleOS.  Picking a greeting card is an example of love effort.  You will get back the same love effort from God.  People wants things besides God's company.  $FG,4$$TX,"One Tin Soldier.",HTML="http://www.youtube.com/watch?v=cTBx-hHf4BE"$
+
+
+$FG,4$$TX,"Downloads",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Downloads.html"$
+
+$LK,"Guidelines for Talking with God",A="FL:::/Adam/God/HSNotes.TXT,1"$
+
+$LK,"Quotes from God",A="FL:::/Adam/God/HSNotes.TXT,100"$
+
+$TX,"The Temple Operating System",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/TempleOS.html"$
+
+$TX,"Hymn Videos",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$
+
+$LK,"Demands (Now that it is officially God's Temple.)",A="FI:::/Doc/Demands.TXT"$
+
+$TX,"TempleOS History",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/History.html"$
+
+$TX,"Terry Davis' Rants",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Rants/TAD/TADRants.html"$
+
+$LK,"About Trivial Solutions",A="FI:D:/Doc/TrivialSolutions.TXT"$$FG$
+
+
+$FG,8$
+* "Linux" is probably a trademark owned by Linus Torvalds.
+* "Windows" and "MSPaint" are trademark of MicroSoft Corp.$FG$

@@ -1,0 +1,6 @@
+#help_index "Snd"
+#include "/Apps/MusicOrgan/JukeBox"
+#include "/Apps/MusicOrgan/JukePuppet"
+#include "/Apps/MusicOrgan/OrganCtrls"
+#include "/Apps/MusicOrgan/Organ"
+#help_index ""

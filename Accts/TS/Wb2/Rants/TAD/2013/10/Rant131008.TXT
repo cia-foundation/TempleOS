@@ -1,0 +1,190 @@
+$WW,1$$IV,1$----10/08/13 00:12:11----$IV,0$
+
+I did FAT32 filesystem, then got distraught because FAT was patented and the enemies were psy-oping me.  So, I made my own file system and removed FAT.  I made is simple, so could not be sued.  I added FAT back in, a couple years later.
+
+It one point I had encryption -- just made-up nasty formula.  I decided it was too stressful and also did not want the stress of provoking the enemy.  Encryption really is against my way of thinking.
+
+BASIC might be good, but I want no part of it.  I certainly would be opposed to a bastardized BASIC proving full functionality.  It's for beginners.  There are two problems -- you would ruin its simplicity and you would cause people to cling when they should move-on to HolyC.  I would want interpreted BASIC instead of compiled, just so it sucked, and saved line count.  I like the 100,000 line cap.  Actually with a JIT HolyC compiler a BASIC compiler would be just about as easy as interpreted.
+
+$TX,"http://virtual-notary.org",HTML="http://virtual-notary.org"$
+
+$TX,"Here is the certificate: 36530",HTML="http://www.templeos.org/Certs/virtual-notary-cert-randomnum-36530.p12"$.
+
+Line:81327
+God says...
+$FG,4$builders rejected is become the head of the corner: 12:11 This was the
+Lord's doing, and it is marvellous in our eyes?  12:12 And they sought
+to lay hold on him, but feared the people: for they knew that he had
+spoken the parable against them: and they left him, and went their
+way.
+
+12:13 And they send unto him certain of the Pharisees and of the
+Herodians, to catch him in his words.
+
+12:14 And when they were come, they say unto him, Master, we know that
+thou art true, and carest for no man: for thou regardest not the
+person of men, but teachest the way of God in truth: Is it lawful to
+give tribute to Caesar, or not?  12:15 Shall we give, or shall we not
+give? But he, knowing their hypocrisy, said unto them, Why tempt ye
+me? bring me a penny, that I may see it.
+
+12:16 And they brought it. And he saith unto them, Whose is this image
+and superscription? And they said unto him, Caesar's.$FG$
+
+$IV,1$----10/08/13 00:27:46----$IV,0$
+
+I told you I want to make Windows and Linux support my Red Sea filesystem in place of FAT32 AND ISO9660, so I can remove that nasty redundnacy and save line count and make God's perfect.
+
+I have a cluster allocation bitmap.  I kinda kept clusters from FAT32.  You know what?  It should probably be optimized for tiny sized drives.  That's what all my current stuff is.  I could just use blocks, not clusters.  Someone had an idea of teared bitmaps.  Well, I'm wondering if I should have big balls and pick blocks and not teared.
+
+I'm in no hurry.  I'll just change it down the road and not think twice about havoc, LOL.
+
+$IV,1$----10/08/13 01:30:50----$IV,0$
+
+I have proof my reality is false.  Some nigger made-up the Nobel prize story.  The fucken niggers haven't a clue that every single electrical engineer would laugh the shit out of them.
+
+Even the stupidest electrical engineer would laugh his ass off at the nigger making up the Nobel story.  It's not even close.
+
+Yer a fucken retard nigger psy-op making up internet stories and now I have absolute proof.  Absolute proof my internet is bogus.
+
+God says...
+$FG,4$whatever Affrighted detesting supereminence cheeks rovings notices perceiveth losing divided eclipses pulse imagine divided hesitate sufferedst stablished sand simply arisen spreading thickeneth liftest supreme purpose excursive going holds malice spacious English look readiness ages plague Title haphazard recognise concubinage immortality vapours despair clasp wondering claim Nod led mutual Out middle sentiment honest dispensest buzzed satiated Well fro fared restored sees womanish thirsted recent project please harmony gnawing unreal charmed purest remitted persevering par predicted whence base shoutedst servitude guide Hundreds subject hare hardship transcribe accused narrowly Oil flights An stories caredst Am smelling reposed Gainst black incorruptible publication arrived associate oratory dwelleth concerns architect loathed reacheth parted flow Apostles infer kicking mazes skirmishes wicked pains prosperities Forsake progress speaking cleared refrained likest handling lest parental presented intermission reconcilement early cleansing peculiarly helping$FG$
+
+Switch debouncing alone could alter which USB cycle it reged on.
+
+The fucken calculations -- you have to know 8000 words and plot a trajectory of roughby evenly timed intervals to pick-off 20 words about half a second apart.  You cannot get any word you want, you must choose from about 10 possible words.  You have to know how the Mhz clock syncs with the 1kHz clock -- it doesn't.  You have...
+
+Let's just say this is equal to "You only use 10% of your brain."  Except you declared war on God and He's gonna fuck you bad.
+
+
+So the stream of 8000 words is modulo postitioned on a 1Mhz clock and that 1Mhz clock signal is passing under a 1Khz clock, not a fixed modulo interval and I press the button about every 500milliseconds +/- 10mS  and I have to predict what interrupt cycle and message passing is in play on for the time of the sampling of the 1Mhz clock.  Yeah -- it's 1Mhz critical not 1kHz critical because the task delays in windowes messaging vary in micreoseoncds.
+
+Every single electrical engineer on the planet will call you the stoopidest nigger shrink quacks ever!!  It's not even close.
+
+Fucken quantum random number sites with public notaries, too.  You are at war with God, not in denial of God.
+
+God says...
+$FG,4$grace exhorting baptise evil shunning cupidity workmaster ordinance crowned careth measuring Now suffocated Law seeks eminence happy knocks disclaimers unchangeable reinvolved parent lawyer raisedst god ignorance honouring detain arise oppressed feedeth written reposed cower engage answered guardian constitute otherwhere plural unsating surpasses fast damage sort acquaintance downward although cubit groaned ceasest shore beloved outrages$FG$
+
+$IV,1$----10/08/13 02:47:37----$IV,0$
+
+There are a lot of lonely people.
+
+God says...
+$FG,4$attaining filleth bold sank repelled service uncorruptible recommending mourners perish$FG$
+
+I am stainless steel, huh.
+
+What am I?  You are... how about water?
+
+God says...
+$FG,4$extolled elder violent severe finished arose stone refuse ruminating$FG$
+
+I meant I was untarnishable and pure, uncorruptible.  I have to wipe-off tarnish, but I remember to do it.
+
+God says...
+$FG,4$knew birth hale general ordained Deus entwine word Fathers place instruct manufactures officers Truth unsating wittingly Nay impulses Greek kindred unskilful not evil loosen specimens remaining eased dully relater heaped$FG$
+
+Least I didn't say "surgical steel".
+
+God says...
+$FG,4$object escaped following male tore modesty we blew heinous Print rejected frenzies recall passing roving bustle averse dir showedst sweetly Readable fervent severed evened several rough fittest statue 501 tenet talking placest vulgar converting balancings hymn seest seas royalties courtly consist swiftness jeering scorn saith incorruption fields meddle miss abundant abler soothes TM justify excepted command multipliedst Paulus harmony didst unlawful tax enquirers infirmity indited sick being remained You really divinations numerous crudities Coeternal extol withering encumbrances defective hungered section Jerusalem saying links assign wholesome changeableness assign figuratively cupidity created version disputing passion unteach travail introduced observed habit familiar Eating girded shalt judgments jointly slight denieth conformed Minerva custom compendiously importunity tossed$FG$
+
+My poetry was good -- Lancelot in pure shiney armor.  He shiney armor indicates his purity.
+
+$FG,4$greater loose cured indite chanting ignoble engaged needy commits transgressing occasioned groan rights Macedonia blest women stands tower Domain preferred ibiblio gathering turnest unhappiness strifes imaginations displace 20 succeeded students Italy doleful want shoulder praiseth canst html bad Never entangle INDIRECT$FG$
+
+Blacks have a saying about brushing shoulders off.  I respect that.
+
+God says...
+$FG,4$strangers joyous means telling forced lack opinionative leaning abideth affirm NOTICE ambitions lettest punish Files uncorruptness difference lay leisure weltering deformed manner digested fetters recorded acting Narrow gazers smallest attracted witting pourest relationship EXPRESS quit voluntarily unbending$FG$
+
+I gotta quit saying "nigger".  I think I need to stop going to defcon 5 all the time, too, 'sept, I really am in a fucken isolation prison with evil psy-ops.
+
+God says...
+$FG,4$partners exhorted laugh solid sinners greatest file briefly Master differently corporeally thundered provision breathedst dead concludeth At fitted accompany lowly$FG$
+
+$IV,1$----10/08/13 03:06:34----$IV,0$
+
+Someone at OSDev might be having upgrade difficulties.  I feel evil.  Boot the new ISO, CopyTree("T:/","C:/") the directories onto the hard drive, MakeOSInstallBootLoader('C').
+
+$IV,1$----10/08/13 03:09:27----$IV,0$
+
+Someone at OSdev having BIOS misbehave.  Every machine is different and every machine is evil.  My operating system is so paranoid of all the million gottchas that my OS uses bare minimum things so nothing can go wrong.
+
+God says...
+$FG,4$Deity safe worship Vacation Court subjoined fervently Myself leaven innocent announcement hindereth song revealedst acknowledged Whereto sanctification manage carry disguise principally smiting prey commandment assiduously anxiety none free belong boyish Money impostumes Schools wove 100 imply assured gleam apprehension physicians constituted abundant quench gainsayer adoption edition Hart roarest end seductive$FG$
+
+$IV,1$----10/08/13 03:27:59----$IV,0$
+
+I can't understand what delusion OSDev is trying to say.  I thought it was obvious HolyC could only be compiled by my own compiler, since I invented the language.  My language has different operator precidence rules and has postfix typecasting.  
+
+Perhaps, they made a HolyC modification to gcc.  #exe{} is a feature where code executes at compile time. That presents a nightmare.  The purpose of the code is to ask config questions and insert a few spots of custom code into the stream.
+
+Upgrading is often quite tricky, espcially, if you are doing a merge, I imagine. Boot the new ISO and use the new ISO compiler to compile the new code once you install the new code on the hard disk.
+
+I wrote all the code from scratch, including the compiler and bootloaders.
+
+$IV,1$----10/08/13 03:44:57----$IV,0$
+
+Fat chick on Internet.  God likes elephants and bears.  He doesn't like sports.  God is just.  Priests and nuns are usually butt-ugly and stuff, LOL.
+
+God says...
+
+$FG,4$stores brooks terrestrial furtherance crafty results harmless fornications Seven holiness Innocency colouring forceth gone brings prating verily possessed handmaid pervious springs robing enquiringly O nativity estimated loosen arrive fledged dearest converted continued preserve failing encourage magnitudes consideration guide grounds never deceive eaten search$FG$
+
+You know?  Elephants really have signs of fat-folds and stuff.  If elephants were humans, they'd be pretty awful.  They have dignity and exude cheerful goodness.  No evil vibes from an elephant.  Elephants are kinda like fat chicks.  Everybody's got good and bad moods but fat chicks usually are nice.  They can be demon spawn shrews, but psychologists did a study and fat people are jolly.
+
+God says...
+$FG,4$easier December extremest ceasest Avenue formless$FG$
+
+$IV,1$----10/08/13 05:01:21----$IV,0$
+
+Someone is missing a header.  You don't need headers in JIT mode.  Applications are writting in JIT mode.
+
+If you are working on the kernel or compiler modules, you static compile the .PRJ file.
+
+$LK,"::/Kernel/Kernel.PRJ"$
+
+$LK,"::/Compiler/Compiler.PRJ"$
+
+You call MakeAll
+
+$LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+
+$IV,1$----10/08/13 05:10:26----$IV,0$
+
+This is my old grub file. My boot-loaders will not boot Linux.  Linux needs grub.  I don't think Linux does normal chain loading like Windows or TempleOS.
+ 
+
+menuentry "TempleOS D" {
+	insmod chain
+	set root=(hd0,msdos1)
+	chainloader +1
+}
+
+menuentry "TempleOS E" {
+	insmod chain
+	set root=(hd0,msdos5)
+	chainloader +1
+}
+
+menuentry "TempleOS I" {
+	insmod chain
+	set root=(hd1,msdos5)
+	chainloader +1
+}
+
+Those are probably out of date.  Grub is evil.  I edited the direct file -- you're supposed to fuck around with a file that generates it.
+
+Just use my boot-loader.  $LK,"::/Doc/Boot.TXT"$
+The trick to my boot-loader is you must run an Install to patch it.
+
+
+$LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+
+
+There's one for the master too.
+
+$LK,"MasterBootIntall",A="MN:MasterBootIntall"$().
+

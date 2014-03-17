@@ -1,0 +1,109 @@
+//This puts the cursor at the bottom
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+PopUpOk(
+"Now, we're going to demonstrate how to work\n"
+"with programs.  We'll change to the\n"
+"$$GREEN$$/Demo/Games$$FG$$ directory.\n\n"
+"Note, that directories are specified with\n"
+"a forward slash, not a backslash.\n"
+"Drives can be specified in a $$GREEN$$Cd()$$FG$$ command\n"
+"and the boot drive is specified with \"$$GREEN$$::$$FG$$\".\n\n"
+"$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
+
+AFPrint(25,"Cd(\"::/Demo/Games\");Dir;");
+AFPmtStr("\n");
+
+PopUpOk(
+"Now, we're going to edit a file.  Normally,\n"
+"you'll probably left-click on a directory\n"
+"listing to edit a file, but we're going to\n"
+"type it on the command line.\n\n"
+"$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
+
+AFPrint(25,"Ed(\"CastleFrankenstein.CPP.Z\");");
+AFPmtStr("\n");
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
+
+Sleep(1000);
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
+PopUpOk(
+"This is a first-person-shooter.\n"
+"It quits when you press $$GREEN$$<SHIFT-ESC>$$FG$$.\n\n"
+"There is no \"$$GREEN$$main()$$FG$$\" function in TempleOS\n"
+"programs.  Any program statements outside\n"
+"functions get executed when you $$GREEN$$#include$$FG$$\n"
+"them at the command line.\n\n"
+"The \"$$GREEN$$CastleFrankenstein;$$FG$$\" statement at the\n"
+"bottom will run the program when we\n"
+"$$GREEN$$#include$$FG$$ it.\n");
+
+
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n"
+);
+
+AFGetChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"Now, we'll run the CastleFrankenstein.CPP.Z\n"
+"program.  Press $$GREEN$$<ENTER>$$FG$$.  Then, move around\n"
+"with cursor keys and $$GREEN$$<SHIFT-ESC>$$FG$$\n"
+"when you are done.\n");
+
+AFPrint(25,"#include \"CastleFrankenstein\";");
+AFPmtStr("\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"The program is still in memory and we\n"
+"can start it again by typing\n"
+"\"$$GREEN$$CastleFrankenstein;$$FG$$\".\n\n"
+"$$GREEN$$<ENTER>$$FG$$ at the command line to\n"
+"run it again.\n");
+
+AFPrint(25,"CastleFrankenstein;");
+AFPmtStr("\n");
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+
+PopUpOk(
+"$$GREEN$$<CTRL-ALT-A>$$FG$$\tExtended ASCII\n"
+"$$GREEN$$<CTRL-ALT-C>$$FG$$\tBreak(interrupt) program\n"
+"$$GREEN$$<CTRL-ALT-E>$$FG$$\tSpawn new user terminal window\n"
+"$$GREEN$$<CTRL-ALT-M>$$FG$$\tMutes sound\n"
+"$$GREEN$$<CTRL-ALT-T>$$FG$$\tSwitch tasks\n"
+"$$GREEN$$<CTRL-ALT-X>$$FG$$\tKill task (window)\n"
+);
+
+AFPrint(50,"Ed(\"CastleFrankenstein.CPP.Z\");\n");
+
+PopUpOk(
+"$$GREEN$$<F5>$$FG$$ in the editor to run the file being edited.\n"
+);
+
+AFGetKey(SC_F5);
+Sleep(50);
+CTask *task=sys_focus_task;
+
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the application.\n"
+"Then, $$GREEN$$<CTRL-ALT-X>$$FG$$ to kill the task.\n"
+);
+WinToTop(task);
+while (TaskValidate(task))
+  Sleep(10);
+
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
+
+AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+
+PopUpOk(
+"Explore the $$LK+PU,\"DemoIndex\",\"FI:::/Doc/DemoIndex.TXT\"$$.  You'll find it\n"
+"on your menu.  It's arranged by difficulty.\n"
+"Hit $$GREEN$$<SPACE BAR>$$FG$$ on a demo index listing\n"
+"and $$GREEN$$<F5>$$FG$$ to run from the editor.\n"
+);
+ 

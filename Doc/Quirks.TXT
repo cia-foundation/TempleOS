@@ -1,0 +1,44 @@
+$FG,5$$TX+CX,"TempleOS Quirks"$$FG$
+
+$WW,1$* You run a risk of problems if you do file operations on the same files simultaneously because there is $BK,1$no file sharing/locking mechanism$BK,0$.  Generally, the last write wins.
+
+* When using $FG,2$FAT32$FG$, TempleOS does not generate unique short-entry names.  Not all $FG,2$FAT32$FG$ filenames are valid TempleOS names and it will complain.  Do not access $FG,2$FAT32$FG$ drives not dedicated to TempleOS.  Disable them with $LK,"DrvEnable",A="MN:DrvEnable"$(OFF), or they will generate error messages.  $FG,2$FAT32$FG$ involves a long and short name for each file.  TempleOS isn't so good at making distinct short names, so don't make files with same 11 characters, or you're asking for trouble when accessing from Windows.
+
+* The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"DFT_STK",A="MN:DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().
+
+* The syntax highlighting occassionally glitches.  The compiler doesn't.
+
+* Call $LK,"ChgDsk",A="MN:ChgDsk"$() when you insert a new removable media.
+
+* Accessing CD-ROM's is flacky.  Try $LK,"Drv",A="MN:Drv"$() or $LK,"ChgDsk",A="MN:ChgDsk"$() twice.
+
+* You can only $FG,2$extern$FG$ something once.  There is a varient called $FG,2$_extern$FG$ which binds a HolyC definition to a asm sym.  This, too, can only be done once.
+
+* A terminal task has a $LK,"CDoc",A="MN:CDoc"$ document structure that remains active even when you change $FG,4$Fs->draw_it$FG$.  To prevent links in the $LK,"CDoc",A="MN:CDoc"$ from being activated when the user clicks in the window, do one of three things:
+$ID,2$
+A) $LK,"DocBottom",A="MN:DocBottom"$() followed by $LK,"DocClear",A="MN:DocClear"$() to clear the $LK,"CDoc",A="MN:CDoc"$ so it has no active widgets.
+
+B) Disable window mgr button click checking with $FG,4$Fs->win_inhibit$FG$ set to mask $LK,"WIF_IP_L",A="MN:WIF_IP_L"$|$LK,"WIF_IP_L_D",A="MN:WIF_IP_L_D"$|$LK,"WIF_IP_R",A="MN:WIF_IP_R"$|$LK,"WIF_IP_R_D",A="MN:WIF_IP_R_D"$.  This inhibits window mgr operations but still generates messages from button clicks.
+$ID,-2$
+* $FG,2$switch/case$FG$ statements allocate a single jump table--do not use with wide, sparse ranges of case values.
+
+* Don't do a $FG,2$goto$FG$ out of a $FG,2$try{}$FG$.
+
+* A $FG,2$goto$FG$ label name must not match a global scope object's name.  (It's not worth slowing-down the compiler to handle this case.)
+
+* $LK,"MemCpy",A="MN:MemCpy"$() only goes fwd.
+
+* A $LK,"Cd",A="MN:Cd"$() cmd must be followed by two semicolons if a $FG,2$#include$FG$ is after it.  This is because the preprocessor processes the next token ahead.
+
+* The assembler's error msgs are often off by a line and undefines are cryptic.
+
+* The last semicolon on the cmd line is converted to a dbl semicolon because the compiler looks ahead before doing a cmd.  This normally has no negative effect, but when entering "$FG,2$if$FG$" statements with "$FG,2$else$FG$" clauses it presents problems.
+
+* You can do a $FG,2$class$FG$ fwd reference by using $FG,2$extern$FG$ on the first declaration, but you can only do ptr references to the $FG,2$class$FG$.
+
+* When doing something like
+$FG,4$$ID,2$$ID,2$U16 *_w=0xF0000000;
+*_w|=0x8000;
+$ID,-2$$FG$The $FG,2$|=$FG$ will be coded as a $FG,2$U32 Bts$FG$ instruction resulting in a $FG,2$U32$FG$ access instead of a $FG,2$U16$FG$ access.  This affects some hardware operations.
+$ID,-2$
+* Compiler warning or error message line numbers will be off if you have a block of word-wrapped comments.  You might press $FG,2$<CTRL-T>$FG$ before doing an editor goto-line-number command.

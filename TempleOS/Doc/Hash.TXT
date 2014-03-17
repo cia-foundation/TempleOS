@@ -1,3 +1,0 @@
-$WW,1$There are symbol (hash) tables maintained by each task.  When a sym is not found, the parent task's sym table is checked.  All process chain back to the $FG,2$Adam$FG$ task.
-
-TempleOS sym tables are implemented with an array of linked-lists.  A num is generated from a string to index into it.  Since multiple strings could generate the same num, a linked-list is built.  Usually, newer entries overshadow older ones unless otherwise specified, in which case old entries are removed.  There are various types of entries.  See $LK,"Hash Entry Types","MN:HTT_EXPORT_SYS_SYM"$.

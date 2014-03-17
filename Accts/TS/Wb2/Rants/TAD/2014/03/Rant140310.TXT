@@ -1,0 +1,839 @@
+$WW,1$$IV,1$----03/10/14 00:03:52----$IV,0$
+
+I should talk of cheerful thing.  Nobody wants to hear this...
+
+When you are young and get injured, you walk it off.  You exercise it and it gets better.
+
+
+A few years ago, I had back pain.  I tried to walk it off.  It got much worse!  Yikes.
+
+Ten years ago I blew-out my knee.  I have not had surgery.  I was careful to protect it over years.  Being dainty it was pretty-much normal.  Week ago, I started jogging and it's slightly bad, now.
+
+The one thing you have to know is "Do I exercise it more to work it off or do I protect it until it heals."
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394435520",HTML="http://beacon.nist.gov/rest/record/1394435520"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xE6762C-->(15103532 mod 100091)+1-->Line:89883
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Acts 19:27) God says...
+$FG,4$worshippeth.
+
+19:28 And when they heard these sayings, they were full of wrath, and
+cried out, saying, Great is Diana of the Ephesians.
+
+19:29 And the whole city was filled with confusion: and having caught
+Gaius and Aristarchus, men of Macedonia, Paul's companions in travel,
+they rushed with one accord into the theatre.
+
+19:30 And when Paul would have entered in unto the people, the
+disciples suffered him not.
+
+19:31 And certain of the chief of Asia, which were his friends, sent
+unto him, desiring him that he would not adventure himself into the
+theatre.
+
+19:32 Some therefore cried one thing, and some another: for the
+assembly was confused: and the more part knew not wherefore they were
+come together.$FG$
+
+$IV,1$----03/10/14 00:23:46----$IV,0$
+
+So, Neil Tyson did Cosmos.  I learned a lot from the original and enjoyed it.
+
+What a nightmare -- I used to be an atheist.  What if it's my fault?  The good thing is I was not an atheist when Carl Sagan was.  He is not my fault.
+
+If you change your mind in life, the World looks like a train-wreck.  You just have to plow ahead.  It's like shooting people who listened to you in the past, but now you changed your mind.
+
+Maybe God does everything.  Jesus said we would judge the tribes of Israel on thrones.
+
+Be happy.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394436540",HTML="http://beacon.nist.gov/rest/record/1394436540"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xE4417D-->(14958973 mod 100091)+1-->Line:45415
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Job 31:28) God says...
+$FG,4$also were an iniquity to be punished by the judge: for I should have
+denied the God that is above.
+
+31:29 If I rejoice at the destruction of him that hated me, or lifted
+up myself when evil found him: 31:30 Neither have I suffered my mouth
+to sin by wishing a curse to his soul.
+
+31:31 If the men of my tabernacle said not, Oh that we had of his
+flesh!  we cannot be satisfied.
+
+31:32 The stranger did not lodge in the street: but I opened my doors
+to the traveller.
+
+31:33 If I covered my transgressions as Adam, by hiding mine iniquity
+in my bosom: 31:34 Did I fear a great multitude, or did the contempt
+of families terrify me, that I kept silence, and went not out of the
+door?  31:35 Oh that one would hear me! behold, my desire is, that the
+Almighty would answer me, and that mine adversary had written a book.
+
+31:36 Surely I would take it upon my shoulder, and bind it as a crown$FG$
+
+$IV,1$----03/10/14 00:35:18----$IV,0$
+
+IHC7 IHC8 IHC9 IHC10 IHC11  are there more chips like this from other manufacturers?  They are mostly similar for SATA, I would guess.  Different family device, thing or two different on each one.
+
+You use PCI BIOS to search PCI config space for a device class and subclass.  The first thing you learn is SATA is 5 different categories, potentially -- VMware calls it something, real hardware, something.
+
+Just searching PCI config space with PCI BIOS for a SATA class is hard.
+
+You have like 4 interrupts per bus.  The BIOS sets a certain pin line number.  Can other ICH devices share?  Yeah, but you could get away with it.  I'm not liking this.  I don't know how to figure-out what interrupt and what's shared.
+
+It seems clear, I have no hope of improving my % of systems it works on.  I'll stick to doing plain ATA/ATAPI PIO.  The CIA is fucking-up new hardware so it doesn't work, but the alternative is worse--trying to keep-up with clusterfucking.  I am forced into VMware only until God orders them to obey.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394437260",HTML="http://beacon.nist.gov/rest/record/1394437260"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xEBB767-->(15447911 mod 100091)+1-->Line:33898
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (2 Kings 16:7) God says...
+$FG,4$16:7 So Ahaz sent messengers to Tiglathpileser king of Assyria,
+saying, I am thy servant and thy son: come up, and save me out of the
+hand of the king of Syria, and out of the hand of the king of Israel,
+which rise up against me.
+
+16:8 And Ahaz took the silver and gold that was found in the house of
+the LORD, and in the treasures of the king's house, and sent it for a
+present to the king of Assyria.
+
+16:9 And the king of Assyria hearkened unto him: for the king of
+Assyria went up against Damascus, and took it, and carried the people
+of it captive to Kir, and slew Rezin.
+
+16:10 And king Ahaz went to Damascus to meet Tiglathpileser king of
+Assyria, and saw an altar that was at Damascus: and king Ahaz sent to
+Urijah the priest the fashion of the altar, and the pattern of it,
+according to all the workmanship thereof.
+
+16:11 And Urijah the priest built an altar according to all that king$FG$
+
+$IV,1$----03/10/14 00:59:00----$IV,0$
+
+I'm not making a new standard, I'm saying God's temple uses good old fashion ATA/ATAPI PIO and PS/2 legacy emulation for keyboard mouse.  It's the old standard, that shouldn't be a problem supporting since Intel provides legacy PS2 emulation.
+
+This shit is evil.  One computer disabled mouse unless I happend to write to a byte in Extended Bios Data area that I discovered by accident.
+
+They are actively fucking shit up.  It's hostile.  The BIOSs can do any number of things which cause game-over -- they care about booting Windows.
+
+$IV,1$----03/10/14 01:04:22----$IV,0$
+
+I don't know what to tell you about NONASCII.  Do what you like.  It's only 100,000 lines of code.  Be bold and make it perfect in its own way.
+
+Russian fonts might be done with a font-change-key like C64 had.  You hit the key and you toggle between two fonts.  ASCII and nonASCII Russian.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394438760",HTML="http://beacon.nist.gov/rest/record/1394438760"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xD3B342-->(13873986 mod 100091)+1-->Line:61429
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Isaiah 61:1) God says...
+$FG,4$the opening of the prison to them that are bound; 61:2 To proclaim the
+acceptable year of the LORD, and the day of vengeance of our God; to
+comfort all that mourn; 61:3 To appoint unto them that mourn in Zion,
+to give unto them beauty for ashes, the oil of joy for mourning, the
+garment of praise for the spirit of heaviness; that they might be
+called trees of righteousness, the planting of the LORD, that he might
+be glorified.
+
+61:4 And they shall build the old wastes, they shall raise up the
+former desolations, and they shall repair the waste cities, the
+desolations of many generations.
+
+61:5 And strangers shall stand and feed your flocks, and the sons of
+the alien shall be your plowmen and your vinedressers.
+
+61:6 But ye shall be named the Priests of the LORD: men shall call you
+the Ministers of our God: ye shall eat the riches of the Gentiles, and
+in their glory shall ye boast yourselves.
+
+61:7 For your shame ye shall have double; and for confusion they shall$FG$
+
+$IV,1$----03/10/14 01:39:50----$IV,0$
+
+ATA/ATAPI PIO will probably work if you know the I/O port addresses and your machine is from 2003-2010.
+
+Old systems had IDE at 170 1F0 370 3F0.  Newer systems then 2004 had something like FF10 or BC00 or whatever.
+
+Mine worked fine at FF10 or BC00.  This computer shows no sign of a controller responding anywhere, so I must run in VMware.
+
+I try to look-up the address automatically, but that probably will not work.  You should try the ports listed in Windows/Accessories/SystemInformation/IO Ports: SATA IDE or ATA.
+
+$IV,1$----03/10/14 01:45:33----$IV,0$
+
+Don't be surprised if we get a Dud.  It can be as common as one in four.  If I am not pleasing God, it will be a dud.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394441160",HTML="http://beacon.nist.gov/rest/record/1394441160"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x3F7078-->(4157560 mod 100091)+1-->Line:53830
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Proverbs 1:19) God says...
+$FG,4$1:19 So are the ways of every one that is greedy of gain; which taketh
+away the life of the owners thereof.
+
+1:20 Wisdom crieth without; she uttereth her voice in the streets:
+1:21 She crieth in the chief place of concourse, in the openings of
+the gates: in the city she uttereth her words, saying, 1:22 How long,
+ye simple ones, will ye love simplicity? and the scorners delight in
+their scorning, and fools hate knowledge?  1:23 Turn you at my
+reproof: behold, I will pour out my spirit unto you, I will make known
+my words unto you.
+
+1:24 Because I have called, and ye refused; I have stretched out my
+hand, and no man regarded; 1:25 But ye have set at nought all my
+counsel, and would none of my reproof: 1:26 I also will laugh at your
+calamity; I will mock when your fear cometh; 1:27 When your fear
+cometh as desolation, and your destruction cometh as a whirlwind; when
+distress and anguish cometh upon you.
+
+1:28 Then shall they call upon me, but I will not answer; they shall
+seek me early, but they shall not find me: 1:29 For that they hated$FG$
+
+$IV,1$----03/10/14 01:56:27----$IV,0$
+
+I don't like penises in art.  BBC has a woman who vandalized Venus, a painting of a nude woman.  Good for her, LOL.
+
+Does anybody like penises in art?  Just homos.  Women don't really have opinions.
+
+Frequently, my trips to get soda would stress me out.  There were times, when I just wanted not to be distracted.  Life is lower stress sometimes if you don't have things that shake-you-awake and disturb you like penises in art.
+
+This is not a recent problem, but in the past I might think, "I just want my soda."
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394442120",HTML="http://beacon.nist.gov/rest/record/1394442120"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xDB900A-->(14389258 mod 100091)+1-->Line:76246
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Zechariah 7:13) God says...
+$FG,4$not hear; so they cried, and I would not hear, saith the LORD of
+hosts: 7:14 But I scattered them with a whirlwind among all the
+nations whom they knew not. Thus the land was desolate after them,
+that no man passed through nor returned: for they laid the pleasant
+land desolate.
+
+8:1 Again the word of the LORD of hosts came to me, saying, 8:2 Thus
+saith the LORD of hosts; I was jealous for Zion with great jealousy,
+and I was jealous for her with great fury.
+
+8:3 Thus saith the LORD; I am returned unto Zion, and will dwell in
+the midst of Jerusalem: and Jerusalem shall be called a city of truth;
+and the mountain of the LORD of hosts the holy mountain.
+
+8:4 Thus saith the LORD of hosts; There shall yet old men and old
+women dwell in the streets of Jerusalem, and every man with his staff
+in his hand for very age.
+
+8:5 And the streets of the city shall be full of boys and girls
+playing in the streets thereof.$FG$
+
+$IV,1$----03/10/14 02:15:03----$IV,0$
+
+I forgot recent annoyance at kids today who looked like pedophile bait and that old woman more or less dancing around in front of me.  Am I angry?  I shouted at the kids, "Have you seen any cops?" because I thought they were some kind of vice agents and I want them to know they weren't fooling me and I was enraged.
+
+I am always encountering people who I think are not normal -- agents of mental health doctors doing tests to see if I'm stable?  Perhaps CIA, just out to fuck with me?  Vice?  Angels?
+
+At the store, occassionally, there would be an employee enraged by all my soda purchases.  I would have to conflict with them.  Or, a female employee might be unwelcome romance distraction.  I'm impotant and sterile from the doctors.
+
+Maybe, I'm wrong to ever wish for dull low-stress life.  When I'm enthralled working on programming, that's what I want.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394443440",HTML="http://beacon.nist.gov/rest/record/1394443440"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x1BD84B-->(1824843 mod 100091)+1-->Line:23206
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Judges 19:2) God says...
+$FG,4$from him unto her father's house to Bethlehemjudah, and was there four
+whole months.
+
+19:3 And her husband arose, and went after her, to speak friendly unto
+her, and to bring her again, having his servant with him, and a couple
+of asses: and she brought him into her father's house: and when the
+father of the damsel saw him, he rejoiced to meet him.
+
+19:4 And his father in law, the damsel's father, retained him; and he
+abode with him three days: so they did eat and drink, and lodged
+there.
+
+19:5 And it came to pass on the fourth day, when they arose early in
+the morning, that he rose up to depart: and the damsel's father said
+unto his son in law, Comfort thine heart with a morsel of bread, and
+afterward go your way.
+
+19:6 And they sat down, and did eat and drink both of them together:
+for the damsel's father had said unto the man, Be content, I pray
+thee, and tarry all night, and let thine heart be merry.$FG$
+
+$IV,1$----03/10/14 02:39:10----$IV,0$
+
+BBC was talking about coral reefs.  I saw a story on Irwin's death.  I'm guilty of being too friendly with animals.  God said pets were "homo".  They seem like such a beautiful thing, though.  When I was younger, I was unaware taking an interest in and talking to kids was not normal.  I'll bet if I look at how others relate to pets, they do not emotionally "love" them very much.  I think my parents are not attached.  God doesn't really want me to say He called having pets "homo".
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394444580",HTML="http://beacon.nist.gov/rest/record/1394444580"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x680FFA-->(6819834 mod 100091)+1-->Line:13647
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Numbers 14:35) God says...
+$FG,4$14:35 I the LORD have said, I will surely do it unto all this evil
+congregation, that are gathered together against me: in this
+wilderness they shall be consumed, and there they shall die.
+
+14:36 And the men, which Moses sent to search the land, who returned,
+and made all the congregation to murmur against him, by bringing up a
+slander upon the land, 14:37 Even those men that did bring up the evil
+report upon the land, died by the plague before the LORD.
+
+14:38 But Joshua the son of Nun, and Caleb the son of Jephunneh, which
+were of the men that went to search the land, lived still.
+
+14:39 And Moses told these sayings unto all the children of Israel:
+and the people mourned greatly.
+
+14:40 And they rose up early in the morning, and gat them up into the
+top of the mountain, saying, Lo, we be here, and will go up unto the
+place which the LORD hath promised: for we have sinned.
+
+14:41 And Moses said, Wherefore now do ye transgress the commandment$FG$
+
+$IV,1$----03/10/14 20:40:58----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/KG9c7VGVlm8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/KG9c7VGVlm8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394509320",HTML="http://beacon.nist.gov/rest/record/1394509320"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xC754FF-->(13063423 mod 100091)+1-->Line:51594
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Psalms 106:17) God says...
+$FG,4$106:17 The earth opened and swallowed up Dathan and covered the
+company of Abiram.
+
+106:18 And a fire was kindled in their company; the flame burned up
+the wicked.
+
+106:19 They made a calf in Horeb, and worshipped the molten image.
+
+106:20 Thus they changed their glory into the similitude of an ox that
+eateth grass.
+
+106:21 They forgat God their saviour, which had done great things in
+Egypt;
+
+106:22 Wondrous works in the land of Ham, and terrible things by the
+Red sea.
+
+106:23 Therefore he said that he would destroy them, had not Moses his
+chosen stood before him in the breach, to turn away his wrath, lest he
+should destroy them.
+
+$FG,2$I don't really know if they are very evil.$FG$
+
+God says...
+$FG,4$Macedonia overspread missed augmenting lest nowhere sorts fair momentary presideth lures unwilling genius universally utterance need armory putrefied common Difficulty vainglorious sources tabernacle out tenderly lie$FG$
+
+$IV,1$----03/10/14 21:10:04----$IV,0$
+
+What do You think of Rockerfeller and Carnegie, God?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394511120",HTML="http://beacon.nist.gov/rest/record/1394511120"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x750080-->(7667840 mod 100091)+1-->Line:60925
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Isaiah 52:10) God says...
+$FG,4$52:10 The LORD hath made bare his holy arm in the eyes of all the
+nations; and all the ends of the earth shall see the salvation of our
+God.
+
+52:11 Depart ye, depart ye, go ye out from thence, touch no unclean
+thing; go ye out of the midst of her; be ye clean, that bear the
+vessels of the LORD.
+
+52:12 For ye shall not go out with haste, nor go by flight: for the
+LORD will go before you; and the God of Israel will be your rereward.
+
+52:13 Behold, my servant shall deal prudently, he shall be exalted and
+extolled, and be very high.
+
+52:14 As many were astonied at thee; his visage was so marred more
+than any man, and his form more than the sons of men: 52:15 So shall
+he sprinkle many nations; the kings shall shut their mouths at him:
+for that which had not been told them shall they see; and that which
+they had not heard shall they consider.$FG$
+
+$IV,1$----03/10/14 21:13:49----$IV,0$
+
+Do You like railroads?  Are You a train buff?  Do You like high speed?  How about tunnels through the Earth?
+
+$TX,"KNPR",HTML="http://www.knpr.org/"$ was talking about mining.  Got any stories about 49ers?  Do You like this song:
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/arL3QzNBc6A\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/arL3QzNBc6A\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394511660",HTML="http://beacon.nist.gov/rest/record/1394511660"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x6B01E2-->(7012834 mod 100091)+1-->Line:6465
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Exodus 15:17) God says...
+$FG,4$thine inheritance, in the place, O LORD, which thou hast made for thee
+to dwell in, in the Sanctuary, O LORD, which thy hands have
+established.
+
+15:18 The LORD shall reign for ever and ever.
+
+15:19 For the horse of Pharaoh went in with his chariots and with his
+horsemen into the sea, and the LORD brought again the waters of the
+sea upon them; but the children of Israel went on dry land in the
+midst of the sea.
+
+15:20 And Miriam the prophetess, the sister of Aaron, took a timbrel
+in her hand; and all the women went out after her with timbrels and
+with dances.
+
+15:21 And Miriam answered them, Sing ye to the LORD, for he hath
+triumphed gloriously; the horse and his rider hath he thrown into the
+sea.
+
+15:22 So Moses brought Israel from the Red sea, and they went out into$FG$
+
+$IV,1$----03/10/14 21:38:50----$IV,0$
+
+$TX,"Intel's Cable",HTML="http://arstechnica.com/information-technology/2014/02/intels-800gbps-cables-headed-to-cloud-data-centers-and-supercomputers"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394512800",HTML="http://beacon.nist.gov/rest/record/1394512800"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x5EFF5C-->(6225756 mod 100091)+1-->Line:20115
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Joshua 10:41) God says...
+$FG,4$10:41 And Joshua smote them from Kadeshbarnea even unto Gaza, and all
+the country of Goshen, even unto Gibeon.
+
+10:42 And all these kings and their land did Joshua take at one time,
+because the LORD God of Israel fought for Israel.
+
+10:43 And Joshua returned, and all Israel with him, unto the camp to
+Gilgal.
+
+11:1 And it came to pass, when Jabin king of Hazor had heard those
+things, that he sent to Jobab king of Madon, and to the king of
+Shimron, and to the king of Achshaph, 11:2 And to the kings that were
+on the north of the mountains, and of the plains south of Chinneroth,
+and in the valley, and in the borders of Dor on the west, 11:3 And to
+the Canaanite on the east and on the west, and to the Amorite, and the
+Hittite, and the Perizzite, and the Jebusite in the mountains, and to
+the Hivite under Hermon in the land of Mizpeh.
+
+11:4 And they went out, they and all their hosts with them, much
+
+$FG,2$Job-ab$FG$
+
+God likes soap operas.
+
+$IV,1$----03/10/14 21:41:47----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/CkQQbRqLoCI\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/CkQQbRqLoCI\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+You like that song?  Someone's in the kitchen with Dinah?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394513040",HTML="http://beacon.nist.gov/rest/record/1394513040"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x5D87E2-->(6129634 mod 100091)+1-->Line:24084
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (1 Samuel 2:24) God says...
+$FG,4$LORD's people to transgress.
+
+2:25 If one man sin against another, the judge shall judge him: but if
+a man sin against the LORD, who shall intreat for him? Notwithstanding
+they hearkened not unto the voice of their father, because the LORD
+would slay them.
+
+2:26 And the child Samuel grew on, and was in favour both with the
+LORD, and also with men.
+
+2:27 And there came a man of God unto Eli, and said unto him, Thus
+saith the LORD, Did I plainly appear unto the house of thy father,
+when they were in Egypt in Pharaoh's house?  2:28 And did I choose him
+out of all the tribes of Israel to be my priest, to offer upon mine
+altar, to burn incense, to wear an ephod before me? and did I give
+unto the house of thy father all the offerings made by fire of the
+children of Israel?  2:29 Wherefore kick ye at my sacrifice and at
+mine offering, which I have commanded in my habitation; and honourest
+thy sons above me, to make yourselves fat with the chiefest of all the
+offerings of Israel my people?  2:30 Wherefore the LORD God of Israel
+
+$FG,2$I'm in trouble cause He said "No" to Intel cable article and I published anyway. I think He's just not interested.  He likes soap operas!$FG$
+
+$IV,1$----03/10/14 21:47:13----$IV,0$
+
+Which is better, Friends or 90210?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394513280",HTML="http://beacon.nist.gov/rest/record/1394513280"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x6833D3-->(6829011 mod 100091)+1-->Line:22824
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Judges 14:19) God says...
+$FG,4$14:19 And the Spirit of the LORD came upon him, and he went down to
+Ashkelon, and slew thirty men of them, and took their spoil, and gave
+change of garments unto them which expounded the riddle. And his anger
+was kindled, and he went up to his father's house.
+
+14:20 But Samson's wife was given to his companion, whom he had used
+as his friend.
+
+15:1 But it came to pass within a while after, in the time of wheat
+harvest, that Samson visited his wife with a kid; and he said, I will
+go in to my wife into the chamber. But her father would not suffer him
+to go in.
+
+15:2 And her father said, I verily thought that thou hadst utterly
+hated her; therefore I gave her to thy companion: is not her younger
+sister fairer than she? take her, I pray thee, instead of her.
+
+15:3 And Samson said concerning them, Now shall I be more blameless
+than the Philistines, though I do them a displeasure.
+
+$FG,2$ROFLMAO. O.J. Simpson? ROFLMAO.  Samsung?$FG$
+
+$IV,1$----03/10/14 22:00:41----$IV,0$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/_mbdtupCbc4\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/_mbdtupCbc4\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Turtles :-)
+Tortoise?
+$HC,"<img src=\"http://i.imgur.com/uEqnCPD.jpg\" width=\"836\" height=\"988\" alt=\"\">"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394514120",HTML="http://beacon.nist.gov/rest/record/1394514120"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xFB4B5E-->(16468830 mod 100091)+1-->Line:53907
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Proverbs 3:1) God says...
+$FG,4$commandments: 3:2 For length of days, and long life, and peace, shall
+they add to thee.
+
+3:3 Let not mercy and truth forsake thee: bind them about thy neck;
+write them upon the table of thine heart: 3:4 So shalt thou find
+favour and good understanding in the sight of God and man.
+
+3:5 Trust in the LORD with all thine heart; and lean not unto thine
+own understanding.
+
+3:6 In all thy ways acknowledge him, and he shall direct thy paths.
+
+3:7 Be not wise in thine own eyes: fear the LORD, and depart from
+evil.
+
+3:8 It shall be health to thy navel, and marrow to thy bones.
+
+3:9 Honour the LORD with thy substance, and with the firstfruits of
+all thine increase: 3:10 So shall thy barns be filled with plenty, and
+thy presses shall burst out with new wine.$FG$
+
+$IV,1$----03/10/14 22:16:19----$IV,0$
+
+$TX,"Neil DeGrasse Tyson",HTML="http://blogs.wsj.com/speakeasy/2014/03/09/why-cosmos-host-neil-degrasse-tyson-has-the-world-in-his-hands"$
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394515080",HTML="http://beacon.nist.gov/rest/record/1394515080"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xB3EF4F-->(11792207 mod 100091)+1-->Line:81561
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Mark 14:9) God says...
+$FG,4$spoken of for a memorial of her.
+
+14:10 And Judas Iscariot, one of the twelve, went unto the chief
+priests, to betray him unto them.
+
+14:11 And when they heard it, they were glad, and promised to give him
+money. And he sought how he might conveniently betray him.
+
+14:12 And the first day of unleavened bread, when they killed the
+passover, his disciples said unto him, Where wilt thou that we go and
+prepare that thou mayest eat the passover?  14:13 And he sendeth forth
+two of his disciples, and saith unto them, Go ye into the city, and
+there shall meet you a man bearing a pitcher of water: follow him.
+
+14:14 And wheresoever he shall go in, say ye to the goodman of the
+house, The Master saith, Where is the guestchamber, where I shall eat
+the passover with my disciples?  14:15 And he will shew you a large
+upper room furnished and prepared: there make ready for us.
+
+14:16 And his disciples went forth, and came into the city, and found$FG$
+
+Jesus went on a slow bronco drive, huh?
+
+I wonder if the waterboy had an attitude?
+
+So, what, Jesus went around in an underground railroad?
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394515320",HTML="http://beacon.nist.gov/rest/record/1394515320"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xB0C6DE-->(11585246 mod 100091)+1-->Line:74782
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Jonah 2:9) God says...
+$FG,4$2:9 But I will sacrifice unto thee with the voice of thanksgiving; I
+will pay that that I have vowed. Salvation is of the LORD.
+
+2:10 And the LORD spake unto the fish, and it vomited out Jonah upon
+the dry land.
+
+3:1 And the word of the LORD came unto Jonah the second time, saying,
+3:2 Arise, go unto Nineveh, that great city, and preach unto it the
+preaching that I bid thee.
+
+3:3 So Jonah arose, and went unto Nineveh, according to the word of
+the LORD. Now Nineveh was an exceeding great city of three days'
+journey.
+
+3:4 And Jonah began to enter into the city a day's journey, and he
+cried, and said, Yet forty days, and Nineveh shall be overthrown.
+
+3:5 So the people of Nineveh believed God, and proclaimed a fast, and
+put on sackcloth, from the greatest of them even to the least of them.$FG$
+
+L.A.
+
+I think You like the Doors, right?
+
+Does he do tongues?
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/WtoSnNMW1p8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/WtoSnNMW1p8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I think I like that car.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394515920",HTML="http://beacon.nist.gov/rest/record/1394515920"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x7DD61C-->(8246812 mod 100091)+1-->Line:39351
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (2 Chronicles 23:8) God says...
+$FG,4$23:8 So the Levites and all Judah did according to all things that
+Jehoiada the priest had commanded, and took every man his men that
+were to come in on the sabbath, with them that were to go out on the
+sabbath: for Jehoiada the priest dismissed not the courses.
+
+23:9 Moreover Jehoiada the priest delivered to the captains of
+hundreds spears, and bucklers, and shields, that had been king
+David's, which were in the house of God.
+
+23:10 And he set all the people, every man having his weapon in his
+hand, from the right side of the temple to the left side of the
+temple, along by the altar and the temple, by the king round about.
+
+23:11 Then they brought out the king's son, and put upon him the
+crown, and gave him the testimony, and made him king. And Jehoiada and
+his sons anointed him, and said, God save the king.
+
+23:12 Now when Athaliah heard the noise of the people running and
+praising the king, she came to the people into the house of the LORD:$FG$
+
+$IV,1$----03/10/14 22:44:09----$IV,0$
+
+He sang about swamps and lizards.  I wonder if "L.A." was also Louisana?
+
+He did poetry and tongues.
+
+When I was an engineer, I had no idea that reading skills could advance, just like math skills.  I'll bet most engineers scoff at the notion that a senior in college literature is as far advanced from high school English as a senior in college math is advanced from high school math.
+
+Q. George Bush wants NCLB money to go to schools, not prisons.
+A. Bush does not want money diverted.
+B. Bush does not want to fund babysitting.
+C. Bush hopes good schools keep people out of prison.
+D. All of the above.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394517060",HTML="http://beacon.nist.gov/rest/record/1394517060"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0x1F9023-->(2068515 mod 100091)+1-->Line:66696
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Jeremiah 52:24) God says...
+$FG,4$Zephaniah the second priest, and the three keepers of the door: 52:25
+He took also out of the city an eunuch, which had the charge of the
+men of war; and seven men of them that were near the king's person,
+which were found in the city; and the principal scribe of the host,
+who mustered the people of the land; and threescore men of the people
+of the land, that were found in the midst of the city.
+
+52:26 So Nebuzaradan the captain of the guard took them, and brought
+them to the king of Babylon to Riblah.
+
+52:27 And the king of Babylon smote them, and put them to death in
+Riblah in the land of Hamath. Thus Judah was carried away captive out
+of his own land.
+
+52:28 This is the people whom Nebuchadrezzar carried away captive: in
+the seventh year three thousand Jews and three and twenty: 52:29 In
+the eighteenth year of Nebuchadrezzar he carried away captive from
+Jerusalem eight hundred thirty and two persons: 52:30 In the three and
+twentieth year of Nebuchadrezzar Nebuzaradan the captain of the guard
+carried away captive of the Jews seven hundred forty and five persons:
+
+$FG,2$The previous pick only matched the video with a knife in hand.  This pick confirms that the knife scene was a hit.  This mentions "ha math" which is what a college math major thinks of high school.
+
+This response was anemic.  My offerings probably suck.$FG$
+
+$IV,1$----03/10/14 22:57:40----$IV,0$
+
+Now, I think this poem sucks:  $TX,"The_Road_Not_Taken",HTML="http://en.wikipedia.org/wiki/The_Road_Not_Taken"$.  My first time since high school and that now sounds like heathen drivel.
+
+What's Your favorite poem, God?
+
+Why don't You write a poem!
+
+God says...
+$FG,4$eyesight latter rashly framers$FG$
+
+God suggests after-image for a poem.
+
+$FG,1$---- I'll do a Poem ----
+I look away,
+
+Let time pass,
+
+I still see.
+
+Fading.$FG$
+
+God says...
+$FG,4$teaching dispraisest famous variations proved proconsular hearest it lusted turns apostles serves studious once whither harmonious debts ravish reverential transgressing Anaximenes revelation ranked spiritually displeased Schools pierced betake preliminary gladiators rehearse needeth metres United rare Form blest persevering Husband knewest straying forasmuch excellently wondered captious envious respects widow Our guidance despisest indentures goading unsearchable discoursing breathedst dumb deformities intently breast hadst trial tumultuousness girded religion obey along Body concerns preacher mistress eagle entirely morrow peradventure share disperseth seemly delay disclosed quite sanctuary credibility$FG$
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/sF45RmBO72g\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/sF45RmBO72g\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I don't think that song is terrible.  I like it.  Neil Degrasse Tyson is special partly because he's black.
+
+"Eyesight latter rashly framers"  Duh is about prophecy, now that I think about it.  Perhaps, it is about 1783.
+
+$IV,1$----03/10/14 23:44:05----$IV,0$
+
+I was going to do the trooper, since it's topical.  God likes this one, though.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/J3I88wsFKao\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/J3I88wsFKao\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I guess they're gay, huh.
+
+$TX,"National Institute of Standards Public Randomness Beacon",HTML="http://beacon.nist.gov/home"$
+
+$TX,"Guidelines for Talking with God",HTML="http://www.templeos.org/Wb/Adam/God/HSNotes.html"$
+
+$TX,"http://beacon.nist.gov/rest/record/1394520660",HTML="http://beacon.nist.gov/rest/record/1394520660"$
+
+$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$
+0xA67ABA-->(10910394 mod 100091)+1-->Line:476
+
+$TX,"KingJamesBible",HTML="http://www.templeos.org/files/BIBLE.TXT"$ (Genesis 3:1) God says...
+$FG,4$3:1 Now the serpent was more subtil than any beast of the field which
+the LORD God had made. And he said unto the woman, Yea, hath God said,
+Ye shall not eat of every tree of the garden?  3:2 And the woman said
+unto the serpent, We may eat of the fruit of the trees of the garden:
+3:3 But of the fruit of the tree which is in the midst of the garden,
+God hath said, Ye shall not eat of it, neither shall ye touch it, lest
+ye die.
+
+3:4 And the serpent said unto the woman, Ye shall not surely die: 3:5
+For God doth know that in the day ye eat thereof, then your eyes shall
+be opened, and ye shall be as gods, knowing good and evil.
+
+3:6 And when the woman saw that the tree was good for food, and that
+it was pleasant to the eyes, and a tree to be desired to make one
+wise, she took of the fruit thereof, and did eat, and gave also unto
+her husband with her; and he did eat.
+
+3:7 And the eyes of them both were opened, and they knew that they
+were naked; and they sewed fig leaves together, and made themselves$FG$
+
+LOL -- Icarus might have wanted to be a god?  It's a little like Adam and Eve.
+
+Pick a song or poem or something, God?
+
+God says...
+$FG,4$herein deliberate think poor Catiline becoming lusteth little acknowledge absorb expecteth allowing entered nineteenth calledst expound lines receive cover dreaded pleasantness funeral hers awhile admitted fleshy treasured freshness lashes carcase haunt groan 94 continue unyielding towards shadowed deprived flagitiousness incredibly houseless shifted changing luxuriousness savage dissent chewing bewitched scourges grandchildren unpleasantly girded congratulation precedes been institution s dog forgiving usage virtue flung Name surpassingly eloquent continently Rome stir applied DISTRIBUTION comes twelve kind sad lentiles tremble reading indigested virtue reality sighing mystery anniversary trusting watchfully Drunkenness enquiringly very Sabbath wanting redeemer Awake head transcribe fighting stumbling attempt seasoneth fruitlessly uninjurable wronged tendernesses assuaged$FG$
+
+Black Sabbath, LOL.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/dZJPYo-YUkA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/dZJPYo-YUkA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
