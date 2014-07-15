@@ -2,7 +2,7 @@ Bool app_done;
 I64 app_done_ack;
 
 U0 Job1(I64)
-{ //Compile Compiler
+{//Compile Compiler
   Preempt(ON);	 //Off by default
   Silent(ON);
   while (!app_done) {
@@ -13,7 +13,7 @@ U0 Job1(I64)
 }
 
 U0 Job2(I64)
-{ //Log a file
+{//Log a file
   Preempt(ON);	 //Off by default
   while (!app_done) {
     AdamLog("%F","::/Demo/MultiCore/LoadTest.CPP");
@@ -23,7 +23,7 @@ U0 Job2(I64)
 }
 
 U0 Job3(I64)
-{ //Log a file
+{//Log a file
   Preempt(ON);	 //Off by default
   while (!app_done) {
     Cd("::/Compiler");

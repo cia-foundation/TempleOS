@@ -93,7 +93,7 @@ U0 TreeCommonAncestorFind(Node *root)
 }
  
 U0 TreeCommonAncestor()
-{ //Make tree and find common ancestor to n1 & n2.
+{//Make tree and find common ancestor to n1 & n2.
   root=NULL;
   n1=n2=common_ancestor=0;
  
@@ -111,8 +111,7 @@ U0 TreeCommonAncestor()
 }
 
 TreeCommonAncestor;
-/*
-Be careful with recursive routines in TempleOS
+/*Be careful with recursive routines in TempleOS
 because the stack does not grow and will overflow.
 
 See $LK,"::/Demo/StkGrow.CPP"$.

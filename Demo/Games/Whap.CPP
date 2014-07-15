@@ -23,8 +23,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrRect(dc,cx-BASE_SIZE+2,cy-BASE_SIZE+2,BASE_SIZE*2-4,BASE_SIZE*2-4);
   dc->color=YELLOW;
   GrLine(dc,balls[0].x,balls[0].y,
-    ipx-task->pix_left-task->scroll_x,
-    ipy-task->pix_top-task->scroll_y);
+    ip.pos.x-task->pix_left-task->scroll_x,
+    ip.pos.y-task->pix_top-task->scroll_y);
   for (i=0;i<NUM_SPRINGS;i++)
     GrLine(dc,springs[i].end1->x,springs[i].end1->y,
 		springs[i].end2->x,springs[i].end2->y);
@@ -51,7 +51,6 @@ U0 DrawIt(CTask *task,CDC *dc)
     Snd(0);
 }
 
-
 U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
 {
   I64 i,j;
@@ -59,7 +58,7 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
   CD3 p,p2;
   CTask *task=ode->win_task;
 
-  D3SubEqu(D3Equ(&p2,ipx-task->pix_left-task->scroll_x,ipy-task->pix_top-task->scroll_y,0),
+  D3SubEqu(D3Equ(&p2,ip.pos.x-task->pix_left-task->scroll_x,ip.pos.y-task->pix_top-task->scroll_y,0),
     &balls[0].state->x);
   D3AddEqu(&balls[0].DstateDt->DxDt,D3MulEqu(&p2,STRETCH));
 
@@ -76,7 +75,7 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
   for (i=0;i<NUM_BALLS;i++)
     for (j=i+1;j<NUM_BALLS;j++) {
       D3Sub(&balls[j].state->x,&balls[i].state->x,&p);
-      dd=D3SqrNorm(&p);
+      dd=D3NormSqr(&p);
       if (dd<=(2*BALL_RADIUS)*(2*BALL_RADIUS)) {
 	if (t-collision_t>0.05) {
 	  Noise(50,5000,6000);
@@ -103,7 +102,6 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
     balls[0].DstateDt->DyDt-=Sqr(Sqr(Sqr((d+BALL_RADIUS)-task->pix_height)));
 }
 
-
 U0 Whap()
 {
   I64 i;
@@ -129,8 +127,8 @@ U0 Whap()
   for (i=1;i<NUM_BALLS;i++)
     D3Equ(&balls[i].x,
     RandI16%500+Fs->pix_width>>1,RandI16%500+Fs->pix_height>>1,0);
-  balls[0].x=ipx-Fs->pix_left-Fs->scroll_x;
-  balls[0].y=ipy-Fs->pix_top-Fs->scroll_y;
+  balls[0].x=ip.pos.x-Fs->pix_left-Fs->scroll_x;
+  balls[0].y=ip.pos.y-Fs->pix_top-Fs->scroll_y;
   for (i=0;i<NUM_BALLS;i++) {
     balls[i].mass=1.0;
     balls[i].drag_profile_factor=1.0;

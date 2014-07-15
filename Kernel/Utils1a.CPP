@@ -1,6 +1,5 @@
 asm {
 USE64
-// ************************************
 _MEMSET::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -14,7 +13,6 @@ _MEMSET::
 	POP	RDI
 	POP	RBP
 	RET1	24
-// ************************************
 _MEMSET_U16::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -28,7 +26,6 @@ _MEMSET_U16::
 	POP	RDI
 	POP	RBP
 	RET1	24
-// ************************************
 _MEMSET_U32::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -42,8 +39,7 @@ _MEMSET_U32::
 	POP	RDI
 	POP	RBP
 	RET1	24
-// ************************************
-_MEMSET_U64::
+_MEMSET_I64::
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RDI
@@ -56,7 +52,6 @@ _MEMSET_U64::
 	POP	RDI
 	POP	RBP
 	RET1	24
-// ************************************
 _MEMCPY::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -72,7 +67,6 @@ _MEMCPY::
 	POP	RSI
 	POP	RBP
 	RET1	24
-// ************************************
 _MEMCMP::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -92,7 +86,6 @@ _MEMCMP::
 	POP	RSI
 	POP	RBP
 	RET1	24
-// ************************************
 _BEQU::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -108,7 +101,6 @@ _BEQU::
 @@10:	ADC	AL,0
 	POP	RBP
 	RET1	24
-// ************************************
 _LBEQU::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -126,7 +118,6 @@ _LBEQU::
 @@10:	ADC	AL,0
 	POP	RBP
 	RET1	24
-// ************************************
 _CLAMP_I64::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -139,7 +130,6 @@ _CLAMP_I64::
 	CMOVG	RAX,RDX
 	POP	RBP
 	RET1	24
-// ************************************
 _CLAMP_U64::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -152,7 +142,6 @@ _CLAMP_U64::
 	CMOVA	RAX,RDX
 	POP	RBP
 	RET1	24
-// ************************************
 _CALL::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -162,7 +151,6 @@ _CALL::
 	CALL	RAX
 @@05:	POP	RBP
 	RET1	8
-// ************************************
 _BIT_FIELD_OR_U32::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -176,7 +164,6 @@ _BIT_FIELD_OR_U32::
 	OR	U64 [RBX],RAX
 	POP	RBP
 	RET1	24
-// ************************************
 _BIT_FIELD_EXTRACT_U32::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -194,8 +181,7 @@ _BIT_FIELD_EXTRACT_U32::
 	AND	RAX,RDX
 	POP	RBP
 	RET1	24
-// ************************************
-_XCHG_U64::
+_XCHG_I64::
 	PUSH	RBP
 	MOV	RBP,RSP
 	MOV	RDX,U64 SF_ARG1[RBP]
@@ -228,7 +214,7 @@ _XCHG_U8::
 	POP	RBP
 	RET1	16
 
-_LXCHG_U64::
+_LXCHG_I64::
 	PUSH	RBP
 	MOV	RBP,RSP
 	MOV	RDX,U64 SF_ARG1[RBP]
@@ -264,7 +250,6 @@ _LXCHG_U8::
 	XCHG	U8 [RDX],AL
 	POP	RBP
 	RET1	16
-// ************************************
 _REP_IN_U32::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -276,7 +261,6 @@ _REP_IN_U32::
 	POP	RDI
 	POP	RBP
 	RET1	24
-
 _REP_IN_U16::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -288,7 +272,6 @@ _REP_IN_U16::
 	POP	RDI
 	POP	RBP
 	RET1	24
-
 _REP_IN_U8::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -300,7 +283,6 @@ _REP_IN_U8::
 	POP	RDI
 	POP	RBP
 	RET1	24
-
 _REP_OUT_U32::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -312,7 +294,6 @@ _REP_OUT_U32::
 	POP	RSI
 	POP	RBP
 	RET1	24
-
 _REP_OUT_U16::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -324,7 +305,6 @@ _REP_OUT_U16::
 	POP	RSI
 	POP	RBP
 	RET1	24
-
 _REP_OUT_U8::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -336,7 +316,6 @@ _REP_OUT_U8::
 	POP	RSI
 	POP	RBP
 	RET1	24
-// ************************************
 _CPUID::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -351,7 +330,6 @@ _CPUID::
 	POP	RSI
 	POP	RBP
 	RET1	16
-// ************************************
 _CALLIND::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -381,7 +359,6 @@ _CALLIND::
 	POP	RSI
 	POP	RBP
 	RET
-// ************************************
 _CALLEXTNUM::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -413,7 +390,6 @@ _CALLEXTNUM::
 	POP	RSI
 	POP	RBP
 	RET
-// ************************************
 _CALLEXTSTR::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -455,7 +431,6 @@ _CALLEXTSTR::
 	POP	RSI
 	POP	RBP
 	RET
-// ************************************
 SET_GS_BASE::
 	PUSH	RAX
 	PUSH	RCX

@@ -1,5 +1,4 @@
-/*
-This does a really crappy job of
+/*This does a really crappy job of
 suggesting spellings.  Write a better
 one for fun.
 */
@@ -22,8 +21,7 @@ U8 *SuggestMatchForm(U8 *src)
   return result;
 }
 
-/*
-Fmt of word lst entry:
+/*Fmt of word lst entry:
   U8 WSD_WORD_CHAR
   U8 word[] with terminating zero
   I16 block; //definition offset in ::/Adam/WordStat/WSDefs.DAT
@@ -31,7 +29,7 @@ Fmt of word lst entry:
 
 U0 SuggestSpelling(U8 *word)
 {
-  U8 *dict=ws_dict_word_lst,
+  U8 *dict=wsd.word_lst,
      *pf=SuggestMatchForm(word),
      *wf;
   I64 len=StrLen(pf),
@@ -43,22 +41,21 @@ U0 SuggestSpelling(U8 *word)
       "%16s",dict+1;
       if (++col==num_cols) {
 	col=0;
-	NewLine;
+	'\n';
       }
     }
     Free(wf);
     dict+=StrLen(dict+1)+4;
   }
   Free(pf);
-  NewLine;
+  '\n';
 }
-
 
 U0 SuggestSpellingDemo()
 {
   U8 *w;
   while (TRUE) {
-    w=PmtStr("Word:");
+    w=GetStr("Word:");
     if (*w) {
       SuggestSpelling(w);
       Free(w);
@@ -67,17 +64,14 @@ U0 SuggestSpellingDemo()
   }
 }
 
-
-/*
-If you "Adam Include" this file, it will
-install this command as a hot-key.
-*/
+//If you "Adam Include" this file, it will
+//install this command as a hot-key.
 
 U0 CtrlAltL(I64)
 {
-//$LK,"ws_cur_word",A="MN:ws_cur_word"$ is only set if WordStat
+//$LK,"ws.cur_word",A="MN:CWordStatGlbls"$ is only set if WordStat
 //is running.
-  PopUp("SuggestSpelling(ws_cur_word);View;");
+  PopUp("SuggestSpelling(ws.cur_word);View;");
 }
 
 if (Fs!=adam_task)
@@ -85,7 +79,7 @@ if (Fs!=adam_task)
 else {
   SetCtrlAltLetCB('L',&CtrlAltL,"Cmd/Suggest Spelling");
 //Appears in the Adam Task Window
-  "<CTRL-ALT-L> installed\n";
+  "<CTRL-ALT-l> installed\n";
 }
 
 //Note: It would be more appropriate

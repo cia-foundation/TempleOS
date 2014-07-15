@@ -1,7 +1,7 @@
 //"ls" is light source.
 
 U0 Lighting(CDC *dc,CD3I32 *ls,CD3I32 *poly,I64 color)
-{ //color is a color from 0-7
+{//color is a color from 0-7
   CD3I32 v1,v2;
   I64 *r=dc->r,i,vn_x,vn_y,vn_z;
   F64 d;
@@ -35,7 +35,6 @@ U0 Lighting(CDC *dc,CD3I32 *ls,CD3I32 *poly,I64 color)
 //The dot product of the light source
 //vect and the surface normal
 //gives an illumination number.
-
 
 //TempleOS will generate a random U16
 //and compare to dither_probability_u16 and
@@ -73,20 +72,18 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrScaleEqu(dc->r,tt);
   GrSetRotMat(dc,dc->r);
 
-  ls.x=-(ipx-task->pix_left-task->scroll_x-cx);
-  ls.y=-(ipy-task->pix_top-task->scroll_y-cy);
+  ls.x=-(ip.pos.x-task->pix_left-task->scroll_x-cx);
+  ls.y=-(ip.pos.y-task->pix_top-task->scroll_y-cy);
   ls.z=GR_WIDTH/8;
   d=1<<16/D3I32Norm(&ls);
   ls.x*=d;
   ls.y*=d;
   ls.z*=d;
 
-
   dc->x=cx;
   dc->y=cy;
   dc->z=MaxI64(cx,cy);
   radius =MinI64(cx,cy)/2;
-
 
   for (i=0;i<RINGS;i++) {
     è =    i*ã/2/RINGS;
@@ -151,7 +148,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 //See $LK,"::/Demo/Graphics/SpritePlot3D.CPP"$.
 //for a CSprite example.
 
-//See $LK,"SpriteMesh",A="MN:SpriteMesh"$() for a fancy example.
+//See $LK,"SpriteMeshEd",A="MN:SpriteMeshEd"$() for a fancy example.
 
 U0 Main()
 {

@@ -1,7 +1,7 @@
-/*  This is not an AutoFile.  It uses $LK,"AutoStr",A="MN:AutoStr"$
+/* This is not an AutoFile.  It uses $LK,"AutoStr",A="MN:AutoStr"$
 to run text as though from an AutoFile.
 
-  This example shows how you can drive pop-up
+This example shows how you can drive pop-up
 windows.
 */
 

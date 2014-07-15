@@ -1,10 +1,10 @@
 F64 MySin(F64 d)
-{
+{ //Sin() does not have an address.
   return Sin(d);
 }
 
 F64 MyCos(F64 d)
-{
+{ //Cos() does not have an address.
   return Cos(d);
 }
 

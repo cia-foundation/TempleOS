@@ -10,15 +10,15 @@ DefineLstLoad("ST_RAINBOW_10",
 "GREEN\0BLUE\0PURPLE\0LTGRAY\0WHITE\0");
 
 U0 SetVGAPalette4Indices()
-{//4-bit (16 color)
-/*There is a level of indirection we wish to identity map.
+{/*4-bit (16 color)
+There is a level of indirection we wish to identity map.
 This sets the 16-colors to use
 the first 16 DAC rgb entries, so
 we never need to worry about indexes,
 just DAC palette settings.
 */
   I64 i;
-  if (text_mode) return;
+  if (!sys_bios_gr_mode) return;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
@@ -36,8 +36,8 @@ just DAC palette settings.
 }
 
 public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
-{ //6-bits per r,dc and g
-  if (text_mode) return;
+{//6-bits per b, g and r.
+  if (!sys_bios_gr_mode) return;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
@@ -52,9 +52,9 @@ public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
 }
 
 public CBGR GetVGAPaletteColor(I64 color_num)
-{ //6-bits per r,dc and g
+{//6-bits per b, g and r.
   CBGR result=0;
-  if (text_mode) return 0;
+  if (!sys_bios_gr_mode) return 0;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
@@ -96,6 +96,6 @@ public U0 SetVGAPalette4(CBGR *bgr)
 }
 
 public U0 SetStdPalette()
-{
+{//Activate std palette.
   SetVGAPalette4(vga_palette4_std);
 }

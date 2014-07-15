@@ -1,5 +1,4 @@
-/*
-The moral of this story is simple
+/*The moral of this story is simple
 instruction level optimizations
 don't matter much on a modern Intel CPU
 because they convert complex instructions
@@ -27,7 +26,6 @@ _BADLY_UNOPTIMIZED::
 	CMP	RCX,U64 16[RDX]
 	JB	@@05
 	RET
-
 
 _WELL_OPTIMIZED1::
 	XOR	RAX,RAX
@@ -67,8 +65,6 @@ _WELL_OPTIMIZED3::
 	RET
 }
 
-
-
 _extern _BADLY_UNOPTIMIZED I64 Loop1();
 _extern _WELL_OPTIMIZED1   I64 Loop2();
 _extern _WELL_OPTIMIZED2   I64 Loop3();
@@ -99,9 +95,7 @@ t0=tS;
 i=Loop4;
 "Result:%d Time:%9.6f\n",i,tS-t0;
 
-
 /*  Program Output$HL,0$$WW+H,1$$FD,1$
-
 8 Cores 2.660GHz
 Bad Code
 Result:3200000040000000 Time: 0.069966
@@ -111,5 +105,4 @@ Good Code #2
 Result:3200000040000000 Time: 0.062907
 Good Code #3
 Result:3200000040000000 Time: 0.156359
-
 $HL,1$*/

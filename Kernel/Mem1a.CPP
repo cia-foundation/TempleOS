@@ -1,7 +1,6 @@
 asm {
-/*
-See $LK,"::/Doc/Acknowledgements.TXT"$.
-See $LK,"::/Doc/Mem.TXT"$
+/*See $LK,"::/Doc/Acknowledgements.TXT"$.
+See $LK,"::/Doc/MemOverview.TXT"$
 */
 
 USE32
@@ -25,8 +24,7 @@ SYS_INIT_MEM::
 	ADC	EDX,0
 	LOOP	@@05
 
-//video ram=write through
-//0xA0000-0xBFFFF
+//0xA0000-0xBFFFF: video ram=write through
 	MOV	EAX,0xF
 	XOR	EDX,EDX
 	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml1+0xA0*8
@@ -62,8 +60,7 @@ SYS_INIT_MEM::
 	ADC	EDX,0
 	LOOP	@@20
 
-//PCI Devs
-//0xE0000000-0xFFFFFFFF
+//0xE0000000-0xFFFFFFFF: PCI Devs
 	MOV	EAX,0x17	//Cache disabled
 	XOR	EDX,EDX
 	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2+8*0x700
@@ -164,7 +161,7 @@ U0 SysBadMAlloc(I64 *ptr)
 }
 
 I64 MemPageSize(U8 *a)
-{
+{//Size of page table at addr.	Either 4K or 2Meg.
   if (a<MEM_NUM_PML1*0x1000*0x200)
     return 0x1000;
   else
@@ -172,7 +169,7 @@ I64 MemPageSize(U8 *a)
 }
 
 I64 *MemPageTable(U8 *a)
-{
+{//Point to page table entry for addr.
   if (a<MEM_NUM_PML1*0x1000*0x200)
     return SYS_FIXED_AREA+offset(CSysFixedArea.pml1)+a>>12*8;
   else
@@ -180,7 +177,7 @@ I64 *MemPageTable(U8 *a)
 }
 
 Bool MemPagePresentMark(U8 *a,Bool val)
-{
+{//Mark an addr's page present or not-present.
   I64 *pte=MemPageTable(a);
   Bool result=*pte&1;
   if (val)
@@ -191,17 +188,14 @@ Bool MemPagePresentMark(U8 *a,Bool val)
   return result;
 }
 
-
 U8 *MemBlksIndependentAlloc(I64 *_pages512,CBlkPool *bp=NULL)
-//This will allocate a 512 byte pages from
-//and not link them to any task.  (Linking to a task
-//means it will be freed when the task
-//dies.)
-//It might give you more than you asked for
-//so a ptr to a page count is passed.
-//
-//Returns NULL if out of memory
-{
+{/*Alloc 512Byte pages from bp. Don't link to task.
+(Linking to a task means it will be freed when the task dies.)
+It might give you more than you asked for
+so a ptr to a page count is passed.
+
+Return: NULL if out of memory.
+*/
   CMemBlk *result=NULL,*m;
   I64 i,num=*_pages512;
   if (!bp) bp=sys_code_bp;
@@ -268,7 +262,7 @@ at_done:
 }
 
 U0 MemBlksNonTaskFree(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL)
-{
+{//Return nontask 512Byte pages(s) to bp.
   I64 i;
   if (m) {
     if (!bp) bp=sys_code_bp;
@@ -299,15 +293,13 @@ U0 MemBlksNonTaskFree(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL)
 }
 
 U8 *MemBlks2MegAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
-//This will allocate 2Meg pages and not
-//link it to any task.	(Linking to a task
-//means they will be freed when the task
-//dies.)
-//It might give you more than you asked for
-//so a ptr to a page count is passed.
-//
-//Returns NULL if out of memory
-{
+{/*Alloc 2Meg pages from bp. Don't link to task.
+(Linking to a task means they will be freed when the task dies.)
+It might give you more than you asked for
+so a ptr to a page count is passed.
+
+Return: NULL if out of memory.
+*/
   I64 i,j,*pte,num=*_pages2Meg;
   CMemBlk *result=NULL,*m,*m1;
 
@@ -406,15 +398,13 @@ am_done:
 }
 
 U8 *MemBlksUncachedAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
-//This will allocate 2Meg pages from
-//and not link them to any task.  (Linking to a task
-//means it will be freed when the task
-//dies.)  It will be marked uncached.
-//It might give you more than you asked for
-//so a ptr to a page count is passed.
-//
-//Returns NULL if out of memory
-{
+{/*Alloc 2Meg pages from bp. Don't link to task.
+(Linking to a task means it will be freed when the task dies.)
+It will be marked uncached. It might give you more than you asked for
+so a ptr to a page count is passed.
+
+Return: NULL if out of memory.
+*/
   CMemBlk *result,*m,*m1;
   I64 num=*_pages2Meg,*pte;
   if (result=MemBlks2MegAlloc(_pages2Meg,bp)) {
@@ -432,15 +422,13 @@ U8 *MemBlksUncachedAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
 }
 
 U8 *MemBlksWriteThroughAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
-//This will allocate 2Meg pages from
-//and not link them to any task.  (Linking to a task
-//means they will be freed when the task
-//dies.)  It will be marked write-through.
-//It might give you more than you asked for
-//so a ptr to a page count is passed.
-//
-//Returns NULL if out of memory
-{
+{/*Alloc 2Meg pages from bp. Don't link to task.
+(Linking to a task means they will be freed when the task dies.)
+It will be marked write-through. It might give you more than you asked for
+so a ptr to a page count is passed.
+
+Return: NULL if out of memory.
+*/
   CMemBlk *result,*m,*m1;
   I64 num=*_pages2Meg,*pte;
   if (result=MemBlks2MegAlloc(_pages2Meg,bp)) {
@@ -458,7 +446,7 @@ U8 *MemBlksWriteThroughAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
 }
 
 U0 MemBlks2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
-{
+{//Return 2Meg page(s) to bp.
   I64 *pte;
   CMemBlk *m1,*m2;
   if (m) {
@@ -486,11 +474,11 @@ U0 MemBlks2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
 }
 
 CMemBlk *MemBlksAlloc(I64 *_pages512,CHeapCtrl *hc)
-{
-//hc must be locked.  Interrupts should probably be off
-//Currently, this is only called from $LK,"MAlloc",A="MN:MAlloc"$().
-//
-//Returns NULL if out of memory
+{/*hc must be locked.  Interrupts should probably be off
+Currently, this is only called from $LK,"MAlloc",A="MN:MAlloc"$().
+
+Return: NULL if out of memory.
+*/
   CMemBlk *result;
   I64 threshold,cnt,size;
   CMemUnusedAllocated *uum,**_uum,**_ptr;
@@ -525,7 +513,7 @@ CMemBlk *MemBlksAlloc(I64 *_pages512,CHeapCtrl *hc)
 }
 
 U0 MemBlksFree(CMemBlk *m,CHeapCtrl *hc)
-{ //hc must be locked
+{//hc must be locked
   if (m) {
     PUSHFD
     CLI

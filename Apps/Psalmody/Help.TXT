@@ -1,0 +1,24 @@
+$WW,1$$PURPLE$$TX+CX,"Psalmody Help"$$FG$
+
+* The keyboard can be used as an organ by typing letter keys or clicking the mouse on the keyboard diagram$FG$.  You can "record" notes by pressing the red button and typing letters.  They will appear on the musical staff.  You can edit and save them.
+
+* The clipboard can be used to cut and paste.
+
+* $GREEN$Psalmody$FG$ uses $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ files as it's fmt!  See $LK,"::/Apps/Psalmody/Examples/personal.CPP"$.  It does not fully parse them when loading back in, so changes made outside $GREEN$Psalmody$FG$ can be lost.
+
+* The first line of the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $GREEN$"no nothing"$FG$, $GREEN$"has words"$FG$, $GREEN$"has graphics"$FG$, or $GREEN$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $GREEN$0$FG$-$GREEN$9$FG$.  You can press $GREEN$<DELETE>$FG$ to delete songs.
+
+* You can take the $LK,"Play",A="MN:Play"$() statements out of a song file and place them in your programs.  You can also add a song to a document with $GREEN$<CTRL-l>$FG$, but you should do it after pressing $GREEN$<CTRL-t>$FG$ because the clipboard-insert in $GREEN$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $GREEN$<CTRL-t>$FG$, now.
+
+* You can call $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$("HOME/Psalmody"); to play your songs.
+
+* To create a $GREEN$.SND$FG$ file which can be exported and played under Windows, set the $GREEN$Bool$FG$ $LK,"snd.record",A="MN:CSndGlbls"$ to $GREEN$TRUE$FG$, play music, and set it to $GREEN$FALSE$FG$.  Then, call $LK,"SndFileCreate",A="MN:SndFileCreate"$().  You might wish to make a $GREEN$<CTRL-ALT-key>$FG$ to toggle this system level recording feat.  See $LK,"Snd",A="MN:Snd"$().  Add this code to your $LK,"HOME/Adam3cKeyPlugIns.CPP"$ file.
+
+$PURPLE$U0 CtrlAltR(I64)
+{
+  snd.record=!snd.record;
+}
+SetCtrlAltLetCB('R',&CtrlAltR,"Toggle snd.record");$FG$
+
+* When calling $LK,"SndFileCreate",A="MN:SndFileCreate"$() you can set a waveform.  The PC speaker is $LK,"WF_SQUARE",A="MN:WF_SQUARE"$.  You can select reverb and averaging, also.
+

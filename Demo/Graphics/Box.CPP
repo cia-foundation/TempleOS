@@ -2,7 +2,7 @@ CDC *dc;
 
 U0 DrawIt(CTask *,CDC *)
 {//This technique is weird, but clever.  In Box() we
- //created an alias of the system $LK,"gr_dc2",A="MN:gr_dc2"$.
+ //created an alias of the system $LK,"gr.dc2",A="MN:CGrGlbls"$.
   dc->pen_width=2;
   dc->color=RED;
   GrLine3(dc,-100,-100,-100, -100, 100,-100);
@@ -22,7 +22,7 @@ U0 DrawIt(CTask *,CDC *)
 U0 Box()
 {
   F64 é=0,è=0,ê=0,s=1,s1=1.05;
-  dc=DCAlias(gr_dc2,Fs);
+  dc=DCAlias(gr.dc2,Fs);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   DocClear;

@@ -9,7 +9,6 @@ class MySpring:CSpring
 
 CMathODE *ode=NULL;
 
-
 U0 DrawIt(CTask *task,CDC *dc)
 {
   Bool old_suspend;
@@ -34,13 +33,10 @@ U0 DrawIt(CTask *task,CDC *dc)
   Suspend(task,old_suspend);
 }
 
-
 U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
-{
-//The forces due to springs and drag are
-//automatically handled by the
-//ode code.  We can add new forces
-//here.
+{//The forces due to springs and drag are
+//automatically handled by the ode code.
+//We can add new forces here.
   F64 d,dd;
   CD3 p;
   MyMass *tempm1,*tempm2;
@@ -50,7 +46,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tempm2=tempm1->next;
     while (tempm2!=&ode->next_mass) {
       D3Sub(&tempm2->state->x,&tempm1->state->x,&p);
-      dd=D3SqrNorm(&p);
+      dd=D3NormSqr(&p);
       if (dd<=Sqr(tempm1->radius+tempm2->radius)) {
 	d=Sqrt(dd)+0.0001;
 	dd=10.0*Sqr(Sqr(Sqr(tempm1->radius+tempm2->radius)-dd));
@@ -106,7 +102,7 @@ U0 CleanUp()
 
 U0 MassSpringDemo()
 {
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   MyMass *tempm1=NULL,*tempm2=NULL;
 
   PopUpOk("Left-Click to place mas\n"
@@ -116,19 +112,19 @@ U0 MassSpringDemo()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
 
-//This Preempt() eliminates a lot of hassles.
-//The concern is about changing
-//que links while the winmgr task
-//is updating the ode or screen.
+/*Preempt(OFF) eliminates a lot of hassles.
+The concern is about changing
+que links while the winmgr task
+is updating the ode or screen.
 
-//The Window mgr suspends this
-//task while updating the ode.  It
-//will not be interrupted and with this
-//preempt, we will not be interrupted.
-//There is little downside to Preempt()
-//since we will yield during GetMsg().
+The Window mgr suspends this
+task while updating the ode.  It
+will not be interrupted and with this
+preempt, we will not be interrupted.
+There is little downside to Preempt()
+since we will yield during GetMsg().
+*/
   Preempt(OFF);
-
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
   WordStat;
@@ -150,22 +146,22 @@ U0 MassSpringDemo()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
-	  PlaceMass(p1,p2);
+	  PlaceMass(a1,a2);
 	  break;
 	case MSG_IP_R_DOWN:
-	  tempm1=MassFind(ode,p1,p2);
+	  tempm1=MassFind(ode,a1,a2);
 	  tempm2=NULL;
 	  break;
 	case MSG_IP_R_UP:
-	  if (tempm1 && (tempm2=MassFind(ode,p1,p2)) && tempm1!=tempm2)
+	  if (tempm1 && (tempm2=MassFind(ode,a1,a2)) && tempm1!=tempm2)
 	    PlaceSpring(tempm1,tempm2);
 	  tempm1=tempm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (p1) {
+	  switch (a1) {
 	    case '\n':
 	      CleanUp;
 	      Init;

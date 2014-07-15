@@ -1,5 +1,5 @@
 U0 ICFOpEqual(CLex *lx,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
-{ //for ADD,SUB,DIV,MUL
+{//for ADD,SUB,DIV,MUL
   CICArg *a1=&tempi->a1,
       *a2=&tempi->a2;
   Bool dont_push_float,dont_pop_float,p1_mem;
@@ -599,7 +599,6 @@ U0 ICFCmpAndBranch(CLex *lx,CIntermediateCode *tempi,I64 ip,
     ICU32(tempi,i);
   }
 }
-
 
 U0 ICFMul(CLex *lx,CIntermediateCode *tempi,U8 *buf,I64 ip)
 {

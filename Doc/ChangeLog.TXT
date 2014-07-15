@@ -1,16 +1,241 @@
-$WW,1$$FG,2$Use $LK,"R",A="MN:R"$() to rename if I change a label.$FG$
+ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
+
+Use $LK,"R",A="MN:R"$() to rename if I change a label.
+
+$IV,1$----07/16/14 00:59:22----$IV,0$
+
+$IV,1$----07/12/14 02:06:10----$IV,0$
+* Fixed bug clicking on icon.
+
+$IV,1$----07/08/14 04:33:20----$IV,0$
+* I changed $LK,"GodDoodleSprite",A="MN:GodDoodleSprite"$().
+
+$IV,1$----06/30/14 02:32:47----$IV,0$
+* Changed max FPS to 30 instead of 60.
+* Got rid of min and max FPS control.
+* $LK,"R",A="MN:R"$("refresh","FPS");
+
+$IV,1$----06/20/14 12:02:44----$IV,0$
+* $BK,1$TempleOS version 2.11 Released$BK,0$
+
+$IV,1$----06/16/14 13:09:10----$IV,0$
+* Added $LK,"DOCT_LST",A="MN:DOCT_LST"$, list widgets.  See $LK,"::/Demo/DolDoc/Form.CPP.Z"$.
+
+$IV,1$----06/13/14 21:27:17----$IV,0$
+* $LK,"R",A="MN:R"$("BootDrv","BootRescueDrv");
+* Fixed bug in "Boot Rescue Drive" feature.
+
+$IV,1$----06/10/14 03:11:14----$IV,0$
+* $BK,1$TempleOS version 2.10 Released$BK,0$
+* Got rid of $FG,4$ImportHashTable$FG$().
+* Got rid of $FG,4$OldSchool$FG$ demos.
+* $FG,2$AOT$FG$ compilation has been removed.  Use $FG,2$JIT$FG$.
+
+$IV,1$----06/02/14 13:52:50----$IV,0$
+* Improved HelpIndex.
+* Improved $LK,"::/Apps/TimeOut/TimeOut.CPP.Z"$.
+
+$IV,1$----05/26/14 16:13:11----$IV,0$
+* $BK,1$TempleOS version 2.09 Released$BK,0$
+* Added BLINK to $LK,"ToHtml",A="MN:ToHtml"$().
+* $LK,"R",A="MN:R"$("DocHome","DocTop");
+
+$IV,1$----05/24/14 20:46:11----$IV,0$
+* Got rid of $FG,4$Day$FG$(), $FG,4$Month$FG$(), $FG,4$Year$FG$(), etc.
+* $LK,"R",A="MN:R"$("WSDDisplayDefs","WSDDefsPut");
+* $LK,"R",A="MN:R"$("WSDGetDef","WSDDefGet");
+* $LK,"R",A="MN:R"$("WSDGetWord","WSDDefsGet");
+* $LK,"R",A="MN:R"$("WSDPtAtWord","WSWordPtAt");
+* $LK,"R",A="MN:R"$("WSGetHits","WSHitsGet");
+
+$IV,1$----05/23/14 04:50:25----$IV,0$
+* $LK,"R",A="MN:R"$("SqrDist","DistSqr");
+* $LK,"R",A="MN:R"$("SqrNorm","NormSqr");
+
+$IV,1$----05/16/14 15:43:17----$IV,0$
+* Added $LK,"DOF_DONT_WINMGR_SYNC",A="MN:DOF_DONT_WINMGR_SYNC"$.
+* Fetches comments for help index reports.
+* Made src line links more accurate.
+
+$IV,1$----05/15/14 06:45:33----$IV,0$
+* Added INVERT to $LK,"ToHtml",A="MN:ToHtml"$().
+
+$IV,1$----05/13/14 07:05:00----$IV,0$
+* $BK,1$TempleOS version 2.08 Released$BK,0$
+
+$IV,1$----05/11/14 08:22:44----$IV,0$
+* Added $LK,"Zip",A="MN:Zip"$() and $LK,"Unzip",A="MN:Unzip"$().
+
+$IV,1$----05/09/14 09:30:39----$IV,0$
+* Added $LK,"PopUpEd",A="MN:PopUpEd"$().
+* $LK,"R",A="MN:R"$("PopUpViewStr","PopUpViewPrint");
+
+$IV,1$----05/07/14 19:12:42----$IV,0$
+* Added classes to help index.
+* $LK,"CGrGlbls",A="MN:CGrGlbls"$		gr;
+* $LK,"CDolDocGlbls",A="MN:CDolDocGlbls"$		doldoc;
+* $LK,"CCmpGlbls",A="MN:CCmpGlbls"$		cmp;
+* $LK,"CUasmGlbls",A="MN:CUasmGlbls"$		uasm;
+* $LK,"CTextGlbls",A="MN:CTextGlbls"$		text;
+
+$IV,1$----05/05/14 23:37:52----$IV,0$
+* $LK,"CGodGlbls",A="MN:CGodGlbls"$		god;
+* $LK,"CMusicGlbls",A="MN:CMusicGlbls"$		music;
+* $LK,"CWordStatGlbls",A="MN:CWordStatGlbls"$	ws;
+* $LK,"CWordStatDictGlbls",A="MN:CWordStatDictGlbls"$	wsd;
+
+$IV,1$----05/05/14 19:54:46----$IV,0$
+* $LK,"CWallPaperGlbls",A="MN:CWallPaperGlbls"$	*wall;
+* $LK,"CWinMgrTimingGlbls",A="MN:CWinMgrTimingGlbls"$	*winmgr.t;
+* $LK,"CWinMgrGlbls",A="MN:CWinMgrGlbls"$		winmgr;
+* $LK,"CSndGlbls",A="MN:CSndGlbls"$		snd;
+* $LK,"CDevGlbls",A="MN:CDevGlbls"$		dev;
+* $LK,"CDskGlbls",A="MN:CDskGlbls"$		dsk;
+* $LK,"CDbgGlbls",A="MN:CDbgGlbls"$		dbg;
+* $LK,"CCntsGlbls",A="MN:CCntsGlbls"$		cnts;
+* $LK,"CKeyDevGlbls",A="MN:CKeyDevGlbls"$		keydev;
+* $LK,"CIPStateGlbls",A="MN:CIPStateGlbls"$		ip;
+* $LK,"CMouseStateGlbls",A="MN:CMouseStateGlbls"$	mouse;
+* $LK,"CKbdStateGlbls",A="MN:CKbdStateGlbls"$	kbd;
+
+$IV,1$----05/05/14 09:14:51----$IV,0$
+* Added $MA-X+PU,"::/Apps/Budget",LM="Cd(\"::/Apps/Budget\");Dir;View;\n"$.
+
+$IV,1$----05/03/14 23:31:50----$IV,0$
+* Added $LK,"DOCEF_USER_DATA",A="MN:DOCEF_USER_DATA"$ $FG,2$arg=$FG$ flag.
+* $LK,"R",A="MN:R"$("Backward","Bwd");
+* Added $LK,"::/Apps/Budget/Budget.CPP"$.
+
+$IV,1$----04/30/14 23:41:42----$IV,0$
+* Added $LK,"CBinFile",A="MN:CBinFile"$.signature.
+
+$IV,1$----04/29/14 15:43:22----$IV,0$
+* $BK,1$TempleOS version 2.07 Released$BK,0$
+
+$IV,1$----04/27/14 05:19:18----$IV,0$
+* Improved documentation.
+* Changed $LK,"CBinFile",A="MN:CBinFile"$ format.
+* Locked-in 640x480 with $LK,"GrUpdateLine64",A="MN:GrUpdateLine64"$().
+
+$IV,1$----04/23/14 22:14:43----$IV,0$
+* Added $LK,"::/Demo/Lectures/NegDisp.CPP"$.
+* $LK,"R",A="MN:R"$("GrLineRect4","GrBorder");
+* Changed $LK,"::/Adam/Gr/GrTextBase.CPP"$.
+* Fixed terminal button on wallpaper.  Yikes!
+
+$IV,1$----04/21/14 16:29:00----$IV,0$
+* Got rid of $FG,4$Spaces$FG$() and $FG,4$NewLine$FG$().  Replaced $FG,4$NewLine$FG$(5) with "%h*c",5,'\n';
+* Improved profiler.
+* Changed $FG,4$CCPU.chained_timer_irq$FG$ to $LK,"CCPU",A="MN:CCPU"$.profiler_timer_irq.
+
+$IV,1$----04/19/14 18:05:09----$IV,0$
+* Got rid of double spacing.
+* Fixed bug in page down.
+* Sorted headers and externs.
+
+$IV,1$----04/18/14 21:45:17----$IV,0$
+* Improved documentation.
+
+$IV,1$----04/16/14 15:49:13----$IV,0$
+* $BK,1$TempleOS version 2.06 Released$BK,0$
+
+$IV,1$----04/15/14 12:29:02----$IV,0$
+* Got rid of lock-to-page and lock-to-center document features.
+* Changed $FG,2$$$DA...$$$FG$ data type to use an arg.  $FG,2$$$DA,-U64+U16,...$$$FG$ is now changed to $FG,2$$$DA,RT=I16,...$$$FG$.
+* $LK,"R",A="MN:R"$("DOCEF1_","DOCEF_");
+* Changed Fs->$LK,"win_inhibits",A="MN:WIF_SELF_FOCUS"$.
+
+$IV,1$----04/13/14 16:20:11----$IV,0$
+* Added $LK,"LK_DOC",A="MN:LK_DOC"$, $LK,"LK_DOC_ANCHOR",A="MN:LK_DOC_ANCHOR"$, $LK,"LK_DOC_LINE",A="MN:LK_DOC_LINE"$ and $LK,"LK_DOC_FIND",A="MN:LK_DOC_FIND"$.
+* $LK,"R",A="MN:R"$("Doc","DolDoc");
+* Improved documentation.
+* Added $LK,"::/Demo/LastClass.CPP"$.
+
+$IV,1$----04/13/14 00:09:48----$IV,0$
+* Got rid of $FG,4$ProfBin()$FG$ and $FG,4$ProfCPU()$FG$.
+* $LK,"R",A="MN:R"$("ProfAll","Prof");
+* Improved documentation.
+* Changed $LK,"CDoc",A="MN:CDoc"$.desc.
+
+$IV,1$----04/11/14 16:58:56----$IV,0$
+* Renamed Sprite functions and vars.
+* Added $LK,"LexExpressionI64",A="MN:LexExpressionI64"$() and $LK,"LexExpressionF64",A="MN:LexExpressionF64"$().  I'm chagrinned.
+
+$IV,1$----04/11/14 11:55:36----$IV,0$
+* Added $LK,"FileNameTempTxt",A="MN:FileNameTempTxt"$().
+* $FG,2$<CTRL-r>$FG$ sprite edit-as-text is now much better.
+* Added $LK,"Str2ColorU16",A="MN:Str2ColorU16"$(), $LK,"Str2ColorU32",A="MN:Str2ColorU32"$(), $LK,"LexFirstRem",A="MN:LexFirstRem"$(), $LK,"Sprite2Code",A="MN:Sprite2Code"$() and $LK,"Code2Sprite",A="MN:Code2Sprite"$().
+* $LK,"R",A="MN:R"$("Color2Text","Color2Str");
+* $LK,"R",A="MN:R"$("Sprite2Text","SpriteElem2OneLineSummary");
+* $LK,"R",A="MN:R"$("DocPrintWhole","DocPrintAtomic");
+* Fixed bug in $LK,"GrRect",A="MN:GrRect"$() relating to dithering.
+* Got rid of $LK,"CDoc",A="MN:CDoc"$.recalc_start.
+
+$IV,1$----04/09/14 14:10:17----$IV,0$
+* Fixed compiler bug by adding a pass to overcome an optimization problem.
+* Improved $LK,"::/Apps/AfterEgypt/GodTalking.CPP"$.
+* Improved $LK,"::/Demo/Graphics/Mountain.CPP"$.
+* Improved $LK,"::/Demo/Graphics/Camp.CPP"$.
+* Improved $LK,"::/Demo/Graphics/SunMoon.CPP"$.
+* Improved $LK,"::/Demo/Games/DunGen.CPP"$.
+* Improved $LK,"::/Demo/Games/FlatTops.CPP"$.
+
+$IV,1$----04/07/14 07:46:56----$IV,0$
+* $BK,1$TempleOS version 2.05 Released$BK,0$
+
+$IV,1$----04/05/14 03:09:18----$IV,0$
+* Got rid of $FG,2$Fs->answers_displayed$FG$ and set it to a fixed value of one answer.
+* Improved documentation.
+* $LK,"R",A="MN:R"$("MusicOrgan","Psalmody");
+* Improved $LK,"AFGetChar",A="MN:AFGetChar"$() and $LK,"AFUntilChar",A="MN:AFUntilChar"$().
+
+$IV,1$----04/03/14 05:57:06----$IV,0$
+* Improved $MA-X+PU,"Tour",LM="SpawnUser(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$.
+* $LK,"R",A="MN:R"$("ipx","ip.pos.x");
+* $LK,"R",A="MN:R"$("mxx","mouse.pos.x");
+* $LK,"R",A="MN:R"$("mxx_prescale","mouse.prescale.x");
+* $LK,"R",A="MN:R"$("A2Date","Str2Date");
+* $LK,"R",A="MN:R"$("A2I64","Str2I64");
+* $LK,"R",A="MN:R"$("A2F64","Str2F64");
+* $LK,"R",A="MN:R"$("SPrint","StrPrint");
+* $LK,"R",A="MN:R"$("MPrint","MStrPrint");
+* $LK,"R",A="MN:R"$("Scan","StrScan");
+
+$IV,1$----04/01/14 08:49:57----$IV,0$
+* Added $LK,"::/Demo/Games/ElephantWalk.CPP"$.
+
+$IV,1$----03/28/14 22:25:48----$IV,0$
+* $LK,"R",A="MN:R"$("COLOR_TRANSPARENT","TRANSPARENT");
+
+$IV,1$----03/26/14 08:40:25----$IV,0$
+* $LK,"R",A="MN:R"$("_ATTR_DIR","RS_ATTR_DIR");
+
+$IV,1$----03/24/14 15:17:14----$IV,0$
+* Coined "DolDoc" as a name for the TempleOS document type.
+* Added $LK,"::/Demo/DolDoc/ClickCallBack.CPP"$.
+
+$IV,1$----03/21/14 04:02:29----$IV,0$
+* $BK,1$TempleOS version 2.04 Released$BK,0$
+
+$IV,1$----03/19/14 21:54:23----$IV,0$
+* $LK,"R",A="MN:R"$("BulgeBomber","BomberGolf");
+* Added $LK,"::/Demo/Dsk/SerializeTree.CPP"$.
+* $LK,"R",A="MN:R"$("DirLstDel","DirTreeDel");
+* Added $LK,"::/Misc/Tour/Tour7.AUT"$ which covers File Masks.
+* $LK,"R",A="MN:R"$("MGetS","GetStr");
+* $LK,"R",A="MN:R"$("PmtStr","GetStr");
 
 $IV,1$----03/17/14 22:34:11----$IV,0$
 * Changed $FG,2$$$MA$FG$ to use "tag$FG$" instead of "$FG,2$A=$FG$".
-* Changed $LK,"DOCEF1_HAS_TERMINATOR",A="MN:DOCEF1_HAS_TERMINATOR"$ -T to -TRM.
-* Changed $LK,"Dollar",A="FI:::/Doc/Dollar.TXT.Z"$ format.  Some flags are not at start.
+* Changed $LK,"DOCEF_HAS_TERMINATOR",A="MN:DOCEF_HAS_TERMINATOR"$ -T to -TRM.
+* Changed $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ format.  Some flags are not at start.
 
 $IV,1$----03/07/14 04:54:10----$IV,0$
-* Added $LK,"::/Demo/ReverseFileExample/Reverse.CPP.Z"$.
+* Added $LK,"::/Demo/ReverseFileExample/Reverse.CPP"$.
 
 $IV,1$----03/03/14 00:18:47----$IV,0$
 * $BK,1$TempleOS version 2.03 Released$BK,0$
-* $LK,"R",A="MN:R"$("A2I","A2I64");
+* $LK,"R",A="MN:R"$("A2I","Str2I64");
 * Removed "Binary Type" from $LK,"CDocBin",A="MN:CDocBin"$.  Old sprites no longer work.
 
 $IV,1$----02/25/14 16:09:01----$IV,0$
@@ -38,16 +263,16 @@ $IV,1$----02/17/14 20:50:58----$IV,0$
 * $LK,"R",A="MN:R"$("DoItOnce","DoOnce");
 
 $IV,1$----02/12/14 14:25:59----$IV,0$
-* Added BMP/GRA file save to $FG,2$CTRL-R$FG$.
-* Added $FG,2$CTRL-ALT-S$FG$ for screen shot to clipboard.
-* Reformed $LK,"CGrid",A="MN:CGrid"$ to be simple.
+* Added BMP/GRA file save to $FG,2$<CTRL-r>$FG$.
+* Added $FG,2$<CTRL-ALT-s>$FG$ for screen shot to clipboard.
+* Reformed $LK,"CGridGlbls",A="MN:CGridGlbls"$ to be simple.
 
 $IV,1$----02/10/14 09:19:59----$IV,0$
 * Added $LK,"HashPublic",A="MN:HashPublic"$().
 * Changed FUF_WHOLE_LABELS $FG,2$+lf$FG$/$FG,2$+lb$FG$ to $FG,2$+lb$FG$/$FG,2$+la$FG$.
 * Got rid of $FG,4$FilesOrder()$FG$, replacing it with $LK,"FUF_CLUSTER_ORDER",A="MN:FUF_CLUSTER_ORDER"$.
-* Added $LK,"::/Demo/Graphics/InputPointer.CPP.Z"$.
-* Made $LK,"gr_dc",A="MN:gr_dc"$ the default device context for graphics routines.
+* Added $LK,"::/Demo/Graphics/InputPointer.CPP"$.
+* Made $LK,"gr.dc",A="MN:CGrGlbls"$ the default device context for graphics routines.
 
 $IV,1$----01/28/14 01:44:46----$IV,0$
 * In a function with an ASM{} blk, you can now JMP to a function goto label.
@@ -58,15 +283,15 @@ $IV,1$----01/27/14 09:02:20----$IV,0$
 
 $IV,1$----01/26/14 03:27:55----$IV,0$
 * Moved $FG,4$fun_class$FG$ to $LK,"CLex",A="MN:CLex"$.htc.fun.
-* Got rid of K=1024 sub_fmt flag in $LK,"SPrintJoin",A="MN:SPrintJoin"$.
+* Got rid of K=1024 sub_fmt flag in $LK,"StrPrintJoin",A="MN:StrPrintJoin"$.
 * Changed MapFile code_heap line addresses to 32-bit.
 * Got rid of $LK,"CTask",A="MN:CTask"$.user_data1-3. 
 * Got rid of $FG,4$ExpressionBinDel$FG$().
 * Got rid of $LK,"CIntermediateCode",A="MN:CIntermediateCode"$.ic_ext_body.
-* Cleaned-up $LK,"::/Compiler/ExpParser.CPP.Z"$.
+* Cleaned-up $LK,"::/Compiler/ExpParser.CPP"$.
 
 $IV,1$----01/24/14 06:40:47----$IV,0$
-* $LK,"R",A="MN:R"$("DocInsSafe","DocPrintWhole");
+* $LK,"R",A="MN:R"$("DocInsSafe","DocPrintAtomic");
 * $LK,"R",A="MN:R"$("DocPutSPartial","DocPrintPartial");
 * Made private WordStat links WHITE.
 * Added "+s" to $LK,"FilesFind",A="MN:FilesFind"$().
@@ -76,16 +301,16 @@ $IV,1$----01/24/14 06:40:47----$IV,0$
 * $LK,"R",A="MN:R"$("TreeSize","Size");
 * $LK,"R",A="MN:R"$("FileSize","Size");
 * $LK,"R",A="MN:R"$("MergeChk","Merge");
-* Added $LK,"::/Demo/Graphics/Balloon.CPP.Z"$.
+* Added $LK,"::/Demo/Graphics/Balloon.CPP"$.
 * Added warning for 64-bit reg vars.
 
 $IV,1$----01/13/14 14:39:34----$IV,0$
-* Optimized $FG,2$if (Carry)$FG$.  See $LK,"::/Demo/Carry.CPP.Z"$.
+* Optimized $FG,2$if (Carry)$FG$.  See $LK,"::/Demo/Carry.CPP"$.
 
 $IV,1$----01/11/14 21:52:00----$IV,0$
 * Added $LK,"BibleLine2Verse",A="MN:BibleLine2Verse"$().
-* Shifted glbl vars from $LK,"::/Kernel/KStart.CPP.Z"$ to $LK,"CSysFixedArea",A="MN:CSysFixedArea"$.
-* Added $LK,"OneTimePopUp",A="MN:OneTimePopUp"$() msg to $LK,"::/Apps/X-Caliber/X-Caliber.CPP.Z"$.  Delete registry and reboot if you are upgrading.
+* Shifted glbl vars from $LK,"::/Kernel/KStart.CPP"$ to $LK,"CSysFixedArea",A="MN:CSysFixedArea"$.
+* Added $LK,"OneTimePopUp",A="MN:OneTimePopUp"$() msg to $LK,"::/Apps/X-Caliber/X-Caliber.CPP"$.  Delete registry and reboot if you are upgrading.
 
 $IV,1$----01/09/14 20:51:20----$IV,0$
 * Converted $FG,2$fp_plot()$FG$ graphics routines to Bool with abort.
@@ -100,7 +325,7 @@ $IV,1$----01/07/14 11:46:38----$IV,0$
 
 $IV,1$----01/06/14 19:22:53----$IV,0$
 * Added $LK,"::/Demo/Asm/AsmAndC3.CPP"$.
-* Added $LK,"::/Demo/OldSchool/SingleFileAOT/Single.CPP"$.
+* Added $FG,4$::/Demo/OldSchool/SingleFileAOT/Single.CPP$FG$
 * Made compiler compile ASM instructions mixed-in with HolyC.
 * Improved $LK,"::/Demo/Graphics/Camp.CPP"$.
 
@@ -109,304 +334,3 @@ $IV,1$----01/03/14 03:39:30----$IV,0$
 
 $IV,1$----01/01/14 13:16:59----$IV,0$
 * Got rid of XSUM in $LK,"CBinFile",A="MN:CBinFile"$ header.
-
-$IV,1$----12/30/13 22:13:59----$IV,0$
-* Added $LK,"::/Apps/MusicOrgan/Examples/killed.CPP"$.
-* Fixed bug in $LK,"U",A="MN:U"$()nassemble.
-* Fixed compiler bug with multipling by 1.0.
-* Improved $LK,"::/Apps/AfterEgypt/GodTalking.CPP"$.
-* Improved $LK,"::/Demo/Graphics/Mountain.CPP"$.
-
-$IV,1$----12/28/13 16:05:41----$IV,0$
-* $BK,1$TempleOS version 1.11 Released$BK,0$
-* Added $LK,"ip_throttle_step",A="MN:ip_throttle_step"$.
-* Improved $LK,"::/Demo/Games/BattleLines.CPP"$.
-* Improved $LK,"::/Demo/Games/BlackDiamond.CPP"$.
-* I changed the $FG,2$.GRA$FG$ file format.
-* $LK,"R",A="MN:R"$("Pixel","Pix");
-* $LK,"R",A="MN:R"$("win_scroll","scroll");
-* Added $LK,"::/Demo/SortFileExample/F64FileGen.CPP"$ and $LK,"::/Demo/SortFileExample/F64FileSort.CPP"$.
-* Added $FG,2$U8 *filename$FG$ as arg to $LK,"DocNew",A="MN:DocNew"$().
-* $LK,"R",A="MN:R"$("SpritePlot","Sprite");
-* $LK,"R",A="MN:R"$("SpritePlotRot","Sprite");
-* Got rid of $FG,4$tT$FG$() and $FG,4$tJ$FG$(), use $LK,"tS",A="MN:tS"$().
-
-$IV,1$----12/27/13 14:09:04----$IV,0$
-* $LK,"R",A="MN:R"$("PutSprite","Sprite");
-* Got rid of $FG,4$TASKf_CURRENTLY_RUNNING$FG$.
-* Improved $LK,"::/Demo/Games/Varoom.CPP"$.
-
-$IV,1$----12/16/13 00:54:35----$IV,0$
-* Got rid of $FG,4$TaskInitExt$FG$().
-
-$IV,1$----12/14/13 11:25:39----$IV,0$
-* $LK,"R",A="MN:R"$("sys_num_task_inits","sys_num_spawned_tasks");
-* Got rid of $FG,4$Fs->user_num$FG$.
-* Got rid of $FG,4$IntEOI$FG$().
-* Got rid of $FG,4$DISPLAYf_HAS_CLOSE_WIN$FG$.
-
-$IV,1$----12/12/13 05:33:07----$IV,0$
-* It is now mandatory, not optional, that NULL dereference causes a page fault.
-
-$IV,1$----12/09/13 23:46:38----$IV,0$
-* Added $FG,2$Acct Drv$FG$ prompt to $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
-* Added $FG,2$BINFILE$FG$ directive.
-* $LK,"R",A="MN:R"$("UseTermDoc","DocTermNew");
-* $LK,"R",A="MN:R"$("IsInDbg","IsDbg");
-* Got rid of $FG,4$IDE$FG$().  It was worthless.
-
-$IV,1$----12/08/13 17:52:33----$IV,0$
-* $LK,"R",A="MN:R"$("AOTAdam.HPP","AOT.HPP");
-* Got rid of $FG,4$Deterministic$FG$ option.
-* Got rid of $FG,4$OPTf_REPLACE_SYMS$FG$.
-* $LK,"R",A="MN:R"$("ExePutS3","ExePutS2");
-
-$IV,1$----12/07/13 05:18:12----$IV,0$
-* Added $LK,"::/Demo/Graphics/Moon.CPP"$.
-* $LK,"R",A="MN:R"$("dither_probability","dither_probability_u16");
-* $LK,"R",A="MN:R"$("plane_size","body_size");
-* Got rid of $FG,4$DCT_COLOR8$FG$. $LK,"DCNew",A="MN:DCNew"$() has fewer args.
-
-$IV,1$----12/03/13 03:10:20----$IV,0$
-* Modified the $LK,"::/Doc/Charter.TXT"$.
-* Modified $LK,"CBootStruct",A="MN:CBootStruct"$. Old RedSea partitions are invalid.
-* $LK,"R",A="MN:R"$("deref_bitmap","ic_bitmap_deref");
-* $LK,"R",A="MN:R"$("alpha_numeric_bitmap","chars_bitmap_alpha_numeric");
-* Added $LK,"::/Doc/RedSea.TXT"$.
-* Cleaned-up $LK,"::/Adam/Utils/HeapLog.CPP"$.
-* "%p" is PSECT, "%P" is link to PSECT.
-* $LK,"R",A="MN:R"$("p1","a1"); In /Compiler
-* Added compiler optimization relating to bit shifts.
-* $LK,"R",A="MN:R"$("doc_tag_types","doc_type_flags_tag");
-
-$IV,1$----11/29/13 04:41:50----$IV,0$
-* $BK,1$TempleOS version 1.10 Released$BK,0$
-* Got rid of old $FG,4$PutExcept()$FG$ and $FG,4$ExceptDepth()$FG$.
-* $LK,"R",A="MN:R"$("CatchAll","PutExcept");
-* Changed $LK,"throw",A="MN:throw"$() to a single char string arg.
-
-$IV,1$----11/28/13 04:15:03----$IV,0$
-* Added $LK,"::/Demo/AcctExample/TAD/Archive/Comm.CPP"$.
-
-$IV,1$----11/20/13 08:56:52----$IV,0$
-* Got rid of $FG,4$WinInhibit$FG$().
-* Added $LK,"GodInit",A="FF:::/Adam/God/HolySpirit.CPP,GodInit"$(), $LK,"GodWord",A="FF:::/Adam/God/HolySpirit.CPP,GodWord"$() and $LK,"GodPassage",A="FF:::/Adam/God/HolySpirit.CPP,GodPassage"$().
-* $LK,"R",A="MN:R"$("WIF_ALL","WIG_TASK_DFT-WIF_FOCUS");
-* Changed $FG,4$TASKf_USER$FG$ to $LK,"WIf_FOCUS",A="MN:WIf_FOCUS"$.
-* Changed $FG,2$WordStat$FG$.
-* Got rid of $LK,"CHashDefineStr",A="MN:CHashDefineStr"$.caller.
-
-$IV,1$----11/18/13 12:58:17----$IV,0$
-* Got rid of $FG,4$StrAdd$FG$().
-* Optimized $LK,"::/Adam/Doc/DocPlain.CPP"$.
-
-$IV,1$----11/16/13 17:16:28----$IV,0$
-* Cleaned-up $LK,"SPrintJoin",A="MN:SPrintJoin"$().  Added %/Q and %/q.
-* Fixed $LK,"AdamLog",A="MN:AdamLog"$(), etc.
-* Cleaned-up $LK,"CDocSettings",A="MN:CDocSettings"$.
-
-$IV,1$----11/14/13 07:21:17----$IV,0$
-* $BK,1$TempleOS version 1.09 Released$BK,0$
-* $LK,"R",A="MN:R"$("DefineSubCnt","DefineCnt");
-* Got rid of $FG,4$DOCEF1_ALIAS$FG$.
-* Cleaned-up $LK,"DocRecalc",A="MN:DocRecalc"$().
-
-$IV,1$----11/12/13 17:14:46----$IV,0$
-* Cleaned-up $LK,"LexGetChar",A="MN:LexGetChar"$().
-
-$IV,1$----11/10/13 10:18:41----$IV,0$
-* Added $LK,"::/Apps/AfterEgypt/Horeb2MP.CPP"$.
-* Added $LK,"::/Doc/Demands.TXT"$.
-
-$IV,1$----11/08/13 22:01:52----$IV,0$
-* Tweeked disk code.
-* Added $LK,"HPET_initial",A="MN:HPET_initial"$.
-* Compiler uses smaller $FG,2$switch()$FG$ jmp tables.
-
-$IV,1$----11/06/13 11:01:04----$IV,0$
-* Improved $LK,"ATAPIWritePktWord",A="MN:ATAPIWritePktWord"$().
-* Got rid of $FG,4$RawI64$FG$(), $FG,4$RawF64$FG$(), $FG,4$RawStr$FG$(), $FG,4$RawAdd$FG$().
-* Got rid of $FG,2$$$HI,""$$$FG$ and $FG,2$$$HV,""$$$FG$.
-* Compiler optimization on $LK,"Bt",A="MN:Bt"$().
-
-$IV,1$----11/05/13 01:51:23----$IV,0$
-* Set RedSea FileSystem sectors-per-cluster to one.
-* $LK,"R",A="MN:R"$("GrScaleMatEqu","GrScaleEqu");
-* $LK,"R",A="MN:R"$("GrScaleMat","GrScaleNew");
-
-$IV,1$----11/02/13 18:34:53----$IV,0$
-* $BK,1$TempleOS version 1.08 Released$BK,0$
-* $LK,"R",A="MN:R"$("GrRotX","GrRotXNew");
-
-$IV,1$----11/01/13 19:32:27----$IV,0$
-* Added HolyC feature: $LK,"::/Demo/SubSwitch.CPP"$.
-* Added $LK,"ZipRep",A="MN:ZipRep"$() to spot files with redundancy.
-* Cleaned-up $LK,"DocInit",A="MN:DocInit"$().
-
-$IV,1$----10/30/13 09:23:45----$IV,0$
-* Added $LK,"HashLstAdd",A="MN:HashLstAdd"$() and $LK,"HashDefineLstAdd",A="MN:HashDefineLstAdd"$().
-* Added $LK,"DOCf_COLOR_NAMES",A="MN:DOCf_COLOR_NAMES"$.
-* Cleaned-up $LK,"::/Adam/Utils/Diff.CPP"$.
-
-$IV,1$----10/24/13 16:36:04----$IV,0$
-* Compiler optimization: Replaced $FG,2$ENTER$FG$ and $FG,2$LEAVE$FG$ with $FG,2$PUSH RBP$FG$;$FG,2$MOVE RBP,RSP$FG$;$FG,2$POP RBP$FG$.
-* Broke-up large files.
-
-$IV,1$----10/24/13 03:48:22----$IV,0$
-* Added $LK,"HashTablePurge",A="MN:HashTablePurge"$().
-* Added $LK,"HTF_RESOLVE",A="MN:HTF_RESOLVE"$.
-* $LK,"R",A="MN:R"$("MakeOSInstallPrtBootLoader","MakeOSPrtBootInstall");
-* $LK,"R",A="MN:R"$("InstallMasterBootLoader","MasterBootInstall");
-
-$IV,1$----10/22/13 20:58:42----$IV,0$
-* Changed $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$ and $LK,"CPUStructInit",A="MN:CPUStructInit"$().
-
-$IV,1$----10/21/13 09:44:21----$IV,0$
-* Added $LK,"::/Demo/DateTime.CPP"$.
-
-$IV,1$----10/19/13 12:45:33----$IV,0$
-* Got rid of $FG,4$DCT_COLOR8$FG$ check and fixed $LK,"GrRect",A="MN:GrRect"$().
-
-$IV,1$----10/18/13 06:56:31----$IV,0$
-* $BK,1$TempleOS version 1.07 Released$BK,0$
-* Changed $FG,2$%D %T$FG$ -- got rid of subcodes.
-* Got rid of $FG,4$LTrace$FG$() and $FG,4$PTrace$FG$().
-* $LK,"R",A="MN:R"$("GetDateTime","Now");
-* $LK,"R",A="MN:R"$("Date2DateStruct","Date2Struct");
-
-$IV,1$----10/14/13 02:59:18----$IV,0$
-* Fixed compiler bug -- floats in triple compare.
-
-$IV,1$----10/13/13 23:33:51----$IV,0$
-* Improved Compiler.
-
-$IV,1$----10/10/13 00:12:20----$IV,0$
-* $LK,"R",A="MN:R"$("PutChar","PutChars");
-* Changed $LK,"DocEntryRun",A="MN:DocEntryRun"$().
-
-$IV,1$----10/05/13 08:16:36----$IV,0$
-* $LK,"R",A="MN:R"$("tMBeat","Beat");
-* Moved directories under $FG,2$/TempleOS$FG$ directory up to root directory.
-
-$IV,1$----10/03/13 20:25:16----$IV,0$
-* Improved $LK,"Ed",A="MN:Ed"$() code.
-* Added $LK,"::/Apps/MusicOrgan/JukePuppet.CPP"$.
-
-$IV,1$----09/29/13 15:42:18----$IV,0$
-* Added $LK,"BibleLines",A="MN:BibleLines"$().
-
-$IV,1$----09/27/13 23:55:48----$IV,0$
-* $BK,1$TempleOS version 1.06 Released$BK,0$
-* Renumbered sprite commands -- old sprites are invalid until converted. $FG,4$::/Misc/SpriteCvt0106.CPP$FG$.
-
-$IV,1$----09/27/13 07:03:37----$IV,0$
-* Added $FG,2$haserrcode$FG$ keyword to compiler to help make interrupt handlers. See $LK,"::/Demo/Lectures/PageTableEntries2.CPP"$.
-* Improved compiler's $LK,"PrsClass",A="MN:PrsClass"$().
-
-$IV,1$----09/25/13 20:59:12----$IV,0$
-* Made compiler N passes.
-* Compiler change: Made compare to zero same as test.
-* Fixed signed and unsigned asm opcodes.  (Optimizes some cases.)
-* Moved compiler to low mem.
-* Added $FG,2$lastclass$FG$ as a special compiler dft arg.
-* Used  $FG,2$lastclass$FG$ in $LK,"ClassRep",A="MN:ClassRep"$() and $LK,"DocFormDo",A="MN:DocFormDo"$().
-* Chged arg order in $LK,"ClassRep",A="MN:ClassRep"$().
-* $LK,"R",A="MN:R"$("NamedFrame","Frame");
-* Changed imports in binary file format.
-
-$IV,1$----09/25/13 00:12:26----$IV,0$
-* Added $LK,"::/Demo/Graphics/Elephant.CPP"$.
-
-$IV,1$----09/14/13 22:16:43----$IV,0$
-* Added $LK,"::/Demo/Carry.CPP"$.
-* Got rid of $LK,"CDirEntry",A="MN:CDirEntry"$.expanded_size.
-  $BK,1$$FG,4$!!! Warning !!!$FG$$BK,0$ RedSea file system is different, old RedSea partitions will
-  not work.
-
-$IV,1$----09/11/13 14:17:45----$IV,0$
-* $LK,"R",A="MN:R"$("FUF_JUST_TXT_FILES","FUF_JUST_TXT");
-* $LK,"R",A="MN:R"$("FILENAME_MASK","FILEMASK");
-* $LK,"R",A="MN:R"$("Lit","Imm");
-* Compiler optimization: Compare immediates.
-
-$IV,1$----08/31/13 14:36:22----$IV,0$
-* Made $LK,"tS",A="MN:tS"$ use $LK,"HPET",A="MN:HPET"$ if available.
-
-$IV,1$----08/30/13 03:21:38----$IV,0$
-* $BK,1$TempleOS version 1.05 Released$BK,0$
-* $LK,"R",A="MN:R"$("GetCurTimeDate","Now");
-* $LK,"R",A="MN:R"$("GetTimeStamp","GetTSC");
-* $LK,"R",A="MN:R"$("GetF","Scan");
-* $LK,"R",A="MN:R"$("BASE_PTR","RBP");
-* $LK,"R",A="MN:R"$("STK_PTR","RSP");
-* $LK,"R",A="MN:R"$("Getlags","GetRFlags");
-* $LK,"R",A="MN:R"$("SetFlags","SetRFlags");
-* Changed args on $LK,"FilesFindMatch",A="MN:FilesFindMatch"$().
-* $LK,"R",A="MN:R"$("SearchStr","StrFind"); and change args.
-* $LK,"R",A="MN:R"$("WildCardMatch","WildMatch"); and change args.
-* $LK,"R",A="MN:R"$("StrStr","StrMatch"); and changed args.
-* $LK,"R",A="MN:R"$("LstEntryMatch","LstMatch");
-* $LK,"R",A="MN:R"$("LstEntryPt","LstSub");
-* Added $LK,"RawPrint",A="MN:RawPrint"$().
-* $LK,"R",A="MN:R"$("DbgI64","RawI64"); etc.
-* $LK,"R",A="MN:R"$("MSPrintF","MPrint");
-* $LK,"R",A="MN:R"$("PrintF","Print");
-* $LK,"R",A="MN:R"$("AFDelayedPutS","AFPrint");
-* Converted PutS to Print
-
-$IV,1$----08/28/13 13:00:02----$IV,0$
-* $LK,"R",A="MN:R"$("HashRep","Who");
-* Converted file utils to flattened list.
-* Got rid of "hidden widgets".
-
-$IV,1$----08/27/13 19:31:01----$IV,0$
-* Fixed $LK,"Randomize",A="MN:Randomize"$().
-* Added $LK,"PopUpI64",A="MN:PopUpI64"$().
-* Added seed to $LK,"::/Apps/ToTheFront/ToTheFront.CPP"$.
-
-$IV,1$----08/27/13 12:13:35----$IV,0$
-* Got rid of $FG,4$IOSnd$FG$().
-* Got rid of $LK,"CDirEntry",A="MN:CDirEntry"$.xsum
-
-$IV,1$----08/26/13 15:54:09----$IV,0$
-* Improved $LK,"::/Demo/Games/EagleDive.CPP"$.
-* Improved $LK,"::/Adam/God/HolySpirit.CPP"$.
-* Songs
-
-$IV,1$----08/20/13 11:19:56----$IV,0$
-* $LK,"R",A="MN:R"$("CDirEntryDel","DirEntryDel");
-
-$IV,1$----08/12/13 08:42:47----$IV,0$
-* Added $LK,"::/Demo/Graphics/PanText.CPP"$.
-* Added $LK,"gr_pan_text_x",A="MN:gr_pan_text_x"$, $LK,"gr_pan_text_y",A="MN:gr_pan_text_y"$.
-* Fixed compiler bug -- Pow() operator type conversion.
-
-$IV,1$----08/04/13 10:31:36----$IV,0$
-* New Logo
-
-$IV,1$----07/27/13 07:17:43----$IV,0$
-* Fixed bug in $LK,"::/Adam/God/GodSong.CPP"$.
-* Improved $LK,"GrRect3",A="MN:GrRect3"$();
-
-$IV,1$----07/25/13 08:01:06----$IV,0$
-* Fixed $LK,"ROP_XOR",A="MN:ROP_XOR"$ in $LK,"GrRect",A="MN:GrRect"$().
-
-$IV,1$----07/24/13 22:56:09----$IV,0$
-* $LK,"R",A="MN:R"$("Sprite3b","Sprite3B");
-* $LK,"R",A="MN:R"$("P3I32","D3I32");
-* Added $LK,"GrRectB",A="MN:GrRectB"$().
-
-$IV,1$----07/14/13 21:14:25----$IV,0$
-* Fixed bug with saved cursor location.
-
-$IV,1$----07/12/13 11:54:11----$IV,0$
-* $LK,"R",A="MN:R"$("CONSTANT","CONST");
-
-$IV,1$----07/11/13 22:52:45----$IV,0$
-* Fixed bug in $LK,"Auto",A="MN:Auto"$().
-* Added score to $LK,"::/Demo/Games/Varoom.CPP"$.
-
-$IV,1$----07/08/13 05:12:13----$IV,0$
-* $LK,"R",A="MN:R"$("Expression","LexExpression");
-* Cleaned-up compiler.
-* Made graphics routines return I64, not Bool.

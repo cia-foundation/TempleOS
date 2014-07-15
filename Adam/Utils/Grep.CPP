@@ -1,4 +1,4 @@
-#help_index "Utils;Cmd Line (Typically)"
+#help_index "Cmd Line (Typically)"
 
 #define GRF_REPLACE	0
 #define GRF_SKIP	1
@@ -22,8 +22,6 @@ I64 PopUpGrepMenu()
   DocDel(doc);
   return i;
 }
-
-
 
 I64 GrepFile(U8 *needle_str,U8 *haystack_filename,I64 *_fuf_flags,U8 *replace_text)
 {
@@ -58,7 +56,7 @@ I64 GrepFile(U8 *needle_str,U8 *haystack_filename,I64 *_fuf_flags,U8 *replace_te
 	  if (first_on_line || Bt(_fuf_flags,FUf_REPLACE)) {
 	    first_on_line=FALSE;
 	    PutFileLink(haystack_filename,doc_e->y+1,TRUE);
-	    name_buf=MPrint("%s,%d",haystack_filename,doc_e->y+1);
+	    name_buf=MStrPrint("%s,%d",haystack_filename,doc_e->y+1);
 	    if (cur_l=DocPut) {
 	      old_flags=cur_l->flags&DOCF_PLAIN_TEXT;
 	      cur_l->flags|=DOCF_PLAIN_TEXT;
@@ -143,8 +141,8 @@ I64 GrepFile(U8 *needle_str,U8 *haystack_filename,I64 *_fuf_flags,U8 *replace_te
 }
 
 public I64 Grep(U8 *needle_str,U8 *files_find_mask="*",U8 *fu_flags=NULL,U8 *replace_text=NULL)
-/*
-This does not do regular expressions--my bad.
+{/*Find occurrences of a string in files.
+This does not do regular expressions.
 Anyway, it's good for searching and replacing.
 Let's say it stands for global replace ;-)
 
@@ -159,8 +157,6 @@ Let's say it stands for global replace ;-)
 "+lb"=only checks for label chars before.
 "+la"=only checks for label chars after.
 */
-
-{
   I64 cnt=0,fuf_flags=0;
   CDirEntry *tempde,*tempde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+i+f+F+T");
@@ -174,12 +170,12 @@ Let's say it stands for global replace ;-)
     cnt+=GrepFile(needle_str,tempde->full_name,&fuf_flags,replace_text);
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
   return cnt;
 }
 
 public I64 FileOcc(U8 *needle_str,U8 *files_find_mask="*",U8 *fu_flags="+r+i+l")
-{/*
+{/*Report occurrences of a string in files.
 "+r"=recurse
 "+i"=ignore case
 "+l"=whole labels only.
@@ -195,13 +191,13 @@ public I64 FileOcc(U8 *needle_str,U8 *files_find_mask="*",U8 *fu_flags="+r+i+l")
 
 class CGrep
 {
-  U8	find_text[136]	    fmtstr "$$DA-P,135,A=\"FIND        :%s\"$$\n";
-  U8	replace_text[136]   fmtstr "$$DA-P,135,A=\"REPLACE     :%s\"$$\n";
-  Bool	replace	    fmtstr "$$CB,\"REPLACE\"$$\n";
-  Bool	match_case	    fmtstr "$$CB,\"MATCH CASE\"$$\n";
-  Bool	whole_labels	    fmtstr "$$CB,\"WHOLE LABELS\"$$\n";
-  U8	filemask[136]	    fmtstr "$$DA-P,135,A=\"FILE MASK   :%s\"$$\n";
-  Bool	recurse	    fmtstr "$$CB,\"RECURSE\"$$\n";
+  U8	find_text[136]	fmtstr "$$DA-P,135,A=\"FIND        :%s\"$$\n";
+  U8	replace_text[136] fmtstr "$$DA-P,135,A=\"REPLACE     :%s\"$$\n";
+  Bool	replace		fmtstr "$$CB,\"REPLACE\"$$\n";
+  Bool	match_case	fmtstr "$$CB,\"MATCH CASE\"$$\n";
+  Bool	whole_labels	fmtstr "$$CB,\"WHOLE LABELS\"$$\n";
+  U8	filemask[136]	fmtstr "$$DA-P,135,A=\"FILE MASK   :%s\"$$\n";
+  Bool	recurse		fmtstr "$$CB,\"RECURSE\"$$\n";
 };
 
 I64 GrepWiz()
@@ -237,9 +233,9 @@ I64 GrepWiz()
       if (g->whole_labels)
 	CatPrint(buf,"+l");
       if (g->replace)
-	st=MPrint("\"$$$$WW+H,1$$$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\",\"%Q\");UserTaskCont;",dir,g->find_text,g->filemask,buf,g->replace_text);
+	st=MStrPrint("\"$$$$WW+H,1$$$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\",\"%Q\");UserTaskCont;",dir,g->find_text,g->filemask,buf,g->replace_text);
       else
-	st=MPrint("\"$$$$WW+H,1$$$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\");UserTaskCont;",dir,g->find_text,g->filemask,buf);
+	st=MStrPrint("\"$$$$WW+H,1$$$$\";Cd(\"%s\");Grep(\"%Q\",\"%Q\",\"%Q\");UserTaskCont;",dir,g->find_text,g->filemask,buf);
       result=PopUp(st);
     }
     Free(dir);
@@ -247,5 +243,3 @@ I64 GrepWiz()
   Free(g);
   return result;
 }
-
-#help_index ""

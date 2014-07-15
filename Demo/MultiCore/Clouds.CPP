@@ -1,4 +1,4 @@
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
 
 
@@ -14,8 +14,7 @@
 
 
 
-
-$SP,"<1>",BI=1,BP="::/Demo/Graphics/Camp.CPP.Z,Mountain"$ //Pointer to sprite in Camp.CPP.Z file
+$SP,"<1>",BI=1,BP="::/Demo/Graphics/Mountain.CPP.Z,Mountain"$ //Pointer to sprite in $LK,"Mountain.CPP",A="FI:::/Demo/Graphics/Mountain.CPP"$ file
 
 #define NUM_CLOUDS		16
 #define SKY_LINES		30
@@ -43,7 +42,7 @@ I64 mp_not_done_flags;
 U0 MPDrawClouds(CTask *task)
 {
   Cloud *c;
-  CDC *dc=DCAlias(gr_dc2,task);
+  CDC *dc=DCAlias(gr.dc2,task);
   I64 i,j,k,xx,yy,lo=Gs->num*CLOUD_PTS/mp_cnt,hi=(Gs->num+1)*CLOUD_PTS/mp_cnt;
 
   for (j=0,c=clouds;j<NUM_CLOUDS;j++,c++)
@@ -161,7 +160,7 @@ U0 CleanUp()
 }
 
 U0 SongTask(I64)
-{ //Song by the Holy Spirit
+{//Song by the Holy Spirit
 //This specifies a callback routine
 //to be called when the task dies.
   Fs->task_end_cb=&SndTaskEndCB;
@@ -188,8 +187,8 @@ U0 CloudScene()
     Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
 
     DocClear;
-    "$$BG,LTCYAN$$"; NewLine(SKY_LINES);
-    "$$BG,YELLOW$$"; NewLine(5);
+    "$$BG,LTCYAN$$%h*c",SKY_LINES,'\n';
+    "$$BG,YELLOW$$%h5c",'\n';
     BibleVerse(,"Exodus,14:19",7);
 
     Preempt(OFF);

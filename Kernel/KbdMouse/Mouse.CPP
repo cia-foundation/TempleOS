@@ -1,13 +1,13 @@
 U0 MousePktRead()
 {
   U8 j;
-  if (GetTSC>mouse_evt_time+time_stamp_freq>>3)
-    FifoU8Flush(mouse_fifo);
-  mouse_evt_time=GetTSC;
-  FifoU8Ins(mouse_fifo,InU8(KBD_PORT));
-  if (FifoU8Cnt(mouse_fifo)==mouse_pkt_size)
-    while (FifoU8Rem(mouse_fifo,&j))
-      FifoU8Ins(mouse2_fifo,j);
+  if (GetTSC>mouse.timestamp+cnts.time_stamp_freq>>3)
+    FifoU8Flush(mouse.fifo);
+  mouse.timestamp=GetTSC;
+  FifoU8Ins(mouse.fifo,InU8(KBD_PORT));
+  if (FifoU8Cnt(mouse.fifo)==mouse.pkt_size)
+    while (FifoU8Rem(mouse.fifo,&j))
+      FifoU8Ins(mouse.fifo2,j);
 }
 
 interrupt U0 MouseIntHandler()
@@ -15,9 +15,9 @@ interrupt U0 MouseIntHandler()
   CLD
   OutU8(0xA0,0x20);
   OutU8(0x20,0x20);
-  mouse_irqs_working=TRUE;
-  if (mouse_install_attempt_in_progress || !mouse_installed) {
-    kbdmouse_rst=TRUE;
+  mouse.irqs_working=TRUE;
+  if (mouse.install_in_progress || !mouse.installed) {
+    kbd.rst=TRUE;
     return;
   }
   MousePktRead;
@@ -29,9 +29,9 @@ U0 MouseGetDevType()
   KbdMouseCmdAck(0xF2);
   b=KbdCmdRead;
   if (b==3)
-    mouse_has_wheel=TRUE;
+    mouse.has_wheel=TRUE;
   else if (b==4)
-    mouse_has_ext_buttons=TRUE;
+    mouse.has_ext_buttons=TRUE;
 }
 
 Bool MouseRst()
@@ -41,8 +41,8 @@ Bool MouseRst()
   F64 timeout;
   Bool result=FALSE,present;
 
-  mouse_has_wheel=FALSE;
-  mouse_has_ext_buttons=FALSE;
+  mouse.has_wheel=FALSE;
+  mouse.has_ext_buttons=FALSE;
 
   _w=0x40E;
   present=MemPagePresentMark(_w,TRUE);
@@ -115,10 +115,10 @@ Bool MouseRst()
     KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
   catch
     Fs->catch_except=TRUE;
-  if (mouse_has_wheel || mouse_has_ext_buttons)
-    mouse_pkt_size=4;
+  if (mouse.has_wheel || mouse.has_ext_buttons)
+    mouse.pkt_size=4;
   else
-    mouse_pkt_size=3;
+    mouse.pkt_size=3;
   if (!result)
     try
       KbdCmdSend(KBD_CTRL,0xA7); //Disable Mouse
@@ -127,50 +127,48 @@ Bool MouseRst()
   return result;
 }
 
-
 U0 SetMouseSpeed()
 {
   I64 dd,temp;
-  if ((dd=SqrI64(old_mxx-mxx)+SqrI64(old_myy-myy)) &&
-      (temp=mouse_evt_time-mouse_last_evt_time))
-    mouse_speed=Sqrt(dd)*time_stamp_freq/temp;
-  mouse_last_evt_time=mouse_evt_time;
+  if ((dd=SqrI64(mouse_last.pos.x-mouse.pos.x)+SqrI64(mouse_last.pos.y-mouse.pos.y)) &&
+      (temp=mouse.timestamp-mouse_last.timestamp))
+    mouse.speed=Sqrt(dd)*cnts.time_stamp_freq/temp;
+  mouse_last.timestamp=mouse.timestamp;
 }
 
-U0 MouseUpdatePre(Bool *old_buttons)
+U0 MouseUpdatePre()
 {
-  I64 i;
-  old_mxx=mxx; old_myy=myy; old_mzz=mzz;
-  for (i=0;i<5;i++)
-    old_buttons[i]=mouse_buttons[i];
+  I64 old_timestamp=mouse_last.timestamp;
+  MemCpy(&mouse_last,&mouse,sizeof(CMouseStateGlbls));
+  mouse_last.timestamp=old_timestamp;
 }
 
-U0 MouseUpdatePost(Bool *old_buttons)
+U0 MouseUpdatePost()
 {
   I64 i;
-  mxx=mxx_prescale*mxx_scale*ip_grid.x_speed;
-  myy=myy_prescale*myy_scale*ip_grid.y_speed;
-  mzz=mzz_prescale*mzz_scale*ip_grid.z_speed;
+  mouse.pos.x=mouse.prescale.x*mouse.scale.x*ip_grid.x_speed;
+  mouse.pos.y=mouse.prescale.y*mouse.scale.y*ip_grid.y_speed;
+  mouse.pos.z=mouse.prescale.z*mouse.scale.z*ip_grid.z_speed;
 
-  i=Trunc(ipx_scale*mxx/ip_grid.x)*ip_grid.x+ipx_offset; //TODO ip_grid.x_offset?
+  i=Trunc(ip.scale.x*mouse.pos.x/ip_grid.x)*ip_grid.x+ip.offset.x; //TODO ip_grid.x_offset?
   if (i<0)
-    ipx_offset-=i;
-  else if (i>=gr_width)
-    ipx_offset+=gr_width-1-i;
+    ip.offset.x-=i;
+  else if (i>=GR_WIDTH)
+    ip.offset.x+=GR_WIDTH-1-i;
 
-  i=Trunc(ipy_scale*myy/ip_grid.y)*ip_grid.y+ipy_offset;
+  i=Trunc(ip.scale.y*mouse.pos.y/ip_grid.y)*ip_grid.y+ip.offset.y;
   if (i<0)
-    ipy_offset-=i;
-  else if (i>=gr_height)
-    ipy_offset+=gr_height-1-i;
+    ip.offset.y-=i;
+  else if (i>=GR_HEIGHT)
+    ip.offset.y+=GR_HEIGHT-1-i;
 
-  if (mxx!=old_mxx||myy!=old_myy||mzz!=old_mzz) {
-    mouse_evt=TRUE;
+  if (mouse.pos.x!=mouse_last.pos.x || mouse.pos.y!=mouse_last.pos.y || mouse.pos.z!=mouse_last.pos.z) {
+    mouse.evt=TRUE;
     SetMouseSpeed;
   } else
     for (i=0;i<5;i++)
-      if (mouse_buttons[i]!=old_buttons[i]) {
-	mouse_evt=TRUE;
+      if (mouse.buttons[i]!=mouse_last.buttons[i]) {
+	mouse.evt=TRUE;
 	break;
       }
 }
@@ -179,21 +177,19 @@ U0 MouseHandler()
 {
   I64 i,dx,dy,dz;
   U8 mouse_buf[4];
-  Bool old_buttons[5];
 
-  MouseUpdatePre(old_buttons);
-
+  MouseUpdatePre;
   for (i=0;i<4;i++)
     mouse_buf[i]=0;
-  for (i=0;i<mouse_pkt_size;i++)
-    if (!FifoU8Rem(mouse2_fifo,&mouse_buf[i]))
+  for (i=0;i<mouse.pkt_size;i++)
+    if (!FifoU8Rem(mouse.fifo2,&mouse_buf[i]))
       mouse_buf[i]=0;
 
-  mouse_buttons[0] = mouse_buf[0] & 1;
-  mouse_buttons[1] = (mouse_buf[0] & 2) >> 1;
-  mouse_buttons[2] = (mouse_buf[0] & 4) >> 2;
-  mouse_buttons[3] = (mouse_buf[3] & 0x10) >> 4;
-  mouse_buttons[4] = (mouse_buf[3] & 0x20) >> 5;
+  mouse.buttons[0] = mouse_buf[0] & 1;
+  mouse.buttons[1] = (mouse_buf[0] & 2) >> 1;
+  mouse.buttons[2] = (mouse_buf[0] & 4) >> 2;
+  mouse.buttons[3] = (mouse_buf[3] & 0x10) >> 4;
+  mouse.buttons[4] = (mouse_buf[3] & 0x20) >> 5;
   if (mouse_buf[0] & 0x10)
     dx=mouse_buf[1]-256;
   else
@@ -207,35 +203,33 @@ U0 MouseHandler()
   else
     dz=mouse_buf[3]&7;
 
-  mxx_prescale+=dx;
-  myy_prescale+=dy;
-  mzz_prescale+=dz;
+  mouse.prescale.x+=dx;
+  mouse.prescale.y+=dy;
+  mouse.prescale.z+=dz;
 
-  MouseUpdatePost(old_buttons);
+  MouseUpdatePost;
 }
 
-U0 SetMouseIP(I64 x,I64 y,I64 z,I64 l,I64 r,I64 c)
+U0 SetMouseIP(I64 x,I64 y,I64 z,I64 l,I64 r)
 {
-  Bool old_buttons[5];
-  mouse_evt_time=GetTSC;
-  MouseUpdatePre(old_buttons);
-  mxx_prescale=x/mxx_scale/ip_grid.x_speed;
-  myy_prescale=y/myy_scale/ip_grid.y_speed;
-  mzz_prescale=z/mzz_scale/ip_grid.z_speed;
-  mouse_buttons[0]=l;
-  mouse_buttons[1]=r;
-  mouse_buttons[2]=c; //unsure which one
-  MouseUpdatePost(old_buttons);
+  mouse.timestamp=GetTSC;
+  MouseUpdatePre;
+  mouse.prescale.x=x/mouse.scale.x/ip_grid.x_speed;
+  mouse.prescale.y=y/mouse.scale.y/ip_grid.y_speed;
+  mouse.prescale.z=z/mouse.scale.z/ip_grid.z_speed;
+  mouse.buttons[0]=l;
+  mouse.buttons[1]=r;
+  MouseUpdatePost;
 }
 
 U0 KbdMouseRst()
 {
   KbdCmdFlush;
-  FifoU8Flush(kbd2_fifo);
-  FifoU8Flush(mouse2_fifo);
-  FifoI64Flush(scan_code_fifo);
-  sys_cur_scan_code=0;
-  kbdmouse_rst=FALSE;
+  FifoU8Flush(kbd.fifo2);
+  FifoU8Flush(mouse.fifo2);
+  FifoI64Flush(kbd.scan_code_fifo);
+  kbd.scan_code=0;
+  kbd.rst=FALSE;
 }
 
 Bool MouseDriverInstall(I64 dummy=0) //can be spawned
@@ -244,34 +238,34 @@ Bool MouseDriverInstall(I64 dummy=0) //can be spawned
   I64 i;
   Bool old_preempt=IsPreempt;
   Preempt(ON);
-  mouse_install_attempt_in_progress=TRUE;
+  mouse.install_in_progress=TRUE;
   OutU8(0xA1,InU8(0xA1)|0x10);
-  mouse_installed=mouse_irqs_working=FALSE;
+  mouse.installed=mouse.irqs_working=FALSE;
   IntEntrySet(0x2C,&MouseIntHandler);
   for(i=0;i<5;i++)
-    mouse_buttons[i]=0;
+    mouse.buttons[i]=0;
   if (i=MouseRst)
     OutU8(0xA1,InU8(0xA1)&~0x10);
   KbdMouseRst;
-  mouse_install_attempts++;
-  mouse_installed=mouse_evt=i;
-  mouse_install_attempt_in_progress=FALSE;
+  mouse.install_attempts++;
+  mouse.installed=mouse.evt=i;
+  mouse.install_in_progress=FALSE;
   Preempt(old_preempt);
-  return mouse_installed;
+  return mouse.installed;
 }
 
 U0 KbdMouseHandler(Bool poll_kbd,Bool poll_mouse)
 {
-  if (mouse_install_attempt_in_progress) {
+  if (mouse.install_in_progress) {
     Yield;
     return;
   }
-  if (kbdmouse_rst)
+  if (kbd.rst)
     KbdMouseRst;
   else {
     if (poll_mouse &&
-	mouse_installed &&
-	!mouse_irqs_working) {
+	mouse.installed &&
+	!mouse.irqs_working) {
       PUSHFD
       CLI
       while (InU8(KBD_CTRL)&1)
@@ -283,13 +277,13 @@ U0 KbdMouseHandler(Bool poll_kbd,Bool poll_mouse)
       while (InU8(KBD_CTRL)&1)
 	KbdPktRead;
 
-    if (kbdmouse_rst)
+    if (kbd.rst)
       KbdMouseRst;
     else {
-      while (FifoU8Cnt(kbd2_fifo))
+      while (FifoU8Cnt(kbd.fifo2))
 	KbdHandler;
-      while (FifoU8Cnt(mouse2_fifo))
-	if (mouse_installed)
+      while (FifoU8Cnt(mouse.fifo2))
+	if (mouse.installed)
 	  MouseHandler;
 	else
 	  KbdMouseRst;
@@ -299,36 +293,21 @@ U0 KbdMouseHandler(Bool poll_kbd,Bool poll_mouse)
 
 U0 KbdMouseVarsInit()
 {
-  sys_key_cnt=0;
-  scan_code_fifo=FifoI64New(128);
-  kbd_fifo=FifoU8New(8);
-  kbd2_fifo=FifoU8New(64);
-  mouse_fifo=FifoU8New(8);
-  mouse2_fifo=FifoU8New(64);
-  MemSet(key_down_bitmap,0,256/8);
-  MemSet(key_down_bitmap2,0,256/8);
-  sys_last_down_scan_code=0;
-  sys_cur_scan_code=0;
-  kbdmouse_rst=FALSE;
-  kbd_irqs_working=FALSE;
-  mouse_irqs_working=FALSE;
-  mxx_scale=0.5;
-  myy_scale=0.5;
-  mzz_scale=1.0;
-  mxx_prescale=gr_width/mxx_scale/2.0;
-  myy_prescale=gr_height/myy_scale/2.0;
-  mzz_prescale=0/mzz_scale;
-  mxx=gr_width>>1;
-  myy=gr_height>>1;
-  mzz=0;
-  mouse_speed=0.0;
-  old_mxx=mxx;
-  old_myy=myy;
-  old_mzz=mzz;
-  mouse_installed=FALSE;
-  mouse_install_attempts=0;
-  mouse_last_evt_time=0;
-  mouse_has_wheel=FALSE;
-  mouse_has_ext_buttons=FALSE;
-  mouse_evt=FALSE;
+  MemSet(&kbd,0,sizeof(CKbdStateGlbls));
+  kbd.fifo=FifoU8New(8);
+  kbd.fifo2=FifoU8New(64);
+  kbd.scan_code_fifo=FifoI64New(128);
+  kbd.irqs_working=FALSE;
+  MemSet(&mouse,0,sizeof(CMouseStateGlbls));
+  mouse.fifo=FifoU8New(8);
+  mouse.fifo2=FifoU8New(64);
+  mouse.scale.x=0.5;
+  mouse.scale.y=0.5;
+  mouse.scale.z=1.0;
+  mouse.prescale.x=GR_WIDTH/mouse.scale.x/2.0;
+  mouse.prescale.y=GR_HEIGHT/mouse.scale.y/2.0;
+  mouse.prescale.z=0/mouse.scale.z;
+  mouse.pos.x=GR_WIDTH>>1;
+  mouse.pos.y=GR_HEIGHT>>1;
+  MemCpy(&mouse_last,&mouse,sizeof(CMouseStateGlbls));
 }

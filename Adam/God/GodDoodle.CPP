@@ -1,13 +1,10 @@
 #help_index "God;Graphics/Sprite"
-Bool god_doodle_done;
-I64 god_doodle_ch;
-CDC *god_doodle_dc=NULL;
 
 U0 GodDoodleDraw(CTask *task,CDC *dc)
 {
-  GrBlot(dc,0,0,god_doodle_dc);
+  GrBlot(dc,0,0,god.doodle_dc);
   if (Blink) {
-    if (god_doodle_done) {
+    if (god.doodle_done) {
       dc->color=RED;
       GrPrint(dc,(task->pix_width-FONT_WIDTH*27)>>1,(task->pix_height-FONT_HEIGHT)>>1,
 	"Press <ESC> or <SHIFT-ESC>.");
@@ -21,10 +18,10 @@ U0 GodDoodleDraw(CTask *task,CDC *dc)
 
 U0 GodDoodleSmooth(I64 num)
 {
-  CDC *dc=DCExtract(god_doodle_dc,0,0,god_doodle_dc->width-1,god_doodle_dc->height-1);
-  I64 i,x,y,x1,y1,c,histogram[16],best,best_cnt,c_old=god_doodle_dc->color;
-  for (y=0;y<god_doodle_dc->height;y++)
-    for (x=0;x<god_doodle_dc->width;x++) {
+  CDC *dc=DCExtract(god.doodle_dc,0,0,god.doodle_dc->width-1,god.doodle_dc->height-1);
+  I64 i,x,y,x1,y1,c,histogram[16],best,best_cnt,c_old=god.doodle_dc->color;
+  for (y=0;y<god.doodle_dc->height;y++)
+    for (x=0;x<god.doodle_dc->width;x++) {
       MemSet(histogram,0,sizeof(histogram));
       for (y1=y-num;y1<=y+num;y1++)
 	for (x1=x-num;x1<=x+num;x1++) {
@@ -39,35 +36,34 @@ U0 GodDoodleSmooth(I64 num)
 	  best=i;
 	  best_cnt=histogram[i];
 	}
-      god_doodle_dc->color=best;
-      GrPlot(god_doodle_dc,x,y);
+      god.doodle_dc->color=best;
+      GrPlot(god.doodle_dc,x,y);
     }
-  god_doodle_dc->color=c_old;
+  god.doodle_dc->color=c_old;
   DCDel(dc);
 }
 
-CFifoU8 *god_doodle_fifo=FifoU8New(32);
 I64 GodDoodleBits(I64 num_bits)
 {
   U8 b;
   I64 i,k,result=0;
   while (num_bits) {
-    if (FifoU8Rem(god_doodle_fifo,&b)) {
+    if (FifoU8Rem(god.doodle_fifo,&b)) {
       result=result<<1+b;
       num_bits--;
     } else {
-      god_doodle_ch=GetChar(,FALSE);
-      if (god_doodle_ch==CH_ESC||god_doodle_ch==CH_SHIFT_ESC)
+      god.doodle_ch=GetChar(,FALSE);
+      if (god.doodle_ch==CH_ESC||god.doodle_ch==CH_SHIFT_ESC)
 	throw;
-      else if (god_doodle_ch=='\n') {
-	DCFill(god_doodle_dc,WHITE);
-	FifoU8Flush(god_doodle_fifo);
-      } else if ('0'<=god_doodle_ch<='9')
-	GodDoodleSmooth(god_doodle_ch-'0');
+      else if (god.doodle_ch=='\n') {
+	DCFill(god.doodle_dc,WHITE);
+	FifoU8Flush(god.doodle_fifo);
+      } else if ('0'<=god.doodle_ch<='9')
+	GodDoodleSmooth(god.doodle_ch-'0');
       else {
 	k=KbdMouseEvtTime>>GOD_BAD_BITS;
 	for (i=0;i<GOD_GOOD_BITS;i++) {
-	  FifoU8Ins(god_doodle_fifo,k&1);
+	  FifoU8Ins(god.doodle_fifo,k&1);
 	  k>>=1;
 	}
       }
@@ -77,12 +73,12 @@ I64 GodDoodleBits(I64 num_bits)
 }
 
 public U8 *GodDoodleSprite()
-{// $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+{//Make God draw sprite. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
   I64 i,j,w,h,x,y,ch;
   U8 *elems;
 
-  if (god_doodle_dc) return NULL;
-  god_doodle_done=FALSE;
+  if (god.doodle_dc) return NULL;
+  god.doodle_done=FALSE;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   WinBorder;
@@ -91,59 +87,54 @@ public U8 *GodDoodleSprite()
   PopUpOk("The $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.TXT"$ can puppet you.\n\n"
 	"Press $$GREEN$$<SPACE>$$FG$$ until it finishes.");
 
-  god_doodle_ch=0;
-  god_doodle_dc=DCNew(Fs->pix_width,Fs->pix_height);
-  DCFill(god_doodle_dc,WHITE);
-  w=god_doodle_dc->width;
-  h=god_doodle_dc->height;
+  god.doodle_ch=0;
+  god.doodle_dc=DCNew(Fs->pix_width,Fs->pix_height);
+  DCFill(god.doodle_dc,WHITE);
+  w=god.doodle_dc->width;
+  h=god.doodle_dc->height;
 
   Fs->draw_it=&GodDoodleDraw;
-  FifoU8Flush(god_doodle_fifo);
+  FifoU8Flush(god.doodle_fifo);
   try {
     for (i=0;i<3;i++) {
-      god_doodle_dc->color=RED;
+      god.doodle_dc->color=RED;
       for (j=0;j<24;j++)
 	nobound_switch (GodDoodleBits(3)) {
 	  case 0:
-	    GrEllipse(god_doodle_dc,
+	    GrEllipse(god.doodle_dc,
 	      (w-1)*GodDoodleBits(5)/15.5-w/2,(h-1)*GodDoodleBits(5)/15.5-h/2,
 	      (w-1)*GodDoodleBits(5)/15.5,(h-1)*GodDoodleBits(5)/15.5);
 	    break;
 	  case 1:
-	    GrCircle(god_doodle_dc,
+	    GrCircle(god.doodle_dc,
 	      (w-1)*GodDoodleBits(5)/15.5-w/2,(h-1)*GodDoodleBits(5)/15.5-h/2,
 	      (w-1)*GodDoodleBits(5)/15.5);
 	    break;
 	  case 2:
-	    GrLineRect4(god_doodle_dc,
+	    GrBorder(god.doodle_dc,
 	      (w-1)*GodDoodleBits(5)/15.5-w/2,(h-1)*GodDoodleBits(5)/15.5-h/2,
 	      (w-1)*GodDoodleBits(5)/15.5,(h-1)*GodDoodleBits(5)/15.5);
 	    break;
 	  case 3...7:
-	    GrLine(god_doodle_dc,
+	    GrLine(god.doodle_dc,
 	      (w-1)*GodDoodleBits(4)/15,(h-1)*GodDoodleBits(4)/15,
 	      (w-1)*GodDoodleBits(4)/15,(h-1)*GodDoodleBits(4)/15);
 	    break;
 	}
-      for (j=4;j;) {
+      for (j=0;j<6;j++) {
 	x=(w-1)*GodDoodleBits(5)/31+w/64;
 	y=(h-1)*GodDoodleBits(5)/31+h/64;
-	switch(GrPeek(god_doodle_dc,x,y)) {
-	  case BLACK:
-	    god_doodle_dc->color=WHITE;
-	    GrFloodFill(god_doodle_dc,x,y);
-	    j--;
-	    break;
-	  case WHITE:
-	    god_doodle_dc->color=BLACK;
-	    GrFloodFill(god_doodle_dc,x,y);
-	    j--;
-	    break;
+	switch(GodDoodleBits(2)) {
+	  case 0: god.doodle_dc->color=BLACK;	break;
+	  case 1: god.doodle_dc->color=DKGRAY;	break;
+	  case 2: god.doodle_dc->color=LTGRAY;	break;
+	  case 3: god.doodle_dc->color=WHITE;	break;
 	}
+	GrFloodFill(god.doodle_dc,x,y);
       }
       GodDoodleSmooth(3);
     }
-    god_doodle_done=TRUE;
+    god.doodle_done=TRUE;
     do ch=GetChar(,FALSE);
     while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
   } catch {
@@ -153,17 +144,17 @@ public U8 *GodDoodleSprite()
   DCFill;
   SettingsPop;
   if (ch==CH_ESC)
-    elems=DC2Sprite(god_doodle_dc);
+    elems=DC2Sprite(god.doodle_dc);
   else
     elems=NULL;
-  DCDel(god_doodle_dc);
-  god_doodle_dc=NULL;
+  DCDel(god.doodle_dc);
+  god.doodle_dc=NULL;
   return elems;
 }
 
 #help_index "God"
 public U0 GodDoodle()
-{// $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+{//Make God draw sprite, insert in doc. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
   U8 *elems;
   if (elems=GodDoodleSprite) {
     Sprite(elems);

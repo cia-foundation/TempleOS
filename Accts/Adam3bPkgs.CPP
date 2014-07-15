@@ -15,10 +15,11 @@ Cd("/Adam/Utils");;
 #include "MemRep"
 #include "ToHtml"
 #include "ToTXT"
-#include "BinRep"
 #include "FileBMP"
 
 MapFileLoad("::/Kernel/Kernel");
 MapFileLoad("::/Compiler/Compiler");
 
 Cd("HOME");;
+
+#help_index ""

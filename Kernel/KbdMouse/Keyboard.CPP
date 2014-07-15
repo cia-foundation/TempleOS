@@ -81,7 +81,7 @@ U0 KbdMouseCmdAck(U8 val)
 }
 
 U0 SetTypeMatic(U8 delay)
-{
+{//Set speed of repeated keys.
   try {
     KbdCmdSend(KBD_CTRL,0xA7); //Disable Mouse
     KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
@@ -94,8 +94,8 @@ U0 SetTypeMatic(U8 delay)
   }
 }
 
-I64 A2ScanCode(I64 ch,I64 sc_flags=0)
-{ //ASCII val to scan code (Slow)
+I64 Char2ScanCode(I64 ch,I64 sc_flags=0)
+{//ASCII val to scan code (Slow).
   I64 i;
   U8 *table;
   if (sc_flags) {
@@ -130,9 +130,8 @@ I64 A2ScanCode(I64 ch,I64 sc_flags=0)
   }
 }
 
-
-U8 ScanCode2A(I64 sc)
-{//Scan Code to ASCII val
+U8 ScanCode2Char(I64 sc)
+{//Scan code to ASCII val.
   U8 *table=NORMAL_KEY_SCAN_DECODE_TABLE;
   if (sc & SCF_E0_PREFIX)
     return 0;
@@ -172,7 +171,6 @@ U8 scan_code_map[0x100]={
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
 
-
 U8 num_lock_map[0x100]={
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -193,8 +191,8 @@ U8 num_lock_map[0x100]={
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
 
-U8 *A2KeyName(I64 ch,Bool include_ctrl=TRUE)
-{//ASCII val to key name
+U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
+{//ASCII val to key name.
   I64 i;
   U8 buf[136];
   if (ch<=CH_SPACE) {
@@ -241,7 +239,7 @@ U8 *A2KeyName(I64 ch,Bool include_ctrl=TRUE)
 }
 
 U8 *ScanCode2KeyName(I64 sc)
-{
+{//Scan code to key name.
   I64 ch;
   U8 buf[136],*st;
   *buf=0;
@@ -251,8 +249,8 @@ U8 *ScanCode2KeyName(I64 sc)
     CatPrint(buf,"ALT ");
   if (sc&SCF_SHIFT)
     CatPrint(buf,"SHIFT ");
-  if (ch=ScanCode2A(sc&255)) {
-    st=A2KeyName(ch,FALSE);
+  if (ch=ScanCode2Char(sc&255)) {
+    st=Char2KeyName(ch,FALSE);
     StrCpy(buf+StrLen(buf),st);
     Free(st);
   } else {
@@ -319,41 +317,41 @@ I64 KbdBuildSC(U8 raw_byte,U8 *_last_raw_byte,I64 *_last_sc,
 
   if (sc&SCF_KEY_UP)
     switch (sc&~SCF_KEY_UP) {
-      case SC_SHIFT:	sc_flags&=~SCF_SHIFT;	goto new_key_done;
-      case SC_CTRL:	sc_flags&=~SCF_CTRL;	goto new_key_done;
-      case SC_ALT:	sc_flags&=~SCF_ALT;	goto new_key_done;
-      case SC_DELETE:	sc_flags&=~SCF_DELETE;	goto new_key_done;
-      case SC_INS:	sc_flags&=~SCF_INS;	goto new_key_done;
+      case SC_SHIFT:	sc_flags&=~SCF_SHIFT;	goto kb_new_key_done;
+      case SC_CTRL:	sc_flags&=~SCF_CTRL;	goto kb_new_key_done;
+      case SC_ALT:	sc_flags&=~SCF_ALT;	goto kb_new_key_done;
+      case SC_DELETE:	sc_flags&=~SCF_DELETE;	goto kb_new_key_done;
+      case SC_INS:	sc_flags&=~SCF_INS;	goto kb_new_key_done;
       case SC_CAPS:
 	sc_flags^=SCF_CAPS;
 	*_set_LEDs=TRUE;
-	goto new_key_done;
+	goto kb_new_key_done;
       case SC_NUM:
 	sc_flags^=SCF_NUM;
 	*_set_LEDs=TRUE;
-	goto new_key_done;
+	goto kb_new_key_done;
       case SC_SCROLL:
 	sc_flags^=SCF_SCROLL;
 	*_set_LEDs=TRUE;
-	goto new_key_done;
+	goto kb_new_key_done;
     }
   else
     switch (sc) {
-      case SC_SHIFT:	sc_flags|=SCF_SHIFT;	goto new_key_done;
-      case SC_CTRL:	sc_flags|=SCF_CTRL;	goto new_key_done;
-      case SC_ALT:	sc_flags|=SCF_ALT;	goto new_key_done;
-      case SC_DELETE:	sc_flags|=SCF_DELETE;	goto new_key_done;
-      case SC_INS:	sc_flags|=SCF_INS;	goto new_key_done;
-      case SC_CAPS:	goto new_key_done;
-      case SC_NUM:	goto new_key_done;
-      case SC_SCROLL:	goto new_key_done;
+      case SC_SHIFT:	sc_flags|=SCF_SHIFT;	goto kb_new_key_done;
+      case SC_CTRL:	sc_flags|=SCF_CTRL;	goto kb_new_key_done;
+      case SC_ALT:	sc_flags|=SCF_ALT;	goto kb_new_key_done;
+      case SC_DELETE:	sc_flags|=SCF_DELETE;	goto kb_new_key_done;
+      case SC_INS:	sc_flags|=SCF_INS;	goto kb_new_key_done;
+      case SC_CAPS:	goto kb_new_key_done;
+      case SC_NUM:	goto kb_new_key_done;
+      case SC_SCROLL:	goto kb_new_key_done;
     }
 
   if (sc_flags & SCF_CTRL && sc_flags & SCF_ALT) {
     sc_flags&=~SCF_NEW_KEY;
     *_ctrl_alt=TRUE;
   } else {
-new_key_done:
+kb_new_key_done:
     sc_flags|=SCF_NEW_KEY;
   }
   return *_last_sc=sc_flags|sc|(sc_flags|sc_raw)<<32;
@@ -367,9 +365,9 @@ U0 KbdPktRead()
   I64 ch,sc;
   Bool set_LEDs,ctrl_alt;
 
-  if (GetTSC>kbd_evt_time+time_stamp_freq>>3)
-    FifoU8Flush(kbd_fifo);
-  kbd_evt_time=GetTSC;
+  if (GetTSC>kbd.timestamp+cnts.time_stamp_freq>>3)
+    FifoU8Flush(kbd.fifo);
+  kbd.timestamp=GetTSC;
   raw_byte=InU8(KBD_PORT);
   sc=KbdBuildSC(raw_byte,&last_raw_byte,&last_sc,&set_LEDs,&ctrl_alt);
   if (ctrl_alt && sc) {
@@ -382,25 +380,25 @@ U0 KbdPktRead()
 	else if (sc&255==SC_TAB)
 	  ch='t';
 	else
-	  ch=ScanCode2A(sc&255);
-	if ('a'<=ch<='z' && fp_ctrl_alt_let_cbs[ch-'a'] &&
-	    Bt(&ctrl_alt_let_in_irq_flags,ch-'a')) {
-	  (*fp_ctrl_alt_let_cbs[ch-'a'])(last_sc);
+	  ch=ScanCode2Char(sc&255);
+	if ('a'<=ch<='z' && keydev.fp_ctrl_alt_let_cbs[ch-'a'] &&
+	    Bt(&keydev.ctrl_alt_let_in_irq_flags,ch-'a')) {
+	  (*keydev.fp_ctrl_alt_let_cbs[ch-'a'])(last_sc);
 	  return;
 	}
       }
     }
   }
-  if (!FifoU8Cnt(kbd_fifo)) {
-    FifoU8Ins(kbd_fifo,raw_byte);
+  if (!FifoU8Cnt(kbd.fifo)) {
+    FifoU8Ins(kbd.fifo,raw_byte);
     if (raw_byte!=0xE0) {
-      while (FifoU8Rem(kbd_fifo,&raw_byte))
-	FifoU8Ins(kbd2_fifo,raw_byte);
+      while (FifoU8Rem(kbd.fifo,&raw_byte))
+	FifoU8Ins(kbd.fifo2,raw_byte);
     }
   } else {
-    FifoU8Ins(kbd_fifo,raw_byte);
-    while (FifoU8Rem(kbd_fifo,&raw_byte))
-      FifoU8Ins(kbd2_fifo,raw_byte);
+    FifoU8Ins(kbd.fifo,raw_byte);
+    while (FifoU8Rem(kbd.fifo,&raw_byte))
+      FifoU8Ins(kbd.fifo2,raw_byte);
   }
 }
 
@@ -408,13 +406,24 @@ interrupt U0 KbdIntHandler()
 {
   CLD
   OutU8(0x20,0x20);
-  kbd_irqs_working=TRUE;
-  if (mouse_install_attempt_in_progress) {
-    kbdmouse_rst=TRUE;
+  kbd.irqs_working=TRUE;
+  if (mouse.install_in_progress) {
+    kbd.rst=TRUE;
     return;
   }
-  ctrl_alt_let_ret_addr=GetRBP()(I64)+8;
+  keydev.ctrl_alt_let_ret_addr=GetRBP()(I64)+8;
   KbdPktRead;
+}
+
+U0 SetCtrlAltLetCB(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,Bool in_irq=FALSE)
+{//Set callback for <CTRL-ALT-letter>.
+  ch=ToUpper(ch)-'A';
+  if (ch<26) {
+    keydev.fp_ctrl_alt_let_cbs[ch]=fp_handler;
+    Free(keydev.ctrl_alt_let_descs[ch]);
+    keydev.ctrl_alt_let_descs[ch]=AStrNew(desc);
+    BEqu(&keydev.ctrl_alt_let_in_irq_flags,ch,in_irq);
+  }
 }
 
 U0 KbdInit()
@@ -425,7 +434,7 @@ U0 KbdInit()
     KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
     KbdCmdSend(KBD_PORT,0xF0);
     KbdCmdSend(KBD_PORT,0x02);
-    KbdSetLEDs(sys_cur_scan_code);
+    KbdSetLEDs(kbd.scan_code);
   } catch {
     KbdCmdFlush;
     Fs->catch_except=TRUE;
@@ -449,13 +458,13 @@ U0 KbdHandler()
   Bool set_LEDs,ctrl_alt;
   I64 ch,sc;
 
-  FifoU8Rem(kbd2_fifo,&raw_byte);
-  sc=KbdBuildSC(raw_byte,&last_raw_byte,&sys_cur_scan_code,&set_LEDs,&ctrl_alt);
+  FifoU8Rem(kbd.fifo2,&raw_byte);
+  sc=KbdBuildSC(raw_byte,&last_raw_byte,&kbd.scan_code,&set_LEDs,&ctrl_alt);
   if (set_LEDs)
     KbdSetLEDs(sc);
   if (raw_byte==0xE0) {
-    FifoU8Rem(kbd2_fifo,&raw_byte);
-    sc=KbdBuildSC(raw_byte,&last_raw_byte,&sys_cur_scan_code,&set_LEDs,&ctrl_alt);
+    FifoU8Rem(kbd.fifo2,&raw_byte);
+    sc=KbdBuildSC(raw_byte,&last_raw_byte,&kbd.scan_code,&set_LEDs,&ctrl_alt);
     if (set_LEDs)
       KbdSetLEDs(sc);
   }
@@ -466,42 +475,40 @@ U0 KbdHandler()
       else if (sc&255==SC_TAB)
 	ch='t';
       else
-	ch=ScanCode2A(sc&255);
-      if ('a'<=ch<='z' && fp_ctrl_alt_let_cbs[ch-'a'] &&
-	!Bt(&ctrl_alt_let_in_irq_flags,ch-'a'))
-	(*fp_ctrl_alt_let_cbs[ch-'a'])(sys_cur_scan_code);
+	ch=ScanCode2Char(sc&255);
+      if ('a'<=ch<='z' && keydev.fp_ctrl_alt_let_cbs[ch-'a'] &&
+	!Bt(&keydev.ctrl_alt_let_in_irq_flags,ch-'a'))
+	(*keydev.fp_ctrl_alt_let_cbs[ch-'a'])(kbd.scan_code);
     }
     return;
   }
-  if (Btr(&sys_cur_scan_code,SCf_NEW_KEY)) {
-    Btr(&sys_cur_scan_code,32+SCf_NEW_KEY);
-    FifoI64Ins(scan_code_fifo,sys_cur_scan_code);
-    sys_key_cnt++;
-    if (!(sys_cur_scan_code&SCF_KEY_UP)) {
-      sys_last_down_scan_code=sys_cur_scan_code;
-      Bts(key_down_bitmap,sys_cur_scan_code.u8[0]);
-      Bts(key_down_bitmap2,sys_cur_scan_code.u8[4]);
+  if (Btr(&kbd.scan_code,SCf_NEW_KEY)) {
+    Btr(&kbd.scan_code,32+SCf_NEW_KEY);
+    FifoI64Ins(kbd.scan_code_fifo,kbd.scan_code);
+    kbd.cnt++;
+    if (!(kbd.scan_code&SCF_KEY_UP)) {
+      kbd.last_down_scan_code=kbd.scan_code;
+      Bts(kbd.down_bitmap,kbd.scan_code.u8[0]);
+      Bts(kbd.down_bitmap2,kbd.scan_code.u8[4]);
     } else {
-      Btr(key_down_bitmap,sys_cur_scan_code.u8[0]);
-      Btr(key_down_bitmap2,sys_cur_scan_code.u8[4]);
+      Btr(kbd.down_bitmap,kbd.scan_code.u8[0]);
+      Btr(kbd.down_bitmap2,kbd.scan_code.u8[4]);
     }
   }
 }
 
 I64 KbdMsgsQue()
 {
-  I64 p1,p2,msg_code=MSG_NULL;
+  I64 a1,a2,msg_code=MSG_NULL;
   CTask *task_focus;
   if (task_focus=sys_focus_task) {
-    while (FifoI64Rem(scan_code_fifo,&p2)) {
-      p1=ScanCode2A(p2);
-      if (p2 & SCF_KEY_UP) {
-	TaskMsg(task_focus,0,
-	  MSG_KEY_UP,p1,p2,0);
+    while (FifoI64Rem(kbd.scan_code_fifo,&a2)) {
+      a1=ScanCode2Char(a2);
+      if (a2 & SCF_KEY_UP) {
+	TaskMsg(task_focus,0,MSG_KEY_UP,a1,a2,0);
 	msg_code=MSG_KEY_UP;
       } else {
-	TaskMsg(task_focus,0,
-	  MSG_KEY_DOWN,p1,p2,0);
+	TaskMsg(task_focus,0,MSG_KEY_DOWN,a1,a2,0);
 	msg_code=MSG_KEY_DOWN;
       }
     }
@@ -510,9 +517,9 @@ I64 KbdMsgsQue()
 }
 
 I64 KbdMouseEvtTime()
-{
-  if (mouse_evt_time>kbd_evt_time)
-    return mouse_evt_time;
+{//Timestamp of last key or mouse event.
+  if (mouse.timestamp>kbd.timestamp)
+    return mouse.timestamp;
   else
-    return kbd_evt_time;
+    return kbd.timestamp;
 }

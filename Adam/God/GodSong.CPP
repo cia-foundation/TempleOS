@@ -1,28 +1,29 @@
 #help_index "God"
+
+DefineLstLoad("ST_RHYTHM_COMPLEXITY","Simple\0Normal\0Complex\0");
+
 class MakeSongSettings
 {
-  Bool simple_rhythms		fmtstr "$$CB,\"Simple Rhythms\"$$\n";
-  Bool normal_rhythms		fmtstr "$$CB,\"Normal Rhythms\"$$\n";
-  Bool complex_rhythms		fmtstr "$$CB,\"Complex Rhythms\"$$\n";
+  I64  complexity		fmtstr "$$LS,D=\"ST_RHYTHM_COMPLEXITY\"$$\n";
   Bool rests			fmtstr "$$CB,\"Rests\"$$\n";
   Bool six_eight		fmtstr "$$CB,\"Six Eight\"$$\n";
   I64  octave			fmtstr "$$DA-TRM,32,A=\"Octave:%d\"$$\n";
 };
 
 U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
-{  //k is a random note nibble
+{//k is a random note nibble
   if (!k && mss->rests) {
     buf[*j]='R';
     *j+=1;
   } else {
     k/=2;
     if (!k) {
-      if (music_octave) {
-	buf[*j]=music_octave-1+'0';
+      if (music.octave) {
+	buf[*j]=music.octave-1+'0';
 	*j+=1;
 	buf[*j]='G';
 	*j+=1;
-	buf[*j]=music_octave+'0';
+	buf[*j]=music.octave+'0';
 	*j+=1;
       } else {
 	buf[*j]='G';
@@ -43,34 +44,33 @@ U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
 #define DUR_8_16_16	5
 #define DUR_16_16_8	6
 
-U8 simple_songs [5]={DUR_4,DUR_4,DUR_4,DUR_4,DUR_8_8};
-U8 normal_songs [5]={DUR_4,DUR_4,DUR_8_8,DUR_3_3_3,DUR_16_16_16_16};
-U8 complex_songs[9]={DUR_4,DUR_4,DUR_8_8,DUR_8_8,DUR_8DOT_16,DUR_3_3_3,DUR_8_16_16,DUR_16_16_8,DUR_16_16_16_16};
+U8 god_simple_songs [5]={DUR_4,DUR_4,DUR_4,DUR_4,DUR_8_8};
+U8 god_normal_songs [5]={DUR_4,DUR_4,DUR_8_8,DUR_3_3_3,DUR_16_16_16_16};
+U8 god_complex_songs[9]={DUR_4,DUR_4,DUR_8_8,DUR_8_8,DUR_8DOT_16,DUR_3_3_3,
+DUR_8_16_16,DUR_16_16_8,DUR_16_16_16_16};
 
 public U8 *GodSongStr()
-{// $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+{//Make God generate 2 measures of a song. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
   MakeSongSettings mss;
   U8 *buf;
   I64 i,j=0,k,n,k2,duration,last_duration=-1,len;
 
-  mss.simple_rhythms=FALSE;
-  mss.normal_rhythms=TRUE;
-  mss.complex_rhythms=FALSE;
+  mss.complexity=1;
   mss.rests=FALSE;
-  mss.octave=music_octave;
+  mss.octave=music.octave;
 
   if (!PopUpForm(&mss))
     return NULL;
 
   buf=CAlloc(256);
-  music_octave=ClampI64(mss.octave,0,6);
+  music.octave=ClampI64(mss.octave,0,6);
   progress4=0;
   if (mss.six_eight)
     progress4_max=6;
   else
     progress4_max=8;
 
-  buf[j++]='0'+music_octave;
+  buf[j++]='0'+music.octave;
   if (mss.six_eight) {
     len=6;
     buf[j++]='M';
@@ -79,15 +79,15 @@ public U8 *GodSongStr()
     buf[j++]='8';
   } else
     len=8;
-  FifoU8Flush(god_fifo);
+  FifoU8Flush(god.fifo);
   for (i=0;i<len;i++) {
     n=GodBits(8);
-    if (mss.complex_rhythms)
-      duration=complex_songs[n%9];
-    else if (mss.normal_rhythms)
-      duration=normal_songs[n%5];
+    if (mss.complexity==2)
+      duration=god_complex_songs[n%9];
+    else if (mss.complexity==1)
+      duration=god_normal_songs[n%5];
     else
-      duration=simple_songs[n%5];
+      duration=god_simple_songs[n%5];
 
     switch (duration) {
       case DUR_8_8:
@@ -155,7 +155,7 @@ public U8 *GodSongStr()
 }
 
 public U0 GodSong()
-{// $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+{//Make God generate 2measures x 2 + 2measures x 2 song. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
   U8 *st1=GodSongStr,*st2=GodSongStr;
   if (st1 && st2)
     DocPrint(DocPut,"$$SO,\"<Song>\",A=\"%s%s%s%s\"$$",st1,st1,st2,st2);

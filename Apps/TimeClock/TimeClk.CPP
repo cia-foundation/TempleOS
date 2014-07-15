@@ -12,7 +12,6 @@ class TimeEntry
   U8 *desc;
 };
 
-
 U0 TimeFileRead(TimeEntry *header)
 {
   U8 *buf,*ptr;
@@ -38,7 +37,7 @@ U0 TimeFileWrite(TimeEntry *header)
 {
   U8 *buf,*ptr;
   TimeEntry *tempt;
-  I64 size=1; //for eof
+  I64 size=1; //for EOF
 
   tempt=header->next;
   while (tempt!=header) {
@@ -127,7 +126,7 @@ public U0 PunchOut()
     tempt->type=TET_PUNCH_OUT;
     tempt->datetime=Now;
     "\nEnter Description.\nPress <ESC> when done.\n";
-    if (!(tempt->desc=MGetS(GETSF_WITH_NEW_LINE)))
+    if (!(tempt->desc=GetStr(,,GSF_WITH_NEW_LINE)))
       tempt->desc=CAlloc(1);
     QueIns(tempt,header->last);
     TimeFileWrite(header);
@@ -147,7 +146,7 @@ public U0 PunchIn()
     tempt->type=TET_PUNCH_IN;
     tempt->datetime=Now;
     "\nEnter Description.\nPress <ESC> when done.\n";
-    if (!(tempt->desc=MGetS(GETSF_WITH_NEW_LINE)))
+    if (!(tempt->desc=GetStr(,,GSF_WITH_NEW_LINE)))
       tempt->desc=CAlloc(1);
     QueIns(tempt,header->last);
     TimeFileWrite(header);

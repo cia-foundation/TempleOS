@@ -2,8 +2,6 @@ I64 *addr=VGA_GRAPHIC_MEM_BASE,
    *pte_addr=MemPageTable(addr),
    err_code=0,
    *reported_fault_addr;
-
-
 /*
   0[RBP]=old base ptr
   8[RBP]=err code
@@ -23,7 +21,6 @@ interrupt haserrcode U0 PageFault()
 	MOV_RAX_CR2
   reported_fault_addr=GetRAX;
 }
-
 
 U0 PageTableDemo2()
 {

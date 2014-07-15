@@ -1,6 +1,5 @@
 //Generate "Stadium.GRA.Z" from "Stadium.TXT.Z"
 
-
 U0 StadiumGen()
 {
   U0 (*fp_old_update)(CDC *dc);
@@ -13,8 +12,8 @@ U0 StadiumGen()
   Type("::/Demo/Games/Stadium/Stadium.TXT");
   "$$CM,0,%d$$",TEXT_ROWS-3;
   DocCursor(OFF);
-  fp_old_update=fp_final_screen_update; //hide mouse cursor
-  fp_final_screen_update=NULL;
+  fp_old_update=gr.fp_final_screen_update; //hide mouse cursor
+  gr.fp_final_screen_update=NULL;
 
   WinMgrSync(2,TRUE);
   dc2=DCCaptureScreen;
@@ -25,7 +24,7 @@ U0 StadiumGen()
   DCDel(dc);
  
   DocCursor(ON);
-  fp_final_screen_update=fp_old_update;
+  gr.fp_final_screen_update=fp_old_update;
   DocClear;
 }
 

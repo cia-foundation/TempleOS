@@ -1,4 +1,4 @@
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
 AcctRegSetDftEntry("TempleOS/RawHide","F64 best_score=9999;\n");
 AcctRegExeBranch("TempleOS/RawHide");
@@ -10,8 +10,7 @@ F64 t0,tf;
 #define MAP_BORDER	3
 CDC *dc2;
 
-$BG,10$
-#define GE_COW		0
+$BG,10$#define GE_COW		0
 
 
 $SP,"<1>",BI=1$
@@ -25,15 +24,11 @@ $SP,"<2>",BI=2$
 $SP,"<3>",BI=3$
 #define GE_NUM		3
 $BG$
-
-
 class RHCSprite
 {
   U8 *img;
   I64 min_x,max_x,min_y,max_y;
 } rh_sprite[GE_NUM];
-
-
 
 #define NUM_ANIMALS	128
 
@@ -46,8 +41,7 @@ class Animal
   Bool dead,pad[2];
 } *a;
 
-
-// ************************************
+//************************************
 #define COURSE_LEN	(MAP_HEIGHT*2)
 I32 *rx,*ry,*rw;
 I64 river_lo,river_hi;
@@ -123,8 +117,7 @@ U0 RiverDel()
   Free(rw);
 }
 
-
-// ************************************
+//************************************
 class RiverDrop
 {
   RiverDrop *next,*last;
@@ -186,10 +179,10 @@ U0 RiverDropsDraw(CDC *dc,I64 cx,I64 cy)
   LBtr(&rd_lock,0);
 }
 
-// ************************************
+//************************************
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  static I64 last_ipx=0;
+  static I64 last_pos_x=0;
   static Bool left=TRUE;
   F64 t;
   I64 i,
@@ -219,20 +212,19 @@ U0 DrawIt(CTask *task,CDC *dc)
       dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
     }
 
-
-  if (ipx-last_ipx>0)
+  if (ip.pos.x-last_pos_x>0)
     left=FALSE;
-  else if (ipx-last_ipx<0)
+  else if (ip.pos.x-last_pos_x<0)
     left=TRUE;
   if (left) {
     dc->flags|=DCF_JUST_MIRROR|DCF_SYMMETRY;
-    GrSetSymmetry(dc,ipx-task->pix_left-task->scroll_x,0,ipx-task->pix_left-task->scroll_x,1);
+    GrSetSymmetry(dc,ip.pos.x-task->pix_left-task->scroll_x,0,ip.pos.x-task->pix_left-task->scroll_x,1);
   }
   Sprite3(dc,
-    ipx-task->pix_left-task->scroll_x,
-    ipy-task->pix_top -task->scroll_y,0,rh_sprite[GE_HORSE].img);
+    ip.pos.x-task->pix_left-task->scroll_x,
+    ip.pos.y-task->pix_top -task->scroll_y,0,rh_sprite[GE_HORSE].img);
   dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
-  last_ipx=ipx;
+  last_pos_x=ip.pos.x;
 
   if (tf) {
     dc->color=RED;
@@ -247,7 +239,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
   GrPrint(dc,-task->scroll_x,-task->scroll_y,"Time:%7.2fs  Best:%7.2fs",t,best_score);
 }
-
 
 U0 BuddySelect(I64 i)
 {
@@ -276,8 +267,8 @@ U0 AnimateTask(CTask *parent)
     max_speed=ClampU64(max_speed,MAX_U32/3,200*MAX_U32);
     cx=(MAP_WIDTH -parent->pix_width)/2,
     cy=(MAP_HEIGHT-parent->pix_height)/2;
-    cursor_x=ipx+cx-parent->pix_left-parent->scroll_x;
-    cursor_y=ipy+cy-parent->pix_top -parent->scroll_y;
+    cursor_x=ip.pos.x+cx-parent->pix_left-parent->scroll_x;
+    cursor_y=ip.pos.y+cy-parent->pix_top -parent->scroll_y;
     min_x=max_x=min_y=max_y=cnt=0;
     stress=0;
     for (i=0;i<NUM_ANIMALS;i++) {
@@ -320,7 +311,6 @@ U0 AnimateTask(CTask *parent)
 	tempa->dx+=0.1*(tempa1->dx-tempa->dx);
 	tempa->dy+=0.1*(tempa1->dy-tempa->dy);
 
-
 //Add random movement, limit speed and dampen speed
 	tempa->dx=0.995*ClampI64(tempa->dx+RandI32/32,-max_speed,max_speed);
 	tempa->dy=0.995*ClampI64(tempa->dy+RandI32/32,-max_speed,max_speed);
@@ -362,13 +352,13 @@ U0 AnimateTask(CTask *parent)
 
     if (!tf && (max_x-min_x)>>32<GR_WIDTH && (max_y-min_y)>>32<GR_HEIGHT) {
       tf=tS;
-      music_mute=TRUE;
+      music.mute=TRUE;
       Snd(2000);Sleep(200);Snd(0);Sleep(100);
       if (tf-t0<best_score) {
 	best_score=tf-t0;
 	Snd(2000);Sleep(200);Snd(0);Sleep(100);
       }
-      music_mute=FALSE;
+      music.mute=FALSE;
     }
 
     updates++;
@@ -388,7 +378,7 @@ U0 AnimateTask(CTask *parent)
 }
 
 U0 SongTask(I64)
-{ //Randomly generated (by God :-)
+{//Randomly generated (by God :-)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
@@ -398,7 +388,6 @@ U0 SongTask(I64)
 	Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
   }
 }
-
 
 U0 ReInit()
 {
@@ -412,7 +401,7 @@ U0 ReInit()
 
   dc2->pen_width=MAP_BORDER;
   dc2->color=RED;
-  GrLineRect4(dc2,MAP_BORDER/2,MAP_BORDER/2,MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
+  GrBorder(dc2,MAP_BORDER/2,MAP_BORDER/2,MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
 
   for (i=river_lo;i<=river_hi;i++)
     RiverDropsNext(Fs);
@@ -463,7 +452,7 @@ U0 CleanUp()
 
 U0 RawHide()
 {
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   PopUpOk(
 	"Coral the cattle into an area\n"
@@ -480,7 +469,7 @@ U0 RawHide()
 "}"
 );
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER-WIF_GRAB_SCROLL-WIF_MENU;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
   WinMax;
   WordStat;
   Preempt(OFF);
@@ -491,14 +480,14 @@ U0 RawHide()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_DOWN);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_DOWN);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:  //Doesn't do anything, yet.
 	  break;
 	case MSG_IP_R_DOWN:  //Doesn't do anything, yet.
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (p1) {
+	  switch (a1) {
 	    case '\n':
 	      ReInit;
 	      break;

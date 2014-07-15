@@ -31,7 +31,7 @@ for (i=0;i<256;i+=4) {
 U8 *tempg=DC2Sprite(img1);
 Sprite(tempg);
 Free(tempg);
-NewLine(9);
+"%h9c",'\n';
 
 DCDel(img1);
 DCDel(img2);

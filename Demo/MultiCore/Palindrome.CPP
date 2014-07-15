@@ -23,7 +23,6 @@ U0 PDNormalize()
   size=dst-r-2*BORDER_CHARS;
 }
 
-
 U0 PDAnswer(U8 *a,I64 len)
 {
   DocLock(doc);

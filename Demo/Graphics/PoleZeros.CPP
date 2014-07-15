@@ -37,7 +37,7 @@ F64 F(Complex *x)
   CDiv(&num,&denom,&n1);
  
   R2P(&m,&a,n1.x,n1.y);
-  if (ip_rb)
+  if (ip.rb)
     return ã+a;
   else
     return m;
@@ -94,7 +94,7 @@ U0 Draw()
 
 U0 PoleZeros()
 {
-  I64 msg_code,p1,p2,p11,p22,cx,cy;
+  I64 msg_code,a1,a2,p11,p22,cx,cy;
   Complex *tempc=NULL;
 
   PopUpOk(
@@ -104,7 +104,7 @@ U0 PoleZeros()
   WinMgrSync;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
   SetVGAPalette4(vga_palette4_gray);
   SetVGAPaletteColor(15,0xFF0000); //White is red
 
@@ -119,21 +119,21 @@ U0 PoleZeros()
   try {
     Draw;
     while (TRUE) {
-      msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE);
 pz_msg:
       cx=Fs->pix_width/2;
       cy=Fs->pix_height/2;
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
-	  tempc=PoleZeroFind(p1-cx,cy-p2);
+	  tempc=PoleZeroFind(a1-cx,cy-a2);
 	  break;
 	case MSG_IP_MOVE:
 	  if (tempc) {
-	    p11=p1;p22=p2;
+	    p11=a1;p22=a2;
 	    //get to last mouse move
-	    while (msg_code=ScanMsg(&p1,&p2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE))
+	    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE))
 	      if (msg_code==MSG_IP_MOVE) {
-		p11=p1;p22=p2;
+		p11=a1;p22=a2;
 	      } else
 		goto pz_msg;
 
@@ -144,8 +144,8 @@ pz_msg:
 	  break;
 	case MSG_IP_L_UP:
 	  if (tempc) {
-	    tempc->x=p1-cx;
-	    tempc->y=cy-p2;
+	    tempc->x=a1-cx;
+	    tempc->y=cy-a2;
 	    tempc=NULL;
 	    Draw;
 	  }
@@ -155,7 +155,7 @@ pz_msg:
 	  Draw;
 	  break;
 	case MSG_KEY_DOWN:
-	  if (p1==CH_SHIFT_ESC||p1==CH_ESC)
+	  if (a1==CH_SHIFT_ESC||a1==CH_ESC)
 	    goto pz_done;
       }
       WinMgrSync;

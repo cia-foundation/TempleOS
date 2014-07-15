@@ -2,7 +2,6 @@
 
 //Giotto, a famous artist, drew a freehand circle as a portfolio for a job.
 
-
 AcctRegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
 AcctRegExeBranch("TempleOS/CircleTrace");
 
@@ -17,11 +16,9 @@ U0 SongTask(I64)
     Play("hEDCARCDECR");
 }
 
-U0 DrawIt(CTask *task,CDC *)
+U0 DrawIt(CTask *task,CDC *dc)
 {
-  U8 buf[128];
-  SPrint(buf,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",avg_error,elapsed_time,score,best_score);
-  PlotWinStr(task,buf,BLACK<<4+WHITE,0,0);
+  GrPrint(dc,0,0,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",avg_error,elapsed_time,score,best_score);
 }
 
 #define CIRCLE_RADIUS	100
@@ -37,7 +34,7 @@ Bool CTPlot(CDC *dc,I64 x,I64 y,I64)
 
 U0 CircleTrace()
 {
-  I64 msg_code,p1,p2,x1,y1;
+  I64 msg_code,a1,a2,x1,y1;
   F64 rad,t0,total_distance;
   CDC *dc=DCAlias;
 
@@ -48,40 +45,40 @@ U0 CircleTrace()
   cx=Fs->pix_width/2;
   cy=Fs->pix_height/2;
 
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;
 
   DCFill;
-  dc->color=ROP_XOR+BLACK^COLOR_TRANSPARENT;
+  dc->color=ROP_XOR+BLACK^TRANSPARENT;
   GrCircle(dc,cx,cy,CIRCLE_RADIUS);
   do {
-    msg_code=GetMsg(&p1,&p2,
+    msg_code=GetMsg(&a1,&a2,
       1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
     switch (msg_code) {
       case MSG_KEY_UP:
 	break;
       case MSG_IP_L_DOWN:
 	DCFill;
-	dc->color=ROP_XOR+BLACK^COLOR_TRANSPARENT;
+	dc->color=ROP_XOR+BLACK^TRANSPARENT;
 	GrCircle(dc,cx,cy,CIRCLE_RADIUS);
-	dc->color=ROP_XOR+RED^COLOR_TRANSPARENT;
+	dc->color=ROP_XOR+RED^TRANSPARENT;
 	t0=tS;
 	total_distance=0.001;
 	total_error=0;
-	x1=p1; y1=p2;
+	x1=a1; y1=a2;
 	do {
-	  msg_code=ScanMsg(&p1,&p2,
+	  msg_code=ScanMsg(&a1,&a2,
 	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  switch (msg_code) {
 	    case MSG_IP_L_UP:
 	      break;
 	    case MSG_IP_MOVE:
-	      if (x1!=p1 || y1!=p2) {
-		total_distance+=Sqrt(Sqr(x1-p1)+Sqr(y1-p2));
-		Line(dc,x1,y1,0,p1,p2,0,&CTPlot);
-		x1=p1;y1=p2;
+	      if (x1!=a1 || y1!=a2) {
+		total_distance+=Sqrt(Sqr(x1-a1)+Sqr(y1-a2));
+		Line(dc,x1,y1,0,a1,a2,0,&CTPlot);
+		x1=a1;y1=a2;
 		//undo overlapping pixs on segments
 		GrPlot(dc,x1,y1);
 		rad=Sqrt(Sqr(x1-cx)+Sqr(y1-cy));
@@ -93,7 +90,7 @@ U0 CircleTrace()
 	  avg_error=total_error/total_distance;
 	  score=elapsed_time*avg_error;
 
-	  //This $LK,"Sleep",A="MN:Sleep"$()s until the next time the
+	  //$LK,"Sleep",A="MN:Sleep"$()s until the next time the
 	  //window mgr task runs.  The
 	  //window mgr calls the UpdateWin() routine
 	  //and places msgs in the que, so there's
@@ -101,7 +98,7 @@ U0 CircleTrace()
 	  WinMgrSync;
 
 	} while (msg_code!=MSG_IP_L_UP);
-	music_mute=TRUE; Sleep(200);
+	music.mute=TRUE; Sleep(200);
 	if (total_distance>0.95*CIRCUMFERENCE) {
 	  if (score<best_score) {
 	    Snd(2000);Sleep(50);Snd(0);Sleep(50);
@@ -114,10 +111,10 @@ U0 CircleTrace()
 	} else {
 	    Snd(100);Sleep(1000);
 	}
-	Snd(0); Sleep(200); music_mute=FALSE;
+	Snd(0); Sleep(200); music.mute=FALSE;
 	break;
     }
-  } while (msg_code!=MSG_KEY_DOWN || p1!=CH_SHIFT_ESC && p1!=CH_ESC);
+  } while (msg_code!=MSG_KEY_DOWN || a1!=CH_SHIFT_ESC && a1!=CH_ESC);
   GetMsg(,,1<<MSG_KEY_UP);
   SettingsPop;
   DCFill;

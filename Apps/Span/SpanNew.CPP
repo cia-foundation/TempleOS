@@ -19,7 +19,6 @@ U0 SpanDel(CMathODE *ode)
   }
 }
 
-
 #define M_SIZE (sizeof(MyMass)	-offset(CMass.start_saved_area))
 #define S_SIZE (sizeof(MySpring)-offset(CSpring.start_saved_area))
 

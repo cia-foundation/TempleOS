@@ -1,4 +1,3 @@
-
 asm {
 DIV_U64_BY_U64::
 	PUSH	RBP

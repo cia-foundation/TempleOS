@@ -10,7 +10,8 @@
 #exe {OptOff(OPTf_KEEP_PRIVATE);};
 #include "CmpAsm"
 #include "CmpExts"
-#include "CmpGlbls"
+CCmpGlbls	cmp;
+CUasmGlbls	uasm;
 #include "Unassembler"
 #include "ICLCC"
 #include "Lex"

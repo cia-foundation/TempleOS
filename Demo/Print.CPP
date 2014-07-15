@@ -1,10 +1,8 @@
 //TempleOS supports standard $LK,"Print",A="MN:Print"$()
 //codes and extended ones.
-//See $LK,"Print Extended Codes",A="FA:::/Doc/HolyC.TXT,SPrintCodes"$.
+//See $LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$.
 
-//This file demonstrates $LK,"sub_fmt",A="FF:::/Doc/HolyC.TXT,sub_fmt:3"$ codes.
-
-
+//Demonstrates $LK,"aux_fmt_num",A="FF:::/Doc/Print.TXT,aux_fmt_num:2"$ codes.
 
 "%10h?d\n",123456789;
 "%10h?d\n",12345;
@@ -23,4 +21,13 @@
 "%16.2h-6n\n",.00123456789;
 "%16.2h-6n\n",12345.0;
 
-"\n";
+'\n';
+
+"%h25c\n",'x'; //Print 25 x's
+
+"%h*c\n",25,'y'; //Print 25 y's
+
+'zzzz\n'; //$LK,"PutChars",A="MN:PutChars"$() up to 8 characters.
+
+'\n';
+

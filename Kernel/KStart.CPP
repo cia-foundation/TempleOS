@@ -18,14 +18,14 @@ USE16
 SYS_KERNEL_START1:: //This must match $LK,"CKernel",A="MN:CKernel"$.
 	JMP	U16 SYS_KERNEL_START2
 
-// ************************************
+//************************************
 //  ASM Global vars required for 16-bit start-up
 	ALIGN	4,OC_NOP
 SYS_BOOT_BASE::			DU32	0;	//Fixed offset from start used by reboot
 SYS_BOOT_PATCH_TABLE_BASE::	DU32	0;
 #exe {StreamPrint("SYS_COMPILE_TIME:: DU64 0x%X;",Now);}
 //See $LK,"BootCdProbe",A="MN:BootCdProbe"$
-#assert SYS_COMPILE_TIME+8+16<CD_BLK_SIZE
+#assert SYS_COMPILE_TIME+8+sizeof(CBinFile)<CD_BLK_SIZE
 
 SYS_OS_32START::	DU32	SYS_INIT_OS;
 SYS_BOOT_CODE::		DU32	0xFF;
@@ -53,9 +53,9 @@ SYS_PCI_BUSSES::	DU16	0;
 SYS_RUN_LEVEL::		DU32	0;
 SYS_TEMP_PTR::		DU16	0;
 			DU64	0;
-// ************************************
-//EBX is SYS_BOOT_CODE (val passed from boot blk)
+//************************************
 SYS_KERNEL_START2::
+//EBX is SYS_BOOT_CODE (val passed from boot blk)
 	MOV	AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
 	MOV	SS,AX
 	MOV	SP,BOOT_STK_SIZE
@@ -81,41 +81,17 @@ TEMPLEOS_CONT_START:
 
 	MOV	U32 [SYS_RUN_LEVEL],RLF_16BIT
 
-#exe {StreamPrint("MOV BX,%d\n",kernel_cfg->bios_gr_mode);};
+	MOV	BX,0x12		//640x480 16 color
 	MOV	U16 [SYS_BIOS_GR_MODE],BX
 	MOV	AX,0x4F02
 #exe {
   if (!kernel_cfg->opts[CFG_TEXT_MODE])
-    StreamPrint("INT 0x10");  //Enable VGA
+    StreamPrint("INT 0x10");	//Enable VGA
 };
 	CMP	AX,0x004F
 	JE	@@10
 	MOV	U16 [SYS_BIOS_GR_MODE],0 //failed
 @@10:
-
-/**** This doesn't help
-//Enable mouse
-	MOV	AX,0xC200 //Enable
-	MOV	BX,0x0100
-	INT	0x15
-	MOV	AX,0xC201 //Rst
-	INT	0x15
-	MOV	AX,0xC200 //Enable
-	MOV	BX,0x0100
-	INT	0x15
-	MOV	AX,0xC202 //Sample
-	MOV	BX,0x0500 //100
-	INT	0x15
-	MOV	AX,0xC203 //Resolution
-	MOV	BX,0x0300 //8 per mm
-	INT	0x15
-	MOV	AX,0xC205 //pkt size
-	MOV	BX,0x0300
-	INT	0x15
-	MOV	AX,0xC200 //Enable
-	MOV	BX,0x0100
-	INT	0x15
-****/
 
 //Get mem maps
 	MOV	AX,0xE801
@@ -184,12 +160,12 @@ TEMPLEOS_CONT_START:
 	POP	U32 [SYS_BOOT_CODE]
 
 	MOV	BX,CS
-	DEC	BX
-#assert sizeof(CBinFile)==16
+	SUB	BX,sizeof(CBinFile)/16
+#assert !(sizeof(CBinFile)&15)
 	MOV	GS,BX
-	MOV	EBX,U32 GS:[CBinFile.loader_patch_table_offset]
+	MOV	EBX,U32 GS:[CBinFile.patch_table_offset]
 	ADD	EAX,EBX
-	SUB	EAX,16
+	SUB	EAX,sizeof(CBinFile)
 	MOV	U32 [SYS_BOOT_PATCH_TABLE_BASE],EAX
 
 	MOV	U32 [GDT_BOOT_DS],0x0000FFFF
@@ -200,8 +176,7 @@ TEMPLEOS_CONT_START:
 	ADD	U32 [GDT_BOOT_DS+2],EAX
 	ADD	U32 [GDT_BOOT_CS+2],EAX
 
-					// Set-up ptr to limit and base
-					//of GDT.
+	//Set-up ptr to limit and base of GDT.
 	MOV	U16 [SYS_TEMP_PTR],sizeof(CGDT)-1
 	MOV	EAX,U32 [SYS_BOOT_BASE]
 	ADD	EAX,SYS_GDT
@@ -226,7 +201,7 @@ the code segment with a far jump.
 
 #assert $$+16<=0xFFFF
 USE32
-// ************************************
+//************************************
 //  ASM Global vars not required for 16-bit start-up
 	ALIGN	8,OC_NOP
 SYS_HEAP_BASE::		DU64	SYS_FIXED_AREA+sizeof(CSysFixedArea);
@@ -268,8 +243,6 @@ SYS_PROGRESS4_DESC::	DU8	PROGRESS_DESC_LEN+1 DUP(0);
 #assert $$-SYS_PROGRESSES==sizeof(CProgress)*4
 
 SYS_FOCUS_TASK::	DU64	0;
-SYS_TIMER::		DU64	0;
-SYS_JIFFIES::		DU64	1;
 SYS_CPU_STRUCTS::	DU64	0;
 SYS_MP_CNT::		DU64	1;
 SYS_MP_CNT_INITIAL::	DU64	1;
@@ -279,7 +252,7 @@ SYS_MP_CNT_LOCK::	DU64	1;
 SYS_CACHE_LINE_WIDTH::	DU64	DFT_CACHE_LINE_WIDTH;
 	DU8	DFT_CACHE_LINE_WIDTH-sizeof(CBinFile)-8 DUP(0);
 SYS_SEMAS::		DU8	NUM_SYS_SEMAS*SEMA_STRUCT_SIZE DUP(0);
-// ************************************
+//************************************
 	ALIGN	16,OC_NOP
 SYS_INIT_OS:: //Entry point for RAM reboots.
 	PUSH	U32 SYS_START_RFLAGS
@@ -303,8 +276,8 @@ SYS_INIT_OS:: //Entry point for RAM reboots.
 	MOV	DS,AX
 	MOV	ES,AX
 
-	MOV	ECX,U32 CBinFilePatchTableWithoutOrg.abs_addres_cnt[ESI]
-	LEA	ESI,U32 CBinFilePatchTableWithoutOrg.abs_addres[ESI]
+	MOV	ECX,U32 CPatchTableAbsAddr.abs_addres_cnt[ESI]
+	LEA	ESI,U32 CPatchTableAbsAddr.abs_addres[ESI]
 @@05:	LODSD
 	ADD	EAX,EDI
 	ADD	U32 [EAX],EDI
@@ -378,7 +351,7 @@ USE64
 
 	JMP	I32 &KernelMain
 
-// ************************************
+//************************************
 USE32
 INIT_EM64T:
 	MOV_EAX_CR4
@@ -405,7 +378,7 @@ USE64
 EM64T_PART3:
 	RET
 
-// ************************************
+//************************************
 SYS_RESTART_KERNEL::
 	XOR	RDI,RDI
 	MOV	EDI,U32 SYS_BOOT_BASE

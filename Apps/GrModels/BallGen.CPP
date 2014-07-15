@@ -1,7 +1,4 @@
-/*
-This makes a mesh ball.
-*/
-
+//Makes a mesh ball.
 
 #define MAX_VERTICES	1024
 #define MAX_TRIS	1024
@@ -14,10 +11,9 @@ class Ball
   CMeshTri t[MAX_TRIS];
 } *b;
 
-
 class BallDefineStruct
 {
-  F64 radius	fmtstr	 "$$DA-TRM,32,A=\"Radius         :%8.3f\"$$\n";
+  F64 radius	fmtstr	 "$$DA-TRM,32,RT=F64,A=\"Radius         :%8.3f\"$$\n";
   I64 n_longitude fmtstr "$$DA-TRM,32,A=\"Longitude Faces:%5d\"$$\n";
   I64 n_lattitude fmtstr "$$DA-TRM,32,A=\"Lattitude Rings:%5d\"$$\n";
 };
@@ -35,7 +31,6 @@ U0 BDCorrect(BallDefineStruct *bd)
   bd->n_longitude=(bd->n_longitude+1)/2;
   bd->n_lattitude=(bd->n_lattitude+1)/2;
 }
-
 
 I64 AddVertex(BallDefineStruct *,I64 x,I64 y,I64 z)
 {
@@ -64,16 +59,16 @@ U8 *Ball2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
-    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+sprite_base_size[GRST_END]),
+    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+sprite_elem_base_sizes[SPT_END]),
     *dst=result;
-  *dst(U8 *)++ =GRST_MESH;
+  *dst(U8 *)++ =SPT_MESH;
   *dst(I32 *)++ =b->vertex_cnt;
   *dst(I32 *)++ =b->tri_cnt;
   MemCpy(dst,&b->v,b->vertex_cnt*sizeof(CD3I32));
   dst+=b->vertex_cnt*sizeof(CD3I32);
   MemCpy(dst,&b->t,b->tri_cnt*sizeof(CMeshTri));
   dst+=b->tri_cnt*sizeof(CMeshTri);
-  *dst(U8 *)++ =GRST_END;
+  *dst(U8 *)++ =SPT_END;
   return result;
 }
 
@@ -117,9 +112,9 @@ public U8 *BallGen()
     }
  
     result=Ball2CSprite;
-    NewLine(7);
+    "%h7c",'\n';
     Sprite(result,"\t\t$$SP,\"<1>\",BI=%d$$");
-    NewLine(7);
+    "%h7c",'\n';
     "Vertices:%d\n",b->vertex_cnt;
     Free(b);
     "Do another";

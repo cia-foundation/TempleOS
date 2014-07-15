@@ -1,33 +1,33 @@
 $WW,1$$FG,5$$TX+CX,"File Manager"$$FG$
 
-$FG,2$SHIFT CURSOR$FG$
+$FG,2$<SHIFT CURSOR>$FG$
 $ID,2$Select files.
 $ID,-2$
-$FG,2$CTRL-Y or DELETE KEY$FG$
+$FG,2$<CTRL-y> or <DELETE>$FG$
 $ID,2$Delete file or tree.
 $ID,-2$
-$FG,2$CTRL-C or CTRL-INS$FG$
+$FG,2$<CTRL-c> or <CTRL-INS>$FG$
 $ID,2$Copy selected files to clipboard.
 $ID,-2$
-$FG,2$CTRL-V or SHIFT-INS$FG$
+$FG,2$<CTRL-v> or <SHIFT-INS>$FG$
 $ID,2$Paste clipboard.
 $ID,-2$
 $FG,2$LEFT-CLICK,drag-drop$FG$
 $ID,2$Move a file or tree to a directory.
 $ID,-2$
-$FG,2$LEFT-CLICK,same file or <SPACE BAR>$FG$
+$FG,2$LEFT-CLICK,same file or <SPACE>$FG$
 $ID,2$Edit file.
 $ID,-2$
-$FG,2$SHIFT-SPACE KEY$FG$
+$FG,2$<SHIFT-SPACE>$FG$
 $ID,2$Edit Plain Text File.
 $ID,-2$
 $FG,2$RIGHT-CLICK or <ENTER>$FG$
 $ID,2$Bring-up menu.
 $ID,-2$
-$FG,2$F5$FG$
+$FG,2$<F5>$FG$
 $ID,2$#include file.
 $ID,-2$
-$FG,2$SHIFT-F5$FG$
+$FG,2$<SHIFT-F5>$FG$
 $ID,2$Adam #include file.
 $ID,-2$
 $FG,2$'r'$FG$
@@ -43,10 +43,10 @@ $FG,2$'f'$FG$
 $ID,2$Format drive.
 $ID,-2$
 $FG,2$'M'$FG$
-$ID,2$Make CD/DVD ISO file.  This creates a file image of the directory the cursor is on.  The name of the ISO file is $LK,"sys_dft_iso_name",A="MN:sys_dft_iso_name"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
+$ID,2$Make CD/DVD ISO file.  This creates a file image of the directory the cursor is on.  The name of the ISO file is $LK,"dsk.dft_iso_filename",A="MN:CDskGlbls"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
 $ID,-2$
 $FG,2$'B'$FG$
-$ID,2$Burn CD/DVD ISO file.  This burns a CD/DVD using the image file, $LK,"sys_dft_iso_name",A="MN:sys_dft_iso_name"$ to the drive the cursor is on.
+$ID,2$Burn CD/DVD ISO file.  This burns a CD/DVD using the image file, $LK,"dsk.dft_iso_filename",A="MN:CDskGlbls"$ to the drive the cursor is on.
 $ID,-2$
 
 $FG,5$Instructions on Using CD/DVD's$FG$

@@ -1,9 +1,9 @@
 #help_index "AutoFile;Training"
 
-public U0 AFPmtStr(U8 *st)
-{
+public U0 AFGetStr(U8 *st)
+{//Wait for user to type certain str.
   I64 ch,sc;
-  U8 buf[136];
+  U8 buf[256],*st2;
   while (*st) {
     ch=GetKey(&sc,FALSE);
     if (sc.u8[0]!=SC_SHIFT &&
@@ -13,12 +13,9 @@ public U0 AFPmtStr(U8 *st)
 	'' ch;
 	st++;
       } else {
-	if (*st=='\n')
-	  SPrint(buf,"Press the '$$GREEN$$<ENTER>$$FG$$' key");
-	else if (*st==CH_SPACE)
-	  SPrint(buf,"Press the '$$GREEN$$<SPACE BAR>$$FG$$' key");
-	else
-	  SPrint(buf,"Press the '$$GREEN$$%c$$FG$$' key",*st);
+	st2=Char2KeyName(*st);
+	StrPrint(buf,"Press the $$GREEN$$<%s>$$FG$$ key.",st2);
+	Free(st2);
 	PopUpOk(buf);
       }
     }
@@ -26,8 +23,8 @@ public U0 AFPmtStr(U8 *st)
 }
 
 public U0 AFPrint(I64 mS=100,U8 *fmt,...)
-{
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv),*st=buf;
+{//Print message with delay after each char.
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=buf;
   I64 ch;
   while (ch=*st++) {
     '' ch;
@@ -36,106 +33,105 @@ public U0 AFPrint(I64 mS=100,U8 *fmt,...)
   Free(buf);
 }
 
-public U0 AFGetKey(I64 scancode,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
-{
+public U0 AFGetKey(I64 scan_code,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
+{//Wait for user to press certain key.
   I64 sc,ch;
   U8 buf[128],*st;
   do {
     ch=GetKey(&sc);
     if (sc.u8[0]!=SC_PRTSCRN1 &&
-	!(sc.u8[0]==SC_SHIFT && scancode&SCF_SHIFT) &&
-	!(sc.u8[0]==SC_CTRL && scancode&SCF_CTRL) &&
-	!(sc.u8[0]==SC_ALT && scancode&SCF_ALT) ) {
-      if (sc&sc_mask!=scancode&sc_mask) {
-	st=ScanCode2KeyName(scancode);
-	SPrint(buf,"Press the '$$GREEN$$%s$$FG$$' key",st);
+	!(sc.u8[0]==SC_SHIFT && scan_code&SCF_SHIFT) &&
+	!(sc.u8[0]==SC_CTRL && scan_code&SCF_CTRL) &&
+	!(sc.u8[0]==SC_ALT && scan_code&SCF_ALT) ) {
+      if (sc&sc_mask!=scan_code&sc_mask) {
+	st=ScanCode2KeyName(scan_code);
+	StrPrint(buf,"Press the $$GREEN$$<%s>$$FG$$ key",st);
 	Free(st);
 	PopUpOk(buf);
       }
     }
-  } while (sc&sc_mask!=scancode&sc_mask);
+  } while (sc&sc_mask!=scan_code&sc_mask);
   Msg(MSG_KEY_DOWN,ch,sc);
 }
 
-public U0 AFGetChar(I64 ch1,I64 ch2=0)
-{
-  I64 sc,ch;
-  U8 buf[256],*st1,*st2;
+public I64 AFGetChar(...)
+{//Wait for user to press one of set of chars.
+  I64 i,sc,ch;
+  U8 buf[512],*st;
   while (TRUE) {
     ch=GetKey(&sc);
-    if (sc.u8[0]!=SC_SHIFT &&
-	sc.u8[0]!=SC_ALT &&
-	sc.u8[0]!=SC_CTRL) {
-      if (ch!=ch1 && (!ch2 || ch!=ch2)) {
-	if (!ch2) {
-	  st1=A2KeyName(ch1);
-	  SPrint(buf,"Press the '$$GREEN$$%s$$FG$$' key",st1);
-	  Free(st1);
-	} else {
-	  st1=A2KeyName(ch1);
-	  st2=A2KeyName(ch2);
-	  SPrint(buf,"Press the '$$GREEN$$%s$$FG$$' key or\n"
-		      "the '$$GREEN$$%s$$FG$$' key.",st1,st2);
-	  Free(st1);
-	  Free(st2);
+    if (sc.u8[0]!=SC_SHIFT && sc.u8[0]!=SC_ALT && sc.u8[0]!=SC_CTRL) {
+      for (i=0;i<argc;i++)
+	if (ch==argv[i]) {
+	  Msg(MSG_KEY_DOWN,ch,sc);
+	  return ch;
 	}
-	PopUpOk(buf);
-      } else
-	break;
+      StrPrint(buf,"Press ");
+      for (i=0;i<argc;i++) {
+	st=Char2KeyName(argv[i]);
+	CatPrint(buf,"$$GREEN$$<%s>$$FG$$",st);
+	Free(st);
+	if (argc==i+1)
+	  CatPrint(buf,".");
+	else if (argc==i+2)
+	  CatPrint(buf," or ");
+	else
+	  CatPrint(buf,", ");
+      }
+      PopUpOk(buf);
     }
   }
-  Msg(MSG_KEY_DOWN,ch,sc);
 }
 
-public U0 AFUntilKey(I64 scancode,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
-{
+public U0 AFUntilKey(I64 scan_code,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
+{//Let user type until he presses certain key.
   I64 sc,ch;
   do {
     ch=GetKey(&sc);
     Msg(MSG_KEY_DOWN,ch,sc);
-  } while (sc&sc_mask!=scancode&sc_mask);
+  } while (sc&sc_mask!=scan_code&sc_mask);
 }
 
-public U0 AFUntilChar(I64 ch1,I64 ch2=0)
-{
-  I64 sc,ch;
-  do {
+public I64 AFUntilChar(...)
+{//Let user type until he presses one of set of chars.
+  I64 i,sc,ch;
+  while (TRUE) {
     ch=GetKey(&sc);
     Msg(MSG_KEY_DOWN,ch,sc);
-  } while (ch!=ch1 && (!ch2 || ch!=ch2));
+    for (i=0;i<argc;i++)
+      if (ch==argv[i])
+	return ch;
+  }
 }
 
-I64 af_l,af_r,af_c;
+I64 af_l,af_r;
 
 Bool AFSetIPPlot(I64 mS,I64 x,I64 y,I64 z)
 {
-  SetIP(x,y,z,af_l,af_r,af_c);
+  SetIP(x,y,z,af_l,af_r);
   Sleep(mS);
   return TRUE;
 }
 
-public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64,I64 c=MAX_I64)
-{
-  if (!(0<=x<gr_width))
-    x=ipx;
-  if (!(0<=y<gr_height))
-    y=ipy;
+public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64)
+{//Move input pointer (mouse) to spot at certain speed.
+  if (!(0<=x<GR_WIDTH))
+    x=ip.pos.x;
+  if (!(0<=y<GR_HEIGHT))
+    y=ip.pos.y;
   if (z==MAX_I64)
-    z=ipz;
+    z=ip.pos.z;
   if (!(FALSE<=l<=TRUE))
-    l=ip_lb;
-  if (!(FALSE<=c<=TRUE))
-    c=ip_cb;
+    l=ip.lb;
   if (!(FALSE<=r<=TRUE))
-    r=ip_rb;
-  af_l=l; af_r=r; af_c=c;
-  Line(mS,ipx,ipy,ipz,x,y,z,&AFSetIPPlot);
+    r=ip.rb;
+  af_l=l; af_r=r;
+  Line(mS,ip.pos.x,ip.pos.y,ip.pos.z,x,y,z,&AFSetIPPlot);
 }
 
 public Bool AFView()
-{
+{//Let user type until <ESC> or <SHIFT-ESC>.
   Bool result=View;
   DocBottom;
   return result;
 }
-#help_index ""

@@ -8,8 +8,7 @@ class CSndWaveCtrl
 };
 
 public U0 SndTaskEndCB()
-//This will turn-off snd when a task gets killed.
-{
+{//Will turn-off snd when a task gets killed.
   Snd(0);
   Exit;
 }
@@ -18,4 +17,3 @@ public U0 SndTaskEndCB()
 #include "Music"
 #include "SndEffects"
 #include "SndFile"
-#help_index ""

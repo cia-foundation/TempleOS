@@ -1,4 +1,4 @@
- //This is the software interrupt num
+//This is the software interrupt num
 //we will use.  See $LK,"Software Int's",A="MN:I_WAKE"$ for
 //picking a num.  Nums are subject to change.
 
@@ -50,7 +50,6 @@ _F_UM_CALL::
 _extern _F_UM_INT F64 UnaryMinusInt(F64 d);
 _extern _F_UM_CALL F64 UnaryMinusCall(F64 d);
 
-
 #define SAMPLE_SIZE	1000000
 U0 TimeIns()
 {
@@ -82,9 +81,7 @@ U0 TimeIns()
 TimeIns;
 
 /*  Program Output$HL,0$$WW+H,1$$FD,1$
-
 $PT$$FG$$BG$6 Cores 3.395GHz
 Interrupt Cycles:  573.98543
 Call	  Cycles:    9.74349
-
 $HL,1$*/

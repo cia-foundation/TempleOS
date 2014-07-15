@@ -1,10 +1,21 @@
 #help_index "God"
-U8 **god_words=NULL;
-I64 god_num_words=0;
-public CFifoU8 *god_fifo=FifoU8New(32);
 
 #define GOD_BAD_BITS	4
 #define GOD_GOOD_BITS	24
+
+public class CGodGlbls
+{
+  U8	**words;
+  I64	num_words;
+  CFifoU8 *fifo;
+  CDC	*doodle_dc;
+  I64	doodle_ch;
+  CFifoU8 *doodle_fifo;
+  Bool	doodle_done;
+} god;
+MemSet(&god,0,sizeof(CGodGlbls));
+god.doodle_fifo	=FifoU8New(32);
+god.fifo	=FifoU8New(32);
 
 extern U0 GodBitsIns(I64 num_bits,I64 n);
 extern U0 GodWord();

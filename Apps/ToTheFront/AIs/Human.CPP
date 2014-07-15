@@ -1,22 +1,22 @@
 U0 TanksPlot()
 {
   Unit *tempu=NULL;
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   F64 target_x,target_y;
   SetViewPlayer(cur_player);
   while (TRUE) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
 	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(p1);
+	HandleChar(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  if (tempu=FindUnit(cursor_row,cursor_col)) {
 	    if (tempu->player==enemy_player || tempu->fired || !tempu->indirect_fire)
 	      tempu=NULL;
@@ -28,8 +28,8 @@ U0 TanksPlot()
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  RowCol2XY(&target_x,&target_y,cursor_row,cursor_col);
 	  if (!tempu)
 	    Beep;
@@ -44,7 +44,7 @@ U0 TanksPlot()
 	fire_radius=0;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,p1,p2))
+	if (CursorInWindow(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }
@@ -54,21 +54,21 @@ U0 TanksPlot()
 U0 TanksMove()
 {
   Unit *tempu=NULL,*target;
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   SetViewPlayer(cur_player);
   while (TRUE) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
 	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(p1);
+	HandleChar(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  if (tempu=FindUnit(cursor_row,cursor_col)) {
 	    if (tempu->player==enemy_player || !tempu->remaining_movement)
 	      tempu=NULL;
@@ -76,8 +76,8 @@ U0 TanksMove()
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  target=FindUnit(cursor_row,cursor_col);
 	  if (!tempu)
 	    Beep;
@@ -85,15 +85,15 @@ U0 TanksMove()
 	    if (target)
 	      Beep;
 	    else
-	      MoveUnit(tempu,p1+Fs->horz_scroll.pos,
-		  p2+Fs->vert_scroll.pos);
+	      MoveUnit(tempu,a1+Fs->horz_scroll.pos,
+		  a2+Fs->vert_scroll.pos);
 	    break;
 	  }
 	}
 	tempu=NULL;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,p1,p2))
+	if (CursorInWindow(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }
@@ -103,21 +103,21 @@ U0 TanksMove()
 U0 TanksFire()
 {
   Unit *tempu=NULL,*target;
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   SetViewPlayer(cur_player);
   while (TRUE) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&p1,&p2,1<<MSG_KEY_DOWN|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
 	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(p1);
+	HandleChar(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  if (tempu=FindUnit(cursor_row,cursor_col)) {
 	    if (tempu->player==enemy_player || tempu->fired || tempu->indirect_fire)
 	      tempu=NULL;
@@ -131,8 +131,8 @@ U0 TanksFire()
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,p1,p2)) {
-	  UpdateCursor(Fs,p1,p2);
+	if (CursorInWindow(Fs,a1,a2)) {
+	  UpdateCursor(Fs,a1,a2);
 	  target=FindUnit(cursor_row,cursor_col);
 	  if (!tempu)
 	    Beep;
@@ -148,7 +148,7 @@ U0 TanksFire()
 	fire_radius=0;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,p1,p2))
+	if (CursorInWindow(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }

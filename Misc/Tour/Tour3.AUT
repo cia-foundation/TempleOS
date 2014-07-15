@@ -1,22 +1,22 @@
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nCd(\"::/Demo/Games\");Dir;\n";
 
 PopUpOk(
 "Now, we're going to add the\n"
 "CastleFrankenstein.CPP.Z program\n"
-"to your personal menu.\n\n"
-"Press $$GREEN$$<CTRL-M>$$FG$$\n"
-"to get to your personal menu.\n");
+"to your PersonalMenu.\n\n"
+"Press $$GREEN$$<CTRL-m>$$FG$$\n"
+"to get to your PersonalMenu.\n");
 AFGetChar(CH_CTRLM);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 Sleep(1000);
 
 PopUpOk(
-"$$GREEN$$<CTRL-L>$$FG$$ to invoke the\n"
+"$$GREEN$$<CTRL-l>$$FG$$ to invoke the\n"
 "text-widget resource editor.\n"
 "\n"
-"($$GREEN$$<CTRL-R>$$FG$$ invokes the\n"
+"($$GREEN$$<CTRL-r>$$FG$$ invokes the\n"
 "graphic resource editor.)\n"
 );
 AFGetChar(CH_CTRLL);
@@ -30,10 +30,9 @@ for (i=0;i<6;i++)
   AFGetKey(SC_CURSOR_DOWN);
 
 PopUpOk(
-"$$GREEN$$<SPACE BAR>$$FG$$.\n");
-AFPmtStr(" ");
+"$$GREEN$$<SPACE>$$FG$$.\n");
+AFGetStr(" ");
 Sleep(1000);
-
 
 PopUpOk(
 "Now, we'll fill-in the visible text\n"
@@ -57,9 +56,9 @@ Sleep(1000);
 
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 PopUpOk(
-"Press $$GREEN$$<SPACE BAR>$$FG$$ to test it.\n");
-AFPmtStr(" ");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+"Press $$GREEN$$<SPACE>$$FG$$ to test it.\n");
+AFGetStr(" ");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
 "Now, we'll do a fancier macro that pops-up\n"
@@ -67,7 +66,7 @@ PopUpOk(
 "returning mem to the system.\n");
 Msg(MSG_KEY_DOWN,CH_CTRLM,0x43200000432);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
-Msg(MSG_KEY_DOWN,CH_CTRLL,0);
+Msg(MSG_KEY_DOWN,CH_CTRLL,0x42600000426);
 for (i=0;i<6;i++)
   Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
 AFPrint(," Click here for Pop-up version");
@@ -81,9 +80,8 @@ PopUpOk(
 for (i=0;i<2;i++)
   AFGetKey(SC_CURSOR_DOWN);
 PopUpOk(
-"$$GREEN$$<SPACE BAR>$$FG$$ to\n"
-"check the box.\n");
-AFPmtStr(" ");
+"$$GREEN$$<SPACE>$$FG$$ to check the box.\n");
+AFGetStr(" ");
 Sleep(500);
 
 PopUpOk("$$GREEN$$<ESC>$$FG$$ to exit the form.\n");
@@ -96,14 +94,14 @@ Sleep(500);
 
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 PopUpOk(
-"$$GREEN$$<SPACE BAR>$$FG$$ to test it.\n");
-AFPmtStr(" ");
+"$$GREEN$$<SPACE>$$FG$$ to test it.\n");
+AFGetStr(" ");
 Sleep(3000);
 
 PopUpOk(
 "$$GREEN$$<CTRL-S>$$FG$$ to save your\n"
-"personal menu file, if you wish.\n"
-"Your personal menu is special and\n"
+"PersonalMenu file, if you wish.\n"
+"Your PersonalMenu is special and\n"
 "does not save on $$GREEN$$<ESC>$$FG$$.\n");
 if (Fs->parent_task->popup_task) {
   '' CH_SHIFT_ESC;

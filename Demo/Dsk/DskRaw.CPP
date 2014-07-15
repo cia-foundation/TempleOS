@@ -23,7 +23,7 @@ U0 RawAccess(I64 drv_let=0)
   p->size=bdev->max_blk-bdev->min_blk+1;
 
   try {
-    blk=PmtI64("Blk to Read: ",old_offset,bdev->min_blk,bdev->max_blk);
+    blk=GetI64("Blk to Read: ",old_offset,bdev->min_blk,bdev->max_blk);
     RBlks(p,buf,blk,1);
     D(buf,BLK_SIZE);
   } catch

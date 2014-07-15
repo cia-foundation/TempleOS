@@ -13,15 +13,15 @@ The $FG,2$$TX,"trivial solution",HTML="http://en.wikipedia.org/wiki/Trivial_solu
 
 * No networking.
 
-* Least (greatest) common denominator hardware support.  Mostly, one driver for each device class.  I can't be in the business of different drivers.  Compatibility is the greatest challenge for PC operating systems.  Disk code does not use interrupts, avoiding compatibility risks.  PS/2 keyboard/mouse is used instead of USB, also more compatible.
+* Least (greatest) common denominator hardware support.  Mostly, one driver for each device class.  I can't be in the business of different drivers.  Compatibility is the greatest challenge for PC operating systems.  Disk code does not use interrupts, avoiding compatibility risks.  $FG,2$PS/2$FG$ keyboard/mouse is used instead of $FG,2$USB$FG$, also more compatible.
 
-* $FG,2$640x480$FG$ 16 colors.  Updates whole screen at 60 fps, optimized for full screen games where "invalid rectangles" are counter-productive.
+* $FG,2$640x480$FG$ 16 colors.  Updates whole screen at $FG,2$60 fps$FG$, optimized for full screen games where $FG,2$InvalidRectangle$FG$s are counter-productive.
 
 * One font, 8x8.  Text and graphic layers done in software with text normally on an 8x8 grid.  It can run in Text mode if graphic initialization fails.
 
 * Compiler extends all values to 64-bit when fetched and does only 64-bit computations intermediately.  Assembler has minimal 16-bit support, good enough for compiling boot loaders.
 
-* No object files.  Linking can be done at $LK,"Load",A="MN:Load"$() time for $FG,2$AOT$FG$ modules, if you insist on not using $FG,2$JIT$FG$.  Modules have imports and exports.
+* No object files.  Use $FG,2$JIT$FG$.
 
 * Whole files are processed almost exclusively, allowing compression.
 
@@ -31,11 +31,11 @@ The $FG,2$$TX,"trivial solution",HTML="http://en.wikipedia.org/wiki/Trivial_solu
 
 * No child windows.  One window per task.  Buttons are widgets, not child windows.  There are child tasks, however.
 
-* No distinction between "thread", "process" or "task".
+* No distinction between $FG,2$thread$FG$, $FG,2$process$FG$ or $FG,2$task$FG$.
 
-* The $LK,"Scheduler",A="FI:::/Kernel/Scheduler.CPP"$ is mostly for home systems, not servers or mainframes.  The focus task is all important.  Disk requests are not broken-up, so sharing is bad, however.
+* The $LK,"Scheduler",A="FI:::/Kernel/Sched.CPP"$ is mostly for home systems, not servers or mainframes.  The focus task is all important.  Disk requests are not broken-up, so sharing is bad, however.
 
-* $LK,"MultiCore",A="FI:::/Doc/MultiCore.TXT"$ is done master/slave, instead of $FG,2$SMP$FG$.  Core zero explicitly assigns jobs.  Locks are present allowing multicore file, heap, and hardware access, though.
+* $LK,"MultiCore",A="FI:::/Doc/MultiCore.TXT"$ is done $FG,2$master/slave$FG$, instead of $FG,2$SMP$FG$.  Core zero explicitly assigns jobs.  Locks are present allowing multicore file, heap, and hardware access, though.
 
 * $LK,"Music",A="MN:Play"$ is done with an elegant one-voice notation.
 

@@ -13,13 +13,13 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,U8 *acct_name,
 {
   U8 *st1,*st2;
 
-  st1=MPrint("%C:/",cd_drv);
-  st2=MPrint("%C:/",drv);
+  st1=MStrPrint("%C:/",cd_drv);
+  st2=MStrPrint("%C:/",drv);
   CopyTree(st1,st2);
   Free(st1);
   Free(st2);
 
-  st1=MPrint("%C:/Accts/%s",drv,acct_name);
+  st1=MStrPrint("%C:/Accts/%s",drv,acct_name);
   MkDir(st1);
   Copy("::/Misc/MakeDistro.CPP.Z",st1);
   Free(st1);
@@ -48,7 +48,7 @@ U0 VMInstallWizard()
   CTask *task;
   while (TRUE) {
     "Make-up a Log-In Name (account).\n";
-    acct_name=PmtStr("User Acct Name: ");
+    acct_name=GetStr("User Acct Name: ");
     if (FileNameChk(acct_name))
       break;
     Free(acct_name);
@@ -88,7 +88,7 @@ U0 RegularInstallWizard()
 
   while (TRUE) {
     "Make-up a Log-In Name (account).\n";
-    acct_name=PmtStr("User Acct Name: ");
+    acct_name=GetStr("User Acct Name: ");
     if (FileNameChk(acct_name))
       break;
     Free(acct_name);
@@ -108,28 +108,28 @@ U0 RegularInstallWizard()
   num_hints=ATARep(FALSE,,&root);
   "\nInclude '$$PURPLE$$0x$$FG$$' for hexidecimal numbers.\n\n";
   while (TRUE) {
-    base0=PmtStr("Hard Drive I/O Port Base0  : ");
-    if (0<A2I64(base0)<=0xFFFF)
+    base0=GetStr("Hard Drive I/O Port Base0  : ");
+    if (0<Str2I64(base0)<=0xFFFF)
       break;
     Free(base0);
   }
-  if (1<=A2I64(base0)<=num_hints) {
-    tempha=ATARepFind(&root,A2I64(base0));
+  if (1<=Str2I64(base0)<=num_hints) {
+    tempha=ATARepFind(&root,Str2I64(base0));
     Free(base0);
-    base0=MPrint("0x%X",tempha->base0);
-    base1=MPrint("0x%X",tempha->base1);
-    ms	 =MPrint("0x%X",tempha->unit);
-    unit=A2I64(ms);
+    base0=MStrPrint("0x%X",tempha->base0);
+    base1=MStrPrint("0x%X",tempha->base1);
+    ms	 =MStrPrint("0x%X",tempha->unit);
+    unit=Str2I64(ms);
   } else {
     while (TRUE) {
-      base1=PmtStr("Hard Drive I/O Port Base1  : ");
-      if (0<A2I64(base1)<=0xFFFF)
+      base1=GetStr("Hard Drive I/O Port Base1  : ");
+      if (0<Str2I64(base1)<=0xFFFF)
 	break;
       Free(base1);
     }
     while (TRUE) {
-      ms =PmtStr("Unit--$$PURPLE$$0$$FG$$=Master or $$PURPLE$$1$$FG$$=Slave: ","0");
-      unit=A2I64(ms);
+      ms =GetStr("Unit--$$PURPLE$$0$$FG$$=Master or $$PURPLE$$1$$FG$$=Slave: ","0");
+      unit=Str2I64(ms);
       if (0<=unit<=1)
 	break;
     }
@@ -138,25 +138,25 @@ U0 RegularInstallWizard()
   XTalkWait(task,"%s\n%s\n%C\n",base0,base1,'0'+unit);
   PrtRep;
   while (TRUE) {
-    dst=PmtStr("\nDestination Partition Letter: ");
+    dst=GetStr("\nDestination Partition Letter: ");
     if ('A'<=ToUpper(*dst)<='Z')
       break;
     Free(dst);
   }
 
-  NewLine;
-  st1=MPrint("%C:/",*sys_acct);
-  st2=MPrint("%C:/",*dst);
+  '\n';
+  st1=MStrPrint("%C:/",*sys_acct);
+  st2=MStrPrint("%C:/",*dst);
 
   "$$RED$$Format %C Partition?$$FG$$\n",*dst;
   if (YorN) {
-    NewLine;
+    '\n';
     while (TRUE) {
     "$$PURPLE$$1$$FG$$) Use FAT32\n"
       "$$PURPLE$$2$$FG$$) Use RedSea\n"
       "\nFile System Type: ";
       ch=GetChar;
-      NewLine;
+      '\n';
       if ('1'<=ch<='2')
 	break;
     }
@@ -166,11 +166,11 @@ U0 RegularInstallWizard()
       Fmt(*dst,,FALSE,PT_REDSEA);
   }
   CopyTree(st1,st2);
-  st2=MPrint("%C:/Temp",*dst);
+  st2=MStrPrint("%C:/Temp",*dst);
   MkDir(st2);
   Free(st2);
 
-  new_home_str=MPrint("%C:/Accts/%s",*dst,acct_name);
+  new_home_str=MStrPrint("%C:/Accts/%s",*dst,acct_name);
   MkDir(new_home_str);
   Copy("::/Misc/MakeDistro.CPP.Z",new_home_str);
   XTalkWait(task,
@@ -188,7 +188,7 @@ U0 RegularInstallWizard()
   *dst,base0,base1,'0'+unit,acct_name);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {
-    NewLine;
+    '\n';
     MasterBootIntall(*dst);
   }
   Free(new_home_str);
@@ -204,12 +204,15 @@ U0 RegularInstallWizard()
 
 U0 DoInstall()
 {
-  I64 pmt_reboot;
-  NewLine(5);
-  "Install on virtual machine ";
-  if (pmt_reboot=YorN)
+  I64 vm_install,pmt_reboot;
+  "\n\n\n\n\nInstall on virtual machine ";
+  vm_install=YorN;
+  DocBottom;
+
+  if (vm_install) {
     VMInstallWizard();
-  else {
+    pmt_reboot=TRUE;
+  } else {
     "\n\nThis wizard works if you have a partition ready.  "
     "You can partition the drive or MakeOSPrtBootInstall() "
     "with more options if you do it by hand, not using this wizard.\n\n"

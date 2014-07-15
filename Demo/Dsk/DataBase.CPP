@@ -3,21 +3,17 @@
 #define DB_ACCT_BLKS	1
 
 class Acct
-{ //Use <CTRL-L> to help generate fmtstrs.
+{//Use <CTRL-l> to help generate fmtstrs.
   U8 name[32] fmtstr "$$DA-P,32,A=\"Name:%s\"$$\n";
   U8 addr[64] fmtstr "$$DA-P,64,A=\"Addr:%s\"$$\n";
   U8 pad[DB_ACCT_BLKS*BLK_SIZE-64-32];
 };
 
-
 U0 InitDatabase()
-{
-  CFile *f;
-  //Write new contiguous file
-  f=FOpen(DB_FILENAME,"w",DB_MAX_ACCT*DB_ACCT_BLKS);
+{ //Write new contiguous file
+  CFile *f=FOpen(DB_FILENAME,"w",DB_MAX_ACCT*DB_ACCT_BLKS);
   FClose(f);
 }
-
 
 U0 WriteAcct()
 {
@@ -25,7 +21,7 @@ U0 WriteAcct()
   Acct a;
   I64 acctnum;
 
-  acctnum=PmtI64("Acct #",-1);
+  acctnum=GetI64("Acct #",-1);
   if (0<=acctnum<DB_MAX_ACCT) {
     MemSet(&a,0,BLK_SIZE);
     if (DocFormDo(&a)) {
@@ -42,7 +38,7 @@ U0 ReadAcct()
   Acct a;
   I64 acctnum;
 
-  acctnum=PmtI64("Acct #",-1);
+  acctnum=GetI64("Acct #",-1);
   if (0<=acctnum<DB_MAX_ACCT) {
     f=FOpen(DB_FILENAME,"r");
     FRBlks(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
@@ -59,7 +55,7 @@ U0 DatabaseDemo()
   do {
     "$$GREEN$$R$$FG$$ead acct, $$GREEN$$W$$FG$$rite acct or $$GREEN$$<SHIFT-ESC>$$FG$$:";
     ch=ToUpper(GetChar);
-    NewLine;
+    '\n';
     if (ch=='R') ReadAcct;
     if (ch=='W') WriteAcct;
   } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);

@@ -14,7 +14,7 @@ U0 F64FileGenTXT(U8 *filename,I64 n)
 F64FileGenTXT("/Demo/SortFileExample/UnsortedF64.TXT.Z",10);
 
 U0 F64FileGenDAT(U8 *filename,I64 n)
-{//$LK,"File/Program Routines/CFile",A="HI:File/Program Routines/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
+{//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
   I64 i;
   F64 *a=MAlloc(n*sizeof(F64));
   for (i=0;i<n;i++)

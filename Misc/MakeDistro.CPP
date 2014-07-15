@@ -7,7 +7,7 @@ $FG,4$$TX,"VMware Player",HTML="https://my.vmware.com/web/vmware/free#desktop_en
 (The $FG,4$$TX,"VMware",HTML="https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/5_0"$$FG$ web page takes a whole minute to load.  They hide the free version.)
 
 Purchase $FG,4$$TX,"VMware WorkStation",HTML="http://www.vmware.com"$$FG$ or download $FG,4$$TX,"WinImage",HTML="http://www.winimage.com/winimage.htm"$$FG$ if you wish to transfer files
-in and out.  The VMWare Workstation will stretch to full-screen and make drives
+in and out.  The VMware Workstation will stretch to full-screen and make drives
 accessible from Windows.
 
 $HL,1$*/

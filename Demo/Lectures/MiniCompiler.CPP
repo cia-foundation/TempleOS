@@ -4,7 +4,7 @@ $ID,2$The mini compiler is like the main compiler, except the main compiler's le
 
 The main compiler generates $LK,"Intermediate Code",A="FF:::/Compiler/CmpDefs.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression",A="MN:PrsExpression"$(), $LK,"PrsStatement",A="MN:PrsStatement"$().
 
-The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="FF:D:/Compiler/CmpInit.CPP,ST_INTERMEDIATE_CODE"$, $LK,"Combining Consts",A="FF:::/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars",A="FF:::/Compiler/OptPass3.CPP,num_reg_vars"$.  Set $LK,"OTrace",A="MN:OTrace"$(ON) to see the optimization stages.
+The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="FF:D:/Compiler/CmpInit.CPP,ST_INTERMEDIATE_CODE"$, $LK,"Combining Consts",A="FF:::/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars",A="FF:::/Compiler/OptPass3.CPP,cmp.num_reg_vars"$.  Set $LK,"OTrace",A="MN:OTrace"$(ON) to see the optimization stages.
 
 The main compiler makes machine code in the back end.  See $LK,"IC Struct",A="MN:CIntermediateCode"$, $LK,"LCCCompile",A="MN:LCCCompile"$ and $LK,"OptPass789",A="FF:::/Compiler/OptPass789.CPP,IC_MUL"$(), $LK,"BackEnd",A="FF:::/Compiler/Back1a.CPP,ICMul"$.  Set $LK,"CTrace",A="MN:CTrace"$(ON) to see the output of the backend.
 $ID,-2$
@@ -30,7 +30,7 @@ $ID,-2$$WW,0$*/
 #define OP_SUB		4
 
 I64 Lex(U8 **_src,I64 *num)
-{ //See $LK,"Lex",A="MN:Lex"$().
+{//See $LK,"Lex",A="MN:Lex"$().
   U8 *src=*_src;
   I64 i;
   while (TRUE) {
@@ -90,7 +90,7 @@ I64 Lex(U8 **_src,I64 *num)
 extern I64 Parse(U8 **_src,U8 **_dst);
 
 U0 PrsTerm(U8 **_src,U8 **_dst,I64 prec)
-{ //See $LK,"PrsExpression",A="MN:PrsExpression"$().
+{//See $LK,"PrsExpression",A="MN:PrsExpression"$().
   I64 i;
   U8 *src2;
   U8 *dst2;
@@ -111,8 +111,7 @@ U0 PrsTerm(U8 **_src,U8 **_dst,I64 prec)
 }
 
 I64 Parse(U8 **_src,U8 **_dst)
-{
-//See $LK,"PrsExpression",A="MN:PrsExpression"$().
+{//See $LK,"PrsExpression",A="MN:PrsExpression"$().
 //See $LK,"Opcode Fmts",A="FF:::/Compiler/OpCodes.TXT,IDIV"$ for details on asm instructions.
   I64 i;
   U8 *dst=*_dst;
@@ -195,7 +194,6 @@ I64 Parse(U8 **_src,U8 **_dst)
   }
 }
 
-
 U0 Main()
 {
   U8 *src,*src2,*code,*dst;
@@ -208,7 +206,7 @@ U0 Main()
     "This will compile an expression\n"
     "consisting of integers, parentheses\n"
     "and the operators +,-,* and /.\n";
-    src=MGetS;
+    src=GetStr;
     if (*src) {
       src2=src;
       dst=code;

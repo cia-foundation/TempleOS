@@ -5,7 +5,6 @@ U0 Job(CDoc *doc)
     DocPrint(doc,"$$FG,%d$$CPU%d ",Gs->num,Gs->num);
 }
 
-
 U0 MPPrintDemo()
 {
   I64 i;

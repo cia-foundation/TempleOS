@@ -4,7 +4,6 @@ Or, type $LK,"AutoFile",A="MN:AutoFile"$(filename);
 See $LK,"AutoFile",A="FF:::/Doc/Glossary.TXT,AutoFile"$ in the glossary for more info.
 */
 
-
 I64 i;
 for (i=0;i<3;i++)
   "Dir;\n";

@@ -1,5 +1,4 @@
-/*
-We use the internal routines from the text editor
+/*We use the internal routines from the text editor
 to cut and paste lines to reverse the order of
 lines in a text file.
 */

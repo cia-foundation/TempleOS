@@ -19,7 +19,6 @@ AcctRegExeBranch("TempleOS/Wenceslas");
 
 
 
-
  
 
 
@@ -29,7 +28,6 @@ AcctRegExeBranch("TempleOS/Wenceslas");
 
 
     $SP,"<4>",BI=4$
-
 
 
 
@@ -55,8 +53,6 @@ AcctRegExeBranch("TempleOS/Wenceslas");
 
 
 
-
-
     $SP,"<6>",BI=6$
 
 
@@ -64,12 +60,7 @@ AcctRegExeBranch("TempleOS/Wenceslas");
 
 
 
-
-
-
     $SP,"<7>",BI=7$
-
-
 
 #define NUM_FLAKES	0x8000
 class Flake
@@ -114,7 +105,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   dc->pen_width=1;
   for (i=0;i<NUM_TREES;i++) {
-    if (trees[i].y<=h/2) { //Draw trees behind house
+    if (trees[i].y<=h/2) {//Draw trees behind house
       if (trees[i].fire_frame_index) {
 	if (trees[i].fire_frame_index++&1)
 	  img=$IB,"<4>",BI=4$;
@@ -131,7 +122,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     Sprite3(dc,w/2,h/2,0,$IB,"<7>",BI=7$);
 
   for (i=0;i<NUM_TREES;i++) {
-    if (trees[i].y>h/2) { //Draw trees in front of house
+    if (trees[i].y>h/2) {//Draw trees in front of house
       if (trees[i].fire_frame_index) {
 	if (trees[i].fire_frame_index++&1)
 	  img=$IB,"<4>",BI=4$;
@@ -287,7 +278,7 @@ U0 Follow(CTask *,Peasant *tempp)
 }
 
 U0 AnimateTask(I64)
-{//preempt off by default after Spawned
+{//Preempt off by default after spawned.
   Step *temps,*temps1;
   Peasant *tempp;
   I64 i,animate_cnt=0,w,h;
@@ -351,13 +342,13 @@ U0 AnimateTask(I64)
     }
     if (!not_stopped_cnt && !tf) {
       tf=tS;
-      music_mute=TRUE;
+      music.mute=TRUE;
       Snd(2000);Sleep(200);Snd(0);Sleep(100);
       if (tf-t0<best_score) {
 	best_score=tf-t0;
 	Snd(2000);Sleep(200);Snd(0);Sleep(100);
       }
-      music_mute=FALSE;
+      music.mute=FALSE;
     }
 
     snow_x+=RandU16%3-1;
@@ -379,8 +370,8 @@ U0 SongTask(I64)
 {
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
-  music_tempo= 2.480;
-  music_stacatto_factor= 0.902;
+  music.tempo= 2.480;
+  music.stacatto_factor= 0.902;
   while (TRUE) {
 	Play("3eCCCDCC2qG3eA2G3ABqCC");
 	Play("eCCCDCC2qG3eA2G3ABqCC");
@@ -464,7 +455,7 @@ Shall yourselves find blessing
 PopUpOk("
 $$PURPLE$$$$TX+CX,\"Winceslas Game\"$$$$FG$$
 
-Start fires by pressing $$GREEN$$<SPACE BAR>$$FG$$
+Start fires by pressing $$GREEN$$<SPACE>$$FG$$
 on trees. (Yule logs)
 
 Lead peasants to fires.

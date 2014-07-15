@@ -30,7 +30,7 @@ start_over:
 	    GrPlot(dc[next_dc],x,y);
 	  }
 	} else {
-//	  if (cnt==3) { //Use this for the classic rules
+//	  if (cnt==3) {//Use this for the classic rules
 	  if (cnt==2) {
 	    dc[next_dc]->color=GREEN;
 	    GrPlot(dc[next_dc],x,y);
@@ -46,7 +46,7 @@ start_over:
 
 public U0 Life()
 {
-  I64 msg_code,cnt,x1,y1,x2,y2,p1,p2;
+  I64 msg_code,cnt,x1,y1,x2,y2,a1,a2;
 
   dc[0]=DCNew(GR_WIDTH,GR_HEIGHT);
   dc[1]=DCNew(GR_WIDTH,GR_HEIGHT);
@@ -61,33 +61,33 @@ public U0 Life()
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   WordStat;
   Fs->draw_it=&DrawIt;
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
 
   do {
-    msg_code=GetMsg(&p1,&p2,
+    msg_code=GetMsg(&a1,&a2,
       1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
     switch (msg_code) {
       case MSG_IP_L_DOWN:
-	x1=p1; y1=p2;
-	x2=p1; y2=p2;
+	x1=a1; y1=a2;
+	x2=a1; y2=a2;
 	cnt=0;
 	while (msg_code!=MSG_IP_L_UP) {
 	  restart=TRUE;
 	  dc[cur_dc]->color=GREEN;
-	  dc[cur_dc]->pen_width=0.04*ip_speed;
+	  dc[cur_dc]->pen_width=0.04*ip.speed;
 	  GrLine3(dc[cur_dc],x1,y1,0,x2,y2,0);
 	  restart=TRUE;
-	  msg_code=GetMsg(&p1,&p2,
+	  msg_code=GetMsg(&a1,&a2,
 	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  x1=x2; y1=y2;
-	  x2=p1; y2=p2;
+	  x2=a1; y2=a2;
 	}
 	GrLine3(dc[cur_dc],x1,y1,0,x2,y2,0);
 	break;
       case MSG_KEY_DOWN:
 	break;
     }
-  } while (msg_code!=MSG_KEY_DOWN || !p1);
+  } while (msg_code!=MSG_KEY_DOWN || !a1);
   GetMsg(,,1<<MSG_KEY_UP);
   SettingsPop;
   DCFill;

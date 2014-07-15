@@ -1,5 +1,5 @@
 U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512)
-{
+{//Add memory to blk pool.
   if (sys_mem_init_flag)
     MemSet(m,sys_mem_init_val,pages512*512);
   PUSHFD
@@ -16,19 +16,18 @@ U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512)
 }
 
 U0 BlkPoolInit(CBlkPool *bp,I64 pages512)
-{
+{//Make memory chunk into a blk pool.
   I64 num;
   CMemBlk *m;
   MemSet(bp,0,sizeof(CBlkPool));
   m=(bp(U8 *)+sizeof(CBlkPool)+PAGE_SIZE-1)&~(PAGE_SIZE-1);
   num=(bp(U8 *)+pages512<<PAGE_BITS-m(U8 *))>>PAGE_BITS;
-  bp->size=pages512-num; //compensate before num added.
+  bp->size=pages512-num; //Compensate before num added.
   BlkPoolAdd(bp,m,num);
 }
 
 CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,CTask *task=NULL,CBlkPool *bp)
-{
-//$LK,"Adam Task",A="FF:::/Kernel/KStart.CPP,CHeapCtrl.bp"$
+{//Called by $LK,"Adam Task",A="FF:::/Kernel/KStart.CPP,CHeapCtrl.bp"$.
   if (!hc)
     hc=ACAlloc(sizeof(CHeapCtrl));
   hc->hc_signature=HEAP_CTRL_SIGNATURE_VAL;
@@ -40,7 +39,7 @@ CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,CTask *task=NULL,CBlkPool *bp)
 }
 
 CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512)
-{
+{//Make memory chunk into heap ctrl and blk pool.
   I64 num;
   CMemBlk *m;
   CHeapCtrl *hc;
@@ -54,7 +53,7 @@ CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512)
 }
 
 U0 HeapCtrlDel(CHeapCtrl *hc)
-{
+{//Free all blks alloced to a heap ctrl.
   CMemBlk *m,*m1;
   if (hc) {
     PUSHFD
@@ -75,8 +74,8 @@ U0 HeapCtrlDel(CHeapCtrl *hc)
 
 Bool Mem32DevIns(CMemRange *tempmr)
 {
-  CMemRange *tempmr1=sys_mem32_dev_root.next,*tempmr2;
-  while (tempmr1!=&sys_mem32_dev_root) {
+  CMemRange *tempmr1=dev.mem32_root.next,*tempmr2;
+  while (tempmr1!=&dev.mem32_root) {
     if (!tempmr1->type && tempmr->base>=tempmr1->base &&
 	tempmr->base+tempmr->size<=tempmr1->base+tempmr1->size) {
       if (tempmr->base>tempmr1->base) {
@@ -107,14 +106,14 @@ U0 Mem32DevInit()
   CMemRange *tempmr;
   CMemE820 *m20=SYS_MEM_E820;
 
-  QueInit(&sys_mem32_dev_root);
+  QueInit(&dev.mem32_root);
   tempmr=AMAlloc(sizeof(CMemRange));
   tempmr->type=MRT_UNUSED;
   tempmr->flags=0;
 //Maybe !!! Change this to 0xE0000000 !!!
   tempmr->base=0xF0000000;
   tempmr->size=0x10000000;
-  QueIns(tempmr,sys_mem32_dev_root.last);
+  QueIns(tempmr,dev.mem32_root.last);
 
   if (m20->type) {
     while (m20->type) {
@@ -131,7 +130,8 @@ U0 Mem32DevInit()
 }
 
 Bool MemLowPagesProtect(Bool val=TRUE)
-{ //FALSE if any were not protected
+{//Mark low memory not present. Catch NULL deref.
+//Returns: FALSE if any were not protected.
   U8 *a=0;
   Bool result=TRUE;
   while (a<=MEM_PROTECTED_LOW_LIMIT) {
@@ -163,13 +163,15 @@ U0 MemPagesNotPresentMark()
 }
 
 U8 *Mem32DevAlloc(I64 size,I64 alignment)
-{//This doesn't work
+{//Alloc 32-bit addr space for device. (Doesn't work.) Not used.
+//For this to work the BIOS E820 map must be searched for gaps in
+//the 32-bit range and the pool initialized to the gaps.
   U8 *base,*limit;
   CMemRange *tempmr,*tempmr1;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr1=sys_mem32_dev_root.next;
-  while (tempmr1!=&sys_mem32_dev_root) {
+  tempmr1=dev.mem32_root.next;
+  while (tempmr1!=&dev.mem32_root) {
     base=(tempmr1->base+alignment-1)&~(alignment-1);
     limit=base+size-1;
     if (!tempmr1->type &&
@@ -194,13 +196,13 @@ U8 *Mem32DevAlloc(I64 size,I64 alignment)
 }
 
 U0 Mem32DevFree(U8 *base)
-{
+{//Free 32-bit device address space.
   CMemRange *tempmr;
   if (!base) return;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=sys_mem32_dev_root.next;
-  while (tempmr!=&sys_mem32_dev_root) {
+  tempmr=dev.mem32_root.next;
+  while (tempmr!=&dev.mem32_root) {
     if (tempmr->base==base) {
       tempmr->type=MRT_UNUSED;
       break;
@@ -211,29 +213,29 @@ U0 Mem32DevFree(U8 *base)
 }
 
 U8 *Mem64DevAlloc(I64 *_pages2Meg)
-{
+{//Alloc 64-bit addr space for device.
   U8 *result;
   I64 i=*_pages2Meg,*pte;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
   while (i--) {
-    sys_mem64_dev_ptr-=0x200000;
-    pte=MemPageTable(sys_mem64_dev_ptr);
+    dev.mem64_ptr-=0x200000;
+    pte=MemPageTable(dev.mem64_ptr);
     *pte=*pte&~0x18 |0x11; //Uncached and present
-    InvlPg(sys_mem64_dev_ptr);
+    InvlPg(dev.mem64_ptr);
   }
-  result=sys_mem64_dev_ptr;
+  result=dev.mem64_ptr;
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
   return result;
 }
 
 U0 Mem64DevFree(U8 *base,I64 pages2Meg)
-{
+{//Free 64-bit device address space.
   if (!base) return;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  if (base==sys_mem64_dev_ptr)
-    sys_mem64_dev_ptr+=pages2Meg*0x200000;
+  if (base==dev.mem64_ptr)
+    dev.mem64_ptr+=pages2Meg*0x200000;
   //else not freed
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 }
@@ -302,9 +304,9 @@ U0 HeapsInit()
 }
 
 I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024)
-//This function is nice for scaling-back allocations if less than 2048 Meg.
-//Disk cache and RAM Drive expressions can include this function.
-{
+{//Helps pick DiskCache and RAMDisk sizes.
+//Can be used in $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$() config scripts.
+//Scale-back allocations if less than 2048 Meg.
   I64 i=sys_code_bp->size<<PAGE_BITS;
   if (i>=limit)
     return max;

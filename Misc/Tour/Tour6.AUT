@@ -6,16 +6,15 @@ PopUpOk(
 
 PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
 
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
 "F(\"RED\");";
-AFPmtStr("\n");
+AFGetStr("\n");
+Sleep(3000);
 
-
-
-
+PopUpOk("Notice the number of matches.\n");
 
 PopUpOk(
 "Try it with the $$GREEN$$+l$$FG$$ flag.\n"
@@ -23,16 +22,15 @@ PopUpOk(
 
 PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
 
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
 "F(\"RED\",\"+l\");";
-AFPmtStr("\n");
+AFGetStr("\n");
+Sleep(3000);
 
-
-
-
+PopUpOk("Notice the number of matches.\n");
 
 PopUpOk(
 "Try it with the $$GREEN$$+l-i$$FG$$ flag.\n"
@@ -41,15 +39,15 @@ PopUpOk(
 
 PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
 
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
 "F(\"RED\",\"+l-i\");";
-AFPmtStr("\n");
+AFGetStr("\n");
+Sleep(3000);
 
-
-
+PopUpOk("Notice the number of matches.\n");
 
 PopUpOk(
 "The wrapper function is in your\n"
@@ -59,17 +57,17 @@ PopUpOk(
 
 PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
 
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
 "Ed(\"HOME/Adam3dWrappers.CPP.Z\");";
-AFPmtStr("\n");
-
+AFGetStr("\n");
 Sleep(2000);
+
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
 "$$GREEN$$+lb$$FG$$ is whole label just before.\n"

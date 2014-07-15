@@ -2,7 +2,7 @@ PopUp("WSInit(\"::/*;~*Bible.TXT*\");");
 WordStat(ON);
 Sleep(3500);
 
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nCd(\"::/Demo\");\n";
 
@@ -33,7 +33,7 @@ Sleep(500);
 
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 Sleep(100);
 sys_focus_task=Fs;
 
@@ -61,4 +61,4 @@ Sleep(1000);
 Sleep(2000);
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);

@@ -1,7 +1,4 @@
-/*
-This makes a mesh man.
-*/
-
+//Makes a mesh man.
 
 #define MAX_VERTICES	1024
 #define MAX_TRIS	1024
@@ -14,42 +11,41 @@ class Man
   CMeshTri t[MAX_TRIS];
 } *m;
 
-
 class ManDefineStruct
 {
-  F64 head_rad	 fmtstr "$$DA-TRM,32,A=\"Head Radius                :%8.3f\"$$\n";
+  F64 head_rad	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Head Radius                :%8.3f\"$$\n";
 
-  F64 torso_len  fmtstr "$$DA-TRM,32,A=\"Torso Length               :%8.3f\"$$\n";
-  F64 arm_len	 fmtstr "$$DA-TRM,32,A=\"Arm Length                 :%8.3f\"$$\n";
-  F64 hand_len	 fmtstr "$$DA-TRM,32,A=\"Hand Length                :%8.3f\"$$\n";
-  F64 leg_len	 fmtstr "$$DA-TRM,32,A=\"Leg Length                 :%8.3f\"$$\n";
-  F64 foot_len	 fmtstr "$$DA-TRM,32,A=\"Foot Length                :%8.3f\"$$\n";
-  F64 torso_width fmtstr "$$DA-TRM,32,A=\"Torso Width                :%8.3f\"$$\n";
-  F64 torso_depth fmtstr "$$DA-TRM,32,A=\"Torso Depth                :%8.3f\"$$\n";
-  F64 arm_rad	 fmtstr "$$DA-TRM,32,A=\"Arm Radius                 :%8.3f\"$$\n";
-  F64 hand_rad	 fmtstr "$$DA-TRM,32,A=\"Hand Radius                :%8.3f\"$$\n";
-  F64 leg_rad	 fmtstr "$$DA-TRM,32,A=\"Leg Radius                 :%8.3f\"$$\n";
-  F64 foot_rad	 fmtstr "$$DA-TRM,32,A=\"Foot Radius                :%8.3f\"$$\n\n";
+  F64 torso_len  fmtstr "$$DA-TRM,32,RT=F64,A=\"Torso Length               :%8.3f\"$$\n";
+  F64 arm_len	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Arm Length                 :%8.3f\"$$\n";
+  F64 hand_len	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Hand Length                :%8.3f\"$$\n";
+  F64 leg_len	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Leg Length                 :%8.3f\"$$\n";
+  F64 foot_len	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Foot Length                :%8.3f\"$$\n";
+  F64 torso_width fmtstr "$$DA-TRM,32,RT=F64,A=\"Torso Width                :%8.3f\"$$\n";
+  F64 torso_depth fmtstr "$$DA-TRM,32,RT=F64,A=\"Torso Depth                :%8.3f\"$$\n";
+  F64 arm_rad	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Arm Radius                 :%8.3f\"$$\n";
+  F64 hand_rad	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Hand Radius                :%8.3f\"$$\n";
+  F64 leg_rad	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Leg Radius                 :%8.3f\"$$\n";
+  F64 foot_rad	 fmtstr "$$DA-TRM,32,RT=F64,A=\"Foot Radius                :%8.3f\"$$\n\n";
 
-  F64 r_shoulder_a1	 fmtstr "$$DA-TRM,32,A=\"R.Shoulder Front/Back Angle:%8.3f\"$$\n";
-  F64 l_shoulder_a1	 fmtstr "$$DA-TRM,32,A=\"L.Shoulder Front/Back Angle:%8.3f\"$$\n";
-  F64 r_hip_a1	 fmtstr "$$DA-TRM,32,A=\"R.Hip Front/Back Angle     :%8.3f\"$$\n";
-  F64 l_hip_a1	 fmtstr "$$DA-TRM,32,A=\"L.Hip Front/Back Angle     :%8.3f\"$$\n";
+  F64 r_shoulder_a1	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Shoulder Front/Back Angle:%8.3f\"$$\n";
+  F64 l_shoulder_a1	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Shoulder Front/Back Angle:%8.3f\"$$\n";
+  F64 r_hip_a1	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Hip Front/Back Angle     :%8.3f\"$$\n";
+  F64 l_hip_a1	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Hip Front/Back Angle     :%8.3f\"$$\n";
 
-  F64 r_shoulder_a2	 fmtstr "$$DA-TRM,32,A=\"R.Shoulder Side Angle      :%8.3f\"$$\n";
-  F64 l_shoulder_a2	 fmtstr "$$DA-TRM,32,A=\"L.Shoulder Side Angle      :%8.3f\"$$\n";
-  F64 r_hip_a2	 fmtstr "$$DA-TRM,32,A=\"R.Hip Side Angle           :%8.3f\"$$\n";
-  F64 l_hip_a2	 fmtstr "$$DA-TRM,32,A=\"L.Hip Side Angle           :%8.3f\"$$\n";
+  F64 r_shoulder_a2	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Shoulder Side Angle      :%8.3f\"$$\n";
+  F64 l_shoulder_a2	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Shoulder Side Angle      :%8.3f\"$$\n";
+  F64 r_hip_a2	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Hip Side Angle           :%8.3f\"$$\n";
+  F64 l_hip_a2	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Hip Side Angle           :%8.3f\"$$\n";
 
-  F64 r_elbow_a	 fmtstr "$$DA-TRM,32,A=\"R.Elbow Angle              :%8.3f\"$$\n";
-  F64 l_elbow_a	 fmtstr "$$DA-TRM,32,A=\"L.Elbow Angle              :%8.3f\"$$\n";
-  F64 r_knee_a	 fmtstr "$$DA-TRM,32,A=\"R.Knee Angle               :%8.3f\"$$\n";
-  F64 l_knee_a	 fmtstr "$$DA-TRM,32,A=\"L.Knee Angle               :%8.3f\"$$\n";
+  F64 r_elbow_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Elbow Angle              :%8.3f\"$$\n";
+  F64 l_elbow_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Elbow Angle              :%8.3f\"$$\n";
+  F64 r_knee_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Knee Angle               :%8.3f\"$$\n";
+  F64 l_knee_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Knee Angle               :%8.3f\"$$\n";
 
-  F64 r_wrist_a	 fmtstr "$$DA-TRM,32,A=\"R.Wrist Angle              :%8.3f\"$$\n";
-  F64 l_wrist_a	 fmtstr "$$DA-TRM,32,A=\"L.Wrist Angle              :%8.3f\"$$\n";
-  F64 r_ankle_a	 fmtstr "$$DA-TRM,32,A=\"R.Ankle Angle              :%8.3f\"$$\n";
-  F64 l_ankle_a	 fmtstr "$$DA-TRM,32,A=\"L.Ankle Angle              :%8.3f\"$$\n";
+  F64 r_wrist_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Wrist Angle              :%8.3f\"$$\n";
+  F64 l_wrist_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Wrist Angle              :%8.3f\"$$\n";
+  F64 r_ankle_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"R.Ankle Angle              :%8.3f\"$$\n";
+  F64 l_ankle_a	 fmtstr "$$DA-TRM,32,RT=F64,A=\"L.Ankle Angle              :%8.3f\"$$\n";
 
 };
 
@@ -115,7 +111,6 @@ U0 MDCorrect(ManDefineStruct *md)
   md->r_ankle_a+=md->r_knee_a;
   md->l_ankle_a+=md->l_knee_a;
 }
-
 
 I64 AddVertex(ManDefineStruct *md,I64 x,I64 y,I64 z)
 {
@@ -184,21 +179,20 @@ U0 AddBox(ManDefineStruct *md,I64 c,I64 x1,I64 y1,I64 z1,F64 w,F64 h,F64 d,F64 h
   Free(r);
 }
 
-
 U8 *Man2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
-      m->vertex_cnt*sizeof(CD3I32)+m->tri_cnt*sizeof(CMeshTri)+sprite_base_size[GRST_END]),
+      m->vertex_cnt*sizeof(CD3I32)+m->tri_cnt*sizeof(CMeshTri)+sprite_elem_base_sizes[SPT_END]),
       *dst=result;
-  *dst(U8 *)++ =GRST_MESH;
+  *dst(U8 *)++ =SPT_MESH;
   *dst(I32 *)++ =m->vertex_cnt;
   *dst(I32 *)++ =m->tri_cnt;
   MemCpy(dst,&m->v,m->vertex_cnt*sizeof(CD3I32));
   dst+=m->vertex_cnt*sizeof(CD3I32);
   MemCpy(dst,&m->t,m->tri_cnt*sizeof(CMeshTri));
   dst+=m->tri_cnt*sizeof(CMeshTri);
-  *dst(U8 *)++ =GRST_END;
+  *dst(U8 *)++ =SPT_END;
   return result;
 }
 
@@ -281,9 +275,9 @@ public U8 *ManGen()
 	md2.l_hip_a2,0,md2.l_ankle_a,&x,&y,&z);
 
     result=Man2CSprite;
-    NewLine(7);
+    "%h7c",'\n';
     Sprite(result,"\t\t$$SP,\"<1>\",BI=%d$$");
-    NewLine(7);
+    "%h7c",'\n';
     Free(m);
     "Do another";
     if (YorN)

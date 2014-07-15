@@ -239,7 +239,7 @@ U0 ICFUnaryMinus(CLex *lx,CIntermediateCode *tempi,U8 *buf2,I64 ip)
 }
 
 U0 ICFMod(CLex *lx,CIntermediateCode *tempi,I64 ip)
-{ //for MOD
+{//for MOD
   Bool dont_push_float,dont_pop_float;
   CmpSetFloatOpPushPop(lx,tempi,&dont_push_float,&dont_pop_float);
   if (dont_push_float) {
@@ -269,7 +269,7 @@ U0 ICFMod(CLex *lx,CIntermediateCode *tempi,I64 ip)
 }
 
 U0 ICFPow(CLex *lx,CIntermediateCode *tempi,U8 *buf,I64 ip)
-{ //for POW
+{//for POW
   I64 i;
   CExeImportExport *tempe;
   CHashExport *tempex=HashFind("SYS_POW",lx->htc.hash_table_lst,HTT_EXPORT_SYS_SYM);
@@ -315,7 +315,7 @@ U0 ICFPow(CLex *lx,CIntermediateCode *tempi,U8 *buf,I64 ip)
 	  tempex->ie_lst=tempe;
 	}
       }
-    } else { //Kernel
+    } else {//Kernel
       if (tempex->type&HTF_UNRESOLVED)
 	throw('Compiler');
       else {
@@ -348,7 +348,7 @@ U0 ICFPow(CLex *lx,CIntermediateCode *tempi,U8 *buf,I64 ip)
 }
 
 U0 ICFOp(CLex *lx,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
-{ //for ADD,SUB,DIV,MUL
+{//for ADD,SUB,DIV,MUL
   CICArg *a1,*a2;
   Bool dont_push_float,dont_pop_float,alt;
   I64 rsp_size=0,builtin1=0,builtin2=0,
@@ -507,10 +507,10 @@ U0 ICFOp(CLex *lx,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
   if (!dont_push_float) {
     if (builtin2 && !builtin1) {
       alt=!alt;
-      SwapU64(&t1,&t2);
-      SwapU64(&r1,&r2);
-      SwapU64(&d1,&d2);
-      SwapU64(&builtin1,&builtin2);
+      SwapI64(&t1,&t2);
+      SwapI64(&r1,&r2);
+      SwapI64(&d1,&d2);
+      SwapI64(&builtin1,&builtin2);
     }
     if (builtin1)
       ICU16(tempi,builtin1);

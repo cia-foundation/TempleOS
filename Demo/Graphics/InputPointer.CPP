@@ -1,7 +1,7 @@
 U0 InputPointer()
 {
-  while (!ip_lb) //Left Button
-    GrPlot(,ipx,ipy);
+  while (!ip.lb) //Left Button
+    GrPlot(,ip.pos.x,ip.pos.y);
   DCFill;
 }
 

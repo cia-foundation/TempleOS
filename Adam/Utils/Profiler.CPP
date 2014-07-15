@@ -1,200 +1,102 @@
-#help_index "Debugging/Profiler;Utils/Profiler;Profiler"
+#help_index "Debugging/Profiler;Profiler;Cmd Line (Typically)/Profiler"
 #help_file "::/Doc/Profiler"
 
 #define PF_ARRAY_CNT 0x100000
-I64 pf_time_start,pf_time_end;
-I64 pf_low=0,pf_high=SYS_KERNEL_END,pf_size=PF_ARRAY_CNT;
+I64 pf_jiffy_start,pf_jiffy_end;
 I64 *pf_array=NULL;
 I64 pf_cpu=0;
-U0 (*fp_chained_timer_routine)(CTask *task)=cpu_structs[pf_cpu].timer_irq_chain;
-I64 pf_ptr,pf_depth;
-#define PFM_OFF		0
-#define PFM_BIN		1
-#define PFM_ALL		2
-I64 prof_mode=PFM_OFF;
-F64 pf_t0;
+I64 pf_buf_in_ptr=0,pf_depth;
+I64 pf_prof_active=0;
 
 U0 ProfTimerInt(CTask *task)
-{
-  I64 i,j=task->rip,k;
-  nobound_switch (prof_mode) {
-    case PFM_OFF:
-      break;
-    case PFM_BIN:
-      i=(j-pf_low) * pf_size/(pf_high-pf_low);
-      if (0<=i<pf_size)
-	pf_array[i]++;
-      break;
-    case PFM_ALL:
-      for (k=0;k<=pf_depth;k++) {
-	if (task==Gs->idle_task)
-	  j=SYS_IDLE_PT;
-	else
-	  j=TaskCaller(task,k,TRUE);
-	if (pf_ptr<PF_ARRAY_CNT) {
-	  pf_array[pf_ptr++]=j;
-	  if (pf_ptr==PF_ARRAY_CNT)
-	    pf_time_end=sys_jiffies;
-	}
+{//See $LK,"profiler_timer_irq",A="FF:::/Kernel/Ints.CPP,profiler_timer_irq"$.
+  I64 i,k;
+  if (Bt(&pf_prof_active,0))
+    for (k=0;k<=pf_depth;k++) {
+      if (task==Gs->idle_task)
+	i=SYS_IDLE_PT;
+      else
+	i=TaskCaller(task,k,TRUE);
+      if (pf_buf_in_ptr<PF_ARRAY_CNT) {
+	pf_array[pf_buf_in_ptr++]=i;
+	pf_jiffy_end=cnts.jiffies;
       }
-      break;
-  }
-  (*fp_chained_timer_routine)(task);
-}
-cpu_structs[pf_cpu].timer_irq_chain=&ProfTimerInt;
-
-public U0 ProfBin(U8 *start,I64 cnt=PF_ARRAY_CNT*3)
-//Start profiler in bin mode.  Profilers
-//report where time is spent by checking
-//the instruction ptr during the
-//timer interrupt.  Do a $LK,"ProfRep",A="MN:ProfRep"$(), (profiler report)
-//after you have collected data.
-{
-  if (cnt<PF_ARRAY_CNT)
-    pf_size=cnt;
-  else
-    pf_size=PF_ARRAY_CNT;
-  pf_low=start;
-  pf_high=start+cnt;
-  if (!pf_array)
-    pf_array=AMAlloc(sizeof(I64)*PF_ARRAY_CNT);
-  MemSet(pf_array,0,PF_ARRAY_CNT*sizeof(I64));
-  pf_time_end=0;
-  pf_time_start=sys_jiffies;
-  prof_mode=PFM_BIN;
-  pf_t0=tS;
+    }
 }
 
-public U0 ProfCPUSet(I64 num)
-{
-  if (num>=mp_cnt)
+public U0 Prof(I64 depth=0,I64 cpu_num=0)
+{/*Start collecting profiler statistics.
+Profilers report where time is spent
+by sampling RIP during the $TX,"1000 Hz",D="DD_JIFFY_HZ"$
+timer interrupt.
+
+Do a $LK,"ProfRep",A="MN:ProfRep"$(), (profiler report)
+after you have collected data.
+*/
+  if (!(0<=cpu_num<mp_cnt))
     ST_ERR_ST "Invalid CPU\n";
-  else if (cpu_structs[pf_cpu].timer_irq_chain!=&ProfTimerInt)
-    ST_ERR_ST "Unchaining not implemented!\n";
   else {
-    cpu_structs[pf_cpu].timer_irq_chain=fp_chained_timer_routine;
-    pf_cpu=num;
-    fp_chained_timer_routine=cpu_structs[pf_cpu].timer_irq_chain;
-    cpu_structs[pf_cpu].timer_irq_chain=&ProfTimerInt;
+    cpu_structs[pf_cpu].profiler_timer_irq=NULL;
+    pf_cpu=cpu_num;
+
+    pf_depth=depth;
+    pf_buf_in_ptr=0;
+    if (!pf_array)
+      pf_array=AMAlloc(sizeof(I64)*PF_ARRAY_CNT);
+    pf_jiffy_end=pf_jiffy_start=cnts.jiffies;
+    LBts(&pf_prof_active,0);
+    cpu_structs[pf_cpu].profiler_timer_irq=&ProfTimerInt;
   }
 }
 
-public U0 ProfAll(I64 depth=0)
-//Start profiler in record-all mode.  Profilers
-//report where time is spent by checking
-//the instruction ptr during the
-//timer interrupt.  Do a $LK,"ProfRep",A="MN:ProfRep"$(), (profiler report)
-//after you have collected data.
+I64 ProfCompare(U8 *i1,U8 *i2)
 {
-  pf_depth=depth;
-  pf_ptr=0;
-  if (!pf_array)
-    pf_array=AMAlloc(sizeof(I64)*PF_ARRAY_CNT);
-  pf_time_end=0;
-  pf_time_start=sys_jiffies;
-  prof_mode=PFM_ALL;
-  pf_t0=tS;
+  return i1-i2;
 }
 
-I64 PFACompare(U8 *i1,U8 *i2)
-{
-  if (i1<i2)
-    return -1;
-  else if (i1>i2)
-    return 1;
-  else
-    return 0;
-}
+public U0 ProfRep(I64 filter_cnt=1,Bool leave_it=OFF)
+{//Profiler report. Call $LK,"Prof",A="MN:Prof"$() first and collect data.
+  I64 i,hits,ip,last_ip=0,routine_total=0;
+  F64 total_time;
+  U8 buf[256],buf2[256],last_buf[256];
+  if (!LBtr(&pf_prof_active,0))
+    "Profiler Not Active\n";
+  if (!pf_buf_in_ptr)
+    "No Profiler Statistic\n";
+  else {
+    if (!(total_time=pf_jiffy_end-pf_jiffy_start))
+      total_time=1;
+    QSortI64(pf_array,pf_buf_in_ptr,&ProfCompare);
+    *last_buf=0;
+    for (i=0;i<pf_buf_in_ptr;i+=hits) {
+      ip=pf_array[i];
+      hits=0;
+      do hits++;
+      while (i+hits<pf_buf_in_ptr && pf_array[i+hits]==ip);
 
-public U0 ProfRep(I64 filter_cnt=1)
-{
-  F64 pf_tf=tS;
-  I64 i,ip,last_ip=pf_low,hits,
-      total_time,routine_total=0,old_mode=prof_mode;
-  U8 buf[128],buf2[128],buf3[128],last_buf[128];
-  prof_mode=PFM_OFF;
-  if (pf_time_end)
-    total_time=pf_time_end-pf_time_start;
-  else
-    total_time=sys_jiffies-pf_time_start;
-  if (!total_time) total_time=1;
-  switch (old_mode) {
-    case PFM_BIN:
-      *last_buf=0;
-      for (i=0;i<pf_size;i++) {
-	ip=pf_low+i*(pf_high-pf_low)/pf_size;
-	SPrint(buf,"%p",ip);
-	StrCpy(buf3,buf);
-	StrFirstRem(buf3,"+",buf2);
-	if (StrCmp(buf2,last_buf)) {
-	  if (*last_buf && routine_total>=filter_cnt) {
-	    "$$GREEN$$%3d.%02d%% %08X:",routine_total*100/total_time,
-	      routine_total*10000/total_time%100,routine_total;
-	    "%s\n$$FG$$",last_buf;
-	  }
-	  StrCpy(last_buf,buf2);
-	  routine_total=0;
-	}
-	hits=pf_array[i];
-	routine_total+=hits;
-	if (hits>=filter_cnt) {
-	  "%3d.%02d%% %08X:",hits*100/total_time,
-	  hits*10000/total_time%100,hits;
-	  if (!PutSrcLink(ip,ip-last_ip))
-	    "%s\n",buf;
-	  else
-	    NewLine;
-	  last_ip=ip;
-	}
+      StrPrint(buf,"%p",ip);
+      StrFirstRem(buf,"+",buf2);
+      if (StrCmp(buf2,last_buf)) {
+	if (*last_buf && routine_total>=filter_cnt)
+	  "$$GREEN$$%6.2f %08X:%s\n$$FG$$",100*routine_total/total_time,
+		routine_total,last_buf;
+	StrCpy(last_buf,buf2);
+	routine_total=0;
       }
-      if (*last_buf && routine_total>=filter_cnt) {
-	"$$GREEN$$%3d.%02d%% %08X:",routine_total*100/total_time,
-	  routine_total*10000/total_time%100,routine_total;
-	"%s\n$$FG$$",last_buf;
+      routine_total+=hits;
+      if (hits>=filter_cnt) {
+	"%6.2f %08X:%P\n",100*hits/total_time,hits,ip;
+	last_ip=ip;
       }
-      break;
-    case PFM_ALL:
-      QSortI64(pf_array,pf_ptr,&PFACompare);
-      *last_buf=0;
-      for (i=0;i<pf_ptr;i++) {
-	ip=pf_array[i];
-	hits=0;
-	while (pf_array[i]==ip) {
-	  hits++;
-	  i++;
-	  if (i>=pf_ptr) break;
-	}
-	SPrint(buf,"%p",ip);
-	StrCpy(buf3,buf);
-	StrFirstRem(buf3,"+",buf2);
-	if (StrCmp(buf2,last_buf)) {
-	  if (*last_buf && routine_total>=filter_cnt) {
-	    "$$GREEN$$%3d.%02d%% %08X:",routine_total*100/total_time,
-	      routine_total*10000/total_time%100,routine_total;
-	    "%s\n$$FG$$",last_buf;
-	  }
-	  StrCpy(last_buf,buf2);
-	  routine_total=0;
-	}
-	routine_total+=hits;
-	if (hits>=filter_cnt) {
-	  "%3d.%02d%% %08X:",hits*100/total_time,
-	  hits*10000/total_time%100,hits;
-	  if (!PutSrcLink(ip,ip-last_ip))
-	    "%s\n",buf;
-	  else
-	    NewLine;
-	  last_ip=ip;
-	}
-      }
-      if (*last_buf && routine_total>=filter_cnt) {
-	"$$GREEN$$%3d.%02d%% %08X:",routine_total*100/total_time,
-	  routine_total*10000/total_time%100,routine_total;
-	"%s\n$$FG$$",last_buf;
-      }
-      break;
+    }
+    if (*last_buf && routine_total>=filter_cnt)
+      "$$GREEN$$%6.2f %08X:%s\n$$FG$$",100*routine_total/total_time,
+	routine_total,last_buf;
+    "Total Time:%0.6fs\n",total_time/JIFFY_FREQ;
+    if (leave_it) {
+      cpu_structs[pf_cpu].profiler_timer_irq=&ProfTimerInt;
+      LBts(&pf_prof_active,0);
+    } else
+      cpu_structs[pf_cpu].profiler_timer_irq=NULL;
   }
-  "Total Time:%12.6fs\n",pf_tf-pf_t0;
 }
-
-#help_index ""

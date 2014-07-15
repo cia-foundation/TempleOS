@@ -1,18 +1,18 @@
 #help_index "WordStat/Dictionary"
 
 public U0 WSDWordsLoad()
-{
+{//Put words from word list into hash table.
   I64 size;
   CHashGeneric *temph;
   U8 *in_ptr,*in_start,*st2;
   U16 *d;
-  ws_dict_num_words=0;
+  wsd.num_words=0;
   if (in_ptr=FileRead(WSD_WORD_FILENAME,&size)) {
     in_start=in_ptr;
-    Free(ws_dict_word_lst);
-    ws_dict_word_lst=AMAlloc(size);
-    MemCpy(ws_dict_word_lst,in_start,size);
-    ws_dict_word_lst_size=size;
+    Free(wsd.word_lst);
+    wsd.word_lst=AMAlloc(size);
+    MemCpy(wsd.word_lst,in_start,size);
+    wsd.word_lst_size=size;
 
     while (in_ptr<in_start+size) {
       if (*in_ptr==WSD_WORD_CHAR)
@@ -29,8 +29,8 @@ public U0 WSDWordsLoad()
 	d=in_ptr;
 	temph->user_data0=*d;
 	in_ptr+=2;
-	HashAdd(temph,ws_hash_table);
-	ws_dict_num_words++;
+	HashAdd(temph,ws.hash_table);
+	wsd.num_words++;
       } else
 	in_ptr+=3;
     }
@@ -38,14 +38,13 @@ public U0 WSDWordsLoad()
   }
 }
 
-
-public U8 *WSDGetDef(U8 *st,I64 def_num=1)
-{
+public U8 *WSDDefGet(U8 *st,I64 def_num=1)
+{//MAlloc str holding single dict definition of word.
   CFile *f;
   CHashGeneric *temph;
   U8 *result=NULL,*buf,*in_ptr,
      *st2=MStrUtil(st,SUF_TO_UPPER);
-  temph=HashFind(st2,ws_hash_table,HTT_DICT_WORD);
+  temph=HashFind(st2,ws.hash_table,HTT_DICT_WORD);
   Free(st2);
   if (temph) {
     if (f=FOpen(WSD_DEF_FILENAME,"r")) {
@@ -82,13 +81,13 @@ public U8 *WSDGetDef(U8 *st,I64 def_num=1)
   return result;
 }
 
-public U8 *WSDGetWord(U8 *st)
-{
+public U8 *WSDDefsGet(U8 *st)
+{//MAlloc str with all dict definitions of word.
   CFile *f;
   CHashGeneric *temph;
   U8 *result=NULL,*buf,*in_ptr,*in_ptr2,
      *st2=MStrUtil(st,SUF_TO_UPPER);
-  temph=HashFind(st2,ws_hash_table,HTT_DICT_WORD);
+  temph=HashFind(st2,ws.hash_table,HTT_DICT_WORD);
   Free(st2);
   if (temph) {
     if (f=FOpen(WSD_DEF_FILENAME,"r")) {
@@ -121,27 +120,25 @@ public U8 *WSDGetWord(U8 *st)
   return result;
 }
 
-
-/*
-Fmt of word lst entry:
+/*Fmt of word lst entry:
   U8 WSD_WORD_CHAR
   U8 word[] with terminating zero
   I16 block;
 */
-public U8 *WSDPtAtWord(U8 *st)
-{
+public U8 *WSDWordPtAt(U8 *st)
+{//Point to word in word list.
   I64 i;
-  U8 *start=ws_dict_word_lst,*r=start,
-     *end=ws_dict_word_lst+ws_dict_word_lst_size;
+  U8 *start=wsd.word_lst,*r=start,
+     *end=wsd.word_lst+wsd.word_lst_size;
   if (!st || !*st)
-    return ws_dict_word_lst;
-  if (ws_dict_word_lst_size) {
+    return wsd.word_lst;
+  if (wsd.word_lst_size) {
     while (start+3<end) {
       r=(start+end)>>1;
       while (TRUE) {
-	while (*r!=WSD_WORD_CHAR && r>ws_dict_word_lst)
+	while (*r!=WSD_WORD_CHAR && r>wsd.word_lst)
 	  r--;
-	if ((r[2]==WSD_WORD_CHAR||r[1]==WSD_WORD_CHAR)&&r-3>ws_dict_word_lst)
+	if ((r[2]==WSD_WORD_CHAR||r[1]==WSD_WORD_CHAR)&&r-3>wsd.word_lst)
 	  r--;
 	else
 	  break;
@@ -159,9 +156,9 @@ public U8 *WSDPtAtWord(U8 *st)
     }
     r=(start+end)>>1;
     while (TRUE) {
-      while (*r!=WSD_WORD_CHAR && r>ws_dict_word_lst)
+      while (*r!=WSD_WORD_CHAR && r>wsd.word_lst)
 	r--;
-      if ((r[2]==WSD_WORD_CHAR||r[1]==WSD_WORD_CHAR)&&r-3>ws_dict_word_lst)
+      if ((r[2]==WSD_WORD_CHAR||r[1]==WSD_WORD_CHAR)&&r-3>wsd.word_lst)
 	r--;
       else
 	break;
@@ -172,27 +169,26 @@ public U8 *WSDPtAtWord(U8 *st)
   if (*r==WSD_WORD_CHAR)
     return r;
   else
-    return ws_dict_word_lst;
+    return wsd.word_lst;
 }
-
 
 U0 WSDDictWordsAdd(CDoc *doc,U8 *st=NULL)
 {
   I64 i;
   U8 *ptr;
   if (!st)
-    st=ws_cur_word;
-  if (st && (ptr=WSDPtAtWord(st))) {
+    st=ws.cur_word;
+  if (st && (ptr=WSDWordPtAt(st))) {
     for (i=0;i<WSD_MAX_FILLINS;i++) {
       if (*ptr++!=WSD_WORD_CHAR)
 	break;
       if (i)
 	DocPrint(doc,"\n");
-      wsd_fillins[i]=ptr-1;
-      DocPrint(doc,"'%d' %s",i,ptr);
+      wsd.fillins[i]=ptr-1;
+      DocPrint(doc,"'%d' %-23ts",i,ptr);
       ptr+=StrLen(ptr)+3;
     }
-    wsd_num_fillins=i;
+    wsd.num_fillins=i;
   }
 }
 
@@ -200,17 +196,16 @@ U0 WSDFillin(I64 n)
 {
   U8 *s;
   I64 len;
-  if (0<=n<wsd_num_fillins) {
-    s=wsd_fillins[n]+1;
+  if (0<=n<wsd.num_fillins) {
+    s=wsd.fillins[n]+1;
     len=StrLen(s);
-    if (len>ws_partial_len)
-      Auto(s+ws_partial_len);
+    if (len>ws.partial_len)
+      Auto(s+ws.partial_len);
   }
 }
 
-
-public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
-{
+public U0 WSDDefsPut(CDoc *doc=NULL,U8 *st,I64 num=-1)
+{//Put to doc a dictionary definition(s) of a word.
   U8 *st2,*st3;
   I64 ch,i=0;
   if (!st) return;
@@ -218,7 +213,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
     st++;
   DocPrint(doc,"$$WW,1$$$$RED$$%s:$$FG$$\n\n",st);
   if (num<0) {
-    if (st3=WSDGetWord(st)) {
+    if (st3=WSDDefsGet(st)) {
       st2=st3;
       while (ch=*st2++) {
 	switch (ch) {
@@ -243,7 +238,7 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
       Free(st3);
     }
   } else {
-    while (st2=WSDGetDef(st,++i)) {
+    while (st2=WSDDefGet(st,++i)) {
       if (i==num)
 	DocPrint(doc,"$$GREEN$$(%d)$$FG$$ %s\n",
 	  i,st2);
@@ -255,15 +250,15 @@ public U0 WSDDisplayDefs(CDoc *doc,U8 *st,I64 num=-1)
 U0 WSDPopUpDef(U8 *st,I64 num=-1,CTask *parent=NULL)
 {
   U8 *buf;
-  buf=MPrint("WSDDisplayDefs(DocPut,\"%s\",%d);View;",st,num);
+  buf=MStrPrint("WSDDefsPut(DocPut,\"%s\",%d);View;",st,num);
   PopUp(buf,parent);
   Free(buf);
 }
 
 U0 WSDDef(I64 n,CTask *parent=NULL)
 {
-  if (0<=n<wsd_num_fillins)
-    WSDPopUpDef(wsd_fillins[n],-1,parent);
+  if (0<=n<wsd.num_fillins)
+    WSDPopUpDef(wsd.fillins[n],-1,parent);
 }
 
 U0 WSFindMisspelled(CDoc *doc)
@@ -272,7 +267,7 @@ U0 WSFindMisspelled(CDoc *doc)
   CDocEntry *doc_e=doc->cur_entry;
   I64 col=doc->cur_data_col,col2,ch;
   do {
-    if (doc_e!=doc && doc_e->flags1&DOCEF1_TAG) {
+    if (doc_e!=doc && doc_e->de_flags&DOCEF_TAG) {
       while (col<doc_e->max_col) {
 	while (col<doc_e->max_col && !Bt(chars_bitmap_word,doc_e->tag[col]))
 	  col++;
@@ -282,7 +277,7 @@ U0 WSFindMisspelled(CDoc *doc)
 	    col2++;
 	  ch=doc_e->tag[col2];
 	  doc_e->tag[col2]=0;
-	  if (StrICmp(&doc_e->tag[col],WSDPtAtWord(&doc_e->tag[col])+1)) {
+	  if (StrICmp(&doc_e->tag[col],WSDWordPtAt(&doc_e->tag[col])+1)) {
 	    doc_e->tag[col2]=ch;
 	    doc->cur_entry=doc_e;
 	    doc->cur_data_col=col;
@@ -300,5 +295,3 @@ fm_done:
   if (unlock)
     DocUnlock(doc);
 }
-
-#help_index ""

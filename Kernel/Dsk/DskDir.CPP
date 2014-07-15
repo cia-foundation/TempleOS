@@ -1,5 +1,5 @@
 Bool DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
-{
+{//Makes a directory entry in the directory from a $LK,"CDirEntry",A="MN:CDirEntry"$ node.
   switch (p->type) {
     case PT_REDSEA:
       return RedSeaFSDirNew(p,cur_dir,tempde,free_old_chain);
@@ -15,7 +15,8 @@ Bool DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
 }
 
 U0 DirEntryDel(CDirEntry *tempde)
-{ //Doesn't Free user_data
+{//Free node returned from $LK,"FilesFind",A="MN:FilesFind"$().  Doesn't Free user_data.
+//Does not change the directory on disk.
   if (tempde) {
     Free(tempde->full_name);
     Free(tempde);
@@ -23,7 +24,8 @@ U0 DirEntryDel(CDirEntry *tempde)
 }
 
 U0 DirEntryDel2(CDirEntry *tempde)
-{ //Frees user_data
+{//Free node returned from $LK,"FilesFind",A="MN:FilesFind"$().  Frees user_data
+//Does not change the directory on disk.
   if (tempde) {
     Free(tempde->full_name);
     Free(tempde->user_data);
@@ -31,25 +33,27 @@ U0 DirEntryDel2(CDirEntry *tempde)
   }
 }
 
-U0 DirLstDel(CDirEntry *tempde)
-{ //Doesn't Free user_data
+U0 DirTreeDel(CDirEntry *tempde)
+{//Free tree returned from $LK,"FilesFind",A="MN:FilesFind"$().  Doesn't Free user_data.
+//Does not change the directory on disk.
   CDirEntry *tempde2;
   while (tempde) {
     tempde2=tempde->next;
     if (tempde->sub)
-      DirLstDel(tempde->sub);
+      DirTreeDel(tempde->sub);
     DirEntryDel(tempde);
     tempde=tempde2;
   }
 }
 
-U0 DirLstDel2(CDirEntry *tempde)
-{ //Frees user_data
+U0 DirTreeDel2(CDirEntry *tempde)
+{//Free tree returned from $LK,"FilesFind",A="MN:FilesFind"$().  Frees user_data
+//Does not change the directory on disk.
   CDirEntry *tempde2;
   while (tempde) {
     tempde2=tempde->next;
     if (tempde->sub)
-      DirLstDel2(tempde->sub);
+      DirTreeDel2(tempde->sub);
     DirEntryDel2(tempde);
     tempde=tempde2;
   }
@@ -60,9 +64,9 @@ I64 DirEntryCompareName(CDirEntry *e1,CDirEntry *e2)
   U8 buf1[CDIR_FILENAME_LEN],buf2[CDIR_FILENAME_LEN],
      buf3[CDIR_FILENAME_LEN],buf4[CDIR_FILENAME_LEN];
   I64 d1=0,d2=0;
-  if (e1->attr & _ATTR_DIR)
+  if (e1->attr & RS_ATTR_DIR)
     d1=1;
-  if (e2->attr & _ATTR_DIR)
+  if (e2->attr & RS_ATTR_DIR)
     d2=1;
   if (d1!=d2)
     return d2-d1;
@@ -134,13 +138,13 @@ U0 DirFilesSort(CDirEntry **_tempde,I64 key)
 }
 
 CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
-{ //returns last node
+{//Returns last node
   CDirEntry *tempde1;
   Bool del;
   if (tempde)
     while (TRUE) {
       tempde1=tempde->next;
-      if (!(tempde->attr&_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
+      if (!(tempde->attr&RS_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
 	_result=*_result=tempde;
 	del=FALSE;
       } else
@@ -190,7 +194,7 @@ CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
 }
 
 U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
-{
+{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT.Z"$ file,line link to StdOut, $LK,"DocPut",A="MN:DocPut"$.
   U8 *buf;
   if (!filename) return;
   if (IsRaw) {
@@ -199,24 +203,32 @@ U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
     else
       "%s",filename;
   } else {
-    buf=FileNameAbs(filename);
-    if (plain_text) {
-      if (line)
-	"$$LK,\"%s,%04d\",A=\"PL:%s,%d\"$$",filename,line,buf,line;
+    //LK_DOC,LK_DOC_ANCHOR,LK_DOC_FIND,LK_DOC_LINE
+    if (filename[0]=='A'&&filename[2]==':') {
+      if (line) //See $LK,"SpriteEdText",A="MN:SpriteEdText"$()
+	"$$LK,\"%s,%04d\",A=\"AL:%s,%d\"$$",filename+3,line,filename+3,line;
       else
-	"$$LK,\"%s\",A=\"PI:%s\"$$",filename,buf;
+	"$$LK,\"%s\",A=\"AI:%s\"$$",filename+3,filename+3;
     } else {
-      if (line)
-	"$$LK,\"%s,%04d\",A=\"FL:%s,%d\"$$",filename,line,buf,line;
-      else
-	"$$LK,\"%s\",A=\"FI:%s\"$$",filename,buf;
+      buf=FileNameAbs(filename);
+      if (plain_text) {
+	if (line)
+	  "$$LK,\"%s,%04d\",A=\"PL:%s,%d\"$$",filename,line,buf,line;
+	else
+	  "$$LK,\"%s\",A=\"PI:%s\"$$",filename,buf;
+      } else {
+	if (line)
+	  "$$LK,\"%s,%04d\",A=\"FL:%s,%d\"$$",filename,line,buf,line;
+	else
+	  "$$LK,\"%s\",A=\"FI:%s\"$$",filename,buf;
+      }
+      Free(buf);
     }
-    Free(buf);
   }
 }
 
 U0 PutDirLink(U8 *dirname)
-{
+{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT.Z"$ dir macro to StdOut, $LK,"DocPut",A="MN:DocPut"$.
   U8 *buf;
   if (!dirname) return;
   if (IsRaw)
@@ -232,6 +244,7 @@ I64 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
 {
   CDirEntry *tempde1=NULL,*tempde2;
   U8 *st;
+  CDateStruct ds;
   I64 csize=0xFFFF,c=0xFFFF,result=0;
   tempde1=SysFilesFind(files_find_mask,fuf_flags);
   if (!(st=CurDir))
@@ -262,16 +275,17 @@ I64 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
 	if (full)
 	  "%D %T %0*tX %0*tX ",tempde1->datetime,tempde1->datetime,
 	    csize,tempde1->size,c,tempde1->cluster;
-	else
-	  "%02d/%02d %02d:%02d %0*tX ",Month(tempde1->datetime),Day(tempde1->datetime),
-	    Hour24(tempde1->datetime),Minute(tempde1->datetime),
+	else {
+	  Date2Struct(&ds,tempde1->datetime+local_time_offset);
+	  "%02d/%02d %02d:%02d %0*tX ",ds.mon,ds.day_of_mon,ds.hour,ds.min,
 	    csize,tempde1->size;
-	if (tempde1->attr & _ATTR_DIR)
+	}
+	if (tempde1->attr & RS_ATTR_DIR)
 	  PutDirLink(tempde1->name);
 	else
 	  PutFileLink(tempde1->name);
 
-	NewLine;
+	'\n';
 	DirEntryDel(tempde1);
 	tempde1=tempde2;
       }

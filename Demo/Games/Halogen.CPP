@@ -61,7 +61,7 @@ U0 Init()
 {
   I64 i,x=0;
   DocClear;
-  "$$BG,DKGRAY$$"; NewLine((TEXT_ROWS-1)/2);
+  "$$BG,DKGRAY$$%h*c",(TEXT_ROWS-1)/2,'\n';
   speed=0;
   distance=0;
   road_trend=0;
@@ -76,10 +76,9 @@ U0 Init()
   crash=FALSE;
 }
 
-
 U0 Halogen()
 {
-  I64 p1,p2,ch=0,sc=0;
+  I64 a1,a2,ch=0,sc=0;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
   MenuPush(
@@ -103,9 +102,9 @@ U0 Halogen()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      switch (ScanMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
+      switch (ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
 	case MSG_KEY_DOWN:
-	  ch=p1;sc=p2;
+	  ch=a1;sc=a2;
 	  switch (ch) {
 	    case '\n':
 	      Init;
@@ -116,7 +115,7 @@ U0 Halogen()
 	  }
 	  break;
 	case MSG_KEY_UP:
-	  ch=p1;sc=p2;
+	  ch=a1;sc=a2;
 	  if (!ch)
 	    switch (sc.u8[0]) {
 	      case SC_CURSOR_RIGHT:

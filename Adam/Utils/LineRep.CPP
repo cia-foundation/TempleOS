@@ -1,4 +1,4 @@
-#help_index "Utils;Cmd Line (Typically)"
+#help_index "Cmd Line (Typically)"
 
 I64 LineRep1(CDirEntry *tempde)
 {
@@ -6,7 +6,7 @@ I64 LineRep1(CDirEntry *tempde)
   I64 result=0,i;
   while (tempde) {
     i=0;
-    if (tempde->attr&_ATTR_DIR)
+    if (tempde->attr&RS_ATTR_DIR)
       i=LineRep1(tempde->sub);
     else {
       doc=DocRead(tempde->full_name);
@@ -23,7 +23,7 @@ I64 LineRep1(CDirEntry *tempde)
 U0 LineRep2(CDoc *doc,CDirEntry *tempde)
 {
   while (tempde) {
-    if (tempde->attr&_ATTR_DIR) {
+    if (tempde->attr&RS_ATTR_DIR) {
       DocPrint(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempde->user_data,tempde->name);
       LineRep2(doc,tempde->sub);
       DocPrint(doc,"$$ID,-2$$");
@@ -34,7 +34,7 @@ U0 LineRep2(CDoc *doc,CDirEntry *tempde)
   }
 }
 public I64 LineRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
-{
+{//Source line-of-code count report.
   I64 fuf_flags=0,result=0;
   CDoc *doc=DocNew;
   CDirEntry *tempde1=NULL;
@@ -45,7 +45,7 @@ public I64 LineRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
     DocPrint(doc,"%8,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
     LineRep2(doc,tempde1);
     DocPrint(doc,"$$ID,-2$$");
-    DirLstDel(tempde1);
+    DirTreeDel(tempde1);
   }
   DocInsDoc(DocPut,doc);
   DocDel(doc);
@@ -58,10 +58,10 @@ I64 SizeRep1(CDirEntry *tempde,I64 *_fuf_flags)
   U8 buf[BLK_SIZE];
   CPrt *p;
   while (tempde) {
-    if (tempde->attr&_ATTR_DIR)
+    if (tempde->attr&RS_ATTR_DIR)
       i=SizeRep1(tempde->sub,_fuf_flags);
     else if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
-	FileAttr(tempde->name)&_ATTR_COMPRESSED) {
+	FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
       p=Drv2Prt(*tempde->full_name);
       RBlks(p,buf,Cluster2Blk(p,tempde->cluster),1);
       i=(&buf)(CArcCompress *)->expanded_size;
@@ -75,7 +75,7 @@ I64 SizeRep1(CDirEntry *tempde,I64 *_fuf_flags)
 U0 SizeRep2(CDoc *doc,CDirEntry *tempde)
 {
   while (tempde) {
-    if (tempde->attr&_ATTR_DIR) {
+    if (tempde->attr&RS_ATTR_DIR) {
       DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempde->user_data,tempde->name);
       SizeRep2(doc,tempde->sub);
       DocPrint(doc,"$$ID,-2$$");
@@ -88,8 +88,7 @@ U0 SizeRep2(CDoc *doc,CDirEntry *tempde)
   }
 }
 public I64 SizeRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
-{
-//"+x" for expanded size.
+{//Report file sizes. "+x" for expanded size of compressed files.
   I64 fuf_flags=0,result=0;
   CDoc *doc=DocNew;
   CDirEntry *tempde1=NULL;
@@ -101,11 +100,9 @@ public I64 SizeRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
     DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",result,files_find_mask);
     SizeRep2(doc,tempde1);
     DocPrint(doc,"$$ID,-2$$");
-    DirLstDel(tempde1);
+    DirTreeDel(tempde1);
   }
   DocInsDoc(DocPut,doc);
   DocDel(doc);
   return result;
 }
-
-#help_index ""

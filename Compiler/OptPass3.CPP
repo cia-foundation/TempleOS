@@ -55,20 +55,20 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
     else {
       if (tempil1=OptLag(tempi)) {
 	if (!(tempil2=OptLag(tempil1)))
-	  tempil2=&opt_nop;
+	  tempil2=&cmp.ic_nop;
       } else
-	tempil1=tempil2=&opt_nop;
+	tempil1=tempil2=&cmp.ic_nop;
       tempc=tempi->ic_class;
-      nobound_switch (cmp_arg_cnt[code]) {
+      nobound_switch (cmp.arg_cnt[code]) {
 	case 9:
 	  ps->ptr-=tempi->ic_data>>3;
 	  break;
 	case 2:
 	  tempi2=PrsPop(ps);
 	  if (tempi2->ic_flags&ICF_R_TO_F64)
-	    tempc2=sys_internal_types[RT_F64];
+	    tempc2=cmp.internal_types[RT_F64];
 	  else if (tempi2->ic_flags & ICF_R_TO_INT)
-	    tempc2=sys_internal_types[RT_I64];
+	    tempc2=cmp.internal_types[RT_I64];
 	  else
 	    tempc2=tempi->t.a2c;
 	  tempi->a2.type=TY_STK+CmpRawType(tempc2);
@@ -77,9 +77,9 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
 	case 1:
 	  tempi1=PrsPop(ps);
 	  if (tempi1->ic_flags&ICF_R_TO_F64)
-	    tempc1=sys_internal_types[RT_F64];
+	    tempc1=cmp.internal_types[RT_F64];
 	  else if (tempi1->ic_flags & ICF_R_TO_INT)
-	    tempc1=sys_internal_types[RT_I64];
+	    tempc1=cmp.internal_types[RT_I64];
 	  else
 	    tempc1=tempi->t.a1c;
 	  tempi->a1.type=TY_STK+CmpRawType(tempc1);
@@ -89,7 +89,7 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
 	case 0: //nobound_switch
 	  break;
       }
-      if (cmp_result_cnt[code]) {
+      if (cmp.result_cnt[code]) {
 	tempi->r.type=TY_STK+CmpRawType(tempc);
 	tempi->r.type_pointed=CmpRawTypePointed(tempc);
 	tempi->ic_flags|=ICF_R_WAS_STK;
@@ -458,7 +458,7 @@ here1:
 	case IC_SWAP_U8:
 	case IC_SWAP_U16:
 	case IC_SWAP_U32:
-	case IC_SWAP_U64:
+	case IC_SWAP_I64:
 	case IC_QUE_INIT:
 	case IC_QUE_INS:
 	case IC_QUE_INS_REV:
@@ -515,6 +515,25 @@ here1:
     }
     tempi=tempi_next;
   }
+/* REGISTER VARIABLE ASSIGNMENT
+
+We just scored num occurrences of each [RBP] offset in the code to help decide
+which variables should be assigned to register variables.
+
+We counted the times each offset was added to RBP as a plus LEA and we subtract the
+times the offset is dereferenced.  If the address was calculated more times
+than the offset was dereferenced, the variable's address was passed or assigned
+and we cannot use a register because you can't take address of a reg var.
+
+RAX,RBX,RCX,RDX are free to be clobbered by each intermediate code.  RAX links
+intermediate codes together.  R8 and R9 are used for stack machine temporaries.
+RBP is used as stack frame.
+
+RSI,RDI,R10,R11,R12,R13,R14,R15 are used for reg vars.	R12 and R13, however,
+have a unusual ModR addressing mode in the x86_64 architecture, so I only use
+R12 and R13 as non-pointer register variables, such as index variables i,j,k.
+
+*/
   if (lx->htc.fun) {
     lx->htc.fun->used_reg_mask=lx->htc.fun->used_reg_mask&~(REG_VARS_MASK|REG_NON_PTR_MASK)|used_reg_mask;
     if (!Bt(&lx->opts,OPTf_NO_REG_VAR) &&
@@ -537,21 +556,21 @@ here1:
       if (j>0) {
 	if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
 	  "Fun:%s\n",lx->htc.fun->str;
-	if (j>num_reg_vars) {
+	if (j>cmp.num_reg_vars) {
 	  l=0;
-	  for (i=0;i<j && l<num_non_ptr_vars;i++) {
+	  for (i=0;i<j && l<cmp.num_non_ptr_vars;i++) {
 	    tempm=mv[i].m;
 	    tempc=OptClassFwd(tempm->member_class);
 	    if (!tempc->ptr_cnt && !tempm->dim.next) {
-	      while (l<num_non_ptr_vars &&
-		    Bts(&lx->htc.fun->used_reg_mask,to_non_ptr_vars_map[l]))
+	      while (l<cmp.num_non_ptr_vars &&
+		    Bts(&lx->htc.fun->used_reg_mask,cmp.non_ptr_vars_map[l]))
 		l++;
-	      if (l<num_non_ptr_vars) {
-		tempm->reg=to_non_ptr_vars_map[l++];
+	      if (l<cmp.num_non_ptr_vars) {
+		tempm->reg=cmp.non_ptr_vars_map[l++];
 		reg_offsets[tempm->reg].offset=mv[i].offset_start;
 		reg_offsets[tempm->reg].m=tempm;
 		if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
-		  "Reg %Z Var \"%s\" %08X[RBP]\n",tempm->reg,"ST_U64_REGS",
+		  "Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 			tempm->str,reg_offsets[tempm->reg].offset;
 		mv[i].offset_start=0; //flag as reg var
 		if (tempm->size<8 && !StrIMatch("Bool",tempm->member_class->str) &&
@@ -565,20 +584,20 @@ here1:
 	  }
 	}
 	l=0;
-	for (i=0;i<j && l<num_reg_vars;i++) {
+	for (i=0;i<j && l<cmp.num_reg_vars;i++) {
 	  tempm=mv[i].m;
 //if not just flagged as reg var
 	  if (mv[i].offset_start && (!mv[i].m->dim.next||
 		tempm->offset>0 && StrCmp(tempm->str,"argv"))) {
-	    while (l<num_reg_vars &&
-		  Bts(&lx->htc.fun->used_reg_mask,to_reg_vars_map[l]))
+	    while (l<cmp.num_reg_vars &&
+		  Bts(&lx->htc.fun->used_reg_mask,cmp.to_reg_vars_map[l]))
 	      l++;
-	    if (l<num_reg_vars) {
-	      tempm->reg=to_reg_vars_map[l++];
+	    if (l<cmp.num_reg_vars) {
+	      tempm->reg=cmp.to_reg_vars_map[l++];
 	      reg_offsets[tempm->reg].offset=mv[i].offset_start;
 	      reg_offsets[tempm->reg].m=tempm;
 	      if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
-		"Reg %Z Var \"%s\" %08X[RBP]\n",tempm->reg,"ST_U64_REGS",
+		"Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 		      tempm->str,reg_offsets[tempm->reg].offset;
 	      if (tempm->size<8 && !StrIMatch("Bool",tempm->member_class->str) &&
 		  tempm->member_class->type&HTT_INTERNAL_TYPE)

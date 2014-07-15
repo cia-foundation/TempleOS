@@ -1,19 +1,5 @@
-/*
-This demonstrates dynamic initialization of
-vars.  It even works for AOT modules
-because code is generated which runs at
-$LK,"Load",A="MN:Load"$() time to initialize them.
-
-This file is dual use -- you can JIT compile
-it or AOT compile it.  If you AOT compile
-then override the filename extension warning.
-
-Static vars are, essentually, global var.
-*/
-
-#ifaot
-#include "::/Kernel/AOT.HPP"
-#endif
+//Demonstrates dynamic initialization of vars.
+//Static vars are, essentually, global vars.
 
 class Test
 {
@@ -43,12 +29,8 @@ U0 Main1()
 
 Main1;
 
-
-/*
-Now, we'll use the data heap glbl option
+/*Now, we'll use the data heap glbl option
 to force global vars onto the data heap.
-You can't initialize heap glbls in a AOT
-module.
 
 You can turn the data heap flag
 on and off within your programs, leaving
@@ -91,4 +73,4 @@ Main2;
 #exe {OptOn(OPTf_GLBLS_ON_DATA_HEAP);};
 #endif
 
-NewLine;
+'\n';

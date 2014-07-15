@@ -1,4 +1,4 @@
-#help_index "Debugging;Utils;Cmd Line (Typically)"
+#help_index "Debugging;Cmd Line (Typically)"
 
 I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
 {
@@ -44,8 +44,7 @@ I64 LinkChkFile(U8 *filename,I64 *_fuf_flags)
   return result;
 }
 public I64 LinkChk(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
-//Checks for broken file links.
-{
+{//Check documents for broken file links.
   I64 fuf_flags=0,result=0;
   CDirEntry *tempde,*tempde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
@@ -55,7 +54,6 @@ public I64 LinkChk(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
     result+=LinkChkFile(tempde->full_name,&fuf_flags);
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
   return result;
 }
-#help_index ""

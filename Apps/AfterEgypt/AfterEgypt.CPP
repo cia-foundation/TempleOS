@@ -1,8 +1,7 @@
 I64 num_people=100;
 
-
 U0 SongTask(I64)
-{ //Song by the Holy Spirit
+{//Song by the Holy Spirit
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
@@ -21,7 +20,7 @@ U0 HoldCourt()
   FlushMsgs;
   DocDblBufStart;
 
-  NewLine;
+  '\n';
   accused=RandU32%3;
   "%s",LstSub(accused,"A man \0A woman \0A child \0");
 
@@ -37,8 +36,7 @@ U0 HoldCourt()
     ", again!";
   else
     '.';
-  NewLine(4);
-
+  "\n\n\n\n"
   "$$LM,4$$"
   "\n\n$$BT,\"Show Mercy\",LE=0$$\n\n"
   "\n\n$$BT,\"Punish\",LE=1$$\n\n"
@@ -62,7 +60,6 @@ U0 HoldCourt()
 #define T_MOSES_COMICS	8
 #define T_HELP		9
 #define T_QUIT		10
-
 
 Bool TakeTurn()
 {
@@ -129,7 +126,7 @@ Bool TakeTurn()
 	ViewComics;
 	break;
       case T_HELP:
-	PopUp("Ed(\"::/Adam/God/HSNotes.TXT.Z\");",Fs);
+	PopUpEd("::/Adam/God/HSNotes.TXT.Z",Fs);
 	PopUpOk("Add your own story-line...\nLike old school toys.\n");
 	break;
     }
@@ -189,7 +186,7 @@ U0 AfterEgypt()
   WinMax;
   PopUp("Trailer;",Fs);
   WordStat;
-  try //This is to catch <CTRL-ALT-C>.
+  try //Catch <CTRL-ALT-c>.
     while (TakeTurn);
   catch
     PutExcept;

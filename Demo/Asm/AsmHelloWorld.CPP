@@ -1,9 +1,8 @@
-/*
-This is a JIT file, not AOT.
-
-Asm labels can only be defined once
-in a task.  Hit F5 to spawn a new task
-each time and run it.
+/*Asm labels can only be defined once
+in a task.  <F5> will spawn a new task
+each time, so you don't get redefine
+error, like when repeatedly #including
+it from the cmd line.
 
 These are many useful kernel
 routines $LK,"::/Kernel/Str1a.CPP",A="FF:::/Kernel/Str1a.CPP,PUT_CHARS"$
@@ -32,7 +31,7 @@ MY_WORLD_MSG:
 	DU8	"World\n",0;
 
 //My convention is to put an underscore
-//on C callable routines.
+//on C callable asm routines.
 _HELLO_WORLD::
 	PUSH	RSI	//See $LK,"REG_VARS_MASK",A="MN:REG_VARS_MASK"$ & $LK,"REG_NON_PTR_MASK",A="MN:REG_NON_PTR_MASK"$
 	MOV	RCX,10

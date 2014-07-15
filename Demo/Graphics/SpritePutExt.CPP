@@ -1,18 +1,16 @@
-/*
-If you press <CTRL-T> you will see this:
+/*If you press <CTRL-t> you will see this:
 
-$$IB+BP,"<1>",1,"::/Demo/Graphics/SpritePut.CPP,2"$$
+$$IB,"<1>",BI=1,BP="::/Demo/Graphics/SpritePut.CPP,2"$$
 
 That imports an external sprite.  It's
-called a $LK,"DOCEF1_BIN_PTR_LINK",A="MN:DOCEF1_BIN_PTR_LINK"$.
+called a $LK,"DOCEF_BIN_PTR_LINK",A="MN:DOCEF_BIN_PTR_LINK"$.  See $LK,"BP=\"\"",A="FF:::/Doc/DolDocOverview.TXT,BP=\"\""$.
 
-Press <CTRL-R> and "pointer to sprite".
+Press <CTRL-r> and "pointer to sprite".
 Then, enter a file and the number of
 the sprite in the file.  Note: the
 number can get messed-up if you change
 the order of sprites in the source file.
-You can enter a tag instead of a num.
-
+You can link to a tag string instead of a num.
 */
 
 U0 SpritePutExt()
@@ -21,7 +19,7 @@ U0 SpritePutExt()
   for (i=0;i<3;i++) {
     "US Map:";
     Sprite($IB,"<1>",BI=1,BP="::/Demo/Graphics/SpritePut.CPP,2"$);
-    NewLine(12);
+    "%h12c",'\n';
   }
 }
 

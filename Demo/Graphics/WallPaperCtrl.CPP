@@ -1,5 +1,4 @@
-/*
-This was done with <CTRL-SHIFT-L> managed code
+/*Done with <CTRL-SHIFT-L> template code
 that was modified.
 
 This is an advanced demo that shows
@@ -76,7 +75,13 @@ U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool)
 CCtrl *SliderNew()
 {
   Bool old_preempt;
-  CCtrl *c=ACAlloc(sizeof(CCtrl));
+  CCtrl *c;
+  if (Fs!=adam_task) {
+    "Must be Adam Included with SHIFT-F5.\n"
+    "(Would crash when code mem was freed.)\n";
+    return NULL;
+  }
+  c=ACAlloc(sizeof(CCtrl));
   c->win_task=sys_winmgr_task;
   c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
   c->type=CTRLT_GENERIC;

@@ -8,17 +8,17 @@ U0 PromptDemo()
   "\n\nNow prompting from the cmd line.\n\n"
   "$$GREEN$$<ENTER>$$FG$$ keeps default.\n\n";
 
-  i=PmtI64("Enter int expression(%d):",123);
+  i=GetI64("Enter int expression(%d):",123);
   "Int=%d\n",i;
 
-  d=PmtF64("Enter float expression(%12g):",1.2e3);
+  d=GetF64("Enter float expression(%12g):",1.2e3);
   "Float=%e\n",d;
 
-  name=PmtStr("Name (%s):","John");
+  name=GetStr("Name (%s):","John");
   "Name:%s\n",name;
   Free(name);
 
-  cdt=PmtDate("Date (%D):",Now);
+  cdt=GetDate("Date (%D):",Now);
   "Date=%D\n",cdt;
 }
 

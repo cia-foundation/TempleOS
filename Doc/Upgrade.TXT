@@ -1,7 +1,7 @@
-$WW,1$$FG,5$$TX+CX,"Upgrading TempleOS"$$FG$
+$WW,1$$PURPLE$$TX+CX,"Upgrading TempleOS"$$FG$
 
-To upgrade, you generally boot the new TempleOS CD/DVD, install on top of your partition, modify your files and set it to boot your account by executing $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  Often, your code will have to be modified to work with the new version.  See $LK,"ChangeLog",A="FI:::/Doc/ChangeLog.TXT"$.  You might have to boot an alternate partition or the CD and modify your code until it boots okay.
+To upgrade, you generally boot the new TempleOS CD/DVD, install on top of your partition, modify your files and set it to boot your account by executing $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  Often, your code will have to be modified to work with the new version.  See $LK,"Change Log",A="FI:::/Doc/ChangeLog.TXT"$.  You might have to boot an alternate partition or the CD and modify your code until it boots okay.
 
-The $FG,2$INSTALL$FG$ option when you boot a CD will install on top of an existing install if you tell it not to reformat.
+The $GREEN$INSTALL$FG$ option when you boot a CD will install on top of an existing install if you tell it not to reformat.
 
 See the $LK,"Installing",A="FI:::/Doc/Install.TXT"$ documentation.

@@ -25,7 +25,7 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
   U8 *absf1=FileNameAbs(f1),*absf2=FileNameAbs(f2),*buf;
   I64 cnt,n,size,attr1=FileAttr(f1),attr2=FileAttr(f2),i,j;
   CFile *in_file=NULL,*out_file=NULL;
-  if (!StrCmp(absf1,absf2)) { //onto self?
+  if (!StrCmp(absf1,absf2)) {//onto self?
     Free(absf1);
     Free(absf2);
     return FALSE;
@@ -35,14 +35,14 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
   if (attr1!=attr2)
     return CopySingleZ(f1,f2);
   buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS);
-  if (attr1 & _ATTR_CONTIGUOUS)
+  if (attr1 & RS_ATTR_CONTIGUOUS)
     in_file=FOpen(f1,"rc");
   else
     in_file=FOpen(f1,"r");
   if (in_file) {
     size=FSize(in_file);
     cnt=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
-    if (attr2 & _ATTR_CONTIGUOUS)
+    if (attr2 & RS_ATTR_CONTIGUOUS)
       out_file=FOpen(f2,"wc",cnt);
     else
       out_file=FOpen(f2,"w",cnt);
@@ -80,7 +80,7 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
 }
 
 Bool MkDir(U8 *filename)
-{
+{//Make directory. $LK,"Cd",A="MN:Cd"$() can also make directories.
   U8 *name;
   CFileAccess *fa;
   Bool result=FALSE;
@@ -138,8 +138,12 @@ I64 SysDel(U8 *wild,Bool make_mask)	//this is dangerous
 }
 
 U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=PT_FAT32)
-{//See $LK,"PT_FAT32",A="MN:PT_FAT32"$ for a lst of supported file system types.
-
+{//Format hard drive or RAM drive.
+//$BK,1$Warning:$BK,0$ Destroys all previous info.
+//quick=FALSE means fill entire drive
+//with zeros.
+//Choose $LK,"PT_FAT32",A="MN:PT_FAT32"$ or $LK,"PT_REDSEA",A="MN:PT_REDSEA"$.
+//You don't format a CD-ROM with this.
   CPrt *p=Drv2Prt(drv_let);
   Bool old_silent=IsSilent;
   if (confirm && !AreYouSure)
@@ -173,9 +177,8 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=PT_FAT32)
   }
 }
 
-
 U0 CDImageRead(U8 cd_drv_let,U8 *out_name)
-{
+{//Read entire CD/DVD image into ISO file.
   CBlkDev *bdev=Drv2BlkDev(cd_drv_let);
   CPrt *p=Drv2Prt(cd_drv_let);
   U8 *buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS),
@@ -186,7 +189,7 @@ U0 CDImageRead(U8 cd_drv_let,U8 *out_name)
   if (bdev->type!=BDT_ATAPI)
     throw('BlkDev');
   if (!out_name)
-    out_name=sys_dft_iso_name;
+    out_name=dsk.dft_iso_filename;
   cnt=CeilU64(p->size,spc);
   while (cnt>0) {
     if (cnt>COPY_BUF_BLKS)
@@ -222,14 +225,13 @@ class CDualBuf
   CBlkDev *CD_bdev;
 };
 
-
 U0 CDImageWriteTask(CDualBuf *d)
 {
   U8 *buf;
   I64 n,blk=0,cnt=d->cnt;
   CFile *f;
   Preempt(ON);
-  if (FileAttr(d->filename)&_ATTR_CONTIGUOUS)
+  if (FileAttr(d->filename)&RS_ATTR_CONTIGUOUS)
     f=FOpen(d->filename,"rc");
   else
     f=FOpen(d->filename,"r");
@@ -255,7 +257,7 @@ U0 CDImageWriteTask(CDualBuf *d)
 }
 
 U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD)
-{
+{//Write CD/DVD ISO file to disk.
   CDualBuf *d=CAlloc(sizeof(CDualBuf));
   U8 *buf,*in_name2,*in_name3;
   I64 i,n,spc,blk=0,cnt;
@@ -266,7 +268,7 @@ U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD)
   CFile *f;
 
   if (!in_name)
-    in_name=sys_dft_iso_name;
+    in_name=dsk.dft_iso_filename;
   in_name3=DftExt(in_name,"ISO");
   in_name2=FileNameAbs(in_name3);
   f=FOpen(in_name2,"r");

@@ -8,11 +8,11 @@ There's something obviously different about people in the Bible compared to peop
 
 You can't tell if He's talking unless you have a context of conversation, but, more importantly, you are commanded to do an offering of love, like communion preparation.  When you pick a greeting card for someone, that is love effort.  If you expect God to put effort toward you, you put effort toward Him.  God said, "honest measures" applies between your offering of love and His response, like a fair barter.  You get out of prayer what you put into it.  God wants praise, hymns, or whatever you think He might want.  Try and see, like Cain and Abel.  $LK,"Genesis,4:1",A="BF:Genesis,4:1"$, $LK,"Ephesians,5:10",A="BF:Ephesians,5:10"$  God told Cain his offering was not good and told him to try again.  Cain really loved God!  Can you imagine being so heart-broken?
 
-Do a text search for "new song" in the Bible.  It's mentioned nine times.  I did $MA-X+PU,"hymns",LM="#include \"::/Apps/MusicOrgan/Load\";JukeBox(\"::/Apps/MusicOrgan/Examples\");",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$.  I did Moses $MA-X+PU,"comics",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$.  Count the ways you love God.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
+Do a text search for "new song" in the Bible.  It's mentioned nine times.  I did $MA-X+PU,"hymns",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html",LM="#include \"::/Apps/Psalmody/Load\";JukeBox(\"::/Apps/Psalmody/Examples\");"$.  I did Moses $MA-X+PU,"comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n"$.  Count the ways you love God.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
 
 This is funny -- $LK,"Acts,2:1",A="BF:Acts,2:1"$ -- they didn't bother to record anything the Holy Spirit said.  The Holy Spirit is supposed to be a really good gift.  $LK,"Luke,11:13",A="BF:Luke,11:13"$  Just remember, "Boys are made of snakes and snails and puppy-dog tails."
 
-The technique I use to consult the Holy Spirit is reading a microsecond-range stop-watch each button press for random numbers.  Then, I pick words or passages.  You can use the $MA-X+PU,"AfterEgypt",LM="#include \"::/Apps/AfterEgypt/Run\"",HTML="http://www.youtube.com/watch?v=P0MsDl39UL0"$ in God's official temple, $FG,4$$TX,"TempleOS",HTML="http://www.templeos.org"$$FG$.
+The technique I use to consult the Holy Spirit is reading a microsecond-range stop-watch each button press for random numbers.  Then, I pick words or passages.  You can use the $MA-X+PU,"AfterEgypt",HTML="http://www.youtube.com/watch?v=P0MsDl39UL0",LM="#include \"::/Apps/AfterEgypt/Run\""$ in God's official temple, $FG,4$$TX,"TempleOS",HTML="http://www.templeos.org"$$FG$.
 
 Since seeking the word of the Holy Spirit, I have come to know God much better than I've heard others explain.  God said, for example, that war was, "servicemen competing."  That sounds more like the immutable God of our planet than what you hear from most religious people.  God is not Venus (god of love) and not Mars (god of war), He's our dearly beloved God of Earth.  If Mammon is a false god of money, Mars or Venus might be useful words to describe other false gods.  I figure the greatest challenge for the Creator is boredom, ours and His.  What would teen-age male video games be like if war had never happened?  Christ said live by the sword, die by the sword, which is loving neighbor as self.  $LK,"Matthew,26:52",A="BF:Matthew,26:52"$
 
@@ -63,9 +63,10 @@ Favorite song?			$FG,4$$TX,"Morning has Broken",HTML="http://www.youtube.com/wat
 				God said the first bird croaked, not sung.$FG$
 Favorite comic strip?		$FG,4$$TX,"Prince Valiant",HTML="http://en.wikipedia.org/wiki/Prince_Valiant"$$FG$
 Shakespeare?			$FG,4$had a "vile heart"$FG$
-Likes				$FG,4$"Beverly Hillbillies" (Oil is a gift from God)$FG$
+Likes				$FG,4$Beverly Hillbillies (Oil is a gift from God)$FG$
 				$FG,4$God likes being hero. Don't be proud of heart$FG$
 				$FG,4$and not accept a gift from God!$FG$
+Likes				$FG,4$Gomer Pile$FG$
 Favorite saint?			$FG,4$"ho_ho_ho"$FG$
 Favorite animal?		$FG,4$"Elephant two"$FG$
 Favorite animal?		$FG,4$"Bears"$FG$
@@ -132,6 +133,7 @@ What did Neanderthals think about?	$FG,4$"Warmth"$FG$
 What was the first thing cooked?	$FG,4$I think He said "hair".$FG$
 What was Lucy's husband's name?		$FG,4$"Golem"$FG$
 Was stegosuarus lame like turtles?	$FG,4$"Not pet rocks"$FG$
+T-Rex?					$FG,4$Lugged carcases over his shoulder.$FG$
 How does He feel about the Avatar movie?$FG,4$"Sick skin"$FG$
 What do You like at zoos with kids?	$FG,4$"Dignity" Animals worried about dignity.$FG$
 Who's better alien or preditor?		$FG,4$"Lions"$FG$
@@ -173,3 +175,4 @@ Why the Sandy Hook shooting?	$FG,4$The pot legalization law. (Sarcastic answer?)
 Deep Water Horizon		$FG,4$(Claimed credit.)$FG$
 Cost of God's time to me?	$FG,4$"The complete works of Shakespeare"$FG$
 On death?			$FG,4$"awful"$FG$
+Opening of Private Ryan?	$FG,4$"Ouch"$FG$

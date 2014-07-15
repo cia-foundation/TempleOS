@@ -49,18 +49,18 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
       templg=CAlloc(sizeof(LogStruct));
       try {
 	src=doc_e->tag;
-	templg->ip_num.u8[3]=A2I64(src,10,&src);
+	templg->ip_num.u8[3]=Str2I64(src,10,&src);
 	if (*src++!='.') throw;
-	templg->ip_num.u8[2]=A2I64(src,10,&src);
+	templg->ip_num.u8[2]=Str2I64(src,10,&src);
 	if (*src++!='.') throw;
-	templg->ip_num.u8[1]=A2I64(src,10,&src);
+	templg->ip_num.u8[1]=Str2I64(src,10,&src);
 	if (*src++!='.') throw;
-	templg->ip_num.u8[0]=A2I64(src,10,&src);
+	templg->ip_num.u8[0]=Str2I64(src,10,&src);
 
 	do if (!*src) throw;
 	while (*src++!='[');
 	MemSet(&ds,0,sizeof(CDateStruct));
-	ds.day_of_mon=A2I64(src,10,&src);
+	ds.day_of_mon=Str2I64(src,10,&src);
 	if (*src++!='/') throw;
 	src2=src;
 	do if (!*src2) throw;
@@ -68,16 +68,16 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 	* --src2=0;
 	ds.mon=1+LstMatch(src,mon_lst,LMF_IGNORE_CASE);
 	src=++src2;
-	ds.year=A2I64(src,10,&src);
+	ds.year=Str2I64(src,10,&src);
 	if (*src++!=':') throw;
-	ds.hour=A2I64(src,10,&src);
+	ds.hour=Str2I64(src,10,&src);
 	if (*src++!=':') throw;
-	ds.min=A2I64(src,10,&src);
+	ds.min=Str2I64(src,10,&src);
 	if (*src++!=':') throw;
-	ds.sec=A2I64(src,10,&src);
+	ds.sec=Str2I64(src,10,&src);
 	templg->datetime=Struct2Date(&ds);
 	if (*src++!=CH_SPACE) throw;
-	i=A2I64(src,10,&src);
+	i=Str2I64(src,10,&src);
 	templg->datetime-=(i/100+i%100/60.0)*CDATE_FREQ*60*60;
 
 	do if (!*src) throw;
@@ -96,9 +96,9 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 	  do if (!*src) throw;
 	  while (*src++!='\"');
 
-	  templg->code=A2I64(src,10,&src);
+	  templg->code=Str2I64(src,10,&src);
 	  if (*src++!=CH_SPACE) throw;
-	  templg->size=A2I64(src,10,&src);
+	  templg->size=Str2I64(src,10,&src);
 	  if (*src++!=CH_SPACE) throw;
 
 	  if (*src++!='\"') throw;
@@ -134,7 +134,7 @@ LogStruct *PrsLogFiles(U8 *files_find_mask)
     PrsSingleLogFile(root,tempde->full_name);
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
   return root;
 }
 
@@ -174,6 +174,7 @@ U0 BlockIPNums(LogStruct *root)
   QueInit(&blocked_root);
   BlockedStructAdd(&blocked_root,68<<24+224<<16+130<<8+96); //Me 68.224.130.96
   BlockedStructAdd(&blocked_root,68<<24+96<<16+100<<8+126); //Me 68.96.100.126
+  BlockedStructAdd(&blocked_root,68<<24+96<<16+110<<8+213); //Me 68.96.110.213
 
   //pass 1: collect robot lst
   while (templg!=root) {
@@ -287,6 +288,7 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
     days_start,days_end,*day_cnts,*day_dup_cnts;
   LogStruct *templg=root->next,*dup_root=NULL;
   LinkStruct *link_root=NULL;
+  CDateStruct ds;
 
   i=start*24;hours_start=i.u32[1];
   i=end  *24;hours_end	=i.u32[1];
@@ -327,18 +329,19 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
   else
     i=hours_start;
   for (;i<=hours_end;i++) {
-    "%D %02d: ",i<<32/24,Hour24(i<<32/24);
+    Date2Struct(&ds,i<<32/24+local_time_offset);
+    "%D %02d: ",i<<32/24,ds.hour;
     for (j=0;j<dup_cnts[i-hours_start];j++)
       '-';
     for (;j<hour_cnts[i-hours_start];j++)
       '+';
-    NewLine;
+    '\n';
   }
   "Total:%d  Dups:%d\n",cnt,dups;
 
   "\n\nDownloads of /TempleOSCD.ISO\n";
   LinkTreeTraverse(link_root);
-  NewLine;
+  '\n';
 
   LinkTreeDel(link_root);
   Free(hour_cnts);
@@ -354,6 +357,7 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
     days_start,days_end,*day_cnts,*day_dup_cnts;
   LogStruct *templg=root->next,*dup_root=NULL;
   LinkStruct *link_root=NULL;
+  CDateStruct ds;
 
   i=start*24;hours_start=i.u32[1];
   i=end  *24;hours_end	=i.u32[1];
@@ -394,18 +398,19 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
   else
     i=hours_start;
   for (;i<=hours_end;i++) {
-    "%D %02d: ",i<<32/24,Hour24(i<<32/24);
+    Date2Struct(&ds,i<<32/24+local_time_offset);
+    "%D %02d: ",i<<32/24,ds.hour;
     for (j=0;j<dup_cnts[i-hours_start];j++)
       '-';
     for (;j<hour_cnts[i-hours_start];j++)
       '+';
-    NewLine;
+    '\n';
   }
   "Total:%d  Dups:%d\n",cnt,dups;
 
   "\n\nHits on /index.html\n";
   LinkTreeTraverse(link_root);
-  NewLine;
+  '\n';
 
   LinkTreeDel(link_root);
   Free(hour_cnts);
@@ -422,8 +427,8 @@ U0 WebLogRep(U8 *mask,U8 *output_filename)
   DocMax;
 
   root=PrsLogFiles(mask);
-  start=PmtDate("Start(%D):",root->next->datetime);
-  end  =PmtDate("End  (%D):",root->last->datetime);
+  start=GetDate("Start(%D):",root->next->datetime);
+  end  =GetDate("End  (%D):",root->last->datetime);
   BlockIPNums(root);
 
   DocClear;

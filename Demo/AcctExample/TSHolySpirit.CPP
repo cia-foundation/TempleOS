@@ -1,5 +1,5 @@
 U0 BadCodeJump()
-{ //$LK,"::/Adam/God/HSNotes.TXT"$
+{//$LK,"::/Adam/God/HSNotes.TXT"$
   CDirEntry *tempde1=FilesFind("/*",FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUSTER_ORDER),
 	*tempde=tempde1;
   I64 cnt=0,num;
@@ -17,12 +17,12 @@ U0 BadCodeJump()
   while (tempde) {
     num-=tempde->user_data;
     if (num<0) {
-      st=MPrint("FL:%s,%d",tempde->full_name,-num);
+      st=MStrPrint("FL:%s,%d",tempde->full_name,-num);
       break;
     }
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
   Ed(st);
   Free(st);
 }
@@ -30,15 +30,15 @@ U0 BadCodeJump()
 public U8 *FileNameNumNext(U8 *files_find_mask,U8 *fmt)
 {
   CDirEntry *tempde=FilesFind(files_find_mask);
-  U8 *result=MPrint(fmt,FileCnt(tempde));
-  DirLstDel(tempde);
+  U8 *result=MStrPrint(fmt,FileCnt(tempde));
+  DirTreeDel(tempde);
   return result;
 }
 
 U0 DCImgWrite(CDC *dc)
 {
   U8 *st=FileNameNumNext("::" TS_BLOG_DIR "/Img*","::" TS_BLOG_DIR "/Img%03d.BMP"),*st2;
-  st2=MPrint("http://www.templeos.org/Wb%s",st+2);
+  st2=MStrPrint("http://www.templeos.org/Wb%s",st+2);
   BMPFileWrite(st,dc);
   Free(st);
   "$$HC,\"<img src=\\\"%s\\\" width=\\\"%d\\\" height=\\\"%d\\\" alt=\\\"\\\">\"$$\n",st2,dc->width,dc->height;
@@ -49,13 +49,13 @@ U0 BlogScreenShot()
 {
   Bool old_cursor=DocCursor;
   CDC *dc1,*dc2;
-  U8 *old_fp_draw_input_ptr=fp_draw_input_ptr;
-  fp_draw_input_ptr=NULL;
+  U8 *old_fp_draw_input_ptr=gr.fp_draw_input_ptr;
+  gr.fp_draw_input_ptr=NULL;
   WinMgrSync(2);
   dc1=DCCaptureScreen;
   dc2=DCExtract(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
   DCImgWrite(dc2);
-  fp_draw_input_ptr=old_fp_draw_input_ptr;
+  gr.fp_draw_input_ptr=old_fp_draw_input_ptr;
   DCDel(dc1);
   DCDel(dc2);
   DocCursor(old_cursor);
@@ -66,7 +66,7 @@ U8 *WebBookMarks(U8 *filename="HOME/Archive/Bookmarks.html")
   U8 *st;
   CDocEntry *doc_e;
   CDoc *doc=DocNew;
-  CLex *lx=LexNew(MPrint("#include \"%s\"",filename));
+  CLex *lx=LexNew(MStrPrint("#include \"%s\"",filename));
   while (Lex(lx))
     if (lx->token==TK_STR && *lx->cur_str(U32 *)=='http') {
       DocPrint(doc,"$$MU-UL,\"%Q\",LE=0x%X$$\n",lx->cur_str,lx->cur_str);
@@ -74,7 +74,10 @@ U8 *WebBookMarks(U8 *filename="HOME/Archive/Bookmarks.html")
     }
   LexDel(lx);
 
-  st=StrNew(PopUpMenu(doc));
+  if ((st=PopUpMenu(doc))!=DOCM_CANCEL)
+    st=StrNew(st);
+  else
+    st=NULL;
 
   doc_e=doc->root.next;
   while (doc_e!=doc) {
@@ -202,7 +205,7 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
   U8 *verse;
   if (*st && (doc_out=DocPut)) {
 
-    i=A2I64(st,radix);
+    i=Str2I64(st,radix);
 
     if (modulo) {
       DocPrint(doc_out,"$TX,"(Modulo is just remainder.)",HTML="http://en.wikipedia.org/wiki/Modulo_operation"$\n");
@@ -228,7 +231,7 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
 
     doc_in=DocNew;
     BibleLines(doc_in,start,num_lines);
-    while (TRUE) { //Del leading blanks
+    while (TRUE) {//Del leading blanks
       doc_e=doc_in->root.next;
       if (doc_e==doc_in)
 	break;
@@ -239,7 +242,7 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
 	  break;
       }
     }
-    while (TRUE) { //Del trailing blanks
+    while (TRUE) {//Del trailing blanks
       doc_e=doc_in->cur_entry->last;
       if (doc_e==doc_in)
 	break;
@@ -256,14 +259,19 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
   }
 }
 
-#define NIST_TIME_OFFSET	(5*3600-353)
+#define NIST_TIME_OFFSET	17586
 
 public U0 SyncNIST()
 {
+  I64 i,j;
+  CDate d;
+  CDateStruct ds;
   while (!ScanChar) {
-    "%d %d\n",
-	ToI64	((Now-A2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET),
-	FloorI64((Now-A2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET,60);
+    d=Now;
+    Date2Struct(&ds,d);
+    i=ToI64((d-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET);
+    j=FloorI64(i,60);
+    "%d %d %02d %02d\n",i,j,ds.sec,(60+ds.sec-(i-j))%60;
     Sleep(100);
   }
 }
@@ -273,7 +281,7 @@ U0 FillInMyURL()
   U8 *tag,*st,*st2;
   CWebBibleForm *url=CAlloc(sizeof(CWebBibleForm));
   url->timestamp=
-	FloorI64((Now-A2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET,60);
+	FloorI64((Now-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET,60);
   switch (PopUpPickLst("NISTBeacon\0WebBible\0YouTube\0Imgur\0Wikipedia\0RandomNumbers.info\0"
 	"Random.org\0VirtualNotary\0Nist\0HotBits\0GenerateData\0WebBookMark\0")) {
     case 0:
@@ -282,7 +290,7 @@ U0 FillInMyURL()
 	"HTML=\"http://beacon.nist.gov/home\"$$\n\n"
 	"$$TX,\"Guidelines for Talking with God\","
 	"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n\n";
-	tag=MPrint("http://beacon.nist.gov/rest/record/%d",url->timestamp);
+	tag=MStrPrint("http://beacon.nist.gov/rest/record/%d",url->timestamp);
 	"$$TX,\"%Q\",HTML=\"%Q\"$$\n\n",tag,tag;
 	Free(tag);
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
@@ -292,7 +300,7 @@ U0 FillInMyURL()
       if (DocFormDo(url(CWebBibleForm *))) {
 	tag=url->special;
 	st2=URLPercentSpaces(url->special);
-	st=MPrint("http://www.biblegateway.com/passage/?search=%s&version=NIV",st2);
+	st=MStrPrint("http://www.biblegateway.com/passage/?search=%s&version=NIV",st2);
 	Free(st2);
 	if (*url->tag)
 	  tag=url->tag;
@@ -303,7 +311,7 @@ U0 FillInMyURL()
     case 2:
       if (DocFormDo(url(CYouTubeForm *))) {
 	if (url->min || url->sec)
-	  st=MPrint("%s&hl=enUS&start=%d",url->special,url->min*60+url->sec);
+	  st=MStrPrint("%s&hl=enUS&start=%d",url->special,url->min*60+url->sec);
 	else
 	  st=StrNew(url->special);
 	"$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\"><param name=\\\"movie\\\" "
@@ -325,7 +333,7 @@ U0 FillInMyURL()
     case 4:
       if (DocFormDo(url(CWikipediaForm *))) {
 	tag=url->special;
-	st=MPrint("http://en.wikipedia.org/wiki/%s",url->special);
+	st=MStrPrint("http://en.wikipedia.org/wiki/%s",url->special);
 	if (*url->tag)
 	  tag=url->tag;
 	"$$TX,\"%Q\",HTML=\"%Q\"$$",tag,st;
@@ -357,7 +365,7 @@ U0 FillInMyURL()
 	tag="http://virtual-notary.org";
 	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
 	tag="Here is the certificate";
-	st=MPrint("http://www.templeos.org/Certs/virtual-notary-cert-randomnum-%d.p12",url->cert);
+	st=MStrPrint("http://www.templeos.org/Certs/virtual-notary-cert-randomnum-%d.p12",url->cert);
 	"\n$$TX,\"%Q: %d\",HTML=\"%Q\"$$.\n\n",tag,url->cert,st;
 	Free(st);
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
@@ -401,4 +409,36 @@ U0 FillInMyURL()
       break;
   }
   Free(url);
+}
+
+public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512)
+{//Make God pick a book passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+  CDirEntry *tempm=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT),
+	*tempm1=tempm;
+  I64 i=0;
+  U8 *st,*st2=NULL;
+  while (tempm) {
+    st=FileRead(tempm->full_name);
+    tempm->user_data=StrLen(st);
+    if (tempm->user_data>=len)
+      i+=tempm->user_data+1-len;
+    Free(st);
+    tempm=tempm->next;
+  }
+  i=(GodBits(24)*i)>>24;
+  tempm=tempm1;
+  while (tempm) {
+    if (!st2 && tempm->user_data>=len) {
+      i-=tempm->user_data+1-len;
+      if (i<0) {
+	st=FileRead(tempm->full_name);
+	st2=st+(tempm->user_data+1-len)+i;
+	st2[len]=0;
+	"%s\n",st2;
+	Free(st);
+      }
+    }
+    tempm=tempm->next;
+  }
+  DirTreeDel(tempm1);
 }

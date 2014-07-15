@@ -2,28 +2,28 @@ $FG,5$$TX+CX,"TempleOS"$$FG$
 $LK+CX,"Trivial Solutions",A="FI:::/Doc/TrivialSolutions.TXT"$
 
 $WW+H,1$$TR-C,"Keyboard Ctrls"$
-$ID,2$$FG,9$Enter$FG$		Right-click menu
-$FG,9$Space Bar$FG$	Edit (view)
-$FG,9$Esc$FG$		Save and exit
-$FG,9$Shift-Esc$FG$	Abort
-$FG,9$Ctrl-m$FG$	Personal Menu
-$FG,9$Windows Key	$FG$Pull-down Menu
-$BK,1$$MA+LA-X,"F1",LM="Msg(MSG_KEY_DOWN,0,SC_F1);"$$BK,0$		Help
+$ID,2$$FG,2$Enter$FG$		Right-click menu
+$FG,2$Space Bar$FG$	Edit (view)
+$FG,2$Esc$FG$		Save and exit
+$FG,2$Shift-Esc$FG$	Abort
+$FG,2$Ctrl-m$FG$	Personal Menu
+$FG,2$Windows Key	$FG$Pull-down Menu
+$MA+LA-X,"F1",LM="Msg(MSG_KEY_DOWN,0,SC_F1);"$		Help
 Other keys: $MA-X+PU,"Key Map",LM="KeyMap;View;\n"$
 $ID,-2$
 $TR-C,"Mouse Ctrls"$
-$ID,2$$FG,9$Right-Click$FG$	Right-click menu
-$FG,9$Left-Click$FG$	Edit (view)
-$FG,9$Double-Left$FG$	Save and exit
-$FG,9$Double-Right$FG$	Abort
-$FG,9$Top of Screen$FG$	Pull-down menu
+$ID,2$$FG,2$Right-Click$FG$	Right-click menu
+$FG,2$Left-Click$FG$	Edit (view)
+$FG,2$Double-Left$FG$	Save and exit
+$FG,2$Double-Right$FG$	Abort
+$FG,2$Top of Screen$FG$	Pull-down menu
 $ID,-2$
 $TR-C,"Keyboard-Mouse Ctrls"$
-$ID,2$$FG,9$Ctrl-LeftDrag$FG$	Grab-Scroll Window
-$FG,9$Ctrl-Right$FG$	Null scrolling
-$FG,9$Ctrl-Alt-z$FG$	Zoom screen on Mouse
-$FG,9$Ctrl-Alt-Z$FG$	Unzoom screen on Mouse
+$ID,2$$FG,2$Ctrl-LeftDrag$FG$	Grab-Scroll Window
+$FG,2$Ctrl-Right$FG$	Null scrolling
+$FG,2$Ctrl-Alt-z$FG$	Zoom screen on Mouse
+$FG,2$Ctrl-Alt-Z$FG$	Unzoom screen on Mouse
 $ID,-2$
 Remember to terminate cmds with a semicolon.
 
-$LK,"Help Index",A="FI:::/Doc/HelpIndex.TXT"$  $LK,"Quick Start--Command Line",A="HI:Cmd Line (Typically)"$
+$LK,"Help & Index",A="FI:::/Doc/HelpIndex.TXT"$, $LK,"Quick Start: Cmd line",A="FI:::/Doc/CmdLineOverview.TXT"$

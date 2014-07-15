@@ -1,6 +1,6 @@
-#help_index "Memory"
+#help_index "Memory/Blk Pool"
 public I64 UnusedBPMem(CBlkPool *bp)
-{
+{//Count of unused bytes in bp.
   I64 result=0,i;
   CMemBlk *tempm;
 
@@ -42,13 +42,54 @@ public I64 UnusedBPMem(CBlkPool *bp)
   return result*PAGE_SIZE;
 }
 
-public I64 UnusedSysMem()
+#help_index "Memory/Heap Ctrl"
+I64 MemBlkLstSize(CHeapCtrl *hc)
 {
-  return UnusedBPMem(sys_code_bp);
+  CMemBlk *m;
+  I64 result=0;
+  m=hc->next_mem_blk;
+  while (m!=&hc->next_mem_blk) {
+    result+=sizeof(CMemBlk);
+    m=m->next;
+  }
+  return result;
 }
 
+public I64 UnusedHCMem(CHeapCtrl *hc)
+{//Unused bytes alloced to a heap ctrl.
+  I64 result,i;
+  CMemUnusedAllocated *u;
+
+  if (!hc) return 0;
+
+  result=UnusedBPMem(hc->bp);
+
+  PUSHFD
+  CLI
+  while (LBts(&hc->locked_flags,HClf_LOCKED))
+    PAUSE
+
+  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+    u=hc->heap_hash[i];
+    while (u) {
+      result+=u->size;
+      u=u->next;
+    }
+  }
+  u=hc->malloc_free_lst;
+  while (u) {
+    result+=u->size;
+    u=u->next;
+  }
+
+  LBtr(&hc->locked_flags,HClf_LOCKED);
+  POPFD
+  return result;
+}
+
+#help_index "Memory/Task"
 public I64 TaskAllocatedMem(CTask *task=NULL,Bool override_validate=FALSE)
-{
+{//Count of bytes alloced to a task, used+unused.
   CMemBlk *m,*m1;
   I64 result=0;
 
@@ -90,20 +131,8 @@ public I64 TaskAllocatedMem(CTask *task=NULL,Bool override_validate=FALSE)
   return result;
 }
 
-I64 MemBlkLstSize(CHeapCtrl *hc)
-{
-  CMemBlk *m;
-  I64 result=0;
-  m=hc->next_mem_blk;
-  while (m!=&hc->next_mem_blk) {
-    result+=sizeof(CMemBlk);
-    m=m->next;
-  }
-  return result;
-}
-
 public I64 TaskUnusedAllocatedMem(CTask *task=NULL,Bool override_validate=FALSE)
-{
+{//Count of bytes alloced to a task but unused.
   I64 result=0,i;
   CMemUnusedAllocated *uum;
   if (!task) task=Fs;
@@ -155,7 +184,7 @@ public I64 TaskUnusedAllocatedMem(CTask *task=NULL,Bool override_validate=FALSE)
 }
 
 public I64 TaskUsedMem(CTask *task=NULL,Bool override_validate=FALSE)
-{
+{//Count of bytes alloced to a task and in use.
   I64 result=0;
   if (!task) task=Fs;
   if (!override_validate && !TaskValidate(task)) return 0;
@@ -165,43 +194,8 @@ public I64 TaskUsedMem(CTask *task=NULL,Bool override_validate=FALSE)
   return result;
 }
 
-    #help_index "Memory/Heap Ctrl"
-
-public I64 UnusedHCMem(CHeapCtrl *hc)
-{
-  I64 result,i;
-  CMemUnusedAllocated *u;
-
-  if (!hc) return 0;
-
-  result=UnusedBPMem(hc->bp);
-
-  PUSHFD
-  CLI
-  while (LBts(&hc->locked_flags,HClf_LOCKED))
-    PAUSE
-
-  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
-    u=hc->heap_hash[i];
-    while (u) {
-      result+=u->size;
-      u=u->next;
-    }
-  }
-  u=hc->malloc_free_lst;
-  while (u) {
-    result+=u->size;
-    u=u->next;
-  }
-
-  LBtr(&hc->locked_flags,HClf_LOCKED);
-  POPFD
-  return result;
-}
-
-#help_index "Info;Memory/Info;Debugging/Heap"
 public Bool HeapRep(CTask *task)
-{
+{//Report status of task's heap.
   I64 i,cnt;
   CMemUnusedAllocated *uum;
 
@@ -236,7 +230,7 @@ public Bool HeapRep(CTask *task)
     if (cnt)
       "%03X:%08X\n",i<<3,cnt;
   }
-  NewLine;
+  '\n';
 
   uum=task->code_heap->malloc_free_lst;
   while (uum) {
@@ -256,13 +250,12 @@ public Bool HeapRep(CTask *task)
   LBtr(&task->code_heap->locked_flags,HClf_LOCKED);
   POPFD
 
-  NewLine;
+  '\n';
 }
 
-#help_index "Memory;Debugging/Heap"
-
+#help_index "Memory/Task;Debugging/Heap"
 public Bool IsInHeap(U8 *a,CTask *task=NULL,Bool lock=TRUE)
-{
+{//Check addr if on heap.
   CMemBlk *m;
 
   if (!task) task=Fs;
@@ -312,7 +305,7 @@ public Bool IsInHeap(U8 *a,CTask *task=NULL,Bool lock=TRUE)
 }
 
 public Bool HeapWalk(CTask *task=NULL)
-{
+{//Check integrity of task's heap.
   I64 i;
   CMemUnusedAllocated *uum;
   Bool result=TRUE;
@@ -389,18 +382,16 @@ public Bool HeapWalk(CTask *task=NULL)
 }
 
 #help_index "Info;Task"
-
 U0 TaskRepTask(CTask *task,I64 indent)
 {
   CTask *task1;
   U8 *st,*desc=MStrUtil(task->task_title,SUF_SAFE_DOLLAR);
-  st=MPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
-  Spaces(indent);
-  "%s $$TX,\"%Q...\",SCX=16$$ Mem:%08X\n",
+  st=MStrPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
+  "%h*c%s $$TX,\"%Q...\",SCX=16$$ Mem:%08X\n",indent,CH_SPACE,
     st,desc,TaskAllocatedMem(task);
-  Spaces(indent+2);
-  "Flags:%04X:%04X\n",task->task_flags,task->display_flags;
-  "Time:%9.2fm\n",task->total_time/60.0/time_stamp_freq_initial;
+  "%h*cFlags:%04X:%04X Time:%0.2fm\n",indent+2,CH_SPACE,
+    task->task_flags,task->display_flags,
+    task->total_time/60.0/cnts.time_stamp_freq_initial;
   Free(st);
   Free(desc);
   task1=task->next_child_task;
@@ -411,7 +402,7 @@ U0 TaskRepTask(CTask *task,I64 indent)
 }
 
 public U0 TaskRep()
-{
+{//Report current tasks on all cores.
   I64 i;
   CCPU *c;
   PUSHFD
@@ -423,5 +414,3 @@ public U0 TaskRep()
   }
   POPFD
 }
-
-#help_index ""

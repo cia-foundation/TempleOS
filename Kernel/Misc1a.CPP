@@ -1,13 +1,11 @@
 U0 PortNop()
-{
-  InU8(0x21); //This is an innoculous (reads IRQ Mask)
-	      //access which should take
-	      //fixed time because it's an ISA-bus standard.
-	      //It takes 1.0uS-2.0uS
+{//Innoculous (reads IRQ Mask) which should take fixed time
+//because it's an ISA-bus standard.  It takes 1.0uS-2.0uS.
+  InU8(0x21);
 }
 
 U16 EndianU16(U16 d)
-{
+{//Swap big<-->little endian.
   I64 result=0;
   result.u8[1]=d.u8[0];
   result.u8[0]=d.u8[1];
@@ -15,7 +13,7 @@ U16 EndianU16(U16 d)
 }
 
 U32 EndianU32(U32 d)
-{
+{//Swap big<-->little endian.
   I64 result=0;
   result.u8[3]=d.u8[0];
   result.u8[2]=d.u8[1];
@@ -24,8 +22,8 @@ U32 EndianU32(U32 d)
   return result;
 }
 
-U64 EndianU64(U64 d)
-{
+I64 EndianI64(I64 d)
+{//Swap big<-->little endian.
   U64 result;
   result.u8[7]=d.u8[0];
   result.u8[6]=d.u8[1];
@@ -39,28 +37,29 @@ U64 EndianU64(U64 d)
 }
 
 I64 BCnt(I64 d)
-{
+{//Count set bits in I64.
   I64 result=0,i;
   for (i=0;i<8;i++)
     result+=set_bits_table[d.u8[i]];
   return result;
 }
 
-U0 IntSimpleTimer(CTask *)
-{
+U0 IntCore0TimerHandler(CTask *)
+{//Called from $LK,"IntCore0TimerHandler",A="FF:::/Kernel/Ints.CPP,IntCore0TimerHandler"$
   I64 i;
   if (mp_cnt>1)
     while (LBts(&sys_semas[SYS_SEMA_SYS_TIMER],0))
       PAUSE
-  lock sys_jiffies++;
-  sys_timer+=SYS_TIMER0_PERIOD+1;
+  lock cnts.jiffies++;
+  cnts.timer+=SYS_TIMER0_PERIOD+1;
   LBtr(&sys_semas[SYS_SEMA_SYS_TIMER],0);
   for (i=1;i<mp_cnt;i++)
     MPInt(I_TIMER,i);
+  OutU8(0x20,0x20); //Acknowledge PIC Interrupt
 }
 
 I64 SysTimerRead()
-{
+{//System timer count with overflow already handled.
   I64 i,result;
   PUSHFD
   CLI
@@ -72,14 +71,14 @@ I64 SysTimerRead()
     if (InU8(0x20) & 1)
       i=-1;
   }
-  result=sys_timer+SYS_TIMER0_PERIOD-i;
+  result=cnts.timer+SYS_TIMER0_PERIOD-i;
   LBtr(&sys_semas[SYS_SEMA_SYS_TIMER],0);
   POPFD
   return result;
 }
 
 I64 TaskTotalTime()
-{
+{//Total CPU cycles given to current task.
   return GetTSC-Fs->time_slice_start+Fs->total_time;
 }
 
@@ -91,22 +90,24 @@ I64 TimeStampFreqCal()
     PUSHFD
     CLI
     if (HPET_start) {
-      time_stamp_freq=HPET_freq*(GetTSC-time_stamp_start);
+      cnts.time_stamp_freq=cnts.HPET_freq*(GetTSC-time_stamp_start);
       i=HPET-HPET_start;
     } else {
-      time_stamp_freq=SYS_TIMER_FREQ*(GetTSC-time_stamp_start);
+      cnts.time_stamp_freq=SYS_TIMER_FREQ*(GetTSC-time_stamp_start);
       i=SysTimerRead-timer_start;
     }
     if (!i)
-      Dbg("Timer Cal Error");
-    time_stamp_freq/=i;
-    time_stamp_kHz_freq=time_stamp_freq/1000;
+      AdamErr("Timer Cal Error");
+    else {
+      cnts.time_stamp_freq/=i;
+      cnts.time_stamp_kHz_freq=cnts.time_stamp_freq/1000;
+      cnts.time_stamp_calibrated=TRUE;
+    }
     POPFD
-    time_stamp_freq_calibrated=TRUE;
   }
   PUSHFD
   CLI
-  if (HPET_freq) {
+  if (cnts.HPET_freq) {
     timer_start=0;
     HPET_start=HPET;
   } else {
@@ -115,36 +116,32 @@ I64 TimeStampFreqCal()
   }
   time_stamp_start=GetTSC;
   POPFD
-  return time_stamp_freq;
+  return cnts.time_stamp_freq;
 }
 
 F64 tS()
-//Time since boot in seconds as a float
-{ //This is slow, but accurate even if no HPET.
-  if (HPET_freq)
-    return ToF64(HPET-HPET_initial)/HPET_freq;
+{//Time since boot in seconds as a float.
+  if (cnts.HPET_freq)
+    return ToF64(HPET-cnts.HPET_initial)/cnts.HPET_freq;
   else
     return SysTimerRead/ToF64(SYS_TIMER_FREQ);
 }
 
 Bool Blink(F64 Hz=2.5)
-{
+{//Return TRUE, then FALSE, then TRUE at given frequency.
   if (!Hz) return 0;
-  return ToI64(sys_jiffies*2*Hz/JIFFY_FREQ)&1;
+  return ToI64(cnts.jiffies*2*Hz/JIFFY_FREQ)&1;
 }
 
-U0 BusyWait(I64 ÊS) //Loosely timed
-{
+U0 BusyWait(I64 ÊS)
+{//Loosely timed.
   I64 i;
   for (i=0;i<ÊS;i++)
     PortNop;
 }
 
 U0 SleepUntil(I64 wake_jiffy)
-//This routine is not for power-saving
-//it is to make a program pause without
-//hogging the CCPU.
-{
+{//Not for power-saving.  It is to make a program pause without hogging the CPU.
   Bool old_idle=LBts(&Fs->task_flags,TASKf_IDLE);
   Fs->wake_jiffy=wake_jiffy;
   Yield;
@@ -152,24 +149,21 @@ U0 SleepUntil(I64 wake_jiffy)
 }
 
 U0 Sleep(I64 mS)
-//This routine is not for power-saving
-//it is to make a program pause without
-//hogging the CCPU.
-{
+{//Not for power-saving.  It is to make a program pause without hogging the CPU.
   if (!mS)
     Yield;
   else
-    SleepUntil(sys_jiffies+mS*JIFFY_FREQ/1000);
+    SleepUntil(cnts.jiffies+mS*JIFFY_FREQ/1000);
 }
 
 U0 Snd(F64 freq)
-{
+{//Play freq.  Zero means off.
   I64 p;
   CSndData *d;
   if (!Bt(&sys_semas[SYS_SEMA_MUTE],0) &&
 	!LBts(&sys_semas[SYS_SEMA_SND],0)) {
-    if (freq!=snd_freq) {
-      snd_freq=freq;
+    if (freq!=snd.freq) {
+      snd.freq=freq;
       if (0<freq<=20000) {
 	p=SYS_TIMER_FREQ/freq;
 	OutU8(0x43,0xB6);
@@ -179,18 +173,18 @@ U0 Snd(F64 freq)
       } else
 	OutU8(0x61,InU8(0x61)&~3);
     }
-    if (!IsDbg && snd_record) {
+    if (!IsDbg && snd.record) {
       d=ACAlloc(sizeof(CSndData));
       d->freq=freq;
-      d->time_stamp=tS;
-      QueIns(d,snd_record_root.last);
+      d->time=tS;
+      QueIns(d,snd.record_root.last);
     }
     LBtr(&sys_semas[SYS_SEMA_SND],0);
   }
 }
 
 U0 Beep(I64 freq=500,Bool busy=FALSE)
-{
+{//Make beep at given freq.
   Snd(freq);
   if (busy)
     BusyWait(500000);
@@ -204,7 +198,7 @@ U0 Beep(I64 freq=500,Bool busy=FALSE)
 }
 
 Bool Mute(Bool val)
-{
+{//Turn-off or on sound.
   Bool result;
   if (val) {
     PUSHFD
@@ -217,59 +211,65 @@ Bool Mute(Bool val)
   return result;
 }
 
-Bool IsMute() {
+Bool IsMute()
+{//Return is-mute flag.
   return Bt(&sys_semas[SYS_SEMA_MUTE],0);
 }
 
-Bool Silent(Bool val) {
-//This turns-off console output, not sound.
+Bool Silent(Bool val)
+{//Turns-off StdOut console text output, not sound.
   return LBEqu(&Fs->display_flags,DISPLAYf_SILENT,val);
 }
 
-Bool IsSilent() {
+Bool IsSilent()
+{//Is StdOut turned-off?
   return Bt(&Fs->display_flags,DISPLAYf_SILENT);
 }
 
-Bool IsPreempt() {
+Bool IsPreempt()
+{
   return Bt(&Fs->task_flags,TASKf_PREEMPT);
 }
 
-Bool SysDbg(Bool val) {
-//Sets or rsts a bit which you can
-//use while debugging.
+Bool SysDbg(Bool val)
+{//Sets or resets sysdbg bit you can use while debugging.
   return LBEqu(&sys_semas[SYS_SEMA_DEBUG],0,val);
 }
 
-Bool IsSysDbg() {
+Bool IsSysDbg()
+{//Is sysdbg bit set?
   return Bt(&sys_semas[SYS_SEMA_DEBUG],0);
 }
 
-Bool Raw(Bool val) {
-//Switches to direct screen output
-//mode for when you don't have
-//a working window.
+Bool Raw(Bool val)
+{//Switches to direct screen, non-windowed output.
   if (!val)
     VGAFlush;
   return !LBEqu(&Fs->task_flags,TASKf_NOT_RAW,!val);
 }
 
-Bool IsRaw() {
+Bool IsRaw()
+{//Are we in BLACK & WHITE raw screen mode?
   return !Bt(&Fs->task_flags,TASKf_NOT_RAW);
 }
 
-Bool SingleUser(Bool val) {
+Bool SingleUser(Bool val)
+{//Sets or resets single-user mode bit.
   return LBEqu(&sys_semas[SYS_SEMA_SINGLE_USER],0,val);
 }
 
-Bool IsSingleUser() {
+Bool IsSingleUser()
+{//Are we in single-user mode?
   return Bt(&sys_semas[SYS_SEMA_SINGLE_USER],0);
 }
 
-Bool InDbg(Bool val) {
+Bool InDbg(Bool val)
+{//Set in-debugger flag.
   return LBEqu(&sys_semas[SYS_SEMA_IN_DEBUGGER],0,val);
 }
 
-Bool IsDbg() {
+Bool IsDbg()
+{//Return in-debugger flag.
   return Bt(&sys_semas[SYS_SEMA_IN_DEBUGGER],0);
 }
 
@@ -294,7 +294,7 @@ U0 CtrlAltD(I64)
     if (Fs==Gs->idle_task)
       BptS(sys_winmgr_task->rip,sys_winmgr_task);
     else
-      BptS(*ctrl_alt_let_ret_addr);
+      BptS(*keydev.ctrl_alt_let_ret_addr);
   }
 }
 

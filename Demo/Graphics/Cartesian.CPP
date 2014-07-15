@@ -14,7 +14,7 @@ U0 Cartesian()
     "Enter algebraic equation to graph.\n"
     "Example: y=2*x\n"
     "y=";
-    if (st=MGetS) {
+    if (st=GetStr) {
       if (*st) {
 	h=Fs->pix_width/2;
 	v=Fs->pix_height/2;
@@ -43,6 +43,6 @@ U0 Cartesian()
 
 Cartesian;
 
-/*$WW,1$
-For better performance, compile the expression entered by the user one time with $LK,"LexExpression2Bin",A="MN:LexExpression2Bin"$() and use $LK,"Call",A="MN:Call"$(). See $LK,"::/Demo/CompileDemo.CPP"$.
-*/
+//For better performance, compile the expression entered by the
+//user one time with $LK,"LexExpression2Bin",A="MN:LexExpression2Bin"$() and use $LK,"Call",A="MN:Call"$().
+//See $LK,"::/Demo/CompileDemo.CPP"$.

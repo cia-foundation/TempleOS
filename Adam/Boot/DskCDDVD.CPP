@@ -12,7 +12,6 @@ U0 FillU32Palindrome(CPalindromeU32 *dst,I64 d)
   dst->little=d;
 }
 
-
 class CCCDUserData //Create CD
 {
   I64 loc,path_entry_num,
@@ -87,7 +86,7 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
     if (!write) tempde1->user_data=CAlloc(sizeof(CCCDUserData));
     de1=de;
     de12=de2;
-    if (tempde1->attr & _ATTR_DIR) {
+    if (tempde1->attr & RS_ATTR_DIR) {
       n=CDFileCreate2(out_file,tempde1,de,de2,_cur_blk,tempde,write,stage2_filename,_stage2_blk);
       de(U8 *)+=sizeof(CISO1DirEntry)-1+n;
       de2(U8 *)+=sizeof(CISO1DirEntry)-1+n<<1;
@@ -234,12 +233,11 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
 }
 
 I64 CDTableLen(CDirEntry *tempde,I64 *size1,I64 *size2,I64 cur_depth)
-//returns depth
-{
+{//Returns depth
   CDirEntry *tempde1=tempde->sub;
   I64 max_depth=cur_depth,i;
   while (tempde1) {
-    if (tempde1->attr & _ATTR_DIR) {
+    if (tempde1->attr & RS_ATTR_DIR) {
       *size1+=sizeof(CISO1PathEntry)-2+ (StrLen(tempde1->name)+1)&-0x2;
       *size2+=sizeof(CISO1PathEntry)-2+StrLen(tempde1->name)<<1;
       i=CDTableLen(tempde1,size1,size2,cur_depth+1);
@@ -262,7 +260,7 @@ U0 CDFillPathTable(CDirEntry *tempde,
  
   if (cur_level==output_level) {
     while (tempde1) {
-      if (tempde1->attr & _ATTR_DIR) {
+      if (tempde1->attr & RS_ATTR_DIR) {
 	tempc=tempde1->user_data;
 	tempc->path_entry_num=*first_free;
 	tabbuf->name_len=StrLen(tempde1->name);
@@ -303,7 +301,7 @@ U0 CDFillPathTable(CDirEntry *tempde,
   tempde1=tempde->sub;
   while (tempde1) {
     tempde2=tempde1->next;
-    if (tempde1->attr & _ATTR_DIR) {
+    if (tempde1->attr & RS_ATTR_DIR) {
       tempc=tempde1->user_data;
       CDFillPathTable(tempde1,_itabbuf,_itabbuf2,tempc->path_entry_num,
 	 big_endian,first_free,cur_level+1,output_level);
@@ -327,12 +325,9 @@ class CElTorito
 
 public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=NULL,
 		  U8 *_stage2_filename=NULL)
-//See $LK,"::/Misc/MakeDistro.CPP"$
-
+{//See $LK,"::/Misc/MakeDistro.CPP"$
 //Use "C:/Distro/*" if you want all files in the C:/Distro directory.
 //Default flags are "+r" recurse.
-
-{
   CISO1PriDesc *iso_pri=CAlloc(CD_BLK_SIZE),
 	       *iso_boot=CAlloc(CD_BLK_SIZE),
 	       *iso_sup=CAlloc(CD_BLK_SIZE),
@@ -355,7 +350,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
 
   if (!_filename)
-    _filename=sys_dft_iso_name;
+    _filename=dsk.dft_iso_filename;
   filename=DftExt(_filename,"ISO");
 
   if (_stage2_filename)
@@ -363,7 +358,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   else
     stage2_filename=NULL;
 
-  rootdir->attr=_ATTR_DIR;
+  rootdir->attr=RS_ATTR_DIR;
   rootdir->sub=FilesFind(src_files_find_mask,fuf_flags);
   rootdir->datetime=Now;
   rootdir->user_data=CAlloc(sizeof(CCCDUserData));
@@ -387,7 +382,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   tabsize2=(tabsize2+CD_BLK_SIZE-1)/CD_BLK_SIZE;
   cur_blk+=tabsize2<<1;
 
-  if (FileAttr(filename) & _ATTR_CONTIGUOUS)
+  if (FileAttr(filename) & RS_ATTR_CONTIGUOUS)
     out_file=FOpen(filename,"wc",cur_blk<<2);
   else
     out_file=FOpen(filename,"w",cur_blk<<2);
@@ -468,7 +463,6 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
-
   MemSet(tabbuf,0,tabsize*CD_BLK_SIZE);
   iso_pri->type_m_path_table=EndianU32(cur_blk);
   tabbuf->name_len=2;  //Fill-in adam entry
@@ -493,7 +487,7 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
-  DirLstDel2(rootdir);
+  DirTreeDel2(rootdir);
   FillU32Palindrome(&iso_pri->vol_space_size,cur_blk);
   FillU32Palindrome(&iso_sup->vol_space_size,cur_blk);
   FWBlks(out_file,iso_pri,16<<2,4);
@@ -532,4 +526,3 @@ cf_done:
   Free(iso_term);
   return cur_blk;
 }
-#help_index ""

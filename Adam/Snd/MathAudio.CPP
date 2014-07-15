@@ -1,6 +1,6 @@
 #help_index "Snd/Math;Math"
 public F64 Saw(F64 t,F64 period)
-{ //0.0 - 1.0 think "(Sin+1)/2"
+{//Sawtooth. 0.0 - 1.0 think "(Sin+1)/2"
   if (period) {
     if (t>=0.0)
       return t%period/period;
@@ -11,7 +11,7 @@ public F64 Saw(F64 t,F64 period)
 }
 
 public F64 FullSaw(F64 t,F64 period)
-{ //1.0 - -1.0 think "Sin"
+{//Plus&Minus Sawtooth. 1.0 - -1.0 think "Sin"
   if (period) {
     if (t>=0.0)
       return 2.0*(t%period/period)-1.0;
@@ -22,7 +22,7 @@ public F64 FullSaw(F64 t,F64 period)
 }
 
 public F64 Caw(F64 t,F64 period)
-{ //1.0 - 0.0 think "(Cos+1)/2"
+{//Cawtooth. 1.0 - 0.0 think "(Cos+1)/2"
   if (period) {
     if (t>=0.0)
       return 1.0-t%period/period;
@@ -33,7 +33,7 @@ public F64 Caw(F64 t,F64 period)
 }
 
 public F64 FullCaw(F64 t,F64 period)
-{ //1.0 - -1.0 think "Cos"
+{//Plus&Minus Cawtooth. 1.0 - -1.0 think "Cos"
   if (period) {
     if (t>=0.0)
       return -2.0*(t%period/period)+1.0;
@@ -44,7 +44,7 @@ public F64 FullCaw(F64 t,F64 period)
 }
 
 public F64 Tri(F64 t,F64 period)
-{ //0.0 - 1.0 - 0.0
+{//Triangle waveform. 0.0 - 1.0 - 0.0
   if (period) {
     t=2.0*(Abs(t)%period)/period;
     if (t<=1.0)
@@ -55,9 +55,8 @@ public F64 Tri(F64 t,F64 period)
     return 0.0;
 }
 
-
 public F64 FullTri(F64 t,F64 period)
-{ //0.0 - 1.0 - 0.0 - -1.0 -0.0
+{//Plus&Minus Triangle waveform. 0.0 - 1.0 - 0.0 - -1.0 -0.0
   if (period) {
     t=4.0*(t%period)/period;
     if (t<=-1.0) {
@@ -79,14 +78,13 @@ public F64 FullTri(F64 t,F64 period)
 
 #help_index "Snd/Math"
 public F64 Note2Freq(I64 note,I64 octave=3)
-{
+{//Note number in octave to freq.
   return 440.0*2.0`(octave-3+note/12.0);
 }
 
-
 F64 SinPhaseCont(F64 last_y,F64 last_dydt,
 		    F64 current_amp,F64 phase_offset)
-{
+{//Next sample of sin waveform.
   F64 phase;
   phase=last_y/current_amp;
   if (phase>1.0) phase=1.0;
@@ -100,7 +98,7 @@ F64 SinPhaseCont(F64 last_y,F64 last_dydt,
 
 public CSndWaveCtrl *SndWaveCtrlNew(I64 sample_rate=8000,I64 sample_bits=24,
   I64 channels=2,CTask *mem_task=NULL)
-{
+{//MAlloc ctrl struct for generating waveforms.
   CSndWaveCtrl *swc=CAlloc(sizeof(CSndWaveCtrl),mem_task);
   swc->freq_multiplier=1.0;
   swc->amp_multiplier=1.0;
@@ -112,7 +110,7 @@ public CSndWaveCtrl *SndWaveCtrlNew(I64 sample_rate=8000,I64 sample_bits=24,
 }
 
 public U0 SndWaveCtrlDel(CSndWaveCtrl *swc)
-{
+{//Free waveform ctrl.
   Free(swc);
 }
 
@@ -126,7 +124,7 @@ public U0 SndWaveCtrlDel(CSndWaveCtrl *swc)
 
 public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
   F64 _freq,I64 _waveform=WF_SQUARE,F64 _amp=1.0,F64 _left=1.0, F64 _right=1.0)
-{
+{//Add waveform to buffer.
 //num_samples is multiplied by channels to get buf_len.
 //left,right range from 0.0-1.0
 //Supports 16,24 and 32 bits
@@ -230,5 +228,3 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
     swc->phase=phase;
   }
 }
-
-#help_index "Snd"

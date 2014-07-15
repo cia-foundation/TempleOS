@@ -48,7 +48,7 @@ U0 Main()
 //has the first four vects.
   for (i=IOREDTAB;i<IOREDTAB+4*2;i+=2) {
     *da=i+1;
-    *_d=mp_apic_ids[DEST_CPU]<<24;
+    *_d=dev.mp_apic_ids[DEST_CPU]<<24;
     *da=i;
     *_d=0x4000+0x40+(i-IOREDTAB)/2;
   }
@@ -63,7 +63,7 @@ U0 Main()
   //Disable vects
   for (i=IOREDTAB;i<IOREDTAB+4*2;i+=2) {
     *da=i+1;
-    *_d=mp_apic_ids[DEST_CPU]<<24;
+    *_d=dev.mp_apic_ids[DEST_CPU]<<24;
     *da=i;
     *_d=0x14000+0x40+(i-IOREDTAB)/2;
   }

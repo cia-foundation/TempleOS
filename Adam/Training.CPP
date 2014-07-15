@@ -1,8 +1,8 @@
 #help_index "Training"
 
 public U0 PressKeyHelp(CTask *task=NULL)
-{
-  I64 p1=0,p2=0;
+{//Jump to key handlers src for key presses.
+  I64 a1=0,a2=0;
   Bool old_preempt=Preempt(OFF);
   CTask *old_hash=Fs->hash_table;
   if (!task) task=Fs;
@@ -17,19 +17,19 @@ task=Fs;
   "Press keys to show handler code.\n"
   "<SHIFT-ESC> to exit.\n"
   "Do not press <CTRL-ALT-keys>.\n";
-  while (p1!=CH_ESC && p1!=CH_SHIFT_ESC) {
-    GetMsg(&p1,&p2,1<<MSG_KEY_DOWN);
-    *key_desc=0;
-    key_handler=NULL;
+  while (a1!=CH_ESC && a1!=CH_SHIFT_ESC) {
+    GetMsg(&a1,&a2,1<<MSG_KEY_DOWN);
+    *keydev.desc=0;
+    keydev.handler=NULL;
     if (task==Fs)
-      PutKey(p1,p2|SCF_KEY_DESC);
+      PutKey(a1,a2|SCF_KEY_DESC);
     else if (TaskValidate(task)) {
-      PostMsg(task,MSG_KEY_DOWN,p1,p2|SCF_KEY_DESC);
-      while (!key_handler)
+      PostMsg(task,MSG_KEY_DOWN,a1,a2|SCF_KEY_DESC);
+      while (!keydev.handler)
 	Yield;
     }
-    if (*key_desc)
-      E(key_handler,512);
+    if (*keydev.desc)
+      E(keydev.handler,512);
   }
   Fs->hash_table=old_hash;
   Preempt(old_preempt);
@@ -37,37 +37,37 @@ task=Fs;
 
 U0 KeyMapCtrlAltFamily()
 {
-  I64 i,p2;
+  I64 i,a2;
   U8 *st,*st2;
 
-  p2=SC_DELETE+SCF_CTRL+SCF_ALT;
-  st2=ScanCode2KeyName(p2);
+  a2=SC_DELETE+SCF_CTRL+SCF_ALT;
+  st2=ScanCode2KeyName(a2);
   st=SrcEdLink(&Reboot,256);
   "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,"Sys/Reboot",st;
   Free(st);
   Free(st2);
 
-  p2=SC_ESC+SCF_CTRL+SCF_ALT;
-  st2=ScanCode2KeyName(p2);
+  a2=SC_ESC+SCF_CTRL+SCF_ALT;
+  st2=ScanCode2KeyName(a2);
   st=SrcEdLink(&SpawnUser,256);
   "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,"Sys/Spawn New User Task",st;
   Free(st);
   Free(st2);
 
-  p2=SC_TAB+SCF_CTRL+SCF_ALT;
-  st2=ScanCode2KeyName(p2);
+  a2=SC_TAB+SCF_CTRL+SCF_ALT;
+  st2=ScanCode2KeyName(a2);
   st=SrcEdLink(&WinToTop,256);
   "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,"Sys/Switch Focus to Next Task",st;
   Free(st);
   Free(st2);
 
   for (i=0;i<26;i++) {
-    if (fp_ctrl_alt_let_cbs[i] &&
-	ctrl_alt_let_descs[i]) {
-      p2=A2ScanCode(i+'a')+SCF_CTRL+SCF_ALT;
-      st2=ScanCode2KeyName(p2);
-      st=SrcEdLink(fp_ctrl_alt_let_cbs[i],256);
-      "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,ctrl_alt_let_descs[i],st;
+    if (keydev.fp_ctrl_alt_let_cbs[i] &&
+	keydev.ctrl_alt_let_descs[i]) {
+      a2=Char2ScanCode(i+'a')+SCF_CTRL+SCF_ALT;
+      st2=ScanCode2KeyName(a2);
+      st=SrcEdLink(keydev.fp_ctrl_alt_let_cbs[i],256);
+      "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,keydev.ctrl_alt_let_descs[i],st;
       Free(st);
       Free(st2);
     }
@@ -133,29 +133,29 @@ I64 KMCompare(U8 *e1,U8 *e2)
 
 U0 KeyMapFamily2(U8 **entries,U8 *family,CTask *task,I64 scf)
 {
-  I64 i,p2,p1;
+  I64 i,a2,a1;
   U8 *st,*st2;
   CTask *old_hash=Fs->hash_table;
   Fs->hash_table=task->hash_table;
   for (i=0;i<256;i++) {
-    p2=scf|i|SCF_KEY_DESC;
-    p1=ScanCode2A(p2);
-    *key_desc=0;
-    key_handler=NULL;
+    a2=scf|i|SCF_KEY_DESC;
+    a1=ScanCode2Char(a2);
+    *keydev.desc=0;
+    keydev.handler=NULL;
     if (task==Fs)
-      PutKey(p1,p2);
+      PutKey(a1,a2);
     else if (TaskValidate(task)) {
-      PostMsg(task,MSG_KEY_DOWN,p1,p2);
-      while (!key_handler)
+      PostMsg(task,MSG_KEY_DOWN,a1,a2);
+      while (!keydev.handler)
 	Yield;
     }
-    if (*key_desc && StrNCmp(key_desc,"Char/",5)) {
-      st=ScanCode2KeyName(p2&~(SCF_CTRL|SCF_ALT|SCF_SHIFT));
-      st2=MPrint("%s %s",family,st);
+    if (*keydev.desc && StrNCmp(keydev.desc,"Char/",5)) {
+      st=ScanCode2KeyName(a2&~(SCF_CTRL|SCF_ALT|SCF_SHIFT));
+      st2=MStrPrint("%s %s",family,st);
       Free(st);
-      st=SrcEdLink(key_handler,256);
-      entries[i]=MPrint("%20s $$LK,\"%s\",A=\"%s\"$$\n",
-	  st2,key_desc,st);
+      st=SrcEdLink(keydev.handler,256);
+      entries[i]=MStrPrint("%20s $$LK,\"%s\",A=\"%s\"$$\n",
+	  st2,keydev.desc,st);
       Free(st);
       Free(st2);
     }
@@ -167,8 +167,8 @@ U0 KeyMapFamily(U8 *family,CTask *task,I64 scf)
 {
   I64 i;
   U8 **entries=CAlloc(2*256*sizeof(U8 *)),st1[32],st2[32];
-  SPrint(st1,"%s      ",family);
-  SPrint(st2,"%s SHIFT",family);
+  StrPrint(st1,"%s      ",family);
+  StrPrint(st2,"%s SHIFT",family);
   KeyMapFamily2(entries    ,st1,task,scf);
   KeyMapFamily2(entries+256,st2,task,scf+SCF_SHIFT);
   QSortI64(entries,2*256,&KMCompare);
@@ -181,7 +181,7 @@ U0 KeyMapFamily(U8 *family,CTask *task,I64 scf)
 }
 
 public U0 KeyMap(CTask *task=NULL)
-{
+{//Report desc of all keys.
   if (!task) task=Fs;
 /*
 This feature is a burden in code.  It would be nice to lst key
@@ -198,7 +198,7 @@ task=Fs;
 }
 
 public U0 TipOfDay(U8 *tip_file="::/Doc/Tips.TXT")
-{
+{//Print random tip-of-day from ::/Doc/Tips.TXT.
   I64 i=RandU16;
   CDoc *doc=DocRead(tip_file),*doc2=DocNew;
   CDocEntry *doc_e=doc->root.next;

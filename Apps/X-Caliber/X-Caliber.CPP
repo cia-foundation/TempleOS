@@ -27,7 +27,6 @@ that never miss.
 Don't be anal.  If you aspire to making
 games, do like Hollywood.  They know the
 public isn't interested in realism.
-
 */
 
 #define  XMSGF_ANTISPIN	0
@@ -49,7 +48,6 @@ class MySpring:CSpring
   F64 strength;
   I64 color;
 };
-
 
 #define SPIN_GAIN		0.25
 #define MAX_MASSES		8
@@ -73,9 +71,9 @@ class Ship
 
 F64 human_t_left,human_t_right,human_antispin;
 
-class Bullet
+class Shot
 {
-  Bullet *next,*last;
+  Shot *next,*last;
   F64 radius;
   F64 fuse_time,die_timeout;
   MyMass p;
@@ -98,7 +96,7 @@ Bool game_over,show_level_msg;
 I64 stars_x[NUM_STARS],stars_y[NUM_STARS];
 
 Ship ship_root;
-Bullet bullet_root;
+Shot shot_root;
 CMathODE *ode=NULL;
 I64 level,score,remaining;
 
@@ -109,17 +107,15 @@ $SP,"<2>",BI=2$
 
 $SP,"<3>",BI=3$
 
-
 $SP,"<4>",BI=4$
 
 
 $SP,"<5>",BI=5$
 
-
 $SP,"<6>",BI=6$
 
 $BG$
-// ********************************** Ship
+//********************************** Ship
 Bool CheckOverlap()
 {
   CD3 p;
@@ -130,7 +126,7 @@ Bool CheckOverlap()
     while (tempm1!=&ode->next_mass) {
       if (tempm!=tempm1) {
 	D3Sub(&tempm->x,&tempm1->x,&p);
-	if (D3SqrNorm(&p)<=Sqr(tempm->radius+tempm1->radius))
+	if (D3NormSqr(&p)<=Sqr(tempm->radius+tempm1->radius))
 	  return TRUE;
       }
       tempm1=tempm1->next;
@@ -143,181 +139,181 @@ Bool CheckOverlap()
 Ship *ShipNew(I64 x,I64 y,I64 type)
 {
   I64 i;
-  Ship *temps=CAlloc(sizeof(Ship));
+  Ship *tempsp=CAlloc(sizeof(Ship));
 
-  switch (temps->type=type) {
+  switch (tempsp->type=type) {
     case ST_HUMAN1:
-      temps->fire_rate=25;
-      temps->masses=5;
-      temps->p[0].x=x;
-      temps->p[0].y=y;
-      temps->p[1].x=x+3;
-      temps->p[1].y=y+10;
-      temps->p[2].x=x-3;
-      temps->p[2].y=y+10;
-      temps->p[3].x=x+20;
-      temps->p[3].y=y+20;
-      temps->p[4].x=x-20;
-      temps->p[4].y=y+20;
+      tempsp->fire_rate=25;
+      tempsp->masses=5;
+      tempsp->p[0].x=x;
+      tempsp->p[0].y=y;
+      tempsp->p[1].x=x+3;
+      tempsp->p[1].y=y+10;
+      tempsp->p[2].x=x-3;
+      tempsp->p[2].y=y+10;
+      tempsp->p[3].x=x+20;
+      tempsp->p[3].y=y+20;
+      tempsp->p[4].x=x-20;
+      tempsp->p[4].y=y+20;
 
-      for (i=0;i<temps->masses;i++) {
-	temps->p[i].mass=1;
+      for (i=0;i<tempsp->masses;i++) {
+	tempsp->p[i].mass=1;
 	if (i<3)
-	  temps->p[i].radius=2.5;
+	  tempsp->p[i].radius=2.5;
 	else
-	  temps->p[i].radius=4;
-	temps->p[i].drag_profile_factor=3;
-	QueIns(&temps->p[i],ode->last_mass);
+	  tempsp->p[i].radius=4;
+	tempsp->p[i].drag_profile_factor=3;
+	QueIns(&tempsp->p[i],ode->last_mass);
       }
-      temps->p[3].mass/=10.0;
-      temps->p[4].mass/=10.0;
+      tempsp->p[3].mass/=10.0;
+      tempsp->p[4].mass/=10.0;
 
-      temps->springs=7;
-      temps->s[0].end1=&temps->p[0];
-      temps->s[0].end2=&temps->p[1];
-      temps->s[1].end1=&temps->p[2];
-      temps->s[1].end2=&temps->p[0];
-      temps->s[2].end1=&temps->p[1];
-      temps->s[2].end2=&temps->p[2];
-      temps->s[3].end1=&temps->p[1];
-      temps->s[3].end2=&temps->p[3];
-      temps->s[4].end1=&temps->p[0];
-      temps->s[4].end2=&temps->p[3];
-      temps->s[5].end1=&temps->p[2];
-      temps->s[5].end2=&temps->p[4];
-      temps->s[6].end1=&temps->p[0];
-      temps->s[6].end2=&temps->p[4];
+      tempsp->springs=7;
+      tempsp->s[0].end1=&tempsp->p[0];
+      tempsp->s[0].end2=&tempsp->p[1];
+      tempsp->s[1].end1=&tempsp->p[2];
+      tempsp->s[1].end2=&tempsp->p[0];
+      tempsp->s[2].end1=&tempsp->p[1];
+      tempsp->s[2].end2=&tempsp->p[2];
+      tempsp->s[3].end1=&tempsp->p[1];
+      tempsp->s[3].end2=&tempsp->p[3];
+      tempsp->s[4].end1=&tempsp->p[0];
+      tempsp->s[4].end2=&tempsp->p[3];
+      tempsp->s[5].end1=&tempsp->p[2];
+      tempsp->s[5].end2=&tempsp->p[4];
+      tempsp->s[6].end1=&tempsp->p[0];
+      tempsp->s[6].end2=&tempsp->p[4];
 
-      for (i=0;i<temps->springs;i++) {
-	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].const=10000;
-	temps->s[i].strength  =30000;
+      for (i=0;i<tempsp->springs;i++) {
+	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].const=10000;
+	tempsp->s[i].strength  =30000;
 	if (i<=2)
-	  temps->s[i].color=LTCYAN;
+	  tempsp->s[i].color=LTCYAN;
 	else
-	  temps->s[i].color=LTGRAY;
-	QueIns(&temps->s[i],ode->last_spring);
+	  tempsp->s[i].color=LTGRAY;
+	QueIns(&tempsp->s[i],ode->last_spring);
       }
       remaining=0;
 
       break;
     case ST_ENEMY1:
-      temps->fire_rate=2.5;
-      temps->masses=3;
-      temps->p[0].x=x;
-      temps->p[0].y=y;
-      temps->p[1].x=x+15;
-      temps->p[1].y=y;
-      temps->p[2].x=x;
-      temps->p[2].y=y+15;
+      tempsp->fire_rate=2.5;
+      tempsp->masses=3;
+      tempsp->p[0].x=x;
+      tempsp->p[0].y=y;
+      tempsp->p[1].x=x+15;
+      tempsp->p[1].y=y;
+      tempsp->p[2].x=x;
+      tempsp->p[2].y=y+15;
 
-      for (i=0;i<temps->masses;i++) {
-	temps->p[i].mass=1;
-	temps->p[i].radius=7;
-	temps->p[i].drag_profile_factor=3;
-	QueIns(&temps->p[i],ode->last_mass);
+      for (i=0;i<tempsp->masses;i++) {
+	tempsp->p[i].mass=1;
+	tempsp->p[i].radius=7;
+	tempsp->p[i].drag_profile_factor=3;
+	QueIns(&tempsp->p[i],ode->last_mass);
       }
 
-      temps->springs=3;
-      temps->s[0].end1=&temps->p[0];
-      temps->s[0].end2=&temps->p[1];
-      temps->s[1].end1=&temps->p[1];
-      temps->s[1].end2=&temps->p[2];
-      temps->s[2].end1=&temps->p[2];
-      temps->s[2].end2=&temps->p[0];
+      tempsp->springs=3;
+      tempsp->s[0].end1=&tempsp->p[0];
+      tempsp->s[0].end2=&tempsp->p[1];
+      tempsp->s[1].end1=&tempsp->p[1];
+      tempsp->s[1].end2=&tempsp->p[2];
+      tempsp->s[2].end1=&tempsp->p[2];
+      tempsp->s[2].end2=&tempsp->p[0];
 
-      for (i=0;i<temps->springs;i++) {
-	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].const=10000;
-	temps->s[i].strength  =20000;
-	temps->s[i].color=BLACK;
-	QueIns(&temps->s[i],ode->last_spring);
+      for (i=0;i<tempsp->springs;i++) {
+	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].const=10000;
+	tempsp->s[i].strength  =20000;
+	tempsp->s[i].color=BLACK;
+	QueIns(&tempsp->s[i],ode->last_spring);
       }
       remaining++;
       break;
     case ST_ENEMY2:
-      temps->fire_rate=5.0;
-      temps->masses=5;
-      temps->p[0].x=x;
-      temps->p[0].y=y;
-      temps->p[1].x=x-7;
-      temps->p[1].y=y+10;
-      temps->p[2].x=x+7;
-      temps->p[2].y=y+10;
-      temps->p[3].x=x-14;
-      temps->p[3].y=y+20;
-      temps->p[4].x=x+14;
-      temps->p[4].y=y+20;
+      tempsp->fire_rate=5.0;
+      tempsp->masses=5;
+      tempsp->p[0].x=x;
+      tempsp->p[0].y=y;
+      tempsp->p[1].x=x-7;
+      tempsp->p[1].y=y+10;
+      tempsp->p[2].x=x+7;
+      tempsp->p[2].y=y+10;
+      tempsp->p[3].x=x-14;
+      tempsp->p[3].y=y+20;
+      tempsp->p[4].x=x+14;
+      tempsp->p[4].y=y+20;
 
-      for (i=0;i<temps->masses;i++) {
-	temps->p[i].mass=1;
-	temps->p[i].radius=6;
-	temps->p[i].drag_profile_factor=5;
-	temps->p[i].color=PURPLE;
-	QueIns(&temps->p[i],ode->last_mass);
+      for (i=0;i<tempsp->masses;i++) {
+	tempsp->p[i].mass=1;
+	tempsp->p[i].radius=6;
+	tempsp->p[i].drag_profile_factor=5;
+	tempsp->p[i].color=PURPLE;
+	QueIns(&tempsp->p[i],ode->last_mass);
       }
 
-      temps->springs=7;
-      temps->s[0].end1=&temps->p[0];
-      temps->s[0].end2=&temps->p[1];
-      temps->s[1].end1=&temps->p[0];
-      temps->s[1].end2=&temps->p[2];
-      temps->s[2].end1=&temps->p[1];
-      temps->s[2].end2=&temps->p[2];
-      temps->s[3].end1=&temps->p[1];
-      temps->s[3].end2=&temps->p[3];
-      temps->s[4].end1=&temps->p[2];
-      temps->s[4].end2=&temps->p[4];
-      temps->s[5].end1=&temps->p[2];
-      temps->s[5].end2=&temps->p[3];
-      temps->s[6].end1=&temps->p[1];
-      temps->s[6].end2=&temps->p[4];
+      tempsp->springs=7;
+      tempsp->s[0].end1=&tempsp->p[0];
+      tempsp->s[0].end2=&tempsp->p[1];
+      tempsp->s[1].end1=&tempsp->p[0];
+      tempsp->s[1].end2=&tempsp->p[2];
+      tempsp->s[2].end1=&tempsp->p[1];
+      tempsp->s[2].end2=&tempsp->p[2];
+      tempsp->s[3].end1=&tempsp->p[1];
+      tempsp->s[3].end2=&tempsp->p[3];
+      tempsp->s[4].end1=&tempsp->p[2];
+      tempsp->s[4].end2=&tempsp->p[4];
+      tempsp->s[5].end1=&tempsp->p[2];
+      tempsp->s[5].end2=&tempsp->p[3];
+      tempsp->s[6].end1=&tempsp->p[1];
+      tempsp->s[6].end2=&tempsp->p[4];
 
-      for (i=0;i<temps->springs;i++) {
-	temps->s[i].rest_len=D3Dist(&temps->s[i].end1->x,&temps->s[i].end2->x);
-	temps->s[i].const= 40000;
-	temps->s[i].strength  =75000;
+      for (i=0;i<tempsp->springs;i++) {
+	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].const= 40000;
+	tempsp->s[i].strength  =75000;
 	if (i>=3)
-	  temps->s[i].color=LTPURPLE;
+	  tempsp->s[i].color=LTPURPLE;
 	else
-	  temps->s[i].color=BLACK;
-	QueIns(&temps->s[i],ode->last_spring);
+	  tempsp->s[i].color=BLACK;
+	QueIns(&tempsp->s[i],ode->last_spring);
       }
       remaining++;
       break;
   }
-  QueIns(temps,ship_root.last);
-  return temps;
+  QueIns(tempsp,ship_root.last);
+  return tempsp;
 }
 
-U0 ShipDel(Ship *temps)
+U0 ShipDel(Ship *tempsp)
 {
   I64 i;
-  if (!temps) return;
-  for (i=0;i<temps->masses;i++)
-    QueRem(&temps->p[i]);
-  for (i=0;i<temps->springs;i++)
-    QueRem(&temps->s[i]);
-  QueRem(temps);
-  Free(temps);
+  if (!tempsp) return;
+  for (i=0;i<tempsp->masses;i++)
+    QueRem(&tempsp->p[i]);
+  for (i=0;i<tempsp->springs;i++)
+    QueRem(&tempsp->s[i]);
+  QueRem(tempsp);
+  Free(tempsp);
   remaining--;
 }
 
 U0 PlaceShip(I64 type)
 {
-  Ship *ee;
+  Ship *tempsp;
   if (CheckOverlap)
     return;
   while (TRUE) {
-    ee=ShipNew(RandU16%(Fs->pix_width-20)+10,RandU16%(Fs->pix_height-20)+10,type);
+    tempsp=ShipNew(RandU16%(Fs->pix_width-20)+10,RandU16%(Fs->pix_height-20)+10,type);
     if (CheckOverlap)
-      ShipDel(ee);
+      ShipDel(tempsp);
     else
       break;
   }
 }
 
-// ********************************** Human Ship
+//********************************** Human Ship
 
 I64 Tweaked()
 {
@@ -341,16 +337,16 @@ I64 Tweaked()
 
 U0 AllDel(CMathODE *ode)
 {
-  Ship *temps,*temps1;
+  Ship *tempsp,*tempsp1;
   QueRem(ode);
-  temps=ship_root.next;
-  while (temps!=&ship_root) {
-    temps1=temps->next;
-    ShipDel(temps);
-    temps=temps1;
+  tempsp=ship_root.next;
+  while (tempsp!=&ship_root) {
+    tempsp1=tempsp->next;
+    ShipDel(tempsp);
+    tempsp=tempsp1;
   }
   human=NULL;
-  QueDel(&bullet_root,TRUE);
+  QueDel(&shot_root,TRUE);
   ODEDel(ode);
 }
 
@@ -366,16 +362,16 @@ Bool LaserPlot(CDC *dc,I64 x,I64 y,I64)
   }
 }
 
-// **********************************
+//**********************************
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,j;
   F64 arg;
-  Ship *temps;
-  Bullet *tempb;
+  Ship *tempsp;
+  Shot *temps;
   CD3 p,p1,p2;
   F64 t_left,t_right,spin,d,x,y;
-  MySpring *tempss;
+  MySpring *tempsps;
   U8 *img;
   Bool draw_laser_line=FALSE;
 
@@ -396,35 +392,35 @@ U0 DrawIt(CTask *task,CDC *dc)
   for (i=0;i<NUM_STARS;i++)
     GrPlot(dc,stars_x[i],stars_y[i]);
 
-  tempss=ode->next_spring;
-  while (tempss!=&ode->next_spring) {
-    if (!(tempss->flags&SSF_INACTIVE)) {
-      dc->color=tempss->color;
-      GrLine(dc,tempss->end1->x,tempss->end1->y,
-	  tempss->end2->x,tempss->end2->y);
+  tempsps=ode->next_spring;
+  while (tempsps!=&ode->next_spring) {
+    if (!(tempsps->flags&SSF_INACTIVE)) {
+      dc->color=tempsps->color;
+      GrLine(dc,tempsps->end1->x,tempsps->end1->y,
+	  tempsps->end2->x,tempsps->end2->y);
     }
-    tempss=tempss->next;
+    tempsps=tempsps->next;
   }
 
-  temps=ship_root.next;
-  while (temps!=&ship_root) {
-    if (!temps->exploding)
-      switch (temps->type) {
+  tempsp=ship_root.next;
+  while (tempsp!=&ship_root) {
+    if (!tempsp->exploding)
+      switch (tempsp->type) {
 	case ST_HUMAN1:
-	  if (temps->spacewalk_side) {
+	  if (tempsp->spacewalk_side) {
 	    t_left=0;
 	    t_right=0;
 	  } else {
-	    if (d=D3Norm(D3Sub(&temps->p[0].x,&temps->p[1].x,&p1))) {
-	      D3Sub(&temps->p[0].DxDt,&temps->p[1].DxDt,&p2);
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1))) {
+	      D3Sub(&tempsp->p[0].DxDt,&tempsp->p[1].DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
 
-	    if (d=D3Norm(D3Sub(&temps->p[0].x,&temps->p[2].x,&p1))) {
-	      D3Sub(&temps->p[0].DxDt,&temps->p[2].DxDt,&p2);
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p1))) {
+	      D3Sub(&tempsp->p[0].DxDt,&tempsp->p[2].DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
@@ -432,152 +428,151 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
 	  }
 
-
-	  D3Sub(&temps->p[1].x,&temps->p[0].x,&p1);
-	  D3Sub(&temps->p[2].x,&temps->p[0].x,&p2);
+	  D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1);
+	  D3Sub(&tempsp->p[2].x,&tempsp->p[0].x,&p2);
 	  D3Unit(D3Add(&p1,&p2,&p));
 
-	  if (!(temps->s[3].flags&SSF_INACTIVE)) {
+	  if (!(tempsp->s[3].flags&SSF_INACTIVE)) {
 	    dc->color=YELLOW;
-	    D3AddEqu(D3Mul(t_left/25,&p,&p1),&temps->p[3].x);
-	    GrLine(dc,temps->p[1].x,temps->p[1].y,p1.x,p1.y);
+	    D3AddEqu(D3Mul(t_left/25,&p,&p1),&tempsp->p[3].x);
+	    GrLine(dc,tempsp->p[1].x,tempsp->p[1].y,p1.x,p1.y);
 	    arg=Arg(p.x,p.y);
-	    SpriteZ3B(dc,temps->p[3].x,temps->p[3].y,0,$IB,"<thruster>",BI=1$,arg);
+	    SpriteZ3B(dc,tempsp->p[3].x,tempsp->p[3].y,0,$IB,"<thruster>",BI=1$,arg);
 	  }
 
-	  if (!(temps->s[5].flags&SSF_INACTIVE)) {
+	  if (!(tempsp->s[5].flags&SSF_INACTIVE)) {
 	    dc->color=YELLOW;
-	    D3AddEqu(D3Mul(t_right/25,&p,&p2),&temps->p[4].x);
-	    GrLine(dc,temps->p[2].x,temps->p[2].y,p2.x,p2.y);
+	    D3AddEqu(D3Mul(t_right/25,&p,&p2),&tempsp->p[4].x);
+	    GrLine(dc,tempsp->p[2].x,tempsp->p[2].y,p2.x,p2.y);
 	    arg=Arg(p.x,p.y);
-	    SpriteZ3B(dc,temps->p[4].x,temps->p[4].y,0,$IB,"<thruster>",BI=1$,arg);
+	    SpriteZ3B(dc,tempsp->p[4].x,tempsp->p[4].y,0,$IB,"<thruster>",BI=1$,arg);
 	  }
 
-	  if (tS>temps->reload_timeout)
+	  if (tS>tempsp->reload_timeout)
 	    img=$IB,"<gun_ready>",BI=2$;
 	  else
 	    img=$IB,"<gun_busy>",BI=3$;
 	  arg=Arg(p.x,p.y);
 	  switch (level) {
 	    case 3:
-	      if (!(temps->s[3].flags&SSF_INACTIVE))
-		SpriteZ3B(dc,temps->p[3].x,temps->p[3].y,0,img,arg);
-	      if (!(temps->s[5].flags&SSF_INACTIVE))
-		SpriteZ3B(dc,temps->p[4].x,temps->p[4].y,0,img,arg);
+	      if (!(tempsp->s[3].flags&SSF_INACTIVE))
+		SpriteZ3B(dc,tempsp->p[3].x,tempsp->p[3].y,0,img,arg);
+	      if (!(tempsp->s[5].flags&SSF_INACTIVE))
+		SpriteZ3B(dc,tempsp->p[4].x,tempsp->p[4].y,0,img,arg);
 	    case 2:
-	      if (!(temps->s[1].flags&SSF_INACTIVE))
-		SpriteZ3B(dc,temps->p[1].x,temps->p[1].y,0,img,arg);
-	      if (!(temps->s[2].flags&SSF_INACTIVE))
-		SpriteZ3B(dc,temps->p[2].x,temps->p[2].y,0,img,arg);
+	      if (!(tempsp->s[1].flags&SSF_INACTIVE))
+		SpriteZ3B(dc,tempsp->p[1].x,tempsp->p[1].y,0,img,arg);
+	      if (!(tempsp->s[2].flags&SSF_INACTIVE))
+		SpriteZ3B(dc,tempsp->p[2].x,tempsp->p[2].y,0,img,arg);
 	    case 1:
-	      SpriteZ3B(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
+	      SpriteZ3B(dc,tempsp->p[0].x,tempsp->p[0].y,0,img,arg);
 	      break;
 	    default:
-	      SpriteZ3B(dc,temps->p[0].x,temps->p[0].y,0,$IB,"<Laser>",BI=6$,arg);
-	      if (temps->lasering && !temps->laser_overheat) {
+	      SpriteZ3B(dc,tempsp->p[0].x,tempsp->p[0].y,0,$IB,"<Laser>",BI=6$,arg);
+	      if (tempsp->lasering && !tempsp->laser_overheat) {
 		draw_laser_line=TRUE;
 		Snd(1000);
 	      }
 	  }
 
-	  ctrl_panel.laser_temperature=temps->laser_temperature;
+	  ctrl_panel.laser_temperature=tempsp->laser_temperature;
 
-	  if (temps->spacewalk_side) {
-	    d=1.0-(temps->spacewalk_timeout-tS)/SPACEWALK_TIME;
+	  if (tempsp->spacewalk_side) {
+	    d=1.0-(tempsp->spacewalk_timeout-tS)/SPACEWALK_TIME;
 	    if (d>1.0) {
-	      temps->spacewalk_side=0;
+	      tempsp->spacewalk_side=0;
 	      ctrl_panel.spacewalk=FALSE;
 	    } else {
 	      if (d<0.5) {
 		d=d*2;
-		x=temps->p[0].x*(1.0-d)+temps->p[temps->spacewalk_side].x*(d);
-		y=temps->p[0].y*(1.0-d)+temps->p[temps->spacewalk_side].y*(d);
+		x=tempsp->p[0].x*(1.0-d)+tempsp->p[tempsp->spacewalk_side].x*(d);
+		y=tempsp->p[0].y*(1.0-d)+tempsp->p[tempsp->spacewalk_side].y*(d);
 	      } else {
 		d=(d-0.5)*2;
-		x=temps->p[temps->spacewalk_side].x*(1.0-d)+temps->p[0].x*(d);
-		y=temps->p[temps->spacewalk_side].y*(1.0-d)+temps->p[0].y*(d);
+		x=tempsp->p[tempsp->spacewalk_side].x*(1.0-d)+tempsp->p[0].x*(d);
+		y=tempsp->p[tempsp->spacewalk_side].y*(1.0-d)+tempsp->p[0].y*(d);
 	      }
 	      SpriteZ3B(dc,x,y,0,$IB,"<spacewalk>",BI=4$,arg+0.75*Sin(tS*2));
 	    }
 	  } else {
 	    if (ctrl_panel.spacewalk) {
-	      if (temps->spacewalk_side=Tweaked)
-		temps->spacewalk_timeout=tS+SPACEWALK_TIME;
+	      if (tempsp->spacewalk_side=Tweaked)
+		tempsp->spacewalk_timeout=tS+SPACEWALK_TIME;
 	      else
 		ctrl_panel.spacewalk=FALSE;
 	    }
 	  }
 	  break;
 	case ST_ENEMY2:
-	  for (i=3;i<temps->masses;i++) {
-	    dc->color=temps->p[i].color;
-	    GrCircle(dc,temps->p[i].x,temps->p[i].y,temps->p[i].radius);
-	    GrFloodFill(dc,temps->p[i].x,temps->p[i].y+2,TRUE);
+	  for (i=3;i<tempsp->masses;i++) {
+	    dc->color=tempsp->p[i].color;
+	    GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].radius);
+	    GrFloodFill(dc,tempsp->p[i].x,tempsp->p[i].y+2,TRUE);
 	    dc->color=WHITE;
-	    GrCircle(dc,temps->p[i].x,temps->p[i].y,temps->p[i].radius);
+	    GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].radius);
 	  }
 	  case ST_ENEMY1:
-	  D3DivEqu(D3Sub(&temps->p[1].x,&temps->p[0].x,&p1),2.0);
-	  D3DivEqu(D3Sub(&temps->p[2].x,&temps->p[0].x,&p2),2.0);
+	  D3DivEqu(D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1),2.0);
+	  D3DivEqu(D3Sub(&tempsp->p[2].x,&tempsp->p[0].x,&p2),2.0);
 	  D3Unit(D3Add(&p1,&p2,&p));
-	  if (tS>temps->reload_timeout)
+	  if (tS>tempsp->reload_timeout)
 	    img=$IB,"<gun_ready>",BI=2$;
 	  else
 	    img=$IB,"<gun_busy>",BI=3$;
 	  arg=Arg(p.x,p.y);
-	  SpriteZ3B(dc,temps->p[0].x,temps->p[0].y,0,img,arg);
+	  SpriteZ3B(dc,tempsp->p[0].x,tempsp->p[0].y,0,img,arg);
 	  arg=Arg(p1.x,p1.y);
-	  SpriteZ3B(dc,temps->p[0].x+p1.x,temps->p[0].y+p1.y,0,$IB,"<EnemySide>",BI=5$,arg);
+	  SpriteZ3B(dc,tempsp->p[0].x+p1.x,tempsp->p[0].y+p1.y,0,$IB,"<EnemySide>",BI=5$,arg);
 	  arg=Arg(p2.x,p2.y);
-	  SpriteZ3B(dc,temps->p[0].x+p2.x,temps->p[0].y+p2.y,0,$IB,"<EnemySide>",BI=5$,arg);
-	  for (i=0;i<temps->masses;i++) {
+	  SpriteZ3B(dc,tempsp->p[0].x+p2.x,tempsp->p[0].y+p2.y,0,$IB,"<EnemySide>",BI=5$,arg);
+	  for (i=0;i<tempsp->masses;i++) {
 	    dc->color=YELLOW;
-	    if (temps->p[i].temperature>=1.0)
-	      GrCircle(dc,temps->p[i].x,temps->p[i].y,temps->p[i].temperature);
+	    if (tempsp->p[i].temperature>=1.0)
+	      GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].temperature);
 	  }
 	  break;
       }
-    else if (temps->die_time<=tS<=temps->die_timeout)
-      for (j=0;j<temps->masses;j++) {
-	d=(tS-temps->die_time)/(temps->die_timeout-temps->die_time);
+    else if (tempsp->die_time<=tS<=tempsp->die_timeout)
+      for (j=0;j<tempsp->masses;j++) {
+	d=(tS-tempsp->die_time)/(tempsp->die_timeout-tempsp->die_time);
 	d=7*Sin(ã*d)*(6+j)+1;
 	for (i=1;i<d;i++) {
 	  if (i&1)
 	    dc->color=YELLOW;
 	  else
 	    dc->color=LTRED;
-	  GrCircle(dc,temps->p[j].x,temps->p[j].y,i);
+	  GrCircle(dc,tempsp->p[j].x,tempsp->p[j].y,i);
 	}
       }
-    temps=temps->next;
+    tempsp=tempsp->next;
   }
 
-  tempb=bullet_root.next;
-  while (tempb!=&bullet_root) {
-    if (tS>tempb->fuse_time) {
-      d=(tS-tempb->fuse_time)/(tempb->die_timeout-tempb->fuse_time);
-      d=7*Sin(ã*d)*tempb->radius+1;
+  temps=shot_root.next;
+  while (temps!=&shot_root) {
+    if (tS>temps->fuse_time) {
+      d=(tS-temps->fuse_time)/(temps->die_timeout-temps->fuse_time);
+      d=7*Sin(ã*d)*temps->radius+1;
       for (i=1;i<d;i++) {
 	if (i&1)
 	  dc->color=YELLOW;
 	else
 	  dc->color=LTRED;
-	GrCircle(dc,tempb->p.x,tempb->p.y,i);
+	GrCircle(dc,temps->p.x,temps->p.y,i);
       }
       } else {
-      if (tempb->radius<1.0) {
+      if (temps->radius<1.0) {
 	dc->color=LTGREEN;
-	GrPlot(dc,tempb->p.x,tempb->p.y);
+	GrPlot(dc,temps->p.x,temps->p.y);
       } else {
 	dc->color=YELLOW;
-	GrCircle(dc,tempb->p.x,tempb->p.y,tempb->radius);
-	if (tempb->radius>=2.0)
-	  GrFloodFill(dc,tempb->p.x,tempb->p.y,TRUE);
+	GrCircle(dc,temps->p.x,temps->p.y,temps->radius);
+	if (temps->radius>=2.0)
+	  GrFloodFill(dc,temps->p.x,temps->p.y,TRUE);
 	dc->color=LTGREEN;
-	GrCircle(dc,tempb->p.x,tempb->p.y,tempb->radius);
+	GrCircle(dc,temps->p.x,temps->p.y,temps->radius);
       }
     }
-    tempb=tempb->next;
+    temps=temps->next;
   }
 
   if (human && draw_laser_line) {
@@ -599,7 +594,7 @@ U0 Explosion(MyMass *tempm1,F64 r)
   while (tempm!=&ode->next_mass) {
     if (tempm!=tempm1) {
       D3Sub(&tempm->state->x,&tempm1->state->x,&p1);
-      d=D3SqrNorm(&p1)-tempm->radius*tempm->radius;
+      d=D3NormSqr(&p1)-tempm->radius*tempm->radius;
       if (d<100.0*100.0) {
 	if (d<1)
 	  d=1;
@@ -621,8 +616,8 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   F64 d,dd,dd2,spin,t_left,t_right;
   CTask *task=ode->win_task;
   CD3 p,p1,p2;
-  Bullet *tempb;
-  Ship *temps;
+  Shot *temps;
+  Ship *tempsp;
   MyMass *tempm,*tempm1;
 
   tempm=ode->next_mass;
@@ -642,7 +637,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     while (tempm1!=&ode->next_mass) {
       if (tempm!=tempm1) {
 	D3Sub(&tempm->state->x,&tempm1->state->x,&p);
-	dd=D3SqrNorm(&p);
+	dd=D3NormSqr(&p);
 	dd2=Sqr(tempm->radius+tempm1->radius);
 	if (dd<=dd2) {
 	  d=Sqrt(dd)+0.0001;
@@ -656,81 +651,79 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tempm=tempm->next;
   }
 
-
-  temps=ship_root.next;
-  while (temps!=&ship_root) {
-    if (temps->exploding && temps->die_time<=tS<=temps->die_timeout)
-      for (i=0;i<temps->masses;i++)
-	Explosion(&temps->p[i],temps->p[i].radius/3.0);
-    switch (temps->type) {
+  tempsp=ship_root.next;
+  while (tempsp!=&ship_root) {
+    if (tempsp->exploding && tempsp->die_time<=tS<=tempsp->die_timeout)
+      for (i=0;i<tempsp->masses;i++)
+	Explosion(&tempsp->p[i],tempsp->p[i].radius/3.0);
+    switch (tempsp->type) {
       case ST_HUMAN1:
-	if (!temps->exploding) {
-	  if (temps->spacewalk_side) {
+	if (!tempsp->exploding) {
+	  if (tempsp->spacewalk_side) {
 	    t_left=0;
 	    t_right=0;
-	    d=1.0-(temps->spacewalk_timeout-tS)/SPACEWALK_TIME;
+	    d=1.0-(tempsp->spacewalk_timeout-tS)/SPACEWALK_TIME;
 	    if (0.485<d<0.515) {
-	      D3Unit(D3Sub(&temps->p[2].state->x,&temps->p[1].state->x,&p));
-	      if (temps->spacewalk_side==3) {
-		temps->p[3].DstateDt->DxDt-=10*MAX_THRUST*p.x;
-		temps->p[3].DstateDt->DyDt-=10*MAX_THRUST*p.y;
-		temps->p[1].DstateDt->DxDt+=10*MAX_THRUST*p.x;
-		temps->p[1].DstateDt->DyDt+=10*MAX_THRUST*p.y;
+	      D3Unit(D3Sub(&tempsp->p[2].state->x,&tempsp->p[1].state->x,&p));
+	      if (tempsp->spacewalk_side==3) {
+		tempsp->p[3].DstateDt->DxDt-=10*MAX_THRUST*p.x;
+		tempsp->p[3].DstateDt->DyDt-=10*MAX_THRUST*p.y;
+		tempsp->p[1].DstateDt->DxDt+=10*MAX_THRUST*p.x;
+		tempsp->p[1].DstateDt->DyDt+=10*MAX_THRUST*p.y;
 	      } else {
-		temps->p[4].DstateDt->DxDt+=10*MAX_THRUST*p.x;
-		temps->p[4].DstateDt->DyDt+=10*MAX_THRUST*p.y;
-		temps->p[2].DstateDt->DxDt-=10*MAX_THRUST*p.x;
-		temps->p[2].DstateDt->DyDt-=10*MAX_THRUST*p.y;
+		tempsp->p[4].DstateDt->DxDt+=10*MAX_THRUST*p.x;
+		tempsp->p[4].DstateDt->DyDt+=10*MAX_THRUST*p.y;
+		tempsp->p[2].DstateDt->DxDt-=10*MAX_THRUST*p.x;
+		tempsp->p[2].DstateDt->DyDt-=10*MAX_THRUST*p.y;
 	      }
 	    }
 	  } else {
-	    if (d=D3Norm(D3Sub(&temps->p[0].state->x,&temps->p[1].state->x,&p1))) {
-	      D3Sub(&temps->p[0].state->DxDt,&temps->p[1].state->DxDt,&p2);
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,&tempsp->p[1].state->x,&p1))) {
+	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[1].state->DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
 
-	    if (d=D3Norm(D3Sub(&temps->p[0].state->x,&temps->p[2].state->x,&p1))) {
-	      D3Sub(&temps->p[0].state->DxDt,&temps->p[2].state->DxDt,&p2);
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,&tempsp->p[2].state->x,&p1))) {
+	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[2].state->DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
 
-	    D3Sub(&temps->p[0].state->x,&temps->p[1].state->x,&p1);
-	    D3Sub(&temps->p[0].state->x,&temps->p[2].state->x,&p2);
+	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[1].state->x,&p1);
+	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[2].state->x,&p2);
 	    D3Unit(D3Add(&p1,&p2,&p));
-	    if (!(temps->s[3].flags&SSF_INACTIVE)) {
+	    if (!(tempsp->s[3].flags&SSF_INACTIVE)) {
 	      D3Mul(t_left,&p,&p1);
-	      D3AddEqu(&temps->p[3].DstateDt->DxDt,&p1);
+	      D3AddEqu(&tempsp->p[3].DstateDt->DxDt,&p1);
 	    }
-	    if (!(temps->s[5].flags&SSF_INACTIVE)) {
+	    if (!(tempsp->s[5].flags&SSF_INACTIVE)) {
 	      D3Mul(t_right,&p,&p2);
-	      D3AddEqu(&temps->p[4].DstateDt->DxDt,&p2);
+	      D3AddEqu(&tempsp->p[4].DstateDt->DxDt,&p2);
 	    }
 	  }
 	}
 	break;
     }
+    tempsp=tempsp->next;
+  }
+
+  temps=shot_root.next;
+  while (temps!=&shot_root) {
+    if (temps->fuse_time<=tS<=temps->die_timeout)
+      Explosion(&temps->p,temps->radius);
     temps=temps->next;
   }
-
-  tempb=bullet_root.next;
-  while (tempb!=&bullet_root) {
-    if (tempb->fuse_time<=tS<=tempb->die_timeout)
-      Explosion(&tempb->p,tempb->radius);
-    tempb=tempb->next;
-  }
 }
-
 
 U0 CheckDamage()
 {
   I64 i,j,k;
-  Ship *temps,*temps1;
+  Ship *tempsp,*tempsp1;
   MyMass *tempm,*best_mass;
   CD3 p,p1,p2;
   F64 d,best_distance;
@@ -766,7 +759,7 @@ U0 CheckDamage()
 	  D3Sub(&human->p[0].x,&tempm->x,&p1);
 	  if (Abs(D3Dot(&p1,&p2))<tempm->radius &&
 	      D3Dot(&p1,&p)<0.0) {
-	    d=D3SqrNorm(&p1);
+	    d=D3NormSqr(&p1);
 	    if (d<best_distance) {
 	      best_distance=d;
 	      best_mass=tempm;
@@ -780,26 +773,26 @@ U0 CheckDamage()
     }
   }
 
-  temps=ship_root.next;
-  while (temps!=&ship_root) {
-    temps1=temps->next;
-    switch (temps->type) {
+  tempsp=ship_root.next;
+  while (tempsp!=&ship_root) {
+    tempsp1=tempsp->next;
+    switch (tempsp->type) {
       case ST_HUMAN1:
-	if (temps->exploding) {
-	  if (tS>temps->die_timeout)  {
-	    ShipDel(temps);
+	if (tempsp->exploding) {
+	  if (tS>tempsp->die_timeout)  {
+	    ShipDel(tempsp);
 	    human=NULL;
 	  }
 	} else
-	  for (i=0;i<temps->springs;i++) {
-	    if (Abs(temps->s[i].f)>temps->s[i].strength)
-	      temps->s[i].flags|=SSF_INACTIVE;
-	    if (temps->s[i].flags&SSF_INACTIVE) {
+	  for (i=0;i<tempsp->springs;i++) {
+	    if (Abs(tempsp->s[i].f)>tempsp->s[i].strength)
+	      tempsp->s[i].flags|=SSF_INACTIVE;
+	    if (tempsp->s[i].flags&SSF_INACTIVE) {
 	      if (i<3) {
-		if (!temps->exploding) {
-		  temps->exploding=TRUE;
-		  temps->die_time=tS;
-		  temps->die_timeout=tS+0.75;
+		if (!tempsp->exploding) {
+		  tempsp->exploding=TRUE;
+		  tempsp->die_time=tS;
+		  tempsp->die_timeout=tS+0.75;
 		  game_over=TRUE;
 		  Noise(750,1000,2000);
 		  break;
@@ -809,70 +802,70 @@ U0 CheckDamage()
 	  }
 	  break;
       default:
-	if (temps->exploding) {
-	  if (tS>temps->die_timeout) {
-	    ShipDel(temps);
+	if (tempsp->exploding) {
+	  if (tS>tempsp->die_timeout) {
+	    ShipDel(tempsp);
 	    score+=level;
 	    if (score>best_score)
 	      best_score=score;
 	  }
 	} else {
 	  j=0;
-	  for (i=0;i<temps->springs;i++) {
-	    if (temps->s[i].flags&SSF_INACTIVE)
+	  for (i=0;i<tempsp->springs;i++) {
+	    if (tempsp->s[i].flags&SSF_INACTIVE)
 	      j++;
-	    else if (Abs(temps->s[i].f)>temps->s[i].strength) {
-	      temps->s[i].flags|=SSF_INACTIVE;
+	    else if (Abs(tempsp->s[i].f)>tempsp->s[i].strength) {
+	      tempsp->s[i].flags|=SSF_INACTIVE;
 	      j++;
 	    }
 	  }
 	  k=0;
-	  for (i=0;i<temps->masses;i++) {
-	    if (temps->p[i].temperature>MASS_MAX_TEMP)
+	  for (i=0;i<tempsp->masses;i++) {
+	    if (tempsp->p[i].temperature>MASS_MAX_TEMP)
 	      k++;
 	  }
 	  if (j>1 || k) {
-	    temps->exploding=TRUE;
-	    temps->die_time=tS;
-	    temps->die_timeout=tS+0.75;
+	    tempsp->exploding=TRUE;
+	    tempsp->die_time=tS;
+	    tempsp->die_timeout=tS+0.75;
 	    Noise(750,1000,3000);
 	  }
 	}
     }
-    temps=temps1;
+    tempsp=tempsp1;
   }
 }
 
-// ********************************** Bullets
+//********************************** Shots
 
-U0 FireOneGun(Ship *temps,I64 g,F64 r,F64 fuse_time)
+U0 FireOneGun(Ship *tempsp,I64 g,F64 r,F64 fuse_time)
 {
   CD3 p,p1,p2;
-  Bullet *tempb;
+  Shot *temps;
 
-  tempb=CAlloc(sizeof(Bullet));
-  D3Copy(&tempb->p.x,&temps->p[g].x);
-  tempb->radius=r;
-  tempb->fuse_time=tS+1.5*fuse_time;
-  tempb->die_timeout=tempb->fuse_time+0.125;
-  tempb->p.mass=0.3*r*r*r;
-  D3Sub(&temps->p[0].x,&temps->p[1].x,&p1);
-  D3Sub(&temps->p[0].x,&temps->p[2].x,&p2);
+  temps=CAlloc(sizeof(Shot));
+  D3Copy(&temps->p.x,&tempsp->p[g].x);
+  temps->radius=r;
+  temps->fuse_time=tS+1.5*fuse_time;
+  temps->die_timeout=temps->fuse_time+0.125;
+  temps->p.mass=0.3*r*r*r;
+  D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1);
+  D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p2);
   D3Add(&p1,&p2,&p);
-  D3AddEqu(&tempb->p.x,D3MulEqu(D3Copy(&p1,D3Unit(&p)),r+temps->p[0].radius+5));
-  D3AddEqu(D3MulEqu(&p,1000/(r+1)),&temps->p[g].DxDt);
-  D3Copy(&tempb->p.DxDt,&p);
-  D3MulEqu(&p,tempb->p.mass/temps->p[g].mass/100.0);
-  D3SubEqu(&temps->p[g].DxDt,&p);
-  QueIns(&tempb->p,ode->last_mass);
-  QueIns(tempb,bullet_root.last);
-  temps->reload_timeout=tS+r/temps->fire_rate;
+  D3AddEqu(&temps->p.x,D3MulEqu(D3Copy(&p1,D3Unit(&p)),r+tempsp->p[0].radius+5));
+  D3AddEqu(D3MulEqu(&p,1000/(r+1)),&tempsp->p[g].DxDt);
+  D3Copy(&temps->p.DxDt,&p);
+  D3MulEqu(&p,temps->p.mass/tempsp->p[g].mass/100.0);
+  D3SubEqu(&tempsp->p[g].DxDt,&p);
+  QueIns(&temps->p,ode->last_mass);
+  QueIns(temps,shot_root.last);
+  tempsp->reload_timeout=tS+r/tempsp->fire_rate;
   Noise(100,r*200,r*400);
 }
 
 U0 HumanFireBegin()
 {
-  F64 r=3.0*ctrl_panel.bullet_radius/CTRL_PANEL_RANGE+0.5,
+  F64 r=3.0*ctrl_panel.shot_radius/CTRL_PANEL_RANGE+0.5,
      fuse_time=ToF64(ctrl_panel.fuse_time+1)/CTRL_PANEL_RANGE;
   if (human) {
     if (!human->exploding && !human->spacewalk_side && tS>human->reload_timeout)
@@ -912,46 +905,44 @@ U0 HumanFireEnd()
 
 U0 ExpireShots()
 {
-  Bullet *tempb=bullet_root.next,*tempb1;
-  while (tempb!=&bullet_root) {
-    tempb1=tempb->next;
-    if (tS>tempb->fuse_time && !tempb->exploding) {
-      tempb->exploding=TRUE;
+  Shot *temps=shot_root.next,*tempb1;
+  while (temps!=&shot_root) {
+    tempb1=temps->next;
+    if (tS>temps->fuse_time && !temps->exploding) {
+      temps->exploding=TRUE;
       Noise(50,3000,6000);
     }
-    if (tS>tempb->die_timeout) {
-      QueRem(tempb);
-      QueRem(&tempb->p);
-      Free(tempb);
+    if (tS>temps->die_timeout) {
+      QueRem(temps);
+      QueRem(&temps->p);
+      Free(temps);
     }
-    tempb=tempb1;
+    temps=tempb1;
   }
 }
 
-// ********************************** AI
+//********************************** AI
 
 U0 AI()
 {
   CD3 p,p1,p2;
-  Ship *temps=ship_root.next;
+  Ship *tempsp=ship_root.next;
   if (human && !human->exploding) {
-    while (temps!=&ship_root) {
-      D3Sub(&temps->p[0].x,&temps->p[1].x,&p1);
-      D3Sub(&temps->p[0].x,&temps->p[2].x,&p2);
+    while (tempsp!=&ship_root) {
+      D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1);
+      D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p2);
       D3Add(&p1,&p2,&p);
-      D3Sub(&human->p[0].x,&temps->p[0].x,&p1);
+      D3Sub(&human->p[0].x,&tempsp->p[0].x,&p1);
       if (D3Dot(D3Unit(&p),D3Unit(&p1))>0.995 &&
-	tS>temps->reload_timeout) {
-	FireOneGun(temps,0,1.5+.5,.4);
+	tS>tempsp->reload_timeout) {
+	FireOneGun(tempsp,0,1.5+.5,.4);
       }
-      temps=temps->next;
+      tempsp=tempsp->next;
     }
   }
 }
 
-// ********************************** Init
-
-
+//********************************** Init
 U0 InitLevel()
 {
   I64 i;
@@ -974,7 +965,7 @@ U0 Init()
   level=1;
 
   ship_root.next=ship_root.last=&ship_root;
-  bullet_root.next=bullet_root.last=&bullet_root;
+  shot_root.next=shot_root.last=&shot_root;
 
   for (i=0;i<NUM_STARS;i++) {
     stars_x[i]=RandU16%GR_WIDTH;
@@ -988,12 +979,10 @@ U0 Init()
   InitLevel;
 }
 
-
-// ********************************** Main
-
+//********************************** Main
 U0 XCaliber()
 {
-  I64 ch,msg_code,p1,p2,sc;
+  I64 ch,msg_code,a1,a2,sc;
   CCtrl *cp=CtrlPanelNew;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
@@ -1021,7 +1010,7 @@ U0 XCaliber()
   WinMax;
   WordStat;
   WinBorder(ON);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER-WIF_MENU-WIF_CTRLS;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;
@@ -1035,10 +1024,10 @@ U0 XCaliber()
     ch=0;
     do {
       while (!game_over && !show_level_msg &&
-	  (msg_code=ScanMsg(&p1,&p2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP))) {
+	  (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP))) {
 	switch (msg_code) {
 	  case MSG_KEY_DOWN:
-	    ch=p1; sc=p2;
+	    ch=a1; sc=a2;
 	    switch (ch) {
 	      case 0:
 		switch (sc.u8[0]) {
@@ -1056,7 +1045,7 @@ U0 XCaliber()
 		    break;
 		  case SC_CURSOR_UP:
 		    if (sc&SCF_SHIFT)
-		      ctrl_panel.bullet_radius+=2;
+		      ctrl_panel.shot_radius+=2;
 		    else {
 		      human_t_right=MAX_THRUST;
 		      human_t_left =MAX_THRUST;
@@ -1064,7 +1053,7 @@ U0 XCaliber()
 		    break;
 		  case SC_CURSOR_DOWN:
 		    if (sc&SCF_SHIFT)
-		      ctrl_panel.bullet_radius-=2;
+		      ctrl_panel.shot_radius-=2;
 		    else
 		      human_antispin=MAX_ANTISPIN;
 		    break;
@@ -1079,7 +1068,7 @@ U0 XCaliber()
 	    }
 	    break;
 	  case MSG_KEY_UP:
-	    ch=p1; sc=p2;
+	    ch=a1; sc=a2;
 	    switch (ch) {
 	      case 0:
 		switch (sc.u8[0]) {

@@ -1,4 +1,4 @@
-#help_index "Utils;Cmd Line (Typically)"
+#help_index "Cmd Line (Typically)"
 
 #define DS_USE_FILE1	0
 #define DS_USE_FILE2	1
@@ -69,7 +69,7 @@ U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
       "%s",doc_unsorted1[i++]->tag;
       if (cur_l)
 	cur_l->flags= cur_l->flags&~DOCF_PLAIN_TEXT |old_flags;
-      NewLine;
+      '\n';
     }
     "$$CYAN$$";
     if (j2_lo<=0)
@@ -84,7 +84,7 @@ U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
       "%s",doc_unsorted2[i++]->tag;
       if (cur_l)
 	cur_l->flags= cur_l->flags&~DOCF_PLAIN_TEXT |old_flags;
-      NewLine;
+      '\n';
     }
     "$$FG$$";
 
@@ -168,7 +168,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
       else {
 	i2b=i2;
 	while (!StrCmp(doc_sorted1[i1]->tag,doc_sorted2[i2]->tag)) {
-	  if (j2_lo<=doc_sorted2[i2]->user_data<j2_hi) { //user_data is the new y
+	  if (j2_lo<=doc_sorted2[i2]->user_data<j2_hi) {//user_data is the new y
 	    score=0;
 	    j1=doc_sorted1[i1]->user_data; //user_data is the new y
 	    j2=doc_sorted2[i2]->user_data; //user_data is the new y
@@ -229,7 +229,8 @@ Bool DiffBins(CDoc *doc1,CDoc *doc2)
 }
 
 public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
-{ //The _df_flags arg is used when this is called by $LK,"Merge",A="MN:Merge"$().
+{//Report differences between two files and merge differences
+//from src_file to dst_file.  Don't use _df_flags arg. (Used by $LK,"Merge",A="MN:Merge"$().)
   CDoc *doc1=DocRead(dst_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR),
        *doc2=DocRead(src_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e,**doc_sorted1,**doc_sorted2,**doc_unsorted1,**doc_unsorted2;
@@ -305,17 +306,16 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   return result;
 }
 
-#help_index "Utils;Cmd Line (Typically);Info"
-
+#help_index "Cmd Line (Typically);Info"
 I64 ZRepCompare(CDirEntry *e1,CDirEntry *e2)
 {
   return SignI64(e2->user_data(F64)-e1->user_data(F64));
 }
-
 public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
   Bool just_text_not_graphics=TRUE)
-{//Report of compressibility.  Dft is just src files.
-//(Used to spot src files with redundancy in them.)
+{//Report file compressibility.
+//Dft is just src files.  (Used to spot
+//src files with redundancy in them.)
   I64 i=0,cnt,size,fuf_flags=0;
   CDirEntry *tempde,*tempde1,**sort_buf;
   U8 *buf;
@@ -340,10 +340,8 @@ public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
   for (i=0;i<cnt;i++) {
     "%4.1f%% %04X ",sort_buf[i]->user_data,sort_buf[i]->size;
     PutFileLink(sort_buf[i]->full_name);
-    NewLine;
+    '\n';
   }
   Free(sort_buf);
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
-
-#help_index ""

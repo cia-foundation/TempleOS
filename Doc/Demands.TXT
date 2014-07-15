@@ -1,40 +1,42 @@
 $WW,1$$FG,5$$TX+CX,"Demands"$$FG$
 
-When God is manifest to the World and He claims this operating system, publically, here's what I want:
+When God publically claims this operating system as His temple, here's what I want:
 
 * VMware to again support PC Speaker and provide emulation if no PC Speaker is present.
 
-* Windows and Linux will support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  I view redundant code that performs the same function as imperfect.  More than one filesystem type is bad, not good!
+* Windows and Linux to support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is bad, just as more than one driver for the same type of device is bad.
 
 $LK,"::/Kernel/Dsk/FileSysRedSea.CPP"$
-$LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:1004
-$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:306
+$LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:965
+$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:284
 $LK,"::/Adam/Boot/DskCDDVD.CPP"$	:536
 
-* No secure boot.  TempleOS is a additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
+* Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
 
-* Mandate to PC hardware manufacturers: ATA/ATAPI PIO must work.
+* PC hardware manufacturers: ATA/ATAPI PIO must work.  In fact, put them at standard IDE port addresses.  Hard disk should be primary master.  CDROM/DVD should be secondary master.  See what you can do to make flash memory sticks with ATA/ATAPI.
 
-* PS2 emulated Keyboard and Mouse must work.  The BIOS must enable these.
+* PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
 
-* VMware should allow ATAPI to connect real CD/DVD hardware.
+* VMware must allow ATAPI interface to real CD/DVD hardware.
 
-* Perhaps, VMware can enable faster than standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so the bandwidth isn't as bad.
+* Perhaps, VMware+Intel can enable faster-than-standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad.
 
-* VMware and others should list TempleOS as one of the official 64-bit operating systems.
+* Computers should have a RESET switch and a fast boot option, skipping diagnostics.
 
-* Windows and Linux should support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bit pixs 4-bits of color and transparency, with no palette.  Compression is an$FG$ LZW compression.  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
+* VMware and others should list TempleOS as an official 64-bit operating systems.
 
-
-
-
-In other words, all hardware and BIOSes must support TempleOS as a native and as a virtual system, dual booted with Windows or Linux.
-
-It would be neat if TempleOS were burned into BIOS ROMs in the factory, or maybe Intel CPU chips, in factory!  My hope is that it will be finished and largely unchanging for centuries.  I need a good dictionary, first.  Maybe, we leave the dictionary out.
-
-I do not intend to ever support UEFI.  That monstrocity uses elf and various propriatary graphics formats.
+* Windows and Linux must support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bits-per-pixels 4-bits of color and transparency, with no palette.  Compression is an$FG$ LZW compression.  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
 
 
+----
+
+In other words, all hardware and BIOSes must support TempleOS, dual booted with Windows or Linux.  Hypervisors must support it fully.
+
+It would be nice if TempleOS were burned into BIOS ROMs in the factory, or Intel CPU chips!  Then, the oracle code would be guaranteed trustworthy.  My hope is that it will be finalized, mostly unchanging for centuries.
+
+I need a good dictionary and need to fix spellcheck.  Maybe, we leave the dictionary out.
+
+I do not intend to ever support UEFI.  That uses elf and various propriatary graphics formats.  It requires additional lines of code and offers nothing!
 
 
 
@@ -68,11 +70,11 @@ God said 640x480 16 color.
 
 God said single audio voice.  (Waveforms okay)
 
-God said lots of arcane stuff, like no child windows.
+God said lots of misc stuff, like no child windows.
 
 I said there is a 100,000 line-of-code limit.
 
-We have 82,000 lines of code, currently, and can expand up to 100,000, but code comments count.  I am opening-this-up to letting other people contribute.  We'll have some kind of organization.
+We have $TX,"81,303",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code, currently, and can expand up to 100,000, but code comments count.  I am opening-this-up to letting other people contribute.  We'll have some kind of organization.
 
 When you have a 100,000 line of code limit, you do not get mellow-dramatic code.  The vision is a C64, not a manned mission NASA mainframe.  If you prance around adding rare-case code, that subtracts from other potential features.  So, long as you know that every line of code added, subtracts a feature, we'll be okay.
 
@@ -80,6 +82,8 @@ When you have a 100,000 line of code limit, you do not get mellow-dramatic code.
 The 640x480 16 color limit is certainly astounding.  God said it was for kid offerings, I guess like 8 crayola colors for kindergardeners.  If you must make a art drawing for you three yearly offerings, you'll be happy only 16 colors exist.  Just think!  Everybody's workload on doing offerings is eased by having only 16 colors.  Isn't that good?
 
 Today, God said dull causes craftiness.  I think what God means is... on a C64, you saw fantasticly crafty creativity because you were not burdened with high-demand photo-realism graphics and sound.  Otherwise, you spend all your energy just burdened with getting something presentable.  Now, you will achieve "presentable" easily and advance to embelishing and getting creative.
+
+God said 640x480 16 color was a covenant, like circumcision.
 
 The 100,000 line of code limit should ensure God's temple stays on-course for a thousand years.  Also, it must be kept perfect.  With these, it will not go astray.  I could hand it over to NASA (for example) and, so long as they kept the 100,000 line of code limit, it would be in good hands.  For the future, I expect low driver-line-count hardware to be created and utilized when all (mostly) computers have advanced to contain it.  All computer are 64-bit, now, for example, if you catch my drift.
 

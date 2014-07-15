@@ -1,5 +1,5 @@
 public CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type)
-{
+{//Find task ctrl givin $LK,"ctrl_type",A="MN:CTRLT_VIEWING_ANGLES"$.
   CCtrl *c;
   Bool old_preempt=Preempt(OFF);
   c=haystack_task->next_ctrl;
@@ -23,15 +23,15 @@ U0 CtrlsUpdate(CTask *task)
     if (c->update_derived_vals)
       (*c->update_derived_vals)(c);
     if (c->flags&CTRLF_BORDER) {
-      c->screen_left  =gr_pan_text_x+task->pix_left+c->left-FONT_WIDTH;
-      c->screen_right =gr_pan_text_x+task->pix_left+c->right-FONT_WIDTH;
-      c->screen_top   =gr_pan_text_y+task->pix_top+c->top-FONT_HEIGHT;
-      c->screen_bottom=gr_pan_text_y+task->pix_top+c->bottom-FONT_HEIGHT;
+      c->screen_left  =gr.pan_text_x+task->pix_left+c->left-FONT_WIDTH;
+      c->screen_right =gr.pan_text_x+task->pix_left+c->right-FONT_WIDTH;
+      c->screen_top   =gr.pan_text_y+task->pix_top+c->top-FONT_HEIGHT;
+      c->screen_bottom=gr.pan_text_y+task->pix_top+c->bottom-FONT_HEIGHT;
     } else {
-      c->screen_left  =gr_pan_text_x+task->pix_left+c->left;
-      c->screen_right =gr_pan_text_x+task->pix_left+c->right;
-      c->screen_top   =gr_pan_text_y+task->pix_top+c->top;
-      c->screen_bottom=gr_pan_text_y+task->pix_top+c->bottom;
+      c->screen_left  =gr.pan_text_x+task->pix_left+c->left;
+      c->screen_right =gr.pan_text_x+task->pix_left+c->right;
+      c->screen_top   =gr.pan_text_y+task->pix_top+c->top;
+      c->screen_bottom=gr.pan_text_y+task->pix_top+c->bottom;
     }
     c=c->next;
   }
@@ -39,7 +39,6 @@ U0 CtrlsUpdate(CTask *task)
 }
 
 fp_update_ctrls=&CtrlsUpdate;
-
 
 Bool CtrlInsideRect(CCtrl *c,I64 x,I64 y)
 {//screen coordinates
@@ -51,7 +50,7 @@ Bool CtrlInsideRect(CCtrl *c,I64 x,I64 y)
 }
 
 public Bool CtrlInside(CCtrl *c,I64 x,I64 y)
-{
+{//Is x,y inside a ctrl?
   if (c->flags&CTRLF_SHOW) {
     if (c->inside_ctrl)
       return (*c->inside_ctrl)(c,x,y);
@@ -64,7 +63,7 @@ public Bool CtrlInside(CCtrl *c,I64 x,I64 y)
 U0 DrawCtrls(CTask *task)
 {
   CCtrl *c;
-  CDC *dc=DCAlias(gr_dc2,task);
+  CDC *dc=DCAlias(gr.dc2,task);
   Bool old_preempt=Preempt(OFF);
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {
@@ -112,7 +111,6 @@ U0 DrawCtrls(CTask *task)
   DCDel(dc);
 }
 
-
 #define WIN_SCROLL_SIZE		8
 #define WIN_SCROLL_BORDER_BONUS	4
 U0 DrawWinScroll(CDC *dc,CCtrl *c)
@@ -147,15 +145,15 @@ U0 WinDerivedScrollValsUpdate(CCtrl *c)
   if (!range) range=1;
   switch (c->type) {
     case CTRLT_WIN_HSCROLL:
-      c->left  =gr_pan_text_x+FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->left  =gr.pan_text_x+FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
       c->right =c->left+WIN_SCROLL_SIZE-1;
-      c->top   =gr_pan_text_y+FONT_HEIGHT+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_height;
+      c->top   =gr.pan_text_y+FONT_HEIGHT+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_height;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
     case CTRLT_WIN_VSCROLL:
-      c->left  =gr_pan_text_x+FONT_WIDTH+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_width;
+      c->left  =gr.pan_text_x+FONT_WIDTH+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_width;
       c->right =c->left+WIN_SCROLL_SIZE-1;
-      c->top   =gr_pan_text_y+FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->top   =gr.pan_text_y+FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
   }
@@ -280,7 +278,6 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
   dc->color=s->cx^8;
   GrRect(dc,i-2,j-1,5,3);
 
-
   dc->color=s->cy;
   GrPrint(dc,c->left+2*VIEWANGLES_SPACING+1-FONT_WIDTH/2,
 	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Y");
@@ -296,7 +293,6 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
   GrRect(dc,i-3,j-2,7,5);
   dc->color=s->cy^8;
   GrRect(dc,i-2,j-1,5,3);
-
 
   dc->color=s->cz;
   GrPrint(dc,c->left+3*VIEWANGLES_SPACING+2-FONT_WIDTH/2,
@@ -350,7 +346,7 @@ U0 LeftClickViewAngles(CCtrl *c,I64 x,I64 y,Bool)
 }
 
 public CCtrl *ViewAnglesNew(CTask *task=NULL)
-{
+{//Create view angle ctrl. See $LK,"::/Demo/Graphics/Shading.CPP.Z"$.
   Bool old_preempt;
   CCtrl *c;
   CViewAngles *s;
@@ -380,7 +376,7 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
 }
 
 public U0 ViewAnglesDel(CTask *task=NULL)
-{
+{//Free view angle ctrl.
   CCtrl *c;
   Bool old_preempt=Preempt(OFF);
   if (!task) task=Fs;

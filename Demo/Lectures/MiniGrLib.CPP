@@ -1,5 +1,5 @@
 //See $LK,"::/Demo/Lectures/GraphicsCPULoad.CPP"$
-U8 reverse[256],	//The VGA bits are backward
+U8 reverse[256],	//The VGA bits are bwd
 
    image[640*480/8];	//We need read-modify write.
 			//0xA0000 memory can't be read.
@@ -16,7 +16,7 @@ U0 MGInit()
 }
  
 U0 MGUpdate()
-{ //Copy image to VGA memory
+{//Copy image to VGA memory
   //For better performance we could only write what's changed.
   //0xA0000 is slower than normal RAM.
   OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
@@ -31,11 +31,11 @@ U0 MGPlot(I64 x,I64 y)
 }
  
 U0 MGHLine(I64 x1,I64 x2,I64 y)
-{ //Warning!  No clipping
+{//Warning!  No clipping
   //For performance, we do as many whole-bytes as possible.
   U8 *ptr;
   I64 i,w,leading,trailing,whole_bytes;
-  if (x2<x1) SwapU64(&x1,&x2);
+  if (x2<x1) SwapI64(&x1,&x2);
   ptr=image+y*640/8+x1>>3;
   w=x2-x1+1;
   leading =8-x1&7;
@@ -54,7 +54,7 @@ U0 MGHLine(I64 x1,I64 x2,I64 y)
 }
  
 U0 MGLine(I64 x1,I64 y1,I64 x2,I64 y2)
-{ //Warning!  No clipping
+{//Warning!  No clipping
   I64 dx=x2-x1,dy=y2-y1;
   x1<<=32; x2<<=32;
   y1<<=32; y2<<=32;
@@ -124,7 +124,7 @@ It is not normal to by-pass the TempleOS graphcis routines.
 The TempleOS graphics don't know VGA has changed.
 This bit tells TempleOS to update whole screen.
 */
-//<CTRL-ALT-F> will flush screen VGA cache.
+//<CTRL-ALT-f> will flush screen VGA cache.
   VGAFlush;
 }
  

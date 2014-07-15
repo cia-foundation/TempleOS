@@ -1,4 +1,4 @@
-//This uses $LK,"fixed-point-arithmetic",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//Uses $LK,"fixed-point-arithmetic",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
 I64 x[16],y[16],dx[16],dy[16];
 
@@ -18,11 +18,11 @@ U0 Init()
 U0 Bounce()
 {
   CDC *dc=DCAlias;
-  I64 i,msg_code,p1,update;
+  I64 i,ch,update;
   Init;
-  try { //Catch <CTRL-ALT-C>
-    while (TRUE) {
-      update=win_updates;
+  try {//Catch <CTRL-ALT-c>
+    do {
+      update=winmgr.updates;
       do for (i=0;i<16;i++) {
 	  dc->color=i;
 	  GrPlot(dc,x[i].i32[1],y[i].i32[1]);
@@ -37,17 +37,8 @@ U0 Bounce()
 	    dy[i]=-dy[i];
 	  }
 	}
-      while (update==win_updates);
-      while (msg_code=ScanMsg(&p1,NULL,1<<MSG_KEY_DOWN|1<<MSG_RESIZE|1<<MSG_MOVE))
-	if (msg_code==MSG_KEY_DOWN) {
-	  if (p1==CH_SHIFT_ESC || p1==CH_ESC)
-	    goto bc_done;
-	  else
-	    Init;
-	} else
-	  DCFill(dc);
-    }
-bc_done:
+      while (update==winmgr.updates);
+    } while (!(ch=ScanChar) || (ch!=CH_SHIFT_ESC && ch!=CH_ESC));
   } catch
     PutExcept;
   DCFill(dc);

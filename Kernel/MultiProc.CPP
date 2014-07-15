@@ -49,7 +49,6 @@ MP_INIT_OS:
 	LOCK
 	BTR	U32 [SYS_MP_CNT_LOCK],0
 
-
 	CMP	ESI,MP_MAX_PROCESSORS
 	JAE	I32 _SYS_HLT
 
@@ -75,7 +74,7 @@ USE64
 }
 
 U0 TSSBusy(I64 tr,Bool val=OFF)
-{ //See $LK,"::/Demo/Lectures/Ring3.CPP"$.
+{//See $LK,"::/Demo/Lectures/Ring3.CPP"$.
   LBEqu((&sys_gdt)(U8 *)+tr+4,9,val);
 }
 
@@ -120,13 +119,11 @@ CTSS *TSSNew(I64 cpu_num)
 }
 
 CCPU *CPUStructInit(I64 num,CCPU *c,CTask *seth_task)
-{//seth is null when called by adam on CSysFixedArea.boot_cpu0
+{//Seth is null when called by adam on CSysFixedArea.boot_cpu0
   MemSet(c,0,sizeof(CCPU));
   c->addr=c;
   c->num=num;
   c->idle_factor=0.01;
-  if (!num)
-    c->timer_irq_chain=&IntSimpleTimer;
   if (Bt(&sys_run_level,RLf_BOOT_HEAP)) {
     c->idle_task=Spawn(0,NULL,"Idle Task",,Fs,,0);
     Bts(&c->idle_task->task_flags,TASKf_IDLE);
@@ -137,7 +134,7 @@ CCPU *CPUStructInit(I64 num,CCPU *c,CTask *seth_task)
 }
 
 U0 MPInt(U8 num,I64 cpu_num=1)
-{
+{//Generate interrupt for specified core.
   if (cpu_num>=mp_cnt) {
     if (!Bt(&sys_run_level,RLf_MP))
       return;
@@ -145,18 +142,18 @@ U0 MPInt(U8 num,I64 cpu_num=1)
       throw('MultCore');
   }
   PUSHFD
-  CLI //multitasking safe because each core has a local apic and IRQ's are off
+  CLI //Multitasking safe because each core has a local apic and IRQ's are off
   while (*LAPIC_ICR_LOW(U32 *)&0x1000)
     PAUSE
-  *LAPIC_ICR_HIGH(U32 *)=mp_apic_ids[cpu_num]<<24;
+  *LAPIC_ICR_HIGH(U32 *)=dev.mp_apic_ids[cpu_num]<<24;
   *LAPIC_ICR_LOW(U32 *)=0x4000+num;
   POPFD
 }
 
 U0 MPIntAll(U8 num)
-{ //(All but self)
+{//Generate interrupt for all but own core.
   PUSHFD
-  CLI //multitasking safe because each core has a local apic and IRQ's are off
+  CLI //Multitasking safe because each core has a local apic and IRQ's are off
   while (*LAPIC_ICR_LOW(U32 *)&0x1000)
     PAUSE
   *LAPIC_ICR_LOW(U32 *)=0xC4800+num;
@@ -164,19 +161,19 @@ U0 MPIntAll(U8 num)
 }
 
 U0 MPNMInt()
-{
+{//Generate nonmaskable interrupt.
   *LAPIC_ICR_LOW(U32 *)=0xC4400;
 }
 
 U0 MPHalt()
-{
+{//Halt all other cores.
   mp_cnt=1;
-  MPNMInt; //Hlt All other processors
+  MPNMInt;
   BusyWait(10000);
 }
 
 U0 MPWake(I64 target_cpu)
-{
+{//Send wake-up interupt to core.
   if (0<=target_cpu<mp_cnt) {
     PUSHFD
     CLI
@@ -194,18 +191,17 @@ U0 MPWake(I64 target_cpu)
 }
 
 U0 MPAPICInit()
-{ //Called by adam during start-up
-  //and other cores during initialization
-  //after $LK,"MPStart",A="MN:MPStart"$().
+{//Called by adam during start-up
+//and other cores during initialization
+//after $LK,"MPStart",A="MN:MPStart"$().
   *LAPIC_SVR(U32 *)|=LAPICF_APIC_ENABLED;
-  mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
-  *LAPIC_LDR(U32 *)=mp_apic_ids[Gs->num]<<24;
+  dev.mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
+  *LAPIC_LDR(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
   *LAPIC_DFR(U32 *)=0xF0000000;
-/*
-  MemSet(LAPIC_IRR,0,0x20);
-  MemSet(LAPIC_ISR,0,0x20);
-  MemSet(LAPIC_TMR,0,0x20);
-*/
+
+//  MemSet(LAPIC_IRR,0,0x20);
+//  MemSet(LAPIC_ISR,0,0x20);
+//  MemSet(LAPIC_TMR,0,0x20);
 
   SetRAX(Gs->tss->tr);
   LTR	AX
@@ -242,9 +238,9 @@ U0 MPSethServerTask()
 CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
        I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
        I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
-//This is to queue multicore jobs, handled by Seth tasks.
+{//Queue multicore jobs, handled by Seth tasks.
 //Set flags to zero if you wish to get the result.
-{
+//See $LK,"::/Demo/MultiCore/Lock.CPP"$
   CSrvCtrl *ctrl;
   CSrvCmd *tempc;
   if (!(0<=target_cpu<mp_cnt))
@@ -301,8 +297,8 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 }
 
 U0 MPCPUTaskInit()
-{ //Called by multicore's seth task after $LK,"MPStart",A="MN:MPStart"$()
-  //as the first thing a CPU does before waiting for jobs
+{//Called by multicore's seth task after $LK,"MPStart",A="MN:MPStart"$()
+//as the first thing a CPU does before waiting for jobs.
   MPAPICInit;
   Fs->rip=&MPSethServerTask;
   Fs->time_slice_start=GetTSC;
@@ -310,10 +306,7 @@ U0 MPCPUTaskInit()
 }
 
 U0 MPStart()
-{ //Called by adam during start-up
-  //and can be called again to rst multicores.
-  //Doesn't always work when rstting.  Kill all tasks, first.
-  //Must be called from core#0.
+{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,MPStart"$.
   CTask *task;
   U8 buf[128];
   CMPMain *mp=MP_VECT_ADDR;
@@ -366,7 +359,7 @@ U0 MPStart()
     my_mp_cnt=MP_MAX_PROCESSORS;
 
   for (i=1;i<my_mp_cnt;i++) {
-    SPrint(buf,"Seth Task CPU#%d",i);
+    StrPrint(buf,"Seth Task CPU#%d",i);
     task=Spawn(&MPCPUTaskInit,NULL,buf,,,SETH_STK,0);
     task->rflags=SYS_START_RFLAGS;
     //$LK,"CTask",A="MN:CTask"$ allocated off this core's seth_task's heap (Which is Adam)
@@ -387,20 +380,20 @@ U0 MPStart()
 }
 
 U0 MPInit()
-{ //Called by adam during start-up
+{//Called by adam during start-up
   CRAXRBCRCXRDX ee;
   CPUId(0x1,&ee);
 
   mp_cnt_initial=mp_cnt=1;
   mp_cnt_lock=0;
 
-  mp_crash=ACAlloc(sizeof(CMPCrash));
+  dbg.mp_crash=ACAlloc(sizeof(CMPCrash));
 
 //Must be in code heap because init code uses 32 bit addr of cpu_struct
   adam_task->gs=cpu_structs=CAlloc(sizeof(CCPU)*MP_MAX_PROCESSORS,Fs->code_heap);
   adam_task->time_slice_start=GetTSC;
   CPUStructInit(0,cpu_structs,adam_task);
-  asm { //RAX has GS
+  asm {//RAX has GS
 	IMPORT SET_GS_BASE;
 	CALL SET_GS_BASE
   }
@@ -412,12 +405,12 @@ U0 MPInit()
 }
 
 U0 MPCrash()
-{ //Entering the debugger from another core causes an interrupt on core#0
-  //Which calls this routine.
+{//Entering the debugger from another core causes an interrupt on core#0
+//Which calls this routine.
   *LAPIC_EOI(U32 *)=0;
   mp_cnt=1;
   Raw(ON);
-  sys_raw_flags|=RWF_SHOW_DOLLAR;
-  "MP Crash CPU#%02X Task:%08X\n",mp_crash->cpu_num,mp_crash->task;
-  Dbg(mp_crash->msg,mp_crash->msg_num);
+  text.raw_flags|=RWF_SHOW_DOLLAR;
+  "MP Crash CPU#%02X Task:%08X\n",dbg.mp_crash->cpu_num,dbg.mp_crash->task;
+  Dbg(dbg.mp_crash->msg,dbg.mp_crash->msg_num);
 }

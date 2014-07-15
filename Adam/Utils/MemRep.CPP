@@ -1,4 +1,4 @@
-#help_index "Info;Utils;Memory/Info;Cmd Line (Typically)"
+#help_index "Info;Memory/Info;Cmd Line (Typically)"
 
 I64 TSSSize(CTSS *tss)
 {
@@ -13,10 +13,10 @@ I64 PenBrushesSize()
   I64 result=0,i;
   for (i=0;i<GR_NUM_PEN_BRUSHES;i++)
     result+=
-      DCSize(gr_pen_brushes[i])+
-      DCSize(gr_collision_pen_brushes[i])+
-      DCSize(gr_even_pen_brushes[i])+
-      DCSize(gr_odd_pen_brushes[i] );
+      DCSize(gr.pen_brushes[i])+
+      DCSize(gr.collision_pen_brushes[i])+
+      DCSize(gr.even_pen_brushes[i])+
+      DCSize(gr.odd_pen_brushes[i] );
   return result;
 }
 
@@ -24,7 +24,7 @@ I64 ScreenZoomTablesSize()
 {
   I64 result=0,i;
   for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++)
-    result+=MSize2(gr_screen_zoom_tables[i]);
+    result+=MSize2(gr.screen_zoom_tables[i]);
   return result;
 }
 
@@ -69,10 +69,10 @@ I64 TaskQueSize(CTask *task)
 
 I64 BlkDevsSize()
 {
-  I64 i,result=MSize2(sys_blkdevs);
+  I64 i,result=MSize2(dsk.blkdevs);
   CBlkDev *bdev;
   for (i=0;i<NUM_BLKDEVS;i++) {
-    bdev=&sys_blkdevs[i];
+    bdev=&dsk.blkdevs[i];
     if (bdev->bd_signature==BD_SIGNATURE_VAL) {
       if (bdev->type==BDT_RAM)
 	"RAMDsk %C\t:%010X Unused:%010X\n",
@@ -86,10 +86,10 @@ I64 BlkDevsSize()
 
 I64 PrtsSize()
 {
-  I64 i,result=MSize2(sys_prts);
+  I64 i,result=MSize2(dsk.prts);
   for (i=0;i<NUM_PRTS;i++)
-    result+=MSize2(sys_prts[i].buffered_map_dirty_bits)+
-	    MSize2(sys_prts[i].fis);
+    result+=MSize2(dsk.prts[i].buffered_map_dirty_bits)+
+	    MSize2(dsk.prts[i].fis);
   return result;
 }
 
@@ -142,7 +142,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   }
 
   if (task==sys_winmgr_task) {
-    "gr_pen_brushes\t:%010X\n",PenBrushesSize;
+    "gr.pen_brushes\t:%010X\n",PenBrushesSize;
     "gr_screen_zoom_tbles:%010X\n",ScreenZoomTablesSize;
   } else if (task==adam_task) {
     j=0;k=0;m=0;n=0;
@@ -173,30 +173,29 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
     "BlkDevs\t:%010X\n",BlkDevsSize;
     "Prts\t:%010X\n",PrtsSize;
     "Audio\t:%010X\n",CallExtStr("AudioSize");
-    if (sys_dsk_cache_base)
+    if (dsk.cache_base)
       "DskCache\t:%010X\n",
-	  MSize2(sys_dsk_cache_base)+MSize2(sys_dsk_cache_hash_table)+MSize2(sys_dsk_cache_ctrl);
+	  MSize2(dsk.cache_base)+MSize2(dsk.cache_hash_table)+MSize2(dsk.cache_ctrl);
     "WordStat\t:%010X\n",CallExtStr("WordStatSize");
     "Clipboard\t:%010X\n",DocSize(sys_clipboard_doc);
-    "gr_1_to_8_bits\t:%010X\n",MSize2(gr_1_to_8_bits);
-    "gr_1_to_8_colors\t:%010X\n",MSize2(gr_1_to_8_colors);
-    "gr_text_base\t:%010X\n",MSize2(gr_text_base);
-    "gr_vga_text_cache\t:%010X\n",MSize2(gr_vga_text_cache);
-    "gr_win_z_buf\t:%010X\n",MSize2(gr_win_z_buf)+MSize2(gr_win_uncovered_bitmap);
-    "gr_dc\t\t:%010X\n",DCSize(gr_dc);
-    "gr_dc1\t\t:%010X\n",DCSize(gr_dc1);
-    "gr_dc2\t\t:%010X\n",DCSize(gr_dc2);
-    "gr_dc_cache\t\t:%010X\n",DCSize(gr_dc_cache);
-    "gr_screen_image\t:%010X\n",DCSize(gr_screen_image);
-    "gr_zoomed_dc\t:%010X\n",DCSize(gr_zoomed_dc);
+    "gr.to_8_bits\t:%010X\n",MSize2(gr.to_8_bits);
+    "gr.to_8_colors\t:%010X\n",MSize2(gr.to_8_colors);
+    "gr.text_base\t:%010X\n",MSize2(gr.text_base);
+    "gr.vga_text_cache\t:%010X\n",MSize2(gr.vga_text_cache);
+    "gr.win_z_buf\t:%010X\n",MSize2(gr.win_z_buf)+MSize2(gr.win_uncovered_bitmap);
+    "gr.dc\t\t:%010X\n",DCSize(gr.dc);
+    "gr.dc1\t\t:%010X\n",DCSize(gr.dc1);
+    "gr.dc2\t\t:%010X\n",DCSize(gr.dc2);
+    "gr.dc_cache\t\t:%010X\n",DCSize(gr.dc_cache);
+    "gr.screen_image\t:%010X\n",DCSize(gr.screen_image);
+    "gr.zoomed_dc\t:%010X\n",DCSize(gr.zoomed_dc);
   }
   "$$ID,-2$$";
   return TRUE;
 }
 
-
 public U0 MemRep()
-{
+{//Memory usage report.
   I64 i;
   CTask *task;
   CCPU *c;
@@ -237,10 +236,8 @@ public U0 MemRep()
   }
 
   "$$GREEN$$Independent Heaps$$FG$$\n$$ID,2$$";
-  "$$BLACK$$sys_uncached_heap:%010X Used:%010X $$RED$$Unused:%010X$$FG$$\n",
-  sys_uncached_heap->bp->size*PAGE_SIZE,sys_uncached_heap->used_u8s,UnusedBPMem(sys_uncached_heap->bp);
+  "$$BLACK$$dev.uncached_heap:%010X Used:%010X $$RED$$Unused:%010X$$FG$$\n",
+  dev.uncached_heap->bp->size*PAGE_SIZE,dev.uncached_heap->used_u8s,UnusedBPMem(dev.uncached_heap->bp);
   "$$ID,-2$$\n";
   Preempt(old_preempt);
 }
-
-  #help_index ""

@@ -54,9 +54,6 @@ SYS_BIOS32_SERVICE_CALL:: DU32	0;
 @@05:	MOV	U32 [SYS_PCI_SERVICES],0
 	RET
 
-
-
-
 USE64
 C32_EAX::	DU32	0;
 C32_EBX::	DU32	0;
@@ -166,12 +163,10 @@ _extern C32_EDI U32 c32_edi;
 _extern C32_EFLAGS U32 c32_eflags;
 _extern SYS_PCI_SERVICES U32 sys_pci_services;
 
-//Not reentrant--used to call BIOS32
-//Takes like, 250uS.
-_extern _FAR_CALL32 Bool FarCall32(U0 (*fp_addr)());
+_extern _FAR_CALL32 Bool FarCall32(U0 (*fp_addr)()); //Not reentrant used to call BIOS32. Takes 250uS.
 
 U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
-{
+{//Read U8 in PCI configspace at bus,dev,fun,reg.
   I64 result;
   PUSHFD
   CLI
@@ -190,7 +185,7 @@ U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
 }
 
 U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
-{
+{//Read U16 in PCI configspace at bus,dev,fun,reg.
   I64 result;
   PUSHFD
   CLI
@@ -209,7 +204,7 @@ U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
 }
 
 U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
-{
+{//Read U32 in PCI configspace at bus,dev,fun,reg.
   I64 result;
   PUSHFD
   CLI
@@ -228,7 +223,7 @@ U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
 }
 
 U0 PCIWriteU8(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
-{
+{//Write U8 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -243,7 +238,7 @@ U0 PCIWriteU8(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 }
 
 U0 PCIWriteU16(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
-{
+{//Write U16 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -258,7 +253,7 @@ U0 PCIWriteU16(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 }
 
 U0 PCIWriteU32(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
-{
+{//Write U32 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -273,11 +268,13 @@ U0 PCIWriteU32(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 }
 
 I64 PCIClassFind(I64 class_code,I64 n)
-{
-//class_code is low three bytes
-//n is index starting at zero
-//Returns: -1 not found
-//	  else bus,dev,fun.
+{/*Find bus,dev,fun of Nth class_code dev.
+
+class_code is low three bytes
+n is index starting at zero
+Return: -1 not found
+	else bus,dev,fun.
+*/
   I64 result;
   PUSHFD
   CLI

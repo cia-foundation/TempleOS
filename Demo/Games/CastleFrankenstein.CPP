@@ -1,5 +1,4 @@
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
 AcctRegSetDftEntry("TempleOS/CastleFrankenstein","F64 best_score=9999;\n");
 AcctRegExeBranch("TempleOS/CastleFrankenstein");
@@ -27,9 +26,7 @@ $SP,"<1>",BI=1$
 
 
 
-
 #define MONSTER_SCALE	2.0
-
 
 		     $SP,"<2>",BI=2$
  
@@ -78,10 +75,7 @@ $SP,"<1>",BI=1$
 
 
 
-
 		       $SP,"<6>",BI=6$
-
-
 
 
 
@@ -104,7 +98,7 @@ F64 man_é;
 
 F64 t0,tf;
 
-#define NUM_MONSTERS	16
+#define NUM_MONSTERS	10
 I64 monsters_left;
 class Monster
 {
@@ -136,7 +130,7 @@ Bool LOSPlot(U8 *,I64 x,I64 y,I64)
 }
 
 Bool LOS(I64 x1,I64 y1,I64 x2,I64 y2)
-{ //Line of sight
+{//Line of sight
   return Line(NULL,x1*LOS_SCALE/SCREEN_SCALE,y1*LOS_SCALE/SCREEN_SCALE,0,
 	       x2*LOS_SCALE/SCREEN_SCALE,y2*LOS_SCALE/SCREEN_SCALE,0,&LOSPlot);
 }
@@ -357,7 +351,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->color=LTCYAN;
   GrPlot3(dc,2*(man_xx/SCREEN_SCALE),2*(map_height-1-man_yy/SCREEN_SCALE),0);
 
-
   if (tf) {
     dc->color=LTRED;
     if (Blink)
@@ -401,14 +394,13 @@ U0 Fire()
   }
 }
 
-
 U0 Init()
 {
   I64 i,x,y;
   I64 min_map_x,max_map_x,min_map_y,max_map_y;
   CDC *dc;
   DocClear;
-  "$$BG,BLACK$$"; NewLine(TEXT_ROWS/2);
+  "$$BG,BLACK$$%h*c",TEXT_ROWS/2,'\n';
 
   SpriteExtents($IB,"<1>",BI=1$,&min_map_x,&max_map_x,&min_map_y,&max_map_y);
   map_width =(max_map_x-min_map_x+1)/MAP_SCALE+2;
@@ -482,7 +474,7 @@ U0 CleanUp()
 }
 
 U0 SongTask(I64)
-{ //Song by Terry A. Davis
+{//Song by Terry A. Davis
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
@@ -531,7 +523,7 @@ U0 CastleFrankenstein()
   "Play {"
   "  Restart(,'\n');"
   "  Fwd(,,SC_CURSOR_UP);"
-  "  Backward(,,SC_CURSOR_DOWN);"
+  "  Bwd(,,SC_CURSOR_DOWN);"
   "  Left(,,SC_CURSOR_LEFT);"
   "  Right(,,SC_CURSOR_RIGHT);"
   "  Fire(,CH_SPACE);"

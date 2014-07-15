@@ -6,3 +6,5 @@
 #include "HOME/Adam3cKeyPlugIns"
 #include "HOME/Adam3dWrappers"
 #include "HOME/Adam3eSys"
+
+#help_index ""

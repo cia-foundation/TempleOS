@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Cut Corners"$
 $FG$
-There are a few places where I cut corners in the interest of not junking-up code.  This is part of the TempleOS mentality.  I try not to let, often stupid, legacy compatibility issues enter and junk-up TempleOS.
+There are a few places where I cut corners in the interest of not junking-up code.  This is part of the TempleOS mentality.  I try not to let stupid legacy compatibility issues enter and junk-up TempleOS.
 
 * I made my type-casting operator post-fix because it makes the compiler way cleaner.
 

@@ -17,7 +17,7 @@ I64 RedSeaFSChkDskLst(CDirEntry *tempde1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
   I64 i,j,errs=0;
   while (tempde1) {
     tempde2=tempde1->next;
-    if (tempde1->attr & _ATTR_DIR) {
+    if (tempde1->attr & RS_ATTR_DIR) {
       if (tempde1->sub)
 	errs+=RedSeaFSChkDskLst(tempde1->sub,bits,bits2,size,bpc);
     }
@@ -50,7 +50,7 @@ I64 RedSeaFSChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 {
   I64 i,j,bpc,size,errs=0;
   CPrt *p=Drv2Prt(drv_let),*old_prt=Fs->cur_prt;
-  U8 *files_find_mask=MPrint("%c:/*",Prt2Drv(p)),
+  U8 *files_find_mask=MStrPrint("%c:/*",Prt2Drv(p)),
      *old_dir=StrNew(Fs->cur_dir),
      *bits,*bits2;
   CDirEntry *ptr,*ptr2;
@@ -110,7 +110,7 @@ I64 FAT32ChkDskLst(CPrt *p,CDirEntry *tempde1,U8 *bits,U32 *bits2,I64 size,I64 b
   I64 i,c,errs=0;
   while (tempde1) {
     tempde2=tempde1->next;
-    if (tempde1->attr & _ATTR_DIR) {
+    if (tempde1->attr & RS_ATTR_DIR) {
       if (tempde1->sub)
 	errs+=FAT32ChkDskLst(p,tempde1->sub,bits,bits2,size,bpc);
     }
@@ -134,7 +134,7 @@ I64 FAT32ChkDskLst(CPrt *p,CDirEntry *tempde1,U8 *bits,U32 *bits2,I64 size,I64 b
       c=ClusterNumNext(p,c);
       i++;
     }
-    if (!(tempde1->attr & _ATTR_DIR)) {
+    if (!(tempde1->attr & RS_ATTR_DIR)) {
       i*=bpc;
       if (tempde1->size>i) {
 	PrintErr("Allocated File Too Short:%s\n",tempde1->full_name);
@@ -155,7 +155,7 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 {
   I64 i,bpc,size,c,errs=0;
   CPrt *p=Drv2Prt(drv_let),*old_prt=Fs->cur_prt;
-  U8 *files_find_mask=MPrint("%c:/*",Prt2Drv(p)),
+  U8 *files_find_mask=MStrPrint("%c:/*",Prt2Drv(p)),
      *old_dir=StrNew(Fs->cur_dir),
      *bits;
   U32 *bits2;
@@ -206,7 +206,8 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 }
 
 public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
-{ //Check for allocation errors.
+{//Check disk for allocation errors and, optionally, fix.
+//You probably want to reformat and reinstall.
   I64 errs=0;
   CPrt *p=Drv2Prt(drv_let);
   switch (p->type) {
@@ -228,5 +229,3 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
   }
   return errs;
 }
-
-#help_index ""

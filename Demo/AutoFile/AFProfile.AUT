@@ -5,7 +5,7 @@ See $LK,"AutoFile",A="FF:::/Doc/Glossary.TXT,AutoFile"$ in the glossary for more
 
 Profiling does not $UL,1$require$UL,0$ autofiles.
 */
-"$$RED$$ProfAll;$$FG$$\n";
+"$$RED$$Prof;$$FG$$\n";
 "$$RED$$//Collecting Data$$FG$$";
 PressAKey;
 "\n$$RED$$ProfRep;$$FG$$\n";

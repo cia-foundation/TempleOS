@@ -44,7 +44,7 @@ _extern _TAKE_EXCEPT U0 TakeExcept();
 _extern _SAVE_EXCEPT_REGS U0 SaveExceptRegs(CExcept *t);
 
 U0 PutExcept(Bool catch_it=TRUE)
-{
+{//Print exception msg and catch exception.
   "Except:%c:%P:%P\n",Fs->except_ch,Fs->except_caller1,Fs->except_caller2;
   Fs->catch_except=catch_it;
 }
@@ -80,7 +80,8 @@ U0 SysUntry()
 }
 
 U0 throw(I64 ch=0,Bool no_log=FALSE)
-{
+{//ch can be up to 8 chars like $LK,"PutChars",A="MN:PutChars"$().
+//In the catcher, fetch ch from Fs->except_ch.
   CExcept *tempt=Fs->last_except;
   Bool was_raw;
   Fs->except_ch=ch;
@@ -111,7 +112,7 @@ U0 SysThrowBreak()
 {
   if (Bt(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC))
     Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0x20100000201);
-  else { //TODO: Might want lock
+  else {//TODO: Might want lock
     Fs->wake_jiffy=0;
     TaskRstAwaitingMsg;
     PrtsRelease();
@@ -121,9 +122,8 @@ U0 SysThrowBreak()
   }
 }
 
-//This can be used to exit an app, but not a task.
 U0 ThrowBreak(CTask *task=NULL)
-{
+{//Can be used to exit an app, but not a task.
   if (task && task!=Fs) {
     if (!TaskValidate(task)) return;
     //TODO: Might want lock
@@ -134,13 +134,13 @@ U0 ThrowBreak(CTask *task=NULL)
 }
 
 Bool BreakLock(CTask *task=NULL)
-{ //This disables CTRL-ALT-C
+{//Disables <CTRL-ALT-c>.
   if (!task) task=Fs;
   return !LBts(&task->task_flags,TASKf_BREAK_LOCKED);
 }
 
 Bool BreakUnlock(CTask *task=NULL)
-{
+{//Reenables <CTRL-ALT-c> and issues any pending breaks.
   Bool result;
   if (!task) task=Fs;
   result=LBtr(&task->task_flags,TASKf_BREAK_LOCKED);

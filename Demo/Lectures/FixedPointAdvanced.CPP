@@ -1,5 +1,4 @@
-/*
-"Fixed point" means you use integers
+/*"Fixed point" means you use integers
 that are scaled by a value.  A common
 example would be using number of pennies
 instead of dollars with a float.
@@ -109,7 +108,6 @@ U0 Main()
   "Float Sum             :%X\n",ToI64(fsum);
   "$$RED$$Float Cycles          :%10.5f$$FG$$\n",
     ToF64(test_time)/SAMPLE_SIZE;
-
 
 //Measure fixed point arithmetic
   d2=Sin(1.0)*0x100000000;

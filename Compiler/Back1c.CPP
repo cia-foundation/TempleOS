@@ -204,7 +204,6 @@ U0 ICAssign(CIntermediateCode *tempi,I64 ip)
   }
 }
 
-
 U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,I64 op,I64 op_imm,I64 is,U8 *buf,I64 ip2)
 {
   I64 i,t,r1,r2,d1,d2,t1,t2;
@@ -325,7 +324,7 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,I64 op,I64 op_imm,I64 is,U8 *buf,I
     } else
       t=t1;
     i=ICModr1(r2,t,r1,d1);
-    SwapU64(&a1,&a2);
+    SwapI64(&a1,&a2);
   } else {
     if (a1->type&TY_MASK==TY_IMM && a1->disp<32) {
       if (op==0xA30F && a1->disp<8) {
@@ -338,7 +337,7 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,I64 op,I64 op_imm,I64 is,U8 *buf,I
     i=ICModr1(r1,t,r2,d2);
   }
   ICRex(tempi,i.u8[1]);
-  if (op_imm==0xF6) { //TEST
+  if (op_imm==0xF6) {//TEST
     ICU16(tempi,i.u8[2]<<8+op_imm);
     ICModr2(tempi,i,a2->disp,ip2+5);
     ICU8(tempi,1<<a1->disp);
@@ -664,7 +663,7 @@ U0 ICSwap(CIntermediateCode *tempi,I64 ip2)
       ICMov(tempi,TY_DISP+RT_U32,r2,0,TY_REG+RT_I64,REG_RCX,0,ip2);
       ICMov(tempi,TY_DISP+RT_U32,r1,0,TY_REG+RT_I64,REG_RDX,0,ip2);
       break;
-    case IC_SWAP_U64:
+    case IC_SWAP_I64:
       ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,TY_DISP+RT_U64,r1,0,ip2);
       ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,TY_DISP+RT_U64,r2,0,ip2);
       ICMov(tempi,TY_DISP+RT_U64,r2,0,TY_REG+RT_I64,REG_RCX,0,ip2);

@@ -30,23 +30,21 @@ U0 AsmUnresolvedAdd(CLex *lx,U8 *ex,I64 type,I64 ip,I64 rel_ip,
 
 U0 AsmLineLst(CLex *lx)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CLexFile *tempf=lx->cur_lfn;
   CDocEntry *doc_e=tempf->line_start,*doc_e2;
   if (a->lst && a->last_lfn==tempf && doc_e) {
     if (doc_e2=a->last_line_lsted) {
       if (tempf->flags& LFSF_DOC) {
 	while (doc_e2->y<doc_e->y) {
-	  Spaces(24-a->display_col);
+	  "%h*c%08X ",24-a->display_col,CH_SPACE,a->last_ip;
 	  a->display_col=0;
-	  "%08X ",a->last_ip;
 	  doc_e2=LexPutLine(lx,doc_e2);
 	}
       } else {
 	while (*doc_e2(U8 *) && doc_e2!=doc_e) {
-	  Spaces(24-a->display_col);
+	  "%h*c%08X ",24-a->display_col,CH_SPACE,a->last_ip;
 	  a->display_col=0;
-	  "%08X ",a->last_ip;
 	  doc_e2=LexPutLine(lx,doc_e2);
 	}
       }
@@ -62,7 +60,7 @@ U0 AsmLineLst(CLex *lx)
 
 U0 AsmStoreCodeU8(CLex *lx,U8 b)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64 i=a->ip>>ASM_CODE_BLK_BITS;
   CAsmCodeBlk *tempc=a->cb;
   while (i--)
@@ -79,7 +77,7 @@ U0 AsmStoreCodeU8(CLex *lx,U8 b)
   tempc->body[a->ip++ & (ASM_CODE_BLK_SIZE-1)]=b;
   if (a->lst) {
     if (a->display_col>=24) {
-      NewLine;
+      '\n';
       a->display_col=0;
     }
     "%02X ",b;
@@ -91,7 +89,7 @@ U0 AsmStoreCodeU8(CLex *lx,U8 b)
 
 U0 AsmStoreCodeU32(CLex *lx,U32 d)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64	i=a->ip>>ASM_CODE_BLK_BITS,
 	j=(a->ip+sizeof(U32))>>ASM_CODE_BLK_BITS;
   U32 *_d;
@@ -117,7 +115,7 @@ U0 AsmStoreCodeU32(CLex *lx,U32 d)
     a->ip+=sizeof(U32);
     if (a->lst) {
       if (a->display_col>=24) {
-	NewLine;
+	'\n';
 	a->display_col=0;
       }
       "%08X ",d;
@@ -130,7 +128,7 @@ U0 AsmStoreCodeU32(CLex *lx,U32 d)
 
 U0 AsmStoreCodeU64(CLex *lx,U64 q)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64	i=a->ip>>ASM_CODE_BLK_BITS,
 	j=(a->ip+sizeof(I64))>>ASM_CODE_BLK_BITS,
 	*_q;
@@ -156,7 +154,7 @@ U0 AsmStoreCodeU64(CLex *lx,U64 q)
     a->ip+=sizeof(I64);
     if (a->lst) {
       if (a->display_col>=24) {
-	NewLine;
+	'\n';
 	a->display_col=0;
       }
       "%016X ",q;
@@ -169,7 +167,7 @@ U0 AsmStoreCodeU64(CLex *lx,U64 q)
 
 U0 AsmStoreCodeU8At(CLex *lx,I64 ip,...)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CAsmCodeBlk *tempc;
   I64 i,j;
   for (j=0;j<argc;j++) {
@@ -226,7 +224,7 @@ U0 AsmResolve(CLex *lx,CAsmUnresolvedRef *tempu,U8 *label,Bool undefined)
       }
       templu=templu->next; //Technically, more than one won't work.
     }
-  } else if (!(tempu->type & 1))  { //Rel?
+  } else if (!(tempu->type & 1))  {//Rel?
     r-=tempu->rel_ip;
     if (tempu->type==EIT_REL_I8 && !(MIN_I8<=r<=MAX_I8) ||
 	  tempu->type==EIT_REL_I16 && !(MIN_I16<=r<=MAX_I16)) {
@@ -251,7 +249,7 @@ U0 AsmResolve(CLex *lx,CAsmUnresolvedRef *tempu,U8 *label,Bool undefined)
 
 U0 AsmLocalsResolve(CLex *lx)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CAsmUnresolvedRef *tempu=a->local_unresolved,*tempu1;
   CLexUndef *templu;
   Bool undefined;
@@ -285,7 +283,7 @@ U0 AsmLocalsResolve(CLex *lx)
 
 U0 AsmGlblsResolve(CLex *lx,CExe *tempx)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CHashFun *tempf;
   CAsmUnresolvedRef *tempu=a->glbl_unresolved,*tempu1;
   I64 j;
@@ -374,7 +372,7 @@ U0 AsmGlblsResolve(CLex *lx,CExe *tempx)
       }
       if (tempex->type & HTF_EXPORT) {
 	tempe=CAlloc(sizeof(CExeImportExport));
-	tempe->type=EIT_REL_EXPORT;
+	tempe->type=EIT_REL32_EXPORT;
 	if (tempex->type & HTT_FUN)
 	  tempe->ip=tempf->executable_addr;
 	else if (tempex->type & HTT_GLBL_VAR)
@@ -477,7 +475,7 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
 	} else {
 	  if ((temph->type&HTG_TYPE_MASK==HTT_CLASS||
 	       temph->type&HTG_TYPE_MASK==HTT_INTERNAL_TYPE) &&
-	      (temph1=HashFind(lx->cur_str,asm_hash,HTT_ASM_KEYWORD)))
+	      (temph1=HashFind(lx->cur_str,cmp.asm_hash,HTT_ASM_KEYWORD)))
 	    temph=temph1;
 	  if (temph->type&HTG_TYPE_MASK==HTT_ASM_KEYWORD) {
 	    switch (temph->user_data0) {
@@ -547,7 +545,7 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
 	  arg->scale=lx->cur_i64;
 	  Lex(lx); //skip scale
 	  if (arg->reg2!=REG_NONE)
-	    SwapU64(&arg->reg1,&arg->reg2);
+	    SwapI64(&arg->reg1,&arg->reg2);
 	} else if (lx->token=='+') {
 	  Lex(lx); //skip '+'
 	} else {
@@ -568,10 +566,9 @@ U0 PrsAsmArg(CLex *lx,CAsmArg *arg)
   }
 }
 
-
 U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *_mask)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   if (arg->just_seg) {
     switch (arg->seg) {
       case 0: *_mask=1<<ARGT_ES|1<<ARGT_SREG; break;
@@ -616,9 +613,9 @@ U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *_mask)
       *_mask&=0x000FFF0000;
   } else {
     if (arg->imm_or_off_present)
-      *_mask&=0x000F00F0FE;
+      *_mask&=0x000F000FFE;
     else
-      *_mask&=0x3F0FFF0F00;
+      *_mask&=0x3F0FFFF000;
   }
   if (arg->seg!=REG_NONE)
     *_mask&=0x00FFFF0000;
@@ -627,31 +624,31 @@ U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *_mask)
       *_mask&=0x00FFFF0000;
     else if (arg->num.i<0) {
       if (arg->num.i>=MIN_I8)
-	*_mask&=0xF08E;
+	*_mask&=0x8FE;
       else if (arg->num.i>=MIN_I16)
-	*_mask&=0xE08E;
+	*_mask&=0x8EE;
       else if (arg->num.i>=MIN_I32)
-	*_mask&=0xC08E;
+	*_mask&=0x8CE;
       else
-	*_mask&=0x808E;
+	*_mask&=0x88E;
     } else {
       if (arg->num.i<=MAX_I8)
-	*_mask&=0xF0FE;
+	*_mask&=0xFFE;
       else if (arg->num.i<=MAX_U8)
-	*_mask&=0xE0FE;
+	*_mask&=0xFEE;
       else if (arg->num.i<=MAX_I16)
-	*_mask&=0xE0EE;
+	*_mask&=0xEEE;
       else if (arg->num.i<=MAX_U16)
-	*_mask&=0xC0EE;
+	*_mask&=0xECE;
       else if (arg->num.i<=MAX_I32)
-	*_mask&=0xC0CE;
+	*_mask&=0xCCE;
       else if (arg->num.i<=MAX_U32)
-	*_mask&=0x80CE;
+	*_mask&=0xC8E;
       else
-	*_mask&=0x808E;
+	*_mask&=0x88E;
     }
   } else {
-    *_mask&=  0x3F00FF0F00;
+    *_mask&=  0x3F00FFF000;
     if (!arg->indirect) //M8-M64
       *_mask&=0xFFFF0FFFFF;
   }
@@ -665,7 +662,7 @@ U0 AsmMakeArgMask(CLex *lx,CAsmArg *arg,I64 *_mask)
 
 Bool AsmStoreNum(CLex *lx,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64 i;
   CExeAbsAddr *tempa;
 
@@ -783,7 +780,7 @@ U8 asm_seg_prefixes[6]={0x26,0x2E,0x36,0x3E,0x64,0x65};
 
 Bool PrsAsmInstruction(CLex *lx,CHashOpcode *tempo,I64 argcnt)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64 i,j,a1,a2,om,seg,arg1mask,arg2mask;
   CAsmArg *tempa1,*tempa2;
   Bool ModrM_complete,U8_avail=FALSE,found_second_possible=FALSE;
@@ -862,7 +859,7 @@ Bool PrsAsmInstruction(CLex *lx,CHashOpcode *tempo,I64 argcnt)
 	      cur.REX|=1;
 	    if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 	      cur.has_REX=TRUE;
-	  } else { //SV_I_REG
+	  } else {//SV_I_REG
 	    if (tempa1->fstk!=REG_NONE)
 	      cur.last_opcode_U8+=tempa1->fstk;
 	  }
@@ -977,7 +974,7 @@ Bool PrsAsmInstruction(CLex *lx,CHashOpcode *tempo,I64 argcnt)
 	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
 	    }
-	  } else { //SV_I_REG
+	  } else {//SV_I_REG
 	    if (tempa1->fstk!=REG_NONE)
 	      cur.last_opcode_U8|=tempa1->fstk;
 	    if (tempa2->fstk!=REG_NONE)
@@ -1188,7 +1185,6 @@ Bool PrsAsmInstruction(CLex *lx,CHashOpcode *tempo,I64 argcnt)
   LexExcept(lx,"invalid instruction at ");
 }
 
-
 U0 PrsAsmDefine(CLex *lx,I64 U8_cnt)
 {
   Bool is_dup;
@@ -1205,7 +1201,7 @@ U0 PrsAsmDefine(CLex *lx,I64 U8_cnt)
       i=lx->cur_str_len-1;
       while (i--)
 	AsmStoreCodeU8(lx,*ptr++);
-    Lex(lx);	//Skip Str
+      Lex(lx);	//Skip Str
     } else {
       is_dup=FALSE;
       lx->abs_cnts=0;
@@ -1280,7 +1276,7 @@ U0 PrsBinFile(CLex *lx)
 
 U0 PrsAsmBlk(CLex *lx,I64 cmp_flags)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64 i,j,k,argcnt,
 	old_flags=lx->flags & LF_ASM_EXPRESSIONS;
   CHashOpcode *tempo;
@@ -1335,14 +1331,16 @@ U0 PrsAsmBlk(CLex *lx,I64 cmp_flags)
 	    if (lx->htc.local_var_lst)
 	      LexExcept(lx,"ALIGN not allowed in fun asm blk ");
 	    i=AsmLexExpression(lx);
-	    if (Bsf(i)!=Bsr(i))
+	    j=Bsf(i);
+	    if (!i || j!=Bsr(i))
 	      LexExcept(lx,"ALIGN must be power of two at ");
 	    if (!(lx->flags&LF_AOT_COMPILE) && i>8)
 	      LexExcept(lx,"In JIT mode, max ALIGN is 8 ");
-	    if (i>a->max_align) a->max_align=i;
+	    if (j>a->max_align_bits) a->max_align_bits=j;
 	    i=CeilU64(a->ip,i);
-	    if (lx->token==',')
-	      Lex(lx);
+	    if (lx->token!=',')
+	      LexExcept(lx,"expecting ',' at ");
+	    Lex(lx);
 	    k=AsmLexExpression(lx);
 	    for (j=a->ip;j<i;j++)
 	      AsmStoreCodeU8(lx,k);
@@ -1477,6 +1475,7 @@ U0 PrsAsmBlk(CLex *lx,I64 cmp_flags)
       break;
   }
   AsmLocalsResolve(lx);
+  a->lst=FALSE;
   lx->flags&=lx->flags&~LF_ASM_EXPRESSIONS|old_flags;
 }
 

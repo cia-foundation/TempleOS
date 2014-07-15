@@ -1,28 +1,26 @@
-#help_index "File/Program Routines/Utils"
-
-I64 DirTreeFlattenSize(CDirEntry *tempde)
+#help_index "File/Internal"
+I64 DirTreeSerializeSize(CDirEntry *tempde)
 {
   I64 result=0;
   while (tempde) {
     result+=CDIR_SIZE+1;
-    if (tempde->attr & _ATTR_DIR)
-      result+=DirTreeFlattenSize(tempde->sub);
+    if (tempde->attr & RS_ATTR_DIR)
+      result+=DirTreeSerializeSize(tempde->sub);
     tempde=tempde->next;
   }
   return result+1;
 }
-I64 DirTreeFlattenFill(CDirEntry *tempde,U8 *dst)
+I64 DirTreeSerializeFill(CDirEntry *tempde,U8 *dst)
 {
   I64 result=0,i;
   while (tempde) {
     *dst++=1;
     result++;
-    i=CDIR_SIZE;
-    MemCpy(dst,&tempde->start,i);
-    dst+=i;
-    result+=i;
-    if (tempde->attr & _ATTR_DIR) {
-      i=DirTreeFlattenFill(tempde->sub,dst);
+    MemCpy(dst,&tempde->start,CDIR_SIZE);
+    dst+=CDIR_SIZE;
+    result+=CDIR_SIZE;
+    if (tempde->attr & RS_ATTR_DIR) {
+      i=DirTreeSerializeFill(tempde->sub,dst);
       dst+=i;
       result+=i;
     }
@@ -31,36 +29,34 @@ I64 DirTreeFlattenFill(CDirEntry *tempde,U8 *dst)
   *dst=0;
   return result+1;
 }
-public U8 *DirTreeFlatten(CDirEntry *tempde,I64 *_size=NULL)
-{
-  I64 size=DirTreeFlattenSize(tempde);
+public U8 *DirTreeSerialize(CDirEntry *tempde,I64 *_size=NULL)
+{//Serialize tree returned from $LK,"FilesFind",A="MN:FilesFind"$() into a one contiguous U8 array.
+  I64 size=DirTreeSerializeSize(tempde);
   U8 *buf=MAlloc(size);
-  DirTreeFlattenFill(tempde,buf);
+  DirTreeSerializeFill(tempde,buf);
   if (_size) *_size=size;
   return buf;
 }
 
-U8 *DirTreeDoUnflatten(U8 *src,CDirEntry **tempde)
+U8 *DirTreeUnserialize2(U8 *src,CDirEntry **tempde)
 {
-  I64 i;
   CDirEntry *tempde1;
   if (*src++) {
     tempde1=CAlloc(sizeof(CDirEntry));
     *tempde=tempde1;
-    i=CDIR_SIZE;
-    MemCpy(&tempde1->start,src,i);
-    src+=i;
-    if (tempde1->attr & _ATTR_DIR)
-      src=DirTreeDoUnflatten(src,&tempde1->sub);
-    src=DirTreeDoUnflatten(src,&tempde1->next);
+    MemCpy(&tempde1->start,src,CDIR_SIZE);
+    src+=CDIR_SIZE;
+    if (tempde1->attr & RS_ATTR_DIR)
+      src=DirTreeUnserialize2(src,&tempde1->sub);
+    src=DirTreeUnserialize2(src,&tempde1->next);
   } else
     *tempde=NULL;
   return src;
 }
-public CDirEntry *DirTreeUnflatten(U8 *src)
-{
+public CDirEntry *DirTreeUnserialize(U8 *src)
+{//Unserialize tree to make it like a tree returned from $LK,"FilesFind",A="MN:FilesFind"$().
   CDirEntry *tempde=NULL;
-  DirTreeDoUnflatten(src,&tempde);
+  DirTreeUnserialize2(src,&tempde);
   return tempde;
 }
 
@@ -76,13 +72,13 @@ class CPlannedPrt
   Bool pri;
 };
 
-//This is available to assist in writing scripts.
+//Available to assist in writing scripts.
 I64 prt_dsk_dsk_size;
 
 public U0 PrtDsk(U8 drv_let=0)
-//Partition Disk containing partition drv_let.
-//or drv_let=0 means add new drv that is not already mounted.
-{
+{//Partition the disk containing partition drv_let.
+//drv_let=0 means add new drive that
+//is not already mounted.
   CBlkDev *bdev;
   CPlannedPrt root,*temppp;
   CMasterBoot mbr;
@@ -141,7 +137,7 @@ public U0 PrtDsk(U8 drv_let=0)
       }
       "Blocks Remaining:%d (0x%X)\n",
 	remaining-PRT_HEADER,remaining-PRT_HEADER;
-      temppp->size=CeilU64(PmtI64("Size in Blocks  :",
+      temppp->size=CeilU64(GetI64("Size in Blocks  :",
 	remaining-PRT_HEADER)+PRT_HEADER,ROUND_PRT_TO);
     } while (!(ROUND_PRT_TO<=temppp->size<=FloorU64(remaining,ROUND_PRT_TO)));
     QueIns(temppp,root.last);
@@ -237,7 +233,6 @@ pd_done:
   }
 }
 
-
 #help_index "Info;File/Cmd Line (Typically);Cmd Line (Typically)"
 
 U0 RedSeaFSDrvView(U8 drv_let=0)
@@ -267,9 +262,9 @@ U0 RedSeaFSDrvView(U8 drv_let=0)
 	lohi=i*s;
 	c1=lohi/l;
 	if (Bt(bitmap,c1))
-	  dc->color=ROP_XOR+BLUE^COLOR_TRANSPARENT;
+	  dc->color=ROP_XOR+BLUE^TRANSPARENT;
 	else
-	  dc->color=ROP_XOR+WHITE^COLOR_TRANSPARENT;
+	  dc->color=ROP_XOR+WHITE^TRANSPARENT;
 	GrPlot(dc,x,y);
 	i++;
       }
@@ -309,9 +304,9 @@ U0 FAT32DrvView(U8 drv_let=0)
 	lohi=i*s;
 	c1=lohi/l;
 	if (bitmap[c1])
-	  dc->color=ROP_XOR+BLUE^COLOR_TRANSPARENT;
+	  dc->color=ROP_XOR+BLUE^TRANSPARENT;
 	else
-	  dc->color=ROP_XOR+WHITE^COLOR_TRANSPARENT;
+	  dc->color=ROP_XOR+WHITE^TRANSPARENT;
 	GrPlot(dc,x,y);
 	i++;
       }
@@ -326,7 +321,7 @@ U0 FAT32DrvView(U8 drv_let=0)
   DCDel(dc);
 }
 public U0 DrvView(U8 drv_let=0)
-{
+{//Drive view. Graph the allocation map's fragmentation.
   CPrt *p=Drv2Prt(drv_let),*p_old=Fs->cur_prt;
   Drv(drv_let);
   switch (p->type) {
@@ -343,7 +338,7 @@ public U0 DrvView(U8 drv_let=0)
 }
 
 public U0 DskView(U8 drv_let=0)
-{
+{//Disk view. Pie chart of partition sizes.
   I64 i,j,
     h=Fs->pix_width,
     v=Fs->pix_height,
@@ -366,7 +361,7 @@ public U0 DskView(U8 drv_let=0)
 
   j=1;
   for (i=0;i<NUM_PRTS;i++) {
-    p=&sys_prts[i];
+    p=&dsk.prts[i];
     if (bdev==p->bdev && p->type) {
       sect_start=-(p->offset*2*ã/(bdev->max_blk+1));
       sect_end	=-((p->offset+p->size)*2*ã/(bdev->max_blk+1));
@@ -394,12 +389,45 @@ public U0 DskView(U8 drv_let=0)
   DCDel(dc);
 }
 
-#help_index "Info;File/Cmd Line (Typically);Cmd Line (Typically);Install"
-public U0 BlkDevRep()
-{
-  I64 i;
-  for (i=0;i<NUM_BLKDEVS;i++)
-    if (sys_blkdevs[i].bd_signature==BD_SIGNATURE_VAL)
-      ClassRep(&sys_blkdevs[i]);
+public I64 Zip(U8 *files_find_mask="*",U8 *fu_flags=NULL)
+{//Compress files by moving to .Z filename.
+  U8 *st;
+  CDirEntry *tempde,*tempde1;
+  I64 result=0,fuf_flags=0;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    if (!IsDotZ(tempde->full_name)) {
+      st=MStrPrint("%s.Z",tempde->full_name);
+      result+=Move(tempde->full_name,st);
+      Free(st);
+    }
+    tempde=tempde->next;
+  }
+  DirTreeDel(tempde1);
+  return result;
 }
-#help_index ""
+
+public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
+{//Uncompress files by moving to not .Z filename.
+//You don't have to do this for normal operation.
+//It automatically unzips ".Z" files.
+  U8 *st;
+  CDirEntry *tempde,*tempde1;
+  I64 result=0,fuf_flags=0;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  while (tempde) {
+    if (IsDotZ(tempde->full_name)) {
+      st=StrNew(tempde->full_name);
+      StrLastRem(st,".");
+      result+=Move(tempde->full_name,st);
+      Free(st);
+    }
+    tempde=tempde->next;
+  }
+  DirTreeDel(tempde1);
+  return result;
+}

@@ -27,13 +27,13 @@ U0 LogScrambleFile(U8 *name)
 
       for (i=3;i>=0;i--) {
 	StrFirstRem(st,".",st2);
-	num.u8[i]=key[i][A2I64(st2)&255];
+	num.u8[i]=key[i][Str2I64(st2)&255];
       }
  
       Free(st);
       Free(st2);
 
-      st=MPrint("%d.%d.%d.%d %s",num.u8[3],num.u8[2],num.u8[1],num.u8[0],doc_e->tag);
+      st=MStrPrint("%d.%d.%d.%d %s",num.u8[3],num.u8[2],num.u8[1],num.u8[0],doc_e->tag);
       Free(doc_e->tag);
       doc_e->tag=st;
     }
@@ -50,7 +50,7 @@ U0 WebLogScramble(U8 *files_find_mask)
     LogScrambleFile(tempde->full_name);
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
 
 //Danger scrambles all log files in the /TempleOS tree

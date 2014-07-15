@@ -1,6 +1,4 @@
-/*Intermediate Code
-To
-Machine Code
+/*Intermediate Code to Machine Code
 
 RAX,RBX,RCX and RDX can be clobbered by
 each intermediate code's output code.
@@ -14,7 +12,6 @@ Internal calculations take place on
 64-bit vals, so anything which has
 found it's way into a reg has been
 sign or zero extended to 64-bits.
-
 */
 
 U0 ICU8(CIntermediateCode *tempi,U8 b)
@@ -141,11 +138,10 @@ extern U0 ICMov(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,I64 t2,I64 r2,I64 
 #define MDR_RIP_REL			7
 
 I64 ICModr1(I64 r,I64 t2,I64 r2,I64 d2)
-{
-  //result.u8[0] is type
-  //result.u8[1] is REX
-  //result.u8[2] is ModR
-  //result.u8[3] is SIB
+{//result.u8[0] is type
+ //result.u8[1] is REX
+ //result.u8[2] is ModR
+ //result.u8[3] is SIB
   I64 result=0;
   if (t2&TY_MASK>TY_RIP_DISP32) {
     "Callers:%P;%P\n",Caller,Caller(2);
@@ -422,7 +418,7 @@ U0 ICTest(CIntermediateCode *tempi,I64 r)
 }
 
 I64 ICBuiltInFloatConst(F64 d)
-{ //Returns 2-byte opcode for FLD const or zero
+{//Returns 2-byte opcode for FLD const or zero
   if (!d)
     return 0xEED9;
   else if (d==1.0)
@@ -442,7 +438,6 @@ I64 ICBuiltInFloatConst(F64 d)
   else
     return 0;
 }
-
 
 U0 ICMov(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,I64 t2,I64 r2,I64 d2,I64 ip)
 {

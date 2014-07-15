@@ -1,8 +1,8 @@
 Bool MapDrv(U8 drv_let,CPrt *p)
-{
+{//Make drive letter map to another.
   drv_let=ToUpper(drv_let);
   if ('A'<=drv_let<='Z') {
-    drv_to_prt[drv_let-'A']=p;
+    dsk.drv_to_prt[drv_let-'A']=p;
     p->drv_let=drv_let;
     return TRUE;
   } else
@@ -10,7 +10,7 @@ Bool MapDrv(U8 drv_let,CPrt *p)
 }
 
 Bool Drv(U8 drv_let)
-{
+{//Set drive.  You can set drive with $LK,"Cd",A="MN:Cd"$() as well.
   CPrt *p=Drv2Prt(drv_let);
   CBlkDev *bdev=p->bdev;
   BlkDevChk(bdev);
@@ -35,7 +35,7 @@ Bool Drv(U8 drv_let)
 }
 
 Bool Cd(U8 *dirname,Bool make_dirs=FALSE)
-{//Optionally, will create the directories if they don't exist.
+{//Change directory. Optionally, make directories, too.
   I64 maxlen,cur_dir_cluster=0;
   U8 *chg_to_buf,*new_cur_dir,*buf;
   CPrt *p;
@@ -114,7 +114,7 @@ Bool Cd(U8 *dirname,Bool make_dirs=FALSE)
 }
 
 U0 FileAccessDel(CFileAccess *fa)
-{
+{//Change back to old cur_dir and prt.
   CBlkDev *bdev;
   if (!fa) return;
   bdev=fa->old_prt->bdev;
@@ -134,7 +134,7 @@ U0 FileAccessDel(CFileAccess *fa)
 }
 
 CFileAccess *FileAccessNew(U8 *_mask,Bool make_mask=FALSE,Bool make_dirs=FALSE,Bool no_mask=FALSE)
-{
+{//Save cur_dir and prt. Change to new dir.
   Bool valid=TRUE,old_silent;
   U8 *buf,*mask,*temp_mask;
   CFileAccess *fa=CAlloc(sizeof(CFileAccess));
@@ -190,22 +190,13 @@ CFileAccess *FileAccessNew(U8 *_mask,Bool make_mask=FALSE,Bool make_dirs=FALSE,B
 }
 
 CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0)
-{
-/*
-Flags:
-  $LK,"FUF_RECURSE",A="MN:FUF_RECURSE"$		+r Recurse
-  $LK,"FUF_SINGLE",A="MN:FUF_SINGLE"$		+s Single File (Optimization for one file in mask.)
-  $LK,"FUF_FLATTEN_TREE",A="MN:FUF_FLATTEN_TREE"$	+f $BK,1$use with '+F'$BK,0$.  Just use +F, probably.
-  $LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$		+D just directories
-  $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$	+F just files (Flattens trees)
-  $LK,"FUF_CLUSTER_ORDER",A="MN:FUF_CLUSTER_ORDER"$	+O sort by cluster (move head one direction)
-  $LK,"FUF_JUST_TXT",A="MN:FUF_JUST_TXT"$	+T just text files	: $LK,"FILEMASK_TXT",A="MN:FILEMASK_TXT"$
-  $LK,"FUF_JUST_SRC",A="MN:FUF_JUST_SRC"$	+S just src files	: $LK,"FILEMASK_SRC",A="MN:FILEMASK_SRC"$
-  $LK,"FUF_JUST_AOT",A="MN:FUF_JUST_AOT"$	+A just aot files	: $LK,"FILEMASK_AOT",A="MN:FILEMASK_AOT"$
-  $LK,"FUF_JUST_JIT",A="MN:FUF_JUST_JIT"$	+J just jit files	: $LK,"FILEMASK_JIT",A="MN:FILEMASK_JIT"$
-  $LK,"FUF_JUST_GRA",A="MN:FUF_JUST_GRA"$	+G just graphic files	: $LK,"FILEMASK_GRA",A="MN:FILEMASK_GRA"$
+{/* See $LK,"::/Doc/FileUtils.TXT"$.
 
-See $LK,"ST_FILE_UTIL_FLAGS",A="MN:ST_FILE_UTIL_FLAGS"$ when used in calling program taking text flags.
+Find files and make a directory tree in memory.
+
+When done, you free with $LK,"DirEntryDel",A="MN:DirEntryDel"$(),$LK,"DirEntryDel2",A="MN:DirEntryDel2"$(),
+$LK,"DirTreeDel",A="MN:DirTreeDel"$() or $LK,"DirTreeDel2",A="MN:DirTreeDel2"$().
+
 */
   CDirEntry *result;
   CFileAccess *fa;
@@ -226,8 +217,8 @@ See $LK,"ST_FILE_UTIL_FLAGS",A="MN:ST_FILE_UTIL_FLAGS"$ when used in calling pro
 }
 
 Bool IsDir(U8 *dir_name)
-{
-  U8 *mask=MPrint("%s/*",dir_name);
+{//Is a str a valid, existing Dir?
+  U8 *mask=MStrPrint("%s/*",dir_name);
   Bool result,old_silent=Silent(ON);
   CFileAccess *fa;
   if (fa=FileAccessNew(mask)) {
@@ -241,7 +232,7 @@ Bool IsDir(U8 *dir_name)
 }
 
 I64 Dir(U8 *files_find_mask="*",Bool full=FALSE)
-{
+{//List directory.
   I64 result;
   CFileAccess *fa;
   if (fa=FileAccessNew(files_find_mask,TRUE)) {
@@ -252,9 +243,8 @@ I64 Dir(U8 *files_find_mask="*",Bool full=FALSE)
     return 0;
 }
 
-
 I64 Del(U8 *files_find_mask,Bool print_msg=TRUE)
-{
+{//Delete files.
   I64 result=0;
   CFileAccess *fa;
   if (fa=FileAccessNew(files_find_mask)) {
@@ -277,7 +267,7 @@ I64 Del(U8 *files_find_mask,Bool print_msg=TRUE)
 }
 
 U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
-{
+{//Read whole file from disk.
   CHashGeneric *temph;
   U8 *absname,*altname,*curname,*result=NULL;
   I64 i,size=0,attr=0;
@@ -346,10 +336,10 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
       "%s ",filename;
       PrintErr("File not found.\n");
     }
-    if (result && !raw && attr & _ATTR_RESIDENT)
+    if (result && !raw && attr & RS_ATTR_RESIDENT)
       HashGenericAdd(curname,HTT_FILE,AMAllocIdentical(result),size,0,adam_task);
   }
-  if (result && !raw && attr & _ATTR_COMPRESSED) {
+  if (result && !raw && attr & RS_ATTR_COMPRESSED) {
     ac=result;
     size=ac->expanded_size;
     result=ExpandBuf(ac);
@@ -363,8 +353,8 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL,Bool raw=FALSE)
 }
 
 Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
-{ //$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$, $LK,"FUF_Z_OR_NOT_Z",A="MN:FUF_Z_OR_NOT_Z"$, $LK,"FUF_SCAN_PARENTS",A="MN:FUF_SCAN_PARENTS"$
-  //If you pass _de, you must Free(_de->full_name);
+{//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$, $LK,"FUF_Z_OR_NOT_Z",A="MN:FUF_Z_OR_NOT_Z"$, $LK,"FUF_SCAN_PARENTS",A="MN:FUF_SCAN_PARENTS"$
+//If you pass _de, you must Free(_de->full_name);
   I64 i,j,cur_dir_cluster;
   U8 *altname,*curname,*full_name=NULL;
   CDirEntry de;
@@ -399,7 +389,7 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
 	  PrintErr("File System Not Supported\n");
       }
       if (result && _de)
-	full_name=MPrint("%C:%s/%s",Fs->cur_prt->drv_let,Fs->cur_dir,de.name);
+	full_name=MStrPrint("%C:%s/%s",Fs->cur_prt->drv_let,Fs->cur_dir,de.name);
       FileAccessDel(fa);
     }
   }
@@ -428,7 +418,7 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
 	}
       }
       if (result && _de)
-	full_name=MPrint("%C:%s/%s",Fs->cur_prt->drv_let,Fs->cur_dir,de.name);
+	full_name=MStrPrint("%C:%s/%s",Fs->cur_prt->drv_let,Fs->cur_dir,de.name);
       FileAccessDel(fa);
     }
   }
@@ -445,14 +435,14 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
 
 I64 FileWrite(U8 *filename,U8 *fbuf,
    I64 size,CDate cdt=0,I64 attr=0,Bool raw=FALSE)
-{
+{//Write whole file to disk.
   I64 c=0;
   CHashGeneric *temph;
   CFileAccess *fa;
   U8 *fbuf2,*absname=FileNameAbs(filename);
   if (fa=FileAccessNew(filename,FALSE,TRUE)) {
     attr=FileAttr(fa->mask,attr);
-    if (attr&_ATTR_COMPRESSED && !raw) {
+    if (attr&RS_ATTR_COMPRESSED && !raw) {
       fbuf=CompressBuf(fbuf,size);
       size=fbuf(CArcCompress *)->compressed_size;
       fbuf2=fbuf;
@@ -473,13 +463,13 @@ I64 FileWrite(U8 *filename,U8 *fbuf,
 	PrintErr("File System Not Supported\n");
     }
     if (temph=HashFind(absname,adam_task->hash_table,HTT_FILE)) {
-      if (!raw && attr & _ATTR_RESIDENT) {
+      if (!raw && attr & RS_ATTR_RESIDENT) {
 	Free(temph->user_data0);
 	temph->user_data0=AMAllocIdentical(fbuf);
 	temph->user_data1=size;
       } else
 	HashRemDel(temph,adam_task->hash_table);
-    } else if (!raw && attr & _ATTR_RESIDENT)
+    } else if (!raw && attr & RS_ATTR_RESIDENT)
       HashGenericAdd(absname,HTT_FILE,AMAllocIdentical(fbuf),size,0,adam_task);
     Free(fbuf2);
     FileAccessDel(fa);

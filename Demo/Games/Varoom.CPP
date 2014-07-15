@@ -1,4 +1,3 @@
- 
 
 
 
@@ -8,10 +7,7 @@
 
 
 
-
     $SP,"<2>",BI=2$
-
-
 
 
 
@@ -50,7 +46,6 @@
 
 
 
-
 		 $SP,"<5>",BI=5$
 
 
@@ -80,7 +75,6 @@
 
 
 		 $SP,"<6>",BI=6$
-
 
 
 
@@ -201,7 +195,7 @@ U0 MPUpdateWin(CDC *dc2)
   Bool draw;
   CD3I32 poly[4];
   TrackPoly *tempt;
-  CDC *dc=DCAlias(gr_dc2,task);
+  CDC *dc=DCAlias(gr.dc2,task);
 
   GrIdentEqu(r);
   GrRotYEqu(r,ã-c[0].é);
@@ -314,9 +308,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   while (mp_not_done_flags)
     Yield;
 
-  if (Bt(key_down_bitmap,SC_CURSOR_LEFT))
+  if (Bt(kbd.down_bitmap,SC_CURSOR_LEFT))
     è=-0.5;
-  else if (Bt(key_down_bitmap,SC_CURSOR_RIGHT))
+  else if (Bt(kbd.down_bitmap,SC_CURSOR_RIGHT))
     è=0.5;
   else
     è=0;
@@ -363,7 +357,6 @@ U0 DrawIt(CTask *task,CDC *dc)
 	180+180/ã*Arg(c[0].p.x,c[0].p.z),100.0*distance/(2*ã*TRACK_INNER),s,best_score);
 }
 
-
 U0 AnimateTask(I64)
 {
   Car  *tempc;
@@ -388,7 +381,7 @@ U0 AnimateTask(I64)
     R2P(&m,&a,c[0].p.x,c[0].p.z);
     if (!game_over && TRACK_INNER<=m<=TRACK_OUTER) {
       for (i=1;i<NUM_CARS;i++)
-	if (D3I32SqrDist(&c[i].p,&c[0].p)<CAR_LENGTH*CAR_LENGTH>>1) {
+	if (D3I32DistSqr(&c[i].p,&c[0].p)<CAR_LENGTH*CAR_LENGTH>>1) {
 	  game_over=TRUE;
 	  Noise(500,50,100);
 	  Sleep(500);
@@ -469,7 +462,7 @@ U0 Varoom()
   SettingsPush(Fs,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
   try {
     Fs->text_attr=YELLOW<<4+BLUE;
-    Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_GRAB_SCROLL-WIF_MENU;
+    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
     WordStat;
     WinMax;
     WinBorder;

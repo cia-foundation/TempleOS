@@ -1,4 +1,4 @@
-#help_index "Utils;Cmd Line (Typically)"
+#help_index "Cmd Line (Typically)"
 
 //$LK,"StrUtil",A="MN:StrUtil"$() operations on files
 
@@ -43,14 +43,11 @@ public U0 SU(U8 *files_find_mask,I64 suf_flags,U8 *fu_flags=NULL,F64 indent_scal
     SUFile(tempde->full_name,suf_flags,indent_scale_factor);
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
 public U0 S2T(U8 *files_find_mask,U8 *fu_flags=NULL)
-{
-//Spaces to tabs.
+{//Spaces to tabs.
 //Use "Hard Space" (SHIFT-SPACE) for spaces
 //in string consts in your code.
   SU(files_find_mask,SUF_S2T|SUF_REM_TRAILING,fu_flags);
 }
-
-#help_index ""

@@ -10,8 +10,8 @@ public Bool Line(U8 *aux_data,
 		 I64 x2,I64 y2,I64 z2,
 		 Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
 		 I64 step=1,I64 start=0)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Step through line segment calling callback.
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 i,j,d,dx=x2-x1,dy=y2-y1,dz=z2-z1,_x,_y,_z,
       adx=AbsI64(dx),ady=AbsI64(dy),adz=AbsI64(dz);
   Bool first=TRUE;
@@ -81,56 +81,52 @@ public Bool Line(U8 *aux_data,
 
 #help_index "Graphics/Math/3D Transformation"
 public I64 *GrRotXNew(F64 è,CTask *mem_task=NULL)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(è)*gr_scale,
-     my_sin=Sin(è)*gr_scale;
+{//MAlloc 4x4 matrix to rot about X axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(è)*GR_SCALE,
+     my_sin=Sin(è)*GR_SCALE;
   I64 *r=CAlloc(sizeof(I64)*16,mem_task);
 
   r[5]=my_cos;
   r[10]=my_cos;
   r[9]=my_sin;
   r[6]=-my_sin;
-  r[0]=gr_scale;
-  r[15]=gr_scale;
+  r[0]=GR_SCALE;
+  r[15]=GR_SCALE;
   return r;
 }
 
 public I64 *GrRotYNew(F64 ê,CTask *mem_task=NULL)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(ê)*gr_scale,
-     my_sin=Sin(ê)*gr_scale;
+{//MAlloc 4x4 matrix to rot about Y axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(ê)*GR_SCALE,
+     my_sin=Sin(ê)*GR_SCALE;
   I64 *r=CAlloc(sizeof(I64)*16,mem_task);
 
   r[0]=my_cos;
   r[10]=my_cos;
   r[8]=-my_sin;
   r[2]=my_sin;
-  r[5]=gr_scale;
-  r[15]=gr_scale;
+  r[5]=GR_SCALE;
+  r[15]=GR_SCALE;
   return r;
 }
 
 public I64 *GrRotZNew(F64 é,CTask *mem_task=NULL)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(é)*gr_scale,
-     my_sin=Sin(é)*gr_scale;
+{//MAlloc 4x4 matrix to rot about Z axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(é)*GR_SCALE,
+     my_sin=Sin(é)*GR_SCALE;
   I64 *r=CAlloc(sizeof(I64)*16,mem_task);
 
   r[0]=my_cos;
   r[5]=my_cos;
   r[4]=my_sin;
   r[1]=-my_sin;
-  r[10]=gr_scale;
-  r[15]=gr_scale;
+  r[10]=GR_SCALE;
+  r[15]=GR_SCALE;
   return r;
 }
 
 public I64 *GrScaleNew(I64 *m1,F64 s,CTask *mem_task=NULL)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//MAlloc matrix that is scaled version of a 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 i,*r=CAlloc(sizeof(I64)*16,mem_task);
   for (i=0;i<16;i++)
     r[i]=m1[i]*s;
@@ -138,9 +134,8 @@ public I64 *GrScaleNew(I64 *m1,F64 s,CTask *mem_task=NULL)
 }
 
 public I64 *GrMulMat(I64 *m1,I64 *m2,CTask *mem_task=NULL)
-{
-  //This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
- //Conceptually, the transform m1 is applied after m2
+{//Multiply 4x4 matrices, return MAlloced matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//Conceptually, the transform m1 is applied after m2
   I64 i,j,k,*r=CAlloc(sizeof(I64)*16,mem_task);
   F64 d;
   for (i=0;i<4;i++) {
@@ -148,7 +143,7 @@ public I64 *GrMulMat(I64 *m1,I64 *m2,CTask *mem_task=NULL)
       for (k=0;k<4;k++) {
 	d=m1[k+4*j];
 	d*=m2[i+4*k]; //TODO!  Possible overflow if norm > one.
-	d/=gr_scale;
+	d/=GR_SCALE;
 	r[i+4*j]+=d;
       }
     }
@@ -157,18 +152,17 @@ public I64 *GrMulMat(I64 *m1,I64 *m2,CTask *mem_task=NULL)
 }
 
 public I64 *GrRotXEqu(I64 *m1,F64 è)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(è)*gr_scale,
-     my_sin=Sin(è)*gr_scale;
+{//Rot matrix about X axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(è)*GR_SCALE,
+     my_sin=Sin(è)*GR_SCALE;
   I64 r[16],*r2;
   MemSet(r,0,sizeof(r));
   r[5]=my_cos;
   r[10]=my_cos;
   r[9]=my_sin;
   r[6]=-my_sin;
-  r[0]=gr_scale;
-  r[15]=gr_scale;
+  r[0]=GR_SCALE;
+  r[15]=GR_SCALE;
 
   r2=GrMulMat(r,m1);
   MemCpy(m1,r2,sizeof(I64)*16);
@@ -177,18 +171,17 @@ public I64 *GrRotXEqu(I64 *m1,F64 è)
 }
 
 public I64 *GrRotYEqu(I64 *m1,F64 ê)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(ê)*gr_scale,
-     my_sin=Sin(ê)*gr_scale;
+{//Rot matrix about Y axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(ê)*GR_SCALE,
+     my_sin=Sin(ê)*GR_SCALE;
   I64 r[16],*r2;
   MemSet(r,0,sizeof(r));
   r[0]=my_cos;
   r[10]=my_cos;
   r[8]=-my_sin;
   r[2]=my_sin;
-  r[5]=gr_scale;
-  r[15]=gr_scale;
+  r[5]=GR_SCALE;
+  r[15]=GR_SCALE;
 
   r2=GrMulMat(r,m1);
   MemCpy(m1,r2,sizeof(I64)*16);
@@ -197,18 +190,17 @@ public I64 *GrRotYEqu(I64 *m1,F64 ê)
 }
 
 public I64 *GrRotZEqu(I64 *m1,F64 é)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  F64 my_cos=Cos(é)*gr_scale,
-     my_sin=Sin(é)*gr_scale;
+{//Rot matrix about Z axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  F64 my_cos=Cos(é)*GR_SCALE,
+     my_sin=Sin(é)*GR_SCALE;
   I64 r[16],*r2;
   MemSet(r,0,sizeof(r));
   r[0]=my_cos;
   r[5]=my_cos;
   r[4]=my_sin;
   r[1]=-my_sin;
-  r[10]=gr_scale;
-  r[15]=gr_scale;
+  r[10]=GR_SCALE;
+  r[15]=GR_SCALE;
 
   r2=GrMulMat(r,m1);
   MemCpy(m1,r2,sizeof(I64)*16);
@@ -217,15 +209,15 @@ public I64 *GrRotZEqu(I64 *m1,F64 é)
 }
 
 public I64 *GrScaleEqu(I64 *m1,F64 s)
-{
+{//Scale 4x4 matrix by value.
   I64 i;
   for (i=0;i<16;i++)
     m1[i]*=s;
   return m1;
 }
 
-public U0 GrScalePenWidth(CDC *dc=gr_dc)
-{
+public U0 GrScalePenWidth(CDC *dc=gr.dc)
+{//Scale device context's pen width by norm of transformation.
   I64 d;
   if (dc->flags&DCF_TRANSFORMATION) {
     if (dc->pen_width) {
@@ -238,27 +230,25 @@ public U0 GrScalePenWidth(CDC *dc=gr_dc)
 }
 
 public I64 *GrSetTranslation(I64 r[4][4],I64 x,I64 y,I64 z)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Set translation values in 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   r[0][3]=x<<32;
   r[1][3]=y<<32;
   r[2][3]=z<<32;
-  r[3][3]=gr_scale;
+  r[3][3]=GR_SCALE;
   return r;
 }
 
 public I64 *GrAddTranslation(I64 r[4][4],I64 x,I64 y,I64 z)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Add translation to 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   r[0][3]+=x<<32;
   r[1][3]+=y<<32;
   r[2][3]+=z<<32;
-  r[3][3]=gr_scale;
+  r[3][3]=GR_SCALE;
   return r;
 }
 
-public Bool GrSetSymmetry(CDC *dc=gr_dc,I64 x1,I64 y1,I64 x2,I64 y2)
-{
+public Bool GrSetSymmetry(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2)
+{//2D. Set device context's symmetry.
   F64 d;
   if (y1==y2 && x1==x2)
     return FALSE;
@@ -268,7 +258,7 @@ public Bool GrSetSymmetry(CDC *dc=gr_dc,I64 x1,I64 y1,I64 x2,I64 y2)
   if (d=Sqrt(SqrI64(dc->sym.snx)+
 	     SqrI64(dc->sym.sny)+
 	     SqrI64(dc->sym.snz))) {
-    d=gr_scale/d;
+    d=GR_SCALE/d;
     dc->sym.snx *= d;
     dc->sym.sny *= d;
     dc->sym.snz *= d;
@@ -279,8 +269,8 @@ public Bool GrSetSymmetry(CDC *dc=gr_dc,I64 x1,I64 y1,I64 x2,I64 y2)
   return TRUE;
 }
 
-public Bool GrSetSymmetry3(CDC *dc=gr_dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,I64 x3,I64 y3,I64 z3)
-{
+public Bool GrSetSymmetry3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,I64 x3,I64 y3,I64 z3)
+{//3D. Set device context's symmetry.
   F64 d,x,y,z,xx,yy,zz;
   I64 xx1,yy1,zz1,xx2,yy2,zz2,*r;
   xx1=x1-x2; yy1=y1-y2; zz1=z1-z2;
@@ -301,7 +291,7 @@ public Bool GrSetSymmetry3(CDC *dc=gr_dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 
     x=xx; y=yy; z=zz;
   }
   if (d=Sqrt(Sqr(x)+Sqr(y)+Sqr(z))) {
-    d=gr_scale/d;
+    d=GR_SCALE/d;
     dc->sym.snx = d*x;
     dc->sym.sny = d*y;
     dc->sym.snz = d*z;
@@ -315,8 +305,7 @@ public Bool GrSetSymmetry3(CDC *dc=gr_dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 
 }
 
 public U0 GrReflect(CDC *dc,I64 *_x,I64 *_y,I64 *_z)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Reflect 3D point about device context's symmetry. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 x=*_x<<32,y=*_y<<32,z=*_z<<32,
     xx=*_x-dc->sym.sx,yy=*_y-dc->sym.sy,zz=*_z-dc->sym.sz,
     d=(xx*dc->sym.snx+yy*dc->sym.sny+zz*dc->sym.snz)>>16,
@@ -352,7 +341,7 @@ public Bool Circle(U8 *aux_data,
 		I64 step=1,
 		F64 start_radians=0,
 		F64 len_radians=2*ã)
-{
+{//Step through circle arc calling callback.
   I64 i,j,len=Ceil(len_radians*radius),
       x,y,x1,y1,s1,s2,c;
   F64 t;
@@ -396,7 +385,7 @@ public Bool Ellipse(U8 *aux_data,
 		I64 step=1,
 		F64 start_radians=0,
 		F64 len_radians=2*ã)
-{
+{//Step through ellipse arc calling callback.
   I64 i,j,len,
       x,y,_x,_y,x1,y1,x2,y2, s1,s2,c, s12,s22,c2;
   F64 t;
@@ -468,7 +457,7 @@ public Bool RegPoly(U8 *aux_data,
 		I64 step=1,
 		F64 start_radians=0,
 		F64 len_radians=2*ã)
-{
+{//Step through regular polygon calling callback.
   I64 i,n,x,y,x1,y1,x2,y2,
     xx1,yy1,xx2,yy2,
     s1,s2,c, s12,s22,c2;
@@ -523,30 +512,30 @@ public Bool RegPoly(U8 *aux_data,
   return TRUE;
 }
 
-#help_index "Graphics/CD3I32;Math/CD3I32"
+#help_index "Graphics/Data Types;Math/Data Types"
 public F64 D3I32Dist(CD3I32 *p1,CD3I32 *p2)
-{
+{//Dist between p1 and p2.
   return Sqrt(SqrI64(p1->x-p2->x)+SqrI64(p1->y-p2->y)+SqrI64(p1->z-p2->z));
 }
 
-public I64 D3I32SqrDist(CD3I32 *p1,CD3I32 *p2)
-{
+public I64 D3I32DistSqr(CD3I32 *p1,CD3I32 *p2)
+{//Dist Squared between p1 and p2.
   return SqrI64(p1->x-p2->x)+SqrI64(p1->y-p2->y)+SqrI64(p1->z-p2->z);
 }
 
 public F64 D3I32Norm(CD3I32 *p)
-{
+{//Norm of p.
   return Sqrt(SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z));
 }
 
-public I64 D3I32SqrNorm(CD3I32 *p)
-{
+public I64 D3I32NormSqr(CD3I32 *p)
+{//Norm Squared of p.
   return SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z);
 }
 
 #help_index "Graphics/Math"
 public Bool Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
-{//2nd order
+{//Go in 2nd order bezier calling callback.
   I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
   F64 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z,
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
@@ -590,7 +579,7 @@ public Bool Bezier2(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
 }
 
 public Bool Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool first=TRUE)
-{ //3rd order
+{//Go in 3rd order bezier calling callback.
   I64 x,y,z,xx,yy,zz,dx,dy,dz,d_max;
   F64 x0=ctrl[0].x,y0=ctrl[0].y,z0=ctrl[0].z,
       x1=ctrl[1].x-x0,y1=ctrl[1].y-y0,z1=ctrl[1].z-z0,
@@ -638,7 +627,7 @@ public Bool Bezier3(U8 *aux_data,CD3I32 *ctrl,Bool (*fp_plot)(U8 *aux,I64 x,I64 
 }
 
 public Bool BSpline2(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
-{ //2nd order
+{//Go in 2nd order spline calling callback.
   I64 i,j;
   CD3I32 *c;
   Bool first;
@@ -704,7 +693,7 @@ public Bool BSpline2(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I
 }
 
 public Bool BSpline3(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),Bool closed=FALSE)
-{ //3rd order
+{//Go in 3rd order spline calling callback.
   I64 i,j;
   F64 x,y,z;
   CD3I32 *c;
@@ -798,7 +787,7 @@ public Bool BSpline3(U8 *aux_data,CD3I32 *ctrl,I64 cnt,Bool (*fp_plot)(U8 *aux,I
 #define CC_BOTTOM	8
 
 public Bool ClipLine(I64 *_x1,I64 *_y1,I64 *_x2,I64 *_y2,I64 left,I64 top,I64 right,I64 bottom)
-{
+{//Clip x1,y1 x2,y2 with left,top,right,bottom.
   I64 x,y,x1=*_x1,y1=*_y1,x2=*_x2,y2=*_y2,
       cc,cc1,cc2;
   if (y1>bottom)

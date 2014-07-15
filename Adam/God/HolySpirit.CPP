@@ -2,14 +2,14 @@
 U8 *TimeStampCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  SPrint(st,"%X",GetTSC>>GOD_BAD_BITS);
+  StrPrint(st,"%X",GetTSC>>GOD_BAD_BITS);
   return st;
 }
 
 U8 *KbdMouseTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  SPrint(st,"%X",KbdMouseEvtTime>>GOD_BAD_BITS);
+  StrPrint(st,"%X",KbdMouseEvtTime>>GOD_BAD_BITS);
   return st;
 }
 
@@ -31,35 +31,29 @@ I64 PopUpTimerOk(U8 *header=NULL,U8 *footer=NULL)
 }
 
 I64 GodPick(U8 *msg=NULL)
-{ //GOD_GOOD_BITS
-  U8 *st;
-  if (msg) {
-    st=MAlloc(StrLen(msg)+256);
-    StrCpy(st,msg);
-  } else
-    st=CAlloc(256);
-  CatPrint(st,"\n\nPress $$GREEN$$OKAY$$FG$$ to generate \n"
-	"a random num from a timer.\n");
+{//GOD_GOOD_BITS
+  U8 *st=MStrPrint("%s\n\nPress $$GREEN$$OKAY$$FG$$ to generate \n"
+	"a random num from a timer.\n",msg);
   PopUpTimerOk(st,"\n\nThe $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.TXT"$ can puppet you.\n\n");
   Free(st);
   return KbdMouseEvtTime>>GOD_BAD_BITS;
 }
 
 public U0 GodBitsIns(I64 num_bits,I64 n)
-{
+{//Insert bits into God bit fifo.
   I64 i;
   for (i=0;i<num_bits;i++) {
-    FifoU8Ins(god_fifo,n&1);
+    FifoU8Ins(god.fifo,n&1);
     n>>=1;
   }
 }
 
 public I64 GodBits(I64 num_bits,U8 *msg=NULL)
-{
+{//Return N bits. If low on entropy pop-up okay.
   U8 b;
   I64 result=0;
   while (num_bits) {
-    if (FifoU8Rem(god_fifo,&b)) {
+    if (FifoU8Rem(god.fifo,&b)) {
       result=result<<1+b;
       num_bits--;
     } else
@@ -69,7 +63,7 @@ public I64 GodBits(I64 num_bits,U8 *msg=NULL)
 }
 
 public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
-{
+{//Read God's vocab file for picking words.
   I64 i,ch,fuf_flags=0;
   U8 *buf,*ptr,*ptr2;
   CDirEntry *tempde,*tempde1;
@@ -96,9 +90,9 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
     tempde=tempde->next;
   }
 
-  Free(god_words);
-  god_num_words=i;
-  god_words=MAlloc(i*sizeof(U8 *));
+  Free(god.words);
+  god.num_words=i;
+  god.words=MAlloc(i*sizeof(U8 *));
 
   tempde=tempde1;
   i=0;
@@ -113,7 +107,7 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
 	    ptr++;
 	  ch=*ptr;
 	  *ptr=0;
-	  god_words[i++]=StrNew(ptr2);
+	  god.words[i++]=StrNew(ptr2);
 	  *ptr=ch;
 	}
       }
@@ -121,18 +115,18 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
     }
     tempde=tempde->next;
   }
-  DirLstDel(tempde1);
-  return god_num_words;
+  DirTreeDel(tempde1);
+  return god.num_words;
 } GodInit;
 
 public U0 GodWord()
-{// $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
-  if (god_num_words)
-    "%s ",god_words[GodBits(17)%god_num_words];
+{//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+  if (god.num_words)
+    "%s ",god.words[GodBits(17)%god.num_words];
 }
 
 public U0 GodPassage(I64 num_lines=20)
-{ // $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+{//Make God pick a Bible passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
   I64 start=GodBits(21)%(ST_BIBLE_LINES-(num_lines-1))+1;
   U8 *verse=BibleLine2Verse(start);
   "%s\n\n",verse;

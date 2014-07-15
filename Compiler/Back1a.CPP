@@ -5,9 +5,9 @@ U0 ICAddEct(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,
   Bool swap=FALSE;
   if (r3!=result_reg) {
     swap^=TRUE;
-    SwapU64(&t2,&t3);
-    SwapU64(&r2,&r3);
-    SwapU64(&d2,&d3);
+    SwapI64(&t2,&t3);
+    SwapI64(&r2,&r3);
+    SwapI64(&d2,&d3);
   }
   if (t2&RT_MASK>=RT_I64 && r2!=result_reg &&
       TY_REG<=t2&TY_MASK<=TY_RIP_DISP32) {
@@ -95,7 +95,7 @@ U0 ICAddSubEctImm(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,
       }
     }
     if (op.u8[0]==0x03 && MIN_I32<=d<=MAX_I32 &&
-      !Bt(&non_ptr_vars_mask,r2)) {
+      !Bt(&cmp.non_ptr_vars_mask,r2)) {
       i=ICModr1(r1,TY_DISP+RT_I64,r2,d);
       i.u8[1]|=0x48;
       ICU24(tempi,i.u8[2]<<16+0x8D00+i.u8[1]);
@@ -215,9 +215,9 @@ U0 ICSub(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,
   Bool swap=FALSE;
   if (r3!=REG_RAX) {
     swap=TRUE;
-    SwapU64(&t2,&t3);
-    SwapU64(&r2,&r3);
-    SwapU64(&d2,&d3);
+    SwapI64(&t2,&t3);
+    SwapI64(&r2,&r3);
+    SwapI64(&d2,&d3);
   }
   if (t2&RT_MASK>=RT_I64 && r2.u8[0]!=REG_RAX && (t2&TY_MASK!=TY_SIB || r2.u8[1]&15!=REG_RAX) &&
       TY_REG<=t2&TY_MASK<=TY_RIP_DISP32) {
@@ -410,7 +410,6 @@ U0 ICMulEqual(CIntermediateCode *tempi,I64 ip)
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,TY_REG+RT_I64,r,0,ip);
 }
 
-
 U0 ICDiv(CIntermediateCode *tempi,I64 ip)
 {
   if (tempi->ic_flags & ICF_A1_FIRST) {
@@ -589,7 +588,7 @@ U0 ICAddSubEctEqual(CIntermediateCode *tempi,I64 type_pointed,I64 t1,I64 r1,I64 
 	  ICSlashOp(tempi,TY_DISP+type_pointed,r2,0,0x838000+op.u8[4],ip);
 	  ICU8(tempi,d3);
 	  done=TRUE;
-	} else if (op.u8[2]==0x24) { //AND
+	} else if (op.u8[2]==0x24) {//AND
 	  ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,t2,r2,d2,ip);
 	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,TY_DISP+type_pointed,REG_RCX,0,ip);
 	  result_reg=REG_RAX;
@@ -599,7 +598,7 @@ U0 ICAddSubEctEqual(CIntermediateCode *tempi,I64 type_pointed,I64 t1,I64 r1,I64 
 	  ICU32(tempi,d3);
 	  ICMov(tempi,TY_DISP+type_pointed,REG_RCX,0,TY_REG+RT_I64,result_reg,0,ip);
 	  done=TRUE;
-	} else if (type_pointed&RT_MASK<RT_I64) { //OR/XOR
+	} else if (type_pointed&RT_MASK<RT_I64) {//OR/XOR
 	  ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,t2,r2,d2,ip);
 	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,TY_DISP+type_pointed,REG_RCX,0,ip);
 	  result_reg=REG_RAX;

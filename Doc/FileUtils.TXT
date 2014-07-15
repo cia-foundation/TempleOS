@@ -1,0 +1,26 @@
+$WW,1$$FG,5$$TX+CX,"File Utils"$$FG$
+
+File util $LK,"FilesFind",A="MN:FilesFind"$() wildcard mask consists of a single base dir with multiple file masks separated by $FG,2$';'$FG$.  The $FG,2$'*'$FG$ and $FG,2$'?'$FG$ wildcard chars are accepted.  A $FG,2$'~'$FG$ indicates an exclusion mask.
+
+ 
+$FG,2$"/Kernel/*"$FG$		BaseDir: $FG,2$/Kernel$FG$	Mask: $FG,2$*$FG$
+$FG,2$"/Demo/*.BMP*;*.GRA*"$FG$	BaseDir: $FG,2$/Demo$FG$		Mask: $FG,2$*.BMP*$FG$ | $FG,2$*.GRA*$FG$
+$FG,2$"/*.TXT*;~*Bible*"$FG$	BaseDir: $FG,2$Root$FG$		Mask: $FG,2$*.TXT*$FG$ but not $FG,2$*Bible*$FG$
+
+See $LK,"FilesFindMatch",A="MN:FilesFindMatch"$().
+
+Flags are either text or integer values.
+
+  $LK,"FUF_RECURSE",A="MN:FUF_RECURSE"$		$FG,2$+r$FG$ Recurse
+  $LK,"FUF_SINGLE",A="MN:FUF_SINGLE"$		$FG,2$+s$FG$ Single File (Optimization for one file in mask.)
+  $LK,"FUF_FLATTEN_TREE",A="MN:FUF_FLATTEN_TREE"$	$FG,2$+f$FG$ use with '$FG,2$+F$FG$'.  Just use $FG,2$+F$FG$, probably.
+  $LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$		$FG,2$+D$FG$ just directories
+  $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$	$FG,2$+F$FG$ just files (Flattens trees)
+  $LK,"FUF_CLUSTER_ORDER",A="MN:FUF_CLUSTER_ORDER"$	$FG,2$+O$FG$ sort by cluster (move head one direction)
+  $LK,"FUF_JUST_TXT",A="MN:FUF_JUST_TXT"$		$FG,2$+T$FG$ just text files	: $LK,"FILEMASK_TXT",A="MN:FILEMASK_TXT"$
+  $LK,"FUF_JUST_SRC",A="MN:FUF_JUST_SRC"$		$FG,2$+S$FG$ just src files	: $LK,"FILEMASK_SRC",A="MN:FILEMASK_SRC"$
+  $LK,"FUF_JUST_AOT",A="MN:FUF_JUST_AOT"$		$FG,2$+A$FG$ just aot files	: $LK,"FILEMASK_AOT",A="MN:FILEMASK_AOT"$
+  $LK,"FUF_JUST_JIT",A="MN:FUF_JUST_JIT"$		$FG,2$+J$FG$ just jit files	: $LK,"FILEMASK_JIT",A="MN:FILEMASK_JIT"$
+  $LK,"FUF_JUST_GRA",A="MN:FUF_JUST_GRA"$		$FG,2$+G$FG$ just graphic files	: $LK,"FILEMASK_GRA",A="MN:FILEMASK_GRA"$
+
+See $LK,"ST_FILE_UTIL_FLAGS",A="MN:ST_FILE_UTIL_FLAGS"$ when used in calling program taking text flags.

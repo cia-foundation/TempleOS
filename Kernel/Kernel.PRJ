@@ -1,6 +1,5 @@
-//You should compile this by calling
-//$LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$(), not doing it directly.
-//See $LK,"Cmp(\"Kernel\")",A="FF:::/Adam/Boot/InsBoot.CPP,Cmp(\"Kernel\""$.
+//Compile this by calling $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+//Don't do it directly.  See $LK,"Cmp(\"Kernel\")",A="FF:::/Adam/Boot/InsBoot.CPP,Cmp(\"Kernel\""$.
 
 #exe {
 OptOn(OPTf_WARN_PAREN);
@@ -22,12 +21,12 @@ kernel_cfg=KernelCfgNew;
 #include "KGlbls"
 #include "Mem1b"
 #include "Math1b"
-#include "Scheduler"
+#include "Sched"
 #include "Mem1c"
 #include "Font8x8"
 #include "Hash1a"
 #include "Str1b"
-#include "Interrupts"
+#include "Ints"
 #include "DataTypes1a"
 #include "Compress"
 #include "Hash1b"
@@ -36,6 +35,7 @@ kernel_cfg=KernelCfgNew;
 #include "StrScan"
 #include "Define1a"
 #include "Display"
+#include "KeyDev"
 #include "Misc1a"
 #include "Dbg1a"
 #include "Except"
@@ -52,7 +52,6 @@ kernel_cfg=KernelCfgNew;
 #exe {Cd("Dsk");};
 #include "DskStr"
 #include "DskCache"
-#include "ATADef.HPP"
 #include "DskATA"
 #include "Dsk1a"
 #include "DskAddDev"

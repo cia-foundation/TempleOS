@@ -8,7 +8,7 @@ Supply the raw dictionary filename in
 the call at the bottom of this file
 and #include this file.
 
-I ran $LK,"::/Misc/Dollar.CPP"$ on it, first.
+I ran $LK,"::/Misc/ToDolDoc.CPP"$ on it, first.
 
 See $LK,"::/Doc/Acknowledgements.TXT"$.
 */
@@ -106,7 +106,6 @@ U8 *WSDSortWords(U8 *start,I64 size,I64 word_cnt)
   *ptr++=0;
   return out_start;
 }
-
 
 U0 WSDGen(U8 *raw_dict_filename)
 {

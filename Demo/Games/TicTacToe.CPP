@@ -35,19 +35,14 @@ U0 DrawBoard(I64 player)
 	break;
 
     }
-/*
-
-ipx,ipy are input pointer (mouse) x,y.
-ip_lb	is mouse left button
-
-*/
+//ip.pos.x,ip.pos.y are input pointer (mouse) x,y.
+//ip.lb	is mouse left button
   if (player==1)
-    DrawX(dc,ipx-Fs->pix_left,ipy-Fs->pix_top);
+    DrawX(dc,ip.pos.x-Fs->pix_left,ip.pos.y-Fs->pix_top);
   else
-    DrawO(dc,ipx-Fs->pix_left,ipy-Fs->pix_top);
+    DrawO(dc,ip.pos.x-Fs->pix_left,ip.pos.y-Fs->pix_top);
   DCDel(dc);
 }
-
 
 U0 TakeTurn(I64 player)
 {
@@ -57,16 +52,16 @@ U0 TakeTurn(I64 player)
       Beep(500);
     else
       Beep(1000);
-    while (!ip_lb) {
+    while (!ip.lb) {
       DrawBoard(player);
       WinMgrSync;
     }
-    while (ip_lb) {
+    while (ip.lb) {
       DrawBoard(player);
       WinMgrSync;
     }
-    x=ipx-Fs->pix_left;
-    y=ipy-Fs->pix_top;
+    x=ip.pos.x-Fs->pix_left;
+    y=ip.pos.y-Fs->pix_top;
     i=(x-100)/100+(y-100)/100*3;
   }
   board[i]=player;
@@ -118,7 +113,7 @@ U0 TicTacToe()
 {
   WinMax;   //Maximize window
   DocClear; //Clear window text.
-  "$$GREEN$$CTRL-ALT-C$$FG$$ to exit.\n";
+  "$$GREEN$$CTRL-ALT-c$$FG$$ to exit.\n";
   try
     while (TRUE)
       DoGame;

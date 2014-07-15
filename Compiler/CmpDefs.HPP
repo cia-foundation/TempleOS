@@ -203,7 +203,7 @@
 #define IC_SWAP_U8		0xAD
 #define IC_SWAP_U16		0xAE
 #define IC_SWAP_U32		0xAF
-#define IC_SWAP_U64		0xB0
+#define IC_SWAP_I64		0xB0
 
 #define IC_ABS_I64		0xB1
 #define IC_SIGN_I64		0xB2
@@ -381,7 +381,7 @@
 
 class COptReg
 {
-  I64 offset;
+  I64	offset;
   CMemberLst *m;
 };
 

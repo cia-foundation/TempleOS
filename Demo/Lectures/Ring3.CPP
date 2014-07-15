@@ -1,5 +1,4 @@
-/*
-TempleOS runs exclusively in ring 0.
+/*TempleOS runs exclusively in ring 0.
 Ring 0 is part of the $LK,"Charter",A="FI:::/Doc/Charter.TXT"$.
 This demo is for you to play around
 with ring 3.  TempleOS is for
@@ -25,8 +24,6 @@ TO_RING0::	//Set to handle general protection 0xD fault temporarily.
 	IRET
 }
 
-
-
 U0 Ring3Demo()
 {
   U8 *old_vect;
@@ -37,7 +34,6 @@ U0 Ring3Demo()
   TSSBusy(Gs->tss->tr_ring3,OFF);
   SetRAX(Gs->tss->tr_ring3+3);
 	LTR	AX
-
 
 asm {
 	MOV	U64 [&old_stk],RSP
@@ -75,6 +71,5 @@ R3_CALLBACK:
   STI
   "Progress1 After :%X\n",progress1;
 }
-
 
 Ring3Demo;

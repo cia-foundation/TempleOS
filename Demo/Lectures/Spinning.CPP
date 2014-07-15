@@ -15,7 +15,6 @@ U0 LoadTask(I64)
   }
 }
 
-
 U0 SpinningPreempt()
 {
   I64 i;
@@ -55,7 +54,6 @@ U0 SpinningNoInterrupts()
     InU8(0x21);
   STI
 }
-
 
 U0 CooperativeMultitaskingPreempt()
 {

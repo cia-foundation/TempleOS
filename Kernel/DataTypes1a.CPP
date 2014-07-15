@@ -1,5 +1,5 @@
 U0 LinkedLstDel(U8 **_lst)
-{
+{//Free entire linked-list.
   U8 **templ;
   while (_lst) {
     templ=*_lst;
@@ -9,7 +9,7 @@ U0 LinkedLstDel(U8 **_lst)
 }
 
 U8 *LinkedLstCopy(U8 **_lst,CTask *mem_task=NULL)
-{
+{//MAlloc identical copy of entire linked-list.
   U8 *result=NULL,**templ=&result;
   while (_lst) {
     templ=*templ=MAllocIdentical(_lst,mem_task);
@@ -19,7 +19,7 @@ U8 *LinkedLstCopy(U8 **_lst,CTask *mem_task=NULL)
 }
 
 I64 LinkedLstCnt(U8 **_lst)
-{
+{//Count of nodes in linked-list.
   I64 result=0;
   while (_lst) {
     result++;
@@ -29,7 +29,7 @@ I64 LinkedLstCnt(U8 **_lst)
 }
 
 I64 LinkedLstSize(U8 **_lst)
-{
+{//Mem size of all nodes in linked-list.
   I64 result=0;
   while (_lst) {
     result+=MSize2(_lst);
@@ -38,8 +38,8 @@ I64 LinkedLstSize(U8 **_lst)
   return result;
 }
 
-U0 QueDel(CQue *root,Bool querem=FALSE) //Does not delete root
-{
+U0 QueDel(CQue *root,Bool querem=FALSE)
+{//Free entrie queue, not root.
   CQue *tempq=root->next,*tempq1;
   while (tempq!=root) {
     tempq1=tempq->next;
@@ -51,7 +51,7 @@ U0 QueDel(CQue *root,Bool querem=FALSE) //Does not delete root
 }
 
 CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
-{
+{//MAlloc identical copy of entire queue and root.
   CQue *result=MAllocIdentical(root,mem_task),*tempq=root->next,*tempq1;
   QueInit(result);
   while (tempq!=root) {
@@ -62,8 +62,8 @@ CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
   return result;
 }
 
-I64 QueCnt(CQue *root) //Does not include root
-{
+I64 QueCnt(CQue *root)
+{//Count of nodes in queue, not root.
   CQue *tempq=root->next;
   I64 result=0;
   while (tempq!=root) {
@@ -73,8 +73,8 @@ I64 QueCnt(CQue *root) //Does not include root
   return result;
 }
 
-I64 QueSize(CQue *root) //Does not include root
-{
+I64 QueSize(CQue *root)
+{//Mem size of all nodes in queue, not root.
   CQue *tempq=root->next;
   I64 result=0;
   while (tempq!=root) {
@@ -85,7 +85,7 @@ I64 QueSize(CQue *root) //Does not include root
 }
 
 CQueVectU8 *QueVectU8New(I64 min_index=0)
-{
+{//Create new queue vecter.
   CQueVectU8 *result=MAlloc(sizeof(CQueVectU8));
   result->next=result->last=result;
   result->total_cnt=result->node_cnt=0;
@@ -94,7 +94,7 @@ CQueVectU8 *QueVectU8New(I64 min_index=0)
 }
 
 U0 QueVectU8Put(CQueVectU8 *v,I64 index,U8 ch)
-{
+{//Put U8 at index i.
   CQueVectU8 *tempv;
   index-=v->min_index;
   if (index<0) return;
@@ -130,7 +130,7 @@ U0 QueVectU8Put(CQueVectU8 *v,I64 index,U8 ch)
 }
 
 U0 QueVectU8Del(CQueVectU8 *v)
-{
+{//Free entire queue vector.
   if (v) {
     QueDel(v);
     Free(v);
@@ -138,7 +138,7 @@ U0 QueVectU8Del(CQueVectU8 *v)
 }
 
 I64 QueVectU8Get(CQueVectU8 *v,I64 index)
-{
+{//Get U8 at index i.
   CQueVectU8 *tempv;
   index-=v->min_index;
   if (!(0<=index<v->total_cnt)) return 0;
@@ -153,7 +153,7 @@ I64 QueVectU8Get(CQueVectU8 *v,I64 index)
 }
 
 CFifoU8 *FifoU8New(I64 size,CTask *mem_task=NULL)
-{
+{//Create new fifo.
   CFifoU8 *f;
   if (!mem_task) mem_task=Fs;
   f=MAlloc(sizeof(CFifoU8),mem_task);
@@ -165,13 +165,13 @@ CFifoU8 *FifoU8New(I64 size,CTask *mem_task=NULL)
 }
 
 U0 FifoU8Del(CFifoU8 *f)
-{
+{//Free fifo.
   Free(f->buf);
   Free(f);
 }
 
 Bool FifoU8Ins(CFifoU8 *f,U8 b)
-{
+{//Insert U8 into fifo.
   I64 new_in_ptr;
   PUSHFD
   CLI
@@ -188,7 +188,7 @@ Bool FifoU8Ins(CFifoU8 *f,U8 b)
 }
 
 Bool FifoU8Rem(CFifoU8 *f,U8 *_b)
-{
+{//Remove U8 from fifo.
   PUSHFD
   CLI
   if (f->in_ptr==f->out_ptr) {
@@ -203,7 +203,7 @@ Bool FifoU8Rem(CFifoU8 *f,U8 *_b)
 }
 
 Bool FifoU8Peek(CFifoU8 *f,U8 *_b)
-{
+{//Peek at front of fifo and don't remove.
   PUSHFD
   CLI
   if (f->in_ptr==f->out_ptr) {
@@ -217,7 +217,7 @@ Bool FifoU8Peek(CFifoU8 *f,U8 *_b)
 }
 
 U0 FifoU8Flush(CFifoU8 *f)
-{
+{//Flush fifo getting rid of all U8's.
   PUSHFD
   CLI
   f->out_ptr=f->in_ptr;
@@ -225,7 +225,7 @@ U0 FifoU8Flush(CFifoU8 *f)
 }
 
 I64 FifoU8Cnt(CFifoU8 *f)
-{
+{//Count of U8's in fifo.
   I64 result;
   PUSHFD
   CLI
@@ -238,7 +238,7 @@ I64 FifoU8Cnt(CFifoU8 *f)
 }
 
 CFifoI64 *FifoI64New(I64 size,CTask *mem_task=NULL)
-{
+{//Create new fifo.
   CFifoI64 *f;
   if (!mem_task) mem_task=Fs;
   f=MAlloc(sizeof(CFifoI64),mem_task);
@@ -250,13 +250,13 @@ CFifoI64 *FifoI64New(I64 size,CTask *mem_task=NULL)
 }
 
 U0 FifoI64Del(CFifoI64 *f)
-{
+{//Free fifo.
   Free(f->buf);
   Free(f);
 }
 
 Bool FifoI64Ins(CFifoI64 *f,I64 q)
-{
+{//Insert I64 into fifo.
   I64 new_in_ptr;
   PUSHFD
   CLI
@@ -273,7 +273,7 @@ Bool FifoI64Ins(CFifoI64 *f,I64 q)
 }
 
 Bool FifoI64Rem(CFifoI64 *f,I64 *_q)
-{
+{//Remove I64 from fifo.
   PUSHFD
   CLI
   if (f->in_ptr==f->out_ptr) {
@@ -288,7 +288,7 @@ Bool FifoI64Rem(CFifoI64 *f,I64 *_q)
 }
 
 Bool FifoI64Peek(CFifoI64 *f,I64 *_q)
-{
+{//Peek at front of fifo and don't remove.
   PUSHFD
   CLI
   if (f->in_ptr==f->out_ptr) {
@@ -302,7 +302,7 @@ Bool FifoI64Peek(CFifoI64 *f,I64 *_q)
 }
 
 U0 FifoI64Flush(CFifoI64 *f)
-{
+{//Flush fifo getting rid of all I64's.
   PUSHFD
   CLI
   f->out_ptr=f->in_ptr;
@@ -310,7 +310,7 @@ U0 FifoI64Flush(CFifoI64 *f)
 }
 
 I64 FifoI64Cnt(CFifoI64 *f)
-{
+{//Count of I64's in fifo.
   I64 result;
   PUSHFD
   CLI

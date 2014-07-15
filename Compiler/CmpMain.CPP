@@ -1,13 +1,10 @@
 U0 StreamPrint(U8 *fmt,...)
-//Inserts text into the stream of
-//characters being compiled.  Called
-//from withing #exe{} block.
-{
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv),*st;
+{//Injects text into the compile stream. Used in #exe{} blocks.
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st;
   CLex *lx=Fs->last_lex;
   CStreamBlk *tempe=lx->last_stream_blk;
   if (tempe!=&lx->next_stream_blk) {
-    st=MPrint("%s%s",tempe->body,buf);
+    st=MStrPrint("%s%s",tempe->body,buf);
     Free(tempe->body);
     tempe->body=st;
   } else
@@ -16,7 +13,7 @@ U0 StreamPrint(U8 *fmt,...)
 }
 
 U8 *LexStatement2Bin(CLex *lx,I64 *_type,I64 cmp_flags=0)
-{
+{//Compile one lx statement to bin code.
   I64 size,i,j,k,*result=INVALID_PTR;
   CLexCodeCtrl *tempcbh;
   if (_type) *_type=RT_I64;
@@ -42,17 +39,15 @@ U8 *LexStatement2Bin(CLex *lx,I64 *_type,I64 cmp_flags=0)
   } else //TODO: too dangerous to del Misc?
     QueDel(&lx->lcc.lcc_root.next);
   if (lx->a_depth==2) {
-progress1++;
     tempcbh=LCCPopNoFree(lx);
     LCCAppend(lx,tempcbh);
   }
   return result;
 }
 
-
 CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
 {
-  CAsmCtrl *a,*old_a=lx->a;
+  CAOTCtrl *a,*old_a=lx->a;
   I64 i,j,l;
   U8 *buf;
   CAsmCodeBlk *tempc;
@@ -68,11 +63,11 @@ CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
   lx->exe=result;
 
   result->next_ie=result->last_ie=&result->next_ie;
-  lx->a=a=CAlloc(sizeof(CAsmCtrl));
+  lx->a=a=CAlloc(sizeof(CAOTCtrl));
   lx->a_depth++;
 
   a->cb=CAlloc(sizeof(CAsmCodeBlk));
-  a->max_align=1;
+  a->max_align_bits=0;
   a->module_org=INVALID_PTR;
 
   MemCpy(htc,&lx->htc,sizeof(CLexHashTableContext));
@@ -83,7 +78,7 @@ CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
   if (lx->flags&LF_AOT_COMPILE) {
     lx->htc.define_hash_table=lx->htc.glbl_hash_table;
     if (lx->a_depth<=1)
-      lx->htc.glbl_hash_table->next=asm_hash;
+      lx->htc.glbl_hash_table->next=cmp.asm_hash;
     else
       lx->htc.glbl_hash_table->next=htc->glbl_hash_table;
   } else
@@ -127,7 +122,7 @@ CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
     LinkedLstDel(a->cb);
     result=NULL;
   } else {
-    if (map_name && !cmp_do_not_write_to_dsk)
+    if (map_name && !cmp.dont_write_to_dsk)
       Who("-r",lx->htc.glbl_hash_table,map_name,mapfile_drv);
     HashTableDel(lx->htc.local_hash_table);
     HashTableDel(lx->htc.glbl_hash_table);
@@ -160,7 +155,7 @@ CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
     LinkedLstDel(a->cb);
     result->abss=a->abss;
     result->heap_glbls=a->heap_glbls;
-    result->max_align =a->max_align;
+    result->max_align_bits=a->max_align_bits;
     result->module_org=a->module_org;
   }
   lx->exe=parent;
@@ -223,13 +218,15 @@ U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
       str=tempe->str;
     }
     switch (tempe->type) {
-      case EIT_REL_EXPORT:
-      case EIT_IMM_EXPORT:
+      case EIT_REL32_EXPORT:
+      case EIT_IMM32_EXPORT:
+      case EIT_REL64_EXPORT:
+      case EIT_IMM64_EXPORT:
 	tempex=CAlloc(sizeof(CHashExport));
 	tempex->str=str;
 	str=NULL;
 	tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
-	if (tempe->type==EIT_IMM_EXPORT)
+	if (tempe->type==EIT_IMM32_EXPORT||tempe->type==EIT_IMM64_EXPORT)
 	  tempex->val=tempe->ip;
 	else
 	  tempex->val=tempe->ip+ip2;
@@ -238,7 +235,7 @@ U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
 	HashAdd(tempex,Fs->hash_table);
 	SysSymImportsResolve(tempex->str);
 	break;
-      case EIT_REL_I8...EIT_IMM_U64:
+      case EIT_REL_I0...EIT_IMM_U64:
 	if (tempe->str) {
 	  if (tempe->flags&EIF_GOTO_LABEL) {
 	    if(!(g_lb=LCCGoToLabelFind(lx,str)))
@@ -266,6 +263,9 @@ U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
 	if (tempex || g_lb) {
 	  ptr=tempe->ip+ip2;
 	  nobound_switch (tempe->type) {
+	    case EIT_REL_I0:
+	    case EIT_IMM_U0:
+	      break;
 	    case EIT_REL_I8:
 	      if (!(MIN_I8<=i-ptr-1<=MAX_I8))
 		LexExcept(lx,"branch out of range at ");
@@ -313,7 +313,7 @@ U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
 
 U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
 {
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   I64 i,ip2=tempx->ip+lx->a->ip;
   U8 *ptr;
   CLexCodeMisc *g_lb=NULL;
@@ -360,7 +360,7 @@ U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
   while (tempe!=&tempx->next_ie) {
     tempe1=tempe->next;
     QueRem(tempe);
-    if (EIT_REL_I8<=tempe->type<=EIT_IMM_U64) {
+    if (EIT_REL_I0<=tempe->type<=EIT_IMM_U64) {
       if (tempe->str) {
 	if (tempe->flags&EIF_GOTO_LABEL) {
 	  if(!(g_lb=LCCGoToLabelFind(lx,tempe->str)))
@@ -379,6 +379,9 @@ U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
     if (g_lb) {
       i=g_lb->addr+tempx->buf;
       nobound_switch (tempe->type) {
+	case EIT_REL_I0:
+	case EIT_IMM_U0:
+	  break;
 	case EIT_REL_I8:
 	  if (!(MIN_I8<=i-ptr-1<=MAX_I8))
 	    LexExcept(lx,"branch out of range at ");
@@ -415,12 +418,16 @@ U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
     } else {
       switch (tempe->type) {
 	sub_switch_start:
-	  case EIT_REL_EXPORT:
-	  case EIT_IMM_EXPORT:
+	  case EIT_REL32_EXPORT:
+	  case EIT_IMM32_EXPORT:
+	  case EIT_REL64_EXPORT:
+	  case EIT_IMM64_EXPORT:
+	  case EIT_IMM_U0:
 	  case EIT_IMM_U8:
 	  case EIT_IMM_U16:
 	  case EIT_IMM_U32:
 	  case EIT_IMM_U64:
+	  case EIT_REL_I0:
 	    break;
 	  case EIT_REL_I8:
 	    *ptr(U8 *) -=ip2;
@@ -446,7 +453,7 @@ U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
 }
 
 I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
-{ //Compile file, returns err_cnt
+{//AOT Compile CPP or PRJ file a and output BIN file. Returns err_cnt.
   U8 *ptr,*fbuf=NULL,*fbuf2=NULL,*fbuf3=NULL,
      *patch_table=MAlloc(0x20000);
   CExe *tempx;
@@ -458,23 +465,14 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
   CExeHeapGlbl *temphg,*temphg1;
 
   fbuf=DftExt(filename,"PRJ.Z");
-  fbuf2=MPrint("#include \"%s\"",fbuf);
+  fbuf2=MStrPrint("#include \"%s\"",fbuf);
   if (map_name)
     fbuf3=DftExt(map_name,"MAP.Z");
 
   if (tempx=CmpBuf(fbuf2,fbuf3,&error_cnt,&warning_cnt,mapfile_drv)) {
     ex_U8s=tempx->ex_U8s;
     ptr=patch_table;
-    //See $LK,"CBinFilePatchTableWithoutOrg",A="MN:CBinFilePatchTableWithoutOrg"$
-    *ptr++=EIT_MODULE_ALIGNMENT; //See $LK,"Load",A="MN:Load"$() and $LK,"BinRep",A="MN:BinRep"$()
-    *ptr(U32 *)++=tempx->max_align;
-    *ptr++=0;
-    if (tempx->module_org!=INVALID_PTR) {
-      //See $LK,"CBinFilePatchTableWithOrg",A="MN:CBinFilePatchTableWithOrg"$
-      *ptr++=EIT_MODULE_ORG;
-      *ptr(U32 *)++=tempx->module_org;
-      *ptr++=0;
-    }
+    //See $LK,"Load",A="MN:Load"$()
     cnt=0;
     tempa=tempx->abss;
     while (tempa) {
@@ -505,7 +503,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
 	temphgr=temphgr->next;
       }
       if (cnt) {
-	*ptr++=EIT_HEAP_GLBL;
+	*ptr++=EIT_DATA_HEAP;
 	*ptr(U32 *)++=cnt;
 	if (temphg->str) {
 	  i=StrLen(temphg->str);
@@ -531,7 +529,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
     tempe=tempx->next_ie;
     while (tempe!=&tempx->next_ie) {
       tempe1=tempe->next;
-      if (tempe->type<=EIT_IMM_EXPORT) {
+      if (!tempe->type || EIT_REL32_EXPORT<=tempe->type<=EIT_IMM64_EXPORT) {
 	QueRem(tempe);
 	*ptr++=tempe->type;
 	*ptr(U32 *)++=tempe->ip;
@@ -577,8 +575,11 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
     bfh=MAlloc(size);
     bfh->jmp=0xEB+256*(sizeof(CBinFile)-2);
 #assert sizeof(CBinFile)-2<=MAX_I8
-    bfh->type=0; //Reserved. Allow other types, maybe.	Must be 16 bytes, anyway.
-    bfh->loader_patch_table_offset=sizeof(CBinFile)+ex_U8s;
+    bfh->reserved=0;
+    bfh->bin_signature=BIN_SIGNATURE_VAL;
+    bfh->module_org=tempx->module_org;
+    bfh->module_align_bits=tempx->max_align_bits;
+    bfh->patch_table_offset=sizeof(CBinFile)+ex_U8s;
     bfh->file_size=size;
     MemCpy(bfh(U8 *)+sizeof(CBinFile),tempx->buf,ex_U8s);
     MemCpy(bfh(U8 *)+sizeof(CBinFile)+ex_U8s,patch_table,size-ex_U8s-sizeof(CBinFile));
@@ -587,7 +588,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
       fbuf2=DftExt(out_name,"BIN.Z");
     else
       fbuf2=ChgExt(fbuf,"BIN.Z");
-    if (!cmp_do_not_write_to_dsk)
+    if (!cmp.dont_write_to_dsk)
       FileWrite(fbuf2,bfh,size);
     Free(bfh);
     Free(tempx->buf);
@@ -603,12 +604,12 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
 }
 
 I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
-{
+{//JIT Compile and execute text from a puts("").
   I64 result;
   Bool okay=TRUE;
   CLex *lx;
   if (!filename)
-    filename=sys_temp_filename;
+    filename=dsk.temp_filename;
   lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
@@ -638,19 +639,19 @@ I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,CLexHashTableContext 
 }
 
 I64 ExePrint(U8 *fmt,...)
-{
+{//JIT Compile and execute text from a printf().
   I64 result;
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   result=ExePutS(buf);
   Free(buf);
   return result;
 }
 
 I64 ExeFile(U8 *name,Bool just_load=FALSE)
-{
+{//JIT Compile and execute a file.
   I64 result;
   U8 *name2=DftExt(name,"CPP.Z"),
-     *st=MPrint("#include \"%s\";",name2);
+     *st=MStrPrint("#include \"%s\";",name2);
   result=ExePutS(st,name,just_load);
   Free(st);
   Free(name2);
@@ -658,11 +659,11 @@ I64 ExeFile(U8 *name,Bool just_load=FALSE)
 }
 
 I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
-{ //throws exceptions
+{//throws exceptions
   I64 result;
   CLex *lx;
   if (!filename)
-    filename=sys_temp_filename;
+    filename=dsk.temp_filename;
   lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
   if (just_load)
     lx->flags|=LF_JUST_LOAD;
@@ -677,19 +678,19 @@ I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
 }
 
 I64 ExePrint2(U8 *fmt,...)
-{ //throws exceptions
+{//throws exceptions
   I64 result;
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   result=ExePutS2(buf);
   Free(buf);
   return result;
 }
 
 I64 ExeFile2(U8 *name,Bool just_load=FALSE)
-{ //throws exceptions
+{//throws exceptions
   I64 result;
   U8 *name2=DftExt(name,"CPP.Z"),
-     *st=MPrint("#include \"%s\";",name2);
+     *st=MStrPrint("#include \"%s\";",name2);
   result=ExePutS2(st,name,just_load);
   Free(st);
   Free(name2);
@@ -697,8 +698,8 @@ I64 ExeFile2(U8 *name,Bool just_load=FALSE)
 }
 
 I64 StreamExePrint(U8 *fmt,...)
-{//Suppose you want a value from the stream to be used in an #exe block...
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+{//Suppose you want a value from the stream to be used in an #exe{} block...
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   I64 result=0;
   CLexHashTableContext *htc;
   CLex *lx=Fs->last_lex;
@@ -716,20 +717,20 @@ I64 StreamExePrint(U8 *fmt,...)
 
 U0 CmpInit()
 {
-  compiled_lines=0;
-  compiled_funs=0;
-  compiled_bytes=0;
-  cmp_do_not_write_to_dsk=FALSE;
+  cmp.compiled_lines=0;
+  cmp.compiled_funs=0;
+  cmp.compiled_bytes=0;
+  cmp.dont_write_to_dsk=FALSE;
   CmpLoadDefines;
   CmpFillTables;
 
-  MemSet(&opt_nop,0,sizeof(CIntermediateCode));
-  QueInit(&opt_nop);
-  opt_nop.ic_class=sys_internal_types[RT_I64];
-  opt_nop.ic_code=IC_NOP1;
+  MemSet(&cmp.ic_nop,0,sizeof(CIntermediateCode));
+  QueInit(&cmp.ic_nop);
+  cmp.ic_nop.ic_class=cmp.internal_types[RT_I64];
+  cmp.ic_nop.ic_code=IC_NOP1;
 
   AsmHashLoad;
-  UnasmHashLoad;
+  UasmHashLoad;
 }
 
 CmpInit;

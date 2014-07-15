@@ -1,6 +1,6 @@
-$WW,1$$FG,5$$TX+CX,"Text-Widget Help"$$FG$
+$WW,1$$FG,5$$TX+CX,"DolDoc Widget Help"$$FG$
 
-See $LK,"::/Doc/Dollar.TXT"$ for details on dollar sign cmds.
+$LK,"DolDoc",A="::/Doc/DolDocOverview.TXT"$ is a propriatary TempleOS document type.
 
 $FG,2$"Expression"$FG$ a num or HolyC algebraic term with operators and HolyC syms can be entered.
 $FG,2$"Macro"$FG$ Most entries can behave like macro entries if you assign them macro strs.
@@ -28,7 +28,7 @@ $FG,5$Tree$FG$ The item will behave like a tree widget, with this as the root.
 $FG,5$Collapsed$FG$ The tree or hidden widget will begin collapsed.
 $FG,5$Define Str$FG$ will substitute a $FG,2$#define$FG$ or $LK,"DefineLoad",A="MN:DefineLoad"$() string for the tag.
 
-$FG,5$Quote$FG$ Make the result suitable for including in a program, in quotes, especially $FG,4$fmtstr$FG$ entries in class definitions.
+$FG,5$Quote$FG$ Make the result suitable for including in a program, in quotes, especially $FG,2$fmtstr$FG$ entries in class definitions.
 
 $FG,5$X Expression$FG$ For cursor movements, the horizontal value.
 $FG,5$Y Expression$FG$ For cursor movements, the vertical value.
@@ -37,6 +37,6 @@ $FG,5$$BK,1$PopUp$BK,0$$FG$ For macro's, run the macro in a PopUp window.  Do th
 
 $FG,5$Escape$FG$ For macro's, send an $FG,2$<ESC>$FG$ char to exit before running the macro.  Without this, the macro runs in the wrong window, usually.
 
-$FG,5$Refresh Data$FG$  updates $FG,4$$$DA$$$FG$ entry continuously.
+$FG,5$Refresh Data$FG$  updates $FG,2$$$DA...$$$FG$ entry continuously.
 
 $FG,5$Html Link$FG$  stores a link which will be embedded if you generate a html version of a document with $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$().

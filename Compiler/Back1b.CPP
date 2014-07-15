@@ -243,7 +243,7 @@ U0 ICCmp(CIntermediateCode *tempi,I64 us,I64 is,I64 ip)
 
 U0 ICBitOps(CIntermediateCode *tempi,CICArg *a1,CICArg *a2,CIntermediateCode *tempi2,
 	      I64 op,I64 op_imm,I64 ip)
-{ //TODO:not fully utilizing Modr
+{//TODO:not fully utilizing Modr
   Bool no_depend=ToBool(tempi2->ic_flags&ICF_NO_DEPEND_RESULT);
   I64 r1,t2,r2,d2,i=0x48;
   if (tempi->ic_flags & ICF_NOT_ADDR) {
@@ -448,7 +448,6 @@ U0 ICPreIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
   }
 }
 
-
 U0 ICPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
 {
   I64 r;
@@ -572,7 +571,6 @@ U0 ICAssignPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
       ICSlashOp(tempi,TY_DISP+RT_I64,REG_RDX,0,op,ip);
   }
 }
-
 
 U0 ICCmpAndBranch(CIntermediateCode *tempi,Bool has_result,I64 ip,
    I64 us,I64 is,I64 not_us,I64 not_is,

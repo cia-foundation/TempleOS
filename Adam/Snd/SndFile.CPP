@@ -2,7 +2,7 @@
 #define SNDFILE_SAMPLE_RATE	8000
 //Header for a ".SND" file
 class CFileSND
-{ //big endian
+{//big endian
   U32 signature;    //0x646e732e
   U32 offset;	   //24
   U32 data_size;
@@ -12,19 +12,16 @@ class CFileSND
   I16 body[1];
 };
 
-//This is a windows media constraint.
+//Windows media constraint.
 //#define MAX_SND_FILE_DATA	0x0007FF00
 #define MAX_SND_FILE_DATA	0x7FFFFF00
 
-
 public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=0.0,I64 waveform=WF_SQUARE,
   F64 reverb_delay=0,F64 reverb_intensity=0)
-//Use "snd_record" flag to start or stop
-//recording, then call this routine.
+{//Use "snd.record" flag to start or stop recording, then call this routine.
 //Averaging should be a num from 0.0 to 0.999.
 //Vol should be from 0.0 to 1.0.
 //Set reverb_delay to like 0.3 sec and reverb_intensity to like 0.4.
-{
   I64 i,k,cnt,cnt2,level,file_num;
   F64 avg,dt;
   CFileSND *s;
@@ -32,12 +29,12 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
   CSndData *d,*d1;
   U8 *name,*name2;
 
-  snd_record=FALSE;
+  snd.record=FALSE;
 
-  dt=snd_record_root.last->time_stamp-snd_record_root.next->time_stamp;
+  dt=snd.record_root.last->time-snd.record_root.next->time;
   if (!dt) return 0;
   cnt=dt*SNDFILE_SAMPLE_RATE;
-  cnt++; //terminator
+  cnt++; //Terminator
 
   name=StrNew(base_filename);
   FileExtRem(name);
@@ -49,11 +46,11 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
   s->sample_rate=EndianU32(SNDFILE_SAMPLE_RATE);
   s->channels=EndianU32(1);
 
-  d=snd_record_root.next;
+  d=snd.record_root.next;
   k=0;
-  while (d->next!=&snd_record_root) {
+  while (d->next!=&snd.record_root) {
     d1=d->next;
-    dt=d1->time_stamp-d->time_stamp;
+    dt=d1->time-d->time;
     cnt2=dt*SNDFILE_SAMPLE_RATE;
     SndWaveAddBuf(swc,&s->body[k],cnt2,d->freq,waveform,normalized_vol);
     k+=cnt2;
@@ -69,14 +66,14 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
       s->body[i]=avg=LowPass1(averaging,avg,s->body[i],1.0);
     }
 
-    //reverb
+  //Reverb
   if (reverb_intensity) {
     if (dt=reverb_delay*SNDFILE_SAMPLE_RATE)
       for (i=dt;i<cnt;i++)
 	s->body[i]+=reverb_intensity*s->body[i-dt];
       }
 
-      //Get rid of D.C. component
+  //Get rid of D.C. component
   for (k=0;k<3;k++) {
     level=0;
     for (i=0;i<cnt-1;i++)
@@ -91,8 +88,8 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
 
   s->body[cnt-1]=0;
 
-  d=snd_record_root.next;
-  while (d!=&snd_record_root) {
+  d=snd.record_root.next;
+  while (d!=&snd.record_root) {
     d1=d->next;
     QueRem(d);
     Free(d);
@@ -108,7 +105,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
       i=MAX_SND_FILE_DATA;
     s->data_size=EndianU32(i*sizeof(I16));
     MemCpy(s->body,&s->body[file_num*MAX_SND_FILE_DATA],i*sizeof(I16));
-    SPrint(name2,"%s%03d.SND",name,file_num++);
+    StrPrint(name2,"%s%03d.SND",name,file_num++);
     FileWrite(name2,s,offset(CFileSND.body)+i*sizeof(I16));
     cnt2-=i;
   }
@@ -119,5 +116,3 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
   SndWaveCtrlDel(swc);
   return cnt;
 }
-
-#help_index ""

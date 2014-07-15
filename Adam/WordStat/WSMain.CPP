@@ -1,36 +1,8 @@
 #help_index "WordStat"
 
-/****  Debug code
-U0 WSPutMatrix(CWSMatrix *m)
-{
-  I64 i,j;
-  CWSMatrixSide *ms;
-  CWS *tempw;
-
-  "n:%d\n",m->n;
-  for (i=0;i<ws_num_matrix_words;i++) {
-    ms=&m->side[i];
-    "col:%d rhits:%d chits:%d\n",i,ms->row_hits,ms->col_hits;
-    tempw=ms->next;
-    while (tempw!=ms) {
-      "substructs:%d entries:%d\n",tempw->substructs,tempw->entries;
-      for (j=0;j<tempw->substructs;j++) {
-	"(%04X %04X) ",
-	  tempw->subs[j].hits,
-	  tempw->subs[j].repeats;
-      }
-      NewLine;
-      tempw=tempw->next;
-    }
-  }
-
-  View;
-}
-****/
-
 CHashWS *WSHashAdd(U8 *w)
 {
-  CHashWS *tempw=HashFind(w,ws_hash_table,HTT_WORD);
+  CHashWS *tempw=HashFind(w,ws.hash_table,HTT_WORD);
   if (tempw) {
     tempw->hits++;
     return tempw;
@@ -41,8 +13,8 @@ CHashWS *WSHashAdd(U8 *w)
   tempw->use_cnt=1;
   tempw->hits=1;
   tempw->num=-1;
-  HashAdd(tempw,ws_hash_table);
-  ws_num_words++;
+  HashAdd(tempw,ws.hash_table);
+  ws.num_words++;
   return tempw;
 }
 
@@ -57,10 +29,10 @@ U0 WSSidesInit(CWSMatrix *m)
     m->side[i].row_hits=0;
     m->side[i].col_hits=0;
     tempa=AMAlloc(sizeof(CWS));
-    ws_structs_size+=MSize2(tempa);
+    ws.structs_size+=MSize2(tempa);
     tempa->subs[0].hits=0;
-    tempa->subs[0].repeats=ws_num_matrix_words;
-    tempa->entries=ws_num_matrix_words;
+    tempa->subs[0].repeats=ws.num_matrix_words;
+    tempa->entries=ws.num_matrix_words;
     tempa->substructs=1;
     QueIns(tempa,m->side[i].last);
   }
@@ -72,10 +44,10 @@ CWS *WSStructFind(CWSMatrix *m,I64 col,I64 row,
   CWS *tempa;
   I64 row_base,i,j;
  
-  if (row>=ws_num_matrix_words ||
-      col>=ws_num_matrix_words)
+  if (row>=ws.num_matrix_words ||
+      col>=ws.num_matrix_words)
     return NULL;
-  if (row<ws_num_matrix_words>>1) {
+  if (row<ws.num_matrix_words>>1) {
     tempa=m->side[col].next;
     row_base=0;
     j=row;
@@ -89,9 +61,9 @@ CWS *WSStructFind(CWSMatrix *m,I64 col,I64 row,
       row_base+=tempa->subs[*_substruct].repeats;
     }
   } else {
-    row=ws_num_matrix_words-row;
+    row=ws.num_matrix_words-row;
     tempa=m->side[col].last;
-    row_base=ws_num_matrix_words;
+    row_base=ws.num_matrix_words;
     j=row;
     while (row>(i=tempa->entries)) {
       row-=i;
@@ -109,12 +81,12 @@ CWS *WSStructFind(CWSMatrix *m,I64 col,I64 row,
   return tempa;
 }
 
-public I64 WSGetHits(CWSMatrix *m,I64 col,I64 row)
-{
+public I64 WSHitsGet(CWSMatrix *m,I64 col,I64 row)
+{//Look-up markov stats for word followed by word.
   I64 row_base,substruct;
   CWS *tempa;
-  if (row>=ws_num_matrix_words ||
-      col>=ws_num_matrix_words)
+  if (row>=ws.num_matrix_words ||
+      col>=ws.num_matrix_words)
     return 0;
   tempa=WSStructFind(m,col,row,
 		    &row_base,&substruct);
@@ -152,7 +124,7 @@ U0 WSRem(CWSSub *s,CWS *parent)
     return;
   if (parent->substructs==1) {
     QueRem(parent);
-    ws_structs_size-=MSize2(parent);
+    ws.structs_size-=MSize2(parent);
     Free(parent);
   } else {
     parent->entries-=s->repeats;
@@ -172,7 +144,7 @@ CWSSub *WSIns(CWSSub *s,CWS **_parent,CWSSub *last)
     *_parent=parent;
     if (parent->substructs==-1) {
       tempa=AMAlloc(sizeof(CWS));
-      ws_structs_size+=MSize2(tempa);
+      ws.structs_size+=MSize2(tempa);
       QueIns(tempa,parent->last);
       parent=tempa;
       *_parent=parent;
@@ -184,7 +156,7 @@ CWSSub *WSIns(CWSSub *s,CWS **_parent,CWSSub *last)
     tempa=parent->next;
     if (tempa->substructs==-1 || tempa->substructs==WS_SUBSTRUCTS_PER_STRUCT) {
       tempa=AMAlloc(sizeof(CWS));
-      ws_structs_size+=MSize2(tempa);
+      ws.structs_size+=MSize2(tempa);
       tempa->entries=0;
       tempa->substructs=0;
       QueIns(tempa,parent);
@@ -253,8 +225,8 @@ I64 WSHitsInc(CWSMatrix *m,I64 col,I64 row)
   CWSSub sn,*temps,*temps1,*temps_l;
   CWS	 *tempa,*tempa1,*tempa_l;
 
-  if (row>=ws_num_matrix_words ||
-      col>=ws_num_matrix_words)
+  if (row>=ws.num_matrix_words ||
+      col>=ws.num_matrix_words)
     return 0;
   tempa=WSStructFind(m,col,row,&row_base,&substruct);
   temps=&tempa->subs[substruct];
@@ -333,12 +305,12 @@ U0 WSSingleFileAdd(U8 *buf,I64 pass)
     if (pass==1)
       WSHashAdd(ptr);
     else {
-      cur_ptr=HashFind(ptr,ws_hash_table,HTT_WORD);
+      cur_ptr=HashFind(ptr,ws.hash_table,HTT_WORD);
       if (cur_ptr->num<0)
 	cur_ptr=NULL;
       else
 	if (last_ptr)
-	  WSHitsInc(ws_matrix,last_ptr->num,cur_ptr->num);
+	  WSHitsInc(ws.matrix,last_ptr->num,cur_ptr->num);
       last_ptr=cur_ptr;
     }
     ptr=ptr2;
@@ -384,7 +356,6 @@ I64 WSPriorWordInStr(U8 *src,U8 *dst,I64 len,I64 buf_size)
   return i+1;
 }
 
-
 Bool WSPartialMatch(U8 *partial,U8 *complete)
 {
   I64 i,l=StrLen(partial);
@@ -398,27 +369,24 @@ U0 WSFillIn(I64 n)
 {
   U8 *s;
   I64 len;
-  if (0<=--n<ws_num_fillins) {
-    s=ws_sorted_words[ws_fillin_matches[n]]->str;
+  if (0<=--n<ws.num_fillins) {
+    s=ws.sorted_words[ws.fillin_matches[n]]->str;
     len=StrLen(s);
-    if (len>ws_partial_len)
-      Auto(s+ws_partial_len);
+    if (len>ws.partial_len)
+      Auto(s+ws.partial_len);
   }
 }
 
 U0 WSMan(I64 n,CTask *parent_task=NULL)
 {
-  U8 *buf;
   CHashWS *tempw;
   CHashSrcSym *temph;
   Bool old_preempt=Preempt(OFF);
-  if (0<=--n<ws_num_fillins && (tempw=ws_sorted_words[ws_fillin_matches[n]]) &&
+  if (0<=--n<ws.num_fillins && (tempw=ws.sorted_words[ws.fillin_matches[n]]) &&
 	(temph=HashFind(tempw->str,Fs->hash_table,HTG_SRC_SYM)) &&
 	temph->src_link) {
-    buf=MPrint("Ed(\"%s\");",temph->src_link);
     Preempt(old_preempt);
-    PopUp(buf,parent_task);
-    Free(buf);
+    PopUpEd(temph->src_link,parent_task);
   }
   Preempt(old_preempt);
 }
@@ -427,23 +395,23 @@ U0 WSFillInAdd(I64 i,I64 j,I64 old_num_fillins)
 {
   Bool cont;
   I64 k;
-  if (ws_num_fillins<WS_MAX_FILLINS || i>ws_fillin_scores[ws_num_fillins-1] ||
-      i==ws_fillin_scores[ws_num_fillins-1] && ws_sorted_words[j]->hits>ws_fillin_hits[ws_num_fillins-1]) {
+  if (ws.num_fillins<WS_MAX_FILLINS || i>ws.fillin_scores[ws.num_fillins-1] ||
+      i==ws.fillin_scores[ws.num_fillins-1] && ws.sorted_words[j]->hits>ws.fillin_hits[ws.num_fillins-1]) {
     cont=TRUE;
-    for (k=ws_num_fillins-1;k>=old_num_fillins && cont;k--)
-      if (i<=ws_fillin_scores[k] || i==ws_fillin_scores[k] && ws_sorted_words[j]->hits<=ws_fillin_hits[k]) {
+    for (k=ws.num_fillins-1;k>=old_num_fillins && cont;k--)
+      if (i<=ws.fillin_scores[k] || i==ws.fillin_scores[k] && ws.sorted_words[j]->hits<=ws.fillin_hits[k]) {
 	cont=FALSE;
 	k++; //offset k--
       } else {
-	ws_fillin_scores[k+1]=ws_fillin_scores[k];
-	ws_fillin_matches[k+1]=ws_fillin_matches[k];
-	ws_fillin_hits[k+1]=ws_fillin_hits[k];
+	ws.fillin_scores[k+1]=ws.fillin_scores[k];
+	ws.fillin_matches[k+1]=ws.fillin_matches[k];
+	ws.fillin_hits[k+1]=ws.fillin_hits[k];
       }
-    if (ws_num_fillins<WS_MAX_FILLINS)
-      ws_num_fillins++;
-    ws_fillin_scores[k+1]=i;
-    ws_fillin_hits[k+1]=ws_sorted_words[j]->hits;
-    ws_fillin_matches[k+1]=j;
+    if (ws.num_fillins<WS_MAX_FILLINS)
+      ws.num_fillins++;
+    ws.fillin_scores[k+1]=i;
+    ws.fillin_hits[k+1]=ws.sorted_words[j]->hits;
+    ws.fillin_matches[k+1]=j;
   }
 }
 
@@ -464,31 +432,31 @@ U0 WSPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task)
   if (data_col==-1)
     data_col=0;
   data_col=WSPriorWordInStr(src,buf,data_col,256);
-  ws_partial_len=StrLen(buf);
+  ws.partial_len=StrLen(buf);
   data_col=WSSkipCrap(src,data_col);
   data_col=WSPriorWordInStr(src,buf1,data_col,256);
 
-  if (ws_cur_word && !StrCmp(ws_cur_word,buf))
+  if (ws.cur_word && !StrCmp(ws.cur_word,buf))
     goto pc_done;
 
-  st=ws_cur_word;
-  ws_cur_word=AStrNew(buf);
+  st=ws.cur_word;
+  ws.cur_word=AStrNew(buf);
   Free(st);
   Preempt(ON);
-  if (StrLen(buf1)&&ws_hash_table)
-    w2=HashFind(buf1,ws_hash_table,HTT_WORD);
+  if (StrLen(buf1)&&ws.hash_table)
+    w2=HashFind(buf1,ws.hash_table,HTT_WORD);
   else
     w2=NULL;
-  ws_num_fillins=0;
-  if (w2 && w2->num<ws_num_matrix_words)
-    for (j=0;j<ws_num_matrix_words && tS<timeout_time;j++)
-      if (WSPartialMatch(ws_cur_word,ws_sorted_words[j]->str)) {
-	i=WSGetHits(ws_matrix,w2->num,ws_sorted_words[j]->num);
+  ws.num_fillins=0;
+  if (w2 && w2->num<ws.num_matrix_words)
+    for (j=0;j<ws.num_matrix_words && tS<timeout_time;j++)
+      if (WSPartialMatch(ws.cur_word,ws.sorted_words[j]->str)) {
+	i=WSHitsGet(ws.matrix,w2->num,ws.sorted_words[j]->num);
 	WSFillInAdd(i,j,0);
       }
-  k=ws_num_fillins;
-  for (j=0;j<ws_num_words && tS<timeout_time;j++)
-    if (WSPartialMatch(ws_cur_word,ws_sorted_words[j]->str))
+  k=ws.num_fillins;
+  for (j=0;j<ws.num_words && tS<timeout_time;j++)
+    if (WSPartialMatch(ws.cur_word,ws.sorted_words[j]->str))
       WSFillInAdd(0,j,k);
   Preempt(OFF);
 
@@ -499,9 +467,9 @@ pc_done:
   Fs->text_attr=LTBLUE<<4+WHITE;
   Fs->border_src =BDS_CONST;
   Fs->border_attr=LTBLUE<<4+BLACK;
-  DocPrint(doc,"Word:%s\n",ws_cur_word);
-  for (i=0;i<ws_num_fillins;i++) {
-    st=ws_sorted_words[ws_fillin_matches[i]]->str;
+  DocPrint(doc,"Word:%s\n",ws.cur_word);
+  for (i=0;i<ws.num_fillins;i++) {
+    st=ws.sorted_words[ws.fillin_matches[i]]->str;
     ch=CH_SPACE;
     DocPrint(doc,"F%02d ",i+1);
     if (TaskValidate(focus_task) &&
@@ -513,7 +481,7 @@ pc_done:
     } else
       DocPrint(doc,"%s\n",st);
   }
-  if (wsd_has_words)
+  if (wsd.has_words)
     WSDDictWordsAdd(doc);
 
   DocRecalc(doc);
@@ -534,9 +502,9 @@ U0 WSTask(I64)
   DocTermNew;
   SetWinHorz(51,Fs->win_right);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_BORDER-WIF_IP_L-WIF_IP_R-WIG_DBL_CLICK;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER-WIF_SELF_IP_L-WIF_SELF_IP_R-WIG_DBL_CLICK;
   while (TRUE) {
-    if (Bt(&ws_flags,WSf_ENABLE)) {
+    if (Bt(&ws.flags,WSf_ENABLE)) {
       original_focus_task=focus_task=sys_focus_task;
       while (TaskValidate(focus_task) && Bt(&focus_task->task_flags,TASKf_INPUT_FILTER_TASK))
 	focus_task=focus_task->parent_task;
@@ -551,7 +519,7 @@ U0 WSTask(I64)
 	    doc_e=doc_e->last;
 	  while (doc_e->last->type_u8 !=DOCT_NEW_LINE && doc_e->last!=doc)
 	    doc_e=doc_e->last;
-	  if (Bt(&ws_flags,WSf_ENABLE))
+	  if (Bt(&ws.flags,WSf_ENABLE))
 	    WSPutChoices(doc,doc_e,focus_task);
 	  else
 	    DocUnlock(doc);
@@ -564,11 +532,11 @@ U0 WSTask(I64)
       break;
     doc=DocPut;
     DocLock(doc);
-    if (doc->cur_entry!=doc && doc->cur_entry->flags1 & DOCEF1_LINK)
+    if (doc->cur_entry!=doc && doc->cur_entry->de_flags & DOCEF_LINK)
       '' CH_SPACE;
     DocUnlock(doc);
   }
-  ws_task=NULL;
+  ws.task=NULL;
 }
 
 U0 WSMainFileLstTraverse(U8 *files_find_mask,I64 pass)
@@ -586,7 +554,7 @@ U0 WSMainFileLstTraverse(U8 *files_find_mask,I64 pass)
     }
   } catch
     Fs->catch_except=TRUE;
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
 
 U0 WSMatrixDel(CWSMatrix *m)
@@ -606,30 +574,29 @@ U0 WSMatrixDel(CWSMatrix *m)
   Free(m);
 }
 
-
 public Bool WordStat(Bool val=OFF)
-{
+{//Turn WordStat OFF (or ON).
   Bool	old_wordstat=FALSE,
 	old_preempt=Preempt(OFF);
   if (val) {
-    while (Bt(&ws_flags,WSf_INIT_IN_PROGRESS))
+    while (Bt(&ws.flags,WSf_INIT_IN_PROGRESS))
       Sleep(10);
-    if (TaskValidate(ws_task))
+    if (TaskValidate(ws.task))
       old_wordstat=TRUE;
     else {
-      ws_task=Spawn(&WSTask,NULL,"WordStat");
-      TaskWait(ws_task);
+      ws.task=Spawn(&WSTask,NULL,"WordStat");
+      TaskWait(ws.task);
     }
-    if (!LBts(&ws_flags,WSf_ENABLE))
-      WinToTop(ws_task);
+    if (!LBts(&ws.flags,WSf_ENABLE))
+      WinToTop(ws.task);
   } else {
-    LBtr(&ws_flags,WSf_ENABLE);
-    if (TaskValidate(ws_task)) {
+    LBtr(&ws.flags,WSf_ENABLE);
+    if (TaskValidate(ws.task)) {
       old_wordstat=TRUE;
-      Kill(ws_task);
-      while (TaskValidate(ws_task))
+      Kill(ws.task);
+      while (TaskValidate(ws.task))
 	Yield;
-      ws_task=NULL;
+      ws.task=NULL;
     }
   }
   Preempt(old_preempt);
@@ -638,27 +605,27 @@ public Bool WordStat(Bool val=OFF)
 
 U0 WSProgressTask(Bool *_start_flag)
 {
-  I64 start=sys_dsk_writes;
+  I64 start=dsk.write_cnt;
   progress1=0;
   progress1_max=(Size(WSD_DEF_FILENAME_Z,"+x+s")+BLK_SIZE-1)>>BLK_SIZE_BITS;
   StrCpy(progress1_desc,"Uncompressing Dictionary");
-  start=sys_dsk_writes;
+  start=dsk.write_cnt;
   *_start_flag=TRUE;
   while (progress1<progress1_max) {
-    progress1=sys_dsk_writes-start;
+    progress1=dsk.write_cnt-start;
     Sleep(10);
   }
   *progress1_desc=progress1=progress1_max=0;
 }
 
 public U0 WSInit(U8 *mask=NULL)
-{
+{//Read files and build WordStat statistics.
   I64 i,j=0;
   Bool start_flag;
   CHashWS *tempw;
   CBlkDev *bdev=Drv2BlkDev;
 
-  while (LBts(&ws_flags,WSf_INIT_IN_PROGRESS))
+  while (LBts(&ws.flags,WSf_INIT_IN_PROGRESS))
     Yield;
   WordStat;
 
@@ -672,52 +639,50 @@ public U0 WSInit(U8 *mask=NULL)
     Move(WSD_DEF_FILENAME_Z,WSD_DEF_FILENAME);
   }
 
-  HashTableDel(ws_hash_table);
-  ws_hash_table=HashTableNew(0x4000,adam_task);
+  HashTableDel(ws.hash_table);
+  ws.hash_table=HashTableNew(0x4000,adam_task);
 
-  ws_num_words=0;
-  ws_num_matrix_words=0;
-  ws_structs_size=0;
-  Free(ws_cur_word);
-  ws_cur_word=NULL;
+  ws.num_words=0;
+  ws.num_matrix_words=0;
+  ws.structs_size=0;
+  Free(ws.cur_word);
+  ws.cur_word=NULL;
 
   "\n\nPass #1\n";
   if (mask) WSMainFileLstTraverse(mask,1);
-  Free(ws_sorted_words);
-  ws_sorted_words=AMAlloc(sizeof(U8 *)*ws_num_words);
+  Free(ws.sorted_words);
+  ws.sorted_words=AMAlloc(sizeof(U8 *)*ws.num_words);
 
-  tempw=ws_hash_table->next_added;
-  while (tempw!=ws_hash_table) {
-    ws_sorted_words[j++]=tempw;
+  tempw=ws.hash_table->next_added;
+  while (tempw!=ws.hash_table) {
+    ws.sorted_words[j++]=tempw;
     tempw=tempw->next_added;
   }
-  QSortI64(ws_sorted_words,ws_num_words,&WSCompare);
-  for (i=0;i<ws_num_words;i++)
-    ws_sorted_words[i]->num=i;
-  if (ws_num_words<=WS_MAX_MATRIX_WORDS)
-    ws_num_matrix_words=ws_num_words;
+  QSortI64(ws.sorted_words,ws.num_words,&WSCompare);
+  for (i=0;i<ws.num_words;i++)
+    ws.sorted_words[i]->num=i;
+  if (ws.num_words<=WS_MAX_MATRIX_WORDS)
+    ws.num_matrix_words=ws.num_words;
   else
-    ws_num_matrix_words=WS_MAX_MATRIX_WORDS;
+    ws.num_matrix_words=WS_MAX_MATRIX_WORDS;
 
-  WSMatrixDel(ws_matrix);
-  ws_matrix=AMAlloc(sizeof(CWSMatrix));
-  WSSidesInit(ws_matrix);
+  WSMatrixDel(ws.matrix);
+  ws.matrix=AMAlloc(sizeof(CWSMatrix));
+  WSSidesInit(ws.matrix);
 
   "\n\nPass #2\n";
   if (mask) WSMainFileLstTraverse(mask,2);
 
   WSDWordsLoad;
-  LBtr(&ws_flags,WSf_INIT_IN_PROGRESS);
+  LBtr(&ws.flags,WSf_INIT_IN_PROGRESS);
   WordStat(ON);
 }
 
 I64 WordStatSize()
 {
-  if (ws_hash_table)
-    return HashTableSize2(ws_hash_table)+ws_structs_size+
-	   MSize2(ws_sorted_words)+MSize2(ws_matrix)+MSize2(ws_dict_word_lst);
+  if (ws.hash_table)
+    return HashTableSize2(ws.hash_table)+ws.structs_size+
+	   MSize2(ws.sorted_words)+MSize2(ws.matrix)+MSize2(wsd.word_lst);
   else
     return 0;
 }
-
-#help_index ""

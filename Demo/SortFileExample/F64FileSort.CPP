@@ -16,7 +16,7 @@ U0 F64FileSortTXT(U8 *in_name,U8 *out_name)
 
   //Pass1: Count the number of F64s.
   n=0;
-  lx=LexNew(MPrint("#include \"%s\"",in_name));
+  lx=LexNew(MStrPrint("#include \"%s\"",in_name));
   while (Lex(lx))
     if (lx->token==TK_F64)
       n++;
@@ -26,7 +26,7 @@ U0 F64FileSortTXT(U8 *in_name,U8 *out_name)
 
   //Pass2: Read F64s.
   i=0;
-  lx=LexNew(MPrint("#include \"%s\"",in_name));
+  lx=LexNew(MStrPrint("#include \"%s\"",in_name));
   while (Lex(lx))
     if (lx->token==TK_F64)
       a[i++]=lx->cur_f64;
@@ -49,7 +49,7 @@ Type("/Demo/SortFileExample/UnsortedF64.TXT.Z");
 Type("/Demo/SortFileExample/SortedF64.TXT.Z");
 
 U0 F64FileSortDAT(U8 *in_name,U8 *out_name)
-{//$LK,"File/Program Routines/CFile",A="HI:File/Program Routines/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
+{//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
   I64 size;
   F64 *a=FileRead(in_name,&size);
   QSortI64(a,size/sizeof(F64),&Compare); //Sort 64-bit sized values
@@ -59,7 +59,7 @@ U0 F64FileSortDAT(U8 *in_name,U8 *out_name)
 F64FileSortDAT("/Demo/SortFileExample/UnsortedF64.DAT.Z","/Demo/SortFileExample/SortedF64.DAT.Z");
 
 U0 F64FileDumpDAT(U8 *in_name)
-{//$LK,"File/Program Routines/CFile",A="HI:File/Program Routines/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
+{//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
   I64 i,n,size;
   F64 *a=FileRead(in_name,&size);
   n=size/sizeof(F64);

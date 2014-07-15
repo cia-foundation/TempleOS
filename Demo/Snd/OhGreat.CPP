@@ -1,8 +1,8 @@
 U0 Song()
-{ //Song by Terry A. Davis
+{//Song by Terry A. Davis
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
-  try //Catch <CTRL-ALT-C> exit
+  try //Catch <CTRL-ALT-c> exit
     while (!ScanChar) {
 	Play("4hEqDCBCDhE",
 	    "God \0is \0a \0g\0od \0of \0love.\n\0");
@@ -34,7 +34,7 @@ U0 Song()
       }
   catch
     PutExcept;
-  NewLine;
+  '\n';
   Snd(0);
 }
 

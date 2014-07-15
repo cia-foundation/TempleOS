@@ -1,405 +1,46 @@
-#help_index "Graphics"
-I64 *gr_1_to_8_bits,*gr_1_to_8_colors;
-
-#help_index "Graphics/Char;Char/Graphics"
-U32 *gr_text_base;
-U16 *gr_win_z_buf;
-
+#help_index "Graphics/Misc"
 asm {
 USE64
-// ************************************
-_PLOT_SCREEN_U8::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	RBX,U64 SF_ARG2[RBP]
-	MOV	RAX,U64 SF_ARG3[RBP]
-	TEST	RBX,RBX
-	JS	@@05
-	TEST	RAX,RAX
-	JS	@@05
-	CMP	RBX,TEXT_COLS
-	JGE	@@05
-	CMP	RAX,TEXT_ROWS
-	JGE	@@05
-	IMUL2	RAX,TEXT_COLS
-	ADD	RBX,RAX
-	SHL	RBX,2
-	ADD	RBX,U64 [&gr_text_base]
-	MOV	RAX,U64 SF_ARG1[RBP]
-	MOV	U32 [RBX],EAX
-
-	MOV	RAX,1
-	POP	RBP
-	RET1	24
-@@05:	XOR	RAX,RAX
-	POP	RBP
-	RET1	24
-// ************************************
-_PLOT_WIN_U8::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	RCX,U64 SF_ARG1[RBP]
-	MOV	RBX,U64 CTask.scroll_x[RCX]
-	SAR	RBX,3
-	ADD	RBX,U64 SF_ARG3[RBP]
-	MOV	RAX,U64 CTask.scroll_y[RCX]
-	SAR	RAX,3
-	ADD	RAX,U64 SF_ARG4[RBP]
-
-	TEST	RBX,RBX
-	JS	@@05
-	ADD	RBX,U64 CTask.win_left[RCX]
-	CMP	RBX,U64 CTask.win_right[RCX]
-	JG	@@05
-	TEST	RBX,RBX
-	JS	@@05
-	CMP	RBX,TEXT_COLS
-	JGE	@@05
-
-	TEST	RAX,RAX
-	JS	@@05
-	ADD	RAX,U64 CTask.win_top[RCX]
-	CMP	RAX,U64 CTask.win_bottom[RCX]
-	JG	@@05
-	TEST	RAX,RAX
-	JS	@@05
-	CMP	RAX,TEXT_ROWS
-	JGE	@@05
-
-	IMUL2	RAX,TEXT_COLS
-	ADD	RBX,RAX
-	SHL	RBX,2
-	ADD	RBX,U64 [&gr_text_base]
-	MOV	RAX,U64 SF_ARG2[RBP]
-	MOV	U32 [RBX],EAX
-
-	MOV	RAX,1
-	POP	RBP
-	RET1	32
-@@05:	XOR	RAX,RAX
-	POP	RBP
-	RET1	32
-// ************************************
-/*
-Bool PlotWinStr2(CTask *task,U8 *s,I64 len,
-		   I64 attr,I64 x,I64 y)
-*/
-_PLOT_WIN_STR2::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	R9,U64 [&gr_text_base]
-	PUSH	RSI
-	PUSH	RDI
-	MOV	RBX,U64 SF_ARG1[RBP]
-	MOV	RSI,U64 SF_ARG2[RBP]
-	MOV	RDI,U64 CTask.scroll_x[RBX]
-	SAR	RDI,3
-	ADD	RDI,U64 SF_ARG5[RBP]
-	MOV	RCX,U64 SF_ARG3[RBP]
-
-	TEST	RDI,RDI
-	JNS	@@05
-	ADD	RCX,RDI
-	SUB	RSI,RDI
-	XOR	RDI,RDI
-@@05:	ADD	RDI,U64 CTask.win_left[RBX]
-	MOV	RDX,RCX
-	ADD	RDX,RDI
-	DEC	RDX
-	CMP	RDX,U64 CTask.win_right[RBX]
-	JLE	@@10
-	MOV	RAX,RDX
-	SUB	RAX,U64 CTask.win_right[RBX]
-	SUB	RDX,RAX
-	SUB	RCX,RAX
-@@10:	TEST	RDI,RDI
-	JNS	@@15
-	ADD	RCX,RDI
-	SUB	RSI,RDI
-	XOR	RDI,RDI
-@@15:	INC	RDX
-	SUB	RDX,TEXT_COLS
-	JLE	@@20
-	SUB	RCX,RDX
-@@20:	CMP	RCX,1
-	JL	@@30
-
-	MOV	RAX,U64 CTask.scroll_y[RBX]
-	SAR	RAX,3
-	ADD	RAX,U64 SF_ARG6[RBP]
-	TEST	RAX,RAX
-	JS	@@30
-	ADD	RAX,U64 CTask.win_top[RBX]
-	CMP	RAX,U64 CTask.win_bottom[RBX]
-	JG	@@30
-	TEST	RAX,RAX
-	JS	@@30
-	CMP	RAX,TEXT_ROWS
-	JGE	@@30
-
-	IMUL2	RAX,TEXT_COLS
-	ADD	RDI,RAX
-	SHL	RDI,2
-	ADD	RDI,R9
-	MOV	RAX,U64 SF_ARG4[RBP]
-@@25:	LODSB
-	STOSD
-	DEC	RCX
-	JNZ	@@25
-
-	POP	RDI
-	POP	RSI
-	MOV	RAX,TRUE
-	POP	RBP
-	RET1	48
-
-@@30:	POP	RDI
-	POP	RSI
-	XOR	RAX,RAX
-	POP	RBP
-	RET1	48
-// ************************************
-/*
-Bool PlotAttrStr2(CTask *task,U32 *hl,I64 len,I64 x,I64 y)
-*/
-_PLOT_ATTR_STR2::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	R9,U64 [&gr_text_base]
-	PUSH	RSI
-	PUSH	RDI
-	MOV	RBX,U64 SF_ARG1[RBP]
-	MOV	RSI,U64 SF_ARG2[RBP]
-	MOV	RDI,U64 CTask.scroll_x[RBX]
-	SAR	RDI,3
-	ADD	RDI,U64 SF_ARG4[RBP]
-	MOV	RCX,U64 SF_ARG3[RBP]
-
-	TEST	RDI,RDI
-	JNS	@@05
-	ADD	RCX,RDI
-	SHL	RDI,2
-	SUB	RSI,RDI
-	XOR	RDI,RDI
-@@05:	ADD	RDI,U64 CTask.win_left[RBX]
-	MOV	RDX,RCX
-	ADD	RDX,RDI
-	DEC	RDX
-	CMP	RDX,U64 CTask.win_right[RBX]
-	JLE	@@10
-	MOV	RAX,RDX
-	SUB	RAX,U64 CTask.win_right[RBX]
-	SUB	RDX,RAX
-	SUB	RCX,RAX
-@@10:	TEST	RDI,RDI
-	JNS	@@15
-	ADD	RCX,RDI
-	SHL	RDI,2
-	SUB	RSI,RDI
-	XOR	RDI,RDI
-@@15:	INC	RDX
-	SUB	RDX,TEXT_COLS
-	JLE	@@20
-	SUB	RCX,RDX
-@@20:	CMP	RCX,1
-	JL	@@30
-
-	MOV	RAX,U64 CTask.scroll_y[RBX]
-	SAR	RAX,3
-	ADD	RAX,U64 SF_ARG5[RBP]
-	TEST	RAX,RAX
-	JS	@@30
-	ADD	RAX,U64 CTask.win_top[RBX]
-	CMP	RAX,U64 CTask.win_bottom[RBX]
-	JG	@@30
-	TEST	RAX,RAX
-	JS	@@30
-	CMP	RAX,TEXT_ROWS
-	JGE	@@30
-
-	IMUL2	RAX,TEXT_COLS
-	ADD	RDI,RAX
-	SHL	RDI,2
-	ADD	RDI,R9
-@@25:	MOVSD
-	DEC	RCX
-	JNZ	@@25
-
-	POP	RDI
-	POP	RSI
-	MOV	RAX,TRUE
-	POP	RBP
-	RET1	40
-
-@@30:	POP	RDI
-	POP	RSI
-	XOR	RAX,RAX
-	POP	RBP
-	RET1	40
-// ************************************
-/*
-Bool PlotAttr(CTask *task,I64 len,
-		I64 attr,I64 x,I64 y)
-*/
-_PLOT_ATTR::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	R9,U64 [&gr_text_base]
-	PUSH	RSI
-	PUSH	RDI
-	MOV	RBX,U64 SF_ARG1[RBP]
-	MOV	RDI,U64 CTask.scroll_x[RBX]
-	SAR	RDI,3
-	ADD	RDI,U64 SF_ARG4[RBP]
-	MOV	RCX,U64 SF_ARG2[RBP]
-
-	TEST	RDI,RDI
-	JNS	@@05
-	ADD	RCX,RDI
-	XOR	RDI,RDI
-@@05:	ADD	RDI,U64 CTask.win_left[RBX]
-	MOV	RDX,RCX
-	ADD	RDX,RDI
-	DEC	RDX
-	CMP	RDX,U64 CTask.win_right[RBX]
-	JLE	@@10
-	MOV	RAX,RDX
-	SUB	RAX,U64 CTask.win_right[RBX]
-	SUB	RDX,RAX
-	SUB	RCX,RAX
-@@10:	TEST	RDI,RDI
-	JNS	@@15
-	ADD	RCX,RDI
-	XOR	RDI,RDI
-@@15:	INC	RDX
-	SUB	RDX,TEXT_COLS
-	JLE	@@20
-	SUB	RCX,RDX
-@@20:	CMP	RCX,1
-	JL	@@35
-
-	MOV	RAX,U64 CTask.scroll_y[RBX]
-	SAR	RAX,3
-	ADD	RAX,U64 SF_ARG5[RBP]
-	TEST	RAX,RAX
-	JS	@@35
-	ADD	RAX,U64 CTask.win_top[RBX]
-	CMP	RAX,U64 CTask.win_bottom[RBX]
-	JG	@@35
-	TEST	RAX,RAX
-	JS	@@35
-	CMP	RAX,TEXT_ROWS
-	JGE	@@35
-
-	IMUL2	RAX,TEXT_COLS
-	ADD	RDI,RAX
-	SHL	RDI,2
-	ADD	RDI,R9
-	MOV	RBX,U64 SF_ARG3[RBP]
-	MOV	RSI,RDI
-@@25:	LODSD
-	TEST	AL,AL
-	JNZ	@@30
-	MOV	RAX,RBX
-	STOSD
-	DEC	RCX
-	JNZ	@@25
-
-@@30:	POP	RDI
-	POP	RSI
-	MOV	RAX,TRUE
-	POP	RBP
-	RET1	40
-
-@@35:	POP	RDI
-	POP	RSI
-	XOR	RAX,RAX
-	POP	RBP
-	RET1	40
-// ************************************
-_PLOT_BORDER_U8::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	R9,U64 [&gr_text_base]
-	MOV	RCX,U64 SF_ARG1[RBP]
-	MOV	RBX,U64 CTask.scroll_x[RCX]
-	SAR	RBX,3
-	ADD	RBX,U64 SF_ARG3[RBP]
-	MOV	RAX,U64 CTask.scroll_y[RCX]
-	SAR	RAX,3
-	ADD	RAX,U64 SF_ARG4[RBP]
-
-	MOV	RDX,-1
-	CMP	RBX,RDX
-	JL	@@05
-	ADD	RBX,U64 CTask.win_left[RCX]
-	MOV	RDX,U64 CTask.win_right[RCX]
-	INC	RDX
-	CMP	RBX,RDX
-	JG	@@05
-	TEST	RBX,RBX
-	JS	@@05
-	CMP	RBX,TEXT_COLS
-	JGE	@@05
-
-	MOV	RDX,-1
-	CMP	RAX,RDX
-	JL	@@05
-	ADD	RAX,U64 CTask.win_top[RCX]
-	MOV	RDX,U64 CTask.win_bottom[RCX]
-	INC	RDX
-	CMP	RAX,RDX
-	JG	@@05
-	TEST	RAX,RAX
-	JS	@@05
-	CMP	RAX,TEXT_ROWS
-	JGE	@@05
-
-	IMUL2	RAX,TEXT_COLS
-	ADD	RBX,RAX
-	SHL	RBX,2
-	ADD	RBX,R9
-	MOV	RAX,U64 SF_ARG2[RBP]
-	MOV	U32 [RBX],EAX
-
-	MOV	RAX,TRUE
-	POP	RBP
-	RET1	32
-@@05:	XOR	RAX,RAX
-	POP	RBP
-	RET1	32
-// ************************************
-_GR_UPDATE_LINE32::
+//************************************
+_GR_UPDATE_LINE64::
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RSI
 	PUSH	RDI
 
 	MOV	RAX,U64 SF_ARG2[RBP]
-	MOV	RSI,U64 [RAX]	//rsi=src2
+	MOV	RSI,U64 [RAX]		//rsi=src
 	MOV	RBX,U64 [&reverse_bits_table]
-	MOV	RCX,U64 SF_ARG3[RBP] //rcx=d5
+	MOV	RCX,U64 SF_ARG3[RBP]	//rcx=d
 	MOV	RAX,U64 SF_ARG4[RBP]
-	MOV	RDI,U64 [RAX]	//rdi=vga image
+	MOV	RDI,U64 [RAX]		//rdi=image
 
 	MOV	RAX,U64 SF_ARG1[RBP]
-	MOV	R8,U64 [RAX]	//rbp=vga dst
+	MOV	R8,U64 [RAX]		//rbp=vga dst
 
-@@05:	LODSD
-	CMP	U32 [RDI],EAX
+@@05:	LODSQ
+	CMP	U64 [RDI],RAX
 	JE	@@10
-	MOV	U32 [RDI],EAX
+	MOV	U64 [RDI],RAX
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
-	MOV	U32 [R8],EAX
-@@10:	ADD	RDI,4
-	ADD	R8,4
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	MOV	U64 [R8],RAX
+@@10:	ADD	RDI,8
+	ADD	R8,8
 	DEC	RCX
 	JNZ	@@05
 
@@ -413,36 +54,44 @@ _GR_UPDATE_LINE32::
 	POP	RSI
 	POP	RBP
 	RET1	32
-// ************************************
-_GR_UPDATE_LINE32_FLUSH_CACHE::
+//************************************
+_GR_UPDATE_LINE64_FLUSH_CACHE::
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RSI
 	PUSH	RDI
 
 	MOV	RAX,U64 SF_ARG2[RBP]
-	MOV	RSI,U64 [RAX]	//rsi=src2
+	MOV	RSI,U64 [RAX]		//rsi=src
 	MOV	RBX,U64 [&reverse_bits_table]
-	MOV	RCX,U64 SF_ARG3[RBP] //rcx=d5
+	MOV	RCX,U64 SF_ARG3[RBP]	//rcx=d
 	MOV	RAX,U64 SF_ARG4[RBP]
-	MOV	RDI,U64 [RAX]	//rdi=vga image
+	MOV	RDI,U64 [RAX]		//rdi=image
 
 	MOV	RAX,U64 SF_ARG1[RBP]
-	MOV	R8,U64 [RAX]	//rbp=vga dst
+	MOV	R8,U64 [RAX]		//rbp=vga dst
 
-@@05:	LODSD
-	MOV	U32 [RDI],EAX
+@@05:	LODSQ
+	MOV	U64 [RDI],RAX
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
+	ROR	RAX,8
 	XLATB
-	ROR	EAX,8
-	MOV	U32 [R8],EAX
-	ADD	RDI,4
-	ADD	R8,4
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	XLATB
+	ROR	RAX,8
+	MOV	U64 [R8],RAX
+	ADD	RDI,8
+	ADD	R8,8
 	DEC	RCX
 	JNZ	@@05
 
@@ -456,7 +105,7 @@ _GR_UPDATE_LINE32_FLUSH_CACHE::
 	POP	RSI
 	POP	RBP
 	RET1	32
-// ************************************
+//************************************
 _DC_BLOT_COLOR4::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -601,7 +250,7 @@ _DC_BLOT_COLOR4::
 	POP	RSI
 	POP	RBP
 	RET1	32
-// ************************************
+//************************************
 _IS_PIX_COVERED0::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -612,7 +261,7 @@ _IS_PIX_COVERED0::
 	SAR	RAX,3
 	MOV	RDX,U64 SF_ARG1[RBP]
 	IMUL2	RCX,TEXT_COLS
-	MOV	RBX,U64 [&gr_win_z_buf]
+	MOV	RBX,U64 [&gr.win_z_buf]
 	MOV	DX,U16 CTask.win_z_num[RDX]
 	ADD	RCX,RAX
 	XOR	RAX,RAX
@@ -621,17 +270,17 @@ _IS_PIX_COVERED0::
 	INC	RAX
 @@05:	POP	RBP
 	RET1	24
-// ************************************
+//************************************
 _GR_ROP_EQU_U8_NO_CLIPPING::
-//Puts foreground char shape onto gr_dc2.
+//Puts foreground char shape onto gr.dc2.
 //ch.u8[1] is color as a whole byte
-//ch DOCEt_UNDERLINE attr flag is used.
+//ch ATTRf_UNDERLINE attr flag is used.
 	PUSH	RBP
 	MOV	RBP,RSP
 	MOVZX	RAX,U8 SF_ARG1[RBP]
-	MOV	RDX,U64 [&gr_font]
+	MOV	RDX,U64 [&text.font]
 	MOV	RAX,U64 [RDX+RAX*8]	//RAX is 8x8 char font data, 64-bits
-	BT	U64 SF_ARG1[RBP],DOCEt_UNDERLINE
+	BT	U64 SF_ARG1[RBP],ATTRf_UNDERLINE
 	JNC	@@05
 	MOV	RBX,0xFF00000000000000
 	OR	RAX,RBX
@@ -641,11 +290,11 @@ _GR_ROP_EQU_U8_NO_CLIPPING::
 	PUSH	RSI
 	PUSH	RDI
 	MOVZX	RBX,U8 SF_ARG1+1[RBP]	//Warning color is 8-bit
-	MOV	RDX,U64 [&gr_1_to_8_colors]
+	MOV	RDX,U64 [&gr.to_8_colors]
 	MOV	R8,U64 [RDX+RBX*8]	//R8 is color repeated 8 times.
 	MOV	R9,U64 SF_ARG3[RBP]	//R9 is width_internal
 	MOV	RDI,U64 SF_ARG2[RBP]
-	MOV	RSI,U64 [&gr_1_to_8_bits] //RSI is gr_1_to_8_bits
+	MOV	RSI,U64 [&gr.to_8_bits] //RSI is gr.to_8_bits
 
 //	m=my_1_to_8_bits[ch&255];ch>>=8;
 //	*dst=*dst&~m|c&m;
@@ -749,27 +398,13 @@ _GR_ROP_EQU_U8_NO_CLIPPING::
 @@10:	POP	RBP
 	RET1	24
 }
-
-#help_index "Graphics/Char;Char/Graphics"
-public _extern _PLOT_SCREEN_U8 Bool PlotScreenU8(I64 w,I64 x,I64 y);
-public _extern _PLOT_WIN_U8 Bool PlotWinU8(CTask *task,I64 w,I64 x,I64 y);
-public _extern _PLOT_WIN_STR2	Bool PlotWinStr2(
-	   CTask *task,U8 *s,I64 len,I64 attr,I64 x,I64 y);
-public _extern _PLOT_ATTR_STR2 Bool PlotAttrStr2(
-	   CTask *task,U32 *hl,I64 len,I64 x,I64 y);
-
-public _extern _PLOT_ATTR	  Bool PlotWinAttr(
-	   CTask *task,I64 len,I64 attr,I64 x,I64 y);
-public _extern _PLOT_BORDER_U8 Bool PlotBorderU8(CTask *task,I64 w,I64 x,I64 y);
 _extern _GR_ROP_EQU_U8_NO_CLIPPING U0 GrRopEquU8NoClipping(I64 ch,U8 *dst,I64 width_internal);
-
-#help_index "Graphics/Misc"
 //No clipping
 public _extern _IS_PIX_COVERED0 Bool IsPixCovered0(CTask *task,I64 x,I64 y);
 
-_extern _GR_UPDATE_LINE32 U0 GrUpdateLine32(
-  U32 **_dst3,U32 **_src2,I64 w,U8 **_vga);
-_extern _GR_UPDATE_LINE32_FLUSH_CACHE U0 GrUpdateLine32FlushCache(
-  U32 **_dst3,U32 **_src2,I64 w,U8 **_vga);
+_extern _GR_UPDATE_LINE64 U0 GrUpdateLine64(
+  U64 **_vga,U64 **_src,I64 d,U8 **_dst);
+_extern _GR_UPDATE_LINE64_FLUSH_CACHE U0 GrUpdateLine64FlushCache(
+  U64 **_vga,U64 **_src,I64 d,U8 **_dst);
 _extern _DC_BLOT_COLOR4 U0 DCBlotColor4(
   U8 *dst,I64 *img,I64 *img_cache,I64 cnt);

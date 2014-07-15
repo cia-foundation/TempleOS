@@ -174,7 +174,7 @@
 #define IC_MEMSET		0x92
 #define IC_MEMSET_U16		0xC2
 #define IC_MEMSET_U32		0xC3
-#define IC_MEMSET_U64		0xC4
+#define IC_MEMSET_I64		0xC4
 
 #define IC_BR_ZERO		0x93
 #define IC_BR_NOT_ZERO		0x94
@@ -216,7 +216,7 @@
 #define IC_SWAP_U8		0xB5
 #define IC_SWAP_U16		0xB6
 #define IC_SWAP_U32		0xB7
-#define IC_SWAP_U64		0xB8
+#define IC_SWAP_I64		0xB8
 
 #define IC_ABS_I64		0xB9
 #define IC_SIGN_I64		0xBA

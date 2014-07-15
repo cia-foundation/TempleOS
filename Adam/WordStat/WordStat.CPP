@@ -31,33 +31,37 @@ class CWSMatrix
   CWSMatrixSide side[WS_MAX_MATRIX_WORDS];
 };
 
-public I64 ws_num_words,ws_num_matrix_words;
-CHashTable *ws_hash_table=NULL;
-public U8 *ws_cur_word=NULL;
-
 #define WSf_ENABLE		0
 #define WSf_INIT_IN_PROGRESS	1
-I64 ws_flags=0;
-
-public CWSMatrix *ws_matrix=NULL;
-public CHashWS **ws_sorted_words=NULL;
-CTask *ws_task=NULL;
-
 
 #define WS_MAX_FILLINS 10
-I64 ws_partial_len=0,ws_fillin_matches[WS_MAX_FILLINS+1];
-I64 ws_num_fillins=0,ws_fillin_scores[WS_MAX_FILLINS+1],ws_fillin_hits[WS_MAX_FILLINS+1];
 
-//**** Dictionary Stuff
+public class CWordStatGlbls
+{
+  I64	num_words,num_matrix_words;
+  CHashTable *hash_table;
+  U8	*cur_word;
+  I64	flags;
+  CWSMatrix *matrix;
+  CHashWS **sorted_words;
+  CTask	*task;
+  I64	partial_len,num_fillins,
+	structs_size,
+	fillin_matches	[WS_MAX_FILLINS+1],
+	fillin_scores	[WS_MAX_FILLINS+1],
+	fillin_hits	[WS_MAX_FILLINS+1];
+
+} ws={0,0,NULL,NULL,0,NULL,NULL,NULL,0,0,0,
+{0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0}};
+
+//Dictionary Stuff
 #help_index "WordStat/Dictionary"
 
 #define WSD_WORD_FILENAME	"/Adam/WordStat/WSWords.DAT.Z"
 #define WSD_DEF_FILENAME	"/Adam/WordStat/WSDefs.DAT"
 #define WSD_DEF_FILENAME_Z	"/Adam/WordStat/WSDefs.DAT.Z"
-
-Bool	wsd_has_words=FileFind(WSD_WORD_FILENAME),
-	wsd_has_defs =FileFind(WSD_DEF_FILENAME)||FileFind(WSD_DEF_FILENAME_Z);
-
 
 #define WSD_H1			0
 #define WSD_H1_END		1
@@ -78,20 +82,20 @@ Bool	wsd_has_words=FileFind(WSD_WORD_FILENAME),
 #define WSD_POS_CHAR		0x04
 #define WSD_EXTRA_CHAR		0x05
 
-public U8 *ws_dict_word_lst=NULL;
-public I64 ws_dict_word_lst_size=0,
-   ws_dict_num_words=0,ws_structs_size=0;
+#define WSD_MAX_FILLINS 10
+
+public class CWordStatDictGlbls
+{
+  U8	*word_lst;
+  I64	word_lst_size,num_words,num_fillins;
+  U8	*fillins[WSD_MAX_FILLINS];
+  Bool	has_words,has_defs;
+} wsd={NULL,0,0,0,{0,0,0,0,0,0,0,0,0,0},FALSE,FALSE};
+wsd.has_words=FileFind(WSD_WORD_FILENAME);
+wsd.has_defs =FileFind(WSD_DEF_FILENAME)||FileFind(WSD_DEF_FILENAME_Z);
 
 extern U0 WSDWordsLoad();
 extern U0 WSDDictWordsAdd(CDoc *doc,U8 *st=NULL);
 
-#define WSD_MAX_FILLINS 10
-U8 *wsd_fillins[WSD_MAX_FILLINS];
-I64 wsd_num_fillins=0;
-
-// ************************************
-
 #include "WSMain"
 #include "WSDict"
-
-#help_index ""

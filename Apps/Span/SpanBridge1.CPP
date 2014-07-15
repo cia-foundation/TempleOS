@@ -45,20 +45,18 @@ U0 SpanBridge1Init(CMathODE *)
   }
 
   DocClear;
-  "$$BG,LTCYAN$$"; NewLine(SKY_LINES);
+  "$$BG,LTCYAN$$%h*c",SKY_LINES,'\n';
   for (i=0;i<10;i++) {
-    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS);
-    "$$BG,LTCYAN$$"; Spaces(TEXT_COLS-2*RIVER_BANK_COLS);
-    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS);
-    NewLine;
+    "$$BG,BROWN$$%h*c",RIVER_BANK_COLS,CH_SPACE;
+    "$$BG,LTCYAN$$%h*c",TEXT_COLS-2*RIVER_BANK_COLS,CH_SPACE;
+    "$$BG,BROWN$$%h*c\n",RIVER_BANK_COLS,CH_SPACE;
   }
   for (i=0;i<5;i++)  {
-    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS+i);
-    "$$BG,BLUE$$";   Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
-    "$$BG,BROWN$$";  Spaces(2*i);
-    "$$BG,BLUE$$";   Spaces(TEXT_COLS/2-RIVER_BANK_COLS-2*i);
-    "$$BG,BROWN$$";  Spaces(RIVER_BANK_COLS+i);
-    NewLine;
+    "$$BG,BROWN$$%h*c",RIVER_BANK_COLS+i,CH_SPACE;
+    "$$BG,BLUE$$%h*c",TEXT_COLS/2-RIVER_BANK_COLS-2*i,CH_SPACE;
+    "$$BG,BROWN$$%h*c",2*i,CH_SPACE;
+    "$$BG,BLUE$$%h*c",TEXT_COLS/2-RIVER_BANK_COLS-2*i,CH_SPACE;
+    "$$BG,BROWN$$%h*c\n",RIVER_BANK_COLS+i,CH_SPACE;
   }
 }
 

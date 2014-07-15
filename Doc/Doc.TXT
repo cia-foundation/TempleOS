@@ -1,5 +1,0 @@
-$WW,1$A TempleOS document is a $LK,"Circular Queue",A="HI:Data Types/Circular Queue"$ of cmds and graphics.  See $LK,"Dollar Cmds",A="FI:::/Doc/Dollar.TXT"$ and $LK,"ST_DOC_CMDS",A="MN:ST_DOC_CMDS"$.  See $LK,"CDocEntry",A="MN:CDocEntry"$ for the entry structure.  See $LK,"TipOfDay",A="MN:TipOfDay"$() for a nice example.
-
-There is one document format for the editor/ viewer/ browser/ cmd line.
-
-There is one $LK,"CDoc",A="MN:CDoc"$ for the border, and a pair for double buffering.  See $LK,"::/Demo/Spy.CPP"$.

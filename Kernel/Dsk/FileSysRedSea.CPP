@@ -130,7 +130,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
  
     d_native=root_dir-offset(CDirEntry.start);
  
-    d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
+    d_native->attr=RS_ATTR_DIR|RS_ATTR_CONTIGUOUS;
     *d_native->name='.';
     d_native->cluster=br->root_cluster;
     d_native->size=BLK_SIZE;
@@ -140,7 +140,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
  
     *d_native->name='.';
     d_native->name[1]='.';
-    d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
+    d_native->attr=RS_ATTR_DIR|RS_ATTR_CONTIGUOUS;
     d_native->cluster=br->root_cluster;
     d_native->datetime=Now;
  
@@ -154,7 +154,7 @@ U0 RedSeaFSFmt(U8 drv_let,Bool quick=TRUE)
 }
 
 Bool RedSeaFSFileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fuf_flags=0)
-{ //$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
+{//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   CDirEntry *buf,*buf2,*ptr;
   U8 dname[CDIR_FILENAME_LEN];
   I64 ch;
@@ -184,9 +184,9 @@ Bool RedSeaFSFileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I6
       while (TRUE) {
 	if (!(ch=*ptr->name))
 	  break;
-	else if (!(ptr->attr & _ATTR_DELETED) &&
-	!(fuf_flags&FUF_JUST_DIRS && !(ptr->attr & _ATTR_DIR)) &&
-	!(fuf_flags&FUF_JUST_FILES && ptr->attr & _ATTR_DIR) &&
+	else if (!(ptr->attr & RS_ATTR_DELETED) &&
+	!(fuf_flags&FUF_JUST_DIRS && !(ptr->attr & RS_ATTR_DIR)) &&
+	!(fuf_flags&FUF_JUST_FILES && ptr->attr & RS_ATTR_DIR) &&
 	!StrCmp(dname,ptr->name)) {
 	  MemCpy(&_result->attr,&ptr->attr,CDIR_SIZE);
 	  result=TRUE;
@@ -203,8 +203,6 @@ exit_this:
 	PrtUnlock(p);
   return result;
 }
-
-
 
 U8 *RedSeaFSFileRead(CPrt *p,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
 {
@@ -351,7 +349,6 @@ I64 RedSeaFSAllocClusters(CPrt *p,I64 cnt)
   return first;
 }
 
-
 Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 {
   CDirEntry *buf,*buf2,*ptr,de2;
@@ -361,7 +358,7 @@ Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
   U8 *temp,*parent_dir;
   try {
     unlock_break=BreakLock;
-    de->attr|=_ATTR_CONTIGUOUS;
+    de->attr|=RS_ATTR_CONTIGUOUS;
     unlock=PrtLock(p);
     cur_dir_cluster=Name2DirCluster(p,cur_dir);
     buf2=MAlloc(BLK_SIZE);
@@ -419,7 +416,7 @@ Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 	  }
 	}
 	break;
-      } else if (ptr->attr & _ATTR_DELETED) {
+      } else if (ptr->attr & RS_ATTR_DELETED) {
 	if (!written) {
 	  MemCpy(&ptr->start,&de->start,CDIR_SIZE);
 	  WBlks(p,buf(U8 *)+j<<BLK_SIZE_BITS,p->data+cur_dir_cluster+j,1);
@@ -433,7 +430,7 @@ Bool RedSeaFSDirNew(CPrt *p,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 	  if (!written)
 	    MemCpy(&ptr->start,&de->start,CDIR_SIZE);
 	  else
-	    ptr->attr|=_ATTR_DELETED;
+	    ptr->attr|=RS_ATTR_DELETED;
 	    WBlks(p,buf(U8 *)+j<<BLK_SIZE_BITS,p->data+cur_dir_cluster+j,1);
 	  break;
 	}
@@ -482,13 +479,13 @@ I64 RedSeaFSFilesDel(CPrt *p,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
     while (TRUE) {
       if (!(ch=*ptr->name))
 	break;
-      else if (!(ptr->attr & _ATTR_DELETED) && ch!='.' && (del_dir ||
-	  !(ptr->attr & _ATTR_DIR)) &&
+      else if (!(ptr->attr & RS_ATTR_DELETED) && ch!='.' && (del_dir ||
+	  !(ptr->attr & RS_ATTR_DIR)) &&
 	  FilesFindMatch(ptr->name,files_find_mask,fuf_flags)) {
-	if (!(ptr->attr & _ATTR_DIR)) result++;
+	if (!(ptr->attr & RS_ATTR_DIR)) result++;
 	if (print_msg)
 	  "Del %s\n",ptr->name;
-	ptr->attr|=_ATTR_DELETED;
+	ptr->attr|=RS_ATTR_DELETED;
 	WBlks(p,buf(U8 *)+j<<BLK_SIZE_BITS,p->data+cur_dir_cluster+j,1);
 	RedSeaFSFreeClusters(p,ptr->cluster,(ptr->size+BLK_SIZE-1)>>BLK_SIZE_BITS);
       }
@@ -529,7 +526,7 @@ I64 RedSeaFSFileWrite(CPrt *p,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
     else
       c=INVALID_CLUSTER;
     de.cluster=c;
-    de.attr=attr|_ATTR_CONTIGUOUS;
+    de.attr=attr|RS_ATTR_CONTIGUOUS;
     de.datetime=cdt;
     if (blk_cnt)
       WClustersBlks(p,buf,c,blk_cnt);
@@ -565,11 +562,11 @@ CDirEntry *RedSeaFSFilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent
     while (TRUE) {
       if (!(ch=*ptr->name))
 	break;
-      else if (!(ptr->attr & _ATTR_DELETED)) {
+      else if (!(ptr->attr & RS_ATTR_DELETED)) {
 	tempde=CAlloc(sizeof(CDirEntry));
 	MemCpy(&tempde->start,&ptr->start,CDIR_SIZE);
 	tempde->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&_ATTR_DIR && *tempde->name!='.') {
+	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR && *tempde->name!='.') {
 	  tempde->next=result;
 	  result=tempde;
 	  tempde->full_name=DirNameAbs(tempde->name);
@@ -579,8 +576,8 @@ CDirEntry *RedSeaFSFilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent
 	    Cd("..");
 	  }
 	  PrtLock(p);
-	} else if ((tempde->attr&_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&_ATTR_DIR) &&
+	} else if ((tempde->attr&RS_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&RS_ATTR_DIR) &&
 	  FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
 	  tempde->next=result;
 	  result=tempde;
@@ -606,15 +603,15 @@ Bool RedSeaFSMkDir(CPrt *p,U8 *cur_dir,U8 *name)
 
   try {
     unlock_break=BreakLock;
-    c=FileWrite(name,buf,size,0,_ATTR_DIR,FALSE);
-    d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
+    c=FileWrite(name,buf,size,0,RS_ATTR_DIR,FALSE);
+    d_native->attr=RS_ATTR_DIR|RS_ATTR_CONTIGUOUS;
     StrCpy(d_native->name,name);
     d_native->cluster=c;
     d_native->size=size;
     d_native->datetime=Now;
     d_native(U8 *)+=CDIR_SIZE;
  
-    d_native->attr=_ATTR_DIR|_ATTR_CONTIGUOUS;
+    d_native->attr=RS_ATTR_DIR|RS_ATTR_CONTIGUOUS;
     *d_native->name='.';
     d_native->name[1]='.';
     d_native->name[2]=0;

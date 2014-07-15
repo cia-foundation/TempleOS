@@ -1,29 +1,26 @@
-//This is run in a #exe{}.
+//This is run in a $LK,"#exe",A="FF:::/Kernel/Kernel.PRJ,KCfg"${}.
 
 U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0"
-"NoMP\0TextMode\0GrMode\0DontProbe\0AutoMountIDE\0BootDrv\0Help\0";
+"NoMP\0TextMode\0DontProbe\0AutoMountIDE\0BootRescueDrv\0Help\0";
 
 #define CFG_MEM_INIT		0
 #define CFG_HEAP_INIT		1
 #define CFG_VAR_INIT		2
 #define CFG_NO_MP		3
 #define CFG_TEXT_MODE		4
-#define CFG_GR_MODE		5
-#define CFG_DONT_PROBE		6
-#define CFG_AUTO_MOUNT_IDE	7
-#define CFG_BOOT_DRV		8
-#define CFG_NUM_OPTIONS		9
+#define CFG_DONT_PROBE		5
+#define CFG_AUTO_MOUNT_IDE	6
+#define CFG_BOOT_RESCUE_DRV	7
+#define CFG_NUM_OPTIONS		8
 
-#define CFG_HELP		9
-
+#define CFG_HELP		8
 
 class CKernelCfg
 {
-  I64 bios_gr_mode;
   U8 *acct_name;
   U8 *dsk_cache_size_exp;
   CDoc *add_dev;
-  U8 *boot_drv_file,*boot_drv_start;
+  U8 *boot_rescue_drv_file,*boot_rescue_drv_start;
   Bool opts[CFG_NUM_OPTIONS];
   U8 mem_init_val,heap_init_val,var_init_val,
      sys_acct_drv,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
@@ -59,12 +56,12 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	"they will be lettered in sequence.\n"
 	"\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
     first_prt_num=ToUpper(GetChar)-'A';
-    NewLine;
+    '\n';
     if (0<=first_prt_num<NUM_PRTS) {
 	"\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
 	"\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
       type=GetChar-'0';
-      NewLine;
+      '\n';
 
       unit=0;
       if (type==BDT_RAM) {
@@ -91,11 +88,11 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	    else
 		"Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
 	    GetS(base0_buf,128);
-	  } while (!A2I64(base0_buf));
-	if (1<=A2I64(base0_buf)<=num_hints) {
-	  tempha=ATARepFind(root,A2I64(base0_buf));
-	  SPrint(base0_buf,"0x%X",tempha->base0);
-	  SPrint(base1_buf,"0x%X",tempha->base1);
+	  } while (!Str2I64(base0_buf));
+	if (1<=Str2I64(base0_buf)<=num_hints) {
+	  tempha=ATARepFind(root,Str2I64(base0_buf));
+	  StrPrint(base0_buf,"0x%X",tempha->base0);
+	  StrPrint(base1_buf,"0x%X",tempha->base1);
 	  unit=tempha->unit;
 	} else if (type!=BDT_ATAPI || *base0_buf) {
 	  if (type==BDT_ATAPI)
@@ -104,12 +101,12 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	    do {
 		"I/O Port Base1:\n";
 	      GetS(base1_buf,128);
-	    } while (!A2I64(base1_buf));
+	    } while (!Str2I64(base1_buf));
 	  do {
 		"\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
 	    unit=GetChar-'0';
 	  } while (!(0<=unit<=1));
-	  NewLine;
+	  '\n';
 	}
 	LinkedLstDel(root);
       }
@@ -125,7 +122,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	if (type==BDT_ATA || type==BDT_ATAPI) {
 	  if (type==BDT_ATAPI && !*base0_buf) {
 	    c->cdrom_ports_pmt=TRUE;
-	    DocPrint(doc,"boot_drv_pmt=PmtBaseUnit(bdev);");
+	    DocPrint(doc,"dsk.boot_rescue_drv_pmt=GetBaseUnit(bdev);");
 	    if (first_prt_num+'A'==c->sys_acct_drv)
 	      make_free=TRUE;
 	  } else
@@ -151,7 +148,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
     for (i=0;i<CFG_NUM_OPTIONS;i++)
       "$$PURPLE$$%13tz$$FG$$:%Z\n",i,kernel_cfg_options,c->opts[i],"ST_OFF_ON";
     "\nType '$$PURPLE$$Help$$FG$$' for help.\n";
-    st=PmtStr("Option ($$PURPLE$$<ENTER>$$FG$$ when done):","");
+    st=GetStr("Option ($$PURPLE$$<ENTER>$$FG$$ when done):","");
     i=LstMatch(st,kernel_cfg_options,LMF_IGNORE_CASE);
     if (i==CFG_HELP)
 "\n"
@@ -160,10 +157,9 @@ U0 KernelCfgOptions(CKernelCfg *c)
 "$$PURPLE$$VarInit$$FG$$ Initializes glbl var memory to a val.\n"
 "$$PURPLE$$NoMP$$FG$$ No multicore.\n"
 "$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
-"$$PURPLE$$GrMode$$FG$$ Graphics Mode (requires hard reboot).\n"
 "$$PURPLE$$DontProbe$$FG$$ Just prompt CD-ROM ports, don't probe.\n"
 "$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
-"$$PURPLE$$BootDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
+"$$PURPLE$$BootRescueDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
 "\n";
     else
       if (0<=i<CFG_NUM_OPTIONS) {
@@ -171,22 +167,15 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	switch (i) {
 	  case CFG_MEM_INIT:
 	    if (state)
-	      c->mem_init_val=PmtI64("Val (0-255):",255,0,255);
+	      c->mem_init_val=GetI64("Val (0-255):",255,0,255);
 	    break;
 	  case CFG_HEAP_INIT:
 	    if (state)
-	      c->heap_init_val=PmtI64("Val (0-255):",255,0,255);
+	      c->heap_init_val=GetI64("Val (0-255):",255,0,255);
 	    break;
 	  case CFG_VAR_INIT:
 	    if (state)
-	      c->var_init_val=PmtI64("Val (0-255):",255,0,255);
-	    break;
-	  case CFG_GR_MODE:
-	    if (state)
-	      c->bios_gr_mode=PmtI64(
-		    "0x12 640x480x4\n"
-		    "0x6A 800x600x4\n\n"
-		    "BIOS Graphic Mode (0x%0X):",c->bios_gr_mode);
+	      c->var_init_val=GetI64("Val (0-255):",255,0,255);
 	    break;
 	  case CFG_AUTO_MOUNT_IDE:
 	    if (state) {
@@ -194,7 +183,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	      c->auto_mount_ide_hd_let=ToUpper(GetChar);
 	      if (!('A'<=c->auto_mount_ide_hd_let<='Z'))
 		c->auto_mount_ide_hd_let=0;
-	      NewLine;
+	      '\n';
 	      if (c->auto_mount_ide_hd_let)
 		"First HD Drive:%C\n",c->auto_mount_ide_hd_let;
 	      else
@@ -204,7 +193,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	      c->auto_mount_ide_cd_let=ToUpper(GetChar);
 	      if (!('A'<=c->auto_mount_ide_cd_let<='Z'))
 		c->auto_mount_ide_cd_let=0;
-	      NewLine;
+	      '\n';
 	      if (c->auto_mount_ide_cd_let)
 		"First CD Drive:%C\n",c->auto_mount_ide_cd_let;
 	      else
@@ -214,13 +203,13 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	      c->auto_mount_ide_cd_let=0;
 	    }
 	    break;
-	  case CFG_BOOT_DRV:
-	    Free(c->boot_drv_file);
-	    c->boot_drv_file=0;
-	    c->boot_drv_start=0;
+	  case CFG_BOOT_RESCUE_DRV:
+	    Free(c->boot_rescue_drv_file);
+	    c->boot_rescue_drv_file=0;
+	    c->boot_rescue_drv_start=0;
 	    if (state) {
-	      c->boot_drv_file=PmtStr("Boot Drv File:");
-	      c->boot_drv_start=PmtI64("Boot Drv Start:");
+	      c->boot_rescue_drv_file=GetStr("Boot Rescue Drv File:");
+	      c->boot_rescue_drv_start=GetI64("Boot Rescue Drv Start:");
 	    }
 	    break;
 	}
@@ -234,10 +223,12 @@ CKernelCfg *KernelCfgNew()
   CKernelCfg *c=CAlloc(sizeof(CKernelCfg));
 
   c->add_dev=KernelCfgAddDev(c);
-  c->acct_name=PmtStr("Start-up Acct ($$PURPLE$$<ENTER>$$FG$$ will prompt):");
-  c->dsk_cache_size_exp=PmtStr("Disk Cache Size in Bytes, gets rounded-up funny, ($$PURPLE$$<ENTER>$$FG$$ will use default of $$PURPLE$$%s$$FG$$ Bytes):",
-			       "Scale2Mem(0x80000,0x8000000)");
-  c->bios_gr_mode=0x12; //0x12=640x480x4 0x6A=800x600x4
+  c->acct_name=GetStr("Start-up Acct ($$PURPLE$$<ENTER>$$FG$$ will prompt):");
+  c->dsk_cache_size_exp=GetStr(
+"Disk Cache Size in Bytes,\n"
+"gets rounded-up funny,\n"
+"($$PURPLE$$<ENTER>$$FG$$ will use default.):",
+"Scale2Mem(0x80000,0x8000000)");
   KernelCfgOptions(c);
   return c;
 }
@@ -245,7 +236,7 @@ CKernelCfg *KernelCfgNew()
 U0 KernelCfgDel(CKernelCfg *c)
 {
   DocDel(c->add_dev);
-  Free(c->boot_drv_file);
+  Free(c->boot_rescue_drv_file);
   Free(c->acct_name);
   Free(c->dsk_cache_size_exp);
   Free(c);

@@ -1,4 +1,4 @@
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
@@ -13,7 +13,7 @@ PopUpOk(
 "$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
 AFPrint(25,"Cd(\"::/Demo/Games\");Dir;");
-AFPmtStr("\n");
+AFGetStr("\n");
 
 PopUpOk(
 "Now, we're going to edit a file.  Normally,\n"
@@ -23,7 +23,7 @@ PopUpOk(
 "$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
 AFPrint(25,"Ed(\"CastleFrankenstein.CPP.Z\");");
-AFPmtStr("\n");
+AFGetStr("\n");
 Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
 
 Sleep(1000);
@@ -39,12 +39,11 @@ PopUpOk(
 "bottom will run the program when we\n"
 "$$GREEN$$#include$$FG$$ it.\n");
 
-
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n"
 );
 
-AFGetChar(CH_SHIFT_ESC,CH_ESC);
+AFGetChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
 "Now, we'll run the CastleFrankenstein.CPP.Z\n"
@@ -53,8 +52,8 @@ PopUpOk(
 "when you are done.\n");
 
 AFPrint(25,"#include \"CastleFrankenstein\";");
-AFPmtStr("\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFGetStr("\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
 "The program is still in memory and we\n"
@@ -64,17 +63,16 @@ PopUpOk(
 "run it again.\n");
 
 AFPrint(25,"CastleFrankenstein;");
-AFPmtStr("\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
-
+AFGetStr("\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
-"$$GREEN$$<CTRL-ALT-A>$$FG$$\tExtended ASCII\n"
-"$$GREEN$$<CTRL-ALT-C>$$FG$$\tBreak(interrupt) program\n"
-"$$GREEN$$<CTRL-ALT-E>$$FG$$\tSpawn new user terminal window\n"
-"$$GREEN$$<CTRL-ALT-M>$$FG$$\tMutes sound\n"
-"$$GREEN$$<CTRL-ALT-T>$$FG$$\tSwitch tasks\n"
-"$$GREEN$$<CTRL-ALT-X>$$FG$$\tKill task (window)\n"
+"$$GREEN$$<CTRL-ALT-a>$$FG$$\tExtended ASCII\n"
+"$$GREEN$$<CTRL-ALT-c>$$FG$$\tBreak(interrupt) program\n"
+"$$GREEN$$<CTRL-ALT-e>$$FG$$\tSpawn new user terminal window\n"
+"$$GREEN$$<CTRL-ALT-m>$$FG$$\tMutes sound\n"
+"$$GREEN$$<CTRL-ALT-t>$$FG$$\tSwitch tasks\n"
+"$$GREEN$$<CTRL-ALT-x>$$FG$$\tKill task (window)\n"
 );
 
 AFPrint(50,"Ed(\"CastleFrankenstein.CPP.Z\");\n");
@@ -89,7 +87,7 @@ CTask *task=sys_focus_task;
 
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the application.\n"
-"Then, $$GREEN$$<CTRL-ALT-X>$$FG$$ to kill the task.\n"
+"Then, $$GREEN$$<CTRL-ALT-x>$$FG$$ to kill the task.\n"
 );
 WinToTop(task);
 while (TaskValidate(task))
@@ -98,12 +96,12 @@ while (TaskValidate(task))
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
 
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 PopUpOk(
 "Explore the $$LK+PU,\"DemoIndex\",\"FI:::/Doc/DemoIndex.TXT\"$$.  You'll find it\n"
 "on your menu.  It's arranged by difficulty.\n"
-"Hit $$GREEN$$<SPACE BAR>$$FG$$ on a demo index listing\n"
+"Hit $$GREEN$$<SPACE>$$FG$$ on a demo index listing\n"
 "and $$GREEN$$<F5>$$FG$$ to run from the editor.\n"
 );
  

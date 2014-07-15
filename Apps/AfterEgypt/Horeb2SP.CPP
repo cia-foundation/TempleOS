@@ -59,13 +59,13 @@ U0 DrawHoreb(CTask *task,CDC *dc)
     }
     Sprite3B(dc,s*tempo->x1+cx,s*tempo->y1+h,0,imgs[tempo->type]);
     dc->flags&=~(DCF_SYMMETRY|DCF_JUST_MIRROR);
-    if (o_sort[i]==&objs[O_BURNING_BUSH]) { //draw burning bush
+    if (o_sort[i]==&objs[O_BURNING_BUSH]) {//draw burning bush
       dc->x=s*tempo->x1+cx;
       dc->y=s*tempo->y1+h;
       dc->z=0;
 
       dc->pen_width=1;
-      dc->color=win_updates&15;
+      dc->color=winmgr.updates&15;
       for (j=0;j<45;j++) {
 	m=Sqr(Rand); a=2*ã*Rand;
 	P2R(&x1,&y1,m,a);

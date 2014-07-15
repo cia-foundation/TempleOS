@@ -5,9 +5,9 @@ HashTablePurge(adam_task->hash_table);
 
 #help_index "Misc"
 
-public F64 os_version=2.03;
+F64 os_version=2.11;//Operating system version.
 
-#include "AdamExt.HPP"
+#include "AdamExts.HPP"
 #include "Math2a"
 #include "Training"
 #include "Utils2a"
@@ -30,7 +30,7 @@ Cd("::/Adam");;
 #include "Win2b"
 #include "Dbg2a"
 
-Cd("::/Adam/Doc");;
+Cd("::/Adam/DolDoc");;
 #include "Doc"
 LBts(&sys_run_level,RLf_DOC);
 

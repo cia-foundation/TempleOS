@@ -1,12 +1,12 @@
-//This demonstrates class meta data.
-//Basically, we make use of the compiler's
-//data about a class.  We can add to the
-//compilers data arbitrary items, either string or
-//or int or F64 (if you typecast).
+/*Demonstrates class meta data.
+Basically, we make use of the compiler's
+data about a class.  We can add to the
+compilers data arbitrary items, either string or
+or int or F64 (if you typecast).
 
-//This stuff is not high performance.
-//Don't get carried away -- it might be slow.
-
+This stuff is not high performance.
+Don't get carried away -- it might be slow.
+*/
 
 U0 RankOut(I64 i)
 {
@@ -27,9 +27,8 @@ class Test2Struct
   I64 serial_num print_str "%6d" dft_val 123456;
 };
 
-
 U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
-{//lastclass is keyword
+{//lastclass is keyword.  See $LK,"::/Demo/LastClass.CPP"$.
   CHashClass *tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS);
   U8 *print_str;
   I64 *q,dft_val;
@@ -53,7 +52,7 @@ U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
       " default:%d",dft_val;
 
 //This corrects for the ambiguity, allowing zero percentile.
-    if (MemberMetaFind("percentile",ml)) { //check if it exists
+    if (MemberMetaFind("percentile",ml)) {//check if it exists
 //We could use the $LK,"CMemberLstMeta",A="MN:CMemberLstMeta"$ structure returned by
 //$LK,"MemberMetaFind",A="MN:MemberMetaFind"$() and save a search.
       percentile=MemberMetaData("percentile",ml)(F64);
@@ -62,7 +61,7 @@ U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
 
     if (fp_output_fun=MemberMetaData("output_fun",ml))
       (*fp_output_fun)(*q);
-    NewLine;
+    '\n';
     ml=ml->next;
   }
 }

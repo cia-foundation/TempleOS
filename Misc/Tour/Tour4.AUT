@@ -1,7 +1,6 @@
-//This is an example of your documentation.
+//This is an example of how you do documentation.
 
-
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nEd(\"::/Misc/Tour/Tour4.AUT.Z\");\n";
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
@@ -13,25 +12,22 @@ PopUpOk(
 "using the $$GREEN$$<F4>$$FG$$ filename chooser.\n");
 
 '' CH_CTRLL;
-Sleep(1000);
+Sleep(1500);
 '' CH_SPACE;
-Sleep(1000);
+Sleep(1500);
 '' CH_SPACE;
 Sleep(1000);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
-Sleep(1000);
+Sleep(2000);
 
 PopUpOk(
-"Press $$GREEN$$<F4>$$FG$$.\n"
-"Pick any file and press $$GREEN$$<ESC>$$FG$$.");
+"Press $$GREEN$$<F4>$$FG$$.  Pick any\n"
+"file and press $$GREEN$$<ESC>$$FG$$.");
 AFGetKey(SC_F4);
-PopUpOk(
-"Press $$GREEN$$<ESC>$$FG$$.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+PopUpOk("Press $$GREEN$$<ESC>$$FG$$.\n");
+AFGetChar(CH_ESC);
 
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+PopUpOk("$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+AFGetChar(CH_SHIFT_ESC);
 
-PopUpOk(
-"$$GREEN$$<SHIFT F4>$$FG$$ to pick directories.\n");
+PopUpOk("$$GREEN$$<SHIFT F4>$$FG$$ to pick directories.\n");

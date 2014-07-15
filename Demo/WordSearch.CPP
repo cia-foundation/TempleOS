@@ -1,4 +1,4 @@
-//This has a simple and fancy way of searching
+//Simple and fancy way of searching
 
 //See ::/Apps/Vocabulary/VocabQuiz.CPP.Z
 //for another example of dictionary usage.
@@ -23,7 +23,7 @@ U0 Display()
   for (y=0;y<NUM_ROWS;y++) {
     for (x=0;x<NUM_COLS;x++)
       '' m[y][x];
-    NewLine;
+    '\n';
   }
 }
 
@@ -37,7 +37,7 @@ U0 GetWord(U8 *dst,I64 x,I64 y,I64 dx,I64 dy)
   *dst=0;
 }
 
-//////////////////////////////////////
+//************************************
 U0 Search(I64 dx,I64 dy)
 {
   I64 x,y,i,n;
@@ -48,7 +48,7 @@ U0 Search(I64 dx,I64 dy)
       n=StrLen(buf);
       for (i=n;i>2;i--) {
 	buf[i]=0;
-	if ((ptr=WSDPtAtWord(buf)) && *ptr++==WSD_WORD_CHAR &&
+	if ((ptr=WSDWordPtAt(buf)) && *ptr++==WSD_WORD_CHAR &&
 	  !StrICmp(ptr,buf)) {
 	  "%s ",buf;
 	}
@@ -66,11 +66,10 @@ U0 SimpleWordSearch()
   Search(-1,-1);
   Search(1,-1);
   Search(-1,1);
-  NewLine;
+  '\n';
 }
 
-
-////////////////////////////////////////
+//************************************
 U8 words[NUM_ROWS*NUM_COLS*8][MAX_DIMENSION+1];
 U8 *word_ptrs[NUM_ROWS*NUM_COLS*8];
 
@@ -91,8 +90,7 @@ I64 WordsCompare(U8 *e1,U8 *e2)
   return StrCmp(e1,e2);
 }
 
-/*
-Fmt of word lst entry:
+/*Fmt of word lst entry:
   U8 WSD_WORD_CHAR
   U8 word[] with terminating zero
   I16 block; //definition offset in ::/Adam/WordStat/WSDefs.DAT
@@ -101,7 +99,7 @@ Fmt of word lst entry:
 U0 DisplayWords(I64 n)
 {
   I64 i=0,k;
-  U8 *w1,*w2,*dict=ws_dict_word_lst;
+  U8 *w1,*w2,*dict=wsd.word_lst;
   for (i=0;i<n;i++)
     while (*dict) {
       w1=word_ptrs[i];
@@ -139,15 +137,15 @@ U0 FancyWordSearch()
   CollectWords(-1,1,&n);
   QSortI64(word_ptrs,n,&WordsCompare);
   DisplayWords(n);
-  NewLine;
+  '\n';
 }
-/////////////////////////////////////
 
+//************************************
 U0 WordSearch()
 {
   Init;
   Display;
-  NewLine;
+  '\n';
   SimpleWordSearch;
   FancyWordSearch;
 }

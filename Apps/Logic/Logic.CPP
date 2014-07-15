@@ -17,25 +17,19 @@ $ID,6$
 $SP,"",BI=1$
 
 
-
 $SP,"",BI=2$
-
 
 
 $SP,"",BI=3$
 
 
-
 $SP,"",BI=4$
-
 
 
 $SP,"",BI=5$
 
 
-
 $SP,"",BI=6$
-
 
 
 $SP,"",BI=7$
@@ -46,7 +40,6 @@ $SP,"",BI=8$
 
 
 
-
 $SP,"",BI=9$
 
 
@@ -54,7 +47,6 @@ $SP,"",BI=9$
 $SP,"",BI=10$
 
 $ID,-6$
-
 U8 *gate_type_lst="NULL\0OUTPUT\0INPUT\0"
      "NOT\0AND\0OR\0NAND\0NOR\0XOR\0AND3\0OR3\0NAND3\0NOR3\0";
 
@@ -84,7 +76,7 @@ I64 num_inputs_entered,num_outputs_entered;
 I64 num_selected_gates,
     selected_gates[MAX_SELECTED_GATES];
 
-U0 PmtGates()
+U0 GetGates()
 {
   I64 i;
   U8 *st;
@@ -93,12 +85,12 @@ U0 PmtGates()
   "Your choices are:\n";
   for (i=GT_FIRST_REAL_GATE;i<GT_NUM_ENTRIES;i++)
     "%z ",i,gate_type_lst;
-  NewLine;
+  '\n';
 
   num_selected_gates=0;
   while (num_selected_gates<GT_NUM_ENTRIES) {
     "%d",num_selected_gates;
-    st=PmtStr(" Gate: ");
+    st=GetStr(" Gate: ");
     if (!*st) {
       Free(st);
       return;
@@ -112,13 +104,12 @@ U0 PmtGates()
   }
 }
 
-
 U0 Init()
 {
   I64 i;
 
   do {
-    table_size=PmtI64("\nTable size in hex (3 input=0x100,4=0x10000): ",0);
+    table_size=GetI64("\nTable size in hex (3 input=0x100,4=0x10000): ",0);
     if (table_size>MAX_TABLE_SIZE)
       "Too large\n";
     else if (table_size<1) {
@@ -142,7 +133,7 @@ U0 Init()
   num_inputs_entered=0;
   while (TRUE) {
     "Input %C: ",'A'+num_inputs_entered;
-    i=PmtI64("",-1);
+    i=GetI64("",-1);
     if (i<0) break;
     if (i>table_size)
       "Too large\n";
@@ -164,7 +155,7 @@ U0 Init()
   num_outputs_entered=0;
   while (TRUE) {
     "Output %C: ",'A'+num_outputs_entered;
-    i=PmtI64("",-1);
+    i=GetI64("",-1);
     if (i<0) break;
     if (i>table_size)
       "Too large\n";
@@ -523,7 +514,6 @@ U0 FillNOr3(Bool *chged,I64 *num_outputs_found)
 	    }
 }
 
-
 I64 FillGateTable()
 {
   I64 current_gate,num_outputs_found=0;
@@ -532,7 +522,7 @@ I64 FillGateTable()
   output_found=-1;
   ProgressBarsRst;
   progress1_max=table_size;
-  NewLine;
+  '\n';
   while (num_outputs_found<num_outputs_entered && chged) {
     "Pass : %d\n",passes++;
     chged=FALSE;
@@ -581,7 +571,7 @@ U0 DigitalLogic()
   WordStat;
   WinBorder(ON);
   DocClear;
-  PmtGates;
+  GetGates;
   try {
     Init;
     if (FillGateTable) {

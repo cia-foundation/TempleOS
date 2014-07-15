@@ -1,10 +1,8 @@
-/*
-  $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ are just global vars
-  shown on the wallpaper. I use them in debugging a lot.
-  If you set $LK,"progress1_max",A="MN:progress1_max"$-$LK,"progress4_max",A="MN:progress4_max"$,
-  then a bar will display.
+/*$LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ are just global vars
+shown on the wallpaper. I use them in debugging a lot.
+If you set $LK,"progress1_max",A="MN:progress1_max"$-$LK,"progress4_max",A="MN:progress4_max"$,
+then a bar will display.
 */
-
 
 U0 Main1()
 {
@@ -17,7 +15,6 @@ U0 Main1()
     Sleep(10);
   progress1_max=0; //hide
 }
-
 
 Main1;
 

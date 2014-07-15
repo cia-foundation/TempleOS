@@ -1,7 +1,7 @@
 I64 mp_n;
 
 I64 MPSum(I64 my_mp_cnt)
-{ //We could use the formula n*(n+1)/2
+{//We could use the formula n*(n+1)/2
   I64 lo=mp_n*Gs->num/my_mp_cnt,
      hi=mp_n*(Gs->num+1)/my_mp_cnt,
      result=0,i;
@@ -21,7 +21,6 @@ I64 Sum(I64 n,I64 my_mp_cnt)
     result+=GetResult(tempm[i]);
   return result;
 }
-
 
 #define SAMPLE_SIZE 100
 

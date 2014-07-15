@@ -1,39 +1,28 @@
-"Ed(\"::/Misc/Bible.TXT.Z\");\n";
-Sleep(1000);
+"FF(\"/Kernel/*\");";
+PopUpOk("Let's list files in the\n"
+	"$$GREEN$$/Kernel$$FG$$ and sub directories.\n\n"
+	"TempleOS masks have one\n"
+	"base directory and multiple\n"
+	"filename masks.\n"
+	"Press $$GREEN$$<ENTER>$$FG$$.");
+AFGetStr("\n");
 
-PopUpOk(
-"$$GREEN$$<CTRL-F>$$FG$$ to find.\n"
-);
+"FF(\"/Kernel/*\",\"-r\");";
+PopUpOk("The recurse $$GREEN$$+r$$FG$$ flag\n"
+	"is usually set.  Let's\n"
+	"turn it off.\n\n"
+	"Press $$GREEN$$<ENTER>$$FG$$.");
+AFGetStr("\n");
 
-AFGetChar(CH_CTRLF);
+"FF(\"/Kernel/M*;*.HPP*\");";
+PopUpOk("Let's have two mask of\n"
+	"$$GREEN$$M*$$FG$$ plus $$GREEN$$*.HPP*$$FG$$\n\n"
+	"Press $$GREEN$$<ENTER>$$FG$$.");
+AFGetStr("\n");
 
-AFPrint(150,"new song");
-
-PopUpOk("Cursor down 8 times.\n");
-I64 i;
-for (i=0;i<8;i++)
-  AFGetKey(SC_CURSOR_DOWN);
-
-PopUpOk(
-"Press '$$GREEN$$2$$FG$$' to show\n"
-"all lines within 2 of a match.\n");
-AFPmtStr("2");
-Sleep(1000);
-
-PopUpOk("Press $$GREEN$$<ESC>$$FG$$.\n");
-AFGetChar(CH_ESC);
-Sleep(500);
-
-PopUpOk(
-"Look around and press $$GREEN$$<ESC>$$FG$$\n"
-"to turn off filter.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
-Sleep(1000);
-
-PopUpOk(
-"You can combine filters to\n"
-"effectively do AND searches.\n");
-Sleep(1000);
-
-'' CH_SHIFT_ESC;
-
+"FF(\"/Kernel/M*;*.HPP*;~Mem*\");";
+PopUpOk("Let's unselect $$GREEN$$Mem*$$FG$$.\n\n"
+	"Press $$GREEN$$<ENTER>$$FG$$.");
+AFGetStr("\n");
+PopUpOk("There is no way to include\n"
+	"multiple base directories.\n");

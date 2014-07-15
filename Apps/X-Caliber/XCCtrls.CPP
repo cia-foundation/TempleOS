@@ -4,11 +4,10 @@
 
 class CtrlPanelState
 {
-  I64 bullet_radius,fuse_time;
+  I64 shot_radius,fuse_time;
   F64 laser_temperature;
   Bool spacewalk;
 } ctrl_panel;
-
 
 #define CTRL_PANEL_SPACING 33
 #define CTRL_PANEL_RANGE   30
@@ -57,14 +56,14 @@ U0 DrawCtrlPanelCtrl(CDC *dc,CCtrl *c)
   dc->color=LTRED;
   GrPrint(dc,c->left+CTRL_PANEL_SPACING-FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
-      "%d",s->bullet_radius*10/CTRL_PANEL_RANGE);
+      "%d",s->shot_radius*10/CTRL_PANEL_RANGE);
   GrPrint(dc,c->left+2*CTRL_PANEL_SPACING+1-FONT_WIDTH/2,
       (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
       "%d",s->fuse_time*10/CTRL_PANEL_RANGE);
-  GrRect(dc,c->left+CTRL_PANEL_SPACING-3,	 (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->bullet_radius-2 ,7,5);
+  GrRect(dc,c->left+CTRL_PANEL_SPACING-3,	 (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->shot_radius-2 ,7,5);
   GrRect(dc,c->left+2*CTRL_PANEL_SPACING+1-3,(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->fuse_time-2,7,5);
   dc->color=YELLOW;
-  GrRect(dc,c->left+CTRL_PANEL_SPACING-2,	 (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->bullet_radius-1 ,5,3);
+  GrRect(dc,c->left+CTRL_PANEL_SPACING-2,	 (c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->shot_radius-1 ,5,3);
   GrRect(dc,c->left+2*CTRL_PANEL_SPACING+1-2,(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1-s->fuse_time-1,5,3);
 
   d_range=c->right-c->left-5-5;
@@ -93,7 +92,7 @@ U0 UpdateDerivedCtrlPanelCtrl(CCtrl *c)
   c->top=c->win_task->pix_height-(CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE+CTRL_PANEL_BUTTON_SIZE);
   c->bottom=c->top+CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE;
 
-  s->bullet_radius =ClampI64(s->bullet_radius,0,CTRL_PANEL_RANGE-1);
+  s->shot_radius =ClampI64(s->shot_radius,0,CTRL_PANEL_RANGE-1);
   s->fuse_time=ClampI64(s->fuse_time,0,CTRL_PANEL_RANGE-1);
 }
 
@@ -104,7 +103,7 @@ U0 LeftClickCtrlPanel(CCtrl *c,I64 x,I64 y,Bool)
     s->spacewalk=TRUE;
   else {
     if (x<(c->right+c->left)/2)
-      s->bullet_radius=CTRL_PANEL_RANGE-1-(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BUTTON_SIZE));
+      s->shot_radius=CTRL_PANEL_RANGE-1-(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BUTTON_SIZE));
     else
       s->fuse_time=CTRL_PANEL_RANGE-1-(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BUTTON_SIZE));
   }

@@ -1,9 +1,8 @@
 $WW,1$$FG,5$$TX+CX,"Acknowledgements"$$FG$
 
-1) The font, $LK,"::/Kernel/Font8x8.CPP"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.
+1) The font, $LK,"::/Kernel/Font8x8.CPP"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.  It's public domain.
 
-2) $LK,"::/Kernel/Dsk/ATADef.HPP"$ originally
-from Linux.  I later got the spec.
+2) $LK,"ATA Reg and Cmd Definitions",A="MN:ATA_NOP"$ are originally from Linux.  Later, I got the spec.
 
 3) The heap algorithm, $LK,"::/Kernel/Mem1b.CPP"$, is adapted from one I saw at Ticketmaster when I worked on their VAX operating system.
 
@@ -13,7 +12,7 @@ from Linux.  I later got the spec.
 
 6) The random number generator is from the book, $UL,1$Numeric Recipies in C$UL,0$.
 
-7) Tne sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.
+7) The mountain, palm trees, sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.
 
 8) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
 
@@ -37,7 +36,11 @@ from Linux.  I later got the spec.
 
 18) I got $FG,4$$TX,"Webster's Dictionary",HTML="http://www.templeos.org/files/DICTIONARY.TXT"$$FG$ and $FG,4$$TX,"The King James Bible",HTML="http://www.templeos.org/files/BIBLE.TXT"$$FG$ from $FG,4$$TX,"Project Gutenberg",HTML="http://promo.net/pg/"$$FG$.
 
-In short, I wrote every one of the $TX,"120,838",D="DD_TEMPLEOS_LOC"$ lines myself, no $FG,2$GPL$FG$ code, no linkage or dependence on other code.  Anyone who says otherwise is being an ass.
+19) John Carmack inspired me to use "$LK,"Clamp",A="MN:Clamp"$" as a name instead of "Limit".  He inspired me to use "needle" and "haystack" as names.  He inspired me to simplify my Frames-Per-Second code.
+
+20) Bill Gates inspired me to add comments to my $LK,"Help & Index",A="FI:::/Doc/HelpIndex.TXT"$.
+
+In short, I wrote every one of the $TX,"121,463",D="DD_TEMPLEOS_LOC"$ lines myself, no $FG,2$GPL$FG$ code, no linkage or dependence on other code.  Anyone who says otherwise is being an ass.
 $FG,8$
 * "MSDOS", "Windows", "MovieMaker" "MS Paint" and "FAT32" are trademarks of MicroSoft Corp.
 * "SiteBuilder" is a trademark of Yahoo! Inc.

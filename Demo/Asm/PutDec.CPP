@@ -13,7 +13,7 @@ PUT_DEC_U64::
 	PUSH	RSI		//See $LK,"REG_VARS_MASK",A="MN:REG_VARS_MASK"$ & $LK,"REG_NON_PTR_MASK",A="MN:REG_NON_PTR_MASK"$
 	LEA	RSI,-1[RBP]	//Load addr of end of buffer.
 				//We picked RSI because of PUT_STR
-				//We'll move backward
+				//We'll move bwd
 	MOV	U8 [RSI],0	//Terminator
 
 	TEST	RAX,RAX		//Special case -- zero
@@ -41,8 +41,8 @@ PUT_DEC_U64::
 _DO_IT::			//The convention is C-callable routines have underscores.
 	MOV	RAX,122333221
 	CALL	PUT_DEC_U64
-	PUSH	1
-	CALL	&NewLine	//Print one carriage return
+	MOV	RAX,'\n'
+	CALL	PUT_CHARS
 	RET
 }
 

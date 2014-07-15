@@ -1,0 +1,272 @@
+$WW,1$$FG,5$$TX+CX,"DolDoc Overview"$$FG$
+
+DolDoc is a propriatary TempleOS document type supported by $LK,"DolDoc Routines",A="HI:DolDoc"$.  In a document, commands are bracketed with '$FG,2$$$$FG$'s.  Use $FG,2$<CTRL-l>$FG$ to experiment inserting a command.  Then, use $FG,2$<CTRL-t>$FG$ to toggle to plain text to see it.
+
+Here is the grammar:
+
+<DolDocCmd> := $FG,2$$$$FG$<$LK,"TwoLetterCmd",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_CMDS"$>[<FlagList>][$FG,2$,$FG$<ArgList>]$FG,2$$$$FG$ | $FG,2$$$$FG$$LK,"ColorName",A="MN:ST_COLORS"$$FG,2$$$$FG$
+
+<FlagList> := $FG,2$+$FG$|$FG,2$-$FG$ <$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>[$FG$<FlagList>]
+
+<ArgList> := <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$<ArgExpression>$FG,2$,$FG$<ArgList> | <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$<ArgExpression>
+
+
+The format of DolDoc cmds is a two character code, +/-flags, a comma and args separated by commas.  Some commands have mandatory args.  Optional args are indicated with <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$.  A $LK,"ColorName",A="MN:ST_COLORS"$ bracked by dollars, will change the foreground color.
+
+See $LK,"::/Doc/Widget.TXT"$ and $LK,"::/Demo/DolDoc/DemoDoc.TXT"$.
+
+<$LK,"TwoLetterCmd",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_CMDS"$>  See $LK,"Type Defines",A="MN:DOCT_TEXT"$ and $LK,"PrsDollarCmd",A="MN:PrsDollarCmd"$().
+$TR,"TX Text"$
+$ID,2$Normally, text is not bracketed with '$FG,2$$$$FG$', but if you wish to specify flag attr, such as centering text, you can bracket them with '$FG,2$$$$FG$' and enter flags such as "$FG,2$+CX$FG$".  You can't edit them normally if they are bracketed by '$FG,2$$$$FG$' unless you toggle to plain text mode with $FG,2$<CTRL-t>$FG$.
+$ID,-2$$TR,"CR Hard Carriage Return (New Line)"$
+$ID,2$New lines are normally not bracketed with '$FG,2$$$$FG$'.
+$ID,-2$$TR,"SR Soft Carriage Return (New Line)"$
+$ID,2$Word wrap uses temporary soft new lines.  Users never place soft new lines.
+$ID,-2$$TR,"CU Cursor pos"$
+$ID,2$The cursor pos is stored as a ASCII#5 character and is not bracketed with '$FG,2$$$$FG$'. Users normally do not enter cursor pos.
+$ID,-2$$TR,"TB Tab"$
+$ID,2$Tabs are normally not bracketed with '$FG,2$$$$FG$', but are ASCII#9.
+$ID,-2$$TR,"CL Clear"$
+$ID,2$Clear all previous entries except ones with hold($FG,2$+H$FG$) flags.  You might want $FG,2$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear",A="MN:DocClear"$().
+$ID,-2$$TR,"PB Page Break"$
+$ID,2$Page break.
+$ID,-2$$TR,"DA Data"$
+$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+
+The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+
+The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the format string.
+
+If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
+$ID,-2$$TR,"PL Page Length"$
+$ID,2$Page length.
+$ID,-2$$TR,"LM Left Margin"$
+$ID,2$Left margin.
+$ID,-2$$TR,"RM Right Margin"$
+$ID,2$Right margin.
+$ID,-2$$TR,"HD Header"$
+$ID,2$Top margin.
+$ID,-2$$TR,"FO Footer"$
+$ID,2$Bottom margin.
+$ID,-2$$TR,"ID Indent +/- num"$
+$ID,2$Changes the indentation deeper if positive, or shallower if negative. It effects the behavior of trees.
+
+$FG,2$$$ID,2$$$FG$ indents 2 columns.
+$ID,-2$$TR,"Text Colors"$
+$ID,2$You place an expression(usually a color define--see $LK,"color defines",A="MN:BLACK"$) to indicate which of the 16 colors to use. If you enter no num, color returns to the default.
+
+$FG,2$FD$FG$ Default Foreground Color
+$FG,2$BD$FG$ Default Background Color
+$FG,2$FG$FG$ Foreground Color
+$FG,2$BG$FG$ Background Color
+
+$FG,2$$$FD,BLUE$$$FG$ will set the default foreground color to BLUE.
+
+$ID,-2$$TR,"PT User Prompt"$
+$ID,2$Start of a user prompt.
+$ID,-2$$TR,"WW Word Wrap"$
+$ID,2$Include a $FG,2$1$FG$ or $FG,2$0$FG$.
+
+$FG,2$$$WW,1$$$FG$ turns word-wrap on.
+$ID,-2$$TR,"UL Underline"$
+$ID,2$Include a $FG,2$1$FG$ or $FG,2$0$FG$.
+
+$FG,2$$$UL,1$$$FG$ turns underline on.
+$ID,-2$$TR,"IV Invert"$
+$ID,2$Include a $FG,2$1$FG$ or $FG,2$0$FG$.
+
+$FG,2$$$IV,1$$$FG$ turns invert on.$FG$
+$ID,-2$$TR,"BK Blink"$
+$ID,2$Include a $FG,2$1$FG$ or $FG,2$0$FG$.
+
+$FG,2$$$BK,1$$$FG$ turns blink on.
+$ID,-2$$TR,"SX Shift X pos"$
+$ID,2$Include a num from $FG,2$-7$FG$ to $FG,2$7$FG$.  Only foreground is shifted.  Positive right.
+
+$FG,2$$$SX,3$$$FG$ shifts characters 3 pixels right.
+$ID,-2$$TR,"SY Shift Y pos"$
+$ID,2$Include a num from $FG,2$-7$FG$ to $FG,2$7$FG$.  Only foreground is shifted.  Positive down.
+
+$FG,2$$$SY,3$$$FG$ shifts characters 3 pixels down.$FG$
+$ID,-2$$TR,"CM Cursor Movement"$
+$ID,2$This has two expressions, one for X offset and one for Y.  You can remove one or the other with $FG,2$-LE$FG$ or $FG,2$-RE$FG$.
+
+The expressions are relative to the current cursor location, unless you make them relative to:
+
+  $FG,2$+LX$FG$ left
+  $FG,2$+CX$FG$ center
+  $FG,2$+RX$FG$ right
+  $FG,2$+MRX$FG$ margin relative
+
+  $FG,2$+TY$FG$ top
+  $FG,2$+CY$FG$ center
+  $FG,2$+BY$FG$ bottom
+  $FG,2$+PRY$FG$ page relative
+
+See $LK,"::/Demo/DolDoc/CursorMove.CPP"$.
+
+$ID,-2$$TR,"AN Anchor"$
+$ID,2$The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the anchor.  I don't use these very often, but they're good sometimes. 
+$ID,-2$$TR,"LK Link"$
+$ID,2$The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the link text.  With no aux the tag becomes the link text, as in example 3.
+
+See $LK,"Link Types",A="MN:LK_FILE"$.
+
+Examples: <CTRL-t> to see
+
+1)$LK,"File link to HelpIndex.TXT",A="::/Doc/HelpIndex.TXT"$
+2)$LK,"File link to HelpIndex.TXT with link type file",A="FI:::/Doc/HelpIndex.TXT"$
+3)File link with same tag str.  $LK,"::/Doc/HelpIndex.TXT"$
+4)$LK,"File find link searching for 'Admin'",A="FF:::/Doc/HelpIndex.TXT,Admin"$
+5)$LK,"File find link searching for 5th 'CTRL'",A="FF:::/Kernel/Adam1a.HPP,CTRL:5"$
+6)$LK,"Manual page link",A="MN:Print"$
+7)$LK,"File line num link",A="FL:::/Kernel/Adam1a.HPP,200"$
+8)$LK,"File anchor link -- <CTRL-t> to see anchor after you click",A="FA:::/Compiler/CmpInit.CPP,IC_INIT_TABLE"$
+9)$LK,"Bible Link",A="BF:Acts,2:3"$ The chapter:verse actually just does a text search.
+10) $LK,"Help Index Link",A="HI:Doc"$.
+11) $LK,"Address Link",A="AD:0x10000"$.
+
+12) For in-memory document address links, see $LK,"SpriteEdText",A="MN:SpriteEdText"$().
+
+$ID,-2$$TR,"BT Button"$
+$ID,2$See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
+$ID,-2$$TR,"CB Check Box"$
+$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
+
+The default data-type for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+$ID,-2$$TR,"MA Macro"$
+$ID,2$A left macro arg, $FG,2$LM=""$FG$, will send text when the left mouse is clicked.
+
+A left auto string, $FG,2$+LA$FG$, flag will cause text to be sent to $LK,"AutoStr",A="MN:AutoStr"$() instead of $LK,"Auto",A="MN:Auto"$().  An AutoStr runs code.  Literal text is in quotes and messages are sent with $LK,"Msg",A="MN:Msg"$().  See $MA-X+PU,LM="Dir(\"::/Demo/AutoFile\");View;"$.
+
+Macro's are usually in your $LK,"HOME/PersonalMenu.TXT"$ and have the '$FG,2$+X$FG$' flag set by $LK,"default",A="MN:DocInit"$.  Adding '$FG,2$-X$FG$' prevents the usual $FG,2$<ESC>$FG$ from being sent (which exits the PersonalMenu screen).  Note: When you click a macro on the cmd line, it will go to the bottom and execute unless you cancel the $FG,2$<ESC>$FG$ with a '$FG,2$-X$FG$'.
+$ID,-2$$TR,"MU Menu Value"$
+$ID,2$A left expression arg, $FG,2$LE=<Exp>$FG$, will return a number when clicked with the left mouse.
+
+See $LK,"PopUpRangeI64",A="MN:PopUpRangeI64"$().
+$ID,-2$$TR,"HX Hex Edit"$
+$ID,2$See $LK,"DocD",A="MN:DocD"$().
+$ID,-2$$TR,"TR Tree Widget"$
+$ID,2$A tree widget is a branch in a collapsable tree.  The domain of the branch extends from the first +indent until enough -indents bring it back to where it started.  Tree's begin collapsed unless a $FG,2$-C$FG$ flag is present.
+
+You might want to use $LK,"DocPrintAtomic",A="MN:DocPrintAtomic"$().
+
+See $LK,"::/Demo/DolDoc/TreeDemo.CPP"$.
+$ID,-2$$TR,"LS List Widget"$
+$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+
+The default data-type for the $FG,2$$$LS...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+$ID,-2$$TR,"SP Sprite"$
+$ID,2$Insert a sprite into text with $FG,2$<CTRL-r>$FG$.  The cursor location at the time you press $FG,2$<CTRL-r>$FG$ is critical because the sprite will be offset from that location.  This is important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clipboard requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-t>$FG$ and manually adding a $FG,2$$$SP...$$$FG$ entry with the same $FG,2$BI=$FG$ num.
+
+You can add a text tag to the $FG,2$$$SP...$$$FG$ cmd by manually adding text into the $FG,2$$$SP...$$$FG$ cmd, as in $FG,2$$$SP,"pic 2",BI=2$$$FG$.  If you enter a tag of the form $FG,2$"<1>"$FG$ then the number in the tag will be updated to match the $FG,2$BI=$FG$ number.
+$ID,-2$$TR,"IB Insert Binary"$
+$ID,2$Tells the compiler to insert a pointer to some binary data stored after the end of text in the document.  There is just one type of binary data in DOC's at this point -- sprites -- created with $FG,2$<CTRL-r>$FG$.  They have a number associated with them.  This number is automatically chosen, because copying to the clip-board and back requires renuming.  To use a $FG,2$$$IB...$$$FG$ cmd, toggle to plain text ($FG,2$<CTRL-t>$FG$) after inserting a sprite and check the number in the $FG,2$$$SP...$$$FG$ cmd. Create a $FG,2$$$IB...$$$FG$ cmd with the same $FG,2$BI=$FG$ number and the sprite will be inserted into the compiled stream like a string const.
+
+You can, optionally, include tag text to be displayed for the $FG,2$$$IB...$$$FG$ cmd.  If you set the tag to "<1>", then the editor will automatically update the tag if the $FG,2$BI=$FG$ number changes.
+
+The reason for the $FG,2$$$IB...$$$FG$ cmd is to pass a arg to $LK,"Sprite",A="MN:Sprite"$() and $LK,"Sprite3",A="MN:Sprite3"$().  See $LK,"::/Demo/Graphics/SpritePlot.CPP"$.
+
+$ID,-2$$TR,"IS Insert Binary Size"$
+$ID,2$Inserts a number into the compiled stream describing the size of binary data associated with a bin number.  I never use this.
+$ID,-2$$TR,"SO Song"$
+$ID,2$See $LK,"Play",A="MN:Play"$().  $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str $FG,2$A=""$FG$ stores the song note text.
+$ID,-2$$TR,"HL Highlighting"$
+$ID,2$Include a $FG,2$1$FG$ or $FG,2$0$FG$.
+
+$FG,2$$$HL,1$$$FG$ will turn syntax highlighting on.
+$ID,-2$$TR,"HC html"$
+$ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() routines will generate a html version of a document.  You can cause html code to be injected with $FG,2$HC$FG$.  Use the $FG,2$+HTML$FG$ flag to inject a html link.
+$ID,-2$$TR,"ER Error"$
+$ID,2$When errors are detected in DolDoc cmds, an $FG,2$ER$FG$ entry is generated.
+$ID,-2$
+<$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Flag Defines",A="MN:DOCEf_LEFT_CB"$ and $LK,"DocInit",A="MN:DocInit"$().
+$TR,"+H Hold"$
+$ID,2$Causes not to delete this cmd when cleared with $FG,2$CL$FG$ or when the doc->max_entries is exceeded.  Word wrap is a good to hold.  There is no way to delete these entries, at this point.
+$ID,-2$$TR,"+L Link"$
+$ID,2$Make a cmd behave as a link.  Perhaps, use this on a $FG,2$$$SP...$$$FG$ cmd.
+$ID,-2$$TR,"+TR Tree"$
+$ID,2$Make a cmd behave as a tree branch.  Usually, this is placed on a $FG,2$TX$FG$ entry.  The tree extends from the start until another tree entry or when indentation has been expanded and reduced back to the starting value.
+
+A $FG,2$+C$FG$ flag on a tree will start it collapsed.
+$ID,-2$$TR,"+LS List"$
+$ID,2$Make a cmd behave as a list widget.  See above.  Usually, this is placed on a $FG,2$TX$FG$ entry.
+$ID,-2$$TR,"+PU PopUp"$
+$ID,2$A PopUp flag on a $FG,2$MA$FG$ will cause the cmds to run in a new task, a pop-up window.
+$ID,-2$$TR,"+C Collapsed"$
+$ID,2$A collapsed flag on a $FG,2$TR$FG$ entry will cause it to start collapsed.  A $FG,2$-C$FG$ flag will make it start open.
+$ID,-2$$TR,"+X <ESC> (Exit)"$
+$ID,2$The exit flag will cause a $FG,2$$$MA...$$$FG$ macro to send an $FG,2$<ESC>$FG$ before running to exit the PersonalMenu screen and return to the cmd prompt.  Actually, the default $FG,2$$$MA...$$$FG$ has an exit flag set so you add a $FG,2$-X$FG$ to turn-off $FG,2$ESC$FG$, for a $FG,2$+PU$FG$ pop-up macro.  If an entry is already at the cmd prompt, the $FG,2$+X$FG$ will movement to the bottom of the window.
+$ID,-2$$TR,"+Q <SHIFT-ESC> (Abort Quit)"$
+$ID,2$A quit flag is similar to a $FG,2$+X$FG$ except a $FG,2$<SHIFT-ESC>$FG$ instead of an $FG,2$<ESC>$FG$ to exit.
+$ID,-2$$TR,"+Z Zero"$
+$ID,2$A zero flag on a $FG,2$HX$FG$ entry will cause the offset from zero.  A $FG,2$-X$FG$ will show the actual memory addr. By default, $FG,2$HX$FG$ has the zero flag set.
+$ID,-2$$TR,"+RD Refresh Data"$
+$ID,2$The Refresh Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value updated continuously.
+$ID,-2$$TR,"+LC Left CallBack"$
+$ID,2$See $LK,"::/Demo/DolDoc/ClickCallBack.CPP"$.
+$ID,-2$$TR,"+RC Right CallBack"$
+$ID,2$See $LK,"::/Demo/DolDoc/ClickCallBack.CPP"$.
+$ID,-2$
+<$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Arg Defines",A="MN:DOCEf_TAG"$.
+$TR,"T=\"\" Tag Str"$
+$ID,2$Some cmds have a tag by default.  See $LK,"TX+T",A="FF:::/Adam/DolDoc/DocInit.CPP,TX+T"$.  You can code $FG,2$T="tag_text"$FG$ as just $FG,2$"tag_text"$FG$ with no $FG,2$T=$FG$. 
+$ID,-2$$TR,"A=\"\" Auxilliary Str"$
+$ID,2$Some cmds need auxilliary strings.  $FG,2$A="str"$FG$ means an $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str is present.  aux_str is used for song note text, link text, anchor text, and $FG,2$$$DA...$$$FG$ format string text.
+$ID,-2$$TR,"D=\"\" Define Str"$
+$ID,2$A $FG,2$D=""$FG$ means either a $LK,"define",A="HI:Define"$ str indirection is present on a text widget, or a define list is present on a list widget.
+
+For indirection, the tag will be regenerated by substituting the value of a system $FG,2$#define$FG$ or $LK,"DefineLoad",A="MN:DefineLoad"$() string.  See $LK,"::/Demo/DolDoc/DefineStr.CPP"$, $LK,"::/Adam/DocDefines.CPP"$ and $LK,"::/Doc/MemOverview.TXT"$.
+
+For $FG,2$LS$FG$ widgets, see $LK,"::/Demo/DolDoc/Form.CPP.Z"$.
+$ID,-2$$TR,"HTML=\"\""$
+$ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() routines will generate a html version of a document.  You can cause html link on an item with $FG,2$HTML=""$FG$.
+$ID,-2$$TR,"LE=<Exp> Left Expression"$
+$ID,2$Left expression.  $FG,2$CM$FG$ has this by default for X offset and you can leave-off the $FG,2$LE=$FG$, just putting the $FG,2$<Exp>$FG$.
+
+See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
+$ID,-2$$TR,"LM=\"\" Left Macro Str"$
+$ID,2$Left macro string.
+$ID,-2$$TR,"RE=<Exp> Right Expression"$
+$ID,2$Right expression.  $FG,2$CM$FG$ has this by default for Y offset and you can leave-off the $FG,2$RE=$FG$, just putting the $FG,2$<Exp>$FG$.
+
+See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
+$ID,-2$$TR,"RM=\"\" Right Macro Str"$
+$ID,2$Right macro string.
+$ID,-2$$TR,"BI=<Exp> Bin Number"$
+$ID,2$Binary data item number.
+$ID,-2$$TR,"BP=\"\" Bin Ptr"$
+$ID,2$The BinPtrLink flags lets you specify a filename and bin num to import a bin$FG$.
+
+$FG,2$$$SP,"<tag>",BI=1,BP="filename,1"$$$FG$ will import bin num "1" from filename.
+$FG,2$$$SP,"<1>",BI=1,BP="::/Demo/Graphics/Mountain.CPP.Z,Mountain"$$$FG$ will import bin with tag name "Mountain" from "::/Demo/Graphics/Mountain.CPP.Z".
+$ID,-2$$TR,"RT=<raw_data_type>"$
+$ID,2$The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  The default for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.
+
+You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+$ID,-2$$TR,"SX=<Exp> Shift X"$
+$ID,2$Shift tag text $FG,2$+$FG$/$FG,2$- 7$FG$ X pixels off the grid.
+$ID,-2$$TR,"SY=<Exp> Shift Y"$
+$ID,2$Shift tag text $FG,2$+$FG$/$FG,2$- 7$FG$ Y pixels off the grid.
+$ID,-2$$TR,"SCX=<Exp> Scroll X"$
+$ID,2$Scroll text in a marquee of so many columns.
+$ID,-2$$TR,"U=<Exp> User Data"$
+$ID,2$User Data.
+
+See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
+$ID,-2$
+$FG,5$EXAMPLES:
+
+$FG$<CTRL-t> to see how the following were done.
+$UL,1$Underlined$UL,0$ $IV,1$Inverted$IV,0$ $BK,1$Blinking$BK,0$ $SY,-3$super$SY,0$ $SY,0$$SY,3$sub$SY,0$
+$TX,"This is a big long scrolling msg.",SCX=10$
+
+$FG,5$Cursor Movements:$FG$
+$CM+LX,LE=3,RE=3$Cursor moved 3 rows down and to 3rd column from left.
+$CM+RX,LE=-40,RE=3$Note mandatory comma after flags
+
+The following may be changed to modes instead of attr with flags.
+
+$TX+CX,"This is centered"$
+
+$TX+RX,"This is right justified"$

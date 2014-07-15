@@ -34,7 +34,7 @@ _HI_CALL::
 	CALL	RAX
 @@05:	POP	RBP
 	RET1	8
-// ************************************
+//************************************
 _HI_MEMCPY::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -55,10 +55,8 @@ _extern _HI_CALL I64 HiCall(U8 *s);
 _extern _HI_MEMCPY U8 *HiMemCpy(U8 *dst,U8 *src,I64 cnt);
 
 #help_index "Boot"
-public U0 SoftBoot(U8 *filename) //No hardware rst
-//Specify the Kernel binary file you
-//wish to boot.
-{
+public U0 SoftBoot(U8 *filename)
+{//Softboot Kernel Bin file. No hardware reset.
   I64 size;
   CKernel	*hi_image,*lo_image=sys_boot_base-sizeof(CBinFile),
 		reg *shutdown,*hi_image2;
@@ -70,7 +68,7 @@ public U0 SoftBoot(U8 *filename) //No hardware rst
   Free(hi_image2);
 
   hi_image->boot_base=lo_image(U8 *)+sizeof(CBinFile);
-  hi_image->boot_patch_table_base=lo_image(U8 *)+hi_image->h.loader_patch_table_offset;
+  hi_image->boot_patch_table_base=lo_image(U8 *)+hi_image->h.patch_table_offset;
   HiMemCpy(&hi_image->sys_mem_E801,&lo_image->sys_mem_E801,2*2);
   HiMemCpy(&hi_image->sys_mem_E820,&lo_image->sys_mem_E820,MEM_NUM_E820_ENTRIES*MEM_E820_ENTRY_SIZE);
   hi_image->sys_gr_mode=lo_image->sys_gr_mode;
@@ -101,7 +99,7 @@ U8 ChkWritable(U8 drv_let=0)
     do {
       "Enter RAM drive (usually 'B') for temporary files:";
       writable_drv=ToUpper(GetChar);
-      NewLine;
+      '\n';
       p=Drv2Prt(writable_drv);
       bdev=p->bdev;
       if (bdev->type!=BDT_RAM ||
@@ -112,24 +110,20 @@ U8 ChkWritable(U8 drv_let=0)
     } while (cont);
     if (drv_let!=writable_drv) {
       Fmt(writable_drv,FALSE,FALSE);
-      SPrint(buf_s,"%c:/",drv_let);
-      SPrint(buf_d,"%c:/",writable_drv);
+      StrPrint(buf_s,"%c:/",drv_let);
+      StrPrint(buf_d,"%c:/",writable_drv);
       CopyTree(buf_s,buf_d);
     }
   }
   return writable_drv;
 }
 
-
 #help_index "Install"
 public U0 MakeAll()
-//Call from $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$()  because loader must be patched with block address.
-
+{//Use $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$. Loader must be patched.
 //These 2 modules (and bootloaders at top) are the only AOT
 //compiled code in TempleOS.  Everything else is JIT.
 //You are doing it wrong if you make AOT compiled code.
-
-{
   Cd("/Compiler");
   if (Cmp("Compiler","Compiler",,':'))
     throw;
@@ -139,17 +133,17 @@ public U0 MakeAll()
 }
 
 public Bool MakeOSPrtBootInstall(U8 src_drv=0,U8 dst_drv=0)
-{//Make All and install new boot-loader.
+{// Does $LK,"MakeAll",A="MN:MakeAll"$ and installs new boot-loader.
 
 //Normally, you just supply a src_drv.	It will compile
 //the code on that drive and update the boot sect.
 
-//If you are making a bootable CD-ROM you supply a dst_drv.
+//If you are making a bootable CD-ROM, you supply a dst_drv.
 //See $LK,"::/Misc/MakeDistro.CPP"$
 
 //See $LK,"Install Documentation",A="FI:::/Doc/Install.TXT"$
 
-//Study my account examples my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TSAdam.CPP,1"$ $LK,"Update Funs",A="FL:::/Demo/AcctExample/TSDistro.CPP,1"$
+//Study my account examples my technique: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TSAdam.CPP,1"$ $LK,"Update Funs",A="FL:::/Demo/AcctExample/TSDistro.CPP,1"$
 
   CBlkDev *bdev;
   CPrt *p;
@@ -205,7 +199,6 @@ public Bool MakeOSPrtBootInstall(U8 src_drv=0,U8 dst_drv=0)
   return result;
 }
 
-
 public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
 {//Reads MBR from disk drive containing src partition.
  //Writes a single blk file to dst /0000Boot directory.
@@ -229,7 +222,7 @@ public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
 }
 
 public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
-{ //Reads OldMBR from src drive /0000Boot directory
+{//Reads OldMBR from src drive /0000Boot directory
   //writes it to the MBR of the drive with dst partition.
   CBlkDev *bdev=Drv2BlkDev(dst_drv);
   CMasterBoot *mbr;
@@ -244,7 +237,7 @@ public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
 }
 
 public U0 MasterBootZero(U8 dst_drv)
-{ //Set MBR of disk with dst partition to zero.
+{//Set MBR of disk with dst partition to zero.
 
 //This is dangerous!!
 //The TempleOS partitioner doesn't play well
@@ -261,7 +254,7 @@ public U0 MasterBootZero(U8 dst_drv)
 }
 
 public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
-{ //Create new MBR on the disk that has drv_let as a partition.
+{//Create new MBR on the disk that has drv_let as a partition.
   //Puts stage 2 in /0000Boot dir of drv_let.
   CBlkDev *bdev,*bdev1;
   CPrt *p,*p1;
@@ -293,7 +286,7 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
       _q=BMHD2_BLK_ARRAY;
       MemSet(_q,0,sizeof(I64)*8);
       menu_ptr=BMHD2_BOOT_MSG;
-      SPrint(menu_ptr,"\n\r\n\rTempleOS Boot Loader\n\r\n\r");
+      StrPrint(menu_ptr,"\n\r\n\rTempleOS Boot Loader\n\r\n\r");
       j=0;
       if (FileFind(OLDMBR_BIN_C,&de,FUF_JUST_FILES)) {
 	Free(de.full_name);
@@ -351,4 +344,3 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
     PutExcept;
   return result;
 }
-#help_index ""

@@ -1,54 +1,39 @@
-PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
-"Ed(\"HI:Debugging\");";
-AFPmtStr("\n");
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+"Ed(\"::/Misc/Bible.TXT.Z\");\n";
+Sleep(1000);
 
 PopUpOk(
-"We will now use $LK,"Uf",A="MN:Uf"$() to\n"
-"unassemble a function.\n"
-"It takes the function name\n"
-"as a string arg.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.");
-"WinMax;WinBorder;\nUf(\"CAlloc\");";
-AFPmtStr("\n");
+"$$GREEN$$<CTRL-F>$$FG$$ to find.\n"
+);
 
-PopUpOk("Press $$GREEN$$<CURSOR-UP>$$FG$$ eight times..");
+AFGetChar(CH_CTRLF);
+
+AFPrint(150,"new song");
+
+PopUpOk("Cursor down 8 times.\n");
 I64 i;
 for (i=0;i<8;i++)
-  AFGetKey(SC_CURSOR_UP);
+  AFGetKey(SC_CURSOR_DOWN);
 
 PopUpOk(
-"Press $$GREEN$$<SPACE BAR>$$FG$$.\n");
-AFPmtStr(" ");
+"Press '$$GREEN$$2$$FG$$' to show\n"
+"all lines within 2 of a match.\n");
+AFGetStr("2");
+Sleep(1000);
+
+PopUpOk("Press $$GREEN$$<ESC>$$FG$$.\n");
+AFGetChar(CH_ESC);
+Sleep(500);
 
 PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
-
-//This puts the cursor at the bottom
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"AFView;\n";
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+"Look around and press $$GREEN$$<ESC>$$FG$$\n"
+"to turn off filter.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
+Sleep(1000);
 
 PopUpOk(
-"We can unassemble a\n"
-"numeric address with $LK,"U",A="MN:U"$().\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.");
-"U(&CAlloc);";
-AFPmtStr("\n");
+"You can combine filters to\n"
+"effectively do AND searches.\n");
+Sleep(1000);
 
-"AFView;\n";
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
-
-PopUpOk("The opcodes are slightly nonstandard.");
-"Ed(\"::/Compiler/OpCodes.TXT.Z\");\n";
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+'' CH_SHIFT_ESC;
 

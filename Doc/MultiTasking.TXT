@@ -1,12 +1,12 @@
 $FG,5$$TX+CX,"MultiTasking"$$FG$
 
-$WW,1$TempleOS is a preemptive multitasking operating system.  However, you can turn-off preemption on a task by task basis and the task will not yield ctrl unless it volunteers with $LK,"Yield",A="MN:Yield"$(), $LK,"Sleep",A="MN:Sleep"$() or a call to I/O which yields ctrl.  Use the $LK,"Preempt",A="MN:Preempt"$() cmd to turn on or off preemption.  This is useful when you have multiple tasks modifying data structures simultaneously.  Interrupts still occur when preemption is off.   
+$WW,1$TempleOS is a preemptive multitasking operating system.  However, you can turn-off preemption on a task by task basis and the task will not yield ctrl unless it volunteers with $LK,"Yield",A="MN:Yield"$(), $LK,"Sleep",A="MN:Sleep"$() or a call to I/O which yields ctrl.  Use the $LK,"Preempt",A="MN:Preempt"$() cmd to turn on or off preemption.  This is useful when you have multiple tasks modifying data structures, simultaneously.  Interrupts still occur when preemption is off.  Turning-off preemption does not protect against multicore simultaneous access.   
 
 $BK,1$Preemption is turned-off by default when a task is $LK,"Spawn",A="MN:Spawn"$()ed.$BK,0$
 
 The time-slice rate is set by $LK,"JIFFY_FREQ",A="MN:JIFFY_FREQ"$.
 
-TempleOS does not remove tasks from "the queue" when they are waiting.  They swap-in, check whatever condition they are waiting for and swap-out.  This keeps it simple, but would cause problems with too many tasks.  TempleOS is intended for non-server, home computers with a maximum of around ten, or so, tasks.  See $LK,"Scheduler",A="FL:::/Kernel/Scheduler.CPP,1"$.
+TempleOS does not remove tasks from $FG,2$the queue$FG$ when they are waiting.  They swap-in, check whatever condition they are waiting for and swap-out.  This keeps it simple, but would cause problems with too many tasks.  TempleOS is intended for non-server, home computers with a maximum of around ten, or so, tasks.  See $LK,"Scheduler",A="FL:::/Kernel/Sched.CPP,1"$.
 
 TempleOS has no task priority scheme.
 
@@ -15,8 +15,10 @@ Disk requests are not broken into pieces for sharing.  Therefore, if one task ma
 
 $FG,5$$TX+CX,"Interrupts"$$FG$
 
-You can turn on and off interrupts in your user programs.  This is part of the mission statement, giving complete freedom to programmers.  Use CLI or STI.  TempleOS currently doesn't use interrupt besides the timer and keyboard and sometimes mouse interrupt.  Since the interrupt flag is part of your task context and since you are voluntarily swapped-out if you call $LK,"GetChar",A="MN:GetChar"$() or whatever, you won't even notice if you turn-off interrupts at the cmd prompt because you are being swapped-out and interrupts are being turned-on by the next task.  
+You can turn on and off interrupts in your user programs.  This is part of the mission statement, giving complete freedom to programmers.  Use $FG,2$CLI$FG$ or $FG,2$STI$FG$.  TempleOS currently doesn't use interrupt besides the timer and keyboard and sometimes mouse interrupt.  Since the interrupt flag is part of your task context and since you are voluntarily swapped-out if you call $LK,"GetChar",A="MN:GetChar"$() or whatever, you won't even notice if you turn-off interrupts at the cmd prompt because you are being swapped-out and interrupts are being turned-on by the next task.  
 
-I saw no reason to make the hard drive or CD-ROM code interrupt driven -- it just creates potential compatibility issues.  On a home system, you do one thing at a time, mostly.  TempleOS can do multiple things at once, but not as efficiently as a server operating system.  It would bogg down with a hundred tasks asking for service.  It is much simpler, though.  The disk code does not break-up large requests in pieces, if you are curious why one task must wait until another finishes an operation.
+I saw no reason to make the hard drive or CD-ROM code interrupt driven -- it just creates potential compatibility issues.  On a home system, you do one thing at a time, mostly.  TempleOS can do multiple things at once, but not as efficiently as a server operating system.  It would bogg down with a hundred tasks asking for service.  It is much simpler, though, the way it is.
+
+The disk code does not break-up large requests in pieces, if you are curious why one task must wait until another finishes an operation.
 
 See $LK,"::/Demo/Lectures/Spinning.CPP"$.

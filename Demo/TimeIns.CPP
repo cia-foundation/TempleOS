@@ -1,43 +1,34 @@
-/*
-This program allows you to measure the
-timing of various instructions.
-Don't be surprised by odd results
-because the CPU does instructions in
-parallel sometimes and a simple
-instruction might take place in parallel
-with the loop instruction and it will
-report zero clock cycles.
+/*Allows you to time instructions.
+Results vary because the CPU does
+parallel and out-of-order execution.
 */
-
 
 #define SAMPLE_SIZE	100000000
 
-
 U0 TimeIns()
 {
-  I64 i;
-  I64 start1,end1,start2,end2,overhead_time,test_time;
-  F64 reg d=5.0; //Use the reg directive to designate reg vars
+  I64 i,start,end,overhead_time,test_time;
+  F64 d=5.0;
   Bool old_preempt=Preempt(OFF);
 
-//Measure Loop Overhead
-  start1=GetTSC;
+  //Measure Loop Overhead
+  start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++);
-  end1=GetTSC;
-  overhead_time=end1-start1;
+  end=GetTSC;
+  overhead_time=end-start;
+  "\nOverhead Cycles:%10.5f\n",ToF64(overhead_time)/SAMPLE_SIZE;
 
-
-  start2=GetTSC;
+  start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++) {
 #exe {OTraceMask(0b1000000000);OTrace(ON);};
-//Put your test instructions here.
+  //Time these instructions
     d*=1.00001;
 #exe {OTrace(OFF);};
   }
-  end2=GetTSC;
-  test_time=end2-start2;
+  end=GetTSC;
+  test_time=end-start;
 
-  "\n\n\nCycles %10.5f\n",ToF64(test_time-overhead_time)/SAMPLE_SIZE;
+  "Measured Cycles:%10.5f\n",ToF64(test_time-overhead_time)/SAMPLE_SIZE;
   Preempt(old_preempt);
 }
 

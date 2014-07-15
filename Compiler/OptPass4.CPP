@@ -18,7 +18,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	  tempil2->a1.type&TY_MASK==TY_REG) {
 	i=tempil1->ic_data;
 	    if (MIN_I32<=i<=MAX_I32 &&
-	    !Bt(&non_ptr_vars_mask,tempil2->a1.reg)) {
+	    !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
 	  tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	  tempil1->ic_code=IC_LEA;
 	  tempil1->a1.type=TY_DISP+tempil1->a1.type&RT_MASK;
@@ -135,7 +135,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	  tempil1->a1.type&TY_MASK==TY_STK) {
 	i=tempil2->ic_data;
 	    if (MIN_I32<=i<=MAX_I32 &&
-	    !Bt(&non_ptr_vars_mask,tempil2->a1.reg)) {
+	    !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
 	  tempil1->ic_flags|=tempil2->ic_flags;
 	  tempil1->ic_code=IC_MOV;
 	  tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed;
@@ -194,16 +194,16 @@ U0 OptPass4(CLex *lx,COptReg *reg_offsets,I64 *_type)
       tempi=OptFree(tempi);
     } else {
       tempc=tempi->ic_class;
-      tempi1=tempi2=tempi3=&opt_nop;
+      tempi1=tempi2=tempi3=&cmp.ic_nop;
       if (tempil1=OptLag2(tempi)) {
 	if (tempil2=OptLag2(tempil1)) {
 	  if (!(tempil3=OptLag2(tempil2)))
-	    tempil3=&opt_nop;
+	    tempil3=&cmp.ic_nop;
 	} else
-	  tempil2=tempil3=&opt_nop;
+	  tempil2=tempil3=&cmp.ic_nop;
       } else
-	tempil1=tempil2=tempil3=&opt_nop;
-      nobound_switch (cmp_arg_cnt[code]) {
+	tempil1=tempil2=tempil3=&cmp.ic_nop;
+      nobound_switch (cmp.arg_cnt[code]) {
 	case 9:
 	  ps->ptr-=tempi->ic_data>>3;
 	  break;
@@ -461,7 +461,7 @@ p4_sib:
 		  break;
 		}
 	    }
-	    tempi->ic_class=sys_internal_types[RT_I64];
+	    tempi->ic_class=cmp.internal_types[RT_I64];
 	  } else if (_type)
 	    *_type=tempi->ic_class->raw_type;
 	  break;
@@ -691,7 +691,7 @@ p4_sib:
 	case IC_SWAP_U8:
 	case IC_SWAP_U16:
 	case IC_SWAP_U32:
-	case IC_SWAP_U64:
+	case IC_SWAP_I64:
 	case IC_QUE_INIT:
 	case IC_QUE_INS:
 	case IC_QUE_INS_REV:
@@ -725,7 +725,7 @@ p4_sib:
       if (tempi) {
 	while (OptIC4(tempi));
 	code=tempi->ic_code;
-	if (cmp_result_cnt[code])
+	if (cmp.result_cnt[code])
 	  PrsPush(ps,tempi);
       }
     }

@@ -61,7 +61,7 @@ is you can't use the <CTRL-SHIFT-L> compile chk feature.
   d=PopUpRangeF64(0,100,25,"%3f% %%","Animation Delay\n");
   DefinePrint("ANIMATION_DELAY","%5.3f",d/100.0);
   Randomize;
-  Randomize(PopUpI64("Seed(0x%X):",Fs->rnd_seed));
+  Randomize(PopUpGetI64("Seed(0x%X):",Fs->rnd_seed));
   XTalk(rotate_tank_task," ");
   TaskWait(rotate_tank_task);
   Kill(rotate_tank_task);
@@ -109,21 +109,16 @@ I64 msg_off_timeout; //Jiffies. Goes away after a time.
 right away in these $LK,"CSprite",A="MN:CSprite"$s so they can
 work for both players by setting dc->color
 before drawing them.  I actually made these
-graphics by defining a color in the <CTRL-R>
+graphics by defining a color in the <CTRL-r>
 menu, drawing the unit and deleting the color.
 
 I had to leave a gap between the tank tread
 and body because of how it is rendered when rotated.
 */
 
-
-
-
 $SP,"<1>",BI=1$
 
-
 $SP,"<2>",BI=2$
-
 
 //This is an infantry.
 
@@ -131,10 +126,7 @@ $SP,"<3>",BI=3$
 
 $SP,"<4>",BI=4$
 
-
 $SP,"<5>",BI=5$
-
-
 
 //Unit types
 #define UT_INFANTRY	0
@@ -154,7 +146,7 @@ class Unit
 
 Unit units[2][MAX_UNITS];
 
-// Bt(visible_unit_bitmap,p1+p0*((MAX_UNITS+7)&~7))
+// Bt(visible_unit_bitmap,player1+player0*((MAX_UNITS+7)&~7))
 U8 visible_unit_bitmap[2][(((MAX_UNITS+7)&~7)*MAX_UNITS)>>3];
 
 #define PHASE_START	0
@@ -179,26 +171,22 @@ U0 Toward(I64 *_row,I64 *_col,I64 direction)
       *_row-=2;
       break;
     case 1:
-      if (*_row&1)
-	*_col+=1;
+      if (*_row&1) *_col+=1;
       *_row-=1;
       break;
     case 2:
-      if (*_row&1)
-	*_col+=1;
+      if (*_row&1) *_col+=1;
       *_row+=1;
       break;
     case 3:
       *_row+=2;
       break;
     case 4:
-      if (!(*_row&1))
-	*_col-=1;
+      if (!(*_row&1)) *_col-=1;
       *_row+=1;
       break;
     case 5:
-      if (!(*_row&1))
-	*_col-=1;
+      if (!(*_row&1)) *_col-=1;
       *_row-=1;
       break;
   }
@@ -268,7 +256,7 @@ class LOSCtrl
 };
 
 Bool LOSPlot(LOSCtrl *l,I64 x,I64 y,I64 z)
-{ //We got tricky and used z as the distance from the start of the line.
+{//We got tricky and used z as the distance from the start of the line.
   I64 row,col;
   XY2RowCol(&row,&col,x,y);
   if ((row!=l->r1 || col!=l->c1) &&
@@ -327,10 +315,10 @@ U0 RVMerge(I64 player)
   I64 i,j;
   Unit *ut1;
   U8 *dst,*src,*mask=CAlloc((MAX_UNITS+7)>>3);
-  for (j=0;j<MAX_UNITS;j++) { //p0
+  for (j=0;j<MAX_UNITS;j++) {//p0
     src=&visible_unit_bitmap[player][(((MAX_UNITS+7)&~7)*j)>>3];
     dst=mask;
-    for (i=0;i<(MAX_UNITS+7)>>3;i++) //p1
+    for (i=0;i<(MAX_UNITS+7)>>3;i++) //player1
       *dst++|=*src++;
   }
   ut1=&units[player^1][0];
@@ -338,7 +326,6 @@ U0 RVMerge(I64 player)
     LBEqu(&ut1->visible[player],0,Bt(mask,j) && ut1->life>0);
   Free(mask);
 }
-
 
 Bool MPRecalcVisible(MPCtrl1 *job)
 {
@@ -427,7 +414,6 @@ Bool RecalcVisible(I64 mode,Unit *tempu=NULL)
 {
   I64 i,hi,k,cnt;
   Bool result;
-
 /*The compiler doesn't go out of it's way
 to know if something is const.;-)  This
 just compiles with the val at compile
@@ -442,10 +428,10 @@ $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
   if (mode==RV_FRIENDLY_UNIT_DIED) {
     MemSet((&visible_unit_bitmap[enemy_player])(U8 *)+(tempu->num*((MAX_UNITS+7)&~7))>>3,0,(MAX_UNITS+7)>>3);
     RVMerge(enemy_player);
-    return 0; //return any value--don't care
+    return 0; //Return any value--don't care
   }
 
-  cnt=mp_cnt; //cores
+  cnt=mp_cnt; //Cores
   hi=MAX_UNITS;
   if (mode==RV_ONE_ENEMY_UNIT) {
     for (hi--;hi>=0;hi--)
@@ -499,7 +485,7 @@ U0 RecalcVisibleMap(I64 row,I64 col)
   MPCtrl2 job[mp_cnt];
   CSrvCmd *cmd[mp_cnt];
 
-  cnt=mp_cnt; //cores
+  cnt=mp_cnt; //Cores
   hi=map_rows;
   k=hi;
   if (hi/mp_cnt<2)
@@ -687,7 +673,7 @@ U0 FireShot(Unit *tempu,Unit *target)
   RowCol2XY(&x1,&y1,tempu->row,tempu->col);
   RowCol2XY(&x2,&y2,target->row,target->col);
 
-  NewLine(2);
+  '\n\n';
 
   d=100*Rand;
   "+%5.2f  Roll\n",d;
@@ -786,7 +772,7 @@ U0 FireShot(Unit *tempu,Unit *target)
       }
     }
   }
-  while (snd_freq) //see $LK,"Snd",A="MN:Snd"$()
+  while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
     Yield;
   target_unit=NULL;
 }
@@ -808,7 +794,7 @@ U0 IndirectFireResolve()
     RowCol2XY(&x1,&y1,tempu->row,tempu->col);
     RowCol2XY(&x2,&y2,tempi->row,tempi->col);
 
-    NewLine(2);
+    '\n\n';
 
     d=100*Rand;
     "+%5.2f  Roll\n",d;
@@ -908,7 +894,7 @@ U0 IndirectFireResolve()
     }
     Noise(2000*ANIMATION_DELAY,800,1000);
     Sleep(2000*ANIMATION_DELAY);
-    while (snd_freq) //see $LK,"Snd",A="MN:Snd"$()
+    while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     indirect_explosion=FALSE;
 
@@ -1082,7 +1068,6 @@ U0 DrawRoads()
     }
 }
 
-
 U0 CalcHexCenters()
 {
   I64 i,j;
@@ -1238,16 +1223,15 @@ U0 NewTurn()
   moving_unit=NULL;
 
   SleepUntil(msg_off_timeout);
-  msg_off_timeout=sys_jiffies+JIFFY_FREQ*2*ANIMATION_DELAY+1;
+  msg_off_timeout=cnts.jiffies+JIFFY_FREQ*2*ANIMATION_DELAY+1;
   Snd(1000);
-  SPrint(msg_buf,"Turn %d",++turn);
+  StrPrint(msg_buf,"Turn %d",++turn);
   RVSetUp(0);
   RVSetUp(1);
   RecalcVisible(RV_ALL_UNITS);
   cur_player=(turn&1)^1;
   enemy_player=cur_player^1;
 }
-
 
 U0 NewPhase()
 {
@@ -1267,20 +1251,20 @@ U0 NewPhase()
     Fs->border_attr=WHITE<<4+RED;
 
   SleepUntil(msg_off_timeout);
-  msg_off_timeout=sys_jiffies+JIFFY_FREQ*2*ANIMATION_DELAY+1;
+  msg_off_timeout=cnts.jiffies+JIFFY_FREQ*2*ANIMATION_DELAY+1;
   Snd(1000);
   switch (phase) {
     case PHASE_PLOT0:
     case PHASE_PLOT1:
-      SPrint(msg_buf,"Player %d Artillery Plot",cur_player+1);
+      StrPrint(msg_buf,"Player %d Artillery Plot",cur_player+1);
       break;
     case PHASE_MOVE0:
     case PHASE_MOVE1:
-      SPrint(msg_buf,"Player %d Move",cur_player+1);
+      StrPrint(msg_buf,"Player %d Move",cur_player+1);
       break;
     case PHASE_FIRE0:
     case PHASE_FIRE1:
-      SPrint(msg_buf,"Player %d Fire",cur_player+1);
+      StrPrint(msg_buf,"Player %d Fire",cur_player+1);
       break;
   }
 }
@@ -1369,7 +1353,7 @@ U0 PickAI(U8 *dirname,I64 player)
   CDirEntry *tempde,*tempde1,*tempde2;
   CDoc *doc=DocNew;
   Bool *old_silent=Silent(ON);
-  st=MPrint("%s/*.CPP*",dirname);
+  st=MStrPrint("%s/*.CPP*",dirname);
   tempde=FilesFind(st);
   Free(st);
   tempde2=FilesFind("HOME/ToTheFront/*.CPP*");
@@ -1400,13 +1384,12 @@ U0 PickAI(U8 *dirname,I64 player)
   while ((tempde1=PopUpMenu(doc))<=0);
   ExeFile(tempde1->full_name);
   DocDel(doc);
-  DirLstDel(tempde);
-  DirLstDel(tempde2);
+  DirTreeDel(tempde);
+  DirTreeDel(tempde2);
   ExePrint("plot_routines[%d]=&TanksPlot;"
 	    "move_routines[%d]=&TanksMove;"
 	    "fire_routines[%d]=&TanksFire;",player,player,player);
 }
-
 
 U0 DrawUnit(CTask *task,CDC *dc,Unit *tempu,I64 x,I64 y,F64 f)
 {
@@ -1476,8 +1459,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   map->flags|=DCF_NO_TRANSPARENTS;
   GrBlot(dc,-h,-v,map);
 
-  i=ipx-task->pix_left-task->scroll_x;
-  j=ipy-task->pix_top -task->scroll_y;
+  i=ip.pos.x-task->pix_left-task->scroll_x;
+  j=ip.pos.y-task->pix_top -task->scroll_y;
   if (CursorInWindow(task,i,j))
     UpdateCursor(task,i,j);
   RowCol2XY(&x,&y,cursor_row,cursor_col);
@@ -1523,7 +1506,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
   ProgressBarsRst;
   if (moving_unit) {
-    if (ipy<GR_HEIGHT/2) {
+    if (ip.pos.y<GR_HEIGHT/2) {
       progress4_max=moving_unit->movement;
       progress4=moving_unit->remaining_movement;
     } else {
@@ -1548,7 +1531,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       tempi=tempi->next;
     }
   }
-  if (Bt(key_down_bitmap,SC_SHIFT)) {
+  if (Bt(kbd.down_bitmap,SC_SHIFT)) {
     if (show_visible_row!=cursor_row || show_visible_col!=cursor_col) {
       show_visible_row=cursor_row;
       show_visible_col=cursor_col;
@@ -1582,9 +1565,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 		(task->pix_height-FONT_HEIGHT)>>1-task->scroll_y,
       msg_buf);
     if (msg_off_timeout) {
-      if (msg_off_timeout-sys_jiffies<3*JIFFY_FREQ/2*ANIMATION_DELAY)
+      if (msg_off_timeout-cnts.jiffies<3*JIFFY_FREQ/2*ANIMATION_DELAY)
 	Snd(0);
-      if (sys_jiffies>msg_off_timeout)
+      if (cnts.jiffies>msg_off_timeout)
 	*msg_buf=0;
     }
   }
@@ -1594,24 +1577,24 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   if (phase&~1==PHASE_PLOT) {
     dc->color=PURPLE;
-    SPrint(buf,"Turn:%2d Artillery",turn);
+    StrPrint(buf,"Turn:%2d Artillery",turn);
   } else if (phase&~1==PHASE_MOVE) {
     dc->color=GREEN;
-    SPrint(buf,"Turn:%2d Move",turn);
+    StrPrint(buf,"Turn:%2d Move",turn);
   } else {
     dc->color=RED;
-    SPrint(buf,"Turn:%2d Fire",turn);
+    StrPrint(buf,"Turn:%2d Fire",turn);
   }
   GrPrint(dc,-task->scroll_x,-task->scroll_y,buf);
 
-  SPrint(buf,"%3d Units",alive_cnt[0]);
+  StrPrint(buf,"%3d Units",alive_cnt[0]);
   if (cur_player || Blink)
     dc->color=CYAN;
   else
     dc->color=LTCYAN;
   GrPrint(dc,-task->scroll_x+(13+7)*FONT_WIDTH,-task->scroll_y,buf);
 
-  SPrint(buf,"%3d Units",alive_cnt[1]);
+  StrPrint(buf,"%3d Units",alive_cnt[1]);
   if (!cur_player || Blink)
     dc->color=PURPLE;
   else
@@ -1651,7 +1634,7 @@ U0 ToTheFront()
   map=DCNew(MAP_WIDTH,MAP_HEIGHT);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Fs->win_inhibit|=WIF_IP_L|WIF_IP_R|WIG_DBL_CLICK;
+  Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R|WIG_DBL_CLICK;
 
   MenuPush(
 	"File {"
@@ -1679,13 +1662,13 @@ U0 ToTheFront()
   PickAI("/Apps/ToTheFront/AIs",1);
 
   PopUpOk("Left-click  to move or fire units.\n"
-	"$$GREEN$$<SPACE BAR>$$FG$$ or right-click to end phase.\n"
+	"$$GREEN$$<SPACE>$$FG$$ or right-click to end phase.\n"
 	"$$GREEN$$<SHIFT>\t   $$FG$$ to show line-of-sight.\n"
 	"$$GREEN$$<ENTER>\t   $$FG$$ to start new game.\n"
 	"$$GREEN$$  1\t   $$FG$$ Player 1 view.\n"
 	"$$GREEN$$  2\t   $$FG$$ Player 2 view.\n"
 	"$$GREEN$$  3\t   $$FG$$ View odds calculations.");
-  Fs->task_end_cb=&TaskEndCB; //<CTRL-ALT-X>
+  Fs->task_end_cb=&TaskEndCB; //<CTRL-ALT-x>
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;

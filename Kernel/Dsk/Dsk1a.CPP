@@ -1,5 +1,5 @@
 Bool BlkDevLock(CBlkDev *bdev)
-{
+{//Make this task have exclusive access to BlkDev.
   BlkDevChk(bdev);
   while (bdev->lock_fwding)
     bdev=bdev->lock_fwding;
@@ -13,7 +13,7 @@ Bool BlkDevLock(CBlkDev *bdev)
 }
 
 Bool PrtLock(CPrt *p)
-{
+{//Make this task have exclusive access to Prt & BlkDev.
   PrtChk(p);
   BlkDevLock(p->bdev);
   if (!Bt(&p->locked_flags,Plf_LOCKED) || p->owning_task!=Fs) {
@@ -26,7 +26,7 @@ Bool PrtLock(CPrt *p)
 }
 
 Bool BlkDevUnlock(CBlkDev *bdev,Bool rst=FALSE)
-{
+{//Release exclusive lock on access to BlkDev.
   BlkDevChk(bdev);
   while (bdev->lock_fwding)
     bdev=bdev->lock_fwding;
@@ -42,7 +42,7 @@ Bool BlkDevUnlock(CBlkDev *bdev,Bool rst=FALSE)
 }
 
 Bool PrtUnlock(CPrt *p,Bool rst=FALSE)
-{
+{//Release exclusive lock on access to Prt & BlkDev.
   PrtChk(p);
   if (Bt(&p->locked_flags,Plf_LOCKED) && p->owning_task==Fs) {
     BlkDevUnlock(p->bdev,rst);
@@ -84,8 +84,8 @@ Bool BlkDevInit(CBlkDev *bdev)
 	//0xFFFF*4 is too big for my taste
 	bdev->max_reads=0x800*4;
 	//max of maybe a quarter of disk cache
-	if (bdev->max_reads>sys_dsk_cache_size/BLK_SIZE/4)
-	  bdev->max_reads=sys_dsk_cache_size/BLK_SIZE/4 & ~3;
+	if (bdev->max_reads>dsk.cache_size/BLK_SIZE/4)
+	  bdev->max_reads=dsk.cache_size/BLK_SIZE/4 & ~3;
 	if (bdev->max_reads<128)
 	  bdev->max_reads=128;
 	bdev->max_writes=0xFFFF*4;
@@ -103,46 +103,48 @@ Bool BlkDevInit(CBlkDev *bdev)
 }
 
 U0 BlkDevsRelease()
-{
+{//When task dies, release all owned BlkDevs.
   I64 i;
   CBlkDev *bdev;
   for (i=0;i<NUM_BLKDEVS;i++) {
-    bdev=&sys_blkdevs[i];
+    bdev=&dsk.blkdevs[i];
     if (bdev->owning_task==Fs && bdev->bd_signature==BD_SIGNATURE_VAL)
       BlkDevUnlock(bdev,TRUE);
   }
 }
 
 U0 PrtsRelease()
-{
+{//When task dies, release all owned Prts.
   I64 i;
   CPrt *p;
   for (i=0;i<NUM_PRTS;i++) {
-    p=&sys_prts[i];
+    p=&dsk.prts[i];
     if (p->owning_task==Fs && p->pt_signature==PRT_SIGNATURE_VAL)
       PrtUnlock(p,TRUE);
   }
 }
 
 CPrt *PrtMakeFree(U8 drv_let)
-{//!!! drv is not a remapped prt.
+{//Make a slot free for a new partition, like during $LK,"Mount",A="MN:Mount"$().
+//!!! drv_let is not a $LK,"remapped",A="MN:MapDrv"$ prt.
   I64 i=ToUpper(drv_let)-'A';
   CPrt *result;
   if (!(0<=i<NUM_PRTS))
     throw('Prt');
-  result=&sys_prts[i];
+  result=&dsk.prts[i];
   MemSet(result,0,sizeof(CPrt));
   result->drv_let='A'+i;
   return result;
 }
 
 CPrt *PrtNextFree(U8 first_drv_let='C')
-{//!!! first_drv_let is not a remapped prt.
+{//Locate free slot for new partition, like during $LK,"Mount",A="MN:Mount"$().
+//!!! first_drv_let is not a $LK,"remapped",A="MN:MapDrv"$ prt.
   I64 i=ToUpper(first_drv_let)-'A';
   if (!(0<=i<NUM_PRTS))
     throw('Prt');
   do
-    if (sys_prts[i].pt_signature!=PRT_SIGNATURE_VAL)
+    if (dsk.prts[i].pt_signature!=PRT_SIGNATURE_VAL)
       return PrtMakeFree(i+'A');
   while (++i<NUM_PRTS);
   throw('Prt');
@@ -150,11 +152,11 @@ CPrt *PrtNextFree(U8 first_drv_let='C')
 }
 
 CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
-{
+{//Locate free slot for new BlkDev, like during $LK,"Mount",A="MN:Mount"$().
   I64 i=0;
   CBlkDev *result;
   do {
-    result=&sys_blkdevs[i];
+    result=&dsk.blkdevs[i];
     if (result->bd_signature!=BD_SIGNATURE_VAL) {
       MemSet(result,0,sizeof(CBlkDev));
       result->first_drv_let=first_drv_let;
@@ -192,7 +194,6 @@ U0 MapBufAlloc(CPrt *p,I64 num_blks)
   RBlks(p,p->cur_map_blk,p->map1,p->num_buffered_map_blks);
 }
 
-
 U0 CleanMAPBuf(CPrt *p,I64 MAP_select=-1)
 {
   I64 i;
@@ -227,7 +228,7 @@ U0 SetFSBuf(CPrt *p,I64 c,I64 map_select=-1)
 
 #define ZERO_BUF_SIZE	2048
 U0 WZeroBlks(CPrt *p,I64 blk,I64 cnt)
-{
+{//Fill blk cnt with zeros in Prt.
   I64 n;
   U8 *z=CAlloc(ZERO_BUF_SIZE<<BLK_SIZE_BITS);
   Bool show_progress;
@@ -255,9 +256,8 @@ U0 WZeroBlks(CPrt *p,I64 blk,I64 cnt)
   }
 }
 
-//Very dangerous
 Bool SetDrvType(U8 drv_let,I64 type=PT_REDSEA)
-{
+{//Very dangerous
   I64 i,j,ext_base,prt_num,offset,cur_type;
   CMasterBoot mbr;
   CBlkDev *bdev=Drv2BlkDev(drv_let);
@@ -309,7 +309,7 @@ Bool SetDrvType(U8 drv_let,I64 type=PT_REDSEA)
 }
 
 Bool RBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
-{
+{//Read blk cnt from Prt to buf.
   Bool result=TRUE,unlock;
   CBlkDev *bdev=p->bdev;
   if (cnt<=0) return TRUE;
@@ -319,7 +319,6 @@ Bool RBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
     BlkDevInit(bdev);
     if (p->offset && blk<p->offset || blk+cnt>p->offset+p->size)
       throw('Prt');
-    blk+=bdev->offset;
  
     if (bdev->flags & BDF_READ_CACHE)
       RCache(p,&buf,&blk,&cnt);
@@ -346,7 +345,7 @@ Bool RBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
 }
 
 Bool WBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
-{
+{//Write blk cnt from buf to Prt.
   Bool result=TRUE,unlock;
   CBlkDev *bdev=p->bdev;
   if (cnt<=0) return TRUE;
@@ -359,7 +358,6 @@ Bool WBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
       throw('BlkDev');
     if (p->offset && blk<p->offset || blk+cnt>p->offset+p->size)
       throw('Prt');
-    blk+=bdev->offset;
     if (cnt>0) {
       switch (bdev->type) {
 	case BDT_RAM:
@@ -382,9 +380,8 @@ Bool WBlks(CPrt *p,U8 *buf, I64 blk, I64 cnt)
   return result;
 }
 
-
 U0 DskCacheInvalidate(CPrt *p)
-{
+{//Needed for removable media. Called by $LK,"ChgDsk",A="MN:ChgDsk"$().
   Bool unlock;
   CBlkDev *bdev=p->bdev;
   PrtChk(p);
@@ -406,7 +403,7 @@ U0 DskCacheInvalidate(CPrt *p)
 }
 
 U0 ChgDsk(U8 drv_let=0)
-{ //This is needed for removable media
+{//Change disk. (Needed for removable media.)
   CPrt *p=Drv2Prt(drv_let);
   CBlkDev *bdev=p->bdev;
   Bool old_preempt=Preempt(OFF);
@@ -420,7 +417,7 @@ U0 ChgDsk(U8 drv_let=0)
 }
 
 U8 *DrvSerialNum(U8 drv_let=0)
-{ //20 bytes max.
+{//20 bytes max.
   CBlkDev *bdev=Drv2BlkDev(drv_let);
   U16 *st,*result=NULL;
   I64 i;
@@ -435,7 +432,7 @@ U8 *DrvSerialNum(U8 drv_let=0)
 }
 
 U8 *DrvModelNum(U8 drv_let=0)
-{ //40 bytes max.
+{//40 bytes max.
   CBlkDev *bdev=Drv2BlkDev(drv_let);
   U16 *st,*result=NULL;
   I64 i;
@@ -450,13 +447,13 @@ U8 *DrvModelNum(U8 drv_let=0)
 }
 
 U0 PrtRep()
-{ //Partition report
+{//Partition report.
   CPrt *p;
   CBlkDev *bdev;
   I64 i,drv_let;
   U8 *st;
   "\nDefined Partitions:\n\n";
-  for (i=0,p=sys_prts;i<NUM_PRTS;i++,p++) {
+  for (i=0,p=dsk.prts;i<NUM_PRTS;i++,p++) {
     if (p->pt_signature==PRT_SIGNATURE_VAL) {
       bdev=p->bdev;
       drv_let=Prt2Drv(p);
@@ -485,7 +482,7 @@ U0 PrtRep()
 }
 
 I64 ClusterNumNext(CPrt *p,I64 c,I64 cnt=1)
-{
+{//Return next cnt'th cluster in chain.
   Bool unlock;
   PrtChk(p);
   if (cnt<=0) return c;
@@ -515,15 +512,14 @@ I64 ClusterNumNext(CPrt *p,I64 c,I64 cnt=1)
   return c;
 }
 
-
 I64 Cluster2Blk(CPrt *p,I64 c)
-{
+{//Prt cluster num to blk num.
   PrtChk(p);
   return p->data+c*p->spc;
 }
 
 I64 RClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
-{ //This accepts blk count, so padding on last cluster is not read.
+{//Accepts blk count, so padding on last cluster is not read.
   I64 i;
   Bool unlock;
   PrtChk(p);
@@ -561,7 +557,7 @@ I64 RClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
 }
 
 I64 RClusters(CPrt *p,U8 *buf,I64 c,I64 cnt)
-{
+{//Read cluster cnt from Prt to buf.
   return RClustersBlks(p,buf,c,cnt*p->spc);
 }
 
@@ -663,9 +659,8 @@ I64 Name2ParentDirCluster(CPrt *p,U8 *dirname)
   return cur_dir_cluster2;
 }
 
-
 I64 WClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
-{ //This accepts blk count, so padding on last cluster is not written.
+{//Accepts blk count, so padding on last cluster is not written.
   I64 i;
   Bool unlock;
   PrtChk(p);
@@ -702,13 +697,13 @@ I64 WClustersBlks(CPrt *p,U8 *buf,I64 c,I64 blks)
 }
 
 I64 WClusters(CPrt *p,U8 *buf,I64 c,I64 cnt)
-{
+{//Write cluster cnt from buf to Prt.
   return WClustersBlks(p,buf,c,cnt*p->spc);
 }
 
-//c=0 means first cluster in chain
 I64 ClustersAlloc(CPrt *p,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
-{
+{//Alloc cluster cnt into chain.
+//c=0 means first cluster in chain
   PrtChk(p);
   if (cnt<=0) return c;
   switch (p->type) {

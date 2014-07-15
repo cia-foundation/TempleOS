@@ -6,7 +6,7 @@ $HL,1$#define CDIR_FILENAME_LEN	38 //Must include terminator zero
 
 public class CDirEntry //64-byte fixed-size
 {
-  U16 attr;	//See $LK,"_ATTR_DIR",A="MN:_ATTR_DIR"$.  I would like to change these.
+  U16 attr;	//See $LK,"RS_ATTR_DIR",A="MN:RS_ATTR_DIR"$.  I would like to change these.
   U8 name[CDIR_FILENAME_LEN]; //See $LK,"chars_bitmap_filename",A="MN:chars_bitmap_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
   I64 cluster;	//One sector per cluster.  I might change origin, let's talk.
   I64 size;	//In bytes

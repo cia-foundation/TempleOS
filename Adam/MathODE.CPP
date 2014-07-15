@@ -1,10 +1,10 @@
-#help_index "Math/CMathODE;CMathODE"
+#help_index "Math/ODE"
 #help_file "::/Doc/ODE"
 
 //See $LK,"::/Doc/Acknowledgements.TXT"$.
 
 F64 LowPass1(F64 a,F64 y0,F64 y,F64 dt=1.0)
-{ //First order low pass filter
+{//First order low pass filter
   dt=Exp(-a*dt);
   return y0*dt+y*(1.0-dt);
 }
@@ -28,8 +28,7 @@ U0 ODERstPtrs(CMathODE *ode)
 }
 
 public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
-{
-//See $LK,"flags",A="MN:ODEF_HAS_MASSES"$.
+{//Make differential equation ctrl struct. See $LK,"flags",A="MN:ODEF_HAS_MASSES"$.
 
 //The tolerance is not precise.
 //You can min_tolerance and it will
@@ -62,7 +61,7 @@ public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
 }
 
 public U0 ODEDel(CMathODE *ode)
-{
+{//Free ODE node, but not masses or springs.
   if (!ode) return;
   ode->ode_signature=0;
   Free(ode->state);
@@ -71,7 +70,7 @@ public U0 ODEDel(CMathODE *ode)
 }
 
 public I64 ODESize(CMathODE *ode)
-{
+{//Mem size of ode ctrl, but not masses and springs.
   if (!ode)
     return 0;
   else
@@ -134,7 +133,7 @@ U0 ODEInternal2State(CMathODE *ode)
 }
 
 public U0 ODERenum(CMathODE *ode)
-{
+{//Renumber masses and springs.
   I64 i;
   CSpring *temps;
   CMass *tempm;
@@ -157,7 +156,7 @@ public U0 ODERenum(CMathODE *ode)
 }
 
 public CMass *MassFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
-{
+{//Search for mass nearest to x,y,z.
   CMass *tempm,*best_mass=NULL;
   F64 d,best_d=MAX_F64;
 
@@ -174,7 +173,7 @@ public CMass *MassFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 }
 
 public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
-{
+{//Find spring midpoint nearest x,y,z.
   CSpring *temps,*best_spring=NULL;
   F64 d,best_d=MAX_F64;
 
@@ -194,7 +193,7 @@ public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 
 public U0 MassOrSpringFind(CMathODE *ode,CMass **result_mass,CSpring **result_spring,
   F64 x,F64 y,F64 z=0)
-{
+{//Find spring or mass nearest x,y,z.
   CMass   *tempm,*best_mass=NULL;
   CSpring *temps,*best_spring=NULL;
   F64 d,best_d=MAX_F64;
@@ -226,7 +225,7 @@ public U0 MassOrSpringFind(CMathODE *ode,CMass **result_mass,CSpring **result_sp
 }
 
 public CMass *MassFindNum(CMathODE *ode,I64 num)
-{
+{//Return mass number N.
   CMass *tempm=ode->next_mass;
   while (tempm!=&ode->next_mass) {
     if (tempm->num==num)
@@ -237,7 +236,7 @@ public CMass *MassFindNum(CMathODE *ode,I64 num)
 }
 
 public U0 ODERstInactive(CMathODE *ode)
-{
+{//Set all masses and springs to ACTIVE for new trial.
   CMass *tempm;
   CSpring *temps;
   tempm=ode->next_mass;
@@ -292,7 +291,7 @@ U0 ODECalcDrag(CMathODE *ode)
     while (tempm!=&ode->next_mass) {
       if (!(tempm->flags & MSF_INACTIVE) &&
 	  tempm->drag_profile_factor &&
-	  (dd=D3SqrNorm(&tempm->state->DxDt))) {
+	  (dd=D3NormSqr(&tempm->state->DxDt))) {
 	d=ode->drag_v;
 	if (ode->drag_v2)
 	  d+=ode->drag_v2*Sqrt(dd);
@@ -392,7 +391,6 @@ U0 ODERK4OneStep(CMathODE *ode)
     ode->state_internal[i]+=h6*(DstateDt[i]+dyt[i]+2.0*dym[i]);
 }
 
-
 #define ODEa2 0.2
 #define ODEa3 0.3
 #define ODEa4 0.6
@@ -458,12 +456,10 @@ U0 ODECashKarp(CMathODE *ode)
     stateerr[i]=h*(ODEdc1*DstateDt[i]+ODEdc3*ak3[i]+ODEdc4*ak4[i]+ODEdc5*ak5[i]+ODEdc6*ak6[i]);
 }
 
-
 #define SAFETY 0.9
 #define PGROW  (-0.2)
 #define PSHRNK (-0.25)
 #define ERRCON 1.89e-4
-
 
 U0 ODERK5OneStep(CMathODE *ode)
 {
@@ -498,9 +494,7 @@ U0 ODERK5OneStep(CMathODE *ode)
 F64 ode_allocated_factor=0.75;
 
 U0 ODEsUpdate(CTask *task)
-{
-/*
-This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScreen.CPP,ODEsUpdate"$ on a continuous
+{/* This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScreen.CPP,ODEsUpdate"$ on a continuous
 basis to allow real-time simulation.  It is intended
 to provide results good enough for games.  It uses a runge-kutta
 integrator which is a better algorithm than doing it with Euler.
@@ -508,7 +502,6 @@ integrator which is a better algorithm than doing it with Euler.
 It is adaptive step-sized, so it slows down when an important
 event is taking place to improve accuracy, but in my implementation
 it has a timeout.
-
 */
   I64 i;
   F64 d,start_time,timeout_time,t_desired,t_initial,interpolation;
@@ -519,7 +512,7 @@ it has a timeout.
     task->last_ode_time=0;
   else {
     //See $LK,"GrUpdateWins",A="MN:GrUpdateWins"$()
-    if (!Bt(&task->win_inhibit,WIf_ODE)) {
+    if (!Bt(&task->win_inhibit,WIf_SELF_ODE)) {
       //TODO: Being preempted here woulds be bad
       if (task!=Fs)
 	old_suspend=Suspend(task);
@@ -528,9 +521,9 @@ it has a timeout.
       //last refresh cycle was spent on ODE's
       //and what the refresh cycle rate was.
       start_time=tS;
-      d=1.0/win_actual_refresh;
+      d=1.0/winmgr.fps;
       timeout_time=start_time+
-	    (task->last_ode_time/d+0.1)/(last_refresh_ode_time/d+0.1)*
+	    (task->last_ode_time/d+0.1)/(winmgr.last_ode_time/d+0.1)*
 	    ode_allocated_factor*d;
       ode=task->next_ode;
       while (ode!=&task->next_ode) {
@@ -612,12 +605,10 @@ ode_done:
 	}
 	ode=ode->next;
       }
-      refresh_ode_time+=task->last_ode_time=tS-start_time;
+      winmgr.ode_time+=task->last_ode_time=tS-start_time;
       //See $LK,"GrUpdateWins",A="MN:GrUpdateWins"$()
       if (task!=Fs)
 	Suspend(task,old_suspend);
     }
   }
 }
-
-#help_index ""

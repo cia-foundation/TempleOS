@@ -1,4 +1,4 @@
-//This puts the cursor at the bottom
+//Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
@@ -13,31 +13,31 @@ PopUpOk(
 "You must remember the semicolon.\n"
 );
 
-AFPmtStr("Dir;\n");
-Sleep(1000);  //allow user time to see dir
+AFGetStr("Dir;\n");
+Sleep(1000);  //Allow user time to see dir
 '\n';
 
 PopUpOk(
 "After clicking $$GREEN$$[OKAY]$$FG$$, you will be at the\n"
 "command line.\n\n"
-"Press $$GREEN$$<CTRL-M>$$FG$$.\n\n"
-"This will access your personal menu.\n"
+"Press $$GREEN$$<CTRL-m>$$FG$$.\n\n"
+"This will access your PersonalMenu.\n"
 "You can customize it.  It's like your\n"
 "START menu and desktop.\n");
 
 AFGetChar(CH_CTRLM);
 Sleep(1000);
 PopUpOk(
-"You can get to your personal menu\n"
+"You can get to your PersonalMenu\n"
 "by clicking on the word \"$$GREEN$$MENU$$FG$$\" in the\n"
 "title bar.\n");
 
 PopUpOk(
 "After clicking $$GREEN$$[OKAY]$$FG$$, you will be back at\n"
-"the personal menu.\n\n"
+"the PersonalMenu.\n\n"
 "Press $$GREEN$$<CURSOR-DOWN>$$FG$$ nine times.\n");
 
-//This puts the cursor at the top
+//Puts the cursor at the top
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 
 I64 i;
@@ -46,7 +46,7 @@ for (i=0;i<9;i++)
 
 PopUpOk(
 "Keyboard commands are:\n\n"
-"$$GREEN$$<SPACE BAR>$$FG$$\tLeft-action\n"
+"$$GREEN$$<SPACE>$$FG$$\t\tLeft-action\n"
 "$$GREEN$$<ENTER>$$FG$$\t\tRight-action\n"
 "$$GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
 "$$GREEN$$<SHIFT-ESC>$$FG$$\tAbort\n"
@@ -56,8 +56,8 @@ PopUpOk(
 "After clicking $$GREEN$$[OKAY]$$FG$$, the cursor will be\n"
 "on top of a macro we wish to run.\n"
 "\n"
-"After clicking $$GREEN$$[OKAY]$$FG$$, press $$GREEN$$<SPACE BAR>$$FG$$.\n");
-AFPmtStr(" ");
+"After clicking $$GREEN$$[OKAY]$$FG$$, press $$GREEN$$<SPACE>$$FG$$.\n");
+AFGetStr(" ");
 Sleep(1000);
 
 PopUpOk(
@@ -72,18 +72,19 @@ PopUpOk(
 "are macros and will change directories.\n");
 
 PopUpOk(
-"\"$$GREEN$$<CTRL-T>$$FG$$\" after clicking $$GREEN$$[OKAY]$$FG$$ to toggle\n"
-"to plain text mode.\n");
+"Press $$GREEN$$<CTRL-t>$$FG$$ after clicking $$GREEN$$[OKAY]$$FG$$\n"
+"to toggle plain text mode.\n\n"
+"These are \"DolDoc\" commands.");
 AFGetChar(CH_CTRLT);
 Sleep(1000);
 
 PopUpOk(
-"The widgets are bracketed with dollar sign\n"
-"characters. \"LK\" stands \"link\" and \"MA\"\n"
-"stands for \"macro\".\n\n"
-"Now, \"$$GREEN$$<CTRL-T>$$FG$$\" to toggle back to\n"
+"The DolDoc widgets are bracketed with\n"
+"dollar sign characters.\n\n"
+"\"LK\" stands \"link\".\n"
+"\"MA\" stands for \"macro\".\n\n"
+"Now, $$GREEN$$<CTRL-t>$$FG$$ to toggle back to\n"
 "regular mode.\n");
 AFGetChar(CH_CTRLT);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 Sleep(1000);
-

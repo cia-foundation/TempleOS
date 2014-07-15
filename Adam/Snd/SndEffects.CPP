@@ -1,3 +1,5 @@
+#help_index "Snd"
+
 #define SE_NOISE	0
 #define SE_SWEEP	1
 
@@ -10,7 +12,7 @@ class CSoundEffectFrame
 U0 SoundEffectEndTaskCB()
 {
   Free(FramePtr("CSoundEffectFrame"));
-  music_mute--;
+  music.mute--;
   SndTaskEndCB;
 }
 
@@ -26,7 +28,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
       while (tS<timeout)
 	if (f=RandU16%i+ns->freq1) {
 	  Snd(f);
-	  Sleep(MaxI64(3000/f,1));
+	  Sleep(ClampI64(3000/f,1,50));
 	} else
 	  break;
       break;
@@ -35,7 +37,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
 	t=(tS-t0)/ns->duration;
 	if (f=(1.0-t)*ns->freq1+t*ns->freq2) {
 	  Snd(f);
-	  Sleep(MaxI64(3000/f,1));
+	  Sleep(ClampI64(3000/f,1,50));
 	} else
 	  break;
       }
@@ -44,7 +46,7 @@ U0 SoundEffectTask(CSoundEffectFrame *ns)
 }
 
 public CTask *Noise(I64 mS,F64 min_freq,F64 max_freq)
-{
+{//Make white noise for given number of mS.
   CSoundEffectFrame *ns;
   if (mS>0) {
     ns=MAlloc(sizeof(CSoundEffectFrame));
@@ -52,14 +54,14 @@ public CTask *Noise(I64 mS,F64 min_freq,F64 max_freq)
     ns->duration=mS/1000.0;
     ns->freq1=min_freq;
     ns->freq2=max_freq;
-    music_mute++;
+    music.mute++;
     return Spawn(&SoundEffectTask,ns,"Noise",,Fs);
   } else
     return NULL;
 }
 
 public CTask *Sweep(I64 mS,F64 freq1,F64 freq2)
-{
+{//Sweep through freq range in given number of mS.
   CSoundEffectFrame *ns;
   if (mS>0) {
     ns=MAlloc(sizeof(CSoundEffectFrame));
@@ -67,7 +69,7 @@ public CTask *Sweep(I64 mS,F64 freq1,F64 freq2)
     ns->duration=mS/1000.0;
     ns->freq1=freq1;
     ns->freq2=freq2;
-    music_mute++;
+    music.mute++;
     return Spawn(&SoundEffectTask,ns,"Noise",,Fs);
   } else
     return NULL;

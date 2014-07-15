@@ -15,7 +15,7 @@ U0 OptPass5(CLex *lx)
 	  ICPut(tempi);
 	}
       }
-      if (cmp_arg_cnt[code]==9)
+      if (cmp.arg_cnt[code]==9)
 	ps->ptr-=tempi->ic_data>>3;
       if (code==IC_PUSH_REGS) {
 	for (i=0;i<NUM_REGS;i++)

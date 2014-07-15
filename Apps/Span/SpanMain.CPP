@@ -24,7 +24,6 @@ F64 Cost(CMathODE *ode)
   return result;
 }
 
-
 U0 DrawIt(CTask *task,CDC *dc)
 {
   Bool old_suspend1,old_suspend2;
@@ -48,7 +47,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (cursor_mass) {
     dc->color=RED;
     dc->pen_width=2;
-    GrLine3(dc,ipx-task->pix_left-task->scroll_x,ipy-task->pix_top-task->scroll_y,0,
+    GrLine3(dc,ip.pos.x-task->pix_left-task->scroll_x,ip.pos.y-task->pix_top-task->scroll_y,0,
       cursor_mass->x,cursor_mass->y,0);
   }
 
@@ -195,7 +194,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
 }
 
 U0 AnimateTask(SpanAnimateStruct *a)
-{ //Preemption is off by default.
+{//Preemption is off by default.
   MySpring *temps,*temps1;
   Bool old_run=FALSE;
   F64 f;
@@ -245,11 +244,11 @@ U0 Init(SpanAnimateStruct *a)
 }
 
 U0 SongTask(I64)
-{ //Song by Terry A. Davis
+{//Song by Terry A. Davis
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
-  music_tempo= 3.636;
-  music_stacatto_factor= 0.902;
+  music.tempo= 3.636;
+  music.stacatto_factor= 0.902;
   while (TRUE) {
 	Play("3q.EeDqED2G3DhE");
 	Play("q.EeDqED2G3DhE");
@@ -260,7 +259,7 @@ U0 SongTask(I64)
 
 U0 Span()
 {
-  I64 msg_code,p1,p2;
+  I64 msg_code,a1,a2;
   MyMass   *tempm1=NULL,*tempm2=NULL;
   MySpring *temps;
   CCtrl *bt_run,*bt_mode;
@@ -276,7 +275,7 @@ U0 Span()
   bt_mode=CtrlButtonNew(0,3.0*FONT_HEIGHT,80,,MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_button);
   a.saved_ode=NULL;
 
-//This Preempt() eliminates a lot of hassles.
+//Preempt(OFF) eliminates a lot of hassles.
 //The concern is about changing
 //que links while the winmgr task
 //is updating the ode or screen.
@@ -288,7 +287,6 @@ U0 Span()
 //There is little downside to Preempt()
 //since we will yield during GetMsg().
   Preempt(OFF);
-
 
   DocCursor;
   WinBorder;
@@ -338,29 +336,29 @@ U0 Span()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&p1,&p2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_L_UP|1<<MSG_KEY_DOWN|1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_L_UP|1<<MSG_KEY_DOWN|1<<MSG_IP_MOVE);
       DCFill(dc);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
 	  cursor_mass=tempm1=tempm2=NULL;
 	  switch (mode_button.state) {
 	    case MD_MASS:
-	      PlaceMass(p1,p2);
+	      PlaceMass(a1,a2);
 	      break;
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      tempm1=MassFind(ode,p1,p2);
+	      tempm1=MassFind(ode,a1,a2);
 	      break;
 	    case MD_MOVE:
 	      if (run_button.state)
-		cursor_mass=MassFind(ode,p1,p2);
+		cursor_mass=MassFind(ode,a1,a2);
 	      else
-		if (tempm1=MassFind(ode,p1,p2))
-		  MoveMass(tempm1,p1,p2);
+		if (tempm1=MassFind(ode,a1,a2))
+		  MoveMass(tempm1,a1,a2);
 	      break;
 	    case MD_DELETE:
-	      MassOrSpringFind(ode,&tempm1,&temps,p1,p2);
+	      MassOrSpringFind(ode,&tempm1,&temps,a1,a2);
 	      if (tempm1)
 		DelMass(tempm1);
 	      if (temps)
@@ -373,12 +371,12 @@ U0 Span()
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      if (tempm1 && (tempm2=MassFind(ode,p1,p2)) && tempm1!=tempm2)
+	      if (tempm1 && (tempm2=MassFind(ode,a1,a2)) && tempm1!=tempm2)
 		PlaceSpring(tempm1,tempm2);
 	      break;
 	    case MD_MOVE:
 	      if (!run_button.state && tempm1)
-		MoveMass(tempm1,p1,p2);
+		MoveMass(tempm1,a1,a2);
 	      break;
 	  }
 	  cursor_mass=tempm1=tempm2=NULL;
@@ -387,13 +385,13 @@ U0 Span()
 	  switch (mode_button.state) {
 	    case MD_MOVE:
 	      if (!run_button.state && tempm1)
-		MoveMass(tempm1,p1,p2);
+		MoveMass(tempm1,a1,a2);
 	      break;
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
 	      if (tempm1) {
-		DrawSpring(dc,tempm1,p1,p2);
+		DrawSpring(dc,tempm1,a1,a2);
 	      }
 	      break;
 	  }
@@ -405,7 +403,7 @@ U0 Span()
 	  cursor_mass=tempm1=tempm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (p1) {
+	  switch (a1) {
 	    case '\n':
 	      if (!SpanTime || !a.saved_ode) {
 		Free(a.saved_ode);

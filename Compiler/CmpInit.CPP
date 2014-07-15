@@ -76,7 +76,7 @@ U0 AsmHashLoad()
   CInstruction *tempi;
   CHashClass *tempc;
 
-  asm_hash=HashTableNew(2048);
+  cmp.asm_hash=HashTableNew(2048);
   size1=offset(CHashOpcode.ins)+sizeof(CInstruction)<<5;
   tempo=MAlloc(size1);
 
@@ -140,9 +140,9 @@ U0 AsmHashLoad()
 	tempo1=MAlloc(size);
 	MemCpy(tempo1,tempo,size);
 	tempo1->use_cnt=0;
-	if (HashFind(tempo1->str,asm_hash,HTT_OPCODE))
+	if (HashFind(tempo1->str,cmp.asm_hash,HTT_OPCODE))
 	  LexExcept(lx,"Duplicate OPCODE entry ");
-	HashAdd(tempo1,asm_hash);
+	HashAdd(tempo1,cmp.asm_hash);
 	break;
       case 9:  //KEYWORD
       case 10: //ASM_KEYWORD
@@ -157,7 +157,7 @@ U0 AsmHashLoad()
 	  temph->type=HTT_KEYWORD;
 	else
 	  temph->type=HTT_ASM_KEYWORD;
-	HashAdd(temph,asm_hash);
+	HashAdd(temph,cmp.asm_hash);
 	Lex(lx); //Skip INT
 	break;
       case REGT_R8:
@@ -177,7 +177,7 @@ U0 AsmHashLoad()
 	tempr->type=HTT_REG;
 	tempr->reg_type=i;
 	tempr->reg_num=lx->cur_i64;
-	HashAdd(tempr,asm_hash);
+	HashAdd(tempr,cmp.asm_hash);
 	Lex(lx); //Skip INT
 	break;
     }
@@ -195,16 +195,17 @@ U0 AsmHashLoad()
     Bts(&tempc->flags,Cf_INTERNAL_TYPE);
     tempc->size=tempit->size;
     tempc->str=AStrNew(tempit->name);
-    HashAdd(tempc,asm_hash);
-    sys_internal_types[tempc->raw_type]=tempc;
+    HashAdd(tempc,cmp.asm_hash);
+    cmp.internal_types[tempc->raw_type]=tempc;
   }
-  adam_task->hash_table->next=asm_hash;
+  adam_task->hash_table->next=cmp.asm_hash;
 }
-
 
 U0 CmpLoadDefines()
 {
-  DefineLstLoad("ST_IT_TYPES","I0\0U0\0I8\0U8\0I16\0U16\0I32\0U32\0I64\0U64\0F64\0uF64\0");
+  DefineLstLoad("ST_RAW_TYPES",
+	" \0 \0I0\0U0\0I8\0U8\0I16\0U16\0I32\0U32\0I64\0U64\0"
+	"F32\0UF32\0F64\0UF64\0");
   DefineLstLoad("ST_TY_TYPES","NULL\0IMM\0REG\0DISP\0SIB\0RIP\0STK\0");
   DefineLstLoad("ST_U8_REGS","AL\0CL\0DL\0BL\0AH\0CH\0DH\0BH\0"
 			"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
@@ -219,12 +220,10 @@ U0 CmpLoadDefines()
   DefineLstLoad("ST_MM_REGS","MM0\0MM1\0MM2\0MM3\0MM4\0MM5\0MM6\0MM7\0");
   DefineLstLoad("ST_XMM_REGS","XMM0\0XMM1\0XMM2\0XMM3\0XMM4\0XMM5\0XMM6\0XMM7\0");
   DefineLstLoad("ST_OPCODE_MODIFIERS","NO\0CB\0CW\0CD\0CP\0IB\0IW\0ID\0");
-  DefineLstLoad("ST_ARG_TYPES",
-		"NO\0REL8\0REL16\0REL32\0UIMM8\0UIMM16\0UIMM32\0UIMM64\0"
-		"R8\0R16\0R32\0R64\0"
-		"IMM8\0IMM16\0IMM32\0IMM64\0RM8\0RM16\0RM32\0RM64\0"
-		"M8\0M16\0M32\0M64\0"
-		"M1632\0M16N32\0M16N16\0M32N32\0"
+  DefineLstLoad("ST_ARG_TYPES","NO\0REL8\0REL16\0REL32\0"
+		"IMM8\0IMM16\0IMM32\0IMM64\0UIMM8\0UIMM16\0UIMM32\0UIMM64\0"
+		"R8\0R16\0R32\0R64\0RM8\0RM16\0RM32\0RM64\0"
+		"M8\0M16\0M32\0M64\0M1632\0M16N32\0M16N16\0M32N32\0"
 		"MOFFS8\0MOFFS16\0MOFFS32\0MOFFS64\0"
 		"AL\0AX\0EAX\0RAX\0CL\0DX\0 \0SREG\0"
 		"SS\0DS\0ES\0FS\0GS\0CS\0ST0\0STI\0"
@@ -448,58 +447,92 @@ U0 CmpFillTables()
   I64 i,k;
   U32 *d;
 
-  ic_bitmap_assign	=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  ic_bitmap_deref	=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  ic_bitmap_cmp		=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  ic_bitmap_not_const	=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  ic_bitmap_fpop	=CAlloc((IC_NUM_ENTRIES+7)>>3);
-  cmp_arg_cnt		=CAlloc(IC_NUM_ENTRIES);
-  cmp_result_cnt	=CAlloc(IC_NUM_ENTRIES);
+  cmp.ic_bitmap_assign	=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  cmp.ic_bitmap_deref	=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  cmp.ic_bitmap_cmp	=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  cmp.ic_bitmap_not_const=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  cmp.ic_bitmap_fpop	=CAlloc((IC_NUM_ENTRIES+7)>>3);
+  cmp.arg_cnt		=CAlloc(IC_NUM_ENTRIES);
+  cmp.result_cnt	=CAlloc(IC_NUM_ENTRIES);
   st=Define("ST_INTERMEDIATE_CODE");
   for (i=0;i<IC_NUM_ENTRIES;i++) {
-    cmp_arg_cnt[i]=*st-'0';
-    cmp_result_cnt[i]=st[1]-'0';
+    cmp.arg_cnt[i]=*st-'0';
+    cmp.result_cnt[i]=st[1]-'0';
     if (st[2]=='*')
-      Bts(ic_bitmap_deref,i);
+      Bts(cmp.ic_bitmap_deref,i);
     else if (st[2]=='=')
-      Bts(ic_bitmap_assign,i);
+      Bts(cmp.ic_bitmap_assign,i);
     else if (st[2]=='^')
-      Bts(ic_bitmap_cmp,i);
+      Bts(cmp.ic_bitmap_cmp,i);
     if (st[3]=='P')
-      Bts(ic_bitmap_fpop,i);
+      Bts(cmp.ic_bitmap_fpop,i);
     if (st[4]=='N')
-      Bts(ic_bitmap_not_const,i);
+      Bts(cmp.ic_bitmap_not_const,i);
     st+=StrLen(st)+1;
     //See $LK,"ICPut",A="FF:::/Compiler/ICLCC.CPP,ST_INTERMEDIATE_CODE"$.
   }
 
-  to_reg_vars_map=CAlloc(NUM_REGS*sizeof(U8));
-  num_reg_vars=0;
-  reg_vars_mask=REG_VARS_MASK;
+  cmp.to_reg_vars_map=CAlloc(NUM_REGS*sizeof(U8));
+  cmp.num_reg_vars=0;
+  cmp.reg_vars_mask=REG_VARS_MASK;
   for (i=0;i<NUM_REGS;i++)
-    if (Bt(&reg_vars_mask,i))
-      to_reg_vars_map[num_reg_vars++]=i;
+    if (Bt(&cmp.reg_vars_mask,i))
+      cmp.to_reg_vars_map[cmp.num_reg_vars++]=i;
 
-  to_non_ptr_vars_map=CAlloc(NUM_REGS*sizeof(U8));
-  num_non_ptr_vars=0;
-  non_ptr_vars_mask=REG_NON_PTR_MASK;
+  cmp.non_ptr_vars_map=CAlloc(NUM_REGS*sizeof(U8));
+  cmp.num_non_ptr_vars=0;
+  cmp.non_ptr_vars_mask=REG_NON_PTR_MASK;
   for (i=0;i<NUM_REGS;i++)
-    if (Bt(&non_ptr_vars_mask,i))
-      to_non_ptr_vars_map[num_non_ptr_vars++]=i;
- 
-  to_stk_temps_map_odd=CAlloc(NUM_REGS*sizeof(U8));
-  to_stk_temps_map_even=CAlloc(NUM_REGS*sizeof(U8));
-  num_stk_temps=0;
-  stk_temps_mask=REG_STK_TEMPS_MASK;
-  for (i=0;i<NUM_REGS;i++)
-    if (Bt(&stk_temps_mask,i))
-      to_stk_temps_map_even[num_stk_temps++]=i;
-  k=num_stk_temps;
-  for (i=0;i<NUM_REGS;i++)
-    if (Bt(&stk_temps_mask,i))
-      to_stk_temps_map_odd[--k]=i;
+    if (Bt(&cmp.non_ptr_vars_mask,i))
+      cmp.non_ptr_vars_map[cmp.num_non_ptr_vars++]=i;
 
-  dual_U16_tokens1=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+/* STK TEMP ALLOCATION: See $LK,"::/Compiler/OptPass6.CPP.Z"$.
+
+Expressions are evaluated with a stack machine.
+
+1+(2+3)*4
+
+
+STK[2]: 1    1	 1   1	 1   1	 21
+STK[1]:      2	 2   5	 5  20
+STK[0]: 	 3	 4
+
+The top of the stack is stored in RAX.
+
+STK[2]: RAX  1	 1   1	 1   1	 RAX
+STK[1]:     RAX  2  RAX  5  RAX
+STK[0]: 	RAX	RAX
+
+Two regs are allocated for stk temps.
+
+STK[0]:
+   R9 : RAX R9	R9  R9	R9  R9	 RAX
+   R8 :     RAX R8  RAX R8  RAX
+      : 	RAX	RAX
+
+Every other funtion, the regs are reversed.  This is to reduce
+pushes before function calls.  R8 is used in even numbered functions
+while R9 is used in odd, so maybe we can avoid pushes if only one
+stk temp reg is used.
+
+STK[0]:
+   R9 : RAX R8	R8  R8	R8  R8	 RAX
+   R8 :     RAX R9  RAX R9  RAX
+      : 	RAX	RAX
+*/
+  cmp.to_stk_temps_map_odd =CAlloc(NUM_REGS*sizeof(U8));
+  cmp.to_stk_temps_map_even=CAlloc(NUM_REGS*sizeof(U8));
+  cmp.num_stk_temps=0;
+  cmp.stk_temps_mask=REG_STK_TEMPS_MASK;
+  for (i=0;i<NUM_REGS;i++)
+    if (Bt(&cmp.stk_temps_mask,i))
+      cmp.to_stk_temps_map_even[cmp.num_stk_temps++]=i;
+  k=cmp.num_stk_temps;
+  for (i=0;i<NUM_REGS;i++)
+    if (Bt(&cmp.stk_temps_mask,i))
+      cmp.to_stk_temps_map_odd[--k]=i;
+
+  cmp.dual_U16_tokens1=d=CAlloc(sizeof(U32)*TK_NUM_TK);
   d['!']=TK_NOT_EQUAL<<16+'=';
   d['&']=TK_AND_AND<<16+'&';
   d['*']=TK_MUL_EQUAL<<16+'=';
@@ -514,7 +547,7 @@ U0 CmpFillTables()
   d['|']=TK_OR_OR<<16+'|';
   d['%']=TK_MOD_EQUAL<<16+'=';
 
-  dual_U16_tokens2=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.dual_U16_tokens2=d=CAlloc(sizeof(U32)*TK_NUM_TK);
   d['&']=TK_AND_EQUAL<<16+'=';
   d['+']=TK_ADD_EQUAL<<16+'=';
   d['-']=TK_MINUS_MINUS<<16+'-';
@@ -524,11 +557,11 @@ U0 CmpFillTables()
   d['^']=TK_XOR_XOR<<16+'^';
   d['|']=TK_OR_EQUAL<<16+'=';
 
-  dual_U16_tokens3=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.dual_U16_tokens3=d=CAlloc(sizeof(U32)*TK_NUM_TK);
   d['-']=TK_SUB_EQUAL<<16+'=';
   d['/']=TK_DIV_EQUAL<<16+'=';
 
-  binary_ops_table=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.binary_ops=d=CAlloc(sizeof(U32)*TK_NUM_TK);
   d['`']	=(PREC_EXP+ASSOCF_RIGHT)<<16+IC_POWER;
   d[TK_SHL]	=(PREC_EXP+ASSOCF_LEFT)<<16+IC_SHL;
   d[TK_SHR]	=(PREC_EXP+ASSOCF_LEFT)<<16+IC_SHR;

@@ -7,7 +7,6 @@ class Drop
   I32 x,y;
 } drops[NUM_DROPS];
 
-
 CDC *cur_dc;
 
 U0 DrawFrame(CTask *task,CDC *dc)
@@ -22,7 +21,7 @@ U0 DrawFrame(CTask *task,CDC *dc)
   dc->color=LTRED;
   GrLine(dc,cx-100,cy-100,cx,cy);
   GrLine(dc,cx+100,cy-100,cx,cy);
-  if (Bt(key_down_bitmap,sc_1)) {
+  if (Bt(kbd.down_bitmap,sc_1)) {
     dc->color=WHITE;
     GrRect(dc,cx-2,cy-2,5,5);
   }
@@ -35,7 +34,7 @@ U0 DrawFrame(CTask *task,CDC *dc)
   dc->color=LTRED;
   GrLine(dc,cx-200,cy,cx,cy+100);
   GrLine(dc,cx+200,cy,cx,cy+100);
-  if (Bt(key_down_bitmap,sc_2)) {
+  if (Bt(kbd.down_bitmap,sc_2)) {
     dc->color=WHITE;
     GrRect(dc,cx-2,cy+100-2,5,5);
   }
@@ -71,7 +70,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   DrawDrops(task,dc);
   UpdateCurBase(task,dc);
 }
-
 
 U0 AnimateTask(I64)
 {
@@ -165,8 +163,8 @@ U0 RainDrops()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   cur_dc=DCNew(GR_WIDTH,GR_HEIGHT);
-  sc_1=A2ScanCode('1');
-  sc_2=A2ScanCode('2');
+  sc_1=Char2ScanCode('1');
+  sc_2=Char2ScanCode('2');
   Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   DocCursor;

@@ -15,7 +15,7 @@ U0 SubSwitch()
 	"] ";
 	break;
     }
-  NewLine;
+  '\n';
 }
 
 SubSwitch;

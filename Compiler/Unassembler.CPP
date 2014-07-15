@@ -40,8 +40,8 @@ I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
       i2=tempi2->flags & IEF_OP_SIZE32;
 	if (result=i1-i2) return result;
 
-      i1=Bt(&uasm_ins64_mask,tempi1->arg1) || Bt(&uasm_ins64_mask,tempi1->arg2);
-      i2=Bt(&uasm_ins64_mask,tempi2->arg1) || Bt(&uasm_ins64_mask,tempi2->arg2);
+      i1=Bt(&uasm.ins64_mask,tempi1->arg1) || Bt(&uasm.ins64_mask,tempi1->arg2);
+      i2=Bt(&uasm.ins64_mask,tempi2->arg1) || Bt(&uasm.ins64_mask,tempi2->arg2);
 	if (result=i1-i2) return result;
 
       i1=tempi1->flags & IEF_48_REX;
@@ -56,17 +56,16 @@ I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
 }
 
 /*
-U0 DumpUnasmIns(CInstruction *tempi)
+U0 DumpUasmIns(CInstruction *tempi)
 {
   CHashOpcode *tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInstruction)-offset(CHashOpcode.ins);
   "%10s:%02d,%02d SV:%02d\n",tempo->str,tempi->arg1,tempi->arg2,tempi->slash_val;
 }
-
-U0 DumpUnasmTable()
+U0 DumpUasmTable()
 {
   I64 k;
-  for (k=0;k<unasm_table_entries;k++)
-    DumpUnasmIns(unasm_table[k]);
+  for (k=0;k<uasm.table_entries;k++)
+    DumpUasmIns(uasm.table[k]);
 }
 */
 
@@ -75,11 +74,11 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
   I64 i,j,n,m,k,a1,a2,o1,o2,oc_cnt,sv;
   CInstruction *tempi;
   i=0;
-  j=unasm_table_entries-1;
+  j=uasm.table_entries-1;
   while (TRUE) {
     k=(i+j)>>1;  //binary search
-    tempi=unasm_table[k];
-//DumpUnasmIns(tempi);
+    tempi=uasm.table[k];
+//DumpUasmIns(tempi);
     m=0;
     n=0;
     while (TRUE) {
@@ -102,7 +101,7 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
 	  sv=tempi->slash_val;
 	if (sv<8) {
 	  if (!(m=ip[n]>>3&7-sv)) {
-	    if ((Bt(&uasm_mem_mask,a1) || Bt(&uasm_mem_mask,a2)) &&
+	    if ((Bt(&uasm.mem_mask,a1) || Bt(&uasm.mem_mask,a2)) &&
 		ip[n]&0xC0==0xC0) {
 	      m=1;
 	      break;
@@ -127,10 +126,10 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
 	      }
 	    }
 	    if (opsize==64||a1==ARGT_M64||a2==ARGT_M64||tempi->flags&IEF_NO_REX) {
-	      if (!Bt(&uasm_ins64_mask,a1) && !Bt(&uasm_ins64_mask,a2) && !(tempi->flags&IEF_48_REX))
+	      if (!Bt(&uasm.ins64_mask,a1) && !Bt(&uasm.ins64_mask,a2) && !(tempi->flags&IEF_48_REX))
 		m=1;
 	    } else {
-	      if (Bt(&uasm_ins64_mask,a1) || Bt(&uasm_ins64_mask,a2) || tempi->flags&IEF_48_REX)
+	      if (Bt(&uasm.ins64_mask,a1) || Bt(&uasm.ins64_mask,a2) || tempi->flags&IEF_48_REX)
 		m=-1;
 	    }
 	  }
@@ -148,7 +147,7 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
 	    }
 	  }
 	  if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
-	    if (!Bt(&uasm_ins64_mask,a1) && !Bt(&uasm_ins64_mask,a2) && !(tempi->flags&IEF_48_REX)&&
+	    if (!Bt(&uasm.ins64_mask,a1) && !Bt(&uasm.ins64_mask,a2) && !(tempi->flags&IEF_48_REX)&&
 		!(a2==ARGT_NO &&
 	    (ARGT_UIMM8<=a1<=ARGT_UIMM64 ||
 		ARGT_IMM8<=a1<=ARGT_IMM64 ) ))
@@ -159,7 +158,7 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
 	    } else if (a2==ARGT_IMM64||a2==ARGT_UIMM64)
 		m=-1;
 	  } else {
-	    if (Bt(&uasm_ins64_mask,a1) || Bt(&uasm_ins64_mask,a2) || tempi->flags&IEF_48_REX)
+	    if (Bt(&uasm.ins64_mask,a1) || Bt(&uasm.ins64_mask,a2) || tempi->flags&IEF_48_REX)
 	      m=-1;
 	  }
 	}
@@ -182,45 +181,45 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize)
     } else
       break;
   }
-  return unasm_table[k];
+  return uasm.table[k];
 }
 
-U0 UnasmHashLoad()
+U0 UasmHashLoad()
 {
   CHashOpcode *temph;
   CInstruction *tempi;
   I64 cnt=0,j,k;
 
-  unasm_table=NULL;
-  unasm_table_entries=0;
-  uasm_ins64_mask=0x0880888880+1<<ARGT_ST0+1<<ARGT_STI;
-  uasm_signed_arg_mask=1<<ARGT_REL8+1<<ARGT_REL16+1<<ARGT_REL32+
+  uasm.table=NULL;
+  uasm.table_entries=0;
+  uasm.ins64_mask=0x0880888880+1<<ARGT_ST0+1<<ARGT_STI;
+  uasm.signed_arg_mask=1<<ARGT_REL8+1<<ARGT_REL16+1<<ARGT_REL32+
     1<<ARGT_IMM8+1<<ARGT_IMM16+1<<ARGT_IMM32+1<<ARGT_IMM64;
-  uasm_mem_mask=1<<ARGT_M8+1<<ARGT_M16+1<<ARGT_M32+1<<ARGT_M64;
+  uasm.mem_mask=1<<ARGT_M8+1<<ARGT_M16+1<<ARGT_M32+1<<ARGT_M64;
 
-  temph=asm_hash->next_added;
-  while (temph!=asm_hash) {
+  temph=cmp.asm_hash->next_added;
+  while (temph!=cmp.asm_hash) {
     if (temph->type==HTT_OPCODE)
       cnt+=temph->instruction_entry_cnt;
     temph=temph->next_added;
   }
-  unasm_table_entries=cnt;
+  uasm.table_entries=cnt;
 
   j=0;
-  unasm_table=MAlloc(cnt*sizeof(U8 *));
-  temph=asm_hash->next_added;
-  while (temph!=asm_hash) {
+  uasm.table=MAlloc(cnt*sizeof(U8 *));
+  temph=cmp.asm_hash->next_added;
+  while (temph!=cmp.asm_hash) {
     if (temph->type==HTT_OPCODE) {
       tempi=&temph->ins;
       for (k=0;k<temph->instruction_entry_cnt;k++) {
-	unasm_table[j++]=tempi;
+	uasm.table[j++]=tempi;
 	tempi++;
       }
       }
     temph=temph->next_added;
   }
 
-  QSortI64(unasm_table,cnt,&InstEntriesCompare);
+  QSortI64(uasm.table,cnt,&InstEntriesCompare);
 }
 
 I64 StrMatchBits(U8 *st)
@@ -237,8 +236,7 @@ I64 StrMatchBits(U8 *st)
 }
 
 U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
-//Unassembles one instruction
-{
+{//Unassembles one instruction
   I64 i,disp,imm,opsize,opadd,
 	a1,a2,reloced_a1,reloced_a2,
 	a1_size=0,a2_size=0,reloced_a1_size,reloced_a2_size,
@@ -268,13 +266,13 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   else
     *line1=0;
 
-  SPrint(line1+StrLen(line1),"%24tp ",ip);
+  StrPrint(line1+StrLen(line1),"%24tp ",ip);
   bin_data_area1=line1+StrLen(line1);
   for (i=0;i<6;i++)
     CatPrint(line1,"%02X",ip[i]);
   CatPrint(line1," ");
 
-  SPrint(line2,"%24tp ",ip+6);
+  StrPrint(line2,"%24tp ",ip+6);
   bin_data_area2=line2+StrLen(line2);
   for (i=6;i<12;i++)
     CatPrint(line2,"%02X",ip[i]);
@@ -317,7 +315,6 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   } while (cont);
   ip--;
 
-
   tempi=InstEntryFind(ip,opsize);
   if (opsize==32 && seg_size==64) {
     tempi2=InstEntryFind(ip,64);
@@ -337,14 +334,14 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   a2=tempi->arg2;
 
   if (a1_size=StrMatchBits(DefineSub(a1,"ST_ARG_TYPES"))) {
-    if (Bt(&uasm_signed_arg_mask,a1))
+    if (Bt(&uasm.signed_arg_mask,a1))
       CatPrint(a1_st,"I%d ",a1_size);
     else
       CatPrint(a1_st,"U%d ",a1_size);
   }
 
   if (a2_size=StrMatchBits(DefineSub(a2,"ST_ARG_TYPES"))) {
-    if (Bt(&uasm_signed_arg_mask,a2))
+    if (Bt(&uasm.signed_arg_mask,a2))
       CatPrint(a2_st,"I%d ",a2_size);
     else
       CatPrint(a2_st,"U%d ",a2_size);
@@ -643,10 +640,8 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   *_ip=ip;
 }
 
-
 U8 *U(U8 *ip,I64 cnt=20,I64 seg_size=64)
-//Unassembles a num of instructions.
-{
+{//Unassembles a num of instructions.
   I64 i;
   U8 buf[1024];
   if (seg_size==16)
@@ -661,8 +656,7 @@ U8 *U(U8 *ip,I64 cnt=20,I64 seg_size=64)
 }
 
 I64 Un(U8 *ip,I64 cnt=0x80,I64 seg_size=64)
-//Unassembles a num of bytes
-{
+{//Unassembles a num of bytes
   I64 i=0;
   U8 buf[1024],*end_ip=ip(I64)+cnt;
   if (seg_size==16)

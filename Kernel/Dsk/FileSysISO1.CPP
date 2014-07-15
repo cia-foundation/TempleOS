@@ -121,13 +121,13 @@ Bool ISO1CDirFill(CDirEntry *tempde,CISO1DirEntry *de)
   tempde->size=de->size.little;
   tempde->attr=FileAttr(tempde->name);
   if (de->flags & ISO1_ATTR_DIR)
-    tempde->attr|=_ATTR_DIR;
+    tempde->attr|=RS_ATTR_DIR;
   tempde->datetime=ISO1DateStruct2CDate(&de->date);
   return result;
 }
 
 Bool ISO1FileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fuf_flags=0)
-{ //$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
+{//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   CISO1DirEntry *isoptr,*buf;
   U8 dname[CDIR_FILENAME_LEN];
   Bool result=FALSE,unlock;
@@ -142,7 +142,7 @@ Bool ISO1FileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fu
       unlock=PrtLock(p);
       isoptr=MAlloc(p->spc<<BLK_SIZE_BITS);
       RClusters(Fs->cur_prt,isoptr,cur_dir_cluster,1);
-      if (isoptr->name_len==1 && !isoptr->name) { //curdir
+      if (isoptr->name_len==1 && !isoptr->name) {//curdir
 	i=(isoptr->size.little+p->spc<<BLK_SIZE_BITS-1)/p->spc<<BLK_SIZE_BITS;
 	buf=MAlloc(p->spc<<BLK_SIZE_BITS*i);
 	RClusters(Fs->cur_prt,buf,cur_dir_cluster,i);
@@ -163,8 +163,8 @@ Bool ISO1FileFind(CPrt *p,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fu
 	    if (!StrCmp(name,dname)) {
 	      result=ISO1CDirFill(_result,isoptr);
 	      if (result &&
-	      !(fuf_flags&FUF_JUST_DIRS && !(_result->attr & _ATTR_DIR)) &&
-	      !(fuf_flags&FUF_JUST_FILES && _result->attr & _ATTR_DIR) )
+	      !(fuf_flags&FUF_JUST_DIRS && !(_result->attr & RS_ATTR_DIR)) &&
+	      !(fuf_flags&FUF_JUST_FILES && _result->attr & RS_ATTR_DIR) )
 		goto exit_this;
 	      else
 		result=FALSE;
@@ -237,7 +237,7 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NUL
     throw('FUF');
   isoptr=MAlloc(p->spc<<BLK_SIZE_BITS);
   RClusters(Fs->cur_prt,isoptr,cur_dir_cluster,1);
-  if (isoptr->name_len==1 && !isoptr->name) { //curdir
+  if (isoptr->name_len==1 && !isoptr->name) {//curdir
     i=(isoptr->size.little+p->spc<<BLK_SIZE_BITS-1)/p->spc<<BLK_SIZE_BITS;
     buf=MAlloc(p->spc<<BLK_SIZE_BITS*i);
     RClusters(Fs->cur_prt,buf,cur_dir_cluster,i);
@@ -256,7 +256,7 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NUL
       tempde=MAlloc(sizeof(CDirEntry));
       if (ISO1CDirFill(tempde,buf)) {
 	tempde->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&_ATTR_DIR && *tempde->name!='.') {
+	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR && *tempde->name!='.') {
 	  tempde->next=result;
 	  result=tempde;
 	  tempde->full_name=DirNameAbs(tempde->name);
@@ -264,8 +264,8 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NUL
 	    tempde->sub=ISO1FilesFind(files_find_mask,fuf_flags,tempde);
 	    Cd("..");
 	  }
-	} else if ((tempde->attr & _ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&_ATTR_DIR) &&
+	} else if ((tempde->attr & RS_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+	!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && tempde->attr&RS_ATTR_DIR) &&
 	   FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
 	  tempde->next=result;
 	  result=tempde;

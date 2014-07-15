@@ -1,5 +1,5 @@
 U0 Exit()
-{
+{//Terminate own task.
   if (Fs==sys_focus_task && IsDbg) {
     LBts(&Fs->task_flags,TASKf_KILL_AFTER_DBG);
     G;
@@ -17,7 +17,7 @@ U0 Exit()
 }
 
 Bool TaskValidate(CTask *task)
-{
+{//return TRUE if task looks valid.
   if (!(0<task<=MAX_I32) || task->addr!=task ||
     task->task_signature(I64)!=TASK_COMBINED_SIGNATURE_VAL)
     return FALSE;
@@ -26,7 +26,7 @@ Bool TaskValidate(CTask *task)
 }
 
 U0 Kill(CTask *task,Bool wait=TRUE)
-{
+{//Terminate other task.
   I64 i;
   CCPU *c;
   Bool found,old_preempt=Preempt(OFF);
@@ -52,7 +52,7 @@ U0 Kill(CTask *task,Bool wait=TRUE)
 }
 
 Bool Suspend(CTask *task=NULL,Bool state=TRUE)
-{
+{//Tell scheduler to skip task.
   Bool result;
   if (!task) task=Fs;
   PUSHFD
@@ -83,11 +83,9 @@ CTaskStk *TaskStkNew(I64 stk_size,CTask *task)
   return temps;
 }
 
-
 #exe {OptOn(OPTf_NO_REG_VAR);};
-//fp_addr can have any fixed number of arguments.
 argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,/*argpop*/I64 (*fp_addr)(...),...)
-{
+{//Grow stk in call with any fixed num of args.
   CTaskStk *temps,*temps2,**_stk;
   I64 result,*rsp,*rsp2,*old_stk;
 
@@ -157,7 +155,7 @@ asm {
 #exe {OptOff(OPTf_NO_REG_VAR);};
 
 I64 TaskInit(CTask *task,I64 stk_size)
-{ //Returns Fs of task
+{//Returns Fs of task
   CTaskStk *temps;
 
   QueInit(&task->code_heap->next_mem_blk);
@@ -172,7 +170,6 @@ I64 TaskInit(CTask *task,I64 stk_size)
 
   task->rflags=SYS_NORMAL_RFLAGS;
   task->win_inhibit=WIG_TASK_DFT;
-  task->win_max_refresh=WIN_DFT_MAX_REFRESH;
 
   task->next_child_task=task->last_child_task=
     (&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
@@ -205,18 +202,17 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->stk=temps=TaskStkNew(stk_size,task);
   task->rsp=(&temps->stk_base)(U8 *)+temps->stk_size;
 
-  task->answers_displayed=1;  //from 0-3
   task->text_attr	=TERM_ATTR_TEXT;
   task->border_attr	=TERM_ATTR_BORDER;
   task->border_src	=BDS_CONST;
   task->title_src	=TTS_CONST;
   task->win_left	=1;
-  task->win_right	=text_cols-2;
+  task->win_right	=text.cols-2;
   task->win_top		=13;
-  task->win_bottom	=text_rows-2;
+  task->win_bottom	=text.rows-2;
 
   //Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart.CPP,TaskInit"$ gets NULL.  Okay, I guess, until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.CPP,ChgDsk"$().
-  task->cur_prt=drv_to_prt[ToUpper(*sys_acct)-'A'];
+  task->cur_prt=dsk.drv_to_prt[ToUpper(*sys_acct)-'A'];
   task->cur_dir=StrNew(sys_acct+2,task);
 
   return task;
@@ -224,13 +220,13 @@ I64 TaskInit(CTask *task,I64 stk_size)
 
 CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,
 		U8 *task_name=NULL,
-		I64 target_cpu=-1,	//-1 means current CPU
+		I64 target_cpu=-1,	//-1 means current CPU. See $LK,"multi-core",A="FI:::/Demo/MultiCore/LoadTest.CPP"$.
 		CTask *parent=NULL,	//NULL means adam
 		I64 stk_size=0,		//0=default
 		I64 flags=1<<SVCf_ADD_TO_QUE)
-{
-//We alloc from code heap so addr will be short
-//Could be allocated off of data heap
+{//Create task on core running at address.
+//Alloc $LK,"CTask",A="MN:CTask"$ structure from code heap so addr will be short.
+//Could be allocated off of data heap.
   CTask *task;
   if (target_cpu>=0)
     return SpawnQue(fp_start_addr,data,task_name,target_cpu,parent,stk_size,flags);
@@ -267,7 +263,7 @@ CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,
 }
 
 U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
-{
+{//Those things calculated from other variables.
   if (!task) task=Fs;
   PUSHFD
   CLI
@@ -283,8 +279,8 @@ U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
 }
 
 I64 ExeCmdLine(CLex *lx)
-{
-  I64 result=0,i,type,old_title_src=Fs->title_src;
+{//Terminal JIT-compile-and-execute loop for CLex.
+  I64 result=0,type,old_title_src=Fs->title_src;
   U8 *ptr,*ptr2,*ptr3,*ex,*old_task_title=StrNew(Fs->task_title);
   F64 t0;
   CDocEntry *doc_e;
@@ -324,14 +320,9 @@ I64 ExeCmdLine(CLex *lx)
       if (!(lx->flags&LF_JUST_LOAD)) {
 	t0=tS;
 	result=Call(ex);
-	for (i=2;i>=0;i--) {
-	  Fs->answers[i+1]=Fs->answers[i];
-	  Fs->answer_types[i+1]=Fs->answer_types[i];
-	  Fs->answer_times[i+1]=Fs->answer_times[i];
-	}
-	Fs->answers[0]=result;
-	Fs->answer_types[0]=type;
-	Fs->answer_times[0]=tS-t0;
+	Fs->answer=result;
+	Fs->answer_type=type;
+	Fs->answer_time=tS-t0;
       }
       if (!(lx->flags&LF_HAS_MISC_DATA))
 	Free(ex);
@@ -352,7 +343,7 @@ I64 ExeCmdLine(CLex *lx)
 }
 
 U0 UserTaskCont()
-{
+{//Terminal key-input-execute loop.
   CLex *lx;
   CDoc *doc;
   Bool cont=TRUE;
@@ -385,12 +376,12 @@ U0 UserCmdLine(I64 dummy=0)
 }
 
 CTask *SpawnUser(U8 *fmt=NULL,...)
-{
+{//Create user term task.
   U8 *st;
   CTask *task=Spawn(&UserCmdLine);
   TaskWait(task);
   if (fmt) {
-    st=SPrintJoin(NULL,fmt,argc,argv);
+    st=StrPrintJoin(NULL,fmt,argc,argv);
     XTalk(task,st);
     Free(st);
   }
@@ -398,7 +389,7 @@ CTask *SpawnUser(U8 *fmt=NULL,...)
 }
 
 U0 SrvTaskCont()
-{
+{//Act as server task in a loop handling commands.
   FlushMsgs;
   while (TRUE) {
     if (SrvCmdsHandler && Fs->title_src==TTS_TASK_NAME)
@@ -420,7 +411,7 @@ U0 SrvUserCmdLine(I64 dummy=0)
 }
 
 U0 TaskFinishOff(CTask *task)
-{ //We delay freeing in case lingering ptr to reincarnated.
+{//We delay freeing in case lingering ptr to reincarnated.
   HeapCtrlDel(task->code_heap);
   if (task->data_heap!=task->code_heap)
     HeapCtrlDel(task->data_heap);
@@ -428,7 +419,7 @@ U0 TaskFinishOff(CTask *task)
 }
 
 I64 TaskEnd()
-{ //called with irq's off
+{//Called with irq's off.
   CTask *task=Fs,*tempt,*tempt1;
   if (task==sys_task_being_screen_updated) {
     LBts(&task->task_flags,TASKf_KILL_TASK);
@@ -516,7 +507,7 @@ I64 TaskEnd()
 U0 TaskFinishOffDying()
 {//Called by Seth tasks. Delay freeing in case lingering ptr to reincarnated.
   CTask *task1,*task2;
-  if (task1=XchgU64(&Gs->dying_task_lst,NULL)) {
+  if (task1=XchgI64(&Gs->dying_task_lst,NULL)) {
     do {
       task2=task1->next_task;
       TaskFinishOff(task1);

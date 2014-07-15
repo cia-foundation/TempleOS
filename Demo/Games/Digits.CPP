@@ -17,7 +17,7 @@ U0 PrintPattern(U8 *st)
   I64 ch;
   while (ch=*st++)
     PrintDigit(ch);
-  NewLine;
+  '\n';
 }
 
 U0 Digits()
@@ -30,7 +30,7 @@ U0 Digits()
   DocClear;
   //Set default background and foreground
   "$$WW,1$$$$BD,DKGRAY$$$$FD,WHITE$$"
-  "\nThis is a mem game.  "
+  "\nThis is a memory game.  "
   "Try to remember the digits and enter them.  "
   "They are colored based on electrical "
   "engineering color codes.\n";

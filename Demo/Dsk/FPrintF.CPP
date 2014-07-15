@@ -1,4 +1,4 @@
-/* There is no FPrintF type function and no
+/*There is no FPrintF type function and no
 way to grow files. Therefore, use mem to
 hold the file until you are done.  The $LK,"CDoc",A="MN:CDoc"$
 framework is convenient for this.
@@ -9,7 +9,7 @@ U0 TreeSub(CDoc *doc,CDirEntry *tempde)
   CDirEntry *tempde1;
   while (tempde) {
     tempde1=tempde->next;
-    if (tempde->attr & _ATTR_DIR) {
+    if (tempde->attr & RS_ATTR_DIR) {
       DocPrint(doc,"$$TR,\"\"$$");
       DocPrint(doc,"$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$\n",
       tempde->name,tempde->full_name);
@@ -23,7 +23,7 @@ U0 TreeSub(CDoc *doc,CDirEntry *tempde)
 	tempde->name,tempde->full_name);
     //Note there is also a routine
     //to delete an entire CDirEntry tree.
-    //See $LK,"DirLstDel",A="MN:DirLstDel"$().
+    //See $LK,"DirTreeDel",A="MN:DirTreeDel"$().
     DirEntryDel(tempde);
     tempde=tempde1;
   }

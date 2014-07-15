@@ -8,7 +8,7 @@ I64 HasLower(U8 *src)
 }
 
 CHash *PSectFind(U8 *addr,I64 *_offset)
-{ //See $LK,"::/Kernel/Hash1a.CPP",A="FL:::/Kernel/Hash1a.CPP,1"$
+{//See $LK,"::/Kernel/Hash1a.CPP",A="FL:::/Kernel/Hash1a.CPP,1"$.
   CHash *result=NULL;
   CHashExport *tempex;
   Bool has_lower=FALSE;
@@ -58,18 +58,18 @@ CHash *PSectFind(U8 *addr,I64 *_offset)
 U0 PSectCacheAdd(CHash *temps,U8 *addr)
 {
   I64 i;
-  CDbgInfo *dbg;
+  CDbgInfo *dbg_info;
   Bool old_preempt;
   CPSectCache *temppc;
   if (temps && temps->type&HTT_FUN &&
-      (dbg=temps(CHashFun *)->debug)) {
+      (dbg_info=temps(CHashFun *)->dbg_info)) {
     old_preempt=Preempt(OFF);
-    lock {i=psect_cache_index++;}
-    temppc=&psect_cache[i&(PSECT_CACHE_SIZE-1)];
-    temppc->base=dbg->body[0];
+    lock {i=dbg.psect_cache_index++;}
+    temppc=&dbg.psect_cache[i&(PSECT_CACHE_SIZE-1)];
+    temppc->base=dbg_info->body[0];
     if (addr<temppc->base)
       temppc->base=addr;
-    temppc->limit=dbg->body[dbg->max_line+1-dbg->min_line];
+    temppc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
     if (addr>=temppc->limit)
       temppc->limit=addr+1;
     i=MinI64(StrLen(temps->str),PSECT_CACHE_STR_LEN-1);
@@ -84,7 +84,7 @@ U8 *PSectCacheFind(U8 *addr,I64 *_offset)
 {
   I64 i;
   F64 timeout;
-  CPSectCache *temppc=psect_cache;
+  CPSectCache *temppc=dbg.psect_cache;
   if (addr==SYS_IDLE_PT) {
     *_offset=0;
     return "SYS_IDLE_PT";
@@ -100,7 +100,7 @@ U8 *PSectCacheFind(U8 *addr,I64 *_offset)
   }
 }
 
-U0 SPrintPSect(U8 *buf,I64 addr,I64 field_len)
+U0 StrPrintPSect(U8 *buf,I64 addr,I64 field_len)
 {
   I64 offset;
   CHashExport *tempex;
@@ -121,40 +121,39 @@ U0 SPrintPSect(U8 *buf,I64 addr,I64 field_len)
     if (str) {
       if (offset>0xFFFF) offset=0xFFFF;
       if (is_fun) {
-	str2=MPrint("&%s",str);
+	str2=MStrPrint("&%s",str);
 	if (field_len>7)
-	  SPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
+	  StrPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
 	else
-	  SPrint(buf,"%s+0x%04X",str2,offset);
+	  StrPrint(buf,"%s+0x%04X",str2,offset);
 	Free(str2);
       } else {
 	if (field_len>7)
-	  SPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
+	  StrPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
 	else
-	  SPrint(buf,"%s+0x%04X",str,offset);
+	  StrPrint(buf,"%s+0x%04X",str,offset);
       }
       return;
     }
   }
   if (field_len)
-    SPrint(buf,"%*tX",field_len,addr);
+    StrPrint(buf,"%*tX",field_len,addr);
   else
-    SPrint(buf,"%X",addr);
+    StrPrint(buf,"%X",addr);
 }
 
-
 I64 SrcLineNum(U8 *addr,I64 cnt=1)
-{
+{//linenum for src of addr.
   CHashSrcSym *temph;
   I64 cur_line,first_line,last_line,num_lines,offset;
-  CDbgInfo *dbg;
+  CDbgInfo *dbg_info;
   U32 *body;
   U8 *src,*src2;
   if (temph=PSectFind(addr,&offset)) {
     if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-      if (dbg=temph->debug) {
-	num_lines=dbg->max_line-dbg->min_line+1;
-	body=dbg->body;
+      if (dbg_info=temph->dbg_info) {
+	num_lines=dbg_info->max_line-dbg_info->min_line+1;
+	body=dbg_info->body;
  
 	//find first nonzero
 	first_line=0;
@@ -182,13 +181,13 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
 	  cur_line++;
 
 	if (addr<body[cur_line]+cnt)
-	  return cur_line+dbg->min_line;
+	  return cur_line+dbg_info->min_line;
 
       } else if (temph->src_link) {
 	src =StrNew(temph->src_link);
 	src2=StrNew(temph->src_link);
 	StrLastRem(src,",",src2);
-	cur_line=A2I64(src2);
+	cur_line=Str2I64(src2);
 	Free(src);
 	Free(src2);
 	return cur_line;
@@ -199,17 +198,17 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
 }
 
 U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
-{
+{//MAlloc filename for src of addr.
   CHashSrcSym *temph;
   I64 i,j,ii,offset,best=NULL,d,best_d;
   U32 *body;
-  CDbgInfo *dbg;
+  CDbgInfo *dbg_info;
   U8 *src;
   if ((temph=PSectFind(addr,&offset)) &&
 	temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-    if (dbg=temph->debug) {
-      j=dbg->max_line-dbg->min_line+1;
-      body=dbg->body;
+    if (dbg_info=temph->dbg_info) {
+      j=dbg_info->max_line-dbg_info->min_line+1;
+      body=dbg_info->body;
       best_d=MAX_I64;
       for (i=0;i<j;i++) {
 	if (0<body[i]<=addr<body[i]+cnt) {
@@ -238,14 +237,14 @@ U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
 }
 
 U8 *SrcEdLink(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
-{
+{//MAlloc file,line link to src of addr.
   U8 *filename,*st,*st2;
   I64 linenum;
   if (filename=SrcFileName(addr,cnt)) {
     linenum=SrcLineNum(addr,cnt);
     if (linenum<1)
       linenum=1;
-    st2=MPrint("FL:%s,%d",filename,linenum);
+    st2=MStrPrint("FL:%s,%d",filename,linenum);
     Free(filename);
     st=StrNew(st2,mem_task);
     Free(st2);
@@ -254,13 +253,12 @@ U8 *SrcEdLink(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
   return NULL;
 }
 
-
 Bool PutSrcLink(U8 *addr,I64 cnt=1,U8 *buf=NULL)
-{
+{//Put to StdOut a $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT.Z"$ file,line link to src of addr.
   U8 *src;
   if (src=SrcEdLink(addr,cnt)) {
     if (buf)
-      SPrint(buf,"$$LK,\"%p\",A=\"%s\"$$",addr,src);
+      StrPrint(buf,"$$LK,\"%p\",A=\"%s\"$$",addr,src);
     else
       "$$LK,\"%p\",A=\"%s\"$$",addr,src;
     Free(src);
@@ -270,28 +268,27 @@ Bool PutSrcLink(U8 *addr,I64 cnt=1,U8 *buf=NULL)
   return FALSE;
 }
 
-U0 E(U8 *addr,I64 cnt=512,I64 ed_flags=0)
-{//Edit src at addr
+U0 E(U8 *addr,I64 cnt=512,I64 edf_dof_flags=0)
+{//Edit src at addr.
   U8 *st;
   if (st=SrcEdLink(addr,cnt)) {
     if (IsRaw)
       EdLiteFileLine(st);
     else
-      Ed(st,ed_flags);
+      Ed(st,edf_dof_flags);
     Free(st);
   }
 }
 
 U0 Man(U8 *st)
-//Edit src code for sym
-{
+{//Owner's manual for symbol.  Edit src code for symbol.
   U8 **st2;
   CHashSrcSym *temph;
   if (IsRaw) {
     if ((temph=HashFind(st,Fs->hash_table,HTG_SRC_SYM)) && temph->src_link)
       EdLiteFileLine(temph->src_link);
   } else {
-    st2=MPrint("MN:%s",st);
+    st2=MStrPrint("MN:%s",st);
     Ed(st2);
     Free(st2);
   }

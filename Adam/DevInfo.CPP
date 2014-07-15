@@ -1,4 +1,4 @@
-#help_index "PCI;Processor;Device;Info"
+#help_index "PCI;Processor;Devices;Info"
 
 //The file was downloaded from
 //http://www.pcidatabase.com/reports.php?type=tab-delimeted
@@ -61,7 +61,7 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
 	buf[0](U16)='0x';
 	buf[2](U32)=doc_e->tag(U32 *)[0];
 	buf[6]=0;
-	if (A2I64(buf)==m) {
+	if (Str2I64(buf)==m) {
 	  doc_e=doc_e->next->next;
 	  if (doc_e->type_u8==DOCT_TEXT) {
 	    vendor=AStrNew(doc_e->tag);
@@ -86,7 +86,7 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
 	    buf[0](U16)='0x';
 	    buf[2](U32)=doc_e->tag(U32 *)[0];
 	    buf[6]=0;
-	    if (A2I64(buf)==d) {
+	    if (Str2I64(buf)==d) {
 	      doc_e=doc_e->next->next;
 	      if (doc_e->type_u8==DOCT_TEXT) {
 		dev=AStrNew(doc_e->tag);
@@ -120,7 +120,7 @@ U0 PCILookUpDevs()
   CPCIDev *temppci;
   I64 w1,w2,b,d,f,timeout=32*8*2;
   CDoc *doc;
-  if (sys_pci_dev_root.next!=&sys_pci_dev_root)
+  if (dev.pci_root.next!=&dev.pci_root)
     return;
   doc=DocRead(PCI_DEV_FILE,DOCF_PLAIN_TEXT);
   for (b=0;b<sys_pci_busses;b++)
@@ -137,7 +137,7 @@ U0 PCILookUpDevs()
 	  temppci->sub_code=PCIReadU8(b,d,f,0xA);
 	  temppci->base_code=PCIReadU8(b,d,f,0xB);
 	  PCILookUpSingle(doc,w1,w2,&temppci->vendor_str,&temppci->dev_id_str);
-	  QueIns(temppci,sys_pci_dev_root.last);
+	  QueIns(temppci,dev.pci_root.last);
 	  timeout=32*8*2;
 	} else if (sys_pci_busses==256 && --timeout<=0)
 	  goto lud_done;
@@ -147,7 +147,7 @@ lud_done:
 }
 
 public U0 PCIRep()
-{
+{//Report description of PCI devices.
   CPCIDev *temppci;
   "PCI Busses:%d\n",sys_pci_busses;
   if (!FileFind(PCI_DEV_FILE)) {
@@ -155,8 +155,8 @@ public U0 PCIRep()
     return;
   }
   PCILookUpDevs;
-  temppci=sys_pci_dev_root.next;
-  while (temppci!=&sys_pci_dev_root) {
+  temppci=dev.pci_root.next;
+  while (temppci!=&dev.pci_root) {
     "%02X:%02X:%01X %02X%02X $$GREEN$$%s $$CYAN$$%s$$FG$$\n",
       temppci->bus,temppci->dev,temppci->fun,
       temppci->base_code,temppci->sub_code,
@@ -167,13 +167,13 @@ public U0 PCIRep()
 
 #help_index "Info;Time/CPU Cycles"
 public U0 CPURep()
-{
-  "%d Cores %6h?nHz\n",mp_cnt,ToF64(time_stamp_freq);
+{//Report number of cores and clock freq.
+  "%d Cores %6h?nHz\n",mp_cnt,ToF64(cnts.time_stamp_freq);
 }
 
 #help_index "Info;Memory/Info"
 public U0 MemBIOSRep()
-{
+{//Report the memory ranges reported by the BIOS at boot.
   U16		*m01=SYS_MEM_E801;
   CMemE820	*m20=SYS_MEM_E820;
   CMemRange	*tempmr;
@@ -183,8 +183,8 @@ public U0 MemBIOSRep()
 	"32 Bit Device Mem\n";
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=sys_mem32_dev_root.next;
-  while (tempmr!=&sys_mem32_dev_root) {
+  tempmr=dev.mem32_root.next;
+  while (tempmr!=&dev.mem32_root) {
     "%02X:0x%016X-0x%016X\n",tempmr->type,tempmr->base,tempmr->base+tempmr->size-1;
     tempmr=tempmr->next;
   }
@@ -195,7 +195,7 @@ public U0 MemBIOSRep()
   "01:0x0000000001000000-0x%016X\n",0x1000000+m01[1]<<16-1;
 
   if (m20->type) {
-    NewLine;
+    '\n';
     "BIOS Memory Report 15:E820\n";
     while (m20->type) {
       "%02X:0x%016X-0x%016X\n",m20->type,m20->base,m20->base+m20->len-1;
@@ -204,5 +204,3 @@ public U0 MemBIOSRep()
   }
 
 }
-
-#help_index ""

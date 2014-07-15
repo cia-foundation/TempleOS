@@ -1,7 +1,5 @@
-//This shows the $LK,"Carry",A="MN:Carry"$ function.
-//It holds the CPU carry flag.
-//$LK,"U",A="MN:U"$() Unassemble to make sure it is
-//right.
+//Shows the $LK,"Carry",A="MN:Carry"$ function.  It holds the CPU carry flag.
+//$LK,"U",A="MN:U"$() Unassemble to make sure it is right.
 
 U0 BigCnt()
 {

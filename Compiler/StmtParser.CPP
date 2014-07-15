@@ -1,77 +1,37 @@
 CHashClass *PrsClassNew()
-{
-// Ptrs to classes are handled by
-// allocating 5 structures for each
-// new class and representing a pointer
-// to a class by advancing 1 struct fwd
-// for one * and two fwd for two **.
-
-  CHashClass *result=CAlloc(sizeof(CHashClass)*5,Fs->code_heap),
-      *tempc=result;
-  tempc->last_in_member_lst=&tempc->member_lst;
-  tempc->type=HTT_CLASS;
-  tempc->raw_type=RT_PTR;
-  tempc->ptr_cnt=0;
-
-  tempc++;
-  tempc->type=HTT_CLASS;
-  tempc->raw_type=RT_PTR;
-  tempc->size=sizeof(U8 *);
-  tempc->ptr_cnt=1;
-
-  tempc++;
-  tempc->type=HTT_CLASS;
-  tempc->raw_type=RT_PTR;
-  tempc->size=sizeof(U8 *);
-  tempc->ptr_cnt=2;
-
-  tempc++;
-  tempc->type=HTT_CLASS;
-  tempc->raw_type=RT_PTR;
-  tempc->size=sizeof(U8 *);
-  tempc->ptr_cnt=3;
-
-  tempc++;
-  tempc->type=HTT_CLASS;
-  tempc->raw_type=RT_PTR;
-  tempc->size=sizeof(U8 *);
-  tempc->ptr_cnt=4;
-
+{/*Ptrs to classes are handled by
+allocating 5 structures for each
+new class and representing a pointer
+to a class by advancing 1 struct fwd
+for one * and two fwd for two **.
+*/
+  I64 i;
+  CHashClass *result=CAlloc(sizeof(CHashClass)*(MAX_PTR_STARS+1),Fs->code_heap),*tempc=result;
+  for (i=0;i<=MAX_PTR_STARS;i++) {
+    tempc->type=HTT_CLASS;
+    tempc->raw_type=RT_PTR;
+    tempc->size=sizeof(U8 *);
+    tempc->ptr_cnt=i;
+    tempc++;
+  }
+  result->last_in_member_lst=&result->member_lst;
+  result->size=0;
   return result;
 }
 
 CHashFun *PrsFunNew()
 {
-  CHashFun *result=CAlloc(sizeof(CHashFun)*5,Fs->code_heap),*tempf=result;
-  tempf->last_in_member_lst=&tempf->member_lst;
-  tempf->type=HTT_FUN;
-  tempf->raw_type=RT_PTR;
-  tempf->ptr_cnt=0;
-
-  tempf++;
-  tempf->type=HTT_FUN;
-  tempf->raw_type=RT_PTR;
-  tempf->size=sizeof(U8 *);
-  tempf->ptr_cnt=1;
-
-  tempf++;
-  tempf->type=HTT_FUN;
-  tempf->raw_type=RT_PTR;
-  tempf->size=sizeof(U8 *);
-  tempf->ptr_cnt=2;
-
-  tempf++;
-  tempf->type=HTT_FUN;
-  tempf->raw_type=RT_PTR;
-  tempf->size=sizeof(U8 *);
-  tempf->ptr_cnt=3;
-
-  tempf++;
-  tempf->type=HTT_FUN;
-  tempf->raw_type=RT_PTR;
-  tempf->size=sizeof(U8 *);
-  tempf->ptr_cnt=4;
-
+  I64 i;
+  CHashFun *result=CAlloc(sizeof(CHashFun)*(MAX_PTR_STARS+1),Fs->code_heap),*tempf=result;
+  for (i=0;i<=MAX_PTR_STARS;i++) {
+    tempf->type=HTT_FUN;
+    tempf->raw_type=RT_PTR;
+    tempf->size=sizeof(U8 *);
+    tempf->ptr_cnt=i;
+    tempf++;
+  }
+  result->last_in_member_lst=&result->member_lst;
+  result->size=0;
   return result;
 }
 
@@ -83,7 +43,7 @@ CMemberLst *MemberLstNew(I64 _reg)
 }
 
 I64 PrsKeyWord(CLex *lx)
-{
+{//Cvt cur token to $LK,"KEYWORD",A="FF:::/Compiler/OpCodes.TXT.Z,KEYWORD"$ or -1.
   CHashGeneric *temph;
   if (lx->token==TK_IDENT &&(temph=lx->hash_entry) && temph->type&HTT_KEYWORD)
     return temph->user_data0;
@@ -109,7 +69,7 @@ U0 PrsVarInit(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_ad
   I64 i,j,r,old_flags,type,size;
   CMemberLst *tempm;
   CIntermediateCode *tempi;
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CExeAbsAddr *tempa;
   CExeImportExport *tempe;
   Bool is_str;
@@ -212,13 +172,11 @@ U0 PrsVarInit(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_ad
   *_dst=dst;
 }
 
-
 class CVI2
 {
   CVI2 *next,*last;
   U0 base;
 };
-
 
 U0 PrsVarInit2(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_addr_ip,U8 **_base,Bool data_heap,I64 pass)
 {
@@ -233,7 +191,7 @@ U0 PrsVarInit2(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_a
 	lx->token==TK_STR) {
       lx->stk_ptr--;	//grows up
       st=LexExtStr(lx,&i);
-      if (tempad1->cnt<0) { //[]
+      if (tempad1->cnt<0) {//[]
 	tempad1->cnt=i;
 	tempad->total_cnt=i*tempad1->total_cnt;
 	Free(*_base);
@@ -255,7 +213,7 @@ U0 PrsVarInit2(CLex *lx,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,U8 *data_a
 	LexPush(lx);
 	Lex(lx);
       }
-      if (tempad1->cnt<0) { //[]
+      if (tempad1->cnt<0) {//[]
 	QueInit(&root);
 	cnt=0;
 	while (lx->token!='}') {
@@ -343,8 +301,8 @@ U0 PrsStaticInit(CLex *lx,CMemberLst *tempm,I64 pass)
 }
 
 Bool PrsArrayDims(CLex *lx,CArrayDim *dim)
-{ //returns false on empty []
-  //dim->next!=0 for array
+{//Returns false on empty []
+//dim->next!=0 for array
   CArrayDim *tempad,*tempad1;
   I64 j;
   Bool result=TRUE;
@@ -357,7 +315,7 @@ Bool PrsArrayDims(CLex *lx,CArrayDim *dim)
       j=-1;
       result=FALSE;
     } else {
-      if ((j=LexExpression(lx))<0)
+      if ((j=LexExpressionI64(lx))<0)
 	LexExcept(lx,"Invalid array size at ");
     }
     tempad1=&dim->next;
@@ -389,7 +347,7 @@ U0 PrsDotDotDot(CLex *lx,CHashFun *tempf,I64 _reg)
   Lex(lx);
   tempm=MemberLstNew(_reg);
   tempm->flags=MLF_DOT_DOT_DOT;
-  tempm->member_class=sys_internal_types[RT_I64];
+  tempm->member_class=cmp.internal_types[RT_I64];
   tempm->str=StrNew("argc");
   tempm->offset=tempf->size;
   tempm->size=8;
@@ -398,7 +356,7 @@ U0 PrsDotDotDot(CLex *lx,CHashFun *tempf,I64 _reg)
 
   tempm=MemberLstNew(_reg);
   tempm->flags=MLF_DOT_DOT_DOT;
-  tempm->member_class=sys_internal_types[RT_I64];
+  tempm->member_class=cmp.internal_types[RT_I64];
   tempm->str=StrNew("argv");
   tempm->dim.total_cnt=127; //arbitrary
   tempm->dim.next=tempad=MAlloc(sizeof(CArrayDim));
@@ -418,7 +376,7 @@ CHashClass *PrsType(CLex *lx,CHashClass **_tempc1,
   I64 *_mode,CMemberLst *tempm,U8 **_ident,CHashFun **_fun_ptr,
   CHashExport **_tempex,CArrayDim *tempad,I64 fsp_flags)
 {
-  I64 k,fun_ptr_cnt,mode=*_mode;
+  I64 k,ptr_cnt,mode=*_mode;
   CHashClass *tempc1=*_tempc1,*tempc2;
   CHashFun *fun_ptr=NULL;
   CHashExport *tempex=NULL;
@@ -427,7 +385,8 @@ CHashClass *PrsType(CLex *lx,CHashClass **_tempc1,
 pt_start:
   if (!tempc1 || !(tempc1->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
     LexExcept(lx,"invalid class at ");
-
+ 
+  ptr_cnt=0;
   while (lx->token=='*') {
     if (mode.u8[1]) {
       lx->stk_ptr--;	//grows up
@@ -435,6 +394,8 @@ pt_start:
     }
     Lex(lx);
     tempc1++;
+    if (++ptr_cnt>MAX_PTR_STARS)
+      LexExcept(lx,"Too many *'s at ");
   }
 
   k=PrsKeyWord(lx);
@@ -451,11 +412,13 @@ pt_start:
   if (lx->token=='(') {
     if (Lex(lx)!='*')
       LexExcept(lx,"expecting '*' at ");
-    fun_ptr_cnt=1;
+    ptr_cnt=1; //fun_ptr
     while (Lex(lx)=='*')
-      fun_ptr_cnt++;
+      ptr_cnt++; //fun_ptr
+    if (ptr_cnt>MAX_PTR_STARS)
+      LexExcept(lx,"Too many *'s at ");
   } else
-    fun_ptr_cnt=-1;
+    ptr_cnt=-1; //fun_ptr
 
   if (_ident) {
     if (lx->token==TK_IDENT) {
@@ -475,13 +438,13 @@ pt_start:
     }
   }
 
-  if (fun_ptr_cnt>=0) {
+  if (ptr_cnt>=0) { //fun_ptr
     if (lx->token!=')')
       LexExcept(lx,"missing ')' at ");
     if (Lex(lx)!='(')
       LexExcept(lx,"expecting '(' at ");
-    fun_ptr=PrsFunJoin(lx,tempc1,NULL,fsp_flags)+fun_ptr_cnt;
-    tempc1=sys_internal_types[RT_PTR]+fun_ptr_cnt;
+    fun_ptr=PrsFunJoin(lx,tempc1,NULL,fsp_flags)+ptr_cnt;
+    tempc1=cmp.internal_types[RT_PTR]+ptr_cnt;
   }
   if (!PrsArrayDims(lx,tempad) && lx->token!='=') {
     tempc1++;
@@ -850,7 +813,9 @@ CHashClass *PrsClass(CLex *lx,I64 keyword,I64 fsp_flags,Bool is_extern)
     }
     if (tempc) {
       Free(tempc->src_link);
+      tempc->src_link=NULL;
       Free(tempc->index);
+      tempc->index=NULL;
     } else {
       tempc=PrsClassNew;
       tempc->str=lx->cur_str;
@@ -860,8 +825,11 @@ CHashClass *PrsClass(CLex *lx,I64 keyword,I64 fsp_flags,Bool is_extern)
     LBtr(&tempc->flags,Cf_EXTERN);
     if (fsp_flags&FSF_PUBLIC)
       tempc->type|=HTF_PUBLIC;
-    SetSrcFileInfo(lx,tempc);
     tempc->use_cnt=0;
+    if (lx->last_U16=='\n')
+      SetSrcFileInfo(lx,tempc,-1);
+    else
+      SetSrcFileInfo(lx,tempc,0);
     if (Lex(lx)==':') {
       if (Lex(lx)!=TK_IDENT || !(base_class=lx->hash_entry) ||
 	!(base_class->type&HTT_CLASS))
@@ -883,9 +851,9 @@ CHashClass *PrsClass(CLex *lx,I64 keyword,I64 fsp_flags,Bool is_extern)
 CHashFun *PrsFunJoin(CLex *lx,CHashClass *temp_return,U8 *name,I64 fsp_flags)
 {
   CMemberLst *tempm;
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CHashFun *tempf;
-  if (name) { //if not fun_ptr
+  if (name) {//if not fun_ptr
     if (lx->flags&LF_AOT_COMPILE) {
       if (tempf=HashFind(name,lx->htc.glbl_hash_table,HTT_FUN)) {
 	if (tempf->type & HTF_IMPORT)
@@ -907,7 +875,9 @@ CHashFun *PrsFunJoin(CLex *lx,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   if (tempf) {
     tempf->used_reg_mask=REG_ALWAYS_CLOBBERED_MASK+REG_STK_TEMPS_MASK;
     Free(tempf->src_link);
+    tempf->src_link=NULL;
     Free(tempf->index);
+    tempf->index=NULL;
     Free(name);
     MemberLstDel(tempf);
   } else {
@@ -971,7 +941,7 @@ U0 PrsFun(CLex *lx,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   if (lx->flags&LF_AOT_COMPILE) {
     lx->htc.fun->executable_addr=lx->a->ip;
     lx->htc.fun->type|=HTF_EXPORT|HTF_RESOLVE;
-    r=LCCCompile(lx,&size,&lx->htc.fun->debug,NULL);
+    r=LCCCompile(lx,&size,&lx->htc.fun->dbg_info,NULL);
     if (r) {
       j=(size+7)>>3;
       for (i=0;i<j;i++)
@@ -980,7 +950,7 @@ U0 PrsFun(CLex *lx,CHashClass *temp_return,U8 *name,I64 fsp_flags)
     }
   } else {
     old_ctrace=Btr(&lx->opts,OPTf_COMPILE_TRACE);
-    lx->htc.fun->executable_addr=LCCCompile(lx,&size,&lx->htc.fun->debug,NULL);
+    lx->htc.fun->executable_addr=LCCCompile(lx,&size,&lx->htc.fun->dbg_info,NULL);
     if (old_ctrace) {
       Bts(&lx->opts,OPTf_COMPILE_TRACE);
       Un(lx->htc.fun->executable_addr,size,64);
@@ -1010,7 +980,7 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
   U8 *st;
   CHashExport *tempex;
   CHashGlblVar *tempg;
-  CAsmCtrl *a=lx->a;
+  CAOTCtrl *a=lx->a;
   CExeHeapGlbl *temphg;
   CHashClass *tempc;
   CHashFun *tempf,*tempf_fun_ptr;
@@ -1050,6 +1020,8 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
 	  tempf->executable_addr=val;
 	  SysSymImportsResolve(tempf->str);
 	  LBtr(&tempf->flags,Cf_EXTERN);
+	  if (saved_mode&255==PRS0__EXTERN)
+	    LBts(&tempf->flags,Ff__EXTERN);
 	  if (lx->flags&LF_AOT_COMPILE)
 	    tempf->type|=HTF_RESOLVE;
 	  return;
@@ -1188,7 +1160,10 @@ U0 PrsGlblVarLst(CLex *lx,I64 saved_mode,CHashClass *saved_tempc,
       tempg->size=j;
       tempg->dim.total_cnt=i;
       tempg->use_cnt=0;
-      SetSrcFileInfo(lx,tempg);
+      if (lx->last_U16=='\n')
+	SetSrcFileInfo(lx,tempg,-1);
+      else
+	SetSrcFileInfo(lx,tempg,0);
       if (mode&255==PRS0_IMPORT || mode&255==PRS0__IMPORT)
 	tempg->flags|=GVF_IMPORT;
       if (mode&255==PRS0_EXTERN)
@@ -1399,9 +1374,9 @@ U0 PrsSwitch(CLex *lx,Bool nobound,I64 try_cnt)
   mc_jt->begin->use_cnt++;
   if (!PrsExpression(lx,NULL,FALSE))
     throw('Compiler');
-  tempi_sub=LCCAdd(lx,IC_IMM_U64,0,sys_internal_types[RT_I64]);
-  LCCAdd(lx,IC_SUB,0,sys_internal_types[RT_I64]);
-  tempi_cmp=LCCAdd(lx,IC_IMM_U64,0,sys_internal_types[RT_I64]);
+  tempi_sub=LCCAdd(lx,IC_IMM_U64,0,cmp.internal_types[RT_I64]);
+  LCCAdd(lx,IC_SUB,0,cmp.internal_types[RT_I64]);
+  tempi_cmp=LCCAdd(lx,IC_IMM_U64,0,cmp.internal_types[RT_I64]);
   if (nobound)
     LCCAdd(lx,IC_NOBOUND_SWITCH,mc_jt,0);
   else
@@ -1472,7 +1447,7 @@ sw_cont:
 	    }
 	    LCCAdd(lx,IC_LABEL,lb_fwd_case,0);
 	  }
-	  k=LexExpression(lx);
+	  k=LexExpressionI64(lx);
 	  if (k<lo) lo=k;
 	  if (k>hi) hi=k;
 	  if (lx->token==':') {
@@ -1484,13 +1459,13 @@ sw_cont:
 	    header=temps;
 	  } else if (lx->token==TK_DOT_DOT_DOT) {
 	    Lex(lx);
-	    k2=LexExpression(lx);
+	    k2=LexExpressionI64(lx);
 	    if (lx->token==':') {
 	      Lex(lx);
 	      if (k2<lo) lo=k2;
 	      if (k2>hi) hi=k2;
 	      if (k>k2)
-		SwapU64(&k,&k2);
+		SwapI64(&k,&k2);
 	      for (i=k;i<=k2;i++) {
 		temps=MAlloc(sizeof(CSwitchCase));
 		temps->label=lb_entry;
@@ -1557,7 +1532,7 @@ sw_sub_end:
   if (lo>hi || !(0<range<=0xFFFF))
     LexExcept(lx,"switch range error at ");
   jmp_table=MAlloc((sizeof(CLexCodeMisc *)*range+0x1FF)&~0x1FF);
-  MemSetU64(jmp_table,lb_dft,range);
+  MemSetI64(jmp_table,lb_dft,range);
   tempi_sub->ic_data=lo;
   tempi_cmp->ic_data=range;
   temps=header;
@@ -1628,7 +1603,7 @@ U0 PrsStreamBlk(CLex *lx)
 U0 PrsTryBlk(CLex *lx,I64 try_cnt)
 {
   CLexCodeMisc	*lb_catch,*lb_done,*lb_untry;
-  CHashClass	*tempc=sys_internal_types[RT_PTR];
+  CHashClass	*tempc=cmp.internal_types[RT_PTR];
   CHashFun	*temp_try=HashFind("SysTry",lx->htc.hash_table_lst,HTT_FUN),
 		*temp_untry=HashFind("SysUntry",lx->htc.hash_table_lst,HTT_FUN);
 
@@ -1789,7 +1764,7 @@ Bool PrsStatement(CLex *lx,I64 try_cnt=0,
 		      i=tempex->val;
 		      Lex(lx);
 		    } else
-		      i=LexExpression(lx);
+		      i=LexExpressionI64(lx);
 		    if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(lx,"expecting type at ");
@@ -1836,7 +1811,7 @@ sm_import:
 		    PrsGlblVarLst(lx,PRS0_IMPORT|PRS1_NULL,tempex,0,FALSE);
 		    break;
 		  case KW__INTERN:
-		    i=LexExpression(lx);
+		    i=LexExpressionI64(lx);
 		    if (lx->token!=TK_IDENT || !(tempex=lx->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(lx,"expecting type at ");
@@ -1879,12 +1854,12 @@ sm_import:
 			lx->abs_cnts.externs++;
 			if (lx->flags&LF_AOT_COMPILE)
 			  LCCAdd(lx,IC_CALL_IMPORT,
-				temp_untry,sys_internal_types[RT_PTR]);
+				temp_untry,cmp.internal_types[RT_PTR]);
 			else
 			  LCCAdd(lx,IC_CALL_INDIRECT2,
-				&temp_untry->executable_addr,sys_internal_types[RT_PTR]);
+				&temp_untry->executable_addr,cmp.internal_types[RT_PTR]);
 		      } else
-			LCCAdd(lx,IC_CALL,temp_untry->executable_addr,sys_internal_types[RT_PTR]);
+			LCCAdd(lx,IC_CALL,temp_untry->executable_addr,cmp.internal_types[RT_PTR]);
 		    }
 		  }
 		  if (Lex(lx)!=';') {
@@ -1933,7 +1908,7 @@ sm_import:
 		    goto sm_semicolon;
 		  }
 	      }
-	    } else { //Ident, found in hash table, not keyword
+	    } else {//Ident, found in hash table, not keyword
 sm_not_keyword_afterall:
 	      if (tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)) {
 		if (lx->htc.fun) {
@@ -1959,7 +1934,7 @@ sm_not_keyword_afterall:
 	      }
 	      fsp_flags&=FSF_ASM;
 	    }
-	  } else { //Ident, not in hash table
+	  } else {//Ident, not in hash table
 	    if (lx->local_var_entry)
 	      goto sm_prs_exp;
 	    if (!(g_lb=LCCGoToLabelFind(lx,lx->cur_str))) {
@@ -1981,7 +1956,7 @@ sm_not_keyword_afterall:
 	} else if (lx->token==TK_STR||lx->token==TK_CHAR_CONST) {
 	  PrsFunCall(lx,NULL,FALSE,NULL);
 	  goto sm_semicolon;
-	} else if (lx->token!=TK_EOF) { //Non-cur_str symbol, number or something
+	} else if (lx->token!=TK_EOF) {//Non-cur_str symbol, number or something
 sm_prs_exp:
 	  if (!PrsExpression(lx,NULL,TRUE))
 	    throw('Compiler');

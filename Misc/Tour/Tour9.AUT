@@ -1,30 +1,51 @@
-PopUpOk(
-"All text widgets work everywhere.\n"
-"The $$GREEN$$Type()$$FG$$ command is like\n"
-"the DOS command of the same name\n"
-"or the UNIX, $$GREEN$$cat$$FG$$ command.\n"
-"We will now send your menu document\n"
-"to the command line.  They use the same\n"
-"document format and it is active!!.\n");
-
 PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+"Ed(\"HI:Debugging\");";
+AFGetStr("\n");
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
-//This puts the cursor at the bottom
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"\n";
+PopUpOk(
+"We will now use $LK,"Uf",A="MN:Uf"$() to\n"
+"unassemble a function.\n"
+"It takes the function name\n"
+"as a string arg.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.");
+"WinMax;WinBorder;\nUf(\"CAlloc\");";
+AFGetStr("\n");
 
-"Type(\"HOME/PersonalMenu.TXT\");";
-AFPmtStr("\n");
+PopUpOk("Press $$GREEN$$<CURSOR-UP>$$FG$$ eight times..");
+I64 i;
+for (i=0;i<8;i++)
+  AFGetKey(SC_CURSOR_UP);
 
-Sleep(1500);
-AFPrint(250,"Dir;\nAFView;\n");
+PopUpOk(
+"Press $$GREEN$$<SPACE>$$FG$$.\n");
+AFGetStr(" ");
 
 PopUpOk(
 "$$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
-AFUntilChar(CH_SHIFT_ESC,CH_ESC);
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 
 PopUpOk(
-"$$GREEN$$Type()$$FG$$ can also be used on\n"
-"$$GREEN$$.BMP$$FG$$ or $$GREEN$$.GRA$$FG$$ files!");
+"We can unassemble a\n"
+"numeric address with $LK,"U",A="MN:U"$().\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.");
+"U(&CAlloc);";
+AFGetStr("\n");
+Sleep(1000);
 
+PopUpOk("The opcodes are slightly nonstandard.");
+"Ed(\"::/Compiler/OpCodes.TXT.Z\");\n";
+
+Msg(MSG_KEY_DOWN,CH_CTRLF,0x42100000421);
+"MOV";
+Msg(MSG_KEY_DOWN,CH_ESC,0x100000001);
+
+PopUpOk(
+"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 

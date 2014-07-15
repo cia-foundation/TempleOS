@@ -5,11 +5,11 @@
 #define SPF_DOLLAR		0x010
 #define SPF_SLASH		0x020
 #define SPF_QUESTION		0x040
-#define SPF_SUB_FMT		0x080
+#define SPF_AUX_FMT_NUM		0x080
 #define SPF_DECIMAL		0x100
 #define SPF_NEG			0x200
 #define SPF_NEG_E		0x400
-#define SPF_NEG_SUB_FMT		0x800
+#define SPF_NEG_AUX_FMT_NUM	0x800
 
 U0 SPutChar(U8 **_dst,U8 ch,U8 **_buf)
 {
@@ -55,14 +55,14 @@ U8 *MPrintTime(CDate cdt)
 {
   CDateStruct ds;
   Date2Struct(&ds,cdt+local_time_offset);
-  return MPrint("%02d:%02d:%02d",ds.hour,ds.min,ds.sec);
+  return MStrPrint("%02d:%02d:%02d",ds.hour,ds.min,ds.sec);
 }
 
 U8 *MPrintDate(CDate cdt)
 {
   CDateStruct ds;
   Date2Struct(&ds,cdt+local_time_offset);
-  return MPrint("%02d/%02d/%02d",ds.mon,ds.day_of_mon,ds.year%100);
+  return MStrPrint("%02d/%02d/%02d",ds.mon,ds.day_of_mon,ds.year%100);
 }
 
 U8 *MPrintQ(U8 *ptr,I64 flags)
@@ -244,22 +244,23 @@ U8 *sys_pos_powers_lets=" KMGTPEZY",
 #define TEMP_BUF_LEN	256
 #define SLOP		8
 
-U8 *SPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
-{//$LK,"Print Extended Codes",A="FA:::/Doc/HolyC.TXT,SPrintCodes"$
-// In float formatting, do not exceed 18-digits
-// before or after the decimal point
-// because the numbers before and after
-// the decimal point are stored
-// in 64-bits.  Use exponentiated forms
-// to avoid this.
+U8 *StrPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
+{/*$LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$
+In float formatting, do not exceed 18-digits
+before or after the decimal point
+because the numbers before and after
+the decimal point are stored
+in 64-bits.  Use exponentiated forms
+to avoid this.
+*/
   I64 i,j,l,ch,k,k0,n,n0,len,dec_len,flags,
-	sub_fmt,comma_cnt,comma_fmt_cnt,cur_arg=0;
+	aux_fmt_num,comma_cnt,comma_fmt_cnt,cur_arg=0;
   U64 m;
   F64 d,d1;
   U8 *ptr,**_buf,*buf,**_dst,temp_buf[TEMP_BUF_LEN],temp_buf2[TEMP_BUF_LEN*2];
 
   if (!src)
-    throw('SPrint');
+    throw('StrPrint');
   if (dst) {
     _buf=NULL;
     buf=dst;
@@ -287,7 +288,7 @@ U8 *SPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
       if (*src=='*') {
 	src++;
 	if (cur_arg>=argc)
-	  throw('SPrint');
+	  throw('StrPrint');
 	len=argv[cur_arg++];
       }
       dec_len=0;
@@ -298,12 +299,13 @@ U8 *SPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
 	if (*src=='*') {
 	  src++;
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  dec_len=argv[cur_arg++];
 	}
 	flags|=SPF_DECIMAL;
       }
 
+      aux_fmt_num=0;
       while (TRUE) {
 	switch (*src) {
 	  sub_switch_start:
@@ -325,64 +327,62 @@ U8 *SPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
 	    src++;
 	    break;
 
-	  default:
-	    goto sp_in_sub_fmt;
-	}
-      }
-
-sp_in_sub_fmt:
-      sub_fmt=0;
-      if (*src=='h') {
-	src++;
-	flags|=SPF_SUB_FMT;
-	if (*src=='?') {
-	  src++;
-	  flags|=SPF_QUESTION;
-	} else {
-	  if (*src=='*') {
+	  case 'h':
 	    src++;
-	    if (cur_arg>=argc)
-	      throw('SPrint');
-	    sub_fmt=argv[cur_arg++];
-	  } else {
-	    if (*src=='-') {
+	    flags|=SPF_AUX_FMT_NUM;
+	    if (*src=='?') {
 	      src++;
-	      flags|=SPF_NEG_SUB_FMT;
+	      flags|=SPF_QUESTION;
+	    } else {
+	      if (*src=='*') {
+		src++;
+		if (cur_arg>=argc)
+		  throw('StrPrint');
+		aux_fmt_num=argv[cur_arg++];
+	      } else {
+		if (*src=='-') {
+		  src++;
+		  flags|=SPF_NEG_AUX_FMT_NUM;
+		}
+		while ('0'<=*src<='9')
+		  aux_fmt_num=aux_fmt_num*10+ *src++ -'0';
+		if (flags&SPF_NEG_AUX_FMT_NUM)
+		  aux_fmt_num=-aux_fmt_num;
+	      }
 	    }
-	    while ('0'<=*src<='9')
-	      sub_fmt=sub_fmt*10+ *src++ -'0';
-	    if (flags&SPF_NEG_SUB_FMT)
-	      sub_fmt=-sub_fmt;
-	  }
+	    break;
+	  default:
+	    goto sp_arg;
 	}
       }
 
+sp_arg:
       k=0;
       switch (*src++) {
 	sub_switch_start:
 	  case 'F':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=FileRead(argv[cur_arg++]);
 	    break;
 	  case 'Q':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=MPrintQ(argv[cur_arg++],flags);
 	    break;
 	  case 'q':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=MPrintq(argv[cur_arg++],flags);
 	    break;
 	  case 'D':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=MPrintDate(argv[cur_arg++]);
 	    break;
 	  case 'T':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=MPrintTime(argv[cur_arg++]);
 	    break;
 	sub_switch_end:
@@ -393,23 +393,23 @@ sp_in_sub_fmt:
 	sub_switch_start:
 	  case 's':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=argv[cur_arg++];
 	    break;
 	  case 'S':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=Define(argv[cur_arg++]);
 	    break;
 	  case 'z':
 	    if (cur_arg+1>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=LstSub(argv[cur_arg],argv[cur_arg+1]);
 	    cur_arg=cur_arg+2;
 	    break;
 	  case 'Z':
 	    if (cur_arg+1>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    ptr=DefineSub(argv[cur_arg],argv[cur_arg+1]);
 	    cur_arg=cur_arg+2;
 	    break;
@@ -420,13 +420,13 @@ sp_in_sub_fmt:
 	sub_switch_start:
 	  case 'c':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    temp_buf[0](I64)=argv[cur_arg++];
 	    temp_buf[8]=0;
 	    break;
 	  case 'C':
 	    if (cur_arg>=argc)
-	      throw('SPrint');
+	      throw('StrPrint');
 	    temp_buf[0](I64)=argv[cur_arg++];
 	    temp_buf[8]=0;
 	    ptr=temp_buf;
@@ -435,27 +435,31 @@ sp_in_sub_fmt:
 	      ptr++;
 	    }
 	    break;
-	  case 'p':
-	    if (cur_arg>=argc)
-	      throw('SPrint');
-	    if (flags&SPF_TRUNCATE)
-	      SPrintPSect(temp_buf,argv[cur_arg++],len);
-	    else
-	      SPrintPSect(temp_buf,argv[cur_arg++],0);
-	    break;
 	sub_switch_end:
-	  OutStr(temp_buf,_buf,_dst,len,flags);
+	  if (!(flags&SPF_AUX_FMT_NUM))
+	    aux_fmt_num=1;
+	  while (aux_fmt_num-->0)
+	    OutStr(temp_buf,_buf,_dst,len,flags);
 	  break;
 
+	case 'p':
+	  if (cur_arg>=argc)
+	    throw('StrPrint');
+	  if (flags&SPF_TRUNCATE)
+	    StrPrintPSect(temp_buf,argv[cur_arg++],len);
+	  else
+	    StrPrintPSect(temp_buf,argv[cur_arg++],0);
+	  OutStr(temp_buf,_buf,_dst,len,flags);
+	  break;
 	case 'P':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  if (flags&SPF_TRUNCATE)
-	    SPrintPSect(temp_buf,argv[cur_arg],len);
+	    StrPrintPSect(temp_buf,argv[cur_arg],len);
 	  else
-	    SPrintPSect(temp_buf,argv[cur_arg],0);
+	    StrPrintPSect(temp_buf,argv[cur_arg],0);
 	  if (!IsRaw || !_buf) {
-	    SPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",temp_buf,argv[cur_arg]);
+	    StrPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",temp_buf,argv[cur_arg]);
 	    OutStr(temp_buf2,_buf,_dst,len,flags);
 	  } else
 	    OutStr(temp_buf,_buf,_dst,len,flags);
@@ -463,14 +467,14 @@ sp_in_sub_fmt:
 	  break;
 	case 'd':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (m(I64)<0) {
 	    flags|=SPF_NEG;
 	    m=-m;
 	  }
 sp_out_dec:
-	  if (flags&SPF_SUB_FMT) {
+	  if (flags&SPF_AUX_FMT_NUM) {
 	    if (!len) len=12;
 	    d=m;
 	    goto sp_out_eng;
@@ -548,12 +552,12 @@ sp_out_num:
 	  break;
 	case 'u':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  goto sp_out_dec;
 	case 'f':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    flags|=SPF_NEG;
@@ -582,7 +586,7 @@ sp_out_inf:
 	    break;
 	  }
 
-	  sp_out_f:
+sp_out_f:
 	  if (dec_len<0)
 	    dec_len=0;
 	  n=Log10(d);
@@ -660,14 +664,13 @@ sp_out_inf:
 	  flags|=SPF_TRUNCATE;
 
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    flags|=SPF_NEG;
 	    d=-d;
 	  }
 	  if (d==ì) goto sp_out_inf;
-
 
 	  if (d)
 	    n=Floor(Log10(d));
@@ -716,7 +719,7 @@ sp_out_e:
 	  if (!len) len=12;
 	  flags|=SPF_TRUNCATE;
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    flags|=SPF_NEG;
@@ -735,7 +738,7 @@ sp_out_e:
 	  if (!len) len=12;
 	  flags|=SPF_TRUNCATE;
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
 	    flags|=SPF_NEG;
@@ -753,7 +756,7 @@ sp_out_eng: //Engineering notation
 	    n=-n;
 	    flags|=SPF_NEG_E;
 	  }
-	  if (flags&SPF_SUB_FMT && -24<=n<=24) {
+	  if (flags&SPF_AUX_FMT_NUM && -24<=n<=24) {
 	    if (flags&SPF_QUESTION) {
 	      if (flags&SPF_NEG_E)
 		i=-n/3;
@@ -762,11 +765,11 @@ sp_out_eng: //Engineering notation
 	      j=0;
 	    } else {
 	      if (flags&SPF_NEG_E)
-		j=-n-sub_fmt;
+		j=-n-aux_fmt_num;
 	      else
-		j=n-sub_fmt;
+		j=n-aux_fmt_num;
 	      d*=Pow10I64(j);
-	      i=sub_fmt/3;
+	      i=aux_fmt_num/3;
 	    }
 	    if (i<0)
 	      temp_buf[k++]=sys_neg_powers_lets[-i];
@@ -818,7 +821,7 @@ sp_out_eng: //Engineering notation
 	  goto sp_out_f;
 	case 'X':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (flags&SPF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -845,7 +848,7 @@ sp_out_eng: //Engineering notation
 	  }
 	case 'x':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (flags&SPF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -873,7 +876,7 @@ sp_out_eng: //Engineering notation
 	case 'b':
 	case 'B':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (flags&SPF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
@@ -897,7 +900,7 @@ sp_out_eng: //Engineering notation
 	case 'o':
 	case 'O':
 	  if (cur_arg>=argc)
-	    throw('SPrint');
+	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (flags&SPF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=3;
@@ -929,47 +932,46 @@ sp_out_eng: //Engineering notation
   return buf;
 }
 
-U8 *SPrint(U8 *dst,U8 *fmt,...)
-{ //See $LK,"SPrintJoin",A="MN:SPrintJoin"$()
-  return SPrintJoin(dst,fmt,argc,argv);
+U8 *StrPrint(U8 *dst,U8 *fmt,...)
+{//See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
+  return StrPrintJoin(dst,fmt,argc,argv);
 }
 
 U8 *CatPrint(U8 *_dst,U8 *fmt,...)
-{ //StrCat().  See $LK,"SPrintJoin",A="MN:SPrintJoin"$()
+{//StrCat().  See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
   U8 *dst=_dst;
   while (*dst)
     dst++;
-  SPrintJoin(dst,fmt,argc,argv);
+  StrPrintJoin(dst,fmt,argc,argv);
   return _dst;
 }
 
 U0 Print(U8 *fmt,...)
-{//$LK,"Print Extended Codes",A="FA:::/Doc/HolyC.TXT,SPrintCodes"$
- //See $LK,"SPrintJoin",A="MN:SPrintJoin"$()
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+{//$LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$.  See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   PutS(buf);
   Free(buf);
 }
 
-U8 *MPrint(U8 *fmt,...)
-{ //See $LK,"SPrintJoin",A="MN:SPrintJoin"$()
-  U8 *result,*buf=SPrintJoin(NULL,fmt,argc,argv);
+U8 *MStrPrint(U8 *fmt,...)
+{//MAlloc StrPrint.  See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
+  U8 *result,*buf=StrPrintJoin(NULL,fmt,argc,argv);
   result=StrNew(buf);
   Free(buf);
   return result;
 }
 
 U0 PrintErr(U8 *fmt,...)
-{
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+{//Print "Err:" and msg in blinking red.
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   GetOutOfDollar;
   ST_ERR_ST "%s",buf;
   Free(buf);
 }
 
 U0 PrintWarn(U8 *fmt,...)
-{
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+{//Print "Warn:" and msg in blinking red.
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   GetOutOfDollar;
   ST_WARN_ST "%s",buf;
   Free(buf);

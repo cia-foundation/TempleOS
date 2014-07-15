@@ -138,18 +138,19 @@ U0 BibleInit()
 	"98684\0"
 	"100111\0");
   DefinePrint("ST_BIBLE_LINES","%d",
-    A2I64(DefineSub(DefineCnt("ST_BIBLE_BOOK_LINES")-1,"ST_BIBLE_BOOK_LINES"))-1);
+    Str2I64(DefineSub(DefineCnt("ST_BIBLE_BOOK_LINES")-1,"ST_BIBLE_BOOK_LINES"))-1);
 } BibleInit;
 
-public U8 *BibleLine2Verse(I64 line)
-{
+public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
+{//Line number to verse str, Malloc()ed.
+//Separate with <SPACE> or ','.
   CDoc *doc;
   CDocEntry *doc_e;
   I64 i=0,cnt=DefineCnt("ST_BIBLE_BOOKS"),start=0,last_start=0;
   U8 *ptr=DefineSub(0,"ST_BIBLE_BOOK_LINES"),*ptr2;
   while (i<=cnt) {
     last_start=start;
-    start=A2I64(ptr);
+    start=Str2I64(ptr);
     if (line<start)
       break;
     i++;
@@ -166,7 +167,7 @@ public U8 *BibleLine2Verse(I64 line)
       while ('0'<=*ptr2<='9' || *ptr2==':')
 	ptr2++;
       *ptr2=0;
-      ptr=MPrint("%Z %s",i,"ST_BIBLE_BOOKS",ptr);
+      ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
     } else {
       while (TRUE) {
 	doc_e=doc_e->last;
@@ -175,7 +176,7 @@ public U8 *BibleLine2Verse(I64 line)
 	  break;
 	}
 	if (doc_e->y+1<last_start) {
-	  ptr=MPrint("%Z",i,"ST_BIBLE_BOOKS");
+	  ptr=MStrPrint("%Z",i,"ST_BIBLE_BOOKS");
 	  break;
 	}
 	if (doc_e->type_u8==DOCT_TEXT && StrLen(doc_e->tag)>=3) {
@@ -193,7 +194,7 @@ public U8 *BibleLine2Verse(I64 line)
 	      while ('0'<=*ptr2<='9')
 		ptr2++;
 	      *ptr2=0;
-	      ptr=MPrint("%Z %s",i,"ST_BIBLE_BOOKS",ptr);
+	      ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
 	      break;
 	    }
 	  }
@@ -207,7 +208,7 @@ public U8 *BibleLine2Verse(I64 line)
 }
 
 public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines)
-{
+{//Put N line starting at line M into doc.
   CDoc *doc_in;
   CDocEntry *doc_e;
   if (!doc_out) doc_out=DocPut;
@@ -229,7 +230,7 @@ public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines)
 }
 
 public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
-{
+{//Put N lines starting at verse str into doc.
   I64 i;
   CDoc *doc_in;
   CDocEntry *doc_e;
@@ -244,7 +245,7 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
       *st2=0;
     i=DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
     if (i>=0) {
-      i=A2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
+      i=Str2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
       doc_in=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
       DocLineNumGoTo(doc_in,i); //one based
       if (*st2) {

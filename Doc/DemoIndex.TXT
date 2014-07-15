@@ -2,12 +2,13 @@ $FG,5$$TX+CX,"TempleOS Demo Index"$$FG$
 
 $WW,1$These are arranged in increasing order of difficulty, more or less.  This can be used as a tutorial if you start at the beginning and work your way fwd.
 
-$FG,2$<SPACE BAR>$FG$ to edit a file and $FG,2$F5$FG$ to run it.
+$FG,2$<SPACE>$FG$ to edit a file and $FG,2$F5$FG$ to run it.
 
 $WW,0$$TR,"Games: Beginner"$
-$ID,2$$LK,"::/Demo/Graphics/DotNet.CPP"$
-$LK,"::/Demo/Graphics/InputPointer.CPP.Z"$
-$LK,"::/Demo/Graphics/Moon.CPP"$
+$ID,2$$LK,"::/Demo/Graphics/NetOfDots.CPP"$
+$LK,"::/Demo/Graphics/InputPointer.CPP"$
+$LK,"::/Demo/Graphics/SunMoon.CPP"$
+$LK,"::/Demo/Games/ElephantWalk.CPP"$
 $LK,"::/Demo/Graphics/LowPassFilter.CPP"$
 $LK,"::/Demo/Graphics/MathAudioDemo.CPP"$
 $LK,"::/Demo/Graphics/Lines.CPP"$
@@ -25,14 +26,13 @@ $LK,"::/Demo/Graphics/WinZBuf.CPP"$
 $LK,"::/Demo/Graphics/Elephant.CPP"$
 $LK,"::/Demo/Graphics/Mountain.CPP"$
 $LK,"::/Demo/Games/Coach.CPP"$
-$LK,"::/Demo/Graphics/WallPaperFish.CPP"$
+$LK,"::/Demo/Graphics/WallPaperFish.CPP"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Games/Digits.CPP"$
 $LK,"::/Demo/Progress.CPP"$ //has some ASM, just ignore
-$LK,"::/Demo/Graphics/Dither.CPP"$
 $LK,"::/Demo/Graphics/Symmetry.CPP"$
 $LK,"::/Demo/Graphics/Blot.CPP"$
 $LK,"::/Demo/Graphics/CaptureScreen.CPP"$
-$LK,"::/Demo/Graphics/EdCSprite.CPP"$
+$LK,"::/Demo/Graphics/EdSprite.CPP"$
 $LK,"::/Demo/PullDownMenu.CPP"$
 $MA-X+PU,"::/Demo/Games/Stadium",LM="Cd(\"::/Demo/Games/Stadium\");Dir;View;\n"$
 $LK,"::/Demo/Graphics/Palette.CPP"$
@@ -41,7 +41,7 @@ $LK,"::/Demo/Games/Halogen.CPP"$
 $LK,"::/Demo/Games/TheDead.CPP"$
 $LK,"::/Demo/Games/RainDrops.CPP"$
 $LK,"::/Demo/Snd/MorseCode.CPP"$
-$LK,"::/Demo/Graphics/PixCollision.CPP"$
+$LK,"::/Demo/Graphics/Collision.CPP"$
 $LK,"::/Demo/Games/BlackDiamond.CPP"$
 $LK,"::/Demo/Games/Wenceslas.CPP"$
 $ID,-2$$TR,"Games: Intermediate"$
@@ -51,8 +51,7 @@ $LK,"::/Demo/Graphics/3DPoly.CPP"$
 $LK,"::/Demo/Graphics/BSpline.CPP"$
 $LK,"::/Demo/Graphics/Extents.CPP"$
 $LK,"::/Demo/Graphics/SpritePlot3D.CPP"$
-$LK,"::/Demo/Graphics/Balloon.CPP.Z"$
-$LK,"::/Demo/Graphics/Logo.CPP"$
+$LK,"::/Demo/Graphics/Balloon.CPP"$
 $LK,"::/Demo/Graphics/RotateTank.CPP"$
 $LK,"::/Demo/ScreenCodes.CPP"$
 $LK,"::/Demo/Graphics/PanText.CPP"$
@@ -62,7 +61,7 @@ $LK,"::/Demo/Graphics/FontEd.CPP"$
 $LK,"::/Demo/ExtendedChars.CPP"$
 $LK,"::/Demo/TimeIns.CPP"$
 $LK,"::/Demo/Snd/WaterFowl.CPP"$
-$MA-X+PU,"::/Apps/MusicOrgan/Examples",LM="Cd(\"::/Apps/MusicOrgan/Examples\");Dir;View;\n"$
+$MA-X+PU,"::/Apps/Psalmody/Examples",LM="Cd(\"::/Apps/Psalmody/Examples\");Dir;View;\n"$
 $LK,"::/Demo/MultiCore/MPPrint.CPP"$
 $LK,"::/Demo/Graphics/PredatorPrey.CPP"$
 $LK,"::/Demo/Graphics/Cartesian.CPP"$
@@ -75,6 +74,7 @@ $LK,"::/Demo/MultiCore/MPAdd.CPP"$
 $LK,"::/Demo/MultiCore/Lock.CPP"$
 $LK,"::/Demo/MultiCore/Clouds.CPP"$
 $LK,"::/Demo/Graphics/SliderCtrl.CPP"$
+$LK,"::/Demo/Graphics/WallPaperCtrl.CPP"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Graphics/ScrollBars.CPP"$
 $LK,"::/Demo/RegistryDemo.CPP"$
 $LK,"::/Demo/Games/BugBird.CPP"$
@@ -94,7 +94,7 @@ $MA-X+PU,"::/Apps/AfterEgypt",LM="Cd(\"::/Apps/AfterEgypt\");Dir;View;\n"$
 $LK,"::/Demo/Games/Varoom.CPP"$
 $LK,"::/Demo/Graphics/Shading.CPP"$
 $LK,"::/Demo/Graphics/Transform.CPP"$
-$LK,"::/Demo/Games/BulgeBomber.CPP"$
+$LK,"::/Demo/Games/BomberGolf.CPP"$
 $LK,"::/Demo/Graphics/Shadow.CPP"$
 $LK,"::/Demo/Graphics/Pick3D.CPP"$
 $MA-X+PU,"::/Apps/ToTheFront",LM="Cd(\"::/Apps/ToTheFront\");Dir;View;\n"$
@@ -113,13 +113,13 @@ $LK,"::/Demo/Games/CastleFrankenstein.CPP"$
 $LK,"::/Demo/Games/EagleDive.CPP"$
 $MA-X+PU,"::/Apps/Strut",LM="Cd(\"::/Apps/Strut\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Span",LM="Cd(\"::/Apps/Span\");Dir;View;\n"$
-$MA-X+PU,"::/Apps/MusicOrgan",LM="Cd(\"::/Apps/MusicOrgan\");Dir;View;\n"$
+$MA-X+PU,"::/Apps/Psalmody",LM="Cd(\"::/Apps/Psalmody\");Dir;View;\n"$
 $ID,-2$$TR,"Non-Game"$
 $ID,2$$LK,"::/Misc/MakeDistro.CPP"$
 $LK,"::/Demo/DbgDemo.CPP"$
 $LK,"::/Demo/SubSwitch.CPP"$
 $LK,"::/Demo/DateTime.CPP"$
-$LK,"::/Demo/ReverseFileExample/Reverse.CPP.Z"$.
+$LK,"::/Demo/ReverseFileExample/Reverse.CPP"$.
 $LK,"::/Demo/SortFileExample/F64FileGen.CPP"$
 $LK,"::/Demo/SortFileExample/F64FileSort.CPP"$
 $LK,"::/Demo/PhoneNumWords.CPP"$
@@ -140,33 +140,35 @@ $LK,"::/Demo/WebLogExample/WebLogScramble.CPP"$
 $MA-X+PU,"::/Apps/TimeClock",LM="Cd(\"::/Apps/TimeClock\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Logic",LM="Cd(\"::/Apps/Logic\");Dir;View;\n"$
 $MA-X+PU,"::/Demo/Lectures",LM="Cd(\"::/Demo/Lectures\");Dir;View;\n"$
-
+$MA-X+PU,"::/Apps/Budget",LM="Cd(\"::/Apps/Budget\");Dir;View;\n"$
 $ID,-2$$TR,"TempleOS Specific"$
-$ID,2$$MA-X+PU,"::/Demo/OldSchool",LM="Cd(\"::/Demo/OldSchool\");Dir;View;\n"$
-$MA-X+PU,"::/Demo/AutoFile",LM="Cd(\"::/Demo/AutoFile\");Dir;View;\n"$
+$ID,2$$MA-X+PU,"::/Demo/AutoFile",LM="Cd(\"::/Demo/AutoFile\");Dir;View;\n"$
 $LK,"::/Demo/Print.CPP"$
 $LK,"::/Demo/SubIntAccess.CPP"$
 $LK,"::/Demo/ParenWarn.CPP"$
 $LK,"::/Demo/CompileDemo.CPP"$
 $LK,"::/Demo/Prompt.CPP"$
 $LK,"::/Demo/ClassMeta.CPP"$
-$LK,"::/Demo/Doc/Form.CPP"$
-$LK,"::/Demo/Doc/MenuButton.CPP"$
-$LK,"::/Demo/Doc/MenuSprite.CPP"$
-$LK,"::/Demo/Doc/TreeDemo.CPP"$
+$LK,"::/Demo/LastClass.CPP"$
+$LK,"::/Demo/DolDoc/Form.CPP"$
+$LK,"::/Demo/DolDoc/MenuButton.CPP"$
+$LK,"::/Demo/DolDoc/MenuSprite.CPP"$
+$LK,"::/Demo/DolDoc/ClickCallBack.CPP"$
+$LK,"::/Demo/DolDoc/TreeDemo.CPP"$
 $LK,"::/Demo/Exceptions.CPP"$
+$LK,"::/Demo/Dsk/SerializeTree.CPP"$
 $LK,"::/Demo/StkGrow.CPP"$
-$LK,"::/Demo/Doc/TextDemo.CPP"$
-$LK,"::/Demo/Doc/CursorMove.CPP"$
-$LK,"::/Demo/Doc/DemoDoc.TXT"$
+$LK,"::/Demo/DolDoc/TextDemo.CPP"$
+$LK,"::/Demo/DolDoc/CursorMove.CPP"$
+$LK,"::/Demo/DolDoc/DemoDoc.TXT"$
 $LK,"::/Demo/Spy.CPP"$
-$LK,"::/Demo/Doc/FileRead.CPP"$
-$LK,"::/Demo/Doc/Data.CPP"$
-$LK,"::/Demo/Doc/DefineStr.CPP"$
-$LK,"::/Demo/Doc/CallBack.CPP"$
+$LK,"::/Demo/DolDoc/FileRead.CPP"$
+$LK,"::/Demo/DolDoc/Data.CPP"$
+$LK,"::/Demo/DolDoc/DefineStr.CPP"$
+$LK,"::/Demo/DolDoc/CallBack.CPP"$
 $LK,"::/Demo/Define.CPP"$
 $LK,"EdRenumAsm",A="MN:EdRenumAsm"$
-$LK,"::/Demo/Doc/UnusedDefine.CPP"$
+$LK,"::/Demo/DolDoc/UnusedDefine.CPP"$
 $LK,"::/Demo/Asm/AsmHelloWorld.CPP"$
 $LK,"::/Demo/Asm/BuzzFizz.CPP"$
 $LK,"::/Demo/Asm/PutDec.CPP"$
@@ -178,5 +180,4 @@ $LK,"::/Demo/Asm/AsmAndC3.CPP"$
 $LK,"::/Demo/GlblVars.CPP"$
 $LK,"::/Misc/OSTestSuite.CPP"$
 $MA-X+PU,"::/Adam",LM="Cd(\"::/Adam\");Dir;View;\n"$
-
 $ID,-2$

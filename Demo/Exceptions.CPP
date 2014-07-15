@@ -3,8 +3,7 @@
 
 //You can use $LK,"PutExcept",A="MN:PutExcept"$() in a catch statement
 //and it will report args.
-
-Bool Pmt(I64 i)
+Bool Prompt(I64 i)
 {
   "%d ",i;
   return YorN;
@@ -13,8 +12,8 @@ Bool Pmt(I64 i)
 U0 D1()
 {
   "D1\n";
-  if (Pmt(1)) throw('Point1');
-  if (Pmt(2)) throw('Point2');
+  if (Prompt(1)) throw('Point1');
+  if (Prompt(2)) throw('Point2');
 }
 
 U0 D2()
@@ -22,7 +21,7 @@ U0 D2()
   "D2\n";
   try {
     D1;
-    if (Pmt(4)) throw('Point4');
+    if (Prompt(4)) throw('Point4');
   } catch {
     "D2 handler\n"
     "Ch:%c:%P\n",Fs->except_ch,Fs->except_caller1;
@@ -37,7 +36,7 @@ U0 Demo()
 {
   try {
     D2;
-    if (Pmt(3)) throw('Point3');
+    if (Prompt(3)) throw('Point3');
   } catch {
     "Demo handler\n"
     "Ch:%c:%P\n",Fs->except_ch,Fs->except_caller1;

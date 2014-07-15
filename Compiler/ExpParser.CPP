@@ -57,43 +57,43 @@ CIntermediateCode *PrsAddOp(CLex *lx,I64 stk_op,CHashClass *tempc)
     case IC_ADD:
       if (tempc->ptr_cnt && !tempi->ic_class->ptr_cnt &&
 	    tempi->ic_class->raw_type!=RT_F64) {
-	LCCAdd(lx,IC_SIZEOF,1,sys_internal_types[RT_I64]);
-	LCCAdd(lx,IC_MUL,0,sys_internal_types[RT_I64]);
+	LCCAdd(lx,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
+	LCCAdd(lx,IC_MUL,0,cmp.internal_types[RT_I64]);
       }
       break;
     case IC_SUB:
       if (tempc->ptr_cnt && tempi->ic_class->raw_type!=RT_F64) {
 	if (!tempi->ic_class->ptr_cnt) {
-	  LCCAdd(lx,IC_SIZEOF,1,sys_internal_types[RT_I64]);
-	  LCCAdd(lx,IC_MUL,0,sys_internal_types[RT_I64]);
+	  LCCAdd(lx,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
+	  LCCAdd(lx,IC_MUL,0,cmp.internal_types[RT_I64]);
 	} else
 	  div_sizeof=TRUE;
       }
       break;
     case IC_AND_AND:
     case IC_OR_OR:
-      LCCAdd(lx,IC_NOP1,0,sys_internal_types[RT_I64]);
+      LCCAdd(lx,IC_NOP1,0,cmp.internal_types[RT_I64]);
       break;
     case IC_ADD_EQUAL:
     case IC_SUB_EQUAL:
       if (tempc->ptr_cnt) {
-	LCCAdd(lx,IC_SIZEOF,1,sys_internal_types[RT_I64]);
-	LCCAdd(lx,IC_MUL,0,sys_internal_types[RT_I64]);
+	LCCAdd(lx,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
+	LCCAdd(lx,IC_MUL,0,cmp.internal_types[RT_I64]);
       }
       break;
   }
   tempi=LCCAdd(lx,stk_op,0,tempc);
   if (stk_op.u8[3]&ECF_HAS_PUSH_CMP) {
     tempi->ic_flags|=ICF_POP_CMP;
-    LCCAdd(lx,IC_NOP1,0,sys_internal_types[RT_I64]);
-    LCCAdd(lx,IC_AND_AND,0,sys_internal_types[RT_I64],ICF_POP_CMP);
+    LCCAdd(lx,IC_NOP1,0,cmp.internal_types[RT_I64]);
+    LCCAdd(lx,IC_AND_AND,0,cmp.internal_types[RT_I64],ICF_POP_CMP);
   }
   if (div_sizeof) {
     tempc--;
     if (tempc->size!=1) {
-      LCCAdd(lx,IC_IMM_U64,tempc->size,sys_internal_types[RT_I64]);
-      LCCAdd(lx,IC_DIV,0,sys_internal_types[RT_I64]);
-      tempc=sys_internal_types[RT_I64];
+      LCCAdd(lx,IC_IMM_U64,tempc->size,cmp.internal_types[RT_I64]);
+      LCCAdd(lx,IC_DIV,0,cmp.internal_types[RT_I64]);
+      tempc=cmp.internal_types[RT_I64];
     }
   }
   return tempi;
@@ -161,7 +161,7 @@ pe_check_binary_ops1:
 	  } else if (paren_prec<=PREC_UNARY_PRE+ASSOC_MASK)
 	    ParenWarning(lx);
 	}
-	cur_op=binary_ops_table[lx->token];
+	cur_op=cmp.binary_ops[lx->token];
 
       case PE_CHECK_BINARY_OPS2:
 pe_check_binary_ops2:
@@ -187,7 +187,7 @@ pe_check_binary_ops2:
 	    tempc--;
 	  else if (stk_op.u16[0]==IC_ADDR) {
 	    lx->abs_cnts.c_addres++;
-	    if (Bt(ic_bitmap_deref,tempi->ic_code))
+	    if (Bt(cmp.ic_bitmap_deref,tempi->ic_code))
 	      OptFree(tempi);
 	    tempc++;
 	  }
@@ -210,13 +210,13 @@ pe_do_binary_op:
 	    tempi=lx->lcc.lcc_root.last;
 	    if (!tempi->ic_class->ptr_cnt &&
 		  tempi->ic_class->raw_type!=RT_F64) {
-	      LCCAdd(lx,IC_SIZEOF,1,sys_internal_types[RT_I64]);
-	      LCCAdd(lx,IC_MUL,0,sys_internal_types[RT_I64]);
+	      LCCAdd(lx,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
+	      LCCAdd(lx,IC_MUL,0,cmp.internal_types[RT_I64]);
 	    }
 	    break;
 	  case IC_AND_AND:
 	  case IC_OR_OR:
-	    LCCAdd(lx,IC_NOP1,0,sys_internal_types[RT_I64]);
+	    LCCAdd(lx,IC_NOP1,0,cmp.internal_types[RT_I64]);
 	    break;
 	}
 	if (lx->flags & LF_FUN_EXP) {
@@ -233,10 +233,10 @@ pe_do_binary_op:
 	if (cur_op.u8[2]>max_prec)
 	  max_prec=cur_op.u8[2];
 	left_prec=cur_op.u8[2];
-	if (Bt(ic_bitmap_assign,cur_op.u16[0])) {
+	if (Bt(cmp.ic_bitmap_assign,cur_op.u16[0])) {
 	  tempi=lx->lcc.lcc_root.last;
 	  tempc=OptClassFwd(tempi->ic_class);
-	  if (!Bt(ic_bitmap_deref,tempi->ic_code) ||
+	  if (!Bt(cmp.ic_bitmap_deref,tempi->ic_code) ||
 		!tempc->ptr_cnt && !Bt(&tempc->flags,Cf_INTERNAL_TYPE))
 	    LexExcept(lx,"invalid lval at ");
 	  tempi->ic_code=IC_NOP1; //Important for setting class (pretty sure)
@@ -257,13 +257,13 @@ pe_pop_higher:
 
 	tempi=PrsAddOp(lx,stk_op,tempc);
 
-	if (Bt(ic_bitmap_cmp,cur_op.u16[0]) && Bt(ic_bitmap_cmp,stk_op.u16[0])) {
+	if (Bt(cmp.ic_bitmap_cmp,cur_op.u16[0]) && Bt(cmp.ic_bitmap_cmp,stk_op.u16[0])) {
 	  tempi->ic_flags|=ICF_PUSH_CMP;
-	  LCCAdd(lx,IC_NOP1,0,sys_internal_types[RT_I64]);
+	  LCCAdd(lx,IC_NOP1,0,cmp.internal_types[RT_I64]);
 	  LCCAdd(lx,IC_PUSH_CMP,0,tempc);
 	  cur_op.u8[3]|=ECF_HAS_PUSH_CMP;
 	} else if (cur_op.u16[0]==IC_AND_AND || cur_op.u16[0]==IC_OR_OR)
-	  LCCAdd(lx,IC_NOP1,0,sys_internal_types[RT_I64]);
+	  LCCAdd(lx,IC_NOP1,0,cmp.internal_types[RT_I64]);
 	goto pe_pop_higher;
 
       case PE_PUSH_LOWER:
@@ -332,7 +332,7 @@ U0 PrsSizeOf(CLex *lx)
 {
   CHashClass *tempc;
   CMemberLst *tempm;
-  CDbgInfo *dbg;
+  CDbgInfo *dbg_info;
   I64 i;
   if (lx->token!=TK_IDENT)
     LexExcept(lx,"invalid class at ");
@@ -346,9 +346,9 @@ U0 PrsSizeOf(CLex *lx)
 	(HTT_CLASS|HTT_INTERNAL_TYPE|HTT_GLBL_VAR|HTT_FUN|HTT_EXPORT_SYS_SYM)))
       LexExcept(lx,"invalid class at ");
     if (tempc->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-      if (!(dbg=tempc(CHashFun *)->debug))
+      if (!(dbg_info=tempc(CHashFun *)->dbg_info))
 	LexExcept(lx,"Size not defined at ");
-      i=dbg->body[dbg->max_line+1-dbg->min_line]-dbg->body[0];
+      i=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line]-dbg_info->body[0];
       Lex(lx);
     } else {
       i=tempc->size;
@@ -373,7 +373,7 @@ pu_sizeof_member:
     while (Lex(lx)=='*');
     i=sizeof(U8 *);
   }
-  LCCAdd(lx,IC_IMM_U64,i,sys_internal_types[RT_I64]);
+  LCCAdd(lx,IC_IMM_U64,i,cmp.internal_types[RT_I64]);
 }
 
 U0 PrsOffsetOf(CLex *lx)
@@ -403,7 +403,7 @@ U0 PrsOffsetOf(CLex *lx)
     i+=tempm->offset;
     tempc=tempm->member_class;
   } while (Lex(lx)=='.');
-  LCCAdd(lx,IC_IMM_U64,i,sys_internal_types[RT_I64]);
+  LCCAdd(lx,IC_IMM_U64,i,cmp.internal_types[RT_I64]);
 }
 
 I64 PrsFunCall(CLex *lx,CPrsStk *ps,Bool indirect,CHashFun *tempf)
@@ -444,10 +444,10 @@ I64 PrsFunCall(CLex *lx,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 
   if (indirect) {
     if (!(lx->flags & (LF_RAX | LF_ARRAY)))
-      LCCAdd(lx,IC_DEREF,0,sys_internal_types[RT_PTR]);
-    lx->lcc.lcc_root.last->ic_class=sys_internal_types[RT_PTR];
-    LCCAdd(lx,IC_SET_RAX,0,sys_internal_types[RT_PTR]);
-    LCCAdd(lx,IC_NOP2,1,sys_internal_types[RT_PTR]); //balance the books
+      LCCAdd(lx,IC_DEREF,0,cmp.internal_types[RT_PTR]);
+    lx->lcc.lcc_root.last->ic_class=cmp.internal_types[RT_PTR];
+    LCCAdd(lx,IC_SET_RAX,0,cmp.internal_types[RT_PTR]);
+    LCCAdd(lx,IC_NOP2,1,cmp.internal_types[RT_PTR]); //balance the books
   }
   LCCPush(lx);
   tempcbh=lx->lcc.lcc_next;
@@ -485,7 +485,7 @@ I64 PrsFunCall(CLex *lx,CPrsStk *ps,Bool indirect,CHashFun *tempf)
       if (tempm->flags & (MLF_STR_DFT_AVAILABLE|MLF_LASTCLASS) &&
 	  lx->flags&LF_AOT_COMPILE) {
 	mc=LCCMiscNew(lx,CMT_STR_CONST);
-	LCCAdd(lx,IC_STR_CONST,mc,sys_internal_types[RT_U8]+1);
+	LCCAdd(lx,IC_STR_CONST,mc,cmp.internal_types[RT_U8]+1);
 	mc->st_len=StrLen(dft_val)+1;
 	mc->str=StrNew(dft_val);
 	lx->flags|=LF_HAS_MISC_DATA;
@@ -592,9 +592,8 @@ I64 PrsFunCall(CLex *lx,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 	  LCCAdd(lx,IC_CALL_EXTERN,tempf,tempf->return_class);
       } else
 	LCCAdd(lx,IC_CALL_INDIRECT2,&tempf->executable_addr,tempf->return_class);
-    } else {
+    } else
       LCCAdd(lx,IC_CALL,tempf->executable_addr,tempf->return_class);
-    }
     if ((Bt(&tempf->flags,Ff_RET1) || Bt(&tempf->flags,Ff_ARGPOP)) && !Bt(&tempf->flags,Ff_NOARGPOP)) {
       if (indirect) {
 	LCCAdd(lx,IC_ADD_RSP1,(argc_cnt+tempf->arg_cnt)<<3,tempf->return_class);
@@ -661,18 +660,18 @@ I64 PrsUnaryTerm(CLex *lx,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tempa
 		  }
 		  lx->abs_cnts.externs++;
 		  LCCAdd(lx,IC_IMM_U64,
-			&tempf->executable_addr,sys_internal_types[RT_PTR]);
+			&tempf->executable_addr,cmp.internal_types[RT_PTR]);
 		  LCCAdd(lx,IC_DEREF,0,
-			sys_internal_types[RT_PTR]);
+			cmp.internal_types[RT_PTR]);
 		} else {
 		  if (lx->flags&LF_AOT_COMPILE) {
 		    LCCAdd(lx,IC_ABS_ADDR,
-			  tempf->executable_addr,sys_internal_types[RT_PTR]);
+			  tempf->executable_addr,cmp.internal_types[RT_PTR]);
 		    if (lx->flags&LF_ASM_EXPRESSIONS)
 		      lx->abs_cnts.abs_addres++;
 		  } else
 		    LCCAdd(lx,IC_IMM_U64,
-			  tempf->executable_addr,sys_internal_types[RT_PTR]);
+			  tempf->executable_addr,cmp.internal_types[RT_PTR]);
 		}
 		lx->abs_cnts.c_addres++;
 		Lex(lx);
@@ -684,7 +683,7 @@ I64 PrsUnaryTerm(CLex *lx,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tempa
 		    tempex->type&HTF_IMM) {
 		lx->abs_cnts.c_addres++;
 		LCCAdd(lx,IC_IMM_U64,
-		      tempex->val,sys_internal_types[RT_PTR]);
+		      tempex->val,cmp.internal_types[RT_PTR]);
 		Lex(lx);
 		return PE_MAYBE_MODIFIERS;
 	      } else
@@ -705,24 +704,24 @@ I64 PrsUnaryTerm(CLex *lx,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tempa
       case TK_CHAR_CONST:
       case TK_INS_BINARY_SIZE:
 	if (lx->cur_i64<0)
-	  LCCAdd(lx,IC_IMM_U64,lx->cur_i64,sys_internal_types[RT_U64]);
+	  LCCAdd(lx,IC_IMM_U64,lx->cur_i64,cmp.internal_types[RT_U64]);
 	else
-	  LCCAdd(lx,IC_IMM_U64,lx->cur_i64,sys_internal_types[RT_I64]);
+	  LCCAdd(lx,IC_IMM_U64,lx->cur_i64,cmp.internal_types[RT_I64]);
 	Lex(lx);
 	break;
       case TK_F64:
-	LCCAdd(lx,IC_IMM_F64,lx->cur_f64(I64),sys_internal_types[RT_F64]);
+	LCCAdd(lx,IC_IMM_F64,lx->cur_f64(I64),cmp.internal_types[RT_F64]);
 	Lex(lx);
 	break;
       case TK_STR:
 	mc=LCCMiscNew(lx,CMT_STR_CONST);
-	LCCAdd(lx,IC_STR_CONST,mc,sys_internal_types[RT_U8]+1);
+	LCCAdd(lx,IC_STR_CONST,mc,cmp.internal_types[RT_U8]+1);
 	mc->str=LexExtStr(lx,&mc->st_len);
 	lx->flags|=LF_HAS_MISC_DATA;
 	break;
       case TK_INS_BINARY:
 	mc=LCCMiscNew(lx,CMT_STR_CONST);
-	LCCAdd(lx,IC_STR_CONST,mc,sys_internal_types[RT_U8]+1);
+	LCCAdd(lx,IC_STR_CONST,mc,cmp.internal_types[RT_U8]+1);
 	mc->str=lx->cur_str;
 	mc->st_len=lx->cur_str_len;
 	lx->cur_str=NULL;
@@ -733,14 +732,14 @@ I64 PrsUnaryTerm(CLex *lx,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tempa
 	if (lx->flags & LF_ASM_EXPRESSIONS) {
 	  lx->abs_cnts.abs_addres++;
 	  if (lx->flags&LF_AOT_COMPILE)
-	    LCCAdd(lx,IC_ABS_ADDR,lx->a->ip,sys_internal_types[RT_PTR]);
+	    LCCAdd(lx,IC_ABS_ADDR,lx->a->ip,cmp.internal_types[RT_PTR]);
 	  else
-	    LCCAdd(lx,IC_IMM_U64,lx->a->ip,sys_internal_types[RT_PTR]);
+	    LCCAdd(lx,IC_IMM_U64,lx->a->ip,cmp.internal_types[RT_PTR]);
 	} else {
 	  if (lx->flags&LF_CLASS_IP)
-	    LCCAdd(lx,IC_IMM_U64,lx->class_ip,sys_internal_types[RT_I64]);
+	    LCCAdd(lx,IC_IMM_U64,lx->class_ip,cmp.internal_types[RT_I64]);
 	  else
-	    LCCAdd(lx,IC_RIP,0,sys_internal_types[RT_PTR]);
+	    LCCAdd(lx,IC_RIP,0,cmp.internal_types[RT_PTR]);
 	}
 	Lex(lx);
 	break;
@@ -810,7 +809,7 @@ I64 PrsUnaryTerm(CLex *lx,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tempa
 	    ps->ptr--;
 	    if (i.u16[0]!=IC_ADDR)
 	      LexExcept(lx,"expecting '&' at ");
-	    LCCAdd(lx,IC_IMM_U64,tempm->offset,sys_internal_types[RT_PTR]);
+	    LCCAdd(lx,IC_IMM_U64,tempm->offset,cmp.internal_types[RT_PTR]);
 	    *_local_var=tempm;
 	    Lex(lx);
 	    return PE_MAYBE_MODIFIERS;
@@ -867,15 +866,15 @@ pu_export_sys_sym:
 	      lx->flags|=LF_UNRESOLVED|LF_LOCAL;
 	    else
 	      lx->flags|=LF_UNRESOLVED;
-	    LCCAdd(lx,IC_IMM_U64,&tempex->val,sys_internal_types[RT_PTR],ICF_NO_RIP);
-	    LCCAdd(lx,IC_DEREF,0,sys_internal_types[RT_PTR]);
+	    LCCAdd(lx,IC_IMM_U64,&tempex->val,cmp.internal_types[RT_PTR],ICF_NO_RIP);
+	    LCCAdd(lx,IC_DEREF,0,cmp.internal_types[RT_PTR]);
 	  } else {
 	    if (lx->flags&LF_AOT_COMPILE && !(tempex->type & HTF_IMM))
-	      LCCAdd(lx,IC_ABS_ADDR,tempex->val,sys_internal_types[RT_PTR]);
+	      LCCAdd(lx,IC_ABS_ADDR,tempex->val,cmp.internal_types[RT_PTR]);
 	    else {
 	      if (tempex->type&HTF_IMM)
 		lx->abs_cnts.c_addres++;
-	      LCCAdd(lx,IC_IMM_U64,tempex->val,sys_internal_types[RT_PTR]);
+	      LCCAdd(lx,IC_IMM_U64,tempex->val,cmp.internal_types[RT_PTR]);
 	    }
 	  }
 	  Lex(lx);
@@ -962,9 +961,9 @@ pu_export_sys_sym:
 		j++;
 	      if (lx->token==TK_IDENT &&
 		    (lx->hash_entry || lx->local_var_entry))
-		LCCAdd(lx,IC_IMM_U64,TRUE,sys_internal_types[RT_I64]);
+		LCCAdd(lx,IC_IMM_U64,TRUE,cmp.internal_types[RT_I64]);
 	      else
-		LCCAdd(lx,IC_IMM_U64,FALSE,sys_internal_types[RT_I64]);
+		LCCAdd(lx,IC_IMM_U64,FALSE,cmp.internal_types[RT_I64]);
 	      Lex(lx);
 	      while (j--) {
 		if (lx->token!=')')
@@ -1134,7 +1133,7 @@ um_join:
 }
 
 U8 *LexExpression2Bin(CLex *lx,I64 *_type=NULL)
-{
+{//Compile lx expression. You call code.
   U8 *result;
   I64 size;
   Bool old_trace=Btr(&lx->flags,Lf_OPT_TRACE_PRESENT);
@@ -1152,12 +1151,40 @@ U8 *LexExpression2Bin(CLex *lx,I64 *_type=NULL)
 }
 
 Bool IsLexExpression2Bin(CLex *lx,U8 **_ex)
-{
+{//Compile lx expression to bin. Return err status.
   return ToBool(*_ex=LexExpression2Bin(lx));
 }
 
+I64 LexExpressionI64(CLex *lx)
+{//Compile lx expression, forcing to I64 and eval.
+  U8 *ex;
+  I64 result,type;
+  if (ex=LexExpression2Bin(lx,&type)) {
+    result=Call(ex);
+    Free(ex);
+    if (type==RT_F64)
+      result=ToI64(result(F64));
+  } else
+    result=0;
+  return result;
+}
+
+F64 LexExpressionF64(CLex *lx)
+{//Compile lx expression, forcing to F64 and eval.
+  U8 *ex;
+  I64 result,type;
+  if (ex=LexExpression2Bin(lx,&type)) {
+    result=Call(ex);
+    Free(ex);
+    if (type!=RT_F64)
+      result(F64)=ToF64(result);
+  } else
+    result=0;
+  return result(F64);
+}
+
 I64 LexExpression(CLex *lx)
-{
+{//Compile lx expression and eval.  Might be I64 or F64.
   U8 *ex;
   I64 result;
   if (ex=LexExpression2Bin(lx)) {
@@ -1166,4 +1193,40 @@ I64 LexExpression(CLex *lx)
   } else
     result=0;
   return result;
+}
+
+CD2I32 *LexD2I32(CLex *lx,CD2I32 *p)
+{//Not HolyC. Sprite-like lex 2D point.
+  if (lx->token!='(')
+    LexExcept(lx,"expecting '(' at ");
+  Lex(lx); //Skip (
+  p->x=LexExpressionI64(lx);
+  if (lx->token!=',')
+    LexExcept(lx,"expecting ',' at ");
+  Lex(lx); //Skip ,
+  p->y=LexExpressionI64(lx);
+  if (lx->token!=')')
+    LexExcept(lx,"expecting ')' at ");
+  Lex(lx); //Skip )
+  return p;
+}
+
+CD3I32 *LexD3I32(CLex *lx,CD3I32 *p)
+{//Not HolyC. Sprite-like lex 3D point.
+  if (lx->token!='(')
+    LexExcept(lx,"expecting '(' at ");
+  Lex(lx); //Skip (
+  p->x=LexExpressionI64(lx);
+  if (lx->token!=',')
+    LexExcept(lx,"expecting ',' at ");
+  Lex(lx); //Skip ,
+  p->y=LexExpressionI64(lx);
+  if (lx->token!=',')
+    LexExcept(lx,"expecting ',' at ");
+  Lex(lx); //Skip ,
+  p->z=LexExpressionI64(lx);
+  if (lx->token!=')')
+    LexExcept(lx,"expecting ')' at ");
+  Lex(lx); //Skip )
+  return p;
 }

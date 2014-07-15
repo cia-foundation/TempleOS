@@ -1,4 +1,4 @@
-$WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
+         $WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
 
 * Oracle in program, $FG,2$AfterEgypt$FG$, for $LK,"tongues",A="FI:::/Adam/God/HSNotes.TXT"$.
 
@@ -16,17 +16,17 @@ $WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
 
 * Keyboard & Mouse support.
 
-* Hard drives, support for $FG,2$FAT32$FG$ and $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file systems with file compression.
+* ATA PIO Hard drives, support for $FG,2$FAT32$FG$ and $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file systems with file compression.
 
-* $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
+* ATAPI PIO $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
 
 * $LK,"Partitioning",A="MN:PrtDsk"$ tool, installer, $FG,2$boot loaders$FG$ for CD-ROM and hard disk.
 
-* $FG,2$Editor/Browser$FG$ for a new $LK,"Document Format",A="FI:::/Doc/Dollar.TXT"$.  Source files and the command line window can have graphics, links, icons, trees, colors, super/sub scripts, margins.  Everything is seamless through-out the tool chain.  No need for separate resource files.
+* $FG,2$Editor/Browser$FG$ for a new $LK,"Document Format",A="FI:::/Doc/DolDocOverview.TXT"$.  Source files and the command line window can have graphics, links, icons, trees, colors, super/sub scripts, margins.  Everything is seamless through-out the tool chain.  No need for separate resource files.
 
-* 8-bit $FG,2$ASCII$FG$, not just 7-bit.  Supported in entire tool chain.  $FG,2$<CTRL-ALT-A>$FG$
+* 8-bit $FG,2$ASCII$FG$, not just 7-bit.  Supported in entire tool chain.  $FG,2$<CTRL-ALT-a>$FG$
 
-* $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic resource editor$FG$. $FG,2$<CTRL-R>$FG$
+* $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic resource editor$FG$. $FG,2$<CTRL-r>$FG$
 
 * $FG,2$64-bit pointers$FG$.  All memory, even more than 4 Gig, can be directly accessed by all tasks on all cores at all times.
 
@@ -38,11 +38,11 @@ $WW,1$$FG,5$$TX+CX,"TempleOS' Features"$$FG$
 
 * Auto-completion, jump-to-source tool called $FG,2$WordStat$FG$ with Dictionary.
 
-* Window Manager.  Pan screen with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom screen on mouse cursor with $FG,2$<CTRL-ALT-Z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
+* Window Manager.  Pan screen with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom screen on mouse cursor with $FG,2$<CTRL-ALT-z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
 
-* File Manager, $FG,2$<CTRL-D>$FG$.
+* File Manager, $FG,2$<CTRL-d>$FG$.
 
-* Code $LK,"profiler",A="MN:ProfAll"$, $LK,"merge",A="MN:Merge"$, $LK,"diff",A="MN:Diff"$ utils.
+* Code $LK,"profiler",A="MN:Prof"$, $LK,"merge",A="MN:Merge"$, $LK,"diff",A="MN:Diff"$ utils.
 
 * $FG,2$PC Speaker$FG$ support with many hymns.
 

@@ -46,7 +46,7 @@ U0 TanksMove()
     CheckUser;
     tempu=&units[cur_player][i];
     if (tempu->life>0) {
-      //This cheats because it violates Line-of-Sight
+      //Cheats because it violates Line-of-Sight
       if (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,FALSE)) {
 	RowCol2XY(&x,&y,target->row,target->col);
 	if (!MoveUnit(tempu,x,y)) {

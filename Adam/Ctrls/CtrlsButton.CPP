@@ -1,4 +1,4 @@
-#define BUTTON_BORDER	2
+#define BUTTBORDER	2
 
 #define BTF_DONT_FREE	1
 
@@ -21,8 +21,8 @@ U0 DrawCtrlButton(CDC *dc,CCtrl *c)
     st=s->state_texts;
   dc->color=s->state_colors[s->state];
   l=StrLen(st);
-  GrRect(dc,c->left+BUTTON_BORDER,c->top+BUTTON_BORDER,
-	    c->right-c->left+1-BUTTON_BORDER*2,c->bottom-c->top+1-BUTTON_BORDER*2);
+  GrRect(dc,c->left+BUTTBORDER,c->top+BUTTBORDER,
+	    c->right-c->left+1-BUTTBORDER*2,c->bottom-c->top+1-BUTTBORDER*2);
   dc->color=s->state_colors[s->state]^(WHITE<<16+WHITE);
   GrPrint(dc,(c->left+c->right+1-l*FONT_WIDTH)>>1,
     (c->top+c->bottom+1-FONT_HEIGHT)>>1,"%s",st);
@@ -40,7 +40,7 @@ U0 LeftClickCtrlButton(CCtrl *c,I64,I64,Bool down)
 
 public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
 	  I64 num_states=1,U8 *state_texts,I32 state_colors[],CCtrlButtonState *_s=NULL)
-{
+{//Create button ctrl. See $LK,"::/Apps/Strut/Strut.CPP.Z"$.
   Bool old_preempt;
   CCtrl *result;
   CCtrlButtonState *s;
@@ -53,9 +53,9 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
 	j=StrLen(st);
 	if (j>l) l=j;
       }
-    width=BUTTON_BORDER*4+l*FONT_WIDTH;
+    width=BUTTBORDER*4+l*FONT_WIDTH;
   }
-  if (height<0) height=BUTTON_BORDER*4+FONT_HEIGHT;
+  if (height<0) height=BUTTBORDER*4+FONT_HEIGHT;
   result=CAlloc(sizeof(CCtrl));
   if (_s) {
     s=_s;
@@ -84,7 +84,7 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
 }
 
 public U0 CtrlButtonDel(CCtrl *c)
-{
+{//Free button ctrl.
   Bool old_preempt=Preempt(OFF);
   QueRem(c);
   Preempt(old_preempt);

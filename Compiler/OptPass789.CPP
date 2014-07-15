@@ -1,9 +1,9 @@
 I64 OptPass789(CLex *lx,COptReg *reg_offsets,U8 *buf,CDbgInfo **_dbg)
-{
-/*
-lx->pass==7 is first time
-lx->pass==8 is repeated until size stops shrinking
-lx->pass==9 is final
+{/*	lx->pass==7 is first time
+	lx->pass==8 is second time
+	lx->pass==8 is third time and repeated until size stops shrinking
+	size is now known
+	lx->pass==9 is final pass, code is placed into buf.
 */
   CIntermediateCode *tempi,*tempi_next;
   I64 code,i,cnt,num_lines=lx->max_line+1-lx->min_line,ip=0,ip2;
@@ -14,8 +14,8 @@ lx->pass==9 is final
   CExeImportExport *tempe;
   CExeHeapGlbl *temphg;
   CExeHeapGlblRef *temphgr;
-  CDbgInfo *dbg;
-  CAsmCtrl *a=lx->a;
+  CDbgInfo *dbg_info;
+  CAOTCtrl *a=lx->a;
   Bool short_jmp;
   CICArg saved_p123[3];
   CHashClass *tempc;
@@ -24,15 +24,15 @@ lx->pass==9 is final
   CExternUsage *tempeu;
 
   if (_dbg) {
-    *_dbg=dbg=CAlloc(offset(CDbgInfo.body)+sizeof(U32)*(num_lines+1));
-    dbg->min_line=lx->min_line;
-    dbg->max_line=lx->max_line;
+    *_dbg=dbg_info=CAlloc(offset(CDbgInfo.body)+sizeof(U32)*(num_lines+1));
+    dbg_info->min_line=lx->min_line;
+    dbg_info->max_line=lx->max_line;
     if (lx->flags&LF_AOT_COMPILE)
-      dbg->body[0]=a->ip;
+      dbg_info->body[0]=a->ip;
     else
-      dbg->body[0]=buf;
+      dbg_info->body[0]=buf;
   } else
-    dbg=NULL;
+    dbg_info=NULL;
 
   if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT) && Bt(&lx->pass_trace_mask,lx->pass))
     "$$BK,1$$$$LTRED$$$$IV,1$$This code gets merged together and patched.\n$$FG$$$$IV,0$$$$BK,0$$";
@@ -58,7 +58,7 @@ lx->pass==9 is final
 	if (lx->pass==7)
 	  lx->dont_push_float=Btr(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0);
 	MemCpy(saved_p123,&tempi->a1,3*sizeof(CICArg));
-	if (cmp_arg_cnt[code]==2 && tempi->a1.type&TY_MASK==TY_REG &&
+	if (cmp.arg_cnt[code]==2 && tempi->a1.type&TY_MASK==TY_REG &&
 	      tempi->a1.reg==REG_RAX)
 	  tempi->ic_flags|=ICF_A1_FIRST;
 	tempi->ic_cnt=0;
@@ -156,7 +156,7 @@ lx->pass==9 is final
 		ICU64(tempi,0);
 		temphg=tempi->ic_data;
 		if (buf && lx->flags&LF_AOT_COMPILE &&
-		      !(lx->flags&(LF_NO_ABSS|LF_ASM_EXPRESSIONS))) { //is this necessary--flags?
+		      !(lx->flags&(LF_NO_ABSS|LF_ASM_EXPRESSIONS))) {//is this necessary--flags?
 		  temphgr=CAlloc(sizeof(CExeHeapGlblRef));
 		  temphgr->next=temphg->references;
 		  temphg->references=temphgr;
@@ -910,7 +910,7 @@ lx->pass==9 is final
 	  case IC_SWAP_U8:
 	  case IC_SWAP_U16:
 	  case IC_SWAP_U32:
-	  case IC_SWAP_U64:
+	  case IC_SWAP_I64:
 	    ICSwap(tempi,ip2);
 	    break;
 	  case IC_QUE_INIT:
@@ -1117,10 +1117,10 @@ lx->pass==9 is final
 	MemCpy(buf+ip,tempi->ic_body,cnt);
 
 skip_copy:
-      if (dbg && lx->min_line<=tempi->ic_line<=lx->max_line) {
+      if (dbg_info && lx->min_line<=tempi->ic_line<=lx->max_line) {
 	i=tempi->ic_line-lx->min_line;
-	if (!dbg->body[i])
-	  dbg->body[i]=ip2;
+	if (!dbg_info->body[i])
+	  dbg_info->body[i]=ip2;
       }
 
       if (tempi->ic_flags&ICF_TRACE && Bt(&lx->pass_trace_mask,lx->pass) && cnt) {
@@ -1191,11 +1191,11 @@ op789_next:
     }
     lb=lb->next;
   }
-  if (dbg) {
+  if (dbg_info) {
     if (lx->flags&LF_AOT_COMPILE)
-      dbg->body[num_lines]=ip+a->ip;
+      dbg_info->body[num_lines]=ip+a->ip;
     else
-      dbg->body[num_lines]=ip+buf;
+      dbg_info->body[num_lines]=ip+buf;
   }
 
   return ip;

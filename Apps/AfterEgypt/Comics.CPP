@@ -21,6 +21,6 @@ U0 ViewComics()
       break;
   }
   DocDel(doc);
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
 

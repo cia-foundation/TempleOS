@@ -1,8 +1,8 @@
 asm {
 USE64
-// ************************************
-// Throws 'OutMem'
+//************************************
 _MALLOC::
+// Throws 'OutMem'
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RSI
@@ -130,7 +130,6 @@ _MALLOC::
 
 @@70:	ADD	RSI,U64 CMemUnusedAllocated.size[RSI]
 
-
 MALLOC_ALMOST_DONE:
 //RSI=result-CMemUsedAllocated.size
 //RAX=size+CMemUsedAllocated.size
@@ -206,7 +205,7 @@ MALLOC_FINAL_EXIT:
 	POP	RSI
 	POP	RBP
 	RET1	16
-// ************************************
+//************************************
 _FREE::
 //Be aware of $LK,"heap_hash",A="FF:::/Kernel/Mem1b.CPP,heap_hash"$ in $LK,"MemBlksAlloc",A="MN:MemBlksAlloc"$().
 	PUSH	RBP
@@ -319,7 +318,7 @@ FREE_DONE:
 	POP	RSI
 	POP	RBP
 	RET1	8
-// ************************************
+//************************************
 _MSIZE::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -335,7 +334,7 @@ _MSIZE::
 @@05:	SUB	RAX,CMemUsedAllocated.start
 @@10:	POP	RBP
 	RET1	8
-// ************************************
+//************************************
 _MSIZE2::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -350,7 +349,7 @@ _MSIZE2::
 @@05:	MOV	RAX,U64 CMemUsedAllocated.size-CMemUsedAllocated.start[RBX]
 @@10:	POP	RBP
 	RET1	8
-// ************************************
+//************************************
 _MHEAP_CTRL::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -367,16 +366,15 @@ _MHEAP_CTRL::
 	RET1	8
 }
 
-_extern _FREE U0 Free(U8 *addr);
-_extern _MSIZE I64 MSize(U8 *src); //size of heap object
-_extern _MSIZE2 I64 MSize2(U8 *src); //Internal size
-_extern _MHEAP_CTRL CHeapCtrl *MHeapCtrl(U8 *src); //$LK,"CHeapCtrl",A="MN:CHeapCtrl"$ of object
-
-//Accepts a $LK,"CTask",A="MN:CTask"$ or $LK,"CHeapCtrl",A="MN:CHeapCtrl"$.  NULL allocs off current task's heap.
-_extern _MALLOC U8 *MAlloc(I64 size,CTask *mem_task=NULL);
+_extern _FREE U0 Free(U8 *addr); //Free $LK,"MAlloc",A="MN:MAlloc"$()ed memory chunk.
+_extern _MSIZE I64 MSize(U8 *src); //Size of heap object.
+_extern _MSIZE2 I64 MSize2(U8 *src); //Internal size of heap object.
+_extern _MHEAP_CTRL CHeapCtrl *MHeapCtrl(U8 *src); //$LK,"CHeapCtrl",A="MN:CHeapCtrl"$ of object.
+_extern _MALLOC U8 *MAlloc(I64 size,CTask *mem_task=NULL); //Allocate memory chunk.
+//Accepts a $LK,"CTask",A="MN:CTask"$ or $LK,"CHeapCtrl",A="MN:CHeapCtrl"$. NULL allocs off current task's heap.
 
 U8 *AMAlloc(I64 size)
-{
+{//Allocate memory in Adam's heap.
   return MAlloc(size,adam_task);
 }
 
@@ -388,7 +386,7 @@ U8 *CAlloc(I64 size,CTask *mem_task=NULL)
 }
 
 U8 *ACAlloc(I64 size)
-{
+{//Allocate and set to zero memory in Adam's heap.
   return CAlloc(size,adam_task);
 }
 
@@ -404,12 +402,12 @@ U8 *MAllocIdentical(U8 *src,CTask *mem_task=NULL)
 }
 
 U8 *AMAllocIdentical(U8 *src)
-{
+{//Allocate in Adam's heap, identical copy of heap node.
   return MAllocIdentical(src,adam_task);
 }
 
 U8 *MAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0)
-{ //only powers of two alignment. This is awful.
+{//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
      *result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
@@ -419,7 +417,7 @@ U8 *MAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0
 }
 
 U8 *CAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0)
-{ //only powers of two alignment. This is awful.
+{//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
      *result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
@@ -445,6 +443,6 @@ U8 *StrNew(U8 *buf,CTask *mem_task=NULL)
 }
 
 U8 *AStrNew(U8 *buf)
-{
+{//Allocate copy of string in Adam's heap.
   return StrNew(buf,adam_task);
 }

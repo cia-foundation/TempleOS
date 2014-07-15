@@ -1,49 +1,56 @@
-#help_index "Graphics/Device Contexts;Graphics/Screen"
-public CDC *gr_screen_image,	//This is read only.
-	   *gr_dc=NULL;		//Persistent
-CDC	*gr_dc1=NULL,
-	*gr_dc2=NULL, //Updated every refresh
-	*gr_dc_cache,
-	*gr_zoomed_dc;
+#help_index "Graphics"
 
-#help_index "Graphics/Screen"
-U16 *gr_win_uncovered_bitmap=NULL,gr_highest_uncovered;
-U16 *gr_vga_text_cache;
-public I64 gr_pan_text_x=0,gr_pan_text_y=0; // [-7,7]
-public U0 (*fp_final_screen_update)(CDC *dc)=NULL;
-public U0 (*fp_wall_paper)(CTask *task)=NULL;
+public class CGrGlbls
+{
+  I64	*to_8_bits,*to_8_colors;
+  CDC	*screen_image,	//Read only.
+	*dc,		//Persistent
+	*dc1,
+	*dc2,		//Updated every refresh
+	*dc_cache,
+	*zoomed_dc;
+  U32	*text_base;	//See $LK,"TextBase Layer",A="HI:TextBase Layer"$.
+  U16	*win_z_buf;
+
+#define SPHT_ELEM_CODE	1
+  CHashTable *sprite_hash;
+
+  U16	*win_uncovered_bitmap;
+  I64	highest_uncovered;
+  U16	*vga_text_cache;
+  I64	pan_text_x,pan_text_y;	//[-7,7]
+  U0	(*fp_final_screen_update)(CDC *dc);
+  U0	(*fp_wall_paper)(CTask *task);
+  U0	(*fp_draw_input_ptr)(CDC *dc,I64 x,I64 y);
+  U0	(*fp_draw_grab_input_ptr)(CDC *dc,I64 x,I64 y,Bool closed);
+  U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/WallPaper.CPP,empty_sprite"$
 
 #define GR_NUM_PEN_BRUSHES 64
-CDC	*gr_pen_brushes[GR_NUM_PEN_BRUSHES],
-	*gr_collision_pen_brushes[GR_NUM_PEN_BRUSHES],
-	*gr_even_pen_brushes[GR_NUM_PEN_BRUSHES],
-	*gr_odd_pen_brushes[GR_NUM_PEN_BRUSHES];
-
-
-#define GR_MAX_SCREEN_ZOOM	8
-U8 *gr_screen_zoom_tables[GR_MAX_SCREEN_ZOOM+1];
-I64 gr_screen_zoom=1,grsx=0,grsy=0;
-
-//When zoomed, this keeps the mouse centered.
-public Bool gr_continuous_scroll=FALSE;
+  CDC	*pen_brushes[GR_NUM_PEN_BRUSHES],
+	*collision_pen_brushes[GR_NUM_PEN_BRUSHES],
+	*even_pen_brushes[GR_NUM_PEN_BRUSHES],
+	*odd_pen_brushes[GR_NUM_PEN_BRUSHES];
 
 #define GR_REFRESH_LOG_CNT	16
-F64 gr_refresh_time_stamps[GR_REFRESH_LOG_CNT];
-I64 gr_refresh_ts_ptr=0;
+  F64	refresh_time_stamps[GR_REFRESH_LOG_CNT];
+  I64	refresh_ts_ptr;
 
+#define GR_MAX_SCREEN_ZOOM	8
+  U8	*screen_zoom_tables[GR_MAX_SCREEN_ZOOM+1];
+  I64	screen_zoom,sx,sy;
+
+  //When zoomed, this keeps the mouse centered.
+  Bool	continuous_scroll;
+} gr;
 
 //See $LK,"SYS_BIOS_GR_MODE",A="FF:D:/Kernel/KStart.CPP,SYS_BIOS_GR_MODE:2"$
 //See $LK,"SysGrInit",A="MN:SysGrInit"$()
-//This allows consts to be used
-//instead of vars.
-DefinePrint("GR_WIDTH","%d",gr_width);
-HashPublic("GR_WIDTH",HTT_DEFINE_STR);
-DefinePrint("GR_HEIGHT","%d",gr_height);
-HashPublic("GR_HEIGHT",HTT_DEFINE_STR);
-;
+//Allows consts to be used instead of vars.
+HashPublic("GR_WIDTH",HTT_DEFINE_STR);;
+HashPublic("GR_HEIGHT",HTT_DEFINE_STR);;
+
 #help_index "Char"
-DefinePrint("TEXT_ROWS","%d",text_rows);
-HashPublic("TEXT_ROWS",HTT_DEFINE_STR);
-DefinePrint("TEXT_COLS","%d",text_cols);
-HashPublic("TEXT_COLS",HTT_DEFINE_STR);
-;
+DefinePrint("TEXT_ROWS","%d",text.rows);;;
+HashPublic("TEXT_ROWS",HTT_DEFINE_STR);;;
+DefinePrint("TEXT_COLS","%d",text.cols);;;
+HashPublic("TEXT_COLS",HTT_DEFINE_STR);;;

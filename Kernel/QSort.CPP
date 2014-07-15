@@ -1,9 +1,9 @@
 U0 QSortI64(I64 *base,I64 num, I64 (*fp_compare)(I64 e1,I64 e2))
-{/*
-For assending strings: Compare can return StrCmp(e1,e2);
+{/*Quick Sort for width==8.
+fp_compare() passes by value instead of ref.
 
-For assending ints   : Compare can return e1-e2;
-Don't use e1-e2 if numbers can overflow, return -1,0 or 1 with if's.
+For assending strings: return StrCmp(e1,e2);
+For assending ints   : return e1-e2;
 
 Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 */
@@ -18,20 +18,18 @@ Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 	  less++;
 	else {
 	  greater--;
-	  SwapU64(less,greater);
+	  SwapI64(less,greater);
 	}
       }
       i=less-base;
-      if (i==num) { //All less or equal to pivot
-
+      if (i==num) {//All less or equal to pivot
       //Point greater to first less
 	do greater--;
 	while (--i && !(*fp_compare)(*greater,pivot));
-
 	if (i) {
 	  less=base+num/2; //Pivot was not moved, point to it
 	  if (less<greater)
-	    SwapU64(less,greater);
+	    SwapI64(less,greater);
 	  num=i;
 	} else //All equal
 	  break;
@@ -47,9 +45,9 @@ Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
   }
 }
 
-
 U0 QSort2a(U8 **_base,I64 num,I64 (*fp_compare)(U8 **_e1,U8 **_e2))
-{//Not public, for case of width=size(U8 *)
+{//Not public.	For case of width==size(U8 *)==8.
+//fp_compare() passes by ref.
   I64 i;
   U8 **_less,**_greater,*pivot;
   do {
@@ -61,20 +59,18 @@ U0 QSort2a(U8 **_base,I64 num,I64 (*fp_compare)(U8 **_e1,U8 **_e2))
 	_less++;
       else {
 	_greater--;
-	SwapU64(_less,_greater);
+	SwapI64(_less,_greater);
       }
     }
     i=_less-_base;
-    if (i==num) { //All less or equal to pivot
-
+    if (i==num) {//All less or equal to pivot
     //Point greater to first less
       do _greater--;
       while (--i && !(*fp_compare)(_greater,&pivot));
-
       if (i) {
 	_less=_base+num/2; //Pivot was not moved, point to it
 	if (_less<_greater)
-	  SwapU64(_less,_greater);
+	  SwapI64(_less,_greater);
 	num=i;
       } else //All equal
 	break;
@@ -90,7 +86,6 @@ U0 QSort2a(U8 **_base,I64 num,I64 (*fp_compare)(U8 **_e1,U8 **_e2))
     }
   } while (num>1);
 }
-
 
 U0 QSort2b(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2),U8 *temp)
 {//Not public
@@ -112,12 +107,10 @@ U0 QSort2b(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2),U8 *tem
       }
     }
     i=(less-base)/width;
-    if (i==num) { //All less or equal to pivot
-
+    if (i==num) {//All less or equal to pivot
     //Point greater to first less
       do greater-=width;
       while (--i && !(*fp_compare)(greater,pivot));
-
       if (i) {
 	less=base+num/2*width; //Pivot was not moved, point to it
 	if (less<greater) {
@@ -141,13 +134,12 @@ U0 QSort2b(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2),U8 *tem
   } while (num>1);
 }
 
-
 U0 QSort(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2))
-{/*
-For assending strings: Compare can return StrCmp(*e1,*e2);
+{/*Quick Sort: fp_compare() passes by ref.
 
-For assending ints   : Compare can return *e1-*e2;
-Don't use e1-e2 if numbers can overflow, return -1,0 or 1 with if's.
+For assending strings: return StrCmp(*e1,*e2);
+For assending ints   : return *e1-*e2;
+  Don't return e1-e2 if numbers can overflow, return -1,0 or 1.
 
 Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 */
@@ -164,20 +156,18 @@ Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 	    less+=sizeof(U8 *);
 	  else {
 	    greater-=sizeof(U8 *);
-	    SwapU64(less,greater);
+	    SwapI64(less,greater);
 	  }
 	}
 	i=(less-base)/sizeof(U8 *);
-	if (i==num) { //All less or equal to pivot
-
+	if (i==num) {//All less or equal to pivot
 	  //Point greater to first less
 	  do greater-=sizeof(U8 *);
 	  while (--i && !(*fp_compare)(greater,&pivot));
-
 	  if (i) {
 	    less=base+num/2*sizeof(U8 *); //Pivot was not moved, point to it
 	    if (less<greater)
-	      SwapU64(less,greater);
+	      SwapI64(less,greater);
 	    num=i;
 	  } else //All equal
 	    break;
@@ -210,12 +200,10 @@ Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 	  }
 	}
 	i=(less-base)/width;
-	if (i==num) { //All less or equal to pivot
-
+	if (i==num) {//All less or equal to pivot
 	  //Point greater to first less
 	  do greater-=width;
 	  while (--i && !(*fp_compare)(greater,pivot));
-
 	  if (i) {
 	    less=base+num/2*width; //Pivot was not moved, point to it
 	    if (less<greater) {
@@ -241,5 +229,3 @@ Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
     }
   }
 }
-
-

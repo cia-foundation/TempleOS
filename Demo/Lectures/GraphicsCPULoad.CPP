@@ -8,7 +8,7 @@ F64 VGAPattern(I64 p)
   for (plane=1;plane<0x10;plane<<=1) {
     OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
     OutU8(VGA_SC_DATA,plane);
-    MemSetU64(0xA0000,p,640*480/64);
+    MemSetI64(0xA0000,p,640*480/64);
   }
   return tS-start;
 }
@@ -29,7 +29,7 @@ U0 GrDemo()
     "  $$GREEN$$Load@60Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*60.0;
   }
   Preempt(old_preempt);
-//<CTRL-ALT-F> will flush screen VGA cache.
+//<CTRL-ALT-f> will flush screen VGA cache.
   VGAFlush;
 }
 

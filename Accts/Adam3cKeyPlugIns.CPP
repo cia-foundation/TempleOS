@@ -9,10 +9,11 @@ U0 FillInTime()
 }
 
 Bool MyPutKey(I64 ch,I64 sc)
-{  //ch=ASCII; sc=scancode
+{//ch=ASCII; sc=scan_code
 
 //See $LK,"Char",A="HI:Char"$ for definition of scan codes.
-//See $LK,"Keyboard Handling",A="FI:::/Doc/KeyBoard.TXT"$
+//See $LK,"Key Allocations",A="FI:::/Doc/KeyAlloc.TXT"$.
+//See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
 
 //You can customize keys.  This routine
 //is called before the main editor
@@ -23,6 +24,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 //handled the key.
 
   I64 i,sc2=sc.u8[0];
+  U8 *st1,*st2;
 
   if (SC_F1<=sc2<=SC_F10 &&
       sc&SCF_ALT &&
@@ -118,8 +120,17 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      SetKeyDesc("Edit/Put Link to Cur Pos on Clipboard");
 	    else {
 	      ClipboardDel;
-	      DocPrint(sys_clipboard_doc,"$$LK,\"FL:%s,%d\"$$",
-		DocPut->filename.name,DocPut->cur_entry->y+1);
+	      st1=FileNameAbs(Define("ST_BIBLE_FILE"));
+	      st2=FileNameAbs(DocPut->filename.name);
+	      if (!StrCmp(st1,st2)) {
+		Free(st1);
+		st1=BibleLine2Verse(DocPut->cur_entry->y+1,',');
+		DocPrint(sys_clipboard_doc,"$$LK,\"BF:%s\"$$",st1);
+	      } else
+		DocPrint(sys_clipboard_doc,"$$LK,\"FL:%s,%d\"$$",
+		  st2,DocPut->cur_entry->y+1);
+	      Free(st1);
+	      Free(st2);
 	    }
 	    return TRUE;
 	  case 'L':

@@ -6,13 +6,13 @@ U16 mon_start_days2[12]={
 0,31,60,91,121,152,182,213,244,274,305,335};
 
 I64 YearStartDate(I64 year)
-{
+{//32-bit day since AD 0, given year number.
   I64 y1=year-1,yd4000=y1/4000,yd400=y1/400,yd100=y1/100,yd4=y1/4;
   return year*365+yd4-yd100+yd400-yd4000;
 }
 
 CDate Struct2Date(CDateStruct *_ds)
-{
+{//Cvt CDateStruct to CDate.
   CDate cdt;
   I64 i1,i2;
   i1=YearStartDate(_ds->year);
@@ -27,7 +27,7 @@ CDate Struct2Date(CDateStruct *_ds)
 }
 
 I64 DayOfWeek(I64 i)
-{
+{//Day of week, given 32-bit day since AD 0.
   i+=CDATE_BASE_DAY_OF_WEEK;
   if (i>=0)
     return i % 7;
@@ -36,7 +36,7 @@ I64 DayOfWeek(I64 i)
 }
 
 U0 Date2Struct(CDateStruct *_ds,CDate cdt)
-{
+{//Cvt CDate to CDateStruct.
   I64 i,k,date=cdt.date;
   _ds->day_of_week=DayOfWeek(date);
   _ds->year=(date+1)*100000/CDATE_YEAR_DAYS_INT;
@@ -68,7 +68,7 @@ U0 Date2Struct(CDateStruct *_ds,CDate cdt)
 }
 
 I64 FirstDayOfMon(I64 i)
-{
+{//First day of month, given 32-bit day since AD 0.
   CDateStruct ds;
   CDate cdt=0;
   cdt.date=i;
@@ -79,7 +79,7 @@ I64 FirstDayOfMon(I64 i)
 }
 
 I64 LastDayOfMon(I64 i)
-{
+{//Last day of month, given 32-bit day since AD 0.
   CDateStruct ds;
   CDate cdt=0;
   cdt.date=i;
@@ -95,7 +95,7 @@ I64 LastDayOfMon(I64 i)
 }
 
 I64 FirstDayOfYear(I64 i)
-{
+{//First day of year, given 32-bit day since AD 0.
   CDateStruct ds;
   CDate cdt=0;
   cdt.date=i;
@@ -107,7 +107,7 @@ I64 FirstDayOfYear(I64 i)
 }
 
 I64 LastDayOfYear(I64 i)
-{
+{//Last day of year, given 32-bit day since AD 0.
   CDateStruct ds;
   CDate cdt=0;
   cdt.date=i;
@@ -119,7 +119,6 @@ I64 LastDayOfYear(I64 i)
   return cdt.date-1;
 }
 
-
 I64 Bcd2Bin(U64 b)
 {
   I64 i,result=0;
@@ -130,8 +129,7 @@ I64 Bcd2Bin(U64 b)
   return result;
 }
 
-
-U0 GetDateTimeStruct(CDateStruct *_ds)
+U0 NowDateTimeStruct(CDateStruct *_ds)
 {
   I64 i;
   U8 *b=_ds;
@@ -179,86 +177,19 @@ U0 GetDateTimeStruct(CDateStruct *_ds)
     for (i=2;i<9;i++)
       b[i]=Bcd2Bin(b[i]);
 
-  if (_ds->year>255) _ds->year=255;
+  if (_ds->year>255)	_ds->year=255;
   _ds->year+=2000;
-  if (_ds->mon>12) _ds->mon=12;
+  if (_ds->mon>12)	_ds->mon=12;
   if (_ds->day_of_mon>31) _ds->day_of_mon=31;
   if (_ds->day_of_week>6) _ds->day_of_week=6;
-  if (_ds->hour>23) _ds->hour=23;
-  if (_ds->min>59) _ds->min=59;
-  if (_ds->sec>59) _ds->sec=59;
+  if (_ds->hour>23)	_ds->hour=23;
+  if (_ds->min>59)	_ds->min=59;
+  if (_ds->sec>59)	_ds->sec=59;
 }
 
 CDate Now()
-{
+{//Current datetime.
   CDateStruct ds;
-  GetDateTimeStruct(&ds);
+  NowDateTimeStruct(&ds);
   return Struct2Date(&ds)-local_time_offset;
-}
-
-I64 Second(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.sec;
-}
-
-I64 Minute(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.min;
-}
-
-I64 Hour12(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  if (ds.hour>=12)
-    return ds.hour-12;
-  else
-    return ds.hour;
-}
-
-I64 Hour24(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.hour;
-}
-
-I64 Day(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.day_of_mon;
-}
-
-I64 WeekDay(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.day_of_week;
-}
-
-I64 Month(CDate cdt=MIN_I64)
-{ //Jan is 1
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.mon;
-}
-
-I64 Year(CDate cdt=MIN_I64)
-{
-  CDateStruct ds;
-  if (cdt==MIN_I64) cdt=Now;
-  Date2Struct(&ds,cdt+local_time_offset);
-  return ds.year;
 }

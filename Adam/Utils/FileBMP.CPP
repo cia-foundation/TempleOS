@@ -1,7 +1,5 @@
 #help_index "Graphics/Windows BMP Files"
 
-//This provides support for Window's BMP files.
-
 class CFileBMP
 {
   U16 type;
@@ -27,8 +25,7 @@ class CFileBMP
 };
 
 public CFileBMP *BMPFile4To(CDC *dc)
-{
-//To Windows 4 bit BMP
+{//To Windows 4-bit BMP.
   U8 *src,*ptr;
   I64 x,y,w=dc->width>>1,
     size=offset(CFileBMP.end)+dc->width*dc->height>>1+16*sizeof(CBGR);
@@ -58,8 +55,7 @@ public CFileBMP *BMPFile4To(CDC *dc)
 }
 
 public CFileBMP *BMPFileRLE4To(CDC *dc)
-{
-//To Windows RLE4 bit BMP
+{//To Windows RLE4 bit BMP.
   U8 *src,*ptr;
   I64 x,y,w=dc->width,cnt,pattern;
   CFileBMP *r=CAlloc(offset(CFileBMP.end)+2*(dc->width+1)*dc->height+16*sizeof(CBGR));
@@ -111,8 +107,7 @@ public CFileBMP *BMPFileRLE4To(CDC *dc)
 }
 
 public CFileBMP *BMPFile24To(CDC *dc)
-{
-//To Windows 24 bit BMP
+{//To Windows 24-bit BMP.
   U8 *src;
   I64 i,x,y,size=offset(CFileBMP.end)+dc->width*dc->height*sizeof(CRGB);
   CBGR *bgr;
@@ -148,7 +143,7 @@ public CFileBMP *BMPFile24To(CDC *dc)
 }
 
 public I64 BMPFileWrite(U8 *filename,CDC *dc,I64 bits=4)
-{ //Window's BMP Files
+{//Window's BMP Files.
   I64 size;
   CFileBMP *r;
   if (bits==4) {
@@ -199,7 +194,7 @@ U8 *BMPFilePaletteNew(CFileBMP *r)
 U8 ms_paint_palette[16]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
 
 public CDC *BMPFileRead(U8 *filename,Bool use_ms_paint_palette=FALSE)
-{ //Window's BMP Files
+{//Window's BMP Files.
   I64 i,j,cnt;
   U8 *palette_map,*ptr;
   Bool rle4;
@@ -220,7 +215,7 @@ public CDC *BMPFileRead(U8 *filename,Bool use_ms_paint_palette=FALSE)
 	else
 	  palette_map=BMPFilePaletteNew(r);
 	for (i=r->height-1;i>=0;i--)
-	  if (rle4) { //We don't support full RLE4, just our own subset
+	  if (rle4) {//We don't support full RLE4, just our own subset
 	    j=0;
 	    while (cnt=*ptr++) {
 	      if (cnt==1) {
@@ -265,7 +260,7 @@ public CDC *BMPFileRead(U8 *filename,Bool use_ms_paint_palette=FALSE)
   return result;
 }
 
-#help_index "Graphics/Sprite;Graphics/Windows BMP Files;Doc/Output"
+#help_index "Graphics/Sprite;Graphics/Windows BMP Files;DolDoc/Output"
 public U0 DocBMPFile(CDoc *doc=NULL,U8 *filename,Bool use_ms_paint_palette=FALSE)
 {//Put a BMP file into a document as a sprite.
   CDC *dc=BMPFileRead(filename,use_ms_paint_palette);
@@ -277,11 +272,9 @@ public U0 DocBMPFile(CDoc *doc=NULL,U8 *filename,Bool use_ms_paint_palette=FALSE
 
 #help_index "Graphics/Windows BMP Files;Graphics/Screen"
 public I64 BMPFileCaptureScreen(U8 *filename,I64 bits=4)
-{
+{//Capture screen as BMP file.
   CDC *dc=DCCaptureScreen;
   I64 size=BMPFileWrite(filename,dc,bits);
   DCDel(dc);
   return size;
 }
-
-#help_index ""

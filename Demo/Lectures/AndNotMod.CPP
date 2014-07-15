@@ -1,8 +1,4 @@
-/*
-
-$WW,1$You may wonder why I use "&" instead of "%".
-$WW,0$
-*/
+//$WW,1$You may wonder why I use "&" instead of "%".
 
 #define SAMPLE_SIZE	100000000
 
@@ -45,9 +41,7 @@ U0 TimeIns()
 TimeIns;
 
 /*  Program Output$HL,0$$WW+H,1$$FD,1$
-
 8 Cores 2.660GHz
 Remainder Version #1 Cycles	:   26.85345
 Remainder Version #2 Cycles	:   -0.00800
-
 $HL,1$*/

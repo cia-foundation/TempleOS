@@ -45,11 +45,11 @@ U0 TimeIns()
 
 TimeIns;
 
-/*  Program Output$HL,0$$WW+H,1$$FD,1$
-
+/*Program Output$HL,0$$WW+H,1$$FD,1$
 8 Cores 2.660GHz
   Cached Cycles:    202,220
 Uncached Cycles: 14,357,016
+
 $FG,2$The difference is even greater
 because the loop overhead was not subtracted.
 $HL,1$*/

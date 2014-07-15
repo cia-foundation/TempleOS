@@ -9,7 +9,6 @@ U0 ViewScreenCapture(U8 *filename)
   DCDel(dc);
 }
 
-
 U0 Main()
 {
   "Capture screen...\n";

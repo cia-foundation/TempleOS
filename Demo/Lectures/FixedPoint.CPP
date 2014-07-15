@@ -1,5 +1,4 @@
-/*
-"Fixed point" means you use integers
+/*"Fixed point" means you use integers
 that are scaled by a value.  A common
 example would be using number of pennies
 instead of dollars with a float.
@@ -37,7 +36,7 @@ U0 Main()
   for (i=1000000000;i;i--)
     f_sum+=f_val;
   "Float   Sum:%.9f Time:%7.3fs\n",f_sum,tS-t0;
-  NewLine;
+  '\n';
 }
 
 U0 DoIt2()
@@ -48,8 +47,7 @@ U0 DoIt2()
   "i&0xFFFFFFFF=%X\n",i&0xFFFFFFFF;
   "i>>32       =%X\n",i>>32;
 
-/*
-  Standard integer types are declared
+/*  Standard integer types are declared
   with a special compiler feature which
   allows a structure to be accessed as a
   whole.  That's why the i variable can
@@ -74,7 +72,6 @@ public U64i union I64
 
 For a complete lst of nonstandard compiler
 features, see $LK,"::/Doc/HolyC.TXT"$.
-
 */
 
   "i.u32[0]    =%X\n",i.u32[0];
@@ -87,8 +84,7 @@ DoIt2;
 
 //See $LK,"::/Demo/Lectures/FixedPointAdvanced.CPP"$
 
-
-/*  Program Output$HL,0$$WW+H,1$$FD,1$
+/*Program Output$HL,0$$WW+H,1$$FD,1$
 
 8 Cores 2.660GHz
 Integer Sum:2000000199.768689408 Time:	0.787s
@@ -99,5 +95,4 @@ i&0xFFFFFFFF=9ABCDEF0
 i>>32	    =12345678
 i.u32[0]    =9ABCDEF0
 i.u32[1]    =12345678
-
 $HL,1$*/

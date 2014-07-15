@@ -7,9 +7,10 @@ HashTablePurge(adam_task->hash_table);
 
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
 
-public F64 os_version=2.03; //Fix here, too: $LK,"::/Demo/AcctExample/DbgAdam2.CPP.Z"$
+public F64 os_version=2.11;//Operating system version.
+//Fix here, too: $LK,"::/Demo/AcctExample/DbgAdam2.CPP"$
 
-#include "AdamExt.HPP"
+#include "AdamExts.HPP"
 #include "Math2a"
 #include "Training"
 #include "Utils2a"
@@ -31,7 +32,7 @@ Cd("::/Adam");;
 
 #include "::/Adam/God/GodExt"
 
-Cd("::/Adam/Doc");;
+Cd("::/Adam/DolDoc");;
 #include "Doc"
 LBts(&sys_run_level,RLf_DOC);
 
@@ -60,7 +61,7 @@ DocTermNew;
 SetWinVert(2,10);
 
 sys_winmgr_task=Spawn(&WinMgrTask,NULL,"Window Mgr");
-Fs->win_inhibit=WIG_TASK_DFT-WIF_BORDER-WIF_GRAB_SCROLL-WIF_CTRLS;
+Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_SELF_CTRLS;
 LBts(&Fs->display_flags,DISPLAYf_CHILDREN_NOT_ON_TOP);
 LBts(&Fs->display_flags,DISPLAYf_SHOW);
 SysLogin;
@@ -74,5 +75,6 @@ Cd("::/Adam");;
 #exe {OptOff(OPTf_WARN_DUP_TYPES);};
 LBts(&sys_run_level,RLf_ADAM2);
 
+#help_index ""
 Cd("HOME");;
 #include "Adam3"

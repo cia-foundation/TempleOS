@@ -1,7 +1,16 @@
-$WW,1$"Input Ptr" is the mouse at this point.
+$WW,1$"Input Ptr" is the mouse.  In the future, might be joystick or pad.
 
-$LK,"ipx",A="MN:ipx"$ and $LK,"ipy",A="MN:ipy"$ can be used to access the x and y coordinates of the input ptr.  They are relative to the screen, not window.  These can be used if you don't want to use msg passing.  $LK,"ipz",A="MN:ipz"$ is the wheel.
+$LK,"ip.pos.x",A="MN:ip"$ and $LK,"ip.pos.y",A="MN:ip"$ can be used to access the x and y coordinates of the input ptr.  They are relative to the screen, not window.  These can be used if you don't want to use msg passing.  $LK,"ip.pos.z",A="MN:ip"$ is the wheel.
 
-$LK,"iptx",A="MN:iptx"$ and $LK,"ipty",A="MN:ipty"$ are the text column and row of the input ptr.  See $LK,"::/Demo/Games/Maze.CPP"$.
+$LK,"ip.pos_text.x",A="MN:CIPStateGlbls"$ and $LK,"ip.pos_text.y",A="MN:CIPStateGlbls"$ are the text column and row of the input ptr.  See $LK,"::/Demo/Games/Maze.CPP"$.
 
-You can make the input ptr snap to a grid by adjusting $FG,4$Fs->snap$FG$.
+See $LK,"CIPStateGlbls",A="MN:CIPStateGlbls"$ and $LK,"CMouseStateGlbls",A="MN:CMouseStateGlbls"$.
+
+$HL,1$//****
+mouse.pos.x=mouse.prescale.x*mouse.scale.x*ip_grid.x_speed;
+ip.presnap.x=ToI64(ip.scale.x*mouse.pos.x)+ip.offset.x;
+if (ip_grid.snap)
+  ip.pos.x=Trunc(ip.presnap.x/ip_grid.x)*ip_grid.x+ip_grid.x_offset;
+else
+  ip.pos.x=ip.presnap.x;
+//****$HL,0$

@@ -130,7 +130,7 @@ U0 Hanoi()
     MoveDisks(0,2,NUM_DISKS);
     Beep; Beep;
     DocClear;
-    "$$CM+BY,0,0$$";
+    DocBottom;
     PressAKey;
   } catch
     PutExcept;

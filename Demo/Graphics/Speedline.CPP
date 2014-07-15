@@ -2,12 +2,12 @@
 
 public U0 SpeedLineDemo()
 {
-  I64 msg_code,cnt,x1,y1,x2,y2,p1,p2,color=BLACK;
+  I64 msg_code,cnt,x1,y1,x2,y2,a1,a2,color=BLACK;
   CDC *dc=DCAlias;
   dc->color=color;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS-WIF_BORDER;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
 
   WinMax;
   WinBorder;
@@ -15,7 +15,7 @@ public U0 SpeedLineDemo()
   DCFill;
   DocClear;
   do {
-    msg_code=GetMsg(&p1,&p2,
+    msg_code=GetMsg(&a1,&a2,
       1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
       1<<MSG_IP_R_UP);
     switch (msg_code) {
@@ -25,23 +25,23 @@ public U0 SpeedLineDemo()
 	  dc->color=color;
 	break;
       case MSG_IP_L_DOWN:
-	x1=p1; y1=p2;
-	x2=p1; y2=p2;
+	x1=a1; y1=a2;
+	x2=a1; y2=a2;
 	cnt=0;
 	while (msg_code!=MSG_IP_L_UP) {
-	  dc->pen_width=0.04*ip_speed;
+	  dc->pen_width=0.04*ip.speed;
 	  GrLine3(dc,x1,y1,0,x2,y2,0);
-	  msg_code=GetMsg(&p1,&p2,
+	  msg_code=GetMsg(&a1,&a2,
 	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  x1=x2; y1=y2;
-	  x2=p1; y2=p2;
+	  x2=a1; y2=a2;
 	}
 	GrLine3(dc,x1,y1,0,x2,y2,0);
 	break;
       case MSG_KEY_DOWN:
 	break;
     }
-  } while (msg_code!=MSG_KEY_DOWN || !p1);
+  } while (msg_code!=MSG_KEY_DOWN || !a1);
   GetMsg(,,1<<MSG_KEY_UP);
   DCFill;
   DCDel(dc);

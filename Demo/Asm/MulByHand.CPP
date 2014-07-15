@@ -1,5 +1,4 @@
-/*
-When I was a kid with a Commodore 64,
+/*When I was a kid with a Commodore 64,
 the 6502 chip had no multiply instruction
 and this is how we had to do it, except,
 I used more regs in this example.
@@ -10,7 +9,7 @@ asm {
 
 USE64	//Defaults to 64, but this is a good habit.
 
-//You can clobber RAX,RBX,RCX,RDX,R8,R9
+//You can clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
 
 MUL_BY_HAND_U8_U8_TO_U16: //This is only for fun.
 //8bit * 8bit-->16bit
@@ -48,7 +47,7 @@ _MUL_U64_U64_TO_U128::
 };
 
 //My convention is to put an underscore
-//on C callable routines.
+//on C callable asm routines.
 _extern _MUL_BY_HAND_U8_U8_TO_U16 U16 MulU8(U8 n1,U8 n2);
 
 class U128

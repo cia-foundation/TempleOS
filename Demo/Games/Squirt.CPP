@@ -11,22 +11,14 @@ class MySpring:CSpring
 {
   I64 type;
 };
-
 $BG,11$
 
 
 	$SP,"<1>",BI=1$
 
-
-
-
-
 	$SP,"<2>",BI=2$
 
-
-
 	$SP,"<3>",BI=3$
-
 $BG$
 
 
@@ -42,8 +34,7 @@ $BG$
 
 
 
-
-$SP,"<4>",BI=4,BP="::/Demo/Graphics/Camp.CPP.Z,Mountain"$ //Pointer to sprite in Camp.CPP.Z file
+$SP,"<4>",BI=4,BP="::/Demo/Graphics/Mountain.CPP.Z,Mountain"$ //Pointer to sprite in $LK,"Mountain.CPP",A="FI:::/Demo/Graphics/Mountain.CPP"$ file
 
 #define HOSE_RADIUS	3
 #define LINK_SIZE	6
@@ -57,7 +48,6 @@ F64 nozzle_é;
 
 CMathODE *ode=NULL;
 F64 start_up_timeout;
-
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
@@ -167,16 +157,12 @@ U0 DrawIt(CTask *task,CDC *dc)
   Suspend(task,old_suspend);
 }
 
-
 U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *state,COrder2D3 *DstateDt)
-{
-//The forces due to springs and drag are
+{//The forces due to springs and drag are
 //automatically handled by the
 //ode code.  We can add new forces
 //here.
   nounusedwarn t,state,DstateDt;
-//  F64 d,dd;
-//  CD3 p;
   MyMass *tempm1,*tempm2;
   nounusedwarn tempm2;
 
@@ -244,8 +230,7 @@ U0 HoseNew()
 }
 
 U0 AnimateTask(I64)
-{
-//Preempt is off by default for new task
+{//Preempt is off by default for new task
   MyMass   *tempm,*tempm1;
   F64 dx,dy;
   while (TRUE) {
@@ -310,7 +295,7 @@ U0 MoveNozzleTaskY(I64 sign)
 U0 Init()
 {
   DocClear;
-  "$$BG,LTCYAN$$"; NewLine(GROUND_Y/FONT_HEIGHT);
+  "$$BG,LTCYAN$$%h*c",ToI64(GROUND_Y/FONT_HEIGHT),'\n';
 
 //Allow hose to settle.
   start_up_timeout=tS+0.5;

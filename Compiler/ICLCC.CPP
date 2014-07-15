@@ -1,66 +1,47 @@
-Bool OptEqu(I64 num,Bool val) {
+Bool OptEqu(I64 num,Bool val)
+{//Set compiler option to value.
   return BEqu(&Fs->last_lex->opts,num,val);
 }
 
-//Turn on compiler option
-Bool OptOn(I64 num) {
+Bool OptOn(I64 num)
+{//Turn on compiler option.
   return OptEqu(num,ON);
 }
 
-//Turn off compiler option
-Bool OptOff(I64 num) {
+Bool OptOff(I64 num)
+{//Turn off compiler option.
   return OptEqu(num,OFF);
 }
 
-//Get state of compiler option
-Bool GetOpt(I64 num) {
+Bool GetOpt(I64 num)
+{//Get state of compiler option.
   return Bt(&Fs->last_lex->opts,num);
 }
 
-//Displays intermediate code after passes through optimization
-Bool OTrace(Bool val) {
+Bool OTrace(Bool val)
+{//Displays intermediate code after passes through optimization.
   return OptEqu(OPTf_OPT_TRACE,val);
 }
 
-//Ctrls which optimizer passes are displayed
-I64 OTraceMask(I64 i=0b1001111101) {
+I64 OTraceMask(I64 i=0b1001111101)
+{//Ctrls which optimizer passes are displayed.
   I64 old=Fs->last_lex->pass_trace_mask;
   Fs->last_lex->pass_trace_mask=i;
   return old;
 }
 
-//Displays assembly code output
-Bool CTrace(Bool val) {
+Bool CTrace(Bool val)
+{//Displays assembly code output from compiler.
   return OptEqu(OPTf_COMPILE_TRACE,val);
 }
 
-//Displays text as it is being compiled
-Bool Echo(Bool val) {
+Bool Echo(Bool val)
+{//Displays text as it is being compiled.
   return OptEqu(OPTf_ECHO,val);
 }
 
-U0 ImportHashTable(CHashTable *src)
-{ //called from #exe {} in AOT modules
-  // See $LK,"::/Kernel/AOT.HPP"$.
-  CLex *lx=Fs->last_lex;
-  if (lx==&Fs->next_lex)
-    PrintErr("Not Compiling\n");
-  else {
-    if (!(lx->flags&LF_EXE_BLK))
-      LexExcept(lx,"import_hash_table only allowed in AOT compiled "
-	"#exe{} mode.");
-    while (src) {
-      if (lx->htc.next && lx->htc.next->glbl_hash_table)
-	HashTableImport(src,lx->htc.next->glbl_hash_table);
-      else if (lx->htc.glbl_hash_table)
-	HashTableImport(src,lx->htc.glbl_hash_table);
-      src=src->next;
-    }
-  }
-}
-
 I64 IncludeDepth()
-{
+{//Returns how many #includes we are in. See $LK,"IncludeDepth",A="FF:::/Demo/Graphics/Camp.CPP,IncludeDepth"$.
   CLex *lx=Fs->last_lex;
   return lx->cur_lfn-&lx->lfns;
 }
@@ -89,17 +70,16 @@ U0 ICClassPut(CHashClass *c)
   '' CH_SPACE;
 }
 
-
 U0 ICArgPut(CICArg *a)
 {
   if (a->type_pointed)
     "%Z %Z %Z ",
-      a->type&RT_MASK,"ST_IT_TYPES",
-      a->type_pointed&RT_MASK,"ST_IT_TYPES",
+      a->type&RT_MASK,"ST_RAW_TYPES",
+      a->type_pointed&RT_MASK,"ST_RAW_TYPES",
       a->type>>4,"ST_TY_TYPES";
   else
     "%Z %Z ",
-      a->type&RT_MASK,"ST_IT_TYPES",
+      a->type&RT_MASK,"ST_RAW_TYPES",
       a->type>>4,"ST_TY_TYPES";
   switch (a->type>>4) {
     case TY_STK>>4:
@@ -195,7 +175,7 @@ U0 ICPut(CIntermediateCode *tempi)
     }
     if (tempi->ic_flags & ICF_ALTERNATE_TEMPLATE)
       "ALT_TEMP ";
-    NewLine;
+    '\n';
   }
 }
 
@@ -406,6 +386,8 @@ U8 *LCCCompile(CLex *lx,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
   }
 
   LCCHeaderPut(lx,7,FALSE);
+  OptPass789(lx,reg_offsets,NULL,NULL);
+  LCCHeaderPut(lx,8,FALSE);
   code_size=OptPass789(lx,reg_offsets,NULL,NULL);
   do {
     last_code_size=code_size;
@@ -424,7 +406,7 @@ U8 *LCCCompile(CLex *lx,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
   LCCHeaderPut(lx,9,FALSE);
   code_size=OptPass789(lx,reg_offsets,result,_dbg);
 
-  compiled_bytes+=code_size;
+  cmp.compiled_bytes+=code_size;
   LCCDel(lx,&lx->lcc);
   if (Bt(&lx->opts,OPTf_COMPILE_TRACE)) {
     if (lx->flags&LF_AOT_COMPILE) {

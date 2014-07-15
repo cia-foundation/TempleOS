@@ -1,5 +1,5 @@
 I64 FSize(CFile *f)
-{
+{//Report size of opened file in bytes.
   if (f)
     return f->de.size;
   else
@@ -7,8 +7,8 @@ I64 FSize(CFile *f)
 }
 
 CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
-{  //allows flags "r","w","w+".  Include a "c" for contiguous.
-   //(It uses $LK,"StrOcc",A="MN:StrOcc"$() for 'w', 'r', '+', 'c')
+{//Allows flags "r","w","w+". "c" for contiguous.
+//(It uses $LK,"StrOcc",A="MN:StrOcc"$() for 'w', 'r', '+', 'c')
   CFile *f=CAlloc(sizeof(CFile));
   CFileAccess *fa;
   U8 *full_name;
@@ -27,7 +27,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
     contiguous=TRUE;
   if (contiguous) {
     f->flags|=FF_CONTIGUOUS;
-    if (f->p->type!=PT_REDSEA && !(FileAttr(filename) & _ATTR_CONTIGUOUS))
+    if (f->p->type!=PT_REDSEA && !(FileAttr(filename) & RS_ATTR_CONTIGUOUS))
       throw('File');
   }
   f->cluster_buf=CAlloc(f->p->spc<<BLK_SIZE_BITS);
@@ -46,7 +46,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
     f->flags|=FF_NEW_FILE;
     if (fa=FileAccessNew(full_name)) {
       StrCpy(f->de.name,fa->mask);
-      if (cnt>0) { //We pre-alloc the whole thing.
+      if (cnt>0) {//We pre-alloc the whole thing.
 	f->de.cluster=ClustersAlloc(f->p,0,
 	  (cnt+f->p->spc-1)/f->p->spc,contiguous);
 	f->de.size=cnt<<BLK_SIZE_BITS;
@@ -71,7 +71,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 }
 
 U0 FClose(CFile *f)
-{
+{//Close CFile, updating directory.
   CFileAccess *fa;
   if (f) {
     if (f->flags & FF_BUF_DIRTY) {
@@ -127,7 +127,7 @@ I64 FSetCluster(CFile *f,I64 c,I64 blk,Bool read)
 }
 
 Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
-{
+{//Read [nth,n+cnt) blks of file.
   CPrt *p=f->p;
   I64 spc=p->spc,i,j,c=f->de.cluster;
   if (!f || !p) return FALSE;
@@ -179,7 +179,7 @@ Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 }
 
 Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
-{
+{//Write [nth,n+cnt) blks of file.
   CPrt *p=f->p;
   I64 spc=p->spc,i,j,c=f->de.cluster,c1;
   if (!f || !p) return FALSE;

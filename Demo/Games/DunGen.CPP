@@ -1,3 +1,6 @@
+AcctRegSetDftEntry("TempleOS/DunGen","F64 best_score=9999;\n");
+AcctRegExeBranch("TempleOS/DunGen");
+
 //Set snap to 4 and width to 4
 //if you edit this map.
 
@@ -20,24 +23,17 @@ $SP,"<2>",BI=2$
 
 
 $SP,"<3>",BI=3$
-
-
 $SP,"<4>",BI=4$	//This is a template you can copy and use to make a tile.
-
 
 
 
 $SP,"<5>",BI=5$
 
-
 $SP,"<6>",BI=6$
-
 
 $SP,"<7>",BI=7$
 
-
 $SP,"<8>",BI=8$
-
 
 
  
@@ -48,10 +44,7 @@ $SP,"<10>",BI=10$
 $SP,"<11>",BI=11$
 
 
-
-$BG$
-
-//These are indexed by color #.
+$BG$//These are indexed by color #.
 //See $LK,"COLORS",A="MN:RED"$.
 
 U8 *tiles1[16]=
@@ -66,8 +59,6 @@ U8 *tiles2[16]=
  NULL,NULL,NULL,NULL,
  NULL,NULL,NULL,NULL};
 
-
-
 #define SCREEN_SCALE	24
 #define SCREEN_WIDTH	24
 #define SCREEN_HEIGHT	24
@@ -81,12 +72,15 @@ I64 man_x,man_y,man_dx,man_dy;
 Bool man_attack;
 F64 man_attack_t0;
 
-#define NUM_MONSTERS	16
+#define NUM_MONSTERS	10
+I64 monsters_left;
 class Monster
 {
   I64 x,y,dx,dy;
   Bool dead,pad[7];
 } monsters[NUM_MONSTERS];
+
+F64 t0,tf;
 
 #define LOS_SCALE	4
 
@@ -99,17 +93,20 @@ Bool LOSPlot(U8 *,I64 x,I64 y,I64)
 }
 
 Bool LOS(I64 x1,I64 y1,I64 x2,I64 y2)
-{ //Line of sight
+{//Line of sight
   return Line(NULL,x1*LOS_SCALE+LOS_SCALE/2,y1*LOS_SCALE+LOS_SCALE/2,0,
 	       x2*LOS_SCALE+LOS_SCALE/2,y2*LOS_SCALE+LOS_SCALE/2,0,&LOSPlot);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  CDC *dc_t=DCAlias(gr_dc2,task);
-  I64 i,x,y,xx,yy,x1,y1,z1,color;
+  CDC *dc_t=DCAlias(gr.dc2,task);
+  I64 i,x,y,xx,yy,x1,y1,z1,color,
+      cx=task->pix_width/2,
+      cy=task->pix_height/2;
   CD3I32 poly[4];
   U8 **_tiles;
+  F64 tt;
 
   if (Blink(5))
     _tiles=tiles1;
@@ -141,7 +138,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	      z1=0;
 	      GrTransform(dc_t,&x1,&y1,&z1);
 	      Sprite3(dc,x1,y1,z1,_tiles[color]);
-	    } else { //If no tile defined, do solid color.
+	    } else {//If no tile defined, do solid color.
 	      poly[0].x=x*SCREEN_SCALE;
 	      poly[0].y=y*SCREEN_SCALE;
 	      poly[0].z=0;
@@ -228,8 +225,18 @@ U0 DrawIt(CTask *task,CDC *dc)
     Sprite3(dc,x1,y1,z1,$IB,"<2>",BI=2$);
 
   DCDel(dc_t);
-}
 
+  if (tf) {
+    dc->color=LTRED;
+    if (Blink)
+      GrPrint(dc,cx-(FONT_WIDTH*14)/2,cy-FONT_HEIGHT/2,"Game Completed");
+    tt=tf;
+  } else {
+    dc->color=LTGREEN;
+    tt=tS;
+  }
+  GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",monsters_left,tt-t0,best_score);
+}
 
 U0 Attack()
 {
@@ -238,11 +245,16 @@ U0 Attack()
   Noise(100,300,1000);
   for (i=0;i<NUM_MONSTERS;i++) {
     if (!monsters[i].dead &&
-	 man_x+man_dx==monsters[i].x && man_y+man_dy==monsters[i].y)
+	  man_x+man_dx==monsters[i].x && man_y+man_dy==monsters[i].y) {
       monsters[i].dead=TRUE;
+      if (!--monsters_left) {
+	tf=tS;
+	if (tf-t0<best_score)
+	  best_score=tf-t0;
+      }
+    }
   }
 }
-
 
 U0 Init()
 {
@@ -260,6 +272,14 @@ U0 Init()
        map[y*map_width+x]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
   DCDel(dc);
 
+  man_attack_t0=tS;
+  man_attack=FALSE;
+  man_x=0;
+  man_y=4;
+  man_dx=0;
+  man_dy=0;
+  screen_x=0;
+  screen_y=0;
   for (i=0;i<NUM_MONSTERS;i++) {
     monsters[i].dead=FALSE;
     monsters[i].dx=0;
@@ -269,14 +289,9 @@ U0 Init()
       monsters[i].y=RandU64%(map_height-2)+1;
     } while (!map[(monsters[i].y)*map_width+monsters[i].x]);
   }
-  man_attack_t0=tS;
-  man_attack=FALSE;
-  man_x=0;
-  man_y=4;
-  man_dx=0;
-  man_dy=0;
-  screen_x=0;
-  screen_y=0;
+  monsters_left=NUM_MONSTERS;
+  tf=0;
+  t0=tS;
 }
 
 U0 CleanUp()
@@ -428,6 +443,7 @@ dg_done:
     PutExcept;
   SettingsPop;
   MenuPop;
+  AcctRegWriteBranch("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
   CleanUp;
 }
 

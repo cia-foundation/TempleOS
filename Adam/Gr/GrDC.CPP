@@ -1,11 +1,10 @@
 #help_index "Graphics/Math/3D Transformation"
 #help_file "::/Doc/Transform"
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-I64 gr_scale=1<<32;
+
+#define	GR_SCALE	(1<<32)
 
 public U0 GrRot(I64 r[4][4],I64 *_x,I64 *_y,I64 *_z)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Rotate 3D point using 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 x1,y1,z1,xx=*_x,yy=*_y,zz=*_z;
   x1=(r[0][0]*xx+r[0][1]*yy+r[0][2]*zz+r[0][3])>>32;
   y1=(r[1][0]*xx+r[1][1]*yy+r[1][2]*zz+r[1][3])>>32;
@@ -15,7 +14,7 @@ public U0 GrRot(I64 r[4][4],I64 *_x,I64 *_y,I64 *_z)
 
 public U0 GrTransform(CDC *dc,I64 *_x,I64 *_y,I64 *_z)
 {//This is a callback.
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   GrRot(dc->r,_x,_y,_z);
   *_x+=dc->x;
   *_y+=dc->y;
@@ -23,8 +22,7 @@ public U0 GrTransform(CDC *dc,I64 *_x,I64 *_y,I64 *_z)
 }
 
 public I64 *GrIdentNew(CTask *mem_task=NULL)
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//MAlloc an identity matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 *r=CAlloc(sizeof(I64)*16,mem_task);
   r[0] .i32[1]=1;
   r[5] .i32[1]=1;
@@ -34,8 +32,7 @@ public I64 *GrIdentNew(CTask *mem_task=NULL)
 }
 
 public I64 *GrIdentEqu(I64 r[4][4])
-{
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+{//Set matrix to identity. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   MemSet(r,0,sizeof(I64)*16);
   r[0][0].i32[1]=1;
   r[1][1].i32[1]=1;
@@ -45,11 +42,12 @@ public I64 *GrIdentEqu(I64 r[4][4])
 }
 
 public U0 GrSetRotMat(CDC *dc=NULL,I64 r[4][4])
-{//NULL means gr_dc
-//This uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-// (1.0/Sqrt(3))*65536=37837.22
+{//Set device context's rot matrix. Will be $LK,"Free",A="MN:Free"$d() in $LK,"DCDel",A="MN:DCDel"$(). Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+//The main purpose is to set matrix norm for pen width scaling.
+//NULL as dc means gr.dc
+//Note: (1.0/Sqrt(3))*65536=37837.22
   I64 xx=37838,yy=37837,zz=37837;
-  if (!dc)   dc=gr_dc;
+  if (!dc)   dc=gr.dc;
   dc->r=r;
   GrRot(r,&xx,&yy,&zz);
   //scaled 32 bits
@@ -121,20 +119,20 @@ public U0 GrLighting(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3,CColorROPU32 color
 }
 
 #help_index "Graphics/Device Contexts"
-public U0 DCFill(CDC *dc=NULL,CColorROPU32 val=COLOR_TRANSPARENT)
-{
-  if (!dc) dc=gr_dc;
+public U0 DCFill(CDC *dc=NULL,CColorROPU32 val=TRANSPARENT)
+{//Fill entire device context with color.
+  if (!dc) dc=gr.dc;
   MemSet(dc->body,val,dc->width_internal*dc->height);
 }
 
 public U0 DCClear(CDC *dc=NULL)
-{
-  if (!dc) dc=gr_dc;
+{//Set entire device context image body to 0 (BLACK).
+  if (!dc) dc=gr.dc;
   DCFill(dc,0);
 }
 
 public U0 DCRst(CDC *dc)
-{
+{//Reset $LK,"CDC",A="MN:CDC"$ structure members but not image body, itself.
   dc->color=BLACK;
   dc->color2=BLACK;
   dc->bkcolor=BLACK;
@@ -149,15 +147,16 @@ public U0 DCRst(CDC *dc)
   dc->transform=&GrTransform;
   dc->lighting =&GrLighting;
   GrIdentEqu(dc->r);
-  dc->r_norm=gr_scale;
+  dc->r_norm=GR_SCALE;
   dc->flags&=~(DCF_SYMMETRY|DCF_TRANSFORMATION|DCF_JUST_MIRROR);
 }
 
 public U0 DCExtentsInit(CDC *dc=NULL)
-{//NULL means gr_dc
+{//Init markers for extent of next newly drawn graphics.
+//NULL means gr.dc
 //See $LK,"::/Demo/Graphics/Extents.CPP"$
 //You should clear the record flag yourself
-  if (!dc)   dc=gr_dc;
+  if (!dc)   dc=gr.dc;
   dc->flags|=DCF_RECORD_EXTENTS;
   dc->min_x=MAX_I64;
   dc->max_x=MIN_I64;
@@ -166,9 +165,10 @@ public U0 DCExtentsInit(CDC *dc=NULL)
 }
 
 public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
-{//NULL means gr_dc
+{//Create alias of dc, so can change pen, color, etc.
+//NULL means gr.dc
   CDC *result;
-  if (!dc)   dc=gr_dc;
+  if (!dc)   dc=gr.dc;
   if (!task) task=Fs;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
     Dbg;
@@ -182,10 +182,10 @@ public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
   return result;
 }
 
-
 public CDC *DCNew(I64 width,I64 height,CTask *task=NULL,Bool null_bitmap=FALSE)
-{//This internally only allows widths which are divisible by 8
-  //Don't forget these $MA-X+PU,"sizeof(CDC)",LM="Grep(\"sizeof(CDC)\",\"/*\");View;"$.
+{//Create new width x height device context.
+//Internally only allows widths which are divisible by 8.
+//Don't forget these $MA-X+PU,"sizeof(CDC)",LM="Grep(\"sizeof(CDC)\",\"/*\");View;"$.
   CDC *result;
   if (!task) task=Fs;
   result=CAlloc(sizeof(CDC),task);
@@ -206,7 +206,7 @@ public CDC *DCNew(I64 width,I64 height,CTask *task=NULL,Bool null_bitmap=FALSE)
 }
 
 public U0 DCDel(CDC *dc)
-{
+{//Free dc, image body, rot mat and depth buf.
   if (!dc) return;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
     Dbg;
@@ -219,7 +219,7 @@ public U0 DCDel(CDC *dc)
 }
 
 public I64 DCSize(CDC *dc)
-{
+{//Mem size of header, image body and depth buffer.
   if (dc)
     return MSize2(dc)+MSize2(dc->body)+MSize2(dc->depth_buf);
   else
@@ -227,20 +227,20 @@ public I64 DCSize(CDC *dc)
 }
 
 public U0 DCDepthBufRst(CDC *dc)
-{
+{//Reset device context depth buf to far away.
   if (dc->depth_buf)
     MemSetU32(dc->depth_buf,MAX_I32,dc->width_internal*dc->height);
 }
 
 public U0 DCAllocDepthBuf(CDC *dc)
-{
+{//Allocate a 32-bit depth buffer for device context.
   Free(dc->depth_buf);
   dc->depth_buf=MAlloc(dc->width_internal*dc->height*sizeof(I32),dc->mem_task);
   DCDepthBufRst(dc);
 }
 
 public CDC *DCCopy(CDC *dc,CTask *task=NULL)
-{
+{//Alloc copy of dc, including image body, rot mat and depth buf.
   CDC *result;
   if (!dc) return NULL;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
@@ -249,12 +249,13 @@ public CDC *DCCopy(CDC *dc,CTask *task=NULL)
   GrSetRotMat(result,MAllocIdentical(dc->r,task));
   result->mem_task=task;
   result->body=MAllocIdentical(dc->body,task);
+  result->depth_buf=MAllocIdentical(dc->depth_buf,task);
   return result;
 }
 
 public U0 DCMono(CDC *dc,
-  I64 quest=COLOR_TRANSPARENT,I64 true_color=0,I64 false_color=COLOR_MONO)
-{
+  I64 quest=TRANSPARENT,I64 true_color=0,I64 false_color=COLOR_MONO)
+{//Set entire device context to one of two colors.
   I64 i;
   U8 *dst;
   dst=dc->body;
@@ -266,8 +267,8 @@ public U0 DCMono(CDC *dc,
       *dst++=false_color;
 }
 
-public I64 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=COLOR_TRANSPARENT)
-{
+public I64 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=TRANSPARENT)
+{//Find and replace src color with dst in device context.
   I64 i,result=0;
   U8 *dst;
   dst=dc->body;
@@ -282,7 +283,7 @@ public I64 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=COLOR_TRANSPARENT)
 }
 
 public U8 *DCSave(CDC *dc,I64 *_size=NULL,Bool compressed=TRUE)
-{ //stores to mem
+{//Stores device context to mem, perhaps, with compression.
   U8 *result,*ptr,*body;
   Bool old_preempt;
   CArcCompress *ac;
@@ -321,7 +322,7 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,Bool compressed=TRUE)
 }
 
 public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
-{ //loads from mem
+{//Loads device context from mem.
   CDC *result;
   U8 *ptr=src;
   CArcCompress *ac;
@@ -352,7 +353,7 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
 
 #help_index "Graphics/Device Contexts;Graphics/GRA Files"
 public I64 GRAWrite(U8 *filename,CDC *dc)
-{ // TempleOS GRA File
+{//TempleOS GRA File.
   I64 size;
   U8 *st=DftExt(filename,"GRA.Z"),
      *src=DCSave(dc,&size);
@@ -363,7 +364,7 @@ public I64 GRAWrite(U8 *filename,CDC *dc)
 }
 
 public CDC *GRARead(U8 *filename,CTask *task=NULL)
-{ // TempleOS GRA File
+{//TempleOS GRA File.
   CDC *dc=NULL;
   U8 *st=DftExt(filename,"GRA.Z"),
      *src=FileRead(st);
@@ -374,7 +375,7 @@ public CDC *GRARead(U8 *filename,CTask *task=NULL)
   return dc;
 }
 
-#help_index "Graphics/Sprite;Graphics/GRA Files;Doc/Output"
+#help_index "Graphics/Sprite;Graphics/GRA Files;DolDoc/Output"
 public U0 DocGRAFile(CDoc *doc=NULL,U8 *filename)
 {//Put a GRA file into a document as a	sprite.
   CDC *dc=GRARead(filename);
@@ -386,12 +387,13 @@ public U0 DocGRAFile(CDoc *doc=NULL,U8 *filename)
 
 #help_index "Graphics/Device Contexts;Graphics/Screen"
 public CDC *DCCaptureScreen(CTask *task=NULL)
-{
+{//Capture screen to a device context.
   CDC *dc;
   U8 *dst;
   WinMgrSync(2,TRUE);
-  dc=DCCopy(gr_screen_image,task);
+  dc=DCCopy(gr.screen_image,task);
   dst=MAlloc(dc->body_size,task);
+  //Pick background color that never occurs. COLOR_INVALID
   GrBitMap4ToBitMap8(dst,dc->body,dc->body_size/2,COLOR_INVALID);
   Free(dc->body);
   dc->body=dst;
@@ -400,7 +402,7 @@ public CDC *DCCaptureScreen(CTask *task=NULL)
 
 #help_index "Graphics/GRA Files;Graphics/Screen"
 public I64 GRACaptureScreen(U8 *filename)
-{ // TempleOS GRA File
+{//Capture screen to a TempleOS GRA File.
   I64 size;
   CDC *dc=DCCaptureScreen;
   size=GRAWrite(filename,dc);

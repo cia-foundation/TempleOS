@@ -2,10 +2,10 @@ U8 *RandVocabWord()
 {
   I64 i;
   U8 *ptr;
-  if (!ws_dict_num_words)
+  if (!wsd.num_words)
     return NULL;
-  i=RandU32%ws_dict_num_words;
-  ptr=ws_dict_word_lst;
+  i=RandU32%wsd.num_words;
+  ptr=wsd.word_lst;
   while (i-- && *ptr==WSD_WORD_CHAR)
     ptr+=StrLen(ptr)+3;
   if (*ptr++!=WSD_WORD_CHAR)
@@ -32,13 +32,13 @@ U0 VocabQuiz()
     "$$WW,1$$$$CM-LE,5$$$$RED$$$$BK,1$$%s$$BK,0$$:$$FG$$$$LM,4$$\n",right_word;
     for (i=0;i<4;i++)
       "\n\n$$GREEN$$$$BT-X,\"%d\",LM=\"%d\"$$$$FG$$"
-      "$$LM,7$$%s\n$$LM,4$$",i+1,i+1,WSDGetDef(words[i]);
+      "$$LM,7$$%s\n$$LM,4$$",i+1,i+1,WSDDefGet(words[i]);
     "\n\n$$LTBLUE$$Answer:$$FG$$";
     do {
       ch=GetKey(,TRUE);
       DocBottom;
       if ('1'<=ch<='4') {
-	NewLine;
+	'\n';
 	if (ch-'1'==num) {
 	  "$$LTGREEN$$Correct\n$$FG$$";
 	  Snd(1000);

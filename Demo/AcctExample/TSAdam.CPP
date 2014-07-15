@@ -57,23 +57,23 @@ Bool ChkDrvModelSerial(U8 drv_let,U8 *model,U8 *serial)
 }
 
 #define SLOP	BLK_SIZE
-U0 TSBootDrv1()
+U0 TSBootRescueDrv1()
 {
   CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
-  DefinePrint("TS_BOOT_DRV_START","0x%X",CeilI64(SYS_KERNEL_END+SLOP,BLK_SIZE));
-  DefinePrint("TS_BOOT_DRV_END",  "0x%X",FloorI64(
+  DefinePrint("TS_BOOT_RESCUE_DRV_START","0x%X",CeilI64(SYS_KERNEL_END+SLOP,BLK_SIZE));
+  DefinePrint("TS_BOOT_RESCUE_DRV_END",  "0x%X",FloorI64(
     (BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4<<4-
     (bfh(I64)-SYS_KERNEL_END)-SLOP,BLK_SIZE));
-  DefinePrint("CFG_BOOT_DRV_FILE","\"/Temp/BootDrv.BIN.Z\"");
-} TSBootDrv1;
+  DefinePrint("CFG_BOOT_RESCUE_DRV_FILE","\"/Temp/BootRescueDrv.BIN.Z\"");
+} TSBootRescueDrv1;
 
-U0 TSBootDrv2()
+U0 TSBootRescueDrv2()
 {
-  DefinePrint("CFG_BOOT_DRV","\"a10x%X\n0x%X\n\"",TS_BOOT_DRV_START,
-    (TS_BOOT_DRV_END-TS_BOOT_DRV_START)/BLK_SIZE);
-  DefinePrint("CFG_BOOT_DRV_START","\"0x%X\"",TS_BOOT_DRV_START);
-} TSBootDrv2;
+  DefinePrint("CFG_BOOT_RESCUE_DRV","\"a10x%X\n0x%X\n\"",TS_BOOT_RESCUE_DRV_START,
+    (TS_BOOT_RESCUE_DRV_END-TS_BOOT_RESCUE_DRV_START)/BLK_SIZE);
+  DefinePrint("CFG_BOOT_RESCUE_DRV_START","\"0x%X\"",TS_BOOT_RESCUE_DRV_START);
+} TSBootRescueDrv2;
 
 U0 TSEmployeeSet()
 {
@@ -86,9 +86,10 @@ U0 TSEmployeeSet()
 
 U0 TSBlogDirSet()
 {
-  CDate cdt=Now;
+  CDateStruct ds;
+  Date2Struct(&ds,Now+local_time_offset);
   DefinePrint("TS_BLOG_DIR","\"/Accts/TS/Wb2/Rants/%s/%04d/%02d\"",
-    TS_EMPLOYEE,Year(cdt),Month(cdt));
+    TS_EMPLOYEE,ds.year,ds.mon);
 } TSBlogDirSet;
 
 #define CID_DFT		0
@@ -102,7 +103,6 @@ U0 TSIDComputer()
 {
 /* My TAD8 computer died.  It had two hard drives.  You could
 boot it directly or from VMware with a physical drive.
-
 
   CMemE820 *m20=SYS_MEM_E820;
   if (IsDrvVMware('D') && DrvMaxBlk('D')==0x575466EF)
@@ -135,7 +135,7 @@ U0 TSInit()
       if (ts_cid==CID_TAD8) {
 	DefinePrint("TS_HDS","\"DEI\"");
 	DefinePrint("TS_MASTER_BOOT_DRVS","\"I\"");
-      } else { //CID_TAD8_VM
+      } else {//CID_TAD8_VM
 	DefinePrint("TS_HDS","\"DE\"");
 	DefinePrint("TS_MASTER_BOOT_DRVS","\"\"");
       }
@@ -149,7 +149,7 @@ U0 TSInit()
     case CID_DFT:
       DefinePrint("CFG_ACCT","\"\nTS/TAD\n\"");
       DefinePrint("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x40000)\n\"");
-      if (sys_auto_mount_ide_cnt) {
+      if (dsk.auto_mount_ide_cnt) {
 	//If AutoMount was successful, No need to manually mount in next compile
 	DefinePrint("CFG_HARD_DRVS","\"\"");
 	DefinePrint("CFG_CDROM_DRVS","\"\"");
@@ -186,7 +186,7 @@ U0 TSInit()
       DefinePrint("TS_MASTER_BOOT_DRVS","\"D\"");
       DefinePrint("TS_MAIN_DRV","\"D\"");
       DefinePrint("TS_BAK_DRV","\"E\"");
-      DefinePrint("TS_BOOT_DRV","\"A\"");
+      DefinePrint("TS_BOOT_RESCUE_DRV","\"A\"");
       DefinePrint("TS_RAM_DRV","\"B\"");
       DefinePrint("TS_WIN_DRV","\"\"");
       DefinePrint("TS_CDROM_DRV","\"T\"");
@@ -197,7 +197,7 @@ U0 TSInit2()
 {
   DefinePrint("TS_MAIN_DRV_LET","'%s'",TS_MAIN_DRV);
   DefinePrint("TS_BAK_DRV_LET","'%s'",TS_BAK_DRV);
-  DefinePrint("TS_BOOT_DRV_LET","'%s'",TS_BOOT_DRV);
+  DefinePrint("TS_BOOT_RESCUE_DRV_LET","'%s'",TS_BOOT_RESCUE_DRV);
   DefinePrint("TS_RAM_DRV_LET","'%s'",TS_RAM_DRV);
   DefinePrint("TS_WIN_DRV_LET","'%s'",TS_WIN_DRV);
   DefinePrint("TS_CDROM_DRV_LET","'%s'",TS_CDROM_DRV);
@@ -206,7 +206,7 @@ U0 TSInit2()
 
 Bool	ts_has_main_drv =ToBool(StrLen(TS_MAIN_DRV)),
 	ts_has_bak_drv	=ToBool(StrLen(TS_BAK_DRV)),
-	ts_has_boot_drv	=ToBool(StrLen(TS_BOOT_DRV)),
+	ts_has_boot_rescue_drv	=ToBool(StrLen(TS_BOOT_RESCUE_DRV)),
 	ts_has_ram_drv	=ToBool(StrLen(TS_RAM_DRV)),
 	ts_has_win_drv	=ToBool(StrLen(TS_WIN_DRV)),
 	ts_has_cdrom_drv=ToBool(StrLen(TS_CDROM_DRV));
@@ -215,8 +215,8 @@ if (ts_has_main_drv)
   SetDrvTextAttr(TS_MAIN_DRV_LET, WHITE <<4|BLUE);
 if (ts_has_bak_drv)
   SetDrvTextAttr(TS_BAK_DRV_LET,  WHITE <<4|RED);
-if (ts_has_boot_drv)
-  SetDrvTextAttr(TS_BOOT_DRV_LET, BLUE	<<4|BROWN);
+if (ts_has_boot_rescue_drv)
+  SetDrvTextAttr(TS_BOOT_RESCUE_DRV_LET, BLUE	<<4|BROWN);
 if (ts_has_ram_drv)
   SetDrvTextAttr(TS_RAM_DRV_LET,  BLUE	<<4|YELLOW);
 if (ts_has_win_drv)
@@ -234,9 +234,8 @@ if (ts_has_cdrom_drv)
 #define TS_CFG		"\n" CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS CFG_ACCT CFG_DSK_CACHE CFG_OPTS
 #define TS_MENU_CFG	"\n" CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS "\n\n"  CFG_DSK_CACHE CFG_OPTS
 #define TS_CDROM_CFG	"Tb1\n0x20000\nt3 \n\nTS\n\nAutoMountIDE\nDT\n"
-#define TS_CDROM_DBG_CFG "A" CFG_BOOT_DRV "b1\nScale2Mem(2048,0x40000)\n\n\n\n"\
-			"DontProbe\nBootDrv\n" TS_MAIN_DRV ":" CFG_BOOT_DRV_FILE "\n" CFG_BOOT_DRV_START "\n\n"
-
+#define TS_CDROM_DBG_CFG "A" CFG_BOOT_RESCUE_DRV "b1\nScale2Mem(2048,0x40000)\n\n\n\n"\
+			"DontProbe\nBootRescueDrv\n" TS_MAIN_DRV ":" CFG_BOOT_RESCUE_DRV_FILE "\n" CFG_BOOT_RESCUE_DRV_START "\n\n"
 //$BK,1$Change these, too...$BK,0$
 //$MA-X+PU,"STD_DISTRO_CDROM_CFG",LM="F(\"STD_DISTRO_CDROM_CFG\");View;"$
 //$LK,"Install Acct",A="FF:::/Accts/Install/DoOnce.CPP,MakeOSPrtBootInstall"$
@@ -244,8 +243,7 @@ if (ts_has_cdrom_drv)
 Bool frame_grabber_on=FALSE;
 #define VIDEO_FRAME_RATE	8
 U0 FrameGrabberTask(I64)
-{
-/**** TO MAKE MOVIE ****
+{/**** TO MAKE MOVIE ****
 
 TempleOS
  <ALT-SHIFT-V>
@@ -267,29 +265,33 @@ Boot Windows
   Silent(ON);	//no output to screen
   MkDir("::/Temp/ScreenShots");
   while (frame_grabber_on) {
-    SPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
+    StrPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
     StrCpy(buf2,buf);
     BMPFileCaptureScreen(buf);
     while (TRUE) {
       end_time+=1.0/VIDEO_FRAME_RATE;
       if (end_time<tS) {
-	SPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
+	StrPrint(buf,"::/Temp/ScreenShots/VID%05d.BMP.Z",frame_num++);
 	Copy(buf2,buf);
       } else
 	break;
     }
-    SleepUntil(sys_jiffies+(end_time-tS)*JIFFY_FREQ);
+    SleepUntil(cnts.jiffies+(end_time-tS)*JIFFY_FREQ);
   }
 }
 
-U0 CopyVideo()
+I64 CopyVideo()
 {
+  I64 result=0;
   if (ts_has_bak_drv) {
     Del(TS_BAK_DRV ":/Temp/*.SND");
     SndFileCreate(TS_BAK_DRV ":/Temp/Audio",0.23,0.0,WF_SQUARE,0.45,0.35);
     DelTree(TS_BAK_DRV ":/Temp/ScreenShots");
     CopyTree("::/Temp/ScreenShots",TS_BAK_DRV ":/Temp/ScreenShots");
+    result=Unzip(TS_BAK_DRV ":/Temp/ScreenShots/*.Z");
   }
+  "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",result,result/60.0/VIDEO_FRAME_RATE;
+  return result;
 }
 
 public U0 FrameGrabberToggle()
@@ -300,13 +302,13 @@ public U0 FrameGrabberToggle()
     if (frame_grabber_on) {
       frame_grabber_on=FALSE;
       Snd(0);
-      wallpaper_record_on=snd_record=FALSE;
+      wall->record=snd.record=FALSE;
       Sleep(1000);
       CopyVideo;
     } else {
       frame_grabber_on=TRUE;
       Spawn(&FrameGrabberTask,NULL,"Frame Grabber");
-      wallpaper_record_on=snd_record=TRUE;
+      wall->record=snd.record=TRUE;
       Snd(0);
     }
   }
@@ -345,7 +347,7 @@ U0 JukeSongsPut(U8 *dir,I64 start_song,I64 end_song)
     tempde=tempde->next;
   }
 
-  DirLstDel(tempde1);
+  DirTreeDel(tempde1);
 }
 
 public U0 JukeLines(I64 start_line,I64 end_line)
@@ -353,10 +355,10 @@ public U0 JukeLines(I64 start_line,I64 end_line)
   WordStat;
   if (!frame_grabber_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Apps/MusicOrgan/Examples",,start_line*5,end_line*5);
+  JukeSongsPuppet("::/Apps/Psalmody/Examples",,start_line*5,end_line*5);
   if (frame_grabber_on)
     FrameGrabberToggle;
-  JukeSongsPut("::/Apps/MusicOrgan/Examples",start_line*5,end_line*5);
+  JukeSongsPut("::/Apps/Psalmody/Examples",start_line*5,end_line*5);
 }
 
 public U0 ChkAll()
@@ -389,7 +391,7 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
 
       best_score=MAX_I64;
       best_ch=0;
-      ptr=&gr_font[32*FONT_HEIGHT];
+      ptr=&text.font[32*FONT_HEIGHT];
       for (ch=32;ch<127;ch++) {
 	diff_image=*ptr++ ^ cur_char_image;
 	score=0;
@@ -437,4 +439,52 @@ public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
   }
   Free(in_name);
   Free(out_name);
+}
+
+U0 DblSpaceScanFile(U8 *filename)
+{
+  CDoc *doc=DocRead(filename);
+  I64 i;
+  CDocEntry *doc_e=doc->root.next;
+  while (doc_e!=doc) {
+    if (doc_e->type_u8==DOCT_NEW_LINE &&
+	doc_e->next->type_u8==DOCT_NEW_LINE &&
+	doc_e->next->next->type_u8==DOCT_NEW_LINE) {
+      i=0;
+      while (doc_e->type_u8==DOCT_NEW_LINE) {
+	i++;
+	doc_e=doc_e->next;
+      }
+      "%02d:",i;
+      PutFileLink(doc->filename.name,doc_e->y);
+      '\n';
+    } else
+      doc_e=doc_e->next;
+  }
+  DocDel(doc);
+}
+
+U0 DblSpaceScanLst(CDirEntry *tempde)
+{
+  CDirEntry *tempde1;
+  while (tempde) {
+    tempde1=tempde->next;
+    if (tempde->attr & RS_ATTR_DIR) {
+      if (tempde->sub) {
+	"Scanning Directory: %s\n",tempde->full_name;
+	DblSpaceScanLst(tempde->sub);
+      }
+    } else
+      DblSpaceScanFile(tempde->full_name);
+    DirEntryDel(tempde);
+    tempde=tempde1;
+  }
+}
+
+public U0 DblSpaceScan(U8 *files_find_mask="*",U8 *fu_flags=NULL)
+{
+  I64 f=0;
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
+  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  DblSpaceScanLst(FilesFind(files_find_mask,f));
 }

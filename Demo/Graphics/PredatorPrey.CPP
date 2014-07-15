@@ -1,4 +1,4 @@
-//This is a classic 2nd order nonlinear ordinary differential equation
+//Classic 2nd order nonlinear ordinary differential equation
 
 I64 mp_not_done_flags;
 

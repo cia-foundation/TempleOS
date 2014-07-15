@@ -1,5 +1,5 @@
 Bool ChkPtr(U8 *ptr)
-{
+{//Check if addr is valid ptr.
   if (sys_heap_base<=ptr<=MEM_MAPPED_SPACE) {
     if (*MemPageTable(ptr)&1)
       return TRUE;
@@ -14,7 +14,7 @@ Bool ChkPtr(U8 *ptr)
 }
 
 Bool ChkCodePtr(U8 *ptr)
-{
+{//Check if addr is valid code addr.
   if (sys_heap_base<=ptr<=sys_heap_limit) {
     if (*MemPageTable(ptr)&1)
       return TRUE;
@@ -29,7 +29,7 @@ Bool ChkCodePtr(U8 *ptr)
 }
 
 Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
-{
+{//Check if addr is valid stk addr.
   Bool result=FALSE;
   PUSHFD
   CLI
@@ -43,7 +43,7 @@ Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
 }
 
 I64 UnusedStk(CTask *task=NULL)
-{
+{//Count of usused bytes in task's stk.
   I64 result;
   if (!task) task=Fs;
   PUSHFD
@@ -57,10 +57,8 @@ I64 UnusedStk(CTask *task=NULL)
 }
 
 U8 *Caller(I64 num=1)
-//Returns the addr of the fun
-//which called this one, or the caller
-//of the caller, etc.
-{
+{//Returns the addr of the fun which called this one,
+//or the caller of the caller, etc.
   U8 **rbp=GetRBP,**ptr;
   while (num--) {
     if (rbp>=*rbp)
@@ -74,7 +72,7 @@ U8 *Caller(I64 num=1)
 }
 
 U8 *TaskCaller(CTask *task=NULL,I64 num=0,Bool saved_context=FALSE)
-{
+{//Fetches addr of Nth caller on task's stk.
   U8 **ptr,**rbp,**rsp;
   if (!task) task=Fs;
   if (!saved_context && task==Fs)
@@ -103,8 +101,7 @@ U8 *TaskCaller(CTask *task=NULL,I64 num=0,Bool saved_context=FALSE)
 #define STK_REP_LEN	32
 
 U0 StkRep(CTask *task=NULL)
-//Reports whats on the stk
-{
+{//Reports whats on the stk.
   I64 i,j,addr,
       **rbp,**rsp,*my_rsp[STK_REP_LEN];
   CHashTable *old_hash=Fs->hash_table;
@@ -146,13 +143,12 @@ U0 StkRep(CTask *task=NULL)
       "$$RED$$";
     "%P$$FG$$\n",my_rsp[i];
   }
-  NewLine;
+  '\n';
   Fs->hash_table=old_hash;
 }
 
 U0 CallerRep(U8 **rbp=NULL,CTask *task=NULL)
-//Prints a report of calling routines
-{
+{//Prints a report of calling routines.
   I64 **ptr;
   if (!task) task=Fs;
   if (!rbp) {
@@ -172,9 +168,8 @@ U0 CallerRep(U8 **rbp=NULL,CTask *task=NULL)
 }
 
 U0 D(U8 *addr,I64 cnt=0x80,Bool show_offset=TRUE)
-//Dump mem, showing offsets.
+{//Dump mem, showing offsets.
 //See $LK,"DocD",A="MN:DocD"$() for a live dump.
-{
   I64 i,j,ch;
   U8 *ptr=addr;
   while (cnt) {
@@ -198,21 +193,19 @@ U0 D(U8 *addr,I64 cnt=0x80,Bool show_offset=TRUE)
       if (ch=='$$')
 	'' ch;
     }
-    NewLine;
+    '\n';
     cnt-=j;
     ptr+=j;
   }
 }
 
 U0 Dm(U8 *addr,I64 cnt=0x80)
-//Show mem addr, not offsets
-{
+{//Show mem addr, not offsets.
   D(addr,cnt,FALSE);
 }
 
 U0 Da(U8 **addr,I64 cnt=0x10)
-//Dump mem, showing symbolic addresses
-{
+{//Dump mem, showing symbolic addresses.
   while (cnt-->0) {
     "%08X:%08X,%P\n",addr,*addr,*addr;
     addr++;
@@ -220,11 +213,9 @@ U0 Da(U8 **addr,I64 cnt=0x10)
 }
 
 U0 RawPrint(I64 mS=100,U8 *fmt,...)
-//Print using $LK,"Raw",A="MN:Raw"$ screen
-//output for a length of time.
+{//Print using $LK,"Raw",A="MN:Raw"$ screen output for a length of time.
 //$BK,1$Your heap must be good.$BK,0$
-{
-  U8 *buf=SPrintJoin(NULL,fmt,argc,argv);
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   Bool old_raw,old_input_filter;
   PUSHFD
   CLI
@@ -239,10 +230,9 @@ U0 RawPrint(I64 mS=100,U8 *fmt,...)
 }
 
 U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80)
-//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
+{//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //screen output for a fixed length
 //of time.
-{
   Bool old_raw,old_input_filter;
   PUSHFD
   CLI
@@ -256,10 +246,9 @@ U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80)
 }
 
 U0 RawDm(I64 mS=100,U8 *addr,I64 cnt=0x80)
-//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
+{//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //screen output for a fixed length
 //of time.
-{
   Bool old_raw,old_input_filter;
   PUSHFD
   CLI
@@ -299,38 +288,38 @@ I64 *TaskRegAddr(CTask *task,I64 reg_num)
 
 U0 RawDr(CTask *task=NULL)
 {
-  I64 i,j,old_col=sys_raw_col;
+  I64 i,j,old_col=text.raw_col;
   Bool old_raw=Raw(ON);
   U8 buf[200];
 
   if (!task) task=Fs;
 
   for (i=0;i<16;i++) {
-    sys_raw_col=i*text_cols+RAWDR_COL;
+    text.raw_col=i*text.cols+RAWDR_COL;
     "º%3Z:%016X\n",i,"ST_U64_REGS",*TaskRegAddr(task,i);
   }
 
-  sys_raw_col=i++*text_cols+RAWDR_COL;
+  text.raw_col=i++*text.cols+RAWDR_COL;
   "ºRIP:%016X\n",task->rip;
 
-  sys_raw_col=i++*text_cols+RAWDR_COL;
-  "º%-*tp\n",text_cols-(RAWDR_COL+1)-1,Fs->rip;
+  text.raw_col=i++*text.cols+RAWDR_COL;
+  "º%-*tp\n",text.cols-(RAWDR_COL+1)-1,Fs->rip;
 
-  sys_raw_col=i++*text_cols+RAWDR_COL;
+  text.raw_col=i++*text.cols+RAWDR_COL;
   'º';
   if (Bt(&sys_run_level,RLf_COMPILER)) {
     j=Fs->rip;
     Ui(buf,&j,,,TRUE);
     "%s",buf;
   } else
-    NewLine;
+    '\n';
 
-  sys_raw_col=i*text_cols+RAWDR_COL;
+  text.raw_col=i*text.cols+RAWDR_COL;
   'È';
-  for (j=0;j<text_cols-RAWDR_COL-1;j++)
+  for (j=0;j<text.cols-RAWDR_COL-1;j++)
     'Í';
 
-  sys_raw_col=old_col;
+  text.raw_col=old_col;
   Raw(old_raw);
 }
 
@@ -350,7 +339,7 @@ U0 OverRideSingleUserSwap()
   SingleUser(old_single);
 }
 
-U8 *SysMGetS(I64)
+U8 *SysGetStr2(I64)
 {
   U8 buf[512];
   GetS(buf,512,FALSE);
@@ -382,7 +371,7 @@ CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
 }
 
 Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
-{//Set breakpoint
+{//Set breakpoint.
   CBpt *tempb;
   Bool result=TRUE;
   if (!task) task=Fs;
@@ -403,7 +392,7 @@ Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 }
 
 Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE)
-{//Rem breakpoint
+{//Rem breakpoint.
   CBpt *tempb;
   Bool result=FALSE;
   if (!task) task=Fs;
@@ -421,8 +410,8 @@ Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE)
 }
 
 Bool B(U8 *addr,CTask *task=NULL,Bool live=TRUE)
-{//Toggle breakpoint
- //Returns TRUE if removed
+{//Toggle breakpoint.
+//Return: TRUE if removed.
   Bool result=FALSE;
   PUSHFD
   CLI
@@ -436,8 +425,8 @@ Bool B(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 }
 
 I64 B2(CTask *task=NULL,Bool live=TRUE)
-{ //Rem all breakpoints
-  //Returns cnt of removed
+{//Rem all breakpoints.
+//Return: cnt of removed.
   I64 result=0;
   CBpt *tempb,*tempb1;
   if (!task) task=Fs;
@@ -458,17 +447,16 @@ I64 B2(CTask *task=NULL,Bool live=TRUE)
 }
 
 U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
-//Go
-{
+{//Go
   if (!task) task=Fs;
   if (ip!=INVALID_PTR) task->rip=ip;
   if (BptFind(task->rip,task))
-    "\nDo one of the following, first:\n"
-    ">S;\t\t\t//Single step\n"
-    ">B2;\t\t\t//Clear all break points\n"
-    ">G2;\t\t\t//Clear all break points and Go\n\n"
-    "After resuming, <CTRL-ALT-T> changes focus task\n"
-    "After resuming, <CTRL-ALT-F> flushes screen VGA cache\n";
+	"\nDo one of the following, first:\n"
+	">S;\t\t\t//Single step\n"
+	">B2;\t\t\t//Clear all break points\n"
+	">G2;\t\t\t//Clear all break points and Go\n\n"
+	"After resuming, <CTRL-ALT-t> changes focus task\n"
+	"After resuming, <CTRL-ALT-f> flushes screen VGA cache\n";
   else {
     LBtr(&task->task_flags,TASKf_DISABLE_BPTS);
     LBtr(&task->rflags,RFLAGf_TRAP);//No single step
@@ -484,18 +472,17 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
 }
 
 U0 G2(U8 *ip=INVALID_PTR,CTask *task=NULL)
-//Rem all breakpoints and Go.
-{
+{//Rem all breakpoints and Go.
   if (!task) task=Fs;
   B2(task);
   if (ext[EXT_WIN_FOCUS])
-    CallExtNum(EXT_WIN_FOCUS,sys_dbg_focus_task);
+    CallExtNum(EXT_WIN_FOCUS,dbg.focus_task);
   VGAFlush;
   G(ip,task);
 }
 
 public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
-{ //Single step
+{//Single step.
   if (!task) task=Fs;
   PUSHFD
   CLI
@@ -515,43 +502,43 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
 
 U0 DbgHelp()
 {
-  "\n"
-  "The cmd line is basically the same as normal.  Here are some common\n"
-  "debugging commands.\n\n"
-  ">EdLite(\"FileName\");\t\t//Edit file.\n"
-  ">D(0x100000);\t\t\t//Dump page tables.\n"
-  ">Dm(0x100000);\t\t\t//Dump page tables.\n"
-  ">Dm(Fs,sizeof(CTask));\t\t//Dump current task record.\n"
-  ">ClassRep(Fs,\"CTask\",1);\t//Dump current task record.\n"
-  ">ClassRep(Fs,,1);\t\t//(It knows lastclass.)\n"
-  ">CallerRep;\t\t\t//Stack trace report.\n"
-  ">Da(_RSP);\t\t\t//Dump stk.\n"
-  ">Dr;\t\t\t\t//Dump Regs.\n"
-  ">1+2*3+&Print;\t\t\t//Show calculation result.\n"
-  ">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
-  ">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
-  ">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
-  ">I64 i;\t\t\t\t//Declare variable.\n"
-  ">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
-  ">U(&Print+0x8);\t\t\t//Unassemble Print.\n"
-  ">Uf(\"Print\");\t\t\t//Unassembler function \"Print\".\n"
-  ">Man(\"Print\");\t\t\t//Edit Src for \"Print\".\n"
-  ">E(_RIP);\t\t\t//Edit Src Code.\n"
-  ">Fix;\t\t\t\t//Edit Last Err Src Code.\n"
-  ">B(&Main+0x20);\t\t\t//Toggle break point.\n"
-  ">B2;\t\t\t\t//Clear all break points.\n"
-  ">S;\t\t\t\t//Single step.\n"
-  ">G;\t\t\t\t//Resume execution.\n"
-  ">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
-  ">Exit;\t\t\t\t//Exit (kill) task.\n\n"
-  "After resuming, <CTRL-ALT-T> changes focus task.\n"
-  "After resuming, <CTRL-ALT-F> flushes screen VGA cache.\n\n";
+"\n"
+"The cmd line is basically the same as normal.	Here are some common\n"
+"debugging commands.\n\n"
+">EdLite(\"FileName\");\t\t//Edit file.\n"
+">D(0x100000);\t\t\t//Dump page tables.\n"
+">Dm(0x100000);\t\t\t//Dump page tables.\n"
+">Dm(Fs,sizeof(CTask));\t\t//Dump current task record.\n"
+">ClassRep(Fs,\"CTask\",1);\t//Dump current task record.\n"
+">ClassRep(Fs,,1);\t\t//(It knows lastclass.)\n"
+">CallerRep;\t\t\t//Stack trace report.\n"
+">Da(_RSP);\t\t\t//Dump stk.\n"
+">Dr;\t\t\t\t//Dump Regs.\n"
+">1+2*3+&Print;\t\t\t//Show calculation result.\n"
+">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
+">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
+">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
+">I64 i;\t\t\t\t//Declare variable.\n"
+">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
+">U(&Print+0x8);\t\t\t//Unassemble Print.\n"
+">Uf(\"Print\");\t\t\t//Unassembler function \"Print\".\n"
+">Man(\"Print\");\t\t\t//Edit Src for \"Print\".\n"
+">E(_RIP);\t\t\t//Edit Src Code.\n"
+">Fix;\t\t\t\t//Edit Last Err Src Code.\n"
+">B(&Main+0x20);\t\t\t//Toggle break point.\n"
+">B2;\t\t\t\t//Clear all break points.\n"
+">S;\t\t\t\t//Single step.\n"
+">G;\t\t\t\t//Resume execution.\n"
+">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
+">Exit;\t\t\t\t//Exit (kill) task.\n\n"
+"After resuming, <CTRL-ALT-t> changes focus task.\n"
+"After resuming, <CTRL-ALT-f> flushes screen VGA cache.\n\n";
 }
 
 U0 Dbg2()
 {
   Bool old_win_inhibit,old_waiting_msg;
-  I64 i,old_dbg_mgets;
+  I64 i,old_getstr2;
   U8 buf[200];
   if (IsRaw) {
     i=Fs->rip;
@@ -563,13 +550,13 @@ U0 Dbg2()
   old_win_inhibit=Fs->win_inhibit;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
   sys_focus_task=Fs;
-  sys_cur_scan_code=0;
-  old_dbg_mgets=fp_mgets;
-  fp_mgets=&SysMGetS;
-  while (!mouse_install_attempts)
+  kbd.scan_code=0;
+  old_getstr2=fp_getstr2;
+  fp_getstr2=&SysGetStr2;
+  while (!mouse.install_attempts)
     OverRideSingleUserSwap;
   UserTaskCont;
-  fp_mgets=old_dbg_mgets;
+  fp_getstr2=old_getstr2;
   Fs->win_inhibit=old_win_inhibit;
   LBEqu(&Fs->task_flags,TASKf_AWAITING_MSG,old_waiting_msg);
 }
@@ -581,12 +568,12 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
   PUSHFD
   CLI
   was_in_dbg=InDbg(ON);
-  if (Gs->num && mp_crash) {
+  if (Gs->num && dbg.mp_crash) {
     mp_cnt=1;
-    mp_crash->cpu_num=Gs->num;
-    mp_crash->task=Fs;
-    mp_crash->msg=sys_dbg_msg;
-    mp_crash->msg_num=sys_dbg_msg_num;
+    dbg.mp_crash->cpu_num=Gs->num;
+    dbg.mp_crash->task=Fs;
+    dbg.mp_crash->msg=dbg.msg;
+    dbg.mp_crash->msg_num=dbg.msg_num;
     MPInt(I_MP_CRASH,0);
     SysHlt;
   }
@@ -594,10 +581,10 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
   ">Help;\t//For help.\n\n";
   Beep(500,TRUE);
   if (fault_num==I_DBG) {
-    if (sys_dbg_msg) {
-      "\n!!! %s",sys_dbg_msg;
-      if (sys_dbg_msg_num)
-	"%016X",sys_dbg_msg_num;
+    if (dbg.msg) {
+      "\n!!! %s",dbg.msg;
+      if (dbg.msg_num)
+	"%016X",dbg.msg_num;
       " !!!\n\n";
     }
   }
@@ -607,24 +594,24 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
   POPFD
 }
 
-U0 Fault2(I64 fault_num,I64 fault_err_code) //Called from $LK,"Fault2",A="FF:::/Kernel/Interrupts.CPP,Fault2"$
-{
+U0 Fault2(I64 fault_num,I64 fault_err_code)
+{//Called from $LK,"Fault2",A="FF:::/Kernel/Ints.CPP,Fault2"$.
 //$BK,1$Be careful not to swap-out and ruin the saved context$BK,0$
   Bool was_raw,was_single_user,was_silent;
-  I64  i,old_raw_flags=sys_raw_flags;
+  I64  i,old_raw_flags=text.raw_flags;
   if (fault_num==I_DIVIDE_BY_ZERO) {
     "RIP:%P\n",Fs->rip;
     throw('DivZero');
   }
   was_single_user=SingleUser(ON);
   if (!IsDbg)
-    sys_dbg_focus_task=sys_focus_task;
+    dbg.focus_task=sys_focus_task;
   sys_focus_task=NULL;
   if (fault_num==I_BPT)
     Fs->rip--;
   was_raw=Raw(ON);
   was_silent=Silent(OFF);
-  sys_raw_flags|=RWF_SHOW_DOLLAR|RWF_SCROLL;
+  text.raw_flags|=RWF_SHOW_DOLLAR|RWF_SCROLL;
 
   "Task \"";
   "%s",Fs->task_title;
@@ -641,19 +628,18 @@ U0 Fault2(I64 fault_num,I64 fault_err_code) //Called from $LK,"Fault2",A="FF:::/
 
   Silent(was_silent);
   Raw(was_raw);
-  sys_raw_flags=old_raw_flags;
+  text.raw_flags=old_raw_flags;
   SingleUser(was_single_user);
   if (LBtr(&Fs->task_flags,TASKf_KILL_AFTER_DBG))
     Exit;
 }
 
 U0 Dbg(U8 *msg=NULL,I64 msg_num=0)
-//Enters the debugger.	Can be used as a panic.
-{
+{//Enters the debugger.	Can be used as a panic.
   PUSHFD
   CLI
-  sys_dbg_msg=msg;
-  sys_dbg_msg_num=msg_num;
+  dbg.msg=msg;
+  dbg.msg_num=msg_num;
   INT I_DBG
   POPFD
 }
