@@ -1,6 +1,6 @@
 #help_index "DolDoc/Conversion"
 
-//See $LK,"::/Doc/Acknowledgements.TXT"$.
+//See $LK,"::/Doc/Credits.TXT"$.
 
 U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,U8 *st,I64 *_col,U8 *style_bitmap=NULL)
 {
@@ -61,7 +61,7 @@ U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,U8 *st,I64 *_col,U8 *style
   }
 }
 
-U8 *TSLinkCvt2(U8 *filename,I64 line_num)
+U8 *TOSLinkCvt2(U8 *filename,I64 line_num)
 {// ::/  --> http://www.templeos.org/Wb/
 //Make your own LinkCvt routine
   U8 *result=NULL,*st;
@@ -74,7 +74,7 @@ U8 *TSLinkCvt2(U8 *filename,I64 line_num)
   return result;
 }
 
-U8 *TSLinkCvt1(U8 *link_st)
+U8 *TOSLinkCvt1(U8 *link_st)
 {
   static CDoc *bible=NULL;
   static I64 locks=0;
@@ -85,7 +85,7 @@ U8 *TSLinkCvt1(U8 *link_st)
       case LK_FILE_LINE:
       case LK_PLAIN_LINE:
       case LK_FILE:
-	result=TSLinkCvt2(filename,num);
+	result=TOSLinkCvt2(filename,num);
 	break;
       case -1:
       case LK_DEF:
@@ -101,12 +101,12 @@ U8 *TSLinkCvt1(U8 *link_st)
 	if (!bible)
 	  bible=Adam("DocRead(\"%s\");",filename);
 	if (DocFind(bible,num,needle))
-	  result=TSLinkCvt2(filename,bible->cur_entry->y+1);
+	  result=TOSLinkCvt2(filename,bible->cur_entry->y+1);
 	LBtr(&locks,0);
 	break;
       default:
 	if (DocFileEd(i,filename,needle,&num,EDF_UNCOLLAPSE|EDF_BAIL))
-	  result=TSLinkCvt2(filename,num);
+	  result=TOSLinkCvt2(filename,num);
     }
     Free(filename);
     Free(needle);
@@ -117,7 +117,7 @@ U8 *TSLinkCvt1(U8 *link_st)
 public CDoc *Doc2Html(CDoc *doc_in,
   U8 *html_header=NULL,
   U8 *body_header=NULL,U8 *body_footer=NULL,Bool line_anchors=TRUE,
-  U8 (*link_cvt)(U8 *link_st)=&TSLinkCvt1)
+  U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
 {//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
   I64 i,y,old_y=MIN_I64,col,_old_u32_attr=-1,old_attr;
@@ -279,14 +279,14 @@ public CDoc *Doc2Html(CDoc *doc_in,
 #help_index "Cmd Line (Typically);DolDoc/Conversion;DolDoc/Cmd Line (Typically)"
 public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   U8 *body_header=NULL,U8 *body_footer=NULL,I64 width=80,
-  Bool line_anchors=TRUE,U8 (*link_cvt)(U8 *link_st)=&TSLinkCvt1)
+  Bool line_anchors=TRUE,U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
 {//Convert $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file to HTML.
 //Supply your own link_cvt routine.
   U8 *in_name,*out_name;
   CDoc *doc_in,*doc_out;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  SetWinHorz(0,width-1); //Sets doc width for word wrap.
+  WinHorz(0,width-1); //Sets doc width for word wrap.
 
   in_name=DftExt(_in_name,"CPP.Z"),
   if (_out_name)

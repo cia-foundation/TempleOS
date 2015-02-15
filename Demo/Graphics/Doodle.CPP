@@ -9,7 +9,7 @@ U0 Doodle()
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
 
   WinMax;
-  WordStat;
+  AutoComplete;
 
   DCFill;
   DocClear;

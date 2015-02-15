@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Directory Structure"$$FG$
 
-$FG,2$/Accts$FG$ Each subdirectory is an acct.  When you boot, you can select an acct to login to, unless you compile Kernel soas to pick one.  Your acct directory is your $FG,2$HOME$FG$ directory and all your user data should be placed in here to ease backing-up your data.  When you Install an application it will create a subdirectory of your $FG,2$HOME$FG$ directory for storage.
+$FG,2$/Home$FG$ All your user data should be placed in here to ease backing-up your data.  When you install an application it will create a subdirectory of your $FG,2$/Home$FG$ directory for storage.
 
 $FG,2$/Apps$FG$ Applications are placed in subdirectories of $FG,2$/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your PersonalMenu, use $FG,2$<CTRL-l>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
 
@@ -8,27 +8,27 @@ $FG,2$/Demo$FG$ Here you can find lots of sample code to do various things.
 
 $FG,2$/Doc$FG$ Here you can find documentation.
 
-$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a $FG,2$kernel$FG$ is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  It is loaded by the boot loader and must fit in 640K.
+$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a $FG,2$kernel$FG$ is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  It is loaded by the boot loader and must fit in 640K.
 
-$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 
 $FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.
 
 
 
-$FG,5$$TX+CX,"Acct Files"$$FG$
+$FG,5$$TX+CX,"::/Home Files"$$FG$
 
-You can add and remove accts by making or removing directories in the $FG,2$::/Accts$FG$ directory.  An empty account directory should be valid because it will get default files from the parent directory.  Compile the $LK,"Kernel",A="MN:MakeOSPrtBootInstall"$ to set the active acct or cause it to prompt an account at boot. 
+An empty $FG,2$::/Home$FG$ directory should be valid because it will get default files from the root directory. 
 
-$LK,"HOME/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+$LK,"::/Home/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
 
-$LK,"HOME/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+$LK,"::/Home/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
 
-$LK,"HOME/Adam3.CPP"$ files invoked when the adam task starts-up.  Customize these!
+$FG,4$::/Home/Adam*$FG$ Copy $FG,2$Adam*$FG$ files from the root into $FG,2$::/Home$FG$ and customize them.  These files are invoked when the adam task starts-up.
 
-$LK,"HOME/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
+$LK,"::/Home/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
 
-$LK,"HOME/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
+$LK,"::/Home/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
 
 
 
@@ -40,15 +40,15 @@ $FG,5$$TX+CX,"Application Policies"$$FG$
 
 * Make a file called $FG,2$Run.CPP.Z$FG$ to load and run the application, preferable by $FG,2$#include$FG$ing the $FG,2$Load.CPP.Z$FG$ file.
 
-* Place user data in a subdirectory of $FG,2$HOME$FG$, preferably naming the subdirectory the same as the $FG,2$/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.CPP.Z$FG$ file.  See $LK,"::/Demo/RegistryDemo.CPP"$.
+* Place user data in a subdirectory of $FG,2$/Home$FG$, preferably naming the subdirectory the same as the $FG,2$/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.CPP.Z$FG$ file.  See $LK,"::/Demo/RegistryDemo.CPP"$.
 
-* If the app needs files in the $FG,2$HOME$FG$ directory, make an $FG,2$/Apps$FG$ file called $FG,2$Install.CPP.Z$FG$ or $FG,2$Install.AUT.Z$FG$ to create the $FG,2$HOME$FG$ subdirectory and do similar stuff.
+* If the app needs files in the $FG,2$/Home$FG$ directory, make an $FG,2$/Apps$FG$ file called $FG,2$Install.CPP.Z$FG$ or $FG,2$Install.AUT.Z$FG$ to create the $FG,2$/Home$FG$ subdirectory.
 
  
 
 $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
-* Virtual mem/Paging is not used -- it is identity mapped in $FG,2$x86_64$FG$ mode.  The stk does not grow, so allocate enough when the task (process) is $LK,"Spawn",A="MN:Spawn"$ed and use the heap for most things.  (The $FG,2$heap$FG$ refers to $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().)
+* Virtual mem/Paging is not used -- it is identity mapped in $FG,2$x86_64$FG$ mode.  The stk does not grow, so alloc enough when the task (process) is $LK,"Spawn",A="MN:Spawn"$ed and use the heap for most things.  (The $FG,2$heap$FG$ refers to $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().)
 
 * See $LK,"Naming Convention",A="FF:::/Doc/Glossary.TXT,Naming Convention"$ and $LK,"Abbreviations",A="FF:::/Doc/Glossary.TXT,Abbreviations"$.
 
@@ -76,7 +76,7 @@ $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
 $FG,5$$TX+CX,"Hash Sym Tables"$$FG$
 
-* See $LK,"::/Adam/Hash2a.CPP"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
+* See $LK,"::/Adam/AHash.CPP"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
 
 * $FG,2$adam_task->hash_table$FG$ holds the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ syms loaded in on start-up.
 
@@ -94,7 +94,7 @@ $FG,5$$TX+CX,"Assembly Language"$$FG$
 
 * Don't change the segment regs unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$ and $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$.
 
-* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT.Z"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REG_VARS_MASK"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
+* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REG_VARS_MASK"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
 
 * I recommend using the standard stk frame for functions because $LK,"Caller",A="MN:Caller"$() is used to display the call stk, such as for the wallpaper.
 $FG,2$	PUSH	RBP

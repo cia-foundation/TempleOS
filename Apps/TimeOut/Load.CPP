@@ -1,5 +1,6 @@
 #help_index "Games"
 
-#include "/Apps/TimeOut/TimeOut"
+Cd(__DIR__);;
+#include "TimeOut"
 
 #help_index ""

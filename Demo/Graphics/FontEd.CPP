@@ -8,7 +8,7 @@ You can load it with:
 If you want to change the system font permanently,
 save to a file with this font editor program
 and cut and paste the code into $LK,"::/Kernel/Font8x8.CPP"$.
-You will need to recompile Kernel by calling $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+You will need to recompile Kernel by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 
 See $LK,"::/Demo/ExtendedChars.CPP"$ and $LK,"::/Demo/ScreenCodes.CPP"$.
 */
@@ -37,7 +37,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   k=0;
   for (i=0;i<FONT_HEIGHT;i++)
     for (j=0;j<FONT_WIDTH;j++) {
-      if (Bt(&text.font[FONT_HEIGHT*cur_ch],k++))
+      if (Bt(&text.font[cur_ch],k++))
 	dc->color=YELLOW;
       else
 	dc->color=BLUE;
@@ -54,7 +54,7 @@ U0 FESave(Bool pmt)
   I64 i,j,k=0;
   for (i=0;i<256;i++) {
     for (j=0;j<FONT_HEIGHT;j++)
-      DocPrint(doc,"0x%02X,",text.font[k++]);
+      DocPrint(doc,"0x%02X,",text.font(U8 *)[k++]);
     if (Bt(chars_bitmap_safe_dollar,i))
       DocPrint(doc,"//%c",i);
     else if (i=='$$')
@@ -77,7 +77,7 @@ U0 FontEd()
   "  Abort(,CH_SHIFT_ESC);"
   "  Exit(,CH_ESC);"
   "}");
-  WordStat;
+  AutoComplete;
   DocClear;
   DocCursor;
   Fs->win_inhibit|=WIG_DBL_CLICK;
@@ -129,9 +129,9 @@ U0 FontEd()
 	    (a1-BLOW_UP_CHAR_X)/FONT_WIDTH;
 	  if (0<=k<FONT_WIDTH*FONT_HEIGHT) {
 	    if (ip.lb||msg_code==MSG_IP_L_DOWN)
-	      Bts(&text.font[FONT_HEIGHT*cur_ch],k);
+	      Bts(&text.font[cur_ch],k);
 	    if (ip.rb||msg_code==MSG_IP_R_DOWN)
-	      Btr(&text.font[FONT_HEIGHT*cur_ch],k);
+	      Btr(&text.font[cur_ch],k);
 	  }
 	  break;
       }

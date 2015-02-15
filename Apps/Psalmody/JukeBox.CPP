@@ -1,12 +1,12 @@
 CTask *SingleSong(U8 *msg,U8 *name)
 {
   Bool old_preempt=Preempt(OFF);
-  CTask *task=Spawn(&SrvUserCmdLine,NULL,name,,Fs);
+  CTask *task=Spawn(&SrvCmdLine,NULL,name,,Fs);
   StrCpy(task->task_title,name);
   task->title_src=TTS_LOCKED_CONST;
   TaskExe(task,Fs,";",1<<SVCf_WAKE_MASTER|1<<SVCf_FREE_ON_COMPLETE);
-  SetWinHorz(task->win_left,task->win_left+50,task);
-  SetWinVert(2,2+8,task);
+  WinHorz(task->win_left,task->win_left+50,task);
+  WinVert(2,2+8,task);
   Preempt(old_preempt);
   TaskExe(task,NULL,msg,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   DocPut(task)->max_entries=100;
@@ -27,7 +27,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
     tempde=doc_ce->left_exp;
     if (sc.u8[0]==SC_DELETE ) {
       Beep;
-      Silent(ON);
+      Silent;
       Del(tempde->full_name);
       Silent(OFF);
     } else if ('0'<=ch<='9') {
@@ -62,7 +62,7 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
   if (_filename)
     *_filename=NULL;
   if (!dirname)
-    dirname=StrNew("HOME/Psalmody");
+    dirname=StrNew("::/Home/Psalmody");
   else
     dirname=StrNew(dirname);
   st=MStrPrint("%s/*.CPP.Z",dirname);

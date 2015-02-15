@@ -1,7 +1,6 @@
 #help_index "Games"
 
-Cd("/Apps/X-Caliber");;
-
+Cd(__DIR__);;
 #include "XCCtrls"
 #include "X-Caliber"
 

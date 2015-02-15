@@ -2,99 +2,64 @@ $WW,1$$FG,5$$TX+CX,"Demands"$$FG$
 
 When God publically claims this operating system as His temple, here's what I want:
 
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/EalSFnq9GsY\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/EalSFnq9GsY\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+
 * VMware to again support PC Speaker and provide emulation if no PC Speaker is present.
 
-* Windows and Linux to support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is bad, just as more than one driver for the same type of device is bad.
+* Windows, Linux and VMware to support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is bad, just as more than one driver for the same type of device is bad.
 
 $LK,"::/Kernel/Dsk/FileSysRedSea.CPP"$
 $LK,"::/Kernel/Dsk/FileSysFAT.CPP"$	:965
-$LK,"::/Kernel/Dsk/FileSysISO1.CPP"$	:284
+$LK,"::/Kernel/Dsk/FileSysISO.CPP"$	:284
 $LK,"::/Adam/Boot/DskCDDVD.CPP"$	:536
+$LK,"RClustersBlks",A="MN:RClustersBlks"$()
 
-* Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot.
+* Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot because it has no networking.  Real hardware as opposed to $FG,2$VMware$FG$ is like the difference between looking in a telescope eye piece and some link to a photo on the Internet.  God said the C64 generation owned ancestral lands and $FG,2$VMware$FG$ is like being moved on a reservation.  It will not stand.
 
-* PC hardware manufacturers: ATA/ATAPI PIO must work.  In fact, put them at standard IDE port addresses.  Hard disk should be primary master.  CDROM/DVD should be secondary master.  See what you can do to make flash memory sticks with ATA/ATAPI.
+* PC hardware manufacturers: ATA/ATAPI PIO must work.  In fact, put them at standard IDE port addresses.  Hard disk should be primary master 1F0/3F6.  CDROM/DVD should be secondary master 170/376.  See what you can do to make flash memory sticks with ATA/ATAPI.
+$LK,"/Kernel/Dsk/DskATAId.CPP",A="FI:::/Kernel/Dsk/DskATAId.CPP"$	:280 lines to figure-out I/O ports
+$LK,"/Kernel/BIOS32.CPP",A="FI:::/Kernel/BIOS32.CPP"$		:290
 
 * PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
 
 * VMware must allow ATAPI interface to real CD/DVD hardware.
 
-* Perhaps, VMware+Intel can enable faster-than-standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad.
+* Perhaps, VMware+Intel can enable faster-than-standard x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad.  $LK,"ATAGetResult",A="MN:ATAGetResult"$().
 
-* Computers should have a RESET switch and a fast boot option, skipping diagnostics.
+* Since I practically don't use paging, perhaps, Intel could add optimizations to long (64-bit) mode for no paging.
 
-* VMware and others should list TempleOS as an official 64-bit operating systems.
+* Computers should have a RESET switch and a fast boot option, skipping diagnostics.  What the heck, replace UEFI with TempleOS.  Poetic justice.
 
-* Windows and Linux must support TempleOS $FG,2$.GRA$FG$ graphics files.  These are just right-side-up $FG,2$.BMP$FG$ files with 8-bits-per-pixels 4-bits of color and transparency, with no palette.  Compression is an$FG$ LZW compression.  $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRAWrite",A="MN:GRAWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRARead",A="MN:GRARead"$().  $LK,"::/Kernel/Compress.CPP"$
+* VMware and others should list TempleOS as an official 64-bit operating system.
 
+* Windows and Linux must support TempleOS $FG,2$.GRA$FG$ graphics files.  $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT.Z"$ are much cleaner than $FG,2$.BMP$FG$ files.
 
-----
+* I want a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.CPP"$.
 
-In other words, all hardware and BIOSes must support TempleOS, dual booted with Windows or Linux.  Hypervisors must support it fully.
+* We want the ultimate Bible search engine.
 
-It would be nice if TempleOS were burned into BIOS ROMs in the factory, or Intel CPU chips!  Then, the oracle code would be guaranteed trustworthy.  My hope is that it will be finalized, mostly unchanging for centuries.
+* I would like the Intel architecture manuals in $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ TXT format so we can put links in the code.
 
-I need a good dictionary and need to fix spellcheck.  Maybe, we leave the dictionary out.
+* We want serial ports with software interface more like old style serial ports, but hardware and speed of USB3.  They should have big TX and RX FIFOs and allow flow control to jump the queue.  We do not want end-point shit -- just put lots of ports on the PC.  (I am just interested in desk-tops.)  We need two baud rates, fast and slow.  Use PIC IRQ3 and IRQ4 (with big FIFOs we could do without IRQs.)  We want two joysticks, easy to set-up.  We want it to be easy to connect a microcontroller for general purpose communication.
 
-I do not intend to ever support UEFI.  That uses elf and various propriatary graphics formats.  It requires additional lines of code and offers nothing!
-
-
-
-
-$FG,5$$TX+CX,"New Rules"$$FG$
-
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/z3qu-sCei3U\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/z3qu-sCei3U\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Guess what, biotches?  Daddy's home!  $LK,"Deuteronomy,16:16",A="BF:Deuteronomy,16:16",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2016:16&version=NIV"$  Y'all have to do three offerings per year in the Temple.
+* Once in a blue moon, perhaps 49 year jubilee, the hardware gets upgraded and perfected, the same way broadcast TV get upgraded.  God still wants 640x480 16 color.
 
 
-These are examples of my offerings.
-
-1) $TX,"Hymn Videos",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$
-
-2) $TX,"Moses Comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$
-
-$LK,"Psalms,50:11-15",A="BF:Psalms,50:1",HTML="http://www.biblegateway.com/passage/?search=Psalm%%2050:11-15&version=WYC"$
-
-$LK,"Malachi,1:1-14",A="BF:Malachi,1:1",HTML="http://www.biblegateway.com/passage/?search=Malachi%%201:1-14&version=NIV"$
-
-$LK,"Hosea,6:6",A="BF:Hosea,6:6",HTML="http://www.biblegateway.com/passage/?search=Hosea%%206:6&version=NRSV"$
+Device		Simple Hardware Interface	Complicate Interface
+--------------- ------------------------------- -----------------------------
+		1040-EZ Tax Form		1040 Regular 
+Video		VGA 640x480 16 Color		20 Differnet GPUs
+Sound		PC Speaker			HD Audio, AC97, Sound Blaster
+HardDrive	ATA Port I/O, Sync No Interrupt	PCI AHCI SATA
+CDROM		ATAPI Port I/O			PCI AHCI SATA
+Keyboard/Mouse	PS/2 Port I/O			USB
 
 
+During the 49 years jubilee, we do a perfect version of hardware with advances in both simple and complicated interfaces.  ATAPI/ATA should be merged and made blemish-free.  We want flash memory sticks to interface like hard drives.  Design it like the 1040EZ tax form.  You do not add extra boxes to get your jollies. 
 
-
-
-$FG,5$$TX+CX,"God's Temple"$$FG$
-
-God said 640x480 16 color.
-
-God said single audio voice.  (Waveforms okay)
-
-God said lots of misc stuff, like no child windows.
-
-I said there is a 100,000 line-of-code limit.
-
-We have $TX,"81,303",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code, currently, and can expand up to 100,000, but code comments count.  I am opening-this-up to letting other people contribute.  We'll have some kind of organization.
-
-When you have a 100,000 line of code limit, you do not get mellow-dramatic code.  The vision is a C64, not a manned mission NASA mainframe.  If you prance around adding rare-case code, that subtracts from other potential features.  So, long as you know that every line of code added, subtracts a feature, we'll be okay.
-
-
-The 640x480 16 color limit is certainly astounding.  God said it was for kid offerings, I guess like 8 crayola colors for kindergardeners.  If you must make a art drawing for you three yearly offerings, you'll be happy only 16 colors exist.  Just think!  Everybody's workload on doing offerings is eased by having only 16 colors.  Isn't that good?
-
-Today, God said dull causes craftiness.  I think what God means is... on a C64, you saw fantasticly crafty creativity because you were not burdened with high-demand photo-realism graphics and sound.  Otherwise, you spend all your energy just burdened with getting something presentable.  Now, you will achieve "presentable" easily and advance to embelishing and getting creative.
-
-God said 640x480 16 color was a covenant, like circumcision.
-
-The 100,000 line of code limit should ensure God's temple stays on-course for a thousand years.  Also, it must be kept perfect.  With these, it will not go astray.  I could hand it over to NASA (for example) and, so long as they kept the 100,000 line of code limit, it would be in good hands.  For the future, I expect low driver-line-count hardware to be created and utilized when all (mostly) computers have advanced to contain it.  All computer are 64-bit, now, for example, if you catch my drift.
-
-
-
-The original core values for this operating system were based on providing kids, today, what I had as a kid -- Ring-0-Only and Identity-mapped simplicity and accessibility.  I had this book, $FG,4$$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$$FG$, and it provided years of entertainment.  All the public and private operating system code and locations were explained and accessible, useful or not.  What I did was learn and tinker.  That was the entertainment.
-
-Today, I imposed the 100,000 line of code limit because -- when you see the light at the end of the tunnel, it is a qualitatively different ball game.
-
-Look at chapter 6: $TX,"Commodore 64 User's Manual",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$.  The thing you did with a C64 was write BASIC programs with hand-coded binary sprite data statements.  Bill Gates would say, "You kids are so lucky today, you can pick from 100 fonts and write HTML webpages."
-
-
-I would hope NASA (If they were caretakers... 'cause SETI or something, LOL) would not need to be told that Ring-0-Only and Identity-Mapped are core values.  I thought maybe I wouldn't have to enshrine that and they would, on their own, just know that.  You could fix the gaps in address space, very easily, but you lose a big principle -- virtual same as physical.  That's worth fight for and sacrificing for.  It's simpler.  Think of the kids!  It's also fast.
-
+$FG,8$
+* "VMware" is a trademark of VMware, Inc.
+* "Linux" is probably a trademark owned by Linus Torvalds.
+* "Windows" is a trademark of MicroSoft Corp.

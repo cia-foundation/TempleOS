@@ -17,9 +17,7 @@ U0 HoldCourt()
   I64 accused,crime,victim;
   Bool old_form=LBts(&(DocPut)->flags,DOCf_FORM);
 
-  FlushMsgs;
   DocDblBufStart;
-
   '\n';
   accused=RandU32%3;
   "%s",LstSub(accused,"A man \0A woman \0A child \0");
@@ -74,7 +72,6 @@ Bool TakeTurn()
   Camp(num_people);
   Kill(Fs->song_task);
 
-  FlushMsgs;
   DocDblBufStart;
 	"$$LM,4$$"
 	"\n\n$$BT,\"Break Camp\",LE=T_BREAK_CAMP$$\n\n"
@@ -164,7 +161,6 @@ U0 Trailer()
   Cd(Fs->parent_task->cur_dir);
   Type("AESplash.TXT");
   Sleep(500);
-  FlushMsgs;
   try {
     TMsg(dc,"Leaving all behind, they fled.");
     TMsg(dc,"Found themselves in a desert.");
@@ -181,11 +177,11 @@ U0 AfterEgypt()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
   WinBorder;
-  WordStat;
+  AutoComplete;
   DocClear;
   WinMax;
   PopUp("Trailer;",Fs);
-  WordStat;
+  AutoComplete;
   try //Catch <CTRL-ALT-c>.
     while (TakeTurn);
   catch

@@ -1,21 +1,38 @@
-$WW,1$$FG,5$$TX+CX,"Strategic Decisions Making"$
-$TX+CX,"TempleOS Simple"$
+$WW,1$$FG,5$$TX+CX,"Decisions Making TempleOS Simple"$
 $FG$
-The $FG,2$$TX,"trivial solution",HTML="http://en.wikipedia.org/wiki/Trivial_solution"$$FG$ in math is the simple, obvious answer.  TempleOS has many examples of using trivial solutions.
+Everybody is obsessed, Jedi mind-tricked, by the notion that when you scale-up, it doesn't get bad, it gets worse.  They automatically think things are going to get bigger.  Guess what happens when you scale down?  It doesn't get good, it gets better!
+
+I limited it to 100,000 lines of code, forever!  I never need a linker or make utility and I can use small labels.
+
+People mock Bill Gates for, "640K should be enough."  I say, "2 Gig for code should be enough."  The same people who mock Bill Gates are probably just like the black woman who sued for a trillion dollars.
+
+My Dad worked on converting the Titan missile to the Gemini Mission rocket.  It had to be "man-rated".  You can bet that everything got an order of magnitude more complexity and documentation.  My vision is a souped-up C64, not a 1970's mainframe; a kayak, not a Titanic.
+
+Linux is a semi-tractor -- you need professional drivers for 20 gears.  Linux has file permissions.  Common people are hurt by file permissions.
+
+Windows is a car.
+
+TempleOS is a motorcycle -- if you lean-over too far, a motorcycle will crash.  Don't do that!  There are no side air bags on a motorcycle.  DOS and C64 had no memory protections and ran in ring-0, with no security.  This saves an order of magnitude complexity.
+
+Linux and Windows are general purpose operating systems.  They attempt to do any task you want.  TempleOS cherry-picks tasks and is designed to do the same things a C64 did.  This saves and order of magnitude complexity.  For example, the $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system allocates just contiguous files -- you load and save whole files at once.  A benefit is this allows compression.  Also, TempleOS does not do networking or multimedia.  In theory, memory will fragment with lots of big files.  The system would fall to pieces with multimedia, but God said 640x480 16 color is a permanent covenant like circumcision.
+
+A three button mouse is like a leg you cannot put weight on.  TempleOS just does hardware everybody has, with no divergent code bases for each machine's custom hardware.  There is one graphics driver instead of 50 for different GPUs.  This saves an order of magnitude complexity and makes for a delightful API, so developer's code is not like a frayed rope end.
+
+
 
 * Everything runs in kernel, $FG,2$ring 0$FG$, mode.
 
-* $FG,2$One memory map$FG$ for all tasks on all cores with virtual addresses set equal to physical.
+* $FG,2$One memory map$FG$ for all tasks on all cores with virtual addresses set equal to physical, just as though paging is not used.
 
 * One platform -- $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC's, no 32-bit support.
 
-* No security.
+* No security or cryptography.
 
 * No networking.
 
 * Least (greatest) common denominator hardware support.  Mostly, one driver for each device class.  I can't be in the business of different drivers.  Compatibility is the greatest challenge for PC operating systems.  Disk code does not use interrupts, avoiding compatibility risks.  $FG,2$PS/2$FG$ keyboard/mouse is used instead of $FG,2$USB$FG$, also more compatible.
 
-* $FG,2$640x480$FG$ 16 colors.  Updates whole screen at $FG,2$60 fps$FG$, optimized for full screen games where $FG,2$InvalidRectangle$FG$s are counter-productive.
+* $FG,2$640x480$FG$ 16 colors.  Updates whole screen at $FG,2$30 fps$FG$, optimized for full screen games where $FG,2$InvalidRectangle$FG$s are counter-productive.
 
 * One font, 8x8.  Text and graphic layers done in software with text normally on an 8x8 grid.  It can run in Text mode if graphic initialization fails.
 
@@ -25,7 +42,7 @@ The $FG,2$$TX,"trivial solution",HTML="http://en.wikipedia.org/wiki/Trivial_solu
 
 * Whole files are processed almost exclusively, allowing compression.
 
-* One language and compiler for command-line, scripts, songs, automations and code.
+* $LK,"One language",A="FI:::/Doc/HolyC.TXT"$ and compiler for command-line, scripts, songs, automations and code.
 
 * One editor/word processor/browser for the command-line window, source code, documentation browser, dialog forms.
 

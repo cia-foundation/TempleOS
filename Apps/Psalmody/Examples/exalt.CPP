@@ -16,6 +16,7 @@ U0 Song()
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
 
+  MusicSettingsRst;
   music.tempo=2.5;
   try {
     while (!ScanKey) {

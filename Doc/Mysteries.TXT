@@ -4,7 +4,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * TempleOS identity-maps all memory, all the time.  There is no $FG,2$high half$FG$ memory space.  TempleOS is ring-0-only, so everything is kernel, even user programs.  There is a special task called $FG,2$Adam$FG$ and he doesn't die, so his heap never gets freed.  That's as close to $FG,2$kernel memory$FG$ as it gets.
 
-* TempleOS puts all code in the lowest 2 Gig, so that $FG,2$REL32$FG$ addressing can be used.  TempleOS is 64-bit, but I just thought $FG,2$2 Gig$FG$ was enough for code.  It actually puts global variables there, too, but you can turn that off with $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$.  $LK,"MAlloc",A="MN:MAlloc"$() can allocate any memory, of course.
+* TempleOS puts all code in the lowest 2 Gig, so that $FG,2$REL32$FG$ addressing can be used.  TempleOS is 64-bit, but I just thought $FG,2$2 Gig$FG$ was enough for code.  It actually puts global variables there, too, but you can turn that off with $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$.  $LK,"MAlloc",A="MN:MAlloc"$() can alloc any memory, of course.
 
 * TempleOS doesn't use software interrupts or $FG,2$SYSCALL$FG$ instructions because it never needs to change out of ring-0, even running user programs.  Calls are always $FG,2$CALL REL32$FG$ instructions.
 
@@ -14,7 +14,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * If you use $LK,"Grub",A="FI:::/Doc/Grub.TXT"$, you $FG,2$chain-load$FG$ like Windows.  You can use the TempleOS boot-loader.  $LK,"Master-Boot-Loader-Stage1",A="FI:::/Adam/Boot/BootMHD.CPP"$, $LK,"Master-Boot-Loader-Stage2",A="FI:::/Adam/Boot/BootMHD2.CPP"$, $LK,"Partition-Boot-Loader",A="FI:::/Adam/Boot/BootHD.CPP"$, $LK,"CD-DVD-Boot-Loader",A="FI:::/Adam/Boot/BootCD.CPP"$.
 
-* The boot-loaders must be patched by you running $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$() or $LK,"MasterBootIntall",A="MN:MasterBootIntall"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2",A="FI:::/Kernel/KStart.CPP"$ if you relocate it.
+* The boot-loaders must be patched by you running $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() or $LK,"MasterBootIntall",A="MN:MasterBootIntall"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2",A="FI:::/Kernel/KStart.CPP"$ if you relocate it.
 
 * TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few $FG,2$BIOS$FG$ info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX,"PCI BIOS",HTML="http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for $FG,2$PCI$FG$ config space access.  TempleOS calls $LK,"that",A="FI:::/Kernel/BIOS32.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
 
@@ -28,7 +28,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * TempleOS has a dictionary that is shipped compressed.  When you boot the first time it is uncompressed.  TempleOS has a Windows utility for uncompressing.  That utility needs $FG,2$Microsoft DLL$FG$ files.  TempleOS does not use any libraries, modules or code from other sources -- I wrote it all from scratch and it is self-contained.
 
-* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  TempleOS is $TX,"120,723",D="DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot $FG,2$JIT$FG$.  The rest is $FG,2$JIT$FG$ demos and applications.
+* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  TempleOS is $TX,"120,629",D="DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot $FG,2$JIT$FG$.  The rest is $FG,2$JIT$FG$ demos and applications.
 
 * A major difference between TempleOS and other systems is that the heap and compiler sym table are associated with tasks, not applications.
 
@@ -36,7 +36,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * The compiler only creates $FG,2$pos independent$FG$ code.  You can't create code which is loaded at a fixed, specified location.  The code is pos independent by virtue of the fact that abs addresses get patched.
 
-* Binary executable files have export syms which are loaded into the sym tables.  The operating system $FG,2$Kernel$FG$ has such an export table.  In addition, some map files are processed to provide more information on syms -- src file links.  This is how the $LK,"Man",A="MN:Man"$()/$FG,2$WORDSTAT$FG$ feature can find src lines.
+* Binary executable files have export syms which are loaded into the sym tables.  The operating system $FG,2$Kernel$FG$ has such an export table.  In addition, some map files are processed to provide more information on syms -- src file links.  This is how the $LK,"Man",A="MN:Man"$()/$FG,2$AUTOCOMPLETE$FG$ feature can find src lines.
 
 * $FG,2$#assert$FG$ might print a message at COMPILE time, not run time.
 
@@ -44,9 +44,9 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * When compilation takes place, the structures used by the compiler stick around.  Data on classes can be accessed by code.  See $LK,"ClassRep",A="MN:ClassRep"$().
 
-* Filenames ending in $FG,2$.Z$FG$ are automatically compressed and uncompressed when writing to disk.  File size in directory listing is the compressed size.  See $LK,"::/Doc/TSZ.TXT"$ for uncompressing from $FG,2$WINDOWS$FG$.
+* Filenames ending in $FG,2$.Z$FG$ are automatically compressed and uncompressed when writing to disk.  File size in directory listing is the compressed size.  See $LK,"::/Doc/TOSZ.TXT"$ for uncompressing from $FG,2$Linux$FG$.
 
-* Some memory objects are allocated when needed and will decrease the available memory displayed.  A task keeps mem objects smaller than a couple blocks in it's own separate heap when freed and these are not counted in the available system free memory, though they are free.  They get returned to the system when the task is killed.  To get a sense of this, compile the operating system and see the amount of mem used.  Then, compile it again and far less will be allocated.  This is because it is reusing the small chunks.  See $LK,"Memory Overview",A="FI:::/Doc/MemOverview.TXT"$ and $LK,"Memory Routines",A="HI:Memory"$.  $MA-X+PU,"Click Here",LM="MemRep;View;"$ for a $LK,"MemRep",A="MN:MemRep"$.
+* Some memory objects are alloced when needed and will decrease the available memory displayed.  A task keeps mem objects smaller than a couple blocks in it's own separate heap when freed and these are not counted in the available system free memory, though they are free.  They get returned to the system when the task is killed.  To get a sense of this, compile the operating system and see the amount of mem used.  Then, compile it again and far less will be alloced.  This is because it is reusing the small chunks.  See $LK,"Memory Overview",A="FI:::/Doc/MemOverview.TXT"$ and $LK,"Memory Routines",A="HI:Memory"$.  $MA-X+PU,"Click Here",LM="MemRep;View;"$ for a $LK,"MemRep",A="MN:MemRep"$.
 
 * The cursor location is stored as an $FG,2$ASCII 5$FG$ in files.  $FG,2$ASCII 31$FG$ is $FG,2$SHIFT-SPACE$FG$, a character which does not get converted to tabs by space-to-tabs, $LK,"S2T",A="MN:S2T"$().  The $FG,2$ASCII 28$FG$ is $FG,2$SHIFT-ESC$FG$. 
 
@@ -54,7 +54,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * Sprites can be stored as vector graphics so they might take shockingly little room.  They can be converted to bitmaps.
 
-* If you change code in the $FG,2$/Adam$FG$, $FG,2$/Adam$FG$ or your $FG,2$HOME$FG$ directory, you don't need to recompile, you just need to reboot because those directories get recompiled when you boot.  It uses JIT compilation.  There is no $FG,2$.BIN$FG$ file for $FG,2$JIT$FG$ compilation.
+* If you change code in the $FG,2$/Adam$FG$ or your $FG,2$/Home$FG$ directory, you don't need to recompile, you just need to reboot because those directories get recompiled when you boot.  It uses JIT compilation.  There is no $FG,2$.BIN$FG$ file for $FG,2$JIT$FG$ compilation.
 
 * If not found, $FG,2$.Z$FG$ is added or removed and a search is done again.  If a file is still not found, the parent directories are searched for a file of the same name.
 
@@ -64,4 +64,5 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 $FG,8$
 * "Windows" is a trademark of MicroSoft Corp.
+* "Linux" is probably a trademark owned by Linus Torvalds.
 $FG$

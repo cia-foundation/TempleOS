@@ -28,6 +28,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 U0 Song()
 {
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  MusicSettingsRst;
   Fs->draw_it=&DrawIt;
   Fs->task_end_cb=&SndTaskEndCB;
 

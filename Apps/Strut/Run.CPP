@@ -1,3 +1,3 @@
-Cd("/Apps/Strut");;
+Cd(__DIR__);;
 #include "Load"
 Strut;

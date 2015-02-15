@@ -12,12 +12,12 @@ U0 Balloon()
 
   CLI
 
-    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-    OutU8(VGA_SC_DATA,0xF);
+    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_DATA,0xF);
     MemSetI64(0xA0000,0,640*480/64);
 
-    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-    OutU8(VGA_SC_DATA,RED+GREEN+8);
+    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_DATA,RED+GREEN+8);
     for (k=100;k<150;k++) {
 
       for (i=0;i<20;i++)

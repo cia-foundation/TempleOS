@@ -2,13 +2,13 @@ U8 *RandVocabWord()
 {
   I64 i;
   U8 *ptr;
-  if (!wsd.num_words)
+  if (!acd.num_words)
     return NULL;
-  i=RandU32%wsd.num_words;
-  ptr=wsd.word_lst;
-  while (i-- && *ptr==WSD_WORD_CHAR)
+  i=RandU32%acd.num_words;
+  ptr=acd.word_lst;
+  while (i-- && *ptr==ACD_WORD_CHAR)
     ptr+=StrLen(ptr)+3;
-  if (*ptr++!=WSD_WORD_CHAR)
+  if (*ptr++!=ACD_WORD_CHAR)
     return NULL;
   else
     return ptr;
@@ -18,7 +18,7 @@ U0 VocabQuiz()
 {
   I64 ch,i,num;
   U8 *right_word,*words[4];
-  if (!FileFind(WSD_DEF_FILENAME)) {
+  if (!FileFind(ACD_DEF_FILENAME)) {
     "Uncompressed dictionary not present.\n";
     return;
   }
@@ -32,7 +32,7 @@ U0 VocabQuiz()
     "$$WW,1$$$$CM-LE,5$$$$RED$$$$BK,1$$%s$$BK,0$$:$$FG$$$$LM,4$$\n",right_word;
     for (i=0;i<4;i++)
       "\n\n$$GREEN$$$$BT-X,\"%d\",LM=\"%d\"$$$$FG$$"
-      "$$LM,7$$%s\n$$LM,4$$",i+1,i+1,WSDDefGet(words[i]);
+      "$$LM,7$$%s\n$$LM,4$$",i+1,i+1,ACDDefGet(words[i]);
     "\n\n$$LTBLUE$$Answer:$$FG$$";
     do {
       ch=GetKey(,TRUE);
@@ -48,7 +48,7 @@ U0 VocabQuiz()
 	}
 	Sleep(500);
 	Snd(0);
-	WSDPopUpDef(right_word);
+	ACDPopUpDef(right_word);
 	break;
       }
     } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);

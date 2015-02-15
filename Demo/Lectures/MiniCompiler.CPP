@@ -1,12 +1,12 @@
 /*$WW,1$
-$TR,"Main Compiler"$
+$TR-C,"Main Compiler"$
 $ID,2$The mini compiler is like the main compiler, except the main compiler's lexical analyser removes comments and does preprocessing.  $LK,"Lex",A="MN:Lex"$(),$LK,"Echo",A="MN:Echo"$(ON).
 
-The main compiler generates $LK,"Intermediate Code",A="FF:::/Compiler/CmpDefs.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression",A="MN:PrsExpression"$(), $LK,"PrsStatement",A="MN:PrsStatement"$().
+The main compiler generates $LK,"Intermediate Code",A="FF:::/Compiler/CompilerA.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression",A="MN:PrsExpression"$(), $LK,"PrsStatement",A="MN:PrsStatement"$().
 
-The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="FF:D:/Compiler/CmpInit.CPP,ST_INTERMEDIATE_CODE"$, $LK,"Combining Consts",A="FF:::/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars",A="FF:::/Compiler/OptPass3.CPP,cmp.num_reg_vars"$.  Set $LK,"OTrace",A="MN:OTrace"$(ON) to see the optimization stages.
+The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="MN:intermediate_code_table"$, $LK,"Combining Consts",A="FF:::/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars",A="FF:::/Compiler/OptPass3.CPP,cmp.num_reg_vars"$.  Set $LK,"OTrace",A="MN:OTrace"$(ON) to see the optimization stages.
 
-The main compiler makes machine code in the back end.  See $LK,"IC Struct",A="MN:CIntermediateCode"$, $LK,"LCCCompile",A="MN:LCCCompile"$ and $LK,"OptPass789",A="FF:::/Compiler/OptPass789.CPP,IC_MUL"$(), $LK,"BackEnd",A="FF:::/Compiler/Back1a.CPP,ICMul"$.  Set $LK,"CTrace",A="MN:CTrace"$(ON) to see the output of the backend.
+The main compiler makes machine code in the back end.  See $LK,"IC Struct",A="MN:CIntermediateCode"$, $LK,"LCCCompile",A="MN:LCCCompile"$ and $LK,"OptPass789A",A="FF:::/Compiler/OptPass789A.CPP,IC_MUL"$(), $LK,"BackEnd",A="FF:::/Compiler/BackA.CPP,ICMul"$.  Set $LK,"CTrace",A="MN:CTrace"$(ON) to see the output of the backend.
 $ID,-2$
 $TR,"Mini Compiler"$
 $ID,2$For this mini compiler, some things you should know about 64-bit asm:
@@ -216,8 +216,8 @@ U0 Main()
 	  throw;
 	"$$RED$$This code is not efficient, but the compiler is simple.$$FG$$\n";
 	Un(code,dst-code); //Unassemble the code we created.
-//$LK,"Call",A="MN:Call"$() is a function.  See $LK,"_CALL",A="FF:::/Kernel/Utils1a.CPP,_CALL"$::
-//See also $LK,"CallInd",A="MN:CallInd"$().  See $LK,"_CALLIND",A="FF:::/Kernel/Utils1a.CPP,_CALLIND"$::
+//$LK,"Call",A="MN:Call"$() is a function.  See $LK,"_CALL",A="FF:::/Kernel/KUtils.CPP,_CALL"$::
+//See also $LK,"CallInd",A="MN:CallInd"$().  See $LK,"_CALLIND",A="FF:::/Kernel/KUtils.CPP,_CALLIND"$::
 	"$$LTBLUE$$Answer:%d$$FG$$\n",Call(code);
       } catch {
 	"$$RED$$Error$$FG$$\n";

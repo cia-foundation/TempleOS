@@ -3,7 +3,7 @@ Bool OptIC4(CIntermediateCode *tempi)
   I64 i,ty,pt,ty1,pt1;
   CIntermediateCode *tempil1,*tempil2;
 
-  if (tempi->ic_code<IC_IMM_U64) return FALSE;
+  if (tempi->ic_code<IC_IMM_I64) return FALSE;
 
   tempil1=tempi;
   if (!(tempil2=OptLag1(tempil1)))
@@ -170,8 +170,8 @@ Bool OptIC4(CIntermediateCode *tempi)
 
 U0 OptPass4(CLex *lx,COptReg *reg_offsets,I64 *_type)
 {
-  CHashClass *tempc,*tempc1,*tempc2,*tempc3;
-  CIntermediateCode *tempi,*tempi1,*tempi2,*tempi3,*tempil1,*tempil2,*tempil3,*tempi_next;
+  CHashClass *tempc,*tempc1,*tempc2;
+  CIntermediateCode *tempi,*tempi1,*tempi2,*tempil1,*tempil2,*tempil3,*tempi_next;
   I64 code,i;
   Bool dead_code=FALSE;
   CLexCodeMisc *lb;
@@ -194,7 +194,7 @@ U0 OptPass4(CLex *lx,COptReg *reg_offsets,I64 *_type)
       tempi=OptFree(tempi);
     } else {
       tempc=tempi->ic_class;
-      tempi1=tempi2=tempi3=&cmp.ic_nop;
+      tempi1=tempi2=&cmp.ic_nop;
       if (tempil1=OptLag2(tempi)) {
 	if (tempil2=OptLag2(tempil1)) {
 	  if (!(tempil3=OptLag2(tempil2)))
@@ -203,25 +203,22 @@ U0 OptPass4(CLex *lx,COptReg *reg_offsets,I64 *_type)
 	  tempil2=tempil3=&cmp.ic_nop;
       } else
 	tempil1=tempil2=tempil3=&cmp.ic_nop;
-      nobound_switch (cmp.arg_cnt[code]) {
-	case 9:
+      nobound_switch (intermediate_code_table[code].arg_cnt) {
+	case IS_V_ARG:
 	  ps->ptr-=tempi->ic_data>>3;
 	  break;
-	case 3:
-	  tempi3=PrsPop(ps);
-	  tempc3=tempi3->ic_class;
-	case 2:
+	case IS_2_ARG:
 	  tempi2=PrsPop(ps);
 	  tempc2=tempi2->ic_class;
-	case 1:
+	case IS_1_ARG:
 	  tempi1=PrsPop(ps);
 	  tempc1=tempi1->ic_class;
 	  break;
-	case 0: //nobound_switch
+	case IS_0_ARG: //nobound_switch
 	  break;
       }
       nobound_switch (code) {
-	case IC_IMM_U64:
+	case IC_IMM_I64:
 	case IC_TYPE:
 	  tempi->a1.type=TY_IMM+RT_I64;
 	  tempi->a1.disp=tempi->ic_data;
@@ -391,7 +388,7 @@ p4_sib:
 	case IC_ASSIGN_PP:
 	case IC_ASSIGN_MM:
 //this val was stashed during pass012 for pointer arithmetic
-	  tempi->ic_class2=tempi->t.class2;
+	  tempi->ic_class2=tempi->t.class2; //See $LK,"ic_class2",A="FF:::/Compiler/BackB.CPP,ic_class2"$
 	case IC_ASSIGN:
 	case IC_SHL_EQUAL:
 	case IC_SHR_EQUAL:
@@ -476,12 +473,6 @@ p4_sib:
 	case IC_BR_NOT_BTS:
 	case IC_BR_NOT_BTR:
 	case IC_BR_NOT_BTC:
-	case IC_BR_LBTS:
-	case IC_BR_LBTR:
-	case IC_BR_LBTC:
-	case IC_BR_NOT_LBTS:
-	case IC_BR_NOT_LBTR:
-	case IC_BR_NOT_LBTC:
 	case IC_BT:
 	case IC_BTS:
 	case IC_BTR:
@@ -553,22 +544,12 @@ p4_sib:
 	    }
 	  }
 	  break;
-	case IC_BR_NOT_EQUAL2:
-	case IC_BR_EQUAL_EQUAL2:
-	case IC_BR_GREATER_EQUAL2:
-	case IC_BR_LESS_EQUAL2:
-	case IC_BR_GREATER2:
-	case IC_BR_LESS2:
-	case IC_BR_ZERO:
-	case IC_BR_NOT_ZERO:
+	case IC_BR_EQUAL_EQUAL ...IC_BR_LESS_EQUAL:
+	case IC_BR_EQUAL_EQUAL2...IC_BR_LESS_EQUAL2:
 	case IC_BR_CARRY:
 	case IC_BR_NOT_CARRY:
-	case IC_BR_NOT_EQUAL:
-	case IC_BR_EQUAL_EQUAL:
-	case IC_BR_GREATER_EQUAL:
-	case IC_BR_LESS_EQUAL:
-	case IC_BR_GREATER:
-	case IC_BR_LESS:
+	case IC_BR_ZERO:
+	case IC_BR_NOT_ZERO:
 	  lb=tempi->ic_data;
 	  if (tempi->ic_flags&ICF_PUSH_CMP) {
 	    lb->flags|=CMF_POP_CMP;
@@ -589,9 +570,12 @@ p4_sib:
 	  break;
 	case IC_CALL_END:
 	case IC_END_EXP:
-	  if (tempi->a1.type&TY_MASK==TY_STK) {
-	    if (tempil1->r.type&TY_MASK==TY_STK &&
-		  !(tempil1->ic_flags&ICF_PUSH_RESULT)) {
+	  if (!(tempil1->ic_flags&ICF_PUSH_RESULT)) {
+	    if (tempi->ic_flags&ICF_NO_DEPEND_RESULT) {
+	      tempil1->ic_flags|=ICF_NO_DEPEND_RESULT;
+	      tempil1->r.type=TY_NULL+tempil1->r.type&RT_MASK;
+	    } else if (tempi->a1.type&TY_MASK==TY_STK &&
+		     tempil1->r.type&TY_MASK==TY_STK) {
 	      tempi->a1.type=TY_REG+tempi->a1.type&RT_MASK;
 	      tempi->a1.reg=REG_RAX;
 	      tempi->a1.disp=0;
@@ -652,12 +636,7 @@ p4_sib:
 	case IC_OR:
 	case IC_XOR:
 	case IC_SUB:
-	case IC_EQUAL_EQUAL:
-	case IC_NOT_EQUAL:
-	case IC_LESS:
-	case IC_GREATER:
-	case IC_LESS_EQUAL:
-	case IC_GREATER_EQUAL:
+	case IC_EQUAL_EQUAL...IC_LESS_EQUAL:
 	case IC_AND_AND:
 	case IC_OR_OR:
 	case IC_XOR_XOR:
@@ -719,13 +698,13 @@ p4_sib:
 	  break;
 	default:
 	  "Pass:%d Missing IC handler\n",lx->pass;
-	  ICPut(tempi);
+	  ICPut(lx,tempi);
 	  LexExcept(lx,"Compiler Optimization Error at ");
       }
       if (tempi) {
 	while (OptIC4(tempi));
 	code=tempi->ic_code;
-	if (cmp.result_cnt[code])
+	if (intermediate_code_table[code].result_cnt)
 	  PrsPush(ps,tempi);
       }
     }

@@ -1,3 +1,5 @@
 $WW,1$$FG,5$$TX+CX,"Sprite BitMap Menu Help"$$FG$
 
 Bitmaps have a background color.  If you delete to the clipboard, what's left will be background colored.
+
+While drawing, you can usually press $FG,2$'c'$FG$ to eye-dropper the color under the mouse.  Press $FG,2$'t'$FG$ for transparent.

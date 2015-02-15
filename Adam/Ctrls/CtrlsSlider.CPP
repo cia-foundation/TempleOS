@@ -1,24 +1,24 @@
-class CTemplateSCSlider
+class CTemplateCSSlider
 {
-  CTemplateSCSlider *next,*last;
+  CTemplateCSSlider *next,*last;
   U8 *name;
   I64 num;
 };
 
-class CTemplateSC
+class CTemplateCS
 {
-  CTemplateSCSlider *next_slider,*last_slider;
+  CTemplateCSSlider *next_slider,*last_slider;
   I64 num_sliders,range,spacing,border;
   U8 *glbl_name;
 };
 
-CTemplateSC *GetSliderCtrl()
+CTemplateCS *CtrlSliderGet()
 {
-  CTemplateSCSlider *temps;
+  CTemplateCSSlider *temps;
   U8 *st,pmt[136];
-  CTemplateSC *result=CAlloc(sizeof(CTemplateSC));
+  CTemplateCS *result=CAlloc(sizeof(CTemplateCS));
 
-  "$$PURPLE$$Slider Ctrl$$FG$$\n\n";
+  "$$PURPLE$$Ctrl Slider$$FG$$\n\n";
 
   result->glbl_name=GetStr("Glbl Struct Name (ENTER for No Glbl):");
   result->range=GetI64	("Range   (%4d):",30);
@@ -33,7 +33,7 @@ CTemplateSC *GetSliderCtrl()
       Free(st);
       break;
     }
-    temps=CAlloc(sizeof(CTemplateSCSlider));
+    temps=CAlloc(sizeof(CTemplateCSSlider));
     temps->name=st;
     QueIns(temps,result->last_slider);
     temps->num=result->num_sliders++;
@@ -41,25 +41,25 @@ CTemplateSC *GetSliderCtrl()
   return result;
 }
 
-U0 TemplateSliderCtrl(CDoc *doc)
+U0 TemplateCtrlSlider(CDoc *doc)
 {
   CTask *task;
-  CTemplateSC *m=NULL;
-  CTemplateSCSlider *temps;
+  CTemplateCS *m=NULL;
+  CTemplateCSSlider *temps;
   I64 i;
 
   DocUnlock(doc);
   DocRecalc(doc);
   DocCaptureUndo(doc,TRUE);
 
-  task=SpawnUser("CTemplateSC **_m=0x%X;*_m=GetSliderCtrl;\n",&m);
+  task=User("CTemplateCS **_m=0x%X;*_m=CtrlSliderGet;\n",&m);
   while (!m)
     Yield;
 
   DocPrint(doc,
-"#define SLIDER_RANGE	%d
-#define SLIDER_SPACING %d
-#define SLIDER_BORDER  %d
+"#define SLIDER_RANGE\t%d
+#define SLIDER_SPACING\t%d
+#define SLIDER_BORDER\t%d
 
 class CSliderState
 {
@@ -77,7 +77,7 @@ class CSliderState
 
   DocPrint(doc,
 "
-U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
+U0 DrawCtrlSlider(CDC *dc,CCtrl *c)
 {
   CSliderState *s=c->state;
 
@@ -124,7 +124,7 @@ U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
   DocPrint(doc,
 "}
 
-U0 UpdateDerivedSliderCtrl(CCtrl *c)
+U0 UpdateDerivedCtrlSlider(CCtrl *c)
 {
   CSliderState *s=c->state;
   c->left=c->win_task->pix_width/2-(SLIDER_SPACING*3+2)/2;
@@ -181,9 +181,9 @@ CCtrl *SliderNew()
   else
     DocPrint(doc,	"  c->state=CAlloc(sizeof(CSliderState));\n");
   DocPrint(doc,
-"  c->draw_it=&DrawSliderCtrl;
+"  c->draw_it=&DrawCtrlSlider;
   c->left_click=&LeftClickSlider;
-  c->update_derived_vals=&UpdateDerivedSliderCtrl;
+  c->update_derived_vals=&UpdateDerivedCtrlSlider;
   old_preempt=Preempt(OFF);
   QueIns(c,Fs->last_ctrl);
   TaskDerivedValsUpdate;

@@ -1,5 +1,6 @@
 #help_index "Games"
 
-#include "/Apps/KeepAway/KeepAway"
+Cd(__DIR__);;
+#include "KeepAway"
 
 #help_index ""

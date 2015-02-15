@@ -1,5 +1,6 @@
 #help_index "Games"
 
-#include "/Apps/Vocabulary/VocabQuiz"
+Cd(__DIR__);;
+#include "VocabQuiz"
 
 #help_index ""

@@ -2,16 +2,18 @@ $WW,1$$FG,5$$TX+CX,"Tips"$$FG$
 
 * Turn-off or reboot ($FG,2$<CTRL-ALT-DEL>$FG$) at any time, except during disk writes.  Writes are not cached. 
 
+* Use $LK,"Seed",A="MN:Seed"$() and the cmd-line to switch $LK,"Rand",A="MN:Rand"$() to non-timer mode and replay games you like.
+
 * 64-bit values are most efficient for the compiler.
 
 * See $MA-X+PU,"Key Map",LM="KeyMap;View;\n"$ for a list of defined keys.  Define your own keys in $LK,"MyPutKey",A="MN:MyPutKey"$().  See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
 
-* $FG,2$<ALT-m>$FG$ maximizes a window.  $FG,2$<ALT-SHIFT-w>$FG$ closes WordStat.  $FG,2$<ALT-w>$FG$ brings back WordStat.  $FG,2$<ALT-v>$FG$ vertically tiles windows.  $FG,2$<ALT-h>$FG$ horizontally tiles windows.  The $FG,2$ALT$FG$ keys are defined in $LK,"::/Accts/Adam3cKeyPlugIns.CPP"$.  You can customize them.
+* $FG,2$<ALT-m>$FG$ maximizes a window.  $FG,2$<ALT-SHIFT-w>$FG$ closes AutoComplete.  $FG,2$<ALT-w>$FG$ brings back AutoComplete.  $FG,2$<ALT-v>$FG$ vertically tiles windows.  $FG,2$<ALT-h>$FG$ horizontally tiles windows.  The $FG,2$ALT$FG$ keys are defined in $LK,"::/Home/AdamKeyPlugIns.CPP"$.  You can customize them.
 
-* If you make changes to TempleOS files in your $FG,2$HOME$FG$ directory, generally you reboot to make them take effect.  (You don't compile anything.)  You should have two TempleOS partitions on your hard drive because a syntax error in a start-up file will make the partition unbootable.  Boot to the second partition or boot to a standard TempleOS CD-ROM and use $LK,"Mount",A="MN:Mount"$() to mount your hard drive.
+* If you make changes to TempleOS files in your $FG,2$/Home$FG$ directory, generally you reboot to make them take effect.  (You don't compile anything.)  You should have two TempleOS partitions on your hard drive because a syntax error in a start-up file will make the partition unbootable.  Boot to the second partition or boot to a standard TempleOS CD-ROM and use $LK,"Mount",A="MN:Mount"$() to mount your hard drive.
 
 * I copy my files to a mirrored identical partition, periodically with $LK,"CopyTree",A="MN:CopyTree"$() commands in scripts.  I do merge commands with a menu entry like this:
-$FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
+$FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * $FG,2$<CTRL-m>$FG$ at the cmd line to access your PersonalMenu.  Place macros there with $FG,2$<CTRL-l>$FG$, or icon-like sprites with $FG,2$<CTRL-r>$FG$.  Use the $FG,2$Pop-Up$FG$ option on macros to $LK,"Spawn",A="MN:Spawn"$() a task to run a file.  It dies when it is finished.  This returns mem to the system.  Be sure to press $FG,2$<CTRL-s>$FG$ to save your macro/menu area after making changes.
 
@@ -19,19 +21,19 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use the PullDown menu at the top of the screen to learn commands, or for finding the keyboard controls to games.
 
-* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:HOME/Adam3aLocalize.CPP,mouse.scale"$.
+* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:/Home/AdamLocalize.CPP,mouse.scale"$.
 
-* You can set your local time zone by setting the $LK,"local_time_offset",A="MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:HOME/Adam3aLocalize.CPP,local_time"$.
+* You can set your local time zone by setting the $LK,"local_time_offset",A="MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:/Home/AdamLocalize.CPP,local_time"$.
 
 * $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to reindent a $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ function or renumber an asm routine's local labels.
 
 * You can use $FG,2$filter_lines$FG$ in the editor text search form ($FG,2$<CTRL-f>$FG$) to temporarily display just lines near each match.  A value of $FG,2$filter lines$FG$ set to $FG,2$5$FG$ will display lines within 5 lines of matches.  Then, you can do another find to a different string and achieve a $FG,2$AND$FG$ search.  When finished, press $FG,2$<ESC>$FG$.
  
-* You can recompile and reinstall the kernel with $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().  You'll probably want to make a function for recompiling that uses the $LK,"Auto",A="MN:Auto"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TSAdam.CPP,1"$ $LK,"Update Funs",A="FL:::/Demo/AcctExample/TSDistro.CPP,1"$.
+* You can recompile and reinstall the kernel with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  You'll probably want to make a function for recompiling that uses the $LK,"Auto",A="MN:Auto"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$.
 
-* $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
+* $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
 
-* You can permanently disable $FG,2$WordStat$FG$ commenting-out $LK,"WSInit",A="FF:HOME/Adam3eSys.CPP,WSInit"$() in $LK,"HOME/Adam3eSys.CPP",A="FF:HOME/Adam3eSys.CPP,WSInit"$.
+* You can permanently disable $FG,2$AutoComplete$FG$ commenting-out $LK,"ACInit",A="FF:/Home/AdamSys.CPP,ACInit"$() in $LK,"::/Home/AdamSys.CPP",A="FF:/Home/AdamSys.CPP,ACInit"$.
 
 * Boolean expressions $BK,1$not$BK,0$ in $FG,2$if$FG$ statements don't have short circuit logic and are compiled inefficiently.
 
@@ -41,9 +43,9 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Many data structures have a $FG,2$user_data$FG$ member.  Those are available for you to store a data item, for convenience.  $LK,"CTask",A="MN:CTask"$, $LK,"CDocEntry",A="MN:CDocEntry"$ and $LK,"CDirEntry",A="MN:CDirEntry"$ have them.  You shouldn't encounter conflicts with TempleOS using them.
 
-* If, for some strange reason, you wanted to reduce mem usage, make a smaller disk cache when you recompile the kernel; disabling $FG,2$WordStat$FG$; Specify smaller stk sizes when doing $LK,"Spawn",A="MN:Spawn"$(), chang $LK,"DFT_STK",A="MN:DFT_STK"$, and using $LK,"DocMax",A="MN:DocMax"$() to reduce the cmd line buffer size.
+* If, for some strange reason, you wanted to reduce mem usage, make a smaller disk cache when you recompile the kernel; disabling $FG,2$AutoComplete$FG$; Specify smaller stk sizes when doing $LK,"Spawn",A="MN:Spawn"$(), chang $LK,"DFT_STK",A="MN:DFT_STK"$, and using $LK,"DocMax",A="MN:DocMax"$() to reduce the cmd line buffer size.
 
-* Filenames ending in "$FG,2$.Z$FG$" will be automatically compressed and uncompressed when read or written.  The compression method is not supported by other operating systems.  You can store files uncompressed by $LK,"Move",A="MN:Move"$()ing them to a filename not ending in "$FG,2$.Z$FG$".  See $LK,"::/Doc/TSZ.TXT"$ if you want to uncompress while in $FG,2$WINDOWS$FG$.
+* Filenames ending in "$FG,2$.Z$FG$" will be automatically compressed and uncompressed when read or written.  The compression method is not supported by other operating systems.  You can store files uncompressed by $LK,"Move",A="MN:Move"$()ing them to a filename not ending in "$FG,2$.Z$FG$".  See $LK,"::/Doc/TOSZ.TXT"$ if you want to uncompress while in $FG,2$Linux$FG$.
 
 * $LK,"Merge",A="MN:Merge"$() can be used to see what's changed.  The $FG,2$+d$FG$ flag will show differences of files which have changed and allow you to merge code.  (The $FG,2$+r$FG$ flag will recurse.)
 
@@ -53,7 +55,7 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can use $LK,"OptOn",A="MN:OptOn"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$) to find unnecessary local var type statements.
 
-* $LK,"OptEqu",A="MN:OptEqu"$($LK,"OPTf_ECHO",A="MN:OPTf_ECHO"$,ON) can be placed in $LK,"Adam1.CPP",A="FI:::/Kernel/Adam1.CPP"$ to echo start-up scripts.
+* $LK,"OptEqu",A="MN:OptEqu"$($LK,"OPTf_ECHO",A="MN:OPTf_ECHO"$,ON) can be placed in $LK,"Adam.CPP",A="FI:::/Adam.CPP"$ to echo start-up scripts.
 
 * Use $LK,"Plain",A="MN:Plain"$() to edit a plain text file.  You'll need this if your file has $FG,2$$$$FG$'s.  Use the $LK,"::/Misc/ToDolDoc.CPP"$ utility to convert plain text to DolDoc's.
 
@@ -71,9 +73,11 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 
-* There are handy functions--$FG,2$F(),R(),FD()$FG$ and $FG,2$RD()$FG$ which are defined in $LK,"HOME/Adam3dWrappers.CPP"$.  You're encouraged to change them, since they're in acct files.  They will perform find-and-replace operations accross multiple files.  The $FG,2$+l$FG$ flag is particularly useful since it limits to whole labels.  The $FG,2$+lb$FG$ and $FG,2$+la$FG$ flags limit to whole labels just before or after.  You are encouraged to add or modify handy wrapper functions to make cmd line operations easier.
+* You can eye-dropper colors in the $FG,2$<CTRL-r>$FG$ sprite editor by pressing $FG,2$'c'$FG$.  Press $FG,2$'t'$FG$ for transparent.
 
-* When using $LK,"Grep",A="MN:Grep"$() while modifying code, work from the bottom-up so that line numbers are correct.  If you work top-down, then inserting or deleting lines causes the lower file links will be incorrect.
+* There are handy functions--$FG,2$F(),R(),FD()$FG$ and $FG,2$RD()$FG$ which are defined in $LK,"::/Home/AdamWrappers.CPP"$.  You are encouraged to change them and add more.  They will perform find-and-replace operations accross multiple files.  The $FG,2$+l$FG$ flag is particularly useful since it limits to whole labels.  The $FG,2$+lb$FG$ and $FG,2$+la$FG$ flags limit to whole labels just before or after.  You are encouraged to add or modify handy wrapper functions to make cmd line operations easier.
+
+* When using $LK,"Find",A="MN:Find"$() while modifying code, work from the bottom-up so that line numbers are correct.  If you work top-down, then inserting or deleting lines causes the lower file links will be incorrect.
 
 * You can save files after making changes, anytime you are within the editor, like when viewing help/macro files.  $FG,2$<CTRL-a>$FG$ saves as, $FG,2$<CTRL-s>$FG$ saves with the same name in the scrolling title bar.  Hitting $FG,2$<ESC>$FG$ will exit and save.  ($FG,2$<SHIFT-ESC>$FG$ will abort).  You can save the cmd line window to a file, too, since you're actually in the editor when you're at the cmd line.
 
@@ -85,15 +89,13 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $LK,"View",A="MN:View"$() in Pop-up macros to linger until the user presses $FG,2$<ESC>$FG$ or $FG,2$<SHIFT-ESC>$FG$.
 
-* You can access the word under the cursor at $LK,"ws.cur_word",A="MN:CWordStatGlbls"$, but you should probably turn-off preemption or interrupts momentarily to copy it.
+* You can access the word under the cursor at $LK,"ac.cur_word",A="MN:CAutoCompleteGlbls"$, but you should probably turn-off preemption or interrupts momentarily to copy it.
 
-* You can reactivate $FG,2$WordStat$FG$ after closing it by pressing $FG,2$<CTRL-Fun Key>$FG$ or $FG,2$<ALT-w>$FG$ if you have it defined.
-
-* If you use consistent var names for items of different classes, you'll usually be able to use $FG,2$WordStat$FG$'s autocomplete for member vars.  I always use $FG,2$lx$FG$ for $LK,"CLex",A="MN:CLex"$ ptrs; $FG,2$doc$FG$ for $LK,"CDoc",A="MN:CDoc"$ ptrs; $FG,2$doc_e$FG$ or $FG,2$doc_ce$FG$ for $LK,"CDocEntry",A="MN:CDocEntry"$ ptrs, etc.
+* You can reactivate $FG,2$AutoComplete$FG$ after closing it by pressing $FG,2$<CTRL-Fun Key>$FG$ or $FG,2$<ALT-w>$FG$ if you have it defined.
 
 * $LK,"Preempt",A="MN:Preempt"$() is used to keep a task from being interrupted and swapped-out.  It has a similar effect to turning-off interrupts.  Each task has it's own preemption ctrl.  A task with preemption turned-off can voluntarily $LK,"Yield",A="MN:Yield"$() with preemption off.
 
-* You can set a color for different drives with $LK,"SetDrvTextAttr",A="MN:SetDrvTextAttr"$().  Place calls to this in $LK,"HOME/Adam3aLocalize.CPP"$.
+* You can set a color for different drives with $LK,"DrvTextAttrSet",A="MN:DrvTextAttrSet"$().  Place calls to this in $LK,"::/Home/AdamLocalize.CPP"$.
 
 * $FG,2$<CTRL-SHIFT-T>$FG$ to toggle to/from plain text just the $LK,"CDoc",A="MN:CDoc"$ cmd under the cursor.  See $LK,"::/Demo/DolDoc/TextDemo.CPP"$.
  
@@ -119,7 +121,7 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Using a sub-int array, $FG,2$i.u8[3]$FG$, for example, will force a local var to non-reg.
 
-* You can delete the $FG,4$HOME/Registry.CPP.Z$FG$ file.  The policy is that deleting it will restore defaults.  It is a text doc, if you want to edit it.  Be careful of tree indentations.
+* You can delete the $FG,4$/Home/Registry.CPP.Z$FG$ file.  The policy is that deleting it will restore defaults.  It is a text doc, if you want to edit it.  Be careful of tree indentations.
 
 * Study $LK,"::/Adam/Utils/MemRep.CPP"$ and $LK,"WallPaper",A="MN:WallPaper"$() to learn how the system resources are put together.
 
@@ -146,3 +148,7 @@ $FG,5$Merge(\"D:/*\",\"E:/*\",\"+r+d\");$FG$ to check my changes.
 * With $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$, common trailing code is fast.  Common leading code is slow.$FG$
 
 * The first line of the $MA-X+PU,"Psalmody",LM="#include \"::/Apps/Psalmody/Run\"\n"$ $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
+
+$FG,8$
+* "Linux" is probably a trademark owned by Linus Torvalds.
+$FG$

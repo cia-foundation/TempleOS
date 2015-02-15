@@ -5,7 +5,7 @@ This is an advanced demo that shows
 that you can place ctrls on the
 wall paper.
 
-See $LK,"::/Demo/Graphics/SliderCtrl.CPP"$
+See $LK,"::/Demo/Graphics/Slider.CPP"$
 and $LK,"::/Demo/Graphics/WallPaperFish.CPP"$
 before messing with this program.
 
@@ -22,7 +22,7 @@ class CSliderState
   I64 right_pos;
 };
 
-U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
+U0 DrawCtrlSlider(CDC *dc,CCtrl *c)
 {
   CSliderState *s=c->state;
 
@@ -50,7 +50,7 @@ U0 DrawSliderCtrl(CDC *dc,CCtrl *c)
   GrRect(dc,c->left+2*SLIDER_SPACING+1-2,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->right_pos-1,5,3);
 }
 
-U0 UpdateDerivedSliderCtrl(CCtrl *c)
+U0 UpdateDerivedCtrlSlider(CCtrl *c)
 {
   CSliderState *s=c->state;
   c->left=c->win_task->pix_width/2-(SLIDER_SPACING*3+2)/2;
@@ -86,9 +86,9 @@ CCtrl *SliderNew()
   c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
   c->type=CTRLT_GENERIC;
   c->state=ACAlloc(sizeof(CSliderState));
-  c->draw_it=&DrawSliderCtrl;
+  c->draw_it=&DrawCtrlSlider;
   c->left_click=&LeftClickSlider;
-  c->update_derived_vals=&UpdateDerivedSliderCtrl;
+  c->update_derived_vals=&UpdateDerivedCtrlSlider;
   old_preempt=Preempt(OFF);
   QueIns(c,sys_winmgr_task->last_ctrl);
   TaskDerivedValsUpdate;

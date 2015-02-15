@@ -8,19 +8,19 @@ F64 scale;
 Complex *PoleZeroFind(I64 x,I64 y)
 {
   I64 i;
-  F64 d,best_d=MAX_F64;
+  F64 dd,best_dd=MAX_F64;
   Complex *result=NULL;
   for (i=0;i<NUM_POLES;i++) {
-    d=Sqr(poles[i].x-x)+Sqr(poles[i].y-y);
-    if (d<best_d) {
-      best_d=d;
+    dd=Sqr(poles[i].x-x)+Sqr(poles[i].y-y);
+    if (dd<best_dd) {
+      best_dd=dd;
       result=&poles[i];
     }
   }
   for (i=0;i<NUM_ZEROS;i++) {
-    d=Sqr(zeros[i].x-x)+Sqr(zeros[i].y-y);
-    if (d<best_d) {
-      best_d=d;
+    dd=Sqr(zeros[i].x-x)+Sqr(zeros[i].y-y);
+    if (dd<best_dd) {
+      best_dd=dd;
       result=&zeros[i];
     }
   }
@@ -109,7 +109,7 @@ U0 PoleZeros()
   SetVGAPaletteColor(15,0xFF0000); //White is red
 
   WinMax;
-  WordStat;
+  AutoComplete;
   WinBorder;
 
   DCFill;

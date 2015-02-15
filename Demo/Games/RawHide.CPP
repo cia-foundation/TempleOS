@@ -4,11 +4,14 @@ AcctRegSetDftEntry("TempleOS/RawHide","F64 best_score=9999;\n");
 AcctRegExeBranch("TempleOS/RawHide");
 
 F64 t0,tf;
+I64 outside_cnt;
 
-#define MAP_WIDTH	1500
-#define MAP_HEIGHT	1500
+#define MAP_WIDTH	1000
+#define MAP_HEIGHT	1000
+#define FENCE_WIDTH	320
+#define FENCE_HEIGHT	200
 #define MAP_BORDER	3
-CDC *dc2;
+CDC *map_dc;
 
 $BG,10$#define GE_COW		0
 
@@ -23,6 +26,9 @@ $SP,"<2>",BI=2$
 
 $SP,"<3>",BI=3$
 #define GE_NUM		3
+
+
+$SP,"<4>",BI=4$
 $BG$
 class RHCSprite
 {
@@ -30,7 +36,7 @@ class RHCSprite
   I64 min_x,max_x,min_y,max_y;
 } rh_sprite[GE_NUM];
 
-#define NUM_ANIMALS	128
+#define NUM_ANIMALS	100
 
 class Animal
 {
@@ -43,13 +49,13 @@ class Animal
 
 //************************************
 #define COURSE_LEN	(MAP_HEIGHT*2)
-I32 *rx,*ry,*rw;
+I32 *r_x,*r_y,*r_width;
 I64 river_lo,river_hi;
 U0 RiverNew()
 {
-  rx=MAlloc(COURSE_LEN*sizeof(I32));
-  ry=MAlloc(COURSE_LEN*sizeof(I32));
-  rw=MAlloc(COURSE_LEN*sizeof(I32));
+  r_x=MAlloc(COURSE_LEN*sizeof(I32));
+  r_y=MAlloc(COURSE_LEN*sizeof(I32));
+  r_width=MAlloc(COURSE_LEN*sizeof(I32));
   river_lo=river_hi=COURSE_LEN/2;
 }
 
@@ -64,7 +70,7 @@ U0 RiverMake()
   i=COURSE_LEN/2;
   while (y.i32[1]<MAP_HEIGHT-MAP_BORDER && i<COURSE_LEN) {
     if (old_x.i32[1]!=x.i32[1]||old_y.i32[1]!=y.i32[1]) {
-      rx[i]=x.i32[1]; ry[i]=y.i32[1]; rw[i]=w.i32[1];
+      r_x[i]=x.i32[1]; r_y[i]=y.i32[1]; r_width[i]=w.i32[1];
       river_hi=i++;
       old_x=x; old_y=y;
     }
@@ -81,7 +87,7 @@ U0 RiverMake()
   i=COURSE_LEN/2-1;
   while (y.i32[1]>=MAP_BORDER && i>=0) {
     if (old_x.i32[1]!=x.i32[1]||old_y.i32[1]!=y.i32[1]) {
-      rx[i]=x.i32[1]; ry[i]=y.i32[1]; rw[i]=w.i32[1];
+      r_x[i]=x.i32[1]; r_y[i]=y.i32[1]; r_width[i]=w.i32[1];
       river_lo=i--;
       old_x=x; old_y=y;
     }
@@ -94,9 +100,9 @@ U0 RiverMake()
   //Plot sand bar
   x=0; y=0;
   for (i=river_lo;i<=river_hi;i++) {
-    dc2->color=YELLOW;
-    dc2->pen_width=rw[i]+5;
-    GrPlot3(dc2,rx[i]+x.i32[1],ry[i]+y.i32[1],0);
+    map_dc->color=YELLOW;
+    map_dc->pen_width=r_width[i]+5;
+    GrPlot3(map_dc,r_x[i]+x.i32[1],r_y[i]+y.i32[1],0);
 
     x=ClampI64(x+RandI32,-6*MAX_U32,6*MAX_U32);
     y=ClampI64(y+RandI32,-6*MAX_U32,6*MAX_U32);
@@ -104,17 +110,17 @@ U0 RiverMake()
 
   //Plot water
   for (i=river_lo;i<=river_hi;i++) {
-    dc2->color=BLUE;
-    dc2->pen_width=rw[i];
-    GrPlot3(dc2,rx[i],ry[i],0);
+    map_dc->color=BLUE;
+    map_dc->pen_width=r_width[i];
+    GrPlot3(map_dc,r_x[i],r_y[i],0);
   }
 }
 
 U0 RiverDel()
 {
-  Free(rx);
-  Free(ry);
-  Free(rw);
+  Free(r_x);
+  Free(r_y);
+  Free(r_width);
 }
 
 //************************************
@@ -148,12 +154,12 @@ U0 RiverDropsNext(CTask *mem_task)
     } else {
       do {
 	if (RandU16&1 &&
-	    GrPeek(dc2,rx[tempr->index]+tempr->dx,ry[tempr->index]+tempr->dy)==BLUE)
+	    GrPeek(map_dc,r_x[tempr->index]+tempr->dx,r_y[tempr->index]+tempr->dy)==BLUE)
 	  break;
-	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-rw[tempr->index]/2,rw[tempr->index]/2);
-	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-rw[tempr->index]/2,rw[tempr->index]/2);
-      } while (GrPeek(dc2,rx[tempr->index]+tempr->dx,ry[tempr->index]+tempr->dy)!=BLUE &&
-	       GrPeek(dc2,rx[tempr->index]	      ,ry[tempr->index])	  ==BLUE); //Might be reinitializing
+	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->index]/2,r_width[tempr->index]/2);
+	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->index]/2,r_width[tempr->index]/2);
+      } while (GrPeek(map_dc,r_x[tempr->index]+tempr->dx,r_y[tempr->index]+tempr->dy)!=BLUE &&
+	       GrPeek(map_dc,r_x[tempr->index]		,r_y[tempr->index])	  ==BLUE); //Might be reinitializing
     }
     tempr=tempr1;
   }
@@ -173,7 +179,7 @@ U0 RiverDropsDraw(CDC *dc,I64 cx,I64 cy)
     Yield;
   tempr=rd_root.next;
   while (tempr!=&rd_root) {
-    GrPlot(dc,rx[tempr->index]+tempr->dx-cx,ry[tempr->index]+tempr->dy-cy);
+    GrPlot(dc,r_x[tempr->index]+tempr->dx-cx,r_y[tempr->index]+tempr->dy-cy);
     tempr=tempr->next;
   }
   LBtr(&rd_lock,0);
@@ -197,8 +203,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (task->scroll_y+cy>MAP_HEIGHT-task->pix_height)
     task->scroll_y=MAP_HEIGHT-task->pix_height-cy;
 
-  dc2->flags|=DCF_NO_TRANSPARENTS;
-  GrBlot(dc,-cx,-cy,dc2);
+  map_dc->flags|=DCF_NO_TRANSPARENTS;
+  GrBlot(dc,-cx,-cy,map_dc);
 
   RiverDropsDraw(dc,cx,cy);
 
@@ -237,7 +243,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     dc->color=BLACK;
     t=tS-t0;
   }
-  GrPrint(dc,-task->scroll_x,-task->scroll_y,"Time:%7.2fs  Best:%7.2fs",t,best_score);
+  GrPrint(dc,-task->scroll_x,-task->scroll_y,"Outside:%03d Time:%7.2fs	Best:%7.2fs",
+    outside_cnt,t,best_score);
 }
 
 U0 BuddySelect(I64 i)
@@ -259,8 +266,8 @@ U0 BuddySelect(I64 i)
 
 U0 AnimateTask(CTask *parent)
 {
-  I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,
-     min_x,max_x,min_y,max_y,updates=0;
+  I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,updates=0,
+    my_outside_cnt;
   F64 f,d,dx,dy,s,stress;
   Animal *tempa,*tempa1;
   while (TRUE) {
@@ -269,8 +276,8 @@ U0 AnimateTask(CTask *parent)
     cy=(MAP_HEIGHT-parent->pix_height)/2;
     cursor_x=ip.pos.x+cx-parent->pix_left-parent->scroll_x;
     cursor_y=ip.pos.y+cy-parent->pix_top -parent->scroll_y;
-    min_x=max_x=min_y=max_y=cnt=0;
-    stress=0;
+    cnt=0;stress=0;
+    my_outside_cnt=0;
     for (i=0;i<NUM_ANIMALS;i++) {
       tempa=&a[i];
       if (!tempa->dead) {
@@ -281,7 +288,7 @@ U0 AnimateTask(CTask *parent)
 	  d=Sqrt(dd);
 	  dx=ddx/d;
 	  dy=ddy/d;
-	  f=2.0e2*MAX_U32/dd;
+	  f=5.0e2*MAX_U32/dd;
 	  tempa->dx+=f*dx;
 	  tempa->dy+=f*dy;
 	}
@@ -316,13 +323,15 @@ U0 AnimateTask(CTask *parent)
 	tempa->dy=0.995*ClampI64(tempa->dy+RandI32/32,-max_speed,max_speed);
 
 //Slow in river
-	if (GrPeek(dc2,tempa->x.i32[1],tempa->y.i32[1])!=LTGREEN) {
-	  tempa->dx/=4;
-	  tempa->dy/=4;
+	if (GrPeek(map_dc,tempa->x.i32[1],tempa->y.i32[1])!=LTGREEN) {
+	  tempa->dx/=2;
+	  tempa->dy/=2;
 	}
 
-	tempa->x+=tempa->dx;
-	tempa->y+=tempa->dy;
+	if (GrPeek(map_dc,(tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)!=LTGRAY) {
+	  tempa->x+=tempa->dx;
+	  tempa->y+=tempa->dy;
+	}
 
 //Keep on map
 	if (!(MAP_BORDER-tempa->ge->min_x<=tempa->x.i32[1]<MAP_WIDTH-MAP_BORDER-tempa->ge->max_x)) {
@@ -333,24 +342,17 @@ U0 AnimateTask(CTask *parent)
 	  tempa->y -=tempa->dy;
 	  tempa->dy=-tempa->dy;
 	}
-
-	if (cnt) {
-	  min_x=MinI64(min_x,tempa->x);
-	  max_x=MaxI64(max_x,tempa->x);
-	  min_y=MinI64(min_y,tempa->y);
-	  max_y=MaxI64(max_y,tempa->y);
-	} else {
-	  min_x=max_x=tempa->x;
-	  min_y=max_y=tempa->y;
-	}
-
 	cnt++;
+	if (tempa->x>>32>=FENCE_WIDTH || tempa->y>>32>=FENCE_HEIGHT)
+	  my_outside_cnt++;
       }
     }
+    outside_cnt=my_outside_cnt;
+
     if (!(updates&15))
       RiverDropsNext(parent);
 
-    if (!tf && (max_x-min_x)>>32<GR_WIDTH && (max_y-min_y)>>32<GR_HEIGHT) {
+    if (!tf && !outside_cnt) {
       tf=tS;
       music.mute=TRUE;
       Snd(2000);Sleep(200);Snd(0);Sleep(100);
@@ -394,14 +396,27 @@ U0 ReInit()
   I64 i;
 
   RiverDropsDel;
-  dc2->color=LTGREEN;
-  GrRect(dc2,2,2,MAP_WIDTH-4,MAP_HEIGHT-4);
+  map_dc->color=LTGREEN;
+  GrRect(map_dc,2,2,MAP_WIDTH-4,MAP_HEIGHT-4);
 
   RiverMake;
 
-  dc2->pen_width=MAP_BORDER;
-  dc2->color=RED;
-  GrBorder(dc2,MAP_BORDER/2,MAP_BORDER/2,MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
+  //Plot fence
+  for (i=FENCE_WIDTH;i>0;i-=16)
+    Sprite3(map_dc,i,FENCE_HEIGHT,0,$IB,"<4>",BI=4$);
+  map_dc->pen_width=1;
+  map_dc->color=BROWN;
+  for (i=0;i<FENCE_HEIGHT-16;i+=16)
+    GrLine(map_dc,FENCE_WIDTH-1,i,FENCE_WIDTH-1,i+7);
+  map_dc->color=LTGRAY;
+  GrLine(map_dc,FENCE_WIDTH,0,FENCE_WIDTH,FENCE_HEIGHT-6);
+
+  map_dc->color=LTGREEN;
+  GrRect(map_dc,FENCE_WIDTH-63,FENCE_HEIGHT-8,46,9);
+
+  map_dc->pen_width=MAP_BORDER;
+  map_dc->color=RED;
+  GrBorder(map_dc,MAP_BORDER/2,MAP_BORDER/2,MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
 
   for (i=river_lo;i<=river_hi;i++)
     RiverDropsNext(Fs);
@@ -417,6 +432,7 @@ U0 ReInit()
       a[i].ge=&rh_sprite[GE_BULL];
     BuddySelect(i);
   }
+  outside_cnt=NUM_ANIMALS;
   t0=tS;
   tf=0;
 }
@@ -437,14 +453,14 @@ U0 Init()
   RiverNew;
   rd_lock=0;
   QueInit(&rd_root);
-  dc2=DCNew(MAP_WIDTH,MAP_HEIGHT);
+  map_dc=DCNew(MAP_WIDTH,MAP_HEIGHT);
   a=MAlloc(NUM_ANIMALS*sizeof(Animal));
   ReInit;
 }
 
 U0 CleanUp()
 {
-  DCDel(dc2);
+  DCDel(map_dc);
   Free(a);
   RiverDropsDel;
   RiverDel;
@@ -455,10 +471,9 @@ U0 RawHide()
   I64 msg_code,a1,a2;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   PopUpOk(
-	"Coral the cattle into an area\n"
-	"the size of a screen.\n\n"
-	"Scroll with {CTRL-Left Grab}.\n"
-	"Center with {CTRL-Right}.");
+	"Coral the cattle.  The coral is in the\n"
+	"upper-left corner if you scroll.\n\n"
+	"Scroll with $$GREEN$${CTRL-Left Grab}$$FG$$.\n");
   MenuPush(
 "File {"
 "  Abort(,CH_SHIFT_ESC);"
@@ -471,7 +486,7 @@ U0 RawHide()
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
   WinMax;
-  WordStat;
+  AutoComplete;
   Preempt(OFF);
   Init;
   Fs->animate_task=Spawn(&AnimateTask,Fs,"Animate",,Fs);
@@ -509,4 +524,9 @@ rh_done:
 }
 
 RawHide;
-         ò           öÿÿÿðÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿ    ÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿ    ÿÿÿÿÿÿ ÿÿÿÿÿ      ÿÿÿÿÿ       ÿÿ    ÿÿÿÿ      ÿÿÿÿÿÿÿÿ   ÿÿ     ÿÿÿ      ÿÿÿÿÿ ÿÿ   ÿ    ÿÿ      ÿÿÿÿ        ÿ      ÿÿÿ              ÿÿ     ÿÿ    ÿ      ÿ      ÿÿÿÿÿÿÿ      ÿÿ ÿ    ÿÿÿÿÿÿÿÿ      ÿÿÿÿ     ÿÿÿÿÿÿÿÿ      ÿÿÿÿ         ÿÿÿÿÿÿÿ             ÿÿ     ÿÿÿÿÿÿ          ÿÿÿ     ÿÿÿÿÿÿ             ÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ     ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿÿ              b           öÿÿÿôÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿ   ÿÿÿ             ÿÿ   ÿÿ    ÿ                          ÿ   ÿÿ       ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ  ÿ  ÿ  ÿÿÿÿ   ÿÿ  ÿ   ÿ  ÿ  ÿÿÿÿ   ÿÿ   ÿÿÿÿÿ  ÿ   ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿ           Â           öÿÿÿðÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ ÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿÿ ÿÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿÿ   ÿ ÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿ   ÿÿÿ              ÿÿ   ÿÿ    ÿ                          ÿ   ÿÿ      ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ  ÿ  ÿ  ÿÿÿÿ   ÿÿ  ÿ   ÿ  ÿ  ÿÿÿÿ   ÿÿ   ÿÿÿÿÿ  ÿ   ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿ    
+        ò     öÿÿÿðÿÿÿ      ÿÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿ    ÿÿÿÿÿÿÿÿÿÿÿÿÿ      ÿÿÿÿ    ÿÿÿÿÿÿ ÿÿÿÿÿ      ÿÿÿÿÿ       ÿÿ    ÿÿÿÿ      ÿÿÿÿÿÿÿÿ   ÿÿ     ÿÿÿ      ÿÿÿÿÿ ÿÿ   ÿ    ÿÿ      ÿÿÿÿ        ÿ      ÿÿÿ              ÿÿ     ÿÿ    ÿ      ÿ      ÿÿÿÿÿÿÿ      ÿÿ ÿ    ÿÿÿÿÿÿÿÿ      ÿÿÿÿ     ÿÿÿÿÿÿÿÿ      ÿÿÿÿ         ÿÿÿÿÿÿÿ             ÿÿ     ÿÿÿÿÿÿ          ÿÿÿ     ÿÿÿÿÿÿ             ÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ    ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ     ÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿÿ              b     öÿÿÿôÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿ   ÿÿÿ             ÿÿ   ÿÿ    ÿ                          ÿ   ÿÿ       ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ  ÿ  ÿ  ÿÿÿÿ   ÿÿ  ÿ   ÿ  ÿ  ÿÿÿÿ   ÿÿ   ÿÿÿÿÿ  ÿ   ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿ           Â     öÿÿÿðÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ ÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿÿ ÿÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿ  ÿ   ÿÿÿÿÿÿÿÿÿÿÿ   ÿ ÿÿ   ÿÿÿÿÿÿÿÿÿÿÿÿ   ÿÿÿ   ÿÿÿ              ÿÿ   ÿÿ    ÿ                          ÿ   ÿÿ      ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ     ÿ  ÿÿÿÿ   ÿÿ  ÿ  ÿ  ÿ  ÿÿÿÿ   ÿÿ  ÿ   ÿ  ÿ  ÿÿÿÿ   ÿÿ   ÿÿÿÿÿ  ÿ   ÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿ           d         
+            ùÿÿÿ   
+    úÿÿÿðÿÿÿúÿÿÿ
+    ÿÿÿÿðÿÿÿÿÿÿÿ
+ðÿÿÿÿÿÿÿÿÿÿÿúÿÿÿ
+ÿÿÿÿÿÿÿÿðÿÿÿúÿÿÿ 

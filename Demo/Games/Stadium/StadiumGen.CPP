@@ -1,15 +1,16 @@
-//Generate "Stadium.GRA.Z" from "Stadium.TXT.Z"
+//Generate "StadiumBG.GRA.Z" from "StadiumBG.TXT.Z"
 
 U0 StadiumGen()
 {
   U0 (*fp_old_update)(CDC *dc);
   CDC *dc,*dc2;
 
+  Cd(__DIR__);
   WinMax;
   WinBorder;
-  WordStat;
+  AutoComplete;
   DocClear;
-  Type("::/Demo/Games/Stadium/Stadium.TXT");
+  Type("StadiumBG.TXT");
   "$$CM,0,%d$$",TEXT_ROWS-3;
   DocCursor(OFF);
   fp_old_update=gr.fp_final_screen_update; //hide mouse cursor
@@ -20,7 +21,7 @@ U0 StadiumGen()
   dc=DCExtract(dc2,0,FONT_HEIGHT,GR_WIDTH,GR_HEIGHT);
   DCDel(dc2);
 
-  GRAWrite("::/Demo/Games/Stadium/Stadium",dc);
+  GRAWrite("StadiumBG",dc);
   DCDel(dc);
  
   DocCursor(ON);

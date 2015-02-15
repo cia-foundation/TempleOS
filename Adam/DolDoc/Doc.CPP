@@ -76,12 +76,15 @@ public class CDolDocGlbls
 } doldoc;
 MemSet(&doldoc,0,sizeof(CDolDocGlbls));
 
+#help_index "God"
+#define BIBLE_FILENAME	"::/Misc/Bible.TXT.Z"
+
 #include "DocNew"
 #include "DocPlain"
 #include "DocInit"
 #include "DocHighlight"
-#include "DocRecalc2a"
-#include "DocRecalc2b"
+#include "DocRecalcA"
+#include "DocRecalcB"
 sys_clipboard_doc=DocNew;
 #include "DocFile"
 #include "DocOpt"
@@ -89,8 +92,8 @@ sys_clipboard_doc=DocNew;
 #include "DocCtrlL"
 #include "DocMacro"
 #include "DocFind"
-#include "DocEd2a"
-#include "DocEd2b"
+#include "DocEdA"
+#include "DocEdB"
 #include "DocCodeTools"
 #include "DocTree"
 #include "DocMain"

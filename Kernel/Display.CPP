@@ -47,36 +47,36 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
   } else if (Bt(chars_bitmap_displayable,ch)) {
     row=text.raw_col/text.cols%text.rows;
     col=text.raw_col%text.cols;
-    if (!sys_bios_gr_mode) { //if text mode
+    if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
-	MemCpy(VGA_TEXT_MEM_BASE,VGA_TEXT_MEM_BASE+text.cols,
+	MemCpy(VGAM_TEXT,VGAM_TEXT+text.cols,
 	  text.cols*(text.rows-1)*2);
-	MemSet(VGA_TEXT_MEM_BASE+text.cols*(text.rows-1)*2,0,text.cols*2);
+	MemSet(VGAM_TEXT+text.cols*(text.rows-1)*2,0,text.cols*2);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
       }
-      ptr=VGA_TEXT_MEM_BASE+(row*text.cols+col)*2;
+      ptr=VGAM_TEXT+(row*text.cols+col)*2;
       ptr[0]=ch;
       ptr[1]=BLACK<<4+WHITE;
     } else {
-      OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-      OutU8(VGA_SC_DATA,0x0F); //All planes -- WHITE
+      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_DATA,0x0F); //All planes -- WHITE
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
       //Scroll cached image
 	MemCpy(text.raw_screen_image,text.raw_screen_image+GR_WIDTH*FONT_HEIGHT>>3,
 	    GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3);
 	MemSet(text.raw_screen_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,GR_WIDTH*FONT_HEIGHT>>3);
 
-	MemCpy(VGA_GRAPHIC_MEM_BASE,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
+	MemCpy(VGAM_GRAPHICS,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
       }
       PUSHFD
       CLI
       ptr=ptr1=col+row*GR_WIDTH*FONT_HEIGHT>>3;
-      ptr+=VGA_GRAPHIC_MEM_BASE;
+      ptr+=VGAM_GRAPHICS;
       ptr1+=text.raw_screen_image; //Write to cached image as well
-      ptr2=&text.font[(ch&255)*FONT_HEIGHT];
+      ptr2=&text.font[ch&255];
       for (i=0;i<FONT_HEIGHT;i++) {
 	*ptr=*ptr1=reverse_bits_table[*ptr2++];
 	ptr+=GR_WIDTH>>3;

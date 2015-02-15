@@ -7,7 +7,7 @@ documentation.
 
 */
 
-DefineLoad("COMPANY","Trivial Solutions");
+DefineLoad("COMPANY","Acme Inc");
 "Company: $$TX,\"\",D=\"COMPANY\"$$\n";
 
 DefinePrint("COMPANY_TIME","%T",Now);

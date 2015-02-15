@@ -60,8 +60,7 @@ is you can't use the <CTRL-SHIFT-L> compile chk feature.
   DefinePrint("HEX_RADIUS","%12.9f",DSIN+0.01); //slop
   d=PopUpRangeF64(0,100,25,"%3f% %%","Animation Delay\n");
   DefinePrint("ANIMATION_DELAY","%5.3f",d/100.0);
-  Randomize;
-  Randomize(PopUpGetI64("Seed(0x%X):",Fs->rnd_seed));
+  Seed(PopUpGetI64("Seed(0x%X):",Seed));
   XTalk(rotate_tank_task," ");
   TaskWait(rotate_tank_task);
   Kill(rotate_tank_task);
@@ -72,7 +71,7 @@ I64 map_cols=(MAP_WIDTH-DCOS)/(2*HEX_SIDE+2*DCOS),
    map_width=map_cols*(2*HEX_SIDE+2*DCOS)+DCOS,
    map_height=map_rows*DSIN+DSIN+1;
 
-CDC *map;
+CDC *map_dc;
 U8 terrain[map_rows][map_cols];
 
 //Centers of hexes
@@ -331,7 +330,7 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 {
   Bool result=FALSE,seen;
   I64 i,j,row,col;
-  F64 x1,y1,x2,y2,d,range;
+  F64 x1,y1,x2,y2,dd,range;
   Unit *ut0,*ut1;
   ut0=&units[cur_player][job->lo];
   ut1=&units[enemy_player][job->lo];
@@ -352,8 +351,8 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	if (ut1->life>0 &&
 	    LOS(row,col,ut1->row,ut1->col)) {
 	    RowCol2XY(&x2,&y2,ut1->row,ut1->col);
-	  d=Sqr(x2-x1)+Sqr(y2-y1);
-	  if (d<range) {
+	  dd=Sqr(x2-x1)+Sqr(y2-y1);
+	  if (dd<range) {
 	    seen=TRUE;
 	    LBts(&ut1->visible[cur_player],0);
 	  }
@@ -531,18 +530,18 @@ I64 MoveCost(Unit *tempu,I64 r,I64 c,I64 facing)
 I64 MoveOneHex(I64 *_row,I64 *_col,F64 x,F64 y)
 {
   I64 direction,best_direction=-1,r,c;
-  F64 d,best_d,x1,y1;
+  F64 dd,best_dd,x1,y1;
   RowCol2XY(&x1,&y1,*_row,*_col);
-  best_d=Sqr(x1-x)+Sqr(y1-y);
+  best_dd=Sqr(x1-x)+Sqr(y1-y);
   for (direction=0;direction<6;direction++) {
     r=*_row; c=*_col;
     Toward(&r,&c,direction);
     RowCol2XY(&x1,&y1,r,c);
-    d=Sqr(x1-x)+Sqr(y1-y);
+    dd=Sqr(x1-x)+Sqr(y1-y);
     if (0<=r<map_rows &&
 	0<=c<map_cols &&
-	d<best_d) {
-      best_d=d;
+	dd<best_dd) {
+      best_dd=dd;
       best_direction=direction;
     }
   }
@@ -805,7 +804,7 @@ U0 IndirectFireResolve()
     "-%5.2f%% of Range\n",100*range_factor;
     d-=100*range_factor;
 
-    "_______\n";
+    '_______\n';
     if (d>=0) {
       "+%5.2f  Hit\n",d;
       hit=TRUE;
@@ -873,7 +872,7 @@ U0 IndirectFireResolve()
 	if (dammage>0) {
 	  "Life:%3d - Dammage:%3f =",target->life,dammage;
 	  if (dammage>=target->life) {
-	    "Killed\n";
+	    'Killed\n';
 	    target->life=0;
 	    RecalcVisible(RV_FRIENDLY_UNIT_DIED,target);
 	    alive_cnt[target->player]--;
@@ -909,30 +908,30 @@ U0 DrawHexes()
   F64 dx=2*HEX_SIDE+2*DCOS,dy=2*DSIN,
       x,y,x1,y1,x2,y2;
   I64 i,j;
-  map->color=WHITE;
-  GrRect(map,0,0,map->width,map->height);
-  map->color=BLACK;
+  map_dc->color=WHITE;
+  GrRect(map_dc,0,0,map_dc->width,map_dc->height);
+  map_dc->color=BLACK;
   y=0;
   for (j=0;j<map_rows;j+=2) {
     x=DCOS;
-    GrLine(map,x,y,x-DCOS,y+DSIN);
-    GrLine(map,x-DCOS,y+DSIN,x,y+2*DSIN);
+    GrLine(map_dc,x,y,x-DCOS,y+DSIN);
+    GrLine(map_dc,x-DCOS,y+DSIN,x,y+2*DSIN);
     for (i=0;i<map_cols;i++) {
       x1=x; y1=y;
       x2=x1+HEX_SIDE; y2=y1;
-      GrLine(map,x1,y1,x2,y2);
+      GrLine(map_dc,x1,y1,x2,y2);
       x1=x2; y1=y2;
       x2+=DCOS; y2+=DSIN;
-      GrLine(map,x1,y1,x2,y2);
-      GrLine(map,x2,y2,x2-DCOS,y2+DSIN);
+      GrLine(map_dc,x1,y1,x2,y2);
+      GrLine(map_dc,x2,y2,x2-DCOS,y2+DSIN);
       x1=x2; y1=y2;
       x2+=HEX_SIDE;
-      GrLine(map,x1,y1,x2,y2);
-      GrLine(map,x2,y2,x2+DCOS,y2+DSIN);
+      GrLine(map_dc,x1,y1,x2,y2);
+      GrLine(map_dc,x2,y2,x2+DCOS,y2+DSIN);
       x1=x2; y1=y2;
       x2+=DCOS; y2-=DSIN;
       if (j || i<map_cols-1)
-	GrLine(map,x1,y1,x2,y2);
+	GrLine(map_dc,x1,y1,x2,y2);
       x+=dx;
     }
     y+=dy;
@@ -941,16 +940,16 @@ U0 DrawHexes()
   for (i=0;i<map_cols;i++) {
     x1=x; y1=y;
     x2=x1+HEX_SIDE; y2=y1;
-    GrLine(map,x1,y1,x2,y2);
+    GrLine(map_dc,x1,y1,x2,y2);
     x1=x2; y1=y2;
     x2+=DCOS; y2+=DSIN;
-    GrLine(map,x1,y1,x2,y2);
+    GrLine(map_dc,x1,y1,x2,y2);
     x1=x2; y1=y2;
     x2+=HEX_SIDE;
-    GrLine(map,x1,y1,x2,y2);
+    GrLine(map_dc,x1,y1,x2,y2);
     x1=x2; y1=y2;
     x2+=DCOS; y2-=DSIN;
-    GrLine(map,x1,y1,x2,y2);
+    GrLine(map_dc,x1,y1,x2,y2);
     x+=dx;
   }
 }
@@ -959,12 +958,12 @@ U0 MakeTerrain(U8 color,I64 cnt,I64 cluster_lo,I64 cluster_hi)
 {
   I64 i,j,l,row,col;
   for (i=0;i<cnt;i++) {
-    col=Rand2U32%map_cols;
-    row=Rand2U32%map_rows;
-    l=cluster_lo+Rand2U16%(cluster_hi-cluster_lo+1);
+    col=RandU32%map_cols;
+    row=RandU32%map_rows;
+    l=cluster_lo+RandU16%(cluster_hi-cluster_lo+1);
     for (j=0;j<l;j++) {
       terrain[row][col]=color;
-      Toward(&row,&col,Rand2U16%6);
+      Toward(&row,&col,RandU16%6);
       col=ClampI64(col,0,map_cols-1);
       row=ClampI64(row,0,map_rows-1);
     }
@@ -975,16 +974,16 @@ U0 MakeRivers()
 {
   I64 i,row,col,direction;
   for (i=0;i<4;i++) {
-    row=Rand2U32%map_rows;
-    col=Rand2U32%map_cols;
-    direction=Rand2U16%6;
+    row=RandU32%map_rows;
+    col=RandU32%map_cols;
+    direction=RandU16%6;
     while (TRUE) {
       rivers[row][col]=TRUE;
       Toward(&row,&col,direction);
       if (!(0<=row<map_rows && 0<=col<map_cols))
 	break;
-      if (!(Rand2U16&3))
-	direction=(direction+(7-Rand2U16%3))%6;
+      if (!(RandU16&3))
+	direction=(direction+(7-RandU16%3))%6;
     }
   }
 }
@@ -993,16 +992,16 @@ U0 MakeRoads()
 {
   I64 i,row,col,direction;
   for (i=0;i<5;i++) {
-    row=Rand2U32%map_rows;
-    col=Rand2U32%map_cols;
-    direction=Rand2U16%6;
+    row=RandU32%map_rows;
+    col=RandU32%map_cols;
+    direction=RandU16%6;
     while (TRUE) {
       roads[row][col]=TRUE;
       Toward(&row,&col,direction);
       if (!(0<=row<map_rows && 0<=col<map_cols))
 	break;
-      if (!(Rand2U16%3))
-	direction=(direction+(7-Rand2U16%3))%6;
+      if (!(RandU16%3))
+	direction=(direction+(7-RandU16%3))%6;
     }
   }
 }
@@ -1013,9 +1012,9 @@ U0 DrawTerrain()
   F64 x,y;
   for (j=0;j<map_rows;j++)
     for (i=0;i<map_cols;i++) {
-      map->color=terrain[j][i];
+      map_dc->color=terrain[j][i];
       RowCol2XY(&x,&y,j,i);
-      GrFloodFill(map,x,y);
+      GrFloodFill(map_dc,x,y);
     }
 }
 
@@ -1033,12 +1032,12 @@ U0 DrawRivers()
 	  if (0<=r<map_rows && 0<=c<map_cols &&
 	    rivers[r][c]) {
 	    RowCol2XY(&x2,&y2,r,c);
-	    map->color=LTBLUE;
-	    map->pen_width=4;
-	    GrLine3(map,x1,y1,0,x2,y2,0);
-	    map->color=BLUE;
-	    map->pen_width=2;
-	    GrLine3(map,x1,y1,0,x2,y2,0);
+	    map_dc->color=LTBLUE;
+	    map_dc->pen_width=4;
+	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
+	    map_dc->color=BLUE;
+	    map_dc->pen_width=2;
+	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
 	  }
 	}
       }
@@ -1049,8 +1048,8 @@ U0 DrawRoads()
 {
   I64 i,j,k,r,c;
   F64 x1,y1,x2,y2;
-  map->color=RED;
-  map->pen_width=3;
+  map_dc->color=RED;
+  map_dc->pen_width=3;
   for (j=0;j<map_rows;j++)
     for (i=0;i<map_cols;i++) {
       if (roads[j][i]) {
@@ -1061,7 +1060,7 @@ U0 DrawRoads()
 	  if (0<=r<map_rows && 0<=c<map_cols &&
 	    roads[r][c]) {
 	    RowCol2XY(&x2,&y2,r,c);
-	    GrLine3(map,x1,y1,0,x2,y2,0);
+	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
 	  }
 	}
       }
@@ -1087,11 +1086,11 @@ U0 DrawDots()
 {
   I64 i,j;
   F64 x,y;
-  map->color=BLACK;
+  map_dc->color=BLACK;
   for (j=0;j<map_rows;j++)
     for (i=0;i<map_cols;i++) {
       RowCol2XY(&x,&y,j,i);
-      GrPlot(map,x,y);
+      GrPlot(map_dc,x,y);
     }
 }
 
@@ -1126,7 +1125,7 @@ U0 InitUnits()
       tempu->player=j;
       tempu->num=i;
       tempu->life=100;
-      tempu->facing=Rand2U16%6;
+      tempu->facing=RandU16%6;
       if (!j) {
 	if (i>=Round(MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)) {
 	  if (Round(i-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)>=Round(0.85*(MAX_UNITS-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)))
@@ -1200,8 +1199,8 @@ U0 InitUnits()
 	  break;
       }
       do {
-	row=Rand2U32%map_rows;
-	col=Rand2U32%(map_cols/3);
+	row=RandU32%map_rows;
+	col=RandU32%(map_cols/3);
 	if (j)
 	  col+=2*map_cols/3;
       } while (FindUnit(row,col));
@@ -1352,11 +1351,11 @@ U0 PickAI(U8 *dirname,I64 player)
   U8 *st;
   CDirEntry *tempde,*tempde1,*tempde2;
   CDoc *doc=DocNew;
-  Bool *old_silent=Silent(ON);
+  Bool *old_silent=Silent;
   st=MStrPrint("%s/*.CPP*",dirname);
   tempde=FilesFind(st);
   Free(st);
-  tempde2=FilesFind("HOME/ToTheFront/*.CPP*");
+  tempde2=FilesFind("::/Home/ToTheFront/*.CPP*");
   tempde1=tempde;
   Silent(old_silent);
 
@@ -1380,7 +1379,7 @@ U0 PickAI(U8 *dirname,I64 player)
     Free(st);
     tempde1=tempde1->next;
   }
-  DocPrint(doc,"\n\n\n$$FG$$Create your own AI in HOME/ToTheFront.");
+  DocPrint(doc,"\n\n\n$$FG$$Create your own AI in /Home/ToTheFront.");
   while ((tempde1=PopUpMenu(doc))<=0);
   ExeFile(tempde1->full_name);
   DocDel(doc);
@@ -1456,8 +1455,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   h=task->horz_scroll.pos;
   v=task->vert_scroll.pos;
 
-  map->flags|=DCF_NO_TRANSPARENTS;
-  GrBlot(dc,-h,-v,map);
+  map_dc->flags|=DCF_NO_TRANSPARENTS;
+  GrBlot(dc,-h,-v,map_dc);
 
   i=ip.pos.x-task->pix_left-task->scroll_x;
   j=ip.pos.y-task->pix_top -task->scroll_y;
@@ -1631,9 +1630,10 @@ I64 DoPhase()
 U0 ToTheFront()
 {
   I64 result,ch;
-  map=DCNew(MAP_WIDTH,MAP_HEIGHT);
+  map_dc=DCNew(MAP_WIDTH,MAP_HEIGHT);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  Cd(__DIR__);
   Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R|WIG_DBL_CLICK;
 
   MenuPush(
@@ -1654,12 +1654,12 @@ U0 ToTheFront()
 	);
 
   WinMax;
-  WordStat;
+  AutoComplete;
   WinBorder(ON);
   Preempt(OFF);
   Init;
-  PickAI("/Apps/ToTheFront/AIs",0);
-  PickAI("/Apps/ToTheFront/AIs",1);
+  PickAI("AIs",0);
+  PickAI("AIs",1);
 
   PopUpOk("Left-click  to move or fire units.\n"
 	"$$GREEN$$<SPACE>$$FG$$ or right-click to end phase.\n"
@@ -1706,8 +1706,9 @@ U0 ToTheFront()
 
   SettingsPop;
   MenuPop;
-  DCDel(map);
+  DCDel(map_dc);
   CleanUp;
+  Seed;
 }
         L         ÿÿÿÿüÿÿÿ          úÿÿÿ      üÿÿÿúÿÿÿþÿÿÿ   
            øÿÿÿ              üÿÿÿüÿÿÿ          

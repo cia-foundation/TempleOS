@@ -2,12 +2,15 @@ $WW,1$$FG,5$$TX+CX,"Glossery"$$FG$
 
 $TR,"Abbreviations"$
 $ID,2$$FG,2$Abs$FG$	Absolute
+$FG,2$AC$FG$	AutoComplete
 $FG,2$Acct$FG$	Account
+$FG,2$ACD$FG$	AutoComplete Dictionary
 $FG,2$Addr$FG$	Address
+$FG,2$Alloc$FG$	Allocate
 $FG,2$AOT$FG$	Ahead-of-Time
 $FG,2$AP$FG$	Application Processor(CPU#>0)
 $FG,2$Arg$FG$	Argument
-$FG,2$Asm$FG$	Assemble or Assembly
+$FG,2$Asm$FG$	Assemble, Assembler or Assembly
 $FG,2$Attr$FG$	Attribute
 $FG,2$Aux$FG$	Auxilliary
 $FG,2$BG$FG$	Backround
@@ -55,6 +58,7 @@ $FG,2$Gen$FG$	Generate
 $FG,2$Glbl$FG$	Global
 $FG,2$Gr$FG$	Graphic
 $FG,2$IDE$FG$	Integrated Drive Electronics, Integrated Development Environment
+$FG,2$Id$FG$	Identification
 $FG,2$Ident$FG$	Identifier, Identity
 $FG,2$IDT$FG$	Interrupt Descriptor Table
 $FG,2$Init$FG$	Initialize
@@ -91,11 +95,13 @@ $FG,2$Prec$FG$	Precedence
 $FG,2$Pri$FG$	Primary
 $FG,2$Prod$FG$	Product, Production
 $FG,2$Prof$FG$	Profile, Profiler
+$FG,2$Prs$FG$	Parse, Parser
 $FG,2$Prt$FG$	Partition
 $FG,2$PSect$FG$	Program Section
 $FG,2$Pt$FG$	Point
 $FG,2$Ptr$FG$	Pointer
 $FG,2$Que$FG$	Queue
+$FG,2$Rand$FG$	Random
 $FG,2$Ref$FG$	Reference
 $FG,2$Reg$FG$	Register, Registry, Regular
 $FG,2$Rem$FG$	Remove
@@ -127,18 +133,16 @@ $FG,2$Vect$FG$	Vector
 $FG,2$Vol$FG$	Volume
 $FG,2$Win$FG$	Window
 $FG,2$Wiz$FG$	Wizard
-$FG,2$WS$FG$	WordStat
-$FG,2$WSD$FG$	WordStat Dictionary
 $ID,-2$$TR,"Task/Process/Thread"$
 $ID,2$There is no distinction between $FG,2$task$FG$, $FG,2$process$FG$ or $FG,2$thread$FG$.  The $FG,2$Fs$FG$ segment reg is kept pointing to the current task's $LK,"CTask",A="MN:CTask"$.  There is only one window per task, and only $FG,2$core#0$FG$ tasks can have windows.  Each task has a code and data heap so memory is returned when it dies.  Each task has a $LK,"hash",A="HI:Hash"$ symbol table.
 $ID,-2$$TR,"Adam Task"$
-$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/Kernel/Adam1.CPP"$  Normally, $FG,2$Adam1.CPP.Z$FG$ ends by $FG,2$#include$FG$ $LK,"::/Adam/Adam2.CPP"$ where the remainder of the operating system is $FG,2$#include$FG$d.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
+$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/Adam.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
 $ID,-2$$TR,"Seth Task"$
 $ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has a special task which is immortal and which is special.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
-$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ instruction, exclusively, and that instruction is limited to calling routines $FG,2$+/-2 Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2 Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er allocate memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can allocate from any heap in any task at any time on any core, even making $LK,"independent",A="MN:MemBlksIndependentAlloc"$ heaps.
+$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ instruction, exclusively, and that instruction is limited to calling routines $FG,2$+/-2 Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2 Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:Mem512Alloc"$ heaps.
 $ID,-2$$TR,"Parent, Child and PopUp Tasks"$
-$ID,2$Often a task will $LK,"Spawn",A="MN:Spawn"$() or $LK,"PopUp",A="MN:PopUp"$() a task as a helper.  The helper is known as a child Task, though you can $LK,"Spawn",A="MN:Spawn"$ a task and assign it a different parent... like $FG,2$Adam$FG$.  Links are kept as to who's who's child, so when one task is $LK,"Kill",A="MN:Kill"$()ed the child helper tasks die, too.  You can get a report of current system tasks with $LK,"TaskRep",A="MN:TaskRep"$().  There is just one window per task, so child tasks are needed for pop-ups.
+$ID,2$Often a task will $LK,"Spawn",A="MN:Spawn"$() or $LK,"PopUp",A="MN:PopUp"$() a task as a helper.  The helper is known as a child Task, though you can $LK,"Spawn",A="MN:Spawn"$ a task and assign it a different parent... like $FG,2$Adam$FG$.  Links are kept as to who's whose child, so when one task is $LK,"Kill",A="MN:Kill"$()ed the child helper tasks die, too.  You can get a report of current system tasks with $LK,"TaskRep",A="MN:TaskRep"$().  There is just one window per task, so child tasks are needed for pop-ups.
 $ID,-2$$TR,"HolyC"$
 $ID,2$$LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ is more than $FG,2$C$FG$ and less than $FG,2$C++$FG$.  It has the default args of $FG,2$C++$FG$ and uses $FG,2$class$FG$ in place of $FG,2$struct$FG$.  It uses $FG,2$U0,U8,U16,U32,I64$FG$ and $FG,2$I0,I8,I16,I32,I64$FG$ for signed and unsigned integers.  It has different $LK,"operator precedence",A="FF:::/Doc/HolyC.TXT,operator precedence"$.  It has $FG,2$PASCAL$FG$-like function calls with no parens, but requires an $FG,2$&$FG,2$$FG$ when referring to function addresses.
 $ID,-2$$TR,"AOT Compile Mode"$
@@ -146,13 +150,13 @@ $ID,2$$FG,2$Ahead-of-Time$FG$ compiling is conventional compilation mode.  Do no
 
 In $FG,2$AOT$FG$ mode, $FG,2$.PRJ$FG$ files are compiled to $FG,2$.BIN$FG$ files, skipping $FG,2$.OBJ$FG$ files.  After compiling, $FG,2$.BIN$FG$ files are $LK,"Load",A="MN:Load"$()ed.
 
-There is no $FG,2$main()$FG$ routine.  Instead, statements outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
+There is no $FG,2$main()$FG$ routine.  Instead, statements outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
 $ID,-2$$TR,"JIT Compile Mode"$
-$ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory allocated from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
+$ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$
 $ID,2$The compiler generates instructions one step before making actual assembly (machine) language instructions.  This code is reverse polish stack machine in nature and can be viewed with $LK,"OTrace",A="MN:OTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"CTrace",A="MN:CTrace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
-$ID,-2$$TR,"Partition/Drive"$
-$ID,2$There is no distinction between $FG,2$partition$FG$ or $FG,2$drive$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
+$ID,-2$$TR,"Drive/Partition"$
+$ID,2$There is no distinction between $FG,2$drive$FG$ or $FG,2$partition$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
 
 '$FG,2$:$FG$' is the boot drive.
 
@@ -194,7 +198,7 @@ $FG,5$*.DAT.Z;*.DAT$FG$
 $FG,5$*.ISO$FG$
   CD-ROM image file--ISO9660.
 $FG,5$*.AUT.Z;*.AUT$FG$
-  $FG,2$AutoFile$FG$ Basically a HolyC program who's stdout goes to the input of a task when $LK,"AutoFile",A="MN:AutoFile"$() is called.
+  $FG,2$AutoFile$FG$ Basically a HolyC program whose stdout goes to the input of a task when $LK,"AutoFile",A="MN:AutoFile"$() is called.
 $FG,5$*.GRA.Z;*.GRA$FG$
   Graphics file
 
@@ -235,7 +239,7 @@ $ID,2$The CPU FS segment reg.  This reg points to the current task's $LK,"CTask"
 $ID,-2$$TR,"Gs"$
 $ID,2$The CPU GS segment reg.  This reg points to the current core's $LK,"CCPU",A="MN:CCPU"$.
 $ID,-2$$TR,"Heap"$
-$ID,2$Programs can dynamically request chunks of memory allocated from a $FG,2$heap$FG$ using $LK,"MAlloc",A="MN:MAlloc"$().  They must $LK,"Free",A="MN:Free"$() it when finished.  Ptrs are used to refer to the chunk.  The $FG,2$heap$FG$ is dynamically allocated mem.
+$ID,2$Programs can dynamically request chunks of memory alloced from a $FG,2$heap$FG$ using $LK,"MAlloc",A="MN:MAlloc"$().  They must $LK,"Free",A="MN:Free"$() it when finished.  Ptrs are used to refer to the chunk.  The $FG,2$heap$FG$ is dynamically alloced mem.
 $ID,-2$$TR,"Root"$
 $ID,2$The base of a binary tree or the head of a queue is the $FG,2$root$FG$.  (I don't like the word $FG,2$head$FG$.)
 $ID,-2$$TR,"Join"$

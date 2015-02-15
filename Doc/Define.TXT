@@ -2,6 +2,6 @@ $WW,1$TempleOS has a string indirection feature implemented with the same hash s
 
 Each task can load it's own Define strings.  Remember, when a $LK,"Hash",A="HI:Hash"$ table is searched for a string, if it is not found, the parent task's table is searched.
 
-The $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ framework supports text that changes based on entries in the task's symbol table.  Set a text entry with a $FG,2$D=$FG$ arg, as in $FG,2$$$TX,"",D="DD_MYSTRING"$$$FG$.  See $LK,"::/Demo/DolDoc/DefineStr.CPP"$, $LK,"::/Adam/DocDefines.CPP"$ and $LK,"::/Doc/MemOverview.TXT"$.
+The $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ framework supports text that changes based on entries in the task's symbol table.  Set a text entry with a $FG,2$D=$FG$ arg, as in $FG,2$$$TX,"",D="DD_MYSTRING"$$$FG$.  See $LK,"::/Demo/DolDoc/DefineStr.CPP"$, $LK,"::/Adam/ADefine.CPP"$ and $LK,"::/Doc/MemOverview.TXT"$.
 
 See $LK,"::/Demo/Define.CPP"$.

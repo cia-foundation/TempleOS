@@ -49,8 +49,8 @@ U0 Song()
   try {
     task=PopUpViewPrint("$LK,"Mark,14:37",A="BF:Mark,14:37"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       "$$GREEN$$Jesus talking...$$FG$$\n";
       Play("3eBCqB2sG3D2G3DetCGFsCBCBetCGBeBGsBCBC",

@@ -8,7 +8,7 @@ See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
 
 $ID,2$$FG,2$'t'$FG$ truncate to <width>.
 $FG,2$','$FG$ add commas every three digits or four nibbles.
-$FG,2$'$$'$FG$ makes $FG,2$%Q$FG$ convert $FG,2$'$$'$FG$ to $FG,2$"\044"$FG$.
+$FG,2$'$$'$FG$ makes $FG,2$%Q$FG$ convert $FG,2$'$$'$FG$ to $FG,2$"\x24"$FG$.
 $FG,2$'/'$FG$ makes $FG,2$%Q$FG$ and $FG,2$%q$FG$ convert $FG,2$'%'$FG$ to $FG,2$"%%"$FG$.
 $ID,-2$
 <aux_fmt_num>:
@@ -31,7 +31,7 @@ $FG,2$"%h*c",25,'\n';$FG$ 25 new-lines.
 
 $FG,2$"%F"$FG$ text file.
 
-$FG,2$"%p"$FG$ ptr.
+$FG,2$"%dv"$FG$ ptr.
 
 $FG,2$"%P"$FG$ link to ptr.
 
@@ -77,6 +77,9 @@ $LK,"AFPrint",A="MN:AFPrint"$(I64 mS,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"
 
 $LK,"RawPrint",A="MN:RawPrint"$(I64 mS,U8 *fmt,...) sends direct to screen memory, bypassing window manager.
 
+$LK,"User",A="MN:User"$(U8 *fmt,...) Spawns a user and execute a string on start-up.
+
+$LK,"PopUpPrint",A="MN:PopUpPrint"$(U8 *fmt,...) compiles and execute a string in a pop-up win.  Note: It returns the result of the last executed expression.
 $LK,"PopUpViewPrint",A="MN:PopUpViewPrint"$(U8 *fmt,...) creates a pop-up window and views text.
 
 $BK,1$Note:$BK,0$ Use $FG,2$Print("%s",src)$FG$ if you need an unmodified string.

@@ -19,8 +19,8 @@ U0 MGUpdate()
 {//Copy image to VGA memory
   //For better performance we could only write what's changed.
   //0xA0000 is slower than normal RAM.
-  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-  OutU8(VGA_SC_DATA,0xF);//All color planes at once -- Black and White
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,0xF);//All color planes at once -- Black and White
   MemCpy(0xA0000,image,sizeof(image));
 }
  

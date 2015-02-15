@@ -115,7 +115,7 @@ U0 SysThrowBreak()
   else {//TODO: Might want lock
     Fs->wake_jiffy=0;
     TaskRstAwaitingMsg;
-    PrtsRelease();
+    DrvsRelease();
     BlkDevsRelease();
     FlushMsgs;
     throw('Break');

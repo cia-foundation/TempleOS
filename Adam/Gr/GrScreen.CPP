@@ -89,16 +89,10 @@ U0 GrUpdateWins()
     PutExcept(FALSE);
     Dbg("Exception in WinMgr");
   }
-
   winmgr.last_ode_time=winmgr.ode_time;
-  ode_allocated_factor=LowPass1(0.1,ode_allocated_factor,
+  ode_alloced_factor=LowPass1(0.1,ode_alloced_factor,
       Clamp(Gs->idle_factor-0.1,0.2,0.8),1/winmgr.fps);
-
   sys_task_being_screen_updated=NULL;
-  gr.refresh_time_stamps[gr.refresh_ts_ptr++&(GR_REFRESH_LOG_CNT-1)]=tS;
-  winmgr.fps=(GR_REFRESH_LOG_CNT-1)/
-      (gr.refresh_time_stamps[(gr.refresh_ts_ptr-1)&(GR_REFRESH_LOG_CNT-1)]-
-      gr.refresh_time_stamps[gr.refresh_ts_ptr&(GR_REFRESH_LOG_CNT-1)]);
 }
 
 U0 GrFixZoomScale()
@@ -339,7 +333,7 @@ U0 GrUpdateTextModeText()
 {
   U32 *src=gr.text_base;
   I64 cur_ch,i,d0=TEXT_COLS*TEXT_ROWS;
-  U16 *dst=VGA_TEXT_MEM_BASE,*dst2=gr.vga_text_cache;
+  U16 *dst=VGAM_TEXT,*dst2=gr.vga_text_cache;
   Bool blink_flag=Blink;
   if (LBtr(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0)) {
     i=d0;
@@ -390,18 +384,18 @@ U0 GrUpdateVGAGraphics()
   dst=gr.screen_image->body;
   if (LBtr(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0)) {
     for (plane=1;plane<0x10;plane<<=1) {
-      OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-      OutU8(VGA_SC_DATA,plane);
-      vga=VGA_GRAPHIC_MEM_BASE;
+      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_DATA,plane);
+      vga=VGAM_GRAPHICS;
       row=gr.zoomed_dc->height;
       while (row--)
 	GrUpdateLine64FlushCache(&vga,&src,d,&dst);
     }
   } else {
     for (plane=1;plane<0x10;plane<<=1) {
-      OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-      OutU8(VGA_SC_DATA,plane);
-      vga=VGA_GRAPHIC_MEM_BASE;
+      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_DATA,plane);
+      vga=VGAM_GRAPHICS;
       row=gr.zoomed_dc->height;
       while (row--)
 	GrUpdateLine64(&vga,&src,d,&dst);
@@ -410,10 +404,10 @@ U0 GrUpdateVGAGraphics()
 }
 
 U0 GrUpdateScreen()
-{//Called by the Window Manager $LK,"HERE",A="FF:::/Adam/Win2b.CPP,GrUpdateScreen"$, 60 times a second.
+{//Called by the Window Manager $LK,"HERE",A="FF:::/Adam/WinB.CPP,GrUpdateScreen"$, 60 times a second.
   CDC *dc;
   Preempt(ON);
-  if (!sys_bios_gr_mode) //if text mode
+  if (!Bt(&sys_run_level,RLf_VGA)) //if text mode
     GrUpdateWins;
   else {
     GrUpdateTextBG;
@@ -429,7 +423,7 @@ U0 GrUpdateScreen()
     (*gr.fp_final_screen_update)(dc);
   DCDel(dc);
 
-  if (!sys_bios_gr_mode) //if text mode
+  if (!Bt(&sys_run_level,RLf_VGA)) //if text mode
     GrUpdateTextModeText;
   else {
     DCBlotColor4(gr.dc1->body,gr.dc2->body,gr.dc_cache->body,

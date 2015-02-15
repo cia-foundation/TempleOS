@@ -5,16 +5,16 @@ it only occurs once in files.
 It's a brute force solution, but
 gets the job done... slowly.
 
-$LK,"Grep",A="MN:Grep"$() returns a count of matches.
+$LK,"Find",A="MN:Find"$() returns a count of matches.
 
-$LK,"FileOcc",A="MN:FileOcc"$() is $LK,"Grep",A="MN:Grep"$() with
+$LK,"FileOcc",A="MN:FileOcc"$() is $LK,"Find",A="MN:Find"$() with
 output $LK,"Silent",A="MN:Silent"$().
 */
 
 U0 UnusedDefineScan()
 {
   CDoc *old_put_doc,*old_display_doc,*doc;
-  I64 cnt=0;
+  I64 i,cnt=0;
   CHashTable *table;
   CHash *temph;
   CDocEntry *doc_e,*doc_e2;
@@ -26,11 +26,13 @@ U0 UnusedDefineScan()
   try {
     table=Fs->hash_table;
     while (table) {
-      temph=table->next_added;
-      while (temph!=table) {
-	if (temph->type&HTT_DEFINE_STR)
-	  cnt++;
-	temph=temph->next_added;
+      for (i=0;i<=table->mask;i++) {
+	temph=table->body[i];
+	while (temph) {
+	  if (temph->type&HTT_DEFINE_STR)
+	    cnt++;
+	  temph=temph->next;
+	}
       }
       table=table->next;
     }
@@ -41,32 +43,34 @@ U0 UnusedDefineScan()
 
     table=Fs->hash_table;
     while (table) {
-      temph=table->next_added;
-      while (temph!=table) {
-	if (temph->type&HTT_DEFINE_STR) {
-	  progress1++;
-	  if (FileOcc(temph->str,"/*","+l-i+T")==1) {
-	    doc=DocNew;
-	    old_put_doc=DocPut;
-	    old_display_doc=DocDisplay;
-	    Fs->put_doc=Fs->display_doc=doc;
-	    Grep(temph->str,"/*","+l-i+T");
-	    Fs->put_doc=old_put_doc;
-	    Fs->display_doc=old_display_doc;
-	    doc_e=doc->root.next;
-	    while (doc_e!=doc) {
-	      if (doc_e->type_u8==DOCT_LINK) {
-		"%s ",temph->str;
-		doc_e2=DocEntryCopy(doc,doc_e);
-		DocInsEntry(old_put_doc,doc_e2);
-		'\n';
+      for (i=0;i<=table->mask;i++) {
+	temph=table->body[i];
+	while (temph) {
+	  if (temph->type&HTT_DEFINE_STR) {
+	    progress1++;
+	    if (FileOcc(temph->str,"/*","+l-i+T")==1) {
+	      doc=DocNew;
+	      old_put_doc=DocPut;
+	      old_display_doc=DocDisplay;
+	      Fs->put_doc=Fs->display_doc=doc;
+	      Find(temph->str,"/*","+l-i+T");
+	      Fs->put_doc=old_put_doc;
+	      Fs->display_doc=old_display_doc;
+	      doc_e=doc->root.next;
+	      while (doc_e!=doc) {
+		if (doc_e->type_u8==DOCT_LINK) {
+		  "%s ",temph->str;
+		  doc_e2=DocEntryCopy(doc,doc_e);
+		  DocInsEntry(old_put_doc,doc_e2);
+		  '\n';
+		}
+		doc_e=doc_e->next;
 	      }
-	      doc_e=doc_e->next;
+	      DocDel(doc);
 	    }
-	    DocDel(doc);
 	  }
+	  temph=temph->next;
 	}
-	temph=temph->next_added;
       }
       table=table->next;
     }

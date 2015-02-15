@@ -3,6 +3,7 @@ U0 Song()
 {
   CTask *task;
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   try {
     task=PopUpViewPrint(
@@ -11,8 +12,8 @@ U0 Song()
 	  "$LK,"Matthew,25:18",A="BF:Matthew,25:18"$\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("2qG3sFEFEqDBEetCB2G3qFsBDBD",
 	    " \0Damn \0 \0 \0 \0 \0 \0fig \0 \0 \0 \0tree.\n\0 \0 \0 \0 \0");

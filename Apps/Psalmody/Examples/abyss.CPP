@@ -17,8 +17,8 @@ U0 Song()
 	  "barrier.  ($LK,"Deuteronomy,4:22",A="BF:Deuteronomy,4:22"$)\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("3sBBBBqCq.BeAqBh.A",
 	    "Can't \0 \0 \0 \0get \0there, \0from \0he\0re.\n\0");

@@ -1,7 +1,7 @@
 #define DOWNLOAD_FILE1		"TempleOSCD.ISO"
-#define DOWNLOAD_FILE1_SIZE	4000000
-#define DOWNLOAD_FILE2		"TempleOSCD2.ISO"
-#define DOWNLOAD_FILE2_SIZE	4000000
+#define DOWNLOAD_FILE1_SIZE	18000000
+#define DOWNLOAD_FILE2		"TempleOSUltra.ISO"
+#define DOWNLOAD_FILE2_SIZE	2000000
 
 #define MAX_HOURS		(24*3)
 
@@ -18,7 +18,7 @@ class LogStruct
 class LinkStruct
 {
   LinkStruct *left,*right;
-  U8 *link;
+  U8 *link,*file;
   I64 cnt;
 };
 
@@ -35,7 +35,7 @@ U0 LogStructDel(LogStruct *templg)
   Free(templg);
 }
 
-U0 PrsSingleLogFile(LogStruct *root,U8 *name)
+U0 PrsSingleLogFile(LogStruct *root,U8 *name,CDate *_start,CDate *_end)
 {
   CDoc *doc=DocRead(name,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_DBL_DOLLARS);
   CDocEntry *doc_e=doc->root.next;
@@ -79,6 +79,9 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
 	if (*src++!=CH_SPACE) throw;
 	i=Str2I64(src,10,&src);
 	templg->datetime-=(i/100+i%100/60.0)*CDATE_FREQ*60*60;
+
+	if (templg->datetime<*_start) *_start=templg->datetime;
+	if (templg->datetime>*_end)   *_end  =templg->datetime;
 
 	do if (!*src) throw;
 	while (*src++!=']');
@@ -125,13 +128,13 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name)
   DocDel(doc);
 }
 
-LogStruct *PrsLogFiles(U8 *files_find_mask)
+LogStruct *PrsLogFiles(U8 *files_find_mask,CDate *_start,CDate *_end)
 {
   LogStruct *root=CAlloc(sizeof(LogStruct));
   CDirEntry *tempde=FilesFind(files_find_mask),*tempde1=tempde;
   QueInit(root);
   while (tempde) {
-    PrsSingleLogFile(root,tempde->full_name);
+    PrsSingleLogFile(root,tempde->full_name,_start,_end);
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
@@ -172,9 +175,10 @@ U0 BlockIPNums(LogStruct *root)
   LogStruct *templg=root->next,*templg1;
 
   QueInit(&blocked_root);
-  BlockedStructAdd(&blocked_root,68<<24+224<<16+130<<8+96); //Me 68.224.130.96
-  BlockedStructAdd(&blocked_root,68<<24+96<<16+100<<8+126); //Me 68.96.100.126
-  BlockedStructAdd(&blocked_root,68<<24+96<<16+110<<8+213); //Me 68.96.110.213
+  BlockedStructAdd(&blocked_root,68<<24+224<<16+130<<8+96);
+  BlockedStructAdd(&blocked_root,68<<24+96<<16+100<<8+126);
+  BlockedStructAdd(&blocked_root,68<<24+96<<16+110<<8+213);
+  BlockedStructAdd(&blocked_root,68<<24+96<<16+242<<8+108);
 
   //pass 1: collect robot lst
   while (templg!=root) {
@@ -211,7 +215,7 @@ Bool IsDownLoad(LogStruct *templg)
 Bool IsIndex(LogStruct *templg)
 {
   if (!StrCmp(templg->file,"/index.html") ||
-      !StrNCmp(templg->file,"/v",2)  ||
+      !StrNCmp(templg->file+StrLen(templg->file)-14,"/TempleOS.html",14) ||
       !StrCmp(templg->file,"/"))
     return TRUE;
   else
@@ -263,6 +267,29 @@ U0 LinkTreeAdd(LinkStruct **_root,LogStruct *templg)
   }
 }
 
+U0 FileTreeAdd(LinkStruct **_root,LogStruct *templg)
+{
+  I64 i;
+  LinkStruct *root,*templk;
+  if (UnusedStk<0x200) {
+    PrintErr("Stk Overflow");
+    ThrowBreak;
+  }
+  if (root=*_root) {
+    if (!(i=StrCmp(templg->file,root->file)))
+      root->cnt++;
+    else if (i<0)
+      FileTreeAdd(&root->left,templg);
+    else
+      FileTreeAdd(&root->right,templg);
+  } else {
+    templk=CAlloc(sizeof(LinkStruct));
+    templk->file=templg->file;
+    templk->cnt=1;
+    *_root=templk;
+  }
+}
+
 U0 LinkTreeDel(LinkStruct *root)
 {
   if (root) {
@@ -278,6 +305,24 @@ U0 LinkTreeTraverse(LinkStruct *root)
     LinkTreeTraverse(root->left);
     "%3d:%Q\n",root->cnt,root->link;
     LinkTreeTraverse(root->right);
+  }
+}
+
+U0 FileTreeDel(LinkStruct *root)
+{
+  if (root) {
+    FileTreeDel(root->left);
+    FileTreeDel(root->right);
+    Free(root);
+  }
+}
+
+U0 FileTreeTraverse(LinkStruct *root)
+{
+  if (root) {
+    FileTreeTraverse(root->left);
+    "%3d:%Q\n",root->cnt,root->file;
+    FileTreeTraverse(root->right);
   }
 }
 
@@ -348,6 +393,21 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
   Free(dup_cnts);
   Free(day_cnts);
   Free(day_dup_cnts);
+}
+
+U0 FileRep(LogStruct *root,CDate start,CDate end)
+{
+  LogStruct *templg=root->next;
+  LinkStruct *file_root=NULL;
+  while (templg!=root) {
+    if (start<=templg->datetime<=end)
+      FileTreeAdd(&file_root,templg);
+    templg=templg->next;
+  }
+  "\n\nFile Hits\n";
+  FileTreeTraverse(file_root);
+  '\n';
+  FileTreeDel(file_root);
 }
 
 U0 IndexRep(LogStruct *root,CDate start,CDate end)
@@ -422,18 +482,19 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
 U0 WebLogRep(U8 *mask,U8 *output_filename)
 {
   LogStruct *root;
-  CDate start,end;
+  CDate start=MAX_I64,end=MIN_I64;
 
   DocMax;
 
-  root=PrsLogFiles(mask);
-  start=GetDate("Start(%D):",root->next->datetime);
-  end  =GetDate("End  (%D):",root->last->datetime);
+  root=PrsLogFiles(mask,&start,&end);
+  start=GetDate("Start(%D):",start);
+  end  =GetDate("End  (%D):",end);
   BlockIPNums(root);
 
   DocClear;
   "$$WW,0$$";
   IndexRep(root,start,end);
+  FileRep(root,start,end);
   DownLoadRep(root,start,end);
 
   StrCpy(DocPut->filename.name,output_filename);
@@ -443,4 +504,9 @@ U0 WebLogRep(U8 *mask,U8 *output_filename)
   LogLstDel(root);
 }
 
-WebLogRep("::/Demo/WebLogExample/*.LOG*","::/Demo/WebLogExample/WebLogRep.TXT.Z");
+//This is so I can use this file stand alone
+//or as a component of a program.
+#if __DEPTH__<1
+Cd(__DIR__);;
+WebLogRep("*.LOG*","WebLogRep.TXT.Z");
+#endif

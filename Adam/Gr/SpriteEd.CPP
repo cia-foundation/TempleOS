@@ -4,8 +4,8 @@ Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
 {
   CSprite *tempg=CAlloc(SpriteElemQuedBaseSize(SPT_PT));
   tempg->type=SPT_PT;
-  tempg->x1=x;
-  tempg->y1=y;
+  tempg->p.x1=x;
+  tempg->p.y1=y;
   QueIns(tempg,root->last);
   return TRUE;
 }
@@ -16,8 +16,8 @@ CSprite *SpriteElemNum2QueEntry(CSprite *root,I64 elem_num,I64 *_x=NULL,I64 *_y=
   CSprite *result=root->next;
   while (result!=root && elem_num--) {
     if (result->type==SPT_SHIFT) {
-      xx+=result->x1;
-      yy+=result->y1;
+      xx+=result->p.x1;
+      yy+=result->p.y1;
     }
     result=result->next;
   }
@@ -83,75 +83,60 @@ U0 SpriteSetOrigin(CSprite *root,I64 dx,I64 dy,I64 dz)
   CSprite *tempg=root->next;
   while (tempg!=root) {
     switch (tempg->type) {
-      case SPT_PT:
-      case SPT_FLOOD_FILL:
-      case SPT_FLOOD_FILL_NOT:
-	tempg->x1+=dx;
-	tempg->y1+=dy;
-	break;
       case SPT_ARROW:
       case SPT_LINE:
       case SPT_PLANAR_SYMMETRY:
-	tempg->x1+=dx;
-	tempg->y1+=dy;
-	tempg->x2+=dx;
-	tempg->y2+=dy;
-	break;
-      case SPT_BITMAP:
-      case SPT_ELLIPSE:
-      case SPT_POLYGON:
-	tempg->x2+=dx;
-	tempg->y2+=dy;
-	break;
       case SPT_RECT:
       case SPT_ROTATED_RECT:
-	tempg->x1+=dx;
-	tempg->y1+=dy;
-	tempg->x2+=dx;
-	tempg->y2+=dy;
-	break;
+	tempg->pp.x2+=dx;
+	tempg->pp.y2+=dy;
+      case SPT_PT:
+      case SPT_FLOOD_FILL:
+      case SPT_FLOOD_FILL_NOT:
       case SPT_TEXT:
       case SPT_TEXT_BOX:
       case SPT_TEXT_DIAMOND:
       case SPT_CIRCLE:
-	tempg->x1+=dx;
-	tempg->y1+=dy;
+      case SPT_BITMAP:
+      case SPT_ELLIPSE:
+      case SPT_POLYGON:
+	tempg->p.x1+=dx;
+	tempg->p.y1+=dy;
 	break;
       case SPT_POLYLINE:
-	ptr=&tempg->y1;
-	for (i=0;i<tempg->num;i++) {
+	ptr=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++) {
 	  ptr[i<<1]+=dx;
 	  ptr[i<<1+1]+=dy;
 	}
 	break;
       case SPT_POLYPT:
-	ptr=&tempg->y1;
-	ptr[0]+=dx;
-	ptr[1]+=dy;
+	tempg->npu.x+=dx;
+	tempg->npu.y+=dy;
 	break;
       case SPT_BSPLINE2:
       case SPT_BSPLINE3:
       case SPT_BSPLINE2_CLOSED:
       case SPT_BSPLINE3_CLOSED:
-	p=&tempg->y1;
-	for (i=0;i<tempg->num;i++,p++) {
+	p=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++,p++) {
 	  p->x+=dx;
 	  p->y+=dy;
 	  p->z+=dz;
 	}
 	break;
       case SPT_MESH:
-	p=&tempg->x2;
-	for (i=0;i<tempg->vertex_cnt;i++,p++) {
+	p=&tempg->mu.u;
+	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
 	  p->x+=dx;
 	  p->y+=dy;
 	  p->z+=dz;
 	}
 	break;
       case SPT_SHIFTABLE_MESH:
-	tempg->x1+=dx;
-	tempg->y1+=dy;
-	tempg->z1+=dz;
+	tempg->pmu.x+=dx;
+	tempg->pmu.y+=dy;
+	tempg->pmu.z+=dz;
 	break;
     }
     tempg=tempg->next;
@@ -161,14 +146,14 @@ U0 SpriteSetOrigin(CSprite *root,I64 dx,I64 dy,I64 dz)
 CSprite *SpriteTransformCircle(I64 r[4][4],CSprite *tempg)
 {
   I64 x,y,z;
-  F64 m1,a1,m2,radius=tempg->x2<<16;
+  F64 m1,a1,m2,radius=tempg->pr.radius<<16;
   CSprite *tempg1=CAlloc(SpriteElemQuedBaseSize(SPT_ELLIPSE));
   tempg1->type=SPT_ELLIPSE;
 
-  x=tempg->x1; y=tempg->y1; z=0;
+  x=tempg->pr.x1; y=tempg->pr.y1; z=0;
   GrRot(r,&x,&y,&z);
-  tempg1->x2=x;
-  tempg1->y2=y;
+  tempg1->pwha.x1=x;
+  tempg1->pwha.y1=y;
 
   x=radius; y=0; z=0;
   GrRot(r,&x,&y,&z);
@@ -178,9 +163,9 @@ CSprite *SpriteTransformCircle(I64 r[4][4],CSprite *tempg)
   GrRot(r,&x,&y,&z);
   m2=Sqrt(x*x+y*y);
 
-  tempg1->width =ToI64(m1)/0x10000;
-  tempg1->height=ToI64(m2)/0x10000;
-  tempg1->rot_angle=-a1;
+  tempg1->pwha.width =ToI64(m1)/0x10000;
+  tempg1->pwha.height=ToI64(m2)/0x10000;
+  tempg1->pwha.angle=-a1;
 
   return tempg1;
 }
@@ -188,19 +173,20 @@ CSprite *SpriteTransformCircle(I64 r[4][4],CSprite *tempg)
 CSprite *SpriteTransformEllipse(I64 r[4][4],CSprite *tempg)
 {
   I64 x,y,z;
-  F64 m1,a1,m2,a2,s,c,x_radius=tempg->width<<16,y_radius=tempg->height<<16;
+  F64 m1,a1,m2,a2,s,c,x_radius=tempg->pwha.width<<16,
+	y_radius=tempg->pwha.height<<16;
   CSprite *tempg1=CAlloc(SpriteElemQuedBaseSize(tempg->type));
   tempg1->type=tempg->type;
   if (tempg->type==SPT_POLYGON)
-    tempg1->sides=tempg->sides;
+    tempg1->pwhas.sides=tempg->pwhas.sides;
 
-  x=tempg->x2; y=tempg->y2; z=0;
+  x=tempg->pwha.x1; y=tempg->pwha.y1; z=0;
   GrRot(r,&x,&y,&z);
-  tempg1->x2=x;
-  tempg1->y2=y;
+  tempg1->pwha.x1=x;
+  tempg1->pwha.y1=y;
 
-  c=Cos(-tempg->rot_angle);
-  s=Sin(-tempg->rot_angle);
+  c=Cos(-tempg->pwha.angle);
+  s=Sin(-tempg->pwha.angle);
 
   x=x_radius*c;
   y=x_radius*s;
@@ -215,11 +201,11 @@ CSprite *SpriteTransformEllipse(I64 r[4][4],CSprite *tempg)
   R2P(&m2,&a2,x,y);
   m2*=Abs(Sin(a2-a1));
 
-  tempg1->width=ToI64(m1)/0x10000;
-  if (tempg1->width<1) tempg1->width=1;
-  tempg1->height=ToI64(m2)/0x10000;
-  if (tempg1->height<1) tempg1->height=1;
-  tempg1->rot_angle=-a1;
+  tempg1->pwha.width=ToI64(m1)/0x10000;
+  if (tempg1->pwha.width<1) tempg1->pwha.width=1;
+  tempg1->pwha.height=ToI64(m2)/0x10000;
+  if (tempg1->pwha.height<1) tempg1->pwha.height=1;
+  tempg1->pwha.angle=-a1;
 
   return tempg1;
 }
@@ -228,15 +214,15 @@ CSprite *SpriteTransformRect(I64 r[4][4],CSprite *tempg,F64 é)
 {
   I64 x,y,z,w,h;
   F64 m1,a1,m2,a2,s,c,
-    x_radius=(tempg->x2-tempg->x1)<<16,
-    y_radius=(tempg->y2-tempg->y1)<<16;
+    x_radius=(tempg->pp.x2-tempg->pp.x1)<<16,
+    y_radius=(tempg->pp.y2-tempg->pp.y1)<<16;
   CSprite *tempg1=CAlloc(SpriteElemQuedBaseSize(SPT_ROTATED_RECT));
   tempg1->type=SPT_ROTATED_RECT;
 
-  x=tempg->x1; y=tempg->y1; z=0;
+  x=tempg->pp.x1; y=tempg->pp.y1; z=0;
   GrRot(r,&x,&y,&z);
-  tempg1->x1=x;
-  tempg1->y1=y;
+  tempg1->ppa.x1=x;
+  tempg1->ppa.y1=y;
 
   c=Cos(-é);
   s=Sin(-é);
@@ -258,9 +244,9 @@ CSprite *SpriteTransformRect(I64 r[4][4],CSprite *tempg,F64 é)
   if (w<1) w=1;
   h=ToI64(m2)/0x10000;
   if (h<1) h=1;
-  tempg1->x2=tempg1->x1+w;
-  tempg1->y2=tempg1->y1+h;
-  tempg1->rot_angle=-a1;
+  tempg1->ppa.x2=tempg1->ppa.x1+w;
+  tempg1->ppa.y2=tempg1->ppa.y1+h;
+  tempg1->ppa.angle=-a1;
 
   return tempg1;
 }
@@ -278,7 +264,7 @@ CSprite *SpriteTransformBitmap(I64 r[4][4],CSprite *tempg)
   miny=maxy=y;
   minz=maxz=z;
 
-  x=0; y=tempg->height; z=0;
+  x=0; y=tempg->pwhu.height; z=0;
   GrRot(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
@@ -287,7 +273,7 @@ CSprite *SpriteTransformBitmap(I64 r[4][4],CSprite *tempg)
   if (z<minx) minz=z;
   if (z>maxx) maxz=z;
 
-  x=tempg->width; y=0; z=0;
+  x=tempg->pwhu.width; y=0; z=0;
   GrRot(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
@@ -296,7 +282,7 @@ CSprite *SpriteTransformBitmap(I64 r[4][4],CSprite *tempg)
   if (z<minx) minz=z;
   if (z>maxx) maxz=z;
 
-  x=tempg->width; y=tempg->height; z=0;
+  x=tempg->pwhu.width; y=tempg->pwhu.height; z=0;
   GrRot(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
@@ -308,11 +294,10 @@ CSprite *SpriteTransformBitmap(I64 r[4][4],CSprite *tempg)
   tempb=DCNew(maxx-minx+1,maxy-miny+1);
 
   img=CAlloc(sizeof(CDC));
-  img->width=tempg->width;
-  img->width_internal=(tempg->width+7)&~7;
-  img->height=tempg->height;
-  img->body_size=img->width_internal*img->height;
-  img->body=tempg(U8 *)+offset(CSprite.linespeed);
+  img->width=tempg->pwhu.width;
+  img->width_internal=(tempg->pwhu.width+7)&~7;
+  img->height=tempg->pwhu.height;
+  img->body=&tempg->pwhu.u;
   img->dc_signature=DCS_SIGNATURE_VAL;
 
   tempb->color=TRANSPARENT;
@@ -335,15 +320,15 @@ CSprite *SpriteTransformBitmap(I64 r[4][4],CSprite *tempg)
   MemCpy(tempg1(U8 *)+offset(CSprite.start),elems,MSize(elems));
   tempg1->type=tempg->type;
 
-  x=tempg->x2; y=tempg->y2; z=0;
+  x=tempg->pwhu.x1; y=tempg->pwhu.y1; z=0;
   GrRot(r,&x,&y,&z);
-  tempg1->x2=x;
-  tempg1->y2=y;
+  tempg1->pwhu.x1=x;
+  tempg1->pwhu.y1=y;
 
   x=0; y=0; z=0;
   GrRot(r,&x,&y,&z);
-  tempg1->x2+=minx-x;
-  tempg1->y2+=miny-y;
+  tempg1->pwhu.x1+=minx-x;
+  tempg1->pwhu.y1+=miny-y;
 
   return tempg1;
 }
@@ -358,32 +343,26 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
   while (tempg!=root) {
     switch (tempg->type) {
       case SPT_WIDTH:
-	// (1.0/Sqrt(3))*65536=37837.22
-	x=37838;y=37838;z=37838;
-	GrRot(r,&x,&y,&z);
-	//scaled 32 bits
-	tempg->width*=Sqrt(x*x+y*y+z*z)/65536;
-	if (tempg->width<0) tempg->width=0;
-	break;
-      case SPT_PT:
-      case SPT_FLOOD_FILL:
-      case SPT_FLOOD_FILL_NOT:
-	x=tempg->x1; y=tempg->y1; z=0;
-	GrRot(r,&x,&y,&z);
-	tempg->x1=x;
-	tempg->y1=y;
+	tempg->w.width*=Sqrt(GrRotNormSqr65536(r))/65536;
+	if (tempg->w.width<0) tempg->w.width=0;
 	break;
       case SPT_PLANAR_SYMMETRY:
       case SPT_ARROW:
       case SPT_LINE:
-	x=tempg->x1; y=tempg->y1; z=0;
+	x=tempg->pp.x2; y=tempg->pp.y2; z=0;
 	GrRot(r,&x,&y,&z);
-	tempg->x1=x;
-	tempg->y1=y;
-	x=tempg->x2; y=tempg->y2; z=0;
+	tempg->pp.x2=x;
+	tempg->pp.y2=y;
+      case SPT_PT:
+      case SPT_FLOOD_FILL:
+      case SPT_FLOOD_FILL_NOT:
+      case SPT_TEXT:
+      case SPT_TEXT_BOX:
+      case SPT_TEXT_DIAMOND:
+	x=tempg->p.x1; y=tempg->p.y1; z=0;
 	GrRot(r,&x,&y,&z);
-	tempg->x2=x;
-	tempg->y2=y;
+	tempg->p.x1=x;
+	tempg->p.y1=y;
 	break;
       case SPT_BITMAP:
 	tempg1=SpriteTransformBitmap(r,tempg);
@@ -393,7 +372,7 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	tempg=tempg1;
 	break;
       case SPT_ROTATED_RECT:
-	tempg1=SpriteTransformRect(r,tempg,tempg->rot_angle);
+	tempg1=SpriteTransformRect(r,tempg,tempg->ppa.angle);
 	QueIns(tempg1,tempg);
 	QueRem(tempg);
 	Free(tempg);
@@ -405,14 +384,6 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	QueRem(tempg);
 	Free(tempg);
 	tempg=tempg1;
-	break;
-      case SPT_TEXT:
-      case SPT_TEXT_BOX:
-      case SPT_TEXT_DIAMOND:
-	x=tempg->x1; y=tempg->y1; z=0;
-	GrRot(r,&x,&y,&z);
-	tempg->x1=x;
-	tempg->y1=y;
 	break;
       case SPT_CIRCLE:
 	tempg1=SpriteTransformCircle(r,tempg);
@@ -430,8 +401,8 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	tempg=tempg1;
 	break;
       case SPT_POLYLINE:
-	ptr=&tempg->y1;
-	for (i=0;i<tempg->num;i++) {
+	ptr=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++) {
 	  x=ptr[i<<1]; y=ptr[i<<1+1]; z=0;
 	  GrRot(r,&x,&y,&z);
 	  ptr[i<<1]=x;
@@ -440,12 +411,11 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	break;
       case SPT_POLYPT:
 	QueInit(&root2);
-	ptr=&tempg->y1;
-	x=ptr[0]; y=ptr[1]; z=0;
+	x=tempg->npu.x; y=tempg->npu.y; z=0;
 	x1=x; y1=y; z1=z;  //unrotated cur coordinates
 	GrRot(r,&x,&y,&z);
-	ptr+=2;
-	k=tempg->num*3;
+	ptr=&tempg->npu.u;
+	k=tempg->npu.num*3;
 	x2=x; y2=y; z2=z;  //rotated start coordinates
 	x3=x; y3=y; z3=z;  //lag 1 rotated coordinates
 	for (i=0;i<k;i+=3) {
@@ -463,38 +433,37 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	x3=0; y3=0; z3=0;
 	while (tempg1!=&root2) {
 	  tempg2=tempg1->next;
-	  if (tempg1->x1==x3 && tempg1->y1==y3) {
+	  if (tempg1->p.x1==x3 && tempg1->p.y1==y3) {
 	    QueRem(tempg1);
 	    Free(tempg1);
 	  } else {
 	    num++;
-	    x3=tempg1->x1;
-	    y3=tempg1->y1;
+	    x3=tempg1->p.x1;
+	    y3=tempg1->p.y1;
 	  }
 	  tempg1=tempg2;
 	}
 
 	tempg3=CAlloc(SpriteElemQuedBaseSize(SPT_POLYPT)+(num*3+7)>>3);
-	ptr=&tempg3->y1;
-	ptr[0]=x2;
-	ptr[1]=y2;
-	ptr+=2;
+	tempg3->npu.x=x2;
+	tempg3->npu.y=y2;
+	ptr=&tempg3->npu.u;
 	x3=0;y3=0; z3=0;
 	i=0;
 	tempg1=root2.next;
 	while (tempg1!=&root2) {
 	  tempg2=tempg1->next;
 	  BFieldOrU32(ptr,i,
-	      polypt_map[SignI64(tempg1->x1-x3)+1+
-	      3*(SignI64(tempg1->y1-y3)+1)]);
+	      polypt_map[SignI64(tempg1->p.x1-x3)+1+
+	      3*(SignI64(tempg1->p.y1-y3)+1)]);
 	  i+=3;
-	  x3=tempg1->x1;y3=tempg1->y1;
+	  x3=tempg1->p.x1;y3=tempg1->p.y1;
 	  QueRem(tempg1);
 	  Free(tempg1);
 	  tempg1=tempg2;
 	}
 	tempg3->type=SPT_POLYPT;
-	tempg3->num=num;
+	tempg3->npu.num=num;
 	QueIns(tempg3,tempg);
 	QueRem(tempg);
 	Free(tempg);
@@ -504,8 +473,8 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
       case SPT_BSPLINE3:
       case SPT_BSPLINE2_CLOSED:
       case SPT_BSPLINE3_CLOSED:
-	p=&tempg->y1;
-	for (i=0;i<tempg->num;i++,p++) {
+	p=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++,p++) {
 	  x=p->x; y=p->y; z=p->z;
 	  GrRot(r,&x,&y,&z);
 	  p->x=x;
@@ -514,13 +483,13 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	}
 	break;
       case SPT_SHIFTABLE_MESH:
-	x=tempg->x1; y=tempg->y1; z=tempg->z1;
+	x=tempg->pmu.x; y=tempg->pmu.y; z=tempg->pmu.z;
 	GrRot(r,&x,&y,&z);
-	tempg->x1=x;
-	tempg->y1=y;
-	tempg->z1=z;
-	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
+	tempg->pmu.x=x;
+	tempg->pmu.y=y;
+	tempg->pmu.z=z;
+	p=&tempg->pmu.u;
+	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
 	  x=p->x; y=p->y; z=p->z;
 	  GrRot(r,&x,&y,&z);
 	  p->x=x;
@@ -529,8 +498,8 @@ U0 SpriteTransform(I64 r[4][4],CSprite *root)
 	}
 	break;
       case SPT_MESH:
-	p=&tempg->x2;
-	for (i=0;i<tempg->vertex_cnt;i++,p++) {
+	p=&tempg->mu.u;
+	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
 	  x=p->x; y=p->y; z=p->z;
 	  GrRot(r,&x,&y,&z);
 	  p->x=x;
@@ -614,9 +583,9 @@ U0 SpriteSideBarTask2(CTask *grand_parent)
     pu_task=grand_parent->popup_task;
     if (TaskValidate(pu_task)) {
       w=parent->win_right-parent->win_left;
-      SetWinHorz(pu_task->win_right+2,pu_task->win_right+2+w,parent);
+      WinHorz(pu_task->win_right+2,pu_task->win_right+2+w,parent);
       h=parent->win_bottom-parent->win_top;
-      SetWinVert(pu_task->win_top,pu_task->win_top+h,parent);
+      WinVert(pu_task->win_top,pu_task->win_top+h,parent);
     }
     WinMgrSync;
   }
@@ -651,7 +620,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
   Sprite2Code(doc,elems);
   Free(elems);
   while (TRUE) {
-    if (result=SrvUser("DocDo(0x%X,0x%X);",doc,0)) {
+    if (result=PopUpPrint("DocDo(0x%X,0x%X);",doc,0)) {
       Fs->put_doc=doc2=DocNew;
       "$$WW,1$$";
       if (elems=Code2Sprite(doc)) {
@@ -664,7 +633,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
 	*_cur_elem_num=QueCnt(root); //TODO: Might want to improve this.
 	break;
       } else {
-	SrvUser("DocDo(0x%X,0x%X);",doc2,0);
+	PopUpPrint("DocDo(0x%X,0x%X);",doc2,0);
 	DocDel(doc2);
 	Fs->put_doc=old_put;
       }
@@ -730,24 +699,24 @@ I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
   return i;
 }
 
-#define GSPT_SIMPLE_PT	0
+#define GSPT_SIMPLE_PT		0
 #define GSPT_WIDTH_HEIGHT	1
 
 #define GSPF_SELECTED		1
 
-class CSpritePt
+class CEdSprite
 {
-  CSpritePt *next,*last;
+  CEdSprite *next,*last;
   I32 type,num,flags,xx,yy,zz;
   I32 *x,*y,*z,*w,*h;
 };
 
-U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
+U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *root)
 {
   I64 i,num=0;
   I32 *ptr;
   CD3I32 *p;
-  CSpritePt *temppe;
+  CEdSprite *temppe;
   CSprite *tempg=elems-offset(CSprite.start);
   QueInit(root);
   while (tempg->type) {
@@ -757,60 +726,52 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
       case SPT_LINE:
       case SPT_ARROW:
       case SPT_PLANAR_SYMMETRY:
-	temppe=CAlloc(sizeof(CSpritePt));
+	temppe=CAlloc(sizeof(CEdSprite));
 	temppe->type=GSPT_SIMPLE_PT;
 	temppe->xx=x;
 	temppe->yy=y;
-	temppe->x=&tempg->x2;
-	temppe->y=&tempg->y2;
+	temppe->x=&tempg->pp.x2;
+	temppe->y=&tempg->pp.y2;
 	temppe->num=num;
 	QueIns(temppe,root->last);
       case SPT_TEXT:
       case SPT_TEXT_BOX:
       case SPT_TEXT_DIAMOND:
       case SPT_PT:
+      case SPT_BITMAP:
       case SPT_FLOOD_FILL:
       case SPT_FLOOD_FILL_NOT:
       case SPT_CIRCLE:
-	temppe=CAlloc(sizeof(CSpritePt));
+	temppe=CAlloc(sizeof(CEdSprite));
 	temppe->type=GSPT_SIMPLE_PT;
 	temppe->xx=x;
 	temppe->yy=y;
-	temppe->x=&tempg->x1;
-	temppe->y=&tempg->y1;
+	temppe->x=&tempg->p.x1;
+	temppe->y=&tempg->p.y1;
 	temppe->num=num;
 	QueIns(temppe,root->last);
 	break;
       case SPT_SHIFT:
-	x+=tempg->x1;
-	y+=tempg->y1;
+	x+=tempg->p.x1;
+	y+=tempg->p.y1;
 	break;
       case SPT_ELLIPSE:
       case SPT_POLYGON:
-	temppe=CAlloc(sizeof(CSpritePt));
+	temppe=CAlloc(sizeof(CEdSprite));
 	temppe->type=GSPT_WIDTH_HEIGHT;
 	temppe->xx=x;
 	temppe->yy=y;
-	temppe->x=&tempg->x2;
-	temppe->y=&tempg->y2;
-	temppe->w=&tempg->width;
-	temppe->h=&tempg->height;
-	temppe->num=num;
-	QueIns(temppe,root->last);
-      case SPT_BITMAP:
-	temppe=CAlloc(sizeof(CSpritePt));
-	temppe->type=GSPT_SIMPLE_PT;
-	temppe->xx=x;
-	temppe->yy=y;
-	temppe->x=&tempg->x2;
-	temppe->y=&tempg->y2;
+	temppe->x=&tempg->pwha.x1;
+	temppe->y=&tempg->pwha.y1;
+	temppe->w=&tempg->pwha.width;
+	temppe->h=&tempg->pwha.height;
 	temppe->num=num;
 	QueIns(temppe,root->last);
 	break;
       case SPT_POLYLINE:
-	ptr=&tempg->y1;
-	for (i=0;i<tempg->num;i++) {
-	  temppe=CAlloc(sizeof(CSpritePt));
+	ptr=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++) {
+	  temppe=CAlloc(sizeof(CEdSprite));
 	  temppe->type=GSPT_SIMPLE_PT;
 	  temppe->xx=x;
 	  temppe->yy=y;
@@ -821,13 +782,12 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
 	}
 	break;
       case SPT_POLYPT:
-	ptr=&tempg->y1;
-	temppe=CAlloc(sizeof(CSpritePt));
+	temppe=CAlloc(sizeof(CEdSprite));
 	temppe->type=GSPT_SIMPLE_PT;
 	temppe->xx=x;
 	temppe->yy=y;
-	temppe->x=&ptr[0];
-	temppe->y=&ptr[1];
+	temppe->x=&tempg->npu.x;
+	temppe->y=&tempg->npu.y;
 	temppe->num=num;
 	QueIns(temppe,root->last);
 	break;
@@ -835,9 +795,9 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
       case SPT_BSPLINE3:
       case SPT_BSPLINE2_CLOSED:
       case SPT_BSPLINE3_CLOSED:
-	p=&tempg->y1;
-	for (i=0;i<tempg->num;i++) {
-	  temppe=CAlloc(sizeof(CSpritePt));
+	p=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++) {
+	  temppe=CAlloc(sizeof(CEdSprite));
 	  temppe->type=GSPT_SIMPLE_PT;
 	  temppe->xx=x;
 	  temppe->yy=y;
@@ -851,13 +811,13 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
       case SPT_MESH:
 	break;
       case SPT_SHIFTABLE_MESH:
-	temppe=CAlloc(sizeof(CSpritePt));
+	temppe=CAlloc(sizeof(CEdSprite));
 	temppe->type=GSPT_SIMPLE_PT;
 	temppe->xx=x;
 	temppe->yy=y;
-	temppe->x=&tempg->x1;
-	temppe->y=&tempg->y1;
-	temppe->z=&tempg->z1;
+	temppe->x=&tempg->pmu.x;
+	temppe->y=&tempg->pmu.y;
+	temppe->z=&tempg->pmu.z;
 	temppe->num=num;
 	QueIns(temppe,root->last);
 	break;
@@ -867,10 +827,10 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CSpritePt *root)
   }
 }
 
-U0 SpriteCtrlPtsDraw(CDC *dc,CSpritePt *root)
+U0 SpriteCtrlPtsDraw(CDC *dc,CEdSprite *root)
 {
   I64 x,y;
-  CSpritePt *temppe;
+  CEdSprite *temppe;
   WinMgrSync;
   DCFill(dc);
   if (Blink(20)) {
@@ -898,9 +858,9 @@ U0 SpriteCtrlPtsDraw(CDC *dc,CSpritePt *root)
   }
 }
 
-U0 SpriteCtrlPtsMove(CSpritePt *root,I64 dx,I64 dy)
+U0 SpriteCtrlPtsMove(CEdSprite *root,I64 dx,I64 dy)
 {
-  CSpritePt *temppe;
+  CEdSprite *temppe;
   temppe=root->next;
   while (temppe!=root) {
     if (temppe->flags&GSPF_SELECTED)
@@ -923,7 +883,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
   I64 msg_code,a1,a2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
   Bool old_preempt,result=TRUE;
   CDC *dc=DCAlias;
-  CSpritePt root,*temppe,*best_pe;
+  CEdSprite root,*temppe,*best_pe;
 
   SpritePtQueNew(elems,x,y,&root);
   cur_elem_num=0;
@@ -1140,16 +1100,16 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,CSprite **_root,I64 *_cur_el
 	  insert_pt=SpriteElemNum2QueEntry(*_root,*_cur_elem_num);
 	  tempg=MAlloc(SpriteElemQuedBaseSize(SPT_SHIFT));
 	  tempg->type=SPT_SHIFT;
-	  tempg->x1=0;
-	  tempg->y1=0;
+	  tempg->p.x1=0;
+	  tempg->p.y1=0;
 	  QueIns(tempg,insert_pt->last);
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
 	  xx=a1; yy=a2;
 	  do {
 	    msg_code=GetMsg(&a1,&a2,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-	    tempg->x1=a1-xx;
-	    tempg->y1=a2-yy;
+	    tempg->p.x1=a1-xx;
+	    tempg->p.y1=a2-yy;
 	    SpriteEdUpdate(doc,tempb,*_root);
 	  } while (msg_code!=MSG_IP_L_UP);
 	  *_cur_elem_num+=1;

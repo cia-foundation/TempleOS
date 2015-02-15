@@ -95,7 +95,7 @@ U0 Halogen()
       "}"
       );
   Preempt(OFF);
-  WordStat;
+  AutoComplete;
   WinMax;
   Init;
   DocCursor;

@@ -1,3 +1,5 @@
+//Conway's Game of Life
+
 CDC *dc[2]; //dbl buf
 I64 cur_dc,;
 Bool restart;
@@ -59,13 +61,11 @@ public U0 Life()
   DocClear;
 
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
-  WordStat;
+  AutoComplete;
   Fs->draw_it=&DrawIt;
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
-
   do {
-    msg_code=GetMsg(&a1,&a2,
-      1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
     switch (msg_code) {
       case MSG_IP_L_DOWN:
 	x1=a1; y1=a2;
@@ -77,8 +77,7 @@ public U0 Life()
 	  dc[cur_dc]->pen_width=0.04*ip.speed;
 	  GrLine3(dc[cur_dc],x1,y1,0,x2,y2,0);
 	  restart=TRUE;
-	  msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+	  msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  x1=x2; y1=y2;
 	  x2=a1; y2=a2;
 	}

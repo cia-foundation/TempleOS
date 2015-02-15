@@ -1,4 +1,4 @@
-$WW,1$A menu appears when you move the mouse to the top of the screen.  Menus are created with $LK,"MenuPush",A="MN:MenuPush"$(), $LK,"MenuFilePush",A="MN:MenuFilePush"$(), $LK,"MenuNew",A="MN:MenuNew"$() or $LK,"MenuFile",A="MN:MenuFile"$() and assigned to $FG,4$Fs->cur_menu$FG$.  The format is:
+$WW,1$A pull-down menu appears when you move the mouse to the top of the screen.  Menus are created with $LK,"MenuPush",A="MN:MenuPush"$(), $LK,"MenuFilePush",A="MN:MenuFilePush"$(), $LK,"MenuNew",A="MN:MenuNew"$() or $LK,"MenuFile",A="MN:MenuFile"$() and assigned to $FG,4$Fs->cur_menu$FG$.  The format is:
 
 $FG,2$
 File 

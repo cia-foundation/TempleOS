@@ -51,7 +51,7 @@ U0 PutS(U8 *st)
   }
 }
 
-U0 SetKeyDesc(U8 *fmt,...)
+U0 KeyDescSet(U8 *fmt,...)
 {//Call this from key handler to report desc in $LK,"KeyMap",A="MN:KeyMap"$().
   I64 i;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);

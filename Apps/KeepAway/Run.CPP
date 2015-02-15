@@ -1,2 +1,3 @@
-#include "/Apps/KeepAway/Load"
+Cd(__DIR__);;
+#include "Load"
 KeepAway;

@@ -1005,13 +1005,13 @@ U0 EdInsDollarCmd()
    }
 }
 
-#define PT_SPRITE		0
-#define PT_SPRITE_PTR		1
-#define PT_DUP_SPRITE		2
-#define PT_SPRITE_SIZE		3
-#define PT_SPRITE_MACRO		4
-#define PT_SPRITE_MENU		5
-#define PT_SPRITE_LINK		6
+#define DVT_SPRITE		0
+#define DVT_SPRITE_PTR		1
+#define DVT_DUP_SPRITE		2
+#define DVT_SPRITE_SIZE		3
+#define DVT_SPRITE_MACRO		4
+#define DVT_SPRITE_MENU		5
+#define DVT_SPRITE_LINK		6
 
 I64 PopUpSpriteType()
 {
@@ -1019,13 +1019,13 @@ I64 PopUpSpriteType()
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Graphic Resource Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/Resource.TXT.Z\"$$\n"
-	"\n$$LTBLUE$$$$MU,\"Make Sprite\",LE=PT_SPRITE$$\n"
-	"$$MU,\"Pointer to Sprite\",LE=PT_SPRITE_PTR$$\n"
-	"$$MU,\"Duplicate Sprite\",LE=PT_DUP_SPRITE$$\n"
-	"$$MU,\"Sprite Size (not really needed)\",LE=PT_SPRITE_SIZE$$\n"
-	"$$MU,\"Sprite Macro (Icon)\",LE=PT_SPRITE_MACRO$$\n"
-	"$$MU,\"Sprite Menu Item\",LE=PT_SPRITE_MENU$$\n"
-	"$$MU,\"Sprite Link\",LE=PT_SPRITE_LINK$$\n"
+	"\n$$LTBLUE$$$$MU,\"Make Sprite\",LE=DVT_SPRITE$$\n"
+	"$$MU,\"Pointer to Sprite\",LE=DVT_SPRITE_PTR$$\n"
+	"$$MU,\"Duplicate Sprite\",LE=DVT_DUP_SPRITE$$\n"
+	"$$MU,\"Sprite Size (not really needed)\",LE=DVT_SPRITE_SIZE$$\n"
+	"$$MU,\"Sprite Macro (Icon)\",LE=DVT_SPRITE_MACRO$$\n"
+	"$$MU,\"Sprite Menu Item\",LE=DVT_SPRITE_MENU$$\n"
+	"$$MU,\"Sprite Link\",LE=DVT_SPRITE_LINK$$\n"
 	"\n$$MU,\"Abort\",LE=DOCM_CANCEL$$\n\n");
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -1074,12 +1074,12 @@ U8 *EdSprite(I64 bin_num)
   CEdMacroSprite *e=CAlloc(sizeof(CEdMacroSprite));
   *buf=0;
   switch (type) {
-    case PT_SPRITE:
+    case DVT_SPRITE:
       StrPrint(e->tag,"<%d>",bin_num);
       if (DocFormDo(e,"CEdJustSprite",,,ctrl_L_footer))
 	st1=MStrPrint("\"%Q\"",e->tag);
       break;
-    case PT_SPRITE_MACRO:
+    case DVT_SPRITE_MACRO:
       e->escape=TRUE;
       if (DocFormDo(e,,,,ctrl_L_footer)) {
 	CatPrint(buf,"+UL");
@@ -1091,26 +1091,26 @@ U8 *EdSprite(I64 bin_num)
 	Free(st);
       }
       break;
-    case PT_SPRITE_MENU:
+    case DVT_SPRITE_MENU:
       e->escape=TRUE;
       if (DocFormDo(e,"CEdMenuSprite",,,ctrl_L_footer)) {
 	if (e->escape)	CatPrint(buf,"+X");
 	st1=MStrPrint("\"%Q\",LE=%s",e->tag,e->exp);
       }
       break;
-    case PT_SPRITE_LINK:
+    case DVT_SPRITE_LINK:
       CatPrint(buf,"+L");
       st1=EdSpriteLink(&pop_up,&html_link);
       if (pop_up)
 	CatPrint(buf,"+PU");
       break;
-    case PT_SPRITE_PTR:
+    case DVT_SPRITE_PTR:
       EdInsBinary(--bin_num,DOCT_INS_BINARY);
       break;
-    case PT_SPRITE_SIZE:
+    case DVT_SPRITE_SIZE:
       EdInsBinary(--bin_num,DOCT_INS_BINARY_SIZE);
       break;
-    case PT_DUP_SPRITE:
+    case DVT_DUP_SPRITE:
       EdInsBinary(--bin_num,DOCT_SPRITE);
       break;
   }

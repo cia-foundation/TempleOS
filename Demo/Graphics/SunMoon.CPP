@@ -10,8 +10,8 @@ U0 SunMoon()
   WinMax;	//Maximize window
   DocClear;	//Clear command-line text
   WinBorder;	//No Border
-  WordStat;	//WordStat Off
-  Fs->text_attr=BLACK<<+WHITE;	//Current $LK,"CTask",A="MN:CTask"$ is Fs segment register.
+  AutoComplete;	//AutoComplete Off
+  Fs->text_attr=BLACK<<4+WHITE;	//Current $LK,"CTask",A="MN:CTask"$ is Fs segment register.
 
   for (i=0;i<0x8000;i+=0x200) {
     //Sun
@@ -33,7 +33,7 @@ U0 SunMoon()
     gr.dc->dither_probability_u16=2*i;	//U16 can be [0,65535]
     GrFloodFill(gr.dc,x-0.75*radius,y);
 
-    WinMgrSync; //Typically 60 fps or 16.6mS
+    WinMgrSync; //Typically 30 fps or 33S
     DCFill;
   }
 

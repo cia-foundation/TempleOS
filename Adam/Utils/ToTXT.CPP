@@ -108,7 +108,7 @@ public U0 ToTXT(U8 *_in_name,U8 *_out_name=NULL,I64 width=70)
   CDoc *doc_in,*doc_out;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  SetWinHorz(0,width-1); //Sets doc width for word wrap.
+  WinHorz(0,width-1); //Sets doc width for word wrap.
 
   in_name=DftExt(_in_name,"TXT.Z"),
   if (_out_name)

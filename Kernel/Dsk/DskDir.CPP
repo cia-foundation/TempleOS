@@ -1,11 +1,11 @@
-Bool DirNew(CPrt *p,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
+Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
 {//Makes a directory entry in the directory from a $LK,"CDirEntry",A="MN:CDirEntry"$ node.
-  switch (p->type) {
-    case PT_REDSEA:
-      return RedSeaFSDirNew(p,cur_dir,tempde,free_old_chain);
-    case PT_FAT32:
-      return FAT32DirNew(p,cur_dir,tempde,free_old_chain);
-    case PT_ISO9660:
+  switch (dv->type) {
+    case DVT_REDSEA:
+      return RedSeaDirNew(dv,cur_dir,tempde,free_old_chain);
+    case DVT_FAT32:
+      return FAT32DirNew(dv,cur_dir,tempde,free_old_chain);
+    case DVT_ISO9660:
       PrintErr("Not Writable\n");
       return FALSE;
     default:
@@ -166,17 +166,17 @@ CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
 
 CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
 {
-  CPrt *p=Fs->cur_prt;
+  CDrv *dv=Fs->cur_dv;
   CDirEntry *result=NULL;
-  PrtChk(p);
-  switch (p->type) {
-    case PT_REDSEA:
-      result=RedSeaFSFilesFind(files_find_mask,fuf_flags);
+  DrvChk(dv);
+  switch (dv->type) {
+    case DVT_REDSEA:
+      result=RedSeaFilesFind(files_find_mask,fuf_flags);
       break;
-    case PT_FAT32:
+    case DVT_FAT32:
       result=FAT32FilesFind(files_find_mask,fuf_flags);
       break;
-    case PT_ISO9660:
+    case DVT_ISO9660:
       result=ISO1FilesFind(files_find_mask,fuf_flags);
       break;
     default:
@@ -194,7 +194,7 @@ CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
 }
 
 U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
-{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT.Z"$ file,line link to StdOut, $LK,"DocPut",A="MN:DocPut"$.
+{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file,line link to StdOut, $LK,"DocPut",A="MN:DocPut"$.
   U8 *buf;
   if (!filename) return;
   if (IsRaw) {
@@ -228,7 +228,7 @@ U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
 }
 
 U0 PutDirLink(U8 *dirname)
-{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT.Z"$ dir macro to StdOut, $LK,"DocPut",A="MN:DocPut"$.
+{//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ dir macro to StdOut, $LK,"DocPut",A="MN:DocPut"$.
   U8 *buf;
   if (!dirname) return;
   if (IsRaw)
@@ -284,7 +284,6 @@ I64 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
 	  PutDirLink(tempde1->name);
 	else
 	  PutFileLink(tempde1->name);
-
 	'\n';
 	DirEntryDel(tempde1);
 	tempde1=tempde2;

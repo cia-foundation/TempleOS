@@ -7,7 +7,7 @@ U0 CtrlAltZ(I64 sc)
   else
     GrScaleZoom(2.0);
 }
-SetCtrlAltLetCB('Z',&CtrlAltZ,"Sys/Zoom In or Out");
+CtrlAltLetCBSet('Z',&CtrlAltZ,"Sys/Zoom In or Out");
 
 U0 Screen2Clipboard(I64)
 {
@@ -25,4 +25,4 @@ U0 CtrlAltS(I64)
 {
   Spawn(&Screen2Clipboard);
 }
-SetCtrlAltLetCB('S',&CtrlAltS,"Sys/Screen Shot to Clipboard");
+CtrlAltLetCBSet('S',&CtrlAltS,"Sys/Screen Shot to Clipboard");

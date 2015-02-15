@@ -89,7 +89,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     è =    i*ã/2/RINGS;
     è2=(i+1)*ã/2/RINGS+SLOP;
     for (j=0;j<FACES;j++) {
-      é =	 j*2*ã/FACES;
+      é =j*2*ã/FACES;
       é2=(j+1)*2*ã/FACES+SLOP;
 
       //Upper half
@@ -162,7 +162,7 @@ U0 Main()
   DocClear;
   WinMax;
   WinBorder;
-  WordStat;
+  AutoComplete;
   Fs->draw_it=&DrawIt;
   try {
     "\n\nMove mouse to change light source.\n\n";

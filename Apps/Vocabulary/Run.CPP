@@ -1,2 +1,3 @@
-#include "/Apps/Vocabulary/Load"
+Cd(__DIR__);;
+#include "Load"
 VocabQuiz;

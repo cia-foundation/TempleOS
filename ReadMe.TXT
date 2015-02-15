@@ -12,8 +12,9 @@ TempleOS may require you to enter I/O port addresses for the CD-ROM drive
 and the hard drive.  In Windows, you can find I/O port info in the
 Accessories folder, System Tools, System Info, Hardware Resources, 
 I/O ports.  Look for and write down "IDE", "ATA" or "SATA" port numbers.
-Then, boot the TempleOS CD and try all combinations.  (Sorry, it's too
-difficult for TempleOS to figure-out port numbers, automatically.)
+In Linux, use "lspci -v".  Then, boot the TempleOS CD and try all
+combinations.  (Sorry, it's too difficult for TempleOS to figure-out port
+numbers, automatically.)
 
 The source code can also be found at the TempleOS web site, 
 http://www.templeos.org but cannot be compiled outside TempleOS because

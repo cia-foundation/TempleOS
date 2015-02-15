@@ -1,25 +1,21 @@
-PopUpOk(
-"All text widgets work everywhere.\n"
-"The $$GREEN$$Type()$$FG$$ command is like\n"
-"the DOS command of the same name\n"
-"or the UNIX, $$GREEN$$cat$$FG$$ command.\n"
-"We will now send your menu document\n"
-"to the command line.  They use the same\n"
-"document format and it is active!!.\n");
-
-PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+TourPut(
+"All text widgets work everywhere.  The $$GREEN$$Type()$$FG$$ command is like "
+"the DOS command of the same name or the UNIX, $$GREEN$$cat$$FG$$ command.  "
+"We will, now, send your menu document to the command line.  It uses the "
+"same document format and the icons are even active!!\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
 
 //Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
-"Type(\"HOME/PersonalMenu.TXT\");";
+"Type(\"::/Home/PersonalMenu.TXT\");";
 AFGetStr("\n");
 
 Sleep(1500);
 AFPrint(250,"Dir;\n");
 
 Sleep(1500);
-PopUpOk(
-"$$GREEN$$Type()$$FG$$ can also be used on\n"
-"$$GREEN$$.BMP$$FG$$ or $$GREEN$$.GRA$$FG$$ files!");
+TourPut(
+"$$GREEN$$Type()$$FG$$ can also be used on $$GREEN$$.BMP$$FG$$ or $$GREEN$$.GRA$$FG$$ "
+"files!",TRUE);

@@ -49,7 +49,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
     case 'a':
       PopUpOk(	"Set the name and color of your accounts.\n"
 		"To delete accounts, manually edit\n"
-		"$$GREEN$$HOME/Budget/Accts.TXT.Z$$FG$$.");
+		"$$GREEN$$/Home/Budget/Accts.TXT.Z$$FG$$.");
       if (PopUpEd(BGT_ACCTS_FILE,Fs)) {
 	BgtAcctsRead;
 	BgtRegen;
@@ -163,7 +163,7 @@ U0 Budget()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   WinBorder;
-  WordStat;
+  AutoComplete;
   MenuPush(
 "File {"
 "  Abort(,CH_SHIFT_ESC);"

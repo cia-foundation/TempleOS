@@ -1,9 +1,9 @@
 #help_index "Games"
 
-Cd("/Apps/Span");;
+Cd(__DIR__);;
 #include "Span.HPP"
 #include "SpanDerive"
-#include "SpanBridge1"
+#include "SpanBridge"
 #include "SpanNew"
 #include "SpanMain"
 

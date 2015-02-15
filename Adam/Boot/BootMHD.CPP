@@ -1,5 +1,8 @@
 #define MODULE_SIZE		1*BLK_SIZE
-#define BOOT_HIGH_LOC	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+MODULE_SIZE))>>4)
+#define BOOT_HIGH_LOC_MHD	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+MODULE_SIZE))>>4)
+
+DefinePrint(
+  "DD_BOOT_HIGH_LOC_MHD","%08X",BOOT_HIGH_LOC_MHD<<4);
 
 asm {
 USE16
@@ -7,7 +10,7 @@ BMHD_START::
 BMHD_CODE::
 	CLD
 
-	MOV	AX,BOOT_HIGH_LOC
+	MOV	AX,BOOT_HIGH_LOC_MHD
 
 	CLI
 	MOV	SS,AX
@@ -26,7 +29,7 @@ BMHD_CODE::
 
 	MOV	ES,AX
 
-	MOV	AX,VGA_TEXT_MEM_BASE/16
+	MOV	AX,VGAM_TEXT/16
 	MOV	FS,AX
 	MOV	U32 FS:[0],'B'+GREEN<<12+('1'+GREEN<<12)<<16
 	CALL	BMHD_GET_IP
@@ -35,7 +38,7 @@ BMHD_GET_IP:
 	SUB	BX,BMHD_GET_IP-BMHD_START
 	MOV	CX,BX
 	SHR	BX,4
-//Copy this bootloader code to just under 0x80000
+//This copies this bootloader's code to 0x$TX,"00096C00",D="DD_BOOT_HIGH_LOC_MHD"$
 	MOV	AX,CS
 	PUSH	AX
 	ADD	AX,BX
@@ -48,21 +51,21 @@ BMHD_GET_IP:
 	XOR	DI,DI
 	REP_MOVSB
 
-	MOV	AX,BOOT_HIGH_LOC
+	MOV	AX,BOOT_HIGH_LOC_MHD
 	MOV	DS,AX
 
 //My assembler doesn't support 16-bit very well.
-	DU8	0xEA;	//JMP BOOT_HIGH_LOC:BMHD_HISTART
-	DU16	BMHD_HISTART-BMHD_START,BOOT_HIGH_LOC;
+	DU8	0xEA;	//JMP BOOT_HIGH_LOC_MHD:BMHD_HISTART
+	DU16	BMHD_HISTART-BMHD_START,BOOT_HIGH_LOC_MHD;
 
 BMHD_BIOS_DRV_NUM:	DU8	0;
 BMHD_OLD_CS_IP:		DU16	0,0;
-//Gets patched by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+//Gets patched by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 BMHD_BLK_CNT::		DU16	0;
 
 BMHD_DAP:		DU8	16,0,1,0; //One blk at a time
 BMHD_DAP_BUF:		DU16	0,0;
-//Gets patched by $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
+//Gets patched by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 BMHD_DAP_BLK::	//64-bit
 BMHD_DAP_BLK_LO:	DU32	0;
 BMHD_DAP_BLK_HI:	DU32	0;

@@ -1,2 +1,3 @@
-#include "/Apps/ToTheFront/Load"
+Cd(__DIR__);;
+#include "Load"
 ToTheFront;

@@ -2,15 +2,15 @@ U8 char_map[26]="22233344455566677778889999";
 
 /*
 Fmt of word lst entry:
-  U8 WSD_WORD_CHAR
+  U8 ACD_WORD_CHAR
   U8 word[] with terminating zero
-  I16 block; //definition offset in ::/Adam/WordStat/WSDefs.DAT
+  I16 block; //definition offset in ::/Adam/AutoComplete/ACDefs.DAT
 */
 U0 PhoneNumWords(U8 *num)
 {
   I64 ch;
   U8 *_num=StrNew(num),*dst=_num,
-      *dict=wsd.word_lst,*st,*src;
+      *dict=acd.word_lst,*st,*src;
   while (*num) {
     if ('0'<=*num<='9')
       *dst++=*num;

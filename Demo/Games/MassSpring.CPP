@@ -127,7 +127,7 @@ since we will yield during GetMsg().
   Preempt(OFF);
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
-  WordStat;
+  AutoComplete;
 
   MenuPush(
 "File {"

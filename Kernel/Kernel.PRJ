@@ -1,43 +1,45 @@
-//Compile this by calling $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$().
-//Don't do it directly.  See $LK,"Cmp(\"Kernel\")",A="FF:::/Adam/Boot/InsBoot.CPP,Cmp(\"Kernel\""$.
+//Compile this by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
+//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Boot/BootIns.CPP,Cmp(\"/Kernel/Kernel\""$.
 
 #exe {
-OptOn(OPTf_WARN_PAREN);
-OptOn(OPTf_WARN_DUP_TYPES);
-#include "KCfg"
-CKernelCfg *kernel_cfg;
-kernel_cfg=KernelCfgNew;
+  Cd(__DIR__);;
+  OptOn(OPTf_WARN_PAREN);
+  OptOn(OPTf_WARN_DUP_TYPES);
+  #include "KCfg"
+  CKernelCfg *kernel_cfg;
+  kernel_cfg=KernelCfgNew;
 };
 
-#include "Adam1a.HPP"
+#include "KernelA.HPP"
 #include "KStart"
-#include "Utils1a"
-#include "Math1a"
-#include "/Compiler/CmpDefs.HPP"
-#include "Adam1b.HPP"
+#include "KUtils"
+#include "KMathA"
+#include "/Compiler/CompilerA.HPP"
+#include "KernelB.HPP"
 #include "KExts"
-#include "Str1a"
-#include "Mem1a"
+#include "StrA"
+#include "MemA"
 #include "KGlbls"
-#include "Mem1b"
-#include "Math1b"
+#include "MemB"
+#include "KMathB"
 #include "Sched"
-#include "Mem1c"
+#include "MemC"
 #include "Font8x8"
-#include "Hash1a"
-#include "Str1b"
+#include "KHashA"
+#include "StrB"
 #include "Ints"
-#include "DataTypes1a"
+#include "KDataTypes"
 #include "Compress"
-#include "Hash1b"
+#include "KHashB"
+#include "KLoad"
 #include "Date"
 #include "StrPrint"
 #include "StrScan"
-#include "Define1a"
+#include "KDefine"
 #include "Display"
 #include "KeyDev"
-#include "Misc1a"
-#include "Dbg1a"
+#include "KMisc"
+#include "KDbg"
 #include "Except"
 #include "KbdMouse/InputPointer"
 #include "KbdMouse/Keyboard"
@@ -45,7 +47,7 @@ kernel_cfg=KernelCfgNew;
 #include "KbdMouse/Message"
 
 #include "QSort"
-#include "Task1a"
+#include "Task"
 #include "SrvCmd"
 #include "BIOS32"
 
@@ -53,15 +55,16 @@ kernel_cfg=KernelCfgNew;
 #include "DskStr"
 #include "DskCache"
 #include "DskATA"
-#include "Dsk1a"
+#include "DskATAId"
+#include "DskA"
 #include "DskAddDev"
 #include "DskDir"
-#include "FileSysISO1"
+#include "FileSysISO"
 #include "FileSysRedSea"
 #include "FileSysFAT"
-#include "Dsk1b"
+#include "DskB"
 #include "DskCFile"
-#include "Dsk1c"
+#include "DskC"
 
 #exe {Cd("..");};
 #include "MultiProc"

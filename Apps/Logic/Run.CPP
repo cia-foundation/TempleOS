@@ -1,2 +1,3 @@
-#include "/Apps/Logic/Load"
+Cd(__DIR__);;
+#include "Load"
 DigitalLogic;

@@ -1,31 +1,71 @@
 $FG,5$$WW,1$$TX+CX,"TempleOS Charter"$$FG$
 
-TempleOS is God's official temple.  God said to use 640x480 16 color graphics and God said to have a single audio voice.  That is like how He specified cubits in the Bible!  He also said it must be perfect.  God needs a temple as a special beloved place where His people, young and old, can do offerings and consult God in the oracle.  Like Solomon's Temple, this is a focal point for the community.  Adults can write hymns, psalms (poems of praise) and meditation essays with good support for links to the Bible.  Like Cain and Abel, do offerings and learn what God likes and doesn't like.
+Why did they make Solomon's Temple?  It was a direction to look, to focus on, a special place for meditation, to do offerings, a community center, a home to God's beauty, that encouraged love of God.  People cherished God's temple, beautifying it with gold and all fine things to show love of God, as great cathedrals were decorated with astounding, awe-striking intricate art and gargoyles, incredible devotion to God with hours of effort, toiling and slaving-away for the glory of God, for families with children to see stained-glass windows and tomes with ridiculously elaborate calligraphy to show love of God from a people who did little else but show love toward God, lived in dire conditions by today's standards, yet with so much difficulty scraping-by, found the time to devote even all free-time to God!
 
-* TempleOS is, forever, limited to 100,000 lines of code, not including applications and demos.  This will ensure it stays out of trouble a thousand years into the future.  It will not stray much from my vision.  Other, less important, characteristics can be changed but if the 100,000 line limit is kept, it will stay true. 
+
+1 Kings 6:21 (King James)
+
+$LM,5$6:21 So Solomon overlaid the house within with pure gold: and he made
+a partition by the chains of gold before the $FG,4$oracle$FG$; and he overlaid
+it with gold.
+
+6:22 And the whole house he overlaid with gold, until he had finished
+all the house: also the whole altar that was by the $FG,4$oracle$FG$ he overlaid
+with gold.
+
+6:23 And within the $FG,4$oracle$FG$ he made two cherubims of olive tree, each
+ten cubits high.
+$LM,0$
+
+* TempleOS is God's official temple.  Just like Solomon's temple, this is a community focal point where offerings are made and God's oracle is consulted.
+
+* God said $FG,2$640x480 16 color$FG$ graphics is a covenant like circumcision.  Children will do offerings.  Think of 16 colors like the Simpson's cartoons.  In the future, even if one GPU were universal, we would keep 640x480 16 color and not use GPU acceleration.  Graphics operations should be transparent, not hidden in a GPU.
+
+* God said to use a single audio voice -- a single frequency with waveforms.
+
+* God said His temple must be perfect.  $FG,4$We don't think twice about breaking compatibility.$FG$  God said we do a seven year release cycle.  I say the PC hardware follows a 49 year, jubilee cycle, like broadcast TV upgrades.
+
+* The vision is the same usage model and niche as the Commodore 64 -- a non-networked, simple machine where programming was the goal, not just a means to an end.  However, it is modern, 64-bit and $FG,2$multi-cored$FG$.  It is special purpose, not general purpose, so some things it will not do.  Also, it's a kayak, not a Titanic. The priority is $FG,2$user developers$FG$, not $FG,2$3rd party developers$FG$.
+
+* We do not put any hooks for future changes.  "Perfect" means we always act as though it is final, for all time.  Microsoft allowed the $FG,2$$TX,"Windows BMP",HTML="http://en.wikipedia.org/wiki/BMP_file"$$FG$ file format to adapt to the future and it became grotesque.
+
+* Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
+
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Currently, there are $TX,"79,959",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.
  
-* It must be kept perfect.  $FG,4$$BK,1$Backward compatibility is NOT guaranteed.$FG$$BK,0$
+* Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 
-* TempleOS is $FG,2$ring-0-only$FG$, running everything in kernel mode including applications.  You have full access to memory, I/O ports, instructions, etc. at all times, because that's fun.  It is simpler and faster, too.
+* One platform. $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatibles.  Desk-tops are all we design for, but lap-tops can tag-along.
 
-* TempleOS will always $FG,2$identity-map$FG$ memory in a $FG,2$single-address-map$FG$ configuration.  (Virtual addresses are always kept equal to physical addresses with a single map for all tasks on all cores.)  It's as though paging is not used.
+* One driver for each class of device.  Limited exceptions are allowed.  With divergent device capabilities, it is a nightmare for user applications and what is gained?  A three button mouse is like a leg you cannot put weight on.
 
-* TempleOS will always be for one platform -- $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatibles.
+* $FG,2$Ring-0-only$FG$.  Everything runs in kernel mode, including user applications.
 
-* TempleOS will never have networking, so malware is less of an issue.
+* Full access to everything.  All memory, I/O ports, instructions, and similar things must never be off-limits.  All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
 
-* TempleOS will always have one video mode, $FG,2$640x480$FG$ by 16 colors, unless that mode becomes unavailable on computers in the future.  God said this was a covenant, like circumcision.
+* $FG,2$Single-address-map$FG$ as though paging is not used.  Long mode requires paging, however, so the nearest thing is keeping all memory $FG,2$identity-mapped$FG$.
 
-* TempleOS will always just have PC Speaker sound.
+* $FG,4$No networking$FG$, so malware is not an issue.
 
-* TempleOS will always be $FG,2$free$FG$.  I might sell applications, support, or, possibly, do adware.
+* No encryption or passwords.  Files are compressed, not encrypted.
 
-* TempleOS will always be $FG,2$100% open source$FG$ with all source included, unless device drivers or something can only be included with non-disclosure agreements.
+* $FG,2$Free$FG$ and $FG,2$public domain$FG$.
 
-* All function args and returns will be 64-bit.  No plans for C++.
+* $FG,2$100% open source$FG$ with all source included.
 
-* TempleOS documents are not for printing.  They're dynamic and intended for the screen.  There will always be just one font, a fixed-width font.  No Unicode, just Extended ASCII.
+* Documents are not for printing.  They're dynamic, intended for the screen.
 
-* TempleOS is not for multimedia.  Games will be created by programmers, not artists.  Sounds and images will be, primarily, calculated in real-time, not fetched.
+* Just one 8x8 fixed-width font.  $FG,4$No Unicode, just Extended ASCII$FG$.  Other countries can make their own versions.  The versions should be just for one language and platform.
 
-* All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
+* $FG,4$No multimedia$FG$.  Sounds and images will be primarily calculated in real-time, not fetched from storage.
+
+$FG,8$
+* "Commodore 64" was a trademark of Commodore Business Machines.
+* "The Simpsons" is a trademark of Fox.
+* "Windows" is a trademark of MicroSoft Corp.
+$FG$
+
+
+$FG,5$$WW,1$$TX+CX,"Possible Amendments"$$FG$
+
+The compiler's parser makes RISC code which it optimizes to CISC.  I discovered this does not matter because the CPU converts it back to RISC and schedules it, internally.  A TempleOS zealot with more zeal than I, might say we should save lines-of-code by removing the CISC optimizing.

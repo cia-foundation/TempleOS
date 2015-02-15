@@ -1,8 +1,12 @@
 #help_index "Snd"
 
-#include "/Apps/Psalmody/JukeBox"
-#include "/Apps/Psalmody/JukePuppet"
-#include "/Apps/Psalmody/PsalmodyCtrls"
-#include "/Apps/Psalmody/Psalmody"
+Cd(__DIR__);;
+#include "JukeBox"
+#include "JukePuppet"
+#include "Psalmody"
+#include "PsalmodyCtrls"
+#include "PsalmodyDraw"
+#include "PsalmodyFile"
+#include "PsalmodyMain"
 
 #help_index ""

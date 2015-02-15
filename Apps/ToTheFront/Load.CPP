@@ -1,5 +1,6 @@
 #help_index "Games"
 
-#include "/Apps/ToTheFront/ToTheFront"
+Cd(__DIR__);;
+#include "ToTheFront"
 
 #help_index ""

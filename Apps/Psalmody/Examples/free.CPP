@@ -144,8 +144,8 @@ U0 Song()
   try {
     task=PopUpViewPrint("$LK,"Romans,8:28",A="BF:Romans,8:28"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("3qEEBeBDsBBBBqDsBFBFD2G3D2G",
 	    "Free \0will... \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0 \0 \0fail.\n\0 \0 \0 \0");

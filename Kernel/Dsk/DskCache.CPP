@@ -23,7 +23,7 @@ U0 DskCacheInit(I64 size_in_U8s)
       tempc=dsk.cache_base+i;
       QueIns(tempc,dsk.cache_ctrl->last_lru);
       tempc->next_hash=tempc->last_hash=tempc;
-      tempc->p=NULL;
+      tempc->dv=NULL;
       tempc->blk=0;
     }
 
@@ -60,30 +60,30 @@ U0 DskCacheQueIns(CCacheBlk *tempc)
   temp_l->next_hash=temp_n->last_hash=tempc;
 }
 
-CCacheBlk *DskCacheFind(CPrt *p,I64 blk)
+CCacheBlk *DskCacheFind(CDrv *dv,I64 blk)
 {
   CCacheBlk *tempc,*tempc1=DskCacheHash(blk);
   tempc=tempc1->next_hash;
   while (tempc!=tempc1) {
-    if (tempc->p==p && tempc->blk==blk)
+    if (tempc->dv==dv && tempc->blk==blk)
       return tempc;
     tempc=tempc->next_hash;
   }
   return NULL;
 }
 
-U0 DskCacheAdd(CPrt *p,U8 *buf, I64 blk, I64 cnt)
+U0 DskCacheAdd(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {
   CCacheBlk *tempc;
   if (dsk.cache_base) {
     while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
       Yield;
     while (cnt-->0) {
-      if (!(tempc=DskCacheFind(p,blk)))
+      if (!(tempc=DskCacheFind(dv,blk)))
 	tempc=dsk.cache_ctrl->next_lru;
       DskCacheQueRem(tempc);
       MemCpy(&tempc->body,buf,BLK_SIZE);
-      tempc->p=p;
+      tempc->dv=dv;
       tempc->blk=blk;
       DskCacheQueIns(tempc);
       blk++;
@@ -93,7 +93,7 @@ U0 DskCacheAdd(CPrt *p,U8 *buf, I64 blk, I64 cnt)
   }
 }
 
-U0 DskCacheInvalidate2(CPrt *p)
+U0 DskCacheInvalidate2(CDrv *dv)
 {
   CCacheBlk *tempc,*tempc1;
   if (dsk.cache_base) {
@@ -102,9 +102,9 @@ U0 DskCacheInvalidate2(CPrt *p)
     tempc=dsk.cache_ctrl->last_lru;
     while (tempc!=dsk.cache_ctrl) {
       tempc1=tempc->last_lru;
-      if (tempc->p==p) {
+      if (tempc->dv==dv) {
 	DskCacheQueRem(tempc);
-	tempc->p=NULL;
+	tempc->dv=NULL;
 	tempc->blk=0;
 	tempc->next_hash=tempc->last_hash=tempc;
 	QueIns(tempc,dsk.cache_ctrl->last_lru);
@@ -115,7 +115,7 @@ U0 DskCacheInvalidate2(CPrt *p)
   }
 }
 
-U0 RCache(CPrt *p,U8 **_buf, I64 *_blk, I64 *_cnt)
+U0 RCache(CDrv *dv,U8 **_buf, I64 *_blk, I64 *_cnt)
 {
   CCacheBlk *tempc;
   if (dsk.cache_base) {
@@ -123,7 +123,7 @@ U0 RCache(CPrt *p,U8 **_buf, I64 *_blk, I64 *_cnt)
       Yield;
     //fetch leading blks from cache
     while (*_cnt>0) {
-      if (tempc=DskCacheFind(p,*_blk)) {
+      if (tempc=DskCacheFind(dv,*_blk)) {
 	MemCpy(*_buf,&tempc->body,BLK_SIZE);
 	*_cnt-=1;
 	*_buf+=BLK_SIZE;
@@ -133,7 +133,7 @@ U0 RCache(CPrt *p,U8 **_buf, I64 *_blk, I64 *_cnt)
     }
     //fetch trailing blks from cache
     while (*_cnt>0) {
-      if (tempc=DskCacheFind(p,*_blk+*_cnt-1)) {
+      if (tempc=DskCacheFind(dv,*_blk+*_cnt-1)) {
 	MemCpy(*_buf+(*_cnt-1)<<BLK_SIZE_BITS,&tempc->body,BLK_SIZE);
 	*_cnt-=1;
       } else

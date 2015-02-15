@@ -4,7 +4,7 @@ I64 app_done_ack;
 U0 Job1(I64)
 {//Compile Compiler
   Preempt(ON);	 //Off by default
-  Silent(ON);
+  Silent;
   while (!app_done) {
     Cd("::/Compiler");
     Cmp("Compiler");

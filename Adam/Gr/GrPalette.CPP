@@ -18,35 +18,35 @@ we never need to worry about indexes,
 just DAC palette settings.
 */
   I64 i;
-  if (!sys_bios_gr_mode) return;
+  if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
     Yield;
-  InU8(VGA_INPUT_STAT); //Rsts attr index/data
+  InU8(VGAP_INPUT_STAT); //Rsts attr index/data
   for (i=0;i<16;i++) {
-    OutU8(VGA_ATTR_INDEX,i);
-    OutU8(VGA_ATTR_DATA_WRITE,i);
+    OutU8(VGAP_ATTR_INDEX,i);
+    OutU8(VGAP_ATTR_DATA_WRITE,i);
   }
-  OutU8(VGA_ATTR_INDEX,0x20);
-  OutU8(VGA_ATTR_DATA_WRITE,0); //Dummy write
-  InU8(VGA_INPUT_STAT); //Rsts attr index/data
+  OutU8(VGAP_ATTR_INDEX,0x20);
+  OutU8(VGAP_ATTR_DATA_WRITE,0); //Dummy write
+  InU8(VGAP_INPUT_STAT); //Rsts attr index/data
   LBtr(&sys_semas[SYS_SEMA_VGA],0);
   POPFD
 }
 
 public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
 {//6-bits per b, g and r.
-  if (!sys_bios_gr_mode) return;
+  if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
     Yield;
-  OutU8(VGA_PALETTE_MASK,0xFF);
-  OutU8(VGA_REG_WRITE,color_num);
-  OutU8(VGA_PALETTE_DATA,bgr.r>>2);
-  OutU8(VGA_PALETTE_DATA,bgr.g>>2);
-  OutU8(VGA_PALETTE_DATA,bgr.b>>2);
+  OutU8(VGAP_PALETTE_MASK,0xFF);
+  OutU8(VGAP_REG_WRITE,color_num);
+  OutU8(VGAP_PALETTE_DATA,bgr.r>>2);
+  OutU8(VGAP_PALETTE_DATA,bgr.g>>2);
+  OutU8(VGAP_PALETTE_DATA,bgr.b>>2);
   LBtr(&sys_semas[SYS_SEMA_VGA],0);
   POPFD
 }
@@ -54,16 +54,16 @@ public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
 public CBGR GetVGAPaletteColor(I64 color_num)
 {//6-bits per b, g and r.
   CBGR result=0;
-  if (!sys_bios_gr_mode) return 0;
+  if (!Bt(&sys_run_level,RLf_VGA)) return 0;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
     Yield;
-  OutU8(VGA_PALETTE_MASK,0xFF);
-  OutU8(VGA_REG_READ,color_num);
-  result.r=InU8(VGA_PALETTE_DATA)<<2;
-  result.g=InU8(VGA_PALETTE_DATA)<<2;
-  result.b=InU8(VGA_PALETTE_DATA)<<2;
+  OutU8(VGAP_PALETTE_MASK,0xFF);
+  OutU8(VGAP_REG_READ,color_num);
+  result.r=InU8(VGAP_PALETTE_DATA)<<2;
+  result.g=InU8(VGAP_PALETTE_DATA)<<2;
+  result.b=InU8(VGAP_PALETTE_DATA)<<2;
   LBtr(&sys_semas[SYS_SEMA_VGA],0);
   POPFD
   return result;

@@ -1,5 +1,6 @@
 #help_index "Misc"
 
-#include "/Apps/Logic/Logic"
+Cd(__DIR__);;
+#include "Logic"
 
 #help_index ""

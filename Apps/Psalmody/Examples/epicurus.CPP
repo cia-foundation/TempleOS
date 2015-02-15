@@ -19,8 +19,8 @@ U0 Song()
 	  "$LK,"John,16:24",A="BF:John,16:24"$\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     DocRecalc(DocPut(task)); //Reformat word-wrap with new window size.
     while (!ScanKey) {
       Play("3qBeCDqCAetAACeECsF2G3F2GqG",

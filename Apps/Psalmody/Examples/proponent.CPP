@@ -2,6 +2,7 @@
 U0 Song()
 {
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   while (TRUE) {
     Play("qCqAqAsEDEDqBqBetGGEs2G3C2G3C");

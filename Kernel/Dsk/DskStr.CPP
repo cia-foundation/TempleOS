@@ -79,170 +79,161 @@ Bool FilesFindMatch(U8 *test_filename,U8 *files_find_mask,I64 fuf_flags=0)
   return result;
 }
 
-U0 PrtChk(CPrt *p)
-{//Check for valid partition. Throw exception.
-  if (!p || p->pt_signature!=PRT_SIGNATURE_VAL)
-    throw('Prt');
+U0 DrvChk(CDrv *dv)
+{//Check for valid drv. Throw exception.
+  if (!dv || dv->dv_signature!=DRV_SIGNATURE_VAL)
+    throw('Drv');
 }
 
-U8 Prt2Drv(CPrt *p=NULL)
-{//Prt ptr to Drv letter.
-  if (!p)
-    p=Fs->cur_prt;
-  PrtChk(p);
-  return p->drv_let;
+U8 Drv2Let(CDrv *dv=NULL)
+{//Drv ptr to Drv letter.
+  if (!dv)
+    dv=Fs->cur_dv;
+  DrvChk(dv);
+  return dv->drv_let;
 }
 
-CPrt *Drv2Prt(U8 drv_let=0)
-{//Drv letter to Prt ptr.
-  CPrt *p;
+CDrv *Let2Drv(U8 drv_let=0)
+{//Drv letter to Drv ptr.
+  CDrv *dv;
   if (!drv_let)
-    p=Fs->cur_prt;
+    dv=Fs->cur_dv;
   else {
     if (drv_let==':')
-      drv_let=*sys_acct;
+      drv_let=dsk.boot_drv_let;
     drv_let=ToUpper(drv_let);
     if (!('A'<=drv_let<='Z'))
-      throw('Prt');
-    p=dsk.drv_to_prt[drv_let-'A'];
+      throw('Drv');
+    dv=dsk.let_to_drv[drv_let-'A'];
   }
-  PrtChk(p);
-  return p;
+  DrvChk(dv);
+  return dv;
 }
 
-U0 BlkDevChk(CBlkDev *bdev)
+U0 BlkDevChk(CBlkDev *bd)
 {//Check for valid BlkDev. Throw exception.
-  if (!bdev || bdev->bd_signature!=BD_SIGNATURE_VAL ||
-      !(BDT_NULL<bdev->type<BDT_NUM_TYPES))
+  if (!bd || bd->bd_signature!=BD_SIGNATURE_VAL ||
+      !(BDT_NULL<bd->type<BDT_NUM_TYPES))
     throw('BlkDev');
 }
 
-CBlkDev *Drv2BlkDev(U8 drv_let=0)
+CBlkDev *Let2BlkDev(U8 drv_let=0)
 {//Drv letter to BlkDev ptr.
-  CPrt *p=Drv2Prt(drv_let);
-  CBlkDev *bdev=p->bdev;
-  BlkDevChk(bdev);
-  return bdev;
+  CDrv *dv=Let2Drv(drv_let);
+  CBlkDev *bd=dv->bd;
+  BlkDevChk(bd);
+  return bd;
 }
 
 Bool IsDrvWritable(U8 drv_let=0)
 {//Is drive writable?
-  CBlkDev *bdev=Drv2BlkDev(drv_let);
-  if (bdev->flags & BDF_READ_ONLY)
+  CBlkDev *bd=Let2BlkDev(drv_let);
+  if (bd->flags & BDF_READ_ONLY)
     return FALSE;
   else
     return TRUE;
 }
 
 U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL)
-{//MAlloc copy of cur dir with partition letter.
+{//MAlloc copy of cur dir with drv letter.
   U8 *st;
   if (!task) task=Fs;
   if (!task->cur_dir)
     return NULL;
   st=MAlloc(StrLen(task->cur_dir)+3,mem_task);
-  *st=Prt2Drv;
+  *st=Drv2Let(task->cur_dv);
   st[1]=':';
   StrCpy(st+2,task->cur_dir);
   return st;
 }
 
 U8 *DirNameAbs(U8 *_dirname)
-{//MAlloc absolute dir string with partition letter.
+{//MAlloc absolute dir string with drv letter.
   I64 maxlen;
-  U8 drv[3],*cur_dir,*buf2,*buf3,*buf,*dirname,*temp_name;
+  U8 drv[3],*result,*buf,*buf2,*buf3,*buf4,*dirname,*free_dirname;
   if (!Fs->cur_dir || !*Fs->cur_dir)
     return StrNew(_dirname);
-  dirname=MStrUtil(_dirname,SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
-  temp_name=dirname;
-  *drv=Prt2Drv;
+  free_dirname=dirname=MStrUtil(_dirname,
+	SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
+  *drv=Drv2Let;
   drv[1]=':';
   drv[2]=0;
   if (*dirname && dirname[1]==':') {
     if (*dirname==':')
-      *drv=*sys_acct;
+      *drv=dsk.boot_drv_let;
     else
       *drv=*dirname;
     dirname=dirname+2;
-    cur_dir=StrNew("/");
+    buf=StrNew("/");
   } else
-    cur_dir=StrNew(Fs->cur_dir);
+    buf=StrNew(Fs->cur_dir);
   if (*dirname=='/') {
-    Free(cur_dir);
-    cur_dir=StrNew("/");
+    Free(buf);
+    buf=StrNew("/");
     dirname++;
   }
-
   buf2=StrNew(dirname);
-  maxlen=StrLen(cur_dir)+1+StrLen(buf2)+1;
+  maxlen=StrLen(buf)+1+StrLen(buf2)+1;
   buf3=MAlloc(maxlen);
-  buf =MAlloc(maxlen);
-  StrCpy(buf3,cur_dir);
+  buf4=MAlloc(maxlen);
+  StrCpy(buf3,buf);
   while (*buf2) {
-    StrFirstRem(buf2,"/",buf);
-    if (!*buf)
+    StrFirstRem(buf2,"/",buf4);
+    if (!*buf4)
       StrCpy(buf3,"/");
-    else if (!StrCmp(buf,"..")) {
+    else if (!StrCmp(buf4,"..")) {
       StrLastRem(buf3,"/");
       if (!*buf3)
 	StrCpy(buf3,"/");
-    } else if (!StrCmp(buf,".")) {
+    } else if (!StrCmp(buf4,".")) {
       ;
-    } else if (*buf) {
-      if (!StrCmp(buf,"HOME")) {
-	Free(buf3);
-	buf3=MAlloc(maxlen+StrLen(sys_acct));
-	StrCpy(buf3,sys_acct+2);
-	*drv=*sys_acct;
-      } else {
-	if (StrCmp(buf3,"/"))
-	  CatPrint(buf3,"/");
-	CatPrint(buf3,buf);
-      }
+    } else if (*buf4) {
+      if (StrCmp(buf3,"/"))
+	CatPrint(buf3,"/");
+      CatPrint(buf3,buf4);
     }
   }
-  Free(cur_dir);
-  cur_dir=MAlloc(StrLen(buf3)+3);
-  StrCpy(cur_dir,drv);
-  StrCpy(cur_dir+2,buf3);
   Free(buf);
+  result=MAlloc(StrLen(buf3)+3);
+  StrCpy(result,drv);
+  StrCpy(result+2,buf3);
   Free(buf2);
   Free(buf3);
-  Free(temp_name);
-  return cur_dir;
+  Free(buf4);
+  Free(free_dirname);
+  return result;
 }
 
 U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0)
 {//Absolute filename. Accepts $LK,"FUF_Z_OR_NOT_Z",A="MN:FUF_Z_OR_NOT_Z"$, $LK,"FUF_SCAN_PARENTS",A="MN:FUF_SCAN_PARENTS"$.
-  U8 *buf,*buf2,*buf3,*filename,*temp_name,*temp_buf;
+  U8 *result,*filename,*buf,*buf_file,*buf_dir,*free_filename,*free_buf;
   CDirEntry de;
-  filename=MStrUtil(_filename,SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
-  temp_name=filename;
-  buf=StrNew(filename);
-  temp_buf=buf;
+  free_filename=filename=MStrUtil(_filename,
+	SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
+  free_buf=buf=StrNew(filename);
   if (*buf && buf[1]==':') {
     buf+=2;
     filename+=2;
   }
-  buf2=MAlloc(StrLen(temp_name)+1);
-  StrLastRem(buf,"/",buf2);
+  buf_file=MAlloc(StrLen(free_filename)+1);
+  StrLastRem(buf,"/",buf_file);
   if (*filename=='/' && !*buf)
     StrCpy(buf,"/");
-  buf3=DirNameAbs(temp_buf);
-  Free(temp_buf);
-  buf=MAlloc(StrLen(buf3)+1+StrLen(buf2)+1);
-  StrCpy(buf,buf3);
-  if (buf[StrLen(buf)-1]!='/')
-    CatPrint(buf,"/");
-  CatPrint(buf,buf2);
-  Free(buf2);
-  Free(buf3);
-  Free(temp_name);
-  if (fuf_flags&&FileFind(buf,&de,fuf_flags|FUF_JUST_FILES)) {
-    Free(buf);
-    buf=de.full_name;
+  buf_dir=DirNameAbs(free_buf);
+  Free(free_buf);
+  result=MAlloc(StrLen(buf_dir)+1+StrLen(buf_file)+1);
+  StrCpy(result,buf_dir);
+  if (result[StrLen(result)-1]!='/')
+    CatPrint(result,"/");
+  CatPrint(result,buf_file);
+  Free(buf_file);
+  Free(buf_dir);
+  Free(free_filename);
+  if (fuf_flags&&FileFind(result,&de,fuf_flags|FUF_JUST_FILES)) {
+    Free(result);
+    result=de.full_name;
   }
-  return buf;
+  return result;
 }
 
 U8 *ChgExt(U8 *filename,U8 *extension)
@@ -311,7 +302,7 @@ U8 *DirFile(U8 *dirname,U8 *name=NULL,U8 *_extension=NULL)
 {/*Strips file from dirname, scans for file upward until found or
 returns default.
 
-("/Kernel/Hash1a.CPP.Z",NULL,NULL)	returns "D:/Kernel"
+("/Kernel/KHashA.CPP.Z",NULL,NULL)	returns "D:/Kernel"
 ("/Kernel",NULL,"PRJ.Z")		returns "D:/Kernel/Kernel.PRJ.Z"
 ("/Kernel/Dsk",NULL,"PRJ.Z")		returns "D:/Kernel/Kernel.PRJ.Z"
 ("/Apps/Psalmody","Load","CPP.Z")	returns "D:/Apps/Psalmody/Load.CPP.Z"
@@ -371,5 +362,5 @@ U8 *ToggleZorNotZ(U8 *name)
 
 U8 *FileNameTempTxt()
 {//Make pretty-safe temp filename in home dir.
-  return MStrPrint("HOME/SysTemp%X.TXT.Z",GetTSC>>8&0xFFFFFFFF);
+  return MStrPrint("::/Home/SysTemp%X.TXT.Z",GetTSC>>8&0xFFFFFFFF);
 }

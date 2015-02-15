@@ -1,11 +1,14 @@
 /*See $LK,"TempleOS MultiTasking",A="FI:::/Doc/MultiTasking.TXT"$.
 
-Tasks are ordered in a circular queue
-by front-to-back window stack order with
-the window mgr as the head (paints
-the wallpaper).  The scheduler is
-round-robin.  It checks if a task
-is ready and runs it or skips it.
+On each core, tasks are linked in a
+circular doubly-linked list queue with
+the Seth task as the head.  On core#0,
+the queue order represents the front-to-back
+window stack order with the window mgr
+as the wallpaper.
+
+The scheduler is round-robin.  It checks
+if a task is ready and runs it or skips it.
 Swapping tasks just involves storing and
 restoring regs (no disk I/O for virtual
 memory and no addr map changes).  It is
@@ -35,7 +38,7 @@ The scheduler checks for a few keys:
 Each core has its own circular task queue.
 For AP processors, they have a "Seth" task
 which stays in a loop waiting for jobs or
-requests to spawn tasks.  See $LK,"MPSethServerTask",A="MN:MPSethServerTask"$().
+requests to spawn tasks.  See $LK,"APSethTask",A="MN:APSethTask"$().
 $HL,1$*/
 
 asm {

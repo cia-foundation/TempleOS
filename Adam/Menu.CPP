@@ -26,7 +26,7 @@ public CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name)
 //Just 2 levels -- across top and down are valid, currently.
   U8 *st,*st2;
   CMenuEntry *tempse;
-  if (!haystack_menu || haystack_menu->mu_signature!=MENU_SIGNATURE_VAL || !needle_full_name)
+  if (!haystack_menu || !needle_full_name)
     return NULL;
   st=StrNew(needle_full_name);
   st2=StrNew(needle_full_name);
@@ -91,13 +91,11 @@ public CMenu *MenuNew(U8 *st,I64 flags=0,CTask *task=NULL)
   m=CAlloc(sizeof(CMenu),task);
   m->task=task;
   m->flags=flags;
-  m->attr	 =LTBLUE<<4 +YELLOW;
-  m->checked_attr=LTGREEN<<4+BROWN;
+  m->attr =BLUE<<4+YELLOW;
   tempse=&m->sub;
   while (tempse)
     tempse=tempse->next=MenuNewSub(lx,task);
   LexDel(lx);
-  m->mu_signature=MENU_SIGNATURE_VAL;
   return m;
 }
 
@@ -127,9 +125,7 @@ U0 MenuDelSub(CMenuEntry *tempme)
 public U0 MenuDel(CMenu *m)
 {//Delete a manu. You probably don't need this.
   CMenuEntry *tempme,*tempme1;
-  if (!m || m->mu_signature!=MENU_SIGNATURE_VAL)
-    return;
-  m->mu_signature=0;
+  if (!m) return;
   tempme=m->sub;
   while (tempme) {
     tempme1=tempme->next;
@@ -181,12 +177,10 @@ U0 DrawMenu(CDC *dc)
   U8 *st=NULL;
   CTask *task=MenuTask;
   I64 i,w,x0,y0,x1=ip.pos.x,y1=ip.pos.y;
-  if (!TaskValidate(task) || !(m=task->cur_menu) ||
-      m->mu_signature!=MENU_SIGNATURE_VAL) {
+  if (!TaskValidate(task) || !(m=task->cur_menu)) {
     sys_cur_submenu_entry=NULL;
     return;
   }
-
   dc->color=m->attr>>4;
   GrRect(dc,0,0,GR_WIDTH,FONT_HEIGHT);
   x0=0;
@@ -205,7 +199,7 @@ U0 DrawMenu(CDC *dc)
       tempse=tempme->sub;
       while (tempse) {
 	if (tempse->checked)
-	  i=m->checked_attr;
+	  i=m->attr^0xFF;
 	else
 	  i=m->attr;
 	if (y0<=y1<y0+FONT_HEIGHT) {

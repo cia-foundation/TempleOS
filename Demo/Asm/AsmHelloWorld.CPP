@@ -5,7 +5,7 @@ error, like when repeatedly #including
 it from the cmd line.
 
 These are many useful kernel
-routines $LK,"::/Kernel/Str1a.CPP",A="FF:::/Kernel/Str1a.CPP,PUT_CHARS"$
+routines $LK,"::/Kernel/StrA.CPP",A="FF:::/Kernel/StrA.CPP,PUT_CHARS"$
 intended to be called from
 asm.  Generally, they preserve
 regs.

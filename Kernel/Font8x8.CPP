@@ -1,4 +1,4 @@
-//See $LK,"::/Doc/Acknowledgements.TXT"$.
+//See $LK,"::/Doc/Credits.TXT"$.
 
 U8 sys_font_8x8[256*8]= {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

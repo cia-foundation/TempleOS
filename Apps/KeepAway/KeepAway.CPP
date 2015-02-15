@@ -618,7 +618,7 @@ U0 KeepAway()
   Preempt(OFF);
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
-  WordStat;
+  AutoComplete;
 
   MenuPush(
 "File {"

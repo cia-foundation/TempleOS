@@ -1,7 +1,7 @@
 Unit *FindNearestUnit(I64 row,I64 col,I64 player,Bool in_LOS,F64 range=-1)
 {
   I64 i;
-  F64 d,best_d=MAX_F64,x1,y1,x2,y2;
+  F64 dd,best_dd=MAX_F64,x1,y1,x2,y2;
   Unit *best=NULL;
 //$LK,"Sqrt",A="MN:Sqrt"$() is slow, so work with squared distances.
   if (range<0)
@@ -13,10 +13,10 @@ Unit *FindNearestUnit(I64 row,I64 col,I64 player,Bool in_LOS,F64 range=-1)
     if (units[player][i].life>0) {
       if (!in_LOS || LOS(row,col,units[player][i].row,units[player][i].col)) {
 	RowCol2XY(&x2,&y2,units[player][i].row,units[player][i].col);
-	d=Sqr(x2-x1)+Sqr(y2-y1);
-	if (d<=range && d<best_d) {
+	dd=Sqr(x2-x1)+Sqr(y2-y1);
+	if (dd<=range && dd<best_dd) {
 	  best=&units[player][i];
-	  best_d=d;
+	  best_dd=dd;
 	}
       }
     }

@@ -3,6 +3,7 @@ U0 Song()
 {
   CTask *task;
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   try {
     task=PopUpViewPrint(
@@ -16,8 +17,8 @@ U0 Song()
 	  "am I worth?\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     DocRecalc(DocPut(task)); //Reformat word-wrap with new window size.
     while (!ScanKey) {
       Play("3qGsB2G3B2G3eF2G3sGGGGeRFC2G3qFC",

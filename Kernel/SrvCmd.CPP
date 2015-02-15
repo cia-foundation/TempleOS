@@ -37,10 +37,9 @@ U0 TaskRstAwaitingMsg(CTask *task=NULL)
 }
 
 CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags)
-{//Queues a request to compile and execute text.
+{//Queues a request to compile and execute src code text.
   CSrvCmd *result;
-  if (!data || !TaskValidate(srv) ||
-      master && !TaskValidate(master) ||
+  if (!data || !TaskValidate(srv) || master && !TaskValidate(master) ||
       srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT))
     return NULL;
   result=ACAlloc(sizeof(CSrvCmd));
@@ -73,12 +72,11 @@ CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags)
 }
 
 CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags)
-{//Post text to servant task. Tell who the master task is.
+{//Post StdIn text to servant task. Tell who the master task is.
   CSrvCmd *result;
   Bool old_preempt=Preempt(OFF);
   CTask *task;
-  if (!data || !TaskValidate(srv) ||
-      master && !TaskValidate(master) ||
+  if (!data || !TaskValidate(srv) || master && !TaskValidate(master) ||
       srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT)) {
     Preempt(old_preempt);
     return NULL;
@@ -126,8 +124,7 @@ CSrvCmd *TaskMsg(CTask *_srv,CTask *master,I64 msg_code,I64 a1,I64 a2,I64 flags)
 //See $LK,"flags",A="MN:SVCf_WAKE_MASTER"$ and $LK,"msg_code",A="MN:MSG_CMD"$.
   CSrvCmd *tempc1,*tempc;
   CTask *srv=_srv;
-  if (!TaskValidate(srv) ||
-      master && !TaskValidate(master)||
+  if (!TaskValidate(srv) || master && !TaskValidate(master)||
       srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT))
     return NULL;
   tempc=ACAlloc(sizeof(CSrvCmd));
@@ -139,8 +136,7 @@ CSrvCmd *TaskMsg(CTask *_srv,CTask *master,I64 msg_code,I64 a1,I64 a2,I64 flags)
   tempc->flags=flags;
   PUSHFD
   if (Bt(&sys_semas[SYS_SEMA_RECORD_MACRO],0) &&
-      srv!=sys_macro_util_task &&
-      msg_code==MSG_KEY_DOWN) {
+      srv!=sys_macro_util_task && msg_code==MSG_KEY_DOWN) {
     tempc1=AMAllocIdentical(tempc);
     CLI
     QueIns(tempc1,sys_macro_root.last);
@@ -385,17 +381,35 @@ sch_done:
   return cnt;
 }
 
-I64 SrvUser(U8 *fmt,...)
-{//Spawns a visible task and sends text which gets compiled and run.
-  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  I64 result=0;
+I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
+{//Execute code text in PopUp win task.
+  I64 result;
   CSrvCmd *tempc;
-  CTask *task=Spawn(&SrvUserCmdLine,NULL,"Servant",,Fs);
-  Fs->popup_task=task;
-  tempc=TaskExe(task,Fs,buf,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-  ScanResult(tempc,&result);
-  Fs->popup_task=NULL;
-  Kill(task,FALSE);
+  Bool old_preempt=Preempt(OFF);
+  CTask *task=Spawn(&SrvCmdLine,NULL,"Servant",,parent);
+  if (!parent) {
+    TaskExe(task,parent,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
+    if (_pu_task) *_pu_task=task;
+    Preempt(old_preempt);
+    return 0;
+  } else {
+    Fs->popup_task=task;
+    tempc=TaskExe(task,parent,buf,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+    if (_pu_task) *_pu_task=task;
+    ScanResult(tempc,&result);
+    Fs->popup_task=NULL;
+    Kill(task);
+    if (_pu_task) *_pu_task=NULL;
+    Preempt(old_preempt);
+    return result;
+  }
+}
+
+I64 PopUpPrint(U8 *fmt,...)
+{//Execute code text in PopUp win task.
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
+  I64 result;
+  result=PopUp(buf,Fs);
   Free(buf);
   return result;
 }
@@ -445,7 +459,7 @@ U0 XTalk(CTask *task,U8 *fmt,...)
 {//Sends text to other task. See $LK,"::/Misc/OSTestSuite.CPP"$.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=AStrNew(buf),
      *st2=MStrPrint("\"%%s\",%d;Free(%d);",st,st);
-  TaskText(task,0,st2,0);
+  TaskText(task,NULL,st2,0);
   Free(st2);
   Free(buf);
 }
@@ -454,7 +468,7 @@ U0 XTalkWait(CTask *task,U8 *fmt,...)
 {//Send text to other task and wait for it to idle.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=AStrNew(buf),
      *st2=MStrPrint("\"%%s\",%d;Free(%d);",st,st);
-  TaskText(task,0,st2,0);
+  TaskText(task,NULL,st2,0);
   Free(st2);
   Free(buf);
   TaskWait(task);
@@ -466,19 +480,20 @@ U0 AutoStr(U8 *fmt,...)
   if (Bt(&Fs->task_flags,TASKf_INPUT_FILTER_TASK))
     ExePrint("%s",buf);
   else
-    TaskText(Fs,0,buf,1<<SVCf_HIGHEST_PRIORITY);
+    TaskText(Fs,NULL,buf,1<<SVCf_HIGHEST_PRIORITY);
   Free(buf);
 }
 
 U0 AutoFile(U8 *filename)
 {//Send AutoFile code file to self.
   U8 *name=DftExt(filename,"AUT.Z");
-  AutoStr("%F",name);
+  AutoStr("Cd(\"%C:%s\");;#include \"%s\"",
+    Drv2Let(Fs->cur_dv),Fs->cur_dir,name);
   Free(name);
 }
 
 U0 Auto(U8 *fmt,...)
-{//Send text to own input buffer. See $LK,"::/Demo/AcctExample/TSDistro.CPP"$.
+{//Send text to own input buffer. See $LK,"::/Demo/AcctExample/TOSDistro.CPP"$.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=AStrNew(buf);
   AutoStr("\"%%s\",%d;Free(%d);",st,st);
   Free(buf);
@@ -487,14 +502,14 @@ U0 Auto(U8 *fmt,...)
 U0 XTalkStr(CTask *task,U8 *fmt,...)
 {//Send AutoFile code to other task.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  TaskText(task,0,buf,0);
+  TaskText(task,NULL,buf,0);
   Free(buf);
 }
 
 U0 XTalkStrWait(CTask *task,U8 *fmt,...)
 {//Send AutoFile code to other task and wait for it to idle.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  TaskText(task,0,buf,0);
+  TaskText(task,NULL,buf,0);
   Free(buf);
   TaskWait(task);
 }

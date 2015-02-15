@@ -4,7 +4,7 @@
 U0 PlotXY(I64 x,I64 y)
 {
   //Screen bits are reversed
-  LBts(VGA_GRAPHIC_MEM_BASE,y*GR_WIDTH+x^7);
+  LBts(VGAM_GRAPHICS,y*GR_WIDTH+x^7);
 }
 
 U0 Main()
@@ -13,22 +13,22 @@ U0 Main()
   Bool old_preempt=Preempt(OFF);
 
 //This makes all 4 color planes active.
-  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-  OutU8(VGA_SC_DATA,WHITE);
-  MemSet(VGA_GRAPHIC_MEM_BASE,0,GR_WIDTH*GR_HEIGHT/8);
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,WHITE);
+  MemSet(VGAM_GRAPHICS,0,GR_WIDTH*GR_HEIGHT/8);
 
-  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-  OutU8(VGA_SC_DATA,RED);
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,RED);
   for (i=0;i<200;i++)
     PlotXY(i,i);
 
-  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-  OutU8(VGA_SC_DATA,GREEN);
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,GREEN);
   for (i=0;i<200;i++)
     PlotXY(100,i);
 
-  OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-  OutU8(VGA_SC_DATA,BLUE);
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,BLUE);
   for (i=0;i<200;i++)
     PlotXY(200-i,i);
 /*If you want a mixed color select multiple planes

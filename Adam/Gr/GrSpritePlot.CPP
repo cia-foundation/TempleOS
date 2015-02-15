@@ -39,15 +39,15 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
     dc->cur_sprite_elem_num=cur_sprite_elem_num++;
     switch (tempg->type) {
       case SPT_COLOR:
-	dc->color=dc->color&~(COLORROP_COLORS_MASK|ROPF_DITHER)|tempg->color;
+	dc->color=dc->color&~(COLORROP_COLORS_MASK|ROPF_DITHER)|tempg->c.color;
 	break;
       case SPT_DITHER_COLOR:
 	dc->color=dc->color&~COLORROP_COLORS_MASK|
-	      tempg->dither_color.u8[0]|
-	      tempg->dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
+	      tempg->d.dither_color.u8[0]|
+	      tempg->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	break;
       case SPT_WIDTH:
-	dc->pen_width=tempg->width;
+	dc->pen_width=tempg->w.width;
 	GrScalePenWidth(dc);
 	break;
       case SPT_TRANSFORM_ON:
@@ -67,86 +67,87 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	dc->flags&=~DCF_TRANSFORMATION;
 	break;
       case SPT_PT:
-	GrPlot3(dc,tempg->x1+x,tempg->y1+y,z);
+	GrPlot3(dc,tempg->p.x1+x,tempg->p.y1+y,z);
 	break;
       case SPT_TEXT:
-	GrPrint3(dc,tempg->x1+x,tempg->y1+y,z,"%s",tempg->st);
+	GrPrint3(dc,tempg->ps.x1+x,tempg->ps.y1+y,z,"%s",tempg->ps.st);
 	break;
       case SPT_TEXT_BOX:
-	GrTextBox3(dc,tempg->x1+x,tempg->y1+y,z,tempg->st);
+	GrTextBox3(dc,tempg->ps.x1+x,tempg->ps.y1+y,z,tempg->ps.st);
 	break;
       case SPT_TEXT_DIAMOND:
-	GrTextDiamond3(dc,tempg->x1+x,tempg->y1+y,z,tempg->st);
+	GrTextDiamond3(dc,tempg->ps.x1+x,tempg->ps.y1+y,z,tempg->ps.st);
 	break;
       case SPT_FLOOD_FILL:
-	GrFloodFill3(dc,tempg->x1+x,tempg->y1+y,z,FALSE);
+	GrFloodFill3(dc,tempg->p.x1+x,tempg->p.y1+y,z,FALSE);
 	break;
       case SPT_FLOOD_FILL_NOT:
 	i=dc->color;
 	dc->color=dc->color.c0;
-	GrFloodFill3(dc,tempg->x1+x,tempg->y1+y,z,TRUE);
+	GrFloodFill3(dc,tempg->p.x1+x,tempg->p.y1+y,z,TRUE);
 	dc->color=i;
 	break;
       case SPT_SHIFT:
-	x+=tempg->x1;
-	y+=tempg->y1;
+	x+=tempg->p.x1;
+	y+=tempg->p.y1;
 	break;
       case SPT_LINE:
-	GrLine3(dc,tempg->x1+x,tempg->y1+y,z,tempg->x2+x,tempg->y2+y,z);
+	GrLine3(dc,tempg->pp.x1+x,tempg->pp.y1+y,z,tempg->pp.x2+x,tempg->pp.y2+y,z);
 	break;
       case SPT_ARROW:
-	GrArrow3(dc,tempg->x1+x,tempg->y1+y,z,tempg->x2+x,tempg->y2+y,z);
+	GrArrow3(dc,tempg->pp.x1+x,tempg->pp.y1+y,z,tempg->pp.x2+x,tempg->pp.y2+y,z);
 	break;
       case SPT_PLANAR_SYMMETRY:
-	if (GrSetSymmetry3(dc,tempg->x1+x,tempg->y1+y,z,tempg->x2+x,tempg->y2+y,z,tempg->x2+x,tempg->y2+y,z+1))
+	if (GrSetSymmetry3(dc,tempg->pp.x1+x,tempg->pp.y1+y,z,tempg->pp.x2+x,tempg->pp.y2+y,z,tempg->pp.x2+x,tempg->pp.y2+y,z+1))
 	  dc->flags|=DCF_SYMMETRY;
 	else
 	  dc->flags&=~DCF_SYMMETRY;
 	break;
       case SPT_BITMAP:
 	img=CAlloc(sizeof(CDC));
-	img->width=tempg->width;
-	img->width_internal=(tempg->width+7)&~7;
-	img->height=tempg->height;
-	img->body_size=img->width_internal*img->height;
-	img->body=tempg(U8 *)+offset(CSprite.linespeed);
+	img->width=tempg->pwhu.width;
+	img->width_internal=(tempg->pwhu.width+7)&~7;
+	img->height=tempg->pwhu.height;
+	img->body=&tempg->pwhu.u;
 	img->dc_signature=DCS_SIGNATURE_VAL;
-	GrBlot3(dc,tempg->x2+x,tempg->y2+y,z,img);
+	GrBlot3(dc,tempg->pwhu.x1+x,tempg->pwhu.y1+y,z,img);
 	Free(img);
 	break;
       case SPT_RECT:
-	GrRect3(dc,tempg->x1+x,tempg->y1+y,z,tempg->x2-tempg->x1,tempg->y2-tempg->y1);
+	GrRect3(dc,tempg->pp.x1+x,tempg->pp.y1+y,z,tempg->pp.x2-tempg->pp.x1,tempg->pp.y2-tempg->pp.y1);
 	break;
       case SPT_ROTATED_RECT:
-	x1=tempg->x1+x;
-	y1=tempg->y1+y;
+	x1=tempg->ppa.x1+x;
+	y1=tempg->ppa.y1+y;
 	z1=z;
 	GrRot(dc->r,&x1,&y1,&z1);
 	old_r=dc->r;
 	dc->flags|=DCF_TRANSFORMATION;
-	r2=GrRotZNew(-tempg->rot_angle);
+	r2=GrRotZNew(-tempg->ppa.angle);
 	GrSetTranslation(r2,x1,y1,z1);
 	GrSetRotMat(dc,GrMulMat(old_r,r2));
-	GrRect3(dc,0,0,0,tempg->x2-tempg->x1,tempg->y2-tempg->y1);
+	GrRect3(dc,0,0,0,tempg->ppa.x2-tempg->ppa.x1,tempg->ppa.y2-tempg->ppa.y1);
 	Free(dc->r);
 	Free(r2);
 	GrSetRotMat(dc,old_r);
 	dc->flags=dc->flags&~DCF_TRANSFORMATION|old_flags;
 	break;
       case SPT_CIRCLE:
-	GrCircle3(dc,tempg->x1+x,tempg->y1+y,z,tempg->x2);
+	GrCircle3(dc,tempg->pr.x1+x,tempg->pr.y1+y,z,tempg->pr.radius);
 	break;
       case SPT_ELLIPSE:
-	GrEllipse3(dc,tempg->x2+x,tempg->y2+y,z,tempg->width,tempg->height,tempg->rot_angle);
+	GrEllipse3(dc,tempg->pwha.x1+x,tempg->pwha.y1+y,z,tempg->pwha.width,
+		tempg->pwha.height,tempg->pwha.angle);
 	break;
       case SPT_POLYGON:
-	GrRegPoly3(dc,tempg->x2+x,tempg->y2+y,z,tempg->width,tempg->height,tempg->sides,tempg->rot_angle);
+	GrRegPoly3(dc,tempg->pwhas.x1+x,tempg->pwhas.y1+y,z,tempg->pwhas.width,
+		tempg->pwhas.height,tempg->pwhas.sides,tempg->pwhas.angle);
 	break;
       case SPT_POLYLINE:
-	ptr=&tempg->y1;
+	ptr=&tempg->nu.u;
 	x1=ptr[0];
 	y1=ptr[1];
-	for (i=1;i<tempg->num;i++) {
+	for (i=1;i<tempg->nu.num;i++) {
 	  x2=ptr[i<<1];
 	  y2=ptr[i<<1+1];
 	  GrLine3(dc,x1+x,y1+y,z,x2+x,y2+y,z);
@@ -154,11 +155,10 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	}
 	break;
       case SPT_POLYPT:
-	ptr=&tempg->y1;
-	x1=ptr[0];
-	y1=ptr[1];
-	ptr+=2;
-	k=tempg->num*3;
+	x1=tempg->npu.x;
+	y1=tempg->npu.y;
+	ptr=&tempg->npu.u;
+	k=tempg->npu.num*3;
 	GrPlot3(dc,x1+x,y1+y,z);
 	for (i=0;i<k;i+=3) {
 	  j=BFieldExtU32(ptr,i,3);
@@ -168,42 +168,43 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	}
 	break;
       sub_switch_start:
-	p=&tempg->y1;
-	for (i=0;i<tempg->num;i++,p++) {
+	p=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++,p++) {
 	  p->x+=x;
 	  p->y+=y;
 	  p->z+=z;
 	}
 	case SPT_BSPLINE2:
-	  Gr2BSpline3(dc,&tempg->y1,tempg->num,FALSE);
+	  Gr2BSpline3(dc,&tempg->nu.u,tempg->nu.num,FALSE);
 	  break;
 	case SPT_BSPLINE3:
-	  Gr3BSpline3(dc,&tempg->y1,tempg->num,FALSE);
+	  Gr3BSpline3(dc,&tempg->nu.u,tempg->nu.num,FALSE);
 	  break;
 	case SPT_BSPLINE2_CLOSED:
-	  Gr2BSpline3(dc,&tempg->y1,tempg->num,TRUE);
+	  Gr2BSpline3(dc,&tempg->nu.u,tempg->nu.num,TRUE);
 	  break;
 	case SPT_BSPLINE3_CLOSED:
-	  Gr3BSpline3(dc,&tempg->y1,tempg->num,TRUE);
+	  Gr3BSpline3(dc,&tempg->nu.u,tempg->nu.num,TRUE);
 	  break;
       sub_switch_end:
-	p=&tempg->y1;
-	for (i=0;i<tempg->num;i++,p++) {
+	p=&tempg->nu.u;
+	for (i=0;i<tempg->nu.num;i++,p++) {
 	  p->x-=x;
 	  p->y-=y;
 	  p->z-=z;
 	}
 	break;
       case SPT_MESH:
-	p=&tempg->x2;
-	for (i=0;i<tempg->vertex_cnt;i++,p++) {
+	p=&tempg->mu.u;
+	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
 	  p->x+=x;
 	  p->y+=y;
 	  p->z+=z;
 	}
-	Gr3Mesh(dc,tempg->vertex_cnt,&tempg->x2,tempg->tri_cnt,(&tempg->x2)(U8 *)+sizeof(CD3I32)*tempg->vertex_cnt);
-	p=&tempg->x2;
-	for (i=0;i<tempg->vertex_cnt;i++,p++) {
+	Gr3Mesh(dc,tempg->mu.vertex_cnt,&tempg->mu.u,tempg->mu.tri_cnt,
+	  (&tempg->mu.u)(U8 *)+sizeof(CD3I32)*tempg->mu.vertex_cnt);
+	p=&tempg->mu.u;
+	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
 	  p->x-=x;
 	  p->y-=y;
 	  p->z-=z;
@@ -211,35 +212,35 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
 	break;
       case SPT_SHIFTABLE_MESH:
 	if (dc->flags&DCF_TRANSFORMATION) {
-	  dc->x+=tempg->x1;
-	  dc->y+=tempg->y1;
-	  dc->z+=tempg->z1;
+	  dc->x+=tempg->pmu.x;
+	  dc->y+=tempg->pmu.y;
+	  dc->z+=tempg->pmu.z;
 	  x1=x;
 	  y1=y;
 	  z1=z;
 	} else {
-	  x1=tempg->x1+x;
-	  y1=tempg->y1+y;
-	  z1=tempg->z1+z;
+	  x1=tempg->pmu.x+x;
+	  y1=tempg->pmu.y+y;
+	  z1=tempg->pmu.z+z;
 	}
-	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
+	p=&tempg->pmu.u;
+	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
 	  p->x+=x1;
 	  p->y+=y1;
 	  p->z+=z1;
 	}
-	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	Gr3Mesh(dc,tempg->shiftable_vertex_cnt,p,tempg->shiftable_tri_cnt,p(U8 *)+sizeof(CD3I32)*tempg->shiftable_vertex_cnt);
-	p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
+	Gr3Mesh(dc,tempg->pmu.vertex_cnt,&tempg->pmu.u,tempg->pmu.tri_cnt,
+	  (&tempg->pmu.u)(U8 *)+sizeof(CD3I32)*tempg->pmu.vertex_cnt);
+	p=&tempg->pmu.u;
+	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
 	  p->x-=x1;
 	  p->y-=y1;
 	  p->z-=z1;
 	}
 	if (dc->flags&DCF_TRANSFORMATION) {
-	  dc->x-=tempg->x1;
-	  dc->y-=tempg->y1;
-	  dc->z-=tempg->z1;
+	  dc->x-=tempg->pmu.x;
+	  dc->y-=tempg->pmu.y;
+	  dc->z-=tempg->pmu.z;
 	}
 	break;
     }
@@ -355,13 +356,13 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
       throw('Graphics');
     switch (tempg0->type) {
       case SPT_ROTATED_RECT:
-	tempgr->rot_angle=(tempg0->rot_angle*t0+tempg1->rot_angle*t1)/GR_SCALE;
+	tempgr->ppa.angle=(tempg0->ppa.angle*t0+tempg1->ppa.angle*t1)/GR_SCALE;
       case SPT_RECT:
       case SPT_LINE:
       case SPT_ARROW:
       case SPT_PLANAR_SYMMETRY:
-	tempgr->x2=(tempg0->x2*t0+tempg1->x2*t1)>>32;
-	tempgr->y2=(tempg0->y2*t0+tempg1->y2*t1)>>32;
+	tempgr->pp.x2=(tempg0->pp.x2*t0+tempg1->pp.x2*t1)>>32;
+	tempgr->pp.y2=(tempg0->pp.y2*t0+tempg1->pp.y2*t1)>>32;
       case SPT_TEXT:
       case SPT_TEXT_BOX:
       case SPT_TEXT_DIAMOND:
@@ -369,69 +370,66 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
       case SPT_FLOOD_FILL:
       case SPT_FLOOD_FILL_NOT:
       case SPT_SHIFT:
-	tempgr->x1=(tempg0->x1*t0+tempg1->x1*t1)>>32;
-	tempgr->y1=(tempg0->y1*t0+tempg1->y1*t1)>>32;
+	tempgr->p.x1=(tempg0->p.x1*t0+tempg1->p.x1*t1)>>32;
+	tempgr->p.y1=(tempg0->p.y1*t0+tempg1->p.y1*t1)>>32;
 	break;
       case SPT_CIRCLE:
-	tempgr->x2=(tempg0->x2*t0+tempg1->x2*t1)>>32;
-	tempgr->x1=(tempg0->x1*t0+tempg1->x1*t1)>>32;
-	tempgr->y1=(tempg0->y1*t0+tempg1->y1*t1)>>32;
+	tempgr->pr.radius=(tempg0->pr.radius*t0+tempg1->pr.radius*t1)>>32;
+	tempgr->pr.x1=(tempg0->pr.x1*t0+tempg1->pr.x1*t1)>>32;
+	tempgr->pr.y1=(tempg0->pr.y1*t0+tempg1->pr.y1*t1)>>32;
 	break;
       case SPT_ELLIPSE:
       case SPT_POLYGON:
-	tempgr->x2=(tempg0->x2*t0+tempg1->x2*t1)>>32;
-	tempgr->y2=(tempg0->y2*t0+tempg1->y2*t1)>>32;
-	tempgr->width=(tempg0->width*t0+tempg1->width*t1)>>32;
-	tempgr->height=(tempg0->height*t0+tempg1->height*t1)>>32;
+	tempgr->pwha.x1=(tempg0->pwha.x1*t0+tempg1->pwha.x1*t1)>>32;
+	tempgr->pwha.y1=(tempg0->pwha.y1*t0+tempg1->pwha.y1*t1)>>32;
+	tempgr->pwha.width =(tempg0->pwha.width *t0+tempg1->pwha.width*t1)>>32;
+	tempgr->pwha.height=(tempg0->pwha.height*t0+tempg1->pwha.height*t1)>>32;
 	break;
       case SPT_BITMAP:
-	tempgr->x2=(tempg0->x2*t0+tempg1->x2*t1)>>32;
-	tempgr->y2=(tempg0->y2*t0+tempg1->y2*t1)>>32;
+	tempgr->pwhu.x1=(tempg0->pwhu.x1*t0+tempg1->pwhu.x1*t1)>>32;
+	tempgr->pwhu.y1=(tempg0->pwhu.y1*t0+tempg1->pwhu.y1*t1)>>32;
 	break;
       case SPT_POLYLINE:
-	ptr0=&tempg0->y1;
-	ptr1=&tempg1->y1;
-	ptrr=&tempgr->y1;
-	for (i=0;i<tempg0->num;i++) {
+	ptr0=&tempg0->nu.u;
+	ptr1=&tempg1->nu.u;
+	ptrr=&tempgr->nu.u;
+	for (i=0;i<tempg0->nu.num;i++) {
 	  ptrr[i<<1]=(ptr0[i<<1]*t0+ptr1[i<<1]*t1)>>32;
 	  ptrr[i<<1+1]=(ptr0[i<<1+1]*t0+ptr1[i<<1+1]*t1)>>32;
 	}
 	break;
       case SPT_POLYPT:
-	ptr0=&tempg0->y1;
-	ptr1=&tempg1->y1;
-	ptrr=&tempgr->y1;
-	ptrr[0]=(ptr0[0]*t0+ptr1[0]*t1)>>32;
-	ptrr[1]=(ptr0[1]*t0+ptr1[1]*t1)>>32;
+	tempgr->npu.x=(tempg0->npu.x*t0+tempg1->npu.x*t1)>>32;
+	tempgr->npu.y=(tempg0->npu.y*t0+tempg1->npu.y*t1)>>32;
 	break;
       case SPT_BSPLINE2:
       case SPT_BSPLINE3:
       case SPT_BSPLINE2_CLOSED:
       case SPT_BSPLINE3_CLOSED:
-	p0=&tempg0->y1;
-	p1=&tempg1->y1;
-	pr=&tempgr->y1;
-	for (i=0;i<tempg0->num;i++) {
+	p0=&tempg0->nu.u;
+	p1=&tempg1->nu.u;
+	pr=&tempgr->nu.u;
+	for (i=0;i<tempg0->nu.num;i++) {
 	  pr[i].x=(p0[i].x*t0+p1[i].x*t1)>>32;
 	  pr[i].y=(p0[i].y*t0+p1[i].y*t1)>>32;
 	  pr[i].z=(p0[i].z*t0+p1[i].z*t1)>>32;
 	}
 	break;
       case SPT_MESH:
-	p0=&tempg0->x2;
-	p1=&tempg1->x2;
-	pr=&tempgr->x2;
-	for (i=0;i<tempg0->vertex_cnt;i++) {
+	p0=&tempg0->mu.u;
+	p1=&tempg1->mu.u;
+	pr=&tempgr->mu.u;
+	for (i=0;i<tempg0->mu.vertex_cnt;i++) {
 	  pr[i].x=(p0[i].x*t0+p1[i].x*t1)>>32;
 	  pr[i].y=(p0[i].y*t0+p1[i].y*t1)>>32;
 	  pr[i].z=(p0[i].z*t0+p1[i].z*t1)>>32;
 	}
 	break;
       case SPT_SHIFTABLE_MESH:
-	p0=(&tempg0->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	p1=(&tempg1->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	pr=(&tempgr->shiftable_tri_cnt)(U8 *)+sizeof(I32);
-	for (i=0;i<tempg0->shiftable_vertex_cnt;i++) {
+	p0=&tempg0->pmu.u;
+	p1=&tempg1->pmu.u;
+	pr=&tempgr->pmu.u;
+	for (i=0;i<tempg0->pmu.vertex_cnt;i++) {
 	  pr[i].x=(p0[i].x*t0+p1[i].x*t1)>>32;
 	  pr[i].y=(p0[i].y*t0+p1[i].y*t1)>>32;
 	  pr[i].z=(p0[i].z*t0+p1[i].z*t1)>>32;

@@ -1,6 +1,6 @@
 #help_index "Games"
 
-Cd("/Apps/AfterEgypt");;
+Cd(__DIR__);;
 #include "Comics"
 #include "/Demo/Graphics/Camp"
 #include "/Demo/MultiCore/Clouds"
@@ -9,15 +9,15 @@ Cd("/Apps/AfterEgypt");;
 #include "Battle"
 #include "WaterRock"
 #include "Quail"
-#include "Horeb1"
+#include "HorebA"
 
 #if mp_cnt>=4
-  #include "Horeb2MP"
+  #include "HorebBMP"
 #else
-  #include "Horeb2SP"
+  #include "HorebBSP"
 #endif
 
-#include "Horeb3"
+#include "HorebC"
 #include "GodTalking"
 #include "AfterEgypt"
 

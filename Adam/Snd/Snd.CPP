@@ -13,7 +13,7 @@ public U0 SndTaskEndCB()
   Exit;
 }
 
-#include "MathAudio"
-#include "Music"
+#include "SndMath"
+#include "SndMusic"
 #include "SndEffects"
 #include "SndFile"

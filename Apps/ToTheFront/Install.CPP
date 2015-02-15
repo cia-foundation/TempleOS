@@ -1,2 +1,2 @@
-MkDir("HOME/ToTheFront");
+MkDir("::/Home/ToTheFront");
 

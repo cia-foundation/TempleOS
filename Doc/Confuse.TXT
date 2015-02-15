@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
-* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"121,847",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"10.9",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.
+* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"121,138",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"11.0",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.
 
 * TempleOS does not execute code not written by me and any time except for a few $FG,2$BIOS$FG$ calls for configuration.
 
@@ -28,7 +28,7 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 * Files with names ending in $FG,2$.Z$FG$ are compressed, not encrypted.  $LK,"Copy",A="MN:Copy"$() or rename them with $LK,"Move",A="MN:Move"$() to store them uncompressed.
 
-* TempleOS is open src and every bit of the src code is included in the distro.  Use $LK,"MakeOSPrtBootInstall",A="MN:MakeOSPrtBootInstall"$() to compile the kernel and compiler.
+* TempleOS is open src and every bit of the src code is included in the distro.  Use $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() to compile the kernel and compiler.
 
 * TempleOS does not use object files or a linker. 
 
@@ -38,9 +38,7 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 * No application has a lock on the speaker so apps can interfere with each other and TempleOS makes speaker noise during disk access on purpose.
 
-* During boot, TempleOS reads-in all text files and collects statistic on them.  It makes a sparse matrix containing the frequency each word was followed by each other word.  This makes it able to predict the next word while you type.  This feature is called $FG,2$WordStat$FG$.
-
-* There are no mem leaks.  TempleOS allocates mem as more items are displayed on the screen.  TempleOS allocates mem for code as it is compiled at the cmd line.  If you $FG,2$#include$FG$ a file twice, it allocates more mem for it.  If you have a 50,000 line program with each line taking twenty bytes on a machine with 1 Gig, you could $FG,2$#include$FG$ it a thousand times if it had no data or graphics and no other use of mem.  Code entered at the cmd line gets allocated and persists.  I don't want to hear any bullshit about leaks unless you actually run-out.  If it bothers you, hit $FG,2$<CTRL-ALT-x>$FG$ and $FG,2$<CTRL-ALT-e>, $FG$periodically$FG$.  Use the pop-up flag on macros in your menu to spawn new tasks, run applications and free the applications when they are finished and everything will be fine.  Small mem chunks stick to the task when they are freed until it is killed.  The only way to get in trouble involves allocating multiple Meg chunks and freeing them.  These can only be reused if the same size gets allocated again.  Use $LK,"HeapLog",A="MN:HeapLog"$() and $LK,"HeapLogRep",A="MN:HeapLogRep"$() to see who allocated mem and didn't free it.
+* There are no mem leaks.  TempleOS alllocs mem as more items are displayed on the screen.  TempleOS alllocs mem for code as it is compiled at the cmd line.  If you $FG,2$#include$FG$ a file twice, it alllocs more mem for it.  If you have a 50,000 line program with each line taking twenty bytes on a machine with 1 Gig, you could $FG,2$#include$FG$ it a thousand times if it had no data or graphics and no other use of mem.  Code entered at the cmd line gets alloced and persists.  I don't want to hear any bullshit about leaks unless you actually run-out.  If it bothers you, hit $FG,2$<CTRL-ALT-x>$FG$ and $FG,2$<CTRL-ALT-e>, $FG$periodically$FG$.  Use the pop-up flag on macros in your menu to spawn new tasks, run applications and free the applications when they are finished and everything will be fine.  Small mem chunks stick to the task when they are freed until it is killed.  The only way to get in trouble involves allocating multiple Meg chunks and freeing them.  These can only be reused if the same size gets alloced again.  Use $LK,"HeapLog",A="MN:HeapLog"$() and $LK,"HeapLogRep",A="MN:HeapLogRep"$() to see who alloced mem and didn't free it.
 
 * The editor periodically takes a snap-shot for $FG,2$UNDO$FG$ and this looks like a memory leak.
 

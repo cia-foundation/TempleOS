@@ -4,13 +4,13 @@ $FG,5$User Skills Required$FG$
 * Knowledge of the $FG,2$C$FG$ programming language.
 
 $FG,5$Supported Hardware$FG$
-*  $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatible computer.  (Obviously, you need 64-bit hardware for a 64-bit operating system.)
+* $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatible computer.  (Obviously, you need 64-bit hardware for a 64-bit operating system.)
 
 * 640x480 16 color VGA graphics.
 
 * Most$FG$ keyboards and mice.
 
-* Minimum 256 Meg RAM; Maximum $TX,"128 Gig",D="DD_MAPPED_MEM_SPACE_GIG"$ RAM (easily increased).
+* Minimum $TX,"512 Meg",D="DD_MEM_MIN_MEG"$ RAM; Maximum $TX,"128 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ RAM (easily increased).
 
 * Internal PC Speakers.
 

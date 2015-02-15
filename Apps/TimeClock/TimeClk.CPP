@@ -1,4 +1,4 @@
-#define TIME_FILENAME	"HOME/TimeClock/TimeFile.DAT.Z"
+#define TIME_FILENAME	"::/Home/TimeClock/TimeFile.DAT.Z"
 
 #define TET_EOF		0
 #define TET_PUNCH_IN	1
@@ -20,7 +20,7 @@ U0 TimeFileRead(TimeEntry *header)
   buf=FileRead(TIME_FILENAME);
   if (!buf)
     buf=CAlloc(1);
-  header->next=header->last=header;
+  QueInit(header);
   ptr=buf;
   while (type=*ptr++) {
     tempt=CAlloc(sizeof(TimeEntry));
@@ -116,10 +116,8 @@ public Bool TimeRep(TimeEntry **_header=NULL)
 
 public U0 PunchOut()
 {
-  Bool is_in;
   TimeEntry *tempt,*header;
-  is_in=TimeRep(&header);
-  if (!is_in)
+  if (!TimeRep(&header))
     "$$BK,1$$Already Punched-Out$$BK,0$$\n";
   else {
     tempt=MAlloc(sizeof(TimeEntry));
@@ -136,10 +134,8 @@ public U0 PunchOut()
 
 public U0 PunchIn()
 {
-  Bool is_in;
   TimeEntry *tempt,*header;
-  is_in=TimeRep(&header);
-  if (is_in)
+  if (TimeRep(&header))
     "$$BK,1$$Already Punched-In$$BK,0$$\n";
   else {
     tempt=MAlloc(sizeof(TimeEntry));

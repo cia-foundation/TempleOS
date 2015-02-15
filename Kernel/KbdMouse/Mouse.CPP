@@ -127,7 +127,7 @@ Bool MouseRst()
   return result;
 }
 
-U0 SetMouseSpeed()
+U0 MouseSpeedSet()
 {
   I64 dd,temp;
   if ((dd=SqrI64(mouse_last.pos.x-mouse.pos.x)+SqrI64(mouse_last.pos.y-mouse.pos.y)) &&
@@ -164,7 +164,7 @@ U0 MouseUpdatePost()
 
   if (mouse.pos.x!=mouse_last.pos.x || mouse.pos.y!=mouse_last.pos.y || mouse.pos.z!=mouse_last.pos.z) {
     mouse.evt=TRUE;
-    SetMouseSpeed;
+    MouseSpeedSet;
   } else
     for (i=0;i<5;i++)
       if (mouse.buttons[i]!=mouse_last.buttons[i]) {
@@ -210,7 +210,7 @@ U0 MouseHandler()
   MouseUpdatePost;
 }
 
-U0 SetMouseIP(I64 x,I64 y,I64 z,I64 l,I64 r)
+U0 MouseIPSet(I64 x,I64 y,I64 z,I64 l,I64 r)
 {
   mouse.timestamp=GetTSC;
   MouseUpdatePre;

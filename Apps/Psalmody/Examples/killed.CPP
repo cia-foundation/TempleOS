@@ -13,7 +13,7 @@ U0 Song()
 	Play("qBsEGeBDe.AsCeA2qF3sBBeACBBsBB",
 		"I'm \0not \0 \0 \0spry.\n\0 \0 \0 \0 \0 \0 \0 \0I \0best \0chill.\n\0 \0 \0");
 	Play("eDDsGFGFeEBqGM5/4",
-		"If \0 \0God \0 \0 \0 \0 \0 \0ask,\n\0");
+		"If \0 \0God \0 \0 \0 \0 \0 \0asked,\n\0");
 	Play("eBGF4A3e.FsEqAAM4/4",
 		" \0\"$$RED$$Can \0 \0 \0you \0 \0Kill?$$FG$$\"\n\0 \0");
 	Play("eDDsGFGFeEBqGM5/4",

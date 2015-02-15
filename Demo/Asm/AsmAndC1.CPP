@@ -17,7 +17,7 @@ _BEEPS::
 //You can always clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
 	PUSH	RBP
 	MOV	RBP,RSP
-	MOV	RCX,U64 SF_ARG1[RBP]  //$LK,"SF_ARG1",A="FF:::/Kernel/Adam1a.HPP,SF_ARG1"$
+	MOV	RCX,U64 SF_ARG1[RBP]  //$LK,"SF_ARG1",A="FF:::/Kernel/KernelA.HPP,SF_ARG1"$
 
 @@05:	PUSH	RCX
 //U0 $LK,"Beep",A="MN:Beep"$(I64 freq=500,Bool busy=FALSE)

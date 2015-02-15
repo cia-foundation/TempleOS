@@ -13,8 +13,8 @@ U0 Song()
 	  "$LK,"John,13:14",A="BF:John,13:14"$\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       "$$GREEN$$Jesus talking...\n$$FG$$";
       Play("M6/8");

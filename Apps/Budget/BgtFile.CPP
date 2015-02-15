@@ -48,26 +48,28 @@ U0 BgtDataRead()
 
 U0 BgtDataWrite()
 {
-  I64 size,cnt1,cnt2;
-  CHashTable	*table=HashTableNew(0x1000);
+  I64 i,num=0,size,cnt1,cnt2;
+  CHashTable	*table=HashTableNew(1024);
   CBgtEntry	*tempb;
   CBgtTemplate	*tempt;
   CHashGeneric *temph;
   U8 *buf,*ptr;
 
-  temph=accts_table->next_added;
-  while (temph!=accts_table) {
-    StrFileAdd(temph->str,table); //Make so accts come first. (Cosmetic)
-    temph=temph->next_added;
+  for (i=0;i<=accts_table->mask;i++) {
+    temph=accts_table->body[i];
+    while (temph) {
+      StrFileAdd(temph->str,&num,table); //Cosmetics -- make accts appear first.
+      temph=temph->next;
+    }
   }
 
   tempb=b_root.next;
   cnt1=0;
   while (tempb!=&b_root) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
-      tempb->credit_index	=StrFileAdd(tempb->credit,table);
-      tempb->debit_index	=StrFileAdd(tempb->debit,table);
-      tempb->desc_index		=StrFileAdd(tempb->desc,table);
+      tempb->credit_index	=StrFileAdd(tempb->credit,&num,table);
+      tempb->debit_index	=StrFileAdd(tempb->debit,&num,table);
+      tempb->desc_index		=StrFileAdd(tempb->desc,&num,table);
       cnt1++;
     }
     tempb=tempb->next;
@@ -76,9 +78,9 @@ U0 BgtDataWrite()
   tempt=t_root.next;
   cnt2=0;
   while (tempt!=&t_root) {
-    tempt->b.credit_index	=StrFileAdd(tempt->b.credit,table);
-    tempt->b.debit_index	=StrFileAdd(tempt->b.debit,table);
-    tempt->b.desc_index		=StrFileAdd(tempt->b.desc,table);
+    tempt->b.credit_index	=StrFileAdd(tempt->b.credit,&num,table);
+    tempt->b.debit_index	=StrFileAdd(tempt->b.debit,&num,table);
+    tempt->b.desc_index		=StrFileAdd(tempt->b.desc,&num,table);
     cnt2++;
     tempt=tempt->next;
   }
@@ -134,4 +136,5 @@ U0 BgtDel()
   }
   StrFileDel(accts_table);
   accts_table=NULL;
+  accts_table_strs=0;
 }

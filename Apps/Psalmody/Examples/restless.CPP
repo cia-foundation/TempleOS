@@ -9,8 +9,8 @@ U0 Song()
   try {
     task=PopUpViewPrint("$LK,"Ecclesiastes,5:12",A="BF:Ecclesiastes,5:12"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("3sDDDACCADDACCAe.DsCCC2G3FD2G3FD2G3CCAe.D",
 	    "I \0 \0 \0 \0got \0 \0 \0paid, \0 \0 \0to\0 \0 \0day.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");

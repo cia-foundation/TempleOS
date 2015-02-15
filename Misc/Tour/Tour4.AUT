@@ -7,27 +7,28 @@ Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
 "//";
 
-PopUpOk(
-"Now, we'll add a link to a file.\n"
-"using the $$GREEN$$<F4>$$FG$$ filename chooser.\n");
+TourPut(
+"Now, we'll add a link to a file using the $$GREEN$$<F4>$$FG$$ filename chooser.\n",
+TRUE);
 
 '' CH_CTRLL;
-Sleep(1500);
-'' CH_SPACE;
-Sleep(1500);
-'' CH_SPACE;
-Sleep(1000);
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
 Sleep(2000);
+'' CH_SPACE;
+Sleep(1500);
+'' CH_SPACE;
+Sleep(1500);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
+Sleep(1500);
 
-PopUpOk(
-"Press $$GREEN$$<F4>$$FG$$.  Pick any\n"
-"file and press $$GREEN$$<ESC>$$FG$$.");
+TourPut(
+"Press $$GREEN$$<F4>$$FG$$ for the file chooser.  Then, "
+"pick a file and press $$GREEN$$<ESC>$$FG$$.");
 AFGetKey(SC_F4);
-PopUpOk("Press $$GREEN$$<ESC>$$FG$$.\n");
+Sleep(5000);
+TourPut("Press $$GREEN$$<ESC>$$FG$$ to exit the form.\n");
 AFGetChar(CH_ESC);
 
-PopUpOk("$$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
 AFGetChar(CH_SHIFT_ESC);
 
-PopUpOk("$$GREEN$$<SHIFT F4>$$FG$$ to pick directories.\n");
+TourPut("Use $$GREEN$$<SHIFT F4>$$FG$$ to pick directories.\n",TRUE);

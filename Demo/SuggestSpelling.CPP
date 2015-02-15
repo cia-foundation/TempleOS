@@ -22,14 +22,14 @@ U8 *SuggestMatchForm(U8 *src)
 }
 
 /*Fmt of word lst entry:
-  U8 WSD_WORD_CHAR
+  U8 ACD_WORD_CHAR
   U8 word[] with terminating zero
-  I16 block; //definition offset in ::/Adam/WordStat/WSDefs.DAT
+  I16 block; //definition offset in ::/Adam/AutoComplete/ACDefs.DAT
 */
 
 U0 SuggestSpelling(U8 *word)
 {
-  U8 *dict=wsd.word_lst,
+  U8 *dict=acd.word_lst,
      *pf=SuggestMatchForm(word),
      *wf;
   I64 len=StrLen(pf),
@@ -69,15 +69,15 @@ U0 SuggestSpellingDemo()
 
 U0 CtrlAltL(I64)
 {
-//$LK,"ws.cur_word",A="MN:CWordStatGlbls"$ is only set if WordStat
+//$LK,"ac.cur_word",A="MN:CAutoCompleteGlbls"$ is only set if AutoComplete
 //is running.
-  PopUp("SuggestSpelling(ws.cur_word);View;");
+  PopUp("SuggestSpelling(ac.cur_word);View;");
 }
 
 if (Fs!=adam_task)
   SuggestSpellingDemo;
 else {
-  SetCtrlAltLetCB('L',&CtrlAltL,"Cmd/Suggest Spelling");
+  CtrlAltLetCBSet('L',&CtrlAltL,"Cmd/Suggest Spelling");
 //Appears in the Adam Task Window
   "<CTRL-ALT-l> installed\n";
 }

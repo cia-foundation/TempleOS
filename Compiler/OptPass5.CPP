@@ -10,12 +10,12 @@ U0 OptPass5(CLex *lx)
   while (code=tempi->ic_code) {
     if (code>IC_NOP2) {
       if (tempi->ic_flags&ICF_TRACE) {
-	if (Bt(&lx->pass_trace_mask,5)) {
+	if (Bt(&lx->otrace_mask,5)) {
 	  "%2d:",ps->ptr;
-	  ICPut(tempi);
+	  ICPut(lx,tempi);
 	}
       }
-      if (cmp.arg_cnt[code]==9)
+      if (intermediate_code_table[code].arg_cnt==IS_V_ARG)
 	ps->ptr-=tempi->ic_data>>3;
       if (code==IC_PUSH_REGS) {
 	for (i=0;i<NUM_REGS;i++)
@@ -110,7 +110,7 @@ U0 OptPass5(CLex *lx)
 	  OptSetNOP2(tempi1);
 	}
       }
-      if (tempi->r.type&TY_MASK==TY_STK)
+      if (tempi->r.type&TY_MASK==TY_STK && !(tempi->ic_flags&ICF_NO_DEPEND_RESULT))
 	PrsPush(ps,tempi);
     }
     tempi=tempi->next;

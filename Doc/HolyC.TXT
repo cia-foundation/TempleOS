@@ -14,7 +14,7 @@ $FG,2$	U0	void, but ZERO size!
 	I32	int
 	U32	unsigned int
 	I64	long (64-bit)
-	I64	unsigned long (64-bit)
+	U64	unsigned long (64-bit)
 	F64	double$FG$
 	$FG,4$no F32 float.$FG$
 
@@ -182,7 +182,7 @@ $FG$$ID,-2$
 
 * There is no question-colon operator.
 
-* TempleOS $LK,"operator precedence",A="FF:::/Compiler/CmpInit.CPP,cmp.binary_ops"$
+* TempleOS $LK,"operator precedence",A="FF:::/Compiler/CInit.CPP,cmp.binary_ops"$
   $FG,2$`$FG$,$FG,2$>>$FG$,$FG,2$<<$FG$
   $FG,2$*$FG$,$FG,2$/$FG$,$FG,2$%$FG$
   $FG,2$&$FG$
@@ -212,7 +212,7 @@ $FG$$ID,-2$
 
 * "$FG,2$$$$FG$" is an escape character.  Two dollar signs signify an ordinary $$.  See $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$.  In $FG,2$asm$FG$ or $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ code, it also refers to the instruction's address or the offset in a $FG,2$class$FG$ definition. 
 
-* $FG,2$union$FG$ is more like a class, so you don't reference it with a $FG,2$union$FG$ label after you define it.  Some common unions are declared in $LK,"Adam1a.HPP",A="MN:U16"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.  See $LK,"::/Demo/SubIntAccess.CPP"$. 
+* $FG,2$union$FG$ is more like a class, so you don't reference it with a $FG,2$union$FG$ label after you define it.  Some common unions are declared in $LK,"KernelA.HPP",A="MN:U16"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.  See $LK,"::/Demo/SubIntAccess.CPP"$. 
 
 * $FG,2$class$FG$ member vars can have meta data. $FG,2$fmtstr$FG$ and $FG,2$fmtdata$FG$ are two meta data types now used.  All compiler structures are saved and you can access the compiler's info about classes and vars.  See $LK,"::/Demo/ClassMeta.CPP"$ and  $LK,"DocFormDo",A="MN:DocFormDo"$().
 
@@ -226,7 +226,7 @@ $FG$$ID,-2$
 
 * $FG,2$lock{}$FG$ can be used to apply asm $FG,2$LOCK$FG$ prefixes to code for safe multicore read-modify-write accesses.  The code bracked with have $FG,2$LOCK$FG$ asm prefix's applied to relevant instructions within.  It's a little shoddy.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
 
-* There is a function called $LK,"MSize",A="MN:MSize"$() which gives the size of an object allocated off the heap.  For larger size allocations, the system rounds-up to a power of two, so $FG,2$MSize()$FG$ lets you know the real size and you can take full advantage of it.
+* There is a function called $LK,"MSize",A="MN:MSize"$() which gives the size of an object alloced off the heap.  For larger size allocations, the system rounds-up to a power of two, so $FG,2$MSize()$FG$ lets you know the real size and you can take full advantage of it.
 
 * You can $LK,"Free",A="MN:Free"$() a $FG,2$NULL$FG$ ptr.  Useful variants of $LK,"MAlloc",A="MN:MAlloc"$() can be found $LK,"Here",A="MN:CAlloc"$.  Each task has a heap and you can $FG,2$MAlloc$FG$ and $FG,2$Free$FG$ off of other task's heaps, or make an independent heap with $LK,"HeapCtrlBPInit",A="MN:HeapCtrlBPInit"$().
 

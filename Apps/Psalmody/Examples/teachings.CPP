@@ -9,8 +9,8 @@ U0 Song()
   try {
     task=PopUpViewPrint("$LK,"Proverbs,11:25",A="BF:Proverbs,11:25"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("2eG3CDAqEsACACGEGEqDsAAAAetCDD",
 	    "Ple\0ase \0te\0ach \0me.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");

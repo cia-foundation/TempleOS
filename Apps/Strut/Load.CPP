@@ -1,6 +1,6 @@
 #help_index "Games"
 
-Cd("/Apps/Strut");;
+Cd(__DIR__);;
 #include "Strut"
 
 #help_index ""

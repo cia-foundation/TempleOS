@@ -17,7 +17,7 @@ class CFileSND
 #define MAX_SND_FILE_DATA	0x7FFFFF00
 
 public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=0.0,I64 waveform=WF_SQUARE,
-  F64 reverb_delay=0,F64 reverb_intensity=0)
+  F64 reverb_delay=0,F64 reverb_intensity=0,F64 time_shift=0)
 {//Use "snd.record" flag to start or stop recording, then call this routine.
 //Averaging should be a num from 0.0 to 0.999.
 //Vol should be from 0.0 to 1.0.
@@ -45,6 +45,20 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
   s->coding=EndianU32(3);
   s->sample_rate=EndianU32(SNDFILE_SAMPLE_RATE);
   s->channels=EndianU32(1);
+
+  if (time_shift) {
+    d=snd.record_root.next;
+    d->time-=time_shift;
+    while (d->next!=&snd.record_root) {
+      d1=d->next;
+      dt=d1->time-d->time;
+      if (dt<0) {
+	QueRem(d1);
+	Free(d1);
+      } else
+	break;
+    }
+  }
 
   d=snd.record_root.next;
   k=0;

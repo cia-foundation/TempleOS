@@ -12,11 +12,11 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
   switch (tempg->type) {
     case SPT_COLOR:
       DocPrint(doc,"{%s}",
-	Color2Str(buf1,tempg->color));
+	Color2Str(buf1,tempg->c.color));
       break;
     case SPT_DITHER_COLOR:
       DocPrint(doc,"{%s}",
-	Color2Str(buf2,ROPF_DITHER|tempg->dither_color.u8[0]|tempg->dither_color.u8[1]<<COLORROP_BITS));
+	Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|tempg->d.dither_color.u8[1]<<COLORROP_BITS));
       break;
     case SPT_TRANSFORM_ON:
       DocPrint(doc,"{ON}");
@@ -27,55 +27,53 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
     case SPT_LINE:
     case SPT_ARROW:
     case SPT_PLANAR_SYMMETRY:
-      DocPrint(doc,"{(%d,%d),(%d,%d)}",tempg->x1,tempg->y1,tempg->x2,tempg->y2);
+      DocPrint(doc,"{(%d,%d),(%d,%d)}",tempg->pp.x1,tempg->pp.y1,tempg->pp.x2,tempg->pp.y2);
       break;
     case SPT_RECT:
-      DocPrint(doc,"{(%d,%d):(%d,%d)}",tempg->x1,tempg->y1,
-	tempg->x2-tempg->x1,tempg->y2-tempg->y1);
+      DocPrint(doc,"{(%d,%d):(%d,%d)}",tempg->pp.x1,tempg->pp.y1,
+	tempg->pp.x2-tempg->pp.x1,tempg->pp.y2-tempg->pp.y1);
       break;
     case SPT_ROTATED_RECT:
-      DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->x1,tempg->y1,
-	tempg->x2-tempg->x1,tempg->y2-tempg->y1,
-	180/ã*Wrap(tempg->rot_angle));
+      DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->ppa.x1,tempg->ppa.y1,
+	tempg->ppa.x2-tempg->ppa.x1,tempg->ppa.y2-tempg->ppa.y1,
+	180/ã*Wrap(tempg->ppa.angle));
       break;
     case SPT_PT:
     case SPT_FLOOD_FILL:
     case SPT_SHIFT:
-      DocPrint(doc,"{(%d,%d)}",tempg->x1,tempg->y1);
+      DocPrint(doc,"{(%d,%d)}",tempg->p.x1,tempg->p.y1);
       break;
     case SPT_FLOOD_FILL_NOT:
-      DocPrint(doc,"{(%d,%d),TRUE}",tempg->x1,tempg->y1);
+      DocPrint(doc,"{(%d,%d),TRUE}",tempg->p.x1,tempg->p.y1);
       break;
     case SPT_CIRCLE:
-      DocPrint(doc,"{(%d,%d):%d}",tempg->x1,tempg->y1,tempg->x2);
+      DocPrint(doc,"{(%d,%d):%d}",tempg->pr.x1,tempg->pr.y1,tempg->pr.radius);
       break;
     case SPT_WIDTH:
-      DocPrint(doc,"{%d}",tempg->width);
+      DocPrint(doc,"{%d}",tempg->w.width);
       break;
     case SPT_ELLIPSE:
-      DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->x2,tempg->y2,
-	tempg->width,tempg->height,180/ã*Wrap(tempg->rot_angle));
+      DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->pwha.x1,tempg->pwha.y1,
+	tempg->pwha.width,tempg->pwha.height,180/ã*Wrap(tempg->pwha.angle));
       break;
     case SPT_POLYGON:
-      DocPrint(doc,"{%d,(%d,%d):(%d,%d),%0.4f}",tempg->sides,tempg->x2,tempg->y2,
-	tempg->width,tempg->height,180/ã*Wrap(tempg->rot_angle));
+      DocPrint(doc,"{%d,(%d,%d):(%d,%d),%0.4f}",tempg->pwhas.sides,
+	tempg->pwhas.x1,tempg->pwhas.y1,tempg->pwhas.width,tempg->pwhas.height,
+	180/ã*Wrap(tempg->pwhas.angle));
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      DocPrint(doc,"{(%d,%d),\"%Q\"}",tempg->x1,tempg->y1,tempg->st);
+      DocPrint(doc,"{(%d,%d),\"%Q\"}",tempg->ps.x1,tempg->ps.y1,tempg->ps.st);
       break;
     case SPT_POLYLINE:
-      ptr=&tempg->y1;
-      DocPrint(doc,"{(%d,%d)",ptr[0],ptr[1]);
-      if (tempg->num>1) DocPrint(doc,",");
-      ptr+=2;
-      for (i=1;i<tempg->num;i++) {
+      ptr=&tempg->nu.u;
+      DocPrint(doc,"{");
+      for (i=0;i<tempg->nu.num;i++,ptr+=2) {
 	DocPrint(doc,"(%d,%d)",ptr[0],ptr[1]);
-	if (i+1<tempg->num) DocPrint(doc,",");
-	if (i&3==3 && i+1<tempg->num)
+	if (i+1<tempg->nu.num) DocPrint(doc,",");
+	if (i&3==3 && i+1<tempg->nu.num)
 	  DocPrint(doc,"\n");
-	ptr+=2;
       }
       DocPrint(doc,"}");
       break;
@@ -83,14 +81,12 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
     case SPT_BSPLINE3:
     case SPT_BSPLINE2_CLOSED:
     case SPT_BSPLINE3_CLOSED:
-      ptr=&tempg->y1;
-      DocPrint(doc,"{(%d,%d,%d)",ptr[0],ptr[1],ptr[2]);
-      ptr+=3;
-      if (tempg->num>1) DocPrint(doc,",");
-      for (i=1;i<tempg->num;i++,ptr+=3) {
+      ptr=&tempg->nu.u;
+      DocPrint(doc,"{");
+      for (i=0;i<tempg->nu.num;i++,ptr+=3) {
 	DocPrint(doc,"(%d,%d,%d)",ptr[0],ptr[1],ptr[2]);
-	if (i+1<tempg->num) DocPrint(doc,",");
-	if (i&3==3 && i+1<tempg->num)
+	if (i+1<tempg->nu.num) DocPrint(doc,",");
+	if (i&3==3 && i+1<tempg->nu.num)
 	  DocPrint(doc,"\n");
       }
       if (tempg->type==SPT_BSPLINE2||tempg->type==SPT_BSPLINE3)
@@ -99,13 +95,12 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
 	DocPrint(doc,",TRUE}");
       break;
     case SPT_POLYPT:
-      ptr=&tempg->y1;
-      DocPrint(doc,"{(%d,%d),",ptr[0],ptr[1]);
-      ptr+=2;
+      DocPrint(doc,"{(%d,%d),",tempg->npu.x,tempg->npu.y);
+      ptr=&tempg->npu.u;
       col=16;
-      for (i=0;i<tempg->num;i++) {
+      for (i=0;i<tempg->npu.num;i++) {
 	DocPrint(doc,"%d",BFieldExtU32(ptr,i*3,3));
-	if (++col>=64 && i+1<tempg->num) {
+	if (++col>=64 && i+1<tempg->npu.num) {
 	  DocPrint(doc,"\n");
 	  col=0;
 	}
@@ -113,23 +108,24 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       DocPrint(doc,"}");
       break;
     case SPT_BITMAP:
-      DocPrint(doc,"{(%d,%d):(%d,%d),\n",tempg->x2,tempg->y2,tempg->width,tempg->height);
-      width_internal=(tempg->width+7)&~7;
+      DocPrint(doc,"{(%d,%d):(%d,%d),\n",tempg->pwhu.x1,tempg->pwhu.y1,
+	tempg->pwhu.width,tempg->pwhu.height);
+      width_internal=(tempg->pwhu.width+7)&~7;
       if (width_internal<80)
 	k=width_internal;
       else
 	k=64;
-      ptr=tempg(U8 *)+offset(CSprite.linespeed);
+      ptr=&tempg->pwhu.u;
       col=0;
-      for (j=0;j<tempg->height;j++)
+      for (j=0;j<tempg->pwhu.height;j++)
 	for (i=0;i<width_internal;i++,ptr(U8 *)++) {
-	  if (i>=tempg->width)
+	  if (i>=tempg->pwhu.width)
 	    DocPrint(doc,"_");
 	  else if (*ptr(U8 *)<16)
 	    DocPrint(doc,"%X",*ptr(U8 *));
 	  else
 	    DocPrint(doc,"%c",CH_SHIFT_SPACE);
-	  if (++col>=k && (i+1<width_internal||j+1<tempg->height)) {
+	  if (++col>=k && (i+1<width_internal||j+1<tempg->pwhu.height)) {
 	    DocPrint(doc,"\n");
 	    col=0;
 	  }
@@ -138,11 +134,11 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       break;
     case SPT_MESH:
       DocPrint(doc,"{FALSE,");
-      p=(&tempg->tri_cnt)(U8 *)+sizeof(I32);
+      p=&tempg->mu.u;
       col=0;
-      for (i=0;i<tempg->vertex_cnt;i++,p++) {
+      for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
 	DocPrint(doc,"(%d,%d,%d)",p->x,p->y,p->z);
-	if (i+1<tempg->vertex_cnt) DocPrint(doc,",");
+	if (i+1<tempg->mu.vertex_cnt) DocPrint(doc,",");
 	if (++col==4) {
 	  DocPrint(doc,"\t//%d\n",i);
 	  col=0;
@@ -150,11 +146,11 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       }
       DocPrint(doc,":");
       tri=p;
-      for (i=0;i<tempg->tri_cnt;i++,tri++) {
+      for (i=0;i<tempg->mu.tri_cnt;i++,tri++) {
 	DocPrint(doc,"(%s,%d,%d,%d)",Color2Str(buf1,tri->color),
 	  tri->nums[0],tri->nums[1],tri->nums[2]);
-	if (i+1<tempg->tri_cnt) DocPrint(doc,",");
-	if (++col>=3 && i+1<tempg->tri_cnt) {
+	if (i+1<tempg->mu.tri_cnt) DocPrint(doc,",");
+	if (++col>=3 && i+1<tempg->mu.tri_cnt) {
 	  DocPrint(doc,"\n");
 	  col=0;
 	}
@@ -162,12 +158,12 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       DocPrint(doc,"}");
       break;
     case SPT_SHIFTABLE_MESH:
-      DocPrint(doc,"{TRUE,(%d,%d,%d):",tempg->x1,tempg->y1,tempg->z1);
-      p=(&tempg->shiftable_tri_cnt)(U8 *)+sizeof(I32);
+      DocPrint(doc,"{TRUE,(%d,%d,%d):",tempg->pmu.x,tempg->pmu.y,tempg->pmu.z);
+      p=&tempg->pmu.u;
       col=1;
-      for (i=0;i<tempg->shiftable_vertex_cnt;i++,p++) {
+      for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
 	DocPrint(doc,"(%d,%d,%d)",p->x,p->y,p->z);
-	if (i+1<tempg->shiftable_vertex_cnt) DocPrint(doc,",");
+	if (i+1<tempg->pmu.vertex_cnt) DocPrint(doc,",");
 	if (++col==4) {
 	  DocPrint(doc,"\t//%d\n",i);
 	  col=0;
@@ -175,11 +171,11 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       }
       DocPrint(doc,":");
       tri=p;
-      for (i=0;i<tempg->shiftable_tri_cnt;i++,tri++) {
+      for (i=0;i<tempg->pmu.tri_cnt;i++,tri++) {
 	DocPrint(doc,"(%s,%d,%d,%d)",Color2Str(buf1,tri->color),
 	  tri->nums[0],tri->nums[1],tri->nums[2]);
-	if (i+1<tempg->shiftable_tri_cnt) DocPrint(doc,",");
-	if (++col>=3 && i+1<tempg->shiftable_tri_cnt) {
+	if (i+1<tempg->pmu.tri_cnt) DocPrint(doc,",");
+	if (++col>=3 && i+1<tempg->pmu.tri_cnt) {
 	  DocPrint(doc,"\n");
 	  col=0;
 	}
@@ -217,9 +213,9 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	color=Str2ColorU32(st);
 	Free(st);
 	Lex(lx); //Skip color
-	g.color=color.c0.color;
+	g.c.color=color.c0.color;
 	if (color&ROPF_DITHER) {
-	  g.dither_color.u8[1]=color.c1.color;
+	  g.d.dither_color.u8[1]=color.c1.color;
 	  g.type=SPT_DITHER_COLOR;
 	} else
 	  g.type=SPT_COLOR;
@@ -237,25 +233,25 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       case SPT_PLANAR_SYMMETRY:
 	Lex(lx); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.x1);
+	LexD2I32(lx,&g.pp.x1);
 	if (lx->token!=',')
 	  LexExcept(lx,"expecting ',' at ");
 	Lex(lx); //Skip ,
-	LexD2I32(lx,&g.x2);
+	LexD2I32(lx,&g.pp.x2);
 	break;
       case SPT_RECT:
       case SPT_ROTATED_RECT:
 	Lex(lx); //Skip {
-	LexD2I32(lx,&g.x1);
+	LexD2I32(lx,&g.pp.x1);
 	if (lx->token!=':')
 	  LexExcept(lx,"expecting ':' at ");
 	Lex(lx); //Skip :
-	LexD2I32(lx,&g.x2);
-	g.x2+=g.x1;
-	g.y2+=g.y1;
+	LexD2I32(lx,&g.pp.x2);
+	g.ppa.x2+=g.pp.x1;
+	g.ppa.y2+=g.pp.y1;
 	if (lx->token==',') {
 	  Lex(lx); //Skip ,
-	  g.rot_angle=ã/180*LexExpressionF64(lx);
+	  g.ppa.angle=ã/180*LexExpressionF64(lx);
 	  g.type=SPT_ROTATED_RECT;
 	} else
 	  g.type=SPT_RECT;
@@ -264,12 +260,12 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       case SPT_SHIFT:
 	Lex(lx); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.x1);
+	LexD2I32(lx,&g.p.x1);
 	break;
       case SPT_FLOOD_FILL:
       case SPT_FLOOD_FILL_NOT:
 	Lex(lx); //Skip {
-	LexD2I32(lx,&g.x1);
+	LexD2I32(lx,&g.p.x1);
 	if (lx->token==',') {
 	  Lex(lx); //Skip ,
 	  i=LexExpressionI64(lx);
@@ -282,36 +278,35 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	break;
       case SPT_WIDTH:
 	Lex(lx); //Skip {
-	g.width=LexExpressionI64(lx);
+	g.w.width=LexExpressionI64(lx);
 	g.type=SPT_WIDTH;
 	break;
       case SPT_CIRCLE:
 	Lex(lx); //Skip {
 	g.type=SPT_CIRCLE;
-	LexD2I32(lx,&g.x1);
+	LexD2I32(lx,&g.pr.x1);
 	if (lx->token!=':')
 	  LexExcept(lx,"expecting ':' at ");
 	Lex(lx); //Skip :
-	g.x2=LexExpressionI64(lx);
+	g.pr.radius=LexExpressionI64(lx);
 	break;
       case SPT_POLYGON:
 	Lex(lx); //Skip {
-	g.sides=LexExpressionI64(lx);
+	g.pwhas.sides=LexExpressionI64(lx);
 	if (lx->token!=',')
 	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
       case SPT_ELLIPSE:
 	Lex(lx); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.x2);
+	LexD2I32(lx,&g.pwha.x1);
 	if (lx->token!=':')
 	  LexExcept(lx,"expecting ':' at ");
 	Lex(lx); //Skip :
-	LexD2I32(lx,&g.width);
+	LexD2I32(lx,&g.pwha.width);
 	if (lx->token!=',')
 	  LexExcept(lx,"expecting ',' at ");
 	Lex(lx); //Skip ,
-	g.rot_angle=ã/180*LexExpressionF64(lx);
+	g.pwha.angle=ã/180*LexExpressionF64(lx);
 	break;
     sub_switch_end:
       size=SpriteElemSize(&g)+offset(CSprite.start);
@@ -323,7 +318,7 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
     case SPT_TEXT_DIAMOND:
       Lex(lx); //Skip {
       g.type=type;
-      LexD2I32(lx,&g.x1);
+      LexD2I32(lx,&g.ps.x1);
       if (lx->token!=',')
 	LexExcept(lx,"expecting ',' at ");
       if (Lex(lx)==TK_STR)  //Skip ,
@@ -345,17 +340,16 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	tempp=CAlloc(sizeof(CQueD3I32));
 	LexD2I32(lx,&tempp->p);
 	QueIns(tempp,rootp.last);
-	g.num++;
+	g.nu.num++;
 	if (lx->token==',')
 	  Lex(lx); //Skip ,
       }
-      if (!g.num)
+      if (g.nu.num<2)
 	LexExcept(lx,"expecting point at ");
       size=SpriteElemQuedBaseSize(SPT_POLYLINE);
-      i=g.num*sizeof(CD2I32);
-      result=MAlloc(size+i);
+      result=MAlloc(size+g.nu.num*sizeof(CD2I32));
       MemCpy(result,&g,size);
-      ptr=&result->y1;
+      ptr=&result->nu.u;
       tempp=rootp.next;
       while (tempp!=&rootp) {
 	tempa1=tempp->next;
@@ -375,15 +369,14 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	tempp=CAlloc(sizeof(CQueD3I32));
 	LexD3I32(lx,&tempp->p);
 	QueIns(tempp,rootp.last);
-	g.num++;
+	g.nu.num++;
 	if (lx->token==',')
 	  Lex(lx); //Skip ,
       }
-      if (!g.num)
+      if (g.nu.num<2)
 	LexExcept(lx,"expecting point at ");
       size=SpriteElemQuedBaseSize(type);
-      i=g.num*sizeof(CD3I32);
-      result=MAlloc(size+i);
+      result=MAlloc(size+g.nu.num*sizeof(CD3I32));
       if (LexExpressionI64(lx)) {
 	if (type==SPT_BSPLINE2||type==SPT_BSPLINE2_CLOSED)
 	  g.type=SPT_BSPLINE2_CLOSED;
@@ -396,7 +389,7 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	  g.type=SPT_BSPLINE3;
       }
       MemCpy(result,&g,size);
-      ptr=&result->y1;
+      ptr=&result->nu.u;
       tempp=rootp.next;
       while (tempp!=&rootp) {
 	tempa1=tempp->next;
@@ -408,7 +401,7 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       break;
     case SPT_POLYPT:
       Lex(lx); //Skip {
-      LexD2I32(lx,&g.y1);
+      LexD2I32(lx,&g.npu.x);
       if (lx->token!=',')
 	LexExcept(lx,"expecting ',' at ");
       tempv=QueVectU8New;
@@ -418,27 +411,26 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	if (i=='}')
 	  break;
 	if ('0'<=i<='7')
-	  QueVectU8Put(tempv,g.num++,i-'0');
+	  QueVectU8Put(tempv,g.npu.num++,i-'0');
       }
       Bts(&lx->flags,Lf_USE_LAST_U16);
       Lex(lx); //Load '}'
       g.type=SPT_POLYPT;
       size=SpriteElemQuedBaseSize(SPT_POLYPT);
-      i=(g.num*3+7)>>3;
-      result=CAlloc(size+i);
+      result=CAlloc(size+(g.npu.num*3+7)>>3);
       MemCpy(result,&g,size);
-      ptr=&result->y2;
-      for (i=0;i<g.num;i++)
+      ptr=&result->npu.u;
+      for (i=0;i<g.npu.num;i++)
 	BFieldOrU32(ptr,i*3,QueVectU8Get(tempv,i));
       QueVectU8Del(tempv);
       break;
     case SPT_BITMAP:
       Lex(lx); //Skip {
-      LexD2I32(lx,&g.x2);
+      LexD2I32(lx,&g.pwhu.x1);
       if (lx->token!=':')
 	LexExcept(lx,"expecting ':' at ");
       Lex(lx); //Skip :
-      LexD2I32(lx,&g.width);
+      LexD2I32(lx,&g.pwhu.width);
       if (lx->token!=',')
 	LexExcept(lx,"expecting ',' at ");
       tempv=QueVectU8New;
@@ -463,7 +455,7 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       size=SpriteElemQuedBaseSize(SPT_BITMAP);
       result=CAlloc(size+num1);
       MemCpy(result,&g,size);
-      ptr=&result->linespeed;
+      ptr=&result->pwhu.u;
       for (i=0;i<num1;i++)
 	*ptr++=QueVectU8Get(tempv,i);
       QueVectU8Del(tempv);
@@ -476,7 +468,7 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	if (lx->token!=',')
 	  LexExcept(lx,"expecting ',' at ");
 	Lex(lx); //Skip ,
-	LexD3I32(lx,&g.x1);
+	LexD3I32(lx,&g.pmu.x);
 	if (lx->token!=':')
 	  LexExcept(lx,"expecting ':' at ");
 	Lex(lx); //Skip :
@@ -528,12 +520,12 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	  Lex(lx); //Skip ,
       }
       if (g.type==SPT_MESH) {
-	g.vertex_cnt=num1;
-	g.tri_cnt=num2;
+	g.mu.vertex_cnt=num1;
+	g.mu.tri_cnt=num2;
 	size=SpriteElemQuedBaseSize(SPT_MESH);
       } else {
-	g.shiftable_vertex_cnt=num1;
-	g.shiftable_tri_cnt=num2;
+	g.pmu.vertex_cnt=num1;
+	g.pmu.tri_cnt=num2;
       }
       size=SpriteElemQuedBaseSize(g.type);
       result=MAlloc(size+num1*sizeof(CD3I32)+num2*sizeof(CMeshTri));

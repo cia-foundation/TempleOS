@@ -144,6 +144,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   CSprite *temps;
   F64 tt;
   CD3I32 poly[4];
+  Monster *tempm;
 
   DCAllocDepthBuf(dc);
   MemSet(panels_processed_bitmap,0,(map_width*map_height+7)>>3);
@@ -197,7 +198,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    LOS(xx*SCREEN_SCALE+SCREEN_SCALE/2,yy*SCREEN_SCALE+SCREEN_SCALE/2,
 		man_xx,man_yy)) {
 	  if (c==YELLOW)
-	    dc->color=RED;
+	    dc->color=DKGRAY;
 	  else
 	    dc->color=c;
 	  poly[0].x=x;
@@ -246,7 +247,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    GrFillPoly3(dc,4,poly);
 	  }
 	  if (!map[yy*map_width+xx+1]) {
-	    dc->color=DKGRAY;
+	    dc->color=WHITE;
 	    poly[0].x=x+SCREEN_SCALE;
 	    poly[0].y=y;
 	    poly[0].z=0;
@@ -278,7 +279,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    GrFillPoly3(dc,4,poly);
 	  }
 	  if (!map[yy*map_width+xx-1]) {
-	    dc->color=DKGRAY;
+	    dc->color=WHITE;
 	    poly[0].x=x;
 	    poly[0].y=y;
 	    poly[0].z=0;
@@ -303,9 +304,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   //Draw Monsters
-  for (i=0;i<NUM_MONSTERS;i++) {
-    x=monsters[i].x;
-    y=monsters[i].y;
+  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
+    x=tempm->x;
+    y=tempm->y;
     if (LOS(x,y,man_xx,man_yy)) {
       x-=man_xx;
       y-=man_yy;
@@ -314,7 +315,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       zz=0;
       GrTransform(dc,&xx,&yy,&zz);
       if (zz>0) {
-	if (monsters[i].dead)
+	if (tempm->dead)
 	  SpriteMat3B(dc,x,y,0,$IB,"<2>",BI=2$,r2);
 	else {
 	  tt=Tri(tS,1.0);
@@ -345,9 +346,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 
     //Draw Things on heads-up Map
     dc->color=LTPURPLE;
-  for (i=0;i<NUM_MONSTERS;i++)
-    if (!monsters[i].dead)
-      GrPlot3(dc,2*(monsters[i].x/SCREEN_SCALE),2*(map_height-1-monsters[i].y/SCREEN_SCALE),0);
+  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++)
+    if (!tempm->dead)
+      GrPlot3(dc,2*(tempm->x/SCREEN_SCALE),2*(map_height-1-tempm->y/SCREEN_SCALE),0);
   dc->color=LTCYAN;
   GrPlot3(dc,2*(man_xx/SCREEN_SCALE),2*(map_height-1-man_yy/SCREEN_SCALE),0);
 
@@ -370,11 +371,13 @@ U0 Fire()
 {
   I64 i,x,y;
   F64 d,dx,dy,xx=Cos(man_é),yy=Sin(man_é);
+  Monster *tempm;
+
   Noise(100,300,1000);
-  for (i=0;i<NUM_MONSTERS;i++) {
-    x=monsters[i].x;
-    y=monsters[i].y;
-    if (!monsters[i].dead &&
+  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
+    x=tempm->x;
+    y=tempm->y;
+    if (!tempm->dead &&
 	LOS(x,y,man_xx,man_yy)) {
       dx=x-man_xx;
       dy=man_yy-y;
@@ -382,7 +385,7 @@ U0 Fire()
 	dx/=d;
 	dy/=d;
 	if (dx*xx+dy*yy>0.995) {
-	  monsters[i].dead=TRUE;
+	  tempm->dead=TRUE;
 	  if (!--monsters_left) {
 	    tf=tS;
 	    if (tf-t0<best_score)
@@ -397,34 +400,33 @@ U0 Fire()
 U0 Init()
 {
   I64 i,x,y;
-  I64 min_map_x,max_map_x,min_map_y,max_map_y;
   CDC *dc;
+  Monster *tempm;
+
   DocClear;
   "$$BG,BLACK$$%h*c",TEXT_ROWS/2,'\n';
 
-  SpriteExtents($IB,"<1>",BI=1$,&min_map_x,&max_map_x,&min_map_y,&max_map_y);
-  map_width =(max_map_x-min_map_x+1)/MAP_SCALE+2;
-  map_height=(max_map_y-min_map_y+1)/MAP_SCALE+2;
+  dc=Sprite2DC($IB,"<1>",BI=1$);
+  map_width =dc->width/MAP_SCALE+2;
+  map_height=dc->height/MAP_SCALE+2;
   Free(map);
   Free(panels_processed_bitmap);
   map=CAlloc(map_width*map_height*sizeof(U8));
   panels_processed_bitmap=MAlloc((map_width*map_height+7)>>3);
-  dc=DCNew(map_width*MAP_SCALE,map_height*MAP_SCALE);
-  Sprite3(dc,-min_map_x+MAP_SCALE,-min_map_y+MAP_SCALE,0,$IB,"<1>",BI=1$);
-  for (y=1;y<map_height-1;y++)
-    for (x=1;x<map_width-1;x++)
-      map[(map_height-1-y)*map_width+x]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
-    DCDel(dc);
+  for (y=0;y<map_height-2;y++)
+    for (x=0;x<map_width-2;x++)
+      map[(map_height-2-y)*map_width+x+1]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
+  DCDel(dc);
   man_xx=(1+MAN_START_X)*SCREEN_SCALE;
   man_yy=(map_height-1-MAN_START_Y)*SCREEN_SCALE;
   man_é=0;
 
-  for (i=0;i<NUM_MONSTERS;i++) {
-    monsters[i].dead=FALSE;
+  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
+    tempm->dead=FALSE;
     do {
-      monsters[i].x=RandU64%((map_width-2)*SCREEN_SCALE)+SCREEN_SCALE;
-      monsters[i].y=RandU64%((map_height-2)*SCREEN_SCALE)+SCREEN_SCALE;
-    } while (!map[(monsters[i].y/SCREEN_SCALE)*map_width+monsters[i].x/SCREEN_SCALE]);
+      tempm->x=RandU64%((map_width-2)*SCREEN_SCALE)+SCREEN_SCALE;
+      tempm->y=RandU64%((map_height-2)*SCREEN_SCALE)+SCREEN_SCALE;
+    } while (!map[(tempm->y/SCREEN_SCALE)*map_width+tempm->x/SCREEN_SCALE]);
   }
   monsters_left=NUM_MONSTERS;
   tf=0;
@@ -434,12 +436,14 @@ U0 Init()
 U0 AnimateTask(I64)
 {
   I64 i,x,y,dd;
+  Monster *tempm;
+
   while (TRUE) {
     dd=0.25*SCREEN_SCALE*Sin(tS/2);
-    for (i=0;i<NUM_MONSTERS;i++)
-      if (!monsters[i].dead) {
-	x=monsters[i].x;
-	y=monsters[i].y;
+    for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++)
+      if (!tempm->dead) {
+	x=tempm->x;
+	y=tempm->y;
 	if (i&1)
 	  x+=dd;
 	else
@@ -457,8 +461,8 @@ U0 AnimateTask(I64)
 	      !map[(y/SCREEN_SCALE-1)*map_width+x/SCREEN_SCALE] &&
 	       y-RoundI64(y,SCREEN_SCALE)<SCREEN_SCALE/2)
 	    y=RoundI64(y,SCREEN_SCALE)+SCREEN_SCALE/2;
-	  monsters[i].x=x;
-	  monsters[i].y=y;
+	  tempm->x=x;
+	  tempm->y=y;
 	}
       }
     Sleep(20);
@@ -493,7 +497,7 @@ U0 MoveMan(F64 é)
     x=Clamp(x,0,map_width*SCREEN_SCALE);
     y=Clamp(y,0,map_height*SCREEN_SCALE);
     color=map[y/SCREEN_SCALE*map_width+x/SCREEN_SCALE];
-    if (color==RED || color==GREEN) {
+    if (color==DKGRAY || color==GREEN) {
       man_xx=x;
       man_yy=y;
       break;
@@ -531,11 +535,11 @@ U0 CastleFrankenstein()
       );
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Fs->text_attr=RED<<4+WHITE;
+  Fs->text_attr=DKGRAY<<4+WHITE;
   Preempt(OFF);
   WinBorder;
   WinMax;
-  WordStat;
+  AutoComplete;
   Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
@@ -583,7 +587,7 @@ fs_done:
 }
 
 CastleFrankenstein;
-        +        
+        +        
              
               
        <      

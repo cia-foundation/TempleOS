@@ -7,12 +7,11 @@ U0 SysGlblsInit()
   CPUId(0x1,&ee);
   sys_cache_line_width=ee.rbx.u8[1]*8;
 
-  sys_rnd_seed	=93186752^GetTSC;
   sys_focus_task=Fs;
   QueInit(&sys_macro_root);
 
   dsk.dft_iso_filename="::/Temp/CDDVD.ISO";
-  StrCpy(dsk.temp_filename,"HOME/Temp.TXT.Z");
+  StrCpy(dsk.temp_filename,"::/Home/Temp.TXT.Z");
   dsk.cdrom_boot_is_good=TRUE;
 #exe {
   if (!kernel_cfg->auto_mount_ide_hd_let) kernel_cfg->auto_mount_ide_hd_let='C';
@@ -35,10 +34,7 @@ U0 SysGlblsInit()
   KeyDevInit;
 
   #exe {
-    if (*kernel_cfg->acct_name)
-      StreamPrint("sys_acct=StrNew(\"%C:/Accts/%s\");",kernel_cfg->sys_acct_drv,kernel_cfg->acct_name);
-    else
-      StreamPrint("sys_acct=StrNew(\"%C:/Accts\");",kernel_cfg->sys_acct_drv);
+    StreamPrint("dsk.boot_drv_let='%C';",kernel_cfg->boot_drv_let);
     StreamPrint("#exe{OptOff(OPTf_WARN_PAREN);}");
     StreamPrint("DskCacheInit(%s);",kernel_cfg->dsk_cache_size_exp);
     StreamPrint("#exe{OptOn(OPTf_WARN_PAREN);}");
@@ -53,9 +49,9 @@ U0 SysGlblsInit()
 
   ProgressBarsRst;
 
-//$AN,"Independent Heap Ctrl Example",A="Independent Heap Ctrl Example"$
+//$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
   i=1; //Rqst 1 blk, we might get more.
-  m=MemBlksUncachedAlloc(&i,sys_code_bp);
+  m=Mem2MegUncachedAlloc(&i,sys_code_bp);
   dev.uncached_heap=HeapCtrlBPInit(m,i*0x200000/0x200);
   QueInit(&dev.pci_root);
   dev.mem64_ptr=MEM_MAPPED_SPACE;
@@ -65,19 +61,19 @@ U0 SysGlblsInit()
 }
 
 U0 SysGrInit()
-{//See $LK,"SYS_BIOS_GR_MODE",A="FF:D:/Kernel/KStart.CPP,SYS_BIOS_GR_MODE:2"$
+{
   text.font=sys_font_8x8;
-  if (sys_bios_gr_mode==0x12) { //if 640x480 16 color
-    text.cols=GR_WIDTH/FONT_WIDTH;
-    text.rows=GR_HEIGHT/FONT_HEIGHT;
-    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-    OutU8(VGA_SC_DATA,0x0F);
-    MemSet(VGA_GRAPHIC_MEM_BASE,0,GR_WIDTH*GR_HEIGHT>>3);
-    text.raw_screen_image=CAlloc(GR_WIDTH*GR_HEIGHT/8);
-  } else {
+  if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
     text.cols=80;
     text.rows=25;
-    MemSet(VGA_TEXT_MEM_BASE,0,text.rows*text.cols<<1);
+    MemSet(VGAM_TEXT,0,text.rows*text.cols<<1);
+  } else { //if 640x480 16 color
+    text.cols=GR_WIDTH/FONT_WIDTH;
+    text.rows=GR_HEIGHT/FONT_HEIGHT;
+    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_DATA,0x0F);
+    MemSet(VGAM_GRAPHICS,0,GR_WIDTH*GR_HEIGHT>>3);
+    text.raw_screen_image=CAlloc(GR_WIDTH*GR_HEIGHT/8);
   }
 }
 
@@ -102,7 +98,7 @@ U0 TimersInit()
   _q=HPET_GCAP_ID;
   i=*_q; //i.u32[1]= period in femtoS (10e-15)
   if (100000<i.u32[1]<1000000000) {
-    cnts.HPET_freq	 =1000000000000000/i.u32[1];
+    cnts.HPET_freq    =1000000000000000/i.u32[1];
     cnts.HPET_kHz_freq=1000000000000/i.u32[1];
     _q=HPET_GEN_CONF;
     *_q|=1; //Enable counting
@@ -134,7 +130,6 @@ U0 KernelMain()
   adam_task=Fs;
   HeapsInit;
   LBts(&sys_run_level,RLf_FULL_HEAP);
-  Fs->hash_table=HashTableNew(ADAM_HASH_SIZE,Fs);
   SysGlblsInit;
   Mem32DevInit;
   MemPagesNotPresentMark;
@@ -148,31 +143,30 @@ U0 KernelMain()
   TaskDerivedValsUpdate;
 
   SysDefinesLoad;
-  MPInit;
+  BSPInit;
   IntInit1;
 
 //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
 //to debug.  After this point, use $LK,"RawPrint",A="MN:RawPrint"$()
   LBts(&sys_run_level,RLf_RAW);
-  if (BIOSTotalMem<250*0x100000)
-    Dbg("Requires 256 Meg of RAM Memory");
-
   TimersInit;
-  IntsInit;
+  if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
+    RawPrint(4000,"!!! Requires $TX,"512 Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
 
+  IntsInit;
   "Enable IRQ's\n";
   SetRFlags(SYS_NORMAL_RFLAGS);
   BusyWait(2000);
-
   IntInit2;
   LBts(&sys_run_level,RLf_INTERRUPTS);
+
   TimeStampFreqCal;
   Preempt(ON);
 
 #exe {
   if (!kernel_cfg->opts[CFG_NO_MP])
     StreamPrint("\"MultiCore Start\\n\\n\";"
-	"MPStart;"
+	"BSPStartMP;"
 	"LBts(&sys_run_level,RLf_MP);");
 };
 
@@ -201,9 +195,9 @@ U0 KernelMain()
 
   InDbg(OFF);
   cnts.time_stamp_freq_initial=TimeStampFreqCal;
-  Cd("/Kernel");
+  Cd("/");
   try
-    ExeFile("Adam1"); //Continues $LK,"/Kernel/Adam1.CPP",A="FL:/Kernel/Adam1.CPP,1"$
+    ExeFile("Adam"); //Continues $LK,"/Adam.CPP",A="FL:/Adam.CPP,1"$
   catch {
     Raw(ON);
     PutExcept;
@@ -218,7 +212,7 @@ asm {	ALIGN	16,OC_NOP
 SYS_KERNEL_END::
 #exe {
   if (kernel_cfg->opts[CFG_BOOT_RESCUE_DRV])
-    StreamPrint("DU8 0x%X-(SYS_KERNEL_END-SYS_KERNEL_START1+"
+    StreamPrint("DU8 0x%X-(SYS_KERNEL_END-SYS_KERNEL+"
 		"BOOT_RAM_BASE+sizeof(CBinFile)) DUP (0);"
 		"BINFILE \"%s\";",kernel_cfg->boot_rescue_drv_start,kernel_cfg->boot_rescue_drv_file);
 };

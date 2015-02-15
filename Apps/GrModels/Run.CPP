@@ -1,2 +1,3 @@
-#include "/Apps/GrModels/Load"
+Cd(__DIR__);;
+#include "Load"
 Models;

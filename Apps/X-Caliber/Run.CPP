@@ -1,2 +1,3 @@
-#include "/Apps/X-Caliber/Load"
+Cd(__DIR__);;
+#include "Load"
 XCaliber;

@@ -290,7 +290,7 @@ U0 Span()
 
   DocCursor;
   WinBorder;
-  WordStat;
+  AutoComplete;
   Fs->win_inhibit|=WIG_DBL_CLICK;
 
   MenuPush(

@@ -8,7 +8,7 @@
 
 * Free, $FG,2$public domain$FG$, $FG,2$100% open source$FG$.
 
-* 64-bit $FG,2$compiler/assembler$FG$ for $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  Truly compiles, not interprets.  $FG,2$Just-in-Time$FG$ and $FG,2$Ahead-of-Time$FG$ compilation.  With $FG,2$JIT$FG$, no need for object or exe files.
+* 64-bit $FG,2$compiler/assembler$FG$ for $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  Truly compiles, doesn't interpret.  $FG,2$Just-in-Time$FG$ and $FG,2$Ahead-of-Time$FG$ compilation.  With $FG,2$JIT$FG$, no need for object or exe files.
 
 * No 32-bit krufty code.
 
@@ -36,7 +36,7 @@
 
 * Real-time fancy $FG,2$differential-equation solver$FG$ for physics engines, to use in games.  (Adaptive step-size Runge-Kutta, interpolated for real-time.)
 
-* Auto-completion, jump-to-source tool called $FG,2$WordStat$FG$ with Dictionary.
+* Auto-completion, jump-to-source tool called $FG,2$AutoComplete$FG$ with Dictionary.
 
 * Window Manager.  Pan screen with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom screen on mouse cursor with $FG,2$<CTRL-ALT-z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
 

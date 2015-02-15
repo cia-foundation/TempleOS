@@ -85,8 +85,8 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 	"\n$$MU-UL,\"Undo\",LE=GBM_UNDO$$\n"
 	"\n$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=GBM_MAIN_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=GBM_EXIT$$\n"
-	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$\n",st1,st2,width);
-  DocPrint(doc,"\nRight-Click to get back to this menu.");
+	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$\n"
+	"\nRight-Click to get back to this menu.",st1,st2,width);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -224,12 +224,21 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,I64 *_xx2
 	  1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN)) {
       switch (msg_code) {
 	case MSG_KEY_DOWN:
-	  if (a1==CH_SHIFT_ESC) {
-	    result=GE_ABORT;
-	    goto bm_key_up_done;
-	  } else if (a1==CH_ESC) {
-	    result=GE_CONT;
-	    goto bm_key_up_done;
+	  switch (a1) {
+	    case CH_SHIFT_ESC:
+	      result=GE_ABORT;
+	      goto bm_key_up_done;
+	    case CH_ESC:
+	      result=GE_CONT;
+	      goto bm_key_up_done;
+	    case 'c': //eye-dropper
+	      dc2=DCCaptureScreen(FALSE);
+	      color=GrPeek(dc2,ip.pos.x,ip.pos.y)^15;//Mouse cursor is XORed.
+	      DCDel(dc2);
+	      break;
+	    case 't': //Set to transparent color
+	      color=TRANSPARENT;
+	      break;
 	  }
 	  break;
 
@@ -291,7 +300,7 @@ bm_menu:
 	    case GBM_SAVE_BMP:
 	      *filename.name=0;
 	      if (DocFormDo(&filename) && *filename.name)
-		BMPFileWrite(filename.name,img);
+		BMPWrite(filename.name,img);
 	      goto bm_menu;
 
 	    case GBM_SAVE_GRA:
@@ -363,38 +372,32 @@ bm_menu:
 	      GrPlot3(img,a1-xx1,a2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
-	    case GBM_LINE:
-	    case GBM_ARROW:
-	    case GBM_RECT:
-	    case GBM_CIRCLE:
-	    case GBM_COPY:
-	    case GBM_DELETE:
+	    sub_switch_start:
 	      if (down)
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      x1=a1; y1=a2;
 	      down=TRUE;
 	      dc->color=color;
 	      dc->pen_width=width;
-	      switch (mode) {
-		case GBM_LINE:
-		  GrLine3(dc,x1,y1,0,a1,a2,0);
-		  break;
-		case GBM_ARROW:
-		  GrArrow3(dc,x1,y1,0,a1,a2,0);
-		  break;
-		case GBM_RECT:
-		  GrRect(dc,x1,y1,1,1);
-		  break;
-		case GBM_CIRCLE:
-		  GrCircle3(dc,x1,y1,0,1);
-		  break;
-		case GBM_COPY:
-		case GBM_DELETE:
-		  dc->color=ROPF_DITHER+WHITE<<16+BLACK;
-		  dc->pen_width=1;
-		  GrBorder(dc,x1,y1,x1,y1);
-		  break;
-	      }
+	      case GBM_LINE:
+		GrLine3(dc,x1,y1,0,a1,a2,0);
+		break;
+	      case GBM_ARROW:
+		GrArrow3(dc,x1,y1,0,a1,a2,0);
+		break;
+	      case GBM_RECT:
+		GrRect(dc,x1,y1,1,1);
+		break;
+	      case GBM_CIRCLE:
+		GrCircle3(dc,x1,y1,0,1);
+		break;
+	      case GBM_COPY:
+	      case GBM_DELETE:
+		dc->color=ROPF_DITHER+WHITE<<16+BLACK;
+		dc->pen_width=1;
+		GrBorder(dc,x1,y1,x1,y1);
+		break;
+	    sub_switch_end:
 	      break;
 	    case GBM_PASTE:
 	    case GBM_PASTE_TRANSPARENT:

@@ -2,6 +2,8 @@
 //$LK,"/Demo/SortFileExample/UnsortedF64.TXT"$
 //$LK,"/Demo/SortFileExample/SortedF64.TXT"$
 
+Cd(__DIR__);;
+
 I64 Compare(F64 e1,F64 e2)
 {
   return Sign(e1-e2);
@@ -44,9 +46,9 @@ U0 F64FileSortTXT(U8 *in_name,U8 *out_name)
 
   Free(a);
 }
-F64FileSortTXT("/Demo/SortFileExample/UnsortedF64.TXT.Z","/Demo/SortFileExample/SortedF64.TXT.Z");
-Type("/Demo/SortFileExample/UnsortedF64.TXT.Z");
-Type("/Demo/SortFileExample/SortedF64.TXT.Z");
+F64FileSortTXT("UnsortedF64.TXT.Z","SortedF64.TXT.Z");
+Type("UnsortedF64.TXT.Z");
+Type("SortedF64.TXT.Z");
 
 U0 F64FileSortDAT(U8 *in_name,U8 *out_name)
 {//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
@@ -56,7 +58,7 @@ U0 F64FileSortDAT(U8 *in_name,U8 *out_name)
   FileWrite(out_name,a,size);
   Free(a);
 }
-F64FileSortDAT("/Demo/SortFileExample/UnsortedF64.DAT.Z","/Demo/SortFileExample/SortedF64.DAT.Z");
+F64FileSortDAT("UnsortedF64.DAT.Z","SortedF64.DAT.Z");
 
 U0 F64FileDumpDAT(U8 *in_name)
 {//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.CPP"$
@@ -68,5 +70,5 @@ U0 F64FileDumpDAT(U8 *in_name)
     "%12.6f\n",a[i];
   Free(a);
 }
-F64FileDumpDAT("/Demo/SortFileExample/UnsortedF64.DAT.Z");
-F64FileDumpDAT("/Demo/SortFileExample/SortedF64.DAT.Z");
+F64FileDumpDAT("UnsortedF64.DAT.Z");
+F64FileDumpDAT("SortedF64.DAT.Z");

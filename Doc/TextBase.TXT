@@ -1,4 +1,4 @@
-$WW,1$$LK,"gr.text_base",A="MN:CGrGlbls"$ must be updated 60fps in your Fs->draw_it() callback.  You probably want $LK,"GrPrint",A="MN:GrPrint"$() or just $LK,"Print",A="MN:Print"$().  The $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ code takes care of plotting text to $LK,"gr.text_base",A="MN:CGrGlbls"$.
+$WW,1$$LK,"gr.text_base",A="MN:CGrGlbls"$ must be updated 30fps in your Fs->draw_it() callback.  You probably want $LK,"GrPrint",A="MN:GrPrint"$() or just $LK,"Print",A="MN:Print"$().  The $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ code takes care of plotting text to $LK,"gr.text_base",A="MN:CGrGlbls"$.
 
 Bits 0-7	8-Bit ASCII Screen Code
 Bits 8-11	Foreground $LK,"color",A="MN:BLACK"$

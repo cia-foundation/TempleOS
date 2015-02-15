@@ -16,6 +16,7 @@ U0 Song()
   CTask *task;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   DocCursor;
   DocClear;
@@ -23,8 +24,8 @@ U0 Song()
   try {
     task=PopUpViewPrint("$LK,"BF:Acts,9:3"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       t0=Beat;
       Play("3qEeACA2G3qCEC2G3E",

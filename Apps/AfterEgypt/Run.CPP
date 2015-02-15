@@ -1,3 +1,3 @@
-Cd("/Apps/AfterEgypt");;
+Cd(__DIR__);;
 #include "Load"
 AfterEgypt;

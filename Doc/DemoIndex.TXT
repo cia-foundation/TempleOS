@@ -21,6 +21,7 @@ $LK,"::/Demo/MsgLoop.CPP"$
 $LK,"::/Demo/Graphics/Doodle.CPP"$
 $LK,"::/Demo/Graphics/Speedline.CPP"$
 $LK,"::/Demo/Graphics/Bounce.CPP"$
+$LK,"::/Demo/RandDemo.CPP"$
 $LK,"::/Demo/KeyBitMap.CPP"$
 $LK,"::/Demo/Graphics/WinZBuf.CPP"$
 $LK,"::/Demo/Graphics/Elephant.CPP"$
@@ -41,6 +42,7 @@ $LK,"::/Demo/Games/Halogen.CPP"$
 $LK,"::/Demo/Games/TheDead.CPP"$
 $LK,"::/Demo/Games/RainDrops.CPP"$
 $LK,"::/Demo/Snd/MorseCode.CPP"$
+$LK,"::/Demo/Graphics/Lattice.CPP"$
 $LK,"::/Demo/Graphics/Collision.CPP"$
 $LK,"::/Demo/Games/BlackDiamond.CPP"$
 $LK,"::/Demo/Games/Wenceslas.CPP"$
@@ -68,12 +70,12 @@ $LK,"::/Demo/Graphics/Cartesian.CPP"$
 $LK,"::/Demo/Graphics/Hanoi.CPP"$
 $LK,"::/Demo/Graphics/Life.CPP"$
 $LK,"::/Demo/Games/Zing.CPP"$
-$LK,"::/Demo/Games/ChessNet.CPP"$
+$LK,"::/Demo/Games/TreeCheckers.CPP"$
 $LK,"::/Demo/MultiCore/Palindrome.CPP"$
 $LK,"::/Demo/MultiCore/MPAdd.CPP"$
 $LK,"::/Demo/MultiCore/Lock.CPP"$
 $LK,"::/Demo/MultiCore/Clouds.CPP"$
-$LK,"::/Demo/Graphics/SliderCtrl.CPP"$
+$LK,"::/Demo/Graphics/Slider.CPP"$
 $LK,"::/Demo/Graphics/WallPaperCtrl.CPP"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Graphics/ScrollBars.CPP"$
 $LK,"::/Demo/RegistryDemo.CPP"$
@@ -99,6 +101,7 @@ $LK,"::/Demo/Graphics/Shadow.CPP"$
 $LK,"::/Demo/Graphics/Pick3D.CPP"$
 $MA-X+PU,"::/Apps/ToTheFront",LM="Cd(\"::/Apps/ToTheFront\");Dir;View;\n"$
 $LK,"::/Demo/Graphics/SpriteText.CPP"$
+$LK,"::/Demo/Graphics/SpriteRaw.CPP"$
 $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/KeepAway",LM="Cd(\"::/Apps/KeepAway\");Dir;View;\n"$
 $LK,"::/Demo/Graphics/Camp.CPP"$
@@ -126,6 +129,7 @@ $LK,"::/Demo/PhoneNumWords.CPP"$
 $LK,"::/Demo/SuggestSpelling.CPP"$
 $LK,"::/Demo/WordSearch.CPP"$
 $LK,"::/Demo/Graphics/CommonAncestor.CPP"$
+$LK,"::/Demo/Directives.CPP"$
 $LK,"::/Demo/Carry.CPP"$
 $LK,"::/Demo/Dsk/DataBase.CPP"$
 $LK,"::/Demo/Dsk/FPrintF.CPP"$

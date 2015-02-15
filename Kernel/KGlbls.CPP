@@ -8,8 +8,6 @@ CTask *adam_task;
 I64 sys_num_spawned_tasks;
 
 CTask *sys_winmgr_task,*sys_task_being_screen_updated;
-I64 sys_rnd_seed;
-U8 *sys_acct; // "D:/Acct/User"
 U8 *reverse_bits_table, //Table with U8 bits reversed
    *set_bits_table; //Table with count of set bits in a U8
 CDate local_time_offset=0;

@@ -1,6 +1,6 @@
-#define BGT_STRINGS_FILE	"HOME/Budget/Strs.TXT.Z"
-#define BGT_ACCTS_FILE		"HOME/Budget/Accts.TXT.Z"
-#define BGT_DATA_FILE		"HOME/Budget/Bgt.DAT.Z"
+#define BGT_STRINGS_FILE	"::/Home/Budget/Strs.TXT.Z"
+#define BGT_ACCTS_FILE		"::/Home/Budget/Accts.TXT.Z"
+#define BGT_DATA_FILE		"::/Home/Budget/Bgt.DAT.Z"
 
 #define BE_NORMAL		0
 #define BE_GAS			1
@@ -55,6 +55,7 @@ class CBgtTemplate
 
 U8 view_acct[512];
 CHashTable *accts_table=NULL;
+I64 accts_table_strs=0;
 
 CDate MyStr2Date(U8 *st)
 {

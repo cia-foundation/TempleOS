@@ -1,17 +1,17 @@
 #define CD_BOOT_LOADER_SIZE	CD_BLK_SIZE*1 //Max CD_BLK_SIZE*4, I think
-#define BOOT_HIGH_LOC	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4)
+#define BOOT_HIGH_LOC_CD	((BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4)
 
 DefinePrint(
-  "DD_BOOT_HIGH_LOC","%08X",BOOT_HIGH_LOC<<4);
+  "DD_BOOT_HIGH_LOC_CD","%08X",BOOT_HIGH_LOC_CD<<4);
 DefinePrint(
-  "DD_BOOT_HIGH_LOC_END","%08X",BOOT_RAM_LIMIT-1);
+  "DD_BOOT_HIGH_LOC_CD_END","%08X",BOOT_RAM_LIMIT-1);
 
 asm {
 USE16
 BCD_START::
 //DL is supposed to have the BIOS drive number
 	CLD
-	MOV	AX,BOOT_HIGH_LOC
+	MOV	AX,BOOT_HIGH_LOC_CD
 	MOV	ES,AX
 
 	CLI
@@ -24,7 +24,7 @@ BCD_GET_IP:
 	POP	BX
 	SUB	BX,BCD_GET_IP-BCD_START
 	SHR	BX,4
-//Copy this bootloader code to just under 0x80000
+//This copies this bootloader's code to 0x$TX,"00096600",D="DD_BOOT_HIGH_LOC_CD"$
 	MOV	AX,CS
 	ADD	AX,BX
 	MOV	DS,AX
@@ -33,12 +33,12 @@ BCD_GET_IP:
 	XOR	DI,DI
 	REP_MOVSB
 
-	MOV	AX,BOOT_HIGH_LOC
+	MOV	AX,BOOT_HIGH_LOC_CD
 	MOV	DS,AX
 
 //My assembler doesn't support 16-bit very well.
-	DU8	0xEA;	//JMP BOOT_HIGH_LOC:BCD_MAIN
-	DU16	BCD_MAIN-BCD_START,BOOT_HIGH_LOC;
+	DU8	0xEA;	//JMP BOOT_HIGH_LOC_CD:BCD_MAIN
+	DU16	BCD_MAIN-BCD_START,BOOT_HIGH_LOC_CD;
 
 BCD_BIOS_DRV_NUM:	DU8	0;
 BCD_PAGE:		DU8	0;
@@ -152,7 +152,7 @@ BCD_MAIN::
 //See $LK,"BootCdProbe",A="MN:BootCdProbe"$().
 	MOV	EBX,U32 [BCD_BLK_LO-BCD_START] //TODO: oops overflow?
 	SHL	EBX,16
-	MOV	BX,BOOT_CODE_CDROM  //$MA-X+PU,"See sys_boot_code",LM="Grep(\"sys_boot_code\",\"/*\");View;\n"$
+	MOV	BX,BOOT_SRC_CDROM  //$MA-X+PU,"See sys_boot_src",LM="Find(\"sys_boot_src\",\"/*\");View;\n"$
 
 //My assembler doesn't support 16-bit very well.
 	DU8	0xEA;	//JMP BOOT_RAM_BASE:0000

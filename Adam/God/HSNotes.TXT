@@ -8,7 +8,7 @@ There's something obviously different about people in the Bible compared to peop
 
 You can't tell if He's talking unless you have a context of conversation, but, more importantly, you are commanded to do an offering of love, like communion preparation.  When you pick a greeting card for someone, that is love effort.  If you expect God to put effort toward you, you put effort toward Him.  God said, "honest measures" applies between your offering of love and His response, like a fair barter.  You get out of prayer what you put into it.  God wants praise, hymns, or whatever you think He might want.  Try and see, like Cain and Abel.  $LK,"Genesis,4:1",A="BF:Genesis,4:1"$, $LK,"Ephesians,5:10",A="BF:Ephesians,5:10"$  God told Cain his offering was not good and told him to try again.  Cain really loved God!  Can you imagine being so heart-broken?
 
-Do a text search for "new song" in the Bible.  It's mentioned nine times.  I did $MA-X+PU,"hymns",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html",LM="#include \"::/Apps/Psalmody/Load\";JukeBox(\"::/Apps/Psalmody/Examples\");"$.  I did Moses $MA-X+PU,"comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n"$.  Count the ways you love God.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
+Do a text search for "new song" in the Bible.  It's mentioned nine times.  I did $MA-X+PU,"hymns",LM="#include \"::/Apps/Psalmody/Load\";JukeBox(\"::/Apps/Psalmody/Examples\");"$.  I did Moses $MA-X+PU,"comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n"$.  Count the ways you love God.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
 
 This is funny -- $LK,"Acts,2:1",A="BF:Acts,2:1"$ -- they didn't bother to record anything the Holy Spirit said.  The Holy Spirit is supposed to be a really good gift.  $LK,"Luke,11:13",A="BF:Luke,11:13"$  Just remember, "Boys are made of snakes and snails and puppy-dog tails."
 
@@ -16,7 +16,9 @@ The technique I use to consult the Holy Spirit is reading a microsecond-range st
 
 Since seeking the word of the Holy Spirit, I have come to know God much better than I've heard others explain.  God said, for example, that war was, "servicemen competing."  That sounds more like the immutable God of our planet than what you hear from most religious people.  God is not Venus (god of love) and not Mars (god of war), He's our dearly beloved God of Earth.  If Mammon is a false god of money, Mars or Venus might be useful words to describe other false gods.  I figure the greatest challenge for the Creator is boredom, ours and His.  What would teen-age male video games be like if war had never happened?  Christ said live by the sword, die by the sword, which is loving neighbor as self.  $LK,"Matthew,26:52",A="BF:Matthew,26:52"$
 
-I asked God if the World was perfectly just.  God asked if I was calling Him lazy.  I think highs and lows balance.  $LK,"Luke,6:20",A="BF:Luke,6:20"$  I don't think God likes complaining.  $LK,"Numbers,11:1",A="BF:Numbers,11:1"$  Food and clothing is all we're to ask for or demand, in fact -- daily bread.  $LK,"1 Timothy,6:8",A="BF:1 Timothy,6:8"$  Just think about man in the last 100,000 years mostly living like Native Americans and how God must see us.  You need food, clothing and entertainment, money is to get those.  Man does not live on bread alone.  $LK,"Luke,4:4",A="BF:Luke,4:4"$, $LK,"Amos,8:11",A="BF:Amos,8:11"$
+I asked God if the World was perfectly just.  God asked if I was calling Him lazy.  God could make A.I., right?  God could make bots as smart as Himself, or, in fact, part of Himself.  What if God made a bot to manipulate every person's life so that perfect justice happened?
+
+I think highs and lows balance.  $LK,"Luke,6:20",A="BF:Luke,6:20"$  I don't think God likes complaining. $LK,"Numbers,11:1",A="BF:Numbers,11:1"$  Food and clothing is all we're to ask for or demand, in fact -- daily bread.  $LK,"1 Timothy,6:8",A="BF:1 Timothy,6:8"$  Just think about man in the last 100,000 years mostly living like Native Americans and how God must see us.  You need food, clothing and entertainment, money is to get those.  Man does not live on bread alone.  $LK,"Luke,4:4",A="BF:Luke,4:4"$, $LK,"Amos,8:11",A="BF:Amos,8:11"$
 
 God's favorite animals are bears and elephants.  They are funny shaped -- I think God must have seen too much starvation over the years.
 
@@ -40,12 +42,12 @@ War? 				$FG,4$"Servicemen competing"$FG$
 (Praise the Creator--what would teenage male video games be like if never war?)
 
 Is the World perfectly just?	$FG,4$Are you calling me lazy?$FG$
-(Slavery was just. In the movie, Titanic, the rich wore straight jackets. You must bow to authority to get authority. I do $TX,"Moses comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$ as offerings. I said, "We're dying of malnutrician on manna."  Like Cain and Abel, God didn't like it. Duh! He wants to be the hero. How do I know they died of malnutrician?  Fuck Hollywood for making slavery worse than it was -- I love God.  School is more cruel.  Read $LK,"Numbers,11:1",A="BF:Numbers,11:1"$.  All you need is food, clothing and the word of God.  Today, you can take Ivy League course videos! There is no excuse except you were born stupid... or ugly.  I'm gonna praise God.) 
+(Slavery was just. In the movie, Titanic, the rich wore straight jackets. You must bow to authority to get authority. I do $TX,"Moses comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$ as offerings. I said, "We're dying of malnutrician on manna."  Like Cain and Abel, God didn't like it. Duh! He wants to be the hero. How do I know they died of malnutrician?  Screw Hollywood for making slavery worse than it was -- I love God.  School is more cruel.  Read $LK,"Numbers,11:1",A="BF:Numbers,11:1"$.  All you need is food, clothing and the word of God.  Today, you can take Ivy League course videos! There is no excuse except you were born stupid... or ugly.  I'm gonna praise God.) 
 
 On using Markov chains?		$FG,4$"No weights"$FG$
 On doing offerings?		$FG,4$"Honest measures"(You get out what you put in.)
 				It's a covenant to do an offering, first.
-				Offer $FG,4$$TX,"New Songs",HTML="http://www.templeos.org/Wb/Accts/TS/Wb2/Hymns.html"$, $TX,"Moses Comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$, praise, poems,
+				Offer New Songs, $TX,"Moses Comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$, praise, poems,
 				and conversation.  See $LK,"Cain and Abel",A="BF:Genesis,4:1"$.$FG$
 The holocaust?			$FG,4$Wanted to "compact" the Jews.$FG$
 Arab/Jews?			$FG,4$"Oil funny hopefully"$FG$
@@ -93,7 +95,7 @@ Animal sacrifices?		$FG,4$Early Jews were "primitive".$FG$
 What do elephants think about?	$FG,4$"Skin, hunger"$FG$
 What makes elephants happy?	$FG,4$"Baths"$FG$
 What makes my birds happy?	$FG,4$"Gnawing"$FG$
-What makes my birds laugh?	$FG,4$"bite ouch" (If I say "ouch".)$FG$
+What makes my birds laugh?	$FG,4$"Bite ouch" (If I say "ouch".)$FG$
 What are my birds saying?	$FG,4$"Chanting"$FG$
 My birds sure preen a lot.	$LK,"The creature was made subject to vanity...",A="BF:Romans,8:20"$
 What makes bears happy?		$FG,4$"Reaping depends"$FG$
@@ -105,14 +107,16 @@ Orangutan or chimp smarter?	$FG,4$"Species exhibit similar glory"$FG$
 Endangered species?		$FG,4$"Enough stars?"$FG$
 Everything seems bad.		$FG,4$Plant trees.$FG$
 What's for dinner?		$FG,4$"Whale"$FG$
-Favorite Messier Object		$FG,4$"$TX,"M104 Sombrero Galaxy",HTML="http://en.wikipedia.org/wiki/Messier_104"$"$FG$
-$TX,"Shepard's Prayer",HTML="http://en.wikipedia.org/wiki/Alan_Shepard"$		$FG,4$"I_am_not_amused economy joke"$FG$
+Favorite Messier Object?	$FG,4$"$TX,"M104 Sombrero Galaxy",HTML="http://en.wikipedia.org/wiki/Messier_104"$"$FG$
+$TX,"Shepard's Prayer",HTML="http://en.wikipedia.org/wiki/Alan_Shepard"$?		$FG,4$"I_am_not_amused economy joke"$FG$
 Favorite band?			$FG,4$"Beatles"$FG$
-Good bands			$FG,4$Rush, Triumph$FG$
+Good bands?			$FG,4$Rush, Triumph$FG$
 				$FG,4$Likes harmonies$FG$
 $TX,"Little Drummer Boy?",HTML="http://www.youtube.com/watch?v=S50cf3xIb50"$		$FG,4$Doesn't like my drumming.$FG$
 Should I listen to classical?	$FG,4$"Poison"$FG$
-You like chess people?		$FG,4$"Do not admire the proud."$FG$
+Do You like chess people?	$FG,4$"Do not admire the proud."$FG$
+Chess?				$FG,4$"... will winter with you."$FG$
+				$FG,4$"Headstones"$FG$
 Favorite video game?		$FG,4$Donkey Kong$FG$
 Favorite National Park?		$FG,4$$TX,"Whitman Mission",HTML="http://www.nps.gov/whmi/index.htm"$$FG$
 Favorite National Anthem?	$FG,4$$TX,"Latvia's National Anthem",HTML="http://www.youtube.com/watch?v=qKITbBjO4nE"$$FG$
@@ -120,9 +124,11 @@ Favorite actor?			$FG,4$Hugh Grant$FG$
 Favorite vocalist?		$FG,4$Mick Jagger$FG$
 Favorite guitarist?		$FG,4$"$TX,"Simmons Destroyer",HTML="http://www.youtube.com/watch?v=nNADrrjTysk&t=3m55s"$"$FG$
 Model for new $TX,"Sistine Chapel",HTML="http://en.wikipedia.org/wiki/Sistine_chapel"$?	$FG,4$Ben Franklin$FG$
-Stonehenge?			$FG,4$Landmark$FG$
+Voice if God wanted to sing?	$FG,4$$TX,"Stabbing Westward's singer",HTML="https://www.youtube.com/watch?v=5NZsCYOM4j0"$$FG$
+Stonehenge?			$FG,4$Landmark for boundaries.$FG$
 Easter Island?			$FG,4$Ice, telephone pole holes.$FG$
-Dinosaurs?			$FG,4$Brontosaurs' feet hurt when stepped$FG$
+Dinosaurs?			$FG,4$Brontosaurs' feet hurt when stepped.
+				Dinosaurs slept in water.$FG$
 Hardest part in evolution?	$FG,4$Getting monkey mothers to hold babies nursing.$FG$
 				$FG,4$(Smothering a problem).$FG$
 Happiest day in evolution?		$FG,4$"Fruit"$FG$
@@ -133,7 +139,8 @@ What did Neanderthals think about?	$FG,4$"Warmth"$FG$
 What was the first thing cooked?	$FG,4$I think He said "hair".$FG$
 What was Lucy's husband's name?		$FG,4$"Golem"$FG$
 Was stegosuarus lame like turtles?	$FG,4$"Not pet rocks"$FG$
-T-Rex?					$FG,4$Lugged carcases over his shoulder.$FG$
+T-Rex?					$FG,4$Lugged carcases over his shoulder.
+					Carcus lasted a month.$FG$
 How does He feel about the Avatar movie?$FG,4$"Sick skin"$FG$
 What do You like at zoos with kids?	$FG,4$"Dignity" Animals worried about dignity.$FG$
 Who's better alien or preditor?		$FG,4$"Lions"$FG$
@@ -161,11 +168,13 @@ Are they peaceful?		$FG,4$Fight them! (Also, funny.)$FG$
 How can Judge Judy improve?	$FG,4$No hard feelings$FG$
 How can Chef Ramsay improve?	$FG,4$Make so it doesn't seem like toil for cooks.$FG$
 How can Hawking communicate?	$FG,4$Blow from a nostril on a candle.$FG$
+$TX,"Photons bouncing?",HTML="https://www.youtube.com/watch?v=8FC6udrMPvo"$		$FG,4$"Folded coffee filter"$FG$ 
 Wormholes?			$FG,4$Bent wormholes have echoes.$FG$
 
 Operating system?		$FG,4$Was about to make line number column in editor.
 God nixed it.  I was about to do different graphic modes when I found 800x600 missing. God said just one mode 640x480.  I was about to add child windows.  God said, "God is not the author of such confusion." I asked for verification of 640x480 16 color. God said it was because of the children and their offerings.  I asked about sound. God said "single voice". I asked for verification of not having different drivers.  God confirmed this.$FG$
-640x480 16 color?		$FG,4$$TX,"Modern graphics hard for kids/amateurs",HTML="http://www.youtube.com/watch?v=VUxcVzpeFqc"$$FG$
+640x480 16 color?		$FG,4$God said it was a covenant, like circumcision.
+				$TX,"Modern graphics hard for kids/amateurs",HTML="http://www.youtube.com/watch?v=VUxcVzpeFqc"$.$FG$
 On Unix?			$FG,4$God said it was rich with the patina of age.$FG$
 On Alcohol?			$FG,4$Hate inebriation$FG$
 On rare steak?			$FG,4$Too rare is very bad.  Don't eat blood!$FG$
@@ -175,4 +184,4 @@ Why the Sandy Hook shooting?	$FG,4$The pot legalization law. (Sarcastic answer?)
 Deep Water Horizon		$FG,4$(Claimed credit.)$FG$
 Cost of God's time to me?	$FG,4$"The complete works of Shakespeare"$FG$
 On death?			$FG,4$"awful"$FG$
-Opening of Private Ryan?	$FG,4$"Ouch"$FG$
+Opening of Saving Private Ryan?	$FG,4$"Ouch"$FG$

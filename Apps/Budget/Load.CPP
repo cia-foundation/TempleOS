@@ -1,11 +1,12 @@
 #help_index "Finance"
 
-#include "/Apps/Budget/BgtStrs"
-#include "/Apps/Budget/Budget"
-#include "/Apps/Budget/BgtAccts"
-#include "/Apps/Budget/BgtEntry"
-#include "/Apps/Budget/BgtTemplate"
-#include "/Apps/Budget/BgtFile"
-#include "/Apps/Budget/BgtMain"
+Cd(__DIR__);;
+#include "BgtStrs"
+#include "Budget"
+#include "BgtAccts"
+#include "BgtEntry"
+#include "BgtTemplate"
+#include "BgtFile"
+#include "BgtMain"
 
 #help_index ""

@@ -1,10 +1,10 @@
-PopUpOk(
-"We will now run a test-suite\n"
-"that automatically executes\n"
-"most TempleOS demos.  It takes\n"
-"a few minutes, so kick-back.\n");
+TourPut(
+"We will now run a test-suite that automatically executes most TempleOS "
+"demos.  It takes a few minutes, so kick-back.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$ in a moment.\n",TRUE);
 
-PopUpOk("Press $$GREEN$$<ENTER>$$FG$$.");
+if (LBtr(&tour_put->display_flags,DISPLAYf_SHOW))
+  WinZBufUpdate;
 
 "#include \"::/Misc/OSTestSuite\";";
 AFGetStr("\n");

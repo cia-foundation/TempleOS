@@ -7,7 +7,7 @@ class Man
 {
   I32 vertex_cnt;
   I32 tri_cnt;
-  CD3I32	    v[MAX_VERTICES];
+  CD3I32   v[MAX_VERTICES];
   CMeshTri t[MAX_TRIS];
 } *m;
 
@@ -182,17 +182,17 @@ U0 AddBox(ManDefineStruct *md,I64 c,I64 x1,I64 y1,I64 z1,F64 w,F64 h,F64 d,F64 h
 U8 *Man2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
-  U8 *result=MAlloc(sizeof(U8)+2*sizeof(I32)+
+  U8 *result=MAlloc(sizeof(CSpriteMeshU8s)+
       m->vertex_cnt*sizeof(CD3I32)+m->tri_cnt*sizeof(CMeshTri)+sprite_elem_base_sizes[SPT_END]),
       *dst=result;
-  *dst(U8 *)++ =SPT_MESH;
+  *dst++ =SPT_MESH;
   *dst(I32 *)++ =m->vertex_cnt;
   *dst(I32 *)++ =m->tri_cnt;
   MemCpy(dst,&m->v,m->vertex_cnt*sizeof(CD3I32));
   dst+=m->vertex_cnt*sizeof(CD3I32);
   MemCpy(dst,&m->t,m->tri_cnt*sizeof(CMeshTri));
   dst+=m->tri_cnt*sizeof(CMeshTri);
-  *dst(U8 *)++ =SPT_END;
+  *dst++ =SPT_END;
   return result;
 }
 

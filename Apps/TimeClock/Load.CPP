@@ -1,6 +1,7 @@
 #help_index "Misc"
 
-#include "/Apps/TimeClock/TimeClk"
-#include "/Apps/TimeClock/Install" //Might as well always install
+Cd(__DIR__);;
+#include "TimeClk"
+#include "Install" //Might as well always install
 
 #help_index ""

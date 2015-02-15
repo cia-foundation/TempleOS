@@ -6,7 +6,7 @@ PUT_DEC_U64::
 	MOV	RBP,RSP
 	SUB	RSP,24		//24 char buffer on stack
 
-//$LK,"Save regs",A="FF:::/Kernel/Adam1a.HPP,PUSH_C_REGS"$ which C code is free to clobber.  We don't have to for C callers,
+//$LK,"Save regs",A="FF:::/Kernel/KernelA.HPP,PUSH_C_REGS"$ which C code is free to clobber.  We don't have to for C callers,
 //but this function will be nice for ASM callers if it saves all regs.
 	PUSH_C_REGS
 

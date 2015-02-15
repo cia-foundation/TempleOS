@@ -170,16 +170,15 @@ U0 RainDrops()
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;
-  WordStat;
+  AutoComplete;
   try {
-    do {
-      ch=GetKey(&sc);
-      switch (ch) {
+    do
+      switch (ch=GetKey(&sc)) {
 	case '\n':
 	  Init;
 	  break;
       }
-    } while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
+    while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
   } catch
     PutExcept;
   SettingsPop;

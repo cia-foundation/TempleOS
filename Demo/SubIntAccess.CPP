@@ -2,7 +2,7 @@
 access to bytes and words of larger
 integers.
 
-See $LK,"U64i union",A="FF:::/Kernel/Adam1a.HPP,U64i union"$.
+See $LK,"U64i union",A="FF:::/Kernel/KernelA.HPP,U64i union"$.
  
 The versions with "i" are internal data types.
 Use "I64" instead of "U64i" and you

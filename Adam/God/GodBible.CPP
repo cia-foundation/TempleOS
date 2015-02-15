@@ -1,7 +1,6 @@
 #help_index "God"
 U0 BibleInit()
 {
-  DefineLoad("ST_BIBLE_FILE","::/Misc/Bible.TXT.Z");
   DefineLstLoad("ST_BIBLE_BOOKS",
 	"Genesis\0"
 	"Exodus\0"
@@ -157,7 +156,7 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
     ptr+=StrLen(ptr)+1;
   }
   if (0<=--i<cnt) {
-    doc=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
+    doc=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT);
     DocLineNumGoTo(doc,line); //one based
     doc_e=doc->cur_entry;
     while (doc_e!=doc && (doc_e->type_u8!=DOCT_TEXT || !*doc_e->tag))
@@ -212,8 +211,8 @@ public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines)
   CDoc *doc_in;
   CDocEntry *doc_e;
   if (!doc_out) doc_out=DocPut;
-  if (doc_out && FileFind(Define("ST_BIBLE_FILE"))) {
-    doc_in=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
+  if (doc_out && FileFind(BIBLE_FILENAME)) {
+    doc_in=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT);
     DocLineNumGoTo(doc_in,start); //one based
     doc_e=doc_in->cur_entry;
     while (lines>0 && doc_e!=doc_in) {
@@ -236,7 +235,7 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
   CDocEntry *doc_e;
   U8 *st,*st2;
   if (!doc_out) doc_out=DocPut;
-  if (doc_out && FileFind(Define("ST_BIBLE_FILE"))) {
+  if (doc_out && FileFind(BIBLE_FILENAME)) {
     st=StrNew(verse);
     st2=StrNew(verse);
     if (StrOcc(st,','))
@@ -246,7 +245,7 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
     i=DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
     if (i>=0) {
       i=Str2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
-      doc_in=DocRead(Define("ST_BIBLE_FILE"),DOCF_PLAIN_TEXT);
+      doc_in=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT);
       DocLineNumGoTo(doc_in,i); //one based
       if (*st2) {
 	StrCpy(doc_in->find_replace->find_text,st2);

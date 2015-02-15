@@ -302,8 +302,8 @@ public Bool DocDo(CDoc *doc,I64 dof_flags=0)
   Free(old_task_title);
   DocDel(bdoc);
   if (dof_flags&DOF_MIN_SIZE) {
-    SetWinHorz(old_left,old_right);
-    SetWinVert(old_top,old_bottom);
+    WinHorz(old_left,old_right);
+    WinVert(old_top,old_bottom);
   }
   Preempt(old_preempt);
   return result;
@@ -403,32 +403,7 @@ md_restart:
   return result;
 }
 
-#help_index "Task/Srv"
-public I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
-{//Execute code text in PopUp win task.
-  I64 result;
-  CSrvCmd *tempc;
-  Bool old_preempt=Preempt(OFF);
-  CTask *task=Spawn(&SrvUserCmdLine,NULL,"System",,parent);
-  if (!parent) {
-    TaskExe(task,parent,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
-    if (_pu_task) *_pu_task=task;
-    Preempt(old_preempt);
-    return 0;
-  } else {
-    Fs->popup_task=task;
-    tempc=TaskExe(task,parent,buf,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-    if (_pu_task) *_pu_task=task;
-    ScanResult(tempc,&result);
-    Fs->popup_task=NULL;
-    Kill(task);
-    if (_pu_task) *_pu_task=NULL;
-    Preempt(old_preempt);
-    return result;
-  }
-}
-
-#help_index "DolDoc;Task/Srv"
+#help_index "DolDoc;Task/Srv/Exe"
 public I64 PopUpEd(U8 *filename,CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Create PopUp win task and edit a doc.
   U8 *st=MStrPrint("Ed(\"%Q\");",filename);
@@ -441,7 +416,7 @@ public I64 PopUpEd(U8 *filename,CTask *parent=NULL,CTask **_pu_task=NULL)
 public CTask *PopUpViewDoc(CDoc *doc,I64 dof_flags=0)
 {//Pass doc to PopUp win task for viewing.
   U8 *buf=MStrPrint("Preempt(ON);DocDo(0x%X,0x%X);",doc,dof_flags);
-  CTask *task=Spawn(&SrvUserCmdLine,NULL,"View",,Fs);
+  CTask *task=Spawn(&SrvCmdLine,NULL,"View",,Fs);
   TaskExe(task,NULL,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   Free(buf);
   return task;
@@ -470,13 +445,13 @@ public CTask *PopUpViewPrint(U8 *fmt,...)
 public I64 PopUpMenu(CDoc *doc,I64 dof_flags=0)
 {//Do (Run) menu chooser doc in PopUp win task.
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
-  return SrvUser("DocMenuDo(0x%X,0x%X);",doc,dof_flags);
+  return PopUpPrint("DocMenuDo(0x%X,0x%X);",doc,dof_flags);
 }
 
 public Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,I64 dof_flags=DOF_MIN_SIZE,
     U8 *header=NULL,U8 *footer=NULL)
 {//See $LK,"::/Demo/DolDoc/Form.CPP"$ and $LK,"::/Demo/LastClass.CPP"$.
-  return SrvUser("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
+  return PopUpPrint("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
     dof_flags,header,footer);
 }
 
@@ -727,7 +702,7 @@ public F64 PopUpRangeF64Log(F64 lo,F64 hi,I64 steps,
   return PopUpRangeF64Exp(lo,hi,Exp(Ln(hi/lo)/(steps-1)),fmt,header,footer);
 }
 
-#help_index "Task/Srv"
+#help_index "Task/Srv/Exe"
 public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
 {//Tell adam task to compile and run a file.
   Bool okay=TRUE;
@@ -875,8 +850,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     }
   i=(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH;
   if (doc->max_x>i) i=doc->max_x;
-  SetWinHorz(task->win_left,task->win_left+i,task);
-  SetWinVert(task->win_top,task->win_top+doc->max_y+(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH,task);
+  WinHorz(task->win_left,task->win_left+i,task);
+  WinVert(task->win_top,task->win_top+doc->max_y+(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH,task);
 }
 
 I64 DitherColorDo(U8 *header=NULL)

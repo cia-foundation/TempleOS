@@ -3,6 +3,8 @@ to cut and paste lines to reverse the order of
 lines in a text file.
 */
 
+Cd(__DIR__);;
+
 U0 Reverse(U8 *in_name,U8 *out_name)
 {
   CDoc	*doc_in =DocRead(in_name),
@@ -18,5 +20,4 @@ U0 Reverse(U8 *in_name,U8 *out_name)
   DocWrite(doc_out);
 }
 
-Reverse("::/Demo/ReverseFileExample/PoemBackward.TXT.Z",
-	"::/Demo/ReverseFileExample/PoemForeward.TXT.Z");
+Reverse("PoemBackward.TXT.Z","PoemForeward.TXT.Z");

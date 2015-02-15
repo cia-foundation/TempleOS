@@ -10,9 +10,9 @@ U0 Main1()
   PressAKey;
   ProgressBarsRst;
   StrCpy(progress1_desc,"Progress Demo"); //PROGRESS_DESC_LEN is max
-  progress1_max=400;
+  progress1_max=200;
   while (progress1++!=progress1_max)
-    Sleep(10);
+    Sleep(20);
   progress1_max=0; //hide
 }
 
@@ -24,9 +24,9 @@ U0 Main2()
   PressAKey;
   ProgressBarsRst;
   //No progress1_desc
-  progress1_max=400;
+  progress1_max=200;
   while (progress1++!=progress1_max)
-    Sleep(10);
+    Sleep(20);
   progress1_max=0; //hide
 }
 

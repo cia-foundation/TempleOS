@@ -11,7 +11,7 @@ public U0 SpeedLineDemo()
 
   WinMax;
   WinBorder;
-  WordStat;
+  AutoComplete;
   DCFill;
   DocClear;
   do {

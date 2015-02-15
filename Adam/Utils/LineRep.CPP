@@ -56,14 +56,14 @@ I64 SizeRep1(CDirEntry *tempde,I64 *_fuf_flags)
 {
   I64 result=0,i;
   U8 buf[BLK_SIZE];
-  CPrt *p;
+  CDrv *dv;
   while (tempde) {
     if (tempde->attr&RS_ATTR_DIR)
       i=SizeRep1(tempde->sub,_fuf_flags);
     else if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
 	FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
-      p=Drv2Prt(*tempde->full_name);
-      RBlks(p,buf,Cluster2Blk(p,tempde->cluster),1);
+      dv=Let2Drv(*tempde->full_name);
+      RBlks(dv,buf,Cluster2Blk(dv,tempde->cluster),1);
       i=(&buf)(CArcCompress *)->expanded_size;
     }
     tempde->user_data=i;

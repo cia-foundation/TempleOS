@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Command Line Overview"$$FG$
 
 The cmd line feeds into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler as you type.  A statement outside a function executes immediately.  Remember to add a semicolon.$WW,1$
 
-Look-up the function headers with $FG,2$WordStat$FG$ by hitting $FG,2$<CTRL-SHIFT-F1>$FG$ after typing the first few letters.
+Look-up the function headers with $FG,2$AutoComplete$FG$ by hitting $FG,2$<CTRL-SHIFT-F1>$FG$ after typing the first few letters.
 
 $LK,"Click Here",A="MN:Dir"$ to see the directory cmd header.  It accepts default args from C++.
 
@@ -27,14 +27,14 @@ The drive can be specified in a $LK,"Cd",A="MN:Cd"$() command as in:
 >$FG,2$Cd("B:/Temp");$FG$	B drive
 >$FG,2$Cd("::/Demo");$FG$	Boot drive
 
->$FG,2$Cd("HOME/Psalmody");$FG$	HOME is your $LK,"acct dir",A="FF:::/Doc/GuideLines.TXT,ACCT FILES"$.
+>$FG,2$Cd("::/Home/Psalmody");$FG$	See $LK,"::/Home dir",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.
 
 If a file is not found, $FG,2$.Z$FG$ is added or removed and a search is done, again.  If a file is still not found, all parent directories are searched.
 
-You can place macros in your $LK,"PersonalMenu",A="FI:HOME/PersonalMenu.TXT"$ for $LK,"Cd",A="MN:Cd"$() commands.  $FG,2$<CTRL-m>$FG$ to access your menu.
+You can place macros in your $LK,"PersonalMenu",A="FI:/Home/PersonalMenu.TXT"$ for $LK,"Cd",A="MN:Cd"$() commands.  $FG,2$<CTRL-m>$FG$ to access your menu.
 
->$FG,2$Grep("needle","/Demo/*.CPP.Z;*.TXT.Z;");$FG$ See $LK,"File Utils",A="FI:::/Doc/FileUtils.TXT"$.
+>$FG,2$Find("needle","/Demo/*.CPP.Z;*.TXT.Z;");$FG$ See $LK,"File Utils",A="FI:::/Doc/FileUtils.TXT"$.
 
 $LK,"Cmd Line Routines",A="HI:Cmd Line (Typically)"$
 
-$MA-X+PU,"Take Tour",LM="SpawnUser(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$
+$MA-X+PU,"Take Tour",LM="User(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$

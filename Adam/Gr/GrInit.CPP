@@ -55,14 +55,14 @@ U0 GrSetUpTables()
 	if (((x-1)^(y-1))&1 && SqrI64(y*2-k)+SqrI64(x*2-k)<rr)
 	  GrPlot0(dc,x-1,y-1);
   }
-  if (!sys_bios_gr_mode) { //if text mode
-    MemSet(VGA_TEXT_MEM_BASE,0,TEXT_ROWS*TEXT_COLS*sizeof(U16));
+  if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
+    MemSet(VGAM_TEXT,0,TEXT_ROWS*TEXT_COLS*sizeof(U16));
     MemSet(gr.vga_text_cache,0,TEXT_ROWS*TEXT_COLS*sizeof(U16));
   } else {
-    OutU8(VGA_SC_INDEX,VGA_MAP_MASK);
-    OutU8(VGA_SC_DATA,0x0F);
+    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_DATA,0x0F);
 //Virtual Box crashes on the following for some reason.
-//    MemSet(VGA_GRAPHIC_MEM_BASE,0,GR_HEIGHT*GR_WIDTH>>3);
+//    MemSet(VGAM_GRAPHICS,0,GR_HEIGHT*GR_WIDTH>>3);
     MemSet(gr.screen_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
   }
   for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++) {
@@ -79,8 +79,6 @@ U0 GrSetUpTables()
 	dst[j+l*256]=m.u8[l];
     }
   }
-  for (i=0;i<GR_REFRESH_LOG_CNT;i++)
-    gr.refresh_time_stamps[i]=tS;
 }
 
 #help_index "Graphics/Screen;Windows"

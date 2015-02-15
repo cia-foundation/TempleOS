@@ -1,39 +1,24 @@
 "Ed(\"::/Misc/Bible.TXT.Z\");\n";
-Sleep(1000);
-
-PopUpOk(
-"$$GREEN$$<CTRL-F>$$FG$$ to find.\n"
-);
-
+TourPut("Press $$GREEN$$<CTRL-F>$$FG$$ to find.\n");
 AFGetChar(CH_CTRLF);
 
 AFPrint(150,"new song");
 
-PopUpOk("Cursor down 8 times.\n");
+TourPut("Cursor down 8 times.\n");
 I64 i;
 for (i=0;i<8;i++)
   AFGetKey(SC_CURSOR_DOWN);
 
-PopUpOk(
-"Press '$$GREEN$$2$$FG$$' to show\n"
-"all lines within 2 of a match.\n");
+TourPut("Press '$$GREEN$$2$$FG$$' to show all lines within 2 of a match.\n");
 AFGetStr("2");
-Sleep(1000);
 
-PopUpOk("Press $$GREEN$$<ESC>$$FG$$.\n");
+TourPut("Press $$GREEN$$<ESC>$$FG$$ to exit the form.\n");
 AFGetChar(CH_ESC);
-Sleep(500);
 
-PopUpOk(
-"Look around and press $$GREEN$$<ESC>$$FG$$\n"
-"to turn off filter.\n");
+TourPut("Look around and press $$GREEN$$<ESC>$$FG$$ to turn off filter.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
-Sleep(1000);
 
-PopUpOk(
-"You can combine filters to\n"
-"effectively do AND searches.\n");
-Sleep(1000);
+TourPut("You can combine filters to effectively do AND searches.\n",TRUE);
 
 '' CH_SHIFT_ESC;
 

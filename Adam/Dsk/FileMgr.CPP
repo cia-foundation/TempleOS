@@ -140,7 +140,7 @@ CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_root,Bool init)
 
 U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
 {
-  CPrt *p;
+  CDrv *dv;
   I64 i;
   CDoc *doc=*_doc,*doc2=sys_clipboard_doc,*parent_doc;
   CFMUncollapsedLst *tempc=NULL;
@@ -211,15 +211,15 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
       break;
   }
   DocPrint(doc,"$$LTBLUE$$");
-  for (i=0;i<NUM_PRTS;i++) {
-    p=&dsk.prts[i];
-    if (p->type==PT_REDSEA||p->type==PT_FAT32)
-      FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
-    else if (p->type==PT_ISO9660) {
-      if (p->bdev->flags&BDF_INITIALIZED)
-	tempde=FMRebuildDocDrv(Prt2Drv(p),doc,_root,TRUE);
+  for (i=0;i<NUM_DRVS;i++) {
+    dv=&dsk.drvs[i];
+    if (dv->type==DVT_REDSEA||dv->type==DVT_FAT32)
+      FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
+    else if (dv->type==DVT_ISO9660) {
+      if (dv->bd->flags&BDF_INITIALIZED)
+	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
       else {
-	tempde=FMRebuildDocDrv(Prt2Drv(p),doc,_root,FALSE);
+	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,FALSE);
 	tempde->flags|=DEF_NOT_INITIALIZED;
       }
       tempde->flags|=DEF_REMOVABLE;
@@ -248,7 +248,7 @@ U0 FMRename(CDoc *doc)
       Cd(parent->full_name);
       StrCpy(fn.name,tempde->name);
       if (DocFormDo(&fn)) {
-	Silent(ON);
+	Silent;
 	Move(tempde->name,fn.name);
 	Silent(OFF);
       }
@@ -260,7 +260,7 @@ U0 FMRename(CDoc *doc)
       StrCpy(fn.name,tempde->name);
       if (DocFormDo(&fn)) {
 	if (StrCmp(tempde->name,fn.name)) {
-	  Silent(ON);
+	  Silent;
 	  if (CopyTree(tempde->name,fn.name))
 	    DelTree(tempde->name);
 	  Silent(OFF);
@@ -281,7 +281,7 @@ U0 FMMkDir(CDoc *doc)
     if (parent=tempde->parent) {
       Cd(parent->full_name);
       if (DocFormDo(&fn)) {
-	Silent(ON);
+	Silent;
 	MkDir(fn.name);
 	Silent(OFF);
       }
@@ -290,7 +290,7 @@ U0 FMMkDir(CDoc *doc)
     tempde=doc_e->user_data;
     Cd(tempde->full_name);
     if (DocFormDo(&fn)) {
-      Silent(ON);
+      Silent;
       MkDir(fn.name);
       Silent(OFF);
     }
@@ -304,7 +304,7 @@ U0 FMDelete(CDoc *doc)
   CDirEntry *tempde;
   if (doc_ce->type_u8==DOCT_MENU_VAL) {
     tempde=doc_ce->user_data;
-    Silent(ON);
+    Silent;
     st=MStrPrint("Delete: %s",tempde->full_name);
     if (PopUpCancelOk(st))
       Del(tempde->full_name);
@@ -312,7 +312,7 @@ U0 FMDelete(CDoc *doc)
     Silent(OFF);
   } else if (doc_ce->type_u8==DOCT_TREE) {
     tempde=doc_ce->user_data;
-    Silent(ON);
+    Silent;
     st=MStrPrint("Delete: %s",tempde->full_name);
     if (PopUpCancelOk(st))
       DelTree(tempde->full_name);
@@ -332,7 +332,7 @@ U0 FMMount(CDoc *doc)
   if (tempde) {
     while (tempde->parent)
       tempde=tempde->parent;
-    Silent(ON);
+    Silent;
     ChgDsk(*tempde->full_name);
     Silent(OFF);
   }
@@ -352,7 +352,7 @@ U0 FMFmtDrv(CDoc *doc)
       tempde=tempde->parent;
     st=MStrPrint("Format Drive '%c'?\nAre You Sure?\n",*tempde->full_name);
     if (PopUpCancelOk(st)) {
-      Silent(ON);
+      Silent;
       Fmt(*tempde->full_name,,FALSE);
       Silent(OFF);
     }
@@ -373,7 +373,7 @@ U0 FMMakeISO(CDoc *doc)
     if (doc_ce->type_u8==DOCT_MENU_VAL)
       tempde=tempde->parent;
     if (tempde && *tempde->full_name) {
-      Silent(ON);
+      Silent;
       if (tempde->full_name[StrLen(tempde->full_name)-1]=='/')
 	st=MStrPrint("%s*",tempde->full_name);
       else
@@ -396,7 +396,7 @@ U0 FMBurnISO(CDoc *doc)
   if (tempde) {
     while (tempde->parent)
       tempde=tempde->parent;
-    Silent(ON);
+    Silent;
     CDImageWrite(*tempde->full_name);
     Silent(OFF);
   }
@@ -423,7 +423,7 @@ U0 FMCopy(CDoc *doc)
 	tempde->flags|=DEF_PROCESSED;
 	tempde2=tempde->parent;
 	if (!tempde2 || !(tempde2->flags&DEF_PROCESSED)) {
-	  Silent(ON);
+	  Silent;
 	  Copy(tempde->full_name,tempde1->full_name);
 	  Silent(OFF);
 	}
@@ -432,7 +432,7 @@ U0 FMCopy(CDoc *doc)
 	tempde->flags|=DEF_PROCESSED;
 	tempde2=tempde->parent;
 	if (!tempde2 || !(tempde2->flags&DEF_PROCESSED)) {
-	  Silent(ON);
+	  Silent;
 	  if (*tempde1->name)
 	    st=MStrPrint("%s/%s",tempde1->full_name,tempde->name);
 	  else
@@ -581,7 +581,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
       case MSG_IP_L_UP:
 	if (doc_ce) {
 	  gr.fp_final_screen_update=fp_old_final_screen_update;
-	  if (SetCursorPos(Fs,a1/FONT_WIDTH+Fs->win_left+Fs->scroll_x/FONT_WIDTH,a2/FONT_HEIGHT+Fs->win_top+Fs->scroll_y/FONT_HEIGHT,TRUE)) {
+	  if (WinCursorPosSet(Fs,a1/FONT_WIDTH+Fs->win_left+Fs->scroll_x/FONT_WIDTH,a2/FONT_HEIGHT+Fs->win_top+Fs->scroll_y/FONT_HEIGHT,TRUE)) {
 	    doc_e=doc->cur_entry;
 	    if (doc_e!=doc_ce) {
 	      st2=NULL;
@@ -595,7 +595,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	      }
 	      if (st2 && doc_ce->type_u8==DOCT_MENU_VAL) {
 		tempde=doc_ce->user_data;
-		Silent(ON);
+		Silent;
 		Move(tempde->full_name,st2);
 		Silent(OFF);
 		FMRebuildDoc(&doc,&root,mode);
@@ -617,7 +617,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 		  else
 		    st=MStrPrint("%s%s",tempde1->full_name,tempde->name);
 		  if (StrCmp(tempde->full_name,st)) {
-		    Silent(ON);
+		    Silent;
 		    CopyTree(tempde->full_name,st);
 		    DelTree(tempde->full_name);
 		    Silent(OFF);

@@ -45,7 +45,7 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
       templ=templ->next;
     } else {
       if (!done_eof) {
-	"<EOF>";
+	'<EOF>';
 	done_eof=TRUE;
       }
       '\n';
@@ -55,13 +55,14 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
   RawPutChar(0x7F);
 }
 
-U0 EdLite(U8 *filename,I64 num=1)
+Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 {//Light weight text editor for debugging.
   U8 *src,*src2,*src3,*dst,*buf,*bin_data=NULL;
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
 	old_raw_flags=text.raw_flags;
   CLine root,*templ,*templ1,*cur_line;
-  Bool old_raw=Raw(ON),
+  Bool	result=FALSE,
+	old_raw=Raw(ON),
 	old_debug=InDbg(ON),
 	old_single=SingleUser(ON);
 
@@ -103,15 +104,20 @@ U0 EdLite(U8 *filename,I64 num=1)
       MemCpy(bin_data,src,bin_size);
     }
     Free(buf);
+    result=TRUE;
   }
 
   cur_line=root.next;
-  if (0<--num) {
-    if (num<cnt)
+  if (--num<0)
+    result=FALSE;
+  else {
+    if (num<=cnt)
       while (num--)
 	cur_line=cur_line->next;
-    else
+    else {
       cur_line=&root;
+      result=FALSE;
+    }
   }
   do {
     if (cur_line==&root)
@@ -246,7 +252,10 @@ U0 EdLite(U8 *filename,I64 num=1)
     }
   } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
 
-  if (ch==CH_ESC) {
+  if (ch!=CH_ESC) {
+    if (edf_dof_flags&EDF_WAS_WRITE)
+      result=FALSE;
+  } else {
     size=bin_size;
 
     templ=root.next;
@@ -268,6 +277,9 @@ U0 EdLite(U8 *filename,I64 num=1)
       MemCpy(dst,bin_data,bin_size);
     FileWrite(filename,buf,size);
     Free(buf);
+
+    if (edf_dof_flags&EDF_WAS_WRITE)
+      result=TRUE;
   }
 
   templ=root.next;
@@ -285,6 +297,7 @@ U0 EdLite(U8 *filename,I64 num=1)
   SingleUser(old_single);
   text.raw_flags=text.raw_flags&~RWF_SHOW_DOLLAR|old_raw_flags&RWF_SHOW_DOLLAR;
   POPFD
+  return result;
 }
 
 U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum)
@@ -300,16 +313,18 @@ U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum)
   *_linenum=linenum;
 }
 
-U0 EdLiteFileLine(U8 *fl_file_line)
+Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0)
 {
+  Bool result;
   U8 *filename;
   I64 linenum;
   ToFileLine(fl_file_line,&filename,&linenum);
-  EdLite(filename,linenum);
+  result=EdLite(filename,linenum,edf_dof_flags);
   Free(filename);
+  return result;
 }
 
-U0 SetFix(U8 *filename,I64 line)
+U0 FixSet(U8 *filename,I64 line)
 {//Compiler calls this to set file line for Fix
   U8 *st=MStrPrint("FL:%s,%d",filename,line);
   while (LBts(&sys_semas[SYS_SEMA_FIX],0))
@@ -319,9 +334,10 @@ U0 SetFix(U8 *filename,I64 line)
   LBtr(&sys_semas[SYS_SEMA_FIX],0);
 }
 
-U0 Fix()
+Bool Fix(I64 edf_dof_flags=0)
 {//Jump to last err src code to fix it.
   U8 *st;
+  Bool result=FALSE;
 
   while (LBts(&sys_semas[SYS_SEMA_FIX],0))
     Yield;
@@ -330,9 +346,10 @@ U0 Fix()
 
   if (st) {
     if (IsRaw)
-      EdLiteFileLine(st);
+      result=EdLiteFileLine(st,edf_dof_flags);
     else
-      Ed(st);
+      result=Ed(st,edf_dof_flags);
   }
   Free(st);
+  return result;
 }

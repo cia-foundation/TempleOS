@@ -49,7 +49,7 @@ U0 KeyMapCtrlAltFamily()
 
   a2=SC_ESC+SCF_CTRL+SCF_ALT;
   st2=ScanCode2KeyName(a2);
-  st=SrcEdLink(&SpawnUser,256);
+  st=SrcEdLink(&User,256);
   "%20s $$LK,\"%s\",A=\"%s\"$$\n",st2,"Sys/Spawn New User Task",st;
   Free(st);
   Free(st2);

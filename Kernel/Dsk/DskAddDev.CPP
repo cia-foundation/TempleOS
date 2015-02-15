@@ -1,18 +1,18 @@
-U0 SetBlkDevLockFwding(CBlkDev *bdev)
-{
-  CBlkDev *bdev1;
+U0 BlkDevLockFwdingSet(CBlkDev *bd)
+{  //If two blkdevs on same controller, use just one lock
+  CBlkDev *bd1;
   I64 i;
-  switch (bdev->type) {
+  switch (bd->type) {
     case BDT_RAM:
       break;
     case BDT_ATA:
     case BDT_ATAPI:
       for (i=0;i<NUM_BLKDEVS;i++) {
-	bdev1=&dsk.blkdevs[i];
-	if (bdev1->bd_signature==BD_SIGNATURE_VAL && bdev!=bdev1 &&
-	    (bdev1->type==BDT_ATAPI || bdev1->type==BDT_ATA) &&
-	    bdev1->base0==bdev->base0) {
-	  bdev->lock_fwding=bdev1;
+	bd1=&dsk.blkdevs[i];
+	if (bd1->bd_signature==BD_SIGNATURE_VAL && bd!=bd1 &&
+	    (bd1->type==BDT_ATAPI || bd1->type==BDT_ATA) &&
+	    bd1->base0==bd->base0) {
+	  bd->lock_fwding=bd1;
 	  break;
 	}
       }
@@ -20,74 +20,74 @@ U0 SetBlkDevLockFwding(CBlkDev *bdev)
   }
 }
 
-I64 BlkDevAdd(CBlkDev *bdev,Bool one_prt,Bool make_free)
+I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 {
   I64 i,j,ext_base,offset,result=0;
-  CPrt *p;
-  CBootStruct br;
+  CDrv *dv;
+  CRedSeaBoot br;
   CMasterBoot mbr;
 
-  bdev->bd_signature=BD_SIGNATURE_VAL;
+  bd->bd_signature=BD_SIGNATURE_VAL;
   if (make_free)
-    p=PrtMakeFree(bdev->first_drv_let+result);
+    dv=DrvMakeFree(bd->first_drv_let+result);
   else
-    p=PrtNextFree(bdev->first_drv_let+result);
-  p->bdev=bdev;
-  p->size=bdev->max_blk+1;
-  switch (bdev->type) {
+    dv=DrvNextFree(bd->first_drv_let+result);
+  dv->bd=bd;
+  dv->size=bd->max_blk+1;
+  switch (bd->type) {
     case BDT_RAM:
-      p->pt_signature=PRT_SIGNATURE_VAL;
-      p->type=PT_REDSEA;
+      dv->dv_signature=DRV_SIGNATURE_VAL;
+      dv->type=DVT_REDSEA;
 //This is to force creation of a RAM
 //drive during boot, so it is probably
 //MAlloced to the same addr and can
 //be assumed to be already formatted.
 //If this line is removed, RAM Drives
-//will be allocated on a just-in-time
+//will be alloced on a just-in-time
 //basis.
-      if (BlkDevInit(bdev))
+      if (BlkDevInit(bd))
 	result++;
       else
-	p->pt_signature=0;
+	dv->dv_signature=0;
       break;
     case BDT_ATA:
-      p->pt_signature=PRT_SIGNATURE_VAL; //Temporarily validate
-      if (!BlkDevInit(bdev))
-	p->pt_signature=0; //Revoke validation
+      dv->dv_signature=DRV_SIGNATURE_VAL; //Temporarily validate
+      if (!BlkDevInit(bd))
+	dv->dv_signature=0; //Revoke validation
       else {
-	p->pt_signature=0; //Revoke validation
-	if (one_prt) {
-	  p->pt_signature=PRT_SIGNATURE_VAL;
+	dv->dv_signature=0; //Revoke validation
+	if (one_drv) {
+	  dv->dv_signature=DRV_SIGNATURE_VAL;
 	  result++;
-	  p->type=PT_REDSEA;
-	  p->size=bdev->max_blk+1;
+	  dv->type=DVT_REDSEA;
+	  dv->size=bd->max_blk+1;
 	  //The following read is a test read.
 	  //if it hangs, the drive is not supported.
-	  ATAReadBlks(bdev,&mbr,0,1);
+	  ATAReadBlks(bd,&mbr,0,1);
 	  break;
 	}
 	offset=0;
 	ext_base=INVALID_CLUSTER;
 	while (TRUE) {
-	  ATAReadBlks(bdev,&mbr,offset,1);
+	  ATAReadBlks(bd,&mbr,offset,1);
 	  if (mbr.signature!=0xAA55)
 	    break;
 	  j=-1;
 	  for (i=0;i<4;i++) {
 	    if (mbr.p[i].type) {
 	      if (make_free)
-		p=PrtMakeFree(bdev->first_drv_let+result);
+		dv=DrvMakeFree(bd->first_drv_let+result);
 	      else
-		p=PrtNextFree(bdev->first_drv_let+result);
-	      p->bdev=bdev;
-	      p->offset=mbr.p[i].offset+offset;
-	      p->size  =mbr.p[i].size;
+		dv=DrvNextFree(bd->first_drv_let+result);
+	      dv->bd=bd;
+	      dv->base_offset=mbr.p[i].offset+offset;
+	      dv->size	=mbr.p[i].size;
 	      switch (mbr.p[i].type) {
 		case MBR_PT_REDSEA:
-		  p->pt_signature=PRT_SIGNATURE_VAL;
+		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  p->type=PT_REDSEA;
-		  RedSeaFSPrtInit(p);
+		  dv->type=DVT_REDSEA;
+		  RedSeaDrvInit(dv);
 		  break;
 		case MBR_PT_FAT32a:
 		case MBR_PT_FAT32b:
@@ -95,30 +95,30 @@ I64 BlkDevAdd(CBlkDev *bdev,Bool one_prt,Bool make_free)
 		case MBR_PT_FAT32d:
 		case MBR_PT_FAT32e:
 		case MBR_PT_FAT32f:
-		  ATAReadBlks(bdev,&br,p->offset,1);
-		  p->pt_signature=PRT_SIGNATURE_VAL;
+		  ATAReadBlks(bd,&br,dv->base_offset,1);
+		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
 		  if (br.signature==MBR_PT_REDSEA) {
-		    p->type=PT_REDSEA;
-		    RedSeaFSPrtInit(p);
+		    dv->type=DVT_REDSEA;
+		    RedSeaDrvInit(dv);
 		  } else {
-		    p->type=PT_FAT32;
-		    FAT32PrtInit(p);
+		    dv->type=DVT_FAT32;
+		    FAT32DrvInit(dv);
 		  }
 		  break;
 		case MBR_PT_NTFS:
-		  p->pt_signature=PRT_SIGNATURE_VAL;
+		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  p->type=PT_NTFS;
+		  dv->type=DVT_NTFS;
 		  break;
 		case 5:
 		case 15:
 		  j=i;
 		  break;
 		default:
-		  p->pt_signature=PRT_SIGNATURE_VAL;
+		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  p->type=PT_UNKNOWN;
+		  dv->type=DVT_UNKNOWN;
 	      }
 	    }
 	  }
@@ -135,26 +135,26 @@ I64 BlkDevAdd(CBlkDev *bdev,Bool one_prt,Bool make_free)
       }
       break;
     case BDT_ATAPI:
-      p->pt_signature=PRT_SIGNATURE_VAL;
+      dv->dv_signature=DRV_SIGNATURE_VAL;
       result++;
-      p->type=PT_ISO9660; //Start with this
-      p->size =0;
+      dv->type=DVT_ISO9660; //Start with this
+      dv->size =0;
       break;
   }
   if (result)
-    SetBlkDevLockFwding(bdev);
+    BlkDevLockFwdingSet(bd);
   else
-    MemSet(bdev,0,sizeof(CBlkDev));
+    MemSet(bd,0,sizeof(CBlkDev));
   return result;
 }
 
 Bool DrvEnable(U8 drv_let,Bool val)
 {//Can unmount or remount, but not mount the first time.
-  CPrt *p;
+  CDrv *dv;
   Bool result=FALSE;
   try {
-    p=Drv2Prt(drv_let);
-    result=!LBEqu(&p->type,PTf_DISABLE,!val);
+    dv=Let2Drv(drv_let);
+    result=!LBEqu(&dv->type,DVTf_DISABLE,!val);
   } catch
     Fs->catch_except=TRUE;
   return result;
@@ -172,14 +172,14 @@ CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num)
 
 U0 Mount(Bool repartition=FALSE)
 {//Mount a drive.
-  CBlkDev *bdev;
-  I64 first_prt_num,type,unit,num_hints;
+  CBlkDev *bd;
+  I64 first_drv_num,type,unit,num_hints;
   U8 blks_buf[128],addr_buf[128],base0_buf[128],base1_buf[128];
   Bool add;
   CATARep *root,*tempha;
 
   do {
-    PrtRep;
+    DrvRep;
 	"\n****** Mount Drives ******\n"
 	"The first drive letter is the letter\n"
 	"of the first partition.  If adding\n"
@@ -187,9 +187,9 @@ U0 Mount(Bool repartition=FALSE)
 	"If more than one partition is present\n"
 	"they will be lettered in sequence.\n"
 	"\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
-    first_prt_num=ToUpper(GetChar)-'A';
+    first_drv_num=ToUpper(GetChar)-'A';
     '\n';
-    if (0<=first_prt_num<NUM_PRTS) {
+    if (0<=first_drv_num<NUM_DRVS) {
 	"\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
 	"\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
       type=GetChar-'0';
@@ -235,35 +235,35 @@ U0 Mount(Bool repartition=FALSE)
       }
 
       if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
-	bdev=BlkDevNextFree(first_prt_num+'A',type);
-	bdev->unit=unit;
+	bd=BlkDevNextFree(first_drv_num+'A',type);
+	bd->unit=unit;
 	if (type==BDT_RAM) {
 	  if (!*addr_buf) StrCpy(addr_buf,"0");
-	  bdev->RAM_dsk=Str2I64(addr_buf);
-	  bdev->max_blk=Str2I64(blks_buf)-1;
+	  bd->RAM_dsk=Str2I64(addr_buf);
+	  bd->max_blk=Str2I64(blks_buf)-1;
 	}
 	if (type==BDT_ATA ||
 	    type==BDT_ATAPI) {
-	  bdev->base0=Str2I64(base0_buf);
-	  bdev->base1=Str2I64(base1_buf);
+	  bd->base0=Str2I64(base0_buf);
+	  bd->base1=Str2I64(base1_buf);
 	}
 	add=TRUE;
 	if (type==BDT_ATA && repartition) {
 	  "\nReformat WHOLE drive!";
 	  if (YorN) {
-	    if (!BlkDevAdd(bdev,TRUE,TRUE))
+	    if (!BlkDevAdd(bd,TRUE,TRUE))
 	      "\n\n$$BK,1$$$$RED$$Operation Failed$$BK,0$$$$FG$$\n\n";
 	    else
-	      CallExtStr("PrtDsk",bdev->first_drv_let);
+	      CallExtStr("PrtDsk",bd->first_drv_let);
 	    add=FALSE;
 	  }
 	}
-	if (add && !BlkDevAdd(bdev,FALSE,TRUE))
+	if (add && !BlkDevAdd(bd,FALSE,TRUE))
 	  "\n\n$$BK,1$$$$RED$$Operation Failed$$BK,0$$$$FG$$\n\n";
       } else
 	"\n\n$$BK,1$$$$RED$$Operation Failed$$BK,0$$$$FG$$\n\n";
     }
-  } while (0<=first_prt_num<NUM_PRTS);
+  } while (0<=first_drv_num<NUM_DRVS);
 }
 
 I64 SysGetI64()
@@ -273,7 +273,7 @@ I64 SysGetI64()
   return Str2I64(st,16);
 }
 
-Bool GetBaseUnit(CBlkDev *bdev)
+Bool GetBaseUnit(CBlkDev *bd)
 {
   I64 ch;
   Bool probe;
@@ -284,25 +284,26 @@ Bool GetBaseUnit(CBlkDev *bdev)
   else
     StreamPrint("probe=TRUE;");
 };
-  if (!probe || !BootCdProbeAll(bdev)) {
+  if (!probe || !BootCdProbeAll(bd)) {
 	"\nDon't worry.  This is not a product\n"
 	"registration.	TempleOS just needs the\n"
 	"I/O port numbers for the CD-ROM.\n"
 	"\nRetry the ports above or check Windows\n"
 	"system information under I/O ports for\n"
 	"'IDE', 'ATA' or 'SATA'.\n"
+	"In Linux, use 'lspci -v' for ports.\n"
 	"\n\nEnter 4-digit hex I/O Port number.\n"
 	"CD-ROM I/O Port Base0: 0x";
-    bdev->base0=SysGetI64;
-    bdev->base1=0;
-    bdev->unit =0;
-    if (bdev->base0) {
+    bd->base0=SysGetI64;
+    bd->base1=0;
+    bd->unit =0;
+    if (bd->base0) {
       "\nUnit (0 or 1): ";
       do ch=GetChar(,FALSE);
       while (!('0'<=ch<='1'));
       '' ch;
-      bdev->unit=ch-'0';
-      dsk.cdrom_boot_is_good=BootCdProbe(bdev);
+      bd->unit=ch-'0';
+      dsk.cdrom_boot_is_good=BootCdProbe(bd);
       return TRUE;
     } else {
       dsk.cdrom_boot_is_good=FALSE;
@@ -314,12 +315,12 @@ Bool GetBaseUnit(CBlkDev *bdev)
 
 U0 BlkDevsInitAll()
 {
-  CBlkDev *bdev;
+  CBlkDev *bd;
   I64 i;
   dsk.blkdevs=CAlloc(sizeof(CBlkDev)*NUM_BLKDEVS);
-  dsk.prts=CAlloc(sizeof(CPrt)*NUM_PRTS);
-  for (i=0;i<NUM_PRTS;i++)
-    dsk.drv_to_prt[i]=&dsk.prts[i];
+  dsk.drvs=CAlloc(sizeof(CDrv)*NUM_DRVS);
+  for (i=0;i<NUM_DRVS;i++)
+    dsk.let_to_drv[i]=&dsk.drvs[i];
   text.raw_col=0;
 #exe {
   if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
@@ -328,5 +329,5 @@ U0 BlkDevsInitAll()
   StreamDoc(kernel_cfg->add_dev);
   StreamPrint("#exe {OptOn(OPTf_WARN_PAREN);}");
 };
-  PrtRep;
+  DrvRep;
 }

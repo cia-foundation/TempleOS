@@ -235,7 +235,7 @@ I64 GrFloodFillRay(CDC *dc,I64 x,I64 y,I64 z,I32 *db)
 }
 
 public I64 GrFloodFill(CDC *dc=gr.dc,I64 x,I64 y,Bool not_color=FALSE,I64 z=0,I32 *db=NULL)
-{//3D. Ignore z and db.
+{//2D. Ignore z and db.
 //not_color=TRUE means fill up to everything which is not the current color.
 //not_color=FALSE means fill all parts equal to the color under the point.
 //Returns cnt of pixs changed

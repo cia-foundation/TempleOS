@@ -8,7 +8,6 @@
  '^'= Rex xor-like
  ':'= floating sti-like for disassembly
  '$$'= ending zero (ENTER)
-
  $FG,4$Note:$FG$ TempleOS uses nonstandard opcodes.
  Asm is kind-of a bonus and I made changes
  to make the assembler simpler. For opcodes
@@ -906,7 +905,8 @@ OPCODE CMPXCHG
 OPCODE CHPXCHG8B 0x0F 0xC7, RM64;
 OPCODE DAA 0x27;
 OPCODE DAS 0x2F;
-OPCODE ENTER 0xC8, $$IW IMM16;
+OPCODE ENTER
+ 0xC8, $$IW IMM16;
 OPCODE HLT 0xF4;
 OPCODE IN
  0xE4, IB &AL UIMM8

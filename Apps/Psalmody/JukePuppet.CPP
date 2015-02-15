@@ -72,12 +72,12 @@ U0 JukeSongPuppet(CTask *juke_task,I64 passes,I64 song_num,U8 *name)
   Kill(task);
 }
 
-public U0 JukeSongsPuppet(U8 *dir="HOME/Psalmody",I64 passes=2,
+public U0 JukeSongsPuppet(U8 *dir="::/Home/Psalmody",I64 passes=2,
 			I64 start_song=0,I64 end_song=MAX_I64)
 {//Help make music video by puppeting JukeBox task.
   I64 i;
   CDirEntry *tempde,*tempde1;
-  CTask *juke_task=SpawnUser("JukeBox(0x%X);\n",dir);
+  CTask *juke_task=User("JukeBox(0x%X);\n",dir);
   Cd(dir);
   tempde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
   for (tempde=tempde1,i=0;tempde && i<start_song;i++)

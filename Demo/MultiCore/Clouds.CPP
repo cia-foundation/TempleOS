@@ -182,7 +182,7 @@ U0 CloudScene()
     DocCursor;
     WinMax;
     WinBorder;
-    WordStat;
+    AutoComplete;
     Init;
     Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
 
@@ -203,6 +203,6 @@ U0 CloudScene()
 
 //This is so I can use this file stand alone
 //or as a component of a program.
-#if IncludeDepth<2
+#if __DEPTH__<2
 CloudScene;
 #endif

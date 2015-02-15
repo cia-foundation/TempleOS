@@ -3,12 +3,13 @@ U0 Song()
 {
   CTask *task;
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   try {
     task=PopUpViewPrint("$LK,"BF:Luke,12:16"$\n");
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("3etGREqDDBRGCB",
 	    "It \0 \0de\0pends \0 \0on \0 \0the \0wea\0ther.\n\0");

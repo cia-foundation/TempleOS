@@ -6,7 +6,7 @@
 #define EF_REINDENT	0
 #define EF_CHK_COMPILE	1
 #define EF_RENUM_ASM	2
-#define EF_SLIDER_CTRL	3
+#define EF_CTRL_SLIDER	3
 #define EF_CH_SC	4
 
 I64 PopUpEdFmt()
@@ -16,7 +16,7 @@ I64 PopUpEdFmt()
   DocPrint(doc,"$$LTBLUE$$$$MU,\"Check Compile\",LE=EF_CHK_COMPILE$$\n"
 	"$$MU,\"Reindent CPP.Z Fun\",LE=EF_REINDENT$$\n"
 	"$$MU,\"Renum Asm Local @@ Labels for Fun\",LE=EF_RENUM_ASM$$\n"
-	"$$MU,\"Insert Template Code: Slider Ctrl\",LE=EF_SLIDER_CTRL$$\n"
+	"$$MU,\"Insert Template Code: Ctrl Slider\",LE=EF_CTRL_SLIDER$$\n"
 	"$$MU,\"Insert ASCII/Scan Code Hex Codes for key pressed\",LE=EF_CH_SC$$\n\n"
 	"$$MU,\"CANCEL\",LE=DOCM_CANCEL$$\n\n"
 	"$$GREEN$$<ALT-BACKSPACE>$$FG$$ to undo if not happy\n"
@@ -30,43 +30,32 @@ class CRILex
 {
   CLex *lx1,*lx2;
   CQueVectU8 *indent;
-  I64 depth,exp_depth;
-  Bool was_new_line,is_not_cont,one_shot;
+  I64 depth,exp_depth,one_shot;
+  Bool was_new_line,is_not_cont;
 };
 
 I64 EdRILex(CRILex *rx)
 {
-  Bool is_not_cont=FALSE;
-  I64 i,k;
+  rx->is_not_cont=FALSE;
+  I64 i;
   do {
     Lex(rx->lx1);
     Lex(rx->lx2);
-
-    if (rx->lx1->token=='\n') {
-      if (rx->lx2->token==TK_IDENT)
-	i=PrsKeyWord(rx->lx2);
-      else
-	i=-1;
-      if (rx->lx2->token==';' || rx->lx2->token=='{' || rx->lx2->token=='}' ||
-	   rx->lx2->token==':' || rx->lx2->token==')' && !rx->exp_depth ||
-	   i==KW_ELSE || i==KW_CATCH || i==KW_DO)
-	is_not_cont=TRUE;
-    }
-    k=PrsKeyWord(rx->lx2);
+    i=PrsKeyWord(rx->lx2);
+    if (rx->lx1->token=='\n' && rx->lx2->token==';' || rx->lx2->token=='{' ||
+	rx->lx2->token=='}' || rx->lx2->token==':' || rx->lx2->token==')' &&
+	!rx->exp_depth || i==KW_ELSE || i==KW_CATCH || i==KW_DO)
+	rx->is_not_cont=TRUE;
     if (rx->was_new_line && (rx->lx1->token!=':' ||
-       k==KW_DFT || k==KW_SUB_SWITCH_START || k==KW_SUB_SWITCH_END)) {
-      if (rx->one_shot) {
-	QueVectU8Put(rx->indent,rx->lx2->lfns[0].cur_entry->y,rx->depth+3);
-	rx->one_shot=FALSE;
-      } else
-	QueVectU8Put(rx->indent,rx->lx2->lfns[0].cur_entry->y,rx->depth);
+	i==KW_DFT || i==KW_SUB_SWITCH_START || i==KW_SUB_SWITCH_END)) {
+      QueVectU8Put(rx->indent,rx->lx2->lfns[0].cur_entry->y,rx->depth+rx->one_shot);
+      rx->one_shot=0;
     }
     if (rx->lx2->token=='\n')
       rx->was_new_line=TRUE;
     else
       rx->was_new_line=FALSE;
   } while (rx->lx1->token=='\n');
-  rx->is_not_cont=is_not_cont;
   return rx->lx1->token;
 }
 
@@ -182,16 +171,14 @@ U0 EdRIStmt(CRILex *rx,Bool indent)
 	default:
 	  if (rx->lx1->token==TK_IDENT && rx->lx1->hash_entry &&
 	    rx->lx1->hash_entry->type&(HTT_OPCODE|HTT_ASM_KEYWORD)) {
-	    i=rx->depth;
-	    rx->depth=4;
-	    rx->one_shot=FALSE;
+	    rx->one_shot=4-rx->depth;
 	    do EdRILex(rx);
 	    while (rx->lx2->token && rx->lx2->token!='\n');
-	    rx->depth=i;
+	    rx->is_not_cont=TRUE;
 	  } else {
 	    while (rx->lx1->token && rx->lx1->token!=';' && rx->lx1->token!=':') {
 	      if (rx->lx2->token=='\n' && !rx->is_not_cont)
-		rx->one_shot=TRUE;
+		rx->one_shot=3;
 	      EdRILex(rx);
 	    }
 	    if (rx->lx1->token==':')
@@ -211,11 +198,11 @@ CQueVectU8 *EdRICode(CDoc *doc)
   CRILex *rx=CAlloc(sizeof(CRILex));
 
   rx->lx1=LexNew(,LF_KEEP_NEW_LINES|LF_DONT_FREE_BUF,doc->filename.name);
-  Free(rx->lx1->lfns[0].name);
+  Free(rx->lx1->lfns[0].full_name);
   LexAttachDoc(rx->lx1,&rx->lx1->lfns[0],doc,,doc->cur_entry,doc->cur_data_col);
 
   rx->lx2=LexNew(,LF_KEEP_NEW_LINES|LF_DONT_FREE_BUF,doc->filename.name);
-  Free(rx->lx2->lfns[0].name);
+  Free(rx->lx2->lfns[0].full_name);
   LexAttachDoc(rx->lx2,&rx->lx2->lfns[0],doc,,doc->cur_entry,doc->cur_data_col);
 
   rx->indent=QueVectU8New(doc->cur_entry->y);
@@ -400,17 +387,17 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action)
       if (doc->flags&DOCF_PLAIN_TEXT)
 	DocFlagsToggle(doc,DOCF_PLAIN_TEXT);
       DocWrite(doc);
-      task=Spawn(&SrvUserCmdLine,NULL,"Srv",,Fs);
+      task=Spawn(&SrvCmdLine,NULL,"Srv",,Fs);
       st2=CurDir;
       st=MStrPrint("Cd(\"%s\");",st2);
       tempc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
       Free(st2);
       Free(st);
-      SetWinHorz(Fs->win_left,Fs->win_right, task);
-      SetWinVert(Fs->win_top, Fs->win_bottom,task);
+      WinHorz(Fs->win_left,Fs->win_right, task);
+      WinVert(Fs->win_top, Fs->win_bottom,task);
       if (ScanResult(tempc,&r)) {
-	st=DirFile(doc->filename.name,,"PRJ.Z"),
-	      prj_file=FileNameAbs(st,FUF_Z_OR_NOT_Z);
+	st=DirFile(doc->filename.name,,"PRJ.Z");
+	prj_file=FileNameAbs(st,FUF_Z_OR_NOT_Z);
 	Free(st);
 	if (FileFind(prj_file)) {
 	  st2=DirFile(prj_file),
@@ -597,8 +584,8 @@ U0 EdCodeTools(CDoc *doc)
     case EF_RENUM_ASM:
       EdCodeTools2(doc,tool_action);
       break;
-    case EF_SLIDER_CTRL:
-      TemplateSliderCtrl(doc);
+    case EF_CTRL_SLIDER:
+      TemplateCtrlSlider(doc);
       break;
     case EF_CH_SC:
       EdChSC(doc);

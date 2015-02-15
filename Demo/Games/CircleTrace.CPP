@@ -40,7 +40,7 @@ U0 CircleTrace()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-  WordStat;
+  AutoComplete;
 
   cx=Fs->pix_width/2;
   cy=Fs->pix_height/2;

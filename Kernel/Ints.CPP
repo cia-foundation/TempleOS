@@ -84,7 +84,7 @@ SYS_IRQ_FAULT::
 	PUSH	U64 CTask.fault_err_code[RSI]
 	PUSH	U64 CTask.fault_num[RSI]
 	MOV	RSI,CTask.rsi[RSI]
-	CALL	&Fault2 	//See $LK,"Fault2",A="FF:::/Kernel/Dbg1a.CPP,Fault2"$
+	CALL	&Fault2 	//See $LK,"Fault2",A="FF:::/Kernel/KDbg.CPP,Fault2"$
 	JMP	I32 RESTORE_FS_TASK_WITH_KEY_CHECK
 
 SYS_FAULT_ERR_CODE_BITMAP::
@@ -109,10 +109,10 @@ U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
 //See $LK,"::/Demo/MultiCore/Interrupts.CPP"$.
   I64 fp=fp_new_handler;
   U8 *result,*dst;
-  result=IntEntryGet(irq);
-  dst=dev.idt(U8 *)+irq*16;
   PUSHFD
   CLI
+  result=IntEntryGet(irq);
+  dst=dev.idt(U8 *)+irq*16;
   *dst(U16 *)++=fp.u16[0];
   *dst(U16 *)++=offset(CGDT.cs64);
   *dst(U16 *)++=0x8000+type<<8+dpl<<13;
@@ -160,18 +160,16 @@ U8 *IntFaultHandlersNew()
 
 U0 IntInit1()
 {//Interrupt descriptor table part1.
-  I64 i,temp_ptr[2];
-  U32 *ptr;
+  I64 i;
+  CSysLimitBase temp_ptr;
   if (!Gs->num) {//Gs cur $LK,"CCPU",A="MN:CCPU"$ struct
     dev.idt=CAlloc(16*256);
     for (i=0;i<256;i++)
       IntEntrySet(i,&IntNop);
   }
-  ptr=temp_ptr;
-  *ptr(U16 *)++=256*16-1; //Typecasting is postfix
-  *ptr(I64 *)++=dev.idt;
-  *ptr(U16 *)=0;
-  SetRAX(temp_ptr);
+  temp_ptr.limit=256*16-1;
+  temp_ptr.base =dev.idt;
+  SetRAX(&temp_ptr);
 	LIDT U64 [RAX]
 }
 

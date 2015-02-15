@@ -3,6 +3,7 @@ U0 Song()
 {
   CTask *task;
   Fs->task_end_cb=&SndTaskEndCB;
+  MusicSettingsRst;
   music.tempo=2.5;
   try {
     task=PopUpViewPrint(
@@ -12,8 +13,8 @@ U0 Song()
 	  "$LK,"BF:Luke,11:5"$\n"
 	  );
     TaskWait(task);
-    SetWinHorz(Fs->win_left,Fs->win_right,task);
-    SetWinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
+    WinHorz(Fs->win_left,Fs->win_right,task);
+    WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("3qBBE2GG3FFC",
 	    "We \0are \0in \0the \0image \0of \0God.\n\0 \0");

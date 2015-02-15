@@ -57,7 +57,7 @@ Note: Not all $LK,"CDocEntry",A="MN:CDocEntry"$'s are full-sized nodes.
 Some are $LK,"MAlloc",A="MN:MAlloc"$ed with a smaller size to save
 mem.	They all have at least the size $LK,"CDocEntryBase",A="MN:CDocEntryBase"$.
 
-Note: $LK,"CDocEntry",A="MN:CDocEntry"$'s should be allocated from the
+Note: $LK,"CDocEntry",A="MN:CDocEntry"$'s should be alloced from the
 heap of the owning task, doc->mem_task.
 
 The flag arrays $LK,"doldoc.type_flags_form",A="MN:CDolDocGlbls"$, etc

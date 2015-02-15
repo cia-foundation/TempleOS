@@ -62,8 +62,8 @@ CBgtEntry *BgtEntryPmt(CBgtEntry *dft=NULL)
 	tempb->debit =StrNew(b.debit);
 	tempb->desc  =StrNew(b.desc);
 	tempb->type  =BE_NORMAL;
-	StrFileAdd(tempb->credit,accts_table);
-	StrFileAdd(tempb->debit,accts_table);
+	StrFileAdd(tempb->credit,&accts_table_strs,accts_table);
+	StrFileAdd(tempb->debit,&accts_table_strs,accts_table);
 	return tempb;
       }
     } else

@@ -168,7 +168,7 @@ I64 PopUpMacroMenu()
 	"\n\n\n$$GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
   StrPrint(buf,"DocMenuDo(%d);",doc);
-  sys_macro_util_task=Spawn(&SrvUserCmdLine,NULL,"Macro Popup",,Fs);
+  sys_macro_util_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_util_task;
   LBts(&sys_macro_util_task->display_flags,DISPLAYf_WIN_ON_TOP);
   tempc=TaskExe(sys_macro_util_task,Fs,buf,
@@ -189,7 +189,7 @@ U0 MacroTask(I64)
   sys_macro_repeat_n=1;
   do {
     i=PopUpMacroMenu;
-    WinRefocus;
+    WinRefocus(sys_focus_task);
     switch (i) {
       case SM_RECORD:
 	LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);

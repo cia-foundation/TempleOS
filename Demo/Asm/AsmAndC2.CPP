@@ -17,13 +17,13 @@ USE64	//Defaults to 64, but this is a good habit.
 
 JIFFIES_MSG:	DU8 "Jiffies:",0;
 
-//See $LK,"::/Kernel/Str1a.CPP",A="FL:::/Kernel/Str1a.CPP,1"$ and $LK,"::/Kernel/Utils1a.CPP"$.
+//See $LK,"::/Kernel/StrA.CPP",A="FL:::/Kernel/StrA.CPP,1"$ and $LK,"::/Kernel/KUtils.CPP"$.
 
 _BEEPS2::
 //You can clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
 	PUSH	RBP
 	MOV	RBP,RSP
-	MOV	RCX,U64 SF_ARG1[RBP] //$LK,"SF_ARG1",A="FF:::/Kernel/Adam1a.HPP,SF_ARG1"$
+	MOV	RCX,U64 SF_ARG1[RBP] //$LK,"SF_ARG1",A="FF:::/Kernel/KernelA.HPP,SF_ARG1"$
 
 	PUSH	U64 [&cnts.jiffies]
 

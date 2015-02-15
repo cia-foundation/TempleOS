@@ -1,64 +1,50 @@
-PopUp("WSInit(\"::/*;~*Bible.TXT*\");");
-WordStat(ON);
+PopUp("ACInit(\"::/*;~*Bible.TXT*\");");
+AutoComplete(ON);
 Sleep(3500);
 
 //Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nCd(\"::/Demo\");\n";
 
-PopUpOk(
-"WordStat is an autocomplete feature\n"
-"which will also jump to source code.\n"
-"The function keys work with code, while\n"
-"the num keys work with the dictionary.\n\n"
-"We will now place some text on the command\n"
-"line and jump to source code.\n");
+TourPut(
+"AutoComplete is a feature which also lets you jump to source code of "
+"symbols.  The function keys jump to code, while the number keys jump to "
+"dictionary definitions.\n\n"
+"We will now place some text on the command line and jump to source code.\n",
+TRUE);
 
 "MakeOS";
 
-Sleep(1000);
-
-PopUpOk(
-"After clicking $$GREEN$$[OKAY]$$FG$$, look at\n"
-"the $$GREEN$$MakeOSPrtBootInstall$$FG$$ entry\n"
-"in the WordStat window.  Notice it\n"
-"is underlined.  This means a source\n"
-"code link is available.\n");
-Sleep(3000);
-
-PopUpOk(
-"$$GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");
+TourPut(
+"Look at the $$GREEN$$MakeOSDrvBootInstall$$FG$$ entry in the AutoComplete "
+"window.  Notice it is underlined.  This means a source code link is "
+"available.\n\n"
+"Press $$GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");
 AFGetKey(SC_F1|SCF_CTRL|SCF_SHIFT);
 Sleep(500);
+WinToTop;//Kludge
 
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
-Sleep(100);
-sys_focus_task=Fs;
 
-PopUpOk(
-"Press $$GREEN$$<CTRL-F1>$$FG$$ to autocomplete.\n");
+TourPut("Press $$GREEN$$<CTRL-F1>$$FG$$ to autocomplete.\n");
 AFGetKey(SC_F1|SCF_CTRL);
 Sleep(500);
 
 Msg(MSG_KEY_DOWN,'\n',SCF_CTRL|SCF_SHIFT);
 "\n";
 
-PopUpOk(
-"Tip: You can restart the WordStat window if you\n"
-"have closed it by pressing $$GREEN$$<CTRL-F1>$$FG$$.\n");
+TourPut(
+"Tip: You can restart the AutoComplete window if you have closed it by "
+"pressing $$GREEN$$<CTRL-F1>$$FG$$.\n",TRUE);
 
-PopUpOk(
-"You can also use the $$GREEN$$Man()$$FG$$ function\n"
-"to jump to source code.  (I use WordStat.)\n"
-"The $$GREEN$$Man()$$FG$$ is good for short symbol names\n"
-"or when inside the debugger.\n");
+TourPut(
+"You can also use the $$GREEN$$Man()$$FG$$ function to jump to source code.  "
+"(I use AutoComplete.)  The $$GREEN$$Man()$$FG$$ is good for short symbol "
+"names or when inside the debugger.\n",TRUE);
 AFPrint(,"Man(\"U\");");
-Sleep(1000);
+Sleep(1500);
 "\n";
 
-Sleep(2000);
-PopUpOk(
-"$$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);

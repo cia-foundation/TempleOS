@@ -2,68 +2,57 @@
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nCd(\"::/Demo/Games\");Dir;\n";
 
-PopUpOk(
-"Now, we're going to add the\n"
-"CastleFrankenstein.CPP.Z program\n"
+TourPut(
+"Now, we're going to add the CastleFrankenstein.CPP.Z program "
 "to your PersonalMenu.\n\n"
-"Press $$GREEN$$<CTRL-m>$$FG$$\n"
-"to get to your PersonalMenu.\n");
+"Press $$GREEN$$<CTRL-m>$$FG$$ to get to your PersonalMenu.\n");
 AFGetChar(CH_CTRLM);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
-Sleep(1000);
 
-PopUpOk(
-"$$GREEN$$<CTRL-l>$$FG$$ to invoke the\n"
-"text-widget resource editor.\n"
-"\n"
-"($$GREEN$$<CTRL-r>$$FG$$ invokes the\n"
-"graphic resource editor.)\n"
-);
+TourPut(
+"Press $$GREEN$$<CTRL-l>$$FG$$ to invoke the text-widget resource editor.\n\n"
+"(Press $$GREEN$$<CTRL-r>$$FG$$ invokes the graphic resource editor.)\n");
 AFGetChar(CH_CTRLL);
 
-Sleep(100);
-PopUpOk(
-"$$GREEN$$<CURSOR-DOWN>$$FG$$ until you reach\n"
-"\"Macro\".\n");
+Sleep(500);
+WinToTop;//Kludge
+
+TourPut("$$GREEN$$<CURSOR-DOWN>$$FG$$ until you reach \"Macro\".\n");
 I64 i;
 for (i=0;i<6;i++)
   AFGetKey(SC_CURSOR_DOWN);
 
-PopUpOk(
-"$$GREEN$$<SPACE>$$FG$$.\n");
+TourPut("Press $$GREEN$$<SPACE>$$FG$$.\n");
 AFGetStr(" ");
-Sleep(1000);
 
-PopUpOk(
-"Now, we'll fill-in the visible text\n"
-"of the macro.\n");
+TourPut(
+"Now, we'll fill-in the visible tag of the macro.  Then, "
+"we'll fill-in the macro text.\n",TRUE);
 AFPrint(,"Click Here");
 
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
-PopUpOk("Now, we'll fill-in the macro text.\n");
 AFPrint(,"Cd(\"::/Demo/Games\");;#include \"CastleFrankenstein\";\\n");
 
-PopUpOk("$$GREEN$$<ESC>$$FG$$ to exit the form.\n");
+TourPut("Press $$GREEN$$<ESC>$$FG$$ to exit the form.\n");
 AFGetChar(CH_ESC);
-Sleep(1000);
 
-PopUpOk(
+TourPut(
 "Press $$GREEN$$<CTRL-SHIFT-ENTER>$$FG$$ to insert a line feed.\n"
-"($$GREEN$$<CTRL-ENTER>$$FG$$ does a page break and $$GREEN$$<ENTER>$$FG$$\n"
-"would execute the macro.)\n");
+"$$GREEN$$<CTRL-ENTER>$$FG$$ does a page break.\n"
+"$$GREEN$$<ENTER>$$FG$$ would execute the macro.\n");
 AFGetKey(SC_ENTER|SCF_CTRL|SCF_SHIFT);
-Sleep(1000);
 
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
-PopUpOk(
-"Press $$GREEN$$<SPACE>$$FG$$ to test it.\n");
+TourPut("Press $$GREEN$$<SPACE>$$FG$$ to test it.\n");
 AFGetStr(" ");
+TourPut(
+"Move around with cursor keys and press $$GREEN$$<SHIFT-ESC>$$FG$$ when you "
+"are done.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
-PopUpOk(
-"Now, we'll do a fancier macro that pops-up\n"
-"a new window which dies when finished,\n"
-"returning mem to the system.\n");
+TourPut(
+"Now, we'll do a fancier macro that pops-up a new window which dies when "
+"finished, returning mem to the system.\n",TRUE);
 Msg(MSG_KEY_DOWN,CH_CTRLM,0x43200000432);
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
 Msg(MSG_KEY_DOWN,CH_CTRLL,0x42600000426);
@@ -74,38 +63,36 @@ Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN);
 AFPrint(,"Cd(\"::/Demo/Games\");;#include \"CastleFrankenstein\";\\n");
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_LEFT|SCF_CTRL);
 
-PopUpOk(
-"$$GREEN$$<CURSOR-DOWN>$$FG$$ until you reach\n"
-"the \"Pop-Up\" check-box.\n");
+TourPut(
+"Press $$GREEN$$<CURSOR-DOWN>$$FG$$ until you reach the \"Pop-Up\" check-box.\n");
 for (i=0;i<2;i++)
   AFGetKey(SC_CURSOR_DOWN);
-PopUpOk(
-"$$GREEN$$<SPACE>$$FG$$ to check the box.\n");
+TourPut(
+"Press $$GREEN$$<SPACE>$$FG$$ to check the box.\n");
 AFGetStr(" ");
-Sleep(500);
 
-PopUpOk("$$GREEN$$<ESC>$$FG$$ to exit the form.\n");
+TourPut("Press $$GREEN$$<ESC>$$FG$$ to exit the form.\n");
 AFGetChar(CH_ESC);
-Sleep(500);
 
-PopUpOk("$$GREEN$$<CTRL-SHIFT-ENTER>$$FG$$ to insert a line feed.\n");
+TourPut("Press $$GREEN$$<CTRL-SHIFT-ENTER>$$FG$$ to insert a line feed.\n");
 AFGetKey(SC_ENTER|SCF_CTRL|SCF_SHIFT);
-Sleep(500);
 
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
-PopUpOk(
-"$$GREEN$$<SPACE>$$FG$$ to test it.\n");
+TourPut(
+"Press $$GREEN$$<SPACE>$$FG$$ to test it.\n");
 AFGetStr(" ");
-Sleep(3000);
 
-PopUpOk(
-"$$GREEN$$<CTRL-S>$$FG$$ to save your\n"
-"PersonalMenu file, if you wish.\n"
-"Your PersonalMenu is special and\n"
-"does not save on $$GREEN$$<ESC>$$FG$$.\n");
-if (Fs->parent_task->popup_task) {
-  '' CH_SHIFT_ESC;
-  Sleep(100);
-}
+Sleep(500);
+WinToTop;//Kludge
+
+TourPut(
+"Move around with cursor keys and press $$GREEN$$<SHIFT-ESC>$$FG$$ when you "
+"are done.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"$$GREEN$$<CTRL-S>$$FG$$ to save your PersonalMenu file, if you wish.  "
+"Your PersonalMenu is special and does not save on $$GREEN$$<ESC>$$FG$$.\n",TRUE);
+
 '' CH_SHIFT_ESC;	//exit menu
 

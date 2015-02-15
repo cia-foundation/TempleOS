@@ -13,7 +13,7 @@ public Bool Ed(U8 *link_st,I64 edf_dof_flags=0)
     case LK_DEF:
       doc=DocNew;
       doc->desc='DictDef';
-      WSDDefsPut(doc,filename,num);
+      ACDDefsPut(doc,filename,num);
       goto ej_doc;
     case LK_HELP_INDEX:
       doc=DocNew;
@@ -24,11 +24,12 @@ ej_doc:
 	DocDo(doc);
 	DocDel(doc);
       }
-      result=TRUE;
+      if (!(edf_dof_flags&EDF_WAS_WRITE))
+	result=TRUE;
       break;
     default:
       if (IsRaw)
-	EdLite(filename,num);
+	result=EdLite(filename,num,edf_dof_flags);
       else {
 	cont=TRUE;
 	if (!(edf_dof_flags&EDF_BAIL) && !(LK_DOC<=i<=LK_DOC_LINE) &&
@@ -44,11 +45,11 @@ ej_doc:
   return result;
 }
 
-public Bool Plain(U8 *filename)
+public Bool Plain(U8 *filename,I64 edf_dof_flags=0)
 {//Edit document in plain text mode, so dollar signs are not special.
   Bool result;
   U8 *st=MStrPrint("PI:%s",filename);
-  result=Ed(st);
+  result=Ed(st,edf_dof_flags);
   Free(st);
   return result;
 }
@@ -97,7 +98,7 @@ public U8 *DocLinkFile(U8 *link_st,CTask *mem_task=NULL)
 	Free(st);
 	break;
       case LK_BIBLE_FIND:
-	result=StrNew(Define("ST_BIBLE_FILE"),mem_task);
+	result=StrNew(BIBLE_FILENAME,mem_task);
 	break;
     }
     Free(filename);
@@ -148,7 +149,7 @@ public U0 DocTermNew()
   CDoc *pdoc=DocNew;
   pdoc->right_click_link=&TermRightClickLink;
   pdoc->max_entries=4096;
-  Fs->border_src=BDS_CUR_PRT;
+  Fs->border_src=BDS_CUR_DRV;
   pdoc->desc='Term';
   Fs->put_doc=Fs->display_doc=pdoc;
   Fs->border_doc=DocBorderNew(pdoc);
@@ -531,7 +532,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    }
 	    "AutoFile(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
-	    AutoStr("%F\n",st);
+	    AutoFile(st);
 	    result=TRUE;
 	    break;
 	}

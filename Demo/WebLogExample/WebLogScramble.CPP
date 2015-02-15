@@ -53,8 +53,15 @@ U0 WebLogScramble(U8 *files_find_mask)
   DirTreeDel(tempde1);
 }
 
-//Danger scrambles all log files in the /TempleOS tree
+U0 LogScrambleDemo()
+{
+  U8 *dirname;
+  Cd(__DIR__);
+  dirname=CurDir;
+  ST_WARN_ST "This will scramble all .LOG files in '%s'.\n\n",dirname;
+  Free(dirname);
+  if (AreYouSure)
+    WebLogScramble("*.LOG*");
+}
 
-ST_WARN_ST "This will scramble all .LOG files in the /Demo Tree.\n\n";
-if (AreYouSure)
-  WebLogScramble("/Demo/*.LOG*");
+LogScrambleDemo;

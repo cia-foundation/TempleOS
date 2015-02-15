@@ -445,25 +445,25 @@ U0 Init()
 
 U0 Varoom()
 {
-  I64 ch,sc;
+  I64 sc;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Accelerator(,,SC_CURSOR_UP);"
-  "  Break(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-      "}"
-      );
-  SettingsPush(Fs,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Accelerator(,,SC_CURSOR_UP);"
+	"  Break(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"}"
+	);
+  SettingsPush(,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
   try {
     Fs->text_attr=YELLOW<<4+BLUE;
     Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
-    WordStat;
+    AutoComplete;
     WinMax;
     WinBorder;
     Preempt(OFF);
@@ -472,38 +472,35 @@ U0 Varoom()
     DocClear;
     Fs->draw_it=&DrawIt;
     Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
-    while (TRUE) {
-      while (ScanKey(&ch,&sc))
-	switch (ch) {
-	  case 0:
-	    switch (sc.u8[0]) {
-	      case SC_CURSOR_LEFT:
-		c[0].é-=ã/100;
-		break;
-	      case SC_CURSOR_RIGHT:
-		c[0].é+=ã/100;
-		break;
-	      case SC_CURSOR_UP:
-		c[0].speed+=3;
-		break;
-	      case SC_CURSOR_DOWN:
-		c[0].speed-=3;
-		break;
-	    }
-	    break;
-	  case '\n':
-	    Init;
-	    break;
-	  case CH_SHIFT_ESC:
-	  case CH_ESC:
-	    goto vr_done;
-	}
-      WinMgrSync;
-    }
+    while (TRUE)
+      switch (GetKey(&sc)) {
+	case 0:
+	  switch (sc.u8[0]) {
+	    case SC_CURSOR_LEFT:
+	      c[0].é-=ã/100;
+	      break;
+	    case SC_CURSOR_RIGHT:
+	      c[0].é+=ã/100;
+	      break;
+	    case SC_CURSOR_UP:
+	      c[0].speed+=3;
+	      break;
+	    case SC_CURSOR_DOWN:
+	      c[0].speed-=3;
+	      break;
+	  }
+	  break;
+	case '\n':
+	  Init;
+	  break;
+	case CH_SHIFT_ESC:
+	case CH_ESC:
+	  goto vr_done;
+      }
 vr_done: //Don't goto out of try
   } catch
     Fs->catch_except=TRUE;
-  SettingsPop(Fs,TSF_SAME_SONG);
+  SettingsPop(,TSF_SAME_SONG);
   MenuPop;
   AcctRegWriteBranch("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
 }

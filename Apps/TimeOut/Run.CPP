@@ -1,2 +1,3 @@
-#include "/Apps/TimeOut/Load"
+Cd(__DIR__);;
+#include "Load"
 TimeOut;

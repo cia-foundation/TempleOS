@@ -70,7 +70,7 @@ ANSWERS:
 
 5) The R13 instruction takes one more byte because it is like $LK,"REG_RBP",A="MN:REG_RBP"$ in the ModR.
 
-6) The RAX instruction has a REX byte prefix to specify 64-bit size.  So does the R8 instruction, but in the REX is also a flag to specify upper-8 reg.  For EAX, there is no need of REX.
+6) The R8 instruction needs a REX byte prefix to specify upper-8 reg.
 
 7) You can access the lowest byte of any reg.  You can access AH but not the second-to-lowest byte of ESI.
 

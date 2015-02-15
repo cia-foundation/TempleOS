@@ -14,7 +14,7 @@ U0 TimeIns()
   CPURep;
 
   shared_blks=1;
-  bp=MemBlksUncachedAlloc(&shared_blks);
+  bp=Mem2MegUncachedAlloc(&shared_blks);
   hc=HeapCtrlBPInit(bp,shared_blks<<12);
   uncached_I64=MAlloc(sizeof(I64),hc);
 
@@ -39,7 +39,7 @@ U0 TimeIns()
   "because the loop overhead was not subtracted.$$FG$$\n\n";
   Free(cached_I64);
   Free(uncached_I64);
-  MemBlks2MegFree(bp,shared_blks);
+  Mem2MegFree(bp,shared_blks);
   Preempt(old_preempt);
 }
 

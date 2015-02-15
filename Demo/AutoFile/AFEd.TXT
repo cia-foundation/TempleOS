@@ -10,7 +10,7 @@
 #define IC_CALL_END2		0x08
 #define IC_RETURN_VAL		0x09
 #define IC_RETURN_VAL2		0x0A
-#define IC_IMM_U64		0x0B
+#define IC_IMM_I64		0x0B
 #define IC_IMM_F64		0x0C
 #define IC_STR_CONST		0x0D
 #define IC_ABS_ADDR		0x0E

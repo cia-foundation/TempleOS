@@ -265,8 +265,9 @@ U0 DocFormFwd(CDoc *doc,Bool giveup=FALSE)
   CDocEntry *doc_e=doc->cur_entry,*doc_e2=doc_e;
   if (doc->flags & DOCF_FORM) {
     if (doc_e==doc) goto ff_recover;
-    while (!Bt(doldoc.type_flags_form,doc_e->type_u8) ||
-       doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
+    while (!Bt(doldoc.type_flags_form,doc_e->type_u8) &&
+	!(doc_e->de_flags&DOCEF_LINK) ||
+	doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
       doc_e=doc_e->next;
       if (doc_e==doc) {
 ff_recover:
@@ -292,8 +293,9 @@ U0 DocFormBwd(CDoc *doc,Bool giveup=FALSE)
 {
   CDocEntry *doc_e=doc->cur_entry,*doc_e2=doc_e;
   if (doc->flags & DOCF_FORM) {
-    while (!Bt(doldoc.type_flags_form,doc_e->type_u8) ||
-       doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
+    while (!Bt(doldoc.type_flags_form,doc_e->type_u8) &&
+	!(doc_e->de_flags&DOCEF_LINK) ||
+	doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
       doc_e=doc_e->last;
       if (doc_e==doc) {
 	doc->cur_data_col=0;

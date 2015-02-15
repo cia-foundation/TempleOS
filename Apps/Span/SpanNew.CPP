@@ -19,8 +19,8 @@ U0 SpanDel(CMathODE *ode)
   }
 }
 
-#define M_SIZE (sizeof(MyMass)	-offset(CMass.start_saved_area))
-#define S_SIZE (sizeof(MySpring)-offset(CSpring.start_saved_area))
+#define M_SIZE (sizeof(MyMass)	-offset(CMass.start))
+#define S_SIZE (sizeof(MySpring)-offset(CSpring.start))
 
 U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
 {
@@ -49,14 +49,14 @@ U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
 
   tempm=ode->next_mass;
   while (tempm!=&ode->next_mass) {
-    MemCpy(ptr,&tempm->start_saved_area,M_SIZE);
+    MemCpy(ptr,&tempm->start,M_SIZE);
     ptr+=M_SIZE;
     tempm=tempm->next;
   }
 
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
-    MemCpy(ptr,&temps->start_saved_area,S_SIZE);
+    MemCpy(ptr,&temps->start,S_SIZE);
     ptr+=S_SIZE;
     temps=temps->next;
   }
@@ -68,10 +68,10 @@ Bool SpanWrite(CMathODE *ode)
 {
   U8 *name,*buf;
   I64 size;
-  Bool result=FALSE,old_silent=Silent(ON);
-  MkDir("HOME/Span");
+  Bool result=FALSE,old_silent=Silent;
+  MkDir("::/Home/Span");
   Silent(old_silent);
-  if (name=PopUpFileName("HOME/Span/Game.DAT")) {
+  if (name=PopUpFileName("::/Home/Span/Game.DAT")) {
     if (buf=SpanSave(ode,&size)) {
       FileWrite(name,buf,size);
       Free(buf);
@@ -96,14 +96,14 @@ U0 SpanLoad(CMathODE *ode,U8 *src)
 
   for (i=0;i<h.num_masses;i++) {
     tempm=CAlloc(sizeof(MyMass));
-    MemCpy(&tempm->start_saved_area,src,M_SIZE);
+    MemCpy(&tempm->start,src,M_SIZE);
     src+=M_SIZE;
     QueIns(tempm,ode->last_mass);
   }
 
   for (i=0;i<h.num_springs;i++) {
     temps=CAlloc(sizeof(MySpring));
-    MemCpy(&temps->start_saved_area,src,S_SIZE);
+    MemCpy(&temps->start,src,S_SIZE);
     src+=S_SIZE;
     QueIns(temps,ode->last_spring);
     temps->end1=MassFindNum(ode,temps->end1_num);
@@ -114,10 +114,10 @@ U0 SpanLoad(CMathODE *ode,U8 *src)
 U8 *SpanRead()
 {
   U8 *src=NULL,*name;
-  Bool old_silent=Silent(ON);
-  MkDir("HOME/Span");
+  Bool old_silent=Silent;
+  MkDir("::/Home/Span");
   Silent(old_silent);
-  if (name=PopUpPickFile("HOME/Span")) {
+  if (name=PopUpPickFile("::/Home/Span")) {
     src=FileRead(name);
     Free(name);
   }

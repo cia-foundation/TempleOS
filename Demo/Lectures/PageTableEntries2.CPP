@@ -1,4 +1,4 @@
-I64 *addr=VGA_GRAPHIC_MEM_BASE,
+I64 *addr=VGAM_GRAPHICS,
    *pte_addr=MemPageTable(addr),
    err_code=0,
    *reported_fault_addr;

@@ -109,7 +109,7 @@ U0 Whap()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
-  WordStat;
+  AutoComplete;
   Preempt(OFF);
 
   MenuPush(

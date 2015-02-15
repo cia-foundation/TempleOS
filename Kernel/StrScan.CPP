@@ -25,7 +25,6 @@ I64 Str2I64(U8 *st,I64 radix=10,U8 **_end_ptr=NULL)
 	if (ch>='B' && (radix<=10 || ch>'A'+radix-11))
 	  switch (ch) {
 	    case 'B': radix=2;	st++; break;
-	    case 'O': radix=8;	st++; break;
 	    case 'D': radix=10; st++; break;
 	    case 'X': radix=16; st++; break;
 	  }
@@ -141,7 +140,7 @@ CDate Str2Date(U8 *_src)
 It also supports some funs
   SM() start of mon
   EM() end of mon
-  SM() start of year
+  SY() start of year
   EY() end of year
 Full expressions are not implimented
 but you can do stuff like SM(*-7)+3

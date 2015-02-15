@@ -5,33 +5,28 @@ USE16
 
 //This code gets copied to $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$.
 //See $LK,"MemCpy(MP_VECT_ADDR",A="FF:::/Kernel/MultiProc.CPP,MemCpy(mp:2"$.
-SYS_MP_INIT_START::
-	JMP	MP2_START2
+AP_16BIT_INIT::
+	JMP	@@05
+
 	ALIGN	4,OC_NOP
-MP2_SYS_TEMP_PTR:	DU32	0,0;
+AP_GDT_PTR:	DU16	sizeof(CGDT)-1;
+		DU64	0;
 
-MP2_START2:
-	CLI
-
+@@05:	CLI
 	WBINVD
-
 	MOV	AX,MP_VECT_ADDR/16
 	MOV	DS,AX
-
-//See $LK,"mp->sys_temp_ptr",A="FF:::/Kernel/MultiProc.CPP,mp->sys_temp_ptr:2"$
-#assert MP2_SYS_TEMP_PTR-SYS_MP_INIT_START==CMPMain.sys_temp_ptr
-	LGDT	U32 [CMPMain.sys_temp_ptr]
+	LGDT	U32 [CAP16BitInit.ap_gdt_ptr]  //See $LK,"mp->ap_gdt_ptr",A="FF:::/Kernel/MultiProc.CPP,mp->ap_gdt_ptr:2"$
 
 	MOV	EAX,SYS_START_CR0
 	MOV_CR0_EAX
-
-	DU8	0x66,0xEA;		 //JMP CGDT.cs32:MP_INIT_OS
-	DU32	MP_INIT_OS;
+	DU8	0x66,0xEA;		 //JMP CGDT.cs32:AP_32BIT_INIT
+	DU32	AP_32BIT_INIT;
 	DU16	CGDT.cs32;
+AP_16BIT_INIT_END::
 
-SYS_MP_INIT_END::
 USE32
-MP_INIT_OS:
+AP_32BIT_INIT:
 	MOV	AX,CGDT.ds
 	MOV	DS,AX
 	MOV	ES,AX
@@ -58,8 +53,8 @@ MP_INIT_OS:
 	LEA	ESP,U32 CCPU.start_stk+sizeof(CCPU.start_stk)[ESI]
 	PUSH	U32 SYS_START_RFLAGS
 	POPFD
-	PUSH	U32 0
-	CALL	INIT_EM64T
+	PUSH	U32 0	//Return from next call will be 64-bit
+	CALL	SYS_EM64T
 USE64
 	FNINIT
 	MOV	RAX,RSI
@@ -193,7 +188,7 @@ U0 MPWake(I64 target_cpu)
 U0 MPAPICInit()
 {//Called by adam during start-up
 //and other cores during initialization
-//after $LK,"MPStart",A="MN:MPStart"$().
+//after $LK,"BSPStartMP",A="MN:BSPStartMP"$().
   *LAPIC_SVR(U32 *)|=LAPICF_APIC_ENABLED;
   dev.mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
   *LAPIC_LDR(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
@@ -213,7 +208,7 @@ U0 MPAPICInit()
 
 #assert !offset(CSrvCtrl.next_waiting)
 
-U0 MPSethServerTask()
+U0 APSethTask()
 {
   CSrvCtrl *my_ctrl=&Fs->srv_ctrl;
   CSrvCmd *tempc,*tempc1=&my_ctrl->next_waiting;
@@ -222,7 +217,6 @@ U0 MPSethServerTask()
     TaskFinishOffDying;
     if (!LBts(&my_ctrl->flags,SVCRf_LOCKED)) {
       tempc=tempc1->next;
-      //Jobs for this core are highest priority.
       if (tempc==tempc1 || !SrvCmdRun(tempc,GetRFlags)) {
 	LBtr(&my_ctrl->flags,SVCRf_LOCKED) ;
 	if (my_ctrl->next_waiting==my_ctrl) {
@@ -296,20 +290,20 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
   return result;
 }
 
-U0 MPCPUTaskInit()
-{//Called by multicore's seth task after $LK,"MPStart",A="MN:MPStart"$()
+U0 APSethInit()
+{//Called by multicore's seth task after $LK,"BSPStartMP",A="MN:BSPStartMP"$()
 //as the first thing a CPU does before waiting for jobs.
   MPAPICInit;
-  Fs->rip=&MPSethServerTask;
+  Fs->rip=&APSethTask;
   Fs->time_slice_start=GetTSC;
   TaskContextRestore;
 }
 
-U0 MPStart()
-{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,MPStart"$.
+U0 BSPStartMP()
+{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,BSPStartMP"$.
   CTask *task;
   U8 buf[128];
-  CMPMain *mp=MP_VECT_ADDR;
+  CAP16BitInit *mp=MP_VECT_ADDR;
   CCPU *c;
   I64 i,my_mp_cnt;
   CRAXRBCRCXRDX ee;
@@ -334,9 +328,8 @@ U0 MPStart()
 //When you start-up other cores, they jump to an addr
 //specified by a byte vect number, $LK,"MPN_VECT",A="MN:MPN_VECT"$ which corresponds
 //to a location 4096*vect number, $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$$WW,0$.
-  MemCpy(mp,SYS_MP_INIT_START,SYS_MP_INIT_END-SYS_MP_INIT_START);
-
-  mp->sys_temp_ptr=sizeof(CGDT)-1+(&sys_gdt)(U8 *)<<16;
+  MemCpy(mp,AP_16BIT_INIT,AP_16BIT_INIT_END-AP_16BIT_INIT);
+  MemCpy(&mp->ap_gdt_ptr,SYS_GDT_PTR,sizeof(CSysLimitBase));
   mp_cnt_initial=mp_cnt=1;
   mp_cnt_lock=0;
 
@@ -360,9 +353,9 @@ U0 MPStart()
 
   for (i=1;i<my_mp_cnt;i++) {
     StrPrint(buf,"Seth Task CPU#%d",i);
-    task=Spawn(&MPCPUTaskInit,NULL,buf,,,SETH_STK,0);
+    task=Spawn(&APSethInit,NULL,buf,,,SETH_STK,0);
     task->rflags=SYS_START_RFLAGS;
-    //$LK,"CTask",A="MN:CTask"$ allocated off this core's seth_task's heap (Which is Adam)
+    //$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
     task->task_in_que_signature=TASK_IN_QUE_SIGNATURE_VAL;
     CPUStructInit(i,&cpu_structs[i],task);
     WBINVD //Not sure why this is needed.  Might just need delay.
@@ -379,7 +372,7 @@ U0 MPStart()
   mp_cnt=my_mp_cnt; //Finalize cnt
 }
 
-U0 MPInit()
+U0 BSPInit()
 {//Called by adam during start-up
   CRAXRBCRCXRDX ee;
   CPUId(0x1,&ee);

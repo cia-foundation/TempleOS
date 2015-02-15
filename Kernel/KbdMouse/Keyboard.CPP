@@ -80,7 +80,7 @@ U0 KbdMouseCmdAck(U8 val)
     throw;
 }
 
-U0 SetTypeMatic(U8 delay)
+U0 KbdTypeMatic(U8 delay)
 {//Set speed of repeated keys.
   try {
     KbdCmdSend(KBD_CTRL,0xA7); //Disable Mouse
@@ -289,15 +289,13 @@ U8 *ScanCode2KeyName(I64 sc)
   return StrNew(buf);
 }
 
-I64 KbdBuildSC(U8 raw_byte,U8 *_last_raw_byte,I64 *_last_sc,
-  Bool *_set_LEDs,Bool *_ctrl_alt)
+U0 KbdBuildSC(U8 raw_byte,Bool in_irq,U8 *_last_raw_byte,I64 *_last_sc)
 {
-  I64 sc_flags,sc,sc2,sc_raw;
-  *_set_LEDs=FALSE;
-  *_ctrl_alt=FALSE;
+  I64 ch,sc_flags,sc,sc2,sc_raw;
+  Bool set_LEDs=FALSE;
   if (raw_byte==0xE0) {
     *_last_raw_byte=raw_byte;
-    return 0;
+    return;
   } else {
     sc=raw_byte;
     BEqu(&sc,SCf_E0_PREFIX,*_last_raw_byte==0xE0);
@@ -317,63 +315,30 @@ I64 KbdBuildSC(U8 raw_byte,U8 *_last_raw_byte,I64 *_last_sc,
 
   if (sc&SCF_KEY_UP)
     switch (sc&~SCF_KEY_UP) {
-      case SC_SHIFT:	sc_flags&=~SCF_SHIFT;	goto kb_new_key_done;
-      case SC_CTRL:	sc_flags&=~SCF_CTRL;	goto kb_new_key_done;
-      case SC_ALT:	sc_flags&=~SCF_ALT;	goto kb_new_key_done;
-      case SC_DELETE:	sc_flags&=~SCF_DELETE;	goto kb_new_key_done;
-      case SC_INS:	sc_flags&=~SCF_INS;	goto kb_new_key_done;
-      case SC_CAPS:
-	sc_flags^=SCF_CAPS;
-	*_set_LEDs=TRUE;
-	goto kb_new_key_done;
-      case SC_NUM:
-	sc_flags^=SCF_NUM;
-	*_set_LEDs=TRUE;
-	goto kb_new_key_done;
-      case SC_SCROLL:
-	sc_flags^=SCF_SCROLL;
-	*_set_LEDs=TRUE;
-	goto kb_new_key_done;
+      case SC_SHIFT:	sc_flags&=~SCF_SHIFT;	break;
+      case SC_CTRL:	sc_flags&=~SCF_CTRL;	break;
+      case SC_ALT:	sc_flags&=~SCF_ALT;	break;
+      case SC_DELETE:	sc_flags&=~SCF_DELETE;	break;
+      case SC_INS:	sc_flags&=~SCF_INS;	break;
+      case SC_CAPS:	sc_flags^=SCF_CAPS;	set_LEDs=TRUE;	break;
+      case SC_NUM:	sc_flags^=SCF_NUM;	set_LEDs=TRUE;	break;
+      case SC_SCROLL:	sc_flags^=SCF_SCROLL;	set_LEDs=TRUE;	break;
     }
   else
     switch (sc) {
-      case SC_SHIFT:	sc_flags|=SCF_SHIFT;	goto kb_new_key_done;
-      case SC_CTRL:	sc_flags|=SCF_CTRL;	goto kb_new_key_done;
-      case SC_ALT:	sc_flags|=SCF_ALT;	goto kb_new_key_done;
-      case SC_DELETE:	sc_flags|=SCF_DELETE;	goto kb_new_key_done;
-      case SC_INS:	sc_flags|=SCF_INS;	goto kb_new_key_done;
-      case SC_CAPS:	goto kb_new_key_done;
-      case SC_NUM:	goto kb_new_key_done;
-      case SC_SCROLL:	goto kb_new_key_done;
+      case SC_SHIFT:	sc_flags|=SCF_SHIFT;	break;
+      case SC_CTRL:	sc_flags|=SCF_CTRL;	break;
+      case SC_ALT:	sc_flags|=SCF_ALT;	break;
+      case SC_DELETE:	sc_flags|=SCF_DELETE;	break;
+      case SC_INS:	sc_flags|=SCF_INS;	break;
     }
 
+  sc_flags|=SCF_NEW_KEY;
+  sc=sc_flags|sc|(sc_flags|sc_raw)<<32;
   if (sc_flags & SCF_CTRL && sc_flags & SCF_ALT) {
-    sc_flags&=~SCF_NEW_KEY;
-    *_ctrl_alt=TRUE;
-  } else {
-kb_new_key_done:
-    sc_flags|=SCF_NEW_KEY;
-  }
-  return *_last_sc=sc_flags|sc|(sc_flags|sc_raw)<<32;
-}
-
-U0 KbdPktRead()
-{
-  static U8 last_raw_byte=0;
-  static I64 last_sc=0;
-  U8 raw_byte;
-  I64 ch,sc;
-  Bool set_LEDs,ctrl_alt;
-
-  if (GetTSC>kbd.timestamp+cnts.time_stamp_freq>>3)
-    FifoU8Flush(kbd.fifo);
-  kbd.timestamp=GetTSC;
-  raw_byte=InU8(KBD_PORT);
-  sc=KbdBuildSC(raw_byte,&last_raw_byte,&last_sc,&set_LEDs,&ctrl_alt);
-  if (ctrl_alt && sc) {
     if (!(sc & SCF_KEY_UP)) {
       if (sc&255==SC_DELETE)
-	CtrlAltDel(last_sc);
+	CtrlAltDel(sc);
       else {
 	if (sc&255==SC_ESC)
 	  ch='e';
@@ -381,14 +346,32 @@ U0 KbdPktRead()
 	  ch='t';
 	else
 	  ch=ScanCode2Char(sc&255);
-	if ('a'<=ch<='z' && keydev.fp_ctrl_alt_let_cbs[ch-'a'] &&
-	    Bt(&keydev.ctrl_alt_let_in_irq_flags,ch-'a')) {
-	  (*keydev.fp_ctrl_alt_let_cbs[ch-'a'])(last_sc);
-	  return;
+	if ('a'<=ch<='z') {
+	  sc&=~(SCF_NEW_KEY|SCF_NEW_KEY<<32);
+	  kbd.last_down_scan_code=sc;
+	  if (keydev.fp_ctrl_alt_let_cbs[ch-'a'] &&
+		Bt(&keydev.ctrl_alt_let_in_irq_flags,ch-'a')==in_irq) {
+	    (*keydev.fp_ctrl_alt_let_cbs[ch-'a'])(sc);
+	  }
 	}
       }
     }
   }
+  if (set_LEDs && !in_irq)
+    KbdSetLEDs(sc);
+  *_last_sc=sc;
+}
+
+U0 KbdPktRead()
+{
+  static U8 last_raw_byte=0;
+  static I64 last_sc=0;
+  U8 raw_byte;
+  if (GetTSC>kbd.timestamp+cnts.time_stamp_freq>>3)
+    FifoU8Flush(kbd.fifo);
+  kbd.timestamp=GetTSC;
+  raw_byte=InU8(KBD_PORT);
+  KbdBuildSC(raw_byte,TRUE,&last_raw_byte,&last_sc);
   if (!FifoU8Cnt(kbd.fifo)) {
     FifoU8Ins(kbd.fifo,raw_byte);
     if (raw_byte!=0xE0) {
@@ -415,7 +398,7 @@ interrupt U0 KbdIntHandler()
   KbdPktRead;
 }
 
-U0 SetCtrlAltLetCB(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,Bool in_irq=FALSE)
+U0 CtrlAltLetCBSet(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,Bool in_irq=FALSE)
 {//Set callback for <CTRL-ALT-letter>.
   ch=ToUpper(ch)-'A';
   if (ch<26) {
@@ -442,45 +425,24 @@ U0 KbdInit()
   IntEntrySet(0x21,&KbdIntHandler);
   OutU8(0x21,InU8(0x21)&~2);
 
-  SetCtrlAltLetCB('C',&CtrlAltC,"Sys/Break Execution",TRUE);
-  SetCtrlAltLetCB('D',&CtrlAltD,"Sys/Enter Debugger",TRUE);
-  SetCtrlAltLetCB('E',&CtrlAltE,"Sys/Spawn New User Task");
-  SetCtrlAltLetCB('F',&CtrlAltF,"Sys/VGA Flush",TRUE);
-  SetCtrlAltLetCB('M',&CtrlAltM,"Sys/Toggle Mute");
-  SetCtrlAltLetCB('T',&CtrlAltT,"Sys/Switch Focus to Next Task",TRUE);
-  SetCtrlAltLetCB('X',&CtrlAltX,"Sys/Kill Focused Task",TRUE);
+  CtrlAltLetCBSet('C',&CtrlAltC,"Sys/Break Execution",TRUE);
+  CtrlAltLetCBSet('D',&CtrlAltD,"Sys/Enter Debugger",TRUE);
+  CtrlAltLetCBSet('E',&CtrlAltE,"Sys/Spawn New User Task");
+  CtrlAltLetCBSet('F',&CtrlAltF,"Sys/VGA Flush",TRUE);
+  CtrlAltLetCBSet('M',&CtrlAltM,"Sys/Toggle Mute");
+  CtrlAltLetCBSet('T',&CtrlAltT,"Sys/Switch Focus to Next Task",TRUE);
+  CtrlAltLetCBSet('X',&CtrlAltX,"Sys/Kill Focused Task",TRUE);
 }
 
 U0 KbdHandler()
 {
   static U8 last_raw_byte=0;
   U8  raw_byte;
-  Bool set_LEDs,ctrl_alt;
-  I64 ch,sc;
-
   FifoU8Rem(kbd.fifo2,&raw_byte);
-  sc=KbdBuildSC(raw_byte,&last_raw_byte,&kbd.scan_code,&set_LEDs,&ctrl_alt);
-  if (set_LEDs)
-    KbdSetLEDs(sc);
+  KbdBuildSC(raw_byte,FALSE,&last_raw_byte,&kbd.scan_code);
   if (raw_byte==0xE0) {
     FifoU8Rem(kbd.fifo2,&raw_byte);
-    sc=KbdBuildSC(raw_byte,&last_raw_byte,&kbd.scan_code,&set_LEDs,&ctrl_alt);
-    if (set_LEDs)
-      KbdSetLEDs(sc);
-  }
-  if (ctrl_alt) {
-    if (!(sc & SCF_KEY_UP)) {
-      if (sc&255==SC_ESC)
-	ch='e';
-      else if (sc&255==SC_TAB)
-	ch='t';
-      else
-	ch=ScanCode2Char(sc&255);
-      if ('a'<=ch<='z' && keydev.fp_ctrl_alt_let_cbs[ch-'a'] &&
-	!Bt(&keydev.ctrl_alt_let_in_irq_flags,ch-'a'))
-	(*keydev.fp_ctrl_alt_let_cbs[ch-'a'])(kbd.scan_code);
-    }
-    return;
+    KbdBuildSC(raw_byte,FALSE,&last_raw_byte,&kbd.scan_code);
   }
   if (Btr(&kbd.scan_code,SCf_NEW_KEY)) {
     Btr(&kbd.scan_code,32+SCf_NEW_KEY);

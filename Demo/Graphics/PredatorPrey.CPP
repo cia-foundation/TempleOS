@@ -59,7 +59,7 @@ U0 PredatorPrey()
     WinMax;
     WinBorder;
     WinMgrSync;
-    WordStat;
+    AutoComplete;
 
     dc->color=BLACK;
     GrLine(dc,OX,0,OX,GR_HEIGHT-FONT_HEIGHT-1);

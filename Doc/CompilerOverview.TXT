@@ -13,8 +13,15 @@ $FG,2$#else
 $FG,2$#ifaot,#ifjit	$FG$Include code if in $FG,2$AOT$FG$ compiler mode.
 $FG,2$defined()$FG$	Is a function that can be used in expressions.
 $FG,2$#help_index$FG$, $FG,2$#help_file$FG$ See $LK,"Help System",A="FI:::/Doc/HelpSystem.TXT"$.
-
-See $LK,"Scoping and Linkages",A="FI:::/Doc/ImportExports.TXT"$, $LK,"preprocessor",A="FF:::/Compiler/Lex.CPP,KW_DEFINE"$ and $LK,"Compiler Options",A="FI:::/Doc/Options.TXT"$.
+$HL,1$$WW,0$
+#define __DATE__ #exe{StreamPrint("\"%D\"",Now);}
+#define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
+#define __LINE__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn->line_num);}
+#define __DEPTH__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn-&Fs->last_lex->lfns-1);}
+#define __FILE__ #exe{StreamPrint("\"%s\"",Fs->last_lex->cur_lfn->full_name);}
+#define __DIR__  #exe{StreamDir;}
+$HL,0$$WW,1$
+See $LK,"::/Demo/Directives.CPP"$, $LK,"Scoping and Linkages",A="FI:::/Doc/ImportExports.TXT"$, $LK,"preprocessor",A="FF:::/Compiler/Lex.CPP,KW_DEFINE"$ and $LK,"Compiler Options",A="FI:::/Doc/Options.TXT"$.
 
 
 $FG,5$$TX+CX,"Assembler Directives"$$FG$
