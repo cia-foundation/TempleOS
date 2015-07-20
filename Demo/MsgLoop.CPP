@@ -2,7 +2,7 @@ U0 MsgLoop()
 {
   I64 a1,a2,msg_code;
   "Use $LK,"msg_code",A="MN:MSG_CMD"$ defines in your programs instead of hardcoded nums.\n"
-  "<ESC> to Exit\n";
+	"<ESC> to Exit\n";
 
   //We don't want the mouse buttons to reposition the cursor,
   //so we inhibit the window mgr from processing them.

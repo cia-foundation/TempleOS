@@ -1,22 +1,22 @@
-#help_index "Training"
+#help_index "Help System"
 
 public U0 PressKeyHelp(CTask *task=NULL)
 {//Jump to key handlers src for key presses.
   I64 a1=0,a2=0;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CTask *old_hash=Fs->hash_table;
   if (!task) task=Fs;
 
-/*
+    /*
 This feature is a burden in code.  It would be nice to lst key
 cmds for all applications, but it makes the code too ugly.
 */
-task=Fs;
+  task=Fs;
 
   Fs->hash_table=task->hash_table;
   "Press keys to show handler code.\n"
-  "<SHIFT-ESC> to exit.\n"
-  "Do not press <CTRL-ALT-keys>.\n";
+	"<SHIFT-ESC> to exit.\n"
+	"Do not press <CTRL-ALT-keys>.\n";
   while (a1!=CH_ESC && a1!=CH_SHIFT_ESC) {
     GetMsg(&a1,&a2,1<<MSG_KEY_DOWN);
     *keydev.desc=0;
@@ -63,7 +63,7 @@ U0 KeyMapCtrlAltFamily()
 
   for (i=0;i<26;i++) {
     if (keydev.fp_ctrl_alt_let_cbs[i] &&
-	keydev.ctrl_alt_let_descs[i]) {
+	  keydev.ctrl_alt_let_descs[i]) {
       a2=Char2ScanCode(i+'a')+SCF_CTRL+SCF_ALT;
       st2=ScanCode2KeyName(a2);
       st=SrcEdLink(keydev.fp_ctrl_alt_let_cbs[i],256);
@@ -155,7 +155,7 @@ U0 KeyMapFamily2(U8 **entries,U8 *family,CTask *task,I64 scf)
       Free(st);
       st=SrcEdLink(keydev.handler,256);
       entries[i]=MStrPrint("%20s $$LK,\"%s\",A=\"%s\"$$\n",
-	  st2,keydev.desc,st);
+	    st2,keydev.desc,st);
       Free(st);
       Free(st2);
     }
@@ -187,16 +187,18 @@ public U0 KeyMap(CTask *task=NULL)
 This feature is a burden in code.  It would be nice to lst key
 cmds for all applications, but it makes the code too ugly.
 */
-task=Fs;
+  task=Fs;
 
   DocMax;
   KeyMapFamily("",task,0);
   KeyMapFamily("CTRL",task,SCF_CTRL);
   KeyMapFamily("ALT",task,SCF_ALT);
   KeyMapCtrlAltFamily;
-  "\n$$MA-X+PU,T=\"Click for help on key pressed\",LM=\"PressKeyHelp(0x%X);\"$$\n",task;
+  "\n$$MA-X+PU,\"Click for help on key pressed\","
+	"LM=\"PressKeyHelp(0x%X);\"$$\n",task;
 }
 
+#help_index "Help System/Training"
 public U0 TipOfDay(U8 *tip_file="::/Doc/Tips.TXT")
 {//Print random tip-of-day from ::/Doc/Tips.TXT.
   I64 i=RandU16;

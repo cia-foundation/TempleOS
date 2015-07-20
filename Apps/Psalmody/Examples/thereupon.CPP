@@ -57,7 +57,8 @@ U0 Song()
       Play("2qG3eCB2hGqG3eCB2qG3A",
 	    "Umm... \0God?\n\0 \0 \0Let \0Your \0 \0 \0 \0");
       Play("CeBA2G3DqEeDCBA2qG3A",
-	    "face \0shine \0on \0down\n\0on \0us, \0Your \0 \0luck\0y \0 \0peo\0");
+	    "face \0shine \0on \0down\n\0on \0us, \0"
+	    "Your \0 \0luck\0y \0 \0peo\0");
       Play("eBA2h.G3qECAF",
 	    " \0ple.\n\0 \0Fath\0e\0r \0a\0");
       Play("FDAeEDqECAF",

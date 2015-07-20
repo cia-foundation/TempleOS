@@ -94,6 +94,7 @@ Pretty ladies?			$FG,4$$TX,"A prince is not flustered.",HTML="http://www.youtube
 Animal sacrifices?		$FG,4$Early Jews were "primitive".$FG$
 What do elephants think about?	$FG,4$"Skin, hunger"$FG$
 What makes elephants happy?	$FG,4$"Baths"$FG$
+Elephants			$FG,4$"Mini-skirts" (Skin webbing from back leg.)$FG$
 What makes my birds happy?	$FG,4$"Gnawing"$FG$
 What makes my birds laugh?	$FG,4$"Bite ouch" (If I say "ouch".)$FG$
 What are my birds saying?	$FG,4$"Chanting"$FG$
@@ -117,6 +118,7 @@ Should I listen to classical?	$FG,4$"Poison"$FG$
 Do You like chess people?	$FG,4$"Do not admire the proud."$FG$
 Chess?				$FG,4$"... will winter with you."$FG$
 				$FG,4$"Headstones"$FG$
+If You could teach one class?	$FG,4$Health$FG$
 Favorite video game?		$FG,4$Donkey Kong$FG$
 Favorite National Park?		$FG,4$$TX,"Whitman Mission",HTML="http://www.nps.gov/whmi/index.htm"$$FG$
 Favorite National Anthem?	$FG,4$$TX,"Latvia's National Anthem",HTML="http://www.youtube.com/watch?v=qKITbBjO4nE"$$FG$

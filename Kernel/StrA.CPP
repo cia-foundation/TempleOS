@@ -18,7 +18,6 @@ U0 PutHex(I64 num,I64 width)
 }
 
 asm {
-USE64
 // IN:	RAX=NUM TO PRINT
 PUT_HEX_U64::
 	PUSH_C_REGS
@@ -306,76 +305,99 @@ _STRIMATCH::
 	POP	RBP
 	RET1	16
 }
-_extern _STRCMP I64 StrCmp(U8 *st1,U8 *st2); //Compare two strings.
-_extern _STRICMP I64 StrICmp(U8 *st1,U8 *st2); //Compare two strings, ignoring case.
-_extern _STRNCMP I64 StrNCmp(U8 *st1,U8 *st2,I64 n); //Compare N bytes in two strings.
-_extern _STRNICMP I64 StrNICmp(U8 *st1,U8 *st2,I64 n); //Compare N bytes in two strings, ignoring case.
-_extern _STRMATCH U8 *StrMatch(U8 *needle,U8 *haystack_str); //Scan for string in string.
-_extern _STRIMATCH U8 *StrIMatch(U8 *needle,U8 *haystack_str); //Scan for string in string, ignoring case.
-_extern _STRCPY U0 StrCpy(U8 *dst,U8 *src); //Copy string.
+_extern _STRCMP I64 StrCmp(
+	U8 *st1,U8 *st2); //Compare two strings.
+_extern _STRICMP I64 StrICmp(
+	U8 *st1,U8 *st2); //Compare two strings, ignoring case.
+_extern _STRNCMP I64 StrNCmp(
+	U8 *st1,U8 *st2,I64 n); //Compare N bytes in two strings.
+_extern _STRNICMP I64 StrNICmp(
+	U8 *st1,U8 *st2,I64 n); //Compare N bytes in two strings, ignoring case.
+_extern _STRMATCH U8 *StrMatch(
+	U8 *needle,U8 *haystack_str); //Scan for string in string.
+_extern _STRIMATCH U8 *StrIMatch(
+	U8 *needle,U8 *haystack_str);//Scan for string in string, ignoring case.
+_extern _STRCPY U0 StrCpy(
+	U8 *dst,U8 *src); //Copy string.
 
 //These bitmaps go to 0-511 so that $LK,"Lex",A="MN:Lex"$() can use them with $LK,"Token Codes",A="MN:TK_EOF"$.
+U32
+  chars_bmp_alpha[16]=
+  {0x0000000,0x00000000,0x87FFFFFF,0x07FFFFFE,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-U32 chars_bitmap_alpha[16]=
-{0x0000000,0x00000000,0x87FFFFFF,0x07FFFFFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_alpha_numeric[16]=
+  {0x0000000,0x03FF0000,0x87FFFFFF,0x07FFFFFE,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_alpha_numeric[16]=
-{0x0000000,0x03FF0000,0x87FFFFFF,0x07FFFFFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_alpha_numeric_no_at[16]=
+  {0x0000000,0x03FF0000,0x87FFFFFE,0x07FFFFFE,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_alpha_numeric_no_at[16]=
-{0x0000000,0x03FF0000,0x87FFFFFE,0x07FFFFFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_word[16]=
+  {0x0000000,0x03FF0080,0x87FFFFFE,0x07FFFFFE,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_word[16]=
-{0x0000000,0x03FF0080,0x87FFFFFE,0x07FFFFFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_filename[16]=
+  {0x0000000,0x03FF73FB,0xEFFFFFFF,0x6FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_filename[16]=
-{0x0000000,0x03FF73FB,0xEFFFFFFF,0x2FFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_dec_numeric[16]=
+  {0x0000000,0x03FF0000,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_dec_numeric[16]=
-{0x0000000,0x03FF0000,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_hex_numeric[16]=
+  {0x0000000,0x03FF0000,0x7E,0x7E,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_hex_numeric[16]=
-{0x0000000,0x03FF0000,0x7E,0x7E,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_white_space[16]=
+  {0x80003600,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_white_space[16]=
-{0x80003600,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_non_eol_white_space[16]=
+  {0x80001200,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_non_eol_white_space[16]=
-{0x80001200,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_zero_cr_nl_cursor[16]=
+  {0x00002421,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_zero_cr_nl_cursor[16]=
-{0x00002421,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_zero_tab_ff_cr_nl_cursor[16]=
+  {0x00003621,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_zero_tab_ff_cr_nl_cursor[16]=
-{0x00003621,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_zero_tab_ff_cr_nl_cursor_dollar[16]=
+  {0x00003621,0x10,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-chars_bitmap_zero_tab_ff_cr_nl_cursor_dollar[16]=
-{0x00003621,0x10,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  chars_bmp_getkey[16]=
+  {0x80002600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_getkey[16]=
-{0x80002600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_macro[16]=
+  {0x80002600,0xFFFFFFDF,0xFFFFFFFF,0x7FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_printable[16]=
-{0x80003600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_printable[16]=
+  {0x80003600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_displayable[16]=
-{0x80000000,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},
+  chars_bmp_displayable[16]=
+  {0x80000000,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},
 
-chars_bitmap_safe_dollar[16]=
-{0x80000000,0xFFFFFFEF,0xFFFFFFFF,0x7FFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0,0,0,0,0,0,0,0},//same but no dollar sign
+  chars_bmp_safe_dollar[16]=
+  {0x80000000,0xFFFFFFEF,0xFFFFFFFF,0x7FFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0,0,0,0,0,0,0,0},//same but no dollar sign
 
-chars_bitmap_non_eol[16]=
-{0xFFFFDBFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
+  chars_bmp_non_eol[16]=
+  {0xFFFFDBFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
 
 U8 *LstSub(I64 sub, U8 *lst)
 {//Point to lst entry.
@@ -399,7 +421,7 @@ U8 *LstSub(I64 sub, U8 *lst)
 I64 LstMatch(U8 *needle, U8 *haystack_lst,I64 flags=0)
 {//-2 if Ambiguous
 // -1 if not found
-// Not efficient. Use hash tables for efficiency.
+  // Not efficient. Use hash tables for efficiency.
   I64 n,sub=0,result=-1;
   U8 *ptr;
   Bool exact_match=FALSE;
@@ -505,14 +527,14 @@ U8 *StrUtil(U8 *_src,I64 flags)
   I64 ch;
 
   if (flags & SUF_REM_LEADING)
-    while (Bt(chars_bitmap_white_space,*src))
+    while (Bt(chars_bmp_white_space,*src))
       src++;
   while (ch=*src++)
-    if (Bt(chars_bitmap_white_space,ch)) {
+    if (Bt(chars_bmp_white_space,ch)) {
       if (!(flags & SUF_REM_SPACES)) {
 	if (flags & SUF_SINGLE_SPACE) {
 	  *dst++ = CH_SPACE;
-	  while ((ch=*src++) && Bt(chars_bitmap_white_space,ch));
+	  while ((ch=*src++) && Bt(chars_bmp_white_space,ch));
 	  src--;
 	} else
 	  *dst++ = ch;
@@ -522,7 +544,7 @@ U8 *StrUtil(U8 *_src,I64 flags)
   *dst=0;
 
   if (flags & SUF_REM_TRAILING)
-    while (dst!=_src && (!*dst || Bt(chars_bitmap_white_space,*dst)))
+    while (dst!=_src && (!*dst || Bt(chars_bmp_white_space,*dst)))
       *dst-- =0;
   if (flags & SUF_TO_UPPER)
     for (dst=_src;*dst;dst++) {
@@ -539,7 +561,7 @@ U8 *StrUtil(U8 *_src,I64 flags)
   if (flags & SUF_SAFE_DOLLAR)
     for (dst=_src;*dst;dst++) {
       ch=*dst;
-      if (!Bt(chars_bitmap_safe_dollar,*dst))
+      if (!Bt(chars_bmp_safe_dollar,*dst))
 	*dst='.';
     }
   if (flags & SUF_S2T)
@@ -610,25 +632,22 @@ U8 *StrFind(U8 *needle,U8 *haystack_str,I64 flags=0)
       haystack_str=StrIMatch(needle,haystack_str);
     else
       haystack_str=StrMatch(needle,haystack_str);
-    if (haystack_str && flags & SFF_WHOLE_LABELS_BEFORE) {
-      if (haystack_str!=saved_haystack_str) {
-	if (Bt(chars_bitmap_alpha_numeric,*(haystack_str-1))) {
-	  haystack_str++;
-	  if (*haystack_str)
-	    cont=TRUE;
-	  else
-	    haystack_str=NULL;
-	}
-      }
+    if (haystack_str && flags & SFF_WHOLE_LABELS_BEFORE &&
+	  haystack_str!=saved_haystack_str &&
+	  Bt(chars_bmp_alpha_numeric,*(haystack_str-1))) {
+      haystack_str++;
+      if (*haystack_str)
+	cont=TRUE;
+      else
+	haystack_str=NULL;
     }
-    if (haystack_str && flags & SFF_WHOLE_LABELS_AFTER) {
-      if (Bt(chars_bitmap_alpha_numeric,*(haystack_str+plen))) {
-	haystack_str++;
-	if (*haystack_str)
-	  cont=TRUE;
-	else
-	  haystack_str=NULL;
-      }
+    if (haystack_str && flags & SFF_WHOLE_LABELS_AFTER &&
+	  Bt(chars_bmp_alpha_numeric,*(haystack_str+plen))) {
+      haystack_str++;
+      if (*haystack_str)
+	cont=TRUE;
+      else
+	haystack_str=NULL;
     }
   } while (cont);
   return haystack_str;

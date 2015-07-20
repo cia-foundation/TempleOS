@@ -54,13 +54,17 @@ U0 Song()
     while (!ScanKey) {
       "$$GREEN$$Jesus talking...$$FG$$\n";
       Play("3eBCqB2sG3D2G3DetCGFsCBCBetCGBeBGsBCBC",
-	    "Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("eBCqB2sG3D2G3DetCGFsCBCBetCGBeBGsBCBC",
-	    "Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Stay \0a\0wake.\n\0 \0 \0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("qDsDBDBetA2G3GqB2G3sADADqDetGFD",
-	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0am \0a \0dead \0 \0man.\n\0");
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0"
+	    "I \0 \0am \0a \0dead \0 \0man.\n\0");
       Play("qDsDBDBetA2G3GqB2G3sADADqDetGFD",
-	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0I \0 \0am \0a \0dead \0 \0man.\n\0");
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0"
+	    "I \0 \0am \0a \0dead \0 \0man.\n\0");
     }
   } catch
     PutExcept;

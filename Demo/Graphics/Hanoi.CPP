@@ -34,7 +34,8 @@ U0 SetDisksRestXY()
   I64 i;
   for (i=0;i<NUM_DISKS;i++) {
     disks_x[i]=poles_x[disks_pole[i]];
-    disks_y[i]=Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2-1-(DISK_HEIGHT+1)*PosInStk(disks_pole[i],i);
+    disks_y[i]=Fs->pix_height-PEDESTAL_HEIGHT
+	  -(DISK_HEIGHT+1)/2-1-(DISK_HEIGHT+1)*PosInStk(disks_pole[i],i);
   }
 }
 
@@ -46,22 +47,30 @@ U0 DrawIt(CTask *task,CDC *dc)
     poles_x[i]=(1+i)*task->pix_width/4;
 
   dc->color=BLACK;
-  GrRect(dc,poles_x[0]-50,task->pix_height-PEDESTAL_HEIGHT,poles_x[2]-poles_x[0]+100,PEDESTAL_HEIGHT-FONT_HEIGHT);
+  GrRect(dc,poles_x[0]-50,task->pix_height-PEDESTAL_HEIGHT,
+	poles_x[2]-poles_x[0]+100,PEDESTAL_HEIGHT-FONT_HEIGHT);
   dc->color=DKGRAY;
-  GrRect(dc,poles_x[0]-49,task->pix_height-PEDESTAL_HEIGHT+1,poles_x[2]-poles_x[0]+98,PEDESTAL_HEIGHT-FONT_HEIGHT-2);
+  GrRect(dc,poles_x[0]-49,task->pix_height-PEDESTAL_HEIGHT+1,
+	poles_x[2]-poles_x[0]+98,PEDESTAL_HEIGHT-FONT_HEIGHT-2);
 
   for (i=0;i<3;i++) {
     dc->color=BLACK;
-    GrRect(dc,poles_x[i]-3,task->pix_height-PEDESTAL_HEIGHT-(NUM_DISKS+1)*(DISK_HEIGHT+1),7,(NUM_DISKS+1)*(DISK_HEIGHT+1));
+    GrRect(dc,poles_x[i]-3,
+	  task->pix_height-PEDESTAL_HEIGHT-(NUM_DISKS+1)*(DISK_HEIGHT+1),
+	  7,(NUM_DISKS+1)*(DISK_HEIGHT+1));
     dc->color=YELLOW;
-    GrRect(dc,poles_x[i]-2,task->pix_height-PEDESTAL_HEIGHT+1-(NUM_DISKS+1)*(DISK_HEIGHT+1),5,(NUM_DISKS+1)*(DISK_HEIGHT+1)-1);
+    GrRect(dc,poles_x[i]-2,
+	  task->pix_height-PEDESTAL_HEIGHT+1-(NUM_DISKS+1)*(DISK_HEIGHT+1),
+	  5,(NUM_DISKS+1)*(DISK_HEIGHT+1)-1);
   }
 
   for (i=0;i<NUM_DISKS;i++) {
     dc->color=BLACK;
-    GrRect(dc,disks_x[i]-(i+1)*DISK_UNIT_WIDTH,disks_y[i]-DISK_HEIGHT/2,(i+1)*(DISK_UNIT_WIDTH*2)+1,DISK_HEIGHT);
+    GrRect(dc,disks_x[i]-(i+1)*DISK_UNIT_WIDTH,
+	  disks_y[i]-DISK_HEIGHT/2,(i+1)*(DISK_UNIT_WIDTH*2)+1,DISK_HEIGHT);
     dc->color=gr_rainbow_10[i];
-    GrRect(dc,disks_x[i]-(i+1)*DISK_UNIT_WIDTH+1,disks_y[i]-DISK_HEIGHT/2+1,(i+1)*(DISK_UNIT_WIDTH*2)-1,DISK_HEIGHT-2);
+    GrRect(dc,disks_x[i]-(i+1)*DISK_UNIT_WIDTH+1,
+	  disks_y[i]-DISK_HEIGHT/2+1,(i+1)*(DISK_UNIT_WIDTH*2)-1,DISK_HEIGHT-2);
   }
 }
 
@@ -81,23 +90,27 @@ U0 MoveDisks(I64 src_pole,I64 dst_pole,I64 num)
   "$$CM+BY,0,0$$Disk:%d from %d to %d\n",TopDisk(src_pole),src_pole,dst_pole;
 
   top=TopDisk(src_pole);
-  for (y=disks_y[top];y>Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2-(DISK_HEIGHT+1)*(NUM_DISKS+2);y--) {
+  for (y=disks_y[top];
+	y>Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2
+	-(DISK_HEIGHT+1)*(NUM_DISKS+2);y--) {
     disks_y[top]=y;
     MySleep;
   }
   if (src_pole<dst_pole)
     for (x=poles_x[src_pole];x<=poles_x[dst_pole];x++) {
-       disks_x[top]=x;
-       MySleep;
+      disks_x[top]=x;
+      MySleep;
     }
   else
     for (x=poles_x[src_pole];x>=poles_x[dst_pole];x--) {
-       disks_x[top]=x;
-       MySleep;
+      disks_x[top]=x;
+      MySleep;
     }
 
   disks_pole[top]=dst_pole;
-  for (y=disks_y[top];y<Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2-1-(DISK_HEIGHT+1)*PosInStk(dst_pole,top);y++) {
+  for (y=disks_y[top];
+	y<Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2-1
+	-(DISK_HEIGHT+1)*PosInStk(dst_pole,top);y++) {
     disks_y[top]=y;
     MySleep;
   }

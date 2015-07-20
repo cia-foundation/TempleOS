@@ -33,39 +33,39 @@ U0 Ring3Demo()
 
   TSSBusy(Gs->tss->tr_ring3,OFF);
   SetRAX(Gs->tss->tr_ring3+3);
-	LTR	AX
+  LTR	AX
 
-asm {
-	MOV	U64 [&old_stk],RSP
+  asm {
+    MOV	U64 [&old_stk],RSP
 
-	LEA	RAX,[R3_CALLBACK]
-	MOV	U64 [&new_rip],RAX
-	
-	MOV	AX,CGDT.ds_ring3+3
-	MOV	DS,AX
-	MOV	ES,AX
+    LEA	RAX,[R3_CALLBACK]
+    MOV	U64 [&new_rip],RAX
 
-	PUSH	U32 CGDT.ds_ring3+3	//STKSEG
-	PUSH	U64 [&old_stk]
-	PUSH	U32 0		//FLAGS--interrupts off
-	PUSH	U32 CGDT.cs64_ring3+3
-	LEA	RAX,[R3_START]
-	PUSH	RAX
-	IRET
+    MOV	AX,CGDT.ds_ring3+3
+    MOV	DS,AX
+    MOV	ES,AX
 
-R3_START:
-	INC	U64 [SYS_PROGRESS1]
-	CLI	//This causes general protection fault #13
+    PUSH	U32 CGDT.ds_ring3+3	//STKSEG
+    PUSH	U64 [&old_stk]
+    PUSH	U32 0		//FLAGS--interrupts off
+    PUSH	U32 CGDT.cs64_ring3+3
+    LEA	RAX,[R3_START]
+    PUSH	RAX
+    IRET
 
-R3_CALLBACK:
-	MOV	AX,CGDT.ds
-	MOV	DS,AX
-	MOV	ES,AX
+    R3_START:
+    INC	U64 [SYS_PROGRESS1]
+    CLI	//This causes general protection fault #13
+
+    R3_CALLBACK:
+    MOV	AX,CGDT.ds
+    MOV	DS,AX
+    MOV	ES,AX
   }
 
   TSSBusy(Gs->tss->tr,OFF);
   SetRAX(Gs->tss->tr);
-	LTR	AX
+  LTR	AX
 
   IntEntrySet(0x0D,old_vect,IDTET_IRQ,0);
   STI

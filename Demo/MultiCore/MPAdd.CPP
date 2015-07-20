@@ -3,8 +3,8 @@ I64 mp_n;
 I64 MPSum(I64 my_mp_cnt)
 {//We could use the formula n*(n+1)/2
   I64 lo=mp_n*Gs->num/my_mp_cnt,
-     hi=mp_n*(Gs->num+1)/my_mp_cnt,
-     result=0,i;
+	hi=mp_n*(Gs->num+1)/my_mp_cnt,
+	result=0,i;
   for (i=lo;i<hi;i++)
     result+=i;
   return result;
@@ -18,7 +18,7 @@ I64 Sum(I64 n,I64 my_mp_cnt)
   for (i=0;i<my_mp_cnt;i++)
     tempm[i]=JobQue(&MPSum,my_mp_cnt,i,0);
   for (i=0;i<my_mp_cnt;i++)
-    result+=GetResult(tempm[i]);
+    result+=JobResultGet(tempm[i]);
   return result;
 }
 
@@ -46,8 +46,8 @@ F64 Test(I64 n,I64 my_mp_cnt)
 U0 MPAdd()
 {
   I64 i,n,
-    h=Fs->pix_width,
-    v=Fs->pix_height;
+	h=Fs->pix_width,
+	v=Fs->pix_height;
   F64 t1,t2,results[NUM_TESTS];
   CDC *dc=DCAlias;
 
@@ -71,7 +71,7 @@ U0 MPAdd()
     dc->color=RED;
     dc->pen_width=2;
     GrLine3(dc,i*h/(NUM_TESTS-1),      v-results[i  ]/MAX_PERCENT*v,0,
-		 (i+1)*h/(NUM_TESTS-1),v-results[i+1]/MAX_PERCENT*v,0);
+	  (i+1)*h/(NUM_TESTS-1),v-results[i+1]/MAX_PERCENT*v,0);
     dc->color=GREEN;
     GrPrint(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
     GrLine(dc,i*h/(NUM_TESTS-1),0,i*h/(NUM_TESTS-1),v);

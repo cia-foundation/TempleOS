@@ -1,254 +1,241 @@
-U0 StreamPrint(U8 *fmt,...)
-{//Injects text into the compile stream. Used in #exe{} blocks.
-  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st;
-  CLex *lx=Fs->last_lex;
-  CStreamBlk *tempe=lx->last_stream_blk;
-  if (tempe!=&lx->next_stream_blk) {
-    st=MStrPrint("%s%s",tempe->body,buf);
-    Free(tempe->body);
-    tempe->body=st;
-  } else
-    PrintErr("No exe{} blk\n");
-  Free(buf);
-}
-
-U8 *LexStatement2Bin(CLex *lx,I64 *_type,I64 cmp_flags=0)
-{//Compile one lx statement to bin code.
+U8 *LexStatement2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
+{//Compile one cc statement to bin code.
   I64 size,i,j,k,*result=INVALID_PTR;
-  CLexCodeCtrl *tempcbh;
+  CCodeCtrl *tempcbh;
   if (_type) *_type=RT_I64;
-  Btr(&lx->flags,Lf_OPT_TRACE_PRESENT);
-  if (lx->a_depth==2)
-    LCCPush(lx);
-  LCCInit(lx);
-  if (!PrsStatement(lx,,,cmp_flags)) {
-    if (lx->lcc.lcc_root.next!=&lx->lcc.lcc_root) {
-      lx->lcc.lcc_root.last->ic_flags&=~ICF_NO_DEPEND_RESULT;
-      LCCAdd(lx,IC_RETURN_VAL2,0,0);
-      LCCAdd(lx,IC_RET,0,0);
-      if (result=LCCCompile(lx,&size,NULL,_type)) {
-	if (lx->flags&LF_AOT_COMPILE) {
-	  j=lx->a->ip;
+  Btr(&cc->flags,CCf_OPT_TRACE_PRESENT);
+  if (cc->aot_depth==2)
+    COCPush(cc);
+  COCInit(cc);
+  if (!PrsStatement(cc,,,cmp_flags)) {
+    if (cc->coc.coc_root.next!=&cc->coc.coc_root) {
+      cc->coc.coc_root.last->ic_flags&=~ICF_NO_DEPEND_RESULT;
+      ICAdd(cc,IC_RETURN_VAL2,0,0);
+      ICAdd(cc,IC_RET,0,0);
+      if (result=COCCompile(cc,&size,NULL,_type)) {
+	if (cc->flags&CCF_AOT_COMPILE) {
+	  j=cc->aotc->ip;
 	  k=(size+7)>>3;
 	  for (i=0;i<k;i++)
-	    AsmStoreCodeU64(lx,result[i]);
+	    AOTStoreCodeU64(cc,result[i]);
 	  Free(result);
 	  result=j;
 	}
       }
     } //TODO: else del misc?
   } else //TODO: too dangerous to del Misc?
-    QueDel(&lx->lcc.lcc_root.next);
-  if (lx->a_depth==2) {
-    tempcbh=LCCPopNoFree(lx);
-    LCCAppend(lx,tempcbh);
+    QueDel(&cc->coc.coc_root.next);
+  if (cc->aot_depth==2) {
+    tempcbh=COCPopNoFree(cc);
+    COCAppend(cc,tempcbh);
   }
   return result;
 }
 
-CExe *CmpJoin(CLex *lx,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv=0)
+CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
 {
-  CAOTCtrl *a,*old_a=lx->a;
+  CAOTCtrl *aotc,*old_aot=cc->aotc;
   I64 i,j,l;
   U8 *buf;
-  CAsmCodeBlk *tempc;
-  CExeImportExport *tempe;
+  CAOTBinBlk *tempbin;
+  CAOTImportExport *tempie;
   Bool okay=TRUE;
   CLexHashTableContext *htc=MAlloc(sizeof(CLexHashTableContext));
-  CExe *result=CAlloc(sizeof(CExe)),*parent;
-  if (parent=lx->exe) {
-    result->parent_exe=parent;
+  CAOT *result=CAlloc(sizeof(CAOT)),*parent;
+  if (parent=cc->aot) {
+    result->parent_aot=parent;
     QueIns(result,parent->last);
   } else
     QueInit(result);
-  lx->exe=result;
+  cc->aot=result;
 
   result->next_ie=result->last_ie=&result->next_ie;
-  lx->a=a=CAlloc(sizeof(CAOTCtrl));
-  lx->a_depth++;
+  cc->aotc=aotc=CAlloc(sizeof(CAOTCtrl));
+  cc->aot_depth++;
 
-  a->cb=CAlloc(sizeof(CAsmCodeBlk));
-  a->max_align_bits=0;
-  a->module_org=INVALID_PTR;
+  aotc->bin=CAlloc(sizeof(CAOTBinBlk));
+  aotc->max_align_bits=0;
+  aotc->module_org=INVALID_PTR;
 
-  MemCpy(htc,&lx->htc,sizeof(CLexHashTableContext));
-  if (lx->htc.fun)
-    lx->htc.glbl_hash_table=HashTableNew(128);
+  MemCpy(htc,&cc->htc,sizeof(CLexHashTableContext));
+  if (cc->htc.fun)
+    cc->htc.glbl_hash_table=HashTableNew(128);
   else
-    lx->htc.glbl_hash_table=HashTableNew(1024);
-  if (lx->flags&LF_AOT_COMPILE) {
-    lx->htc.define_hash_table=lx->htc.glbl_hash_table;
-    if (lx->a_depth<=1)
-      lx->htc.glbl_hash_table->next=cmp.asm_hash;
+    cc->htc.glbl_hash_table=HashTableNew(1024);
+  if (cc->flags&CCF_AOT_COMPILE) {
+    cc->htc.define_hash_table=cc->htc.glbl_hash_table;
+    if (cc->aot_depth<=1)
+      cc->htc.glbl_hash_table->next=cmp.asm_hash;
     else
-      lx->htc.glbl_hash_table->next=htc->glbl_hash_table;
+      cc->htc.glbl_hash_table->next=htc->glbl_hash_table;
   } else
-    lx->htc.glbl_hash_table->next=Fs->hash_table;
-  lx->htc.hash_table_lst=lx->htc.local_hash_table=HashTableNew(16);
-  lx->htc.local_hash_table->next=lx->htc.glbl_hash_table;
-  lx->htc.local_var_lst=lx->htc.fun; //HolyC local vars
-  lx->htc.fun=NULL;
+    cc->htc.glbl_hash_table->next=Fs->hash_table;
+  cc->htc.hash_table_lst=cc->htc.local_hash_table=HashTableNew(16);
+  cc->htc.local_hash_table->next=cc->htc.glbl_hash_table;
+  cc->htc.local_var_lst=cc->htc.fun; //HolyC local vars
+  cc->htc.fun=NULL;
   try {
     if (cmp_flags&CMPF_LEX_FIRST)
-      Lex(lx);
+      Lex(cc);
     if (!(cmp_flags&CMPF_ONE_ASM_INS))
       cmp_flags|=CMPF_PRS_SEMICOLON;
-    if (lx->flags&LF_AOT_COMPILE) {
-      while (lx->token!=TK_EOF) {
-	buf=LexStatement2Bin(lx,NULL,cmp_flags);
+    if (cc->flags&CCF_AOT_COMPILE) {
+      while (cc->token!=TK_EOF) {
+	buf=LexStatement2Bin(cc,NULL,cmp_flags);
 	if (buf!=INVALID_PTR) {
-	  tempe=CAlloc(sizeof(CExeImportExport));
-	  tempe->type=EIT_MAIN;
-	  tempe->ip=buf;
-	  QueIns(tempe,result->last_ie);
+	  tempie=CAlloc(sizeof(CAOTImportExport));
+	  tempie->type=IET_MAIN;
+	  tempie->ip=buf;
+	  QueIns(tempie,result->last_ie);
 	}
 	if (cmp_flags&CMPF_ASM_BLK)
 	  break;
       }
     } else
-      PrsStatement(lx,,,cmp_flags);
-    AsmGlblsResolve(lx,result);
+      PrsStatement(cc,,,cmp_flags);
+    AOTGlblsResolve(cc,result);
   } catch {
     if (Fs->except_ch=='Compiler' && !(cmp_flags&CMPF_ASM_BLK)) {
-      LexPutPos(lx);
+      LexPutPos(cc);
       Fs->catch_except=TRUE;
     }
     okay=FALSE;
   }
   if (!okay) {
-    if (lx->error_cnt<1)
-      lx->error_cnt=1;
-    lx->exe=result->parent_exe;
+    if (cc->error_cnt<1)
+      cc->error_cnt=1;
+    cc->aot=result->parent_aot;
     Free(result);
-    LinkedLstDel(a->cb);
+    LinkedLstDel(aotc->bin);
     result=NULL;
   } else {
-    if (map_name && !cmp.dont_write_to_dsk)
-      Who("-r",lx->htc.glbl_hash_table,map_name,mapfile_drv);
-    HashTableDel(lx->htc.local_hash_table);
-    HashTableDel(lx->htc.glbl_hash_table);
+    if (map_name)
+      MapFileWrite(cc->htc.glbl_hash_table,map_name,mapfile_drv_let);
+    HashTableDel(cc->htc.local_hash_table);
+    HashTableDel(cc->htc.glbl_hash_table);
 
-    if (!a->num_ex_U8s)
+    if (!aotc->num_bin_U8s)
       result->buf=NULL;
     else {
-      if (lx->flags&LF_AOT_COMPILE)
-	result->buf=MAlloc(a->num_ex_U8s);
+      if (cc->flags&CCF_AOT_COMPILE)
+	result->buf=MAlloc(aotc->num_bin_U8s);
       else {
-	if (a->module_org==INVALID_PTR)
-	  result->buf=MAlloc(a->num_ex_U8s,Fs->code_heap);
+	if (aotc->module_org==INVALID_PTR)
+	  result->buf=MAlloc(aotc->num_bin_U8s,Fs->code_heap);
 	else
-	  result->buf=a->module_org;
+	  result->buf=aotc->module_org;
       }
-      result->ex_U8s=a->num_ex_U8s;
-      tempc=a->cb;
+      result->aot_U8s=aotc->num_bin_U8s;
+      tempbin=aotc->bin;
       j=0;
-      l=a->num_ex_U8s;
-      while (tempc) {
+      l=aotc->num_bin_U8s;
+      while (tempbin) {
 	i=l;
-	if (i>ASM_CODE_BLK_SIZE)
-	  i=ASM_CODE_BLK_SIZE;
-	MemCpy(result->buf+j,tempc->body,i);
+	if (i>AOT_BIN_BLK_SIZE)
+	  i=AOT_BIN_BLK_SIZE;
+	MemCpy(result->buf+j,tempbin->body,i);
 	j+=i;
 	l-=i;
-	tempc=tempc->next;
+	tempbin=tempbin->next;
       }
     }
-    LinkedLstDel(a->cb);
-    result->abss=a->abss;
-    result->heap_glbls=a->heap_glbls;
-    result->max_align_bits=a->max_align_bits;
-    result->module_org=a->module_org;
+    LinkedLstDel(aotc->bin);
+    result->abss=aotc->abss;
+    result->heap_glbls=aotc->heap_glbls;
+    result->max_align_bits=aotc->max_align_bits;
+    result->module_org=aotc->module_org;
   }
-  lx->exe=parent;
-  MemCpy(&lx->htc,htc,sizeof(CLexHashTableContext));
+  cc->aot=parent;
+  MemCpy(&cc->htc,htc,sizeof(CLexHashTableContext));
   Free(htc);
-  Free(a);
-  lx->a=old_a;
-  lx->a_depth--;
+  Free(aotc);
+  cc->aotc=old_aot;
+  cc->aot_depth--;
   return result;
 }
 
-CExe *CmpBuf(U8 *buf,U8 *map_name=NULL,
-  I64 *error_cnt=NULL, I64 *warning_cnt=NULL,U8 mapfile_drv=0)
+CAOT *CmpBuf(U8 *buf,U8 *map_name=NULL,
+  I64 *error_cnt=NULL, I64 *warning_cnt=NULL,U8 mapfile_drv_let=0)
 {
-  CLex *lx;
-  CExe *result=NULL;
-  lx=LexNew(buf,LF_DONT_FREE_BUF);
-  lx->flags|=LF_AOT_COMPILE;
-  QueIns(lx,Fs->last_lex);
-  result=CmpJoin(lx,CMPF_LEX_FIRST,map_name,mapfile_drv);
-  if (error_cnt)   *error_cnt=lx->error_cnt;
-  if (warning_cnt) *warning_cnt=lx->warning_cnt;
-  QueRem(lx);
+  CCmpCtrl *cc;
+  CAOT *result=NULL;
+  cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF);
+  cc->flags|=CCF_AOT_COMPILE;
+  QueIns(cc,Fs->last_lex);
+  result=CmpJoin(cc,CMPF_LEX_FIRST,map_name,mapfile_drv_let);
+  if (error_cnt)   *error_cnt=cc->error_cnt;
+  if (warning_cnt) *warning_cnt=cc->warning_cnt;
+  QueRem(cc);
   if (result)
-    LexDel(lx);
+    CmpCtrlDel(cc);
   return result;
 }
 
-U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
+U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 {
-  I64 i,ip2=tempx->buf+tempx->ip,*str=NULL;
+  I64 i,ip2=tempaot->buf+tempaot->ip,*str=NULL;
   U8 *ptr;
-  CLexCodeMisc *g_lb;
-  CExeAbsAddr *tempa,*tempa1;
-  CExeImportExport *tempe,*tempe1;
+  CCodeMisc *g_lb;
+  CAOTAbsAddr *tempa,*tempa1;
+  CAOTImportExport *tempie,*tempie1;
   CHashExport *tempex;
 
-  tempa=tempx->abss;
+  tempa=tempaot->abss;
   while (tempa) {
     tempa1=tempa->next;
     ptr=ip2+tempa->ip;
     nobound_switch (tempa->type) {
-      case EAT_ADD_U8:	*ptr(U8 *) +=ip2; break;
-      case EAT_SUB_U8:	*ptr(U8 *) -=ip2; break;
-      case EAT_ADD_U16:	*ptr(U16 *)+=ip2; break;
-      case EAT_SUB_U16:	*ptr(U16 *)-=ip2; break;
-      case EAT_ADD_U32:	*ptr(U32 *)+=ip2; break;
-      case EAT_SUB_U32:	*ptr(U32 *)-=ip2; break;
-      case EAT_ADD_U64:	*ptr(I64 *)+=ip2; break;
-      case EAT_SUB_U64:	*ptr(I64 *)-=ip2; break;
+      case AAT_ADD_U8:	*ptr(U8 *) +=ip2; break;
+      case AAT_SUB_U8:	*ptr(U8 *) -=ip2; break;
+      case AAT_ADD_U16:	*ptr(U16 *)+=ip2; break;
+      case AAT_SUB_U16:	*ptr(U16 *)-=ip2; break;
+      case AAT_ADD_U32:	*ptr(U32 *)+=ip2; break;
+      case AAT_SUB_U32:	*ptr(U32 *)-=ip2; break;
+      case AAT_ADD_U64:	*ptr(I64 *)+=ip2; break;
+      case AAT_SUB_U64:	*ptr(I64 *)-=ip2; break;
     }
     Free(tempa);
     tempa=tempa1;
   }
-  tempe=tempx->next_ie;
-  while (tempe!=&tempx->next_ie) {
-    tempe1=tempe->next;
-    if (tempe->str) {
+  tempie=tempaot->next_ie;
+  while (tempie!=&tempaot->next_ie) {
+    tempie1=tempie->next;
+    if (tempie->str) {
       Free(str);
-      str=tempe->str;
+      str=tempie->str;
     }
-    switch (tempe->type) {
-      case EIT_REL32_EXPORT:
-      case EIT_IMM32_EXPORT:
-      case EIT_REL64_EXPORT:
-      case EIT_IMM64_EXPORT:
+    switch (tempie->type) {
+      case IET_REL32_EXPORT:
+      case IET_IMM32_EXPORT:
+      case IET_REL64_EXPORT:
+      case IET_IMM64_EXPORT:
 	tempex=CAlloc(sizeof(CHashExport));
 	tempex->str=str;
 	str=NULL;
 	tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
-	if (tempe->type==EIT_IMM32_EXPORT||tempe->type==EIT_IMM64_EXPORT)
-	  tempex->val=tempe->ip;
+	if (tempie->type==IET_IMM32_EXPORT||tempie->type==IET_IMM64_EXPORT)
+	  tempex->val=tempie->ip;
 	else
-	  tempex->val=tempe->ip+ip2;
-	tempex->src_link=tempe->src_link;
-	tempe->src_link=NULL;
+	  tempex->val=tempie->ip+ip2;
+	tempex->src_link=tempie->src_link;
+	tempie->src_link=NULL;
 	HashAdd(tempex,Fs->hash_table);
 	SysSymImportsResolve(tempex->str);
 	break;
-      case EIT_REL_I0...EIT_IMM_I64:
-	if (tempe->str) {
-	  if (tempe->flags&EIF_GOTO_LABEL) {
-	    if(!(g_lb=LCCGoToLabelFind(lx,str)))
+      case IET_REL_I0...IET_IMM_I64:
+	if (tempie->str) {
+	  if (tempie->flags&IEF_GOTO_LABEL) {
+	    if(!(g_lb=COCGoToLabelFind(cc,str)))
 	      "Unresolved Reference:%s\n",str;
 	    else {
 	      g_lb->use_cnt++;
 	      g_lb=OptLabelFwd(g_lb);
-	      i=g_lb->addr+tempx->buf;
+	      i=g_lb->addr+tempaot->buf;
 	    }
 	    tempex=NULL;
 	  } else {
-	    if (!(tempex=HashFind(str,Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM)))
+	    if (!(tempex=HashFind(str,Fs->hash_table,
+		  HTG_ALL-HTT_IMPORT_SYS_SYM)))
 	      "Unresolved Reference:%s\n",str;
 	    else {
 	      if (tempex->type & HTT_FUN)
@@ -262,94 +249,94 @@ U0 CmpFixUpJITAsm(CLex *lx,CExe *tempx)
 	  }
 	}
 	if (tempex || g_lb) {
-	  ptr=tempe->ip+ip2;
-	  nobound_switch (tempe->type) {
-	    case EIT_REL_I0:
-	    case EIT_IMM_U0:
+	  ptr=tempie->ip+ip2;
+	  nobound_switch (tempie->type) {
+	    case IET_REL_I0:
+	    case IET_IMM_U0:
 	      break;
-	    case EIT_REL_I8:
+	    case IET_REL_I8:
 	      if (!(MIN_I8<=i-ptr-1<=MAX_I8))
-		LexExcept(lx,"branch out of range at ");
+		LexExcept(cc,"branch out of range at ");
 	      *ptr(U8 *) =i-ptr-1;
 	      break;
-	    case EIT_IMM_U8:
+	    case IET_IMM_U8:
 	      *ptr(U8 *) =i;
 	      break;
-	    case EIT_REL_I16:
+	    case IET_REL_I16:
 	      if (!(MIN_I16<=i-ptr-2<=MAX_I16))
-		LexExcept(lx,"branch out of range at ");
+		LexExcept(cc,"branch out of range at ");
 	      *ptr(U16 *)=i-ptr-2;
 	      break;
-	    case EIT_IMM_U16:
+	    case IET_IMM_U16:
 	      *ptr(U16 *)=i;
 	      break;
-	    case EIT_REL_I32:
+	    case IET_REL_I32:
 	      if (!(MIN_I32<=i-ptr-4<=MAX_I32))
-		LexExcept(lx,"branch out of range at ");
+		LexExcept(cc,"branch out of range at ");
 	      *ptr(U32 *)=i-ptr-4;
 	      break;
-	    case EIT_IMM_U32:
+	    case IET_IMM_U32:
 	      *ptr(U32 *)=i;
 	      break;
-	    case EIT_REL_I64:
+	    case IET_REL_I64:
 	      *ptr(I64 *)=i-ptr-8;
 	      break;
-	    case EIT_IMM_I64:
+	    case IET_IMM_I64:
 	      *ptr(I64 *)=i;
 	      break;
 	  }
 	}
 	break;
     }
-    Free(tempe->src_link);
-    Free(tempe);
-    tempe=tempe1;
+    Free(tempie->src_link);
+    Free(tempie);
+    tempie=tempie1;
   }
   Free(str);
-  if (!lx->a_depth && Bt(&lx->opts,OPTf_COMPILE_TRACE))
-    Un(ip2,tempx->ex_U8s,64);
-  QueRem(tempx);
-  Free(tempx);
+  if (!cc->aot_depth && Bt(&cc->opts,OPTf_COMPILE_TRACE))
+    Un(ip2,tempaot->aot_U8s,64);
+  QueRem(tempaot);
+  Free(tempaot);
 }
 
-U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
+U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
 {
-  CAOTCtrl *a=lx->a;
-  I64 i,ip2=tempx->ip+lx->a->ip;
+  CAOTCtrl *aotc=cc->aotc;
+  I64 i,ip2=tempaot->ip+cc->aotc->ip;
   U8 *ptr;
-  CLexCodeMisc *g_lb=NULL;
-  CExeAbsAddr *tempa,*tempa1;
-  CExeImportExport *tempe,*tempe1;
+  CCodeMisc *g_lb=NULL;
+  CAOTAbsAddr *tempa,*tempa1;
+  CAOTImportExport *tempie,*tempie1;
 
-  tempa=tempx->abss;
+  tempa=tempaot->abss;
   while (tempa) {
     tempa1=tempa->next;
-    tempa->next=a->abss;
-    ptr=tempx->buf+tempx->ip+tempa->ip;
+    tempa->next=aotc->abss;
+    ptr=tempaot->buf+tempaot->ip+tempa->ip;
     nobound_switch (tempa->type) {
-      case EAT_ADD_U8:	*ptr(U8 *)+=ip2;	break;
-      case EAT_SUB_U8:	*ptr(U8 *)-=ip2;	break;
-      case EAT_ADD_U16:	*ptr(U16 *)+=ip2;	break;
-      case EAT_SUB_U16:	*ptr(U16 *)-=ip2;	break;
-      case EAT_ADD_U32:	*ptr(U32 *)+=ip2;	break;
-      case EAT_SUB_U32:	*ptr(U32 *)-=ip2;	break;
-      case EAT_ADD_U64:	*ptr(I64 *)+=ip2;	break;
-      case EAT_SUB_U64:	*ptr(I64 *)-=ip2;	break;
+      case AAT_ADD_U8:	*ptr(U8 *)+=ip2;	break;
+      case AAT_SUB_U8:	*ptr(U8 *)-=ip2;	break;
+      case AAT_ADD_U16:	*ptr(U16 *)+=ip2;	break;
+      case AAT_SUB_U16:	*ptr(U16 *)-=ip2;	break;
+      case AAT_ADD_U32:	*ptr(U32 *)+=ip2;	break;
+      case AAT_SUB_U32:	*ptr(U32 *)-=ip2;	break;
+      case AAT_ADD_U64:	*ptr(I64 *)+=ip2;	break;
+      case AAT_SUB_U64:	*ptr(I64 *)-=ip2;	break;
     }
-    a->abss=tempa;
+    aotc->abss=tempa;
     tempa->ip+=ip2;
     tempa=tempa1;
   }
 
-  tempe=tempx->next_ie;
-  while (tempe!=&tempx->next_ie) {
-    tempe1=tempe->next;
-    QueRem(tempe);
-    if (EIT_REL_I0<=tempe->type<=EIT_IMM_I64) {
-      if (tempe->str) {
-	if (tempe->flags&EIF_GOTO_LABEL) {
-	  if(!(g_lb=LCCGoToLabelFind(lx,tempe->str)))
-	    "Unresolved Reference:%s\n",tempe->str;
+  tempie=tempaot->next_ie;
+  while (tempie!=&tempaot->next_ie) {
+    tempie1=tempie->next;
+    QueRem(tempie);
+    if (IET_REL_I0<=tempie->type<=IET_IMM_I64) {
+      if (tempie->str) {
+	if (tempie->flags&IEF_GOTO_LABEL) {
+	  if(!(g_lb=COCGoToLabelFind(cc,tempie->str)))
+	    "Unresolved Reference:%s\n",tempie->str;
 	  else {
 	    g_lb->use_cnt++;
 	    g_lb=OptLabelFwd(g_lb);
@@ -360,108 +347,108 @@ U0 CmpFixUpAOTAsm(CLex *lx,CExe *tempx)
     } else
       g_lb=NULL;
 
-    ptr=tempx->buf+tempx->ip+tempe->ip;
+    ptr=tempaot->buf+tempaot->ip+tempie->ip;
     if (g_lb) {
-      i=g_lb->addr+tempx->buf;
-      nobound_switch (tempe->type) {
-	case EIT_REL_I0:
-	case EIT_IMM_U0:
+      i=g_lb->addr+tempaot->buf;
+      nobound_switch (tempie->type) {
+	case IET_REL_I0:
+	case IET_IMM_U0:
 	  break;
-	case EIT_REL_I8:
+	case IET_REL_I8:
 	  if (!(MIN_I8<=i-ptr-1<=MAX_I8))
-	    LexExcept(lx,"branch out of range at ");
+	    LexExcept(cc,"branch out of range at ");
 	  *ptr(U8 *) =i-ptr-1;
 	  break;
-	case EIT_IMM_U8:
+	case IET_IMM_U8:
 	  *ptr(U8 *) =i;
 	  break;
-	case EIT_REL_I16:
+	case IET_REL_I16:
 	  if (!(MIN_I16<=i-ptr-2<=MAX_I16))
-	    LexExcept(lx,"branch out of range at ");
+	    LexExcept(cc,"branch out of range at ");
 	  *ptr(U16 *)=i-ptr-2;
 	  break;
-	case EIT_IMM_U16:
+	case IET_IMM_U16:
 	  *ptr(U16 *)=i;
 	  break;
-	case EIT_REL_I32:
+	case IET_REL_I32:
 	  if (!(MIN_I32<=i-ptr-4<=MAX_I32))
-	    LexExcept(lx,"branch out of range at ");
+	    LexExcept(cc,"branch out of range at ");
 	  *ptr(U32 *)=i-ptr-4;
 	  break;
-	case EIT_IMM_U32:
+	case IET_IMM_U32:
 	  *ptr(U32 *)=i;
 	  break;
-	case EIT_REL_I64:
+	case IET_REL_I64:
 	  *ptr(I64 *)=i-ptr-8;
 	  break;
-	case EIT_IMM_I64:
+	case IET_IMM_I64:
 	  *ptr(I64 *)=i;
 	  break;
       }
-      Free(tempe->src_link);
-      Free(tempe);
+      Free(tempie->src_link);
+      Free(tempie);
     } else {
-      switch (tempe->type) {
+      switch (tempie->type) {
 	sub_switch_start:
-	  case EIT_REL32_EXPORT:
-	  case EIT_IMM32_EXPORT:
-	  case EIT_REL64_EXPORT:
-	  case EIT_IMM64_EXPORT:
-	  case EIT_IMM_U0:
-	  case EIT_IMM_U8:
-	  case EIT_IMM_U16:
-	  case EIT_IMM_U32:
-	  case EIT_IMM_I64:
-	  case EIT_REL_I0:
+	  case IET_REL32_EXPORT:
+	  case IET_IMM32_EXPORT:
+	  case IET_REL64_EXPORT:
+	  case IET_IMM64_EXPORT:
+	  case IET_IMM_U0:
+	  case IET_IMM_U8:
+	  case IET_IMM_U16:
+	  case IET_IMM_U32:
+	  case IET_IMM_I64:
+	  case IET_REL_I0:
 	    break;
-	  case EIT_REL_I8:	    *ptr(U8 *) -=ip2;	    break;
-	  case EIT_REL_I16:	    *ptr(U16 *)-=ip2;	    break;
-	  case EIT_REL_I32:	    *ptr(U32 *)-=ip2;	    break;
-	  case EIT_REL_I64:	    *ptr(I64 *)-=ip2;	    break;
+	  case IET_REL_I8:	    *ptr(U8 *) -=ip2;	    break;
+	  case IET_REL_I16:	    *ptr(U16 *)-=ip2;	    break;
+	  case IET_REL_I32:	    *ptr(U32 *)-=ip2;	    break;
+	  case IET_REL_I64:	    *ptr(I64 *)-=ip2;	    break;
 	sub_switch_end:
-	  tempe->ip+=ip2;
+	  tempie->ip+=ip2;
 	  break;
       }
-      tempe->exe=NULL;
-      QueIns(tempe,tempx->parent_exe->last_ie);
+      tempie->aot=NULL;
+      QueIns(tempie,tempaot->parent_aot->last_ie);
     }
-    tempe=tempe1;
+    tempie=tempie1;
   }
 }
 
-I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
+I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 {//AOT Compile CPP or PRJ file a and output BIN file. Returns err_cnt.
   U8 *ptr,*fbuf=NULL,*fbuf2=NULL,*fbuf3=NULL,
-     *patch_table=MAlloc(0x20000);
-  CExe *tempx;
-  I64 i,cnt,size=0,error_cnt=0,warning_cnt=0,ex_U8s=0;
+	*patch_table=MAlloc(0x20000);
+  CAOT *tempaot;
+  I64 i,cnt,size=0,error_cnt=0,warning_cnt=0,aot_U8s=0;
   CBinFile *bfh;
-  CExeImportExport *tempe,*tempe1;
-  CExeAbsAddr *tempa,*tempa1;
-  CExeHeapGlblRef *temphgr,*temphgr1;
-  CExeHeapGlbl *temphg,*temphg1;
+  CAOTImportExport *tempie,*tempie1;
+  CAOTAbsAddr *tempa,*tempa1;
+  CAOTHeapGlblRef *temphgr,*temphgr1;
+  CAOTHeapGlbl *temphg,*temphg1;
 
   fbuf=DftExt(filename,"PRJ.Z");
   fbuf2=MStrPrint("#include \"%s\"",fbuf);
   if (map_name)
     fbuf3=DftExt(map_name,"MAP.Z");
 
-  if (tempx=CmpBuf(fbuf2,fbuf3,&error_cnt,&warning_cnt,mapfile_drv)) {
-    ex_U8s=tempx->ex_U8s;
+  if (tempaot=CmpBuf(fbuf2,fbuf3,&error_cnt,&warning_cnt,mapfile_drv_let)) {
+    aot_U8s=tempaot->aot_U8s;
     ptr=patch_table;
-    //See $LK,"Load",A="MN:Load"$()
+//See $LK,"Load",A="MN:Load"$()
     cnt=0;
-    tempa=tempx->abss;
+    tempa=tempaot->abss;
     while (tempa) {
       if (!(tempa->type&1))
 	cnt++;
       tempa=tempa->next;
     }
     if (cnt) {
-      *ptr++=EIT_ABS_ADDR;
+      *ptr++=IET_ABS_ADDR;
       *ptr(U32 *)++=cnt;
       *ptr++=0;
-      tempa=tempx->abss;
+      tempa=tempaot->abss;
       while (tempa) {
 	tempa1=tempa->next;
 	if (!(tempa->type&1))
@@ -470,7 +457,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
 	tempa=tempa1;
       }
     }
-    temphg=tempx->heap_glbls;
+    temphg=tempaot->heap_glbls;
     while (temphg) {
       temphg1=temphg->next;
       cnt=0;
@@ -480,7 +467,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
 	temphgr=temphgr->next;
       }
       if (cnt) {
-	*ptr++=EIT_DATA_HEAP;
+	*ptr++=IET_DATA_HEAP;
 	*ptr(U32 *)++=cnt;
 	if (temphg->str) {
 	  i=StrLen(temphg->str);
@@ -502,106 +489,108 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv=0)
       temphg=temphg1;
     }
 
-//Do exports first
-    tempe=tempx->next_ie;
-    while (tempe!=&tempx->next_ie) {
-      tempe1=tempe->next;
-      if (!tempe->type || EIT_REL32_EXPORT<=tempe->type<=EIT_IMM64_EXPORT) {
-	QueRem(tempe);
-	*ptr++=tempe->type;
-	*ptr(U32 *)++=tempe->ip;
-	if (tempe->str) {
-	  i=StrLen(tempe->str);
-	  MemCpy(ptr,tempe->str,i+1);
-	  Free(tempe->str);
+    //Do exports first
+    tempie=tempaot->next_ie;
+    while (tempie!=&tempaot->next_ie) {
+      tempie1=tempie->next;
+      if (!tempie->type || IET_REL32_EXPORT<=tempie->type<=IET_IMM64_EXPORT) {
+	QueRem(tempie);
+	*ptr++=tempie->type;
+	*ptr(U32 *)++=tempie->ip;
+	if (tempie->str) {
+	  i=StrLen(tempie->str);
+	  MemCpy(ptr,tempie->str,i+1);
+	  Free(tempie->str);
 	  ptr+=i+1;
 	} else
 	  *ptr++=0;
-	Free(tempe->src_link);
-	Free(tempe);
+	Free(tempie->src_link);
+	Free(tempie);
       }
-      tempe=tempe1;
+      tempie=tempie1;
     }
 
-//Do imports second
-    tempe=tempx->next_ie;
-    while (tempe!=&tempx->next_ie) {
-      tempe1=tempe->next;
-      QueRem(tempe);
-      *ptr++=tempe->type;
-      if (tempe->exe)
-	tempe->ip+=tempe->exe->ip2;
-      *ptr(U32 *)++=tempe->ip;
-      if (tempe->str) {
-	i=StrLen(tempe->str);
-	MemCpy(ptr,tempe->str,i+1);
-	Free(tempe->str);
+    //Do imports second
+    tempie=tempaot->next_ie;
+    while (tempie!=&tempaot->next_ie) {
+      tempie1=tempie->next;
+      QueRem(tempie);
+      *ptr++=tempie->type;
+      if (tempie->aot)
+	tempie->ip+=tempie->aot->ip2;
+      *ptr(U32 *)++=tempie->ip;
+      if (tempie->str) {
+	i=StrLen(tempie->str);
+	MemCpy(ptr,tempie->str,i+1);
+	Free(tempie->str);
 	ptr+=i+1;
       } else
 	*ptr++=0;
-      Free(tempe->src_link);
-      Free(tempe);
-      tempe=tempe1;
+      Free(tempie->src_link);
+      Free(tempie);
+      tempie=tempie1;
     }
 
-    *ptr++=EIT_END;
+    *ptr++=IET_END;
     MemSet(ptr,0,16);
     i=ptr-patch_table;
-    //Needs 16 ALIGN
-    size=(sizeof(CBinFile)+ex_U8s+i+15)&-16;
+//Needs 16 ALIGN
+    size=(sizeof(CBinFile)+aot_U8s+i+15)&-16;
     bfh=MAlloc(size);
     bfh->jmp=0xEB+256*(sizeof(CBinFile)-2);
 #assert sizeof(CBinFile)-2<=MAX_I8
     bfh->reserved=0;
     bfh->bin_signature=BIN_SIGNATURE_VAL;
-    bfh->module_org=tempx->module_org;
-    bfh->module_align_bits=tempx->max_align_bits;
-    bfh->patch_table_offset=sizeof(CBinFile)+ex_U8s;
+    bfh->module_org=tempaot->module_org;
+    bfh->module_align_bits=tempaot->max_align_bits;
+    bfh->patch_table_offset=sizeof(CBinFile)+aot_U8s;
     bfh->file_size=size;
-    MemCpy(bfh(U8 *)+sizeof(CBinFile),tempx->buf,ex_U8s);
-    MemCpy(bfh(U8 *)+sizeof(CBinFile)+ex_U8s,patch_table,size-ex_U8s-sizeof(CBinFile));
+    MemCpy(bfh(U8 *)+sizeof(CBinFile),tempaot->buf,aot_U8s);
+    MemCpy(bfh(U8 *)+sizeof(CBinFile)+aot_U8s,patch_table,
+	  size-aot_U8s-sizeof(CBinFile));
     Free(fbuf2);
     if (out_name)
       fbuf2=DftExt(out_name,"BIN.Z");
     else
       fbuf2=ChgExt(fbuf,"BIN.Z");
-    if (!cmp.dont_write_to_dsk)
-      FileWrite(fbuf2,bfh,size);
+    FileWrite(fbuf2,bfh,size);
     Free(bfh);
-    Free(tempx->buf);
-    QueDel(tempx);
-    Free(tempx);
+    Free(tempaot->buf);
+    QueDel(tempaot);
+    Free(tempaot);
   }
   Free(patch_table);
   Free(fbuf);
   Free(fbuf2);
   Free(fbuf3);
-  Print("Errs:%d Warns:%d Code:%X Size:%X\n",error_cnt,warning_cnt,ex_U8s,size);
+  Print("Errs:%d Warns:%d Code:%X Size:%X\n",
+	error_cnt,warning_cnt,aot_U8s,size);
   return error_cnt;
 }
 
-I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
+I64 ExePutS(U8 *buf,U8 *filename=NULL,
+	Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
 {//JIT Compile and execute text from a puts("").
   I64 result;
   Bool okay=TRUE;
-  CLex *lx;
+  CCmpCtrl *cc;
   if (!filename)
     filename=dsk.temp_filename;
-  lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
+  cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
   if (just_load)
-    lx->flags|=LF_JUST_LOAD;
+    cc->flags|=CCF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex) {
-    lx->opts=Fs->last_lex->opts;
+    cc->opts=Fs->last_lex->opts;
     if (htc) {
-      lx->flags=lx->flags &~LF_ASM_EXPRESSIONS |
-	    htc->old_flags&LF_ASM_EXPRESSIONS;
-      MemCpy(&lx->htc,htc,sizeof(CLexHashTableContext));
+      cc->flags=cc->flags &~CCF_ASM_EXPRESSIONS |
+	    htc->old_flags&CCF_ASM_EXPRESSIONS;
+      MemCpy(&cc->htc,htc,sizeof(CLexHashTableContext));
     }
   }
-  QueIns(lx,Fs->last_lex);
+  QueIns(cc,Fs->last_lex);
   try {
-    Lex(lx);
-    result=ExeCmdLine(lx);
+    Lex(cc);
+    result=ExeCmdLine(cc);
   } catch {
     if (Fs->except_ch=='Compiler' || Fs->except_ch=='Break') {
       Fs->catch_except=TRUE;
@@ -609,9 +598,9 @@ I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,CLexHashTableContext 
       result=0;
     }
   }
-  QueRem(lx);
+  QueRem(cc);
   if (okay)
-    LexDel(lx); //TODO: can crash
+    CmpCtrlDel(cc); //TODO: can crash
   return result;
 }
 
@@ -628,7 +617,7 @@ I64 ExeFile(U8 *name,Bool just_load=FALSE)
 {//JIT Compile and execute a file.
   I64 result;
   U8 *name2=DftExt(name,"CPP.Z"),
-     *st=MStrPrint("#include \"%s\";",name2);
+	*st=MStrPrint("#include \"%s\";",name2);
   result=ExePutS(st,name,just_load);
   Free(st);
   Free(name2);
@@ -638,19 +627,19 @@ I64 ExeFile(U8 *name,Bool just_load=FALSE)
 I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
 {//throws exceptions
   I64 result;
-  CLex *lx;
+  CCmpCtrl *cc;
   if (!filename)
     filename=dsk.temp_filename;
-  lx=LexNew(buf,LF_DONT_FREE_BUF,filename);
+  cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
   if (just_load)
-    lx->flags|=LF_JUST_LOAD;
+    cc->flags|=CCF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex)
-    lx->opts=Fs->last_lex->opts;
-  QueIns(lx,Fs->last_lex);
-  Lex(lx);
-  result=ExeCmdLine(lx);
-  QueRem(lx);
-  LexDel(lx);
+    cc->opts=Fs->last_lex->opts;
+  QueIns(cc,Fs->last_lex);
+  Lex(cc);
+  result=ExeCmdLine(cc);
+  QueRem(cc);
+  CmpCtrlDel(cc);
   return result;
 }
 
@@ -667,7 +656,7 @@ I64 ExeFile2(U8 *name,Bool just_load=FALSE)
 {//throws exceptions
   I64 result;
   U8 *name2=DftExt(name,"CPP.Z"),
-     *st=MStrPrint("#include \"%s\";",name2);
+	*st=MStrPrint("#include \"%s\";",name2);
   result=ExePutS2(st,name,just_load);
   Free(st);
   Free(name2);
@@ -675,17 +664,17 @@ I64 ExeFile2(U8 *name,Bool just_load=FALSE)
 }
 
 I64 StreamExePrint(U8 *fmt,...)
-{//Suppose you want a value from the stream to be used in an #exe{} block...
+{//Causes value from stream to be used in an #exe{} block.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   I64 result=0;
   CLexHashTableContext *htc;
-  CLex *lx=Fs->last_lex;
-  if (lx==&Fs->next_lex)
+  CCmpCtrl *cc=Fs->last_lex;
+  if (cc==&Fs->next_lex)
     PrintErr("Not Compiling\n");
   else {
-    if (!(lx->flags&LF_EXE_BLK))
-      LexExcept(lx,"StreamExePrint only allowed in AOT compiled #exe{} mode.");
-    if (htc=lx->htc.next)
+    if (!(cc->flags&CCF_EXE_BLK))
+      LexExcept(cc,"StreamExePrint only allowed in AOT compiled #exe{} mode.");
+    if (htc=cc->htc.next)
       result=ExePutS(buf,,,htc);
   }
   Free(buf);
@@ -694,18 +683,13 @@ I64 StreamExePrint(U8 *fmt,...)
 
 U0 CInit()
 {
-  cmp.compiled_lines=0;
-  cmp.dont_write_to_dsk=FALSE;
   CmpLoadDefines;
   CmpFillTables;
-
-  MemSet(&cmp.ic_nop,0,sizeof(CIntermediateCode));
   QueInit(&cmp.ic_nop);
   cmp.ic_nop.ic_class=cmp.internal_types[RT_I64];
   cmp.ic_nop.ic_code=IC_NOP1;
-
   AsmHashLoad;
-  UasmHashLoad;
+  UAsmHashLoad;
 }
 
 CInit;

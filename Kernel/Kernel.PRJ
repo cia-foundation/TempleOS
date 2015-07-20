@@ -14,7 +14,12 @@
 #include "KStart"
 #include "KUtils"
 #include "KMathA"
+#exe {OptOn(OPTf_KEEP_PRIVATE);};
 #include "/Compiler/CompilerA.HPP"
+#exe {OptOn(OPTf_EXTERNS_TO_IMPORTS);};
+#include "/Compiler/CompilerB.HPP"
+#exe {OptOff(OPTf_EXTERNS_TO_IMPORTS);};
+#exe {OptOff(OPTf_KEEP_PRIVATE);};
 #include "KernelB.HPP"
 #include "KExts"
 #include "StrA"
@@ -37,38 +42,22 @@
 #include "StrScan"
 #include "KDefine"
 #include "Display"
-#include "KeyDev"
 #include "KMisc"
 #include "KDbg"
-#include "Except"
+#include "KeyDev"
+#include "KExcept"
 #include "KbdMouse/InputPointer"
 #include "KbdMouse/Keyboard"
 #include "KbdMouse/Mouse"
 #include "KbdMouse/Message"
-
 #include "QSort"
 #include "Task"
 #include "SrvCmd"
-#include "BIOS32"
-
+#include "PCIBIOS"
 #exe {Cd("Dsk");};
-#include "DskStr"
-#include "DskCache"
-#include "DskATA"
-#include "DskATAId"
-#include "DskA"
-#include "DskAddDev"
-#include "DskDir"
-#include "FileSysISO"
-#include "FileSysRedSea"
-#include "FileSysFAT"
-#include "DskB"
-#include "DskCFile"
-#include "DskC"
-
+#include "Dsk"
 #exe {Cd("..");};
 #include "MultiProc"
-
 #include "EdLite"
 #include "PSect"
 #include "KEnd"

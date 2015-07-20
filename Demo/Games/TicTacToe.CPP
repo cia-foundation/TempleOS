@@ -36,7 +36,7 @@ U0 DrawBoard(I64 player)
 
     }
 //ip.pos.x,ip.pos.y are input pointer (mouse) x,y.
-//ip.lb	is mouse left button
+    //ip.lb	is mouse left button
   if (player==1)
     DrawX(dc,ip.pos.x-Fs->pix_left,ip.pos.y-Fs->pix_top);
   else

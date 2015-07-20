@@ -6,7 +6,7 @@ the normal screen text output routine.
 
 See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 */
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   I64 i,row,col;
   U8 *ptr,*ptr1,*ptr2;
 
@@ -44,13 +44,13 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
     while (text.raw_col % text.cols)
       RawPutChar(CH_SPACE);
 
-  } else if (Bt(chars_bitmap_displayable,ch)) {
+  } else if (Bt(chars_bmp_displayable,ch)) {
     row=text.raw_col/text.cols%text.rows;
     col=text.raw_col%text.cols;
     if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
 	MemCpy(VGAM_TEXT,VGAM_TEXT+text.cols,
-	  text.cols*(text.rows-1)*2);
+	      text.cols*(text.rows-1)*2);
 	MemSet(VGAM_TEXT+text.cols*(text.rows-1)*2,0,text.cols*2);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
@@ -62,10 +62,12 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
       OutU8(VGAP_INDEX,VGAR_MAP_MASK);
       OutU8(VGAP_DATA,0x0F); //All planes -- WHITE
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
-      //Scroll cached image
-	MemCpy(text.raw_screen_image,text.raw_screen_image+GR_WIDTH*FONT_HEIGHT>>3,
-	    GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3);
-	MemSet(text.raw_screen_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,GR_WIDTH*FONT_HEIGHT>>3);
+//Scroll cached image
+	MemCpy(text.raw_screen_image,
+	      text.raw_screen_image+GR_WIDTH*FONT_HEIGHT>>3,
+	      GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3);
+	MemSet(text.raw_screen_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,
+	      GR_WIDTH*FONT_HEIGHT>>3);
 
 	MemCpy(VGAM_GRAPHICS,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
 	text.raw_col-=text.cols;
@@ -98,13 +100,13 @@ U0 WinDerivedValsUpdate(CTask *task=NULL)
 {//Those things calculated from other variables.
   if (!task) task=Fs;
 
-//Assert: This is called with TASKLf_TASK_LOCK set
+    //Assert: This is called with TASKLf_TASK_LOCK set
   PUSHFD
   CLI
   task->win_width =task->win_right-task->win_left+1;
   task->win_height=task->win_bottom-task->win_top+1;
 
-//Inside the Border
+  //Inside the Border
   task->pix_left	=FONT_WIDTH*task->win_left;
   task->pix_right	=FONT_WIDTH*(task->win_right+1)-1;
   task->pix_width	=task->pix_right-task->pix_left+1;
@@ -112,7 +114,7 @@ U0 WinDerivedValsUpdate(CTask *task=NULL)
   task->pix_bottom	=FONT_HEIGHT*(task->win_bottom+1)-1;
   task->pix_height	=task->pix_bottom-task->pix_top+1;
 
-//Outside the border
+  //Outside the border
   if (Bt(&task->display_flags,DISPLAYf_NO_BORDER)) {
     task->border_pix_left	=task->pix_left;
     task->border_pix_right	=task->pix_right;

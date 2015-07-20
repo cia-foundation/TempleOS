@@ -1,7 +1,7 @@
 #define DOWNLOAD_FILE1		"TempleOSCD.ISO"
-#define DOWNLOAD_FILE1_SIZE	18000000
+#define DOWNLOAD_FILE1_SIZE	17000000
 #define DOWNLOAD_FILE2		"TempleOSUltra.ISO"
-#define DOWNLOAD_FILE2_SIZE	2000000
+#define DOWNLOAD_FILE2_SIZE	 1900000
 
 #define MAX_HOURS		(24*3)
 
@@ -175,6 +175,8 @@ U0 BlockIPNums(LogStruct *root)
   LogStruct *templg=root->next,*templg1;
 
   QueInit(&blocked_root);
+
+  BlockedStructAdd(&blocked_root,70<<24+173<<16+110<<8+214);
   BlockedStructAdd(&blocked_root,68<<24+224<<16+130<<8+96);
   BlockedStructAdd(&blocked_root,68<<24+96<<16+100<<8+126);
   BlockedStructAdd(&blocked_root,68<<24+96<<16+110<<8+213);
@@ -183,11 +185,11 @@ U0 BlockIPNums(LogStruct *root)
   //pass 1: collect robot lst
   while (templg!=root) {
     if (StrIMatch("ROBOT",templg->file) &&
-	!IsBlocked(&blocked_root,templg->ip_num))
+	  !IsBlocked(&blocked_root,templg->ip_num))
       BlockedStructAdd(&blocked_root,templg->ip_num);
     templg=templg->next;
   }
- 
+
   //pass 2: removed blocked ip_nums
   templg=root->next;
   while (templg!=root) {
@@ -198,15 +200,16 @@ U0 BlockIPNums(LogStruct *root)
     }
     templg=templg1;
   }
- 
+
   QueDel(&blocked_root);
 }
 
 Bool IsDownLoad(LogStruct *templg)
 {
-  if (
-    StrMatch(DOWNLOAD_FILE1,templg->file) && templg->size>=DOWNLOAD_FILE1_SIZE ||
-    StrMatch(DOWNLOAD_FILE2,templg->file) && templg->size>=DOWNLOAD_FILE2_SIZE )
+  if (StrMatch(DOWNLOAD_FILE1,templg->file)&&templg->size>=
+	DOWNLOAD_FILE1_SIZE ||
+	StrMatch(DOWNLOAD_FILE2,templg->file)&&templg->size>=
+	DOWNLOAD_FILE2_SIZE )
     return TRUE;
   else
     return FALSE;
@@ -215,8 +218,8 @@ Bool IsDownLoad(LogStruct *templg)
 Bool IsIndex(LogStruct *templg)
 {
   if (!StrCmp(templg->file,"/index.html") ||
-      !StrNCmp(templg->file+StrLen(templg->file)-14,"/TempleOS.html",14) ||
-      !StrCmp(templg->file,"/"))
+	!StrNCmp(templg->file+StrLen(templg->file)-14,"/TempleOS.html",14) ||
+	!StrCmp(templg->file,"/"))
     return TRUE;
   else
     return FALSE;
@@ -329,8 +332,8 @@ U0 FileTreeTraverse(LinkStruct *root)
 U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
 {
   I64 i,j,cnt,dups,
-    hours_start,hours_end,*hour_cnts,*dup_cnts,
-    days_start,days_end,*day_cnts,*day_dup_cnts;
+	hours_start,hours_end,*hour_cnts,*dup_cnts,
+	days_start,days_end,*day_cnts,*day_dup_cnts;
   LogStruct *templg=root->next,*dup_root=NULL;
   LinkStruct *link_root=NULL;
   CDateStruct ds;
@@ -365,10 +368,10 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
   "\n\nDownloads of /TempleOSCD.ISO\n";
   for (i=start;i<=end;i+=1<<32)
     "%D:%5d%5d\n",i,day_dup_cnts[(i+local_time_offset)>>32-days_start],
-      day_cnts[(i+local_time_offset)>>32-days_start];
+	  day_cnts[(i+local_time_offset)>>32-days_start];
 
   "\n\nDownloads of /TempleOSCD.ISO\n"
-  "'-' is a dup.  '+' is not a dup.\n";
+	"'-' is a dup.  '+' is not a dup.\n";
   if (hours_end-hours_start>=MAX_HOURS)
     i=hours_end-MAX_HOURS+1;
   else
@@ -413,8 +416,8 @@ U0 FileRep(LogStruct *root,CDate start,CDate end)
 U0 IndexRep(LogStruct *root,CDate start,CDate end)
 {
   I64 i,j,cnt,dups,
-    hours_start,hours_end,*hour_cnts,*dup_cnts,
-    days_start,days_end,*day_cnts,*day_dup_cnts;
+	hours_start,hours_end,*hour_cnts,*dup_cnts,
+	days_start,days_end,*day_cnts,*day_dup_cnts;
   LogStruct *templg=root->next,*dup_root=NULL;
   LinkStruct *link_root=NULL;
   CDateStruct ds;
@@ -447,10 +450,10 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
   }
 
   "\n\nHits on /index.html\n"
-  "'-' is a dup.  '+' is not a dup.\n";
+	"'-' is a dup.  '+' is not a dup.\n";
   for (i=start;i<=end;i+=1<<32)
     "%D:%5d%5d\n",i,day_dup_cnts[(i+local_time_offset)>>32-days_start],
-     day_cnts[(i+local_time_offset)>>32-days_start];
+	  day_cnts[(i+local_time_offset)>>32-days_start];
 
   "\n\nHits on /index.html\n";
   if (hours_end-hours_start>=MAX_HOURS)

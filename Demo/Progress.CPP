@@ -23,7 +23,7 @@ U0 Main2()
   "\nNo description.\n";
   PressAKey;
   ProgressBarsRst;
-  //No progress1_desc
+//No progress1_desc
   progress1_max=200;
   while (progress1++!=progress1_max)
     Sleep(20);

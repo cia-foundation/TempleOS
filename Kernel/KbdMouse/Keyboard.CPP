@@ -13,8 +13,10 @@ SHIFT_KEY_SCAN_DECODE_TABLE::
 	DU8	0,0,0,0,0,0,0,0,0,0,'-',0,0,0,'+',0;
 CTRL_KEY_SCAN_DECODE_TABLE::
 	DU8	0,CH_ESC,"1234567890-=",CH_BACKSPACE,'\t';
-	DU8	CH_CTRLQ,CH_CTRLW,CH_CTRLE,CH_CTRLR,CH_CTRLT,CH_CTRLY,CH_CTRLU,CH_CTRLI,CH_CTRLO,CH_CTRLP,"[]",'\n',0,CH_CTRLA,CH_CTRLS;
-	DU8	CH_CTRLD,CH_CTRLF,CH_CTRLG,CH_CTRLH,CH_CTRLJ,CH_CTRLK,CH_CTRLL,";'\`",0,"\\",CH_CTRLZ,CH_CTRLX,CH_CTRLC,CH_CTRLV;
+	DU8	CH_CTRLQ,CH_CTRLW,CH_CTRLE,CH_CTRLR,CH_CTRLT,CH_CTRLY,CH_CTRLU,
+		CH_CTRLI,CH_CTRLO,CH_CTRLP,"[]",'\n',0,CH_CTRLA,CH_CTRLS;
+	DU8	CH_CTRLD,CH_CTRLF,CH_CTRLG,CH_CTRLH,CH_CTRLJ,CH_CTRLK,CH_CTRLL,
+		";'\`",0,"\\",CH_CTRLZ,CH_CTRLX,CH_CTRLC,CH_CTRLV;
 	DU8	CH_CTRLB,CH_CTRLN,CH_CTRLM,",./",0,'*',0,CH_SPACE,0,0,0,0,0,0;
 	DU8	0,0,0,0,0,0,0,0,0,0,'-',0,0,0,'+',0;
 }
@@ -49,7 +51,7 @@ U0 KbdCmdFlush()
 
 U0 KbdSetLEDs(I64 sc)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   U8 v=0;
   BEqu(&v,0,Bt(&sc,SCf_SCROLL));
   BEqu(&v,1,Bt(&sc,SCf_NUM));
@@ -165,8 +167,10 @@ U8 scan_code_map[0x100]={
   0,0,0,0,0,0,0,0,0,0,0,0,SC_ENTER,SC_CTRL,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0x35,0,0,SC_ALT,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,SC_HOME,SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
-  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INS,SC_DELETE,0,0,0,0,0,0,0,0,SC_GUI,0,0,0,
+  0,0,0,0,0,0,0,SC_HOME,
+	SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
+  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INS,SC_DELETE,0,0,0,0,
+	0,0,0,0,SC_GUI,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
@@ -185,8 +189,10 @@ U8 num_lock_map[0x100]={
   0,0,0,0,0,0,0,0,0,0,0,0,SC_ENTER,SC_CTRL,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0x35,0,0,SC_ALT,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,SC_HOME,SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
-  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INS,SC_DELETE,0,0,0,0,0,0,0,0,SC_GUI,0,0,0,
+  0,0,0,0,0,0,0,SC_HOME,
+	SC_CURSOR_UP,SC_PAGE_UP,0,SC_CURSOR_LEFT,0,SC_CURSOR_RIGHT,0,SC_END,
+  SC_CURSOR_DOWN,SC_PAGE_DOWN,SC_INS,SC_DELETE,0,0,0,0,
+	0,0,0,0,SC_GUI,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
@@ -194,7 +200,7 @@ U8 num_lock_map[0x100]={
 U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
 {//ASCII val to key name.
   I64 i;
-  U8 buf[136];
+  U8 buf[STR_LEN];
   if (ch<=CH_SPACE) {
     nobound_switch (ch) {
       case '\n':
@@ -230,7 +236,7 @@ U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
 	buf[i+1]=0;
 	break;
     }
-  } else if (Bt(chars_bitmap_printable,ch)) {
+  } else if (Bt(chars_bmp_printable,ch)) {
     *buf=ch;
     buf[1]=0;
   } else
@@ -241,7 +247,7 @@ U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
 U8 *ScanCode2KeyName(I64 sc)
 {//Scan code to key name.
   I64 ch;
-  U8 buf[136],*st;
+  U8 buf[STR_LEN],*st;
   *buf=0;
   if (sc&SCF_CTRL)
     CatPrint(buf,"CTRL ");
@@ -262,8 +268,8 @@ U8 *ScanCode2KeyName(I64 sc)
       case SC_CURSOR_UP:CatPrint(buf,"UP");	break;
       case SC_CURSOR_DOWN:CatPrint(buf,"DOWN");	break;
       case SC_CURSOR_LEFT:CatPrint(buf,"LEFT");	break;
-      case SC_CURSOR_RIGHT:CatPrint(buf,"RIGHT");	break;
-      case SC_PAGE_UP:	CatPrint(buf,"PAGE_UP");	break;
+      case SC_CURSOR_RIGHT:CatPrint(buf,"RIGHT"); break;
+      case SC_PAGE_UP:	CatPrint(buf,"PAGE_UP");  break;
       case SC_PAGE_DOWN:CatPrint(buf,"PAGE_DOWN");break;
       case SC_HOME:	CatPrint(buf,"HOME");	break;
       case SC_END:	CatPrint(buf,"END");	break;
@@ -281,9 +287,9 @@ U8 *ScanCode2KeyName(I64 sc)
       case SC_F10:	CatPrint(buf,"F10");	break;
       case SC_F11:	CatPrint(buf,"F11");	break;
       case SC_F12:	CatPrint(buf,"F12");	break;
-      case SC_GUI:	CatPrint(buf,"WINDOWS");	break;
-      case SC_PRTSCRN1:	CatPrint(buf,"PRTSCRN1");	break;
-      case SC_PRTSCRN2:	CatPrint(buf,"PRTSCRN2");	break;
+      case SC_GUI:	CatPrint(buf,"WINDOWS");  break;
+      case SC_PRTSCRN1:	CatPrint(buf,"PRTSCRN1"); break;
+      case SC_PRTSCRN2:	CatPrint(buf,"PRTSCRN2"); break;
     }
   }
   return StrNew(buf);
@@ -398,17 +404,6 @@ interrupt U0 KbdIntHandler()
   KbdPktRead;
 }
 
-U0 CtrlAltLetCBSet(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,Bool in_irq=FALSE)
-{//Set callback for <CTRL-ALT-letter>.
-  ch=ToUpper(ch)-'A';
-  if (ch<26) {
-    keydev.fp_ctrl_alt_let_cbs[ch]=fp_handler;
-    Free(keydev.ctrl_alt_let_descs[ch]);
-    keydev.ctrl_alt_let_descs[ch]=AStrNew(desc);
-    BEqu(&keydev.ctrl_alt_let_in_irq_flags,ch,in_irq);
-  }
-}
-
 U0 KbdInit()
 {
   try {
@@ -424,14 +419,6 @@ U0 KbdInit()
   }
   IntEntrySet(0x21,&KbdIntHandler);
   OutU8(0x21,InU8(0x21)&~2);
-
-  CtrlAltLetCBSet('C',&CtrlAltC,"Sys/Break Execution",TRUE);
-  CtrlAltLetCBSet('D',&CtrlAltD,"Sys/Enter Debugger",TRUE);
-  CtrlAltLetCBSet('E',&CtrlAltE,"Sys/Spawn New User Task");
-  CtrlAltLetCBSet('F',&CtrlAltF,"Sys/VGA Flush",TRUE);
-  CtrlAltLetCBSet('M',&CtrlAltM,"Sys/Toggle Mute");
-  CtrlAltLetCBSet('T',&CtrlAltT,"Sys/Switch Focus to Next Task",TRUE);
-  CtrlAltLetCBSet('X',&CtrlAltX,"Sys/Kill Focused Task",TRUE);
 }
 
 U0 KbdHandler()

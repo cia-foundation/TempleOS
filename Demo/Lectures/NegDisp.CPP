@@ -33,12 +33,12 @@ This example uses 8-bit negative displacements.
 
 class Person
 { $$=-128;
-  U8 first    [32];
-  U8 last     [32];
-  U8 address1 [64];
-  U8 address2 [64];
-  U8 city     [32];
-  U8 state_zip[32];
+U8 first    [32];
+U8 last     [32];
+U8 address1 [64];
+U8 address2 [64];
+U8 city     [32];
+U8 state_zip[32];
 };
 
 U0 OffsetDemo2()

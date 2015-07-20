@@ -97,20 +97,24 @@ U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
 	  use_file1=FALSE;
 	  break;
 	case DS_REMAINDER_1:
-	  *_df_flags=*_df_flags&~DF_REMAINDER_ALL_FILE2|DF_REMAINDER_ALL_FILE1|DF_NO_MORE_PMTS_THIS_FILE;
+	  *_df_flags=*_df_flags&~DF_REMAINDER_ALL_FILE2|
+		DF_REMAINDER_ALL_FILE1|DF_NO_MORE_PMTS_THIS_FILE;
 	  break;
 	case DS_REMAINDER_2:
-	  *_df_flags=*_df_flags&~DF_REMAINDER_ALL_FILE1|DF_REMAINDER_ALL_FILE2|DF_NO_MORE_PMTS_THIS_FILE;
+	  *_df_flags=*_df_flags&~DF_REMAINDER_ALL_FILE1|
+		DF_REMAINDER_ALL_FILE2|DF_NO_MORE_PMTS_THIS_FILE;
 	  break;
 	case DS_ABORT_FILE:
-	  *_df_flags|=DF_DONT_MODIFIED|DF_ABORT_FILE|DF_NO_MORE_PMTS_THIS_FILE;
+	  *_df_flags|=DF_DONT_MODIFIED|DF_ABORT_FILE|
+		DF_NO_MORE_PMTS_THIS_FILE;
 	  break;
 	default:
-	  *_df_flags|=DF_DONT_MODIFIED|DF_ABORT_ALL_FILES|DF_NO_MORE_PMTS_THIS_FILE;
+	  *_df_flags|=DF_DONT_MODIFIED|DF_ABORT_ALL_FILES|
+		DF_NO_MORE_PMTS_THIS_FILE;
       }
     }
     if (*_df_flags & DF_REMAINDER_ALL_FILE2 &&
-	!(*_df_flags & (DF_DONT_MODIFIED|DF_REMAINDER_ALL_FILE1)))
+	  !(*_df_flags & (DF_DONT_MODIFIED|DF_REMAINDER_ALL_FILE1)))
       use_file1=FALSE;
     if (!use_file1) {
       *_df_flags|=DF_MODIFIED;
@@ -141,13 +145,13 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 	CDocEntry **doc_unsorted1,CDocEntry **doc_unsorted2)
 {
   I64 i,i1=0,i2=0,i2b,j1,j2,n,
-      best_j1,best_j2,best_score=0,score;
+	best_j1,best_j2,best_score=0,score;
   Bool result=FALSE;
 
   if (j1_lo>=j1_hi || j2_lo>=j2_hi) {
     if (j1_lo<j1_hi || j2_lo<j2_hi) {
       DiffSelect(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
-	doc_unsorted1,doc_unsorted2);
+	    doc_unsorted1,doc_unsorted2);
       return TRUE;
     } else
       return FALSE;
@@ -157,7 +161,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
   while (i1<cnt1 && i2<cnt2) {
     if (!(j1_lo<=doc_sorted1[i1]->user_data<j1_hi)) //user_data is the new y
       i1++;
-    else if (!(j2_lo<=doc_sorted2[i2]->user_data<j2_hi)) //user_data is the new y
+    else if (!(j2_lo<=doc_sorted2[i2]->user_data<j2_hi)) //user_data is new y
       i2++;
     else {
       i=StrCmp(doc_sorted1[i1]->tag,doc_sorted2[i2]->tag);
@@ -177,7 +181,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 	      n=j2_hi-j2;
 	    while (score<n) {
 	      if (!StrCmp(doc_unsorted1[j1+score]->tag,
-			  doc_unsorted2[j2+score]->tag))
+		    doc_unsorted2[j2+score]->tag))
 		score++;
 	      else
 		break;
@@ -199,14 +203,15 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
   }
   if (!best_score) {
     DiffSelect(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
-		doc_unsorted1,doc_unsorted2);
+	  doc_unsorted1,doc_unsorted2);
     return TRUE;
   } else {
     if (DiffSub(doc,_df_flags,j1_lo,best_j1,j2_lo,best_j2,cnt1,cnt2,
-		doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
+	  doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
       result=TRUE;
-    if (DiffSub(doc,_df_flags,best_j1+best_score,j1_hi,best_j2+best_score,j2_hi,cnt1,cnt2,
-		doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
+    if (DiffSub(doc,_df_flags,best_j1+best_score,j1_hi,best_j2+best_score,
+	  j2_hi,cnt1,cnt2,
+	  doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
       result=TRUE;
     return result;
   }
@@ -215,12 +220,13 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 Bool DiffBins(CDoc *doc1,CDoc *doc2)
 {
   CDocBin *tempb1=doc1->bin_root.next,
-	      *tempb2=doc2->bin_root.next;
+	*tempb2=doc2->bin_root.next;
 
   if (tempb1->last->last->num!=tempb2->last->last->num)
     return TRUE;
   while (tempb1!=&doc1->bin_root) {
-    if (tempb1->size!=tempb2->size || MemCmp(tempb1->data,tempb2->data,tempb1->size))
+    if (tempb1->size!=tempb2->size ||
+	  MemCmp(tempb1->data,tempb2->data,tempb1->size))
       return TRUE;
     tempb1=tempb1->next;
     tempb2=tempb2->next;
@@ -232,7 +238,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
 {//Report differences between two files and merge differences
 //from src_file to dst_file.  Don't use _df_flags arg. (Used by $LK,"Merge",A="MN:Merge"$().)
   CDoc *doc1=DocRead(dst_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR),
-       *doc2=DocRead(src_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
+	*doc2=DocRead(src_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e,**doc_sorted1,**doc_sorted2,**doc_unsorted1,**doc_unsorted2;
   I64 i,cnt1=0,cnt2=0,df_flags;
   Bool result=FALSE;
@@ -286,7 +292,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   QSortI64(doc_sorted2,cnt2,&DiffEntriesCompare);
 
   result=DiffSub(doc1,&df_flags,0,cnt1,0,cnt2,cnt1,cnt2,
-		doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2);
+	doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2);
   if (df_flags&DF_MODIFIED && !(df_flags&DF_DONT_MODIFIED))
     DocWrite(doc1);
 
@@ -315,11 +321,11 @@ public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
   Bool just_text_not_graphics=TRUE)
 {//Report file compressibility.
 //Dft is just src files.  (Used to spot
-//src files with redundancy in them.)
+  //src files with redundancy in them.)
   I64 i=0,cnt,size,fuf_flags=0;
   CDirEntry *tempde,*tempde1,**sort_buf;
   U8 *buf;
-  CArcCompress *ac;
+  CArcCompress *arc;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+F+S");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
@@ -330,10 +336,10 @@ public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
     buf=FileRead(tempde->full_name,&size);
     if (just_text_not_graphics)
       size=StrLen(buf);
-    ac=CompressBuf(buf,size);
+    arc=CompressBuf(buf,size);
     Free(buf);
-    tempde->user_data(F64)=100.0*ac->compressed_size/ac->expanded_size;
-    Free(ac);
+    tempde->user_data(F64)=100.0*arc->compressed_size/arc->expanded_size;
+    Free(arc);
     tempde=tempde->next;
   }
   QSortI64(sort_buf,cnt,&ZRepCompare);

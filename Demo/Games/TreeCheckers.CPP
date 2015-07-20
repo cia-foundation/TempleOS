@@ -1,7 +1,19 @@
-#define BORDER		16
-#define NUM_UNITS	64
-#define CIRCLE_RAD	8
-#define MOVE_CIRCLES	5
+U0 InitDefines()
+{
+  I64 w=GR_WIDTH,h=GR_HEIGHT-FONT_HEIGHT,cols,rows,
+	size=PopUpRangeI64(1,9,,"Size\n"),rad=16-size;
+  if (size<0) throw;
+  DefinePrint("NUM_UNITS","%d",4096/SqrI64(rad)&~1);
+  DefinePrint("CIRCLE_RAD","%d",rad);
+  DefinePrint("MOVE_CIRCLES","%d",40/rad);
+
+  cols=(w-8-rad)/(2*rad)&~1-1;
+  DefinePrint("BORDER_X","%d",(w+rad-cols*2*rad)/2);
+
+  rows=(h-8)/(2*rad)&~1;
+  DefinePrint("BORDER_Y","%d",(h-rows*2*rad)/2);
+
+} InitDefines;
 
 class Unit
 {
@@ -16,11 +28,11 @@ Bool show_start;
 U0 S2Circle(I64 *_x,I64 *_y)
 {
   I64 i,j;
-  j=(*_y-BORDER)/(CIRCLE_RAD*2);
+  j=(*_y-BORDER_Y)/(CIRCLE_RAD*2);
   if (j&1)
-    i=(*_x-CIRCLE_RAD-BORDER)/(CIRCLE_RAD*2);
+    i=(*_x-CIRCLE_RAD-BORDER_X)/(CIRCLE_RAD*2);
   else
-    i=(*_x-BORDER)/(CIRCLE_RAD*2);
+    i=(*_x-BORDER_X)/(CIRCLE_RAD*2);
   *_y=j;
   *_x=i;
 }
@@ -28,8 +40,8 @@ U0 S2Circle(I64 *_x,I64 *_y)
 U0 Circle2S(I64 *_x,I64 *_y)
 {
   I64 j=*_y,i=*_x;
-  *_y=j*CIRCLE_RAD*2+CIRCLE_RAD+BORDER;
-  *_x=i*CIRCLE_RAD*2+CIRCLE_RAD+BORDER;
+  *_y=j*CIRCLE_RAD*2+CIRCLE_RAD+BORDER_Y;
+  *_x=i*CIRCLE_RAD*2+CIRCLE_RAD+BORDER_X;
   if (j&1) *_x+=CIRCLE_RAD;
 }
 
@@ -80,7 +92,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   if ((num_alive[0]==1 || num_alive[1]==1) && Blink(4)) {
     dc->color=BLACK;
     GrPrint(dc,(task->pix_width-FONT_WIDTH*9)>>1,
-		  (task->pix_height-FONT_HEIGHT)>>1,"Game Over");
+	  (task->pix_height-FONT_HEIGHT)>>1,"Game Over");
   }
 }
 
@@ -117,7 +129,7 @@ U0 CheckForKills(I64 x1,I64 y1,I64 player)
 	  found=FALSE;
 	  for (j=0;j<NUM_UNITS;j++)
 	    if (u[j].alive && u[j].player!=player && !u[j].king &&
-	      !u[u[j].link].alive) {
+		  !u[u[j].link].alive) {
 	      found=TRUE;
 	      u[j].alive=FALSE;
 	      Snd(500);Sleep(100);Snd(0);Sleep(25);
@@ -171,14 +183,14 @@ CDC *DrawHexMap(I64 *_w,I64 *_h)
 {
   CDC *dc=DCNew(*_w,*_h);
   I64 i,j,x,y;
-  *_w=(dc->width-BORDER*2-CIRCLE_RAD)/(CIRCLE_RAD*2);
-  *_h=(dc->height-BORDER*2)/(CIRCLE_RAD*2);
+  *_w=(dc->width-BORDER_X*2-CIRCLE_RAD)/(CIRCLE_RAD*2);
+  *_h=(dc->height-BORDER_Y*2)/(CIRCLE_RAD*2);
   DCFill(dc,WHITE);
   dc->color=LTGRAY;
   for (j=0;j<*_h;j++) {
     for (i=0;i<*_w;i++) {
-      y=j*CIRCLE_RAD*2+BORDER+CIRCLE_RAD;
-      x=i*CIRCLE_RAD*2+BORDER+CIRCLE_RAD;
+      x=i*CIRCLE_RAD*2+BORDER_X+CIRCLE_RAD;
+      y=j*CIRCLE_RAD*2+BORDER_Y+CIRCLE_RAD;
       if (j&1) x+=CIRCLE_RAD;
       S2W(&x,&y);
       GrCircle(dc,x,y,CIRCLE_RAD);
@@ -191,30 +203,31 @@ CDC *DrawHexMap(I64 *_w,I64 *_h)
 
 U0 Init()
 {
-  I64 i,j,dd,best_dd,best,w=Fs->pix_width,h=Fs->pix_height;
+  I64 i,j,j1,j2,dd,best_dd,best,w=Fs->pix_width,h=Fs->pix_height;
   map_dc=DrawHexMap(&w,&h);
   cur_player=0;
   for (i=0;i<NUM_UNITS/2;i++) {
     u[i].num=i;
     u[i+NUM_UNITS/2].num=i+NUM_UNITS/2;
 
-    u[i].y=RandU32%h;
+    u[i].y=FloorI64(RandU32%h,CIRCLE_RAD*2)+CIRCLE_RAD;
     u[i+NUM_UNITS/2].y=h-1-u[i].y;
-    j=u[i].y/(CIRCLE_RAD*2);
-    u[i].y+=BORDER;
-    u[i+NUM_UNITS/2].y+=BORDER;
+    j1=u[i].y/(CIRCLE_RAD*2);
+    j2=u[i+NUM_UNITS/2].y/(CIRCLE_RAD*2);
+    u[i].y+=BORDER_Y;
+    u[i+NUM_UNITS/2].y+=BORDER_Y;
 
     if (!i)
       u[i].x=CIRCLE_RAD;
     else
-      u[i].x=RandU32%((w-2*BORDER-CIRCLE_RAD*2)/2)+CIRCLE_RAD*2;
+      u[i].x=FloorI64(RandU32%((w-CIRCLE_RAD*2*2)/2),CIRCLE_RAD*2)+CIRCLE_RAD;
     u[i+NUM_UNITS/2].x=w-1-u[i].x;
-    if (j&1) {
+    if (j1&1)
       u[i].x+=CIRCLE_RAD;
+    if (j2&1)
       u[i+NUM_UNITS/2].x+=CIRCLE_RAD;
-    }
-    u[i].x+=BORDER;
-    u[i+NUM_UNITS/2].x+=BORDER;
+    u[i].x+=BORDER_X;
+    u[i+NUM_UNITS/2].x+=BORDER_X;
 
     S2W(&u[i].x,&u[i].y);
     S2W(&u[i+NUM_UNITS/2].x,&u[i+NUM_UNITS/2].y);
@@ -243,7 +256,7 @@ U0 Init()
       for (j=0;j<NUM_UNITS/2;j++) {
 	if (i!=j) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
-	  if (u[j].x<u[i].x && dd<best_dd) {
+	  if (u[j].x<=u[i].x && dd<best_dd) {
 	    best_dd=dd;
 	    best=j;
 	  }
@@ -268,7 +281,7 @@ U0 TreeCheckers()
   Unit *tempu;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Preempt(OFF);
+  Preempt;
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -281,13 +294,12 @@ U0 TreeCheckers()
   WinMax;
   WinBorder;
   AutoComplete;
-  Preempt(OFF);
+  Preempt;
   DocCursor;
   DocClear;
-  PopUpOk("Step on the link mid points.\n"
-	"Make a computer player or\n"
-	"modify the rules.\n");
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU;
+  PopUpOk("Step on the link mid points.\n");
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU;
   try {
 cn_start:
     Init;
@@ -295,7 +307,8 @@ cn_start:
     show_start=FALSE;
     Fs->draw_it=&DrawIt;
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&a1,&a2,
+	    1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
       switch (msg_code) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {

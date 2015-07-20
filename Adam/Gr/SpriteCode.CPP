@@ -1,8 +1,8 @@
-#help_index "Graphics/Sprite"
+#help_index "Graphics/Sprite;Sprites"
 
 U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
 {
-  U8 buf1[256],buf2[136];
+  U8 buf1[STR_LEN],buf2[STR_LEN];
   I32 *ptr;
   I64 i,j,k,col,width_internal;
   CD3I32 *p;
@@ -12,11 +12,12 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
   switch (tempg->type) {
     case SPT_COLOR:
       DocPrint(doc,"{%s}",
-	Color2Str(buf1,tempg->c.color));
+	    Color2Str(buf1,tempg->c.color));
       break;
     case SPT_DITHER_COLOR:
       DocPrint(doc,"{%s}",
-	Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|tempg->d.dither_color.u8[1]<<COLORROP_BITS));
+	    Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|
+	    tempg->d.dither_color.u8[1]<<COLORROP_BITS));
       break;
     case SPT_TRANSFORM_ON:
       DocPrint(doc,"{ON}");
@@ -27,16 +28,17 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
     case SPT_LINE:
     case SPT_ARROW:
     case SPT_PLANAR_SYMMETRY:
-      DocPrint(doc,"{(%d,%d),(%d,%d)}",tempg->pp.x1,tempg->pp.y1,tempg->pp.x2,tempg->pp.y2);
+      DocPrint(doc,"{(%d,%d),(%d,%d)}",tempg->pp.x1,tempg->pp.y1,
+	    tempg->pp.x2,tempg->pp.y2);
       break;
     case SPT_RECT:
       DocPrint(doc,"{(%d,%d):(%d,%d)}",tempg->pp.x1,tempg->pp.y1,
-	tempg->pp.x2-tempg->pp.x1,tempg->pp.y2-tempg->pp.y1);
+	    tempg->pp.x2-tempg->pp.x1,tempg->pp.y2-tempg->pp.y1);
       break;
     case SPT_ROTATED_RECT:
       DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->ppa.x1,tempg->ppa.y1,
-	tempg->ppa.x2-tempg->ppa.x1,tempg->ppa.y2-tempg->ppa.y1,
-	180/ã*Wrap(tempg->ppa.angle));
+	    tempg->ppa.x2-tempg->ppa.x1,tempg->ppa.y2-tempg->ppa.y1,
+	    180/ã*Wrap(tempg->ppa.angle));
       break;
     case SPT_PT:
     case SPT_FLOOD_FILL:
@@ -54,12 +56,13 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       break;
     case SPT_ELLIPSE:
       DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tempg->pwha.x1,tempg->pwha.y1,
-	tempg->pwha.width,tempg->pwha.height,180/ã*Wrap(tempg->pwha.angle));
+	    tempg->pwha.width,tempg->pwha.height,180/ã*Wrap(tempg->pwha.angle));
       break;
     case SPT_POLYGON:
       DocPrint(doc,"{%d,(%d,%d):(%d,%d),%0.4f}",tempg->pwhas.sides,
-	tempg->pwhas.x1,tempg->pwhas.y1,tempg->pwhas.width,tempg->pwhas.height,
-	180/ã*Wrap(tempg->pwhas.angle));
+	    tempg->pwhas.x1,tempg->pwhas.y1,
+	    tempg->pwhas.width,tempg->pwhas.height,
+	    180/ã*Wrap(tempg->pwhas.angle));
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
@@ -109,7 +112,7 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       break;
     case SPT_BITMAP:
       DocPrint(doc,"{(%d,%d):(%d,%d),\n",tempg->pwhu.x1,tempg->pwhu.y1,
-	tempg->pwhu.width,tempg->pwhu.height);
+	    tempg->pwhu.width,tempg->pwhu.height);
       width_internal=(tempg->pwhu.width+7)&~7;
       if (width_internal<80)
 	k=width_internal;
@@ -148,7 +151,7 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       tri=p;
       for (i=0;i<tempg->mu.tri_cnt;i++,tri++) {
 	DocPrint(doc,"(%s,%d,%d,%d)",Color2Str(buf1,tri->color),
-	  tri->nums[0],tri->nums[1],tri->nums[2]);
+	      tri->nums[0],tri->nums[1],tri->nums[2]);
 	if (i+1<tempg->mu.tri_cnt) DocPrint(doc,",");
 	if (++col>=3 && i+1<tempg->mu.tri_cnt) {
 	  DocPrint(doc,"\n");
@@ -173,7 +176,7 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tempg)
       tri=p;
       for (i=0;i<tempg->pmu.tri_cnt;i++,tri++) {
 	DocPrint(doc,"(%s,%d,%d,%d)",Color2Str(buf1,tri->color),
-	  tri->nums[0],tri->nums[1],tri->nums[2]);
+	      tri->nums[0],tri->nums[1],tri->nums[2]);
 	if (i+1<tempg->pmu.tri_cnt) DocPrint(doc,",");
 	if (++col>=3 && i+1<tempg->pmu.tri_cnt) {
 	  DocPrint(doc,"\n");
@@ -195,7 +198,7 @@ public U0 Sprite2Code(CDoc *doc=NULL,U8 *elems)
   }
 }
 
-CSprite *Code2SpriteElem(CLex *lx,I64 type)
+CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 {
   I64 i,num1,num2,size;
   CSprite *result,g;
@@ -209,10 +212,10 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
     sub_switch_start:
       case SPT_COLOR:
       case SPT_DITHER_COLOR:
-	st=LexFirstRem(lx,"}");
+	st=LexFirstRem(cc,"}");
 	color=Str2ColorU32(st);
 	Free(st);
-	Lex(lx); //Skip color
+	Lex(cc); //Skip color
 	g.c.color=color.c0.color;
 	if (color&ROPF_DITHER) {
 	  g.d.dither_color.u8[1]=color.c1.color;
@@ -222,8 +225,8 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	break;
       case SPT_TRANSFORM_ON:
       case SPT_TRANSFORM_OFF:
-	Lex(lx); //Skip {
-	if (LexExpressionI64(lx))
+	Lex(cc); //Skip {
+	if (LexExpressionI64(cc))
 	  g.type=SPT_TRANSFORM_ON;
 	else
 	  g.type=SPT_TRANSFORM_OFF;
@@ -231,44 +234,44 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       case SPT_LINE:
       case SPT_ARROW:
       case SPT_PLANAR_SYMMETRY:
-	Lex(lx); //Skip {
+	Lex(cc); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.pp.x1);
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	LexD2I32(lx,&g.pp.x2);
+	LexD2I32(cc,&g.pp.x1);
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	LexD2I32(cc,&g.pp.x2);
 	break;
       case SPT_RECT:
       case SPT_ROTATED_RECT:
-	Lex(lx); //Skip {
-	LexD2I32(lx,&g.pp.x1);
-	if (lx->token!=':')
-	  LexExcept(lx,"expecting ':' at ");
-	Lex(lx); //Skip :
-	LexD2I32(lx,&g.pp.x2);
+	Lex(cc); //Skip {
+	LexD2I32(cc,&g.pp.x1);
+	if (cc->token!=':')
+	  LexExcept(cc,"expecting ':' at ");
+	Lex(cc); //Skip :
+	LexD2I32(cc,&g.pp.x2);
 	g.ppa.x2+=g.pp.x1;
 	g.ppa.y2+=g.pp.y1;
-	if (lx->token==',') {
-	  Lex(lx); //Skip ,
-	  g.ppa.angle=ã/180*LexExpressionF64(lx);
+	if (cc->token==',') {
+	  Lex(cc); //Skip ,
+	  g.ppa.angle=ã/180*LexExpressionF64(cc);
 	  g.type=SPT_ROTATED_RECT;
 	} else
 	  g.type=SPT_RECT;
 	break;
       case SPT_PT:
       case SPT_SHIFT:
-	Lex(lx); //Skip {
+	Lex(cc); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.p.x1);
+	LexD2I32(cc,&g.p.x1);
 	break;
       case SPT_FLOOD_FILL:
       case SPT_FLOOD_FILL_NOT:
-	Lex(lx); //Skip {
-	LexD2I32(lx,&g.p.x1);
-	if (lx->token==',') {
-	  Lex(lx); //Skip ,
-	  i=LexExpressionI64(lx);
+	Lex(cc); //Skip {
+	LexD2I32(cc,&g.p.x1);
+	if (cc->token==',') {
+	  Lex(cc); //Skip ,
+	  i=LexExpressionI64(cc);
 	} else
 	  i=0;
 	if (i)
@@ -277,36 +280,36 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	  g.type=SPT_FLOOD_FILL;
 	break;
       case SPT_WIDTH:
-	Lex(lx); //Skip {
-	g.w.width=LexExpressionI64(lx);
+	Lex(cc); //Skip {
+	g.w.width=LexExpressionI64(cc);
 	g.type=SPT_WIDTH;
 	break;
       case SPT_CIRCLE:
-	Lex(lx); //Skip {
+	Lex(cc); //Skip {
 	g.type=SPT_CIRCLE;
-	LexD2I32(lx,&g.pr.x1);
-	if (lx->token!=':')
-	  LexExcept(lx,"expecting ':' at ");
-	Lex(lx); //Skip :
-	g.pr.radius=LexExpressionI64(lx);
+	LexD2I32(cc,&g.pr.x1);
+	if (cc->token!=':')
+	  LexExcept(cc,"expecting ':' at ");
+	Lex(cc); //Skip :
+	g.pr.radius=LexExpressionI64(cc);
 	break;
       case SPT_POLYGON:
-	Lex(lx); //Skip {
-	g.pwhas.sides=LexExpressionI64(lx);
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
+	Lex(cc); //Skip {
+	g.pwhas.sides=LexExpressionI64(cc);
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
       case SPT_ELLIPSE:
-	Lex(lx); //Skip {
+	Lex(cc); //Skip {
 	g.type=type;
-	LexD2I32(lx,&g.pwha.x1);
-	if (lx->token!=':')
-	  LexExcept(lx,"expecting ':' at ");
-	Lex(lx); //Skip :
-	LexD2I32(lx,&g.pwha.width);
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	g.pwha.angle=ã/180*LexExpressionF64(lx);
+	LexD2I32(cc,&g.pwha.x1);
+	if (cc->token!=':')
+	  LexExcept(cc,"expecting ':' at ");
+	Lex(cc); //Skip :
+	LexD2I32(cc,&g.pwha.width);
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	g.pwha.angle=ã/180*LexExpressionF64(cc);
 	break;
     sub_switch_end:
       size=SpriteElemSize(&g)+offset(CSprite.start);
@@ -316,15 +319,15 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      Lex(lx); //Skip {
+      Lex(cc); //Skip {
       g.type=type;
-      LexD2I32(lx,&g.ps.x1);
-      if (lx->token!=',')
-	LexExcept(lx,"expecting ',' at ");
-      if (Lex(lx)==TK_STR)  //Skip ,
-	st=LexExtStr(lx);
+      LexD2I32(cc,&g.ps.x1);
+      if (cc->token!=',')
+	LexExcept(cc,"expecting ',' at ");
+      if (Lex(cc)==TK_STR)  //Skip ,
+	st=LexExtStr(cc);
       else
-	LexExcept(lx,"expecting string at ");
+	LexExcept(cc,"expecting string at ");
       size=SpriteElemQuedBaseSize(type);
       i=StrLen(st)+1;
       result=MAlloc(size+i);
@@ -333,19 +336,19 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       Free(st);
       break;
     case SPT_POLYLINE:
-      Lex(lx); //Skip {
+      Lex(cc); //Skip {
       g.type=SPT_POLYLINE;
       QueInit(&rootp);
-      while (lx->token=='(') {
+      while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
-	LexD2I32(lx,&tempp->p);
+	LexD2I32(cc,&tempp->p);
 	QueIns(tempp,rootp.last);
 	g.nu.num++;
-	if (lx->token==',')
-	  Lex(lx); //Skip ,
+	if (cc->token==',')
+	  Lex(cc); //Skip ,
       }
       if (g.nu.num<2)
-	LexExcept(lx,"expecting point at ");
+	LexExcept(cc,"expecting point at ");
       size=SpriteElemQuedBaseSize(SPT_POLYLINE);
       result=MAlloc(size+g.nu.num*sizeof(CD2I32));
       MemCpy(result,&g,size);
@@ -363,21 +366,21 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
     case SPT_BSPLINE3:
     case SPT_BSPLINE2_CLOSED:
     case SPT_BSPLINE3_CLOSED:
-      Lex(lx); //Skip {
+      Lex(cc); //Skip {
       QueInit(&rootp);
-      while (lx->token=='(') {
+      while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
-	LexD3I32(lx,&tempp->p);
+	LexD3I32(cc,&tempp->p);
 	QueIns(tempp,rootp.last);
 	g.nu.num++;
-	if (lx->token==',')
-	  Lex(lx); //Skip ,
+	if (cc->token==',')
+	  Lex(cc); //Skip ,
       }
       if (g.nu.num<2)
-	LexExcept(lx,"expecting point at ");
+	LexExcept(cc,"expecting point at ");
       size=SpriteElemQuedBaseSize(type);
       result=MAlloc(size+g.nu.num*sizeof(CD3I32));
-      if (LexExpressionI64(lx)) {
+      if (LexExpressionI64(cc)) {
 	if (type==SPT_BSPLINE2||type==SPT_BSPLINE2_CLOSED)
 	  g.type=SPT_BSPLINE2_CLOSED;
 	else
@@ -400,21 +403,21 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       }
       break;
     case SPT_POLYPT:
-      Lex(lx); //Skip {
-      LexD2I32(lx,&g.npu.x);
-      if (lx->token!=',')
-	LexExcept(lx,"expecting ',' at ");
+      Lex(cc); //Skip {
+      LexD2I32(cc,&g.npu.x);
+      if (cc->token!=',')
+	LexExcept(cc,"expecting ',' at ");
       tempv=QueVectU8New;
       while (TRUE) {
-	if (!(i=LexGetChar(lx)))
-	  LexExcept(lx,"expecting '}' at ");
+	if (!(i=LexGetChar(cc)))
+	  LexExcept(cc,"expecting '}' at ");
 	if (i=='}')
 	  break;
 	if ('0'<=i<='7')
 	  QueVectU8Put(tempv,g.npu.num++,i-'0');
       }
-      Bts(&lx->flags,Lf_USE_LAST_U16);
-      Lex(lx); //Load '}'
+      Bts(&cc->flags,CCf_USE_LAST_U16);
+      Lex(cc); //Load '}'
       g.type=SPT_POLYPT;
       size=SpriteElemQuedBaseSize(SPT_POLYPT);
       result=CAlloc(size+(g.npu.num*3+7)>>3);
@@ -425,19 +428,19 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       QueVectU8Del(tempv);
       break;
     case SPT_BITMAP:
-      Lex(lx); //Skip {
-      LexD2I32(lx,&g.pwhu.x1);
-      if (lx->token!=':')
-	LexExcept(lx,"expecting ':' at ");
-      Lex(lx); //Skip :
-      LexD2I32(lx,&g.pwhu.width);
-      if (lx->token!=',')
-	LexExcept(lx,"expecting ',' at ");
+      Lex(cc); //Skip {
+      LexD2I32(cc,&g.pwhu.x1);
+      if (cc->token!=':')
+	LexExcept(cc,"expecting ':' at ");
+      Lex(cc); //Skip :
+      LexD2I32(cc,&g.pwhu.width);
+      if (cc->token!=',')
+	LexExcept(cc,"expecting ',' at ");
       tempv=QueVectU8New;
       num1=0;
       while (TRUE) {
-	if (!(i=ToUpper(LexGetChar(lx))))
-	  LexExcept(lx,"expecting '}' at ");
+	if (!(i=ToUpper(LexGetChar(cc))))
+	  LexExcept(cc,"expecting '}' at ");
 	if (i=='}')
 	  break;
 	if ('0'<=i<='9')
@@ -449,8 +452,8 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
 	else if (i=='_')
 	  QueVectU8Put(tempv,num1++,0);
       }
-      Bts(&lx->flags,Lf_USE_LAST_U16);
-      Lex(lx); //Load '}'
+      Bts(&cc->flags,CCf_USE_LAST_U16);
+      Lex(cc); //Load '}'
       g.type=SPT_BITMAP;
       size=SpriteElemQuedBaseSize(SPT_BITMAP);
       result=CAlloc(size+num1);
@@ -462,62 +465,62 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       break;
     case SPT_MESH:
     case SPT_SHIFTABLE_MESH:
-      Lex(lx); //Skip {
-      if (LexExpressionI64(lx)) {
+      Lex(cc); //Skip {
+      if (LexExpressionI64(cc)) {
 	g.type=SPT_SHIFTABLE_MESH;
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	LexD3I32(lx,&g.pmu.x);
-	if (lx->token!=':')
-	  LexExcept(lx,"expecting ':' at ");
-	Lex(lx); //Skip :
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	LexD3I32(cc,&g.pmu.x);
+	if (cc->token!=':')
+	  LexExcept(cc,"expecting ':' at ");
+	Lex(cc); //Skip :
       } else {
 	g.type=SPT_MESH;
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
       }
       num1=0;
       QueInit(&rootp);
-      while (lx->token=='(') {
+      while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
-	LexD3I32(lx,&tempp->p);
+	LexD3I32(cc,&tempp->p);
 	QueIns(tempp,rootp.last);
 	num1++;
-	if (lx->token==',')
-	  Lex(lx); //Skip ,
+	if (cc->token==',')
+	  Lex(cc); //Skip ,
       }
-      if (lx->token!=':')
-	LexExcept(lx,"expecting ':' at ");
-      Lex(lx); //Skip :
+      if (cc->token!=':')
+	LexExcept(cc,"expecting ':' at ");
+      Lex(cc); //Skip :
       num2=0;
       QueInit(&roott);
-      while (lx->token=='(') {
+      while (cc->token=='(') {
 	tempt=CAlloc(sizeof(CQueMeshTri));
-	st=LexFirstRem(lx,",");
+	st=LexFirstRem(cc,",");
 	tempt->color=Str2ColorU32(st);
 	Free(st);
-	Lex(lx); //Skip color
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	tempt->nums[0]=LexExpressionI64(lx);
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	tempt->nums[1]=LexExpressionI64(lx);
-	if (lx->token!=',')
-	  LexExcept(lx,"expecting ',' at ");
-	Lex(lx); //Skip ,
-	tempt->nums[2]=LexExpressionI64(lx);
-	if (lx->token!=')')
-	  LexExcept(lx,"expecting ')' at ");
-	Lex(lx); //Skip )
+	Lex(cc); //Skip color
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	tempt->nums[0]=LexExpressionI64(cc);
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	tempt->nums[1]=LexExpressionI64(cc);
+	if (cc->token!=',')
+	  LexExcept(cc,"expecting ',' at ");
+	Lex(cc); //Skip ,
+	tempt->nums[2]=LexExpressionI64(cc);
+	if (cc->token!=')')
+	  LexExcept(cc,"expecting ')' at ");
+	Lex(cc); //Skip )
 	QueIns(tempt,roott.last);
 	num2++;
-	if (lx->token==',')
-	  Lex(lx); //Skip ,
+	if (cc->token==',')
+	  Lex(cc); //Skip ,
       }
       if (g.type==SPT_MESH) {
 	g.mu.vertex_cnt=num1;
@@ -549,10 +552,10 @@ CSprite *Code2SpriteElem(CLex *lx,I64 type)
       }
       break;
   }
-  if (lx->token!='}')
-    LexExcept(lx,"expecting '}' at ");
-  if (Lex(lx)!=';')
-    LexExcept(lx,"expecting ';' at ");
+  if (cc->token!='}')
+    LexExcept(cc,"expecting '}' at ");
+  if (Lex(cc)!=';')
+    LexExcept(cc,"expecting ';' at ");
   return result;
 }
 
@@ -561,24 +564,24 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
   CSprite root;
   U8 *result;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
-  CLex *lx=LexNew(,LF_DONT_FREE_BUF);
-  CHashTable *old_hash_table_lst=lx->htc.hash_table_lst;
+  CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
+  CHashTable *old_hash_table_lst=cc->htc.hash_table_lst;
   CHashGeneric *temph;
   I64 i,size=0;
   QueInit(&root);
-  LexAttachDoc(lx,,doc);
+  LexAttachDoc(cc,,doc);
   try {
     do {
-      lx->htc.hash_table_lst=NULL;
-      if (Lex(lx)==TK_IDENT && //Skip ;
-	    (temph=HashFind(lx->cur_str,gr.sprite_hash,SPHT_ELEM_CODE))) {
+      cc->htc.hash_table_lst=NULL;
+      if (Lex(cc)==TK_IDENT && //Skip ;
+	    (temph=HashFind(cc->cur_str,gr.sprite_hash,SPHT_ELEM_CODE))) {
 	i=temph->user_data0;
-	lx->htc.hash_table_lst=old_hash_table_lst;
-	if (Lex(lx)=='{') //Skip ident
-	  QueIns(Code2SpriteElem(lx,i),root.last);
-      } else if (lx->token)
-	LexExcept(lx,"expecting sprite element type name at ");
-    } while (lx->token);
+	cc->htc.hash_table_lst=old_hash_table_lst;
+	if (Lex(cc)=='{') //Skip ident
+	  QueIns(Code2SpriteElem(cc,i),root.last);
+      } else if (cc->token)
+	LexExcept(cc,"expecting sprite element type name at ");
+    } while (cc->token);
     okay=TRUE;
   } catch {
     Fs->catch_except=TRUE;
@@ -587,7 +590,7 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
   if (unlock_doc)
     DocUnlock(doc);
   if (okay) {
-    LexDel(lx); //TODO: can crash
+    CmpCtrlDel(cc); //TODO: can crash
     result=SpriteQue2Sprite(&root,&size);
   } else {
     result=NULL;

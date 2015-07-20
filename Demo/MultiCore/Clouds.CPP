@@ -116,8 +116,8 @@ U0 Init()
   Cloud *c=clouds;
   CloudPen *cp=cloud_pens;
   I64 i,j,k,l,
-     w=Fs->pix_width,
-     h=SKY_LINES*FONT_HEIGHT;
+	w=Fs->pix_width,
+	h=SKY_LINES*FONT_HEIGHT;
 
   for (i=0;i<NUM_CLOUDS;i++,c++) {
     c->x=ToI64(w/2+Rand*w/2-w/4)<<32;
@@ -162,7 +162,7 @@ U0 CleanUp()
 U0 SongTask(I64)
 {//Song by the Holy Spirit
 //This specifies a callback routine
-//to be called when the task dies.
+  //to be called when the task dies.
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
@@ -191,7 +191,7 @@ U0 CloudScene()
     "$$BG,YELLOW$$%h5c",'\n';
     BibleVerse(,"Exodus,14:19",7);
 
-    Preempt(OFF);
+    Preempt;
     Fs->draw_it=&DrawIt;
     GetChar;
     WinMgrSync;

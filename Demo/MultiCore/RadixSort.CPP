@@ -38,7 +38,7 @@ U0 QSortU32(I32 *base,I64 num)
       i=less-base;
       if (i==num) {//All less or equal to pivot
 
-      //Point greater to first less
+	//Point greater to first less
 	do greater--;
 	while (--i && *greater==pivot);
 
@@ -94,7 +94,7 @@ U0 MPRadixSortDemo(I64 dummy=0)
   D(a2+NUM/4);
 
   for (i=0;i<my_mp_cnt;i++) {
-    //$WW,0$We must do full size, just in case.
+//$WW,0$We must do full size, just in case.
     //There will be uneven split between cores
     //depending on the distribution of rand numbers.
     b[i]=MAlloc(NUM*sizeof(I32));

@@ -1,25 +1,25 @@
-#help_index "Misc/Accts"
-#define ACCT_REGISTRY_FILENAME "::/Home/Registry.CPP.Z"
+#help_index "Misc/Registry"
+#define REGISTRY_FILENAME "::/Home/Registry.CPP.Z"
 CDoc *sys_registry_doc=NULL;
 I64 sys_msg_flags[1]={0};
 F64 registry_version;
 
-Bool AcctCacheRegistry()
+Bool RegCache()
 {
   Bool old_silent;
   if (!sys_registry_doc) {
     old_silent=Silent;
-    sys_registry_doc=DocRead(ACCT_REGISTRY_FILENAME);
+    sys_registry_doc=DocRead(REGISTRY_FILENAME);
     Silent(old_silent);
     return FALSE;
   } else
     return TRUE;
 }
 
-public Bool AcctRegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
+public Bool RegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
 {//Add code doc tree branch to registry.
   Bool result,unlock_doc;
-  AcctCacheRegistry;
+  RegCache;
   unlock_doc=DocLock(sys_registry_doc);
   if (!DocTreeFind(sys_registry_doc,path)) {
     DocTreeMake(sys_registry_doc,path);
@@ -30,7 +30,7 @@ public Bool AcctRegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
       else
 	Adam("%s",val);
     }
-    if (IsDrvWritable(':'))
+    if (DrvIsWritable(':'))
       DocWrite(sys_registry_doc);
     result=FALSE;
   } else
@@ -40,24 +40,25 @@ public Bool AcctRegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
   return result;
 }
 
-public I64 AcctRegExeBranch(U8 *path)
+public I64 RegExeBranch(U8 *path)
 {//Execute doc tree branch in registry.
-  AcctCacheRegistry;
+  RegCache;
   return DocTreeBranchExe(sys_registry_doc,path);
 }
 
-public Bool AcctRegWriteBranch(U8 *path,U8 *fmt,...)
+public Bool RegWriteBranch(U8 *path,U8 *fmt,...)
 {//Rewrite doc tree branch in registry.
   Bool result,unlock_doc;
   CDocEntry *tree_branch,*start_indent,*end_indent;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  AcctCacheRegistry;
+  RegCache;
   unlock_doc=DocLock(sys_registry_doc);
-  if (result=DocTreeFind(sys_registry_doc,path,&tree_branch,&start_indent,&end_indent))
+  if (result=DocTreeFind(sys_registry_doc,path,
+	&tree_branch,&start_indent,&end_indent))
     DocCut(sys_registry_doc,tree_branch,end_indent);
   DocTreeMake(sys_registry_doc,path);
   DocPrint(sys_registry_doc,"%s",buf);
-  if (IsDrvWritable(':'))
+  if (DrvIsWritable(':'))
     DocWrite(sys_registry_doc);
   if (unlock_doc)
     DocUnlock(sys_registry_doc);
@@ -83,23 +84,23 @@ public Bool OneTimePopUp(U8 *_flags,I64 flag_num,U8 *msg)
   return result;
 }
 
-U0 AcctOneTimePopUp(I64 flag_num,U8 *msg)
+U0 RegOneTimePopUp(I64 flag_num,U8 *msg)
 {//You're not supposed to make system pop-up flags, only me.
   if (OneTimePopUp(sys_msg_flags,flag_num,msg))
-    AcctRegWriteBranch("Adam/SysMsgFlags","sys_msg_flags[0]=0x%X;\n",
-	sys_msg_flags[0]);
+    RegWriteBranch("Adam/SysMsgFlags","sys_msg_flags[0]=0x%X;\n",
+	  sys_msg_flags[0]);
 }
 
-U0 RegistryInit()
+U0 RegInit()
 {
-  U8 buf[136];
+  U8 buf[STR_LEN];
   Bool version_present;
-  AcctRegSetDftEntry("Adam/SysMsgFlags","sys_msg_flags[0]=0;\n",TRUE);
+  RegSetDftEntry("Adam/SysMsgFlags","sys_msg_flags[0]=0;\n",TRUE);
   StrPrint(buf,"registry_version=%4.3f;\n",os_version);
-  version_present=AcctRegSetDftEntry("Adam/SysRegVer",buf,TRUE);
-  AcctRegExeBranch("Adam");
+  version_present=RegSetDftEntry("Adam/SysRegVer",buf,TRUE);
+  RegExeBranch("Adam");
   if (registry_version!=os_version) {
-    AcctRegWriteBranch("Adam/SysRegVer",buf);
-    AcctRegExeBranch("Adam");
+    RegWriteBranch("Adam/SysRegVer",buf);
+    RegExeBranch("Adam");
   }
 }

@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
-AcctRegSetDftEntry("TempleOS/CastleFrankenstein","F64 best_score=9999;\n");
-AcctRegExeBranch("TempleOS/CastleFrankenstein");
+RegSetDftEntry("TempleOS/CastleFrankenstein","F64 best_score=9999;\n");
+RegExeBranch("TempleOS/CastleFrankenstein");
 
 //Set snap to 4 and width to 4
 //if you edit this map.
@@ -109,7 +109,7 @@ class Monster
 U0 CFTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 {
   I64 zz;
-  GrRot(dc->r,x,y,z);
+  Mat4x4MulXYZ(dc->r,x,y,z);
   zz=SCREEN_SCALE/3+*z;
   if (zz<1) zz=1;
   *x=SCREEN_SCALE/2* *x/zz;
@@ -132,37 +132,38 @@ Bool LOSPlot(U8 *,I64 x,I64 y,I64)
 Bool LOS(I64 x1,I64 y1,I64 x2,I64 y2)
 {//Line of sight
   return Line(NULL,x1*LOS_SCALE/SCREEN_SCALE,y1*LOS_SCALE/SCREEN_SCALE,0,
-	       x2*LOS_SCALE/SCREEN_SCALE,y2*LOS_SCALE/SCREEN_SCALE,0,&LOSPlot);
+	x2*LOS_SCALE/SCREEN_SCALE,y2*LOS_SCALE/SCREEN_SCALE,0,&LOSPlot);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,j,*r1,*r2,*r3,*s2w,xx,yy,zz,x,y,x1,y1,z1,
-      c,x1w,y1w,x1h,y1h,xh,yh,zh,
-      cx=task->pix_width/2,
-      cy=task->pix_height/2;
+	c,x1w,y1w,x1h,y1h,xh,yh,zh,
+	cx=task->pix_width/2,
+	cy=task->pix_height/2;
   CSprite *temps;
   F64 tt;
   CD3I32 poly[4];
   Monster *tempm;
 
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
   MemSet(panels_processed_bitmap,0,(map_width*map_height+7)>>3);
 
   //World to screen
-  GrRotZEqu(dc->r,man_é+ã/2);
-  GrRotXEqu(dc->r,ã/2);
-  GrSetRotMat(dc,dc->r);
+  Mat4x4RotZ(dc->r,man_é+ã/2);
+  Mat4x4RotX(dc->r,ã/2);
+  DCMat4x4Set(dc,dc->r);
 
   xh=-man_xx/SCREEN_SCALE; yh=-man_yy/SCREEN_SCALE; zh=0;
-  GrRot(dc->r,&xh,&yh,&zh);
-  GrSetTranslation(dc->r,xh,yh,zh);
+  Mat4x4MulXYZ(dc->r,&xh,&yh,&zh);
+  Mat4x4TranslationEqu(dc->r,xh,yh,zh);
 
   //Screen to world
-  s2w=GrRotXNew(-ã/2,task);
-  GrRotZEqu(s2w,-man_é-ã/2);
+  s2w=Mat4x4IdentNew(task);
+  Mat4x4RotX(s2w,-ã/2);
+  Mat4x4RotZ(s2w,-man_é-ã/2);
   xh=0; yh=0; zh=SCREEN_SCALE;
-  GrRot(s2w,&xh,&yh,&zh);
+  Mat4x4MulXYZ(s2w,&xh,&yh,&zh);
 
   //Rotate light source
   xx=dc->ls.x; yy=dc->ls.y; zz=-dc->ls.z;
@@ -173,15 +174,17 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->transform=&CFTransform;
   dc->x=cx;
   dc->y=cy;
-  r1=GrRotXNew(-ã/2,task);
-  GrRotZEqu(r1,tS);
-  GrScaleEqu(r1,MONSTER_SCALE);
+  r1=Mat4x4IdentNew(task);
+  Mat4x4RotX(r1,-ã/2);
+  Mat4x4RotZ(r1,tS);
+  Mat4x4Scale(r1,MONSTER_SCALE);
 
-  r2=GrIdentNew(task);
-  GrScaleEqu(r2,MONSTER_SCALE);
+  r2=Mat4x4IdentNew(task);
+  Mat4x4Scale(r2,MONSTER_SCALE);
 
-  r3=GrRotXNew(-ã/2,task);
-  GrScaleEqu(r3,PLANT_SCALE);
+  r3=Mat4x4IdentNew(task);
+  Mat4x4RotX(r3,-ã/2);
+  Mat4x4Scale(r3,PLANT_SCALE);
 
   x1h=man_xx+yh*PLOT_GRID_WIDTH/2+xh*(PLOT_GRID_HEIGHT-1);
   y1h=man_yy-xh*PLOT_GRID_WIDTH/2+yh*(PLOT_GRID_HEIGHT-1);
@@ -193,10 +196,10 @@ U0 DrawIt(CTask *task,CDC *dc)
       xx=x1w/SCREEN_SCALE; yy=y1w/SCREEN_SCALE;
       x=xx*SCREEN_SCALE-man_xx; y=yy*SCREEN_SCALE-man_yy;
       if (1<=xx<map_width-1 && 1<=yy<map_height-1 &&
-	  !LBts(panels_processed_bitmap,yy*map_width+xx)) {
+	    !LBts(panels_processed_bitmap,yy*map_width+xx)) {
 	if ((c=map[yy*map_width+xx]) &&
-	    LOS(xx*SCREEN_SCALE+SCREEN_SCALE/2,yy*SCREEN_SCALE+SCREEN_SCALE/2,
-		man_xx,man_yy)) {
+	      LOS(xx*SCREEN_SCALE+SCREEN_SCALE/2,yy*SCREEN_SCALE+SCREEN_SCALE/2,
+	      man_xx,man_yy)) {
 	  if (c==YELLOW)
 	    dc->color=DKGRAY;
 	  else
@@ -218,14 +221,14 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    x1=x+SCREEN_SCALE/2;
 	    y1=y+SCREEN_SCALE/2;
 	    z1=0;
-	    GrTransform(dc,&x1,&y1,&z1);
+	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
 	      SpriteMat3B(dc,x+SCREEN_SCALE/2,y+SCREEN_SCALE/2,0,$IB,"<5>",BI=5$,r3);
 	  } else if (c==YELLOW) {
 	    x1=x+SCREEN_SCALE/2;
 	    y1=y+SCREEN_SCALE/2;
 	    z1=0;
-	    GrTransform(dc,&x1,&y1,&z1);
+	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
 	      SpriteMat3B(dc,x+SCREEN_SCALE/2,y+SCREEN_SCALE/2,0,$IB,"<6>",BI=6$,r3);
 	  }
@@ -313,7 +316,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       xx=x;
       yy=y;
       zz=0;
-      GrTransform(dc,&xx,&yy,&zz);
+      DCTransform(dc,&xx,&yy,&zz);
       if (zz>0) {
 	if (tempm->dead)
 	  SpriteMat3B(dc,x,y,0,$IB,"<2>",BI=2$,r2);
@@ -332,11 +335,11 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   //Draw Map heads-up display, scaled 2 pixs
   Free(dc->r);
-  GrSetRotMat(dc,GrIdentNew(task));
+  DCMat4x4Set(dc,Mat4x4IdentNew(task));
   dc->x=task->pix_width -2*map_width;
   dc->y=task->pix_height-2*map_height;
   dc->z=0;
-  dc->transform=&GrTransform;
+  dc->transform=&DCTransform;
   dc->pen_width=2;
   for (i=0;i<map_height;i++)
     for (j=0;j<map_width;j++) {
@@ -345,10 +348,11 @@ U0 DrawIt(CTask *task,CDC *dc)
     }
 
     //Draw Things on heads-up Map
-    dc->color=LTPURPLE;
+  dc->color=LTPURPLE;
   for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++)
     if (!tempm->dead)
-      GrPlot3(dc,2*(tempm->x/SCREEN_SCALE),2*(map_height-1-tempm->y/SCREEN_SCALE),0);
+      GrPlot3(dc,2*(tempm->x/SCREEN_SCALE),
+	    2*(map_height-1-tempm->y/SCREEN_SCALE),0);
   dc->color=LTCYAN;
   GrPlot3(dc,2*(man_xx/SCREEN_SCALE),2*(map_height-1-man_yy/SCREEN_SCALE),0);
 
@@ -363,7 +367,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrLine(dc,cx,cy-5,cx,cy+5);
     tt=tS;
   }
-  GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",monsters_left,tt-t0,best_score);
+  GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",
+	monsters_left,tt-t0,best_score);
   Free(s2w);
 }
 
@@ -378,7 +383,7 @@ U0 Fire()
     x=tempm->x;
     y=tempm->y;
     if (!tempm->dead &&
-	LOS(x,y,man_xx,man_yy)) {
+	  LOS(x,y,man_xx,man_yy)) {
       dx=x-man_xx;
       dy=man_yy-y;
       if (d=Sqrt(dx*dx+dy*dy)) {
@@ -449,17 +454,17 @@ U0 AnimateTask(I64)
 	else
 	  y+=dd;
 	if (0<=x<=map_width*SCREEN_SCALE &&
-	    0<=y<=map_height*SCREEN_SCALE &&
-	    map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE]) {
+	      0<=y<=map_height*SCREEN_SCALE &&
+	      map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE]) {
 	  if (!map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE+1] &&
-	       x-RoundI64(x,SCREEN_SCALE)>SCREEN_SCALE/2 ||
-	      !map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE-1] &&
-	       x-RoundI64(x,SCREEN_SCALE)<SCREEN_SCALE/2)
+		x-RoundI64(x,SCREEN_SCALE)>SCREEN_SCALE/2 ||
+		!map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE-1] &&
+		x-RoundI64(x,SCREEN_SCALE)<SCREEN_SCALE/2)
 	    x=RoundI64(x,SCREEN_SCALE)+SCREEN_SCALE/2;
 	  if (!map[(y/SCREEN_SCALE+1)*map_width+x/SCREEN_SCALE] &&
-	       y-RoundI64(y,SCREEN_SCALE)>SCREEN_SCALE/2 ||
-	      !map[(y/SCREEN_SCALE-1)*map_width+x/SCREEN_SCALE] &&
-	       y-RoundI64(y,SCREEN_SCALE)<SCREEN_SCALE/2)
+		y-RoundI64(y,SCREEN_SCALE)>SCREEN_SCALE/2 ||
+		!map[(y/SCREEN_SCALE-1)*map_width+x/SCREEN_SCALE] &&
+		y-RoundI64(y,SCREEN_SCALE)<SCREEN_SCALE/2)
 	    y=RoundI64(y,SCREEN_SCALE)+SCREEN_SCALE/2;
 	  tempm->x=x;
 	  tempm->y=y;
@@ -482,9 +487,9 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-	Play("2q.A#1eG2AeA#qAq.A#1eG2eAeA#qA");
-	Play("q.A#1eG2A#A1qG2q.A#1eG2A#A1qG");
-	Play("3eA#A2qG3eA#A2qG3eA#A2G3AA#A2qG");
+    Play("2q.A#1eG2AeA#qAq.A#1eG2eAeA#qA");
+    Play("q.A#1eG2A#A1qG2q.A#1eG2A#A1qG");
+    Play("3eA#A2qG3eA#A2qG3eA#A2G3AA#A2qG");
   }
 }
 
@@ -520,23 +525,23 @@ U0 CastleFrankenstein()
 {
   I64 sc;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Fwd(,,SC_CURSOR_UP);"
-  "  Bwd(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-  "  Fire(,CH_SPACE);"
-      "}"
-      );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Fwd(,,SC_CURSOR_UP);"
+	"  Bwd(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"  Fire(,CH_SPACE);"
+	"}"
+	);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=DKGRAY<<4+WHITE;
-  Preempt(OFF);
+  Preempt;
   WinBorder;
   WinMax;
   AutoComplete;
@@ -583,7 +588,8 @@ fs_done:
   SettingsPop;
   CleanUp;
   MenuPop;
-  AcctRegWriteBranch("TempleOS/CastleFrankenstein","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/CastleFrankenstein","F64 best_score=%5.4f;\n",
+	best_score);
 }
 
 CastleFrankenstein;

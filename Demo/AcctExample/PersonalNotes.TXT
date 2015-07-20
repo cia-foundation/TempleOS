@@ -15,12 +15,7 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
 * 1/?/2015 Macro select in Menu did not go to shell.
 
-* Real World User Issues:
-  QEMU runs maximized, but slow.
-  If you move cursor off of bottom, macros don't work.
-  Stutters in QEMU doing sound.
-
-* $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.
+* $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Did I fix it?
 
 * Why is nontimer $LK,"Rand",A="MN:Rand"$() so bad?
 
@@ -28,21 +23,25 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
 * More $LK,"CCtrl",A="MN:CCtrl"$.
 
+* Add Redo to editor.
+
+* PSect does not scan all task tables.
+
+* No Compiler Warning:  dc->palette48.r   =palette24[i].r<<8;
+
+* I think subswitch_start with a break in the preface fails.
+
+* Add editor select just visible text for with filter.
+
 * Add change-triangle-color to mesh editor.
 
 * Add AVL binary tree support or red/black whatever that is.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  Where could we use?
 
 * Maybe let committee decide if we want intern to make binary tree look-up using PSECT symbol addresses, so we can eliminate psect cache and wall-paper kludge.  All HolyC functions and glbl vars would have left-right for address search.
 
-* QEMU $LK,"tS",A="MN:tS"$ real-time-clock, slow Wenceslas.
-
-* Is "GrSetSymmetry" or "GrSymmetry" better?
-
 * DCF_TRANSFORMATION|DCF_SYMMETRY|DCF_JUST_MIRROR -- maybe not both needed at once.
 
 * DiskCache during FileRead. CTRL-ALT-C, $LK,"Kill",A="MN:Kill"$().  
-
-* Help Index no mention of Symmetry in $LK,"GrLine",A="MN:GrLine"$() $LK,"GrLine3",A="MN:GrLine3"$().
 
 * Get rid of BYTE WORD DWORD in opcode and replace with U8 U16 U32.
 
@@ -57,6 +56,10 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 * FlatTop is torpedo, not bombs.
 * BomberGolf is weird concept?
 
+* Maybe, 3x3 instead of 4x4 matrices. <sigh>
+
+* Get rid of text background color.
+
 * Make a game, S.E.T.I., with radio telescope array.  Put God on air. 
 
 * $LK,"Diff",A="MN:Diff"$() flags.
@@ -64,6 +67,8 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 * Backward SHIFT-F3 is broken
 
 * MOV U8 [RSP+RCX],DL
+
+* UAsm negative byte displacement, neg 32-bit disp.
 
 * Might want HeapLog x Cnt
 
@@ -83,7 +88,7 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
 * Might want to move kernel code out of low 2Meg.  Might be faster.
 
-* F2 Macro on TestSuite
+* Add F2 Macro on TestSuite
 
 * 4/13/14 Strut or RawHide crashed when sys_var_init_flag etc
 was set during testsuite.
@@ -103,9 +108,6 @@ Looks like task_flags,locked_flags cause problems with neg offset.
 ---------------------
 
 * 3/19/14: RESET during RawHide
-* 2013? Wenceslas in TestSuite crashes, long time ago
-
-* 12/26/13: Mountain in TestSuite didn't run right.  Turned yellow, did nothing.
 
 * FAQ frontloaded
 
@@ -124,13 +126,12 @@ COMPILER
 
 * ATA/ATAPI ID in VMware, when not booted to CD?  I forgot.
 
-* I use fixed-point in $LK,"Circle",A="MN:Circle"$(), $LK,"Ellipse",A="MN:Ellipse"$(), $LK,"GrRot",A="MN:GrRot"$(), $LK,"GrMulMat",A="MN:GrMulMat"$() and others.
+* I use fixed-point in $LK,"Circle",A="MN:Circle"$(), $LK,"Ellipse",A="MN:Ellipse"$(), $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$(), $LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$() and others.
 God says I might want to change to float. 
 $LK,"::/Demo/Lectures/FixedPoint.CPP"$.
 $LK,"::/Demo/Lectures/FixedPointAdvanced.CPP"$.
 
 * DOCF_DBL_DOLLARS in reindention
-* # in reindention
 
 * HexEdit with odd size, ASCII cannot be edited.
 
@@ -260,7 +261,7 @@ registry-like routines... or registry I guess.
 
 * New Editor widgets
 
-* Make use of flag potential in SysFilesFind and possibly CFileAccess
+* Make use of flag potential in $LK,"FilesFind",A="MN:FilesFind"$() and possibly $LK,"DirContextNew",A="MN:DirContextNew"$()
 * implement fixed pos files
 
 * new HolyC language features
@@ -271,7 +272,7 @@ registry-like routines... or registry I guess.
 * Move stuff out of Kernel module.
 
 * $LK,"ROP_XOR",A="MN:ROP_XOR"$ with pen_width>1 is broken.
-* RGB wrong in BMP files.
+* BGR wrong in BMP files.
 
 * use width and height in line clipping for pen_width>1 or blot.
 * SIMD transformation
@@ -287,7 +288,7 @@ registry-like routines... or registry I guess.
 * support r4u8 by adding 0x40 byte
 * static var off of data heap.
 * Might want to use U32*U32 multiplication.
-* could add "const" to not set LF_NOT_CONST flag for trig, etc.
+* could add "const" to not set CCF_NOT_CONST flag for trig, etc.
 * do r,rm ICCmp like ICBrCmp
 * could make glblvar imports use TY_RIP_DISP32.
 * PUSH_CMP allocs reg R9 or whatever
@@ -296,7 +297,7 @@ assignments.  Is ShiftNoPush fully implemented?
 * NOP1 might need to have diff ic_data's
 * in divequal, it assumes about ebx
 * error/warning line nums
-* ASM branch out warning of range off by 1 line--use lx->last_line_num
+* ASM branch out warning of range off by 1 line--use cc->last_line_num
 
 * Switch statement with sparse cases (low priority)
 * maybe inline functions?
@@ -310,76 +311,43 @@ assignments.  Is ShiftNoPush fully implemented?
 * sort options for findfiles
 * Maybe, get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.CPP,0x20000"$ in compiler.
 
+It is love I desire: $LK,"Hosea,6:6",A="BF:Hosea,6:6"$ $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
 
-$LK,"Hosea,6:6",A="BF:Hosea,6:6"$
+Offer a sacrifice of praise: $LK,"Hebrews,13:15",A="BF:Hebrews,13:15"$ $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
 
-$LK,"Hebrews,13:15",A="BF:Hebrews,13:15"$
+Do I drink blood of goats? Offer praise: $LK,"Psalms,50:14",A="BF:Psalms,50:14"$ $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
 
-$LK,"Psalms,50:14",A="BF:Psalms,50:14"$
+Runner's Stride: $LK,"Psalms,147:10",A="BF:Psalms,147:10"$ $TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
 
-
+Buckling Armor: $LK,"1 Kings,20:11",A="BF:1 Kings,20:11"$ $TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
 
 >lspci -v
 
+Size:$TX,"17594 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
+$TX,"Let me Google NIST Random Beacon",HTML="http://lmgtfy.com?q=NIST+random+beacon"$
 
-/*****************************************************************************/
-$WW,1$This is the transcript of a radio conversation of a US naval ship with Canadian authorities off the coast of Newfoundland in October, 1995. Radio conversation released by the Chief of Naval Operations 10-10-95.
+Commodore 64 Basic/Assembly
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/d8bZ92gIVms\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/d8bZ92gIVms\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
-                Americans: Please divert your course 15 degrees to the North to avoid a Collision.
-
-                Canadians: Recommend you divert YOUR course 15 degrees to the South to avoid a collision.
-
-                Americans: This is the Captain of a US Navy ship. I say again, divert YOUR course.
-
-                Canadians: No. I say again, you divert YOUR course.
-
-                Americans: This is the aircraft carrier USS Lincoln, the second largest ship in the United States' Atlantic fleet. We are accompanied by three destroyers, three cruisers and numerous support vessels. I demand that YOU change your course 15 degrees north, that's one five degrees north, or countermeasures will be undertaken to ensure the safety of this ship.
-
-                Canadians: This is a lighthouse. Your call.[2]
-$WW,0$/*****************************************************************************/
-
-
-
-/*****************************************************************************/
-char *words[10000]; //Single word list.  No statistical weights allowed.
-int i=0;
-
-while (true) {  
-  while (!keyboard_hit())
-    i++;
-  printf("%s ",words[i%10000]);
-}
-/*****************************************************************************/
-
-
-Size:$TX,"17784 KB",D="DD_TEMPLEOSCD_K_SIZE"$
-
-/************************** $TX,"Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon/"$ ********************************/
-$TX,"NIST Randomness Beacon",HTML="http://www.nist.gov/itl/csd/ct/nist_beacon.cfm"$ is a government certified random number.  You can call
-the caretaker on that page, Rene Peralta 301-975-8702, $TX,"rene.peralta@nist.gov",HTML="mailto:rene.peralta@nist.gov"$.
-Once every minute, they have a random lottery and post the results to their
-site.  You can go back and check old lottery numbers, by entering link+time.
-$TX,"https:/beacon.nist.gov/rest/record/1415440980",HTML="https:/beacon.nist.gov/rest/record/1415440980"$
-$TX,"https:/beacon.nist.gov/rest/record/1415445300",HTML="https:/beacon.nist.gov/rest/record/1415445300"$	To check old numbers, enter
-$TX,"https:/beacon.nist.gov/rest/record/1415529600",HTML="https:/beacon.nist.gov/rest/record/1415529600"$	Unix timestamp in the the URL.
-$TX,"https:/beacon.nist.gov/rest/record/1415531580",HTML="https:/beacon.nist.gov/rest/record/1415531580"$	(Seconds since 1-JAN-1970)
-$TX,"https:/beacon.nist.gov/rest/record/1415563680",HTML="https:/beacon.nist.gov/rest/record/1415563680"$	$TX,"Unix Timestamp Tool",HTML="http://www.epochconverter.com"$
-$TX,"https:/beacon.nist.gov/rest/record/1415565600",HTML="https:/beacon.nist.gov/rest/record/1415565600"$
-$TX,"https:/beacon.nist.gov/rest/record/1415566560",HTML="https:/beacon.nist.gov/rest/record/1415566560"$	They chain the numbers so they
-$TX,"https:/beacon.nist.gov/rest/record/1415568120",HTML="https:/beacon.nist.gov/rest/record/1415568120"$	cannot be tampered with.
-/*****************************************************************************/
+Bill Gates Predictions
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/4r9u_R0cCew\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/4r9u_R0cCew\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
 Cop tying shoe:  (After drive-by shooting, God said kid was not innocent, LOL.)
 $HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
 
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
+$TX,"My Bookmarks",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bookmarks"$
 $TX,"Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon/"$
 $TX,"Top 100 Movies",HTML="http://www.afi.com/100years/movies10.aspx"$
-$TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$
+$TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
+$TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
+$TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$
+$TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
 $TX,"KeyPeele#1",HTML="http://www.youtube.com/watch?v=Dd7FixvoKBw"$
 $TX,"KeyPeele#2",HTML="http://www.youtube.com/watch?v=VHG_Gv_zLY4"$
 $TX,"ThePrisoner",HTML="http://www.youtube.com/watch?v=HRPDO63rI1E"$
+$TX,"Bible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
 $TX,"WestWorld",HTML="http://www.youtube.com/watch?v=LcL3eP0Hfy4"$
 $TX,"Picard:FourLights",HTML="http://www.youtube.com/watch?v=o_eSwq1ewsU"$
 $TX,"Dwight:NerdTorture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
@@ -388,16 +356,9 @@ $TX,"Dumb Guards",HTML="http://www.youtube.com/watch?v=OdKa9bXVinE"$
 $TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
 Holy Grail: Lmq5PxHpLNw  1:28:27
 $TX,"ATA/ATAPI Spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
-$TX,"BBC",HTML="http://www.knpr.org/"$
+$TX,"BBC",HTML="http://www.knpr.org"$
+$TX,"BBC_News_24",HTML="http://www.wherever.tv/tv-channels/BBC-News-24.jsf"$
 $TX,"BBC_Five_Live",HTML="http://www.bbc.co.uk/radio/player/bbc_radio_five_live"$
-$TX,"KNPR",HTML="http://www.knpr.org/"$
+$TX,"KNPR",HTML="http://www.knpr.org"$
 $TX,"C64 Users Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$
 $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_programmers_reference/c64-programmers_reference.htm"$
-
-
-1) Strings, Opcode in Compiler
-2) FizzBuzz
-3) Negative displacements
-4) Multicore
-5) Preempt
-6) Graphics

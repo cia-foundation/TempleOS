@@ -1,6 +1,5 @@
 #help_index "Graphics/Misc"
 asm {
-USE64
 //************************************
 _GR_UPDATE_LINE64::
 	PUSH	RBP
@@ -398,9 +397,10 @@ _GR_ROP_EQU_U8_NO_CLIPPING::
 @@10:	POP	RBP
 	RET1	24
 }
-_extern _GR_ROP_EQU_U8_NO_CLIPPING U0 GrRopEquU8NoClipping(I64 ch,U8 *dst,I64 width_internal);
-//No clipping
-public _extern _IS_PIX_COVERED0 Bool IsPixCovered0(CTask *task,I64 x,I64 y);
+_extern _GR_ROP_EQU_U8_NO_CLIPPING U0 GrRopEquU8NoClipping(I64 ch,
+	U8 *dst,I64 width_internal);
+public _extern _IS_PIX_COVERED0 Bool IsPixCovered0(
+	CTask *task,I64 x,I64 y);//No clipping
 
 _extern _GR_UPDATE_LINE64 U0 GrUpdateLine64(
   U64 **_vga,U64 **_src,I64 d,U8 **_dst);

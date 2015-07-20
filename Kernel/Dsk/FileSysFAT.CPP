@@ -1,7 +1,7 @@
 U0 CDate2Dos(U16 *t,U16 *d,CDate cdt)
 {
   CDateStruct ds;
-  Date2Struct(&ds,cdt+local_time_offset);
+  Date2Struct(&ds,cdt);
   *d=ds.day_of_mon+(ds.mon+(ds.year-1980)<<4)<<5;
   *t=ds.sec>>1+(ds.min+ds.hour<<6)<<5;
 }
@@ -16,7 +16,7 @@ CDate Dos2CDate(U16 t,U16 d)
   ds.sec=(t&0x1F)*2; t=t>>5;
   ds.min=t&0x3F;
   ds.hour=t>>6;
-  return Struct2Date(&ds)-local_time_offset;
+  return Struct2Date(&ds);
 }
 
 U0 FAT32DrvInit(CDrv *dv)
@@ -30,7 +30,8 @@ U0 FAT32DrvInit(CDrv *dv)
     dv->file_system_info_sect=dv->base_offset+br32.file_system_info_sect;
     dv->map1=dv->base_offset+br32.reserved_sects;
     dv->map2=dv->map1+br32.sects_per_fat;
-    dv->data_area=dv->map2+br32.sects_per_fat-2*br32.sects_per_cluster; //Starts at Cluster 2
+    dv->data_area=dv->map2+br32.sects_per_fat
+	  -2*br32.sects_per_cluster; //Starts at Cluster 2
     dv->spc=br32.sects_per_cluster;
     dv->root_cluster=br32.root_cluster;
     DrvMapBlkAlloc(dv);
@@ -52,9 +53,9 @@ Bool FAT32DrvValidate(U8 drv_let)
   try {
     dv=Let2Drv(drv_let);
     if (dv->type==DVT_FAT32 &&
-	RBlks(dv,&br,dv->base_offset,1) &&
-	br.signature==0xAA55 &&
-	br.sects==dv->size)
+	  RBlks(dv,&br,dv->base_offset,1) &&
+	  br.signature==0xAA55 &&
+	  br.sects==dv->size)
       result=TRUE;
   } catch
     Fs->catch_except=TRUE;
@@ -90,7 +91,7 @@ U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
       br->sects_per_cluster=32;
     else
       br->sects_per_cluster=64;
- 
+
     br->reserved_sects=32;
     br->copies_of_fat=2;
     br->media_desc=0xF8;
@@ -110,13 +111,13 @@ U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
     fis->free_clusters=-1;
     fis->most_recently_alloced=0;
     fis->signature3=0xAA550000;
- 
+
     if (quick)
       i=br->reserved_sects+2*l+4*br->sects_per_cluster;
     else
       i=dv->size;
     WZeroBlks(dv,dv->base_offset,i);
- 
+
     WBlks(dv,fis,dv->base_offset+br->file_system_info_sect,1);
     WBlks(dv,br,dv->base_offset,1);
     FAT32DrvInit(dv);
@@ -227,7 +228,8 @@ Bool DirLongNameFill(CDirEntry *tempde,CFAT32DirEntryLong *de,I64 *xsum)
   return TRUE;
 }
 
-Bool FAT32CDirFill(CDirEntry *tempde,CFAT32DirEntry *de)
+Bool FAT32CDirFill(CDirEntry *tempde,
+	CFAT32DirEntry *de,CDate _local_time_offset)
 {
   Bool result;
   if (*tempde->name)
@@ -237,11 +239,12 @@ Bool FAT32CDirFill(CDirEntry *tempde,CFAT32DirEntry *de)
   tempde->cluster=de->cluster_lo+de->cluster_hi<<16;
   tempde->size=de->size;
   tempde->attr=de->attr;
-  tempde->datetime=Dos2CDate(de->WrtTime,de->WrtDate);
+  tempde->datetime=Dos2CDate(de->WrtTime,de->WrtDate)-_local_time_offset;
   return result;
 }
 
-Bool FAT32DirFill(CFAT32DirEntry *de,CDirEntry *tempde,I64 *_de_cnt=NULL)
+Bool FAT32DirFill(CFAT32DirEntry *de,
+	CDirEntry *tempde,I64 *_de_cnt,CDate _local_time_offset)
 {//Fill up to 3 entries and store cnt of entries.
   I64 de_cnt=0,i,l,xsum,ord;
   U8 *ptr,dname[16];
@@ -290,13 +293,15 @@ Bool FAT32DirFill(CFAT32DirEntry *de,CDirEntry *tempde,I64 *_de_cnt=NULL)
   de[de_cnt].attr=tempde->attr;
   if (!tempde->datetime)
     tempde->datetime=Now;
-  CDate2Dos(&de[de_cnt].WrtTime,&de[de_cnt].WrtDate,tempde->datetime);
+  CDate2Dos(&de[de_cnt].WrtTime,&de[de_cnt].WrtDate,
+	tempde->datetime+_local_time_offset);
   if (_de_cnt)
     *_de_cnt=de_cnt+1;
   return result;
 }
 
-Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 fuf_flags=0)
+Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,
+	U8 *name,CDirEntry *_result,I64 fuf_flags=0)
 {//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   Bool result=FALSE,unlock;
   CFAT32DirEntry *buf;
@@ -332,7 +337,8 @@ Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,CDirEntry *_result,I64 
 		MemSet(_result,0,sizeof(CDirEntry));
 	      if (!(fuf_flags&FUF_JUST_DIRS && !(attr & RS_ATTR_DIR)) &&
 		    !(fuf_flags&FUF_JUST_FILES && attr & RS_ATTR_DIR) &&
-		    FAT32CDirFill(_result,&buf[cur_dir_entry]) &&
+		    FAT32CDirFill(_result,&buf[cur_dir_entry],
+		    dv->fat32_local_time_offset) &&
 		    !StrCmp(dname,_result->name)) {
 		result=TRUE;
 		goto fff_done;
@@ -430,7 +436,7 @@ U0 FAT32FreeClusters(CDrv *dv,I64 c)
 	c=next;
       } while (0<c<0x0FFFFFF8);
       DrvMapBlkClean(dv,0);
- 
+
       c=saved_c;
       do {
 	DrvMapBlkSet(dv,c,1);
@@ -456,7 +462,7 @@ I64 FAT32AllocClusters(CDrv *dv,I64 c,I64 cnt)
 {
   Bool wrap_around=FALSE,unlock,unlock_break;
   I64 first=INVALID_CLUSTER,j,l;
- 
+
   if (cnt<=0) return 0x0FFFFFFF;
   try {
     unlock_break=BreakLock;
@@ -486,14 +492,14 @@ I64 FAT32AllocClusters(CDrv *dv,I64 c,I64 cnt)
       }
       c=j;
     }
- 
+
     if (0<c<l) {
       DrvMapBlkSet(dv,c);
       dv->cur_map_blk[c&(BLK_SIZE/4-1)]=0x0FFFFFFF;
       LBts(&dv->map_blk_dirty,0);
     }
     DrvMapBlkClean(dv);
- 
+
     dv->fis->most_recently_alloced=j;
     dv->fis->free_clusters=-1;
     WBlks(dv,dv->fis,dv->file_system_info_sect,1);
@@ -514,7 +520,7 @@ I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt)
 {
   I64 i,first=1;
   Bool cont,unlock,unlock_break;
- 
+
   if (cnt<=0) return 0x0FFFFFFF;
   try {
     unlock_break=BreakLock;
@@ -536,7 +542,7 @@ I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt)
 	first=first+i;
       else {
 	DrvMapBlkClean(dv);
- 
+
 	for (i=0;i<cnt;i++) {
 	  DrvMapBlkSet(dv,first+i,0);
 	  if (i+1==cnt)
@@ -546,7 +552,7 @@ I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt)
 	  LBts(&dv->map_blk_dirty,0);
 	}
 	DrvMapBlkClean(dv,0);
- 
+
 	for (i=0;i<cnt;i++) {
 	  DrvMapBlkSet(dv,first+i,1);
 	  if (i+1==cnt)
@@ -577,12 +583,12 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
 //See $LK,"::/Doc/CutCorners.TXT"$.
   CFAT32DirEntry *buf,*last_buf,*temp_buf,de[3];
   I64 i,attr,avail_cnt,de_cnt,c,
-      cur_dir_entry,entries_per_cluster,
-      cur_dir_cluster,xsum=0,last_dir_cluster=INVALID_CLUSTER;
+	cur_dir_entry,entries_per_cluster,
+	cur_dir_cluster,xsum=0,last_dir_cluster=INVALID_CLUSTER;
   U8 ch;
   Bool written=FALSE,unlock,unlock_break;
   CDirEntry long_name;
-  FAT32DirFill(&de,tempde,&de_cnt);
+  FAT32DirFill(&de,tempde,&de_cnt,dv->fat32_local_time_offset);
   MemSet(&long_name,0,sizeof(CDirEntry));
   try {
     unlock_break=BreakLock;
@@ -598,7 +604,8 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
       if (ch!=0xE5 && attr&RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
 	DirLongNameFill(&long_name,&buf[cur_dir_entry],&xsum);
       else {
-	avail_cnt=FAT32_ENTRIES_PER_BLK-cur_dir_entry & (FAT32_ENTRIES_PER_BLK-1);
+	avail_cnt=FAT32_ENTRIES_PER_BLK-cur_dir_entry
+	      &(FAT32_ENTRIES_PER_BLK-1);
 	for (i=0;i<avail_cnt;i++)
 	  if (*buf[cur_dir_entry+i].name!=0xE5) {
 	    if (*buf[cur_dir_entry+i].name)
@@ -608,8 +615,8 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
 	if (ch==0xE5 && !written && avail_cnt>=de_cnt) {
 	  MemCpy(&buf[cur_dir_entry],&de,de_cnt*sizeof(CFAT32DirEntry));
 	  WBlks(dv,&buf[cur_dir_entry & -FAT32_ENTRIES_PER_BLK],
-	      dv->data_area+cur_dir_cluster*dv->spc
-	      +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
+		dv->data_area+cur_dir_cluster*dv->spc
+		+cur_dir_entry>>FAT32_ENTRIES_BITS,1);
 	  cur_dir_entry+=de_cnt-1; //gets inc'ed
 	  written=TRUE;
 	} else if (ch!=0xE5 && !(attr&RS_ATTR_VOL_ID)) {
@@ -617,38 +624,40 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
 	    MemSet(&long_name,0,sizeof(CDirEntry));
 	  if (!*long_name.name)
 	    FATFromName(long_name.name,buf[cur_dir_entry].name);
-	    //Del old entry with same name
+//Del old entry with same name
 	  if (!StrCmp(long_name.name,tempde->name)) {
 	    if (free_old_chain)
 	      FAT32FreeClusters(dv,buf[cur_dir_entry].cluster_lo+
-		  buf[cur_dir_entry].cluster_hi<<16);
+		    buf[cur_dir_entry].cluster_hi<<16);
 	    if (!written) {
 	      MemCpy(&buf[cur_dir_entry],&de[de_cnt-1],sizeof(CFAT32DirEntry));
 	      WBlks(dv,&buf[cur_dir_entry & -FAT32_ENTRIES_PER_BLK],
-		  dv->data_area+cur_dir_cluster*dv->spc
-		  +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
+		    dv->data_area+cur_dir_cluster*dv->spc
+		    +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
 	      written=TRUE;
 	    } else {
 	      *buf[cur_dir_entry].name=0xE5;
 	      i=1;
 	      while (i<=cur_dir_entry &&
-		  buf[cur_dir_entry-i].attr&RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
+		    buf[cur_dir_entry-i].attr&RS_ATTR_LONG_NAME_MASK
+		    ==RS_ATTR_LONG_NAME)
 		*buf[cur_dir_entry-i++].name=0xE5;
 	      i--;
 	      WBlks(dv,&buf[(cur_dir_entry-i)&-FAT32_ENTRIES_PER_BLK],
-		  dv->data_area+cur_dir_cluster*dv->spc
-		  +(cur_dir_entry-i)>>FAT32_ENTRIES_BITS,
-		  (i+FAT32_ENTRIES_PER_BLK)>>FAT32_ENTRIES_BITS);
+		    dv->data_area+cur_dir_cluster*dv->spc
+		    +(cur_dir_entry-i)>>FAT32_ENTRIES_BITS,
+		    (i+FAT32_ENTRIES_PER_BLK)>>FAT32_ENTRIES_BITS);
 	      if (i==cur_dir_entry && 0<last_dir_cluster<0x0FFFFFF8) {
 		i=1;
 		while (i<=entries_per_cluster &&
-		    last_buf[entries_per_cluster-i].attr&RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
+		      last_buf[entries_per_cluster-i].attr
+		      &RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
 		  *last_buf[entries_per_cluster-i++].name=0xE5;
 		if (--i>0)
 		  WBlks(dv,&buf[(entries_per_cluster-i)&-FAT32_ENTRIES_PER_BLK],
-		      dv->data_area+last_dir_cluster*dv->spc
-		      +(entries_per_cluster-i)>>FAT32_ENTRIES_BITS,
-		      (i+FAT32_ENTRIES_PER_BLK-1)>>FAT32_ENTRIES_BITS);
+			dv->data_area+last_dir_cluster*dv->spc
+			+(entries_per_cluster-i)>>FAT32_ENTRIES_BITS,
+			(i+FAT32_ENTRIES_PER_BLK-1)>>FAT32_ENTRIES_BITS);
 	      }
 	    }
 	    break;
@@ -676,8 +685,8 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
 	for (i=0;i<avail_cnt;i++)
 	  *buf[cur_dir_entry+i].name=0xE5;
 	WBlks(dv,&buf[cur_dir_entry &-FAT32_ENTRIES_PER_BLK],
-	    dv->data_area+cur_dir_cluster*dv->spc
-	    +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
+	      dv->data_area+cur_dir_cluster*dv->spc
+	      +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
 	cur_dir_entry+=avail_cnt;
 	if (cur_dir_entry==entries_per_cluster) {
 	  last_dir_cluster=cur_dir_cluster;
@@ -690,8 +699,8 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
       }
       MemCpy(&buf[cur_dir_entry],&de,de_cnt*sizeof(CFAT32DirEntry));
       WBlks(dv,&buf[cur_dir_entry &-FAT32_ENTRIES_PER_BLK],
-	  dv->data_area+cur_dir_cluster*dv->spc+
-	  cur_dir_entry>>FAT32_ENTRIES_BITS,1);
+	    dv->data_area+cur_dir_cluster*dv->spc+
+	    cur_dir_entry>>FAT32_ENTRIES_BITS,1);
       cur_dir_entry+=de_cnt;
       if (cur_dir_entry==entries_per_cluster) {
 	cur_dir_cluster=ClustersAlloc(dv,cur_dir_cluster,1);
@@ -700,8 +709,8 @@ Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
       } else {
 	MemSet(&buf[cur_dir_entry],0,sizeof(CFAT32DirEntry));
 	WBlks(dv,&buf[cur_dir_entry &-FAT32_ENTRIES_PER_BLK],
-	    dv->data_area+cur_dir_cluster*dv->spc
-	    +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
+	      dv->data_area+cur_dir_cluster*dv->spc
+	      +cur_dir_entry>>FAT32_ENTRIES_BITS,1);
       }
     }
     Free(last_buf);
@@ -724,7 +733,7 @@ I64 FAT32FilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
 {
   CFAT32DirEntry *buf,*last_buf,*temp_buf;
   I64 i,result=0,attr,xsum=0,last_dir_cluster=INVALID_CLUSTER,
-    cur_dir_entry,entries_per_cluster,cur_dir_cluster;
+	cur_dir_entry,entries_per_cluster,cur_dir_cluster;
   U8 ch;
   Bool unlock_break;
   CDirEntry long_name;
@@ -745,7 +754,7 @@ I64 FAT32FilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
 	  DirLongNameFill(&long_name,&buf[cur_dir_entry],&xsum);
 	else {
 	  if (!(attr & RS_ATTR_VOL_ID) &&
-	  (del_dir || !(attr & RS_ATTR_DIR))) {
+		(del_dir || !(attr & RS_ATTR_DIR))) {
 	    if (xsum!=FATNameXSum(buf[cur_dir_entry].name))
 	      MemSet(&long_name,0,sizeof(CDirEntry));
 	    if (!*long_name.name)
@@ -757,26 +766,28 @@ I64 FAT32FilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
 	      *buf[cur_dir_entry].name=0xE5;
 	      i=1;
 	      while (i<=cur_dir_entry &&
-	      buf[cur_dir_entry-i].attr&RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
+		    buf[cur_dir_entry-i].attr&RS_ATTR_LONG_NAME_MASK
+		    ==RS_ATTR_LONG_NAME)
 		*buf[cur_dir_entry-i++].name=0xE5;
 	      i--;
 	      WBlks(dv,&buf[(cur_dir_entry-i)&-FAT32_ENTRIES_PER_BLK],
-	      dv->data_area+cur_dir_cluster*dv->spc
-	      +(cur_dir_entry-i)>>FAT32_ENTRIES_BITS,
-	      (i+FAT32_ENTRIES_PER_BLK)>>FAT32_ENTRIES_BITS);
+		    dv->data_area+cur_dir_cluster*dv->spc
+		    +(cur_dir_entry-i)>>FAT32_ENTRIES_BITS,
+		    (i+FAT32_ENTRIES_PER_BLK)>>FAT32_ENTRIES_BITS);
 	      if (i==cur_dir_entry && last_dir_cluster!=INVALID_CLUSTER) {
 		i=1;
 		while (i<=entries_per_cluster &&
-		last_buf[entries_per_cluster-i].attr&RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
+		      last_buf[entries_per_cluster-i].attr
+		      &RS_ATTR_LONG_NAME_MASK==RS_ATTR_LONG_NAME)
 		  *last_buf[entries_per_cluster-i++].name=0xE5;
 		if (--i>0)
 		  WBlks(dv,&buf[(entries_per_cluster-i)&-FAT32_ENTRIES_PER_BLK],
-		  dv->data_area+last_dir_cluster*dv->spc
-		  +(entries_per_cluster-i)>>FAT32_ENTRIES_BITS,
-		  (i+FAT32_ENTRIES_PER_BLK-1)>>FAT32_ENTRIES_BITS);
+			dv->data_area+last_dir_cluster*dv->spc
+			+(entries_per_cluster-i)>>FAT32_ENTRIES_BITS,
+			(i+FAT32_ENTRIES_PER_BLK-1)>>FAT32_ENTRIES_BITS);
 	      }
 	      FAT32FreeClusters(dv,buf[cur_dir_entry].cluster_lo+
-	      buf[cur_dir_entry].cluster_hi<<16);
+		    buf[cur_dir_entry].cluster_hi<<16);
 	    }
 	  }
 	  MemSet(&long_name,0,sizeof(CDirEntry));
@@ -837,12 +848,13 @@ I64 FAT32FileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   return c;
 }
 
-CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NULL,I64 *_dir_size=NULL)
+CDirEntry *FAT32FilesFind(U8 *files_find_mask,
+	I64 fuf_flags,CDirEntry *parent=NULL,I64 *_dir_size=NULL)
 {
   CDrv *dv=Fs->cur_dv;
   CFAT32DirEntry *buf;
   I64 attr,xsum=0,dir_size=0,sub_dir_size,
-  cur_dir_cluster,cur_dir_entry,entries_per_cluster;
+	cur_dir_cluster,cur_dir_entry,entries_per_cluster;
   U8 ch;
   CDirEntry *result=NULL,*tempde,long_name;
   if (fuf_flags&~FUG_FILES_FIND)
@@ -853,8 +865,8 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NU
     cur_dir_cluster=Name2DirCluster(dv,Fs->cur_dir);
     buf=MAlloc(BLK_SIZE*dv->spc);
     entries_per_cluster=dv->spc<<FAT32_ENTRIES_BITS;
-    RClusters(Fs->cur_dv,buf,cur_dir_cluster,1);
-    dir_size+=Fs->cur_dv->spc*BLK_SIZE;
+    RClusters(dv,buf,cur_dir_cluster,1);
+    dir_size+=dv->spc*BLK_SIZE;
     cur_dir_entry=0;
     while (ch=*buf[cur_dir_entry].name) {
       attr=buf[cur_dir_entry].attr;
@@ -868,22 +880,26 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NU
 	      MemCpy(tempde,&long_name,sizeof(CDirEntry));
 	    else
 	      MemSet(tempde,0,sizeof(CDirEntry));
-	    if (FAT32CDirFill(tempde,&buf[cur_dir_entry])) {
+	    if (FAT32CDirFill(tempde,&buf[cur_dir_entry],
+		  dv->fat32_local_time_offset)) {
 	      tempde->parent=parent;
-	      if (Bt(&fuf_flags,FUf_RECURSE) && attr&RS_ATTR_DIR && *tempde->name!='.') {
+	      if (Bt(&fuf_flags,FUf_RECURSE) && attr&RS_ATTR_DIR &&
+		    *tempde->name!='.') {
 		tempde->next=result;
 		result=tempde;
 		tempde->full_name=DirNameAbs(tempde->name);
 		DrvUnlock(dv);
 		if (Cd(tempde->name)) {
-		  tempde->sub=FAT32FilesFind(files_find_mask,fuf_flags,tempde,&sub_dir_size);
+		  tempde->sub=FAT32FilesFind(files_find_mask,fuf_flags,
+			tempde,&sub_dir_size);
 		  tempde->size=sub_dir_size;
 		  Cd("..");
 		}
 		DrvLock(dv);
 	      } else if ((attr&RS_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	      !(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' && attr&RS_ATTR_DIR) &&
-		FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
+		    !(Bt(&fuf_flags,FUf_RECURSE) &&
+		    *tempde->name=='.' && attr&RS_ATTR_DIR) &&
+		    FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
 		tempde->next=result;
 		result=tempde;
 		tempde->full_name=FileNameAbs(tempde->name);
@@ -902,7 +918,7 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NU
 	  break;
 	else {
 	  RClusters(dv,buf,cur_dir_cluster,1);
-	  dir_size+=Fs->cur_dv->spc*BLK_SIZE;
+	  dir_size+=dv->spc*BLK_SIZE;
 	  cur_dir_entry=0;
 	}
       }
@@ -919,12 +935,12 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,I64 fuf_flags,CDirEntry *parent=NU
 Bool FAT32MkDir(CDrv *dv,U8 *cur_dir,U8 *name)
 {
   I64 size=dv->spc<<BLK_SIZE_BITS,c,
-      cur_dir_cluster=Name2DirCluster(dv,cur_dir);
+	cur_dir_cluster=Name2DirCluster(dv,cur_dir);
   U8 *buf=CAlloc(size);
   CDirEntry d_native;
   CFAT32DirEntry *dFAT=buf;
   Bool unlock_break;
- 
+
   try {
     unlock_break=BreakLock;
     c=FileWrite(name,buf,size,0,RS_ATTR_DIR);
@@ -935,9 +951,9 @@ Bool FAT32MkDir(CDrv *dv,U8 *cur_dir,U8 *name)
     d_native.cluster=c;
     d_native.size=0;
     d_native.datetime=Now;
-    FAT32DirFill(dFAT,&d_native);
+    FAT32DirFill(dFAT,&d_native,NULL,dv->fat32_local_time_offset);
     dFAT++;
- 
+
     MemSet(&d_native,0,sizeof(CDirEntry));
     d_native.attr=RS_ATTR_DIR;
     *d_native.name='.';
@@ -946,7 +962,7 @@ Bool FAT32MkDir(CDrv *dv,U8 *cur_dir,U8 *name)
     d_native.cluster=cur_dir_cluster;
     d_native.size=0;
     d_native.datetime=Now;
-    FAT32DirFill(dFAT,&d_native);
+    FAT32DirFill(dFAT,&d_native,NULL,dv->fat32_local_time_offset);
     WClusters(dv,buf,c,1);
     Free(buf);
     if (unlock_break)

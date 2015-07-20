@@ -151,7 +151,8 @@ class CEdProject
 	hide;
 };
 
-Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html_link)
+Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
+	Bool *_quote,U8 **_html_link)
 {
   I64 i;
   CEdFileLink *e=CAlloc(sizeof(CEdFileLink));
@@ -160,7 +161,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
     e->num=1;
     switch (type) {
       case LK_FILE:
-	if (DocFormDo(e,,,,ctrl_L_footer)) {
+	if (DocForm(e,,,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
@@ -170,7 +171,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_PLAIN:
-	if (DocFormDo(e,,,,ctrl_L_footer)) {
+	if (DocForm(e,,,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
@@ -180,7 +181,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_FILE_ANCHOR:
-	if (DocFormDo(e,"CEdFileAnchorLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdFileAnchorLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
@@ -190,7 +191,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_FILE_FIND:
-	if (DocFormDo(e,"CEdFileFindLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdFileFindLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (e->num==1) {
 	    if (!*e->tag)
@@ -208,7 +209,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_PLAIN_FIND:
-	if (DocFormDo(e,"CEdFileFindLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdFileFindLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (e->num==1) {
 	    if (!*e->tag)
@@ -226,7 +227,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_FILE_LINE:
-	if (DocFormDo(e,"CEdFileLineLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdFileLineLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
@@ -236,7 +237,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_PLAIN_LINE:
-	if (DocFormDo(e,"CEdFileLineLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdFileLineLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
@@ -246,7 +247,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_MAN_PAGE:
-	if (DocFormDo(e,"CEdManPageLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdManPageLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
@@ -256,7 +257,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_PLACE_ANCHOR:
-	if (DocFormDo(e,"CEdPlaceAnchor",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdPlaceAnchor",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag) {
 	    if (e->hide)
@@ -271,7 +272,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
       case LK_BIBLE_FIND: //TODO
 	i=PopUpPickDefineSub("ST_BIBLE_BOOKS");
 	if (i>=0) {
-	  if (DocFormDo(e,"CEdBibleLink",,,ctrl_L_footer)) {
+	  if (DocForm(e,"CEdBibleLink",,,ctrl_L_footer)) {
 	    result=TRUE;
 	    if (!*e->tag)
 	      *_tag=MStrPrint("%Z,%s",i,"ST_BIBLE_BOOKS",e->aux);
@@ -283,7 +284,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	break;
       case LK_DEF:
 	e->num=-1;
-	if (DocFormDo(e,"CEdDefLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdDefLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
@@ -297,7 +298,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	}
 	break;
       case LK_HELP_INDEX:
-	if (DocFormDo(e,"CEdManPageLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdManPageLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
@@ -308,7 +309,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,Bool *_quote,U8 **_html
 	break;
       case LK_ADDR:
 	e->num=DFT_ADDR_LINK_BIN_SIZE;
-	if (DocFormDo(e,"CEdAddrLink",,,ctrl_L_footer)) {
+	if (DocForm(e,"CEdAddrLink",,,ctrl_L_footer)) {
 	  result=TRUE;
 	  if (e->num==DFT_ADDR_LINK_BIN_SIZE) {
 	    if (!*e->tag)
@@ -363,7 +364,8 @@ U0 EdInsLink()
 	  break;
 	default:
 	  if (html_link)
-	    st=MStrPrint("$$LK%s,\"%Q\",A=\"%Q\",HTML=\"%Q\"$$",pop_up_st,tag,link,html_link);
+	    st=MStrPrint("$$LK%s,\"%Q\",A=\"%Q\",HTML=\"%Q\"$$",
+		  pop_up_st,tag,link,html_link);
 	  else
 	    st=MStrPrint("$$LK%s,\"%Q\",A=\"%Q\"$$",pop_up_st,tag,link);
       }
@@ -442,7 +444,7 @@ U0 EdInsPageSetting()
   CEdPageSetting1 *e=CAlloc(sizeof(CEdPageSetting1));
   if (type>=0) {
     if (type==DOCT_RIGHT_MARGIN||type==DOCT_PAGE_LEN) {
-      if (DocFormDo(e(CEdPageSetting2 *))) {
+      if (DocForm(e(CEdPageSetting2 *))) {
 	if (e->winrel) {
 	  if (*e->val)
 	    "$$%Z+WR,%s$$",type,"ST_DOC_CMDS",e->val;
@@ -456,7 +458,7 @@ U0 EdInsPageSetting()
 	}
       }
     } else {
-      if (DocFormDo(e)) {
+      if (DocForm(e)) {
 	if (*e->val)
 	  "$$%Z,%s$$",type,"ST_DOC_CMDS",e->val;
 	else
@@ -506,18 +508,23 @@ class CEdDollarText
 	underline fmtstr "$$CB,\"Underline\"$$\n",
 	tree	  fmtstr "$$CB,\"Tree\"$$\n",
 	collapsed fmtstr "$$CB,\"Collapsed\"$$\n";
-  U8	scroll_x [512]	  fmtstr "$$DA-P,511,A=\"Scroll X Length Expression:%s\"$$\n",
-	shift_x  [512]	  fmtstr "$$DA-P,511,A=\"X Offset Expression       :%s\"$$\n",
-	shift_y  [512]	  fmtstr "$$DA-P,511,A=\"Y Offset Expression       :%s\"$$\n",
-	define_str[512]	  fmtstr "$$DA-P,511,A=\"Define Str                :%s\"$$\n",
-	html_link[512]	  fmtstr "$$DA-P,511,A=\"Html Link                 :%s\"$$\n";
+  U8	scroll_x [512]
+	fmtstr "$$DA-P,511,A=\"Scroll X Length Expression:%s\"$$\n",
+	shift_x  [512]
+	fmtstr "$$DA-P,511,A=\"X Offset Expression       :%s\"$$\n",
+	shift_y  [512]
+	fmtstr "$$DA-P,511,A=\"Y Offset Expression       :%s\"$$\n",
+	define_str[512]
+	fmtstr "$$DA-P,511,A=\"Define Str                :%s\"$$\n",
+	html_link[512]
+	fmtstr "$$DA-P,511,A=\"Html Link                 :%s\"$$\n";
 };
 
 U0 EdInsDollarText()
 {
   U8 *st,buf[512];
   CEdDollarText *e=CAlloc(sizeof(CEdDollarText));
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->left_x  )  CatPrint(buf,"+LX");
     if (e->center_x)  CatPrint(buf,"+CX");
@@ -561,7 +568,7 @@ class CEdSong
 U0 EdInsSong()
 {
   CEdSong *e=CAlloc(sizeof(CEdSong));
-  if (DocFormDo(e,,,,ctrl_L_footer))
+  if (DocForm(e,,,,ctrl_L_footer))
     "$$SO,\"%Q\",A=\"%s\"$$",e->tag,e->song;
   Free(e);
 }
@@ -574,7 +581,7 @@ class CEdHighlight
 U0 EdInsHighlight()
 {
   CEdHighlight *e=CAlloc(sizeof(CEdHighlight));
-  if (DocFormDo(e,,,,ctrl_L_footer))
+  if (DocForm(e,,,,ctrl_L_footer))
     "$$HL,%d$$",e->highlight_on;
   Free(e);
 }
@@ -587,16 +594,19 @@ class CEdHtmlCode
 U0 EdInsHtml()
 {
   CEdHtmlCode *e=CAlloc(sizeof(CEdHtmlCode));
-  if (DocFormDo(e,,,,ctrl_L_footer))
+  if (DocForm(e,,,,ctrl_L_footer))
     "$$HC,\"%Q\"$$",e->tag;
   Free(e);
 }
 
 class CEdMacroMenu
 {
-  U8	tag[512]	fmtstr "$$DA-P,511,A=\"Tag Text                  :%s\"$$\n",
-	left_macro[512]	fmtstr "$$DA-P,511,A=\"Left Click Macro          :%s\"$$\n",
-	left_exp[512]	fmtstr "$$DA-P,511,A=\"Left Click Expression     :%s\"$$\n";
+  U8	tag[512]
+	fmtstr "$$DA-P,511,A=\"Tag Text                  :%s\"$$\n",
+	left_macro[512]
+	fmtstr "$$DA-P,511,A=\"Left Click Macro          :%s\"$$\n",
+	left_exp[512]
+	fmtstr "$$DA-P,511,A=\"Left Click Expression     :%s\"$$\n";
   Bool	popup		fmtstr "$$CB,\"PopUp\"$$\n",
 	left_is_auto	fmtstr "$$CB,\"Left is AutoStr\"$$\n",
 	left_x		fmtstr "$$CB,\"Left X \"$$\n",
@@ -607,9 +617,12 @@ class CEdMacroMenu
 	invert		fmtstr "$$CB,\"Invert\"$$\n",
 	underline	fmtstr "$$CB,\"Underline\"$$\n",
 	escape		fmtstr "$$CB,\"Escape\"$$\n";
-  U8	scroll_x[512]	fmtstr "$$DA-P,511,A=\"Scroll X Length Expression:%s\"$$\n",
-	shift_x[512]	fmtstr "$$DA-P,511,A=\"X Offset Expression       :%s\"$$\n",
-	shift_y[512]	fmtstr "$$DA-P,511,A=\"Y Offset Expression       :%s\"$$\n";
+  U8	scroll_x[512]
+	fmtstr "$$DA-P,511,A=\"Scroll X Length Expression:%s\"$$\n",
+	shift_x[512]
+	fmtstr "$$DA-P,511,A=\"X Offset Expression       :%s\"$$\n",
+	shift_y[512]
+	fmtstr "$$DA-P,511,A=\"Y Offset Expression       :%s\"$$\n";
 };
 
 U0 EdInsMacroMenu(Bool is_macro)
@@ -618,7 +631,7 @@ U0 EdInsMacroMenu(Bool is_macro)
   CEdMacroMenu *e=CAlloc(sizeof(CEdMacroMenu));
   e->underline=TRUE;
   e->escape=TRUE;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->popup)	CatPrint(buf,"+PU-X");
     if (e->left_x  )	CatPrint(buf,"+LX");
@@ -682,7 +695,7 @@ U0 EdInsButton()
   U8 *st,buf[512];
   CEdButton *e=CAlloc(sizeof(CEdButton));
   e->escape=TRUE;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->popup)    CatPrint(buf,"+PU-X");
     if (e->left_x  ) CatPrint(buf,"+LX");
@@ -741,7 +754,7 @@ U0 EdInsCursorMovement()
 {
   U8 buf[512];
   CEdCursorMovement *e=CAlloc(sizeof(CEdCursorMovement));
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->left_x  ) CatPrint(buf,"+LX");
     if (e->center_x) CatPrint(buf,"+CX");
@@ -785,7 +798,7 @@ U0 EdInsData()
   e->term=TRUE;
   e->len=512;
   e->type=RT_I64;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->type==RT_I64)
       *raw_type=0;
@@ -815,7 +828,7 @@ U0 EdInsCheckBox()
   U8 *st,buf[512],raw_type[16];
   CEdCheckBox *e=CAlloc(sizeof(CEdCheckBox));
   e->type=RT_I8;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->type==RT_I8)
       *raw_type=0;
@@ -842,7 +855,7 @@ U0 EdInsLst()
   U8 *st1,*st2,buf[512],raw_type[16];
   CEdLst *e=CAlloc(sizeof(CEdLst));
   e->type=RT_I64;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (e->type==RT_I64)
       *raw_type=0;
@@ -879,7 +892,7 @@ U0 EdInsHexEd()
   e->cnt=128;
   e->cols=4;
   e->zero=TRUE;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (!e->zero)  CatPrint(buf,"-Z");
     if (e->refresh)  CatPrint(buf,"+RD");
@@ -903,18 +916,18 @@ U0 EdInsBinary(I64 bin_num,I64 type)
   StrPrint(e->tag,"<%d>",bin_num);
   e->bin_num=bin_num;
   e->bin_ptr_link_bin_num=1;
-  if (DocFormDo(e,,,
-"Note: Normally, you enter no file,\n"
-"just a bin num.  If You enter a\n"
-"file, enter a file bin num or a file\n"
-"bin tag.\n\n",ctrl_L_footer)) {
+  if (DocForm(e,,,
+	"Note: Normally, you enter no file,\n"
+	"just a bin num.  If You enter a\n"
+	"file, enter a file bin num or a file\n"
+	"bin tag.\n\n",ctrl_L_footer)) {
     if (*e->bin_ptr_link_file) {
       if (*e->bin_ptr_link_tag)
 	"$$%Z,\"%Q\",BI=%d,BP=\"%s,%s\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
-	  e->bin_ptr_link_file,e->bin_ptr_link_tag;
+	      e->bin_ptr_link_file,e->bin_ptr_link_tag;
       else
 	"$$%Z,\"%Q\",BI=%d,BP=\"%s,%d\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
-	  e->bin_ptr_link_file,e->bin_ptr_link_bin_num;
+	      e->bin_ptr_link_file,e->bin_ptr_link_bin_num;
     } else {
       if (DocBinFindNum(DocPut,e->bin_num))
 	"$$%Z,\"%Q\",BI=%d$$",type,"ST_DOC_CMDS",e->tag,e->bin_num;
@@ -938,12 +951,12 @@ U0 EdInsTree()
   CEdTree *e=CAlloc(sizeof(CEdTree));
   e->collapsed=TRUE;
   e->indent=2;
-  if (DocFormDo(e,,,,ctrl_L_footer)) {
+  if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
     if (!e->collapsed)	CatPrint(buf,"-C");
     st1=MStrPrint("%q",e->tag);
     st2=MStrPrint("$$TR%s,\"%Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
-      buf,st1,e->indent,-e->indent);
+	  buf,st1,e->indent,-e->indent);
     DocPrintAtomic(DocPut,"%s",st2);
     Free(st1);
     Free(st2);
@@ -1002,16 +1015,16 @@ U0 EdInsDollarCmd()
       break;
     case DOCT_HTML_CODE:
       EdInsHtml;
-   }
+  }
 }
 
-#define DVT_SPRITE		0
-#define DVT_SPRITE_PTR		1
-#define DVT_DUP_SPRITE		2
-#define DVT_SPRITE_SIZE		3
-#define DVT_SPRITE_MACRO		4
-#define DVT_SPRITE_MENU		5
-#define DVT_SPRITE_LINK		6
+#define EST_SPRITE		0
+#define EST_SPRITE_PTR		1
+#define EST_DUP_SPRITE		2
+#define EST_SPRITE_SIZE		3
+#define EST_SPRITE_MACRO		4
+#define EST_SPRITE_MENU		5
+#define EST_SPRITE_LINK		6
 
 I64 PopUpSpriteType()
 {
@@ -1019,13 +1032,13 @@ I64 PopUpSpriteType()
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Graphic Resource Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/Resource.TXT.Z\"$$\n"
-	"\n$$LTBLUE$$$$MU,\"Make Sprite\",LE=DVT_SPRITE$$\n"
-	"$$MU,\"Pointer to Sprite\",LE=DVT_SPRITE_PTR$$\n"
-	"$$MU,\"Duplicate Sprite\",LE=DVT_DUP_SPRITE$$\n"
-	"$$MU,\"Sprite Size (not really needed)\",LE=DVT_SPRITE_SIZE$$\n"
-	"$$MU,\"Sprite Macro (Icon)\",LE=DVT_SPRITE_MACRO$$\n"
-	"$$MU,\"Sprite Menu Item\",LE=DVT_SPRITE_MENU$$\n"
-	"$$MU,\"Sprite Link\",LE=DVT_SPRITE_LINK$$\n"
+	"\n$$LTBLUE$$$$MU,\"Make Sprite\",LE=EST_SPRITE$$\n"
+	"$$MU,\"Pointer to Sprite\",LE=EST_SPRITE_PTR$$\n"
+	"$$MU,\"Duplicate Sprite\",LE=EST_DUP_SPRITE$$\n"
+	"$$MU,\"Sprite Size (not really needed)\",LE=EST_SPRITE_SIZE$$\n"
+	"$$MU,\"Sprite Macro (Icon)\",LE=EST_SPRITE_MACRO$$\n"
+	"$$MU,\"Sprite Menu Item\",LE=EST_SPRITE_MENU$$\n"
+	"$$MU,\"Sprite Link\",LE=EST_SPRITE_LINK$$\n"
 	"\n$$MU,\"Abort\",LE=DOCM_CANCEL$$\n\n");
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -1074,14 +1087,14 @@ U8 *EdSprite(I64 bin_num)
   CEdMacroSprite *e=CAlloc(sizeof(CEdMacroSprite));
   *buf=0;
   switch (type) {
-    case DVT_SPRITE:
+    case EST_SPRITE:
       StrPrint(e->tag,"<%d>",bin_num);
-      if (DocFormDo(e,"CEdJustSprite",,,ctrl_L_footer))
+      if (DocForm(e,"CEdJustSprite",,,ctrl_L_footer))
 	st1=MStrPrint("\"%Q\"",e->tag);
       break;
-    case DVT_SPRITE_MACRO:
+    case EST_SPRITE_MACRO:
       e->escape=TRUE;
-      if (DocFormDo(e,,,,ctrl_L_footer)) {
+      if (DocForm(e,,,,ctrl_L_footer)) {
 	CatPrint(buf,"+UL");
 	if (e->is_auto)CatPrint(buf,"+LA");
 	if (e->popup)	CatPrint(buf,"+PU");
@@ -1091,26 +1104,26 @@ U8 *EdSprite(I64 bin_num)
 	Free(st);
       }
       break;
-    case DVT_SPRITE_MENU:
+    case EST_SPRITE_MENU:
       e->escape=TRUE;
-      if (DocFormDo(e,"CEdMenuSprite",,,ctrl_L_footer)) {
+      if (DocForm(e,"CEdMenuSprite",,,ctrl_L_footer)) {
 	if (e->escape)	CatPrint(buf,"+X");
 	st1=MStrPrint("\"%Q\",LE=%s",e->tag,e->exp);
       }
       break;
-    case DVT_SPRITE_LINK:
+    case EST_SPRITE_LINK:
       CatPrint(buf,"+L");
       st1=EdSpriteLink(&pop_up,&html_link);
       if (pop_up)
 	CatPrint(buf,"+PU");
       break;
-    case DVT_SPRITE_PTR:
+    case EST_SPRITE_PTR:
       EdInsBinary(--bin_num,DOCT_INS_BINARY);
       break;
-    case DVT_SPRITE_SIZE:
+    case EST_SPRITE_SIZE:
       EdInsBinary(--bin_num,DOCT_INS_BINARY_SIZE);
       break;
-    case DVT_DUP_SPRITE:
+    case EST_DUP_SPRITE:
       EdInsBinary(--bin_num,DOCT_SPRITE);
       break;
   }

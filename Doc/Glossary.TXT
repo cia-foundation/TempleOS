@@ -16,6 +16,7 @@ $FG,2$Aux$FG$	Auxilliary
 $FG,2$BG$FG$	Backround
 $FG,2$Bin$FG$	Binary
 $FG,2$Blk$FG$	Block
+$FG,2$Bmp$FG$	BitMap
 $FG,2$BSP$FG$	Boot-strap Processor(CPU#0)
 $FG,2$Buf$FG$	Buffer
 $FG,2$Bwd$FG$	Backward
@@ -91,6 +92,7 @@ $FG,2$Pix$FG$	Pixel
 $FG,2$$FG,2$Pkg$FG$	Package
 $FG,2$Poly$FG$	Polygon
 $FG,2$Pos$FG$	Position
+$FG,2$Pow$FG$	Power
 $FG,2$Prec$FG$	Precedence
 $FG,2$Pri$FG$	Primary
 $FG,2$Prod$FG$	Product, Production
@@ -122,11 +124,13 @@ $FG,2$Std$FG$	Standard
 $FG,2$Stk$FG$	Stack
 $FG,2$Str$FG$	String
 $FG,2$Sym$FG$	Symbol
+$FG,2$Sync$FG$	Synchronization
 $FG,2$Sys$FG$	System
+$FG,2$Tbl$FG$	Table
 $FG,2$Term$FG$	Terminal
 $FG,2$Tri$FG$	Triangle
 $FG,2$Tx$FG$	Transmit
-$FG,2$Uasm$FG$	Unassemble
+$FG,2$UAsm$FG$	Unassemble
 $FG,2$Val$FG$	Value
 $FG,2$Var$FG$	Variable
 $FG,2$Vect$FG$	Vector

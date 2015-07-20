@@ -100,7 +100,8 @@ U0 PsmRightClick(I64 x,I64 y)
 	      Free(st);
 	    } else
 	      tempo->word=StrNew(" ");
-	    if (DocPut) DocPut->flags=DocPut->flags&~DOCF_FORM|old_doc_flags&DOCF_FORM;
+	    if (DocPut) DocPut->flags=DocPut->flags&
+		    ~DOCF_FORM|old_doc_flags&DOCF_FORM;
 	  }
 	  break;
 	case PSMR_INS_NOTE:
@@ -115,7 +116,8 @@ U0 PsmRightClick(I64 x,I64 y)
       }
     }
     PsmSetWidth(oc.cur_note);
-    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
+    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	  -WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
   }
 }
 
@@ -320,31 +322,28 @@ class PsmKey
 #define PSM_B_W	8
 #define PSM_B_H	20
 
-PsmKey psm_kbd[PSM_NUM_KEYS]=
-{
+PsmKey psm_kbd[PSM_NUM_KEYS]={
+  { 2*PSM_W_W-4,PSM_B_W,PSM_B_H,'e' },
+  { 3*PSM_W_W-4,PSM_B_W,PSM_B_H,'r' },
+  { 4*PSM_W_W-4,PSM_B_W,PSM_B_H,'t' },
+  { 6*PSM_W_W-4,PSM_B_W,PSM_B_H,'u' },
+  { 7*PSM_W_W-4,PSM_B_W,PSM_B_H,'i' },
+  { 9*PSM_W_W-4,PSM_B_W,PSM_B_H,'p' },
+  {10*PSM_W_W-4,PSM_B_W,PSM_B_H,'[' },
+  {11*PSM_W_W-4,PSM_B_W,PSM_B_H,']' },
 
-{ 2*PSM_W_W-4,PSM_B_W,PSM_B_H,'e' },
-{ 3*PSM_W_W-4,PSM_B_W,PSM_B_H,'r' },
-{ 4*PSM_W_W-4,PSM_B_W,PSM_B_H,'t' },
-{ 6*PSM_W_W-4,PSM_B_W,PSM_B_H,'u' },
-{ 7*PSM_W_W-4,PSM_B_W,PSM_B_H,'i' },
-{ 9*PSM_W_W-4,PSM_B_W,PSM_B_H,'p' },
-{10*PSM_W_W-4,PSM_B_W,PSM_B_H,'[' },
-{11*PSM_W_W-4,PSM_B_W,PSM_B_H,']' },
-
-{ 0*PSM_W_W,PSM_W_W,PSM_W_H,'a' },
-{ 1*PSM_W_W,PSM_W_W,PSM_W_H,'s' },
-{ 2*PSM_W_W,PSM_W_W,PSM_W_H,'d' },
-{ 3*PSM_W_W,PSM_W_W,PSM_W_H,'f' },
-{ 4*PSM_W_W,PSM_W_W,PSM_W_H,'g' },
-{ 5*PSM_W_W,PSM_W_W,PSM_W_H,'h' },
-{ 6*PSM_W_W,PSM_W_W,PSM_W_H,'j' },
-{ 7*PSM_W_W,PSM_W_W,PSM_W_H,'k' },
-{ 8*PSM_W_W,PSM_W_W,PSM_W_H,'l' },
-{ 9*PSM_W_W,PSM_W_W,PSM_W_H,';' },
-{10*PSM_W_W,PSM_W_W,PSM_W_H,'\'' },
-{11*PSM_W_W,PSM_W_W,PSM_W_H,'\n'},
-
+  { 0*PSM_W_W,PSM_W_W,PSM_W_H,'a' },
+  { 1*PSM_W_W,PSM_W_W,PSM_W_H,'s' },
+  { 2*PSM_W_W,PSM_W_W,PSM_W_H,'d' },
+  { 3*PSM_W_W,PSM_W_W,PSM_W_H,'f' },
+  { 4*PSM_W_W,PSM_W_W,PSM_W_H,'g' },
+  { 5*PSM_W_W,PSM_W_W,PSM_W_H,'h' },
+  { 6*PSM_W_W,PSM_W_W,PSM_W_H,'j' },
+  { 7*PSM_W_W,PSM_W_W,PSM_W_H,'k' },
+  { 8*PSM_W_W,PSM_W_W,PSM_W_H,'l' },
+  { 9*PSM_W_W,PSM_W_W,PSM_W_H,';' },
+  {10*PSM_W_W,PSM_W_W,PSM_W_H,'\'' },
+  {11*PSM_W_W,PSM_W_W,PSM_W_H,'\n'},
 };
 
 U0 PsmDownKey(I64 x,I64 y)
@@ -383,7 +382,8 @@ U0 PsmUpKey(I64 x,I64 y)
 
 U0 PsmPushMode(I64 psm_octave)
 {
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
   PsmMenu(psm_octave);
 }
 
@@ -413,7 +413,7 @@ U0 Psalmody(U8 *dirname=NULL)
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinBorder;
   AutoComplete;
-  Preempt(OFF);
+  Preempt;
 
   MkDir("::/Home/Psalmody");
   MusicSettingsRst;
@@ -489,10 +489,12 @@ U0 Psalmody(U8 *dirname=NULL)
       was_playing=FALSE;
 mo_start:
       if (ip.pos_text.y-Fs->win_top<18)
-	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|
+	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
+	      1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|
 	      1<<MSG_IP_MOVE|1<<MSG_CMD);
       else
-	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|1<<MSG_IP_MOVE|1<<MSG_CMD);
+	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
+	      1<<MSG_IP_MOVE|1<<MSG_CMD);
 mo_got_msg:
       if (msg_code==MSG_KEY_DOWN && a1==CH_SPACE && !a2) {
 //The Window Mgr sets the Doc cur_entry to a button
@@ -640,7 +642,7 @@ mo_got_msg:
 		break;
 	      case CH_CTRLO:
 		PsmPopMode;
-		AcctOneTimePopUp(ARf_PSALMODY_JUKEBOX,
+		RegOneTimePopUp(ARf_PSALMODY_JUKEBOX,
 		      "Select a song and preview it.\n"
 		      "$$GREEN$$<SHIFT-ESC>$$FG$$ to load it into Psalmody.\n\n"
 		      ST_WARN_ST " Graphics and other embelishments\n"
@@ -702,15 +704,18 @@ mo_got_msg:
 		  if (tempo->type!=PSMT_METER) {
 		    timeout_val=cnts.jiffies;
 		    if (ip.pos_text.y-Fs->win_top<18)
-		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP|1<<MSG_CMD);
+		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|
+			    1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP|1<<MSG_CMD);
 		    else
-		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_CMD);
+		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|
+			    1<<MSG_IP_L_DOWN|1<<MSG_CMD);
 		    if (msg_code) {
 		      f=0;
 		      psm_play_f=0;
 		      oc.playing=FALSE;
 		      was_playing=TRUE;
-		      if (ip.pos_text.y-Fs->win_top>=18 && msg_code==MSG_IP_L_DOWN)
+		      if (ip.pos_text.y-Fs->win_top>=18 &&
+			    msg_code==MSG_IP_L_DOWN)
 			goto mo_start;
 		      else
 			goto mo_got_msg;
@@ -731,7 +736,8 @@ mo_got_msg:
 		      psm_play_f=0;
 
 		    music.tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
-		    music.stacatto_factor=0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
+		    music.stacatto_factor=
+			  0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
 		    d=JIFFY_FREQ*psm_durations[tempo->duration]/music.tempo;
 		    if (Bt(&tempo->flags,PSMf_TIE)) {
 		      timeout_val+=d;
@@ -801,7 +807,8 @@ mo_got_msg:
 	  if (a2>18*FONT_HEIGHT)
 	    Fs->win_inhibit=WIG_USER_TASK_DFT;
 	  else
-	    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
+	    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER
+		  -WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
 	  break;
 	case MSG_IP_L_DOWN:
 	  PsmDownKey(a1,a2);
@@ -829,7 +836,8 @@ mo_got_msg:
 	    music.tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
 	    music.stacatto_factor=0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
 
-	    tempo->duration=PsmCvtDuration(music.tempo*(evt_time-note_down_time));
+	    tempo->duration=PsmCvtDuration(
+		  music.tempo*(evt_time-note_down_time));
 	    PsmSetWidth(tempo);
 	    QueIns(tempo,oc.cur_note->last);
 	  }

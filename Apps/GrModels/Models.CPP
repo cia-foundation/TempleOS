@@ -11,7 +11,7 @@ U0 Models()
   "\n\n$$BT,\"Man\",LE=T_MAN$$\n\n";
   "\n\n$$BT,\"Ball\",LE=T_BALL$$\n\n";
   "$$LM,0$$";
-  i=DocMenuDo(DocPut);
+  i=DocMenu(DocPut);
   LBEqu(&(DocPut)->flags,DOCf_FORM,old_form);
   DocBottom;
   switch (i) {

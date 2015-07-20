@@ -16,7 +16,8 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 	return;
       } else {
 	first=FALSE;
-	if (!(tempex=HashFind(st_ptr,Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM))) {
+	if (!(tempex=HashFind(st_ptr,
+	      Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM))) {
 	  if (!(ld_flags & LDF_SILENT))
 	    "Unresolved Reference:%s\n",st_ptr;
 	  tempiss=CAlloc(sizeof(CHashImport));
@@ -37,14 +38,14 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
       else
 	i=tempex->val;
       switch (etype) {
-	case EIT_REL_I8:  *ptr2(U8 *) =i-ptr2-1; break;
-	case EIT_IMM_U8:  *ptr2(U8 *) =i;  break;
-	case EIT_REL_I16: *ptr2(U16 *)=i-ptr2-2; break;
-	case EIT_IMM_U16: *ptr2(U16 *)=i; break;
-	case EIT_REL_I32: *ptr2(U32 *)=i-ptr2-4; break;
-	case EIT_IMM_U32: *ptr2(U32 *)=i; break;
-	case EIT_REL_I64: *ptr2(I64 *)=i-ptr2-8; break;
-	case EIT_IMM_I64: *ptr2(I64 *)=i; break;
+	case IET_REL_I8:  *ptr2(U8 *) =i-ptr2-1; break;
+	case IET_IMM_U8:  *ptr2(U8 *) =i;  break;
+	case IET_REL_I16: *ptr2(U16 *)=i-ptr2-2; break;
+	case IET_IMM_U16: *ptr2(U16 *)=i; break;
+	case IET_REL_I32: *ptr2(U32 *)=i-ptr2-4; break;
+	case IET_IMM_U32: *ptr2(U32 *)=i; break;
+	case IET_REL_I64: *ptr2(I64 *)=i-ptr2-8; break;
+	case IET_IMM_I64: *ptr2(I64 *)=i; break;
       }
     }
   }
@@ -55,7 +56,8 @@ U0 SysSymImportsResolve(U8 *st_ptr,I64 ld_flags)
 {
   CHashImport *tempiss;
   U8 *ptr;
-  while (tempiss=HashSingleTableFind(st_ptr,Fs->hash_table,HTT_IMPORT_SYS_SYM)) {
+  while (tempiss=HashSingleTableFind(st_ptr,
+	Fs->hash_table,HTT_IMPORT_SYS_SYM)) {
     ptr=tempiss->module_header_entry;
     LoadOneImport(&ptr,tempiss->module_base,ld_flags);
     tempiss->type=HTT_INVALID;
@@ -72,25 +74,25 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
     st_ptr=src;
     src+=StrLen(st_ptr)+1;
     switch (etype) {
-      case EIT_REL32_EXPORT:
-      case EIT_IMM32_EXPORT:
-      case EIT_REL64_EXPORT:
-      case EIT_IMM64_EXPORT:
+      case IET_REL32_EXPORT:
+      case IET_IMM32_EXPORT:
+      case IET_REL64_EXPORT:
+      case IET_IMM64_EXPORT:
 	tempex=CAlloc(sizeof(CHashExport));
 	tempex->str=StrNew(st_ptr);
 	tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
-	if (etype==EIT_IMM32_EXPORT||etype==EIT_IMM64_EXPORT)
+	if (etype==IET_IMM32_EXPORT||etype==IET_IMM64_EXPORT)
 	  tempex->val=i;
 	else
 	  tempex->val=i+module_base;
 	HashAdd(tempex,Fs->hash_table);
 	SysSymImportsResolve(st_ptr,ld_flags);
 	break;
-      case EIT_REL_I0...EIT_IMM_I64:
+      case IET_REL_I0...IET_IMM_I64:
 	src=st_ptr-5;
 	LoadOneImport(&src,module_base,ld_flags);
 	break;
-      case EIT_ABS_ADDR:
+      case IET_ABS_ADDR:
 	if (ld_flags & LDF_NO_ABSS)
 	  src+=i*sizeof(U32);
 	else {
@@ -103,10 +105,10 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	break;
 
       sub_switch_start:
-	case EIT_CODE_HEAP:
+	case IET_CODE_HEAP:
 	  ptr3=MAlloc(*src(I32 *)++,Fs->code_heap);
 	  break;
-	case EIT_ZEROED_CODE_HEAP:
+	case IET_ZEROED_CODE_HEAP:
 	  ptr3=CAlloc(*src(I32 *)++,Fs->code_heap);
 	  break;
       sub_switch_end:
@@ -125,10 +127,10 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	break;
 
       sub_switch_start:
-	case EIT_DATA_HEAP:
+	case IET_DATA_HEAP:
 	  ptr3=MAlloc(*src(I64 *)++);
 	  break;
-	case EIT_ZEROED_DATA_HEAP:
+	case IET_ZEROED_DATA_HEAP:
 	  ptr3=CAlloc(*src(I64 *)++);
 	  break;
       sub_switch_end:
@@ -158,18 +160,18 @@ U0 LoadPass2(U8 *src,U8 *module_base,I64)
     st_ptr=src;
     src+=StrLen(st_ptr)+1;
     switch (etype) {
-      case EIT_MAIN:
+      case IET_MAIN:
 	Call(i+module_base);
 	break;
-      case EIT_ABS_ADDR:
+      case IET_ABS_ADDR:
 	src+=sizeof(U32)*i;
 	break;
-      case EIT_CODE_HEAP:
-      case EIT_ZEROED_CODE_HEAP:
+      case IET_CODE_HEAP:
+      case IET_ZEROED_CODE_HEAP:
 	src+=4+sizeof(U32)*i;
 	break;
-      case EIT_DATA_HEAP:
-      case EIT_ZEROED_DATA_HEAP:
+      case IET_DATA_HEAP:
+      case IET_ZEROED_DATA_HEAP:
 	src+=8+sizeof(U32)*i;
 	break;
     }
@@ -189,7 +191,7 @@ CBinFile *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR)
     return NULL;
   }
 
-  //See $LK,"Patch Table Generation",A="FF:::/Compiler/CMain.CPP,EIT_ABS_ADDR"$
+  //See $LK,"Patch Table Generation",A="FF:::/Compiler/CMain.CPP,IET_ABS_ADDR"$
   module_align=1<<bfh->module_align_bits;
   if (!module_align || bfh->bin_signature!=BIN_SIGNATURE_VAL) {
     Free(bfh);
@@ -218,7 +220,7 @@ CBinFile *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR)
   MemCpy(bfh_addr,bfh,size);
   Free(bfh);
 
-lo_skip:
+  lo_skip:
   module_base=bfh_addr(U8 *)+sizeof(CBinFile);
 
   absname=FileNameAbs(fbuf);
@@ -237,11 +239,12 @@ lo_skip:
 
 U0 LoadKernel()
 {
-  HashGenericAdd(KERNEL_MODULE_NAME,HTT_MODULE|HTF_PUBLIC,sys_boot_base-sizeof(CBinFile));
+  HashGenericAdd(KERNEL_MODULE_NAME,HTT_MODULE|HTF_PUBLIC,
+	sys_boot_base-sizeof(CBinFile));
 
-//Abs patches done here $LK,"CPatchTableAbsAddr",A="FF:D:/Kernel/KStart.CPP,CPatchTableAbsAddr"$.
+  //Abs patches done here $LK,"CPatchTableAbsAddr",A="FF:D:/Kernel/KStart.CPP,CPatchTableAbsAddr"$.
   LoadPass1(sys_boot_patch_table_base,sys_boot_base,LDF_NO_ABSS|LDF_SILENT);
 
-//No main routines
-//  LoadPass2(sys_boot_patch_table_base,sys_boot_base,0);
+  //No main routines
+  //  LoadPass2(sys_boot_patch_table_base,sys_boot_base,0);
 }

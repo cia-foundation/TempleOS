@@ -6,7 +6,7 @@ U0 PromptDemo()
   CDate cdt;
 
   "\n\nNow prompting from the cmd line.\n\n"
-  "$$GREEN$$<ENTER>$$FG$$ keeps default.\n\n";
+	"$$GREEN$$<ENTER>$$FG$$ keeps default.\n\n";
 
   i=GetI64("Enter int expression(%d):",123);
   "Int=%d\n",i;

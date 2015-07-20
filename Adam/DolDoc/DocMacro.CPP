@@ -1,6 +1,6 @@
 #help_index "DolDoc/Misc"
 
-U8 captured_macro_name[136];
+U8 captured_macro_name[STR_LEN];
 StrCpy(captured_macro_name,"Test");
 
 I64 sys_macro_repeat_n=1;
@@ -12,11 +12,11 @@ U0 SysMacroStripKey(CSrvCmd *macro_root,I64 a1,I64 a2)
   while (tempc!=macro_root) {
     tempc1=tempc->next;
     if (tempc->cmd_code==SVCT_MSG &&
-	(tempc->msg_code==MSG_KEY_DOWN ||
-	 tempc->msg_code==MSG_KEY_UP ||
-	 tempc->msg_code==MSG_KEY_DOWN_UP) &&
-	 a1 && tempc->aux1==a1 ||
-	!a1 && tempc->aux2==a2) {
+	  (tempc->msg_code==MSG_KEY_DOWN ||
+	  tempc->msg_code==MSG_KEY_UP ||
+	  tempc->msg_code==MSG_KEY_DOWN_UP) &&
+	  a1 && tempc->aux1==a1 ||
+	  !a1 && tempc->aux2==a2) {
       QueRem(tempc);
       SrvCmdDel(tempc);
     }
@@ -32,14 +32,14 @@ class CMacroTemp
 {
   CMacroTemp *next,*last;
   I64 type;
-  U8 buf[136];
+  U8 buf[STR_LEN];
 };
 
 CMacroTemp *Cmd2MT(CSrvCmd *tempc)
 {
   U8 buf[8];
   CMacroTemp *tempmt=CAlloc(sizeof(CMacroTemp));
-  if (Bt(chars_bitmap_getkey,tempc->aux1) && tempc->msg_code==MSG_KEY_DOWN) {
+  if (Bt(chars_bmp_macro,tempc->aux1) && tempc->msg_code==MSG_KEY_DOWN) {
     tempmt->type=MT_CHAR;
     buf[0]=tempc->aux1;
     buf[1]=0;
@@ -47,7 +47,7 @@ CMacroTemp *Cmd2MT(CSrvCmd *tempc)
   } else {
     tempmt->type=MT_MSG;
     StrPrint(tempmt->buf,"Msg(0x%X,0x%X,0x%X);",
-      tempc->msg_code,tempc->aux1,tempc->aux2);
+	  tempc->msg_code,tempc->aux1,tempc->aux2);
   }
   return tempmt;
 }
@@ -58,7 +58,7 @@ U8 *SysMacro2Str(CSrvCmd *macro_root)
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
   CMacroTemp *tempmt,*tempmt1,root;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
 
   QueInit(&root);
@@ -113,7 +113,7 @@ U0 PlaySysMacro(I64 n=1)
   U8 *m;
   if (TaskValidate(task)) {
     LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
-    old_preempt=Preempt(OFF);
+    old_preempt=Preempt;
     m=SysMacro2Str(&sys_macro_root);
     while (n-- && TaskValidate(task)) {
       if (task==Fs)
@@ -128,11 +128,11 @@ U0 PlaySysMacro(I64 n=1)
 
 U0 EdInsCapturedMacro()
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   U8 *st=SysMacro2Str(&sys_macro_root);
   if (sys_focus_task) {
     XTalk(sys_focus_task,"$$MA+LA,T=\"%s\",LM=\"%Q\"$$",
-	captured_macro_name,st);
+	  captured_macro_name,st);
     Free(st);
   }
   Preempt(old_preempt);
@@ -147,10 +147,10 @@ U0 EdInsCapturedMacro()
 I64 PopUpMacroMenu()
 {
   I64 result=0;
-  U8 buf[136];
+  U8 buf[STR_LEN];
   CSrvCmd *tempc;
   CDoc *doc=DocNew;
-  CDocEntry *doc_e=DocPrint(doc,"$$DA-P,135,A=\"Name:%%s\"$$");
+  CDocEntry *doc_e=DocPrint(doc,"$$DA-P,STR_LEN-1,A=\"Name:%%s\"$$");
   doc_e->data=captured_macro_name;
   DocDataFmt(doc,doc_e);
 
@@ -167,13 +167,13 @@ I64 PopUpMacroMenu()
 	"$$CM+LX,17,0$$$$BT,\"CANCEL\",LE=DOCM_CANCEL$$"
 	"\n\n\n$$GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
-  StrPrint(buf,"DocMenuDo(%d);",doc);
+  StrPrint(buf,"DocMenu(%d);",doc);
   sys_macro_util_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_util_task;
   LBts(&sys_macro_util_task->display_flags,DISPLAYf_WIN_ON_TOP);
   tempc=TaskExe(sys_macro_util_task,Fs,buf,
-      1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-  ScanResult(tempc,&result);
+	1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+  JobResultScan(tempc,&result);
   Fs->popup_task=NULL;
   Kill(sys_macro_util_task);
   sys_macro_util_task=NULL;

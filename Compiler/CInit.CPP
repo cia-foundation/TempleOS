@@ -3,203 +3,205 @@
 class CInternalType
 {
   U8 type,size,name[8];
+} internal_types_table[NUM_INTERNAL_TYPES]={
+  {RT_I0,0,"I0i"},{RT_I0,0,"I0"},{RT_U0,0,"U0i"},{RT_U0,0,"U0"},
+  {RT_I8,1,"I8i"},{RT_I8,1,"I8"},{RT_I8,1,"Bool"},
+  {RT_U8,1,"U8i"},{RT_U8,1,"U8"},
+  {RT_I16,2,"I16i"},{RT_U16,2,"U16i"},
+  {RT_I32,4,"I32i"},{RT_U32,4,"U32i"},
+  {RT_I64,8,"I64i"},{RT_U64,8,"U64i"},
+  {RT_F64,8,"F64i"},{RT_F64,8,"F64"},
 };
 
-CInternalType internal_types_table[NUM_INTERNAL_TYPES]={
-{RT_I0,0,"I0i"},{RT_I0,0,"I0"},{RT_U0,0,"U0i"},{RT_U0,0,"U0"},
-{RT_I8,1,"I8i"},{RT_I8,1,"I8"},{RT_I8,1,"Bool"},
-{RT_U8,1,"U8i"},{RT_U8,1,"U8"},
-{RT_I16,2,"I16i"},{RT_U16,2,"U16i"},
-{RT_I32,4,"I32i"},{RT_U32,4,"U32i"},
-{RT_I64,8,"I64i"},{RT_U64,8,"U64i"},
-{RT_F64,8,"F64i"},{RT_F64,8,"F64"},
+CIntermediateStruct intermediate_code_table[IC_NUM_ENTRIES]={
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"END"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"NOP1"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"END_EXP"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"NOP2"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"LABEL"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"CALL_START"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"CALL_END"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"CALL_END2"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"RETURN_VAL"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"RETURN_VAL2"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"IMM_I64"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"IMM_F64"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"STR_CONST"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"ABS_ADDR"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"ADDR_IMPORT"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"HEAP_GLBL"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"SIZEOF"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"TYPE"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"GET_LABEL"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"RBP"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"REG"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"FS"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"MOV_FS"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"GS"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"MOV_GS"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"LEA"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"MOV"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"TO_I64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"TO_F64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"TO_BOOL"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"TOUPPER"},
+  {IS_1_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"HOLYC_TYPECAST"},
+  {IS_1_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"ADDR"},
+  {IS_1_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"COM"},
+  {IS_1_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"NOT"},
+  {IS_1_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"UNARY_MINUS"},
+  {IS_1_ARG,1,IST_DEREF,FALSE,TRUE,0,0,0,"DEREF"},
+  {IS_1_ARG,1,IST_DEREF,FALSE,TRUE,0,0,0,"DEREF_PP"},
+  {IS_1_ARG,1,IST_DEREF,FALSE,TRUE,0,0,0,"DEREF_MM"},
+  {IS_1_ARG,1,IST_DEREF,TRUE,TRUE,0,0,0,"_PP"},
+  {IS_1_ARG,1,IST_DEREF,TRUE,TRUE,0,0,0,"_MM"},
+  {IS_1_ARG,1,IST_DEREF,TRUE,TRUE,0,0,0,"PP_"},
+  {IS_1_ARG,1,IST_DEREF,TRUE,TRUE,0,0,0,"MM_"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"SHL"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"SHR"},
+  {IS_1_ARG,1,IST_ASSIGN,FALSE,FALSE,0,0,0,"SHL_CONST"},
+  {IS_1_ARG,1,IST_ASSIGN,FALSE,FALSE,0,0,0,"SHR_CONST"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"POWER"},
+  {IS_2_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"MUL"},
+  {IS_2_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"DIV"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"MOD"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"AND"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"OR"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"XOR"},
+  {IS_2_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"ADD"},
+  {IS_2_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"SUB"},
+  {IS_1_ARG,1,IST_ASSIGN,FALSE,FALSE,0,0,0,"ADD_CONST"},
+  {IS_1_ARG,1,IST_ASSIGN,FALSE,FALSE,0,0,0,"SUB_CONST"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"EQUAL_EQUAL"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"NOT_EQUAL"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"LESS"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"GREATER_EQUAL"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"GREATER"},
+  {IS_2_ARG,1,IST_CMP,FALSE,FALSE,0,0,0,"LESS_EQUAL"},
+  {IS_0_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"PUSH_CMP"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"AND_AND"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"OR_OR"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"XOR_XOR"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"ASSIGN"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"ASSIGN_PP"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"ASSIGN_MM"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"SHL_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"SHR_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"MUL_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"DIV_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"MOD_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"AND_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"OR_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"XOR_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"ADD_EQUAL"},
+  {IS_2_ARG,1,IST_ASSIGN,FALSE,TRUE,0,0,0,"SUB_EQUAL"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"JMP"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SUB_CALL"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SWITCH"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"NOBOUND_SWITCH"},
+  {IS_V_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"ADD_RSP"},
+  {IS_V_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"ADD_RSP1"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"ENTER"},
+  {IS_0_ARG,0,IST_ASSIGN,FALSE,FALSE,0,0,0,"PUSH_REGS"},
+  {IS_0_ARG,0,IST_ASSIGN,FALSE,FALSE,0,0,0,"POP_REGS"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"LEAVE"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"RET"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CALL"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CALL_INDIRECT"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CALL_INDIRECT2"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CALL_IMPORT"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CALL_EXTERN"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"ASM"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"PREEMPT"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"PUSH"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"POP"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CLFLUSH"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"INVLPG"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"IN_U8"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"IN_U16"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"IN_U32"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"OUT_U8"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"OUT_U16"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"OUT_U32"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"GET_RFLAGS"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"CARRY"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SET_RFLAGS"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"GET_RAX"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SET_RAX"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"GET_RBP"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SET_RBP"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"GET_RSP"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SET_RSP"},
+  {IS_0_ARG,1,IST_NULL,FALSE,TRUE,0,0,0,"RIP"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"RDTSC"},
+  {IS_0_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"HPET"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BT"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BTS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BTR"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BTC"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"LBTS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"LBTR"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"LBTC"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BSF"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BSR"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"QUE_INIT"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"QUE_INS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"QUE_INS_REV"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"QUE_REM"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"STRLEN"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_ZERO"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_NOT_ZERO"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_CARRY"},
+  {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_NOT_CARRY"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_EQUAL_EQUAL"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_NOT_EQUAL"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_LESS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_GREATER_EQUAL"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_GREATER"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_LESS_EQUAL"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2EQUAL_EQUAL"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2NOT_EQUAL"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2LESS"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2GREATER_EQUAL"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2GREATER"},
+  {IS_2_ARG,1,IST_NULL,FALSE,FALSE,0,0,0,"BR_2LESS_EQUAL"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_AND_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_AND_NOT_ZERO"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_MM_ZERO"},
+  {IS_1_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_MM_NOT_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_AND_AND_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_AND_AND_NOT_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_OR_OR_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"BR_OR_OR_NOT_ZERO"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_BT"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_BTS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_BTR"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_BTC"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_NOT_BT"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_NOT_BTS"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_NOT_BTR"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"BR_NOT_BTC"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SWAP_U8"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SWAP_U16"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SWAP_U32"},
+  {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SWAP_U64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"ABS_I64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SIGN_I64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MIN_I64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MIN_U64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MAX_I64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MAX_U64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MOD_U64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SQRI64"},
+  {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SQRU64"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"SQR"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"ABS"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"SQRT"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"SIN"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"COS"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"TAN"},
+  {IS_1_ARG,1,IST_NULL,TRUE,FALSE,0,0,0,"ATAN"},
 };
-
-U0 AsmPrsInsFlags(CLex *lx,CInstruction *tempi)
-{
-  I64 i;
-  while (TRUE) {
-    switch (lx->token) {
-      case TK_IDENT:
-	if ((i=DefineMatch(lx->cur_str,"ST_OPCODE_MODIFIERS"))>=0) {
-	  tempi->opcode_modifier=i;
-	  break;
-	} else
-	  return;
-      case TK_INTEGER:
-	if (lx->cur_i64==16)
-	  tempi->flags|=IEF_OP_SIZE16;
-	else if (lx->cur_i64==32)
-	  tempi->flags|=IEF_OP_SIZE32;
-	else
-	  return;
-	break;
-      case '+':
-	tempi->flags|=IEF_PLUS_OPCODE;
-      case '/':
-	if (Lex(lx)==TK_INTEGER && lx->cur_i64<8)
-	  tempi->slash_val=lx->cur_i64;
-	else if (lx->token==TK_IDENT) {
-	  if (!StrCmp(lx->cur_str,"R"))
-	    tempi->slash_val=SV_R_REG;
-	  else if (!StrCmp(lx->cur_str,"I"))
-	    tempi->slash_val=SV_I_REG;
-	  else
-	    return;
-	} else
-	  return;
-	break;
-      case '!': tempi->flags|=IEF_DONT_SWITCH_MODES; break;
-      case '&': tempi->flags|=IEF_DFT;		break;
-      case ':': tempi->flags|=IEF_STI;		break;
-      case '-': tempi->flags|=IEF_NO_REX;	break;
-      case '~': tempi->flags|=IEF_40_REX;	break;
-      case '=': tempi->flags|=IEF_48_REX;	break;
-      case '`': tempi->flags|=IEF_REX_ONLY_R8_R15; break;
-      case '^': tempi->flags|=IEF_REX_XOR_LIKE;	break;
-      case '$$': tempi->flags|=IEF_ENDING_ZERO;	break;
-      default:
-	return;
-    }
-    Lex(lx);
-  }
-}
-
-U0 AsmHashLoad()
-{
-  I64 i,j,size,size1;
-  CInternalType *tempit;
-  CLex *lx;
-  CHashGeneric *temph;
-  CHashReg *tempr;
-  CHashOpcode *tempo,*tempo1;
-  CInstruction *tempi;
-  CHashClass *tempc;
-
-  cmp.asm_hash=HashTableNew(1024);
-  size1=offset(CHashOpcode.ins)+sizeof(CInstruction)<<5;
-  tempo=MAlloc(size1);
-
-  lx=LexNew(FileRead("OpCodes.TXT"),,"OpCodes.TXT.Z");
-  lx->htc.hash_table_lst=NULL;
-  Lex(lx);
-  while (lx->token) {
-    if (lx->token!=TK_IDENT)
-      LexExcept(lx,"expecting identifier at ");
-    i=LstMatch(lx->cur_str,"R8\0R16\0R32\0R64\0SEG\0FSTK\0MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
-    if (i<0)
-      LexExcept(lx,"Unknown Statement");
-    Lex(lx); //skip keyword
-    if (lx->token!=TK_IDENT)
-      LexExcept(lx,"expecting identifier at ");
-    switch (i) {
-      case 8: //OPCODE
-	MemSet(tempo,0,size1);
-	tempo->type=HTT_OPCODE;
-	tempo->instruction_entry_cnt=0;
-	tempo->str=lx->cur_str;
-	lx->cur_str=0;
-	Lex(lx);	//Skip OPCODE
-	while (lx->token && lx->token!=';') {
-	  tempi=&tempo->ins[tempo->instruction_entry_cnt];
-	  tempi->ins_entry_num=tempo->instruction_entry_cnt++;
-	  tempi->slash_val=SV_NONE; //Not zero!!
-	  while (lx->token==TK_INTEGER) {
-	    tempi->opcode[tempi->opcode_cnt++]=lx->cur_i64;
-	    Lex(lx);
-	  }
-	  if (lx->token==',')
-	    Lex(lx);
-	  else if (lx->token!=';')
-	    LexExcept(lx,"expecting ',' at ");
-
-	  AsmPrsInsFlags(lx,tempi);
-
-	  tempi->arg1=0;
-	  tempi->arg2=0;
-	  if (lx->token==TK_IDENT) {
-	    j=DefineMatch(lx->cur_str,"ST_ARG_TYPES");
-	    tempi->arg1=j;
-	    if (ARGT_REL8<=j<=ARGT_REL32 ||
-		ARGT_MOFFS8<=j<=ARGT_MOFFS64)
-	      tempi|=IEF_NO_REX;
-
-	    if (Lex(lx)==TK_IDENT) {
-	      j=DefineMatch(lx->cur_str,"ST_ARG_TYPES");
-	      Lex(lx);
-	      tempi->arg2=j;
-	      if (ARGT_REL8<=j<=ARGT_REL32 ||
-	      ARGT_MOFFS8<=j<=ARGT_MOFFS64)
-		tempi|=IEF_NO_REX;
-	    }
-	  }
-	}
-	size=offset(CHashOpcode.ins)+
-	  sizeof(CInstruction)*tempo->instruction_entry_cnt;
-
-	tempo1=MAlloc(size);
-	MemCpy(tempo1,tempo,size);
-	tempo1->use_cnt=0;
-	if (HashFind(tempo1->str,cmp.asm_hash,HTT_OPCODE))
-	  LexExcept(lx,"Duplicate OPCODE entry ");
-	HashAdd(tempo1,cmp.asm_hash);
-	break;
-      case 9:  //KEYWORD
-      case 10: //ASM_KEYWORD
-	temph=CAlloc(sizeof(CHashGeneric));
-	temph->str=lx->cur_str;
-	lx->cur_str=NULL;
-	Lex(lx); //skip keyword name
-	if (lx->token!=TK_INTEGER)
-	  LexExcept(lx,"expecting integer at ");
-	temph->user_data0=lx->cur_i64;
-	if (i==9)
-	  temph->type=HTT_KEYWORD;
-	else
-	  temph->type=HTT_ASM_KEYWORD;
-	HashAdd(temph,cmp.asm_hash);
-	Lex(lx); //Skip INT
-	break;
-      case REGT_R8:
-      case REGT_R16:
-      case REGT_R32:
-      case REGT_R64:
-      case REGT_SEG:
-      case REGT_FSTK:
-      case REGT_MM:
-      case REGT_XMM:
-	tempr=CAlloc(sizeof(CHashReg));
-	tempr->str=lx->cur_str;
-	lx->cur_str=NULL;
-	Lex(lx); //skip keyword name
-	if (lx->token!=TK_INTEGER)
-	  LexExcept(lx,"expecting integer at ");
-	tempr->type=HTT_REG;
-	tempr->reg_type=i;
-	tempr->reg_num=lx->cur_i64;
-	HashAdd(tempr,cmp.asm_hash);
-	Lex(lx); //Skip INT
-	break;
-    }
-    if (lx->token!=';')
-      LexExcept(lx,"missing ';' at");
-    Lex(lx); //Skip ';'
-  }
-  Free(tempo);
-  LexDel(lx);
-  for (i=0;i<NUM_INTERNAL_TYPES;i++) {
-    tempit=&internal_types_table[i];
-    tempc=PrsClassNew;
-    tempc->type=HTT_INTERNAL_TYPE;
-    tempc->raw_type=tempit->type;
-    Bts(&tempc->flags,Cf_INTERNAL_TYPE);
-    tempc->size=tempit->size;
-    tempc->str=AStrNew(tempit->name);
-    HashAdd(tempc,cmp.asm_hash);
-    cmp.internal_types[tempc->raw_type]=tempc;
-  }
-  adam_task->hash_table->next=cmp.asm_hash;
-}
 
 U0 CmpLoadDefines()
 {
@@ -208,26 +210,27 @@ U0 CmpLoadDefines()
 	"F32\0UF32\0F64\0UF64\0");
   DefineLstLoad("ST_TY_TYPES","NULL\0IMM\0REG\0DISP\0SIB\0RIP\0STK\0");
   DefineLstLoad("ST_U8_REGS","AL\0CL\0DL\0BL\0AH\0CH\0DH\0BH\0"
-			"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
+	"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
   DefineLstLoad("ST_U8_REX_REGS","AL\0CL\0DL\0BL\0RSPu8\0RBPu8\0RSIu8\0RDIu8\0"
-			"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
+	"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
   DefineLstLoad("ST_U16_REGS","AX\0CX\0DX\0BX\0SP\0BP\0SI\0DI\0"
-			"R8u16\0R9u16\0R10u16\0R11u16\0R12u16\0R13u16\0R14u16\0R15u16\0");
+	"R8u16\0R9u16\0R10u16\0R11u16\0R12u16\0R13u16\0R14u16\0R15u16\0");
   DefineLstLoad("ST_U32_REGS","EAX\0ECX\0EDX\0EBX\0ESP\0EBP\0ESI\0EDI\0"
-			"R8u32\0R9u32\0R10u32\0R11u32\0R12u32\0R13u32\0R14u32\0R15u32\0");
+	"R8u32\0R9u32\0R10u32\0R11u32\0R12u32\0R13u32\0R14u32\0R15u32\0");
   DefineLstLoad("ST_U64_REGS","RAX\0RCX\0RDX\0RBX\0RSP\0RBP\0RSI\0RDI\0"
-			"R8\0R9\0R10\0R11\0R12\0R13\0R14\0R15\0");
+	"R8\0R9\0R10\0R11\0R12\0R13\0R14\0R15\0");
   DefineLstLoad("ST_MM_REGS","MM0\0MM1\0MM2\0MM3\0MM4\0MM5\0MM6\0MM7\0");
-  DefineLstLoad("ST_XMM_REGS","XMM0\0XMM1\0XMM2\0XMM3\0XMM4\0XMM5\0XMM6\0XMM7\0");
+  DefineLstLoad("ST_XMM_REGS",
+	"XMM0\0XMM1\0XMM2\0XMM3\0XMM4\0XMM5\0XMM6\0XMM7\0");
   DefineLstLoad("ST_OPCODE_MODIFIERS","NO\0CB\0CW\0CD\0CP\0IB\0IW\0ID\0");
   DefineLstLoad("ST_ARG_TYPES","NO\0REL8\0REL16\0REL32\0"
-		"IMM8\0IMM16\0IMM32\0IMM64\0UIMM8\0UIMM16\0UIMM32\0UIMM64\0"
-		"R8\0R16\0R32\0R64\0RM8\0RM16\0RM32\0RM64\0"
-		"M8\0M16\0M32\0M64\0M1632\0M16N32\0M16N16\0M32N32\0"
-		"MOFFS8\0MOFFS16\0MOFFS32\0MOFFS64\0"
-		"AL\0AX\0EAX\0RAX\0CL\0DX\0 \0SREG\0"
-		"SS\0DS\0ES\0FS\0GS\0CS\0ST0\0STI\0"
-		"MM\0MM32\0MM64\0XMM\0XMM32\0XMM64\0XMM128\0XMM0\0");
+	"IMM8\0IMM16\0IMM32\0IMM64\0UIMM8\0UIMM16\0UIMM32\0UIMM64\0"
+	"R8\0R16\0R32\0R64\0RM8\0RM16\0RM32\0RM64\0"
+	"M8\0M16\0M32\0M64\0M1632\0M16N32\0M16N16\0M32N32\0"
+	"MOFFS8\0MOFFS16\0MOFFS32\0MOFFS64\0"
+	"AL\0AX\0EAX\0RAX\0CL\0DX\0 \0SREG\0"
+	"SS\0DS\0ES\0FS\0GS\0CS\0ST0\0STI\0"
+	"MM\0MM32\0MM64\0XMM\0XMM32\0XMM64\0XMM128\0XMM0\0");
   DefineLstLoad("ST_SEG_REGS","ES\0CS\0SS\0DS\0FS\0GS\0");
   DefineLstLoad("ST_FSTK_REGS","ST0\0ST1\0ST2\0ST3\0ST4\0ST5\0ST6\0ST7\0");
 }
@@ -239,19 +242,19 @@ U0 CmpFillTables()
 
   cmp.to_reg_vars_map=CAlloc(NUM_REGS*sizeof(U8));
   cmp.num_reg_vars=0;
-  cmp.reg_vars_mask=REG_VARS_MASK;
+  cmp.reg_vars_mask=REGG_C_LOCAL_VARS;
   for (i=0;i<NUM_REGS;i++)
     if (Bt(&cmp.reg_vars_mask,i))
       cmp.to_reg_vars_map[cmp.num_reg_vars++]=i;
 
   cmp.non_ptr_vars_map=CAlloc(NUM_REGS*sizeof(U8));
   cmp.num_non_ptr_vars=0;
-  cmp.non_ptr_vars_mask=REG_NON_PTR_MASK;
+  cmp.non_ptr_vars_mask=REGG_C_LOCAL_NON_PTR_VARS;
   for (i=0;i<NUM_REGS;i++)
     if (Bt(&cmp.non_ptr_vars_mask,i))
       cmp.non_ptr_vars_map[cmp.num_non_ptr_vars++]=i;
 
-/* STK TEMP ALLOCATION: See $LK,"::/Compiler/OptPass6.CPP"$.
+      /* STK TEMP ALLOCATION: See $LK,"::/Compiler/OptPass6.CPP"$.
 
 Expressions are evaluated with a stack machine.
 
@@ -271,9 +274,9 @@ STK[0]: 	RAX	RAX
 Two regs are alloced for stk temps.
 
 STK[0]:
-   R9 : RAX R9	R9  R9	R9  R9	 RAX
-   R8 :     RAX R8  RAX R8  RAX
-      : 	RAX	RAX
+R9 : RAX R9	R9  R9	R9  R9	 RAX
+R8 :	 RAX R8  RAX R8  RAX
+:	RAX	RAX
 
 Every other funtion, the regs are reversed.  This is to reduce
 pushes before function calls.  R8 is used in even numbered functions
@@ -281,14 +284,14 @@ while R9 is used in odd, so maybe we can avoid pushes if only one
 stk temp reg is used.
 
 STK[0]:
-   R9 : RAX R8	R8  R8	R8  R8	 RAX
-   R8 :     RAX R9  RAX R9  RAX
-      : 	RAX	RAX
+R9 : RAX R8	R8  R8	R8  R8	 RAX
+R8 :	 RAX R9  RAX R9  RAX
+:	RAX	RAX
 */
   cmp.to_stk_temps_map_odd =CAlloc(NUM_REGS*sizeof(U8));
   cmp.to_stk_temps_map_even=CAlloc(NUM_REGS*sizeof(U8));
   cmp.num_stk_temps=0;
-  cmp.stk_temps_mask=REG_STK_TEMPS_MASK;
+  cmp.stk_temps_mask=REGG_C_TEMP_CLOBBERED;
   for (i=0;i<NUM_REGS;i++)
     if (Bt(&cmp.stk_temps_mask,i))
       cmp.to_stk_temps_map_even[cmp.num_stk_temps++]=i;

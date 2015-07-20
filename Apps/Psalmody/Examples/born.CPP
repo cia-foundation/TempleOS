@@ -37,13 +37,17 @@ U0 Song()
     while (!ScanKey) {
       t0=Beat;
       Play("3qBeB2G3qAeFAsFAFAqC2sG3A2G3ARBRB",
-	  "New \0day \0is \0born.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "New \0day \0is \0born.\n\0 \0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("qBeB2G3qAeFAsFAFAqC2sG3A2G3ARBRB",
-	  "Though \0it's \0the \0mourn',\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Though \0it's \0the \0mourn',\n\0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("eDDRCqG2eGR3qEetEAFqCsDGDG",
-	  "cheer-\0up \0 \0the \0heart\n\0 \0 \0 \0 \0 \0 \0 \0 \0as \0 \0you \0");
+	    "cheer-\0up \0 \0the \0heart\n\0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0as \0 \0you \0");
       Play("eDDRCqG2eGR3qEetEAFqCsDGDG",
-	  "hitch-\0up \0 \0the \0cart.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "hitch-\0up \0 \0the \0cart.\n\0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0");
     }
   } catch
     PutExcept;

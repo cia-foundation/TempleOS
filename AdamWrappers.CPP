@@ -6,21 +6,21 @@
 //These are customized quick commands.
 //Feel free to add more or change.
 public I64 F(U8 *needle_str,U8 *fu_flags=NULL)
-{//Find (Find) all text files.
+{//Find text in all text files.
   return Find(needle_str,"/*",fu_flags);
 }
 
 public I64 R(U8 *needle_str,U8 *replace_text=NULL,U8 *fu_flags="+l-i")
-{//Find (Find) and replace string with string in all files.
+{//Find text and replace in all text files.
   return Find(needle_str,"/*",fu_flags,replace_text);
 }
 
 public I64 FD(U8 *needle_str,U8 *fu_flags=NULL)
-{//Find (Find) text files in cur dir.
+{//Find text in cur dir text files.
   return Find(needle_str,"*",fu_flags);
 }
 
 public I64 RD(U8 *needle_str,U8 *replace_text=NULL,U8 *fu_flags="+l-i")
-{//Find (Find) and replace string with string in cur dir.
+{//Find text and replace in cur dir text files.
   return Find(needle_str,"*",fu_flags,replace_text);
 }

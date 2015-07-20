@@ -1,12 +1,12 @@
 $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
-* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"121,138",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"11.0",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.
+* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"120,912",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"11.6",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.  See $LK,"::/Doc/Credits.TXT.Z"$.
 
-* TempleOS does not execute code not written by me and any time except for a few $FG,2$BIOS$FG$ calls for configuration.
+* TempleOS does not execute code not written by me and any time except for a few $FG,2$BIOS$FG$ calls for configuration.  See $LK,"::/Doc/Credits.TXT.Z"$.
 
 * TempleOS is 100% independent -- it does not access the files of your primary operating system.  It will work as the only operating system on your computer.
 
-* TempleOS is 100% written from scratch.  There is no $FG,2$Linux$FG$ or $FG,2$GNU$FG$ or any other code in TempleOS.  Yes, I wrote the compiler from scratch.  (I probably need to repeat that a few times.)
+* TempleOS is 100% written from scratch.  There is no $FG,2$Linux$FG$ or $FG,2$GNU$FG$ or any other code in TempleOS.  Yes, I wrote the compiler from scratch.  (I probably need to repeat that a few times.)  See $LK,"::/Doc/Credits.TXT.Z"$.
 
 * TempleOS is an operating system, not a browser.  The cmd line has active links.  They link to local files.
 

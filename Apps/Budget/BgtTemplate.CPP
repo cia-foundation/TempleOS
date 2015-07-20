@@ -133,7 +133,7 @@ CBgtTemplate *BgtTemplatePmt(CBgtTemplate *dft_t=NULL)
   }
   while (TRUE)
     if (PopUpForm(&t) && ((t.type==BT_INTERVAL && t.period>0) ||
-	t.type>BT_INTERVAL)) {
+	  t.type>BT_INTERVAL)) {
       if (tempb=BgtEntryPmt(dft_b)) {
 	tempt=CAlloc(sizeof(CBgtTemplate));
 	MemCpy(&tempt->start,&t.start,BT_SIZE);

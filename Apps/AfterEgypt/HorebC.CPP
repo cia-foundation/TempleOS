@@ -7,7 +7,8 @@ U0 AnimateTask(I64)
     t=tS;
     for (i=0;i<O_NUM_OBJS+O_NUM_PEBBLES;i++) {
       tempo=&objs[i];
-      if (tempo->type==OT_SHEEP || tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
+      if (tempo->type==OT_SHEEP ||
+	    tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
 	tempo->x+=tempo->dx;
 	tempo->y+=tempo->dy;
 	tempo->z+=tempo->dz;
@@ -97,11 +98,12 @@ U0 Horeb()
   SettingsPush(Fs,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
   try {
     Fs->text_attr=YELLOW<<4+BLUE;
-    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
+    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	  -WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
     AutoComplete;
     WinMax;
     WinBorder;
-    Preempt(OFF);
+    Preempt;
 
     DocClear;
     "$$BG,LTCYAN$$%h6c",'\n';

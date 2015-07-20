@@ -33,4 +33,4 @@ SrcExample;
 //See $LK,"::/Demo/ScreenCodes.CPP"$, $LK,"::/Demo/Graphics/CharGraphics.CPP"$,
 //and $LK,"::/Demo/Graphics/FontEd.CPP"$.
 
-//See $LK,"chars_bitmap_alpha",A="MN:chars_bitmap_alpha"$ and $LK,"chars_bitmap_alpha_numeric",A="MN:chars_bitmap_alpha_numeric"$.
+//See $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ and $LK,"chars_bmp_alpha_numeric",A="MN:chars_bmp_alpha_numeric"$.

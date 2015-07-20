@@ -15,27 +15,34 @@ U0 DrawTempoCtrl(CDC *dc,CCtrl *c)
   GrRect(dc, c->left,c->top,TEMPO_SPACING*3+2,TEMPO_SPACING*2+TEMPO_RANGE);
   dc->color=BLACK;
   GrRect(dc, c->left+TEMPO_BORDER,c->top+TEMPO_BORDER,
-    TEMPO_SPACING*3+2-2*TEMPO_BORDER,TEMPO_SPACING*2+TEMPO_RANGE-2*TEMPO_BORDER);
+	TEMPO_SPACING*3+2-2*TEMPO_BORDER,
+	TEMPO_SPACING*2+TEMPO_RANGE-2*TEMPO_BORDER);
   dc->color=WHITE;
   GrLine(dc,c->left+TEMPO_SPACING,c->top+TEMPO_SPACING,
-	      c->left+TEMPO_SPACING,c->top+TEMPO_SPACING+TEMPO_RANGE-1);
+	c->left+TEMPO_SPACING,c->top+TEMPO_SPACING+TEMPO_RANGE-1);
   GrLine(dc,c->left+2*TEMPO_SPACING+1,c->top+TEMPO_SPACING,
-	      c->left+2*TEMPO_SPACING+1,c->top+TEMPO_SPACING+TEMPO_RANGE-1);
+	c->left+2*TEMPO_SPACING+1,c->top+TEMPO_SPACING+TEMPO_RANGE-1);
 
   dc->color=LTGREEN;
   GrPrint(dc,c->left+TEMPO_SPACING-FONT_WIDTH/2,
-	      c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",s->tempo*10/TEMPO_RANGE);
+	c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",s->tempo*10/TEMPO_RANGE);
   GrPrint(dc,c->left+2*TEMPO_SPACING+1-FONT_WIDTH/2,
-	      c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",s->stacatto*10/TEMPO_RANGE);
-  GrRect(dc,c->left+TEMPO_SPACING-3,	 c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->tempo-2 ,7,5);
-  GrRect(dc,c->left+2*TEMPO_SPACING+1-3,c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-2,7,5);
+	c->top+TEMPO_SPACING+TEMPO_RANGE+3,"%d",
+	s->stacatto*10/TEMPO_RANGE);
+  GrRect(dc,c->left+TEMPO_SPACING-3,
+	c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->tempo-2 ,7,5);
+  GrRect(dc,c->left+2*TEMPO_SPACING+1-3,
+	c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-2,7,5);
   dc->color=YELLOW;
-  GrRect(dc,c->left+TEMPO_SPACING-2,	 c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->tempo-1 ,5,3);
-  GrRect(dc,c->left+2*TEMPO_SPACING+1-2,c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-1,5,3);
+  GrRect(dc,c->left+TEMPO_SPACING-2,
+	c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->tempo-1 ,5,3);
+  GrRect(dc,c->left+2*TEMPO_SPACING+1-2,
+	c->top+TEMPO_SPACING+TEMPO_RANGE-1-s->stacatto-1,5,3);
 
   dc->color=GREEN;
   GrVPrint(dc,c->left+TEMPO_BORDER+2,c->top+TEMPO_SPACING+2,"Tempo");
-  GrVPrint(dc,c->right-TEMPO_BORDER-2-FONT_WIDTH,c->top+TEMPO_SPACING+2,"Stacatto");
+  GrVPrint(dc,c->right-TEMPO_BORDER-2-FONT_WIDTH,
+	c->top+TEMPO_SPACING+2,"Stacatto");
 }
 
 U0 UpdateDerivedTempoCtrl(CCtrl *c)
@@ -71,7 +78,7 @@ CCtrl *TempoNew()
   c->update_derived_vals=&UpdateDerivedTempoCtrl;
   c->left=396;
   c->top=96;
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   QueIns(c,Fs->last_ctrl);
   TaskDerivedValsUpdate;
   Preempt(old_preempt);
@@ -80,7 +87,7 @@ CCtrl *TempoNew()
 
 U0 TempoDel(CCtrl *c)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   QueRem(c);
   Preempt(old_preempt);
   Free(c);

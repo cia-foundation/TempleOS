@@ -11,25 +11,25 @@
 interrupt U0 MyVect40()
 {
   lock {progress1++;}
-  *LAPIC_EOI(U32 *)=0;
+*LAPIC_EOI(U32 *)=0;
 }
 
 interrupt U0 MyVect41()
 {
   lock {progress2++;}
-  *LAPIC_EOI(U32 *)=0;
+*LAPIC_EOI(U32 *)=0;
 }
 
 interrupt U0 MyVect42()
 {
   lock {progress3++;}
-  *LAPIC_EOI(U32 *)=0;
+*LAPIC_EOI(U32 *)=0;
 }
 
 interrupt U0 MyVect43()
 {
   lock {progress4++;}
-  *LAPIC_EOI(U32 *)=0;
+*LAPIC_EOI(U32 *)=0;
 }
 
 I64 vect[4]={&MyVect40,&MyVect41,&MyVect42,&MyVect43};
@@ -44,8 +44,8 @@ U0 Main()
   for (i=I_USER;i<I_USER+4;i++)
     IntEntrySet(i,vect[i&3],IDTET_IRQ);
 
-//There are like 4*6 vects.  Bus zero
-//has the first four vects.
+    //There are like 4*6 vects.  Bus zero
+    //has the first four vects.
   for (i=IOREDTAB;i<IOREDTAB+4*2;i+=2) {
     *da=i+1;
     *_d=dev.mp_apic_ids[DEST_CPU]<<24;
@@ -55,10 +55,10 @@ U0 Main()
 
   Sleep(1000);
   "The keyboard and timer seem to be active.\n"
-  "IntA:%d IntB:%d IntC:%d IntD:%d\n\n"
-  "IntB is my keybaord and regs a single KEY-UP.\n"
-  "Rerun and press a few keys.\n",
-  progress1,progress2,progress3,progress4;
+	"IntA:%d IntB:%d IntC:%d IntD:%d\n\n"
+	"IntB is my keybaord and regs a single KEY-UP.\n"
+	"Rerun and press a few keys.\n",
+	progress1,progress2,progress3,progress4;
 
   //Disable vects
   for (i=IOREDTAB;i<IOREDTAB+4*2;i+=2) {

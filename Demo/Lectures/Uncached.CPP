@@ -4,13 +4,13 @@ U0 TimeIns()
 {
   I64 i,start,end;
   I64 *cached_I64=MAlloc(sizeof(I64)),
-     shared_blks,*uncached_I64;
+	shared_blks,*uncached_I64;
   CBlkPool *bp;
   CHeapCtrl *hc;
   Bool old_preempt;
 
   "$$RED$$Now, this demo seems broken, perhaps,\n"
-  "because I run in a virtual machine.$$FG$$\n\n";
+	"because I run in a virtual machine.$$FG$$\n\n";
   CPURep;
 
   shared_blks=1;
@@ -18,9 +18,9 @@ U0 TimeIns()
   hc=HeapCtrlBPInit(bp,shared_blks<<12);
   uncached_I64=MAlloc(sizeof(I64),hc);
 
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
 
-//Measure cached time
+  //Measure cached time
   start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
     *cached_I64=i;
@@ -28,7 +28,7 @@ U0 TimeIns()
   end=GetTSC;
   "  Cached Cycles: %10,d\n",end-start;
 
-//Measure uncached time
+  //Measure uncached time
   start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
     *uncached_I64=i;
@@ -36,7 +36,7 @@ U0 TimeIns()
   "Uncached Cycles: %10,d\n",end-start;
 
   "$$GREEN$$The difference is even greater\n"
-  "because the loop overhead was not subtracted.$$FG$$\n\n";
+	"because the loop overhead was not subtracted.$$FG$$\n\n";
   Free(cached_I64);
   Free(uncached_I64);
   Mem2MegFree(bp,shared_blks);

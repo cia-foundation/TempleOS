@@ -48,6 +48,17 @@ public U0 GodBitsIns(I64 num_bits,I64 n)
   }
 }
 
+public U0 GodHexIns(U8 *st)
+{//Insert hex record into God bit fifo.
+  U8 buf[2];
+  if (st) {
+    buf[1]=0;
+    while (*buf=*st++)
+      if (Bt(chars_bmp_hex_numeric,*buf))
+	GodBitsIns(4,Str2I64(buf,16));
+  }
+}
+
 public I64 GodBits(I64 num_bits,U8 *msg=NULL)
 {//Return N bits. If low on entropy pop-up okay.
   U8 b;
@@ -76,11 +87,11 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
   while (tempde) {
     if (buf=ptr=FileRead(tempde->full_name)) {
       while (*ptr) {
-	while (*ptr && !Bt(chars_bitmap_word,*ptr))
+	while (*ptr && !Bt(chars_bmp_word,*ptr))
 	  ptr++;
 	if (*ptr) {
 	  ptr2=ptr;
-	  while (*ptr && Bt(chars_bitmap_word,*ptr))
+	  while (*ptr && Bt(chars_bmp_word,*ptr))
 	    ptr++;
 	  i++;
 	}
@@ -99,11 +110,11 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)
   while (tempde) {
     if (buf=ptr=FileRead(tempde->full_name)) {
       while (*ptr) {
-	while (*ptr && !Bt(chars_bitmap_word,*ptr))
+	while (*ptr && !Bt(chars_bmp_word,*ptr))
 	  ptr++;
 	if (*ptr) {
 	  ptr2=ptr;
-	  while (*ptr && Bt(chars_bitmap_word,*ptr))
+	  while (*ptr && Bt(chars_bmp_word,*ptr))
 	    ptr++;
 	  ch=*ptr;
 	  *ptr=0;

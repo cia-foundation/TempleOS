@@ -1,5 +1,5 @@
-AcctRegSetDftEntry("TempleOS/Wenceslas","F64 best_score=9999;\n");
-AcctRegExeBranch("TempleOS/Wenceslas");
+RegSetDftEntry("TempleOS/Wenceslas","F64 best_score=9999;\n");
+RegExeBranch("TempleOS/Wenceslas");
 
 #define BORDER		5
 #define KING_STEP	6
@@ -8,7 +8,8 @@ AcctRegExeBranch("TempleOS/Wenceslas");
 
 
 
-	$SP,"<1>",BI=1$
+	$SP,"<1>",BI=1$	//See $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$ for making 3D men.
+
 
 
 
@@ -127,7 +128,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   Step *tempst;
   Peasant *tempp;
   F64 tt;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   dc->pen_width=1;
   for (i=0;i<NUM_TREES;i++) {
@@ -171,14 +172,14 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempst=tempst->next;
   }
 
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
   dc->flags|=DCF_TRANSFORMATION;
   dc->pen_width=1;
   tempp=peasant_root.next;
   while (tempp!=&peasant_root) {
-    GrIdentEqu(r);
-    GrRotYEqu(r,tempp->é+ã/2);
-    GrRotXEqu(r,ã/6);
+    Mat4x4IdentEqu(r);
+    Mat4x4RotY(r,tempp->é+ã/2);
+    Mat4x4RotX(r,ã/6);
     if (tempp->stopped)
       SpriteMat3B(dc,tempp->x,tempp->y,GR_Z_ALL,peasant_imgs[0],r);
     else {
@@ -193,9 +194,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   dc->pen_width=1;
-  GrIdentEqu(r);
-  GrRotYEqu(r,king_é+ã/2);
-  GrRotXEqu(r,ã/6);
+  Mat4x4IdentEqu(r);
+  Mat4x4RotY(r,king_é+ã/2);
+  Mat4x4RotX(r,ã/6);
   if (tS>king_timeout)
     SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,king_imgs[0],r);
   else {
@@ -268,7 +269,7 @@ U0 StepNew(CTask *task,I64 x,I64 y,F64 é,Bool left_right,Bool king)
 U0 Init()
 {
   I64 i,min_x,max_x,min_y,max_y,
-      w=Fs->pix_width,h=Fs->pix_height;
+	w=Fs->pix_width,h=Fs->pix_height;
   Peasant *tempp;
   snow_x=0;
   snow_y=0;
@@ -324,7 +325,7 @@ U0 Follow(CTask *,Peasant *tempp)
   F64 d,best_d=MAX_F64;
   while (temps!=&king_step_root) {
     if ((d=Sqr(temps->x-tempp->x)+Sqr(temps->y-tempp->y)) &&
-	d<15*15) {
+	  d<15*15) {
       d+=1000*Sqr(tS-temps->t0);
       if (d<best_d) {
 	best_d=d;
@@ -378,7 +379,8 @@ U0 AnimateTask(I64)
 	  tempp->door_opened_t0=door_open_t0=tS;
 	}
 	for (i=0;i<NUM_TREES;i++) //Hang-out by fire
-	  if (trees[i].fire_frame_index && Sqr(tempp->x-trees[i].x)+Sqr(tempp->y-trees[i].y)<20*20) {
+	  if (trees[i].fire_frame_index &&
+		Sqr(tempp->x-trees[i].x)+Sqr(tempp->y-trees[i].y)<20*20) {
 	    tempp->stopped=TRUE;
 	    break;
 	  }
@@ -386,13 +388,15 @@ U0 AnimateTask(I64)
 	  Follow(Fs->parent_task,tempp);
 	  tempp->x+=Cos(tempp->é)/100;
 	  tempp->y+=Sin(tempp->é)/100;
-	  if (!(BORDER/2<=tempp->x<w-BORDER/2) || !(BORDER/2<=tempp->y<h-BORDER/2)) {
+	  if (!(BORDER/2<=tempp->x<w-BORDER/2) ||
+		!(BORDER/2<=tempp->y<h-BORDER/2)) {
 	    tempp->é+=ã;
 	    tempp->x+=3*Cos(tempp->é)/100;
 	    tempp->y+=3*Sin(tempp->é)/100;
 	  }
 	  if (!animate_mS && animate_phase&1)
-	    StepNew(Fs->parent_task,tempp->x,tempp->y,tempp->é,animate_phase&2,FALSE);
+	    StepNew(Fs->parent_task,tempp->x,tempp->y,tempp->é,
+		  animate_phase&2,FALSE);
 	  not_stopped_cnt++;
 	}
       }
@@ -442,9 +446,9 @@ U0 SongTask(I64)
   music.tempo= 2.480;
   music.stacatto_factor= 0.902;
   while (TRUE) {
-	Play("3eCCCDCC2qG3eA2G3ABqCC");
-	Play("eCCCDCC2qG3eA2G3ABqCC");
-	Play("eGFEDEDqCeA2G3ABqCC");
+    Play("3eCCCDCC2qG3eA2G3ABqCC");
+    Play("eCCCDCC2qG3eA2G3ABqCC");
+    Play("eGFEDEDqCeA2G3ABqCC");
   }
 }
  
@@ -469,7 +473,7 @@ U0 Wenceslas()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
-  Preempt(OFF);
+  Preempt;
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
   PopUpOk("
@@ -588,7 +592,7 @@ ws_done:
   SettingsPop;
   MenuPop;
   CleanUp;
-  AcctRegWriteBranch("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
 }
 
 Wenceslas;

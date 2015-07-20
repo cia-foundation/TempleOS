@@ -77,7 +77,7 @@ Bool Mem32DevIns(CMemRange *tempmr)
   CMemRange *tempmr1=dev.mem32_root.next,*tempmr2;
   while (tempmr1!=&dev.mem32_root) {
     if (!tempmr1->type && tempmr->base>=tempmr1->base &&
-	tempmr->base+tempmr->size<=tempmr1->base+tempmr1->size) {
+	  tempmr->base+tempmr->size<=tempmr1->base+tempmr1->size) {
       if (tempmr->base>tempmr1->base) {
 	tempmr2=AMAlloc(sizeof(CMemRange));
 	tempmr2->type=MRT_UNUSED;
@@ -88,7 +88,7 @@ Bool Mem32DevIns(CMemRange *tempmr)
       }
       QueInsRev(tempmr,tempmr1);
       tempmr1->size=tempmr1->base+tempmr1->size-
-		    (tempmr->base+tempmr->size);
+	    (tempmr->base+tempmr->size);
       tempmr1->base=tempmr->base+tempmr->size;
       if (!tempmr1->size) {
 	QueRem(tempmr1);
@@ -165,7 +165,7 @@ U0 MemPagesNotPresentMark()
 U8 *Mem32DevAlloc(I64 size,I64 alignment)
 {//Alloc 32-bit addr space for device. (Doesn't work.) Not used.
 //For this to work the BIOS E820 map must be searched for gaps in
-//the 32-bit range and the pool initialized to the gaps.
+  //the 32-bit range and the pool initialized to the gaps.
   U8 *base,*limit;
   CMemRange *tempmr,*tempmr1;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
@@ -175,7 +175,7 @@ U8 *Mem32DevAlloc(I64 size,I64 alignment)
     base=(tempmr1->base+alignment-1)&~(alignment-1);
     limit=base+size-1;
     if (!tempmr1->type &&
-	limit<tempmr1->base+tempmr1->size) {
+	  limit<tempmr1->base+tempmr1->size) {
       tempmr=AMAlloc(sizeof(CMemRange));
       tempmr->type=MRT_DEV;
       tempmr->flags=0;
@@ -236,7 +236,7 @@ U0 Mem64DevFree(U8 *base,I64 pages2Meg)
     Yield;
   if (base==dev.mem64_ptr)
     dev.mem64_ptr+=pages2Meg*0x200000;
-  //else not freed
+//else not freed
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 }
 

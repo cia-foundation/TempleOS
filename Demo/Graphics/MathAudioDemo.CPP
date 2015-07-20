@@ -13,7 +13,8 @@ U0 FunDraw1(CDC *dc,F64 (*f)(F64 t))
   I64 i,w=Fs->pix_width,h=Fs->pix_height;
   F64 scale=h/5.0;
   for (i=-w/2;i<=w/2;i++)
-    GrLine(dc,w/2+i,h/2-scale*f(i/scale*2*ã),w/2+i+1,h/2-scale*f((i+1)/scale*2*ã));
+    GrLine(dc,w/2+i,h/2-scale*f(i/scale*2*ã),
+	  w/2+i+1,h/2-scale*f((i+1)/scale*2*ã));
 }
 
 U0 FunDraw2(CDC *dc,F64 (*f)(F64 t,F64 p),F64 T)
@@ -46,7 +47,8 @@ U0 Init(CDC *dc)
     GrLine(dc,w/2+scale*i,h/2-3,w/2+scale*i,h/2+3);
     if (i) {
       dc->color=DKGRAY;
-      GrPrint(dc,w/2+scale*i-7*FONT_WIDTH/2,h/2+5+FONT_HEIGHT,"%5.1f*T",ToF64(i));
+      GrPrint(dc,
+	    w/2+scale*i-7*FONT_WIDTH/2,h/2+5+FONT_HEIGHT,"%5.1f*T",ToF64(i));
     }
   }
 }

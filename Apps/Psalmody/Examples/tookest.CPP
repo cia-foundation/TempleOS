@@ -17,9 +17,11 @@ U0 Song()
       Play("qDeDq.CqBABAR",
 	    "Has \0the \0rap\0ture \0come \0and \0gone?\n\0 \0");
       Play("EeD2sG3DeB2G3qFCeCsC2G3etGB2G3qE",
-	    "Dear \0God, \0 \0 \0am \0I \0here?\n\0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Dear \0God, \0 \0 \0am \0I \0here?\n\0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0");
       Play("EeG2sG3EeCA2qG3CeCsC2G3EEAAeEE",
-	    "Dear \0God, \0 \0 \0am \0I \0here?\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Dear \0God, \0 \0 \0am \0I \0here?\n\0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
     }
   } catch
     PutExcept;

@@ -3,8 +3,8 @@
 public U8 *DBlk(I64 blk,Bool write=FALSE)
 {//Dump disk block. Optionally, write.
 //If you set write to TRUE, the block will
-//be written when you press <ESC>.
-//See $LK,"::/Demo/Dsk/DskRaw.CPP"$.
+  //be written when you press <ESC>.
+  //See $LK,"::/Demo/Dsk/DskRaw.CPP"$.
   U8 *buf=MAlloc(BLK_SIZE);
 
   RBlks(Fs->cur_dv,buf,blk,1);
@@ -22,9 +22,9 @@ public U8 *DBlk(I64 blk,Bool write=FALSE)
 public U8 *DCluster(I64 c,Bool write=FALSE,I64 num=0)
 {//Dump disk cluster. Optionally, write.
 //If you set write to TRUE, the cluster will
-//be written when you press <ESC>.
-//See $LK,"::/Demo/Dsk/DskRaw.CPP"$.
-//Do $LK,"Dir",A="MN:Dir"$("*",TRUE); to get cluster numbers of files.
+  //be written when you press <ESC>.
+  //See $LK,"::/Demo/Dsk/DskRaw.CPP"$.
+  //Do $LK,"Dir",A="MN:Dir"$("*",TRUE); to get cluster numbers of files.
   U8 *buf=MAlloc(Fs->cur_dv->spc<<BLK_SIZE_BITS);
   c=ClusterNumNext(Fs->cur_dv,c,num);
   RClusters(Fs->cur_dv,buf,c,1);
@@ -43,7 +43,7 @@ public U8 *DCluster(I64 c,Bool write=FALSE,I64 num=0)
 public U8 *Dump(U8 *filename,Bool write=FALSE)
 {//Dump file. Optionally, write.
 //If you set write to TRUE, the file will
-//be written when you press <ESC>.
+  //be written when you press <ESC>.
   U8 *buf;
   I64 size;
   if (buf=FileRead(filename,&size)) {
@@ -95,16 +95,16 @@ public I64 FileCnt(CDirEntry *tempde)
 public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
 {//Copy files.
 //If the name ends in ".Z", it will
-//be stored compressed.  If not ".Z"
-//it will be stored uncompressed.
+  //be stored compressed.  If not ".Z"
+  //it will be stored uncompressed.
   Bool result=TRUE;
-  CFileAccess *fa;
+  CDirContext *dirc;
   CDirEntry *tempde,*tempde1;
   U8 *st;
   if (!(tempde=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
     return FALSE;
   if (IsDir(dst_files_find_mask)) {
-    if (fa=FileAccessNew(dst_files_find_mask,TRUE)) {
+    if (dirc=DirContextNew(dst_files_find_mask,TRUE)) {
       while (tempde) {
 	tempde1=tempde->next;
 	if (!(tempde->attr & RS_ATTR_DIR)) {
@@ -116,7 +116,7 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
 	DirEntryDel(tempde);
 	tempde=tempde1;
       }
-      FileAccessDel(fa);
+      DirContextDel(dirc);
     }
     return result;
   } else
@@ -151,10 +151,11 @@ I64 CopyTree2(CDirEntry *tempde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
   }
   return result;
 }
-public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,Bool no_mask=TRUE)
+public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
+	Bool no_mask=TRUE)
 {//Copy directory tree.
 //Returns the count of copied files (not dirs).
-  CFileAccess *fa;
+  CDirContext *dirc;
   CDirEntry *tempde=NULL;
   I64 result=0,i1,i2;
   U8 *st1,*st2;
@@ -169,18 +170,18 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,Bool no_mask
   }
   Free(st1);
   Free(st2);
-  if (fa=FileAccessNew(src_files_find_mask,TRUE,,no_mask)) {
-    tempde=SysFilesFind(fa->mask,FUF_RECURSE);
+  if (dirc=DirContextNew(src_files_find_mask,TRUE,,no_mask)) {
+    tempde=FilesFind(dirc->mask,FUF_RECURSE);
     st1=CurDir;
-    FileAccessDel(fa);
+    DirContextDel(dirc);
     i1=StrLen(st1);
     if (i1==3) i1--;
-    if (fa=FileAccessNew(dst_files_find_mask,TRUE,TRUE)) {
+    if (dirc=DirContextNew(dst_files_find_mask,TRUE,TRUE)) {
       st2=CurDir;
       i2=StrLen(st2);
       if (i2==3) i2--;
       result=CopyTree2(tempde,i1,i2,st2);
-      FileAccessDel(fa);
+      DirContextDel(dirc);
       Free(st2);
     }
     DirTreeDel(tempde);
@@ -198,7 +199,7 @@ I64 DelTreeDirs(CDirEntry *tempde1)
     if (tempde1->attr & RS_ATTR_DIR) {
       if (tempde1->sub)
 	result+=DelTreeDirs(tempde1->sub);
-      result+=SysDel(tempde1->full_name,TRUE);
+      result+=Del(tempde1->full_name,TRUE,TRUE);
     }
     DirEntryDel(tempde1);
     tempde1=tempde2;
@@ -215,7 +216,7 @@ I64 DelTreeFiles(CDirEntry *tempde1)
       if (tempde1->sub)
 	result+=DelTreeFiles(tempde1->sub);
     } else
-      result+=SysDel(tempde1->full_name,FALSE);
+      result+=Del(tempde1->full_name,FALSE,TRUE);
     DirEntryDel(tempde1);
     tempde1=tempde2;
   }
@@ -228,8 +229,8 @@ public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (IsDir(files_find_mask)) {
     result=DelTreeDirs(FilesFind(files_find_mask,fuf_flags));
-    result+=SysDel(files_find_mask,TRUE);
-    result+=SysDel(files_find_mask,FALSE);
+    result+=Del(files_find_mask,TRUE,TRUE);
+    result+=Del(files_find_mask,FALSE,TRUE);
   } else
     result=DelTreeFiles(FilesFind(files_find_mask,fuf_flags));
   return result;
@@ -240,7 +241,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
   CDrv *dv=Let2Drv(*filename);
   CDirEntry de;
   U8 *cur_dir=StrNew(filename),
-     buf[136];
+	buf[STR_LEN];
   if (FileFind(filename,&de,FUF_JUST_FILES)) {
     Free(de.full_name);
     if (!StrCmp(attr,"+?"))
@@ -260,14 +261,15 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
   } else
     PrintErr("File not found.\n");
 }
-public U0 Touch(U8 *files_find_mask,U8 *attr="+?",U8 *fu_flags=NULL,CDate cdt=MIN_I64)
+public U0 Touch(U8 *files_find_mask,U8 *attr="+?",
+	U8 *fu_flags=NULL,CDate cdt=MIN_I64)
 {/*Touch file attributes and DateTime.
 Default lists attributes.
 attr: "+?" =show current
-	"+T" =resident
-	$LK,"RS_ATTR_READ_ONLY",A="MN:RS_ATTR_READ_ONLY"$  $LK,"ST_FILE_ATTRS",A="MN:ST_FILE_ATTRS"$
+"+T" =resident
+$LK,"RS_ATTR_READ_ONLY",A="MN:RS_ATTR_READ_ONLY"$  $LK,"ST_FILE_ATTRS",A="MN:ST_FILE_ATTRS"$
 To Set DateL:
-	Touch(filename,"",,datetime);
+Touch(filename,"",,datetime);
 */
   I64 fuf_flags=0;
   CDirEntry *tempde,*tempde1;
@@ -374,7 +376,8 @@ I64 Size1(CDirEntry *tempde,I64 *_fuf_flags,I64 round_to)
   CDrv *dv;
   while (tempde) {
     if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
-       !(tempde->attr&RS_ATTR_DIR) && FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
+	  !(tempde->attr&RS_ATTR_DIR) &&
+	  FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
       dv=Let2Drv(*tempde->full_name);
       RBlks(dv,buf,Cluster2Blk(dv,tempde->cluster),1);
       i=(&buf)(CArcCompress *)->expanded_size;
@@ -392,7 +395,7 @@ I64 Size1(CDirEntry *tempde,I64 *_fuf_flags,I64 round_to)
 public I64 Size(U8 *files_find_mask="/*",U8 *fu_flags=NULL,I64 round_to=0)
 {//Total size of files in mask. "+x" for expanded size.
 //Does not include directory size of base directory, but
-//does include size of sub directories.
+  //does include size of sub directories.
   I64 fuf_flags=0,result=0;
   CDirEntry *tempde1=NULL;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");

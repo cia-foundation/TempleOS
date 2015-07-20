@@ -19,39 +19,31 @@ typedef unsigned char BOOL;
 #define CT_7_BIT	2
 #define CT_8_BIT	3
 
-class ArcTableEntry
+class CArcEntry
 { public:
-  ArcTableEntry *next;
+  CArcEntry *next;
   WORD basecode;
   BYTE ch,pad;
 };
 
-class ArcCs //control structure
+class CArcCtrl //control structure
 { public:
-  DWORD src_size;
-  DWORD src_pos;
-  BYTE *src_buf;
-  DWORD dst_size;
-  DWORD dst_pos;
-  BYTE *dst_buf;
-  DWORD min_bits;
-  DWORD min_table_entry;
-  ArcTableEntry *cur_entry;
-  DWORD cur_bits_in_use;
-  ArcTableEntry *next_entry;
-  DWORD next_bits_in_use;
-  BYTE *stack_ptr;
-  BYTE *stack_base;
-  DWORD free_index;
-  DWORD free_limit;
-  DWORD saved_basecode;
-  DWORD	entry_used;
-  BYTE	last_ch,pad1,pad2,pad3;
-  ArcTableEntry compress[ARC_MAX_TABLE_ENTRY+1];
-  ArcTableEntry *hash[ARC_MAX_TABLE_ENTRY+1];
+  DWORD src_pos,src_size,
+	dst_pos,dst_size;
+  BYTE *src_buf,*dst_buf;
+  DWORD min_bits,min_table_entry;
+  CArcEntry *cur_entry,*next_entry;
+  DWORD cur_bits_in_use,next_bits_in_use;
+  BYTE *stk_ptr,*stk_base;
+  DWORD free_index,free_limit,
+	saved_basecode,
+	entry_used,
+	last_ch;
+  CArcEntry compress[ARC_MAX_TABLE_ENTRY+1],
+	*hash[ARC_MAX_TABLE_ENTRY+1];
 };
 
-class ArcCompressStruct
+class CArcCompress
 { public:
   DWORD compressed_size,compressed_size_hi,
 	expanded_size,expanded_size_hi;
@@ -59,14 +51,14 @@ class ArcCompressStruct
   BYTE body[1];
 };
 
-int bit_test(int bit_num, BYTE *bit_field)
+int Bt(int bit_num, BYTE *bit_field)
 {
   bit_field+=bit_num>>3;
   bit_num&=7;
   return (*bit_field & (1<<bit_num)) ? 1:0;
 }
 
-int bit_test_and_set(int bit_num, BYTE *bit_field)
+int Bts(int bit_num, BYTE *bit_field)
 {
   int result;
   bit_field+=bit_num>>3;
@@ -76,19 +68,19 @@ int bit_test_and_set(int bit_num, BYTE *bit_field)
   return (result) ? 1:0;
 }
 
-DWORD ExtractWORDBitField(BYTE *src,DWORD pos,DWORD bits)
+DWORD BFieldExtU32(BYTE *src,DWORD pos,DWORD bits)
 {
   DWORD i,result=0;
   for (i=0;i<bits;i++)
-    if (bit_test(pos+i,src))
-      bit_test_and_set(i,(BYTE *)&result);
+    if (Bt(pos+i,src))
+      Bts(i,(BYTE *)&result);
   return result;
 }
 
-void ArcGetTableEntry(ArcCs *c)
+void ArcEntryGet(CArcCtrl *c)
 {
   DWORD i;
-  ArcTableEntry *temp,*temp1;
+  CArcEntry *temp,*temp1;
 
   if (c->entry_used) {
     i=c->free_index;
@@ -107,7 +99,7 @@ void ArcGetTableEntry(ArcCs *c)
       while (c->hash[i]);
       temp=&c->compress[i];
       c->next_entry=temp;
-      temp1=(ArcTableEntry *)&c->hash[temp->basecode];
+      temp1=(CArcEntry *)&c->hash[temp->basecode];
       while (temp1 && temp1->next!=temp)
 	temp1=temp1->next;
       if (temp1)
@@ -117,57 +109,55 @@ void ArcGetTableEntry(ArcCs *c)
   }
 }
 
-void ArcExpandBuf(ArcCs *c)
+void ArcExpandBuf(CArcCtrl *c)
 {
   BYTE *dst_ptr,*dst_limit;
   DWORD basecode,lastcode,code;
-  ArcTableEntry *temp,*temp1;
+  CArcEntry *temp,*temp1;
 
   dst_ptr=c->dst_buf+c->dst_pos;
   dst_limit=c->dst_buf+c->dst_size;
 
-  while (dst_ptr<dst_limit &&
-	 c->stack_ptr!=c->stack_base)
-    *dst_ptr++ = * -- c->stack_ptr;
+  while (dst_ptr<dst_limit && c->stk_ptr!=c->stk_base)
+    *dst_ptr++ = * -- c->stk_ptr;
 
-  if (c->stack_ptr==c->stack_base && dst_ptr<dst_limit) {
+  if (c->stk_ptr==c->stk_base && dst_ptr<dst_limit) {
     if (c->saved_basecode==0xFFFFFFFFl) {
-      lastcode=ExtractWORDBitField(c->src_buf,c->src_pos,
-	 c->next_bits_in_use);
+      lastcode=BFieldExtU32(c->src_buf,c->src_pos,
+	    c->next_bits_in_use);
       c->src_pos=c->src_pos+c->next_bits_in_use;
       *dst_ptr++=lastcode;
-      ArcGetTableEntry(c);
+      ArcEntryGet(c);
       c->last_ch=lastcode;
     } else
       lastcode=c->saved_basecode;
-    while (dst_ptr<dst_limit &&
-      c->src_pos+c->next_bits_in_use<=c->src_size) {
-      basecode=ExtractWORDBitField(c->src_buf,c->src_pos,
-	 c->next_bits_in_use);
+    while (dst_ptr<dst_limit && c->src_pos+c->next_bits_in_use<=c->src_size) {
+      basecode=BFieldExtU32(c->src_buf,c->src_pos,
+	    c->next_bits_in_use);
       c->src_pos=c->src_pos+c->next_bits_in_use;
       if (c->cur_entry==&c->compress[basecode]) {
-	*c->stack_ptr++=c->last_ch;
+	*c->stk_ptr++=c->last_ch;
 	code=lastcode;
       } else
 	code=basecode;
       while (code>=c->min_table_entry) {
-	*c->stack_ptr++=c->compress[code].ch;
+	*c->stk_ptr++=c->compress[code].ch;
 	code=c->compress[code].basecode;
       }
-      *c->stack_ptr++=code;
+      *c->stk_ptr++=code;
       c->last_ch=code;
 
       c->entry_used=TRUE;
       temp=c->cur_entry;
       temp->basecode=lastcode;
       temp->ch=c->last_ch;
-      temp1=(ArcTableEntry *)&c->hash[lastcode];
+      temp1=(CArcEntry *)&c->hash[lastcode];
       temp->next=temp1->next;
       temp1->next=temp;
 
-      ArcGetTableEntry(c);
-      while (dst_ptr<dst_limit && c->stack_ptr!=c->stack_base)
-	*dst_ptr++ = * -- c->stack_ptr;
+      ArcEntryGet(c);
+      while (dst_ptr<dst_limit && c->stk_ptr!=c->stk_base)
+	*dst_ptr++ = * -- c->stk_ptr;
       lastcode=basecode;
     }
     c->saved_basecode=lastcode;
@@ -175,14 +165,14 @@ void ArcExpandBuf(ArcCs *c)
   c->dst_pos=dst_ptr-c->dst_buf;
 }
 
-ArcCs *NewArcCs(DWORD expand,DWORD compression_type)
+CArcCtrl *ArcCtrlNew(DWORD expand,DWORD compression_type)
 {
-  ArcCs *c;
-  c=(ArcCs *)malloc(sizeof(ArcCs));
-  memset(c,0,sizeof(ArcCs));
+  CArcCtrl *c;
+  c=(CArcCtrl *)malloc(sizeof(CArcCtrl));
+  memset(c,0,sizeof(CArcCtrl));
   if (expand) {
-    c->stack_base=(BYTE *)malloc(ARC_MAX_TABLE_ENTRY+1);
-    c->stack_ptr=c->stack_base;
+    c->stk_base=(BYTE *)malloc(ARC_MAX_TABLE_ENTRY+1);
+    c->stk_ptr=c->stk_base;
   }
   if (compression_type==CT_7_BIT)
     c->min_bits=7;
@@ -194,52 +184,49 @@ ArcCs *NewArcCs(DWORD expand,DWORD compression_type)
   c->free_limit=1<<c->next_bits_in_use;
   c->saved_basecode=0xFFFFFFFFl;
   c->entry_used=TRUE;
-  ArcGetTableEntry(c);
+  ArcEntryGet(c);
   c->entry_used=TRUE;
   return c;
 }
 
-void DelArcCs(ArcCs *c)
+void ArcCtrlDel(CArcCtrl *c)
 {
-  free(c->stack_base);
+  free(c->stk_base);
   free(c);
 }
 
-BYTE *ExpandBuf(ArcCompressStruct *r)
+BYTE *ExpandBuf(CArcCompress *arc)
 {
-  ArcCs *c;
-  ArcCompressStruct *r2=r;
+  CArcCtrl *c;
   BYTE *result;
 
-  if (r->compression_type>CT_8_BIT)
-    return NULL;
-  if (r2->expanded_size>0x10000000l)
+  if (!(CT_NONE<=arc->compression_type && arc->compression_type<=CT_8_BIT) ||
+	arc->expanded_size>=0x20000000l)
     return NULL;
 
-  result=(BYTE *)malloc(r2->expanded_size+1);
-  result[r2->expanded_size]=0; //terminate
-
-  if (r2->compression_type==CT_NONE) {
-    memcpy(result,r2->body,r2->expanded_size);
-    goto expand_end;
+  result=(BYTE *)malloc(arc->expanded_size+1);
+  result[arc->expanded_size]=0; //terminate
+  switch (arc->compression_type) {
+    case CT_NONE:
+      memcpy(result,arc->body,arc->expanded_size);
+      break;
+    case CT_7_BIT:
+    case CT_8_BIT:
+      c=ArcCtrlNew(TRUE,arc->compression_type);
+      c->src_size=arc->compressed_size*8;
+      c->src_pos=(sizeof(CArcCompress)-1)*8;
+      c->src_buf=(BYTE *)arc;
+      c->dst_size=arc->expanded_size;
+      c->dst_buf=result;
+      c->dst_pos=0;
+      ArcExpandBuf(c);
+      ArcCtrlDel(c);
+      break;
   }
-  c=NewArcCs(TRUE,r2->compression_type);
-  c->src_size=r2->compressed_size*8;
-  c->src_pos=(sizeof(ArcCompressStruct)-1)*8;
-  c->src_buf=(BYTE *)r2;
-  c->dst_size=r2->expanded_size;
-  c->dst_buf=result;
-  c->dst_pos=0;
-  ArcExpandBuf(c);
-  DelArcCs(c);
-
-expand_end:
-  if (r2!=r)
-    free(r2);
   return result;
 }
 
-long fsize(FILE *f)
+long FSize(FILE *f)
 {
   long	result,original=ftell(f);
   fseek(f,0,SEEK_END);
@@ -248,21 +235,21 @@ long fsize(FILE *f)
   return result;
 }
 
-void convert(char *name,BOOL cvt_ascii)
+void Cvt(char *name,BOOL cvt_ascii)
 {
   DWORD out_size,i,j,in_size;
-  ArcCompressStruct *in_buf;
+  CArcCompress *arc;
   BYTE *out_buf;
   FILE *io_file;
- 
+
   if (io_file=fopen(name,"rb")) {
-    in_size=fsize(io_file);
-    in_buf=(ArcCompressStruct *)malloc(in_size);
-    fread(in_buf,1,in_size,io_file);
-    out_size=in_buf->expanded_size;
+    in_size=FSize(io_file);
+    arc=(CArcCompress *)malloc(in_size);
+    fread(arc,1,in_size,io_file);
+    out_size=arc->expanded_size;
     printf("%-45s %d-->%d\r\n",name,(DWORD) in_size,out_size);
     fclose(io_file);
-    if (out_buf=ExpandBuf(in_buf)) {
+    if (out_buf=ExpandBuf(arc)) {
       if (cvt_ascii) {
 	j=0;
 	for (i=0;i<out_size;i++)
@@ -278,7 +265,7 @@ void convert(char *name,BOOL cvt_ascii)
       }
       free(out_buf);
     }
-    free(in_buf);
+    free(arc);
   }
 }
 
@@ -299,13 +286,11 @@ int main(int argc, char* argv[])
   }
 
   if (okay)
-    convert(name,cvt_ascii);
+    Cvt(name,cvt_ascii);
   else
     puts("TOSZ [-ascii] filename\r\n\r\n"
-	 "TOSZ expands a single TempleOS file.\r\n"
-	 "The -ascii flag will convert nonstandard TempleOS\r\n"
-	 "ASCII characters to regular ASCII.\r\n"
-    );
- 
+	  "TOSZ expands a single TempleOS file. The -ascii flag will convert "
+	  "nonstandard TempleOS ASCII characters to regular ASCII.\r\n");
+
   return EXIT_SUCCESS;
 }

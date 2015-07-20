@@ -12,7 +12,7 @@ U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _temp_u32_attr)
     case DOCSS_NORMAL:
 hl_normal:
       while (len) {
-	while (len && !Bt(chars_bitmap_alpha_numeric,*src)) {
+	while (len && !Bt(chars_bmp_alpha_numeric,*src)) {
 	  temp_u32_attr=_temp_u32_attr;
 	  ch1=*src++;
 	  switch (ch1) {
@@ -65,13 +65,14 @@ hl_normal:
 	  if (!--len) goto hl_normal_done;
 	}
 	ptr=src;
-	while (len && Bt(chars_bitmap_alpha_numeric,*src)) {
+	while (len && Bt(chars_bmp_alpha_numeric,*src)) {
 	  src++;
 	  len--;
 	}
 	ch=*src;
 	*src=0;
-	if (temph=HashFind(ptr,cmp.asm_hash,HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE|HTT_REG)) {
+	if (temph=HashFind(ptr,cmp.asm_hash,
+	      HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE|HTT_REG)) {
 	  if (temph->type&(HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE))
 	    temp_u32_attr=DOC_COLOR_KEYWORD<<8|mask_temp_u32_attr;
 	  else

@@ -1,5 +1,5 @@
 U0 GridInit()
-{//Init input pointer grid struct.
+{//Init input pointer grid struct. See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
   ip_grid.x=ip_grid.y=ip_grid.z=8;
   ip_grid.x_offset=ip_grid.y_offset=ip_grid.z_offset=0;
   ip_grid.x_speed =ip_grid.y_speed =ip_grid.z_speed =1;
@@ -41,8 +41,8 @@ U0 IPVarsUpdate(I64 x,I64 y,I64 z,Bool l,Bool r)
 }
 
 U0 IPSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64)
-{//Note: Generates a message.
-  Bool old_preempt=Preempt(OFF);
+{//Note: Generates a message. See $LK,"IPSet",A="FF:::/Demo/Games/Zing.CPP.Z,IPSet"$().
+  Bool old_preempt=Preempt;
   if (!(0<=x<GR_WIDTH))
     x=ip.pos.x;
   if (!(0<=y<GR_HEIGHT))

@@ -87,7 +87,8 @@ Bool BootCdProbeAll(CBlkDev *bd)
   }
 }
 
-U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,CATARep **_root,I64 *num_hints)
+U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
+		CATARep **_root,I64 *num_hints)
 {
   I64 type;
   base0&=-8;
@@ -100,7 +101,8 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,CATARep **_root,I64 
       "$$RED$$ATA   ";
     else
       "$$RED$$ATAPI ";
-    "$$LTBLUE$$%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",msg,base0,base1,irq,unit;
+    "$$LTBLUE$$%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
+	  msg,base0,base1,irq,unit;
     if (_root) {
       tempha=CAlloc(sizeof(CATARep));
       tempha->next=*_root;
@@ -116,7 +118,7 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,CATARep **_root,I64 
 
 Bool ATARepExitAllApplications()
 {
-	"\nWe're going to probe hardware.\n"
+  "\nWe're going to probe hardware.\n"
 	"$$RED$$Exit all other applications.$$FG$$\n"
 	"Press '$$PURPLE$$p$$FG$$' to probe or '$$PURPLE$$s$$FG$$' to skip.\n";
   if (ToUpper(GetChar(,FALSE))=='S')
@@ -136,7 +138,7 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
   if (pmt && ATARepExitAllApplications)
     return 0;
 
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   for (i=0;i<NUM_BLKDEVS;i++)
     if (dsk.blkdevs[i].bd_signature==BD_SIGNATURE_VAL)
       BEqu(&unlock_flags,i,
@@ -193,13 +195,14 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
   return num_hints;
 }
 
-CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,CATARep **_ata_drv,CATARep **_atapi_drv)
+CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,
+		CATARep **_ata_drv,CATARep **_atapi_drv)
 {//This is for when trying to sort-out main hard drives and CD-ROM drives.
   CATARep *result=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
   Bool was_silent=Silent;
   try
-    bd=Let2BlkDev(_sys_boot_drv);
+	  bd=Let2BlkDev(_sys_boot_drv);
   catch {
     Fs->catch_except=TRUE;
     bd=NULL;
@@ -208,20 +211,20 @@ CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,CATARep **_ata_drv,CATARep **
   while (tempha) {
     if (!result && bd && bd->type==tempha->type) {
       if (bd->type==BDT_ATAPI &&
-	  bd->base0==tempha->base0 && bd->unit==tempha->unit)
+	    bd->base0==tempha->base0 && bd->unit==tempha->unit)
 	result=atapi_drv=tempha;
       else if (bd->type==BDT_ATA && bd->base0==tempha->base0 &&
-	  bd->base1==tempha->base1 && bd->unit==tempha->unit)
+	    bd->base1==tempha->base1 && bd->unit==tempha->unit)
 	result=ata_drv=tempha;
     }
     if (!result || result->type!=tempha->type) {
       if (tempha->type==BDT_ATA) {
 	if (!ata_drv || tempha->unit<ata_drv->unit ||
-	  tempha->unit==ata_drv->unit && tempha->num<ata_drv->num)
+	      tempha->unit==ata_drv->unit && tempha->num<ata_drv->num)
 	  ata_drv=tempha;
       } else if (tempha->type==BDT_ATAPI) {
 	if (!atapi_drv || tempha->unit<atapi_drv->unit ||
-	  tempha->unit==atapi_drv->unit && tempha->num<atapi_drv->num)
+	      tempha->unit==atapi_drv->unit && tempha->num<atapi_drv->num)
 	  atapi_drv=tempha;
       }
     }
@@ -236,7 +239,7 @@ CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
 {
   CBlkDev *result;
   if (0<=first_drv_let-'A'<NUM_DRVS && (type==BDT_ATA || type==BDT_ATAPI) &&
-      0<=unit<=1) {
+	0<=unit<=1) {
     result=BlkDevNextFree(first_drv_let,type);
     result->unit=unit;
     result->base0=base0;
@@ -250,7 +253,7 @@ CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
 I64 AutoMountIDE()
 {//Try to mount hard drive and CD/DVD, automatically. (Kernel.Cfg option).
 //It uses 'C' and 'T' as first drive letters or whatever you set
-//in config when compiling Kernel.BIN.
+  //in config when compiling Kernel.BIN.
   I64 result=0;
   CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
   ATARep(FALSE,TRUE,&root);
@@ -259,16 +262,17 @@ I64 AutoMountIDE()
 	ata_drv->base0,ata_drv->base1,ata_drv->unit))
     result++;
   if (atapi_drv && ATAMount(dsk.first_cd_drv_let,BDT_ATAPI,
-      atapi_drv->base0,atapi_drv->base1,atapi_drv->unit))
+	atapi_drv->base0,atapi_drv->base1,atapi_drv->unit))
     result++;
   tempha=root;
   while (tempha) {
     if (tempha!=ata_drv && tempha!=atapi_drv) {
       if (tempha->type==BDT_ATA && ATAMount(dsk.first_hd_drv_let,BDT_ATA,
-	  tempha->base0,tempha->base1,tempha->unit))
+	    tempha->base0,tempha->base1,tempha->unit))
 	result++;
-      else if (tempha->type==BDT_ATAPI && ATAMount(dsk.first_cd_drv_let,BDT_ATAPI,
-	  tempha->base0,tempha->base1,tempha->unit))
+      else if (tempha->type==BDT_ATAPI &&
+	    ATAMount(dsk.first_cd_drv_let,BDT_ATAPI,
+	    tempha->base0,tempha->base1,tempha->unit))
 	result++;
     }
     tempha=tempha->next;

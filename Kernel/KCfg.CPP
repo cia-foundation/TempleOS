@@ -22,19 +22,19 @@ class CKernelCfg
   U8 *boot_rescue_drv_file,*boot_rescue_drv_start;
   Bool opts[CFG_NUM_OPTIONS];
   U8 mem_init_val,heap_init_val,var_init_val,
-     boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
+	boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
   Bool cdrom_ports_pmt;
 };
 
 CDoc *KernelCfgAddDev(CKernelCfg *c)
 {
   I64 ch,num_hints,first_drv_num,type,unit,cnt=0;
-  U8 blks_buf[256],addr_buf[256],base0_buf[128],base1_buf[128];
+  U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN];
   CATARep *root=NULL,*tempha;
   CDoc *doc=DocNew;
   Bool make_free;
 
-	"\n\nIn anticipation of the drives you will\n"
+  "\n\nIn anticipation of the drives you will\n"
 	"define shortly, enter the drive letter\n"
 	"of the drive with the account directory.\n"
 	"\n($$PURPLE$$<ENTER>$$FG$$ for cur drv) Home Drv:";
@@ -44,49 +44,49 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
   else
     c->boot_drv_let=Drv2Let(Fs->cur_dv);
 
-	"\n\n$$BK,1$$$$PURPLE$$Mount drives so they will be present when "
+  "\n\n$$BK,1$$$$PURPLE$$Mount drives so they will be present when "
 	"you boot.$$FG$$$$BK,0$$\n";
   do {
-	"\n****** Mount Drives ******\n"
-	"The first drive letter is the letter\n"
-	"of the first partition.  If adding\n"
-	"a hard drive, you should pick 'C'.\n"
-	"If more than one partition is present\n"
-	"they will be lettered in sequence.\n"
-	"\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
+    "\n****** Mount Drives ******\n"
+	  "The first drive letter is the letter\n"
+	  "of the first partition.  If adding\n"
+	  "a hard drive, you should pick 'C'.\n"
+	  "If more than one partition is present\n"
+	  "they will be lettered in sequence.\n"
+	  "\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
     first_drv_num=ToUpper(GetChar)-'A';
     '\n';
     if (0<=first_drv_num<NUM_DRVS) {
-	"\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
-	"\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
+      "\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
+	    "\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
       type=GetChar-'0';
       '\n';
 
       unit=0;
       if (type==BDT_RAM) {
 	"Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";
-	GetS(addr_buf,256);
+	GetS(addr_buf,STR_LEN);
 	"Blks of 512 bytes:";
-	GetS(blks_buf,256);
+	GetS(blks_buf,STR_LEN);
       } else if (type==BDT_ATA ||
-	  type==BDT_ATAPI) {
+	    type==BDT_ATAPI) {
 	num_hints=ATARep(,,&root);
 	if (type==BDT_ATAPI) {
 	  "<ENTER> to use booted CD-ROM\n";
 	  if (num_hints)
-		"Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
-		"I/O Port Base0:\n";
+	    "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
+		  "I/O Port Base0:\n";
 	  else
-		"Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
-	  GetS(base0_buf,128);
+	    "Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
+	  GetS(base0_buf,STR_LEN);
 	} else
 	  do {
 	    if (num_hints)
-		"Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
-		"I/O Port Base0:\n";
+	      "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
+		    "I/O Port Base0:\n";
 	    else
-		"Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
-	    GetS(base0_buf,128);
+	      "Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
+	    GetS(base0_buf,STR_LEN);
 	  } while (!Str2I64(base0_buf));
 	if (1<=Str2I64(base0_buf)<=num_hints) {
 	  tempha=ATARepFind(root,Str2I64(base0_buf));
@@ -98,11 +98,11 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	    StrCpy(base1_buf,"0");
 	  else
 	    do {
-		"I/O Port Base1:\n";
-	      GetS(base1_buf,128);
+	      "I/O Port Base1:\n";
+	      GetS(base1_buf,STR_LEN);
 	    } while (!Str2I64(base1_buf));
 	  do {
-		"\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
+	    "\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
 	    unit=GetChar-'0';
 	  } while (!(0<=unit<=1));
 	  '\n';
@@ -111,7 +111,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
       }
       if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
 	DocPrint(doc,"bd=BlkDevNextFree(%d,%d);"
-		      "bd->unit=%d;",first_drv_num+'A',type,unit);
+	      "bd->unit=%d;",first_drv_num+'A',type,unit);
 	if (type==BDT_RAM) {
 	  if (!*addr_buf) StrCpy(addr_buf,"0");
 	  DocPrint(doc,"bd->RAM_dsk=%s;",addr_buf);
@@ -126,7 +126,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	      make_free=TRUE;
 	  } else
 	    DocPrint(doc,"bd->base0=%s;bd->base1=%s;",
-		base0_buf,base1_buf);
+		  base0_buf,base1_buf);
 	}
 	DocPrint(doc,"BlkDevAdd(bd,FALSE,%d);",make_free);
 	cnt++;
@@ -150,16 +150,17 @@ U0 KernelCfgOptions(CKernelCfg *c)
     st=GetStr("Option ($$PURPLE$$<ENTER>$$FG$$ when done):","");
     i=LstMatch(st,kernel_cfg_options,LMF_IGNORE_CASE);
     if (i==CFG_HELP)
-"\n"
-"$$PURPLE$$MemInit$$FG$$ Initializes memory above 0x100000 to a val at boot.\n"
-"$$PURPLE$$HeapInit$$FG$$ Initializes MAlloc() memory to a val.\n"
-"$$PURPLE$$VarInit$$FG$$ Initializes glbl var memory to a val.\n"
-"$$PURPLE$$NoMP$$FG$$ No multicore.\n"
-"$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
-"$$PURPLE$$DontProbe$$FG$$ Just prompt CD-ROM ports, don't probe.\n"
-"$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
-"$$PURPLE$$BootRescueDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
-"\n";
+      "\n"
+	    "$$PURPLE$$MemInit$$FG$$ Initializes memory above 0x100000 "
+	    "to a val at boot.\n"
+	    "$$PURPLE$$HeapInit$$FG$$ Initializes MAlloc() memory to a val.\n"
+	    "$$PURPLE$$VarInit$$FG$$ Initializes glbl var memory to a val.\n"
+	    "$$PURPLE$$NoMP$$FG$$ No multicore.\n"
+	    "$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
+	    "$$PURPLE$$DontProbe$$FG$$ Just prompt CD-ROM ports, don't probe.\n"
+	    "$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
+	    "$$PURPLE$$BootRescueDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
+	    "\n";
     else
       if (0<=i<CFG_NUM_OPTIONS) {
 	state=c->opts[i]=!c->opts[i];
@@ -223,10 +224,10 @@ CKernelCfg *KernelCfgNew()
 
   c->add_dev=KernelCfgAddDev(c);
   c->dsk_cache_size_exp=GetStr(
-"Disk Cache Size in Bytes,\n"
-"gets rounded-up funny,\n"
-"($$PURPLE$$<ENTER>$$FG$$ will use default.):",
-"Scale2Mem(0x80000,0x8000000)");
+	"Disk Cache Size in Bytes,\n"
+	"gets rounded-up funny,\n"
+	"($$PURPLE$$<ENTER>$$FG$$ will use default.):",
+	"Scale2Mem(0x80000,0x8000000)");
   KernelCfgOptions(c);
   return c;
 }

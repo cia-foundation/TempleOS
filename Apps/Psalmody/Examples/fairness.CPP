@@ -18,14 +18,17 @@ U0 Song()
     "$$WW+H,1$$";
     while (!ScanKey) {
       Play("3qGGsEAEAqAsF2G3F2G3qCeEFqD",
-	    "Life, \0life, \0isn't \0 \0 \0 \0fair.  \0Isn't \0 \0 \0 \0fair.\n\0 \0 \0 \0");
+	    "Life, \0life, \0isn't \0 \0 \0 \0fair.  \0"
+	    "Isn't \0 \0 \0 \0fair.\n\0 \0 \0 \0");
       Play("GGsEAEAqAsF2G3F2G3qCeEFqD",
-	    "Waaa, \0waaa, \0isn't \0 \0 \0 \0fair.  \0Isn't \0 \0 \0 \0fair.\n\0 \0 \0 \0");
+	    "Waaa, \0waaa, \0isn't \0 \0 \0 \0fair.  \0"
+	    "Isn't \0 \0 \0 \0fair.\n\0 \0 \0 \0");
       Play("eFCqEBDBE2eG3EsFEFE",
 	    " \0 \0I \0 \0ne\0ver \0sin.\n\0 \0 \0 \0 \0 \0 \0");
       Play("eFCqEBDBE2eG3EsFEFE",
 	    " \0 \0I \0 \0ne\0ver \0win.\n\0 \0 \0 \0 \0 \0 \0");
-      "$$GREEN$$(A warning on presumption. 'Who loves more man -- forgiven big debt or little?'  See prodigal son.)$$FG$$\n";
+      "$$GREEN$$(A warning on presumption. 'Who loves more man --"
+	    " forgiven big debt or little?'  See prodigal son.)$$FG$$\n";
     }
   } catch
     PutExcept;

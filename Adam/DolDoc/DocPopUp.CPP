@@ -1,6 +1,7 @@
 #help_index "DolDoc"
 
-public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,Bool exited,I64 *_has_action=NULL)
+public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
+	Bool exited,I64 *_has_action=NULL)
 {//Do action on final entry selected by user.
 //Sometimes returns locked, sometimes unlocked
   U8 ch=doc->cmd_U8,*st;
@@ -52,9 +53,11 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,Bool exited,I64 *_has_action=N
 	}
 	has_action=TRUE;
       }
-      if (!exited && doc_e->de_flags & DOCEF_LST && doc_e->de_flags & DOCEF_DEFINE &&
-	 (temph=HashFind(doc_e->define_str,doc->win_task->hash_table,HTT_DEFINE_STR)) &&
-	  (result=PopUpPickLst(temph->data))!=DOCM_CANCEL) {
+      if (!exited && doc_e->de_flags & DOCEF_LST &&
+	    doc_e->de_flags & DOCEF_DEFINE &&
+	    (temph=HashFind(doc_e->define_str,
+	    doc->win_task->hash_table,HTT_DEFINE_STR)) &&
+	    (result=PopUpPickLst(temph->data))!=DOCM_CANCEL) {
 	DocDataFmt(doc,doc_e,result);
 	DocDataScan(doc,doc_e);
 	has_action=TRUE;
@@ -150,7 +153,7 @@ U8 *EdDollarTypeCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
 {
   CDoc *doc=doc_e->user_data;
   U8 *src=DefineSub(doc->cur_entry->type_u8,"ST_DOC_CMDS"),
-     *st=CAlloc(8,mem_task);
+	*st=CAlloc(8,mem_task);
   if (doc->cur_entry==doc)
     src="EOF";
   else if (!src)
@@ -168,7 +171,7 @@ public I64 DocGetKey(I64 *_sc=NULL)
     DocRecalc(DocPut);
     cont=FALSE;
     if (ch==CH_ESC || ch==CH_SHIFT_ESC) {//Check for exit filter mode
-      Preempt(OFF);
+      Preempt;
       if (DocPut && DocPut->find_replace->filter_lines) {
 	EdUndoFilter(DocPut);
 	cont=TRUE;
@@ -180,7 +183,7 @@ public I64 DocGetKey(I64 *_sc=NULL)
   return ch;
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 public Bool View()
 {//Go live for user interaction until <ESC> or <SHIFT-ESC>.
   I64 ch;
@@ -190,16 +193,16 @@ public Bool View()
 }
 
 #help_index "DolDoc"
-public Bool DocDo(CDoc *doc,I64 dof_flags=0)
+public Bool DocEd(CDoc *doc,I64 dof_flags=0)
 {//Live for user interaction. End on <ESC> or <SHIFT-ESC>.
   CDoc *old_put_doc	  =DocPut,
-       *old_display_doc=DocDisplay,
-       *old_border_doc =DocBorder,*bdoc;
+	*old_display_doc=DocDisplay,
+	*old_border_doc =DocBorder,*bdoc;
   CDocEntry *doc_e;
   I64 old_attr=Fs->text_attr,
-      old_top =Fs->win_top, old_bottom=Fs->win_bottom,
-      old_left=Fs->win_left,old_right =Fs->win_right,
-      old_title_src=Fs->title_src;
+	old_top =Fs->win_top, old_bottom=Fs->win_bottom,
+	old_left=Fs->win_left,old_right =Fs->win_right,
+	old_title_src=Fs->title_src;
   Bool result,unlock,old_preempt;
   U8 *old_task_title;
   if (dof_flags&DOF_WIN_MAX)
@@ -256,7 +259,7 @@ public Bool DocDo(CDoc *doc,I64 dof_flags=0)
   DocRecalc(doc);
   if (!(dof_flags&DOF_DONT_HOME))
     DocTop(doc);
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   Fs->border_doc=bdoc;
   if (doc!=old_display_doc)
     doc->parent_doc=old_display_doc;
@@ -279,7 +282,7 @@ public Bool DocDo(CDoc *doc,I64 dof_flags=0)
   }
   result=View;
 
-  Preempt(OFF);
+  Preempt;
   DocLock(doc);
   if (result) {
     doc_e=doc->root.next;
@@ -309,11 +312,10 @@ public Bool DocDo(CDoc *doc,I64 dof_flags=0)
   return result;
 }
 
-#help_index "DolDoc/Input"
-public Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,
+#help_index "DolDoc/Input;StdIn/DolDoc"
+public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     I64 dof_flags=0,U8 *header=NULL,U8 *footer=NULL)
-{//Supply a class name that has fmtstr definitions.
-//and this routine will allow user input.
+{//User input. Supply a class name that has fmtstr definitions.
 //See $LK,"::/Demo/DolDoc/Form.CPP"$ and $LK,"::/Demo/LastClass.CPP"$.
   CMemberLst *ml;
   CDocEntry *doc_e;
@@ -344,7 +346,7 @@ public Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,
   if (doc->root.next!=doc)	{
     Fs->border_src=BDS_CONST;
     DocRecalc(doc);
-    if (DocDo(doc,dof_flags)) {
+    if (DocEd(doc,dof_flags)) {
       doc_e=doc->cur_entry;
       result=TRUE;
       if (doc_e!=doc) {
@@ -359,25 +361,25 @@ public Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,
   return result;
 }
 
-U0 DocMenuDoEndTaskCB()
+U0 DocMenuEndTaskCB()
 {
   WinToTop;
   throw;
 }
 
-public I64 DocMenuDo(CDoc *m,I64 dof_flags=0)
-{//Do (Run) menu chooser doc. (Returns menu doc unlocked.)
+public I64 DocMenu(CDoc *m,I64 dof_flags=0)
+{//Run menu chooser doc. Returns menu doc unlocked.
   U8 *old_end_cb=Fs->task_end_cb;
   Bool old_break_shift_esc=LBts(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC);
   CDocEntry *doc_e;
   I64 old_border_src=Fs->border_src,result=DOCM_CANCEL,has_action;
-  Fs->task_end_cb=&DocMenuDoEndTaskCB;
+  Fs->task_end_cb=&DocMenuEndTaskCB;
   try {
     if (m) {
       m->desc='Menu';
       Fs->border_src=BDS_CONST;
-md_restart:
-      if (DocDo(m,dof_flags)) {
+dm_restart:
+      if (DocEd(m,dof_flags)) {
 	doc_e=m->cur_entry;
 	if (doc_e!=m) {
 	  result=DocEntryRun(m,doc_e,TRUE,&has_action);
@@ -385,7 +387,7 @@ md_restart:
 	  if (!has_action) {
 	    result=DOCM_CANCEL;
 	    dof_flags|=DOF_DONT_HOME;
-	    goto md_restart;
+	    goto dm_restart;
 	  }
 	}
       }
@@ -412,10 +414,10 @@ public I64 PopUpEd(U8 *filename,CTask *parent=NULL,CTask **_pu_task=NULL)
   return result;
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 public CTask *PopUpViewDoc(CDoc *doc,I64 dof_flags=0)
 {//Pass doc to PopUp win task for viewing.
-  U8 *buf=MStrPrint("Preempt(ON);DocDo(0x%X,0x%X);",doc,dof_flags);
+  U8 *buf=MStrPrint("Preempt(ON);DocEd(0x%X,0x%X);",doc,dof_flags);
   CTask *task=Spawn(&SrvCmdLine,NULL,"View",,Fs);
   TaskExe(task,NULL,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   Free(buf);
@@ -441,21 +443,21 @@ public CTask *PopUpViewPrint(U8 *fmt,...)
   return task;
 }
 
-#help_index "DolDoc/Input"
+#help_index "DolDoc/Input;StdIn/DolDoc"
 public I64 PopUpMenu(CDoc *doc,I64 dof_flags=0)
-{//Do (Run) menu chooser doc in PopUp win task.
+{//Run menu chooser doc in PopUp win task.
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
-  return PopUpPrint("DocMenuDo(0x%X,0x%X);",doc,dof_flags);
+  return PopUpPrint("DocMenu(0x%X,0x%X);",doc,dof_flags);
 }
 
-public Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,I64 dof_flags=DOF_MIN_SIZE,
-    U8 *header=NULL,U8 *footer=NULL)
+public Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,
+	I64 dof_flags=DOF_MIN_SIZE,U8 *header=NULL,U8 *footer=NULL)
 {//See $LK,"::/Demo/DolDoc/Form.CPP"$ and $LK,"::/Demo/LastClass.CPP"$.
-  return PopUpPrint("DocFormDo(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
-    dof_flags,header,footer);
+  return PopUpPrint("DocForm(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
+	dof_flags,header,footer);
 }
 
-#help_index "DolDoc/Input;File/FileNames"
+#help_index "DolDoc/Input;File/FileNames;StdIn/DolDoc"
 public U8 *PopUpPickFile(U8 *dir=NULL)
 {//Filename chooser.  Uses $LK,"FileMgr",A="MN:FileMgr"$().
   U8 *result,*st,*st2;
@@ -493,7 +495,7 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 dof_flags=0,CTask *mem_task=NULL)
     StrCpy(fn.name,dft);
   else
     *fn.name=0;
-  if (DocFormDo(&fn,,dof_flags))
+  if (DocForm(&fn,,dof_flags))
     return StrNew(fn.name,mem_task);
   else
     return NULL;
@@ -501,8 +503,8 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 dof_flags=0,CTask *mem_task=NULL)
 
 public U8 *PopUpFileName(U8 *dft=NULL,I64 dof_flags=0)
 {//Filename chooser. Uses form, not $LK,"FileMgr",A="MN:FileMgr"$().
-  U8 *st=MStrPrint("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",dft,dof_flags|DOF_MIN_SIZE),
-     *result=PopUp(st,Fs);
+  U8 *st=MStrPrint("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",
+	dft,dof_flags|DOF_MIN_SIZE),*result=PopUp(st,Fs);
   Free(st);
   return result;
 }
@@ -520,7 +522,7 @@ Bool PopUpCd()
   return result;
 }
 
-#help_index "DolDoc/Input;Char/Lists"
+#help_index "DolDoc/Input;Char/Lists;StdIn/DolDoc"
 public U8 *PopUpPickLst(U8 *lst)
 {//Prompt for lst entry in PopUp win task.
   I64 i=0;
@@ -545,7 +547,7 @@ public U8 *PopUpPickDefineSub(U8 *st)
   return PopUpPickLst(Define(st));
 }
 
-#help_index "DolDoc/Input"
+#help_index "DolDoc/Input;StdIn/DolDoc"
 public I64 PopUp1(U8 *b1,I64 n1,U8 *header=NULL,U8 *footer=NULL)
 {//Make PopUp win task with one button.
   I64 i,l1=StrLen(b1);
@@ -611,7 +613,7 @@ I64 PopUpReplaceSkipAllCancel(U8 *header=NULL,U8 *footer=NULL)
   return i;
 }
 
-U8 *DoPopUpGetStr(U8 *header,CTask *mem_task)
+U8 *PopUpGetStr2(U8 *header,CTask *mem_task)
 {
   U8 *result,*st;
   if (header)
@@ -624,8 +626,8 @@ U8 *DoPopUpGetStr(U8 *header,CTask *mem_task)
 
 public U8 *PopUpGetStr(U8 *header=NULL)
 {//Prompt for text str in PopUp win task.
-  U8 *st=MStrPrint("DoPopUpGetStr(0x%X,0x%X);",header,Fs),
-     *result=PopUp(st,Fs);
+  U8 *st=MStrPrint("PopUpGetStr2(0x%X,0x%X);",header,Fs),
+	*result=PopUp(st,Fs);
   Free(st);
   return result;
 }
@@ -638,7 +640,16 @@ public I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
   return result;
 }
 
-public I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NULL)
+public F64 PopUpGetF64(U8 *msg,F64 dft,F64 lo=MIN_F64,F64 hi=MAX_F64)
+{//Prompt for F64 text expression in PopUp win task.
+  U8 *st=MStrPrint("GetF64(0x%X,0x%X(F64),0x%X(F64),0x%X(F64));",msg,dft,lo,hi);
+  F64 result=PopUp(st,Fs)(F64);
+  Free(st);
+  return result;
+}
+
+public I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,
+	U8 *header=NULL,U8 *footer=NULL)
 {//Evenly-spaced I64 range chooser in PopUp win task.
   I64 i;
   CDoc *doc=DocNew;
@@ -659,7 +670,7 @@ public F64 PopUpRangeF64(F64 lo,F64 hi,F64 step,
 {//Evenly-spaced F64 range chooser in PopUp win task.
   F64 d;
   I64 i;
-  U8 buf[136];
+  U8 buf[STR_LEN];
   CDoc *doc=DocNew;
   if (header)
     DocPrint(doc,"%s",header);
@@ -680,7 +691,7 @@ public F64 PopUpRangeF64Exp(F64 lo,F64 hi,F64 factor,
 {//Exp-spaced F64 range chooser in PopUp win task.
   F64 d;
   I64 i;
-  U8 buf[136];
+  U8 buf[STR_LEN];
   CDoc *doc=DocNew;
   if (header)
     DocPrint(doc,"%s",header);
@@ -707,11 +718,11 @@ public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
 {//Tell adam task to compile and run a file.
   Bool okay=TRUE;
   U8 *name=FileNameAbs(filename),
-     *name2=DftExt(name,"CPP.Z");
+	*name2=DftExt(name,"CPP.Z");
   I64 result=0;
   if (warn_ext &&
-      !FilesFindMatch(name2,FILEMASK_JIT) &&
-      !PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
+	!FilesFindMatch(name2,FILEMASK_JIT) &&
+	!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
     okay=FALSE;
   if (okay)
     result=Adam("#include \"%s\";",name2);
@@ -720,18 +731,21 @@ public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
   return result;
 }
 
-public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,CTask *parent=NULL,CTask **_pu_task=NULL)
+public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
+	CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Run code file in PopUp win task.
   Bool okay=TRUE;
   U8 *st,*name=FileNameAbs(filename),
-     *name2=DftExt(name,"CPP.Z");
+	*name2=DftExt(name,"CPP.Z");
   I64 result=0;
   if (warn_ext &&
-      !FilesFindMatch(name2,FILEMASK_JIT) &&
-      !PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
+	!FilesFindMatch(name2,FILEMASK_JIT) &&
+	!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
     okay=FALSE;
   if (okay) {
-    st=MStrPrint("\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\");\\n\");UserTaskCont;",name2);
+    st=MStrPrint(
+	  "\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\");\\n\");UserTaskCont;",
+	  name2);
     result=PopUp(st,parent,_pu_task);
     Free(st);
   }
@@ -741,7 +755,8 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,CTask *parent=NULL,CTask **
 }
 
 #help_index "Graphics/Input"
-public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft=TRUE)
+public I64 PopUpColor(U8 *header=NULL,
+	Bool allow_transparent=TRUE,Bool allow_dft=TRUE)
 {//Chooser for 16-color, default or transparent.
   I64 i;
   CDoc *doc=DocNew;
@@ -749,7 +764,7 @@ public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft
     DocPrint(doc,"%s",header);
   if (allow_transparent)
     DocPrint(doc,"$$MU,\"TRANSPARENT\",LE=TRANSPARENT$$\n");
-  for (i=0;i<16;i++)
+  for (i=0;i<NUM_COLORS;i++)
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-8Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",i);
   if (allow_dft)
     DocPrint(doc,"$$BG,WHITE$$$$MU,\"DEFAULT\",LE=DOC_DFT$$$$BG$$");
@@ -759,27 +774,32 @@ public I64 PopUpColor(U8 *header=NULL,Bool allow_transparent=TRUE,Bool allow_dft
 }
 
 public I64 PopUpColorLighting(U8 *header=NULL)
-{//Chooser for std TempleOS $LK,"GrLighting",A="MN:GrLighting"$() color.
+{//Chooser for std TempleOS $LK,"DCLighting",A="MN:DCLighting"$() color.
   I64 i;
   CDoc *doc=DocNew;
   if (header)
     DocPrint(doc,"%s",header);
   DocPrint(doc,"\nSingle-Sided means both sides same color."
-	      "\nDouble-Sided means back side darker."
-	      "\n"
-	      "\nHalf-Range means 0 to [0,7]"
-	      "\n                 [8,15]-8 to [8,15]"
-	      "\nFull-Range means 0 to [0,7] to [0,7]+8"
-	      "\n");
-  DocPrint(doc,"\n$$LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$BLACK$$");
-  for (i=0;i<8;i++) {
+	"\nDouble-Sided means back side darker."
+	"\n"
+	"\nHalf-Range means 0 to [0,7]"
+	"\n                 [8,15]-8 to [8,15]"
+	"\nFull-Range means 0 to [0,7] to [0,7]+8"
+	"\n");
+  DocPrint(doc,
+	"\n$$LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$BLACK$$");
+  for (i=0;i<NUM_COLORS/2;i++) {
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$ ",i,i,"ST_COLORS",i);
-    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",
+	  ROPF_TWO_SIDED+i);
   }
-  DocPrint(doc,"\n$$LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$BLACK$$");
-  for (i=0;i<16;i++) {
-    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$ ",i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
-    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",ROPF_TWO_SIDED+ROPF_HALF_RANGE_COLOR+i);
+  DocPrint(doc,
+	"\n$$LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$BLACK$$");
+  for (i=0;i<NUM_COLORS;i++) {
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$ ",
+	  i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
+    DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",
+	  i,i,"ST_COLORS",ROPF_TWO_SIDED+ROPF_HALF_RANGE_COLOR+i);
   }
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -791,7 +811,8 @@ class CTransformForm
   F64 x_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"X Scale :%12.6f\"$$\n";
   F64 y_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"Y Scale :%12.6f\"$$\n";
   F64 z_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"Z Scale :%12.6f\"$$\n";
-  F64 é_z	fmtstr "\nAngles are in degrees\n$$DA-TRM,32,RT=F64,A=\"Z-Axis  :%12.6f\"$$\n";
+  F64 é_z	fmtstr
+	"\nAngles are in degrees\n$$DA-TRM,32,RT=F64,A=\"Z-Axis  :%12.6f\"$$\n";
   F64 é_y	fmtstr "$$DA-TRM,32,RT=F64,A=\"Y-Axis  :%12.6f\"$$\n";
   F64 é_x	fmtstr "$$DA-TRM,32,RT=F64,A=\"X-Axis  :%12.6f\"$$\n";
   F64 x_offset	fmtstr "\n$$DA-TRM,32,RT=F64,A=\"X Offset:%12.6f\"$$\n";
@@ -818,9 +839,9 @@ Bool PopUpTransform(I64 *r)
     r[10]=tf->z_scale*GR_SCALE;
     r[15]=GR_SCALE;
 
-    GrRotZEqu(r,tf->é_z*ã/180.0);
-    GrRotYEqu(r,tf->é_y*ã/180.0);
-    GrRotXEqu(r,tf->é_x*ã/180.0);
+    Mat4x4RotZ(r,tf->é_z*ã/180.0);
+    Mat4x4RotY(r,tf->é_y*ã/180.0);
+    Mat4x4RotX(r,tf->é_x*ã/180.0);
 
     r[3] =tf->x_offset*GR_SCALE;
     r[7] =tf->y_offset*GR_SCALE;
@@ -846,21 +867,23 @@ U0 DrawIt(CTask *task,CDC *dc)
       else
 	i1=TRANSPARENT;
       dc->color=j1+i1<<16+ROPF_DITHER;
-      GrRect(dc,i*PU_SPACING,j*PU_SPACING+FramePtr("DitherDoFrame",task),PU_SPACING,PU_SPACING);
+      GrRect(dc,i*PU_SPACING,j*PU_SPACING+FramePtr("DitherFrame",task),
+	    PU_SPACING,PU_SPACING);
     }
   i=(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH;
   if (doc->max_x>i) i=doc->max_x;
   WinHorz(task->win_left,task->win_left+i,task);
-  WinVert(task->win_top,task->win_top+doc->max_y+(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH,task);
+  WinVert(task->win_top,task->win_top+doc->max_y+
+	(17*PU_SPACING+FONT_WIDTH-1)/FONT_WIDTH,task);
 }
 
-I64 DitherColorDo(U8 *header=NULL)
+I64 DitherColor2(U8 *header=NULL)
 {
   I64 msg_code,a1,a2,result=-1,i,j;
   DocClear;
   "%s",header;
   DocRecalc(DocPut);
-  FramePtrAdd("DitherDoFrame",(DocPut->max_y+1)*FONT_HEIGHT);
+  FramePtrAdd("DitherFrame",(DocPut->max_y+1)*FONT_HEIGHT);
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->draw_it=&DrawIt;
   do {
@@ -868,26 +891,26 @@ I64 DitherColorDo(U8 *header=NULL)
     if (msg_code==MSG_IP_L_DOWN) {
       msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
       i=a1/PU_SPACING;
-      j=(a2-FramePtr("DitherDoFrame"))/PU_SPACING;
+      j=(a2-FramePtr("DitherFrame"))/PU_SPACING;
       if (a1>=0 && a2>=0 && 0<=j<17 && 0<=i<17) {
 	if (j==16) j=TRANSPARENT;
 	if (i==16) i=TRANSPARENT;
 	result=j+i<<16+ROPF_DITHER;
-	goto dcd_done;
+	goto dc_done;
       }
     }
   } while (!(msg_code==MSG_KEY_DOWN && (a1==CH_ESC || a1==CH_SHIFT_ESC)));
   do GetMsg(&a1,&a2,1<<MSG_KEY_UP);
   while (!a1);
-dcd_done:
+dc_done:
   SettingsPop;
-  FramePtrDel("DitherDoFrame");
+  FramePtrDel("DitherFrame");
   return result;
 }
 
 public I64 PopUpColorDither(U8 *header=NULL)
 {//Chooser for 2 x 16 colors or transparent.
-  U8 buf[136];
-  StrPrint(buf,"DitherColorDo(0x%X);",header);
+  U8 buf[STR_LEN];
+  StrPrint(buf,"DitherColor2(0x%X);",header);
   return PopUp(buf,Fs);
 }

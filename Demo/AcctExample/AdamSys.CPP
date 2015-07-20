@@ -15,7 +15,7 @@ U0 UserStartUp()
       "$$PURPLE$$DFT$$FG$$:";
       break;
   }
-  "$TX,"79,905",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
+  "$TX,"80,729",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
   CPURep;
 }
 

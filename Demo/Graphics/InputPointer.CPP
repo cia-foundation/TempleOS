@@ -1,6 +1,7 @@
 U0 InputPointer()
 {
-  while (!ip.lb) //Left Button
+  "Press left mouse button to exit.\n";
+  while (!ip.lb) //Left button to exit.
     GrPlot(,ip.pos.x,ip.pos.y);
   DCFill;
 }

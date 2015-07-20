@@ -34,7 +34,8 @@ Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
   PUSHFD
   CLI
   if (task) {
-    if (&task->stk->stk_base<=ptr<=(&task->stk->stk_base)(U8 *)+task->stk->stk_size)
+    if (&task->stk->stk_base<=ptr<=
+	  (&task->stk->stk_base)(U8 *)+task->stk->stk_size)
       result=TRUE;
   } else if (sys_heap_base<=ptr<=sys_heap_limit)
     result=TRUE;
@@ -103,7 +104,7 @@ U8 *TaskCaller(CTask *task=NULL,I64 num=0,Bool saved_context=FALSE)
 U0 StkRep(CTask *task=NULL)
 {//Reports whats on the stk.
   I64 i,j,addr,
-      **rbp,**rsp,*my_rsp[STK_REP_LEN];
+	**rbp,**rsp,*my_rsp[STK_REP_LEN];
   CHashTable *old_hash=Fs->hash_table;
   if (!task) task=Fs;
   if (!TaskValidate(task))
@@ -127,9 +128,10 @@ U0 StkRep(CTask *task=NULL)
   Fs->hash_table=task->hash_table;
   for (i=0;i<STK_REP_LEN;i++) {
     "%08X [RSP+%04X]: %016X ",rsp+i,
-      i*sizeof(U8 *),my_rsp[i];
+	  i*sizeof(U8 *),my_rsp[i];
     while (TRUE) {
-      if (!(&task->stk->stk_base<=rbp<(&task->stk->stk_base)(U8 *)+task->stk->stk_size))
+      if (!(&task->stk->stk_base<=rbp<
+	    (&task->stk->stk_base)(U8 *)+task->stk->stk_size))
 	break;
       j=rbp-rsp;
       if (j>=i)
@@ -232,7 +234,7 @@ U0 RawPrint(I64 mS=100,U8 *fmt,...)
 U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //screen output for a fixed length
-//of time.
+  //of time.
   Bool old_raw,old_input_filter;
   PUSHFD
   CLI
@@ -248,7 +250,7 @@ U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80)
 U0 RawDm(I64 mS=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //screen output for a fixed length
-//of time.
+  //of time.
   Bool old_raw,old_input_filter;
   PUSHFD
   CLI
@@ -451,12 +453,12 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
   if (!task) task=Fs;
   if (ip!=INVALID_PTR) task->rip=ip;
   if (BptFind(task->rip,task))
-	"\nDo one of the following, first:\n"
-	">S;\t\t\t//Single step\n"
-	">B2;\t\t\t//Clear all break points\n"
-	">G2;\t\t\t//Clear all break points and Go\n\n"
-	"After resuming, <CTRL-ALT-t> changes focus task\n"
-	"After resuming, <CTRL-ALT-f> flushes screen VGA cache\n";
+    "\nDo one of the following, first:\n"
+	  ">S;\t\t\t//Single step\n"
+	  ">B2;\t\t\t//Clear all break points\n"
+	  ">G2;\t\t\t//Clear all break points and Go\n\n"
+	  "After resuming, <CTRL-ALT-t> changes focus task\n"
+	  "After resuming, <CTRL-ALT-f> flushes screen VGA cache\n";
   else {
     LBtr(&task->task_flags,TASKf_DISABLE_BPTS);
     LBtr(&task->rflags,RFLAGf_TRAP);//No single step
@@ -464,7 +466,7 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
     if (task==Fs) {
       if (IsDbg && task->next_lex!=&task->next_lex) {
 	"Exit Dbg\n";
-	Btr(&task->last_lex->flags,Lf_PMT);
+	Btr(&task->last_lex->flags,CCf_PMT);
       }
     } else
       Exit;
@@ -493,7 +495,7 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
   if (task==Fs) {
     if (IsDbg) {
       if (task->next_lex!=&task->next_lex)
-	Btr(&task->last_lex->flags,Lf_PMT);
+	Btr(&task->last_lex->flags,CCf_PMT);
     }
   } else
     Exit;
@@ -502,37 +504,37 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
 
 U0 DbgHelp()
 {
-"\n"
-"The cmd line is basically the same as normal.	Here are some common\n"
-"debugging commands.\n\n"
-">EdLite(\"FileName\");\t\t//Edit file.\n"
-">D(0x100000);\t\t\t//Dump page tables.\n"
-">Dm(0x100000);\t\t\t//Dump page tables.\n"
-">Dm(Fs,sizeof(CTask));\t\t//Dump current task record.\n"
-">ClassRep(Fs,\"CTask\",1);\t//Dump current task record.\n"
-">ClassRep(Fs,,1);\t\t//(It knows lastclass.)\n"
-">CallerRep;\t\t\t//Stack trace report.\n"
-">Da(_RSP);\t\t\t//Dump stk.\n"
-">Dr;\t\t\t\t//Dump Regs.\n"
-">1+2*3+&Print;\t\t\t//Show calculation result.\n"
-">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
-">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
-">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
-">I64 i;\t\t\t\t//Declare variable.\n"
-">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
-">U(&Print+0x8);\t\t\t//Unassemble Print.\n"
-">Uf(\"Print\");\t\t\t//Unassembler function \"Print\".\n"
-">Man(\"Print\");\t\t\t//Edit Src for \"Print\".\n"
-">E(_RIP);\t\t\t//Edit Src Code.\n"
-">Fix;\t\t\t\t//Edit Last Err Src Code.\n"
-">B(&Main+0x20);\t\t\t//Toggle break point.\n"
-">B2;\t\t\t\t//Clear all break points.\n"
-">S;\t\t\t\t//Single step.\n"
-">G;\t\t\t\t//Resume execution.\n"
-">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
-">Exit;\t\t\t\t//Exit (kill) task.\n\n"
-"After resuming, <CTRL-ALT-t> changes focus task.\n"
-"After resuming, <CTRL-ALT-f> flushes screen VGA cache.\n\n";
+  "\n"
+	"The cmd line is basically the same as normal.	Here are some common\n"
+	"debugging commands.\n\n"
+	">EdLite(\"FileName\");\t\t//Edit file.\n"
+	">D(0x100000);\t\t\t//Dump page tables.\n"
+	">Dm(0x100000);\t\t\t//Dump page tables.\n"
+	">Dm(Fs,sizeof(CTask));\t\t//Dump current task record.\n"
+	">ClassRep(Fs,\"CTask\",1);\t//Dump current task record.\n"
+	">ClassRep(Fs,,1);\t\t//(It knows lastclass.)\n"
+	">CallerRep;\t\t\t//Stack trace report.\n"
+	">Da(_RSP);\t\t\t//Dump stk.\n"
+	">Dr;\t\t\t\t//Dump Regs.\n"
+	">1+2*3+&Print;\t\t\t//Show calculation result.\n"
+	">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
+	">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
+	">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
+	">I64 i;\t\t\t\t//Declare variable.\n"
+	">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
+	">U(&Print+0x8);\t\t\t//Unassemble Print.\n"
+	">Uf(\"Print\");\t\t\t//Unassembler function \"Print\".\n"
+	">Man(\"Print\");\t\t\t//Edit Src for \"Print\".\n"
+	">E(_RIP);\t\t\t//Edit Src Code.\n"
+	">Fix;\t\t\t\t//Edit Last Err Src Code.\n"
+	">B(&Main+0x20);\t\t\t//Toggle break point.\n"
+	">B2;\t\t\t\t//Clear all break points.\n"
+	">S;\t\t\t\t//Single step.\n"
+	">G;\t\t\t\t//Resume execution.\n"
+	">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
+	">Exit;\t\t\t\t//Exit (kill) task.\n\n"
+	"After resuming, <CTRL-ALT-t> changes focus task.\n"
+	"After resuming, <CTRL-ALT-f> flushes screen VGA cache.\n\n";
 }
 
 U0 Dbg2()
@@ -578,7 +580,7 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
     SysHlt;
   }
   "\n\tTempleOS Debugger\n\n"
-  ">Help;\t//For help.\n\n";
+	">Help;\t//For help.\n\n";
   Beep(500,TRUE);
   if (fault_num==I_DBG) {
     if (dbg.msg) {
@@ -616,7 +618,8 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
   "Task \"";
   "%s",Fs->task_title;
   "\"\n";
-  "Fault:0x%02X %Z\t\tErr Code:%08X\n",fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
+  "Fault:0x%02X %Z\t\tErr Code:%08X\n",
+	fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
   "RIP:%08X",Fs->rip; //Sometimes crashes on %p, so do this first
   ":%p  RSP:%08X\n",Fs->rip,Fs->rsp;
   if (fault_num==I_PAGE_FAULT) {
@@ -635,7 +638,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
 }
 
 U0 Dbg(U8 *msg=NULL,I64 msg_num=0)
-{//Enters the debugger.	Can be used as a panic.
+{//Enters the debugger.Can be used as a panic.
   PUSHFD
   CLI
   dbg.msg=msg;

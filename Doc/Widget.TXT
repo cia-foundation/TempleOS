@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"DolDoc Widget Help"$$FG$
 
-$LK,"DolDoc",A="::/Doc/DolDocOverview.TXT"$ is a propriatary TempleOS document type.
+$LK,"DolDoc",A="::/Doc/DolDocOverview.TXT"$ is a TempleOS document type.
 
 $FG,2$"Expression"$FG$ a num or HolyC algebraic term with operators and HolyC syms can be entered.
 $FG,2$"Macro"$FG$ Most entries can behave like macro entries if you assign them macro strs.
@@ -33,7 +33,7 @@ $FG,5$Quote$FG$ Make the result suitable for including in a program, in quotes, 
 $FG,5$X Expression$FG$ For cursor movements, the horizontal value.
 $FG,5$Y Expression$FG$ For cursor movements, the vertical value.
 
-$FG,5$$BK,1$PopUp$BK,0$$FG$ For macro's, run the macro in a PopUp window.  Do this when making a macro to run a program, so it doesn't tie-up memory.
+$FG,5$PopUp$FG$ For macro's, run the macro in a PopUp window.  Do this when making a macro to run a program, so it doesn't tie-up memory.
 
 $FG,5$Escape$FG$ For macro's, send an $FG,2$<ESC>$FG$ char to exit before running the macro.  Without this, the macro runs in the wrong window, usually.
 

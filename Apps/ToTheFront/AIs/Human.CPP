@@ -8,8 +8,8 @@ U0 TanksPlot()
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
     msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
-	1<<MSG_IP_R_UP);
+	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
 	HandleChar(a1);
@@ -18,7 +18,8 @@ U0 TanksPlot()
 	if (CursorInWindow(Fs,a1,a2)) {
 	  UpdateCursor(Fs,a1,a2);
 	  if (tempu=FindUnit(cursor_row,cursor_col)) {
-	    if (tempu->player==enemy_player || tempu->fired || !tempu->indirect_fire)
+	    if (tempu->player==enemy_player || tempu->fired ||
+		  !tempu->indirect_fire)
 	      tempu=NULL;
 	    else {
 	      RowCol2XY(&fire_radius_x,&fire_radius_y,tempu->row,tempu->col);
@@ -34,7 +35,8 @@ U0 TanksPlot()
 	  if (!tempu)
 	    Beep;
 	  else {
-	    if (Sqrt(Sqr(fire_radius_x-target_x)+Sqr(fire_radius_y-target_y))>fire_radius)
+	    if (Sqrt(Sqr(fire_radius_x-target_x)+Sqr(fire_radius_y-target_y))>
+		  fire_radius)
 	      Beep;
 	    else
 	      PlotShot(tempu,cursor_row,cursor_col);
@@ -60,8 +62,8 @@ U0 TanksMove()
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
     msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
-	1<<MSG_IP_R_UP);
+	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
 	HandleChar(a1);
@@ -86,7 +88,7 @@ U0 TanksMove()
 	      Beep;
 	    else
 	      MoveUnit(tempu,a1+Fs->horz_scroll.pos,
-		  a2+Fs->vert_scroll.pos);
+		    a2+Fs->vert_scroll.pos);
 	    break;
 	  }
 	}
@@ -109,8 +111,8 @@ U0 TanksFire()
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
     msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
-	1<<MSG_IP_R_UP);
+	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
 	HandleChar(a1);
@@ -119,7 +121,8 @@ U0 TanksFire()
 	if (CursorInWindow(Fs,a1,a2)) {
 	  UpdateCursor(Fs,a1,a2);
 	  if (tempu=FindUnit(cursor_row,cursor_col)) {
-	    if (tempu->player==enemy_player || tempu->fired || tempu->indirect_fire)
+	    if (tempu->player==enemy_player || tempu->fired ||
+		  tempu->indirect_fire)
 	      tempu=NULL;
 	    else {
 	      RVSetUp(cur_player);
@@ -137,7 +140,8 @@ U0 TanksFire()
 	  if (!tempu)
 	    Beep;
 	  else {
-	    if (!target || target->player!=enemy_player || !Bt(&target->visible,0))
+	    if (!target || target->player!=enemy_player ||
+		  !Bt(&target->visible,0))
 	      Beep;
 	    else
 	      FireShot(tempu,target);

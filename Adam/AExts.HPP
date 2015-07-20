@@ -4,17 +4,15 @@ extern U0 ACDFillin(I64 n);
 extern U0 ACFillIn(I64 n);
 extern U0 ACFindMisspelled(CDoc *doc);
 extern U0 ACMan(I64 n,CTask *parent=NULL);
-extern U0 AcctOneTimePopUp(I64 flag_num,U8 *msg);
 extern I64 AdamFile(U8 *filename,Bool warn_ext=TRUE);
 extern Bool AutoComplete(Bool val=OFF);
 extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
-extern I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=NULL,
-		U8 *_stage2_filename=NULL);
 extern U0 ClipboardDel();
 extern CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type);
 extern Bool CtrlInside(CCtrl *c,I64 x,I64 y);
 extern U8 *DC2Sprite(CDC *tempb);
-extern U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE);
+extern U0 DocBMP(CDoc *doc=NULL,U8 *filename,
+	Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE);
 extern U0 DocBinDel(CDoc *doc,CDocBin *b);
 extern U0 DocBinsValidate(CDoc *doc);
 extern U0 DocBottom(CDoc *doc=NULL);
@@ -27,7 +25,8 @@ extern U0 DocDel(CDoc *doc);
 extern CDoc *DocDisplay(CTask *task=NULL);
 extern U0 DocDump(CDoc *doc,I64 uS_delay=0);
 extern CDocEntry *DocEntryCopy(CDoc *doc,CDocEntry *doc_e);
-extern Bool DocFormDo(U8 *_d,U8 *class_name=lastclass,I64 dof_flags=0,U8 *header=NULL,U8 *footer=NULL);
+extern Bool DocForm(U8 *_d,U8 *class_name=lastclass,
+	I64 dof_flags=0,U8 *header=NULL,U8 *footer=NULL);
 extern U0 DocHelpIndex(CDoc *doc,U8 *index);
 extern U0 DocInsDoc(CDoc *doc,CDoc *doc2);
 extern U0 DocInsEntry(CDoc *doc,CDocEntry *doc_e);
@@ -51,9 +50,11 @@ extern I64 EdCurU8(CDoc *doc);
 extern U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64);
 extern U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64);
 extern U8 *EdSprite(I64 bin_num);
+extern I64 FindWiz();
 extern I64 GetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64);
 extern U0 GrPlot0(CDC *dc,I64 x,I64 y);
-extern I64 GrepWiz();
+extern I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
+	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL);
 extern CMenuEntry *MenuEntryFind(CMenu *m,U8 *full_name);
 extern CMenu *MenuFilePush(U8 *filename);
 extern U0 MenuPop();
@@ -61,18 +62,22 @@ extern CMenu *MenuPush(U8 *st);
 extern CTask *Noise(I64 mS,I64 min_freq,I64 max_freq);
 extern Bool Plain(U8 *filename,I64 edf_dof_flags=0);
 extern Bool PopUpCancelOk(U8 *header=NULL,U8 *footer=NULL);
-extern I64 PopUpColor(U8 *header=NULL,Bool allow_transpant=TRUE,Bool allow_dft=TRUE);
+extern I64 PopUpColor(U8 *header=NULL,
+	Bool allow_transpant=TRUE,Bool allow_dft=TRUE);
 extern I64 PopUpColorDither(U8 *header=NULL);
 extern I64 PopUpColorLighting(U8 *header=NULL);
-extern I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,CTask *parent=NULL,CTask **_pu_task=NULL);
-extern Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,I64 dof_flags=DOF_MIN_SIZE,
-		U8 *header=NULL,U8 *footer=NULL);
+extern I64 PopUpFile(U8 *filename,
+	Bool warn_ext=TRUE,CTask *parent=NULL,CTask **_pu_task=NULL);
+extern Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,
+	I64 dof_flags=DOF_MIN_SIZE,U8 *header=NULL,U8 *footer=NULL);
 extern U8 *PopUpGetStr(U8 *header=NULL);
 extern I64 PopUpMenu(CDoc *doc,I64 dof_flags=0);
 extern Bool PopUpNoYes(U8 *header=NULL,U8 *footer=NULL);
 extern Bool PopUpOk(U8 *header=NULL,U8 *footer=NULL);
-extern I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NULL);
+extern I64 PopUpRangeI64(
+	I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NULL);
 extern Bool PopUpTransform(I64 *r);
+extern U0 RegOneTimePopUp(I64 flag_num,U8 *msg);
 extern U0 SettingsPop(CTask *task=NULL,I64 flags=0);
 extern CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0);
 extern U0 TemplateCtrlSlider(CDoc *doc);
@@ -80,7 +85,8 @@ extern Bool View();
 extern U0 ViewAnglesDel(CTask *task=NULL);
 extern CCtrl *ViewAnglesNew(CTask *task=NULL);
 extern Bool WinBorder(Bool val,CTask *task=NULL);
-extern CDoc *WinCursorPosSet(CTask *task,I64 ip_text_x,I64 ip_text_y,Bool set_cursor=TRUE);
+extern CDoc *WinCursorPosSet(
+	CTask *task,I64 ip_text_x,I64 ip_text_y,Bool set_cursor=TRUE);
 extern Bool WinHorz(I64 left,I64 right,CTask *task=NULL);
 extern U0 WinMax(CTask *task=NULL);
 extern U0 WinMgrSync(I64 cnt=1,Bool force=FALSE);

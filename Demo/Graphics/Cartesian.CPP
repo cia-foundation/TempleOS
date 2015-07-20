@@ -12,8 +12,8 @@ U0 Cartesian()
   do {
     DocClear;
     "Enter algebraic equation to graph.\n"
-    "Example: y=2*x\n"
-    "y=";
+	  "Example: y=2*x\n"
+	  "y=";
     if (st=GetStr) {
       if (*st) {
 	h=Fs->pix_width/2;
@@ -35,7 +35,7 @@ U0 Cartesian()
 	ch=CH_SHIFT_ESC;
       Free(st);
     } else
-       ch=CH_SHIFT_ESC;
+      ch=CH_SHIFT_ESC;
     DCFill;
   } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
   DCDel(dc);

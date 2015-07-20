@@ -12,24 +12,24 @@ U0 Balloon()
 
   CLI
 
-    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
-    OutU8(VGAP_DATA,0xF);
-    MemSetI64(0xA0000,0,640*480/64);
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,0xF);
+  MemSetI64(0xA0000,0,640*480/64);
 
-    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
-    OutU8(VGAP_DATA,RED+GREEN+8);
-    for (k=100;k<150;k++) {
+  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  OutU8(VGAP_DATA,RED+GREEN+8);
+  for (k=100;k<150;k++) {
 
-      for (i=0;i<20;i++)
-	for (j=0;j<3;j++)
-	  *(0xA0000+0x1000+(i+k)*640/8+j)(U8 *)=a[i*3+j];
+    for (i=0;i<20;i++)
+      for (j=0;j<3;j++)
+	*(0xA0000+0x1000+(i+k)*640/8+j)(U8 *)=a[i*3+j];
 
-      BusyWait(40000);
+    BusyWait(40000);
 
-      for (i=0;i<20;i++)
-	for (j=0;j<3;j++)
-	  *(0xA0000+0x1000+(i+k)*640/8+j)(U8 *)=0;
-    }
+    for (i=0;i<20;i++)
+      for (j=0;j<3;j++)
+	*(0xA0000+0x1000+(i+k)*640/8+j)(U8 *)=0;
+  }
 
   STI
   VGAFlush;

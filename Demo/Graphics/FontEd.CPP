@@ -1,9 +1,11 @@
-/*After making a font, you can save it as a binary
-file with:
+/*After making a font...
+
+You can save it as a binary file with:
 	FileWrite("filename.BIN.Z",text.font,256*FONT_HEIGHT);
+
 You can load it with:
-	U8 *myfont=FileRead("filename.BIN");
-	text.font=myfont; //preserve text.font if you want to go back.
+	U64 *my_font=FileRead("filename.BIN.Z");
+	text.font=my_font; //preserve text.font if you want to go back.
 
 If you want to change the system font permanently,
 save to a file with this font editor program
@@ -33,7 +35,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	c=(BLUE<<4+WHITE)<<8 + k++;
       TextChar(task,,j,i,c);
     }
- 
+
   k=0;
   for (i=0;i<FONT_HEIGHT;i++)
     for (j=0;j<FONT_WIDTH;j++) {
@@ -42,8 +44,8 @@ U0 DrawIt(CTask *task,CDC *dc)
       else
 	dc->color=BLUE;
       GrRect(dc,BLOW_UP_CHAR_X+j*FONT_WIDTH,
-		  BLOW_UP_CHAR_Y+i*FONT_HEIGHT,
-	     FONT_WIDTH,FONT_HEIGHT);
+	    BLOW_UP_CHAR_Y+i*FONT_HEIGHT,
+	    FONT_WIDTH,FONT_HEIGHT);
     }
 }
 
@@ -51,11 +53,10 @@ U0 FESave(Bool pmt)
 {
   U8 old_draw_it=Fs->draw_it;
   CDoc *doc=DocNew;
-  I64 i,j,k=0;
+  I64 i;
   for (i=0;i<256;i++) {
-    for (j=0;j<FONT_HEIGHT;j++)
-      DocPrint(doc,"0x%02X,",text.font(U8 *)[k++]);
-    if (Bt(chars_bitmap_safe_dollar,i))
+    DocPrint(doc,"0x%016X,",text.font[i]);
+    if (Bt(chars_bmp_safe_dollar,i))
       DocPrint(doc,"//%c",i);
     else if (i=='$$')
       DocPrint(doc,"//$$$$",i);
@@ -72,11 +73,11 @@ U0 FontEd()
   I64 msg_code,a1,a2,k;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   MenuPush(
-  "File {"
-  "  SaveAs(,CH_CTRLA);"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}");
+	"File {"
+	"  SaveAs(,CH_CTRLA);"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}");
   AutoComplete;
   DocClear;
   DocCursor;
@@ -85,7 +86,8 @@ U0 FontEd()
   try {
     Fs->draw_it=&DrawIt;
     while (TRUE) {
-      switch (msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE)) {
+      switch (msg_code=GetMsg(&a1,&a2,
+	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE)) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {
 	    case 0:
@@ -120,13 +122,13 @@ U0 FontEd()
 	case MSG_IP_L_DOWN:
 	case MSG_IP_R_DOWN:
 	  if (0<=a1<FONT_WIDTH*16 &&
-	      0<=a2<FONT_HEIGHT*16) {
+		0<=a2<FONT_HEIGHT*16) {
 	    cur_ch=(a2/FONT_HEIGHT)*16+a1/FONT_WIDTH;
 	    break;
 	  } //fall through
 	case MSG_IP_MOVE:
 	  k=((a2-BLOW_UP_CHAR_Y)/FONT_HEIGHT)*FONT_WIDTH+
-	    (a1-BLOW_UP_CHAR_X)/FONT_WIDTH;
+		(a1-BLOW_UP_CHAR_X)/FONT_WIDTH;
 	  if (0<=k<FONT_WIDTH*FONT_HEIGHT) {
 	    if (ip.lb||msg_code==MSG_IP_L_DOWN)
 	      Bts(&text.font[cur_ch],k);

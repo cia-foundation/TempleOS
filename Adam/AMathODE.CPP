@@ -30,10 +30,10 @@ U0 ODERstPtrs(CMathODE *ode)
 public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
 {//Make differential equation ctrl struct. See $LK,"flags",A="MN:ODEF_HAS_MASSES"$.
 
-//The tolerance is not precise.
-//You can min_tolerance and it will
-//dynamically adjust tolerance to utilize
-//the CPU.
+  //The tolerance is not precise.
+  //You can min_tolerance and it will
+  //dynamically adjust tolerance to utilize
+  //the CPU.
 
   I64 s=n*sizeof(F64);
   CMathODE *ode=MAlloc(sizeof(CMathODE));
@@ -78,7 +78,7 @@ public I64 ODESize(CMathODE *ode)
 U0 ODESetMassesPtrs(CMathODE *ode,F64 *state,F64 *DstateDt)
 {
   COrder2D3 *ptr1=state(F64 *)+ode->n,
-	   *ptr2=DstateDt(F64 *)+ode->n;
+	*ptr2=DstateDt(F64 *)+ode->n;
   CMass *tempm=ode->next_mass;
   while (tempm!=&ode->next_mass) {
     tempm->state=ptr1++;
@@ -178,8 +178,8 @@ public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     dd=Sqr((temps->end1->x+temps->end2->x)/2-x)+
-      Sqr((temps->end1->y+temps->end2->y)/2-y)+
-      Sqr((temps->end1->z+temps->end2->z)/2-z);
+	  Sqr((temps->end1->y+temps->end2->y)/2-y)+
+	  Sqr((temps->end1->z+temps->end2->z)/2-z);
     if (dd<best_dd) {
       best_dd=dd;
       best_spring=temps;
@@ -189,8 +189,9 @@ public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
   return best_spring;
 }
 
-public U0 MassOrSpringFind(CMathODE *ode,CMass **result_mass,CSpring **result_spring,
-  F64 x,F64 y,F64 z=0)
+public U0 MassOrSpringFind(
+	CMathODE *ode,CMass **result_mass,CSpring **result_spring,
+	F64 x,F64 y,F64 z=0)
 {//Find spring or mass nearest x,y,z.
   CMass   *tempm,*best_mass=NULL;
   CSpring *temps,*best_spring=NULL;
@@ -209,8 +210,8 @@ public U0 MassOrSpringFind(CMathODE *ode,CMass **result_mass,CSpring **result_sp
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     dd=Sqr((temps->end1->x+temps->end2->x)/2-x)+
-      Sqr((temps->end1->y+temps->end2->y)/2-y)+
-      Sqr((temps->end1->z+temps->end2->z)/2-z);
+	  Sqr((temps->end1->y+temps->end2->y)/2-y)+
+	  Sqr((temps->end1->z+temps->end2->z)/2-z);
     if (dd<best_dd) {
       best_dd=dd;
       best_spring=temps;
@@ -288,15 +289,15 @@ U0 ODECalcDrag(CMathODE *ode)
     tempm=ode->next_mass;
     while (tempm!=&ode->next_mass) {
       if (!(tempm->flags & MSF_INACTIVE) &&
-	  tempm->drag_profile_factor &&
-	  (dd=D3NormSqr(&tempm->state->DxDt))) {
+	    tempm->drag_profile_factor &&
+	    (dd=D3NormSqr(&tempm->state->DxDt))) {
 	d=ode->drag_v;
 	if (ode->drag_v2)
 	  d+=ode->drag_v2*Sqrt(dd);
 	if (ode->drag_v3)
 	  d+=dd*ode->drag_v3;
 	D3SubEqu(&tempm->DstateDt->DxDt,
-	  D3Mul(d*tempm->drag_profile_factor,&tempm->state->DxDt,&p));
+	      D3Mul(d*tempm->drag_profile_factor,&tempm->state->DxDt,&p));
       }
       tempm=tempm->next;
     }
@@ -311,7 +312,7 @@ U0 ODEApplyAccelerationLimit(CMathODE *ode)
     tempm=ode->next_mass;
     while (tempm!=&ode->next_mass) {
       if (!(tempm->flags & MSF_INACTIVE) &&
-	  (d=D3Norm(&tempm->DstateDt->DxDt))>ode->acceleration_limit)
+	    (d=D3Norm(&tempm->DstateDt->DxDt))>ode->acceleration_limit)
 	D3MulEqu(&tempm->DstateDt->DxDt,ode->acceleration_limit/d);
       tempm=tempm->next;
     }
@@ -422,7 +423,9 @@ U0 ODERK4OneStep(CMathODE *ode)
 U0 ODECashKarp(CMathODE *ode)
 {
   I64 i,n=ode->n_internal;
-  F64 h=ode->h,*state=ode->state_internal,*DstateDt=ode->DstateDt,*ak2,*ak3,*ak4,*ak5,*ak6,*tempstate,*stateerr,*outstate;
+  F64 h=ode->h,*state=ode->state_internal,
+	*DstateDt=ode->DstateDt,*ak2,*ak3,*ak4,*ak5,*ak6,
+	*tempstate,*stateerr,*outstate;
 
   ak2=ode->temp0;
   ak3=ode->temp1;
@@ -443,15 +446,19 @@ U0 ODECashKarp(CMathODE *ode)
     tempstate[i]=state[i]+h*(ODEb41*DstateDt[i]+ODEb42*ak2[i]+ODEb43*ak3[i]);
   ODECallDerivative(ode,ode->t+ODEa4*h,tempstate,ak4);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb51*DstateDt[i]+ODEb52*ak2[i]+ODEb53*ak3[i]+ODEb54*ak4[i]);
+    tempstate[i]=state[i]+h*(ODEb51*DstateDt[i]+
+	  ODEb52*ak2[i]+ODEb53*ak3[i]+ODEb54*ak4[i]);
   ODECallDerivative(ode,ode->t+ODEa5*h,tempstate,ak5);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb61*DstateDt[i]+ODEb62*ak2[i]+ODEb63*ak3[i]+ODEb64*ak4[i]+ODEb65*ak5[i]);
+    tempstate[i]=state[i]+h*(ODEb61*DstateDt[i]+
+	  ODEb62*ak2[i]+ODEb63*ak3[i]+ODEb64*ak4[i]+ODEb65*ak5[i]);
   ODECallDerivative(ode,ode->t+ODEa6*h,tempstate,ak6);
   for (i=0;i<n;i++)
-    outstate[i]=state[i]+h*(ODEc1*DstateDt[i]+ODEc3*ak3[i]+ODEc4*ak4[i]+ODEc6*ak6[i]);
+    outstate[i]=state[i]+h*(ODEc1*DstateDt[i]+
+	  ODEc3*ak3[i]+ODEc4*ak4[i]+ODEc6*ak6[i]);
   for (i=0;i<n;i++)
-    stateerr[i]=h*(ODEdc1*DstateDt[i]+ODEdc3*ak3[i]+ODEdc4*ak4[i]+ODEdc5*ak5[i]+ODEdc6*ak6[i]);
+    stateerr[i]=h*(ODEdc1*DstateDt[i]+ODEdc3*ak3[i]+
+	  ODEdc4*ak4[i]+ODEdc5*ak5[i]+ODEdc6*ak6[i]);
 }
 
 #define SAFETY 0.9
@@ -504,15 +511,11 @@ it has a timeout.
   I64 i;
   F64 d,start_time,timeout_time,t_desired,t_initial,interpolation;
   CMathODE *ode;
-  Bool old_suspend;
 
   if (task->next_ode==&task->next_ode)
     task->last_ode_time=0;
   else if (!Bt(&task->win_inhibit,WIf_SELF_ODE)) {
-    //See $LK,"GrUpdateWins",A="MN:GrUpdateWins"$()
-    //TODO: Being preempted here woulds be bad
-    if (task!=Fs)
-      old_suspend=Suspend(task);
+//See $LK,"GrUpdateTasks",A="MN:GrUpdateTasks"$() and $LK,"GrUpdateTaskODEs",A="MN:GrUpdateTaskODEs"$().
     //We will not pick a time limit based on
     //how busy the CPU is, what percent of the
     //last refresh cycle was spent on ODE's
@@ -536,7 +539,8 @@ it has a timeout.
 	ode->base_t+=t_desired-ode->t; //Slip
       else if (ode->derivative) {
 	ODEState2Internal(ode);
-	MemCpy(ode->initial_state,ode->state_internal,ode->n_internal*sizeof(F64));
+	MemCpy(ode->initial_state,ode->state_internal,
+	      ode->n_internal*sizeof(F64));
 	while (ode->t<t_desired) {
 	  ode->h_max=t_desired-ode->t;
 	  ODECallDerivative(ode,ode->t,ode->state_internal,ode->DstateDt);
@@ -595,13 +599,11 @@ ode_done:
 	  else
 	    ode->tolerance_internal*=2.0`d;
 	}
-	ode->tolerance_internal=Clamp(ode->tolerance_internal,ode->min_tolerance,ode->max_tolerance);
+	ode->tolerance_internal=Clamp(ode->tolerance_internal,
+	      ode->min_tolerance,ode->max_tolerance);
       }
       ode=ode->next;
     }
     winmgr.ode_time+=task->last_ode_time=tS-start_time;
-    //See $LK,"GrUpdateWins",A="MN:GrUpdateWins"$()
-    if (task!=Fs)
-      Suspend(task,old_suspend);
   }
 }

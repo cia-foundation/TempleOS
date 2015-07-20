@@ -3,7 +3,7 @@
 public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
 {//Typically, called at start of an application.
 //It saves many settings so they can be restored
-//at the end of the application with $LK,"SettingsPop",A="MN:SettingsPop"$().
+  //at the end of the application with $LK,"SettingsPop",A="MN:SettingsPop"$().
 
   CTaskSettings *tempse;
   CDoc *doc;
@@ -12,7 +12,7 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
   tempse=CAlloc(sizeof(CTaskSettings),task);
   tempse->cur_dir=CurDir(task,task);
   tempse->draw_it=task->draw_it;
-  GetVGAPalette4(tempse->palette4);
+  GrPaletteGet(tempse->palette);
   tempse->task_end_cb=task->task_end_cb;
 
   if (!(flags&TSF_SAME_SONG)) {
@@ -81,14 +81,14 @@ U0 SettingsPop2(CTask *task,CTaskSettings *tempse)
   task->title_src  =tempse->title_src;
   StrCpy(task->task_title,tempse->task_title);
   AutoComplete(tempse->autocomplete);
-  SetVGAPalette4(tempse->palette4);
+  GrPaletteSet(tempse->palette);
   Snd(0);
 }
 
 public U0 SettingsPop(CTask *task=NULL,I64 flags=0)
 {//Typically, called at end of an application.
   CTaskSettings *tempse;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (!task) task=Fs;
   if (!TaskValidate(task)) {
     Preempt(old_preempt);

@@ -12,7 +12,7 @@ public I64 GrFillPoly3(CDC *dc=gr.dc,I64 n,CD3I32 *poly)
 	x=poly[j].x; y=poly[j].y; z=poly[j].z;
 	if (dc->flags&DCF_TRANSFORMATION)
 	  (*dc->transform)(dc,&x,&y,&z);
-	GrReflect(dc,&x,&y,&z);
+	DCReflect(dc,&x,&y,&z);
 	tri[0].x=x; tri[0].y=y; tri[0].z=z;
       }
 
@@ -21,7 +21,7 @@ public I64 GrFillPoly3(CDC *dc=gr.dc,I64 n,CD3I32 *poly)
 	x=poly[j].x; y=poly[j].y; z=poly[j].z;
 	if (dc->flags&DCF_TRANSFORMATION)
 	  (*dc->transform)(dc,&x,&y,&z);
-	GrReflect(dc,&x,&y,&z);
+	DCReflect(dc,&x,&y,&z);
       }
       tri[1].x=x; tri[1].y=y; tri[1].z=z;
 
@@ -29,7 +29,7 @@ public I64 GrFillPoly3(CDC *dc=gr.dc,I64 n,CD3I32 *poly)
       x=poly[j].x; y=poly[j].y; z=poly[j].z;
       if (dc->flags&DCF_TRANSFORMATION)
 	(*dc->transform)(dc,&x,&y,&z);
-      GrReflect(dc,&x,&y,&z);
+      DCReflect(dc,&x,&y,&z);
       tri[2].x=x; tri[2].y=y; tri[2].z=z;
 
       result+=GrFillTri0(dc,&tri[0],&tri[1],&tri[2]);
@@ -90,7 +90,8 @@ public I64 GrRect3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,I64 w,I64 h)
   return GrFillPoly3(dc,4,poly);
 }
 
-public U0 GrBorder(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 step=1,I64 start=0)
+public U0 GrBorder(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
+	I64 step=1,I64 start=0)
 {//2D. Transformation with pen width.
 //Can be used with ROPF_DITHER+WHITE<<16+BLACK for dotted rect.
   GrLine3(dc,x1,y1,0,x2,y1,0,step,start);
@@ -99,7 +100,8 @@ public U0 GrBorder(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 step=1,I64 star
   GrLine3(dc,x1,y2,0,x1,y1,0,step,start);
 }
 
-public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64 w=2.75,I64 step=1,I64 start=0)
+public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,
+	I64 x2,I64 y2,I64 z2,F64 w=2.75,I64 step=1,I64 start=0)
 {//3D. Transformation with pen width.
   I64 _x1,_y1,_z1,_x2,_y2,_z2,dx,dy;
   F64 d;
@@ -112,16 +114,18 @@ public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64
   }
   if (dc->flags & DCF_SYMMETRY) {
     _x1=x1; _y1=y1; _z1=z1;
-    GrReflect(dc,&_x1,&_y1,&_z1);
+    DCReflect(dc,&_x1,&_y1,&_z1);
     _x2=x2; _y2=y2; _z2=z2;
-    GrReflect(dc,&_x2,&_y2,&_z2);
+    DCReflect(dc,&_x2,&_y2,&_z2);
     dc->flags&=~DCF_SYMMETRY;
     result=Line(dc,_x1,_y1,_z1,_x2,_y2,_z2,&GrPlot3,step,start);
     dx=_x2-_x1; dy=_y2-_y1;
     if (d=Sqrt(dx*dx+dy*dy)) {
       d=w*dc->pen_width/d;
-      result|=Line(dc,_x2-dx*d+dy*d+0.5,_y2-dy*d-dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
-      result|=Line(dc,_x2-dx*d-dy*d+0.5,_y2-dy*d+dx*d+0.5,_z2,_x2,_y2,_z2,&GrPlot3,step);
+      result|=Line(dc,_x2-dx*d+dy*d+0.5,_y2-dy*d-dx*d+0.5,_z2,
+	    _x2,_y2,_z2,&GrPlot3,step);
+      result|=Line(dc,_x2-dx*d-dy*d+0.5,_y2-dy*d+dx*d+0.5,_z2,
+	    _x2,_y2,_z2,&GrPlot3,step);
     }
     was_symmetry=TRUE;
     if (dc->flags&DCF_JUST_MIRROR)
@@ -131,8 +135,10 @@ public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,F64
   dx=x2-x1; dy=y2-y1;
   if (d=Sqrt(dx*dx+dy*dy)) {
     d=w*dc->pen_width/d;
-    result|=Line(dc,x2-dx*d+dy*d+0.5,y2-dy*d-dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
-    result|=Line(dc,x2-dx*d-dy*d+0.5,y2-dy*d+dx*d+0.5,z2,x2,y2,z2,&GrPlot3,step);
+    result|=Line(dc,x2-dx*d+dy*d+0.5,y2-dy*d-dx*d+0.5,z2,
+	  x2,y2,z2,&GrPlot3,step);
+    result|=Line(dc,x2-dx*d-dy*d+0.5,y2-dy*d+dx*d+0.5,z2,
+	  x2,y2,z2,&GrPlot3,step);
   }
 gr_done:
   if (was_transform)
@@ -174,7 +180,8 @@ public Bool GrTextBox3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
 
 #define MAX_DIAMOND_SLOPE	2.75
 
-public Bool GrTextDiamond3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
+public Bool GrTextDiamond3(CDC *dc=gr.dc,
+	I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
 {//3D. Transformation. DCF_SYMMETRY is silly.
   Bool first=TRUE;
   U8 ch,*ptr,*ptr_end,*st,*s;
@@ -239,7 +246,8 @@ public Bool GrTextDiamond3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=
 }
 
 #help_index "Graphics/Mesh"
-public I64 Gr3Mesh(CDC *dc=gr.dc,I64 vertex_cnt,CD3I32 *p,I64 tri_cnt,CMeshTri *tri)
+public I64 Gr3Mesh(CDC *dc=gr.dc,I64 vertex_cnt,CD3I32 *p,
+	I64 tri_cnt,CMeshTri *tri)
 {//Returns cnt of pixs changed.
   CColorROPU32 old_color=dc->color;
   I64 i,x,y,z,result=0;
@@ -261,20 +269,23 @@ public I64 Gr3Mesh(CDC *dc=gr.dc,I64 vertex_cnt,CD3I32 *p,I64 tri_cnt,CMeshTri *
     p_sym=p;
     for (i=0;i<vertex_cnt;i++,p_sym++,dst++) {
       x=p_sym->x; y=p_sym->y; z=p_sym->z;
-      GrReflect(dc,&x,&y,&z);
+      DCReflect(dc,&x,&y,&z);
       dst->x=x; dst->y=y; dst->z=z;
     }
     p_sym=pt_sym;
     for (i=0;i<tri_cnt;i++,tri_sym++) {
-      (*dc->lighting)(dc,&p_sym[tri_sym->nums[0]],&p_sym[tri_sym->nums[2]],&p_sym[tri_sym->nums[1]],tri_sym->color);
-      result+=GrFillTri0(dc,&p_sym[tri_sym->nums[0]],&p_sym[tri_sym->nums[2]],&p_sym[tri_sym->nums[1]]);
+      (*dc->lighting)(dc,&p_sym[tri_sym->nums[0]],&p_sym[tri_sym->nums[2]],
+	    &p_sym[tri_sym->nums[1]],tri_sym->color);
+      result+=GrFillTri0(dc,&p_sym[tri_sym->nums[0]],&p_sym[tri_sym->nums[2]],
+	    &p_sym[tri_sym->nums[1]]);
     }
     Free(pt_sym);
     if (dc->flags&DCF_JUST_MIRROR)
       goto mesh_done;
   }
   for (i=0;i<tri_cnt;i++,tri++) {
-    (*dc->lighting)(dc,&p[tri->nums[0]],&p[tri->nums[1]],&p[tri->nums[2]],tri->color);
+    (*dc->lighting)(dc,&p[tri->nums[0]],&p[tri->nums[1]],
+	  &p[tri->nums[2]],tri->color);
     result+=GrFillTri0(dc,&p[tri->nums[0]],&p[tri->nums[1]],&p[tri->nums[2]]);
   }
 mesh_done:
@@ -285,9 +296,9 @@ mesh_done:
 
 #help_index "Graphics/Misc;Input Pointer/Displayed Image"
 public U0 DrawStdInputPtr(CDC *dc,I64 x,I64 y)
-{//This is a callback.
+{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
 //Called by $LK,"DrawInputPtr",A="MN:DrawInputPtr"$() which is
-//called by $LK,"WinFinalUpdate",A="MN:WinFinalUpdate"$().
+  //called by $LK,"WinFinalUpdate",A="MN:WinFinalUpdate"$().
   dc->pen_width=1;
   dc->flags&=~(DCF_TRANSFORMATION|DCF_SYMMETRY);
   GrArrow3(dc,x+8,y+8,0,x,y,0);
@@ -296,7 +307,7 @@ public U0 DrawStdInputPtr(CDC *dc,I64 x,I64 y)
 gr.fp_draw_input_ptr=&DrawStdInputPtr;
 
 public U0 DrawWaitInputPtr(CDC *dc,I64 x,I64 y)
-{//This is a callback.
+{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
   I64 old_pen_width=dc->pen_width;
   CColorROPU32 old_color=dc->color;
   dc->pen_width=3;

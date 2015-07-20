@@ -19,8 +19,8 @@ public class CAutoCompleteGlbls
   CHashAC *fillin_matches[AC_MAX_FILLINS+1];
 
 } ac={0,NULL,NULL,0,NULL,0,0,
-{0,0,0,0,0,0,0,0,0,0,0},
-{NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}};
+  {0,0,0,0,0,0,0,0,0,0,0},
+  {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}};
 
 //Dictionary Stuff
 #help_index "AutoComplete/Dictionary"

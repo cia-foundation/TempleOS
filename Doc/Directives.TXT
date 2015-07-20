@@ -1,8 +1,8 @@
 $HL,1$$WW,0$#define __DATE__ #exe{StreamPrint("\"%D\"",Now);}
 #define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
-#define __LINE__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn->line_num);}
-#define __DEPTH__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn-&Fs->last_lex->lfns-1);}
-#define __FILE__ #exe{StreamPrint("\"%s\"",Fs->last_lex->cur_lfn->full_name);}
+#define __LINE__ #exe{StreamPrint("%d",Fs->last_lex->lex_include_stk->line_num);}
+#define __DEPTH__ #exe{StreamPrint("%d",Fs->last_lex->lex_include_stk->depth);}
+#define __FILE__ #exe{StreamPrint("\"%s\"",Fs->last_lex->lex_include_stk->full_name);}
 #define __DIR__  #exe{StreamDir;}
 
 See $LK,"::/Demo/Directives.CPP"$.$HL,0$$WW,1$

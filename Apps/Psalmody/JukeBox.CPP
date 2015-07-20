@@ -1,6 +1,6 @@
 CTask *SingleSong(U8 *msg,U8 *name)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CTask *task=Spawn(&SrvCmdLine,NULL,name,,Fs);
   StrCpy(task->task_title,name);
   task->title_src=TTS_LOCKED_CONST;
@@ -23,7 +23,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
   CDirEntry *tempde;
   CDoc *s;
   if (!(sc&(SCF_ALT|SCF_CTRL|SCF_SHIFT))
-    && doc_ce->type_u8==DOCT_MENU_VAL && doc_ce->left_exp>=0) {
+	&& doc_ce->type_u8==DOCT_MENU_VAL && doc_ce->left_exp>=0) {
     tempde=doc_ce->left_exp;
     if (sc.u8[0]==SC_DELETE ) {
       Beep;
@@ -45,8 +45,8 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       return TRUE;
     } else if (ch==CH_SPACE||ch==CH_ESC)
       tempde->user_data++; //JB_RUN_LEVEL++
-    //<SPACE> is followed by <ESC> --> JB_RUN_LEVEL_TWO
-    //Actual <ESC> just exits          --> JB_RUN_LEVEL_ONE
+//<SPACE> is followed by <ESC> --> JB_RUN_LEVEL_TWO
+      //Actual <ESC> just exits          --> JB_RUN_LEVEL_ONE
   }
   return FALSE;
 }
@@ -71,10 +71,10 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
   Free(dirname);
   doc->user_put_key=&JBPutKey;
   DocPrint(doc,
-  "Key: $$GREEN$$Graphics $$BLUE$$Words $$RED$$No Nothing "
-  "$$BLACK$$Incomplete $$CYAN$$Special$$FG$$\n\n"
-  "$$GREEN$$<DELETE>$$FG$$ to delete a song.\n"
-      "Press a number to rate a song.\n");
+	"Key: $$GREEN$$Graphics $$BLUE$$Words $$RED$$No Nothing "
+	"$$BLACK$$Incomplete $$CYAN$$Special$$FG$$\n\n"
+	"$$GREEN$$<DELETE>$$FG$$ to delete a song.\n"
+	"Press a number to rate a song.\n");
   while (tempde) {
     if (!(i++%5))
       DocPrint(doc,"\n");
@@ -101,7 +101,7 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
 	  DocPrint(doc,"$$RED$$");
 	  if (FileOcc("\\0",tempde->full_name,"")) {
 	    s->cur_entry=doc_e->next;
-	    s->cur_data_col=0;
+	    s->cur_col=0;
 	    DocEntryDel(s,doc_e);
 	    DocPrint(s,"//0 has words\n");
 	    DocWrite(s);

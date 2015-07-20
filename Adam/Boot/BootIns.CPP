@@ -13,8 +13,8 @@
 public U0 MakeAll()
 {//Use $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$. Loader must be patched.
 //These 2 modules (and bootloaders at top) are the only AOT
-//compiled code in TempleOS.  Everything else is JIT.
-//You are doing it wrong if you make AOT compiled code.
+  //compiled code in TempleOS.	Everything else is JIT.
+  //You are doing it wrong if you make AOT compiled code.
   if (Cmp("/Compiler/Compiler","Compiler",,':'))
     throw;
   if (Cmp("/Kernel/Kernel","Kernel",,':'))
@@ -24,15 +24,15 @@ public U0 MakeAll()
 public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
 {// Does $LK,"MakeAll",A="MN:MakeAll"$ and installs new boot-loader.
 
-//Normally, you just supply a src_drv.	It will compile
-//the code on that drive and update the boot sect.
+  //Normally, you just supply a src_drv.	It will compile
+  //the code on that drive and update the boot sect.
 
-//If you are making a bootable CD-ROM, you supply a dst_drv.
-//See $LK,"::/Misc/MakeDistro.CPP"$
+  //If you are making a bootable CD-ROM, you supply a dst_drv.
+  //See $LK,"::/Misc/MakeDistro.CPP"$
 
-//See $LK,"Install Documentation",A="FI:::/Doc/Install.TXT"$
+  //See $LK,"Install Documentation",A="FI:::/Doc/Install.TXT"$
 
-//Study my account examples my technique: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$
+  //Study my account examples my technique: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$
 
   CBlkDev *bd;
   CDrv *dv;
@@ -87,7 +87,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
 
 public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
 {//Reads MBR from disk drive containing src partition.
- //Writes a single blk file to dst /0000Boot directory.
+//Writes a single blk file to dst BOOT_DIR.
   CBlkDev *bd=Let2BlkDev(src_drv);
   CDrv *dv;
   CMasterBoot mbr;
@@ -96,7 +96,7 @@ public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
   if (dv->type!=DVT_REDSEA && dv->type!=DVT_FAT32)
     PrintErr("Not RedSea Drv\n");
   else {
-    //Bypass partition bounds-checking
+//Bypass partition bounds-checking
     BlkDevLock(bd);
     ATAReadBlks(bd,&mbr,0,1);
     BlkDevUnlock(bd);
@@ -108,13 +108,13 @@ public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
 }
 
 public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
-{//Reads OldMBR from src drive /0000Boot directory
-  //writes it to the MBR of the drive with dst partition.
+{//Reads OldMBR from src drive BOOT_DIR.
+//writes it to the MBR of the drive with dst partition.
   CBlkDev *bd=Let2BlkDev(dst_drv);
   CMasterBoot *mbr;
   Drv(src_drv);
   if (mbr=FileRead(BOOT_DIR_OLDMBR_BIN_C)) {
-    //Bypass partition bounds-checking
+//Bypass partition bounds-checking
     BlkDevLock(bd);
     ATAWriteBlks(bd,mbr,0,1);
     BlkDevUnlock(bd);
@@ -125,15 +125,15 @@ public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
 public U0 MasterBootZero(U8 dst_drv)
 {//Set MBR of disk with dst partition to zero.
 
-//This is dangerous!!
-//The TempleOS partitioner doesn't play well
-//with other operating systems at this time and you need
-//to do this on a drive partitioned by TempleOS
-//if you wish to partition with another operating system.
+  //This is dangerous!!
+  //The TempleOS partitioner doesn't play well
+  //with other operating systems at this time and you need
+  //to do this on a drive partitioned by TempleOS
+  //if you wish to partition with another operating system.
   CBlkDev *bd=Let2BlkDev(dst_drv);
   CMasterBoot mbr;
   MemSet(&mbr,0,BLK_SIZE);
-  //Bypass partition bounds-checking
+//Bypass partition bounds-checking
   BlkDevLock(bd);
   ATAWriteBlks(bd,&mbr,0,1);
   BlkDevUnlock(bd);
@@ -141,13 +141,13 @@ public U0 MasterBootZero(U8 dst_drv)
 
 public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
 {//Create new MBR on the disk that has drv_let as a partition.
-  //Puts stage 2 in /0000Boot dir of drv_let.
+//Puts stage 2 in BOOT_DIR of drv_let.
   CBlkDev *bd,*bd1;
   CDrv *dv,*p1;
   CMasterBoot mbr;
   CDirEntry de;
   I64 i,j,size,*_q;
-  U8 *menu_ptr,*ptr,ch,buf[128];
+  U8 *menu_ptr,*ptr,ch,buf[STR_LEN];
   Bool result=FALSE;
 
   try {
@@ -209,7 +209,7 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
 	Free(de.full_name);
 	*BMHD_BLK_CNT(U16 *)=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
 	*BMHD_DAP_BLK(I64 *)=Cluster2Blk(dv,de.cluster);
-	//Bypass partition bounds-checking
+//Bypass partition bounds-checking
 	BlkDevLock(bd);
 	ATAReadBlks(bd,&mbr,0,1);
 	for (i=0;i<BMHD_END-BMHD_CODE;i++)

@@ -34,14 +34,15 @@ is you can't use the <CTRL-SHIFT-L> compile chk feature.
 */
 #define HEX_SIDE	11
 
-#exe {
+U0 InitDefines1()
+{
   CTask *rotate_tank_task;
   F64 d;
   PopUpFile("/Demo/Graphics/RotateTank.CPP",FALSE,NULL,&rotate_tank_task);
   PopUpOk("This aspires to be a rip-off of\n"
-	  "the Perfect General, but has tank\n"
-	  "facing like the board game,\n"
-	  "Stalin's Tanks.\n");
+	"the Perfect General, but has tank\n"
+	"facing like the board game,\n"
+	"Stalin's Tanks.\n");
   if (!PopUpNoYes("Tournament Settings")) {
     d=PopUpRangeF64Log(300,2000,20,"%4f","Map Width In Pixs\n");
     DefinePrint("MAP_WIDTH","%f",d);
@@ -57,14 +58,18 @@ is you can't use the <CTRL-SHIFT-L> compile chk feature.
   }
   DefinePrint("DCOS","%12.9f",HEX_SIDE*Cos(60.0/180*ã));
   DefinePrint("DSIN","%12.9f",HEX_SIDE*Sin(60.0/180*ã));
-  DefinePrint("HEX_RADIUS","%12.9f",DSIN+0.01); //slop
   d=PopUpRangeF64(0,100,25,"%3f% %%","Animation Delay\n");
   DefinePrint("ANIMATION_DELAY","%5.3f",d/100.0);
   Seed(PopUpGetI64("Seed(0x%X):",Seed));
   XTalk(rotate_tank_task," ");
   TaskWait(rotate_tank_task);
   Kill(rotate_tank_task);
-}
+} InitDefines1;
+
+U0 InitDefines2()
+{
+  DefinePrint("HEX_RADIUS","%12.9f",DSIN+0.01); //slop
+} InitDefines2;
 
 I64 map_cols=(MAP_WIDTH-DCOS)/(2*HEX_SIDE+2*DCOS),
    map_rows=ToI64((MAP_HEIGHT-DSIN)/DSIN)&~1,
@@ -101,7 +106,7 @@ movement_costs[MOUNTAINS]=10;
 F64 fire_radius,fire_radius_x,fire_radius_y;
 
 //These display "phase", "turn" and "game over".
-U8 msg_buf[136];
+U8 msg_buf[STR_LEN];
 I64 msg_off_timeout; //Jiffies. Goes away after a time.
 
 /*I got tricky by not defining a color
@@ -137,9 +142,9 @@ class Unit
 {
   U8 *img;
   I64 num,row,col,
-     armored_attack,unarmored_attack,armor;
+	armored_attack,unarmored_attack,armor;
   I8 type,player,facing,movement,life,
-     range,remaining_movement,accuracy;
+	range,remaining_movement,accuracy;
   Bool visible[2],fired,infantry,indirect_fire,pad[3];
 };
 
@@ -160,8 +165,9 @@ U8 visible_unit_bitmap[2][(((MAX_UNITS+7)&~7)*MAX_UNITS)>>3];
 #define PHASE_FIRE1	5
 #define PHASE_END	6
 
-I64 phase,cur_player,enemy_player,view_player,turn,cursor_row,cursor_col,alive_cnt[2],
-   plot_routines[2],move_routines[2],fire_routines[2];
+I64 phase,cur_player,enemy_player,view_player,turn,
+	cursor_row,cursor_col,alive_cnt[2],
+	plot_routines[2],move_routines[2],fire_routines[2];
 
 U0 Toward(I64 *_row,I64 *_col,I64 direction)
 {
@@ -228,8 +234,8 @@ Unit *FindUnit(I64 row,I64 col)
   for (j=0;j<2;j++)
     for (i=0;i<MAX_UNITS;i++)
       if (units[j][i].life>0 &&
-	  units[j][i].row==row &&
-	  units[j][i].col==col)
+	    units[j][i].row==row &&
+	    units[j][i].col==col)
 	return &units[j][i];
   return NULL;
 }
@@ -237,7 +243,7 @@ Unit *FindUnit(I64 row,I64 col)
 Bool CursorInWindow(CTask *task,I64 x,I64 y)
 {
   if (0<=x+task->scroll_x<task->pix_width &&
-      0<=y+task->scroll_y<task->pix_height)
+	0<=y+task->scroll_y<task->pix_height)
     return TRUE;
   else
     return FALSE;
@@ -246,7 +252,8 @@ Bool CursorInWindow(CTask *task,I64 x,I64 y)
 U0 UpdateCursor(CTask *task,I64 x,I64 y)
 {
   if (CursorInWindow(task,x,y))
-    XY2RowCol(&cursor_row,&cursor_col,x+task->horz_scroll.pos,y+task->vert_scroll.pos);
+    XY2RowCol(&cursor_row,
+	  &cursor_col,x+task->horz_scroll.pos,y+task->vert_scroll.pos);
 }
 
 class LOSCtrl
@@ -259,8 +266,8 @@ Bool LOSPlot(LOSCtrl *l,I64 x,I64 y,I64 z)
   I64 row,col;
   XY2RowCol(&row,&col,x,y);
   if ((row!=l->r1 || col!=l->c1) &&
-      (row!=l->r2 || col!=l->c2) &&
-      terrain[row][col]!=PLAINS) {
+	(row!=l->r2 || col!=l->c2) &&
+	terrain[row][col]!=PLAINS) {
     if (terrain[l->r1][l->c1]==MOUNTAINS) {
       if (terrain[row][col]==MOUNTAINS || z>l->distance>>1)
 	return FALSE;
@@ -349,8 +356,8 @@ Bool MPRecalcVisible(MPCtrl1 *job)
       for (i=job->lo;i<job->hi;i++,ut1++) {
 	seen=FALSE;
 	if (ut1->life>0 &&
-	    LOS(row,col,ut1->row,ut1->col)) {
-	    RowCol2XY(&x2,&y2,ut1->row,ut1->col);
+	      LOS(row,col,ut1->row,ut1->col)) {
+	  RowCol2XY(&x2,&y2,ut1->row,ut1->col);
 	  dd=Sqr(x2-x1)+Sqr(y2-y1);
 	  if (dd<range) {
 	    seen=TRUE;
@@ -358,18 +365,21 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	  }
 	}
 	if (job->mode==RV_UPDATE_FRIENDLY_UNIT)
-	  LBEqu(&visible_unit_bitmap[cur_player],i+job->tempu->num*((MAX_UNITS+7)&~7),seen);
+	  LBEqu(&visible_unit_bitmap[cur_player],
+		i+job->tempu->num*((MAX_UNITS+7)&~7),seen);
       }
       break;
     case RV_ONE_ENEMY_UNIT:
       RowCol2XY(&x1,&y1,row,col);
       for (i=job->lo;i<job->hi;i++,ut1++)
 	if (ut1->life>0 &&
-	    LOS(row,col,ut1->row,ut1->col)) {
-	  LBts(&visible_unit_bitmap[enemy_player],job->tempu->num+i*((MAX_UNITS+7)&~7));
+	      LOS(row,col,ut1->row,ut1->col)) {
+	  LBts(&visible_unit_bitmap[enemy_player],
+		job->tempu->num+i*((MAX_UNITS+7)&~7));
 	  result=TRUE;
 	} else
-	  LBtr(&visible_unit_bitmap[enemy_player],job->tempu->num+i*((MAX_UNITS+7)&~7));
+	  LBtr(&visible_unit_bitmap[enemy_player],
+		job->tempu->num+i*((MAX_UNITS+7)&~7));
       break;
     case RV_ALL_UNITS:
       ut0=&units[cur_player][0];
@@ -379,7 +389,7 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	  ut1=&units[enemy_player][job->lo];
 	  for (j=job->lo;j<job->hi;j++,ut1++) {
 	    if (ut1->life>0 &&
-	      LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
+		  LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
 	      LBts(&ut1->visible[cur_player],0);
 	      LBts(&visible_unit_bitmap[cur_player],j+i*((MAX_UNITS+7)&~7));
 	    } else
@@ -395,7 +405,7 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	  ut1=&units[cur_player][job->lo];
 	  for (j=job->lo;j<job->hi;j++,ut1++) {
 	    if (ut1->life>0 &&
-	      LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
+		  LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
 	      LBts(&ut1->visible[enemy_player],0);
 	      LBts(&visible_unit_bitmap[enemy_player],j+i*((MAX_UNITS+7)&~7));
 	    } else
@@ -425,7 +435,8 @@ $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
   CSrvCmd *cmd[mp_cnt];
 
   if (mode==RV_FRIENDLY_UNIT_DIED) {
-    MemSet((&visible_unit_bitmap[enemy_player])(U8 *)+(tempu->num*((MAX_UNITS+7)&~7))>>3,0,(MAX_UNITS+7)>>3);
+    MemSet((&visible_unit_bitmap[enemy_player])(U8 *)+
+	  (tempu->num*((MAX_UNITS+7)&~7))>>3,0,(MAX_UNITS+7)>>3);
     RVMerge(enemy_player);
     return 0; //Return any value--don't care
   }
@@ -455,7 +466,7 @@ $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
   for (i=0;i<cnt;i++)
     cmd[i]=JobQue(&MPRecalcVisible,&job[i],i,0);
   for (i=0;i<cnt;i++)
-    if (GetResult(cmd[i]))
+    if (JobResultGet(cmd[i]))
       result=TRUE;
   if (mode==RV_UPDATE_FRIENDLY_UNIT)
     RVMerge(cur_player);
@@ -501,7 +512,7 @@ U0 RecalcVisibleMap(I64 row,I64 col)
   for (i=0;i<cnt;i++)
     cmd[i]=JobQue(&MPRecalcVisibleMap,&job[i],i,0);
   for (i=0;i<cnt;i++)
-    GetResult(cmd[i]);
+    JobResultGet(cmd[i]);
 }
 
 I64 MoveCost(Unit *tempu,I64 r,I64 c,I64 facing)
@@ -539,8 +550,8 @@ I64 MoveOneHex(I64 *_row,I64 *_col,F64 x,F64 y)
     RowCol2XY(&x1,&y1,r,c);
     dd=Sqr(x1-x)+Sqr(y1-y);
     if (0<=r<map_rows &&
-	0<=c<map_cols &&
-	dd<best_dd) {
+	  0<=c<map_cols &&
+	  dd<best_dd) {
       best_dd=dd;
       best_direction=direction;
     }
@@ -613,7 +624,8 @@ Bool MoveUnit(Unit *tempu,I64 x,I64 y)
 	tempu->row=r;
 	tempu->col=c;
 	RecalcVisible(RV_UPDATE_FRIENDLY_UNIT,tempu);
-	LBEqu(&tempu->visible[enemy_player],0,RecalcVisible(RV_ONE_ENEMY_UNIT,tempu));
+	LBEqu(&tempu->visible[enemy_player],0,
+	      RecalcVisible(RV_ONE_ENEMY_UNIT,tempu));
       } else
 	break;
     }
@@ -662,8 +674,8 @@ Bool FirePlot(U0,I64 x,I64 y,I64)
 U0 FireShot(Unit *tempu,Unit *target)
 {
   I64 r,c,facing,
-    t1=terrain[tempu->row][tempu->col],
-    t2=terrain[target->row][target->col];
+	t1=terrain[tempu->row][tempu->col],
+	t2=terrain[target->row][target->col];
   F64 x1,y1,x2,y2,d,a,dammage=0,range_factor;
   Bool hit;
 
@@ -729,21 +741,21 @@ U0 FireShot(Unit *tempu,Unit *target)
     if (target->armor) {
       d=target->armor/100.0*(5-facing)/5.0;
       "Armor:%d-FacingAdjustment(%z) Yields:%5.2f Defense\n",
-	target->armor,facing,"Front\0Side\0Rear\0",100*d;
+	    target->armor,facing,"Front\0Side\0Rear\0",100*d;
       if (d>=0) {
 	dammage*=(tempu->armored_attack/100.0)/d;
 	"Armored Attack:%d\nRaw*Attack/Defense=%5.2f Dammage\n",
-	  tempu->armored_attack,dammage;
+	      tempu->armored_attack,dammage;
       } else
 	dammage=0;
     } else {
       d=1.0-range_factor;
       if (d>0) {
 	"Range:%5.2f%% --> %5.2f%% Remaining\n",
-	  100*range_factor,100*d;
+	      100*range_factor,100*d;
 	dammage*=(tempu->unarmored_attack/100.0)*d;
 	"Unarmored Attack:%d\nRaw*Attack*Remaining=%5.2f Dammage\n",
-	  tempu->unarmored_attack,dammage;
+	      tempu->unarmored_attack,dammage;
       } else
 	dammage=0;
     }
@@ -843,28 +855,28 @@ U0 IndirectFireResolve()
 	c=tempi->col+col_offsets_even[i];
       r=tempi->row+row_offsets[i];
       if (0<=r<map_rows && 0<=c<map_cols &&
-	(target=FindUnit(r,c))) {
+	    (target=FindUnit(r,c))) {
 	facing=1;
 	dammage=200.0*Rand;
 	"Raw dammage roll out of 200: %3f\n",dammage;
 	if (target->armor) {
 	  d=target->armor/100.0*(5-facing)/5.0;
 	  "Armor:%d-FacingAdjustment(%z) Yields:%5.2f Defense\n",
-	    target->armor,facing,"Front\0Side\0Rear\0",100*d;
+		target->armor,facing,"Front\0Side\0Rear\0",100*d;
 	  if (d>=0) {
 	    dammage*=(tempu->armored_attack/100.0)/d;
 	    "Armored Attack:%d\nRaw*Attack/Defense=%5.2f Dammage\n",
-	      tempu->armored_attack,dammage;
+		  tempu->armored_attack,dammage;
 	  } else
 	    dammage=0;
 	} else {
 	  d=1.0-range_factor;
 	  if (d>0) {
 	    "Range:%5.2f%% --> %5.2f%% Remaining\n",
-	      100*range_factor,100*d;
+		  100*range_factor,100*d;
 	    dammage*=(tempu->unarmored_attack/100.0)*d;
 	    "Unarmored Attack:%d\nRaw*Attack*Remaining=%5.2f Dammage\n",
-	      tempu->unarmored_attack,dammage;
+		  tempu->unarmored_attack,dammage;
 	  } else
 	    dammage=0;
 	}
@@ -906,7 +918,7 @@ U0 IndirectFireResolve()
 U0 DrawHexes()
 {
   F64 dx=2*HEX_SIDE+2*DCOS,dy=2*DSIN,
-      x,y,x1,y1,x2,y2;
+	x,y,x1,y1,x2,y2;
   I64 i,j;
   map_dc->color=WHITE;
   GrRect(map_dc,0,0,map_dc->width,map_dc->height);
@@ -1030,7 +1042,7 @@ U0 DrawRivers()
 	  r=j;c=i;
 	  Toward(&r,&c,k);
 	  if (0<=r<map_rows && 0<=c<map_cols &&
-	    rivers[r][c]) {
+		rivers[r][c]) {
 	    RowCol2XY(&x2,&y2,r,c);
 	    map_dc->color=LTBLUE;
 	    map_dc->pen_width=4;
@@ -1058,7 +1070,7 @@ U0 DrawRoads()
 	  r=j;c=i;
 	  Toward(&r,&c,k);
 	  if (0<=r<map_rows && 0<=c<map_cols &&
-	    roads[r][c]) {
+		roads[r][c]) {
 	    RowCol2XY(&x2,&y2,r,c);
 	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
 	  }
@@ -1128,19 +1140,23 @@ U0 InitUnits()
       tempu->facing=RandU16%6;
       if (!j) {
 	if (i>=Round(MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)) {
-	  if (Round(i-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)>=Round(0.85*(MAX_UNITS-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)))
+	  if (Round(i-MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0)>=
+		Round(0.85*(MAX_UNITS-MAX_UNITS*P1_TO_P2_ODDS*
+		PLAYER_1_ARMOR_PERCENT/100.0)))
 	    type=UT_ARTILLERY;
 	  else
 	    type=UT_INFANTRY;
 	} else {
-	  if (i>=Round(0.5*MAX_UNITS*P1_TO_P2_ODDS*PLAYER_1_ARMOR_PERCENT/100.0))
+	  if (i>=Round(0.5*MAX_UNITS*P1_TO_P2_ODDS*
+		PLAYER_1_ARMOR_PERCENT/100.0))
 	    type=UT_MD_TANK;
 	  else
 	    type=UT_LT_TANK;
 	}
       } else {
 	if (i>=Round(MAX_UNITS*PLAYER_2_ARMOR_PERCENT/100.0)) {
-	  if (Round(i-MAX_UNITS*PLAYER_2_ARMOR_PERCENT/100.0)>=Round(0.85*(MAX_UNITS-MAX_UNITS*PLAYER_2_ARMOR_PERCENT/100.0)))
+	  if (Round(i-MAX_UNITS*PLAYER_2_ARMOR_PERCENT/100.0)>=
+		Round(0.85*(MAX_UNITS-MAX_UNITS*PLAYER_2_ARMOR_PERCENT/100.0)))
 	    type=UT_ARTILLERY;
 	  else
 	    type=UT_INFANTRY;
@@ -1386,24 +1402,29 @@ U0 PickAI(U8 *dirname,I64 player)
   DirTreeDel(tempde);
   DirTreeDel(tempde2);
   ExePrint("plot_routines[%d]=&TanksPlot;"
-	    "move_routines[%d]=&TanksMove;"
-	    "fire_routines[%d]=&TanksFire;",player,player,player);
+	"move_routines[%d]=&TanksMove;"
+	"fire_routines[%d]=&TanksFire;",player,player,player);
 }
 
 U0 DrawUnit(CTask *task,CDC *dc,Unit *tempu,I64 x,I64 y,F64 f)
 {
   if (tempu->infantry)
-    Sprite3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,tempu->img);
+    Sprite3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,
+	  tempu->img);
   else
-    SpriteZ3B(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,tempu->img,f);
-  if (phase&~1==PHASE_PLOT && tempu->indirect_fire && !tempu->fired && tempu->player==cur_player) {
+    SpriteZ3B(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,
+	  tempu->img,f);
+  if (phase&~1==PHASE_PLOT && tempu->indirect_fire &&
+	!tempu->fired && tempu->player==cur_player) {
     dc->pen_width=2;
     if (cur_player)
       dc->color=PURPLE;
     else
       dc->color=CYAN;
-    GrCircle3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,20*Saw(4*tS,2.0));
-    GrCircle3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,20*Saw(4*tS+1.0,2.0));
+    GrCircle3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,
+	  20*Saw(4*tS,2.0));
+    GrCircle3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,
+	  20*Saw(4*tS+1.0,2.0));
     dc->pen_width=1;
   }
 }
@@ -1427,12 +1448,13 @@ U0 DrawUnits(CTask *task,CDC *dc)
 	else
 	  dc->color=LTCYAN;
       }
-      if (tempu->life>0 && Bt(&tempu->visible[view_player],0) && tempu!=moving_unit) {
+      if (tempu->life>0 && Bt(&tempu->visible[view_player],0) &&
+	    tempu!=moving_unit) {
 	RowCol2XY(&x,&y,tempu->row,tempu->col);
 	if (phase&~1==PHASE_MOVE && tempu->remaining_movement ||
-	    (phase&~1==PHASE_PLOT&& tempu->indirect_fire||
-	     phase&~1==PHASE_FIRE&&!tempu->indirect_fire) && !tempu->fired ||
-	    Blink(5))
+	      (phase&~1==PHASE_PLOT&& tempu->indirect_fire||
+	      phase&~1==PHASE_FIRE&&!tempu->indirect_fire) && !tempu->fired ||
+	      Blink(5))
 	  DrawUnit(task,dc,tempu,x,y,tempu->facing*60.0*ã/180.0);
       }
     }
@@ -1443,9 +1465,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   F64 x,y;
   I64 h,v,i,j,r,c;
-  U8 buf[128];
+  U8 buf[STR_LEN];
   IndirectOrders *tempi;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   task->horz_scroll.min=0;
   task->horz_scroll.max=map_width-task->pix_width;
@@ -1464,7 +1486,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     UpdateCursor(task,i,j);
   RowCol2XY(&x,&y,cursor_row,cursor_col);
 
-//Roads require multiple cursor fills
+  //Roads require multiple cursor fills
   dc->color=YELLOW;
   c=terrain[cursor_row][cursor_col];
   for (i=-(HEX_SIDE+DCOS)/2;i<=(HEX_SIDE+DCOS)/2;i++) {
@@ -1494,7 +1516,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    dc->color=LTRED;
 	  else
 	    dc->color=YELLOW;
-	  GrCircle(dc,x+RandU16%HEX_SIDE-HEX_SIDE/2-h,y+RandU16%HEX_SIDE-HEX_SIDE/2-v,2);
+	  GrCircle(dc,x+RandU16%HEX_SIDE-HEX_SIDE/2-h,
+		y+RandU16%HEX_SIDE-HEX_SIDE/2-v,2);
 	}
       }
     }
@@ -1551,18 +1574,18 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (i=StrLen(msg_buf)*FONT_WIDTH) {
     dc->color=BLACK;
     GrRect(dc,(task->pix_width-i)>>1-10-task->scroll_x,
-	       (task->pix_height-FONT_HEIGHT)>>1-10-task->scroll_y,
-	       i+20,FONT_HEIGHT+20);
+	  (task->pix_height-FONT_HEIGHT)>>1-10-task->scroll_y,
+	  i+20,FONT_HEIGHT+20);
 
     dc->color=YELLOW;
     GrRect(dc,(task->pix_width-i)>>1-7-task->scroll_x,
-	       (task->pix_height-FONT_HEIGHT)>>1-7-task->scroll_y,
-	       i+14,FONT_HEIGHT+14);
+	  (task->pix_height-FONT_HEIGHT)>>1-7-task->scroll_y,
+	  i+14,FONT_HEIGHT+14);
 
     dc->color=RED;
     GrPrint(dc,(task->pix_width-i)>>1-task->scroll_x,
-		(task->pix_height-FONT_HEIGHT)>>1-task->scroll_y,
-      msg_buf);
+	  (task->pix_height-FONT_HEIGHT)>>1-task->scroll_y,
+	  msg_buf);
     if (msg_off_timeout) {
       if (msg_off_timeout-cnts.jiffies<3*JIFFY_FREQ/2*ANIMATION_DELAY)
 	Snd(0);
@@ -1572,7 +1595,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   dc->color=WHITE;
-  GrRect(dc,-task->scroll_x,-task->scroll_y,(13+7+10+10)*FONT_WIDTH,FONT_HEIGHT);
+  GrRect(dc,-task->scroll_x,-task->scroll_y,
+	(13+7+10+10)*FONT_WIDTH,FONT_HEIGHT);
 
   if (phase&~1==PHASE_PLOT) {
     dc->color=PURPLE;
@@ -1656,7 +1680,7 @@ U0 ToTheFront()
   WinMax;
   AutoComplete;
   WinBorder(ON);
-  Preempt(OFF);
+  Preempt;
   Init;
   PickAI("AIs",0);
   PickAI("AIs",1);

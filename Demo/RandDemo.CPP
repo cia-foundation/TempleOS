@@ -13,15 +13,15 @@ U0 RandDemo()
   I64 i;
 
   "Seed(0) will do timer randomized random numbers.  A task starts with "
-  "$LK,"Seed(0)",A="FF:::/Kernel/Task.CPP,Seed("$ by dft.\n";
+	"$LK,"Seed(0)",A="FF:::/Kernel/Task.CPP,Seed("$ by dft.\n";
   PressAKey;
   Seed;
   RandPts;
   DCFill;
 
   "\nSeed(num) will do non-timer starting at specific seed.  "
-  "Non-timer rand is awful.  You can run a specific video game by "
-  "typing Seed(num) at the cmd-line before the game.\n";
+	"Non-timer rand is awful.  You can run a specific video game by "
+	"typing Seed(num) at the cmd line before the game.\n";
   PressAKey;
   Seed(1);
   RandPts;

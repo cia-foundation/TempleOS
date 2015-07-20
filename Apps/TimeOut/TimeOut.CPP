@@ -1,5 +1,5 @@
-AcctRegSetDftEntry("TempleOS/TimeOut","I64 best_score=0;\n");
-AcctRegExeBranch("TempleOS/TimeOut");
+RegSetDftEntry("TempleOS/TimeOut","I64 best_score=0;\n");
+RegExeBranch("TempleOS/TimeOut");
 
 #define MAP_HEIGHT	4096
 #define BULLET_LEN	10
@@ -127,19 +127,19 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->pen_width=3;
   dc->color=BROWN;
   GrLine3(dc,0,  (finish_line-scroll_y)&(MAP_HEIGHT-1),0,
-	  GR_WIDTH,(finish_line-scroll_y)&(MAP_HEIGHT-1),0);
+	GR_WIDTH,(finish_line-scroll_y)&(MAP_HEIGHT-1),0);
 
   dc->color=LTRED;
   for (i=0,tempb=b;i<MAX_BULLETS;i++,tempb++)
     if (!tempb->dead)
       GrLine(dc,tempb->x>>32,tempb->y>>32,
-	(tempb->x+tempb->dx*BULLET_LEN)>>32,
-	(tempb->y+tempb->dy*BULLET_LEN)>>32);
+	    (tempb->x+tempb->dx*BULLET_LEN)>>32,
+	    (tempb->y+tempb->dy*BULLET_LEN)>>32);
   for (i=0,tempm=m;i<MAX_MAN;i++,tempm++) {
     yy=(tempm->y-scroll_y)&(MAP_HEIGHT-1);
     if (-32<=yy<=Fs->pix_bottom+32) {
       if (tempm->dead &&
-	  tS<tempm->corpse_timeout)
+	    tS<tempm->corpse_timeout)
 	if (!(RandU16&15)) {
 	  if (tempm->friendly)
 	    temps=$IB,"<5>",BI=5$;
@@ -147,7 +147,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    temps=$IB,"<9>",BI=9$;
 	  SpriteZ3B(dc,tempm->x,yy,0,temps,tempm->é);
 	}
-   }
+    }
   }
   for (i=0,tempm=m;i<MAX_MAN;i++,tempm++) {
     yy=(tempm->y-scroll_y)&(MAP_HEIGHT-1);
@@ -171,17 +171,18 @@ U0 DrawIt(CTask *task,CDC *dc)
     t1=tf;
     dc->color=RED;
     if (game_over && Blink)
-      GrPrint(dc,task->pix_width/2-9*FONT_WIDTH/2,task->pix_height/2,"Game Over");
+      GrPrint(dc,task->pix_width/2-9*FONT_WIDTH/2,task->pix_height/2,
+	    "Game Over");
   } else {
     t1=tS;
     if (!enemy_left || !friendly_left)
-     game_over=TRUE;
+      game_over=TRUE;
   }
   dc->color=BROWN;
   GrPrint(dc,0,0,"Enemy:%d Friends:%d Friendly Fire:%d Time:%6.2f Bullets:%d",
-    enemy_left,friendly_left,friendly_fire,t1-t0,bullets_fired);
+	enemy_left,friendly_left,friendly_fire,t1-t0,bullets_fired);
   GrPrint(dc,0,8,"Total Score:%,d High Score:%,d",
-      total_score,best_score);
+	total_score,best_score);
 }
 
 U0 CheckCollisions()
@@ -194,8 +195,8 @@ U0 CheckCollisions()
   for (i=0,tempb=b;i<MAX_BULLETS;i++,tempb++)
     if (!tempb->dead)
       GrLine(dc2,tempb->x>>32,tempb->y>>32,
-	(tempb->x+tempb->dx*BULLET_LEN)>>32,
-	(tempb->y+tempb->dy*BULLET_LEN)>>32);
+	    (tempb->x+tempb->dx*BULLET_LEN)>>32,
+	    (tempb->y+tempb->dy*BULLET_LEN)>>32);
 
   dc2->color  =ROP_COLLISION;
   dc2->bkcolor=BLACK;
@@ -247,7 +248,7 @@ U0 Init()
   dx=0;
   dy=0;
   é=0;
- 
+
   for (i=0;i<MAX_LANDSCAPE;i++) {
     ls[i].x=(Fs->pix_width-100)*RandU32/MAX_U32+50;
     ls[i].y=(MAP_HEIGHT-100)*RandU32/MAX_U32+50;
@@ -422,34 +423,34 @@ U0 TimeOut()
 
   I64 next_update_jiffy;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Preempt(OFF);
+  Preempt;
   WinBorder;
   AutoComplete;
 
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Fire(,CH_SPACE);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-  "}"
-  );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Fire(,CH_SPACE);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"}"
+	);
   WinMax;
   DocClear;
   "\n\nYou're sent back through time "
-  "to help fight some bad guys.  ($$LTPURPLE$$Purple$$FG$$)\n\n"
-  "Scoring:\n"
-  "  Enemy Killed\t\t+5\n"
-  "  Enemy by Friendly\t+10\n"
-  "  Friendly Fire\t\t-200\n"
-  "  Bullets Fired\t\t-1\n"
-  "  Game Time\t\t-10 per second\n"
-  "  Surviving Friendlies\t+500\n\n"
-  "Sweep side-to-side while shooting.\n\n";
+	"to help fight some bad guys.  ($$LTPURPLE$$Purple$$FG$$)\n\n"
+	"Scoring:\n"
+	"  Enemy Killed\t\t+5\n"
+	"  Enemy by Friendly\t+10\n"
+	"  Friendly Fire\t\t-200\n"
+	"  Bullets Fired\t\t-1\n"
+	"  Game Time\t\t-10 per second\n"
+	"  Surviving Friendlies\t+500\n\n"
+	"Sweep side-to-side while shooting.\n\n";
 
   PressAKey;
   Fs->text_attr=YELLOW<<4+CYAN;
@@ -464,7 +465,7 @@ U0 TimeOut()
     while (TRUE) {
       next_update_jiffy=cnts.jiffies+JIFFY_FREQ/100;
       while (msg_code=ScanMsg(&a1,&a2,
-      1<<MSG_KEY_DOWN+1<<MSG_KEY_UP)) {
+	    1<<MSG_KEY_DOWN+1<<MSG_KEY_UP)) {
 	switch (msg_code) {
 	  case MSG_KEY_DOWN:
 	    switch (a1) {
@@ -502,8 +503,8 @@ U0 TimeOut()
 	  b[i].x+=b[i].dx2;
 	  b[i].y+=b[i].dy2;
 	  if (b[i].y<0||b[i].x<0||
-	  b[i].x>>32>=Fs->pix_width||
-	  b[i].y>>32>=Fs->pix_height)
+		b[i].x>>32>=Fs->pix_width||
+		b[i].y>>32>=Fs->pix_height)
 	    b[i].dead=TRUE;
 	}
       }
@@ -522,7 +523,7 @@ U0 TimeOut()
       while (x<0)
 	x+=Fs->pix_width;
 
-      //It takes too much CPU do do all these all the time.
+	//It takes too much CPU do do all these all the time.
       nobound_switch (main_loop_pass&7) {
 	case 0:
 	  nobound_switch (main_loop_pass>>3&7) {
@@ -561,10 +562,10 @@ U0 TimeOut()
       SleepUntil(next_update_jiffy);
 
       total_score=5*(MAX_ENEMY-enemy_left)
-	+10*enemy_by_friendly
-	-200*friendly_fire
-	-10*(tS-t0)
-	-bullets_fired;
+      +10*enemy_by_friendly
+	    -200*friendly_fire
+	    -10*(tS-t0)
+      -bullets_fired;
       if (game_over) {
 	tf=tS;
 	Sleep(750);
@@ -588,11 +589,11 @@ U0 TimeOut()
 to_done:
     GetMsg(,,1<<MSG_KEY_UP);
   }
-    catch
-      PutExcept;
+  catch
+    PutExcept;
   SettingsPop;
   MenuPop;
-  AcctRegWriteBranch("TempleOS/TimeOut","I64 best_score=%d;\n",best_score);
+  RegWriteBranch("TempleOS/TimeOut","I64 best_score=%d;\n",best_score);
 }
  
             ôÿÿÿÐÿÿÿ   0   ÿÿÿÿÿÿÿÿÿÿÿÿ

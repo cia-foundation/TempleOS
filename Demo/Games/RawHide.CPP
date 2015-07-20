@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
-AcctRegSetDftEntry("TempleOS/RawHide","F64 best_score=9999;\n");
-AcctRegExeBranch("TempleOS/RawHide");
+RegSetDftEntry("TempleOS/RawHide","F64 best_score=9999;\n");
+RegExeBranch("TempleOS/RawHide");
 
 F64 t0,tf;
 I64 outside_cnt;
@@ -62,7 +62,7 @@ U0 RiverNew()
 U0 RiverMake()
 {
   I64 i,x,y,dx,dy,w,old_x,old_y;
-  //Plan lower course of river
+//Plan lower course of river
   old_x=-1;old_y=-1;
   x=MAP_WIDTH<<32/2; y=MAP_HEIGHT<<32/2;
   dx=0; dy=1<<32;
@@ -79,7 +79,7 @@ U0 RiverMake()
     x+=dx; y+=dy;
     w=ClampI64(w+RandI32*2,10*MAX_U32,150*MAX_U32);
   }
-  //Plan upper course of river
+//Plan upper course of river
   old_x=-1;old_y=-1;
   x=MAP_WIDTH<<32/2; y=MAP_HEIGHT<<32/2;
   dx=0; dy=-1<<32;
@@ -154,12 +154,17 @@ U0 RiverDropsNext(CTask *mem_task)
     } else {
       do {
 	if (RandU16&1 &&
-	    GrPeek(map_dc,r_x[tempr->index]+tempr->dx,r_y[tempr->index]+tempr->dy)==BLUE)
+	      GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
+	      r_y[tempr->index]+tempr->dy)==BLUE)
 	  break;
-	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->index]/2,r_width[tempr->index]/2);
-	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->index]/2,r_width[tempr->index]/2);
-      } while (GrPeek(map_dc,r_x[tempr->index]+tempr->dx,r_y[tempr->index]+tempr->dy)!=BLUE &&
-	       GrPeek(map_dc,r_x[tempr->index]		,r_y[tempr->index])	  ==BLUE); //Might be reinitializing
+	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->index]/2,
+	      r_width[tempr->index]/2);
+	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->index]/2,
+	      r_width[tempr->index]/2);
+      } while (GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
+	    r_y[tempr->index]+tempr->dy)!=BLUE &&
+	    GrPeek(map_dc,r_x[tempr->index],
+	    r_y[tempr->index])==BLUE); //Might be reinitializing
     }
     tempr=tempr1;
   }
@@ -192,8 +197,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   static Bool left=TRUE;
   F64 t;
   I64 i,
-     cx=(MAP_WIDTH -task->pix_width)/2,
-     cy=(MAP_HEIGHT-task->pix_height)/2;
+	cx=(MAP_WIDTH -task->pix_width)/2,
+	cy=(MAP_HEIGHT-task->pix_height)/2;
   if (task->scroll_x+cx<0)
     task->scroll_x=-cx;
   if (task->scroll_x+cx>MAP_WIDTH-task->pix_width)
@@ -212,7 +217,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     if (!a[i].dead) {
       if (a[i].dx<0) {
 	dc->flags|=DCF_JUST_MIRROR|DCF_SYMMETRY;
-	GrSetSymmetry(dc,a[i].x.i32[1]-cx,0,a[i].x.i32[1]-cx,1);
+	DCSymmetrySet(dc,a[i].x.i32[1]-cx,0,a[i].x.i32[1]-cx,1);
       }
       Sprite3(dc,a[i].x.i32[1]-cx,a[i].y.i32[1]-cy,0,a[i].ge->img);
       dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
@@ -224,11 +229,12 @@ U0 DrawIt(CTask *task,CDC *dc)
     left=TRUE;
   if (left) {
     dc->flags|=DCF_JUST_MIRROR|DCF_SYMMETRY;
-    GrSetSymmetry(dc,ip.pos.x-task->pix_left-task->scroll_x,0,ip.pos.x-task->pix_left-task->scroll_x,1);
+    DCSymmetrySet(dc,ip.pos.x-task->pix_left-task->scroll_x,0,
+	  ip.pos.x-task->pix_left-task->scroll_x,1);
   }
   Sprite3(dc,
-    ip.pos.x-task->pix_left-task->scroll_x,
-    ip.pos.y-task->pix_top -task->scroll_y,0,rh_sprite[GE_HORSE].img);
+	ip.pos.x-task->pix_left-task->scroll_x,
+	ip.pos.y-task->pix_top -task->scroll_y,0,rh_sprite[GE_HORSE].img);
   dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
   last_pos_x=ip.pos.x;
 
@@ -237,14 +243,15 @@ U0 DrawIt(CTask *task,CDC *dc)
     t=tf-t0;
     if (Blink)
       GrPrint(dc,(task->pix_width-FONT_WIDTH*14)>>1-task->scroll_x,
-		  (task->pix_height-FONT_HEIGHT)>>1-task->scroll_y,
-	"Game Completed");
+	    (task->pix_height-FONT_HEIGHT)>>1-task->scroll_y,
+	    "Game Completed");
   } else {
     dc->color=BLACK;
     t=tS-t0;
   }
-  GrPrint(dc,-task->scroll_x,-task->scroll_y,"Outside:%03d Time:%7.2fs	Best:%7.2fs",
-    outside_cnt,t,best_score);
+  GrPrint(dc,-task->scroll_x,-task->scroll_y,
+	"Outside:%03d Time:%7.2fs Best:%7.2fs",
+	outside_cnt,t,best_score);
 }
 
 U0 BuddySelect(I64 i)
@@ -253,8 +260,8 @@ U0 BuddySelect(I64 i)
   for (b=0;b<NUM_ANIMALS;b++) {
     if (b!=i && !a[b].dead) {
       score=RandU32%(512*512)+
-	SqrI64(a[b].x.i32[1]-a[i].x.i32[1])+
-	SqrI64(a[b].y.i32[1]-a[i].y.i32[1]);
+	    SqrI64(a[b].x.i32[1]-a[i].x.i32[1])+
+	    SqrI64(a[b].y.i32[1]-a[i].y.i32[1]);
       if (score<best_score) {
 	best_score=score;
 	best_b=b;
@@ -267,13 +274,13 @@ U0 BuddySelect(I64 i)
 U0 AnimateTask(CTask *parent)
 {
   I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,updates=0,
-    my_outside_cnt;
+	my_outside_cnt;
   F64 f,d,dx,dy,s,stress;
   Animal *tempa,*tempa1;
   while (TRUE) {
     max_speed=ClampU64(max_speed,MAX_U32/3,200*MAX_U32);
     cx=(MAP_WIDTH -parent->pix_width)/2,
-    cy=(MAP_HEIGHT-parent->pix_height)/2;
+	  cy=(MAP_HEIGHT-parent->pix_height)/2;
     cursor_x=ip.pos.x+cx-parent->pix_left-parent->scroll_x;
     cursor_y=ip.pos.y+cy-parent->pix_top -parent->scroll_y;
     cnt=0;stress=0;
@@ -293,14 +300,14 @@ U0 AnimateTask(CTask *parent)
 	  tempa->dy+=f*dy;
 	}
 
-//Reselect buddy about every NUM_ANIMALS*10ms=5.12 seconds
+	//Reselect buddy about every NUM_ANIMALS*10ms=5.12 seconds
 	tempa1=&a[tempa->buddy];
 	if (tempa1->dead || i==updates%NUM_ANIMALS) {
 	  BuddySelect(i);
 	  tempa1=&a[tempa->buddy];
 	}
 
-//Move toward buddy
+	//Move toward buddy
 	ddx=tempa->x.i32[1]-tempa1->x.i32[1];
 	ddy=tempa->y.i32[1]-tempa1->y.i32[1];
 	if (dd=SqrI64(ddx)+SqrI64(ddy)) {
@@ -314,31 +321,34 @@ U0 AnimateTask(CTask *parent)
 	  tempa->dy+=f*dy;
 	}
 
-//Make velocity similar to buddy
+	//Make velocity similar to buddy
 	tempa->dx+=0.1*(tempa1->dx-tempa->dx);
 	tempa->dy+=0.1*(tempa1->dy-tempa->dy);
 
-//Add random movement, limit speed and dampen speed
+	//Add random movement, limit speed and dampen speed
 	tempa->dx=0.995*ClampI64(tempa->dx+RandI32/32,-max_speed,max_speed);
 	tempa->dy=0.995*ClampI64(tempa->dy+RandI32/32,-max_speed,max_speed);
 
-//Slow in river
+	//Slow in river
 	if (GrPeek(map_dc,tempa->x.i32[1],tempa->y.i32[1])!=LTGREEN) {
 	  tempa->dx/=2;
 	  tempa->dy/=2;
 	}
 
-	if (GrPeek(map_dc,(tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)!=LTGRAY) {
+	if (GrPeek(map_dc,(tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)
+	      !=LTGRAY) {
 	  tempa->x+=tempa->dx;
 	  tempa->y+=tempa->dy;
 	}
 
-//Keep on map
-	if (!(MAP_BORDER-tempa->ge->min_x<=tempa->x.i32[1]<MAP_WIDTH-MAP_BORDER-tempa->ge->max_x)) {
+	//Keep on map
+	if (!(MAP_BORDER-tempa->ge->min_x
+	      <=tempa->x.i32[1]<MAP_WIDTH-MAP_BORDER-tempa->ge->max_x)) {
 	  tempa->x -=tempa->dx;
 	  tempa->dx=-tempa->dx;
 	}
-	if (!(MAP_BORDER-tempa->ge->min_y<=tempa->y.i32[1]<MAP_HEIGHT-MAP_BORDER-tempa->ge->max_y)) {
+	if (!(MAP_BORDER-tempa->ge->min_y
+	      <=tempa->y.i32[1]<MAP_HEIGHT-MAP_BORDER-tempa->ge->max_y)) {
 	  tempa->y -=tempa->dy;
 	  tempa->dy=-tempa->dy;
 	}
@@ -384,10 +394,10 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-	Play("3qC2etG3DCBDCECFqFCsADADqB");
-	Play("C2etG3DCBDCECFqFCsADADqB");
-	Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
-	Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
+    Play("3qC2etG3DCBDCECFqFCsADADqB");
+    Play("C2etG3DCBDCECFqFCsADADqB");
+    Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
+    Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
   }
 }
 
@@ -416,7 +426,8 @@ U0 ReInit()
 
   map_dc->pen_width=MAP_BORDER;
   map_dc->color=RED;
-  GrBorder(map_dc,MAP_BORDER/2,MAP_BORDER/2,MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
+  GrBorder(map_dc,MAP_BORDER/2,MAP_BORDER/2,
+	MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
 
   for (i=river_lo;i<=river_hi;i++)
     RiverDropsNext(Fs);
@@ -475,19 +486,20 @@ U0 RawHide()
 	"upper-left corner if you scroll.\n\n"
 	"Scroll with $$GREEN$${CTRL-Left Grab}$$FG$$.\n");
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Play {"
-"  Restart(,'\n');"
-"}"
-);
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"}"
+	);
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
   WinMax;
   AutoComplete;
-  Preempt(OFF);
+  Preempt;
   Init;
   Fs->animate_task=Spawn(&AnimateTask,Fs,"Animate",,Fs);
   DocCursor;
@@ -495,7 +507,8 @@ U0 RawHide()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_DOWN);
+      msg_code=GetMsg(&a1,&a2,
+	    1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_DOWN);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:  //Doesn't do anything, yet.
 	  break;
@@ -520,7 +533,7 @@ rh_done:
   MenuPop;
   SettingsPop;
   CleanUp;
-  AcctRegWriteBranch("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
 }
 
 RawHide;

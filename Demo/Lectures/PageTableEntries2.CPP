@@ -18,7 +18,7 @@ interrupt haserrcode U0 PageFault()
   *pte_addr|=1;
   InvlPg(addr);
   err_code=rbp[1];
-	MOV_RAX_CR2
+  MOV_RAX_CR2
   reported_fault_addr=GetRAX;
 }
 

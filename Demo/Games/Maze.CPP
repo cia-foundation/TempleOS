@@ -8,11 +8,11 @@ U0 DrawIt(CTask *task,CDC *)
 { //$LK,"gr.text_base",A="MN:CGrGlbls"$ gets clear 30fps, so we must use our own permanent text array.
   MemCpy(gr.text_base+TEXT_COLS,text,(TEXT_ROWS-1)*TEXT_COLS*sizeof(U32));
 
-// You can copy it this way, if you like:
-//  I64 i,j;
-//  for (j=0;j<TEXT_ROWS;j++)
-//    for (i=0;i<TEXT_COLS;i++)
-//     TextChar(task,,i,j,text[j][i]);
+  // You can copy it this way, if you like:
+  //  I64 i,j;
+  //  for (j=0;j<TEXT_ROWS;j++)
+  //	for (i=0;i<TEXT_COLS;i++)
+  //	 TextChar(task,,i,j,text[j][i]);
 
   TextPrint(task,0,0,ATTR>>8,"Draw a maze with left button.");
   TextPrint(task,0,1,ATTR>>8,"Solve maze starting at right click.");
@@ -43,7 +43,7 @@ U0 SolveMaze(I64 x,I64 y)
   stk_dir[stk_ptr++]=dir;
   while (TRUE) {
     if (!(0<=x<MinI64(Fs->win_width,TEXT_COLS)) ||
-	!(0<=y<MinI64(Fs->win_height,TEXT_ROWS)) ) {
+	  !(0<=y<MinI64(Fs->win_height,TEXT_ROWS)) ) {
       Beep;Beep;
       break;
     }
@@ -51,7 +51,7 @@ U0 SolveMaze(I64 x,I64 y)
       text[y][x]='.'+ATTR;
     x+=dir_x[dir];
     y+=dir_y[dir];
-	//u8.[0] is the ASCII
+//u8.[0] is the ASCII
     if (text[y][x].u8[0]) {
       x-=dir_x[dir];
       y-=dir_y[dir];
@@ -91,7 +91,7 @@ U0 Maze()
     do {
       MemSet(text,0,sizeof(text));
       while (!(ch=ScanChar)) {
-	//Input Ptr (mouse) text x,y coordinates.
+//Input Ptr (mouse) text x,y coordinates.
 	x=ip.pos_text.x-Fs->win_left-Fs->scroll_x/FONT_WIDTH;
 	y=ip.pos_text.y-Fs->win_top-Fs->scroll_y/FONT_HEIGHT;
 	if (ip.lb&&!winmgr.grab_scroll)

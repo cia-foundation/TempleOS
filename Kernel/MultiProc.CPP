@@ -51,7 +51,7 @@ AP_32BIT_INIT:
 	ADD	ESI,U32 [SYS_CPU_STRUCTS]
 
 	LEA	ESP,U32 CCPU.start_stk+sizeof(CCPU.start_stk)[ESI]
-	PUSH	U32 SYS_START_RFLAGS
+	PUSH	U32 RFLAGG_START
 	POPFD
 	PUSH	U32 0	//Return from next call will be 64-bit
 	CALL	SYS_EM64T
@@ -179,7 +179,7 @@ U0 MPWake(I64 target_cpu)
     MPInt(I_WAKE,target_cpu);
     if (!target_cpu)
       LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
-    if (Bt(&cpu_structs[target_cpu].cpu_flags,CPUf_SETH_SLEEP)) //In case went back to sleep
+    if (Bt(&cpu_structs[target_cpu].cpu_flags,CPUf_SETH_SLEEP))//back to sleep?
       cpu_structs[target_cpu].seth_task->wake_jiffy=0;
     POPFD
   }
@@ -188,21 +188,21 @@ U0 MPWake(I64 target_cpu)
 U0 MPAPICInit()
 {//Called by adam during start-up
 //and other cores during initialization
-//after $LK,"BSPStartMP",A="MN:BSPStartMP"$().
+  //after $LK,"BSPStartMP",A="MN:BSPStartMP"$().
   *LAPIC_SVR(U32 *)|=LAPICF_APIC_ENABLED;
   dev.mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
   *LAPIC_LDR(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
   *LAPIC_DFR(U32 *)=0xF0000000;
 
-//  MemSet(LAPIC_IRR,0,0x20);
-//  MemSet(LAPIC_ISR,0,0x20);
-//  MemSet(LAPIC_TMR,0,0x20);
+  //  MemSet(LAPIC_IRR,0,0x20);
+  //  MemSet(LAPIC_ISR,0,0x20);
+  //  MemSet(LAPIC_TMR,0,0x20);
 
   SetRAX(Gs->tss->tr);
   LTR	AX
   if (Gs->num) {
     IntInit1;
-    SetRFlags(SYS_NORMAL_RFLAGS);
+    SetRFlags(RFLAGG_NORMAL);
   }
 }
 
@@ -234,7 +234,7 @@ CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
        I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
 {//Queue multicore jobs, handled by Seth tasks.
 //Set flags to zero if you wish to get the result.
-//See $LK,"::/Demo/MultiCore/Lock.CPP"$
+  //See $LK,"::/Demo/MultiCore/Lock.CPP"$
   CSrvCtrl *ctrl;
   CSrvCmd *tempc;
   if (!(0<=target_cpu<mp_cnt))
@@ -261,14 +261,13 @@ CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
   return tempc;
 }
 
-CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
-	    U8 *task_name=NULL,
-	    I64 target_cpu,
-	    CTask *parent=NULL, //NULL means adam
-	    I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
+CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
+	I64 target_cpu, CTask *parent=NULL, //NULL means adam
+	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
 {
   CTask *result;
-  CSrvCmd *tempc=JobQue(fp_addr,data,target_cpu,flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
+  CSrvCmd *tempc=JobQue(fp_addr,data,target_cpu,
+	flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
   CSrvCtrl *ctrl;
 
   while (!Bt(&tempc->flags,SVCf_DONE)) {
@@ -302,7 +301,7 @@ U0 APSethInit()
 U0 BSPStartMP()
 {//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,BSPStartMP"$.
   CTask *task;
-  U8 buf[128];
+  U8 buf[STR_LEN];
   CAP16BitInit *mp=MP_VECT_ADDR;
   CCPU *c;
   I64 i,my_mp_cnt;
@@ -325,9 +324,9 @@ U0 BSPStartMP()
   }
   MemSet(&cpu_structs[1],0,sizeof(CCPU)*(MP_MAX_PROCESSORS-1));
 
-//When you start-up other cores, they jump to an addr
-//specified by a byte vect number, $LK,"MPN_VECT",A="MN:MPN_VECT"$ which corresponds
-//to a location 4096*vect number, $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$$WW,0$.
+  //When you start-up other cores, they jump to an addr
+  //specified by a byte vect number, $LK,"MPN_VECT",A="MN:MPN_VECT"$ which corresponds
+  //to a location 4096*vect number, $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$$WW,0$.
   MemCpy(mp,AP_16BIT_INIT,AP_16BIT_INIT_END-AP_16BIT_INIT);
   MemCpy(&mp->ap_gdt_ptr,SYS_GDT_PTR,sizeof(CSysLimitBase));
   mp_cnt_initial=mp_cnt=1;
@@ -354,9 +353,8 @@ U0 BSPStartMP()
   for (i=1;i<my_mp_cnt;i++) {
     StrPrint(buf,"Seth Task CPU#%d",i);
     task=Spawn(&APSethInit,NULL,buf,,,SETH_STK,0);
-    task->rflags=SYS_START_RFLAGS;
-    //$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
-    task->task_in_que_signature=TASK_IN_QUE_SIGNATURE_VAL;
+    task->rflags=RFLAGG_START;
+//$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
     CPUStructInit(i,&cpu_structs[i],task);
     WBINVD //Not sure why this is needed.  Might just need delay.
   }
@@ -382,17 +380,18 @@ U0 BSPInit()
 
   dbg.mp_crash=ACAlloc(sizeof(CMPCrash));
 
-//Must be in code heap because init code uses 32 bit addr of cpu_struct
-  adam_task->gs=cpu_structs=CAlloc(sizeof(CCPU)*MP_MAX_PROCESSORS,Fs->code_heap);
+  //Must be in code heap because init code uses 32 bit addr of cpu_struct
+  adam_task->gs=cpu_structs=
+	CAlloc(sizeof(CCPU)*MP_MAX_PROCESSORS,Fs->code_heap);
   adam_task->time_slice_start=GetTSC;
   CPUStructInit(0,cpu_structs,adam_task);
   asm {//RAX has GS
-	IMPORT SET_GS_BASE;
-	CALL SET_GS_BASE
+    IMPORT SET_GS_BASE;
+    CALL SET_GS_BASE
   }
   if (Bt(&ee.rdx,9)) {
 //Unnecessary?
-//    SetMSR(IA32_LAPIC_BASE,LAPIC_BASE+0x900);
+    //	  SetMSR(IA32_LAPIC_BASE,LAPIC_BASE+0x900);
     MPAPICInit;
   }
 }

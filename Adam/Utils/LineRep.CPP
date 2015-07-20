@@ -29,7 +29,7 @@ U0 LineRep2(CDoc *doc,CDirEntry *tempde)
       DocPrint(doc,"$$ID,-2$$");
     } else
       DocPrint(doc,"%8,d $$LK,\"%s\",A=\"FI:%s\"$$\n",
-	tempde->user_data,tempde->name,tempde->full_name);
+	    tempde->user_data,tempde->name,tempde->full_name);
     tempde=tempde->next;
   }
 }
@@ -61,7 +61,7 @@ I64 SizeRep1(CDirEntry *tempde,I64 *_fuf_flags)
     if (tempde->attr&RS_ATTR_DIR)
       i=SizeRep1(tempde->sub,_fuf_flags);
     else if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
-	FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
+	  FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
       dv=Let2Drv(*tempde->full_name);
       RBlks(dv,buf,Cluster2Blk(dv,tempde->cluster),1);
       i=(&buf)(CArcCompress *)->expanded_size;
@@ -76,13 +76,14 @@ U0 SizeRep2(CDoc *doc,CDirEntry *tempde)
 {
   while (tempde) {
     if (tempde->attr&RS_ATTR_DIR) {
-      DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",tempde->user_data,tempde->name);
+      DocPrint(doc,"%10,d $$TR+C,\"%s\"$$\n$$ID,2$$",
+	    tempde->user_data,tempde->name);
       SizeRep2(doc,tempde->sub);
       DocPrint(doc,"$$ID,-2$$");
     } else {
       DocPrint(doc,"%10,d ",tempde->user_data);
       DocPrint(doc,"$$LK,\"%s\",A=\"FI:%s\"$$\n",
-	  tempde->name,tempde->full_name);
+	    tempde->name,tempde->full_name);
     }
     tempde=tempde->next;
   }

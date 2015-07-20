@@ -23,7 +23,7 @@ HashTablePurge(adam_task->hash_table);
 
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
 
-public F64 os_version=3.03;//Operating system version.
+public F64 os_version=3.07;//Operating system version.
 
 #include "AExts.HPP"
 #include "AMath"
@@ -56,7 +56,7 @@ Cd("::/Adam/Ctrls");;
 
 Cd("::/Adam");;
 #include "AutoFile"
-#include "Acct"
+#include "ARegistry"
 
 Cd("::/Adam/AutoComplete");;
 #include "AutoComplete"
@@ -75,16 +75,17 @@ DocTermNew;
 WinVert(2,10);
 
 sys_winmgr_task=Spawn(&WinMgrTask,NULL,"Window Mgr");
-Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_SELF_CTRLS;
+Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER
+	-WIF_SELF_GRAB_SCROLL-WIF_SELF_CTRLS;
 LBts(&Fs->display_flags,DISPLAYf_CHILDREN_NOT_ON_TOP);
 LBts(&Fs->display_flags,DISPLAYf_SHOW);
-RegistryInit;
+RegInit;
 LBts(&sys_run_level,RLf_REGISTRY);
 
 Cd("::/Adam");;
 #include "WallPaper"
 
-if (IsDrvWritable)
+if (DrvIsWritable)
   MkDir("/Temp"); //Good to have a Temp
 
 #exe {OptOff(OPTf_WARN_PAREN);};

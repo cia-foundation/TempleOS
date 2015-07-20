@@ -18,11 +18,12 @@ CDate Struct2Date(CDateStruct *_ds)
   i1=YearStartDate(_ds->year);
   i2=YearStartDate(_ds->year+1);
   if (i2-i1==365)
-     i1+=mon_start_days1[_ds->mon-1];
-   else
-     i1+=mon_start_days2[_ds->mon-1];
+    i1+=mon_start_days1[_ds->mon-1];
+  else
+    i1+=mon_start_days2[_ds->mon-1];
   cdt.date=i1+_ds->day_of_mon-1;
-  cdt.time=(_ds->sec10000+100*(_ds->sec100+100*(_ds->sec+60*(_ds->min+60*_ds->hour))))<<21/(15*15*3*625);
+  cdt.time=(_ds->sec10000+100*(_ds->sec100+100*(_ds->sec
+	+60*(_ds->min+60*_ds->hour))))<<21/(15*15*3*625);
   return cdt;
 }
 

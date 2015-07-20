@@ -20,10 +20,13 @@ U0 HoldCourt()
   DocDblBufStart;
   '\n';
   accused=RandU32%3;
-  "%s",LstSub(accused,"A man \0A woman \0A child \0");
+  "%s",LstSub(accused,
+	"A man \0A woman \0A child \0");
 
   crime=RandU32&3;
-  "%s",LstSub(crime,"commits murder\0commits adultery\0commits blasphemy\0commits idolatry\0");
+  "%s",LstSub(crime,
+	"commits murder\0commits adultery\0"
+	"commits blasphemy\0commits idolatry\0");
 
   if (crime<=1) {
     '' CH_SPACE;
@@ -35,13 +38,13 @@ U0 HoldCourt()
   else
     '.';
   "\n\n\n\n"
-  "$$LM,4$$"
-  "\n\n$$BT,\"Show Mercy\",LE=0$$\n\n"
-  "\n\n$$BT,\"Punish\",LE=1$$\n\n"
-  "\n\n$$BT,\"Really Punish\",LE=2$$\n\n"
-  "$$LM,0$$";
+	"$$LM,4$$"
+	"\n\n$$BT,\"Show Mercy\",LE=0$$\n\n"
+	"\n\n$$BT,\"Punish\",LE=1$$\n\n"
+	"\n\n$$BT,\"Really Punish\",LE=2$$\n\n"
+	"$$LM,0$$";
   DocDblBufEnd;
-  DocMenuDo(DocPut);
+  DocMenu(DocPut);
 
   LBEqu(&(DocPut)->flags,DOCf_FORM,old_form);
   DocBottom;
@@ -73,7 +76,7 @@ Bool TakeTurn()
   Kill(Fs->song_task);
 
   DocDblBufStart;
-	"$$LM,4$$"
+  "$$LM,4$$"
 	"\n\n$$BT,\"Break Camp\",LE=T_BREAK_CAMP$$\n\n"
 	"\n\n$$BT,\"Talk with God\",LE=T_TALK_WITH_GOD$$\n\n"
 	"\n\n$$BT,\"View Clouds\",LE=T_VIEW_CLOUDS$$\n\n"
@@ -87,7 +90,7 @@ Bool TakeTurn()
 	"\n\n$$BT,\"Quit\",LE=T_QUIT$$\n\n"
 	"$$LM,0$$";
   DocDblBufEnd;
-  i=DocMenuDo(DocPut,DOF_DONT_TEXT_ATTR);
+  i=DocMenu(DocPut,DOF_DONT_TEXT_ATTR);
 
   LBEqu(&(DocPut)->flags,DOCf_FORM,old_form);
   DocBottom;
@@ -146,7 +149,8 @@ U0 TMsg(CDC *dc,U8 *msg)
     dc->color=BLACK;
     GrRect(dc,2,GR_HEIGHT-FONT_HEIGHT*3+2,GR_WIDTH-4,FONT_HEIGHT*2-4);
     dc->color=YELLOW;
-    GrPrint(dc,(GR_WIDTH-StrLen(msg)*FONT_WIDTH)/2,GR_HEIGHT-5*FONT_HEIGHT/2,"%s",msg);
+    GrPrint(dc,(GR_WIDTH-StrLen(msg)*FONT_WIDTH)/2,
+	  GR_HEIGHT-5*FONT_HEIGHT/2,"%s",msg);
     WinMgrSync;
     if (ScanChar)
       throw;

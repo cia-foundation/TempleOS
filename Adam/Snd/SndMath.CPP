@@ -126,8 +126,8 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
   F64 _freq,I64 _waveform=WF_SQUARE,F64 _amp=1.0,F64 _left=1.0, F64 _right=1.0)
 {//Add waveform to buffer.
 //num_samples is multiplied by channels to get buf_len.
-//left,right range from 0.0-1.0
-//Supports 16,24 and 32 bits
+  //left,right range from 0.0-1.0
+  //Supports 16,24 and 32 bits
   I64 reg i,reg j,reg k;
   F64 a,f,amp,reg phase;
   if (!swc) return;
@@ -195,7 +195,7 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
 	  }
 	  break;
       }
-      //left channel
+//left channel
       k=j*_left;
       if (swc->sample_bits==16) {
 	k>>=16;
@@ -205,7 +205,7 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
 	  k&=0xFFFFFF00;
 	buf(I32 *)[i++]+=k;
       }
-      //right channel
+//right channel
       if (swc->channels==2) {
 	k=j*_right;
 	if (swc->sample_bits==16) {

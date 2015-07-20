@@ -1,5 +1,4 @@
 asm {
-USE64
 SYS_MP_CRASH_HANDLER_ADDR:: //Forward reference to work around compiler
 	DU32	&MPCrash;
 
@@ -106,7 +105,7 @@ U8 *IntEntryGet(I64 irq)
 U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
 {//Set interrupt vector. See $LK,"IDTET_IRQ",A="MN:IDTET_IRQ"$.
 //See $LK,"::/Demo/Lectures/InterruptDemo.CPP"$.
-//See $LK,"::/Demo/MultiCore/Interrupts.CPP"$.
+  //See $LK,"::/Demo/MultiCore/Interrupts.CPP"$.
   I64 fp=fp_new_handler;
   U8 *result,*dst;
   PUSHFD
@@ -170,7 +169,7 @@ U0 IntInit1()
   temp_ptr.limit=256*16-1;
   temp_ptr.base =dev.idt;
   SetRAX(&temp_ptr);
-	LIDT U64 [RAX]
+  LIDT U64 [RAX]
 }
 
 U0 IntInit2()

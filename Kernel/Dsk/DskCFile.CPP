@@ -10,7 +10,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 {//Allows flags "r","w","w+". "c" for contiguous.
 //(It uses $LK,"StrOcc",A="MN:StrOcc"$() for 'w', 'r', '+', 'c')
   CFile *f=CAlloc(sizeof(CFile));
-  CFileAccess *fa;
+  CDirContext *dirc;
   U8 *full_name;
   Bool contiguous=StrOcc(flags,'c');
 
@@ -41,19 +41,19 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 	return f;
       }
     } else
-      Del(full_name,FALSE);
+      Del(full_name,,,FALSE);
     f->de.full_name=full_name;
     f->flags|=FF_NEW_FILE;
-    if (fa=FileAccessNew(full_name)) {
-      StrCpy(f->de.name,fa->mask);
+    if (dirc=DirContextNew(full_name)) {
+      StrCpy(f->de.name,dirc->mask);
       if (cnt>0) {//We pre-alloc the whole thing.
 	f->de.cluster=ClustersAlloc(f->dv,0,
-	  (cnt+f->dv->spc-1)/f->dv->spc,contiguous);
+	      (cnt+f->dv->spc-1)/f->dv->spc,contiguous);
 	f->de.size=cnt<<BLK_SIZE_BITS;
-	DirNew(fa->dv,Fs->cur_dir,&f->de,TRUE);
+	DirNew(dirc->dv,Fs->cur_dir,&f->de,TRUE);
 	f->flags&=~FF_NEW_FILE;
       }
-      FileAccessDel(fa);
+      DirContextDel(dirc);
       if (!contiguous || cnt>0)
 	return f;
     }
@@ -72,21 +72,21 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 
 U0 FClose(CFile *f)
 {//Close CFile, updating directory.
-  CFileAccess *fa;
+  CDirContext *dirc;
   if (f) {
     if (f->flags & FF_BUF_DIRTY) {
       WClusters(f->dv,f->cluster_buf,f->cluster,1);
       f->flags&=~FF_BUF_DIRTY;
     }
     if (f->flags & FF_NEEDS_WRITE) {
-      if (fa=FileAccessNew(f->de.full_name)) {
+      if (dirc=DirContextNew(f->de.full_name)) {
 	if (!(f->flags & FF_USE_OLD_DATETIME))
 	  f->de.datetime=Now;
 	if (f->flags & FF_NEW_FILE)
-	  DirNew(fa->dv,Fs->cur_dir,&f->de,TRUE);
+	  DirNew(dirc->dv,Fs->cur_dir,&f->de,TRUE);
 	else
-	  DirNew(fa->dv,Fs->cur_dir,&f->de,FALSE);
-	FileAccessDel(fa);
+	  DirNew(dirc->dv,Fs->cur_dir,&f->de,FALSE);
+	DirContextDel(dirc);
       } else
 	throw('File');
     }

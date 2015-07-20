@@ -43,14 +43,15 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
   CFile *f;
   CHashGeneric *temph;
   U8 *result=NULL,*buf,*in_ptr,
-     *st2=MStrUtil(st,SUF_TO_UPPER);
+	*st2=MStrUtil(st,SUF_TO_UPPER);
   temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
   if (temph) {
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,ACD_BLK_SIZE*2/BLK_SIZE);
+      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;
       while (in_ptr<buf+ACD_BLK_SIZE*2) {
@@ -59,7 +60,7 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
 	if (*in_ptr++==ACD_WORD_CHAR) {
 	  if (!StrICmp(st,in_ptr)) {
 	    while (def_num && *in_ptr!=ACD_WORD_CHAR
-		   && in_ptr<buf+ACD_BLK_SIZE*2) {
+		  && in_ptr<buf+ACD_BLK_SIZE*2) {
 	      if (*in_ptr==ACD_DEF_CHAR) {
 		if (!--def_num)
 		  break;
@@ -86,14 +87,15 @@ public U8 *ACDDefsGet(U8 *st)
   CFile *f;
   CHashGeneric *temph;
   U8 *result=NULL,*buf,*in_ptr,*in_ptr2,
-     *st2=MStrUtil(st,SUF_TO_UPPER);
+	*st2=MStrUtil(st,SUF_TO_UPPER);
   temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
   if (temph) {
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,ACD_BLK_SIZE*2/BLK_SIZE);
+      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;
       while (in_ptr<buf+ACD_BLK_SIZE*2) {
@@ -104,7 +106,7 @@ public U8 *ACDDefsGet(U8 *st)
 	    in_ptr2=in_ptr;
 	    in_ptr--;
 	    while (*in_ptr2!=ACD_WORD_CHAR
-		   && in_ptr2<buf+ACD_BLK_SIZE*2) {
+		  && in_ptr2<buf+ACD_BLK_SIZE*2) {
 	      in_ptr2++;
 	    }
 	    result=MAlloc(in_ptr2+1-in_ptr);
@@ -129,7 +131,7 @@ public U8 *ACDWordPtAt(U8 *st)
 {//Point to word in word list.
   I64 i;
   U8 *start=acd.word_lst,*r=start,
-     *end=acd.word_lst+acd.word_lst_size;
+	*end=acd.word_lst+acd.word_lst_size;
   if (!st || !*st)
     return acd.word_lst;
   if (acd.word_lst_size) {
@@ -219,7 +221,7 @@ public U0 ACDDefsPut(CDoc *doc=NULL,U8 *st,I64 num=-1)
 	    break;
 	  case ACD_DEF_CHAR:
 	    DocPrint(doc,"$$GREEN$$(%d)$$FG$$ %s\n",
-	      ++i,st2);
+		  ++i,st2);
 	    break;
 	  case ACD_PRONUNCIATION_CHAR:
 	    DocPrint(doc,"$$LTGREEN$$%s$$FG$$\n",st2);
@@ -239,7 +241,7 @@ public U0 ACDDefsPut(CDoc *doc=NULL,U8 *st,I64 num=-1)
     while (st2=ACDDefGet(st,++i)) {
       if (i==num)
 	DocPrint(doc,"$$GREEN$$(%d)$$FG$$ %s\n",
-	  i,st2);
+	      i,st2);
       Free(st2);
     }
   }
@@ -263,22 +265,22 @@ U0 ACFindMisspelled(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
   CDocEntry *doc_e=doc->cur_entry;
-  I64 col=doc->cur_data_col,col2,ch;
+  I64 col=doc->cur_col,col2,ch;
   do {
     if (doc_e!=doc && doc_e->de_flags&DOCEF_TAG) {
       while (col<doc_e->max_col) {
-	while (col<doc_e->max_col && !Bt(chars_bitmap_word,doc_e->tag[col]))
+	while (col<doc_e->max_col && !Bt(chars_bmp_word,doc_e->tag[col]))
 	  col++;
 	if (col<doc_e->max_col) {
 	  col2=col;
-	  while (col2<doc_e->max_col && Bt(chars_bitmap_word,doc_e->tag[col2]))
+	  while (col2<doc_e->max_col && Bt(chars_bmp_word,doc_e->tag[col2]))
 	    col2++;
 	  ch=doc_e->tag[col2];
 	  doc_e->tag[col2]=0;
 	  if (StrICmp(&doc_e->tag[col],ACDWordPtAt(&doc_e->tag[col])+1)) {
 	    doc_e->tag[col2]=ch;
 	    doc->cur_entry=doc_e;
-	    doc->cur_data_col=col;
+	    doc->cur_col=col;
 	    goto fm_done;
 	  }
 	  doc_e->tag[col2]=ch;

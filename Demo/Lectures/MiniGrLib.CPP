@@ -17,7 +17,7 @@ U0 MGInit()
  
 U0 MGUpdate()
 {//Copy image to VGA memory
-  //For better performance we could only write what's changed.
+//For better performance we could only write what's changed.
   //0xA0000 is slower than normal RAM.
   OutU8(VGAP_INDEX,VGAR_MAP_MASK);
   OutU8(VGAP_DATA,0xF);//All color planes at once -- Black and White
@@ -32,7 +32,7 @@ U0 MGPlot(I64 x,I64 y)
  
 U0 MGHLine(I64 x1,I64 x2,I64 y)
 {//Warning!  No clipping
-  //For performance, we do as many whole-bytes as possible.
+//For performance, we do as many whole-bytes as possible.
   U8 *ptr;
   I64 i,w,leading,trailing,whole_bytes;
   if (x2<x1) SwapI64(&x1,&x2);
@@ -88,11 +88,11 @@ U0 MGCircle(I64 x,I64 y,F64 r)
   MGPlot(x+x1,y+y1);
   while (len-->=0) {
 
-//m1@a1 * m2@a2     = m1*m2@(a1+a2)
+    //m1@a1 * m2@a2	= m1*m2@(a1+a2)
 
-//(x1+y1i)*(x2+y2i) = x1*x2+(x1*y1+x2*y2)i-y1*y2
+    //(x1+y1i)*(x2+y2i) = x1*x2+(x1*y1+x2*y2)i-y1*y2
 
-// me$SY,-3$ti$SY,0$=mCos(t)+imSin(t)
+    // me$SY,-3$ti$SY,0$=mCos(t)+imSin(t)
 
     x2=x1; y2=y1;
     x1=c*x2-s*y2;
@@ -108,7 +108,7 @@ U0 MiniGrLibDemo()
   Bool old_preempt;
   MGInit;
 
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   for (i=0;i<100;i++)
     MGHLine(200+i,400+i,300+i);
   for (i=0;i<500;i+=10)
@@ -124,7 +124,7 @@ It is not normal to by-pass the TempleOS graphcis routines.
 The TempleOS graphics don't know VGA has changed.
 This bit tells TempleOS to update whole screen.
 */
-//<CTRL-ALT-f> will flush screen VGA cache.
+  //<CTRL-ALT-f> will flush screen VGA cache.
   VGAFlush;
 }
  

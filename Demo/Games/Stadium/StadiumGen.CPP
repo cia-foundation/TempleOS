@@ -17,13 +17,13 @@ U0 StadiumGen()
   gr.fp_final_screen_update=NULL;
 
   WinMgrSync(2,TRUE);
-  dc2=DCCaptureScreen;
+  dc2=DCScreenCapture;
   dc=DCExtract(dc2,0,FONT_HEIGHT,GR_WIDTH,GR_HEIGHT);
   DCDel(dc2);
 
-  GRAWrite("StadiumBG",dc);
+  GRAWrite("StadiumBG",dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
   DCDel(dc);
- 
+
   DocCursor(ON);
   gr.fp_final_screen_update=fp_old_update;
   DocClear;

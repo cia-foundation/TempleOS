@@ -1,5 +1,5 @@
-AcctRegSetDftEntry("TempleOS/DunGen","F64 best_score=9999;\n");
-AcctRegExeBranch("TempleOS/DunGen");
+RegSetDftEntry("TempleOS/DunGen","F64 best_score=9999;\n");
+RegExeBranch("TempleOS/DunGen");
 
 //Set snap to 4 and width to 4
 //if you edit this map.
@@ -43,17 +43,11 @@ $SP,"<10>",BI=10$
 $BG$//These are indexed by color #.
 //See $LK,"COLORS",A="MN:RED"$.
 
-U8 *tiles1[16]=
-{NULL,$IB,"<7>",BI=7$ ,$IB,"<5>",BI=5$ ,NULL,
- NULL,NULL,NULL,NULL,
- $IB,"<6>",BI=6$ ,NULL,NULL,NULL,
- NULL,NULL,NULL,NULL};
+U8 *tiles1[16]={NULL,$IB,"<7>",BI=7$ ,$IB,"<5>",BI=5$ ,NULL,NULL,NULL,NULL,NULL,
+  $IB,"<6>",BI=6$ ,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 
-U8 *tiles2[16]=
-{NULL,$IB,"<8>",BI=8$ ,$IB,"<5>",BI=5$ ,NULL,
- NULL,NULL,NULL,NULL,
- $IB,"<6>",BI=6$ ,NULL,NULL,NULL,
- NULL,NULL,NULL,NULL};
+U8 *tiles2[16]={NULL,$IB,"<8>",BI=8$ ,$IB,"<5>",BI=5$ ,NULL,NULL,NULL,NULL,NULL,
+  $IB,"<6>",BI=6$ ,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 
 #define SCREEN_SCALE	24
 #define SCREEN_WIDTH	24
@@ -91,7 +85,7 @@ Bool LOSPlot(U8 *,I64 x,I64 y,I64)
 Bool LOS(I64 x1,I64 y1,I64 x2,I64 y2)
 {//Line of sight
   return Line(NULL,x1*LOS_SCALE+LOS_SCALE/2,y1*LOS_SCALE+LOS_SCALE/2,0,
-	       x2*LOS_SCALE+LOS_SCALE/2,y2*LOS_SCALE+LOS_SCALE/2,0,&LOSPlot);
+	x2*LOS_SCALE+LOS_SCALE/2,y2*LOS_SCALE+LOS_SCALE/2,0,&LOSPlot);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -110,9 +104,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   else
     _tiles=tiles2;
 
-  GrRotXEqu(dc_t->r,60*2*ã/360);
-  GrRotZEqu(dc_t->r,15*2*ã/360);
-  GrSetRotMat(dc_t,dc_t->r);
+  Mat4x4RotX(dc_t->r,60*2*ã/360);
+  Mat4x4RotZ(dc_t->r,15*2*ã/360);
+  DCMat4x4Set(dc_t,dc_t->r);
   dc_t->x=task->pix_width/2;
   dc_t->y=task->pix_height/2;
   dc_t->flags|=DCF_TRANSFORMATION;
@@ -133,7 +127,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	      x1=x*SCREEN_SCALE;
 	      y1=y*SCREEN_SCALE;
 	      z1=0;
-	      GrTransform(dc_t,&x1,&y1,&z1);
+	      DCTransform(dc_t,&x1,&y1,&z1);
 	      Sprite3(dc,x1,y1,z1,_tiles[color]);
 	    } else {//If no tile defined, do solid color.
 	      poly[0].x=x*SCREEN_SCALE;
@@ -167,14 +161,14 @@ U0 DrawIt(CTask *task,CDC *dc)
 	      x1=x*SCREEN_SCALE;
 	      y1=y*SCREEN_SCALE;
 	      z1=0;
-	      GrTransform(dc_t,&x1,&y1,&z1);
+	      DCTransform(dc_t,&x1,&y1,&z1);
 	      Sprite3(dc,x1,y1,z1,$IB,"<9>",BI=9$);
 	    }
 	    if (xx+1<map_width && LOS(xx+1,yy,man_x,man_y)) {
 	      x1=x*SCREEN_SCALE;
 	      y1=y*SCREEN_SCALE;
 	      z1=0;
-	      GrTransform(dc_t,&x1,&y1,&z1);
+	      DCTransform(dc_t,&x1,&y1,&z1);
 	      Sprite3(dc,x1,y1,z1,$IB,"<10>",BI=10$);
 	    }
 	  }
@@ -187,10 +181,10 @@ U0 DrawIt(CTask *task,CDC *dc)
       x1=(tempm->x-screen_x)*SCREEN_SCALE+SCREEN_SCALE/2;
       y1=(tempm->y-screen_y)*SCREEN_SCALE+SCREEN_SCALE/2;
       z1=0;
-      GrTransform(dc_t,&x1,&y1,&z1);
+      DCTransform(dc_t,&x1,&y1,&z1);
       if (tempm->dx<0) {
 	dc->flags|=DCF_SYMMETRY|DCF_JUST_MIRROR;
-	GrSetSymmetry(dc,x1,y1,x1,y1+1);
+	DCSymmetrySet(dc,x1,y1,x1,y1+1);
       } else
 	dc->flags&=~(DCF_SYMMETRY|DCF_JUST_MIRROR);
       Sprite3(dc,x1,y1,z1,$IB,"<4>",BI=4$);
@@ -205,10 +199,10 @@ U0 DrawIt(CTask *task,CDC *dc)
     if (man_dy!=1)
       y1-=Saw(tS-man_attack_t0,0.2)*SCREEN_SCALE;
   }
-  GrTransform(dc_t,&x1,&y1,&z1);
+  DCTransform(dc_t,&x1,&y1,&z1);
   if (man_dx<0) {
     dc->flags|=DCF_SYMMETRY|DCF_JUST_MIRROR;
-    GrSetSymmetry(dc,x1,y1,x1,y1+1);
+    DCSymmetrySet(dc,x1,y1,x1,y1+1);
   } else
     dc->flags&=~(DCF_SYMMETRY|DCF_JUST_MIRROR);
 
@@ -228,7 +222,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     dc->color=LTGREEN;
     tt=tS;
   }
-  GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",monsters_left,tt-t0,best_score);
+  GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",
+	monsters_left,tt-t0,best_score);
 }
 
 U0 Attack()
@@ -264,7 +259,7 @@ U0 Init()
   map=MAlloc(map_width*map_height*sizeof(U8));
   for (y=0;y<map_height;y++)
     for (x=0;x<map_width;x++)
-       map[y*map_width+x]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
+      map[y*map_width+x]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
   DCDel(dc);
 
   man_attack_t0=0;
@@ -323,23 +318,23 @@ U0 DunGen()
   I64 ch,sc;
 
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Up(,,SC_CURSOR_UP);"
-  "  Down(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-  "  Attack(,CH_SPACE);"
-      "}"
-      );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Up(,,SC_CURSOR_UP);"
+	"  Down(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"  Attack(,CH_SPACE);"
+	"}"
+	);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
-  Preempt(OFF);
+  Preempt;
   WinMax;
   AutoComplete;
   Init;
@@ -370,14 +365,15 @@ U0 DunGen()
 		    man_dy=0;
 		    Attack;
 		  } else
-		    if (man_x+1<map_width && map[man_y*map_width+(man_x+1)]==DKGRAY) {
-		    man_x++;
-		    if (man_x-screen_x>SCREEN_WIDTH/2-3) {
-		      screen_x+=SCREEN_WIDTH/2;
-		      if (screen_x+SCREEN_WIDTH/2>map_width)
-			screen_x=map_width-SCREEN_WIDTH/2;
+		    if (man_x+1<map_width &&
+			  map[man_y*map_width+(man_x+1)]==DKGRAY) {
+		      man_x++;
+		      if (man_x-screen_x>SCREEN_WIDTH/2-3) {
+			screen_x+=SCREEN_WIDTH/2;
+			if (screen_x+SCREEN_WIDTH/2>map_width)
+			  screen_x=map_width-SCREEN_WIDTH/2;
+		      }
 		    }
-		  }
 		  break;
 		case SC_CURSOR_LEFT:
 		  if (man_attack) {
@@ -385,14 +381,15 @@ U0 DunGen()
 		    man_dy=0;
 		    Attack;
 		  } else
-		    if (man_x-1>=0 && map[man_y*map_width+(man_x-1)]==DKGRAY) {
-		    man_x--;
-		    if (man_x-screen_x<-SCREEN_WIDTH/2+3) {
-		      screen_x-=SCREEN_WIDTH/2;
-		      if (screen_x-SCREEN_WIDTH/2<0)
-			screen_x=SCREEN_WIDTH/2;
+		    if (man_x-1>=0 &&
+			  map[man_y*map_width+(man_x-1)]==DKGRAY) {
+		      man_x--;
+		      if (man_x-screen_x<-SCREEN_WIDTH/2+3) {
+			screen_x-=SCREEN_WIDTH/2;
+			if (screen_x-SCREEN_WIDTH/2<0)
+			  screen_x=SCREEN_WIDTH/2;
+		      }
 		    }
-		  }
 		  break;
 		case SC_CURSOR_UP:
 		  if (man_attack) {
@@ -400,14 +397,15 @@ U0 DunGen()
 		    man_dy=-1;
 		    Attack;
 		  } else
-		    if (man_y-1>=0 && map[(man_y-1)*map_width+man_x]==DKGRAY) {
-		    man_y--;
-		    if (man_y-screen_y<-SCREEN_HEIGHT/2+3) {
-		      screen_y-=SCREEN_HEIGHT/2;
-		      if (screen_y-SCREEN_HEIGHT/2<0)
-			screen_y=SCREEN_HEIGHT/2;
+		    if (man_y-1>=0 &&
+			  map[(man_y-1)*map_width+man_x]==DKGRAY) {
+		      man_y--;
+		      if (man_y-screen_y<-SCREEN_HEIGHT/2+3) {
+			screen_y-=SCREEN_HEIGHT/2;
+			if (screen_y-SCREEN_HEIGHT/2<0)
+			  screen_y=SCREEN_HEIGHT/2;
+		      }
 		    }
-		  }
 		  break;
 		case SC_CURSOR_DOWN:
 		  if (man_attack) {
@@ -415,14 +413,15 @@ U0 DunGen()
 		    man_dy=1;
 		    Attack;
 		  } else
-		    if (man_y+1<map_height && map[(man_y+1)*map_width+man_x]==DKGRAY) {
-		    man_y++;
-		    if (man_y-screen_y>SCREEN_HEIGHT/2-3) {
-		      screen_y+=SCREEN_HEIGHT/2;
-		      if (screen_y+SCREEN_HEIGHT/2>map_height)
-			screen_y=map_height-SCREEN_HEIGHT/2;
+		    if (man_y+1<map_height &&
+			  map[(man_y+1)*map_width+man_x]==DKGRAY) {
+		      man_y++;
+		      if (man_y-screen_y>SCREEN_HEIGHT/2-3) {
+			screen_y+=SCREEN_HEIGHT/2;
+			if (screen_y+SCREEN_HEIGHT/2>map_height)
+			  screen_y=map_height-SCREEN_HEIGHT/2;
+		      }
 		    }
-		  }
 		  break;
 	      }
 	  }
@@ -439,7 +438,7 @@ dg_done:
     PutExcept;
   SettingsPop;
   MenuPop;
-  AcctRegWriteBranch("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
   CleanUp;
 }
 

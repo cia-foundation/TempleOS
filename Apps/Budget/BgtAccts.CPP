@@ -5,15 +5,19 @@ U0 BgtAcctsUpdate()
   tempb=b_root.next;
   while (tempb!=&b_root) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
-      tempb->credit_index	=StrFileAdd(tempb->credit,&accts_table_strs,accts_table);
-      tempb->debit_index	=StrFileAdd(tempb->debit,&accts_table_strs,accts_table);
+      tempb->credit_index=StrFileAdd(tempb->credit,
+	    &accts_table_strs,accts_table);
+      tempb->debit_index =StrFileAdd(tempb->debit,
+	    &accts_table_strs,accts_table);
     }
     tempb=tempb->next;
   }
   tempt=t_root.next;
   while (tempt!=&t_root) {
-    tempt->b.credit_index	=StrFileAdd(tempt->b.credit,&accts_table_strs,accts_table);
-    tempt->b.debit_index	=StrFileAdd(tempt->b.debit,&accts_table_strs,accts_table);
+    tempt->b.credit_index=StrFileAdd(tempt->b.credit,
+	  &accts_table_strs,accts_table);
+    tempt->b.debit_index =StrFileAdd(tempt->b.debit,
+	  &accts_table_strs,accts_table);
     tempt=tempt->next;
   }
 }
@@ -71,7 +75,7 @@ U8 *BgtPopUpAcct(U8 *header=NULL,U8 *dft=NULL)
 
   if (doc_dft) {
     doc->cur_entry=doc_dft;
-    doc->cur_data_col=0;
+    doc->cur_col=0;
   }
   result=PopUpMenu(doc,DOF_DONT_HOME);
   DocDel(doc);

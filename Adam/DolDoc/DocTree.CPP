@@ -17,32 +17,33 @@ public Bool DocTreeFind(CDoc *haystack_doc,U8 *needle_path,
       while (doc_e!=haystack_doc) {
 	if (doc_e->type_u8==DOCT_INDENT)
 	  i+=doc_e->attr;
-	else if (i==k && doc_e->de_flags&DOCEF_TREE && !StrCmp(doc_e->tag+3,st2)) {
-	   if (*st1)
-	     break;
-	   else {
-	     if (_tree_entry) *_tree_entry=doc_e;
-	     i=0;
-	     while (doc_e!=haystack_doc && doc_e->type_u8!=DOCT_INDENT)
-	       doc_e=doc_e->next;
-	     if (doc_e!=haystack_doc) {
-	       i=doc_e->attr;
-	       if (_start_indent) *_start_indent=doc_e;
-	       doc_e=doc_e->next;
-	       while (doc_e!=haystack_doc && i>0) {
-		 if (doc_e->type_u8==DOCT_INDENT) {
-		   i+=doc_e->attr;
-		   if (i<=0) {
-		     if (_end_indent) *_end_indent=doc_e;
-		     result=TRUE;
-		     break;
-		   }
-		 }
-		 doc_e=doc_e->next;
-	       }
-	     }
-	     goto ft_done;
-	   }
+	else if (i==k && doc_e->de_flags&DOCEF_TREE &&
+	      !StrCmp(doc_e->tag+3,st2)) {
+	  if (*st1)
+	    break;
+	  else {
+	    if (_tree_entry) *_tree_entry=doc_e;
+	    i=0;
+	    while (doc_e!=haystack_doc && doc_e->type_u8!=DOCT_INDENT)
+	      doc_e=doc_e->next;
+	    if (doc_e!=haystack_doc) {
+	      i=doc_e->attr;
+	      if (_start_indent) *_start_indent=doc_e;
+	      doc_e=doc_e->next;
+	      while (doc_e!=haystack_doc && i>0) {
+		if (doc_e->type_u8==DOCT_INDENT) {
+		  i+=doc_e->attr;
+		  if (i<=0) {
+		    if (_end_indent) *_end_indent=doc_e;
+		    result=TRUE;
+		    break;
+		  }
+		}
+		doc_e=doc_e->next;
+	      }
+	    }
+	    goto ft_done;
+	  }
 	}
 	doc_e=doc_e->next;
       }
@@ -61,12 +62,12 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
 {//Make registry-like tree widget.
   I64 i=0,j=MIN_I64,k=0;
   U8 *st1=StrNew(path),
-     *st2=MAlloc(StrLen(path)+1),
-     *st3=StrNew(path);
+	*st2=MAlloc(StrLen(path)+1),
+	*st3=StrNew(path);
   Bool result=TRUE,unlock_doc=DocLock(doc);
   CDocEntry *doc_e=doc->root.next;
   doc->cur_entry=doc;
-  doc->cur_data_col=0;
+  doc->cur_col=0;
   while (*st1 && doc_e!=doc) {
     StrFirstRem(st1,"/",st2);
     if (*st2) {
@@ -75,17 +76,18 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
 	  i+=doc_e->attr;
 	  if (i==j) {
 	    doc->cur_entry=doc_e;
-	    doc->cur_data_col=0;
+	    doc->cur_col=0;
 	    goto mt_done;
 	  }
-	} else if (i==k && doc_e->de_flags&DOCEF_TREE && !StrCmp(doc_e->tag+3,st2)) {
-	   Free(st3);
-	   st3=StrNew(st1);
-	   j=i;
-	   if (!*st1)
-	     result=FALSE;
-	   else
-	     break;
+	} else if (i==k && doc_e->de_flags&DOCEF_TREE &&
+	      !StrCmp(doc_e->tag+3,st2)) {
+	  Free(st3);
+	  st3=StrNew(st1);
+	  j=i;
+	  if (!*st1)
+	    result=FALSE;
+	  else
+	    break;
 	}
 	doc_e=doc_e->next;
       }
@@ -99,7 +101,7 @@ mt_done:
       if (*st2) {
 	DocPrint(doc,"$$TR+C,\"%s\"$$\n$$ID,2$$",st2);
 	doc->cur_entry=DocPrint(doc,"$$ID,-2$$");
-	doc->cur_data_col=0;
+	doc->cur_col=0;
       }
     }
   }
@@ -116,16 +118,16 @@ public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
 {//JIT Compile and execute a document.
   I64 result;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
-  CLex *lx=LexNew(,LF_DONT_FREE_BUF);
+  CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
   if (just_load)
-    lx->flags|=LF_JUST_LOAD;
+    cc->flags|=CCF_JUST_LOAD;
   if (Fs->last_lex!=&Fs->next_lex)
-    lx->opts=Fs->last_lex->opts;
-  QueIns(lx,Fs->last_lex);
-  LexAttachDoc(lx,,doc);
+    cc->opts=Fs->last_lex->opts;
+  QueIns(cc,Fs->last_lex);
+  LexAttachDoc(cc,,doc);
   try {
-    Lex(lx);
-    result=ExeCmdLine(lx);
+    Lex(cc);
+    result=ExeCmdLine(cc);
   } catch {
     if (Fs->except_ch=='Compiler' || Fs->except_ch=='Break') {
       Fs->catch_except=TRUE;
@@ -133,9 +135,9 @@ public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
       result=0;
     }
   }
-  QueRem(lx);
+  QueRem(cc);
   if (okay)
-    LexDel(lx); //TODO: can crash
+    CmpCtrlDel(cc); //TODO: can crash
   if (unlock_doc)
     DocUnlock(doc);
   return result;

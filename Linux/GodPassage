@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#This prints a random Bible passage.
+
+if [ ! -f Bible.TXT ]; then
+    echo "Downloading Bible.TXT..."
+    wget http://www.templeos.org/Wb/Home/Wb2/Files/Text/Bible.TXT
+    echo "Done."
+fi
+
+LINE=$(shuf -en 1 {1..100000} --random-source=/dev/urandom)
+echo "Line $LINE:"
+tail -n $LINE Bible.TXT | head -n 16
+

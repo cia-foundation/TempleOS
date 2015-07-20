@@ -5,7 +5,8 @@ U0 GrInit1()
 	"End\0Color\0Dither Color\0"
 	"Width\0Planar Symmetry\0Transform On\0Transform Off\0Shift\0"
 	"Point\0PolyPoint\0Line\0PolyLine\0Rect\0Rotated Rect\0"
-	"Circle\0Ellipse\0Polygon\0BSpline2\0BSpline2 Closed\0BSpline3\0BSpline3 Closed\0"
+	"Circle\0Ellipse\0Polygon\0BSpline2\0BSpline2 Closed\0"
+	"BSpline3\0BSpline3 Closed\0"
 	"Flood Fill\0Flood Fill Not Color\0BitMap\0Mesh\0Shiftable Mesh\0"
 	"Arrow\0Text\0Text Box\0Text Diamond\0");
   DefineLstLoad("ST_SPRITE_ELEM_CODES",
@@ -18,12 +19,13 @@ U0 GrInit1()
 }
 GrInit1;
 
-#help_index "Graphics/Sprite"
+#help_index "Sprites/Binary"
 
 class CMeshTri
 {
-  I32 color; //Give one of 0-7 colors.	Colors 8-15 are 0-7 with intensity bit set.
-  I32 nums[3]; //Vertex number
+  I32 color;	//Give one of 0-7 colors.
+//Colors 8-15 are 0-7 with intensity bit set.
+  I32 nums[3];	//Vertex number
 };
 
 class CQueMeshTri
@@ -49,7 +51,7 @@ public class CSpriteDitherColor : CSpriteBase
   U16 dither_color;
 };
 
-public class CSpriteWidth : CSpriteBase
+public class CSpriteW : CSpriteBase
 {
   I32 width;
 };
@@ -136,7 +138,7 @@ public class CSpritePtMeshU8s : CSpriteBase
 #define SPT_END			0	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
 #define SPT_COLOR		1	//$LK,"CSpriteColor",A="MN:CSpriteColor"$
 #define SPT_DITHER_COLOR	2	//$LK,"CSpriteDitherColor",A="MN:CSpriteDitherColor"$
-#define SPT_WIDTH		3	//$LK,"CSpriteWidth",A="MN:CSpriteWidth"$
+#define SPT_WIDTH		3	//$LK,"CSpriteW",A="MN:CSpriteW"$
 #define SPT_PLANAR_SYMMETRY	4	//$LK,"CSpritePtPt",A="MN:CSpritePtPt"$
 #define SPT_TRANSFORM_ON	5	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
 #define SPT_TRANSFORM_OFF	6	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
@@ -157,14 +159,17 @@ public class CSpritePtMeshU8s : CSpriteBase
 #define SPT_FLOOD_FILL		21	//$LK,"CSpritePt",A="MN:CSpritePt"$
 #define SPT_FLOOD_FILL_NOT	22	//$LK,"CSpritePt",A="MN:CSpritePt"$
 #define SPT_BITMAP		23	//$LK,"CSpritePtWHU8s",A="MN:CSpritePtWHU8s"$
-#define SPT_MESH		24	//$LK,"CSpriteMeshU8s",A="MN:CSpriteMeshU8s"$	See $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$.
+#define SPT_MESH		24	//$LK,"CSpriteMeshU8s",A="MN:CSpriteMeshU8s"$ See $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$.
 #define SPT_SHIFTABLE_MESH	25	//$LK,"CSpritePtMeshU8s",A="MN:CSpritePtMeshU8s"$ See $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$.
 #define SPT_ARROW		26	//$LK,"CSpritePtPt",A="MN:CSpritePtPt"$
 #define SPT_TEXT		27	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_TEXT_BOX		28	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_TEXT_DIAMOND	29	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_NUM_TYPES		30
-//See $LK,"Graphics/Sprite",A="HI:Graphics/Sprite"$.  See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ and
+
+#help_index "Graphics/Sprite;Sprites;Sprites/Binary"
+
+//See $LK,"Sprites",A="HI:Sprites"$.  See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ and
 //$LK,"::/Demo/Graphics/SpriteRaw.CPP"$ for how CSprite are stored.
 public class CSprite
 {
@@ -175,7 +180,7 @@ public class CSprite
     CSpriteBase		b;
     CSpriteColor	c;
     CSpriteDitherColor	d;
-    CSpriteWidth	w;
+    CSpriteW	w;
     CSpritePt		p;
     CSpritePtPt		pp;
     CSpritePtPtAng	ppa;
@@ -195,13 +200,14 @@ public class CSprite
 
 extern I64 GrBlot3(CDC *dc,I64 x1,I64 y1,I64 z1,CDC *img);
 extern U8 *GrBitMap4ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor);
+extern I64 *Mat4x4New(I64 *src,CTask *mem_task=NULL);
 extern U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL);
 
 #include "GrGlbls"
 #include "GrTextBase"
 #include "GrAsm"
-#include "GrDC"
 #include "GrPalette"
+#include "GrDC"
 #include "GrInit"
 #include "GrMath"
 #include "GrScreen"

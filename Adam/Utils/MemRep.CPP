@@ -10,7 +10,7 @@ I64 PenBrushesSize()
   I64 result=0,i;
   for (i=0;i<GR_NUM_PEN_BRUSHES;i++)
     result+=DCSize(gr.pen_brushes[i])+DCSize(gr.collision_pen_brushes[i])+
-      DCSize(gr.even_pen_brushes[i])+DCSize(gr.odd_pen_brushes[i]);
+	  DCSize(gr.even_pen_brushes[i])+DCSize(gr.odd_pen_brushes[i]);
   return result;
 }
 
@@ -70,8 +70,8 @@ I64 BlkDevsSize()
     if (bd->bd_signature==BD_SIGNATURE_VAL) {
       if (bd->type==BDT_RAM)
 	"RAMDsk %C\t:%010X Unused:%010X\n",
-	  bd->first_drv_let,(bd->max_blk+1)<<BLK_SIZE_BITS,
-	  UnusedDrvSpace(bd->first_drv_let);
+	      bd->first_drv_let,(bd->max_blk+1)<<BLK_SIZE_BITS,
+	      UnusedDrvSpace(bd->first_drv_let);
       result+=MSize2(bd->dev_id_record);
     }
   }
@@ -91,7 +91,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   I64 i,j,k,m,n;
   U8 *st;
   CDoc *pdoc,*ddoc,*bdoc;
-  CLex *lx;
+  CCmpCtrl *cc;
   CMathODE *o;
   CCPU *c;
   CTask *task1;
@@ -104,8 +104,8 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   "$$GREEN$$Task:%010X$$CYAN$$ %-30ts$$FG$$\n$$ID,2$$",task,st;
   Free(st);
   "$$PURPLE$$Alloced:%010X Used:%010X$$FG$$\n",
-      TaskMemAlloced(task,override_validate),
-      TaskMemUsed(task,override_validate);
+	TaskMemAlloced(task,override_validate),
+	TaskMemUsed(task,override_validate);
   "HashTable\t:%010X\n",HashTableSize2(task->hash_table);
 
   i=UnusedStk(task);
@@ -121,10 +121,10 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   if (bdoc=DocBorder(task))
     "BorderDoc\t:%010X\n",DocSize(bdoc);
 
-  lx=task->next_lex;
-  while (lx!=&task->next_lex) {
-    "Lex\t\t:%010X\n",LexSize(lx);
-    lx=lx->next;
+  cc=task->next_lex;
+  while (cc!=&task->next_lex) {
+    "Lex\t\t:%010X\n",CmpCtrlSize(cc);
+    cc=cc->next;
   }
 
   o=task->next_ode;
@@ -167,14 +167,16 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
     "Drvs\t:%010X\n",DrvsSize;
     if (dsk.cache_base)
       "DskCache\t:%010X\n",
-	  MSize2(dsk.cache_base)+MSize2(dsk.cache_hash_table)+MSize2(dsk.cache_ctrl);
+	    MSize2(dsk.cache_base)+MSize2(dsk.cache_hash_table)+
+	    MSize2(dsk.cache_ctrl);
     "Clipboard\t:%010X\n",DocSize(sys_clipboard_doc);
     "AutoComplete:%010X\n",CallExtStr("AutoCompleteSize");
     "gr.to_8_bits\t:%010X\n",MSize2(gr.to_8_bits);
     "gr.to_8_colors\t:%010X\n",MSize2(gr.to_8_colors);
     "gr.text_base\t:%010X\n",MSize2(gr.text_base);
     "gr.vga_text_cache\t:%010X\n",MSize2(gr.vga_text_cache);
-    "gr.win_z_buf\t:%010X\n",MSize2(gr.win_z_buf)+MSize2(gr.win_uncovered_bitmap);
+    "gr.win_z_buf\t:%010X\n",MSize2(gr.win_z_buf)+
+	  MSize2(gr.win_uncovered_bitmap);
     "gr.dc\t\t:%010X\n",DCSize(gr.dc);
     "gr.dc1\t\t:%010X\n",DCSize(gr.dc1);
     "gr.dc2\t\t:%010X\n",DCSize(gr.dc2);
@@ -191,7 +193,7 @@ public U0 MemRep()
   I64 i;
   CTask *task;
   CCPU *c;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
 
@@ -207,12 +209,12 @@ public U0 MemRep()
 
   if (sys_data_bp) {
     "$$BLACK$$Code Heap:%010X Used:%010X$$FG$$\n",
-    sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
+	  sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
     "$$BLACK$$Data Heap:%010X Used:%010X$$FG$$\n",
-    sys_data_bp->alloced_u8s,sys_data_bp->used_u8s;
+	  sys_data_bp->alloced_u8s,sys_data_bp->used_u8s;
   } else
     "$$BLACK$$Code/Data Heap:%010X Used:%010X$$FG$$\n",
-    sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
+	  sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
 
   for (i=0;i<mp_cnt;i++) {
     c=&cpu_structs[i];
@@ -229,7 +231,7 @@ public U0 MemRep()
 
   "$$GREEN$$Independent Heaps$$FG$$\n$$ID,2$$";
   "$$BLACK$$dev.uncached_heap:%010X Used:%010X$$FG$$\n",
-  dev.uncached_heap->bp->alloced_u8s,dev.uncached_heap->used_u8s;
+	dev.uncached_heap->bp->alloced_u8s,dev.uncached_heap->used_u8s;
   "$$ID,-2$$\n";
   Preempt(old_preempt);
 }

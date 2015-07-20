@@ -62,7 +62,7 @@ U0 DirTreeDel2(CDirEntry *tempde)
 I64 DirEntryCompareName(CDirEntry *e1,CDirEntry *e2)
 {
   U8 buf1[CDIR_FILENAME_LEN],buf2[CDIR_FILENAME_LEN],
-     buf3[CDIR_FILENAME_LEN],buf4[CDIR_FILENAME_LEN];
+	buf3[CDIR_FILENAME_LEN],buf4[CDIR_FILENAME_LEN];
   I64 d1=0,d2=0;
   if (e1->attr & RS_ATTR_DIR)
     d1=1;
@@ -164,35 +164,6 @@ CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
   return _result;
 }
 
-CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags)
-{
-  CDrv *dv=Fs->cur_dv;
-  CDirEntry *result=NULL;
-  DrvChk(dv);
-  switch (dv->type) {
-    case DVT_REDSEA:
-      result=RedSeaFilesFind(files_find_mask,fuf_flags);
-      break;
-    case DVT_FAT32:
-      result=FAT32FilesFind(files_find_mask,fuf_flags);
-      break;
-    case DVT_ISO9660:
-      result=ISO1FilesFind(files_find_mask,fuf_flags);
-      break;
-    default:
-      PrintErr("File System Not Supported\n");
-      result=NULL;
-  }
-  if (result) {
-    DirFilesSort(&result,SK_NAME);
-    if (fuf_flags&(FUF_FLATTEN_TREE|FUF_JUST_FILES))
-      DirFilesFlatten(result,&result,fuf_flags);
-    if (fuf_flags&FUF_CLUSTER_ORDER)
-      DirFilesSort(&result,SK_CLUSTER);
-  }
-  return result;
-}
-
 U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
 {//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file,line link to StdOut, $LK,"DocPut",A="MN:DocPut"$.
   U8 *buf;
@@ -203,7 +174,7 @@ U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
     else
       "%s",filename;
   } else {
-    //LK_DOC,LK_DOC_ANCHOR,LK_DOC_FIND,LK_DOC_LINE
+//LK_DOC,LK_DOC_ANCHOR,LK_DOC_FIND,LK_DOC_LINE
     if (filename[0]=='A'&&filename[2]==':') {
       if (line) //See $LK,"SpriteEdText",A="MN:SpriteEdText"$()
 	"$$LK,\"%s,%04d\",A=\"AL:%s,%d\"$$",filename+3,line,filename+3,line;
@@ -238,59 +209,4 @@ U0 PutDirLink(U8 *dirname)
     "$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$",dirname,buf;
     Free(buf);
   }
-}
-
-I64 Dir2(U8 *files_find_mask,I64 fuf_flags,Bool full)
-{
-  CDirEntry *tempde1=NULL,*tempde2;
-  U8 *st;
-  CDateStruct ds;
-  I64 csize=0xFFFF,c=0xFFFF,result=0;
-  tempde1=SysFilesFind(files_find_mask,fuf_flags);
-  if (!(st=CurDir))
-    PrintErr("Invalid Drive\n");
-  else {
-    if (tempde1) {
-      //Find max columns
-      tempde2=tempde1;
-      while (tempde2) {
-	if (tempde2->size>csize)
-	  csize=tempde2->size;
-	if (tempde2->cluster>c)
-	  c=tempde2->cluster;
-	tempde2=tempde2->next;
-      }
-      csize=Bsr(csize)/4+1;
-      c=Bsr(c)/4+1;
-
-      "$$MA,T=\"Directory\",LM=\"PopUpCd;Dir;\n\"$$ of %s\n",st;
-      if (full)
-	"__DATE__ __TIME__ %*ts %*ts\n",
-	csize,"SIZE",c,"CLUSTER";
-      else
-	"DATE_ TIME_ %*ts\n",csize,"SIZE";
-      while (tempde1) {
-	tempde2=tempde1->next;
-	result++;
-	if (full)
-	  "%D %T %0*tX %0*tX ",tempde1->datetime,tempde1->datetime,
-	    csize,tempde1->size,c,tempde1->cluster;
-	else {
-	  Date2Struct(&ds,tempde1->datetime+local_time_offset);
-	  "%02d/%02d %02d:%02d %0*tX ",ds.mon,ds.day_of_mon,ds.hour,ds.min,
-	    csize,tempde1->size;
-	}
-	if (tempde1->attr & RS_ATTR_DIR)
-	  PutDirLink(tempde1->name);
-	else
-	  PutFileLink(tempde1->name);
-	'\n';
-	DirEntryDel(tempde1);
-	tempde1=tempde2;
-      }
-    } else
-      "No matching entries\n";
-    Free(st);
-  }
-  return result;
 }

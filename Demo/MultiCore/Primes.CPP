@@ -4,10 +4,10 @@ I64 prime_range,my_mp_cnt,pending;
 U0 PrimesJob(I64 i)
 {
   I64 j,k,l=Sqrt(prime_range),
-     lo=i*prime_range/my_mp_cnt,
-     hi=(i+1)*prime_range/my_mp_cnt,
-     lo2=lo+sys_cache_line_width,
-     hi2=hi-sys_cache_line_width;
+	lo=i*prime_range/my_mp_cnt,
+	hi=(i+1)*prime_range/my_mp_cnt,
+	lo2=lo+sys_cache_line_width,
+	hi2=hi-sys_cache_line_width;
   if (lo2>hi2) lo2=hi2;
   for (j=2;j<=l;j++) {
     if (!Bt(master_bitmap,j)) {
@@ -62,8 +62,8 @@ I64 Primes(I64 range,I64 _my_mp_cnt)
     if (!Bt(master_bitmap,i))
       "%d ",i;
 
-  "\n$$RED$$CPUs:%d PrimeRange:%,d PrimeCnt:%,d Time:%9.6,f$$FG$$\n",
-    my_mp_cnt,prime_range,prime_cnt,tf-t0;
+  "\n$$RED$$CPUs:%d PrimeRange:%,d PrimeCnt:%,d Time:%9.7,f$$FG$$\n",
+	my_mp_cnt,prime_range,prime_cnt,tf-t0;
 
   Free(master_bitmap);
   return prime_cnt;

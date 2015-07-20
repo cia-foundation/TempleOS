@@ -69,7 +69,7 @@ U0 HashDel(CHashSrcSym *temph)
     if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM))
       Free(temph->dbg_info);
     if (temph->type & (HTT_FUN | HTT_CLASS))
-    //Assumes code not on heap, so doesn't Free.
+//Assumes code not on heap, so doesn't Free.
     //$LK,"MemberLstDel",A="MN:MemberLstDel"$() is an import to the Kernel module
       MemberLstDel(temph);
     else if (temph->type&HTT_DEFINE_STR)
@@ -79,7 +79,8 @@ U0 HashDel(CHashSrcSym *temph)
 	Free(temph(CHashGlblVar *)->data_addr);
       LinkedLstDel(temph(CHashGlblVar *)->dim.next);
       if (temph(CHashGlblVar *)->fun_ptr)
-	HashDel(temph(CHashGlblVar *)->fun_ptr-temph(CHashGlblVar *)->fun_ptr->ptr_stars_cnt);
+	HashDel(temph(CHashGlblVar *)->fun_ptr
+	      -temph(CHashGlblVar *)->fun_ptr->ptr_stars_cnt);
     }
   } else if (temph->type & HTT_FILE)
     Free(temph(CHashGeneric *)->user_data0);
@@ -108,8 +109,8 @@ I64 HashTablePurge(CHashTable *table)
   I64 i,result=0;
   CHashSrcSym *temph,*temph1,*temph2;
   if (!table) return 0;
-	PUSHFD
-	CLI	 //Precaution
+  PUSHFD
+  CLI	 //Precaution
   for (i=0;i<=table->mask;i++) {
     temph=table->body[i];
     while (temph) {
@@ -117,7 +118,8 @@ I64 HashTablePurge(CHashTable *table)
       if (temph->type&(HTT_FUN|HTT_GLBL_VAR)) {
 	temph2=temph->next; //Older always later in chain
 	while (temph2) {
-	  if ((temph2->type&HTT_EXPORT_SYS_SYM || temph2->type&HTG_TYPE_MASK==HTT_INVALID) &&
+	  if ((temph2->type&HTT_EXPORT_SYS_SYM ||
+		temph2->type&HTG_TYPE_MASK==HTT_INVALID) &&
 		!StrCmp(temph2->str,temph->str)) {
 	    if (temph2->type&HTG_TYPE_MASK==HTT_INVALID)
 	      temph2->type=HTT_KEYWORD;//Won't delete HTT_INVALID
@@ -131,11 +133,12 @@ I64 HashTablePurge(CHashTable *table)
       temph=temph1;
     }
   }
-	POPFD
+  POPFD
   return result;
 }
 
-CHashGeneric *HashGenericAdd(U8 *name,I64 type,I64 u0=0,I64 u1=0,I64 u2=0,CTask *task=NULL)
+CHashGeneric *HashGenericAdd(U8 *name,I64 type,
+	I64 u0=0,I64 u1=0,I64 u2=0,CTask *task=NULL)
 {//Add any type to task hash_table, 3 user_data values.
   if (!task) task=Fs;
   CHashGeneric *result=CAlloc(sizeof(CHashGeneric),task);
@@ -148,18 +151,18 @@ CHashGeneric *HashGenericAdd(U8 *name,I64 type,I64 u0=0,I64 u1=0,I64 u2=0,CTask 
   return result;
 }
 
-U0 HashSrcFileSet(CLex *lx,CHashSrcSym *h,I64 line_num_offset=0)
-{//Set $LK,"CHashSrcSym",A="MN:CHashSrcSym"$ link and help_index by cur lx pos.
-  CLexFile *tempf=lx->cur_lfn;
+U0 HashSrcFileSet(CCmpCtrl *cc,CHashSrcSym *h,I64 line_num_offset=0)
+{//Set $LK,"CHashSrcSym",A="MN:CHashSrcSym"$ link and help_index by cur cc pos.
+  CLexFile *tempf=cc->lex_include_stk;
   I64 line_num=tempf->line_num+line_num_offset;
   if (line_num<1) line_num=1;
   Free(h->src_link);
   h->src_link=MStrPrint("FL:%s,%d",tempf->full_name,line_num);
-  if (Bt(&lx->opts,OPTf_KEEP_PRIVATE))
+  if (Bt(&cc->opts,OPTf_KEEP_PRIVATE))
     h->type|=HTF_PRIVATE;
   Free(h->index);
-  if (lx->cur_help_index)
-    h->index=StrNew(lx->cur_help_index);
+  if (cc->cur_help_index && *cc->cur_help_index)
+    h->index=StrNew(cc->cur_help_index);
   else
     h->index=NULL;
 }

@@ -5,8 +5,8 @@
   OptOn(OPTf_KEEP_PRIVATE);
 }
 #include "/Kernel/KernelA.HPP"
-#exe {OptOn(OPTf_EXTERNS_TO_IMPORTS);};
 #include "/Compiler/CompilerA.HPP"
+#exe {OptOn(OPTf_EXTERNS_TO_IMPORTS);};
 #include "/Kernel/KernelB.HPP"
 #include "/Kernel/KernelC.HPP"
 #exe {OptOff(OPTf_EXTERNS_TO_IMPORTS);};
@@ -14,14 +14,22 @@
 #include "Templates"
 #include "CExts"
 CCmpGlbls	cmp;
-CUasmGlbls	uasm;
-#include "UAsm"
-#include "CMisc"
+CUAsmGlbls	uasm;
+#include "CInit"
+#include "CExcept"
+#include "LexLib"
 #include "Lex"
+#include "UAsm"
 #include "CHash"
+#include "PrsLib"
+#include "AsmInit"
+#include "AsmLib"
+#include "AsmResolve"
 #include "Asm"
 #include "OptLib"
 #include "PrsExp"
+#include "PrsVar"
+#include "CMisc"
 #include "PrsStmt"
 #include "OptPass012"
 #include "OptPass3"
@@ -35,5 +43,4 @@ CUasmGlbls	uasm;
 #include "BackB"
 #include "BackC"
 #include "OptPass789A"
-#include "CInit"
 #include "CMain"

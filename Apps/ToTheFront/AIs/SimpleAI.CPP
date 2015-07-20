@@ -31,7 +31,8 @@ U0 TanksPlot()
     CheckUser;
     tempu=&units[cur_player][i];
     if (tempu->life>0 && tempu->indirect_fire &&
-	(target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,tempu->range*2*HEX_RADIUS)))
+	  (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,
+	  tempu->range*2*HEX_RADIUS)))
       PlotShot(tempu,target->row,target->col);
   }
   throw('PhaseOvr',TRUE);
@@ -46,7 +47,7 @@ U0 TanksMove()
     CheckUser;
     tempu=&units[cur_player][i];
     if (tempu->life>0) {
-      //Cheats because it violates Line-of-Sight
+//Cheats because it violates Line-of-Sight
       if (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,FALSE)) {
 	RowCol2XY(&x,&y,target->row,target->col);
 	if (!MoveUnit(tempu,x,y)) {
@@ -67,7 +68,8 @@ U0 TanksFire()
     CheckUser;
     tempu=&units[cur_player][i];
     if (tempu->life>0 && !tempu->indirect_fire &&
-	(target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,tempu->range*2*HEX_RADIUS))) {
+	  (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,
+	  tempu->range*2*HEX_RADIUS))) {
       FireShot(tempu,target);
       Sleep(250*ANIMATION_DELAY);
     }

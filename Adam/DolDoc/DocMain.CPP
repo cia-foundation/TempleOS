@@ -21,7 +21,7 @@ public Bool Ed(U8 *link_st,I64 edf_dof_flags=0)
       DocHelpIndex(doc,filename);
 ej_doc:
       if (!(edf_dof_flags&EDF_BAIL)) {
-	DocDo(doc);
+	DocEd(doc);
 	DocDel(doc);
       }
       if (!(edf_dof_flags&EDF_WAS_WRITE))
@@ -33,8 +33,8 @@ ej_doc:
       else {
 	cont=TRUE;
 	if (!(edf_dof_flags&EDF_BAIL) && !(LK_DOC<=i<=LK_DOC_LINE) &&
-		!FilesFindMatch(filename,FILEMASK_TXT) &&
-		!PopUpCancelOk(ST_WARN_ST "Not Text File\n\n"))
+	      !FilesFindMatch(filename,FILEMASK_TXT) &&
+	      !PopUpCancelOk(ST_WARN_ST "Not Text File\n\n"))
 	  cont=FALSE;
 	if (cont)
 	  result=DocFileEd(i,filename,needle_str,&num,edf_dof_flags);
@@ -57,7 +57,7 @@ public Bool Plain(U8 *filename,I64 edf_dof_flags=0)
 #help_index "DolDoc"
 public Bool DocLinkChk(U8 *link_st)
 {//Check for bad $LK,"Editor Link",A="MN:LK_FILE"$.
-  U8 *filename;
+  U8 *filename,*st;
   Bool result=FALSE;
   if (link_st) {
     switch (EdLinkCvt(link_st,&filename)) {
@@ -66,11 +66,17 @@ public Bool DocLinkChk(U8 *link_st)
       case LK_FILE_LINE:
       case LK_PLAIN_LINE:
       case LK_FILE:
-	//We don't check line number
-	result=FileFind(filename,,FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
+//We don't check line number
+	result=FileFind(filename,,
+	      FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
 	break;
       case LK_BIBLE_FIND:
-	result=TRUE; //We don't check verse string
+	st=StrNew(link_st+3);
+	if (StrOcc(st,','))
+	  StrLastRem(st,",");
+	if (DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE)>=0)
+	  result=TRUE;
+	Free(st);
 	break;
       default://TODO: Need to validate HI: and DF:
 	if (Ed(link_st,EDF_BAIL))
@@ -106,7 +112,7 @@ public U8 *DocLinkFile(U8 *link_st,CTask *mem_task=NULL)
   return result;
 }
 
-#help_index "DolDoc/Task"
+#help_index "DolDoc/Task;StdOut/Task"
 public CDoc *DocBorderNew(CDoc *pdoc)
 {//Make new std border doc.
   CDocEntry *doc_e;
@@ -145,7 +151,7 @@ public CDoc *DocBorderNew(CDoc *pdoc)
 
 public U0 DocTermNew()
 {//Make into term win task with Put/Display/Border docs.
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CDoc *pdoc=DocNew;
   pdoc->right_click_link=&TermRightClickLink;
   pdoc->max_entries=4096;
@@ -159,8 +165,9 @@ public U0 DocTermNew()
   Raw(OFF);
 }
 
-#help_index "DolDoc/Input"
-public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,I64 *cur_col=NULL,CDocEntry **_do_e_end=NULL)
+#help_index "DolDoc/Input;StdIn/DolDoc"
+public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
+	I64 *cur_col=NULL,CDocEntry **_do_e_end=NULL)
 {//Start at entry in doc,make and return one line as str.
   CDocEntry *doc_e2=doc_e;
   Bool unlock=DocLock(doc);
@@ -187,19 +194,19 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,I64 *cur_col=NULL,CDocEntry **
     } else if (doc_e->type_u8==DOCT_TAB)
       *dst++='\t';
     if (doc_e==doc->cur_entry && cur_col)
-      *cur_col=start-result+doc->cur_data_col;
+      *cur_col=start-result+doc->cur_col;
     doc_e=doc_e->next;
   }
   if (_do_e_end) *_do_e_end=doc_e;
   *dst=0;
-  if (doc_e==doc->cur_entry && cur_col && !doc->cur_data_col)
+  if (doc_e==doc->cur_entry && cur_col && !doc->cur_col)
     *cur_col=dst-result;
   if (unlock)
     DocUnlock(doc);
   return result;
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 U0 DocDump(CDoc *doc,I64 uS_delay=0)
 {
   U8 *st;
@@ -259,7 +266,7 @@ public CDocEntry *DocPutLine(CDoc *doc=NULL,CDocEntry *doc_e)
   return doc_e;
 }
 
-#help_index "DolDoc/Input"
+#help_index "DolDoc/Input;StdIn/DolDoc"
 U8 *DocGetStr2(I64 flags=0)
 {//$LK,"Flags",A="MN:GSF_SHIFT_ESC_EXIT"$
   CDoc *doc;
@@ -291,10 +298,11 @@ U8 *DocGetStr2(I64 flags=0)
 	goto gs_done;
       }
     }
-    //<CTRL-SHIFT-ENTER> is a blank line without entry
-  } while (flags&GSF_WITH_NEW_LINE || ch!='\n' || sc & SCF_CTRL && sc & SCF_SHIFT);
+//<CTRL-SHIFT-ENTER> is a blank line without entry
+  } while (flags&GSF_WITH_NEW_LINE || ch!='\n' ||
+	sc & SCF_CTRL && sc & SCF_SHIFT);
 
-  Preempt(OFF);
+  Preempt;
   doc=DocPut;
   DocLock(doc);
   if (flags&GSF_WITH_NEW_LINE) {
@@ -319,11 +327,11 @@ U8 *DocGetStr2(I64 flags=0)
     doc_e=doc->cur_entry;
     do doc_e=doc_e->last;
     while (doc_e!=doc && doc_e->type_u8!=DOCT_NEW_LINE &&
-	doc_e->type_u8!=DOCT_PMT);
+	  doc_e->type_u8!=DOCT_PMT);
     if (doc_e!=doc && doc_e->type_u8!=DOCT_PMT) {
       do doc_e=doc_e->last;
       while (doc_e!=doc && doc_e->type_u8!=DOCT_NEW_LINE &&
-	  doc_e->type_u8!=DOCT_PMT);
+	    doc_e->type_u8!=DOCT_PMT);
     }
     doc_e=doc_e->next;
     result=DocScanLine(doc,doc_e,NULL);
@@ -335,7 +343,7 @@ gs_done:
   return result;
 }
 
-#help_index "Keyboard Devices;Char/Input"
+#help_index "Keyboard Devices;Char/Input;StdIn"
 
 public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
 {//Prompt user for I64 expression.
@@ -389,7 +397,8 @@ public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
   }
 }
 
-public CDate GetDate(U8 *msg=NULL,CDate dft=MIN_I64,CDate lo=MIN_I64,CDate hi=MAX_I64)
+public CDate GetDate(U8 *msg=NULL,CDate dft=MIN_I64,
+	CDate lo=MIN_I64,CDate hi=MAX_I64)
 {//Prompt user for date expression. (Use $LK,"Now",A="MN:Now"$() if you want current time.)
   U8 *st;
   CDate result;
@@ -497,14 +506,14 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    break;
 	  case RIGHT_COPY:
 	    StrCpy(fn.name,st);
-	    if (DocFormDo(&fn)) {
+	    if (DocForm(&fn)) {
 	      result=ToBool(Copy(st,fn.name));
 	    } else
 	      send_new_line=TRUE;
 	    break;
 	  case RIGHT_MOVE:
 	    StrCpy(fn.name,st);
-	    if (DocFormDo(&fn))
+	    if (DocForm(&fn))
 	      result=Move(st,fn.name);
 	    else
 	      send_new_line=TRUE;
@@ -551,7 +560,8 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
   return result;
 }
 
-#help_index "Debugging/Dump;DolDoc/Cmd Line (Typically);Cmd Line (Typically);DolDoc/Output"
+#help_index "Debugging/Dump;DolDoc/Cmd Line (Typically);"\
+	"Cmd Line (Typically);DolDoc/Output;StdOut/DolDoc"
 public U0 DocDm(U8 *buf,I64 cnt=0x80)
 {//Dump live chunk of mem showing addresses. Can be edited.
   CDocEntry *doc_e;
@@ -578,7 +588,7 @@ public U0 DocD(U8 *buf,I64 cnt=0x80)
     DocUnlock(doc);
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 Bool KDDocPutS(U8 *st)
 {
   CDoc *doc;

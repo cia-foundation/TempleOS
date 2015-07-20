@@ -61,7 +61,7 @@ _WELL_OPTIMIZED3::
 	XOR	RAX,RAX
 	MOV	RCX,SAMPLES-1
 @@05:	ADD	RAX,RCX
-	LOOP	@@05		//This instruction sucks, speedwise, but it saves code size
+	LOOP	@@05	//Instruction sucks in speed, but saves code size.
 	RET
 }
 

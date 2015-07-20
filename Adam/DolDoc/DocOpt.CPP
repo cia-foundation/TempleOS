@@ -7,7 +7,8 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
 
   if (doc_e->de_flags&DOCEF_LINK && doc_e->de_flags&(DOCEF_AUX_STR|DOCEF_TAG)) {
     if (doc_e->de_flags & DOCEF_AUX_STR && doc_e->de_flags & DOCEF_TAG &&
-	!MemCmp(doc_e->aux_str,"FI:",3) && !StrCmp(doc_e->aux_str+3,doc_e->tag)) {
+	  !MemCmp(doc_e->aux_str,"FI:",3) &&
+	  !StrCmp(doc_e->aux_str+3,doc_e->tag)) {
       Free(doc_e->aux_str);
       doc_e->aux_str=NULL;
       doc_e->de_flags&=~DOCEF_AUX_STR;
@@ -31,18 +32,18 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
       Free(st);
     }
 /* !!! Dangerous, but handy !!!
-    if (doc_e->de_flags & DOCEF_AUX_STR) {
-      if (st=StrMatch(".Z",doc_e->aux_str)) {
-	StrCpy(st,st+2);
-	result++;
-      }
-    }
-    if (doc_e->de_flags&DOCEF_TAG) {
-      if (st=StrMatch(".Z",doc_e->tag)) {
-	StrCpy(st,st+2);
-	result++;
-      }
-    }
+if (doc_e->de_flags & DOCEF_AUX_STR) {
+if (st=StrMatch(".Z",doc_e->aux_str)) {
+StrCpy(st,st+2);
+result++;
+}
+}
+if (doc_e->de_flags&DOCEF_TAG) {
+if (st=StrMatch(".Z",doc_e->tag)) {
+StrCpy(st,st+2);
+result++;
+}
+}
 */
   }
   return result;

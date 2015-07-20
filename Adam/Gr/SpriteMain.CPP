@@ -1,4 +1,4 @@
-#help_index "Graphics/Sprite"
+#help_index "Graphics/Sprite;Sprites"
 
 #define SPT_MENU	-2
 #define SPT_INS_SCREEN_BITMAP			-3
@@ -37,12 +37,17 @@ I64 PopUpSpriteMain(CSprite **_root,I64 *_cur_elem_num)
 	"$$MU-UL,\"BSpline2 Closed\",LE=SPT_BSPLINE2_CLOSED$$\n"
 	"$$MU-UL,\"BSpline3 Closed\",LE=SPT_BSPLINE3_CLOSED$$\n"
 	"$$MU-UL,\"Insert Screen-Captured BitMap\",LE=SPT_INS_SCREEN_BITMAP$$\n"
-	"$$MU-UL,\"Insert Transparent Screen-Captured BitMap\",LE=SPT_INS_TRANSPARENT_SCREEN_BITMAP$$\n"
+	"$$MU-UL,\"Insert Transparent Screen-Captured BitMap\","
+	"LE=SPT_INS_TRANSPARENT_SCREEN_BITMAP$$\n"
 	"$$PURPLE$$$$MU-UL,\"+] Create or Edit 3D Mesh\",LE=SPT_MESH$$\n"
-	"$$MU-UL,\"+] Create or Edit Shiftable 3D Mesh\",LE=SPT_SHIFTABLE_MESH$$\n"
-	"$$MU-UL,\"+] Convert to BitMap or Edit BitMap\",LE=SPT_BITMAP$$$$LTBLUE$$\n"
-	"\n$$MU-UL,\"Transform On  (for use with 3D icons)\",LE=SPT_TRANSFORM_ON$$\n"
-	"$$MU-UL,\"Transform Off (for use with 3D icons)\",LE=SPT_TRANSFORM_OFF$$\n"
+	"$$MU-UL,\"+] Create or Edit Shiftable 3D Mesh\","
+	"LE=SPT_SHIFTABLE_MESH$$\n"
+	"$$MU-UL,\"+] Convert to BitMap or Edit BitMap\","
+	"LE=SPT_BITMAP$$$$LTBLUE$$\n"
+	"\n$$MU-UL,\"Transform On  (for use with 3D icons)\","
+	"LE=SPT_TRANSFORM_ON$$\n"
+	"$$MU-UL,\"Transform Off (for use with 3D icons)\","
+	"LE=SPT_TRANSFORM_OFF$$\n"
 	"\n"
 	"$$PURPLE$$$$MU-UL,\"+] Sprite Edit Menu\",LE=SPT_ED_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=SPT_EXIT$$\n"
@@ -86,7 +91,8 @@ Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
   return i;
 }
 
-U0 SpriteSetSettings(CDC *dc,CSprite *root,I64 cur_elem_num,CColorROPU32 *_color,I64 *_width,I64 x,I64 y)
+U0 SpriteSetSettings(CDC *dc,CSprite *root,
+	I64 cur_elem_num,CColorROPU32 *_color,I64 *_width,I64 x,I64 y)
 {
   CSprite *tempg;
   *_color=BLACK;
@@ -101,14 +107,15 @@ U0 SpriteSetSettings(CDC *dc,CSprite *root,I64 cur_elem_num,CColorROPU32 *_color
 	break;
       case SPT_DITHER_COLOR:
 	dc->color=*_color=
-	       tempg->d.dither_color.u8[0]|
-	       tempg->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
+	      tempg->d.dither_color.u8[0]|
+	      tempg->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	break;
       case SPT_WIDTH:
 	dc->pen_width=*_width=tempg->w.width;
 	break;
       case SPT_PLANAR_SYMMETRY:
-	if (GrSetSymmetry3(dc,tempg->pp.x1+x,tempg->pp.y1+y,0,tempg->pp.x2+x,tempg->pp.y2+y,0,tempg->pp.x2+x,tempg->pp.y2+y,1))
+	if (DCSymmetry3Set(dc,tempg->pp.x1+x,tempg->pp.y1+y,0,
+	      tempg->pp.x2+x,tempg->pp.y2+y,0,tempg->pp.x2+x,tempg->pp.y2+y,1))
 	  dc->flags|=DCF_SYMMETRY;
 	else
 	  dc->flags&=~DCF_SYMMETRY;
@@ -133,13 +140,13 @@ U0 SpriteScreenInit(CDC *dc,I64,I64)
     yy=-dc->sym.snx*8192;
     dc->color=RED;
     GrLine3(dc,dc->sym.sx-xx.i32[1],dc->sym.sy-yy.i32[1],0,
-      dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,0);
+	  dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,0);
     dc->color=WHITE;
     GrLine3(dc,dc->sym.sx-xx.i32[1],dc->sym.sy-yy.i32[1],0,
-      dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,1);
+	  dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,1);
     dc->color=BLACK;
     GrLine3(dc,dc->sym.sx-xx.i32[1],dc->sym.sy-yy.i32[1],0,
-      dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,2);
+	  dc->sym.sx+xx.i32[1],dc->sym.sy+yy.i32[1],0,3,2);
     dc->flags|=DCF_SYMMETRY;
   }
   dc->color=old_color;
@@ -178,7 +185,8 @@ I64 SpriteMainEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
     SpriteSetSettings(dc,root,cur_elem_num,&color,&width,x,y);
     DCFill;
     if (eletype==SPT_MENU) {
-      Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL;
+      Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	    -WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL;
       if (winmgr.fps<10)
 	doc_e->de_flags|=DOCEF_DONT_DRAW;
       StrCpy(Fs->task_title,old_task_title);
@@ -191,7 +199,7 @@ I64 SpriteMainEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
       switch (eletype) {
 	case SPT_FLOOD_FILL:
 	case SPT_FLOOD_FILL_NOT:
-	  AcctOneTimePopUp(ARf_FLOODFILL,
+	  RegOneTimePopUp(ARf_FLOODFILL,
 		ST_WARN_ST "This is affected by what's underneath\n"
 		"when it is drawn.  You will probably want to\n"
 		"convert it to a bitmap.\n\n"
@@ -200,7 +208,7 @@ I64 SpriteMainEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y)
 		"brush strokes look cool.\n");
 	  break;
 	case SPT_PLANAR_SYMMETRY:
-	  AcctOneTimePopUp(ARf_PLANAR_SYMMETRY,
+	  RegOneTimePopUp(ARf_PLANAR_SYMMETRY,
 		"Right-click to turn-off symmetry.\n");
 	  break;
       }
@@ -489,7 +497,7 @@ ei_restart:
 	result=GE_ABORT;
 	goto ei_done;
       }
-      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN | 1<<MSG_IP_L_DOWN | 1<<MSG_IP_R_UP);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP);
       if (msg_code==MSG_IP_R_UP) {
 	if (eletype==SPT_PLANAR_SYMMETRY) {
 	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_PLANAR_SYMMETRY));
@@ -510,7 +518,7 @@ ei_restart:
 	    result=GE_ABORT;
 	    goto ei_done;
 	  case 'c': //eye-dropper
-	    dc3=DCCaptureScreen(FALSE);
+	    dc3=DCScreenCapture(FALSE);
 	    color=GrPeek(dc3,ip.pos.x,ip.pos.y)^15;//Mouse cursor is XORed.
 	    DCDel(dc3);
 	    tempg=MAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
@@ -627,8 +635,10 @@ ei_restart:
 	      dc2->pen_width=1;
 	      do {
 		dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
-		GrBorder(dc2,xx1+Fs->pix_left+Fs->scroll_x,yy1+Fs->pix_top+Fs->scroll_y,
-		      xx2+Fs->pix_left+Fs->scroll_x,yy2+Fs->pix_top+Fs->scroll_y);
+		GrBorder(dc2,xx1+Fs->pix_left+Fs->scroll_x,
+		      yy1+Fs->pix_top+Fs->scroll_y,
+		      xx2+Fs->pix_left+Fs->scroll_x,
+		      yy2+Fs->pix_top+Fs->scroll_y);
 		msg_code=GetMsg(&a1,&a2,
 		      1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 		SpriteScreenInit(dc,x,y);
@@ -657,10 +667,12 @@ ei_restart:
 	      GrScaleZoom(1.0/i);
 	      WinMgrSync(2,TRUE);
 
-	      dc3=DCCaptureScreen;
+	      dc3=DCScreenCapture;
 	      img=DCExtract(dc3,
-		    Fs->pix_left+Fs->scroll_x+xx1,Fs->pix_top+Fs->scroll_y+yy1,
-		    Fs->pix_left+Fs->scroll_x+xx2-1,Fs->pix_top+Fs->scroll_y+yy2-1);
+		    Fs->pix_left+Fs->scroll_x+xx1,
+		    Fs->pix_top+Fs->scroll_y+yy1,
+		    Fs->pix_left+Fs->scroll_x+xx2-1,
+		    Fs->pix_top+Fs->scroll_y+yy2-1);
 	      if (eletype==SPT_INS_TRANSPARENT_SCREEN_BITMAP)
 		DCColorChg(img,bm_bkcolor);
 	      GrScaleZoom(i);
@@ -669,7 +681,8 @@ ei_restart:
 	      DCDel(dc3);
 	      dc2->pen_width=old_width;
 	      eletype=SPT_MENU;
-	      Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL;
+	      Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+		    -WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL;
 	      break;
 	    case SPT_CIRCLE:
 	      do {
@@ -823,7 +836,8 @@ ei_restart:
 	      } while (msg_code!=MSG_IP_R_UP);
 	      case SPT_POLYLINE:
 		if (num>1) {
-		  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_POLYLINE)+num*sizeof(CD2I32));
+		  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_POLYLINE)+
+			num*sizeof(CD2I32));
 		  ptr=&tempg->nu.u;
 		  tempg2=root2.next;
 		  for (i=0;i<num;i++) {
@@ -850,7 +864,8 @@ ei_restart:
 	      case SPT_BSPLINE2_CLOSED:
 	      case SPT_BSPLINE3_CLOSED:
 		if (num>2) {
-		  tempg=CAlloc(SpriteElemQuedBaseSize(eletype)+num*sizeof(CD3I32));
+		  tempg=CAlloc(SpriteElemQuedBaseSize(eletype)+
+			num*sizeof(CD3I32));
 		  p=&tempg->nu.u;
 		  tempg2=root2.next;
 		  for (i=0;i<num;i++) {
@@ -973,7 +988,8 @@ ei_bitmap:
 	      insert_pt=root->next=root->last=root;
 	      cur_elem_num=1;
 	    } else {
-	      SpriteSetSettings(img,root,cur_elem_num,&color,&width,-(xx1-x),-(yy1-y));
+	      SpriteSetSettings(img,root,cur_elem_num,&color,&width,
+		    -(xx1-x),-(yy1-y));
 	      Sprite3(img,-(xx1-x),-(yy1-y),0,&tempg1->start,TRUE);
 	      insert_pt=tempg1->next;
 	      QueRem(tempg1);
@@ -981,7 +997,8 @@ ei_bitmap:
 	    }
 	    MemCpy(&tempg->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
 
-	    switch (i=SpriteBitMapEd(doc,doc_e,dc,&xx1,&yy1,&xx2,&yy2,&img,bm_bkcolor)) {
+	    switch (i=SpriteBitMapEd(doc,doc_e,dc,&xx1,&yy1,
+		  &xx2,&yy2,&img,bm_bkcolor)) {
 	      case GE_EXIT:
 	      case GE_CONT:
 		Free(tempg);
@@ -1042,7 +1059,8 @@ ei_shiftable_mesh:
 	      old_mesh=NULL;
 	    }
 	    if (mesh=SpriteMeshEd(old_mesh,&size,TRUE)) {
-	      tempg=MAlloc(SpriteElemQuedBaseSize(SPT_SHIFTABLE_MESH)-sizeof(I32)*2+size);
+	      tempg=MAlloc(SpriteElemQuedBaseSize(SPT_SHIFTABLE_MESH)
+	      -sizeof(I32)*2+size);
 	      tempg->type=SPT_SHIFTABLE_MESH;
 	      MemCpy(&tempg->pmu.vertex_cnt,mesh,size);
 	      Free(mesh);

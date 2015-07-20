@@ -125,7 +125,8 @@ pain without MAlloc up-and-running.
 #define CONSERVATIVE_16MEG_SIZE	0xF00000
 #define ESTIMATED_MISC_ALLOCS	0x100000
 
-#assert CONSERVATIVE_16MEG_SIZE-(SYS_FIXED_AREA+sizeof(CSysFixedArea))>ADAM_STK+ESTIMATED_MISC_ALLOCS
+#assert CONSERVATIVE_16MEG_SIZE-
+	(SYS_FIXED_AREA+sizeof(CSysFixedArea))>ADAM_STK+ESTIMATED_MISC_ALLOCS
 
 //EBX=BASE EAX=SIZE
 	TEST	U8 [SYS_MEM_INIT_FLAG],1
@@ -162,7 +163,7 @@ U0 SysBadMAlloc(I64 *ptr)
 }
 
 I64 MemPageSize(U8 *a)
-{//Size of page table at addr.	Either 4K or 2Meg.
+{//Size of page table at addr.Either 4K or 2Meg.
   if (a<MEM_NUM_PML1*0x1000*0x200)
     return 0x1000;
   else
@@ -212,10 +213,10 @@ Return: NULL if out of memory.
     i=Bsr(FREE_PAGE_HASH_SIZE)+1;
   } else {
 //We'll now round-up to a power of two.
-//There is some overhead on allocations and
-//we wouldn't want to round to the next
-//power of two if a power of two was requested.
-//So we use a little more than a power of two.
+    //There is some overhead on allocations and
+    //we wouldn't want to round to the next
+    //power of two if a power of two was requested.
+    //So we use a little more than a power of two.
     num-=2;
     i=Bsr(num)+1;
     num=1<<i+2;
@@ -227,7 +228,7 @@ Return: NULL if out of memory.
   m=&bp->mem_free_lst;
   while (TRUE) {
     if (!(result=m->next)) {
-      //We're probably out of luck, but lets search for a
+//We're probably out of luck, but lets search for a
       //freed larger size block... and, screw-it, return the whole thing.
       do {
 	if (result=bp->free_page_hash2[++i]) {
@@ -279,10 +280,10 @@ U0 Mem512Free(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL)
       bp->free_page_hash[pages512]=m;
     } else {
 //We'll now round-up to a power of two.
-//There is some overhead on allocations and
-//we wouldn't want to round to the next
-//power of two if a power of two was requested.
-//So we use a little more than a power of two.
+      //There is some overhead on allocations and
+      //we wouldn't want to round to the next
+      //power of two if a power of two was requested.
+      //So we use a little more than a power of two.
       pages512-=2;
       i=Bsr(pages512);
       m->next=bp->free_page_hash2[i];

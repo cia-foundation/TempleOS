@@ -232,7 +232,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	}
 	break;
       default:
-	if (Bt(chars_bitmap_getkey,ch)) {
+	if (Bt(chars_bmp_getkey,ch)) {
 	  if (cur_line==&root) {
 	    cur_line=MAlloc(sizeof(CLine));
 	    cur_line->line=StrNew("");

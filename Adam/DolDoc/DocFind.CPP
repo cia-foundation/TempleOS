@@ -18,7 +18,7 @@ public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
 }
 
 public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=MIN_I64,
-			      U8 *needle,I64 match=1)
+U8 *needle,I64 match=1)
 {//Find str by searching tags. Move cur_entry & center.
   Bool result=FALSE,unlock;
   CDocEntry *doc_e;
@@ -38,13 +38,14 @@ public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=MIN_I64,
 	result=FALSE;
 	while (doc_e!=haystack_doc) {
 	  if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-		(ptr=StrIMatch(needle,doc_e->tag))) {//TODO: handle multientry strings
+//TODO: handle multientry strs
+		(ptr=StrIMatch(needle,doc_e->tag))) {
 	    i=ptr-doc_e->tag;
 	    if (!--match) {
 	      haystack_doc->cur_entry=doc_e;
 	      if (i<doc_e->min_col) i=doc_e->min_col;
 	      if (i>doc_e->max_col) i=doc_e->max_col;
-	      haystack_doc->cur_data_col=i;
+	      haystack_doc->cur_col=i;
 	      result=TRUE;
 	      break;
 	    }
@@ -74,7 +75,7 @@ public Bool DocAnchorFind(CDoc *haystack_doc,U8 *needle_str)
 	if (doc_e->type_u8==DOCT_ANCHOR && doc_e->de_flags & DOCEF_AUX_STR) {
 	  if (!StrCmp(needle_str,doc_e->aux_str)) {
 	    haystack_doc->cur_entry=doc_e;
-	    haystack_doc->cur_data_col=doc_e->min_col;
+	    haystack_doc->cur_col=doc_e->min_col;
 	    result=TRUE;
 	    break;
 	  }
@@ -104,11 +105,13 @@ public U0 EdFindNext(CDoc *doc)
   do {
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-	!(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
-	if (doc_e->type & DOCET_SELECTED || !doc->find_replace->scan_selected_text) {
+	    !(doc_e->de_flags&(DOCEG1_DONT_EDIT|
+	    DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	if (doc_e->type & DOCET_SELECTED ||
+	      !doc->find_replace->scan_selected_text) {
 	  if (doc->find_replace->scan_fwd) {
 	    if (doc_e==doc_ce) {
-	      ptr=doc_ce->tag+doc->cur_data_col+1;
+	      ptr=doc_ce->tag+doc->cur_col+1;
 	      if (ptr-doc_ce->tag>=doc_ce->max_col)
 		goto fn_skip;
 	      if (ptr-doc_ce->tag<doc_ce->min_col)
@@ -117,11 +120,11 @@ public U0 EdFindNext(CDoc *doc)
 	      ptr=doc_e->tag;
 	    if (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
 	      doc->cur_entry=doc_e;
-	      doc->cur_data_col=ptr-doc_e->tag;
-	      if (doc->cur_data_col>=doc_e->max_col)
-		doc->cur_data_col=doc_e->max_col-1;
-	      if (doc->cur_data_col<doc_e->min_col)
-		doc->cur_data_col=doc_e->min_col;
+	      doc->cur_col=ptr-doc_e->tag;
+	      if (doc->cur_col>=doc_e->max_col)
+		doc->cur_col=doc_e->max_col-1;
+	      if (doc->cur_col<doc_e->min_col)
+		doc->cur_col=doc_e->min_col;
 	      DocCenter(doc);
 	      if (unlock)
 		DocUnlock(doc);
@@ -131,7 +134,7 @@ public U0 EdFindNext(CDoc *doc)
 	    ptr2=NULL;
 	    ptr=doc_e->tag+doc_e->min_col;
 	    if (doc_e==doc_ce)
-	      ptr3=doc_ce->tag+doc->cur_data_col;
+	      ptr3=doc_ce->tag+doc->cur_col;
 	    else
 	      ptr3=doc_e->tag+doc_e->max_col;
 	    while (ptr=StrFind(doc->find_replace->find_text,ptr,sf_flags)) {
@@ -141,11 +144,11 @@ public U0 EdFindNext(CDoc *doc)
 	    }
 	    if (ptr2 && ptr2<ptr3) {
 	      doc->cur_entry=doc_e;
-	      doc->cur_data_col=ptr2-doc_e->tag;
-	      if (doc->cur_data_col>=doc_e->max_col)
-		doc->cur_data_col=doc_e->max_col-1;
-	      if (doc->cur_data_col<doc_e->min_col)
-		doc->cur_data_col=doc_e->min_col;
+	      doc->cur_col=ptr2-doc_e->tag;
+	      if (doc->cur_col>=doc_e->max_col)
+		doc->cur_col=doc_e->max_col-1;
+	      if (doc->cur_col<doc_e->min_col)
+		doc->cur_col=doc_e->min_col;
 	      DocCenter(doc);
 	      if (unlock)
 		DocUnlock(doc);
@@ -177,11 +180,12 @@ public U0 EdSelectAll(CDoc *doc,Bool select)
     DocUnlock(doc);
 }
 
-public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_colon=FALSE)
+public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,
+Bool fwd,Bool abort_on_dbl_colon=FALSE)
 {//Find { } or ( ) pair. Move cur_entry & center.
   Bool unlock=DocLock(doc),result=FALSE;
   U8 *ptr;
-  I64 ch,levels=0,colons=0,original_col=doc->cur_data_col;
+  I64 ch,levels=0,colons=0,original_col=doc->cur_col;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce,*original_ce=doc_ce;
   if (abort_on_dbl_colon && EdCurU8(doc)==':')
     colons=1;
@@ -190,10 +194,10 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
   do {
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-	!(doc_e->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	    !(doc_e->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
 	if (fwd) {
 	  if (doc_e==doc_ce)
-	    ptr=doc_e->tag+doc->cur_data_col+1;
+	    ptr=doc_e->tag+doc->cur_col+1;
 	  else
 	    ptr=doc_e->tag;
 	  if (ptr-doc_e->tag<doc_e->min_col)
@@ -204,7 +208,7 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 	    if (abort_on_dbl_colon && ch==':') {
 	      if (++colons==2) {
 		doc->cur_entry=doc_e;
-		doc->cur_data_col=ptr-doc_e->tag-1;
+		doc->cur_col=ptr-doc_e->tag-1;
 		EdCursorLeft(doc);
 		result=FALSE;
 		goto pa_done;
@@ -216,15 +220,16 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 	      else if (ch==minus) {
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
-		  doc->cur_data_col=ptr-doc_e->tag-1;
-		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
+		  doc->cur_col=ptr-doc_e->tag-1;
+		  result=doc->cur_entry!=original_ce ||
+			doc->cur_col!=original_col;
 		  goto pa_done;
 		}
 	      }
 	    }
 	} else {
 	  if (doc_e==doc_ce) {
-	    ptr=doc_e->tag+doc->cur_data_col-1;
+	    ptr=doc_e->tag+doc->cur_col-1;
 	    if (ptr-doc_e->tag>=doc_e->max_col)
 	      ptr=doc_e->tag+doc_e->max_col-1;
 	  } else
@@ -236,7 +241,7 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 	    if (abort_on_dbl_colon && ch==':') {
 	      if (++colons==2) {
 		doc->cur_entry=doc_e;
-		doc->cur_data_col=ptr-doc_e->tag+1;
+		doc->cur_col=ptr-doc_e->tag+1;
 		result=FALSE;
 		goto pa_done;
 	      }
@@ -247,8 +252,9 @@ public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,Bool fwd,Bool abort_on_dbl_c
 	      else if (ch==minus) {
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
-		  doc->cur_data_col=ptr-doc_e->tag+1;
-		  result=doc->cur_entry!=original_ce || doc->cur_data_col!=original_col;
+		  doc->cur_col=ptr-doc_e->tag+1;
+		  result=doc->cur_entry!=original_ce ||
+			doc->cur_col!=original_col;
 		  goto pa_done;
 		}
 	      }
@@ -284,7 +290,7 @@ public Bool EdGoToFun(CDoc *doc,Bool fwd,Bool abort_on_dbl_colon)
 	if (++colons==2) {
 	  EdCursorLeft(doc);
 	  break;
-       }
+	}
       } else {
 	colons=0;
 	if (ch=='{')
@@ -335,7 +341,7 @@ public U0 EdSelectFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
     if (doc_e->de_flags&DOCEF_TAG && doc_e->tag) {
       ptr=doc_e->tag;
       if (doc_e==doc->cur_entry)
-	ptr+=doc->cur_data_col;
+	ptr+=doc->cur_col;
       while (ch=*ptr++)
 	if (abort_on_dbl_colon && ch==':') {
 	  if (++colons==2)
@@ -379,7 +385,7 @@ I64 EdFindReplace(CDoc *doc)
     cmd=RSAC_REPLACE;
   else
     cmd=RSAC_ALL;
-  if (!doc->find_replace->pmt || DocFormDo(doc->find_replace)) {
+  if (!doc->find_replace->pmt || DocForm(doc->find_replace)) {
     result=0;
     unlock=DocLock(doc);
     if (doc->find_replace->match_case || doc->find_replace->local_var)
@@ -393,7 +399,7 @@ I64 EdFindReplace(CDoc *doc)
       doc_ce=doc->root.next;
       while (doc_ce!=doc) {
 	if (doc_ce->de_flags&DOCEF_TAG && doc_ce->tag &&
-	  !(doc_ce->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	      !(doc_ce->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
 	      StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
 	  doc_ce->type|=DOCET_SELECTED;
 	  result++;
@@ -462,18 +468,21 @@ I64 EdFindReplace(CDoc *doc)
 	    break;
 	}
 	if (doc_e->type_u8==DOCT_TEXT &&
-	      !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
-	      (doc_e->type & DOCET_SELECTED || !doc->find_replace->scan_selected_text&&!doc->find_replace->local_var)) {
+	      !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_HARD_SKIP|
+	      DOCEF_FILTER_SKIP)) &&
+	      (doc_e->type & DOCET_SELECTED ||
+	      !doc->find_replace->scan_selected_text&&
+	      !doc->find_replace->local_var)) {
 	  src=doc_e->tag;
 	  while (src) {
 	    src=StrFind(doc->find_replace->find_text,src,sf_flags);
 	    if (src) {
-	      doc->cur_data_col=src-doc_e->tag;
+	      doc->cur_col=src-doc_e->tag;
 	      doc->cur_entry=doc_e;
 	      if (cmd!=RSAC_ALL)
 		DocCenter(doc);
 	      doc_e=doc->cur_entry;
-	      src=doc->cur_data_col+doc_e->tag;
+	      src=doc->cur_col+doc_e->tag;
 	      if (cmd!=RSAC_ALL) {
 		DocUnlock(doc);
 		cmd=PopUpReplaceSkipAllCancel("");
@@ -496,14 +505,14 @@ I64 EdFindReplace(CDoc *doc)
 		  *dst++=doc_e->tag[i];
 		Free(doc_e->tag);
 		doc_e->tag=dst2;
-		doc->cur_data_col=src-doc_e->tag;
+		doc->cur_col=src-doc_e->tag;
 		doc->cur_entry=doc_e;
 		if (cmd!=RSAC_ALL) {
 		  DocRemSoftNewLines(doc,doc->cur_entry);
 		  DocRecalc(doc);
 		}
 		doc_e=doc->cur_entry;
-		src=doc->cur_data_col+doc_e->tag;
+		src=doc->cur_col+doc_e->tag;
 		result++;
 	      } else
 		src++;
@@ -527,7 +536,7 @@ fr_unlock_done:
 }
 
 public I64 EdReplace(CDoc *doc,U8 *find,U8 *replace,
-  Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
+Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
 {//Find & replace using editor's cmd.
   CEdFindText old_find_replace;
   Bool unlock;
@@ -565,6 +574,6 @@ U0 EdGoToLine(CDoc *doc)
 {//Prompt with form and go to line num.
   CEdLineGoTo gtl;
   gtl.line=1;
-  if (DocFormDo(&gtl))
+  if (DocForm(&gtl))
     DocLineNumGoTo(doc,gtl.line);
 }

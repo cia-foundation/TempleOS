@@ -1,22 +1,14 @@
 #help_index "Graphics/Color"
-public I32 gr_rainbow_10[10]=
-{
-BLACK,BROWN,RED,LTRED,YELLOW,
-GREEN,BLUE,PURPLE,LTGRAY,WHITE
-};
+public U8 gr_rainbow_10[10]={
+  BLACK,BROWN,RED,LTRED,YELLOW,GREEN,BLUE,PURPLE,LTGRAY,WHITE};
 
 DefineLstLoad("ST_RAINBOW_10",
-"BLACK\0BROWN\0RED\0LTRED\0YELLOW\0"
-"GREEN\0BLUE\0PURPLE\0LTGRAY\0WHITE\0");
+  "BLACK\0BROWN\0RED\0LTRED\0YELLOW\0GREEN\0BLUE\0PURPLE\0LTGRAY\0WHITE\0");
 
-U0 SetVGAPalette4Indices()
-{/*4-bit (16 color)
-There is a level of indirection we wish to identity map.
-This sets the 16-colors to use
-the first 16 DAC rgb entries, so
-we never need to worry about indexes,
-just DAC palette settings.
-*/
+U0 GrPaletteIndicesSet()
+{//There is a level of indirection that we identity map.
+// Set 16-colors to use first 16 DAC BGR entries, so we
+// never need to worry about indexes, just DAC palette settings.
   I64 i;
   if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
@@ -24,7 +16,7 @@ just DAC palette settings.
   while (LBts(&sys_semas[SYS_SEMA_VGA],0))
     Yield;
   InU8(VGAP_INPUT_STAT); //Rsts attr index/data
-  for (i=0;i<16;i++) {
+  for (i=0;i<NUM_COLORS;i++) {
     OutU8(VGAP_ATTR_INDEX,i);
     OutU8(VGAP_ATTR_DATA_WRITE,i);
   }
@@ -35,8 +27,8 @@ just DAC palette settings.
   POPFD
 }
 
-public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
-{//6-bits per b, g and r.
+public U0 GrPaletteColorSet(I64 color_num,CBGR48 bgr48)
+{//VGA has 6-bits for blue, for green, and for red.
   if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
   CLI
@@ -44,16 +36,16 @@ public U0 SetVGAPaletteColor(I64 color_num,CBGR bgr)
     Yield;
   OutU8(VGAP_PALETTE_MASK,0xFF);
   OutU8(VGAP_REG_WRITE,color_num);
-  OutU8(VGAP_PALETTE_DATA,bgr.r>>2);
-  OutU8(VGAP_PALETTE_DATA,bgr.g>>2);
-  OutU8(VGAP_PALETTE_DATA,bgr.b>>2);
+  OutU8(VGAP_PALETTE_DATA,bgr48.r>>10);
+  OutU8(VGAP_PALETTE_DATA,bgr48.g>>10);
+  OutU8(VGAP_PALETTE_DATA,bgr48.b>>10);
   LBtr(&sys_semas[SYS_SEMA_VGA],0);
   POPFD
 }
 
-public CBGR GetVGAPaletteColor(I64 color_num)
-{//6-bits per b, g and r.
-  CBGR result=0;
+public CBGR48 GrPaletteColorGet(I64 color_num)
+{//VGA has 6-bits for blue, for green, and for red.
+  CBGR48 result=0;
   if (!Bt(&sys_run_level,RLf_VGA)) return 0;
   PUSHFD
   CLI
@@ -61,41 +53,41 @@ public CBGR GetVGAPaletteColor(I64 color_num)
     Yield;
   OutU8(VGAP_PALETTE_MASK,0xFF);
   OutU8(VGAP_REG_READ,color_num);
-  result.r=InU8(VGAP_PALETTE_DATA)<<2;
-  result.g=InU8(VGAP_PALETTE_DATA)<<2;
-  result.b=InU8(VGAP_PALETTE_DATA)<<2;
+  result.r=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
+  result.g=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
+  result.b=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
   LBtr(&sys_semas[SYS_SEMA_VGA],0);
   POPFD
   return result;
 }
 
-public CBGR vga_palette4_std[16]={
-0x000000,0x0000AA,0x00AA00,0x00AAAA,
-0xAA0000,0xAA00AA,0xAA5500,0xAAAAAA,
-0x555555,0x5555FF,0x55FF55,0x55FFFF,
-0xFF5555,0xFF55FF,0xFFFF55,0xFFFFFF};
+public CBGR48 gr_palette_std[NUM_COLORS]={
+0x000000000000,0x00000000AAAA,0x0000AAAA0000,0x0000AAAAAAAA,
+0xAAAA00000000,0xAAAA0000AAAA,0xAAAA55550000,0xAAAAAAAAAAAA,
+0x555555555555,0x55555555FFFF,0x5555FFFF5555,0x5555FFFFFFFF,
+0xFFFF55555555,0xFFFF5555FFFF,0xFFFFFFFF5555,0xFFFFFFFFFFFF};
 
-public CBGR vga_palette4_gray[16]={
-0x000000,0x111111,0x222222,0x333333,
-0x444444,0x555555,0x666666,0x777777,
-0x888888,0x999999,0xAAAAAA,0xBBBBBB,
-0xCCCCCC,0xDDDDDD,0xEEEEEE,0xFFFFFF};
+public CBGR48 gr_palette_gray[NUM_COLORS]={
+0x000000000000,0x111111111111,0x222222222222,0x333333333333,
+0x444444444444,0x555555555555,0x666666666666,0x777777777777,
+0x888888888888,0x999999999999,0xAAAAAAAAAAAA,0xBBBBBBBBBBBB,
+0xCCCCCCCCCCCC,0xDDDDDDDDDDDD,0xEEEEEEEEEEEE,0xFFFFFFFFFFFF};
 
-public U0 GetVGAPalette4(CBGR *bgr)
-{//4-bit (16 color)
+public U0 GrPaletteGet(CBGR48 *bgr48)
+{//16 colors
   I64 i;
-  for (i=0;i<16;i++)
-    bgr[i]=GetVGAPaletteColor(i);
+  for (i=0;i<NUM_COLORS;i++)
+    bgr48[i]=GrPaletteColorGet(i);
 }
 
-public U0 SetVGAPalette4(CBGR *bgr)
-{//4-bit (16 color)
+public U0 GrPaletteSet(CBGR48 *bgr48)
+{//16 colors
   I64 i;
-  for (i=0;i<16;i++)
-    SetVGAPaletteColor(i,bgr[i]);
+  for (i=0;i<NUM_COLORS;i++)
+    GrPaletteColorSet(i,bgr48[i]);
 }
 
-public U0 SetStdPalette()
+public U0 PaletteSetStd()
 {//Activate std palette.
-  SetVGAPalette4(vga_palette4_std);
+  GrPaletteSet(gr_palette_std);
 }

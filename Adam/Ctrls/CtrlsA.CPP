@@ -1,7 +1,7 @@
 public CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type)
-{//Find task ctrl givin $LK,"ctrl_type",A="MN:CTRLT_VIEWING_ANGLES"$.
+{//Find task ctrl given $LK,"ctrl_type",A="MN:CTRLT_VIEWING_ANGLES"$.
   CCtrl *c;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   c=haystack_task->next_ctrl;
   while (c!=&haystack_task->next_ctrl) {
     if (c->type==needle_type) {
@@ -17,7 +17,7 @@ public CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type)
 U0 CtrlsUpdate(CTask *task)
 {
   CCtrl *c;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {
     if (c->update_derived_vals)
@@ -43,7 +43,7 @@ fp_update_ctrls=&CtrlsUpdate;
 Bool CtrlInsideRect(CCtrl *c,I64 x,I64 y)
 {//screen coordinates
   if (c->screen_left<=x<=c->screen_right &&
-      c->screen_top<=y<=c->screen_bottom)
+	c->screen_top<=y<=c->screen_bottom)
     return TRUE;
   else
     return FALSE;
@@ -64,7 +64,7 @@ U0 DrawCtrls(CTask *task)
 {
   CCtrl *c;
   CDC *dc=DCAlias(gr.dc2,task);
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {
     if (c->flags&CTRLF_SHOW) {
@@ -116,7 +116,7 @@ U0 DrawCtrls(CTask *task)
 U0 DrawWinScroll(CDC *dc,CCtrl *c)
 {
   CWinScroll *s=c->state;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   if (c->flags&CTRLF_CLICKED)
     dc->color=s->color>>4;
@@ -140,20 +140,26 @@ U0 WinDerivedScrollValsUpdate(CCtrl *c)
   if (s->pos<s->min) s->pos=s->min;
   if (s->pos>s->max) s->pos=s->max;
   s->color=c->win_task->border_attr&0xF^0xF+
-	  (c->win_task->border_attr&0xF)<<4;
+	(c->win_task->border_attr&0xF)<<4;
   range=s->max-s->min;
   if (!range) range=1;
   switch (c->type) {
     case CTRLT_WIN_HSCROLL:
-      c->left  =gr.pan_text_x+FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->left  =gr.pan_text_x+FONT_WIDTH-WIN_SCROLL_BORDER_BONUS+
+	    (s->pos-s->min)*(c->win_task->pix_width+2*WIN_SCROLL_BORDER_BONUS
+	    -WIN_SCROLL_SIZE)/range;
       c->right =c->left+WIN_SCROLL_SIZE-1;
-      c->top   =gr.pan_text_y+FONT_HEIGHT+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_height;
+      c->top   =gr.pan_text_y+FONT_HEIGHT+
+	    (FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_height;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
     case CTRLT_WIN_VSCROLL:
-      c->left  =gr.pan_text_x+FONT_WIDTH+(FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_width;
+      c->left  =gr.pan_text_x+FONT_WIDTH+
+	    (FONT_WIDTH-WIN_SCROLL_SIZE)/2+c->win_task->pix_width;
       c->right =c->left+WIN_SCROLL_SIZE-1;
-      c->top   =gr.pan_text_y+FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+(s->pos-s->min)*(c->win_task->pix_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
+      c->top   =gr.pan_text_y+FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS+
+	    (s->pos-s->min)*(c->win_task->pix_height+
+	    2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE)/range;
       c->bottom=c->top+WIN_SCROLL_SIZE-1;
       break;
   }
@@ -165,7 +171,8 @@ U0 LeftClickHWinScroll(CCtrl *c,I64 x,I64,Bool down)
   CWinScroll *s=c->state;
   I64 range=task->pix_width+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE;
   LBts(&s->flags,WSSf_SET_TO_POS);
-  s->pos=((x-(FONT_WIDTH-WIN_SCROLL_BORDER_BONUS))*(s->max-s->min+1)+range/2)/range+s->min;
+  s->pos=((x-(FONT_WIDTH-WIN_SCROLL_BORDER_BONUS))
+  *(s->max-s->min+1)+range/2)/range+s->min;
   if (down)
     c->flags|=CTRLF_CLICKED;
   else
@@ -180,7 +187,8 @@ U0 LeftClickVWinScroll(CCtrl *c,I64,I64 y,Bool down)
   CWinScroll *s=c->state;
   I64 range=task->pix_height+2*WIN_SCROLL_BORDER_BONUS-WIN_SCROLL_SIZE;
   LBts(&s->flags,WSSf_SET_TO_POS);
-  s->pos=((y-(FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS))*(s->max-s->min+1)+range/2)/range+s->min;
+  s->pos=((y-(FONT_HEIGHT-WIN_SCROLL_BORDER_BONUS))
+  *(s->max-s->min+1)+range/2)/range+s->min;
   if (down)
     c->flags|=CTRLF_CLICKED;
   else
@@ -200,7 +208,7 @@ U0 WheelChangeWinScroll(CCtrl *c,I64 delta)
 
 U0 WinScrollsInit(CTask *task)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CCtrl *c;
 
   if (!CtrlFindUnique(task,CTRLT_WIN_HSCROLL)) {
@@ -241,33 +249,41 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
   CViewAngles *s=c->state;
 
   dc->color=s->cbd;
-  GrRect(dc, c->left,c->top,VIEWANGLES_SPACING*4+3,VIEWANGLES_SPACING*2+VIEWANGLES_RANGE);
+  GrRect(dc, c->left,c->top,VIEWANGLES_SPACING*4+3,
+	VIEWANGLES_SPACING*2+VIEWANGLES_RANGE);
   dc->color=s->cbg;
   GrRect(dc, c->left+VIEWANGLES_BORDER,c->top+VIEWANGLES_BORDER,
-    VIEWANGLES_SPACING*4+3-2*VIEWANGLES_BORDER,VIEWANGLES_SPACING*2+VIEWANGLES_RANGE-2*VIEWANGLES_BORDER);
+	VIEWANGLES_SPACING*4+3-2*VIEWANGLES_BORDER,
+	VIEWANGLES_SPACING*2+VIEWANGLES_RANGE-2*VIEWANGLES_BORDER);
   dc->color=s->cfg;
   GrLine(dc,c->left+VIEWANGLES_SPACING,c->top+VIEWANGLES_SPACING,
-	      c->left+VIEWANGLES_SPACING,c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE-1);
+	c->left+VIEWANGLES_SPACING,c->top+VIEWANGLES_SPACING+
+	VIEWANGLES_RANGE-1);
   GrLine(dc,c->left+2*VIEWANGLES_SPACING+1,c->top+VIEWANGLES_SPACING,
-	      c->left+2*VIEWANGLES_SPACING+1,c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE-1);
+	c->left+2*VIEWANGLES_SPACING+1,c->top+VIEWANGLES_SPACING+
+	VIEWANGLES_RANGE-1);
   GrLine(dc,c->left+3*VIEWANGLES_SPACING+2,c->top+VIEWANGLES_SPACING,
-	      c->left+3*VIEWANGLES_SPACING+2,c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE-1);
+	c->left+3*VIEWANGLES_SPACING+2,c->top+VIEWANGLES_SPACING+
+	VIEWANGLES_RANGE-1);
   for (i=1;i<VIEWANGLES_RANGE+1;i+=2*VIEWANGLES_SNAP) {
     j=2-i/3&1;
     GrLine(dc,c->left+VIEWANGLES_SPACING-j,c->bottom-VIEWANGLES_SPACING-i,
-		c->left+VIEWANGLES_SPACING+j,c->bottom-VIEWANGLES_SPACING-i);
+	  c->left+VIEWANGLES_SPACING+j,c->bottom
+	  -VIEWANGLES_SPACING-i);
     GrLine(dc,c->left+2*VIEWANGLES_SPACING+1-j,c->bottom-VIEWANGLES_SPACING-i,
-		c->left+2*VIEWANGLES_SPACING+1+j,c->bottom-VIEWANGLES_SPACING-i);
+	  c->left+2*VIEWANGLES_SPACING+1+j,c->bottom
+	  -VIEWANGLES_SPACING-i);
     GrLine(dc,c->left+3*VIEWANGLES_SPACING+2-j,c->bottom-VIEWANGLES_SPACING-i,
-		c->left+3*VIEWANGLES_SPACING+2+j,c->bottom-VIEWANGLES_SPACING-i);
+	  c->left+3*VIEWANGLES_SPACING+2+j,c->bottom
+	  -VIEWANGLES_SPACING-i);
   }
 
   dc->color=s->cx;
   GrPrint(dc,c->left+VIEWANGLES_SPACING-FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"X");
+	c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"X");
   GrPrint(dc,c->left+VIEWANGLES_SPACING-3*FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
-    "%3d",s->sx*360/VIEWANGLES_RANGE);
+	c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
+	"%3d",s->sx*360/VIEWANGLES_RANGE);
   i=c->left+VIEWANGLES_SPACING;
   if (s->sx>VIEWANGLES_RANGE/2)
     j=-VIEWANGLES_RANGE/2+s->sx;
@@ -280,10 +296,10 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
 
   dc->color=s->cy;
   GrPrint(dc,c->left+2*VIEWANGLES_SPACING+1-FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Y");
+	c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Y");
   GrPrint(dc,c->left+2*VIEWANGLES_SPACING+1-3*FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
-    "%3d",s->sy*360/VIEWANGLES_RANGE);
+	c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
+	"%3d",s->sy*360/VIEWANGLES_RANGE);
   i=c->left+2*VIEWANGLES_SPACING+1;
   if (s->sy>VIEWANGLES_RANGE/2)
     j=-VIEWANGLES_RANGE/2+s->sy;
@@ -296,10 +312,10 @@ U0 DrawViewAnglesCtrl(CDC *dc,CCtrl *c)
 
   dc->color=s->cz;
   GrPrint(dc,c->left+3*VIEWANGLES_SPACING+2-FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Z");
+	c->top+VIEWANGLES_SPACING-(1+FONT_HEIGHT),"Z");
   GrPrint(dc,c->left+3*VIEWANGLES_SPACING+2-3*FONT_WIDTH/2,
-	      c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
-    "%3d",s->sz*360/VIEWANGLES_RANGE);
+	c->top+VIEWANGLES_SPACING+VIEWANGLES_RANGE+3,
+	"%3d",s->sz*360/VIEWANGLES_RANGE);
   i=c->left+3*VIEWANGLES_SPACING+2;
   if (s->sz>VIEWANGLES_RANGE/2)
     j=-VIEWANGLES_RANGE/2+s->sz;
@@ -367,7 +383,7 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
     c->draw_it=&DrawViewAnglesCtrl;
     c->left_click=&LeftClickViewAngles;
     c->update_derived_vals=&UpdateDerivedViewAnglesCtrl;
-    old_preempt=Preempt(OFF);
+    old_preempt=Preempt;
     QueIns(c,task->last_ctrl);
     TaskDerivedValsUpdate(task);
     Preempt(old_preempt);
@@ -378,7 +394,7 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
 public U0 ViewAnglesDel(CTask *task=NULL)
 {//Free view angle ctrl.
   CCtrl *c;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (!task) task=Fs;
   if (c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES)) {
     QueRem(c);

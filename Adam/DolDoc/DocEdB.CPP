@@ -1,4 +1,4 @@
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 
 public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 {//$LK,"PutKey",A="MN:PutKey"$(ch,sc) at doc insert pt, cur_entry.
@@ -16,7 +16,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
   if (!Bt(doldoc.clean_scan_codes,sc.u8[0]))
     doc->flags|=DOCF_UNDO_DIRTY;
   DocCaptureUndo(doc);
-  if (Bt(chars_bitmap_getkey,ch) &&
+  if (Bt(chars_bmp_getkey,ch) &&
 	!(sc&(SCF_CTRL|SCF_ALT))) {
     if (sc&SCF_KEY_DESC) {
       st=Char2KeyName(ch,FALSE);
@@ -39,7 +39,8 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Win/Toggle Border");
 	else
-	  WinBorder(Bt(&doc->win_task->display_flags,DISPLAYf_NO_BORDER),doc->win_task);
+	  WinBorder(Bt(&doc->win_task->display_flags,
+		DISPLAYf_NO_BORDER),doc->win_task);
 	break;
       case CH_CTRLC:
 	if (sc&SCF_KEY_DESC)
@@ -61,7 +62,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	  if (sc&SCF_KEY_DESC)
 	    KeyDescSet("Cmd/Find Wizard");
 	  else
-	    GrepWiz;
+	    FindWiz;
 	} else {
 	  if (sc&SCF_KEY_DESC)
 	    KeyDescSet("Edit/Find & Replace");
@@ -87,21 +88,21 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	  else {
 	    DocCaptureUndo(doc);
 	    doc_ce=doc->cur_entry;
-	    if (doc->cur_data_col<=doc_ce->min_col) {
+	    if (doc->cur_col<=doc_ce->min_col) {
 	      doc_ce=doc->cur_entry=doc_ce->last;
 	      if (doc_ce!=doc && doc_ce->type_u8==DOCT_SOFT_NEW_LINE)
 		doc_ce=doc->cur_entry=doc_ce->last;
 	      if (doc_ce==doc || doc_ce->type_u8==DOCT_PMT) {
 		doc_ce=doc->cur_entry=doc_ce->next;
-		doc->cur_data_col=doc_ce->min_col;
+		doc->cur_col=doc_ce->min_col;
 	      } else {
-		doc->cur_data_col=doc_ce->max_col;
-		if (doc->cur_data_col>doc_ce->min_col)
-		  doc->cur_data_col--;
+		doc->cur_col=doc_ce->max_col;
+		if (doc->cur_col>doc_ce->min_col)
+		  doc->cur_col--;
 		EdDelChar(doc);
 	      }
 	    } else {
-	      doc->cur_data_col--;
+	      doc->cur_col--;
 	      EdDelChar(doc);
 	    }
 	  }
@@ -164,7 +165,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    Ed("::/Home/PersonalNotes.TXT.Z");
 	  else {
 	    m=DocRead("::/Home/PersonalMenu.TXT.Z");
-	    DocMenuDo(m);
+	    DocMenu(m);
 	    DocDel(m);
 	  }
 	}
@@ -217,11 +218,11 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    if (doc_ce->type_u8==DOCT_SPRITE)
 	      EdSpriteEd(doc,
 		    (doc_ce->x-doc->line_start_col+doc_ce->max_col)*FONT_WIDTH,
-		    (doc_ce->y-doc->cur_top_line_num)*FONT_HEIGHT);
+		    (doc_ce->y-doc->top_line_num)*FONT_HEIGHT);
 	    else
 	      EdSpriteIns(doc,
-		    (doc_ce->x+doc->cur_data_col-doc->line_start_col)*FONT_WIDTH,
-		    (doc_ce->y-doc->cur_top_line_num)*FONT_HEIGHT);
+		    (doc_ce->x+doc->cur_col-doc->line_start_col)*FONT_WIDTH,
+		    (doc_ce->y-doc->top_line_num)*FONT_HEIGHT);
 	    DocLock(doc);
 	  }
 	}
@@ -249,7 +250,8 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	  if (sc&SCF_KEY_DESC)
 	    KeyDescSet("Edit/Toggle Plain Text Display");
 	  else
-	    if (!(doc->flags&DOCF_FORM) || doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))
+	    if (!(doc->flags&DOCF_FORM) ||
+		  doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))
 	      DocFlagsToggle(doc,DOCF_PLAIN_TEXT);
 	}
 	break;
@@ -404,7 +406,8 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		      DocUnlock(doc);
 		      if (sc&SCF_SHIFT) {
 			if (TaskValidate(sys_macro_util_task))
-			  SendMsg(sys_macro_util_task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
+			  PostMsgWait(sys_macro_util_task,
+				MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
 			SysMacroStripKey(&sys_macro_root,ch,sc);
 			PlaySysMacro;
 		      } else
@@ -479,10 +482,12 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		      else
 			KeyDescSet("God Song");
 		    } else {
-		      //$LK,"::/Adam/God/HSNotes.TXT"$
-		      if (sc & SCF_SHIFT)
+//$LK,"::/Adam/God/HSNotes.TXT"$
+		      if (sc & SCF_SHIFT) {
+			DocUnlock(doc);
 			GodDoodle;
-		      else
+			DocLock(doc);
+		      } else
 			GodSong;
 		    }
 		    break;
@@ -493,7 +498,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		      else
 			KeyDescSet("God Word");
 		    } else {
-		      //$LK,"::/Adam/God/HSNotes.TXT"$
+//$LK,"::/Adam/God/HSNotes.TXT"$
 		      FifoU8Flush(god.fifo);
 		      GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
 		      if (sc & SCF_SHIFT)
@@ -519,7 +524,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 		  doc_ce=doc->cur_entry=doc_ce->next;
 		}
-		doc->cur_data_col=doc_ce->min_col;
+		doc->cur_col=doc_ce->min_col;
 		DocFormBwd(doc);
 	      }
 	    } else if (sc&SCF_KEY_DESC) {
@@ -545,7 +550,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		  doc_ce=doc->cur_entry=doc_ce->last;
 		}
 		doc_ce=doc->cur_entry=doc->root.next;
-		doc->cur_data_col=doc_ce->min_col;
+		doc->cur_col=doc_ce->min_col;
 		DocFormFwd(doc);
 	      }
 	    } else if (sc&SCF_KEY_DESC) {
@@ -565,10 +570,11 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    } else {
 	      i=doc_ce->y+doc->win_task->win_height-1;
 	      if (doc_ce->type_u8==DOCT_HEX_ED)
-		i+=doc->cur_data_col/3/doc_ce->hex_ed_width;
+		i+=doc->cur_col/3/doc_ce->hex_ed_width;
 	      while (doc_ce!=doc &&
 		    (doc_ce->type_u8!=DOCT_HEX_ED && doc_ce->y<i ||
-		    doc_ce->type_u8==DOCT_HEX_ED && doc_ce->y+doc->cur_data_col/3/doc_ce->hex_ed_width<i)) {
+		    doc_ce->type_u8==DOCT_HEX_ED &&
+		    doc_ce->y+doc->cur_col/3/doc_ce->hex_ed_width<i)) {
 		EdLineDown(doc,sc);
 //paranoid check for stuck on same node
 		if (doc->cur_entry==doc_ce && doc_ce->type_u8!=DOCT_HEX_ED)
@@ -586,10 +592,11 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    }else {
 	      i=doc_ce->y-(doc->win_task->win_height-1);
 	      if (doc_ce->type_u8==DOCT_HEX_ED)
-		i+=doc->cur_data_col/3/doc_ce->hex_ed_width;
+		i+=doc->cur_col/3/doc_ce->hex_ed_width;
 	      while (doc_ce->last!=doc &&
 		    (doc_ce->type_u8!=DOCT_HEX_ED && doc_ce->y>i ||
-		    doc_ce->type_u8==DOCT_HEX_ED && doc_ce->y+doc->cur_data_col/3/doc_ce->hex_ed_width>i) &&
+		    doc_ce->type_u8==DOCT_HEX_ED &&
+		    doc_ce->y+doc->cur_col/3/doc_ce->hex_ed_width>i) &&
 		    doc_ce->y!=doc->root.next->y) {
 		EdLineUp(doc,sc);
 //paranoid check for stuck on same node
@@ -693,15 +700,15 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
       DocPutKey(doc,ch,0);
   else
     while (ch=*ptr) {
-      if (!Bt(chars_bitmap_safe_dollar,ch) ||
-	  doc->flags & (DOCF_OVERSTRIKE | DOCF_IN_DOLLAR)) {
+      if (!Bt(chars_bmp_safe_dollar,ch) ||
+	    doc->flags & (DOCF_OVERSTRIKE | DOCF_IN_DOLLAR)) {
 	DocPutKey(doc,ch,0);
 	ptr++;
       } else {
 	ptr2=ptr++;
 	while (TRUE) {
 	  ch=*ptr++;
-	  if (!Bt(chars_bitmap_safe_dollar,ch))
+	  if (!Bt(chars_bmp_safe_dollar,ch))
 	    break;
 	}
 	ptr--;
@@ -711,8 +718,8 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
 	if (IsEditableText(doc_ce)) {
 	  dst=b=MAlloc(doc_ce->max_col+j+1,doc->mem_task);
 	  src=doc_ce->tag;
-	  i=doc->cur_data_col;
-	  doc->cur_data_col+=j;
+	  i=doc->cur_col;
+	  doc->cur_col+=j;
 	  doc_ce->max_col+=j;
 	  while (i-->0)
 	    *dst++=*src++;
@@ -729,7 +736,7 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
 	  doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
 	  QueIns(doc_ne,doc_ce->last);
 	  doc->cur_entry=doc_ne;
-	  doc->cur_data_col=StrLen(ptr2);
+	  doc->cur_col=StrLen(ptr2);
 	}
 	*ptr=ch;
 	DocRemSoftNewLines(doc,doc->cur_entry);
@@ -837,7 +844,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
 
       if (edf_dof_flags&EDF_WAS_WRITE)
 	result=FALSE;
-      if (!(edf_dof_flags&EDF_BAIL) && DocDo(doc,edf_dof_flags|DOF_DONT_HOME)) {
+      if (!(edf_dof_flags&EDF_BAIL) && DocEd(doc,edf_dof_flags|DOF_DONT_HOME)) {
 	DocLock(doc);
 	doc_e=doc->cur_entry;
 	if (doc_e!=doc)
@@ -879,7 +886,8 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
     switch (result=DefineMatch(st,"ST_LINK_TYPES",LMF_IGNORE_CASE)) {
       case LK_MAN_PAGE:
 	if (temph=HashFind(filename2,Fs->hash_table,HTG_SRC_SYM))
-	  result=EdLinkCvt(temph->src_link,&filename,&needle_str,&num,edf_dof_flags);
+	  result=EdLinkCvt(temph->src_link,&filename,
+		&needle_str,&num,edf_dof_flags);
 	else
 	  result=-1;
 	goto lc_done;

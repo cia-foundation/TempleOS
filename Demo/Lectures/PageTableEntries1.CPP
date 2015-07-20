@@ -22,13 +22,13 @@ U0 PageTableDemo1()
   InvlPg(VGAM_GRAPHICS); //Invalidate translation look aside buffer (TLB).
   InvlPg(VGAM_GRAPHICS+0x1000);
 
-//Use this if you wish to change
-//the page table reg.
+  //Use this if you wish to change
+  //the page table reg.
 
-//  SetRAX(0x100000+0x1000*(MEM_NUM_PML1+MEM_NUM_PML2+MEM_NUM_PML3));
-//  MOV_CR3_EAX
+  //  SetRAX(0x100000+0x1000*(MEM_NUM_PML1+MEM_NUM_PML2+MEM_NUM_PML3));
+  //  MOV_CR3_EAX
 
-//<CTRL-ALT-f> will flush screen VGA cache.
+  //<CTRL-ALT-f> will flush screen VGA cache.
   VGAFlush;
   PressAKey;
 
@@ -37,7 +37,7 @@ U0 PageTableDemo1()
   InvlPg(VGAM_GRAPHICS);
   InvlPg(VGAM_GRAPHICS+0x1000);
 
-//<CTRL-ALT-f> will flush screen VGA cache.
+  //<CTRL-ALT-f> will flush screen VGA cache.
   VGAFlush;
 }
 

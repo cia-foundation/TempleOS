@@ -16,12 +16,13 @@ class CFileSND
 //#define MAX_SND_FILE_DATA	0x0007FF00
 #define MAX_SND_FILE_DATA	0x7FFFFF00
 
-public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=0.0,I64 waveform=WF_SQUARE,
-  F64 reverb_delay=0,F64 reverb_intensity=0,F64 time_shift=0)
+public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
+	F64 averaging=0.0,I64 waveform=WF_SQUARE,
+	F64 reverb_delay=0,F64 reverb_intensity=0,F64 time_shift=0)
 {//Use "snd.record" flag to start or stop recording, then call this routine.
 //Averaging should be a num from 0.0 to 0.999.
-//Vol should be from 0.0 to 1.0.
-//Set reverb_delay to like 0.3 sec and reverb_intensity to like 0.4.
+  //Vol should be from 0.0 to 1.0.
+  //Set reverb_delay to like 0.3 sec and reverb_intensity to like 0.4.
   I64 i,k,cnt,cnt2,level,file_num;
   F64 avg,dt;
   CFileSND *s;
@@ -78,14 +79,14 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
     avg=0;
     for (i=0;i<cnt-1;i++)
       s->body[i]=avg=LowPass1(averaging,avg,s->body[i],1.0);
-    }
+  }
 
   //Reverb
   if (reverb_intensity) {
     if (dt=reverb_delay*SNDFILE_SAMPLE_RATE)
       for (i=dt;i<cnt;i++)
 	s->body[i]+=reverb_intensity*s->body[i-dt];
-      }
+  }
 
   //Get rid of D.C. component
   for (k=0;k<3;k++) {
@@ -95,7 +96,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,F64 averaging=
     level/=cnt-1;
     for (i=0;i<cnt-1;i++)
       s->body[i]=ClampI64(s->body[i]-level,MIN_I16,MAX_I16);
-    }
+  }
 
   for (i=0;i<cnt-1;i++)
     s->body[i]=EndianU16(s->body[i]);

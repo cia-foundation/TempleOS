@@ -1,4 +1,4 @@
-#help_index "AutoFile"
+#help_index "AutoFile;StdIn/AutoFile"
 #help_file "::/Doc/AutoFile"
 
 #help_index "Bit"
@@ -25,15 +25,15 @@ public _extern C32_EFLAGS U32 c32_eflags;
 public _extern C32_ESI U32 c32_esi;
 
 #help_index "Char/BitMaps"
-public extern U32 chars_bitmap_alpha[16],chars_bitmap_alpha_numeric[16],
-chars_bitmap_alpha_numeric_no_at[16],	chars_bitmap_word[16],
-chars_bitmap_dec_numeric[16],		chars_bitmap_hex_numeric[16],
-chars_bitmap_white_space[16],		chars_bitmap_non_eol_white_space[16],
-chars_bitmap_zero_cr_nl_cursor[16],	chars_bitmap_zero_tab_ff_cr_nl_cursor[16],
-chars_bitmap_zero_tab_ff_cr_nl_cursor_dollar[16],chars_bitmap_getkey[16],
-chars_bitmap_printable[16],		chars_bitmap_displayable[16],
-chars_bitmap_safe_dollar[16],		chars_bitmap_filename[16],
-chars_bitmap_non_eol[16];
+public extern U32 chars_bmp_alpha[16],chars_bmp_alpha_numeric[16],
+chars_bmp_alpha_numeric_no_at[16],	chars_bmp_word[16],
+chars_bmp_dec_numeric[16],		chars_bmp_hex_numeric[16],
+chars_bmp_white_space[16],		chars_bmp_non_eol_white_space[16],
+chars_bmp_zero_cr_nl_cursor[16],	chars_bmp_zero_tab_ff_cr_nl_cursor[16],
+chars_bmp_zero_tab_ff_cr_nl_cursor_dollar[16],chars_bmp_getkey[16],
+chars_bmp_macro[16],			chars_bmp_printable[16],
+chars_bmp_displayable[16],		chars_bmp_safe_dollar[16],
+chars_bmp_filename[16],			chars_bmp_non_eol[16];
 
 #help_index "Char/Conversion"
 public extern U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE);
@@ -86,7 +86,7 @@ public extern U8 *AStrNew(U8 *buf);
 #help_index "Char/Operations;Memory/Heap"
 public extern U8 *StrNew(U8 *buf,CTask *mem_task=NULL);
 
-#help_index "Char/Output"
+#help_index "Char/Output;StdOut"
 public extern U0 GetOutOfDollar();
 public extern Bool IsSilent();
 public extern U0 Print(U8 *fmt,...);
@@ -103,14 +103,16 @@ extern U8 *StrPrintHex(U8 *dst,I64 num;I64 width);
 public extern CTextGlbls text;
 
 #help_index "Compiler/Lex"
-public extern U0 HashSrcFileSet(CLex *lx,CHashSrcSym *h,I64 line_num_offset=0);
+public extern U0 HashSrcFileSet(CCmpCtrl *cc,
+	CHashSrcSym *h,I64 line_num_offset=0);
 
 #help_index "Compiler;Cmd Line (Typically)"
-extern U8 *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR); //INVALID_PTR means don't care what load addr.
+extern U8 *Load(U8 *filename,I64 ld_flags=0,
+	CBinFile *bfh_addr=INVALID_PTR); //INVALID_PTR=don't care what load addr
 
 #help_index "Compression"
 public extern CArcCompress *CompressBuf(U8 *src,I64 size,CTask *mem_task=NULL);
-public extern U8 *ExpandBuf(CArcCompress *r,CTask *mem_task=NULL);
+public extern U8 *ExpandBuf(CArcCompress *arc,CTask *mem_task=NULL);
 
 #help_index "Compression/Piece by Piece"
 public extern U0 ArcCompressBuf(CArcCtrl *c);
@@ -162,24 +164,30 @@ public extern Bool IsSingleUser();
 public extern Bool IsSysDbg();
 public extern Bool SingleUser(Bool val);
 public extern Bool SysDbg(Bool val);
-public extern U8 *TaskCaller(CTask *task=NULL,I64 num=0,Bool saved_context=FALSE);
+public extern U8 *TaskCaller(CTask *task=NULL,
+	I64 num=0,Bool saved_context=FALSE);
 public extern I64 UnusedStk(CTask *task=NULL);
 public extern CDbgGlbls dbg;
 
 #help_index "Debugging/Debugger"
-public extern Bool B(U8 *addr,CTask *task=NULL,Bool live=TRUE) //Toggle breakpoint
+public extern Bool B(U8 *addr,CTask *task=NULL,Bool live=TRUE) //Toggle bpt.
 public extern I64 B2(CTask *task=NULL,Bool live=TRUE);
 extern CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE);
 public extern Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE);
 public extern Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE);
 public extern Bool E(U8 *addr,I64 cnt=512,I64 edf_dof_flags=0);
+public extern Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0);
+extern Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0);
+public extern Bool Fix(I64 edf_dof_flags=0);
+public extern U0 FixSet(U8 *filename,I64 line);
 public extern U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL);
 public extern U0 G2(U8 *ip=INVALID_PTR,CTask *task=NULL);
 public extern Bool InDbg(Bool val);
 public extern Bool IsDbg();
 public extern U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL);
 
-#help_index "Debugging/Debugger;DolDoc/Cmd Line (Typically);Cmd Line (Typically);Training"
+#help_index "Debugging/Debugger;DolDoc/Cmd Line (Typically);"\
+	"Cmd Line (Typically);Help System"
 public extern Bool Man(U8 *st,I64 edf_dof_flags=0);
 
 #help_index "Debugging/Dump"
@@ -198,7 +206,7 @@ public extern U8 *SrcEdLink(U8 *addr,I64 cnt=1,CTask *mem_task=NULL);
 public extern U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL);
 public extern I64 SrcLineNum(U8 *addr,I64 cnt=1);
 
-#help_index "Debugging/PSect;Hash"
+#help_index "Debugging/PSect;Hash/System"
 public extern CHash *PSectFind(U8 *addr,I64 *_offset);
 
 #help_index "Debugging/Raw Output"
@@ -213,10 +221,6 @@ public extern U0 VGAFlush();
 
 #help_index "Debugging;Debugging/Debugger"
 public extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
-public extern Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0);
-extern Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0);
-public extern Bool Fix(I64 edf_dof_flags=0);
-public extern U0 FixSet(U8 *filename,I64 line);
 
 #help_index "Define;Char/Define"
 #help_file "::/Doc/Define"
@@ -240,7 +244,8 @@ public extern CDevGlbls dev;
 #help_index "DolDoc/Clipboard"
 public extern CDoc *sys_clipboard_doc;
 
-#help_index "DolDoc/Task"
+#help_index "DolDoc/Task;StdOut/Task"
+#help_file "::/Doc/StdOutTask"
 extern CDoc *(*fp_doc_put)(CTask *task=NULL);
 
 #help_index "Exceptions"
@@ -254,7 +259,8 @@ public extern U0 throw(I64 ch=0,Bool no_log=FALSE);
 
 #help_index "File/CD DVD"
 public extern U0 CDImageRead(U8 cd_drv_let,U8 *out_name);
-public extern U0 CDImageWrite(U8 cd_drv_let,U8 *in_name=NULL,I64 media_type=MT_CD);
+public extern U0 CDImageWrite(U8 cd_drv_let,
+	U8 *in_name=NULL,I64 media_type=MT_CD);
 
 #help_index "File/CFile"
 public extern U0 FClose(CFile *f);
@@ -266,11 +272,14 @@ public extern Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1);
 #help_index "File/Cmd Line (Typically);Cmd Line (Typically)"
 public extern Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE);
 public extern U0 ChgDsk(U8 drv_let=0);
-public extern I64 Del(U8 *wild,Bool print_msg=TRUE);
-public extern I64 Dir(U8 *wild="*",Bool full=FALSE);
+public extern I64 Del(U8 *files_find_mask,Bool make_mask=FALSE,
+	Bool del_dir=FALSE,Bool print_msg=TRUE);
+public extern I64 Dir(U8 *files_find_mask="*",Bool full=FALSE);
 public extern Bool Drv(U8 drv_let);
-public extern Bool MapDrv(U8 drv_let,CDrv *dv);
 public extern Bool MkDir(U8 *filename);
+
+#help_index "File/Cmd Line (Typically);Cmd Line (Typically);Install"
+public extern Bool MapDrv(U8 drv_let,CDrv *dv);
 
 #help_index "File/FileNames"
 extern CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name);
@@ -279,15 +288,16 @@ public extern U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL);
 public extern U8 *DftExt(U8 *filename,U8 *extension);
 public extern U8 *DirFile(U8 *dirname,U8 *name=NULL,U8 *_extension=NULL);
 public extern U8 *DirNameAbs(U8 *dirname);
+public extern Bool DrvIsWritable(U8 drv_let=0);
 public extern U8 *FileExtDot(U8 *src);
 public extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 public extern U8 *FileNameAbs(U8 *filename,I64 fuf_flags=0);
 public extern Bool FileNameChk(U8 *filename);
-public extern Bool FilesFindMatch(U8 *test_filename,U8 *files_find_mask,I64 fuf_flags=0);
+public extern Bool FilesFindMatch(U8 *test_filename,
+	U8 *files_find_mask,I64 fuf_flags=0);
 public extern Bool IsDir(U8 *dir_name);
 public extern Bool IsDotC(U8 *filename);
 public extern Bool IsDotZ(U8 *filename);
-public extern Bool IsDrvWritable(U8 drv_let=0);
 public extern U0 PutDirLink(U8 *dirname);
 public extern U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE);
 public extern U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum);
@@ -297,9 +307,11 @@ public extern U8 *ToggleZorNotZ(U8 *name);
 public extern U8 *FileNameTempTxt();
 
 #help_index "File/Internal"
-public extern Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE);
-public extern U0 FileAccessDel(CFileAccess *fa);
-public extern CFileAccess *FileAccessNew(U8 *mask,Bool make_mask=FALSE,Bool make_dirs=FALSE,Bool no_mask=FALSE);
+public extern U0 DirContextDel(CDirContext *dirc);
+public extern CDirContext *DirContextNew(U8 *mask,
+	Bool make_mask=FALSE,Bool make_dirs=FALSE,Bool no_mask=FALSE);
+public extern Bool DirNew(CDrv *dv,U8 *cur_dir,
+	CDirEntry *tempde,Bool free_old_chain=TRUE);
 extern I64 FileAttr(U8 *name,I64 old_attr=0);
 
 #help_index "File/Low Level"
@@ -310,7 +322,8 @@ public extern Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE);
 public extern U0 BlkDevsRelease();
 public extern I64 Cluster2Blk(CDrv *dv,I64 c);
 public extern I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1);
-public extern I64 ClustersAlloc(CDrv *dv,I64 c=0,I64 cnt=1,Bool contiguous=FALSE);
+public extern I64 ClustersAlloc(CDrv *dv,I64 c=0,
+	I64 cnt=1,Bool contiguous=FALSE);
 extern Bool CopySingle(U8 *f1,U8 *f2); //Just one file
 public extern U8 Drv2Let(CDrv *dv=NULL);
 public extern U0 DrvChk(CDrv *dv);
@@ -330,8 +343,6 @@ public extern Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
 public extern I64 RClusters(CDrv *dv,U8 *buf,I64 c,I64 cnt);
 public extern I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks);
 extern U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt);
-extern I64 SysDel(U8 *wild,Bool make_mask);	//this is dangerous
-extern CDirEntry *SysFilesFind(U8 *files_find_mask,I64 fuf_flags);
 public extern Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
 public extern I64 WClusters(CDrv *dv,U8 *buf,I64 c,I64 cnt);
 public extern I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks);
@@ -344,14 +355,17 @@ public extern U0 DirTreeDel(CDirEntry *tempde);
 public extern U0 DirTreeDel2(CDirEntry *tempde);
 public extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 public extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);
-public extern I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
+public extern I64 FileWrite(U8 *filename,
+	U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
 
 #help_index "File/Program Routines;File/FileNames"
 public extern CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0);
 
 #help_index "File/System"
-public extern CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,CATARep **_ata_drv,CATARep **_atapi_drv);
-extern CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit);
+public extern CATARep *ATAIDDrvs(CATARep *root,
+	I64 _sys_boot_drv,CATARep **_ata_drv,CATARep **_atapi_drv);
+extern CBlkDev *ATAMount(U8 first_drv_let,
+	I64 type,I64 base0,I64 base1,I64 unit);
 extern Bool ATAPIStartStop(CBlkDev *bd,F64 timeout,Bool start);
 extern I64 ATAProbe(I64 base0,I64 base1,I64 unit);
 extern U0 ATAReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt);
@@ -371,25 +385,16 @@ public extern CColorROPU32 Str2ColorU32(U8 *st);
 #help_index "Hash"
 #help_file "::/Doc/Hash"
 public _extern _HASH_ADD U0 HashAdd(CHash *temph,CHashTable *table);
-public _extern _HASH_ADD_AFTER U0 HashAddAfter(CHash *temph,CHash *pred,CHashTable *table); //Add hash entry after entry.
+public _extern _HASH_ADD_AFTER U0 HashAddAfter(CHash *temph,
+	CHash *pred,CHashTable *table); //Add hash entry after entry.
 public _extern _HASH_BUCKET_FIND CHash **HashBucketFind(
-	
-U8 *needle_str,CHashTable *haystack_table);
-public extern U0 HashDel(CHashSrcSym *temph);
-public _extern _HASH_FIND CHash *HashFind(U8 *needle_str,CHashTable *haystack_table,I64 mask,I64 instance=1);
-public extern CHashGeneric *HashGenericAdd(U8 *name,I64 type,I64 val=0,I64 u8=0,I64 u16=0,CTask *task=NULL);
-public extern CHashGeneric *HashPublic(U8 *st,I64 mask,Bool val=TRUE);
-public _extern _HASH_REM_DEL Bool HashRemDel(CHash *temph,CHashTable *table,
-					I64 instance=1);//instance must match temph's
+	U8 *needle_str,CHashTable *haystack_table);
+public _extern _HASH_FIND CHash *HashFind(U8 *needle_str,
+	CHashTable *haystack_table,I64 mask,I64 instance=1);
 public _extern _HASH_SINGLE_TABLE_FIND CHash *HashSingleTableFind(
 	U8 *needle_str,CHashTable *haystack_table,I64 mask,I64 instance=1);
 public _extern _HASH_STR I64 HashStr(U8 *st);
-public extern U0 HashTableDel(CHashTable *table);
 public extern CHashTable *HashTableNew(I64 size,CTask *mem_task=NULL);
-public extern I64 HashTablePurge(CHashTable *table);
-public extern I64 HashTypeNum(CHash *temph);
-public extern I64 HashVal(CHash *temph);
-extern U0 SysSymImportsResolve(U8 *sptr,I64 ld_flags=0);
 
 #help_index "Hash/Frame"
 #help_file "::/Doc/Frame"
@@ -398,11 +403,27 @@ public extern CHashGeneric *FramePtrAdd(U8 *name,I64 val=0,CTask *task=NULL);
 public extern I64 FramePtrDel(U8 *name,CTask *task=NULL);
 public extern I64 FramePtrSet(U8 *name,I64 val,CTask *task=NULL);
 
-#help_index "Hash;Char/Lists"
+#help_index "Hash/System"
+public extern U0 HashDel(CHashSrcSym *temph);
+public extern CHashGeneric *HashGenericAdd(U8 *name,
+	I64 type,I64 val=0,I64 u8=0,I64 u16=0,CTask *task=NULL);
+public extern CHashGeneric *HashPublic(U8 *st,I64 mask,Bool val=TRUE);
+public _extern _HASH_REM_DEL Bool HashRemDel(CHash *temph,CHashTable *table,
+	I64 instance=1);//instance must match temph's
+public extern U0 HashTableDel(CHashTable *table);
+public extern I64 HashTablePurge(CHashTable *table);
+public extern I64 HashTypeNum(CHash *temph);
+public extern I64 HashVal(CHash *temph);
+extern U0 SysSymImportsResolve(U8 *sptr,I64 ld_flags=0);
+
+#help_index "Hash/System;Char/Lists"
 public extern I64 HashLstAdd(U8 *lst,I64 type,CHashTable *table);
 
-#help_index "Hash;Define;Char/Define;Char/Lists"
+#help_index "Hash/System;Define;Char/Define;Char/Lists"
 public extern I64 HashDefineLstAdd(U8 *name,I64 type,CHashTable *table);
+
+#help_index "Help System;Debugging/Debugger"
+public extern U0 Help();
 
 #help_index "Info;File/Cmd Line (Typically);Cmd Line (Typically);Install"
 public extern U0 DrvRep();
@@ -410,7 +431,8 @@ public extern U0 DrvRep();
 #help_index "Input Pointer"
 #help_file "::/Doc/InputPointer"
 public extern U0 GridInit();
-public extern U0 IPSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64);
+public extern U0 IPSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
+	I64 l=MAX_I64,I64 r=MAX_I64);
 public extern CIPStateGlbls ip;
 public extern CGridGlbls ip_grid;
 extern CIPStateGlbls ip_last;
@@ -429,7 +451,8 @@ extern CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num);
 public extern Bool DrvEnable(U8 drv_let,Bool val);
 
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
-public extern U0 Fmt(U8 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32);
+public extern U0 Fmt(U8 drv_let,Bool quick=TRUE,
+	Bool confirm=TRUE,I64 type=DVT_FAT32);
 public extern U0 Mount(Bool repartition=FALSE);
 
 #help_index "Install;Memory/BlkPool"
@@ -437,19 +460,23 @@ public extern I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024);
 
 #help_index "Keyboard Devices/System;Char/System"
 #help_file "::/Doc/KeyDev"
-public extern U0 CtrlAltLetCBSet(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,Bool in_irq=FALSE);
+public extern U0 CtrlAltLetCBSet(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,
+	Bool in_irq=FALSE);
 public extern U0 KeyDescSet(U8 *fmt,...);
-public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
+public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
+	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
 public extern U0 KeyDevRem(CKeyDevEntry *tempp);
 extern CKeyDevGlbls keydev;
 extern CSrvCmd sys_macro_root;
 extern CTask *sys_macro_util_task;
 
-#help_index "Keyboard Devices;Char/Input"
+#help_index "Keyboard Devices;Char/Input;StdIn"
 extern U8  *(*fp_getstr2)(I64 flags=0); //GetStr $LK,"Flags",A="MN:GSF_SHIFT_ESC_EXIT"$
 public extern Bool AreYouSure();
-public extern I64 GetChar(I64 *_scan_code=NULL,Bool echo=TRUE,Bool raw_cursor=FALSE);
-public extern I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE);
+public extern I64 GetChar(I64 *_scan_code=NULL,Bool echo=TRUE,
+	Bool raw_cursor=FALSE);
+public extern I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,
+	Bool raw_cursor=FALSE);
 public extern I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE);
 public extern U8 *GetStr(U8 *msg=NULL,U8 *dft=NULL,I64 flags=0);
 extern U0	KbdInit();
@@ -461,9 +488,9 @@ public extern U0 KbdTypeMatic(U8 delay);
 extern Bool	MouseDriverInstall();
 public extern I64 PressAKey();
 public extern I64 ScanChar();
+public extern Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE);
 public extern Bool YorN();
 public extern CKbdStateGlbls	kbd;
-public extern Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE);
 
 #help_index "Math"
 public extern I64 CeilI64(I64 num,I64 to);
@@ -501,10 +528,12 @@ public extern U0 Mem512Free(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL);
 
 #help_index "Memory/Heap"
 public extern U8 *CAlloc(I64 size,CTask *mem_task=NULL);
-public extern U8 *CAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0);
+public extern U8 *CAllocAligned(I64 size,I64 alignment,
+	CTask *mem_task=NULL,I64 misalignment=0);
 public _extern _FREE U0 Free(U8 *addr);
 public _extern _MALLOC U8 *MAlloc(I64 size,CTask *mem_task=NULL);
-public extern U8 *MAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0);
+public extern U8 *MAllocAligned(I64 size,I64 alignment,
+	CTask *mem_task=NULL,I64 misalignment=0);
 public extern U8 *MAllocIdentical(U8 *src,CTask *mem_task=NULL);
 public _extern _MHEAP_CTRL CHeapCtrl *MHeapCtrl(U8 *src);
 public _extern _MSIZE I64 MSize(U8 *src);   //size of heap object
@@ -513,7 +542,8 @@ public _extern _MSIZE2 I64 MSize2(U8 *src); //Internal size
 #help_index "Memory/HeapCtrl"
 public extern CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512);
 public extern U0 HeapCtrlDel(CHeapCtrl *hc);
-public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,CTask *task=NULL,CBlkPool *bp);
+public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
+	CTask *task=NULL,CBlkPool *bp);
 
 #help_index "Memory/Page Tables"
 public extern Bool MemLowPagesProtect(Bool val=TRUE);
@@ -524,16 +554,20 @@ public extern I64 *MemPageTable(U8 *a);
 #help_index "Messages"
 #help_file "::/Doc/Msgs"
 public extern I64 FlushMsgs(CTask *task=NULL);
-public extern I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL);
+public extern I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,
+	I64 mask=~1,CTask *task=NULL);
 extern U0 InputFilterTask();
-public extern I64 ScanMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL);
+public extern I64 ScanMsg(I64 *_a1=NULL,I64 *_a2=NULL,
+	I64 mask=~1,CTask *task=NULL);
 
 #help_index "Misc"
 public extern I64 EndianI64(I64 d);
 public extern U16 EndianU16(U16 d);
 public extern U32 EndianU32(U32 d);
-public extern U0 QSort(U8 *base,I64 num, I64 width,I64 (*fp_compare)(U8 *e1,U8 *e2));
-public extern U0 QSortI64(I64 *base,I64 num, I64 (*fp_compare)(I64 e1,I64 e2));
+public extern U0 QSort(U8 *base,I64 num, I64 width,
+	I64 (*fp_compare)(U8 *e1,U8 *e2));
+public extern U0 QSortI64(I64 *base,I64 num,
+	I64 (*fp_compare)(I64 e1,I64 e2));
 
 #help_index "Misc/Progress Bars"
 public extern U0 ProgressBarsRst();
@@ -566,15 +600,19 @@ public extern U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg);
 public extern U0 PCIWriteU16(I64 bus,I64 dev,I64 fun,I64 rg,I64 val);
 public extern U0 PCIWriteU32(I64 bus,I64 dev,I64 fun,I64 rg,I64 val);
 public extern U0 PCIWriteU8(I64 bus,I64 dev,I64 fun,I64 rg,I64 val);
-public _extern SYS_BIOS32_SERVICE_DIR U32 sys_BIOS32_service_dir;//Far call routine in the BIOS
-public _extern SYS_PCI_SERVICES U32 sys_pci_services;//Far call routine in the BIOS
+public _extern SYS_PCIBIOS_SERVICE_DIR
+	U32 sys_PCIBIOS_service_dir;//Far call routine in the BIOS
+public _extern SYS_PCI_SERVICES
+	U32 sys_pci_services;//Far call routine in the BIOS
 
 #help_index "PCI;Info;File/System;Devices"
-public extern I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL);
+public extern I64 ATARep(Bool pmt=TRUE,
+	Bool just_ide=FALSE,CATARep **_root=NULL);
 
 #help_index "Processor"
 public extern U8 *IntEntryGet(I64 irq);
-public extern U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0);
+public extern U8 *IntEntrySet(I64 irq,
+	U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0);
 
 #help_index "Snd"
 public extern U0 Beep(I64 freq=500,Bool busy=FALSE);
@@ -582,6 +620,12 @@ public extern Bool IsMute();
 public extern Bool Mute(Bool val);
 public extern U0 Snd(F64 freq);
 public extern CSndGlbls snd;
+
+#help_index "StdIn"
+#help_file "::/Doc/Streams"
+
+#help_index "StdOut"
+#help_file "::/Doc/Streams"
 
 #help_index "Task"
 public extern U0 Exit();
@@ -637,17 +681,17 @@ public extern CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags);
 public extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
 
 #help_index "Task/Srv/Exe;Compiler"
-public extern I64 ExeCmdLine(CLex *lx);
+public extern I64 ExeCmdLine(CCmpCtrl *cc);
 public extern U0 UserTaskCont();
 
 #help_index "Task/Srv/Exe;MultiCore"
-public extern I64 GetResult(CSrvCmd *rqst=NULL);
-public extern Bool ScanResult(CSrvCmd *rqst=NULL,I64 *_result=NULL);
+public extern I64 JobResultGet(CSrvCmd *rqst=NULL);
+public extern Bool JobResultScan(CSrvCmd *rqst=NULL,I64 *_result=NULL);
 
 #help_index "Task/Srv/Text & Msgs"
 public extern CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags);
 
-#help_index "Task/Srv/Text & Msgs;AutoFile"
+#help_index "Task/Srv/Text & Msgs;AutoFile;StdIn/AutoFile"
 public extern U0 Auto(U8 *fmt,...);
 public extern U0 AutoFile(U8 *filename);
 public extern U0 AutoStr(U8 *fmt,...);
@@ -659,7 +703,8 @@ public extern U0 XTalkWait(CTask *task,U8 *fmt,...);
 #help_index "Task/Srv/Text & Msgs;Messages"
 public extern U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0);
 public extern U0 PostMsg(CTask *task,I64 msg_code,I64 a1,I64 a2,I64 flags=0);
-public extern U0 SendMsg(CTask *task,I64 msg_code,I64 a1,I64 a2,I64 flags=0);
+public extern U0 PostMsgWait(CTask *task,I64 msg_code,
+	I64 a1,I64 a2,I64 flags=0);
 public extern CSrvCmd *TaskMsg(CTask *srv,CTask *master,
 		     I64 msg_code,I64 a1,I64 a2,I64 flags);
 
@@ -704,8 +749,5 @@ public extern I64 SysTimerRead();//18.33333*65536Hz (SYS_TIMER_FREQ)
 #help_index "Time/Seconds"
 public extern Bool Blink(F64 Hz=2.5);
 public extern F64 tS(); //From SysTimerFreq.
-
-#help_index "Training;Debugging/Debugger"
-public extern U0 Help();
 
 #help_index ""

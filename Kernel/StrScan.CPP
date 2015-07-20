@@ -1,14 +1,14 @@
 I64 Str2I64(U8 *st,I64 radix=10,U8 **_end_ptr=NULL)
 {//String to I64. Similar to strtoul().
 //Allows radix change with "0x20" "0b1010" "0d123" "0o18".
-//Be careful of Str2I64("0b101",16)-->0xB101.
+  //Be careful of Str2I64("0b101",16)-->0xB101.
   Bool neg=FALSE;
   I64 ch,result=0;
   if (!st || !(2<=radix<=36)) {
     if (_end_ptr) *_end_ptr=st;
     return 0;
   }
-  while (Bt(chars_bitmap_white_space,*st))
+  while (Bt(chars_bmp_white_space,*st))
     st++;
   while (TRUE)
     switch (*st) {
@@ -66,7 +66,7 @@ to avoid this.
   Bool neg=FALSE,neg_e=FALSE;
 
   ch=*src++;
-  while (Bt(chars_bitmap_white_space,ch))
+  while (Bt(chars_bmp_white_space,ch))
     ch=*src++;
   if (ch=='-') {
     neg=TRUE;
@@ -84,7 +84,7 @@ to avoid this.
   }
   i=0;
   while (TRUE) {
-    if (Bt(chars_bitmap_dec_numeric,ch))
+    if (Bt(chars_bmp_dec_numeric,ch))
       i=i*10+ch-'0';
     else {
       if (ch=='.' || ch=='e' || ch=='E')
@@ -98,7 +98,7 @@ to avoid this.
     ch=*src++;
   k=0;
   while (TRUE) {
-    if (Bt(chars_bitmap_dec_numeric,ch)) {
+    if (Bt(chars_bmp_dec_numeric,ch)) {
       i=i*10+ch-'0';
       k++;
     } else {
@@ -116,7 +116,7 @@ to avoid this.
   }
   j=0;
   while (TRUE) {
-    if (Bt(chars_bitmap_dec_numeric,ch))
+    if (Bt(chars_bmp_dec_numeric,ch))
       j=j*10+ch-'0';
     else {
       if (neg_e)
@@ -138,10 +138,10 @@ a2f_end:
 CDate Str2Date(U8 *_src)
 {/*"*+nnnn", "*-nnnn", "mm/dd", "mm/dd/yy"
 It also supports some funs
-  SM() start of mon
-  EM() end of mon
-  SY() start of year
-  EY() end of year
+SM() start of mon
+EM() end of mon
+SY() start of year
+EY() end of year
 Full expressions are not implimented
 but you can do stuff like SM(*-7)+3
 and it will return the 3rd day after
@@ -151,10 +151,10 @@ today.
   CDate result=0;
   CDateStruct ds,ds_now;
   U8 *src=MStrUtil(_src,SUF_REM_SPACES|SUF_TO_UPPER),
-     *v=StrNew(src),
-     *ptr=src;
+	*v=StrNew(src),
+	*ptr=src;
   Bool start_mon=FALSE,end_mon=FALSE,
-       start_year=FALSE,end_year=FALSE;
+	start_year=FALSE,end_year=FALSE;
 
   MemSet(&ds,0,sizeof(CDateStruct));
   if (!StrNCmp(ptr,"SM(",3)) {

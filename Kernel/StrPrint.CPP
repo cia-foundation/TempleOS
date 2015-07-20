@@ -69,7 +69,7 @@ U8 *MPrintQ(U8 *ptr,I64 flags)
 {
   U8 **_buf,*buf,**_dst,*dst,buf2[8],*ptr2;
   I64 ch;
-  buf=MAlloc(128);
+  buf=MAlloc(STR_LEN);
   _buf=&buf;
   dst=buf;
   _dst=&dst;
@@ -128,7 +128,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 {
   U8 **_buf,*buf,**_dst,*dst;
   I64 i,ch,ch1;
-  buf=MAlloc(128);
+  buf=MAlloc(STR_LEN);
   _buf=&buf;
   dst=buf;
   _dst=&dst;
@@ -173,7 +173,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	      ptr++;
 	      while (TRUE) {
 		ch1=ToUpper(*ptr++);
-		if (Bt(chars_bitmap_hex_numeric,ch1)) {
+		if (Bt(chars_bmp_hex_numeric,ch1)) {
 		  if (ch1<='9')
 		    i=i<<4+ch1-'0';
 		  else
@@ -207,15 +207,15 @@ U8 *MPrintq(U8 *ptr,I64 flags)
   return buf;
 }
 
-U8 *sys_pos_powers_lets=" KMGTPEZY",
-   *sys_neg_powers_lets=" mænpfazy",
-   *sys_pos_powers_lst="kilo\0mega\0giga\0tera\0peta\0exa\0zetta\0yotta\0",
-   *sys_neg_powers_lst="milli\0micro\0nano\0pico\0femto\0atto\0zepto\0yocto\0";
+U8 *sys_pos_pows_lets=" KMGTPEZY",
+   *sys_neg_pows_lets=" mænpfazy",
+   *sys_pos_pows_lst="kilo\0mega\0giga\0tera\0peta\0exa\0zetta\0yotta\0",
+   *sys_neg_pows_lst="milli\0micro\0nano\0pico\0femto\0atto\0zepto\0yocto\0";
 
 #define TEMP_BUF_LEN	256
 #define SLOP		8
 
-U8 *StrPrintJoin(U8 *dst,U8 *src,I64 argc,I64 *argv)
+U8 *StrPrintJoin(U8 *dst,U8 *fmt,I64 argc,I64 *argv)
 {/*$LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$
 In float formatting, do not exceed 18-digits
 before or after the decimal point
@@ -230,45 +230,45 @@ to avoid this.
   F64 d,d1;
   U8 *ptr,**_buf,*buf,**_dst,temp_buf[TEMP_BUF_LEN],temp_buf2[TEMP_BUF_LEN*2];
 
-  if (!src)
+  if (!fmt)
     throw('StrPrint');
   if (dst) {
     _buf=NULL;
     buf=dst;
   } else {
-    buf=MAlloc(128);
+    buf=MAlloc(STR_LEN);
     _buf=&buf;
     dst=buf;
   }
   _dst=&dst;
 
-  while (ch = *src++) {
+  while (ch = *fmt++) {
     if (ch=='%') {
       flags=0;
-      if (*src=='-') {
+      if (*fmt=='-') {
 	flags|=SPF_LEFT_JUSTIFY;
-	src++;
+	fmt++;
       }
-      if (*src=='0') {
+      if (*fmt=='0') {
 	flags|=SPF_PAD_ZERO;
-	src++;
+	fmt++;
       }
       len=0;
-      while ('0'<=*src<='9')
-	len=len*10+ *src++ -'0';
-      if (*src=='*') {
-	src++;
+      while ('0'<=*fmt<='9')
+	len=len*10+ *fmt++ -'0';
+      if (*fmt=='*') {
+	fmt++;
 	if (cur_arg>=argc)
 	  throw('StrPrint');
 	len=argv[cur_arg++];
       }
       dec_len=0;
-      if (*src=='.') {
-	src++;
-	while ('0'<=*src<='9')
-	  dec_len=dec_len*10+ *src++ -'0';
-	if (*src=='*') {
-	  src++;
+      if (*fmt=='.') {
+	fmt++;
+	while ('0'<=*fmt<='9')
+	  dec_len=dec_len*10+ *fmt++ -'0';
+	if (*fmt=='*') {
+	  fmt++;
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  dec_len=argv[cur_arg++];
@@ -278,7 +278,7 @@ to avoid this.
 
       aux_fmt_num=0;
       while (TRUE) {
-	switch (*src) {
+	switch (*fmt) {
 	  sub_switch_start:
 	    case '$$':
 	      flags|=SPF_DOLLAR;
@@ -295,28 +295,28 @@ to avoid this.
 	    case 'l': //harmless
 	      break;
 	  sub_switch_end:
-	    src++;
+	    fmt++;
 	    break;
 
 	  case 'h':
-	    src++;
+	    fmt++;
 	    flags|=SPF_AUX_FMT_NUM;
-	    if (*src=='?') {
-	      src++;
+	    if (*fmt=='?') {
+	      fmt++;
 	      flags|=SPF_QUESTION;
 	    } else {
-	      if (*src=='*') {
-		src++;
+	      if (*fmt=='*') {
+		fmt++;
 		if (cur_arg>=argc)
 		  throw('StrPrint');
 		aux_fmt_num=argv[cur_arg++];
 	      } else {
-		if (*src=='-') {
-		  src++;
+		if (*fmt=='-') {
+		  fmt++;
 		  flags|=SPF_NEG_AUX_FMT_NUM;
 		}
-		while ('0'<=*src<='9')
-		  aux_fmt_num=aux_fmt_num*10+ *src++ -'0';
+		while ('0'<=*fmt<='9')
+		  aux_fmt_num=aux_fmt_num*10+ *fmt++ -'0';
 		if (flags&SPF_NEG_AUX_FMT_NUM)
 		  aux_fmt_num=-aux_fmt_num;
 	      }
@@ -327,9 +327,9 @@ to avoid this.
 	}
       }
 
-sp_arg:
+      sp_arg:
       k=0;
-      switch (*src++) {
+      switch (*fmt++) {
 	sub_switch_start:
 	  case 'F':
 	    if (cur_arg>=argc)
@@ -430,7 +430,8 @@ sp_arg:
 	  else
 	    StrPrintPSect(temp_buf,argv[cur_arg],0);
 	  if (!IsRaw || !_buf) {
-	    StrPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",temp_buf,argv[cur_arg]);
+	    StrPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",
+		  temp_buf,argv[cur_arg]);
 	    OutStr(temp_buf2,_buf,_dst,len,flags);
 	  } else
 	    OutStr(temp_buf,_buf,_dst,len,flags);
@@ -474,7 +475,8 @@ sp_out_comma_num:
 	    if (flags&SPF_PAD_ZERO) {
 	      if (flags&SPF_NEG)
 		SPutChar(_dst,'-',_buf);
-	      comma_cnt=(len-k-i+comma_fmt_cnt-comma_cnt+1)%(comma_fmt_cnt+1)+1;
+	      comma_cnt=(len-k-i+comma_fmt_cnt-comma_cnt+1)
+	      %(comma_fmt_cnt+1)+1;
 	      for (;i<len-k;i++) {
 		if (!--comma_cnt) {
 		  SPutChar(_dst,',',_buf);
@@ -557,7 +559,7 @@ sp_out_inf:
 	    break;
 	  }
 
-sp_out_f:
+	  sp_out_f:
 	  if (dec_len<0)
 	    dec_len=0;
 	  n=Log10(d);
@@ -743,9 +745,9 @@ sp_out_eng: //Engineering notation
 	      i=aux_fmt_num/3;
 	    }
 	    if (i<0)
-	      temp_buf[k++]=sys_neg_powers_lets[-i];
+	      temp_buf[k++]=sys_neg_pows_lets[-i];
 	    else if (i>0)
-	      temp_buf[k++]=sys_pos_powers_lets[i];
+	      temp_buf[k++]=sys_pos_pows_lets[i];
 	    else if (len!=0)
 	      temp_buf[k++]=CH_SPACE;
 	    if (!(flags&SPF_DECIMAL)) {
@@ -895,8 +897,9 @@ U8 *CatPrint(U8 *_dst,U8 *fmt,...)
 
 U0 Print(U8 *fmt,...)
 {//$LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$.  See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
+//Don't use this.  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT.Z,DemoHolyC"$
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  PutS(buf);
+  PutS(buf);//Don't use PutS().  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT.Z,DemoHolyC"$
   Free(buf);
 }
 

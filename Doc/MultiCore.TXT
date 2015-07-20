@@ -4,7 +4,7 @@ Only tasks on core#0 can have windows, but other cores can help render them.
 
 Each core has a $GREEN$seth task$FG$ which is the father of all tasks on that core.  Adam is the seth task on core 0.
 
-You give a job to a seth task with $LK,"JobQue",A="MN:JobQue"$() and get the result with $LK,"GetResult",A="MN:GetResult"$().  You spawn a task on another core with $LK,"Spawn",A="MN:Spawn"$().
+You give a job to a seth task with $LK,"JobQue",A="MN:JobQue"$() and get the result with $LK,"JobResultGet",A="MN:JobResultGet"$().  You spawn a task on another core with $LK,"Spawn",A="MN:Spawn"$().
 
 Note: You must use the $GREEN$LOCK$FG$ asm prefix when changing shared structures in a multicore environment.  The $LK,"LBts",A="MN:LBts"$(), $LK,"LBtr",A="MN:LBtr"$() and $LK,"LBtc",A="MN:LBtc"$() instructions have $GREEN$LOCK$FG$ prefixes.  The compiler has a $GREEN$lock{}$FG$ feature but it doesn't work well.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
 

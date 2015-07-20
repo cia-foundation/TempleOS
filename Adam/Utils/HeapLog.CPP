@@ -1,4 +1,5 @@
 #help_index "Debugging/Heap"
+#help_file "::/Doc/HeapDbg"
 
 #define HL_CALLER_DEPTH	4
 #define HL_HASH_SIZE	0x1000
@@ -121,7 +122,7 @@ public U0 HeapLogRep(Bool leave_it=OFF)
   for (i=0;i<HL_HASH_SIZE;i++) {
     temphl=heaplog_root[i].next;
     while (temphl!=&heaplog_root[i]) {
-      //Take snapshot in case modified. (while we work)
+//Take snapshot in case modified. (while we work)
       MemCpy(&hl,temphl,sizeof(CHeapLog));
       "$$PURPLE$$%08X$$FG$$ %08X",MSize(hl.addr),hl.addr;
       for (j=0;j<HL_CALLER_DEPTH;j++)

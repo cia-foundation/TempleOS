@@ -1,40 +1,39 @@
-#help_index "Graphics/Sprite"
+#help_index "Graphics/Sprite;Sprites"
 #help_file "::/Doc/Sprite"
 
 U8 polypt_map[9]={0,1,2,3,0,4,5,6,7};
 
-I64 sprite_elem_base_sizes[SPT_NUM_TYPES]=
-{
-sizeof(CSpriteBase),		//SPT_END
-sizeof(CSpriteColor),		//SPT_COLOR
-sizeof(CSpriteDitherColor),	//SPT_DITHER_COLOR
-sizeof(CSpriteWidth),		//SPT_WIDTH
-sizeof(CSpritePtPt),		//SPT_PLANAR_SYMMETRY
-sizeof(CSpriteBase),		//SPT_TRANSFORM_ON
-sizeof(CSpriteBase),		//SPT_TRANSFORM_OFF
-sizeof(CSpritePt),		//SPT_SHIFT
-sizeof(CSpritePt),		//SPT_PT
-sizeof(CSpriteNumPtU8s),	//SPT_POLYPT
-sizeof(CSpritePtPt),		//SPT_LINE
-sizeof(CSpriteNumU8s),		//SPT_POLYLINE
-sizeof(CSpritePtPt),		//SPT_RECT
-sizeof(CSpritePtPtAng),		//SPT_ROTATED_RECT
-sizeof(CSpritePtRad),		//SPT_CIRCLE
-sizeof(CSpritePtWHAng),		//SPT_ELLIPSE
-sizeof(CSpritePtWHAngSides),	//SPT_POLYGON
-sizeof(CSpriteNumU8s),		//SPT_BSPLINE2
-sizeof(CSpriteNumU8s),		//SPT_BSPLINE2_CLOSED
-sizeof(CSpriteNumU8s),		//SPT_BSPLINE3
-sizeof(CSpriteNumU8s),		//SPT_BSPLINE3_CLOSED
-sizeof(CSpritePt),		//SPT_FLOOD_FILL
-sizeof(CSpritePt),		//SPT_FLOOD_FILL_NOT
-sizeof(CSpritePtWHU8s),		//SPT_BITMAP
-sizeof(CSpriteMeshU8s),		//SPT_MESH
-sizeof(CSpritePtMeshU8s),	//SPT_SHIFTABLE_MESH
-sizeof(CSpritePtPt),		//SPT_ARROW
-sizeof(CSpritePtStr),		//SPT_TEXT
-sizeof(CSpritePtStr),		//SPT_TEXT_BOX
-sizeof(CSpritePtStr),		//SPT_TEXT_DIAMOND
+I64 sprite_elem_base_sizes[SPT_NUM_TYPES]={
+  sizeof(CSpriteBase),		//SPT_END
+  sizeof(CSpriteColor),		//SPT_COLOR
+  sizeof(CSpriteDitherColor),	//SPT_DITHER_COLOR
+  sizeof(CSpriteW),		//SPT_WIDTH
+  sizeof(CSpritePtPt),		//SPT_PLANAR_SYMMETRY
+  sizeof(CSpriteBase),		//SPT_TRANSFORM_ON
+  sizeof(CSpriteBase),		//SPT_TRANSFORM_OFF
+  sizeof(CSpritePt),		//SPT_SHIFT
+  sizeof(CSpritePt),		//SPT_PT
+  sizeof(CSpriteNumPtU8s),	//SPT_POLYPT
+  sizeof(CSpritePtPt),		//SPT_LINE
+  sizeof(CSpriteNumU8s),		//SPT_POLYLINE
+  sizeof(CSpritePtPt),		//SPT_RECT
+  sizeof(CSpritePtPtAng),		//SPT_ROTATED_RECT
+  sizeof(CSpritePtRad),		//SPT_CIRCLE
+  sizeof(CSpritePtWHAng),		//SPT_ELLIPSE
+  sizeof(CSpritePtWHAngSides),	//SPT_POLYGON
+  sizeof(CSpriteNumU8s),		//SPT_BSPLINE2
+  sizeof(CSpriteNumU8s),		//SPT_BSPLINE2_CLOSED
+  sizeof(CSpriteNumU8s),		//SPT_BSPLINE3
+  sizeof(CSpriteNumU8s),		//SPT_BSPLINE3_CLOSED
+  sizeof(CSpritePt),		//SPT_FLOOD_FILL
+  sizeof(CSpritePt),		//SPT_FLOOD_FILL_NOT
+  sizeof(CSpritePtWHU8s),		//SPT_BITMAP
+  sizeof(CSpriteMeshU8s),		//SPT_MESH
+  sizeof(CSpritePtMeshU8s),	//SPT_SHIFTABLE_MESH
+  sizeof(CSpritePtPt),		//SPT_ARROW
+  sizeof(CSpritePtStr),		//SPT_TEXT
+  sizeof(CSpritePtStr),		//SPT_TEXT_BOX
+  sizeof(CSpritePtStr),		//SPT_TEXT_DIAMOND
 };
 
 I64 SpriteElemQuedBaseSize(I64 type)
@@ -67,10 +66,12 @@ I64 SpriteElemSize(CSprite *tempg)
       i+=tempg->nu.num*sizeof(CD3I32);
       break;
     case SPT_MESH:
-      i+=tempg->mu.vertex_cnt*sizeof(CD3I32)+tempg->mu.tri_cnt*sizeof(CMeshTri);
+      i+=tempg->mu.vertex_cnt*sizeof(CD3I32)+
+	    tempg->mu.tri_cnt*sizeof(CMeshTri);
       break;
     case SPT_SHIFTABLE_MESH:
-      i+=tempg->pmu.vertex_cnt*sizeof(CD3I32)+tempg->pmu.tri_cnt*sizeof(CMeshTri);
+      i+=tempg->pmu.vertex_cnt*sizeof(CD3I32)+
+	    tempg->pmu.tri_cnt*sizeof(CMeshTri);
       break;
   }
   return i;
@@ -101,9 +102,9 @@ public U8 *DC2Sprite(CDC *tempb)
 {//Convert device context to sprite.
   CSprite *tempg;
   tempg=CAlloc(sprite_elem_base_sizes[SPT_BITMAP]+
-	      tempb->width_internal*tempb->height+
-	   sprite_elem_base_sizes[SPT_END])
-	(U8 *)-offset(CSprite.start);
+	tempb->width_internal*tempb->height+
+	sprite_elem_base_sizes[SPT_END])
+  (U8 *)-offset(CSprite.start);
   tempg->type=SPT_BITMAP;
   tempg->pwhu.width=tempb->width;
   tempg->pwhu.height=tempb->height;
@@ -113,9 +114,9 @@ public U8 *DC2Sprite(CDC *tempb)
   return tempg(U8 *)+offset(CSprite.start);
 }
 
-public U8 *SpriteElem2OneLineSummary(CSprite *tempg)
+public U8 *SpriteElem2Summary(CSprite *tempg)
 {//Study $LK,"::/Demo/Graphics/SpriteText.CPP"$.
-  U8 buf[256],buf2[136];
+  U8 buf[STR_LEN],buf2[STR_LEN];
   I32 *ptr;
   StrPrint(buf,"%Z",tempg->type,"ST_SPRITE_ELEM_TYPES");
   switch (tempg->type) {
@@ -123,7 +124,8 @@ public U8 *SpriteElem2OneLineSummary(CSprite *tempg)
       CatPrint(buf," %s",Color2Str(buf2,tempg->c.color));
       break;
     case SPT_DITHER_COLOR:
-      CatPrint(buf," %s",Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|tempg->d.dither_color.u8[1]<<COLORROP_BITS));
+      CatPrint(buf," %s",Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|
+	    tempg->d.dither_color.u8[1]<<COLORROP_BITS));
       break;
     case SPT_PT:
     case SPT_FLOOD_FILL:
@@ -136,7 +138,8 @@ public U8 *SpriteElem2OneLineSummary(CSprite *tempg)
     case SPT_PLANAR_SYMMETRY:
     case SPT_RECT:
     case SPT_ROTATED_RECT:
-      CatPrint(buf," (%d,%d),(%d,%d)",tempg->pp.x1,tempg->pp.y1,tempg->pp.x2,tempg->pp.y2);
+      CatPrint(buf," (%d,%d),(%d,%d)",tempg->pp.x1,tempg->pp.y1,
+	    tempg->pp.x2,tempg->pp.y2);
       break;
     case SPT_CIRCLE:
       CatPrint(buf," (%d,%d):%dR",tempg->pr.x1,tempg->pr.y1,tempg->pr.radius);
@@ -157,7 +160,8 @@ public U8 *SpriteElem2OneLineSummary(CSprite *tempg)
     case SPT_ELLIPSE:
     case SPT_POLYGON:
     case SPT_BITMAP:
-      CatPrint(buf," (%d,%d):%dW,%dH",tempg->pwhu.x1,tempg->pwhu.y1,tempg->pwhu.width,tempg->pwhu.height);
+      CatPrint(buf," (%d,%d):%dW,%dH",tempg->pwhu.x1,tempg->pwhu.y1,
+	    tempg->pwhu.width,tempg->pwhu.height);
       break;
     case SPT_BSPLINE2:
     case SPT_BSPLINE3:

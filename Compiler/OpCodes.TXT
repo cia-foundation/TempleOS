@@ -1,9 +1,9 @@
-/* 
+/* See $LK,"AsmHashLoad",A="MN:AsmHashLoad"$().
+
  '!'= don't switch modes
  '&'= default
- '-'= NoRex
- '='= Rex 0x48 only if 64-bit code segment
- '~'= Rex 0x40
+ '%'= Not allowed in 64-bit mode
+ '='= Rex 0x48 only if 64-bit mode
  '`'= Rex only R8-R15
  '^'= Rex xor-like
  ':'= floating sti-like for disassembly
@@ -16,8 +16,8 @@
  The assembler will not report certain invalid
  forms. Get an Intel datasheet and learn
  which forms are valid.
-
 */
+
 R8 AL 0;
 R8 CL 1;
 R8 DL 2;
@@ -218,10 +218,10 @@ OPCODE PUSH
  0x6A, &IB IMM8
  0x68, 16 !IW IMM16
  0x68, 32 !ID IMM32
- 0x50,+R 16 R16
+ 0x50,+R 16 % R16
  0x50,+R 32 R32
  0x50,+R 32 ` R64
- 0xFF,/6 16 RM16
+ 0xFF,/6 16 % RM16
  0xFF,/6 32 RM32
  0xFF,/6 32 RM64;
 OPCODE PUSHAW 0x60, 16;
@@ -765,15 +765,15 @@ OPCODE JZ
  0x0F 0x84, 32 !CD REL32;
 
 OPCODE INC
-// 0x40,+R 16 R16
-// 0x40,+R 32 R32
+ 0x40,+R 16 % R16
+ 0x40,+R 32 % R32
  0xFE,/0 RM8
  0xFF,/0 16 RM16
  0xFF,/0 32 RM32
  0xFF,/0 32 RM64;
 OPCODE DEC
-// 0x48,+R 16 R16
-// 0x48,+R 32 R32
+ 0x48,+R 16 % R16
+ 0x48,+R 32 % R32
  0xFE,/1 RM8
  0xFF,/1 16 RM16
  0xFF,/1 32 RM32

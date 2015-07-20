@@ -266,12 +266,12 @@ U0 DocFormFwd(CDoc *doc,Bool giveup=FALSE)
   if (doc->flags & DOCF_FORM) {
     if (doc_e==doc) goto ff_recover;
     while (!Bt(doldoc.type_flags_form,doc_e->type_u8) &&
-	!(doc_e->de_flags&DOCEF_LINK) ||
-	doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
+	  !(doc_e->de_flags&DOCEF_LINK) ||
+	  doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
       doc_e=doc_e->next;
       if (doc_e==doc) {
 ff_recover:
-	doc->cur_data_col=0;
+	doc->cur_col=0;
 	if (!giveup) {
 	  doc->cur_entry=doc_e->last;
 	  DocFormBwd(doc,TRUE);
@@ -284,7 +284,7 @@ ff_recover:
   while (doc_e->type_u8==DOCT_INDENT)
     doc_e=doc_e->next;
   if (doc_e!=doc_e2) {
-    doc->cur_data_col=doc_e->min_col;
+    doc->cur_col=doc_e->min_col;
     doc->cur_entry=doc_e;
   }
 }
@@ -294,11 +294,11 @@ U0 DocFormBwd(CDoc *doc,Bool giveup=FALSE)
   CDocEntry *doc_e=doc->cur_entry,*doc_e2=doc_e;
   if (doc->flags & DOCF_FORM) {
     while (!Bt(doldoc.type_flags_form,doc_e->type_u8) &&
-	!(doc_e->de_flags&DOCEF_LINK) ||
-	doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
+	  !(doc_e->de_flags&DOCEF_LINK) ||
+	  doc_e->de_flags&DOCEF_SKIP_IN_FORM) {
       doc_e=doc_e->last;
       if (doc_e==doc) {
-	doc->cur_data_col=0;
+	doc->cur_col=0;
 	if (!giveup) {
 	  doc->cur_entry=doc_e->next;
 	  DocFormFwd(doc,TRUE);
@@ -311,7 +311,7 @@ U0 DocFormBwd(CDoc *doc,Bool giveup=FALSE)
   while (doc_e->type_u8==DOCT_INDENT)
     doc_e=doc_e->next;
   if (doc_e!=doc_e2) {
-    doc->cur_data_col=doc_e->min_col;
+    doc->cur_col=doc_e->min_col;
     doc->cur_entry=doc_e;
   }
 }
@@ -323,11 +323,11 @@ public U0 DocTop(CDoc *doc=NULL)
     return;
   unlock=DocLock(doc);
   doc->cur_entry=doc->root.next;
-  doc->cur_data_col=doc->cur_entry->min_col;
+  doc->cur_col=doc->cur_entry->min_col;
   doc->x=0;
   doc->y=0;
   doc->line_start_col=0;
-  doc->cur_top_line_num=0;
+  doc->top_line_num=0;
 
   DocFormFwd(doc);
   DocRecalc(doc);
@@ -367,7 +367,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
       b=b1;
     }
   }
-  //Check $LK,"DocInsDoc",A="MN:DocInsDoc"$
+//Check $LK,"DocInsDoc",A="MN:DocInsDoc"$
   doc->flags&=DOCF_BREAK_UNLOCKED;
   doc->root.next=doc->root.last=doc;
   QueInit(&doc->bin_root);
@@ -495,9 +495,8 @@ U0 DocDataFmt(CDoc *doc,CDocEntry *doc_e,I64 d=DOCM_CANCEL)
       }
       doc_e->max_col=StrLen(doc_e->tag);
     } else if (doc_e->de_flags & DOCEF_LST) {
-      if (doc_e->de_flags & DOCEF_DEFINE &&
-	    (temph=HashFind(doc_e->define_str,doc->win_task->hash_table,HTT_DEFINE_STR)) &&
-	    0<=d<temph->cnt) {
+      if (doc_e->de_flags & DOCEF_DEFINE && (temph=HashFind(doc_e->define_str,
+	    doc->win_task->hash_table,HTT_DEFINE_STR)) && 0<=d<temph->cnt) {
 	ptr=MStrPrint("[%s]",temph->sub_lst[d]);
 	Free(doc_e->tag);
 	doc_e->tag=StrNew(ptr,doc->mem_task);
@@ -521,7 +520,7 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
   U8 *ptr,*ptr1,*ptr2;
   CHashDefineStr *temph;
   if (doc_e->type_u8==DOCT_DATA && doc_e->de_flags&DOCEF_AUX_STR ||
-      doc_e->type_u8==DOCT_CHECK_BOX || doc_e->de_flags & DOCEF_LST) {
+	doc_e->type_u8==DOCT_CHECK_BOX || doc_e->de_flags & DOCEF_LST) {
     if (doc_e->de_flags & DOCEF_DATA_IS_PTR) {
       if (!(ptr=doc_e->data)) return;
     } else
@@ -545,7 +544,8 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
     } else if (doc_e->de_flags & DOCEF_LST) {
       d=0;
       if (doc_e->tag && doc_e->de_flags & DOCEF_DEFINE &&
-	(temph=HashFind(doc_e->define_str,doc->win_task->hash_table,HTT_DEFINE_STR))) {
+	    (temph=HashFind(doc_e->define_str,
+	    doc->win_task->hash_table,HTT_DEFINE_STR))) {
 	ptr1=ptr2=StrNew(doc_e->tag);
 	if (*ptr2=='[') {
 	  ptr2++;
@@ -596,7 +596,7 @@ U0 DocRemSoftNewLines(CDoc *doc=NULL,CDocEntry *doc_e=NULL)
     if (doc_e->type_u8==DOCT_SOFT_NEW_LINE) {
       if (doc->cur_entry==doc_e) {
 	doc->cur_entry=doc_e2;
-	doc->cur_data_col=doc->cur_entry->min_col;
+	doc->cur_col=doc->cur_entry->min_col;
       }
       DocEntryDel(doc,doc_e);
     } else if (saved_ll && doc_e->type_u8==DOCT_NEW_LINE)
@@ -612,9 +612,9 @@ U0 DocRemSoftNewLines(CDoc *doc=NULL,CDocEntry *doc_e=NULL)
 public I64 DocMax(I64 i=MAX_I64)
 {//Set max document entries. (Cmd line buffer.)
 //Adjusts the size of the cmd line buf.
-//Normally, the cmd line deletes entries
-//when more are added and the old scroll up.
-//See $LK,"max_entries",A="FF:::/Adam/DolDoc/DocMain.CPP,max_entries"$.
+  //Normally, the cmd line deletes entries
+  //when more are added and the old scroll up.
+  //See $LK,"max_entries",A="FF:::/Adam/DolDoc/DocMain.CPP,max_entries"$.
   I64 result;
   CDoc *doc;
   if (doc=DocPut) {
@@ -650,10 +650,10 @@ public CDoc *DocNew(U8 *filename=NULL,CTask *task=NULL)
   return doc;
 }
 
-#help_index "DolDoc/Task"
+#help_index "DolDoc/Task;StdOut/Task"
 public CDoc *DocPut(CTask *task=NULL)
 {//Current document that StdOut Put() goes to.
- //Basically, StdOut unless double buffering.
+//Basically, StdOut unless double buffering.
   CDoc *result;
   if (!task) task=Fs;
   if ((result=task->put_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
@@ -684,13 +684,13 @@ public CDoc *DocBorder(CTask *task=NULL)
 
 public CDoc *DocDblBufStart(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
-  Bool unlock_ddoc,old_preempt=Preempt(OFF);
+  Bool unlock_ddoc,old_preempt=Preempt;
   CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task),*result;
   if (!pdoc || !ddoc || pdoc!=ddoc)
     result=NULL; //Already Double buffering
   else {
     if (!task) task=Fs;
-    unlock_ddoc=DocLock(ddoc); //dont want change during winupdate, so lock DocPut$WW,0$
+    unlock_ddoc=DocLock(ddoc); //dont change during winupdate, so lock DocPut$WW,0$
     result=DocNew(,task);
     result->win_task		=ddoc->win_task;
     result->max_entries		=ddoc->max_entries;
@@ -715,7 +715,7 @@ public CDoc *DocDblBufStart(CTask *task=NULL)
 
 public Bool DocDblBufEnd(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
-  Bool result=FALSE,old_preempt=Preempt(OFF);
+  Bool result=FALSE,old_preempt=Preempt;
   CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
   if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
     if (!task) task=Fs;
@@ -733,7 +733,7 @@ public Bool DocDblBufEnd(CTask *task=NULL)
 
 public Bool DocDblBufSwap(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
-  Bool result=FALSE,old_preempt=Preempt(OFF);
+  Bool result=FALSE,old_preempt=Preempt;
   CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
   if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
     if (!task) task=Fs;
@@ -746,7 +746,8 @@ public Bool DocDblBufSwap(CTask *task=NULL)
     MemCpy(ddoc->find_replace,pdoc->find_replace,sizeof(CEdFindText));
     MemCpy(&ddoc->filename,&pdoc->filename,sizeof(CEdFileName));
     ddoc->max_entries		=pdoc->max_entries;
-    ddoc->flags			=pdoc->flags&DOCG_DBL_BUF_FLAGS | ddoc->flags&~DOCG_DBL_BUF_FLAGS;
+    ddoc->flags			=pdoc->flags&DOCG_DBL_BUF_FLAGS |
+	  ddoc->flags&~DOCG_DBL_BUF_FLAGS;
     ddoc->left_click_link	=pdoc->left_click_link;
     ddoc->right_click_link	=pdoc->right_click_link;
     ddoc->user_put_data		=pdoc->user_put_data;

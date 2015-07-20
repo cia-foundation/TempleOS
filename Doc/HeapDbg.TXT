@@ -1,0 +1,1 @@
+$WW,1$Recompile the kernel with $LK,"_CFG_HEAP_DBG",A="MN:_CFG_HEAP_DBG"$=TRUE if you want more heap debugging.  You are on your own.

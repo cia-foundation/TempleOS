@@ -52,7 +52,7 @@ class Prime
 I64 *PrimesNew(I64 N,I64 *_sqrt_primes,I64 *_cbrt_primes)
 {
   I64 i,j,sqrt=Ceil(Sqrt(N)),cbrt=Ceil(N`(1/3.0)),sqrt_sqrt=Ceil(Sqrt(sqrt)),
-    sqrt_primes=0,cbrt_primes=0;
+	sqrt_primes=0,cbrt_primes=0;
   U8 *s=CAlloc((sqrt+1+7)/8);
   Prime *primes,*p;
 
@@ -167,12 +167,12 @@ Bool TestSumFact(I64 n,I64 target_sf,I64 sqrt_primes,I64 cbrt_primes,Prime *p)
     }
     p++;
   }
-  /*  At this point we have three possible cases to test
-  1)n==p1	->sf==(1+p1)	    ?
-  2)n==p1*p1	->sf==(1+p1+p1^2)   ?
-  3)n==p1*p2	->sf==(p1+1)*(p2+1) ?
+/*  At this point we have three possible cases to test
+1)n==p1	->sf==(1+p1)	    ?
+2)n==p1*p1	->sf==(1+p1+p1^2)   ?
+3)n==p1*p2	->sf==(p1+1)*(p2+1) ?
 
-  */
+*/
   if (1+n==target_sf) {
     while (i++<sqrt_primes) {
       k=0;
@@ -207,16 +207,16 @@ Bool TestSumFact(I64 n,I64 target_sf,I64 sqrt_primes,I64 cbrt_primes,Prime *p)
       return FALSE;
   } else {
 // n==p1*p2 -> sf==(p1+1)*(p2+1) ?  where p1!=1 && p2!=1
-// if p1==1 || p2==1, it is FALSE because we checked a single prime above.
+    // if p1==1 || p2==1, it is FALSE because we checked a single prime above.
 
-// sf==(p1+1)*(n/p1+1)
-// sf==n+p1+n/p1+1
-// sf*p1==n*p1+p1^2+n+p1
-// p1^2+(n+1-sf)*p1+n=0
-// x=(-b+/-sqrt(b^2-4ac))/2a
-// a=1
-// x=(-b+/-sqrt(b^2-4c))/2
-// b=n+1-sf;c=n
+    // sf==(p1+1)*(n/p1+1)
+    // sf==n+p1+n/p1+1
+    // sf*p1==n*p1+p1^2+n+p1
+    // p1^2+(n+1-sf)*p1+n=0
+    // x=(-b+/-sqrt(b^2-4ac))/2a
+    // a=1
+    // x=(-b+/-sqrt(b^2-4c))/2
+    // b=n+1-sf;c=n
     b=n+1-target_sf;
 // x=(-b+/-sqrt(b^2-4n))/2
     disc=b*b-4*n;
@@ -264,8 +264,8 @@ class RangeJob
 I64 TestCoreSubRange(RangeJob *r)
 {
   I64 i,j,m,n,n2,sf,result=0,range=r->hi-r->lo,
-      *sumfacts=MAlloc(range*sizeof(I64)),
-      *residue =MAlloc(range*sizeof(I64));
+	*sumfacts=MAlloc(range*sizeof(I64)),
+	*residue =MAlloc(range*sizeof(I64));
   U16 *pow_cnt =MAlloc(range*sizeof(U16));
   Prime *p=r->primes;
   PowPrime *pp;
@@ -301,7 +301,7 @@ I64 TestCoreSubRange(RangeJob *r)
     n2=sf-n-1;
     if (n<n2<r->N) {
       if (r->lo<=n2<r->hi && sumfacts[n2-r->lo]-n2-1==n ||
-	TestSumFact(n2,sf,r->sqrt_primes,r->cbrt_primes,r->primes)) {
+	    TestSumFact(n2,sf,r->sqrt_primes,r->cbrt_primes,r->primes)) {
 	DocPrint(r->doc,"%u:%u\n",n,sf-n-1);
 	result++;
       }
@@ -335,11 +335,11 @@ I64 MagicPairs(I64 N)
   F64 t0=tS;
   I64 result=0;
   I64 sqrt_primes,cbrt_primes,num_powprimes,
-    i,k,n=(N-1)/mp_cnt+1;
+	i,k,n=(N-1)/mp_cnt+1;
   Prime *primes=PrimesNew(N,&sqrt_primes,&cbrt_primes);
   PowPrime *powprimes=PowPrimesNew(N,sqrt_primes,primes,&num_powprimes);
   "N:%u SqrtPrimes:%u CbrtPrimes:%u PowersOfPrimes:%u\n",
-    N,sqrt_primes,cbrt_primes,num_powprimes;
+	N,sqrt_primes,cbrt_primes,num_powprimes;
 
   k=2;
   for (i=0;i<mp_cnt;i++) {
@@ -355,7 +355,7 @@ I64 MagicPairs(I64 N)
     rj[i].cmd=JobQue(&TestCoreRange,&rj[i],i,0);
   }
   for (i=0;i<mp_cnt;i++)
-    result+=GetResult(rj[i].cmd);
+    result+=JobResultGet(rj[i].cmd);
   Free(powprimes);
   Free(primes);
   "Found:%u Time:%9.4f\n",result,tS-t0;

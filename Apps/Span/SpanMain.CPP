@@ -26,20 +26,16 @@ F64 Cost(CMathODE *ode)
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  Bool old_suspend1,old_suspend2;
-  I64 i,j;
   MyMass   *tempm;
   MySpring *temps;
 
-  old_suspend1=Suspend(task);
-  old_suspend2=Suspend(task->animate_task);
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     if (!(temps->flags&SSF_INACTIVE)) {
       dc->color=temps->color;
       dc->pen_width=temps->pen_width;
       GrLine3(dc,temps->end1->x,temps->end1->y,0,
-		temps->end2->x,temps->end2->y,0);
+	    temps->end2->x,temps->end2->y,0);
     }
     temps=temps->next;
   }
@@ -47,8 +43,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (cursor_mass) {
     dc->color=RED;
     dc->pen_width=2;
-    GrLine3(dc,ip.pos.x-task->pix_left-task->scroll_x,ip.pos.y-task->pix_top-task->scroll_y,0,
-      cursor_mass->x,cursor_mass->y,0);
+    GrLine3(dc,ip.pos.x-task->pix_left-task->scroll_x,
+	  ip.pos.y-task->pix_top-task->scroll_y,0,
+	  cursor_mass->x,cursor_mass->y,0);
   }
 
   tempm=ode->next_mass;
@@ -69,8 +66,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->color=BLACK;
   GrPrint(dc,90,0,"Cost:%12.2,f",Cost(ode));
   GrPrint(dc,90,FONT_HEIGHT,"Time:%12.2f",SpanTime);
-  Suspend(task,old_suspend1);
-  Suspend(task->animate_task,old_suspend2);
 }
 
 MyMass PlaceMass(I64 x, I64 y)
@@ -91,7 +86,8 @@ U0 NullSpring(MySpring *temps,F64 scale)
 {
   F64 d=D3Dist(&temps->end1->x,&temps->end2->x);
   temps->rest_len=d*scale;
-  temps->compression_strength=temps->base_compression_strength/(temps->rest_len+1.0);
+  temps->compression_strength=
+	temps->base_compression_strength/(temps->rest_len+1.0);
   temps->tensile_strength=temps->base_tensile_strength/(temps->rest_len+1.0);
   temps->const=temps->base_const/(temps->rest_len+1.0);
   temps->cost=temps->base_cost*temps->rest_len;
@@ -203,8 +199,10 @@ U0 AnimateTask(SpanAnimateStruct *a)
     while (temps!=&ode->next_spring) {
       temps1=temps->next;
       f=temps->f;
-      if (f>0 &&  f>temps->compression_strength && !(temps->flags&SSF_NO_COMPRESSION)||
-	  f<0 && -f>temps->tensile_strength	&& !(temps->flags&SSF_NO_TENSION))
+      if (f>0 &&  f>temps->compression_strength &&
+	    !(temps->flags&SSF_NO_COMPRESSION)||
+	    f<0 && -f>temps->tensile_strength &&
+	    !(temps->flags&SSF_NO_TENSION))
 	temps->flags|=SSF_INACTIVE;
       temps=temps1;
     }
@@ -250,10 +248,10 @@ U0 SongTask(I64)
   music.tempo= 3.636;
   music.stacatto_factor= 0.902;
   while (TRUE) {
-	Play("3q.EeDqED2G3DhE");
-	Play("q.EeDqED2G3DhE");
-	Play("q.FeEFEqF2G3EhF");
-	Play("q.FeEFEqF2G3EhF");
+    Play("3q.EeDqED2G3DhE");
+    Play("q.EeDqED2G3DhE");
+    Play("q.FeEFEqF2G3EhF");
+    Play("q.FeEFEqF2G3EhF");
   }
 }
 
@@ -271,22 +269,17 @@ U0 Span()
   WinMax;
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
-  bt_run =CtrlButtonNew(0,0,		  80,,2,"Stopped\0Running\0",run_colors,&run_button);
-  bt_mode=CtrlButtonNew(0,3.0*FONT_HEIGHT,80,,MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_button);
+  bt_run =CtrlButtonNew(0,0,		  80,,
+	2,"Stopped\0Running\0",run_colors,&run_button);
+  bt_mode=CtrlButtonNew(0,3.0*FONT_HEIGHT,80,,
+	MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_button);
   a.saved_ode=NULL;
 
-//Preempt(OFF) eliminates a lot of hassles.
-//The concern is about changing
-//que links while the winmgr task
-//is updating the ode or screen.
-
-//The Window mgr suspends this
-//task while updating the ode.  It
-//will not be interrupted and with this
-//preempt, we will not be interrupted.
-//There is little downside to Preempt()
-//since we will yield during GetMsg().
-  Preempt(OFF);
+  //Preempt eliminates a lot of hassles.
+  //The concern is about changing
+  //que links while the winmgr task
+  //is updating the ode or screen.
+  Preempt;
 
   DocCursor;
   WinBorder;
@@ -294,24 +287,24 @@ U0 Span()
   Fs->win_inhibit|=WIG_DBL_CLICK;
 
   MenuPush(
-"File {"
-"  New(,CH_CTRLN);"
-"  Open(,CH_CTRLO);"
-"  SaveAs(,CH_CTRLA);"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Play {"
-"  Restart(,'\n');"
-"  RunStop(,CH_SPACE);"
-"  Mass(,'m');"
-"  Concrete(,'c');"
-"  Steel(,'s');"
-"  Wire(,'w');"
-"  Move(,'v');"
-"  Delete(,'d');"
-"}"
-  );
+	"File {"
+	"  New(,CH_CTRLN);"
+	"  Open(,CH_CTRLO);"
+	"  SaveAs(,CH_CTRLA);"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  RunStop(,CH_SPACE);"
+	"  Mass(,'m');"
+	"  Concrete(,'c');"
+	"  Steel(,'s');"
+	"  Wire(,'w');"
+	"  Move(,'v');"
+	"  Delete(,'d');"
+	"}"
+	);
 
   ode=NULL;
   Init(&a);
@@ -336,7 +329,8 @@ U0 Span()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_L_UP|1<<MSG_KEY_DOWN|1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|
+	    1<<MSG_IP_L_UP|1<<MSG_KEY_DOWN|1<<MSG_IP_MOVE);
       DCFill(dc);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:

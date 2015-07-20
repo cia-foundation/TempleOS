@@ -49,7 +49,8 @@ TourPut(
 "The $$RED$$RED$$FG$$ filenames listed are file links.  Left-clicking will "
 "edit/view them.  Right-clicking or pressing $$GREEN$$<ENTER>$$FG$$ when the "
 "cursor is on top will bring-up a menu of options.\n\n"
-"The $$LTBLUE$$BLUE$$FG$$ underline entries \"$$LTBLUE$$.$$FG$$\" and \"$$LTBLUE$$..$$FG$$\""
+"The $$LTBLUE$$BLUE$$FG$$ underline entries \"$$LTBLUE$$.$$FG$$\" "
+"and \"$$LTBLUE$$..$$FG$$\""
 "are macros and will change directories.\n",TRUE);
 
 TourPut(

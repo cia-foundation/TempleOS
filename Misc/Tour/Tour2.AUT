@@ -92,7 +92,7 @@ TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 TourPut(
-"Explore the $$RED$$$$TX+L+PU+UL,\"DemoIndex\",A=\"FI:::/Doc/DemoIndex.TXT\"$$$$FG$$.  "
+"Explore the $$RED$$$TX+L+PU+UL,"DemoIndex",A="FI:::/Doc/DemoIndex.TXT"$$$FG$$.  "
 "You'll find it on your menu.  It's arranged by difficulty.  "
 "Hit $$GREEN$$<SPACE>$$FG$$ on a demo index listing "
 "and $$GREEN$$<F5>$$FG$$ to run from the editor.\n",TRUE);

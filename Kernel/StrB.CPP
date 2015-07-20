@@ -140,7 +140,8 @@ ScanFlags(&flags,"R\0L\0Dump\0Scan\0","+Dump-R"); //Sets Bit#2, Clears Bit#0.
 	src++;
 	if (*src) {
 	  ptr=buf;
-	  while (*src && *src!='+' && *src!='-' && *src!=CH_SPACE && *src!=CH_SHIFT_SPACE)
+	  while (*src && *src!='+' && *src!='-' &&
+		*src!=CH_SPACE && *src!=CH_SHIFT_SPACE)
 	    *ptr++=*src++;
 	  *ptr=0;
 	  i=LstMatch(buf,lst);
@@ -155,7 +156,8 @@ ScanFlags(&flags,"R\0L\0Dump\0Scan\0","+Dump-R"); //Sets Bit#2, Clears Bit#0.
 	src++;
 	if (*src) {
 	  ptr=buf;
-	  while (*src && *src!='+' && *src!='-' && *src!=CH_SPACE && *src!=CH_SHIFT_SPACE)
+	  while (*src && *src!='+' && *src!='-' &&
+		*src!=CH_SPACE && *src!=CH_SHIFT_SPACE)
 	    *ptr++=*src++;
 	  *ptr=0;
 	  i=LstMatch(buf,lst);

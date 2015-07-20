@@ -36,13 +36,13 @@ class Obj
   U16 flags;
   I16 squadron,member_num;
   F64 x,y,é,dé,
-      speed,turn_rate,
-      life_percent,
-      target_x,target_y,
-      ship_guns,ship_guns_range,
-      air_guns,air_guns_range,
-      fuel,max_fuel,fuel_burn_rate,
-      death_time,next_action_time;
+	speed,turn_rate,
+	life_percent,
+	target_x,target_y,
+	ship_guns,ship_guns_range,
+	air_guns,air_guns_range,
+	fuel,max_fuel,fuel_burn_rate,
+	death_time,next_action_time;
   I32 torpedos,max_torpedos;
   F64 torpedos_range;
   U8  fire[(FIRE_WIDTH*FIRE_HEIGHT+7)/8];
@@ -100,7 +100,7 @@ Obj *ObjFind(F64 x,F64 y,
   F64 dd,best_dd=MAX_F64;
   while (tempo!=&obj_root) {
     if (tempo->flags&flag_mask==flag_val &&
-	Bt(&type_mask,tempo->type)&&Bt(&player_mask,tempo->player)) {
+	  Bt(&type_mask,tempo->type)&&Bt(&player_mask,tempo->player)) {
       dd=Sqr(tempo->x-x)+Sqr(tempo->y-y);
       if (dd<best_dd) {
 	best=tempo;
@@ -162,7 +162,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   F64 d,cur_time=tS;
   Obj *tempo;
   Torpedo *tempt;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   tempt=torpedo_root.next;
   while (tempt!=&torpedo_root) {
@@ -174,17 +174,21 @@ U0 DrawIt(CTask *task,CDC *dc)
   tempo=obj_root.next;
   while (tempo!=&obj_root) {
     if (tempo->flags&OF_ACTIVE && tempo->flags&OF_SHIP) {
-      SpriteZ3B(dc,tempo->x,tempo->y,0,imgs[tempo->player][tempo->type],tempo->é+ã/2);
+      SpriteZ3B(dc,tempo->x,tempo->y,0,
+	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
 
       k=0;
       for (j=0;j<FIRE_HEIGHT;j++)
 	for (i=0;i<FIRE_WIDTH;i++)
 	  if (Bt(tempo->fire,k++)) {
 	    dc->color=fire_colors[ToI64(k+10*tS)&(FIRE_COLORS-1)];
-	    GrPlot(dc,tempo->x+FIRE_X_SCALE*(i-FIRE_WIDTH /2+(11*tS+i)%1.7)*Cos(tempo->é)-
-			       FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(12*tS+j)%1.7)*Sin(tempo->é),
-		      tempo->y+FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(19*tS+j)%1.7)*Cos(tempo->é)+
-			       FIRE_X_SCALE*(i-FIRE_WIDTH /2+(13*tS+i)%1.7)*Sin(tempo->é));
+	    GrPlot(dc,
+		  tempo->x+FIRE_X_SCALE*(i-FIRE_WIDTH /2+(11*tS+i)%1.7)
+	    *Cos(tempo->é)-
+		  FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(12*tS+j)%1.7)*Sin(tempo->é),
+		  tempo->y+FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(19*tS+j)%1.7)
+	    *Cos(tempo->é)+
+		  FIRE_X_SCALE*(i-FIRE_WIDTH /2+(13*tS+i)%1.7)*Sin(tempo->é));
 	  }
       if (Blink) {
 	dc->color=BLACK;
@@ -197,7 +201,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    dc->color=YELLOW;
 	  else
 	    dc->color=GREEN;
-	  GrLine(dc,tempo->x+5,tempo->y,tempo->x+5+10*tempo->life_percent/100,tempo->y);
+	  GrLine(dc,tempo->x+5,tempo->y,
+		tempo->x+5+10*tempo->life_percent/100,tempo->y);
 	}
 
 	dc->color=BLACK;
@@ -220,7 +225,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   tempo=obj_root.next;
   while (tempo!=&obj_root) {
     if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_SHIP))
-      SpriteZ3B(dc,tempo->x,tempo->y,0,imgs[tempo->player][tempo->type],tempo->é+ã/2);
+      SpriteZ3B(dc,tempo->x,tempo->y,0,
+	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
     if (tempo->flags&OF_SHOOTING) {
       dc->color=LTRED;
       GrLine(dc,tempo->x,tempo->y,tempo->target_x,tempo->target_y,3);
@@ -231,23 +237,29 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->flags|=DCF_TRANSFORMATION;
   if (cur_time<launch_t) {
     dc->color=LTGREEN;
-    GrArrow3(dc,launch_unit_x1,launch_unit_y1,0,launch_unit_x2,launch_unit_y2,0);
+    GrArrow3(dc,launch_unit_x1,launch_unit_y1,0,
+	  launch_unit_x2,launch_unit_y2,0);
   }
   if (cur_time<return_t) {
     dc->color=LTRED;
-    GrArrow3(dc,return_unit_x1,return_unit_y1,0,return_unit_x2,return_unit_y2,0);
+    GrArrow3(dc,return_unit_x1,return_unit_y1,0,
+	  return_unit_x2,return_unit_y2,0);
   }
   if (cur_time<set_é_t) {
     dc->color=YELLOW;
-    GrArrow3(dc,set_é_unit_x1,set_é_unit_y1,0,set_é_unit_x2,set_é_unit_y2,0);
+    GrArrow3(dc,set_é_unit_x1,set_é_unit_y1,0,
+	  set_é_unit_x2,set_é_unit_y2,0);
   }
 
   dc->color=YELLOW;
-  GrPrint(dc,-task->scroll_x,-task->scroll_y,"Game Speed: %5.2f",game_speed);
+  GrPrint(dc,-task->scroll_x,-task->scroll_y,
+	"Game Speed: %5.2f",game_speed);
   dc->color=LTCYAN;
-  GrPrint(dc,-task->scroll_x,-task->scroll_y+	FONT_HEIGHT,"Player 1: %d",num_alive[0]);
+  GrPrint(dc,-task->scroll_x,-task->scroll_y+FONT_HEIGHT,
+	"Player 1: %d",num_alive[0]);
   dc->color=LTPURPLE;
-  GrPrint(dc,-task->scroll_x,-task->scroll_y+2*FONT_HEIGHT,"Player 2: %d",num_alive[1]);
+  GrPrint(dc,-task->scroll_x,-task->scroll_y+2*FONT_HEIGHT,
+	"Player 2: %d",num_alive[1]);
 
   if ((!num_alive[0]||!num_alive[1]) && Blink) {
     if (!num_alive[1]) {
@@ -266,7 +278,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 U0 Init()
 {
   I64 i,fighter,ship,player,squadron,
-      w=Fs->pix_width,h=Fs->pix_height;
+	w=Fs->pix_width,h=Fs->pix_height;
   Squadron *temps;
   Obj *tempo,*tempo1;
   QueInit(&obj_root);
@@ -322,7 +334,8 @@ U0 Init()
       tempo1->next_action_time=0;
       QueIns(tempo1,obj_root.last);
 
-      for (squadron=0;squadron<num_squadrons_per_carrier[player];squadron++,num_squadrons++) {
+      for (squadron=0;squadron<num_squadrons_per_carrier[player];
+	    squadron++,num_squadrons++) {
 	for (fighter=0;fighter<num_planes_per_squadron[player];fighter++) {
 	  tempo=CAlloc(sizeof(Obj));
 	  num_alive[player]++;
@@ -368,7 +381,8 @@ U0 CleanUp()
   Free(squadrons);
 }
 
-Obj *ObjLaunch(I64 player,I64 squadron=-1,Obj *host=NULL,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
+Obj *ObjLaunch(I64 player,I64 squadron=-1,
+	Obj *host=NULL,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 {
   Obj *tempo;
   F64 cur_time=tS;
@@ -379,9 +393,12 @@ Obj *ObjLaunch(I64 player,I64 squadron=-1,Obj *host=NULL,F64 x=MAX_F64,F64 y=MAX
       é=Arg(x-host->x,y-host->y);
     tempo=obj_root.next;
     while (tempo!=&obj_root) {
-      if (tempo->host==host && (squadron<0||tempo->squadron==squadron) && !(tempo->flags&OF_ACTIVE) &&
-	(tempo->squadron<0||squadrons[tempo->squadron].action==SA_PARKED||squadrons[tempo->squadron].action==SA_LAUNCHING)) {
-	if (tempo->fuel<=0.0) //When low on fuel, not zero, gets launched and captured.
+      if (tempo->host==host && (squadron<0||tempo->squadron==squadron) &&
+	    !(tempo->flags&OF_ACTIVE) &&
+	    (tempo->squadron<0||squadrons[tempo->squadron].action==SA_PARKED||
+	    squadrons[tempo->squadron].action==SA_LAUNCHING)) {
+	if (tempo->fuel<=0.0)
+//When low on fuel, not zero, gets launched and captured.
 	  LBts(&squadrons[tempo->squadron].dead_mask,tempo->member_num);
 	else {
 	  tempo->flags=tempo->flags&~OF_RETURNING|OF_ACTIVE;
@@ -461,7 +478,8 @@ Squadron *SquadronReturn(I64 player,F64 x,F64 y)
 Obj *ObjSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 {
   Obj *tempo;
-  if ((tempo=ObjFind(x,y,,,,1<<player)) && tempo->flags&OF_ACTIVE && !(tempo->flags&OF_RETURNING)) {
+  if ((tempo=ObjFind(x,y,,,,1<<player)) && tempo->flags&OF_ACTIVE &&
+	!(tempo->flags&OF_RETURNING)) {
     if (é==MAX_F64)
       é=Arg(x-tempo->x,y-tempo->y);
     tempo->dé+=Wrap(é-(tempo->é+tempo->dé),-ã);
@@ -553,7 +571,8 @@ U0 AI(I64 player,F64 period)
     if (tempo->player==player) {
       if (tempo->type==OT_CARRIER && Rand<5*period)
 	SquadronLaunch(player,tempo->x,tempo->y);
-      if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_RETURNING) && Rand<10.0*period)
+      if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_RETURNING) &&
+	    Rand<10.0*period)
 	SquadronSeté(player,tempo->x,tempo->y,tempo->é+pi/2*(Rand-0.5));
     }
     tempo=tempo->next;
@@ -607,7 +626,8 @@ U0 Combat(F64 period)
   while (tempo!=&obj_root) {
     tempo->flags&=~OF_SHOOTING;
     if (tempo->flags&OF_ACTIVE &&
-      (tempo1=ObjFind(tempo->x,tempo->y,OF_ACTIVE,OF_ACTIVE,,1<<(tempo->player^1),&d))) {
+	  (tempo1=ObjFind(tempo->x,tempo->y,OF_ACTIVE,OF_ACTIVE,,
+	  1<<(tempo->player^1),&d))) {
       tempo->target_x=tempo1->x;
       tempo->target_y=tempo1->y;
       if (tempo1->flags&OF_SHIP) {
@@ -656,8 +676,9 @@ U0 Combat(F64 period)
   while (tempo!=&obj_root) {
     tempo1=tempo->next;
     if (tempo->type==OT_FIGHTER &&
-	(tempo->life_percent<=0.0 || tempo->flags&OF_ACTIVE && tempo->fuel<=0.0 ||
-	 tempo->host && !(tempo->flags&OF_ACTIVE) && tempo->host->life_percent<=0.0))
+	  (tempo->life_percent<=0.0 || tempo->flags&OF_ACTIVE &&
+	  tempo->fuel<=0.0 || tempo->host &&
+	  !(tempo->flags&OF_ACTIVE) && tempo->host->life_percent<=0.0))
       ObjDel(tempo);
     tempo=tempo1;
   }
@@ -746,7 +767,8 @@ U0 AnimateTask(I64)
 	  } else if (d>tempo->fuel-250)
 	    tempo->flags|=OF_RETURNING;
 	  if (tempo->flags&OF_RETURNING)
-	    tempo->dé+=Wrap(Arg(tempo->host->x-tempo->x,tempo->host->y-tempo->y)-(tempo->é+tempo->dé),-ã);
+	    tempo->dé+=Wrap(Arg(tempo->host->x-tempo->x,
+		  tempo->host->y-tempo->y)-(tempo->é+tempo->dé),-ã);
 	} else if (tempo->type==OT_CARRIER)
 	  ShipFix(tempo,2.5*period);
       }
@@ -771,28 +793,29 @@ U0 FlatTops()
   DocCursor;
   DocClear;
   PopUpOk("$$GREEN$${Left-Mouse}$$FG$$\t\tChange Course\n"
-	  "$$GREEN$${Right-Mouse}$$FG$$\t\tLaunch Squadron\n"
-	  "$$GREEN$${Right-Double-Mouse}$$FG$$\tReturn Squadron\n"
-	  "$$GREEN$${Ctrl-Left Grab}$$FG$$\tScroll Screen\n");
-  Preempt(OFF),
-  MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Play {"
-"  Restart(,'\n');"
-"  Faster(,'+');"
-"  Slower(,'-');"
-"}"
-);
+	"$$GREEN$${Right-Mouse}$$FG$$\t\tLaunch Squadron\n"
+	"$$GREEN$${Right-Double-Mouse}$$FG$$\tReturn Squadron\n"
+	"$$GREEN$${Ctrl-Left Grab}$$FG$$\tScroll Screen\n");
+  Preempt,
+	MenuPush(
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Faster(,'+');"
+	"  Slower(,'-');"
+	"}"
+	);
   Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R;
   Init;
   Fs->draw_it=&DrawIt;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   try {
     while (TRUE)
-      switch(GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|1<<MSG_IP_R_D_UP)) {
+      switch(GetMsg(&a1,&a2,
+	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|1<<MSG_IP_R_D_UP)) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {
 	    case '\n':

@@ -29,9 +29,9 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
   CFile *in_file;
   U8 *buf=MAlloc(CD_BLK_SIZE),*ptr1,*ptr2;
   CISO1DirEntry *dir_blk_buf =CAlloc(CD_BLK_SIZE*128),
-		*de =dir_blk_buf, *de1,
-		*dir_blk_buf2=CAlloc(CD_BLK_SIZE*128),
-		*de2=dir_blk_buf2,*de12;
+	*de =dir_blk_buf, *de1,
+	*dir_blk_buf2=CAlloc(CD_BLK_SIZE*128),
+	*de2=dir_blk_buf2,*de12;
   I64 i,n;
 
   tempc=parent->user_data;
@@ -87,7 +87,8 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
     de1=de;
     de12=de2;
     if (tempde1->attr & RS_ATTR_DIR) {
-      n=CDFileCreate2(out_file,tempde1,de,de2,_cur_blk,tempde,write,stage2_filename,_stage2_blk);
+      n=CDFileCreate2(out_file,tempde1,de,de2,_cur_blk,
+	    tempde,write,stage2_filename,_stage2_blk);
       de(U8 *)+=sizeof(CISO1DirEntry)-1+n;
       de2(U8 *)+=sizeof(CISO1DirEntry)-1+n<<1;
     } else {
@@ -145,20 +146,22 @@ I64 CDFileCreate2(CFile *out_file,CDirEntry *tempde,
       FClose(in_file);
     }
     if ((de1(U8 *)-dir_blk_buf(U8 *))/CD_BLK_SIZE!=
-	(de(U8 *) -dir_blk_buf(U8 *))/CD_BLK_SIZE) {
+	  (de(U8 *) -dir_blk_buf(U8 *))/CD_BLK_SIZE) {
       i=de1->len;
       MemCpy(buf,de1,i);
       MemSet(de1,0,i);
-      de=dir_blk_buf(U8 *)+(de(U8 *)-dir_blk_buf(U8 *))/CD_BLK_SIZE*CD_BLK_SIZE;
+      de=dir_blk_buf(U8 *)+(de(U8 *)
+      -dir_blk_buf(U8 *))/CD_BLK_SIZE*CD_BLK_SIZE;
       MemCpy(de,buf,i);
       de(U8 *)+=i;
     }
     if ((de12(U8 *)-dir_blk_buf2(U8 *))/CD_BLK_SIZE!=
-	(de2(U8 *) -dir_blk_buf2(U8 *))/CD_BLK_SIZE) {
+	  (de2(U8 *) -dir_blk_buf2(U8 *))/CD_BLK_SIZE) {
       i=de12->len;
       MemCpy(buf,de12,i);
       MemSet(de12,0,i);
-      de2(U8 *)=dir_blk_buf2(U8 *)+(de2(U8 *)-dir_blk_buf2(U8 *))/CD_BLK_SIZE*CD_BLK_SIZE;
+      de2(U8 *)=dir_blk_buf2(U8 *)+(de2(U8 *)
+      -dir_blk_buf2(U8 *))/CD_BLK_SIZE*CD_BLK_SIZE;
       MemCpy(de2,buf,i);
       de2(U8 *)+=i;
     }
@@ -250,14 +253,15 @@ I64 CDTableLen(CDirEntry *tempde,I64 *size1,I64 *size2,I64 cur_depth)
 
 U0 CDFillPathTable(CDirEntry *tempde,
   CISO1PathEntry **_itabbuf,CISO1PathEntry **_itabbuf2,
-  I64 parent_entry_num,Bool big_endian,I64 *first_free,I64 cur_level,I64 output_level)
+  I64 parent_entry_num,Bool big_endian,I64 *first_free,
+  I64 cur_level,I64 output_level)
 {
   U8 *ptr1,*ptr2;
   I64 i;
   CISO1PathEntry *tabbuf=*_itabbuf,*tabbuf2=*_itabbuf2;
   CDirEntry *tempde1=tempde->sub,*tempde2;
   CCCDUserData *tempc;
- 
+
   if (cur_level==output_level) {
     while (tempde1) {
       if (tempde1->attr & RS_ATTR_DIR) {
@@ -273,7 +277,8 @@ U0 CDFillPathTable(CDirEntry *tempde,
 	}
 	StrCpy(&tabbuf->name,tempde1->name);
 
-	tabbuf(U8 *)+=sizeof(CISO1PathEntry)-2+(StrLen(tempde1->name)+1) & -0x2;
+	tabbuf(U8 *)+=sizeof(CISO1PathEntry)-2+
+	      (StrLen(tempde1->name)+1) & -0x2;
 
 	tabbuf2->name_len=StrLen(tempde1->name)<<1;
 	if (big_endian) {
@@ -290,7 +295,7 @@ U0 CDFillPathTable(CDirEntry *tempde,
 	  *ptr1++=*ptr2++;
 	}
 	tabbuf2(U8 *)+=sizeof(CISO1PathEntry)-2+
-	  StrLen(tempde1->name)<<1;
+	      StrLen(tempde1->name)<<1;
 	*first_free+=1;
       }
       tempde1=tempde1->next;
@@ -304,7 +309,7 @@ U0 CDFillPathTable(CDirEntry *tempde,
     if (tempde1->attr & RS_ATTR_DIR) {
       tempc=tempde1->user_data;
       CDFillPathTable(tempde1,_itabbuf,_itabbuf2,tempc->path_entry_num,
-	 big_endian,first_free,cur_level+1,output_level);
+	    big_endian,first_free,cur_level+1,output_level);
     }
     tempde1=tempde2;
   }
@@ -323,24 +328,23 @@ class CElTorito
   U8 zero2[20];
 };
 
-public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=NULL,
-		  U8 *_stage2_filename=NULL)
+public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
+	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL)
 {//See $LK,"::/Misc/MakeDistro.CPP"$
 //Use "C:/Distro/*" if you want all files in the C:/Distro directory.
-//Default flags are "+r" recurse.
+  //Default flags are "+r" recurse.
   CISO1PriDesc *iso_pri=CAlloc(CD_BLK_SIZE),
-	       *iso_boot=CAlloc(CD_BLK_SIZE),
-	       *iso_sup=CAlloc(CD_BLK_SIZE),
-	       *iso_term=CAlloc(CD_BLK_SIZE);
+	*iso_boot=CAlloc(CD_BLK_SIZE),
+	*iso_sup=CAlloc(CD_BLK_SIZE),
+	*iso_term=CAlloc(CD_BLK_SIZE);
   CDirEntry *rootdir=CAlloc(sizeof(CDirEntry));
-  I64 i,j,stage2_blk=(CD_FILE_OFFSET+1<<2+CD_BOOT_LOADER_SIZE/BLK_SIZE)>>2,stage2_size,
-      cur_blk=0,tabsize,tabsize2,first_free,max_depth,
-      fuf_flags=0;
+  I64 i,j,stage2_blk=(CD_FILE_OFFSET+1<<2+CD_BOOT_LOADER_SIZE/BLK_SIZE)>>2,
+	stage2_size,cur_blk=0,tabsize,tabsize2,first_free,max_depth,fuf_flags=0;
   U32 *d;
   CElTorito *et=CAlloc(CD_BLK_SIZE);
   U8 *filename,*stage2_filename,
-     *stage1_buf=CAlloc(CD_BOOT_LOADER_SIZE),
-     *zero_buf=CAlloc(CD_BLK_SIZE);
+	*stage1_buf=CAlloc(CD_BOOT_LOADER_SIZE),
+	*zero_buf=CAlloc(CD_BLK_SIZE);
   CISO1PathEntry *tabbuf=NULL,*tabbuf2=NULL,*itabbuf,*itabbuf2;
   CFile *out_file=NULL;
   CISO1DirEntry *tempi;
@@ -369,9 +373,9 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   if (stage2_filename) //preboot and bootloader
     cur_blk+=1+CD_BOOT_LOADER_SIZE/CD_BLK_SIZE;
   CDFileCreate2(out_file,rootdir,
-    &iso_pri->root_dir_record,
-    &iso_sup->root_dir_record,
-    &cur_blk,rootdir,FALSE,stage2_filename,&stage2_blk);
+	&iso_pri->root_dir_record,
+	&iso_sup->root_dir_record,
+	&cur_blk,rootdir,FALSE,stage2_filename,&stage2_blk);
   tabsize=sizeof(CISO1PathEntry);
   tabsize2=sizeof(CISO1PathEntry);
   max_depth=CDTableLen(rootdir,&tabsize,&tabsize2,1);
@@ -437,7 +441,8 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
   }
 
   CDFileCreate2(out_file,rootdir,&iso_pri->root_dir_record,
-      &iso_sup->root_dir_record,&cur_blk,rootdir,TRUE,stage2_filename,&stage2_blk);
+	&iso_sup->root_dir_record,&cur_blk,rootdir,TRUE,
+	stage2_filename,&stage2_blk);
 
   tabbuf=CAlloc(tabsize*CD_BLK_SIZE);
   iso_pri->type_l_path_table=cur_blk;
@@ -503,15 +508,16 @@ public I64 CDFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,U8 *fu_flags=
     MemCpy(stage1_buf,BCD_START,BCD_END-BCD_START);
     *(BCD_BLK_CNT-BCD_START+stage1_buf)(U16 *)=stage2_size;
     *(BCD_BLK_LO -BCD_START+stage1_buf)(U32 *)=stage2_blk;
-    "$$RED$$!!! Boot Stage 2 !!! %X-%X$$FG$$\n",stage2_blk,stage2_blk+stage2_size-1;
+    "$$RED$$!!! Boot Stage 2 !!! %X-%X$$FG$$\n",
+	  stage2_blk,stage2_blk+stage2_size-1;
     FWBlks(out_file,stage1_buf,
-      CD_FILE_OFFSET+1<<2,CD_BOOT_LOADER_SIZE/BLK_SIZE);
+	  CD_FILE_OFFSET+1<<2,CD_BOOT_LOADER_SIZE/BLK_SIZE);
   } else {
     FWBlks(out_file,iso_sup,17<<2,4);
     FWBlks(out_file,iso_term,18<<2,4);
   }
 
-cf_done:
+  cf_done:
   FClose(out_file);
   Free(tabbuf);
   Free(tabbuf2);

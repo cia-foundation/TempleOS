@@ -31,7 +31,7 @@ $FG,2$"%h*c",25,'\n';$FG$ 25 new-lines.
 
 $FG,2$"%F"$FG$ text file.
 
-$FG,2$"%dv"$FG$ ptr.
+$FG,2$"%p"$FG$ ptr.
 
 $FG,2$"%P"$FG$ link to ptr.
 

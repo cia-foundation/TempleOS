@@ -28,7 +28,7 @@ U0 TurtlePlot(CDC *dc,Turtle *t,CColorROPU16 edge,CColorROPU16 middle)
   if (w<0) w=0;
   dc->color=middle;
   GrLine3(dc,t->x+w*Cos(t->é+ã/2),t->y+w*Sin(t->é+ã/2),t->z,
-	     t->x+w*Cos(t->é-ã/2),t->y+w*Sin(t->é-ã/2),t->z);
+	t->x+w*Cos(t->é-ã/2),t->y+w*Sin(t->é-ã/2),t->z);
   w=t->w/2.0;
   dc->color=edge;
   GrPlot3(dc,t->x+w*Cos(t->é+ã/2),t->y+w*Sin(t->é+ã/2),t->z);
@@ -113,7 +113,7 @@ U0 DrawIt(CTask *,CDC *dc)
 U0 SetMenu()
 {
   I64 i;
-  U8 buf[64];
+  U8 buf[STR_LEN];
   CMenuEntry *tempse;
   for (i=0;i<=9;i++) {
     StrPrint(buf,"Settings/Layer%d",i);
@@ -137,7 +137,7 @@ U0 Lattice()
   Bool aim=FALSE;
   I64 a1,a2;
   CDC  *dc=DCAlias;
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -169,7 +169,7 @@ U0 Lattice()
 	"}"
 	);
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Preempt(OFF);
+  Preempt;
   WinMax;
   AutoComplete;
   WinBorder;
@@ -177,7 +177,8 @@ U0 Lattice()
   DocCursor;
   TurtleInit(&tt);
   SetMenu;
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS_TASK_MENU-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_FOCUS_TASK_MENU
+	-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL;
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {

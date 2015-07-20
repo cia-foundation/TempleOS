@@ -1,4 +1,4 @@
-#help_index "AutoFile;Training"
+#help_index "AutoFile;Help System/Training"
 
 public U0 AFGetStr(U8 *st)
 {//Wait for user to type certain str.
@@ -7,8 +7,8 @@ public U0 AFGetStr(U8 *st)
   while (*st) {
     ch=GetKey(&sc,FALSE);
     if (sc.u8[0]!=SC_SHIFT &&
-	sc.u8[0]!=SC_ALT &&
-	sc.u8[0]!=SC_CTRL) {
+	  sc.u8[0]!=SC_ALT &&
+	  sc.u8[0]!=SC_CTRL) {
       if (ch==*st) {
 	'' ch;
 	st++;
@@ -36,13 +36,13 @@ public U0 AFPrint(I64 mS=100,U8 *fmt,...)
 public U0 AFGetKey(I64 scan_code,I64 sc_mask=0xFF|SCF_SHIFT|SCF_CTRL|SCF_ALT)
 {//Wait for user to press certain key.
   I64 sc,ch;
-  U8 buf[128],*st;
+  U8 buf[STR_LEN],*st;
   do {
     ch=GetKey(&sc);
     if (sc.u8[0]!=SC_PRTSCRN1 &&
-	!(sc.u8[0]==SC_SHIFT && scan_code&SCF_SHIFT) &&
-	!(sc.u8[0]==SC_CTRL && scan_code&SCF_CTRL) &&
-	!(sc.u8[0]==SC_ALT && scan_code&SCF_ALT) ) {
+	  !(sc.u8[0]==SC_SHIFT && scan_code&SCF_SHIFT) &&
+	  !(sc.u8[0]==SC_CTRL && scan_code&SCF_CTRL) &&
+	  !(sc.u8[0]==SC_ALT && scan_code&SCF_ALT) ) {
       if (sc&sc_mask!=scan_code&sc_mask) {
 	st=ScanCode2KeyName(scan_code);
 	StrPrint(buf,"Press the $$GREEN$$<%s>$$FG$$ key",st);
@@ -113,7 +113,8 @@ Bool AFSetIPPlot(I64 mS,I64 x,I64 y,I64 z)
   return TRUE;
 }
 
-public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64)
+public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
+		I64 l=MAX_I64,I64 r=MAX_I64)
 {//Move input pointer (mouse) to spot at certain speed.
   if (!(0<=x<GR_WIDTH))
     x=ip.pos.x;

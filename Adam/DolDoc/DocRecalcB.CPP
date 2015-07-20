@@ -17,7 +17,7 @@ I64 DocWordWrapDel(CDoc *doc,CDocEntry *doc_e,
       if (doc_e2->type_u8==DOCT_SOFT_NEW_LINE && !same_win) {
 	if (doc->cur_entry==doc_e2) {
 	  doc->cur_entry=doc_e2->next;
-	  doc->cur_data_col=doc->cur_entry->min_col;
+	  doc->cur_col=doc->cur_entry->min_col;
 	}
 	if (*_best_doc_e==doc_e2) {
 	  *_best_doc_e=doc_e2->next;
@@ -34,7 +34,7 @@ I64 DocWordWrapDel(CDoc *doc,CDocEntry *doc_e,
 	doc_e->tag=ptr;
 	if (doc->cur_entry==doc_e2) {
 	  doc->cur_entry=doc_e;
-	  doc->cur_data_col+=k;
+	  doc->cur_col+=k;
 	}
 	if (*_best_doc_e==doc_e2) {
 	  *_best_doc_e=doc_e;
@@ -94,7 +94,7 @@ U0 DocRecalcXY(CDoc *doc,CDocEntry *doc_e,
     doc->page_line_num+=y-i;
     if (doc->page_line_num<0)
       doc->page_line_num=doc_e->settings.page_len+
-	doc->page_line_num%doc_e->settings.page_len;
+	    doc->page_line_num%doc_e->settings.page_len;
     else
       doc->page_line_num=doc->page_line_num%doc_e->settings.page_len;
     if (doc_e->settings.header!=DOC_DFT &&
@@ -112,7 +112,8 @@ U0 DocRecalcXY(CDoc *doc,CDocEntry *doc_e,
 	}
       }
     } else {
-      if (doc->page_line_num>=doc_e->settings.page_len-doc_e->settings.footer) {
+      if (doc->page_line_num>=
+	    doc_e->settings.page_len-doc_e->settings.footer) {
 	y+=doc_e->settings.footer;
 	if (doc_e->settings.header==DOC_DFT)
 	  doc->page_line_num=0;
@@ -137,10 +138,10 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
   ii=x+1-doc_e->settings.left_margin;
   if (IsEditableText(doc_e)) {
     if (doc->cur_entry==doc_e->next) {
-      if (doc->cur_data_col==doc_e->next->min_col)
+      if (doc->cur_col==doc_e->next->min_col)
 	i--;
     } else {
-      if (doc->cur_entry==doc_e && doc->cur_data_col==i)
+      if (doc->cur_entry==doc_e && doc->cur_col==i)
 	i--;
     }
     if (*_k>i) {
@@ -154,9 +155,9 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
 	doc_e2=MAllocIdentical(doc_e,doc->mem_task);
 	doc_e2->tag=StrNew(doc_e->tag+i,doc->mem_task);
 	QueIns(doc_e2,doc_e);
-	if (doc->cur_entry==doc_e && doc->cur_data_col>=i) {
+	if (doc->cur_entry==doc_e && doc->cur_col>=i) {
 	  doc->cur_entry=doc_e2;
-	  doc->cur_data_col=doc->cur_data_col-i;
+	  doc->cur_col=doc->cur_col-i;
 	}
 	doc_e->tag[i]=0;
 	ptr=StrNew(doc_e->tag,doc->mem_task);
@@ -164,7 +165,8 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
 	doc_e->tag=ptr;
 	doc_e2=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
 	doc_e2->type=DOCT_SOFT_NEW_LINE | doc_e->type & 0xFFFFFF00;
-	doc_e2->de_flags=doc_e->de_flags&~DOCEF_TAG|doldoc.dft_de_flags[DOCT_SOFT_NEW_LINE];
+	doc_e2->de_flags=doc_e->de_flags
+	      &~DOCEF_TAG|doldoc.dft_de_flags[DOCT_SOFT_NEW_LINE];
 	doc_e2->x=x;
 	doc_e2->y=y;
 	doc_e2->page_line_num=doc_e->page_line_num;
@@ -185,7 +187,8 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
       doc_e2=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
       doc_e2->type=DOCT_SOFT_NEW_LINE | doc_e->type & 0xFFFFFF00;
       doc_e2->de_flags=DOCEF_WORD_WRAP|doldoc.dft_de_flags[DOCT_SOFT_NEW_LINE]|
-	    doc_e->de_flags & (DOCEF_HIGHLIGHT|DOCG_BL_IV_UL|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP);
+	    doc_e->de_flags&(DOCEF_HIGHLIGHT|DOCG_BL_IV_UL|
+	    DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP);
       doc_e2->x=x;
       doc_e2->y=y;
       doc_e2->page_line_num=doc_e->last->page_line_num;
@@ -202,7 +205,9 @@ I64 DocTempAttr(CDoc *doc,CDocEntry *doc_e,I64 cur_u8_attr)
   I64 temp_u32_attr;
   doc_e->de_flags=doc->flags& (DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT) |
 	doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT);
-  temp_u32_attr=(cur_u8_attr&0xF0)<<8|doc->flags&DOCG_BL_IV_UL|(doc_e->settings.shifted_x&0x1F)<<16|(doc_e->settings.shifted_y&0x1F)<<21;
+  temp_u32_attr=(cur_u8_attr&0xF0)<<8|
+	doc->flags&DOCG_BL_IV_UL|(doc_e->settings.shifted_x&0x1F)<<16|
+	(doc_e->settings.shifted_y&0x1F)<<21;
   if (doc_e->de_flags & DOCEF_HAS_BIN && *doc_e->tag=='<')
     temp_u32_attr.u8[1]|=DOC_COLOR_BIN;
   else
@@ -259,7 +264,7 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	find_cursor=FALSE,blink_flag,full_refresh=TRUE,unlock;
   CTask *win_task,*mem_task;
   CDC *dc;
-  U8 *bptr,*ptr,buf[136],ch;
+  U8 *bptr,*ptr,buf[STR_LEN],ch;
   U32 *u32_ptr,*hl;
   I32 *depth_buf=NULL;
   F64 cur_time=tS;
@@ -340,11 +345,12 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
   hss=&win_task->horz_scroll;
   vss=&win_task->vert_scroll;
   if (doc->flags&DOCF_BORDER_DOC) {
-    doc->cur_top_line_num=0;
+    doc->top_line_num=0;
     doc->line_start_col=0;
     has_cursor=FALSE;
     if (recalc==DOC_RECALC_TO_SCREEN)
-      doc->settings_root.cur_text_attr=doc->settings_root.dft_text_attr=win_task->border_attr;
+      doc->settings_root.cur_text_attr=
+	    doc->settings_root.dft_text_attr=win_task->border_attr;
   } else {
     if (has_cursor && full_refresh) {
       if (Bt(&hss->flags,WSSf_SET_TO_POS)||Bt(&vss->flags,WSSf_SET_TO_POS)) {
@@ -354,35 +360,37 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	    LBtr(&hss->flags,WSSf_SET_TO_POS);
 	  }
 	  if (Bt(&vss->flags,WSSf_SET_TO_POS)) {
-	    doc->cur_top_line_num=vss->pos;
+	    doc->top_line_num=vss->pos;
 	    LBtr(&vss->flags,WSSf_SET_TO_POS);
 	  }
 	}
 	doc->x=doc->line_start_col+width/2;
-	doc->y=doc->cur_top_line_num+height/2;
+	doc->y=doc->top_line_num+height/2;
 	find_cursor=TRUE;
       }
     }
     if (recalc==DOC_RECALC_TO_SCREEN)
-      doc->settings_root.cur_text_attr=doc->settings_root.dft_text_attr=win_task->text_attr;
+      doc->settings_root.cur_text_attr=
+	    doc->settings_root.dft_text_attr=win_task->text_attr;
   }
   x0=doc->line_start_col;
-  y0=doc->cur_top_line_num;
+  y0=doc->top_line_num;
   same_win=top	 ==doc->old_win_top &&
 	bottom==doc->old_win_bottom &&
 	left  ==doc->old_win_left &&
 	right ==doc->old_win_right &&
 	doc->cur_entry==doc->old_cur_entry &&
-	doc->cur_data_col==doc->old_cur_data_col;
+	doc->cur_col==doc->old_cur_col;
   if (recalc==DOC_RECALC_TO_SCREEN) {
     y_plot_top=y0-scroll_y/FONT_HEIGHT;
     y_plot_bottom=y0+height-1-scroll_y/FONT_HEIGHT;
-    if (!(doc->flags&DOCF_BORDER_DOC) && !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
+    if (!(doc->flags&DOCF_BORDER_DOC) &&
+	  !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
       DocBorderLstDraw(doc);
   }
 
-  if (doc->cur_data_col<=doc->cur_entry->min_col)
-    doc->cur_data_col=doc->cur_entry->min_col;
+  if (doc->cur_col<=doc->cur_entry->min_col)
+    doc->cur_col=doc->cur_entry->min_col;
   doc_e=doc->root.next;
   doc_e->de_flags&=~(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT);
   if (doc_e==doc->root.next)
@@ -404,7 +412,7 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
     best_doc_e=doc;
     best_col=0;
     doc->cur_entry=doc;
-    doc->cur_data_col=0;
+    doc->cur_col=0;
     doc_e=doc;
   }
   skipped_update= doc_e==doc && doc->root.next!=doc;
@@ -423,7 +431,7 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
       MemCpy(&doc_e->settings,s,sizeof(CDocSettings));
       s=&doc_e->settings;
       if (doc_e->de_flags & (DOCEF_TAG_CB|DOCEF_DEFINE) &&
-	 !(doc_e->de_flags & DOCEF_LST)) {
+	    !(doc_e->de_flags & DOCEF_LST)) {
 	Free(doc_e->tag);
 	if (doc_e->de_flags & DOCEF_TAG_CB) {
 	  if (doc_e->tag_cb)
@@ -431,17 +439,18 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	  else
 	    doc_e->tag=StrNew("",mem_task);
 	} else {
-	  if (temph=HashFind(doc_e->define_str,win_task->hash_table,HTT_DEFINE_STR))
+	  if (temph=HashFind(doc_e->define_str,
+		win_task->hash_table,HTT_DEFINE_STR))
 	    doc_e->tag=StrNew(temph->data,mem_task);
 	  else
 	    doc_e->tag=CAlloc(1,mem_task);
 	}
 	doc_e->max_col=StrLen(doc_e->tag);
-	if (doc->cur_entry==doc_e && doc->cur_data_col>=doc_e->max_col) {
+	if (doc->cur_entry==doc_e && doc->cur_col>=doc_e->max_col) {
 	  if (doc_e->max_col)
-	    doc->cur_data_col=doc_e->max_col-1;
+	    doc->cur_col=doc_e->max_col-1;
 	  else
-	    doc->cur_data_col=0;
+	    doc->cur_col=0;
 	}
       }
       k=DocWordWrapDel(doc,doc_e,full_refresh,same_win,
@@ -475,8 +484,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
       cursor_y=doc_e->y;
 
     if (doc_e->de_flags & DOCEF_REFRESH_DATA &&
-	(doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_CHECK_BOX ||
-	doc_e->de_flags & DOCEF_LST)) {
+	  (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_CHECK_BOX ||
+	  doc_e->de_flags & DOCEF_LST)) {
       DocDataFmt(doc,doc_e);
       k=StrLen(doc_e->tag);
     }
@@ -520,8 +529,9 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	  ijif>>=3;
 	  for (k=0;k<doc_e->scroll_len;k++) {
 	    ch=ptr[(ijif+k)%j];
-	    if (!Bt(chars_bitmap_displayable,ch)) ch='.';
-	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
+	    if (recalc==DOC_RECALC_TO_SCREEN &&
+		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
 		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
@@ -540,7 +550,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 	      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER)) {
 	  while (ch=*ptr++) {
-	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW))
+	    if (recalc==DOC_RECALC_TO_SCREEN &&
+		  !(doc_e->de_flags&DOCEF_DONT_DRAW))
 	      TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
 	    else
 	      if (find_cursor) {
@@ -558,8 +569,10 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	    hl=DocHighlight(doc_e,ptr,k,temp_u32_attr);
 	  else
 	    hl=NULL;
-	  if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
-	    if (y>y_plot_bottom) //Technically we should do this for scrolling_x, too.
+	  if (recalc==DOC_RECALC_TO_SCREEN &&
+		!(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+//Technically we should do this for scrolling_x, too.
+	    if (y>y_plot_bottom)
 	      more=TRUE;
 	    else if (y>=y_plot_top) {
 	      if (hl)
@@ -591,8 +604,9 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
     }
     nobound_switch (doc_e->type_u8) {
       case DOCT_TEXT:
-	if (!col2 && !(doc_e->de_flags&(DOCEF_TREE|DOCEF_LST|DOCEF_TAG_CB|DOCEF_DEFINE|
-	    DOCEF_HTML_LINK|DOCEF_BIN_PTR_LINK)))
+	if (!col2 && !(doc_e->de_flags
+	      &(DOCEF_TREE|DOCEF_LST|DOCEF_TAG_CB|DOCEF_DEFINE|
+	      DOCEF_HTML_LINK|DOCEF_BIN_PTR_LINK)))
 	  del_cl=TRUE;
 	break;
       case DOCT_HEX_ED:
@@ -608,7 +622,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	    StrPrint(buf,"%08tX ",bptr);
 	  ptr=buf;
 	  while (ch=*ptr++) {
-	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	    if (recalc==DOC_RECALC_TO_SCREEN &&
+		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
 		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
@@ -629,7 +644,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	    StrPrint(buf,"%02tX",*bptr++);
 	    ptr=buf;
 	    while (ch=*ptr++) {
-	      if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	      if (recalc==DOC_RECALC_TO_SCREEN &&
+		    !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 		if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
 		  TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
@@ -652,8 +668,9 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	  x+=(doc_e->hex_ed_width-k)*3;
 	  for (j=0;j<k;j++) {
 	    ch=*bptr++;
-	    if (!Bt(chars_bitmap_displayable,ch)) ch='.';
-	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
+	    if (recalc==DOC_RECALC_TO_SCREEN &&
+		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
 		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
@@ -679,7 +696,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 	      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER)) {
 	  while (x<k) {
-	    if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW))
+	    if (recalc==DOC_RECALC_TO_SCREEN &&
+		  !(doc_e->de_flags&DOCEF_DONT_DRAW))
 	      TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+CH_SPACE);
 	    if (find_cursor) {
 	      d2=DocCharDist(doc,x,y);
@@ -690,7 +708,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	  }
 	} else {
 	  k-=x;
-	  if (recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	  if (recalc==DOC_RECALC_TO_SCREEN &&
+		!(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	    if (y_plot_top<=y<=y_plot_bottom)
 	      TextLenStr(win_task,x-x0,y-y0,k,temp_u32_attr,"        ");
 	    x+=k;
@@ -709,8 +728,8 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
 	break;
       case DOCT_NEW_LINE:
       case DOCT_SOFT_NEW_LINE:
-	if (recalc==DOC_RECALC_TO_SCREEN &&
-	      !(doc_e->de_flags&DOCEF_DONT_DRAW)&& y_plot_top<=y<=y_plot_bottom)
+	if (recalc==DOC_RECALC_TO_SCREEN &&!(doc_e->de_flags&DOCEF_DONT_DRAW)&&
+	      y_plot_top<=y<=y_plot_bottom)
 	  TextLenAttr(win_task,x-x0,y-y0,width-(x-x0),cur_u8_attr<<8);
 	if (doc_e->de_flags&DOCEF_HIGHLIGHT) {
 	  if (s->state==DOCSS_CPP_Z_COMMENT)
@@ -856,7 +875,7 @@ rc_adjust_xy:
 	cur_u8_attr=cur_u8_attr&0xF0|DOC_COLOR_PMT;
 	if (y==cursor_y) {
 	  doc->cur_entry=doc_e->next;
-	  doc->cur_data_col=doc->cur_entry->min_col;
+	  doc->cur_col=doc->cur_entry->min_col;
 	}
 	break;
       case DOCT_WORD_WRAP:
@@ -898,14 +917,15 @@ rc_adjust_xy:
       case DOCT_CURSOR:
 	if (!find_cursor && !(doc->flags & DOCF_NO_CURSOR)) {
 	  doc->cur_entry=doc_e->next;
-	  doc->cur_data_col=doc->cur_entry->min_col;
+	  doc->cur_col=doc->cur_entry->min_col;
 	}
 	del_cl=TRUE;
 	break;
       case DOCT_SPRITE:
 	if (!doc_e->bin_data && doc->flags&DOCEF_HAS_BIN)
 	  doc_e->bin_data=DocBinFindNum(doc,doc_e->bin_num);
-	if ((tempb=doc_e->bin_data) && !tempb->tag && doc_e->tag && *doc_e->tag)
+	if ((tempb=doc_e->bin_data) &&
+	      !tempb->tag && doc_e->tag && *doc_e->tag)
 	  tempb->tag=StrNew(doc_e->tag,mem_task);
 	if (tempb && dc) {
 	  DCRst(dc);
@@ -926,14 +946,13 @@ rc_adjust_xy:
 	      i^=0xF;
 	    if (temp_u32_attr & DOCET_INVERT)
 	      i^=0xF;
-	    if (blink_flag && (doc_e==doc->cur_entry || temp_u32_attr&DOCET_BLINK))
+	    if (blink_flag &&
+		  (doc_e==doc->cur_entry || temp_u32_attr&DOCET_BLINK))
 	      i^=0xF;
 	  }
 	  dc->color=i;
 	  if (find_cursor)
 	    dc->flags|=DCF_LOCATE_NEAREST;
-	  dc->nearest_sprite_elem_num=0;
-	  dc->nearest_dist=MAX_I64;
 	  if (recalc==DOC_RECALC_TO_SCREEN && doc->cur_sprite==bptr) {
 	    dc->flags|=DCF_LOCATE_NEAREST;
 	    dc->cur_x=ip.pos.x;
@@ -955,13 +974,14 @@ rc_adjust_xy:
 	  }
 	  if (ii&(1<<SPT_MESH|1<<SPT_SHIFTABLE_MESH)) {
 	    if (!depth_buf) {
-	      DCAllocDepthBuf(dc);
+	      DCDepthBufAlloc(dc);
 	      depth_buf=dc->depth_buf;
 	    } else
 	      dc->depth_buf=depth_buf;
-	    GrRotZEqu(dc->r,cur_time*3.1);
-	    GrRotYEqu(dc->r,cur_time*1.9);
-	    GrRotXEqu(dc->r,cur_time);
+	    Mat4x4IdentEqu(dc->r);
+	    Mat4x4RotZ(dc->r,cur_time*3.1);
+	    Mat4x4RotY(dc->r,cur_time*1.9);
+	    Mat4x4RotX(dc->r,cur_time);
 	    dc->flags|=DCF_TRANSFORMATION;
 	    dc->x=xx;
 	    dc->y=yy;
@@ -971,7 +991,7 @@ rc_adjust_xy:
 	  Sprite3(dc,xx,yy,zz,bptr);
 	  dc->depth_buf=NULL;
 	  if (recalc==DOC_RECALC_TO_SCREEN && doc->cur_sprite==bptr)
-	    doc->cur_sprite_elem_num=dc->nearest_sprite_elem_num;
+	    doc->nearest_sprite_elem_num=dc->nearest_sprite_elem_num;
 	  dc->flags&=~(DCF_LOCATE_NEAREST|DCF_DONT_DRAW|DCF_TRANSFORMATION);
 	  if (dc->nearest_dist<=D) {
 	    D=dc->nearest_dist;
@@ -980,8 +1000,10 @@ rc_adjust_xy:
 	}
 	break;
       case DOCT_SONG:
-	if (sys_focus_task==win_task && recalc==DOC_RECALC_TO_SCREEN && !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
-	  if (doc_e->aux_str && (!music.cur_song || StrCmp(music.cur_song,doc_e->aux_str))) {
+	if (sys_focus_task==win_task && recalc==DOC_RECALC_TO_SCREEN &&
+	      !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
+	  if (doc_e->aux_str &&
+		(!music.cur_song || StrCmp(music.cur_song,doc_e->aux_str))) {
 	    Free(music.cur_song);
 	    MusicSettingsRst;
 	    music.cur_song=AStrNew(doc_e->aux_str);
@@ -999,7 +1021,7 @@ rc_adjust_xy:
 
     if (doc_e->de_flags & DOCEF_HAS_BORDER)
       TextBorder(win_task,doc_e->x-x0,x-x0-1,doc_e->y-y0,y-y0,
-	temp_u32_attr.u8[1],ToBool(doc_e->de_flags & DOCEF_SOLID_BORDER));
+	    temp_u32_attr.u8[1],ToBool(doc_e->de_flags & DOCEF_SOLID_BORDER));
     if (full_refresh) {
       switch (doc_e->type_u8) {
 	case DOCT_CHECK_BOX:
@@ -1033,7 +1055,8 @@ rc_adjust_xy:
 	else
 	  tree_collapsed=FALSE;
 	doc_e2=doc_e->next;
-	while (doc_e2!=doc && doc_e2->type_u8!=DOCT_INDENT && !(doc_e2->de_flags & DOCEF_TREE))
+	while (doc_e2!=doc && doc_e2->type_u8!=DOCT_INDENT &&
+	      !(doc_e2->de_flags & DOCEF_TREE))
 	  doc_e2=doc_e2->next;
 	if (doc_e2->type_u8==DOCT_INDENT) {
 	  j=i=s->indent;
@@ -1056,10 +1079,11 @@ rc_adjust_xy:
 
     doc_e2=doc_e->next;
 rc_skip:
-    while (doc_e2!=doc && doc_e2->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) {
+    while (doc_e2!=doc && doc_e2->de_flags
+	  &(DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) {
       if (doc_e2==doc->cur_entry) {
 	doc->cur_entry=doc_e2->next;
-	doc->cur_data_col=doc->cur_entry->min_col;
+	doc->cur_col=doc->cur_entry->min_col;
       }
       if (full_refresh) {
 	doc_e2->x=x;
@@ -1067,7 +1091,8 @@ rc_skip:
 	doc_e2->page_line_num=doc->page_line_num;
 	MemCpy(&doc_e2->settings,s,sizeof(CDocSettings));
 	doc_e2->type.u8[1]=cur_u8_attr;
-	doc_e2->de_flags=doc->flags&(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT) |
+	doc_e2->de_flags=doc->flags
+	      &(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT) |
 	      doc_e2->de_flags&~(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT);
       }
       doc_e2=doc_e2->next;
@@ -1078,7 +1103,7 @@ rc_skip:
 	if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
 	  if (doc_e==doc->cur_entry) {
 	    doc->cur_entry=doc_e2;
-	    doc->cur_data_col=doc_e2->min_col;
+	    doc->cur_col=doc_e2->min_col;
 	  }
 	  if (best_doc_e==doc_e) {
 	    best_doc_e=doc_e2;
@@ -1151,7 +1176,7 @@ rc_skip:
     }
     if (find_cursor) {
       doc->cur_entry=best_doc_e;
-      doc->cur_data_col=best_col;
+      doc->cur_col=best_col;
       DocFormBwd(doc);
 //We need this because text coordinates are used
       if (best_d<FONT_WIDTH)
@@ -1161,10 +1186,10 @@ rc_skip:
 
     if (doc->cur_entry->type_u8!=DOCT_HEX_ED) {
       doc->y=doc->cur_entry->y;
-      doc->x=doc->cur_entry->x+doc->cur_data_col;
+      doc->x=doc->cur_entry->x+doc->cur_col;
     } else {
-      doc->y=doc->cur_entry->y+doc->cur_data_col/3/doc->cur_entry->hex_ed_width;
-      x=doc->cur_data_col%(doc->cur_entry->hex_ed_width*3);
+      doc->y=doc->cur_entry->y+doc->cur_col/3/doc->cur_entry->hex_ed_width;
+      x=doc->cur_col%(doc->cur_entry->hex_ed_width*3);
       i=x/doc->cur_entry->hex_ed_width;
       doc->x=doc->cur_entry->x+9;
       if (i<2)
@@ -1184,15 +1209,15 @@ rc_skip:
 	x=scroll_x/FONT_WIDTH;
 	y=scroll_y/FONT_HEIGHT;
       }
-      if (doc->cur_top_line_num-y+height-1>doc->max_y)
-	doc->cur_top_line_num=doc->max_y-(height-1)+y;
-      if (doc->cur_top_line_num-y<doc->min_y)
-	doc->cur_top_line_num=doc->min_y+y;
+      if (doc->top_line_num-y+height-1>doc->max_y)
+	doc->top_line_num=doc->max_y-(height-1)+y;
+      if (doc->top_line_num-y<doc->min_y)
+	doc->top_line_num=doc->min_y+y;
 
-      if (doc->y-doc->cur_top_line_num+y>height-1)
-	doc->cur_top_line_num=doc->y-(height-1)+y;
-      if (doc->y-doc->cur_top_line_num+y<0)
-	doc->cur_top_line_num=doc->y+y;
+      if (doc->y-doc->top_line_num+y>height-1)
+	doc->top_line_num=doc->y-(height-1)+y;
+      if (doc->y-doc->top_line_num+y<0)
+	doc->top_line_num=doc->y+y;
 
       if (doc->line_start_col-x+width-1>doc->max_x)
 	doc->line_start_col=doc->max_x-(width-1)+x;
@@ -1207,7 +1232,7 @@ rc_skip:
   }
   if (recalc==DOC_RECALC_TO_SCREEN && has_cursor) {
     x=doc->x-doc->line_start_col+left +scroll_x/FONT_WIDTH;
-    y=doc->y-doc->cur_top_line_num+top+scroll_y/FONT_HEIGHT;
+    y=doc->y-doc->top_line_num+top+scroll_y/FONT_HEIGHT;
     if (0<=x<=right && 0<=y<=bottom &&
 	  x<TEXT_COLS && y<TEXT_ROWS &&
 	  !(doc->flags&DOCF_HIDE_CURSOR)) {
@@ -1231,7 +1256,7 @@ rc_skip:
 	    vss->max=vss->min;
 	  else
 	    vss->max=doc->max_y-height+1;
-	  vss->pos=doc->cur_top_line_num;
+	  vss->pos=doc->top_line_num;
 	}
       }
       LBEqu(&doc->flags,DOCf_MORE,more);
@@ -1243,7 +1268,7 @@ rc_skip:
     doc->old_win_left=left;
     doc->old_win_right=right;
     doc->old_cur_entry=doc->cur_entry;
-    doc->old_cur_data_col=doc->old_cur_data_col;
+    doc->old_cur_col=doc->old_cur_col;
   }
   if (doc->flags & DOCF_HAS_SONG)
     LBts(&win_task->task_flags,TASKf_HAS_SONG);

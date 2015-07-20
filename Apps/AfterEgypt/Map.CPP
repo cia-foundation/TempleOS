@@ -24,14 +24,14 @@ U0 DrawMap(CTask *,CDC *dc)
 U0 AEMap()
 {
   I64 i=0,
-      cx=Fs->pix_width>>1,
-      cy=Fs->pix_height>>1,
-      c_min=MinI64(cx,cy),
-      *r=NULL,
-      x1=0,y1=0,z1=0,
-      x_last=x1,y_last=y1;
+	cx=Fs->pix_width>>1,
+	cy=Fs->pix_height>>1,
+	c_min=MinI64(cx,cy),
+	*r=NULL,
+	x1=0,y1=0,z1=0,
+	x_last=x1,y_last=y1;
   F64 a,a1=(AE1_MAX+AE1_MIN)/2,a2=(AE2_MAX+AE2_MIN)/2,a2_total=a2,
-      x_scale=ToF64(cx)/c_min,y_scale=ToF64(cy)/c_min;
+	x_scale=ToF64(cx)/c_min,y_scale=ToF64(cy)/c_min;
   CDC *dc=DCAlias;
 
   SettingsPush(Fs,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
@@ -48,8 +48,9 @@ U0 AEMap()
       if ( 0.0<=a<=AE1_MIN) a=AE1_MIN;
       if (-AE1_MIN<=a<=0.0) a=-AE1_MIN;
       Free(r);
-      r=GrRotZNew(a);
-      GrRot(r,&x1,&y1,&z1);
+      r=Mat4x4IdentNew;
+      Mat4x4RotZ(r,a);
+      Mat4x4MulXYZ(r,&x1,&y1,&z1);
 
       a2=Clamp(Wrap(a2+(AE2_MAX+AE2_MIN)/5.0*(Rand-0.5)),-AE2_MAX,AE2_MAX);
       a=a2;

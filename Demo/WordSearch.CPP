@@ -49,7 +49,7 @@ U0 Search(I64 dx,I64 dy)
       for (i=n;i>2;i--) {
 	buf[i]=0;
 	if ((ptr=ACDWordPtAt(buf)) && *ptr++==ACD_WORD_CHAR &&
-	  !StrICmp(ptr,buf)) {
+	      !StrICmp(ptr,buf)) {
 	  "%s ",buf;
 	}
       }

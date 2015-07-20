@@ -9,28 +9,28 @@ U0 PullDownMenuDemo()
   CMenuEntry *tempse;
 
   MenuPush(
-  "File {"
-  "  Open(,'O');"
-  "  Save(,'S');"
-  "  Exit(,CH_SHIFT_ESC);"
-  "}"
-  "Edit {"
-  "  Cut(,,SC_DELETE|SCF_SHIFT);"
-  "  Paste(,,SC_INS|SCF_SHIFT);"
-  "}"
-  "Misc {"
-  "  Beep(,CH_SPACE);"
-  "  Opt1(MSG_CMD,M_OPTION1);"
-  "  Opt2(MSG_CMD,M_OPTION2);"
-  "}"
-  "Help {"
-  "  Help(,,0x3B0000003B);"
-  "  About(,,0x23B0000023B);"
-      "}");
+	"File {"
+	"  Open(,'O');"
+	"  Save(,'S');"
+	"  Exit(,CH_SHIFT_ESC);"
+	"}"
+	"Edit {"
+	"  Cut(,,SC_DELETE|SCF_SHIFT);"
+	"  Paste(,,SC_INS|SCF_SHIFT);"
+	"}"
+	"Misc {"
+	"  Beep(,CH_SPACE);"
+	"  Opt1(MSG_CMD,M_OPTION1);"
+	"  Opt2(MSG_CMD,M_OPTION2);"
+	"}"
+	"Help {"
+	"  Help(,,0x3B0000003B);"
+	"  About(,,0x23B0000023B);"
+	"}");
 
   "A pull-down menu will appear "
-  "if you move the mouse to the top "
-  "of the screen.\n\n";
+	"if you move the mouse to the top "
+	"of the screen.\n\n";
 
   do {
     msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_CMD);
@@ -64,7 +64,7 @@ U0 PullDownMenuDemo()
 	break;
 
       case MSG_CMD:
-      //I Recommend making your menu
+//I Recommend making your menu
       //drive by key strokes, but you can
       //use the $LK,"MSG_CMD",A="MN:MSG_CMD"$ val.
 	switch (a1) {

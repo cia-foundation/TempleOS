@@ -2,8 +2,8 @@
 
 //Giotto, a famous artist, drew a freehand circle as a portfolio for a job.
 
-AcctRegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
-AcctRegExeBranch("TempleOS/CircleTrace");
+RegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
+RegExeBranch("TempleOS/CircleTrace");
 
 I64 cx,cy;
 F64 avg_error=0,elapsed_time=0,total_error=0,score=999;
@@ -18,7 +18,8 @@ U0 SongTask(I64)
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  GrPrint(dc,0,0,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",avg_error,elapsed_time,score,best_score);
+  GrPrint(dc,0,0,"Error:%6.3f  Time:%6.3f  Score:%6.3f  Best:%8.3f",
+	avg_error,elapsed_time,score,best_score);
 }
 
 #define CIRCLE_RADIUS	100
@@ -55,7 +56,7 @@ U0 CircleTrace()
   GrCircle(dc,cx,cy,CIRCLE_RADIUS);
   do {
     msg_code=GetMsg(&a1,&a2,
-      1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
+	  1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
     switch (msg_code) {
       case MSG_KEY_UP:
 	break;
@@ -70,7 +71,7 @@ U0 CircleTrace()
 	x1=a1; y1=a2;
 	do {
 	  msg_code=ScanMsg(&a1,&a2,
-	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+		1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  switch (msg_code) {
 	    case MSG_IP_L_UP:
 	      break;
@@ -79,7 +80,7 @@ U0 CircleTrace()
 		total_distance+=Sqrt(Sqr(x1-a1)+Sqr(y1-a2));
 		Line(dc,x1,y1,0,a1,a2,0,&CTPlot);
 		x1=a1;y1=a2;
-		//undo overlapping pixs on segments
+//undo overlapping pixs on segments
 		GrPlot(dc,x1,y1);
 		rad=Sqrt(Sqr(x1-cx)+Sqr(y1-cy));
 		total_error-=Abs(rad-CIRCLE_RADIUS);
@@ -109,7 +110,7 @@ U0 CircleTrace()
 	    Snd(500);Sleep(50);
 	  }
 	} else {
-	    Snd(100);Sleep(1000);
+	  Snd(100);Sleep(1000);
 	}
 	Snd(0); Sleep(200); music.mute=FALSE;
 	break;
@@ -119,7 +120,7 @@ U0 CircleTrace()
   SettingsPop;
   DCFill;
   DCDel(dc);
-  AcctRegWriteBranch("TempleOS/CircleTrace","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/CircleTrace","F64 best_score=%5.4f;\n",best_score);
 }
 
 CircleTrace;  //Execute when #included

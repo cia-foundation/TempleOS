@@ -13,12 +13,14 @@ U0 SysGlblsInit()
   dsk.dft_iso_filename="::/Temp/CDDVD.ISO";
   StrCpy(dsk.temp_filename,"::/Home/Temp.TXT.Z");
   dsk.cdrom_boot_is_good=TRUE;
-#exe {
-  if (!kernel_cfg->auto_mount_ide_hd_let) kernel_cfg->auto_mount_ide_hd_let='C';
-  if (!kernel_cfg->auto_mount_ide_cd_let) kernel_cfg->auto_mount_ide_cd_let='T';
-  StreamPrint("dsk.first_hd_drv_let=%d;",kernel_cfg->auto_mount_ide_hd_let);
-  StreamPrint("dsk.first_cd_drv_let=%d;",kernel_cfg->auto_mount_ide_cd_let);
-}
+  #exe {
+    if (!kernel_cfg->auto_mount_ide_hd_let)
+      kernel_cfg->auto_mount_ide_hd_let='C';
+    if (!kernel_cfg->auto_mount_ide_cd_let)
+      kernel_cfg->auto_mount_ide_cd_let='T';
+    StreamPrint("dsk.first_hd_drv_let=%d;",kernel_cfg->auto_mount_ide_hd_let);
+    StreamPrint("dsk.first_cd_drv_let=%d;",kernel_cfg->auto_mount_ide_cd_let);
+  }
 
   InDbg(ON);
   reverse_bits_table	=CAlloc(256);
@@ -49,7 +51,7 @@ U0 SysGlblsInit()
 
   ProgressBarsRst;
 
-//$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
+  //$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
   i=1; //Rqst 1 blk, we might get more.
   m=Mem2MegUncachedAlloc(&i,sys_code_bp);
   dev.uncached_heap=HeapCtrlBPInit(m,i*0x200000/0x200);
@@ -86,12 +88,12 @@ U0 TimersInit()
   OutU8(0x40,SYS_TIMER0_PERIOD);
   OutU8(0x40,SYS_TIMER0_PERIOD>>8);
 
-// High Precision Event Timer
+  //High Precision Event Timer
   if (PCIReadU16(0,31,0,0)==0x8086) {//Intel?
-    //D31 F0, cfg 0xF0=RCBA of PCI-LPC Bridge
+//D31 F0, cfg 0xF0=RCBA of PCI-LPC Bridge
     _d=PCIReadU32(0,31,0,0xF0)(U8 *)&~0x3FFF+0x3404; //HPET cfg
-  //7	enable
-  //1:0 HPET is at 0xFED00000,0xFED01000, 0xFED02000 or 0xFED03000.
+//7	enable
+    //1:0 HPET is at 0xFED00000,0xFED01000, 0xFED02000 or 0xFED03000.
     *_d=*_d&3|0x80;
   }
 
@@ -146,8 +148,8 @@ U0 KernelMain()
   BSPInit;
   IntInit1;
 
-//Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
-//to debug.  After this point, use $LK,"RawPrint",A="MN:RawPrint"$()
+  //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
+  //to debug.  After this point, use $LK,"RawPrint",A="MN:RawPrint"$()
   LBts(&sys_run_level,RLf_RAW);
   TimersInit;
   if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
@@ -155,7 +157,7 @@ U0 KernelMain()
 
   IntsInit;
   "Enable IRQ's\n";
-  SetRFlags(SYS_NORMAL_RFLAGS);
+  SetRFlags(RFLAGG_NORMAL);
   BusyWait(2000);
   IntInit2;
   LBts(&sys_run_level,RLf_INTERRUPTS);
@@ -163,12 +165,12 @@ U0 KernelMain()
   TimeStampFreqCal;
   Preempt(ON);
 
-#exe {
-  if (!kernel_cfg->opts[CFG_NO_MP])
-    StreamPrint("\"MultiCore Start\\n\\n\";"
-	"BSPStartMP;"
-	"LBts(&sys_run_level,RLf_MP);");
-};
+  #exe {
+    if (!kernel_cfg->opts[CFG_NO_MP])
+      StreamPrint("\"MultiCore Start\\n\\n\";"
+	    "BSPStartMP;"
+	    "LBts(&sys_run_level,RLf_MP);");
+  };
 
   KbdMouseVarsInit;
   IPVarsInit;
@@ -181,10 +183,13 @@ U0 KernelMain()
   "BlkDevsInitAll\n";
   BlkDevsInitAll;
   "BlkDevsInitAll Done\n";
-#exe {
-  if (kernel_cfg->cdrom_ports_pmt)
-    StreamPrint("if (dsk.boot_rescue_drv_pmt) \"%%S\",\"ST_CDROM_PORTS_PMT2\";");
-};
+
+  #exe {
+    if (kernel_cfg->cdrom_ports_pmt)
+      StreamPrint(
+	    "if (dsk.boot_rescue_drv_pmt) \"%%S\",\"ST_CDROM_PORTS_PMT2\";");
+  };
+
   ChgDsk(':');
   LBts(&sys_run_level,RLf_DSK);
 
@@ -197,7 +202,7 @@ U0 KernelMain()
   cnts.time_stamp_freq_initial=TimeStampFreqCal;
   Cd("/");
   try
-    ExeFile("Adam"); //Continues $LK,"/Adam.CPP",A="FL:/Adam.CPP,1"$
+	  ExeFile("Adam"); //Continues $LK,"/Adam.CPP",A="FL:/Adam.CPP,1"$
   catch {
     Raw(ON);
     PutExcept;
@@ -213,7 +218,8 @@ SYS_KERNEL_END::
 #exe {
   if (kernel_cfg->opts[CFG_BOOT_RESCUE_DRV])
     StreamPrint("DU8 0x%X-(SYS_KERNEL_END-SYS_KERNEL+"
-		"BOOT_RAM_BASE+sizeof(CBinFile)) DUP (0);"
-		"BINFILE \"%s\";",kernel_cfg->boot_rescue_drv_start,kernel_cfg->boot_rescue_drv_file);
+	"BOOT_RAM_BASE+sizeof(CBinFile)) DUP (0);"
+	"BINFILE \"%s\";",kernel_cfg->boot_rescue_drv_start,
+			  kernel_cfg->boot_rescue_drv_file);
 };
 }

@@ -18,15 +18,15 @@ U0 GrDemo()
 {
   I64 i;
   F64 t;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   CPURep;
   for (i=0;i<16;i++) {
     t=VGAPattern(0x5555555555555555);
     "$$GREEN$$Rate:$$RED$$%5.1f FPS$$FG$$"
-    "  $$GREEN$$Load@30Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*30.0;
+	  "  $$GREEN$$Load@30Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*30.0;
     t=VGAPattern(0x3333333333333333);
     "$$GREEN$$Rate:$$RED$$%5.1f FPS$$FG$$"
-    "  $$GREEN$$Load@30Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*30.0;
+	  "  $$GREEN$$Load@30Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*30.0;
   }
   Preempt(old_preempt);
 //<CTRL-ALT-f> will flush screen VGA cache.

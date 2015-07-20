@@ -3,7 +3,7 @@ I64 HasLower(U8 *src)
   I64 ch;
   while (ch=*src++)
     if ('a'<=ch<='z')
-     return TRUE;
+      return TRUE;
   return FALSE;
 }
 
@@ -64,22 +64,22 @@ U0 PSectCacheAdd(CHash *temps,U8 *addr)
   Bool old_preempt;
   CPSectCache *temppc;
   if (temps && temps->type&HTT_FUN &&
-      (dbg_info=temps(CHashFun *)->dbg_info)) {
-    old_preempt=Preempt(OFF);
+	(dbg_info=temps(CHashFun *)->dbg_info)) {
+    old_preempt=Preempt;
     lock {i=dbg.psect_cache_index++;}
-    temppc=&dbg.psect_cache[i&(PSECT_CACHE_SIZE-1)];
-    temppc->base=dbg_info->body[0];
-    if (addr<temppc->base)
-      temppc->base=addr;
-    temppc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
-    if (addr>=temppc->limit)
-      temppc->limit=addr+1;
-    i=MinI64(StrLen(temps->str),PSECT_CACHE_STR_LEN-1);
-    MemCpy(temppc->str,temps->str,i);
-    temppc->str[i]=0;
-    temppc->time_stamp=tS;
-    Preempt(old_preempt);
-  }
+  temppc=&dbg.psect_cache[i&(PSECT_CACHE_SIZE-1)];
+  temppc->base=dbg_info->body[0];
+  if (addr<temppc->base)
+    temppc->base=addr;
+  temppc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
+  if (addr>=temppc->limit)
+    temppc->limit=addr+1;
+  i=MinI64(StrLen(temps->str),PSECT_CACHE_STR_LEN-1);
+  MemCpy(temppc->str,temps->str,i);
+  temppc->str[i]=0;
+  temppc->time_stamp=tS;
+  Preempt(old_preempt);
+}
 }
 
 U8 *PSectCacheFind(U8 *addr,I64 *_offset)
@@ -94,7 +94,7 @@ U8 *PSectCacheFind(U8 *addr,I64 *_offset)
     timeout=tS+8.0;
     for (i=0;i<PSECT_CACHE_SIZE;i++,temppc++)
       if (temppc->base<=addr<temppc->limit &&
-	  temppc->time_stamp>timeout) {
+	    temppc->time_stamp>timeout) {
 	*_offset=addr-temppc->base;
 	return temppc->str;
       }
@@ -156,7 +156,7 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
       if (dbg_info=temph->dbg_info) {
 	num_lines=dbg_info->max_line-dbg_info->min_line+1;
 	body=dbg_info->body;
- 
+
 	//find first nonzero
 	first_line=0;
 	while (!body[first_line]) {
@@ -170,15 +170,15 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
 	while (!body[last_line] && last_line>first_line)
 	  last_line--;
 
-	//interpolate to guess line num
+	  //interpolate to guess line num
 	cur_line=ClampI64(ToF64(addr-body[first_line])*(last_line-first_line+1)/
-		 (body[last_line]-body[first_line]+1),first_line,last_line);
+	      (body[last_line]-body[first_line]+1),first_line,last_line);
 
 	//retreat while too high
 	while ((!body[cur_line] || body[cur_line]>=addr) && cur_line>first_line)
 	  cur_line--;
 
-	//advance while to low
+	  //advance while to low
 	while ((!body[cur_line] || body[cur_line]<addr) && cur_line<last_line)
 	  cur_line++;
 

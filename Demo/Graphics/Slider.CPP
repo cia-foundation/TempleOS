@@ -24,24 +24,29 @@ U0 DrawCtrlSlider(CDC *dc,CCtrl *c)
   GrRect(dc, c->left,c->top,SLIDER_SPACING*3+2,SLIDER_SPACING*2+SLIDER_RANGE);
   dc->color=BLUE;
   GrRect(dc, c->left+SLIDER_BORDER,c->top+SLIDER_BORDER,
-    SLIDER_SPACING*3+2-2*SLIDER_BORDER,SLIDER_SPACING*2+SLIDER_RANGE-2*SLIDER_BORDER);
+	SLIDER_SPACING*3+2-2*SLIDER_BORDER,
+	SLIDER_SPACING*2+SLIDER_RANGE-2*SLIDER_BORDER);
   dc->color=BLACK;
   GrLine(dc,c->left+1*SLIDER_SPACING+0,c->top+SLIDER_SPACING,
-	      c->left+1*SLIDER_SPACING+0,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
+	c->left+1*SLIDER_SPACING+0,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
   GrLine(dc,c->left+2*SLIDER_SPACING+1,c->top+SLIDER_SPACING,
-	      c->left+2*SLIDER_SPACING+1,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
+	c->left+2*SLIDER_SPACING+1,c->top+SLIDER_SPACING+SLIDER_RANGE-1);
   dc->color=LTRED;
   GrPrint(dc,c->left+1*SLIDER_SPACING+0-FONT_WIDTH/2,
-    c->top+SLIDER_SPACING+SLIDER_RANGE+3,
-    "%d",s->left_pos*10/SLIDER_RANGE);
+	c->top+SLIDER_SPACING+SLIDER_RANGE+3,
+	"%d",s->left_pos*10/SLIDER_RANGE);
   GrPrint(dc,c->left+2*SLIDER_SPACING+1-FONT_WIDTH/2,
-    c->top+SLIDER_SPACING+SLIDER_RANGE+3,
-    "%d",s->right_pos*10/SLIDER_RANGE);
-  GrRect(dc,c->left+1*SLIDER_SPACING+0-3,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->left_pos-2,7,5);
-  GrRect(dc,c->left+2*SLIDER_SPACING+1-3,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->right_pos-2,7,5);
+	c->top+SLIDER_SPACING+SLIDER_RANGE+3,
+	"%d",s->right_pos*10/SLIDER_RANGE);
+  GrRect(dc,c->left+1*SLIDER_SPACING+0-3,
+	c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->left_pos-2,7,5);
+  GrRect(dc,c->left+2*SLIDER_SPACING+1-3,
+	c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->right_pos-2,7,5);
   dc->color=YELLOW;
-  GrRect(dc,c->left+1*SLIDER_SPACING+0-2,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->left_pos-1,5,3);
-  GrRect(dc,c->left+2*SLIDER_SPACING+1-2,c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->right_pos-1,5,3);
+  GrRect(dc,c->left+1*SLIDER_SPACING+0-2,
+	c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->left_pos-1,5,3);
+  GrRect(dc,c->left+2*SLIDER_SPACING+1-2,
+	c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->right_pos-1,5,3);
 }
 
 U0 UpdateDerivedCtrlSlider(CCtrl *c)
@@ -78,7 +83,7 @@ CCtrl *SliderNew()
   c->draw_it=&DrawCtrlSlider;
   c->left_click=&LeftClickSlider;
   c->update_derived_vals=&UpdateDerivedCtrlSlider;
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   QueIns(c,Fs->last_ctrl);
   TaskDerivedValsUpdate;
   Preempt(old_preempt);
@@ -87,7 +92,7 @@ CCtrl *SliderNew()
 
 U0 SliderDel(CCtrl *c)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   QueRem(c);
   Preempt(old_preempt);
   Free(c);
@@ -101,8 +106,8 @@ U0 Main()
   CCtrl *c=SliderNew;
   PressAKey;
   "Left: %d  Right: %d\n",
-    sld.left_pos*10/SLIDER_RANGE,
-    sld.right_pos*10/SLIDER_RANGE;
+	sld.left_pos*10/SLIDER_RANGE,
+	sld.right_pos*10/SLIDER_RANGE;
   SliderDel(c);
   DocBottom;
 }

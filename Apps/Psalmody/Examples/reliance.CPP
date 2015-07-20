@@ -22,13 +22,17 @@ U0 Song()
     DocRecalc(DocPut(task)); //Reformat word-wrap with new window size.
     while (!ScanKey) {
       Play("3qGsB2G3B2G3eF2G3sGGGGeRFC2G3qFC",
-	    "Where's \0my \0 \0 \0next \0 \0 \0meal!!\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Where's \0my \0 \0 \0next \0 \0 \0meal!!\n\0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("GsB2G3B2G3eF2G3sGGGGeRFC2G3qFC",
-	    "God, \0we \0 \0 \0had \0 \0a \0deal!!\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "God, \0we \0 \0 \0had \0 \0a \0deal!!\n\0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0");
       Play("B2GsG3A2G3AeCCsCECEqACsGFGF",
-	    "Day \0old \0bread?\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Day \0old \0bread?\n\0 \0 \0 \0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0");
       Play("qB2GsG3A2G3AeCCsCECEqACsGFGF",
-	    "'Dai\0ly' \0I \0 \0 \0 \0said.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "'Dai\0ly' \0I \0 \0 \0 \0said.\n\0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0");
     }
   } catch
     PutExcept;

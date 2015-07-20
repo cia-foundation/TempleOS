@@ -1,10 +1,10 @@
 asm {
 USE32
 
-SYS_BIOS32_SERVICE_DIR:: DU32	0;
+SYS_PCIBIOS_SERVICE_DIR:: DU32	0;
 SYS_PCI_SERVICES::	 DU32	0;
 
-SYS_FIND_BIOS32_SERVICE_DIR::
+SYS_FIND_PCIBIOS_SERVICE_DIR::
 	MOV	ESI,0xE0000
 	MOV	ECX,(0x100000-0xE0000)/4
 @@05:	CMP	U32 [ESI],'_32_'
@@ -24,26 +24,26 @@ SYS_FIND_BIOS32_SERVICE_DIR::
 	POP	ECX
 	TEST	AL,AL
 	JNZ	@@20
-	MOV	U32 [SYS_BIOS32_SERVICE_DIR],ESI
+	MOV	U32 [SYS_PCIBIOS_SERVICE_DIR],ESI
 	MOV	ESI,U32 4[ESI]
-	MOV	U32 [SYS_BIOS32_SERVICE_CALL],ESI
+	MOV	U32 [SYS_PCIBIOS_SERVICE_CALL],ESI
 	RET
 
 @@20:	ADD	ESI,4
 	LOOP	@@05
-	MOV	U32 [SYS_BIOS32_SERVICE_DIR],0
+	MOV	U32 [SYS_PCIBIOS_SERVICE_DIR],0
 	RET
 
 SYS_FIND_PCI_SERVICES::
-	MOV	ESI,U32 [SYS_BIOS32_SERVICE_DIR]
+	MOV	ESI,U32 [SYS_PCIBIOS_SERVICE_DIR]
 	TEST	ESI,ESI
 	JNZ	@@05
 	MOV	U32 [SYS_PCI_SERVICES],0
 	RET
 @@05:	MOV	EAX,'$$PCI'
 	XOR	EBX,EBX
-	DU8	0x9A;		 //CALL CGDT.cs32:BIOS32_SERVICE
-SYS_BIOS32_SERVICE_CALL:: DU32	0;
+	DU8	0x9A;		 //CALL CGDT.cs32:PCIBIOS_SERVICE
+SYS_PCIBIOS_SERVICE_CALL:: DU32	0;
 	DU16	CGDT.cs32;
 	TEST	AL,AL
 	JNZ	@@05
@@ -158,7 +158,7 @@ _extern C32_EDI U32 c32_edi;
 _extern C32_EFLAGS U32 c32_eflags;
 _extern SYS_PCI_SERVICES U32 sys_pci_services;
 
-_extern _FAR_CALL32 Bool FarCall32(U0 (*fp_addr)()); //Not reentrant used to call BIOS32. Takes 250uS.
+_extern _FAR_CALL32 Bool FarCall32(U0 (*fp_addr)());//Not reentrant.For PCIBIOS.
 
 U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
 {//Read U8 in PCI configspace at bus,dev,fun,reg.
@@ -209,9 +209,9 @@ U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   if (FarCall32(sys_pci_services))
-      result=c32_ecx;
-    else
-      result=0xFFFFFFFF;
+    result=c32_ecx;
+  else
+    result=0xFFFFFFFF;
   LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
   POPFD
   return result;
@@ -268,7 +268,7 @@ I64 PCIClassFind(I64 class_code,I64 n)
 class_code is low three bytes
 n is index starting at zero
 Return: -1 not found
-	else bus,dev,fun.
+else bus,dev,fun.
 */
   I64 result;
   PUSHFD

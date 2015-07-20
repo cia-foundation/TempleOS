@@ -35,7 +35,7 @@ F64 F(Complex *x)
   CPoly(&num,  x,zeros,NUM_ZEROS);
   CPoly(&denom,x,poles,NUM_POLES);
   CDiv(&num,&denom,&n1);
- 
+
   R2P(&m,&a,n1.x,n1.y);
   if (ip.rb)
     return ã+a;
@@ -47,7 +47,7 @@ F64 MPDraw(CTask *task)
 {
   Complex xx;
   I64 x,y,w=task->pix_width,h=task->pix_height,cx=w/2,cy=h/2,
-     lo=Gs->num*h/mp_cnt,hi=(Gs->num+1)*h/mp_cnt;
+	lo=Gs->num*h/mp_cnt,hi=(Gs->num+1)*h/mp_cnt;
   F64 yy,y_total=0;
   CDC *dc=DCAlias(,task);
   for (y=lo;y<hi;y++) {
@@ -58,7 +58,7 @@ F64 MPDraw(CTask *task)
       y_total+=Clamp(yy,-14,14);
       GrPlot(dc,x,y);
     }
-    }
+  }
   DCDel(dc);
   return y_total;
 }
@@ -74,7 +74,7 @@ U0 Draw()
       tempm[i]=JobQue(&MPDraw,Fs,i,0);
     y_total=0;
     for (i=0;i<mp_cnt;i++)
-      y_total+=GetResult(tempm[i])(F64);
+      y_total+=JobResultGet(tempm[i])(F64);
 
     if (!y_total) break;
     scale*=7*GR_WIDTH*GR_HEIGHT/y_total;
@@ -100,13 +100,13 @@ U0 PoleZeros()
   PopUpOk(
 	"Drag the poles and zeros with left mouse.\n"
 	"Hold right mouse for phase plot.\n"
-  );
+	);
   WinMgrSync;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
-  SetVGAPalette4(vga_palette4_gray);
-  SetVGAPaletteColor(15,0xFF0000); //White is red
+  GrPaletteSet(gr_palette_gray);
+  GrPaletteColorSet(15,0xFFFF00000000); //White is red
 
   WinMax;
   AutoComplete;
@@ -119,7 +119,8 @@ U0 PoleZeros()
   try {
     Draw;
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
+	    1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE);
 pz_msg:
       cx=Fs->pix_width/2;
       cy=Fs->pix_height/2;
@@ -130,8 +131,10 @@ pz_msg:
 	case MSG_IP_MOVE:
 	  if (tempc) {
 	    p11=a1;p22=a2;
-	    //get to last mouse move
-	    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE))
+//get to last mouse move
+	    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
+		  1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+
+		  1<<MSG_IP_R_UP+1<<MSG_IP_MOVE))
 	      if (msg_code==MSG_IP_MOVE) {
 		p11=a1;p22=a2;
 	      } else

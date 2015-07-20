@@ -80,7 +80,6 @@ U0 DrawIt(CTask *,CDC *dc)
 {
   I64 i;
   F64 é,d,x1,y1,x2,y2;
-  Bool old_suspend;
   MyMass   *tempm;
   MySpring *temps;
 
@@ -91,7 +90,7 @@ U0 DrawIt(CTask *,CDC *dc)
   }
 
   dc->flags|=DCF_TRANSFORMATION;
-  GrScaleEqu(dc->r,zoom);
+  Mat4x4Scale(dc->r,zoom);
 
   switch (main_mode_button.state) {
     case MMD_EDIT:
@@ -118,18 +117,16 @@ U0 DrawIt(CTask *,CDC *dc)
     }
   }
 
-  old_suspend=Suspend(task);
-
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     if (temps->type==EMD_SPRING) {
       dc->color=LTCYAN;
       GrLine3(dc,temps->end1->x,temps->end1->y,0,
-		 temps->end2->x,temps->end2->y,0);
+	    temps->end2->x,temps->end2->y,0);
     } else if (temps->type==EMD_CONNECTOR) {
       dc->color=CYAN;
       GrLine3(dc,temps->end1->x,temps->end1->y,0,
-		 temps->end2->x,temps->end2->y,0);
+	    temps->end2->x,temps->end2->y,0);
     }
     temps=temps->next;
   }
@@ -149,7 +146,7 @@ U0 DrawIt(CTask *,CDC *dc)
       é=Arg(x2-x1,y2-y1);
       if (Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
 	dc->flags|=DCF_SYMMETRY;
-	GrSetSymmetry3(dc,x1,y1,256,x1,y1,0,x1-256*Cos(é),y1-256*Sin(é),0);
+	DCSymmetry3Set(dc,x1,y1,256,x1,y1,0,x1-256*Cos(é),y1-256*Sin(é),0);
 	for (i=0;i<8;i++) {
 	  d=20*Rand+6;
 	  if (d<10)
@@ -159,11 +156,11 @@ U0 DrawIt(CTask *,CDC *dc)
 	  else
 	    dc->color=YELLOW;
 	  GrLine3(dc,x1-3*Cos(é),y1-3*Sin(é),0,
-		     x1-d*Cos(é)+0.5*d*Sin(é),
-		     y1-d*Sin(é)-0.5*d*Cos(é),0);
+		x1-d*Cos(é)+0.5*d*Sin(é),
+		y1-d*Sin(é)-0.5*d*Cos(é),0);
 	  GrLine3(dc,x1-2*d*Cos(é),y1-2*d*Sin(é),0,
-		     x1-d*Cos(é)+0.5*d*Sin(é),
-		     y1-d*Sin(é)-0.5*d*Cos(é),0);
+		x1-d*Cos(é)+0.5*d*Sin(é),
+		y1-d*Sin(é)-0.5*d*Cos(é),0);
 	}
 	dc->flags&=~DCF_SYMMETRY;
       }
@@ -180,16 +177,14 @@ U0 DrawIt(CTask *,CDC *dc)
     }
     temps=temps->next;
   }
-
-  Suspend(task,old_suspend);
 }
 
 U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 {
 //The forces due to springs and drag are
-//automatically handled by the
-//ode code.  We can add new forces
-//here.
+  //automatically handled by the
+  //ode code.  We can add new forces
+  //here.
   F64 d,dd;
   CD3 p;
   MyMass *tempm1,*tempm2;
@@ -216,7 +211,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     if (main_mode_button.state==MMD_PLAY && temps->type==EMD_THRUSTER &&
-      Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
+	  Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
       D3Sub(&temps->end2->state->x,&temps->end1->state->x,&p);
       D3Unit(&p);
       D3MulEqu(&p,2000);
@@ -284,7 +279,7 @@ U0 BreakConnectors()
   while (temps!=&ode->next_spring) {
     temps1=temps->next;
     if (temps->type==EMD_CONNECTOR &&
-      Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
+	  Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
       QueRem(temps);
       Free(temps);
     }
@@ -330,32 +325,32 @@ U0 PlayShip()
   Bool okay;
   ode->flags&=~ODEF_PAUSED;
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Edit {"
-"  EditShip(,CH_SPACE);"
-"}"
-"Play {"
-"  Center(,'c');"
-"  Damp(,'d');"
-"  Action0(,'0');"
-"  Action1(,'1');"
-"  Action2(,'2');"
-"  Action3(,'3');"
-"  Action4(,'4');"
-"  Action5(,'5');"
-"  Action6(,'6');"
-"  Action7(,'7');"
-"  Action8(,'8');"
-"  Action9(,'9');"
-"}"
-"View {"
-"  ZoomIn(,'z');"
-"  ZoomOut(,'Z');"
-"}"
-  );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Edit {"
+	"  EditShip(,CH_SPACE);"
+	"}"
+	"Play {"
+	"  Center(,'c');"
+	"  Damp(,'d');"
+	"  Action0(,'0');"
+	"  Action1(,'1');"
+	"  Action2(,'2');"
+	"  Action3(,'3');"
+	"  Action4(,'4');"
+	"  Action5(,'5');"
+	"  Action6(,'6');"
+	"  Action7(,'7');"
+	"  Action8(,'8');"
+	"  Action9(,'9');"
+	"}"
+	"View {"
+	"  ZoomIn(,'z');"
+	"  ZoomOut(,'Z');"
+	"}"
+	);
   DocClear;
   try {
     while (main_mode_button.state==MMD_PLAY) {
@@ -421,45 +416,46 @@ U0 EditShip()
   Bool okay;
   MyMass *tempm1=NULL,*tempm2=NULL;
   CCtrl *bt_edit_mode=CtrlButtonNew(0,5*FONT_HEIGHT+4,80,,EMD_NUM_MODES,
-	   Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_button);
+	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_button);
   ode->flags|=ODEF_PAUSED;
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Play {"
-"  PlayShip(,CH_SPACE);"
-"  Center(,'c');"
-"  Damp(,'d');"
-"}"
-"Edit {"
-"  Move(,'v');"
-"  Mass(,'m');"
-"  Spring(,'s');"
-"  Connector(,'n');"
-"  Thruster(,'t');"
-"  Restart(,'\n');"
-"  Action0(,'0');"
-"  Action1(,'1');"
-"  Action2(,'2');"
-"  Action3(,'3');"
-"  Action4(,'4');"
-"  Action5(,'5');"
-"  Action6(,'6');"
-"  Action7(,'7');"
-"  Action8(,'8');"
-"  Action9(,'9');"
-"}"
-"View {"
-"  ZoomIn(,'z');"
-"  ZoomOut(,'Z');"
-"}"
-  );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  PlayShip(,CH_SPACE);"
+	"  Center(,'c');"
+	"  Damp(,'d');"
+	"}"
+	"Edit {"
+	"  Move(,'v');"
+	"  Mass(,'m');"
+	"  Spring(,'s');"
+	"  Connector(,'n');"
+	"  Thruster(,'t');"
+	"  Restart(,'\n');"
+	"  Action0(,'0');"
+	"  Action1(,'1');"
+	"  Action2(,'2');"
+	"  Action3(,'3');"
+	"  Action4(,'4');"
+	"  Action5(,'5');"
+	"  Action6(,'6');"
+	"  Action7(,'7');"
+	"  Action8(,'8');"
+	"  Action9(,'9');"
+	"}"
+	"View {"
+	"  ZoomIn(,'z');"
+	"  ZoomOut(,'Z');"
+	"}"
+	);
   DocClear;
   try {
     while (main_mode_button.state==MMD_EDIT) {
-      switch (ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
+      switch (ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|
+	    1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
 	case MSG_IP_L_DOWN:
 	  switch (edit_mode_button.state) {
 	    case EMD_MASS:
@@ -604,19 +600,21 @@ U0 Strut()
   WinMax;
   DocClear;
   "\n$$WW,1$$$$PURPLE$$$$TX+CX,\"Build a ship.\"$$$$FG$$\n\n"
-  "Select mass mode.\tLeft-click to place masses.\n"
-  "Select spring mode.\tLeft-drag to make members.\n"
-  "Select thruster mode.\tPress a digit, 0-9.  Drag to make thruster.\n"
-  "Select connector mode.\tPress a digit, 0-9.  Drag to make breakable connector.\n\n"
-  "Press $$GREEN$$<SPACE>$$FG$$ to run the game.  Press digits to operate "
-  "thrusters and break connectors.\n\n"
-  "Press $$GREEN$$<z>$$FG$$ or $$GREEN$$<SHIFT-Z>$$FG$$ to zoom in/out.\n\n";
+	"Select mass mode.\tLeft-click to place masses.\n"
+	"Select spring mode.\tLeft-drag to make members.\n"
+	"Select thruster mode.\tPress a digit, 0-9.  Drag to make thruster.\n"
+	"Select connector mode.\tPress a digit, 0-9.  "
+	"Drag to make breakable connector.\n\n"
+	"Press $$GREEN$$<SPACE>$$FG$$ to run the game.  Press digits to operate "
+	"thrusters and break connectors.\n\n"
+	"Press $$GREEN$$<z>$$FG$$ or $$GREEN$$<SHIFT-Z>$$FG$$ to zoom in/out.\n\n";
 
   PressAKey;
-  bt_main_mode=CtrlButtonNew((GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_NUM_MODES,
-	   Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_button);
+  bt_main_mode=CtrlButtonNew(
+	(GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_NUM_MODES,
+	Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_button);
   WinBorder;
-  Preempt(OFF);
+  Preempt;
   AutoComplete;
   DocCursor;
   DocClear;

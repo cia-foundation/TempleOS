@@ -1,5 +1,6 @@
 #help_index "Debugging/Dump"
-Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,I64 depth,I64 max_depth,Bool dynamic,I64 types=HTT_CLASS,I64 offset=0)
+Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
+	I64 depth,I64 max_depth,Bool dynamic,I64 types=HTT_CLASS,I64 offset=0)
 {//See $LK,"::/Demo/LastClass.CPP"$.
   I64 i,j,stars,*ptr;
   CMemberLst *ml;
@@ -15,7 +16,8 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,I64 depth,I64 max_depth
     DocPrint(doc,"Bad Ptr:%016X\n",_d);
     return FALSE;
   }
-  if (tempc->base_class && !ClassRep2(doc,_d,tempc->base_class->str,depth,max_depth,dynamic,types,offset))
+  if (tempc->base_class && !ClassRep2(doc,_d,tempc->base_class->str,
+	depth,max_depth,dynamic,types,offset))
     return FALSE;
   unlock=DocLock(doc);
   DocPrint(doc,"Class:\"%s\"\n",class_name);
@@ -149,7 +151,8 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,I64 depth,I64 max_depth
   return TRUE;
 }
 
-public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
+public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,
+	I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
 {//Displays members of a record by using the compiler's info.
   CDoc *doc;
   Bool old_preempt;
@@ -157,7 +160,7 @@ public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,I64 max_depth=2,Bool fun=FALS
     doc=DocNew;
   } else {
     DocMax;
-    old_preempt=Preempt(OFF);
+    old_preempt=Preempt;
     doc=DocPut;
   }
   if (fun)
@@ -173,7 +176,8 @@ public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,I64 max_depth=2,Bool fun=FALS
     Preempt(old_preempt);
 }
 
-public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
+public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,
+	I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
 {//Dynamic ClassRep. Uses hex_ed widgit for live changes.
   CDoc *doc;
   Bool old_preempt;
@@ -181,7 +185,7 @@ public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,I64 max_depth=2,Bool fun=FAL
     doc=DocNew;
   } else {
     DocMax;
-    old_preempt=Preempt(OFF);
+    old_preempt=Preempt;
     doc=DocPut;
   }
   if (fun)
@@ -220,7 +224,7 @@ public U0 FunRep(U8 *st,U8 *rbp=NULL,I64 max_depth=2,CTask *task=NULL)
   if (tempf) {
     if (rbp) {
       if (task) {
-	//tempf->size is negative.  It's the bottom
+//tempf->size is negative.  It's the bottom
 	//of the fun local var space relative to RBP .
 	size=tempf->arg_cnt*8-tempf->size+16;
 
@@ -255,7 +259,8 @@ public U0 Uf(U8 *st)
     if (tempf->type&HTT_FUN)
       FunRep(st);
     if (dbg_info=tempf->dbg_info) {
-      i=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line]-dbg_info->body[0];
+      i=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line]
+	    -dbg_info->body[0];
       Un(dbg_info->body[0],i);
       "Code Size:%04X\n",i;
     } else

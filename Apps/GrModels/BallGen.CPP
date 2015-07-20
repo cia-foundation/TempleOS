@@ -59,8 +59,9 @@ U8 *Ball2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
   U8 *result=MAlloc(sizeof(CSpriteMeshU8s)+
-    b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)+sprite_elem_base_sizes[SPT_END]),
-    *dst=result;
+	b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)
+  +sprite_elem_base_sizes[SPT_END]),
+	*dst=result;
   *dst++ =SPT_MESH;
   *dst(I32 *)++ =b->vertex_cnt;
   *dst(I32 *)++ =b->tri_cnt;
@@ -82,7 +83,7 @@ public U8 *BallGen()
   BDInit(&bd1);
 
   while (TRUE) {
-    if (!DocFormDo(&bd1))
+    if (!DocForm(&bd1))
       return NULL;
     MemCpy(&bd2,&bd1,sizeof(BallDefineStruct));
     BDCorrect(&bd2);
@@ -110,7 +111,7 @@ public U8 *BallGen()
 	AddTri(&bd2,c,p3,p2,p4);
       }
     }
- 
+
     result=Ball2CSprite;
     "%h7c",'\n';
     Sprite(result,"\t\t$$SP,\"<1>\",BI=%d$$");

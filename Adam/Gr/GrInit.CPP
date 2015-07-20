@@ -62,7 +62,7 @@ U0 GrSetUpTables()
     OutU8(VGAP_INDEX,VGAR_MAP_MASK);
     OutU8(VGAP_DATA,0x0F);
 //Virtual Box crashes on the following for some reason.
-//    MemSet(VGAM_GRAPHICS,0,GR_HEIGHT*GR_WIDTH>>3);
+    //	  MemSet(VGAM_GRAPHICS,0,GR_HEIGHT*GR_WIDTH>>3);
     MemSet(gr.screen_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
   }
   for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++) {
@@ -128,17 +128,17 @@ U0 WinZBufFill(CTask *task)
   if (w=r-l+1)
     for (y=t;y<=b;y++)
       MemSetU16(gr.win_z_buf(U8 *)+(y*TEXT_COLS+l)*sizeof(U16),
-	task->win_z_num,w);
+	    task->win_z_num,w);
 }
 
 public U0 WinZBufUpdate()
-{//Might have to call this if you are doing graphics outside winmgr callback routines.
+{//Might have to call if doing graphics outside winmgr callback routines.
 //Call it if, for example, when a pop-up window closes and you need to refresh
-//before graphics.
+  //before graphics.
   I64 i,z=1;
   U16 *ptr;
   CTask *task,*task1;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (gr.win_z_buf) {
     LBtr(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
     task1=task=sys_winmgr_task;
@@ -167,9 +167,9 @@ U0 GrInit2()
   HashDefineLstAdd("ST_SPRITE_ELEM_CODES",SPHT_ELEM_CODE,gr.sprite_hash);
   gr.screen_zoom=1;
 
-  SetStdPalette;
-  fp_set_std_palette=&SetStdPalette;
-  SetVGAPalette4Indices;
+  PaletteSetStd;
+  fp_set_std_palette=&PaletteSetStd;
+  GrPaletteIndicesSet;
 
   gr.to_8_bits	=MAlloc(256*sizeof(I64));
   gr.to_8_colors=MAlloc(256*sizeof(I64));

@@ -55,22 +55,22 @@ U0 TimeIns()
 {
   I64 start,end;
   I64 i,old_irq;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   CPURep;
   old_irq=IntEntrySet(I_F_UNARY_MINUS,F_UNARY_MINUS_INT,IDTET_TRAP);
 
-//Measure interrupt time
+  //Measure interrupt time
   start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
-	  UnaryMinusInt(ã);
+    UnaryMinusInt(ã);
   end=GetTSC;
   "Interrupt Cycles: %10.5f\n",ToF64(end-start)/SAMPLE_SIZE;
 
-//Measure call time
+  //Measure call time
   start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
-	  UnaryMinusCall(ã);
+    UnaryMinusCall(ã);
   end=GetTSC;
   "Call      Cycles: %10.5f\n",ToF64(end-start)/SAMPLE_SIZE;
 

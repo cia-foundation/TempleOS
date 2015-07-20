@@ -13,8 +13,8 @@ F64 collision_t;
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,
-    cx=task->pix_width>>1,
-    cy=task->pix_height>>1;
+	cx=task->pix_width>>1,
+	cy=task->pix_height>>1;
   Bool snd_on=FALSE;
   dc->color=BLACK;
   GrPrint(dc,0,0,"Protect your base.");
@@ -23,11 +23,11 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrRect(dc,cx-BASE_SIZE+2,cy-BASE_SIZE+2,BASE_SIZE*2-4,BASE_SIZE*2-4);
   dc->color=YELLOW;
   GrLine(dc,balls[0].x,balls[0].y,
-    ip.pos.x-task->pix_left-task->scroll_x,
-    ip.pos.y-task->pix_top-task->scroll_y);
+	ip.pos.x-task->pix_left-task->scroll_x,
+	ip.pos.y-task->pix_top-task->scroll_y);
   for (i=0;i<NUM_SPRINGS;i++)
     GrLine(dc,springs[i].end1->x,springs[i].end1->y,
-		springs[i].end2->x,springs[i].end2->y);
+	  springs[i].end2->x,springs[i].end2->y);
 
   dc->color=LTCYAN;
   GrCircle(dc,balls[0].x,balls[0].y,BALL_RADIUS);
@@ -40,7 +40,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrCircle(dc,balls[i].x,balls[i].y,BALL_RADIUS);
     GrFloodFill(dc,balls[i].x,balls[i].y,TRUE);
     if (cx-BASE_SIZE-BALL_RADIUS<=balls[i].x<=cx+BASE_SIZE+BALL_RADIUS &&
-	cy-BASE_SIZE-BALL_RADIUS<=balls[i].y<=cy+BASE_SIZE+BALL_RADIUS)
+	  cy-BASE_SIZE-BALL_RADIUS<=balls[i].y<=cy+BASE_SIZE+BALL_RADIUS)
       snd_on=TRUE;
     dc->color=BLACK;
     GrCircle(dc,balls[i].x,balls[i].y,BALL_RADIUS);
@@ -58,15 +58,17 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
   CD3 p,p2;
   CTask *task=ode->win_task;
 
-  D3SubEqu(D3Equ(&p2,ip.pos.x-task->pix_left-task->scroll_x,ip.pos.y-task->pix_top-task->scroll_y,0),
-    &balls[0].state->x);
+  D3SubEqu(D3Equ(&p2,
+	ip.pos.x-task->pix_left-task->scroll_x,
+	ip.pos.y-task->pix_top-task->scroll_y,0),
+	&balls[0].state->x);
   D3AddEqu(&balls[0].DstateDt->DxDt,D3MulEqu(&p2,STRETCH));
 
   D3Equ(&p2,task->pix_width>>1,task->pix_height>>1,0);
   for (i=1;i<NUM_BALLS;i++) {
     D3Sub(&p2,&balls[i].state->x,&p);
     if (d=D3Norm(&p)) {
-      //Gravity would be /(d*d*d), but that's too exponential.
+//Gravity would be /(d*d*d), but that's too exponential.
       D3MulEqu(&p,GRAVITY/d);
       D3AddEqu(&balls[i].DstateDt->DxDt,&p);
     }
@@ -110,14 +112,14 @@ U0 Whap()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   AutoComplete;
-  Preempt(OFF);
+  Preempt;
 
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-);
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	);
   ode->derivative=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
@@ -126,7 +128,7 @@ U0 Whap()
   D3Equ(&balls[0].x,100,100,0);
   for (i=1;i<NUM_BALLS;i++)
     D3Equ(&balls[i].x,
-    RandI16%500+Fs->pix_width>>1,RandI16%500+Fs->pix_height>>1,0);
+	  RandI16%500+Fs->pix_width>>1,RandI16%500+Fs->pix_height>>1,0);
   balls[0].x=ip.pos.x-Fs->pix_left-Fs->scroll_x;
   balls[0].y=ip.pos.y-Fs->pix_top-Fs->scroll_y;
   for (i=0;i<NUM_BALLS;i++) {

@@ -16,7 +16,7 @@ public U0 DocCenter(CDoc *doc=NULL,I64 recalc=DOC_RECALC)
   task=doc->win_task;
   DocRecalc(doc,FALSE,recalc);
   if (!(doc->flags&DOCF_BORDER_DOC))
-    doc->cur_top_line_num=doc->y-(task->win_height+1)>>1;
+    doc->top_line_num=doc->y-(task->win_height+1)>>1;
   if (unlock)
     DocUnlock(doc);
 }
@@ -29,7 +29,7 @@ U0 DocDelToNum(CDoc *doc,I64 num)
     if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
       if (doc_e==doc->cur_entry) {
 	doc->cur_entry=doc_e2;
-	doc->cur_data_col=doc_e2->min_col;
+	doc->cur_col=doc_e2->min_col;
       }
       DocEntryDel(doc,doc_e);
     }
@@ -45,7 +45,7 @@ U0 DocDelToEntry(CDoc *doc,CDocEntry *clear_entry)
     if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
       if (doc_e==doc->cur_entry) {
 	doc->cur_entry=doc_e2;
-	doc->cur_data_col=doc_e2->min_col;
+	doc->cur_col=doc_e2->min_col;
       }
       DocEntryDel(doc,doc_e);
     }
@@ -62,7 +62,7 @@ U0 DocBorderLstDraw(CDoc *doc)
   U64 ch;
   CDoc *templ=doc;
   CD3I64 saved_scroll;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   while (templ && templ->doc_signature==DOC_SIGNATURE_VAL) {
     y+=(Bsr(templ->desc)+7)>>3+1; //StrLen+1
     templ=templ->parent_doc;
@@ -94,7 +94,7 @@ public U0 DocBottom(CDoc *doc=NULL)
     return;
   unlock=DocLock(doc);
   doc->cur_entry=doc;
-  doc->cur_data_col=0;
+  doc->cur_col=0;
   DocRecalc(doc);
   if (unlock)
     DocUnlock(doc);
@@ -145,7 +145,7 @@ public U0 DocCollapse(Bool collapse=TRUE,CDoc *doc=NULL)
     DocUnlock(doc);
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 public U0 DocPrintAtomic(CDoc *doc,U8 *fmt,...)
 {//Necessary when hidden text might screw-up
 //inserts.  It does multiple whole doc cmds all-at-once.
@@ -166,13 +166,13 @@ public U0 DocPrintAtomic(CDoc *doc,U8 *fmt,...)
   Free(buf);
 }
 
-#help_index "DolDoc/Task"
+#help_index "DolDoc/Task;StdOut/Task"
 U0 DocUpdateTaskDocs(CTask *task)
-{//This is called from $LK,"GrUpdateWins",A="MN:GrUpdateWins"$() by the winmgr at 30fps.
+{//This is called from $LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$() by the winmgr at 30fps.
   CDrv *dv;
   CDoc *doc;
   CD3I64 saved_scroll;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   I64 border_attr;
   if (task->border_src==BDS_CUR_DRV && task->cur_dv) {
     border_attr=task->cur_dv->text_attr;
@@ -195,7 +195,7 @@ U0 DocUpdateTaskDocs(CTask *task)
       MemCpy(task->task_title,doc->filename.name,TASK_TITLE_LEN);
     Preempt(old_preempt);
     DocRecalc(doc,TRUE,DOC_RECALC_TO_SCREEN);
-    Preempt(OFF);
+    Preempt;
   }
   if ((doc=DocBorder(task)) && !(doc->flags&DOCF_DONT_SHOW)) {
     WinScrollNull(task,&saved_scroll);

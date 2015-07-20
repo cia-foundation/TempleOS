@@ -1,9 +1,10 @@
 #help_index "Windows"
 
 CIPStateGlbls old_ip={IP_NULL,{-1000,-1000,0},{-1000,-1000,0},{-1000,-1000,0},
-	{0,0,0},{1.0,1.0,1.0},
-	0,(MAX_I32+1)>>3,0.0,GetTSC,0.350,0,0,
-	FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE};
+  {0,0,0},{1.0,1.0,1.0},
+  0,(MAX_I32+1)>>3,0.0,GetTSC,0.350,0,0,
+  FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
+};
 
 public CWinMgrGlbls winmgr={0,0,0,WMG_FPS,tS,NULL,NULL,FALSE,FALSE,FALSE};
 winmgr.t=CAlloc(sizeof(CWinMgrTimingGlbls));
@@ -20,19 +21,19 @@ U0 DrawProgressBars(CDC *dc)
     if (m=sys_progresses[i].max) {
       dc->color=BLACK;
       GrRect(dc,
-	(GR_WIDTH-PROGRESS_BAR_WIDTH)/2,
-	(GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2,
-	PROGRESS_BAR_WIDTH,PROGRESS_BAR_HEIGHT);
+	    (GR_WIDTH-PROGRESS_BAR_WIDTH)/2,
+	    (GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2,
+	    PROGRESS_BAR_WIDTH,PROGRESS_BAR_HEIGHT);
 
       dc->color=LTGREEN;
       n=sys_progresses[i].val;
       if (n>m)
 	n=m;
       GrRect(dc,
-	(GR_WIDTH-PROGRESS_BAR_WIDTH)/2+2,
-	(GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2+2,
-	n*(PROGRESS_BAR_WIDTH-4)/m,
-	PROGRESS_BAR_HEIGHT-4);
+	    (GR_WIDTH-PROGRESS_BAR_WIDTH)/2+2,
+	    (GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2+2,
+	    n*(PROGRESS_BAR_WIDTH-4)/m,
+	    PROGRESS_BAR_HEIGHT-4);
 
       if (m>1) {
 	dc->color=BLACK;
@@ -40,10 +41,14 @@ U0 DrawProgressBars(CDC *dc)
 	if (k>19) k=19;
 	for (j=0;j<=k;j++)
 	  GrLine(dc,
-	  (GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
-	  (GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2+4,
-	  (GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
-	  (GR_HEIGHT-(NUM_PROGRESS_BARS*2-3-i*4)*PROGRESS_BAR_HEIGHT)/2-4);
+		(GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*
+		(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
+		(GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*
+		PROGRESS_BAR_HEIGHT)/2+4,
+		(GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*
+		(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
+		(GR_HEIGHT-(NUM_PROGRESS_BARS*2-3-i*4)*
+		PROGRESS_BAR_HEIGHT)/2-4);
       }
 
       dc->color=WHITE;
@@ -52,8 +57,8 @@ U0 DrawProgressBars(CDC *dc)
       else
 	st=MStrPrint("%d/%d",n,m);
       GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,
-	(GR_HEIGHT-FONT_HEIGHT-
-	(NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
+	    (GR_HEIGHT-FONT_HEIGHT-
+	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
       Free(st);
     }
   }
@@ -193,13 +198,14 @@ U0 WinIPUpdate()
     ip.has_wheel=mouse.has_wheel;
     if (mouse.evt) {
       ip.throttle+=ip.throttle_step*SignI64(mouse.pos.z-ip.pos.z);
-      IPVarsUpdate(mouse.pos.x,mouse.pos.y,mouse.pos.z,mouse.buttons[0],mouse.buttons[1]);
+      IPVarsUpdate(mouse.pos.x,mouse.pos.y,mouse.pos.z,
+	    mouse.buttons[0],mouse.buttons[1]);
       mouse.evt=FALSE;
       set=TRUE;
     }
   } else if (ip.dev==IP_NULL && mouse.installed)
     ip.dev=IP_MOUSE;
- 
+
   if (set) {
     if (ip.dev==IP_MOUSE) {
       ip.speed=mouse.speed;
@@ -255,7 +261,7 @@ I64 WinOnTopWindows()
       return result;
     }
     if (Bt(&task->display_flags,DISPLAYf_WIN_ON_TOP) &&
-	task!=sys_winmgr_task->last_task) {
+	  task!=sys_winmgr_task->last_task) {
       TaskQueRem(task);
       TaskQueIns(task,sys_winmgr_task);
       result++;
@@ -300,7 +306,7 @@ public I64 WinToTop(CTask *task=NULL,Bool update_z_buf=TRUE)
       task1=task1->next_sibling_task;
     }
     if (task->popup_task &&
-      task->popup_task->parent_task==task)
+	  task->popup_task->parent_task==task)
       result+=WinToTop(task->popup_task,FALSE);
   }
   POPFD

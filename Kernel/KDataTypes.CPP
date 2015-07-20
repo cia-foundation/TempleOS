@@ -39,7 +39,7 @@ I64 LinkedLstSize(U8 **_lst)
 }
 
 U0 QueDel(CQue *root,Bool querem=FALSE)
-{//Free entrie queue, not root.
+{//Free entries in queue, not root.
   CQue *tempq=root->next,*tempq1;
   while (tempq!=root) {
     tempq1=tempq->next;
@@ -87,7 +87,7 @@ I64 QueSize(CQue *root)
 CQueVectU8 *QueVectU8New(I64 min_index=0)
 {//Create new queue vecter.
   CQueVectU8 *result=MAlloc(sizeof(CQueVectU8));
-  result->next=result->last=result;
+  QueInit(result);
   result->total_cnt=result->node_cnt=0;
   result->min_index=min_index;
   return result;

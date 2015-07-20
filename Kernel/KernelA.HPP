@@ -6,10 +6,10 @@ extern class CDoc;
 extern class CCPU;
 extern class CHashClass;
 extern class CHashFun;
-extern class CExeImportExport;
+extern class CAOTImportExport;
 extern class CHeapCtrl;
-extern class CExeHeapGlbl;
-extern class CExe;
+extern class CAOTHeapGlbl;
+extern class CAOT;
 extern class CDC;
 extern class CSrvCtrl;
 extern class CIntermediateCode;
@@ -36,6 +36,7 @@ extern class CIntermediateCode;
 #define MIN_U64 0
 #define MAX_U64 0xFFFFFFFFFFFFFFFF
 #define INVALID_PTR	MAX_I64
+#define STR_LEN 144
 
 //(Int to F64 conversion is signed)
 //Turn off 80-bit float constants with $LK,"OPTf_NO_BUILTIN_CONST",A="MN:OPTf_NO_BUILTIN_CONST"$.
@@ -109,7 +110,7 @@ I64i union I64
   U32	u32[2];
 };
 
-#help_index "Math/Complex"
+#help_index "Math/Complex;Data Types/Complex"
 public class Complex
 {
   F64	x,y;
@@ -121,36 +122,36 @@ public class CQue
   CQue	*next,*last;
 };
 
-#help_index "Math/Data Types;Graphics/Data Types"
-public class CD3I32	//Three dimensional pt
+#help_index "Graphics/Data Types/D3I32;Math/Data Types/D3I32;Data Types/D3I32"
+public class CD3I32 //Three dimensional I32 pt
 {
   I32	x,y,z;
 };
-public class CQueD3I32
+public class CQueD3I32 //Que of three dimensional I32 pts
 {
   CQueD3I32	*next,*last;
   CD3I32	p;
 };
-#help_index "Math/Data Types"
-public class CD2I32	//two dimensional pt
+#help_index "Math/Data Types;Data Types"
+public class CD2I32 //Two dimensional I32 pt
 {
   I32	x,y;
 };
-public class CD2I64	//two dimensional pt
+public class CD2I64 //Two dimensional I64 pt
 {
   I64	x,y;
 };
-public class CD3I64	//three dimensional pt
+public class CD3I64 //Three dimensional I64 pt
 {
   I64	x,y,z;
 };
-public class CD2	//two dimensional pt
+public class CD2 //Two dimensional F64 pt
 {
   F64	x,y;
 };
 
-#help_index "Math/Data Types;Math/CD3"
-public class CD3	//three dimensional pt
+#help_index "Math/CD3;Data Types/CD3"
+public class CD3 //Three dimensional F64 pt
 {
   F64	x,y,z;
 };
@@ -320,8 +321,8 @@ public class CMathODE
 #define RFLAGf_VINT_PENDING	20
 #define RFLAGf_ID		21
 
-#define SYS_START_RFLAGS	0x0000
-#define SYS_NORMAL_RFLAGS	(1<<RFLAGf_INT)
+#define RFLAGG_START		0x0000
+#define RFLAGG_NORMAL		(1<<RFLAGf_INT)
 
 //Global Descriptor Table
 class CGDTEntry
@@ -373,42 +374,42 @@ class CBinFile
 	reserved;
   U32	bin_signature;
   I64	module_org,
-	patch_table_offset, //$LK,"Patch Table Generation",A="FF:::/Compiler/CMain.CPP,EIT_ABS_ADDR"$
+	patch_table_offset, //$LK,"Patch Table Generation",A="FF:::/Compiler/CMain.CPP,IET_ABS_ADDR"$
 	file_size;
 };
 
 class CPatchTableAbsAddr
 {
-  U8	eit_abs_addr;	//$LK,"EIT_ABS_ADDR",A="MN:EIT_ABS_ADDR"$
+  U8	eit_abs_addr;	//$LK,"IET_ABS_ADDR",A="MN:IET_ABS_ADDR"$
   U32	abs_addres_cnt;
   U8	zero;
   U32	abs_addres[1];
 };
 
-//$LK,"CExeImportExport",A="MN:CExeImportExport"$ Types. Used in PatchTable.
-#define EIT_END			0
+//$LK,"CAOTImportExport",A="MN:CAOTImportExport"$ Types. Used in PatchTable.
+#define IET_END			0
 //reserved
-#define EIT_REL_I0		2 //Fictitious
-#define EIT_IMM_U0		3 //Fictitious
-#define EIT_REL_I8		4
-#define EIT_IMM_U8		5
-#define EIT_REL_I16		6
-#define EIT_IMM_U16		7
-#define EIT_REL_I32		8
-#define EIT_IMM_U32		9
-#define EIT_REL_I64		10
-#define EIT_IMM_I64		11
+#define IET_REL_I0		2 //Fictitious
+#define IET_IMM_U0		3 //Fictitious
+#define IET_REL_I8		4
+#define IET_IMM_U8		5
+#define IET_REL_I16		6
+#define IET_IMM_U16		7
+#define IET_REL_I32		8
+#define IET_IMM_U32		9
+#define IET_REL_I64		10
+#define IET_IMM_I64		11
 //reserved
-#define EIT_REL32_EXPORT	16
-#define EIT_IMM32_EXPORT	17
-#define EIT_REL64_EXPORT	18 //Not implemented
-#define EIT_IMM64_EXPORT	19 //Not implemented
-#define EIT_ABS_ADDR		20
-#define EIT_CODE_HEAP		21 //Not really used
-#define EIT_ZEROED_CODE_HEAP	22 //Not really used
-#define EIT_DATA_HEAP		23
-#define EIT_ZEROED_DATA_HEAP	24 //Not really used
-#define EIT_MAIN		25
+#define IET_REL32_EXPORT	16
+#define IET_IMM32_EXPORT	17
+#define IET_REL64_EXPORT	18 //Not implemented
+#define IET_IMM64_EXPORT	19 //Not implemented
+#define IET_ABS_ADDR		20
+#define IET_CODE_HEAP		21 //Not really used
+#define IET_ZEROED_CODE_HEAP	22 //Not really used
+#define IET_DATA_HEAP		23
+#define IET_ZEROED_DATA_HEAP	24 //Not really used
+#define IET_MAIN		25
 
 #help_index "Boot"
 class CKernel
@@ -578,7 +579,7 @@ class CRAXRBCRCXRDX
 //Semaphores
 class CSema
 {//I read you're supposed to use one cache line.
- //I don't know why.  Might be silly.
+//I don't know why.  Might be silly.
   Bool	val;
   U8	pad[SEMA_STRUCT_SIZE-sizeof(Bool)];
 };
@@ -609,6 +610,33 @@ class CSema
 #define SYSf_CTRL_ALT_C			1
 #define SYSf_CTRL_ALT_X 		2
 #define SYSf_CTRL_ALT_TAB		3
+
+#help_index "Hash"
+public class CHash
+{
+//Hash entries are not removed.  New entries eclipse old by being
+  //in front for searches.  Old function code is not freed
+  //because a reference might use it.
+  CHash	*next;
+  U8	*str;
+  U32	type,use_cnt;
+//use_cnt is never decremented.  It is incremented
+  //each time a node is found in a hash search.
+  //One place it is used is to tell if a externed function was unused
+  //before being defined.  It is also used for popularity measures
+  //in autocomplete.	You can do a $LK,"Who",A="MN:Who"$() to see
+  //roughly how many times a symbol has been
+  //referenced.	Beware of instances where
+  //a hash entry is continuously searched for and
+  //racks-up huge use_cnt numbers.
+};
+
+public class CHashTable
+{
+  CHashTable *next;
+  I64	mask,locked_flags;
+  CHash	**body;
+};
 
 #help_index "Hash/System"
 //Hash table types
@@ -650,8 +678,8 @@ class CSema
 #define HTT_CLASS		0x00010 //CHashClass
 #define HTT_INTERNAL_TYPE	0x00020 //CHashClass
 #define HTT_FUN			0x00040 //CHashFun
-#define HTT_WORD		0x00080 //CHashAC--only in AutoComplete table
-#define HTT_DICT_WORD		0x00100 //CHashGeneric--only in AutoComplete table
+#define HTT_WORD		0x00080 //CHashAC only in AutoComplete table
+#define HTT_DICT_WORD		0x00100 //CHashGeneric only in AutoComplete tbl
 #define HTT_KEYWORD		0x00200 //CHashGeneric
 #define HTT_ASM_KEYWORD		0x00400 //CHashGeneric
 #define HTT_OPCODE		0x00800 //CHashOpcode
@@ -673,7 +701,8 @@ class CSema
 #define HTF_LOCAL		0x80000000
 #define HTG_FLAGS_MASK		0xFF000000
 
-#define HTG_SRC_SYM		(HTT_DEFINE_STR|HTT_GLBL_VAR|HTT_FUN|HTT_CLASS|HTT_EXPORT_SYS_SYM|HTT_HELP_FILE)
+#define HTG_SRC_SYM	(HTT_DEFINE_STR|HTT_GLBL_VAR|HTT_FUN|HTT_CLASS|\
+			HTT_EXPORT_SYS_SYM|HTT_HELP_FILE)
 #define HTG_ALL 		-1
 
 #define KERNEL_MODULE_NAME	"/Kernel/Kernel"
@@ -684,32 +713,13 @@ class CDbgInfo
   U32	body[1]; //Code heap is 32-bit value
 };
 
-public class CHash
-{
-//Hash entries are not removed.  New entries eclipse old by being
-//in front for searches.  Old function code is not freed
-//because a reference might use it.
-  CHash	*next;
-  U8	*str;
-  U32	type,use_cnt;
-//use_cnt is never decremented.  It is incremented
-//each time a node is found in a hash search.
-//One place it is used is to tell if a externed function was unused
-//before being defined.  It is also used for popularity measures
-//in autocomplete.	You can do a $LK,"Who",A="MN:Who"$() to see
-//roughly how many times a symbol has been
-//referenced.	Beware of instances where
-//a hash entry is continuously searched for and
-//racks-up huge use_cnt numbers.
-};
-
 public class CHashSrcSym:CHash
 {
   U8	*src_link,
 	*index;
   CDbgInfo *dbg_info;
   U8	*import_name;
-  CExeImportExport *ie_lst;
+  CAOTImportExport *ie_lst;
 };
 
 public class CHashGeneric:CHash
@@ -731,13 +741,6 @@ public class CHashReg:CHash
   U8	reg_num,reg_type;
 };
 
-public class CHashTable
-{
-  CHashTable *next;
-  I64	mask,locked_flags;
-  CHash	**body;
-};
-
 public class CHashAC:CHash
 {
   I32	num;
@@ -753,12 +756,6 @@ public class CHashImport:CHashSrcSym
 {
   U8	*module_base,
 	*module_header_entry;
-};
-
-public class CHashDefineStr:CHashSrcSym
-{
-  U8	*data,**sub_lst;
-  I64	cnt;
 };
 
 #help_index "Compiler/Internal"
@@ -790,10 +787,10 @@ public class CMemberLstMeta
 
 public class CMemberLst
 {
-  CMemberLst	*next,*left,*right,
-		*left2,*right2; //For finding dup class local vars, not names.
+  CMemberLst *next,*left,*right,
+	*left2,*right2; //For finding dup class local vars, not names.
   U8	*str;
-  CHashClass	*member_class,*member_class2;
+  CHashClass *member_class,*member_class2;
   CMemberLstMeta *meta;
   U32	use_cnt;
   U16	flags;
@@ -815,6 +812,12 @@ class CExternUsage
 };
 
 #help_index "Hash/System;Compiler/Internal"
+public class CHashDefineStr:CHashSrcSym
+{
+  U8	*data,**sub_lst;
+  I64	cnt;
+};
+
 #define Cf_EXTERN		0
 #define Cf_INTERNAL_TYPE	1
 
@@ -824,10 +827,10 @@ public class CHashClass:CHashSrcSym
   U32	member_cnt;
   U8	ptr_stars_cnt,raw_type;
   U16	flags;
-  CMemberLst	*member_lst,*member_lst2,
-		*last_in_member_lst;
+  CMemberLst *member_lst,*member_lst2,
+	*last_in_member_lst;
   CHashClass	*base_class,
-		*fwd_class;
+	*fwd_class;
 };
 
 //Function flags
@@ -860,13 +863,13 @@ public class CHashFun:CHashClass
 public class CHashGlblVar:CHashSrcSym
 {
   I64	size,flags;
-  CHashClass	*var_class;
-  CHashFun	*fun_ptr;
-  CArrayDim	dim;
+  CHashClass *var_class;
+  CHashFun *fun_ptr;
+  CArrayDim dim;
   U8	*data_addr;
   union {
     I64	data_addr_ip;
-    CExeHeapGlbl *heap_glbl;
+    CAOTHeapGlbl *heap_glbl;
   }
 };
 #assert offset(CHashClass.size)==offset(CHashGlblVar.size)
@@ -891,28 +894,28 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCT_TAB		4
 #define DOCT_CLEAR		5
 #define DOCT_PAGE_BREAK		6
-#define DOCT_DATA		7
-#define DOCT_PAGE_LEN		8
-#define DOCT_LEFT_MARGIN	9
-#define DOCT_RIGHT_MARGIN	10
-#define DOCT_HEADER		11
-#define DOCT_FOOTER		12
-#define DOCT_INDENT		13
-#define DOCT_FOREGROUND		14
-#define DOCT_BACKGROUND		15
-#define DOCT_DFT_FOREGROUND	16
-#define DOCT_DFT_BACKGROUND	17
-#define DOCT_PMT		18
-#define DOCT_WORD_WRAP		19
-#define DOCT_UNDERLINE		20
-#define DOCT_INVERT		21
-#define DOCT_BLINK		22
-#define DOCT_SHIFTED_X		23
-#define DOCT_SHIFTED_Y		24
-#define DOCT_CURSOR_MOVEMENT	25
-#define DOCT_ANCHOR		26
-#define DOCT_LINK		27
-#define DOCT_BUTTON		28
+#define DOCT_PAGE_LEN		7
+#define DOCT_LEFT_MARGIN	8
+#define DOCT_RIGHT_MARGIN	9
+#define DOCT_HEADER		10
+#define DOCT_FOOTER		11
+#define DOCT_INDENT		12
+#define DOCT_FOREGROUND		13
+#define DOCT_BACKGROUND		14
+#define DOCT_DFT_FOREGROUND	15
+#define DOCT_DFT_BACKGROUND	16
+#define DOCT_PMT		17
+#define DOCT_WORD_WRAP		18
+#define DOCT_UNDERLINE		19
+#define DOCT_INVERT		20
+#define DOCT_BLINK		21
+#define DOCT_SHIFTED_X		22
+#define DOCT_SHIFTED_Y		23
+#define DOCT_CURSOR_MOVEMENT	24
+#define DOCT_ANCHOR		25
+#define DOCT_LINK		26
+#define DOCT_BUTTON		27
+#define DOCT_DATA		28
 #define DOCT_CHECK_BOX		29
 #define DOCT_LST		30
 #define DOCT_MACRO		31
@@ -941,10 +944,11 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEt_SELECTED		ATTRf_SELECTED
 #define DOCEt_UNDERLINE		ATTRf_UNDERLINE
 
-#define DOCG_DBL_BUF_FLAGS	(DOCF_OVERSTRIKE|DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS| \
-				DOCF_MIN_SIZE|DOCF_NO_CURSOR|DOCF_FORM| \
-				DOCF_DBL_DOLLARS|DOCF_DONT_SWAP_OUT| \
-				DOCF_DO_FULL_REFRESH|DOCF_BORDER_DOC|DOCF_HIDE_CURSOR|DOCF_CARRIAGE_RETURN)
+#define DOCG_DBL_BUF_FLAGS	(DOCF_OVERSTRIKE|DOCF_PLAIN_TEXT|\
+		DOCF_PLAIN_TEXT_WITH_TABS|DOCF_MIN_SIZE|DOCF_NO_CURSOR|\
+		DOCF_FORM|DOCF_DBL_DOLLARS|DOCF_DONT_SWAP_OUT|\
+		DOCF_DO_FULL_REFRESH|DOCF_BORDER_DOC|DOCF_HIDE_CURSOR|\
+		DOCF_CARRIAGE_RETURN)
 
 //CDocEntry.de_flags.  These first 15 are arg=
 #define DOCEF_TAG		1
@@ -1087,14 +1091,14 @@ public class CHashGlblVar:CHashSrcSym
 
 public class CDocBin
 {
-  CDocBin	*next,*last;
+  CDocBin *next,*last;
   I32	temp_use_cnt,renum_num;
   U8	*tag;
   U0	start;
   U32	num,flags,size,use_cnt;
   U0	end;
   U8	*data;
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #define DOC_SCROLL_SPEED	8
@@ -1136,8 +1140,8 @@ public class CDocSettings
 public class CDocEntryBase
 {
 //This is a shortened structure for
-//cmds like the text cmd which
-//don't require the full CDocEntry structure.
+  //cmds like the text cmd which
+  //don't require the full CDocEntry structure.
   CDocEntryBase *next,*last;
   U8	*tag;
   union {
@@ -1150,7 +1154,7 @@ public class CDocEntryBase
   U32	min_col,max_col;
   CDocSettings settings;
   I64	user_data;
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 public class CDocEntry:CDocEntryBase
@@ -1183,10 +1187,10 @@ public class CDocEntry:CDocEntryBase
   U8	raw_type,pad[3];
   CDocBin *bin_data;
   U8	*data;
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
-//$LK,"DocFormDo",A="MN:DocFormDo"$() $LK,"DocMenuDo",A="MN:DocMenuDo"$() $LK,"DocDo",A="MN:DocDo"$() $LK,"PopUpMenu",A="MN:PopUpMenu"$()
+//$LK,"DocForm",A="MN:DocForm"$() $LK,"DocMenu",A="MN:DocMenu"$() $LK,"DocEd",A="MN:DocEd"$() $LK,"PopUpMenu",A="MN:PopUpMenu"$()
 #define	DOF_MIN_SIZE		0x01
 #define	DOF_INTERCEPT_TASK_END	0x02
 #define DOF_DONT_HOME		0x04
@@ -1198,8 +1202,8 @@ U0 pad;#assert !($$&7) //(compiler lags one token)
 
 class CEdFindText
 {
-  U8	find_text[136]		fmtstr "$$DA-P,135,A=\"Find        :%s\"$$\n",
-	replace_text[136]	fmtstr "$$DA-P,135,A=\"Replace     :%s\"$$\n";
+  U8	find_text[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Find        :%s\"$$\n",
+	replace_text[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Replace     :%s\"$$\n";
   Bool	replace			fmtstr "$$CB,\"Replace\"$$\n",
 	scan_fwd		fmtstr "$$CB,\"Fwd\"$$\n",
 	scan_selected_text	fmtstr "$$CB,\"Selection\"$$\n",
@@ -1308,7 +1312,7 @@ class CDocUndo
   U8	*body;
 };
 
-//See $LK,"DocMenuDo",A="MN:DocMenuDo"$()
+//See $LK,"DocMenu",A="MN:DocMenu"$()
 #define DOCM_CANCEL		(-1)
 
 #define DOC_SIGNATURE_VAL	'DocS'
@@ -1323,11 +1327,11 @@ public class CDoc //Linked Text File header
   CDocEntryBase root;
   I64	flags,locked_flags;
   CDocEntry *cur_entry,*old_cur_entry;
-  I32	cur_data_col,old_cur_data_col,
-	line_start_col,cur_top_line_num,
-	ext_ascii_val,ext_ascii_cnt, //Like <CTRL-ALT-a>, <ALT-#><ALT-#><ALT-#> works
+  I32	cur_col,old_cur_col,
+	line_start_col,top_line_num,
+	ext_ascii_val,ext_ascii_cnt, //Like <CTRL-ALT-a>, <ALT-#><ALT-#><ALT-#>
 	dollar_buf_size,dollar_buf_ptr;
-  U8	*dollar_buf; //When entering $$ commands, it buffers them until the end $$.
+  U8	*dollar_buf; //When entering $$ cmds, it buffers them until the end $$.
 
   CTask *win_task,*mem_task,*owning_task;
   I32	page_line_num,undo_cnt,
@@ -1341,8 +1345,9 @@ public class CDoc //Linked Text File header
 	updates_cnt;
   CEdFindText *find_replace;
 
-  U8	*cur_sprite;
-  I64	cur_sprite_elem_num;
+  U8	*cur_sprite;//Set cur_sprite use (ip.pos.x,ip.pos.y) as input.
+//Output is nearest. See $LK,"*_cur_elem_num=",A="FF:::/Adam/Gr/SpriteEd.CPP.Z,*_cur_elem_num=doc->"$ and $LK,"::/Demo/Graphics/Pick.CPP.Z"$.
+  I64	nearest_sprite_elem_num;
 
   CEdFileName filename;
   I64	file_attr;
@@ -1357,12 +1362,12 @@ public class CDoc //Linked Text File header
   CDoc	*parent_doc; //(When browsing deeper, opening deeper docs.)
   U64	desc; //8 characters. See $LK,"DocBorderLstDraw",A="MN:DocBorderLstDraw"$().
 
-  CDocBin	bin_root;
-  CDocSettings	settings_root;
-  CDocUndo	undo_root;
+  CDocBin bin_root;
+  CDocSettings settings_root;
+  CDocUndo undo_root;
 
   I64	user_data;
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Windows"
@@ -1397,7 +1402,8 @@ tries to do something.
 #define WIF_FOCUS_TASK_GRAB_SCROLL 0x02000000
 
 #define WIG_DBL_CLICK		(WIF_FOCUS_TASK_IP_L_D|WIF_FOCUS_TASK_IP_R_D)
-#define WIG_TASK_DFT		(WIF_FOCUS_TASK_MENU|WIG_DBL_CLICK|0xFFFF-WIF_SELF_DOC-WIF_SELF_ODE)
+#define WIG_TASK_DFT	(WIF_FOCUS_TASK_MENU|WIG_DBL_CLICK|\
+			0xFFFF-WIF_SELF_DOC-WIF_SELF_ODE)
 #define WIG_USER_TASK_DFT	0
 
 #define WIf_SELF_FOCUS		0
@@ -1449,7 +1455,8 @@ public class CWinMgrGlbls
 //  Use $LK,"OptOn",A="MN:OptOn"$() $LK,"OptOff",A="MN:OptOff"$()
 
 //You might need to do #exe {OptOn();}
-//Note: The #exe statement is lexed-ahead, so it takes effect earlier than you might expect.
+//Note: The #exe statement is lexed-ahead,
+//so it takes effect earlier than you might expect.
 #define OPTf_ECHO		0x00
 #define OPTf_OPT_TRACE		0x01
 #define OPTf_COMPILE_TRACE	0x02
@@ -1492,7 +1499,8 @@ public class CWinMgrGlbls
 #define TY_DISP			0x30
 #define TY_SIB			0x40
 #define TY_RIP_DISP32		0x50
-#define TY_RIP_DISP32_IMPORT	0x60 //not implemented--requires storage for glblvar struct in intermediate code
+//Not implemented.  Requires storage for glblvar struct in intermediate code.
+#define TY_RIP_DISP32_IMPORT	0x60
 #define TY_STK			0x70
 #define TY_MASK			0xF0
 
@@ -1515,8 +1523,8 @@ public class CWinMgrGlbls
 #define ICF_R_WAS_STK			0x000010000
 #define ICF_A1_WAS_STK			0x000020000
 #define ICF_A2_WAS_STK			0x000040000
-#define ICF_PUSH_CMP			0x000080000 //for 50<i<j<=100 expressions
-#define ICF_POP_CMP			0x000100000 //for 50<i<j<=100 expressions
+#define ICF_PUSH_CMP			0x000080000 //for 50<i<j<=100 exps
+#define ICF_POP_CMP			0x000100000 //for 50<i<j<=100 exps
 #define ICF_DEPEND_RESULT		0x000200000
 #define ICF_SWAP			0x000400000
 #define ICf_DONT_PUSH_FLOAT0		23 // 3bits
@@ -1532,7 +1540,7 @@ public class CWinMgrGlbls
 
 #define IC_BODY_SIZE			0x80
 
-#define ECF_HAS_PUSH_CMP		0x01 //for 50<i<j<=100 expressions
+#define ECF_HAS_PUSH_CMP		0x01 //for 50<i<j<=100 exps
 
 class CICArg
 {
@@ -1543,9 +1551,9 @@ class CICArg
 
 class CICTreeLinks
 {
-  CHashClass	*a1c,*a2c;
+  CHashClass *a1c,*a2c;
   CIntermediateCode *a1t,*a2t;
-  CHashClass	*class2;
+  CHashClass *class2;
 };
 
 class CIntermediateCodeBase
@@ -1568,7 +1576,7 @@ class CIntermediateCode:CIntermediateCodeBase
   CICArg a1,a2,r;
   union {
     U8 ic_body[IC_BODY_SIZE];
-    //Tree Links are created in OptPass012.  An ADD opcode, for exmaple,
+//Tree Links are created in OptPass012.  An ADD opcode, for exmaple,
     //points back to its two earlier addend instructions, not MAlloced,
     //just pointers to previous CIntermediate codes in the array.
 
@@ -1579,7 +1587,7 @@ class CIntermediateCode:CIntermediateCodeBase
     //Tree links are mostly used during 012 and 3 for determining types.
     CICTreeLinks t;
   };
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 class CPrsStk
@@ -1608,9 +1616,9 @@ class CPrsStk
 
 #define CM_MAX_CONSTS		16
 
-class CLexCodeMisc
+class CCodeMisc
 {
-  CLexCodeMisc *next,*last,*fwd,*dft,*begin;
+  CCodeMisc *next,*last,*fwd,*dft,*begin;
   U8	*str;
   U32	type,flags;
   I64	use_cnt;
@@ -1622,26 +1630,25 @@ class CLexCodeMisc
     I64 ip;		//ASM_LABEL
   }
   union {
-    CLexCodeMisc **jmp_table;
-    F64		*float_consts;
-    CArrayDim	*dim;
-    CHash	*h;
+    CCodeMisc **jmp_table;
+    F64	*float_consts;
+    CArrayDim *dim;
+    CHash *h;
   };
 };
 
 #help_index "Compiler/Assembler"
 #define IEF_OP_SIZE16		0x001
 #define IEF_OP_SIZE32		0x002
-#define IEF_DONT_SWITCH_MODES	0x004
-#define IEF_PLUS_OPCODE		0x008
+#define IEF_PLUS_OPCODE		0x004
+#define IEF_DONT_SWITCH_MODES	0x008
 #define IEF_DFT			0x010
-#define IEF_NO_REX		0x020
-#define IEF_40_REX		0x040
-#define IEF_48_REX		0x080
-#define IEF_REX_ONLY_R8_R15	0x100
-#define IEF_REX_XOR_LIKE	0x200
-#define IEF_STI			0x400
-#define IEF_ENDING_ZERO		0x800
+#define IEF_NOT_IN_64_BIT	0x020
+#define IEF_48_REX		0x040
+#define IEF_REX_ONLY_R8_R15	0x080
+#define IEF_REX_XOR_LIKE	0x100
+#define IEF_STI			0x200
+#define IEF_ENDING_ZERO		0x400
 
 //Slash value
 #define SV_R_REG	8
@@ -1654,8 +1661,9 @@ class CInstruction
 	opcode[4];
   U16	flags;
   U8	slash_val,opcode_modifier,
-	arg1,arg2;
-  U32	pad;
+	arg1,arg2,
+	size1,size2,//Size in bits
+	pad[2];
 };
 
 //x86 opcodes
@@ -1676,6 +1684,8 @@ PUSH RDI PUSH R8 PUSH R9 PUSH R10 PUSH R11 PUSH R12 PUSH R13 PUSH R14 PUSH R15
 #define POP_REGS POP R15 POP R14 POP R13 POP R12 POP R11 POP R10 POP R9 \
 POP R8 POP RDI POP RSI POP RBP POP RBX POP RDX POP RCX POP RAX
 
+#define NUM_REGS	16
+
 #define REG_RAX	0
 #define REG_RCX	1
 #define REG_RDX	2
@@ -1690,39 +1700,40 @@ POP R8 POP RDI POP RSI POP RBP POP RBX POP RDX POP RCX POP RAX
 #define REG_ALLOC	33	//reg flag sets it to this
 #define REG_UNDEF	MIN_I8
 
-#define REG_ALWAYS_CLOBBERED_MASK	0x003F //RAX,RCX,RDX,RBX,RBP,RSP
-#define REG_STK_TEMPS_MASK		0x0300 //R8,R9
-#define REG_VARS_MASK			0xCCC0 //RSI,RDI,R10,R11,R14,R15
-#define REG_NON_PTR_MASK		0x3000 //R12,R13
+#define REGG_C_CLOBBERED		0x003F //RAX,RCX,RDX,RBX
+#define REGG_SAVED			0x0030 //RBP,RSP
+#define REGG_C_TEMP_CLOBBERED		0x0300 //R8,R9
+#define REGG_C_LOCAL_VARS		0xCCC0 //RSI,RDI,R10,R11,R14,R15
+#define REGG_C_LOCAL_NON_PTR_VARS	0x3000 //R12,R13
 
-#define ASM_CODE_BLK_BITS 16
-#define ASM_CODE_BLK_SIZE (1<<ASM_CODE_BLK_BITS)
+#define AOT_BIN_BLK_BITS 16
+#define AOT_BIN_BLK_SIZE (1<<AOT_BIN_BLK_BITS)
 
-class CAsmCodeBlk
+class CAOTBinBlk
 {
-  CAsmCodeBlk *next;
-  U8	body[ASM_CODE_BLK_SIZE];
+  CAOTBinBlk *next;
+  U8	body[AOT_BIN_BLK_SIZE];
 };
 
 I64 class CAbsCntsI64
 {
-  U16	abs_addres,
-	c_addres,
-	externs,pad;
+  U16	abs_addres, //Only odd/even matters. Cnt of absolute addres in an exp.
+	c_addres; //Only odd/even matters. Cnt of C addres in an exp.
+  U32	externs; //Only nonzero matters. Some regions have externs banned.
 };
 
-class CLexUndef
-{
-  CLexUndef	*next;
+class CAsmUndefHash
+{//Only place created is $LK,"Exp Parser",A="FF:::/Compiler/PrsExp.CPP.Z,sizeof(CAsmUndefHash)"$ when an undef is found in an ASM exp.
+  CAsmUndefHash	*next;
   CHashExport	*hash;
 };
 
 class CAsmNum
 {
   I64	i;
-  U8	*ex;
-  CLexUndef	*undef_local,*undef_glbl;
-  CAbsCntsI64	abs_cnts;
+  U8	*machine_code;
+  CAsmUndefHash	*local_asm_undef_hash,*glbl_asm_undef_hash;
+  CAbsCntsI64 abs_cnts;
 };
 
 class CAsmNum2
@@ -1734,8 +1745,8 @@ class CAsmNum2
 
 class CAsmIns
 {
-  CInstruction	*tempi;
-  CAsmNum2	imm,disp;
+  CInstruction *tempi;
+  CAsmNum2 imm,disp;
   I64	U8_cnt,last_opcode_U8,
 	REX,ModrM,SIB;
   Bool	has_REX,has_ModrM,has_SIB,
@@ -1747,7 +1758,8 @@ class CAsmIns
 class CAsmArg
 {
   CAsmNum num;
-  I64	seg,size,reg1,reg2,fstk,
+  I64	seg,size, //Size in bytes
+	reg1,reg2,fstk,
 	scale;
   Bool	indirect,imm_or_off_present,just_seg,pad[5];
 };
@@ -1756,11 +1768,11 @@ class CAsmUnresolvedRef
 {
   CAsmUnresolvedRef *next;
   I64	type,line_num;
-  U8	*ex;
+  U8	*machine_code;
   I64	ip,rel_ip;
-  CExe	*exe;
+  CAOT	*aot;
   U8	*str;	//Only for import glbls
-  CLexUndef *undef_hash;
+  CAsmUndefHash *asm_undef_hash;
   Bool	U8_avail,
 	imm_flag;//Only for import glbls
 };
@@ -1853,57 +1865,57 @@ public class CHashOpcode:CHash
 };
 
 #help_index "Compiler/Intermediate Code"
-#define EIF_GOTO_LABEL		1
-class CExeImportExport
+#define IEF_GOTO_LABEL		1
+class CAOTImportExport
 {
-  CExeImportExport *next,*last;
+  CAOTImportExport *next,*last;
   I64	ip,flags;
-  CExe	*exe;
+  CAOT	*aot;
   U8	*str,
 	*src_link,
 	type,pad[7];
 };
 
-#define EAT_ADD_U8		0
-#define EAT_SUB_U8		1
-#define EAT_ADD_U16		2
-#define EAT_SUB_U16		3
-#define EAT_ADD_U32		4
-#define EAT_SUB_U32		5
-#define EAT_ADD_U64		6
-#define EAT_SUB_U64		7
-class CExeAbsAddr
+#define AAT_ADD_U8		0
+#define AAT_SUB_U8		1
+#define AAT_ADD_U16		2
+#define AAT_SUB_U16		3
+#define AAT_ADD_U32		4
+#define AAT_SUB_U32		5
+#define AAT_ADD_U64		6
+#define AAT_SUB_U64		7
+class CAOTAbsAddr
 {
-  CExeAbsAddr *next;
+  CAOTAbsAddr *next;
   I64	ip;
   U8	type,pad[7];
 };
 
-class CExeHeapGlblRef
+class CAOTHeapGlblRef
 {
-  CExeHeapGlblRef *next;
+  CAOTHeapGlblRef *next;
   I64	ip;
 };
 
-class CExeHeapGlbl
+class CAOTHeapGlbl
 {
-  CExeHeapGlbl *next;
+  CAOTHeapGlbl *next;
   U8	*str;
   I64	size;
-  CExeHeapGlblRef *references;
+  CAOTHeapGlblRef *references;
 };
 
-class CExe
+class CAOT
 {
-  CExe	*next,*last;
+  CAOT	*next,*last;
   U8	*buf;
   I64	ip,ip2,
-	ex_U8s,
+	aot_U8s,
 	max_align_bits,module_org;
-  CExe	*parent_exe;
-  CExeImportExport *next_ie,*last_ie;
-  CExeAbsAddr	*abss;
-  CExeHeapGlbl	*heap_glbls;
+  CAOT	*parent_aot;
+  CAOTImportExport *next_ie,*last_ie;
+  CAOTAbsAddr *abss;
+  CAOTHeapGlbl *heap_glbls;
 };
 
 class CStreamBlk
@@ -1912,25 +1924,29 @@ class CStreamBlk
   U8	*body;
 };
 
-class CLexCodeCtrl
+class CCodeCtrl
 {
-  CLexCodeCtrl	*lcc_next;
-  CLexCodeMisc	*lcc_next_misc,*lcc_last_misc;
-  CIntermediateCodeBase	lcc_root;
+  CCodeCtrl *coc_next;
+  CCodeMisc *coc_next_misc,*coc_last_misc;
+  CIntermediateCodeBase	coc_root;
 };
 
 #help_index "Compiler/Lex"
 #define __DATE__ #exe{StreamPrint("\"%D\"",Now);}
 #define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
-#define __LINE__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn->line_num);}
-#define __DEPTH__ #exe{StreamPrint("%d",Fs->last_lex->cur_lfn-&Fs->last_lex->lfns-1);}
-#define __FILE__ #exe{StreamPrint("\"%s\"",Fs->last_lex->cur_lfn->full_name);}
+#define __LINE__ #exe{StreamPrint("%d",\
+	Fs->last_lex->lex_include_stk->line_num);}
+#define __DEPTH__ #exe{StreamPrint("%d",\
+	Fs->last_lex->lex_include_stk->depth);}
+#define __FILE__ #exe{StreamPrint("\"%s\"",\
+	Fs->last_lex->lex_include_stk->full_name);}
 #define __DIR__  #exe{StreamDir;}
 
 #define LFSF_DOC	1
 #define LFSF_DEFINE	2
 class CLexFile
 {
+  CLexFile *next;
   U8	*buf,
 	*buf_ptr;
   I64	line_num,flags;
@@ -1938,22 +1954,23 @@ class CLexFile
 	*line_start;
   CDoc	*doc;
   CDocEntry *cur_entry;
-  U8	last_U16,pad[7];
+  I32	depth;
+  U8	last_U16,pad[3];
 };
 
 class CAOTCtrl
 {
   I64	ip; //Instruction ptr
-  CAsmArg	arg1,arg2;
-  CAsmCodeBlk	*cb;
-  I64	num_ex_U8s,
+  CAsmArg arg1,arg2;
+  CAOTBinBlk *bin;
+  I64	num_bin_U8s,
 	max_align_bits,module_org;
   CAsmUnresolvedRef *local_unresolved,*glbl_unresolved;
-  CExeAbsAddr	*abss;
-  CExeHeapGlbl	*heap_glbls;
-  I64	display_col,last_ip;
-  U8	*last_label,*last_line_lsted;
-  CLexFile *last_lfn;
+  CAOTAbsAddr *abss;
+  CAOTHeapGlbl *heap_glbls;
+  I64	lst_col,lst_last_ip;
+  U8	*last_label,*lst_last_line;
+  CLexFile *lst_last_lfn;
   I64	seg_size;
   Bool	lst;
 };
@@ -2004,67 +2021,63 @@ class CAOTCtrl
 #define TK_INS_BINARY_SIZE	0x126
 #define TK_NUM_TK		0x127
 
-//Lex flags
-#define LF_PMT			1
-#define Lf_PMT			0
-#define LF_DONT_FREE_BUF	2
-#define LF_NO_DEFINES		4
-#define LF_IN_IF		8
-#define LF_JUST_LOAD		16
-#define LF_KEEP_NEW_LINES	32
-#define LF_KEEP_DOT		64
-#define LF_KEEP_NUM_SIGN	128
-#define LF_KEEP_AT_SIGN		256
-#define Lf_OPT_TRACE_PRESENT	9
-#define LF_NOT_CONST		0x0000010000
-#define LF_NO_REG_OPT		0x0000020000
-#define LF_IN_QUOTES		0x0000040000
-#define LF_EXE_BLK		0x0000080000
-#define LF_HAS_MISC_DATA	0x0000100000
-#define LF_HAS_RETURN		0x0000200000
-#define LF_ASM_EXPRESSIONS	0x0000400000
-#define LF_UNRESOLVED		0x0000800000
-#define LF_LOCAL		0x0001000000
-#define LF_FUN_EXP		0x0002000000
-#define Lf_FUN_EXP		25
-#define LF_POSTINC		0x0004000000
-#define LF_POSTDEC		0x0008000000
-#define LF_PREINC		0x0010000000
-#define LF_PREDEC		0x0020000000
-#define LF_ARRAY		0x0040000000
-#define LF_RAX			0x0080000000
-#define LF_USE_LAST_U16		0x0100000000
-#define Lf_USE_LAST_U16		32
-#define LF_LAST_WAS_DOT		0x0200000000
-#define LF_AOT_COMPILE		0x0400000000
-#define Lf_AOT_COMPILE		34
-#define LF_NO_ABSS		0x0800000000
-#define LF_PAREN		0x1000000000
-#define Lf_PAREN		36
-#define LF_CLASS_IP		0x2000000000
-#define LF_DONT_MAKE_RESULT	0x4000000000
-
 #define LEX_MAX_IDENT	134 //Max is 132
-#define LFN_CNT		8
-#define LFN_STK_CNT	32
-
-#define NUM_REGS	16
 
 class CLexHashTableContext
 {
   CLexHashTableContext *next;
   I64	old_flags,hash_mask;
-  CHashFun	*local_var_lst,
-		*fun;
-  CHashTable	*hash_table_lst,
-		*define_hash_table,
-		*local_hash_table,
-		*glbl_hash_table;
+  CHashFun *local_var_lst,
+	*fun;
+  CHashTable *hash_table_lst,
+	*define_hash_table,
+	*local_hash_table,
+	*glbl_hash_table;
 };
 
-public class CLex
+//CmpCtrl flags
+#define CCF_PMT			1
+#define CCf_PMT			0
+#define CCF_DONT_FREE_BUF	2
+#define CCF_NO_DEFINES		4
+#define CCF_IN_IF		8
+#define CCF_JUST_LOAD		16
+#define CCF_KEEP_NEW_LINES	32
+#define CCF_KEEP_DOT		64
+#define CCF_KEEP_NUM_SIGN	128
+#define CCF_KEEP_AT_SIGN	256
+#define CCf_OPT_TRACE_PRESENT	9
+#define CCF_NOT_CONST		0x0000010000
+#define CCF_NO_REG_OPT		0x0000020000
+#define CCF_IN_QUOTES		0x0000040000
+#define CCF_EXE_BLK		0x0000080000
+#define CCF_HAS_MISC_DATA	0x0000100000
+#define CCF_HAS_RETURN		0x0000200000
+#define CCF_ASM_EXPRESSIONS	0x0000400000
+#define CCF_UNRESOLVED		0x0000800000
+#define CCF_LOCAL		0x0001000000
+#define CCF_FUN_EXP		0x0002000000
+#define CCf_FUN_EXP		25
+#define CCF_POSTINC		0x0004000000
+#define CCF_POSTDEC		0x0008000000
+#define CCF_PREINC		0x0010000000
+#define CCF_PREDEC		0x0020000000
+#define CCF_ARRAY		0x0040000000
+#define CCF_RAX			0x0080000000
+#define CCF_USE_LAST_U16	0x0100000000
+#define CCf_USE_LAST_U16	32
+#define CCF_LAST_WAS_DOT	0x0200000000
+#define CCF_AOT_COMPILE		0x0400000000
+#define CCf_AOT_COMPILE		34
+#define CCF_NO_ABSS		0x0800000000
+#define CCF_PAREN		0x1000000000
+#define CCf_PAREN		36
+#define CCF_CLASS_IP		0x2000000000
+#define CCF_DONT_MAKE_RESULT	0x4000000000
+
+public class CCmpCtrl
 {
-  CLex	*next,*last;
+  CCmpCtrl *next,*last;
   I64	token,
 	flags,
 	cur_i64;
@@ -2078,22 +2091,21 @@ public class CLex
   I64	last_U16,
 	min_line,max_line,last_line_num,
 	lock_cnt;
-  U32	*chars_bitmap_alpha_numeric;
+  U32	*chars_bmp_alpha_numeric;
   CLexHashTableContext htc;
-  CHashGeneric	*hash_entry;
-  CAbsCntsI64	abs_cnts;
-  CLexUndef	*undef_hash_entry;
-  CMemberLst	*local_var_entry;
-  CLexCodeMisc	*lb_leave;
+  CHashGeneric *hash_entry;
+  CAbsCntsI64 abs_cnts;
+  CAsmUndefHash *asm_undef_hash;
+  CMemberLst *local_var_entry;
+  CCodeMisc *lb_leave;
   U8	*cur_buf_ptr;
-  CLexFile *cur_lfn,*fun_lfn;
-  I64	stk_ptr;
+  CLexFile *lex_include_stk,
+	*lex_prs_stk,
+	*fun_lex_file;
   CStreamBlk *next_stream_blk,*last_stream_blk;
-  CExe	*exe;
+  CAOT	*aot;
 
-  I64	pass,
-	opts,
-	otrace_mask,
+  I64	pass,opts,otrace_mask,
 	error_cnt,warning_cnt;
 
   //For intermediate codes with multiple float ops (int<->float conversions)
@@ -2102,23 +2114,18 @@ public class CLex
   Bool	last_dont_pushable,last_dont_popable,last_float_op_pos,
 	dont_push_float,pad[4];
 
-  CLexCodeCtrl	lcc;
-  CPrsStk	*ps;
-  CAOTCtrl	*a;
-  I64	a_depth;
-
-  U0	end_zeroed;
-  CLexFile lfns[LFN_CNT];
-  CLexFile stk[LFN_STK_CNT];
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  CCodeCtrl coc;
+  CPrsStk *ps;
+  CAOTCtrl *aotc;
+  I64	aot_depth;
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Compiler"
 public class CCmpGlbls
 {
-  CHashTable	*asm_hash;
-  Bool	dont_write_to_dsk;
-  CHashClass	*internal_types[RT_NUM_IT];
+  CHashTable *asm_hash;
+  CHashClass *internal_types[RT_NUM_IT];
   CIntermediateCode ic_nop;
   U32	*dual_U16_tokens1,*dual_U16_tokens2,*dual_U16_tokens3,
 	*binary_ops;
@@ -2126,17 +2133,19 @@ public class CCmpGlbls
 	stk_temps_mask,reg_vars_mask,non_ptr_vars_mask;
   U8	*to_stk_temps_map_odd,*to_stk_temps_map_even,
 	*to_reg_vars_map,*non_ptr_vars_map;
-  I64	compiled_lines;
+  I64	size_arg_mask[9],
+	compiled_lines;
 };
 
 #help_index "Debugging/Unassemble"
-class CUasmGlbls
+class CUAsmGlbls
 {
-  CInstruction **table;
-  I64	table_entries,
-	ins64_mask,
+  CInstruction **table_16_32,**table_64;
+  I64	table_16_32_entries,
+	table_64_entries,
+	ins64_arg_mask,
 	signed_arg_mask,
-	mem_mask;
+	mem_arg_mask;
 };
 
 #help_index "Devices;PCI"
@@ -2362,7 +2371,7 @@ class CISO1DirEntry
   U8	len,ext_attr_len;
   CPalindromeU32 loc;
   CPalindromeU32 size;
-  CISO1Date	date;
+  CISO1Date date;
   U8	flags,file_unit_size,interleave;
   CPalindromeU16 vol_seq_num;
   U8	name_len,name;
@@ -2431,7 +2440,8 @@ class CISO1PriDesc
 #define RS_ATTR_VOL_ID		0x08 //V
 #define RS_ATTR_DIR		0x10 //D
 #define RS_ATTR_ARCHIVE		0x20 //A
-#define RS_ATTR_LONG_NAME	(RS_ATTR_READ_ONLY|RS_ATTR_HIDDEN|RS_ATTR_SYSTEM|RS_ATTR_VOL_ID)
+#define RS_ATTR_LONG_NAME	(RS_ATTR_READ_ONLY|RS_ATTR_HIDDEN|\
+				RS_ATTR_SYSTEM|RS_ATTR_VOL_ID)
 #define RS_ATTR_LONG_NAME_MASK	(RS_ATTR_LONG_NAME|RS_ATTR_DIR|RS_ATTR_ARCHIVE)
 #define RS_ATTR_DELETED		0x100 //X
 #define RS_ATTR_RESIDENT	0x200 //T
@@ -2521,7 +2531,8 @@ public class CDirEntry
 #define FUG_FILES_FIND	(FUF_RECURSE|FUF_SINGLE|FUF_CLUSTER_ORDER|\
   FUF_JUST_DIRS|FUF_JUST_FILES|FUF_JUST_TXT|\
   FUF_JUST_SRC|FUF_JUST_AOT|FUF_JUST_JIT|FUF_JUST_GRA|FUF_FLATTEN_TREE)
-#define FUG_FILE_FIND	(FUF_JUST_DIRS|FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS)
+#define FUG_FILE_FIND	(FUF_JUST_DIRS|FUF_JUST_FILES|FUF_Z_OR_NOT_Z|\
+  FUF_SCAN_PARENTS)
 
 #help_index "File/Low Level"
 //See $LK,"ST_BLKDEV_TYPES",A="MN:ST_BLKDEV_TYPES"$
@@ -2611,7 +2622,7 @@ class CFreeLst
 public class CDrv
 {
 //Don't access ->drv_let directly in case a drive has been remapped.
-//Use $LK,"Drv2Let",A="MN:Drv2Let"$().
+  //Use $LK,"Drv2Let",A="MN:Drv2Let"$().
   I64	locked_flags;
   U32	type,  //Bit31 is used as a disable, since it will be unknown
 	dv_signature;
@@ -2623,6 +2634,7 @@ public class CDrv
 	root_cluster,
 	data_area,
 	spc; //sectors per cluster
+  CDate fat32_local_time_offset;
   CTask *owning_task;
   CBlkDev *bd;
 
@@ -2653,13 +2665,13 @@ public class CDskGlbls
   CBlkDev *blkdevs;
   CDrv	*drvs,*let_to_drv[32];
   I64	auto_mount_ide_cnt;
-  U8	temp_filename[136],boot_drv_let,
+  U8	temp_filename[STR_LEN],boot_drv_let,
 	first_hd_drv_let,first_cd_drv_let;
   Bool	boot_rescue_drv_pmt,cdrom_boot_is_good;
 };
 
 #help_index "File/Internal"
-public class CFileAccess
+public class CDirContext
 {
   CDrv	*old_dv,*dv;
   U8	*old_dir,*mask;
@@ -2675,7 +2687,7 @@ public class CFileAccess
 #define FF_CONTIGUOUS		16
 #define FF_USE_OLD_DATETIME	32
 
-public class CFile
+public class CFile //See $LK,"::/Demo/Dsk/DataBase.CPP.Z"$.
 {
   I64	flags;
   CDirEntry de;
@@ -2801,19 +2813,19 @@ public class CHeapCtrl
   CTask *mem_task;
   CMemBlk *next_mem_blk,*last_mem_blk;
   CMemUnused *malloc_free_lst;
-  CMemUsed   *next_um,*last_um;
+  CMemUsed *next_um,*last_um;
   CMemUnused *heap_hash[HEAP_HASH_SIZE/sizeof(U8 *)];
 };
 
 #help_index "Devices"
 public class CDevGlbls
 {
-  I64		*idt;
-  U8		*mem64_ptr;
-  CHeapCtrl	*uncached_heap;
-  U8		mp_apic_ids[MP_MAX_PROCESSORS];
-  CMemRange	mem32_root;
-  CPCIDev	pci_root;
+  I64	*idt;
+  U8	*mem64_ptr;
+  CHeapCtrl *uncached_heap;
+  U8	mp_apic_ids[MP_MAX_PROCESSORS];
+  CMemRange mem32_root;
+  CPCIDev pci_root;
 };
 
 #help_index "Graphics/Color;Graphics/Device Contexts"
@@ -2833,7 +2845,7 @@ public class CDevGlbls
 #define ROP_MONO			(ROPB_MONO<<8)
 
 //These are just for $LK,"ROPF_PROBABILITY_DITHER",A="MN:ROPF_PROBABILITY_DITHER"$
-//See $LK,"GrLighting",A="MN:GrLighting"$().
+//See $LK,"DCLighting",A="MN:DCLighting"$().
 #define ROPF_HALF_RANGE_COLOR		0x1000
 #define ROPF_TWO_SIDED			0x2000
 
@@ -2875,16 +2887,16 @@ public U32 class CColorROPU32
 #define COLORROP_COLORS_MASK	0x00FF00FF
 #define COLORROP_NO_ROP0_MASK	0xFFFF00FF
 #define COLORROP_BITS		16
-public U32i class CRGB
+public U32 class CBGR24
 {
-  U8	r,g,b,reserved;
+  U8	b,g,r,pad;
 };
-public U32i class CBGR
+public I64 class CBGR48
 {
-  U8	b,g,r,reserved;
+  U16	b,g,r,pad;
 };
 
-#help_index "Keyboard Devices;Char/Input"
+#help_index "Keyboard Devices;Char/Input;StdIn"
 #define KBD_PORT	0x60
 #define KBD_CTRL	0x64
 public class CKbdStateGlbls
@@ -2899,7 +2911,7 @@ public class CKbdStateGlbls
   //BitTest, $LK,"Bt",A="MN:Bt"$(), with a merged scan code.
   //(Left and right shift merged, for example.)
   U32	down_bitmap[8],
-  //BitTest, $LK,"Bt",A="MN:Bt"$(), with an unmerged scan code.
+//BitTest, $LK,"Bt",A="MN:Bt"$(), with an unmerged scan code.
 	down_bitmap2[8];
 
   Bool	rst,		//Private: Reset KbdMouse
@@ -3004,15 +3016,15 @@ public class CCtrl
   CTask *win_task;
   I64	type,flags;
 
-//win pix coordinates
+  //win pix coordinates
   I64	left,right,top,bottom;
 
-//screen pix coordinates (derived)
+  //screen pix coordinates (derived)
   I64	screen_left,screen_right,screen_top,screen_bottom;
 
   U8	*state;
 
-//called on resize
+  //called on resize
   U0	(*update_derived_vals)(CCtrl *c);
   U0	(*draw_it)(CDC *dc,CCtrl *c);
 
@@ -3082,8 +3094,8 @@ class CFPU
 
 class CSrvCmd
 {
-  CSrvCmd	*next,*last;
-  CSrvCtrl	*ctrl;
+  CSrvCmd *next,*last;
+  CSrvCtrl *ctrl;
   I64	cmd_code,flags,
 	target_cpu,servant_cpu_num,
 	msg_code;
@@ -3092,7 +3104,7 @@ class CSrvCmd
   U8	*fun_arg;
 
   U8	*aux_str;
-  I64	aux1,aux2, //Sometimes called arg1 and arg2.  (Windows msg param1 param2)
+  I64	aux1,aux2, //Sometimes called arg1 and arg2. (Windows msg param1 param2)
 	result;
 
   CTask	*spawned_task,
@@ -3102,8 +3114,8 @@ class CSrvCmd
 #define SVCRf_LOCKED		0
 class CSrvCtrl
 {
-  CSrvCmd	*next_waiting,*last_waiting,
-		*next_done,*last_done;
+  CSrvCmd *next_waiting,*last_waiting,
+	*next_done,*last_done;
   I64	flags;
 };
 
@@ -3148,13 +3160,13 @@ public class CTaskSettings
   U0	(*task_end_cb)();
   CTask *song_task,*animate_task;
   I64	scroll_x,scroll_y,scroll_z;
-  CBGR	palette4[16];
+  CBGR48 palette[NUM_COLORS];
   U32	win_inhibit;;
   U8	text_attr,title_src,
 	border_attr,border_src,
 	task_title[TASK_TITLE_LEN+1];
   Bool	border,preempt,cursor,scroll,autocomplete,pad[3];
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Task"
@@ -3197,11 +3209,7 @@ U0 pad;#assert !($$&7) //(compiler lags one token)
 #define DISPLAYf_CHILDREN_NOT_ON_TOP	4
 
 #define TASK_SIGNATURE_VAL		'TskS'
-#define TASK_IN_QUE_SIGNATURE_VAL	'TskQ'
-#define TASK_COMBINED_SIGNATURE_VAL	(TASK_SIGNATURE_VAL+TASK_IN_QUE_SIGNATURE_VAL<<32)
-
 #define TASK_NAME_LEN			31
-#define TASK_WALLPAPER_DATA_SIZE	128
 class CTaskStk
 {
   CTaskStk *next_stk;
@@ -3212,7 +3220,7 @@ class CTaskStk
 public class CTask //The Fs segment reg points to current CTask.
 {
   CTask *addr; //Self-addressed ptr
-  U32	task_signature,task_in_que_signature;
+  U32	task_signature,pad;
   I64	task_flags,locked_flags;
   U32	display_flags,win_inhibit;
   I64	wake_jiffy;
@@ -3241,8 +3249,8 @@ public class CTask //The Fs segment reg points to current CTask.
 
 	scroll_x,scroll_y,scroll_z;
 
-//These must be in this order
-//for $LK,"TASK_CONTEXT_SAVE",A="FF:::/Kernel/Sched.CPP,TASK_CONTEXT_SAVE"$ and $LK,"_TASK_CONTEXT_RESTORE",A="FF:::/Kernel/Sched.CPP,_TASK_CONTEXT_RESTORE"$
+  //These must be in this order
+  //for $LK,"TASK_CONTEXT_SAVE",A="FF:::/Kernel/Sched.CPP,TASK_CONTEXT_SAVE"$ and $LK,"_TASK_CONTEXT_RESTORE",A="FF:::/Kernel/Sched.CPP,_TASK_CONTEXT_RESTORE"$
   I64	rip,rflags,rsp,rsi,rax,rcx,rdx,rbx,rbp,rdi,
 	r8,r9,r10,r11,r12,r13,r14,r15;
   CCPU	*gs;
@@ -3255,7 +3263,7 @@ public class CTask //The Fs segment reg points to current CTask.
 
   U8	task_title[TASK_TITLE_LEN+1],
 	task_name[TASK_NAME_LEN+1],
-	wallpaper_data[TASK_WALLPAPER_DATA_SIZE],
+	wallpaper_data[STR_LEN],
 
 	title_src,border_src,
 	text_attr,border_attr;
@@ -3269,19 +3277,20 @@ public class CTask //The Fs segment reg points to current CTask.
   U8	*except_caller1,*except_caller2;
 
   Bool	catch_except;
-  U8	answer_type,pad[6];
+  Bool	new_answer;
+  U8	answer_type,pad[5];
   I64	answer;
   F64	answer_time;
   CBpt	*bpt_lst;
   CCtrl	*next_ctrl,*last_ctrl;
   CMenu	*cur_menu;
   CTaskSettings *next_settings;
-  CMathODE	*next_ode,*last_ode;
+  CMathODE *next_ode,*last_ode;
   F64	last_ode_time;
   CHashTable *hash_table;
 
   CSrvCtrl srv_ctrl;
-  CLex	*next_lex,*last_lex;
+  CCmpCtrl *next_lex,*last_lex;
 
   I64	win_old_left,win_old_right,win_old_top,win_old_bottom;
 
@@ -3294,7 +3303,7 @@ public class CTask //The Fs segment reg points to current CTask.
   CWinScroll horz_scroll,vert_scroll;
 
   I64	user_data;
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 class CTSS
@@ -3330,7 +3339,6 @@ class CTSS
 #define _R15 Fs->r15
 
 #help_index "MultiCore"
-#define CPU_WALLPAPER_DATA_SIZE		128
 #define CPUf_RAN_A_TASK			0
 #define CPUf_SETH_SLEEP			1
 
@@ -3348,11 +3356,8 @@ public class CCPU //The Gs segment reg points to current CCPU.
   U0	(*profiler_timer_irq)(CTask *task);
   CTask *dying_task_lst;
   CTSS	*tss;
-  union {
-    U8	wallpaper_data[CPU_WALLPAPER_DATA_SIZE];
-    I64 start_stk[16];
-  }
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  I64	start_stk[16];
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Memory/Page Tables"
@@ -3370,11 +3375,11 @@ public class CSysFixedArea
   U8	pml1[MEM_NUM_PML1*0x1000],pml2[MEM_NUM_PML2*0x1000],
 	pml3[MEM_NUM_PML3*0x1000],pml4[MEM_NUM_PML4*0x1000];
   $$=($$+15)&-16;
-  CFPU		init_fpu_mmx;
-  CCPU		boot_cpu;
-  CTask		adam;
-  CBlkPool	adam_bp;
-  CHeapCtrl	adam_hc;
+  CFPU	init_fpu_mmx;
+  CCPU	boot_cpu;
+  CTask	adam;
+  CBlkPool adam_bp;
+  CHeapCtrl adam_hc;
   $$=($$+PAGE_SIZE-1)&-PAGE_SIZE;
 };
 
@@ -3516,11 +3521,12 @@ public class CTextGlbls
 #help_index "Graphics/Device Contexts"
 //Low 8 bits reserved for flags that go into saved bitmaps
 #define DCF_COMPRESSED		1
-#define DCF_NO_TRANSPARENTS	2 //Can be used to optimized $LK,"GrBlot",A="MN:GrBlot"$().
+#define DCF_PALETTE		2
+#define DCF_NO_TRANSPARENTS	4 //Can be used to optimized $LK,"GrBlot",A="MN:GrBlot"$().
 
 #define DCF_TRANSFORMATION	0x100
 
-//See $LK,"GrSetSymmetry",A="MN:GrSetSymmetry"$() or $LK,"GrSetSymmetry3",A="MN:GrSetSymmetry3"$()
+//See $LK,"DCSymmetrySet",A="MN:DCSymmetrySet"$() or $LK,"DCSymmetry3Set",A="MN:DCSymmetry3Set"$()
 #define DCF_SYMMETRY		0x200
 
 //Must be used with DCF_SYMMETRY set also.
@@ -3535,12 +3541,16 @@ public class CTextGlbls
 #define DCF_RECORD_EXTENTS	0x10000
 #define DCF_ON_TOP		0x20000
 
+//$LK,"DCSave",A="MN:DCSave"$() flags.
+#define DCSF_COMPRESSED		1
+#define DCSF_PALETTE_GET	2
+
 #define DCS_SIGNATURE_VAL	'DvCS'
 
 class CGrSym
 {
   I32	sx,sy,sz,pad;
-  //Normal of symmetry plane
+//Normal of symmetry plane
   I64	snx,sny,snz;
 };
 
@@ -3551,8 +3561,9 @@ public class CDC
 	height,
 	flags;
   U0	end;
+  CBGR48 palette[NUM_COLORS];
 
-//public (Change directly)
+  //public (Change directly)
   CColorROPU32 color,
 	bkcolor, //Set for use with $LK,"ROP_COLLISION",A="MN:ROP_COLLISION"$
 	color2; //Internally used for $LK,"GrFloodFill",A="MN:GrFloodFill"$()
@@ -3568,27 +3579,25 @@ public class CDC
 
   CDC *brush;
 
-//Set with $LK,"GrSetRotMat",A="MN:GrSetRotMat"$().  $LK,"Free",A="MN:Free"$() before setting.
-  I64 *r,  //rotation matrix of quads decimal in lo
+  //Set with $LK,"DCMat4x4Set",A="MN:DCMat4x4Set"$().  $LK,"Free",A="MN:Free"$() before setting.
+  I64	*r, //rotation matrix of quads decimal in lo
 	r_norm; //shifted 32 bits.  Used for scaling pen width
 
-//public (Change directly)
+  //public (Change directly)
   I32	x,y,z,
 	pen_width;
 
-//Can be changed from the default $LK,"GrTransform",A="MN:GrTransform"$()
+  //Can be changed from the default $LK,"DCTransform",A="MN:DCTransform"$()
   U0	(*transform)(CDC *dc,I64 *x,I64 *y,I64 *z);
-//Can be changed from the default $LK,"GrLighting",A="MN:GrLighting"$()
-  U0	(*lighting)(CDC *dc,CD3I32 *p1,CD3I32 *p2,CD3I32 *p3,CColorROPU32 color);
+//Can be changed from the default $LK,"DCLighting",A="MN:DCLighting"$()
+  U0	(*lighting)(CDC *dc,CD3I32 *p1,CD3I32 *p2,
+	CD3I32 *p3,CColorROPU32 color);
 
-//Set by $LK,"GrSetSymmetry",A="MN:GrSetSymmetry"$() or $LK,"GrSetSymmetry3",A="MN:GrSetSymmetry3"$()
+  //Set by $LK,"DCSymmetrySet",A="MN:DCSymmetrySet"$() or $LK,"DCSymmetry3Set",A="MN:DCSymmetry3Set"$()
   CGrSym sym;
 
-//not document num, but num in a CSprite collection
-  I64	nearest_sprite_elem_num,nearest_dist,
-
-//not document num, but num in a CSprite collection
-	cur_sprite_elem_num;
+  I64	dist,nearest_dist,
+	nearest_sprite_elem_num; //num in a CSprite elem lst
 
   I32	cur_x,cur_y,cur_z,pad;
   I64	collision_cnt;
@@ -3601,10 +3610,10 @@ public class CDC
   CDC	*alias;
   U8	*body;
 
-  //Set by $LK,"DCAllocDepthBuf",A="MN:DCAllocDepthBuf"$()
+  //Set by $LK,"DCDepthBufAlloc",A="MN:DCDepthBufAlloc"$()
   I32	*depth_buf;
   I64	db_z; //private
-U0 pad;#assert !($$&7) //(compiler lags one token)
+  U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Devices"
@@ -3651,16 +3660,15 @@ public class CArcCtrl
 	dst_pos,dst_size;
   U8	*src_buf,*dst_buf;
   I64	min_bits,min_table_entry;
-  CArcEntry *cur_entry;
-  CArcEntry *next_entry;
+  CArcEntry *cur_entry,*next_entry;
   I64	cur_bits_in_use,next_bits_in_use;
   U8	*stk_ptr,*stk_base;
   I64	free_index,free_limit,
 	saved_basecode,
 	entry_used,
 	last_ch;
-  CArcEntry	compress[ARC_MAX_ENTRY+1],
-		*hash[ARC_MAX_ENTRY+1];
+  CArcEntry compress[ARC_MAX_ENTRY+1],
+	*hash[ARC_MAX_ENTRY+1];
 };
 
 #help_index "Compression"
@@ -3671,7 +3679,7 @@ public class CArcCompress
   U0	body;
 };
 
-#define "Char/Input"
+#define "Char/Input;StdIn"
 //GetStr flags
 #define GSF_SHIFT_ESC_EXIT	1 //This kills task on <SHIFT-ESC>
 #define GSF_WITH_NEW_LINE	2
@@ -3717,7 +3725,7 @@ class CKeyDevGlbls
   I64	ctrl_alt_let_in_irq_flags,
 	**ctrl_alt_let_ret_addr; //addr of ret addr on stack in kbd irq
   U8	**ctrl_alt_let_descs,
-	desc[128],
+	desc[STR_LEN],
 	*handler;
 };
 
@@ -3743,7 +3751,7 @@ class CPSectCache
   I64	base,limit;
   F64	time_stamp;
   U8	str[1]; //PSECT_CACHE_STR_LEN
-  $$=64;
+$$=64;
 };
 #define PSECT_CACHE_STR_LEN	(sizeof(CPSectCache)-offset(CPSectCache.str))
 
@@ -3782,8 +3790,8 @@ public class CDbgGlbls
 // $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 #define STD_DISTRO_CDROM_CFG	"Tb1\nScale2Mem(2048,0x40000)\nt3 \n\n\n\n"
 
-#help_index "Misc/Accts"
-//Acct Registry sys_msg_flags. $LK,"AcctOneTimePopUp",A="MN:AcctOneTimePopUp"$()
+#help_index "Misc/Registry"
+//Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()
 #define ARf_FLOODFILL			0
 #define ARf_CSPRITE_INS_CLIPBOARD	1
 #define ARf_CSPRITE_PICK_GRAPHICALLY	2

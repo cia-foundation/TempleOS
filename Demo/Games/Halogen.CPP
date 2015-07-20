@@ -12,7 +12,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 w=task->pix_width,h=task->pix_height;
   I64 i,x,y,xx;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   xx=w>>1-car_x+road_x[road_ptr&(NUM_ROAD-1)];
 
   dc->color=LTGRAY;
@@ -24,7 +24,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrPlot(dc,x-ROAD_WIDTH_BY_2+0.4*i,y);
   }
   dc->color=WHITE;
- 
+
   x=w>>1-CAR_WIDTH_BY_2;
   if (x<xx-ROAD_WIDTH_BY_2)
     crash=TRUE;
@@ -51,7 +51,7 @@ U0 UpdateRoad()
   while (distance>1.0) {
     road_trend=ClampI64(road_trend+SignI64(RandU16%3-1),-5,5);
     road_x[road_ptr&(NUM_ROAD-1)]=
-      road_x[(road_ptr-1)&(NUM_ROAD-1)]+=road_trend/3;
+	  road_x[(road_ptr-1)&(NUM_ROAD-1)]+=road_trend/3;
     road_ptr++;
     distance-=1.0;
   }
@@ -82,19 +82,19 @@ U0 Halogen()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Accelerate(,,SC_CURSOR_UP);"
-  "  Deccellerate(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-      "}"
-      );
-  Preempt(OFF);
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Accelerate(,,SC_CURSOR_UP);"
+	"  Deccellerate(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"}"
+	);
+  Preempt;
   AutoComplete;
   WinMax;
   Init;

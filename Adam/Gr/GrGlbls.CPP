@@ -12,7 +12,7 @@ public class CGrGlbls
   U32	*text_base;	//See $LK,"TextBase Layer",A="HI:TextBase Layer"$. (Similar to 0xB8000 but 32 bits)
   U16	*win_z_buf;
 
-#define SPHT_ELEM_CODE	1
+  #define SPHT_ELEM_CODE	1
   CHashTable *sprite_hash;
 
   U16	*win_uncovered_bitmap;
@@ -25,13 +25,13 @@ public class CGrGlbls
   U0	(*fp_draw_grab_input_ptr)(CDC *dc,I64 x,I64 y,Bool closed);
   U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/WallPaper.CPP,empty_sprite"$
 
-#define GR_NUM_PEN_BRUSHES 64
+  #define GR_NUM_PEN_BRUSHES 64
   CDC	*pen_brushes[GR_NUM_PEN_BRUSHES],
 	*collision_pen_brushes[GR_NUM_PEN_BRUSHES],
 	*even_pen_brushes[GR_NUM_PEN_BRUSHES],
 	*odd_pen_brushes[GR_NUM_PEN_BRUSHES];
 
-#define GR_MAX_SCREEN_ZOOM	8
+  #define GR_MAX_SCREEN_ZOOM	8
   U8	*screen_zoom_tables[GR_MAX_SCREEN_ZOOM+1];
   I64	screen_zoom,sx,sy;
 

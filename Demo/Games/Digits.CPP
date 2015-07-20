@@ -28,12 +28,12 @@ U0 Digits()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=DKGRAY<<4+WHITE;
   DocClear;
-  //Set default background and foreground
+//Set default background and foreground
   "$$WW,1$$$$BD,DKGRAY$$$$FD,WHITE$$"
-  "\nThis is a memory game.  "
-  "Try to remember the digits and enter them.  "
-  "They are colored based on electrical "
-  "engineering color codes.\n";
+	"\nThis is a memory game.  "
+	"Try to remember the digits and enter them.  "
+	"They are colored based on electrical "
+	"engineering color codes.\n";
   for (i=0;i<10;i++)
     "$$FG,%Z$$%d: %Z\n",i,"ST_RAINBOW_10",i,i,"ST_RAINBOW_10";
   "$$FG$$\n"; //set to default background
@@ -42,7 +42,7 @@ U0 Digits()
   while (TRUE) {
 restart:
     num=0;
-    //Set to zeros so we have terminators
+//Set to zeros so we have terminators
     MemSet(answer,0,sizeof(answer));
     while (TRUE) {
       DocClear;

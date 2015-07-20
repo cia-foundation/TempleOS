@@ -11,7 +11,8 @@ Bool ChkDskConfirm(Bool *_fix,Bool *_confirm)
   return *_fix;
 }
 
-I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tempde1,U8 *bits,U8 *bits2,I64 size,I64 bpc)
+I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tempde1,
+	U8 *bits,U8 *bits2,I64 size,I64 bpc)
 {
   CDirEntry *tempde2;
   I64 i,j,errs=0;
@@ -23,18 +24,18 @@ I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tempde1,U8 *bits,U8 *bits2,I64 size,I64 
     for (i=0;i<j;i++) {
       if (i+tempde1->cluster-dv->data_area>size) {
 	PrintErr("Invalid Cluster:%s Cluster:%X\n",tempde1->full_name,
-		i+tempde1->cluster);
+	      i+tempde1->cluster);
 	errs++;
 	break;
       }
       if (LBts(bits,i+tempde1->cluster-dv->data_area)) {
 	PrintErr("Dbl Alloc:%s Cluster:%X\n",tempde1->full_name,
-		i+tempde1->cluster);
+	      i+tempde1->cluster);
 	errs++;
       }
       if (!LBtr(bits2,i+tempde1->cluster-dv->data_area)) {
 	PrintErr("UnAlloc:%s Cluster:%X\n",tempde1->full_name,
-		i+tempde1->cluster);
+	      i+tempde1->cluster);
 	errs++;
       }
     }
@@ -49,8 +50,8 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   I64 i,j,bpc,size,errs=0;
   CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
   U8 *files_find_mask=MStrPrint("%c:/*",Drv2Let(dv)),
-     *old_dir=StrNew(Fs->cur_dir),
-     *bits,*bits2;
+	*old_dir=StrNew(Fs->cur_dir),
+	*bits,*bits2;
   CDirEntry *ptr,*ptr2;
 
   Drv(drv_let);
@@ -84,7 +85,8 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
     }
   }
 
-  errs+=RedSeaChkDskLst(dv,FilesFind(files_find_mask,FUF_RECURSE),bits,bits2,size,bpc);
+  errs+=RedSeaChkDskLst(dv,FilesFind(files_find_mask,FUF_RECURSE),
+	bits,bits2,size,bpc);
   for (i=1;i<size;i++)
     if (Bt(bits2,i)) {
       PrintWarn("Shouldn't Alloc Cluster:%0X\n",i+dv->data_area);
@@ -102,7 +104,8 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   return errs;
 }
 
-I64 FAT32ChkDskLst(CDrv *dv,CDirEntry *tempde1,U8 *bits,U32 *bits2,I64 size,I64 bpc)
+I64 FAT32ChkDskLst(CDrv *dv,CDirEntry *tempde1,
+	U8 *bits,U32 *bits2,I64 size,I64 bpc)
 {
   CDirEntry *tempde2;
   I64 i,c,errs=0;
@@ -152,8 +155,8 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   I64 i,bpc,size,c,errs=0;
   CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
   U8 *files_find_mask=MStrPrint("%c:/*",Drv2Let(dv)),
-     *old_dir=StrNew(Fs->cur_dir),
-     *bits;
+	*old_dir=StrNew(Fs->cur_dir),
+	*bits;
   U32 *bits2;
   Drv(drv_let);
   "Scanning...\n";
@@ -182,7 +185,8 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
     c=ClusterNumNext(dv,c);
   }
 
-  errs+=FAT32ChkDskLst(dv,FilesFind(files_find_mask,FUF_RECURSE),bits,bits2,size,bpc);
+  errs+=FAT32ChkDskLst(dv,FilesFind(files_find_mask,FUF_RECURSE),
+	bits,bits2,size,bpc);
 
   bits2[1]=0; //See $LK,"FAT32Fmt",A="MN:FAT32Fmt"$()
   for (i=1;i<size;i++)
@@ -220,8 +224,8 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
     if (fix)
       "It might be a little better.  ";
     "Copy files to another partition or CD-ROM, "
-    "reformat, and copy back.  "
-    "Or, copy from a back-up.\n";
+	  "reformat, and copy back.  "
+	  "Or, copy from a back-up.\n";
   }
   return errs;
 }

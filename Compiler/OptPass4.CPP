@@ -10,15 +10,15 @@ Bool OptIC4(CIntermediateCode *tempi)
     return FALSE;
 
   if (tempil2->r.type&TY_MASK==TY_STK &&
-      !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
+	!(tempil2->ic_flags&ICF_PUSH_RESULT)) {
     if (tempil1->ic_code==IC_ADD_CONST &&
-	tempil1->a1.type&TY_MASK==TY_STK) {
+	  tempil1->a1.type&TY_MASK==TY_STK) {
       if ((tempil2->ic_code==IC_REG ||
-	  tempil2->ic_code==IC_MOV) &&
-	  tempil2->a1.type&TY_MASK==TY_REG) {
+	    tempil2->ic_code==IC_MOV) &&
+	    tempil2->a1.type&TY_MASK==TY_REG) {
 	i=tempil1->ic_data;
-	    if (MIN_I32<=i<=MAX_I32 &&
-	    !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
+	if (MIN_I32<=i<=MAX_I32 &&
+	      !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
 	  tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	  tempil1->ic_code=IC_LEA;
 	  tempil1->a1.type=TY_DISP+tempil1->a1.type&RT_MASK;
@@ -28,11 +28,11 @@ Bool OptIC4(CIntermediateCode *tempi)
 	  return TRUE;
 	}
       } else if (tempil2->ic_code==IC_SHL_CONST &&
-	  tempil2->a1.type&TY_MASK==TY_REG) {
+	    tempil2->a1.type&TY_MASK==TY_REG) {
 	i=tempil1->ic_data;
-	    if (MIN_I32<=i<=MAX_I32 &&
-	    tempil2->a1.reg!=REG_RSP &&
-	    1<=tempil2->ic_data<=3) {
+	if (MIN_I32<=i<=MAX_I32 &&
+	      tempil2->a1.reg!=REG_RSP &&
+	      1<=tempil2->ic_data<=3) {
 	  tempil1->ic_flags|=tempil2->ic_flags&ICG_NO_CVT_MASK;
 	  tempil1->ic_code=IC_LEA;
 	  tempil1->a1.type=TY_SIB+tempil1->a1.type&RT_MASK;
@@ -50,7 +50,7 @@ Bool OptIC4(CIntermediateCode *tempi)
       }
     }
     if (tempil2->ic_code==IC_MOV ||
-	tempil2->ic_code==IC_REG) {
+	  tempil2->ic_code==IC_REG) {
       if (tempil1->a2.type&TY_MASK==TY_STK) {
 	if (tempil2->ic_flags & ICF_R_TO_INT) {
 	  if (tempil2->a1.type&TY_MASK==TY_IMM)
@@ -131,11 +131,11 @@ Bool OptIC4(CIntermediateCode *tempi)
     }
     if (tempil1->ic_code==IC_DEREF) {
       if (tempil2->ic_code==IC_ADD_CONST &&
-	  tempil2->a1.type&TY_MASK==TY_REG &&
-	  tempil1->a1.type&TY_MASK==TY_STK) {
+	    tempil2->a1.type&TY_MASK==TY_REG &&
+	    tempil1->a1.type&TY_MASK==TY_STK) {
 	i=tempil2->ic_data;
-	    if (MIN_I32<=i<=MAX_I32 &&
-	    !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
+	if (MIN_I32<=i<=MAX_I32 &&
+	      !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
 	  tempil1->ic_flags|=tempil2->ic_flags;
 	  tempil1->ic_code=IC_MOV;
 	  tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed;
@@ -146,7 +146,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	}
       }
       if (tempil2->ic_code==IC_LEA &&
-	  tempil1->a1.type&TY_MASK==TY_STK) {
+	    tempil1->a1.type&TY_MASK==TY_STK) {
 	tempil1->ic_flags|=tempil2->ic_flags;
 	tempil1->ic_code=IC_MOV;
 	tempil1->a1.type=tempil2->a1.type&TY_MASK+tempil1->a1.type_pointed;
@@ -168,21 +168,22 @@ Bool OptIC4(CIntermediateCode *tempi)
   return FALSE;
 }
 
-U0 OptPass4(CLex *lx,COptReg *reg_offsets,I64 *_type)
+U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 {
   CHashClass *tempc,*tempc1,*tempc2;
-  CIntermediateCode *tempi,*tempi1,*tempi2,*tempil1,*tempil2,*tempil3,*tempi_next;
+  CIntermediateCode *tempi,*tempi1,*tempi2,*tempil1,*tempil2,*tempil3,
+	*tempi_next;
   I64 code,i;
   Bool dead_code=FALSE;
-  CLexCodeMisc *lb;
-  CPrsStk *ps=lx->ps;
+  CCodeMisc *lb;
+  CPrsStk *ps=cc->ps;
   ps->ptr=0;
   ps->ptr2=0;
 
   if (_type)
     *_type=RT_I64;
 
-  tempi=lx->lcc.lcc_root.next;
+  tempi=cc->coc.coc_root.next;
   while (code=tempi->ic_code) {
     tempi_next=tempi->next;
     if (dead_code&&code!=IC_LABEL) {
@@ -331,7 +332,8 @@ p4_lea_gone:
 		tempi->a1.disp=0;
 		tempi->a1.reg=tempi2->a1.reg+tempi1->a1.reg<<8;
 p4_sib:
-		tempi->ic_flags|=(tempi1->ic_flags|tempi2->ic_flags)&ICG_NO_CVT_MASK;
+		tempi->ic_flags|=(tempi1->ic_flags|tempi2->ic_flags)
+		&ICG_NO_CVT_MASK;
 		OptSetNOP2(tempi1);
 		OptFree(tempi2);
 
@@ -341,7 +343,8 @@ p4_sib:
 
 		tempi->a2.type=TY_NULL+tempi->a2.type&RT_MASK;
 	      }
-	    } else if (tempi2->ic_code==IC_SHL_CONST && tempi2->a1.type==TY_REG+RT_I64 &&
+	    } else if (tempi2->ic_code==IC_SHL_CONST &&
+		  tempi2->a1.type==TY_REG+RT_I64 &&
 		  tempi2->ic_data<=3) {
 	      if (tempi2->a1.reg!=REG_RSP) {
 		tempi->a1.disp=0;
@@ -355,8 +358,10 @@ p4_sib:
 		goto p4_sib;
 	      }
 	    }
-	  } else if (tempi1->ic_code==IC_LEA && tempi1->a1.type&TY_MASK==TY_DISP) {
-	    if (tempi1->a1.reg==REG_RBP && CmpOffset2Reg(tempi1->a1.disp,reg_offsets)>=0)
+	  } else if (tempi1->ic_code==IC_LEA &&
+		tempi1->a1.type&TY_MASK==TY_DISP) {
+	    if (tempi1->a1.reg==REG_RBP &&
+		  CmpOffset2Reg(tempi1->a1.disp,reg_offsets)>=0)
 	      break;
 	    if (tempi2->ic_code==IC_MOV && tempi2->a1.type==TY_REG+RT_I64 ||
 		  tempi2->ic_code==IC_REG) {
@@ -369,7 +374,8 @@ p4_sib:
 		tempi->a1.reg=tempi2->a1.reg+tempi1->a1.reg<<8;
 		goto p4_sib;
 	      }
-	    } else if (tempi2->ic_code==IC_SHL_CONST && tempi2->a1.type==TY_REG+RT_I64 &&
+	    } else if (tempi2->ic_code==IC_SHL_CONST &&
+		  tempi2->a1.type==TY_REG+RT_I64 &&
 		  tempi2->ic_data<=3) {
 	      if (tempi2->a1.reg!=REG_RSP) {
 		tempi->a1.disp=tempi1->a1.disp;
@@ -575,7 +581,7 @@ p4_sib:
 	      tempil1->ic_flags|=ICF_NO_DEPEND_RESULT;
 	      tempil1->r.type=TY_NULL+tempil1->r.type&RT_MASK;
 	    } else if (tempi->a1.type&TY_MASK==TY_STK &&
-		     tempil1->r.type&TY_MASK==TY_STK) {
+		  tempil1->r.type&TY_MASK==TY_STK) {
 	      tempi->a1.type=TY_REG+tempi->a1.type&RT_MASK;
 	      tempi->a1.reg=REG_RAX;
 	      tempi->a1.disp=0;
@@ -697,9 +703,9 @@ p4_sib:
 	case IC_CALL_END2:
 	  break;
 	default:
-	  "Pass:%d Missing IC handler\n",lx->pass;
-	  ICPut(lx,tempi);
-	  LexExcept(lx,"Compiler Optimization Error at ");
+	  "Pass:%d Missing IC handler\n",cc->pass;
+	  ICPut(cc,tempi);
+	  LexExcept(cc,"Compiler Optimization Error at ");
       }
       if (tempi) {
 	while (OptIC4(tempi));
@@ -711,7 +717,7 @@ p4_sib:
     tempi=tempi_next;
   }
   if (ps->ptr>2) {
-    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
-    LexExcept(lx,"Compiler Optimization Error at ");
+    "Pass:%d Stk:%08X\n",cc->pass,ps->ptr;
+    LexExcept(cc,"Compiler Optimization Error at ");
   }
 }

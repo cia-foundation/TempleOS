@@ -137,7 +137,8 @@ U0 BibleInit()
 	"98684\0"
 	"100111\0");
   DefinePrint("ST_BIBLE_LINES","%d",
-    Str2I64(DefineSub(DefineCnt("ST_BIBLE_BOOK_LINES")-1,"ST_BIBLE_BOOK_LINES"))-1);
+	Str2I64(DefineSub(DefineCnt("ST_BIBLE_BOOK_LINES")-1,
+	"ST_BIBLE_BOOK_LINES"))-1);
 } BibleInit;
 
 public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
@@ -180,7 +181,8 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
 	}
 	if (doc_e->type_u8==DOCT_TEXT && StrLen(doc_e->tag)>=3) {
 	  ptr=doc_e->tag+StrLen(doc_e->tag)-1;
-	  while (ptr>doc_e->tag && (!('0'<=*(ptr-1)<='9') || *ptr!=':' || !('0'<=*(ptr+1)<='9')))
+	  while (ptr>doc_e->tag && (!('0'<=*(ptr-1)<='9') || *ptr!=':' ||
+		!('0'<=*(ptr+1)<='9')))
 	    ptr--;
 	  ptr--;
 	  while (ptr>=doc_e->tag && '0'<=*ptr<='9')

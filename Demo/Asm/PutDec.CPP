@@ -10,7 +10,7 @@ PUT_DEC_U64::
 //but this function will be nice for ASM callers if it saves all regs.
 	PUSH_C_REGS
 
-	PUSH	RSI		//See $LK,"REG_VARS_MASK",A="MN:REG_VARS_MASK"$ & $LK,"REG_NON_PTR_MASK",A="MN:REG_NON_PTR_MASK"$
+	PUSH	RSI	      //See $LK,"REGG_C_LOCAL_VARS",A="MN:REGG_C_LOCAL_VARS"$&$LK,"REGG_C_LOCAL_NON_PTR_VARS",A="MN:REGG_C_LOCAL_NON_PTR_VARS"$
 	LEA	RSI,-1[RBP]	//Load addr of end of buffer.
 				//We picked RSI because of PUT_STR
 				//We'll move bwd
@@ -38,7 +38,7 @@ PUT_DEC_U64::
 	LEAVE
 	RET
 
-_DO_IT::			//The convention is C-callable routines have underscores.
+_DO_IT::	//The convention is C-callable routines have underscores.
 	MOV	RAX,122333221
 	CALL	PUT_DEC_U64
 	MOV	RAX,'\n'

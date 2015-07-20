@@ -13,14 +13,13 @@ asm {
 //Opcodes are slightly different to make writing my x86_64 assembler easier.
 //See $LK,"::/Compiler/OpCodes.TXT"$.
 
-USE64	//Defaults to 64, but this is a good habit.
-
 JIFFIES_MSG:	DU8 "Jiffies:",0;
 
 //See $LK,"::/Kernel/StrA.CPP",A="FL:::/Kernel/StrA.CPP,1"$ and $LK,"::/Kernel/KUtils.CPP"$.
 
 _BEEPS2::
 //You can clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
+//See $LK,"REGG_C_CLOBBERED",A="MN:REGG_C_CLOBBERED"$ and $LK,"REGG_C_TEMP_CLOBBERED",A="MN:REGG_C_TEMP_CLOBBERED"$.
 	PUSH	RBP
 	MOV	RBP,RSP
 	MOV	RCX,U64 SF_ARG1[RBP] //$LK,"SF_ARG1",A="FF:::/Kernel/KernelA.HPP,SF_ARG1"$
@@ -35,7 +34,7 @@ _BEEPS2::
 	POP	RCX
 	LOOP	@@05
 
-	PUSH	RSI	//See $LK,"REG_VARS_MASK",A="MN:REG_VARS_MASK"$ & $LK,"REG_NON_PTR_MASK",A="MN:REG_NON_PTR_MASK"$
+	PUSH	RSI	//See $LK,"REGG_C_LOCAL_VARS",A="MN:REGG_C_LOCAL_VARS"$ & $LK,"REGG_C_LOCAL_NON_PTR_VARS",A="MN:REGG_C_LOCAL_NON_PTR_VARS"$
 	MOV	RSI,JIFFIES_MSG
 	CALL	PUT_STR
 	POP	RSI
@@ -63,30 +62,28 @@ U0 AsmAndC2()
   Beeps2(i);
 
   asm {
-LIST
+    LIST
 //You can clobber RAX,RBX,RCX,RDX, but preserve the rest.
 
-USE64	//Defaults to 64, but this is a good habit.
+    MOV	RCX,R15 //You can clobber RAX,RBX,RCX,RDX. Preserve the rest.
 
-	MOV	RCX,R15 //You can clobber RAX,RBX,RCX,RDX. Preserve the rest.
-
-@@05:	PUSH	RCX
+    @@05:	PUSH	RCX
 //U0 $LK,"Snd",A="MN:Snd"$(F64 freq);
 
-	MOV	RAX,RCX	//freq=loop*100.0+100.0
-	IMUL2	RAX,glbl_hz_step	//evaluated at compile ttime
-	ADD	RAX,U64 [&glbl_hz_base] //evaluated at run time
-	PUSH	RAX
-	FILD	U64 [RSP]	//Convert from int to floating
-	FSTP	U64 [RSP]
+    MOV	RAX,RCX	//freq=loop*100.0+100.0
+    IMUL2	RAX,glbl_hz_step	//evaluated at compile ttime
+    ADD	RAX,U64 [&glbl_hz_base] //evaluated at run time
+    PUSH	RAX
+    FILD	U64 [RSP]	//Convert from int to floating
+    FSTP	U64 [RSP]
 
-	CALL	&Snd	//We can skip IMPORT with & if JIT compiling.
+    CALL	&Snd	//We can skip IMPORT with & if JIT compiling.
 
-	MOV	RCX,cnts.time_stamp_freq>>3	//JIT Const.  Simple delay loop.
+    MOV	RCX,cnts.time_stamp_freq>>3	//JIT Const.  Simple delay loop.
 @@10:	LOOP	@@10
 
-	POP	RCX
-	LOOP	@@05
+    POP	RCX
+    LOOP	@@05
   }
   Snd(0);
 }

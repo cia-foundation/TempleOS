@@ -20,10 +20,10 @@ U0 InputFilterTask()
 	SetRFlags(old_flags);
 	Preempt(ON);
 	try
-	  ExePrint("%s",tempc->aux_str);
+		ExePrint("%s",tempc->aux_str);
 	catch
 	  Fs->catch_except=TRUE;
-	Preempt(OFF);
+	Preempt;
 	SrvCmdDel(tempc);
       } else
 	break;
@@ -66,8 +66,8 @@ Note: This delivers messages from parent down to pop-up.
 	  *_a2=tempc->aux2;
 	SrvCmdDel(tempc);
 	if ((result!=MSG_KEY_DOWN || !(tempc->aux2&SCF_KEY_DESC) ||
-	  Bt(&mask,MSGF_ALLOW_KEY_DESC)) && Bt(&mask,result))
-	    goto sm_done;
+	      Bt(&mask,MSGF_ALLOW_KEY_DESC)) && Bt(&mask,result))
+	  goto sm_done;
       }
     }
     SetRFlags(old_flags);
@@ -97,9 +97,9 @@ I64 FlushMsgs(CTask *task=NULL)
 I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL)
 {//Wait for a message of type specified by a one in the mask.
 //Throw-out all messages not in mask.
-//Returns $LK,"msg_code",A="MN:MSG_CMD"$. See $LK,"::/Demo/MsgLoop.CPP"$.
+  //Returns $LK,"msg_code",A="MN:MSG_CMD"$. See $LK,"::/Demo/MsgLoop.CPP"$.
   I64 result;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (!task) task=Fs;
   LBtr(&task->task_flags,TASKf_IDLE);
   while (!(result=ScanMsg(_a1,_a2,mask,task))) {
@@ -114,7 +114,7 @@ I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL)
 I64 ScanChar()
 {//Checks for $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$ and returns 0 immediately if no key.
 //Waits for $LK,"MSG_KEY_UP",A="MN:MSG_KEY_UP"$ of non-zero $LK,"ASCII",A="MN:CH_CTRLA"$ key and returns $LK,"ASCII",A="MN:CH_CTRLA"$ if key.
-//$LK,"ScanMsg",A="MN:ScanMsg"$() throws away other message types.
+  //$LK,"ScanMsg",A="MN:ScanMsg"$() throws away other message types.
   I64 a1a,a2a,a1b,a2b;
   if (!ScanMsg(&a1a,&a2a,1<<MSG_KEY_DOWN)||!a1a)
     return 0;
@@ -127,8 +127,8 @@ I64 ScanChar()
 Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE)
 {//Checks for $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$ and returns FALSE immediately if no key.
 //Sets $LK,"ASCII",A="MN:CH_CTRLA"$ and $LK,"scan_code",A="FI:::/Doc/CharOverview.TXT"$.
-//Removes key message and returns TRUE.
-//$LK,"ScanMsg",A="MN:ScanMsg"$() throws away other message types.
+  //Removes key message and returns TRUE.
+  //$LK,"ScanMsg",A="MN:ScanMsg"$() throws away other message types.
   I64 ch=0,sc=0;
   if (ScanMsg(&ch,&sc,1<<MSG_KEY_DOWN)) {
     if (_ch) *_ch=ch;
@@ -146,9 +146,9 @@ Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE)
 I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
 {//Waits for $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$ message and returns $LK,"ASCII",A="MN:CH_CTRLA"$.
 //Sets $LK,"scan_code",A="FI:::/Doc/CharOverview.TXT"$.
-//$LK,"ScanKey",A="MN:ScanKey"$() throws away other message types.
+  //$LK,"ScanKey",A="MN:ScanKey"$() throws away other message types.
   I64 ch,sc;
-  Bool old_preempt=Preempt(OFF),cursor_on=FALSE;
+  Bool old_preempt=Preempt,cursor_on=FALSE;
   while (!ScanKey(&ch,&sc,FALSE)) {
     if (IsRaw && raw_cursor) {
       if (!cursor_on && ToI64(GetTSC*5/cnts.time_stamp_freq)&1) {
@@ -161,7 +161,7 @@ I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
     }
     LBts(&Fs->task_flags,TASKf_IDLE);
     if (IsDbg) {
-      //We don't want interrupt-driven keyboard when in debugger
+//We don't want interrupt-driven keyboard when in debugger
       //because that could have side-effects or crash, so we poll
       //keyboard when in debugger with interrupts off.
       PUSHFD

@@ -1,12 +1,14 @@
 #help_index "Graphics/Windows BMP Files"
 
+#define NUM_BMP_COLORS	16
+
 class CFileBMP
 {
   U16 type;
   U32 file_size;
   U32 reserved;
   U32 data_offset;
- 
+
   U32 header_size;
   U32 width;
   U32 height;
@@ -21,26 +23,34 @@ class CFileBMP
 
   U0 end;
 
-  CBGR palette[16];
+  CBGR24 palette[NUM_BMP_COLORS];
 };
 
 public CFileBMP *BMP4To(CDC *dc)
 {//To Windows 4-bit BMP.
   U8 *src,*ptr;
-  I64 x,y,w=dc->width>>1,
-    size=sizeof(CFileBMP)+dc->width*dc->height>>1;
-  CFileBMP *r	=CAlloc(size);
-  r->type	='BM';
-  r->planes	=1;
-  r->file_size	=size;
-  r->data_offset=sizeof(CFileBMP);
-  r->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
-  r->width	=dc->width;
-  r->height	=dc->height;
-  r->bit_cnt	=4;
-  r->image_size	=dc->width*dc->height>>1;
-  GetVGAPalette4(r->palette);
-  ptr=r(U8 *)+r->data_offset;
+  CBGR48 palette[NUM_COLORS];
+  I64 i,x,y,w=dc->width>>1,
+	size=sizeof(CFileBMP)+dc->width*dc->height>>1;
+  CFileBMP *bmp	=CAlloc(size);
+  bmp->type	='BM';
+  bmp->planes	=1;
+  bmp->file_size	=size;
+  bmp->data_offset=sizeof(CFileBMP);
+  bmp->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
+  bmp->width	=dc->width;
+  bmp->height	=dc->height;
+  bmp->bit_cnt	=4;
+  bmp->image_size	=dc->width*dc->height>>1;
+  GrPaletteGet(palette);
+#assert NUM_COLORS==NUM_BMP_COLORS
+  for (i=0;i<NUM_BMP_COLORS;i++) {
+    bmp->palette[i].b=palette[i].b>>8;
+    bmp->palette[i].g=palette[i].g>>8;
+    bmp->palette[i].r=palette[i].r>>8;
+    bmp->palette[i].pad=0;
+  }
+  ptr=bmp(U8 *)+bmp->data_offset;
   for (y=dc->height-1;y>=0;y--) {
     src=y*dc->width_internal+dc->body;
     for (x=0;x<w;x++) {
@@ -49,24 +59,32 @@ public CFileBMP *BMP4To(CDC *dc)
       ptr++;
     }
   }
-  return r;
+  return bmp;
 }
 
 public CFileBMP *BMPRLE4To(CDC *dc)
 {//To Windows RLE4 bit BMP.
   U8 *src,*ptr,*start;
-  I64 x,y,w=dc->width,cnt,pattern;
-  CFileBMP *r	=CAlloc(sizeof(CFileBMP)+2*(dc->width+1)*dc->height);
-  r->type	='BM';
-  r->planes	=1;
-  r->data_offset=sizeof(CFileBMP);
-  r->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
-  r->width	=dc->width;
-  r->height	=dc->height;
-  r->bit_cnt	=4;
-  r->compression=2; //RLE4
-  GetVGAPalette4(r->palette);
-  start=ptr=r(U8 *)+r->data_offset;
+  I64 i,x,y,w=dc->width,cnt,pattern;
+  CBGR48 palette[NUM_COLORS];
+  CFileBMP *bmp	=CAlloc(sizeof(CFileBMP)+2*(dc->width+1)*dc->height);
+  bmp->type	='BM';
+  bmp->planes	=1;
+  bmp->data_offset=sizeof(CFileBMP);
+  bmp->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
+  bmp->width	=dc->width;
+  bmp->height	=dc->height;
+  bmp->bit_cnt	=4;
+  bmp->compression=2; //RLE4
+  GrPaletteGet(palette);
+#assert NUM_COLORS==NUM_BMP_COLORS
+  for (i=0;i<NUM_BMP_COLORS;i++) {
+    bmp->palette[i].b=palette[i].b>>8;
+    bmp->palette[i].g=palette[i].g>>8;
+    bmp->palette[i].r=palette[i].r>>8;
+    bmp->palette[i].pad=0;
+  }
+  start=ptr=bmp(U8 *)+bmp->data_offset;
   for (y=dc->height-1;y>=0;y--) {
     src=y*dc->width_internal+dc->body;
     x=0;
@@ -97,28 +115,28 @@ public CFileBMP *BMPRLE4To(CDC *dc)
     }
     *ptr(U16 *)++=0;
   }
-  r->image_size=ptr-start;
-  r->file_size=sizeof(CFileBMP)+r->image_size;
-  return r;
+  bmp->image_size=ptr-start;
+  bmp->file_size=sizeof(CFileBMP)+bmp->image_size;
+  return bmp;
 }
 
 public CFileBMP *BMP24To(CDC *dc)
 {//To Windows 24-bit BMP.
   U8 *src;
-  I64 i,x,y,size=offset(CFileBMP.end)+dc->width*dc->height*sizeof(CRGB);
-  CBGR *bgr;
-  CFileBMP *r	=CAlloc(size);
-  r->type	='BM';
-  r->planes	=1;
-  r->file_size	=size;
-  r->data_offset=offset(CFileBMP.end);
-  r->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
-  r->width	=dc->width;
-  r->height	=dc->height;
-  r->bit_cnt	=32;
-  r->image_size	=dc->width*dc->height<<2;
+  I64 i,x,y,size=offset(CFileBMP.end)+dc->width*dc->height*sizeof(CBGR24);
+  CBGR24 *bgr;
+  CFileBMP *bmp	=CAlloc(size);
+  bmp->type	='BM';
+  bmp->planes	=1;
+  bmp->file_size	=size;
+  bmp->data_offset=offset(CFileBMP.end);
+  bmp->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
+  bmp->width	=dc->width;
+  bmp->height	=dc->height;
+  bmp->bit_cnt	=32;
+  bmp->image_size	=dc->width*dc->height<<2;
 
-  bgr=r(U8 *)+r->data_offset;
+  bgr=bmp(U8 *)+bmp->data_offset;
   for (y=dc->height-1;y>=0;y--) {
     src=y*dc->width_internal+dc->body;
     for (x=0;x<dc->width;x++) {
@@ -134,48 +152,49 @@ public CFileBMP *BMP24To(CDC *dc)
       bgr(U8 *)+=4;
     }
   }
-  return r;
+  return bmp;
 }
 
 public I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4)
 {//Window's BMP Files.
   I64 size;
-  CFileBMP *r;
+  CFileBMP *bmp;
   if (bits==4) {
     if (IsDotZ(filename)) //.Z compression is better than RLE
-      r=BMP4To(dc);
+      bmp=BMP4To(dc);
     else {
-      r=BMPRLE4To(dc);
-      if (r->file_size>sizeof(CFileBMP)+dc->width*dc->height>>1) {
-	Free(r);
-	r=BMP4To(dc);
+      bmp=BMPRLE4To(dc);
+      if (bmp->file_size>sizeof(CFileBMP)+dc->width*dc->height>>1) {
+	Free(bmp);
+	bmp=BMP4To(dc);
       }
     }
   } else if (bits==24)
-    r=BMP24To(dc);
+    bmp=BMP24To(dc);
   else {
     "Format Not Supported.\n";
     return 0;
   }
-  size=r->file_size;
-  FileWrite(filename,r,r->file_size);
-  Free(r);
+  size=bmp->file_size;
+  FileWrite(filename,bmp,bmp->file_size);
+  Free(bmp);
   return size;
 }
 
-U8 *BMPPaletteNew(CFileBMP *r)
+U8 *BMPPaletteNew(CFileBMP *bmp)
 {
   I64 i,j,best,score,best_score;
-  CBGR palette[16];
-  U8 *result=CAlloc(16*sizeof(U8));
-  GetVGAPalette4(palette);
-  for (i=0;i<16;i++) {
+  CBGR48 palette[NUM_COLORS];
+  U8 *result=CAlloc(NUM_BMP_COLORS*sizeof(U8));
+  GrPaletteGet(palette);
+#assert NUM_COLORS==NUM_BMP_COLORS
+  for (i=0;i<NUM_BMP_COLORS;i++) {
     best=i;
     best_score=MAX_I64;
-    for (j=0;j<16;j++) {
-      score=SqrI64(r->palette[i].r-palette[j].r)+
-	  SqrI64(r->palette[i].g-palette[j].g)+
-	  SqrI64(r->palette[i].b-palette[j].b);
+    for (j=0;j<NUM_BMP_COLORS;j++) {
+      score=SqrI64(bmp->palette[i].r-palette[j].r>>8)+
+	    SqrI64(bmp->palette[i].g-palette[j].g>>8)+
+	    SqrI64(bmp->palette[i].b-palette[j].b>>8);
       if (score<best_score) {
 	best=j;
 	best_score=score;
@@ -186,9 +205,9 @@ U8 *BMPPaletteNew(CFileBMP *r)
   return result;
 }
 
-U8 ms_paint_palette[16]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
+U8 ms_paint_palette[NUM_BMP_COLORS]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
 
-I64 BMP24Color(CBGR *ptr,Bool dither_probability)
+I64 BMP24Color(CBGR24 *ptr,Bool dither_probability)
 {
   I64 result,k;
   if (dither_probability) {
@@ -216,28 +235,29 @@ I64 BMP24Color(CBGR *ptr,Bool dither_probability)
   return result;
 }
 
-public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE)
+public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
+	Bool use_ms_paint_palette=FALSE)
 {//Window's BMP Files.
   I64 i,j,cnt;
   U8 *palette_map,*ptr;
   Bool rle;
-  CFileBMP *r;
+  CFileBMP *bmp;
   CDC *result=NULL;
   if (ptr=FileRead(filename)) {
-    r=ptr;
-    if (0<r->width<MAX_I32 && 0<r->height<MAX_I32) {
-      result=DCNew(r->width,r->height);
-      ptr+=r->data_offset;
-      if (r->compression==2)
+    bmp=ptr;
+    if (0<bmp->width<MAX_I32 && 0<bmp->height<MAX_I32) {
+      result=DCNew(bmp->width,bmp->height);
+      ptr+=bmp->data_offset;
+      if (bmp->compression==2)
 	rle=TRUE;
       else
 	rle=FALSE;
       if (use_ms_paint_palette)
 	palette_map=ms_paint_palette;
       else
-	palette_map=BMPPaletteNew(r);
-      if (r->bit_cnt==4) {
-	for (i=r->height-1;i>=0;i--)
+	palette_map=BMPPaletteNew(bmp);
+      if (bmp->bit_cnt==4) {
+	for (i=bmp->height-1;i>=0;i--)
 	  if (rle) {//We don't support full RLE4, just our own subset
 	    j=0;
 	    while (cnt=*ptr++) {
@@ -261,7 +281,7 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint
 	    }
 	    ptr++;
 	  } else
-	    for (j=0;j<(r->width+7)&~7;) {
+	    for (j=0;j<(bmp->width+7)&~7;) {
 	      result->color=palette_map[*ptr&15];
 	      GrPlot(result,j+1,i);
 	      result->color=palette_map[*ptr>>4];
@@ -271,19 +291,19 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint
 	    }
 	if (!use_ms_paint_palette)
 	  Free(palette_map);
-      } else if (r->bit_cnt==24) {
-	for (i=r->height-1;i>=0;i--) {
-	  for (j=0;j<r->width;j++,ptr+=3) {
+      } else if (bmp->bit_cnt==24) {
+	for (i=bmp->height-1;i>=0;i--) {
+	  for (j=0;j<bmp->width;j++,ptr+=3) {
 	    result->color=BMP24Color(ptr,dither_probability);
 	    GrPlot(result,j,i);
 	  }
-	  ptr+=r->width&3;
+	  ptr+=bmp->width&3;
 	}
 	if (!use_ms_paint_palette)
 	  Free(palette_map);
-      } else if (r->bit_cnt>=32) {
-	for (i=r->height-1;i>=0;i--)
-	  for (j=0;j<r->width;j++,ptr+=4) {
+      } else if (bmp->bit_cnt>=32) {
+	for (i=bmp->height-1;i>=0;i--)
+	  for (j=0;j<bmp->width;j++,ptr+=4) {
 	    result->color=BMP24Color(ptr,dither_probability);
 	    GrPlot(result,j,i);
 	  }
@@ -296,13 +316,15 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint
       }
     } else
       "Invalid BMP File\n";
-    Free(r);
+    Free(bmp);
   }
   return result;
 }
 
-#help_index "Graphics/Sprite;Graphics/Windows BMP Files;DolDoc/Output"
-public U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE)
+#help_index "Graphics/Sprite;Graphics/Windows BMP Files;"\
+	"DolDoc/Output;StdOut/DolDoc"
+public U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,
+	Bool use_ms_paint_palette=FALSE)
 {//Put a BMP file into a document as a sprite.
   CDC *dc=BMPRead(filename,dither_probability,use_ms_paint_palette);
   CSprite *elems=DC2Sprite(dc);
@@ -312,9 +334,9 @@ public U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,Bool 
 }
 
 #help_index "Graphics/Windows BMP Files;Graphics/Screen"
-public I64 BMPCaptureScreen(U8 *filename,I64 bits=4,Bool include_zoom=TRUE)
+public I64 BMPScreenCapture(U8 *filename,I64 bits=4,Bool include_zoom=TRUE)
 {//Capture screen as BMP file.
-  CDC *dc=DCCaptureScreen(include_zoom);
+  CDC *dc=DCScreenCapture(include_zoom);
   I64 size=BMPWrite(filename,dc,bits);
   DCDel(dc);
   return size;

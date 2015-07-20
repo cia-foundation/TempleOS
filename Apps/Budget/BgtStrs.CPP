@@ -1,6 +1,7 @@
 #define SFT_GENERIC	1
 
-public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,U8 **_colors=NULL,Bool no_nums=FALSE)
+public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
+	U8 **_colors=NULL,Bool no_nums=FALSE)
 {
   CDoc		*doc=DocRead(name,DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
   CDocEntry	*doc_e=doc->root.next;
@@ -53,7 +54,8 @@ public U0 StrFileArrDel(U8 **a,I64 max_num)
   Free(a);
 }
 
-public I64 StrFileAdd(U8 *st,I64 *_num,CHashTable *table,I64 color=COLOR_INVALID)
+public I64 StrFileAdd(U8 *st,I64 *_num,
+	CHashTable *table,I64 color=COLOR_INVALID)
 {
   CHashGeneric *temph;
   if (!st) return 0;

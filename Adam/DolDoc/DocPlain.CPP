@@ -1,10 +1,11 @@
 #help_index "DolDoc"
 
-I64 PrsDocFlagSingle(CLex *lx,I64 *_de_flags,U32 *_type,Bool turn_on)
+I64 PrsDocFlagSingle(CCmpCtrl *cc,I64 *_de_flags,U32 *_type,Bool turn_on)
 {
   I64 result=-1;
   CHashGeneric *temph;
-  if (lx->token==TK_IDENT && (temph=HashFind(lx->cur_str,doldoc.hash,DHT_DOC_FLAG))) {
+  if (cc->token==TK_IDENT &&
+	(temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_FLAG))) {
     result=temph->user_data0;
     if (result<64) {
       BEqu(_de_flags,result,turn_on);
@@ -17,24 +18,24 @@ I64 PrsDocFlagSingle(CLex *lx,I64 *_de_flags,U32 *_type,Bool turn_on)
 	  break;
       }
     }
-    Lex(lx);	//skip flag
+    Lex(cc);	//skip flag
   }
   return result;
 }
 
-I64 PrsDocFlags(CLex *lx,I64 *_de_flags,U32 *_type)
+I64 PrsDocFlags(CCmpCtrl *cc,I64 *_de_flags,U32 *_type)
 {
   I64 result=-1;
   Bool turn_on;
   while (TRUE) {
-    if (lx->token=='+')
+    if (cc->token=='+')
       turn_on=TRUE;
-    else if (lx->token=='-')
+    else if (cc->token=='-')
       turn_on=FALSE;
     else
       break;
-    Lex(lx);
-    result=PrsDocFlagSingle(lx,_de_flags,_type,turn_on);
+    Lex(cc);
+    result=PrsDocFlagSingle(cc,_de_flags,_type,turn_on);
   }
   return result;
 }
@@ -45,7 +46,8 @@ I64 DocBinPtrRst(CDoc *doc,CDocEntry *doc_e)
   CDoc *doc2;
   CDocBin *tempb,*tempb2;
   I64 i,bin_num=0;
-  if (doc_e->de_flags&DOCEF_HAS_BIN && doc_e->bin_ptr_link && StrLen(doc_e->bin_ptr_link)) {
+  if (doc_e->de_flags&DOCEF_HAS_BIN &&
+	doc_e->bin_ptr_link && StrLen(doc_e->bin_ptr_link)) {
     bin_num=doc_e->bin_num;
     st=StrNew(doc_e->bin_ptr_link);
     st2=StrNew(st);
@@ -54,7 +56,7 @@ I64 DocBinPtrRst(CDoc *doc,CDocEntry *doc_e)
     if (i>0||*st2) {
       doc2=DocRead(st);
       if (i>0  && (tempb2=DocBinFindNum(doc2,i)) ||
-	  i==0 && (tempb2=DocBinFindTag(doc2,st2))) {
+	    i==0 && (tempb2=DocBinFindTag(doc2,st2))) {
 	i=1;
 	if (bin_num>0) {
 	  if (tempb=DocBinFindNum(doc,bin_num)) {
@@ -91,7 +93,8 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	t1,f1,de_flags,type;
   U8 *buf,*buf2;
 
-  if (doc_e->type_u8==DOCT_FOREGROUND && doc->flags&DOCF_COLOR_NAMES && 0<=attr<NUM_COLORS) {
+  if (doc_e->type_u8==DOCT_FOREGROUND &&
+	doc->flags&DOCF_COLOR_NAMES && 0<=attr<NUM_COLORS) {
     buf=StrNew(DefineSub(attr,"ST_COLORS"));
     attr=DOC_DFT;
   } else
@@ -100,7 +103,8 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
     f1=doldoc.dft_de_flags[doc_e->type_u8];
     t1=doc_e->type_u8|doldoc.dft_type_flags[doc_e->type_u8];
 
-    de_flags=doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_SELECTED|DOCEF_HIGHLIGHT|DOCEF_WORD_WRAP|DOCEF_SKIP|DOCEF_FILTER_SKIP);
+    de_flags=doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_SELECTED|
+	  DOCEF_HIGHLIGHT|DOCEF_WORD_WRAP|DOCEF_SKIP|DOCEF_FILTER_SKIP);
     for (i=0;i<DOCEf_NUM_FLAGS;i++)
       if (Bt(&f1,i)!=Bt(&de_flags,i)) {
 	if (Bt(&de_flags,i)) {
@@ -174,9 +178,12 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       nobound_switch (j) {
 	case DOCEf_TAG:
 	  if (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_MACRO &&
-	      (doc_e->de_flags&DOCEF_LEFT_MACRO && !StrCmp(doc_e->tag,doc_e->left_macro) ||
-	       doc_e->de_flags&DOCEF_RIGHT_MACRO && !StrCmp(doc_e->tag,doc_e->right_macro)) ||
-	      doc_e->de_flags&DOCEF_LST && !StrCmp(doc_e->tag,"[]") && doc_e->de_flags&DOCEF_DEFINE) {
+		(doc_e->de_flags&DOCEF_LEFT_MACRO &&
+		!StrCmp(doc_e->tag,doc_e->left_macro) ||
+		doc_e->de_flags&DOCEF_RIGHT_MACRO &&
+		!StrCmp(doc_e->tag,doc_e->right_macro)) ||
+		doc_e->de_flags&DOCEF_LST && !StrCmp(doc_e->tag,"[]") &&
+		doc_e->de_flags&DOCEF_DEFINE) {
 	    buf2=buf;
 	    buf=NULL;
 	  } else {
@@ -227,7 +234,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	  break;
 	case DOCEf_RAW_TYPE:
 	  if (doc_e->type_u8==DOCT_CHECK_BOX&&doc_e->raw_type!=RT_I8 ||
-	      doc_e->type_u8!=DOCT_CHECK_BOX&&doc_e->raw_type!=RT_I64)
+		doc_e->type_u8!=DOCT_CHECK_BOX&&doc_e->raw_type!=RT_I64)
 	    buf2=MStrPrint("%sRT=%Z,",buf,doc_e->raw_type,"ST_RAW_TYPES");
 	  break;
 	case DOCEf_SHIFTED_X:
@@ -264,12 +271,12 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
   U8 *ptr,*st2;
   CDocEntry *doc_e=NULL;
   CHashGeneric *temph;
-  CLex *lx=LexNew(st,LF_DONT_FREE_BUF);
-  CHashTable *old_hash_table_lst=lx->htc.hash_table_lst;
+  CCmpCtrl *cc=CmpCtrlNew(st,CCF_DONT_FREE_BUF);
+  CHashTable *old_hash_table_lst=cc->htc.hash_table_lst;
   try {
-    lx->htc.hash_table_lst=NULL;
-    if (Lex(lx)==TK_IDENT) {
-      if (temph=HashFind(lx->cur_str,doldoc.hash,DHT_DOC_CMD|DHT_COLOR)) {
+    cc->htc.hash_table_lst=NULL;
+    if (Lex(cc)==TK_IDENT) {
+      if (temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD|DHT_COLOR)) {
 	if (temph->type&DHT_DOC_CMD)
 	  i=temph->user_data0;
 	else {//DHT_COLOR
@@ -278,20 +285,20 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	}
       } else
 	goto pd_err;
-      Lex(lx); //skip cmd code
+      Lex(cc); //skip cmd code
       doc_e=CAlloc(sizeof(CDocEntry),doc->mem_task);
       doc_e->type=i;
       doc_e->de_flags=doldoc.dft_de_flags[i];
       doc_e->type|=doldoc.dft_type_flags[i];
       doc_e->raw_type=RT_I64;
-      j=PrsDocFlags(lx,&doc_e->de_flags,&doc_e->type);
-      lx->htc.hash_table_lst=old_hash_table_lst;
+      j=PrsDocFlags(cc,&doc_e->de_flags,&doc_e->type);
+      cc->htc.hash_table_lst=old_hash_table_lst;
       nobound_switch (i) {
 	case DOCT_DATA:
-	  while (lx->token==',')
-	    Lex(lx);
-	  if (lx->token)
-	    doc_e->len=LexExpressionI64(lx);
+	  while (cc->token==',')
+	    Lex(cc);
+	  if (cc->token)
+	    doc_e->len=LexExpressionI64(cc);
 	  else
 	    goto pd_err;
 	  break;
@@ -299,16 +306,16 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  doc_e->raw_type=RT_I8;
 	  break;
 	case DOCT_HEX_ED:
-	  while (lx->token==',')
-	    Lex(lx);
-	  if (lx->token)
-	    doc_e->len=LexExpressionI64(lx);
+	  while (cc->token==',')
+	    Lex(cc);
+	  if (cc->token)
+	    doc_e->len=LexExpressionI64(cc);
 	  else
 	    goto pd_err;
-	  while (lx->token==',')
-	    Lex(lx);
-	  if (lx->token)
-	    doc_e->hex_ed_width=LexExpressionI64(lx);
+	  while (cc->token==',')
+	    Lex(cc);
+	  if (cc->token)
+	    doc_e->hex_ed_width=LexExpressionI64(cc);
 	  else
 	    goto pd_err;
 	  break;
@@ -329,10 +336,10 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	case DOCT_BLINK:
 	case DOCT_SHIFTED_X:
 	case DOCT_SHIFTED_Y:
-	  while (lx->token==',')
-	    Lex(lx);
-	  if (lx->token)
-	    doc_e->attr=LexExpressionI64(lx);
+	  while (cc->token==',')
+	    Lex(cc);
+	  if (cc->token)
+	    doc_e->attr=LexExpressionI64(cc);
 	  else
 	    doc_e->attr=attr;
 	  break;
@@ -343,15 +350,15 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 
       processed_flags=0;
       while (TRUE) {
-	lx->htc.hash_table_lst=NULL;
-	while (lx->token==',')
-	  Lex(lx);
-	lx->htc.hash_table_lst=old_hash_table_lst;
-	j=PrsDocFlagSingle(lx,&doc_e->de_flags,&doc_e->type,TRUE);
+	cc->htc.hash_table_lst=NULL;
+	while (cc->token==',')
+	  Lex(cc);
+	cc->htc.hash_table_lst=old_hash_table_lst;
+	j=PrsDocFlagSingle(cc,&doc_e->de_flags,&doc_e->type,TRUE);
 	if (!(de_flags=~processed_flags & doc_e->de_flags & DOCEG1_HAS_ARG))
 	  break;
-	if (lx->token=='=')
-	  Lex(lx);
+	if (cc->token=='=')
+	  Lex(cc);
 	else
 	  j=Bsf(de_flags);
 	if (j<0 || Bts(&processed_flags,j))
@@ -360,10 +367,11 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  case DOCEf_TAG:
 	    if (!doc_e->tag) {
 //If a $$MA,LM=""$$, Tag is filled when the LM is processed.
-//if doc_e->df_flags&DOCEF_LST, Tag is filled when the Define is processed.
-//(The dft_flag1.tag calls this after.)
-	      if (lx->token==TK_STR) {
-		st2=LexExtStr(lx);
+	      //if doc_e->df_flags&DOCEF_LST,
+	      // Tag is filled when the Define is processed.
+	      //(The dft_flag1.tag calls this after.)
+	      if (cc->token==TK_STR) {
+		st2=LexExtStr(cc);
 		if (i==DOCT_CHECK_BOX) {
 		  st=MStrPrint("[X] %s",st2);
 		  Free(st2);
@@ -388,22 +396,23 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	    }
 	    break;
 	  case DOCEf_AUX_STR:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->aux_str=StrNew(st2,doc->mem_task);
 	      Free(st2);
 //$AN,"Anchor",A="DataTagWidth"$
 	      if (i==DOCT_DATA) {
 		if (ptr=StrMatch(":",doc_e->aux_str))
 		  doc_e->min_col=ptr-doc_e->aux_str+1;
-		doc_e->tag=MAlloc(doc_e->len+doc_e->min_col+2,doc->mem_task); //+2 because "_\0"
+		doc_e->tag=MAlloc(doc_e->len+doc_e->min_col+2,
+		      doc->mem_task); //+2 because "_\0"
 	      }
 	    } else
 	      goto pd_err;
 	    break;
 	  case DOCEf_DEFINE:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->define_str=StrNew(st2,doc->mem_task);
 	      Free(st2);
 	      if (doc_e->de_flags&DOCEF_LST && !doc_e->tag)
@@ -412,22 +421,22 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      goto pd_err;
 	    break;
 	  case DOCEf_HTML_LINK:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->html_link=StrNew(st2,doc->mem_task);
 	      Free(st2);
 	    } else
 	      goto pd_err;
 	    break;
 	  case DOCEf_LEFT_EXP:
-	    if (lx->token)
-	      doc_e->left_exp=LexExpression(lx);
+	    if (cc->token)
+	      doc_e->left_exp=LexExpression(cc);
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_LEFT_MACRO:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->left_macro=StrNew(st2,doc->mem_task);
 	      Free(st2);
 	      if (i==DOCT_MACRO && !doc_e->tag)
@@ -436,14 +445,14 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      goto pd_err;
 	    break;
 	  case DOCEf_RIGHT_EXP:
-	    if (lx->token)
-	      doc_e->right_exp=LexExpression(lx);
+	    if (cc->token)
+	      doc_e->right_exp=LexExpression(cc);
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_RIGHT_MACRO:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->right_macro=StrNew(st2,doc->mem_task);
 	      Free(st2);
 	      if (i==DOCT_MACRO && !doc_e->tag)
@@ -452,14 +461,14 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      goto pd_err;
 	    break;
 	  case DOCEf_HAS_BIN:
-	    if (lx->token)
-	      doc_e->bin_num=LexExpressionI64(lx);
+	    if (cc->token)
+	      doc_e->bin_num=LexExpressionI64(cc);
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_BIN_PTR_LINK:
-	    if (lx->token==TK_STR) {
-	      st2=LexExtStr(lx);
+	    if (cc->token==TK_STR) {
+	      st2=LexExtStr(cc);
 	      doc_e->bin_ptr_link=StrNew(st2,doc->mem_task);
 	      Free(st2);
 	      if (!DocBinPtrRst(doc,doc_e))
@@ -468,36 +477,36 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      goto pd_err;
 	    break;
 	  case DOCEf_RAW_TYPE:
-	    if (lx->token==TK_IDENT) {
-	      j=DefineMatch(lx->cur_str,"ST_RAW_TYPES");
+	    if (cc->token==TK_IDENT) {
+	      j=DefineMatch(cc->cur_str,"ST_RAW_TYPES");
 	      if (j<0)
 		goto pd_err;
 	      doc_e->raw_type=j;
-	      Lex(lx);
+	      Lex(cc);
 	    } else
 	      goto pd_err;
 	    break;
 	  case DOCEf_SHIFTED_X:
-	    if (lx->token)
-	      doc_e->type|=(LexExpressionI64(lx) & 0x1F)<<16;
+	    if (cc->token)
+	      doc_e->type|=(LexExpressionI64(cc) & 0x1F)<<16;
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_SHIFTED_Y:
-	    if (lx->token)
-	      doc_e->type|=(LexExpressionI64(lx) & 0x1F)<<21;
+	    if (cc->token)
+	      doc_e->type|=(LexExpressionI64(cc) & 0x1F)<<21;
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_SCROLLING_X:
-	    if (lx->token)
-	      doc_e->scroll_len=LexExpressionI64(lx);
+	    if (cc->token)
+	      doc_e->scroll_len=LexExpressionI64(cc);
 	    else
 	      goto pd_err;
 	    break;
 	  case DOCEf_USER_DATA:
-	    if (lx->token)
-	      doc_e->user_data=LexExpression(lx);
+	    if (cc->token)
+	      doc_e->user_data=LexExpression(cc);
 	    else
 	      goto pd_err;
 	    break;
@@ -512,11 +521,12 @@ pd_err:
       doc_e->type=DOCT_ERROR;
       doc_e->de_flags=0;
     }
-    if (doc_e->de_flags & DOCEF_LST && !(doc_e->de_flags & DOCEF_DATA_IS_PTR)) {
+    if (doc_e->de_flags & DOCEF_LST &&
+	  !(doc_e->de_flags & DOCEF_DATA_IS_PTR)) {
       DocDataScan(doc,doc_e);
       DocDataFmt(doc,doc_e);
     }
-    LexDel(lx);
+    CmpCtrlDel(cc);
   } catch {
     Fs->catch_except=TRUE;
     if (!doc_e)
@@ -537,40 +547,40 @@ public U0 DocInsEntry(CDoc *doc,CDocEntry *doc_e)
   doc_e->y=doc_ce->y;
   doc_e->page_line_num=doc_ce->page_line_num;
   MemCpy(&doc_e->settings,&doc_ce->settings,sizeof(CDocSettings));
-  if (doc->cur_data_col>0 &&
-      doc_ce->type_u8==DOCT_TEXT &&
-      !(doc_ce->de_flags&(DOCEF_TAG_CB|DOCEF_DEFINE|
+  if (doc->cur_col>0 &&
+	doc_ce->type_u8==DOCT_TEXT &&
+	!(doc_ce->de_flags&(DOCEF_TAG_CB|DOCEF_DEFINE|
 	DOCEF_HTML_LINK|DOCEF_BIN_PTR_LINK)) &&
-      doc->cur_data_col<doc_ce->max_col) {
-    dst=doc_ce->tag+doc->cur_data_col;
+	doc->cur_col<doc_ce->max_col) {
+    dst=doc_ce->tag+doc->cur_col;
     doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
     *dst=0;
     doc_ne->type=DOCT_TEXT|doc_ce->type&0xFFFFFF00;
-    doc_ce->max_col=doc->cur_data_col;
+    doc_ce->max_col=doc->cur_col;
     QueIns(doc_ne,doc_ce);
-    doc->cur_data_col=0;
+    doc->cur_col=0;
     doc_ce=doc_ne;
   }
-  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_data_col>=doc_ce->max_col) {
+  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_col>=doc_ce->max_col) {
     QueIns(doc_e,doc_ce);
     doc->cur_entry=doc_e->next;
   } else {
     QueIns(doc_e,doc_ce->last);
     doc->cur_entry=doc_ce;
   }
-  doc->cur_data_col=doc->cur_entry->min_col;
+  doc->cur_col=doc->cur_entry->min_col;
   DocRemSoftNewLines(doc,doc->cur_entry);
   if (unlock)
     DocUnlock(doc);
 }
 
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 CDocEntry *DocPutS(CDoc *doc,U8 *st)
 {//Don't use this.  Use $LK-UL,"DocPrint",A="MN:DocPrint"$().
-  //Does not handle partial Doc entries
+//Does not handle partial Doc entries
   //Returns last newly created dollar-sign CDocEntry.
   U8 *ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src,
-     *char_bitmap;
+	*char_bitmap;
   Bool unlock;
   I64 ch,j;
   CDocEntry *doc_e=NULL,*result=NULL,*doc_ce;
@@ -578,11 +588,11 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
     return NULL;
   unlock=DocLock(doc);
   if (doc->flags & DOCF_PLAIN_TEXT_WITH_TABS)
-    char_bitmap=chars_bitmap_zero_cr_nl_cursor;
+    char_bitmap=chars_bmp_zero_cr_nl_cursor;
   else if (doc->flags & DOCF_PLAIN_TEXT)
-    char_bitmap=chars_bitmap_zero_tab_ff_cr_nl_cursor;
+    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor;
   else
-    char_bitmap=chars_bitmap_zero_tab_ff_cr_nl_cursor_dollar;
+    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor_dollar;
   doc_ce=doc->cur_entry;
   while (*ptr) {
     ptr2=ptr;
@@ -694,7 +704,8 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 		  DocInsEntry(doc,doc_e);
 		} else if (ch==CH_FORM_FEED) {
 		  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_e->type=DOCT_PAGE_BREAK | doc->settings_root.dft_text_attr<<8;
+		  doc_e->type=DOCT_PAGE_BREAK |
+			doc->settings_root.dft_text_attr<<8;
 		  doc_e->de_flags=doldoc.dft_de_flags[DOCT_PAGE_BREAK];
 		  DocInsEntry(doc,doc_e);
 		} else

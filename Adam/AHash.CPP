@@ -1,4 +1,4 @@
-#help_index "Info;Hash;Cmd Line (Typically)"
+#help_index "Info;Hash/System;Cmd Line (Typically)"
 class CWho
 {
   CHashGeneric *h;
@@ -80,11 +80,17 @@ U8 *HelpComment(CTask *task,CHash *temph,U8 *_src_link)
 
   doc=DocPut(task);
   doc_e=doc->cur_entry;
-  if (temph->type&HTT_FUN && !Bt(&temph(CHashFun *)->flags,Ff__EXTERN) &&
-	!Bt(&temph(CHashFun *)->flags,Ff_INTERNAL))
-    while (doc_e!=doc &&
-	(!(doc_e->de_flags&DOCEF_TAG)||!StrOcc(doc_e->tag,'{')))
-      doc_e=doc_e->next;
+  if (temph->type&HTT_FUN) {
+    if (Bt(&temph(CHashFun *)->flags,Ff__EXTERN) ||
+	  Bt(&temph(CHashFun *)->flags,Ff_INTERNAL))
+      while (doc_e!=doc &&
+	    (!(doc_e->de_flags&DOCEF_TAG)||!StrOcc(doc_e->tag,';')))
+	doc_e=doc_e->next;
+    else
+      while (doc_e!=doc &&
+	    (!(doc_e->de_flags&DOCEF_TAG)||!StrOcc(doc_e->tag,'{')))
+	doc_e=doc_e->next;
+  }
   if (doc_e!=doc) {
     if (doc_e->de_flags&DOCEF_TAG) {
       ptr=doc_e->tag;
@@ -141,7 +147,7 @@ I64 HashEntriesCompare3(CWho *h1,CWho *h2)
 }
 
 public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
-  U8 *outname=NULL,U8 mapfile_drv=0,U8 *index=NULL,CDoc *_doc=NULL)
+U8 *index=NULL,CDoc *doc=NULL)
 {//Dump hash symbol table.
 // "+p" for only public symbols
   // "+m" to order by number (normally alphabetical)
@@ -150,12 +156,9 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
   CHashSrcSym *temph;
   CHashGeneric *ptr;
   CWho *lst;
-  I64 cnt,i,j,k,size,f=0,dbg_bin_num;
-  U8 buf[512],*st,*src_link,*last_index=StrNew(""),*cur_index,*comment;
-  CDoc *doc;
-  Bool recurse,publics,map,old_preempt=Preempt(OFF);
-  CDocBin *tempb;
-  CDbgInfo *dbg_info;
+  I64 cnt,i,j,k,f=0;
+  U8 buf[512],*st,*last_index=StrNew(""),*cur_index,*comment;
+  Bool recurse,publics,map,old_preempt=Preempt;
   CTask *task;
 
   ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r");
@@ -167,14 +170,6 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
   map	 =Bt(&f,FUf_MAP);
 
   if (!h) h=Fs->hash_table;
-
-  if (_doc)
-    doc=_doc;
-  else if (outname) {
-    doc=DocNew(outname);
-    doc->flags|=DOCF_NO_CURSOR;
-  } else
-    doc=NULL;
 
   if (index) {
     task=User;
@@ -247,7 +242,6 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
   for (i=0;i<cnt;i++) {
     comment=NULL;
     ptr=lst[i].h;
-    dbg_info=NULL;
     if (index)
       if (cur_index=lst[i].index) {
 	if (StrCmp(cur_index,last_index)) {
@@ -265,38 +259,10 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
       DocPrint(doc,"$$WW,0$$");
     } else {
       if (ptr->type&HTG_SRC_SYM && ptr(CHashSrcSym *)->src_link) {
-	src_link=StrNew(ptr(CHashSrcSym *)->src_link);
-	if (mapfile_drv && StrLen(src_link)>4 && buf[1]==':' && src_link[4]==':')
-	  src_link[3]=mapfile_drv;
-	dbg_info=NULL;
-	if (outname && doc && ptr->type & HTT_FUN) {
-	  if (dbg_info=ptr(CHashFun *)->dbg_info) {
-	    size=offset(CDbgInfo.body)+sizeof(U32)*(dbg_info->max_line+2-dbg_info->min_line);
-	    if (size>MSize(dbg_info)) {
-	      "Corrupt Map Entry\n";
-	      dbg_info=NULL;
-	    } else {
-	      if (dbg_info->min_line<=dbg_info->max_line) {
-		tempb=CAlloc(sizeof(CDocBin));
-		tempb->size=size;
-		tempb->data=MAlloc(size);
-		MemCpy(tempb->data,dbg_info,size);
-		dbg_bin_num=tempb->num=doc->cur_bin_num++;
-		tempb->use_cnt=1;
-		QueIns(tempb,doc->bin_root.last);
-	      } else
-		dbg_info=NULL;
-	    }
-	  }
-	}
-	if (dbg_info)
-	  DocPrint(doc,"$$LK,\"%-20s\",A=\"%s\",BI=%d$$",ptr->str,src_link,dbg_bin_num);
-	else {
-	  DocPrint(doc,"$$LK,\"%-20s\",A=\"%s\"$$",ptr->str,src_link);
-	  if (index)
-	    comment=HelpComment(task,ptr,src_link);
-	}
-	Free(src_link);
+	DocPrint(doc,"$$LK,\"%-20s\",A=\"%s\"$$",
+	      ptr->str,ptr(CHashSrcSym *)->src_link);
+	if (index)
+	  comment=HelpComment(task,ptr,ptr(CHashSrcSym *)->src_link);
       } else
 	DocPrint(doc,"%-20s",ptr->str);
 
@@ -309,12 +275,9 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
 	  else
 	    StrPrint(buf,"%-10tQ %02X",st,j);
 	  Free(st);
-	} else if (ptr->type & HTT_GLBL_VAR) {
-	  if (outname)
-	    StrPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr_ip);
-	  else
-	    StrPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr);
-	} else
+	} else if (ptr->type & HTT_GLBL_VAR)
+	  StrPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr);
+	else
 	  StrPrint(buf,"%010X   ",HashVal(ptr));
 	j=HashEntrySize(ptr);
 	if (j==-1)
@@ -354,20 +317,16 @@ public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
     wh_done:
   Preempt(old_preempt);
   if (doc) {
-    DocBinsValidate(doc);
-    if (!_doc) {
-      DocWrite(doc);
-      DocDel(doc);
-    } else {
-      if (doc->root.next==doc)
-	DocPrint(doc,"No Match");
-      else
-	DocRecalc(doc);
-    }
+    if (doc->root.next==doc)
+      DocPrint(doc,"No Match");
+    else
+      DocRecalc(doc);
   }
   Free(last_index);
   Kill(task);
 }
+
+#help_index "Info;Hash;Cmd Line (Typically)"
 
 #define HDR_MAX	16
 public I64 HashDepthRep(CHashTable *table=NULL)
@@ -393,16 +352,16 @@ public I64 HashDepthRep(CHashTable *table=NULL)
     if (a[i])
       "%02d:%d\n",i,a[i];
   "Size:%d Count:%d Longest:%d\n",
-    table->mask+1,cnt,longest;
+	table->mask+1,cnt,longest;
   return longest;
 }
 
-#help_index "Help System;Training"
+#help_index "Help System"
 #help_file "::/Doc/HelpSystem"
 
 public U0 DocHelpIndex(CDoc *doc,U8 *index)
 {//Put to doc report for given help index.
-  Who("+p",,,,index,doc);
+  Who("+p",,index,doc);
 }
 
 public U0 PopUpHelpIndex(U8 *index,CTask *parent=NULL)
@@ -413,7 +372,7 @@ public U0 PopUpHelpIndex(U8 *index,CTask *parent=NULL)
   Free(buf);
 }
 
-#help_index "Hash"
+#help_index "Hash/System"
 public U0 MapFileLoad(U8 *filename)
 {//Load map file so we have src line info.
   U8 *st,*ptr,*name=DftExt(filename,"MAP.Z"),

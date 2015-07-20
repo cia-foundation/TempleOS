@@ -6,8 +6,8 @@ Bool restart;
 
 U0 DrawIt(CTask *,CDC *dc2)
 {
-  dc[cur_dc]->flags|=DCF_NO_TRANSPARENTS;
-  GrBlot(dc2,0,0,dc[cur_dc]);
+dc[cur_dc]->flags|=DCF_NO_TRANSPARENTS;
+GrBlot(dc2,0,0,dc[cur_dc]);
 }
 
 U0 AnimateTask(I64)

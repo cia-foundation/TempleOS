@@ -1,5 +1,4 @@
 asm {
-USE64
 _MEMSET::
 	PUSH	RBP
 	MOV	RBP,RSP

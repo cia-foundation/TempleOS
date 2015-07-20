@@ -8,6 +8,13 @@ There are a few places where I cut corners in the interest of not junking-up cod
 
 * I changed the $LK,"asm opcodes",A="FI:::/Compiler/OpCodes.TXT"$ names to remove the ambiguity between instructions with different numbers of arguments, making my $LK,"assembler",A="FI:::/Compiler/Asm.CPP"$ simpler and I did minimal 16-bit asm support, since 64-bit is what you should be using, unless you're doing a $LK,"boot loader",A="FI:::/Adam/Boot/BootCD.CPP"$.
 
-* There are no file-sharing locks of any kind.  You're on your own.
+* There are no user-controlled file-sharing locks.  However, the drive and file system have locks and concurrent operations should be fine. 
 
 * A hidden window is never refreshed.  Certain tasks are never done, therefore.  During refresh, the entry count limit of the document buffer is, normally, checked and enforced.  If you print to the command-line in a task whose window is covered, no limit on buffer exists and it will alloc memory for the document buffer until the system runs out of memory and crashes.
+
+* Even if a local function variable is declared less than 64 bits, the compiler does calculations with 64-bit.
+
+* $LK,"Print",A="FI:::/Doc/Print.TXT"$() uses $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().  You cannot use vastly over-sized fields for %f.
+
+* $LK,"GrEllipse3",A="MN:GrEllipse3"$() is broken on transformations.
+ 

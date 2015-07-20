@@ -29,7 +29,8 @@ U0 DskCacheInit(I64 size_in_U8s)
 
     dsk.cache_hash_table=AMAlloc(DSK_CACHE_HASH_SIZE*sizeof(U8 *)*2);
     for (i=0;i<DSK_CACHE_HASH_SIZE;i++) {
-      tempc=dsk.cache_hash_table(U8 *)+i*sizeof(U8 *)*2-offset(CCacheBlk.next_hash);
+      tempc=dsk.cache_hash_table(U8 *)+i*sizeof(U8 *)*2
+	    -offset(CCacheBlk.next_hash);
       tempc->next_hash=tempc->last_hash=tempc;
     }
   }
@@ -121,7 +122,7 @@ U0 RCache(CDrv *dv,U8 **_buf, I64 *_blk, I64 *_cnt)
   if (dsk.cache_base) {
     while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
       Yield;
-    //fetch leading blks from cache
+//fetch leading blks from cache
     while (*_cnt>0) {
       if (tempc=DskCacheFind(dv,*_blk)) {
 	MemCpy(*_buf,&tempc->body,BLK_SIZE);
@@ -131,7 +132,7 @@ U0 RCache(CDrv *dv,U8 **_buf, I64 *_blk, I64 *_cnt)
       } else
 	break;
     }
-    //fetch trailing blks from cache
+//fetch trailing blks from cache
     while (*_cnt>0) {
       if (tempc=DskCacheFind(dv,*_blk+*_cnt-1)) {
 	MemCpy(*_buf+(*_cnt-1)<<BLK_SIZE_BITS,&tempc->body,BLK_SIZE);

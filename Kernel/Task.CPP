@@ -19,7 +19,7 @@ U0 Exit()
 Bool TaskValidate(CTask *task)
 {//return TRUE if task looks valid.
   if (!(0<task<=MAX_I32) || task->addr!=task ||
-    task->task_signature(I64)!=TASK_COMBINED_SIGNATURE_VAL)
+	task->task_signature!=TASK_SIGNATURE_VAL)
     return FALSE;
   else
     return TRUE;
@@ -28,7 +28,7 @@ Bool TaskValidate(CTask *task)
 Bool Kill(CTask *task,Bool wait=TRUE)
 {//Terminate other task.
   I64 i;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (TaskValidate(task) && task!=sys_winmgr_task) {
     for (i=0;i<mp_cnt;i++)
       if (task==cpu_structs[i].seth_task)
@@ -79,7 +79,8 @@ CTaskStk *TaskStkNew(I64 stk_size,CTask *task)
 }
 
 #exe {OptOn(OPTf_NO_REG_VAR);};
-argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,/*argpop*/I64 (*fp_addr)(...),...)
+argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
+			/*argpop*/I64 (*fp_addr)(...),...)
 {//Grow stk in call with any fixed num of args.
 //See $LK,"::/Demo/StkGrow.CPP"$.
   CTaskStk *temps,*temps2,**_stk;
@@ -87,15 +88,15 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,/*argpop*/I64 (*fp_ad
 
   if (UnusedStk>=stk_size_threshold) {
 
-asm {
-	LEAVE
-	POP	RAX	//return addr
-	ADD	RSP,16	//pop threshold,stk_size
-	POP	RBX	// *f
-	ADD	RSP,8	//pop ARGC
-	PUSH	RAX
-	JMP	RBX	//CALL fp_addr()
-};
+    asm {
+      LEAVE
+      POP	RAX	//return addr
+      ADD	RSP,16	//pop threshold,stk_size
+      POP	RBX	// *f
+      ADD	RSP,8	//pop ARGC
+      PUSH	RAX
+      JMP	RBX	//CALL fp_addr()
+    };
 
   } else {
 
@@ -107,43 +108,43 @@ asm {
       *--rsp2=*--rsp;
     _stk=&Fs->stk;
     temps->stk_ptr=rsp=GetRSP;
-asm {
-	IMPORT	_FREE;	//We are in a function, not at glbl scope.
-			//The compiler treats these in isolation.
+    asm {
+      IMPORT	_FREE;	//We are in a function, not at glbl scope.
+//The compiler treats these in isolation.
 
-	PUSHFD
-	POP	RDX	//flags
-	CLI
-	MOV	RBX,U64 &temps2[RBP]
-	MOV	RAX,&_stk[RBP]
-	MOV	U64 [RAX],RBX	//Fs->stk=temps2
-	MOV	RSP,U64 &rsp2[RBP]
-	PUSH	RDX
-	POPFD
+      PUSHFD
+      POP	RDX	//flags
+      CLI
+      MOV	RBX,U64 &temps2[RBP]
+      MOV	RAX,&_stk[RBP]
+      MOV	U64 [RAX],RBX	//Fs->stk=temps2
+      MOV	RSP,U64 &rsp2[RBP]
+      PUSH	RDX
+      POPFD
 
-	CALL	U64 &fp_addr[RBP]
-	MOV	U64 &result[RBP],RAX
+      CALL	U64 &fp_addr[RBP]
+      MOV	U64 &result[RBP],RAX
 
-	PUSHFD
-	POP	RDX	//flags
-	CLI
-	MOV	RBX,U64 &temps[RBP]
-	MOV	RAX,&_stk[RBP]
-	MOV	U64 [RAX],RBX	//Fs->stk=temps
-	MOV	RSP,U64 &rsp[RBP]
-	PUSH	RDX
-	POPFD
+      PUSHFD
+      POP	RDX	//flags
+      CLI
+      MOV	RBX,U64 &temps[RBP]
+      MOV	RAX,&_stk[RBP]
+      MOV	U64 [RAX],RBX	//Fs->stk=temps
+      MOV	RSP,U64 &rsp[RBP]
+      PUSH	RDX
+      POPFD
 
-	PUSH	U64 &temps2[RBP]
-	CALL	_FREE
+      PUSH	U64 &temps2[RBP]
+      CALL	_FREE
 
-	MOV	RDX,U64 &old_stk[RBP]
-	MOV	RBX,U64 8[RBP]
-	MOV	RAX,U64 &result[RBP]
-	MOV	RBP,U64 [RBP]
-	MOV	RSP,RDX
-	JMP	RBX	//return
-};
+      MOV	RDX,U64 &old_stk[RBP]
+      MOV	RBX,U64 8[RBP]
+      MOV	RAX,U64 &result[RBP]
+      MOV	RBP,U64 [RBP]
+      MOV	RSP,RDX
+      JMP	RBX	//return
+    };
   }
   return 0; //dummy to get rid of warning
 }
@@ -159,16 +160,16 @@ I64 TaskInit(CTask *task,I64 stk_size)
     QueInit(&task->data_heap->next_mem_blk);
 
   task->addr=task->next_task=task->last_task=
-    task->next_input_filter_task=task->last_input_filter_task=
-    task;
+	task->next_input_filter_task=task->last_input_filter_task=
+	task;
 
   task->task_num=sys_num_spawned_tasks++;
 
-  task->rflags=SYS_NORMAL_RFLAGS;
+  task->rflags=RFLAGG_NORMAL;
   task->win_inhibit=WIG_TASK_DFT;
 
   task->next_child_task=task->last_child_task=
-    (&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
+	(&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
 
   SrvCtrlInit(&task->srv_ctrl);
   QueInit(&task->next_lex);
@@ -177,7 +178,8 @@ I64 TaskInit(CTask *task,I64 stk_size)
   QueInit(&task->next_ode);
 
   task->fpu_mmx=MAllocAligned(sizeof(CFPU),0x10,task);
-  MemCpy(task->fpu_mmx,SYS_FIXED_AREA+offset(CSysFixedArea.init_fpu_mmx),sizeof(CFPU));
+  MemCpy(task->fpu_mmx,
+	SYS_FIXED_AREA+offset(CSysFixedArea.init_fpu_mmx),sizeof(CFPU));
 
   task->hash_table=HashTableNew(TASK_HASH_SIZE,task);
 
@@ -195,7 +197,7 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->win_top		=13;
   task->win_bottom	=text.rows-2;
 
-  if (dsk.boot_drv_let) //Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart.CPP,TaskInit"$.  Okay, I guess, until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.CPP,ChgDsk"$().
+  if (dsk.boot_drv_let) //Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart.CPP,TaskInit"$. I guess ok until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.CPP,ChgDsk"$().
     task->cur_dv=dsk.let_to_drv[ToUpper(dsk.boot_drv_let)-'A'];
   task->cur_dir=StrNew("/Home",task);
 
@@ -204,18 +206,18 @@ I64 TaskInit(CTask *task,I64 stk_size)
   return task;
 }
 
-CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,
-		U8 *task_name=NULL,
-		I64 target_cpu=-1,	//-1 means current CPU. See $LK,"multi-core",A="FI:::/Demo/MultiCore/LoadTest.CPP"$.
-		CTask *parent=NULL,	//NULL means adam
-		I64 stk_size=0,		//0=default
-		I64 flags=1<<SVCf_ADD_TO_QUE)
+CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
+	I64 target_cpu=-1,	//-1 for current CPU. See $LK,"multi-core",A="FI:::/Demo/MultiCore/LoadTest.CPP"$.
+	CTask *parent=NULL,	//NULL means adam
+	I64 stk_size=0,		//0=default
+	I64 flags=1<<SVCf_ADD_TO_QUE)
 {//Create task on core running at address.
 //Alloc $LK,"CTask",A="MN:CTask"$ structure from code heap so addr will be short.
-//Could be alloced off of data heap.
+  //Could be alloced off of data heap.
   CTask *task;
   if (target_cpu>=0)
-    return SpawnQue(fp_start_addr,data,task_name,target_cpu,parent,stk_size,flags);
+    return SpawnQue(fp_start_addr,data,task_name,target_cpu,
+	  parent,stk_size,flags);
   task=CAlloc(sizeof(CTask),adam_task->code_heap);
   task->task_signature=TASK_SIGNATURE_VAL;
   if (!task_name) task_name="Unnamed Task";
@@ -264,23 +266,23 @@ U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
   POPFD
 }
 
-I64 ExeCmdLine(CLex *lx)
-{//Terminal JIT-compile-and-execute loop for CLex.
+I64 ExeCmdLine(CCmpCtrl *cc)
+{//Terminal JIT-compile-and-execute loop for CCmpCtrl.
   I64 result=0,type,old_title_src=Fs->title_src;
-  U8 *ptr,*ptr2,*ptr3,*ex,*old_task_title=StrNew(Fs->task_title);
+  U8 *ptr,*ptr2,*ptr3,*machine_code,*old_task_title=StrNew(Fs->task_title);
   F64 t0;
   CDocEntry *doc_e;
   CDoc *doc;
   if (Fs->title_src!=TTS_LOCKED_CONST)
     Fs->title_src=TTS_CUR_LEX;
-  while (lx->token &&
-    (lx->token!='}' || !(lx->flags & LF_EXE_BLK)) ) {
+  while (cc->token &&
+	(cc->token!='}' || !(cc->flags & CCF_EXE_BLK)) ) {
     if (Fs->title_src==TTS_CUR_LEX) {
       ptr2=&Fs->task_title;
       ptr3=ptr2+TASK_TITLE_LEN;
-      if (lx->cur_lfn->flags & LFSF_DOC) {
-	doc_e=lx->cur_lfn->cur_entry;
-	doc=lx->cur_lfn->doc;
+      if (cc->lex_include_stk->flags & LFSF_DOC) {
+	doc_e=cc->lex_include_stk->cur_entry;
+	doc=cc->lex_include_stk->doc;
 	while (doc_e!=doc && ptr2<ptr3) {
 	  switch (doc_e->type_u8) {
 	    case DOCT_TEXT:
@@ -297,21 +299,22 @@ I64 ExeCmdLine(CLex *lx)
 	}
 	if (ptr2<ptr3) *ptr2=0;
       } else
-	if ((ptr=lx->cur_lfn->line_start) && *ptr)
+	if ((ptr=cc->lex_include_stk->line_start) && *ptr)
 	  MemCpy(ptr2,ptr,TASK_TITLE_LEN);
     }
-    lx->flags&=~LF_HAS_MISC_DATA;
-    ex=LexStatement2Bin(lx,&type);
-    if (ex!=INVALID_PTR) {
-      if (!(lx->flags&LF_JUST_LOAD)) {
+    cc->flags&=~CCF_HAS_MISC_DATA;
+    machine_code=LexStatement2Bin(cc,&type);
+    if (machine_code!=INVALID_PTR) {
+      if (!(cc->flags&CCF_JUST_LOAD)) {
 	t0=tS;
-	result=Call(ex);
+	result=Call(machine_code);
 	Fs->answer=result;
 	Fs->answer_type=type;
 	Fs->answer_time=tS-t0;
+	Fs->new_answer=TRUE;
       }
-      if (!(lx->flags&LF_HAS_MISC_DATA))
-	Free(ex);
+      if (!(cc->flags&CCF_HAS_MISC_DATA))
+	Free(machine_code);
     }
   }
   if (Fs->title_src!=TTS_LOCKED_CONST) {
@@ -319,8 +322,8 @@ I64 ExeCmdLine(CLex *lx)
     StrCpy(Fs->task_title,old_task_title);
   }
   Free(old_task_title);
-  if (lx->flags&LF_JUST_LOAD) {
-    if (lx->error_cnt)
+  if (cc->flags&CCF_JUST_LOAD) {
+    if (cc->error_cnt)
       return FALSE;
     else
       return TRUE;
@@ -330,18 +333,18 @@ I64 ExeCmdLine(CLex *lx)
 
 U0 UserTaskCont()
 {//Terminal key-input-execute loop.
-  CLex *lx;
+  CCmpCtrl *cc;
   CDoc *doc;
   Bool cont=TRUE;
   do {
-    lx=LexNew(,LF_PMT);
-    QueIns(lx,Fs->last_lex);
+    cc=CmpCtrlNew(,CCF_PMT);
+    QueIns(cc,Fs->last_lex);
     try {
-      Lex(lx);
-      ExeCmdLine(lx);
-      cont=Bt(&lx->flags,Lf_PMT);
-      QueRem(lx);
-      LexDel(lx);
+      Lex(cc);
+      ExeCmdLine(cc);
+      cont=Bt(&cc->flags,CCf_PMT);
+      QueRem(cc);
+      CmpCtrlDel(cc);
     } catch {
       if ((doc=Fs->put_doc) && doc->doc_signature==DOC_SIGNATURE_VAL)
 	DocUnlock(doc);
@@ -459,7 +462,7 @@ I64 TaskEnd()
       (*fp_set_std_palette)();
   }
 
-//QueRem
+  //QueRem
   task->task_signature(I64)=0;
 
   tempt =task->next_input_filter_task;
@@ -484,9 +487,9 @@ I64 TaskEnd()
   } else
     TaskFinishOff(task); //dangerous (stk in use)
 //Never happens--winmgr exists except during boot and no tasks die during boot
-//currently, though this has been different and might be different in future.
-//Would have to be multicore task getting this task's memory
-//because IRQs are off, so no tasks on this core run.
+    //currently, though this has been different and might be different in
+    //future. Would have to be multicore task getting this task's memory
+    //because IRQs are off, so no tasks on this core run.
   return tempt;
 }
 

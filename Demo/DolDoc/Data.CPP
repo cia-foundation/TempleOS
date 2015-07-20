@@ -29,24 +29,24 @@ U0 DataDemo()
 {
   CDocEntry *doc_e;
 
-//This is the command line document.
+  //This is the command line document.
   CDoc *doc=DocPut;
 
-//We do this to prevent access to
-//doc_e->data before it is set.
+  //We do this to prevent access to
+  //doc_e->data before it is set.
   Bool unlock=DocLock(doc);
 
-//You might set the $LK,"DOCF_FORM",A="MN:DOCF_FORM"$ flag.
-//  doc->flags|=DOCF_FORM
-//if you wish.
+  //You might set the $LK,"DOCF_FORM",A="MN:DOCF_FORM"$ flag.
+  //  doc->flags|=DOCF_FORM
+  //if you wish.
 
   Spawn(&UpdateGlblTask,NULL,"Update Glbl",,Fs);
 
   "Enter editor overstrike mode\n"
-  "and you can modify the val.\n"
-  "However, changes happen immediately,\n"
-  "so it's tricky.\n\n";
-  //Use <CTRL-l> for the $$DA...$$ format.
+	"and you can modify the val.\n"
+	"However, changes happen immediately,\n"
+	"so it's tricky.\n\n";
+//Use <CTRL-l> for the $$DA...$$ format.
   doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=I16,A=\"%%7d\"$$\n");
   doc_e->data=&i;
 

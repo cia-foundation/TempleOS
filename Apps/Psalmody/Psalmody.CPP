@@ -19,7 +19,7 @@ This uses four types of output
 
   4) The Fs->next_ctrl for the tempo/stacatto sliders.
 
-See $LK,"GrUpdateWins",A="MN:GrUpdateWins"$() and $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
+See $LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$(), $LK,"GrUpdateTasks",A="MN:GrUpdateTasks"$() and $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 $WW,1$$WW,0$*/
 
 #define NOTE_REST	MIN_I64
@@ -42,12 +42,12 @@ class PsmNote
   U8 *word;
   I64 type,flags;
   union {
-     I64 note;
-     I64 meter_top;
+    I64 note;
+    I64 meter_top;
   };
   union {
-     I64 octave;
-     I64 meter_bottom;
+    I64 octave;
+    I64 meter_bottom;
   }
   I64 duration,width;
   U8 ascii[32];
@@ -63,7 +63,7 @@ class PsmCtrl
   PsmNote clipboard;
   CMenuEntry *incomplete_entry,*record_entry;
   I64 screen_x,
-     tool;
+	tool;
   PsmNote *cur_note;
   CDC *dc2;
   Bool playing;

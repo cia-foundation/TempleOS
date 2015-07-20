@@ -16,8 +16,8 @@ public U0 SpeedLineDemo()
   DocClear;
   do {
     msg_code=GetMsg(&a1,&a2,
-      1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
-      1<<MSG_IP_R_UP);
+	  1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
+	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_IP_R_UP:
 	color=PopUpColor;
@@ -32,7 +32,7 @@ public U0 SpeedLineDemo()
 	  dc->pen_width=0.04*ip.speed;
 	  GrLine3(dc,x1,y1,0,x2,y2,0);
 	  msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+		1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	  x1=x2; y1=y2;
 	  x2=a1; y2=a2;
 	}

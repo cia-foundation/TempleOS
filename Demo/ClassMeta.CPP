@@ -40,21 +40,21 @@ U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
   while (ml) {
     "%s:",ml->str;
 
-//All our items are I64's.  If you want, you can check
-//the data type of the member var.  See $LK,"ClassRep",A="MN:ClassRep"$().
+    //All our items are I64's.	If you want, you can check
+    //the data type of the member var.  See $LK,"ClassRep",A="MN:ClassRep"$().
     q=_d+ml->offset;
 
     if (print_str=MemberMetaData("print_str",ml))
       "" print_str,*q;
 
-//This is slightly ambiguous -- if no meta is present it will return zero.
+      //This is slightly ambiguous -- if no meta is present it will return zero.
     if (dft_val=MemberMetaData("dft_val",ml))
       " default:%d",dft_val;
 
-//This corrects for the ambiguity, allowing zero percentile.
+      //This corrects for the ambiguity, allowing zero percentile.
     if (MemberMetaFind("percentile",ml)) {//check if it exists
 //We could use the $LK,"CMemberLstMeta",A="MN:CMemberLstMeta"$ structure returned by
-//$LK,"MemberMetaFind",A="MN:MemberMetaFind"$() and save a search.
+      //$LK,"MemberMetaFind",A="MN:MemberMetaFind"$() and save a search.
       percentile=MemberMetaData("percentile",ml)(F64);
       " percentile: %5.2f",percentile;
     }

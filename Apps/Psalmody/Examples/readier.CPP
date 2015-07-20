@@ -6,14 +6,15 @@ U0 Song()
   music.tempo= 2.646;
   music.stacatto_factor= 0.989;
   try {
-  while (!ScanKey) {
-	Play("2q.G3sCCqAeBB2qG3CeAAqB");
-	Play("q.CsCCeCCCCBDDDDDqB",
-		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0Go!\n\0");
-	Play("e.AsADCeAetDDDeAsEGeBFsFDFDeEsFACGeC",
-		" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0Go!\n\0");
-	Play("e.AsADCeAetDDDeAsEGeBFsFDFDeEsFACGeC");
-  }
+    while (!ScanKey) {
+      Play("2q.G3sCCqAeBB2qG3CeAAqB");
+      Play("q.CsCCeCCCCBDDDDDqB",
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0Go!\n\0");
+      Play("e.AsADCeAetDDDeAsEGeBFsFDFDeEsFACGeC",
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0Go!\n\0");
+      Play("e.AsADCeAetDDDeAsEGeBFsFDFDeEsFACGeC");
+    }
   } catch
     PutExcept;
   Snd(0);

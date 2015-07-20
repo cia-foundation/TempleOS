@@ -28,9 +28,9 @@ SYS_RUN_LEVEL::			DU32	0;
 //See $LK,"BootCdProbe",A="MN:BootCdProbe"$
 #assert SYS_COMPILE_TIME+sizeof(CDate)+sizeof(CBinFile)<CD_BLK_SIZE
 
-SYS_BOOT_BASE::		DU32	0;	//Offset from start used by reboot
-SYS_MEM_E801::		DU16	0,0;
-SYS_MEM_E820::		DU8	MEM_NUM_E820_ENTRIES*MEM_E820_ENTRY_SIZE DUP (0);
+SYS_BOOT_BASE::	DU32	0;	//Offset from start used by reboot
+SYS_MEM_E801::	DU16	0,0;
+SYS_MEM_E820::	DU8	MEM_NUM_E820_ENTRIES*MEM_E820_ENTRY_SIZE DUP (0);
 
 	ALIGN	16,OC_NOP
 SYS_GDT:: //See $LK,"CGDT",A="MN:CGDT"$
@@ -39,7 +39,7 @@ GDT_BOOT_DS:	DU64	0x00CF92000000FFFF,0; //Gets patched.
 GDT_BOOT_CS:	DU64	0x00CF9A000000FFFF,0; //Gets patched.
 GDT_CS32:	DU64	0x00CF9A000000FFFF,0;
 GDT_CS64:	DU64	0x00209A0000000000,0; //The $LK,"Charter",A="FI:::/Doc/Charter.TXT"$ says just ring0.
-GDT_CS64_RING3:	DU64	0x0020FA0000000000,0; //$LK,"Ring3",A="FI:::/Demo/Lectures/Ring3.CPP"$, in case you want to play around.
+GDT_CS64_RING3:	DU64	0x0020FA0000000000,0; //$LK,"Ring3",A="FI:::/Demo/Lectures/Ring3.CPP"$, so you can play with.
 GDT_DS:		DU64	0x00CF92000000FFFF,0;
 GDT_DS_RING3:	DU64	0x00CFF2000000FFFF,0;
 GDT_TR:		DU8	MP_MAX_PROCESSORS*16 DUP(0);
@@ -57,7 +57,7 @@ BSP_16BIT_INIT::
 	MOV	AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
 	MOV	SS,AX
 	MOV	SP,BOOT_STK_SIZE
-	PUSH	EBX		//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootCD",A="FF:::/Adam/Boot/BootCD.CPP,BOOT_SRC_CDROM"$ & $LK,"BootRAM",A="FF:::/Adam/Boot/Boot.CPP,BOOT_SRC_RAM"$.
+	PUSH	EBX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootCD",A="FF:::/Adam/Boot/BootCD.CPP,BOOT_SRC_CDROM"$ & $LK,"BootRAM",A="FF:::/Adam/Boot/Boot.CPP,BOOT_SRC_RAM"$.
 	MOV	AX,VGAM_TEXT/16
 	MOV	ES,AX
 	MOV	U32 ES:[0],'O'+BLUE<<12+('S'+GREEN<<12)<<16
@@ -172,7 +172,7 @@ The assembler doesn't support far jumps so we hand code it.
 To complete the switch to 32-bit mode, we have to load
 the code segment with a far jump.
 */
-	DU8	0x66,0xEA;		 //JMP CGDT.boot_cs:BSP_32BIT_INIT
+	DU8	0x66,0xEA; //JMP CGDT.boot_cs:BSP_32BIT_INIT
 	DU32	BSP_32BIT_INIT;
 	DU16	CGDT.boot_cs;
 
@@ -232,7 +232,7 @@ SYS_SEMAS::		DU8	NUM_SYS_SEMAS*SEMA_STRUCT_SIZE DUP(0);
 //************************************
 	ALIGN	16,OC_NOP
 BSP_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
-	PUSH	U32 SYS_START_RFLAGS
+	PUSH	U32 RFLAGG_START
 	POPFD
 	MOV	EAX,SYS_START_CR0
 	MOV_CR0_EAX
@@ -265,7 +265,7 @@ BSP_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
 
 @@10:	BTS	U32 [SYS_RUN_LEVEL],RLf_PATCHED
 
-	CALL	SYS_FIND_BIOS32_SERVICE_DIR
+	CALL	SYS_FIND_PCIBIOS_SERVICE_DIR
 	CALL	SYS_FIND_PCI_SERVICES
 
 	MOV	U32 [SYS_HEAP_BASE],SYS_FIXED_AREA+sizeof(CSysFixedArea)
@@ -273,7 +273,8 @@ BSP_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
 
 	PUSH	U32 0	//Return from next call will be 64-bit
 	CALL	SYS_EM64T
-USE64	BTS	U32 [SYS_RUN_LEVEL],RLf_64BIT
+USE64
+	BTS	U32 [SYS_RUN_LEVEL],RLf_64BIT
 
 	FNINIT
 	MOV	RAX,SYS_FIXED_AREA+CSysFixedArea.init_fpu_mmx
@@ -301,7 +302,6 @@ USE64	BTS	U32 [SYS_RUN_LEVEL],RLf_64BIT
 	MOV	U64 CTask.code_heap[RAX],RDI
 	MOV	U64 CTask.data_heap[RAX],RDI
 	MOV	U32 CTask.task_signature[RAX],TASK_SIGNATURE_VAL
-	MOV	U32 CTask.task_in_que_signature[RAX],TASK_IN_QUE_SIGNATURE_VAL
 	
 	BTS	U32 [SYS_RUN_LEVEL],RLf_BOOT_HEAP
 
@@ -369,6 +369,6 @@ USE32
 	MOV	EBX,BOOT_SRC_RAM
 	MOV	EAX,I32 BSP_32BIT_INIT
 	JMP	EAX
-USE64
 SYS_RAM_REBOOT_END::
+USE64
 }

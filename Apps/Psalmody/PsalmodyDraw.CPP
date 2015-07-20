@@ -115,7 +115,7 @@ U0 PsmSetWidth(PsmNote *tempo)
 U0 PsmSetOctave(I64 octave)
 {
   I64 i;
-  U8 buf[136];
+  U8 buf[STR_LEN];
   CMenuEntry *tempse;
   for (i=0;i<=6;i++) {
     StrPrint(buf,"Snd/Octave%d",i);
@@ -196,9 +196,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   PsmNote *tempo;
   I64 i,x,y,
-     w=task->pix_width;
+	w=task->pix_width;
   F64 measure_len=4,measure_left=measure_len;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
 
   dc->color=BLACK;
   for (i=1;i<6;i++)
@@ -215,7 +215,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     oc.screen_x+=128;
     PsmRecalcNoteXY;
   }
- 
+
   tempo=oc.root.next;
   while (tempo!=&oc.root) {
     x=tempo->x;
@@ -319,7 +319,7 @@ U0 DrawPickTools()
   else
     oc.dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
   GrBorder(oc.dc2,PSM_TOOLS_X,PSM_TOOLS_Y,
-    PSM_TOOLS_X+10,PSM_TOOLS_Y+10);
+	PSM_TOOLS_X+10,PSM_TOOLS_Y+10);
 
   if (oc.tool==PSMTT_PTR_TOOL)
     oc.dc2->color=RED;
@@ -332,7 +332,7 @@ U0 DrawPickTools()
 Bool PsmGetPickToolBox(I64 xx,I64 yy)
 {
   if (PSM_TOOLS_X<=xx<PSM_TOOLS_X+27 &&
-      PSM_TOOLS_Y<=yy<PSM_TOOLS_Y+15) {
+	PSM_TOOLS_Y<=yy<PSM_TOOLS_Y+15) {
     PsmMarkSelected(0,0,FALSE);
     if (xx<PSM_TOOLS_X+13)
       oc.tool=PSMTT_BOX_TOOL;
@@ -354,7 +354,7 @@ Bool PsmGetPickMeterBox(I64 xx,I64 yy,I64 *top,I64 *bottom)
 {
   I64 i;
   if (PSM_METER_X<=xx<PSM_METER_X+PSM_METER_W*PSM_NUM_METERS &&
-      PSM_METER_Y<=yy<PSM_METER_Y+2*FONT_HEIGHT) {
+	PSM_METER_Y<=yy<PSM_METER_Y+2*FONT_HEIGHT) {
     i=(xx-PSM_METER_X)/PSM_METER_W;
     *top=meter_tops[i];
     *bottom=meter_bottoms[i];
@@ -368,7 +368,8 @@ U0 DrawPickMeterBox()
   I64 i;
   oc.dc2->color=BLACK;
   for (i=0;i<PSM_NUM_METERS;i++)
-    DrawTimeSignature(oc.dc2,PSM_METER_X+i*PSM_METER_W,PSM_METER_Y,meter_tops[i],meter_bottoms[i]);
+    DrawTimeSignature(oc.dc2,PSM_METER_X+i*PSM_METER_W,PSM_METER_Y,
+	  meter_tops[i],meter_bottoms[i]);
 }
 
 U0 DrawDC2()
@@ -396,10 +397,11 @@ U0 PsmMenu(I64 psm_octave)
   DrawDC2;
 
   "$$LTGREEN$$<SPACE>$$FG$$\t\tRest\n"
-  "$$LTGREEN$$<BACKSPACE>$$FG$$\tDeletes Last Note\n"
-  "$$LTGREEN$$Left Mouse$$FG$$\tDrag note or shift word\n"
-  "$$LTGREEN$$Right Mouse$$FG$$\tChange duration or set word\n";
-  Sprite($IB,"<6>",BI=6$,"$$SP+LA,\"\",LM=\"Msg(MSG_KEY_DOWN,0,SCF_CTRL|SC_CURSOR_LEFT);\",BI=%d$$");
+	"$$LTGREEN$$<BACKSPACE>$$FG$$\tDeletes Last Note\n"
+	"$$LTGREEN$$Left Mouse$$FG$$\tDrag note or shift word\n"
+	"$$LTGREEN$$Right Mouse$$FG$$\tChange duration or set word\n";
+  Sprite($IB,"<6>",BI=6$,"$$SP+LA,\"\","
+	"LM=\"Msg(MSG_KEY_DOWN,0,SCF_CTRL|SC_CURSOR_LEFT);\",BI=%d$$");
   "   ";
   if (oc.playing)
     Sprite($IB,"<9>",BI=9$,"$$SP,\"\",LM=\"x\",BI=%d$$");
@@ -412,7 +414,8 @@ U0 PsmMenu(I64 psm_octave)
   } else
     Sprite($IB,"<11>",BI=11$,"$$SP,\"\",LM=\"z\",BI=%d$$");
   "   ";
-  Sprite($IB,"<7>",BI=7$,"$$SP+LA,\"\",LM=\"Msg(MSG_KEY_DOWN,0,SCF_CTRL|SC_CURSOR_RIGHT);\",BI=%d$$");
+  Sprite($IB,"<7>",BI=7$,"$$SP+LA,\"\","
+	"LM=\"Msg(MSG_KEY_DOWN,0,SCF_CTRL|SC_CURSOR_RIGHT);\",BI=%d$$");
   "$$CM+LX,0,6$$";
   PsmSetOctave(psm_octave);
   WinMgrSync(2);

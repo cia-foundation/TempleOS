@@ -30,11 +30,11 @@ U8 *SuggestMatchForm(U8 *src)
 U0 SuggestSpelling(U8 *word)
 {
   U8 *dict=acd.word_lst,
-     *pf=SuggestMatchForm(word),
-     *wf;
+	*pf=SuggestMatchForm(word),
+	*wf;
   I64 len=StrLen(pf),
-     num_cols=Fs->win_width/16,
-     col=0;
+	num_cols=Fs->win_width/16,
+	col=0;
   while (*dict) {
     wf=SuggestMatchForm(dict+1);
     if (!StrNCmp(pf,wf,len)) {
@@ -70,7 +70,7 @@ U0 SuggestSpellingDemo()
 U0 CtrlAltL(I64)
 {
 //$LK,"ac.cur_word",A="MN:CAutoCompleteGlbls"$ is only set if AutoComplete
-//is running.
+  //is running.
   PopUp("SuggestSpelling(ac.cur_word);View;");
 }
 

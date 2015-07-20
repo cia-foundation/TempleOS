@@ -29,11 +29,12 @@ U0 LogScrambleFile(U8 *name)
 	StrFirstRem(st,".",st2);
 	num.u8[i]=key[i][Str2I64(st2)&255];
       }
- 
+
       Free(st);
       Free(st2);
 
-      st=MStrPrint("%d.%d.%d.%d %s",num.u8[3],num.u8[2],num.u8[1],num.u8[0],doc_e->tag);
+      st=MStrPrint("%d.%d.%d.%d %s",num.u8[3],num.u8[2],
+	    num.u8[1],num.u8[0],doc_e->tag);
       Free(doc_e->tag);
       doc_e->tag=st;
     }
@@ -44,7 +45,8 @@ U0 LogScrambleFile(U8 *name)
 }
 U0 WebLogScramble(U8 *files_find_mask)
 {
-  CDirEntry *tempde=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_FILES),*tempde1=tempde;
+  CDirEntry *tempde=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_FILES),
+	*tempde1=tempde;
   InitKey;
   while (tempde) {
     LogScrambleFile(tempde->full_name);

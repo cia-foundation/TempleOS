@@ -22,41 +22,45 @@ extern U8 *PopUpPickLst(U8 *lst);
 #define DHT_DOC_FLAG	2
 #define DHT_COLOR	4
 
-//--TEMPLEOS LINK TYPES--
-//  "filename"
-//  "FI:filename"
-//  "FA:haystack_filename,needle_anchor_str"
-//  "FF:haystack_filename,needle_str"
-//  "FF:haystack_filename,needle_str:occurnum"
-//  "FL:filename,linenum"
+/* See $LK,"TempleOS Link Types",A="MN:ST_LINK_TYPES"$.
+
+"filename"
+"FI:filename"
+"FA:haystack_filename,needle_anchor_str"
+"FF:haystack_filename,needle_str"
+"FF:haystack_filename,needle_str:occurnum"
+"FL:filename,linenum"
+"MN:SymName"
+"PI:filename"
+"PF:haystack_filename,needle_str"
+"PF:haystack_filename,needle_str:occurnum"
+"PL:filename,linenum"
+"BF:haystack_bible_book,needle_str"
+"DF:word"
+"DF:word,defnum"
+"HI:index"
+"AD:code_address_number"
+
+		To edit a doc structure already in memory. See $LK,"SpriteEdText",A="MN:SpriteEdText"$().
+"AI:doc_address"
+"AA:haystack_doc_address,needle_anchor_str"
+"AF:haystack_doc_address,needle_str"
+"AF:haystack_doc_address,needle_str:occurnum"
+"AL:doc_address,linenum"
+
+*/
 #define LK_FILE 	0
 #define LK_FILE_ANCHOR	1
 #define LK_FILE_FIND	2
 #define LK_FILE_LINE	3
-//  "MN:SymName"
 #define LK_MAN_PAGE	4
-//  "PI:filename"
-//  "PF:haystack_filename,needle_str"
-//  "PF:haystack_filename,needle_str:occurnum"
-//  "PL:filename,linenum"
 #define LK_PLAIN	5
 #define LK_PLAIN_FIND	6
 #define LK_PLAIN_LINE	7
-//  "BF:haystack_bible_book,needle_str"
 #define LK_BIBLE_FIND	8
-//  "DF:word"
-//  "DF:word,defnum"
 #define LK_DEF		9
-//  "HI:index"
 #define LK_HELP_INDEX	10
-//  "AD:code_address_number"
 #define LK_ADDR		11
-//These are to edit a doc structure already in memory.
-//  "AI:doc_address"
-//  "AA:haystack_doc_address,needle_anchor_str"
-//  "AF:haystack_doc_address,needle_str"
-//  "AF:haystack_doc_address,needle_str:occurnum"
-//  "AL:doc_address,linenum"
 #define LK_DOC		12 //See $LK,"SpriteEdText",A="MN:SpriteEdText"$()
 #define LK_DOC_ANCHOR	13
 #define LK_DOC_FIND	14

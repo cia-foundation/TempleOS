@@ -1,4 +1,4 @@
-#help_index "DolDoc/Output"
+#help_index "DolDoc/Output;StdOut/DolDoc"
 U0 DirFileDoc(CDoc *doc,CDirEntry *tempde)
 {
   while (tempde) {
@@ -49,7 +49,8 @@ CFMUncollapsedLst *FMCollectUncollapsedLst(CDoc *doc)
   return result;
 }
 
-U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,U8 *cur_entry,U8 *next_entry)
+U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,
+	U8 *cur_entry,U8 *next_entry)
 {
   CDocEntry *doc_e=doc->root.next;
   CFMUncollapsedLst *tempc1;
@@ -71,7 +72,8 @@ U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,U8 *cur_entry,U8 *next_e
 	  if (StrLen(tempde->full_name)==StrLen(cur_entry))
 	    cur_entry=NULL;
 	} else if (next_entry) {
-	  if (!StrNCmp(next_entry,tempde->full_name,StrLen(tempde->full_name))) {
+	  if (!StrNCmp(next_entry,
+		tempde->full_name,StrLen(tempde->full_name))) {
 	    doc->cur_entry=doc_e;
 	    if (StrLen(tempde->full_name)==StrLen(next_entry))
 	      cur_entry=NULL;
@@ -86,7 +88,8 @@ U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,U8 *cur_entry,U8 *next_e
 	  if (StrLen(tempde->full_name)==StrLen(cur_entry))
 	    cur_entry=NULL;
 	} else if (next_entry) {
-	  if (!StrNCmp(next_entry,tempde->full_name,StrLen(tempde->full_name))) {
+	  if (!StrNCmp(next_entry,
+		tempde->full_name,StrLen(tempde->full_name))) {
 	    doc->cur_entry=doc_e;
 	    if (StrLen(tempde->full_name)==StrLen(next_entry))
 	      cur_entry=NULL;
@@ -199,7 +202,8 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   doc->flags|=DOCF_FORM;
   switch (mode) {
     case FM_NORMAL:
-      DocPrint(doc,"$$PURPLE$$File Manager\n\n$$LK,\"Click for Help\",A=\"FI:::/Doc/FileMgr.TXT\"$$\n\n");
+      DocPrint(doc,"$$PURPLE$$File Manager\n\n"
+	    "$$LK,\"Click for Help\",A=\"FI:::/Doc/FileMgr.TXT\"$$\n\n");
       break;
     case FM_PICK_FILE:
       DocPrint(doc,"$$PURPLE$$Pick file and press <ESC>\n\n");
@@ -247,7 +251,7 @@ U0 FMRename(CDoc *doc)
     if (parent=tempde->parent) {
       Cd(parent->full_name);
       StrCpy(fn.name,tempde->name);
-      if (DocFormDo(&fn)) {
+      if (DocForm(&fn)) {
 	Silent;
 	Move(tempde->name,fn.name);
 	Silent(OFF);
@@ -258,7 +262,7 @@ U0 FMRename(CDoc *doc)
     if (parent=tempde->parent) {
       Cd(parent->full_name);
       StrCpy(fn.name,tempde->name);
-      if (DocFormDo(&fn)) {
+      if (DocForm(&fn)) {
 	if (StrCmp(tempde->name,fn.name)) {
 	  Silent;
 	  if (CopyTree(tempde->name,fn.name))
@@ -280,7 +284,7 @@ U0 FMMkDir(CDoc *doc)
     tempde=doc_e->user_data;
     if (parent=tempde->parent) {
       Cd(parent->full_name);
-      if (DocFormDo(&fn)) {
+      if (DocForm(&fn)) {
 	Silent;
 	MkDir(fn.name);
 	Silent(OFF);
@@ -289,7 +293,7 @@ U0 FMMkDir(CDoc *doc)
   } else if (doc_e->type_u8==DOCT_TREE) {
     tempde=doc_e->user_data;
     Cd(tempde->full_name);
-    if (DocFormDo(&fn)) {
+    if (DocForm(&fn)) {
       Silent;
       MkDir(fn.name);
       Silent(OFF);
@@ -378,7 +382,7 @@ U0 FMMakeISO(CDoc *doc)
 	st=MStrPrint("%s*",tempde->full_name);
       else
 	st=MStrPrint("%s/*",tempde->full_name);
-      CDFileCreate(,st);
+      ISOFileCreate(,st);
       Free(st);
       Silent(OFF);
     }
@@ -581,7 +585,9 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
       case MSG_IP_L_UP:
 	if (doc_ce) {
 	  gr.fp_final_screen_update=fp_old_final_screen_update;
-	  if (WinCursorPosSet(Fs,a1/FONT_WIDTH+Fs->win_left+Fs->scroll_x/FONT_WIDTH,a2/FONT_HEIGHT+Fs->win_top+Fs->scroll_y/FONT_HEIGHT,TRUE)) {
+	  if (WinCursorPosSet(Fs,
+		a1/FONT_WIDTH+Fs->win_left+Fs->scroll_x/FONT_WIDTH,
+		a2/FONT_HEIGHT+Fs->win_top+Fs->scroll_y/FONT_HEIGHT,TRUE)) {
 	    doc_e=doc->cur_entry;
 	    if (doc_e!=doc_ce) {
 	      st2=NULL;
@@ -705,7 +711,8 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    else if (mode==FM_PICK_DIR) {
 	      if (doc_ce->type_u8==DOCT_TREE)
 		result=StrNew(tempde->full_name,mem_task);
-	      else if (doc_ce->type_u8==DOCT_MENU_VAL && (tempde=tempde->parent))
+	      else if (doc_ce->type_u8==DOCT_MENU_VAL &&
+		    (tempde=tempde->parent))
 		result=StrNew(tempde->full_name,mem_task);
 	    }
 	    break;

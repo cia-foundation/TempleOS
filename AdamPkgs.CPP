@@ -4,18 +4,18 @@
 Cd("/Adam/Boot");;
 #include "Boot"
 Cd("/Adam/Utils");;
-#include "Profiler"
 #include "Diff"
+#include "FileBMP"
 #include "Find"
-#include "LineRep"
-#include "Merge"
-#include "S2T"
-#include "LinkChk"
 #include "HeapLog"
+#include "LineRep"
+#include "LinkChk"
 #include "MemRep"
+#include "Merge"
+#include "Profiler"
+#include "StrUtils"
 #include "ToHtml"
 #include "ToTXT"
-#include "FileBMP"
 
 MapFileLoad("::/Kernel/Kernel");
 MapFileLoad("::/Compiler/Compiler");

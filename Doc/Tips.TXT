@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Tips"$$FG$
 
 * Turn-off or reboot ($FG,2$<CTRL-ALT-DEL>$FG$) at any time, except during disk writes.  Writes are not cached. 
 
-* Use $LK,"Seed",A="MN:Seed"$() and the cmd-line to switch $LK,"Rand",A="MN:Rand"$() to non-timer mode and replay games you like.
+* Use $LK,"Seed",A="MN:Seed"$() and the cmd line to switch $LK,"Rand",A="MN:Rand"$() to non-timer mode and replay games you like.
 
 * 64-bit values are most efficient for the compiler.
 

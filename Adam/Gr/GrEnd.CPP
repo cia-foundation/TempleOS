@@ -11,7 +11,7 @@ CtrlAltLetCBSet('Z',&CtrlAltZ,"Sys/Zoom In or Out");
 
 U0 Screen2Clipboard(I64)
 {
-  CDC *dc=DCCaptureScreen;
+  CDC *dc=DCScreenCapture;
   U8 *elems=DC2Sprite(dc);
   Bool unlock_doc=DocLock(sys_clipboard_doc);
   ClipboardDel;

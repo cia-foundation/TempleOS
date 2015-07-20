@@ -8,7 +8,8 @@ Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
     return FALSE;
 }
 
-U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,CATARep *ata_drv,CATARep *atapi_drv)
+U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,
+	CATARep *ata_drv,CATARep *atapi_drv)
 {
   U8 *st1,*st2;
 
@@ -24,8 +25,8 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,CATARep *ata_drv,CATARep *atapi_dr
   Free(st1);
 
   XTalkWait(task,
-    "MakeOSDrvBootInstall('%C');\n"
-    "\nB1\n0x20000\n",drv);
+	"MakeOSDrvBootInstall('%C');\n"
+	"\nB1\n0x20000\n",drv);
 
   if (ata_drv)
     XTalkWait(task,"C2p%d\n",ata_drv->num);
@@ -33,9 +34,9 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,CATARep *ata_drv,CATARep *atapi_dr
     XTalkWait(task,"T3p%d\n",atapi_drv->num);
 
   XTalkWait(task,
-    "\n"   //Exit Drives
-    "\n"   //Dsk Cache
-    "\n"); //Options
+	"\n"   //Exit Drives
+	"\n"   //Dsk Cache
+	"\n"); //Options
 }
 
 U0 VMInstallWizard()
@@ -131,9 +132,9 @@ U0 RegularInstallWizard()
   if (YorN) {
     '\n';
     while (TRUE) {
-    "$$PURPLE$$1$$FG$$) Use FAT32\n"
-      "$$PURPLE$$2$$FG$$) Use RedSea\n"
-      "\nFile System Type: ";
+      "$$PURPLE$$1$$FG$$) Use FAT32\n"
+	    "$$PURPLE$$2$$FG$$) Use RedSea\n"
+	    "\nFile System Type: ";
       ch=GetChar;
       '\n';
       if ('1'<=ch<='2')
@@ -153,17 +154,17 @@ U0 RegularInstallWizard()
   MkDir(new_home_str);
   Copy("::/Misc/MakeDistro.CPP.Z",new_home_str);
   XTalkWait(task,
-  "MakeOSDrvBootInstall('%C');\n"
-  "\nB1\n0x20000\n"
-  "C"
-  "2p"
-  "%s\n"
-  "%s\n"
-  "%C"
-  "\n"	 //Exit Drives
-  "\n"	 //Dsk Cache
-  "\n",	 //Options
-  *dst,base0,base1,'0'+unit);
+	"MakeOSDrvBootInstall('%C');\n"
+	"\nB1\n0x20000\n"
+	"C"
+	"2p"
+	"%s\n"
+	"%s\n"
+	"%C"
+	"\n"	 //Exit Drives
+	"\n"	 //Dsk Cache
+	"\n",	 //Options
+	*dst,base0,base1,'0'+unit);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {
     '\n';
@@ -197,7 +198,7 @@ U0 DoInstall()
 {
   I64 vm_install,pmt_reboot;
   "\n\n\n\n\nAre you installing inside VMware, QEMU, VirtualBox "
-  "or a similar virtual machine? ";
+	"or a similar virtual machine? ";
   vm_install=YorN;
   DocBottom;
 
@@ -206,9 +207,9 @@ U0 DoInstall()
     pmt_reboot=TRUE;
   } else {
     "\n\nThis wizard works if you have a partition ready.  "
-    "You can partition the drive or MakeOSDrvBootInstall() "
-    "with more options if you do it by hand, not using this wizard.\n\n"
-    "Continue Install Wizard ";
+	  "You can partition the drive or MakeOSDrvBootInstall() "
+	  "with more options if you do it by hand, not using this wizard.\n\n"
+	  "Continue Install Wizard ";
     if (pmt_reboot=YorN)
       RegularInstallWizard();
   }

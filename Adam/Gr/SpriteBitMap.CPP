@@ -1,4 +1,4 @@
-#help_index "Graphics/Sprite"
+#help_index "Graphics/Sprite;Sprites"
 
 #define GBM_EXIT		0
 #define GBM_MAIN_MENU		1
@@ -43,7 +43,7 @@ GrInit4;
 I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 {
   I64 i;
-  U8 *st1,*st2,buf[136];
+  U8 *st1,*st2,buf[STR_LEN];
   CDoc *doc=DocNew;
 
   Color2Str(buf,color);
@@ -98,11 +98,12 @@ U0 GrBitMapEdPrepPersistentDC(CDC *dc,I64 xx1,I64 yy1,CDC *img)
   GrBlot(dc,xx1,yy1,img);
 }
 
-U0 GrBitMapEdTrimToExtents(CDC **_img,I64 *_xx1,I64 *_yy1,I64 *_xx2,I64 *_yy2,CColorROPU32 bkcolor)
+U0 GrBitMapEdTrimToExtents(CDC **_img,I64 *_xx1,I64 *_yy1,
+	I64 *_xx2,I64 *_yy2,CColorROPU32 bkcolor)
 {
   CDC *img=*_img;
   I64 i,c,
-    x1=0,y1=0,x2=img->width-1,y2=img->height-1; //inclusive
+	x1=0,y1=0,x2=img->width-1,y2=img->height-1; //inclusive
   while (y1<y2) {
     for (i=x1;i<=x2;i++) {
       c=GrPeek(img,i,y1);
@@ -111,7 +112,7 @@ U0 GrBitMapEdTrimToExtents(CDC **_img,I64 *_xx1,I64 *_yy1,I64 *_xx2,I64 *_yy2,CC
     y1++;
   }
 
-tr_y2:
+  tr_y2:
   while (y1<y2) {
     for (i=x1;i<=x2;i++) {
       c=GrPeek(img,i,y2);
@@ -120,7 +121,7 @@ tr_y2:
     y2--;
   }
 
-tr_x1:
+  tr_x1:
   while (x1<x2) {
     for (i=y1;i<=y2;i++) {
       c=GrPeek(img,x1,i);
@@ -129,7 +130,7 @@ tr_x1:
     x1++;
   }
 
-tr_x2:
+  tr_x2:
   while (x1<x2) {
     for (i=y1;i<=y2;i++) {
       c=GrPeek(img,x2,i);
@@ -138,14 +139,15 @@ tr_x2:
     x2--;
   }
 
-tr_done:
+  tr_done:
   *_img=DCExtract(img,x1,y1,x2,y2);
   *_xx1+=x1;		    *_yy1+=y1;
   *_xx2+=x2-(img->width-1); *_yy2+=y2-(img->height-1); //not inclusive
   DCDel(img);
 }
 
-U0 GrBitMapEdAddOutline(CDC *img,I64 width,CColorROPU32 color,CColorROPU32 bkcolor)
+U0 GrBitMapEdAddOutline(CDC *img,I64 width,
+	CColorROPU32 color,CColorROPU32 bkcolor)
 {
   I64 i,j,k,c;
   CColorROPU32 old_color;
@@ -197,10 +199,11 @@ U0 GrBitMapEdEtch(CDC *img,I64 width,CColorROPU32 bkcolor)
   }
 }
 
-I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,I64 *_xx2,I64 *_yy2,CDC **_img,CColorROPU32 bkcolor)
+I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
+	I64 *_xx2,I64 *_yy2,CDC **_img,CColorROPU32 bkcolor)
 {
-  I64 i,j,mode=GBM_LINE,color=BLACK,width=1,msg_code,a1,a2,x1,y1,x11,y11,x22,y22,
-	result,xx1=*_xx1,yy1=*_yy1,xx2=*_xx2,yy2=*_yy2,
+  I64 i,j,mode=GBM_LINE,color=BLACK,width=1,msg_code,a1,a2,x1,y1,x11,y11,
+	x22,y22,result,xx1=*_xx1,yy1=*_yy1,xx2=*_xx2,yy2=*_yy2,
 	old_de_flags=doc_e->de_flags;
   Bool down=FALSE;
   U8 *st=NULL;
@@ -220,8 +223,8 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,I64 *_xx2
     dc->pen_width=1;
     GrBorder(dc,xx1-1,yy1-1,xx2,yy2);//This is done little bit too often.
 
-    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|
-	  1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN)) {
+    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+	  1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN)) {
       switch (msg_code) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {
@@ -232,7 +235,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,I64 *_xx2
 	      result=GE_CONT;
 	      goto bm_key_up_done;
 	    case 'c': //eye-dropper
-	      dc2=DCCaptureScreen(FALSE);
+	      dc2=DCScreenCapture(FALSE);
 	      color=GrPeek(dc2,ip.pos.x,ip.pos.y)^15;//Mouse cursor is XORed.
 	      DCDel(dc2);
 	      break;
@@ -299,14 +302,14 @@ bm_menu:
 
 	    case GBM_SAVE_BMP:
 	      *filename.name=0;
-	      if (DocFormDo(&filename) && *filename.name)
+	      if (DocForm(&filename) && *filename.name)
 		BMPWrite(filename.name,img);
 	      goto bm_menu;
 
 	    case GBM_SAVE_GRA:
 	      *filename.name=0;
-	      if (DocFormDo(&filename) && *filename.name)
-		GRAWrite(filename.name,img);
+	      if (DocForm(&filename) && *filename.name)
+		GRAWrite(filename.name,img,DCSF_COMPRESSED|DCSF_PALETTE_GET);
 	      goto bm_menu;
 
 	    case GBM_DITHER_COLOR:

@@ -20,7 +20,8 @@ U0 ShowTree(CDC *dc,Node *tempn,I64 *_node_x,I64 *_tree_x,I64 y)
     if (tempn->left) {
       ShowTree(dc,tempn->left,&node_x,_tree_x,y+Y_SPACING);
       dc->color=BLUE;
-      GrArrow3(dc,*_tree_x,y,0,node_x+ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
+      GrArrow3(dc,*_tree_x,y,0,
+	    node_x+ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
     }
     if (tempn->n==n1 || tempn->n==n2) {
       if (tempn->n==common_ancestor)
@@ -31,15 +32,16 @@ U0 ShowTree(CDC *dc,Node *tempn,I64 *_node_x,I64 *_tree_x,I64 y)
       dc->color=GREEN;
     else
       dc->color=BLUE;
- 
+
     *_node_x=*_tree_x;
     GrPrint(dc,*_node_x,y,"%d",tempn->n);
     *_tree_x+=X_SPACING;
- 
+
     if (tempn->right) {
       ShowTree(dc,tempn->right,&node_x,_tree_x,y+Y_SPACING);
       dc->color=BLUE;
-      GrArrow3(dc,*_node_x,y,0,node_x-ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
+      GrArrow3(dc,*_node_x,y,0,
+	    node_x-ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
     }
   }
 }
@@ -70,12 +72,12 @@ U0 TreeNew()
   for (i=0;i<N;i++) {
     tempn=CAlloc(sizeof(Node));
     tempn->n=RandU16%N;
- 
+
     if (i==N-1)
       n1=tempn->n;
     else if (i==N-2)
       n2=tempn->n;
- 
+
     TreeAdd(&root,tempn);
     Sleep(50);
   }
@@ -96,7 +98,7 @@ U0 TreeCommonAncestor()
 {//Make tree and find common ancestor to n1 & n2.
   root=NULL;
   n1=n2=common_ancestor=0;
- 
+
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->draw_it=&DrawIt;
   DocClear;

@@ -24,7 +24,7 @@ U0 ACSingleFileAdd(U8 *buf)
   while (TRUE) {
     while (TRUE) {
       if (ch=*ptr++) {
-	if (Bt(chars_bitmap_alpha_numeric,ch))
+	if (Bt(chars_bmp_alpha_numeric,ch))
 	  break;
       } else
 	return;
@@ -34,7 +34,7 @@ U0 ACSingleFileAdd(U8 *buf)
     ptr--;
     while (TRUE) {
       if (ch=*ptr2++) {
-	if (Bt(chars_bitmap_alpha_numeric,ch))
+	if (Bt(chars_bmp_alpha_numeric,ch))
 	  *ptr3++=ch;
 	else if (ch!=CH_CURSOR)
 	  break;
@@ -54,7 +54,7 @@ I64 ACSkipCrap(U8 *src,I64 len)
   I64 j;
   j=len-1;
   while (j>=0) {
-    if (Bt(chars_bitmap_alpha_numeric,src[j]))
+    if (Bt(chars_bmp_alpha_numeric,src[j]))
       break;
     else
       j--;
@@ -67,7 +67,7 @@ I64 ACPriorWordInStr(U8 *src,U8 *dst,I64 len,I64 buf_size)
   I64 i,j=0,k;
   i=len-1;
   while (i>=0)
-    if (!Bt(chars_bitmap_alpha_numeric,src[i]))
+    if (!Bt(chars_bmp_alpha_numeric,src[i]))
       break;
     else
       i--;
@@ -92,7 +92,7 @@ U0 ACMan(I64 n,CTask *parent_task=NULL)
 {
   CHashAC *tempw;
   CHashSrcSym *temph;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   if (0<=--n<ac.num_fillins && (tempw=ac.fillin_matches[n]) &&
 	(temph=HashFind(tempw->str,Fs->hash_table,HTG_SRC_SYM)) &&
 	temph->src_link) {
@@ -105,7 +105,8 @@ U0 ACMan(I64 n,CTask *parent_task=NULL)
 U0 ACFillInAdd(CHashAC *tempw)
 {
   I64 k;
-  if (ac.num_fillins<AC_MAX_FILLINS || tempw->hits>ac.fillin_hits[ac.num_fillins-1]) {
+  if (ac.num_fillins<AC_MAX_FILLINS ||
+	tempw->hits>ac.fillin_hits[ac.num_fillins-1]) {
     for (k=ac.num_fillins-1;k>=0;k--) {
       if (tempw->hits<=ac.fillin_hits[k])
 	break;
@@ -149,15 +150,15 @@ U0 ACPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task)
     ac.num_fillins=0;
     if (*ac.cur_word) {
       Preempt(ON);
-      for (i=0;i<=ac.hash_table->mask;i++) {
+      for (i=0;i<=ac.hash_table->mask && tS<timeout_time;i++) {
 	tempw=ac.hash_table->body[i];
-	while (tempw && tS<timeout_time) {
+	while (tempw) {
 	  if (!MemCmp(ac.cur_word,tempw->str,StrLen(ac.cur_word)))
 	    ACFillInAdd(tempw);
 	  tempw=tempw->next;
 	}
       }
-      Preempt(OFF);
+      Preempt;
     }
     DocRst(doc,TRUE);
     doc->flags|=DOCF_MIN_SIZE;
@@ -203,12 +204,14 @@ U0 ACTask(I64)
   DocTermNew;
   WinHorz(51,Fs->win_right);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER-WIF_SELF_IP_L-WIF_SELF_IP_R-WIG_DBL_CLICK;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER
+	-WIF_SELF_IP_L-WIF_SELF_IP_R-WIG_DBL_CLICK;
   Free(ac.cur_word);
   ac.cur_word=NULL;
   while (TRUE) {
     original_focus_task=focus_task=sys_focus_task;
-    while (TaskValidate(focus_task) && Bt(&focus_task->task_flags,TASKf_INPUT_FILTER_TASK))
+    while (TaskValidate(focus_task) &&
+	  Bt(&focus_task->task_flags,TASKf_INPUT_FILTER_TASK))
       focus_task=focus_task->parent_task;
     if (TaskValidate(focus_task) && (doc=DocPut(focus_task)) &&
 	  focus_task!=Fs && Bt(&focus_task->display_flags,DISPLAYf_SHOW)) {
@@ -244,7 +247,8 @@ U0 ACMainFileLstTraverse(U8 *files_find_mask)
   U8 *buf;
   CDirEntry *tempde,*tempde1;
   try {
-    tempde=tempde1=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES|FUF_CLUSTER_ORDER);
+    tempde=tempde1=FilesFind(files_find_mask,
+	  FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES|FUF_CLUSTER_ORDER);
     while (tempde) {
       "%s\n",tempde->full_name;
       buf=FileRead(tempde->full_name);
@@ -260,7 +264,7 @@ U0 ACMainFileLstTraverse(U8 *files_find_mask)
 public Bool AutoComplete(Bool val=OFF)
 {//Turn AutoComplete OFF (or ON).
   Bool	old_autocomplete=FALSE,
-	old_preempt=Preempt(OFF);
+	old_preempt=Preempt;
   if (val) {
     while (Bt(&ac.flags,ACf_INIT_IN_PROGRESS))
       Sleep(10);
@@ -308,7 +312,8 @@ public U0 ACInit(U8 *mask=NULL)
     Yield;
   AutoComplete;
 
-  if (IsDrvWritable && FileFind(ACD_DEF_FILENAME_Z) && !FileFind(ACD_DEF_FILENAME)) {
+  if (DrvIsWritable && FileFind(ACD_DEF_FILENAME_Z) &&
+	!FileFind(ACD_DEF_FILENAME)) {
     if (bd->type!=BDT_RAM) {
       start_flag=FALSE;
       Spawn(&ACProgressTask,&start_flag);

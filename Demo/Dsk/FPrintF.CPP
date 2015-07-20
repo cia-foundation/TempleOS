@@ -12,7 +12,7 @@ U0 TreeSub(CDoc *doc,CDirEntry *tempde)
     if (tempde->attr & RS_ATTR_DIR) {
       DocPrint(doc,"$$TR,\"\"$$");
       DocPrint(doc,"$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$\n",
-      tempde->name,tempde->full_name);
+	    tempde->name,tempde->full_name);
       if (tempde->sub) {
 	DocPrint(doc,"$$ID,+2$$");
 	TreeSub(doc,tempde->sub);
@@ -20,10 +20,10 @@ U0 TreeSub(CDoc *doc,CDirEntry *tempde)
       }
     } else
       DocPrint(doc,"$$LK,\"%s\",A=\"FI:%s\"$$\n",
-	tempde->name,tempde->full_name);
-    //Note there is also a routine
-    //to delete an entire CDirEntry tree.
-    //See $LK,"DirTreeDel",A="MN:DirTreeDel"$().
+	    tempde->name,tempde->full_name);
+//Note there is also a routine
+      //to delete an entire CDirEntry tree.
+      //See $LK,"DirTreeDel",A="MN:DirTreeDel"$().
     DirEntryDel(tempde);
     tempde=tempde1;
   }

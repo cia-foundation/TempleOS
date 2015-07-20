@@ -12,7 +12,7 @@ $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
 6) The random number generator is from the book, $UL,1$Numeric Recipies in C$UL,0$.
 
-7) The mountain, palm trees, sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.  The wolf in BlackDiamond is also from there.
+7) The mountain, palm trees, sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.  The wolf in BlackDiamond is also from there.  I took watermarked photos and converted to 16 color.
 
 8) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
 
@@ -40,7 +40,9 @@ $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
 20) Bill Gates inspired me to add comments to my $LK,"Help & Index",A="FI:::/Doc/HelpIndex.TXT"$.
 
-In short, I wrote every one of the $TX,"120,532",D="DD_TEMPLEOS_LOC"$ lines myself, no $FG,2$GPL$FG$ code, no linkage or dependence on other code.  Anyone who says otherwise is being an ass.
+21) I hired and artist, Cody Rigby, for $$3,000 worth of pixel art.
+
+22) Erik van der Karbargenbok made $LK,"TempleBot",A="PI:::/Linux/TempleBot",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bin/TempleBot.html"$.
 $FG,8$
 * "MSDOS", "Windows", "MovieMaker" "MS Paint" and "FAT32" are trademarks of MicroSoft Corp.
 * "SiteBuilder" is a trademark of Yahoo! Inc.

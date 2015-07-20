@@ -13,7 +13,7 @@ U0 Main()
 {
   "Capture screen...\n";
   PressAKey;
-  GRACaptureScreen("::/Home/ScreenShot");
+  GRAScreenCapture("::/Home/ScreenShot");
 
   "View captured screen...\n";
   PressAKey;

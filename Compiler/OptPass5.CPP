@@ -1,18 +1,18 @@
-U0 OptPass5(CLex *lx)
+U0 OptPass5(CCmpCtrl *cc)
 {
   CIntermediateCode *tempi,*tempi1;
   I64 code,i,ty,pt,ty1,pt1;
-  CPrsStk *ps=lx->ps;
+  CPrsStk *ps=cc->ps;
   ps->ptr=0;
   ps->ptr2=0;
 
-  tempi=lx->lcc.lcc_root.next;
+  tempi=cc->coc.coc_root.next;
   while (code=tempi->ic_code) {
     if (code>IC_NOP2) {
       if (tempi->ic_flags&ICF_TRACE) {
-	if (Bt(&lx->otrace_mask,5)) {
+	if (Bt(&cc->otrace_mask,5)) {
 	  "%2d:",ps->ptr;
-	  ICPut(lx,tempi);
+	  ICPut(cc,tempi);
 	}
       }
       if (intermediate_code_table[code].arg_cnt==IS_V_ARG)
@@ -29,7 +29,7 @@ U0 OptPass5(CLex *lx)
       if (tempi->a2.type&TY_MASK==TY_STK) {
 	tempi1=PrsPop(ps);
 	if (tempi1->ic_code==IC_MOV ||
-	    tempi1->ic_code==IC_REG) {
+	      tempi1->ic_code==IC_REG) {
 	  if (tempi1->ic_flags & ICF_R_TO_INT) {
 	    if (tempi1->a1.type&TY_MASK==TY_IMM)
 	      tempi1->a1.disp=tempi1->a1.disp(F64);
@@ -70,7 +70,7 @@ U0 OptPass5(CLex *lx)
       if (tempi->a1.type&TY_MASK==TY_STK) {
 	tempi1=PrsPop(ps);
 	if (tempi1->ic_code==IC_MOV ||
-	    tempi1->ic_code==IC_REG) {
+	      tempi1->ic_code==IC_REG) {
 	  if (tempi1->ic_flags & ICF_R_TO_INT) {
 	    if (tempi1->a1.type&TY_MASK==TY_IMM)
 	      tempi1->a1.disp=tempi1->a1.disp(F64);
@@ -110,13 +110,14 @@ U0 OptPass5(CLex *lx)
 	  OptSetNOP2(tempi1);
 	}
       }
-      if (tempi->r.type&TY_MASK==TY_STK && !(tempi->ic_flags&ICF_NO_DEPEND_RESULT))
+      if (tempi->r.type&TY_MASK==TY_STK &&
+	    !(tempi->ic_flags&ICF_NO_DEPEND_RESULT))
 	PrsPush(ps,tempi);
     }
     tempi=tempi->next;
   }
   if (ps->ptr>2) {
-    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
-    LexExcept(lx,"Compiler Optimization Error at ");
+    "Pass:%d Stk:%08X\n",cc->pass,ps->ptr;
+    LexExcept(cc,"Compiler Optimization Error at ");
   }
 }

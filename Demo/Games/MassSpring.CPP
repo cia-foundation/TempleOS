@@ -9,18 +9,16 @@ class MySpring:CSpring
 
 CMathODE *ode=NULL;
 
-U0 DrawIt(CTask *task,CDC *dc)
+U0 DrawIt(CTask *,CDC *dc)
 {
-  Bool old_suspend;
   MyMass   *tempm;
   MySpring *temps;
 
-  old_suspend=Suspend(task);
   dc->color=RED;
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
     GrLine(dc,temps->end1->x,temps->end1->y,
-		temps->end2->x,temps->end2->y);
+	  temps->end2->x,temps->end2->y);
     temps=temps->next;
   }
 
@@ -30,13 +28,12 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrCircle(dc,tempm->x,tempm->y,tempm->radius);
     tempm=tempm->next;
   }
-  Suspend(task,old_suspend);
 }
 
 U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 {//The forces due to springs and drag are
 //automatically handled by the ode code.
-//We can add new forces here.
+  //We can add new forces here.
   F64 d,dd;
   CD3 p;
   MyMass *tempm1,*tempm2;
@@ -106,13 +103,13 @@ U0 MassSpringDemo()
   MyMass *tempm1=NULL,*tempm2=NULL;
 
   PopUpOk("Left-Click to place mas\n"
-	  "Right-Click and drag to\n"
-	  "connect with spring.\n\n"
-	  "Springs are 100 pixs long.\n");
+	"Right-Click and drag to\n"
+	"connect with spring.\n\n"
+	"Springs are 100 pixs long.\n");
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
 
-/*Preempt(OFF) eliminates a lot of hassles.
+  /*Preempt eliminates a lot of hassles.
 The concern is about changing
 que links while the winmgr task
 is updating the ode or screen.
@@ -124,20 +121,20 @@ preempt, we will not be interrupted.
 There is little downside to Preempt()
 since we will yield during GetMsg().
 */
-  Preempt(OFF);
+  Preempt;
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
   AutoComplete;
 
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Play {"
-"  Restart(,'\n');"
-"}"
-  );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"}"
+	);
 
   Init;
   DocCursor;
@@ -146,7 +143,8 @@ since we will yield during GetMsg().
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN);
+      msg_code=GetMsg(&a1,&a2,
+	    1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
 	  PlaceMass(a1,a2);

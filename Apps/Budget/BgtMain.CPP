@@ -9,7 +9,8 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
   U8 *st;
   switch (ch) {
     case '\n':
-      if ((doc_ce=doc->cur_entry) && doc_ce!=doc && doc_ce->type_u8==DOCT_MENU_VAL) {
+      if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
+	    doc_ce->type_u8==DOCT_MENU_VAL) {
 	tempb=doc_ce->user_data;
 	if (tempt=tempb->template) {
 	  if (tempt1=BgtTemplatePmt(tempt)) {
@@ -32,7 +33,8 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       }
       return TRUE;
     case CH_CTRLY:
-      if ((doc_ce=doc->cur_entry) && doc_ce!=doc && doc_ce->type_u8==DOCT_MENU_VAL) {
+      if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
+	    doc_ce->type_u8==DOCT_MENU_VAL) {
 	tempb=doc_ce->user_data;
 	if (tempt=tempb->template) {
 	  QueRem(tempt);
@@ -48,8 +50,8 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       return TRUE;
     case 'a':
       PopUpOk(	"Set the name and color of your accounts.\n"
-		"To delete accounts, manually edit\n"
-		"$$GREEN$$/Home/Budget/Accts.TXT.Z$$FG$$.");
+	    "To delete accounts, manually edit\n"
+	    "$$GREEN$$/Home/Budget/Accts.TXT.Z$$FG$$.");
       if (PopUpEd(BGT_ACCTS_FILE,Fs)) {
 	BgtAcctsRead;
 	BgtRegen;
@@ -75,7 +77,8 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       }
       return TRUE;
     case 'c':
-      if ((doc_ce=doc->cur_entry) && doc_ce!=doc && doc_ce->type_u8==DOCT_MENU_VAL)
+      if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
+	    doc_ce->type_u8==DOCT_MENU_VAL)
 	tempb=doc_ce->user_data;
       else
 	tempb=NULL;
@@ -107,7 +110,8 @@ U0 BgtRegen()
       color=c;
       DocPrint(doc,"$$FG,%d$$",color);
     }
-    tempb->doc_e=DocPrint(doc,"$$MU-UL,\"%D %8ts %8ts:%8.2f %8.2f:%Q\",U=0x%X$$\n",
+    tempb->doc_e=DocPrint(doc,
+	  "$$MU-UL,\"%D %8ts %8ts:%8.2f %8.2f:%Q\",U=0x%X$$\n",
 	  tempb->date,tempb->credit,tempb->debit,balance,
 	  tempb->amount,tempb->desc,tempb);
     tempb=tempb->next;
@@ -116,7 +120,7 @@ U0 BgtRegen()
 
   if (pdoc=Fs->put_doc) {
     DocLock(pdoc);
-    //Now, we want to preserve old position in doc, using ugly brute force.
+//Now, we want to preserve old position in doc, using ugly brute force.
     //It's tricky -- can't use old line num because of editor filters.
 
     //The price we pay for using the standard document editor is this kludge.
@@ -134,7 +138,7 @@ U0 BgtRegen()
       while (tempb!=&b_root) {
 	if (tempb==tempb_ce) {
 	  doc->cur_entry=tempb->doc_e;
-	  doc->cur_data_col=0;
+	  doc->cur_col=0;
 	  DocCenter(doc);
 	  goto br_cont;
 	}
@@ -144,7 +148,7 @@ U0 BgtRegen()
     }
   }
 
-br_cont:
+  br_cont:
   ddoc=Fs->display_doc;
   Fs->put_doc	 =doc;
   Fs->display_doc=doc;
@@ -165,22 +169,22 @@ U0 Budget()
   WinBorder;
   AutoComplete;
   MenuPush(
-"File {"
-"  Abort(,CH_SHIFT_ESC);"
-"  Exit(,CH_ESC);"
-"}"
-"Edit {"
-"  NewEntry(,'n');"
-"  CopyEntry(,'c');"
-"  EditEntry(,'\n');"
-"  DeleteEntry(,CH_CTRLY);"
-"  NewTemplate(,'t');"
-"  AcctsFile(,'a');"
-"}"
-"View {"
-"  ViewAcct(,'v');"
-"}"
-  );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Edit {"
+	"  NewEntry(,'n');"
+	"  CopyEntry(,'c');"
+	"  EditEntry(,'\n');"
+	"  DeleteEntry(,CH_CTRLY);"
+	"  NewTemplate(,'t');"
+	"  AcctsFile(,'a');"
+	"}"
+	"View {"
+	"  ViewAcct(,'v');"
+	"}"
+	);
   StrCpy(view_acct,"BANK");
   DocMax;
   old_put	 =Fs->put_doc;

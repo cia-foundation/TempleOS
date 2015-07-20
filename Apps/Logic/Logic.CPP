@@ -82,7 +82,7 @@ U0 GetGates()
   U8 *st;
 
   "\nEnter the available gate types in the order you prefer them to be used.\n"
-  "Your choices are:\n";
+	"Your choices are:\n";
   for (i=GT_FIRST_REAL_GATE;i<GT_NUM_ENTRIES;i++)
     "%z ",i,gate_type_lst;
   '\n';
@@ -162,7 +162,7 @@ U0 Init()
     else {
       if (gate_type_table[i]==GT_INPUT)
 	"To produce this output, connect to input %C\n",
-	    'A'+input1_table[i];
+	      'A'+input1_table[i];
       else if (gate_type_table[i]==GT_OUTPUT)
 	"Duplicate\n";
       else {
@@ -181,8 +181,8 @@ U0 Init()
 U0 DrawDesign(CDC *dc,I64 *_y,I64 output,I64 depth,I64 *_x_out,I64 *_y_out)
 {
   I64 y=*_y,type=gate_type_table[output],
-      xx=(passes-depth)*(GATE_WIDTH+CONNECT_WIDTH),yy=y,
-      x1,y1,x2,y2,x3,y3;
+	xx=(passes-depth)*(GATE_WIDTH+CONNECT_WIDTH),yy=y,
+	x1,y1,x2,y2,x3,y3;
   if (_x_out) *_x_out=xx;
   if (_y_out) *_y_out=yy;
   if (Bt(displayed_design,output) && type!=GT_INPUT) {
@@ -528,7 +528,7 @@ I64 FillGateTable()
     chged=FALSE;
     MemSet(added_this_pass,0,(table_size+7)/8);
     for (current_gate=0;current_gate<num_selected_gates &&
-      num_outputs_found<num_outputs_entered;current_gate++) {
+	  num_outputs_found<num_outputs_entered;current_gate++) {
       switch (selected_gates[current_gate]) {
 	case GT_NOT:   FillNot	(&chged,&num_outputs_found); break;
 	case GT_AND:   FillAnd	(&chged,&num_outputs_found); break;
@@ -542,7 +542,7 @@ I64 FillGateTable()
 	case GT_NOR3:  FillNOr3 (&chged,&num_outputs_found); break;
       }
     }
-    }
+  }
   ProgressBarsRst;
   return num_outputs_found;
 }

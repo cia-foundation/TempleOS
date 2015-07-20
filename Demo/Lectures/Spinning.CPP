@@ -3,8 +3,8 @@ U0 LoadTask(I64)
 {
   I64 i,j=100;
 //Preemption is ctrlled on a per task basis.
-//Preemption is OFF by default on new tasks.
-//It is turned on for user terminal tasks.
+  //Preemption is OFF by default on new tasks.
+  //It is turned on for user terminal tasks.
   Preempt(ON);
   while (TRUE) {
     for (i=0;i<10000;i++)
@@ -29,13 +29,13 @@ U0 SpinningNoPreempt()
   Bool old_preempt;
   "Spinning with no preemption...\n";
 
-//Put on screen before it starts.  Text lags by one refresh
-//and we might catch it in the middle of an update.
+  //Put on screen before it starts.  Text lags by one refresh
+  //and we might catch it in the middle of an update.
   WinMgrSync;
   WinMgrSync;
   WinMgrSync;
 
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   for (i=0;i<3000000;i++)
     InU8(0x21);
   Preempt(old_preempt);
@@ -69,7 +69,7 @@ U0 CooperativeMultitaskingPreempt()
 U0 CooperativeMultitaskingNoPreempt()
 {
   F64 timeout=tS+3.0;
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   "Cooperative multitasking with no preemption...\n";
   while (tS<timeout) {
     InU8(0x21);

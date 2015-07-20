@@ -4,15 +4,15 @@ U0 DrawIt(CTask *,CDC *dc)
   I64 i;
   F64 dt=Beat%8.0,z,w,x1,y1,z1,x2,y2,z2;
   Bool first=TRUE;
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
   dc->flags|=DCF_TRANSFORMATION;
   dc->x=30*dt+20.0*Sin(dt)+25;
   dc->y=10*dt-15;
   dc->z=GR_Z_ALL;
-  GrRotXEqu(dc->r,0.75*dt);
-  GrRotYEqu(dc->r,0.45*dt);
-  GrRotZEqu(dc->r,0.50*dt);
-  GrScaleEqu(dc->r,0.5);
+  Mat4x4RotX(dc->r,0.75*dt);
+  Mat4x4RotY(dc->r,0.45*dt);
+  Mat4x4RotZ(dc->r,0.50*dt);
+  Mat4x4Scale(dc->r,0.5);
   for (i=-50;i<40;i+=2) {
     if (i&2)
       dc->color=LTGRAY;
@@ -46,13 +46,15 @@ U0 Song()
   try {
     "$$BG+H,LTCYAN$$";
     while (!ScanKey) {
-	Play("3qEAAetF2G3GqDFetFED2eG3G",
-		"A\0dam... \0 \0no \0 \0 \0long\0er \0sees \0Your \0face.\n\0 \0 \0");
-	Play("qEAAetF2G3GqDFetFED2eG3G",
-		"Oh! \0 \0 \0What \0 \0a \0wretch\0ed \0bar\0ren \0waste!\n\0 \0 \0");
-	Play("qACFeBCB2GqG3ED",
-		" \0 \0 \0 \0 \0 \0 \0 \0Ex\0iled.\n\0");
-	Play("ACFeBCB2GqG3ED");
+      Play("3qEAAetF2G3GqDFetFED2eG3G",
+	    "A\0dam... \0 \0no \0 \0 \0long\0er \0sees \0"
+	    "Your \0face.\n\0 \0 \0");
+      Play("qEAAetF2G3GqDFetFED2eG3G",
+	    "Oh! \0 \0 \0What \0 \0a \0wretch\0ed \0bar\0"
+	    "ren \0waste!\n\0 \0 \0");
+      Play("qACFeBCB2GqG3ED",
+	    " \0 \0 \0 \0 \0 \0 \0 \0Ex\0iled.\n\0");
+      Play("ACFeBCB2GqG3ED");
     }
   } catch
     PutExcept;

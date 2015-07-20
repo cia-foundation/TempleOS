@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"DolDoc Overview"$$FG$
 
-DolDoc is a propriatary TempleOS document type supported by $LK,"DolDoc Routines",A="HI:DolDoc"$.  In a document, commands are bracketed with '$FG,2$$$$FG$'s.  Use $FG,2$<CTRL-l>$FG$ to experiment inserting a command.  Then, use $FG,2$<CTRL-t>$FG$ to toggle to plain text to see it.
+DolDoc is a TempleOS document type supported by $LK,"DolDoc Routines",A="HI:DolDoc"$.  In a document, commands are bracketed with '$FG,2$$$$FG$'s.  Use $FG,2$<CTRL-l>$FG$ to experiment inserting a command.  Then, use $FG,2$<CTRL-t>$FG$ to toggle to plain text to see it.
 
 Here is the grammar:
 
@@ -8,7 +8,7 @@ Here is the grammar:
 
 <FlagList> := $FG,2$+$FG$|$FG,2$-$FG$ <$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>[$FG$<FlagList>]
 
-<ArgList> := <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$<ArgExpression>$FG,2$,$FG$<ArgList> | <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$<ArgExpression>
+<ArgList> := <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$<ArgExpression>[$FG,2$,$FG$<ArgList>]
 
 
 The format of DolDoc cmds is a two character code, +/-flags, a comma and args separated by commas.  Some commands have mandatory args.  Optional args are indicated with <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>$FG,2$=$FG$.  A $LK,"ColorName",A="MN:ST_COLORS"$ bracked by dollars, will change the foreground color.
@@ -18,9 +18,9 @@ See $LK,"::/Doc/Widget.TXT"$ and $LK,"::/Demo/DolDoc/DemoDoc.TXT"$.
 <$LK,"TwoLetterCmd",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_CMDS"$>  See $LK,"Type Defines",A="MN:DOCT_TEXT"$ and $LK,"PrsDollarCmd",A="MN:PrsDollarCmd"$().
 $TR,"TX Text"$
 $ID,2$Normally, text is not bracketed with '$FG,2$$$$FG$', but if you wish to specify flag attr, such as centering text, you can bracket them with '$FG,2$$$$FG$' and enter flags such as "$FG,2$+CX$FG$".  You can't edit them normally if they are bracketed by '$FG,2$$$$FG$' unless you toggle to plain text mode with $FG,2$<CTRL-t>$FG$.
-$ID,-2$$TR,"CR Hard Carriage Return (New Line)"$
+$ID,-2$$TR,"CR Hard New Line"$
 $ID,2$New lines are normally not bracketed with '$FG,2$$$$FG$'.
-$ID,-2$$TR,"SR Soft Carriage Return (New Line)"$
+$ID,-2$$TR,"SR Soft New Line"$
 $ID,2$Word wrap uses temporary soft new lines.  Users never place soft new lines.
 $ID,-2$$TR,"CU Cursor pos"$
 $ID,2$The cursor pos is stored as a ASCII#5 character and is not bracketed with '$FG,2$$$$FG$'. Users normally do not enter cursor pos.
@@ -30,14 +30,6 @@ $ID,-2$$TR,"CL Clear"$
 $ID,2$Clear all previous entries except ones with hold($FG,2$+H$FG$) flags.  You might want $FG,2$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear",A="MN:DocClear"$().
 $ID,-2$$TR,"PB Page Break"$
 $ID,2$Page break.
-$ID,-2$$TR,"DA Data"$
-$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
-
-The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
-
-The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the format string.
-
-If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
 $ID,-2$$TR,"PL Page Length"$
 $ID,2$Page length.
 $ID,-2$$TR,"LM Left Margin"$
@@ -124,16 +116,28 @@ Examples: <CTRL-t> to see
 8)$LK,"File anchor link -- <CTRL-t> to see anchor after you click",A="FA:::/Kernel/KEnd.CPP,Independent HeapCtrl Example"$
 9)$LK,"Bible Link",A="BF:Acts,2:3"$ The chapter:verse actually just does a text search.
 10) $LK,"Help Index Link",A="HI:Doc"$.
-11) $LK,"Address Link",A="AD:0x10000"$.
+11) $LK,"Address Link",A="AD:0x11000"$.
 
 12) For in-memory document address links, see $LK,"SpriteEdText",A="MN:SpriteEdText"$().
 
 $ID,-2$$TR,"BT Button"$
 $ID,2$See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
+$ID,-2$$TR,"DA Data"$
+$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+
+The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+
+The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the format string.
+
+If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
 $ID,-2$$TR,"CB Check Box"$
-$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
 
 The default data-type for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+$ID,-2$$TR,"LS List Widget"$
+$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+
+The default data-type for the $FG,2$$$LS...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"MA Macro"$
 $ID,2$A left macro arg, $FG,2$LM=""$FG$, will send text when the left mouse is clicked.
 
@@ -152,10 +156,6 @@ $ID,2$A tree widget is a branch in a collapsable tree.  The domain of the branch
 You might want to use $LK,"DocPrintAtomic",A="MN:DocPrintAtomic"$().
 
 See $LK,"::/Demo/DolDoc/TreeDemo.CPP"$.
-$ID,-2$$TR,"LS List Widget"$
-$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocFormDo",A="MN:DocFormDo"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
-
-The default data-type for the $FG,2$$$LS...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"SP Sprite"$
 $ID,2$Insert a sprite into text with $FG,2$<CTRL-r>$FG$.  The cursor location at the time you press $FG,2$<CTRL-r>$FG$ is critical because the sprite will be offset from that location.  This is important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clipboard requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-t>$FG$ and manually adding a $FG,2$$$SP...$$$FG$ entry with the same $FG,2$BI=$FG$ num.
 
@@ -180,7 +180,7 @@ $ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() rou
 $ID,-2$$TR,"ER Error"$
 $ID,2$When errors are detected in DolDoc cmds, an $FG,2$ER$FG$ entry is generated.
 $ID,-2$
-<$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Flag Defines",A="MN:DOCEf_LEFT_CB"$ and $LK,"DocInit",A="MN:DocInit"$().
+<$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Flag Defines",A="MN:DOCEf_LEFT_CB"$ and $LK,"Simple Flags",A="FI:::/Doc/Widget.TXT.Z"$.
 $TR,"+H Hold"$
 $ID,2$Causes not to delete this cmd when cleared with $FG,2$CL$FG$ or when the doc->max_entries is exceeded.  Word wrap is a good to hold.  There is no way to delete these entries, at this point.
 $ID,-2$$TR,"+L Link"$
@@ -205,6 +205,8 @@ $ID,-2$$TR,"+RD Refresh Data"$
 $ID,2$The Refresh Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value on the screen updated continuously.
 $ID,-2$$TR,"+UD Update Data"$
 $ID,2$The Update Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value in the $LK,"CDocEntry",A="MN:CDocEntry"$ updated when keys are typed on it.
+$ID,-2$$TR,"+TC Tag CallBack"$
+$ID,2$See $LK,"::/Demo/DolDoc/CallBack.CPP"$.
 $ID,-2$$TR,"+LC Left CallBack"$
 $ID,2$See $LK,"::/Demo/DolDoc/ClickCallBack.CPP"$.
 $ID,-2$$TR,"+RC Right CallBack"$

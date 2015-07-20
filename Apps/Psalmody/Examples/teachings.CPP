@@ -13,13 +13,17 @@ U0 Song()
     WinVert(Fs->win_bottom+3,Fs->win_bottom+15,task);
     while (!ScanKey) {
       Play("2eG3CDAqEsACACGEGEqDsAAAAetCDD",
-	    "Ple\0ase \0te\0ach \0me.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Ple\0ase \0te\0ach \0me.\n\0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("2eG3CDAqEsACACGEGEqDsAAAAetCDD",
-	    "Wa\0ter \0thi\0s \0tree.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    "Wa\0ter \0thi\0s \0tree.\n\0 \0 \0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("2qGG3eEBqAGeFEsFGFGetDBD",
-	    " \0 \0$$RED$$I \0will \0teach \0thee.\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    " \0 \0$$RED$$I \0will \0teach \0thee.\n\0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0 \0");
       Play("2qGG3eEBqAGeFEsFGFGetDBD",
-	    " \0 \0Wat\0er \0that \0tree.$$FG$$\n\0 \0 \0 \0 \0 \0 \0 \0 \0 \0");
+	    " \0 \0Wat\0er \0that \0tree.$$FG$$\n\0 \0"
+	    " \0 \0 \0 \0 \0 \0 \0 \0");
     }
   } catch
     PutExcept;

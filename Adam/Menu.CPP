@@ -11,7 +11,8 @@ CTask *MenuTask()
 
 CMenuEntry *sys_cur_submenu_entry=NULL;
 
-public CMenuEntry *MenuSubEntryFind(CMenuEntry *haystack_first,U8 *needle_entry_name)
+public CMenuEntry *MenuSubEntryFind(
+	CMenuEntry *haystack_first,U8 *needle_entry_name)
 {//You probably don't need this. Use dir / and $LK,"MenuEntryFind",A="MN:MenuEntryFind"$().
   while (haystack_first) {
     if (!StrCmp(haystack_first->name,needle_entry_name))
@@ -40,43 +41,43 @@ public CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name)
   return tempse;
 }
 
-CMenuEntry *MenuNewSub(CLex *lx,CTask *task)
+CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
 {
   CMenuEntry *tempme=NULL,*tempse;
-  if (lx->token==TK_IDENT) {
+  if (cc->token==TK_IDENT) {
     tempme=CAlloc(sizeof(CMenuEntry),task);
-    if (StrLen(lx->cur_str)>31)
-      lx->cur_str[31]=0;
-    StrCpy(tempme->name,lx->cur_str);
-    if (Lex(lx)=='(') {
+    if (StrLen(cc->cur_str)>31)
+      cc->cur_str[31]=0;
+    StrCpy(tempme->name,cc->cur_str);
+    if (Lex(cc)=='(') {
       tempme->msg_code=MSG_KEY_DOWN_UP;
-      if (Lex(lx)!=',' && lx->token!=')')
-	tempme->msg_code=LexExpressionI64(lx);
-      if (lx->token==',')
-	Lex(lx);
-      if (lx->token!=',' && lx->token!=')')
-	tempme->a1=LexExpressionI64(lx);
-      if (lx->token==',')
-	Lex(lx);
-      if (lx->token!=',' && lx->token!=')')
-	tempme->a2=LexExpressionI64(lx);
-      if (lx->token!=')')
-	LexExcept(lx,"missing ')' at ");
-      if (Lex(lx)!=';')
-	LexExcept(lx,"missing ';' at");
-      Lex(lx); //Skip ;
-    } else if (lx->token=='{') {
-      Lex(lx); //Skip {
+      if (Lex(cc)!=',' && cc->token!=')')
+	tempme->msg_code=LexExpressionI64(cc);
+      if (cc->token==',')
+	Lex(cc);
+      if (cc->token!=',' && cc->token!=')')
+	tempme->a1=LexExpressionI64(cc);
+      if (cc->token==',')
+	Lex(cc);
+      if (cc->token!=',' && cc->token!=')')
+	tempme->a2=LexExpressionI64(cc);
+      if (cc->token!=')')
+	LexExcept(cc,"missing ')' at ");
+      if (Lex(cc)!=';')
+	LexExcept(cc,"missing ';' at");
+      Lex(cc); //Skip ;
+    } else if (cc->token=='{') {
+      Lex(cc); //Skip {
       tempme->dir=TRUE;
       tempse=&tempme->sub;
-      while (tempse && lx->token!='}')
-	tempse=tempse->next=MenuNewSub(lx,task);
-      if (lx->token!='}')
-	LexExcept(lx,"missing '}' at ");
+      while (tempse && cc->token!='}')
+	tempse=tempse->next=MenuNewSub(cc,task);
+      if (cc->token!='}')
+	LexExcept(cc,"missing '}' at ");
       else
-	Lex(lx); //Skip }
+	Lex(cc); //Skip }
     } else
-      LexExcept(lx,"expecting '{' at ");
+      LexExcept(cc,"expecting '{' at ");
   }
   return tempme;
 }
@@ -85,17 +86,17 @@ public CMenu *MenuNew(U8 *st,I64 flags=0,CTask *task=NULL)
 {//Parse a menu. You probably don't need this.
   CMenu *m;
   CMenuEntry *tempse;
-  CLex *lx=LexNew(st,LF_DONT_FREE_BUF);
+  CCmpCtrl *cc=CmpCtrlNew(st,CCF_DONT_FREE_BUF);
   if (!task) task=Fs;
-  Lex(lx);
+  Lex(cc);
   m=CAlloc(sizeof(CMenu),task);
   m->task=task;
   m->flags=flags;
   m->attr =BLUE<<4+YELLOW;
   tempse=&m->sub;
   while (tempse)
-    tempse=tempse->next=MenuNewSub(lx,task);
-  LexDel(lx);
+    tempse=tempse->next=MenuNewSub(cc,task);
+  CmpCtrlDel(cc);
   return m;
 }
 
@@ -203,7 +204,8 @@ U0 DrawMenu(CDC *dc)
 	else
 	  i=m->attr;
 	if (y0<=y1<y0+FONT_HEIGHT) {
-	  if (tempse->msg_code==MSG_KEY_DOWN||tempse->msg_code==MSG_KEY_DOWN_UP) {
+	  if (tempse->msg_code==MSG_KEY_DOWN||
+		tempse->msg_code==MSG_KEY_DOWN_UP) {
 	    if (!tempse->a2)
 	      tempse->a2=Char2ScanCode(tempse->a1);
 	    st=ScanCode2KeyName(tempse->a2);
@@ -215,7 +217,8 @@ U0 DrawMenu(CDC *dc)
 	  GrPrint(dc,x0,y0,"%s",tempse->name);
 	  if (st) {
 	    dc->color=i>>4;
-	    GrRect(dc,x0+w,y0-FONT_HEIGHT,(StrLen(st)+1)*FONT_WIDTH,FONT_HEIGHT*3);
+	    GrRect(dc,x0+w,y0-FONT_HEIGHT,
+		  (StrLen(st)+1)*FONT_WIDTH,FONT_HEIGHT*3);
 	    dc->color=i&15;
 	    GrPrint(dc,x0+w,y0,"%s",st);
 	    Free(st);

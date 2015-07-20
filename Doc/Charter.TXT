@@ -1,6 +1,6 @@
 $FG,5$$WW,1$$TX+CX,"TempleOS Charter"$$FG$
 
-Why did they make Solomon's Temple?  It was a direction to look, to focus on, a special place for meditation, to do offerings, a community center, a home to God's beauty, that encouraged love of God.  People cherished God's temple, beautifying it with gold and all fine things to show love of God, as great cathedrals were decorated with astounding, awe-striking intricate art and gargoyles, incredible devotion to God with hours of effort, toiling and slaving-away for the glory of God, for families with children to see stained-glass windows and tomes with ridiculously elaborate calligraphy to show love of God from a people who did little else but show love toward God, lived in dire conditions by today's standards, yet with so much difficulty scraping-by, found the time to devote even all free-time to God!
+Why did they make Solomon's Temple?  It was a direction to look, to focus on, a special place for meditation, to do offerings, a community center, a home to God's beauty, that encouraged love of God.  People cherished God's temple, beautifying it with gold and all fine things to show love of God, as great $TX,"cathedrals",HTML="https://www.youtube.com/watch?v=xkfmK-CLvcc"$ were decorated with astounding, awe-striking intricate art and gargoyles, incredible devotion to God with hours of effort, toiling and slaving-away for the glory of God, for families with children to see $TX,"stained-glass",HTML="https://www.youtube.com/watch?v=t8g1e-JLrhM"$ windows and tomes with ridiculously elaborate $TX,"calligraphy",HTML="https://www.youtube.com/watch?v=Oa8gMb0YC68"$ to show love of God, from a people who did little else but show love toward God, lived in dire conditions by today's standards, yet with so much difficulty scraping-by, found the time to devote $TX,"even all free-time",HTML="https://www.youtube.com/watch?v=tZw5V4XuUIo"$ to God!
 
 
 1 Kings 6:21 (King James)
@@ -21,7 +21,7 @@ $LM,0$
 
 * God said $FG,2$640x480 16 color$FG$ graphics is a covenant like circumcision.  Children will do offerings.  Think of 16 colors like the Simpson's cartoons.  In the future, even if one GPU were universal, we would keep 640x480 16 color and not use GPU acceleration.  Graphics operations should be transparent, not hidden in a GPU.
 
-* God said to use a single audio voice -- a single frequency with waveforms.
+* God said to use a single audio voice -- a single frequency with waveforms and, maybe, amplitude envelope. 
 
 * God said His temple must be perfect.  $FG,4$We don't think twice about breaking compatibility.$FG$  God said we do a seven year release cycle.  I say the PC hardware follows a 49 year, jubilee cycle, like broadcast TV upgrades.
 
@@ -31,17 +31,19 @@ $LM,0$
 
 * Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
 
-* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Currently, there are $TX,"79,959",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Currently, there are $TX,"80,860",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.
  
 * Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 
-* One platform. $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatibles.  Desk-tops are all we design for, but lap-tops can tag-along.
+* One platform. $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC compatibles.  Desk-tops are all we design for, but laptops can tag along.
+
+* All hardware access will be done through x86 IN/OUT instructions, not PCI drivers.  A frame buffer for VGA is an exception.
 
 * One driver for each class of device.  Limited exceptions are allowed.  With divergent device capabilities, it is a nightmare for user applications and what is gained?  A three button mouse is like a leg you cannot put weight on.
 
 * $FG,2$Ring-0-only$FG$.  Everything runs in kernel mode, including user applications.
 
-* Full access to everything.  All memory, I/O ports, instructions, and similar things must never be off-limits.  All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
+* Full access to everything.  All memory, I/O ports, instructions, and similar things must never be off limits.  All functions, variables and class members will be accessible.  There are no C++ $FG,2$public$FG$/$FG,2$private$FG$ protections and all functions, even secondary ones in the kernel, can be called.
 
 * $FG,2$Single-address-map$FG$ as though paging is not used.  Long mode requires paging, however, so the nearest thing is keeping all memory $FG,2$identity-mapped$FG$.
 

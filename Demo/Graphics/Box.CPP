@@ -2,7 +2,7 @@ CDC *dc;
 
 U0 DrawIt(CTask *,CDC *)
 {//This technique is weird, but clever.  In Box() we
- //created an alias of the system $LK,"gr.dc2",A="MN:CGrGlbls"$.
+//created an alias of the system $LK,"gr.dc2",A="MN:CGrGlbls"$.
   dc->pen_width=2;
   dc->color=RED;
   GrLine3(dc,-100,-100,-100, -100, 100,-100);
@@ -27,18 +27,18 @@ U0 Box()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   DocClear;
   Fs->draw_it=&DrawIt;
-  Preempt(OFF); //We don't want matrix used while we're changing it.
+  Preempt; //We don't want matrix used while we're changing it.
 
   dc->x=200;
   dc->y=200;
   dc->flags|=DCF_TRANSFORMATION;
   while (!ScanChar) {
-    GrIdentEqu(dc->r);
-    GrRotZEqu(dc->r,é);
-    GrRotXEqu(dc->r,è);
-    GrRotZEqu(dc->r,ê);
-    GrScaleEqu(dc->r,s);
-    GrSetRotMat(dc,dc->r);
+    Mat4x4IdentEqu(dc->r);
+    Mat4x4RotZ(dc->r,é);
+    Mat4x4RotX(dc->r,è);
+    Mat4x4RotZ(dc->r,ê);
+    Mat4x4Scale(dc->r,s);
+    DCMat4x4Set(dc,dc->r);
 
     Sleep(20);
     é+=2*ã/70;

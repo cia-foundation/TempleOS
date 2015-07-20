@@ -30,11 +30,11 @@ public isn't interested in realism.
 */
 
 #define  XMSGF_ANTISPIN	0
-AcctRegSetDftEntry("TempleOS/XCaliber",
+RegSetDftEntry("TempleOS/XCaliber",
 	"I64 best_score=0;\n"
 	"I64 msg_flags=0;\n"
 	);
-AcctRegExeBranch("TempleOS/XCaliber");
+RegExeBranch("TempleOS/XCaliber");
 
 class MyMass:CMass
 {
@@ -185,7 +185,8 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
       tempsp->s[6].end2=&tempsp->p[4];
 
       for (i=0;i<tempsp->springs;i++) {
-	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].rest_len=
+	      D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
 	tempsp->s[i].const=10000;
 	tempsp->s[i].strength  =30000;
 	if (i<=2)
@@ -223,7 +224,8 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
       tempsp->s[2].end2=&tempsp->p[0];
 
       for (i=0;i<tempsp->springs;i++) {
-	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].rest_len=
+	      D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
 	tempsp->s[i].const=10000;
 	tempsp->s[i].strength  =20000;
 	tempsp->s[i].color=BLACK;
@@ -270,7 +272,8 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
       tempsp->s[6].end2=&tempsp->p[4];
 
       for (i=0;i<tempsp->springs;i++) {
-	tempsp->s[i].rest_len=D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
+	tempsp->s[i].rest_len=
+	      D3Dist(&tempsp->s[i].end1->x,&tempsp->s[i].end2->x);
 	tempsp->s[i].const= 40000;
 	tempsp->s[i].strength  =75000;
 	if (i>=3)
@@ -305,7 +308,8 @@ U0 PlaceShip(I64 type)
   if (CheckOverlap)
     return;
   while (TRUE) {
-    tempsp=ShipNew(RandU16%(Fs->pix_width-20)+10,RandU16%(Fs->pix_height-20)+10,type);
+    tempsp=ShipNew(RandU16%(Fs->pix_width-20)+10,
+	  RandU16%(Fs->pix_height-20)+10,type);
     if (CheckOverlap)
       ShipDel(tempsp);
     else
@@ -382,11 +386,11 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (game_over) {
     if (Blink)
       GrPrint(dc,(task->pix_width-9*FONT_WIDTH)/2,
-	  (task->pix_height-FONT_HEIGHT)/2,"Game Over");
+	    (task->pix_height-FONT_HEIGHT)/2,"Game Over");
   } else if (show_level_msg) {
     if (Blink)
       GrPrint(dc,(task->pix_width-8*FONT_WIDTH)/2,
-	  (task->pix_height-FONT_HEIGHT)/2+50,"Level %d",level);
+	    (task->pix_height-FONT_HEIGHT)/2+50,"Level %d",level);
   }
 
   for (i=0;i<NUM_STARS;i++)
@@ -397,7 +401,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     if (!(tempsps->flags&SSF_INACTIVE)) {
       dc->color=tempsps->color;
       GrLine(dc,tempsps->end1->x,tempsps->end1->y,
-	  tempsps->end2->x,tempsps->end2->y);
+	    tempsps->end2->x,tempsps->end2->y);
     }
     tempsps=tempsps->next;
   }
@@ -417,7 +421,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	      spin=p.z/d;
 	    } else
 	      spin=0;
-	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
+		  0,MAX_THRUST);
 
 	    if (d=D3Norm(D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p1))) {
 	      D3Sub(&tempsp->p[0].DxDt,&tempsp->p[2].DxDt,&p2);
@@ -425,7 +430,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	      spin=p.z/d;
 	    } else
 	      spin=0;
-	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,
+		  0,MAX_THRUST);
 	  }
 
 	  D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1);
@@ -485,12 +491,16 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    } else {
 	      if (d<0.5) {
 		d=d*2;
-		x=tempsp->p[0].x*(1.0-d)+tempsp->p[tempsp->spacewalk_side].x*(d);
-		y=tempsp->p[0].y*(1.0-d)+tempsp->p[tempsp->spacewalk_side].y*(d);
+		x=tempsp->p[0].x*(1.0-d)+
+		      tempsp->p[tempsp->spacewalk_side].x*(d);
+		y=tempsp->p[0].y*(1.0-d)+
+		      tempsp->p[tempsp->spacewalk_side].y*(d);
 	      } else {
 		d=(d-0.5)*2;
-		x=tempsp->p[tempsp->spacewalk_side].x*(1.0-d)+tempsp->p[0].x*(d);
-		y=tempsp->p[tempsp->spacewalk_side].y*(1.0-d)+tempsp->p[0].y*(d);
+		x=tempsp->p[tempsp->spacewalk_side].x*(1.0-d)+
+		      tempsp->p[0].x*(d);
+		y=tempsp->p[tempsp->spacewalk_side].y*(1.0-d)+
+		      tempsp->p[0].y*(d);
 	      }
 	      SpriteZ3B(dc,x,y,0,$IB,"<spacewalk>",BI=4$,arg+0.75*Sin(tS*2));
 	    }
@@ -511,7 +521,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    dc->color=WHITE;
 	    GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].radius);
 	  }
-	  case ST_ENEMY1:
+	case ST_ENEMY1:
 	  D3DivEqu(D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1),2.0);
 	  D3DivEqu(D3Sub(&tempsp->p[2].x,&tempsp->p[0].x,&p2),2.0);
 	  D3Unit(D3Add(&p1,&p2,&p));
@@ -522,13 +532,16 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  arg=Arg(p.x,p.y);
 	  SpriteZ3B(dc,tempsp->p[0].x,tempsp->p[0].y,0,img,arg);
 	  arg=Arg(p1.x,p1.y);
-	  SpriteZ3B(dc,tempsp->p[0].x+p1.x,tempsp->p[0].y+p1.y,0,$IB,"<EnemySide>",BI=5$,arg);
+	  SpriteZ3B(dc,tempsp->p[0].x+p1.x,tempsp->p[0].y+p1.y,0,
+		$IB,"<EnemySide>",BI=5$,arg);
 	  arg=Arg(p2.x,p2.y);
-	  SpriteZ3B(dc,tempsp->p[0].x+p2.x,tempsp->p[0].y+p2.y,0,$IB,"<EnemySide>",BI=5$,arg);
+	  SpriteZ3B(dc,tempsp->p[0].x+p2.x,tempsp->p[0].y+p2.y,0,
+		$IB,"<EnemySide>",BI=5$,arg);
 	  for (i=0;i<tempsp->masses;i++) {
 	    dc->color=YELLOW;
 	    if (tempsp->p[i].temperature>=1.0)
-	      GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].temperature);
+	      GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,
+		    tempsp->p[i].temperature);
 	  }
 	  break;
       }
@@ -559,7 +572,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  dc->color=LTRED;
 	GrCircle(dc,temps->p.x,temps->p.y,i);
       }
-      } else {
+    } else {
       if (temps->radius<1.0) {
 	dc->color=LTGREEN;
 	GrPlot(dc,temps->p.x,temps->p.y);
@@ -580,7 +593,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     D3Sub(&human->p[2].x,&human->p[0].x,&p2);
     D3Unit(D3Add(&p1,&p2,&p));
     dc->color=LTBLUE;
-    Line(dc,human->p[0].x-10*p.x,human->p[0].y-10*p.y,0,human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
+    Line(dc,human->p[0].x-10*p.x,human->p[0].y-10*p.y,0,
+	  human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
   }
 }
 
@@ -678,21 +692,25 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	      }
 	    }
 	  } else {
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,&tempsp->p[1].state->x,&p1))) {
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,
+		  &tempsp->p[1].state->x,&p1))) {
 	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[1].state->DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
-	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
+		  0,MAX_THRUST);
 
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,&tempsp->p[2].state->x,&p1))) {
+	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,
+		  &tempsp->p[2].state->x,&p1))) {
 	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[2].state->DxDt,&p2);
 	      D3Cross(&p1,&p2,&p);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
-	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,0,MAX_THRUST);
+	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,
+		  0,MAX_THRUST);
 
 	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[1].state->x,&p1);
 	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[2].state->x,&p2);
@@ -758,7 +776,7 @@ U0 CheckDamage()
 	while (tempm!=&ode->next_mass) {
 	  D3Sub(&human->p[0].x,&tempm->x,&p1);
 	  if (Abs(D3Dot(&p1,&p2))<tempm->radius &&
-	      D3Dot(&p1,&p)<0.0) {
+		D3Dot(&p1,&p)<0.0) {
 	    d=D3NormSqr(&p1);
 	    if (d<best_distance) {
 	      best_distance=d;
@@ -800,7 +818,7 @@ U0 CheckDamage()
 	      }
 	    }
 	  }
-	  break;
+	break;
       default:
 	if (tempsp->exploding) {
 	  if (tS>tempsp->die_timeout) {
@@ -852,7 +870,8 @@ U0 FireOneGun(Ship *tempsp,I64 g,F64 r,F64 fuse_time)
   D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1);
   D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p2);
   D3Add(&p1,&p2,&p);
-  D3AddEqu(&temps->p.x,D3MulEqu(D3Copy(&p1,D3Unit(&p)),r+tempsp->p[0].radius+5));
+  D3AddEqu(&temps->p.x,
+	D3MulEqu(D3Copy(&p1,D3Unit(&p)),r+tempsp->p[0].radius+5));
   D3AddEqu(D3MulEqu(&p,1000/(r+1)),&tempsp->p[g].DxDt);
   D3Copy(&temps->p.DxDt,&p);
   D3MulEqu(&p,temps->p.mass/tempsp->p[g].mass/100.0);
@@ -866,7 +885,7 @@ U0 FireOneGun(Ship *tempsp,I64 g,F64 r,F64 fuse_time)
 U0 HumanFireBegin()
 {
   F64 r=3.0*ctrl_panel.shot_radius/CTRL_PANEL_RANGE+0.5,
-     fuse_time=ToF64(ctrl_panel.fuse_time+1)/CTRL_PANEL_RANGE;
+	fuse_time=ToF64(ctrl_panel.fuse_time+1)/CTRL_PANEL_RANGE;
   if (human) {
     if (!human->exploding && !human->spacewalk_side && tS>human->reload_timeout)
       switch (level) {
@@ -934,7 +953,7 @@ U0 AI()
       D3Add(&p1,&p2,&p);
       D3Sub(&human->p[0].x,&tempsp->p[0].x,&p1);
       if (D3Dot(D3Unit(&p),D3Unit(&p1))>0.995 &&
-	tS>tempsp->reload_timeout) {
+	    tS>tempsp->reload_timeout) {
 	FireOneGun(tempsp,0,1.5+.5,.4);
       }
       tempsp=tempsp->next;
@@ -948,7 +967,7 @@ U0 InitLevel()
   I64 i;
   if (level==4)
     OneTimePopUp(&msg_flags,XMSGF_ANTISPIN,
-	"Press $$GREEN$$<CURSOR-DOWN>$$FG$$ for anti-spin stabilizer.\n");
+	  "Press $$GREEN$$<CURSOR-DOWN>$$FG$$ for anti-spin stabilizer.\n");
   human=ShipNew(Fs->pix_width/2,Fs->pix_height/2,ST_HUMAN1);
   for (i=0;i<level+2;i++)
     PlaceShip(ST_ENEMY1);
@@ -987,30 +1006,31 @@ U0 XCaliber()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
-  Preempt(OFF);
+  Preempt;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Fire(,CH_SPACE);"
-  "  Thrust(,,SC_CURSOR_UP);"
-  "  StopSpin(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-  "  Spackwalk(,'w');"
-  "  LongerFuse(,,SC_CURSOR_RIGHT|SCF_SHIFT);"
-  "  ShorterFuse(,,SC_CURSOR_LEFT|SCF_SHIFT);"
-  "  LargerShot(,,SC_CURSOR_UP|SCF_SHIFT);"
-  "  SmallerShot(,,SC_CURSOR_DOWN|SCF_SHIFT);"
-      "}"
-      );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Fire(,CH_SPACE);"
+	"  Thrust(,,SC_CURSOR_UP);"
+	"  StopSpin(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"  Spackwalk(,'w');"
+	"  LongerFuse(,,SC_CURSOR_RIGHT|SCF_SHIFT);"
+	"  ShorterFuse(,,SC_CURSOR_LEFT|SCF_SHIFT);"
+	"  LargerShot(,,SC_CURSOR_UP|SCF_SHIFT);"
+	"  SmallerShot(,,SC_CURSOR_DOWN|SCF_SHIFT);"
+	"}"
+	);
   WinMax;
   AutoComplete;
   WinBorder(ON);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;
@@ -1024,7 +1044,7 @@ U0 XCaliber()
     ch=0;
     do {
       while (!game_over && !show_level_msg &&
-	  (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP))) {
+	    (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP))) {
 	switch (msg_code) {
 	  case MSG_KEY_DOWN:
 	    ch=a1; sc=a2;
@@ -1123,7 +1143,7 @@ U0 XCaliber()
   SettingsPop;
   CtrlPanelDel(cp);
   MenuPop;
-  AcctRegWriteBranch("TempleOS/XCaliber",
+  RegWriteBranch("TempleOS/XCaliber",
 	"I64 best_score=%d;\n"
 	"I64 msg_flags=%d;\n",best_score,msg_flags);
 }

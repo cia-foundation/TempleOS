@@ -16,7 +16,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * The boot-loaders must be patched by you running $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() or $LK,"MasterBootIntall",A="MN:MasterBootIntall"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2",A="FI:::/Kernel/KStart.CPP"$ if you relocate it.
 
-* TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few $FG,2$BIOS$FG$ info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX,"PCI BIOS",HTML="http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for $FG,2$PCI$FG$ config space access.  TempleOS calls $LK,"that",A="FI:::/Kernel/BIOS32.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
+* TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few $FG,2$BIOS$FG$ info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX,"PCI BIOS",HTML="http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for $FG,2$PCI$FG$ config space access.  TempleOS calls $LK,"that",A="FI:::/Kernel/PCIBIOS.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
 
 * $FG,2$PUSH EAX$FG$ : All stack operations in 64-bit mode are 64-bits.
 

@@ -10,13 +10,13 @@ I64 sys_num_spawned_tasks;
 CTask *sys_winmgr_task,*sys_task_being_screen_updated;
 U8 *reverse_bits_table, //Table with U8 bits reversed
    *set_bits_table; //Table with count of set bits in a U8
-CDate local_time_offset=0;
+CDate local_time_offset;
 F64 *pow10_I64;
 
 CSndGlbls	snd;
 CCntsGlbls	cnts={1,0,2676302000,2676302,2676302000,0,0,0,FALSE};
 CIPStateGlbls	ip,ip_last;
-CGridGlbls	ip_grid;
+CGridGlbls	ip_grid; //See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
 CMouseStateGlbls mouse,mouse_last;
 CKbdStateGlbls	kbd;
 CKeyDevGlbls	keydev;

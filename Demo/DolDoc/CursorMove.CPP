@@ -8,9 +8,9 @@ U0 CursorMovementDemo()
       "$$CM,4,-10$$";
   }
 
-//+LX is relative to left side.
-//See <CTRL-l> with cursor-movement for all the flags.
-//Check "Quote" to set-up a cmd for in quotes.
+  //+LX is relative to left side.
+  //See <CTRL-l> with cursor-movement for all the flags.
+  //Check "Quote" to set-up a cmd for in quotes.
   "$$CM+LX,0,+10$$\n";
 }
 

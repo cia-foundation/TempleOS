@@ -39,7 +39,7 @@ U0 SpanBridge1Init(CMathODE *)
 
   for (i=0;i<LOAD_WEIGHTS;i++) {
     tempm=PlaceMass(FIXED_X1+(i+1)*(GR_WIDTH-2*FIXED_X1)/(LOAD_WEIGHTS+1),
-		    FIXED_Y1);
+	  FIXED_Y1);
     tempm->load_t=(i+1.0)/LOAD_WEIGHTS;
     tempm->color=RED;
   }

@@ -97,35 +97,34 @@ U0 DefinePrint(U8 *name,U8 *src,...)
 U0 SysDefinesLoad()
 {
   DefineLstLoad("ST_OFF_ON","Off\0On\0");
-  DefineLstLoad("ST_HTT_TYPES","ExportSysSym\0ImportSysSym\0DefineStr\0GlbVar\0Class\0"
-		"IntType\0Funct\0Word\0DictWord\0KeyWord\0AsmKeyWord\0OpCode\0Reg\0"
-		"File\0Module\0HelpFile\0Frame Ptr\0"
-		" \0 \0 \0 \0 \0 \0"
-		"Private\0Public\0Export\0Import\0Imm\0Goto\0Res\0Unres\0Local\0");
+  DefineLstLoad("ST_HTT_TYPES","ExportSysSym\0ImportSysSym\0DefineStr\0GlbVar\0"
+	"Class\0IntType\0Funct\0Word\0DictWord\0KeyWord\0AsmKeyWord\0OpCode\0"
+	"Reg\0File\0Module\0HelpFile\0Frame Ptr\0 \0 \0 \0 \0 \0 \0Private\0"
+	"Public\0Export\0Import\0Imm\0Goto\0Res\0Unres\0Local\0");
   DefineLstLoad("ST_DAYS_OF_WEEK","Sunday\0Monday\0Tuesday\0Wednesday\0"
-		"Thursday\0Friday\0Saturday\0");
+	"Thursday\0Friday\0Saturday\0");
   DefineLstLoad("ST_MONTHS","January\0February\0March\0April\0May\0"
-		"June\0July\0August\0September\0October\0November\0December\0");
+	"June\0July\0August\0September\0October\0November\0December\0");
   DefineLstLoad("ST_FILE_ATTRS","R\0H\0S\0V\0D\0A\0 \0 \0X\0T\0Z\0C\0F\0");
   DefineLstLoad("ST_FILE_UTIL_FLAGS","r\0d\0i\0a\0c\0R\0p\0m\0x\0s\0"
-		"D\0F\0T\0S\0A\0J\0G\0Z\0O\0P\0f\0l\0lb\0la\0");
+	"D\0F\0T\0S\0A\0J\0G\0Z\0O\0P\0f\0l\0lb\0la\0");
   DefineLstLoad("ST_BLKDEV_TYPES","NULL\0RAM\0ATA\0ATAPI\0");
-  DefineLstLoad("ST_DRV_TYPES","NULL\0REDSEA\0FAT32\0ISO9660\0ISO13490\0ISO13346\0NTFS\0UNKNOWN\0");
+  DefineLstLoad("ST_DRV_TYPES",
+	"NULL\0REDSEA\0FAT32\0ISO9660\0ISO13490\0ISO13346\0NTFS\0UNKNOWN\0");
   DefineLstLoad("ST_COLORS","BLACK\0BLUE\0GREEN\0CYAN\0"
 	"RED\0PURPLE\0BROWN\0LTGRAY\0DKGRAY\0LTBLUE\0LTGREEN\0"
 	"LTCYAN\0LTRED\0LTPURPLE\0YELLOW\0WHITE\0");
-  DefineLstLoad("ST_INT_NAMES",
-	"Divide Error\0SingleStep\0NMI\0Breakpoint\0Overflow\0BOUND Range Exceeded\0Invalid Opcode\0No Math Coprocessor\0"
-	"Double Fault\0Coprocessor Segment Fault\0Invalid TASK\0Segment Not Present\0Stk Segment Fault\0General Protection\0Page Fault\0 \0"
-	"Math Fault\0Alignment Check\0Machine Check\0SIMD Exception\0 \0 \0 \0 \0"
-	" \0 \0 \0 \0 \0 \0 \0 \0"
-	" \0 \0 \0 \0 \0 \0 \0 \0"
-	" \0 \0 \0 \0 \0 \0 \0 \0"
-	"MP Crash\0Wake\0Dbg\0");
+  DefineLstLoad("ST_INT_NAMES","Divide Error\0SingleStep\0NMI\0Breakpoint\0"
+	"Overflow\0BOUND Range Exceeded\0Invalid Opcode\0No Math Coprocessor\0"
+	"Double Fault\0Coprocessor Segment Fault\0Invalid TASK\0"
+	"Segment Not Present\0Stk Segment Fault\0General Protection\0"
+	"Page Fault\0 \0Math Fault\0Alignment Check\0Machine Check\0"
+	"SIMD Exception\0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0"
+	" \0 \0 \0 \0 \0 \0 \0 \0 \0 \0 \0MP Crash\0Wake\0Dbg\0");
 }
 
 U8 *Color2Str(U8 *buf,CColorROPU32 c)
-{//$LK,"CColorROPU32",A="MN:CColorROPU32"$ with flags to $LK,"GrLighting",A="MN:GrLighting"$ str.
+{//$LK,"CColorROPU32",A="MN:CColorROPU32"$ with flags to $LK,"DCLighting",A="MN:DCLighting"$ str.
   *buf=0;
   if (c.c0.rop&ROPBF_TWO_SIDED)
     CatPrint(buf,"TWO|");
@@ -153,18 +152,20 @@ U8 *Color2Str(U8 *buf,CColorROPU32 c)
   return buf;
 }
 
+U8 *str2color_lst="/,)}>";
+
 CColorROPU16 Str2ColorU16(U8 *st)
-{//$LK,"GrLighting",A="MN:GrLighting"$ color str with flags to $LK,"CColorROPU16",A="MN:CColorROPU16"$.
+{//$LK,"DCLighting",A="MN:DCLighting"$ color str with flags to $LK,"CColorROPU16",A="MN:CColorROPU16"$.
   CColorROPU16 result=COLOR_INVALID;
   I64 i;
   U8 *ptr,*ptr2,*st2;
   if (!st) return COLOR_INVALID;
   while (TRUE) {
-    if (!*st||StrOcc("/,)}>",*st))
+    if (!*st||StrOcc(str2color_lst,*st))
       return result;
-    if (Bt(chars_bitmap_alpha,*st)) {
+    if (Bt(chars_bmp_alpha,*st)) {
       ptr=st;
-      while (Bt(chars_bitmap_alpha_numeric,*ptr))
+      while (Bt(chars_bmp_alpha_numeric,*ptr))
 	ptr++;
       st2=ptr2=MAlloc(ptr-st+1);
       while (st<ptr)
@@ -183,7 +184,7 @@ CColorROPU16 Str2ColorU16(U8 *st)
 	return COLOR_INVALID;
       }
       Free(st2);
-    } else if (*st=='+'||*st=='|'||Bt(chars_bitmap_white_space,*st))
+    } else if (*st=='+'||*st=='|'||Bt(chars_bmp_white_space,*st))
       st++;
     else if ('0'<=*st<='9') {
       i=Str2I64(st,10,&ptr);
@@ -198,12 +199,12 @@ CColorROPU16 Str2ColorU16(U8 *st)
 }
 
 CColorROPU32 Str2ColorU32(U8 *st)
-{//$LK,"GrLighting",A="MN:GrLighting"$ color str with flags to $LK,"CColorROPU32",A="MN:CColorROPU32"$.
+{//$LK,"DCLighting",A="MN:DCLighting"$ color str with flags to $LK,"CColorROPU32",A="MN:CColorROPU32"$.
   U8 *st2;
   CColorROPU32 result=0;
   if (!st) return COLOR_INVALID;
   st2=MAlloc(StrLen(st)+1);
-  StrFirstRem(st,"/,)}>",st2);
+  StrFirstRem(st,str2color_lst,st2);
   result.c0=Str2ColorU16(st2);
   if (*st) {
     result.c1=Str2ColorU16(st);

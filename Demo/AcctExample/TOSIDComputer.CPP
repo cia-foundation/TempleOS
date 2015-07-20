@@ -7,7 +7,7 @@ Bool IsDrvVMware(U8 drv_let)
   U8 *m=NULL;
   try
     if ((m=DrvModelNum(drv_let)) &&
-	!MemCmp(m,"VMware",6))
+	  !MemCmp(m,"VMware",6))
       result=TRUE;
   catch
     Fs->catch_except=TRUE;
@@ -32,8 +32,8 @@ I64 IsDrvATAPI(U8 drv_let)
   Bool result=FALSE;
   CBlkDev *bd;
   try if ((bd=Let2BlkDev(drv_let)) &&
-	bd->type==BDT_ATAPI)
-	result=TRUE;
+	  bd->type==BDT_ATAPI)
+      result=TRUE;
   catch
     Fs->catch_except=TRUE;
   return result;

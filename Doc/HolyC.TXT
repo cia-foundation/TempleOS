@@ -144,7 +144,7 @@ $ID,-2$
 
 $ID,2$$FG,2$U0 Main()
 {
-  //Only use $LK,"REG_VARS_MASK",A="MN:REG_VARS_MASK"$ or $LK,"REG_NON_PTR_MASK",A="MN:REG_NON_PTR_MASK"$ for reg vars or else clobbered.
+  //Only use $LK,"REGG_C_LOCAL_VARS",A="MN:REGG_C_LOCAL_VARS"$ or $LK,"REGG_C_LOCAL_NON_PTR_VARS",A="MN:REGG_C_LOCAL_NON_PTR_VARS"$ for reg vars or else clobbered.
   I64 reg R15 i=5, noreg j=4;
   nounusedwarn i;
   asm {
@@ -214,9 +214,9 @@ $FG$$ID,-2$
 
 * $FG,2$union$FG$ is more like a class, so you don't reference it with a $FG,2$union$FG$ label after you define it.  Some common unions are declared in $LK,"KernelA.HPP",A="MN:U16"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.  See $LK,"::/Demo/SubIntAccess.CPP"$. 
 
-* $FG,2$class$FG$ member vars can have meta data. $FG,2$fmtstr$FG$ and $FG,2$fmtdata$FG$ are two meta data types now used.  All compiler structures are saved and you can access the compiler's info about classes and vars.  See $LK,"::/Demo/ClassMeta.CPP"$ and  $LK,"DocFormDo",A="MN:DocFormDo"$().
+* $FG,2$class$FG$ member vars can have meta data. $FG,2$fmtstr$FG$ and $FG,2$fmtdata$FG$ are two meta data types now used.  All compiler structures are saved and you can access the compiler's info about classes and vars.  See $LK,"::/Demo/ClassMeta.CPP"$ and  $LK,"DocForm",A="MN:DocForm"$().
 
-* There is a keyword $FG,2$lastclass$FG$ you use as a dft arg.  It is set to the class name of the previous arg.  See $LK,"::/Demo/LastClass.CPP"$, $LK,"ClassRep",A="MN:ClassRep"$(), $LK,"DocFormDo",A="MN:DocFormDo"$()  and $LK,"::/Demo/Dsk/BlkDevRep.CPP"$.
+* There is a keyword $FG,2$lastclass$FG$ you use as a dft arg.  It is set to the class name of the previous arg.  See $LK,"::/Demo/LastClass.CPP"$, $LK,"ClassRep",A="MN:ClassRep"$(), $LK,"DocForm",A="MN:DocForm"$()  and $LK,"::/Demo/Dsk/BlkDevRep.CPP"$.
 
 * See $LK,"::/Demo/Exceptions.CPP"$.  $FG,2$try{} catch{}$FG$ and $FG,2$throw$FG$ are different from C++. $FG,2$throw$FG$ is a function with an 8-byte or less char arg.  The char string passed in $FG,2$throw()$FG$ can be accessed from within a $FG,2$catch{}$FG$ using the $FG,2$Fs->except_ch$FG$.  Within a $FG,2$catch {}$FG$ blk, set the var $FG,2$Fs->catch_except$FG$ to $FG,2$TRUE$FG$ if you want to terminate the search for a handler.  Use $LK,"PutExcept",A="MN:PutExcept"$() as a handler, if you like.
 

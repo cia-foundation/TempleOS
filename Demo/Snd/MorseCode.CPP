@@ -146,7 +146,7 @@ U0 Morse()
 
   //We don't want the tag call back
   //called before we set it, so preempt off.
-  old_preempt=Preempt(OFF);
+  old_preempt=Preempt;
   doc_e=DocPrint(DocPut,"$$TX+TC,\" \"$$");
   doc_e->tag_cb=&MorseTimes;
   Preempt(old_preempt);

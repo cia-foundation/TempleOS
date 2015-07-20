@@ -81,11 +81,12 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	    cnt++;
 	  break;
 	case DOCT_TEXT://$BK,1$Update $LK,"DOCT_TEXT",A="FF:D:/Compiler/Lex.CPP,DOCT_TEXT"$$BK,0$
-	  if (!(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
-	      !(doc_e->type&DOCG_BL_IV_UL)) {
+	  if (!(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
+		DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))&&
+		!(doc_e->type&DOCG_BL_IV_UL)) {
 	    cnt+=StrLen(doc_e->tag);
 	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_WITH_TABS)) ||
-	      doc->flags&DOCF_DBL_DOLLARS)
+		  doc->flags&DOCF_DBL_DOLLARS)
 	      cnt+=StrOcc(doc_e->tag,'$$');
 	  } else {
 	    st=Doc2PlainText(doc,doc_e);
@@ -95,39 +96,42 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	  break;
 	default:
 	  if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE &&
-	      doc_e->type_u8!=DOCT_CURSOR) {
+		doc_e->type_u8!=DOCT_CURSOR) {
 	    st=Doc2PlainText(doc,doc_e);
 	    cnt+=StrLen(st)+2;
 	    Free(st);
 	  }
-       }
+      }
     }
   }
   for (b=doc->bin_root.next;b!=&doc->bin_root;b=b->next) {
     if (b->use_cnt>b->temp_use_cnt)
       cnt+=offset(CDocBin.end)-
-	   offset(CDocBin.start)+b->size;
+	    offset(CDocBin.start)+b->size;
   }
   result=MAlloc(cnt);
   dst=result;
   for (doc_e=doc->root.next;doc_e!=doc;doc_e=doc_e->next) {
     if (!Bt(doldoc.type_flags_data,doc_e->type_u8)) {
       if (doc_e->type_u8==DOCT_TEXT &&
-	!(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
-	!(doc_e->type&DOCG_BL_IV_UL)) {
+	    !(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
+	    DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	    !(doc_e->type&DOCG_BL_IV_UL)) {
 	src=doc_e->tag;
 	i=0;
 	while (ch=*src++) {
-	  if (doc_e==doc->cur_entry && i++==doc->cur_data_col && !(doc->flags&DOCF_NO_CURSOR))
+	  if (doc_e==doc->cur_entry && i++==doc->cur_col &&
+		!(doc->flags&DOCF_NO_CURSOR))
 	    *dst++=CH_CURSOR;
 	  *dst++=ch;
 	  if (ch=='$$') {
 	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_WITH_TABS)) ||
-	      doc->flags&DOCF_DBL_DOLLARS)
+		  doc->flags&DOCF_DBL_DOLLARS)
 	      *dst++=ch;
 	  }
 	}
-	if (doc_e==doc->cur_entry && i++==doc->cur_data_col && !(doc->flags&DOCF_NO_CURSOR))
+	if (doc_e==doc->cur_entry && i++==doc->cur_col &&
+	      !(doc->flags&DOCF_NO_CURSOR))
 	  *dst++=CH_CURSOR;
       } else {
 	if (doc_e==doc->cur_entry && !(doc->flags&DOCF_NO_CURSOR))
@@ -146,7 +150,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	    break;
 	  default:
 	    if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE &&
-		doc_e->type_u8!=DOCT_CURSOR) {//(Cursor is set by cur_entry)
+		  doc_e->type_u8!=DOCT_CURSOR) {//(Cursor is set by cur_entry)
 	      *dst++='$$';
 	      st=Doc2PlainText(doc,doc_e);
 	      StrCpy(dst,st);
@@ -158,7 +162,8 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
       }
     }
   }
-  if (doc->cur_entry==doc && doc->root.next!=doc && !(doc->flags&DOCF_NO_CURSOR))
+  if (doc->cur_entry==doc && doc->root.next!=doc &&
+	!(doc->flags&DOCF_NO_CURSOR))
     *dst++=CH_CURSOR;
   *dst++=0;
   if (*result==CH_CURSOR) {
@@ -189,7 +194,7 @@ public Bool DocWrite(CDoc *doc,Bool prompt=FALSE)
 {//Store doc to disk.
   I64 size;
   U8 *buf;
-  if (prompt && !DocFormDo(&doc->filename) ||
+  if (prompt && !DocForm(&doc->filename) ||
 	doc->filename.name[0]=='A' && doc->filename.name[2]==':')
     return FALSE;  //CANCEL || LK_DOC,LK_DOC_ANCHOR,LK_DOC_FIND,LK_DOC_LINE?
   buf=DocSave(doc,&size);
@@ -207,18 +212,18 @@ public U0 DocInsDoc(CDoc *doc=NULL,CDoc *doc2)
   CDocEntry *doc_ne,*doc_e=doc2->root.next,*doc_ce;
   if (!doc) doc=DocPut;
   unlock_doc=DocLock(doc),
-  DocRemSoftNewLines(doc,NULL);
+	DocRemSoftNewLines(doc,NULL);
   doc_ce=doc->cur_entry;
-  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_data_col>doc_ce->min_col) {
-    if (doc->cur_data_col<doc_ce->max_col) {
-      dst=doc_ce->tag+doc->cur_data_col;
+  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_col>doc_ce->min_col) {
+    if (doc->cur_col<doc_ce->max_col) {
+      dst=doc_ce->tag+doc->cur_col;
       doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
       *dst=0;
       doc_ne->type=DOCT_TEXT | doc_ce->type & 0xFFFFFF00;
-      doc_ce->max_col=doc->cur_data_col;
+      doc_ce->max_col=doc->cur_col;
       QueIns(doc_ne,doc_ce);
       doc->cur_entry=doc_ne;
-      doc->cur_data_col=doc_ne->min_col;
+      doc->cur_col=doc_ne->min_col;
     } else
       if (doc_ce!=doc)
 	doc->cur_entry=doc_ce->next;
@@ -247,7 +252,7 @@ public U0 EdCopyToClipboard(CDoc *doc)
 {//Copy $LK,"DOCET_SELECTED",A="MN:DOCET_SELECTED"$ flagged entries to clipboard.
   CDoc *doc2=sys_clipboard_doc;
   Bool unlock_doc=DocLock(doc),
-	 unlock_doc2=DocLock(doc2);
+	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_e=doc->root.next,*doc_ne;
   ClipboardDel;
   while (doc_e!=doc) {
@@ -270,7 +275,7 @@ public U0 EdCutToClipboard(CDoc *doc)
 {//Remove selected entries and place on clipboard.
   CDoc *doc2=sys_clipboard_doc;
   Bool unlock_doc=DocLock(doc),
-	 unlock_doc2=DocLock(doc2);
+	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_e=doc->root.next,*doc_e1,*doc_ne,*doc_e2=NULL;
   ClipboardDel;
   while (doc_e!=doc) {
@@ -289,7 +294,7 @@ public U0 EdCutToClipboard(CDoc *doc)
   }
   if (doc_e2) {
     doc->cur_entry=doc_e2;
-    doc->cur_data_col=doc_e2->min_col;
+    doc->cur_col=doc_e2->min_col;
   }
   DocRemSoftNewLines(doc,NULL);
   if (unlock_doc2)
@@ -302,7 +307,7 @@ public U0 EdPasteClipboard(CDoc *doc)
 {//Insert copy of clipboard at insert pt, cur_entry.
   CDoc *doc2=sys_clipboard_doc;
   Bool unlock_doc=DocLock(doc),
-      unlock_doc2=DocLock(doc2);
+	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
   if (doc_ce->type_u8==DOCT_DATA) {
     doc_e=doc2->root.next;
@@ -327,7 +332,7 @@ public U0 DocCut(CDoc *doc,CDocEntry *start,CDocEntry *end)
     doc_e1=start->next;
     if (start==doc->cur_entry) {
       doc->cur_entry=start->next;
-      doc->cur_data_col=doc->cur_entry->min_col;
+      doc->cur_col=doc->cur_entry->min_col;
     }
     DocEntryDel(doc,start);
     if (start==end)
@@ -389,7 +394,8 @@ Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
     unlock=DocLock(doc);
     time_stamp=GetTSC;
     if (doc->flags&DOCF_UNDO_DIRTY &&
-	time_stamp>doc->undo_root.last->time_stamp+cnts.time_stamp_freq<<4 || force) {
+	  time_stamp>doc->undo_root.last->time_stamp+cnts.time_stamp_freq<<4 ||
+	  force) {
       u=CAlloc(sizeof(CDocUndo),doc->mem_task);
       u->time_stamp=time_stamp;
       u->body=DocSave(doc,&u->size);
@@ -427,8 +433,8 @@ U0 DocUndoRestore(CDoc *doc)
     DocUnlock(doc);
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;DolDoc/Output"
-
+#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;"\
+	"DolDoc/Output;StdOut/DolDoc"
 public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to document.
   Bool result=FALSE;
@@ -455,8 +461,9 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   return result;
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;File/Cmd Line (Typically);DolDoc/Cmd Line (Typically);Cmd Line (Typically)"
-
+#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;"\
+	"File/Cmd Line (Typically);DolDoc/Cmd Line (Typically);"\
+	"StdOut;Cmd Line (Typically)"
 public Bool Type(U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to command line.
   return DocType(,filename,trailing_new_lines);

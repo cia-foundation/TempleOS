@@ -47,13 +47,13 @@ U0 DoIt2()
   "i&0xFFFFFFFF=%X\n",i&0xFFFFFFFF;
   "i>>32       =%X\n",i>>32;
 
-/*  Standard integer types are declared
-  with a special compiler feature which
-  allows a structure to be accessed as a
-  whole.  That's why the i variable can
-  be accessed normally in addition to
-  structure member access $LK,"I64",A="MN:I64"$.  The actual
-  intrinsic compiler type is U64i.
+  /*  Standard integer types are declared
+with a special compiler feature which
+allows a structure to be accessed as a
+whole.  That's why the i variable can
+be accessed normally in addition to
+structure member access $LK,"I64",A="MN:I64"$.  The actual
+intrinsic compiler type is U64i.
 
 public U64i union I64
 {
@@ -65,10 +65,10 @@ public U64i union I64
   U32 u32[2];
 };
 
-  It's not quite as great as it seems
-  because the compiler decides it cannot
-  place i into a reg, so there is a
-  penalty.
+It's not quite as great as it seems
+because the compiler decides it cannot
+place i into a reg, so there is a
+penalty.
 
 For a complete lst of nonstandard compiler
 features, see $LK,"::/Doc/HolyC.TXT"$.

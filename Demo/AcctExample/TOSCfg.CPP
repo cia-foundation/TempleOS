@@ -3,17 +3,18 @@ U0 TOSBootRescueDrv1()
 {
   CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
-  DefinePrint("TOS_BOOT_RESCUE_DRV","0x%X",CeilI64(SYS_KERNEL_END+SLOP,BLK_SIZE));
+  DefinePrint("TOS_BOOT_RESCUE_DRV","0x%X",
+	CeilI64(SYS_KERNEL_END+SLOP,BLK_SIZE));
   DefinePrint("TOS_BOOT_RESCUE_DRV_END",  "0x%X",FloorI64(
-    (BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4<<4-
-    (bfh(I64)-SYS_KERNEL_END)-SLOP,BLK_SIZE));
+	(BOOT_RAM_LIMIT-(BOOT_STK_SIZE+CD_BOOT_LOADER_SIZE))>>4<<4-
+	(bfh(I64)-SYS_KERNEL_END)-SLOP,BLK_SIZE));
   DefinePrint("CFG_BOOT_RESCUE_DRV_FILE","\"/Temp/BootRescueDrv.BIN.Z\"");
 } TOSBootRescueDrv1;
 
 U0 TOSBootRescueDrv2()
 {
   DefinePrint("CFG_BOOT_RESCUE_DRV","\"a10x%X\n0x%X\n\"",TOS_BOOT_RESCUE_DRV,
-    (TOS_BOOT_RESCUE_DRV_END-TOS_BOOT_RESCUE_DRV)/BLK_SIZE);
+	(TOS_BOOT_RESCUE_DRV_END-TOS_BOOT_RESCUE_DRV)/BLK_SIZE);
   DefinePrint("CFG_BOOT_RESCUE_DRV_START","\"0x%X\"",TOS_BOOT_RESCUE_DRV);
 } TOSBootRescueDrv2;
 
@@ -23,9 +24,10 @@ U0 TOSInit()
   CBlkDev *bd;
   switch (tos_cid) {
     case CID_DFT:
-      DefinePrint("CFG_RAM_DRVS","\"b1\nScale2Mem(2048,0x280000,4*1024*1024*1024)\n\"");
+      DefinePrint("CFG_RAM_DRVS",
+	    "\"b1\nScale2Mem(2048,0x280000,4*1024*1024*1024)\n\"");
       if (dsk.auto_mount_ide_cnt) {
-	//If AutoMount was successful, No need to manually mount in next compile
+//If AutoMount was successful, No need to manually mount in next compile
 	DefinePrint("CFG_HARD_DRVS","\"\"");
 	DefinePrint("CFG_CDROM_DRVS","\"\"");
       } else {
@@ -46,7 +48,7 @@ U0 TOSInit()
 	  try {
 	    bd=Let2BlkDev('C');
 	    DefinePrint("CFG_HARD_DRVS","\"c2s0x%X\n0x%X\n%d\"",
-	      bd->base0,bd->base1,bd->unit);
+		  bd->base0,bd->base1,bd->unit);
 	  } catch
 	    Fs->catch_except=TRUE;
 	  try {
@@ -78,7 +80,11 @@ U0 TOSDrvTextAttrSet()
 			"HeapInit\n130\nMemInit\n131\nVarInit\n132\n\n"
 #define CFG_DBGZ_OPTS	"AutoMountIDE\nCT"\
 			"HeapInit\n0\nMemInit\n0\nVarInit\n0\n\n"
-#define TOS_CFG		"\n" CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS "\n" CFG_DSK_CACHE CFG_OPTS
+#define TOS_CFG		"\n" CFG_RAM_DRVS CFG_CDROM_DRVS CFG_HARD_DRVS "\n"\
+			CFG_DSK_CACHE CFG_OPTS
 #define TOS_CDROM_CFG	"Tb1\n0x20000\nt3 \n\n\nAutoMountIDE\nCT\n"
-#define TOS_CDROM_DBG_CFG "A" CFG_BOOT_RESCUE_DRV "b1\nScale2Mem(2048,0x40000)\n\n\n"\
-			"DontProbe\nBootRescueDrv\n" "C:" CFG_BOOT_RESCUE_DRV_FILE "\n" CFG_BOOT_RESCUE_DRV_START "\n\n"
+#define TOS_CDROM_DBG_CFG "A" CFG_BOOT_RESCUE_DRV\
+			"b1\nScale2Mem(2048,0x40000)\n\n\n"\
+			"DontProbe\nBootRescueDrv\n"\
+			"C:" CFG_BOOT_RESCUE_DRV_FILE "\n"\
+			CFG_BOOT_RESCUE_DRV_START "\n\n"

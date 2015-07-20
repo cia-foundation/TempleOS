@@ -2,12 +2,11 @@
 #include "BootHD"
 #include "BootMHD"
 #include "BootMHD2"
-#include "DskCDDVD"
+#include "DskISOFile"
 #include "BootIns"
 
 #help_index "Call"
 asm {
-USE64
 _HI_CALL::
 	PUSH	RBP
 	MOV	RBP,RSP
@@ -34,14 +33,15 @@ _HI_MEMCPY::
 	POP	RBP
 	RET1	24
 }
-_extern _HI_CALL I64 HiCall(U8 *s);
+_extern _HI_CALL I64 HiCall(U8 *machine_code);
 _extern _HI_MEMCPY U8 *HiMemCpy(U8 *dst,U8 *src,I64 cnt);
 
 #help_index "Boot"
 public U0 RAMReboot(U8 *filename)
 {//Softboot Kernel Bin file. No hardware reset.
   I64 size;
-  CKernel *hi_image,*lo_image=sys_boot_base-sizeof(CBinFile),reg *sys_ram_reboot;
+  CKernel *hi_image,*lo_image=sys_boot_base-sizeof(CBinFile),
+	reg *sys_ram_reboot;
 
   do if (!(hi_image=FileRead(filename,&size))) return;
   while (hi_image<0x100000);
@@ -52,7 +52,8 @@ public U0 RAMReboot(U8 *filename)
   hi_image->boot_src=BOOT_SRC_RAM;
   hi_image->boot_patch_table_base=lo_image(U8 *)+hi_image->h.patch_table_offset;
   hi_image->sys_run_level =lo_image->sys_run_level&(RLF_VGA|RLF_16BIT);
-  MemCpy(&hi_image->start,&lo_image->start,sizeof(CKernel)-offset(CKernel.start));
+  MemCpy(&hi_image->start,&lo_image->start,
+	sizeof(CKernel)-offset(CKernel.start));
 
   CLI
   if (mp_cnt>1)

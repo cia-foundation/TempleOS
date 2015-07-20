@@ -11,28 +11,28 @@ I64 Compare(F64 e1,F64 e2)
 
 U0 F64FileSortTXT(U8 *in_name,U8 *out_name)
 {
-  CLex *lx;
+  CCmpCtrl *cc;
   I64 i,n;
   F64 *a;
   CDoc *doc;
 
   //Pass1: Count the number of F64s.
   n=0;
-  lx=LexNew(MStrPrint("#include \"%s\"",in_name));
-  while (Lex(lx))
-    if (lx->token==TK_F64)
+  cc=CmpCtrlNew(MStrPrint("#include \"%s\"",in_name));
+  while (Lex(cc))
+    if (cc->token==TK_F64)
       n++;
-  LexDel(lx);
+  CmpCtrlDel(cc);
 
   a=MAlloc(n*sizeof(F64));
 
   //Pass2: Read F64s.
   i=0;
-  lx=LexNew(MStrPrint("#include \"%s\"",in_name));
-  while (Lex(lx))
-    if (lx->token==TK_F64)
-      a[i++]=lx->cur_f64;
-  LexDel(lx);
+  cc=CmpCtrlNew(MStrPrint("#include \"%s\"",in_name));
+  while (Lex(cc))
+    if (cc->token==TK_F64)
+      a[i++]=cc->cur_f64;
+  CmpCtrlDel(cc);
 
   QSortI64(a,n,&Compare); //Sort 64-bit sized values
 

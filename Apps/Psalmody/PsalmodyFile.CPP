@@ -23,7 +23,7 @@ U0 PsmSongDel(PsmNote *root)
     PsmNoteDel(tempo);
     tempo=tempo1;
   }
-  root->next=root->last=root;
+  QueInit(root);
 }
 
 U0 PsmCutToClipboard()
@@ -202,22 +202,22 @@ U0 PsmLoadSong(U8 *filename,I64 *psm_octave,F64 *psm_duration)
 {
   U8 *st;
   PsmNote *tempo;
-  CLex *lx=LexNew(MStrPrint("#include \"%s\"",filename));
+  CCmpCtrl *cc=CmpCtrlNew(MStrPrint("#include \"%s\"",filename));
   if (FileOcc("incomplete",filename,""))
     oc.incomplete_entry->checked=TRUE;
   else
     oc.incomplete_entry->checked=FALSE;
-  while (Lex(lx)) {
-    if (lx->token==TK_IDENT)
-      if (!StrCmp(lx->cur_str,"Play")) {
-	if (Lex(lx)=='(')
-	  if (Lex(lx)==TK_STR) {
+  while (Lex(cc)) {
+    if (cc->token==TK_IDENT)
+      if (!StrCmp(cc->cur_str,"Play")) {
+	if (Lex(cc)=='(')
+	  if (Lex(cc)==TK_STR) {
 	    tempo=oc.root.last;
-	    st=LexExtStr(lx);
+	    st=LexExtStr(cc);
 	    PsmLoadSongStr(st,psm_octave,psm_duration);
-	    if (lx->token==',') {
-	      if (Lex(lx)==TK_STR) {
-		st=LexExtStr(lx);
+	    if (cc->token==',') {
+	      if (Lex(cc)==TK_STR) {
+		st=LexExtStr(cc);
 		do {
 		  do tempo=tempo->next;
 		  while (tempo!=&oc.root && tempo->type==PSMT_METER);
@@ -228,19 +228,23 @@ U0 PsmLoadSong(U8 *filename,I64 *psm_octave,F64 *psm_duration)
 	      }
 	    }
 	  }
-      } else if (!StrCmp(lx->cur_str,"music.tempo")) {
-	if (Lex(lx)=='=' && Lex(lx)==TK_F64) {
-	  music.tempo=lx->cur_f64-0.0005;
-	  tempo_state.tempo=Round(TEMPO_RANGE*(music.tempo-0.5)/4.4);
-	}
-      } else if (!StrCmp(lx->cur_str,"music.stacatto_factor")) {
-	if (Lex(lx)=='=' && Lex(lx)==TK_F64) {
-	  music.stacatto_factor=lx->cur_f64-0.0005;
-	  tempo_state.stacatto=Round(TEMPO_RANGE*(music.stacatto_factor-0.12)/0.88);
+      } else if (!StrCmp(cc->cur_str,"music") &&
+	    Lex(cc)=='.' && Lex(cc)==TK_IDENT) {
+	if (!StrCmp(cc->cur_str,"tempo")) {
+	  if (Lex(cc)=='=' && Lex(cc)==TK_F64) {
+	    music.tempo=cc->cur_f64-0.0005;
+	    tempo_state.tempo=Round(TEMPO_RANGE*(music.tempo-0.5)/4.4);
+	  }
+	} else if (!StrCmp(cc->cur_str,"stacatto_factor")) {
+	  if (Lex(cc)=='=' && Lex(cc)==TK_F64) {
+	    music.stacatto_factor=cc->cur_f64-0.0005;
+	    tempo_state.stacatto=
+		  Round(TEMPO_RANGE*(music.stacatto_factor-0.12)/0.88);
+	  }
 	}
       }
   }
-  LexDel(lx);
+  CmpCtrlDel(cc);
 }
 
 U8 *PsmCvtSong()
@@ -327,7 +331,7 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
   F64 measure_len=4,two_measure_left=2*measure_len;
   I64 ch;
   U8 *ptr;
- 
+
   Free(PsmCvtSong); //set tempo->ascii;
 
   music.tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
@@ -347,15 +351,15 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
     DocPrint(doc,"//0 no nothing\n");
 
   DocPrint(doc,
-"U0 Song()\n"
-"{\n"
-"  Fs->task_end_cb=&SndTaskEndCB;\n"
-"  MusicSettingsRst;\n"
-"  music.tempo=%6.3f;\n"
-"  music.stacatto_factor=%6.3f;\n"
-"  try {\n"
-"    while (!ScanKey) {\n"
-"\tPlay(\"",music.tempo+0.0005,music.stacatto_factor+0.0005);
+	"U0 Song()\n"
+	"{\n"
+	"  Fs->task_end_cb=&SndTaskEndCB;\n"
+	"  MusicSettingsRst;\n"
+	"  music.tempo=%6.3f;\n"
+	"  music.stacatto_factor=%6.3f;\n"
+	"  try {\n"
+	"    while (!ScanKey) {\n"
+	"\tPlay(\"",music.tempo+0.0005,music.stacatto_factor+0.0005);
 
   tempo=oc.root.next;
   tempo1=tempo;
@@ -388,7 +392,7 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
 	}
       }
       DocPrint(doc,"\");\n"
-		"\tPlay(\"");
+	    "\tPlay(\"");
       two_measure_left=2*measure_len;
       tempo1=tempo;
       has_words=FALSE;
@@ -412,13 +416,13 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
     }
   }
   DocPrint(doc,"\");\n"
-"    }\n"
-"  } catch\n"
-"    PutExcept;\n"
-"  Snd(0);\n"
-"}\n"
-"\n"
-"Song;\n");
+	"    }\n"
+	"  } catch\n"
+	"    PutExcept;\n"
+	"  Snd(0);\n"
+	"}\n"
+	"\n"
+	"Song;\n");
   DocRecalc(doc);
   if (full_filename)
     Free(full_filename);

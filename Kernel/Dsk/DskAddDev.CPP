@@ -10,8 +10,8 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
       for (i=0;i<NUM_BLKDEVS;i++) {
 	bd1=&dsk.blkdevs[i];
 	if (bd1->bd_signature==BD_SIGNATURE_VAL && bd!=bd1 &&
-	    (bd1->type==BDT_ATAPI || bd1->type==BDT_ATA) &&
-	    bd1->base0==bd->base0) {
+	      (bd1->type==BDT_ATAPI || bd1->type==BDT_ATA) &&
+	      bd1->base0==bd->base0) {
 	  bd->lock_fwding=bd1;
 	  break;
 	}
@@ -39,12 +39,12 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
       dv->dv_signature=DRV_SIGNATURE_VAL;
       dv->type=DVT_REDSEA;
 //This is to force creation of a RAM
-//drive during boot, so it is probably
-//MAlloced to the same addr and can
-//be assumed to be already formatted.
-//If this line is removed, RAM Drives
-//will be alloced on a just-in-time
-//basis.
+      //drive during boot, so it is probably
+      //MAlloced to the same addr and can
+      //be assumed to be already formatted.
+      //If this line is removed, RAM Drives
+      //will be alloced on a just-in-time
+      //basis.
       if (BlkDevInit(bd))
 	result++;
       else
@@ -61,7 +61,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	  result++;
 	  dv->type=DVT_REDSEA;
 	  dv->size=bd->max_blk+1;
-	  //The following read is a test read.
+//The following read is a test read.
 	  //if it hangs, the drive is not supported.
 	  ATAReadBlks(bd,&mbr,0,1);
 	  break;
@@ -174,24 +174,24 @@ U0 Mount(Bool repartition=FALSE)
 {//Mount a drive.
   CBlkDev *bd;
   I64 first_drv_num,type,unit,num_hints;
-  U8 blks_buf[128],addr_buf[128],base0_buf[128],base1_buf[128];
+  U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN];
   Bool add;
   CATARep *root,*tempha;
 
   do {
     DrvRep;
-	"\n****** Mount Drives ******\n"
-	"The first drive letter is the letter\n"
-	"of the first partition.  If adding\n"
-	"a hard drive, you should pick 'C'.\n"
-	"If more than one partition is present\n"
-	"they will be lettered in sequence.\n"
-	"\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
+    "\n****** Mount Drives ******\n"
+	  "The first drive letter is the letter\n"
+	  "of the first partition.  If adding\n"
+	  "a hard drive, you should pick 'C'.\n"
+	  "If more than one partition is present\n"
+	  "they will be lettered in sequence.\n"
+	  "\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
     first_drv_num=ToUpper(GetChar)-'A';
     '\n';
     if (0<=first_drv_num<NUM_DRVS) {
-	"\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
-	"\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
+      "\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
+	    "\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
       type=GetChar-'0';
       '\n';
 
@@ -200,11 +200,11 @@ U0 Mount(Bool repartition=FALSE)
 	num_hints=ATARep(,,&root);
 	do {
 	  if (num_hints)
-		"Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
-		"I/O Port Base0:\n";
+	    "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
+		  "I/O Port Base0:\n";
 	  else
-		"Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
-	  GetS(base0_buf,128);
+	    "Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
+	  GetS(base0_buf,STR_LEN);
 	} while (!Str2I64(base0_buf));
 	if (1<=Str2I64(base0_buf)<=num_hints) {
 	  tempha=ATARepFind(root,Str2I64(base0_buf));
@@ -216,11 +216,11 @@ U0 Mount(Bool repartition=FALSE)
 	    StrCpy(base1_buf,"0");
 	  else
 	    do {
-		"I/O Port Base1:\n";
-	      GetS(base1_buf,128);
+	      "I/O Port Base1:\n";
+	      GetS(base1_buf,STR_LEN);
 	    } while (!Str2I64(base1_buf));
 	  do {
-		"\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
+	    "\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
 	    unit=GetChar-'0';
 	  } while (!(0<=unit<=1));
 	  '\n';
@@ -229,9 +229,9 @@ U0 Mount(Bool repartition=FALSE)
       }
       if (type==BDT_RAM) {
 	"Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";
-	GetS(addr_buf,128);
+	GetS(addr_buf,STR_LEN);
 	"Blks of 512 bytes:";
-	GetS(blks_buf,128);
+	GetS(blks_buf,STR_LEN);
       }
 
       if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
@@ -243,7 +243,7 @@ U0 Mount(Bool repartition=FALSE)
 	  bd->max_blk=Str2I64(blks_buf)-1;
 	}
 	if (type==BDT_ATA ||
-	    type==BDT_ATAPI) {
+	      type==BDT_ATAPI) {
 	  bd->base0=Str2I64(base0_buf);
 	  bd->base1=Str2I64(base1_buf);
 	}
@@ -268,8 +268,8 @@ U0 Mount(Bool repartition=FALSE)
 
 I64 SysGetI64()
 {
-  U8 st[136];
-  GetS(st,136,FALSE);
+  U8 st[STR_LEN];
+  GetS(st,STR_LEN,FALSE);
   return Str2I64(st,16);
 }
 
@@ -278,22 +278,22 @@ Bool GetBaseUnit(CBlkDev *bd)
   I64 ch;
   Bool probe;
   "            TempleOS\n\n\n";
-#exe {
-  if (kernel_cfg->opts[CFG_DONT_PROBE])
-    StreamPrint("probe=FALSE;");
-  else
-    StreamPrint("probe=TRUE;");
-};
+  #exe {
+    if (kernel_cfg->opts[CFG_DONT_PROBE])
+      StreamPrint("probe=FALSE;");
+    else
+      StreamPrint("probe=TRUE;");
+  };
   if (!probe || !BootCdProbeAll(bd)) {
-	"\nDon't worry.  This is not a product\n"
-	"registration.	TempleOS just needs the\n"
-	"I/O port numbers for the CD-ROM.\n"
-	"\nRetry the ports above or check Windows\n"
-	"system information under I/O ports for\n"
-	"'IDE', 'ATA' or 'SATA'.\n"
-	"In Linux, use 'lspci -v' for ports.\n"
-	"\n\nEnter 4-digit hex I/O Port number.\n"
-	"CD-ROM I/O Port Base0: 0x";
+    "\nDon't worry.  This is not a product\n"
+	  "registration.	TempleOS just needs the\n"
+	  "I/O port numbers for the CD-ROM.\n"
+	  "\nRetry the ports above or check Windows\n"
+	  "system information under I/O ports for\n"
+	  "'IDE', 'ATA' or 'SATA'.\n"
+	  "In Linux, use 'lspci -v' for ports.\n"
+	  "\n\nEnter 4-digit hex I/O Port number.\n"
+	  "CD-ROM I/O Port Base0: 0x";
     bd->base0=SysGetI64;
     bd->base1=0;
     bd->unit =0;
@@ -322,12 +322,12 @@ U0 BlkDevsInitAll()
   for (i=0;i<NUM_DRVS;i++)
     dsk.let_to_drv[i]=&dsk.drvs[i];
   text.raw_col=0;
-#exe {
-  if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
-    StreamPrint("AutoMountIDE;");
-  StreamPrint("#exe {OptOff(OPTf_WARN_PAREN);}");
-  StreamDoc(kernel_cfg->add_dev);
-  StreamPrint("#exe {OptOn(OPTf_WARN_PAREN);}");
-};
+  #exe {
+    if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
+      StreamPrint("AutoMountIDE;");
+    StreamPrint("#exe {OptOff(OPTf_WARN_PAREN);}");
+    StreamDoc(kernel_cfg->add_dev);
+    StreamPrint("#exe {OptOn(OPTf_WARN_PAREN);}");
+  };
   DrvRep;
 }

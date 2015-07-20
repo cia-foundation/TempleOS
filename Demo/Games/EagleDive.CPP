@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 
-AcctRegSetDftEntry("TempleOS/EagleDive","I64 best_score=0;\n");
-AcctRegExeBranch("TempleOS/EagleDive");
+RegSetDftEntry("TempleOS/EagleDive","I64 best_score=0;\n");
+RegExeBranch("TempleOS/EagleDive");
 
 //Keep these power of two so shift is used instead of multiply
 //to index arrays.
@@ -28,7 +28,7 @@ class Panel
 {
   Panel *next;
   I32 n,   //num polygon sides
-     num; //panel number
+	num; //panel number
   CD3I32 *pts;
   I64 color,cnt;
 };
@@ -68,8 +68,8 @@ Normally, just spawn a popup task,
 run it and kill it using an icon.
 */
 I16 elevations[MAP_HEIGHT][MAP_WIDTH];
-I32 normals[MAP_HEIGHT][MAP_WIDTH*2];
-Panel *panels[MAP_HEIGHT][MAP_WIDTH*2];
+CD3 normals[MAP_HEIGHT][MAP_WIDTH];
+Panel *panels[MAP_HEIGHT][MAP_WIDTH];
 
 I64 num_panels;
 Panel *panel_root;
@@ -91,7 +91,7 @@ class MPCtrl {
 U0 EDTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 {
   I64 zz;
-  GrRot(dc->r,x,y,z);
+  Mat4x4MulXYZ(dc->r,x,y,z);
   *z=zz=-*z;
   if (zz>0) {
     *x = *x * DISPLAY_SCALE/ zz; //Foreshortening
@@ -102,98 +102,48 @@ U0 EDTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 }
 
 U0 CalcNormals()
-{
-/*The idea is that there are two tris
-forming every grid square and we find the normal
-vect with a curl.
+{/*Find the normal vect with a curl.
 
- i  j  k
- 0  1  dz2
- 1  0  dz1
+i,j and k are the axis unit vectors,
+not to be confused with my local index variables.
 
-Normal:
-dz1*i + dz2*j - k
+i  j  k
+0  1  dz2
+1  0  dz1
 
-  i   j   k
- -1   0  -dz3
-  0  -1  -dz4
-
-Normal:
--dz3*i - dz4*j + k
-
- 
-Basically, we want to combine grid
-locations with the same normals.  These
-are not unit vects for one thing.
-
-What I came-up with is dz1/dz2 and dz3/dz4.
-
-It works pretty well.  It combines
-more than it should, but that's good
-because it would  result in too many
-panels.
+Normal:  dz1*i + dz2*j - k
 */
-  I64 i,j,k,dz1,dz2;
+  I64 i,j;
   for (j=0;j<MAP_HEIGHT-1;j++) {
-    k=0;
     for (i=0;i<MAP_WIDTH-1;i++) {
-      dz1=elevations[j][i+1]-elevations[j][i];
-      dz2=elevations[j+1][i]-elevations[j][i];
-      if (dz2)
-	normals[j][k++]=dz1<<16/dz2;
-      else {
-	if (!dz1)
-	  normals[j][k++]=0;
-	else if (dz1>0)
-	  normals[j][k++]=MAX_I32;
-	else
-	  normals[j][k++]=MIN_I32;
-      }
-
-      dz1=elevations[j+1][i+1]-elevations[j][i+1];
-      dz2=elevations[j+1][i+1]-elevations[j+1][i];
-      if (dz2)
-	normals[j][k++]=dz1<<16/dz2;
-      else {
-	if (!dz1)
-	  normals[j][k++]=0;
-	else if (dz1>0)
-	  normals[j][k++]=MAX_I32;
-	else
-	  normals[j][k++]=MIN_I32;
-      }
+      normals[j][i].x=elevations[j][i+1]-elevations[j][i];
+      normals[j][i].y=elevations[j+1][i]-elevations[j][i];
+      normals[j][i].z=-1;
+      D3Unit(&normals[j][i]);
     }
-    normals[j][k++]=0;
-    normals[j][k++]=0;
+    MemSet(&normals[j][i],0,sizeof(CD3));
   }
-  k=0;
-  for (i=0;i<MAP_WIDTH-1;i++) {
-    normals[j][k++]=0;
-    normals[j][k++]=0;
-  }
+  for (i=0;i<MAP_WIDTH-1;i++)
+    MemSet(&normals[j][i],0,sizeof(CD3));
 }
 
 Bool TestSameSlope(I64 x,I64 y,I64 w,I64 h)
 {
-  I64 k1,k2,xx,yy,s;
+  CD3 p,*s;
+  I64 k1,k2;
   if (!(0<=x && x+w<MAP_WIDTH && 0<=y && y+h<MAP_HEIGHT))
     return FALSE;
-    //Works well averaging the two slopes of two tris.
-    //If it is too picky, we get too many panels.
-  s=normals[y][x*2]+normals[y][x*2+1];
+  s=&normals[y][x];
   for (k2=0;k2<h;k2++)
-    for (k1=0;k1<w;k1++) {
-      xx=(x+k1)*2;
-      yy=y+k2;
-      if (normals[yy][xx]+normals[yy][xx+1]!=s)
-       return FALSE;
-    }
+    for (k1=0;k1<w;k1++)
+      if (D3NormSqr(D3Sub(&normals[y+k2][x+k1],s,&p))>.10)
+	return FALSE;
   return TRUE;
 }
 
 U0 MPDoPanels(CTask *task)
 {
-  I64 i,j,k,l,k1,k2,w,h,threshold,lo,hi;
+  I64 i,j,l,k1,k2,w,h,threshold,lo,hi;
   Bool cont;
   Panel *tempp,*start_ptr=NULL,*end_ptr=NULL;
   CD3I32 *poly;
@@ -202,9 +152,8 @@ U0 MPDoPanels(CTask *task)
   hi=(Gs->num+1)*(MAP_HEIGHT-1)/mp.mp_cnt;
   for (threshold=8;threshold>=1;threshold--)
     for (j=lo;j<hi;j++) {
-      k=0;
       for (i=0;i<MAP_WIDTH-1;i++) {
-	if (!panels[j][k]) {
+	if (!panels[j][i]) {
 	  w=1;
 	  h=1;
 	  do {
@@ -223,9 +172,9 @@ U0 MPDoPanels(CTask *task)
 	    lock {tempp->num=num_panels++;}
 	    l=elevations[j][i];
 	    if (l<=WATER_ELEVATION*MAP_SCALE &&
-		elevations[j][i+w-1]<=WATER_ELEVATION*MAP_SCALE &&
-		elevations[j+h-1][i]<=WATER_ELEVATION*MAP_SCALE &&
-		elevations[j+h-1][i+w-1]<=WATER_ELEVATION*MAP_SCALE) {
+		  elevations[j][i+w-1]<=WATER_ELEVATION*MAP_SCALE &&
+		  elevations[j+h-1][i]<=WATER_ELEVATION*MAP_SCALE &&
+		  elevations[j+h-1][i+w-1]<=WATER_ELEVATION*MAP_SCALE) {
 	      tempp->color=BLUE;
 	      if (Rand<0.05) {
 		tempf=MAlloc(sizeof(Fish),task);
@@ -286,13 +235,10 @@ U0 MPDoPanels(CTask *task)
 	    if (!end_ptr)
 	      end_ptr=tempp;
 	    for (k2=0;k2<h;k2++)
-	      for (k1=0;k1<w;k1++) {
-		panels[j+k2][(i+k1)*2]=tempp;
-		panels[j+k2][(i+k1)*2+1]=tempp;
-	      }
+	      for (k1=0;k1<w;k1++)
+		panels[j+k2][i+k1]=tempp;
 	  }
 	}
-	k+=2;
       }
     }
   if (end_ptr) {
@@ -338,15 +284,8 @@ U0 InitElevations()
 
 U0 InitMap()
 {/*We make a topographic data structure "elevations[][]"
-and convert it to panels.  The conversion to panels leaves
-gaps the way I did it, but it looks good, except for sky leaking through
-There is no wrong way to pick colors if it looks good, unless
-you wanted to do lighting.
-
-"panels[][]" holds the flat and sloped panels for each spot, while
-"hstep_panels[][]" holds side panels in cases of step-like formations.
-They require a separate array because a single "elevation[][]" spot can
-have a panel on top and a panel on the side like stairs.
+and convert it to panels. "panels[][]" holds the panels
+for each spot.
 */
   I64 i,x,y,xx,yy;
 
@@ -443,61 +382,63 @@ I64 update_jiffy_limit;
 U0 MPDrawIt(CTask *task,CDC *dc)
 {
   I64 j,strip_width,*s2w,x1,y1,z1, xx,yy,
-      xh,yh,zh,yh2,xh2,x1h,y1h,x1wa,y1wa,x1wb,y1wb,
-      x3,y3,z3,
-      cx=task->pix_width>>1,
-      cy=task->pix_height>>1;
+	xh,yh,zh,yh2,xh2,x1h,y1h,x1wa,y1wa,x1wb,y1wb,
+	x3,y3,z3,
+	cx=task->pix_width>>1,
+	cy=task->pix_height>>1;
   Panel reg *tempp;
 
   xx=x/(MAP_SCALE*COORDINATE_SCALE);
   yy=y/(MAP_SCALE*COORDINATE_SCALE);
 
   //World to screen coordinates
-  GrIdentEqu(dc->r);
-  GrRotZEqu(dc->r,é2);
-  GrRotXEqu(dc->r,è);
-  GrRotZEqu(dc->r,é1);
-  GrSetRotMat(dc,dc->r);
+  Mat4x4IdentEqu(dc->r);
+  Mat4x4RotZ(dc->r,é2);
+  Mat4x4RotX(dc->r,è);
+  Mat4x4RotZ(dc->r,é1);
+  DCMat4x4Set(dc,dc->r);
 
   //Screen to world coordinates
 
-//This gives us the vects for stepping through the grid in
-//the direction the plane is facing. we step horizontally and vertically
-//and use the reciprocal slope principle	y=mx+b and y=(-1/m)x+b are perpendicular.
+  //This gives us the vects for stepping through the grid in
+  //the direction the plane is facing. we step horizontally and vertically
+  //and use the reciprocal slope principle
+  //y=mx+b and y=(-1/m)x+b are perpendicular.
 
-  s2w=GrIdentNew;
-  GrRotZEqu(s2w,-é1);
-  GrRotXEqu(s2w,-è);
-  GrRotZEqu(s2w,-é2);
+  s2w=Mat4x4IdentNew;
+  Mat4x4RotZ(s2w,-é1);
+  Mat4x4RotX(s2w,-è);
+  Mat4x4RotZ(s2w,-é2);
   xh=0;
   yh=0;
   zh=-256;
-  GrRot(s2w,&xh,&yh,&zh);
+  Mat4x4MulXYZ(s2w,&xh,&yh,&zh);
 
-//The layer for core#1 is not cleared automatically
-//it is persistent.  I have carefully syncronized to the update
-//cycle initiated by core#0 to prevent flicker.
+  //The layer for core#1 is not cleared automatically
+  //it is persistent.  I have carefully syncronized to the update
+  //cycle initiated by core#0 to prevent flicker.
 
   dc->flags|=DCF_TRANSFORMATION;
   dc->transform=&EDTransform;
   dc->x=cx;
   dc->y=cy;
 
-//dc->x and the translation part of dc->r are identical in effect,
-//but we use both to show-off.	We could add offsets together and use one or the other.
+  //dc->x and the translation part of dc->r are identical in effect,
+  //but we use both to show-off.	We could add offsets together and
+  //use one or the other.
 
   x1=-x>>COORDINATE_BITS;
   y1=-y>>COORDINATE_BITS;
   z1=-z>>COORDINATE_BITS;
-  GrRot(dc->r,&x1,&y1,&z1);
-  GrSetTranslation(dc->r,x1,y1,z1);
+  Mat4x4MulXYZ(dc->r,&x1,&y1,&z1);
+  Mat4x4TranslationEqu(dc->r,x1,y1,z1);
 
   //This is a refinement.
   if (Abs(è*180/ã)>90) {
     x3=0;
     y3=-cy;
     z3=0;
-    GrRot(s2w,&x3,&y3,&z3);
+    Mat4x4MulXYZ(s2w,&x3,&y3,&z3);
     xx+=x3;
     yy+=y3;
   }
@@ -528,13 +469,14 @@ U0 MPDrawIt(CTask *task,CDC *dc)
     for (j=0;j<strip_height && cnts.jiffies<update_jiffy_limit;j++) {
       x1=x1h>>8; y1=y1h>>8;
       if (0<=x1<MAP_WIDTH && 0<=y1<MAP_HEIGHT) {
-	  if ((tempp=panels[y1][x1*2]) && !LBts(panels_processed_bitmap,tempp->num)) {
-	    if (tempp->cnt>8*(1.1-Gs->idle_factor)) {
-	      dc->color=tempp->color;
-	      tempp->cnt=GrFillPoly3(dc,tempp->n,tempp->pts);
-	    } else
-	      tempp->cnt++;
-	  }
+	if ((tempp=panels[y1][x1]) &&
+	      !LBts(panels_processed_bitmap,tempp->num)) {
+	  if (tempp->cnt>8*(1.1-Gs->idle_factor)) {
+	    dc->color=tempp->color;
+	    tempp->cnt=GrFillPoly3(dc,tempp->n,tempp->pts);
+	  } else
+	    tempp->cnt++;
+	}
       }
       x1h+=xh;
       y1h+=yh;
@@ -566,7 +508,7 @@ U0 APEagleDiveTask(CTask *master_task)
       MPDrawIt(master_task,dc);
   }
 
-//We made an alias of this we don't want freed.
+  //We made an alias of this we don't want freed.
   dc->depth_buf=NULL;
 
   DCDel(dc);
@@ -575,30 +517,30 @@ U0 APEagleDiveTask(CTask *master_task)
 
 U0 DrawHorizon(CDC *dc)
 {
-  I64 x1,y1,z1,x2,y2,z2,xh,yh,zh,*s2w=GrIdentNew,
-      cx=Fs->pix_width>>1,
-      cy=Fs->pix_height>>1;
+  I64 x1,y1,z1,x2,y2,z2,xh,yh,zh,*s2w=Mat4x4IdentNew,
+	cx=Fs->pix_width>>1,
+	cy=Fs->pix_height>>1;
   CD3I32 p[4];
   I32 *old_db=dc->depth_buf;
   dc->depth_buf=NULL;
 
-  GrIdentEqu(dc->r);
-  GrRotZEqu(dc->r,é2);
-  GrRotXEqu(dc->r,è);
-  GrRotZEqu(dc->r,é1);
-  GrSetRotMat(dc,dc->r);
+  Mat4x4IdentEqu(dc->r);
+  Mat4x4RotZ(dc->r,é2);
+  Mat4x4RotX(dc->r,è);
+  Mat4x4RotZ(dc->r,é1);
+  DCMat4x4Set(dc,dc->r);
   dc->flags&=~DCF_TRANSFORMATION;
   dc->transform=&EDTransform;
   dc->x=cx;
   dc->y=cy;
 
-  GrRotZEqu(s2w,-é1);
-  GrRotXEqu(s2w,-è);
-  GrRotZEqu(s2w,-é2);
+  Mat4x4RotZ(s2w,-é1);
+  Mat4x4RotX(s2w,-è);
+  Mat4x4RotZ(s2w,-é2);
   xh=0;
   yh=0;
   zh=-256;
-  GrRot(s2w,&xh,&yh,&zh);
+  Mat4x4MulXYZ(s2w,&xh,&yh,&zh);
   Free(s2w);
 
   x1=xh+yh*32; y1=yh-xh*32; z1=0;
@@ -668,8 +610,8 @@ U0 BSPEagleDive()
 {
   CDC *dc=DCAlias(main_dc,Fs);
   I64 i,xx,yy,height,bkcolor,
-      cx=Fs->pix_width>>1,
-      cy=Fs->pix_height>>1;
+	cx=Fs->pix_width>>1,
+	cy=Fs->pix_height>>1;
   F64 min_strip_width;
   Fish *tempf;
 
@@ -716,7 +658,9 @@ U0 BSPEagleDive()
     min_strip_width=MAX_F64;
     for (i=0;i<mp.mp_cnt;i++)
       min_strip_width=Min(min_strip_width,32.0*mp.strip_width[i]/(i+32.0));
-    strip_height=ClampI64(strip_height*Clamp(0.25*min_strip_width/strip_height,0.9,1.1),64,1024);
+    strip_height=ClampI64(
+	  strip_height*Clamp(0.25*min_strip_width/strip_height,0.9,1.1),
+	  64,1024);
   } else {
     dc->color=bkcolor;
     GrRect(dc,0,0,dc->width,dc->height);
@@ -730,19 +674,21 @@ U0 BSPEagleDive()
   GrLine3(dc,cx+5,cy,0,cx-5,cy,0);
   GrLine3(dc,cx,cy+5,0,cx,cy-5,0);
   GrPrint(dc,0,0,"é1:%5.1f è:%5.1f é2:%5.1f Strip:%5d",
-      é1*180/ã,è*180/ã,é2*180/ã,strip_height);
-  GrPrint(dc,0,FONT_HEIGHT,"x:%5.1f y:%5.1f z:%5.1f height:%3d score:%d high:%d",
-      ToF64(x)/COORDINATE_SCALE,ToF64(y)/COORDINATE_SCALE,ToF64(z)/COORDINATE_SCALE,
-      height,game_score,best_score);
+	é1*180/ã,è*180/ã,é2*180/ã,strip_height);
+  GrPrint(dc,0,FONT_HEIGHT,
+	"x:%5.1f y:%5.1f z:%5.1f height:%3d score:%d high:%d",
+	ToF64(x)/COORDINATE_SCALE,
+	ToF64(y)/COORDINATE_SCALE,ToF64(z)/COORDINATE_SCALE,
+	height,game_score,best_score);
 
   if (game_over && Blink) {
     dc->color=RED;
     GrPrint(dc,(Fs->pix_width-9*FONT_WIDTH)/2,
-	(Fs->pix_height-FONT_HEIGHT)/2,"Game Over");
+	  (Fs->pix_height-FONT_HEIGHT)/2,"Game Over");
   } else if (tS-game_t0<5.0 && Blink) {
     dc->color=WHITE;
     GrPrint(dc,(Fs->pix_width-10*FONT_WIDTH)/2,
-	(Fs->pix_height-FONT_HEIGHT)/2,"Catch Fish");
+	  (Fs->pix_height-FONT_HEIGHT)/2,"Catch Fish");
   }
 //We made an alias of this we don't want freed.
   dc->depth_buf=NULL;
@@ -761,13 +707,13 @@ U0 AnimateTask(I64)
     mS=1000*(tS-t0);
     t0=tS;
     if (!game_over) {
-      //Screen to world coordinates
-      s2w=GrIdentNew;
-      GrRotZEqu(s2w,-é1);
-      GrRotXEqu(s2w,-è);
-      GrRotZEqu(s2w,-é2);
+//Screen to world coordinates
+      s2w=Mat4x4IdentNew;
+      Mat4x4RotZ(s2w,-é1);
+      Mat4x4RotX(s2w,-è);
+      Mat4x4RotZ(s2w,-é2);
       x1=0;y1=0;z1=-speed*mS*COORDINATE_SCALE;
-      GrRot(s2w,&x1,&y1,&z1);
+      Mat4x4MulXYZ(s2w,&x1,&y1,&z1);
       x+=x1;
       y+=y1;
       z+=z1;
@@ -779,7 +725,8 @@ U0 AnimateTask(I64)
 	tempf=fish_root.next;
 	while (tempf!=&fish_root) {
 	  tempf1=tempf->next;
-	  if (SqrI64(tempf->p.x-x1)+SqrI64(tempf->p.y-y1)<MAP_SCALE*MAP_SCALE*5*5) {
+	  if (SqrI64(tempf->p.x-x1)+
+		SqrI64(tempf->p.y-y1)<MAP_SCALE*MAP_SCALE*5*5) {
 	    game_score++;
 	    if (game_score>best_score)
 	      best_score=game_score;
@@ -810,7 +757,7 @@ U0 MPEnd()
   update_jiffy_limit=0;
   mp.app_not_done_flags=1<<mp.mp_cnt-1-1;
   mp.app_done=TRUE;
-  //Wait for all cores to exit
+//Wait for all cores to exit
   while (mp.app_not_done_flags)
     Sleep(1);
 }
@@ -827,8 +774,8 @@ U0 SongTask(I64)
   MusicSettingsRst;
   music.stacatto_factor=0.2;
   while (TRUE) {
-	Play("3eBDEDBDEDFEEDFEED");
-	Play("BDEDBDEDFEEDFEED");
+    Play("3eBDEDBDEDFEEDFEED");
+    Play("BDEDBDEDFEEDFEED");
   }
 }
 
@@ -846,7 +793,7 @@ U0 Init(I64 _mp_cnt)
     mp.mp_cnt=mp_cnt;
   QueInit(&fish_root);
   InitMap;
-  DCAllocDepthBuf(main_dc);
+  DCDepthBufAlloc(main_dc);
 
   strip_height=128;
   è	=-90.0*ã/180.0;
@@ -895,18 +842,18 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   AutoComplete;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  Down(,,SC_CURSOR_UP);"
-  "  Up(,,SC_CURSOR_DOWN);"
-  "  Left(,,SC_CURSOR_LEFT);"
-  "  Right(,,SC_CURSOR_RIGHT);"
-      "}"
-      );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  Down(,,SC_CURSOR_UP);"
+	"  Up(,,SC_CURSOR_DOWN);"
+	"  Left(,,SC_CURSOR_LEFT);"
+	"  Right(,,SC_CURSOR_RIGHT);"
+	"}"
+	);
   WinMax;
   WinBorder;
   "Initializing...\n";
@@ -946,7 +893,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
 	    Init(_mp_cnt);
 	    Fs->draw_it=&DrawIt;
 	    break;
-	  }
+	}
 	é1=Wrap(é1);
 	è =Wrap(è);
 	é2=Wrap(é2);
@@ -958,7 +905,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
   SettingsPop;
   CleanUp;
 #ifjit
-  AcctRegWriteBranch("TempleOS/EagleDive","I64 best_score=%d;\n",best_score);
+  RegWriteBranch("TempleOS/EagleDive","I64 best_score=%d;\n",best_score);
 #endif
   MenuPop;
 }

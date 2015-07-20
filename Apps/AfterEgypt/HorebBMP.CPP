@@ -9,16 +9,17 @@ U0 MPDrawHoreb(CDC *dc2)
   F64 s,m,a,x1,y1,x2,y2;
   Obj *tempo;
 
-  GrIdentEqu(r);
-  GrRotYEqu(r,-é);
-  GrRotXEqu(r,77*ã/180);
+  Mat4x4IdentEqu(r);
+  Mat4x4RotY(r,-é);
+  Mat4x4RotX(r,77*ã/180);
   for (i=Gs->num;i<O_NUM_OBJS+O_NUM_PEBBLES;i+=mp_cnt) {
     tempo=&objs[i];
     tempo->x1=tempo->x+vx; tempo->y1=tempo->y; tempo->z1=tempo->z+vz;
-    GrRot(r,&tempo->x1,&tempo->y1,&tempo->z1);
-    if (tempo->type==OT_SHEEP || tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
+    Mat4x4MulXYZ(r,&tempo->x1,&tempo->y1,&tempo->z1);
+    if (tempo->type==OT_SHEEP ||
+	  tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
       dx=100*tempo->dx; dy=100*tempo->dy; dz=100*tempo->dz;
-      GrRot(r,&dx,&dy,&dz);
+      Mat4x4MulXYZ(r,&dx,&dy,&dz);
       if (dx<0)
 	tempo->sym=TRUE;
       else
@@ -27,13 +28,14 @@ U0 MPDrawHoreb(CDC *dc2)
     if (tempo->z1>=0) {
       s=100.0/(AbsI64(tempo->z1)+50);
       if (tempo->type) {
-	GrIdentEqu(dc->r);
-	GrScaleEqu(dc->r,s*2);
-	GrSetRotMat(dc,dc->r);
+	Mat4x4IdentEqu(dc->r);
+	Mat4x4Scale(dc->r,s*2);
+	DCMat4x4Set(dc,dc->r);
 	dc->flags|=DCF_TRANSFORMATION;
 	if (tempo->sym) {
 	  dc->flags|=DCF_SYMMETRY|DCF_JUST_MIRROR;
-	  GrSetSymmetry(dc,s*tempo->x1+cx,s*tempo->y1+h,s*tempo->x1+cx,s*tempo->y1+h+10);
+	  DCSymmetrySet(dc,s*tempo->x1+cx,s*tempo->y1+h,
+		s*tempo->x1+cx,s*tempo->y1+h+10);
 	}
 	Sprite3B(dc,s*tempo->x1+cx,s*tempo->y1+h,tempo->z1,imgs[tempo->type]);
       } else {
@@ -69,12 +71,12 @@ U0 DrawHoreb(CTask *task,CDC *dc)
 {
   I64 i,x,y,z,w=task->pix_width,h=task->pix_height,r[16],cx=w>>1,cy=h>>1;
   F64 s;
-  GrIdentEqu(r);
-  GrRotYEqu(r,-é);
-  GrRotXEqu(r,77*ã/180);
-  //Sun
+  Mat4x4IdentEqu(r);
+  Mat4x4RotY(r,-é);
+  Mat4x4RotX(r,77*ã/180);
+//Sun
   x=vx; y=0; z=1000000+vz;
-  GrRot(r,&x,&y,&z);
+  Mat4x4MulXYZ(r,&x,&y,&z);
   s=100.0/(AbsI64(z)+50);
   if (y<0) {
     dc->color=BROWN;
@@ -82,7 +84,7 @@ U0 DrawHoreb(CTask *task,CDC *dc)
     dc->color=YELLOW;
     GrFloodFill(dc,s*x+cx,15);
   }
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
   mp_not_done_flags=1<<mp_cnt-1;
   for (i=0;i<mp_cnt;i++)
     JobQue(&MPDrawHoreb,dc,i);

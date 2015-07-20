@@ -10,7 +10,7 @@ I64 mp_not_done_flags;
 class State
 {
   F64 wabbits,hawks,
-      d_wabbits,d_hawks; //Technically, these are not part of the state.
+	d_wabbits,d_hawks; //Technically, these are not part of the state.
 };
 
 U0 Steps(State *s)

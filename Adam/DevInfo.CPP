@@ -26,7 +26,7 @@ public U0 PCIDevFileGen()
       first=FALSE;
     }
     if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[StrLen(doc_e->tag)-1]=='=' &&
-	doc_e2->type_u8==DOCT_NEW_LINE) {
+	  doc_e2->type_u8==DOCT_NEW_LINE) {
       doc_e->tag[StrLen(doc_e->tag)-1]=CH_SPACE;
       cont=TRUE;
     }
@@ -57,7 +57,8 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (first) {
-      if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[0]!=';' && StrLen(doc_e->tag)>=4) {
+      if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[0]!=';' &&
+	    StrLen(doc_e->tag)>=4) {
 	buf[0](U16)='0x';
 	buf[2](U32)=doc_e->tag(U32 *)[0];
 	buf[6]=0;
@@ -158,9 +159,9 @@ public U0 PCIRep()
   temppci=dev.pci_root.next;
   while (temppci!=&dev.pci_root) {
     "%02X:%02X:%01X %02X%02X $$GREEN$$%s $$CYAN$$%s$$FG$$\n",
-      temppci->bus,temppci->dev,temppci->fun,
-      temppci->base_code,temppci->sub_code,
-      temppci->vendor_str,temppci->dev_id_str;
+	  temppci->bus,temppci->dev,temppci->fun,
+	  temppci->base_code,temppci->sub_code,
+	  temppci->vendor_str,temppci->dev_id_str;
     temppci=temppci->next;
   }
 }
@@ -177,7 +178,7 @@ public U0 MemBIOSRep()
   U16		*m01=SYS_MEM_E801;
   CMemE820	*m20=SYS_MEM_E820;
   CMemRange	*tempmr;
-	"Standard Addresses\n"
+  "Standard Addresses\n"
 	"0x000A0000-0x000BFFFF VGA\n"
 	"0xFEE00000-0xFEE00FFF See $$LK,\"APIC\",A=\"MN:LAPIC_BASE\"$$\n\n"
 	"32 Bit Device Mem\n";
@@ -185,13 +186,14 @@ public U0 MemBIOSRep()
     Yield;
   tempmr=dev.mem32_root.next;
   while (tempmr!=&dev.mem32_root) {
-    "%02X:0x%016X-0x%016X\n",tempmr->type,tempmr->base,tempmr->base+tempmr->size-1;
+    "%02X:0x%016X-0x%016X\n",
+	  tempmr->type,tempmr->base,tempmr->base+tempmr->size-1;
     tempmr=tempmr->next;
   }
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 
   "\nBIOS Memory Report 15:E801\n"
-  "01:0x0000000000000000-0x%016X\n",0x100000+m01[0]<<10-1;
+	"01:0x0000000000000000-0x%016X\n",0x100000+m01[0]<<10-1;
   "01:0x0000000001000000-0x%016X\n",0x1000000+m01[1]<<16-1;
 
   if (m20->type) {

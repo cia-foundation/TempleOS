@@ -1,3 +1,4 @@
+#help_index "Compiler/Internal"
 //Intermediate compiler codes
 #define IS_0_ARG	0
 #define IS_1_ARG	1
@@ -366,8 +367,8 @@ class CIntermediateStruct
 #define FSF_HASERRCODE		(1<<Ff_HASERRCODE)
 #define FSF_ARGPOP		(1<<Ff_ARGPOP)
 #define FSF_NOARGPOP		(1<<Ff_NOARGPOP)
-#define FSG_FUN_FLAGS1		(FSF_INTERRUPT|FSF_HASERRCODE|FSF_ARGPOP|FSF_NOARGPOP)
-#define FSG_FUN_FLAGS2		(FSG_FUN_FLAGS1|FSF_PUBLIC)
+#define FSG_FUN_FLAGS1 (FSF_INTERRUPT|FSF_HASERRCODE|FSF_ARGPOP|FSF_NOARGPOP)
+#define FSG_FUN_FLAGS2 (FSG_FUN_FLAGS1|FSF_PUBLIC)
 
 //Byte 0
 #define PRS0_NULL		0x000000
@@ -402,3 +403,5 @@ class COptReg
 #define CMPF_ONE_ASM_INS	2
 #define CMPF_LEX_FIRST		4
 #define CMPF_PRS_SEMICOLON	8
+
+#help_index ""

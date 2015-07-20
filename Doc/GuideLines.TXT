@@ -14,6 +14,8 @@ $FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is
 
 $FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.
 
+$FG,2$/0000Boot$FG$ Misc boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $FG,2$0000Kernel.BIN.C$FG$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
+
 
 
 $FG,5$$TX+CX,"::/Home Files"$$FG$
@@ -50,6 +52,8 @@ $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
 * Virtual mem/Paging is not used -- it is identity mapped in $FG,2$x86_64$FG$ mode.  The stk does not grow, so alloc enough when the task (process) is $LK,"Spawn",A="MN:Spawn"$ed and use the heap for most things.  (The $FG,2$heap$FG$ refers to $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().)
 
+* You can $LK,"Free",A="MN:Free"$($FG,2$NULL$FG$)$FG$.
+
 * See $LK,"Naming Convention",A="FF:::/Doc/Glossary.TXT,Naming Convention"$ and $LK,"Abbreviations",A="FF:::/Doc/Glossary.TXT,Abbreviations"$.
 
 * There are two modes of compiling, $LK,"AOT Compile Mode",A="FF:::/Doc/Glossary.TXT,AOT Compile Mode"$ and $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$.  Compilation is done in both -- neither is "interpreted".  Use $FG,2$$LK,"JIT Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$$FG$.
@@ -58,9 +62,21 @@ $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
 * Use $FG,2$I64$FG$ instead of smaller int sizes because the compiler converts everything to 64-bit.  Don't use unsigned$FG$ unless it actually breaks.  A policy of signed keeps it simple so you don't have to agonize over choices.
 
-* In-order, short circuit logic is used, in fact required.
+$LM,5$$HL,1$U32 DistDist(U16 x1, U16 y1, U16 x2, U16 y2)
+{//This requires zero-extend when fetching args.
+  return SqrI64(x1-x2)+SqrI64(y1-y2);
+}
+
+I64 DistDist(I64 x1, I64 y1, I64 x2, I64 y2)
+{
+  return SqrI64(x1-x2)+SqrI64(y1-y2);
+}$HL,0$
+$LM,0$
+* In-order, short circuit logic is assumed.
 
 * Avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte signed int -- nothing forces it to $FG,2$1$FG$ or $FG,2$0$FG$.  There is a $LK,"ToBool",A="MN:ToBool"$() function that will for to $FG,2$1$FG$ ot $FG,2$0$FG$, however.
+
+* Glbl vars in $FG,2$AOT$FG$ BIN modules are initialized to zero.  They occupy space in BIN files.
 
 * If you use floats in your interrupt routine, save and restore the fpu state with $LK,"Fxsave",A="MN:Fxsave"$() and $LK,"Fxrstor",A="MN:Fxrstor"$().  The timer interrupt does this.  The keyboard and mouse don't use floats.
 
@@ -70,7 +86,7 @@ $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
 * I don't use $FG,2$U0 *$FG$ because the size is zero for ptr arithmetic.
 
-* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Utils/S2T.CPP,S2T"$ on source code.
+* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Utils/StrUtils.CPP,S2T"$ on source code.
 
 
 
@@ -94,7 +110,7 @@ $FG,5$$TX+CX,"Assembly Language"$$FG$
 
 * Don't change the segment regs unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$ and $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$.
 
-* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REG_VARS_MASK"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
+* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REGG_C_LOCAL_VARS"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
 
 * I recommend using the standard stk frame for functions because $LK,"Caller",A="MN:Caller"$() is used to display the call stk, such as for the wallpaper.
 $FG,2$	PUSH	RBP
@@ -111,3 +127,5 @@ $FG$
 * No args are passed in regs.
 
 * RAX holds function return values, of course.
+$FG,8$
+* "MagicISO" is a trademark of MagicISO Corp.

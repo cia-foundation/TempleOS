@@ -49,7 +49,7 @@ Bool MouseRst()
   if (*_w==0x9FC0) {
     _b=0x9FC00+0x30;
     *_b=1; //This enables my mouse.  It might be for one machine.
-	   //USB DMA packets, set-up by BIOS to make legacy PS/2?
+//USB DMA packets, set-up by BIOS to make legacy PS/2?
   }
   if (!present)
     MemPagePresentMark(_w,FALSE);
@@ -71,7 +71,7 @@ Bool MouseRst()
     while (tS<timeout);
 
     try
-      KbdCmdRead;
+	    KbdCmdRead;
     catch
       Fs->catch_except=TRUE;
 
@@ -98,7 +98,7 @@ Bool MouseRst()
     KbdMouseCmdAck(0xF4); // enable Mouse
     result=TRUE;
 
-//Enable IRQ 12
+    //Enable IRQ 12
     KbdCmdSend(KBD_CTRL,0x20);
     b=KbdCmdRead;
     KbdCmdSend(KBD_CTRL,0x60);
@@ -107,12 +107,12 @@ Bool MouseRst()
   } catch
     Fs->catch_except=TRUE;
 
-//This is been added to override failure
-//because the mouse sometimes still works.
-	result=TRUE;
+    //This is been added to override failure
+    //because the mouse sometimes still works.
+  result=TRUE;
 
   try
-    KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
+	  KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
   catch
     Fs->catch_except=TRUE;
   if (mouse.has_wheel || mouse.has_ext_buttons)
@@ -121,7 +121,7 @@ Bool MouseRst()
     mouse.pkt_size=3;
   if (!result)
     try
-      KbdCmdSend(KBD_CTRL,0xA7); //Disable Mouse
+	    KbdCmdSend(KBD_CTRL,0xA7); //Disable Mouse
     catch
       Fs->catch_except=TRUE;
   return result;
@@ -130,8 +130,9 @@ Bool MouseRst()
 U0 MouseSpeedSet()
 {
   I64 dd,temp;
-  if ((dd=SqrI64(mouse_last.pos.x-mouse.pos.x)+SqrI64(mouse_last.pos.y-mouse.pos.y)) &&
-      (temp=mouse.timestamp-mouse_last.timestamp))
+  if ((dd=SqrI64(mouse_last.pos.x-mouse.pos.x)
+	+SqrI64(mouse_last.pos.y-mouse.pos.y)) &&
+	(temp=mouse.timestamp-mouse_last.timestamp))
     mouse.speed=Sqrt(dd)*cnts.time_stamp_freq/temp;
   mouse_last.timestamp=mouse.timestamp;
 }
@@ -150,7 +151,8 @@ U0 MouseUpdatePost()
   mouse.pos.y=mouse.prescale.y*mouse.scale.y*ip_grid.y_speed;
   mouse.pos.z=mouse.prescale.z*mouse.scale.z*ip_grid.z_speed;
 
-  i=Trunc(ip.scale.x*mouse.pos.x/ip_grid.x)*ip_grid.x+ip.offset.x; //TODO ip_grid.x_offset?
+  i=Trunc(ip.scale.x*mouse.pos.x/ip_grid.x)*ip_grid.x+ip.offset.x;
+//TODO ip_grid.x_offset?
   if (i<0)
     ip.offset.x-=i;
   else if (i>=GR_WIDTH)
@@ -162,7 +164,8 @@ U0 MouseUpdatePost()
   else if (i>=GR_HEIGHT)
     ip.offset.y+=GR_HEIGHT-1-i;
 
-  if (mouse.pos.x!=mouse_last.pos.x || mouse.pos.y!=mouse_last.pos.y || mouse.pos.z!=mouse_last.pos.z) {
+  if (mouse.pos.x!=mouse_last.pos.x || mouse.pos.y!=mouse_last.pos.y ||
+	mouse.pos.z!=mouse_last.pos.z) {
     mouse.evt=TRUE;
     MouseSpeedSet;
   } else
@@ -264,8 +267,8 @@ U0 KbdMouseHandler(Bool poll_kbd,Bool poll_mouse)
     KbdMouseRst;
   else {
     if (poll_mouse &&
-	mouse.installed &&
-	!mouse.irqs_working) {
+	  mouse.installed &&
+	  !mouse.irqs_working) {
       PUSHFD
       CLI
       while (InU8(KBD_CTRL)&1)

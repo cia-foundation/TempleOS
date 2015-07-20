@@ -64,7 +64,8 @@ U0 ATACmd(CBlkDev *bd,U8 cmd)
   PortNop;
 }
 
-Bool ATAGetResult(CBlkDev *bd,F64 timeout,U8 *buf,I64 cnt,I64 _avail,Bool one_read)
+Bool ATAGetResult(CBlkDev *bd,F64 timeout,U8 *buf,I64 cnt,
+		I64 _avail,Bool one_read)
 {
   I64 avail,overflow;
   bd->flags&=~BDF_LAST_WAS_WRITE;
@@ -152,7 +153,7 @@ Bool ATAPIStartStop(CBlkDev *bd,F64 timeout,Bool start)
   else
     OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
   ATACmd(bd,ATA_PACKET);
-  //Start/Stop
+//Start/Stop
   if (ATAPIWritePktWord(bd,timeout,0x1B00,0,i,0,0,0))
     return ATAWaitNotBUSY(bd,timeout);
   else
@@ -227,7 +228,7 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
 	result.u8[3]=InU8(bd->base0+ATAR0_SECT);
 	result.u8[4]=InU8(bd->base0+ATAR0_LCYL);
 	result.u8[5]=InU8(bd->base0+ATAR0_HCYL);
- 
+
 	if (result>>24==result&0xFFFFFF) {//Kludge to make qemu-kvm work
 	  bd->flags&=~BDF_EXT_SIZE;
 	  result&=0xFFFFFF;
@@ -286,7 +287,7 @@ CATAPITrack *ATAPIReadTrackInfo(CBlkDev *bd,I64 blk)
     OutU8(bd->base0+ATAR0_HCYL,sizeof(CATAPITrack)>>8);
     ATACmd(bd,ATA_PACKET);
     ATAPIWritePktWord(bd,0,0x5200,blk.u16[1],blk.u16[0],
-	(sizeof(CATAPITrack)&0xFF00)>>8,(sizeof(CATAPITrack)&0x00FF)<<8,0);
+	  (sizeof(CATAPITrack)&0xFF00)>>8,(sizeof(CATAPITrack)&0x00FF)<<8,0);
     if (!ATAGetResult(bd,0,result,sizeof(CATAPITrack),0,TRUE)) {
       Free(result);
       result=NULL;
@@ -334,12 +335,12 @@ Bool ATAPIWaitReady(CBlkDev *bd,F64 timeout)
 {
   do {
     if (!ATAWaitNotBUSY(bd,timeout) ||
-	!ATANop(bd,timeout) ||
-	!ATAPIStartStop(bd,timeout,TRUE))
+	  !ATANop(bd,timeout) ||
+	  !ATAPIStartStop(bd,timeout,TRUE))
       return FALSE;
     if (InU8(bd->base0+ATAR0_STAT) & ATAS_DRDY &&
-	!InU8(bd->base0+ATAR0_FEAT));
-      return TRUE;
+	  !InU8(bd->base0+ATAR0_FEAT));
+    return TRUE;
     ATAInit(bd);
     Yield;
   } while (!(0<timeout<tS));
@@ -351,7 +352,7 @@ U0 ATAReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
   I64 retries=3;
   Bool unlock=BlkDevLock(bd);
 
-retry:
+  retry:
   ATABlkSelect(bd,blk,cnt);
   if (bd->flags & BDF_EXT_SIZE)
     ATACmd(bd,ATA_READ_MULTI_EXT);
@@ -381,7 +382,8 @@ I64 ATAProbe(I64 base0,I64 base1,I64 unit)
   return ATAGetDevId(&bd,tS+0.1,NULL);
 }
 
-Bool ATAPIReadBlks2(CBlkDev *bd,F64 timeout,U8 *buf, I64 native_blk, I64 cnt,Bool lock)
+Bool ATAPIReadBlks2(CBlkDev *bd,F64 timeout,U8 *buf,
+		I64 native_blk, I64 cnt,Bool lock)
 {
   Bool result=FALSE,unlock;
   if (cnt<=0)
@@ -412,7 +414,7 @@ U0 ATAPIReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
 {
   CDrv *dv=Let2Drv(bd->first_drv_let);
   I64 retry,spc=bd->blk_size>>BLK_SIZE_BITS,n,blk2,
-    l2=bd->max_reads<<1+spc<<1;
+	l2=bd->max_reads<<1+spc<<1;
   U8 *cd_buf=MAlloc(l2<<BLK_SIZE_BITS);
   if (cnt>0) {
     if (blk<=bd->max_reads)
@@ -426,7 +428,7 @@ U0 ATAPIReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
     retry=4;
     while (--retry)
       if (ATAPIReadBlks2(bd,tS+7.0+0.004*n,cd_buf,blk2/spc,n,TRUE))
-	//n is 0x800 if max_reads.  Up to 8 additional seconds
+//n is 0x800 if max_reads.  Up to 8 additional seconds
 	break;
     if (!retry)
       ATAPIReadBlks2(bd,0,cd_buf,blk2/spc,n,TRUE);

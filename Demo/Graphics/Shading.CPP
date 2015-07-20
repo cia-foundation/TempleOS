@@ -14,8 +14,8 @@ U0 Lighting(CDC *dc,CD3I32 *ls,CD3I32 *poly,I64 color)
   v2.y=poly[2].y-poly[1].y;
   v2.z=poly[2].z-poly[1].z;
 
-//V1 and V2 are vects along two sides
-//of the polygon joined at point[1].
+  //V1 and V2 are vects along two sides
+  //of the polygon joined at point[1].
 
   vn_x=v1.y*v2.z-v1.z*v2.y;
   vn_y=v1.z*v2.x-v1.x*v2.z;
@@ -27,19 +27,19 @@ U0 Lighting(CDC *dc,CD3I32 *ls,CD3I32 *poly,I64 color)
   vn_y*=d;
   vn_z*=d;
 //Vn is the cross product of V1 and V3
-//which means it is perpendicular.  It
-//is the normal vect to the surface.
-//It has been scaled to length 65536.
-  GrRot(r,&vn_x,&vn_y,&vn_z);
+  //which means it is perpendicular.  It
+  //is the normal vect to the surface.
+  //It has been scaled to length 65536.
+  Mat4x4MulXYZ(r,&vn_x,&vn_y,&vn_z);
   i=(vn_x*ls->x+vn_y*ls->y+vn_z*ls->z)>>16;
 //The dot product of the light source
-//vect and the surface normal
-//gives an illumination number.
+  //vect and the surface normal
+  //gives an illumination number.
 
-//TempleOS will generate a random U16
-//and compare to dither_probability_u16 and
-//will pick from two colors.
-//Probability dithering does not work with pen_width>1 at this time.
+  //TempleOS will generate a random U16
+  //and compare to dither_probability_u16 and
+  //will pick from two colors.
+  //Probability dithering does not work with pen_width>1 at this time.
   if (i<0) {
     dc->color=ROPF_PROBABILITY_DITHER+BLACK<<16+color;
     dc->dither_probability_u16=-i;
@@ -58,19 +58,19 @@ U0 DrawIt(CTask *task,CDC *dc)
   CCtrl *c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES);
   CViewAngles *s=c->state;
   F64 tt=0.5*(Sin(ã*2*(tS%10.0)/10.0)+2.0),
-     é,é2,è,è2,radius,d;
+	é,é2,è,è2,radius,d;
   I64 i,j,cx=task->pix_width/2,cy=task->pix_height/2;
   CD3I32 poly[3],ls;
 
   dc->flags|=DCF_TRANSFORMATION;
-  DCAllocDepthBuf(dc);
+  DCDepthBufAlloc(dc);
 
-  GrIdentEqu(dc->r);
-  GrRotZEqu(dc->r,s->az);
-  GrRotYEqu(dc->r,s->ay);
-  GrRotXEqu(dc->r,s->ax+ã);
-  GrScaleEqu(dc->r,tt);
-  GrSetRotMat(dc,dc->r);
+  Mat4x4IdentEqu(dc->r);
+  Mat4x4RotZ(dc->r,s->az);
+  Mat4x4RotY(dc->r,s->ay);
+  Mat4x4RotX(dc->r,s->ax+ã);
+  Mat4x4Scale(dc->r,tt);
+  DCMat4x4Set(dc,dc->r);
 
   ls.x=-(ip.pos.x-task->pix_left-task->scroll_x-cx);
   ls.y=-(ip.pos.y-task->pix_top-task->scroll_y-cy);

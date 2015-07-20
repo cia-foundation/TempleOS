@@ -78,28 +78,28 @@ I64 drv_dsk_dsk_size;
 public U0 PrtDsk(U8 drv_let=0)
 {//Partition the disk containing partition drv_let.
 //drv_let=0 means add new drive that
-//is not already mounted.
+  //is not already mounted.
   CBlkDev *bd;
   CPlannedDrv root,*temppp;
   CMasterBoot mbr;
   Bool pri=TRUE;
   I64 ext_base,drv_let2,pri_cnt=0,
-     i,start_offset,offset,remaining;
-"This command does not play well\n"
-"with other operating systems.\n"
-"You really should use another\n"
-"operating system's partitioner.\n"
-"If you use this, it may, in fact,\n"
-"make your hard drive impossible\n"
-"to repartition with other operating\n"
-"until you set block zero to zero\n"
-"with $$LK,\"MasterBootZero\",\"MN:MasterBootZero\"$$()\n\n\n"
-"Continue";
+	i,start_offset,offset,remaining;
+  "This command does not play well\n"
+	"with other operating systems.\n"
+	"You really should use another\n"
+	"operating system's partitioner.\n"
+	"If you use this, it may, in fact,\n"
+	"make your hard drive impossible\n"
+	"to repartition with other operating\n"
+	"until you set block zero to zero\n"
+	"with $$LK,\"MasterBootZero\",\"MN:MasterBootZero\"$$()\n\n\n"
+	"Continue";
   if (!YorN) return;
 
   if (drv_let)
     try
-      Let2BlkDev(drv_let);
+	    Let2BlkDev(drv_let);
     catch {
       drv_let=0;
       Fs->catch_except=TRUE;
@@ -136,9 +136,9 @@ public U0 PrtDsk(U8 drv_let=0)
 	  pri=FALSE;
       }
       "Blocks Remaining:%d (0x%X)\n",
-	remaining-DRV_HEADER,remaining-DRV_HEADER;
+	    remaining-DRV_HEADER,remaining-DRV_HEADER;
       temppp->size=CeilU64(GetI64("Size in Blocks  :",
-	remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
+	    remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
     } while (!(ROUND_DRV_TO<=temppp->size<=FloorU64(remaining,ROUND_DRV_TO)));
     QueIns(temppp,root.last);
     remaining-=temppp->size;
@@ -225,7 +225,7 @@ public U0 PrtDsk(U8 drv_let=0)
   for (i=bd->first_drv_let;i<drv_let2;i++)
     Fmt(i,,FALSE);
 
-pd_done:
+    pd_done:
   while (root.next!=&root) {
     temppp=root.next;
     QueRem(temppp);
@@ -243,7 +243,7 @@ U0 RedSeaDrvView(U8 drv_let=0)
   CDC *dc=DCAlias;
 
   l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
-  s=(dv->size+dv->spc-1)/dv->spc;
+	s=(dv->size+dv->spc-1)/dv->spc;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
@@ -273,7 +273,7 @@ U0 RedSeaDrvView(U8 drv_let=0)
   } catch
     DrvUnlock(dv);
   GetChar;
- 
+
   SettingsPop;
   DCFill;
   DCDel(dc);
@@ -285,8 +285,8 @@ U0 FAT32DrvView(U8 drv_let=0)
   U32 *bitmap;
   CDC *dc=DCAlias;
   l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
-  s=(dv->size+dv->spc-1)/dv->spc;
- 
+	s=(dv->size+dv->spc-1)/dv->spc;
+
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   DocCursor;
@@ -315,7 +315,7 @@ U0 FAT32DrvView(U8 drv_let=0)
   } catch
     DrvUnlock(dv);
   GetChar;
- 
+
   SettingsPop;
   DCFill;
   DCDel(dc);
@@ -340,9 +340,9 @@ public U0 DrvView(U8 drv_let=0)
 public U0 DskView(U8 drv_let=0)
 {//Disk view. Pie chart of partition sizes.
   I64 i,j,
-    h=Fs->pix_width,
-    v=Fs->pix_height,
-    radius;
+	h=Fs->pix_width,
+	v=Fs->pix_height,
+	radius;
   CDrv *dv;
   CBlkDev *bd=Let2BlkDev(drv_let);
   CDC *dc=DCAlias;
@@ -367,18 +367,18 @@ public U0 DskView(U8 drv_let=0)
       sect_end	=-((dv->base_offset+dv->size)*2*ã/(bd->max_blk+1));
       dc->color=BLACK;
       GrLine(dc,h>>1,v>>1,
-	h>>1+radius*Cos(sect_start),
-	v>>1+radius*Sin(sect_start));
+	    h>>1+radius*Cos(sect_start),
+	    v>>1+radius*Sin(sect_start));
       GrLine(dc,h>>1,v>>1,
-	h>>1+radius*Cos(sect_end),
-	v>>1+radius*Sin(sect_end));
+	    h>>1+radius*Cos(sect_end),
+	    v>>1+radius*Sin(sect_end));
 
       dc->color=j;
       GrPrint(dc,0,v-FONT_HEIGHT*j,"%C %-8Z",Drv2Let(dv),
-	dv->type.u16[0],"ST_DRV_TYPES");
+	    dv->type.u16[0],"ST_DRV_TYPES");
       GrFloodFill(dc,
-	h>>1+(radius-4)*Cos((sect_start+sect_end)/2),
-	v>>1+(radius-4)*Sin((sect_start+sect_end)/2),FALSE);
+	    h>>1+(radius-4)*Cos((sect_start+sect_end)/2),
+	    v>>1+(radius-4)*Sin((sect_start+sect_end)/2),FALSE);
       j++;
     }
   }
@@ -388,6 +388,8 @@ public U0 DskView(U8 drv_let=0)
   DCFill;
   DCDel(dc);
 }
+
+#help_index "File/Cmd Line (Typically);Cmd Line (Typically)"
 
 public I64 Zip(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Compress files by moving to .Z filename.
@@ -412,7 +414,7 @@ public I64 Zip(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
 {//Uncompress files by moving to not .Z filename.
 //You don't have to do this for normal operation.
-//It automatically unzips ".Z" files.
+  //It automatically unzips ".Z" files.
   U8 *st;
   CDirEntry *tempde,*tempde1;
   I64 result=0,fuf_flags=0;

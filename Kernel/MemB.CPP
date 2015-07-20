@@ -1,5 +1,4 @@
 asm {
-USE64
 //************************************
 _MALLOC::
 // Throws 'OutMem'
@@ -15,7 +14,7 @@ _MALLOC::
 	MOV	RDX,U64 FS:CTask.addr[RBX]
 @@05:	CMP	U32 CTask.task_signature[RDX],TASK_SIGNATURE_VAL
 
-#assert CTask.task_signature==CHeapCtrl.hc_signature //location of signature matches
+#assert CTask.task_signature==CHeapCtrl.hc_signature //location signature same
 
 	JNE	@@10
 	MOV	RDX,U64 CTask.data_heap[RDX]
@@ -406,21 +405,23 @@ U8 *AMAllocIdentical(U8 *src)
   return MAllocIdentical(src,adam_task);
 }
 
-U8 *MAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0)
+U8 *MAllocAligned(I64 size,I64 alignment,
+	CTask *mem_task=NULL,I64 misalignment=0)
 {//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
-     *result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
+	*result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
   result(I64 *)[-1]=ptr-result;
 #assert offset(CMemUsed.size)==offset(CMemUsed.start)-sizeof(I64)
   return result;
 }
 
-U8 *CAllocAligned(I64 size,I64 alignment,CTask *mem_task=NULL,I64 misalignment=0)
+U8 *CAllocAligned(I64 size,I64 alignment,
+	CTask *mem_task=NULL,I64 misalignment=0)
 {//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
-     *result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
+	*result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
   result(I64 *)[-1]=ptr-result;
 #assert offset(CMemUsed.size)==offset(CMemUsed.start)-sizeof(I64)
   MemSet(result,0,size);

@@ -2,18 +2,22 @@
 
 //See $LK,"::/Doc/Credits.TXT"$.
 
-U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,U8 *st,I64 *_col,U8 *style_bitmap=NULL)
+U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,
+	U8 *st,I64 *_col,U8 *style_bitmap=NULL)
 {
   U8 *ch,*ptr;
+  u32_attr&=0xFFFFFF00;
   if (u32_attr&DOCET_INVERT)
     u32_attr.u8[1]=(u32_attr.u8[1]&15)<<4|u32_attr.u8[1]>>4;
   if (u32_attr!=*_old_u32_attr) {
-    if (!(u32_attr&DOCET_BLINK) && *_old_u32_attr&DOCET_BLINK)
+    if (!(u32_attr&DOCET_BLINK) &&
+	*_old_u32_attr!=-1 && *_old_u32_attr&DOCET_BLINK)
       DocPrint(doc,"</blink>");
     if (*_old_u32_attr!=-1)
       DocPrint(doc,"</span>");
     DocPrint(doc,"<span class=c%02X>",u32_attr.u8[1]);
-    if (u32_attr&DOCET_BLINK && !(*_old_u32_attr&DOCET_BLINK))
+    if (u32_attr&DOCET_BLINK &&
+	(*_old_u32_attr==-1 || !(*_old_u32_attr&DOCET_BLINK)))
       DocPrint(doc,"<blink>");
     *_old_u32_attr=u32_attr;
     if (style_bitmap)
@@ -120,11 +124,11 @@ public CDoc *Doc2Html(CDoc *doc_in,
   U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
 {//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
-  I64 i,y,old_y=MIN_I64,col,_old_u32_attr=-1,old_attr;
+  I64 i,y,old_y=MIN_I64,col,old_u32_attr=-1,old_attr;
   U32 *hl,*src;
   U8 *st,st_2[2],*link_st,*style_bitmap=CAlloc(256/8);
-  CBGR p[16];
-  GetVGAPalette4(p);
+  CBGR48 p[NUM_COLORS];
+  GrPaletteGet(p);
   CDoc *doc_out=DocNew;
   Bool unlock_doc_in=DocLock(doc_in),no_bwd;
 
@@ -142,19 +146,20 @@ public CDoc *Doc2Html(CDoc *doc_in,
   if (!body_header) body_header="";
   if (!body_footer) body_footer="";
   DocPrint(doc_out,
-    "<!DOCTYPE HTML>\n"
-    "<html>\n"
-    "<head>\n"
-    "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=US-ASCII\">\n"
-    "%s"
-    "<meta name=\"generator\" content=\"TempleOS V%4.2f\">\n"
-    "<style type=\"text/css\">\n",html_header,os_version);
+	"<!DOCTYPE HTML>\n"
+	"<html>\n"
+	"<head>\n"
+	"<meta http-equiv=\"Content-Type\" "
+	"content=\"text/html;charset=US-ASCII\">\n"
+	"%s"
+	"<meta name=\"generator\" content=\"TempleOS V%4.2f\">\n"
+	"<style type=\"text/css\">\n",html_header,os_version);
   style=doc_out->cur_entry->last;
   DocPrint(doc_out,
-    "</style>\n"
-    "</head>\n"
-    "<body>\n"
-    "<pre style=\"font-family:courier;font-size:10pt\">\n");
+	"</style>\n"
+	"</head>\n"
+	"<body>\n"
+	"<pre style=\"font-family:courier;font-size:10pt\">\n");
   DocPrint(doc_out,"%s",body_header);
 
   doc_e=doc_in->root.next;
@@ -167,7 +172,8 @@ public CDoc *Doc2Html(CDoc *doc_in,
 	old_y=y;
       }
       while (y<doc_e->y) {
-	HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,"\n",&col,style_bitmap);
+	HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+	      &old_u32_attr,"\n",&col,style_bitmap);
 	if (line_anchors && ++y!=old_y) {
 	  DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	  old_y=y;
@@ -186,7 +192,8 @@ public CDoc *Doc2Html(CDoc *doc_in,
       }
       if (no_bwd)
 	while (col<doc_e->x)
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr," ",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		&old_u32_attr," ",&col,style_bitmap);
 
       link_st=NULL;
       if (doc_e->de_flags&DOCEF_HTML_LINK)
@@ -197,9 +204,9 @@ public CDoc *Doc2Html(CDoc *doc_in,
       }
 
       if (link_st) {
-	if (_old_u32_attr!=-1) {
+	if (old_u32_attr!=-1) {
 	  DocPrint(doc_out,"</span>");
-	  _old_u32_attr=-1;
+	  old_u32_attr=-1;
 	}
 	DocPrint(doc_out,"<a href=\"%s\">",link_st);
       }
@@ -208,40 +215,49 @@ public CDoc *Doc2Html(CDoc *doc_in,
 	case DOCT_TEXT:
 	  if (doc_e->de_flags&DOCEF_HIGHLIGHT) {
 	    if (doc_e->last==doc_in)
-	      MemCpy(&doc_e->settings,&doc_in->settings_root,sizeof(CDocSettings));
+	      MemCpy(&doc_e->settings,&doc_in->settings_root,
+		    sizeof(CDocSettings));
 	    else
-	      MemCpy(&doc_e->settings,&doc_e->last->settings,sizeof(CDocSettings));
-	    src=hl=DocHighlight(doc_e,doc_e->tag,StrLen(doc_e->tag),doc_e->type&0xFF00);
+	      MemCpy(&doc_e->settings,&doc_e->last->settings,
+		    sizeof(CDocSettings));
+	    src=hl=DocHighlight(doc_e,doc_e->tag,StrLen(doc_e->tag),
+		  doc_e->type&0xFF00);
 	    while (*src) {
 	      st_2[0]=*src&0xFF;
-	      HtmlPutS(doc_out,*src++,&_old_u32_attr,st_2,&col,style_bitmap);
+	      HtmlPutS(doc_out,*src++,&old_u32_attr,st_2,&col,style_bitmap);
 	    }
 	    Free(hl);
 	  } else
-	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,doc_e->tag,&col,style_bitmap);
+	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		  &old_u32_attr,doc_e->tag,&col,style_bitmap);
 	  break;
 	case DOCT_TAB:
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,"\t",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		&old_u32_attr,"\t",&col,style_bitmap);
 	  break;
 	case DOCT_HTML_CODE:
-	  if (_old_u32_attr!=-1) {
+	  if (old_u32_attr!=-1) {
 	    DocPrint(doc_out,"</span>");
-	    _old_u32_attr=-1;
+	    old_u32_attr=-1;
 	  }
 	  DocPrint(doc_out,"%s",doc_e->tag);
 	  break;
 	case DOCT_SPRITE:
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,doc_e->tag,&col,style_bitmap);
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,"/* Graphics Not Rendered in HTML */",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		&old_u32_attr,doc_e->tag,&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		&old_u32_attr,"/* Graphics Not Rendered in HTML */",
+		&col,style_bitmap);
 	  break;
 	default:
 	  if (doc_e->de_flags&DOCEF_TAG)
-	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,doc_e->tag,&col,style_bitmap);
+	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+		  &old_u32_attr,doc_e->tag,&col,style_bitmap);
       }
       if (link_st) {
-	if (_old_u32_attr!=-1) {
+	if (old_u32_attr!=-1) {
 	  DocPrint(doc_out,"</span>");
-	  _old_u32_attr=-1;
+	  old_u32_attr=-1;
 	}
 	DocPrint(doc_out,"</a>");
 	Free(link_st);
@@ -250,14 +266,15 @@ public CDoc *Doc2Html(CDoc *doc_in,
     doc_e=doc_e->next;
   }
   while (y++<doc_e->y) {
-    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&_old_u32_attr,"\n",&col,style_bitmap);
+    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
+	  &old_u32_attr,"\n",&col,style_bitmap);
     col=0;
   }
-  if (_old_u32_attr!=-1) {
-    if (_old_u32_attr&DOCET_BLINK)
+  if (old_u32_attr!=-1) {
+    if (old_u32_attr&DOCET_BLINK)
       DocPrint(doc_out,"</blink>");
     DocPrint(doc_out,"</span>");
-    _old_u32_attr=-1;
+    old_u32_attr=-1;
   }
   DocPrint(doc_out,"%s",body_footer);
   DocPrint(doc_out,"</pre></body>\n</html>\n");
@@ -265,7 +282,10 @@ public CDoc *Doc2Html(CDoc *doc_in,
   doc_out->cur_entry=style->next;
   for (i=0;i<256;i++)
     if (Bt(style_bitmap,i))
-      DocPrint(doc_out,".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",i,p[i&15].r,p[i&15].g,p[i&15].b,p[i/16].r,p[i/16].g,p[i/16].b);
+      DocPrint(doc_out,
+	    ".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",
+	    i,p[i&15].r>>8,p[i&15].g>>8,p[i&15].b>>8,
+	    p[i/16].r>>8,p[i/16].g>>8,p[i/16].b>>8);
   doc_out->cur_entry=&doc_out->root;
   DocRecalc(doc_out);
 
@@ -289,13 +309,14 @@ public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   WinHorz(0,width-1); //Sets doc width for word wrap.
 
   in_name=DftExt(_in_name,"CPP.Z"),
-  if (_out_name)
-    out_name=DftExt(_out_name,"html");
+	if (_out_name)
+  out_name=DftExt(_out_name,"html");
   else
-    out_name=ChgExt(_in_name,"html");
+  out_name=ChgExt(_in_name,"html");
 
   doc_in=DocRead(in_name);
-  doc_out=Doc2Html(doc_in,html_header,body_header,body_footer,line_anchors,link_cvt);
+  doc_out=Doc2Html(doc_in,html_header,body_header,
+	body_footer,line_anchors,link_cvt);
   StrCpy(&doc_out->filename.name,out_name);
 
   SettingsPop;

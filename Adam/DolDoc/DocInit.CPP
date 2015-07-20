@@ -2,14 +2,14 @@
 
 U0 DocInit()
 {//$LK-UL,"CMD Defines",A="MN:DOCT_TEXT"$
-  CLex *lx;
+  CCmpCtrl *cc;
   I64 i;
   CHashGeneric *temph;
 
   DefineLstLoad("ST_DOC_CMDS",
-	"TX\0CR\0SR\0CU\0TB\0CL\0PB\0DA\0PL\0LM\0RM\0HD\0FO\0ID\0"
-	"FG\0BG\0FD\0BD\0PT\0WW\0UL\0IV\0BK\0SX\0SY\0CM\0AN\0LK\0BT\0"
-	"CB\0LS\0MA\0MU\0HX\0TR\0SP\0IB\0IS\0SO\0HL\0HC\0ER\0");
+	"TX\0CR\0SR\0CU\0TB\0CL\0PB\0PL\0LM\0RM\0HD\0FO\0ID\0FG\0"
+	"BG\0FD\0BD\0PT\0WW\0UL\0IV\0BK\0SX\0SY\0CM\0AN\0LK\0BT\0"
+	"DA\0CB\0LS\0MA\0MU\0HX\0TR\0SP\0IB\0IS\0SO\0HL\0HC\0ER\0");
   DefineLstLoad("ST_DOC_FLAGS",
 	"T\0A\0D\0HTML\0LE\0LM\0RE\0RM\0BI\0BP\0RT\0SX\0SY\0SCX\0U\0"
 	"LC\0LA\0RC\0RA\0TC\0LX\0CX\0RX\0TY\0CY\0BY\0"
@@ -26,21 +26,21 @@ U0 DocInit()
 
   MemSet(doldoc.dft_de_flags,	0,sizeof(doldoc.dft_de_flags));
   MemSet(doldoc.dft_type_flags,	0,sizeof(doldoc.dft_type_flags));
-  lx=LexNew("TX+T;DA+P+TRM+T;CM+LE+RE;AN+T;LK+L+UL+T;MA+X+UL+T;MU+X+UL+T;"
+  cc=CmpCtrlNew("TX+T;DA+P+TRM+T;CM+LE+RE;AN+T;LK+L+UL+T;MA+X+UL+T;MU+X+UL+T;"
 	"BT+X+B+T;CB+CA+P+T;LS+LS+P+T;HX+P+Z;TR+TR+C+CA+UL+T;SP+T;IB+T;IS+T;"
-	"SO+T;HC+T;",LF_DONT_FREE_BUF);
-  lx->htc.hash_table_lst=NULL;
-  Lex(lx);
-  while (lx->token==TK_IDENT) {
-    if (temph=HashFind(lx->cur_str,doldoc.hash,DHT_DOC_CMD)) {
+	"SO+T;HC+T;",CCF_DONT_FREE_BUF);
+  cc->htc.hash_table_lst=NULL;
+  Lex(cc);
+  while (cc->token==TK_IDENT) {
+    if (temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD)) {
       i=temph->user_data0;
-      Lex(lx);
-      PrsDocFlags(lx,&doldoc.dft_de_flags[i],&doldoc.dft_type_flags[i]);
+      Lex(cc);
+      PrsDocFlags(cc,&doldoc.dft_de_flags[i],&doldoc.dft_type_flags[i]);
     }
-    if (lx->token==';')
-      Lex(lx);
+    if (cc->token==';')
+      Lex(cc);
   }
-  LexDel(lx);
+  CmpCtrlDel(cc);
 
   for (i=0;i<DOCT_NUM_TYPES;i++)
     doldoc.dft_de_flags[i]&=~DOCG_BL_IV_UL;
@@ -50,7 +50,7 @@ U0 DocInit()
     if (Bt(&doldoc.dft_de_flags[i],DOCEf_TAG) && i!=DOCT_TEXT || i==DOCT_HEX_ED)
       Bts(doldoc.type_flags_form,i);
 
-  //Don't forget $LK,"cmp_type_flags_src_code",A="MN:cmp_type_flags_src_code"$.
+      //Don't forget $LK,"cmp_type_flags_src_code",A="MN:cmp_type_flags_src_code"$.
   doldoc.type_flags_nontag_invisible[0]=
 	1<<DOCT_PAGE_LEN|
 	1<<DOCT_LEFT_MARGIN|

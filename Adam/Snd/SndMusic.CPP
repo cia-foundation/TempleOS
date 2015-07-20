@@ -20,7 +20,7 @@ public class CMusicGlbls
 
 #help_index "Snd/Music;Time/Seconds"
 public F64 tM()
-{//Time in seconds synchronized to music subsystem.
+{//Time in seconds synced to music subsystem.
   return (cnts.jiffies+music.tM_correction)/JIFFY_FREQ;
 }
 
@@ -98,37 +98,37 @@ U8 *MusicSetNoteLen(U8 *st)
 public U0 Play(U8 *st,U8 *words=NULL)
 {/* Notes are entered with a capital letter.
 
-  Octaves are entered with a digit and
-  stay set until changed.
+Octaves are entered with a digit and
+stay set until changed.
 
-  Durations are entered with
-    'w' whole note
-    'h' half note
-    'q' quarter note
-    'e' eighth note
-    't' sets to 2/3rds the current duration
-    '.' sets to 1.5 times the current duration
-  durations stay set until changed.
+Durations are entered with
+'w' whole note
+'h' half note
+'q' quarter note
+'e' eighth note
+'t' sets to 2/3rds the current duration
+'.' sets to 1.5 times the current duration
+durations stay set until changed.
 
-    '(' tie, placed before the note to be extended
+'(' tie, placed before the note to be extended
 
-  $LK,"music.meter_top",A="MN:CMusicGlbls"$,$LK,"music.meter_bottom",A="MN:CMusicGlbls"$ is set with
-    "M3/4"
-    "M4/4"
-    etc.
+$LK,"music.meter_top",A="MN:CMusicGlbls"$,$LK,"music.meter_bottom",A="MN:CMusicGlbls"$ is set with
+"M3/4"
+"M4/4"
+etc.
 
-  Sharp and flat are done with '#' or 'b'.
+Sharp and flat are done with '#' or 'b'.
 
-  The var music.stacatto_factor can
-  be set to a range from 0.0 to 1.0.
+The var music.stacatto_factor can
+be set to a range from 0.0 to 1.0.
 
-  The var music.tempo is quarter-notes
-  per second.  It defaults to
-  2.5 and gets faster when bigger.
+The var music.tempo is quarter-notes
+per second.  It defaults to
+2.5 and gets faster when bigger.
 */
   U8 *word,*last_st;
   I64 note,i=0,timeout_val,timeout_val2;
-  Bool tie,old_preempt=Preempt(OFF);
+  Bool tie,old_preempt=Preempt;
   F64 f,d,on_jiffies,off_jiffies;
   music.play_note_num=0;
   while (*st) {

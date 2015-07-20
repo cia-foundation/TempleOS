@@ -12,7 +12,7 @@ CDC *cur_dc;
 U0 DrawFrame(CTask *task,CDC *dc)
 {
   I64 w=task->pix_width,h=task->pix_height,
-     cx=w>>1,cy=h>>1;
+	cx=w>>1,cy=h>>1;
 
   dc->color=LTRED;
   GrLine(dc,cx-20,cy-50,cx,cy-150);
@@ -56,10 +56,11 @@ U0 DrawDrops(CTask *,CDC *dc)
 
 U0 UpdateCurBase(CTask *task,CDC *dc)
 {
-  Bool old_preempt=Preempt(OFF);
+  Bool old_preempt=Preempt;
   cur_dc->color=ROP_EQU;
   dc->flags|=DCF_NO_TRANSPARENTS;
-  GrBlot(cur_dc,-task->pix_left-task->scroll_x,-task->pix_top-task->scroll_y,dc);
+  GrBlot(cur_dc,-task->pix_left-task->scroll_x,
+	-task->pix_top-task->scroll_y,dc);
   dc->flags&=~DCF_NO_TRANSPARENTS;
   Preempt(old_preempt);
 }
@@ -87,7 +88,7 @@ U0 AnimateTask(I64)
 	  break;
 	j++;
       } while (j<=NUM_DROPS);
- 
+
       drops[cur_drop].x=RandU32%w;
       drops[cur_drop].y=0;
     }
@@ -150,16 +151,16 @@ U0 RainDrops()
 {
   I64 ch,sc;
   MenuPush(
-  "File {"
-  "  Abort(,CH_SHIFT_ESC);"
-  "  Exit(,CH_ESC);"
-  "}"
-  "Play {"
-  "  Restart(,'\n');"
-  "  OpenUpper(,'1');"
-  "  OpenLower(,'2');"
-      "}"
-      );
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Play {"
+	"  Restart(,'\n');"
+	"  OpenUpper(,'1');"
+	"  OpenLower(,'2');"
+	"}"
+	);
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
   cur_dc=DCNew(GR_WIDTH,GR_HEIGHT);

@@ -7,8 +7,6 @@ asm {
 //Opcodes are slightly different to make writing my x86_64 assembler easier.
 //See $LK,"::/Compiler/OpCodes.TXT"$.
 
-USE64	//Defaults to 64, but this is a good habit.
-
 //You can clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
 
 MUL_BY_HAND_U8_U8_TO_U16: //This is only for fun.

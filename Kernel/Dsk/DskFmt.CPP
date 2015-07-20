@@ -1,0 +1,90 @@
+Bool DrvTypeSet(U8 drv_let,I64 type=DVT_REDSEA)
+{//Very dangerous
+  I64 i,j,ext_base,drv_num,offset,cur_type;
+  CMasterBoot mbr;
+  CBlkDev *bd=Let2BlkDev(drv_let);
+  drv_num=bd->first_drv_let-'A';
+  switch (bd->type) {
+    case BDT_ATA:
+      offset=0;
+      ext_base=INVALID_CLUSTER;
+      while (TRUE) {
+	ATAReadBlks(bd,&mbr,offset,1);
+	j=-1;
+	for (i=0;i<4;i++) {
+	  cur_type=mbr.p[i].type;
+	  if (cur_type) {
+	    if (cur_type==5 || cur_type==15)
+	      j=i;
+	    else {
+	      if (drv_num+'A'==ToUpper(drv_let)) {
+		switch (type) {
+		  case DVT_REDSEA:
+		    mbr.p[i].type=MBR_PT_REDSEA;
+		    break;
+		  case DVT_FAT32:
+		    mbr.p[i].type=MBR_PT_FAT32a;
+		    break;
+		  default:
+		    throw('Drv');
+		}
+		mbr.p[i].active=0x80;
+		ATAWriteBlks(bd,&mbr,offset,1);
+		return TRUE;
+	      }
+	      drv_num++;
+	    }
+	  }
+	}
+	if (j<0)
+	  break;
+	if (!mbr.p[j].offset)
+	  break;
+	if (ext_base==INVALID_CLUSTER) {
+	  offset=mbr.p[j].offset;
+	  ext_base=offset;
+	} else
+	  offset=mbr.p[j].offset+ext_base;
+      }
+      break;
+  }
+}
+
+U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32)
+{//Format hard drive or RAM drive.
+//$BK,1$Warning:$BK,0$ Destroys all previous info.
+  //quick=FALSE means fill entire drive with zeros.
+  //Choose $LK,"DVT_FAT32",A="MN:DVT_FAT32"$ or $LK,"DVT_REDSEA",A="MN:DVT_REDSEA"$.
+  //You don't format a CD-ROM with this.
+  CDrv *dv=Let2Drv(drv_let);
+  Bool old_silent=IsSilent;
+  if (confirm && !AreYouSure)
+    return;
+  if (!dv)  {
+    PrintErr("Invalid Drive\n");
+    return;
+  }
+  switch (type) {
+    case DVT_REDSEA:
+      Silent;
+      Drv(drv_let);
+      Silent(old_silent);
+      RedSeaFmt(drv_let,quick);
+      DskCacheInvalidate(Let2Drv(drv_let));
+      Drv(drv_let);
+      break;
+    case DVT_FAT32:
+      Silent;
+      Drv(drv_let);
+      Silent(old_silent);
+      FAT32Fmt(drv_let,quick);
+      DskCacheInvalidate(Let2Drv(drv_let));
+      Drv(drv_let);
+      break;
+    case DVT_ISO9660:
+      PrintErr("Not Writable\n");
+      break;
+    default:
+      PrintErr("File System Not Supported\n");
+  }
+}

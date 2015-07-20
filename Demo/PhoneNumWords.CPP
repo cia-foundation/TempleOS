@@ -10,7 +10,7 @@ U0 PhoneNumWords(U8 *num)
 {
   I64 ch;
   U8 *_num=StrNew(num),*dst=_num,
-      *dict=acd.word_lst,*st,*src;
+	*dict=acd.word_lst,*st,*src;
   while (*num) {
     if ('0'<=*num<='9')
       *dst++=*num;

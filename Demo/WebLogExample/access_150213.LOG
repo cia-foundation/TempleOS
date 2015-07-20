@@ -374,7 +374,7 @@
 154.119.160.119 - - [12/Feb/2015:08:00:14 -0800] "GET /Wb/Accts/TS/Wb2/TempleOS.html HTTP/1.1" 404 89 "-" "Twitterbot/1.0" "www.templeos.org"
 8.177.213.37 - - [12/Feb/2015:08:08:59 -0800] "GET /Wb/Home/Wb2/Downloads.html HTTP/1.1" 200 7086 "http://www.templeos.org/" "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko" "www.templeos.org"
 147.203.164.194 - - [12/Feb/2015:08:11:06 -0800] "HEAD / HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/534.51.22 (KHTML, like Gecko) Version/5.1.1 Safari/534.51.22" "www.templeos.org"
-52.209.6.68 - - [12/Feb/2015:08:22:10 -0800] "GET /Wb/Kernel/BIOS32.html HTTP/1.1" 200 132777 "-" "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)" "www.templeos.org"
+52.209.6.68 - - [12/Feb/2015:08:22:10 -0800] "GET /Wb/Kernel/PCIBIOS.html HTTP/1.1" 200 132777 "-" "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)" "www.templeos.org"
 64.124.225.255 - - [12/Feb/2015:08:32:33 -0800] "GET /Wb/Kernel/Dsk/DskCFile.html HTTP/1.1" 200 138681 "-" "Mozilla/5.0 (compatible; SeznamBot/3.2; +http://fulltext.sblog.cz/)" "www.templeos.org"
 34.168.143.76 - - [12/Feb/2015:08:39:43 -0800] "GET /robots.txt HTTP/1.1" 404 89 "-" "Sogou web spider/4.0(+http://www.sogou.com/docs/help/webmasters.htm#07)" "www.templeos.org"
 91.143.212.182 - - [12/Feb/2015:08:49:30 -0800] "GET /Wb/Accts/TS/Wb2/TAD/TADRants2014.html HTTP/1.1" 404 89 "http://www.reddit.com/r/TempleOS_Official/comments/2pdlh3/post_what_god_said_ill_help_interpret/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:35.0) Gecko/20100101 Firefox/35.0" "www.templeos.org"

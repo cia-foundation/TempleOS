@@ -1,15 +1,15 @@
-U0 OptPass3(CLex *lx,COptReg *reg_offsets)
+U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 {
   CHashClass *tempc,*tempc1,*tempc2;
-  CLexCodeMisc *lb;
+  CCodeMisc *lb;
   CIntermediateCode *tempi,*tempi1,*tempi2,*tempi_next,
 	*tempil1,*tempil2;
   I64 code,i,j,l,member_cnt,used_reg_mask=0;
   CMemberLst *tempm;
   COptMemberVar *mv=NULL;
-  CExe *tempx;
-  CExeImportExport *tempe;
-  CPrsStk *ps=lx->ps;
+  CAOT *tempaot;
+  CAOTImportExport *tempie;
+  CPrsStk *ps=cc->ps;
   ps->ptr=0;
   ps->ptr2=0;
 
@@ -17,19 +17,20 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
     reg_offsets[i].offset=MAX_I64;
     reg_offsets[i].m=NULL;
   }
-  if (lx->htc.fun) {
-    member_cnt=lx->htc.fun->member_cnt;
-    if (Bt(&lx->htc.fun->flags,Ff_DOT_DOT_DOT))
+  if (cc->htc.fun) {
+    member_cnt=cc->htc.fun->member_cnt;
+    if (Bt(&cc->htc.fun->flags,Ff_DOT_DOT_DOT))
       member_cnt+=2;
     mv=CAlloc(member_cnt*sizeof(COptMemberVar));
     member_cnt=0;
-    tempm=lx->htc.fun->member_lst;
+    tempm=cc->htc.fun->member_lst;
     while (tempm) {
       tempc=OptClassFwd(tempm->member_class);
       if (0<=tempm->reg<NUM_REGS) {
 	if (Bts(&used_reg_mask,tempm->reg))
 	  PrintWarn("Reg in use\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-		lx->cur_lfn->full_name,lx->cur_lfn->line_num,tempm->str,lx->htc.fun->str);
+		cc->lex_include_stk->full_name,
+		cc->lex_include_stk->line_num,tempm->str,cc->htc.fun->str);
 	reg_offsets[tempm->reg].offset=tempm->offset;
 	reg_offsets[tempm->reg].m=tempm;
       } else if (tempc->raw_type!=RT_F64 && tempm->reg!=REG_NONE ||
@@ -42,14 +43,15 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
       } else {
 	if (tempm->reg==REG_ALLOC)
 	  PrintWarn("Can't reg var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-		lx->cur_lfn->full_name,lx->cur_lfn->line_num,tempm->str,lx->htc.fun->str);
+		cc->lex_include_stk->full_name,
+		cc->lex_include_stk->line_num,tempm->str,cc->htc.fun->str);
       }
       tempm=tempm->next;
     }
   } else
     member_cnt=0;
 
-  tempi=lx->lcc.lcc_root.next;
+  tempi=cc->coc.coc_root.next;
   while (code=tempi->ic_code) {
     tempi_next=tempi->next;
     if (code==IC_NOP1)
@@ -256,7 +258,8 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
 	  if (tempc) {
 	    if (tempc->raw_type==RT_F64 && tempil1->ic_class->raw_type!=RT_F64)
 	      tempil1->ic_flags|=ICF_R_TO_F64;
-	    else if (tempc->raw_type!=RT_F64 && tempil1->ic_class->raw_type==RT_F64)
+	    else if (tempc->raw_type!=RT_F64 &&
+		  tempil1->ic_class->raw_type==RT_F64)
 	      tempil1->ic_flags|=ICF_R_TO_INT;
 	  }
 	  break;
@@ -272,23 +275,24 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
 	  break;
 	case IC_NOBOUND_SWITCH:
 	case IC_SWITCH:
-	  lb=OptLabelFwd(tempi->ic_data(CLexCodeMisc *)->dft);
+	  lb=OptLabelFwd(tempi->ic_data(CCodeMisc *)->dft);
 	  lb->use_cnt++;
 	  break;
 	case IC_ASM:
-	  tempx=tempi->ic_data;
-	  tempe=tempx->next_ie;
-	  while (tempe!=&tempx->next_ie) {
-	    if (EIT_REL_I0<=tempe->type<=EIT_IMM_I64 &&
-		  tempe->str && tempe->flags&EIF_GOTO_LABEL &&
-		  (lb=LCCGoToLabelFind(lx,tempe->str)))
+	  tempaot=tempi->ic_data;
+	  tempie=tempaot->next_ie;
+	  while (tempie!=&tempaot->next_ie) {
+	    if (IET_REL_I0<=tempie->type<=IET_IMM_I64 &&
+		  tempie->str && tempie->flags&IEF_GOTO_LABEL &&
+		  (lb=COCGoToLabelFind(cc,tempie->str)))
 	      lb->use_cnt++; //Prevent deadcode elimination.
-	    tempe=tempe->next;
+	    tempie=tempie->next;
 	  }
 	  break;
 	case IC_BR_NOT_EQUAL:
 	case IC_BR_EQUAL_EQUAL:
-	  if ((tempi1->ic_code==IC_IMM_I64 || tempi1->ic_code==IC_IMM_F64) && !tempi1->ic_data) {
+	  if ((tempi1->ic_code==IC_IMM_I64 ||
+		tempi1->ic_code==IC_IMM_F64) && !tempi1->ic_data) {
 	    OptFree(tempi1);
 	    MemCpy(&tempi->a1,&tempi->a2,sizeof(CICArg));
 	    tempi->a2.type=TY_NULL;
@@ -298,7 +302,8 @@ U0 OptPass3(CLex *lx,COptReg *reg_offsets)
 	      code=tempi->ic_code=IC_BR_NOT_ZERO;
 	    tempi1=tempi2;
 	    tempc1=tempc2;
-	  } else if ((tempi2->ic_code==IC_IMM_I64 || tempi2->ic_code==IC_IMM_F64) && !tempi2->ic_data) {
+	  } else if ((tempi2->ic_code==IC_IMM_I64 ||
+		tempi2->ic_code==IC_IMM_F64) && !tempi2->ic_data) {
 	    OptFree(tempi2);
 	    tempi->a2.type=TY_NULL;
 	    if (code==IC_BR_EQUAL_EQUAL)
@@ -509,9 +514,9 @@ here1:
 	case IC_LABEL:
 	  break;
 	default:
-	  "Pass:%d Missing IC handler\n",lx->pass;
-	  ICPut(lx,tempi);
-	  LexExcept(lx,"Compiler Optimization Error at ");
+	  "Pass:%d Missing IC handler\n",cc->pass;
+	  ICPut(cc,tempi);
+	  LexExcept(cc,"Compiler Optimization Error at ");
       }
     }
     tempi=tempi_next;
@@ -521,8 +526,8 @@ here1:
 We just scored num occurrences of each [RBP] offset in the code to help decide
 which variables should be assigned to register variables.
 
-We counted the times each offset was added to RBP as a plus LEA and we subtract the
-times the offset is dereferenced.  If the address was calculated more times
+We counted the times each offset was added to RBP as a plus LEA and we subtract
+the times the offset is dereferenced.  If the address was calculated more times
 than the offset was dereferenced, the variable's address was passed or assigned
 and we cannot use a register because you can't take address of a reg var.
 
@@ -535,10 +540,11 @@ have a unusual ModR addressing mode in the x86_64 architecture, so I only use
 R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 
 */
-  if (lx->htc.fun) {
-    lx->htc.fun->used_reg_mask=lx->htc.fun->used_reg_mask&~(REG_VARS_MASK|REG_NON_PTR_MASK)|used_reg_mask;
-    if (!Bt(&lx->opts,OPTf_NO_REG_VAR) &&
-	  !(lx->flags & LF_NO_REG_OPT)) {
+  if (cc->htc.fun) {
+    cc->htc.fun->used_reg_mask=cc->htc.fun->used_reg_mask&
+	  ~(REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS)|used_reg_mask;
+    if (!Bt(&cc->opts,OPTf_NO_REG_VAR) &&
+	  !(cc->flags & CCF_NO_REG_OPT)) {
       QSort(mv,member_cnt,sizeof(COptMemberVar),&OptMVCompare);
       while (member_cnt && !mv[member_cnt-1].score)
 	member_cnt--;
@@ -551,12 +557,13 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 	} else {
 	  if (mv[i].m->reg==REG_ALLOC)
 	    PrintWarn("Can't reg var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-		  lx->cur_lfn->full_name,lx->cur_lfn->line_num,mv[i].m->str,lx->htc.fun->str);
+		  cc->lex_include_stk->full_name,
+		  cc->lex_include_stk->line_num,mv[i].m->str,cc->htc.fun->str);
 	}
       }
       if (j>0) {
-	if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
-	  "Fun:%s\n",lx->htc.fun->str;
+	if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
+	  "Fun:%s\n",cc->htc.fun->str;
 	if (j>cmp.num_reg_vars) {
 	  l=0;
 	  for (i=0;i<j && l<cmp.num_non_ptr_vars;i++) {
@@ -564,22 +571,24 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 	    tempc=OptClassFwd(tempm->member_class);
 	    if (!tempc->ptr_stars_cnt && !tempm->dim.next) {
 	      while (l<cmp.num_non_ptr_vars &&
-		    Bts(&lx->htc.fun->used_reg_mask,cmp.non_ptr_vars_map[l]))
+		    Bts(&cc->htc.fun->used_reg_mask,cmp.non_ptr_vars_map[l]))
 		l++;
 	      if (l<cmp.num_non_ptr_vars) {
 		tempm->reg=cmp.non_ptr_vars_map[l++];
 		reg_offsets[tempm->reg].offset=mv[i].offset_start;
 		reg_offsets[tempm->reg].m=tempm;
-		if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
+		if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
 		  "Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 			tempm->str,reg_offsets[tempm->reg].offset;
 		mv[i].offset_start=0; //flag as reg var
-		if (tempm->size<8 && !StrIMatch("Bool",tempm->member_class->str) &&
+		if (tempm->size<8 &&
+		      !StrIMatch("Bool",tempm->member_class->str) &&
 		      tempm->member_class->type&HTT_INTERNAL_TYPE)
 		  PrintWarn("Using 64-bit reg var.\n "
 			"$$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-			lx->cur_lfn->full_name,lx->cur_lfn->line_num,
-			tempm->str,lx->htc.fun->str);
+			cc->lex_include_stk->full_name,
+			cc->lex_include_stk->line_num,
+			tempm->str,cc->htc.fun->str);
 	      }
 	    }
 	  }
@@ -591,21 +600,23 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 	  if (mv[i].offset_start && (!mv[i].m->dim.next||
 		tempm->offset>0 && StrCmp(tempm->str,"argv"))) {
 	    while (l<cmp.num_reg_vars &&
-		  Bts(&lx->htc.fun->used_reg_mask,cmp.to_reg_vars_map[l]))
+		  Bts(&cc->htc.fun->used_reg_mask,cmp.to_reg_vars_map[l]))
 	      l++;
 	    if (l<cmp.num_reg_vars) {
 	      tempm->reg=cmp.to_reg_vars_map[l++];
 	      reg_offsets[tempm->reg].offset=mv[i].offset_start;
 	      reg_offsets[tempm->reg].m=tempm;
-	      if (Bt(&lx->flags,Lf_OPT_TRACE_PRESENT))
+	      if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
 		"Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 		      tempm->str,reg_offsets[tempm->reg].offset;
-	      if (tempm->size<8 && !StrIMatch("Bool",tempm->member_class->str) &&
+	      if (tempm->size<8 &&
+		    !StrIMatch("Bool",tempm->member_class->str) &&
 		    tempm->member_class->type&HTT_INTERNAL_TYPE)
 		PrintWarn("Using 64-bit reg var.\n "
 		      "$$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-		      lx->cur_lfn->full_name,lx->cur_lfn->line_num,
-		      tempm->str,lx->htc.fun->str);
+		      cc->lex_include_stk->full_name,
+		      cc->lex_include_stk->line_num,
+		      tempm->str,cc->htc.fun->str);
 	    }
 	  }
 	}
@@ -614,8 +625,8 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
     Free(mv);
   }
   if (ps->ptr>2) {
-    "Pass:%d Stk:%08X\n",lx->pass,ps->ptr;
-    LexExcept(lx,"Compiler Optimization Error at ");
+    "Pass:%d Stk:%08X\n",cc->pass,ps->ptr;
+    LexExcept(cc,"Compiler Optimization Error at ");
   }
 }
 

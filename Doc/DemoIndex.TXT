@@ -4,6 +4,8 @@ $WW,1$These are arranged in increasing order of difficulty, more or less.  This 
 
 $FG,2$<SPACE>$FG$ to edit a file and $FG,2$F5$FG$ to run it.
 
+$LK,"::/Doc/HelloWorld.TXT.Z"$
+
 $WW,0$$TR,"Games: Beginner"$
 $ID,2$$LK,"::/Demo/Graphics/NetOfDots.CPP"$
 $LK,"::/Demo/Graphics/InputPointer.CPP"$
@@ -32,7 +34,7 @@ $LK,"::/Demo/Games/Digits.CPP"$
 $LK,"::/Demo/Progress.CPP"$ //has some ASM, just ignore
 $LK,"::/Demo/Graphics/Symmetry.CPP"$
 $LK,"::/Demo/Graphics/Blot.CPP"$
-$LK,"::/Demo/Graphics/CaptureScreen.CPP"$
+$LK,"::/Demo/Graphics/ScreenCapture.CPP"$
 $LK,"::/Demo/Graphics/EdSprite.CPP"$
 $LK,"::/Demo/PullDownMenu.CPP"$
 $MA-X+PU,"::/Demo/Games/Stadium",LM="Cd(\"::/Demo/Games/Stadium\");Dir;View;\n"$
@@ -45,7 +47,6 @@ $LK,"::/Demo/Snd/MorseCode.CPP"$
 $LK,"::/Demo/Graphics/Lattice.CPP"$
 $LK,"::/Demo/Graphics/Collision.CPP"$
 $LK,"::/Demo/Games/BlackDiamond.CPP"$
-$LK,"::/Demo/Games/Wenceslas.CPP"$
 $ID,-2$$TR,"Games: Intermediate"$
 $ID,2$$LK,"::/Demo/Graphics/Box.CPP"$
 $LK,"::/Demo/Graphics/Pick.CPP"$
@@ -55,6 +56,7 @@ $LK,"::/Demo/Graphics/Extents.CPP"$
 $LK,"::/Demo/Graphics/SpritePlot3D.CPP"$
 $LK,"::/Demo/Graphics/Balloon.CPP"$
 $LK,"::/Demo/Graphics/RotateTank.CPP"$
+$LK,"::/Demo/Games/Wenceslas.CPP"$
 $LK,"::/Demo/ScreenCodes.CPP"$
 $LK,"::/Demo/Graphics/PanText.CPP"$
 $LK,"::/Demo/Graphics/CharGraphics.CPP"$
@@ -70,6 +72,7 @@ $LK,"::/Demo/Graphics/Cartesian.CPP"$
 $LK,"::/Demo/Graphics/Hanoi.CPP"$
 $LK,"::/Demo/Graphics/Life.CPP"$
 $LK,"::/Demo/Games/Zing.CPP"$
+$LK,"::/Demo/Graphics/Grid.CPP.Z"$
 $LK,"::/Demo/Games/TreeCheckers.CPP"$
 $LK,"::/Demo/MultiCore/Palindrome.CPP"$
 $LK,"::/Demo/MultiCore/MPAdd.CPP"$
@@ -154,6 +157,7 @@ $LK,"::/Demo/CompileDemo.CPP"$
 $LK,"::/Demo/Prompt.CPP"$
 $LK,"::/Demo/ClassMeta.CPP"$
 $LK,"::/Demo/LastClass.CPP"$
+$LK,"::/Demo/DolDoc/NumBible.CPP.Z"$
 $LK,"::/Demo/DolDoc/Form.CPP"$
 $LK,"::/Demo/DolDoc/MenuButton.CPP"$
 $LK,"::/Demo/DolDoc/MenuSprite.CPP"$

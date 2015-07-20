@@ -91,7 +91,7 @@ public U0 ProfRep(I64 filter_cnt=1,Bool leave_it=OFF)
     }
     if (*last_buf && routine_total>=filter_cnt)
       "$$GREEN$$%6.2f %08X:%s\n$$FG$$",100*routine_total/total_time,
-	routine_total,last_buf;
+	    routine_total,last_buf;
     "Total Time:%0.6fs\n",total_time/JIFFY_FREQ;
     if (leave_it) {
       cpu_structs[pf_cpu].profiler_timer_irq=&ProfTimerInt;
