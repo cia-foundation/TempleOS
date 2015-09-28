@@ -9,8 +9,8 @@ U0 OptPass5(CCmpCtrl *cc)
   tempi=cc->coc.coc_root.next;
   while (code=tempi->ic_code) {
     if (code>IC_NOP2) {
-      if (tempi->ic_flags&ICF_TRACE) {
-	if (Bt(&cc->otrace_mask,5)) {
+      if (tempi->ic_flags&ICF_PASS_TRACE) {
+	if (Bt(&cc->saved_pass_trace,5)) {
 	  "%2d:",ps->ptr;
 	  ICPut(cc,tempi);
 	}

@@ -1,3 +1,10 @@
+#help_index "AutoComplete"
+#help_file "::/Doc/AutoComplete"
+public extern CAutoCompleteGlbls ac;
+
+#help_index "AutoComplete/Dictionary"
+public extern CAutoCompleteDictGlbls acd;
+
 #help_index "AutoFile;StdIn/AutoFile"
 #help_file "::/Doc/AutoFile"
 
@@ -99,7 +106,7 @@ extern U0 PutS(U8 *st); //Use $LK,"Print",A="MN:Print"$()
 public extern Bool Silent(Bool val=ON);
 extern U8 *StrPrintHex(U8 *dst,I64 num;I64 width);
 
-#help_index "Char;Debugging/Raw Output"
+#help_index "Char;Debugging/Raw Output;TextBase Layer/Char"
 public extern CTextGlbls text;
 
 #help_index "Compiler/Lex"
@@ -258,9 +265,9 @@ public extern U0 ThrowBreak(CTask *task=NULL);
 public extern U0 throw(I64 ch=0,Bool no_log=FALSE);
 
 #help_index "File/CD DVD"
-public extern U0 CDImageRead(U8 cd_drv_let,U8 *out_name);
-public extern U0 CDImageWrite(U8 cd_drv_let,
-	U8 *in_name=NULL,I64 media_type=MT_CD);
+public extern U0 DVDImageRead(U8 dvd_drv_let,U8 *out_name);
+public extern U0 DVDImageWrite(U8 dvd_drv_let,
+	U8 *in_name=NULL,I64 media_type=MT_DVD);
 
 #help_index "File/CFile"
 public extern U0 FClose(CFile *f);
@@ -315,6 +322,7 @@ public extern Bool DirNew(CDrv *dv,U8 *cur_dir,
 extern I64 FileAttr(U8 *name,I64 old_attr=0);
 
 #help_index "File/Low Level"
+#help_file "::/Doc/FileLowLevel"
 public extern U0 BlkDevChk(CBlkDev *bd);
 public extern Bool BlkDevLock(CBlkDev *bd);
 public extern CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type);
@@ -374,7 +382,7 @@ public extern I64 AutoMountIDE();
 extern I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free);
 extern U0 DskCacheInit(I64 size_in_U8s);
 public extern U0 DskCacheInvalidate(CDrv *dv);
-public extern CDskGlbls dsk;
+public extern CBlkDevGlbls blkdev;
 
 #help_index "Graphics/Color"
 extern U0 (*fp_set_std_palette)();
@@ -460,8 +468,8 @@ public extern I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024);
 
 #help_index "Keyboard Devices/System;Char/System"
 #help_file "::/Doc/KeyDev"
-public extern U0 CtrlAltLetCBSet(U8 ch,U0 (*fp_handler)(I64 sc),U8 *desc,
-	Bool in_irq=FALSE);
+public extern U0 CtrlAltCBSet(U8 ch,U0 (*fp_handler)(I64 sc),
+	U8 *no_shift_desc=NULL,U8 *shift_desc=NULL,Bool in_irq=FALSE);
 public extern U0 KeyDescSet(U8 *fmt,...);
 public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
@@ -629,7 +637,6 @@ public extern CSndGlbls snd;
 
 #help_index "Task"
 public extern U0 Exit();
-public extern Bool IsPreempt();
 public extern Bool IsSuspended(CTask *task=NULL);
 public extern Bool Kill(CTask *task,Bool wait=TRUE);
 public extern Bool Suspend(CTask *task=NULL,Bool state=TRUE);
@@ -675,7 +682,7 @@ public extern I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL);
 public extern I64 PopUpPrint(U8 *fmt,...);
 public extern U0 SrvCmdDel(CSrvCmd *tempc);
 extern U0 SrvCmdLine();
-public extern I64 SrvCmdsHandler(CTask *task=NULL);
+public extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
 public extern U0 SrvTaskCont();
 public extern CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags);
 public extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
@@ -749,5 +756,8 @@ public extern I64 SysTimerRead();//18.33333*65536Hz (SYS_TIMER_FREQ)
 #help_index "Time/Seconds"
 public extern Bool Blink(F64 Hz=2.5);
 public extern F64 tS(); //From SysTimerFreq.
+
+#help_index "Windows"
+public extern Bool WinInside(I64 x,I64 y,CTask *task=NULL,Bool border=FALSE);
 
 #help_index ""

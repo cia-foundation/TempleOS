@@ -1,6 +1,4 @@
-/*See $LK,"TempleOS MultiTasking",A="FI:::/Doc/MultiTasking.TXT"$.
-
-On each core, tasks are linked in a
+/*On each core, tasks are linked in a
 circular doubly-linked list queue with
 the Seth task as the head.  On core#0,
 the queue order represents the front-to-back
@@ -18,12 +16,8 @@ Tasks can be switched in half a microsecond.
 The scheduler checks if a task is
 waiting for a certain time or waiting
 on a message and skips if not ready.
-A task runs until it voluntarily yields
-ctrl with a call to $LK,"Yield",A="MN:Yield"$() or gets
-preempted by the fixed 1kHz $LK,"JIFFY_FREQ",A="MN:JIFFY_FREQ"$
-timer interrupt.  See $LK,"SYS_TIMER_HANDLER",A="MN:SYS_TIMER_HANDLER"$.
-Tasks can ask not to be preempted with
-$LK,"Preempt",A="MN:Preempt"$(ON/OFF).  Tasks waiting on I/O
+A task runs until it voluntarily yields ctrl
+with a call to $LK,"Yield",A="MN:Yield"$().  Tasks waiting on I/O
 often loop, checking for a status and
 $LK,"Yield",A="MN:Yield"$ing.  This does not really degrade
 performance, but pegs the CPU Load.
@@ -155,11 +149,11 @@ _TASK_END_NOW::
 	CALL	SET_FS_BASE
 	JMP	I8 RESTORE_RSI_TASK_WITH_KEY_CHECK
 
-RESTORE_RSI_NO_PREEMPT_TASK:
+RESTORE_RSI_TASK:
 	BT	U32 [SYS_CTRL_ALT_FLAGS],SYSf_CTRL_ALT_DEL
 	JC	I32 HANDLE_SWAP_KEY_EVENT
 	XOR	RAX,RAX
-	CMP	U64 GS:CCPU.idle_task[RAX],RSI	//IDLE TASK HAS PREEMPT-OFF
+	CMP	U64 GS:CCPU.idle_task[RAX],RSI
 	JNE	RESTORE_RSI_TASK_NO_KEY_CHECK
 	JMP	I32 SWAP_IN_SETH_TASK_IF_READY
 
@@ -193,8 +187,6 @@ _YIELD::
 	MOV	U64 CTask.rip[RSI],RBX
 	POP	U64 CTask.rflags[RSI]
 	MOV	U64 CTask.rsp[RSI],RSP
-
-RESTORE_NEXT_RSI_TASK:
 	MOV	RSI,U64 CTask.next_task[RSI]
 
 RESTORE_RSI_TASK_WITH_KEY_CHECK:

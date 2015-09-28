@@ -54,7 +54,7 @@ for one * and two fwd for two **.
     tempc->ptr_stars_cnt=i;
     tempc++;
   }
-  result->last_in_member_lst=&result->member_lst;
+  result->last_in_member_lst=&result->member_lst_and_root;
   result->size=0;
   return result;
 }
@@ -71,7 +71,7 @@ CHashFun *PrsFunNew()
     tempf->ptr_stars_cnt=i;
     tempf++;
   }
-  result->last_in_member_lst=&result->member_lst;
+  result->last_in_member_lst=&result->member_lst_and_root;
   result->size=0;
   return result;
 }
@@ -84,9 +84,9 @@ CIntermediateCode *ICAdd(CCmpCtrl *cc,
   tempi->ic_precedence=opcode_and_precedence.u16[1];
   tempi->ic_data=arg;
   tempi->ic_class=c;
-  if (Bt(&cc->opts,OPTf_OPT_TRACE)) {
-    Bts(&cc->flags,CCf_OPT_TRACE_PRESENT);
-    flags|=ICF_TRACE;
+  if (cc->pass_trace) {
+    Bts(&cc->flags,CCf_PASS_TRACE_PRESENT);
+    flags|=ICF_PASS_TRACE;
   }
   if (cc->lock_cnt)
     flags|=ICF_LOCK;
@@ -229,18 +229,18 @@ U0 COCDel(CCmpCtrl *cc,CCodeCtrl *coc)
 U0 COCHeaderPut(CCmpCtrl *cc,I64 pass,Bool put)
 {
   CIntermediateCode *tempi;
-  if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT)) {
+  if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT)) {
     if (put) {
-      if (Bt(&cc->otrace_mask,pass-1)) {
+      if (Bt(&cc->saved_pass_trace,pass-1)) {
 	"$$IV,1$$Pass %d:$$IV,0$$\n",pass-1;
 	tempi=cc->coc.coc_root.next;
 	while (tempi->ic_code) {
-	  if (tempi->ic_flags&ICF_TRACE)
+	  if (tempi->ic_flags&ICF_PASS_TRACE)
 	    ICPut(cc,tempi);
 	  tempi=tempi->next;
 	}
       }
-    } else if (Bt(&cc->otrace_mask,pass))
+    } else if (Bt(&cc->saved_pass_trace,pass))
       "$$IV,1$$Pass %d:$$IV,0$$\n",pass;
   }
   cc->pass=pass;
@@ -303,7 +303,7 @@ U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
   code_size=OptPass789A(cc,reg_offsets,result,_dbg);
 
   COCDel(cc,&cc->coc);
-  if (Bt(&cc->opts,OPTf_COMPILE_TRACE)) {
+  if (Bt(&cc->opts,OPTf_TRACE)) {
     if (cc->flags&CCF_AOT_COMPILE) {
       if (cc->aotc->seg_size==16)
 	Un(result,code_size,16);
@@ -315,5 +315,6 @@ U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
       Un(result,code_size,64);
   }
   if (_code_size) *_code_size=code_size;
+  cc->saved_pass_trace=cc->pass_trace;
   return result;
 }

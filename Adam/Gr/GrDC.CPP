@@ -3,12 +3,12 @@
 
 #define	GR_SCALE	(1<<32)
 
-public U0 Mat4x4MulXYZ(I64 r[4][4],I64 *_x,I64 *_y,I64 *_z)
+public U0 Mat4x4MulXYZ(I64 *r,I64 *_x,I64 *_y,I64 *_z)
 {//Rotate 3D point using 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   I64 x1,y1,z1,xx=*_x,yy=*_y,zz=*_z;
-  x1=(r[0][0]*xx+r[0][1]*yy+r[0][2]*zz+r[0][3])>>32;
-  y1=(r[1][0]*xx+r[1][1]*yy+r[1][2]*zz+r[1][3])>>32;
-  z1=(r[2][0]*xx+r[2][1]*yy+r[2][2]*zz+r[2][3])>>32;
+  x1=(r[0*4+0]*xx+r[0*4+1]*yy+r[0*4+2]*zz+r[0*4+3])>>32;
+  y1=(r[1*4+0]*xx+r[1*4+1]*yy+r[1*4+2]*zz+r[1*4+3])>>32;
+  z1=(r[2*4+0]*xx+r[2*4+1]*yy+r[2*4+2]*zz+r[2*4+3])>>32;
   *_x=x1;*_y=y1;*_z=z1;
 }
 
@@ -21,13 +21,13 @@ public U0 DCTransform(CDC *dc,I64 *_x,I64 *_y,I64 *_z)
   *_z+=dc->z;
 }
 
-public I64 *Mat4x4IdentEqu(I64 r[4][4])
+public I64 *Mat4x4IdentEqu(I64 *r)
 {//Set matrix to identity. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
   MemSet(r,0,sizeof(I64)*16);
-  r[0][0].i32[1]=1;
-  r[1][1].i32[1]=1;
-  r[2][2].i32[1]=1;
-  r[3][3].i32[1]=1;
+  r[0*4+0].i32[1]=1;
+  r[1*4+1].i32[1]=1;
+  r[2*4+2].i32[1]=1;
+  r[3*4+3].i32[1]=1;
   return r;
 }
 
@@ -36,15 +36,15 @@ public I64 *Mat4x4IdentNew(CTask *mem_task=NULL)
   return Mat4x4IdentEqu(MAlloc(sizeof(I64)*16,mem_task));
 }
 
-public I64 Mat4x4NormSqr65536(I64 r[4][4])
+public I64 Mat4x4NormSqr65536(I64 *r)
 {//Norm Squared of r.
 //(1.0/Sqrt(3))*65536=37837.22
-  return SqrI64((r[0][0]*37838+r[0][1]*37838+r[0][2]*37838)>>32)+
-	SqrI64((r[1][0]*37837+r[1][1]*37837+r[1][2]*37837)>>32)+
-	SqrI64((r[2][0]*37837+r[2][1]*37837+r[2][2]*37837)>>32);
+  return SqrI64((r[0*4+0]*37838+r[0*4+1]*37838+r[0*4+2]*37838)>>32)+
+	SqrI64((r[1*4+0]*37837+r[1*4+1]*37837+r[1*4+2]*37837)>>32)+
+	SqrI64((r[2*4+0]*37837+r[2*4+1]*37837+r[2*4+2]*37837)>>32);
 }
 
-public U0 DCMat4x4Set(CDC *dc=NULL,I64 r[4][4])
+public U0 DCMat4x4Set(CDC *dc=NULL,I64 *r)
 {//Set device context's rot matrix. Will be $LK,"Free",A="MN:Free"$d() in $LK,"DCDel",A="MN:DCDel"$().Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
 //The main purpose is to set matrix norm for pen width scaling.
   //NULL as dc means gr.dc

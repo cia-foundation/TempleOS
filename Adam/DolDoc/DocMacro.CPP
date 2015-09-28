@@ -58,7 +58,6 @@ U8 *SysMacro2Str(CSrvCmd *macro_root)
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
   CMacroTemp *tempmt,*tempmt1,root;
-  Bool old_preempt=Preempt;
   LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
 
   QueInit(&root);
@@ -102,18 +101,15 @@ U8 *SysMacro2Str(CSrvCmd *macro_root)
     tempmt=tempmt1;
   }
   *ptr=0;
-  Preempt(old_preempt);
   return m;
 }
 
 U0 PlaySysMacro(I64 n=1)
 {
   CTask *task=sys_focus_task;
-  Bool old_preempt;
   U8 *m;
   if (TaskValidate(task)) {
     LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
-    old_preempt=Preempt;
     m=SysMacro2Str(&sys_macro_root);
     while (n-- && TaskValidate(task)) {
       if (task==Fs)
@@ -122,20 +118,17 @@ U0 PlaySysMacro(I64 n=1)
 	XTalkStrWait(task,"%s",m);
     }
     Free(m);
-    Preempt(old_preempt);
   }
 }
 
 U0 EdInsCapturedMacro()
 {
-  Bool old_preempt=Preempt;
   U8 *st=SysMacro2Str(&sys_macro_root);
   if (sys_focus_task) {
     XTalk(sys_focus_task,"$$MA+LA,T=\"%s\",LM=\"%Q\"$$",
 	  captured_macro_name,st);
     Free(st);
   }
-  Preempt(old_preempt);
 }
 
 #define SM_RECORD	0

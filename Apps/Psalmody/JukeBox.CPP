@@ -1,13 +1,11 @@
 CTask *SingleSong(U8 *msg,U8 *name)
 {
-  Bool old_preempt=Preempt;
   CTask *task=Spawn(&SrvCmdLine,NULL,name,,Fs);
   StrCpy(task->task_title,name);
   task->title_src=TTS_LOCKED_CONST;
   TaskExe(task,Fs,";",1<<SVCf_WAKE_MASTER|1<<SVCf_FREE_ON_COMPLETE);
   WinHorz(task->win_left,task->win_left+50,task);
   WinVert(2,2+8,task);
-  Preempt(old_preempt);
   TaskExe(task,NULL,msg,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
   DocPut(task)->max_entries=100;
   return task;
@@ -51,7 +49,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
   return FALSE;
 }
 
-public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
+public U0 JukeBox(U8 *dirname="::/Home/Psalmody",U8 **_filename=NULL)
 {//_filename is for using this as a song-chooser program.
   I64 i=0,rating;
   U8 *st,*st2;
@@ -61,10 +59,7 @@ public U0 JukeBox(U8 *dirname=NULL,U8 **_filename=NULL)
   CTask *task=NULL;
   if (_filename)
     *_filename=NULL;
-  if (!dirname)
-    dirname=StrNew("::/Home/Psalmody");
-  else
-    dirname=StrNew(dirname);
+  dirname=StrNew(dirname);
   st=MStrPrint("%s/*.CPP.Z",dirname);
   tempde=tempde1=FilesFind(st);
   Free(st);

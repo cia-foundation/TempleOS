@@ -269,3 +269,18 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
     Free(st2);
   }
 }
+
+U0 BibleView()
+{
+  U8 buf[STR_LEN];
+  I64 book=PopUpPickDefineSub("ST_BIBLE_BOOKS");
+  if (book>=0) {
+    StrPrint(buf,"BF:%Z,1:1",book,"ST_BIBLE_BOOKS");
+    Ed(buf);
+  }
+}
+U0 CtrlAltB(I64)
+{
+  PopUp("BibleView;");
+}
+CtrlAltCBSet('B',&CtrlAltB,"Cmd /Bible");

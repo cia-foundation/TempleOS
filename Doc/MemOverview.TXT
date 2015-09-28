@@ -17,11 +17,11 @@ $FG,5$$TX+CX,"Single System-wide Mem Map"$
 $FG,2$ 0x0000000000- 0x00$TX,"00006FFF",D="DD_PROTECTED_LOW"$$FG$
 $ID,2$Pages marked not present so NULL ptr dereference causes a fault.
 $ID,-2$
-$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"0003569F",D="DD_KERNEL_END"$$FG$
+$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"00034EAF",D="DD_KERNEL_END"$$FG$
 $ID,2$Kernel module, placed here by the boot-loader, $LK,"BOOT_RAM_BASE",A="MN:BOOT_RAM_BASE"$.
 $ID,-2$
-$FG,2$ 0x00$TX,"00096600",D="DD_BOOT_HIGH_LOC_CD"$- 0x00$TX,"00096FFF",D="DD_BOOT_HIGH_LOC_CD_END"$$FG$
-$ID,2$$FG$Boot block relocated here before loading the Kernel module, $LK,"BootCD",A="FI:::/Adam/Boot/BootCD.CPP"$ & $LK,"BootHD",A="FI:::/Adam/Boot/BootHD.CPP"$.
+$FG,2$ 0x00$TX,"00096600",D="DD_BOOT_HIGH_LOC_DVD"$- 0x00$TX,"00096FFF",D="DD_BOOT_HIGH_LOC_DVD_END"$$FG$
+$ID,2$$FG$Boot block relocated here before loading the Kernel module, $LK,"BootDVD",A="FI:::/Adam/Opt/Boot/BootDVD.CPP"$ & $LK,"BootHD",A="FI:::/Adam/Opt/Boot/BootHD.CPP"$.
 $ID,-2$
 $FG,2$ 0x00$TX,"00097000",D="DD_MP_VECT"$- 0x00$TX,"00097030",D="DD_MP_VECT_END"$$FG$
 $ID,2$Multicore start-up vect code, $LK,"MPN_VECT",A="MN:MPN_VECT"$.
@@ -35,15 +35,18 @@ $ID,-2$
 $FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"001845FF",D="DD_SYS_FIXED_AREA_END"$$FG$
 $ID,2$$LK,"CSysFixedArea",A="MN:CSysFixedArea"$ for page tables and misc.  $TX,"128 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ of address space mapped.
 $ID,-2$
-$FG,2$ 0x00$TX,"00184600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"3FFE3DFF",D="DD_SYS_HEAP_LIMIT"$$FG$
+$FG,2$ 0x00$TX,"00184600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"3FFDFEFF",D="DD_SYS_HEAP_LIMIT"$$FG$
 $ID,2$Code Heap mem.
+$ID,-2$
+$FG,2$             - 0x007FFFFFFF$FG$
+$ID,2$Data Heap mem.  (This exists if there is less than 2 Gig of code heap.)
 $ID,-2$
 $FG,2$ 0x00E0000000- 0x00FFFFFFFF$FG$
 $ID,2$32-bit devices could alloc memory at 0xF0000000 going up, but this is wrong, since some PCs already have devices at 0xF0000000.  No PCI devices are supported, so $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() flaws are not an issue.
 $ID,-2$
 $FG,2$ 0x0080000000-~0x00DFFFFFFF$FG$
 $FG,2$ 0x0100000000-~0x$TX,"1FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
-$ID,2$Data Heap mem.
+$ID,2$Data Heap mem.  (The physical memory that exists in this range is data heap.)
 $ID,-2$
 $FG,2$             - 0x$TX,"1FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$$FG$
 $ID,2$64-bit devices are alloced with $LK,"Mem64DevAlloc",A="MN:Mem64DevAlloc"$() counting bwd from $TX,"128 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$, but no PCI devices are actually supported$WW,0$.

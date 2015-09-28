@@ -23,7 +23,7 @@ class CKernelCfg
   Bool opts[CFG_NUM_OPTIONS];
   U8 mem_init_val,heap_init_val,var_init_val,
 	boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
-  Bool cdrom_ports_pmt;
+  Bool dvd_ports_pmt;
 };
 
 CDoc *KernelCfgAddDev(CKernelCfg *c)
@@ -58,7 +58,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
     '\n';
     if (0<=first_drv_num<NUM_DRVS) {
       "\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
-	    "\t$$PURPLE$$3$$FG$$=ATAPI(CD-ROM)\nType:";
+	    "\t$$PURPLE$$3$$FG$$=ATAPI(CD/DVD)\nType:";
       type=GetChar-'0';
       '\n';
 
@@ -72,7 +72,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	    type==BDT_ATAPI) {
 	num_hints=ATARep(,,&root);
 	if (type==BDT_ATAPI) {
-	  "<ENTER> to use booted CD-ROM\n";
+	  "<ENTER> to use booted CD/DVD\n";
 	  if (num_hints)
 	    "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
 		  "I/O Port Base0:\n";
@@ -120,8 +120,8 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	make_free=FALSE;
 	if (type==BDT_ATA || type==BDT_ATAPI) {
 	  if (type==BDT_ATAPI && !*base0_buf) {
-	    c->cdrom_ports_pmt=TRUE;
-	    DocPrint(doc,"dsk.boot_rescue_drv_pmt=GetBaseUnit(bd);");
+	    c->dvd_ports_pmt=TRUE;
+	    DocPrint(doc,"blkdev.boot_rescue_drv_pmt=GetBaseUnit(bd);");
 	    if (first_drv_num+'A'==c->boot_drv_let)
 	      make_free=TRUE;
 	  } else
@@ -157,7 +157,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	    "$$PURPLE$$VarInit$$FG$$ Initializes glbl var memory to a val.\n"
 	    "$$PURPLE$$NoMP$$FG$$ No multicore.\n"
 	    "$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
-	    "$$PURPLE$$DontProbe$$FG$$ Just prompt CD-ROM ports, don't probe.\n"
+	    "$$PURPLE$$DontProbe$$FG$$ Just prompt CD/DVD ports, don't probe.\n"
 	    "$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
 	    "$$PURPLE$$BootRescueDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
 	    "\n";

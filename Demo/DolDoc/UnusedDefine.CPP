@@ -20,9 +20,6 @@ U0 UnusedDefineScan()
   CDocEntry *doc_e,*doc_e2;
   Bool old_silent=IsSilent;
 
-  //Technically, we might want to
-  //turn-off preemption in case the
-  //table were modified.
   try {
     table=Fs->hash_table;
     while (table) {

@@ -48,7 +48,6 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
   tempse->border_attr=task->border_attr;
   tempse->border_src =task->border_src;
   tempse->border=!Bt(&task->display_flags,DISPLAYf_NO_BORDER);
-  tempse->preempt=Bt(&task->task_flags,TASKf_PREEMPT);
   if (TaskValidate(ac.task))
     tempse->autocomplete=TRUE;
   else
@@ -88,12 +87,9 @@ U0 SettingsPop2(CTask *task,CTaskSettings *tempse)
 public U0 SettingsPop(CTask *task=NULL,I64 flags=0)
 {//Typically, called at end of an application.
   CTaskSettings *tempse;
-  Bool old_preempt=Preempt;
   if (!task) task=Fs;
-  if (!TaskValidate(task)) {
-    Preempt(old_preempt);
+  if (!TaskValidate(task))
     return;
-  }
   if (tempse=task->next_settings) {
     task->next_settings=tempse->next;
     Cd(tempse->cur_dir);
@@ -117,9 +113,6 @@ public U0 SettingsPop(CTask *task=NULL,I64 flags=0)
     WinMgrSync(,TRUE);
     SettingsPop2(task,tempse); //Redo in case was lost by old update
 
-    Preempt(old_preempt);
-    LBEqu(&task->task_flags,TASKf_PREEMPT,tempse->preempt);
     Free(tempse);
-  } else
-    Preempt(old_preempt);
+  }
 }

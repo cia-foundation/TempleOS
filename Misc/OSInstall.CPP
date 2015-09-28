@@ -8,12 +8,12 @@ Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
     return FALSE;
 }
 
-U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,
+U0 VMInstallBoot(CTask *task,U8 dvd_drv,U8 drv,
 	CATARep *ata_drv,CATARep *atapi_drv)
 {
   U8 *st1,*st2;
 
-  st1=MStrPrint("%C:/",cd_drv);
+  st1=MStrPrint("%C:/",dvd_drv);
   st2=MStrPrint("%C:/",drv);
   CopyTree(st1,st2);
   Free(st1);
@@ -21,7 +21,8 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,
 
   st1=MStrPrint("%C:/Home",drv);
   MkDir(st1);
-  Copy("::/Misc/MakeDistro.CPP.Z",st1);
+  Copy("::/Misc/DoDistro.CPP.Z",st1);
+  Copy("::/MakeHome.CPP.Z",st1);
   Free(st1);
 
   XTalkWait(task,
@@ -39,7 +40,7 @@ U0 VMInstallBoot(CTask *task,U8 cd_drv,U8 drv,
 	"\n"); //Options
 }
 
-U0 VMInstallWizard()
+U0 VMInstallWiz()
 {
   CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL;
   CTask *task;
@@ -54,10 +55,10 @@ U0 VMInstallWizard()
   WinToTop(Fs);
 
   ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,dsk.boot_drv_let,&ata_drv,&atapi_drv);
+  ATAIDDrvs(root,blkdev.boot_drv_let,&ata_drv,&atapi_drv);
   if (VMPrtDsk(task,ata_drv)) {
-    VMInstallBoot(task,dsk.boot_drv_let,'C',ata_drv,atapi_drv);
-    VMInstallBoot(task,dsk.boot_drv_let,'D',ata_drv,atapi_drv);
+    VMInstallBoot(task,blkdev.boot_drv_let,'C',ata_drv,atapi_drv);
+    VMInstallBoot(task,blkdev.boot_drv_let,'D',ata_drv,atapi_drv);
     MasterBootIntall('C');
   }
   LinkedLstDel(root);
@@ -66,7 +67,7 @@ U0 VMInstallWizard()
   Kill(task);
 }
 
-U0 RegularInstallWizard()
+U0 RegularInstallWiz()
 {
   I64 unit;
   U8 *base0,*base1,*ms,*dst,*st1,*st2,*new_home_str;
@@ -125,7 +126,7 @@ U0 RegularInstallWizard()
   }
 
   '\n';
-  st1=MStrPrint("%C:/",dsk.boot_drv_let);
+  st1=MStrPrint("%C:/",blkdev.boot_drv_let);
   st2=MStrPrint("%C:/",*dst);
 
   "$$RED$$Format %C Partition?$$FG$$\n",*dst;
@@ -152,7 +153,8 @@ U0 RegularInstallWizard()
 
   new_home_str=MStrPrint("%C:/Home",*dst);
   MkDir(new_home_str);
-  Copy("::/Misc/MakeDistro.CPP.Z",new_home_str);
+  Copy("::/Misc/DoDistro.CPP.Z",new_home_str);
+  Copy("::/MakeHome.CPP.Z",new_home_str);
   XTalkWait(task,
 	"MakeOSDrvBootInstall('%C');\n"
 	"\nB1\n0x20000\n"
@@ -203,7 +205,7 @@ U0 DoInstall()
   DocBottom;
 
   if (vm_install) {
-    VMInstallWizard();
+    VMInstallWiz();
     pmt_reboot=TRUE;
   } else {
     "\n\nThis wizard works if you have a partition ready.  "
@@ -211,7 +213,7 @@ U0 DoInstall()
 	  "with more options if you do it by hand, not using this wizard.\n\n"
 	  "Continue Install Wizard ";
     if (pmt_reboot=YorN)
-      RegularInstallWizard();
+      RegularInstallWiz();
   }
   if (pmt_reboot) {
     "Reboot Now ";

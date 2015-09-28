@@ -11,7 +11,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,
   Bool is_str;
 
   tempc=OptClassFwd(tempc);
-  if (tempm=tempc->member_lst) {
+  if (tempm=tempc->member_lst_and_root) {
     if (cc->token!='{')
       LexExcept(cc,"expecting '{' at ");
     LexPopNoRestore(cc);
@@ -244,7 +244,7 @@ U0 PrsStaticInit(CCmpCtrl *cc,CMemberLst *tempm,I64 pass)
   }
 }
 
-Bool PrsArrayDims(CCmpCtrl *cc,CArrayDim *dim)
+Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
 {//Returns false on empty []
 //dim->next!=0 for array
   CArrayDim *tempad,*tempad1;
@@ -254,29 +254,32 @@ Bool PrsArrayDims(CCmpCtrl *cc,CArrayDim *dim)
   dim->cnt=0;
   dim->total_cnt=1;
   tempad1=&dim->next;
-  while (cc->token=='[') {
-    if (Lex(cc)==']' && !dim->next) {
-      j=-1;
-      result=FALSE;
-    } else {
-      if ((j=LexExpressionI64(cc))<0)
-	LexExcept(cc,"Invalid array size at ");
-    }
-    tempad1=&dim->next;
-    while (tempad1->next) {
-      tempad1->next->total_cnt*=j;
-      tempad1=tempad1->next;
-    }
-    tempad=MAlloc(sizeof(CArrayDim));
-    tempad1->next=tempad;
-    tempad1=tempad;
-    tempad->next=NULL;
-    tempad->cnt=j;
-    tempad->total_cnt=1;
-    dim->total_cnt*=j;
-    if (cc->token!=']')
-      LexExcept(cc,"missing ']' at ");
-    Lex(cc);
+  if (cc->token=='[') {
+    if (mode.u8[1]==PRS1B_FUN_ARG)
+      LexExcept(cc,"No arrays in fun args at ");
+    do {
+      if (Lex(cc)==']' && !dim->next) {
+	j=-1;
+	result=FALSE;
+      } else {
+	if ((j=LexExpressionI64(cc))<0)
+	  LexExcept(cc,"Invalid array size at ");
+      }
+      tempad1=&dim->next;
+      while (tempad1->next) {
+	tempad1->next->total_cnt*=j;
+	tempad1=tempad1->next;
+      }
+      tempad=MAlloc(sizeof(CArrayDim));
+      tempad1->next=tempad;
+      tempad1=tempad;
+      tempad->next=NULL;
+      tempad->cnt=j;
+      tempad->total_cnt=1;
+      dim->total_cnt*=j;
+      if (cc->token!=']')
+	LexExcept(cc,"missing ']' at ");
+    } while (Lex(cc)=='[');
   }
   return result;
 }
@@ -355,7 +358,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tempc1,
     fun_ptr=PrsFunJoin(cc,tempc1,NULL,fsp_flags)+ptr_stars_cnt;
     tempc1=cmp.internal_types[RT_PTR]+ptr_stars_cnt;
   }
-  if (!PrsArrayDims(cc,tempad) && cc->token!='=') {
+  if (!PrsArrayDims(cc,mode,tempad) && cc->token!='=') {
     tempc1++;
     tempad2=tempad->next->next;
     Free(tempad->next);

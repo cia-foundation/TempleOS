@@ -30,13 +30,13 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 $ID,2$
 $LK,"Echo",A="MN:Echo"$() turns on or off raw data going into the lexical analyzer.
 
-$LK,"CTrace",A="MN:CTrace"$() unassembles code generated from the HolyC compiler.
+$LK,"Trace",A="MN:Trace"$() unassembles code generated from the HolyC compiler.
 
-$LK,"OTrace",A="MN:OTrace"$() shows intermediate code coming-out after optimization.  $LK,"OTraceMask",A="MN:OTraceMask"$() ctrls which passes are displayed.
+$LK,"PassTrace",A="MN:PassTrace"$() shows intermediate code coming-out after optimization.  The bits ctrl which passes are displayed.
 $ID,-2$
 
 * There is a heap check utility which can find leaks.  Use $LK,"HeapLog",A="MN:HeapLog"$(), and $LK,"HeapLogRep",A="MN:HeapLogRep"$().  It's a really simple program which intercepts $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().  You can customize the code to find other heap issues.
 
-* You can define handler functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltLetCBSet",A="MN:CtrlAltLetCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
+* You can define handler functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
 
 * If you recompile $FG,2$Kernel$FG,2$$FG$ with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$(), you can set the $FG,4$MemInit$FG$, option to initialize memory to a value at boot, the $FG,4$HeapInit$FG$ option to cause mem alloced off the heap to be initialized or $FG,4$VarInit$FG$ option so both global and local vars will be initialized to a value.  Pick a non-zero value to discover uninitialized var bugs.  You can set $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$, and $LK,"sys_heap_init_flag",A="MN:sys_heap_init_flag"$ directly after booting.

@@ -567,9 +567,9 @@ U0 DigitalLogic()
   input3_table	  =NULL;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  WinMax;
   AutoComplete;
   WinBorder(ON);
+  WinMax;
   DocClear;
   GetGates;
   try {

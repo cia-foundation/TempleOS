@@ -8,7 +8,7 @@ I64 HasLower(U8 *src)
 }
 
 CHash *PSectFind(U8 *addr,I64 *_offset)
-{//See $LK,"::/Kernel/KHashA.CPP",A="FL:::/Kernel/KHashA.CPP,1"$.
+{//See $LK,"Hash",A="HI:Hash"$.
   CHash *result=NULL;
   CHashExport *tempex;
   Bool has_lower=FALSE;
@@ -61,25 +61,22 @@ U0 PSectCacheAdd(CHash *temps,U8 *addr)
 {
   I64 i;
   CDbgInfo *dbg_info;
-  Bool old_preempt;
   CPSectCache *temppc;
   if (temps && temps->type&HTT_FUN &&
 	(dbg_info=temps(CHashFun *)->dbg_info)) {
-    old_preempt=Preempt;
-    lock {i=dbg.psect_cache_index++;}
-  temppc=&dbg.psect_cache[i&(PSECT_CACHE_SIZE-1)];
-  temppc->base=dbg_info->body[0];
-  if (addr<temppc->base)
-    temppc->base=addr;
-  temppc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
-  if (addr>=temppc->limit)
-    temppc->limit=addr+1;
-  i=MinI64(StrLen(temps->str),PSECT_CACHE_STR_LEN-1);
-  MemCpy(temppc->str,temps->str,i);
-  temppc->str[i]=0;
-  temppc->time_stamp=tS;
-  Preempt(old_preempt);
-}
+    lock i=dbg.psect_cache_index++;
+    temppc=&dbg.psect_cache[i&(PSECT_CACHE_SIZE-1)];
+    temppc->base=dbg_info->body[0];
+    if (addr<temppc->base)
+      temppc->base=addr;
+    temppc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
+    if (addr>=temppc->limit)
+      temppc->limit=addr+1;
+    i=MinI64(StrLen(temps->str),PSECT_CACHE_STR_LEN-1);
+    MemCpy(temppc->str,temps->str,i);
+    temppc->str[i]=0;
+    temppc->time_stamp=tS;
+  }
 }
 
 U8 *PSectCacheFind(U8 *addr,I64 *_offset)

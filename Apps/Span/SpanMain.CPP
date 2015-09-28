@@ -190,7 +190,7 @@ U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
 }
 
 U0 AnimateTask(SpanAnimateStruct *a)
-{//Preemption is off by default.
+{
   MySpring *temps,*temps1;
   Bool old_run=FALSE;
   F64 f;
@@ -266,7 +266,10 @@ U0 Span()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BROWN<<4+BLACK;
+  AutoComplete;
+  WinBorder;
   WinMax;
+  DocCursor;
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
   bt_run =CtrlButtonNew(0,0,		  80,,
@@ -275,15 +278,6 @@ U0 Span()
 	MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_button);
   a.saved_ode=NULL;
 
-  //Preempt eliminates a lot of hassles.
-  //The concern is about changing
-  //que links while the winmgr task
-  //is updating the ode or screen.
-  Preempt;
-
-  DocCursor;
-  WinBorder;
-  AutoComplete;
   Fs->win_inhibit|=WIG_DBL_CLICK;
 
   MenuPush(

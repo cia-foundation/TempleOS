@@ -5,6 +5,7 @@ U0 LowPassFilterDemo()
   F64 y,y1,t,dt;
   CDC *dc=DCAlias;
 
+  WinBorder;
   WinMax;
   DocClear;
 

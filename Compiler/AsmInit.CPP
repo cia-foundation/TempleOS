@@ -4,7 +4,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
   while (TRUE) {
     switch (cc->token) {
       case TK_IDENT:
-	if ((i=DefineMatch(cc->cur_str,"ST_OPCODE_MODIFIERS"))>=0) {
+	if ((i=LstMatch(cc->cur_str,"NO\0CB\0CW\0CD\0CP\0IB\0IW\0ID\0"))>=0) {
 	  tempi->opcode_modifier=i;
 	  break;
 	} else
@@ -38,7 +38,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
       case '=': tempi->flags|=IEF_48_REX;		break;
       case '`': tempi->flags|=IEF_REX_ONLY_R8_R15;	break;
       case '^': tempi->flags|=IEF_REX_XOR_LIKE;		break;
-      case ':': tempi->flags|=IEF_STI;			break;
+      case '*': tempi->flags|=IEF_STI_LIKE;		break;
       case '$$': tempi->flags|=IEF_ENDING_ZERO;		break;
       default:
 	return;
@@ -48,7 +48,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
 }
 
 U0 AsmHashLoad()
-{//See $LK,"::/Compiler/OpCodes.TXT.Z"$.
+{//See $LK,"::/Compiler/OpCodes.TXT"$.
   I64 i,j,size,size1;
   CInternalType *tempit;
   CCmpCtrl *cc;
@@ -103,6 +103,10 @@ U0 AsmHashLoad()
 	    LexExcept(cc,"expecting ',' at ");
 
 	  AsmPrsInsFlags(cc,tempi);
+
+	  tempi->uasm_slash_val=tempi->slash_val;
+	  if (tempi->flags&IEF_STI_LIKE && tempi->slash_val!=SV_I_REG)
+	    tempi->uasm_slash_val=SV_STI_LIKE;
 
 	  tempi->arg1=tempi->arg2=tempi->size1=tempi->size2=0;
 	  if (cc->token==TK_IDENT) {

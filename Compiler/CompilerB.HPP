@@ -11,16 +11,13 @@ public extern CCmpGlbls cmp;
 
 #help_index "Compiler/Directive"
 #help_file "::/Doc/Directives"
-public extern Bool CTrace(Bool val);
 public extern Bool Echo(Bool val);
-public extern Bool GetOpt(I64 num);
-public extern Bool OTrace(Bool val);
-public extern I64 OTraceMask(I64 i=0b1001111101);
-public extern Bool OptOff(I64 num);
-public extern Bool OptOn(I64 num);
+public extern Bool GetOption(I64 num);
+public extern I64 PassTrace(I64 i=0b1001111101);
 extern U0 StreamDir();
 public extern I64 StreamExePrint(U8 *fmt,...);
 public extern U0 StreamPrint(U8 *fmt,...);
+public extern Bool Trace(Bool val);
 
 #help_index "Compiler/Lex"
 #help_file "::/Doc/Lex"
@@ -52,15 +49,14 @@ public extern U0 LexSkipEol(CCmpCtrl *cc);
 public extern U8 *LexStatement2Bin(
 	CCmpCtrl *cc,I64 *_type,I64 cmp_flags=CMPF_PRS_SEMICOLON);
 public extern U0 LexWarn(CCmpCtrl *cc,U8 *str=NULL);
-public extern CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class);
-public extern CMemberLst *MemberFind2(
+extern CMemberLst *MemberClassBaseFind(
 	CHashClass *needle_class,CHashClass *haystack_class);
+public extern CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class);
 extern U0 MemberLstDel(CHashClass *c);
 public extern I64 MemberMetaData(U8 *st,CMemberLst *ml);
 public extern CMemberLstMeta *MemberMetaFind(U8 *st,CMemberLst *ml);
 public extern CHashClass *OptClassFwd(CHashClass *tempc);
 public extern I64 PrsKeyWord(CCmpCtrl *cc);
-
 #help_index "Compiler;Cmd Line (Typically)"
 extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);

@@ -31,7 +31,7 @@ U0 OptPass6Lag(CCmpCtrl *cc,CPrsStk *ps,CIntermediateCode *tempi,
   I64 i=*i_,j,k,l,code,clobbered_reg_mask=*_clobbered_reg_mask;
   CHashFun *tempf;
   code=tempi->ic_code;
-  if (tempi->ic_flags&ICF_TRACE && Bt(&cc->otrace_mask,6)) {
+  if (tempi->ic_flags&ICF_PASS_TRACE && Bt(&cc->saved_pass_trace,6)) {
     "%2d:",i;
     ICPut(cc,tempi);
   }
@@ -187,8 +187,8 @@ U0 OptPass6(CCmpCtrl *cc)
     cc->htc.fun->used_reg_mask&=~REGG_C_TEMP_CLOBBERED;
     cc->htc.fun->used_reg_mask|=clobbered_reg_mask;
     cc->htc.fun->clobbered_reg_mask=clobbered_reg_mask;
-    if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT) &&
-	  Bt(&cc->otrace_mask,6)) {
+    if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT) &&
+	  Bt(&cc->saved_pass_trace,6)) {
       "Used      Reg Mask:%04X\n",cc->htc.fun->used_reg_mask;
       "Clobbered Reg Mask:%04X\n",clobbered_reg_mask;
     }

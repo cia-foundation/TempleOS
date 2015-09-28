@@ -965,7 +965,6 @@ $WW,0$*/
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   AutoComplete;
-  Preempt; //We don't really want window update while modifying links
   RegOneTimePopUp(ARf_MESH_ED,
 	"$$GREEN$$Right Mouse$$FG$$: Hold and move to shift cursor z\n"
 	"$$GREEN$$'j'$$FG$$: Jump cursor Z to nearest vertex's Z\n"

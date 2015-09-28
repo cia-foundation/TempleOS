@@ -20,13 +20,13 @@
 
 * ATAPI PIO $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
 
-* $LK,"Partitioning",A="MN:PrtDsk"$ tool, installer, $FG,2$boot loaders$FG$ for CD-ROM and hard disk.
+* $LK,"Partitioning",A="MN:PrtDsk"$ tool, installer, $FG,2$boot loaders$FG$ for CD/DVD and hard disk.
 
 * $FG,2$Editor/Browser$FG$ for a new $LK,"Document Format",A="FI:::/Doc/DolDocOverview.TXT"$.  Source files and the command line window can have graphics, links, icons, trees, colors, super/sub scripts, margins.  Everything is seamless through-out the tool chain.  No need for separate resource files.
 
 * 8-bit $FG,2$ASCII$FG$, not just 7-bit.  Supported in entire tool chain.  $FG,2$<CTRL-ALT-a>$FG$
 
-* $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic resource editor$FG$. $FG,2$<CTRL-r>$FG$
+* $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic sprite editor$FG$. $FG,2$<CTRL-r>$FG$
 
 * $FG,2$64-bit pointers$FG$.  All memory, even more than 4 Gig, can be directly accessed by all tasks on all cores at all times.
 

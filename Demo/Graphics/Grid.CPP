@@ -18,8 +18,10 @@ U0 GridDemo()
   ip_grid.y=GRID;
   old_draw_input_ptr=gr.fp_draw_input_ptr;
   gr.fp_draw_input_ptr=&DrawMyInputPtr;
-  while (!ip.lb) //Left button to exit.
+  while (!ip.lb)  {//Left button to exit.
     GrPlot(,ip.pos.x,ip.pos.y);
+    Yield;
+  }
   DCFill;
   gr.fp_draw_input_ptr=old_draw_input_ptr;
   MemCpy(&ip_grid,&old_grid,sizeof(CGridGlbls));

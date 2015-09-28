@@ -105,10 +105,8 @@ U0 MGCircle(I64 x,I64 y,F64 r)
 U0 MiniGrLibDemo()
 {
   I64 i;
-  Bool old_preempt;
   MGInit;
 
-  old_preempt=Preempt;
   for (i=0;i<100;i++)
     MGHLine(200+i,400+i,300+i);
   for (i=0;i<500;i+=10)
@@ -117,7 +115,6 @@ U0 MiniGrLibDemo()
     MGCircle(200,100+i,i);
   MGUpdate;
   BusyWait(1500000);
-  Preempt(old_preempt);
 /*
 We are returning graphics to normal operations under TempleOS.
 It is not normal to by-pass the TempleOS graphcis routines.

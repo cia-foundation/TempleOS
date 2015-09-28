@@ -6,7 +6,6 @@ U0 TimeIns()
 {
   I64 start1,end1,start2,end2,overhead_time,test_time;
   I64 reg i,reg temp;
-  Bool old_preempt=Preempt;
 
   CPURep;
 
@@ -34,8 +33,6 @@ U0 TimeIns()
   test_time=end2-start2;
   "Remainder Version #2 Cycles\t: %10.5f\n",
 	ToF64(test_time-overhead_time)/SAMPLE_SIZE;
-
-  Preempt(old_preempt);
 }
 
 TimeIns;

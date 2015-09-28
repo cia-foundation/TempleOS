@@ -179,19 +179,18 @@ U0 CloudScene()
   try {
     Fs->text_attr=YELLOW<<4+BLUE;
     Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-    DocCursor;
-    WinMax;
-    WinBorder;
     AutoComplete;
+    WinBorder;
+    WinMax;
+    DocCursor;
+    DocClear;
     Init;
     Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
 
-    DocClear;
     "$$BG,LTCYAN$$%h*c",SKY_LINES,'\n';
     "$$BG,YELLOW$$%h5c",'\n';
     BibleVerse(,"Exodus,14:19",7);
 
-    Preempt;
     Fs->draw_it=&DrawIt;
     GetChar;
     WinMgrSync;

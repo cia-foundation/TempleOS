@@ -13,6 +13,10 @@ I64 outside_cnt;
 #define MAP_BORDER	3
 CDC *map_dc;
 
+#define GATE_WIDTH	22
+#define GATE_HEIGHT	7
+F64 gate_é,gate_t;
+
 $BG,10$#define GE_COW		0
 
 
@@ -153,8 +157,7 @@ U0 RiverDropsNext(CTask *mem_task)
       Free(tempr);
     } else {
       do {
-	if (RandU16&1 &&
-	      GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
+	if (RandU16&1 && GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
 	      r_y[tempr->index]+tempr->dy)==BLUE)
 	  break;
 	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->index]/2,
@@ -271,6 +274,52 @@ U0 BuddySelect(I64 i)
   a[i].buddy=best_b;
 }
 
+
+U0 RedrawGate()
+{
+  F64 tt=tS-gate_t;
+  I64 x1=FENCE_WIDTH-63,y1=FENCE_HEIGHT-1,dx,dy;
+
+  if (tt<0.5)
+    gate_é=Clamp(gate_é+0.02,0,ã/2);
+  else if (tt>5.0)
+    gate_é=Clamp(gate_é-0.02,0,ã/2);
+
+  dx=GATE_WIDTH*Cos(gate_é); dy=-0.8*GATE_WIDTH*Sin(gate_é);
+
+  map_dc->color=LTGREEN;
+  GrRect(map_dc,x1,y1-0.8*GATE_WIDTH-GATE_HEIGHT,
+	46,0.8*GATE_WIDTH+GATE_HEIGHT+3);
+
+  map_dc->color=BLACK;
+
+  GrLine(map_dc,x1,y1,x1+dx,y1+dy);
+  GrLine(map_dc,x1,y1,x1,y1-GATE_HEIGHT);
+  GrLine(map_dc,x1+dx,y1+dy,x1+dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1,y1-GATE_HEIGHT,x1+dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1,y1,x1+dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1,y1-GATE_HEIGHT,x1+dx,y1+dy);
+
+  GrLine(map_dc,x1+45,y1,x1+45-dx,y1+dy);
+  GrLine(map_dc,x1+45,y1,x1+45,y1-GATE_HEIGHT);
+  GrLine(map_dc,x1+45-dx,y1+dy,x1+45-dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1+45,y1-GATE_HEIGHT,x1+45-dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1+45,y1,x1+45-dx,y1+dy-GATE_HEIGHT);
+  GrLine(map_dc,x1+45,y1-GATE_HEIGHT,x1+45-dx,y1+dy);
+}
+
+Bool CheckMap(I64 x,I64 y)
+{
+  I64 i,j,c;
+  for (j=-4;j<=2;j++)
+    for (i=-4;i<=4;i++) {
+      c=GrPeek(map_dc,x+i,y+j);
+      if (c==LTGRAY || c==BLACK)
+	return FALSE;
+    }
+  return TRUE;
+}
+
 U0 AnimateTask(CTask *parent)
 {
   I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,updates=0,
@@ -285,6 +334,9 @@ U0 AnimateTask(CTask *parent)
     cursor_y=ip.pos.y+cy-parent->pix_top -parent->scroll_y;
     cnt=0;stress=0;
     my_outside_cnt=0;
+    if (cursor_x<FENCE_WIDTH && cursor_y<FENCE_HEIGHT)
+      gate_t=tS;
+    RedrawGate;
     for (i=0;i<NUM_ANIMALS;i++) {
       tempa=&a[i];
       if (!tempa->dead) {
@@ -335,8 +387,7 @@ U0 AnimateTask(CTask *parent)
 	  tempa->dy/=2;
 	}
 
-	if (GrPeek(map_dc,(tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)
-	      !=LTGRAY) {
+	if (CheckMap((tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)) {
 	  tempa->x+=tempa->dx;
 	  tempa->y+=tempa->dy;
 	}
@@ -420,9 +471,7 @@ U0 ReInit()
     GrLine(map_dc,FENCE_WIDTH-1,i,FENCE_WIDTH-1,i+7);
   map_dc->color=LTGRAY;
   GrLine(map_dc,FENCE_WIDTH,0,FENCE_WIDTH,FENCE_HEIGHT-6);
-
-  map_dc->color=LTGREEN;
-  GrRect(map_dc,FENCE_WIDTH-63,FENCE_HEIGHT-8,46,9);
+  RedrawGate;
 
   map_dc->pen_width=MAP_BORDER;
   map_dc->color=RED;
@@ -435,8 +484,10 @@ U0 ReInit()
   MemSet(a,0,NUM_ANIMALS*sizeof(Animal));
   for (i=0;i<NUM_ANIMALS;i++) {
     a[i].num=i;
-    a[i].x=(64+RandU32%(MAP_WIDTH-128))<<32;
-    a[i].y=(64+RandU32%(MAP_WIDTH-128))<<32;
+    do {
+      a[i].x=(64+RandU32%(MAP_WIDTH-128))<<32;
+      a[i].y=(64+RandU32%(MAP_WIDTH-128))<<32;
+    } while (!CheckMap(a[i].x>>32,a[i].y>>32));
     if (i&1)
       a[i].ge=&rh_sprite[GE_COW];
     else
@@ -444,6 +495,8 @@ U0 ReInit()
     BuddySelect(i);
   }
   outside_cnt=NUM_ANIMALS;
+  gate_t=0;
+  gate_é=0;
   t0=tS;
   tf=0;
 }
@@ -497,13 +550,13 @@ U0 RawHide()
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
 	-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
-  WinMax;
   AutoComplete;
-  Preempt;
-  Init;
-  Fs->animate_task=Spawn(&AnimateTask,Fs,"Animate",,Fs);
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
+  Init;
+  Fs->animate_task=Spawn(&AnimateTask,Fs,"Animate",,Fs);
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {

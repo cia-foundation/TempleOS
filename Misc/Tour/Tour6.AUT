@@ -1,69 +1,50 @@
-TourPut(
-"$$RED$$$$TX+L+PU+UL,\"F\",A=\"MN:F\"$$$$FG$$() is a handy function.  "
-"It is a wrapper around $$RED$$$$TX+L+PU+UL,\"Find\",A=\"MN:Find\"$$$$FG$$().  "
-"It searches for a sym.\n",TRUE);
-
-TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
+PopUp("ACInit(\"::/*;~*Bible.TXT*\");");
+AutoComplete(ON);
+Sleep(3500);
 
 //Puts the cursor at the bottom.
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"\n";
-
-"F(\"RED\");";
-AFGetStr("\n");
-Sleep(2000);
-
-TourPut("Notice the number of matches.\n",TRUE);
+"\nCd(\"::/Demo\");\n";
 
 TourPut(
-"Try it with the $$GREEN$$+l$$FG$$ flag.  This limits to whole labels, not "
-"partials.\n",TRUE);
+"AutoComplete is a feature which also lets you jump to source code of "
+"symbols.  The function keys jump to code, while the number keys jump to "
+"dictionary definitions.\n\n"
+"We will now place some text on the command line and jump to source code.\n",
+TRUE);
 
-TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
-
-//Puts the cursor at the bottom.
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"\n";
-
-"F(\"RED\",\"+l\");";
-AFGetStr("\n");
-Sleep(2000);
-
-TourPut("Notice the number of matches.\n",TRUE);
+"MakeOS";
 
 TourPut(
-"Try it with the $$GREEN$$+l-i$$FG$$ flag.  This does not ignore case and "
-"limits to whole labels, not partials.\n",TRUE);
-
-TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
-
-//Puts the cursor at the bottom.
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"\n";
-
-"F(\"RED\",\"+l-i\");";
-AFGetStr("\n");
-Sleep(2000);
-
-TourPut("Notice the number of matches.\n",TRUE);
-
-TourPut(
-"The wrapper function is in your $$RED$$/Home/AdamWrappers.CPP.Z$$FG$$ file.  "
-"There is a function $$RED$$$$TX+L+PU+UL,\"R\",A=\"MN:R\"$$$$FG$$() for "
-"find and replace.  Feel free to customize.\n",TRUE);
-
-TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
-
-//Puts the cursor at the bottom.
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"\n";
-
-"Ed(\"::/Home/AdamWrappers.CPP.Z\");";
-AFGetStr("\n");
+"Look at the $$GREEN$$MakeOSDrvBootInstall$$FG$$ entry in the AutoComplete "
+"window.  Notice it is underlined.  This means a source code link is "
+"available.\n\n"
+"Press $$GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");
+AFGetKey(SC_F1|SCF_CTRL|SCF_SHIFT);
+Sleep(500);
+WinToTop;//Kludge
 
 TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
+TourPut("Press $$GREEN$$<CTRL-F1>$$FG$$ to autocomplete.\n");
+AFGetKey(SC_F1|SCF_CTRL);
+Sleep(500);
+
+Msg(MSG_KEY_DOWN,'\n',SCF_CTRL|SCF_SHIFT);
+"\n";
+
 TourPut(
-"$$GREEN$$+lb$$FG$$ is whole label just before.\n"
-"$$GREEN$$+la$$FG$$ is whole label just after.\n",TRUE);
+"Tip: You can restart the AutoComplete window if you have closed it by "
+"pressing $$GREEN$$<CTRL-F1>$$FG$$.\n",TRUE);
+
+TourPut(
+"You can also use the $$GREEN$$Man()$$FG$$ function to jump to source code.  "
+"(I use AutoComplete.)  The $$GREEN$$Man()$$FG$$ is good for short symbol "
+"names or when inside the debugger.\n",TRUE);
+AFPrint(,"Man(\"U\");");
+Sleep(1500);
+"\n";
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);

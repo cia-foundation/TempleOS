@@ -1,4 +1,4 @@
-$FG,2$$WW,1$AutoComplete$FG$ is the $FG,7$LTGRAY$FG$ window on the right of the screen.  $LK,"ACInit",A="MN:ACInit"$() collects words from all text files in subdirectories.  Normally, the call to $LK,"ACInit",A="MN:ACInit"$() is in $LK,"AdamSys.CPP",A="FF:/Home/AdamSys.CPP,ACInit"$.  It provides auto-complete for typing, jump-to-code and jump-to-dictionary functionality.
+$FG,2$$WW,1$AutoComplete$FG$ is the $FG,7$LTGRAY$FG$ window on the right of the screen.  $LK,"ACInit",A="MN:ACInit"$() collects words from all text files in subdirectories.  Normally, the call to $LK,"ACInit",A="MN:ACInit"$() is in $LK,"HomeSys.CPP",A="FF:/Home/HomeSys.CPP,ACInit"$.  It provides auto-complete for typing, jump-to-code and jump-to-dictionary functionality.
 
 $FG,2$<ALT-SHIFT-A>$FG$	Closes the $FG,7$LTGRAY$FG$ AutoComplete window.
 $FG,2$<ALT-a>$FG$		Opens the $FG,7$LTGRAY$FG$ AutoComplete window.

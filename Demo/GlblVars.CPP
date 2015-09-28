@@ -46,7 +46,7 @@ because they don't take-up room in the .BIN.Z file.
 */
 
 #ifjit
-#exe {OptOn(OPTf_GLBLS_ON_DATA_HEAP);};
+#exe {Option(OPTf_GLBLS_ON_DATA_HEAP,ON);};
 
 Test g2[]={
   {10,"name1"},
@@ -70,7 +70,7 @@ U0 Main2()
 
 Main2;
 
-#exe {OptOn(OPTf_GLBLS_ON_DATA_HEAP);};
+#exe {Option(OPTf_GLBLS_ON_DATA_HEAP,ON);};
 #endif
 
 '\n';

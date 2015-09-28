@@ -3,7 +3,7 @@
 
 //This file is executed by the
 //first terminal window upon start-up.
-//See $LK,"DoOnce",A="FF:/Home/AdamSys.CPP,DoOnce"$ and $LK,"Home Files",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.
+//See $LK,"DoOnce",A="FF:/Home/HomeSys.CPP,DoOnce"$ and $LK,"Home Files",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.
 
 //  Type("::/Doc/Customize.TXT");
 

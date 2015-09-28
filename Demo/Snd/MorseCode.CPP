@@ -130,7 +130,6 @@ I64 MorseWaitKey()
 
 U0 Morse()
 {
-  Bool old_preempt;
   CDocEntry *doc_e;
   I64 ch;
   U8 buf[8],*dst,*src;
@@ -144,12 +143,8 @@ U0 Morse()
 
   "$$GREEN$$";
 
-  //We don't want the tag call back
-  //called before we set it, so preempt off.
-  old_preempt=Preempt;
   doc_e=DocPrint(DocPut,"$$TX+TC,\" \"$$");
   doc_e->tag_cb=&MorseTimes;
-  Preempt(old_preempt);
 
   "$$FG$$\n";
 

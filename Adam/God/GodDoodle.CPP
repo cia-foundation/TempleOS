@@ -101,9 +101,9 @@ public U8 *GodDoodleSprite(U8 *hex=NULL)
   if (god.doodle_dc) return NULL;
   god.doodle_done=FALSE;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  WinMax;
-  WinBorder;
   AutoComplete;
+  WinBorder;
+  WinMax;
 
   PopUpOk("The $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.TXT"$ can puppet you.\n\n"
 	"Press $$GREEN$$<SPACE>$$FG$$ until it finishes.");

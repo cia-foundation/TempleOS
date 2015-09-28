@@ -13,7 +13,7 @@ U0 RandDemo()
   I64 i;
 
   "Seed(0) will do timer randomized random numbers.  A task starts with "
-	"$LK,"Seed(0)",A="FF:::/Kernel/Task.CPP,Seed("$ by dft.\n";
+	"$LK,"Seed(0)",A="FF:::/Kernel/KTask.CPP,Seed("$ by dft.\n";
   PressAKey;
   Seed;
   RandPts;

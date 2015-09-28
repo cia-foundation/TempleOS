@@ -56,13 +56,11 @@ U0 DrawDrops(CTask *,CDC *dc)
 
 U0 UpdateCurBase(CTask *task,CDC *dc)
 {
-  Bool old_preempt=Preempt;
   cur_dc->color=ROP_EQU;
   dc->flags|=DCF_NO_TRANSPARENTS;
   GrBlot(cur_dc,-task->pix_left-task->scroll_x,
 	-task->pix_top-task->scroll_y,dc);
   dc->flags&=~DCF_NO_TRANSPARENTS;
-  Preempt(old_preempt);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -162,16 +160,17 @@ U0 RainDrops()
 	"}"
 	);
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  AutoComplete;
+  WinBorder;
   WinMax;
+  DocCursor;
+  DocClear;
   cur_dc=DCNew(GR_WIDTH,GR_HEIGHT);
   sc_1=Char2ScanCode('1');
   sc_2=Char2ScanCode('2');
   Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
-  AutoComplete;
   try {
     do
       switch (ch=GetKey(&sc)) {

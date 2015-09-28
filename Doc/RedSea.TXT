@@ -15,7 +15,7 @@ public class CDirEntry //64-byte fixed-size
   U8 name[CDIR_FILENAME_LEN]; //See $LK,"chars_bmp_filename",A="MN:chars_bmp_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
   I64 cluster; (blk) //One sector per cluster.
   I64 size;	//In bytes
-  CDate datetime; //See  $LK,"DateTime",A="::/Doc/TimeDate.TXT"$, $LK,"Implementation of DateTime",A="FI:::/Kernel/Date.CPP"$
+  CDate datetime; //See  $LK,"DateTime",A="::/Doc/TimeDate.TXT"$, $LK,"Implementation of DateTime",A="FI:::/Kernel/KDate.CPP"$
 };
 
 public class CRedSeaBoot //RedSea is type FAT32 in partition table to fool BIOS.
@@ -31,7 +31,7 @@ public class CRedSeaBoot //RedSea is type FAT32 in partition table to fool BIOS.
   U16 signature2;	//0xAA55
 };
 $HL,0$
-See $LK,"implementation of RedSea file system",A="::/Kernel/Dsk/FileSysRedSea.CPP"$.
+See $LK,"implementation of RedSea file system",A="::/Kernel/BlkDev/FileSysRedSea.CPP"$.
 
 File with names ending in .Z are stored compressed.
 See $LK,"implementation of LZW compression",A="::/Kernel/Compress.CPP"$.

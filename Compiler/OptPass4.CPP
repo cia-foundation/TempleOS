@@ -652,7 +652,6 @@ p4_sib:
 	case IC_ADDR_IMPORT:
 	case IC_BSF:
 	case IC_BSR:
-	case IC_PREEMPT:
 	case IC_SIGN_I64:
 	case IC_TOUPPER:
 	case IC_TO_I64:

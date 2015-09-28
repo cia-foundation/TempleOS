@@ -10,8 +10,6 @@ U0 PlotXY(I64 x,I64 y)
 U0 Main()
 {
   I64 i;
-  Bool old_preempt=Preempt;
-
   //This makes all 4 color planes active.
   OutU8(VGAP_INDEX,VGAR_MAP_MASK);
   OutU8(VGAP_DATA,WHITE);
@@ -38,8 +36,6 @@ You can't do reads on VGA memory, by the way.
 That means no read-modify-writes, too.
 */
   BusyWait(4000000);
-
-  Preempt(old_preempt);
 
   //TempleOS has a 4 plane memory duplicate of the screen, $LK,"gr.screen_image",A="MN:CGrGlbls"$,
   //and only writes actual changes.  See $LK,"GrUpdateVGAGraphics",A="MN:GrUpdateVGAGraphics"$().

@@ -626,12 +626,13 @@ U0 KeepAway()
 	"Right-Click to jump.\n");
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK+YELLOW<<4;
-  WinMax;
+  AutoComplete;
   WinBorder;
-  Preempt;
+  WinMax;
+  DocCursor;
+  DocClear;
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
-  AutoComplete;
 
   MenuPush(
 	"File {"
@@ -646,8 +647,6 @@ U0 KeepAway()
 	);
 
   Init;
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
   Fs->animate_task=Spawn(&AnimateTask,Fs,"Animate",,Fs);
 

@@ -334,13 +334,13 @@ U0 DunGen()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
-  Preempt;
-  WinMax;
   AutoComplete;
-  Init;
-  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
+  Init;
+  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   Fs->draw_it=&DrawIt;
 
   try {

@@ -26,19 +26,19 @@ $ID,-2$
 $ID,-2$2) $LK,"Fmt",A="MN:Fmt"$($FG,2$'D'$FG$,$FG,2$TRUE,FALSE,DVT_FAT32$FG$)
 $ID,2$This command formats a drive with $FG,2$FAT32$FG$ or the $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system type.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
 
-$BK,1$WARNING:$BK,0$  If you are upgrading, be sure not to lose the file, $FG,2$/0000Boot/OldMBR.BIN.C$FG$.
+$BK,1$WARNING:$BK,0$  If you are upgrading, be sure not to lose the file, $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$.
 
 $ID,-2$3) $LK,"CopyTree",A="MN:CopyTree"$($FG,2$"T:/"$FG$,$FG,2$"D:/"$FG$)
-$ID,2$This command is used to copy files onto a hard drive partition from the CD-ROM.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
+$ID,2$This command is used to copy files onto a hard drive partition from the CD/DVD.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
 
 $ID,-2$4) $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$($FG,2$'D'$FG$)
 $ID,2$This command recompiles the source code on a drive and writes to the $UL,1$drive's$UL,0$ boot record.  You'll need to reenter the $LK,"Mount",A="MN:Mount"$ information so it can be stored in the kernel.
 
 $ID,-2$5) Use Linux's $LK,"Grub",A="FI:::/Doc/Grub.TXT"$ or TempleOS' $LK,"MasterBootIntall",A="MN:MasterBootIntall"$($FG,2$'D'$FG$)
 $ID,2$
-The $LK,"MasterBootIntall",A="MN:MasterBootIntall"$() command places a boot loader on a drive.  It saves the old master boot record to $FG,2$/0000Boot/OldMBR.BIN.C$FG$ and replaces it.  When you boot, you will have the option of booting the old master boot record.  This command can be skipped if you already have a boot loader.  Be sure not to lose the copy of the old boot record, like if you reformat the drive.
+The $LK,"MasterBootIntall",A="MN:MasterBootIntall"$() command places a boot loader on a drive.  It saves the old master boot record to $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ and replaces it.  When you boot, you will have the option of booting the old master boot record.  This command can be skipped if you already have a boot loader.  Be sure not to lose the copy of the old boot record, like if you reformat the drive.
 
-Delete $FG,2$/0000Boot/OldMBR.BIN.C$FG$ if you want to get a fresh copy of a mbr, like if installing from your own custom CD containing it's own $FG,2$/0000Boot/OldMBR.BIN.C$FG$ onto a system with a non-TempleOS boot loader.
+Delete $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ if you want to get a fresh copy of a mbr, like if installing from your own custom CD containing it's own $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ onto a system with a non-TempleOS boot loader.
 
 If you have anti-virus software, it might object to having a different master boot record.
 $ID,-2$

@@ -574,6 +574,7 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
     mp_cnt=1;
     dbg.mp_crash->cpu_num=Gs->num;
     dbg.mp_crash->task=Fs;
+    dbg.mp_crash->rip=Fs->rip;
     dbg.mp_crash->msg=dbg.msg;
     dbg.mp_crash->msg_num=dbg.msg_num;
     MPInt(I_MP_CRASH,0);
@@ -597,41 +598,41 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
 }
 
 U0 Fault2(I64 fault_num,I64 fault_err_code)
-{//Called from $LK,"Fault2",A="FF:::/Kernel/Ints.CPP,Fault2"$.
+{//Called from $LK,"Fault2",A="FF:::/Kernel/KInts.CPP,Fault2"$.
 //$BK,1$Be careful not to swap-out and ruin the saved context$BK,0$
   Bool was_raw,was_single_user,was_silent;
   I64  i,old_raw_flags=text.raw_flags;
-  if (fault_num==I_DIVIDE_BY_ZERO) {
-    "RIP:%P\n",Fs->rip;
-    throw('DivZero');
-  }
   was_single_user=SingleUser(ON);
   if (!IsDbg)
     dbg.focus_task=sys_focus_task;
   sys_focus_task=NULL;
   if (fault_num==I_BPT)
     Fs->rip--;
-  was_raw=Raw(ON);
-  was_silent=Silent(OFF);
-  text.raw_flags|=RWF_SHOW_DOLLAR|RWF_SCROLL;
+  if (Fs->dbg_task)
+    CallExtNum(EXT_DBG_RESUME,fault_num,fault_err_code);
+  else {
+    was_raw=Raw(ON);
+    was_silent=Silent(OFF);
+    text.raw_flags|=RWF_SHOW_DOLLAR|RWF_SCROLL;
 
-  "Task \"";
-  "%s",Fs->task_title;
-  "\"\n";
-  "Fault:0x%02X %Z\t\tErr Code:%08X\n",
-	fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
-  "RIP:%08X",Fs->rip; //Sometimes crashes on %p, so do this first
-  ":%p  RSP:%08X\n",Fs->rip,Fs->rsp;
-  if (fault_num==I_PAGE_FAULT) {
-    MOV_RAX_CR2
-    i=GetRAX;
-    "Fault Addr:%08X:%p\n",i,i;
+    "Task \"";
+    "%s",Fs->task_title;
+    "\"\n";
+    "Fault:0x%02X %Z\t\tErr Code:%08X\n",
+	  fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
+    "RIP:%08X",Fs->rip; //Sometimes crashes on %p, so do this first
+    ":%p  RSP:%08X\n",Fs->rip,Fs->rsp;
+    if (fault_num==I_PAGE_FAULT) {
+      MOV_RAX_CR2
+      i=GetRAX;
+      "Fault Addr:%08X:%p\n",i,i;
+    }
+    Fault3(fault_num,fault_err_code);
+
+    Silent(was_silent);
+    Raw(was_raw);
+    text.raw_flags=old_raw_flags;
   }
-  Fault3(fault_num,fault_err_code);
-
-  Silent(was_silent);
-  Raw(was_raw);
-  text.raw_flags=old_raw_flags;
   SingleUser(was_single_user);
   if (LBtr(&Fs->task_flags,TASKf_KILL_AFTER_DBG))
     Exit;

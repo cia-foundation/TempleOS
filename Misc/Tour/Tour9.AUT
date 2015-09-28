@@ -1,44 +1,24 @@
-TourPut("Press $$GREEN$$<ENTER>$$FG$$.");
-"Ed(\"HI:Debugging\");";
-AFGetStr("\n");
-TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
-AFUntilChar(CH_ESC,CH_SHIFT_ESC);
+"Ed(\"::/Misc/Bible.TXT.Z\");\n";
+TourPut("Press $$GREEN$$<CTRL-F>$$FG$$ to find.\n");
+AFGetChar(CH_CTRLF);
 
-TourPut(
-"We will now use $$RED$$$$TX+L+PU+UL,\"Uf\",A=\"MN:Uf\"$$$$FG$$() to "
-"unassemble a function.  It takes the function name as a string arg.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
-"WinMax;WinBorder;\nUf(\"CAlloc\");";
-AFGetStr("\n");
+AFPrint(150,"new song");
 
-TourPut("Press $$GREEN$$<CURSOR-UP>$$FG$$ eight times..");
+TourPut("Cursor down 8 times.\n");
 I64 i;
 for (i=0;i<8;i++)
-  AFGetKey(SC_CURSOR_UP);
+  AFGetKey(SC_CURSOR_DOWN);
 
-TourPut(
-"Press $$GREEN$$<SPACE>$$FG$$.\n");
-AFGetStr(" ");
+TourPut("Press '$$GREEN$$2$$FG$$' to show all lines within 2 of a match.\n");
+AFGetStr("2");
 
-TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+TourPut("Press $$GREEN$$<ESC>$$FG$$ to exit the form.\n");
+AFGetChar(CH_ESC);
+
+TourPut("Look around and press $$GREEN$$<ESC>$$FG$$ to turn off filter.\n");
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
-//Puts the cursor at the bottom.
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+TourPut("You can combine filters to effectively do AND searches.\n",TRUE);
 
-TourPut(
-"We can unassemble a numeric address with "
-"$$RED$$$$TX+L+PU+UL,\"U\",A=\"MN:U\"$$$$FG$$().\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
-"U(&CAlloc);";
-AFGetStr("\n");
+'' CH_SHIFT_ESC;
 
-TourPut("The opcodes are slightly nonstandard.\n",TRUE);
-"Ed(\"::/Compiler/OpCodes.TXT.Z\");\n";
-
-Msg(MSG_KEY_DOWN,CH_CTRLF,0x42100000421);
-"MOV";
-Msg(MSG_KEY_DOWN,CH_ESC,0x100000001);
-
-TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
-AFUntilChar(CH_ESC,CH_SHIFT_ESC);

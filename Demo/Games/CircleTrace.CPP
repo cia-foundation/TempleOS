@@ -1,6 +1,6 @@
 //Practice tracing circles
 
-//Giotto, a famous artist, drew a freehand circle as a portfolio for a job.
+//Giotto, a famous artist, drew a freehand circle to get a job.
 
 RegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
 RegExeBranch("TempleOS/CircleTrace");
@@ -42,13 +42,15 @@ U0 CircleTrace()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
   AutoComplete;
+  WinBorder;
+  WinMax;
+  DocCursor;
+  DocClear;
 
   cx=Fs->pix_width/2;
   cy=Fs->pix_height/2;
 
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
 
   DCFill;

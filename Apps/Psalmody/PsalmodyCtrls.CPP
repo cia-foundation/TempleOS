@@ -67,7 +67,6 @@ U0 LeftClickTempo(CCtrl *c,I64 x,I64 y,Bool)
 
 CCtrl *TempoNew()
 {
-  Bool old_preempt;
   CCtrl *c=CAlloc(sizeof(CCtrl));
   c->win_task=Fs;
   c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
@@ -78,17 +77,13 @@ CCtrl *TempoNew()
   c->update_derived_vals=&UpdateDerivedTempoCtrl;
   c->left=396;
   c->top=96;
-  old_preempt=Preempt;
   QueIns(c,Fs->last_ctrl);
   TaskDerivedValsUpdate;
-  Preempt(old_preempt);
   return c;
 }
 
 U0 TempoDel(CCtrl *c)
 {
-  Bool old_preempt=Preempt;
   QueRem(c);
-  Preempt(old_preempt);
   Free(c);
 }

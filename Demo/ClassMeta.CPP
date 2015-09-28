@@ -36,7 +36,7 @@ U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
   F64 percentile;
   if (!tempc) return;
   CMemberLst *ml;
-  ml=tempc->member_lst;
+  ml=tempc->member_lst_and_root;
   while (ml) {
     "%s:",ml->str;
 

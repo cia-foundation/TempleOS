@@ -74,13 +74,10 @@ CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags)
 CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags)
 {//Post StdIn text to servant task. Tell who the master task is.
   CSrvCmd *result;
-  Bool old_preempt=Preempt;
   CTask *task;
   if (!data || !TaskValidate(srv) || master && !TaskValidate(master) ||
-	srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT)) {
-    Preempt(old_preempt);
+	srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT))
     return NULL;
-  }
   result=ACAlloc(sizeof(CSrvCmd));
   result->master_task=master; //in case somebody cares
   result->cmd_code=SVCT_TEXT_INPUT;
@@ -115,7 +112,6 @@ CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags)
     LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
   }
   POPFD
-  Preempt(old_preempt);
   return result;
 }
 
@@ -267,12 +263,11 @@ U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0)
 #define SCR_CONT	1
 #define SCR_EXIT	2
 
-I64 SrvCmdRun(CSrvCmd *tempc,I64 old_flags)
+I64 SrvCmdRun(I64 run_flags,CSrvCmd *tempc)
 {
   CSrvCtrl *ctrl=tempc->ctrl;
   CTask    *master;
-  Bool old_preempt=IsPreempt;
-  I64 result,flags=tempc->flags;
+  I64 result,flags=tempc->flags,old_flags=GetRFlags;
   if (Bt(&flags,SVCf_EXIT_ON_COMPLETE))
     result=SCR_EXIT;
   else
@@ -295,7 +290,7 @@ I64 SrvCmdRun(CSrvCmd *tempc,I64 old_flags)
       LBts(&tempc->flags,SVCf_DISPATCHED);
       tempc->servant_cpu_num=Gs->num;
       LBtr(&ctrl->flags,SVCRf_LOCKED);
-      SetRFlags(old_flags);
+      SetRFlags(run_flags);
       LBtr(&Fs->task_flags,TASKf_IDLE);
       try
 	      tempc->result=(*tempc->addr)(tempc->fun_arg);
@@ -308,7 +303,7 @@ I64 SrvCmdRun(CSrvCmd *tempc,I64 old_flags)
       LBts(&tempc->flags,SVCf_DISPATCHED);
       tempc->servant_cpu_num=Gs->num;
       LBtr(&ctrl->flags,SVCRf_LOCKED);
-      SetRFlags(old_flags);
+      SetRFlags(run_flags);
       LBtr(&Fs->task_flags,TASKf_IDLE);
       try
 	      tempc->result=ExePrint("%s",tempc->aux_str);
@@ -348,11 +343,10 @@ I64 SrvCmdRun(CSrvCmd *tempc,I64 old_flags)
       SetRFlags(old_flags);
     }
   }
-  Preempt(old_preempt);
   return result;
 }
 
-I64 SrvCmdsHandler(CTask *task=NULL)
+I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL)
 {//Handle all waiting cmds and return.
   I64 cnt=0,old_flags=GetRFlags;
   CSrvCmd *tempc,*tempc1;
@@ -366,7 +360,7 @@ I64 SrvCmdsHandler(CTask *task=NULL)
     if (tempc==tempc1)
       goto sch_done;
     else
-      switch (SrvCmdRun(tempc,old_flags)) {
+      switch (SrvCmdRun(run_flags,tempc)) {
 	case SCR_CONT:
 	  cnt++;
 	  break;
@@ -386,12 +380,10 @@ I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Execute code text in PopUp win task.
   I64 result;
   CSrvCmd *tempc;
-  Bool old_preempt=Preempt;
   CTask *task=Spawn(&SrvCmdLine,NULL,"Servant",,parent);
   if (!parent) {
     TaskExe(task,parent,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
     if (_pu_task) *_pu_task=task;
-    Preempt(old_preempt);
     return 0;
   } else {
     Fs->popup_task=task;
@@ -401,7 +393,6 @@ I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
     Fs->popup_task=NULL;
     Kill(task);
     if (_pu_task) *_pu_task=NULL;
-    Preempt(old_preempt);
     return result;
   }
 }
@@ -419,16 +410,14 @@ I64 Adam(U8 *fmt,...)
 {//Sends text to the adam task which gets compiled and run.
   I64 result;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  Bool old_preempt=Preempt;
   CSrvCmd *tempc;
   if (Fs==adam_task) {
     tempc=TaskExe(adam_task,Fs,buf,0);
-    SrvCmdsHandler;
+    SrvCmdsHandler(GetRFlags);
   } else {
     TaskWait(adam_task);
     tempc=TaskExe(adam_task,Fs,buf,1<<SVCf_WAKE_MASTER);
   }
-  Preempt(old_preempt);
   JobResultScan(tempc,&result);
   Free(buf);
   return result;

@@ -1,6 +1,16 @@
-$WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
+$WW,1$* I'm going to redo all my videos and make them more professional.
+
+* $TX,"Kruskal-Wallis_one-way_analysis_of_variance",HTML="http://en.wikipedia.org/wiki/Kruskal-Wallis_one-way_analysis_of_variance"$ disk sector allocation?
+
+* Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
+
+* 8/20/2015 TAD8, Tour1, then Tour TestSuite was missing #include "TestSuite".
+
+* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
 * Get rid of having two terms and pick one, "Disk" and "BlkDev"?  I don't think so.  (Probably not.)
+
+* Make Bible into Tree Branches Collapsed.
 
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
 
@@ -8,12 +18,18 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
 * Entering a '$$' in text entry
 
-* Clean-up ASCII-127 delete.
+* Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
+  CArrayDim dim;
+  CHashFun *fun_ptr;
+
+* Clean-up ASCII-127 delete char.
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(st); With st="\n\\";
+
+* 8/2/2015 VMware start-up. Probably multicore.
 
 * 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
 
-* 1/?/2015 Macro select in Menu did not go to shell.
+* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell.  No: I think CTRL-M twice.
 
 * $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Did I fix it?
 
@@ -24,6 +40,12 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 * More $LK,"CCtrl",A="MN:CCtrl"$.
 
 * Add Redo to editor.
+
+* Perhaps, links to self document if empty file name? $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$
+
+* Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
+
+* $LK,"Type",A="MN:Type"$() doesn't work in $LK,"Raw",A="MN:Raw"$() mode.
 
 * PSect does not scan all task tables.
 
@@ -54,7 +76,6 @@ $WW,1$* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 * $$CM+LE+RE is nasty
 
 * FlatTop is torpedo, not bombs.
-* BomberGolf is weird concept?
 
 * Maybe, 3x3 instead of 4x4 matrices. <sigh>
 
@@ -137,8 +158,6 @@ $LK,"::/Demo/Lectures/FixedPointAdvanced.CPP"$.
 
 * clean-up addDev pmt
 
-* Might want to convert some Preempt() to Cli
-
 * $LK,"Plain",A="MN:Plain"$() might be better not saving $LK,"CH_CURSOR",A="MN:CH_CURSOR"$.
 
 * TRANSPARENT might not work with line ROPF_DITHER
@@ -200,13 +219,13 @@ Works for $LK,"IPSet",A="MN:IPSet"$(), though.
 
 * Add local vars to sym table in $LK,"Dbg",A="MN:Dbg"$()?  (maybe)
 
-* $LK,"Bible sized nodes",A="FF:::/Adam/DolDoc/DocRecalcB.CPP,->tag+i"$
-* Mouseinstall throws exceptions, doesn't work, investigate Mouse $LK,"0x9FC30",A="FF:::/Kernel/KbdMouse/Mouse.CPP,9FC"$
+* $LK,"Bible sized nodes",A="FF:::/Adam/DolDoc/DocRecalc.CPP,->tag+i"$
+* Mouseinstall throws exceptions, doesn't work, investigate Mouse $LK,"0x9FC30",A="FF:::/Kernel/SerialDev/Mouse.CPP,9FC"$
 * get kbd lights working.
 * Might have issue with compiler exceptions and restoring lex.hash tables.
 * Generates two compiler error messages for expressions in statements.
 * release semaphores or break lock sema,usb_td
-* Fix Mom's secondary CD-ROM, dad's primary
+* Fix Mom's secondary CD/DVD, dad's primary
 * pmtstr in install didn't like focus change
 
 *$FG,2$U0 Main()
@@ -234,7 +253,6 @@ short names.
 * Maybe convert graphics to float
 * Warn unnecessary typecast
 * compiler F32
-* preempt(OFF) during graphic clipping?
 * compiler optimization heap_glbls with added offset
 * Might make FAT32 read in contiguous chunks.
 * make Clamp(),Min(),Max() asm routines.
@@ -267,7 +285,6 @@ registry-like routines... or registry I guess.
 * new HolyC language features
 * better debugging
 
-* Too much preemption turned off?
 * Look for mem leaks.
 * Move stuff out of Kernel module.
 
@@ -311,24 +328,51 @@ assignments.  Is ShiftNoPush fully implemented?
 * sort options for findfiles
 * Maybe, get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.CPP,0x20000"$ in compiler.
 
-It is love I desire: $LK,"Hosea,6:6",A="BF:Hosea,6:6"$ $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
+================================================================================
+It is love I desire: $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
+Offer a sacrifice of praise: $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
+Do I drink blood of goats? Offer praise: $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
+Runner's Stride: $TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
 
-Offer a sacrifice of praise: $LK,"Hebrews,13:15",A="BF:Hebrews,13:15"$ $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
-
-Do I drink blood of goats? Offer praise: $LK,"Psalms,50:14",A="BF:Psalms,50:14"$ $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
-
-Runner's Stride: $LK,"Psalms,147:10",A="BF:Psalms,147:10"$ $TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
-
-Buckling Armor: $LK,"1 Kings,20:11",A="BF:1 Kings,20:11"$ $TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/aKchwAWMpDA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/aKchwAWMpDA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+Buckling Armor: $TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
+Lot cast in the lap: $TX,"Proverbs 16:33",HTML="http://www.biblegateway.com/verse/en/Proverbs%2016:33"$
+Lord does not repeat: $TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/en/Job%2033:14"$
+Offer only in approved place: $TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
+Jesus' zeal for the Temple: $TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
 
 >lspci -v
+Size:$TX,"17294 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
-Size:$TX,"17594 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/E6K9zK9ZWSg\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/E6K9zK9ZWSg\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+8:11 Behold, the days come, saith the Lord GOD, that I will send a
+famine in the land, not a famine of bread, nor a thirst for water, but
+of hearing the words of the LORD: 8:12 And they shall wander from sea
+to sea, and from the north even to the east, they shall run to and fro
+to seek the word of the LORD, and shall not find it.
 
-$TX,"Let me Google NIST Random Beacon",HTML="http://lmgtfy.com?q=NIST+random+beacon"$
+TempleOS Logo
+$HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
+
+Contact
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/SRoj3jK37Vc\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/SRoj3jK37Vc\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Black Knight
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/dhRUe-gz690\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/dhRUe-gz690\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Metallica: Creeping Death
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/z5lXEFdZAmU\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/z5lXEFdZAmU\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Neil Degrasse Tyson: Get of of their Way
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/AIEJjpVlZu0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/AIEJjpVlZu0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+Neil Degrasse Tyson: Girl
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/rVwQ9jBuoFA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/rVwQ9jBuoFA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
 Commodore 64 Basic/Assembly
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/d8bZ92gIVms\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/d8bZ92gIVms\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Red Fang: Prehistoric Dog
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/VufilzHKTqk\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/VufilzHKTqk\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
 Bill Gates Predictions
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/4r9u_R0cCew\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/4r9u_R0cCew\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
@@ -336,7 +380,25 @@ $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://w
 Cop tying shoe:  (After drive-by shooting, God said kid was not innocent, LOL.)
 $HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
 
+Frontier Psychiatrist
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/qLrnkK2YEcE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/qLrnkK2YEcE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/DfIcZtjAch8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/DfIcZtjAch8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Morning has Broken
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/kKoRp05L95c\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/kKoRp05L95c\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Icarus
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/0Pmgtyw2n8w\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/0Pmgtyw2n8w\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Zombie Game
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/F27r_9oyqBI\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/F27r_9oyqBI\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+Sports Game
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/ORXqOEGFQfE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/ORXqOEGFQfE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
+$TX,"PCI Interrupt Routing",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
+$TX,"Lamp Shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
 $TX,"My Bookmarks",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bookmarks"$
 $TX,"Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon/"$
 $TX,"Top 100 Movies",HTML="http://www.afi.com/100years/movies10.aspx"$
@@ -348,6 +410,7 @@ $TX,"KeyPeele#1",HTML="http://www.youtube.com/watch?v=Dd7FixvoKBw"$
 $TX,"KeyPeele#2",HTML="http://www.youtube.com/watch?v=VHG_Gv_zLY4"$
 $TX,"ThePrisoner",HTML="http://www.youtube.com/watch?v=HRPDO63rI1E"$
 $TX,"Bible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
+$TX,"Security at NIST",HTML="http://csrc.nist.gov/publications/nistpubs/800-30-rev1/sp800_30_r1.pdf"$
 $TX,"WestWorld",HTML="http://www.youtube.com/watch?v=LcL3eP0Hfy4"$
 $TX,"Picard:FourLights",HTML="http://www.youtube.com/watch?v=o_eSwq1ewsU"$
 $TX,"Dwight:NerdTorture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
@@ -362,3 +425,5 @@ $TX,"BBC_Five_Live",HTML="http://www.bbc.co.uk/radio/player/bbc_radio_five_live"
 $TX,"KNPR",HTML="http://www.knpr.org"$
 $TX,"C64 Users Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$
 $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_programmers_reference/c64-programmers_reference.htm"$
+$TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
+$TX,"Resperdal Shortens Life",HTML="http://factmed.com/study-RISPERDAL-causing-LIFE EXPECTANCY SHORTENED.php"$

@@ -352,38 +352,6 @@ U0 ICBitOps(CIntermediateCode *tempi,CICArg *a1,CICArg *a2,
   }
 }
 
-U0 ICPreempt(CIntermediateCode *tempi,I64 ip)
-{
-  CIntermediateCode *tempi2=tempi->next;
-  if (tempi->a1.type&TY_MASK==TY_IMM) {
-    ICZero(tempi,REG_RBX);
-    ICU32(tempi,0x1B8B4864);
-    if (!(tempi2->ic_flags&ICF_NO_DEPEND_RESULT))
-      ICZero(tempi,REG_RAX);
-    if (tempi->a1.disp)
-      ICU24(tempi,0x6BBA0F);
-    else
-      ICU24(tempi,0x73BA0F);
-    ICU16(tempi,CTask.task_flags+TASKf_PREEMPT<<8);
-  } else {
-    ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-    if (!(tempi2->ic_flags&ICF_NO_DEPEND_RESULT))
-      ICZero(tempi,REG_RAX);
-    ICZero(tempi,REG_RBX);
-    ICU32(tempi,0x1B8B4864);
-    ICTest(tempi,REG_RCX);
-    ICU16(tempi,0x0774);
-    ICU24(tempi,0x6BBA0F);
-    ICU16(tempi,CTask.task_flags+TASKf_PREEMPT<<8);
-    ICU16(tempi,0x05EB);
-    ICU24(tempi,0x73BA0F);
-    ICU16(tempi,CTask.task_flags+TASKf_PREEMPT<<8);
-  }
-  if (!(tempi2->ic_flags&ICF_NO_DEPEND_RESULT))
-    ICU32(tempi,0xD08348);
-}
-
 U0 ICToUpper(CIntermediateCode *tempi,I64 ip)
 {
   ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,

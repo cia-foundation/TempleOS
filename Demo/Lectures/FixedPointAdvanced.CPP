@@ -78,7 +78,6 @@ U0 Main()
   I64 start,end,overhead_time,test_time;
   F64 d1,fsum;
   I64 reg i,temp,reg d2,reg sum;
-  Bool old_preempt=Preempt;
 
   CPURep;
 
@@ -141,7 +140,6 @@ U0 Main()
   "$$RED$$Asm Float Cycles      :%10.5f$$FG$$\n",
 	ToF64(test_time)/SAMPLE_SIZE;
 
-  Preempt(old_preempt);
 }
 
 Main;

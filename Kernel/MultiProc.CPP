@@ -177,10 +177,10 @@ U0 MPWake(I64 target_cpu)
     if (!target_cpu)
       LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
     MPInt(I_WAKE,target_cpu);
-    if (!target_cpu)
-      LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
     if (Bt(&cpu_structs[target_cpu].cpu_flags,CPUf_SETH_SLEEP))//back to sleep?
       cpu_structs[target_cpu].seth_task->wake_jiffy=0;
+    if (!target_cpu)
+      LBtr(&adam_task->task_flags,TASKf_AWAITING_MSG);
     POPFD
   }
 }
@@ -217,7 +217,7 @@ U0 APSethTask()
     TaskFinishOffDying;
     if (!LBts(&my_ctrl->flags,SVCRf_LOCKED)) {
       tempc=tempc1->next;
-      if (tempc==tempc1 || !SrvCmdRun(tempc,GetRFlags)) {
+      if (tempc==tempc1 || !SrvCmdRun(GetRFlags,tempc)) {
 	LBtr(&my_ctrl->flags,SVCRf_LOCKED) ;
 	if (my_ctrl->next_waiting==my_ctrl) {
 	  Bts(&Gs->cpu_flags,CPUf_SETH_SLEEP);
@@ -396,13 +396,14 @@ U0 BSPInit()
   }
 }
 
-U0 MPCrash()
+interrupt U0 IntMPCrash()
 {//Entering the debugger from another core causes an interrupt on core#0
 //Which calls this routine.
   *LAPIC_EOI(U32 *)=0;
   mp_cnt=1;
   Raw(ON);
   text.raw_flags|=RWF_SHOW_DOLLAR;
-  "MP Crash CPU#%02X Task:%08X\n",dbg.mp_crash->cpu_num,dbg.mp_crash->task;
+  "MP Crash CPU#%02X Task:%08X\n"
+  "RIP:%P\n",dbg.mp_crash->cpu_num,dbg.mp_crash->task,dbg.mp_crash->rip;
   Dbg(dbg.mp_crash->msg,dbg.mp_crash->msg_num);
 }

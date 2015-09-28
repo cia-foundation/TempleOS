@@ -4,7 +4,7 @@ $WW,1$These are arranged in increasing order of difficulty, more or less.  This 
 
 $FG,2$<SPACE>$FG$ to edit a file and $FG,2$F5$FG$ to run it.
 
-$LK,"::/Doc/HelloWorld.TXT.Z"$
+$LK,"::/Doc/HelloWorld.TXT"$
 
 $WW,0$$TR,"Games: Beginner"$
 $ID,2$$LK,"::/Demo/Graphics/NetOfDots.CPP"$
@@ -72,7 +72,7 @@ $LK,"::/Demo/Graphics/Cartesian.CPP"$
 $LK,"::/Demo/Graphics/Hanoi.CPP"$
 $LK,"::/Demo/Graphics/Life.CPP"$
 $LK,"::/Demo/Games/Zing.CPP"$
-$LK,"::/Demo/Graphics/Grid.CPP.Z"$
+$LK,"::/Demo/Graphics/Grid.CPP"$
 $LK,"::/Demo/Games/TreeCheckers.CPP"$
 $LK,"::/Demo/MultiCore/Palindrome.CPP"$
 $LK,"::/Demo/MultiCore/MPAdd.CPP"$
@@ -82,7 +82,7 @@ $LK,"::/Demo/Graphics/Slider.CPP"$
 $LK,"::/Demo/Graphics/WallPaperCtrl.CPP"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Graphics/ScrollBars.CPP"$
 $LK,"::/Demo/RegistryDemo.CPP"$
-$LK,"::/Demo/Games/BugBird.CPP"$
+$LK,"::/Demo/Games/FlapBat.CPP"$
 $LK,"::/Demo/Games/BattleLines.CPP"$
 $LK,"::/Demo/Games/BigGuns.CPP"$
 $LK,"::/Demo/Games/FlatTops.CPP"$
@@ -121,7 +121,7 @@ $MA-X+PU,"::/Apps/Strut",LM="Cd(\"::/Apps/Strut\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Span",LM="Cd(\"::/Apps/Span\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Psalmody",LM="Cd(\"::/Apps/Psalmody\");Dir;View;\n"$
 $ID,-2$$TR,"Non-Game"$
-$ID,2$$LK,"::/Misc/MakeDistro.CPP"$
+$ID,2$$LK,"::/Misc/DoDistro.CPP"$
 $LK,"::/Demo/DbgDemo.CPP"$
 $LK,"::/Demo/SubSwitch.CPP"$
 $LK,"::/Demo/DateTime.CPP"$
@@ -157,7 +157,7 @@ $LK,"::/Demo/CompileDemo.CPP"$
 $LK,"::/Demo/Prompt.CPP"$
 $LK,"::/Demo/ClassMeta.CPP"$
 $LK,"::/Demo/LastClass.CPP"$
-$LK,"::/Demo/DolDoc/NumBible.CPP.Z"$
+$LK,"::/Demo/DolDoc/NumBible.CPP"$
 $LK,"::/Demo/DolDoc/Form.CPP"$
 $LK,"::/Demo/DolDoc/MenuButton.CPP"$
 $LK,"::/Demo/DolDoc/MenuSprite.CPP"$

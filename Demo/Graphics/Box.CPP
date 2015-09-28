@@ -27,7 +27,6 @@ U0 Box()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   DocClear;
   Fs->draw_it=&DrawIt;
-  Preempt; //We don't want matrix used while we're changing it.
 
   dc->x=200;
   dc->y=200;

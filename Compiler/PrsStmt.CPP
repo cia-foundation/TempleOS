@@ -120,7 +120,7 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,
   tempf->arg_cnt=tempf->member_cnt;
   if (0<tempf->arg_cnt<<3<=MAX_I16 && !Bt(&tempf->flags,Ff_DOT_DOT_DOT))
     LBts(&tempf->flags,Ff_RET1);
-  tempm=tempf->member_lst;
+  tempm=tempf->member_lst_and_root;
   while (tempm) {
     tempm->offset+=16; //RBP+RETURN
     tempm=tempm->next;
@@ -134,7 +134,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   CMemberLst *tempm;
   CCodeMisc *saved_leave_label;
   I64 i,j,size,*r;
-  Bool old_ctrace;
+  Bool old_trace;
 
   cc->fun_lex_file=cc->lex_include_stk;
   cc->min_line=cc->max_line=cc->lex_include_stk->line_num;
@@ -143,7 +143,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   cc->htc.local_var_lst=cc->htc.fun=PrsFunJoin(cc,temp_return,name,fsp_flags);
 
   COCPush(cc);
-  Btr(&cc->flags,CCf_OPT_TRACE_PRESENT);
+  Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
   COCInit(cc);
   ICAdd(cc,IC_ENTER,0,0);
   saved_leave_label=cc->lb_leave;
@@ -171,25 +171,25 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
       Free(r);
     }
   } else {
-    old_ctrace=Btr(&cc->opts,OPTf_COMPILE_TRACE);
+    old_trace=Btr(&cc->opts,OPTf_TRACE);
     cc->htc.fun->executable_addr=COCCompile(cc,&size,
 	  &cc->htc.fun->dbg_info,NULL);
-    if (old_ctrace) {
-      Bts(&cc->opts,OPTf_COMPILE_TRACE);
+    if (old_trace) {
+      Bts(&cc->opts,OPTf_TRACE);
       Un(cc->htc.fun->executable_addr,size,64);
     }
     SysSymImportsResolve(cc->htc.fun->str);
   }
   LBtr(&cc->htc.fun->flags,Cf_EXTERN);
   COCPop(cc);
-  tempm=cc->htc.fun->member_lst;
+  tempm=cc->htc.fun->member_lst_and_root;
   while (tempm) {
     if (tempm->flags & MLF_NO_UNUSED_WARN) {
       if (tempm->use_cnt>1&&StrCmp(tempm->str,"_anon_"))
 	PrintWarn("Unneeded nounusedwarn\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 	      cc->lex_include_stk->full_name,cc->lex_include_stk->line_num,
 	      tempm->str,cc->htc.fun->str);
-    } else if (!tempm->use_cnt && GetOpt(OPTf_WARN_UNUSED_VAR))
+    } else if (!tempm->use_cnt && GetOption(OPTf_WARN_UNUSED_VAR))
       PrintWarn("Unused var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 	    cc->lex_include_stk->full_name,cc->lex_include_stk->line_num,
 	    tempm->str,cc->htc.fun->str);

@@ -106,7 +106,6 @@ U0 GrFixZoomScale()
 
 public U0 GrScaleZoom(F64 scale)
 {//Multiply zoom factor larger or smaller.
-  Bool old_preempt=Preempt;
   F64 s=gr.screen_zoom;
   gr.screen_zoom=gr.screen_zoom*scale;
   GrFixZoomScale;
@@ -120,7 +119,6 @@ public U0 GrScaleZoom(F64 scale)
   gr.sx=ip.pos.x-gr.zoomed_dc->width >>1/gr.screen_zoom;
   gr.sy=ip.pos.y-gr.zoomed_dc->height>>1/gr.screen_zoom;
   GrFixZoomScale;
-  Preempt(old_preempt);
 }
 
 U0 GrZoomInScreen()
@@ -403,7 +401,6 @@ U0 GrUpdateVGAGraphics()
 U0 GrUpdateScreen()
 {//Called by the Window Manager $LK,"HERE",A="FF:::/Adam/WinB.CPP,GrUpdateScreen"$, 60 times a second.
   CDC *dc;
-  Preempt(ON);
   if (!Bt(&sys_run_level,RLf_VGA)) //if text mode
     GrUpdateTasks;
   else {
@@ -412,7 +409,6 @@ U0 GrUpdateScreen()
     GrUpdateTasks;
     DCBlotColor8(gr.dc2,gr.dc);
   }
-  Preempt;
 
   dc=DCAlias(gr.dc2,Fs);
   dc->flags|=DCF_ON_TOP;

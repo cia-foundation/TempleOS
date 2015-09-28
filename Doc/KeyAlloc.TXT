@@ -8,9 +8,7 @@ When you are at the cmd line, editing documents, browsing documentation and help
 
 $FG,2$<ALT-keys>$FG$ and $FG,2$<ALT-SHIFT-keys>$FG$  Free for user configurations in your $LK,"MyPutKey",A="MN:MyPutKey"$() handler, except for $FG,2$ALT-BACKSPACE$FG$ (undo).  There are a few examples pre-defined, but you can change them if you wish.
 
-$FG,2$<ALT-digit keys>$FG$  Extended ASCII (3 digit decimal number).
-
-$FG,2$<CTRL-ALT-keys>$FG$ and $FG,2$<CTRL-ALT-SHIFT-keys>$FG$  Handled at a system level, NOT by the $LK,"CDoc",A="MN:CDoc"$ editor.  I reserve the right to alloc these, but in the mean time, you can define your own handlers with $LK,"CtrlAltLetCBSet",A="MN:CtrlAltLetCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
+$FG,2$<CTRL-ALT-keys>$FG$ and $FG,2$<CTRL-ALT-SHIFT-keys>$FG$  Handled at a system level, NOT by the $LK,"CDoc",A="MN:CDoc"$ editor.  I reserve the right to alloc these, but in the mean time, you can define your own handlers with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
 
 $FG,2$<CTRL-function key>$FG$  Auto-completes local words.
 

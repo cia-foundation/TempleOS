@@ -1,10 +1,10 @@
 //Compile this by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
-//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Boot/BootIns.CPP,Cmp(\"/Kernel/Kernel\""$.
+//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootIns.CPP,Cmp(\"/Kernel/Kernel\""$.
 
 #exe {
   Cd(__DIR__);;
-  OptOn(OPTf_WARN_PAREN);
-  OptOn(OPTf_WARN_DUP_TYPES);
+  Option(OPTf_WARN_PAREN,ON);
+  Option(OPTf_WARN_DUP_TYPES,ON);
   #include "KCfg"
   CKernelCfg *kernel_cfg;
   kernel_cfg=KernelCfgNew;
@@ -12,14 +12,14 @@
 
 #include "KernelA.HPP"
 #include "KStart"
-#include "KUtils"
 #include "KMathA"
-#exe {OptOn(OPTf_KEEP_PRIVATE);};
+#include "KUtils"
+#exe {Option(OPTf_KEEP_PRIVATE,ON);};
 #include "/Compiler/CompilerA.HPP"
-#exe {OptOn(OPTf_EXTERNS_TO_IMPORTS);};
+#exe {Option(OPTf_EXTERNS_TO_IMPORTS,ON);};
 #include "/Compiler/CompilerB.HPP"
-#exe {OptOff(OPTf_EXTERNS_TO_IMPORTS);};
-#exe {OptOff(OPTf_KEEP_PRIVATE);};
+#exe {Option(OPTf_EXTERNS_TO_IMPORTS,OFF);};
+#exe {Option(OPTf_KEEP_PRIVATE,OFF);};
 #include "KernelB.HPP"
 #include "KExts"
 #include "StrA"
@@ -30,14 +30,14 @@
 #include "Sched"
 #include "MemC"
 #include "Font8x8"
-#include "KHashA"
 #include "StrB"
-#include "Ints"
+#include "KHashA"
+#include "KInts"
 #include "KDataTypes"
 #include "Compress"
 #include "KHashB"
 #include "KLoad"
-#include "Date"
+#include "KDate"
 #include "StrPrint"
 #include "StrScan"
 #include "KDefine"
@@ -46,19 +46,14 @@
 #include "KDbg"
 #include "KeyDev"
 #include "KExcept"
-#include "KbdMouse/InputPointer"
-#include "KbdMouse/Keyboard"
-#include "KbdMouse/Mouse"
-#include "KbdMouse/Message"
+#include "SerialDev/MakeSerialDev"
 #include "QSort"
-#include "Task"
+#include "KTask"
 #include "SrvCmd"
 #include "PCIBIOS"
-#exe {Cd("Dsk");};
-#include "Dsk"
-#exe {Cd("..");};
 #include "MultiProc"
 #include "EdLite"
+#include "BlkDev/MakeBlkDev"
 #include "PSect"
 #include "KEnd"
 

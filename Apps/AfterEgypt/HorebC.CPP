@@ -1,5 +1,5 @@
 U0 AnimateTask(I64)
-{//Preemption is off after Spawn
+{
   I64 i;
   F64 t;
   Obj *tempo;
@@ -101,10 +101,8 @@ U0 Horeb()
     Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
 	  -WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
     AutoComplete;
-    WinMax;
     WinBorder;
-    Preempt;
-
+    WinMax;
     DocClear;
     "$$BG,LTCYAN$$%h6c",'\n';
     "$$BG,YELLOW$$%h30c",'\n';

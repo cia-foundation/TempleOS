@@ -1,23 +1,18 @@
 public CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type)
 {//Find task ctrl given $LK,"ctrl_type",A="MN:CTRLT_VIEWING_ANGLES"$.
   CCtrl *c;
-  Bool old_preempt=Preempt;
   c=haystack_task->next_ctrl;
   while (c!=&haystack_task->next_ctrl) {
-    if (c->type==needle_type) {
-      Preempt(old_preempt);
+    if (c->type==needle_type)
       return c;
-    }
     c=c->next;
   }
-  Preempt(old_preempt);
   return NULL;
 }
 
 U0 CtrlsUpdate(CTask *task)
 {
   CCtrl *c;
-  Bool old_preempt=Preempt;
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {
     if (c->update_derived_vals)
@@ -35,7 +30,6 @@ U0 CtrlsUpdate(CTask *task)
     }
     c=c->next;
   }
-  Preempt(old_preempt);
 }
 
 fp_update_ctrls=&CtrlsUpdate;
@@ -64,7 +58,6 @@ U0 DrawCtrls(CTask *task)
 {
   CCtrl *c;
   CDC *dc=DCAlias(gr.dc2,task);
-  Bool old_preempt=Preempt;
   c=task->next_ctrl;
   while (c!=&task->next_ctrl) {
     if (c->flags&CTRLF_SHOW) {
@@ -107,7 +100,6 @@ U0 DrawCtrls(CTask *task)
     }
     c=c->next;
   }
-  Preempt(old_preempt);
   DCDel(dc);
 }
 
@@ -116,7 +108,6 @@ U0 DrawCtrls(CTask *task)
 U0 DrawWinScroll(CDC *dc,CCtrl *c)
 {
   CWinScroll *s=c->state;
-  Bool old_preempt=Preempt;
 
   if (c->flags&CTRLF_CLICKED)
     dc->color=s->color>>4;
@@ -129,7 +120,6 @@ U0 DrawWinScroll(CDC *dc,CCtrl *c)
   else
     dc->color=s->color>>4;
   GrRect(dc,c->left+2,c->top+2,c->right-c->left+1-4,c->bottom-c->top+1-4);
-  Preempt(old_preempt);
 }
 
 U0 WinDerivedScrollValsUpdate(CCtrl *c)
@@ -208,7 +198,6 @@ U0 WheelChangeWinScroll(CCtrl *c,I64 delta)
 
 U0 WinScrollsInit(CTask *task)
 {
-  Bool old_preempt=Preempt;
   CCtrl *c;
 
   if (!CtrlFindUnique(task,CTRLT_WIN_HSCROLL)) {
@@ -236,7 +225,6 @@ U0 WinScrollsInit(CTask *task)
     QueIns(c,task->last_ctrl);
   }
   TaskDerivedValsUpdate(task);
-  Preempt(old_preempt);
 }
 #define VIEWANGLES_SPACING	22
 #define VIEWANGLES_RANGE	48
@@ -363,7 +351,6 @@ U0 LeftClickViewAngles(CCtrl *c,I64 x,I64 y,Bool)
 
 public CCtrl *ViewAnglesNew(CTask *task=NULL)
 {//Create view angle ctrl. See $LK,"::/Demo/Graphics/Shading.CPP"$.
-  Bool old_preempt;
   CCtrl *c;
   CViewAngles *s;
   if (!task) task=Fs;
@@ -383,10 +370,8 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
     c->draw_it=&DrawViewAnglesCtrl;
     c->left_click=&LeftClickViewAngles;
     c->update_derived_vals=&UpdateDerivedViewAnglesCtrl;
-    old_preempt=Preempt;
     QueIns(c,task->last_ctrl);
     TaskDerivedValsUpdate(task);
-    Preempt(old_preempt);
   }
   return c;
 }
@@ -394,12 +379,10 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
 public U0 ViewAnglesDel(CTask *task=NULL)
 {//Free view angle ctrl.
   CCtrl *c;
-  Bool old_preempt=Preempt;
   if (!task) task=Fs;
   if (c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES)) {
     QueRem(c);
     Free(c->state);
     Free(c);
   }
-  Preempt(old_preempt);
 }

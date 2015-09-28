@@ -32,18 +32,18 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e)
       Free(st);
     }
 /* !!! Dangerous, but handy !!!
-if (doc_e->de_flags & DOCEF_AUX_STR) {
-if (st=StrMatch(".Z",doc_e->aux_str)) {
-StrCpy(st,st+2);
-result++;
-}
-}
-if (doc_e->de_flags&DOCEF_TAG) {
-if (st=StrMatch(".Z",doc_e->tag)) {
-StrCpy(st,st+2);
-result++;
-}
-}
+    if (doc_e->de_flags & DOCEF_AUX_STR) {
+      if (st=StrMatch(".Z",doc_e->aux_str)) {
+	StrCpy(st,st+2);
+	result++;
+      }
+    }
+    if (doc_e->de_flags&DOCEF_TAG) {
+      if (st=StrMatch(".Z",doc_e->tag)) {
+	StrCpy(st,st+2);
+	result++;
+      }
+    }
 */
   }
   return result;

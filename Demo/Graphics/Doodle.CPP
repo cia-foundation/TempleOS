@@ -8,11 +8,11 @@ U0 Doodle()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
 
-  WinMax;
   AutoComplete;
-
-  DCFill;
+  WinBorder;
+  WinMax;
   DocClear;
+  DCFill;
   do {
     msg_code=GetMsg(&a1,&a2,
 	  1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+

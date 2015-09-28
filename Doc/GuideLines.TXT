@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Directory Structure"$$FG$
 
 $FG,2$/Home$FG$ All your user data should be placed in here to ease backing-up your data.  When you install an application it will create a subdirectory of your $FG,2$/Home$FG$ directory for storage.
 
-$FG,2$/Apps$FG$ Applications are placed in subdirectories of $FG,2$/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app for the current user acct.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your PersonalMenu, use $FG,2$<CTRL-l>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
+$FG,2$/Apps$FG$ Applications are placed in subdirectories of $FG,2$/Apps$FG$.  Applications should have a file called $FG,2$Install.CPP.Z$FG$ which will install the app, possibly making files or directories in $FG,2$/Home$FG$.  The file, $FG,2$Load.CPP.Z$FG$ will load the application into mem.  The file, $FG,2$Run.CPP.Z$FG$, will usually load and execute the app.  To add an app to your PersonalMenu, use $FG,2$<CTRL-l>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.CPP.Z$FG$ file.
 
 $FG,2$/Demo$FG$ Here you can find lots of sample code to do various things.
 
@@ -12,9 +12,9 @@ $FG,2$/Kernel$FG$ The core of the operating system is found here.  Since privile
 
 $FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 
-$FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.
+$FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.  The $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$ is the father of all tasks, like Adam and Eve.
 
-$FG,2$/0000Boot$FG$ Misc boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $FG,2$0000Kernel.BIN.C$FG$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
+$FG,2$/0000Boot$FG$ Boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $FG,2$0000Kernel.BIN.C$FG$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
 
 
 
@@ -26,7 +26,9 @@ $LK,"::/Home/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or
 
 $LK,"::/Home/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
 
-$FG,4$::/Home/Adam*$FG$ Copy $FG,2$Adam*$FG$ files from the root into $FG,2$::/Home$FG$ and customize them.  These files are invoked when the adam task starts-up.
+$LK,"::/Home/MakeHome.CPP"$ a file compiled by the $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$ during $LK,"StartOS",A="FF:::/StartOS.CPP,MakeHome"$.
+
+$FG,4$::/Home/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$::/Home$FG$ and customize them.  These files are invoked when the adam task starts-up.
 
 $LK,"::/Home/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
 
@@ -86,7 +88,7 @@ $LM,0$
 
 * I don't use $FG,2$U0 *$FG$ because the size is zero for ptr arithmetic.
 
-* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Utils/StrUtils.CPP,S2T"$ on source code.
+* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Opt/Utils/StrUtils.CPP,S2T"$ on source code.
 
 
 

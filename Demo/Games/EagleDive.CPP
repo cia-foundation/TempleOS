@@ -500,7 +500,6 @@ U0 MPDrawIt(CTask *task,CDC *dc)
 U0 APEagleDiveTask(CTask *master_task)
 {
   CDC *dc=DCAlias(main_dc,master_task);
-  Preempt(ON);
   while (!mp.app_done) {
     while (!Bt(&mp.update_not_done_flags,Gs->num) && !mp.app_done)
       Sleep(1);
@@ -609,10 +608,8 @@ U0 DrawHorizon(CDC *dc)
 U0 BSPEagleDive()
 {
   CDC *dc=DCAlias(main_dc,Fs);
-  I64 i,xx,yy,height,bkcolor,
-	cx=Fs->pix_width>>1,
-	cy=Fs->pix_height>>1;
-  F64 min_strip_width;
+  I64 i,xx,yy,height,bkcolor,cx=Fs->pix_width>>1,cy=Fs->pix_height>>1;
+  F64 min_strip_width,roll,pitch,heading;
   Fish *tempf;
 
   update_jiffy_limit=cnts.jiffies+JIFFY_FREQ/40;
@@ -673,13 +670,18 @@ U0 BSPEagleDive()
   dc->flags&=~DCF_TRANSFORMATION;
   GrLine3(dc,cx+5,cy,0,cx-5,cy,0);
   GrLine3(dc,cx,cy+5,0,cx,cy-5,0);
-  GrPrint(dc,0,0,"é1:%5.1f è:%5.1f é2:%5.1f Strip:%5d",
-	é1*180/ã,è*180/ã,é2*180/ã,strip_height);
-  GrPrint(dc,0,FONT_HEIGHT,
-	"x:%5.1f y:%5.1f z:%5.1f height:%3d score:%d high:%d",
-	ToF64(x)/COORDINATE_SCALE,
-	ToF64(y)/COORDINATE_SCALE,ToF64(z)/COORDINATE_SCALE,
-	height,game_score,best_score);
+  heading=Wrap(é2,0);
+  roll=é1;
+  pitch=Wrap(-è-ã/2,-ã);
+  if (Abs(pitch)>ã/2) {
+    pitch=Wrap(ã-pitch,-ã);
+    roll=Wrap(roll+ã,-ã);
+    heading=Wrap(heading+ã,0);
+  }
+  GrPrint(dc,0,0,"Roll:%5.1f Pitch:%5.1f Heading:%5.1f",
+	roll*180/ã,pitch*180/ã,heading*180/ã);
+  GrPrint(dc,0,FONT_HEIGHT,"Height:%5d Score:%d High:%d  [Core Strip:%3d]",
+	height,game_score,best_score,strip_height);
 
   if (game_over && Blink) {
     dc->color=RED;
@@ -840,7 +842,6 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
   F64 pp,tt1,tt2;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  AutoComplete;
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -854,14 +855,15 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
 	"  Right(,,SC_CURSOR_RIGHT);"
 	"}"
 	);
-  WinMax;
+  AutoComplete;
   WinBorder;
+  WinMax;
+  DocCursor;
+  DocClear;
   "Initializing...\n";
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
   Init(_mp_cnt);
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
   try //in case <CTRL-ALT-c> is pressed.
     do {

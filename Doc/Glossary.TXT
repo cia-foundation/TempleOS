@@ -39,6 +39,7 @@ $FG,2$Desc$FG$	Descriptor, Description
 $FG,2$Dev$FG$	Device
 $FG,2$Dft$FG$	Default
 $FG,2$Dir$FG$	Directory, Direction
+$FG,2$Div$FG$	Divide
 $FG,2$Doc$FG$	Document
 $FG,2$Drv$FG$	Drive
 $FG,2$Dsk$FG$	Disk
@@ -65,7 +66,7 @@ $FG,2$IDT$FG$	Interrupt Descriptor Table
 $FG,2$Init$FG$	Initialize
 $FG,2$Ins$FG$	Insert
 $FG,2$Int$FG$	Interrupt
-$FG,2$ip_$FG$	Input Pointer.  See $LK,"InputPointer.CPP",A="FI:::/Kernel/KbdMouse/InputPointer.CPP"$.
+$FG,2$ip_$FG$	Input Pointer.  See $LK,"InputPointer.CPP",A="FI:::/Kernel/SerialDev/InputPointer.CPP"$.
 $FG,2$Irq$FG$	Interrupt (Request)
 $FG,2$JIT$FG$	Just-in-Time
 $FG,2$Kbd$FG$	Keyboard
@@ -87,6 +88,7 @@ $FG,2$Num$FG$	Number
 $FG,2$Obj$FG$	Object
 $FG,2$Occ$FG$	Occurrence
 $FG,2$ODE$FG$	Ordinary Differential Equation
+$FG,2$Opt$FG$	Option, Optimize
 $FG,2$Paren$FG$	Parenthesis
 $FG,2$Pix$FG$	Pixel
 $FG,2$$FG,2$Pkg$FG$	Package
@@ -140,7 +142,7 @@ $FG,2$Wiz$FG$	Wizard
 $ID,-2$$TR,"Task/Process/Thread"$
 $ID,2$There is no distinction between $FG,2$task$FG$, $FG,2$process$FG$ or $FG,2$thread$FG$.  The $FG,2$Fs$FG$ segment reg is kept pointing to the current task's $LK,"CTask",A="MN:CTask"$.  There is only one window per task, and only $FG,2$core#0$FG$ tasks can have windows.  Each task has a code and data heap so memory is returned when it dies.  Each task has a $LK,"hash",A="HI:Hash"$ symbol table.
 $ID,-2$$TR,"Adam Task"$
-$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/Adam.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
+$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/StartOS.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
 $ID,-2$$TR,"Seth Task"$
 $ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has a special task which is immortal and which is special.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
@@ -158,7 +160,7 @@ There is no $FG,2$main()$FG$ routine.  Instead, statements outside functions are
 $ID,-2$$TR,"JIT Compile Mode"$
 $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$
-$ID,2$The compiler generates instructions one step before making actual assembly (machine) language instructions.  This code is reverse polish stack machine in nature and can be viewed with $LK,"OTrace",A="MN:OTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"CTrace",A="MN:CTrace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
+$ID,2$The compiler generates instructions one step before making actual assembly (machine) language instructions.  This code is reverse polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
 $ID,-2$$TR,"Drive/Partition"$
 $ID,2$There is no distinction between $FG,2$drive$FG$ or $FG,2$partition$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
 
@@ -200,7 +202,7 @@ $FG,5$*.BIN.Z;*.BIN.C;*.BIN$FG$
 $FG,5$*.DAT.Z;*.DAT$FG$
   Data files
 $FG,5$*.ISO$FG$
-  CD-ROM image file--ISO9660.
+  CD/DVD image file--ISO9660.
 $FG,5$*.AUT.Z;*.AUT$FG$
   $FG,2$AutoFile$FG$ Basically a HolyC program whose stdout goes to the input of a task when $LK,"AutoFile",A="MN:AutoFile"$() is called.
 $FG,5$*.GRA.Z;*.GRA$FG$

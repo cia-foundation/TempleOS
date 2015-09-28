@@ -2,15 +2,17 @@
 
 public U0 WinMgrSync(I64 cnt=1,Bool force=FALSE)
 {//Wait for win manager to start and finish updating screen.
-  //0 Cnt Sync to WinMgr. (not used)
+  //0,FALSE Cnt Sync to WinMgr. (not used)
+  //0,TRUE  Pump Msgs.
   //1 Cnt Wait and Pump Msgs.
   //2 Cnt Make Sure to do a Full Refresh
   //	and Set Cur Pos.
-  Bool old_preempt=Preempt,
-	old_full_refresh,
+  Bool	old_full_refresh,
 	old_idle=LBts(&Fs->task_flags,TASKf_IDLE);
   CDoc *old_doc=DocPut;
   I64 update_cnt;
+  if (!cnt&&force)
+    LBts(&sys_semas[SYS_SEMA_JUST_PUMP_MSGS],0);
   while (Bt(&sys_semas[SYS_SEMA_REFRESH_IN_PROGRESS],0)) {
     if (force) {
       LBts(&sys_semas[SYS_SEMA_FORCE_WINMGR],0);
@@ -26,12 +28,11 @@ public U0 WinMgrSync(I64 cnt=1,Bool force=FALSE)
       LBts(&sys_semas[SYS_SEMA_FORCE_WINMGR],0);
       if (sys_winmgr_task) sys_winmgr_task->wake_jiffy=cnts.jiffies;
     }
-    Yield;
+    Sleep(1);
   }
   if (old_doc)
     LBEqu(&old_doc->flags,DOCf_DO_FULL_REFRESH,old_full_refresh);
   LBEqu(&Fs->task_flags,TASKf_IDLE,old_idle);
-  Preempt(old_preempt);
 }
 
 #help_index "Windows"
@@ -268,45 +269,44 @@ I64 WinMgrSleep(Bool flush_msgs=FALSE)
     LBtr(&sys_focus_task->task_flags,TASKf_HAS_SONG);
   WinIPUpdate;
 
-  timeout_val=cnts.jiffies+JIFFY_FREQ/WMG_FPS;
-  LBts(&sys_semas[SYS_SEMA_REFRESH_IN_PROGRESS],0);
-  GrUpdateScreen;
-  LBtr(&sys_semas[SYS_SEMA_REFRESH_IN_PROGRESS],0);
+  if (!LBtr(&sys_semas[SYS_SEMA_JUST_PUMP_MSGS],0)) {
+    timeout_val=cnts.jiffies+JIFFY_FREQ/WMG_FPS;
+    LBts(&sys_semas[SYS_SEMA_REFRESH_IN_PROGRESS],0);
+    GrUpdateScreen;
+    LBtr(&sys_semas[SYS_SEMA_REFRESH_IN_PROGRESS],0);
 
-  if (sys_focus_task && !Bt(&sys_focus_task->task_flags,TASKf_HAS_SONG)) {
-    Free(music.cur_song);
-    music.cur_song=NULL;
+    if (sys_focus_task && !Bt(&sys_focus_task->task_flags,TASKf_HAS_SONG)) {
+      Free(music.cur_song);
+      music.cur_song=NULL;
+    }
+    if (music.cur_song) {
+      if (!music.cur_song_task)
+	music.cur_song_task=Spawn(&CurSongTask,NULL,"Song");
+    } else if (music.cur_song_task) {
+      Kill(music.cur_song_task);
+      music.cur_song_task=NULL;
+    }
+    winmgr.updates++;
+    if (!mouse.install_attempts)
+      SleepUntil(timeout_val); //Just for before mouse install attempt at boot.
+    else
+      do {
+	KbdMouseHandler(FALSE,TRUE);
+	SleepUntil(MinI64(timeout_val,cnts.jiffies+JIFFY_FREQ/500));
+      } while (cnts.jiffies<timeout_val &&
+	    !Bt(&sys_semas[SYS_SEMA_FORCE_WINMGR],0));
   }
-  if (music.cur_song) {
-    if (!music.cur_song_task)
-      music.cur_song_task=Spawn(&CurSongTask,NULL,"Song");
-  } else if (music.cur_song_task) {
-    Kill(music.cur_song_task);
-    music.cur_song_task=NULL;
-  }
-  winmgr.updates++;
-  if (!mouse.install_attempts)
-    SleepUntil(timeout_val); //Just for before mouse install attempt at boot.
-  else
-    do {
-      KbdMouseHandler(FALSE,TRUE);
-      SleepUntil(MinI64(timeout_val,cnts.jiffies+JIFFY_FREQ/500));
-    } while (cnts.jiffies<timeout_val &&
-	  !Bt(&sys_semas[SYS_SEMA_FORCE_WINMGR],0));
   LBtr(&sys_semas[SYS_SEMA_FORCE_WINMGR],0);
   return msg_code;
 }
 
-CDoc *WinCursorPosSet(CTask *task,I64 ip_text_x,
-	I64 ip_text_y,Bool set_cursor=TRUE)
+CDoc *WinCursorPosSet(CTask *task,I64 ipx,I64 ipy,Bool set_cursor=TRUE)
 {
   CDoc *result=NULL;
   Bool unlock;
   I64 x0,y0;
   if (!task) task=Fs;
-  if (!TaskValidate(task)) return FALSE;
-  if (task->win_top <=ip_text_y<=task->win_bottom &&
-	task->win_left<=ip_text_x<=task->win_right) {
+  if (WinInside(ipx,ipy,task)) {
     if ((result=DocDisplay(task)) && result->flags&DOCF_DONT_SHOW)
       result=NULL;
     else if (set_cursor) {
@@ -317,8 +317,8 @@ CDoc *WinCursorPosSet(CTask *task,I64 ip_text_x,
 	x0=result->line_start_col;
 	y0=result->top_line_num;
 	DocRecalc(result,TRUE);
-	result->x=ip_text_x-task->win_left-task->scroll_x/FONT_WIDTH +x0;
-	result->y=ip_text_y-task->win_top -task->scroll_y/FONT_HEIGHT+y0;
+	result->x=(ipx-task->pix_left-task->scroll_x)/FONT_WIDTH +x0;
+	result->y=(ipy-task->pix_top -task->scroll_y)/FONT_HEIGHT+y0;
 	DocRecalc(result,FALSE,DOC_RECALC_FIND_CURSOR);
 	task->scroll_x=0;
 	task->scroll_y=0;
@@ -468,9 +468,7 @@ wmt_start:
 	  SetRFlags(old_flags);
 	  goto wmt_start;
 	}
-	if (Bt(&task->display_flags,DISPLAYf_SHOW) &&
-	      task->border_pix_left<=ip.pos.x<=task->border_pix_right &&
-	      task->border_pix_top<=ip.pos.y<=task->border_pix_bottom) {
+	if (WinInside(ip.pos.x,ip.pos.y,task,TRUE)) {
 	  SetRFlags(old_flags);
 	  break;
 	}
@@ -518,7 +516,8 @@ wmt_start:
 	    kbd.scan_code&SCF_CTRL && TaskValidate(task)) {
 	winmgr.grab_scroll_closed=FALSE;
 	winmgr.grab_scroll=TRUE;
-	while (kbd.scan_code&SCF_CTRL && TaskValidate(task)) {
+	while (kbd.scan_code&SCF_CTRL && TaskValidate(task) &&
+		(!ac.task || !WinInside(ip.pos.x,ip.pos.y,ac.task,TRUE))) {
 	  if (ip.lb) {
 	    winmgr.grab_scroll_closed=TRUE;
 	    x=ip.pos.x-task->scroll_x;
@@ -539,6 +538,7 @@ wmt_start:
 	  } else
 	    WinMgrSleep;
 	}
+	winmgr.grab_scroll=FALSE;
 	goto wmt_start;
       } else
 	winmgr.grab_scroll=FALSE;
@@ -666,7 +666,7 @@ wmt_start:
 	    (!TaskValidate(sys_focus_task)||
 	    !Bt(&sys_focus_task->win_inhibit,WIf_FOCUS_TASK_IP_L))) {
 	if (!old_ip.lb && ip.lb) {
-	  if (doc=WinCursorPosSet(task,ip.pos_text.x,ip.pos_text.y)) {
+	  if (doc=WinCursorPosSet(task,ip.pos.x,ip.pos.y)) {
 	    DocLock(doc);
 	    if (doc->doc_signature==DOC_SIGNATURE_VAL) {
 	      doc_e=doc->cur_entry;
@@ -685,7 +685,7 @@ wmt_start:
 	    (!TaskValidate(sys_focus_task)||
 	    !Bt(&sys_focus_task->win_inhibit,WIf_FOCUS_TASK_IP_R))) {
 	if (!old_ip.rb && ip.rb) {
-	  if (WinCursorPosSet(task,ip.pos_text.x,ip.pos_text.y)) {
+	  if (WinCursorPosSet(task,ip.pos.x,ip.pos.y)) {
 	    old_ip.rb=TRUE;
 	    goto wmt_start;
 	  }
@@ -715,7 +715,7 @@ wmt_start:
 	    (!TaskValidate(sys_focus_task)||
 	    !Bt(&sys_focus_task->win_inhibit,WIf_FOCUS_TASK_IP_L))) {
 	if (old_ip.lb && !ip.lb) {
-	  if (doc=WinCursorPosSet(task,ip.pos_text.x,ip.pos_text.y,FALSE)) {
+	  if (doc=WinCursorPosSet(task,ip.pos.x,ip.pos.y,FALSE)) {
 	    do msg_code=WinMgrSleep;
 	    while (TaskValidate(task) &&
 		  (ip.lb || ip.left_dbl_time));
@@ -751,7 +751,7 @@ wmt_start:
 	    (!TaskValidate(sys_focus_task)||
 	    !Bt(&sys_focus_task->win_inhibit,WIf_FOCUS_TASK_IP_R))) {
 	if (old_ip.rb && !ip.rb) {
-	  if (doc=WinCursorPosSet(task,ip.pos_text.x,ip.pos_text.y,FALSE)) {
+	  if (doc=WinCursorPosSet(task,ip.pos.x,ip.pos.y,FALSE)) {
 	    do msg_code=WinMgrSleep;
 	    while (TaskValidate(task) &&
 		  (ip.rb || ip.right_dbl_time));

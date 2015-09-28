@@ -3,7 +3,7 @@ U8 *LexStatement2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
   I64 size,i,j,k,*result=INVALID_PTR;
   CCodeCtrl *tempcbh;
   if (_type) *_type=RT_I64;
-  Btr(&cc->flags,CCf_OPT_TRACE_PRESENT);
+  Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
   if (cc->aot_depth==2)
     COCPush(cc);
   COCInit(cc);
@@ -293,7 +293,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
     tempie=tempie1;
   }
   Free(str);
-  if (!cc->aot_depth && Bt(&cc->opts,OPTf_COMPILE_TRACE))
+  if (!cc->aot_depth && Bt(&cc->opts,OPTf_TRACE))
     Un(ip2,tempaot->aot_U8s,64);
   QueRem(tempaot);
   Free(tempaot);
@@ -575,7 +575,7 @@ I64 ExePutS(U8 *buf,U8 *filename=NULL,
   Bool okay=TRUE;
   CCmpCtrl *cc;
   if (!filename)
-    filename=dsk.temp_filename;
+    filename=blkdev.temp_filename;
   cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
   if (just_load)
     cc->flags|=CCF_JUST_LOAD;
@@ -629,7 +629,7 @@ I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
   I64 result;
   CCmpCtrl *cc;
   if (!filename)
-    filename=dsk.temp_filename;
+    filename=blkdev.temp_filename;
   cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
   if (just_load)
     cc->flags|=CCF_JUST_LOAD;

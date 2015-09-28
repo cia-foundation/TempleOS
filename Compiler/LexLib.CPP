@@ -69,7 +69,7 @@ CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class)
   I64 i;
   CMemberLst *tempm;
   do {
-    tempm=haystack_class->member_lst;
+    tempm=haystack_class->member_lst_and_root;
     while (tempm) {
       if (!(i=StrCmp(tempm->str,needle_str))) {
 	tempm->use_cnt++;
@@ -84,17 +84,18 @@ CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class)
   return NULL;
 }
 
-CMemberLst *MemberFind2(CHashClass *needle_class,CHashClass *haystack_class)
-{//Find class member, just offset<0. See $LK,"ClassRep",A="MN:ClassRep"$() and $LK,"DocForm",A="MN:DocForm"$().
+CMemberLst *MemberClassBaseFind(CHashClass *needle_class,
+	CHashClass *haystack_class)
+{//Find class member class base. For finding dup class local vars.
   CMemberLst *tempm;
-  tempm=haystack_class->member_lst2;
+  tempm=haystack_class->member_class_base_root;
   while (tempm) {
-    if (needle_class==tempm->member_class2)
+    if (needle_class==tempm->member_class_base)
       return tempm;
-    if (needle_class<tempm->member_class2)
-      tempm=tempm->left2;
+    if (needle_class<tempm->member_class_base)
+      tempm=tempm->left_class_base;
     else
-      tempm=tempm->right2;
+      tempm=tempm->right_class_base;
   }
   return NULL;
 }
@@ -103,19 +104,11 @@ U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
 {
   U8 *st=tempm->str;
   CMemberLst **tempm1,*tempm2;
-  CHashClass *tempc2;
+
   if (MemberFind(st,tempc) && StrCmp(st,"pad") &&
 	StrCmp(st,"reserved") && StrCmp(st,"_anon_"))
     LexExcept(cc,"Duplicate member at ");
-  if (mode==PRS1B_LOCAL_VAR) {
-    tempc2=tempm->member_class-tempm->member_class->ptr_stars_cnt;
-    if (Bt(&cc->opts,OPTf_WARN_DUP_TYPES) && MemberFind2(tempc2,tempc))
-      LexWarn(cc,"Duplicate type at ");
-  } else
-    tempc2=NULL;
-  tempm->member_class2=tempc2;
-
-  tempm1=&tempc->member_lst;
+  tempm1=&tempc->member_lst_and_root;
   while (tempm2=*tempm1) {
     if (StrCmp(tempm2->str,st)<=0)
       tempm1=&tempm2->left;
@@ -124,13 +117,18 @@ U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
   }
   *tempm1=tempm;
 
-  if (tempc2) {
-    tempm1=&tempc->member_lst2;
+  if (mode==PRS1B_LOCAL_VAR) {
+    tempm->member_class_base=
+	tempm->member_class-tempm->member_class->ptr_stars_cnt;
+    if (Bt(&cc->opts,OPTf_WARN_DUP_TYPES) &&
+	 MemberClassBaseFind(tempm->member_class_base,tempc))
+      LexWarn(cc,"Duplicate type at ");
+    tempm1=&tempc->member_class_base_root;
     while (tempm2=*tempm1) {
-      if (tempc2<tempm2->member_class2)
-	tempm1=&tempm2->left2;
-      else if (tempc2>tempm2->member_class2)
-	tempm1=&tempm2->right2;
+      if (tempm->member_class_base<tempm2->member_class_base)
+	tempm1=&tempm2->left_class_base;
+      else if (tempm->member_class_base>tempm2->member_class_base)
+	tempm1=&tempm2->right_class_base;
       else {
 	tempm1=NULL;
 	break;
@@ -138,12 +136,13 @@ U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
     }
     if (tempm1)
       *tempm1=tempm;
-  }
+  } else
+    tempm->member_class_base=NULL;
 
   tempm->left=NULL;
   tempm->right=NULL;
-  tempm->left2=NULL;
-  tempm->right2=NULL;
+  tempm->left_class_base=NULL;
+  tempm->right_class_base=NULL;
   tempm2=tempc->last_in_member_lst;
   tempm2->next=tempc->last_in_member_lst=tempm;
 }
@@ -159,7 +158,7 @@ U0 MemberLstDel(CHashClass *tempc)
 {
   CMemberLst *tempm,*tempm1;
   CMemberLstMeta *temp_meta,*temp_meta1;
-  tempm=tempc->member_lst;
+  tempm=tempc->member_lst_and_root;
   while (tempm) {
     tempm1=tempm->next;
     Free(tempm->str);
@@ -181,9 +180,9 @@ U0 MemberLstDel(CHashClass *tempc)
     tempm=tempm1;
   }
   tempc->size=0;
-  tempc->last_in_member_lst=&tempc->member_lst;
-  tempc->member_lst=NULL;
-  tempc->member_lst2=NULL;
+  tempc->last_in_member_lst=&tempc->member_lst_and_root;
+  tempc->member_lst_and_root=NULL;
+  tempc->member_class_base_root=NULL;
   tempc->member_cnt=0;
   if (tempc->type&HTT_FUN)
     tempc(CHashFun *)->arg_cnt=0;
@@ -194,7 +193,7 @@ I64 MemberLstSize(CHashClass *tempc)
   CMemberLst *tempm;
   CMemberLstMeta *temp_meta;
   I64 result=0;
-  tempm=tempc->member_lst;
+  tempm=tempc->member_lst_and_root;
   while (tempm) {
     result+=MSize2(tempm->str);
     result+=LinkedLstSize(tempm->dim.next);

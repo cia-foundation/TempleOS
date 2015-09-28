@@ -1,9 +1,9 @@
 I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
 {
   I64 i1,i2,j=0,result=0,oc_cnt1=tempi1->opcode_cnt,oc_cnt2=tempi2->opcode_cnt;
-  if (tempi1->flags&IEF_STI)
+  if (tempi1->flags&IEF_STI_LIKE)
     oc_cnt1--;
-  if (tempi2->flags&IEF_STI)
+  if (tempi2->flags&IEF_STI_LIKE)
     oc_cnt2--;
   while (TRUE) {
     if (j<oc_cnt1 && j<oc_cnt2) {
@@ -14,41 +14,27 @@ I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
       if (result=oc_cnt1-oc_cnt2)
 	return result;
 
-      if (tempi1->flags&IEF_STI)
-	i1=tempi1->opcode[j]>>3&7;
-      else
-	i1=tempi1->slash_val;
-      if (tempi2->flags&IEF_STI)
-	i2=tempi2->opcode[j]>>3&7;
-      else
-	i2=tempi2->slash_val;
-      if (result=i1-i2) return result;
+      if (tempi1->flags&IEF_STI_LIKE && tempi2->flags&IEF_STI_LIKE)
+	return tempi1->opcode[j]-tempi2->opcode[j];
 
-      if (tempi1->flags&IEF_STI && tempi2->flags&IEF_STI) {
-	i1=tempi1->opcode[j]&7;
-	i2=tempi2->opcode[j]&7;
-	if (result=i1-i2) return result;
-      }
+      if (result=tempi1->flags&IEF_STI_LIKE - tempi2->flags&IEF_STI_LIKE)
+	return result;
 
-      if (tempi1->flags&IEF_STI)
-	return 1;
+      if (result=tempi1->slash_val-tempi2->slash_val)
+	return result;
 
-      if (tempi2->flags&IEF_STI)
-	return -1;
-
-      i1=tempi1->flags & IEF_OP_SIZE32;
-      i2=tempi2->flags & IEF_OP_SIZE32;
-      if (result=i1-i2) return result;
+      if (result=tempi1->flags&IEF_OP_SIZE32 - tempi2->flags&IEF_OP_SIZE32)
+	return result;
 
       i1=Bt(&uasm.ins64_arg_mask,tempi1->arg1) ||
 	    Bt(&uasm.ins64_arg_mask,tempi1->arg2);
       i2=Bt(&uasm.ins64_arg_mask,tempi2->arg1) ||
 	    Bt(&uasm.ins64_arg_mask,tempi2->arg2);
-      if (result=i1-i2) return result;
+      if (result=i1-i2)
+	return result;
 
-      i1=tempi1->flags & IEF_48_REX;
-      i2=tempi2->flags & IEF_48_REX;
-      if (result=i1-i2) return result;
+      if (result=tempi1->flags&IEF_48_REX - tempi2->flags&IEF_48_REX)
+	return result;
 
       i1=tempi1->arg2==ARGT_IMM64 || tempi1->arg2==ARGT_UIMM64;
       i2=tempi2->arg2==ARGT_IMM64 || tempi2->arg2==ARGT_UIMM64;
@@ -79,7 +65,7 @@ U0 DumpUAsmTables()
 
 CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 {//Binary Search
-  I64 i,j,n,m,k,a1,a2,o1,o2,oc_cnt,sv;
+  I64 i,j,n,m,k,a1,a2,o1,o2,oc_cnt;
   CInstruction *tempi,**table;
   i=0;
   if (seg_size==64) {
@@ -95,11 +81,11 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 //DumpUAsmIns(tempi);
     m=0;
     n=0;
-    while (TRUE) {
+    while (TRUE) { //ief_compare_start
       a1=tempi->arg1;
       a2=tempi->arg2;
       oc_cnt=tempi->opcode_cnt;
-      if (tempi->flags&IEF_STI)
+      if (tempi->flags&IEF_STI_LIKE)
 	oc_cnt--;
       if (n<oc_cnt) {
 	o1=ip[n];
@@ -107,83 +93,80 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 	  o1&=-8;
 	o2=tempi->opcode[n++];
 	if (m=o1-o2)
-	  break;
-      } else {
-	if (tempi->flags&IEF_STI)
-	  sv=tempi->opcode[tempi->opcode_cnt-1]>>3&7;
-	else
-	  sv=tempi->slash_val;
-	if (sv<8) {
-	  if (!(m=ip[n]>>3&7-sv)) {
-	    if ((Bt(&uasm.mem_arg_mask,a1) || Bt(&uasm.mem_arg_mask,a2)) &&
-		  ip[n]&0xC0==0xC0) {
-	      m=1;
-	      break;
-	    } else if (tempi->flags&IEF_STI) {
-	      if (ip[n]&0xC0!=0xC0) {
-		m=-1;
-		break;
+	  goto ief_compare_done;
+      } else
+	nobound_switch (tempi->uasm_slash_val) {
+	  case 0...7:
+	    if (!(m=ip[n]>>3&7-tempi->slash_val)) {
+	      if ((Bt(&uasm.mem_arg_mask,a1) || Bt(&uasm.mem_arg_mask,a2)) &&
+		    ip[n]&0xC0==0xC0) {
+		m=1;
+		goto ief_compare_done;
 	      }
-	      if (a1!=ARGT_STI && a2!=ARGT_STI)
-		m=ip[n]&0x7-tempi->opcode[tempi->opcode_cnt-1]&7;
-	      break;
+	      if (opsize==16) {
+		if (tempi->flags & IEF_OP_SIZE32) {
+		  m=-1;
+		  goto ief_compare_done;
+		}
+	      } else {
+		if (tempi->flags & IEF_OP_SIZE16) {
+		  m=1;
+		  goto ief_compare_done;
+		}
+	      }
+	      if (opsize==64||a1==ARGT_M64||a2==ARGT_M64) {
+		if (!Bt(&uasm.ins64_arg_mask,a1)&&
+		      !Bt(&uasm.ins64_arg_mask,a2)&&!(tempi->flags&IEF_48_REX))
+		  m=1;
+	      } else {
+		if (Bt(&uasm.ins64_arg_mask,a1)||Bt(&uasm.ins64_arg_mask,a2) ||
+		      tempi->flags&IEF_48_REX)
+		  m=-1;
+	      }
 	    }
+	    goto ief_compare_done;
+	  case SV_I_REG:
+	    m=ip[n]>>3-tempi->opcode[tempi->opcode_cnt-1]>>3;
+	    goto ief_compare_done;
+	  case SV_STI_LIKE:
+	    if (!(m=ip[n]>>3-tempi->opcode[tempi->opcode_cnt-1]>>3))
+	      m=ip[n]-tempi->opcode[tempi->opcode_cnt-1];
+	    goto ief_compare_done;
+	  case SV_R_REG:
+	  case SV_NONE:
+	    m=0;
 	    if (opsize==16) {
 	      if (tempi->flags & IEF_OP_SIZE32) {
 		m=-1;
-		break;
+		goto ief_compare_done;
 	      }
 	    } else {
 	      if (tempi->flags & IEF_OP_SIZE16) {
 		m=1;
-		break;
+		goto ief_compare_done;
 	      }
 	    }
-	    if (opsize==64||a1==ARGT_M64||a2==ARGT_M64) {
-	      if (!Bt(&uasm.ins64_arg_mask,a1)&& !Bt(&uasm.ins64_arg_mask,a2) &&
-		    !(tempi->flags&IEF_48_REX))
+	    if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
+	      if (!Bt(&uasm.ins64_arg_mask,a1) &&
+		    !Bt(&uasm.ins64_arg_mask,a2) &&
+		    !(tempi->flags&IEF_48_REX)&&
+		    !(a2==ARGT_NO &&
+		    (ARGT_UIMM8<=a1<=ARGT_UIMM64 || ARGT_IMM8<=a1<=ARGT_IMM64)))
 		m=1;
+	      else if (tempi->arg2==ARGT_IMM64 || tempi->arg2==ARGT_UIMM64) {
+		if (a2!=ARGT_IMM64&&a2!=ARGT_UIMM64)
+		  m=1;
+	      } else if (a2==ARGT_IMM64||a2==ARGT_UIMM64)
+		m=-1;
 	    } else {
 	      if (Bt(&uasm.ins64_arg_mask,a1) || Bt(&uasm.ins64_arg_mask,a2) ||
 		    tempi->flags&IEF_48_REX)
 		m=-1;
 	    }
-	  }
-	} else {
-	  m=0;
-	  if (opsize==16) {
-	    if (tempi->flags & IEF_OP_SIZE32) {
-	      m=-1;
-	      break;
-	    }
-	  } else {
-	    if (tempi->flags & IEF_OP_SIZE16) {
-	      m=1;
-	      break;
-	    }
-	  }
-	  if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
-	    if (!Bt(&uasm.ins64_arg_mask,a1) && !Bt(&uasm.ins64_arg_mask,a2) &&
-		  !(tempi->flags&IEF_48_REX)&&
-		  !(a2==ARGT_NO &&
-		  (ARGT_UIMM8<=a1<=ARGT_UIMM64 ||
-		  ARGT_IMM8<=a1<=ARGT_IMM64 ) ))
-	      m=1;
-	    else if (tempi->arg2==ARGT_IMM64 || tempi->arg2==ARGT_UIMM64) {
-	      if (a2!=ARGT_IMM64&&a2!=ARGT_UIMM64)
-		m=1;
-	    } else if (a2==ARGT_IMM64||a2==ARGT_UIMM64)
-	      m=-1;
-	  } else {
-	    if (Bt(&uasm.ins64_arg_mask,a1) || Bt(&uasm.ins64_arg_mask,a2) ||
-		  tempi->flags&IEF_48_REX)
-	      m=-1;
-	  }
+	    goto ief_compare_done;
 	}
-	break;
-      }
     }
-
+ief_compare_done:
     if (m>0) {
       if (k==i) {
 	k=j;

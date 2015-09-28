@@ -196,9 +196,9 @@ $FG$$ID,-2$
   $FG,2$||$FG$$FG$
   $FG,2$=$FG$,$FG,2$<<=$FG$,$FG,2$>>=$FG$,$FG,2$*=$FG$,$FG,2$/=$FG$,$FG,2$&=$FG$,$FG,2$|=$FG$,$FG,2$^=$FG$,$FG,2$+=$FG$,$FG,2$-=$FG$
 
-* You can use $LK,"OptOn",A="MN:OptOn"$($LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$) to find unnecessary parentheses in code.
+* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$,ON) to find unnecessary parentheses in code.
 
-* You can use $LK,"OptOn",A="MN:OptOn"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$) to find dup local var type statements.
+* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find dup local var type statements.
 
 * With the $FG,2$#exe{}$FG$ feature in your src code, you can place programs that insert text into the stream of code being compiled.  See $LK,"#exe {}",A="FF:::/Kernel/KEnd.CPP,#exe {"$ for an example where the date/time and compile-time prompting for cfguration data is placed into a program.  $LK,"StreamPrint",A="MN:StreamPrint"$() places text into a src program stream following the conclusion of the $FG,2$#exe{}$FG$ blk.
 

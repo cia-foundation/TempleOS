@@ -13,7 +13,6 @@ typedef unsigned int DWORD;
 typedef unsigned char BOOL;
 
 #define ARC_MAX_BITS 12
-#define ARC_MAX_TABLE_ENTRY ((1<<ARC_MAX_BITS)-1)
 
 #define CT_NONE 	1
 #define CT_7_BIT	2
@@ -39,8 +38,8 @@ class CArcCtrl //control structure
 	saved_basecode,
 	entry_used,
 	last_ch;
-  CArcEntry compress[ARC_MAX_TABLE_ENTRY+1],
-	*hash[ARC_MAX_TABLE_ENTRY+1];
+  CArcEntry compress[1<<ARC_MAX_BITS],
+	*hash[1<<ARC_MAX_BITS];
 };
 
 class CArcCompress
@@ -171,7 +170,7 @@ CArcCtrl *ArcCtrlNew(DWORD expand,DWORD compression_type)
   c=(CArcCtrl *)malloc(sizeof(CArcCtrl));
   memset(c,0,sizeof(CArcCtrl));
   if (expand) {
-    c->stk_base=(BYTE *)malloc(ARC_MAX_TABLE_ENTRY+1);
+    c->stk_base=(BYTE *)malloc(1<<ARC_MAX_BITS);
     c->stk_ptr=c->stk_base;
   }
   if (compression_type==CT_7_BIT)
@@ -235,62 +234,78 @@ long FSize(FILE *f)
   return result;
 }
 
-void Cvt(char *name,BOOL cvt_ascii)
+BOOL Cvt(char *in_name,char *out_name,BOOL cvt_ascii)
 {
   DWORD out_size,i,j,in_size;
   CArcCompress *arc;
   BYTE *out_buf;
   FILE *io_file;
-
-  if (io_file=fopen(name,"rb")) {
+  BOOL okay=FALSE;
+  if (io_file=fopen(in_name,"rb")) {
     in_size=FSize(io_file);
     arc=(CArcCompress *)malloc(in_size);
     fread(arc,1,in_size,io_file);
     out_size=arc->expanded_size;
-    printf("%-45s %d-->%d\r\n",name,(DWORD) in_size,out_size);
+    printf("%-45s %d-->%d\r\n",in_name,(DWORD) in_size,out_size);
     fclose(io_file);
-    if (out_buf=ExpandBuf(arc)) {
-      if (cvt_ascii) {
-	j=0;
-	for (i=0;i<out_size;i++)
-	  if (out_buf[i]==31)
-	    out_buf[j++]=32;
-	  else if (out_buf[i]!=5)
-	    out_buf[j++]=out_buf[i];
-	out_size=j;
+    if (arc->compressed_size==in_size &&
+	arc->compression_type && arc->compression_type<=3) {
+      if (out_buf=ExpandBuf(arc)) {
+	if (cvt_ascii) {
+	  j=0;
+	  for (i=0;i<out_size;i++)
+	    if (out_buf[i]==31)
+	      out_buf[j++]=32;
+	    else if (out_buf[i]!=5)
+	      out_buf[j++]=out_buf[i];
+	  out_size=j;
+	}
+	if (io_file=fopen(out_name,"wb")) {
+	  fwrite(out_buf,1,out_size,io_file);
+	  fclose(io_file);
+	  okay=TRUE;
+	}
+	free(out_buf);
       }
-      if (io_file=fopen(name,"wb")) {
-	fwrite(out_buf,1,out_size,io_file);
-	fclose(io_file);
-      }
-      free(out_buf);
     }
     free(arc);
   }
+  return okay;
 }
 
 int main(int argc, char* argv[])
 {
-  char *name;
-  BOOL okay=FALSE,cvt_ascii=FALSE;
-  if (argc==3) {
-    name=argv[2];
-    if (!strcmp(argv[1],"-ascii")) {
-      cvt_ascii=TRUE;
-      okay=TRUE;
+  char *in_name,*out_name,buf[256];
+  BOOL cvt_ascii,del_in=FALSE;
+  int i=1,l;
+  if (argc>i && !strcmp(argv[i],"-ascii")) {
+    cvt_ascii=TRUE;
+    i++;
+  } else
+    cvt_ascii=FALSE;
+  if (argc>i) {
+    in_name=argv[i++];
+    if (argc>i)
+      out_name=argv[i++];
+    else {
+      strcpy(buf,in_name);
+      l=strlen(buf);
+      if (l>2 && buf[l-1]=='Z' && buf[l-2]=='.') {
+	buf[l-2]=0;
+	del_in=TRUE;
+      }
+      out_name=buf;
+    }
+    if (Cvt(in_name,out_name,cvt_ascii)) {
+      if (del_in) {
+	sprintf(buf,"rm %s",in_name);
+	system(buf);
+      }
     } else
-      okay=FALSE;
-  } if (argc==2) {
-    name=argv[1];
-    okay=TRUE;
-  }
-
-  if (okay)
-    Cvt(name,cvt_ascii);
-  else
-    puts("TOSZ [-ascii] filename\r\n\r\n"
+      printf("Fail: %s %s\r\n",in_name,out_name);
+  } else
+    puts("TOSZ [-ascii] in_name [out_name]\r\n\r\n"
 	  "TOSZ expands a single TempleOS file. The -ascii flag will convert "
 	  "nonstandard TempleOS ASCII characters to regular ASCII.\r\n");
-
   return EXIT_SUCCESS;
 }

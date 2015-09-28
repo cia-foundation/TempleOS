@@ -79,7 +79,7 @@ extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
     I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
 extern U0 SrvCmdDel(CSrvCmd *tempc);
 extern U0 SrvCmdQueDel(CSrvCmd *root);
-extern I64 SrvCmdsHandler(CTask *task=NULL);
+extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
 extern U0 SrvCtrlInit(CSrvCtrl *ctrl);
 extern U8 *StrPrint(U8 *dst,U8 *fmt,...);
 extern U0 StrPrintPSect(U8 *buf,I64 addr,I64 field_len);

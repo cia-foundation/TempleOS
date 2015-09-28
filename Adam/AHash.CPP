@@ -158,7 +158,7 @@ U8 *index=NULL,CDoc *doc=NULL)
   CWho *lst;
   I64 cnt,i,j,k,f=0;
   U8 buf[512],*st,*last_index=StrNew(""),*cur_index,*comment;
-  Bool recurse,publics,map,old_preempt=Preempt;
+  Bool recurse,publics,map;
   CTask *task;
 
   ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r");
@@ -226,7 +226,6 @@ U8 *index=NULL,CDoc *doc=NULL)
     else
       break;
   }
-  Preempt(old_preempt);
 
   if (map)
     QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare2);
@@ -314,8 +313,7 @@ U8 *index=NULL,CDoc *doc=NULL)
   if (index)
     progress1=progress1_max=0;
 
-    wh_done:
-  Preempt(old_preempt);
+wh_done:
   if (doc) {
     if (doc->root.next==doc)
       DocPrint(doc,"No Match");
@@ -403,7 +401,7 @@ public U0 MapFileLoad(U8 *filename)
 
 	  ptr=temph->src_link;
 	  if (ptr[0] && ptr[1] && ptr[2]==':' && ptr[3]==':')
-	    ptr[3]=dsk.boot_drv_let;
+	    ptr[3]=blkdev.boot_drv_let;
 
 	  doc_e->aux_str=NULL;
 	}

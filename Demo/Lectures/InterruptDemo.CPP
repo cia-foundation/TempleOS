@@ -55,7 +55,6 @@ U0 TimeIns()
 {
   I64 start,end;
   I64 i,old_irq;
-  Bool old_preempt=Preempt;
 
   CPURep;
   old_irq=IntEntrySet(I_F_UNARY_MINUS,F_UNARY_MINUS_INT,IDTET_TRAP);
@@ -74,7 +73,6 @@ U0 TimeIns()
   end=GetTSC;
   "Call      Cycles: %10.5f\n",ToF64(end-start)/SAMPLE_SIZE;
 
-  Preempt(old_preempt);
   IntEntrySet(I_F_UNARY_MINUS,old_irq,IDTET_IRQ);
 }
 

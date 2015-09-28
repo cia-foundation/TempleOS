@@ -597,7 +597,10 @@ U0 Strut()
   CCtrl *bt_main_mode;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R|WIG_DBL_CLICK;
+  AutoComplete;
+  WinBorder;
   WinMax;
+  DocCursor;
   DocClear;
   "\n$$WW,1$$$$PURPLE$$$$TX+CX,\"Build a ship.\"$$$$FG$$\n\n"
 	"Select mass mode.\tLeft-click to place masses.\n"
@@ -613,10 +616,6 @@ U0 Strut()
   bt_main_mode=CtrlButtonNew(
 	(GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_NUM_MODES,
 	Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_button);
-  WinBorder;
-  Preempt;
-  AutoComplete;
-  DocCursor;
   DocClear;
   Init;
   Fs->draw_it=&DrawIt;

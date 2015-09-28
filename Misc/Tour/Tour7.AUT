@@ -1,25 +1,69 @@
-"FF(\"/Kernel/*\");";
 TourPut(
-"Let's list files in the $$GREEN$$/Kernel$$FG$$ and sub directories.\n\n"
-"TempleOS masks have one base directory and multiple filename masks.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
+"$$RED$$$$TX+L+PU+UL,\"F\",A=\"MN:F\"$$$$FG$$() is a handy function.  "
+"It is a wrapper around $$RED$$$$TX+L+PU+UL,\"Find\",A=\"MN:Find\"$$$$FG$$().  "
+"It searches for a sym.\n",TRUE);
+
+TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\");";
+AFGetStr("\n");
+Sleep(2000);
+
+TourPut("Notice the number of matches.\n",TRUE);
+
+TourPut(
+"Try it with the $$GREEN$$+l$$FG$$ flag.  This limits to whole labels, not "
+"partials.\n",TRUE);
+
+TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\",\"+l\");";
+AFGetStr("\n");
+Sleep(2000);
+
+TourPut("Notice the number of matches.\n",TRUE);
+
+TourPut(
+"Try it with the $$GREEN$$+l-i$$FG$$ flag.  This does not ignore case and "
+"limits to whole labels, not partials.\n",TRUE);
+
+TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"F(\"RED\",\"+l-i\");";
+AFGetStr("\n");
+Sleep(2000);
+
+TourPut("Notice the number of matches.\n",TRUE);
+
+TourPut(
+"The wrapper function is in your $$RED$$/Home/HomeWrappers.CPP.Z$$FG$$ file.  "
+"There is a function $$RED$$$$TX+L+PU+UL,\"R\",A=\"MN:R\"$$$$FG$$() for "
+"find and replace.  Feel free to customize.\n",TRUE);
+
+TourPut("Press $$GREEN$$<ENTER>$$FG$$.\n");
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+"Ed(\"::/Home/HomeWrappers.CPP.Z\");";
 AFGetStr("\n");
 
-"FF(\"/Kernel/*\",\"-r\");";
-TourPut(
-"The recurse $$GREEN$$+r$$FG$$ flag is usually set.  Let's turn it off.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
-AFGetStr("\n");
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
-"FF(\"/Kernel/M*;*.HPP*\");";
 TourPut(
-"Let's have two mask of $$GREEN$$M*$$FG$$ plus $$GREEN$$*.HPP*$$FG$$\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
-AFGetStr("\n");
-
-"FF(\"/Kernel/M*;*.HPP*;~Mem*\");";
-TourPut(
-"Let's unselect $$GREEN$$Mem*$$FG$$.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$.\n");
-AFGetStr("\n");
-TourPut("There is no way to include multiple base directories.\n",TRUE);
+"$$GREEN$$+lb$$FG$$ is whole label just before.\n"
+"$$GREEN$$+la$$FG$$ is whole label just after.\n",TRUE);

@@ -296,7 +296,7 @@ mesh_done:
 
 #help_index "Graphics/Misc;Input Pointer/Displayed Image"
 public U0 DrawStdInputPtr(CDC *dc,I64 x,I64 y)
-{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
+{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP"$.
 //Called by $LK,"DrawInputPtr",A="MN:DrawInputPtr"$() which is
   //called by $LK,"WinFinalUpdate",A="MN:WinFinalUpdate"$().
   dc->pen_width=1;
@@ -307,7 +307,7 @@ public U0 DrawStdInputPtr(CDC *dc,I64 x,I64 y)
 gr.fp_draw_input_ptr=&DrawStdInputPtr;
 
 public U0 DrawWaitInputPtr(CDC *dc,I64 x,I64 y)
-{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
+{//This is a callback. See $LK,"::/Demo/Graphics/Grid.CPP"$.
   I64 old_pen_width=dc->pen_width;
   CColorROPU32 old_color=dc->color;
   dc->pen_width=3;

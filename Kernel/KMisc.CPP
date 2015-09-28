@@ -45,7 +45,7 @@ I64 BCnt(I64 d)
 }
 
 U0 IntCore0TimerHandler(CTask *)
-{//Called from $LK,"IntCore0TimerHandler",A="FF:::/Kernel/Ints.CPP,IntCore0TimerHandler"$
+{//Called from $LK,"IntCore0TimerHandler",A="FF:::/Kernel/KInts.CPP,IntCore0TimerHandler"$
   I64 i;
   if (mp_cnt>1)
     while (LBts(&sys_semas[SYS_SEMA_SYS_TIMER],0))
@@ -228,11 +228,6 @@ Bool Silent(Bool val=ON)
 Bool IsSilent()
 {//Is StdOut turned-off?
   return Bt(&Fs->display_flags,DISPLAYf_SILENT);
-}
-
-Bool IsPreempt()
-{
-  return Bt(&Fs->task_flags,TASKf_PREEMPT);
 }
 
 Bool SysDbg(Bool val)

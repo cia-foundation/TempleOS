@@ -1,21 +1,23 @@
 /* See $LK,"AsmHashLoad",A="MN:AsmHashLoad"$().
 
- '!'= don't switch modes
- '&'= default
- '%'= Not allowed in 64-bit mode
- '='= Rex 0x48 only if 64-bit mode
- '`'= Rex only R8-R15
- '^'= Rex xor-like
- ':'= floating sti-like for disassembly
- '$$'= ending zero (ENTER)
- $FG,4$Note:$FG$ TempleOS uses nonstandard opcodes.
- Asm is kind-of a bonus and I made changes
- to make the assembler simpler. For opcodes
- which can have different numbers of
- args, I separated them out -- Like IMUL and IMUL2.
- The assembler will not report certain invalid
- forms. Get an Intel datasheet and learn
- which forms are valid.
+'!'= IEF_DONT_SWITCH_MODES
+'&'= IEF_DFT
+'%'= IEF_NOT_IN_64_BIT	Not Allowed in 64-bit.
+'='= IEF_48_REX		Rex 0x48 only if in 64-bit mode.
+'`'= IEF_REX_ONLY_R8_R15
+'^'= IEF_REX_XOR_LIKE
+'*'= IEF_STI_LIKE	Floating STI-like for UAsm.
+'$$'= IEF_ENDING_ZERO	Ending zero for ENTER.
+
+$FG,4$Note:$FG$ TempleOS uses nonstandard opcodes.
+Asm is kind-of a bonus and I made changes
+to make the assembler simpler. For opcodes
+which can have different numbers of
+args, I separated them out -- Like IMUL and IMUL2.
+The assembler will not report certain invalid
+forms. Get an Intel datasheet and learn
+which forms are valid.
+
 */
 
 R8 AL 0;
@@ -1296,15 +1298,15 @@ OPCODE FISTTP
 OPCODE FLD
  0xD9,/0 M32	//Load F32
  0xDD,/0 ` M64	//Load F64
- 0xD9 0xC0,+I: STI;
+ 0xD9 0xC0,+I* STI;
 OPCODE FSTP
  0xD9,/3 M32	//Store F32
  0xDD,/3 ` M64	//Store F64
- 0xDD 0xD8,+I: STI;
+ 0xDD 0xD8,+I* STI;
 OPCODE FST
  0xD9,/2 M32	//Store F32
  0xDD,/2 ` M64	//Store F64
- 0xDD 0xD0,+I: STI;
+ 0xDD 0xD0,+I* STI;
 OPCODE FRSTOR
  0xDD,/4 M32
  0xDD,/4 M64;
@@ -1312,79 +1314,79 @@ OPCODE FSAVE
  0xDD,/6 M32
  0xDD,/6 M64;
 
-OPCODE FYL2X 0xD9 0xF1,:;
-OPCODE FYL2XP1 0xD9 0xF9,:;
-OPCODE F2XM1 0xD9 0xF0,:;
-OPCODE FABS 0xD9 0xE1,:;
-OPCODE FCHS 0xD9 0xE0,:;
-OPCODE FSIN 0xD9 0xFE,:;
-OPCODE FCOS 0xD9 0xFF,:;
-OPCODE FPTAN 0xD9 0xF2,:;
-OPCODE FPATAN 0xD9 0xF3,:;
-OPCODE FSQRT 0xD9 0xFA,:;
-OPCODE FMULP 0xDE 0xC8,+I: STI ST0;
+OPCODE FYL2X 0xD9 0xF1,*;
+OPCODE FYL2XP1 0xD9 0xF9,*;
+OPCODE F2XM1 0xD9 0xF0,*;
+OPCODE FABS 0xD9 0xE1,*;
+OPCODE FCHS 0xD9 0xE0,*;
+OPCODE FSIN 0xD9 0xFE,*;
+OPCODE FCOS 0xD9 0xFF,*;
+OPCODE FPTAN 0xD9 0xF2,*;
+OPCODE FPATAN 0xD9 0xF3,*;
+OPCODE FSQRT 0xD9 0xFA,*;
+OPCODE FMULP 0xDE 0xC8,+I* STI ST0;
 OPCODE FMUL 
  0xD8,/1 ST0 M32
  0xDC,/1 ` ST0 M64
- 0xD8 0xC8,+I: ST0 STI
- 0xDC 0xC8,+I: STI ST0;
+ 0xD8 0xC8,+I* ST0 STI
+ 0xDC 0xC8,+I* STI ST0;
 OPCODE FIMUL 
  0xDA,/1 ST0 M32
  0xDE,/1 ST0 M16;
-OPCODE FDIVP 0xDE 0xF8,+I: STI ST0;
+OPCODE FDIVP 0xDE 0xF8,+I* STI ST0;
 OPCODE FDIV 
  0xD8,/6 ST0 M32
  0xDC,/6 ` ST0 M64
- 0xD8 0xF0,+I: ST0 STI
- 0xDC 0xF8,+I: STI ST0;
-OPCODE FDIVRP 0xDE 0xF0,+I: STI ST0;
+ 0xD8 0xF0,+I* ST0 STI
+ 0xDC 0xF8,+I* STI ST0;
+OPCODE FDIVRP 0xDE 0xF0,+I* STI ST0;
 OPCODE FDIVR 
  0xD8,/7 ST0 M32
  0xDC,/7 ` ST0 M64
- 0xD8 0xF8,+I: ST0 STI
- 0xDC 0xF0,+I: STI ST0;
-OPCODE FPREM 0xD9 0xF8,:;
-OPCODE FADDP 0xDE 0xC0,+I: STI ST0;
+ 0xD8 0xF8,+I* ST0 STI
+ 0xDC 0xF0,+I* STI ST0;
+OPCODE FPREM 0xD9 0xF8,*;
+OPCODE FADDP 0xDE 0xC0,+I* STI ST0;
 OPCODE FADD 
  0xD8,/0 ST0 M32
  0xDC,/0 ` ST0 M64
- 0xD8 0xC0,+I: ST0 STI
- 0xDC 0xC0,+I: STI ST0;
-OPCODE FSUBP 0xDE 0xE8,+I: STI ST0;
+ 0xD8 0xC0,+I* ST0 STI
+ 0xDC 0xC0,+I* STI ST0;
+OPCODE FSUBP 0xDE 0xE8,+I* STI ST0;
 OPCODE FSUB 
  0xD8,/4 ST0 M32
  0xDC,/4 ` ST0 M64
- 0xD8 0xE0,+I: ST0 STI
- 0xDC 0xE8,+I: STI ST0;
-OPCODE FSUBRP 0xDE 0xE0,+I: STI ST0;
+ 0xD8 0xE0,+I* ST0 STI
+ 0xDC 0xE8,+I* STI ST0;
+OPCODE FSUBRP 0xDE 0xE0,+I* STI ST0;
 OPCODE FSUBR 
  0xD8,/5 ST0 M32
  0xDC,/5 ` ST0 M64
- 0xD8 0xE8,+I: ST0 STI
- 0xDC 0xE0,+I: STI ST0;
-OPCODE FCOMIP 0xDF 0xF0,+I: ST0 STI;
-OPCODE FCOMI 0xDB 0xF0,+I: ST0 STI;
-OPCODE FCLEX 0x9B 0xDB 0xE2,:;
-OPCODE FNCLEX 0xDB 0xE2,:;
-OPCODE FSTSW 0xDF 0xE0,:;
-OPCODE FDECSTP 0xD9 0xF6,:;
-OPCODE FINCSTP 0xD9 0xF7,:;
-OPCODE FFREE 0xDD 0xC0,+I: STI;
-OPCODE FRNDINT 0xD9 0xFC,:;
-OPCODE FSCALE 0xD9 0xFD,:;
-OPCODE FXTRACT 0xD9 0xF4,:;
+ 0xD8 0xE8,+I* ST0 STI
+ 0xDC 0xE0,+I* STI ST0;
+OPCODE FCOMIP 0xDF 0xF0,+I* ST0 STI;
+OPCODE FCOMI 0xDB 0xF0,+I* ST0 STI;
+OPCODE FCLEX 0x9B 0xDB 0xE2,*;
+OPCODE FNCLEX 0xDB 0xE2,*;
+OPCODE FSTSW 0xDF 0xE0,*;
+OPCODE FDECSTP 0xD9 0xF6,*;
+OPCODE FINCSTP 0xD9 0xF7,*;
+OPCODE FFREE 0xDD 0xC0,+I* STI;
+OPCODE FRNDINT 0xD9 0xFC,*;
+OPCODE FSCALE 0xD9 0xFD,*;
+OPCODE FXTRACT 0xD9 0xF4,*;
 
-OPCODE FLD1 0xD9 0xE8,:;
-OPCODE FLDL2T 0xD9 0xE9,:;
-OPCODE FLDL2E 0xD9 0xEA,:;
-OPCODE FLDPI 0xD9 0xEB,:;
-OPCODE FLDLG2 0xD9 0xEC,:;
-OPCODE FLDLN2 0xD9 0xED,:;
-OPCODE FLDZ 0xD9 0xEE,:;
+OPCODE FLD1 0xD9 0xE8,*;
+OPCODE FLDL2T 0xD9 0xE9,*;
+OPCODE FLDL2E 0xD9 0xEA,*;
+OPCODE FLDPI 0xD9 0xEB,*;
+OPCODE FLDLG2 0xD9 0xEC,*;
+OPCODE FLDLN2 0xD9 0xED,*;
+OPCODE FLDZ 0xD9 0xEE,*;
 
-OPCODE FXCH 0xD9 0xC8,+I: STI;
-OPCODE FTST 0xD9 0xE4,:;
-OPCODE FXAM 0xD9 0xE5,:;
+OPCODE FXCH 0xD9 0xC8,+I* STI;
+OPCODE FTST 0xD9 0xE4,*;
+OPCODE FXAM 0xD9 0xE5,*;
 OPCODE FINIT 0x9B 0xDB 0xE3;
 OPCODE FNINIT 0xDB 0xE3;
 

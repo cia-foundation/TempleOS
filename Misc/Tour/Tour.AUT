@@ -74,17 +74,18 @@ public I64 PopUpTourPart()
   I64 i;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$TempleOS Tours$$FG$$\n\n"
-	"$$CM+LX,4,4$$$$BT,\"Part  1: The basics\",LE=1$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  2: Editing and running programs\",LE=2$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  3: Adding macros to PersonalMenu\",LE=3$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  4: Choose filename, choose dir\",LE=4$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  5: AutoComplete\",LE=5$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  6: Search (Find)\",LE=6$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  7: TempleOS file masks\",LE=7$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  8: Editor filter\",LE=8$$"
-	"$$CM+LX,4,4$$$$BT,\"Part  9: Debugging\",LE=9$$"
-	"$$CM+LX,4,4$$$$BT,\"Part 10: Wow!!\",LE=10$$"
-	"$$CM+LX,4,4$$$$BT,\"Part 11: Test Suite\",LE=11$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  1: The help system\",LE=1$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  2: The basics\",LE=2$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  3: Editing and running programs\",LE=3$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  4: Adding macros to PersonalMenu\",LE=4$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  5: Choose filename, choose dir\",LE=5$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  6: AutoComplete\",LE=6$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  7: Search (Find)\",LE=7$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  8: TempleOS file masks\",LE=8$$"
+	"$$CM+LX,4,4$$$$BT,\"Part  9: Editor filter\",LE=9$$"
+	"$$CM+LX,4,4$$$$BT,\"Part 10: Debugging\",LE=10$$"
+	"$$CM+LX,4,4$$$$BT,\"Part 11: Wow!!\",LE=11$$"
+	"$$CM+LX,4,4$$$$BT,\"Part 12: Test Suite\",LE=12$$"
 	"$$CM+LX,4,4$$$$BT,\"Done\",LE=DOCM_CANCEL$$\n");
   doc->flags|=DOCF_FORM;
   i=PopUpPrint("WinMax;DocMenu(0x%X,0);",doc);

@@ -128,7 +128,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   Step *tempst;
   Peasant *tempp;
   F64 tt;
-  Bool old_preempt=Preempt;
 
   dc->pen_width=1;
   for (i=0;i<NUM_TREES;i++) {
@@ -225,8 +224,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->color=LTBLUE;
   GrPrint(dc,0,0,"Freezing Peasants:%d Time:%3.2f Best:%3.2f",
 	not_stopped_cnt,tt-t0,best_score);
-
-  Preempt(old_preempt);
 }
 
 U0 StepNew(CTask *task,I64 x,I64 y,F64 é,Bool left_right,Bool king)
@@ -337,7 +334,7 @@ U0 Follow(CTask *,Peasant *tempp)
 }
 
 U0 AnimateTask(I64)
-{//Preempt off by default after spawned.
+{
   Step *temps,*temps1;
   Peasant *tempp;
   I64 i,w,h;
@@ -472,8 +469,11 @@ U0 Wenceslas()
 	);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  AutoComplete;
+  WinBorder;
   WinMax;
-  Preempt;
+  DocCursor;
+  DocClear;
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
   PopUpOk("
@@ -536,10 +536,6 @@ Lead peasants to fires.
 
   Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
-  AutoComplete;
-
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {

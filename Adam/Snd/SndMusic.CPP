@@ -128,7 +128,7 @@ per second.  It defaults to
 */
   U8 *word,*last_st;
   I64 note,i=0,timeout_val,timeout_val2;
-  Bool tie,old_preempt=Preempt;
+  Bool tie;
   F64 f,d,on_jiffies,off_jiffies;
   music.play_note_num=0;
   while (*st) {
@@ -186,7 +186,6 @@ per second.  It defaults to
 
     music.play_note_num++;
   }
-  Preempt(old_preempt);
 }
 
 U0 MusicSettingsRst()
@@ -214,7 +213,6 @@ MusicSettingsRst;
 
 U0 CurSongTask()
 {
-  Preempt(ON);
   Fs->task_end_cb=&SndTaskEndCB;
   while (TRUE)
     Play(music.cur_song);

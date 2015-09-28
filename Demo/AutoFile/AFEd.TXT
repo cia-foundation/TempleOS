@@ -119,7 +119,6 @@
 #define IC_ASM			0x61
 #define IC_CLI	 		0x62
 #define IC_STI	 		0x63
-#define IC_PREEMPT		0x64
 #define IC_CLD	 		0x65
 #define IC_STD	 		0x66
 #define IC_HLT	 		0x67

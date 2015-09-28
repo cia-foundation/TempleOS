@@ -93,6 +93,29 @@ RegExeBranch("TempleOS/Varoom");
 F64 distance,t0,tf;
 Bool game_over;
 
+#define BORDER		7500
+#define R		10000
+#define WIDTH		2000
+#define SHOULDER	200
+#define D_é		(2*ã/360)   //Curve track slice is one degree.
+#define D_S		(2*ã*R/360) //Straight track slice is degree at 10000.
+#define DIPS		5
+#define DIP_DEPTH	50
+class Track
+{
+  Track *next,*last;
+  I32 num;
+  CColorROPU16 c,pad;
+  I64 x,z;
+  F64 é,d;
+  CD3I32 left[4],center[4],right[4];
+} track_root,
+  *track_start[MP_MAX_PROCESSORS],*track_end[MP_MAX_PROCESSORS];
+
+CDC *track_map;
+#define MAP_BITS	9
+I64 t_minx,t_maxx,t_minz,t_maxz;
+
 #define NUM_BUSHES	512
 class Bush
 {
@@ -105,29 +128,16 @@ class Bush
 class Car
 {
   CD3I32 p;
-  F64 é,speed;
+  F64 é,dé,speed;
   CSprite *img;
+  Track *t;
 } c[NUM_CARS];
-
-#define TRACK_INNER	16000
-#define TRACK_OUTER	18000
-#define SHOULDER	200
-#define SLICES		500
-#define D_é		(2*ã/SLICES)
-#define TRACK_POLYS	(3*SLICES)
-#define DIPS		5
-#define DIP_DEPTH	100
-class TrackPoly
-{
-  CColorROPU16 c,pad[3];
-  CD3I32 p[4];
-} track[TRACK_POLYS];
 
 I64 DipY(I64 x,I64 z)
 {
   F64 m,a;
   R2P(&m,&a,x,z);
-  return DIP_DEPTH*m*Cos(DIPS*a)/((TRACK_INNER+TRACK_OUTER)/2);
+  return DIP_DEPTH*m*Cos(DIPS*a)/R;
 }
 
 #define CAR_LENGTH	400
@@ -140,62 +150,210 @@ F64 Dipé(I64 x,I64 z,F64 é)
   return ASin((y_front-y_back)/CAR_LENGTH);
 }
 
-U0 InitTrackPoly(TrackPoly *tempt,CColorROPU16 c,
-  I64 inner,I64 outer,F64 é1,F64 é2)
+Track *TrackFind(Track *_tempt,I64 x,I64 z)
 {
-  tempt->c=c;
-  tempt->p[0].x=inner*Cos(é1);
-  tempt->p[0].z=inner*Sin(é1);
-  tempt->p[0].y=DipY(tempt->p[0].x,tempt->p[0].z);
-  tempt->p[1].x=outer*Cos(é1);
-  tempt->p[1].z=outer*Sin(é1);
-  tempt->p[1].y=DipY(tempt->p[1].x,tempt->p[1].z);
-  tempt->p[2].x=outer*Cos(é2);
-  tempt->p[2].z=outer*Sin(é2);
-  tempt->p[2].y=DipY(tempt->p[2].x,tempt->p[2].z);
-  tempt->p[3].x=inner*Cos(é2);
-  tempt->p[3].z=inner*Sin(é2);
-  tempt->p[3].y=DipY(tempt->p[3].x,tempt->p[3].z);
+  Track *result=_tempt,*tempt;
+  I64 dd,best=SqrI64(result->x-x)+SqrI64(result->z-z);
+
+  tempt=_tempt;
+  while (TRUE) {
+    tempt=tempt->next;
+    if (tempt==&track_root)
+      tempt=tempt->next;
+    dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
+    if (dd<best) {
+      best=dd;
+      result=tempt;
+    } else
+      break;
+  }
+  tempt=_tempt;
+  while (TRUE) {
+    tempt=tempt->last;
+    if (tempt==&track_root)
+      tempt=tempt->last;
+    dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
+    if (dd<best) {
+      best=dd;
+      result=tempt;
+    } else
+      break;
+  }
+  return result;
+}
+
+U0 TrackSlice(F64 *_x,F64 *_z,F64 é,F64 d)
+{
+  F64 x=*_x,z=*_z,c=Cos(é),s=Sin(é),dx=d*s,dz=-d*c;
+  Track *tempt,*last=track_root.last;
+  if (last==&track_root)
+    last=NULL;
+
+  tempt=CAlloc(sizeof(Track));
+  if (last) {
+    MemCpy(&tempt->center[0],&last->center[3],sizeof(CD3I32));
+    MemCpy(&tempt->center[1],&last->center[2],sizeof(CD3I32));
+  }
+  tempt->center[2].x=x+(WIDTH/2)*c+dx;
+  tempt->center[2].z=z+(WIDTH/2)*s+dz;
+  tempt->center[2].y=DipY(tempt->center[2].x,tempt->center[2].z);
+  tempt->center[3].x=x-(WIDTH/2)*c+dx;
+  tempt->center[3].z=z-(WIDTH/2)*s+dz;
+  tempt->center[3].y=DipY(tempt->center[3].x,tempt->center[3].z);
+
+  if (last) {
+    MemCpy(&tempt->left[0],&last->left[3],sizeof(CD3I32));
+    MemCpy(&tempt->left[1],&last->left[2],sizeof(CD3I32));
+  }
+  tempt->left[2].x=x-(WIDTH/2)*c+dx;
+  tempt->left[2].z=z-(WIDTH/2)*s+dz;
+  tempt->left[2].y=DipY(tempt->left[2].x,tempt->left[2].z);
+  tempt->left[3].x=x-(WIDTH/2+SHOULDER)*c+dx;
+  tempt->left[3].z=z-(WIDTH/2+SHOULDER)*s+dz;
+  tempt->left[3].y=DipY(tempt->left[3].x,tempt->left[3].z);
+
+  if (last) {
+    MemCpy(&tempt->right[0],&last->right[3],sizeof(CD3I32));
+    MemCpy(&tempt->right[1],&last->right[2],sizeof(CD3I32));
+  }
+  tempt->right[2].x=x+(WIDTH/2+SHOULDER)*c+dx;
+  tempt->right[2].z=z+(WIDTH/2+SHOULDER)*s+dz;
+  tempt->right[2].y=DipY(tempt->right[2].x,tempt->right[2].z);
+  tempt->right[3].x=x+(WIDTH/2)*c+dx;
+  tempt->right[3].z=z+(WIDTH/2)*s+dz;
+  tempt->right[3].y=DipY(tempt->right[3].x,tempt->right[3].z);
+
+  tempt->x=x;
+  tempt->z=z;
+  tempt->é=é;
+  tempt->num=track_root.last->num+1;
+  tempt->d  =track_root.last->d+d;
+
+  QueIns(tempt,track_root.last);
+
+  if (tempt->num&1)
+    tempt->c=RED;
+  else
+    tempt->c=WHITE;
+
+  if (x<t_minx) t_minx=x;
+  if (x>t_maxx) t_maxx=x;
+  if (z<t_minz) t_minz=z;
+  if (z>t_maxz) t_maxz=z;
+
+  x+=dx;
+  *_x=x;
+  z+=dz;
+  *_z=z;
+
+  if (x<t_minx) t_minx=x;
+  if (x>t_maxx) t_maxx=x;
+  if (z<t_minz) t_minz=z;
+  if (z>t_maxz) t_maxz=z;
+}
+
+U0 CoupleEnds()
+{
+  Track *first=track_root.next,*last=track_root.last;
+  MemCpy(&first->center[0],&last->center[3],sizeof(CD3I32));
+  MemCpy(&first->center[1],&last->center[2],sizeof(CD3I32));
+  MemCpy(&first->left[0]  ,&last->left[3]  ,sizeof(CD3I32));
+  MemCpy(&first->left[1]  ,&last->left[2]  ,sizeof(CD3I32));
+  MemCpy(&first->right[0] ,&last->right[3] ,sizeof(CD3I32));
+  MemCpy(&first->right[1] ,&last->right[2] ,sizeof(CD3I32));
 }
 
 U0 InitTrack()
 {
-  TrackPoly *tempt=track;
-  I64 i;
-  for (i=0;i<SLICES;i++) {
-    InitTrackPoly(tempt++,DKGRAY,TRACK_INNER,TRACK_OUTER,
-	  i*2*ã/SLICES,(i+1)*2*ã/SLICES);
-    if (i&1) {
-      InitTrackPoly(tempt++,RED,TRACK_INNER-SHOULDER,TRACK_INNER,
-	    i*2*ã/SLICES,(i+1)*2*ã/SLICES);
-      InitTrackPoly(tempt++,WHITE,TRACK_OUTER,TRACK_OUTER+SHOULDER,
-	    i*2*ã/SLICES,(i+1)*2*ã/SLICES);
-    } else {
-      InitTrackPoly(tempt++,WHITE,TRACK_INNER-SHOULDER,TRACK_INNER,
-	    i*2*ã/SLICES,(i+1)*2*ã/SLICES);
-      InitTrackPoly(tempt++,RED,TRACK_OUTER,TRACK_OUTER+SHOULDER,
-	    i*2*ã/SLICES,(i+1)*2*ã/SLICES);
-    }
+  I64 i,j;
+  Track *tempt;
+  F64 x,z,é,d;
+
+  MemSet(&track_root,0,sizeof(Track));
+  QueInit(&track_root);
+
+  t_minx=t_minz=MAX_I64;
+  t_maxx=t_maxz=MIN_I64;
+
+  x=0; z=0; é=0;
+  for (d=0;d<6*R;d+=D_S)
+    TrackSlice(&x,&z,é,D_S);
+  for (i=0;i<180;i++,é+=D_é)
+    TrackSlice(&x,&z,é,D_é*R);
+  for (d=0;d<R;d+=D_S)
+    TrackSlice(&x,&z,é,D_S);
+  for (i=0;i<90;i++,é-=D_é)
+    TrackSlice(&x,&z,é,D_é*R);
+  for (i=0;i<180;i++,é+=D_é)
+    TrackSlice(&x,&z,é,D_é*R);
+  for (i=0;i<90;i++,é-=D_é)
+    TrackSlice(&x,&z,é,D_é*R);
+  for (d=0;d<R;d+=D_S)
+    TrackSlice(&x,&z,é,D_S);
+  for (i=0;i<180;i++,é+=D_é)
+    TrackSlice(&x,&z,é,D_é*R);
+
+  CoupleEnds;
+
+  tempt=track_root.next;
+  for (i=0;i<mp_cnt;i++) {
+    j=(i+1)*track_root.last->num/mp_cnt+1;
+    track_start[i]=tempt;
+    while (tempt!=&track_root && tempt->num!=j)
+      tempt=tempt->next;
+    track_end[i]=tempt;
+  }
+
+  t_minx-=BORDER; t_minz-=BORDER;
+  t_maxx+=BORDER; t_maxz+=BORDER;
+  track_map=DCNew((t_maxx-t_minx+1<<MAP_BITS-1)>>MAP_BITS,
+	(t_maxz-t_minz+1<<MAP_BITS-1)>>MAP_BITS);
+
+  track_map->color=LTGRAY;
+  GrRect(track_map,0,0,track_map->width,track_map->height);
+  tempt=track_root.next;
+  track_map->color=YELLOW;
+  track_map->pen_width=3;
+  while (tempt!=&track_root) {
+    GrPlot3(track_map,track_map->width-(tempt->x-t_minx)>>MAP_BITS,
+	  (tempt->z-t_minz)>>MAP_BITS,0);
+    tempt=tempt->next;
   }
 }
 
 #define HORIZON_DIP	200
+
+Bool PrepPoly(CD3I32 *p,I64 *r,I64 cx,I64 h,CD3I32 *poly)
+{
+  I64 x,y,z,i;
+  F64 s;
+  for (i=0;i<4;i++) {
+    x=p[i].x-c[0].p.x;
+    y=p[i].y-c[0].p.y;
+    z=p[i].z-c[0].p.z;
+    Mat4x4MulXYZ(r,&x,&y,&z);
+    s=100.0/(AbsI64(z)+50);
+    poly[i].y=s*y+h;
+    if (z<-200 || !(-h<poly[i].y<2*h))
+      return FALSE;
+    poly[i].x=s*x+cx;
+    poly[i].z=z+GR_Z_ALL;
+  }
+  return TRUE;
+}
 
 I64 mp_not_done_flags;
 
 U0 MPUpdateWin(CDC *dc2)
 {
   CTask *task=dc2->win_task;
-  I64 i,j,x,y,z,lo,hi,
-	w=task->pix_width,
-	h=task->pix_height,r[16],
-	cx=w>>1;
-  F64 s,dip_é=Dipé(c[0].p.x,c[0].p.z,c[0].é);
-  Car  *tempc;
-  Bool draw;
+  I64	i,x,y,z,
+	w=task->pix_width,h=task->pix_height,r[16],cx=w>>1;
+  F64	s,dip_é=Dipé(c[0].p.x,c[0].p.z,c[0].é);
+  Car	*tempc;
   CD3I32 poly[4];
-  TrackPoly *tempt;
-  CDC *dc=DCAlias(gr.dc2,task);
+  Track	*tempt,*tempt1;
+  CDC	*dc=DCAlias(gr.dc2,task);
 
   Mat4x4IdentEqu(r);
   Mat4x4RotY(r,ã-c[0].é);
@@ -204,27 +362,19 @@ U0 MPUpdateWin(CDC *dc2)
   dc->depth_buf=dc2->depth_buf;
 
   //Track
-  lo=Gs->num*TRACK_POLYS/mp_cnt;
-  hi=(Gs->num+1)*TRACK_POLYS/mp_cnt;
-  for (i=lo,tempt=&track[lo];i<hi;i++,tempt++) {
-    dc->color=tempt->c;
-    draw=TRUE;
-    for (j=0;j<4;j++) {
-      x=tempt->p[j].x-c[0].p.x;
-      y=tempt->p[j].y-c[0].p.y;
-      z=tempt->p[j].z-c[0].p.z;
-      Mat4x4MulXYZ(r,&x,&y,&z);
-      s=100.0/(AbsI64(z)+50);
-      poly[j].y=s*y+h;
-      if (z<-200 || !(-h<poly[j].y<2*h)) {
-	draw=FALSE;
-	break;
-      }
-      poly[j].x=s*x+cx;
-      poly[j].z=z+GR_Z_ALL;
-    }
-    if (draw)
+  tempt =track_start[Gs->num];
+  tempt1=track_end  [Gs->num];
+  while (tempt!=tempt1) {
+    dc->color=DKGRAY;
+    if (PrepPoly(&tempt->center,r,cx,h,poly)) {
       GrFillPoly3(dc,4,poly);
+      dc->color=tempt->c;
+      if (PrepPoly(&tempt->left,r,cx,h,poly))
+	GrFillPoly3(dc,4,poly);
+      if (PrepPoly(&tempt->right,r,cx,h,poly))
+	GrFillPoly3(dc,4,poly);
+    }
+    tempt=tempt->next;
   }
 
   dc->flags|=DCF_TRANSFORMATION;
@@ -278,11 +428,12 @@ U0 VRTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  I64 i,x,y,z,
+  I64	i,x,y,z,
 	w=task->pix_width,
 	h=task->pix_height,r[16],
 	cx=w>>1;
-  F64 s,è,dip_é=Dipé(c[0].p.x,c[0].p.z,c[0].é);
+  F64	s,dip_é=Dipé(c[0].p.x,c[0].p.z,c[0].é);
+  Car	*tempc=&c[0];
 
   dc->color=LTCYAN;
   GrRect(dc,0,0,w,HORIZON_DIP*Sin(dip_é)+FONT_HEIGHT*4.5);
@@ -310,14 +461,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   while (mp_not_done_flags)
     Yield;
 
-  if (Bt(kbd.down_bitmap,SC_CURSOR_LEFT))
-    è=-0.5;
-  else if (Bt(kbd.down_bitmap,SC_CURSOR_RIGHT))
-    è=0.5;
-  else
-    è=0;
   Mat4x4IdentEqu(r);
-  Mat4x4RotY(r,è);
+  Mat4x4RotY(r,tempc->dé);
   Mat4x4RotX(r,0.4-8*dip_é); //Made this up
   dc->transform=&VRTransform;
   dc->x=task->pix_width>>1;
@@ -326,12 +471,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   SpriteMat3B(dc,0,0,-100,c[0].img,r);
 
   //Map
-  dc->color=LTGRAY;
-  GrRect(dc,w-64,h-64,64,64);
-  dc->color=LTGREEN;
-  for (i=0;i<NUM_BUSHES;i++)
-    GrPlot(dc,w-64+64*(0x5000-b[i].p.x)/0xA000,
-	  h-64*(-b[i].p.z+0x5000)/0xA000);
+  GrBlot(dc,w-track_map->width,h-track_map->height,track_map);
 
   dc->pen_width=2;
   for (i=0;i<NUM_CARS;i++) {
@@ -339,8 +479,8 @@ U0 DrawIt(CTask *task,CDC *dc)
       dc->color=LTPURPLE;
     else
       dc->color=LTCYAN;
-    GrPlot3(dc,w-64+64*(0x5000-c[i].p.x)/0xA000,
-	  h-64*(-c[i].p.z+0x5000)/0xA000,0);
+    GrPlot3(dc,w-(c[i].p.x-t_minx)>>MAP_BITS,
+	       h-track_map->height+(c[i].p.z-t_minz)>>MAP_BITS,0);
   }
 
   if (game_over) {
@@ -357,44 +497,58 @@ U0 DrawIt(CTask *task,CDC *dc)
   } else
     s=tS-t0;
   dc->color=BLACK;
-  GrPrint(dc,0,0,"é:%0.1f %0.1f%% Time:%0.2f Best:%0.2f",
-	180+180/ã*Arg(c[0].p.x,c[0].p.z),
-	100.0*distance/(2*ã*TRACK_INNER),s,best_score);
+  GrPrint(dc,0,0,"%0.1f%% Time:%0.2f Best:%0.2f",
+	100.0*distance/track_root.last->d,s,best_score);
 }
 
 U0 AnimateTask(I64)
 {
   Car  *tempc;
-  I64 i;
-  F64 m,a;
+  I64 i,x,z;
+  Bool on_track;
+  Track *tempt,*tempt2;
   while (TRUE) {
     if (!game_over)
-      Snd(c[0].speed*3+10);
+      Snd(0.01*c[0].speed*3+10);
     else
       Snd(0);
     for (i=0;i<NUM_CARS;i++) {
       tempc=&c[i];
-      tempc->p.x-=tempc->speed*Cos(tempc->é-ã/2);
-      tempc->p.z+=tempc->speed*Sin(tempc->é-ã/2);
+      tempc->p.x-=0.01*tempc->speed*Cos(tempc->é-ã/2);
+      tempc->p.z+=0.01*tempc->speed*Sin(tempc->é-ã/2);
+      tempt=TrackFind(tempc->t,tempc->p.x,tempc->p.z);
       if (i) {
-	tempc->é=Arg(-tempc->p.x,tempc->p.z);
-	tempc->p.x=-(TRACK_INNER+TRACK_OUTER)/2*Cos(tempc->é);
-	tempc->p.z= (TRACK_INNER+TRACK_OUTER)/2*Sin(tempc->é);
+	if (tempt!=tempc->t) {
+	  tempt2=tempt->next;
+	  if (tempt2==&track_root)
+	    tempt2=tempt2->next;
+	  tempc->é=Arg(-tempt2->z+tempc->p.z,-tempt2->x+tempc->p.x);
+	}
+      } else {
+	tempc->é+=0.01*tempc->dé;
+	x=track_map->width-(tempc->p.x-t_minx)>>MAP_BITS;
+	z=(tempc->p.z-t_minz)>>MAP_BITS;
+	if (GrPeek(track_map,x,z)!=YELLOW) {
+	  on_track=FALSE;
+	  tempc->speed-=0.01*tempc->speed;
+	  if (tempc->speed<0) tempc->speed=0;
+	} else
+	  on_track=TRUE;
       }
+      tempc->t=tempt;
       tempc->p.y=DipY(tempc->p.x,tempc->p.z);
     }
-    R2P(&m,&a,c[0].p.x,c[0].p.z);
-    if (!game_over && TRACK_INNER<=m<=TRACK_OUTER) {
+    if (!game_over && on_track) {
       for (i=1;i<NUM_CARS;i++)
-	if (D3I32DistSqr(&c[i].p,&c[0].p)<CAR_LENGTH*CAR_LENGTH>>1) {
+	if (D3I32DistSqr(&c[i].p,&c[0].p)<CAR_LENGTH>>1*CAR_LENGTH>>1) {
 	  game_over=TRUE;
 	  Noise(500,50,100);
 	  Sleep(500);
 	  break;
 	}
       if (!game_over) {
-	distance+=c[0].speed;
-	if (distance>2*ã*TRACK_INNER && Wrap(a+ã,-ã)>0.0) {
+	distance+=0.01*c[0].speed;
+	if (distance>track_root.last->d&& c[0].t->num<track_root.last->num>>1) {
 	  tf=tS;
 	  game_over=TRUE;
 	  Beep;
@@ -411,41 +565,74 @@ U0 AnimateTask(I64)
 
 CSprite *imgs[8]={$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$,$IB,"<4>",BI=4$,$IB,"<4>",BI=4$};
 
-U0 Init()
+
+U0 InitBushes()
 {
   Bush *tempb;
-  Car  *tempc;
-  I64 i;
+  I64 i,j,x,z;
+  track_map->color=LTGREEN;
+  track_map->pen_width=1;
   for (i=0;i<NUM_BUSHES;i++) {
     tempb=&b[i];
-    do {
-      tempb->p.x=RandU32&0x7FFF-0x4000;
-      tempb->p.z=RandU32&0x7FFF-0x4000;
-    } while (TRACK_INNER-SHOULDER<=
-	  Sqrt(SqrI64(tempb->p.x)+SqrI64(tempb->p.z))<=TRACK_OUTER+SHOULDER);
+
+ib_restart:
+    tempb->p.x=Rand*(t_maxx-t_minx)+t_minx;
+    tempb->p.z=Rand*(t_maxz-t_minz)+t_minz;
+    x=track_map->width-(tempb->p.x-t_minx)>>MAP_BITS;
+    z=(tempb->p.z-t_minz)>>MAP_BITS;
+    for (j=0;j<8;j++)
+      if (GrPeek(track_map,x+gr_x_offsets[j],z+gr_y_offsets[j])!=LTGRAY)
+	goto ib_restart;
+
+    GrPlot(track_map,x,z);
     tempb->p.y=DipY(tempb->p.x,tempb->p.z);
     tempb->sym=RandU16&1;
     tempb->img=imgs[i&7];
   }
+}
+
+
+U0 Init()
+{
+  Car	*tempc;
+  Track *tempt;
+  F64	d;
+  I64	i;
+
   InitTrack;
+  InitBushes;
+  tempt=track_root.next;
   for (i=0;i<NUM_CARS;i++) {
     tempc=&c[i];
-    if (i==0) {
+    tempc->t=tempt;
+    tempc->p.x=tempt->x;
+    tempc->p.z=tempt->z;
+    tempc->p.y=DipY(tempc->p.x,tempc->p.z);
+    tempc->é  =-tempt->é;
+    tempc->dé=0;
+    if (!i) {
       tempc->img=$IB,"<5>",BI=5$;
       tempc->speed=0;
     } else {
       tempc->img=$IB,"<6>",BI=6$;
-      tempc->speed=50.0;
+      tempc->speed=2500.0;
     }
-    tempc->é=i*2*ã/NUM_CARS;
-    tempc->p.x=-(TRACK_INNER+TRACK_OUTER)/2*Cos(tempc->é);
-    tempc->p.z= (TRACK_INNER+TRACK_OUTER)/2*Sin(tempc->é);
-    tempc->p.y=DipY(tempc->p.x,tempc->p.z);
+    d=(i+1)*track_root.last->d/NUM_CARS;
+    while (tempt->next!=&track_root && tempt->d<d)
+      tempt=tempt->next;
   }
   distance=0;
   tf=0;
   t0=tS;
   game_over=FALSE;
+}
+
+U0 CleanUp()
+{
+  while (mp_not_done_flags)
+    Yield;
+  QueDel(&track_root,TRUE);
+  DCDel(track_map);
 }
 
 U0 Varoom()
@@ -470,12 +657,11 @@ U0 Varoom()
     Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
 	  -WIF_SELF_GRAB_SCROLL-WIF_FOCUS_TASK_MENU;
     AutoComplete;
-    WinMax;
     WinBorder;
-    Preempt;
-    Init;
+    WinMax;
     DocCursor;
     DocClear;
+    Init;
     Fs->draw_it=&DrawIt;
     Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
     while (TRUE)
@@ -483,20 +669,22 @@ U0 Varoom()
 	case 0:
 	  switch (sc.u8[0]) {
 	    case SC_CURSOR_LEFT:
-	      c[0].é-=ã/100;
+	      c[0].dé-=ã/60;
 	      break;
 	    case SC_CURSOR_RIGHT:
-	      c[0].é+=ã/100;
+	      c[0].dé+=ã/60;
 	      break;
 	    case SC_CURSOR_UP:
-	      c[0].speed+=3;
+	      c[0].speed+=300;
 	      break;
 	    case SC_CURSOR_DOWN:
-	      c[0].speed-=3;
+	      c[0].speed-=900;
+	      if (c[0].speed<0) c[0].speed=0;
 	      break;
 	  }
 	  break;
 	case '\n':
+	  CleanUp;
 	  Init;
 	  break;
 	case CH_SHIFT_ESC:
@@ -506,6 +694,7 @@ U0 Varoom()
 vr_done: //Don't goto out of try
   } catch
     Fs->catch_except=TRUE;
+  CleanUp;
   SettingsPop(,TSF_SAME_SONG);
   MenuPop;
   RegWriteBranch("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);

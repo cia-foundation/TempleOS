@@ -897,9 +897,9 @@ U8 *CatPrint(U8 *_dst,U8 *fmt,...)
 
 U0 Print(U8 *fmt,...)
 {//$LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$.  See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
-//Don't use this.  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT.Z,DemoHolyC"$
+//Don't use this.  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT,DemoHolyC"$
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  PutS(buf);//Don't use PutS().  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT.Z,DemoHolyC"$
+  PutS(buf);//Don't use PutS().  $LK,"See Print() shortcut.",A="FF:::/Doc/HolyC.TXT,DemoHolyC"$
   Free(buf);
 }
 

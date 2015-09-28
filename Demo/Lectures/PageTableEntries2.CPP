@@ -12,7 +12,7 @@ I64 *addr=VGAM_GRAPHICS,
   48[RBP]=STK_SELECTOR
 */
 
-interrupt haserrcode U0 PageFault()
+interrupt haserrcode U0 IntPageFault()
 {
   I64 reg *rbp=GetRBP;
   *pte_addr|=1;
@@ -24,7 +24,7 @@ interrupt haserrcode U0 PageFault()
 
 U0 PageTableDemo2()
 {
-  U8 *old_idte=IntEntrySet(I_PAGE_FAULT,&PageFault,IDTET_IRQ);
+  U8 *old_idte=IntEntrySet(I_PAGE_FAULT,&IntPageFault,IDTET_IRQ);
   err_code=0;
   *pte_addr &=~1; //Not present
   InvlPg(addr);

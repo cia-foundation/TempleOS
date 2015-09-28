@@ -1,4 +1,5 @@
 //Compiler initializes glbls in AOT bin modules to zero.
+//$LK,"Globals Set to Zero Here",A="FF:::/Compiler/PrsStmt.CPP.Z,sys_var_init_flag"$.
 
 CSrvCmd sys_macro_root;
 CTask *sys_macro_util_task;
@@ -13,17 +14,19 @@ U8 *reverse_bits_table, //Table with U8 bits reversed
 CDate local_time_offset;
 F64 *pow10_I64;
 
-CSndGlbls	snd;
+CAutoCompleteDictGlbls acd;
+CAutoCompleteGlbls ac;
+CBlkDevGlbls	blkdev;
 CCntsGlbls	cnts={1,0,2676302000,2676302,2676302000,0,0,0,FALSE};
+CDbgGlbls	dbg;
+CDevGlbls	dev;
+CGridGlbls	ip_grid; //See $LK,"::/Demo/Graphics/Grid.CPP"$.
 CIPStateGlbls	ip,ip_last;
-CGridGlbls	ip_grid; //See $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
-CMouseStateGlbls mouse,mouse_last;
 CKbdStateGlbls	kbd;
 CKeyDevGlbls	keydev;
-CDevGlbls	dev;
+CMouseStateGlbls mouse,mouse_last;
+CSndGlbls	snd;
 CTextGlbls	text;
-CDbgGlbls	dbg;
-CDskGlbls	dsk;
 
 U8  *(*fp_getstr2)(I64 flags=0);
 U0 (*fp_update_ctrls)(CTask *task);

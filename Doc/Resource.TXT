@@ -1,4 +1,4 @@
-$WW,1$$FG,5$$TX+CX,"Graphic Resource Help"$$FG$
+$WW,1$$FG,5$$TX+CX,"Graphic Sprite Resource Help"$$FG$
 
 A sprite is an ordered list of elements such as lines, rectangles, bitmaps and color changes.  In a program's source code, you first make a sprite.  Then, you insert a pointer to it.
 

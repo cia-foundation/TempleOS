@@ -186,6 +186,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   Mat4x4RotX(r3,-ã/2);
   Mat4x4Scale(r3,PLANT_SCALE);
 
+  Seed(1);
   x1h=man_xx+yh*PLOT_GRID_WIDTH/2+xh*(PLOT_GRID_HEIGHT-1);
   y1h=man_yy-xh*PLOT_GRID_WIDTH/2+yh*(PLOT_GRID_HEIGHT-1);
   xh>>=1; yh>>=1;
@@ -370,6 +371,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrPrint(dc,0,0,"Enemy:%d Time:%3.2f Best:%3.2f",
 	monsters_left,tt-t0,best_score);
   Free(s2w);
+  Seed(0);
 }
 
 U0 Fire()
@@ -541,14 +543,13 @@ U0 CastleFrankenstein()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=DKGRAY<<4+WHITE;
-  Preempt;
+  AutoComplete;
   WinBorder;
   WinMax;
-  AutoComplete;
+  DocCursor;
   Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-  DocCursor;
   Fs->draw_it=&DrawIt;
 
   try {

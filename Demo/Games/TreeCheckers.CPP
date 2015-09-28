@@ -204,12 +204,15 @@ CDC *DrawHexMap(I64 *_w,I64 *_h)
 U0 Init()
 {
   I64 i,j,j1,j2,dd,best_dd,best,w=Fs->pix_width,h=Fs->pix_height;
+
   map_dc=DrawHexMap(&w,&h);
   cur_player=0;
+
   for (i=0;i<NUM_UNITS/2;i++) {
     u[i].num=i;
     u[i+NUM_UNITS/2].num=i+NUM_UNITS/2;
 
+ti_restart:
     u[i].y=FloorI64(RandU32%h,CIRCLE_RAD*2)+CIRCLE_RAD;
     u[i+NUM_UNITS/2].y=h-1-u[i].y;
     j1=u[i].y/(CIRCLE_RAD*2);
@@ -217,11 +220,14 @@ U0 Init()
     u[i].y+=BORDER_Y;
     u[i+NUM_UNITS/2].y+=BORDER_Y;
 
-    if (!i)
+    if (!i) {
       u[i].x=CIRCLE_RAD;
-    else
+      if (j1&1)
+	goto ti_restart;
+    } else
       u[i].x=FloorI64(RandU32%((w-CIRCLE_RAD*2*2)/2),CIRCLE_RAD*2)+CIRCLE_RAD;
     u[i+NUM_UNITS/2].x=w-1-u[i].x;
+
     if (j1&1)
       u[i].x+=CIRCLE_RAD;
     if (j2&1)
@@ -281,7 +287,6 @@ U0 TreeCheckers()
   Unit *tempu;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Preempt;
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -291,10 +296,9 @@ U0 TreeCheckers()
 	"  Restart(,'\n');"
 	"}"
 	);
-  WinMax;
-  WinBorder;
   AutoComplete;
-  Preempt;
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
   PopUpOk("Step on the link mid points.\n");

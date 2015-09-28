@@ -162,7 +162,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   F64 d,cur_time=tS;
   Obj *tempo;
   Torpedo *tempt;
-  Bool old_preempt=Preempt;
 
   tempt=torpedo_root.next;
   while (tempt!=&torpedo_root) {
@@ -272,7 +271,6 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    task->pix_height>>1-FONT_HEIGHT/2-task->scroll_y,"Game Over");
     }
   }
-  Preempt(old_preempt);
 }
 
 U0 Init()
@@ -693,7 +691,7 @@ U0 Combat(F64 period)
 
 #define ANIMATE_FREQ	50
 U0 AnimateTask(I64)
-{//Preemption is off after Spawn
+{
   Obj *tempo;
   Torpedo *tempt,*tempt1;
   F64 d,period;
@@ -787,17 +785,16 @@ U0 FlatTops()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLUE<<4+WHITE;
-  WinMax;
-  WinBorder;
   AutoComplete;
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
   PopUpOk("$$GREEN$${Left-Mouse}$$FG$$\t\tChange Course\n"
 	"$$GREEN$${Right-Mouse}$$FG$$\t\tLaunch Squadron\n"
 	"$$GREEN$${Right-Double-Mouse}$$FG$$\tReturn Squadron\n"
 	"$$GREEN$${Ctrl-Left Grab}$$FG$$\tScroll Screen\n");
-  Preempt,
-	MenuPush(
+  MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
 	"  Exit(,CH_ESC);"

@@ -71,7 +71,7 @@ public I64 GrBlot(CDC *dc=gr.dc,I64 x,I64 y,CDC *img)
 	reg bit_shift,win_z_buf_line_inc,win_z_buf_line_dec,win_z_num,
 	color_mask;
   U8 reg *dst,*src;
-  I32 db;
+  I32 *db;
   U16 reg *win_z_buf_ptr;
   CColorROPU32 color,c,old_color;
   CTask *win_task;

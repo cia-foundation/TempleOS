@@ -79,7 +79,6 @@ U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool)
 
 CCtrl *SliderNew()
 {
-  Bool old_preempt;
   CCtrl *c;
   if (Fs!=adam_task) {
     "Must be Adam Included with SHIFT-F5.\n"
@@ -94,18 +93,14 @@ CCtrl *SliderNew()
   c->draw_it=&DrawCtrlSlider;
   c->left_click=&LeftClickSlider;
   c->update_derived_vals=&UpdateDerivedCtrlSlider;
-  old_preempt=Preempt;
   QueIns(c,sys_winmgr_task->last_ctrl);
   TaskDerivedValsUpdate;
-  Preempt(old_preempt);
   return c;
 }
 
 U0 SliderDel(CCtrl *c)
 {
-  Bool old_preempt=Preempt;
   QueRem(c);
-  Preempt(old_preempt);
   Free(c->state);
   Free(c);
 }

@@ -423,7 +423,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
   tempcbh=cc->coc.coc_next;
   cc->coc.coc_next=NULL;
   i=tempf->arg_cnt;
-  tempm=tempf->member_lst;
+  tempm=tempf->member_lst_and_root;
   argc_cnt=0;
   if (cc->token=='(') {
     Lex(cc);
@@ -1113,7 +1113,7 @@ U8 *LexExpression2Bin(CCmpCtrl *cc,I64 *_type=NULL)
 {//Compile cc expression. You call the code.
   U8 *result;
   I64 size;
-  Bool old_trace=Btr(&cc->flags,CCf_OPT_TRACE_PRESENT);
+  Bool old_trace=Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
   COCPush(cc);
   COCInit(cc);
   if (PrsExpression(cc,NULL,FALSE)) {
@@ -1123,7 +1123,7 @@ U8 *LexExpression2Bin(CCmpCtrl *cc,I64 *_type=NULL)
   } else
     result=NULL;
   COCPop(cc);
-  BEqu(&cc->flags,CCf_OPT_TRACE_PRESENT,old_trace);
+  BEqu(&cc->flags,CCf_PASS_TRACE_PRESENT,old_trace);
   return result;
 }
 

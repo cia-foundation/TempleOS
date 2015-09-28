@@ -362,17 +362,23 @@ sf_done:
     DocUnlock(doc);
 }
 
-U0 EdUndoFilter(CDoc *doc)
+#define RSAC_REPLACE	0
+#define RSAC_SKIP	1
+#define RSAC_ALL	2
+
+I64 PopUpReplaceSkipAllCancel(U8 *header=NULL,U8 *footer=NULL)
 {
-  Bool unlock=DocLock(doc);
-  CDocEntry *doc_ce=doc->root.next;
-  while (doc_ce!=doc) {
-    doc_ce->de_flags&=~DOCEF_FILTER_SKIP;
-    doc_ce=doc_ce->next;
-  }
-  doc->find_replace->filter_lines=0;
-  if (unlock)
-    DocUnlock(doc);
+  I64 i;
+  CDoc *doc=DocNew;
+  if (header) DocPrint(doc,"%s",header);
+  DocPrint(doc,"$$CM+LX,1,4$$$$BT,\"REPLACE\",LE=RSAC_REPLACE$$"
+	"$$CM+LX,17,0$$$$BT,\"SKIP\",LE=RSAC_SKIP$$"
+	"$$CM+LX,1,3$$$$BT,\"ALL\",LE=RSAC_ALL$$"
+	"$$CM+LX,17,0$$$$BT,\"CANCEL\",LE=DOCM_CANCEL$$\n");
+  if (footer) DocPrint(doc,"%s",footer);
+  i=PopUpMenu(doc);
+  DocDel(doc);
+  return i;
 }
 
 I64 EdFindReplace(CDoc *doc)
@@ -481,8 +487,6 @@ I64 EdFindReplace(CDoc *doc)
 	      doc->cur_entry=doc_e;
 	      if (cmd!=RSAC_ALL)
 		DocCenter(doc);
-	      doc_e=doc->cur_entry;
-	      src=doc->cur_col+doc_e->tag;
 	      if (cmd!=RSAC_ALL) {
 		DocUnlock(doc);
 		cmd=PopUpReplaceSkipAllCancel("");
@@ -490,6 +494,8 @@ I64 EdFindReplace(CDoc *doc)
 		if (cmd<0)
 		  goto fr_unlock_done;
 	      }
+	      doc_e=doc->cur_entry;
+	      src=doc->cur_col+doc_e->tag;
 	      if (cmd==RSAC_REPLACE || cmd==RSAC_ALL) {
 		dlen=StrLen(doc_e->tag);
 		doc_e->max_col=dlen+rlen-plen;

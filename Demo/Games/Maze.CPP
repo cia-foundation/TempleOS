@@ -79,9 +79,9 @@ U0 Maze()
   I64 ch,x,y;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  WinMax;
-  WinBorder;
   AutoComplete;
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
   Fs->draw_it=&DrawIt;

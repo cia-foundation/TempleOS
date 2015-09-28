@@ -1,24 +1,24 @@
-$WW,1$$PURPLE$$TX+CX,"Psalmody Help"$$FG$
+$WW,1$$FG,5$$TX+CX,"Psalmody Help"$$FG$
 
 * The keyboard can be used as an organ by typing letter keys or clicking the mouse on the keyboard diagram$FG$.  You can "record" notes by pressing the red button and typing letters.  They will appear on the musical staff.  You can edit and save them.
 
 * The clipboard can be used to cut and paste.
 
-* $GREEN$Psalmody$FG$ uses $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ files as it's fmt!  See $LK,"::/Apps/Psalmody/Examples/personal.CPP"$.  It does not fully parse them when loading back in, so changes made outside $GREEN$Psalmody$FG$ can be lost.
+* $FG,2$Psalmody$FG$ uses $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ files as the song format!  See $LK,"::/Apps/Psalmody/Examples/prosper.CPP"$.  The $FG,2$Psalmody$FG$ program does not fully parse the songs when loading them back in, so changes made outside $FG,2$Psalmody$FG$ will be lost, like if you add graphics.
 
-* The first line of the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $GREEN$"no nothing"$FG$, $GREEN$"has words"$FG$, $GREEN$"has graphics"$FG$, or $GREEN$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $GREEN$0$FG$-$GREEN$9$FG$.  You can press $GREEN$<DELETE>$FG$ to delete songs.
+* The first line of the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
 
-* You can take the $LK,"Play",A="MN:Play"$() statements out of a song file and place them in your programs.  You can also add a song to a document with $GREEN$<CTRL-l>$FG$, but you should do it after pressing $GREEN$<CTRL-t>$FG$ because the clipboard-insert in $GREEN$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $GREEN$<CTRL-t>$FG$, now.
+* You can take the $LK,"Play",A="MN:Play"$() statements out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-l>$FG$, but you should do it after pressing $FG,2$<CTRL-t>$FG$ because the clipboard-insert in $FG,2$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $FG,2$<CTRL-t>$FG$, now.
 
 * You can call $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$("::/Home/Psalmody"); to play your songs.
 
-* To create a $GREEN$.SND$FG$ file which can be exported and played under Windows, set the $GREEN$Bool$FG$ $LK,"snd.record",A="MN:CSndGlbls"$ to $GREEN$TRUE$FG$, play music, and set it to $GREEN$FALSE$FG$.  Then, call $LK,"SndFileCreate",A="MN:SndFileCreate"$().  You might wish to make a $GREEN$<CTRL-ALT-key>$FG$ to toggle this system level recording feat.  See $LK,"Snd",A="MN:Snd"$().  Add this code to your $LK,"::/Home/AdamKeyPlugIns.CPP"$ file.
+* To create a $FG,2$.SND$FG$ file which can be exported and played under Windows, set the $FG,2$Bool$FG$ $LK,"snd.record",A="MN:CSndGlbls"$ to $FG,2$TRUE$FG$, play music, and set it to $FG,2$FALSE$FG$.  Then, call $LK,"SndFileCreate",A="MN:SndFileCreate"$().  You might wish to make a $FG,2$<CTRL-ALT-key>$FG$ to toggle this system level recording feat.  See $LK,"Snd",A="MN:Snd"$().  Add this code to your $LK,"::/Home/HomeKeyPlugIns.CPP"$ file.
 
-$PURPLE$U0 CtrlAltR(I64)
+$FG,5$U0 CtrlAltR(I64)
 {
   snd.record=!snd.record;
 }
-CtrlAltLetCBSet('R',&CtrlAltR,"Toggle snd.record");$FG$
+CtrlAltCBSet('R',&CtrlAltR,"Cmd /Toggle snd.record");$FG$
 
 * When calling $LK,"SndFileCreate",A="MN:SndFileCreate"$() you can set a waveform.  The PC speaker is $LK,"WF_SQUARE",A="MN:WF_SQUARE"$.  You can select reverb and averaging, also.
 

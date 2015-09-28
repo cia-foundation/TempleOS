@@ -1222,7 +1222,6 @@ args.
       case IC_SET_RBP:
       case IC_SET_RSP:
       case IC_SET_RAX:
-      case IC_PREEMPT:
       case IC_SIGN_I64:
       case IC_TOUPPER:
       case IC_ABS_I64:

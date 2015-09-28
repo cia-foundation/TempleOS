@@ -303,7 +303,7 @@ U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
       HashAdd(tempex,cc->htc.glbl_hash_table);
     }
     if (tempex->type&HTF_IMPORT) {
-      if (GetOpt(OPTf_USE_IMM64)) {
+      if (GetOption(OPTf_USE_IMM64)) {
 	ICU16(tempi,0xBB48);
 	ICU64(tempi,0);
 	if (buf) {

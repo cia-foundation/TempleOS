@@ -2,67 +2,63 @@
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
-TourPut(
-"You are now at the command line.\n"
-"\n"
-"The syntax is like $$GREEN$$C/C++$$FG$$ except you don't need $$GREEN$$()$$FG$$ "
-"if there are no args.\n"
-"\n"
-"Type \"$$GREEN$$Dir;$$FG$$\" and press $$GREEN$$<ENTER>$$FG$$.\n\n"
-"You must remember the semicolon.\n");
-AFGetStr("Dir;\n");
+TourPut("Press $$GREEN$$<F1>$$FG$$ for the main help index.\n"
+	"\n"
+	"The $$GREEN$$<F1>$$FG$$ key works both in "
+	"the editor and at the command line.\n"
+	"\n"
+	"You can find the $LK+PU,"Demo Index",A="FI:::/Doc/DemoIndex.TXT"$ on the help index.\n");
+AFGetKey(SC_F1);
 
 TourPut(
-"Press $$GREEN$$<CTRL-m>$$FG$$.\n\n"
-"This will access your PersonalMenu.  You can customize it.  "
-"It's like your START menu and desktop.\n");
+"Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort and exit.\n");
+AFGetChar(CH_SHIFT_ESC);
 
-AFGetChar(CH_CTRLM);
-TourPut(
-"You can also get to your PersonalMenu by clicking on the word "
-"\"$$GREEN$$MENU$$FG$$\" in the title bar.\n",TRUE);
+U0 RevealPopUpHelp(I64 scf)
+{
+  F64 t0;
+  U8 *st,*st2;
+  Bool old_key_desc;
+  do {
+    AutoComplete(ON);
+    st=ScanCode2KeyName(scf);
+    st2=MStrUtil(st,SUF_REM_TRAILING);
+    Free(st);
+    st=MStrPrint(
+	  "If you have $$GREEN$$AutoComplete$$FG$$ on, you "
+	  "can list the key commands.  This works both "
+	  "in the editor and at the command line.\n"
+	  "\n"
+	  "You can click the links to jump to source code.\n"
+	  "\n"
+	  "Press and hold the $$GREEN$$<%s>$$FG$$ key.\n"
+	  "Hold it for more than 1.0 seconds.\n",st2);
+    Free(st2);
+    TourPut(st);
+    Free(st);
 
-TourPut("Press $$GREEN$$<CURSOR-DOWN>$$FG$$ nine times.\n");
+    old_key_desc=LBtr(&Fs->win_inhibit,WIf_SELF_KEY_DESC);
+    while (kbd.scan_code&(SCF_CTRL|SCF_ALT|SCF_SHIFT)!=scf)
+      Sleep(1);
 
-//Puts the cursor at the top
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+    t0=tS;
+    while (kbd.scan_code&(SCF_CTRL|SCF_ALT|SCF_SHIFT)==scf) {
+      ScanKey(,,TRUE);
+      if (1.0<tS-t0<1.15)
+	Snd(100);
+      else
+	Snd(0);
+      Sleep(1);
+    }
+    LBEqu(&Fs->win_inhibit,WIf_SELF_KEY_DESC,old_key_desc);
+    Snd(0);
+  } while (tS-t0<1.0);
+}
 
-I64 i;
-for (i=0;i<9;i++)
-  AFGetKey(SC_CURSOR_DOWN);
-
-TourPut(
-"Keyboard commands are:\n\n"
-"$$GREEN$$<SPACE>$$FG$$\t\tLeft-action\n"
-"$$GREEN$$<ENTER>$$FG$$\t\tRight-action\n"
-"$$GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
-"$$GREEN$$<SHIFT-ESC>$$FG$$\tAbort and exit\n",TRUE);
-
-TourPut(
-"The cursor is now on top of a macro we wish to run.\n"
-"\n"
-"Press $$GREEN$$<SPACE>$$FG$$.\n");
-AFGetStr(" ");
-
-TourPut(
-"The macro changed directories and did a $$GREEN$$Dir;$$FG$$ command.  "
-"The $$RED$$RED$$FG$$ filenames listed are file links.  Left-clicking will "
-"edit/view them.  Right-clicking or pressing $$GREEN$$<ENTER>$$FG$$ when the "
-"cursor is on top will bring-up a menu of options.\n\n"
-"The $$LTBLUE$$BLUE$$FG$$ underline entries \"$$LTBLUE$$.$$FG$$\" "
-"and \"$$LTBLUE$$..$$FG$$\""
-"are macros and will change directories.\n",TRUE);
-
-TourPut(
-"Press $$GREEN$$<CTRL-t>$$FG$$ to toggle to plain text mode.\n\n"
-"These are \"DolDoc\" commands.");
-AFGetChar(CH_CTRLT);
-
-TourPut(
-"The DolDoc widgets are bracketed with dollar sign characters.\n\n"
-"\"LK\" stands \"link\".\n"
-"\"MA\" stands for \"macro\".\n\n"
-"Now, $$GREEN$$<CTRL-t>$$FG$$ to toggle back to regular mode.\n");
-AFGetChar(CH_CTRLT);
-Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+RevealPopUpHelp(SCF_CTRL);
+RevealPopUpHelp(SCF_CTRL|SCF_SHIFT);
+RevealPopUpHelp(SCF_ALT);
+RevealPopUpHelp(SCF_ALT|SCF_SHIFT);
+RevealPopUpHelp(SCF_CTRL|SCF_ALT);
+RevealPopUpHelp(SCF_CTRL|SCF_ALT|SCF_SHIFT);
 

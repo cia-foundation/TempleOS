@@ -8,31 +8,31 @@
 
 #assert I_USER==0x40
 
-interrupt U0 MyVect40()
+interrupt U0 IntMy40()
 {
   lock {progress1++;}
 *LAPIC_EOI(U32 *)=0;
 }
 
-interrupt U0 MyVect41()
+interrupt U0 IntMy41()
 {
   lock {progress2++;}
 *LAPIC_EOI(U32 *)=0;
 }
 
-interrupt U0 MyVect42()
+interrupt U0 IntMy42()
 {
   lock {progress3++;}
 *LAPIC_EOI(U32 *)=0;
 }
 
-interrupt U0 MyVect43()
+interrupt U0 IntMy43()
 {
   lock {progress4++;}
 *LAPIC_EOI(U32 *)=0;
 }
 
-I64 vect[4]={&MyVect40,&MyVect41,&MyVect42,&MyVect43};
+I64 vect[4]={&IntMy40,&IntMy41,&IntMy42,&IntMy43};
 
 U0 Main()
 {

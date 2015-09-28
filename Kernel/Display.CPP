@@ -6,7 +6,6 @@ the normal screen text output routine.
 
 See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 */
-  Bool old_preempt=Preempt;
   I64 i,row,col;
   U8 *ptr,*ptr1,*ptr2;
 
@@ -16,20 +15,16 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 	text.raw_flags&=~RWF_IN_DOLLAR;
 	if (!(text.raw_flags & RWF_LAST_DOLLAR)) {
 	  text.raw_flags&=~RWF_LAST_DOLLAR;
-	  Preempt(old_preempt);
 	  return;
 	}
       } else {
 	text.raw_flags|=RWF_IN_DOLLAR|RWF_LAST_DOLLAR;
-	Preempt(old_preempt);
 	return;
       }
     }
     text.raw_flags&=~RWF_LAST_DOLLAR;
-    if (text.raw_flags&RWF_IN_DOLLAR) {
-      Preempt(old_preempt);
+    if (text.raw_flags&RWF_IN_DOLLAR)
       return;
-    }
   }
   if (ch=='\t') {
     RawPutChar(CH_SPACE);
@@ -88,7 +83,6 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
     }
     text.raw_col++;
   }
-  Preempt(old_preempt);
 }
 
 U0 VGAFlush()
@@ -127,4 +121,19 @@ U0 WinDerivedValsUpdate(CTask *task=NULL)
     task->border_pix_bottom	=task->pix_bottom+FONT_HEIGHT;
   }
   POPFD
+}
+
+Bool WinInside(I64 x,I64 y,CTask *task=NULL,Bool border=FALSE)
+{//Is pixel (x,y) inside task's win?
+  if (!task) task=Fs;
+  if (TaskValidate(task) && Bt(&task->display_flags,DISPLAYf_SHOW)) {
+    if (border) {
+      if (task->border_pix_left<=x<=task->border_pix_right &&
+	    task->border_pix_top<=y<=task->border_pix_bottom)
+	return TRUE;
+    } else if (task->pix_left<=x<=task->pix_right &&
+	  task->pix_top<=y<=task->pix_bottom)
+      return TRUE;
+  }
+  return FALSE;
 }

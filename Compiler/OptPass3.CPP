@@ -23,7 +23,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
       member_cnt+=2;
     mv=CAlloc(member_cnt*sizeof(COptMemberVar));
     member_cnt=0;
-    tempm=cc->htc.fun->member_lst;
+    tempm=cc->htc.fun->member_lst_and_root;
     while (tempm) {
       tempc=OptClassFwd(tempm->member_class);
       if (0<=tempm->reg<NUM_REGS) {
@@ -448,7 +448,6 @@ here1:
 	case IC_LBTC:
 	case IC_BSF:
 	case IC_BSR:
-	case IC_PREEMPT:
 	case IC_SIGN_I64:
 	case IC_TOUPPER:
 	case IC_TO_I64:
@@ -562,7 +561,7 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 	}
       }
       if (j>0) {
-	if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
+	if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT))
 	  "Fun:%s\n",cc->htc.fun->str;
 	if (j>cmp.num_reg_vars) {
 	  l=0;
@@ -577,7 +576,7 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 		tempm->reg=cmp.non_ptr_vars_map[l++];
 		reg_offsets[tempm->reg].offset=mv[i].offset_start;
 		reg_offsets[tempm->reg].m=tempm;
-		if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
+		if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT))
 		  "Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 			tempm->str,reg_offsets[tempm->reg].offset;
 		mv[i].offset_start=0; //flag as reg var
@@ -606,7 +605,7 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 	      tempm->reg=cmp.to_reg_vars_map[l++];
 	      reg_offsets[tempm->reg].offset=mv[i].offset_start;
 	      reg_offsets[tempm->reg].m=tempm;
-	      if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT))
+	      if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT))
 		"Reg %Z Var \"%-15ts\" %016X[RBP]\n",tempm->reg,"ST_U64_REGS",
 		      tempm->str,reg_offsets[tempm->reg].offset;
 	      if (tempm->size<8 &&

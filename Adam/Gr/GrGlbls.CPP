@@ -23,7 +23,7 @@ public class CGrGlbls
   U0	(*fp_wall_paper)(CTask *task);
   U0	(*fp_draw_input_ptr)(CDC *dc,I64 x,I64 y);
   U0	(*fp_draw_grab_input_ptr)(CDC *dc,I64 x,I64 y,Bool closed);
-  U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/WallPaper.CPP,empty_sprite"$
+  U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/AInputPointer.CPP,empty_sprite"$
 
   #define GR_NUM_PEN_BRUSHES 64
   CDC	*pen_brushes[GR_NUM_PEN_BRUSHES],
@@ -45,7 +45,7 @@ public class CGrGlbls
 HashPublic("GR_WIDTH",HTT_DEFINE_STR);;
 HashPublic("GR_HEIGHT",HTT_DEFINE_STR);;
 
-#help_index "Char"
+#help_index "Char;TextBase Layer/Char"
 DefinePrint("TEXT_ROWS","%d",text.rows);;;
 HashPublic("TEXT_ROWS",HTT_DEFINE_STR);;;
 DefinePrint("TEXT_COLS","%d",text.cols);;;

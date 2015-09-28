@@ -6,13 +6,13 @@ U0 StadiumGen()
   CDC *dc,*dc2;
 
   Cd(__DIR__);
-  WinMax;
-  WinBorder;
   AutoComplete;
+  WinBorder;
+  WinMax;
+  DocCursor(OFF);
   DocClear;
   Type("StadiumBG.TXT");
   "$$CM,0,%d$$",TEXT_ROWS-3;
-  DocCursor(OFF);
   fp_old_update=gr.fp_final_screen_update; //hide mouse cursor
   gr.fp_final_screen_update=NULL;
 

@@ -110,9 +110,9 @@ U0 Whap()
   CMathODE *ode=ODENew(0,1e-2,ODEF_HAS_MASSES);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  WinMax;
   AutoComplete;
-  Preempt;
+  WinBorder;
+  WinMax;
 
   MenuPush(
 	"File {"

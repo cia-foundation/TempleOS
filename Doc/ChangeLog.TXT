@@ -2,7 +2,120 @@
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----07/20/15 11:24:35----$IV,0$
+$IV,1$----09/27/15 21:18:10----$IV,0$
+
+$IV,1$----09/27/15 11:46:44----$IV,0$
+* Got rid of preemption.
+
+$IV,1$----09/23/15 14:17:35----$IV,0$
+* No arrays in fun args.
+* Got rid of 4x4 array dimensions in function args.
+
+$IV,1$----09/05/15 11:26:12----$IV,0$
+* Gave $LK,"I_DIV_ZERO",A="MN:I_DIV_ZERO"$ its own vector instead of common fault vector.
+* $LK,"R",A="MN:R"$("$FG,4$Dsk$FG$","$FG,4$BlkDev$FG$");
+
+$IV,1$----09/04/15 17:04:39----$IV,0$
+* $BK,1$TempleOS version 3.11 Released$BK,0$
+
+$IV,1$----08/28/15 01:50:15----$IV,0$
+*  Added $LK,"BibleView",A="MN:BibleView"$() and $FG,2$<CTRL-ALT-b>$FG$.
+
+$IV,1$----08/25/15 23:29:48----$IV,0$
+* Moved $LK,"ToDolDoc",A="MN:ToDolDoc"$() to $FG,2$/Adam/Opt/Utils$FG$.
+* $LK,"R",A="MN:R"$("$FG,4$map$FG$","$FG,4$fat$FG$");
+
+$IV,1$----08/22/15 20:38:15----$IV,0$
+* $LK,"R",A="MN:R"$("$FG,4$CDImageWrite$FG$","$LK,"DVDImageWrite",A="MN:DVDImageWrite"$");
+* $LK,"R",A="MN:R"$("$FG,4$MakeDistro$FG$","$FG,4$DoDistro$FG$");
+* $LK,"R",A="MN:R"$("$FG,4$::/Home/Adam*.CPP$FG$","$FG,4$::/Home/Home*.CPP$FG$");
+* Created $FG,2$Make*.CPP$FG$ make dir files.
+* Moved $FG,2$/Adam/Boot$FG$ and $FG,2$/Adam/Utils$FG$ to $FG,2$/Adam/Opt$FG$.
+
+$IV,1$----08/21/15 19:14:29----$IV,0$
+* $BK,1$TempleOS version 3.10 Released$BK,0$
+
+$IV,1$----08/20/15 20:05:08----$IV,0$
+* Fixed bug in $LK,"::/Adam/ABlkDev/FileMgr.CPP"$.
+* Fixed bug in $LK,"::/Demo/Games/TreeCheckers.CPP"$.
+
+$IV,1$----08/18/15 07:28:03----$IV,0$
+* Improved $LK,"::/PersonalMenu.TXT"$.
+* Improved $LK,"::/Demo/Games/BattleLines.CPP"$.
+
+$IV,1$----08/16/15 14:42:01----$IV,0$
+* Improved $LK,"::/Demo/Games/BlackDiamond.CPP"$.
+* Improved $LK,"::/Demo/Games/EagleDive.CPP"$.
+* Improved $LK,"::/Demo/Games/RawHide.CPP"$.
+* Improved $LK,"::/Apps/TimeOut/TimeOut.CPP"$.
+* Improved $LK,"::/Demo/Games/FlapBat.CPP"$.
+* Improved $LK,"::/Demo/Games/Varoom.CPP"$.
+* Improved $LK,"::/Demo/Games/BomberGolf.CPP"$.
+
+$IV,1$----08/09/15 09:47:10----$IV,0$
+* Cleaned-up Ultra distro.
+
+$IV,1$----08/08/15 06:14:09----$IV,0$
+* $BK,1$TempleOS version 3.09 Released$BK,0$
+
+$IV,1$----08/06/15 09:28:49----$IV,0$
+* Removed most Moses comics so you can make your own.
+* Removed most hymns so that you can make your own.
+
+$IV,1$----08/05/15 21:39:59----$IV,0$
+* Fixed bug parsing "$$GREEN FG$$".  It is an error.
+
+$IV,1$----08/05/15 13:49:10----$IV,0$
+* Fixed bug in $LK,"SrvCmdsHandler",A="MN:SrvCmdsHandler"$() && $LK,"SrvTaskCont",A="MN:SrvTaskCont"$().
+
+$IV,1$----08/03/15 18:09:33----$IV,0$
+* Improved $LK,"::/Demo/Games/FlapBat.CPP"$.
+
+$IV,1$----08/02/15 07:19:59----$IV,0$
+* $LK,"R",A="MN:R"$("$FG,4$BugBird$FG$","$FG,4$FlapBat$FG$");
+
+$IV,1$----08/02/15 02:51:04----$IV,0$
+* Rearranged $LK,"::/Adam/DolDoc/MakeDoc.CPP"$.
+* Got rid of ext ascii with alt-digits keys.  Just use $FG,2$<CTRL-ALT-a>$FG$.
+* Rearranged $LK,"DocPutKey",A="MN:DocPutKey"$().
+* Got rid of $FG,4$PressKeyHelp$FG$().
+* $LK,"R",A="MN:R"$("$FG,4$CtrlAltLet$FG$","$FG,4$CtrlAlt$FG$");
+
+$IV,1$----07/30/15 22:26:22----$IV,0$
+* Fixed bug.  Now, turned-off preemption in $LK,"WinMgrTask",A="MN:WinMgrTask"$().
+* Added $LK,"::/Misc/Tour/Tour1.AUT"$.
+
+$IV,1$----07/30/15 03:38:10----$IV,0$
+* Added ::/Apps/Psalmody/Examples/caesar.CPP
+
+$IV,1$----07/29/15 10:17:29----$IV,0$
+* Improved $LK,"::/Linux/TOSZ.CPP"$.
+* Rearranged AutoComplete and $LK,"KeyMap",A="MN:KeyMap"$() code.
+* Added $LK,"WinInside",A="MN:WinInside"$().
+* Added $LK,"SYS_SEMA_JUST_PUMP_MSGS",A="MN:SYS_SEMA_JUST_PUMP_MSGS"$.
+* Added help for $FG,2$<ALT>$FG$ & $FG,2$<CTRL>$FG$ keys.
+* Added $LK,"WIf_SELF_KEY_DESC",A="MN:WIf_SELF_KEY_DESC"$.
+
+$IV,1$----07/26/15 06:57:29----$IV,0$
+* Cleaned-up $LK,"MemberClassBaseFind",A="MN:MemberClassBaseFind"$() and $LK,"MemberAdd",A="MN:MemberAdd"$().
+* $LK,"R",A="MN:R"$("$FG,4$member_lst$FG$","$FG,4$member_lst_and_root$FG$");
+
+$IV,1$----07/24/15 19:35:12----$IV,0$
+* $BK,1$TempleOS version 3.08 Released$BK,0$
+* Fixed $LK,"UAsm",A="FI:::/Compiler/UAsm.CPP"$ bug.
+* $LK,"R",A="MN:R"$("$FG,4$CTrace$FG$","$LK,"Trace",A="MN:Trace"$()");
+* $LK,"R",A="MN:R"$("$FG,4$OTrace$FG$","$LK,"PassTrace",A="MN:PassTrace"$()");
+* $LK,"R",A="MN:R"$("$FG,4$OTraceMask$FG$","$LK,"PassTrace",A="MN:PassTrace"$()");
+* $LK,"R",A="MN:R"$("$FG,4$GetEqu$FG$","$LK,"Option",A="MN:Option"$()");
+* $LK,"R",A="MN:R"$("$FG,4$GetOpt$FG$","$LK,"GetOption",A="MN:GetOption"$()");
+* $LK,"R",A="MN:R"$("$FG,4$OptOn$FG$","$LK,"Option",A="MN:Option"$(,ON)");
+* $LK,"R",A="MN:R"$("$FG,4$OptOff$FG$","$LK,"Option",A="MN:Option"$(,OFF)");
+* Added $LK,"Dsk Stk Diagram",A="FI:::/Doc/FileLowLevel.TXT"$.
+
+$IV,1$----07/22/15 22:45:16----$IV,0$
+* Fixed bug in $LK,"EdFindReplace",A="MN:EdFindReplace"$().
+
+$IV,1$----07/20/15 19:48:53----$IV,0$
 * Added args to $LK,"Del",A="MN:Del"$().
 * Rearranged disk code.
 * $LK,"R",A="MN:R"$("$FG,4$CFileAccess$FG$","$LK,"CDirContext",A="MN:CDirContext"$");
@@ -24,12 +137,12 @@ $IV,1$----06/26/15 12:54:41----$IV,0$
 * $BK,1$TempleOS version 3.07 Released$BK,0$
 
 $IV,1$----06/19/15 18:16:11----$IV,0$
-* Added $LK,"::/Apps/Psalmody/Examples/science.CPP.Z"$.
-* Added $LK,"::/Apps/AfterEgypt/Comics/Moses84.TXT.Z"$.
-* Added $LK,"::/Apps/AfterEgypt/Comics/Moses85.TXT.Z"$.
+* Added ::/Apps/Psalmody/Examples/science.CPP
+* Added ::/Apps/AfterEgypt/Comics/Moses84.TXT
+* Added ::/Apps/AfterEgypt/Comics/Moses85.TXT
 
 $IV,1$----06/13/15 07:36:01----$IV,0$
-* Improved $LK,"::/Demo/Games/EagleDive.CPP.Z"$.
+* Improved $LK,"::/Demo/Games/EagleDive.CPP"$.
 
 $IV,1$----06/11/15 19:26:27----$IV,0$
 * Fixed bug in $FG,2$<F2>$FG$ macros.
@@ -37,7 +150,7 @@ $IV,1$----06/11/15 19:26:27----$IV,0$
 
 $IV,1$----06/04/15 08:31:15----$IV,0$
 * Improved assembler and unassembler.
-* Added $LK,"::/Doc/HelloWorld.TXT.Z"$.
+* Added $LK,"::/Doc/HelloWorld.TXT"$.
 
 $IV,1$----05/26/15 21:10:30----$IV,0$
 * Added $LK,"DCF_PALETTE",A="MN:DCF_PALETTE"$.
@@ -51,17 +164,17 @@ $IV,1$----05/23/15 09:46:51----$IV,0$
 * $LK,"R",A="MN:R"$("$FG,4$VGAPalette4Get$FG$","$LK,"GrPaletteGet",A="MN:GrPaletteGet"$");
 * $LK,"R",A="MN:R"$("$FG,4$VGAPalette4Set$FG$","$LK,"GrPaletteSet",A="MN:GrPaletteSet"$");
 * Added flags to $LK,"DCSave",A="MN:DCSave"$() and $LK,"GRAWrite",A="MN:GRAWrite"$().
-* Added palettes to $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT.Z"$.
+* Added palettes to $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.
 
 $IV,1$----05/19/15 21:28:19----$IV,0$
-* Fixed bug in $LK,"::/Apps/Psalmody/PsalmodyFile.CPP.Z"$.
+* Fixed bug in $LK,"::/Apps/Psalmody/PsalmodyFile.CPP"$.
 
 $IV,1$----05/18/15 09:05:45----$IV,0$
 * $BK,1$TempleOS version 3.06 Released$BK,0$
 * $LK,"R",A="MN:R"$("$FG,4$BIOS32$FG$","$FG,4$PCIBIOS$FG$");
 
 $IV,1$----05/14/15 15:39:41----$IV,0$
-* Enhanced $LK,"::/Apps/Psalmody/Examples/abyss.CPP.Z"$.
+* Enhanced ::/Apps/Psalmody/Examples/abyss.CPP
 
 $IV,1$----05/13/15 07:51:00----$IV,0$
 * Fixed bug in $LK,"ToHtml",A="MN:ToHtml"$().
@@ -124,19 +237,19 @@ $IV,1$----04/30/15 19:13:07----$IV,0$
 * Cleaned-up $LK,"Who",A="MN:Who"$() and compiler mapfiles.
 
 $IV,1$----04/11/15 05:48:05----$IV,0$
-* Fixed bug in $LK,"DrvMapBlkClean",A="MN:DrvMapBlkClean"$().
+* Fixed bug in $LK,"DrvFATBlkClean",A="MN:DrvFATBlkClean"$().
 
 $IV,1$----04/09/15 04:42:31----$IV,0$
-* Improved $LK,"::/Demo/Games/TreeCheckers.CPP.Z"$.
+* Improved $LK,"::/Demo/Games/TreeCheckers.CPP"$.
 
 $IV,1$----04/08/15 15:24:27----$IV,0$
 * $LK,"R",A="MN:R"$("DocDo","DocEd");
 
 $IV,1$----04/07/15 05:27:38----$IV,0$
-* Added $LK,"::/Apps/Psalmody/Examples/whos.CPP.Z"$.
+* Added ::/Apps/Psalmody/Examples/whos.CPP
 
 $IV,1$----04/04/15 14:27:07----$IV,0$
-* Enhanced $LK,"::/Apps/Psalmody/Examples/proponent.CPP.Z"$.
+* Enhanced ::/Apps/Psalmody/Examples/proponent.CPP
 
 $IV,1$----03/30/15 10:29:57----$IV,0$
 * $LK,"R",A="MN:R"$("cur_data_col","cur_col");
@@ -144,15 +257,15 @@ $IV,1$----03/30/15 10:29:57----$IV,0$
 * Fixed bug in $LK,"EdLineDown",A="MN:EdLineDown"$().
 
 $IV,1$----03/28/15 02:41:15----$IV,0$
-* Fixed $LK,"::/Demo/Snd/WaterFowl.CPP.Z"$.
-* Added $LK,"::/Demo/Graphics/Grid.CPP.Z"$.
-* Enhanced $LK,"::/Apps/Psalmody/Examples/image.CPP.Z"$.
-* Enhanced $LK,"::/Apps/Psalmody/Examples/dream.CPP.Z"$.
-* Enhanced $LK,"::/Apps/Psalmody/Examples/killed.CPP.Z"$.
-* Enhanced $LK,"::/Apps/Psalmody/Examples/worship.CPP.Z"$.
+* Fixed $LK,"::/Demo/Snd/WaterFowl.CPP"$.
+* Added $LK,"::/Demo/Graphics/Grid.CPP"$.
+* Enhanced ::/Apps/Psalmody/Examples/image.CPP
+* Enhanced ::/Apps/Psalmody/Examples/dream.CPP
+* Enhanced ::/Apps/Psalmody/Examples/killed.CPP
+* Enhanced ::/Apps/Psalmody/Examples/worship.CPP
 
 $IV,1$----03/23/15 07:21:26----$IV,0$
-* Updated $LK,"::/Demo/Graphics/Pick.CPP.Z"$.
+* Updated $LK,"::/Demo/Graphics/Pick.CPP"$.
 * Modified $LK,"DCF_LOCATE_NEAREST",A="MN:DCF_LOCATE_NEAREST"$.
 
 $IV,1$----03/21/15 09:10:58----$IV,0$
@@ -164,13 +277,13 @@ $IV,1$----03/18/15 02:00:15----$IV,0$
 
 $IV,1$----03/14/15 07:08:05----$IV,0$
 * $BK,1$TempleOS version 3.04 Released$BK,0$
-* Reformatted $LK,"::/Kernel/Font8x8.CPP.Z"$.
+* Reformatted $LK,"::/Kernel/Font8x8.CPP"$.
 * Added $LK,"PopUpGetF64",A="MN:PopUpGetF64"$().
 
 $IV,1$----03/14/15 04:48:50----$IV,0$
 * $LK,"R",A="MN:R"$("AcctReg...","Reg...");
 * Overhauled $LK,"GrUpdateTasks",A="MN:GrUpdateTasks"$().
-* Overhauled $LK,"::/Doc/GraphicsOverview.TXT.Z"$.
+* Overhauled $LK,"::/Doc/GraphicsOverview.TXT"$.
 
 $IV,1$----03/09/15 06:07:25----$IV,0$
 * Dict now has extended ASCII chars.
@@ -182,11 +295,11 @@ $IV,1$----02/25/15 02:51:45----$IV,0$
 * Added IRC ChatBot $LK,"::/Linux/TempleBot",A="PI:::/Linux/TempleBot"$.
 
 $IV,1$----02/21/15 19:07:32----$IV,0$
-* Added $LK,"::/Demo/DolDoc/NumBible.CPP.Z"$.
+* Added $LK,"::/Demo/DolDoc/NumBible.CPP"$.
 
 $IV,1$----02/19/15 18:39:53----$IV,0$
 * Fixed bug in $FG,2$<SHIFT-F6>$FG$ $LK,"GodDoodle",A="MN:GodDoodle"$().
-* Made default arg for $LK,"Preempt",A="MN:Preempt"$() into "OFF".
+* Made default arg for $FG,4$Preempt$FG$() into "OFF".
 
 $IV,1$----02/17/15 21:32:26----$IV,0$
 * Made so cmd line doesn't print answer line unless a new answer occurs.
@@ -195,7 +308,7 @@ $IV,1$----02/14/15 05:12:45----$IV,0$
 * Added $LK,"Dump",A="MN:Dump"$().
 
 $IV,1$----02/13/15 13:46:14----$IV,0$
-* Got rid of "body_size" in $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT.Z"$.
+* Got rid of "body_size" in $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.
 
 $IV,1$----02/13/15 09:49:33----$IV,0$
 * $BK,1$TempleOS version 3.03 Released$BK,0$

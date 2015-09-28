@@ -1,43 +1,29 @@
-Bool OptEqu(I64 num,Bool val)
-{//Set compiler option to value.
+Bool Option(I64 num,Bool val)
+{//Set compiler $LK,"option",A="MN:OPTf_ECHO"$ to value.
   return BEqu(&Fs->last_lex->opts,num,val);
 }
 
-Bool OptOn(I64 num)
-{//Turn on compiler option.
-  return OptEqu(num,ON);
-}
-
-Bool OptOff(I64 num)
-{//Turn off compiler option.
-  return OptEqu(num,OFF);
-}
-
-Bool GetOpt(I64 num)
-{//Get state of compiler option.
+Bool GetOption(I64 num)
+{//Get state of compiler $LK,"option",A="MN:OPTf_ECHO"$.
   return Bt(&Fs->last_lex->opts,num);
 }
 
-Bool OTrace(Bool val)
-{//Displays intermediate code after passes through optimization.
-  return OptEqu(OPTf_OPT_TRACE,val);
-}
-
-I64 OTraceMask(I64 i=0b10001111101)
+I64 PassTrace(I64 i=0b10001111101)
 {//Ctrls which optimizer passes are displayed.
-  I64 old=Fs->last_lex->otrace_mask;
-  Fs->last_lex->otrace_mask=i;
+  I64 old=Fs->last_lex->pass_trace;
+  if (i) Fs->last_lex->saved_pass_trace=i;
+  Fs->last_lex->pass_trace=i;
   return old;
 }
 
-Bool CTrace(Bool val)
+Bool Trace(Bool val)
 {//Displays assembly code output from compiler.
-  return OptEqu(OPTf_COMPILE_TRACE,val);
+  return Option(OPTf_TRACE,val);
 }
 
 Bool Echo(Bool val)
 {//Displays text as it is being compiled.
-  return OptEqu(OPTf_ECHO,val);
+  return Option(OPTf_ECHO,val);
 }
 
 U0 StreamPrint(U8 *fmt,...)

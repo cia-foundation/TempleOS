@@ -12,7 +12,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * There is no $FG,2$PATH$FG$.  You do not enter filenames at the command-line and expect them to run.  You enter C-like code.  $LK,"Get Started Here",A="FI:::/Doc/CmdLineOverview.TXT"$.
 
-* If you use $LK,"Grub",A="FI:::/Doc/Grub.TXT"$, you $FG,2$chain-load$FG$ like Windows.  You can use the TempleOS boot-loader.  $LK,"Master-Boot-Loader-Stage1",A="FI:::/Adam/Boot/BootMHD.CPP"$, $LK,"Master-Boot-Loader-Stage2",A="FI:::/Adam/Boot/BootMHD2.CPP"$, $LK,"Partition-Boot-Loader",A="FI:::/Adam/Boot/BootHD.CPP"$, $LK,"CD-DVD-Boot-Loader",A="FI:::/Adam/Boot/BootCD.CPP"$.
+* If you use $LK,"Grub",A="FI:::/Doc/Grub.TXT"$, you $FG,2$chain-load$FG$ like Windows.  You can use the TempleOS boot-loader.  $LK,"Master-Boot-Loader-Stage1",A="FI:::/Adam/Opt/Boot/BootMHD.CPP"$, $LK,"Master-Boot-Loader-Stage2",A="FI:::/Adam/Opt/Boot/BootMHD2.CPP"$, $LK,"Partition-Boot-Loader",A="FI:::/Adam/Opt/Boot/BootHD.CPP"$, $LK,"CD-DVD-Boot-Loader",A="FI:::/Adam/Opt/Boot/BootDVD.CPP"$.
 
 * The boot-loaders must be patched by you running $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() or $LK,"MasterBootIntall",A="MN:MasterBootIntall"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2",A="FI:::/Kernel/KStart.CPP"$ if you relocate it.
 
@@ -28,7 +28,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * TempleOS has a dictionary that is shipped compressed.  When you boot the first time it is uncompressed.  TempleOS has a Windows utility for uncompressing.  That utility needs $FG,2$Microsoft DLL$FG$ files.  TempleOS does not use any libraries, modules or code from other sources -- I wrote it all from scratch and it is self-contained.
 
-* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  TempleOS is $TX,"120,629",D="DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot $FG,2$JIT$FG$.  The rest is $FG,2$JIT$FG$ demos and applications.
+* There are no OBJ or EXE files.  There are only two files compiled ahead-of-time -- $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$.  You can delete them and recompile with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  TempleOS is $TX,"119,216",D="DD_TEMPLEOS_LOC"$ lines.  Roughly 50,000 is compiled AOT and 50,000 during boot $FG,2$JIT$FG$.  The rest is $FG,2$JIT$FG$ demos and applications.
 
 * A major difference between TempleOS and other systems is that the heap and compiler sym table are associated with tasks, not applications.
 
@@ -60,7 +60,7 @@ $WW,1$$FG,5$$TX+CX,"Mysteries"$$FG$
 
 * TempleOS supports $FG,2$FAT32$FG$ and $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file systems.  The $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ partitions will appear as $FG,2$FAT32$FG$ to other operating systems, but will not work.  Do not access the native TempleOS partitions from other operating systems.  This was to fool a bootloader when I tricked it to use it's recovery partition feature.
 
-* The CPU usage during disk operation expands to 99%.  It polls while swapping-out.  You can do other, non-disk activity during disk operations because it swaps-out a lot and task swaps take only half a microsecond, probably a hundred times faster than a typical OS.  See $LK,"Cooperative Multitasking",A="FI:::/Demo/Lectures/Spinning.CPP"$.  It does not break-up disk operations into small pieces for sharing, however, so the disk is lock onto that one task.
+* The CPU usage during disk operation expands to 99%.  It polls while swapping-out.  You can do other, non-disk activity during disk operations because it swaps-out a lot and task swaps take only half a microsecond, probably a hundred times faster than a typical OS.  It does not break-up disk operations into small pieces for sharing, however, so the disk is lock onto that one task.
 
 $FG,8$
 * "Windows" is a trademark of MicroSoft Corp.

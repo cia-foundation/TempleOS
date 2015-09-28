@@ -11,9 +11,10 @@ U0 SymmetryDemo()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
 
+  WinBorder;
   WinMax;
-  DCFill;
   DocClear;
+  DCFill;
   dc->flags|=DCF_SYMMETRY;
   DCSymmetrySet(dc,Fs->pix_width/2,0,Fs->pix_width/2,1);
   do {
@@ -50,10 +51,8 @@ U0 SymmetryDemo()
 	}
 	GrLine3(dc,x1,y1,0,x2,y2,0);
 	break;
-      case MSG_KEY_DOWN:
-	break;
     }
-  } while (msg_code!=MSG_KEY_DOWN || !a1);
+  } while (msg_code!=MSG_KEY_DOWN || (a1!=CH_ESC && a1!=CH_SHIFT_ESC));
   GetMsg(,,1<<MSG_KEY_UP);
   DCFill;
   DCDel(dc);

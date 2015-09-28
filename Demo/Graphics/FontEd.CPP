@@ -79,8 +79,8 @@ U0 FontEd()
 	"  Exit(,CH_ESC);"
 	"}");
   AutoComplete;
-  DocClear;
   DocCursor;
+  DocClear;
   Fs->win_inhibit|=WIG_DBL_CLICK;
   cur_ch=0;
   try {

@@ -1,10 +1,21 @@
 TourPut(
-"We will now run a test-suite that automatically executes most TempleOS "
-"demos.  It takes a few minutes, so kick-back.\n\n"
-"Press $$GREEN$$<ENTER>$$FG$$ in a moment.\n",TRUE);
+"All text widgets work everywhere.  The $$GREEN$$Type()$$FG$$ command is like "
+"the DOS command of the same name or the UNIX, $$GREEN$$cat$$FG$$ command.  "
+"We will, now, send your menu document to the command line.  It uses the "
+"same document format and the icons are even active!!\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
 
-if (LBtr(&tour_put->display_flags,DISPLAYf_SHOW))
-  WinZBufUpdate;
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
 
-"#include \"::/Misc/OSTestSuite\";";
+"Type(\"::/Home/PersonalMenu.TXT\");";
 AFGetStr("\n");
+
+Sleep(1500);
+AFPrint(250,"Dir;\n");
+
+Sleep(1500);
+TourPut(
+"$$GREEN$$Type()$$FG$$ can also be used on $$GREEN$$.BMP$$FG$$ or $$GREEN$$.GRA$$FG$$ "
+"files!",TRUE);

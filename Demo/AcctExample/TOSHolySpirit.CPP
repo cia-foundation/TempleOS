@@ -127,7 +127,7 @@ class CTopMoviesForm
   U8	tag[STR_LEN];
   U8	special[STR_LEN];
   I64	timestamp;
-  I64	cert		fmtstr "$$DA,32,A=\"Movie #1-100 :%d\"$$\n";
+  I64	cert		fmtstr "$$DA-TRM,2,A=\"Movie #1-100 :%02d\"$$\n";
   I64	min;
   I64	sec;
 };
@@ -155,7 +155,7 @@ class CWebBibleForm
 class CYouTubeForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,11,A=\"SerialNum:%11s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min		fmtstr "$$DA,32,A=\"Minutes  :%d\"$$\n";
@@ -165,7 +165,7 @@ class CYouTubeForm
 class CTopMoviesYouTubeForm
 {
   U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Movie    :%s\"$$\n";
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min		fmtstr "$$DA,32,A=\"Minutes  :%d\"$$\n";
@@ -175,7 +175,7 @@ class CTopMoviesYouTubeForm
 class CImgurForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min		fmtstr "$$DA,32,A=\"Width    :%d\"$$\n";
@@ -185,7 +185,7 @@ class CImgurForm
 class CWikipediaForm
 {
   U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Index   :%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Index   :%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -195,7 +195,7 @@ class CWikipediaForm
 class CRandDecForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Dec):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Dec):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -205,7 +205,7 @@ class CRandDecForm
 class CRandHexForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -222,10 +222,22 @@ class CRandCertForm
   I64	sec;
 };
 
-class CRandHexBeaconForm
+class CRandHexBeacon5Form
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
+  U8	special[STR_LEN]
+			fmtstr "$$DA-P-TRM,5,A=\"Line (5-Digit Hex):%5s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,32,A=\"TimeStamp :%d\"$$\n";
+  I64	cert;
+  I64	min;
+  I64	sec;
+};
+
+class CRandHexBeacon8Form
+{
+  U8	tag[STR_LEN];
+  U8	special[STR_LEN]
+			fmtstr "$$DA-P-TRM,8,A=\"Line (8-Digit Hex):%8s\"$$\n";
   I64	timestamp	fmtstr "$$DA,32,A=\"TimeStamp :%d\"$$\n";
   I64	cert;
   I64	min;
@@ -311,7 +323,53 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
   }
 }
 
-#define NIST_TIME_OFFSET	(-7788-local_time_offset/CDATE_FREQ)
+public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
+	I64 rand_i32=MIN_I64,Bool full=FALSE)
+{//Make God pick a book passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
+  CDirEntry *tempde=FilesFind(files_find_mask,
+	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT),
+	*tempde1=tempde;
+  I64 i=0;
+  U8 *st,*st2=NULL;
+  while (tempde) {
+    st=FileRead(tempde->full_name);
+    tempde->user_data=StrLen(st);
+    if (full)
+      "%08X-",i;
+    if (tempde->user_data>=len)
+      i+=tempde->user_data+1-len;
+    if (full)
+      "%08X:$$LK,\"%s\",A=\"FI:%s\"$$\n",
+	    i-1,tempde->full_name+2,tempde->full_name;
+    Free(st);
+    tempde=tempde->next;
+  }
+  if (rand_i32<0)
+    rand_i32=GodBits(32);
+  if (full)
+    "\n%08X*%08X",rand_i32,i;
+  i*=rand_i32;
+  if (full)
+    "=%08X.%08X\n",i.u32[1],i.u32[0];
+  i=i.u32[1];
+  tempde=tempde1;
+  while (tempde) {
+    if (!st2 && tempde->user_data>=len) {
+      i-=tempde->user_data+1-len;
+      if (i<0) {
+	st=FileRead(tempde->full_name);
+	st2=st+(tempde->user_data+1-len)+i;
+	st2[len]=0;
+	"%s\n\n$$RED$$%s$$FG$$\n",tempde->full_name,st2;
+	Free(st);
+      }
+    }
+    tempde=tempde->next;
+  }
+  DirTreeDel(tempde1);
+}
+
+#define NIST_TIME_OFFSET	(-7788-21-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()
@@ -336,12 +394,13 @@ U0 InsMyURL()
   url->timestamp=
 	FloorI64((Now-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET-
 	NIST_TIME_TO_SWITCH,60);
-  switch (PopUpPickLst("NISTBeacon\0BibleGatewaySearch\0BibleGatewayVerse\0"
+  switch (PopUpPickLst("NISTBeacon5Bible\0NISTBeacon8Passage\0"
+	"BibleGatewaySearch\0BibleGatewayVerse\0"
 	"YouTube\0Imgur\0Wikipedia\0RandomNumbers.info\0Random.org\0PassWord\0"
 	"VirtualNotary\0Nist\0HotBits\0GenerateData\0WebBookMark\0"
 	"Roulette\0Movie\0")) {
     case 0:
-      if (DocForm(url(CRandHexBeaconForm *))) {
+      if (DocForm(url(CRandHexBeacon5Form *))) {
 	"$$TX,\"Guidelines for Talking with God.\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
@@ -351,6 +410,17 @@ U0 InsMyURL()
       }
       break;
     case 1:
+      if (DocForm(url(CRandHexBeacon8Form *))) {
+	"$$TX,\"Guidelines for Talking with God.\","
+	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	Free(tag);
+	GodBooksPassage("C:/Home/Wb2/Files/Text/*",,
+	      Str2I64(url->special,16),TRUE);
+      }
+      break;
+    case 2:
       if (DocForm(url(CWebBibleForm *))) {
 	tag=url->special;
 	st2=URLPercentSpaces(url->special);
@@ -363,7 +433,7 @@ U0 InsMyURL()
 	Free(st);
       }
       break;
-    case 2:
+    case 3:
       if (DocForm(url(CWebBibleForm *))) {
 	tag=url->special;
 	st2=URLPercentSpaces(url->special);
@@ -376,7 +446,7 @@ U0 InsMyURL()
 	Free(st);
       }
       break;
-    case 3:
+    case 4:
       if (DocForm(url(CYouTubeForm *))) {
 	if (url->min || url->sec)
 	  st=MStrPrint("%s&hl=enUS&start=%d",url->special,url->min*60+url->sec);
@@ -395,14 +465,14 @@ U0 InsMyURL()
 	Free(st);
       }
       break;
-    case 4:
+    case 5:
       if (DocForm(url(CImgurForm *))) {
 	"$$HC,\"<img src=\\\"http://i.imgur.com/%s\\\" "
 	      "width=\\\"%d\\\" height=\\\"%d\\\" alt=\\\"\\\">\"$$\n",
 	      url->special,url->min,url->sec;
       }
       break;
-    case 5:
+    case 6:
       if (DocForm(url(CWikipediaForm *))) {
 	tag=url->special;
 	st=MStrPrint("http://en.wikipedia.org/wiki/%s",url->special);
@@ -412,7 +482,7 @@ U0 InsMyURL()
 	Free(st);
       }
       break;
-    case 6:
+    case 7:
       if (DocForm(url(CRandDecForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -421,7 +491,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,10,FALSE,TRUE);
       }
       break;
-    case 7:
+    case 8:
       if (DocForm(url(CRandDecForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -430,7 +500,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
-    case 8:
+    case 9:
       if (DocForm(url(CRandDecForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -439,7 +509,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
-    case 9:
+    case 10:
       if (DocForm(url(CRandCertForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -453,7 +523,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
-    case 10:
+    case 11:
       if (DocForm(url(CRandHexForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -462,7 +532,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
       }
       break;
-    case 11:
+    case 12:
       if (DocForm(url(CRandHexForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -471,7 +541,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
       }
       break;
-    case 12:
+    case 13:
       if (DocForm(url(CRandDecForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
@@ -480,7 +550,7 @@ U0 InsMyURL()
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
-    case 13:
+    case 14:
       if (DocForm(url(CWebBookMarkForm *))) {
 	tag=st=WebBookMarks;
 	if (*url->tag)
@@ -489,17 +559,16 @@ U0 InsMyURL()
 	Free(st);
       }
       break;
-    case 14:
+    case 15:
       if (DocForm(url(CRandDecForm *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="https://www.dublinbet.com/casino_game.html"
-	      "?mode=demo&game=136#gameId=136";
+	tag="https://www.dublinbet.com";
 	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
-    case 15:
+    case 16:
       if (DocForm(url(CTopMoviesForm *)) && (st=TopMoviesRead(,url->cert*2))) {
 	StrCpy(url->tag,st);
 	Free(st);
@@ -536,39 +605,6 @@ U0 InsMyURL()
       break;
   }
   Free(url);
-}
-
-public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512)
-{//Make God pick a book passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.TXT"$
-  CDirEntry *tempm=FilesFind(files_find_mask,
-	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT),
-	*tempm1=tempm;
-  I64 i=0;
-  U8 *st,*st2=NULL;
-  while (tempm) {
-    st=FileRead(tempm->full_name);
-    tempm->user_data=StrLen(st);
-    if (tempm->user_data>=len)
-      i+=tempm->user_data+1-len;
-    Free(st);
-    tempm=tempm->next;
-  }
-  i=(GodBits(24)*i)>>24;
-  tempm=tempm1;
-  while (tempm) {
-    if (!st2 && tempm->user_data>=len) {
-      i-=tempm->user_data+1-len;
-      if (i<0) {
-	st=FileRead(tempm->full_name);
-	st2=st+(tempm->user_data+1-len)+i;
-	st2[len]=0;
-	"%s\n\n%s\n",tempm->full_name,st2;
-	Free(st);
-      }
-    }
-    tempm=tempm->next;
-  }
-  DirTreeDel(tempm1);
 }
 
 if (FileFind("::/Home/Wb2/Files/Words/HappyWords.TXT"))

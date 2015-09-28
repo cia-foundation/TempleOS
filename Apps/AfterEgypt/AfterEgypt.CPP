@@ -160,8 +160,8 @@ U0 TMsg(CDC *dc,U8 *msg)
 U0 Trailer()
 {
   CDC *dc=DCAlias;
-  WinMax;
   WinBorder;
+  WinMax;
   Cd(Fs->parent_task->cur_dir);
   Type("AESplash.TXT");
   Sleep(500);
@@ -180,12 +180,11 @@ U0 AfterEgypt()
 {
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
+  AutoComplete;
   WinBorder;
-  AutoComplete;
-  DocClear;
   WinMax;
+  DocClear;
   PopUp("Trailer;",Fs);
-  AutoComplete;
   try //Catch <CTRL-ALT-c>.
     while (TakeTurn);
   catch

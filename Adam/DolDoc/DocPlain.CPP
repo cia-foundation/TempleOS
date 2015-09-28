@@ -40,53 +40,6 @@ I64 PrsDocFlags(CCmpCtrl *cc,I64 *_de_flags,U32 *_type)
   return result;
 }
 
-I64 DocBinPtrRst(CDoc *doc,CDocEntry *doc_e)
-{
-  U8 *st,*st2;
-  CDoc *doc2;
-  CDocBin *tempb,*tempb2;
-  I64 i,bin_num=0;
-  if (doc_e->de_flags&DOCEF_HAS_BIN &&
-	doc_e->bin_ptr_link && StrLen(doc_e->bin_ptr_link)) {
-    bin_num=doc_e->bin_num;
-    st=StrNew(doc_e->bin_ptr_link);
-    st2=StrNew(st);
-    StrLastRem(st,",",st2);
-    i=Str2I64(st2);
-    if (i>0||*st2) {
-      doc2=DocRead(st);
-      if (i>0  && (tempb2=DocBinFindNum(doc2,i)) ||
-	    i==0 && (tempb2=DocBinFindTag(doc2,st2))) {
-	i=1;
-	if (bin_num>0) {
-	  if (tempb=DocBinFindNum(doc,bin_num)) {
-	    i=tempb->use_cnt;
-	    DocBinDel(doc,tempb);
-	  }
-	} else
-	  bin_num=doc->cur_bin_num++;
-	tempb=MAllocIdentical(tempb2,doc->mem_task);
-	tempb->use_cnt=i;
-	tempb->data=MAllocIdentical(tempb2->data,doc->mem_task);
-	tempb->num=bin_num;
-	doc_e->bin_data=tempb;
-	if (doc_e->de_flags&DOCEF_TAG && doc_e->tag && *doc_e->tag)
-	  tempb->tag=StrNew(doc_e->tag,doc->mem_task);
-	else
-	  tempb->tag=NULL;
-	QueIns(tempb,doc->bin_root.last);
-      } else
-	bin_num=0;
-      DocDel(doc2);
-    } else
-      bin_num=0;
-    Free(st2);
-    Free(st);
-    doc_e->bin_num=bin_num;
-  }
-  return bin_num;
-}
-
 U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 {//TODO: break strs
   I64 i,j,attr=doc_e->attr,
@@ -537,214 +490,124 @@ pd_err:
   return doc_e;
 }
 
-public U0 DocInsEntry(CDoc *doc,CDocEntry *doc_e)
-{//Insert entry into doc, updating its vals.
-  U8 *dst;
-  Bool unlock=DocLock(doc);
-  CDocEntry *doc_ce=doc->cur_entry,*doc_ne;
-
-  doc_e->x=doc_ce->x;
-  doc_e->y=doc_ce->y;
-  doc_e->page_line_num=doc_ce->page_line_num;
-  MemCpy(&doc_e->settings,&doc_ce->settings,sizeof(CDocSettings));
-  if (doc->cur_col>0 &&
-	doc_ce->type_u8==DOCT_TEXT &&
-	!(doc_ce->de_flags&(DOCEF_TAG_CB|DOCEF_DEFINE|
-	DOCEF_HTML_LINK|DOCEF_BIN_PTR_LINK)) &&
-	doc->cur_col<doc_ce->max_col) {
-    dst=doc_ce->tag+doc->cur_col;
-    doc_ne=DocEntryNew(doc,doc_ce,StrNew(dst,doc->mem_task));
-    *dst=0;
-    doc_ne->type=DOCT_TEXT|doc_ce->type&0xFFFFFF00;
-    doc_ce->max_col=doc->cur_col;
-    QueIns(doc_ne,doc_ce);
-    doc->cur_col=0;
-    doc_ce=doc_ne;
-  }
-  if (doc_ce->type_u8==DOCT_TEXT && doc->cur_col>=doc_ce->max_col) {
-    QueIns(doc_e,doc_ce);
-    doc->cur_entry=doc_e->next;
-  } else {
-    QueIns(doc_e,doc_ce->last);
-    doc->cur_entry=doc_ce;
-  }
-  doc->cur_col=doc->cur_entry->min_col;
-  DocRemSoftNewLines(doc,doc->cur_entry);
-  if (unlock)
-    DocUnlock(doc);
-}
-
-#help_index "DolDoc/Output;StdOut/DolDoc"
-CDocEntry *DocPutS(CDoc *doc,U8 *st)
-{//Don't use this.  Use $LK-UL,"DocPrint",A="MN:DocPrint"$().
-//Does not handle partial Doc entries
-  //Returns last newly created dollar-sign CDocEntry.
-  U8 *ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src,
-	*char_bitmap;
-  Bool unlock;
-  I64 ch,j;
-  CDocEntry *doc_e=NULL,*result=NULL,*doc_ce;
-  if (!st || !doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
-    return NULL;
-  unlock=DocLock(doc);
-  if (doc->flags & DOCF_PLAIN_TEXT_WITH_TABS)
-    char_bitmap=chars_bmp_zero_cr_nl_cursor;
-  else if (doc->flags & DOCF_PLAIN_TEXT)
-    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor;
-  else
-    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor_dollar;
-  doc_ce=doc->cur_entry;
-  while (*ptr) {
-    ptr2=ptr;
-    do ch=*ptr++;
-    while (!Bt(char_bitmap,ch) || ch==CH_CURSOR && doc->flags&DOCF_NO_CURSOR);
-    ptr--;
-    if (!ch) {
-      if (j=ptr-ptr2) {
-	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-	doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
-	if (doc->flags & DOCF_NO_CURSOR) {
-	  src=MAlloc(j+1);
-	  MemCpy(src,ptr2,j+1);
-	  StrUtil(src,SUF_REM_CTRL_CHARS);
-	  j=StrLen(src);
+U0 DocEntryToggle(CDoc *doc)
+{
+  Bool unlock=DocLock(doc),old_color_names;
+  CDocEntry *doc_ce=doc->cur_entry,*cl1,*doc_ce2;
+  U8 ch,*st,*st2;
+  I64 i,j,k;
+  if (doc_ce!=doc &&
+	!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))) {
+    if (doc_ce->type_u8==DOCT_TEXT && !(doc_ce->de_flags &
+	  ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
+	  DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	  !(doc_ce->type&DOCG_BL_IV_UL)) {
+      doc_ce2=doc_ce->last;
+      for (k=0;k<20;k++) {
+	if (doc_ce2!=doc) {
+	  cl1=doc_ce2->last;
+	  if (doc_ce2->type_u8==DOCT_TEXT &&
+		doc_ce->de_flags==doc_ce2->de_flags &&
+		doc_ce->type==doc_ce2->type) {
+	    i=StrLen(doc_ce2->tag);
+	    j=StrLen(doc_ce->tag);
+	    st=MAlloc(i+j+1,doc->mem_task);
+	    MemCpy(st,doc_ce2->tag,i);
+	    MemCpy(st+i,doc_ce->tag,j+1);
+	    Free(doc_ce->tag);
+	    doc_ce->tag=st;
+	    doc_ce->max_col=i+j;
+	    doc->cur_col+=i;
+	    DocEntryDel(doc,doc_ce2);
+	  } else if (doc_ce2->type_u8==DOCT_SOFT_NEW_LINE)
+	    DocEntryDel(doc,doc_ce2);
+	  else
+	    break;
+	  doc_ce2=cl1;
 	} else
-	  src=ptr2;
-	doc_e->tag=MAlloc(j+1,doc->mem_task);
-	MemCpy(doc_e->tag,src,j+1);
-	doc_e->max_col=j;
-	DocInsEntry(doc,doc_e);
-	if (doc->flags & DOCF_NO_CURSOR)
-	  Free(src);
+	  break;
+      }
+      doc_ce2=doc_ce->next;
+      for (k=0;k<20;k++) {
+	if (doc_ce2!=doc) {
+	  cl1=doc_ce2->next;
+	  if (doc_ce2->type_u8==DOCT_TEXT &&
+		doc_ce->de_flags==doc_ce2->de_flags &&
+		doc_ce->type==doc_ce2->type) {
+	    i=StrLen(doc_ce->tag);
+	    j=StrLen(doc_ce2->tag);
+	    st=MAlloc(i+j+1,doc->mem_task);
+	    MemCpy(st,doc_ce->tag,i);
+	    MemCpy(st+i,doc_ce2->tag,j+1);
+	    Free(doc_ce->tag);
+	    doc_ce->tag=st;
+	    doc_ce->max_col=i+j;
+	    DocEntryDel(doc,doc_ce2);
+	  } else if (doc_ce2->type_u8==DOCT_SOFT_NEW_LINE)
+	    DocEntryDel(doc,doc_ce2);
+	  else
+	    break;
+	  doc_ce2=cl1;
+	} else
+	  break;
+      }
+      i=doc->cur_col;
+      while (i>doc_ce->min_col && doc_ce->tag[i]!='$$')
+	i--;
+      j=doc->cur_col+1;
+      while (j<doc_ce->max_col && doc_ce->tag[j]!='$$')
+	j++;
+      if (i<j-1 && doc_ce->min_col<=i<j<doc_ce->max_col &&
+	    doc_ce->tag[i]=='$$' && doc_ce->tag[j]=='$$') {
+	ch=doc_ce->tag[j+1];
+	doc_ce->tag[j+1]=0;
+	st=StrNew(doc_ce->tag+i);
+	doc_ce->tag[j+1]=ch;
+	StrCpy(doc_ce->tag+i,doc_ce->tag+j+1);
+	doc->cur_col=i;
+	st2=MStrPrint("%q",st);
+	if (doc_ce=DocPrint(doc,st2)) {
+	  doc->cur_entry=doc_ce;
+	  doc->cur_col=doc_ce->min_col;
+	}
+	Free(st);
+	Free(st2);
       }
     } else {
-      if (j=ptr-ptr2) {
-	*ptr=0;
-	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-	doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
-	if (doc->flags & DOCF_NO_CURSOR) {
-	  src=MAlloc(j+1);
-	  MemCpy(src,ptr2,j+1);
-	  ptr3=src;
-	  ptr4=src;
-	  while (*ptr3)
-	    if (*ptr3!=CH_CURSOR)
-	      *ptr4++=*ptr3++;
-	    else
-	      ptr3++;
-	  *ptr4=0;
-	  j=ptr4-src;
-	} else
-	  src=ptr2;
-	doc_e->tag=MAlloc(j+1,doc->mem_task);
-	MemCpy(doc_e->tag,src,j+1);
-	doc_e->max_col=j;
-	DocInsEntry(doc,doc_e);
-	if (doc->flags & DOCF_NO_CURSOR)
-	  Free(src);
-	*ptr=ch;
-      }
-      switch (ch) {
-	case CH_CURSOR:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
-	  DocInsEntry(doc,doc_e);
-	  ptr++;
-	  break;
-	case CH_FORM_FEED:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_PAGE_BREAK | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_PAGE_BREAK];
-	  DocInsEntry(doc,doc_e);
-	  ptr++;
-	  break;
-	case '\t':
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_TAB | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_TAB];
-	  DocInsEntry(doc,doc_e);
-	  ptr++;
-	  break;
-	case '$$':
-	  ptr++; //skip first dollar
-	  ptr2=ptr;
-	  while (*ptr && *ptr!='$$')
-	    ptr++;
-	  if (*ptr) {
-	    *ptr=0; //zero second dollar
-	    if (ptr-1==ptr2 && *ptr2==CH_CURSOR) {
-	      doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	      doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-	      doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
-	      DocInsEntry(doc,doc_e);
-	      ptr2++;
-	    }
-	    if (ptr==ptr2) {
-	      doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	      doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-	      doc_e->max_col=1;
-	      if (doc->flags & DOCF_DBL_DOLLARS)
-		doc_e->tag=StrNew("$$$$",doc->mem_task);
-	      else
-		doc_e->tag=StrNew("$$",doc->mem_task);
-	      doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
-	      DocInsEntry(doc,doc_e);
-	    } else {
-	      st2=MAlloc(ptr-ptr2+1);
-	      ptr3=ptr2;
-	      ptr4=st2;
-	      while (ch=*ptr3++) {
-		if (ch==CH_CURSOR) {
-		  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-		  doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
-		  DocInsEntry(doc,doc_e);
-		} else if (ch==CH_FORM_FEED) {
-		  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_e->type=DOCT_PAGE_BREAK |
-			doc->settings_root.dft_text_attr<<8;
-		  doc_e->de_flags=doldoc.dft_de_flags[DOCT_PAGE_BREAK];
-		  DocInsEntry(doc,doc_e);
-		} else
-		  *ptr4++=ch;
-	      }
-	      *ptr4=0;
-	      if (doc_e=PrsDollarCmd(doc,st2)) {
-		result=doc_e;
-		DocInsEntry(doc,doc_e);
-	      }
-	      Free(st2);
-	    }
-	    *ptr++='$$';
-	  }
-	  break;
-	default:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_NEW_LINE | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_NEW_LINE];
-	  DocInsEntry(doc,doc_e);
-	  if (ch=='\r')
-	    while (*ptr=='\r')
-	      ptr++;
-	  if (*ptr=='\n')
-	    ptr++;
-	  while (*ptr=='\r')
-	    ptr++;
-      }
+      old_color_names=LBts(&doc->flags,DOCf_COLOR_NAMES);
+      st=Doc2PlainText(doc,doc_ce);
+      LBEqu(&doc->flags,DOCf_COLOR_NAMES,old_color_names);
+      DocEntryDel(doc,doc_ce);
+      DocPrint(doc,"$$$$%Q$$$$",st);
     }
+    DocRecalc(doc);
   }
   if (unlock)
     DocUnlock(doc);
-  return result;
 }
 
-public CDocEntry *DocPrint(CDoc *doc,U8 *fmt,...)
-{//You must not print partial doc cmds.
-  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  CDocEntry *result=DocPutS(doc,buf);
-  Free(buf);
-  return result;
+U0 DocFlagsToggle(CDoc *doc,I64 tog_flags)
+{
+  Bool	unlock=DocLock(doc);
+  I64 size,flags=doc->flags^tog_flags;
+  U8 *st;
+  CDocUndo *u_next,*u_last;
+
+  doc->flags|=DOCF_COLOR_NAMES;
+  st=DocSave(doc,&size);
+
+  u_next=doc->undo_root.next;
+  u_last=doc->undo_root.last;
+  doc->undo_root.next=doc->undo_root.last=&doc->undo_root;
+
+  DocRst(doc,TRUE);
+  doc->undo_root.next=u_next;
+  doc->undo_root.last=u_last;
+  DocUndoCntSet(doc);
+  doc->flags=flags & ~(DOCG_BL_IV_UL|DOCF_WORD_WRAP);
+  DocLoad(doc,st,size);
+  DocCenter(doc);
+  if (unlock)
+    DocUnlock(doc);
+  Free(st);
 }

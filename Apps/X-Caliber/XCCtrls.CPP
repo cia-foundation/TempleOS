@@ -133,7 +133,6 @@ U0 LeftClickCtrlPanel(CCtrl *c,I64 x,I64 y,Bool)
 
 CCtrl *CtrlPanelNew()
 {
-  Bool old_preempt;
   CCtrl *c=CAlloc(sizeof(CCtrl));
   MemSet(&ctrl_panel,0,sizeof(ctrl_panel));
   c->win_task=Fs;
@@ -143,17 +142,13 @@ CCtrl *CtrlPanelNew()
   c->draw_it=&DrawCtrlPanelCtrl;
   c->left_click=&LeftClickCtrlPanel;
   c->update_derived_vals=&UpdateDerivedCtrlPanelCtrl;
-  old_preempt=Preempt;
   QueIns(c,Fs->last_ctrl);
   TaskDerivedValsUpdate;
-  Preempt(old_preempt);
   return c;
 }
 
 U0 CtrlPanelDel(CCtrl *c)
 {
-  Bool old_preempt=Preempt;
   QueRem(c);
-  Preempt(old_preempt);
   Free(c);
 }

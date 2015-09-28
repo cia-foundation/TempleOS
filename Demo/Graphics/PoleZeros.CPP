@@ -108,12 +108,11 @@ U0 PoleZeros()
   GrPaletteSet(gr_palette_gray);
   GrPaletteColorSet(15,0xFFFF00000000); //White is red
 
-  WinMax;
   AutoComplete;
   WinBorder;
-
-  DCFill;
+  WinMax;
   DocClear;
+  DCFill;
   scale=1.0;
 
   try {

@@ -48,7 +48,7 @@ U0 PutExcept(Bool catch_it=TRUE)
   Fs->catch_except=catch_it;
 }
 
-#exe {OptOn(OPTf_NO_REG_VAR);};
+#exe {Option(OPTf_NO_REG_VAR,ON);};
 
 class CTryStk
 {
@@ -105,7 +105,7 @@ U0 throw(I64 ch=0,Bool no_log=FALSE)
   Raw(was_raw);
 }
 
-#exe {OptOff(OPTf_NO_REG_VAR);};
+#exe {Option(OPTf_NO_REG_VAR,OFF);};
 
 U0 SysThrowBreak()
 {

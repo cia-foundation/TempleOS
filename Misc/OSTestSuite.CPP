@@ -452,8 +452,11 @@ U0 DoBomberGolf()
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_RIGHT);
     Sleep(100);
   }
+  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   for (i=0;i<7;i++) {
-    PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+    PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
+    PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_LEFT);
+    PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_LEFT);
     Sleep(200);
   }
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
@@ -484,7 +487,9 @@ U0 DoVaroom()
   I64 i;
   CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Games/Varoom\";\n");
-  for (i=0;i<15;i++) {
+  for (i=0;i<10;i++) {
+    PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
+    Sleep(50);
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
     Sleep(50);
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
@@ -1063,7 +1068,7 @@ U0 DoBugFlapper()
 {
   I64 i;
   CTask *task=User;
-  XTalk(task,"#include \"::/Demo/Games/BugBird\";\n");
+  XTalk(task,"#include \"::/Demo/Games/FlapBat\";\n");
   while (!TaskValidate(task->popup_task))
     Yield;
   TaskWait(task->popup_task);

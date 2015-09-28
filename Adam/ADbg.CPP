@@ -21,7 +21,7 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
     return FALSE;
   unlock=DocLock(doc);
   DocPrint(doc,"Class:\"%s\"\n",class_name);
-  ml=tempc->member_lst;
+  ml=tempc->member_lst_and_root;
   while (ml) {
     tempc2=ml->member_class;
     ptr=_d(U8 *)+ml->offset;
@@ -155,12 +155,10 @@ public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,
 	I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
 {//Displays members of a record by using the compiler's info.
   CDoc *doc;
-  Bool old_preempt;
-  if (IsRaw) {
+  if (IsRaw)
     doc=DocNew;
-  } else {
+  else {
     DocMax;
-    old_preempt=Preempt;
     doc=DocPut;
   }
   if (fun)
@@ -172,20 +170,17 @@ public U0 ClassRep(U8 *_d,U8 *class_name=lastclass,
   if (IsRaw) {
     DocDump(doc,100000);
     DocDel(doc);
-  } else
-    Preempt(old_preempt);
+  }
 }
 
 public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,
 	I64 max_depth=2,Bool fun=FALSE,I64 offset=0)
 {//Dynamic ClassRep. Uses hex_ed widgit for live changes.
   CDoc *doc;
-  Bool old_preempt;
-  if (IsRaw) {
+  if (IsRaw)
     doc=DocNew;
-  } else {
+  else {
     DocMax;
-    old_preempt=Preempt;
     doc=DocPut;
   }
   if (fun)
@@ -197,15 +192,14 @@ public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,
   if (IsRaw) {
     DocDump(doc,100000);
     DocDel(doc);
-  } else
-    Preempt(old_preempt);
+  }
 }
 
 U0 UpdateRegVarImg(CHashFun *tempf,U8 *_b,CTask *task)
 {
   CMemberLst *ml;
   CHashClass *tempc;
-  ml=tempf->member_lst;
+  ml=tempf->member_lst_and_root;
   while (ml) {
     if (ml->reg!=REG_NONE) {
       tempc=OptClassFwd(ml->member_class);
@@ -236,7 +230,7 @@ public U0 FunRep(U8 *st,U8 *rbp=NULL,I64 max_depth=2,CTask *task=NULL)
       } else
 	ClassRep(rbp,st,max_depth,TRUE);
     } else {
-      tempm=tempf->member_lst;
+      tempm=tempf->member_lst_and_root;
       while (tempm) {
 	if (0<=tempm->reg<NUM_REGS)
 	  "%08Z %s\n",tempm->reg,"ST_U64_REGS",tempm->str;

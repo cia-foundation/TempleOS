@@ -12,7 +12,7 @@ a fault to switch back.
 U8 *old_stk,*new_rip;
 
 asm {
-TO_RING0::	//Set to handle general protection 0xD fault temporarily.
+INT_TO_RING0::	//Set to handle general protection 0xD fault temporarily.
 	INC	U64 [SYS_PROGRESS1]
 	PUSH	U32 CGDT.ds	//STKSEG
 	MOV	RAX,U64 [&old_stk]
@@ -29,7 +29,7 @@ U0 Ring3Demo()
   U8 *old_vect;
   "Progress1 Before:%X\n",progress1;
   CLI
-  old_vect=IntEntrySet(0x0D,TO_RING0,IDTET_TRAP,0);
+  old_vect=IntEntrySet(0x0D,INT_TO_RING0,IDTET_TRAP,0);
 
   TSSBusy(Gs->tss->tr_ring3,OFF);
   SetRAX(Gs->tss->tr_ring3+3);

@@ -25,8 +25,8 @@ SYS_BOOT_SRC::			DU32	BOOT_SRC_NULL;
 SYS_BOOT_PATCH_TABLE_BASE::	DU32	0;
 SYS_RUN_LEVEL::			DU32	0;
 #exe {StreamPrint("SYS_COMPILE_TIME:: DU64 0x%X;",Now);}
-//See $LK,"BootCdProbe",A="MN:BootCdProbe"$
-#assert SYS_COMPILE_TIME+sizeof(CDate)+sizeof(CBinFile)<CD_BLK_SIZE
+//See $LK,"BootDVDProve",A="MN:BootDVDProve"$
+#assert SYS_COMPILE_TIME+sizeof(CDate)+sizeof(CBinFile)<DVD_BLK_SIZE
 
 SYS_BOOT_BASE::	DU32	0;	//Offset from start used by reboot
 SYS_MEM_E801::	DU16	0,0;
@@ -53,11 +53,11 @@ SYS_PCI_BUSSES::	DU16	0;
 
 //************************************
 BSP_16BIT_INIT::
-//EBX is $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. (Val passed from boot blk, $LK,"BootHD",A="FF:::/Adam/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootCD",A="FF:::/Adam/Boot/BootCD.CPP,BOOT_SRC_CDROM"$, & $LK,"BootRAM",A="FF:::/Adam/Boot/Boot.CPP,BOOT_SRC_RAM"$.)
+//EBX is $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. (Val passed from boot blk, $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.)
 	MOV	AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
 	MOV	SS,AX
 	MOV	SP,BOOT_STK_SIZE
-	PUSH	EBX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootCD",A="FF:::/Adam/Boot/BootCD.CPP,BOOT_SRC_CDROM"$ & $LK,"BootRAM",A="FF:::/Adam/Boot/Boot.CPP,BOOT_SRC_RAM"$.
+	PUSH	EBX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$ & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.
 	MOV	AX,VGAM_TEXT/16
 	MOV	ES,AX
 	MOV	U32 ES:[0],'O'+BLUE<<12+('S'+GREEN<<12)<<16
@@ -134,7 +134,7 @@ GET_IP:	POP	BX
 	OR	AL,2
 	OUT	0x92,AL
 
-	POP	U32 [SYS_BOOT_SRC]	//See $LK,"BootHD",A="FF:::/Adam/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootCD",A="FF:::/Adam/Boot/BootCD.CPP,BOOT_SRC_CDROM"$, & $LK,"BootRAM",A="FF:::/Adam/Boot/Boot.CPP,BOOT_SRC_RAM"$.
+	POP	U32 [SYS_BOOT_SRC]	//See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.
 
 	CLD
 	XOR	EAX,EAX
@@ -345,7 +345,7 @@ USE64
 	RET
 
 //************************************
-SYS_RAM_REBOOT:: //This gets copied high.  $LK,"SYS_RAM_REBOOT",A="FF:::/Adam/Boot/Boot.CPP,SYS_RAM_REBOOT:2"$
+SYS_RAM_REBOOT:: //This gets copied high.  $LK,"SYS_RAM_REBOOT",A="FF:::/Adam/Opt/Boot/Reboot.CPP,SYS_RAM_REBOOT:2"$
 	PUSH	U32 CGDT.ds		//stk seg
 	PUSH	U32 BOOT_RAM_LIMIT	//stk
 	PUSH	U32 0			//flags

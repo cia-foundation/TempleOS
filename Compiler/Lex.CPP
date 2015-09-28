@@ -35,7 +35,6 @@ CCmpCtrl *CmpCtrlNew(U8 *buf=NULL,I64 flags=0,U8 *filename=NULL)
   QueInit(cc);
   cc->flags=flags;
   cc->opts=1<<OPTf_WARN_UNUSED_VAR;
-  cc->otrace_mask=0b10001111101;
   cc->htc.hash_mask=HTG_TYPE_MASK-HTT_IMPORT_SYS_SYM;
   cc->htc.define_hash_table=cc->htc.hash_table_lst=
 	cc->htc.glbl_hash_table=cc->htc.local_hash_table=Fs->hash_table;
@@ -48,7 +47,7 @@ CCmpCtrl *CmpCtrlNew(U8 *buf=NULL,I64 flags=0,U8 *filename=NULL)
   if (filename)
     tempf->full_name=FileNameAbs(filename);
   else
-    tempf->full_name=StrNew(dsk.temp_filename);
+    tempf->full_name=StrNew(blkdev.temp_filename);
   if (flags & CCF_PMT)
     buf=CAlloc(8);
   tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=buf;
@@ -298,7 +297,7 @@ U0 LexIncludeStr(CCmpCtrl *cc,U8 *abs_filename,U8 *src,Bool actual_file)
   if (actual_file)
     tempf->full_name=StrNew(abs_filename);
   else
-    tempf->full_name=StrNew(dsk.temp_filename);
+    tempf->full_name=StrNew(blkdev.temp_filename);
   tempf->line_num=1;
   tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=src;
 }
@@ -630,53 +629,50 @@ lex_float_start:
 	cc->token=TK_STR;
 	goto lex_end;
       case '\'':
-	if (!(ch=LexGetChar(cc)))
-	  k='\'';
-	else {
-	  k=0;
-	  if (ch!='\'')
-	    for (j=0;j<8;j++) {
-	      if (ch=='\\') {
-		switch (ch=LexGetChar(cc)) {
-		  case 'n':	k.u8[j]='\n';	break;
-		  case 'r':	k.u8[j]='\r';	break;
-		  case '"':	k.u8[j]='"';	break;
-		  case '\'':	k.u8[j]='\'';	break;
-		  case '\`':	k.u8[j]='\`';	break;
-		  case '\\':	k.u8[j]='\\';	break;
-		  case 't':	k.u8[j]='\t';	break;
-		  case '0':	k.u8[j]=0;	break;
-		  case 'x':
-		  case 'X':
-		    i=0;
-		    while (TRUE) {
-		      ch=ToUpper(LexGetChar(cc));
-		      if (Bt(chars_bmp_hex_numeric,ch)) {
-			if (ch<='9')
-			  i=i<<4+ch-'0';
-			else
-			  i=i<<4+ch-'A'+10;
-		      } else
-			break;
-		    }
-		    k.u8[j]=i;
-		    cc->flags|=CCF_USE_LAST_U16;
+	k=0;
+	for (j=0;j<8;j++) {
+	  if (!(ch=LexGetChar(cc)) || ch=='\'')
+	    break;
+	  if (ch=='\\') {
+	    switch (ch=LexGetChar(cc)) {
+	      case 'n':		k.u8[j]='\n';	break;
+	      case 'r':		k.u8[j]='\r';	break;
+	      case '"':		k.u8[j]='"';	break;
+	      case '\'':	k.u8[j]='\'';	break;
+	      case '\`':	k.u8[j]='\`';	break;
+	      case '\\':	k.u8[j]='\\';	break;
+	      case 't':		k.u8[j]='\t';	break;
+	      case '0':		k.u8[j]=0;	break;
+	      case 'x':
+	      case 'X':
+		i=0;
+		while (TRUE) {
+		  ch=ToUpper(LexGetChar(cc));
+		  if (Bt(chars_bmp_hex_numeric,ch)) {
+		    if (ch<='9')
+		      i=i<<4+ch-'0';
+		    else
+		      i=i<<4+ch-'A'+10;
+		  } else
 		    break;
-		  default:
-		    k.u8[j]='\\';
-		    cc->flags|=CCF_USE_LAST_U16;
 		}
-	      } else if (ch=='$$') {
-		ch=LexGetChar(cc);
-		k.u8[j]='$$';
-		if (ch!='$$')
-		  cc->flags|=CCF_USE_LAST_U16;
-	      } else
-		k.u8[j]=ch;
-	      if (!(ch=LexGetChar(cc)) || ch=='\'')
+		k.u8[j]=i;
+		cc->flags|=CCF_USE_LAST_U16;
 		break;
+	      default:
+		k.u8[j]='\\';
+		cc->flags|=CCF_USE_LAST_U16;
 	    }
+	  } else if (ch=='$$') {
+	    ch=LexGetChar(cc);
+	    k.u8[j]='$$';
+	    if (ch!='$$')
+	      cc->flags|=CCF_USE_LAST_U16;
+	  } else
+	    k.u8[j]=ch;
 	}
+	if (ch!='\'' && (ch=LexGetChar(cc)) && ch!='\'')
+	  LexExcept(cc,"Char const limited to 8 chars at ");
 	cc->cur_i64=k;
 	cc->token=TK_CHAR_CONST;
 	goto lex_end;

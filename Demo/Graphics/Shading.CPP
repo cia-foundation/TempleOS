@@ -159,10 +159,10 @@ U0 Main()
   s->sz=6*VIEWANGLES_SNAP;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  DocClear;
-  WinMax;
-  WinBorder;
   AutoComplete;
+  WinBorder;
+  WinMax;
+  DocClear;
   Fs->draw_it=&DrawIt;
   try {
     "\n\nMove mouse to change light source.\n\n";

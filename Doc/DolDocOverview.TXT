@@ -123,7 +123,7 @@ Examples: <CTRL-t> to see
 $ID,-2$$TR,"BT Button"$
 $ID,2$See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
 $ID,-2$$TR,"DA Data"$
-$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
 
 The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 
@@ -131,11 +131,11 @@ The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the
 
 If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
 $ID,-2$$TR,"CB Check Box"$
-$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
 
 The default data-type for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"LS List Widget"$
-$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a resource editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
 
 The default data-type for the $FG,2$$$LS...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"MA Macro"$
@@ -180,7 +180,7 @@ $ID,2$The $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$() rou
 $ID,-2$$TR,"ER Error"$
 $ID,2$When errors are detected in DolDoc cmds, an $FG,2$ER$FG$ entry is generated.
 $ID,-2$
-<$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Flag Defines",A="MN:DOCEf_LEFT_CB"$ and $LK,"Simple Flags",A="FI:::/Doc/Widget.TXT.Z"$.
+<$LK,"FlagCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Flag Defines",A="MN:DOCEf_LEFT_CB"$ and $LK,"Simple Flags",A="FI:::/Doc/Widget.TXT"$.
 $TR,"+H Hold"$
 $ID,2$Causes not to delete this cmd when cleared with $FG,2$CL$FG$ or when the doc->max_entries is exceeded.  Word wrap is a good to hold.  There is no way to delete these entries, at this point.
 $ID,-2$$TR,"+L Link"$

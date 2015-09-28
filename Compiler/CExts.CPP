@@ -8,10 +8,6 @@ import CDocEntry *DocPutLine(CDoc *doc,CDocEntry *doc_e);
 import I64 DocSize(CDoc *doc);
 import Bool DocWrite(CDoc *doc,Bool prompt=FALSE);
 extern U8 *CmdLinePmt();
-extern U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot);
-extern U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot);
-extern CAOT *CmpJoin(
-	CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0);
 extern I64 HashEntrySize2(CHashSrcSym *temph);
 extern Bool IsLexExpression2Bin(CCmpCtrl *cc,U8 **_machine_code);
 extern I64 Lex(CCmpCtrl *cc);

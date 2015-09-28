@@ -55,11 +55,11 @@ U0 PredatorPrey()
 	"with different, random, initial populations.\n");
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   try {
-    DocClear;
-    WinMax;
-    WinBorder;
-    WinMgrSync;
     AutoComplete;
+    WinBorder;
+    WinMax;
+    DocClear;
+    WinMgrSync;
 
     dc->color=BLACK;
     GrLine(dc,OX,0,OX,GR_HEIGHT-FONT_HEIGHT-1);

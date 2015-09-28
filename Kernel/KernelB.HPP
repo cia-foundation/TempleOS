@@ -1,7 +1,7 @@
 /*  Kernel ASM symbols.
 $LK,"KernelB",A="FF:::/Kernel/Kernel.PRJ,KernelB"$ Kernel.PRJ
 $LK,"KernelB",A="FF:::/Compiler/Compiler.PRJ,KernelB"$ Compiler.PRJ
-$LK,"KernelB",A="FF:::/Adam.CPP,KernelB"$ Adam.CPP
+$LK,"KernelB",A="FF:::/StartOS.CPP,KernelB"$ StartOS.CPP
 */
 
 #help_index "Bit"
@@ -71,9 +71,9 @@ public _intern IC_QUE_INS_REV U0 QueInsRev(
 public _intern IC_QUE_REM U0 QueRem(CQue *entry); //Remove item from queue.
 
 #help_index "I/O;Processor/IO Port"
-public _intern IC_IN_U16 I64 InU16(I64 port); //Read U16 from I/O port.
-public _intern IC_IN_U32 I64 InU32(I64 port); //Read U32 from I/O port.
-public _intern IC_IN_U8 I64 InU8(I64 port); //Read U8 from I/O port.
+public _intern IC_IN_U16 U16 InU16(I64 port); //Read U16 from I/O port.
+public _intern IC_IN_U32 U32 InU32(I64 port); //Read U32 from I/O port.
+public _intern IC_IN_U8 U8 InU8(I64 port); //Read U8 from I/O port.
 public _intern IC_OUT_U16 U0 OutU16(I64 port, I64 val); //Write U16 to I/O port.
 public _intern IC_OUT_U32 U0 OutU32(I64 port, I64 val); //Write U32 to I/O port.
 public _intern IC_OUT_U8  U0 OutU8(I64 port, I64 val); //Write U8 to I/O port.
@@ -257,16 +257,16 @@ public _intern IC_SET_RSP U0 SetRSP(U8 *d); //Set RSP register value.
 public _extern _CPUID U0 CPUId(
 	U32 rax,CRAXRBCRCXRDX *result); //Do CPUID instruction.
 public _extern _LXCHG_I64 I64 LXchgI64(I64 *dst,I64 d); //Locked eXchange I64s.
-public _extern _LXCHG_U16 U64 LXchgU16(U16 *dst,U16 d); //Locked eXchange U16s.
-public _extern _LXCHG_U32 U64 LXchgU32(U32 *dst,U32 d); //Locked eXchange U32s.
-public _extern _LXCHG_U8  U64 LXchgU8(U8 *dst,U8 d); //Locked eXchange U8s.
+public _extern _LXCHG_U16 U16 LXchgU16(U16 *dst,U16 d); //Locked eXchange U16s.
+public _extern _LXCHG_U32 U32 LXchgU32(U32 *dst,U32 d); //Locked eXchange U32s.
+public _extern _LXCHG_U8  U8 LXchgU8(U8 *dst,U8 d); //Locked eXchange U8s.
 public _extern _SET_MSR U0 SetMSR(
 	I64 model_specific_reg,I64 val); //Model Specific Reg See $LK,"MSRs",A="MN:IA32_EFER"$.
 public _extern _SYS_HLT U0 SysHlt(); //Loops doing HLT instruction.
 public _extern _XCHG_I64 I64 XchgI64(I64 *dst,I64 d); //eXchange I64s.
-public _extern _XCHG_U16 U64 XchgU16(U16 *dst,U16 d); //eXchange U16s.
-public _extern _XCHG_U32 U64 XchgU32(U32 *dst,U32 d); //eXchange U32s.
-public _extern _XCHG_U8  U64 XchgU8(U8 *dst,U8 d); //eXchange U8s.
+public _extern _XCHG_U16 U16 XchgU16(U16 *dst,U16 d); //eXchange U16s.
+public _extern _XCHG_U32 U32 XchgU32(U32 *dst,U32 d); //eXchange U32s.
+public _extern _XCHG_U8  U8 XchgU8(U8 *dst,U8 d); //eXchange U8s.
 public _extern SYS_CACHE_LINE_WIDTH
 	I64 sys_cache_line_width; //CPU's Cache line width.
 _extern SYS_GDT CGDT sys_gdt;
@@ -277,10 +277,6 @@ public _intern IC_CLFLUSH U0 CLFlush(U8 *a); //Flush cache line instruction.
 #help_index "Processor/Page Tables;Memory/Page Tables"
 public _intern IC_INVLPG
 	U0 InvlPg(U8 *a); //Invalidate page at addr instruction.
-
-#help_index "Task"
-public _intern IC_PREEMPT
-	Bool Preempt(Bool val=OFF); //Turn mutli-tasking preemption OFF/ON.
 
 #help_index "Task;Processor"
 public _intern IC_FS CTask *Fs(); //FS seg reg points to the current $LK,"CTask",A="MN:CTask"$.

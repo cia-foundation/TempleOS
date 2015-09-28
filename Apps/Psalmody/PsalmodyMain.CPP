@@ -396,7 +396,7 @@ U0 PsmPopMode()
 #define PSMF_CD		1
 #define PSMF_INCOMPLETE	2
 
-U0 Psalmody(U8 *dirname=NULL)
+U0 Psalmody(U8 *dirname="::/Home/Psalmody")
 {
   Bool was_playing;
   I64 a1,a2,msg_code=0,col,
@@ -411,11 +411,7 @@ U0 Psalmody(U8 *dirname=NULL)
 
   if (DocPut) old_doc_flags=DocPut->flags;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  WinBorder;
-  AutoComplete;
-  Preempt;
 
-  MkDir("::/Home/Psalmody");
   MusicSettingsRst;
   tempo_state.tempo=Round(TEMPO_RANGE*(music.tempo-0.5)/4.4);
   tempo_state.stacatto=Round(TEMPO_RANGE*(music.stacatto_factor-0.12)/0.88);
@@ -474,12 +470,11 @@ U0 Psalmody(U8 *dirname=NULL)
   oc.incomplete_entry=MenuEntryFind(Fs->cur_menu,"Song/MarkIncomplete");
   oc.record_entry=MenuEntryFind(Fs->cur_menu,"Song/Record");
 
+  AutoComplete;
+  WinBorder;
   WinMax;
 
-  if (!dirname)
-    dirname=StrNew("::/Home/Psalmody");
-  else
-    dirname=StrNew(dirname);
+  dirname=StrNew(dirname);
   PsmPushMode(psm_octave);
   col=0;
   Fs->draw_it=&DrawIt;

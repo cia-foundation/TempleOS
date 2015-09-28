@@ -90,7 +90,8 @@ public U0 CopySongs(U8 threshold='7')
 {
   CDoc *s;
   CDocEntry *doc_e;
-  CDirEntry *tempde=FilesFind("::/Home/Psalmody/*.CPP*",FUF_CLUSTER_ORDER),
+  CDirEntry *tempde=FilesFind("::/Home/Wb2/Files/Psalmody/*.CPP*",
+	FUF_CLUSTER_ORDER),
 	*tempde1=tempde;
   DelTree("/Apps/Psalmody/Examples");
   MkDir("/Apps/Psalmody/Examples");
@@ -110,7 +111,7 @@ U0 DistroPrep()
   Del("/Demo/ReverseFileExample/PoemForeward.TXT*");
   Del("/Home/NumBible.TXT.Z");
   DelTree("/Home/*Temp.TXT.Z");
-  if (FileFind("::/Home/Psalmody"))
+  if (FileFind("::/Home/Wb2/Files/Psalmody"))
     CopySongs;
 
   DelTree("/Temp");
@@ -123,8 +124,12 @@ U0 DistroPrep()
   DelTree("/Demo/AcctExample");
   CopyTree("/Home","/Demo/AcctExample");
   DelTree("/Demo/AcctExample/Archive");
+  DelTree("/Demo/AcctExample/Blog");
   DelTree("/Demo/AcctExample/Budget");
+  DelTree("/Demo/AcctExample/Code");
+  DelTree("/Demo/AcctExample/Misc");
   DelTree("/Demo/AcctExample/Psalmody");
+  DelTree("/Demo/AcctExample/Videos");
   DelTree("/Demo/AcctExample/Wb2");
   Del("/Demo/AcctExample/Test*");
 
@@ -160,15 +165,17 @@ U0 MakeBootRescueDrvFile()
 
   MkDir("A:/Kernel");
   Copy("C:/Kernel/*.HPP*",		"A:/Kernel");
-  CopyTree("C:/Kernel/Dsk",		"A:/Kernel/Dsk");
+  CopyTree("C:/Kernel/BlkDev",		"A:/Kernel/BlkDev");
 
-  Copy("C:/Home/Wb2/Files/DbgAdam.CPP.Z","A:/Adam.CPP.Z");
+  Copy("C:/Home/Wb2/Files/DbgStartOS.CPP.Z","A:/StartOS.CPP.Z");
 
   MkDir("A:/Adam");
+  Copy("C:/Home/Wb2/Files/DbgMakeAdam.CPP.Z","A:/Adam/MakeAdam.CPP.Z");
   Copy("C:/Adam/AExts.HPP.Z",	"A:/Adam");
   Copy("C:/Adam/AMath.CPP.Z",	"A:/Adam");
   Copy("C:/Adam/Training.CPP.Z","A:/Adam");
-  Copy("C:/Adam/AUtils.CPP.Z",	"A:/Adam");
+  Copy("C:/Adam/AMem.CPP.Z",	"A:/Adam");
+  Copy("C:/Adam/TaskRep.CPP.Z",	"A:/Adam");
   Copy("C:/Adam/AMathODE.CPP.Z","A:/Adam");
 
   FileWrite("C:" CFG_BOOT_RESCUE_DRV_FILE,
@@ -270,7 +277,7 @@ website, too.
 */
   Drv('C');
   DistroPrep;
-  Auto(TOS_CDROM_CFG);
+  Auto(TOS_DVD_CFG);
   MakeOSDrvBootInstall('C','T');
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -282,14 +289,14 @@ U0 MakeTOSDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSTS_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
 
 
 U0 DbgDistroPrep()
-{/*This is a debug distro.  The CDROM bootloader uses BIOS INT 0x13 0x42 to
+{/*This is a debug distro.  The CD/DVD bootloader uses BIOS INT 0x13 0x42 to
 load Kernel.BIN.C which has been modified to also hold a small RAM drive
 (Drive A) that fits in the low 640k.  The bootloader starts in real mode
 and the kernel changes to long, 64-bit mode.  It loads the 64-bit compiler
@@ -305,7 +312,7 @@ I call $LK,"MakeBootDrvFile",A="FF:::/Demo/AcctExample/TOSDistro.CPP,MakeBootRes
   Drv('C');
   DistroPrep;
   MakeBootRescueDrvFile;
-  Auto(TOS_CDROM_DBG_CFG);
+  Auto(TOS_DVD_DBG_CFG);
   MakeOSDrvBootInstall('C','T');
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -318,7 +325,7 @@ U0 MakeDbgDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -327,7 +334,7 @@ U0 StdDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  Auto(STD_DISTRO_CDROM_CFG);
+  Auto(STD_DISTRO_DVD_CFG);
   MakeOSDrvBootInstall('C','T');
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -366,7 +373,7 @@ U0 MakeLiteDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -388,6 +395,10 @@ FileManager, WindowManager, PCSpeaker, Documentation.
   Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACWords.DAT*");
   Del(TOS_DISTRO_DIR "/Adam/God/Vocab.TXT.Z");
   Del(TOS_DISTRO_DIR "/Misc/OSTestSuite.CPP.Z");
+  Copy("C:/Home/Wb2/Files/UltraMenu.TXT.Z",
+	TOS_DISTRO_DIR "/PersonalMenu.TXT.Z");
+  Copy("C:/Demo/Games/EagleDive.CPP.Z",
+	TOS_DISTRO_DIR "/Misc");
 }
 U0 MakeUltraDistro()
 {
@@ -395,7 +406,7 @@ U0 MakeUltraDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -473,18 +484,19 @@ U0 FreshenWebDir(U8 *dirname)
 U0 MakeWebSitePartial()
 {
   FreshenWebDir("/Home/Wb2");
+  FreshenWebDir("/Home/Wb2/Imgs");
   Drv('C');
 }
 
 U0 UpdateISODocDefines()
 {
   DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
   DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	"%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V3.07",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V3.10",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
 	0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
   DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	"%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
@@ -498,8 +510,8 @@ public U0 MakeDistrosAndBackUp()
   progress4=*progress4_desc=0;
   progress4_max=14;
   AutoComplete;
-  WinMax;
   WinBorder;
+  WinMax;
   ChkAll; progress4++;
 
   MakeLineRepFile; progress4++;

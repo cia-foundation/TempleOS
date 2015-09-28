@@ -1006,7 +1006,6 @@ U0 XCaliber()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
-  Preempt;
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -1026,13 +1025,13 @@ U0 XCaliber()
 	"  SmallerShot(,,SC_CURSOR_DOWN|SCF_SHIFT);"
 	"}"
 	);
-  WinMax;
   AutoComplete;
-  WinBorder(ON);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
-	-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
+  WinBorder;
+  WinMax;
   DocCursor;
   DocClear;
+  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
+	-WIF_SELF_BORDER-WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
   Fs->draw_it=&DrawIt;
   do {
     ode=ODENew(0,0.01,ODEF_HAS_MASSES);

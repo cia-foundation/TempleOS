@@ -1467,7 +1467,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   I64 h,v,i,j,r,c;
   U8 buf[STR_LEN];
   IndirectOrders *tempi;
-  Bool old_preempt=Preempt;
 
   task->horz_scroll.min=0;
   task->horz_scroll.max=map_width-task->pix_width;
@@ -1623,7 +1622,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   else
     dc->color=LTPURPLE;
   GrPrint(dc,-task->scroll_x+(13+7+10)*FONT_WIDTH,-task->scroll_y,buf);
-  Preempt(old_preempt);
 }
 
 U0 TaskEndCB()
@@ -1677,10 +1675,11 @@ U0 ToTheFront()
 	"}"
 	);
 
-  WinMax;
   AutoComplete;
   WinBorder(ON);
-  Preempt;
+  WinMax;
+  DocCursor;
+  DocClear;
   Init;
   PickAI("AIs",0);
   PickAI("AIs",1);
@@ -1693,8 +1692,6 @@ U0 ToTheFront()
 	"$$GREEN$$  2\t   $$FG$$ Player 2 view.\n"
 	"$$GREEN$$  3\t   $$FG$$ View odds calculations.");
   Fs->task_end_cb=&TaskEndCB; //<CTRL-ALT-x>
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
   "$$GREEN$$<SHIFT-ESC>$$FG$$ to return to game.\n";
 

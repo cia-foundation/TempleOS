@@ -3,7 +3,6 @@ I64 app_done_ack;
 
 U0 Job1(I64)
 {//Compile Compiler
-  Preempt(ON);	 //Off by default
   Silent;
   while (!app_done) {
     Cd("::/Compiler");
@@ -14,7 +13,6 @@ U0 Job1(I64)
 
 U0 Job2(I64)
 {//Log a file
-  Preempt(ON);	 //Off by default
   while (!app_done) {
     AdamLog("%F","::/Demo/MultiCore/LoadTest.CPP");
     Yield;
@@ -24,7 +22,6 @@ U0 Job2(I64)
 
 U0 Job3(I64)
 {//Log a file
-  Preempt(ON);	 //Off by default
   while (!app_done) {
     Cd("::/Compiler");
     AdamLog("%F","Compiler.PRJ.Z");

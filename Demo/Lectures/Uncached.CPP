@@ -7,7 +7,6 @@ U0 TimeIns()
 	shared_blks,*uncached_I64;
   CBlkPool *bp;
   CHeapCtrl *hc;
-  Bool old_preempt;
 
   "$$RED$$Now, this demo seems broken, perhaps,\n"
 	"because I run in a virtual machine.$$FG$$\n\n";
@@ -17,8 +16,6 @@ U0 TimeIns()
   bp=Mem2MegUncachedAlloc(&shared_blks);
   hc=HeapCtrlBPInit(bp,shared_blks<<12);
   uncached_I64=MAlloc(sizeof(I64),hc);
-
-  old_preempt=Preempt;
 
   //Measure cached time
   start=GetTSC;
@@ -40,7 +37,6 @@ U0 TimeIns()
   Free(cached_I64);
   Free(uncached_I64);
   Mem2MegFree(bp,shared_blks);
-  Preempt(old_preempt);
 }
 
 TimeIns;

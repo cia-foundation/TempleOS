@@ -1,17 +1,3 @@
-/*Uses $LK,"DocPrint",A="MN:DocPrint"$() because updates
-to within a tree while a tree is collapsed get
-messed-up if "live" (like using ordinary Print.)
-The insert point is confused by hiding of
-data in collapsed trees.  Therefore, the window main
-Doc is taken off-line by disabling preemption so there
-are no screen updates until all data has been inserted.
-
-There is a special Doc function which is also
-available to take an Doc off-line.  See $LK,"DocPrintAtomic",A="MN:DocPrintAtomic"$.
-For this example, however, I wanted to use DocPrint
-and disabled Preemption myself.
-*/
-
 U0 TreeSub(CDoc *doc,CDirEntry *tempde)
 {
   CDirEntry *tempde1;

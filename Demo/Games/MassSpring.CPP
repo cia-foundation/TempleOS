@@ -107,24 +107,13 @@ U0 MassSpringDemo()
 	"connect with spring.\n\n"
 	"Springs are 100 pixs long.\n");
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  AutoComplete;
+  WinBorder;
   WinMax;
-
-  /*Preempt eliminates a lot of hassles.
-The concern is about changing
-que links while the winmgr task
-is updating the ode or screen.
-
-The Window mgr suspends this
-task while updating the ode.  It
-will not be interrupted and with this
-preempt, we will not be interrupted.
-There is little downside to Preempt()
-since we will yield during GetMsg().
-*/
-  Preempt;
+  DocCursor;
+  DocClear;
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
-  AutoComplete;
 
   MenuPush(
 	"File {"
@@ -137,8 +126,6 @@ since we will yield during GetMsg().
 	);
 
   Init;
-  DocCursor;
-  DocClear;
   Fs->draw_it=&DrawIt;
 
   try {

@@ -29,8 +29,8 @@ Edit
 
 Insert
 {
-  Widget(,CH_CTRLL,0x42600000426);
-  Resource(,CH_CTRLR,0x41300000413);
+  TextWidgets(,CH_CTRLL,0x42600000426);
+  GraphicResource(,CH_CTRLR,0x41300000413);
   FileName(,,0x3E0000003E);
   DirName(,,0x23E0000023E);
   GodWord(,,0x4100000041);

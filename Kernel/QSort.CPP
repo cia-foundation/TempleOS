@@ -2,8 +2,8 @@ U0 QSortI64(I64 *base,I64 num, I64 (*fp_compare)(I64 e1,I64 e2))
 {/*Quick Sort for width==8.
 fp_compare() passes by value instead of ref.
 
-For assending strings: return StrCmp(e1,e2);
-For assending ints   : return e1-e2;
+For ascending strings: return StrCmp(e1,e2);
+For ascending ints   : return e1-e2;
 
 Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.
 */
@@ -85,8 +85,8 @@ U0 QSort2b(U8 *base,I64 num, I64 width,
 U0 QSort(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2))
 {/*Quick Sort: fp_compare() passes by ref.
 
-For assending strings: return StrCmp(*e1,*e2);
-For assending ints   : return *e1-*e2;
+For ascending strings: return StrCmp(*e1,*e2);
+For ascending ints   : return *e1-*e2;
 Don't return e1-e2 if numbers can overflow, return -1,0 or 1.
 
 Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.CPP"$.

@@ -12,7 +12,6 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 w=task->pix_width,h=task->pix_height;
   I64 i,x,y,xx;
-  Bool old_preempt=Preempt;
   xx=w>>1-car_x+road_x[road_ptr&(NUM_ROAD-1)];
 
   dc->color=LTGRAY;
@@ -40,7 +39,6 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->color=YELLOW;
   if (crash)
     GrPrint(dc,w>>1-FONT_WIDTH*4,(h-FONT_HEIGHT)>>1,"Game Over");
-  Preempt(old_preempt);
 }
 
 U0 UpdateRoad()
@@ -94,11 +92,11 @@ U0 Halogen()
 	"  Right(,,SC_CURSOR_RIGHT);"
 	"}"
 	);
-  Preempt;
   AutoComplete;
+  WinBorder;
   WinMax;
-  Init;
   DocCursor;
+  Init;
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {

@@ -41,9 +41,8 @@ U0 LeftClickCtrlButton(CCtrl *c,I64,I64,Bool down)
 
 public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
 	I64 num_states=1,U8 *state_texts,
-	I32 state_colors[],CCtrlButtonState *_s=NULL)
+	I32 *state_colors,CCtrlButtonState *_s=NULL)
 {//Create button ctrl. See $LK,"::/Apps/Strut/Strut.CPP"$.
-  Bool old_preempt;
   CCtrl *result;
   CCtrlButtonState *s;
   I64 i,j,l;
@@ -79,17 +78,13 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
   result->top=y;
   result->right=result->left+width-1;
   result->bottom=result->top+height-1;
-  old_preempt=Preempt;
   QueIns(result,Fs->last_ctrl);
-  Preempt(old_preempt);
   return result;
 }
 
 public U0 CtrlButtonDel(CCtrl *c)
 {//Free button ctrl.
-  Bool old_preempt=Preempt;
   QueRem(c);
-  Preempt(old_preempt);
   if (!(c->flags&BTF_DONT_FREE))
     Free(c->state);
   Free(c);

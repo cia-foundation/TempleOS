@@ -281,7 +281,7 @@ public class CMathODE
 
 //Interrupts
 //0x00-0x1F are reserved by Intel
-#define I_DIVIDE_BY_ZERO	0x00
+#define I_DIV_ZERO		0x00
 #define I_SINGLE_STEP		0x01
 #define I_NMI			0x02
 #define I_BPT			0x03
@@ -440,8 +440,8 @@ class CKernel
 #define RLf_FULL_HEAP		6
 #define RLf_RAW			7
 #define RLf_INTERRUPTS		8
-#define RLf_MP			9
-#define RLf_DSK			10
+#define RLf_BLKDEV		9
+#define RLf_MP			10
 #define RLf_COMPILER		11
 #define RLf_DOC			12
 #define RLf_WINMGR		13
@@ -458,8 +458,8 @@ class CKernel
 #define RLF_FULL_HEAP		0x00040
 #define RLF_RAW			0x00080
 #define RLF_INTERRUPTS		0x00100
-#define RLF_MP			0x00200
-#define RLF_DSK			0x00400
+#define RLF_BLKDEV		0x00200
+#define RLF_MP			0x00400
 #define RLF_COMPILER		0x00800
 #define RLF_DOC			0x01000
 #define RLF_WINMGR		0x02000
@@ -570,7 +570,8 @@ class CRAXRBCRCXRDX
 #define EXT_WIN_FOCUS		1
 #define EXT_HEAPLOG_MALLOC	2
 #define EXT_HEAPLOG_FREE	3
-#define EXT_NUM_ENTRIES		4
+#define EXT_DBG_RESUME		4
+#define EXT_NUM_ENTRIES		5
 
 #help_index "Processor"
 #define DFT_CACHE_LINE_WIDTH	64
@@ -602,9 +603,10 @@ class CSema
 #define SYS_SEMA_TT			16
 #define SYS_SEMA_MUTE			17
 #define SYS_SEMA_FORCE_WINMGR		18
-#define SYS_SEMA_TMBEAT			19
-#define SYS_SEMA_FIX			20
-#define NUM_SYS_SEMAS			21
+#define SYS_SEMA_JUST_PUMP_MSGS		19
+#define SYS_SEMA_TMBEAT			20
+#define SYS_SEMA_FIX			21
+#define NUM_SYS_SEMAS			22
 
 #define SYSf_CTRL_ALT_DEL		0
 #define SYSf_CTRL_ALT_C			1
@@ -788,9 +790,9 @@ public class CMemberLstMeta
 public class CMemberLst
 {
   CMemberLst *next,*left,*right,
-	*left2,*right2; //For finding dup class local vars, not names.
+	*left_class_base,*right_class_base; //For finding dup class local vars.
   U8	*str;
-  CHashClass *member_class,*member_class2;
+  CHashClass *member_class,*member_class_base;
   CMemberLstMeta *meta;
   U32	use_cnt;
   U16	flags;
@@ -827,7 +829,8 @@ public class CHashClass:CHashSrcSym
   U32	member_cnt;
   U8	ptr_stars_cnt,raw_type;
   U16	flags;
-  CMemberLst *member_lst,*member_lst2,
+  CMemberLst *member_lst_and_root, //Head of linked list and root of tree.
+	*member_class_base_root, //For finding dup class local vars.
 	*last_in_member_lst;
   CHashClass	*base_class,
 	*fwd_class;
@@ -1014,7 +1017,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEF_DONT_DRAW		0x400000000000000 //only works on sprites
 
 #define DOCEG1_DONT_EDIT	(DOCEF_DEFINE|DOCEF_HTML_LINK|\
-  DOCEF_BIN_PTR_LINK|DOCEF_SCROLLING_X|DOCEF_TAG_CB)
+  DOCEF_AUX_STR|DOCEF_BIN_PTR_LINK|DOCEF_SCROLLING_X|DOCEF_TAG_CB)
 
 //These are identical to Doc flags
 #define DOCEF_HIGHLIGHT		0x4000000
@@ -1329,7 +1332,6 @@ public class CDoc //Linked Text File header
   CDocEntry *cur_entry,*old_cur_entry;
   I32	cur_col,old_cur_col,
 	line_start_col,top_line_num,
-	ext_ascii_val,ext_ascii_cnt, //Like <CTRL-ALT-a>, <ALT-#><ALT-#><ALT-#>
 	dollar_buf_size,dollar_buf_ptr;
   U8	*dollar_buf; //When entering $$ cmds, it buffers them until the end $$.
 
@@ -1346,7 +1348,7 @@ public class CDoc //Linked Text File header
   CEdFindText *find_replace;
 
   U8	*cur_sprite;//Set cur_sprite use (ip.pos.x,ip.pos.y) as input.
-//Output is nearest. See $LK,"*_cur_elem_num=",A="FF:::/Adam/Gr/SpriteEd.CPP.Z,*_cur_elem_num=doc->"$ and $LK,"::/Demo/Graphics/Pick.CPP.Z"$.
+//Output is nearest. See $LK,"*_cur_elem_num=",A="FF:::/Adam/Gr/SpriteEd.CPP,*_cur_elem_num=doc->"$ and $LK,"::/Demo/Graphics/Pick.CPP"$.
   I64	nearest_sprite_elem_num;
 
   CEdFileName filename;
@@ -1390,6 +1392,7 @@ tries to do something.
 #define WIF_SELF_GRAB_SCROLL	0x0200
 #define WIF_SELF_DOC		0x0400
 #define WIF_SELF_ODE		0x0800
+#define WIF_SELF_KEY_DESC	0x1000
 		//FOCUS		0x00010000
 #define WIF_FOCUS_TASK_MENU	0x00020000
 #define WIF_FOCUS_TASK_CTRLS	0x00040000
@@ -1404,7 +1407,7 @@ tries to do something.
 #define WIG_DBL_CLICK		(WIF_FOCUS_TASK_IP_L_D|WIF_FOCUS_TASK_IP_R_D)
 #define WIG_TASK_DFT	(WIF_FOCUS_TASK_MENU|WIG_DBL_CLICK|\
 			0xFFFF-WIF_SELF_DOC-WIF_SELF_ODE)
-#define WIG_USER_TASK_DFT	0
+#define WIG_USER_TASK_DFT	WIF_SELF_KEY_DESC
 
 #define WIf_SELF_FOCUS		0
 #define WIf_SELF_CTRLS		2
@@ -1415,6 +1418,7 @@ tries to do something.
 #define WIf_SELF_GRAB_SCROLL	9
 #define WIf_SELF_DOC		10
 #define WIf_SELF_ODE		11
+#define WIf_SELF_KEY_DESC	12
 #define WIf_FOCUS_TASK_MENU	17
 #define WIf_FOCUS_TASK_CTRLS	18
 #define WIf_FOCUS_TASK_IP_L	19
@@ -1450,16 +1454,61 @@ public class CWinMgrGlbls
 	grab_scroll_closed;
 };
 
-#help_index "Compiler/Directive"
-//Compiler Options
-//  Use $LK,"OptOn",A="MN:OptOn"$() $LK,"OptOff",A="MN:OptOff"$()
+#help_index "AutoComplete"
+#define ACf_INIT_IN_PROGRESS	0
+#define AC_MAX_FILLINS 10
+public class CAutoCompleteGlbls
+{
+  I64	num_words;
+  CHashTable *hash_table;
+  U8	*cur_word;
+  I64	flags;
+  CTask	*task;
+  I64	partial_len,num_fillins,
+	fillin_hits	[AC_MAX_FILLINS+1];
+  CHashAC *fillin_matches[AC_MAX_FILLINS+1];
+};
 
-//You might need to do #exe {OptOn();}
+#help_index "AutoComplete/Dictionary"
+#define ACD_WORD_FILENAME	"/Adam/AutoComplete/ACWords.DAT.Z"
+#define ACD_DEF_FILENAME	"/Adam/AutoComplete/ACDefs.DAT"
+#define ACD_DEF_FILENAME_Z	"/Adam/AutoComplete/ACDefs.DAT.Z"
+
+#define ACD_H1			0
+#define ACD_H1_END		1
+#define ACD_DEF			2
+#define ACD_DEF_END		3
+#define ACD_PRONUNCIATION	4
+#define ACD_PRONUNCIATION_END	5
+#define ACD_POS			6
+#define ACD_POS_END		7
+#define ACD_EXTRA		8
+#define ACD_EXTRA_END		9
+#define ACD_BLK_SIZE		0x4000
+
+#define ACD_END_CHAR		0x00
+#define ACD_WORD_CHAR		0x01
+#define ACD_DEF_CHAR		0x02
+#define ACD_PRONUNCIATION_CHAR	0x03
+#define ACD_POS_CHAR		0x04
+#define ACD_EXTRA_CHAR		0x05
+
+#define ACD_MAX_FILLINS 10
+public class CAutoCompleteDictGlbls
+{
+  U8	*word_lst;
+  I64	word_lst_size,num_words,num_fillins;
+  U8	*fillins[ACD_MAX_FILLINS];
+  Bool	has_words,has_defs;
+};
+
+#help_index "Compiler/Directive"
+//Compiler $LK,"Option",A="MN:Option"$()s
+//You might need to do #exe {Option();}
 //Note: The #exe statement is lexed-ahead,
 //so it takes effect earlier than you might expect.
 #define OPTf_ECHO		0x00
-#define OPTf_OPT_TRACE		0x01
-#define OPTf_COMPILE_TRACE	0x02
+#define OPTf_TRACE		0x01
 #define OPTf_WARN_UNUSED_VAR	0x10 //Applied to funs, not statements
 #define OPTf_WARN_PAREN		0x11 //Warn unnecessary parens
 #define OPTf_WARN_DUP_TYPES	0x12 //Warn dup local var type statements
@@ -1519,7 +1568,7 @@ public class CWinMgrGlbls
 #define ICF_SHORT_JMP			0x000001000
 #define ICF_A1_FIRST			0x000002000
 #define ICF_PUSH_RESULT			0x000004000
-#define ICF_TRACE			0x000008000
+#define ICF_PASS_TRACE			0x000008000
 #define ICF_R_WAS_STK			0x000010000
 #define ICF_A1_WAS_STK			0x000020000
 #define ICF_A2_WAS_STK			0x000040000
@@ -1647,23 +1696,24 @@ class CCodeMisc
 #define IEF_48_REX		0x040
 #define IEF_REX_ONLY_R8_R15	0x080
 #define IEF_REX_XOR_LIKE	0x100
-#define IEF_STI			0x200
+#define IEF_STI_LIKE		0x200
 #define IEF_ENDING_ZERO		0x400
 
 //Slash value
 #define SV_R_REG	8
 #define SV_I_REG	9
-#define SV_NONE		10
+#define SV_STI_LIKE	10 //$LK,"uasm_slash_val",A="FF:::/Compiler/AsmInit.CPP,uasm_slash_val"$ only.
+#define SV_NONE		11
 class CInstruction
 {
   U8	ins_entry_num, //This entry num in opcode hash entry
 	opcode_cnt,
 	opcode[4];
   U16	flags;
-  U8	slash_val,opcode_modifier,
+  U8	slash_val,uasm_slash_val,opcode_modifier,
 	arg1,arg2,
 	size1,size2,//Size in bits
-	pad[2];
+	pad;
 };
 
 //x86 opcodes
@@ -1723,7 +1773,7 @@ I64 class CAbsCntsI64
 };
 
 class CAsmUndefHash
-{//Only place created is $LK,"Exp Parser",A="FF:::/Compiler/PrsExp.CPP.Z,sizeof(CAsmUndefHash)"$ when an undef is found in an ASM exp.
+{//Only place created is $LK,"Exp Parser",A="FF:::/Compiler/PrsExp.CPP,sizeof(CAsmUndefHash)"$ when an undef is found in an ASM exp.
   CAsmUndefHash	*next;
   CHashExport	*hash;
 };
@@ -2046,7 +2096,7 @@ class CLexHashTableContext
 #define CCF_KEEP_DOT		64
 #define CCF_KEEP_NUM_SIGN	128
 #define CCF_KEEP_AT_SIGN	256
-#define CCf_OPT_TRACE_PRESENT	9
+#define CCf_PASS_TRACE_PRESENT	9
 #define CCF_NOT_CONST		0x0000010000
 #define CCF_NO_REG_OPT		0x0000020000
 #define CCF_IN_QUOTES		0x0000040000
@@ -2105,7 +2155,7 @@ public class CCmpCtrl
   CStreamBlk *next_stream_blk,*last_stream_blk;
   CAOT	*aot;
 
-  I64	pass,opts,otrace_mask,
+  I64	pass,opts,pass_trace,saved_pass_trace,
 	error_cnt,warning_cnt;
 
   //For intermediate codes with multiple float ops (int<->float conversions)
@@ -2206,8 +2256,8 @@ public class CATARep
 #help_index "File/Low Level"
 #define BLK_SIZE_BITS	9
 #define BLK_SIZE	(1<<BLK_SIZE_BITS)
-#define CD_BLK_SIZE	(4*BLK_SIZE)
-#define CD_FILE_OFFSET	80
+#define DVD_BLK_SIZE	(4*BLK_SIZE)
+#define DVD_FILE_OFFSET	80
 #define INVALID_CLUSTER (-1)
 
 class CMBRPrt
@@ -2450,7 +2500,7 @@ class CISO1PriDesc
 #define RS_ATTR_FIXED		0x1000 //F
 
 #help_index "File/CD DVD"
-//Media types for $LK,"CDImageWrite",A="MN:CDImageWrite"$()
+//Media types for $LK,"DVDImageWrite",A="MN:DVDImageWrite"$()
 #define MT_CD		1
 #define MT_DVD		2
 
@@ -2591,9 +2641,9 @@ public class CBlkDev
 #define DVT_NULL	0
 #define DVT_REDSEA	1 //Supported
 #define DVT_FAT32	2 //Supported except for short names, to some degree
-#define DVT_ISO9660	3 //Supported (CD-ROM)
-#define DVT_ISO13490	4 //Not Supported (CD-ROM)
-#define DVT_ISO13346	5 //Not Supported (CD-ROM)
+#define DVT_ISO9660	3 //Supported (CD/DVD)
+#define DVT_ISO13490	4 //Not Supported (CD/DVD)
+#define DVT_ISO13346	5 //Not Supported (CD/DVD)
 #define DVT_NTFS	6 //Not Supported
 #define DVT_UNKNOWN	7
 #define DVT_NUM_TYPES	8
@@ -2630,7 +2680,7 @@ public class CDrv
   I64	base_offset,
 	size,
 	file_system_info_sect,
-	map1,map2,
+	fat1,fat2,
 	root_cluster,
 	data_area,
 	spc; //sectors per cluster
@@ -2639,9 +2689,9 @@ public class CDrv
   CBlkDev *bd;
 
   CFAT32FileInfoSect *fis;
-  I64	map_blk_dirty,
-	cur_map_blk_num;
-  U32	*cur_map_blk;
+  I64	fat_blk_dirty,
+	cur_fat_blk_num;
+  U32	*cur_fat_blk;
   CFreeLst *next_free,*last_free;
 };
 
@@ -2657,17 +2707,17 @@ class CCacheBlk
 };
 
 #help_index "File/System"
-public class CDskGlbls
+public class CBlkDevGlbls
 {
-  U8	*dft_iso_filename;  //See $LK,"dsk.dft_iso_filename",A="FF:::/Kernel/KEnd.CPP,dsk.dft_iso_filename"$
+  CBlkDev *blkdevs;
+  U8	*dft_iso_filename;  //See $LK,"blkdev.dft_iso_filename",A="FF:::/Kernel/KEnd.CPP,blkdev.dft_iso_filename"$
+  U8	*temp_filename;
   CCacheBlk *cache_base,*cache_ctrl,**cache_hash_table;
   I64	cache_size,read_cnt,write_cnt;
-  CBlkDev *blkdevs;
   CDrv	*drvs,*let_to_drv[32];
   I64	auto_mount_ide_cnt;
-  U8	temp_filename[STR_LEN],boot_drv_let,
-	first_hd_drv_let,first_cd_drv_let;
-  Bool	boot_rescue_drv_pmt,cdrom_boot_is_good;
+  U8	boot_drv_let,first_hd_drv_let,first_dvd_drv_let;
+  Bool	boot_rescue_drv_pmt,dvd_boot_is_good,pad[3];
 };
 
 #help_index "File/Internal"
@@ -2687,7 +2737,7 @@ public class CDirContext
 #define FF_CONTIGUOUS		16
 #define FF_USE_OLD_DATETIME	32
 
-public class CFile //See $LK,"::/Demo/Dsk/DataBase.CPP.Z"$.
+public class CFile //See $LK,"::/Demo/Dsk/DataBase.CPP"$.
 {
   I64	flags;
   CDirEntry de;
@@ -2904,7 +2954,8 @@ public class CKbdStateGlbls
   I64	scan_code,	//See $LK,"scan codes",A="FI:::/Doc/CharOverview.TXT"$
 	last_down_scan_code,
 	cnt,		//Count of keys pressed since boot.
-	timestamp;	//Output: GetTSC when event.
+	timestamp,	//Output: GetTSC when event.
+	new_key_timestamp; //Output: GetTSC when new key event.
   CFifoU8 *fifo,*fifo2; //Private
   CFifoI64 *scan_code_fifo;
 
@@ -3144,8 +3195,6 @@ class CSrvCtrl
 #define MSG_IP_R_DOWN_UP	-9  //Down & Up
 #define MSG_IP_R_D_DOWN_UP	-11 //Down & Up
 
-#define MSGF_ALLOW_KEY_DESC	63
-
 #help_index "Task"
 #define TASK_TITLE_LEN	127
 
@@ -3165,7 +3214,7 @@ public class CTaskSettings
   U8	text_attr,title_src,
 	border_attr,border_src,
 	task_title[TASK_TITLE_LEN+1];
-  Bool	border,preempt,cursor,scroll,autocomplete,pad[3];
+  Bool	border,cursor,scroll,autocomplete,pad[4];
   U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
@@ -3185,19 +3234,18 @@ public class CTaskSettings
 // TASK task flags
 #define TASKf_KILL_TASK		0
 #define TASKf_SUSPENDED		1
-#define TASKf_PREEMPT		2
-#define TASKf_IDLE		3
-#define TASKf_INPUT_FILTER_TASK	4
-#define TASKf_FILTER_INPUT	5
-#define TASKf_HAS_SONG		6
-#define TASKf_NOT_RAW		7
-#define TASKf_DISABLE_BPTS	8
-#define TASKf_AWAITING_MSG	9
-#define TASKf_BREAK_LOCKED	10
-#define TASKf_PENDING_BREAK	11
-#define TASKf_BREAK_TO_SHIFT_ESC 12
-#define TASKf_KILL_AFTER_DBG	13
-#define TASKf_NONTIMER_RAND	14
+#define TASKf_IDLE		2
+#define TASKf_INPUT_FILTER_TASK	3
+#define TASKf_FILTER_INPUT	4
+#define TASKf_HAS_SONG		5
+#define TASKf_NOT_RAW		6
+#define TASKf_DISABLE_BPTS	7
+#define TASKf_AWAITING_MSG	8
+#define TASKf_BREAK_LOCKED	9
+#define TASKf_PENDING_BREAK	10
+#define TASKf_BREAK_TO_SHIFT_ESC 11
+#define TASKf_KILL_AFTER_DBG	12
+#define TASKf_NONTIMER_RAND	13
 
 //locked flags
 #define TASKLf_TASK_LOCK		0
@@ -3299,7 +3347,8 @@ public class CTask //The Fs segment reg points to current CTask.
   I64	rand_seed,
 	task_num,
 	fault_num,fault_err_code;
-  CTask *popup_task;
+  CTask *popup_task,
+	*dbg_task;
   CWinScroll horz_scroll,vert_scroll;
 
   I64	user_data;
@@ -3435,6 +3484,7 @@ public class CSysFixedArea
 #define SCf_IP_R_DOWN	17
 #define SCf_DELETE	18
 #define SCf_INS		19
+#define SCf_NO_SHIFT	30
 #define SCf_KEY_DESC	31
 #define SCF_E0_PREFIX	(1<<SCf_E0_PREFIX)
 #define SCF_KEY_UP	(1<<SCf_KEY_UP)
@@ -3449,6 +3499,7 @@ public class CSysFixedArea
 #define SCF_IP_R_DOWN	(1<<SCf_IP_R_DOWN)
 #define SCF_DELETE	(1<<SCf_DELETE)
 #define SCF_INS 	(1<<SCf_INS)
+#define SCF_NO_SHIFT	(1<<SCf_NO_SHIFT)
 #define SCF_KEY_DESC	(1<<SCf_KEY_DESC)
 
 //TempleOS places a 1 in bit 7 for
@@ -3491,7 +3542,7 @@ public class CSysFixedArea
 #define SC_PRTSCRN1	0xAA
 #define SC_PRTSCRN2	0xB7
 
-#help_index "Char;Debugging/Raw Output"
+#help_index "Char;Debugging/Raw Output;TextBase Layer/Char"
 //text.raw_flags
 #define RWF_IN_DOLLAR	1
 #define RWF_LAST_DOLLAR	2
@@ -3641,7 +3692,6 @@ public class CDC
 
 #help_index "Compression/Piece by Piece"
 #define ARC_MAX_BITS	12
-#define ARC_MAX_ENTRY	(1<<ARC_MAX_BITS-1)
 
 #define CT_NONE 	1
 #define CT_7_BIT	2
@@ -3667,8 +3717,8 @@ public class CArcCtrl
 	saved_basecode,
 	entry_used,
 	last_ch;
-  CArcEntry compress[ARC_MAX_ENTRY+1],
-	*hash[ARC_MAX_ENTRY+1];
+  CArcEntry compress[1<<ARC_MAX_BITS],
+	*hash[1<<ARC_MAX_BITS];
 };
 
 #help_index "Compression"
@@ -3721,10 +3771,10 @@ class CKeyDevEntry
 class CKeyDevGlbls
 {
   CKeyDevEntry put_key_root;
-  U0	(**fp_ctrl_alt_let_cbs)(I64 sc);
-  I64	ctrl_alt_let_in_irq_flags,
-	**ctrl_alt_let_ret_addr; //addr of ret addr on stack in kbd irq
-  U8	**ctrl_alt_let_descs,
+  U0	(**fp_ctrl_alt_cbs)(I64 sc);
+  I64	ctrl_alt_in_irq_flags,
+	**ctrl_alt_ret_addr; //addr of ret addr on stack in kbd irq
+  U8	**ctrl_alt_no_shift_descs,**ctrl_alt_shift_descs,
 	desc[STR_LEN],
 	*handler;
 };
@@ -3758,8 +3808,9 @@ $$=64;
 #help_index "Debugging"
 class CMPCrash
 {
-  CTask *task;
   I64	cpu_num;
+  CTask *task;
+  I64	rip;
   U8	*msg;
   I64	msg_num;
 };
@@ -3770,7 +3821,7 @@ public class CDbgGlbls
   U8	*msg;
   I64	msg_num;
   CMPCrash *mp_crash;
-  U8	*fault_handlers_code,
+  U8	*int_fault_code,
 	*fix_file_line;
   CPSectCache *psect_cache;
   I64	psect_cache_index;
@@ -3785,10 +3836,10 @@ public class CDbgGlbls
 #define BOOT_SRC_NULL		0
 #define BOOT_SRC_RAM		1
 #define BOOT_SRC_HARDDRV	2
-#define BOOT_SRC_CDROM		3
+#define BOOT_SRC_DVD		3
 
 // $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
-#define STD_DISTRO_CDROM_CFG	"Tb1\nScale2Mem(2048,0x40000)\nt3 \n\n\n\n"
+#define STD_DISTRO_DVD_CFG	"Tb1\nScale2Mem(2048,0x40000)\nt3 \n\n\n\n"
 
 #help_index "Misc/Registry"
 //Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()

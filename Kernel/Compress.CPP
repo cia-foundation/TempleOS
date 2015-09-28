@@ -223,7 +223,7 @@ CArcCtrl *ArcCtrlNew(Bool expand,I64 compression_type=CT_8_BIT)
   CArcCtrl *c;
   c=CAlloc(sizeof(CArcCtrl));
   if (expand) {
-    c->stk_base=MAlloc(ARC_MAX_ENTRY+1);
+    c->stk_base=MAlloc(1<<ARC_MAX_BITS);
     c->stk_ptr=c->stk_base;
   }
   if (compression_type==CT_7_BIT)

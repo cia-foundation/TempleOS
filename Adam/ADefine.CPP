@@ -11,15 +11,15 @@ U0 LoadDocDefines()
   //This is cut and replaced when I generate a distro.
   //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOSDistro.CPP,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","122,918");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","80,950");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","118,728");
+DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","80,899");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;
   DefinePrint("DD_KERNEL_END","%08X",bfh);
   DefinePrint("DD_PROTECTED_LOW","%08X",MEM_PROTECTED_LOW_LIMIT);
 
-  //$LK,"DD_BOOT_HIGH_LOC_CD",A="FF:::/Adam/Boot/BootCD.CPP,DD_BOOT_HIGH_LOC_CD"$
+  //$LK,"DD_BOOT_HIGH_LOC_DVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,DD_BOOT_HIGH_LOC_DVD"$
 
   DefinePrint("DD_MP_VECT","%08X",MP_VECT_ADDR);
   DefinePrint("DD_MP_VECT_END","%08X",

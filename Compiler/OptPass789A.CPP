@@ -35,7 +35,8 @@ cc->pass==10 is final pass, code is placed into buf.
   } else
     dbg_info=NULL;
 
-  if (Bt(&cc->flags,CCf_OPT_TRACE_PRESENT) && Bt(&cc->otrace_mask,cc->pass))
+  if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT) &&
+	Bt(&cc->saved_pass_trace,cc->pass))
     "$$BK,1$$$$LTRED$$$$IV,1$$This code gets merged together and patched.\n"
 	  "$$FG$$$$IV,0$$$$BK,0$$";
 
@@ -46,7 +47,7 @@ cc->pass==10 is final pass, code is placed into buf.
   tempi=tempi->next;
   while (tempi->ic_code) {
     tempi_next=tempi->next;
-    if (tempi->ic_flags&ICF_TRACE && Bt(&cc->otrace_mask,cc->pass))
+    if (tempi->ic_flags&ICF_PASS_TRACE && Bt(&cc->saved_pass_trace,cc->pass))
       ICPut(cc,tempi);
     ip2=ip;
     if (cc->flags&CCF_AOT_COMPILE)
@@ -410,7 +411,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	    }
 	    break;
 	  case IC_CALL_IMPORT:
-	    if (GetOpt(OPTf_USE_IMM64)) {
+	    if (GetOption(OPTf_USE_IMM64)) {
 	      ICU16(tempi,0xBB48);
 	      ICU64(tempi,0);
 	      if (buf) {
@@ -881,9 +882,6 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICCopyTemplate(cc,tempi,CMP_TEMPLATE_SIGN_I64,
 		TRUE,FALSE,FALSE,CN_MAIN);
 	  break;
-	case IC_PREEMPT:
-	  ICPreempt(tempi,ip2);
-	  break;
 	case IC_TOUPPER:
 	  ICToUpper(tempi,ip2);
 	  break;
@@ -1159,7 +1157,8 @@ op789A_skip_copy:
       if (!dbg_info->body[i])
 	dbg_info->body[i]=ip2;
     }
-    if (tempi->ic_flags&ICF_TRACE && Bt(&cc->otrace_mask,cc->pass) && cnt) {
+    if (tempi->ic_flags&ICF_PASS_TRACE &&
+	  Bt(&cc->saved_pass_trace,cc->pass) && cnt) {
       "$$RED$$";
       if (buf)
 	Un(buf+ip,cnt,64);

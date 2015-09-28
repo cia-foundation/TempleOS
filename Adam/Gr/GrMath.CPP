@@ -179,21 +179,21 @@ public U0 DCPenWidthScale(CDC *dc=gr.dc)
   }
 }
 
-public I64 *Mat4x4TranslationEqu(I64 r[4][4],I64 x,I64 y,I64 z)
+public I64 *Mat4x4TranslationEqu(I64 *r,I64 x,I64 y,I64 z)
 {//Set translation values in 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  r[0][3]=x<<32;
-  r[1][3]=y<<32;
-  r[2][3]=z<<32;
-  r[3][3]=GR_SCALE;
+  r[0*4+3]=x<<32;
+  r[1*4+3]=y<<32;
+  r[2*4+3]=z<<32;
+  r[3*4+3]=GR_SCALE;
   return r;
 }
 
-public I64 *Mat4x4TranslationAdd(I64 r[4][4],I64 x,I64 y,I64 z)
+public I64 *Mat4x4TranslationAdd(I64 *r,I64 x,I64 y,I64 z)
 {//Add translation to 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  r[0][3]+=x<<32;
-  r[1][3]+=y<<32;
-  r[2][3]+=z<<32;
-  r[3][3]=GR_SCALE;
+  r[0*4+3]+=x<<32;
+  r[1*4+3]+=y<<32;
+  r[2*4+3]+=z<<32;
+  r[3*4+3]=GR_SCALE;
   return r;
 }
 
