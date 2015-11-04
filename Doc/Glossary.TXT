@@ -8,7 +8,7 @@ $FG,2$ACD$FG$	AutoComplete Dictionary
 $FG,2$Addr$FG$	Address
 $FG,2$Alloc$FG$	Allocate
 $FG,2$AOT$FG$	Ahead-of-Time
-$FG,2$AP$FG$	Application Processor(CPU#>0)
+$FG,2$AP$FG$	ApplicationProcessor (Core1 - Core7)
 $FG,2$Arg$FG$	Argument
 $FG,2$Asm$FG$	Assemble, Assembler or Assembly
 $FG,2$Attr$FG$	Attribute
@@ -17,7 +17,6 @@ $FG,2$BG$FG$	Backround
 $FG,2$Bin$FG$	Binary
 $FG,2$Blk$FG$	Block
 $FG,2$Bmp$FG$	BitMap
-$FG,2$BSP$FG$	Boot-strap Processor(CPU#0)
 $FG,2$Buf$FG$	Buffer
 $FG,2$Bwd$FG$	Backward
 $FG,2$CB$FG$	Call-Back, Code Block
@@ -119,6 +118,7 @@ $FG,2$Sec$FG$	Second, Secondary
 $FG,2$$FG,2$Sect$FG$	Sector
 $FG,2$Seq$FG$	Sequence
 $FG,2$Snd$FG$	Sound
+$FG,2$SP$FG$	SingleProcessor
 $FG,2$Src$FG$	Source
 $FG,2$Srv$FG$	Servant
 $FG,2$Stat$FG$	Status, Statistic
@@ -252,6 +252,6 @@ $ID,-2$$TR,"Join"$
 $ID,2$When two parts of a program have a common low-level routine, that routine is often labeled SomethingJoin.
 $ID,-2$$TR,"user_data"$
 $ID,2$Many operating system structures have space set aside for you to store values.  You are on your own managing these with multiple applications and libraries.
-$ID,-2$$TR,"Multicore BSP/AP Processors"$
-$ID,2$The $FG,2$boot-strap processor$FG$ is core#0, has the $FG,2$Adam task$FG$, and it is the master.  The $FG,2$application processors$FG$ have Seth tasks and are the slave processors.  Only the $FG,2$BSP$FG$ core#0 processor's tasks can have windows.  More or less, applications are launched exclusively from the $FG,2$BSP$FG$ processor.  It is the master.  The only way slave cores get used is if the application explicitly $LK,"Spawn",A="MN:Spawn"$s() a task on them or $LK,"JobQue",A="MN:JobQue"$() a job on them.
+$ID,-2$$TR,"Multicore Core0/CoreAP"$
+$ID,2$Core#0, has the $FG,2$Adam task$FG$, and it is the master.  The $FG,2$application processors$FG$ have Seth tasks and are the slave processors.  Only core#0 tasks can have windows and can launch applications.  Slave cores are used if the application explicitly $LK,"Spawn",A="MN:Spawn"$s() a task or $LK,"JobQue",A="MN:JobQue"$() a job on them.
 $ID,-2$

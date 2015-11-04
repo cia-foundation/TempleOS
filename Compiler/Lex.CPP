@@ -440,7 +440,7 @@ I64 Lex(CCmpCtrl *cc)
   I64 i,j,k,ch;
   CHash *temph;
   Bool str_done,neg_e;
-  U8 *fbuf,*buf2,*buf3,buf[LEX_MAX_IDENT];
+  U8 *fbuf,*buf2,*buf3,buf[STR_LEN];
   cc->last_line_num=cc->lex_include_stk->line_num;
   while (TRUE) {
 lex_cont:
@@ -469,8 +469,8 @@ lex_ident:
 	i=0;
 	buf[i++]=ch;
 	while (TRUE) {
-	  if (i>=LEX_MAX_IDENT-1) //1 for terminator
-	    break;
+	  if (i>=STR_LEN)
+	    LexExcept(cc,"Ident limited to STR_LEN chars at ");
 	  else if (!(ch=LexGetChar(cc)))
 	    break;
 	  else if (Bt(cc->chars_bmp_alpha_numeric,ch))
@@ -607,7 +607,7 @@ lex_float_start:
 	buf2=NULL;
 	i=0;
 	do {
-	  j=LexInStr(cc,buf,LEX_MAX_IDENT,&str_done);
+	  j=LexInStr(cc,buf,STR_LEN,&str_done);
 	  buf3=MAlloc(i+j);
 	  if (buf2) {
 	    MemCpy(buf3,buf2,i);
@@ -748,7 +748,7 @@ lex_float_start:
 		      buf[j++]=ch;
 		    else
 		      break;
-		    if (j>=LEX_MAX_IDENT-4) {//spare spot for '\\' next loop
+		    if (j>=STR_LEN-4) {//Spot for ['\'][ch],[ch],[0]
 		      buf[j++]=0;
 		      buf3=MAlloc(i+j);
 		      if (buf2) {

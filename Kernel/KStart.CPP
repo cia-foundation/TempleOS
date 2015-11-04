@@ -16,7 +16,7 @@ because it is #included first.  $LK,"Kernel.PRJ",A="FF:::/Kernel/Kernel.PRJ,KSta
 */
 USE16
 SYS_KERNEL:: //This must match $LK,"CKernel",A="MN:CKernel"$.
-	JMP	U16 BSP_16BIT_INIT
+	JMP	U16 CORE0_16BIT_INIT
 
 //************************************
 //  ASM Global vars required for 16-bit start-up
@@ -52,7 +52,7 @@ SYS_PCI_BUSSES::	DU16	0;
 #assert $$-SYS_KERNEL==sizeof(CKernel)-sizeof(CBinFile)
 
 //************************************
-BSP_16BIT_INIT::
+CORE0_16BIT_INIT::
 //EBX is $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. (Val passed from boot blk, $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.)
 	MOV	AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
 	MOV	SS,AX
@@ -172,8 +172,8 @@ The assembler doesn't support far jumps so we hand code it.
 To complete the switch to 32-bit mode, we have to load
 the code segment with a far jump.
 */
-	DU8	0x66,0xEA; //JMP CGDT.boot_cs:BSP_32BIT_INIT
-	DU32	BSP_32BIT_INIT;
+	DU8	0x66,0xEA; //JMP CGDT.boot_cs:CORE0_32BIT_INIT
+	DU32	CORE0_32BIT_INIT;
 	DU16	CGDT.boot_cs;
 
 #assert $$+16<=0xFFFF
@@ -231,7 +231,7 @@ SYS_CACHE_LINE_WIDTH::	DU64	DFT_CACHE_LINE_WIDTH;
 SYS_SEMAS::		DU8	NUM_SYS_SEMAS*SEMA_STRUCT_SIZE DUP(0);
 //************************************
 	ALIGN	16,OC_NOP
-BSP_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
+CORE0_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
 	PUSH	U32 RFLAGG_START
 	POPFD
 	MOV	EAX,SYS_START_CR0
@@ -367,7 +367,7 @@ USE32
 	WRMSR
 
 	MOV	EBX,BOOT_SRC_RAM
-	MOV	EAX,I32 BSP_32BIT_INIT
+	MOV	EAX,I32 CORE0_32BIT_INIT
 	JMP	EAX
 SYS_RAM_REBOOT_END::
 USE64

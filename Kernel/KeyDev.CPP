@@ -150,7 +150,7 @@ U0 CtrlAltE(I64)
 
 U0 CtrlAltF(I64)
 {
-  VGAFlush;
+  SwapI64(&text.font,&text.aux_font);
 }
 
 U0 CtrlAltM(I64)
@@ -161,6 +161,11 @@ U0 CtrlAltM(I64)
 U0 CtrlAltT(I64)
 {
   LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_TAB);
+}
+
+U0 CtrlAltV(I64)
+{
+  VGAFlush;
 }
 
 U0 CtrlAltX(I64)
@@ -204,8 +209,9 @@ U0 KeyDevInit()
   CtrlAltCBSet('C',&CtrlAltC,"Cmd /Break Execution",,TRUE);
   CtrlAltCBSet('D',&CtrlAltD,"Cmd /Enter Debugger",,TRUE);
   CtrlAltCBSet('E',&CtrlAltE,"Cmd /Spawn New User Task");
-  CtrlAltCBSet('F',&CtrlAltF,"Cmd /VGA Flush",,TRUE);
+  CtrlAltCBSet('F',&CtrlAltF,"Cmd /Toggle Aux Font");
   CtrlAltCBSet('M',&CtrlAltM,"Cmd /Toggle Mute");
   CtrlAltCBSet('T',&CtrlAltT,"Cmd /Switch Focus to Next Task",,TRUE);
+  CtrlAltCBSet('V',&CtrlAltV,"Cmd /VGA Flush",,TRUE);
   CtrlAltCBSet('X',&CtrlAltX,"Cmd /Kill Focused Task",,TRUE);
 }

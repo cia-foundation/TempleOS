@@ -232,7 +232,7 @@ public _extern SYS_PROGRESSES
 #help_file "::/Doc/MultiCore"
 public _extern SYS_CPU_STRUCTS CCPU *cpu_structs; //$LK,"Gs",A="MN:Gs"$ points to cur $LK,"CCPU",A="MN:CCPU"$.
 public _extern SYS_MP_CNT I64 mp_cnt; //Count of cores
-_extern SYS_MP_CNT_INITIAL I64 mp_cnt_initial; //only used during $LK,"BSPStartMP",A="MN:BSPStartMP"$
+_extern SYS_MP_CNT_INITIAL I64 mp_cnt_initial; //only used during $LK,"Core0StartMP",A="MN:Core0StartMP"$
 _extern SYS_MP_CNT_LOCK I64 mp_cnt_lock;
 _extern SYS_SEMAS CSema sys_semas[NUM_SYS_SEMAS];
 

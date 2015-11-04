@@ -2,7 +2,21 @@
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----09/27/15 21:18:10----$IV,0$
+$IV,1$----11/03/15 22:40:18----$IV,0$
+* Added $FG,2$CTRL-ALT-f$FG$ to toggle an aux font.
+* $FG,2$CTRL-ALT-v$FG$ is now flush VGA cache.
+* Added $LK,"BibleDoc",A="MN:BibleDoc"$ to present Bible with tree widgets.
+* Fixed $FG,2$CTRL-ALT-C$FG$ bug.
+
+$IV,1$----11/01/15 21:44:46----$IV,0$
+* $BK,1$TempleOS version 3.12 Released$BK,0$
+* Created $FG,2$/Kernel/Mem$FG$ directory.
+
+$IV,1$----10/08/15 10:17:55----$IV,0$
+* $LK,"R",A="MN:R"$("$FG,4$BSP$FG$","$FG,4$Core0$FG$");
+
+$IV,1$----10/06/15 06:30:49----$IV,0$
+* Added $LK,"TaskFocusNext",A="MN:TaskFocusNext"$().
 
 $IV,1$----09/27/15 11:46:44----$IV,0$
 * Got rid of preemption.

@@ -65,7 +65,7 @@ U0 DrawCtrls(CTask *task)
 	if (!Bt(&task->display_flags,DISPLAYf_NO_BORDER)) {
 	  PUSHFD
 	  CLI
-	  while (LBts(&task->locked_flags,TASKLf_TASK_LOCK))
+	  while (LBts(&task->task_flags,TASKf_TASK_LOCK))
 	    PAUSE
 
 	  task->win_left--; //Allow drawing on border
@@ -74,7 +74,7 @@ U0 DrawCtrls(CTask *task)
 	  task->win_bottom++;
 	  WinDerivedValsUpdate(task);
 
-	  LBtr(&task->locked_flags,TASKLf_TASK_LOCK);
+	  LBtr(&task->task_flags,TASKf_TASK_LOCK);
 	  POPFD
 
 	  if (c->draw_it)
@@ -82,7 +82,7 @@ U0 DrawCtrls(CTask *task)
 
 	  PUSHFD
 	  CLI
-	  while (LBts(&task->locked_flags,TASKLf_TASK_LOCK))
+	  while (LBts(&task->task_flags,TASKf_TASK_LOCK))
 	    PAUSE
 
 	  task->win_left++;
@@ -91,7 +91,7 @@ U0 DrawCtrls(CTask *task)
 	  task->win_bottom--;
 	  WinDerivedValsUpdate(task);
 
-	  LBtr(&task->locked_flags,TASKLf_TASK_LOCK);
+	  LBtr(&task->task_flags,TASKf_TASK_LOCK);
 	  POPFD
 	}
       } else

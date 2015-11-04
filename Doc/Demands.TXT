@@ -28,7 +28,7 @@ $LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminate
 * Perhaps, Intel can make a fast software interrupt, the same as a CALL REL32?  Perhaps, we have a new x86 mode for TempleOS?
 
 * Since I don't use paging (for anything), Intel should have an option for  no-paging long mode, and optimize it.
-$LK,"::/Kernel/MemA.CPP"$		:153 lines to identity-map gets eliminated.
+$LK,"::/Kernel/Mem/PageTables.CPP"$		:153 lines to identity-map gets eliminated.
 
 * Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS when the reset button is pressed and booting UEFI when the power button is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.
 

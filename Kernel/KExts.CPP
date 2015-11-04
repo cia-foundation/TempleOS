@@ -8,6 +8,7 @@ import Bool DocUnlock(CDoc *doc);
 import Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
 extern U0 AdamErr(U8 *fmt,...);
 extern U0 AdamLog(U8 *fmt,...);
+extern I64 BIOSTotalMem();
 extern I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free);
 extern U0 BlkDevChk(CBlkDev *bd);
 extern Bool BlkDevLock(CBlkDev *bd);
@@ -47,6 +48,8 @@ extern I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
 extern I64 FlushMsgs(CTask *task=NULL);
 extern I64 GetChar(I64 *scan_code=NULL,Bool echo=TRUE,Bool raw_cursor=FALSE);
 extern I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE);
+extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
+	CTask *task=NULL,CBlkPool *bp);
 extern Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_result,I64 fuf_flags=0);
 extern Bool ISODrvInit(CDrv *dv,I64 blk);

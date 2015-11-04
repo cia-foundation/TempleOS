@@ -121,7 +121,7 @@ It is not normal to by-pass the TempleOS graphcis routines.
 The TempleOS graphics don't know VGA has changed.
 This bit tells TempleOS to update whole screen.
 */
-  //<CTRL-ALT-f> will flush screen VGA cache.
+  //<CTRL-ALT-v> will flush screen VGA cache.
   VGAFlush;
 }
  

@@ -2071,8 +2071,6 @@ class CAOTCtrl
 #define TK_INS_BINARY_SIZE	0x126
 #define TK_NUM_TK		0x127
 
-#define LEX_MAX_IDENT	134 //Max is 132
-
 class CLexHashTableContext
 {
   CLexHashTableContext *next;
@@ -3219,26 +3217,26 @@ public class CTaskSettings
 };
 
 #help_index "Task"
-//Border ATTR src
+//CTask.border_src
 #define BDS_CONST		0
 #define BDS_CUR_DRV		1
 #define BDS_ED_FILENAME_DRV	2
 
-//Task title src
+//CTask.title_src
 #define TTS_CONST		0
 #define TTS_LOCKED_CONST	1 //This is not strictly enforced
 #define TTS_TASK_NAME		2
 #define TTS_ED_FILENAME		3
 #define TTS_CUR_LEX		4
 
-// TASK task flags
-#define TASKf_KILL_TASK		0
-#define TASKf_SUSPENDED		1
-#define TASKf_IDLE		2
-#define TASKf_INPUT_FILTER_TASK	3
-#define TASKf_FILTER_INPUT	4
-#define TASKf_HAS_SONG		5
-#define TASKf_NOT_RAW		6
+//CTask.task_flags
+#define TASKf_TASK_LOCK		0
+#define TASKf_KILL_TASK		1
+#define TASKf_SUSPENDED		2
+#define TASKf_IDLE		3
+#define TASKf_INPUT_FILTER_TASK	4
+#define TASKf_FILTER_INPUT	5
+#define TASKf_HAS_SONG		6
 #define TASKf_DISABLE_BPTS	7
 #define TASKf_AWAITING_MSG	8
 #define TASKf_BREAK_LOCKED	9
@@ -3247,14 +3245,13 @@ public class CTaskSettings
 #define TASKf_KILL_AFTER_DBG	12
 #define TASKf_NONTIMER_RAND	13
 
-//locked flags
-#define TASKLf_TASK_LOCK		0
-
+//CTask.display_flags
 #define DISPLAYf_SHOW			0
-#define DISPLAYf_SILENT			1
-#define DISPLAYf_NO_BORDER		2
-#define DISPLAYf_WIN_ON_TOP		3
-#define DISPLAYf_CHILDREN_NOT_ON_TOP	4
+#define DISPLAYf_NOT_RAW		1
+#define DISPLAYf_SILENT			2
+#define DISPLAYf_NO_BORDER		3
+#define DISPLAYf_WIN_ON_TOP		4
+#define DISPLAYf_CHILDREN_NOT_ON_TOP	5
 
 #define TASK_SIGNATURE_VAL		'TskS'
 #define TASK_NAME_LEN			31
@@ -3268,9 +3265,8 @@ class CTaskStk
 public class CTask //The Fs segment reg points to current CTask.
 {
   CTask *addr; //Self-addressed ptr
-  U32	task_signature,pad;
-  I64	task_flags,locked_flags;
-  U32	display_flags,win_inhibit;
+  U32	task_signature;
+  U32	task_flags,display_flags,win_inhibit;
   I64	wake_jiffy;
 
   CHeapCtrl *code_heap,*data_heap;
@@ -3554,7 +3550,7 @@ public class CTextGlbls
   I64	raw_col,raw_flags;
   U8	*raw_screen_image;
   I64	rows,cols;	//Use TEXT_ROWS,TEXT_COLS
-  U64	*font;
+  U64	*font,*aux_font;
 };
 
 #define FONT_WIDTH	8

@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
-* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"119,216",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"12.2",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.  See $LK,"::/Doc/Credits.TXT"$.
+* I, $FG,2$Terry A. Davis$FG$, wrote every one of the $TX,"118,706",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"12.2",D="DD_TEMPLEOS_AGE"$ years (full-time).  It runs on bare hardware with no layering, libraries, tools, modules or anything from other sources.  It's 100% independent and stands alone.  It has no networking and certainly doesn't call home.  Every line of TempleOS src code is including in all distro's, from the kernel to the compiler to the boot loaders.  See $LK,"::/Doc/Credits.TXT"$.
 
 * TempleOS does not execute code not written by me and any time except for a few $FG,2$BIOS$FG$ calls for configuration.  See $LK,"::/Doc/Credits.TXT"$.
 
@@ -26,13 +26,11 @@ $WW,1$$FG,5$$TX+CX,"Clearing-up Confusions"$$FG$
 
 * I use the term $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$.  This means it is compiled and executable code placed into mem, ready to be called.
 
-* Files with names ending in $FG,2$.Z$FG$ are compressed, not encrypted.  $LK,"Copy",A="MN:Copy"$() or rename them with $LK,"Move",A="MN:Move"$() to store them uncompressed.
+* Files with names ending in $FG,2$.Z$FG$ are individually compressed, not encrypted.  $LK,"Copy",A="MN:Copy"$() or rename them with $LK,"Move",A="MN:Move"$() to store them uncompressed.
 
 * TempleOS is open src and every bit of the src code is included in the distro.  Use $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() to compile the kernel and compiler.
 
 * TempleOS does not use object files or a linker. 
-
-* The swap rate is high because tasks stay in the queue and poll conditions and swap-out voluntarily.  Swaps also occur at $FG,2$$TX,"1000 Hz",D="DD_JIFFY_HZ"$$FG$ due to the timer interrupt.  See $LK,"JIFFY_FREQ",A="MN:JIFFY_FREQ"$.
 
 * Refresh rate is how often TempleOS updates screen mem.  It is not syncronized to the hardware rate.  It has nothing to do with it.
 

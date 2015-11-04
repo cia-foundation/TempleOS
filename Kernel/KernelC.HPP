@@ -581,8 +581,8 @@ public extern U0 QSortI64(I64 *base,I64 num,
 public extern U0 ProgressBarsRst();
 
 #help_index "MultiCore"
-extern U0 APSethTask();
-extern U0 BSPStartMP();
+extern U0 Core0StartMP();
+extern U0 CoreAPSethTask();
 public extern U0 MPInt(U8 num,I64 cpu_num=1);
 public extern U0 MPIntAll(U8 num);
 public extern U0 MPNMInt();
@@ -666,7 +666,6 @@ public extern U0 SleepUntil(I64 wake_jiffy);
 
 #help_index "Task/Misc"
 extern U0 (*fp_update_ctrls)(CTask *task);
-public extern U0 OverRideSingleUserSwap();
 public extern U0 TSSBusy(I64 tr,Bool val=OFF);
 public extern U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE);
 public extern U0 WinDerivedValsUpdate(CTask *task=NULL);

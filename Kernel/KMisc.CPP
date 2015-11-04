@@ -244,12 +244,12 @@ Bool Raw(Bool val)
 {//Switches to direct screen, non-windowed output.
   if (!val)
     VGAFlush;
-  return !LBEqu(&Fs->task_flags,TASKf_NOT_RAW,!val);
+  return !LBEqu(&Fs->display_flags,DISPLAYf_NOT_RAW,!val);
 }
 
 Bool IsRaw()
 {//Are we in BLACK & WHITE raw screen mode?
-  return !Bt(&Fs->task_flags,TASKf_NOT_RAW);
+  return !Bt(&Fs->display_flags,DISPLAYf_NOT_RAW);
 }
 
 Bool SingleUser(Bool val)

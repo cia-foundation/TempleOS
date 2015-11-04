@@ -497,7 +497,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   LBtr(&mp.update_not_done_flags,Gs->num);
 }
 
-U0 APEagleDiveTask(CTask *master_task)
+U0 CoreAPEagleDiveTask(CTask *master_task)
 {
   CDC *dc=DCAlias(main_dc,master_task);
   while (!mp.app_done) {
@@ -605,7 +605,7 @@ U0 DrawHorizon(CDC *dc)
   dc->depth_buf=old_db;
 }
 
-U0 BSPEagleDive()
+U0 Core0EagleDive()
 {
   CDC *dc=DCAlias(main_dc,Fs);
   I64 i,xx,yy,height,bkcolor,cx=Fs->pix_width>>1,cy=Fs->pix_height>>1;
@@ -808,7 +808,7 @@ U0 Init(I64 _mp_cnt)
   z=64		 *COORDINATE_SCALE*MAP_SCALE;
 
   for (i=1;i<mp.mp_cnt;i++)
-    Spawn(&APEagleDiveTask,Fs,"AP EagleDive",i);
+    Spawn(&CoreAPEagleDiveTask,Fs,"AP EagleDive",i);
   Fs->task_end_cb=&TaskEndCB;
   game_t0=tS;
 }
@@ -900,7 +900,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
 	è =Wrap(è);
 	é2=Wrap(é2);
       } else
-	BSPEagleDive;
+	Core0EagleDive;
     } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
   catch
     PutExcept;

@@ -67,6 +67,8 @@ U0 SysGlblsInit()
 U0 SysGrInit()
 {
   text.font=sys_font_8x8;
+  text.aux_font=MAlloc(256*FONT_HEIGHT);
+  MemCpy(text.aux_font,text.font,256*FONT_HEIGHT);
   if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
     text.cols=80;
     text.rows=25;
@@ -133,7 +135,7 @@ U0 KernelMain()
 {//Continued from $LK,"Kernel",A="FF:::/Kernel/KStart.CPP,I32 &Kernel"$
   OutU8(0x61,InU8(0x61)&~3); //Snd(0);
   adam_task=Fs;
-  HeapsInit;
+  BlkPoolsInit;
   LBts(&sys_run_level,RLf_FULL_HEAP);
   SysGlblsInit;
   Mem32DevInit;
@@ -148,7 +150,7 @@ U0 KernelMain()
   TaskDerivedValsUpdate;
 
   SysDefinesLoad;
-  BSPInit;
+  Core0Init;
   IntInit1;
 
   //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
@@ -184,7 +186,7 @@ U0 KernelMain()
   #exe {
     if (!kernel_cfg->opts[CFG_NO_MP])
       StreamPrint("\"MultiCore Start\\n\\n\";"
-	    "BSPStartMP;"
+	    "Core0StartMP;"
 	    "LBts(&sys_run_level,RLf_MP);");
   };
 

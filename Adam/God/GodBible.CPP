@@ -270,14 +270,69 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
   }
 }
 
-U0 BibleView()
-{
-  U8 buf[STR_LEN];
-  I64 book=PopUpPickDefineSub("ST_BIBLE_BOOKS");
-  if (book>=0) {
-    StrPrint(buf,"BF:%Z,1:1",book,"ST_BIBLE_BOOKS");
-    Ed(buf);
+public CDoc *BibleDoc()
+{//Return Bible as DolDoc with trees.
+  CDoc	*result=DocRead(BIBLE_FILENAME);
+  CDocEntry *doc_e=result->root.next,*doc_e1;
+  Bool open_chapter=FALSE;
+  U8	*ptr=Define("ST_BIBLE_BOOK_LINES");
+  I64	book,book_cnt=DefineCnt("ST_BIBLE_BOOK_LINES")-1,
+	chapter,
+	line=Str2I64(ptr,,&ptr);
+  ptr++;
+  for (book=0;book<book_cnt;book++) {
+    while (doc_e->y+1<line) {
+      doc_e1=doc_e->next;
+      DocEntryDel(result,doc_e);
+      doc_e=doc_e1;
+    }
+    result->cur_entry=doc_e;
+    result->cur_col=0;
+    DocPrint(result,"$$TR,\"%Z\"$$\n$$ID,2$$",book,"ST_BIBLE_BOOKS");
+    line=Str2I64(ptr,,&ptr);
+    ptr++;
+    chapter=1;
+    while (doc_e->y+1<line) {
+      doc_e1=doc_e->next;
+      if (doc_e->type_u8==DOCT_TEXT && StrMatch(":1 ",doc_e->tag)) {
+	result->cur_entry=doc_e;
+	result->cur_col=0;
+	if (open_chapter) {
+	  DocPrint(result,"$$ID,-2$$");
+	  open_chapter=FALSE;
+	}
+	DocPrint(result,"$$TR,\"%d\"$$\n$$ID,2$$",chapter++);
+	open_chapter=TRUE;
+      } else if (chapter==1) {
+	doc_e1=doc_e->next;
+	DocEntryDel(result,doc_e);
+	doc_e=doc_e1;
+      }
+      doc_e=doc_e1;
+    }
+    result->cur_entry=doc_e;
+    result->cur_col=0;
+    if (open_chapter) {
+      DocPrint(result,"$$ID,-2$$");
+      open_chapter=FALSE;
+    }
+    DocPrint(result,"$$ID,-2$$");
   }
+  while (doc_e!=result) {
+    doc_e1=doc_e->next;
+    DocEntryDel(result,doc_e);
+    doc_e=doc_e1;
+  }
+  return result;
+}
+
+public U0 BibleView()
+{//View Bible as DolDoc with trees.
+  U8 buf[STR_LEN];
+  CDoc *doc=BibleDoc;
+  StrPrint(buf,"AL:%d,1",doc);
+  Ed(buf);
+  DocDel(doc);
 }
 U0 CtrlAltB(I64)
 {

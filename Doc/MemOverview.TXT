@@ -55,6 +55,6 @@ $ID,-2$
 
 $WW,1$* Note: There is a break in the data-heap block pool.  This has no effect except the obvious effect that fragmentation has on contiguous requests.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 8 Gig chunk on my 12 Gig machine.
 
-* Note: For systems with less than 2 Gig RAM, the code and data heap block pools are the same.  For systems with 2-4 Gig of RAM, the code heap is 1/4 of the total.  See $LK,"HeapsInit",A="MN:HeapsInit"$().
+* Note: For systems with less than 2 Gig RAM, the code and data heap block pools are the same.  For systems with 2-4 Gig of RAM, the code heap is 1/4 of the total.  See $LK,"BlkPoolsInit",A="MN:BlkPoolsInit"$().
 
 * See $LK,"Independent HeapCtrl Example",A="FA:::/Kernel/KEnd.CPP,Independent HeapCtrl Example"$.

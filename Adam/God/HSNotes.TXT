@@ -154,6 +154,10 @@ Best way for Bill Gates to save lives?	$FG,4$Earthquake prediction$FG$
 Stem cells?			$FG,4$Lower hanging fruit exists (2007)$FG$
 Eleventh commandment?		$FG,4$Thou shall not litter.(Maybe, glory of Creation)$FG$
 Twelfth commandment?		$FG,4$Don't slaughter unarmed men in war.$FG$
+Thirteenth commandment		$FG,4$No gore unless it looks fake.$FG$
+Fourteenth commandment		$FG,4$No pedophilia or child porn.$FG$
+Fifteenth commandment		$FG,4$Don't eat rare meat with blood.$FG$
+Sixteenth commandment		$FG,4$No wife beating.$FG$
 Before Katrina			$FG,4$Floods do justice. Black bead elder (tree book)$FG$
 After Katrina			$FG,4$Suffering Simplifies Life$FG$
 What field are You most better?	$FG,4$Economics$FG$

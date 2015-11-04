@@ -251,14 +251,14 @@ U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
   if (!task) task=Fs;
   PUSHFD
   CLI
-  while (LBts(&task->locked_flags,TASKLf_TASK_LOCK))
+  while (LBts(&task->task_flags,TASKf_TASK_LOCK))
     PAUSE
   WinDerivedValsUpdate(task);
   if (fp_update_ctrls)
     (*fp_update_ctrls)(task);
   if (update_z_buf && Bt(&task->display_flags,DISPLAYf_SHOW))
     LBts(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
-  LBtr(&task->locked_flags,TASKLf_TASK_LOCK);
+  LBtr(&task->task_flags,TASKf_TASK_LOCK);
   POPFD
 }
 
@@ -442,7 +442,7 @@ I64 TaskEnd()
   if (LBtr(&task->display_flags,DISPLAYf_SHOW))
     LBts(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
 
-  while (LBts(&task->locked_flags,TASKLf_TASK_LOCK))
+  while (LBts(&task->task_flags,TASKf_TASK_LOCK))
     PAUSE
   while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
     PAUSE
@@ -478,7 +478,7 @@ I64 TaskEnd()
   TaskQueRem(task);
 
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
-  LBtr(&task->locked_flags,TASKLf_TASK_LOCK);
+  LBtr(&task->task_flags,TASKf_TASK_LOCK);
 
   if (sys_winmgr_task) {
     task->next_task=Gs->dying_task_lst;

@@ -5,7 +5,7 @@ USE16
 
 //This code gets copied to $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$.
 //See $LK,"MemCpy(MP_VECT_ADDR",A="FF:::/Kernel/MultiProc.CPP,MemCpy(mp:2"$.
-AP_16BIT_INIT::
+COREAP_16BIT_INIT::
 	JMP	@@05
 
 	ALIGN	4,OC_NOP
@@ -23,7 +23,7 @@ AP_GDT_PTR:	DU16	sizeof(CGDT)-1;
 	DU8	0x66,0xEA;		 //JMP CGDT.cs32:AP_32BIT_INIT
 	DU32	AP_32BIT_INIT;
 	DU16	CGDT.cs32;
-AP_16BIT_INIT_END::
+COREAP_16BIT_INIT_END::
 
 USE32
 AP_32BIT_INIT:
@@ -121,7 +121,7 @@ CCPU *CPUStructInit(I64 num,CCPU *c,CTask *seth_task)
   c->idle_factor=0.01;
   if (Bt(&sys_run_level,RLf_BOOT_HEAP)) {
     c->idle_task=Spawn(0,NULL,"Idle Task",,Fs,,0);
-    Bts(&c->idle_task->task_flags,TASKf_IDLE);
+    LBts(&c->idle_task->task_flags,TASKf_IDLE);
     c->tss=TSSNew(num);
   }
   c->seth_task=seth_task;// It waits for this to be filled-in: $LK,"seth_task",A="FF:::/Kernel/MultiProc.CPP,seth_task"$
@@ -188,7 +188,7 @@ U0 MPWake(I64 target_cpu)
 U0 MPAPICInit()
 {//Called by adam during start-up
 //and other cores during initialization
-  //after $LK,"BSPStartMP",A="MN:BSPStartMP"$().
+  //after $LK,"Core0StartMP",A="MN:Core0StartMP"$().
   *LAPIC_SVR(U32 *)|=LAPICF_APIC_ENABLED;
   dev.mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
   *LAPIC_LDR(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
@@ -208,7 +208,7 @@ U0 MPAPICInit()
 
 #assert !offset(CSrvCtrl.next_waiting)
 
-U0 APSethTask()
+U0 CoreAPSethTask()
 {
   CSrvCtrl *my_ctrl=&Fs->srv_ctrl;
   CSrvCmd *tempc,*tempc1=&my_ctrl->next_waiting;
@@ -289,17 +289,17 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   return result;
 }
 
-U0 APSethInit()
-{//Called by multicore's seth task after $LK,"BSPStartMP",A="MN:BSPStartMP"$()
+U0 CoreAPSethInit()
+{//Called by multicore's seth task after $LK,"Core0StartMP",A="MN:Core0StartMP"$()
 //as the first thing a CPU does before waiting for jobs.
   MPAPICInit;
-  Fs->rip=&APSethTask;
+  Fs->rip=&CoreAPSethTask;
   Fs->time_slice_start=GetTSC;
   TaskContextRestore;
 }
 
-U0 BSPStartMP()
-{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,BSPStartMP"$.
+U0 Core0StartMP()
+{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.CPP,Core0StartMP"$.
   CTask *task;
   U8 buf[STR_LEN];
   CAP16BitInit *mp=MP_VECT_ADDR;
@@ -327,7 +327,7 @@ U0 BSPStartMP()
   //When you start-up other cores, they jump to an addr
   //specified by a byte vect number, $LK,"MPN_VECT",A="MN:MPN_VECT"$ which corresponds
   //to a location 4096*vect number, $LK,"MP_VECT_ADDR",A="MN:MP_VECT_ADDR"$$WW,0$.
-  MemCpy(mp,AP_16BIT_INIT,AP_16BIT_INIT_END-AP_16BIT_INIT);
+  MemCpy(mp,COREAP_16BIT_INIT,COREAP_16BIT_INIT_END-COREAP_16BIT_INIT);
   MemCpy(&mp->ap_gdt_ptr,SYS_GDT_PTR,sizeof(CSysLimitBase));
   mp_cnt_initial=mp_cnt=1;
   mp_cnt_lock=0;
@@ -352,7 +352,7 @@ U0 BSPStartMP()
 
   for (i=1;i<my_mp_cnt;i++) {
     StrPrint(buf,"Seth Task CPU#%d",i);
-    task=Spawn(&APSethInit,NULL,buf,,,SETH_STK,0);
+    task=Spawn(&CoreAPSethInit,NULL,buf,,,SETH_STK,0);
     task->rflags=RFLAGG_START;
 //$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
     CPUStructInit(i,&cpu_structs[i],task);
@@ -370,7 +370,7 @@ U0 BSPStartMP()
   mp_cnt=my_mp_cnt; //Finalize cnt
 }
 
-U0 BSPInit()
+U0 Core0Init()
 {//Called by adam during start-up
   CRAXRBCRCXRDX ee;
   CPUId(0x1,&ee);

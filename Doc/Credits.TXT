@@ -4,7 +4,7 @@ $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
 2) $LK,"ATA Reg and Cmd Definitions",A="MN:ATA_NOP"$ are originally from Linux.  Later, I got the spec.
 
-3) The heap algorithm, $LK,"::/Kernel/MemB.CPP"$, is adapted from one I saw at Ticketmaster when I worked on their VAX operating system.
+3) The heap algorithm, $LK,"::/Kernel/Mem/MAllocFree.CPP"$, is adapted from one I saw at Ticketmaster when I worked on their VAX operating system.
 
 4) The LZW compression algorithm, $LK,"::/Kernel/Compress.CPP"$, came from a magazine and I implemented it when I worked for Ticketmaster.
 

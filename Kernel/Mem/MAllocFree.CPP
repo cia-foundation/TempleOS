@@ -1,5 +1,6 @@
 asm {
 //************************************
+//See $LK,"::/Doc/Credits.TXT"$.
 _MALLOC::
 // Throws 'OutMem'
 	PUSH	RBP
@@ -206,7 +207,7 @@ MALLOC_FINAL_EXIT:
 	RET1	16
 //************************************
 _FREE::
-//Be aware of $LK,"heap_hash",A="FF:::/Kernel/MemB.CPP,heap_hash"$ in $LK,"Mem512TaskAlloc",A="MN:Mem512TaskAlloc"$().
+//Be aware of $LK,"heap_hash",A="FF:::/Kernel/Mem/MAllocFree.CPP,heap_hash"$ in $LK,"Mem512TaskAlloc",A="MN:Mem512TaskAlloc"$().
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RSI

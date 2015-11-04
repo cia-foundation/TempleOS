@@ -5,7 +5,9 @@ You can save it as a binary file with:
 
 You can load it with:
 	U64 *my_font=FileRead("filename.BIN.Z");
-	text.font=my_font; //preserve text.font if you want to go back.
+	text.aux_font=my_font;
+
+<CTRL-ALT-f> will toggle main font and aux_font.
 
 If you want to change the system font permanently,
 save to a file with this font editor program
@@ -16,13 +18,14 @@ See $LK,"::/Demo/ExtendedChars.CPP"$ and $LK,"::/Demo/ScreenCodes.CPP"$.
 */
 
 #define BLOW_UP_CHAR_X	(18*FONT_WIDTH)
-#define BLOW_UP_CHAR_Y	(2*FONT_HEIGHT)
+#define BLOW_UP_CHAR_Y	(4*FONT_HEIGHT)
 
 U8 cur_ch;
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,j,k,c;
+  TextPrint(task,0,0,BLUE<<4+YELLOW,"Press <CTRL-ALT-f> to Toggle Aux Font.");
   k=0;
   for (i=0;i<16;i++)
     for (j=0;j<16;j++) {
@@ -33,7 +36,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  c=(YELLOW<<4+BLUE)<<8 + k++;
       } else
 	c=(BLUE<<4+WHITE)<<8 + k++;
-      TextChar(task,,j,i,c);
+      TextChar(task,,j,i+2,c);
     }
 
   k=0;

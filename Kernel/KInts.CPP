@@ -45,9 +45,7 @@ IRQ_TIMER::  //I_TIMER
 	MOV	EAX,U32 LAPIC_EOI
 	MOV	U32 [RAX],0
 	JMP	@@25
-
 @@20:	CALL	&IntCore0TimerHandler	//Only Core 0 calls this.
-
 @@25:	JMP	I32 RESTORE_RSI_TASK
 //************************************
 INT_FAULT::
@@ -80,7 +78,7 @@ INT_FAULT::
 	PUSH	U64 CTask.fault_num[RSI]
 	MOV	RSI,CTask.rsi[RSI]
 	CALL	&Fault2 	//See $LK,"Fault2",A="FF:::/Kernel/KDbg.CPP,Fault2"$
-	JMP	I32 RESTORE_FS_TASK_WITH_KEY_CHECK
+	JMP	I32 RESTORE_FS_TASK
 
 INT_FAULT_ERR_CODE_BITMAP::
 	DU32	0x00027D00,0,0,0,0,0,0,0;

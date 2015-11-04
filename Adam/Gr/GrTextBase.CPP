@@ -344,7 +344,7 @@ public U0 TextBorder(CTask *task=NULL,
       TextChar(task,,i,b+1,'Í'+attr);
     }
     for (i=t;i<=b;i++) {
-      TextChar(task,,l-1,i,'º'+attr);
+      TextChar(task,,l-1,i,'º'+attr); //Note: $LK,"RawDr",A="MN:RawDr"$() uses this char.
       TextChar(task,,r+1,i,'º'+attr);
     }
   } else {

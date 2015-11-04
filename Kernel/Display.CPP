@@ -94,7 +94,7 @@ U0 WinDerivedValsUpdate(CTask *task=NULL)
 {//Those things calculated from other variables.
   if (!task) task=Fs;
 
-    //Assert: This is called with TASKLf_TASK_LOCK set
+  //Assert: This is called with TASKf_TASK_LOCK set
   PUSHFD
   CLI
   task->win_width =task->win_right-task->win_left+1;

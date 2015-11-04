@@ -334,13 +334,6 @@ U0 Dr(CTask *task=NULL)
   "RIP:%016X\n",task->rip;
 }
 
-U0 OverRideSingleUserSwap()
-{//You never need this, probably.
-  Bool old_single=SingleUser(OFF);
-  Yield;
-  SingleUser(old_single);
-}
-
 U8 *SysGetStr2(I64)
 {
   U8 buf[512];
@@ -458,7 +451,7 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
 	  ">B2;\t\t\t//Clear all break points\n"
 	  ">G2;\t\t\t//Clear all break points and Go\n\n"
 	  "After resuming, <CTRL-ALT-t> changes focus task\n"
-	  "After resuming, <CTRL-ALT-f> flushes screen VGA cache\n";
+	  "After resuming, <CTRL-ALT-v> flushes screen VGA cache\n";
   else {
     LBtr(&task->task_flags,TASKf_DISABLE_BPTS);
     LBtr(&task->rflags,RFLAGf_TRAP);//No single step
@@ -534,12 +527,12 @@ U0 DbgHelp()
 	">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
 	">Exit;\t\t\t\t//Exit (kill) task.\n\n"
 	"After resuming, <CTRL-ALT-t> changes focus task.\n"
-	"After resuming, <CTRL-ALT-f> flushes screen VGA cache.\n\n";
+	"After resuming, <CTRL-ALT-v> flushes screen VGA cache.\n\n";
 }
 
 U0 Dbg2()
 {
-  Bool old_win_inhibit,old_waiting_msg;
+  Bool old_win_inhibit,old_waiting_msg,old_single;
   I64 i,old_getstr2;
   U8 buf[200];
   if (IsRaw) {
@@ -555,8 +548,10 @@ U0 Dbg2()
   kbd.scan_code=0;
   old_getstr2=fp_getstr2;
   fp_getstr2=&SysGetStr2;
+  old_single=SingleUser(OFF);
   while (!mouse.install_attempts)
-    OverRideSingleUserSwap;
+    Yield;
+  SingleUser(old_single);
   UserTaskCont;
   fp_getstr2=old_getstr2;
   Fs->win_inhibit=old_win_inhibit;

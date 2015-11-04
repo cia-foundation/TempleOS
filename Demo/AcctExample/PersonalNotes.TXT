@@ -10,8 +10,6 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Get rid of having two terms and pick one, "Disk" and "BlkDev"?  I don't think so.  (Probably not.)
 
-* Make Bible into Tree Branches Collapsed.
-
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
 
 * $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.
@@ -21,6 +19,9 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 * Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
   CArrayDim dim;
   CHashFun *fun_ptr;
+
+* Add Russian, Hebrew and all Greek. $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().
+  Add aux_font $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$.
 
 * Clean-up ASCII-127 delete char.
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(st); With st="\n\\";
@@ -52,6 +53,8 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 * No Compiler Warning:  dc->palette48.r   =palette24[i].r<<8;
 
 * I think subswitch_start with a break in the preface fails.
+
+* Do $LK,"CTask",A="MN:CTask"$->task_flags need to be in separate cache lines?
 
 * Add editor select just visible text for with filter.
 
@@ -208,7 +211,7 @@ so that applications can plan a big alloc.
 * This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/SrvCmd.CPP,Fs->catch_except=TRUE"$ causes problems because it
 catches divide and out-of-mem.  Not sure what to do, yet.
 
-* Make $LK,"BSPStartMP",A="MN:BSPStartMP"$() start work after boot to reset multicores.  Bonus for
+* Make $LK,"Core0StartMP",A="MN:Core0StartMP"$() start work after boot to reset multicores.  Bonus for
 freeing old task memory. (Prolly never gonna do anything about this.)
 
 * $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ local vars.
@@ -342,7 +345,7 @@ Offer only in approved place: $TX,"Deuteronomy 12:13-18",HTML="http://www.bibleg
 Jesus' zeal for the Temple: $TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
 
 >lspci -v
-Size:$TX,"17294 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17318 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/E6K9zK9ZWSg\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/E6K9zK9ZWSg\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 8:11 Behold, the days come, saith the Lord GOD, that I will send a
@@ -394,6 +397,14 @@ Zombie Game
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/F27r_9oyqBI\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/F27r_9oyqBI\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 Sports Game
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/ORXqOEGFQfE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/ORXqOEGFQfE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+MachineGun
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/wv_Q0E5PSC0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/wv_Q0E5PSC0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+Van Gogh
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/YBMGVu6GTDw\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/YBMGVu6GTDw\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+DumbGuards
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/OdKa9bXVinE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/OdKa9bXVinE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
 
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
