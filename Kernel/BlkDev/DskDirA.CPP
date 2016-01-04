@@ -107,7 +107,7 @@ U0 DirFilesSort(CDirEntry **_tempde,I64 key)
 	sort_buf[i++]=tempde1;
 	tempde1=tempde1->next;
       }
-      nobound_switch(key) {
+      nobound_switch (key) {
 	case SK_NAME:
 	  QSortI64(sort_buf,cnt,&DirEntryCompareName);
 	  break;

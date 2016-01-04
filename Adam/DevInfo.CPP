@@ -6,7 +6,6 @@
 #define PCI_DEV_FILE "::/Misc/PCIDevices.TXT.Z"
 
 /****
-
 //1) Plain text edit and remove file header and tail
 //2) Text find-and-replace "=0A=" with "".
 //3) Run PCIDevFileGen().
@@ -46,7 +45,6 @@ public U0 PCIDevFileGen()
   }
   DocWrite(doc);
 }
-
 ****/
 
 //$LK,"::/Misc/PCIDevices.TXT",A="PI:::/Misc/PCIDevices.TXT"$

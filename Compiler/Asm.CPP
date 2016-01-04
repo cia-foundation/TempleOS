@@ -1101,7 +1101,8 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
     else
       LexExcept(cc,"syntax error at ");
     if (cmp_flags&CMPF_ONE_ASM_INS && (cc->token!=TK_IDENT ||
-	  !(tempo=cc->hash_entry) || !(tempo->type&HTT_OPCODE)))
+	  !(tempo=cc->hash_entry) ||
+	  !(tempo->type&(HTT_OPCODE|HTT_ASM_KEYWORD))))
       break;
   }
   AOTLocalsResolve(cc);

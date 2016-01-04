@@ -34,7 +34,7 @@ Bool BlkDevInit(CBlkDev *bd)
   Bool result=FALSE;
   if (!LBts(&bd->flags,BDf_INITIALIZED)) {
     bd->flags|=BDF_INIT_IN_PROGRESS;
-    switch(bd->type) {
+    switch (bd->type) {
       case BDT_RAM:
 	if (!bd->RAM_dsk) {
 	  bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);

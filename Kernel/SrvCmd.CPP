@@ -54,6 +54,7 @@ CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags)
   while (LBts(&srv->srv_ctrl.flags,SVCRf_LOCKED))
     PAUSE
   if (!TaskValidate(srv)) {
+    LBtr(&srv->srv_ctrl.flags,SVCRf_LOCKED);
     POPFD
     SrvCmdDel(result);
     return NULL;

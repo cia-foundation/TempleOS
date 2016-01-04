@@ -682,8 +682,8 @@ public class CHashTable
 #define HTT_FUN			0x00040 //CHashFun
 #define HTT_WORD		0x00080 //CHashAC only in AutoComplete table
 #define HTT_DICT_WORD		0x00100 //CHashGeneric only in AutoComplete tbl
-#define HTT_KEYWORD		0x00200 //CHashGeneric
-#define HTT_ASM_KEYWORD		0x00400 //CHashGeneric
+#define HTT_KEYWORD		0x00200 //CHashGeneric $LK,"KEYWORD",A="FF:::/Compiler/OpCodes.TXT,KEYWORD"$
+#define HTT_ASM_KEYWORD		0x00400 //CHashGeneric $LK,"ASM_KEYWORD",A="FF:::/Compiler/OpCodes.TXT,ASM_KEYWORD"$
 #define HTT_OPCODE		0x00800 //CHashOpcode
 #define HTT_REG			0x01000 //CHashReg
 #define HTT_FILE		0x02000 //CHashGeneric

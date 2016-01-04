@@ -38,7 +38,7 @@ U8 *needle,I64 match=1)
 	result=FALSE;
 	while (doc_e!=haystack_doc) {
 	  if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-//TODO: handle multientry strs
+//TODO: handle multi-DocEntry strs
 		(ptr=StrIMatch(needle,doc_e->tag))) {
 	    i=ptr-doc_e->tag;
 	    if (!--match) {

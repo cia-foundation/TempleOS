@@ -1,6 +1,15 @@
+seven nation
+cage the elephant
+spoonman
+joline
+Sound garden
+black hole
+
 $WW,1$* I'm going to redo all my videos and make them more professional.
 
-* $TX,"Kruskal-Wallis_one-way_analysis_of_variance",HTML="http://en.wikipedia.org/wiki/Kruskal-Wallis_one-way_analysis_of_variance"$ disk sector allocation?
+* What if you had a $LK,"ClassRep",A="MN:ClassRep"$() that converted to plain text?
+
+* Why is nontimer $LK,"Rand",A="MN:Rand"$() so bad?
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
@@ -8,33 +17,46 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
+* $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens
+
+* Bug 12/25/15 Copy-Paste index.html glitch if source window 40 columns.
+
 * Get rid of having two terms and pick one, "Disk" and "BlkDev"?  I don't think so.  (Probably not.)
 
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
 
 * $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.
 
-* Entering a '$$' in text entry
+* Should we switch to having just C and D drives (and RAM and CD/DVD)?
+
+* Entering a '$$' in $$TX command's tag
 
 * Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
   CArrayDim dim;
   CHashFun *fun_ptr;
 
-* Add Russian, Hebrew and all Greek. $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().
-  Add aux_font $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$.
+* Might want to warn switch() dup case numbers
 
-* Clean-up ASCII-127 delete char.
-* $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(st); With st="\n\\";
+* Add cyrillic 8-bit Russian font on aux_font? <CTRL-ALT-f> will toggle fonts.
+  Move 12 border chars to screen font codes 0-26?  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().
+  Add aux_font option with $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ configured for any aux_font?
+
+* Should we rename chars_bmp_ to set_
+
+* Use standard terminology from "the literature".
+
+* Clean-up ASCII #127 delete char?  (No. Maybe, we want a new usage for 127 in future centuries.)
+
+* $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (I forgot what this is talking about.)
 
 * 8/2/2015 VMware start-up. Probably multicore.
+* $LK,"CtrlAltDel",A="FF:::/Kernel/SerialDev/Keyboard.CPP,CtrlAltDel"$ on <CTRL-ALT-INS>  Probably, VMware bug.
 
 * 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
 
-* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell.  No: I think CTRL-M twice.
+* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell.  No: I think CTRL-M twice.  (Probably, fixed or not a bug.)
 
 * $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Did I fix it?
-
-* Why is nontimer $LK,"Rand",A="MN:Rand"$() so bad?
 
 * $LK,"FL:::/Adam/Gr/SpriteEd.CPP,789"$ Resize bitmap?
 
@@ -44,29 +66,29 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Perhaps, links to self document if empty file name? $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$
 
+* Change $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ "DF:word" to "DN:word"
+
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
 
-* $LK,"Type",A="MN:Type"$() doesn't work in $LK,"Raw",A="MN:Raw"$() mode.
-
 * PSect does not scan all task tables.
+* $LK,"R",A="MN:R"$("PSect","Fun-something"); ?
+* Maybe let committee decide if we want intern to make binary tree look-up using PSECT symbol addresses, so we can eliminate psect cache and wall-paper kludge.  All HolyC functions and glbl vars would have left-right for address search.
 
-* No Compiler Warning:  dc->palette48.r   =palette24[i].r<<8;
 
 * I think subswitch_start with a break in the preface fails.
 
 * Do $LK,"CTask",A="MN:CTask"$->task_flags need to be in separate cache lines?
 
-* Add editor select just visible text for with filter.
+* Add DeleteHidden checkbox to <CTRL-F> Filter.
 
 * Add change-triangle-color to mesh editor.
+* Add 3D-Mesh Editor make-prism.
 
 * Add AVL binary tree support or red/black whatever that is.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  Where could we use?
 
-* Maybe let committee decide if we want intern to make binary tree look-up using PSECT symbol addresses, so we can eliminate psect cache and wall-paper kludge.  All HolyC functions and glbl vars would have left-right for address search.
-
 * DCF_TRANSFORMATION|DCF_SYMMETRY|DCF_JUST_MIRROR -- maybe not both needed at once.
 
-* DiskCache during FileRead. CTRL-ALT-C, $LK,"Kill",A="MN:Kill"$().  
+* DiskCache during FileRead. <CTRL-ALT-C>, $LK,"Kill",A="MN:Kill"$().  
 
 * Get rid of BYTE WORD DWORD in opcode and replace with U8 U16 U32.
 
@@ -90,6 +112,11 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Backward SHIFT-F3 is broken
 
+* Since no true preprocessor, maybe change nomeclature and get rid of #?
+* Rename #define to strmap.
+
+* Review writing to same cache-line from multicore.
+
 * MOV U8 [RSP+RCX],DL
 
 * UAsm negative byte displacement, neg 32-bit disp.
@@ -104,7 +131,9 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Exception msgs in Adam look bad
 
-3sGCGCqCCe2G3EE2G3qDetDEFsDBDB
+* Nice song "3sGCGCqCCe2G3EE2G3qDetDEFsDBDB"
+* Nice song? "3qDe2G3AetGD2G3sBDBDqCeDFetABDeFB3qDe2G3AetGD2G3sBDBDqCeDFetABDeFB3e2G3GDGqDeEADDqACB3e2G3GDGqDeEADDqACB"
+
 
 * $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() is broken. Devices should be in free spot of E820 report.
 
@@ -319,6 +348,8 @@ assignments.  Is ShiftNoPush fully implemented?
 * error/warning line nums
 * ASM branch out warning of range off by 1 line--use cc->last_line_num
 
+* $LK,"Who",A="MN:Who"$("-r"); Capital r is strongly desired.
+
 * Switch statement with sparse cases (low priority)
 * maybe inline functions?
 * Use of more floating-point stk?
@@ -331,84 +362,39 @@ assignments.  Is ShiftNoPush fully implemented?
 * sort options for findfiles
 * Maybe, get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.CPP,0x20000"$ in compiler.
 
+============================ Possible Things to Eliminate =====================
+* $LK,"::/Adam/Ctrls/CtrlsA.CPP"$?
+* $LK,"::/Adam/AMathODE.CPP"$?
+* $LK,"Complex",A="MN:Complex"$?
+* $LK,"CDC",A="MN:CDC"$.brush?
+* $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$() change to 3x3?
+* $LK,"ROP_XOR",A="MN:ROP_XOR"$?
 ================================================================================
+
+>lspci -v
+Size:$TX,"17322 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+
 It is love I desire: $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
 Offer a sacrifice of praise: $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
 Do I drink blood of goats? Offer praise: $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
+When a servant becomes king. $TX,"Proverb 30:22",HTML="http://www.biblegateway.com/verse/en/Proverb%2030:22"$
 Runner's Stride: $TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
-
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/aKchwAWMpDA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/aKchwAWMpDA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 Buckling Armor: $TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
 Lot cast in the lap: $TX,"Proverbs 16:33",HTML="http://www.biblegateway.com/verse/en/Proverbs%2016:33"$
 Lord does not repeat: $TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/en/Job%2033:14"$
 Offer only in approved place: $TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
 Jesus' zeal for the Temple: $TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
-
->lspci -v
-Size:$TX,"17318 KB",D="DD_TEMPLEOSCD_K_SIZE"$
-
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/E6K9zK9ZWSg\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/E6K9zK9ZWSg\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-8:11 Behold, the days come, saith the Lord GOD, that I will send a
-famine in the land, not a famine of bread, nor a thirst for water, but
-of hearing the words of the LORD: 8:12 And they shall wander from sea
-to sea, and from the north even to the east, they shall run to and fro
-to seek the word of the LORD, and shall not find it.
+Famine not for bread: $TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
 
 TempleOS Logo
 $HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
-
-Contact
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/SRoj3jK37Vc\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/SRoj3jK37Vc\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Black Knight
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/dhRUe-gz690\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/dhRUe-gz690\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Metallica: Creeping Death
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/z5lXEFdZAmU\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/z5lXEFdZAmU\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Neil Degrasse Tyson: Get of of their Way
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/AIEJjpVlZu0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/AIEJjpVlZu0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-Neil Degrasse Tyson: Girl
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/rVwQ9jBuoFA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/rVwQ9jBuoFA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Commodore 64 Basic/Assembly
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/d8bZ92gIVms\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/d8bZ92gIVms\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Red Fang: Prehistoric Dog
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/VufilzHKTqk\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/VufilzHKTqk\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Bill Gates Predictions
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/4r9u_R0cCew\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/4r9u_R0cCew\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Cop tying shoe:  (After drive-by shooting, God said kid was not innocent, LOL.)
+Cop tying shoe
 $HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
 
-Frontier Psychiatrist
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/qLrnkK2YEcE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/qLrnkK2YEcE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/DfIcZtjAch8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/DfIcZtjAch8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Morning has Broken
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/kKoRp05L95c\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/kKoRp05L95c\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Icarus
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/0Pmgtyw2n8w\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/0Pmgtyw2n8w\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Zombie Game
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/F27r_9oyqBI\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/F27r_9oyqBI\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-Sports Game
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/ORXqOEGFQfE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/ORXqOEGFQfE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-MachineGun
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/wv_Q0E5PSC0\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/wv_Q0E5PSC0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-Van Gogh
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/YBMGVu6GTDw\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/YBMGVu6GTDw\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-DumbGuards
-$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/OdKa9bXVinE\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/OdKa9bXVinE\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
-
-
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
-$TX,"PCI Interrupt Routing",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
+$TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
+$TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
+$TX,"The Sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-newton-list-of-sins"$
 $TX,"Lamp Shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
 $TX,"My Bookmarks",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bookmarks"$
 $TX,"Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon/"$
@@ -417,24 +403,18 @@ $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$ 
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
 $TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
-$TX,"KeyPeele#1",HTML="http://www.youtube.com/watch?v=Dd7FixvoKBw"$
-$TX,"KeyPeele#2",HTML="http://www.youtube.com/watch?v=VHG_Gv_zLY4"$
-$TX,"ThePrisoner",HTML="http://www.youtube.com/watch?v=HRPDO63rI1E"$
 $TX,"Bible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
 $TX,"Security at NIST",HTML="http://csrc.nist.gov/publications/nistpubs/800-30-rev1/sp800_30_r1.pdf"$
-$TX,"WestWorld",HTML="http://www.youtube.com/watch?v=LcL3eP0Hfy4"$
-$TX,"Picard:FourLights",HTML="http://www.youtube.com/watch?v=o_eSwq1ewsU"$
+$TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
 $TX,"Dwight:NerdTorture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
-$TX,"AliG:Homosapiens",HTML="http://www.youtube.com/watch?v=eB5VXJXxnNU&t=2m20s"$
-$TX,"Dumb Guards",HTML="http://www.youtube.com/watch?v=OdKa9bXVinE"$
-$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
-Holy Grail: Lmq5PxHpLNw  1:28:27
 $TX,"ATA/ATAPI Spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
 $TX,"BBC",HTML="http://www.knpr.org"$
 $TX,"BBC_News_24",HTML="http://www.wherever.tv/tv-channels/BBC-News-24.jsf"$
 $TX,"BBC_Five_Live",HTML="http://www.bbc.co.uk/radio/player/bbc_radio_five_live"$
 $TX,"KNPR",HTML="http://www.knpr.org"$
+$TX,"CBS News",HTML="http://www.cbsnews.com/live/?ftag= NM14632fc"$
+$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
 $TX,"C64 Users Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$
 $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_programmers_reference/c64-programmers_reference.htm"$
 $TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
-$TX,"Resperdal Shortens Life",HTML="http://factmed.com/study-RISPERDAL-causing-LIFE EXPECTANCY SHORTENED.php"$
+$TX,"Risperdal Shortens Life",HTML="http://factmed.com/study-RISPERDAL-causing-LIFE EXPECTANCY SHORTENED.php"$

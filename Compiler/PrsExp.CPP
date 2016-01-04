@@ -88,7 +88,7 @@ pe_unary_term1:
 	state=PrsUnaryModifier(cc,ps,&local_var,&tempad,&unary_post_prec);
 	break;
       case PE_MAYBE_MODIFIERS:
-	if (cc->token=='(') {
+	if (cc->token=='(') { //Typecast or fun_ptr
 	  cc->flags|=CCF_RAX;
 	  state=PrsUnaryModifier(cc,ps,&local_var,&tempad,&unary_post_prec);
 	} else
@@ -982,7 +982,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       if (!*unary_post_prec)
 	*unary_post_prec=PREC_TERM;
       tempc=cc->coc.coc_root.last->ic_class;
-      if (!tempc->ptr_stars_cnt && cc->token=='.')
+      if ((!tempc->ptr_stars_cnt || cc->flags & CCF_ARRAY) && cc->token=='.')
 	LexExcept(cc,"Must be address, not value ");
       if (!(cc->flags & CCF_RAX))
 	tempc--;

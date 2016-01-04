@@ -2,6 +2,23 @@
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
+$IV,1$----01/03/16 16:30:56----$IV,0$
+* Updated $LK,"::/Misc/PCIDevices.TXT.Z"$.
+* Added null case option.  Next higher integer with "$FG,2$case:$FG$" in $FG,2$switch$FG$ statements.  See  $LK,"::/Demo/NullCase.CPP"$.
+
+$IV,1$----12/31/15 00:44:44----$IV,0$
+* Made $LK,"ASM_KEYWORD",A="FF:::/Compiler/OpCodes.TXT,ASM_KEYWORD"$s usable in HolyC outside asm{} blocks.
+
+$IV,1$----12/26/15 19:39:31----$IV,0$
+* Added entry_lines to $LK,"Sort",A="MN:Sort"$().
+
+$IV,1$----12/14/15 14:51:57----$IV,0$
+* Fixed missing compiler warning with dereferencing zero star array classes.
+* Changed Linear congruential generator, $LK,"Rand",A="MN:Rand"$() from 32-bit to 64-bit.
+
+$IV,1$----11/22/15 21:02:38----$IV,0$
+* Improved $LK,"::/Adam/God/HSNotes.TXT"$.
+
 $IV,1$----11/03/15 22:40:18----$IV,0$
 * Added $FG,2$CTRL-ALT-f$FG$ to toggle an aux font.
 * $FG,2$CTRL-ALT-v$FG$ is now flush VGA cache.
@@ -165,227 +182,3 @@ $IV,1$----06/11/15 19:26:27----$IV,0$
 $IV,1$----06/04/15 08:31:15----$IV,0$
 * Improved assembler and unassembler.
 * Added $LK,"::/Doc/HelloWorld.TXT"$.
-
-$IV,1$----05/26/15 21:10:30----$IV,0$
-* Added $LK,"DCF_PALETTE",A="MN:DCF_PALETTE"$.
-* $LK,"R",A="MN:R"$("$FG,4$VGAPaletteColorGet$FG$","$LK,"GrPaletteColorGet",A="MN:GrPaletteColorGet"$");
-* $LK,"R",A="MN:R"$("$FG,4$VGAPaletteColorSet$FG$","$LK,"GrPaletteColorSet",A="MN:GrPaletteColorSet"$");
-
-$IV,1$----05/23/15 09:46:51----$IV,0$
-* Cleaned-up $LK,"::/Linux/TOSZ.CPP"$.
-* $LK,"R",A="MN:R"$("$FG,4$CaptureScreen$FG$","$FG,4$ScreenCapture$FG$");
-* Converted from 24 to 48 bit palette.
-* $LK,"R",A="MN:R"$("$FG,4$VGAPalette4Get$FG$","$LK,"GrPaletteGet",A="MN:GrPaletteGet"$");
-* $LK,"R",A="MN:R"$("$FG,4$VGAPalette4Set$FG$","$LK,"GrPaletteSet",A="MN:GrPaletteSet"$");
-* Added flags to $LK,"DCSave",A="MN:DCSave"$() and $LK,"GRAWrite",A="MN:GRAWrite"$().
-* Added palettes to $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.
-
-$IV,1$----05/19/15 21:28:19----$IV,0$
-* Fixed bug in $LK,"::/Apps/Psalmody/PsalmodyFile.CPP"$.
-
-$IV,1$----05/18/15 09:05:45----$IV,0$
-* $BK,1$TempleOS version 3.06 Released$BK,0$
-* $LK,"R",A="MN:R"$("$FG,4$BIOS32$FG$","$FG,4$PCIBIOS$FG$");
-
-$IV,1$----05/14/15 15:39:41----$IV,0$
-* Enhanced ::/Apps/Psalmody/Examples/abyss.CPP
-
-$IV,1$----05/13/15 07:51:00----$IV,0$
-* Fixed bug in $LK,"ToHtml",A="MN:ToHtml"$().
-* Added $FG,2$'\'$FG$ line continuation for $FG,2$#help_index$FG$.
-* Expanded $LK,"LexExtStr",A="MN:LexExtStr"$().
-* Reindented everything.
-
-$IV,1$----05/10/15 18:31:46----$IV,0$
-* $LK,"R",A="MN:R"$("$FG,4$SendMsg$FG$","$LK,"PostMsgWait",A="MN:PostMsgWait"$");
-
-$IV,1$----05/09/15 08:32:05----$IV,0$
-* Got rid of $FG,4$TASK_IN_QUE_SIGNATURE_VAL$FG$.
-* Broke-up long text file lines.
-
-$IV,1$----05/08/15 16:58:46----$IV,0$
-* Cleaned-up Compiler.
-* $LK,"R",A="MN:R"$("$FG,4$CLex$FG$","$LK,"CCmpCtrl",A="MN:CCmpCtrl"$");
-* $LK,"R",A="MN:R"$("$FG,4$LexNew$FG$","$LK,"CmpCtrlNew",A="MN:CmpCtrlNew"$");
-* $LK,"R",A="MN:R"$("$FG,4$LexDel$FG$","$LK,"CmpCtrlDel",A="MN:CmpCtrlDel"$");
-* $LK,"R",A="MN:R"$("$FG,4$LexSize$FG$","$LK,"CmpCtrlSize",A="MN:CmpCtrlSize"$");
-
-$IV,1$----05/06/15 21:31:40----$IV,0$
-* Fixed bug in $LK,"QSort",A="MN:QSort"$() and $LK,"QSortI64",A="MN:QSortI64"$().
-* Added $LK,"Sort",A="MN:Sort"$().
-
-$IV,1$----05/06/15 11:19:25----$IV,0$
-* $LK,"R",A="MN:R"$("$FG,4$GetResult$FG$","$LK,"JobResultGet",A="MN:JobResultGet"$");
-* $LK,"R",A="MN:R"$("$FG,4$ScanResult$FG$","$LK,"JobResultScan",A="MN:JobResultScan"$");
-
-$IV,1$----05/06/15 10:13:27----$IV,0$
-* $LK,"R",A="MN:R"$("$FG,4$DCAllocDepthBuf$FG$",		"$LK,"DCDepthBufAlloc",A="MN:DCDepthBufAlloc"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrAddTranslation$FG$",		"$LK,"Mat4x4TranslationAdd",A="MN:Mat4x4TranslationAdd"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrSetTranslation$FG$",		"$LK,"Mat4x4TranslationEqu",A="MN:Mat4x4TranslationEqu"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrSetSymmetry$FG$",		"$LK,"DCSymmetrySet",A="MN:DCSymmetrySet"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrSetSymmetry3$FG$",		"$LK,"DCSymmetry3Set",A="MN:DCSymmetry3Set"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrSetRotMat$FG$",		"$LK,"DCMat4x4Set",A="MN:DCMat4x4Set"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrReflect$FG$",		"$LK,"DCReflect",A="MN:DCReflect"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrScalePenWidth$FG$",		"$LK,"DCPenWidthScale",A="MN:DCPenWidthScale"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrTransform$FG$",		"$LK,"DCTransform",A="MN:DCTransform"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrLighting$FG$",		"$LK,"DCLighting",A="MN:DCLighting"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrRot$FG$",			"$LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrRotXEqu$FG$",		"$LK,"Mat4x4RotX",A="MN:Mat4x4RotX"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrRotYEqu$FG$",		"$LK,"Mat4x4RotY",A="MN:Mat4x4RotY"$");
-* $LK,"R",A="MN:R"$("$FG,4$GrRotZEqu$FG$",		"$LK,"Mat4x4RotZ",A="MN:Mat4x4RotZ"$");
-* $LK,"R",A="MN:R"$("$FG,4$SetStdPalette$FG$",		"$LK,"PaletteSetStd",A="MN:PaletteSetStd"$");
-* $LK,"R",A="MN:R"$("$FG,4$GetGrPalette4$FG$",		"$LK,"GrPaletteGet",A="MN:GrPaletteGet"$");
-* $LK,"R",A="MN:R"$("$FG,4$GetGrPaletteColor$FG$",	"$LK,"GrPaletteColorGet",A="MN:GrPaletteColorGet"$");
-* $LK,"R",A="MN:R"$("$FG,4$SetGrPalette4$FG$",		"$LK,"GrPaletteSet",A="MN:GrPaletteSet"$");
-* $LK,"R",A="MN:R"$("$FG,4$SetGrPaletteColor$FG$",	"$LK,"GrPaletteColorSet",A="MN:GrPaletteColorSet"$");
-
-$IV,1$----05/03/15 05:11:31----$IV,0$
-* $BK,1$TempleOS version 3.05 Released$BK,0$
-* Added $LK,"Mat4x4MulMat4x4Equ",A="MN:Mat4x4MulMat4x4Equ"$().
-* $LK,"R",A="MN:R"$("$FG,4$GrMulMat$FG$","$LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$").
-* Added $LK,"Mat4x4Equ",A="MN:Mat4x4Equ"$() and $LK,"Mat4x4New",A="MN:Mat4x4New"$().
-* Got rid of $FG,4$GrScaleNew$FG$(), $FG,4$GrRotXNew$FG$(), $FG,4$GrRotYNew$FG$() and $FG,4$GrRotZNew$FG$().
-
-$IV,1$----04/30/15 19:13:07----$IV,0$
-* Added $LK,"CDrv",A="MN:CDrv"$.fat32_local_time_offset.
-* Cleaned-up $LK,"Who",A="MN:Who"$() and compiler mapfiles.
-
-$IV,1$----04/11/15 05:48:05----$IV,0$
-* Fixed bug in $LK,"DrvFATBlkClean",A="MN:DrvFATBlkClean"$().
-
-$IV,1$----04/09/15 04:42:31----$IV,0$
-* Improved $LK,"::/Demo/Games/TreeCheckers.CPP"$.
-
-$IV,1$----04/08/15 15:24:27----$IV,0$
-* $LK,"R",A="MN:R"$("DocDo","DocEd");
-
-$IV,1$----04/07/15 05:27:38----$IV,0$
-* Added ::/Apps/Psalmody/Examples/whos.CPP
-
-$IV,1$----04/04/15 14:27:07----$IV,0$
-* Enhanced ::/Apps/Psalmody/Examples/proponent.CPP
-
-$IV,1$----03/30/15 10:29:57----$IV,0$
-* $LK,"R",A="MN:R"$("cur_data_col","cur_col");
-* $LK,"R",A="MN:R"$("cur_top_line_num","top_line_num");
-* Fixed bug in $LK,"EdLineDown",A="MN:EdLineDown"$().
-
-$IV,1$----03/28/15 02:41:15----$IV,0$
-* Fixed $LK,"::/Demo/Snd/WaterFowl.CPP"$.
-* Added $LK,"::/Demo/Graphics/Grid.CPP"$.
-* Enhanced ::/Apps/Psalmody/Examples/image.CPP
-* Enhanced ::/Apps/Psalmody/Examples/dream.CPP
-* Enhanced ::/Apps/Psalmody/Examples/killed.CPP
-* Enhanced ::/Apps/Psalmody/Examples/worship.CPP
-
-$IV,1$----03/23/15 07:21:26----$IV,0$
-* Updated $LK,"::/Demo/Graphics/Pick.CPP"$.
-* Modified $LK,"DCF_LOCATE_NEAREST",A="MN:DCF_LOCATE_NEAREST"$.
-
-$IV,1$----03/21/15 09:10:58----$IV,0$
-* Fixed bug in sprite edit of ellipses & polygons.
-
-$IV,1$----03/18/15 02:00:15----$IV,0$
-* $LK,"R",A="MN:R"$("DocFormDo","DocForm");
-* $LK,"R",A="MN:R"$("DocMenuDo","DocMenu");
-
-$IV,1$----03/14/15 07:08:05----$IV,0$
-* $BK,1$TempleOS version 3.04 Released$BK,0$
-* Reformatted $LK,"::/Kernel/Font8x8.CPP"$.
-* Added $LK,"PopUpGetF64",A="MN:PopUpGetF64"$().
-
-$IV,1$----03/14/15 04:48:50----$IV,0$
-* $LK,"R",A="MN:R"$("AcctReg...","Reg...");
-* Overhauled $LK,"GrUpdateTasks",A="MN:GrUpdateTasks"$().
-* Overhauled $LK,"::/Doc/GraphicsOverview.TXT"$.
-
-$IV,1$----03/09/15 06:07:25----$IV,0$
-* Dict now has extended ASCII chars.
-
-$IV,1$----03/02/15 04:40:55----$IV,0$
-* Added help on $LK,"StdIn",A="HI:StdIn"$ and $LK,"StdOut",A="HI:StdOut"$.
-
-$IV,1$----02/25/15 02:51:45----$IV,0$
-* Added IRC ChatBot $LK,"::/Linux/TempleBot",A="PI:::/Linux/TempleBot"$.
-
-$IV,1$----02/21/15 19:07:32----$IV,0$
-* Added $LK,"::/Demo/DolDoc/NumBible.CPP"$.
-
-$IV,1$----02/19/15 18:39:53----$IV,0$
-* Fixed bug in $FG,2$<SHIFT-F6>$FG$ $LK,"GodDoodle",A="MN:GodDoodle"$().
-* Made default arg for $FG,4$Preempt$FG$() into "OFF".
-
-$IV,1$----02/17/15 21:32:26----$IV,0$
-* Made so cmd line doesn't print answer line unless a new answer occurs.
-
-$IV,1$----02/14/15 05:12:45----$IV,0$
-* Added $LK,"Dump",A="MN:Dump"$().
-
-$IV,1$----02/13/15 13:46:14----$IV,0$
-* Got rid of "body_size" in $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.
-
-$IV,1$----02/13/15 09:49:33----$IV,0$
-* $BK,1$TempleOS version 3.03 Released$BK,0$
-
-$IV,1$----02/12/15 16:10:14----$IV,0$
-* Overhauled $LK,"::/Demo/WebLogExample/WebLogRep.CPP"$.
-* Added $LK,"EDF_WAS_WRITE",A="MN:EDF_WAS_WRITE"$.
-
-$IV,1$----02/12/15 03:48:28----$IV,0$
-* Overhauled $MA-X+PU,"::/Demo/AcctExample",LM="Dir(\"::/Demo/AcctExample\");View;"$.  Now, if you have a virtual machine install, you can easily run my exact set-up by copying my files to your $FG,2$/Home$FG$ directory. 
-
-$IV,1$----02/07/15 15:45:49----$IV,0$
-* Tweaked AutoComplete.
-
-$IV,1$----02/05/15 12:39:06----$IV,0$
-* Fixed minor compiler bug relating to dead code elimination.
-
-$IV,1$----02/02/15 14:03:28----$IV,0$
-* Added $LK,"::/Demo/Graphics/Lattice.CPP"$.
-
-$IV,1$----01/29/15 02:58:45----$IV,0$
-* Added $LK,"::/Demo/Directives.CPP"$.
-$HL,1$$WW,0$#define __DATE__ #exe{StreamPrint("\"%D\"",Now);}
-#define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
-#define __LINE__ #exe{StreamPrint("%d",Fs->last_lex->lex_include_stk->line_num);}
-#define __DEPTH__ #exe{StreamPrint("%d",Fs->last_lex->lex_include_stk->depth);}
-#define __FILE__ #exe{StreamPrint("\"%s\"",Fs->last_lex->lex_include_stk->full_name);}
-#define __DIR__  #exe{StreamDir;}
-$HL,0$$WW,1$
-$IV,1$----01/28/15 11:40:37----$IV,0$
-* $BK,1$TempleOS version 3.02 Released$BK,0$
-* Overhauled $MA-X+PU,"Tour",LM="User(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$.
-
-$IV,1$----01/18/15 19:42:50----$IV,0$
-* $LK,"BusyWait",A="MN:BusyWait"$() now uses $LK,"HPET",A="MN:HPET"$().
-* Min RAM requirement is now 512 Meg.
-* $LK,"R",A="MN:R"$("TSZ","TOSZ");
-* Added $FG,4$CdLexDir$FG$() and $FG,4$CdSrcDir$FG$().  Now, you can run apps from any directory, not just $FG,2$/Apps$FG$. 
-
-$IV,1$----01/16/15 15:08:58----$IV,0$
-* Changed $LK,"Scale2Mem",A="MN:Scale2Mem"$().
-
-$IV,1$----01/15/15 05:11:31----$IV,0$
-* $BK,1$TempleOS version 3.01 Released$BK,0$
-
-$IV,1$----01/15/15 03:13:07----$IV,0$
-* Added eye-dropper-like $FG,2$'t'$FG$ for transparent color in the sprite $FG,2$<CTRL-r>$FG$ editor.
-* Got rid of $LK,"CHash",A="MN:CHash"$.next_added.
-* Reduced $LK,"TASK_HASH_SIZE",A="MN:TASK_HASH_SIZE"$ size.
-
-$IV,1$----01/10/15 15:12:30----$IV,0$
-* $LK,"R",A="MN:R"$("Grep","Find");
-
-$IV,1$----01/08/15 17:40:37----$IV,0$
-* Undid "Improved $LK,"DCScreenCapture",A="MN:DCScreenCapture"$()" from 12/27/14. (It didn't work.)
-
-$IV,1$----01/06/15 18:58:16----$IV,0$
-* Reorganized $MA-X+PU,"::/Apps/Psalmody",LM="Cd(\"::/Apps/Psalmody\");Dir;View;\n"$.
-
-$IV,1$----01/04/15 02:20:50----$IV,0$
-* Added $LK,"::/Demo/Graphics/SpriteRaw.CPP"$.
-
-$IV,1$----01/02/15 04:46:36----$IV,0$
-* Changed Sprite format.  Download $FG,2$Cvt300.CPP.Z$FG$ from
-$FG,4$$TX,"http://www.templeos.org/Wb/Home/Wb2/Files",HTML="http://www.templeos.org/Wb/Home/Wb2/Files"$$FG$.
-* Cleaned-up the $LK,"CSprite",A="MN:CSprite"$ code.

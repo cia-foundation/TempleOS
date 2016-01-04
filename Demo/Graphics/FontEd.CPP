@@ -124,9 +124,8 @@ U0 FontEd()
 	  break;
 	case MSG_IP_L_DOWN:
 	case MSG_IP_R_DOWN:
-	  if (0<=a1<FONT_WIDTH*16 &&
-		0<=a2<FONT_HEIGHT*16) {
-	    cur_ch=(a2/FONT_HEIGHT)*16+a1/FONT_WIDTH;
+	  if (0<=a1<FONT_WIDTH*16 && FONT_HEIGHT*2<=a2<FONT_HEIGHT*16) {
+	    cur_ch=(a2/FONT_HEIGHT-2)*16+a1/FONT_WIDTH;
 	    break;
 	  } //fall through
 	case MSG_IP_MOVE:

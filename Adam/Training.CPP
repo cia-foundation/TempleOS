@@ -110,7 +110,7 @@ U0 KeyMapFamily2(U8 **entries,CTask *task,I64 scf)
       else
 	PostMsg(task,MSG_KEY_DOWN,a1,a2);
       WinMgrSync(0,TRUE);
-      Sleep(1);
+      Sleep(1); //Open loop because might be no response.  TODO: Drops msgs.
     }
     if (*keydev.desc && StrNCmp(keydev.desc,"Char  /",7))
       entries[i]=KeyMapKeyMStrPrint(a2,keydev.handler,keydev.desc,task);

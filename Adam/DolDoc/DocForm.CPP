@@ -68,7 +68,7 @@ U0 DocDataFmt(CDoc *doc,CDocEntry *doc_e,I64 d=DOCM_CANCEL)
 	if (!(ptr=doc_e->data)) return;
       } else
 	ptr=&doc_e->data;
-      switch(doc_e->raw_type) {
+      switch (doc_e->raw_type) {
 	case RT_I0:
 	case RT_U0:	d=0;		break;
 	case RT_I8:	d=*ptr(I8 *);	break;
@@ -156,7 +156,7 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
       else
 	d=FALSE;
     }
-    switch(doc_e->raw_type) {
+    switch (doc_e->raw_type) {
       case RT_I8:
       case RT_U8:
 	*ptr(U8 *)=d;

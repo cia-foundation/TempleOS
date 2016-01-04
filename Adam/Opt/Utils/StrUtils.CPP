@@ -1,16 +1,17 @@
 #help_index "Cmd Line (Typically)"
 
-I64 DECompare(CDocEntry *e1,CDocEntry *e2)
+I64 DEPtrCompare(CDocEntry **e1,CDocEntry **e2)
 {
-  return StrCmp(e1->tag,e2->tag);
+  return StrCmp((*e1)->tag,(*e2)->tag);
 }
 
-public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,Bool unique=FALSE)
+public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
+	I64 entry_lines=1,Bool unique=FALSE)
 {//Sort lines of a text file. Removes blank lines.
   U8 *in_name,*out_name,*st;
   CDoc *doc;
   CDocEntry *doc_e,*doc_e1,**a;
-  I64 i,cnt=0,result;
+  I64 i,j,cnt=0,result;
 
   if (!_in_name) return 0;
   in_name=DftExt(_in_name,"TXT.Z");
@@ -38,20 +39,25 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,Bool unique=FALSE)
       DocEntryDel(doc,doc_e);
     doc_e=doc_e1;
   }
-  QSortI64(a,cnt,&DECompare);
+  QSort(a,cnt/entry_lines,entry_lines*sizeof(CDocEntry *),&DEPtrCompare);
 
   result=0;
   st=NULL;
-  for (i=0;i<cnt;i++) {
-    QueIns(a[i],doc->root.last);
+  for (i=0;i<cnt;) {
     if (!unique || !st || StrCmp(a[i]->tag,st)) {
       st=a[i]->tag;
-      doc->cur_entry=&doc->root;
-      doc->cur_col=0;
-      DocPrint(doc,"\n");
+      for (j=0;j<entry_lines && i<cnt;j++,i++) {
+	QueIns(a[i],doc->root.last);
+	doc->cur_entry=&doc->root;
+	doc->cur_col=0;
+	DocPrint(doc,"\n");
+      }
       result++;
     } else
-      DocEntryDel(doc,a[i]);
+      for (j=0;j<entry_lines && i<cnt;j++,i++) {
+	QueIns(a[i],doc->root.last);
+	DocEntryDel(doc,a[i]);
+      }
   }
   StrCpy(doc->filename.name,out_name);
   DocWrite(doc);
@@ -60,7 +66,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,Bool unique=FALSE)
   DocDel(doc);
   Free(in_name);
   Free(out_name);
-  return result; //Num Lines
+  return result; //Num Entries
 }
 
 I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)

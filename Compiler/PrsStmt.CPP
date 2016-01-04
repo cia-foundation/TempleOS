@@ -579,7 +579,7 @@ U0 PrsSwitch(CCmpCtrl *cc,Bool nobound,I64 try_cnt)
   CCodeMisc *lb_dft,*lb_fwd_case,*mc_jt,*lb_entry,**jmp_table;
   CIntermediateCode *tempi_sub,*tempi_cmp,*tempi_jmp,*tempi_start;
   Bool dft_found=FALSE;
-  I64 i,k,k2,lo=MAX_I64,hi=MIN_I64,range;
+  I64 i,k_start=MIN_I64,k_end,lo=MAX_I64,hi=MIN_I64,range;
 
   if (cc->token!='(')
     LexExcept(cc,"expecting '(' at ");
@@ -668,26 +668,32 @@ sw_cont:
 	    }
 	    ICAdd(cc,IC_LABEL,lb_fwd_case,0);
 	  }
-	  k=LexExpressionI64(cc);
-	  if (k<lo) lo=k;
-	  if (k>hi) hi=k;
+	  if (cc->token==':') {
+	    if (k_start==MIN_I64)
+	      k_start=0;
+	    else
+	      k_start++;
+	  } else
+	    k_start=LexExpressionI64(cc);
+	  if (k_start<lo) lo=k_start;
+	  if (k_start>hi) hi=k_start;
 	  if (cc->token==':') {
 	    Lex(cc);
 	    temps=MAlloc(sizeof(CSwitchCase));
 	    temps->label=lb_entry;
-	    temps->val=k;
+	    temps->val=k_start;
 	    temps->next=header;
 	    header=temps;
 	  } else if (cc->token==TK_DOT_DOT_DOT) {
 	    Lex(cc);
-	    k2=LexExpressionI64(cc);
+	    k_end=LexExpressionI64(cc);
 	    if (cc->token==':') {
 	      Lex(cc);
-	      if (k2<lo) lo=k2;
-	      if (k2>hi) hi=k2;
-	      if (k>k2)
-		SwapI64(&k,&k2);
-	      for (i=k;i<=k2;i++) {
+	      if (k_end<lo) lo=k_end;
+	      if (k_end>hi) hi=k_end;
+	      if (k_start>k_end)
+		SwapI64(&k_start,&k_end);
+	      for (i=k_start;i<=k_end;i++) {
 		temps=MAlloc(sizeof(CSwitchCase));
 		temps->label=lb_entry;
 		temps->val=i;
@@ -1152,7 +1158,7 @@ sm_not_keyword_afterall:
 		  PrsGlblVarLst(cc,PRS0_NULL|PRS1_NULL,tempex,0,fsp_flags);
 		}
 	      } else {
-		if (tempex->type & HTT_OPCODE) {
+		if (tempex->type & (HTT_OPCODE|HTT_ASM_KEYWORD)) {
 		  if (cc->htc.fun) {
 		    if (tempaot=CmpJoin(cc,CMPF_ASM_BLK|CMPF_ONE_ASM_INS))
 		      ICAdd(cc,IC_ASM,tempaot,0);

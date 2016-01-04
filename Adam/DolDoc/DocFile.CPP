@@ -321,6 +321,8 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   if (FilesFindMatch(filename,FILEMASK_TXT)) {
     doc2=DocRead(filename);
     DocInsDoc(doc,doc2);
+    if (IsRaw)
+      DocDump(doc2,100000);
     DocDel(doc2);
     result=TRUE;
   } else if (FilesFindMatch(filename,"*.BMP.Z")) {

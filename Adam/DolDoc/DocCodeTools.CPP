@@ -75,7 +75,7 @@ I64 EdRILex(CRILex *rx)
 	  rx->cc2->token=='}' || rx->cc2->token==':' || rx->cc2->token==')' &&
 	  !rx->exp_depth || i==KW_ELSE || i==KW_CATCH || i==KW_DO)
       rx->is_not_cont=TRUE;
-    if (rx->was_new_line && (rx->cc1->token!=':' ||
+    if (rx->was_new_line && (rx->cc1->token!=':' || i==KW_CASE ||
 	  i==KW_DFT || i==KW_SUB_SWITCH_START || i==KW_SUB_SWITCH_END)) {
       tempf=rx->cc2->lex_include_stk;
       while (tempf->next)

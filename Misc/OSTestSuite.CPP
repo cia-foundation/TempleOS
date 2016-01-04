@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=162;
+  progress4_max=163;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -859,6 +859,14 @@ U0 DoSubSwitch()
 {
   CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/SubSwitch\";\n");
+  Sleep(750);
+  XTalk(task,"Exit;\n");
+}
+
+U0 DoNullCase()
+{
+  CTask *task=User;
+  XTalkWait(task,"#include \"::/Demo/NullCase\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -2321,6 +2329,7 @@ U0 OSTestSuite()
   TS; DoCharGraphics;
   TS; DoDateTime;
   TS; DoSubSwitch;
+  TS; DoNullCase;
   TS; DoMagicPairs;
   TS; DoHanoi;
   TS; DoSquirt;

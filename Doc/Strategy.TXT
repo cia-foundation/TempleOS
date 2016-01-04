@@ -50,7 +50,7 @@ A three button mouse is like a leg you cannot put weight on.  TempleOS just does
 
 * No distinction between $FG,2$thread$FG$, $FG,2$process$FG$ or $FG,2$task$FG$.
 
-* The $LK,"Scheduler",A="FI:::/Kernel/Sched.CPP"$ is mostly for home systems, not servers or mainframes.  The focus task is all important.  Disk requests are not broken-up, so sharing is bad, however.
+* The $LK,"Scheduler",A="FI:::/Kernel/Sched.CPP"$ is for home systems.  It is not preemptiove.  Disk requests are not broken-up, so sharing is bad.  It's wonderfully simple.
 
 * $LK,"MultiCore",A="FI:::/Doc/MultiCore.TXT"$ is done $FG,2$master/slave$FG$, instead of $FG,2$SMP$FG$.  Core zero explicitly assigns jobs.  Locks are present allowing multicore file, heap, and hardware access, though.
 

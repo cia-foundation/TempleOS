@@ -5,7 +5,7 @@ $FG,5$Websites:$FG$
 $TX,"www.templeos.org",HTML="http://www.templeos.org"$
 
 $FG,5$Owner/President:$FG$
-Terry A. Davis
+$TX,"Terry A. Davis",HTML="mailto:tdavis@templeos.org"$
 
 $HC,"<img src=\"http://www.templeos.org/images/140414TerryADavis.jpg\" width=\"432\" height=\"324\" alt=\"\">"$
 

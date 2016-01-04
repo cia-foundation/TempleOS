@@ -300,14 +300,15 @@ U0 KbdBuildSC(U8 raw_byte,Bool in_irq,U8 *_last_raw_byte,I64 *_last_sc)
   I64 ch,sc_flags,sc,sc2,sc_raw,new_key_f;
   Bool set_LEDs=FALSE;
   if (raw_byte==0xE0) {
+    *_last_sc&=~0x1FF;
     *_last_raw_byte=raw_byte;
     return;
-  } else {
-    sc=raw_byte;
-    BEqu(&sc,SCf_E0_PREFIX,*_last_raw_byte==0xE0);
-    BEqu(&sc,SCf_KEY_UP,raw_byte & 0x80);
-    *_last_raw_byte=raw_byte;
   }
+  sc=raw_byte;
+  BEqu(&sc,SCf_E0_PREFIX,*_last_raw_byte==0xE0);
+  BEqu(&sc,SCf_KEY_UP,raw_byte & 0x80);
+  *_last_raw_byte=raw_byte;
+
   sc_flags=_last_sc->u32[0]&~0x1FF;
   sc_raw=sc;
 

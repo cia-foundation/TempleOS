@@ -13,7 +13,6 @@
 0315	SK - Electronics Co., Ltd.
 0402	 Acer aspire one
 	1050	0x1050 ethernet controller
-	5209	n2600 intel(R) Atom(TM)
 	5606	0x0436 0x4752
 	8086	0x8086 video controller
 	9665	PCI\VEN_10DE&DEV_0059&SUBSYS_2052161F&REV_A2 ZCT8YBT'
@@ -57,7 +56,6 @@
 	2016	UPEK fingerprint sensors  Driver Windows xp
 04A9	Canon
 	314D	unknown uhknown
-	317b	04A9&PID 04A9&PID
 04B3	IBM
 	24D5	PCI\VEN_8086&DEV_24D5&SUBSYS_B026144D&REV_02 Audio Controller
 	401		8086 PCI\VEN_8086&DEV_293E&SUBSYS_20F217AA&REV_03\3&B1BFB68&0&D8	
@@ -187,7 +185,6 @@
 	219C	BCM2070 Broadcom BCM2070 Bluetooth 3.0+HS USB Device 
 	21E1	Broadcom 20702 Bluetooth 4.0 .0112
 	21E3	BCM43142A0 Broadcom Bluetooth 4.0
-	21F3	\VID_0A5C&PID_21F3&REV_0112 Broadcom Bluetooth 4.0
 	4500	BCM2046B1 Broadcom 2046 Bluetooth 2.1 USB Dongle
 	4502	BCM2046B1 Broadcom 2046 Bluetooth 2.1 USB Dongle
 	4503	 BCM2046B1 Broadcom 2046 Bluetooth 2.1 USB Dongle
@@ -215,7 +212,7 @@
 	602C	SN9C102C home made
 	602D	VID_0C45&PID_6480&MI_00 USB Webcam
 	6030	USB\VID_0C45&PID_6029\5&18D8BE1C&0&1 USB WebCam 
-	610C	USB\VID_0C45&PID_610B\7&3211544E$$$$$$$$0$$$$$$$$2 usb web camera 
+	610C	USB\VID_0C45&PID_610B\7&3211544E$$0$$2 usb web camera 
 	6128	USB\VID_0C45&PID_613C&REV_0101 USB &#1074;&#1077;&#1073;-&#1082;&#1072;&#1084;&#1077;&#1088;&#1072;
 	6128_	USB\VID_0C45&PID_6148&REV_0101 USB PC Camera Plus
 	6129	USB\VID_0C45&PID_6128\5&3875c171&0&1 USB WebCam
@@ -997,7 +994,7 @@
 	7914	7914 PCI standard PCI-to-PCI bridge
 	7915	7915 PCI standard PCI-to-PCI bridge
 	7916	7916 PCI standard PCI-to-PCI bridge
-	791a	791A AMD HDMI Audio Driver XP/Vista/7 32/64bit
+	791a	791A HDMI Audio
 	791E	RS690 ATI RADEON X1200 Series
 	791F	RS690M ATI Radeon X1250
 	791Z	SUBSYS_826D1043 REV_00
@@ -1737,7 +1734,7 @@
 	00E7	uPD72874 IEEE1394 OHCI 1.1 3-port PHY-Link Ctrlr
 	00F2	D72874GC IEEE1394+OHCI+1.1+3-port+PHY-Link+Ctrlr
 	0165	- AVerMedia A313 MiniCard Hybrid DVB-T
-	0194	0C0330 NEC USB 3.0 Host Controller Driver || Renesas Electronics USB 3.0 Host Controller
+	0194	0C0330 Renesas Electronics USB 3.0 Host Controller
 	0520	NEC D72874GC 1394 CARD
 	1033	0720101GJ NEC PCI to USB Open Host Controller
 	9876	uPD720100A uPD720102GC USB 2.0 Host Controller
@@ -1799,7 +1796,7 @@
 	0659	SiS R659 CPU to PCI Bridge
 	0660	vt8237a Host-to-PCI Bridge
 	0661	SiS 661FX SiS 661FX/GX Chipset - Host-PCI Bridge
-	0662	ALC662 CPU to PCI Bridge
+	0662	??? CPU to PCI Bridge
 	0663	??? CPU to PCI Bridge
 	0730	SiS 730 Host-to-PCI Bridge
 	0735	SiS 735 Host-to-PCI Bridge
@@ -1951,7 +1948,6 @@
 	0675	p5g41c-mlx Crestline
 	1969	P5LD2 - EAYZ Attansic L1 Gigabit Ethernet 10/100/1000Base-T Adapter
 	5653	M5A78L-M LX V2 ATI Radeon 3000 Graphics (Microsoft Corporation - WDDM v1.1)
-	5818	7800 AMD Radeon 7800 Series
 	8103	NV31 NV31 [GeForce FX 5600 Ultra]
 	82c6	RTL8168 Gigabit Ethernet(NDIS 6.0)
 1044	Distributed Processing Tech
@@ -2093,7 +2089,6 @@
 	8671	bogus bogus
 	9065	TMX320C6412 Fixed Point Digital Signal Processor
 	9066	USR5410 U.S. Robotics 802.11g Wireless Turbo PC Card 
-	9876	PCI\VEN_104C&DEV_803B&SUBSYS_FF021179&REV_00 PCI Simple Communications Controller
 	A001	TDC1570 64-bit PCI ATM SAR
 	A100	TDC1561 32-bit PCI ATM SAR
 	A102	TNETA1575 HyperSAR Plus w/PCI host & UTOPIA i/f
@@ -3061,7 +3056,6 @@
 	301	PLX PCI 9030 based on the PLX PCI 9030 to build a MIL1553 bus interface
 	324	PLX PCI96556 64 Bit/66MHz PCI to Local Bus Bridge
 	8086	a002 geodelink pci south
-	FE50	CRU Common Readout Unit
 10DD	Evans & Sutherland
 	0001	3D graphics processor
 10DE	NVIDIA
@@ -3728,7 +3722,6 @@
 	1054	GeForce 410M Vvideo Карты
 	1056	NVidia NVS 4200m NVidia NVS 4200m
 	1058	NV34 Riva128
-	1082	GF110 nVidia 560Ti
 	1086	GF110 GTX 570
 	10C3	GT218 NVIDIA GeForce 8400GS
 	10C5	GT218 Nvidia Geforce 405(OEM)
@@ -3741,8 +3734,6 @@
 	110	nv11 geforcemx/mx400
 	1112	0x1112 Gateway Solo 9550 NVIDIA Geforce 2 GO 32 MB
 	1140	GF117 Geforce 710M
-	119F	119F NVIDIA GeForce GTX 780M
-	11A0	11A0 NVIDIA GeForce GTX 680M
 	11a2	GK104M GeForce GTX 675MX (Mac)
 	11a3	GK104M GeForce GTX 680MX
 	11C0	GTX660 GeForce GTX 660
@@ -3759,7 +3750,6 @@
 	135m	220gt navidia quadro nvs135m
 	1381	GM107-300-A2 GeForce GTX 750
 	13C2	GTX970 NVIDIA GeForce GTX 970
-	13D7	13D7 NVIDIA GeForce GTX 980M
 	161	NV44 GeForce 6200 TurboCache
 	181	NV18B GeForce4 MX 440 AGP 8X
 	247	NVS210S GF6150
@@ -3890,7 +3880,6 @@
 	5209	Realtek Realtek PCIE CardReader
 	5227	123 Realtek PCIE Card Reader
 	5229	Rts5229 Realtek PCIE CardReader
-	5249	RTS5101/RTS5111/RTS5116/RTS5169 Realtek Card Reader
 	5286	Realtek RTS528x Realtek RTS528x PCIe Card Reader
 	5287	5287 Realtek PCIE CardReader (PCI Device)
 	5288	Realtek USB 2.0 Card Reader card reader
@@ -4857,7 +4846,7 @@
 	0100	88e8003 Ethernet Adapter
 	1002	DFE-550TX/580TX/DFE-550FX Fast Ethernet Adapter
 	1100	driv16c003206 Fast Ethernet Adapter
-	1300	DL10030B Realtek RTL8139 Family PCI Fast Ethernet Adapter
+	1300	DL10038C or DL10038E Realtek RTL8139 Family PCI Fast Ethernet Adapter
 	1301	DGE-528T  Fast Ethernet Adapter
 	1340	DFE-690TXD Fast Ethernet CardBus PC Card
 	1561	DRP-32TXD CardBus PC Card
@@ -5200,7 +5189,6 @@
 11D2	Intercom Inc.
 11D3	Trancell Systems Inc
 11D4	Analog Devices, Inc.
-	000B	AD2000B SoundMax Integrated Digital HD Audio
 	11D4	1986 AD1988B 8-channel High Definition Audio CODEC
 	11d4ncah6n	266e&subsys 01791028
 	1535	ADSP-21535 Blackfin DSP PCI Bus Interface
@@ -6474,9 +6462,7 @@
 	9114	PCI-9114 
 144B	Loronix Information Systems, Inc.
 	0601	
-144D	Samsung Electronics Co., Ltd.
-	A820	171x NVMe SSD 171x series
-	A821	172x NVMe SSD 172x series
+144D	sanyo
 1450	Octave Communications Ind.
 1451	SP3D Chip Design GMBH
 1453	Mycom Inc
@@ -6737,7 +6723,6 @@
 	16A8	BLM5701 NetXtreme Gigabit Ethernet
 	16AA	B06BDRV BroadCom NetExtreme II Server
 	16B1	BCM57781 BCM57781
-	16b4	NetXtreme BCM57765 NetXtreme BCM57765 for MacBook Pro
 	16B5	BCM57785X Broadcom NetLink Gigabit Ethernet
 	16BE	16BE8 CardReader Broadcom 1.0.0.221
 	16BF	0x16BF CardReader Broadcom 15.0.7.2
@@ -6950,7 +6935,7 @@
 	5066	Cx20561 HDAUDIO\Func_01&VEN_14F1&DEV_5069&SUBSYS_17AA214C&REV_1003
 	5069	20585 conexant 20585 smartAudio HD
 	506C	0x506C Conexant High Definition Audio
-	506E	CX20672-21Z Conexant High-Definition Audio CX20672-21Z
+	506E	001 Conexant 20672 SmartAudio HD
 	50A1	CX20641/CX20651 Conexant HD Audio
 	50A2	Conexant CX20642 Conexant HD Audio
 	5B7A	Belived to be a CX23416 Single-Chip MPEG-2 Encoder with Integrated Analog Video/Broadcast Audio Decoder
@@ -7786,7 +7771,6 @@
 	0601	RT2860T b/g/n  Wlan
 	0701	RT2860T 802.11 bgn
 	0781	RT2790T/RT2860/RT2890/RT2700E Wireless 802.11 bgn PCI-e
-	1234	802.11 wireless lan
 	1418	0x14FI 802.11b/g Wireless LAN
 	14F1	0x1814 PCI\VEN_168C&DEV_001A&SUBSYS_04181468&REV_01\4&FCF0450&0&10A4
 	201	25601814&REV_01 Ralink RT2500 Wireless Lan Card
@@ -7854,7 +7838,7 @@
 1910	Seaway Networks
 	0001	SW5000-NCA Seaway Network Content Accelerator
 1912	Renesas Electronics
-	0014	YET-D720201-0014 Renesas/Nec uPD720201/720202 USB 3.0 Controller
+	0014	YET-D720201-0014 usb3.0 renesas
 	0015	 upd720202  nec
 	0015_	EC01-P Renesas Electronics USB 3.0 Host Controller
 1931	Option NV
@@ -8513,7 +8497,7 @@
 	1c3a	161C103C Intel Management Engine Interface
 	1c3a.	161C103C Intel Management Engine Interface
 	1C3b	111 Series Chipset Family HECI Controller #2
-	1C3D	Intel(R) 6 Series Series Chipset Family Intel(R) Active Management Technology - SOL | Intel Management Engine 7.1 Components Driver
+	1C3D	Intel(R) 6 Series Series Chipset Family Intel(R) Active Management Technology - SOL
 	1C49	FCD01179 04
 	1C4C	Q65 Intel(R) Q65 Express Chipset Family LPC Interface Controller
 	1D3A	X79 series chipset HECI Controller X79/C600 series chipset Management Engine Interface
@@ -8751,15 +8735,13 @@
 	27A1	Intel 82945PM Memory Controller Intel Corporation Mobile 945PM Express PCI Express Root Port
 	27A2	HPQ0006 Mobile Intel(R) 945 Express Chipset Family
 	27A6	945GM Intel 945GM/950
-	27AC	27AC Mobile Intel(R) 945GME Express Process to DRAM Controller
-	27AE	27AE Mobile Intel(R) 945 Express Chipset Family
 	27B8	945GL Intel(R) ICH7 Family LPC Interface Controller
 	27B9	ICH7 Intel(R) ICH7M/U LPC Interface Controller
 	27BC	NM10 NM10 Family LPC Interface Controller
 	27c0	82801GB/GR/GH Intel(R) N10/ICH7 Family Serial ATA Storage Controller
 	27C1	82801GB/GR/GH AHCI Controller
 	27c3	82801GR/GH Raid Controller
-	27c4	82801GBM/GHM Intel(R) ICH7-M Family SATA Controller
+	27c4	82801GBM/GHM SATA IDE Controller
 	27C5	82801GBM/GHM Intel(R) ICH7/M/MDH SATA AHCI Controller
 	27C6	82801GHM Raid Controller
 	27c8	946 Intel(R) N10/ICH7 Family USB Universal Host Controller
@@ -8841,7 +8823,6 @@
 	2940	ICH9 Intel(R) ICH9 Family PCI Express Root Port
 	2942	ICH9 Intel(R) ICH9 Family PCI Express Root Port
 	2944	ICH9 Intel(R) ICH9 Family PCI Express Root Port
-	2946	ICH9 Intel(R) ICH9 Family PCI Express Root Port
 	2948	ICH9 Intel(R) ICH9 Family PCI Express Root Port
 	294C	82566DC-2 Intel(R) 82566DC-2 Gigabit Network Connection
 	2972	82946GZ  Onboard Video Device for 82946GZ chips
@@ -9179,7 +9160,6 @@
 	9c3a  Subsys_05eb1	9c3a Subsys_05eb1028 & rev_04\3 & 11583659 PCI Simple Communication Controller
 	9c3a Subsys_05eb1	12 PCI Simple Communication Controller
 	9C43	9C43 Intel(R) 8 Series LPC Controller
-	9CA4	0x9CA4 Intel(R) Dynamic Platform and Thermal Framework
 	9CB1	PCI\VEN_8086&DEV_9CB1 Intel USB 3.0 Driver for Intel 8 and U/Y Series 
 	A001	3150 Intel Media Accelerator 3150
 	A002	GMA 3150 Intel� Grafik-Media-Accelerator 3150 (Intel� GMA 3150)

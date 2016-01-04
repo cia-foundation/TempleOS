@@ -73,56 +73,50 @@ I64 CeilI64(I64 num,I64 to)
 //See $LK,"::/Doc/Credits.TXT"$.
 I16 RandI16()
 {//Random I16.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=result;
-  return result.i16[0];
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed.i16[0];
 }
 
 U16 RandU16()
 {//Random U16.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=result;
-  return result.u16[0];
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed.u16[0];
 }
 
 I32 RandI32()
 {//Random I32.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=result;
-  return result.i32[0];
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed.i32[0];
 }
 
 U32 RandU32()
 {//Random U32.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=result;
-  return result.u32[0];
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed.u32[0];
 }
 
 I64 RandI64()
 {//Random I64.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=1664525*result+1013904223;
-  return result<<32+Fs->rand_seed&0xFFFFFFFF;
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed;
 }
 
 U64 RandU64()
 {//Random U64.
-  I64 result=1664525*Fs->rand_seed+1013904223;
+  Fs->rand_seed=6364136223846793005*Fs->rand_seed+1442695040888963407;
   if (!Bt(&Fs->task_flags,TASKf_NONTIMER_RAND))
-    result^=GetTSC>>4;
-  Fs->rand_seed=1664525*result+1013904223;
-  return result<<32+Fs->rand_seed&0xFFFFFFFF;
+    Fs->rand_seed^=GetTSC>>4;
+  return Fs->rand_seed;
 }
 
 F64 Rand()

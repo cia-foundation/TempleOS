@@ -108,31 +108,40 @@ $FG,2$if (13<=age<20)
 $FG$$ID,-2$
 * $FG,2$switch$FG$ statements always use a jump table.  Don't use them with cases with really big, sparse ranges.
 
-* Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ statements. 
+* Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ statements.
+
+* A no case number causes next higher integer case in $FG,2$switch$FG$ statements.  See $LK,"::/Demo/NullCase.CPP"$.
+
+$ID,2$$FG,2$I64 i;
+for (i=0;i<20;i++) 
+  switch (i) {
+    case: "Zero\n";	break; //Starts at zero
+    case: "One\n";	break; //One plus previous case.
+    case: "Two\n";	break;
+    case: "Three\n";	break;
+    case 10: "Ten\n";	break;
+    case: "Eleven\n";	break; //One plus previous case.
+  }$FG$$ID,-2$
 
 * $FG,2$nobound_switch$FG$ can be used if you know a switch statement will not exceed the lowest or highest case values.  It's a little faster because it doesn't check.
 
-* $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$ allow a new type of nested-switch control flow.  (Don't goto, throw exception or return out of $FG,2$sub_switch_start$FG$ front porch area.)
+* $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$ allow a new type of nested-switch control flow.  (Don't goto, throw exception or return out of $FG,2$sub_switch_start$FG$ front porch area.)  See $LK,"::/Demo/SubSwitch.CPP"$.
 
-$ID,2$$FG,2$U0 SubSwitch()
-{
-  I64 i;
-  for (i=0;i<10;i++)
-    switch (i) {
-      case 0: "Zero ";	break;
-      case 2: "Two ";		break;
-      case 4: "Four ";	break;
-      sub_switch_start:
-        "[";
-        case 1: "One";	break;
-        case 3: "Three";	break;
-        case 5: "Five";	break;
-      sub_switch_end:
-        "] ";
-        break;
-    }
-  '\n';
-}$FG$$FG$
+$ID,2$$FG,2$I64 i;
+for (i=0;i<10;i++)
+  switch (i) {
+    case 0: "Zero ";	break;
+    case 2: "Two ";		break;
+    case 4: "Four ";	break;
+    sub_switch_start:
+      "[";
+      case 1: "One";	break;
+      case 3: "Three";	break;
+      case 5: "Five";	break;
+    sub_switch_end:
+      "] ";
+      break;
+  }$FG$
 $BG$OutPut:
 >$FG,2$Zero [One] Two [Three] Four [Five]$FG$
 $ID,-2$

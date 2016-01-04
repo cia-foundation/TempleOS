@@ -811,7 +811,7 @@ U0 FlatTops()
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   try {
     while (TRUE)
-      switch(GetMsg(&a1,&a2,
+      switch (GetMsg(&a1,&a2,
 	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|1<<MSG_IP_R_D_UP)) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {
