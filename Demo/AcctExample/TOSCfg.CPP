@@ -25,7 +25,7 @@ U0 TOSInit()
   switch (tos_cid) {
     case CID_DFT:
       DefinePrint("CFG_RAM_DRVS",
-	    "\"b1\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
+	    "\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
       if (blkdev.auto_mount_ide_cnt) {
 //If AutoMount was successful, No need to manually mount in next compile
 	DefinePrint("CFG_HARD_DRVS","\"\"");
@@ -33,27 +33,27 @@ U0 TOSInit()
       } else {
 
 	//These two are a crazy guess.	ATA:IDE Primary  ATAPI:IDE Secondary
-	DefinePrint("CFG_HARD_DRVS","\"c2s0x1F0\n0x3F4\n0\"");
-	DefinePrint("CFG_DVD_DRVS","\"t3s0x170\n0\"");
+	DefinePrint("CFG_HARD_DRVS","\"cs0x1F0\n0x3F4\n0\"");
+	DefinePrint("CFG_DVD_DRVS","\"ts0x170\n0\"");
 
 	bd=Let2BlkDev(':');
 	if (bd->type==BDT_ATAPI) {
 	  ATARep(FALSE,,&root);
 	  ATAIDDrvs(root,blkdev.boot_drv_let,&ata_drv,&atapi_drv);
 	  if (ata_drv)
-	    DefinePrint("CFG_HARD_DRVS","\"c2p%d\n\"",ata_drv->num);
+	    DefinePrint("CFG_HARD_DRVS","\"cp%d\n\"",ata_drv->num);
 	  if (atapi_drv)
-	    DefinePrint("CFG_DVD_DRVS","\"t3p%d\n\"",atapi_drv->num);
+	    DefinePrint("CFG_DVD_DRVS","\"tp%d\n\"",atapi_drv->num);
 	} else {
 	  try {
 	    bd=Let2BlkDev('C');
-	    DefinePrint("CFG_HARD_DRVS","\"c2s0x%X\n0x%X\n%d\"",
+	    DefinePrint("CFG_HARD_DRVS","\"cs0x%X\n0x%X\n%d\"",
 		  bd->base0,bd->base1,bd->unit);
 	  } catch
 	    Fs->catch_except=TRUE;
 	  try {
 	    bd=Let2BlkDev('T');
-	    DefinePrint("CFG_DVD_DRVS","\"t3s0x%X\n%d\"",bd->base0,bd->unit);
+	    DefinePrint("CFG_DVD_DRVS","\"ts0x%X\n%d\"",bd->base0,bd->unit);
 	  } catch
 	    Fs->catch_except=TRUE;
 	}
@@ -82,9 +82,9 @@ U0 TOSDrvTextAttrSet()
 			"HeapInit\n0\nMemInit\n0\nVarInit\n0\n\n"
 #define TOS_CFG		"\n" CFG_RAM_DRVS CFG_DVD_DRVS CFG_HARD_DRVS "\n"\
 			CFG_DSK_CACHE CFG_OPTS
-#define TOS_DVD_CFG	"Tb1\n0x20000\nt3 \n\n\nAutoMountIDE\nCT\n"
+#define TOS_DVD_CFG	"Tb\n0x20000\nt \n\n\nAutoMountIDE\nCT\n"
 #define TOS_DVD_DBG_CFG "A" CFG_BOOT_RESCUE_DRV\
-			"b1\nScale2Mem(2048,0x40000)\n\n\n"\
+			"b\nScale2Mem(2048,0x40000)\n\n\n"\
 			"DontProbe\nBootRescueDrv\n"\
 			"C:" CFG_BOOT_RESCUE_DRV_FILE "\n"\
 			CFG_BOOT_RESCUE_DRV_START "\n\n"

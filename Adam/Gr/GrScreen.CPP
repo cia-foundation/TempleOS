@@ -16,7 +16,7 @@ U0 GrUpdateTaskODEs(CTask *task)
 }
 
 U0 GrUpdateTaskWin(CTask *task)
-{ //Draw core#0 task win.
+{ //Draw core0 task win.
   CDC *dc;
   CD3I64 saved_scroll;
   sys_task_being_screen_updated=task;
@@ -64,7 +64,7 @@ U0 GrUpdateTasks()
     if (Bt(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0))
       WinZBufUpdate;
     task1=task=sys_winmgr_task;
-    do { //Loop through core#0 tasks.
+    do { //Loop through core0 tasks.
       if (!TaskValidate(task)) break;
       if (Bt(&task->display_flags,DISPLAYf_SHOW) &&
 	    Bt(gr.win_uncovered_bitmap,task->win_z_num))
@@ -399,7 +399,7 @@ U0 GrUpdateVGAGraphics()
 }
 
 U0 GrUpdateScreen()
-{//Called by the Window Manager $LK,"HERE",A="FF:::/Adam/WinB.CPP,GrUpdateScreen"$, 60 times a second.
+{//Called by the Window Manager $LK,"HERE",A="FF:::/Adam/WinB.CPP,GrUpdateScreen"$, 30 times a second.
   CDC *dc;
   if (!Bt(&sys_run_level,RLf_VGA)) //if text mode
     GrUpdateTasks;

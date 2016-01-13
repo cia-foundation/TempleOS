@@ -1,9 +1,10 @@
 //Make Your own Distro by #include-ing this file.
 
-#define STD_DISTRO_DVD_CFG	"Tb1\nScale2Mem(2048,0x40000)\nt3 \n\n\n\n"
+#define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
 
 U0 MakeMyISO(U8 *out_iso_filename)
 {//Does everything with current drive.
+//If you have not recompiled $FG,2$Kernel$FG$ and defined your CD/DVD drive, use $LK,"Mount",A="MN:Mount"$.
   if (!DrvIsWritable) {
     "Drive must be writable.  Install on Hard drive, first.\n";
     return;

@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=163;
+  progress4_max=164;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -1241,6 +1241,14 @@ U0 DoStkGrow()
   XTalk(task,"Exit;\n");
 }
 
+U0 DoMemDemo()
+{
+  CTask *task=User;
+  XTalkWait(task,"#include \"::/Demo/MemDemo\";\n");
+  Sleep(750);
+  XTalk(task,"Exit;\n");
+}
+
 U0 DoSpan()
 {
   CTask *task=User;
@@ -2360,6 +2368,7 @@ U0 OSTestSuite()
   TS; DoSuggestedSpelling;
   TS; DoWordSearch;
   TS; DoStkGrow;
+  TS; DoMemDemo;
   TS; DoWaterFowl;
   TS; DoAsmHelloWorld;
   TS; DoAsmAndC1;

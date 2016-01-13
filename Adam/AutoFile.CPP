@@ -1,4 +1,5 @@
 #help_index "AutoFile;Help System/Training"
+#help_file "::/Doc/AutoFile"
 
 public U0 AFGetStr(U8 *st)
 {//Wait for user to type certain str.

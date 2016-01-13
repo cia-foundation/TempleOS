@@ -43,7 +43,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Many data structures have a $FG,2$user_data$FG$ member.  Those are available for you to store a data item, for convenience.  $LK,"CTask",A="MN:CTask"$, $LK,"CDocEntry",A="MN:CDocEntry"$ and $LK,"CDirEntry",A="MN:CDirEntry"$ have them.  You shouldn't encounter conflicts with TempleOS using them.
 
-* If, for some strange reason, you wanted to reduce mem usage, make a smaller disk cache when you recompile the kernel; disabling $FG,2$AutoComplete$FG$; Specify smaller stk sizes when doing $LK,"Spawn",A="MN:Spawn"$(), chang $LK,"DFT_STK",A="MN:DFT_STK"$, and using $LK,"DocMax",A="MN:DocMax"$() to reduce the cmd line buffer size.
+* If, for some strange reason, you wanted to reduce mem usage, make a smaller disk cache when you recompile the kernel; disabling $FG,2$AutoComplete$FG$; Specify smaller stk sizes when doing $LK,"Spawn",A="MN:Spawn"$(), chang $LK,"MEM_DFT_STK",A="MN:MEM_DFT_STK"$, and using $LK,"DocMax",A="MN:DocMax"$() to reduce the cmd line buffer size.
 
 * Filenames ending in "$FG,2$.Z$FG$" will be automatically compressed and uncompressed when read or written.  The compression method is not supported by other operating systems.  You can store files uncompressed by $LK,"Move",A="MN:Move"$()ing them to a filename not ending in "$FG,2$.Z$FG$".  See $LK,"::/Doc/TOSZ.TXT"$ if you want to uncompress while in $FG,2$Linux$FG$.
 

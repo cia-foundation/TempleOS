@@ -4,7 +4,7 @@ $WW,1$* You run a risk of problems if you do file operations on the same files s
 
 * When using $FG,2$FAT32$FG$, TempleOS does not generate unique short-entry names, the ones with the $FG,2$~$FG$s.  Not all $FG,2$FAT32$FG$ filenames are valid TempleOS names and it will complain.  Do not access $FG,2$FAT32$FG$ drives not dedicated to TempleOS.  Disable them with $LK,"DrvEnable",A="MN:DrvEnable"$(OFF), or they will generate error messages.  $FG,2$FAT32$FG$ involves a long and short name for each file.
 
-* The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"DFT_STK",A="MN:DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().
+* The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"MEM_DFT_STK",A="MN:MEM_DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().
 
 * The syntax highlighting occassionally glitches.  The compiler doesn't.
 

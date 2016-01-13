@@ -1011,10 +1011,9 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEF_SKIP		0x10000000000000
 #define DOCEF_POPUP		0x20000000000000
 #define DOCEF_SKIP_IN_FORM	0x40000000000000
-#define DOCEF_HARD_SKIP		0x80000000000000
-#define DOCEF_FILTER_SKIP	0x100000000000000
-#define DOCEF_NO_CLICK_ON	0x200000000000000
-#define DOCEF_DONT_DRAW		0x400000000000000 //only works on sprites
+#define DOCEF_FILTER_SKIP	0x80000000000000
+#define DOCEF_NO_CLICK_ON	0x100000000000000
+#define DOCEF_DONT_DRAW		0x200000000000000 //only works on sprites
 
 #define DOCEG1_DONT_EDIT	(DOCEF_DEFINE|DOCEF_HTML_LINK|\
   DOCEF_AUX_STR|DOCEF_BIN_PTR_LINK|DOCEF_SCROLLING_X|DOCEF_TAG_CB)
@@ -1086,11 +1085,10 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEf_SKIP		52
 #define DOCEf_POPUP		53
 #define DOCEf_SKIP_IN_FORM	54
-#define DOCEf_HARD_SKIP		55
-#define DOCEf_FILTER_SKIP	56
-#define DOCEf_NO_CLICK_ON	57
-#define DOCEf_DONT_DRAW		58 //only works on sprites
-#define DOCEf_NUM_FLAGS		59
+#define DOCEf_FILTER_SKIP	55
+#define DOCEf_NO_CLICK_ON	56
+#define DOCEf_DONT_DRAW		57 //only works on sprites
+#define DOCEf_NUM_FLAGS		58
 
 public class CDocBin
 {
@@ -2086,15 +2084,16 @@ class CLexHashTableContext
 //CmpCtrl flags
 #define CCF_PMT			1
 #define CCf_PMT			0
-#define CCF_DONT_FREE_BUF	2
-#define CCF_NO_DEFINES		4
-#define CCF_IN_IF		8
-#define CCF_JUST_LOAD		16
-#define CCF_KEEP_NEW_LINES	32
-#define CCF_KEEP_DOT		64
-#define CCF_KEEP_NUM_SIGN	128
-#define CCF_KEEP_AT_SIGN	256
-#define CCf_PASS_TRACE_PRESENT	9
+#define CCF_QUESTION_HELP	2
+#define CCF_DONT_FREE_BUF	4
+#define CCF_NO_DEFINES		8
+#define CCF_IN_IF		16
+#define CCF_JUST_LOAD		32
+#define CCF_KEEP_NEW_LINES	64
+#define CCF_KEEP_DOT		128
+#define CCF_KEEP_NUM_SIGN	256
+#define CCF_KEEP_AT_SIGN	512
+#define CCf_PASS_TRACE_PRESENT	10
 #define CCF_NOT_CONST		0x0000010000
 #define CCF_NO_REG_OPT		0x0000020000
 #define CCF_IN_QUOTES		0x0000040000
@@ -2165,7 +2164,7 @@ public class CCmpCtrl
   CCodeCtrl coc;
   CPrsStk *ps;
   CAOTCtrl *aotc;
-  I64	aot_depth;
+  I64	aot_depth,pmt_line;
   U0 pad;#assert !($$&7) //(compiler lags one token)
 };
 
@@ -2532,6 +2531,7 @@ public class CDirEntry
 #define FUf_ALL			3
 #define FUf_CANCEL		4
 #define FUf_REPLACE		5
+#define FUf_RISKY		5
 #define FUf_PUBLIC		6
 #define FUf_MAP			7
 #define FUf_EXPAND		8
@@ -2557,6 +2557,7 @@ public class CDirEntry
 #define FUF_ALL			0x000008 //a
 #define FUF_CANCEL		0x000010 //c
 #define FUF_REPLACE		0x000020 //R
+#define FUF_RISKY		0x000020 //R
 #define FUF_PUBLIC		0x000040 //p
 #define FUF_MAP			0x000080 //m
 #define FUF_EXPAND		0x000100 //x
@@ -2613,7 +2614,7 @@ public class CDirEntry
 //locked flags
 #define BDlf_LOCKED		0
 
-#define NUM_BLKDEVS		32
+#define NUM_BLKDEVS		26
 #define BD_SIGNATURE_VAL	'BDSV'
 public class CBlkDev
 {
@@ -2664,7 +2665,7 @@ class CFreeLst
   I64	start,size;
 };
 
-#define NUM_DRVS		32
+#define NUM_DRVS		26
 
 #define DRV_SIGNATURE_VAL	'DVSV'
 public class CDrv
@@ -2715,7 +2716,7 @@ public class CBlkDevGlbls
   CDrv	*drvs,*let_to_drv[32];
   I64	auto_mount_ide_cnt;
   U8	boot_drv_let,first_hd_drv_let,first_dvd_drv_let;
-  Bool	boot_rescue_drv_pmt,dvd_boot_is_good,pad[3];
+  Bool	dvd_boot_is_good,pad[4];
 };
 
 #help_index "File/Internal"
@@ -2784,8 +2785,8 @@ class CMemUsed
 #help_index "Memory/BlkPool"
 /*TempleOS does not mess with page tables after it
 identity-maps them during boot -- $LK,"SYS_INIT_MEM",A="MN:SYS_INIT_MEM"$.
-$LK,"PAGE_SIZE",A="MN:PAGE_SIZE"$ is arbitrary, and is not related to CPU hardware.
-I need some unit for memory allocation so I invented "$LK,"PAGE_SIZE",A="MN:PAGE_SIZE"$".
+$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$ is arbitrary, and is not related to CPU hardware.
+I need some unit for memory allocation so I invented "$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$".
 
 All virtual addresses are identical to physical, always.
 There is no high kernel memory because RAM's physical
@@ -2825,18 +2826,20 @@ class CMemRange
   I64	size;
 };
 
-#define PAGE_BITS		9
-#define PAGE_SIZE		(1<<PAGE_BITS)
+#define MEM_PAGE_BITS		9
+#define MEM_PAGE_SIZE		(1<<MEM_PAGE_BITS)
+#define MEM_HEAP_HASH_SIZE	1024
+#define MEM_FREE_PAGE_HASH_SIZE	0x100
+//It is common to $LK,"MAlloc",A="MN:MAlloc"$() exact powers of two.  There is some overhead.
+//We add $TX,"2",D="MEM_EXTRA_HASH2_PAGES"$ pages, so a request is not rounded-up to next power of two.
+#define MEM_EXTRA_HASH2_PAGES	2
 
-#define HEAP_HASH_SIZE		1024
-#define FREE_PAGE_HASH_SIZE	0x100
+#define MEM_ADAM_STK		(MEM_PAGE_SIZE*512) //Like 16384*MEM_PAGE_SIZE
+#define MEM_SETH_STK		(MEM_PAGE_SIZE*512)
+#define MEM_INTERRUPT_STK	(MEM_PAGE_SIZE*512)
+#define MEM_DFT_STK		(MEM_PAGE_SIZE*512)
 
-#define ADAM_STK		(PAGE_SIZE*512) //limit of like 16384*PAGE_SIZE
-#define SETH_STK		(PAGE_SIZE*512)
-#define INTERRUPT_STK		(PAGE_SIZE*512)
-#define DFT_STK			(PAGE_SIZE*512)
-
-#define TASK_HASH_SIZE		(1<<10)
+#define TASK_HASH_TABLE_SIZE	(1<<10)
 
 //locked flags
 #define BPlf_LOCKED		0
@@ -2844,8 +2847,8 @@ public class CBlkPool
 {
   I64	locked_flags,alloced_u8s,used_u8s;
   CMemBlk *mem_free_lst,*mem_free_2meg_lst,
-	*free_page_hash[FREE_PAGE_HASH_SIZE],
-	*free_page_hash2[64-PAGE_BITS];
+	*free_page_hash[MEM_FREE_PAGE_HASH_SIZE],
+	*free_page_hash2[64-MEM_PAGE_BITS];
 };
 
 #help_index "Memory/HeapCtrl"
@@ -2862,7 +2865,7 @@ public class CHeapCtrl
   CMemBlk *next_mem_blk,*last_mem_blk;
   CMemUnused *malloc_free_lst;
   CMemUsed *next_um,*last_um;
-  CMemUnused *heap_hash[HEAP_HASH_SIZE/sizeof(U8 *)];
+  CMemUnused *heap_hash[MEM_HEAP_HASH_SIZE/sizeof(U8 *)];
 };
 
 #help_index "Devices"
@@ -3425,7 +3428,7 @@ public class CSysFixedArea
   CTask	adam;
   CBlkPool adam_bp;
   CHeapCtrl adam_hc;
-  $$=($$+PAGE_SIZE-1)&-PAGE_SIZE;
+  $$=($$+MEM_PAGE_SIZE-1)&-MEM_PAGE_SIZE;
 };
 
 #help_index "Char"
@@ -3835,7 +3838,7 @@ public class CDbgGlbls
 #define BOOT_SRC_DVD		3
 
 // $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
-#define STD_DISTRO_DVD_CFG	"Tb1\nScale2Mem(2048,0x40000)\nt3 \n\n\n\n"
+#define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
 
 #help_index "Misc/Registry"
 //Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()

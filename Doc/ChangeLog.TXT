@@ -2,8 +2,28 @@
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/03/16 16:30:56----$IV,0$
-* Updated $LK,"::/Misc/PCIDevices.TXT.Z"$.
+$IV,1$----01/12/16 16:47:54----$IV,0$
+* Overhauled $LK,"Mount",A="MN:Mount"$() and $LK,"::/Kernel/KCfg.CPP"$.
+
+$IV,1$----01/12/16 10:06:18----$IV,0$
+* $BK,1$TempleOS version 4.01 Released$BK,0$
+* Standardized drive letters.  Your $LK,"Auto",A="MN:Auto"$() config scripts for compiling the kernel with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() must be changed.
+* Added $LK,"CCF_QUESTION_HELP",A="MN:CCF_QUESTION_HELP"$.
+
+$IV,1$----01/11/16 00:04:38----$IV,0$
+* $LK,"R",A="MN:R"$("PAGE_SIZE","MEM_PAGE_SIZE"); etc.
+* $LK,"R",A="MN:R"$("DFT_STK","MEM_DFT_STK"); etc.
+* Added $LK,"::/Demo/MemDemo.CPP"$.
+
+$IV,1$----01/08/16 17:04:58----$IV,0$
+* Added $LK,"FUF_RISKY",A="MN:FUF_RISKY"$ to $LK,"DocOpt",A="MN:DocOpt"$().
+* Fixed $LK,"::/Doc/CompilerOverview.TXT"$.
+
+$IV,1$----01/06/16 11:01:57----$IV,0$
+* Got rid of $FG,4$DOCEF_HARD_SKIP$FG$.
+
+$IV,1$----01/03/16 17:15:41----$IV,0$
+* Updated $LK,"::/Misc/PCIDevices.TXT"$.
 * Added null case option.  Next higher integer with "$FG,2$case:$FG$" in $FG,2$switch$FG$ statements.  See  $LK,"::/Demo/NullCase.CPP"$.
 
 $IV,1$----12/31/15 00:44:44----$IV,0$

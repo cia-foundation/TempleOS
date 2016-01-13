@@ -173,12 +173,6 @@ U0 KernelMain()
   BlkDevsInitAll;
   "After  BlkDevsInitAll\n";
 
-  #exe {
-    if (kernel_cfg->dvd_ports_pmt)
-      StreamPrint(
-	    "if (blkdev.boot_rescue_drv_pmt) \"%%S\",\"ST_DVD_PORTS_PMT2\";");
-  };
-
   ChgDsk(':');
   Gs->idle_task->cur_dv=blkdev.let_to_drv[ToUpper(blkdev.boot_drv_let)-'A'];
   LBts(&sys_run_level,RLf_BLKDEV);

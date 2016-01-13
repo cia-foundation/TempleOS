@@ -14,7 +14,7 @@ Return: NULL if out of memory.
   CLI
   while (LBts(&bp->locked_flags,BPlf_LOCKED))
     PAUSE
-  num<<=21-PAGE_BITS;
+  num<<=21-MEM_PAGE_BITS;
 
   m=&bp->mem_free_2meg_lst;
   while (TRUE) {
@@ -28,7 +28,7 @@ Return: NULL if out of memory.
 	goto am_done;
       } else {
 	result->pages-=num;
-	result(U8 *)+=result->pages<<PAGE_BITS;
+	result(U8 *)+=result->pages<<MEM_PAGE_BITS;
 	result->pages=num;
 	goto am_done;
       }
@@ -53,20 +53,20 @@ Return: NULL if out of memory.
 	  goto am_done;
 	}
       } else {
-	if (i=(result(U8 *)&0x1FFFFF)>>PAGE_BITS) {
-	  j=1<<(21-PAGE_BITS)-i;
+	if (i=(result(U8 *)&0x1FFFFF)>>MEM_PAGE_BITS) {
+	  j=1<<(21-MEM_PAGE_BITS)-i;
 	  if (result->pages<num+j)
 	    m=result;
 	  else if (result->pages==num+j) {
 	    result->pages-=num;
-	    result(U8 *)+=result->pages<<PAGE_BITS;
+	    result(U8 *)+=result->pages<<MEM_PAGE_BITS;
 	    result->pages=num;
 	    goto am_done;
 	  } else {
 	    m1=result;
-	    result(U8 *)+=j<<PAGE_BITS;
+	    result(U8 *)+=j<<MEM_PAGE_BITS;
 	    result->pages=num;
-	    m=result(U8 *)+num<<PAGE_BITS;
+	    m=result(U8 *)+num<<MEM_PAGE_BITS;
 	    m->pages=m1->pages-num-j;
 	    m1->pages=j;
 	    m->next=m1->next;
@@ -75,7 +75,7 @@ Return: NULL if out of memory.
 	    goto am_done;
 	  }
 	} else {
-	  m=m->next=result(U8 *)+num<<PAGE_BITS;
+	  m=m->next=result(U8 *)+num<<MEM_PAGE_BITS;
 	  m->next=result->next;
 	  m->pages=result->pages-num;
 	  m->mb_signature=MBS_UNUSED_SIGNATURE_VAL;
@@ -86,9 +86,9 @@ Return: NULL if out of memory.
     }
   }
 am_done:
-  i=num<<PAGE_BITS;
+  i=num<<MEM_PAGE_BITS;
   bp->used_u8s+=i;
-  num>>=21-PAGE_BITS;
+  num>>=21-MEM_PAGE_BITS;
   *_pages2Meg=num;
   m=result;
   m1=m(U8 *)+i;
@@ -170,7 +170,7 @@ U0 Mem2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
     while (LBts(&bp->locked_flags,BPlf_LOCKED))
       PAUSE
     m->mb_signature=MBS_UNUSED_SIGNATURE_VAL;
-    m->pages=pages2Meg<<(21-PAGE_BITS);
+    m->pages=pages2Meg<<(21-MEM_PAGE_BITS);
     bp->used_u8s-=pages2Meg<<21;
     m->next=bp->mem_free_2meg_lst;
     bp->mem_free_2meg_lst=m;

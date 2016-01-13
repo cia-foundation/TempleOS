@@ -45,7 +45,7 @@ public Bool HeapRep(CTask *task)
     while (LBts(&task->data_heap->locked_flags,HClf_LOCKED))
       PAUSE
 
-  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+  for (i=0;i<MEM_HEAP_HASH_SIZE>>3;i++) {
     cnt=0;
     uum=task->code_heap->heap_hash[i];
     while (uum) {
@@ -96,7 +96,7 @@ public Bool IsInHeapCtrl(U8 *a,CHeapCtrl *hc,Bool lock=TRUE)
       PAUSE
   m=hc->next_mem_blk;
   while (m!=&hc->next_mem_blk) {
-    if (a>=m && a<m(U8 *)+m->pages*PAGE_SIZE) {
+    if (a>=m && a<m(U8 *)+m->pages*MEM_PAGE_SIZE) {
       if (lock)
 	LBtr(&hc->locked_flags,HClf_LOCKED);
       POPFD
@@ -120,7 +120,7 @@ public Bool HeapCtrlWalk(CHeapCtrl *hc)
   while (LBts(&hc->locked_flags,HClf_LOCKED))
     PAUSE
 
-  for (i=0;i<HEAP_HASH_SIZE>>3;i++) {
+  for (i=0;i<MEM_HEAP_HASH_SIZE>>3;i++) {
     uum=hc->heap_hash[i];
     while (uum) {
       if (!IsInHeapCtrl(uum,hc,FALSE))

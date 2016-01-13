@@ -1,5 +1,5 @@
 Bool Option(I64 num,Bool val)
-{//Set compiler $LK,"option",A="MN:OPTf_ECHO"$ to value.
+{//Set compiler $LK,"Option",A="FI:::/Doc/Options.TXT"$ to val.
   return BEqu(&Fs->last_lex->opts,num,val);
 }
 

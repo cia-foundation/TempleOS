@@ -28,7 +28,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
   if (sc!=MIN_I64) sc=sc.u32[0];
   if (sc>=0 && sc&SCF_CTRL) {
     while (doc_ce->last!=doc && (doc_ce->last->y==y ||
-	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)))
+	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)))
       doc_ce=doc_ce->last;  //TODO: select? recurse?
     cc=doc_ce->min_col;
   } else {
@@ -57,8 +57,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
       while (doc_ce->last!=doc &&
 	    (doc_ce->last->type_u8==DOCT_SOFT_NEW_LINE ||
 	    doc_ce->last->type_u8==DOCT_INDENT ||
-	    doc_ce->last->de_flags
-	    &(DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	    doc_ce->last->de_flags&(DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
 	doc_ce=doc_ce->last;
 	if (sc>=0)
 	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
@@ -103,7 +102,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
     while (doc_ce!=doc && doc_ce->next->y==y &&
 	  doc_ce->next->type_u8!=DOCT_SOFT_NEW_LINE && doc_ce->next!=doc &&
 	  (doc_ce->next->type_u8!=DOCT_NEW_LINE || !(doc->flags & DOCF_FORM)) ||
-	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))
+	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))
       doc_ce=doc_ce->next;
     if (doc_ce->max_col>doc_ce->min_col)
       cc=doc_ce->max_col-1;
@@ -144,8 +143,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
 	if (cc<=doc_ce->min_col && sc>=0)
 	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 	doc_ce=doc_ce->next;
-	while (doc_ce!=doc && doc_ce->de_flags
-	      &(DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) {
+	while (doc_ce!=doc && doc_ce->de_flags&(DOCEF_SKIP|DOCEF_FILTER_SKIP)) {
 	  if (sc>=0)
 	    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
 	  doc_ce=doc_ce->next;
@@ -205,7 +203,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   DocFormBwd(doc);
   doc_ce=doc->cur_entry;
   while (doc_ce->last!=doc && (doc_ce->y>=y ||
-	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
     doc_ce=doc_ce->last;
     if (sc>=0)
       BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
@@ -213,7 +211,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   y=doc_ce->y;
   doc->y=y;
   while (doc_ce!=doc && (doc_ce->y>=y && doc_ce->x>=x ||
-	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
     if (sc>=0)
       BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
     doc_ce=doc_ce->last;
@@ -320,12 +318,12 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
   }
   doc_ce2=doc_ce;
   while (doc_ce!=doc && (doc_ce->y<=y ||
-	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)))
+	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)))
     doc_ce=doc_ce->next;
   y=doc_ce->y;
   doc->y=y;
   while (doc_ce!=doc && (doc_ce->y<=y && doc_ce->x<=x ||
-	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
     old_de_flags=doc_ce->de_flags;
     old_color=doc_ce->type;
     doc_ce=doc_ce->next;
@@ -344,7 +342,7 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
   }
   while (doc_ce2!=doc && (doc_ce2!=doc_ce || IsEditableText(doc_ce))) {
     if ((doc_ce2->y<y || doc_ce2->x<x ||
-	  doc_ce2->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP) ||
+	  doc_ce2->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP) ||
 	  doc_ce2->x==x && !doc_ce2->max_col &&
 	  Bt(doldoc.type_flags_nontag_invisible,doc_ce2->type_u8)) && sc>=0)
       BEqu(&doc_ce2->type,DOCEt_SELECTED,sc&SCF_SHIFT);

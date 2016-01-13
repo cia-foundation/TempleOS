@@ -188,7 +188,7 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
       doc_e2->type=DOCT_SOFT_NEW_LINE | doc_e->type & 0xFFFFFF00;
       doc_e2->de_flags=DOCEF_WORD_WRAP|doldoc.dft_de_flags[DOCT_SOFT_NEW_LINE]|
 	    doc_e->de_flags&(DOCEF_HIGHLIGHT|DOCG_BL_IV_UL|
-	    DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP);
+	    DOCEF_SKIP|DOCEF_FILTER_SKIP);
       doc_e2->x=x;
       doc_e2->y=y;
       doc_e2->page_line_num=doc_e->last->page_line_num;
@@ -424,7 +424,7 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
   while (doc_e!=doc) {
     while (TRUE) {
       del_cl=FALSE;
-      if (doc_e->de_flags & (DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) {
+      if (doc_e->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)) {
 	doc_e2=doc_e;
 	goto rc_skip;
       }
@@ -1079,8 +1079,7 @@ rc_adjust_xy:
 
     doc_e2=doc_e->next;
 rc_skip:
-    while (doc_e2!=doc && doc_e2->de_flags
-	  &(DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) {
+    while (doc_e2!=doc && doc_e2->de_flags&(DOCEF_SKIP|DOCEF_FILTER_SKIP)) {
       if (doc_e2==doc->cur_entry) {
 	doc->cur_entry=doc_e2->next;
 	doc->cur_col=doc->cur_entry->min_col;

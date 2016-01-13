@@ -50,7 +50,7 @@ public CDoc *Doc2TXT(CDoc *doc_in)
   col=doc_e->x;
   y=doc_e->y;
   while (doc_e!=doc_in) {
-    if (!(doc_e->de_flags&(DOCEF_SKIP|DOCEF_HARD_SKIP))) {
+    if (!(doc_e->de_flags&DOCEF_SKIP)) {
       while (y<doc_e->y) {
 	TXTPutS(doc_out,"\n",&col);
 	y++;

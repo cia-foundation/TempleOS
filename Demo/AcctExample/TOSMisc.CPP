@@ -76,12 +76,22 @@ public U0 FrameGrabberToggle()
   }
 }
 
+public U0 JukeSong(I64 num)
+{
+  AutoComplete;
+  if (!fg_on)
+    FrameGrabberToggle;
+  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,num,num+1);
+  if (fg_on)
+    FrameGrabberToggle;
+}
+
 public U0 JukeLines(I64 start_line,I64 end_line)
 {
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Apps/Psalmody/Examples",,start_line*5,end_line*5);
+  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -305,6 +315,6 @@ U0 TOSJukeVideo(I64 start=0,I64 end=10)
   Free(buf);
   AutoComplete;
   FrameGrabberToggle;
-  JukeSongsPuppet("::/Apps/Psalmody/Examples",,start,end);
+  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,start,end);
   FrameGrabberToggle;
 }

@@ -33,6 +33,27 @@ U0 InsDirLinks()
   Free(st2);
 }
 
+U0 DocHiddenDel(CDoc *doc=NULL)
+{
+  Bool unlock;
+  CDocEntry *doc_e,*doc_e1;
+  if (!doc) doc=DocPut;
+  if (doc) {
+    unlock=DocLock(doc);
+    DocRecalc(doc);
+    doc_e=doc->root.next;
+    while (doc_e!=doc) {
+      doc_e1=doc_e->next;
+      if (doc_e->de_flags&(DOCEF_FILTER_SKIP|DOCEF_SKIP))
+	DocEntryDel(doc,doc_e);
+      doc_e=doc_e1;
+    }
+    DocRecalc(doc);
+    if (unlock)
+      DocUnlock(doc);
+  }
+}
+
 Bool MyPutKey(I64 ch,I64 sc)
 {//ch=ASCII; sc=scan_code
 
@@ -105,6 +126,24 @@ Bool MyPutKey(I64 ch,I64 sc)
 		"$$BLUE$$";
 	    }
 	    return TRUE;
+	  case SC_F5:
+	    if (sc&SCF_SHIFT) {
+	      if (sc&SCF_KEY_DESC)
+		KeyDescSet("Edit/Collaborative Fiction");
+	      else
+		"---- $TX,"Collaborative Fiction",HTML="http://en.wikipedia.org/wiki/Collaborative_fiction"$ ----\n"
+		      "Once upon a time ";
+	    } else {
+	      if (sc&SCF_KEY_DESC)
+		KeyDescSet("Edit/Moses Comic");
+	      else
+		"---- Moses Comic ---- "
+		      "(Set in the $TX,"Numbers 11",HTML="http://www.biblegateway.com/passage/?search=Numbers%%%%2011&version=NIV"$ "
+		      "part of the story.)\n"
+		      "Moses says, \"\"\n"
+		      "God says, \"\"\n";
+	    }
+	    return TRUE;
 	  case SC_F6:
 	    if (sc&SCF_SHIFT) {
 	      if (sc&SCF_KEY_DESC)
@@ -172,6 +211,12 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  KeyDescSet("Cmd /Tile Horizontally");
 	else
 	  WinTileHorz;
+	return TRUE;
+      case 'H':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Edit/Del Hidden Doc Entries");
+	else
+	  DocHiddenDel;
 	return TRUE;
       case 'm':
 	if (sc&SCF_KEY_DESC)

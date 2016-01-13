@@ -23,17 +23,12 @@ class CKernelCfg
   Bool opts[CFG_NUM_OPTIONS];
   U8 mem_init_val,heap_init_val,var_init_val,
 	boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
-  Bool dvd_ports_pmt;
 };
 
 CDoc *KernelCfgAddDev(CKernelCfg *c)
 {
-  I64 ch,num_hints,first_drv_num,type,unit,cnt=0;
-  U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN];
-  CATARep *root=NULL,*tempha;
-  CDoc *doc=DocNew;
-  Bool make_free;
-
+  I64 ch,cnt=0;
+  CDoc *doc=DocNew,*doc2;
   "\n\nIn anticipation of the drives you will\n"
 	"define shortly, enter the drive letter\n"
 	"of the drive with the account directory.\n"
@@ -43,97 +38,15 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
     c->boot_drv_let=ch;
   else
     c->boot_drv_let=Drv2Let(Fs->cur_dv);
-
   "\n\n$$BK,1$$$$PURPLE$$Mount drives so they will be present when "
 	"you boot.$$FG$$$$BK,0$$\n";
   do {
-    "\n****** Mount Drives ******\n"
-	  "The first drive letter is the letter\n"
-	  "of the first partition.  If adding\n"
-	  "a hard drive, you should pick 'C'.\n"
-	  "If more than one partition is present\n"
-	  "they will be lettered in sequence.\n"
-	  "\nFirst Drive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
-    first_drv_num=ToUpper(GetChar)-'A';
-    '\n';
-    if (0<=first_drv_num<NUM_DRVS) {
-      "\t$$PURPLE$$1$$FG$$=RAM\n\t$$PURPLE$$2$$FG$$=ATA(Harddisk)\n"
-	    "\t$$PURPLE$$3$$FG$$=ATAPI(CD/DVD)\nType:";
-      type=GetChar-'0';
-      '\n';
-
-      unit=0;
-      if (type==BDT_RAM) {
-	"Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";
-	GetS(addr_buf,STR_LEN);
-	"Blks of 512 bytes:";
-	GetS(blks_buf,STR_LEN);
-      } else if (type==BDT_ATA ||
-	    type==BDT_ATAPI) {
-	num_hints=ATARep(,,&root);
-	if (type==BDT_ATAPI) {
-	  "<ENTER> to use booted CD/DVD\n";
-	  if (num_hints)
-	    "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
-		  "I/O Port Base0:\n";
-	  else
-	    "Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
-	  GetS(base0_buf,STR_LEN);
-	} else
-	  do {
-	    if (num_hints)
-	      "Enter dev number or\nport with $$PURPLE$$0x$$FG$$ prefix.\n"
-		    "I/O Port Base0:\n";
-	    else
-	      "Include $$PURPLE$$0x$$FG$$ prefix.\nI/O Port Base0:\n";
-	    GetS(base0_buf,STR_LEN);
-	  } while (!Str2I64(base0_buf));
-	if (1<=Str2I64(base0_buf)<=num_hints) {
-	  tempha=ATARepFind(root,Str2I64(base0_buf));
-	  StrPrint(base0_buf,"0x%X",tempha->base0);
-	  StrPrint(base1_buf,"0x%X",tempha->base1);
-	  unit=tempha->unit;
-	} else if (type!=BDT_ATAPI || *base0_buf) {
-	  if (type==BDT_ATAPI)
-	    StrCpy(base1_buf,"0");
-	  else
-	    do {
-	      "I/O Port Base1:\n";
-	      GetS(base1_buf,STR_LEN);
-	    } while (!Str2I64(base1_buf));
-	  do {
-	    "\t$$PURPLE$$0$$FG$$=Master\n\t$$PURPLE$$1$$FG$$=Slave\nUnit:";
-	    unit=GetChar-'0';
-	  } while (!(0<=unit<=1));
-	  '\n';
-	}
-	LinkedLstDel(root);
-      }
-      if (BDT_NULL<type<BDT_NUM_TYPES && 0<=unit<=1) {
-	DocPrint(doc,"bd=BlkDevNextFree(%d,%d);"
-	      "bd->unit=%d;",first_drv_num+'A',type,unit);
-	if (type==BDT_RAM) {
-	  if (!*addr_buf) StrCpy(addr_buf,"0");
-	  DocPrint(doc,"bd->RAM_dsk=%s;",addr_buf);
-	  DocPrint(doc,"bd->max_blk=(%s)-1;",blks_buf);
-	}
-	make_free=FALSE;
-	if (type==BDT_ATA || type==BDT_ATAPI) {
-	  if (type==BDT_ATAPI && !*base0_buf) {
-	    c->dvd_ports_pmt=TRUE;
-	    DocPrint(doc,"blkdev.boot_rescue_drv_pmt=GetBaseUnit(bd);");
-	    if (first_drv_num+'A'==c->boot_drv_let)
-	      make_free=TRUE;
-	  } else
-	    DocPrint(doc,"bd->base0=%s;bd->base1=%s;",
-		  base0_buf,base1_buf);
-	}
-	DocPrint(doc,"BlkDevAdd(bd,FALSE,%d);",make_free);
-	cnt++;
-      } else
-	"\n\n$$BK,1$$$$RED$$Operation Failed$$BK,0$$$$FG$$\n\n";
+    if (doc2=BlkDevPmt(c->boot_drv_let)) {
+      DocInsDoc(doc,doc2);
+      DocDel(doc2);
+      cnt++;
     }
-  } while (!cnt || 0<=first_drv_num<NUM_DRVS);
+  } while (!cnt || doc2);
   return doc;
 }
 

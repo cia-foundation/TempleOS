@@ -414,9 +414,9 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   zh=-256;
   Mat4x4MulXYZ(s2w,&xh,&yh,&zh);
 
-  //The layer for core#1 is not cleared automatically
+  //The layer for core1 is not cleared automatically
   //it is persistent.  I have carefully syncronized to the update
-  //cycle initiated by core#0 to prevent flicker.
+  //cycle initiated by core0 to prevent flicker.
 
   dc->flags|=DCF_TRANSFORMATION;
   dc->transform=&EDTransform;

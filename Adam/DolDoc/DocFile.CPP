@@ -82,7 +82,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	  break;
 	case DOCT_TEXT://$BK,1$Update $LK,"DOCT_TEXT",A="FF:D:/Compiler/Lex.CPP,DOCT_TEXT"$$BK,0$
 	  if (!(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
-		DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))&&
+		DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_FILTER_SKIP))&&
 		!(doc_e->type&DOCG_BL_IV_UL)) {
 	    cnt+=StrLen(doc_e->tag);
 	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_WITH_TABS)) ||
@@ -115,7 +115,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
     if (!Bt(doldoc.type_flags_data,doc_e->type_u8)) {
       if (doc_e->type_u8==DOCT_TEXT &&
 	    !(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
-	    DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	    DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_FILTER_SKIP)) &&
 	    !(doc_e->type&DOCG_BL_IV_UL)) {
 	src=doc_e->tag;
 	i=0;

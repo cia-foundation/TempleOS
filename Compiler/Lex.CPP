@@ -131,7 +131,7 @@ lgc_start2:
 	      case DOCT_TEXT:
 		if (doc_e->de_flags & ~(DOCEF_TAG|DOCEF_DEFINE|DOCEF_TAG_CB|
 		      DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
-		      DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP) &&
+		      DOCEF_SKIP|DOCEF_FILTER_SKIP) &&
 		      LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
 		  tempf->line_num=doc_e->y+1;
 		  tempf->buf_ptr=cc->cur_buf_ptr=src;
@@ -228,8 +228,13 @@ lgc_start2:
 	} else {
 	  if (cc->flags & CCF_PMT) {
 	    Free(tempf->buf);
-	    tempf->buf=tempf->buf_ptr=tempf->line_start=
-		  cc->cur_buf_ptr=CmdLinePmt;
+	    ptr=CmdLinePmt;
+	    if (StrCmp(ptr,"\n") && !cc->pmt_line++ && !StrCmp(ptr,"?\n") &&
+		cc->flags & CCF_QUESTION_HELP) {
+	      Free(ptr);
+	      ptr=StrNew("Help;;\n");
+	    }
+	    tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=ptr;
 	    goto lgc_start1;
 	  } else {
 	    if (src)

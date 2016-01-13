@@ -500,7 +500,7 @@ U0 DocEntryToggle(CDoc *doc)
 	!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))) {
     if (doc_ce->type_u8==DOCT_TEXT && !(doc_ce->de_flags &
 	  ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
-	  DOCEF_SKIP|DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	  DOCEF_SKIP|DOCEF_FILTER_SKIP)) &&
 	  !(doc_ce->type&DOCG_BL_IV_UL)) {
       doc_ce2=doc_ce->last;
       for (k=0;k<20;k++) {

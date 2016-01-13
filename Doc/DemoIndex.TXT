@@ -165,6 +165,7 @@ $LK,"::/Demo/DolDoc/ClickCallBack.CPP"$
 $LK,"::/Demo/DolDoc/TreeDemo.CPP"$
 $LK,"::/Demo/Exceptions.CPP"$
 $LK,"::/Demo/Dsk/SerializeTree.CPP"$
+$LK,"::/Demo/MemDemo.CPP"$
 $LK,"::/Demo/StkGrow.CPP"$
 $LK,"::/Demo/DolDoc/TextDemo.CPP"$
 $LK,"::/Demo/DolDoc/CursorMove.CPP"$

@@ -98,10 +98,10 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
     *num_hints+=1;
     "\n\n$$PURPLE$$ $$BT+X,\"%d\",LM=\"%d\\n\"$$$$FG$$$$LM,4$$",*num_hints,*num_hints;
     if (type==BDT_ATA)
-      "$$RED$$ATA   ";
+      "$$RED$$Hard Drive   $$LTBLUE$$ATA   ";
     else
-      "$$RED$$ATAPI ";
-    "$$LTBLUE$$%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
+      "$$RED$$CD/DVD Drive $$LTBLUE$$ATAPI ";
+    "%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
 	  msg,base0,base1,irq,unit;
     if (_root) {
       tempha=CAlloc(sizeof(CATARep));
@@ -189,6 +189,16 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
     if (Bt(&unlock_flags,i))
       BlkDevUnlock(&blkdev.blkdevs[i]);
   return num_hints;
+}
+
+CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num)
+{
+  while (haystack_root) {
+    if (haystack_root->num==needle_num)
+      return haystack_root;
+    haystack_root=haystack_root->next;
+  }
+  return NULL;
 }
 
 CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,

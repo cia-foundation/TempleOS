@@ -41,7 +41,7 @@ _MALLOC::
 	PAUSE	//don't know if this instruction helps
 	JC	@@25
 
-	CMP	RAX,HEAP_HASH_SIZE
+	CMP	RAX,MEM_HEAP_HASH_SIZE
 	JAE	@@30
 	MOV	RSI,U64 CHeapCtrl.heap_hash[RAX+RDX]
 	TEST	RSI,RSI
@@ -51,8 +51,8 @@ _MALLOC::
 	JMP	I32 MALLOC_ALMOST_DONE
 
 //Big allocation
-@@30:	ADD	RAX,sizeof(CMemBlk)+PAGE_SIZE-1
-	SHR	RAX,PAGE_BITS
+@@30:	ADD	RAX,sizeof(CMemBlk)+MEM_PAGE_SIZE-1
+	SHR	RAX,MEM_PAGE_BITS
 
 	PUSH	RDX //preserve HeapCtrl
 	PUSH	RAX //num blks (we must pass address of this)
@@ -66,7 +66,7 @@ _MALLOC::
 	TEST	RSI,RSI
 	JZ	@@45	//Out of memory
 
-	SHL	RAX,PAGE_BITS
+	SHL	RAX,MEM_PAGE_BITS
 	SUB	RAX,sizeof(CMemBlk)
 	ADD	RSI,sizeof(CMemBlk)
 	JMP	I32 MALLOC_ALMOST_DONE
@@ -79,8 +79,8 @@ _MALLOC::
 	TEST	RSI,RSI
 	JNZ	@@55
 	PUSH	RAX		//-**** save byte size
-	ADD	RAX,16*PAGE_SIZE-1
-	SHR	RAX,PAGE_BITS
+	ADD	RAX,16*MEM_PAGE_SIZE-1
+	SHR	RAX,MEM_PAGE_BITS
 
 	PUSH	RDX //preserve HeapCtrl
 	PUSH	RAX //num blks (we must pass address of this)
@@ -105,7 +105,7 @@ _MALLOC::
 	JMP	I32 MALLOC_FINAL_EXIT //Never gets here, hopefully.
 
 @@50:	LEA	RSI,U64 sizeof(CMemBlk)[RSI]
-	SHL	RAX,PAGE_BITS
+	SHL	RAX,MEM_PAGE_BITS
 	SUB	RAX,sizeof(CMemBlk)
 	LEA	RBX,U64 CHeapCtrl.malloc_free_lst-CMemUnused.next[RDX]
 	MOV	RDI,U64 CMemUnused.next[RBX]
@@ -292,7 +292,7 @@ _FREE::
 
 	MOV	RDX,U64 CMemUsed.hc[RSI]
 #endif
-	CMP	RAX,HEAP_HASH_SIZE
+	CMP	RAX,MEM_HEAP_HASH_SIZE
 	JAE	@@50
 
 #assert CMemUnused.size==CMemUsed.size

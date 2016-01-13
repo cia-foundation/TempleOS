@@ -5,9 +5,6 @@ public extern CAutoCompleteGlbls ac;
 #help_index "AutoComplete/Dictionary"
 public extern CAutoCompleteDictGlbls acd;
 
-#help_index "AutoFile;StdIn/AutoFile"
-#help_file "::/Doc/AutoFile"
-
 #help_index "Bit"
 public extern I64 BCnt(I64 d);
 public extern U8 *reverse_bits_table,*set_bits_table;
@@ -461,7 +458,6 @@ public extern Bool DrvEnable(U8 drv_let,Bool val);
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
 public extern U0 Fmt(U8 drv_let,Bool quick=TRUE,
 	Bool confirm=TRUE,I64 type=DVT_FAT32);
-public extern U0 Mount(Bool repartition=FALSE);
 
 #help_index "Install;Memory/BlkPool"
 public extern I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024);

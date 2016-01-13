@@ -1,5 +1,4 @@
 #help_index "File/Cmd Line (Typically);Cmd Line (Typically)"
-
 public U8 *DBlk(I64 blk,Bool write=FALSE)
 {//Dump disk block. Optionally, write.
 //If you set write to TRUE, the block will
@@ -261,7 +260,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
   } else
     PrintErr("File not found.\n");
 }
-public U0 Touch(U8 *files_find_mask,U8 *attr="+?",
+public U0 Touch(U8 *files_find_mask="*",U8 *attr="+?",
 	U8 *fu_flags=NULL,CDate cdt=MIN_I64)
 {/*Touch file attributes and DateTime.
 Default lists attributes.

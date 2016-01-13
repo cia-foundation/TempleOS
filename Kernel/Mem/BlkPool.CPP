@@ -9,7 +9,7 @@ U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512)
   m->next=bp->mem_free_lst;
   m->pages=pages512;
   m->mb_signature=MBS_UNUSED_SIGNATURE_VAL;
-  bp->alloced_u8s+=pages512<<PAGE_BITS;
+  bp->alloced_u8s+=pages512<<MEM_PAGE_BITS;
   bp->mem_free_lst=m;
   LBtr(&bp->locked_flags,BPlf_LOCKED);
   POPFD
@@ -20,9 +20,9 @@ U0 BlkPoolInit(CBlkPool *bp,I64 pages512)
   I64 num;
   CMemBlk *m;
   MemSet(bp,0,sizeof(CBlkPool));
-  m=(bp(U8 *)+sizeof(CBlkPool)+PAGE_SIZE-1)&~(PAGE_SIZE-1);
-  num=(bp(U8 *)+pages512<<PAGE_BITS-m(U8 *))>>PAGE_BITS;
-  bp->alloced_u8s=(pages512-num)<<PAGE_BITS; //Compensate before num added.
+  m=(bp(U8 *)+sizeof(CBlkPool)+MEM_PAGE_SIZE-1)&~(MEM_PAGE_SIZE-1);
+  num=(bp(U8 *)+pages512<<MEM_PAGE_BITS-m(U8 *))>>MEM_PAGE_BITS;
+  bp->alloced_u8s=(pages512-num)<<MEM_PAGE_BITS; //Compensate before num added.
   BlkPoolAdd(bp,m,num);
 }
 
@@ -42,7 +42,7 @@ U0 BlkPoolsInit()
     code_heap_limit=0x80000000;
 
   i=code_heap_limit-0x1000000;
-  BlkPoolAdd(sys_code_bp,0x1000000,i>>PAGE_BITS);
+  BlkPoolAdd(sys_code_bp,0x1000000,i>>MEM_PAGE_BITS);
   sys_heap_limit=i+0x1000000-1;
 
   if (code_heap_limit<total) {
@@ -58,12 +58,12 @@ U0 BlkPoolsInit()
 	}
 	if (code_heap_limit<=lo<hi) {
 	  if (first) {
-	    BlkPoolInit(lo,(hi-lo)>>PAGE_BITS);
+	    BlkPoolInit(lo,(hi-lo)>>MEM_PAGE_BITS);
 	    sys_data_bp=lo;
 	    Fs->data_heap=HeapCtrlInit(,Fs,sys_data_bp);
 	    first=FALSE;
 	  } else
-	    BlkPoolAdd(sys_data_bp,lo,(hi-lo)>>PAGE_BITS);
+	    BlkPoolAdd(sys_data_bp,lo,(hi-lo)>>MEM_PAGE_BITS);
 	}
       }
       m20++;

@@ -1,7 +1,7 @@
 Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
 {
   if (ata_drv) {
-    XTalkWait(task,"PrtDsk;\nYC2p%d\nYYY",ata_drv->num);
+    XTalkWait(task,"PrtDsk;\nYCp%d\nYYY",ata_drv->num);
     XTalkWait(task,"%d\nY\nY\n",(drv_dsk_dsk_size-DRV_HEADER)/2);
     return TRUE;
   } else
@@ -27,12 +27,12 @@ U0 VMInstallBoot(CTask *task,U8 dvd_drv,U8 drv,
 
   XTalkWait(task,
 	"MakeOSDrvBootInstall('%C');\n"
-	"\nB1\n0x20000\n",drv);
+	"\nB\n0x20000\n",drv);
 
   if (ata_drv)
-    XTalkWait(task,"C2p%d\n",ata_drv->num);
+    XTalkWait(task,"Cp%d\n",ata_drv->num);
   if (atapi_drv)
-    XTalkWait(task,"T3p%d\n",atapi_drv->num);
+    XTalkWait(task,"Tp%d\n",atapi_drv->num);
 
   XTalkWait(task,
 	"\n"   //Exit Drives
@@ -84,7 +84,7 @@ U0 RegularInstallWiz()
   WinVert(Fs->win_top,(Fs->win_top+Fs->win_bottom)>>2-1,task);
   WinVert(task->win_bottom+3,Fs->win_bottom);
   WinToTop(Fs);
-  XTalk(task,"Mount;\nC2 ");
+  XTalk(task,"Mount;\nC ");
 
   num_hints=ATARep(FALSE,,&root);
   "\nInclude '$$PURPLE$$0x$$FG$$' for hexidecimal numbers.\n\n";
@@ -157,9 +157,9 @@ U0 RegularInstallWiz()
   Copy("::/MakeHome.CPP.Z",new_home_str);
   XTalkWait(task,
 	"MakeOSDrvBootInstall('%C');\n"
-	"\nB1\n0x20000\n"
+	"\nB\n0x20000\n"
 	"C"
-	"2p"
+	"p"
 	"%s\n"
 	"%s\n"
 	"%C"

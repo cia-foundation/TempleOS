@@ -22,7 +22,7 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 
 * $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/AutoFile/AFProfile.AUT"$ (This is an $LK,"AutoFile",A="FF:::/Doc/Glossary.TXT,AutoFile"$.)
 
-* Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The WinMgr runs on core0 and will overwrite raw text from other cores when it updates the screen.
+* Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The $FG,2$WinMgr$FG$ runs on $FG,2$core0$FG$ and will overwrite raw text from other cores when it updates the screen.
 
 * Use $LK,"SysDbg",A="MN:SysDbg"$() to set a flag which you can read with $LK,"IsSysDbg",A="MN:IsSysDbg"$() when you wish to trigger some debug activity.  It's just a handy simple flag, nothing fancy.
 

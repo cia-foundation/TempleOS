@@ -166,7 +166,7 @@ public CDoc *Doc2Html(CDoc *doc_in,
   col=doc_e->x;
   y=doc_e->y;
   while (doc_e!=doc_in) {
-    if (!(doc_e->de_flags&(DOCEF_SKIP|DOCEF_HARD_SKIP))) {
+    if (!(doc_e->de_flags&DOCEF_SKIP)) {
       if (line_anchors && y!=old_y) {
 	DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	old_y=y;

@@ -106,6 +106,8 @@ $FG,5$$TX+CX,"Hash Sym Tables"$$FG$
 
 $FG,5$$TX+CX,"Assembly Language"$$FG$
 
+See $LK,"::/Doc/Asm.TXT"$.
+
 * $FG,2$FS$FG$ must always point to the cur $LK,"CTask",A="MN:CTask"$.
 
 * $FG,2$GS$FG$ must always point to the cur $LK,"CCPU",A="MN:CCPU"$.

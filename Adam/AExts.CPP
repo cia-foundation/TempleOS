@@ -46,6 +46,7 @@ extern U0 DrawCtrls(CTask *task);
 extern Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
 extern U0 EdCodeTools(CDoc *doc);
 extern U8 *EdSprite(I64 bin_num);
+extern I64 ExeDoc(CDoc *doc,Bool just_load=FALSE);
 extern I64 FindWiz();
 extern I64 GetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64);
 extern U0 GrPlot0(CDC *dc,I64 x,I64 y);

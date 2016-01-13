@@ -124,7 +124,8 @@ pain without MAlloc up-and-running.
 #define ESTIMATED_MISC_ALLOCS	0x100000
 
 #assert CONSERVATIVE_16MEG_SIZE-
-	(SYS_FIXED_AREA+sizeof(CSysFixedArea))>ADAM_STK+ESTIMATED_MISC_ALLOCS
+	(SYS_FIXED_AREA+sizeof(CSysFixedArea))>MEM_ADAM_STK+
+	ESTIMATED_MISC_ALLOCS
 
 //EBX=BASE EAX=SIZE
 	TEST	U8 [SYS_MEM_INIT_FLAG],1
@@ -136,7 +137,7 @@ pain without MAlloc up-and-running.
 	REP_STOSB
 	POP	EAX
 
-@@40:	SHR	EAX,PAGE_BITS
+@@40:	SHR	EAX,MEM_PAGE_BITS
 	MOV	ESI,SYS_FIXED_AREA+CSysFixedArea.adam_bp
 	MOV	EDI,U32 CBlkPool.mem_free_lst[ESI]
 	MOV	U32 CMemBlk.next[EBX],EDI
@@ -145,7 +146,7 @@ pain without MAlloc up-and-running.
 	MOV	U32 CBlkPool.mem_free_lst+4[ESI],0
 	MOV	U32 CMemBlk.mb_signature[EBX],MBS_UNUSED_SIGNATURE_VAL
 	MOV	U32 CMemBlk.pages[EBX],EAX
-	SHL	EAX,PAGE_BITS
+	SHL	EAX,MEM_PAGE_BITS
 	ADD	U32 CBlkPool.alloced_u8s[ESI],EAX
 	RET
 }

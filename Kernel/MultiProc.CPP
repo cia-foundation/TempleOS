@@ -80,11 +80,11 @@ CTSS *TSSNew(I64 cpu_num)
   tss->io_map_offset=offset(CTSS.io_map);
   MemSet(tss->io_map,0xFF,0x10000/8);
 
-  tss->st0=MAlloc(INTERRUPT_STK);
+  tss->st0=MAlloc(MEM_INTERRUPT_STK);
   tss->rsp0=tss->st0(U8 *)+MSize(tss->st0);
-  tss->st1=MAlloc(INTERRUPT_STK);
+  tss->st1=MAlloc(MEM_INTERRUPT_STK);
   tss->rsp1=tss->st1(U8 *)+MSize(tss->st1);
-  tss->st2=MAlloc(INTERRUPT_STK);
+  tss->st2=MAlloc(MEM_INTERRUPT_STK);
   tss->rsp2=tss->st2(U8 *)+MSize(tss->st2);
 
   tss->tr      =offset(CGDT.tr)+cpu_num*16;
@@ -352,7 +352,7 @@ U0 Core0StartMP()
 
   for (i=1;i<my_mp_cnt;i++) {
     StrPrint(buf,"Seth Task CPU#%d",i);
-    task=Spawn(&CoreAPSethInit,NULL,buf,,,SETH_STK,0);
+    task=Spawn(&CoreAPSethInit,NULL,buf,,,MEM_SETH_STK,0);
     task->rflags=RFLAGG_START;
 //$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
     CPUStructInit(i,&cpu_structs[i],task);
@@ -397,7 +397,7 @@ U0 Core0Init()
 }
 
 interrupt U0 IntMPCrash()
-{//Entering the debugger from another core causes an interrupt on core#0
+{//Entering the debugger from another core causes an interrupt on core0
 //Which calls this routine.
   *LAPIC_EOI(U32 *)=0;
   mp_cnt=1;

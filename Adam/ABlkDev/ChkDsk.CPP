@@ -1,5 +1,4 @@
 #help_index "Info;File/Cmd Line (Typically);Cmd Line (Typically)"
-
 Bool ChkDskConfirm(Bool *_fix,Bool *_confirm)
 {
   if (*_fix && *_confirm) {

@@ -17,9 +17,10 @@ CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512)
   CHeapCtrl *hc;
   MemSet(bp,0,sizeof(CBlkPool)+sizeof(CHeapCtrl));
   hc=HeapCtrlInit(bp(U8 *)+sizeof(CBlkPool),,bp);
-  m=(bp(U8 *)+sizeof(CBlkPool)+sizeof(CHeapCtrl)+PAGE_SIZE-1)&~(PAGE_SIZE-1);
-  num=(bp(U8 *)+pages512<<PAGE_BITS-m(U8 *))>>PAGE_BITS;
-  bp->alloced_u8s=(pages512-num)<<PAGE_BITS;
+  m=(bp(U8 *)+sizeof(CBlkPool)+sizeof(CHeapCtrl)+MEM_PAGE_SIZE-1)&
+	~(MEM_PAGE_SIZE-1);
+  num=(bp(U8 *)+pages512<<MEM_PAGE_BITS-m(U8 *))>>MEM_PAGE_BITS;
+  bp->alloced_u8s=(pages512-num)<<MEM_PAGE_BITS;
   BlkPoolAdd(bp,m,num);
   return hc;
 }

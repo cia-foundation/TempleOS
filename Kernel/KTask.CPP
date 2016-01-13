@@ -177,10 +177,10 @@ I64 TaskInit(CTask *task,I64 stk_size)
   MemCpy(task->fpu_mmx,
 	SYS_FIXED_AREA+offset(CSysFixedArea.init_fpu_mmx),sizeof(CFPU));
 
-  task->hash_table=HashTableNew(TASK_HASH_SIZE,task);
+  task->hash_table=HashTableNew(TASK_HASH_TABLE_SIZE,task);
 
   if (!stk_size)
-    stk_size=DFT_STK;
+    stk_size=MEM_DFT_STK;
   task->stk=temps=TaskStkNew(stk_size,task);
   task->rsp=(&temps->stk_base)(U8 *)+temps->stk_size;
 
@@ -308,6 +308,7 @@ I64 ExeCmdLine(CCmpCtrl *cc)
 	Fs->answer_type=type;
 	Fs->answer_time=tS-t0;
 	Fs->new_answer=TRUE;
+	cc->pmt_line=0;
       }
       if (!(cc->flags&CCF_HAS_MISC_DATA))
 	Free(machine_code);
@@ -333,7 +334,7 @@ U0 UserTaskCont()
   CDoc *doc;
   Bool cont=TRUE;
   do {
-    cc=CmpCtrlNew(,CCF_PMT);
+    cc=CmpCtrlNew(,CCF_PMT|CCF_QUESTION_HELP);
     QueIns(cc,Fs->last_lex);
     try {
       Lex(cc);

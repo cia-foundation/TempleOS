@@ -105,8 +105,7 @@ public U0 EdFindNext(CDoc *doc)
   do {
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-	    !(doc_e->de_flags&(DOCEG1_DONT_EDIT|
-	    DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	    !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_FILTER_SKIP))) {
 	if (doc_e->type & DOCET_SELECTED ||
 	      !doc->find_replace->scan_selected_text) {
 	  if (doc->find_replace->scan_fwd) {
@@ -194,7 +193,7 @@ Bool fwd,Bool abort_on_dbl_colon=FALSE)
   do {
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-	    !(doc_e->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	    !(doc_e->de_flags&DOCEF_FILTER_SKIP)) {
 	if (fwd) {
 	  if (doc_e==doc_ce)
 	    ptr=doc_e->tag+doc->cur_col+1;
@@ -405,7 +404,7 @@ I64 EdFindReplace(CDoc *doc)
       doc_ce=doc->root.next;
       while (doc_ce!=doc) {
 	if (doc_ce->de_flags&DOCEF_TAG && doc_ce->tag &&
-	      !(doc_ce->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP)) &&
+	      !(doc_ce->de_flags&DOCEF_FILTER_SKIP) &&
 	      StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
 	  doc_ce->type|=DOCET_SELECTED;
 	  result++;
@@ -416,7 +415,7 @@ I64 EdFindReplace(CDoc *doc)
 
       doc_ce=doc->root.next;
       while (doc_ce!=doc) {
-	if (!(doc_ce->de_flags&(DOCEF_HARD_SKIP|DOCEF_FILTER_SKIP))) {
+	if (!(doc_ce->de_flags&DOCEF_FILTER_SKIP)) {
 	  found=FALSE;
 
 	  doc_e=doc_ce;
@@ -474,8 +473,7 @@ I64 EdFindReplace(CDoc *doc)
 	    break;
 	}
 	if (doc_e->type_u8==DOCT_TEXT &&
-	      !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_HARD_SKIP|
-	      DOCEF_FILTER_SKIP)) &&
+	      !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_FILTER_SKIP)) &&
 	      (doc_e->type & DOCET_SELECTED ||
 	      !doc->find_replace->scan_selected_text&&
 	      !doc->find_replace->local_var)) {

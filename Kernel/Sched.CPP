@@ -1,6 +1,6 @@
 /*On each core, tasks are linked in a
 circular doubly-linked list queue with
-the Seth task as the head.  On core#0,
+the Seth task as the head.  On core0,
 the queue order represents the front-to-back
 window stack order with the window mgr
 as the wallpaper.
@@ -224,7 +224,7 @@ RESTORE_RSI_TASK2:
 	JC	@@20	//Jmp if had chance for IRQ already
 	MOV	RAX,U64 GS:CCPU.idle_task[RAX]
 	MOV	RSP,U64 CTask.stk[RAX]
-	ADD	RSP,DFT_STK+CTaskStk.stk_base	//Rst to top
+	ADD	RSP,MEM_DFT_STK+CTaskStk.stk_base	//Rst to top
 	CALL	SET_FS_BASE
 	STI	//Restore idle task so we can unmask IRQs.
 	HLT

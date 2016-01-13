@@ -14,7 +14,7 @@ U0 IntTest()
 {//Modify interrupt descriptor table use by all cores.
   IntEntrySet(I_USER,&IntBeepOn,IDTET_TRAP);
   IntEntrySet(I_USER+1,&IntBeepOff,IDTET_TRAP);
-//Issue interupt to core#1
+//Issue interupt to core1
   MPInt(I_USER,1);
   Sleep(1000);
   MPInt(I_USER+1,1);

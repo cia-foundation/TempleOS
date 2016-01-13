@@ -1,13 +1,13 @@
 $WW,1$$FG,5$$TX+CX,"Welcome to TempleOS"$$FG$
 
-TempleOS is a x86_64, multi-cored, multi-tasking, ring-0-only, single-address_mapped (identity-mapped), operating system for recreational programming.  Paging is almost not used.
+TempleOS is a x86_64, multi-cored, non-preemptive multi-tasking, ring-0-only, single-address_mapped (identity-mapped), operating system for recreational programming.  Paging is almost not used.
 
 The people whom can most benefit are:
 $ID,2$* Professionals doing hobby projects
 * Teenagers doing projects
 * Non-professional, older-persons projects
 $ID,-2$
-Simplicity is a goal to $LK,"keep the line count down",A="FI:::/Doc/Strategy.TXT"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX,"118,751",D="DD_TEMPLEOS_LOC"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a $LK,"Hello World",A="FI:::/Doc/HelloWorld.TXT"$ application in one line of code and can put graphics on the screen with a three line program!
+Simplicity is a goal to $LK,"keep the line count down",A="FI:::/Doc/Strategy.TXT"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX,"80,940",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a $LK,"Hello World",A="FI:::/Doc/HelloWorld.TXT"$ application in one line of code and can put graphics on the screen with a three line program!
 
 It's a kayak, not a Titanic -- it will crash if you do something wrong.  You quickly reboot, however.  DOS and the 8-bit home computers of the 80's worked fine without memory protection and most computers in the world -- the embedded ones -- operate without protection.  The resulting simplicity of no protections is why TempleOS has value.  In facts, that's the point of TempleOS.  See the $LK,"TempleOS Charter",A="FI:::/Doc/Charter.TXT"$.
 
@@ -15,7 +15,7 @@ Conventional thinking is "failure is not an option" for general purpose operatin
 
 Two things to know about TempleOS are that $UL,1$tasks$UL,0$ have $LK,"MAlloc",A="MN:MAlloc"$/$LK,"Free",A="MN:Free"$ heap memory, not applications, and tasks have compiler symbol tables that persist at a scope like environment variables in other operating systems, and the symbols can include functions.
 
-In other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$TempleOS$FG$, the command line feeds right into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler, line by line, and it places code into memory it $LK,"MAlloc",A="MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it. See $LK,"::/Doc/HelloWorld.TXT"$.
+In other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$TempleOS$FG$, the command line feeds right into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler, line by line, and it places code into memory it $LK,"MAlloc",A="MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.
 
 During the boot process, many files get $LK,"compiled",A="FI:::/StartOS.CPP"$ before you have access to the command line.  (Don't worry, booting takes only a couple of seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,2$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ machine code, nothing is $FG,2$interpreted$FG$ and there is no $FG,2$byte code$FG$.
 

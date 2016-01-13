@@ -1,8 +1,8 @@
 $WW,1$$FG,5$$TX+CX,"HolyC"$$FG$
 
-* See $LK,"Scoping and Linkages",A="FI:::/Doc/ImportExports.TXT"$ for details on $FG,2$extern$FG$, $FG,2$import$FG$, $FG,2$_extern$FG$, $FG,2$_import$FG$, etc.
-
 * See $LK,"::/Doc/CompilerOverview.TXT"$.
+
+* See $LK,"Scoping and Linkage",A="FI:::/Doc/ScopingLinkage.TXT"$ for details on $FG,2$extern$FG$, $FG,2$import$FG$, $FG,2$_extern$FG$, $FG,2$_import$FG$, etc.
 
 * Built-in types include $FG,2$I0,I8,I16,I32,I64$FG$ for signed 0-8 byte ints and $FG,2$U0,U8,U16,U32,U64$FG$ for unsigned 0-8 byte ints and $FG,2$F64$FG$ for 8 byte floats.
 
@@ -239,7 +239,7 @@ $FG$$ID,-2$
 
 * You can $LK,"Free",A="MN:Free"$() a $FG,2$NULL$FG$ ptr.  Useful variants of $LK,"MAlloc",A="MN:MAlloc"$() can be found $LK,"Here",A="MN:CAlloc"$.  Each task has a heap and you can $FG,2$MAlloc$FG$ and $FG,2$Free$FG$ off of other task's heaps, or make an independent heap with $LK,"HeapCtrlBPInit",A="MN:HeapCtrlBPInit"$().
 
-* The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"DFT_STK",A="MN:DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().  You can use $LK,"CallStkGrow",A="MN:CallStkGrow"$(), but it's odd.  See $LK,"::/Demo/StkGrow.CPP"$. 
+* The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"MEM_DFT_STK",A="MN:MEM_DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().  You can use $LK,"CallStkGrow",A="MN:CallStkGrow"$(), but it's odd.  See $LK,"::/Demo/StkGrow.CPP"$. 
 
 * Only one base class is allowed.
 

@@ -354,9 +354,9 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
   I64 i,start;
   U8 *verse;
   if (*st && (doc_out=DocPut)) {
+    DocPrint(doc_out,"$$BG,LTGRAY$$");
 
     i=Str2I64(st,radix);
-
     if (modulo) {
       if (radix==16)
 	DocPrint(doc_out,"0x%s-->",st);
@@ -376,7 +376,7 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
     DocPrint(doc_out,"-->Line:%d\n",start);
 
     verse=BibleLine2Verse(start);
-    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/files/NumBible.TXT"$ (%s) God says...\n$$RED$$",verse);
+    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/files/NumBible.TXT"$ (%s)\n$$BG$$\nGod says...\n$$RED$$",verse);
     Free(verse);
 
     doc_in=DocNew;
@@ -417,6 +417,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
 	*tempde1=tempde;
   I64 i=0;
   U8 *st,*st2=NULL;
+  "$$BG,LTGRAY$$";
   while (tempde) {
     st=FileRead(tempde->full_name);
     tempde->user_data=StrLen(st);
@@ -433,7 +434,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   if (rand_i32<0)
     rand_i32=GodBits(32);
   if (full)
-    "\n%08X*%08X",rand_i32,i;
+    "                                   \n%08X*%08X",rand_i32,i;
   i*=rand_i32;
   if (full)
     "=%08X.%08X\n",i.u32[1],i.u32[0];
@@ -446,7 +447,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
 	st=FileRead(tempde->full_name);
 	st2=st+(tempde->user_data+1-len)+i;
 	st2[len]=0;
-	"%s\n\n$$RED$$%s$$FG$$\n",tempde->full_name,st2;
+	"%s\n$$BG$$\nGod says...\n$$RED$$%s$$FG$$\n",tempde->full_name,st2;
 	Free(st);
       }
     }
@@ -455,7 +456,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tempde1);
 }
 
-#define NIST_TIME_OFFSET	(-11455-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-7879-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()
@@ -487,22 +488,26 @@ U0 InsMyURL()
 	"Roulette\0Movie\0Metallica\0")) {
     case:
       if (DocForm(url(CRandHexBeacon5Form *))) {
+	"$$BG,LTGRAY$$";
+	if (FileFind("::/Home/Wb2/Files/NISTPassage.TXT.Z"))
+	  Type("::/Home/Wb2/Files/NISTPassage.TXT.Z",0);
 	"$$TX,\"Guidelines for Talking with God.\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	Free(tag);
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
       }
       break;
     case:
       if (DocForm(url(CRandHexBeacon8Form *))) {
+	"$$BG,LTGRAY$$";
 	if (FileFind("::/Home/Wb2/Files/NISTPick.TXT.Z"))
-	  Type("::/Home/Wb2/Files/NISTPick.TXT.Z");
+	  Type("::/Home/Wb2/Files/NISTPick.TXT.Z",0);
 	"$$TX,\"Guidelines for Talking with God.\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	Free(tag);
 	GodBooksPassage("C:/Home/Wb2/Files/Text/*",,
 	      Str2I64(url->special,16),TRUE);
@@ -581,69 +586,69 @@ U0 InsMyURL()
       break;
     case:
       if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://www.randomnumbers.info";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,TRUE);
       }
       break;
     case:
       if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://www.random.org";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
     case:
       if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="https://passed.pw";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
     case:
       if (DocForm(url(CRandCertForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://virtual-notary.org";
 	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
 	tag="Here is the certificate";
 	st=MStrPrint("http://www.templeos.org/Certs/virtual-notary-cert"
 	      "-randomnum-%d.p12",url->cert);
-	"\n$$TX,\"%Q: %d\",HTML=\"%Q\"$$.\n",tag,url->cert,st;
+	"\n$$TX,\"%Q: %d\",HTML=\"%Q\"$$.\n$$BG$$",tag,url->cert,st;
 	Free(st);
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
     case:
       if (DocForm(url(CRandHexForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://qrng.anu.edu.au/NIST.php";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
       }
       break;
     case:
       if (DocForm(url(CRandHexForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="https://www.fourmilab.ch/hotbits/secure_generate.html";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,16,TRUE,TRUE);
       }
       break;
     case:
       if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://www.generatedata.com";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
@@ -658,10 +663,10 @@ U0 InsMyURL()
       break;
     case:
       if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
+	"$$BG,LTGRAY$$$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="https://www.dublinbet.com";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
+	"$$TX,\"%Q\",HTML=\"%Q\"$$\n$$BG$$",tag,tag;
 	MyBibleLines(url->special,20,10,FALSE,FALSE);
       }
       break;
@@ -673,7 +678,7 @@ U0 InsMyURL()
     case:
       if (DocForm(url(CMetallicaForm *)))
 	RandVideo("Metallica Song",
-	"http://home.hccnet.nl/a.r.adams/lyrics/metallica/songindex.html",
+	      "http://home.hccnet.nl/a.r.adams/lyrics/metallica/songindex.html",
 	      url,"C:/Home/Wb2/Files/Metallica.TXT.Z");
       break;
   }

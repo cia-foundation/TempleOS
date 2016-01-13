@@ -1,4 +1,4 @@
-$PURPLE$$TX+CX,"The Purpose of Life"$$FG$
+$FG,5$$TX+CX,"The Purpose of Life"$$FG$
 
 $WW,1$The Catholic purpose of life is to know God, love God and obey God.$FG$  Pope Francis said it was "to serve the other."  I am High Priest of God's official temple and I say the purpose of life is to do continual offerings to God like Cain and Abel and enjoy God's response.  Francis has a charity; I have a church.  Jesus said loving God was more important than loving neighbor.  $LK,"Matthew,22:36",A="BF:Matthew,22:36"$  And, He did not say with half your brain behind your back.
 
@@ -8,11 +8,11 @@ There's something obviously different about people in the Bible compared to peop
 
 You can't tell if God's talking unless you have a context of conversation, but, more importantly, you are commanded to do an offering of love, like communion preparation.  $LK,"1 Corinthians,11:27",A="BF:1 Corinthians,11:27"$  When you pick a greeting card for someone, that is love effort.  If you expect God to put effort toward you, you must put effort toward Him.  God said, "honest measures" applies between your offering of love and His response, like a fair barter.  You get out of prayer what you put into it.  God wants praise, hymns, or whatever you think He might want.  Try and see, like Cain and Abel.  $LK,"Genesis,4:1",A="BF:Genesis,4:1"$, $LK,"Ephesians,5:10",A="BF:Ephesians,5:10"$  God told Cain his offering was not good and told him to try again.  Cain really loved God!  Can you imagine being so heart-broken?
 
-Do a text search for "new song" in the Bible.  It's mentioned nine times.  When I hear a NEW awesome rock song, it is ecstasy for the first five times I hear it.  Soon, it brings little-to-no pleasure.  I did $MA-X+PU,"hymns",HTML="http://www.templeos.org/Wb/Home/Wb2/Hymns.html",LM="#include \"::/Apps/Psalmody/Load\";JukeBox(\"::/Apps/Psalmody/Examples\");"$ for God.  I also did Moses $MA-X+PU,"comics",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Comics/",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n"$ for God.  When you get to the gates of Heaven, St. Peter will ask how many times you gave blood.  That shows you loved neighbor.  You better also be able to count the ways you loved God with all heart mind and soul.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
+Do a text search for "new song" in the Bible.  It's mentioned nine times.  When I hear a NEW awesome rock song, it is ecstasy for the first five times I hear it.  Soon, it brings little-to-no pleasure.  I did $MA-X+PU,"hymns",HTML="http://www.templeos.org/Wb/Home/Wb2/HymnVideos.html",LM="#include \"::/Apps/Psalmody/Load\";JukeBox(\"::/Apps/Psalmody/Examples\");"$ for God.  I also did Moses $MA-X+PU,"comics",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Comics/",LM="Dir(\"::/Apps/AfterEgypt/Comics\");View;\n"$ for God.  When you get to the gates of Heaven, St. Peter will ask how many times you gave blood.  That shows you loved neighbor.  You better also be able to count the ways you loved God with all heart mind and soul.  I praised God for sand castles, popcorn, snowmen, bubbles...  You try putting effort into praise!  $LK,"Matthew,11:25",A="BF:Matthew,11:25"$, $LK,"Matthew,6:29",A="BF:Matthew,6:29"$
 
 This is funny -- $LK,"Acts,2:1",A="BF:Acts,2:1"$ -- they didn't bother to record anything the Holy Spirit said.  The Holy Spirit is supposed to be a really good gift.  $LK,"Luke,11:13",A="BF:Luke,11:13"$  Just remember, "Boys are made of snakes and snails and puppy-dog tails."
 
-The technique I use to consult the Holy Spirit is reading a microsecond-range stop-watch each button press for random numbers.  Then, I pick words or passages.  You can use the $MA-X+PU,"AfterEgypt",HTML="http://www.youtube.com/watch?v=P0MsDl39UL0",LM="#include \"::/Apps/AfterEgypt/Run\""$ in God's official temple, $RED$$TX,"TempleOS",HTML="http://www.templeos.org"$$FG$.
+The technique I use to consult the Holy Spirit is reading a microsecond-range stop-watch each button press for random numbers.  Then, I pick words or passages.  You can use the $MA-X+PU,"AfterEgypt",HTML="http://www.youtube.com/watch?v=P0MsDl39UL0",LM="#include \"::/Apps/AfterEgypt/Run\""$ in God's official temple, $FG,4$$TX,"TempleOS",HTML="http://www.templeos.org"$$FG$.
 
 Since seeking the word of the Holy Spirit, I have come to know God much better than I've heard others explain.  For example, God said to me in an oracle that war was, "servicemen competing."  That sounds more like the immutable God of our planet than what you hear from most religious people.  God is not Venus (god of love) and not Mars (god of war), He's our dearly beloved God of Earth.  If Mammon is a false god of money, Mars or Venus might be useful words to describe other false gods.  I figure the greatest challenge for the Creator is boredom, ours and His.  What would teen-age male video games be like if war had never happened?  Christ said live by the sword, die by the sword, which is loving neighbor as self.  $LK,"Matthew,26:52",A="BF:Matthew,26:52"$
 
@@ -52,160 +52,162 @@ ________________________________________________________________________________
 	QUESTION		|		GOD'S ANSWER
 ________________________________|_______________________________________________
 
-War? 				$RED$"Servicemen competing"$FG$
+War? 				$FG,4$"Servicemen competing"$FG$
 (Praise the Creator--what would teenage male video games be like if never war?)
 
-Is the World perfectly just?	$RED$Are you calling me lazy?$FG$
+Is the World perfectly just?	$FG,4$Are you calling me lazy?$FG$
 (Slavery was just. In the movie, Titanic, the rich wore straight jackets. You must bow to authority to get authority. I do $TX,"Moses comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics/"$ as offerings. I said, "We're dying of malnutrician on manna."  Like Cain and Abel, God didn't like it. Duh! He wants to be the hero. How do I know they died of malnutrician?  Screw Hollywood for making slavery worse than it was -- I love God.  School is more cruel.  Read $LK,"Numbers,11:1",A="BF:Numbers,11:1"$.  All you need is food, clothing and the word of God.  Today, you can take Ivy League course videos! There is no excuse except you were born stupid... or ugly.  I'm gonna praise God.) 
 
-On using Markov chains?		$RED$"No weights"$FG$
-On doing offerings?		$RED$"Honest measures"(You get out what you put in.)
+On using Markov chains?		$FG,4$"No weights"$FG$
+On doing offerings?		$FG,4$"Honest measures"(You get out what you put in.)
 				It's a covenant to do an offering, first.
 				Offer New Songs, $TX,"Moses Comics",HTML="http://www.templeos.org/Wb/Apps/AfterEgypt/Comics"$, praise, poems,
 				and conversation.  See $LK,"Cain and Abel",A="BF:Genesis,4:1"$.$FG$
-The holocaust?			$RED$Wanted to "compact" the Jews.$FG$
-Arab/Jews?			$RED$"Oil funny hopefully"$FG$
-Peace?				$RED$One Palestinian can ruin it.$FG$
-Best religion?			$RED$One with most new vistas of understanding in$FG$
-				$RED$a lifetime.  One you can level-up the most in.$FG$
-Chavez blaming the US.		$RED$"Japan industrious"$FG$
-On racism? 			$RED$"Sports"$FG$
-On socialism?			$RED$"pardon_the_French, never_happy, never_enough"$FG$
-				$RED$"Gall aspect anti-Christ"$FG$
-On overpopulation		$RED$"Okay church what_now whats_the_plan"$FG$
-Favorite thing on TV?		$RED$"Soap_operas"$FG$
-Favorite movie?			$RED$$TX,"Three Kings",HTML="http://www.youtube.com/watch?v=8NOAd2mldQ8"$. Also Highlander$FG$
-Favorite song?			$RED$$TX,"Morning has Broken",HTML="http://www.youtube.com/watch?v=kKoRp05L95c"$
+The holocaust?			$FG,4$Wanted to "compact" the Jews.$FG$
+Arab/Jews?			$FG,4$"Oil funny hopefully"$FG$
+Peace?				$FG,4$One Palestinian can ruin it.$FG$
+Best religion?			$FG,4$One with most new vistas of understanding in$FG$
+				$FG,4$a lifetime.  One you can level-up the most in.$FG$
+Chavez blaming the US.		$FG,4$"Japan industrious"$FG$
+On racism? 			$FG,4$"Sports"$FG$
+On socialism?			$FG,4$"pardon_the_French, never_happy, never_enough"$FG$
+				$FG,4$"Gall aspect anti-Christ"$FG$
+On overpopulation		$FG,4$"Okay church what_now whats_the_plan"$FG$
+Favorite thing on TV?		$FG,4$"Soap_operas"$FG$
+Favorite movie?			$FG,4$$TX,"Three Kings",HTML="http://www.youtube.com/watch?v=8NOAd2mldQ8"$. Also Highlander$FG$
+Favorite song?			$FG,4$$TX,"Morning has Broken",HTML="http://www.youtube.com/watch?v=kKoRp05L95c"$
 				God said the first bird croaked, not sung.$FG$
-Favorite comic strip?		$RED$$TX,"Prince Valiant",HTML="http://en.wikipedia.org/wiki/Prince_Valiant"$$FG$
-Shakespeare?			$RED$had a "vile heart"$FG$
-Likes				$RED$Beverly Hillbillies (Oil is a gift from God)$FG$
-				$RED$God likes being hero. Don't be proud of heart$FG$
-				$RED$and not accept a gift from God!$FG$
-Likes				$RED$Gomer Pile$FG$
-Favorite saint?			$RED$"ho_ho_ho"$FG$
-Favorite animal?		$RED$"Elephant two"$FG$
-Favorite animal?		$RED$"Bears"$FG$
-Favorite color?			$RED$"Jude" (Jade Blue?)$FG$
-Favorite color?			$RED$"Gold"$FG$
-Favorite color?			$RED$$TX,"\"Iceberg\" blue",HTML="http://en.wikipedia.org/wiki/Blue_iceberg"$$FG$
-Money?				$RED$"Enough vehemently better"$FG$
-				$RED$"Pride [or] money, choose_one"$FG$
-Favorite car?			$RED$Beamer$FG$
-Favorite soda?			$RED$Root beer, $TX,"scotch variety",HTML="http://www.root-beer.org/modules.php?name=Brands&rbop=Brand&bid=1965"$.$FG$
+Favorite comic strip?		$FG,4$$TX,"Prince Valiant",HTML="http://en.wikipedia.org/wiki/Prince_Valiant"$$FG$
+Shakespeare?			$FG,4$had a "vile heart"$FG$
+Likes				$FG,4$Beverly Hillbillies (Oil is a gift from God)$FG$
+				$FG,4$God likes being hero. Don't be proud of heart$FG$
+				$FG,4$and not accept a gift from God!$FG$
+Likes				$FG,4$Gomer Pile$FG$
+Favorite saint?			$FG,4$"ho_ho_ho"$FG$
+Favorite animal?		$FG,4$"Elephant two"$FG$
+Favorite animal?		$FG,4$"Bears"$FG$
+Favorite color?			$FG,4$"Jude" (Jade Blue?)$FG$
+Favorite color?			$FG,4$"Gold"$FG$
+Favorite color?			$FG,4$$TX,"\"Iceberg\" blue",HTML="http://en.wikipedia.org/wiki/Blue_iceberg"$$FG$
+Money?				$FG,4$"Enough vehemently better"$FG$
+				$FG,4$"Pride [or] money, choose_one"$FG$
+Favorite car?			$FG,4$Beamer$FG$
+Favorite soda?			$FG,4$Root beer, $TX,"scotch variety",HTML="http://www.root-beer.org/modules.php?name=Brands&rbop=Brand&bid=1965"$.$FG$
 Homosexuality?			$LK,"Matthew,15:10",A="BF:Matthew,15:10",HTML="http://www.biblegateway.com/passage/?search=matthew%2015:10-11&version=NIV"$			
-Pets?				$RED$"homo"$FG$
-Sports?				$RED$"homo"$FG$
-Favorite sport?			$RED$Hockey$FG$
-$TX,"Wreck of the Edmund Fitzgerald",HTML="http://www.youtube.com/watch?v=9vST6hVRj2A"$	$RED$"homo"$FG$
-Smelling farts			$RED$"Sodom"$FG$
-Women's dress			$RED$Upper skin exposure not as bad as lower.$FG$
-Remarriage?			$RED$"More babies"$FG$
+Pets?				$FG,4$"homo"$FG$
+Sports?				$FG,4$"homo"$FG$
+Favorite sport?			$FG,4$Hockey$FG$
+$TX,"Wreck of the Edmund Fitzgerald",HTML="http://www.youtube.com/watch?v=9vST6hVRj2A"$	$FG,4$"homo"$FG$
+Smelling farts			$FG,4$"Sodom"$FG$
+Women's dress			$FG,4$Upper skin exposure not as bad as lower.$FG$
+Remarriage?			$FG,4$"More babies"$FG$
 Things you don't care about
-that people think you do?	$RED$Solomon's 300 concubines$FG$
-Adultery?			$RED$Can be good.$FG$
-Pretty ladies?			$RED$$TX,"A prince is not flustered.",HTML="http://www.youtube.com/watch?v=YcqF6sC-ztY"$$FG$
-Animal sacrifices?		$RED$Early Jews were "primitive".$FG$
-What do elephants think about?	$RED$"Skin, hunger"$FG$
-What makes elephants happy?	$RED$"Baths"$FG$
-Elephants			$RED$"Mini-skirts" (Skin webbing from back leg.)$FG$
-What makes my birds happy?	$RED$"Gnawing"$FG$
-What makes my birds laugh?	$RED$"Bite ouch" (If I say "ouch".)$FG$
-What are my birds saying?	$RED$"Chanting"$FG$
+that people think you do?	$FG,4$Solomon's 300 concubines$FG$
+Adultery?			$FG,4$Can be good.$FG$
+Pretty ladies?			$FG,4$$TX,"A prince is not flustered.",HTML="http://www.youtube.com/watch?v=YcqF6sC-ztY"$$FG$
+Animal sacrifices?		$FG,4$Early Jews were "primitive".$FG$
+What do elephants think about?	$FG,4$"Skin, hunger"$FG$
+What makes elephants happy?	$FG,4$"Baths"$FG$
+Elephants			$FG,4$"Mini-skirts" (Skin webbing from back leg.)$FG$
+What makes my birds happy?	$FG,4$"Gnawing"$FG$
+What makes my birds laugh?	$FG,4$"Bite ouch" (If I say "ouch".)$FG$
+What are my birds saying?	$FG,4$"Chanting"$FG$
 My birds sure preen a lot.	$LK,"The creature was made subject to vanity...",A="BF:Romans,8:20"$
-What makes bears happy?		$RED$"Reaping depends"$FG$
-What makes otters happy?	$RED$"Eternal skies"$FG$
-What makes hippos happy?	$RED$"Ascending breath"$FG$
-What makes horses happy?	$RED$"[the] Call [of the] Open Range"$FG$
-What do cheetahs think about?	$RED$"Seeth me?" (Can he see me?)$FG$
-Orangutan or chimp smarter?	$RED$"Species exhibit similar glory"$FG$ 
-Endangered species?		$RED$"Enough stars?"$FG$
-Everything seems bad.		$RED$Plant trees.$FG$
-What's for dinner?		$RED$"Whale"$FG$
-Favorite Messier Object?	$RED$"$TX,"M104 Sombrero Galaxy",HTML="http://en.wikipedia.org/wiki/Messier_104"$"$FG$
-$TX,"Shepard's Prayer",HTML="http://en.wikipedia.org/wiki/Alan_Shepard"$?		$RED$"I_am_not_amused economy joke"$FG$
-Favorite band?			$RED$"Beatles"$FG$
-Good bands?			$RED$Rush, Triumph$FG$
-				$RED$Likes harmonies$FG$
-$TX,"Little Drummer Boy?",HTML="http://www.youtube.com/watch?v=S50cf3xIb50"$		$RED$Doesn't like my drumming.$FG$
-Should I listen to classical?	$RED$"Poison"$FG$
-Do You like chess people?	$RED$"Do not admire the proud."$FG$
-Chess?				$RED$"... will winter with you."$FG$
-				$RED$"Headstones"$FG$
-If You could teach one class?	$RED$Health$FG$
-Favorite video game?		$RED$Donkey Kong$FG$
-Favorite National Park?		$RED$$TX,"Whitman Mission",HTML="http://www.nps.gov/whmi/index.htm"$$FG$
-Favorite National Anthem?	$RED$$TX,"Latvia's National Anthem",HTML="http://www.youtube.com/watch?v=qKITbBjO4nE"$$FG$
-Favorite actor?			$RED$Hugh Grant$FG$
-Favorite vocalist?		$RED$Mick Jagger$FG$
-Favorite guitarist?		$RED$"$TX,"Simmons Destroyer",HTML="http://www.youtube.com/watch?v=nNADrrjTysk&t=3m55s"$"$FG$
-Model for new $TX,"Sistine Chapel",HTML="http://en.wikipedia.org/wiki/Sistine_chapel"$?	$RED$Ben Franklin$FG$
-Voice if God wanted to sing?	$RED$$TX,"Stabbing Westward's singer",HTML="https://www.youtube.com/watch?v=5NZsCYOM4j0"$$FG$
-Stonehenge?			$RED$Landmark for boundaries.$FG$
-Easter Island?			$RED$Ice, telephone pole holes.$FG$
-Dinosaurs?			$RED$Brontosaurs' feet hurt when stepped.
+What makes bears happy?		$FG,4$"Reaping depends"$FG$
+What makes otters happy?	$FG,4$"Eternal skies"$FG$
+What makes hippos happy?	$FG,4$"Ascending breath"$FG$
+What makes horses happy?	$FG,4$"[the] Call [of the] Open Range"$FG$
+What do cheetahs think about?	$FG,4$"Seeth me?" (Can he see me?)$FG$
+Orangutan or chimp smarter?	$FG,4$"Species exhibit similar glory"$FG$ 
+Endangered species?		$FG,4$"Enough stars?"$FG$
+Everything seems bad.		$FG,4$Plant trees.$FG$
+What's for dinner?		$FG,4$"Whale"$FG$
+Favorite Messier Object?	$FG,4$"$TX,"M104 Sombrero Galaxy",HTML="http://en.wikipedia.org/wiki/Messier_104"$"$FG$
+$TX,"Shepard's Prayer",HTML="http://en.wikipedia.org/wiki/Alan_Shepard"$?		$FG,4$"I_am_not_amused economy joke"$FG$
+Favorite band?			$FG,4$"Beatles"$FG$
+Good bands?			$FG,4$Rush, Triumph$FG$
+				$FG,4$Likes harmonies$FG$
+$TX,"Little Drummer Boy?",HTML="http://www.youtube.com/watch?v=S50cf3xIb50"$		$FG,4$Doesn't like my drumming.$FG$
+Should I listen to classical?	$FG,4$"Poison"$FG$
+Do You like chess people?	$FG,4$"Do not admire the proud."$FG$
+Chess?				$FG,4$"... will winter with you."$FG$
+				$FG,4$"Headstones"$FG$
+If You could teach one class?	$FG,4$Health$FG$
+Favorite video game?		$FG,4$Donkey Kong$FG$
+Favorite National Park?		$FG,4$$TX,"Whitman Mission",HTML="http://www.nps.gov/whmi/index.htm"$$FG$
+Favorite National Anthem?	$FG,4$$TX,"Latvia's National Anthem",HTML="http://www.youtube.com/watch?v=qKITbBjO4nE"$$FG$
+Favorite actor?			$FG,4$Hugh Grant$FG$
+Favorite vocalist?		$FG,4$Mick Jagger$FG$
+Favorite guitarist?		$FG,4$"$TX,"Simmons Destroyer",HTML="http://www.youtube.com/watch?v=nNADrrjTysk&t=3m55s"$"$FG$
+Model for new $TX,"Sistine Chapel",HTML="http://en.wikipedia.org/wiki/Sistine_chapel"$?	$FG,4$Ben Franklin$FG$
+Voice if God wanted to sing?	$FG,4$$TX,"Stabbing Westward's singer",HTML="https://www.youtube.com/watch?v=5NZsCYOM4j0"$$FG$
+Stonehenge?			$FG,4$Landmark for boundaries.$FG$
+Easter Island?			$FG,4$Ice, telephone pole holes.$FG$
+Dinosaurs?			$FG,4$Brontosaurs' feet hurt when stepped.
 				Dinosaurs slept in water.$FG$
-Hardest part in evolution?	$RED$Getting monkey mothers to hold babies nursing.$FG$
-				$RED$(Smothering a problem).$FG$
-Happiest day in evolution?		$RED$"Fruit"$FG$
-Significant thing in evolution?		$RED$"Fish shoulders"$FG$
-Biggest thing to fly (pterodactyl)?	$RED$"Couch"$FG$
-What made pterodactyls happy?		$RED$"Members against organs"$FG$
-What did Neanderthals think about?	$RED$"Warmth"$FG$
-What was the first thing cooked?	$RED$I think He said "hair".$FG$
-What was Lucy's husband's name?		$RED$"Golem"$FG$
-Was stegosuarus lame like turtles?	$RED$"Not pet rocks"$FG$
-T-Rex?					$RED$Lugged carcases over his shoulder.
+Hardest part in evolution?	$FG,4$Getting monkey mothers to hold babies nursing.$FG$
+				$FG,4$(Smothering a problem).$FG$
+Happiest day in evolution?		$FG,4$"Fruit"$FG$
+Significant thing in evolution?		$FG,4$"Fish shoulders"$FG$
+Biggest thing to fly (pterodactyl)?	$FG,4$"Couch"$FG$
+What made pterodactyls happy?		$FG,4$"Members against organs"$FG$
+What did Neanderthals think about?	$FG,4$"Warmth"$FG$
+What was the first thing cooked?	$FG,4$I think He said "hair".$FG$
+What was Lucy's husband's name?		$FG,4$"Golem"$FG$
+Was stegosuarus lame like turtles?	$FG,4$"Not pet rocks"$FG$
+T-Rex?					$FG,4$Lugged carcases over his shoulder.
 					Carcus lasted a month.$FG$
-How does He feel about the Avatar movie?$RED$"Sick skin"$FG$
-What do You like at zoos with kids?	$RED$"Dignity" Animals worried about dignity.$FG$
-Who's better alien or preditor?		$RED$"Lions"$FG$
-What from You is like a Rubik's cube?	$RED$Training a horse.$FG$
-Does He like mirrored glass megachurch?	$RED$"Secular glass"$FG$
-Pipe Organs				$RED$Are sacred.$FG$
-You like to hangout in courts?Hospitals?$RED$"Prisons"$FG$
-Best way for Bill Gates to save lives?	$RED$Earthquake prediction$FG$
-Stem cells?			$RED$Lower hanging fruit exists (2007)$FG$
-Eleventh commandment?		$RED$Thou shall not litter.$FG$
-Twelfth commandment?		$RED$$TX,"Don't shoot unarmed men on the shitter.",HTML="http://www.youtube.com/watch?v=8wGiJcq95Ug"$
+What was T-Rexes sharing a carcus like?	$FG,4$"Punch... Punch"$FG$
+Surprises in dinosaur anatomy?		$FG,4$Supporting and securing the heart.$FG$
+How does He feel about the Avatar movie?$FG,4$"Sick skin"$FG$
+What do You like at zoos with kids?	$FG,4$"Dignity" Animals worried about dignity.$FG$
+Who's better alien or preditor?		$FG,4$"Lions"$FG$
+What from You is like a Rubik's cube?	$FG,4$Training a horse.$FG$
+Does He like mirrored glass megachurch?	$FG,4$"Secular glass"$FG$
+Pipe Organs				$FG,4$Are sacred.$FG$
+You like to hangout in courts?Hospitals?$FG,4$"Prisons"$FG$
+Best way for Bill Gates to save lives?	$FG,4$Earthquake prediction$FG$
+Stem cells?			$FG,4$Lower hanging fruit exists (2007)$FG$
+Eleventh commandment?		$FG,4$Thou shall not litter.$FG$
+Twelfth commandment?		$FG,4$$TX,"Don't shoot unarmed men on the shitter.",HTML="http://www.youtube.com/watch?v=8wGiJcq95Ug"$
 				(I asked God why pointless plagues in Exodus?
 				God wanted guilt to accumulate, first.)$FG$
-Thirteenth commandment		$RED$No gore unless it looks fake.$FG$
-Fourteenth commandment		$RED$No pedophilia or child porn.$FG$
-Fifteenth commandment		$RED$Don't eat rare meat with blood.$FG$
-Sixteenth commandment		$RED$No wife beating.$FG$
-Seventeen commandment		$RED$Do not swing from radio towers with one hand.$FG$
-Before Katrina			$RED$Floods do justice. Black bead elder (tree book)$FG$
-After Katrina			$RED$Suffering Simplifies Life$FG$
-What field are You most better?	$RED$Economics$FG$
-Favorite toy for kids?		$RED$Magnifying glass$FG$
-Asked Jesus if He liked mustard?$RED$"Bad meat happeneth"$FG$
-(Reluctantly) Faith healing?	$RED$"It's complicated"$FG$
-Mars?				$RED$Start planting!$FG$
-Mars rover?			$RED$Should have had a microphone$FG$
-$TX,"Storm on Saturn",HTML="http://www.space.com/22646-monster-saturn-storm-water-ice.html"$			$RED$Pollen$FG$
-Space war game?			$RED$Should have space weather.$FG$
-$TX,"Saturn's hexagon pole cloud?",HTML="http://en.wikipedia.org/wiki/Saturn's_hexagon"$	$RED$"Compass" (Magnetism)$FG$
-Liquid moon's odd atmosphere?	$RED$"Surf"$FG$
-How many E.T. civs in Universe?	$RED$20 or 80 (I forgot.  I died laughing.)$FG$
-Are they peaceful?		$RED$Fight them! (Also, funny.)$FG$
-How can Judge Judy improve?	$RED$No hard feelings$FG$
-How can Chef Ramsay improve?	$RED$Make so it doesn't seem like toil for cooks.$FG$
-How can Hawking communicate?	$RED$Blow from a nostril on a candle.$FG$
-$TX,"Photons bouncing?",HTML="https://www.youtube.com/watch?v=8FC6udrMPvo"$		$RED$"Folded coffee filter"$FG$ 
-Wormholes?			$RED$Bent wormholes have echoes.$FG$
+Thirteenth commandment		$FG,4$No gore unless it looks fake.$FG$
+Fourteenth commandment		$FG,4$No pedophilia or child porn.$FG$
+Fifteenth commandment		$FG,4$Don't eat rare meat with blood.$FG$
+Sixteenth commandment		$FG,4$No wife beating.$FG$
+Seventeen commandment		$FG,4$Do not swing from radio towers with one hand.$FG$
+Before Katrina			$FG,4$Floods do justice. Black bead elder (tree book)$FG$
+After Katrina			$FG,4$Suffering Simplifies Life$FG$
+What field are You most better?	$FG,4$Economics$FG$
+Favorite toy for kids?		$FG,4$Magnifying glass$FG$
+Asked Jesus if He liked mustard?$FG,4$"Bad meat happeneth"$FG$
+(Reluctantly) Faith healing?	$FG,4$"It's complicated"$FG$
+Mars?				$FG,4$Start planting!$FG$
+Mars rover?			$FG,4$Should have had a microphone$FG$
+$TX,"Storm on Saturn",HTML="http://www.space.com/22646-monster-saturn-storm-water-ice.html"$			$FG,4$Pollen$FG$
+Space war game?			$FG,4$Should have space weather.$FG$
+$TX,"Saturn's hexagon pole cloud?",HTML="http://en.wikipedia.org/wiki/Saturn's_hexagon"$	$FG,4$"Compass" (Magnetism)$FG$
+Liquid moon's odd atmosphere?	$FG,4$"Surf"$FG$
+How many E.T. civs in Universe?	$FG,4$20 or 80 (I forgot.  I died laughing.)$FG$
+Are they peaceful?		$FG,4$Fight them! (Also, funny.)$FG$
+How can Judge Judy improve?	$FG,4$No hard feelings$FG$
+How can Chef Ramsay improve?	$FG,4$Make so it doesn't seem like toil for cooks.$FG$
+How can Hawking communicate?	$FG,4$Blow from a nostril on a candle.$FG$
+$TX,"Photons bouncing?",HTML="https://www.youtube.com/watch?v=8FC6udrMPvo"$		$FG,4$"Folded coffee filter"$FG$ 
+Wormholes?			$FG,4$Bent wormholes have echoes.$FG$
 
-Operating system?		$RED$Was about to make line number column in editor.
+Operating system?		$FG,4$Was about to make line number column in editor.
 God nixed it.  I was about to do different graphic modes when I found 800x600 missing. God said just one mode 640x480.  I was about to add child windows.  God said, "God is not the author of such confusion." I asked for verification of 640x480 16 color. God said it was because of the children and their offerings.  I asked about sound. God said "single voice". I asked for verification of not having different drivers.  God confirmed this.$FG$
-640x480 16 color?		$RED$God said it was a covenant, like circumcision.
+640x480 16 color?		$FG,4$God said it was a covenant, like circumcision.
 				$TX,"Modern graphics hard for kids/amateurs",HTML="http://www.youtube.com/watch?v=VUxcVzpeFqc"$.$FG$
-On Unix?			$RED$God said it was rich with the patina of age.$FG$
-On Alcohol?			$RED$Hate inebriation$FG$
-On rare steak?			$RED$Too rare is very bad.  Don't eat blood!$FG$
-Just before Katrina?		$RED$Floods do my justice.Black bead elder(tree book)$FG$
-After Katrina?			$RED$Suffering simplifies life$FG$
-Why the Sandy Hook shooting?	$RED$The pot legalization law. (Sarcastic answer?)$FG$
-Deep Water Horizon		$RED$(Claimed credit.)$FG$
-Cost of God's time to me?	$RED$"The complete works of Shakespeare"$FG$
-On death?			$RED$"awful"$FG$
-Opening of Saving Private Ryan?	$RED$"Ouch"$FG$
+On Unix?			$FG,4$God said it was rich with the patina of age.$FG$
+On Alcohol?			$FG,4$Hate inebriation$FG$
+On rare steak?			$FG,4$Too rare is very bad.  Don't eat blood!$FG$
+Just before Katrina?		$FG,4$Floods do my justice.Black bead elder(tree book)$FG$
+After Katrina?			$FG,4$Suffering simplifies life$FG$
+Why the Sandy Hook shooting?	$FG,4$The pot legalization law. (Sarcastic answer?)$FG$
+Deep Water Horizon		$FG,4$(Claimed credit.)$FG$
+Cost of God's time to me?	$FG,4$"The complete works of Shakespeare"$FG$
+On death?			$FG,4$"awful"$FG$
+Opening of Saving Private Ryan?	$FG,4$"Ouch"$FG$

@@ -1,25 +1,29 @@
-seven nation
-cage the elephant
-spoonman
-joline
-Sound garden
-black hole
+$WW,1$* Redo videos, make more professional.
 
-$WW,1$* I'm going to redo all my videos and make them more professional.
-
-* What if you had a $LK,"ClassRep",A="MN:ClassRep"$() that converted to plain text?
-
-* Why is nontimer $LK,"Rand",A="MN:Rand"$() so bad?
+* Nontimer $LK,"Rand",A="MN:Rand"$() is really bad!
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
-* 8/20/2015 TAD8, Tour1, then Tour TestSuite was missing #include "TestSuite".
+* Add AVL binary tree support or red/black whatever that is.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
+
+* 1/12/16 $LK,"ATARepEntry",A="MN:ATARepEntry"$ shows corrupted buttons.
+
+* 8/20/2015 TAD8, Tour TestSuite was missing #include "TestSuite".
+* 1/03/2016 TAD8 Repeated
+
+* Bug introduced around 11/1/15.  Changed $LK,"::/Kernel/Sched.CPP"$ and now $LK,"WinToTop",A="MN:WinToTop"$ is called on Adam task at start-up, sometimes.
+
+* 1/12/16 make RAM drive 2288 blks, copy /Home.
 
 * Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
 
+* $LK,"Mount",A="MN:Mount"$() crashes on bad drive.
+
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens
 
-* Bug 12/25/15 Copy-Paste index.html glitch if source window 40 columns.
+* 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
+* 01/10/16 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Wb2/CounterRenaissance.TXT"$ "Rennaisance"
+* 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
 
 * Get rid of having two terms and pick one, "Disk" and "BlkDev"?  I don't think so.  (Probably not.)
 
@@ -83,8 +87,6 @@ $WW,1$* I'm going to redo all my videos and make them more professional.
 
 * Add change-triangle-color to mesh editor.
 * Add 3D-Mesh Editor make-prism.
-
-* Add AVL binary tree support or red/black whatever that is.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  Where could we use?
 
 * DCF_TRANSFORMATION|DCF_SYMMETRY|DCF_JUST_MIRROR -- maybe not both needed at once.
 
@@ -372,9 +374,10 @@ assignments.  Is ShiftNoPush fully implemented?
 ================================================================================
 
 >lspci -v
-Size:$TX,"17322 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17328 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 It is love I desire: $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
+Males Appear Three Times: $TX,"Deuteronomy 16:16",HTML="http://www.biblegateway.com/verse/en/Deuteronomy%2016:16"$
 Offer a sacrifice of praise: $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
 Do I drink blood of goats? Offer praise: $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
 When a servant becomes king. $TX,"Proverb 30:22",HTML="http://www.biblegateway.com/verse/en/Proverb%2030:22"$
@@ -385,12 +388,16 @@ Lord does not repeat: $TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/en
 Offer only in approved place: $TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
 Jesus' zeal for the Temple: $TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
 Famine not for bread: $TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
-
+Meek and HUmble of Heart: $TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
 TempleOS Logo
 $HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
 Cop tying shoe
 $HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
-
+Dragon Scale
+$HC,"<img src=\"http://i.imgur.com/zUdfEqy.jpg\" width=\"800\" height=\"640\" alt=\"\">"$
+$WW,1$
+$TX,"Good Time Bad Times Lyrics",HTML="https://www.google.com/#q=led+zep+good+times+bad+times+lyrics"$
+Intel CEO: Brian Krzanich
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
 $TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
 $TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
@@ -416,5 +423,6 @@ $TX,"CBS News",HTML="http://www.cbsnews.com/live/?ftag= NM14632fc"$
 $TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
 $TX,"C64 Users Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$
 $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_programmers_reference/c64-programmers_reference.htm"$
+$TX,"8-Bit Pixel Art",HTML="http://8bitdecals.com/8-bit-image-gallery"$
 $TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
 $TX,"Risperdal Shortens Life",HTML="http://factmed.com/study-RISPERDAL-causing-LIFE EXPECTANCY SHORTENED.php"$

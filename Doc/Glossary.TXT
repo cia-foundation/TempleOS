@@ -140,11 +140,11 @@ $FG,2$Vol$FG$	Volume
 $FG,2$Win$FG$	Window
 $FG,2$Wiz$FG$	Wizard
 $ID,-2$$TR,"Task/Process/Thread"$
-$ID,2$There is no distinction between $FG,2$task$FG$, $FG,2$process$FG$ or $FG,2$thread$FG$.  The $FG,2$Fs$FG$ segment reg is kept pointing to the current task's $LK,"CTask",A="MN:CTask"$.  There is only one window per task, and only $FG,2$core#0$FG$ tasks can have windows.  Each task has a code and data heap so memory is returned when it dies.  Each task has a $LK,"hash",A="HI:Hash"$ symbol table.
+$ID,2$There is no distinction between $FG,2$task$FG$, $FG,2$process$FG$ or $FG,2$thread$FG$.  The $FG,2$Fs$FG$ segment reg is kept pointing to the current task's $LK,"CTask",A="MN:CTask"$.  There is only one window per task, and only $FG,2$core0$FG$ tasks can have windows.  Each task has a code and data heap so memory is returned when it dies.  Each task has a $LK,"hash",A="HI:Hash"$ symbol table.
 $ID,-2$$TR,"Adam Task"$
 $ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/StartOS.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
 $ID,-2$$TR,"Seth Task"$
-$ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has a special task which is immortal and which is special.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
+$ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has an executive task called $FG,2$Seth$FG$ that is immortal.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
 $ID,2$TempleOS uses the asm $FG,2$CALL$FG$ instruction, exclusively, and that instruction is limited to calling routines $FG,2$+/-2 Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2 Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:Mem512Alloc"$ heaps.
 $ID,-2$$TR,"Parent, Child and PopUp Tasks"$
@@ -253,5 +253,5 @@ $ID,2$When two parts of a program have a common low-level routine, that routine 
 $ID,-2$$TR,"user_data"$
 $ID,2$Many operating system structures have space set aside for you to store values.  You are on your own managing these with multiple applications and libraries.
 $ID,-2$$TR,"Multicore Core0/CoreAP"$
-$ID,2$Core#0, has the $FG,2$Adam task$FG$, and it is the master.  The $FG,2$application processors$FG$ have Seth tasks and are the slave processors.  Only core#0 tasks can have windows and can launch applications.  Slave cores are used if the application explicitly $LK,"Spawn",A="MN:Spawn"$s() a task or $LK,"JobQue",A="MN:JobQue"$() a job on them.
+$ID,2$Core0, has the $FG,2$Adam task$FG$, and it is the master.  The $FG,2$application processors$FG$ have an executive $FG,2$Seth tasks$FG$ and are the slave processors.  Only $FG,2$core0$FG$ tasks can have windows and can launch applications.  Slave cores are used if the application explicitly $LK,"Spawn",A="MN:Spawn"$s() a task or $LK,"JobQue",A="MN:JobQue"$() a job on them.
 $ID,-2$
