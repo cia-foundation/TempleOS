@@ -1,7 +1,8 @@
 Cd(__DIR__);;
 #include "ADskA"
-#include "Mount"
 #include "ADskB"
+#include "PrtDsk"
+#include "Mount"
 #include "ChkDsk"
 #include "FileMgr"
 Cd("..");;

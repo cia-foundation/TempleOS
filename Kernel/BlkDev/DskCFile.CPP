@@ -23,11 +23,12 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
   f->file_cluster_num=INVALID_CLUSTER;
   full_name=FileNameAbs(filename);
   f->dv=Let2Drv(*full_name);
-  if (f->dv->type==DVT_REDSEA)
+  if (f->dv->fs_type==FSt_REDSEA)
     contiguous=TRUE;
   if (contiguous) {
     f->flags|=FF_CONTIGUOUS;
-    if (f->dv->type!=DVT_REDSEA && !(FileAttr(filename) & RS_ATTR_CONTIGUOUS))
+    if (f->dv->fs_type!=FSt_REDSEA &&
+	  !(FileAttr(filename) & RS_ATTR_CONTIGUOUS))
       throw('File');
   }
   f->cluster_buf=CAlloc(f->dv->spc<<BLK_SIZE_BITS);

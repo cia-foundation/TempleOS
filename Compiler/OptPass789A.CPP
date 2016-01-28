@@ -224,19 +224,19 @@ cc->pass==10 is final pass, code is placed into buf.
 	    ICPreIncDec(tempi,SLASH_OP_DEC,ip2);
 	    ICFlagBranch(tempi,ip,0x75850F,buf);
 	    break;
-	  case IC_BR_EQUAL_EQUAL:
+	  case IC_BR_EQU_EQU:
 	    ICCmpAndBranch(tempi,FALSE,ip,0x74840F,0x74840F,
 		  0x74840F,0x74840F,buf,ip2);
 	    break;
-	  case IC_BR_EQUAL_EQUAL2:
+	  case IC_BR_EQU_EQU2:
 	    ICCmpAndBranch(tempi,TRUE,ip,0x74840F,0x74840F,
 		  0x74840F,0x74840F,buf,ip2);
 	    break;
-	  case IC_BR_NOT_EQUAL:
+	  case IC_BR_NOT_EQU:
 	    ICCmpAndBranch(tempi,FALSE,ip,0x75850F,0x75850F,
 		  0x75850F,0x75850F,buf,ip2);
 	    break;
-	  case IC_BR_NOT_EQUAL2:
+	  case IC_BR_NOT_EQU2:
 	    ICCmpAndBranch(tempi,TRUE,ip,0x75850F,0x75850F,
 		  0x75850F,0x75850F,buf,ip2);
 	    break;
@@ -251,14 +251,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	    ICCmpAndBranch(tempi,TRUE,ip,0x72820F,0x7C8C0F,
 		  0x77870F,0x7F8F0F,buf,ip2);
 	    break;
-	  case IC_BR_GREATER_EQUAL:
+	  case IC_BR_GREATER_EQU:
 	    if (tempi->ic_flags&ICF_USE_F64)
 	      ICFCmpAndBranch(cc,tempi,  ip,0x73830F,0x76860F,buf,ip2);
 	    else
 	      ICCmpAndBranch(tempi,FALSE,ip,0x73830F,0x7D8D0F,
 		    0x76860F,0x7E8E0F,buf,ip2);
 	    break;
-	  case IC_BR_GREATER_EQUAL2:
+	  case IC_BR_GREATER_EQU2:
 	    ICCmpAndBranch(tempi,TRUE,ip,0x73830F,0x7D8D0F,
 		  0x76860F,0x7E8E0F,buf,ip2);
 	    break;
@@ -273,14 +273,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	    ICCmpAndBranch(tempi,TRUE,ip,0x77870F,0x7F8F0F,
 		  0x72820F,0x7C8C0F,buf,ip2);
 	    break;
-	  case IC_BR_LESS_EQUAL:
+	  case IC_BR_LESS_EQU:
 	    if (tempi->ic_flags&ICF_USE_F64)
 	      ICFCmpAndBranch(cc,tempi,  ip,0x76860F,0x73830F,buf,ip2);
 	    else
 	      ICCmpAndBranch(tempi,FALSE,ip,0x76860F,0x7E8E0F,
 		    0x73830F,0x7D8D0F,buf,ip2);
 	    break;
-	  case IC_BR_LESS_EQUAL2:
+	  case IC_BR_LESS_EQU2:
 	    ICCmpAndBranch(tempi,TRUE,ip,0x76860F,0x7E8E0F,
 		  0x73830F,0x7D8D0F,buf,ip2);
 	    break;
@@ -618,10 +618,10 @@ cc->pass==10 is final pass, code is placed into buf.
 	  else
 	    ICFSub(cc,tempi,buf,ip2);
 	  break;
-	case IC_EQUAL_EQUAL:
+	case IC_EQU_EQU:
 	  ICCmp(tempi,0x75,0x75,ip2);
 	  break;
-	case IC_NOT_EQUAL:
+	case IC_NOT_EQU:
 	  ICCmp(tempi,0x74,0x74,ip2);
 	  break;
 	case IC_LESS:
@@ -630,11 +630,11 @@ cc->pass==10 is final pass, code is placed into buf.
 	  else
 	    ICFCmp(cc,tempi,CMP_TEMPLATE_LESS,ip2);
 	  break;
-	case IC_GREATER_EQUAL:
+	case IC_GREATER_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
 	    ICCmp(tempi,0x72,0x7C,ip2);
 	  else
-	    ICFCmp(cc,tempi,CMP_TEMPLATE_GREATER_EQUAL,ip2);
+	    ICFCmp(cc,tempi,CMP_TEMPLATE_GREATER_EQU,ip2);
 	  break;
 	case IC_GREATER:
 	  if (tempi->ic_flags&ICF_USE_INT)
@@ -642,11 +642,11 @@ cc->pass==10 is final pass, code is placed into buf.
 	  else
 	    ICFCmp(cc,tempi,CMP_TEMPLATE_GREATER,ip2);
 	  break;
-	case IC_LESS_EQUAL:
+	case IC_LESS_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
 	    ICCmp(tempi,0x77,0x7F,ip2);
 	  else
-	    ICFCmp(cc,tempi,CMP_TEMPLATE_LESS_EQUAL,ip2);
+	    ICFCmp(cc,tempi,CMP_TEMPLATE_LESS_EQU,ip2);
 	  break;
 	case IC_AND_AND:
 	  ICAndAnd(tempi,ip2);
@@ -666,66 +666,66 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_ASSIGN_MM:
 	  ICAssignPostIncDec(tempi,SLASH_OP_DEC,ip2);
 	  break;
-	case IC_SHL_EQUAL:
-	  ICShiftEqual(tempi,tempi->a1.type_pointed,
+	case IC_SHL_EQU:
+	  ICShiftEqu(tempi,tempi->a1.type_pointed,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		0xE0D1E0D3E0C1,0xE0D1E0D3E0C1,ip2);
 	  break;
-	case IC_SHR_EQUAL:
-	  ICShiftEqual(tempi,tempi->a1.type_pointed,
+	case IC_SHR_EQU:
+	  ICShiftEqu(tempi,tempi->a1.type_pointed,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		0xE8D1E8D3E8C1,0xF8D1F8D3F8C1,ip2);
 	  break;
-	case IC_MUL_EQUAL:
+	case IC_MUL_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICMulEqual(tempi,ip2);
+	    ICMulEqu(tempi,ip2);
 	  else
-	    ICFOpEqual(cc,tempi,SLASH_OP_FMUL,buf,ip2);
+	    ICFOpEqu(cc,tempi,SLASH_OP_FMUL,buf,ip2);
 	  break;
-	case IC_DIV_EQUAL:
+	case IC_DIV_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICDivEqual(tempi,FALSE,ip2);
+	    ICDivEqu(tempi,FALSE,ip2);
 	  else
-	    ICFOpEqual(cc,tempi,SLASH_OP_FDIV,buf,ip2);
+	    ICFOpEqu(cc,tempi,SLASH_OP_FDIV,buf,ip2);
 	  break;
-	case IC_MOD_EQUAL:
+	case IC_MOD_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICDivEqual(tempi,TRUE,ip2);
+	    ICDivEqu(tempi,TRUE,ip2);
 	  else
-	    ICFModEqual(cc,tempi,ip2);
+	    ICFModEqu(cc,tempi,ip2);
 	  break;
-	case IC_AND_EQUAL:
-	  ICAndEqual(tempi,ip2);
+	case IC_AND_EQU:
+	  ICAndEqu(tempi,ip2);
 	  break;
-	case IC_OR_EQUAL:
-	  ICOrEqual(tempi,ip2);
+	case IC_OR_EQU:
+	  ICOrEqu(tempi,ip2);
 	  break;
-	case IC_XOR_EQUAL:
-	  ICXorEqual(tempi,ip2);
+	case IC_XOR_EQU:
+	  ICXorEqu(tempi,ip2);
 	  break;
-	case IC_ADD_EQUAL:
+	case IC_ADD_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqual(tempi,tempi->a1.type_pointed,
+	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		  0x010000000003,ip2);
 	  else
-	    ICFOpEqual(cc,tempi,SLASH_OP_FADD,buf,ip2);
+	    ICFOpEqu(cc,tempi,SLASH_OP_FADD,buf,ip2);
 	  break;
-	case IC_SUB_EQUAL:
+	case IC_SUB_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqual(tempi,tempi->a1.type_pointed,
+	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		  0x29000000052B,ip2);
 	  else
-	    ICFOpEqual(cc,tempi,SLASH_OP_FSUB,buf,ip2);
+	    ICFOpEqu(cc,tempi,SLASH_OP_FSUB,buf,ip2);
 	  break;
 	case IC_SHL_CONST:
 	  ICShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,

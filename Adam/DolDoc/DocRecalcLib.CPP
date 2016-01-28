@@ -182,27 +182,15 @@ public I64 DocMax(I64 i=MAX_I64)
 #help_index "DolDoc/Task;StdOut/Task"
 U0 DocUpdateTaskDocs(CTask *task)
 {//This is called from $LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$() by the winmgr at 30fps.
-  CDrv *dv;
   CDoc *doc;
   CD3I64 saved_scroll;
-  I64 border_attr;
-  if (task->border_src==BDS_CUR_DRV && task->cur_dv) {
-    border_attr=task->cur_dv->text_attr;
-    if (border_attr&15!=border_attr>>4)
-      task->border_attr=border_attr;
-  }
+  if (task->border_src==BDS_CUR_DRV && task->cur_dv)
+    task->border_attr=DrvTextAttrGet(Drv2Let(task->cur_dv));
   if (task->title_src==TTS_TASK_NAME)
     StrCpy(task->task_title,task->task_name);
   if ((doc=DocDisplay(task)) && !(doc->flags&DOCF_DONT_SHOW)) {
     if (task->border_src==BDS_ED_FILENAME_DRV)
-      try {
-	if (dv=Let2Drv(*doc->filename.name)) {
-	  border_attr=dv->text_attr;
-	  if (border_attr&15!=border_attr>>4)
-	    task->border_attr=border_attr;
-	}
-      } catch
-	Fs->catch_except=TRUE;
+      task->border_attr=DrvTextAttrGet(*doc->filename.name);
     if (task->title_src==TTS_ED_FILENAME)
       MemCpy(task->task_title,doc->filename.name,TASK_TITLE_LEN);
     DocRecalc(doc,TRUE,DOC_RECALC_TO_SCREEN);

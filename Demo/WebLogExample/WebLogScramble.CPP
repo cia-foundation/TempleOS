@@ -13,7 +13,7 @@ U0 InitKey()
 
 U0 LogScrambleFile(U8 *name)
 {
-  CDoc *doc=DocRead(name,DOCF_PLAIN_TEXT);
+  CDoc *doc=DocRead(name,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
   CDocEntry *doc_e=doc->root.next;
   I64 i;
   U32 num;

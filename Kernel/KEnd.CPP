@@ -60,7 +60,7 @@ U0 SysGlblsInit()
   QueInit(&dev.pci_root);
   dev.mem64_ptr=MEM_MAPPED_SPACE;
 
-  dbg.psect_cache=CAlloc(PSECT_CACHE_SIZE*sizeof(CPSectCache));
+  dbg.fun_seg_cache=CAlloc(FUN_SEG_CACHE_SIZE*sizeof(CFunSegCache));
   dbg.int_fault_code=IntFaultHandlersNew;
 }
 
@@ -203,6 +203,8 @@ U0 KernelMain()
   try ExeFile("StartOS"); //Continues $LK,"/StartOS.CPP",A="FL:/StartOS.CPP,1"$
   catch {
     Raw(ON);
+    Silent(OFF);
+    GetOutOfDollar;
     PutExcept;
     Dbg;
   }

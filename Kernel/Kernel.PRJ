@@ -52,7 +52,7 @@
 #include "MultiProc"
 #include "EdLite"
 #include "BlkDev/MakeBlkDev"
-#include "PSect"
+#include "FunSeg"
 #include "KEnd"
 
 #exe {KernelCfgDel(kernel_cfg);};

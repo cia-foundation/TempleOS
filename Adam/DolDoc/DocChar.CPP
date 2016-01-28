@@ -462,7 +462,7 @@ U0 EdInsChar(I64 ch,I64 sc,CDoc *doc)
     } else
       goto ic_done;
   }
-  if (ch=='$$' && !(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))) {
+  if (ch=='$$' && !(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS))) {
     doc->flags|=DOCF_IN_DOLLAR;
     doc->dollar_buf_ptr=0;
     doc->dollar_buf[doc->dollar_buf_ptr++]=ch;

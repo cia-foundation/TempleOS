@@ -1153,7 +1153,7 @@ U0 EdSpriteIns(CDoc *doc,I64 x,I64 y)
 	DocUnlock(doc);
     }
   }
-  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS)))
+  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)))
     DocBinsValidate(doc);
 }
 

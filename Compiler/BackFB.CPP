@@ -1,4 +1,4 @@
-U0 ICFOpEqual(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
+U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 {//for ADD,SUB,DIV,MUL
   CICArg *a1=&tempi->a1,
 	*a2=&tempi->a2;

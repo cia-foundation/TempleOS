@@ -237,8 +237,8 @@ Bool DiffBins(CDoc *doc1,CDoc *doc2)
 public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
 {//Report differences between two files and merge differences
 //from src_file to dst_file.  Don't use _df_flags arg. (Used by $LK,"Merge",A="MN:Merge"$().)
-  CDoc *doc1=DocRead(dst_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR),
-	*doc2=DocRead(src_file,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
+  CDoc *doc1=DocRead(dst_file,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR),
+	*doc2=DocRead(src_file,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e,**doc_sorted1,**doc_sorted2,**doc_unsorted1,**doc_unsorted2;
   I64 i,cnt1=0,cnt2=0,df_flags;
   Bool result=FALSE;

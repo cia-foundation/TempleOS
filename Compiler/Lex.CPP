@@ -160,7 +160,7 @@ lgc_start2:
 		tempf->line_num=doc_e->y+2; //TODO: should be a page down
 		cc->last_U16=CH_FORM_FEED;
 		goto lgc_done;
-	      case DOCT_INS_BINARY:
+	      case DOCT_INS_BIN:
 		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
 		tempf->line_num=doc_e->y+1;
 		Free(cc->cur_str);
@@ -173,16 +173,16 @@ lgc_start2:
 		  cc->cur_str=ptr;
 		  cc->cur_str_len=doc_e->bin_data->size;
 		}
-		cc->last_U16=TK_INS_BINARY;
+		cc->last_U16=TK_INS_BIN;
 		goto lgc_done;
-	      case DOCT_INS_BINARY_SIZE:
+	      case DOCT_INS_BIN_SIZE:
 		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
 		if (doc_e->bin_data)
 		  cc->cur_i64=doc_e->bin_data->size;
 		else
 		  cc->cur_i64=0;
 		tempf->line_num=doc_e->y+1;
-		cc->last_U16=TK_INS_BINARY_SIZE;
+		cc->last_U16=TK_INS_BIN_SIZE;
 		goto lgc_done;
 	      case DOCT_SHIFTED_Y:
 		if (LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
@@ -324,9 +324,8 @@ CDoc *LexDocRead(U8 *abs_filename,I64 flags)
   return doc;
 }
 
-
 I64 cmp_type_flags_src_code[(DOCT_NUM_TYPES+63)/64]={
-  1<<DOCT_TEXT|1<<DOCT_TAB|1<<DOCT_INS_BINARY|1<<DOCT_INS_BINARY_SIZE};
+  1<<DOCT_TEXT|1<<DOCT_TAB|1<<DOCT_INS_BIN|1<<DOCT_INS_BIN_SIZE};
 
 U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
 	CDoc *doc=NULL,U8 *abs_filename=NULL,CDocEntry *doc_e=NULL,I64 col=0)
@@ -1039,8 +1038,8 @@ lex_ifjit:
       case '\n':
 	if (!(cc->flags&CCF_KEEP_NEW_LINES))
 	  break; //else fall through
-      case TK_INS_BINARY:
-      case TK_INS_BINARY_SIZE:
+      case TK_INS_BIN:
+      case TK_INS_BIN_SIZE:
 	cc->token=ch;
 	goto lex_end;
       case '.':
@@ -1147,9 +1146,9 @@ lex_check_comment:
 		  j=LexGetChar(cc);
 		  if (j=='=') {
 		    if (i==TK_SHL)
-		      i=TK_SHL_EQUAL;
+		      i=TK_SHL_EQU;
 		    else
-		      i=TK_SHR_EQUAL;
+		      i=TK_SHR_EQU;
 		  } else
 		    cc->flags|=CCF_USE_LAST_U16;
 		}

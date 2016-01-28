@@ -203,15 +203,15 @@ public extern U0 Dr(CTask *task=NULL);
 public extern U0 StkRep(CTask *task=NULL);
 extern I64 *TaskRegAddr(CTask *task,I64 reg_num);
 
-#help_index "Debugging/PSect"
-#help_file "::/Doc/DbgPSect"
+#help_index "Debugging/FunSeg"
+#help_file "::/Doc/DbgFunSeg"
 public extern Bool PutSrcLink(U8 *addr,I64 cnt=1,U8 *buf=NULL);
 public extern U8 *SrcEdLink(U8 *addr,I64 cnt=1,CTask *mem_task=NULL);
 public extern U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL);
 public extern I64 SrcLineNum(U8 *addr,I64 cnt=1);
 
-#help_index "Debugging/PSect;Hash/System"
-public extern CHash *PSectFind(U8 *addr,I64 *_offset);
+#help_index "Debugging/FunSeg;Hash/System"
+public extern CHash *FunSegFind(U8 *addr,I64 *_offset);
 
 #help_index "Debugging/Raw Output"
 public extern Bool IsRaw();
@@ -292,12 +292,12 @@ public extern U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL);
 public extern U8 *DftExt(U8 *filename,U8 *extension);
 public extern U8 *DirFile(U8 *dirname,U8 *name=NULL,U8 *_extension=NULL);
 public extern U8 *DirNameAbs(U8 *dirname);
-public extern Bool DrvIsWritable(U8 drv_let=0);
+public extern CBlkDev *DrvIsWritable(U8 drv_let=0,Bool except=FALSE);
 public extern U8 *FileExtDot(U8 *src);
 public extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 public extern U8 *FileNameAbs(U8 *filename,I64 fuf_flags=0);
 public extern Bool FileNameChk(U8 *filename);
-public extern Bool FilesFindMatch(U8 *test_filename,
+public extern Bool FilesFindMatch(U8 *_test_name,
 	U8 *files_find_mask,I64 fuf_flags=0);
 public extern Bool IsDir(U8 *dir_name);
 public extern Bool IsDotC(U8 *filename);
@@ -320,7 +320,7 @@ extern I64 FileAttr(U8 *name,I64 old_attr=0);
 
 #help_index "File/Low Level"
 #help_file "::/Doc/FileLowLevel"
-public extern U0 BlkDevChk(CBlkDev *bd);
+public extern CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE);
 public extern Bool BlkDevLock(CBlkDev *bd);
 public extern CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type);
 public extern Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE);
@@ -331,17 +331,19 @@ public extern I64 ClustersAlloc(CDrv *dv,I64 c=0,
 	I64 cnt=1,Bool contiguous=FALSE);
 extern Bool CopySingle(U8 *f1,U8 *f2); //Just one file
 public extern U8 Drv2Let(CDrv *dv=NULL);
-public extern U0 DrvChk(CDrv *dv);
+public extern CDrv *DrvChk(CDrv *dv,Bool except=TRUE);
 public extern Bool DrvLock(CDrv *dv);
 public extern CDrv *DrvMakeFree(U8 drv_let);
 public extern U8 *DrvModelNum(U8 drv_let=0);
 public extern CDrv *DrvNextFree(U8 first_drv_let='C');
 public extern U8 *DrvSerialNum(U8 drv_let=0);
+public extern U8 DrvTextAttrGet(U8 drv_let=0);
 public extern Bool DrvUnlock(CDrv *dv,Bool rst=FALSE);
 public extern U0 DrvsRelease();
 extern U0 FAT32FreeClusters(CDrv *dv,I64 c);
-public extern CBlkDev *Let2BlkDev(U8 drv_let=0);
-public extern CDrv *Let2Drv(U8 drv_let=0);
+public extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
+public extern I64 Let2BlkDevType(U8 drv_let=0);
+public extern CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE);
 extern I64 Name2DirCluster(CDrv *dv,U8 *dirname);
 extern I64 Name2ParentDirCluster(CDrv *dv,U8 *dirname);
 public extern Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
@@ -457,7 +459,7 @@ public extern Bool DrvEnable(U8 drv_let,Bool val);
 
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
 public extern U0 Fmt(U8 drv_let,Bool quick=TRUE,
-	Bool confirm=TRUE,I64 type=DVT_FAT32);
+	Bool confirm=TRUE,I64 type=FSt_FAT32);
 
 #help_index "Install;Memory/BlkPool"
 public extern I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024);
@@ -472,7 +474,7 @@ public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 public extern U0 KeyDevRem(CKeyDevEntry *tempp);
 extern CKeyDevGlbls keydev;
 extern CSrvCmd sys_macro_root;
-extern CTask *sys_macro_util_task;
+extern CTask *sys_macro_task;
 
 #help_index "Keyboard Devices;Char/Input;StdIn"
 extern U8  *(*fp_getstr2)(I64 flags=0); //GetStr $LK,"Flags",A="MN:GSF_SHIFT_ESC_EXIT"$

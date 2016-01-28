@@ -10,7 +10,7 @@ $LK,"OPTf_WARN_UNUSED_VAR",A="MN:OPTf_WARN_UNUSED_VAR"$	warning if unused var.  
 
 $LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$		warning if parenthesis are not needed.
 
-$LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$	warning if dup local var type statements.
+$LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$	warning if dup local var type stmts.
 
 $LK,"OPTf_NO_REG_VAR",A="MN:OPTf_NO_REG_VAR"$ forces all function local vars to the stk not regs.  Applied to functions.
 

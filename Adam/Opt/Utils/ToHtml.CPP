@@ -300,7 +300,7 @@ public CDoc *Doc2Html(CDoc *doc_in,
 public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   U8 *body_header=NULL,U8 *body_footer=NULL,I64 width=80,
   Bool line_anchors=TRUE,U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
-{//Convert $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file to HTML.
+{//Convert $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$file to HTML.
 //Supply your own link_cvt routine.
   U8 *in_name,*out_name;
   CDoc *doc_in,*doc_out;
@@ -308,11 +308,11 @@ public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinHorz(0,width-1); //Sets doc width for word wrap.
 
-  in_name=DftExt(_in_name,"CPP.Z"),
-	if (_out_name)
-  out_name=DftExt(_out_name,"html");
+  in_name=DftExt(_in_name,"CPP.Z");
+  if (_out_name)
+    out_name=DftExt(_out_name,"html");
   else
-  out_name=ChgExt(_in_name,"html");
+    out_name=ChgExt(_in_name,"html");
 
   doc_in=DocRead(in_name);
   doc_out=Doc2Html(doc_in,html_header,body_header,

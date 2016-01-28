@@ -582,7 +582,7 @@ U0 ICFCmp(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,I64 ip)
 	TY_REG+RT_I64,REG_RAX,0,ip);
 }
 
-U0 ICFModEqual(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
+U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
 {
   Bool dont_push_float,dont_pop_float;
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);

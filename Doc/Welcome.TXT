@@ -19,7 +19,7 @@ In other operating systems, I hated learning one language for command line scrip
 
 During the boot process, many files get $LK,"compiled",A="FI:::/StartOS.CPP"$ before you have access to the command line.  (Don't worry, booting takes only a couple of seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,2$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ machine code, nothing is $FG,2$interpreted$FG$ and there is no $FG,2$byte code$FG$.
 
-Statements at the global scope -- outside the scope of functions -- execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a statement in the global scope, usually at the bottom of your file.
+Stmts at the global scope -- outside the scope of functions -- execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a stmt in the global scope, usually at the bottom of your file.
 
 I started with $FG,2$C$FG$ syntax, but didn't like the command line for a directory listing looking like this:
 

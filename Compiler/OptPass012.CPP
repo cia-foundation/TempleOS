@@ -722,7 +722,7 @@ args.
 	}
 	break;
       sub_switch_start:
-	case IC_EQUAL_EQUAL:
+	case IC_EQU_EQU:
 	  if (OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    tempi->ic_data=tempi1->ic_data==tempi2->ic_data;
 	    tempi->ic_code=IC_IMM_I64;
@@ -730,7 +730,7 @@ args.
 	    if (tempi->ic_class->raw_type==RT_F64)
 	      tempi->ic_flags|=ICF_USE_F64;
 	  break;
-	case IC_NOT_EQUAL:
+	case IC_NOT_EQU:
 	  if (OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    tempi->ic_data=tempi1->ic_data!=tempi2->ic_data;
 	    tempi->ic_code=IC_IMM_I64;
@@ -755,7 +755,7 @@ args.
 	      tempi->ic_flags|=ICF_USE_F64;
 	  }
 	  break;
-	case IC_GREATER_EQUAL:
+	case IC_GREATER_EQU:
 	  if (i=OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    if (i==FBO1_INT) {
 	      if (is_unsigned)
@@ -789,7 +789,7 @@ args.
 	      tempi->ic_flags|=ICF_USE_F64;
 	  }
 	  break;
-	case IC_LESS_EQUAL:
+	case IC_LESS_EQU:
 	  if (i=OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    if (i==FBO1_INT) {
 	      if (is_unsigned)
@@ -825,38 +825,38 @@ args.
 	if (cc->pass==2 && (!tempc->size||!tempc2->size))
 	  LexWarn(cc,"Assign U0 ");
 	sub_switch_start:
-	  case IC_MUL_EQUAL:
+	  case IC_MUL_EQU:
 	    if (tempi2->ic_code==IC_IMM_I64 &&
 		  tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64) {
 	      if (i=tempi2->ic_data) {
 		if (Bsf(i)==Bsr(i)) {
 		  tempi2->ic_data=Bsf(i);
-		  tempi->ic_code=IC_SHL_EQUAL;
+		  tempi->ic_code=IC_SHL_EQU;
 		}
 	      }
 	    }
 	    break;
-	  case IC_DIV_EQUAL:
+	  case IC_DIV_EQU:
 	    if (tempi2->ic_code==IC_IMM_I64 &&
 		  tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64 &&
 		  (i=tempi2->ic_data) && Bsf(i)==Bsr(i)) {
 	      tempi2->ic_data=Bsf(i);
-	      tempi->ic_code=IC_SHR_EQUAL;
+	      tempi->ic_code=IC_SHR_EQU;
 	    }
 	    break;
-	  case IC_MOD_EQUAL:
+	  case IC_MOD_EQU:
 	    if (tempi2->ic_code==IC_IMM_I64 &&
 		  tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64 &&
 		  (i=tempi2->ic_data) && Bsf(i)==Bsr(i)) {
 	      tempi2->ic_data=i-1;
-	      tempi->ic_code=IC_AND_EQUAL;
+	      tempi->ic_code=IC_AND_EQU;
 	    }
 	    break;
-	  case IC_ADD_EQUAL:
-	  case IC_SUB_EQUAL:
+	  case IC_ADD_EQU:
+	  case IC_SUB_EQU:
 	    break;
 	sub_switch_end:
 	  if (tempi2->ic_class->raw_type==RT_F64)
@@ -888,11 +888,11 @@ args.
 	    }
 	  }
 	  break;
-	case IC_SHL_EQUAL:
-	case IC_SHR_EQUAL:
-	case IC_AND_EQUAL:
-	case IC_OR_EQUAL:
-	case IC_XOR_EQUAL:
+	case IC_SHL_EQU:
+	case IC_SHR_EQU:
+	case IC_AND_EQU:
+	case IC_OR_EQU:
+	case IC_XOR_EQU:
 	  if (tempc2->raw_type==RT_F64)
 	    tempi2->ic_flags|=ICF_R_TO_INT;
 	  break;
@@ -1167,8 +1167,8 @@ args.
       case IC_ATAN:
       case IC_BR_CARRY:
       case IC_BR_NOT_CARRY:
-      case IC_BR_EQUAL_EQUAL ...IC_BR_LESS_EQUAL:
-      case IC_BR_EQUAL_EQUAL2...IC_BR_LESS_EQUAL2:
+      case IC_BR_EQU_EQU ...IC_BR_LESS_EQU:
+      case IC_BR_EQU_EQU2...IC_BR_LESS_EQU2:
       case IC_BR_OR_OR_NOT_ZERO:
       case IC_BR_OR_OR_ZERO:
       case IC_BR_AND_AND_NOT_ZERO:

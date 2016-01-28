@@ -253,8 +253,8 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		    } else {
 		      DocUnlock(doc);
 		      if (sc&SCF_SHIFT) {
-			if (TaskValidate(sys_macro_util_task))
-			  PostMsgWait(sys_macro_util_task,
+			if (TaskValidate(sys_macro_task))
+			  PostMsgWait(sys_macro_task,
 				MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
 			SysMacroStripKey(&sys_macro_root,ch,sc);
 			PlaySysMacro;
@@ -557,7 +557,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Cmd /Sprite Graphic Resource");
 	    else {
-	      if (!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))) {
+	      if (!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS))) {
 		DocUnlock(doc);
 		if (doc_ce->type_u8==DOCT_SPRITE)
 		  EdSpriteEd(doc,
@@ -577,7 +577,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Edit/Find Misspelled");
 	    else
-	      ACFindMisspelled(doc);
+	      ACMisspelledFind(doc);
 	  } else {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Edit/Save");
@@ -596,7 +596,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      KeyDescSet("Edit/Toggle Plain Text Display");
 	    else
 	      if (!(doc->flags&DOCF_FORM) ||
-		    doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))
+		    doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS))
 		DocFlagsToggle(doc,DOCF_PLAIN_TEXT);
 	  }
 	  break;

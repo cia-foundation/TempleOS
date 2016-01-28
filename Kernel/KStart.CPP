@@ -46,9 +46,9 @@ GDT_TR:		DU8	MP_MAX_PROCESSORS*16 DUP(0);
 GDT_TR_RING3:	DU8	MP_MAX_PROCESSORS*16 DUP(0);
 #assert $$-SYS_GDT==sizeof(CGDT)
 
-SYS_GDT_PTR::		DU16	sizeof(CGDT)-1;
-			DU64	0;
-SYS_PCI_BUSSES::	DU16	0;
+SYS_GDT_PTR::	DU16	sizeof(CGDT)-1;
+		DU64	0;
+SYS_PCI_BUSES::	DU16	0;
 #assert $$-SYS_KERNEL==sizeof(CKernel)-sizeof(CBinFile)
 
 //************************************
@@ -117,7 +117,7 @@ GET_IP:	POP	BX
 @@20:	ADD	SP,2
 
 //Get PCI Bus Info
-@@25:	MOV	U16 [SYS_PCI_BUSSES],256
+@@25:	MOV	U16 [SYS_PCI_BUSES],256
 	XOR	DX,DX
 	MOV	AX,0xB101
 	INT	0x1A
@@ -125,7 +125,7 @@ GET_IP:	POP	BX
 	JNE	@@30
 	MOV	CH,0
 	INC	CX
-	MOV	U16 [SYS_PCI_BUSSES],CX
+	MOV	U16 [SYS_PCI_BUSES],CX
 @@30:
 
 	CLI

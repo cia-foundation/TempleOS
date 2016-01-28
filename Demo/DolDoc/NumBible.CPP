@@ -3,7 +3,7 @@
 
 U0 NumBible()
 {
-  CDoc *doc_in=DocRead("::/Misc/Bible.TXT.Z",DOCF_PLAIN_TEXT_WITH_TABS),
+  CDoc *doc_in=DocRead("::/Misc/Bible.TXT.Z",DOCF_PLAIN_TEXT_TABS),
 	*doc_out=DocNew("::/Home/NumBible.TXT.Z");
   CDocEntry *doc_e=doc_in->root.next;
   while (doc_e!=doc_in) {
@@ -20,6 +20,7 @@ U0 NumBible()
     } else
       doc_e=doc_e->next;
   }
+  doc_out->flags|=DOCF_NO_CURSOR;
   DocWrite(doc_out);
   DocDel(doc_out);
   DocDel(doc_in);

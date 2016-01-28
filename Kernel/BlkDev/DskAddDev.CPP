@@ -37,7 +37,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
   switch (bd->type) {
     case BDT_RAM:
       dv->dv_signature=DRV_SIGNATURE_VAL;
-      dv->type=DVT_REDSEA;
+      dv->fs_type=FSt_REDSEA;
 //This is to force creation of a RAM
       //drive during boot, so it is probably
       //MAlloced to the same addr and can
@@ -59,7 +59,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	if (one_drv) {
 	  dv->dv_signature=DRV_SIGNATURE_VAL;
 	  result++;
-	  dv->type=DVT_REDSEA;
+	  dv->fs_type=FSt_REDSEA;
 	  dv->size=bd->max_blk+1;
 //The following read is a test read.
 	  //if it hangs, the drive is not supported.
@@ -86,7 +86,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		case MBR_PT_REDSEA:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  dv->type=DVT_REDSEA;
+		  dv->fs_type=FSt_REDSEA;
 		  RedSeaDrvInit(dv);
 		  break;
 		case MBR_PT_FAT32a:
@@ -99,17 +99,17 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
 		  if (br.signature==MBR_PT_REDSEA) {
-		    dv->type=DVT_REDSEA;
+		    dv->fs_type=FSt_REDSEA;
 		    RedSeaDrvInit(dv);
 		  } else {
-		    dv->type=DVT_FAT32;
+		    dv->fs_type=FSt_FAT32;
 		    FAT32DrvInit(dv);
 		  }
 		  break;
 		case MBR_PT_NTFS:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  dv->type=DVT_NTFS;
+		  dv->fs_type=FSt_NTFS;
 		  break;
 		case 5:
 		case 15:
@@ -118,7 +118,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		default:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  result++;
-		  dv->type=DVT_UNKNOWN;
+		  dv->fs_type=FSt_UNKNOWN;
 	      }
 	    }
 	  }
@@ -137,7 +137,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
     case BDT_ATAPI:
       dv->dv_signature=DRV_SIGNATURE_VAL;
       result++;
-      dv->type=DVT_ISO9660; //Start with this
+      dv->fs_type=FSt_ISO9660; //Start with this
       dv->size =0;
       break;
   }
@@ -151,13 +151,10 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 Bool DrvEnable(U8 drv_let,Bool val)
 {//Can unmount or remount, but not mount the first time.
   CDrv *dv;
-  Bool result=FALSE;
-  try {
-    dv=Let2Drv(drv_let);
-    result=!LBEqu(&dv->type,DVTf_DISABLE,!val);
-  } catch
-    Fs->catch_except=TRUE;
-  return result;
+  if (dv=Let2Drv(drv_let,FALSE))
+    return !LBEqu(&dv->fs_type,FStf_DISABLE,!val);
+  else
+    return FALSE;
 }
 
 I64 SysGetI64()

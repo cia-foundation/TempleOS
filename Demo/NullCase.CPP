@@ -1,4 +1,4 @@
-//This shows a switch statement with some null cases.
+//This shows a switch stmt with some null cases.
 //If no number for the case,
 //it uses one plus previous case number.
 

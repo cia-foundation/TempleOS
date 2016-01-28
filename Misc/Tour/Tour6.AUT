@@ -1,4 +1,4 @@
-PopUp("ACInit(\"::/*;~*Bible.TXT*\");");
+PopUp("ACInit(\"::/*;~*/Bible.TXT*\");");
 AutoComplete(ON);
 Sleep(3500);
 

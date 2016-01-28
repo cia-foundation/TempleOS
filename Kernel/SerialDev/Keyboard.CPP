@@ -49,7 +49,7 @@ U0 KbdCmdFlush()
     InU8(KBD_PORT);
 }
 
-U0 KbdSetLEDs(I64 sc)
+U0 KbdLEDsSet(I64 sc)
 {
   U8 v=0;
   BEqu(&v,0,Bt(&sc,SCf_SCROLL));
@@ -378,7 +378,7 @@ U0 KbdBuildSC(U8 raw_byte,Bool in_irq,U8 *_last_raw_byte,I64 *_last_sc)
     }
   }
   if (set_LEDs && !in_irq)
-    KbdSetLEDs(sc);
+    KbdLEDsSet(sc);
   *_last_sc=sc;
 }
 
@@ -426,7 +426,7 @@ U0 KbdInit()
     KbdCmdSend(KBD_CTRL,0xAE); //Enable Keyboard
     KbdCmdSend(KBD_PORT,0xF0);
     KbdCmdSend(KBD_PORT,0x02);
-    KbdSetLEDs(kbd.scan_code);
+    KbdLEDsSet(kbd.scan_code);
   } catch {
     KbdCmdFlush;
     Fs->catch_except=TRUE;

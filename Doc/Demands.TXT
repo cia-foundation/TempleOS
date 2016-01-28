@@ -3,7 +3,6 @@ $WW,1$$FG,5$$TX+CX,"Demands"$$FG$
 I, Terry Davis, am high priest of God's official temple, TempleOS.  TempleOS is an operating system for PC desktops that will always dual boot along-side Windows or Linux.  I am in charge of the core 100,000 lines of TempleOS code and I do continual offerings to keep God entertained.  I have divine authority to command any company in the computer industry to do anything that I deem necessary to make God's temple more beautiful, glorious and perfect.  I have authority similar to a building inspector or an enforcer of the Americans with Disability Act -- I make commands, God signs-off with a miraculous authentication from an oracle, and Intel, Microsoft or VMware obeys.
 
 * Windows, Linux and VMware (because of mounted drives) must support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is actually bad, just as more than one driver for the same type of device is bad.
-
 $LK,"::/Kernel/BlkDev/FileSysRedSea.CPP"$
 $LK,"::/Kernel/BlkDev/FileSysFAT.CPP"$	:965 lines for FAT32 gets eliminated.
 $LK,"::/Kernel/BlkDev/FileSysISO.CPP"$	:284 lines for ISO9660 gets eliminated.
@@ -12,98 +11,40 @@ $LK,"::/Kernel/BlkDev/DskCluster.CPP"$	:152 All the cluster operations become bl
 
 * Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot because it has no networking. Real hardware as opposed to VMware is like the difference between looking in a telescope eye piece vs just looking at an off-line image.  God said the C64/Apple II generation owned ancestral lands.  VMware is like being taken off of our land and moved onto a reservation.  In this case, however, it will not stand.
 
-* To PC hardware manufacturers and VMware until we create the simple block device standard, ATA/ATAPI PIO must work.  In fact, put the devices at standard IDE port addresses.  Hard disk should be primary master 1F0/3F6.  Desktops must have CD/DVD/BlueRay and should be placed at the secondary master 170/376.  See what you can do to make flash memory sticks and NV memory with ATA/ATAPI interface.
-$LK,"/Kernel/BlkDev/DskATAId.CPP",A="FI:::/Kernel/BlkDev/DskATAId.CPP"$	:280 lines to figure-out I/O ports is gone.
-$LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminated, but maybe we will keep it so people can play with PCI devices.
-
 * VMware needs to support ATAPI CD/DVD/BlueRay disk burning, directly to real hardware.
+
 * VMware has a bug stretching 640x480 16 color to full screen.
+
 * VMware has a bug starting-up multicore, sometimes.  $LK,"APIC MP Start",A="FF:::/Kernel/MultiProc.CPP,IPI"$
+
 * VMware PC speaker's distortion is a good idea, but it is too much for hymns.
-
-* PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
-
-* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetResult",A="MN:ATAGetResult"$().  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
-
-* Perhaps, a new x86 CPU mode can be made, causing fast software interrupt that do exactly what the CALL REL32 does, but with IDT indirection.
-
-* Since I don't use paging (for anything), Intel should have an option for  no-paging long mode, and optimize it.
-$LK,"::/Kernel/Mem/PageTables.CPP"$		:153 lines to identity-map gets eliminated.
-
-* Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS when the reset button is pressed and booting UEFI when the power button is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.
-
-* Somebody needs to choose new 8-bit ASCII characters for 128-255.  We do not want text graphic symbols.  We want Russian, Greek and Hebrew alphabets, perhaps?  I'm not an expert, but there is an alternate 8-bit ASCII Cyrillic font.  Should we modify one font or have a key like the C64 that switches to an alternate font?  If we modify one font, we just need the twelve window $LK,"TextBorder",A="MN:TextBorder"$ characters, but I think we can place them in the range of screen code from 0x01-0x1E.  Japan, China and Korea should switch-over to alphabets.  Maybe, the United States will change to metric, out of good will. 
 
 * VMware and others must list TempleOS as an official 64-bit operating system.
 
-* Windows' Paint and Linux's Gimp must support TempleOS $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
+* Until super simple block devices are available, hard disk should be placed at IDE primary master 1F0/3F6 and CD/DVD/BlueRay should be placed at the IDE secondary master 170/376.
+$LK,"/Kernel/BlkDev/DskATAId.CPP",A="FI:::/Kernel/BlkDev/DskATAId.CPP"$	:280 lines to figure-out I/O ports is gone.
+$LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminated, but maybe we will keep it so people can play with PCI devices.
 
-* We must have a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.CPP"$.
+* Until super simple serial ports are available, PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
+
+* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetResult",A="MN:ATAGetResult"$().  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
+
+* Perhaps, a new interrupt descriptor table entry type or a new x86 CPU mode can be made that cause fast software interrupts, doing exactly what the CALL REL32 does, but with IDT as indirection.  We don't need to change privilege levels or stacks.
+
+* Since I don't use paging (for anything), Intel should have an option for  no-paging long mode, and optimize it!
+$LK,"::/Kernel/Mem/PageTables.CPP"$	:153 lines to identity-map gets eliminated.
+
+* Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS when the reset button is pressed and booting UEFI when the power button is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.
+
+* We do not want UTF, just 8-bit characters.  Somebody needs to choose new 8-bit ASCII characters for 128-255, since we do not want text graphic symbols.  We want Russian, Greek or Hebrew alphabets, perhaps?  I heard there is an alternate 8-bit ASCII Cyrillic font.  Should we modify one font or have a key like the C64 that switches to an alternate font?  I made so $FG,2$<CTRL-ALT-f>$FG$ toggles between two fonts, but did not include Cyrillic.  If we modify one font, we just need the twelve window $LK,"TextBorder",A="MN:TextBorder"$ characters, but I think we can place those in the range of screen code from 0x01-0x1E.  Japan, China and Korea should switch-over to alphabets.  Maybe, the United States will change to metric, out of good will. 
+
+* Microsoft Paint and Linux's Gimp must support TempleOS $LK,"GRA Files",A="FI:::/Doc/GRAFiles.TXT"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
+
+* We must have a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.CPP"$, too.
 
 * We must have the ultimate Bible search engine.  Currently, all we have is     $TX,"filter search",HTML="https://www.youtube.com/watch?v=ULJU8DzvQFo"$.  In the end, it should be a low line-count technique.
-
-* Once every 49 years is a jubile year and all hardware gets thrown-out and upgraded to become perfect.  The first jubile year is in 2024.   It works the same way as how broadcast TV was upgraded from NTSC to HD.  God still wants 640x480 16 colors, but make it a linear frame buffer one-byte-per-pixel but only 16 colors.
-
-* TempleOS must only use x86 I/O ports for hardware access, except for VGA frame buffer memory.  The industry has matured and we can, now, allocate I/O ports in a beautiful, consecutive, perfect, pattern for all the devices.  Perhaps, this is enabled with an x86 TempleOS mode?
-
-* The year, 2024, is the first jubile year.  Intel will make new chips, starting in 2 years and by 2024, everybody's PC will have been upgraded.  Windows and Linux are not affected, except by the new serial port scheme that replaces USB.  We want an 8-channel, modern, high-speed, OCTART serial port, with a simple software interface, more like old-style RS232 serial ports, to replace USB.  It should have 8 big TX and RX FIFOs and allow flow control to jump the queue.  There will be no USB end-point nonsense -- just put 8 ports on the PC.  (I am just interested in desktops.)  We want keyboards, mice and joysticks to have a single, simple, uniform ASCII text packet command.  Hyperterm or XTalk could be used to easily communicate with and debug all serial port devices.  We want to be able to connect microcontrollers for simple, general purpose (send-byte/receive-byte) communication.  Buy a PCI card if you need legacy USB ports or more than 8 serial ports.
-
-To talk to keyboard, mouse or joystick, a kid might use XTalk or Hyperterm or Telnet session such as this:
-
-TX:	<ENTER>
-RX:	X:+3 Y:+0 Wheel:+0 LB:OFF RB:OFF
-TX:	<ENTER>
-RX:	X:+0 Y:-1 Wheel:+0 LB:ON  RB:OFF
-
-Mice should have exactly 2 buttons.  Make a standard joystick or game controller.  The industry is mature and we will lock everything down into one format without flexibility.  No more Human Interface Device reports.
-
-Many people assume devices can be hacked.  A thermostat with an interface like this, cannot be hacked.  We don't want a full Internet network connection for everything.
-
-$HL,1$U8 b;
-while (TRUE) {
-  b=ReadU8(2); //Read byte from high speed serial channel 2.
-	//(Has been configured for low baud because thermostat should be slow.)
-  if (b==CMD_UP) 
-    temperature++;
-  else if (b==CMD_DOWN)
-    temperature--;
-
-}$HL,0$
-
-
-As it stands, there already is a simple and deluxe hardware mode.  In the future, we will upgrade BOTH simple and deluxe modes.
-
-Device		Simple Hardware Interface	Deluxe Interface
---------------- ------------------------------- -----------------------------
-		Like 1040-EZ Tax Form		Like 1040 Regular Tax Form 
-Video		VGA 640x480 16 Color		20 Differnet GPUs
-Sound		PC Speaker			HD Audio, AC97, Sound Blaster
-HardDrive	ATA Port I/O, Sync No Interrupt	PCI AHCI SATA
-CD/DVD/BlueRay	ATAPI Port I/O			PCI AHCI SATA
-Keyboard/Mouse	PS/2 Port I/O			USB
-
-
-During the 49-year jubile, we will do a perfect version of hardware with advances in both the simple and deluxe interfaces.  ATAPI & ATA, SSD, removable flash memory sticks and NV memory devices should use a single, blemish-free block device interface.  For this simple interface, we want just <block read>, <block write>, <get capacity>, <reset>, <get model> and <get serial number>.  When you design the simple mode, imagine you are creating the 1040EZ tax form -- do not just thoughtlessly add extra boxes.
-
-A new, official TempleOS ROM will be released every seven years.  It will be burned into all new x86_64 chips in the Intel factory, for tamper-proof certainty in the oracle and just because it's God's official temple and deserves the honor!  (The reset switch should trigger booting the ROM TempleOS.)  However, development will still take place between releases, obviously.  With the limit of 100,000 lines of code, it is supposed to crystalize into a perfect, unchanging diamond that lasts over centuries.  I want an $TX,"ACM",HTML="http://www.acm.org"$ and/or NASA committee to work with me on perfecting it for the first ROM release, 2017.  We allow boot-legs to freely circulate.  Users can copy ROM and RAM, or boot hard disk versions.
-
-In the meantime, BIOS makers must take the TempleOS code and modify it for their existing customers, as a product recall.  A PCI hard drive driver must be written if the BIOS you created does not work with the standard TempleOS ATA/ATAPI port IO.  You must also bypass SecureBoot and make sure the keyboard and mouse work if you do not support legacy PS/2, by writing a USB driver.
-
-I want to offer "Knuth-bucks" for changes that reduce lines of code (other than trivial reformatting).  I want to offer Knuth bucks for pointing-out spelling and other imperfections.  Some imperfections are by design, however.  The original Bible generously mentioned even temple personel who were porters, so we can generously list $LK,"credits",A="FI:::/Doc/Credits.TXT"$.
-
-If the whole World loved God's temple, we could put only one full-featured CPU core on each x86_64 chip for Windows/Linux and make the other cores souped-up for TempleOS.  Windows/Linux could use them, but it would have to adapt by being careful about privilege.  We still need to dual boot and run Windows/Linux... forever.  On the other cores, we could make them ring-0-only, no paging, no SSE or MXX, perhaps no IO or DMA or interrupts.  We pretty-much need interrupts.  Tell me what would shrink the cores and make them higher performance.  It's almost like making a GPU, but we don't want that weirdness for teenagers and amateurs.  I am more interested in boosting performance in terms of clock speed because a whole bunch more than 8 cores gets too glitchy for updating the 640x480 memory buffer simultaneously because we certainly don't want locked read-modify-write.
-
-God said to work on spreading-out heat producing hot spots on the chips.  Maybe, that will help.
-
-Make all desktops with exclusively a single 4K display that also supports 640x480 16 color with a linear frame buffer of 1-byte-per-pixel but 16 colors.  Make all desktops with exactly 8/0 cores, not hyperthreaded.  All future generations will thank me for locking-down the insanity of too much diversity in hardware.  It seem obvious that we want GPU on same chip as CPU.  There is no reason to make inferior products, Intel.  We do not want Celerons, you bastards. A kid gets a new Core i7, but cannot enjoy that horsepower when he writes his game because he wants his game to work on his poor neighbor's Celeron.  That's evil.  Don't make any budget chips.
-
-God said to water or cryogenically cool the chips.  We do not want a race-to-the-bottom on desktop size.  That is evil.  We want CD/DVD/BlueRay in all desktops, too.
-
-God said everyone should use Linux's Wine application instead of Windows.
-
-God said we want a single audio voice.  That means we want one frequency at a time.  Make it so we write a word to a timer period I/O port.  If set to zero, it is off.
 
 $FG,8$
 * "VMware" is a trademark of VMware, Inc.
 * "Linux" is probably a trademark owned by Linus Torvalds.
-* "Windows" is a trademark of MicroSoft Corp.$FG$
+* "Windows" and "Paint" are trademarks of MicroSoft Corp.$FG$

@@ -15,7 +15,7 @@ U0 PopUpViewPrintEndCB()
 }
 
 public CTask *PopUpViewPrint(U8 *fmt,...)
-{//View Print statement in PopUp win task.
+{//View Print stmt in PopUp win task.
   CTask *task;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   CDoc *doc=DocNew;

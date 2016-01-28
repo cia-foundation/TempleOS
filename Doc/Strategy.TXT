@@ -22,7 +22,7 @@ A three button mouse is like a leg you cannot put weight on.  TempleOS just does
 
 * Everything runs in kernel, $FG,2$ring 0$FG$, mode.
 
-* $FG,2$One memory map$FG$ for all tasks on all cores with virtual addresses set equal to physical, just as though paging is not used.
+* $FG,2$One memory map$FG$ for all tasks on all cores with virtual addresses set equ to physical, just as though paging is not used.
 
 * One platform -- $FG,4$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ PC's, no 32-bit support.
 

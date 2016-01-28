@@ -40,7 +40,7 @@ Bool BlkDevInit(CBlkDev *bd)
 	  bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);
 	  bd->max_blk=MSize(bd->RAM_dsk)>>BLK_SIZE_BITS-1;
 	}
-	dv->type=DVT_REDSEA;
+	dv->fs_type=FSt_REDSEA;
 	dv->size=bd->max_blk+1;
 	if (RedSeaDrvValidate(bd->first_drv_let))
 	  RedSeaDrvInit(dv);
@@ -116,17 +116,23 @@ CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
   return NULL; //never gets here
 }
 
-U0 BlkDevChk(CBlkDev *bd)
+CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE)
 {//Check for valid BlkDev. Throw exception.
   if (!bd || bd->bd_signature!=BD_SIGNATURE_VAL ||
-	!(BDT_NULL<bd->type<BDT_NUM_TYPES))
-    throw('BlkDev');
+	!(BDT_NULL<bd->type<BDT_NUM_TYPES)) {
+    if (except)
+      throw('BlkDev');
+    else
+      return NULL;
+  } else
+    return bd;
 }
 
-CBlkDev *Let2BlkDev(U8 drv_let=0)
+CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE)
 {//Drv letter to BlkDev ptr.
-  CDrv *dv=Let2Drv(drv_let);
-  CBlkDev *bd=dv->bd;
-  BlkDevChk(bd);
-  return bd;
+  CDrv *dv;
+  if (dv=Let2Drv(drv_let,except))
+    return BlkDevChk(dv->bd,except);
+  else
+    return NULL;
 }

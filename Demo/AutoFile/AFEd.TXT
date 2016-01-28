@@ -66,12 +66,12 @@
 #define IC_ADD_CONST		0x37
 #define IC_SUB_CONST		0x38
 
-#define IC_EQUAL_EQUAL 		0x39
-#define IC_NOT_EQUAL		0x3A
+#define IC_EQU_EQU 		0x39
+#define IC_NOT_EQU		0x3A
 #define IC_LESS			0x3B
 #define IC_GREATER		0x3C
-#define IC_LESS_EQUAL		0x3D
-#define IC_GREATER_EQUAL	0x3E
+#define IC_LESS_EQU		0x3D
+#define IC_GREATER_EQU		0x3E
 #define IC_PUSH_CMP		0x3F
 
 #define IC_AND_AND		0x40
@@ -86,16 +86,16 @@
 #define IC_ASSIGN_PP		0x46
 #define IC_ASSIGN_MM		0x47
 
-#define IC_SHL_EQUAL		0x48
-#define IC_SHR_EQUAL		0x49
-#define IC_MUL_EQUAL		0x4A
-#define IC_DIV_EQUAL		0x4B
-#define IC_MOD_EQUAL		0x4C
-#define IC_AND_EQUAL		0x4D
-#define IC_OR_EQUAL		0x4E
-#define IC_XOR_EQUAL		0x4F
-#define IC_ADD_EQUAL		0x50
-#define IC_SUB_EQUAL		0x51
+#define IC_SHL_EQU		0x48
+#define IC_SHR_EQU		0x49
+#define IC_MUL_EQU		0x4A
+#define IC_DIV_EQU		0x4B
+#define IC_MOD_EQU		0x4C
+#define IC_AND_EQU		0x4D
+#define IC_OR_EQU		0x4E
+#define IC_XOR_EQU		0x4F
+#define IC_ADD_EQU		0x50
+#define IC_SUB_EQU		0x51
 
 #define IC_JMP			0x52
 #define IC_SWITCH		0x53
@@ -131,7 +131,7 @@
 #define IC_WBINVD		0x6F
 #define IC_INVD			0x70
 
-#define IC_IN_U8	 		0x71
+#define IC_IN_U8 		0x71
 #define IC_IN_U16		0x72
 #define IC_IN_U32		0x73
 #define IC_OUT_U8		0x74
@@ -178,16 +178,16 @@
 #define IC_BR_ZERO		0x93
 #define IC_BR_NOT_ZERO		0x94
 
-#define IC_BR_NOT_EQUAL		0x95
-#define IC_BR_EQUAL_EQUAL	0x96
-#define IC_BR_GREATER_EQUAL	0x97
-#define IC_BR_LESS_EQUAL	0x98
+#define IC_BR_NOT_EQU		0x95
+#define IC_BR_EQU_EQU		0x96
+#define IC_BR_GREATER_EQU	0x97
+#define IC_BR_LESS_EQU		0x98
 #define IC_BR_GREATER		0x99
 #define IC_BR_LESS		0x9A
-#define IC_BR_NOT_EQUAL2	0x9B
-#define IC_BR_EQUAL_EQUAL2	0x9C
-#define IC_BR_GREATER_EQUAL2	0x9D
-#define IC_BR_LESS_EQUAL2	0x9E
+#define IC_BR_NOT_EQU2		0x9B
+#define IC_BR_EQU_EQU2		0x9C
+#define IC_BR_GREATER_EQU2	0x9D
+#define IC_BR_LESS_EQU2		0x9E
 #define IC_BR_GREATER2		0x9F
 #define IC_BR_LESS2		0xA0
 #define IC_BR_AND_ZERO		0xA1

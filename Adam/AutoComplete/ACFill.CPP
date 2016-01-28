@@ -204,7 +204,7 @@ U0 ACDDef(I64 n,CTask *parent=NULL)
     ACDPopUpDef(acd.fillins[n],-1,parent);
 }
 
-U0 ACFindMisspelled(CDoc *doc)
+U0 ACMisspelledFind(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
   CDocEntry *doc_e=doc->cur_entry;

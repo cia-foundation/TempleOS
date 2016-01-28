@@ -13,7 +13,8 @@
 public U0 PCIDevFileGen()
 {
   Bool first=TRUE,del=FALSE,del2=FALSE,cont=FALSE;
-  CDoc *doc=DocRead(PCI_DEV_FILE,DOCF_PLAIN_TEXT|DOCF_DBL_DOLLARS);
+  CDoc *doc=DocRead(PCI_DEV_FILE,
+	DOCF_PLAIN_TEXT|DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
   CDocEntry *doc_e=doc->root.next,*doc_e2;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
@@ -121,7 +122,7 @@ U0 PCILookUpDevs()
   CDoc *doc;
   if (dev.pci_root.next!=&dev.pci_root)
     return;
-  doc=DocRead(PCI_DEV_FILE,DOCF_PLAIN_TEXT);
+  doc=DocRead(PCI_DEV_FILE,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
   for (b=0;b<sys_pci_busses;b++)
     for (d=0;d<32;d++)
       for (f=0;f<8;f++) {

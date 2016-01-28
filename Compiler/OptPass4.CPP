@@ -396,16 +396,16 @@ p4_sib:
 //this val was stashed during pass012 for pointer arithmetic
 	  tempi->ic_class2=tempi->t.class2; //See $LK,"ic_class2",A="FF:::/Compiler/BackB.CPP,ic_class2"$
 	case IC_ASSIGN:
-	case IC_SHL_EQUAL:
-	case IC_SHR_EQUAL:
-	case IC_MUL_EQUAL:
-	case IC_DIV_EQUAL:
-	case IC_MOD_EQUAL:
-	case IC_AND_EQUAL:
-	case IC_OR_EQUAL:
-	case IC_XOR_EQUAL:
-	case IC_ADD_EQUAL:
-	case IC_SUB_EQUAL:
+	case IC_SHL_EQU:
+	case IC_SHR_EQU:
+	case IC_MUL_EQU:
+	case IC_DIV_EQU:
+	case IC_MOD_EQU:
+	case IC_AND_EQU:
+	case IC_OR_EQU:
+	case IC_XOR_EQU:
+	case IC_ADD_EQU:
+	case IC_SUB_EQU:
 	  if (tempi1->ic_code==IC_LEA) {
 	    if (TY_DISP<=tempi1->a1.type&TY_MASK<=TY_SIB) {
 	      if (tempi1->a1.type&TY_MASK==TY_DISP && tempi1->a1.reg==REG_RBP) {
@@ -550,8 +550,8 @@ p4_sib:
 	    }
 	  }
 	  break;
-	case IC_BR_EQUAL_EQUAL ...IC_BR_LESS_EQUAL:
-	case IC_BR_EQUAL_EQUAL2...IC_BR_LESS_EQUAL2:
+	case IC_BR_EQU_EQU ...IC_BR_LESS_EQU:
+	case IC_BR_EQU_EQU2...IC_BR_LESS_EQU2:
 	case IC_BR_CARRY:
 	case IC_BR_NOT_CARRY:
 	case IC_BR_ZERO:
@@ -642,7 +642,7 @@ p4_sib:
 	case IC_OR:
 	case IC_XOR:
 	case IC_SUB:
-	case IC_EQUAL_EQUAL...IC_LESS_EQUAL:
+	case IC_EQU_EQU...IC_LESS_EQU:
 	case IC_AND_AND:
 	case IC_OR_OR:
 	case IC_XOR_XOR:

@@ -106,11 +106,11 @@ $ID,2$
 $FG,2$if (13<=age<20)
   "Teen-ager";
 $FG$$ID,-2$
-* $FG,2$switch$FG$ statements always use a jump table.  Don't use them with cases with really big, sparse ranges.
+* $FG,2$switch$FG$ stmts always use a jump table.  Don't use them with cases with really big, sparse ranges.
 
-* Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ statements.
+* Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ stmts.
 
-* A no case number causes next higher integer case in $FG,2$switch$FG$ statements.  See $LK,"::/Demo/NullCase.CPP"$.
+* A no case number causes next higher integer case in $FG,2$switch$FG$ stmts.  See $LK,"::/Demo/NullCase.CPP"$.
 
 $ID,2$$FG,2$I64 i;
 for (i=0;i<20;i++) 
@@ -123,7 +123,7 @@ for (i=0;i<20;i++)
     case: "Eleven\n";	break; //One plus previous case.
   }$FG$$ID,-2$
 
-* $FG,2$nobound_switch$FG$ can be used if you know a switch statement will not exceed the lowest or highest case values.  It's a little faster because it doesn't check.
+* $FG,2$nobound_switch$FG$ can be used if you know a switch stmt will not exceed the lowest or highest case values.  It's a little faster because it doesn't check.
 
 * $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$ allow a new type of nested-switch control flow.  (Don't goto, throw exception or return out of $FG,2$sub_switch_start$FG$ front porch area.)  See $LK,"::/Demo/SubSwitch.CPP"$.
 
@@ -145,7 +145,7 @@ for (i=0;i<10;i++)
 $BG$OutPut:
 >$FG,2$Zero [One] Two [Three] Four [Five]$FG$
 $ID,-2$
-* A $FG,2$nounusedwarn$FG$ statement will suppress an unused var warning.
+* A $FG,2$nounusedwarn$FG$ stmt will suppress an unused var warning.
 
 * You can have multiple member vars of a class named "$FG,2$pad$FG$" or "$FG,2$reserved$FG$", and it won't issue warnings. 
 
@@ -170,7 +170,7 @@ $ID,2$$FG,2$U0 Main()
 $FG$$ID,-2$
 * $FG,2$interrupt$FG$, $FG,2$haserrcode$FG$, $FG,2$public$FG$, $FG,2$argpop$FG$ or $FG,2$noargpop$FG$ are function flags. See $LK,"::/Demo/Lectures/PageTableEntries2.CPP"$.
 
-* A single quote can encompass multiple characters.  $FG,2$'ABC'$FG$ is equal to $FG,2$0x434241$FG$.  $LK,"PutChars",A="MN:PutChars"$() takes multiple characters.
+* A single quote can encompass multiple characters.  $FG,2$'ABC'$FG$ is equ to $FG,2$0x434241$FG$.  $LK,"PutChars",A="MN:PutChars"$() takes multiple characters.
 
 $ID,2$$FG,2$asm {
 HELLO_WORLD::
@@ -207,7 +207,7 @@ $FG$$ID,-2$
 
 * You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$,ON) to find unnecessary parentheses in code.
 
-* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find dup local var type statements.
+* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find dup local var type stmts.
 
 * With the $FG,2$#exe{}$FG$ feature in your src code, you can place programs that insert text into the stream of code being compiled.  See $LK,"#exe {}",A="FF:::/Kernel/KEnd.CPP,#exe {"$ for an example where the date/time and compile-time prompting for cfguration data is placed into a program.  $LK,"StreamPrint",A="MN:StreamPrint"$() places text into a src program stream following the conclusion of the $FG,2$#exe{}$FG$ blk.
 
@@ -231,7 +231,7 @@ $FG$$ID,-2$
 
 * A function is available similar to $FG,2$sizeof$FG$ which provides the offset of a member of a class.  It's called $FG,2$offset$FG$.  You place the class name and member inside as in $FG,2$offset(classname.membername)$FG$.  It has nothing to do with 16-bit code.  Both $FG,2$sizeof$FG$ and $FG,2$offset$FG$ only accept one level of member vars.  That is, you can't do $FG,2$sizeof(classname.membername.submembername)$FG$.$FG$
 
-* There is no $FG,2$continue$FG$ statement.  Use $FG,2$goto$FG$.
+* There is no $FG,2$continue$FG$ stmt.  Use $FG,2$goto$FG$.
 
 * $FG,2$lock{}$FG$ can be used to apply asm $FG,2$LOCK$FG$ prefixes to code for safe multicore read-modify-write accesses.  The code bracked with have $FG,2$LOCK$FG$ asm prefix's applied to relevant instructions within.  It's a little shoddy.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
 

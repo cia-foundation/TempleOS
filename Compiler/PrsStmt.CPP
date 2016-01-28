@@ -149,7 +149,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   saved_leave_label=cc->lb_leave;
   cc->lb_leave=COCMiscNew(cc,CMT_LABEL);
   cc->flags&=~CCF_HAS_RETURN;
-  PrsStatement(cc,,,0);
+  PrsStmt(cc,,,0);
 
   if (cc->max_line<cc->min_line)
     cc->max_line=cc->min_line;
@@ -467,14 +467,14 @@ U0 PrsIf(CCmpCtrl *cc,I64 try_cnt,CCodeMisc *lb_break)
   Lex(cc);
   lb=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_BR_ZERO,lb,0);
-  PrsStatement(cc,try_cnt,lb_break);
+  PrsStmt(cc,try_cnt,lb_break);
   k=PrsKeyWord(cc);
   if (k==KW_ELSE) {
     Lex(cc);
     lb1=COCMiscNew(cc,CMT_LABEL);
     ICAdd(cc,IC_JMP,lb1,0);
     ICAdd(cc,IC_LABEL,lb,0);
-    PrsStatement(cc,try_cnt,lb_break);
+    PrsStmt(cc,try_cnt,lb_break);
     ICAdd(cc,IC_LABEL,lb1,0);
   } else
     ICAdd(cc,IC_LABEL,lb,0);
@@ -495,7 +495,7 @@ U0 PrsWhile(CCmpCtrl *cc,I64 try_cnt)
   Lex(cc);
   lb_done=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_BR_ZERO,lb_done,0);
-  PrsStatement(cc,try_cnt,lb_done);
+  PrsStmt(cc,try_cnt,lb_done);
   ICAdd(cc,IC_JMP,lb,0);
   ICAdd(cc,IC_LABEL,lb_done,0);
 }
@@ -506,7 +506,7 @@ U0 PrsDoWhile(CCmpCtrl *cc,I64 try_cnt)
   lb=COCMiscNew(cc,CMT_LABEL);
   lb_done=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_LABEL,lb,0);
-  PrsStatement(cc,try_cnt,lb_done);
+  PrsStmt(cc,try_cnt,lb_done);
   if (PrsKeyWord(cc)!=KW_WHILE)
     LexExcept(cc,"missing 'while' at");
   if (Lex(cc)!='(')
@@ -531,7 +531,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   if (cc->token!='(')
     LexExcept(cc,"expecting '(' at ");
   Lex(cc);
-  PrsStatement(cc,try_cnt);
+  PrsStmt(cc,try_cnt);
 
   lb=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_LABEL,lb,0);
@@ -546,7 +546,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   COCPush(cc);
   COCInit(cc);
   if (cc->token!=')')
-    PrsStatement(cc,try_cnt,NULL,0);
+    PrsStmt(cc,try_cnt,NULL,0);
   COCPush(cc);
   tempcbh=COCPopNoFree(cc);
   COCPop(cc);
@@ -554,7 +554,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
     LexExcept(cc,"missing ')' at ");
   Lex(cc);
 
-  PrsStatement(cc,try_cnt,lb_done);
+  PrsStmt(cc,try_cnt,lb_done);
   COCAppend(cc,tempcbh);
   ICAdd(cc,IC_JMP,lb,0);
   ICAdd(cc,IC_LABEL,lb_done,0);
@@ -646,7 +646,7 @@ sw_cont:
 		}
 		goto sw_cont;
 	      default:
-		PrsStatement(cc,try_cnt,root.last->last->lb_break);
+		PrsStmt(cc,try_cnt);
 	    }
 	  }
 	  break;
@@ -728,7 +728,7 @@ sw_cont:
 	  dft_found=TRUE;
 	  break;
 	default:
-	  PrsStatement(cc,try_cnt,root.last->lb_break);
+	  PrsStmt(cc,try_cnt,root.last->lb_break);
       }
     }
 sw_sub_end:
@@ -863,7 +863,7 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   ICAdd(cc,IC_CALL_END,0,tempc);
   ICAdd(cc,IC_END_EXP,0,0,ICF_NO_DEPEND_RESULT);
 
-  PrsStatement(cc,try_cnt+1);
+  PrsStmt(cc,try_cnt+1);
 
   ICAdd(cc,IC_LABEL,lb_untry,0);
   ICAdd(cc,IC_CALL_START,0,0);
@@ -885,12 +885,12 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
 
   Lex(cc);
   ICAdd(cc,IC_LABEL,lb_catch,0);
-  PrsStatement(cc,try_cnt+1);
+  PrsStmt(cc,try_cnt+1);
   ICAdd(cc,IC_RET,0,tempc);
   ICAdd(cc,IC_LABEL,lb_done,0);
 }
 
-Bool PrsStatement(CCmpCtrl *cc,I64 try_cnt=0,
+Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
   CCodeMisc *lb_break=NULL,I64 cmp_flags=CMPF_PRS_SEMICOLON)
 {
   I64 i,fsp_flags=0;
@@ -912,7 +912,7 @@ Bool PrsStatement(CCmpCtrl *cc,I64 try_cnt=0,
       if (cc->token=='{') {
 	Lex(cc);
 	while (cc->token!='}' && cc->token!=TK_EOF)
-	  PrsStatement(cc,try_cnt,lb_break);
+	  PrsStmt(cc,try_cnt,lb_break);
 	if (cc->lex_include_stk==cc->fun_lex_file)
 	  cc->max_line=cc->lex_include_stk->line_num;
 	if (Lex(cc)!=',') goto sm_done;
@@ -953,7 +953,7 @@ Bool PrsStatement(CCmpCtrl *cc,I64 try_cnt=0,
 		    Lex(cc);
 		    case KW_LOCK:
 		      cc->lock_cnt++;
-		      PrsStatement(cc,try_cnt);
+		      PrsStmt(cc,try_cnt);
 		      cc->lock_cnt--;
 		      break;
 		    case KW_TRY:

@@ -385,7 +385,7 @@ U0 MPDrawIt(CMeshFrame *e)
   CMeshEdTri *tempt=e->tri_root.next;
   I64 i,*old_r=dc->r;
 
-  //$LK,"DCAlias",A="MN:DCAlias"$() alllocs a new identity rotation matrix.
+  //$LK,"DCAlias",A="MN:DCAlias"$() allocs a new identity rotation matrix.
   //We want e->dc's rotation matrix.
   dc->r=e->dc->r;
 

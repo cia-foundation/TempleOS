@@ -45,6 +45,7 @@ $FG,2$Dsk$FG$	Disk
 $FG,2$Dst$FG$	Destination
 $FG,2$Ed$FG$	Edit, Editor
 $FG,2$Elem$FG$	Element
+$FG,2$Equ$FG$	Equal
 $FG,2$Evt$FG$	Event
 $FG,2$Exe$FG$	Execute
 $FG,2$Ext$FG$	Extern, Extended
@@ -100,7 +101,7 @@ $FG,2$Prod$FG$	Product, Production
 $FG,2$Prof$FG$	Profile, Profiler
 $FG,2$Prs$FG$	Parse, Parser
 $FG,2$Prt$FG$	Partition
-$FG,2$PSect$FG$	Program Section
+$FG,2$FunSeg$FG$	Program Section
 $FG,2$Pt$FG$	Point
 $FG,2$Ptr$FG$	Pointer
 $FG,2$Que$FG$	Queue
@@ -124,6 +125,7 @@ $FG,2$Srv$FG$	Servant
 $FG,2$Stat$FG$	Status, Statistic
 $FG,2$Std$FG$	Standard
 $FG,2$Stk$FG$	Stack
+$FG,2$Stmt$FG$	Statement
 $FG,2$Str$FG$	String
 $FG,2$Sym$FG$	Symbol
 $FG,2$Sync$FG$	Synchronization
@@ -142,7 +144,7 @@ $FG,2$Wiz$FG$	Wizard
 $ID,-2$$TR,"Task/Process/Thread"$
 $ID,2$There is no distinction between $FG,2$task$FG$, $FG,2$process$FG$ or $FG,2$thread$FG$.  The $FG,2$Fs$FG$ segment reg is kept pointing to the current task's $LK,"CTask",A="MN:CTask"$.  There is only one window per task, and only $FG,2$core0$FG$ tasks can have windows.  Each task has a code and data heap so memory is returned when it dies.  Each task has a $LK,"hash",A="HI:Hash"$ symbol table.
 $ID,-2$$TR,"Adam Task"$
-$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/StartOS.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ statements can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
+$ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  This task is created at start-up and appears in the small window at the top beneath the user windows.  On it's heap are all memory objects which you don't want destroyed by a task's death.  When created, Adam runs the file $LK,"::/StartOS.CPP"$.  When start-up is finished, the adam task enters a server mode where it accepts requests from other tasks.  The $LK,"Adam",A="MN:Adam"$("") routine will make Adam compile and run text src code.  $FG,2$#include$FG$ stmts can be sent to $LK,"Adam",A="MN:Adam"$(""), creating system-wide code and data which don't disappear when any particular task ends.
 $ID,-2$$TR,"Seth Task"$
 $ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has an executive task called $FG,2$Seth$FG$ that is immortal.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
@@ -156,7 +158,7 @@ $ID,2$$FG,2$Ahead-of-Time$FG$ compiling is conventional compilation mode.  Do no
 
 In $FG,2$AOT$FG$ mode, $FG,2$.PRJ$FG$ files are compiled to $FG,2$.BIN$FG$ files, skipping $FG,2$.OBJ$FG$ files.  After compiling, $FG,2$.BIN$FG$ files are $LK,"Load",A="MN:Load"$()ed.
 
-There is no $FG,2$main()$FG$ routine.  Instead, statements outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
+There is no $FG,2$main()$FG$ routine.  Instead, stmts outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
 $ID,-2$$TR,"JIT Compile Mode"$
 $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$

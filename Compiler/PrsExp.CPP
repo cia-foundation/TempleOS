@@ -37,8 +37,8 @@ CIntermediateCode *PrsAddOp(CCmpCtrl *cc,I64 stk_op,CHashClass *tempc)
     case IC_OR_OR:
       ICAdd(cc,IC_NOP1,0,cmp.internal_types[RT_I64]);
       break;
-    case IC_ADD_EQUAL:
-    case IC_SUB_EQUAL:
+    case IC_ADD_EQU:
+    case IC_SUB_EQU:
       if (tempc->ptr_stars_cnt) {
 	ICAdd(cc,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
 	ICAdd(cc,IC_MUL,0,cmp.internal_types[RT_I64]);
@@ -675,7 +675,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
     sub_switch_start:
       case TK_INTEGER:
       case TK_CHAR_CONST:
-      case TK_INS_BINARY_SIZE:
+      case TK_INS_BIN_SIZE:
 	if (cc->cur_i64<0)
 	  ICAdd(cc,IC_IMM_I64,cc->cur_i64,cmp.internal_types[RT_U64]);
 	else
@@ -692,7 +692,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	cm->str=LexExtStr(cc,&cm->st_len);
 	cc->flags|=CCF_HAS_MISC_DATA;
 	break;
-      case TK_INS_BINARY:
+      case TK_INS_BIN:
 	cm=COCMiscNew(cc,CMT_STR_CONST);
 	ICAdd(cc,IC_STR_CONST,cm,cmp.internal_types[RT_U8]+1);
 	cm->str=cc->cur_str;

@@ -35,7 +35,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can permanently disable $FG,2$AutoComplete$FG$ commenting-out $LK,"ACInit",A="FF:/Home/HomeSys.CPP,ACInit"$() in $LK,"::/Home/HomeSys.CPP",A="FF:/Home/HomeSys.CPP,ACInit"$.
 
-* Boolean expressions $BK,1$not$BK,0$ in $FG,2$if$FG$ statements don't have short circuit logic and are compiled inefficiently.
+* Boolean expressions $BK,1$not$BK,0$ in $FG,2$if$FG$ stmts don't have short circuit logic and are compiled inefficiently.
 
 * You can use $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ in your programs for whatever you like.  They're just global vars that are shown on the wallpaper.  The original intent was to indicate how far along operations were.  There's no coordination, so different apps might interfere.  I use them most for debugging--just values easily viewed.  See $LK,"::/Demo/Progress.CPP"$.
 
@@ -53,7 +53,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$,ON) to find unnecessary parentheses in code.
 
-* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find unnecessary local var type statements.
+* You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find unnecessary local var type stmts.
 
 * $LK,"Option",A="MN:Option"$($LK,"OPTf_ECHO",A="MN:OPTf_ECHO"$,ON) can be placed in $LK,"StartOS.CPP",A="FI:::/StartOS.CPP"$ to echo start-up scripts.
 
@@ -93,8 +93,6 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can reactivate $FG,2$AutoComplete$FG$ after closing it by pressing $FG,2$<CTRL-Fun Key>$FG$ or $FG,2$<ALT-w>$FG$ if you have it defined.
 
-* You can set a color for different drives with $LK,"DrvTextAttrSet",A="MN:DrvTextAttrSet"$().  Place calls to this in $LK,"::/Home/HomeLocalize.CPP"$.
-
 * $FG,2$<CTRL-SHIFT-T>$FG$ to toggle to/from plain text just the $LK,"CDoc",A="MN:CDoc"$ cmd under the cursor.  See $LK,"::/Demo/DolDoc/TextDemo.CPP"$.
  
 * If you toggle to plain text when you are working with graphics in a document, you can add duplicate entries for sprites by entering a $FG,2$$$SP...$$$FG$ cmd with the same num.
@@ -127,7 +125,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * $LK,"cnts.time_stamp_freq",A="MN:CCntsGlbls"$ is continuously calibrated.  Be careful because expressions might decrease.  Take a snap-shot, like this: $FG,2$timeout=$LK,"GetTSC",A="MN:GetTSC"$+$LK,"cnts.time_stamp_freq",A="MN:CCntsGlbls"$ x seconds;$FG$ and compare against $LK,"GetTSC",A="MN:GetTSC"$().  I recommend just using $LK,"tS",A="MN:tS"$ or $LK,"cnts.jiffies",A="MN:CCntsGlbls"$.
 
-* Use $LK,"HeapLog",A="MN:HeapLog"$() and $LK,"HeapLogRep",A="MN:HeapLogRep"$() to find leaks.  Don't be confused by $LK,"CDoc",A="MN:CDoc"$ allocations.  Those are generated when text is written to the cmd line buffer.
+* Use $LK,"HeapLog",A="MN:HeapLog"$(), $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() and $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$() to find leaks.  Don't be confused by $LK,"CDoc",A="MN:CDoc"$ allocations.  Those are generated when text is written to the cmd line buffer.
 
 * For advanced heap debugging, play with $LK,"_CFG_HEAP_DBG",A="MN:_CFG_HEAP_DBG"$.  You're on your own.
 

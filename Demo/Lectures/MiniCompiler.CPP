@@ -2,7 +2,7 @@
 $TR-C,"Main Compiler"$
 $ID,2$The mini compiler is like the main compiler, except the main compiler's lexical analyser removes comments and does preprocessing.  $LK,"Lex",A="MN:Lex"$(),$LK,"Echo",A="MN:Echo"$(ON).
 
-The main compiler generates $LK,"Intermediate Code",A="FF:::/Compiler/CompilerA.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression",A="MN:PrsExpression"$(), $LK,"PrsStatement",A="MN:PrsStatement"$().
+The main compiler generates $LK,"Intermediate Code",A="FF:::/Compiler/CompilerA.HPP,IC_END"$ at the parser stage.  See $LK,"PrsExpression",A="MN:PrsExpression"$(), $LK,"PrsStmt",A="MN:PrsStmt"$().
 
 The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="MN:intermediate_code_table"$, $LK,"Combining Consts",A="FF:::/Compiler/OptPass012.CPP,case IC_MUL"$, $LK,"Choosing Reg Vars",A="FF:::/Compiler/OptPass3.CPP,cmp.num_reg_vars"$.  Use $LK,"PassTrace",A="MN:PassTrace"$() to see the optimization stages.
 

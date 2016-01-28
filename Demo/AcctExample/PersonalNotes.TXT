@@ -1,428 +1,440 @@
-$WW,1$* Redo videos, make more professional.
 
-* Nontimer $LK,"Rand",A="MN:Rand"$() is really bad!
-
+$WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
-* Add AVL binary tree support or red/black whatever that is.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
+* Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
 
-* 1/12/16 $LK,"ATARepEntry",A="MN:ATARepEntry"$ shows corrupted buttons.
+* In <CTRL-r> menu, transform individual elements.
 
-* 8/20/2015 TAD8, Tour TestSuite was missing #include "TestSuite".
-* 1/03/2016 TAD8 Repeated
+* $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.CPP"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
 
-* Bug introduced around 11/1/15.  Changed $LK,"::/Kernel/Sched.CPP"$ and now $LK,"WinToTop",A="MN:WinToTop"$ is called on Adam task at start-up, sometimes.
-
-* 1/12/16 make RAM drive 2288 blks, copy /Home.
-
-* Clean-up $LK,"FileNameAbs",A="MN:FileNameAbs"$().
-
-* $LK,"Mount",A="MN:Mount"$() crashes on bad drive.
-
-* $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens
-
-* 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
-* 01/10/16 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Wb2/CounterRenaissance.TXT"$ "Rennaisance"
-* 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
-
-* Get rid of having two terms and pick one, "Disk" and "BlkDev"?  I don't think so.  (Probably not.)
+* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: $LK,"R",A="MN:R"$("Mesh",...);?
+* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: Add change triangle color.
+* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: Add make-prism.
 
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
+* Backward <SHIFT-F3> is broken?
 
-* $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.
+* Cannot entering a '$$' in $$TX command's tag.
 
-* Should we switch to having just C and D drives (and RAM and CD/DVD)?
+* $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
 
-* Entering a '$$' in $$TX command's tag
+* Editor overstrike mode at cmd line with menu macro?  Probably, many other overstrike issues.
 
-* Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
-  CArrayDim dim;
-  CHashFun *fun_ptr;
-
-* Might want to warn switch() dup case numbers
-
-* Add cyrillic 8-bit Russian font on aux_font? <CTRL-ALT-f> will toggle fonts.
-  Move 12 border chars to screen font codes 0-26?  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().
-  Add aux_font option with $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ configured for any aux_font?
-
-* Should we rename chars_bmp_ to set_
-
-* Use standard terminology from "the literature".
-
-* Clean-up ASCII #127 delete char?  (No. Maybe, we want a new usage for 127 in future centuries.)
-
-* $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (I forgot what this is talking about.)
-
-* 8/2/2015 VMware start-up. Probably multicore.
-* $LK,"CtrlAltDel",A="FF:::/Kernel/SerialDev/Keyboard.CPP,CtrlAltDel"$ on <CTRL-ALT-INS>  Probably, VMware bug.
-
-* 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
-
-* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell.  No: I think CTRL-M twice.  (Probably, fixed or not a bug.)
-
-* $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Did I fix it?
+* $LK,"DOCT_HEX_ED",A="MN:DOCT_HEX_ED"$ with odd size, ASCII cannot be edited.
 
 * $LK,"FL:::/Adam/Gr/SpriteEd.CPP,789"$ Resize bitmap?
 
-* More $LK,"CCtrl",A="MN:CCtrl"$.
-
-* Add Redo to editor.
-
-* Perhaps, links to self document if empty file name? $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$
-
-* Change $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ "DF:word" to "DN:word"
-
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
 
-* PSect does not scan all task tables.
-* $LK,"R",A="MN:R"$("PSect","Fun-something"); ?
-* Maybe let committee decide if we want intern to make binary tree look-up using PSECT symbol addresses, so we can eliminate psect cache and wall-paper kludge.  All HolyC functions and glbl vars would have left-right for address search.
+* No way to clear $LK,"DOCEf_HOLD",A="MN:DOCEf_HOLD"$ entries.
+
+* $LK,"DOCF_DBL_DOLLARS",A="MN:DOCF_DBL_DOLLARS"$ in $LK,"Reindention",A="MN:EdCodeTools2"$.
+
+* Compiler: Warn unnecessary typecast.
+
+* Compiler Optimization: Local array vars --> reg.  Might exist.
+
+* Compiler Optimization: heap_glbls with added offset.  Might exist.
+
+* AfterEgypt: $LK,"Numbers,13:33",A="BF:Numbers,13:33"$ scouts? $LK,"Numbers,21:8",A="BF:Numbers,21:8"$ snakes?
+
+* Find-and-replace text on $$PT$$ line before it.
+* 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
+* 01/10/2016 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Web/TAD/CounterRenaissance.TXT"$ "Rennaisance"
+* 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
+
+* Document $$DA zero terminator.  Explain str or not.
+
+* Document, perhaps with video, $LK,"GetStr",A="MN:GetStr"$() all the way down into $LK,"PutKey",A="MN:PutKey"$() code.
+
+* Better dictionary.
+* Good $LK,"spell checker",A="MN:ACMisspelledFind"$.
+* Good Bible search.
+
+* Bible ranges in $LK,"BibleVerse",A="MN:BibleVerse"$(). 
+
+* $LK,"::/Demo/Games/FlatTops.CPP"$ is torpedo, not bombs.
+
+* $LK,"::/Demo/Games/EagleDive.CPP"$ doesn't make sense or look real.  Bad.
+
+* Reset MPs with $LK,"Core0StartMP",A="MN:Core0StartMP"$() after boot.  Free old task memory?
+
+* Use pen_width and pen_height when clipping with pen_width>1.
+
+* Asm LIST NOLIST bugs.
+
+* Review writing to same cache-line from multicore.  Do $LK,"CTask",A="MN:CTask"$->task_flags and others need to be in separate cache lines?
+
+* Fix $LK,"KbdLEDsSet",A="MN:KbdLEDsSet"$().
+* NumLock comes on with break key.
 
 
-* I think subswitch_start with a break in the preface fails.
+$FG,5$$TX+CX,"TODO? Meh"$$FG$
+* Compiler: lock{} needs warn on invalid modes or something.
 
-* Do $LK,"CTask",A="MN:CTask"$->task_flags need to be in separate cache lines?
+* Compiler: Warn recurse class define?
 
-* Add DeleteHidden checkbox to <CTRL-F> Filter.
+* Asm could support R4u8 by adding 0x40 byte.
 
-* Add change-triangle-color to mesh editor.
-* Add 3D-Mesh Editor make-prism.
+* $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() is broken.  Devices should be in free spot of E820 report.
 
-* DCF_TRANSFORMATION|DCF_SYMMETRY|DCF_JUST_MIRROR -- maybe not both needed at once.
+* $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.CPP"$: Strip $LK,"SPT_SHIFT",A="MN:SPT_SHIFT"$ origin cmds?
 
-* DiskCache during FileRead. <CTRL-ALT-C>, $LK,"Kill",A="MN:Kill"$().  
+* Clean-up ASCII #127 delete char?  (No. Maybe, we want a new usage for 127 in future centuries.)
 
-* Get rid of BYTE WORD DWORD in opcode and replace with U8 U16 U32.
+* $LK,"DocSave",A="MN:DocSave"$() $LK,"*result==CH_CURSOR",A="FF:::/Adam/DolDoc/DocFile.CPP,*result==CH_CURSOR"$ is ugly.
 
-* 5/7/14:Something like AFSetIP.CPP caused hang, then reboot in TestSuite.
+* Compiler: Exceptions don't free $LK,"CCmpCtrl",A="MN:CCmpCtrl"$ stuff.
+
+* Unhandled exception msgs from MP's get overwritten by WinMgr.
+
+* $LK,"Diff",A="MN:Diff"$("C:/Misc/Bible.TXT","D:/Misc/Bible.TXT"); Takes too long.
+
+* Finish Pilgrim game.
+
+* Compiler: PtrArith MUL SIZE -->QueIns(MUL)?
+* Compiler: QueRem(IC_NOP)?
+
+* Fix Chess game so not isometric view.
+
+
+$FG,5$$TX+CX,"TODO: Too Hard, or Not Worth Doing."$$FG$
+* AutoComplete/$LK,"Man",A="MN:Man"$() Jmp for user code.
+
+* $LK,"Bible sized nodes",A="FF:::/Adam/DolDoc/DocRecalc.CPP,->tag+i"$
+
+* $LK,"FileMgr",A="MN:FileMgr"$() is bad with lots of files.  
+
+* Would be nice to have a routine telling how much free memory, so apps can plan a big alloc.  This is doable, depending on how.
+
+* Log-to-file is inefficient because we load and save whole file.
+
+* Short FAT32 ~ names.
+
+* Compiler: Inline functions?
+
+* Compiler: FunPtr local vars?  I forgot if this was hard or not.
+$ID,5$$HL,1$U0 Main()
+{
+  U0 (*fp_old_draw_input_ptr)(CDC *dc,I64 x,I64 y)=gr.fp_draw_input_ptr;
+}
+$ID,-5$$HL,0$
+* Compiler: Get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.CPP,0x20000"$ limit.
+
+* $LK,"GrFloodFillRay",A="MN:GrFloodFillRay"$: Get rid of $LK,"0x80000",A="FF:::/Adam/Gr/GrPrimatives.CPP,0x80000"$ limit.
+
+
+$FG,5$$TX+CX,"Bugs"$$FG$
+* 1/12/16 make RAM drive 2288 blks, $FG,2$CopyTree("C:/Home","B:/Home"); $FG$  Disk runs-out of space and hangs instead of reporting errors.
+
+* Bug introduced around 11/1/15.  Changed $LK,"::/Kernel/Sched.CPP"$ and now $LK,"WinToTop",A="MN:WinToTop"$ is called on Adam task at start-up, sometimes.  Might be user's fault because of bad keys pressed during VMware power-on init.  Might be fixed by $LK,"ACf_INIT_IN_PROGRESS",A="MN:ACf_INIT_IN_PROGRESS"$.
+
+* 1/12/16 $LK,"ATARepEntry",A="MN:ATARepEntry"$ shows corrupted buttons.  Weird.  Perhaps, my imagination.
+
+
+$FG,5$$TX+CX,"3rd Party Bugs"$$FG$
+* VMware: Stretch to full screen
+* VMware: PC speaker sound distorted.
+* VMware: 8/2/2015 start-up. Probably multicore.
+* VMware: $LK,"CtrlAltDel",A="FF:::/Kernel/SerialDev/Keyboard.CPP,CtrlAltDel"$ on <CTRL-ALT-INS>
+* VMware: Size zero files don't copy out of mounted disk?  (Might be fixed.)
+
+
+$FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
+* $LK,"Mount",A="MN:Mount"$() crashes on bad drive.
+
+* Graphics clipping: screen y+top<0 for top<0?
+
+* 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
+
+* 4/13/14 Strut or RawHide crashed when $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ was set during testsuite.  Perhaps, floodfill?
+* 3/19/14: RESET during RawHide. 
+
+* $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.  I don't know if I fixed this.
+
+* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
+
+* 5/7/14:Something like $LK,"AFSetIP",A="MN:AFSetIP"$ caused hang, then reboot in TestSuite.
 * 5/7/14:#63 Maybe, $LK,"::/Demo/Graphics/Pick3D.CPP"$ crashed in TestSuite.
-* 6/8/14:After or in PageEntries2 in TestSuite crash.
+* 6/8/14:After or in $LK,"PageTableEntries2",A="FF:::/Misc/OSTestSuite.CPP,PageTableEntries2"$ in TestSuite crash.
+
+* $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (Forgot what this is talking about.)
+
+* $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Fixed?
+
+
+$FG,5$$TX+CX,"TODO? Not really, just angst."$$FG$
+* Nontimer $LK,"Rand",A="MN:Rand"$() is really bad!
+
+* Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
+$ID,5$CArrayDim dim;
+CHashFun *fun_ptr;
+$ID,-5$
+* extern of fun with dft arg of str?
+
+* Might want to warn switch() dup case numbers.
+
+* Make $LK,"Clamp",A="MN:Clamp"$(), $LK,"Min",A="MN:Min"$(), $LK,"Max",A="MN:Max"$() into asm routines?
+
+* Add local vars to sym table in $LK,"Dbg",A="MN:Dbg"$()?
+
+* Compiler: Prints two error messages for expressions in stmts.
+
+* $LK,"U",A="MN:U"$() negative byte displacement, neg 32-bit disp.
+
+* Race condition in $LK,"::/Demo/Games/FlatTops.CPP"$ torpedo.
+
+* Links to self document if empty file name? $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$
+
+* $LK,"FUF_RECURSE",A="MN:FUF_RECURSE"$ would be nice if capital "+R".
+
+* Sprites in cmd line code.
+
+* 16-Bit Assembly and Unassembly and is bad.
+
+* Compiler: Cmd to enable/disable warnings.
+
+* Compiler: Type for either F64 or I64, like Print -- no conversion.
+* Compiler: Arg type ... that did do conversion, if we have one that doesn't.
+
+* $LK,"R",A="MN:R"$("chars_bmp_","set_");
+
+* Clean-up code $LK,"FileNameAbs",A="MN:FileNameAbs"$(), does it need so many local var names?  I guess no choice.
+
+
+$FG,5$$TX+CX,"Committee Needed"$$FG$
+* Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
+* FunSeg does not scan all task tables.
+
+* Improve editor undo, add redo.
+
+* Compiler: F32?
+
+* International Date output: $LK,"MPrintDate",A="MN:MPrintDate"$().  Every country make own version?
+* International Date input: $LK,"Str2Date",A="MN:Str2Date"$().
+
+* Might want to move kernel code out of low 2Meg.  Might be faster.
+
+* $LK,"DCF_SYMMETRY",A="MN:DCF_SYMMETRY"$ before transformation? (Currently, it's after.) 
+
+* $LK,"TRANSPARENT",A="MN:TRANSPARENT"$ does not work with $LK,"ROPF_DITHER",A="MN:ROPF_DITHER"$.
+
+* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with pen_width>1 is broken.
+
+* $LK,"GrPutChar3",A="MN:GrPutChar3"$() with depth buf?
+
+* Eliminate?  $LK,"::/Adam/Ctrls/CtrlsA.CPP"$?
+* Eliminate?  $LK,"::/Adam/AMathODE.CPP"$?
+* Eliminate?  $LK,"Complex",A="MN:Complex"$?
+* Eliminate?  $LK,"CDC",A="MN:CDC"$.brush?
+* Eliminate?  $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$() change to 3x3?
+* Eliminate?  $LK,"ROP_XOR",A="MN:ROP_XOR"$?
+
+* $LK,"WinMgrTask",A="MN:WinMgrTask"$ needs to do doc operations on $LK,"PostMsg",A="MN:PostMsg"$() msgs for mouse.  Already works for $LK,"IPSet",A="MN:IPSet"$()?
+
+* Should Msgs in PopUp queue get fwded to parent when task dies?
+
+* Import Intel datasheets so we can use links in $LK,"Code",A="FI:::/Kernel/Mem/PageTables.CPP"$ for documentation.  I tried a PDF-to-text convertor and it wasn't acceptible.
+
+* Why are BMP file $LK,"CBGR24",A="MN:CBGR24"$'s wrong?  $LK,"::/Adam/Opt/Utils/FileBMP.CPP"$.
+
+* Switch stmt with sparse cases?  Maybe, ban sparse switch stmts.
+
+* Compiler Optimization: Postpone LocalVar init until last possible moment in case of return.
+
+* Compiler: Local var array/struct initialization.
+
+* Compiler Optimization: Bools use r,rm in $LK,"ICCmp",A="MN:ICCmp"$() like in $LK,"ICCmpAndBranch",A="MN:ICCmpAndBranch"$()?
+
+* Compiler: !F64 ~F64
+
+* Compiler: &=, |= can overflow with Bts Btr on small data types?
+
+* Since no true preprocessor, $LK,"R",A="MN:R"$("#define","StrMap");  $LK,"R",A="MN:R"$("#include",...); also?
+
+* Compiler: $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ for local vars?
+
+* Implement $LK,"RS_ATTR_FIXED",A="MN:RS_ATTR_FIXED"$ fixed pos files?
+
+* Editor page formatting is FUBAR.
+
+* SIMD in $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$?
+
+* I use fixed-point in $LK,"Circle",A="MN:Circle"$(), $LK,"Ellipse",A="MN:Ellipse"$(), $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$(), $LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$() and others.  God says I might want to change to float.  $LK,"::/Demo/Lectures/FixedPoint.CPP"$ $LK,"::/Demo/Lectures/FixedPointAdvanced.CPP"$.
+
+* Note: We will never put multiple $LK,"Keyboard Tables",A="FI:::/Kernel/SerialDev/Keyboard.CPP"$.  Each country must make their own version of TempleOS.  The $LK,"Intel Factory ROM",A="FF:::/Doc/Demands.TXT,English"$ will have just English.  Our $LK,"Charter",A="FI:::/Doc/Charter.TXT"$ bans multiple country or architectures in the same version.
+
+* We are not doing UTF, but we will add cyrillic 8-bit Russian font on aux_font. <CTRL-ALT-f> will toggle fonts.  Or, we will redefine upper 128-255 ASCII characters and move 12 border chars to screen font codes 0-26?  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().  Add aux_font option with $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ configured for any aux_font?
+
+
+$FG,5$$TX+CX,"Inspirational Ideas"$$FG$
+* Redo videos, make more professional.
+
+* Use standard terminology from "the literature".
+
+* Get rid of BYTE, WORD, DWORD in opcode and replace with U8, U16, U32.
+
+* Get rid of "Char".
+
+* Get rid of having two terms and pick one, "Disk" and "BlkDev"?  (Probably, not that one.)
+
+* Could switch to having just C and D drives and RAMDrive and CD/DVD? 
+
+* New editor widgets.
+
+* Make use of flag potential in $LK,"FilesFind",A="MN:FilesFind"$() and possibly $LK,"DirContextNew",A="MN:DirContextNew"$().
+* Sort options for $LK,"FilesFind",A="MN:FilesFind"$()?
+
+* New $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ language features?
+
+* Better $LK,"Debugging",A="HI:Debugging"$?
+
+* Look for mem leaks?
+
+* Std local var names.
+
+* Ticketmaster format stmts? Overflow "t='*'" and padding character?
+
+* Move stuff out of $LK,"Kernel",A="FI:::/Kernel/Kernel.PRJ"$ module.
 
 * $$LK,L="FL:D:/Kernel/File.CPP"$$ instead of A=
 * $$SP,B=1$$ instead of $$SP,BI=1$$
 * $$CM+LE+RE is nasty
 
-* FlatTop is torpedo, not bombs.
+* DCF_TRANSFORMATION|DCF_SYMMETRY|DCF_JUST_MIRROR -- maybe not both needed at once.
 
-* Maybe, 3x3 instead of 4x4 matrices. <sigh>
+* More $LK,"Controls",A="MN:CCtrl"$?
 
-* Get rid of text background color.
+* Compiler: More use of more floating-point stk?
 
-* Make a game, S.E.T.I., with radio telescope array.  Put God on air. 
+* Compiler: More aggressive in $LK,"CmpF2PushPop",A="MN:CmpF2PushPop"$() with types besides MOV and F64. 
 
-* $LK,"Diff",A="MN:Diff"$() flags.
-
-* Backward SHIFT-F3 is broken
-
-* Since no true preprocessor, maybe change nomeclature and get rid of #?
-* Rename #define to strmap.
-
-* Review writing to same cache-line from multicore.
-
-* MOV U8 [RSP+RCX],DL
-
-* UAsm negative byte displacement, neg 32-bit disp.
-
-* Might want HeapLog x Cnt
-
-* Find-and-replace text on $$PT$$ line before it.
-
-* Compiler: Warn recurse class define?
-
-* <CTRL-r> Text "$$" has no extents and deletes
-
-* Exception msgs in Adam look bad
-
-* Nice song "3sGCGCqCCe2G3EE2G3qDetDEFsDBDB"
-* Nice song? "3qDe2G3AetGD2G3sBDBDqCeDFetABDeFB3qDe2G3AetGD2G3sBDBDqCeDFetABDeFB3e2G3GDGqDeEADDqACB3e2G3GDGqDeEADDqACB"
-
-
-* $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() is broken. Devices should be in free spot of E820 report.
-
-* SPRITES in CMD Line code.
-
-* Might want to move kernel code out of low 2Meg.  Might be faster.
-
-* Add F2 Macro on TestSuite
-
-* 4/13/14 Strut or RawHide crashed when sys_var_init_flag etc
-was set during testsuite.
-
-* PSect search all tables if not found very well.
-* asm LIST NOLIST bug
-* Bible ranges. 
-* No way to clear +Hold entries
-
----------------------
-$$=-CTASK_NEG_OFFSET
+* Playing with $LK,"::/Demo/Lectures/NegDisp.CPP"$ on $LK,"CTask",A="MN:CTask"$?
+$ID,5$$$=-CTASK_NEG_OFFSET
 offset(CTask.addr)==0
 Spawn(): CAlloc()
 TaskFinishOff(): Free()
 CSysFixedArea.adam
 Looks like task_flags,locked_flags cause problems with neg offset.
----------------------
+$ID,-5$
+* Make a game, S.E.T.I., with radio telescope array.  Put God on air.
 
-* 3/19/14: RESET during RawHide
 
-* FAQ frontloaded
+$FG,5$$TX+CX,"Test"$$FG$
+* $LK,"SpriteBitMap",A="FI:::/Adam/Gr/SpriteBitMap.CPP"$: Grabscroll? 
 
-COMPILER
-  * Postpone LocalVar Init until last possible moment. (in case RETURN)
-  * PtrArith MUL SIZE -->QueIns(MUL)? 
-  * QueRem(IC_NOP)?
+* Return results for $LK,"GrBlot",A="MN:GrBlot"$, $LK,"GrRect",A="MN:GrRect"$, $LK,"GrPutChar",A="MN:GrPutChar"$?
+* Collision cnts for $LK,"GrBlot",A="MN:GrBlot"$, $LK,"GrRect",A="MN:GrRect"$, $LK,"GrPutChar",A="MN:GrPutChar"$?
 
-* Fix return result for GrBlot, ect.
+* $LK,"GetStr",A="MN:GetStr"$() or $LK,"GetChar",A="MN:GetChar"$() in $LK,"OSInstall",A="FI:::/Misc/OSInstall.CPP"$ didn't like focus change.
 
-* CTRL-r transform individual elements
+* Test on Dad's computer or other people's?
 
-* Size zero files don't copy out from VMware.
+* $LK,"ICDivEqu",A="MN:ICDivEqu"$() assumes RBX.  Is it okay?
 
-* FileMgr header (scrolled out of window?)
+* Autofile PopUp of PopUp?
 
-* ATA/ATAPI ID in VMware, when not booted to CD?  I forgot.
+* $LK,"FileMgr",A="MN:FileMgr"$() help link scrolls out of window.
 
-* I use fixed-point in $LK,"Circle",A="MN:Circle"$(), $LK,"Ellipse",A="MN:Ellipse"$(), $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$(), $LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$() and others.
-God says I might want to change to float. 
-$LK,"::/Demo/Lectures/FixedPoint.CPP"$.
-$LK,"::/Demo/Lectures/FixedPointAdvanced.CPP"$.
+* $LK,"MouseDriverInstall",A="MN:MouseDriverInstall"$() throws exceptions?  Doesn't work?  Why mouse $LK,"0x9FC30",A="FF:::/Kernel/SerialDev/Mouse.CPP,9FC"$?
 
-* DOCF_DBL_DOLLARS in reindention
+* VirtualBox MP reboot?
 
-* HexEdit with odd size, ASCII cannot be edited.
+* Compiler: Err/Warn line nums?
+* Asm branch-out-of-range warn by one line?
 
-* clean-up addDev pmt
+* Make sure queue links safe in one direction.  Task $LK,"QueIns",A="MN:QueIns"$ and $LK,"QueRem",A="MN:QueRem"$ for multicore cycling fwd through tasks.
 
-* $LK,"Plain",A="MN:Plain"$() might be better not saving $LK,"CH_CURSOR",A="MN:CH_CURSOR"$.
+* Test removable media id and $LK,"RS_ATTR_RESIDENT",A="MN:RS_ATTR_RESIDENT"$.  $LK,"Touch",A="MN:Touch"$("","+T");
 
-* TRANSPARENT might not work with line ROPF_DITHER
 
-* It would be nice if $LK,"U",A="MN:U"$() NOP were better.
+$FG,5$$TX+CX,"Uncategorized"$$FG$
+* DiskCache during FileRead. <CTRL-ALT-c>, $LK,"Kill",A="MN:Kill"$().  
 
-* unhandled exception on MP message gets overwritten by WinMgr
-
-* Cmd to enable/disable compiler warnings
-
-* What if we had a type for either F64 or I64, like Print -- no conversion.
-* What if we had a ... that did do conversion, if we have one that doesn't.
-
-* fix documentation problem -- remembering 0 terminator in str or not for $$DA
-* GetS, crazy putkey code
-* editor page formatting is FUBAR
+* MOV U8 [RSP+RCX],DL
 
 * $LK,"gr.screen_image",A="MN:CGrGlbls"$
   >Might want to do ZOOM in U8 graphics and convert screen capture to U8
   >Might want to reverse bit order
 
-* return vals for grrect, grblot, grputchar?
-* collisions for grrect, grblot, grputchar?
-
-* Race condition in FlatTops.CPP.Z torpedo
-
-* {Lock|Rep}{Seg|2E=NotBr|3E=Br}{OP}{ADD}{REX}
-* Virtual Box MP reboot
-* Std local var names
-
-//After Egypt possible future ideas
-//$LK,"Numbers,13:33",A="BF:Numbers,13:33"$ scouts
-//$LK,"Numbers,21:8",A="BF:Numbers,21:8"$ snakes
-
-* GrEdit: Move sidebar selected elems.
-	- Be careful of multipt elems.
-* GrEdit: Strip origin shift cmds.
-
-* GrEditBitMap, grabscroll? 
-
-* extern of fun with dft arg of str?
-
-* We kinda need a routine to return how much free memory,
-so that applications can plan a big alloc.
-
-* FileMgr bad with lots of files.  
-
 * This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/SrvCmd.CPP,Fs->catch_except=TRUE"$ causes problems because it
 catches divide and out-of-mem.  Not sure what to do, yet.
 
-* Make $LK,"Core0StartMP",A="MN:Core0StartMP"$() start work after boot to reset multicores.  Bonus for
-freeing old task memory. (Prolly never gonna do anything about this.)
+* Release semaphores or break lock sema,usb_td
 
-* $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ local vars.
-* sprite shift pts, ctrl pt for ellipse/polygon w,h is off when rotated.
-
-* Window mgr needs to do DOC operations on posted messages from mouse.
-Works for $LK,"IPSet",A="MN:IPSet"$(), though.
-
-* Add local vars to sym table in $LK,"Dbg",A="MN:Dbg"$()?  (maybe)
-
-* $LK,"Bible sized nodes",A="FF:::/Adam/DolDoc/DocRecalc.CPP,->tag+i"$
-* Mouseinstall throws exceptions, doesn't work, investigate Mouse $LK,"0x9FC30",A="FF:::/Kernel/SerialDev/Mouse.CPP,9FC"$
-* get kbd lights working.
-* Might have issue with compiler exceptions and restoring lex.hash tables.
-* Generates two compiler error messages for expressions in statements.
-* release semaphores or break lock sema,usb_td
-* Fix Mom's secondary CD/DVD, dad's primary
-* pmtstr in install didn't like focus change
-
-*$FG,2$U0 Main()
-{
-  U0 (*fp_old_draw_input_ptr)(CDC *dc,I64 x,I64 y)=gr.fp_draw_input_ptr;
-}$FG$
-
-* What about local variable array/struct initialization.
-
-* Demo $LK,"ToHtml",A="MN:ToHtml"$().
-
-* Del short name in FAT32--currently I do not check to see if I have generated
-a unique short name and one can delete multiple files accidentally.
-Generating unique short names is a pain in the ass because you have to scan
-the whole directory.  I think I just truncate the name instead of
-"Program~1" or whatever.  S081130-0001.BMP crashed windows--two identical
-short names.
-
-* OVERSTRIKE at cmd line with menu macro.
-
-* $FG,2$lock{}$FG$ warning on invalid modes.
-* Local array vars-->reg.
-* $LK,"DCF_SYMMETRY",A="MN:DCF_SYMMETRY"$, before transformation? (Currently it's after) 
-* all graphics clipping -- screen y+top<0 for top<0
-* Maybe convert graphics to float
-* Warn unnecessary typecast
-* compiler F32
-* compiler optimization heap_glbls with added offset
-* Might make FAT32 read in contiguous chunks.
-* make Clamp(),Min(),Max() asm routines.
 * Might make CSprite flood fill operate on a separate bitmap
 and blotted at the end.
-* autofile popup of popup
 * <CTRL-r> delete subsprite in menu near others
-* consider changing domenu so a real <ESC> on menu item doesn't select
-(<SPACE> sends <ESC> followed by <SPACE> or something)
-* puts3 with depth buf?  might not do this
-* make task queins and querem safe for multicore cycling through tasks (fwd).
-* make better heapwalk, do something with _CFG_HEAP_DBG.
-* log to file--would be inefficient--load-in whole file, modify and write out.
-Useful, but not very efficient  (TempleOS file system has no grow-file ability.
-Created when FAT patent was an issue and wanted absly nothing people could sue
-me for.)
-* APIC2
-* import intel datasheets, somehow?
-* Get better dictionary, good spell checker.
-* AutoComplete/Man Jmp for user code.
-* Might make DskView show drive colors.
-* Might do utility to set drive colors, making a tree entry in Adam 3 using
-registry-like routines... or registry I guess.
+* make better heapwalk, do something with $LK,"_CFG_HEAP_DBG",A="FF:::/Kernel/KernelA.HPP,_CFG_HEAP_DBG"$.
 
-* New Editor widgets
-
-* Make use of flag potential in $LK,"FilesFind",A="MN:FilesFind"$() and possibly $LK,"DirContextNew",A="MN:DirContextNew"$()
-* implement fixed pos files
-
-* new HolyC language features
-* better debugging
-
-* Look for mem leaks.
-* Move stuff out of Kernel module.
-
-* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with pen_width>1 is broken.
-* BGR wrong in BMP files.
-
-* use width and height in line clipping for pen_width>1 or blot.
-* SIMD transformation
-* test removable media id  (critical for resident files)
-
-* add field overflow U8 "t='*'"
-* Implement fmt codes into Get
-* Date Input
-* Default date fmt
-
-* 16 bit Unassembly is bad--very low priority
-* more signed int disassembly
-* support r4u8 by adding 0x40 byte
 * static var off of data heap.
-* Might want to use U32*U32 multiplication.
 * could add "const" to not set CCF_NOT_CONST flag for trig, etc.
-* do r,rm ICCmp like ICBrCmp
 * could make glblvar imports use TY_RIP_DISP32.
 * PUSH_CMP allocs reg R9 or whatever
 * Might be problem with NOP in OPT pass1 for NO_PUSH in expressions besides
 assignments.  Is ShiftNoPush fully implemented?
-* NOP1 might need to have diff ic_data's
-* in divequal, it assumes about ebx
-* error/warning line nums
-* ASM branch out warning of range off by 1 line--use cc->last_line_num
 
-* $LK,"Who",A="MN:Who"$("-r"); Capital r is strongly desired.
 
-* Switch statement with sparse cases (low priority)
-* maybe inline functions?
-* Use of more floating-point stk?
+$FG,5$$TX+CX,"Bible Passages"$$FG$
+It is love I desire			$TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
+Males appear three times, not empty	$TX,"Deuteronomy 16:16",HTML="http://www.biblegateway.com/verse/en/Deuteronomy%2016:16"$
+Offer a sacrifice of praise		$TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
+Do I drink blood of goats? Offer praise	$TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
+When a servant becomes king...		$TX,"Proverb 30:22",HTML="http://www.biblegateway.com/verse/en/Proverb%2030:22"$
+Runner's stride				$TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
+Buckling armor				$TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
+Lot cast in the lap			$TX,"Proverbs 16:33",HTML="http://www.biblegateway.com/verse/en/Proverbs%2016:33"$
+Lord does not repeat			$TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/en/Job%2033:14"$
+Offer only in approved place		$TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
+Jesus' zeal for the Temple		$TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
+Famine not for bread			$TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
+Meek and humble of heart		$TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
 
-* More aggressive in this routine $LK,"CmpF2PushPop",A="MN:CmpF2PushPop"$() with types besides MOV and F64. 
-* !dbl ~dbl
-* &=, |= can overflow with Bts Btr on small data types
 
-* num lock comes on with break key
-* sort options for findfiles
-* Maybe, get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.CPP,0x20000"$ in compiler.
+$FG,5$$TX+CX,"Misc Notes"$$FG$
+Intel CEO's name: Brian Krzanich
+>$FG,2$lspci -v$FG$
+Size:$TX,"17344 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
-============================ Possible Things to Eliminate =====================
-* $LK,"::/Adam/Ctrls/CtrlsA.CPP"$?
-* $LK,"::/Adam/AMathODE.CPP"$?
-* $LK,"Complex",A="MN:Complex"$?
-* $LK,"CDC",A="MN:CDC"$.brush?
-* $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$() change to 3x3?
-* $LK,"ROP_XOR",A="MN:ROP_XOR"$?
-================================================================================
-
->lspci -v
-Size:$TX,"17328 KB",D="DD_TEMPLEOSCD_K_SIZE"$
-
-It is love I desire: $TX,"Hosea 6:6",HTML="http://www.biblegateway.com/verse/en/Hosea%206:6"$
-Males Appear Three Times: $TX,"Deuteronomy 16:16",HTML="http://www.biblegateway.com/verse/en/Deuteronomy%2016:16"$
-Offer a sacrifice of praise: $TX,"Hebrews 13:15",HTML="http://www.biblegateway.com/verse/en/Hebrews%2013:15"$
-Do I drink blood of goats? Offer praise: $TX,"Psalms 50:14",HTML="http://www.biblegateway.com/verse/en/Psalms%2050:14"$
-When a servant becomes king. $TX,"Proverb 30:22",HTML="http://www.biblegateway.com/verse/en/Proverb%2030:22"$
-Runner's Stride: $TX,"Psalms 147:10",HTML="http://www.biblegateway.com/verse/en/Psalms%20147:10"$
-Buckling Armor: $TX,"1 Kings 20:11",HTML="http://www.biblegateway.com/verse/en/1%20Kings%2020:11"$
-Lot cast in the lap: $TX,"Proverbs 16:33",HTML="http://www.biblegateway.com/verse/en/Proverbs%2016:33"$
-Lord does not repeat: $TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/en/Job%2033:14"$
-Offer only in approved place: $TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
-Jesus' zeal for the Temple: $TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
-Famine not for bread: $TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
-Meek and HUmble of Heart: $TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
-TempleOS Logo
-$HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
-Cop tying shoe
-$HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
-Dragon Scale
-$HC,"<img src=\"http://i.imgur.com/zUdfEqy.jpg\" width=\"800\" height=\"640\" alt=\"\">"$
-$WW,1$
-$TX,"Good Time Bad Times Lyrics",HTML="https://www.google.com/#q=led+zep+good+times+bad+times+lyrics"$
-Intel CEO: Brian Krzanich
-$TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
-$TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
-$TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
-$TX,"The Sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-newton-list-of-sins"$
-$TX,"Lamp Shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
-$TX,"My Bookmarks",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bookmarks"$
-$TX,"Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon/"$
-$TX,"Top 100 Movies",HTML="http://www.afi.com/100years/movies10.aspx"$
+$FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
+$TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
+Machine		$HC,"<img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\">"$
+Frosting	$HC,"<img src=\"http://www.templeos.org/images/Frosting.jpg\" width=\"600\" height=\"400\" alt=\"\">"$
+Soap Carvings	$HC,"<img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\">"$
+CottonTail	$HC,"<img src=\"http://www.templeos.org/images/CttnTail.jpg\" width=\"644\" height=\"1113\" alt=\"\">"$
+TempleOS Logo	$HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
+$TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
 $TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
-$TX,"Bible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
-$TX,"Security at NIST",HTML="http://csrc.nist.gov/publications/nistpubs/800-30-rev1/sp800_30_r1.pdf"$
+
+
+$FG,5$$TX+CX,"Web Bookmarks"$$FG$
+Cop tying shoe	$HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
+$TX,"Good Time Bad Times Lyrics",HTML="https://www.google.com/#q=led+zep+good+times+bad+times+lyrics"$
+$TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
+$TX,"Handford school",HTML="https:/pinterest.com/pin/255368241346360278"$
+$TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
+$TX,"The sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-newton-list-of-sins"$
+$TX,"Stalin's Tanks",HTML="https://boardgamegeek.com/boardgame/5198/stalins-tanks"$
+$TX,"Lamp shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
+$TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
 $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
-$TX,"Dwight:NerdTorture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
-$TX,"ATA/ATAPI Spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
+$TX,"Dwight: Nerd torture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
+$TX,"ATA/ATAPI spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
+
+$TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
 $TX,"BBC",HTML="http://www.knpr.org"$
+$TX,"KNPR",HTML="http://www.knpr.org"$
 $TX,"BBC_News_24",HTML="http://www.wherever.tv/tv-channels/BBC-News-24.jsf"$
 $TX,"BBC_Five_Live",HTML="http://www.bbc.co.uk/radio/player/bbc_radio_five_live"$
-$TX,"KNPR",HTML="http://www.knpr.org"$
 $TX,"CBS News",HTML="http://www.cbsnews.com/live/?ftag= NM14632fc"$
-$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
+
 $TX,"C64 Users Guide",HTML="http://www.commodore.ca/manuals/c64_users_guide/c64-users_guide.htm"$
+$TX,"Mapping the Commodore 64",HTML="http://unusedino.de/ec64/technical/project64/mapping_c64.html"$
 $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_programmers_reference/c64-programmers_reference.htm"$
+
 $TX,"8-Bit Pixel Art",HTML="http://8bitdecals.com/8-bit-image-gallery"$
 $TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
-$TX,"Risperdal Shortens Life",HTML="http://factmed.com/study-RISPERDAL-causing-LIFE EXPECTANCY SHORTENED.php"$

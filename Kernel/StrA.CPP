@@ -522,7 +522,7 @@ I64 Spaces2Tabs(U8 *dst,U8 *src)
 }
 
 U8 *StrUtil(U8 *_src,I64 flags)
-{//See $LK,"flags",A="MN:SUF_REM_SPACES"$ for all the options.
+{//Modifies in place. See $LK,"flags",A="MN:SUF_REM_SPACES"$ for all the options.
   U8 *src=_src,*dst=_src;
   I64 ch;
 

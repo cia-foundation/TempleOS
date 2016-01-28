@@ -20,7 +20,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   else
     out_name=StrNew(in_name);
 
-  doc=DocRead(in_name,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
+  doc=DocRead(in_name,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT)
@@ -159,7 +159,7 @@ U0 SUFile(U8 *filename,I64 suf_flags,F64 indent_scale_factor)
   U8 *dst;
   Bool chged=FALSE;
   I64 reduced=0;
-  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_WITH_TABS | DOCF_NO_CURSOR);
+  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT) {

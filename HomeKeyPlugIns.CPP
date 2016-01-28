@@ -177,6 +177,18 @@ Bool MyPutKey(I64 ch,I64 sc)
 	else
 	  'ê';
 	return TRUE;
+      case '9':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Dol /---->");
+	else
+	  "$$ID,5$$";
+	return TRUE;
+      case '0':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Dol /<----");
+	else
+	  "$$ID,-5$$";
+	return TRUE;
     }
   }
   return FALSE;

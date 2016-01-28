@@ -1,4 +1,4 @@
-Bool DrvTypeSet(U8 drv_let,I64 type=DVT_REDSEA)
+Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
 {//Very dangerous
   I64 i,j,ext_base,drv_num,offset,cur_type;
   CMasterBoot mbr;
@@ -19,10 +19,10 @@ Bool DrvTypeSet(U8 drv_let,I64 type=DVT_REDSEA)
 	    else {
 	      if (drv_num+'A'==ToUpper(drv_let)) {
 		switch (type) {
-		  case DVT_REDSEA:
+		  case FSt_REDSEA:
 		    mbr.p[i].type=MBR_PT_REDSEA;
 		    break;
-		  case DVT_FAT32:
+		  case FSt_FAT32:
 		    mbr.p[i].type=MBR_PT_FAT32a;
 		    break;
 		  default:
@@ -50,11 +50,11 @@ Bool DrvTypeSet(U8 drv_let,I64 type=DVT_REDSEA)
   }
 }
 
-U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32)
+U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=FSt_FAT32)
 {//Format hard drive or RAM drive.
 //$BK,1$Warning:$BK,0$ Destroys all previous info.
   //quick=FALSE means fill entire drive with zeros.
-  //Choose $LK,"DVT_FAT32",A="MN:DVT_FAT32"$ or $LK,"DVT_REDSEA",A="MN:DVT_REDSEA"$.
+  //Choose $LK,"FSt_FAT32",A="MN:FSt_FAT32"$ or $LK,"FSt_REDSEA",A="MN:FSt_REDSEA"$.
   //You don't format a CD/DVD with this.
   CDrv *dv=Let2Drv(drv_let);
   Bool old_silent=IsSilent;
@@ -65,7 +65,7 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32)
     return;
   }
   switch (type) {
-    case DVT_REDSEA:
+    case FSt_REDSEA:
       Silent;
       Drv(drv_let);
       Silent(old_silent);
@@ -73,7 +73,7 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32)
       DskCacheInvalidate(Let2Drv(drv_let));
       Drv(drv_let);
       break;
-    case DVT_FAT32:
+    case FSt_FAT32:
       Silent;
       Drv(drv_let);
       Silent(old_silent);
@@ -81,7 +81,7 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=DVT_FAT32)
       DskCacheInvalidate(Let2Drv(drv_let));
       Drv(drv_let);
       break;
-    case DVT_ISO9660:
+    case FSt_ISO9660:
       PrintErr("Not Writable\n");
       break;
     default:

@@ -5,7 +5,7 @@ Why did they make Solomon's Temple?  It was a direction to look, to focus on, a 
 
 1 Kings 6:21 (King James)
 
-$LM,5$6:21 So Solomon overlaid the house within with pure gold: and he made
+$ID,5$6:21 So Solomon overlaid the house within with pure gold: and he made
 a partition by the chains of gold before the $FG,4$oracle$FG$; and he overlaid
 it with gold.
 
@@ -15,7 +15,7 @@ with gold.
 
 6:23 And within the $FG,4$oracle$FG$ he made two cherubims of olive tree, each
 ten cubits high.
-$LM,0$
+$ID,-5$
 
 * TempleOS is God's official temple.  Just like Solomon's temple, this is a community focal point where offerings are made and God's oracle is consulted.
 
@@ -31,7 +31,7 @@ $LM,0$
 
 * Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
 
-* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,048",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"80,901",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
  
 * Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 

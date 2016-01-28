@@ -8,36 +8,28 @@ Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
     return FALSE;
 }
 
-U0 VMInstallBoot(CTask *task,U8 dvd_drv,U8 drv,
+U0 VMInstallBoot(CTask *task,U8 dvd_drv,U8 drv_let,
 	CATARep *ata_drv,CATARep *atapi_drv)
 {
   U8 *st1,*st2;
 
-  st1=MStrPrint("%C:/",dvd_drv);
-  st2=MStrPrint("%C:/",drv);
+  st1=MStrPrint("%C:/",dvd_drv);  st2=MStrPrint("%C:/",drv_let);
   CopyTree(st1,st2);
-  Free(st1);
-  Free(st2);
+  Free(st1); Free(st2);
 
-  st1=MStrPrint("%C:/Home",drv);
+  st1=MStrPrint("%C:/Home",drv_let);
   MkDir(st1);
   Copy("::/Misc/DoDistro.CPP.Z",st1);
   Copy("::/MakeHome.CPP.Z",st1);
   Free(st1);
 
-  XTalkWait(task,
-	"MakeOSDrvBootInstall('%C');\n"
-	"\nB\n0x20000\n",drv);
-
+  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n"
+	"\nB\n0x20000\n",drv_let);
   if (ata_drv)
     XTalkWait(task,"Cp%d\n",ata_drv->num);
   if (atapi_drv)
     XTalkWait(task,"Tp%d\n",atapi_drv->num);
-
-  XTalkWait(task,
-	"\n"   //Exit Drives
-	"\n"   //Dsk Cache
-	"\n"); //Options
+  XTalkWait(task,"\n\n\n"); //Exit Drives,Dsk Cache,Options
 }
 
 U0 VMInstallWiz()
@@ -49,6 +41,10 @@ U0 VMInstallWiz()
 
   task=User;
   TaskWait(task);
+  task->border_src=BDS_CONST;
+  task->border_attr=LTGRAY<<4+DrvTextAttrGet(':')&15;
+  task->text_attr  =LTGRAY<<4+BLUE;
+  task->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER;
   WinHorz(Fs->win_left,Fs->win_right,task);
   WinVert(Fs->win_top,(Fs->win_top+Fs->win_bottom)>>2-1,task);
   WinVert(task->win_bottom+3,Fs->win_bottom);
@@ -59,18 +55,17 @@ U0 VMInstallWiz()
   if (VMPrtDsk(task,ata_drv)) {
     VMInstallBoot(task,blkdev.boot_drv_let,'C',ata_drv,atapi_drv);
     VMInstallBoot(task,blkdev.boot_drv_let,'D',ata_drv,atapi_drv);
-    MasterBootIntall('C');
+    MasterBootInstall('C');
   }
   LinkedLstDel(root);
-
   WinVert(task->win_top,Fs->win_bottom);
   Kill(task);
 }
 
 U0 RegularInstallWiz()
 {
-  I64 unit;
-  U8 *base0,*base1,*ms,*dst,*st1,*st2,*new_home_str;
+  I64 unit,drv_let;
+  U8 *st,*base0,*base1,*st1,*st2,*new_home_str;
   CATARep *root=NULL,*tempha;
   I64 ch,num_hints;
   CTask *task;
@@ -80,11 +75,15 @@ U0 RegularInstallWiz()
 
   task=User;
   TaskWait(task);
+  task->border_src=BDS_CONST;
+  task->border_attr=LTGRAY<<4+DrvTextAttrGet(':')&15;
+  task->text_attr  =LTGRAY<<4+BLUE;
+  task->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER;
   WinHorz(Fs->win_left,Fs->win_right,task);
   WinVert(Fs->win_top,(Fs->win_top+Fs->win_bottom)>>2-1,task);
   WinVert(task->win_bottom+3,Fs->win_bottom);
   WinToTop(Fs);
-  XTalk(task,"Mount;\nC ");
+  XTalk(task,"Mount;\nCp");
 
   num_hints=ATARep(FALSE,,&root);
   "\nInclude '$$PURPLE$$0x$$FG$$' for hexidecimal numbers.\n\n";
@@ -99,8 +98,9 @@ U0 RegularInstallWiz()
     Free(base0);
     base0=MStrPrint("0x%X",tempha->base0);
     base1=MStrPrint("0x%X",tempha->base1);
-    ms	 =MStrPrint("0x%X",tempha->unit);
-    unit=Str2I64(ms);
+    st	 =MStrPrint("0x%X",tempha->unit);
+    unit=Str2I64(st);
+    Free(st);
   } else {
     while (TRUE) {
       base1=GetStr("Hard Drive I/O Port Base1  : ");
@@ -108,75 +108,61 @@ U0 RegularInstallWiz()
 	break;
       Free(base1);
     }
-    while (TRUE) {
-      ms =GetStr("Unit--$$PURPLE$$0$$FG$$=Master or $$PURPLE$$1$$FG$$=Slave: ","0");
-      unit=Str2I64(ms);
-      if (0<=unit<=1)
-	break;
-    }
+    do {
+      st =GetStr("Unit--$$PURPLE$$0$$FG$$=Master or $$PURPLE$$1$$FG$$=Slave: ","0");
+      unit=Str2I64(st);
+      Free(st);
+    } while (!(0<=unit<=1));
   }
   LinkedLstDel(root);
   XTalkWait(task,"%s\n%s\n%C\n",base0,base1,'0'+unit);
   DrvRep;
-  while (TRUE) {
-    dst=GetStr("\nDestination Partition Letter: ");
-    if ('A'<=ToUpper(*dst)<='Z')
-      break;
-    Free(dst);
-  }
-
+  do {
+    st=GetStr("\nDestination Partition Letter: ");
+    drv_let=ToUpper(*st);
+    Free(st);
+  } while (!('A'<=drv_let<='Z'));
   '\n';
   st1=MStrPrint("%C:/",blkdev.boot_drv_let);
-  st2=MStrPrint("%C:/",*dst);
+  st2=MStrPrint("%C:/",drv_let);
 
-  "$$RED$$Format %C Partition?$$FG$$\n",*dst;
+  "$$RED$$Format %C Partition?$$FG$$\n",drv_let;
   if (YorN) {
     '\n';
-    while (TRUE) {
+    do {
       "$$PURPLE$$1$$FG$$) Use FAT32\n"
 	    "$$PURPLE$$2$$FG$$) Use RedSea\n"
 	    "\nFile System Type: ";
       ch=GetChar;
       '\n';
-      if ('1'<=ch<='2')
-	break;
-    }
+    } while (!('1'<=ch<='2'));
     if (ch=='1')
-      Fmt(*dst,,FALSE,DVT_FAT32);
+      Fmt(drv_let,,FALSE,FSt_FAT32);
     else
-      Fmt(*dst,,FALSE,DVT_REDSEA);
+      Fmt(drv_let,,FALSE,FSt_REDSEA);
   }
   CopyTree(st1,st2);
-  st2=MStrPrint("%C:/Temp",*dst);
+  st2=MStrPrint("%C:/Temp",drv_let);
   MkDir(st2);
   Free(st2);
 
-  new_home_str=MStrPrint("%C:/Home",*dst);
+  new_home_str=MStrPrint("%C:/Home",drv_let);
   MkDir(new_home_str);
   Copy("::/Misc/DoDistro.CPP.Z",new_home_str);
   Copy("::/MakeHome.CPP.Z",new_home_str);
-  XTalkWait(task,
-	"MakeOSDrvBootInstall('%C');\n"
+  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n"
 	"\nB\n0x20000\n"
-	"C"
-	"p"
-	"%s\n"
-	"%s\n"
-	"%C"
-	"\n"	 //Exit Drives
-	"\n"	 //Dsk Cache
-	"\n",	 //Options
-	*dst,base0,base1,'0'+unit);
+	"Cs%s\n%s\n%C"
+	"\n\n\n", //Exit Drives,Dsk Cache,Options
+	drv_let,base0,base1,'0'+unit);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {
     '\n';
-    MasterBootIntall(*dst);
+    MasterBootInstall(drv_let);
   }
   Free(new_home_str);
   Free(base0);
   Free(base1);
-  Free(ms);
-  Free(dst);
 
   WinVert(task->win_top,Fs->win_bottom);
   Kill(task);

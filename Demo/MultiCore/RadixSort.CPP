@@ -36,7 +36,7 @@ U0 QSortU32(I32 *base,I64 num)
 	}
       }
       i=less-base;
-      if (i==num) {//All less or equal to pivot
+      if (i==num) {//All less or equ to pivot
 
 	//Point greater to first less
 	do greater--;
@@ -47,7 +47,7 @@ U0 QSortU32(I32 *base,I64 num)
 	  if (less<greater)
 	    SwapU32(less,greater);
 	  num=i;
-	} else //All equal
+	} else //All equ
 	  break;
       } else if (i<num/2) {
 	QSortU32(base,i);

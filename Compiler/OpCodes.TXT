@@ -18,6 +18,7 @@ The assembler will not report certain invalid
 forms. Get an Intel datasheet and learn
 which forms are valid.
 
+{Lock|Rep}{Seg|2E=NotBr|3E=Br}{OP}{ADD}{REX}
 */
 
 R8 AL 0;

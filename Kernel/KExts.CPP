@@ -4,13 +4,14 @@ before import is resolved, you can use
 "import".  Otherwise, use a fun pointer
 var and check it before calling.
 */
+import U8 *DocSave(CDoc *doc,I64 *_size=NULL);
 import Bool DocUnlock(CDoc *doc);
 import Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
 extern U0 AdamErr(U8 *fmt,...);
 extern U0 AdamLog(U8 *fmt,...);
 extern I64 BIOSTotalMem();
 extern I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free);
-extern U0 BlkDevChk(CBlkDev *bd);
+extern CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE);
 extern Bool BlkDevLock(CBlkDev *bd);
 extern CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type);
 extern Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE);
@@ -28,8 +29,9 @@ extern I64 Del(U8 *files_find_mask,Bool make_mask=FALSE,
 extern U8 *DftExt(U8 *name,U8 *extension);
 extern Bool Drv(U8 drv_let);
 extern U8 Drv2Let(CDrv *dv=NULL);
-extern U0 DrvChk(CDrv *dv);
-extern Bool DrvTypeSet(U8 drv_let,I64 type=DVT_REDSEA);
+extern CDrv *DrvChk(CDrv *dv,Bool except=TRUE);
+extern U8 DrvTextAttrGet(U8 drv_let=0);
+extern Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA);
 extern U0 DrvsRelease();
 extern U0 DskCacheInvalidate(CDrv *dv);
 extern U0 Exit();
@@ -56,8 +58,8 @@ extern Bool ISODrvInit(CDrv *dv,I64 blk);
 extern Bool IsDbg();
 extern Bool IsDir(U8 *dir_name);
 extern Bool IsRaw();
-extern CBlkDev *Let2BlkDev(U8 drv_let=0);
-extern CDrv *Let2Drv(U8 drv_let=0);
+extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
+extern CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE);
 extern U0 MPInt(I64 num,I64 cpu_num=1);
 extern U8 *MStrPrint(U8 *fmt,...);
 extern Bool MkDir(U8 *filename);
@@ -85,7 +87,7 @@ extern U0 SrvCmdQueDel(CSrvCmd *root);
 extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
 extern U0 SrvCtrlInit(CSrvCtrl *ctrl);
 extern U8 *StrPrint(U8 *dst,U8 *fmt,...);
-extern U0 StrPrintPSect(U8 *buf,I64 addr,I64 field_len);
+extern U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len);
 extern Bool Suspend(CTask *task=NULL,Bool state=TRUE);
 extern CSrvCmd *TaskMsg(CTask *_srv,CTask *master,
 	I64 code,I64 a1,I64 a2,I64 flags);

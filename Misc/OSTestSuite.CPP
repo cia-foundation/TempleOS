@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=164;
+  progress4_max=167;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -755,6 +755,43 @@ U0 DoCtrlR1()
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (TaskValidate(task->popup_task))
     Yield;
+  Sleep(1000);
+  XTalk(task,"\nExit;\n");
+}
+
+U0 DoF2Macro()
+{
+  I64 i;
+  U8 *ptr="\"Boo!\\n\";\n";
+  CTask *task=User;
+  while (TaskValidate(sys_macro_task))
+    Yield;
+  PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_F2);
+  while (!TaskValidate(sys_macro_task))
+    Yield;
+  TaskWait(sys_macro_task);
+
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_RIGHT|SCF_CTRL);
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_RIGHT);
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,CH_SPACE,0); //Press RECORD
+  while (!Bt(&sys_semas[SYS_SEMA_RECORD_MACRO],0))
+    Yield;
+
+  while (*ptr)
+    PostMsgWait(task,MSG_KEY_DOWN,*ptr++,0);
+
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  PostMsgWait(sys_macro_task,MSG_KEY_DOWN_UP,CH_SPACE,0); //Press STOP
+
+  for (i=0;i<10;i++)
+    PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_F2|SCF_SHIFT);
+
+  PostMsg(sys_macro_task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
+  while (TaskValidate(sys_macro_task))
+    Yield;
+
   Sleep(1000);
   XTalk(task,"\nExit;\n");
 }
@@ -1833,6 +1870,15 @@ U0 DoSortFile()
   XTalk(task,"Exit;\n");
 }
 
+U0 DoToHtmlToTXT()
+{
+  CTask *task=User;
+  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTExample/HtmlGen\";\n");
+  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTExample/TXTGen\";\n");
+  Sleep(750);
+  XTalk(task,"Exit;\n");
+}
+
 /*
 U0 Do()
 {
@@ -2210,14 +2256,18 @@ U0 DoReps()
   TS; XTalkWait(task,"MemRep;Sleep(750);\n");
   TS; XTalkWait(task,"ZipRep;Sleep(750);\n");
   TS; XTalkWait(task,"ProfRep;Sleep(750);\n");
-  TS; XTalkWait(task,"HeapLogRep; HeapLog(OFF);Sleep(750);\n");
-  TS; XTalkWait(task,"ChkDsk;Sleep(750);\n");
-  TS; XTalkWait(task,"DrvView;\n");
-  Sleep(750);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  XTalkWait(task,"DskView;\n");
-  Sleep(250); //Short because ATARep takes time.
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  TS; XTalkWait(task,"HeapLogSizeRep;Sleep(750);\n");
+  TS; if (DrvIsWritable(':')) XTalkWait(task,"ChkDsk;Sleep(750);\n");
+  TS; if (DrvIsWritable(':')) {
+    XTalkWait(task,"DrvView;\n");
+    Sleep(750);
+    PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  }
+  TS; if (DrvIsWritable(':')) {
+    XTalkWait(task,"DskView;\n");
+    Sleep(250); //Short because ATARep takes time.
+    PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  }
   TS; XTalkWait(task,"ATARep;\npSleep(750);\n");
   TS; XTalkWait(task,"HashDepthRep(adam_task->hash_table);Sleep(750);\n");
   TS; XTalkWait(task,"Who;Sleep(750);\n");
@@ -2317,6 +2367,7 @@ U0 OSTestSuite()
   TS; DoFontEd;
   TS; DoLattice;
   TS; DoCtrlR1;
+  TS; DoF2Macro;
   TS; DoSubIntAccess;
   TS; DoDemoDoc;
   TS; DoTreeDemo;
@@ -2351,6 +2402,7 @@ U0 OSTestSuite()
   TS; if (DrvIsWritable(':')) DoWebLog;
   TS; if (DrvIsWritable(':')) DoReverseFile;
   TS; if (DrvIsWritable(':')) DoSortFile;
+  TS; if (DrvIsWritable(':')) DoToHtmlToTXT;
   TS; if (DrvIsWritable(':')) DoRegistryDemo;
   TS; DoDefine;
   TS; DoGlblVars;
@@ -2360,7 +2412,7 @@ U0 OSTestSuite()
   TS; DoData;
   TS; DoCallBack;
   TS; DoClassMeta;
-  TS; DoNumBible;
+  TS; if (DrvIsWritable(':')) DoNumBible;
   TS; DoForm;
   TS; DoClickCallBack;
   TS; DoMenuButton;

@@ -1,0 +1,95 @@
+$WW,1$$FG,5$$TX+CX,"Frequently Asked Questions"$$FG$
+
+$TR,"How come it is public domain, not GPL?"$
+$ID,2$I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"118,851",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"12.5",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  See $LK,"::/Doc/Credits.TXT"$.
+$ID,-2$$TR,"Shouldn't it be GNU/TempleOS?"$
+$ID,2$TempleOS executes no code not written by me at any time except for a few $FG,2$BIOS$FG$ calls for configuration.  I even wrote boot-loaders, so I do not need $LK,"Grub",A="FI:::/Doc/Grub.TXT"$.  See $LK,"::/Doc/Credits.TXT"$.
+$ID,-2$$TR,"Don't you use GNU's gcc?"$
+$ID,2$TempleOS was written from scratch, starting with $FG,2$TASM$FG$ long ago, launching from real-mode DOS.  Now, there is no $FG,2$Linux$FG$ or $FG,2$GNU$FG$ or any other code in TempleOS.  Yes, I wrote the compiler from scratch.  See $LK,"::/Doc/Credits.TXT"$.
+$ID,-2$$TR,"Why do you dual boot?"$
+$ID,2$TempleOS is 100% independent -- it does not access the files of your primary operating system and TempleOS will work as the only operating system on your computer, but it has no networking.  In your off hours, you will use your other operating system.
+$ID,-2$$TR,"It has links, so is it a browser?"$
+$ID,2$TempleOS is an operating system, not a browser.  $LK,"TempleOS links",A="MN:LK_FILE"$ are a special format and only link too local files and symbol source addresses.
+$ID,-2$$TR,"Where are the animated 3D icon GIFs?"$
+$ID,2$3D $LK,"Sprites",A="FI:::/Doc/Sprite.TXT"$ are stored as a mesh of triangles.  There are no GIF files.  It $LK,"rotates",A="MN:Mat4x4MulXYZ"$ 3D sprite objects on the fly.
+$ID,-2$$TR,"If the compiler is JIT, isn't it an interpretor?"$
+$ID,2$TempleOS compiles, doesn't $FG,2$interpret$FG$, and uses no $FG,2$byte code$FG$ anywhere.  I loosely use the word $FG,2$script$FG$ sometimes, but it's actually compiled.  The compiler's $LK,"optimization",A="MN:OptPass012"$ code is actually where the compiler evaluates constants to simplify them, like every optimizing compiler.
+$ID,-2$$TR,"Are you a Creationist?"$
+$ID,2$I am an evolutionist.  $FG,2$Adam$FG$ is a better term for the first father of all tasks than $FG,2$root$FG$ was!
+$ID,-2$$TR,"Is 'Bt()' in the code Bit Torrent?"$
+$ID,2$$LK,"Bt",A="MN:Bt"$() is $FG,2$bit test$FG$, like the $FG,2$x86$FG$ instruction, not $FG,2$bit torrent$FG$.
+$ID,-2$$TR,"Is 'Fs->' in the code file system?"$
+$ID,2$$LK,"Fs",A="MN:Fs"$ is a segment reg, not $FG,2$file system$FG$.  ($LK,"Fs",A="MN:Fs"$ is kept pointing to the current task's record.)  There is no memory segmentation.  It is 64-bit and flat. FS and GS are used as general purpose regs, more or less.
+$ID,-2$$TR,"Is it Pascal?"$
+$ID,2$TempleOS uses a dialect of C/C++ called $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  It is not $FG,2$Pascal$FG$.  I altered the syntax making parenthesis optional on function calls with no paramaters.
+$ID,-2$$TR,"Why doesn't Sleep() make my laptop hibernate?"$
+$ID,2$$LK,"Sleep",A="MN:Sleep"$() makes a program pause.  It is not hibernation for a laptop.
+$ID,-2$$TR,"What is Yield() for in loops?"$
+$ID,2$$LK,"Yield",A="MN:Yield"$() saves the current task's regs (context) and loads in the next task.  In a loop waiting for disk IO, it executes $LK,"Yield",A="MN:Yield"$() which pegs the CPU load, yet the system is responsive.
+$ID,-2$$TR,"What is JIT Compiled Mode?"$
+$ID,2$The term $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$ means it compiles and executes code placed into mem, not stored on disk.
+$ID,-2$$TR,"Why do files end in .Z?  Are they encrypted?"$
+$ID,2$Files with names ending in $FG,2$.Z$FG$ are individually compressed using $LK,"TempleOS Compression",A="FI:::/Kernel/Compress.CPP"$.  They are not encrypted.  $LK,"Copy",A="MN:Copy"$() or rename them with $LK,"Move",A="MN:Move"$() to a name without $FG,2$.Z$FG$ and they will be stored in an uncompressed form.  See $LK,"TOSZ",A="FI:::/Doc/TOSZ.TXT"$ for Linux or Windows uncompress C/C++ code.
+$ID,-2$$TR,"Is it open source?  How do I build it?"$
+$ID,2$TempleOS is 100% open src.  All the src code is included in the distro.  Use $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() to compile the kernel and compiler.  The rest is $LK,"JIT Compiled",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$ during boot.  See $LK,"::/StartOS.CPP"$. 
+$ID,-2$$TR,"Where are object files?  How do I link?"$
+$ID,2$TempleOS does not use object files or a linker.  $LK,"AOT Compile Mode",A="FF:::/Doc/Glossary.TXT,AOT Compile Mode"$ is used to directly create flat binary files, $FG,2$/Kernel.BIN.C$FG$ and $FG,2$/Compiler/Compiler.BIN.Z$FG$ with no object files and linking.$FG$  $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$ place code in memory, ready to run, with no object files or linking.  Linking is done when $FG,2$BIN$FG$ modules are $LK,"Load",A="MN:Load"$()ed.
+$ID,-2$$TR,"What is the FPS refresh rate?"$
+$ID,2$The refresh rate is $TX,"30",D="WMG_FPS"$ frames-per-second.  That is how often TempleOS updates screen mem.  It is not syncronized to the hardware.
+$ID,-2$$TR,"How does a task own the speaker?"$
+$ID,2$No task or application has a lock on the speaker so apps will interfere with each other.
+$ID,-2$$TR,"Why does it leak memory?"$
+$ID,2$TempleOS allocs mem as more items are displayed in the window.  Also, TempleOS allocs mem for code as it is compiled at the cmd line.  If you $FG,2$#include$FG$ a file twice, it allocs more mem for it.  If you have a 50,000 line program with each line taking twenty bytes on a machine with 1 Gig, you could $FG,2$#include$FG$ it a thousand times if it had no data or graphics and no other use of mem.  If it bothers you, hit $FG,2$<CTRL-ALT-x>$FG$ and $FG,2$<CTRL-ALT-e>, $FG$periodically, to kill and recreate the task$FG$.  Use the pop-up flag on macros in your $LK,"PersonalMenu",A="FI:::Home/PersonalMenu.TXT"$ to spawn new tasks, run applications and free the applications when they are finished.  Small mem chunks stick to the task when they are freed until it is killed.  The only way to get in trouble is allocating multiple Meg chunks and freeing them.  These can only be reused if the same size gets alloced again.  Use $LK,"HeapLog",A="MN:HeapLog"$(), $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() and $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$() to see who alloced mem and didn't free it.  See $LK,"MemOverview",A="FI:::/Doc/MemOverview.TXT"$.
+$ID,-2$$TR,"Why do I get a memory leak when editing big files?"$
+$ID,2$The editor periodically takes a snap-shot of the document for $FG,2$UNDO$FG$ and this looks like a memory leak.
+$ID,-2$$TR,"Why is it in text mode?"$
+$ID,2$TempleOS runs in $FG,2$VGA 640x480 16 color$FG$ graphics mode, not text mode.  It changes to this mode with a $LK,"BIOS call",A="FF:::/Kernel/KStart.CPP,INT 0x10"$ while in real-mode before it switches to 64-bit mode.  The text is $LK,"drawn by hand",A="MN:GrUpdateTextFG"$.  See $LK,"::/Kernel/Font8x8.CPP"$.  If graphics mode fails, it falls-back on text mode.  You can force text mode with an $LK,"Kernel config",A="FI:::/Kernel/KCfg.CPP"$ option.
+$ID,-2$$TR,"Where is the kernel memory?"$
+$ID,2$TempleOS identity-maps all memory, all the time.  It is like paging is not used.  There is no special kernel $FG,2$high half$FG$ memory space.  TempleOS is ring-0-only, so everything is kernel, even user programs.  There is a special task called $FG,2$Adam$FG$ and he doesn't die, so his heap never gets freed.  That's as close to $FG,2$kernel memory$FG$ as it gets.  All code goes in the lowest 2 Gig of addresses, known as the $LK,"Code Heap",A="FF:::/Doc/Glossary.TXT,Code and Data Heaps"$, so that the $FG,2$REL32$FG$ addressing mode can be used.  See $LK,"MemOverview",A="FI:::/Doc/MemOverview.TXT"$.
+$ID,-2$$TR,"Why does it run code from stack addresses?"$
+$ID,2$TempleOS puts all code in the lowest 2 Gig, known as the $LK,"Code Heap",A="FF:::/Doc/Glossary.TXT,Code and Data Heaps"$, so that the $FG,2$REL32$FG$ addressing mode can be used.  TempleOS is 64-bit, but $FG,2$2 Gig$FG$ is enough for code.  It actually puts global variables there, too, but you can turn that off with $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$.  $LK,"MAlloc",A="MN:MAlloc"$() allocs higher memory.
+$ID,-2$$TR,"How does it SYSCALL?"$
+$ID,2$TempleOS doesn't use software interrupts or $FG,2$SYSCALL$FG$ instructions because it never needs to change out of ring-0, even running user programs.  Calls are always $FG,2$CALL REL32$FG$ instructions.
+$ID,-2$$TR,"How do you fault-in stack?"$
+$ID,2$The stack does not grow, so do not do deep recursion.  In theory, memory gets fragmented, too.
+$ID,-2$$TR,"How do I set the PATH?"$
+$ID,2$There is no $FG,2$PATH$FG$.  You do not enter filenames at the command-line and expect them to run.  You enter C-like code.  $LK,"Get Started Here",A="FI:::/Doc/CmdLineOverview.TXT"$.
+$ID,-2$$TR,"How do I boot it with Grub?"$
+$ID,2$If you use $LK,"Grub",A="FI:::/Doc/Grub.TXT"$, you $FG,2$chain-load$FG$ like Windows.  See $LK,"Boot",A="FI:::/Doc/Boot.TXT"$.  You can use the TempleOS boot-loader.  $LK,"Master-Boot-Loader-Stage1",A="FI:::/Adam/Opt/Boot/BootMHD.CPP"$, $LK,"Master-Boot-Loader-Stage2",A="FI:::/Adam/Opt/Boot/BootMHD2.CPP"$, $LK,"Partition-Boot-Loader",A="FI:::/Adam/Opt/Boot/BootHD.CPP"$, $LK,"CD-DVD-Boot-Loader",A="FI:::/Adam/Opt/Boot/BootDVD.CPP"$.
+$ID,-2$$TR,"How do I get Kernel.BIN to boot?"$
+$ID,2$The boot-loaders must be patched by you running $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() or $LK,"MasterBootInstall",A="MN:MasterBootInstall"$().  Those will write the block address into the boot-loader because the boot-loaders do not navigate file systems to find the $LK,"Stage2",A="FI:::/Kernel/KStart.CPP"$ if you relocate it.
+$ID,-2$$TR,"Why is there some 16-Bit code?"$
+$ID,2$TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few $FG,2$BIOS$FG$ info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX,"PCI BIOS",HTML="http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for $FG,2$PCI$FG$ config space access.  TempleOS calls $LK,"that",A="FI:::/Kernel/PCIBIOS.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
+$ID,-2$$TR,"Why are you pushing 32-bit values on the stack?"$
+$ID,2$$FG,2$PUSH EAX$FG$ : All stack operations in 64-bit mode are 64-bits.
+$ID,-2$$TR,"Why are you using 32-bit instructions and not setting high 32-bits?"$
+$ID,2$$FG,2$XOR EAX,EAX$FG$ : Operations on 32-bit regs clear the high 32-bits.
+$ID,-2$$TR,"How do you use the FS and GS segment registers."$
+$ID,2$$FG,2$MOV RAX,FS:[RAX]$FG$ : FS can be set with a $FG,2$WRMSR$FG$, but displacement is RIP relative, so it's tricky to use.  FS is used for the current $LK,"CTask",A="MN:CTask"$, GS for $LK,"CCPU",A="MN:CCPU"$.
+$ID,-2$$TR,"How do I set ORG for position of code?"$
+$ID,2$The compiler creates $FG,2$pos independent$FG$ code.  Don't create code which is loaded at a fixed, specified location.  Code in a BIN file is $FG,2$pos independent$FG$ by virtue of a table in the BIN file for patching absolute addresses.
+$ID,-2$$TR,"How are symbols loaded?"$
+$ID,2$Binary executable files have export syms which are loaded into the sym tables.  The operating system $FG,2$Kernel$FG$ has such an export table.  In addition, some map files are processed to provide more information on syms -- src file links.  This is how the $LK,"Man",A="MN:Man"$()/$FG,2$AutoComplete$FG$ feature can find src lines.
+$ID,-2$$TR,"Why doesn't assert work?"$
+$ID,2$$FG,2$#assert$FG$ might print a message at COMPILE time, not run time.
+$ID,-2$$TR,"Why doesn't C++ public work?"$
+$ID,2$The word $FG,2$public$FG$ in $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ does very little except allow the $LK,"Help & Index",A="FI:::/Doc/HelpIndex.TXT"$ and $LK,"Who",A="MN:Who"$() to exclude meaningless syms.  If you wish a full report of public and nonpublic syms $MA-X+PU,"Click Here",LM="DocMax(1000000);Who;View;\n"$.
+$ID,-2$$TR,"How does the debugger do source debugging?"$
+$ID,2$When compilation takes place, the structures used by the compiler stick around.  Data on classes can be accessed.  See $LK,"ClassRep",A="MN:ClassRep"$().
+$ID,-2$$TR,"What are the ASCII 5 and ASCII 31 chars doing in my text files?"$
+$ID,2$The cursor location is stored as an $FG,2$ASCII 5$FG$ in files.  $FG,2$ASCII 31$FG$ is $FG,2$SHIFT-SPACE$FG$, a character which does not get converted to tabs by space-to-tabs, $LK,"S2T",A="MN:S2T"$().  The $FG,2$ASCII 28$FG$ is $FG,2$SHIFT-ESC$FG$. 
+$ID,-2$$TR,"Why is there garbage at the end of my text files?"$
+$ID,2$Binary sprite data is stored beyond the terminating $FG,2$NULL$FG$ in text files.  Map files store debug src line addresses.
+$ID,-2$$TR,"Why are sprites so small?"$
+$ID,2$Sprites can be stored as vector graphics so they might take shockingly little room.  They can be converted to bitmaps.
+$ID,-2$$TR,"Why don't I need to recompile /Adam and /Home files?"$
+$ID,2$If you change code in the $FG,2$/Adam$FG$ or your $FG,2$/Home$FG$ directory, you don't need to recompile, you just need to reboot because those directories get recompiled when you boot.  It uses $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$.  There is no $FG,2$.BIN$FG$ file for $FG,2$JIT$FG$ compilation.  See $LK,"::/StartOS.CPP"$.
+$ID,-2$$TR,"Why does it finds files that aren't there?"$
+$ID,2$If not found, $FG,2$.Z$FG$ is added or removed from filename and a search is done again.  If a file is still not found, the parent directories are searched for a file of the same name.
+$ID,-2$
+$FG,8$
+* "Windows" is a trademark of MicroSoft Corp.
+* "Linux" is probably a trademark owned by Linus Torvalds.
+* "VMware" is a trademark of VMware, Inc.
+* "VirtualBox" is a trademark of Oracle.
+$FG$

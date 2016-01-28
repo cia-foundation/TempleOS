@@ -23,7 +23,8 @@ U0 ACDocRst(I64 left,I64 top)
   DocRst(doc,TRUE);
   doc->flags|=DOCF_MIN_SIZE;
   Fs->border_src=BDS_CONST;
-  Fs->text_attr =Fs->border_attr=LTGRAY<<4+BLUE;
+  Fs->border_attr=LTGRAY<<4+DrvTextAttrGet(':')&15;
+  Fs->text_attr  =LTGRAY<<4+BLUE;
   LBtr(&Fs->display_flags,DISPLAYf_SHOW);
   WinHorz(left,Fs->win_right);
   WinVert(top,Fs->win_bottom);
@@ -259,9 +260,9 @@ U0 ACTask(I64)
 public Bool AutoComplete(Bool val=OFF)
 {//Turn AutoComplete OFF or ON.
   Bool	old_autocomplete=FALSE;
+  while (Bt(&ac.flags,ACf_INIT_IN_PROGRESS))
+    Sleep(10);
   if (val) {
-    while (Bt(&ac.flags,ACf_INIT_IN_PROGRESS))
-      Sleep(10);
     if (TaskValidate(ac.task))
       old_autocomplete=TRUE;
     else {

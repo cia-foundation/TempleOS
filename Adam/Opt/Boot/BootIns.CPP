@@ -42,16 +42,15 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
   I64 i,type;
   try {
     if (!src_drv) src_drv=Drv2Let(Fs->cur_dv);
+    src_drv=ToUpper(src_drv);
     if (!dst_drv) dst_drv=src_drv;
+    dst_drv=ToUpper(dst_drv);
     if (!Drv(src_drv))
       throw;
     MakeAll;
-    try {
-      bd=Let2BlkDev(dst_drv);
-      dv=Let2Drv(dst_drv);
+    if ((bd=Let2BlkDev(dst_drv,FALSE)) && (dv=Let2Drv(dst_drv,FALSE)))
       type=bd->type;
-    } catch {
-      Fs->catch_except=TRUE;
+    else {
       type=BDT_ATAPI;
       PrintWarn("Defaulting to CD/DVD dst.\n");
     }
@@ -100,8 +99,8 @@ public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
   CMasterBoot mbr;
   Drv(dst_drv);
   dv=Fs->cur_dv;
-  if (dv->type!=DVT_REDSEA && dv->type!=DVT_FAT32)
-    PrintErr("Not RedSea Drv\n");
+  if (dv->fs_type!=FSt_REDSEA && dv->fs_type!=FSt_FAT32)
+    PrintErr("File System Not Supported\n");
   else {
 //Bypass partition bounds-checking
     BlkDevLock(bd);
@@ -146,7 +145,7 @@ public U0 MasterBootZero(U8 dst_drv)
   BlkDevUnlock(bd);
 }
 
-public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
+public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
 {//Create new MBR on the disk that has drv_let as a partition.
 //Puts stage 2 in BOOT_DIR of drv_let.
   CBlkDev *bd,*bd1;
@@ -158,9 +157,10 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
   Bool result=FALSE;
 
   try {
-    if (drv_lst)
+    if (drv_lst) {
       StrCpy(buf,drv_lst);
-    else {
+      StrUtil(buf,SUF_TO_UPPER);
+    } else {
       j=0;
       for (i='A';i<='Z';i++)
 	buf[j++]=i;
@@ -169,8 +169,8 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
 
     Drv(drv_let);
     dv=Fs->cur_dv;
-    if (dv->type!=DVT_REDSEA && dv->type!=DVT_FAT32)
-      PrintErr("Not RedSea Drv\n");
+    if (dv->fs_type!=FSt_REDSEA && dv->fs_type!=FSt_FAT32)
+      PrintErr("File System Not Supported\n");
     else {
       bd=Let2BlkDev(drv_let);
       if (!FileFind(BOOT_DIR_OLDMBR_BIN_C,,FUF_JUST_FILES))
@@ -190,15 +190,7 @@ public Bool MasterBootIntall(U8 drv_let,U8 *drv_lst=NULL)
 
       ptr=buf;
       while (ch=*ptr++) {
-	try {
-	  p1 =Let2Drv(ch);
-	  bd1=Let2BlkDev(ch);
-	} catch {
-	  Fs->catch_except=TRUE;
-	  p1 =NULL;
-	  bd1=NULL;
-	}
-	if (p1 && bd1==bd) {
+	if ((p1=Let2Drv(ch,FALSE)) && (bd1=Let2BlkDev(ch,FALSE)) && bd1==bd) {
 	  *_q=p1->base_offset;
 	  "Drive %C:%16X\n",Drv2Let(p1),*_q;
 	  CatPrint(menu_ptr,"%d. Drive %C\n\r",j++,Drv2Let(p1));

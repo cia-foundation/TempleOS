@@ -37,7 +37,8 @@ U0 LogStructDel(LogStruct *templg)
 
 U0 PrsSingleLogFile(LogStruct *root,U8 *name,CDate *_start,CDate *_end)
 {
-  CDoc *doc=DocRead(name,DOCF_PLAIN_TEXT_WITH_TABS|DOCF_DBL_DOLLARS);
+  CDoc *doc=DocRead(name,
+	DOCF_PLAIN_TEXT_TABS|DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
   CDocEntry *doc_e=doc->root.next;
   U8 *src,*src2,*mon_lst=Define("ST_MONTHS");
   LogStruct *templg;

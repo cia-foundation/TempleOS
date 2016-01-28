@@ -341,7 +341,7 @@ U0 ICMul(CIntermediateCode *tempi,I64 ip)
   ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,TY_REG+RT_I64,r,0,ip);
 }
 
-U0 ICMulEqual(CIntermediateCode *tempi,I64 ip)
+U0 ICMulEqu(CIntermediateCode *tempi,I64 ip)
 {
   I64 i=tempi->a2.disp,r=REG_RAX,j;
   if (!(tempi->ic_class->raw_type&1) &&
@@ -449,7 +449,7 @@ U0 ICDiv(CIntermediateCode *tempi,I64 ip)
 	TY_REG+RT_I64,REG_RAX,0,ip);
 }
 
-U0 ICDivEqual(CIntermediateCode *tempi,Bool is_mod,I64 ip)
+U0 ICDivEqu(CIntermediateCode *tempi,Bool is_mod,I64 ip)
 {
   if (tempi->ic_flags & ICF_NOT_ADDR) {
     if (tempi->ic_flags & ICF_A1_FIRST) {
@@ -542,7 +542,7 @@ U0 ICMod(CIntermediateCode *tempi,I64 ip)
 	TY_REG+RT_I64,REG_RDX,0,ip);
 }
 
-U0 ICAddSubEctEqual(CIntermediateCode *tempi,I64 type_pointed,
+U0 ICAddSubEctEqu(CIntermediateCode *tempi,I64 type_pointed,
 	I64 t1,I64 r1,I64 d1,I64 t2,I64 r2,I64 d2,
 	I64 t3,I64 r3,I64 d3,I64 op,I64 ip)
 {
@@ -723,7 +723,7 @@ U0 ICShift(CIntermediateCode *tempi,I64 t1,I64 r1,I64 d1,
   ICMov(tempi,t1,r1,d1,TY_REG+RT_I64,result_reg,0,ip);
 }
 
-U0 ICShiftEqual(CIntermediateCode *tempi,I64 type_pointed,I64 t1,I64 r1,I64 d1,
+U0 ICShiftEqu(CIntermediateCode *tempi,I64 type_pointed,I64 t1,I64 r1,I64 d1,
 	I64 t2,I64 r2,I64 d2,I64 t3,I64 r3,I64 d3,I64 us,I64 is,I64 ip)
 {
   I64 result_reg;

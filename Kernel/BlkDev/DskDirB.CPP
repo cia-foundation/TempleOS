@@ -39,14 +39,14 @@ Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
     } else if (StrCmp(buf,".") && *buf) {
       dv=Fs->cur_dv;
       cur_dir_cluster=Name2DirCluster(dv,new_cur_dir);
-      switch (dv->type) {
-	case DVT_REDSEA:
+      switch (dv->fs_type) {
+	case FSt_REDSEA:
 	  result=RedSeaCd(buf,cur_dir_cluster);
 	  break;
-	case DVT_FAT32:
+	case FSt_FAT32:
 	  result=FAT32Cd(buf,cur_dir_cluster);
 	  break;
-	case DVT_ISO9660:
+	case FSt_ISO9660:
 	  result=ISO1Cd(buf,cur_dir_cluster);
 	  break;
 	default:
@@ -158,14 +158,14 @@ Bool MkDir(U8 *filename)
 	"Make Directory:%s\n",filename;
 	name=MStrUtil(dirc->mask,
 	      SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
-	switch (dirc->dv->type) {
-	  case DVT_REDSEA:
+	switch (dirc->dv->fs_type) {
+	  case FSt_REDSEA:
 	    result=RedSeaMkDir(dirc->dv,Fs->cur_dir,name);
 	    break;
-	  case DVT_FAT32:
+	  case FSt_FAT32:
 	    result=FAT32MkDir(dirc->dv,Fs->cur_dir,name);
 	    break;
-	  case DVT_ISO9660:
+	  case FSt_ISO9660:
 	    PrintErr("Not Writable\n");
 	    break;
 	  default:

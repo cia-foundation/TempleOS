@@ -240,7 +240,7 @@ public I64 GrFloodFill(CDC *dc=gr.dc,I64 x,I64 y,
 	Bool not_color=FALSE,I64 z=0,I32 *db=NULL)
 {//2D. Ignore z and db.
 //not_color=TRUE means fill up to everything which is not the current color.
-  //not_color=FALSE means fill all parts equal to the color under the point.
+  //not_color=FALSE means fill all parts equ to the color under the point.
   //Returns cnt of pixs changed
   I64 result=0,j,old_flags=dc->flags;
   CColorROPU32 old_color2=dc->color2;
@@ -711,7 +711,7 @@ public Bool GrRegPoly3(CDC *dc=gr.dc,
 public I64 GrFloodFill3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,Bool not_color=FALSE)
 {//3D. Transformation.
 //not_color=TRUE means fill up to everything which is not the current color.
-  //not_color=FALSE means fill all parts equal to the color under the point.
+  //not_color=FALSE means fill all parts equ to the color under the point.
   //Returns cnt of pixs changed
   I64 result,old_flags=dc->flags,
 	_x,_y,_z;
@@ -1364,11 +1364,9 @@ p4y
  1
   4
 
-
     2
  1
   4
-
 
 
   2

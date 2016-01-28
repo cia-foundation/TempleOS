@@ -25,7 +25,7 @@ public U0 DocLoad(CDoc *doc,U8 *src2,I64 size)
 	doc->cur_bin_num=tempb->num+1;
     }
   }
-  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS)))
+  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)))
     DocBinsValidate(doc);
   DocTop(doc); //DOCT_CURSOR will set it in recalc
   DocRecalc(doc);
@@ -59,14 +59,13 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   I64 ch,i,cnt;
   U8 *st,*result,*dst,*src;
 
+  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)))
+    DocBinsValidate(doc);
+  DocRecalc(doc);
   if (doc->flags&DOCF_NO_CURSOR || doc->root.next==doc)
     cnt=1; //terminator
   else
     cnt=2; //cursor + terminator
-
-  if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS)))
-    DocBinsValidate(doc);
-  DocRecalc(doc);
   for (doc_e=doc->root.next;doc_e!=doc;doc_e=doc_e->next) {
     if (!Bt(doldoc.type_flags_data,doc_e->type_u8)) {
       switch (doc_e->type_u8) {
@@ -80,27 +79,22 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	  else
 	    cnt++;
 	  break;
+	case DOCT_SOFT_NEW_LINE:
+	  break;
 	case DOCT_TEXT://$BK,1$Update $LK,"DOCT_TEXT",A="FF:D:/Compiler/Lex.CPP,DOCT_TEXT"$$BK,0$
 	  if (!(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
 		DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_FILTER_SKIP))&&
 		!(doc_e->type&DOCG_BL_IV_UL)) {
 	    cnt+=StrLen(doc_e->tag);
-	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_WITH_TABS)) ||
+	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_TABS)) ||
 		  doc->flags&DOCF_DBL_DOLLARS)
 	      cnt+=StrOcc(doc_e->tag,'$$');
-	  } else {
-	    st=Doc2PlainText(doc,doc_e);
-	    cnt+=StrLen(st)+2;
-	    Free(st);
+	    break;
 	  }
-	  break;
 	default:
-	  if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE &&
-		doc_e->type_u8!=DOCT_CURSOR) {
-	    st=Doc2PlainText(doc,doc_e);
-	    cnt+=StrLen(st)+2;
-	    Free(st);
-	  }
+	  st=Doc2PlainText(doc,doc_e);
+	  cnt+=StrLen(st)+2;
+	  Free(st);
       }
     }
   }
@@ -125,7 +119,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	    *dst++=CH_CURSOR;
 	  *dst++=ch;
 	  if (ch=='$$') {
-	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_WITH_TABS)) ||
+	    if (!(doc->flags & (DOCF_PLAIN_TEXT | DOCF_PLAIN_TEXT_TABS)) ||
 		  doc->flags&DOCF_DBL_DOLLARS)
 	      *dst++=ch;
 	  }
@@ -148,16 +142,15 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	      *dst++='\r';
 	    *dst++='\n';
 	    break;
+	  case DOCT_SOFT_NEW_LINE:
+	    break;
 	  default:
-	    if (doc_e->type_u8!=DOCT_SOFT_NEW_LINE &&
-		  doc_e->type_u8!=DOCT_CURSOR) {//(Cursor is set by cur_entry)
-	      *dst++='$$';
-	      st=Doc2PlainText(doc,doc_e);
-	      StrCpy(dst,st);
-	      dst+=StrLen(st);
-	      *dst++='$$';
-	      Free(st);
-	    }
+	    *dst++='$$';
+	    st=Doc2PlainText(doc,doc_e);
+	    StrCpy(dst,st);
+	    dst+=StrLen(st);
+	    *dst++='$$';
+	    Free(st);
 	}
       }
     }

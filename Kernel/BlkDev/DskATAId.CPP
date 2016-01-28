@@ -207,12 +207,7 @@ CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,
   CATARep *result=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
   Bool was_silent=Silent;
-  try
-	  bd=Let2BlkDev(_sys_boot_drv);
-  catch {
-    Fs->catch_except=TRUE;
-    bd=NULL;
-  }
+  bd=Let2BlkDev(_sys_boot_drv,FALSE);
   Silent(was_silent);
   while (tempha) {
     if (!result && bd && bd->type==tempha->type) {

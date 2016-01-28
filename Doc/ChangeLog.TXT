@@ -2,7 +2,50 @@
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/12/16 16:47:54----$IV,0$
+$IV,1$----01/28/16 14:05:52----$IV,0$
+* Fixed bug in $LK,"AutoComplete",A="MN:AutoComplete"$() init.
+* Added $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().
+
+$IV,1$----01/27/16 20:41:54----$IV,0$
+* $BK,1$TempleOS version 4.02 Released$BK,0$
+
+$IV,1$----01/27/16 06:40:46----$IV,0$
+* Added $FG,2$<F2>$FG$ macro to $LK,"TestSuite",A="FI:::/Misc/OSTestSuite.CPP"$.
+* Added compiler err for $FG,2$break;$FG$ in a subswitch preface.
+
+$IV,1$----01/27/16 04:14:08----$IV,0$
+* Added $LK,"::/Demo/ToHtmlToTXTExample/HtmlGen.CPP"$ and $LK,"::/Demo/ToHtmlToTXTExample/TXTGen.CPP"$.
+* Now, $LK,"Plain",A="MN:Plain"$() doesn't save with $LK,"CH_CURSOR",A="MN:CH_CURSOR"$.
+* $LK,"R",A="MN:R"$("DOCF_PLAIN_TEXT_WITH_TABS","DOCF_PLAIN_TEXT_TABS"); 
+* Change $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ "DF:word" to "DN:word".
+* Merged documentation into $LK,"::/Doc/FAQ.TXT"$.
+
+$IV,1$----01/26/16 17:51:45----$IV,0$
+* $LK,"R",A="MN:R"$("PSect","FunSeg"); 
+* $LK,"R",A="MN:R"$("Equal","Equ");
+* $LK,"R",A="MN:R"$("Binary","Bin");
+
+$IV,1$----01/26/16 14:09:45----$IV,0$
+* Changed $LK,"DirContextNew",A="MN:DirContextNew"$(), $LK,"FilesFindMatch",A="MN:FilesFindMatch"$() and $LK,"FilesFind",A="MN:FilesFind"$() to use full_name.
+* $LK,"R",A="MN:R"$("Statement","Stmt");
+
+$IV,1$----01/18/16 15:19:43----$IV,0$
+* Added except arg to $LK,"Let2BlkDev",A="MN:Let2BlkDev"$(), $LK,"BlkDevChk",A="MN:BlkDevChk"$(), $LK,"Let2Drv",A="MN:Let2Drv"$(), $LK,"DrvChk",A="MN:DrvChk"$() and $LK,"DrvIsWritable",A="MN:DrvIsWritable"$().
+
+$IV,1$----01/16/16 08:20:00----$IV,0$
+* Added $LK,"DrvTextAttrGet",A="MN:DrvTextAttrGet"$().
+* Removed $FG,4$DrvTextAttrSet$FG$().
+
+$IV,1$----01/15/16 00:47:31----$IV,0$
+* $LK,"KeyboardPlug-Ins '9','0'",A="FF:::/HomeKeyPlugIns.CPP,'9'"$.
+* $LK,"R",A="MN:R"$("$$$$LM,5$$$$","$$$$ID,5$$$$");
+
+$IV,1$----01/15/16 00:12:02----$IV,0$
+* Added $LK,"Let2BlkDevType",A="MN:Let2BlkDevType"$().
+* Added $LK,"WIF_SELF_FOCUS",A="MN:WIF_SELF_FOCUS"$ to $LK,"::/Misc/OSInstall.CPP"$.
+* Added $FG,2$%$$F$FG$ to $LK,"Print(\"\") Fmt Strings",A="FI:::/Doc/Print.TXT"$.
+
+$IV,1$----01/12/16 19:17:12----$IV,0$
 * Overhauled $LK,"Mount",A="MN:Mount"$() and $LK,"::/Kernel/KCfg.CPP"$.
 
 $IV,1$----01/12/16 10:06:18----$IV,0$
@@ -24,7 +67,7 @@ $IV,1$----01/06/16 11:01:57----$IV,0$
 
 $IV,1$----01/03/16 17:15:41----$IV,0$
 * Updated $LK,"::/Misc/PCIDevices.TXT"$.
-* Added null case option.  Next higher integer with "$FG,2$case:$FG$" in $FG,2$switch$FG$ statements.  See  $LK,"::/Demo/NullCase.CPP"$.
+* Added null case option.  Next higher integer with "$FG,2$case:$FG$" in $FG,2$switch$FG$ stmts.  See  $LK,"::/Demo/NullCase.CPP"$.
 
 $IV,1$----12/31/15 00:44:44----$IV,0$
 * Made $LK,"ASM_KEYWORD",A="FF:::/Compiler/OpCodes.TXT,ASM_KEYWORD"$s usable in HolyC outside asm{} blocks.

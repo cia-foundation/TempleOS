@@ -7,7 +7,11 @@
 class CHeapLog
 {
   CHeapLog *next,*last;
-  U8 *addr;
+  union {
+    U8 *addr;
+    I64 size;
+  }
+  I64 cnt;
   U8 *caller[HL_CALLER_DEPTH];
 };
 
@@ -67,7 +71,7 @@ U0 HeapLogFree(U8 *addr)
 }
 
 public Bool HeapLog(Bool val=ON,CTask *task=NULL)
-{//Turn on.  Collect data.  Call $LK,"HeapLogRep",A="MN:HeapLogRep"$().
+{//Turn on.  Collect data.  Call $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() or  $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().
   I64 i;
   if (val) {
     if (Bt(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
@@ -108,7 +112,7 @@ public Bool HeapLog(Bool val=ON,CTask *task=NULL)
   }
 }
 
-public U0 HeapLogRep(Bool leave_it=OFF)
+public U0 HeapLogAddrRep(Bool leave_it=OFF)
 {//Call $LK,"HeapLog",A="MN:HeapLog"$() first and collect data.
   I64 i,j,total=0;
   CHeapLog *temphl,hl;
@@ -133,6 +137,73 @@ public U0 HeapLogRep(Bool leave_it=OFF)
     }
   }
   LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+  "\n$$LTRED$$Total:%08X$$FG$$\n",total;
+  LBts(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0);
+  if (!leave_it)
+    HeapLog(OFF);
+}
+
+public U0 HeapLogSizeRep(Bool leave_it=OFF)
+{//Call $LK,"HeapLog",A="MN:HeapLog"$() first and collect data.
+  I64 i,j,k,total=0;
+  CHeapLog *temphla,hla,*temphls,*temphls1;
+  CHeapLogHash *size_root;
+  if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
+    "HeapLog Not Active\n";
+    return;
+  }
+
+  size_root=MAlloc(sizeof(CHeapLogHash)*HL_HASH_SIZE,heaplog_hc);
+  for (i=0;i<HL_HASH_SIZE;i++)
+    QueInit(&size_root[i]);
+
+  "$$WW,0$$";
+  while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+    PAUSE
+  for (i=0;i<HL_HASH_SIZE;i++) {
+    temphla=heaplog_root[i].next;
+    while (temphla!=&heaplog_root[i]) {
+//Take snapshot in case modified. (while we work)
+      MemCpy(&hla,temphla,sizeof(CHeapLog));
+      k=(MSize(hla.addr)>>3+hla.caller[0])&(HL_HASH_SIZE-1);
+      temphls=size_root[k].next;
+      while (temphls!=&size_root[k]) {
+	if (MSize(hla.addr)==temphls->size) {
+	  for (j=0;j<HL_CALLER_DEPTH;j++)
+	    if (hla.caller[j]!=temphls->caller[j])
+	      goto hl_next;
+	  temphls->cnt++;
+	  goto hl_found;
+	}
+hl_next:
+	temphls=temphls->next;
+      }
+      temphls=MAlloc(sizeof(CHeapLog),heaplog_hc);
+      MemCpy(temphls,&hla,sizeof(CHeapLog));
+      temphls->cnt=1;
+      temphls->size=MSize(hla.addr);
+      QueIns(temphls,size_root[k].last);
+hl_found:
+      temphla=hla.next;
+    }
+  }
+  LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+
+  for (i=0;i<HL_HASH_SIZE;i++) {
+    temphls=size_root[i].next;
+    while (temphls!=&size_root[i]) {
+      temphls1=temphls->next;
+      "%08X*%08X=%08X",temphls->size,temphls->cnt,temphls->size*temphls->cnt;
+      for (j=0;j<HL_CALLER_DEPTH;j++)
+	" %P",temphls->caller[j];
+      '\n';
+      total+=temphls->size*temphls->cnt;
+      Free(temphls);
+      temphls=temphls1;
+    }
+  }
+  Free(size_root);
+
   "\n$$LTRED$$Total:%08X$$FG$$\n",total;
   LBts(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0);
   if (!leave_it)

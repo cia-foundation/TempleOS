@@ -30,7 +30,7 @@ I64 FindFile(U8 *needle_str,U8 *haystack_filename,
   U8 *src,*dst,*dst2,*name_buf=NULL;
   I64 i,j,plen,rlen,dlen,cnt=0,old_flags,ss_flags;
   CDoc *cur_l,*doc=DocRead(haystack_filename,
-	DOCF_PLAIN_TEXT_WITH_TABS|DOCF_NO_CURSOR);
+	DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e;
 
   if (Bt(_fuf_flags,FUf_IGNORE))
@@ -118,7 +118,7 @@ I64 FindFile(U8 *needle_str,U8 *haystack_filename,
 		DocDel(doc);
 		"Wrote:%s\n",name_buf;
 		Ed(name_buf);
-		doc=DocRead(name_buf, DOCF_PLAIN_TEXT_WITH_TABS);
+		doc=DocRead(name_buf, DOCF_PLAIN_TEXT_TABS);
 		doc_e=doc->cur_entry;
 		if (doc_e->last!=doc) doc_e=doc_e->last;
 		src=NULL;

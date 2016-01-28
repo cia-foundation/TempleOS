@@ -217,9 +217,9 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   DocPrint(doc,"$$LTBLUE$$");
   for (i=0;i<NUM_DRVS;i++) {
     dv=&blkdev.drvs[i];
-    if (dv->type==DVT_REDSEA||dv->type==DVT_FAT32)
+    if (dv->fs_type==FSt_REDSEA||dv->fs_type==FSt_FAT32)
       FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
-    else if (dv->type==DVT_ISO9660) {
+    else if (dv->fs_type==FSt_ISO9660) {
       if (dv->bd->flags&BDF_INITIALIZED)
 	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
       else {

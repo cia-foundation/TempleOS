@@ -10,8 +10,9 @@ U0 TourPutTask()
   WinVert(TEXT_ROWS/2+5,TEXT_ROWS-7);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
   WinToTop;
-  Fs->text_attr=Fs->border_attr=LTGRAY<<4+BLUE;
   Fs->border_src=BDS_CONST;
+  Fs->border_attr=LTGRAY<<4+DrvTextAttrGet(':')&15;
+  Fs->text_attr  =LTGRAY<<4+BLUE;
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER-WIF_SELF_IP_L
 		-WIF_SELF_IP_R-WIG_DBL_CLICK;
   doc=DocPut;

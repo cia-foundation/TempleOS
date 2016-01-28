@@ -497,7 +497,7 @@ U0 DocEntryToggle(CDoc *doc)
   U8 ch,*st,*st2;
   I64 i,j,k;
   if (doc_ce!=doc &&
-	!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS))) {
+	!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS))) {
     if (doc_ce->type_u8==DOCT_TEXT && !(doc_ce->de_flags &
 	  ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
 	  DOCEF_SKIP|DOCEF_FILTER_SKIP)) &&
@@ -593,7 +593,7 @@ U0 DocFlagsToggle(CDoc *doc,I64 tog_flags)
   U8 *st;
   CDocUndo *u_next,*u_last;
 
-  doc->flags|=DOCF_COLOR_NAMES;
+  doc->flags=doc->flags&~DOCF_NO_CURSOR|DOCF_COLOR_NAMES;
   st=DocSave(doc,&size);
 
   u_next=doc->undo_root.next;
@@ -604,8 +604,9 @@ U0 DocFlagsToggle(CDoc *doc,I64 tog_flags)
   doc->undo_root.next=u_next;
   doc->undo_root.last=u_last;
   DocUndoCntSet(doc);
-  doc->flags=flags & ~(DOCG_BL_IV_UL|DOCF_WORD_WRAP);
+  doc->flags=flags&~(DOCF_NO_CURSOR|DOCG_BL_IV_UL|DOCF_WORD_WRAP);
   DocLoad(doc,st,size);
+  doc->flags|=flags&DOCF_NO_CURSOR;
   DocCenter(doc);
   if (unlock)
     DocUnlock(doc);

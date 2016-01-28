@@ -12,11 +12,9 @@ U0 SysMacroStripKey(CSrvCmd *macro_root,I64 a1,I64 a2)
   while (tempc!=macro_root) {
     tempc1=tempc->next;
     if (tempc->cmd_code==SVCT_MSG &&
-	  (tempc->msg_code==MSG_KEY_DOWN ||
-	  tempc->msg_code==MSG_KEY_UP ||
+	  (tempc->msg_code==MSG_KEY_DOWN || tempc->msg_code==MSG_KEY_UP ||
 	  tempc->msg_code==MSG_KEY_DOWN_UP) &&
-	  a1 && tempc->aux1==a1 ||
-	  !a1 && tempc->aux2==a2) {
+	  a1 && tempc->aux1==a1 || !a1 && tempc->aux2==a2) {
       QueRem(tempc);
       SrvCmdDel(tempc);
     }
@@ -161,15 +159,15 @@ I64 PopUpMacroMenu()
 	"\n\n\n$$GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
   doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
   StrPrint(buf,"DocMenu(%d);",doc);
-  sys_macro_util_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
-  Fs->popup_task=sys_macro_util_task;
-  LBts(&sys_macro_util_task->display_flags,DISPLAYf_WIN_ON_TOP);
-  tempc=TaskExe(sys_macro_util_task,Fs,buf,
+  sys_macro_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
+  Fs->popup_task=sys_macro_task;
+  LBts(&sys_macro_task->display_flags,DISPLAYf_WIN_ON_TOP);
+  tempc=TaskExe(sys_macro_task,Fs,buf,
 	1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
   JobResultScan(tempc,&result);
   Fs->popup_task=NULL;
-  Kill(sys_macro_util_task);
-  sys_macro_util_task=NULL;
+  Kill(sys_macro_task);
+  sys_macro_task=NULL;
   DocDataScan(doc,doc_e);
   DocDel(doc);
   return result;
@@ -208,6 +206,6 @@ U0 MacroTask(I64)
 
 U0 EdMacroUtil()
 {
-  if (!sys_macro_util_task)
+  if (!sys_macro_task)
     Spawn(&MacroTask,NULL,"Macro");
 }

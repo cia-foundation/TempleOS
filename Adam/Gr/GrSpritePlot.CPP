@@ -15,7 +15,8 @@ making CSprite by hand.  It uses $LK,"SPT_MESH",A="MN:SPT_MESH"$,
 one of the most complicated.
 */
 
-public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
+public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
+	Bool just_one_elem=FALSE)
 {//Plot a sprite into a CDC.
   CSprite *tempg=elems-offset(CSprite.start);
   I64 i,j,k,x1,y1,z1,x2,y2,
@@ -252,7 +253,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,Bool just_one=FALSE)
       dc->nearest_sprite_elem_num=cur_sprite_elem_num;
     }
     cur_sprite_elem_num++;
-    if (just_one) break;
+    if (just_one_elem) break;
     tempg(U8 *)+=SpriteElemSize(tempg);
   }
   MemCpy(&dc->sym,&old_sym,sizeof(CGrSym));

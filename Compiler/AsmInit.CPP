@@ -77,7 +77,7 @@ U0 AsmHashLoad()
     i=LstMatch(cc->cur_str,"R8\0R16\0R32\0R64\0SEG\0FSTK\0"
 	  "MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
     if (i<0)
-      LexExcept(cc,"Unknown Statement");
+      LexExcept(cc,"Unknown Stmt");
     Lex(cc); //skip keyword
     if (cc->token!=TK_IDENT)
       LexExcept(cc,"expecting identifier at ");

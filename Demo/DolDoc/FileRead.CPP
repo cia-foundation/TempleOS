@@ -8,7 +8,7 @@ public U0 DocProfile(U8 *filename,I64 flags)
   //use $LK,"DocRecalc",A="MN:DocRecalc"$().
   CDoc *doc=DocRead(filename,flags);
 
-  //doc->root which is equal to doc is the
+  //doc->root which is equ to doc is the
   //header of the CQue and represents the end-of-file marker.
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {

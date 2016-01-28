@@ -13,65 +13,21 @@ U0 TOSBootRescueDrv1()
 
 U0 TOSBootRescueDrv2()
 {
-  DefinePrint("CFG_BOOT_RESCUE_DRV","\"a10x%X\n0x%X\n\"",TOS_BOOT_RESCUE_DRV,
+  DefinePrint("CFG_BOOT_RESCUE_DRV","\"a0x%X\n0x%X\n\"",TOS_BOOT_RESCUE_DRV,
 	(TOS_BOOT_RESCUE_DRV_END-TOS_BOOT_RESCUE_DRV)/BLK_SIZE);
   DefinePrint("CFG_BOOT_RESCUE_DRV_START","\"0x%X\"",TOS_BOOT_RESCUE_DRV);
 } TOSBootRescueDrv2;
 
 U0 TOSInit()
 {
-  CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL;
-  CBlkDev *bd;
-  switch (tos_cid) {
-    case CID_DFT:
-      DefinePrint("CFG_RAM_DRVS",
-	    "\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
-      if (blkdev.auto_mount_ide_cnt) {
-//If AutoMount was successful, No need to manually mount in next compile
-	DefinePrint("CFG_HARD_DRVS","\"\"");
-	DefinePrint("CFG_DVD_DRVS","\"\"");
-      } else {
-
-	//These two are a crazy guess.	ATA:IDE Primary  ATAPI:IDE Secondary
-	DefinePrint("CFG_HARD_DRVS","\"cs0x1F0\n0x3F4\n0\"");
-	DefinePrint("CFG_DVD_DRVS","\"ts0x170\n0\"");
-
-	bd=Let2BlkDev(':');
-	if (bd->type==BDT_ATAPI) {
-	  ATARep(FALSE,,&root);
-	  ATAIDDrvs(root,blkdev.boot_drv_let,&ata_drv,&atapi_drv);
-	  if (ata_drv)
-	    DefinePrint("CFG_HARD_DRVS","\"cp%d\n\"",ata_drv->num);
-	  if (atapi_drv)
-	    DefinePrint("CFG_DVD_DRVS","\"tp%d\n\"",atapi_drv->num);
-	} else {
-	  try {
-	    bd=Let2BlkDev('C');
-	    DefinePrint("CFG_HARD_DRVS","\"cs0x%X\n0x%X\n%d\"",
-		  bd->base0,bd->base1,bd->unit);
-	  } catch
-	    Fs->catch_except=TRUE;
-	  try {
-	    bd=Let2BlkDev('T');
-	    DefinePrint("CFG_DVD_DRVS","\"ts0x%X\n%d\"",bd->base0,bd->unit);
-	  } catch
-	    Fs->catch_except=TRUE;
-	}
-      }
-      DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
-      DefinePrint("TOS_HDS","\"CD\"");
-      DefinePrint("TOS_MASTER_BOOT_DRVS","\"C\"");
-  }
+  DefinePrint("CFG_RAM_DRVS",
+	"\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
+  DefinePrint("CFG_HARD_DRVS","\"\"");
+  DefinePrint("CFG_DVD_DRVS","\"\"");
+  DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
+  DefinePrint("TOS_HDS","\"CD\"");
+  DefinePrint("TOS_MASTER_BOOT_DRVS","\"C\"");
 } TOSInit;
-
-U0 TOSDrvTextAttrSet()
-{
-  DrvTextAttrSet('C', WHITE <<4|BLUE);	//Main
-  DrvTextAttrSet('D', WHITE <<4|RED);	//Back-up
-  DrvTextAttrSet('A', BLUE  <<4|BROWN);	//Rescue
-  DrvTextAttrSet('B', BLUE  <<4|YELLOW);//RAM
-  DrvTextAttrSet('T', LTGRAY<<4|BLUE);	//CD/DVD
-} TOSDrvTextAttrSet;
 
 #define TOS_ISO_NAME	"B:/TempleOSCD.ISO"
 #define TOS_DISTRO_DIR	"B:/Distro"

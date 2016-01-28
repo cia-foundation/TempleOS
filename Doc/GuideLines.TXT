@@ -64,7 +64,7 @@ $FG,5$$TX+CX,"Programming Guidelines"$$FG$
 
 * Use $FG,2$I64$FG$ instead of smaller int sizes because the compiler converts everything to 64-bit.  Don't use unsigned$FG$ unless it actually breaks.  A policy of signed keeps it simple so you don't have to agonize over choices.
 
-$LM,5$$HL,1$U32 DistDist(U16 x1, U16 y1, U16 x2, U16 y2)
+$ID,5$$HL,1$U32 DistDist(U16 x1, U16 y1, U16 x2, U16 y2)
 {//This requires zero-extend when fetching args.
   return SqrI64(x1-x2)+SqrI64(y1-y2);
 }
@@ -73,7 +73,7 @@ I64 DistDist(I64 x1, I64 y1, I64 x2, I64 y2)
 {
   return SqrI64(x1-x2)+SqrI64(y1-y2);
 }$HL,0$
-$LM,0$
+$ID,-5$
 * In-order, short circuit logic is assumed.
 
 * Avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte signed int -- nothing forces it to $FG,2$1$FG$ or $FG,2$0$FG$.  There is a $LK,"ToBool",A="MN:ToBool"$() function that will for to $FG,2$1$FG$ ot $FG,2$0$FG$, however.
@@ -124,7 +124,7 @@ $FG,2$	PUSH	RBP
 	LEAVE
 	RET
 $FG$
-* The args are removed from the stack with $FG,2$RET1$FG$ statements.
+* The args are removed from the stack with $FG,2$RET1$FG$ stmts.
 
 	$FG,2$RET1	16	//remove two args$FG$
 

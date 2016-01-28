@@ -9,13 +9,13 @@ $LK,"::/Doc/HelloWorld.TXT"$
 $WW,0$$TR,"Games: Beginner"$
 $ID,2$$LK,"::/Demo/Graphics/NetOfDots.CPP"$
 $LK,"::/Demo/Graphics/InputPointer.CPP"$
+$LK,"::/Demo/Graphics/Lines.CPP"$
 $LK,"::/Demo/Graphics/SunMoon.CPP"$
-$LK,"::/Demo/Games/ElephantWalk.CPP"$
 $LK,"::/Demo/Graphics/LowPassFilter.CPP"$
 $LK,"::/Demo/Graphics/MathAudioDemo.CPP"$
-$LK,"::/Demo/Graphics/Lines.CPP"$
 $LK,"::/Demo/Games/TicTacToe.CPP"$
 $LK,"::/Demo/Graphics/SpritePlot.CPP"$
+$LK,"::/Demo/Games/ElephantWalk.CPP"$
 $LK,"::/Demo/Graphics/SpritePut.CPP"$
 $LK,"::/Demo/Graphics/SpritePutExt.CPP"$
 $LK,"::/Demo/Snd/ASCIIOrgan.CPP"$
@@ -37,13 +37,13 @@ $LK,"::/Demo/Graphics/Blot.CPP"$
 $LK,"::/Demo/Graphics/ScreenCapture.CPP"$
 $LK,"::/Demo/Graphics/EdSprite.CPP"$
 $LK,"::/Demo/PullDownMenu.CPP"$
-$MA-X+PU,"::/Demo/Games/Stadium",LM="Cd(\"::/Demo/Games/Stadium\");Dir;View;\n"$
 $LK,"::/Demo/Graphics/Palette.CPP"$
 $LK,"::/Demo/Games/CircleTrace.CPP"$
 $LK,"::/Demo/Games/Halogen.CPP"$
 $LK,"::/Demo/Games/TheDead.CPP"$
 $LK,"::/Demo/Games/RainDrops.CPP"$
 $LK,"::/Demo/Snd/MorseCode.CPP"$
+$MA-X+PU,"::/Demo/Games/Stadium",LM="Cd(\"::/Demo/Games/Stadium\");Dir;View;\n"$
 $LK,"::/Demo/Graphics/Lattice.CPP"$
 $LK,"::/Demo/Graphics/Collision.CPP"$
 $LK,"::/Demo/Games/BlackDiamond.CPP"$
@@ -125,7 +125,9 @@ $ID,2$$LK,"::/Misc/DoDistro.CPP"$
 $LK,"::/Demo/DbgDemo.CPP"$
 $LK,"::/Demo/SubSwitch.CPP"$
 $LK,"::/Demo/DateTime.CPP"$
-$LK,"::/Demo/ReverseFileExample/Reverse.CPP"$.
+$LK,"::/Demo/ReverseFileExample/Reverse.CPP"$
+$LK,"::/Demo/ToHtmlToTXTExample/HtmlGen.CPP"$
+$LK,"::/Demo/ToHtmlToTXTExample/TXTGen.CPP"$
 $LK,"::/Demo/SortFileExample/F64FileGen.CPP"$
 $LK,"::/Demo/SortFileExample/F64FileSort.CPP"$
 $LK,"::/Demo/PhoneNumWords.CPP"$

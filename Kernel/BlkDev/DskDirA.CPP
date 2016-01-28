@@ -1,11 +1,11 @@
 Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
 {//Makes a directory entry in the directory from a $LK,"CDirEntry",A="MN:CDirEntry"$ node.
-  switch (dv->type) {
-    case DVT_REDSEA:
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
       return RedSeaDirNew(dv,cur_dir,tempde,free_old_chain);
-    case DVT_FAT32:
+    case FSt_FAT32:
       return FAT32DirNew(dv,cur_dir,tempde,free_old_chain);
-    case DVT_ISO9660:
+    case FSt_ISO9660:
       PrintErr("Not Writable\n");
       return FALSE;
     default:

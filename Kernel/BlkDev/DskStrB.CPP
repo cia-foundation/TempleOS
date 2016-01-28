@@ -20,14 +20,14 @@ I64 Name2DirCluster(CDrv *dv,U8 *dirname)
     while (*buf && cont) {
       StrFirstRem(buf,"/",buf2);
       if (*buf2) {
-	switch (dv->type) {
-	  case DVT_REDSEA:
+	switch (dv->fs_type) {
+	  case FSt_REDSEA:
 	    cont=RedSeaFileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
-	  case DVT_FAT32:
+	  case FSt_FAT32:
 	    cont=FAT32FileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
-	  case DVT_ISO9660:
+	  case FSt_ISO9660:
 	    cont=ISO1FileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
 	  default:
@@ -65,14 +65,14 @@ I64 Name2ParentDirCluster(CDrv *dv,U8 *dirname)
       cur_dir_cluster2=cur_dir_cluster;
       StrFirstRem(buf,"/",buf2);
       if (*buf2) {
-	switch (dv->type) {
-	  case DVT_REDSEA:
+	switch (dv->fs_type) {
+	  case FSt_REDSEA:
 	    cont=RedSeaFileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
-	  case DVT_FAT32:
+	  case FSt_FAT32:
 	    cont=FAT32FileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
-	  case DVT_ISO9660:
+	  case FSt_ISO9660:
 	    cont=ISO1FileFind(dv,cur_dir_cluster,buf2,&de,FUF_JUST_DIRS);
 	    break;
 	  default:

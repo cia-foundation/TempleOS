@@ -81,7 +81,7 @@ public U0 JukeSong(I64 num)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,num,num+1);
+  JukeSongsPuppet("::/Home/Downloads/Psalmody",,num,num+1);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -91,7 +91,7 @@ public U0 JukeLines(I64 start_line,I64 end_line)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,start_line*5,end_line*5);
+  JukeSongsPuppet("::/Home/Downloads/Psalmody",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -177,54 +177,6 @@ public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
   Free(out_name);
 }
 
-U0 DblSpaceScanFile(U8 *filename)
-{
-  CDoc *doc=DocRead(filename);
-  I64 i;
-  CDocEntry *doc_e=doc->root.next;
-  while (doc_e!=doc) {
-    if (doc_e->type_u8==DOCT_NEW_LINE &&
-	  doc_e->next->type_u8==DOCT_NEW_LINE &&
-	  doc_e->next->next->type_u8==DOCT_NEW_LINE) {
-      i=0;
-      while (doc_e->type_u8==DOCT_NEW_LINE) {
-	i++;
-	doc_e=doc_e->next;
-      }
-      "%02d:",i;
-      PutFileLink(doc->filename.name,doc_e->y);
-      '\n';
-    } else
-      doc_e=doc_e->next;
-  }
-  DocDel(doc);
-}
-
-U0 DblSpaceScanLst(CDirEntry *tempde)
-{
-  CDirEntry *tempde1;
-  while (tempde) {
-    tempde1=tempde->next;
-    if (tempde->attr & RS_ATTR_DIR) {
-      if (tempde->sub) {
-	"Scanning Directory: %s\n",tempde->full_name;
-	DblSpaceScanLst(tempde->sub);
-      }
-    } else
-      DblSpaceScanFile(tempde->full_name);
-    DirEntryDel(tempde);
-    tempde=tempde1;
-  }
-}
-
-public U0 DblSpaceScan(U8 *files_find_mask="*",U8 *fu_flags=NULL)
-{
-  I64 f=0;
-  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
-  ScanFlags(&f,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  DblSpaceScanLst(FilesFind(files_find_mask,f));
-}
-
 RegSetDftEntry("TempleOS/TOS",
 	"I64 tos_code_walk_thru=1,tos_after_egypt_in_action=1;\n");
 RegExeBranch("TempleOS/TOS");
@@ -305,7 +257,7 @@ U0 TempleOSTheme()
 {
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  ExeFile("::/Home/Wb2/Files/TempleOSTheme.CPP");
+  ExeFile("::/Home/Downloads/Graphics/TempleOSTheme.CPP");
   DocClear;
 }
 
@@ -315,6 +267,6 @@ U0 TOSJukeVideo(I64 start=0,I64 end=10)
   Free(buf);
   AutoComplete;
   FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Wb2/Files/Psalmody",,start,end);
+  JukeSongsPuppet("::/Home/Downloads/Psalmody",,start,end);
   FrameGrabberToggle;
 }

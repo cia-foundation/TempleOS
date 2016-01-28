@@ -165,7 +165,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      else {
 		FifoU8Flush(god.fifo);
 		GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
-		GodBooksPassage("C:/Home/Wb2/Files/Text/*");
+		GodBooksPassage("C:/Home/Downloads/Text/*");
 	      }
 	    } else {
 	      if (sc&SCF_KEY_DESC)
@@ -293,6 +293,18 @@ Bool MyPutKey(I64 ch,I64 sc)
 	else
 	  'ê';
 	return TRUE;
+      case '9':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Dol /---->");
+	else
+	  "$$ID,5$$";
+	return TRUE;
+      case '0':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Dol /<----");
+	else
+	  "$$ID,-5$$";
+	return TRUE;
       case 'b':
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /Jump to Bad Code");
@@ -309,7 +321,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /JukeBox(TAD)");
 	else
-	  JukeBox("::/Home/Wb2/Files/Psalmody");
+	  JukeBox("::/Home/Downloads/Psalmody");
 	return TRUE;
       case 'P':
 	if (sc&SCF_KEY_DESC)

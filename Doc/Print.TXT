@@ -29,7 +29,9 @@ $FG,2$"%h25c",'\n';$FG$ 25 new-lines.
 
 $FG,2$"%h*c",25,'\n';$FG$ 25 new-lines.
 
-$FG,2$"%F"$FG$ text file.
+$FG,2$"%F"$FG$ text file by filename.
+
+$FG,2$"%$$F"$FG$ $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file in memory.
 
 $FG,2$"%p"$FG$ ptr.
 

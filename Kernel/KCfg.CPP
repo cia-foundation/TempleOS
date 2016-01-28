@@ -27,8 +27,8 @@ class CKernelCfg
 
 CDoc *KernelCfgAddDev(CKernelCfg *c)
 {
-  I64 ch,cnt=0;
-  CDoc *doc=DocNew,*doc2;
+  I64 ch;
+  CDoc *doc=DocNew;
   "\n\nIn anticipation of the drives you will\n"
 	"define shortly, enter the drive letter\n"
 	"of the drive with the account directory.\n"
@@ -40,13 +40,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
     c->boot_drv_let=Drv2Let(Fs->cur_dv);
   "\n\n$$BK,1$$$$PURPLE$$Mount drives so they will be present when "
 	"you boot.$$FG$$$$BK,0$$\n";
-  do {
-    if (doc2=BlkDevPmt(c->boot_drv_let)) {
-      DocInsDoc(doc,doc2);
-      DocDel(doc2);
-      cnt++;
-    }
-  } while (!cnt || doc2);
+  Mount2(c->boot_drv_let,doc,FALSE);
   return doc;
 }
 

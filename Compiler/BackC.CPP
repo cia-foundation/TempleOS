@@ -691,7 +691,7 @@ U0 ICSwap(CIntermediateCode *tempi,I64 ip2)
   }
 }
 
-U0 ICAndEqual(CIntermediateCode *tempi,I64 ip2)
+U0 ICAndEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&TY_MASK==TY_IMM && tempi->a1.type&TY_MASK!=TY_STK &&
@@ -706,13 +706,13 @@ U0 ICAndEqual(CIntermediateCode *tempi,I64 ip2)
       return;
     }
   }
-  ICAddSubEctEqual(tempi,tempi->a1.type_pointed,
+  ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
 	tempi->r.type,tempi->r.reg,tempi->r.disp,
 	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x210425240423,ip2);
 }
 
-U0 ICOrEqual(CIntermediateCode *tempi,I64 ip2)
+U0 ICOrEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&TY_MASK==TY_IMM && tempi->a1.type&TY_MASK!=TY_STK &&
@@ -727,13 +727,13 @@ U0 ICOrEqual(CIntermediateCode *tempi,I64 ip2)
       return;
     }
   }
-  ICAddSubEctEqual(tempi,tempi->a1.type_pointed,
+  ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
 	tempi->r.type,tempi->r.reg,tempi->r.disp,
 	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x09010D0C010B,ip2);
 }
 
-U0 ICXorEqual(CIntermediateCode *tempi,I64 ip2)
+U0 ICXorEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&TY_MASK==TY_IMM && tempi->a1.type&TY_MASK!=TY_STK &&
@@ -748,7 +748,7 @@ U0 ICXorEqual(CIntermediateCode *tempi,I64 ip2)
       return;
     }
   }
-  ICAddSubEctEqual(tempi,tempi->a1.type_pointed,
+  ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
 	tempi->r.type,tempi->r.reg,tempi->r.disp,
 	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x310635340633,ip2);

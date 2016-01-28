@@ -44,7 +44,8 @@ _extern _SAVE_EXCEPT_REGS U0 SaveExceptRegs(CExcept *t);
 
 U0 PutExcept(Bool catch_it=TRUE)
 {//Print exception msg and catch exception.
-  "Except:%c:%P:%P\n",Fs->except_ch,Fs->except_caller1,Fs->except_caller2;
+  "Except:%c:",Fs->except_ch;
+  "%P:%P\n",Fs->except_caller1,Fs->except_caller2;
   Fs->catch_except=catch_it;
 }
 

@@ -209,11 +209,11 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
 //You probably want to reformat and reinstall.
   I64 errs=0;
   CDrv *dv=Let2Drv(drv_let);
-  switch (dv->type) {
-    case DVT_REDSEA:
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
       errs=RedSeaChkDsk(drv_let,&fix,&confirm);
       break;
-    case DVT_FAT32:
+    case FSt_FAT32:
       errs=FAT32ChkDsk(drv_let,&fix,&confirm);
       break;
     default:
@@ -227,4 +227,219 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
 	  "Or, copy from a back-up.\n";
   }
   return errs;
+}
+
+U0 RedSeaDrvView(U8 drv_let=0)
+{
+  CDrv *dv=Let2Drv(drv_let);
+  I64 lohi,c1,i,x,y,l,s;
+  U8 *bitmap;
+  CDC *dc=DCAlias;
+
+  l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
+	s=(dv->size+dv->spc-1)/dv->spc;
+
+  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  WinMax;
+  DocCursor;
+  DocClear;
+  DCFill;
+  try {
+    i=((s+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS;
+    bitmap=MAlloc(i<<BLK_SIZE_BITS);
+    RBlks(dv,bitmap,dv->fat1,i);
+    i=0;
+    for (y=0;y<GR_HEIGHT-3*FONT_HEIGHT;y++) {
+      if (ScanKey)
+	break;
+      for (x=0;x<GR_WIDTH-FONT_WIDTH<<1;x++) {
+	lohi=i*s;
+	c1=lohi/l;
+	if (Bt(bitmap,c1))
+	  dc->color=ROP_XOR+BLUE^TRANSPARENT;
+	else
+	  dc->color=ROP_XOR+WHITE^TRANSPARENT;
+	GrPlot(dc,x,y);
+	i++;
+      }
+    }
+    Free(bitmap);
+  } catch
+    DrvUnlock(dv);
+  GetChar;
+
+  SettingsPop;
+  DCFill;
+  DCDel(dc);
+}
+U0 FAT32DrvView(U8 drv_let=0)
+{
+  CDrv *dv=Let2Drv(drv_let);
+  I64 lohi,c1,i,x,y,l,s;
+  U32 *bitmap;
+  CDC *dc=DCAlias;
+  l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
+	s=(dv->size+dv->spc-1)/dv->spc;
+
+  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  WinMax;
+  DocCursor;
+  DocClear;
+  DCFill;
+  try {
+    i=(s*4+BLK_SIZE-1)>>BLK_SIZE_BITS;
+    bitmap=MAlloc(i<<BLK_SIZE_BITS);
+    RBlks(dv,bitmap,dv->fat1,i);
+    i=0;
+    for (y=0;y<GR_HEIGHT-3*FONT_HEIGHT;y++) {
+      if (ScanKey)
+	break;
+      for (x=0;x<GR_WIDTH-FONT_WIDTH<<1;x++) {
+	lohi=i*s;
+	c1=lohi/l;
+	if (bitmap[c1])
+	  dc->color=ROP_XOR+BLUE^TRANSPARENT;
+	else
+	  dc->color=ROP_XOR+WHITE^TRANSPARENT;
+	GrPlot(dc,x,y);
+	i++;
+      }
+    }
+    Free(bitmap);
+  } catch
+    DrvUnlock(dv);
+  GetChar;
+
+  SettingsPop;
+  DCFill;
+  DCDel(dc);
+}
+public U0 DrvView(U8 drv_let=0)
+{//Drive view. Graph the allocation map's fragmentation.
+  CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
+  Drv(drv_let);
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
+      RedSeaDrvView(drv_let);
+      break;
+    case FSt_FAT32:
+      FAT32DrvView(drv_let);
+      break;
+    default:
+      PrintErr("File System Not Supported\n");
+  }
+  Drv(Drv2Let(old_dv));
+}
+
+public U0 DskView(U8 drv_let=0)
+{//Disk view. Pie chart of partition sizes.
+  I64 i,j,attr,
+	h=Fs->pix_width,
+	v=Fs->pix_height,
+	radius;
+  CDrv *dv;
+  CBlkDev *bd=Let2BlkDev(drv_let);
+  CDC *dc=DCAlias;
+  F64 sect_start,sect_end;
+
+  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  DocCursor;
+  DocClear;
+  DCFill;
+  if (h<v)
+    radius=0.4*h;
+  else
+    radius=0.4*v;
+  dc->color=BLACK;
+  GrCircle(dc,h>>1,v>>1,radius);
+
+  j=1;
+  for (i=0;i<NUM_DRVS;i++) {
+    dv=&blkdev.drvs[i];
+    if (bd==dv->bd && dv->fs_type) {
+      sect_start=-(dv->base_offset*2*ã/(bd->max_blk+1));
+      sect_end	=-((dv->base_offset+dv->size)*2*ã/(bd->max_blk+1));
+      dc->color=BLACK;
+      GrLine(dc,h>>1,v>>1,
+	    h>>1+radius*Cos(sect_start),
+	    v>>1+radius*Sin(sect_start));
+      GrLine(dc,h>>1,v>>1,
+	    h>>1+radius*Cos(sect_end),
+	    v>>1+radius*Sin(sect_end));
+
+      attr=DrvTextAttrGet(Drv2Let(dv));
+      dc->color=attr&15;
+      GrPrint(dc,0,v-FONT_HEIGHT*j,"%C %-8Z",Drv2Let(dv),
+	    dv->fs_type,"ST_DRV_TYPES");
+      dc->color.c1=attr>>4;
+      dc->color|=ROPF_DITHER;
+      GrFloodFill(dc,
+	    h>>1+(radius-4)*Cos((sect_start+sect_end)/2),
+	    v>>1+(radius-4)*Sin((sect_start+sect_end)/2),FALSE);
+      j++;
+    }
+  }
+
+  GetChar(,FALSE);
+  SettingsPop;
+  DCFill;
+  DCDel(dc);
+}
+
+I64 RedSeaUnusedDrvSpace(U8 drv_let=0)
+{
+  CDrv *dv=Let2Drv(drv_let);
+  I64 result=0,i,l;
+  U8 *bitmap;
+  try {
+    l=(dv->size+dv->spc-1)/dv->spc;
+    i=((l+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS;
+    bitmap=MAlloc(i<<BLK_SIZE_BITS);
+    RBlks(dv,bitmap,dv->fat1,i);
+    for (i=0;i<l;i++)
+      if (!Bt(bitmap,i))
+	result++;
+    Free(bitmap);
+  } catch
+    DrvUnlock(dv);
+  return result*BLK_SIZE*dv->spc;
+}
+I64 FAT32UnusedDrvSpace(U8 drv_let=0)
+{
+  CDrv *dv=Let2Drv(drv_let);
+  I64 result=0,i,l;
+  U32 *bitmap;
+  try {
+    l=(dv->size+dv->spc-1)/dv->spc;
+    i=(l*4+BLK_SIZE-1)>>BLK_SIZE_BITS;
+    bitmap=MAlloc(i<<BLK_SIZE_BITS);
+    RBlks(dv,bitmap,dv->fat1,i);
+    for (i=0;i<l;i++)
+      if (!bitmap[i])
+	result++;
+    Free(bitmap);
+  } catch
+    DrvUnlock(dv);
+  return result*BLK_SIZE*dv->spc;
+}
+public I64 UnusedDrvSpace(U8 drv_let=0)
+{//Returns unused size in bytes.
+  CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
+  U8 *old_dir=StrNew(Fs->cur_dir);
+  I64 result=0;
+  Drv(drv_let);
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
+      result=RedSeaUnusedDrvSpace(drv_let);
+      break;
+    case FSt_FAT32:
+      result=FAT32UnusedDrvSpace(drv_let);
+      break;
+    default:
+      PrintErr("File System Not Supported\n");
+  }
+  Drv(Drv2Let(old_dv));
+  Cd(old_dir);
+  Free(old_dir);
+  return result;
 }

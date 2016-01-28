@@ -35,7 +35,7 @@ $LK,"Trace",A="MN:Trace"$() unassembles code generated from the HolyC compiler.
 $LK,"PassTrace",A="MN:PassTrace"$() shows intermediate code coming-out after optimization.  The bits ctrl which passes are displayed.
 $ID,-2$
 
-* There is a heap check utility which can find leaks.  Use $LK,"HeapLog",A="MN:HeapLog"$(), and $LK,"HeapLogRep",A="MN:HeapLogRep"$().  It's a really simple program which intercepts $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().  You can customize the code to find other heap issues.
+* There is a heap check utility which can find leaks.  Use $LK,"HeapLog",A="MN:HeapLog"$(), $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() and $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().  It's a really simple program which intercepts $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().  You can customize the code to find other heap issues.
 
 * You can define handler functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
 

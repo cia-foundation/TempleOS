@@ -85,12 +85,12 @@ class CIntermediateStruct
 #define IC_ADD_CONST		0x38
 #define IC_SUB_CONST		0x39
 
-#define IC_EQUAL_EQUAL		0x3A
-#define IC_NOT_EQUAL		0x3B
+#define IC_EQU_EQU		0x3A
+#define IC_NOT_EQU		0x3B
 #define IC_LESS			0x3C
-#define IC_GREATER_EQUAL	0x3D
+#define IC_GREATER_EQU		0x3D
 #define IC_GREATER		0x3E
-#define IC_LESS_EQUAL		0x3F
+#define IC_LESS_EQU		0x3F
 #define IC_PUSH_CMP		0x40
 
 #define IC_AND_AND		0x41
@@ -102,16 +102,16 @@ class CIntermediateStruct
 #define IC_ASSIGN_PP		0x45
 #define IC_ASSIGN_MM		0x46
 
-#define IC_SHL_EQUAL		0x47
-#define IC_SHR_EQUAL		0x48
-#define IC_MUL_EQUAL		0x49
-#define IC_DIV_EQUAL		0x4A
-#define IC_MOD_EQUAL		0x4B
-#define IC_AND_EQUAL		0x4C
-#define IC_OR_EQUAL		0x4D
-#define IC_XOR_EQUAL		0x4E
-#define IC_ADD_EQUAL		0x4F
-#define IC_SUB_EQUAL		0x50
+#define IC_SHL_EQU		0x47
+#define IC_SHR_EQU		0x48
+#define IC_MUL_EQU		0x49
+#define IC_DIV_EQU		0x4A
+#define IC_MOD_EQU		0x4B
+#define IC_AND_EQU		0x4C
+#define IC_OR_EQU		0x4D
+#define IC_XOR_EQU		0x4E
+#define IC_ADD_EQU		0x4F
+#define IC_SUB_EQU		0x50
 
 #define IC_JMP			0x51
 #define IC_SUB_CALL		0x52
@@ -182,19 +182,19 @@ class CIntermediateStruct
 #define IC_BR_CARRY		0x88
 #define IC_BR_NOT_CARRY		0x89
 
-#define IC_BR_EQUAL_EQUAL	0x8A
-#define IC_BR_NOT_EQUAL		0x8B
+#define IC_BR_EQU_EQU		0x8A
+#define IC_BR_NOT_EQU		0x8B
 #define IC_BR_LESS		0x8C
-#define IC_BR_GREATER_EQUAL	0x8D
+#define IC_BR_GREATER_EQU	0x8D
 #define IC_BR_GREATER		0x8E
-#define IC_BR_LESS_EQUAL	0x8F
+#define IC_BR_LESS_EQU		0x8F
 
-#define IC_BR_EQUAL_EQUAL2	0x90
-#define IC_BR_NOT_EQUAL2	0x91
+#define IC_BR_EQU_EQU2		0x90
+#define IC_BR_NOT_EQU2		0x91
 #define IC_BR_LESS2		0x92
-#define IC_BR_GREATER_EQUAL2	0x93
+#define IC_BR_GREATER_EQU2	0x93
 #define IC_BR_GREATER2		0x94
-#define IC_BR_LESS_EQUAL2	0x95
+#define IC_BR_LESS_EQU2		0x95
 
 #define IC_BR_AND_ZERO		0x96
 #define IC_BR_AND_NOT_ZERO	0x97
@@ -314,26 +314,26 @@ class CIntermediateStruct
 #define AKW_BINFILE	88
 #define KW_NUM_KEYWORDS	89
 
-#define CMP_TEMPLATE_INC		0x00
-#define CMP_TEMPLATE_DEC		0x01
-#define CMP_TEMPLATE_MOD		0x02
-#define CMP_TEMPLATE_LESS		0x03
-#define CMP_TEMPLATE_GREATER		0x04
-#define CMP_TEMPLATE_LESS_EQUAL		0x05
-#define CMP_TEMPLATE_GREATER_EQUAL	0x06
-#define CMP_TEMPLATE_STRLEN		0x07
-#define CMP_TEMPLATE_RDTSC		0x08
-#define CMP_TEMPLATE_SIGN_I64		0x09
-#define CMP_TEMPLATE_FSTP		0x0A
-#define CMP_TEMPLATE_FLD		0x0B
-#define CMP_TEMPLATE_HPET		0x0C
-#define CMP_TEMPLATE_SQR		0x0D
-#define CMP_TEMPLATE_ABS		0x0E
-#define CMP_TEMPLATE_SQRT		0x0F
-#define CMP_TEMPLATE_SIN		0x10
-#define CMP_TEMPLATE_COS		0x11
-#define CMP_TEMPLATE_TAN		0x12
-#define CMP_TEMPLATE_ATAN		0x13
+#define CMP_TEMPLATE_INC	0x00
+#define CMP_TEMPLATE_DEC	0x01
+#define CMP_TEMPLATE_MOD	0x02
+#define CMP_TEMPLATE_LESS	0x03
+#define CMP_TEMPLATE_GREATER	0x04
+#define CMP_TEMPLATE_LESS_EQU	0x05
+#define CMP_TEMPLATE_GREATER_EQU 0x06
+#define CMP_TEMPLATE_STRLEN	0x07
+#define CMP_TEMPLATE_RDTSC	0x08
+#define CMP_TEMPLATE_SIGN_I64	0x09
+#define CMP_TEMPLATE_FSTP	0x0A
+#define CMP_TEMPLATE_FLD	0x0B
+#define CMP_TEMPLATE_HPET	0x0C
+#define CMP_TEMPLATE_SQR	0x0D
+#define CMP_TEMPLATE_ABS	0x0E
+#define CMP_TEMPLATE_SQRT	0x0F
+#define CMP_TEMPLATE_SIN	0x10
+#define CMP_TEMPLATE_COS	0x11
+#define CMP_TEMPLATE_TAN	0x12
+#define CMP_TEMPLATE_ATAN	0x13
 
 #define ASSOCF_LEFT	1
 #define ASSOCF_RIGHT	2

@@ -129,10 +129,9 @@ public U0 ACInit(U8 *mask=NULL)
   Bool start_flag;
   CBlkDev *bd=Let2BlkDev;
 
+  AutoComplete;
   while (LBts(&ac.flags,ACf_INIT_IN_PROGRESS))
     Yield;
-  AutoComplete;
-
   if (DrvIsWritable && FileFind(ACD_DEF_FILENAME_Z) &&
 	!FileFind(ACD_DEF_FILENAME)) {
     if (bd->type!=BDT_RAM) {

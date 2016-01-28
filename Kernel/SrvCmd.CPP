@@ -133,7 +133,7 @@ CSrvCmd *TaskMsg(CTask *_srv,CTask *master,I64 msg_code,I64 a1,I64 a2,I64 flags)
   tempc->flags=flags;
   PUSHFD
   if (Bt(&sys_semas[SYS_SEMA_RECORD_MACRO],0) &&
-	srv!=sys_macro_util_task && msg_code==MSG_KEY_DOWN) {
+	srv!=sys_macro_task && msg_code==MSG_KEY_DOWN) {
     tempc1=AMAllocIdentical(tempc);
     CLI
     QueIns(tempc1,sys_macro_root.last);

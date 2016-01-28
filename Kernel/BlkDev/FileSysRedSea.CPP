@@ -64,7 +64,7 @@ U0 RedSeaDrvInit(CDrv *dv)
     RBlks(dv,&br,dv->base_offset,1);
     if (br.signature!=MBR_PT_REDSEA || br.signature2!=0xAA55)
       throw('Drv');
-    dv->type=DVT_REDSEA;
+    dv->fs_type=FSt_REDSEA;
     RedSeaFreeFreeLst(dv);
     dv->spc=1;
     dv->size=br.sects;
@@ -83,16 +83,12 @@ Bool RedSeaDrvValidate(U8 drv_let)
 {
   CDrv *dv;
   CRedSeaBoot br;
-  Bool result=FALSE;
-  try {
-    dv=Let2Drv(drv_let);
-    if (dv->type==DVT_REDSEA && RBlks(dv,&br,dv->base_offset,1) &&
-	  br.signature==MBR_PT_REDSEA && br.signature2==0xAA55 &&
-	  br.sects==dv->size)
-      result=TRUE;
-  } catch
-    Fs->catch_except=TRUE;
-  return result;
+  if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_REDSEA &&
+	RBlks(dv,&br,dv->base_offset,1) && br.signature==MBR_PT_REDSEA &&
+	br.signature2==0xAA55 && br.sects==dv->size)
+    return TRUE;
+  else
+    return FALSE;
 }
 
 U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
@@ -104,9 +100,9 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
   I64 i,n;
   try {
     DrvLock(dv);
-//	DrvTypeSet(drv_let,DVT_REDSEA);
-    DrvTypeSet(drv_let,DVT_FAT32);
-    dv->type=DVT_REDSEA;
+//	DrvTypeSet(drv_let,FSt_REDSEA);
+    DrvTypeSet(drv_let,FSt_FAT32);
+    dv->fs_type=FSt_REDSEA;
     br->signature=MBR_PT_REDSEA;
     br->signature2=0xAA55;
     br->base_offset=dv->base_offset; //For CD/DVD image copy.
@@ -165,7 +161,7 @@ Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
     throw('FUF');
   MemSet(_result,0,sizeof(CDirEntry));
   DrvChk(dv);
-  if (dv->type!=DVT_REDSEA)
+  if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else if (!CFileNameTo(dname,name))
     PrintErr("Invalid FileName.\n");
@@ -214,7 +210,7 @@ U8 *RedSeaFileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
   DrvChk(dv);
   *_size=0;
   *_attr=0;
-  if (dv->type!=DVT_REDSEA)
+  if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else
     try {
@@ -238,7 +234,7 @@ U8 *RedSeaFileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
 Bool RedSeaCd(U8 *name,I64 cur_dir_cluster)
 {
   CDirEntry de;
-  if (Fs->cur_dv->type!=DVT_REDSEA)
+  if (Fs->cur_dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else if (RedSeaFileFind(Fs->cur_dv,cur_dir_cluster,name,&de,FUF_JUST_DIRS))
     return TRUE;
@@ -255,7 +251,7 @@ U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt)
   Bool found=FALSE,unlock,unlock_break;
   DrvChk(dv);
   if (!c) return;
-  if (dv->type!=DVT_REDSEA)
+  if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else
     try {
@@ -517,7 +513,7 @@ I64 RedSeaFileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   I64 c=0,blk_cnt;
   MemSet(&de,0,sizeof(CDirEntry));
   if (size<0) size=0;
-  if (dv->type!=DVT_REDSEA)
+  if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else if (!CFileNameTo(de.name,name))
     PrintErr("Invalid FileName.\n");
@@ -581,16 +577,18 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	    Cd("..");
 	  }
 	  DrvLock(dv);
-	} else if ((tempde->attr&RS_ATTR_DIR ||
-	      !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-	      !(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' &&
-	      tempde->attr&RS_ATTR_DIR) &&
-	      FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
-	  tempde->next=result;
-	  result=tempde;
+	} else {
 	  tempde->full_name=FileNameAbs(tempde->name);
-	} else
-	  DirEntryDel(tempde);
+	  if ((tempde->attr&RS_ATTR_DIR ||
+		!Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+		!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' &&
+		tempde->attr&RS_ATTR_DIR) &&
+		FilesFindMatch(tempde->full_name,files_find_mask,fuf_flags)) {
+	    tempde->next=result;
+	    result=tempde;
+	  } else
+	    DirEntryDel(tempde);
+	}
       }
       ptr(U8 *)+=CDIR_SIZE;
     }

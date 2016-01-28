@@ -138,7 +138,7 @@ Bool OptFixupBinaryOp1(CIntermediateCode *tempi,
     } else
       if (tempc2->raw_type!=RT_F64)
 	tempi2->ic_flags|=ICF_R_TO_F64;
-    if (IC_LESS<=tempi->ic_code<=IC_GREATER_EQUAL && (tempii=OptLead1(tempi)) &&
+    if (IC_LESS<=tempi->ic_code<=IC_GREATER_EQU && (tempii=OptLead1(tempi)) &&
 	  tempii->ic_code!=IC_PUSH_CMP && tempii->ic_code!=IC_AND_AND) {
 //We are looking for float comparisons to zero to convert to int.
       if (tempi1->ic_code==IC_IMM_F64 && !tempi1->ic_data &&
@@ -241,8 +241,8 @@ CIntermediateCode *OptBrZero(CCmpCtrl *cc,CIntermediateCode *tempi)
       tempi->t.a1t=tempii->t.a1t;
       OptFree(tempii);
       return OptBrNotZero(cc,tempi);
-    case IC_EQUAL_EQUAL...IC_LESS_EQUAL:
-      tempi->ic_code=(tempii->ic_code-IC_EQUAL_EQUAL)^1+IC_BR_EQUAL_EQUAL;
+    case IC_EQU_EQU...IC_LESS_EQU:
+      tempi->ic_code=(tempii->ic_code-IC_EQU_EQU)^1+IC_BR_EQU_EQU;
       break;
     case IC_OR_OR:
       tempi->ic_code=IC_BR_OR_OR_ZERO;
@@ -301,9 +301,9 @@ CIntermediateCode *OptBrZero(CCmpCtrl *cc,CIntermediateCode *tempi)
     OptFree(tempii);
 
     if (tempi->ic_flags&ICF_PUSH_CMP &&
-	  IC_BR_NOT_EQUAL<=tempi->ic_code<=IC_BR_LESS_EQUAL &&
+	  IC_BR_NOT_EQU<=tempi->ic_code<=IC_BR_LESS_EQU &&
 	  !(tempi->ic_flags&ICF_USE_F64)) {
-      tempi->ic_code+=IC_BR_EQUAL_EQUAL2-IC_BR_EQUAL_EQUAL;
+      tempi->ic_code+=IC_BR_EQU_EQU2-IC_BR_EQU_EQU;
       tempi->ic_flags&=~ICF_PUSH_CMP;
       tempii=tempi->next; //IC_PUSH_CMP instruction
       while (tempii->ic_code!=IC_PUSH_CMP)
@@ -368,8 +368,8 @@ CIntermediateCode *OptBrNotZero(CCmpCtrl *cc,CIntermediateCode *tempi)
       tempi->t.a1t=tempii->t.a1t;
       OptFree(tempii);
       return OptBrZero(cc,tempi);
-    case IC_EQUAL_EQUAL...IC_LESS_EQUAL:
-      tempi->ic_code=tempii->ic_code+IC_BR_EQUAL_EQUAL-IC_EQUAL_EQUAL;
+    case IC_EQU_EQU...IC_LESS_EQU:
+      tempi->ic_code=tempii->ic_code+IC_BR_EQU_EQU-IC_EQU_EQU;
       break;
     case IC_OR_OR:
       tempi->ic_code=IC_BR_OR_OR_NOT_ZERO;
@@ -428,9 +428,9 @@ CIntermediateCode *OptBrNotZero(CCmpCtrl *cc,CIntermediateCode *tempi)
     OptFree(tempii);
 
     if (tempi->ic_flags&ICF_PUSH_CMP &&
-	  IC_BR_NOT_EQUAL<=tempi->ic_code<=IC_BR_LESS_EQUAL &&
+	  IC_BR_NOT_EQU<=tempi->ic_code<=IC_BR_LESS_EQU &&
 	  !(tempi->ic_flags&ICF_USE_F64)) {
-      tempi->ic_code+=IC_BR_EQUAL_EQUAL2-IC_BR_EQUAL_EQUAL;
+      tempi->ic_code+=IC_BR_EQU_EQU2-IC_BR_EQU_EQU;
       tempi->ic_flags&=~ICF_PUSH_CMP;
       tempii=tempi->next; //IC_PUSH_CMP instruction
       while (tempii->ic_code!=IC_PUSH_CMP)

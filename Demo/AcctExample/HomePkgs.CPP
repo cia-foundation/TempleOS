@@ -5,7 +5,6 @@
 #include "::/Apps/Psalmody/Load"
 #include "::/Demo/WebLogExample/WebLogRep"
 Cd("::/Home");;
-#include "::/Home/TOSIDComputer"
 #include "::/Home/TOSCfg"
 #include "::/Home/TOSMisc"
 #include "::/Home/TOSDistro"

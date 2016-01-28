@@ -220,27 +220,27 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  }
 	  break;
 	case IC_LESS:
-	case IC_GREATER_EQUAL:
+	case IC_GREATER_EQU:
 	case IC_GREATER:
-	case IC_LESS_EQUAL:
+	case IC_LESS_EQU:
 	  if (tempi->ic_flags&ICF_USE_F64)
 	    CmpF2PushPop(tempi,tempi1,tempi2);
 	  break;
-	case IC_MUL_EQUAL:
-	case IC_DIV_EQUAL:
-	case IC_ADD_EQUAL:
-	case IC_SUB_EQUAL:
+	case IC_MUL_EQU:
+	case IC_DIV_EQU:
+	case IC_ADD_EQU:
+	case IC_SUB_EQU:
 	  if (tempc->raw_type==RT_F64)
 	    CmpF1PushPop(tempi,tempi2);
 	case IC_ASSIGN_PP:
 	case IC_ASSIGN_MM:
 	case IC_ASSIGN:
-	case IC_SHL_EQUAL:
-	case IC_SHR_EQUAL:
-	case IC_MOD_EQUAL:
-	case IC_AND_EQUAL:
-	case IC_OR_EQUAL:
-	case IC_XOR_EQUAL:
+	case IC_SHL_EQU:
+	case IC_SHR_EQU:
+	case IC_MOD_EQU:
+	case IC_AND_EQU:
+	case IC_OR_EQU:
+	case IC_XOR_EQU:
 	  if (tempi1->ic_code==IC_LEA &&
 		tempi1->a1.type&TY_MASK==TY_DISP &&
 		tempi1->a1.reg==REG_RBP)
@@ -289,14 +289,14 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    tempie=tempie->next;
 	  }
 	  break;
-	case IC_BR_NOT_EQUAL:
-	case IC_BR_EQUAL_EQUAL:
+	case IC_BR_NOT_EQU:
+	case IC_BR_EQU_EQU:
 	  if ((tempi1->ic_code==IC_IMM_I64 ||
 		tempi1->ic_code==IC_IMM_F64) && !tempi1->ic_data) {
 	    OptFree(tempi1);
 	    MemCpy(&tempi->a1,&tempi->a2,sizeof(CICArg));
 	    tempi->a2.type=TY_NULL;
-	    if (code==IC_BR_EQUAL_EQUAL)
+	    if (code==IC_BR_EQU_EQU)
 	      code=tempi->ic_code=IC_BR_ZERO;
 	    else
 	      code=tempi->ic_code=IC_BR_NOT_ZERO;
@@ -306,7 +306,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		tempi2->ic_code==IC_IMM_F64) && !tempi2->ic_data) {
 	    OptFree(tempi2);
 	    tempi->a2.type=TY_NULL;
-	    if (code==IC_BR_EQUAL_EQUAL)
+	    if (code==IC_BR_EQU_EQU)
 	      code=tempi->ic_code=IC_BR_ZERO;
 	    else
 	      code=tempi->ic_code=IC_BR_NOT_ZERO;
@@ -378,12 +378,12 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  tempi->a1.type_pointed=CmpRawType(tempc);
 	  goto here1;
 	case IC_BR_LESS:
-	case IC_BR_GREATER_EQUAL:
+	case IC_BR_GREATER_EQU:
 	case IC_BR_GREATER:
-	case IC_BR_LESS_EQUAL:
+	case IC_BR_LESS_EQU:
 	  if (tempi->ic_flags&ICF_USE_F64)
 	    CmpF2PushPop(tempi,tempi1,tempi2);
-	case IC_BR_EQUAL_EQUAL2...IC_BR_LESS_EQUAL2:
+	case IC_BR_EQU_EQU2...IC_BR_LESS_EQU2:
 	case IC_BR_CARRY:
 	case IC_BR_NOT_CARRY:
 	case IC_GET_LABEL:
@@ -495,8 +495,8 @@ here1:
 	case IC_AND:
 	case IC_OR:
 	case IC_XOR:
-	case IC_EQUAL_EQUAL:
-	case IC_NOT_EQUAL:
+	case IC_EQU_EQU:
+	case IC_NOT_EQU:
 	case IC_AND_AND:
 	case IC_OR_OR:
 	case IC_XOR_XOR:

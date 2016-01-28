@@ -40,7 +40,7 @@ $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
 20) I hired and artist, Cody Rigby, for $$3,000 worth of pixel art.
 
-21) Erik van der Karbargenbok made $LK,"TempleBot",A="PI:::/Linux/TempleBot",HTML="http://www.templeos.org/Wb/Home/Wb2/Files/Bin/TempleBot.html"$.
+21) Erik van der Karbargenbok made $LK,"TempleBot",A="PI:::/Linux/TempleBot",HTML="http://www.templeos.org/Wb/Home/Downloads/Bin/TempleBot.html"$.
 
 22) The random number generator is from Donald Knuth in the wikipedia entry for $TX,"Linear_congruential_generator",HTML="http://en.wikipedia.org/wiki/Linear_congruential_generator"$.
 

@@ -17,7 +17,7 @@ U0 Main()
     y1=ClampI64(y1+vy1,0,Fs->pix_height-1);
     x2=ClampI64(x2+vx2,0,Fs->pix_width-1);
     y2=ClampI64(y2+vy2,0,Fs->pix_height-1);
-    Sleep(1); //Take this out and see what happens!
+    Sleep(1); //Replace this with Yield() ort Sleep(0) and see what happens!
   }
   DCFill(dc);
   DCDel(dc);

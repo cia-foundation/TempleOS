@@ -26,7 +26,7 @@ extern CHashClass *PrsClass(
 extern CHashFun *PrsFunJoin(
 	CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags);
 extern I64 PrsKeyWord(CCmpCtrl *cc);
-extern Bool PrsStatement(CCmpCtrl *cc,I64 try_cnt=0,
+extern Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 	CCodeMisc *lb_break=NULL,I64 cmp_flags=CMPF_PRS_SEMICOLON);
 extern U0 PrsStreamBlk(CCmpCtrl *cc);
 extern CHashClass *PrsType(CCmpCtrl *cc,CHashClass **tempc1,

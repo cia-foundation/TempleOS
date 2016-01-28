@@ -25,7 +25,7 @@ U0 FAT32DrvInit(CDrv *dv)
   Bool unlock;
   try {
     unlock=DrvLock(dv);
-    dv->type=DVT_FAT32;
+    dv->fs_type=FSt_FAT32;
     RBlks(dv,&br32,dv->base_offset,1);
     dv->file_system_info_sect=dv->base_offset+br32.file_system_info_sect;
     dv->fat1=dv->base_offset+br32.reserved_sects;
@@ -49,17 +49,12 @@ Bool FAT32DrvValidate(U8 drv_let)
 {
   CDrv *dv;
   CFAT32Boot br;
-  Bool result=FALSE;
-  try {
-    dv=Let2Drv(drv_let);
-    if (dv->type==DVT_FAT32 &&
-	  RBlks(dv,&br,dv->base_offset,1) &&
-	  br.signature==0xAA55 &&
-	  br.sects==dv->size)
-      result=TRUE;
-  } catch
-    Fs->catch_except=TRUE;
-  return result;
+  if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_FAT32 &&
+	RBlks(dv,&br,dv->base_offset,1) && br.signature==0xAA55 &&
+	br.sects==dv->size)
+    return TRUE;
+  else
+    return FALSE;
 }
 
 U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
@@ -70,8 +65,8 @@ U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
   I64 i,l;
   try {
     DrvLock(dv);
-    DrvTypeSet(drv_let,DVT_FAT32);
-    dv->type=DVT_FAT32;
+    DrvTypeSet(drv_let,FSt_FAT32);
+    dv->fs_type=FSt_FAT32;
     br->jump_and_nop[0]=OC_JMP_REL8;
     br->jump_and_nop[1]=offset(CFAT32Boot.code)-2;
     br->jump_and_nop[2]=OC_NOP;
@@ -313,7 +308,7 @@ Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,
   MemSet(_result,0,sizeof(CDirEntry));
   MemSet(&long_name,0,sizeof(CDirEntry));
   DrvChk(dv);
-  if (dv->type!=DVT_FAT32)
+  if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else if (!CFileNameTo(dname,name))
     PrintErr("Invalid FileName.\n");
@@ -377,7 +372,7 @@ U8 *FAT32FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
   DrvChk(dv);
   *_size=0;
   *_attr=0;
-  if (dv->type!=DVT_FAT32)
+  if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else
     try {
@@ -404,7 +399,7 @@ U8 *FAT32FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
 Bool FAT32Cd(U8 *name,I64 cur_dir_cluster)
 {
   CDirEntry de;
-  if (Fs->cur_dv->type!=DVT_FAT32)
+  if (Fs->cur_dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else if (FAT32FileFind(Fs->cur_dv,cur_dir_cluster,name,&de,FUF_JUST_DIRS))
     return TRUE;
@@ -421,7 +416,7 @@ U0 FAT32FreeClusters(CDrv *dv,I64 c)
   Bool unlock,unlock_break;
   DrvChk(dv);
   if (!(0<c<0x0FFFFFF8)) return;
-  if (dv->type!=DVT_FAT32)
+  if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else
     try {
@@ -823,7 +818,7 @@ I64 FAT32FileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   Bool contiguous;
   MemSet(&de,0,sizeof(CDirEntry));
   if (size<0) size=0;
-  if (dv->type!=DVT_FAT32)
+  if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else if (!CFileNameTo(de.name,name))
     PrintErr("Invalid FileName.\n");
@@ -896,15 +891,18 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,
 		  Cd("..");
 		}
 		DrvLock(dv);
-	      } else if ((attr&RS_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-		    !(Bt(&fuf_flags,FUf_RECURSE) &&
-		    *tempde->name=='.' && attr&RS_ATTR_DIR) &&
-		    FilesFindMatch(tempde->name,files_find_mask,fuf_flags)) {
-		tempde->next=result;
-		result=tempde;
+	      } else {
 		tempde->full_name=FileNameAbs(tempde->name);
-	      } else
-		DirEntryDel(tempde);
+		if ((attr&RS_ATTR_DIR || !Bt(&fuf_flags,FUf_JUST_DIRS)) &&
+		      !(Bt(&fuf_flags,FUf_RECURSE) &&
+		      *tempde->name=='.' && attr&RS_ATTR_DIR) &&
+		      FilesFindMatch(tempde->full_name,files_find_mask,
+		      fuf_flags)) {
+		  tempde->next=result;
+		  result=tempde;
+		} else
+		  DirEntryDel(tempde);
+	      }
 	    } else
 	      DirEntryDel(tempde);
 	  }

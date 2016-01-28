@@ -3,14 +3,14 @@ CDirEntry *FilesFind2(U8 *files_find_mask,I64 fuf_flags)
   CDrv *dv=Fs->cur_dv;
   CDirEntry *result=NULL;
   DrvChk(dv);
-  switch (dv->type) {
-    case DVT_REDSEA:
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
       result=RedSeaFilesFind(files_find_mask,fuf_flags);
       break;
-    case DVT_FAT32:
+    case FSt_FAT32:
       result=FAT32FilesFind(files_find_mask,fuf_flags);
       break;
-    case DVT_ISO9660:
+    case FSt_ISO9660:
       result=ISO1FilesFind(files_find_mask,fuf_flags);
       break;
     default:
@@ -64,7 +64,8 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
   Bool result=FALSE,old_silent;
   if (fuf_flags&~FUG_FILE_FIND)
     throw('FUF');
-  if (!filename) return FALSE;
+  if (!filename || *filename && filename[1]==':' && !Let2Drv(*filename,FALSE))
+    return FALSE;
   altname=ToggleZorNotZ(filename);
   if (fuf_flags&FUF_Z_OR_NOT_Z)
     j=2;
@@ -81,16 +82,16 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
     else {
       Silent(old_silent);
       cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
-      switch (dirc->dv->type) {
-	case DVT_REDSEA:
+      switch (dirc->dv->fs_type) {
+	case FSt_REDSEA:
 	  result=RedSeaFileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
-	case DVT_FAT32:
+	case FSt_FAT32:
 	  result=FAT32FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
-	case DVT_ISO9660:
+	case FSt_ISO9660:
 	  result=ISO1FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
@@ -121,16 +122,16 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
       while (!result && StrCmp(Fs->cur_dir,"/")) {
 	Cd("..");
 	cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
-	switch (dirc->dv->type) {
-	  case DVT_REDSEA:
+	switch (dirc->dv->fs_type) {
+	  case FSt_REDSEA:
 	    result=RedSeaFileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;
-	  case DVT_FAT32:
+	  case FSt_FAT32:
 	    result=FAT32FileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;
-	  case DVT_ISO9660:
+	  case FSt_ISO9660:
 	    result=ISO1FileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;

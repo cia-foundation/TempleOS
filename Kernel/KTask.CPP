@@ -184,9 +184,9 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->stk=temps=TaskStkNew(stk_size,task);
   task->rsp=(&temps->stk_base)(U8 *)+temps->stk_size;
 
-  task->text_attr	=TERM_ATTR_TEXT;
-  task->border_attr	=TERM_ATTR_BORDER;
+  task->text_attr	=WHITE<<4+BLUE;
   task->border_src	=BDS_CONST;
+  task->border_attr	=DrvTextAttrGet(':');
   task->title_src	=TTS_CONST;
   task->win_left	=1;
   task->win_right	=text.cols-2;
@@ -299,7 +299,7 @@ I64 ExeCmdLine(CCmpCtrl *cc)
 	  MemCpy(ptr2,ptr,TASK_TITLE_LEN);
     }
     cc->flags&=~CCF_HAS_MISC_DATA;
-    machine_code=LexStatement2Bin(cc,&type);
+    machine_code=LexStmt2Bin(cc,&type);
     if (machine_code!=INVALID_PTR) {
       if (!(cc->flags&CCF_JUST_LOAD)) {
 	t0=tS;

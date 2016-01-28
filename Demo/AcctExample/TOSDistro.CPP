@@ -15,7 +15,7 @@ U0 TOSMakeOSDrvBootInstall(U8 drv_let)
   Auto(TOS_CFG);
   MakeOSDrvBootInstall(drv_let);
   if (StrOcc(TOS_MASTER_BOOT_DRVS,drv_let))
-    MasterBootIntall(drv_let);
+    MasterBootInstall(drv_let);
 }
 
 U0 TOSCopyDrv(U8 src,U8 dst)
@@ -24,7 +24,7 @@ U0 TOSCopyDrv(U8 src,U8 dst)
   src=ToUpper(src);
   dst=ToUpper(dst);
 
-  Fmt(dst,,FALSE,DVT_FAT32);
+  Fmt(dst,,FALSE,FSt_FAT32);
 
   StrPrint(buf_s,"%c:/",src);
   StrPrint(buf_d,"%c:/",dst);
@@ -90,7 +90,7 @@ public U0 CopySongs(U8 threshold='7')
 {
   CDoc *s;
   CDocEntry *doc_e;
-  CDirEntry *tempde=FilesFind("::/Home/Wb2/Files/Psalmody/*.CPP*",
+  CDirEntry *tempde=FilesFind("/Home/Downloads/Psalmody/*.CPP*",
 	FUF_CLUSTER_ORDER),
 	*tempde1=tempde;
   DelTree("/Apps/Psalmody/Examples");
@@ -109,9 +109,10 @@ U0 DistroPrep()
 {
   Del("/Demo/WebLogExample/WebLogRep.TXT*");
   Del("/Demo/ReverseFileExample/PoemForeward.TXT*");
+  Del("/Demo/ToHtmlToTXTExample/Out*");
   Del("/Home/NumBible.TXT.Z");
   DelTree("/Home/*Temp.TXT.Z");
-  if (FileFind("::/Home/Wb2/Files/Psalmody"))
+  if (FileFind("/Home/Downloads/Psalmody"))
     CopySongs;
 
   DelTree("/Temp");
@@ -123,19 +124,19 @@ U0 DistroPrep()
 
   DelTree("/Demo/AcctExample");
   CopyTree("/Home","/Demo/AcctExample");
-  DelTree("/Demo/AcctExample/Archive");
-  DelTree("/Demo/AcctExample/Blog");
   DelTree("/Demo/AcctExample/Budget");
-  DelTree("/Demo/AcctExample/Code");
-  DelTree("/Demo/AcctExample/Misc");
-  DelTree("/Demo/AcctExample/Psalmody");
-  DelTree("/Demo/AcctExample/Videos");
-  DelTree("/Demo/AcctExample/Wb2");
+  DelTree("/Demo/AcctExample/Private");
+  DelTree("/Demo/AcctExample/Downloads");
+  DelTree("/Demo/AcctExample/Web");
   Del("/Demo/AcctExample/Test*");
 
-  //Once in a while, do these:
-  //  SortHeaders;
-  //  DblSpaceScan("/*");
+  if (FileFind("/Home/Downloads/Utils/SortHeaders.CPP.Z"))
+    ExeFile("/Home/Downloads/Utils/SortHeaders.CPP.Z");
+
+  if (FileFind("/Home/Downloads/Blog/YouTube.TXT.Z"))
+    Sort("/Home/Downloads/Blog/YouTube.TXT.Z",,2);
+
+  //Once in a while, do $LK,"::/Home/Downloads/Utils/DblSpaceScan.CPP"$.
 
   CursorRem("/*");
   DelTree("/Demo/*.BI*");
@@ -146,15 +147,13 @@ U0 DistroPrep()
 
 U0 MakeBootRescueDrvFile()
 {
-  try
-	  Let2Drv('A');
-  catch {
-    Fs->catch_except=TRUE;
+  CBlkDev *bd;
+  if (!Let2Drv('A',FALSE)) {
     Auto(CFG_BOOT_RESCUE_DRV "\n");
     Mount;
   }
-  CBlkDev *bd=Let2BlkDev('A');
-  Fmt('A',,FALSE,DVT_REDSEA);
+  bd=Let2BlkDev('A');
+  Fmt('A',,FALSE,FSt_REDSEA);
 
   MkDir("A:/Compiler");
   Copy("C:/Compiler/Compiler.BIN.Z",	"A:/Compiler");
@@ -166,11 +165,12 @@ U0 MakeBootRescueDrvFile()
   Copy("C:/Kernel/*.HPP*",		"A:/Kernel");
   CopyTree("C:/Kernel/BlkDev",		"A:/Kernel/BlkDev");
 
-  Copy("C:/Home/Wb2/Files/DbgStartOS.CPP.Z","A:/StartOS.CPP.Z");
+  Copy("C:/Home/Downloads/Distro/DbgStartOS.CPP.Z","A:/StartOS.CPP.Z");
 
   MkDir("A:/Adam");
-  Copy("C:/Home/Wb2/Files/DbgMakeAdam.CPP.Z","A:/Adam/MakeAdam.CPP.Z");
-  Copy("C:/Adam/AExts.HPP.Z",	"A:/Adam");
+  Copy("C:/Home/Downloads/Distro/DbgMakeAdam.CPP.Z","A:/Adam/MakeAdam.CPP.Z");
+  Copy("C:/Home/Downloads/Distro/DbgMount.CPP.Z","A:/Adam");
+  Copy("C:/Adam/AExts.CPP.Z",	"A:/Adam");
   Copy("C:/Adam/AMath.CPP.Z",	"A:/Adam");
   Copy("C:/Adam/Training.CPP.Z","A:/Adam");
   Copy("C:/Adam/AMem.CPP.Z",	"A:/Adam");
@@ -192,7 +192,7 @@ U0 MakeSymFiles()
   Who;
   if (doc=DocPut) {
     st=StrNew(doc->filename.name);
-    StrCpy(doc->filename.name,"D:/Wb/Home/Wb2/SymsAlpha.TXT.Z");
+    StrCpy(doc->filename.name,"D:/Wb/Home/Web/SymsAlpha.TXT.Z");
     DocWrite(doc);
     StrCpy(doc->filename.name,st);
     Free(st);
@@ -202,7 +202,7 @@ U0 MakeSymFiles()
   Who("+m");
   if (doc=DocPut) {
     st=StrNew(doc->filename.name);
-    StrCpy(doc->filename.name,"D:/Wb/Home/Wb2/SymsAddress.TXT.Z");
+    StrCpy(doc->filename.name,"D:/Wb/Home/Web/SymsAddress.TXT.Z");
     DocWrite(doc);
     StrCpy(doc->filename.name,st);
     Free(st);
@@ -231,7 +231,7 @@ I64 MakeLineRepFile()
   result=LineRep;
   if (doc=DocPut) {
     st=StrNew(doc->filename.name);
-    StrCpy(doc->filename.name,"B:/TOS/Wb2/LineRep.TXT.Z");
+    StrCpy(doc->filename.name,"B:/TOS/Web/LineRep.TXT.Z");
     DocWrite(doc);
     StrCpy(doc->filename.name,st);
     Free(st);
@@ -288,11 +288,10 @@ U0 MakeTOSDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSTS_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
-
 
 U0 DbgDistroPrep()
 {/*This is a debug distro.  The CD/DVD bootloader uses BIOS INT 0x13 0x42 to
@@ -324,7 +323,7 @@ U0 MakeDbgDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -372,7 +371,7 @@ U0 MakeLiteDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -394,7 +393,7 @@ FileManager, WindowManager, PCSpeaker, Documentation.
   Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACWords.DAT*");
   Del(TOS_DISTRO_DIR "/Adam/God/Vocab.TXT.Z");
   Del(TOS_DISTRO_DIR "/Misc/OSTestSuite.CPP.Z");
-  Copy("C:/Home/Wb2/Files/UltraMenu.TXT.Z",
+  Copy("C:/Home/Downloads/Distro/UltraMenu.TXT.Z",
 	TOS_DISTRO_DIR "/PersonalMenu.TXT.Z");
   Copy("C:/Demo/Games/EagleDive.CPP.Z",
 	TOS_DISTRO_DIR "/Misc");
@@ -405,7 +404,7 @@ U0 MakeUltraDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -435,24 +434,23 @@ U0 MakeWebSite()
   CDirEntry *tempde,*tempde1;
   DocClear;
   Cd("D:/Wb");
-  DelTree("D:/Wb/Home/Archive");
   DelTree("D:/Wb/Home/Budget");
-  DelTree("D:/Wb/Home/Psalmody");
+  DelTree("D:/Wb/Home/Private");
   Del("D:/Wb/Home/*");
-  Touch("D:/Wb/Home/Wb2/index.TXT.Z","");
-  Touch("D:/Wb/Home/Wb2/Downloads.TXT.Z","");
-  Touch("D:/Wb/Home/Wb2/TempleOS.TXT.Z","");
+  Touch("D:/Wb/Home/Web/index.TXT.Z","");
+  Touch("D:/Wb/Home/Web/Downloads.TXT.Z","");
+  Touch("D:/Wb/Home/Web/TempleOS.TXT.Z","");
   tempde=tempde1=FilesFind("*",
 	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
   while (tempde) {
     TOSWebFile(tempde->full_name);
     tempde=tempde->next;
   }
-  Copy(	"D:/Wb/Home/Wb2/Files/Bin/TempleBot",
-	"D:/Wb/Home/Wb2/Files/Bin/TempleBot.TXT");
-  ToDolDoc("D:/Wb/Home/Wb2/Files/Bin/TempleBot.TXT");
-  ToHtml("D:/Wb/Home/Wb2/Files/Bin/TempleBot.TXT");
-  Del("D:/Wb/Home/Wb2/Files/Bin/TempleBot.TXT");
+  Copy(	"D:/Wb/Home/Downloads/Bin/TempleBot",
+	"D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
+  ToDolDoc("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
+  ToHtml("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
+  Del("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
   DirTreeDel(tempde1);
   Drv('C');
 }
@@ -482,23 +480,27 @@ U0 FreshenWebDir(U8 *dirname)
 
 U0 MakeWebSitePartial()
 {
-  FreshenWebDir("/Home/Wb2");
-  FreshenWebDir("/Home/Wb2/Imgs");
+  FreshenWebDir("/Home/Web");
+  FreshenWebDir("/Home/Web/TAD");
+  FreshenWebDir("/Home/Web/Imgs");
   Drv('C');
 }
 
 U0 UpdateISODocDefines()
 {
-  DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
-	0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
-  DefinePrint("DD_TEMPLEOSCD_K_SIZE",
-	"%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
-  DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V3.12",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
-	0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
-  DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
-	"%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
+  try {
+    DefinePrint("DD_TEMPLEOSCD_SIZE",
+	  "Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
+    DefinePrint("DD_TEMPLEOSCD_K_SIZE",
+	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
+    DefinePrint("DD_TEMPLEOSULTRA_SIZE",
+	  "Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
+	  0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
+    DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
+	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
+  } catch
+    Fs->catch_except=TRUE;
 }
 
 UpdateISODocDefines;
@@ -550,9 +552,9 @@ public U0 MakeDistrosAndBackUp()
 
 public U0 PreBackUp()
 {
-  Copy("D:/Home/Wb2/Files/Bookmarks.html","C:/Home/Wb2/Files");
-  Del("C:/Home/Wb2/Files/Bin/*");
-  Copy("D:/Home/Wb2/Files/Bin/*","C:/Home/Wb2/Files/Bin");
-  Copy("D:/Home/Wb2/Files/Bin/TempleBot","C:/Linux");
-  Copy("D:/Home/Wb2/Files/Bin/God*","C:/Linux");
+  Copy("D:/Home/Downloads/Blog/Bookmarks.html","C:/Home/Downloads/Blog");
+  Del("C:/Home/Downloads/Bin/*");
+  Copy("D:/Home/Downloads/Bin/*","C:/Home/Downloads/Bin");
+  Copy("D:/Home/Downloads/Bin/TempleBot","C:/Linux");
+  Copy("D:/Home/Downloads/Bin/God*","C:/Linux");
 }

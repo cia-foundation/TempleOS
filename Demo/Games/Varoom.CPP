@@ -693,7 +693,7 @@ U0 Varoom()
       }
 vr_done: //Don't goto out of try
   } catch
-    Fs->catch_except=TRUE;
+    PutExcept;
   CleanUp;
   SettingsPop(,TSF_SAME_SONG);
   MenuPop;

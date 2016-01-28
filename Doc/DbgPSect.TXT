@@ -1,2 +1,0 @@
-$WW,1$Use $GREEN$%p$FG$ to print a pointer with PSect+Offset or use $GREEN$%P$FG$ to print a link to a PSect+Offset.
- 

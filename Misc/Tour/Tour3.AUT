@@ -31,10 +31,10 @@ Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
 TourPut(
 "This is a first-person-shooter.\n\n"
 "There is no \"$$GREEN$$main()$$FG$$\" function in TempleOS "
-"programs.  Any program statements outside "
+"programs.  Any program stmts outside "
 "functions get executed when you $$GREEN$$#include$$FG$$ "
 "them at the command line.\n\n"
-"The \"$$GREEN$$CastleFrankenstein;$$FG$$\" statement at the "
+"The \"$$GREEN$$CastleFrankenstein;$$FG$$\" stmt at the "
 "bottom will run the program when we "
 "$$GREEN$$#include$$FG$$ it.\n",TRUE);
 

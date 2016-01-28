@@ -296,9 +296,9 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	  else
 	    *_tag=StrNew(e->tag);
 	  if (e->num<0)
-	    *_link=MStrPrint("DF:%s",e->aux);
+	    *_link=MStrPrint("DN:%s",e->aux);
 	  else
-	    *_link=MStrPrint("DF:%s,%d",e->aux,e->num);
+	    *_link=MStrPrint("DN:%s,%d",e->aux,e->num);
 
 	}
 	break;
@@ -906,7 +906,7 @@ U0 EdInsHexEd()
   Free(e);
 }
 
-class CEdBinary
+class CEdBin
 {
   U8	tag[512]		fmtstr "$$DA-P,511,A=\"Tag Text      :%s\"$$\n";
   I64	bin_num			fmtstr "$$DA,512,A=\"Bin Num:%d\"$$\n";
@@ -915,9 +915,9 @@ class CEdBinary
   U8	bin_ptr_link_tag[512]	fmtstr "$$DA-P,511,A=\"File Bin Tag:%s\"$$\n";
 };
 
-U0 EdInsBinary(I64 bin_num,I64 type)
+U0 EdInsBin(I64 bin_num,I64 type)
 {
-  CEdBinary *e=CAlloc(sizeof(CEdBinary));
+  CEdBin *e=CAlloc(sizeof(CEdBin));
   StrPrint(e->tag,"<%d>",bin_num);
   e->bin_num=bin_num;
   e->bin_ptr_link_bin_num=1;
@@ -1036,15 +1036,22 @@ I64 PopUpSpriteType()
   I64 i;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Graphic Sprite Resource Menu\"$$\n"
-	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/Resource.TXT.Z\"$$\n"
-	"\n$$LTBLUE$$$$MU,\"Make Sprite\",LE=EST_SPRITE$$\n"
-	"$$MU,\"Pointer to Sprite\",LE=EST_SPRITE_PTR$$\n"
-	"$$MU,\"Duplicate Sprite\",LE=EST_DUP_SPRITE$$\n"
-	"$$MU,\"Sprite Size (not really needed)\",LE=EST_SPRITE_SIZE$$\n"
-	"$$MU,\"Sprite Macro (Icon)\",LE=EST_SPRITE_MACRO$$\n"
-	"$$MU,\"Sprite Menu Item\",LE=EST_SPRITE_MENU$$\n"
-	"$$MU,\"Sprite Link\",LE=EST_SPRITE_LINK$$\n"
-	"\n$$MU,\"Abort\",LE=DOCM_CANCEL$$\n\n");
+	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/Resource.TXT.Z\"$$\n\n"
+	"$$LTBLUE$$$$MU,\"Make Sprite\",LE=EST_SPRITE$$$$FG$$\t "
+	"Start by making a sprite.\n"
+	"$$LTBLUE$$$$MU,\"Ptr to Sprite\",LE=EST_SPRITE_PTR$$$$FG$$\t "
+	"Insert pointer into src code.\n"
+	"$$LTBLUE$$$$MU,\"Duplicate Sprite\",LE=EST_DUP_SPRITE$$$$FG$$ "
+	"Make dup image for in a doc.\n"
+	"$$LTBLUE$$$$MU,\"Sprite Size\",LE=EST_SPRITE_SIZE$$$$FG$$\t "
+	"Insert size of a sprite into src code.\n"
+	"$$LTBLUE$$$$MU,\"Sprite Macro\",LE=EST_SPRITE_MACRO$$$$FG$$\t "
+	"Create icon with auto-text payload.\n"
+	"$$LTBLUE$$$$MU,\"Sprite Menu Item\",LE=EST_SPRITE_MENU$$$$FG$$ "
+	"Create icon with numeric payload.\n"
+	"$$LTBLUE$$$$MU,\"Sprite Link\",LE=EST_SPRITE_LINK$$$$FG$$\t "
+	"Create icon with link payload.\n\n"
+	"$$LTBLUE$$$$MU,\"Abort\",LE=DOCM_CANCEL$$\n\n");
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -1123,13 +1130,13 @@ U8 *EdSprite(I64 bin_num)
 	CatPrint(buf,"+PU");
       break;
     case EST_SPRITE_PTR:
-      EdInsBinary(--bin_num,DOCT_INS_BINARY);
+      EdInsBin(--bin_num,DOCT_INS_BIN);
       break;
     case EST_SPRITE_SIZE:
-      EdInsBinary(--bin_num,DOCT_INS_BINARY_SIZE);
+      EdInsBin(--bin_num,DOCT_INS_BIN_SIZE);
       break;
     case EST_DUP_SPRITE:
-      EdInsBinary(--bin_num,DOCT_SPRITE);
+      EdInsBin(--bin_num,DOCT_SPRITE);
       break;
   }
   if (st1) {

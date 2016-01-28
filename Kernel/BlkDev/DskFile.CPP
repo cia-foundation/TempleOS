@@ -21,16 +21,16 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
       else
 	curname=altname;
       if (dirc=DirContextNew(curname)) {
-	switch (dirc->dv->type) {
-	  case DVT_REDSEA:
+	switch (dirc->dv->fs_type) {
+	  case FSt_REDSEA:
 	    result=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
-	  case DVT_FAT32:
+	  case FSt_FAT32:
 	    result=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
-	  case DVT_ISO9660:
+	  case FSt_ISO9660:
 	    result=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
@@ -50,16 +50,16 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
       if (dirc=DirContextNew(curname)) {
 	while (!result && StrCmp(Fs->cur_dir,"/")) {
 	  Cd("..");
-	  switch (Fs->cur_dv->type) {
-	    case DVT_REDSEA:
+	  switch (Fs->cur_dv->fs_type) {
+	    case FSt_REDSEA:
 	      result=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
-	    case DVT_FAT32:
+	    case FSt_FAT32:
 	      result=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
-	    case DVT_ISO9660:
+	    case FSt_ISO9660:
 	      result=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
@@ -106,16 +106,16 @@ I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0)
     } else
       fbuf2=NULL;
     if (!cdt) cdt=Now;
-    switch (dirc->dv->type) {
-      case DVT_REDSEA:
+    switch (dirc->dv->fs_type) {
+      case FSt_REDSEA:
 	c=RedSeaFileWrite(dirc->dv,Fs->cur_dir,dirc->mask,fbuf,
 	      size,cdt,attr);
 	break;
-      case DVT_FAT32:
+      case FSt_FAT32:
 	c=FAT32FileWrite(dirc->dv,Fs->cur_dir,dirc->mask,fbuf,
 	      size,cdt,attr);
 	break;
-      case DVT_ISO9660:
+      case FSt_ISO9660:
 	PrintErr("Not Writable\n");
 	break;
       default:

@@ -329,7 +329,7 @@ public Bool DocRecalc(CDoc *doc,Bool has_cursor=FALSE,I64 recalc=DOC_RECALC)
   }
   best_doc_e=doc->cur_entry;
 
-  if (!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_WITH_TABS)) &&
+  if (!(doc->flags&(DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)) &&
 	FilesFindMatch(doc->filename.name,FILEMASK_SRC))
     doc->flags|=DOCF_HIGHLIGHT;
   else

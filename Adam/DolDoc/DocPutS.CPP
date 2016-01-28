@@ -12,7 +12,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
   if (!st || !doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
     return NULL;
   unlock=DocLock(doc);
-  if (doc->flags & DOCF_PLAIN_TEXT_WITH_TABS)
+  if (doc->flags & DOCF_PLAIN_TEXT_TABS)
     char_bitmap=chars_bmp_zero_cr_nl_cursor;
   else if (doc->flags & DOCF_PLAIN_TEXT)
     char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor;

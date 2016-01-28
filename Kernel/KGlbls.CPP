@@ -2,7 +2,7 @@
 //$LK,"Globals Set to Zero Here",A="FF:::/Compiler/PrsStmt.CPP,sys_var_init_flag"$.
 
 CSrvCmd sys_macro_root;
-CTask *sys_macro_util_task;
+CTask *sys_macro_task;
 CDoc *sys_clipboard_doc;
 
 CTask *adam_task;

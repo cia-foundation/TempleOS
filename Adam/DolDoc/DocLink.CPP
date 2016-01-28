@@ -13,8 +13,8 @@
 "PF:haystack_filename,needle_str:occurnum"
 "PL:filename,linenum"
 "BF:haystack_bible_book,needle_str"
-"DF:word"
-"DF:word,defnum"
+"DN:word"
+"DN:word,defnum"
 "HI:index"
 "AD:code_address_number"
 
@@ -67,7 +67,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
   try {
     switch (type) {
       case LK_PLAIN:
-	flags=DOCF_PLAIN_TEXT;
+	flags=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
       case LK_DOC:
 	type=LK_FILE;
 	break;
@@ -75,17 +75,17 @@ Bool DocFileEd(I64 _type,U8 *filename,
 	type=LK_FILE_ANCHOR;
 	break;
       case LK_PLAIN_FIND:
-	flags=DOCF_PLAIN_TEXT;
+	flags=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
       case LK_DOC_FIND:
 	type=LK_FILE_FIND;
 	break;
       case LK_PLAIN_LINE:
-	flags=DOCF_PLAIN_TEXT;
+	flags=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
       case LK_DOC_LINE:
 	type=LK_FILE_LINE;
 	break;
       case LK_BIBLE_FIND:
-	flags=DOCF_PLAIN_TEXT;
+	flags=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
 	break;
     }
 
@@ -309,7 +309,7 @@ public Bool DocLinkChk(U8 *link_st)
 	  result=TRUE;
 	Free(st);
 	break;
-      default://TODO: Need to validate HI: and DF:
+      default://TODO: Need to validate HI: and DN:
 	if (Ed(link_st,EDF_BAIL))
 	  result=TRUE;
     }

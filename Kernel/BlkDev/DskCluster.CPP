@@ -5,12 +5,12 @@ I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1)
   if (cnt<=0) return c;
   try {
     unlock=DrvLock(dv);
-    switch (dv->type) {
-      case DVT_ISO9660:
-      case DVT_REDSEA:
+    switch (dv->fs_type) {
+      case FSt_ISO9660:
+      case FSt_REDSEA:
 	c+=cnt;
 	break;
-      case DVT_FAT32:
+      case FSt_FAT32:
 	while (cnt-->0 && 0<c<0x0FFFFFF8) {
 	  DrvFATBlkSet(dv,c);
 	  c=dv->cur_fat_blk[c & (BLK_SIZE/4-1)];
@@ -32,11 +32,11 @@ I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1)
 I64 Cluster2Blk(CDrv *dv,I64 c)
 {//Drv cluster num to blk num.
   DrvChk(dv);
-  switch (dv->type) {
-    case DVT_REDSEA:
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
       return c;
-    case DVT_ISO9660:
-    case DVT_FAT32:
+    case FSt_ISO9660:
+    case FSt_FAT32:
       return dv->data_area+c*dv->spc;
     default:
       throw('Drv');
@@ -51,16 +51,16 @@ I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
   if (blks<=0) return c;
   try {
     unlock=DrvLock(dv);
-    switch (dv->type) {
-      case DVT_ISO9660:
+    switch (dv->fs_type) {
+      case FSt_ISO9660:
 	RBlks(dv,buf,dv->data_area+c*dv->spc,blks);
 	c+=(blks+dv->spc-1)/dv->spc;
 	break;
-      case DVT_REDSEA:
+      case FSt_REDSEA:
 	RBlks(dv,buf,c,blks);
 	c+=blks;
 	break;
-      case DVT_FAT32:
+      case FSt_FAT32:
 	while (blks && 0<c<0x0FFFFFF8) {
 	  i=blks;
 	  if (i>dv->spc)
@@ -97,12 +97,12 @@ I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
   if (blks<=0) return c;
   try {
     unlock=DrvLock(dv);
-    switch (dv->type) {
-      case DVT_REDSEA:
+    switch (dv->fs_type) {
+      case FSt_REDSEA:
 	WBlks(dv,buf,c,blks);
 	c=0;
 	break;
-      case DVT_FAT32:
+      case FSt_FAT32:
 	while (blks) {
 	  if (!(0<c<0x0FFFFFF8))
 	    throw('Drv');
@@ -136,10 +136,10 @@ I64 ClustersAlloc(CDrv *dv,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
 //c=0 means first cluster in chain
   DrvChk(dv);
   if (cnt<=0) return c;
-  switch (dv->type) {
-    case DVT_REDSEA:
+  switch (dv->fs_type) {
+    case FSt_REDSEA:
       return RedSeaAllocClusters(dv,cnt);
-    case DVT_FAT32:
+    case FSt_FAT32:
       if (contiguous) {
 	if (c) throw('File');
 	return FAT32AllocContiguousClusters(dv,cnt);
