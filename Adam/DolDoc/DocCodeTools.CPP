@@ -272,7 +272,7 @@ U0 EdRemFunLeadingSpace(CDoc *doc)
   do {
     doc_e2=doc_e->next;
     if (doc_e!=doc && doc_e!=doc->cur_entry &&
-	  !(doc_e->de_flags&(DOCEG1_DONT_EDIT-DOCEF_SCROLLING_X)))
+	  !(doc_e->de_flags&(DOCEG_DONT_EDIT-DOCEF_SCROLLING_X)))
       switch (doc_e->type_u8) {
 	case DOCT_TEXT:
 	  ptr=doc_e->tag;
@@ -511,7 +511,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	end_y=start_y+indent->total_cnt;
 	while (start_y<=doc_e->y<end_y) {
 	  if (doc_e!=doc && doc_e!=doc->cur_entry &&
-		!(doc_e->de_flags&(DOCEG1_DONT_EDIT-DOCEF_SCROLLING_X))) {
+		!(doc_e->de_flags&(DOCEG_DONT_EDIT-DOCEF_SCROLLING_X))) {
 	    if (doc_e->type_u8==DOCT_NEW_LINE||
 		  doc_e->type_u8==DOCT_SOFT_NEW_LINE)
 	      start_of_line=TRUE;
@@ -520,12 +520,9 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 		i=QueVectU8Get(indent,doc_e->y)*C_INDENT_SPACES;
 		x=doc_e->x+1;
 		while (i>8) {
-		  doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_ne->type=DOCT_TAB | doc->settings_root.dft_text_attr<<8;
-		  doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TAB];
-		  doc_ne->x=x;
-		  doc_ne->y=doc_e->y;
-		  doc_ne->page_line_num=doc_e->page_line_num;
+		  doc_ne=DocEntryNewBase(doc,
+			DOCT_TAB|doc->settings_root.dft_text_attr<<8,,
+			x,doc_e->y,doc_e->page_line_num);
 		  MemCpy(&doc_ne->settings,
 			&doc_e->settings,sizeof(CDocSettings));
 		  QueIns(doc_ne,doc_e->last);
@@ -536,14 +533,11 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 		  b=MAlloc(i+1,doc->mem_task);
 		  MemSet(b,CH_SPACE,i);
 		  b[i]=0;
-		  doc_ne=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-		  doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
+		  doc_ne=DocEntryNewBase(doc,
+			DOCT_TEXT|doc->settings_root.dft_text_attr<<8,,
+			x,doc_e->y,doc_e->page_line_num);
 		  doc_ne->tag=b;
 		  doc_ne->max_col=1;
-		  doc_ne->x=x;
-		  doc_ne->y=doc_e->y;
-		  doc_ne->page_line_num=doc_e->page_line_num;
 		  MemCpy(&doc_ne->settings,
 			&doc_e->settings,sizeof(CDocSettings));
 		  QueIns(doc_ne,doc_e->last);

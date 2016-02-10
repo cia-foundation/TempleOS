@@ -28,7 +28,8 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
   task->animate_task=NULL;
 
   if (doc=DocPut(task)) {
-    tempse->cursor=!Bt(&doc->flags,DOCf_HIDE_CURSOR);
+    tempse->hide_cursor=!Bt(&doc->flags,DOCf_HIDE_CURSOR);
+    tempse->highlight_cursor=!Bt(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR);
     tempse->scroll=!Bt(&doc->flags,DOCf_NO_SCROLL_BARS);
   }
 
@@ -63,7 +64,8 @@ U0 SettingsPop2(CTask *task,CTaskSettings *tempse)
   CDoc *doc;
 
   if (doc=DocPut(task)) {
-    LBEqu(&doc->flags,DOCf_HIDE_CURSOR,!tempse->cursor);
+    LBEqu(&doc->flags,DOCf_HIDE_CURSOR,!tempse->hide_cursor);
+    LBEqu(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR,!tempse->highlight_cursor);
     LBEqu(&doc->flags,DOCf_NO_SCROLL_BARS,!tempse->scroll);
   }
 

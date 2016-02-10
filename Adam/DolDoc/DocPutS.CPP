@@ -26,9 +26,8 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
     ptr--;
     if (!ch) {
       if (j=ptr-ptr2) {
-	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-	doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
+	doc_e=DocEntryNewBase(doc,
+	      DOCT_TEXT|doc->settings_root.dft_text_attr<<8);
 	if (doc->flags & DOCF_NO_CURSOR) {
 	  src=MAlloc(j+1);
 	  MemCpy(src,ptr2,j+1);
@@ -46,9 +45,8 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
     } else {
       if (j=ptr-ptr2) {
 	*ptr=0;
-	doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
-	doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
+	doc_e=DocEntryNewBase(doc,
+	      DOCT_TEXT|doc->settings_root.dft_text_attr<<8);
 	if (doc->flags & DOCF_NO_CURSOR) {
 	  src=MAlloc(j+1);
 	  MemCpy(src,ptr2,j+1);
@@ -73,23 +71,20 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
       }
       switch (ch) {
 	case CH_CURSOR:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
+	  doc_e=DocEntryNewBase(doc,
+		DOCT_CURSOR|doc->settings_root.dft_text_attr<<8);
 	  DocInsEntry(doc,doc_e);
 	  ptr++;
 	  break;
 	case CH_FORM_FEED:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_PAGE_BREAK | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_PAGE_BREAK];
+	  doc_e=DocEntryNewBase(doc,
+		DOCT_PAGE_BREAK|doc->settings_root.dft_text_attr<<8);
 	  DocInsEntry(doc,doc_e);
 	  ptr++;
 	  break;
 	case '\t':
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_TAB | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_TAB];
+	  doc_e=DocEntryNewBase(doc,
+		DOCT_TAB|doc->settings_root.dft_text_attr<<8);
 	  DocInsEntry(doc,doc_e);
 	  ptr++;
 	  break;
@@ -101,21 +96,19 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	  if (*ptr) {
 	    *ptr=0; //zero second dollar
 	    if (ptr-1==ptr2 && *ptr2==CH_CURSOR) {
-	      doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	      doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-	      doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
+	      doc_e=DocEntryNewBase(doc,
+		    DOCT_CURSOR|doc->settings_root.dft_text_attr<<8);
 	      DocInsEntry(doc,doc_e);
 	      ptr2++;
 	    }
 	    if (ptr==ptr2) {
-	      doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	      doc_e->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
+	      doc_e=DocEntryNewBase(doc,
+		    DOCT_TEXT|doc->settings_root.dft_text_attr<<8);
 	      doc_e->max_col=1;
 	      if (doc->flags & DOCF_DBL_DOLLARS)
 		doc_e->tag=StrNew("$$$$",doc->mem_task);
 	      else
 		doc_e->tag=StrNew("$$",doc->mem_task);
-	      doc_e->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
 	      DocInsEntry(doc,doc_e);
 	    } else {
 	      st2=MAlloc(ptr-ptr2+1);
@@ -123,15 +116,12 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	      ptr4=st2;
 	      while (ch=*ptr3++) {
 		if (ch==CH_CURSOR) {
-		  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_e->type=DOCT_CURSOR | doc->settings_root.dft_text_attr<<8;
-		  doc_e->de_flags=doldoc.dft_de_flags[DOCT_CURSOR];
+		  doc_e=DocEntryNewBase(doc,
+			DOCT_CURSOR|doc->settings_root.dft_text_attr<<8);
 		  DocInsEntry(doc,doc_e);
 		} else if (ch==CH_FORM_FEED) {
-		  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-		  doc_e->type=DOCT_PAGE_BREAK |
-			doc->settings_root.dft_text_attr<<8;
-		  doc_e->de_flags=doldoc.dft_de_flags[DOCT_PAGE_BREAK];
+		  doc_e=DocEntryNewBase(doc,
+			DOCT_PAGE_BREAK|doc->settings_root.dft_text_attr<<8);
 		  DocInsEntry(doc,doc_e);
 		} else
 		  *ptr4++=ch;
@@ -147,9 +137,8 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	  }
 	  break;
 	default:
-	  doc_e=CAlloc(sizeof(CDocEntryBase),doc->mem_task);
-	  doc_e->type=DOCT_NEW_LINE | doc->settings_root.dft_text_attr<<8;
-	  doc_e->de_flags=doldoc.dft_de_flags[DOCT_NEW_LINE];
+	  doc_e=DocEntryNewBase(doc,
+		DOCT_NEW_LINE|doc->settings_root.dft_text_attr<<8);
 	  DocInsEntry(doc,doc_e);
 	  if (ch=='\r')
 	    while (*ptr=='\r')
@@ -176,7 +165,7 @@ public CDocEntry *DocPrint(CDoc *doc,U8 *fmt,...)
 
 public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
 {//Lets you print half a doc cmd, if you like.
-  U8 *buf,*b,*src,*dst,*ptr,*ptr2;
+  U8 *buf,*st,*src,*dst,*ptr,*ptr2;
   Bool unlock;
   CDocEntry *doc_ce,*doc_ne;
   I64 ch,i,j;
@@ -195,7 +184,7 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
   else
     while (ch=*ptr) {
       if (!Bt(chars_bmp_safe_dollar,ch) ||
-	    doc->flags & (DOCF_OVERSTRIKE | DOCF_IN_DOLLAR)) {
+	    doc->flags & (DOCF_OVERSTRIKE|DOCF_IN_DOLLAR)) {
 	DocPutKey(doc,ch,0);
 	ptr++;
       } else {
@@ -210,7 +199,7 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
 	doc_ce=doc->cur_entry;
 	j=ptr-ptr2;
 	if (IsEditableText(doc_ce)) {
-	  dst=b=MAlloc(doc_ce->max_col+j+1,doc->mem_task);
+	  dst=st=MAlloc(doc_ce->max_col+j+1,doc->mem_task);
 	  src=doc_ce->tag;
 	  i=doc->cur_col;
 	  doc->cur_col+=j;
@@ -221,12 +210,10 @@ public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
 	    *dst++=*ptr2++;
 	  while (*dst++=*src++);
 	  Free(doc_ce->tag);
-	  doc_ce->tag=b;
+	  doc_ce->tag=st;
 	} else {
-	  dst=MAlloc(j+1,doc->mem_task);
-	  MemCpy(dst,ptr2,j+1);
-	  doc_ne=DocEntryNew(doc,doc_ce,dst);
-	  doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
+	  doc_ne=DocEntryNewTag(doc,doc_ce,ptr2);
+	  doc_ne->type=DOCT_TEXT|doc->settings_root.dft_text_attr<<8;
 	  doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
 	  QueIns(doc_ne,doc_ce->last);
 	  doc->cur_entry=doc_ne;

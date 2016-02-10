@@ -227,9 +227,5 @@ public U0 MemRep()
     MemRepTask(c->idle_task,TRUE);
     "$$ID,-2$$";
   }
-
-  "$$GREEN$$Independent Heaps$$FG$$\n$$ID,2$$";
-  "$$BLACK$$dev.uncached_heap:%010X Used:%010X$$FG$$\n",
-	dev.uncached_heap->bp->alloced_u8s,dev.uncached_heap->used_u8s;
   "$$ID,-2$$\n";
 }

@@ -1,3 +1,5 @@
+//This file is required by $LK,"::/Demo/Lectures/Mem/Uncached.CPP"$.
+
 U8 *Mem2MegAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
 {/*Alloc 2Meg pages from BlkPool. Don't link to task.
 (Linking to a task means they will be freed when the task dies.)
@@ -178,3 +180,23 @@ U0 Mem2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
     POPFD
   }
 }
+
+CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512)
+{//Make mem chunk into HeapCtrl and BlkPool.
+  I64 num;
+  CMemBlk *m;
+  CHeapCtrl *hc;
+  MemSet(bp,0,sizeof(CBlkPool)+sizeof(CHeapCtrl));
+  hc=HeapCtrlInit(bp(U8 *)+sizeof(CBlkPool),,bp);
+  m=(bp(U8 *)+sizeof(CBlkPool)+sizeof(CHeapCtrl)+MEM_PAGE_SIZE-1)&
+	~(MEM_PAGE_SIZE-1);
+  num=(bp(U8 *)+pages512<<MEM_PAGE_BITS-m(U8 *))>>MEM_PAGE_BITS;
+  bp->alloced_u8s=(pages512-num)<<MEM_PAGE_BITS;
+  BlkPoolAdd(bp,m,num);
+  return hc;
+}
+
+/*  PCI hardware devices, when they require uncached memory buffers, need
+this code.  TempleOS, however, has a law requiring only IN/OUT port hardware
+access except VGA, handled here: $LK,"::/Kernel/Mem/PageTables.CPP"$.
+*/

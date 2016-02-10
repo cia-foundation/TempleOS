@@ -1,3 +1,8 @@
+#help_index "TOS"
+
+#define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
+#define PERSONAL_INITIALS	"TAD"
+
 #define SLOP	BLK_SIZE
 U0 TOSBootRescueDrv1()
 {

@@ -91,14 +91,10 @@ I64 DirEntryCompareCluster(CDirEntry *e1,CDirEntry *e2)
 
 U0 DirFilesSort(CDirEntry **_tempde,I64 key)
 {
-  I64 i,cnt=0;
+  I64 i,cnt;
   CDirEntry *tempde=*_tempde,*tempde1,**sort_buf;
   if (tempde) {
-    tempde1=tempde;
-    while (tempde1) {
-      cnt++;
-      tempde1=tempde1->next;
-    }
+    cnt=LinkedLstCnt(tempde);
     if (cnt>1) {
       sort_buf=MAlloc(cnt*sizeof(U8 *));
       i=0;

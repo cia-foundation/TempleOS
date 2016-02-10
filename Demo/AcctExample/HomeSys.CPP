@@ -9,7 +9,7 @@ U0 UserStartUp()
   WinToTop;
   WinZBufUpdate;
   Dir;
-  "$TX,"80,916",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
+  "$TX,"81,095",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
   CPURep;
 }
 

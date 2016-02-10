@@ -7,7 +7,7 @@ public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
     unlock=DocLock(doc);
     doc->x=0;
     doc->y=line_num-1;
-    DocRecalc(doc,FALSE,DOC_RECALC_FIND_CURSOR);
+    DocRecalc(doc,RECALCt_FIND_CURSOR);
     DocCenter(doc);
     if (doc->cur_entry->y==line_num-1)
       result=TRUE;
@@ -105,7 +105,7 @@ public U0 EdFindNext(CDoc *doc)
   do {
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
-	    !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_FILTER_SKIP))) {
+	    !(doc_e->de_flags&(DOCEG_DONT_EDIT|DOCEF_FILTER_SKIP))) {
 	if (doc_e->type & DOCET_SELECTED ||
 	      !doc->find_replace->scan_selected_text) {
 	  if (doc->find_replace->scan_fwd) {
@@ -473,7 +473,7 @@ I64 EdFindReplace(CDoc *doc)
 	    break;
 	}
 	if (doc_e->type_u8==DOCT_TEXT &&
-	      !(doc_e->de_flags&(DOCEG1_DONT_EDIT|DOCEF_FILTER_SKIP)) &&
+	      !(doc_e->de_flags&(DOCEG_DONT_EDIT|DOCEF_FILTER_SKIP)) &&
 	      (doc_e->type & DOCET_SELECTED ||
 	      !doc->find_replace->scan_selected_text&&
 	      !doc->find_replace->local_var)) {
@@ -571,7 +571,7 @@ Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
 
 class CEdLineGoTo
 {
-  I64 line fmtstr "$$DA,256,A=\"Go to Line:%d\"$$";
+  I64 line fmtstr "$$DA,A=\"Go to Line:%d\"$$";
 };
 
 U0 EdGoToLine(CDoc *doc)

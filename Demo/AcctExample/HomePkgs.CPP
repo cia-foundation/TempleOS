@@ -7,6 +7,8 @@
 Cd("::/Home");;
 #include "::/Home/TOSCfg"
 #include "::/Home/TOSMisc"
+#include "::/Home/TOSToHtml"
 #include "::/Home/TOSDistro"
+#include "::/Home/TOSBlog"
 #include "::/Home/TOSHolySpirit"
 Cd("::/Home");;

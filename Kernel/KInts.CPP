@@ -46,7 +46,10 @@ IRQ_TIMER::  //I_TIMER
 	MOV	U32 [RAX],0
 	JMP	@@25
 @@20:	CALL	&IntCore0TimerHandler	//Only Core 0 calls this.
-@@25:	JMP	I32 RESTORE_RSI_TASK
+@@25:	XOR	RAX,RAX
+	CMP	RSI,U64 GS:CCPU.idle_task[RAX]
+	JE	I32 RESTORE_SETH_TASK_IF_READY
+	JMP	I32 RESTORE_RSI_TASK
 //************************************
 INT_FAULT::
 	PUSH	RBX

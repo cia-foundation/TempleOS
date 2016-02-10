@@ -264,10 +264,10 @@ U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0)
 #define SCR_CONT	1
 #define SCR_EXIT	2
 
-I64 SrvCmdRun(I64 run_flags,CSrvCmd *tempc)
-{
-  CSrvCtrl *ctrl=tempc->ctrl;
-  CTask    *master;
+I64 SrvCmdRunOne(I64 run_flags,CSrvCtrl *ctrl)
+{//Called with ctrl->flags,SVCRf_LOCKED.
+  CSrvCmd *tempc=ctrl->next_waiting;
+  CTask   *master;
   I64 result,flags=tempc->flags,old_flags=GetRFlags;
   if (Bt(&flags,SVCf_EXIT_ON_COMPLETE))
     result=SCR_EXIT;
@@ -350,18 +350,13 @@ I64 SrvCmdRun(I64 run_flags,CSrvCmd *tempc)
 I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL)
 {//Handle all waiting cmds and return.
   I64 cnt=0,old_flags=GetRFlags;
-  CSrvCmd *tempc,*tempc1;
   if (!task) task=Fs;
   while (TRUE) {
     CLI
     while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
       PAUSE
-    tempc1=&task->srv_ctrl.next_waiting;
-    tempc=tempc1->next;
-    if (tempc==tempc1)
-      goto sch_done;
-    else
-      switch (SrvCmdRun(run_flags,tempc)) {
+    if (task->srv_ctrl.next_waiting!=&task->srv_ctrl)
+      switch (SrvCmdRunOne(run_flags,&task->srv_ctrl)) {
 	case SCR_CONT:
 	  cnt++;
 	  break;
@@ -370,6 +365,8 @@ I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL)
 	case SCR_DONE:
 	  goto sch_done;
       }
+    else
+      goto sch_done;
   }
 sch_done:
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);

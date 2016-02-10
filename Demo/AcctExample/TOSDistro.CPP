@@ -1,5 +1,7 @@
 //The CFG defines are $LK,"::/Home/TOSCfg.CPP",A="FI:::/Demo/AcctExample/TOSCfg.CPP"$.
 
+#help_index "TOS"
+
 U8 TOSGetDrv()
 {
   I64 result;
@@ -45,61 +47,20 @@ U0 TOSPromptAndCopyDrv()
   TOSCopyDrv(src,dst);
 }
 
-public U0 CursorRemFile(U8 *filename)
-{
-  CDoc *doc;
-  doc=DocRead(filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
-  DocWrite(doc);
-  DocDel(doc);
-}
-public U0 CursorRem(U8 *files_find_mask="*")
-{
-  I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
-  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
-  while (tempde) {
-    CursorRemFile(tempde->full_name);
-    Touch(tempde->full_name,"",,tempde->datetime);
-    tempde=tempde->next;
-  }
-  DirTreeDel(tempde1);
-}
-
-U0 UncollapseFile(U8 *filename,I64 *)
-{
-  CDoc *doc=DocRead(filename,DOCF_NO_CURSOR);
-  DocCollapse(FALSE,doc);
-  DocWrite(doc);
-  DocDel(doc);
-}
-U0 Uncollapse(U8 *files_find_mask="*",U8 *fu_flags=NULL)
-{
-  I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T+O");
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
-  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    UncollapseFile(tempde->full_name,&fuf_flags);
-    Touch(tempde->full_name,"",,tempde->datetime);
-    tempde=tempde->next;
-  }
-  DirTreeDel(tempde1);
-}
-
 public U0 CopySongs(U8 threshold='7')
 {
-  CDoc *s;
+  CDoc *doc;
   CDocEntry *doc_e;
   CDirEntry *tempde=FilesFind("/Home/Downloads/Psalmody/*.CPP*",
-	FUF_CLUSTER_ORDER),
-	*tempde1=tempde;
+	FUF_CLUSTER_ORDER),*tempde1=tempde;
   DelTree("/Apps/Psalmody/Examples");
   MkDir("/Apps/Psalmody/Examples");
   while (tempde) {
-    s=DocRead(tempde->full_name);
-    doc_e=s->root.next;
+    doc=DocRead(tempde->full_name);
+    doc_e=doc->root.next;
     if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[2]>=threshold)
       Copy(tempde->full_name,"/Apps/Psalmody/Examples");
+    DocDel(doc);
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
@@ -288,7 +249,7 @@ U0 MakeTOSDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSTS_SIZE",
-	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -323,7 +284,7 @@ U0 MakeDbgDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -371,7 +332,7 @@ U0 MakeLiteDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -404,85 +365,8 @@ U0 MakeUltraDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
-  Drv('C');
-}
-
-U0 TOSWebFile(U8 *name)
-{
-  U8 *name2;
-  CDirEntry de;
-  if (FileFind(name,&de)) {
-    Free(de.full_name);
-    "File:%s\n",name;
-    UncollapseFile(name,NULL);
-    Touch(name,"",,de.datetime);
-    name2=ChgExt(name,"html");
-    ToHtml(name,name2,
-	  "<title>The Temple Operating System</title>\n"
-	  "<meta name=\"keywords\" "
-	  "content=\"Operating System,64-Bit,64 Bit,"
-	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n");
-    Touch(name2,"",,de.datetime);
-    Free(name2);
-  }
-}
-
-U0 MakeWebSite()
-{
-  CDirEntry *tempde,*tempde1;
-  DocClear;
-  Cd("D:/Wb");
-  DelTree("D:/Wb/Home/Budget");
-  DelTree("D:/Wb/Home/Private");
-  Del("D:/Wb/Home/*");
-  Touch("D:/Wb/Home/Web/index.TXT.Z","");
-  Touch("D:/Wb/Home/Web/Downloads.TXT.Z","");
-  Touch("D:/Wb/Home/Web/TempleOS.TXT.Z","");
-  tempde=tempde1=FilesFind("*",
-	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
-  while (tempde) {
-    TOSWebFile(tempde->full_name);
-    tempde=tempde->next;
-  }
-  Copy(	"D:/Wb/Home/Downloads/Bin/TempleBot",
-	"D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  ToDolDoc("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  ToHtml("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  Del("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  DirTreeDel(tempde1);
-  Drv('C');
-}
-
-U0 FreshenWebDir(U8 *dirname)
-{//No recurse
-  CDirEntry *tempde,*tempde1;
-  U8 *src,*dst;
-
-  src=MStrPrint("D:/Wb%s/*",dirname);
-  Del(src);
-  Free(src);
-  src=MStrPrint("C:%s/*",dirname);
-  dst=MStrPrint("D:/Wb%s",dirname);
-  Copy(src,dst);
-  Free(src);
-  Free(dst);
-
-  src=MStrPrint("D:/Wb%s/*",dirname);
-  tempde=tempde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
-  while (tempde) {
-    TOSWebFile(tempde->full_name);
-    tempde=tempde->next;
-  }
-  DirTreeDel(tempde1);
-}
-
-U0 MakeWebSitePartial()
-{
-  FreshenWebDir("/Home/Web");
-  FreshenWebDir("/Home/Web/TAD");
-  FreshenWebDir("/Home/Web/Imgs");
   Drv('C');
 }
 
@@ -490,12 +374,12 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.01",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);

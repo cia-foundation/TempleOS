@@ -35,7 +35,7 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	ptr=*ptr;
 	if (ChkPtr(ptr)) {
 	  if (dynamic) {
-	    doc_e=DocPrint(doc,"$$DA-TRM-P+RD,64,A=\"%%40ts\"$$\n");
+	    doc_e=DocPrint(doc,"$$DA-TRM-P+RD,LEN=64,A=\"%%40ts\"$$\n");
 	    doc_e->data=ptr;
 	    DocDataFmt(doc,doc_e);
 	  } else
@@ -46,13 +46,13 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	if (tempc2->raw_type==RT_I8 || tempc2->raw_type==RT_U8) {
 	  if (j==1) {
 	    if (dynamic) {
-	      doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=U8,A=\"%%c\"$$\n");
+	      doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U8,A=\"%%c\"$$\n");
 	      doc_e->data=ptr;
 	    } else
 	      DocPrint(doc,"%c\n",*ptr(U8 *));
 	  } else {
 	    if (dynamic) {
-	      doc_e=DocPrint(doc,"$$DA-TRM-P+RD,64,A=\"%%40ts\"$$\n");
+	      doc_e=DocPrint(doc,"$$DA-TRM-P+RD,LEN=64,A=\"%%40ts\"$$\n");
 	      doc_e->data=ptr;
 	      DocDataFmt(doc,doc_e);
 	    } else
@@ -66,56 +66,56 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	      break;
 	    case RT_I8:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=I8,A=\"%%02X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=I8,A=\"%%02X\"$$ ");
 		doc_e->data=ptr(I8 *)++;
 	      } else
 		DocPrint(doc,"%02X ",*ptr(I8 *)++);
 	      break;
 	    case RT_U8:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=U8,A=\"%%02X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U8,A=\"%%02X\"$$ ");
 		doc_e->data=ptr(U8 *)++;
 	      } else
 		DocPrint(doc,"%02X ",*ptr(U8 *)++);
 	      break;
 	    case RT_I16:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=I16,A=\"%%04X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=I16,A=\"%%04X\"$$ ");
 		doc_e->data=ptr(I16 *)++;
 	      } else
 		DocPrint(doc,"%04X ",*ptr(I16 *)++);
 	      break;
 	    case RT_U16:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=U16,A=\"%%04X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U16,A=\"%%04X\"$$ ");
 		doc_e->data=ptr(U16 *)++;
 	      } else
 		DocPrint(doc,"%04X ",*ptr(U16 *)++);
 	      break;
 	    case RT_I32:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=I32,A=\"%%08X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=I32,A=\"%%08X\"$$ ");
 		doc_e->data=ptr(I32 *)++;
 	      } else
 		DocPrint(doc,"%08X ",*ptr(I32 *)++);
 	      break;
 	    case RT_U32:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=U32,A=\"%%08X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U32,A=\"%%08X\"$$ ");
 		doc_e->data=ptr(U32 *)++;
 	      } else
 		DocPrint(doc,"%08X ",*ptr(U32 *)++);
 	      break;
 	    case RT_F64:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=F64,A=\"%%16g\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=F64,A=\"%%16g\"$$ ");
 		doc_e->data=ptr(F64 *)++;
 	      } else
 		DocPrint(doc,"%16g ",*ptr(I64 *)++);
 	      break;
 	    default:
 	      if (dynamic) {
-		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,A=\"%%016X\"$$ ");
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,A=\"%%016X\"$$ ");
 		doc_e->data=ptr(I64 *)++;
 	      } else
 		DocPrint(doc,"%016X ",*ptr(I64 *)++);

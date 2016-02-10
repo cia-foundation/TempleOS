@@ -4,8 +4,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
 
-* In <CTRL-r> menu, transform individual elements.
-
 * $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.CPP"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
 
 * $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: $LK,"R",A="MN:R"$("Mesh",...);?
@@ -27,11 +25,11 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
 
+* $LK,"DOCEF_REMALLOC_DATA",A="FF:::/Adam/DolDoc/DocChar.CPP,DOCEF_REMALLOC_DATA"$ HexEdit Remalloc.
+
 * No way to clear $LK,"DOCEf_HOLD",A="MN:DOCEf_HOLD"$ entries.
 
 * $LK,"DOCF_DBL_DOLLARS",A="MN:DOCF_DBL_DOLLARS"$ in $LK,"Reindention",A="MN:EdCodeTools2"$.
-
-* Compiler: Warn unnecessary typecast.
 
 * Compiler Optimization: Local array vars --> reg.  Might exist.
 
@@ -39,7 +37,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * AfterEgypt: $LK,"Numbers,13:33",A="BF:Numbers,13:33"$ scouts? $LK,"Numbers,21:8",A="BF:Numbers,21:8"$ snakes?
 
-* Find-and-replace text on $$PT$$ line before it.
+* Bug: Find-and-replace text on $$PT$$ line before it.
 * 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
 * 01/10/2016 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Web/TAD/CounterRenaissance.TXT"$ "Rennaisance"
 * 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
@@ -83,9 +81,9 @@ $FG,5$$TX+CX,"TODO? Meh"$$FG$
 
 * Clean-up ASCII #127 delete char?  (No. Maybe, we want a new usage for 127 in future centuries.)
 
-* $LK,"DocSave",A="MN:DocSave"$() $LK,"*result==CH_CURSOR",A="FF:::/Adam/DolDoc/DocFile.CPP,*result==CH_CURSOR"$ is ugly.
-
 * Compiler: Exceptions don't free $LK,"CCmpCtrl",A="MN:CCmpCtrl"$ stuff.
+
+* $LK,"::/Adam/DolDoc/DocHighlight.CPP"$ for code comments at top of documents.
 
 * Unhandled exception msgs from MP's get overwritten by WinMgr.
 
@@ -126,6 +124,8 @@ $ID,-5$$HL,0$
 
 
 $FG,5$$TX+CX,"Bugs"$$FG$
+* 1/28/16 $LK,"::/Demo/Graphics/Pick3D.CPP"$ crashed in TestSuite.
+
 * 1/12/16 make RAM drive 2288 blks, $FG,2$CopyTree("C:/Home","B:/Home"); $FG$  Disk runs-out of space and hangs instead of reporting errors.
 
 * Bug introduced around 11/1/15.  Changed $LK,"::/Kernel/Sched.CPP"$ and now $LK,"WinToTop",A="MN:WinToTop"$ is called on Adam task at start-up, sometimes.  Might be user's fault because of bad keys pressed during VMware power-on init.  Might be fixed by $LK,"ACf_INIT_IN_PROGRESS",A="MN:ACf_INIT_IN_PROGRESS"$.
@@ -273,6 +273,8 @@ $FG,5$$TX+CX,"Inspirational Ideas"$$FG$
 
 * Use standard terminology from "the literature".
 
+* Striped and other dither patterns.  Brushes?
+
 * Get rid of BYTE, WORD, DWORD in opcode and replace with U8, U16, U32.
 
 * Get rid of "Char".
@@ -314,7 +316,7 @@ $FG,5$$TX+CX,"Inspirational Ideas"$$FG$
 $ID,5$$$=-CTASK_NEG_OFFSET
 offset(CTask.addr)==0
 Spawn(): CAlloc()
-TaskFinishOff(): Free()
+TaskDel(): Free()
 CSysFixedArea.adam
 Looks like task_flags,locked_flags cause problems with neg offset.
 $ID,-5$
@@ -395,15 +397,15 @@ Meek and humble of heart		$TX,"Matthew 11:29",HTML="http://www.biblegateway.com/
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17344 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17358 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
-Machine		$HC,"<img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\">"$
-Frosting	$HC,"<img src=\"http://www.templeos.org/images/Frosting.jpg\" width=\"600\" height=\"400\" alt=\"\">"$
-Soap Carvings	$HC,"<img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\">"$
-CottonTail	$HC,"<img src=\"http://www.templeos.org/images/CttnTail.jpg\" width=\"644\" height=\"1113\" alt=\"\">"$
-TempleOS Logo	$HC,"<img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\">"$
+Machine		$HC,"<center><img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
+Frosting	$HC,"<center><img src=\"http://www.templeos.org/images/Frosting.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
+Soap Carvings	$HC,"<center><img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
+CottonTail	$HC,"<center><img src=\"http://www.templeos.org/images/CttnTail.jpg\" width=\"644\" height=\"1113\" alt=\"\"></center>"$
+TempleOS Logo	$HC,"<center><img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\"></center>"$
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
@@ -412,7 +414,7 @@ $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
 
 
 $FG,5$$TX+CX,"Web Bookmarks"$$FG$
-Cop tying shoe	$HC,"<img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\">"$
+Cop tying shoe	$HC,"<center><img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\"></center>"$
 $TX,"Good Time Bad Times Lyrics",HTML="https://www.google.com/#q=led+zep+good+times+bad+times+lyrics"$
 $TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
 $TX,"Handford school",HTML="https:/pinterest.com/pin/255368241346360278"$

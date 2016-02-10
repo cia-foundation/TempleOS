@@ -61,7 +61,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
     for (i=0;i<DOCEf_NUM_FLAGS;i++)
       if (Bt(&f1,i)!=Bt(&de_flags,i)) {
 	if (Bt(&de_flags,i)) {
-	  if (!(1<<i&DOCEG1_HAS_ARG)) {
+	  if (!(1<<i&DOCEG_HAS_ARG)) {
 	    buf2=MStrPrint("%s+%Z",buf,i,"ST_DOC_FLAGS");
 	    Free(buf); buf=buf2;
 	  }
@@ -82,19 +82,12 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
     buf2=MStrPrint("%s,",buf);
     Free(buf); buf=buf2;
     nobound_switch (doc_e->type_u8) {
-      sub_switch_start:
-	case DOCT_DATA:
-	  buf2=MStrPrint("%s%d,",buf,doc_e->len);
-	  break;
-	case DOCT_HEX_ED:
-	  buf2=MStrPrint("%s%d,",buf,doc_e->len);
-	  Free(buf); buf=buf2;
-	  buf2=MStrPrint("%s%d,",buf,doc_e->hex_ed_width);
-	  break;
-      sub_switch_end:
+      case DOCT_HEX_ED:
+	buf2=MStrPrint("%s%d,",buf,doc_e->len);
+	Free(buf); buf=buf2;
+	buf2=MStrPrint("%s%d,",buf,doc_e->hex_ed_width);
 	Free(buf); buf=buf2;
 	break;
-
       case DOCT_FOREGROUND:
       case DOCT_BACKGROUND:
       case DOCT_DFT_FOREGROUND:
@@ -124,7 +117,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       case DOCT_NUM_TYPES-1: //nobound_switch
 	break;
     }
-    de_flags=doc_e->de_flags & DOCEG1_HAS_ARG;
+    de_flags=doc_e->de_flags & DOCEG_HAS_ARG;
     while (de_flags) {
       j=Bsf(de_flags);
       Btr(&de_flags,j);
@@ -157,6 +150,9 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	    else
 	      buf2=MStrPrint("%sT=\"%$$Q\",",buf,buf2);
 	  }
+	  break;
+	case DOCEf_LEN:
+	  buf2=MStrPrint("%sLEN=%d,",buf,doc_e->len);
 	  break;
 	case DOCEf_AUX_STR:
 	  buf2=MStrPrint("%sA=\"%$$Q\",",buf,doc_e->aux_str);
@@ -244,17 +240,10 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
       doc_e->de_flags=doldoc.dft_de_flags[i];
       doc_e->type|=doldoc.dft_type_flags[i];
       doc_e->raw_type=RT_I64;
+      doc_e->len=DOCE_LEN_DFT;
       j=PrsDocFlags(cc,&doc_e->de_flags,&doc_e->type);
       cc->htc.hash_table_lst=old_hash_table_lst;
       nobound_switch (i) {
-	case DOCT_DATA:
-	  while (cc->token==',')
-	    Lex(cc);
-	  if (cc->token)
-	    doc_e->len=LexExpressionI64(cc);
-	  else
-	    goto pd_err;
-	  break;
 	case DOCT_CHECK_BOX:
 	  doc_e->raw_type=RT_I8;
 	  break;
@@ -308,7 +297,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  Lex(cc);
 	cc->htc.hash_table_lst=old_hash_table_lst;
 	j=PrsDocFlagSingle(cc,&doc_e->de_flags,&doc_e->type,TRUE);
-	if (!(de_flags=~processed_flags & doc_e->de_flags & DOCEG1_HAS_ARG))
+	if (!(de_flags=~processed_flags & doc_e->de_flags & DOCEG_HAS_ARG))
 	  break;
 	if (cc->token=='=')
 	  Lex(cc);
@@ -347,6 +336,12 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	      } else
 		goto pd_err;
 	    }
+	    break;
+	  case DOCEf_LEN:
+	    if (cc->token)
+	      doc_e->len=LexExpression(cc);
+	    else
+	      goto pd_err;
 	    break;
 	  case DOCEf_AUX_STR:
 	    if (cc->token==TK_STR) {
@@ -474,8 +469,8 @@ pd_err:
       doc_e->type=DOCT_ERROR;
       doc_e->de_flags=0;
     }
-    if (doc_e->de_flags & DOCEF_LST &&
-	  !(doc_e->de_flags & DOCEF_DATA_IS_PTR)) {
+    if (doc_e->de_flags&DOCEF_LST && (doc_e->de_flags&DOCEF_REMALLOC_DATA ||
+	  !(doc_e->de_flags&DOCEF_DEREF_DATA))) {
       DocDataScan(doc,doc_e);
       DocDataFmt(doc,doc_e);
     }

@@ -305,7 +305,7 @@ gr_done:
 
 public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
 {//3D. Clipping and transformation and pen width.
-  I64 _x,_y,_z,i,j,w;
+  I64 _x,_y,_z,i,j,w,dist;
   CColorROPU32 old_color=dc->color;
   Bool record,was_transform=FALSE,was_symmetry=FALSE;
   CTask *win_task;
@@ -382,8 +382,13 @@ public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
 	x+=win_task->pix_left+win_task->scroll_x;
 	y+=win_task->pix_top+win_task->scroll_y;
       }
-      if (dc->flags & DCF_LOCATE_NEAREST)
-	dc->dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
+      if (dc->flags & DCF_LOCATE_NEAREST) {
+	dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
+	if (dist<dc->nearest_dist) {
+	  dc->nearest_dist=dist;
+	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+	}
+      }
       if (dc->flags & DCF_RECORD_EXTENTS) {
 	if (x-w<dc->min_x) dc->min_x=x-w;
 	if (y-w<dc->min_y) dc->min_y=y-w;

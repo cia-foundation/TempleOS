@@ -47,11 +47,11 @@ U0 DataDemo()
 	"However, changes happen immediately,\n"
 	"so it's tricky.\n\n";
 //Use <CTRL-l> for the $$DA...$$ format.
-  doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,32,RT=I16,A=\"%%7d\"$$\n");
+  doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=I16,A=\"%%7d\"$$\n");
   doc_e->data=&i;
 
   StrCpy(buf,"Terry");
-  doc_e=DocPrint(doc,"$$DA-P+RD+UD,7,A=\"Str:%%s\"$$\n");
+  doc_e=DocPrint(doc,"$$DA-P+RD+UD,LEN=7,A=\"Str:%%s\"$$\n");
   doc_e->data=buf;
 
   if (unlock)

@@ -43,6 +43,5 @@ U0 PageTableDemo1()
 
 PageTableDemo1;
 
-//See $LK,"Mem2MegAlloc",A="MN:Mem2MegAlloc"$(), $LK,"Mem2MegFree",A="MN:Mem2MegFree"$() for page aligned allocations.
 //See $LK,"CBlkPool",A="MN:CBlkPool"$, $LK,"CHeapCtrl",A="MN:CHeapCtrl"$, $LK,"sys_code_bp",A="MN:sys_code_bp"$ and $LK,"sys_data_bp",A="MN:sys_data_bp"$.
 //See $LK,"Memory Overview",A="FI:::/Doc/MemOverview.TXT"$ and $LK,"Memory Routines",A="HI:Memory"$.

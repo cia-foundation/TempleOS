@@ -11,15 +11,15 @@ TourPut(
 "Press $$GREEN$$<ENTER>$$FG$$.\n");
 AFGetStr("\n");
 
-"FF(\"/Kernel/M*;*.HPP*\");";
+"FF(\"/Kernel/St*;*.HPP*\");";
 TourPut(
-"Let's have two mask of $$GREEN$$M*$$FG$$ plus $$GREEN$$*.HPP*$$FG$$\n\n"
+"Let's have two mask of $$GREEN$$St*$$FG$$ plus $$GREEN$$*.HPP*$$FG$$\n\n"
 "Press $$GREEN$$<ENTER>$$FG$$.\n");
 AFGetStr("\n");
 
-"FF(\"/Kernel/M*;*.HPP*;~Mem*\");";
+"FF(\"/Kernel/St*;*.HPP*;~*Print*\");";
 TourPut(
-"Let's unselect $$GREEN$$Mem*$$FG$$.\n\n"
+"Let's unselect $$GREEN$$*Print*$$FG$$.\n\n"
 "Press $$GREEN$$<ENTER>$$FG$$.\n");
 AFGetStr("\n");
 TourPut("There is no way to include multiple base directories.\n",TRUE);

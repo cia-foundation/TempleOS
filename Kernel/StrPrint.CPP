@@ -21,6 +21,7 @@ U0 SPutChar(U8 **_dst,U8 ch,U8 **_buf)
     if (i>=MSize(buf)) {
       buf=MAlloc(i<<1+1);
       MemCpy(buf,*_buf,i);
+      Free(*_buf);
       dst=buf+i;
       *_buf=buf;
     }

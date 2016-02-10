@@ -18,7 +18,7 @@ $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
 9) I included $LK,"PCIDevice Lst File",A="FI:::/Misc/PCIDevices.TXT",HTML="http://www.pcidatabase.com/reports.php?type=tab-delimeted"$.
 
-10) Thanks to whoever wrote this $FG,4$$TX,"CppHtml.CPP.Z",HTML="http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"ToHtml",A="FI:::/Adam/Opt/Utils/ToHtml.CPP"$.
+10) Thanks to whoever wrote this $FG,4$$TX,"CppHtml.CPP.Z",HTML="http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
 
 11) I used $FG,4$$TX,"MagicISO",HTML="http://www.magiciso.com"$$FG$ to burn test CD's to help me understand the ISO9660 file system format.  I mostly used the $FG,4$$TX,"ISO9660",HTML="http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"$$FG$ spec.
 

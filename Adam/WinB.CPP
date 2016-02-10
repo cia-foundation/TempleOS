@@ -316,10 +316,10 @@ CDoc *WinCursorPosSet(CTask *task,I64 ipx,I64 ipy,Bool set_cursor=TRUE)
       else {
 	x0=result->line_start_col;
 	y0=result->top_line_num;
-	DocRecalc(result,TRUE);
+	DocRecalc(result,RECALCF_HAS_CURSOR);
 	result->x=(ipx-task->pix_left-task->scroll_x)/FONT_WIDTH +x0;
 	result->y=(ipy-task->pix_top -task->scroll_y)/FONT_HEIGHT+y0;
-	DocRecalc(result,FALSE,DOC_RECALC_FIND_CURSOR);
+	DocRecalc(result,RECALCt_FIND_CURSOR);
 	task->scroll_x=0;
 	task->scroll_y=0;
 	task->scroll_z=0;
@@ -440,10 +440,9 @@ U0 WinMgrTask(I64)
   while (TRUE) {
     try {
 wmt_start:
+      if (Bt(&sys_run_level,RLf_ADAM_SERVER))
+	TaskKillDying;
       WinMgrSleep;
-//We delay freeing in case lingering
-      //references are made to task's.
-      TaskFinishOffDying;
 
       task=Fs->last_task;
       while (TRUE) {

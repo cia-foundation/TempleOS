@@ -1,7 +1,7 @@
 #help_index "Debugging/Heap"
 #help_file "::/Doc/HeapDbg"
 
-#define HL_CALLER_DEPTH	4
+#define HL_CALLER_DEPTH	5 //Feel free to change this.
 #define HL_HASH_SIZE	0x1000
 
 class CHeapLog

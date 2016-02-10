@@ -8,7 +8,7 @@ U0 SysBadMAlloc(I64 *ptr)
   Dbg("Bad MAlloc:",ptr);
 }
 
-U8 *Mem512Alloc(I64 *_pages512,CBlkPool *bp=NULL)
+U8 *Mem512Alloc(I64 pages512,CBlkPool *bp=NULL)
 {/*Alloc 512Byte pages from BlkPool. Don't link to task.
 (Linking to a task means they will be freed when the task dies.)
 It might give you more than you asked for
@@ -17,15 +17,15 @@ so a ptr to a page count is passed.
 Return: NULL if out of memory.
 */
   CMemBlk *result=NULL,*m;
-  I64 i,num=*_pages512;
+  I64 i;
   if (!bp) bp=sys_code_bp;
   PUSHFD
   CLI
   while (LBts(&bp->locked_flags,BPlf_LOCKED))
     PAUSE
-  if (num<MEM_FREE_PAGE_HASH_SIZE) {
-    if (result=bp->free_page_hash[num]) {
-      bp->free_page_hash[num]=result->next;
+  if (pages512<MEM_FREE_PAGE_HASH_SIZE) {
+    if (result=bp->free_page_hash[pages512]) {
+      bp->free_page_hash[pages512]=result->next;
       goto at_done;
     }
     i=Bsr(MEM_FREE_PAGE_HASH_SIZE)+1;
@@ -35,9 +35,9 @@ Return: NULL if out of memory.
     //we wouldn't want to round to the next
     //power of two if a power of two was requested.
     //So we use a little more than a power of two.
-    num-=MEM_EXTRA_HASH2_PAGES;
-    i=Bsr(num)+1;
-    num=1<<i+MEM_EXTRA_HASH2_PAGES;
+    pages512-=MEM_EXTRA_HASH2_PAGES;
+    i=Bsr(pages512)+1;
+    pages512=1<<i+MEM_EXTRA_HASH2_PAGES;
     if (result=bp->free_page_hash2[i]) {
       bp->free_page_hash2[i]=result->next;
       goto at_done;
@@ -50,48 +50,47 @@ Return: NULL if out of memory.
       //freed larger size block... and, screw-it, return the whole thing.
       do {
 	if (result=bp->free_page_hash2[++i]) {
-	  num=1<<i+MEM_EXTRA_HASH2_PAGES;
+	  pages512=1<<i+MEM_EXTRA_HASH2_PAGES;
 	  bp->free_page_hash2[i]=result->next;
 	  goto at_done;
 	}
       } while (i<64-MEM_PAGE_BITS-1);
-      num=0;
+      pages512=0;
       result=NULL; //Out of memory
       goto at_done;
     }
-    if (result->pages<num)
+    if (result->pages<pages512)
       m=result;
     else {
-      if (result->pages==num) {
+      if (result->pages==pages512) {
 	m->next=result->next;
 	goto at_done;
       } else {
-	result->pages-=num;
+	result->pages-=pages512;
 	result(U8 *)+=result->pages<<MEM_PAGE_BITS;
-	result->pages=num;
+	result->pages=pages512;
 	goto at_done;
       }
     }
   }
 at_done:
-  *_pages512=num;
-  bp->used_u8s+=num<<MEM_PAGE_BITS;
+  bp->used_u8s+=pages512<<MEM_PAGE_BITS;
   LBtr(&bp->locked_flags,BPlf_LOCKED);
   POPFD
   return result;
 }
 
-U0 Mem512Free(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL)
+U0 Mem512Free(CMemBlk *m,CBlkPool *bp=NULL)
 {//Return non-task 512Byte pages to BlkPool.
-  I64 i;
+  I64 i,pages512;
   if (m) {
     if (!bp) bp=sys_code_bp;
     PUSHFD
     CLI
     while (LBts(&bp->locked_flags,BPlf_LOCKED))
       PAUSE
+    pages512=m->pages;
     m->mb_signature=MBS_UNUSED_SIGNATURE_VAL;
-    m->pages=pages512;
     bp->used_u8s-=pages512<<MEM_PAGE_BITS;
     if (pages512<MEM_FREE_PAGE_HASH_SIZE) {
       m->next=bp->free_page_hash[pages512];
@@ -112,19 +111,18 @@ U0 Mem512Free(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL)
   }
 }
 
-CMemBlk *Mem512TaskAlloc(I64 *_pages512,CHeapCtrl *hc)
+CMemBlk *Mem512TaskAlloc(I64 pages512,CHeapCtrl *hc)
 {/*hc must be locked.  Interrupts should probably be off
 Currently, this is only called from $LK,"MAlloc",A="MN:MAlloc"$().
-
 Return: NULL if out of memory.
 */
   CMemBlk *result;
   I64 threshold,cnt,size;
   CMemUnused *uum,**_uum,**_ptr;
-  if (result=Mem512Alloc(_pages512,hc->bp)) {
+  if (result=Mem512Alloc(pages512,hc->bp)) {
     QueIns(result,hc->last_mem_blk);
     result->mb_signature=MBS_USED_SIGNATURE_VAL;
-    hc->alloced_u8s+=*_pages512<<MEM_PAGE_BITS;
+    hc->alloced_u8s+=result->pages<<MEM_PAGE_BITS;
 
     //Tidy-up free lst (Move into heap hash)
     //because if free lst gets long, delay causes crash
@@ -162,7 +160,7 @@ U0 Mem512TaskFree(CMemBlk *m,CHeapCtrl *hc)
     else {
       QueRem(m);
       hc->alloced_u8s-=m->pages<<MEM_PAGE_BITS;
-      Mem512Free(m,m->pages,hc->bp);
+      Mem512Free(m,hc->bp);
     }
     POPFD
   }

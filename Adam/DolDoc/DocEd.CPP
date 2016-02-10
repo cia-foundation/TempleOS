@@ -95,15 +95,16 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
   old_task_title=StrNew(Fs->task_title);
   if (Fs->title_src!=TTS_LOCKED_CONST) {
     Fs->title_src=TTS_ED_FILENAME;
-    MemCpy(Fs->task_title,doc->filename.name,TASK_TITLE_LEN);
+    MemCpy(Fs->task_title,doc->filename.name,STR_LEN-1);
   }
-  doc_e=DocPrint(bdoc,"$$DA-TRM-P+BD+RD+CX+IV,140,A=\"%%s...\",SCX=16$$");
+  doc_e=DocPrint(bdoc,"$$DA-TRM-P+BD+RD+CX+IV,LEN=STR_LEN-1,"
+	"A=\"%%s...\",SCX=16$$");
   doc_e->data=&Fs->task_title;
   DocDataFmt(bdoc,doc_e);
 
   if (doc->flags & DOCF_ALLOW_UNDO) {
     DocPrint(bdoc,"$$CM+BY+LX+NC,1,1$$");
-    doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,32,RT=U32,A=\"Undo:%%03d\"$$\n");
+    doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,RT=U32,A=\"Undo:%%03d\"$$\n");
     doc_e->data=&doc->undo_cnt;
     DocDataFmt(bdoc,doc_e);
   }
@@ -124,10 +125,10 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
   doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarCB;
-  doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,32,A=\"Line:%%04d \"$$");
+  doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,A=\"Line:%%04d \"$$");
   doc_e->data=&doc->line;
   DocDataFmt(bdoc,doc_e);
-  doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,32,A=\"Col:%%04d\"$$\n");
+  doc_e=DocPrint(bdoc,"$$DA+BD+RD-TRM,A=\"Col:%%04d\"$$\n");
   doc_e->data=&doc->col;
   DocDataFmt(bdoc,doc_e);
 

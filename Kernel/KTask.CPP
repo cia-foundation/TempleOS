@@ -152,8 +152,11 @@ I64 TaskInit(CTask *task,I64 stk_size)
   CTaskStk *temps;
 
   QueInit(&task->code_heap->next_mem_blk);
-  if (task->code_heap!=task->data_heap)
+  task->code_heap->last_mergable=NULL;
+  if (task->code_heap!=task->data_heap) {
     QueInit(&task->data_heap->next_mem_blk);
+    task->data_heap->last_mergable=NULL;
+  }
 
   task->addr=task->next_task=task->last_task=
 	task->next_input_filter_task=task->last_input_filter_task=
@@ -233,7 +236,7 @@ CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   task->rsp(U8 *)-=8;
   *task->rsp=&Exit;
   task->hash_table->next=parent->hash_table;
-  MemCpy(task->task_name,task_name,TASK_NAME_LEN+1);
+  MemCpy(task->task_name,task_name,TASK_NAME_LEN);
   StrCpy(task->task_title,task->task_name);
   task->title_src=TTS_TASK_NAME;
   PUSHFD
@@ -275,7 +278,7 @@ I64 ExeCmdLine(CCmpCtrl *cc)
 	(cc->token!='}' || !(cc->flags & CCF_EXE_BLK)) ) {
     if (Fs->title_src==TTS_CUR_LEX) {
       ptr2=&Fs->task_title;
-      ptr3=ptr2+TASK_TITLE_LEN;
+      ptr3=ptr2+STR_LEN-1;
       if (cc->lex_include_stk->flags & LFSF_DOC) {
 	doc_e=cc->lex_include_stk->cur_entry;
 	doc=cc->lex_include_stk->doc;
@@ -296,7 +299,7 @@ I64 ExeCmdLine(CCmpCtrl *cc)
 	if (ptr2<ptr3) *ptr2=0;
       } else
 	if ((ptr=cc->lex_include_stk->line_start) && *ptr)
-	  MemCpy(ptr2,ptr,TASK_TITLE_LEN);
+	  MemCpy(ptr2,ptr,STR_LEN-1);
     }
     cc->flags&=~CCF_HAS_MISC_DATA;
     machine_code=LexStmt2Bin(cc,&type);
@@ -328,6 +331,22 @@ I64 ExeCmdLine(CCmpCtrl *cc)
     return result;
 }
 
+U0 SrvTaskCont()
+{//Act as server task in a loop handling commands.
+  I64 old_flags=GetRFlags;
+  FlushMsgs;
+  while (TRUE) {
+    CLI
+    if (SrvCmdsHandler(old_flags) && Fs->title_src==TTS_TASK_NAME)
+      MemCpy(Fs->task_title,Fs->task_name,TASK_NAME_LEN);
+    FlushMsgs;
+    LBts(&Fs->task_flags,TASKf_IDLE);
+    LBts(&Fs->task_flags,TASKf_AWAITING_MSG);
+    Yield;
+    SetRFlags(old_flags);
+  }
+}
+
 U0 UserTaskCont()
 {//Terminal key-input-execute loop.
   CCmpCtrl *cc;
@@ -348,6 +367,15 @@ U0 UserTaskCont()
       PutExcept;
     }
   } while (cont);
+}
+
+U0 SrvCmdLine(I64 dummy=0)
+{
+  nounusedwarn dummy;
+  Fs->win_inhibit=WIG_USER_TASK_DFT;
+  if (HashFind("SrvStartUp",adam_task->hash_table,HTT_FUN))
+    CallExtStr("SrvStartUp");
+  SrvTaskCont;
 }
 
 U0 UserCmdLine(I64 dummy=0)
@@ -374,32 +402,7 @@ CTask *User(U8 *fmt=NULL,...)
   return task;
 }
 
-U0 SrvTaskCont()
-{//Act as server task in a loop handling commands.
-  I64 old_flags=GetRFlags;
-  FlushMsgs;
-  while (TRUE) {
-    CLI
-    if (SrvCmdsHandler(old_flags) && Fs->title_src==TTS_TASK_NAME)
-      MemCpy(Fs->task_title,Fs->task_name,TASK_NAME_LEN+1);
-    FlushMsgs;
-    LBts(&Fs->task_flags,TASKf_IDLE);
-    LBts(&Fs->task_flags,TASKf_AWAITING_MSG);
-    Yield;
-    SetRFlags(old_flags);
-  }
-}
-
-U0 SrvCmdLine(I64 dummy=0)
-{
-  nounusedwarn dummy;
-  Fs->win_inhibit=WIG_USER_TASK_DFT;
-  if (HashFind("SrvStartUp",adam_task->hash_table,HTT_FUN))
-    CallExtStr("SrvStartUp");
-  SrvTaskCont;
-}
-
-U0 TaskFinishOff(CTask *task)
+U0 TaskDel(CTask *task)
 {//We delay freeing in case lingering ptr to reincarnated.
   HeapCtrlDel(task->code_heap);
   if (task->data_heap!=task->code_heap)
@@ -481,26 +484,30 @@ I64 TaskEnd()
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
   LBtr(&task->task_flags,TASKf_TASK_LOCK);
 
-  if (sys_winmgr_task) {
-    task->next_task=Gs->dying_task_lst;
-    Gs->dying_task_lst=task;
-  } else
-    TaskFinishOff(task); //dangerous (stk in use)
-//Never happens--winmgr exists except during boot and no tasks die during boot
-    //currently, though this has been different and might be different in
-    //future. Would have to be multicore task getting this task's memory
-    //because IRQs are off, so no tasks on this core run.
+  task->wake_jiffy=cnts.jiffies+DYING_JIFFIES;
+  while (LBts(&Gs->cpu_flags,CPUf_DYING_TASK_QUE))
+    PAUSE
+  QueIns(task,Gs->last_dying);
+  LBtr(&Gs->cpu_flags,CPUf_DYING_TASK_QUE);
+
   return tempt;
 }
 
-U0 TaskFinishOffDying()
-{//Called by Seth tasks. Delay freeing in case lingering ptr to reincarnated.
-  CTask *task1,*task2;
-  if (task1=XchgI64(&Gs->dying_task_lst,NULL)) {
-    do {
-      task2=task1->next_task;
-      TaskFinishOff(task1);
-      task1=task2;
-    } while (task1);
+U0 TaskKillDying()
+{//Delay freeing to prevent asking for trouble with quick reincarnations.
+//What if the user is doing this: $LK,"DoTreeCheckers",A="FF:::/Misc/OSTestSuite.CPP,DoTreeCheckers"$.
+  CTaskDying *task,*task1;
+  if (Gs->kill_jiffy<cnts.jiffies) {//Avoid doing as many lock operations.
+    while (LBts(&Gs->cpu_flags,CPUf_DYING_TASK_QUE))
+      PAUSE
+    task=Gs->next_dying;
+    while (task!=&Gs->next_dying && task->wake_jiffy<cnts.jiffies) {
+      task1=task->next;
+      QueRem(task);
+      TaskDel(task);
+      task=task1;
+    }
+    LBtr(&Gs->cpu_flags,CPUf_DYING_TASK_QUE);
+    Gs->kill_jiffy=cnts.jiffies+DYING_JIFFIES;
   }
 }

@@ -179,13 +179,13 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case '9':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Dol /---->");
+	  KeyDescSet("Dol /Indent 5");
 	else
 	  "$$ID,5$$";
 	return TRUE;
       case '0':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Dol /<----");
+	  KeyDescSet("Dol /Unindent 5");
 	else
 	  "$$ID,-5$$";
 	return TRUE;

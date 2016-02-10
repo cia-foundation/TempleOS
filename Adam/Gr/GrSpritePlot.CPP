@@ -31,9 +31,10 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
   MemCpy(&old_sym,&dc->sym,sizeof(CGrSym));
   if (dc->flags & DCF_LOCATE_NEAREST) {
     dc->nearest_sprite_elem_num=0;
-    dc->dist=dc->nearest_dist=MAX_I64;
+    dc->nearest_dist=MAX_I64;
   }
   while (tempg->type) {
+    dc->cur_sprite_elem_num=cur_sprite_elem_num;
     switch (tempg->type) {
       case SPT_COLOR:
 	dc->color=dc->color&~(COLORROP_COLORS_MASK|ROPF_DITHER)|tempg->c.color;
@@ -248,10 +249,6 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	}
 	break;
     }
-    if (dc->flags & DCF_LOCATE_NEAREST && dc->dist<dc->nearest_dist) {
-      dc->nearest_dist=dc->dist;
-      dc->nearest_sprite_elem_num=cur_sprite_elem_num;
-    }
     cur_sprite_elem_num++;
     if (just_one_elem) break;
     tempg(U8 *)+=SpriteElemSize(tempg);
@@ -276,15 +273,14 @@ public U0 Sprite3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems)
 
 public U0 SpriteMat3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,I64 *m)
 {//Plot rotated by matrix.
-  I64 r[16],*old_r=dc->r,old_m[16],
+  I64 r[16],*old_r=dc->r,new_m[16],
 	old_flags=dc->flags&DCF_TRANSFORMATION;
-  MemCpy(old_m,m,16*sizeof(I64));
+  MemCpy(new_m,m,16*sizeof(I64));
   dc->flags|=DCF_TRANSFORMATION;
-  Mat4x4TranslationAdd(m,x,y,z);
-  dc->r=Mat4x4MulMat4x4Equ(r,old_r,m);
+  Mat4x4TranslationAdd(new_m,x,y,z);
+  dc->r=Mat4x4MulMat4x4Equ(r,old_r,new_m);
   Sprite3(dc,0,0,0,elems);
   dc->r=old_r;
-  MemCpy(m,old_m,16*sizeof(I64));
   dc->flags=dc->flags&~DCF_TRANSFORMATION|old_flags;
 }
 

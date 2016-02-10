@@ -141,11 +141,11 @@ I64 PopUpMacroMenu()
   U8 buf[STR_LEN];
   CSrvCmd *tempc;
   CDoc *doc=DocNew;
-  CDocEntry *doc_e=DocPrint(doc,"$$DA-P,STR_LEN-1,A=\"Name:%%s\"$$");
+  CDocEntry *doc_e=DocPrint(doc,"$$DA-P,LEN=STR_LEN-1,A=\"Name:%%s\"$$");
   doc_e->data=captured_macro_name;
   DocDataFmt(doc,doc_e);
 
-  doc_e=DocPrint(doc,"\n$$DA,32,A=\"Repeat N:%%d\"$$");
+  doc_e=DocPrint(doc,"\n$$DA,A=\"Repeat N:%%d\"$$");
   doc_e->data=&sys_macro_repeat_n;
   DocDataFmt(doc,doc_e);
 

@@ -168,7 +168,7 @@ $ID,2$$FG,2$U0 Main()
   }
 }
 $FG$$ID,-2$
-* $FG,2$interrupt$FG$, $FG,2$haserrcode$FG$, $FG,2$public$FG$, $FG,2$argpop$FG$ or $FG,2$noargpop$FG$ are function flags. See $LK,"::/Demo/Lectures/PageTableEntries2.CPP"$.
+* $FG,2$interrupt$FG$, $FG,2$haserrcode$FG$, $FG,2$public$FG$, $FG,2$argpop$FG$ or $FG,2$noargpop$FG$ are function flags. See $LK,"::/Demo/Lectures/Mem/PageTableEntries2.CPP"$.
 
 * A single quote can encompass multiple characters.  $FG,2$'ABC'$FG$ is equ to $FG,2$0x434241$FG$.  $LK,"PutChars",A="MN:PutChars"$() takes multiple characters.
 
@@ -237,7 +237,7 @@ $FG$$ID,-2$
 
 * There is a function called $LK,"MSize",A="MN:MSize"$() which gives the size of an object alloced off the heap.  For larger size allocations, the system rounds-up to a power of two, so $FG,2$MSize()$FG$ lets you know the real size and you can take full advantage of it.
 
-* You can $LK,"Free",A="MN:Free"$() a $FG,2$NULL$FG$ ptr.  Useful variants of $LK,"MAlloc",A="MN:MAlloc"$() can be found $LK,"Here",A="MN:CAlloc"$.  Each task has a heap and you can $FG,2$MAlloc$FG$ and $FG,2$Free$FG$ off of other task's heaps, or make an independent heap with $LK,"HeapCtrlBPInit",A="MN:HeapCtrlBPInit"$().
+* You CAN $LK,"Free",A="MN:Free"$() a $FG,2$NULL$FG$ ptr.  Useful variants of $LK,"MAlloc",A="MN:MAlloc"$() can be found $LK,"Here",A="MN:CAlloc"$.  Each task has a heap and you can $FG,2$MAlloc$FG$ and $FG,2$Free$FG$ off-of other task's heaps, or make an independent heap with $LK,"HeapCtrlInit",A="MN:HeapCtrlInit"$().  See $LK,"HeapLog",A="MN:HeapLog"$() for an example.
 
 * The stk does not grow because virtual mem is not used.  I recommend allocating large local vars from the heap.  You can change $LK,"MEM_DFT_STK",A="MN:MEM_DFT_STK"$ and recompile $FG,2$Kernel$FG$ or request more when doing a $LK,"Spawn",A="MN:Spawn"$().  You can use $LK,"CallStkGrow",A="MN:CallStkGrow"$(), but it's odd.  See $LK,"::/Demo/StkGrow.CPP"$. 
 

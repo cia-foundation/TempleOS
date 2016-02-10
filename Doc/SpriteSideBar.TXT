@@ -4,4 +4,4 @@ $WW,1$You can cut and paste elements in this side-bar to reorder, delete or dupl
 
 You can click on an element to make it the insert point for new elements.
 
-The RED element is the current element and it is the insert point for new elements.
+The RED element is the current insert point for new elements.

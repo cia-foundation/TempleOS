@@ -172,8 +172,8 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
     }
   } else {
     old_trace=Btr(&cc->opts,OPTf_TRACE);
-    cc->htc.fun->executable_addr=COCCompile(cc,&size,
-	  &cc->htc.fun->dbg_info,NULL);
+    cc->htc.fun->executable_addr=COCCompile(
+	  cc,&size,&cc->htc.fun->dbg_info,NULL);
     if (old_trace) {
       Bts(&cc->opts,OPTf_TRACE);
       Un(cc->htc.fun->executable_addr,size,64);

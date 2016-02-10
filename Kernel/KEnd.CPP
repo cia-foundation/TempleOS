@@ -1,7 +1,6 @@
 U0 SysGlblsInit()
 {
   I64 i,j;
-  U8 *m;
   CRAXRBCRCXRDX ee;
 
   CPUId(0x1,&ee);
@@ -55,8 +54,6 @@ U0 SysGlblsInit()
 
   //$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
   i=1; //Rqst 1 blk, we might get more.
-  m=Mem2MegUncachedAlloc(&i,sys_code_bp);
-  dev.uncached_heap=HeapCtrlBPInit(m,i*0x200000/0x200);
   QueInit(&dev.pci_root);
   dev.mem64_ptr=MEM_MAPPED_SPACE;
 
@@ -187,10 +184,7 @@ U0 KernelMain()
   KbdMouseVarsInit;
   IPVarsInit;
   KbdInit;
-  if (mp_cnt<2)
-    Spawn(&MouseDriverInstall);
-  else
-    Spawn(&MouseDriverInstall,,,1);
+  Spawn(&MouseDriverInstall);
 
   "Loading Compiler\n";
   Cd("/Compiler");

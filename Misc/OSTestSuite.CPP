@@ -659,16 +659,12 @@ U0 DoCtrlR1()
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (TaskValidate(task->popup_task))
     Yield;
-
-    //Tag text
-  PostMsg(task,MSG_KEY_DOWN_UP,CH_ESC,0);
-
   //Color
   while (!TaskValidate(task->popup_task))
     Yield;
   TaskWait(task->popup_task);
   task_num=task->popup_task->task_num;
-  for (i=0;i<1;i++)
+  for (i=0;i<2;i++)
     PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (!TaskValidate(task->popup_task)||task->popup_task->task_num==task_num)
@@ -684,7 +680,7 @@ U0 DoCtrlR1()
     Yield;
   TaskWait(task->popup_task);
   task_num=task->popup_task->task_num;
-  for (i=0;i<3;i++)
+  for (i=0;i<4;i++)
     PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (!TaskValidate(task->popup_task)||task->popup_task->task_num==task_num)
@@ -700,7 +696,7 @@ U0 DoCtrlR1()
     Yield;
   TaskWait(task->popup_task);
   task_num=task->popup_task->task_num;
-  for (i=0;i<6;i++)
+  for (i=0;i<7;i++)
     PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (TaskValidate(task->popup_task))
@@ -721,7 +717,7 @@ U0 DoCtrlR1()
     Yield;
   TaskWait(task->popup_task);
   task_num=task->popup_task->task_num;
-  for (i=0;i<1;i++)
+  for (i=0;i<2;i++)
     PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (!TaskValidate(task->popup_task)||task->popup_task->task_num==task_num)
@@ -737,7 +733,7 @@ U0 DoCtrlR1()
     Yield;
   TaskWait(task->popup_task);
   task_num=task->popup_task->task_num;
-  for (i=0;i<9;i++)
+  for (i=0;i<10;i++)
     PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
   PostMsg(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   while (TaskValidate(task->popup_task))
@@ -1257,7 +1253,7 @@ U0 DoRadixSort()
 U0 DoPageTableEntries2()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/Lectures/PageTableEntries2\";\n");
+  XTalkWait(task,"#include \"::/Demo/Lectures/Mem/PageTableEntries2\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }

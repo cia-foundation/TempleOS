@@ -29,7 +29,7 @@ U0 Digits()
   Fs->text_attr=DKGRAY<<4+WHITE;
   DocClear;
 //Set default background and foreground
-  "$$WW,1$$$$BD,DKGRAY$$$$FD,WHITE$$"
+  "$$WW,1$$$$BG,DKGRAY$$$$FD,WHITE$$"
 	"\nThis is a memory game.  "
 	"Try to remember the digits and enter them.  "
 	"They are colored based on electrical "
@@ -46,14 +46,14 @@ restart:
     MemSet(answer,0,sizeof(answer));
     while (TRUE) {
       DocClear;
-      "$$WW,1$$$$BD,DKGRAY$$$$FD,WHITE$$\n";
+      "$$WW,1$$$$BG,DKGRAY$$$$FD,WHITE$$\n";
       "Pattern\nLength:%d\n\n",num+1;
       answer[num++]=RandU32%10+'0';
       PrintPattern(answer);
       ch=PressAKey;
       if (ch==CH_ESC||ch==CH_SHIFT_ESC) goto dg_done;
       DocClear;
-      "$$WW,1$$$$BD,DKGRAY$$$$FD,WHITE$$\n";
+      "$$WW,1$$$$BG,DKGRAY$$$$FD,WHITE$$\n";
       "Guess\nLength:%d\n\n",num;
       for (i=0;i<num;i++) {
 	ch=GetChar(,FALSE);

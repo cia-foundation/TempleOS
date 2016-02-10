@@ -153,6 +153,7 @@ public class CSpritePtMeshU8s : CSpriteBase
 public class CSprite
 {
   CSprite *next,*last;
+  Bool selected;
   U0 start;
   union {
     U8 type;

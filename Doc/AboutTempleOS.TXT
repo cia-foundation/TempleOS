@@ -7,7 +7,7 @@ $TX,"www.templeos.org",HTML="http://www.templeos.org"$
 $FG,5$Owner/President:$FG$
 $TX,"Terry A. Davis",HTML="mailto:tdavis@templeos.org"$
 
-$HC,"<img src=\"http://www.templeos.org/images/140414TerryADavis.jpg\" width=\"432\" height=\"324\" alt=\"\">"$
+$HC,"<center><img src=\"http://www.templeos.org/images/140414TerryADavis.jpg\" width=\"432\" height=\"324\" alt=\"\"></center>"$
 
 8144 Sickle Lane
 Las Vegas, NV 89128
@@ -24,7 +24,7 @@ I was a National Merit Scholar with a 1440 SAT at Arizona State University.  I h
 
 I designed a 3 axis stepper-motor-driven milling machine 1996-1997 with a CAD/CAM package for a company I started called Home Automation and Robotic Equipment.
 
-$HC,"<img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\">"$
+$HC,"<center><img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
 
 I worked for a company named Xytec Corp. 1997-1999.  We made FPGA-based image processing equipment.  I wrote $FG,2$$TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$$FG$ from 2000-2001 for H.A.R.E.  I worked as head software/electrical engineer for a company called Graphic Technologies, 2001-2002, making replacement chips for toner printer cartridges so they could be refilled. 
 

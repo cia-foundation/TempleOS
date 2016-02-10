@@ -67,26 +67,28 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
   CDirContext *dirc;
   CDirEntry *tempde,*tempde1;
   U8 *st;
-  if (!(tempde=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
+  if (!(tempde1=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
     return FALSE;
   if (IsDir(dst_files_find_mask)) {
     if (dirc=DirContextNew(dst_files_find_mask,TRUE)) {
+      tempde=tempde1;
       while (tempde) {
-	tempde1=tempde->next;
 	if (!(tempde->attr & RS_ATTR_DIR)) {
 	  st=FileNameAbs(tempde->name);
 	  if (!CopySingle(tempde->full_name,st))
 	    result=FALSE;
 	  Free(st);
 	}
-	DirEntryDel(tempde);
-	tempde=tempde1;
+	tempde=tempde->next;
       }
       DirContextDel(dirc);
     }
+    DirTreeDel(tempde1);
     return result;
-  } else
+  } else {
+    DirTreeDel(tempde1);
     return CopySingle(src_files_find_mask,dst_files_find_mask);
+  }
 }
 
 public Bool Move(U8 *f1,U8 *f2)
@@ -206,8 +208,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
 {
   CDrv *dv=Let2Drv(*filename);
   CDirEntry de;
-  U8 *cur_dir=StrNew(filename),
-	buf[STR_LEN];
+  U8 *cur_dir=StrNew(filename),buf[STR_LEN];
   if (FileFind(filename,&de,FUF_JUST_FILES)) {
     Free(de.full_name);
     if (!StrCmp(attr,"+?"))
@@ -226,6 +227,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
     }
   } else
     PrintErr("File not found.\n");
+  Free(cur_dir);
 }
 public U0 Touch(U8 *files_find_mask="*",U8 *attr="+?",
 	U8 *fu_flags=NULL,CDate cdt=MIN_I64)

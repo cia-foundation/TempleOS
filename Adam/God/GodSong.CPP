@@ -7,7 +7,7 @@ class MakeSongSettings
   I64  complexity		fmtstr "$$LS,D=\"ST_RHYTHM_COMPLEXITY\"$$\n";
   Bool rests			fmtstr "$$CB,\"Rests\"$$\n";
   Bool six_eight		fmtstr "$$CB,\"Six Eight\"$$\n";
-  I64  octave			fmtstr "$$DA-TRM,32,A=\"Octave:%d\"$$\n";
+  I64  octave			fmtstr "$$DA-TRM,A=\"Octave:%d\"$$\n";
 };
 
 U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)

@@ -1,3 +1,46 @@
+#help_index "TOS"
+
+public U0 CursorRemFile(U8 *filename)
+{
+  CDoc *doc;
+  doc=DocRead(filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
+  DocWrite(doc);
+  DocDel(doc);
+}
+public U0 CursorRem(U8 *files_find_mask="*")
+{
+  I64 fuf_flags=0;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
+  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
+  while (tempde) {
+    CursorRemFile(tempde->full_name);
+    Touch(tempde->full_name,"",,tempde->datetime);
+    tempde=tempde->next;
+  }
+  DirTreeDel(tempde1);
+}
+
+U0 UncollapseFile(U8 *filename,I64 *)
+{
+  CDoc *doc=DocRead(filename,DOCF_NO_CURSOR);
+  DocCollapse(FALSE,doc);
+  DocWrite(doc);
+  DocDel(doc);
+}
+public U0 Uncollapse(U8 *files_find_mask="*",U8 *fu_flags=NULL)
+{
+  I64 fuf_flags=0;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T+O");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
+  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    UncollapseFile(tempde->full_name,&fuf_flags);
+    Touch(tempde->full_name,"",,tempde->datetime);
+    tempde=tempde->next;
+  }
+  DirTreeDel(tempde1);
+}
+
 #define VIDEO_FRAME_RATE	8
 
 #define FG_JUST_AUDIO	0
@@ -198,7 +241,7 @@ U0 TOSRegWrite()
 
 class CYouTubeForm2
 {
-  U8 special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8 special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"SerialNum:%s\"$$\n";
 };
 
 U8 *TOSYouTube()

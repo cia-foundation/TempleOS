@@ -10,6 +10,5 @@ Cd(__DIR__);;
 #include "Profiler"
 #include "StrUtils"
 #include "ToDolDoc"
-#include "ToHtml"
 #include "ToTXT"
 Cd("..");;

@@ -336,6 +336,7 @@ U0 Init()
   ls[1].img=landscape_imgs[LANDSCAPE_TYPES-2]; //mountain
   ls[2].img=landscape_imgs[LANDSCAPE_TYPES-1]; //castle
 
+  MemSet(m,0,sizeof(m));
   for (i=0,tempm=m;i<MAX_MAN;i++,tempm++) {
     if (i<MAX_FRIENDLY) {
       tempm->friendly=TRUE;
@@ -353,9 +354,10 @@ U0 Init()
     tempm->dead=FALSE;
     tempm->x=xx+64*RandI32/MAX_I32+100;
     tempm->y=yy+64*RandU32/MAX_I32-64+100;
-    tempm->corpse_timeout=0;
-    tempm->phase=2*ã*Rand;
     tempm->best_dd=MAX_I64;
+    tempm->é=0;
+    tempm->phase=2*ã*Rand;
+    tempm->corpse_timeout=0;
   }
   for (i=0;i<MAX_BULLETS;i++)
     b[i].dead=TRUE;

@@ -39,4 +39,4 @@ $FG,5$Escape$FG$ For macro's, send an $FG,2$<ESC>$FG$ char to exit before runnin
 
 $FG,5$Refresh Data$FG$  updates $FG,2$$$DA...$$$FG$ entry continuously.
 
-$FG,5$Html Link$FG$  stores a link which will be embedded if you generate a html version of a document with $LK,"ToHtml",A="MN:ToHtml"$() or $LK,"Doc2Html",A="MN:Doc2Html"$().
+$FG,5$Html Link$FG$  stores a link which will be embedded if you generate a html version of a document with $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.

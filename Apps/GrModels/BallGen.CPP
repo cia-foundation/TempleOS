@@ -13,9 +13,9 @@ class Ball
 
 class BallDefineStruct
 {
-  F64 radius	fmtstr	 "$$DA-TRM,32,RT=F64,A=\"Radius         :%8.3f\"$$\n";
-  I64 n_longitude fmtstr "$$DA-TRM,32,A=\"Longitude Faces:%5d\"$$\n";
-  I64 n_lattitude fmtstr "$$DA-TRM,32,A=\"Lattitude Rings:%5d\"$$\n";
+  F64 radius	fmtstr	 "$$DA-TRM,RT=F64,A=\"Radius         :%8.3f\"$$\n";
+  I64 n_longitude fmtstr "$$DA-TRM,A=\"Longitude Faces:%5d\"$$\n";
+  I64 n_lattitude fmtstr "$$DA-TRM,A=\"Lattitude Rings:%5d\"$$\n";
 };
 
 U0 BDInit(BallDefineStruct *bd)

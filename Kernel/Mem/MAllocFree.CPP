@@ -55,16 +55,14 @@ _MALLOC::
 	SHR	RAX,MEM_PAGE_BITS
 
 	PUSH	RDX //preserve HeapCtrl
-	PUSH	RAX //num blks (we must pass address of this)
-	MOV	RAX,RSP
 	PUSH	RDX
-	PUSH	RAX //addr of num blks
+	PUSH	RAX
 	CALL	&Mem512TaskAlloc
-	MOV	RSI,RAX
-	POP	RAX //blks that were alloced
 	POP	RDX
-	TEST	RSI,RSI
+	TEST	RAX,RAX
 	JZ	@@45	//Out of memory
+	MOV	RSI,RAX
+	MOV	EAX,U32 CMemBlk.pages[RSI]
 
 	SHL	RAX,MEM_PAGE_BITS
 	SUB	RAX,sizeof(CMemBlk)
@@ -77,21 +75,17 @@ _MALLOC::
 @@40:	MOV	RBX,RSI
 	MOV	RSI,U64 CMemUnused.next[RBX]
 	TEST	RSI,RSI
-	JNZ	@@55
+	JNZ	I32 @@60
 	PUSH	RAX		//-**** save byte size
 	ADD	RAX,16*MEM_PAGE_SIZE-1
 	SHR	RAX,MEM_PAGE_BITS
 
 	PUSH	RDX //preserve HeapCtrl
-	PUSH	RAX //num blks (we must pass address of this)
-	MOV	RAX,RSP
 	PUSH	RDX
-	PUSH	RAX //addr of num blks
+	PUSH	RAX
 	CALL	&Mem512TaskAlloc
-	MOV	RSI,RAX
-	POP	RAX //blks that were alloced
 	POP	RDX
-	TEST	RSI,RSI
+	TEST	RAX,RAX
 	JNZ	@@50
 
 //Out of memory
@@ -104,8 +98,28 @@ _MALLOC::
 	CALL	I32 &throw
 	JMP	I32 MALLOC_FINAL_EXIT //Never gets here, hopefully.
 
-@@50:	LEA	RSI,U64 sizeof(CMemBlk)[RSI]
+@@50:	MOV	RSI,RAX
+	MOV	EAX,U32 CMemBlk.pages[RSI]
 	SHL	RAX,MEM_PAGE_BITS
+
+//Can it be combined with last chunk? (Never Free these chunks.)
+	MOV	RDI,U64 CHeapCtrl.last_mergable[RDX]
+	LEA	RBX,U64 [RSI+RAX]
+	CMP	RDI,RBX
+	JNE	@@55
+
+	PUSH	RAX
+	MOV	EAX,U32 CMemBlk.pages[RDI]
+	ADD	U32 CMemBlk.pages[RSI],EAX
+//QueRem
+	MOV	RAX,U64 CMemBlk.next[RDI]
+	MOV	RBX,U64 CMemBlk.last[RDI]
+	MOV	U64 CMemBlk.last[RAX],RBX
+	MOV	U64 CMemBlk.next[RBX],RAX
+	POP	RAX
+
+@@55:	MOV	U64 CHeapCtrl.last_mergable[RDX],RSI
+	LEA	RSI,U64 sizeof(CMemBlk)[RSI]
 	SUB	RAX,sizeof(CMemBlk)
 	LEA	RBX,U64 CHeapCtrl.malloc_free_lst-CMemUnused.next[RDX]
 	MOV	RDI,U64 CMemUnused.next[RBX]
@@ -113,22 +127,22 @@ _MALLOC::
 	MOV	U64 CMemUnused.size[RSI],RAX
 	MOV	U64 CMemUnused.next[RBX],RSI
 	POP	RAX		//+****
-	JMP	@@65
-@@55:	CMP	U64 CMemUnused.size[RSI],RAX
-	JB	@@40
-	JNE	@@65
+	JMP	@@70
+@@60:	CMP	U64 CMemUnused.size[RSI],RAX
+	JB	I32 @@40
+	JNE	@@70
 
-@@60:	MOV	RDI,U64 CMemUnused.next[RSI]
+@@65:	MOV	RDI,U64 CMemUnused.next[RSI]
 	MOV	U64 CMemUnused.next[RBX],RDI
 	JMP	MALLOC_ALMOST_DONE
 
-@@65:	SUB	U64 CMemUnused.size[RSI],RAX	//UPDATE FREE ENTRY
+@@70:	SUB	U64 CMemUnused.size[RSI],RAX	//UPDATE FREE ENTRY
 	CMP	U64 CMemUnused.size[RSI],sizeof(CMemUnused)
-	JAE	@@70			//take from top of block
+	JAE	@@75			//take from top of block
 	ADD	U64 CMemUnused.size[RSI],RAX	//doesn't fit, undo
 	JMP	I32 @@40
 
-@@70:	ADD	RSI,U64 CMemUnused.size[RSI]
+@@75:	ADD	RSI,U64 CMemUnused.size[RSI]
 
 MALLOC_ALMOST_DONE:
 //RSI=result-CMemUsed.size
@@ -150,21 +164,21 @@ MALLOC_ALMOST_DONE:
 	MOV	RDX,U64 [SYS_HEAP_LIMIT]
 	MOV	RDI,U64 SF_RIP[RBP]
 	CMP	RDI,RDX
-	JB	@@75
-	XOR	RDI,RDI
-	MOV	U64 CMemUsed.caller1[RSI],RDI
-	JMP	@@85
-@@75:	MOV	U64 CMemUsed.caller1[RSI],RDI
-	MOV	RDI,U64 SF_RBP[RBP]
-	CMP	RDI,RDX
 	JB	@@80
 	XOR	RDI,RDI
-	JMP	@@85
-@@80:	MOV	RDI,U64 SF_RIP[RDI]
+	MOV	U64 CMemUsed.caller1[RSI],RDI
+	JMP	@@90
+@@80:	MOV	U64 CMemUsed.caller1[RSI],RDI
+	MOV	RDI,U64 SF_RBP[RBP]
 	CMP	RDI,RDX
 	JB	@@85
 	XOR	RDI,RDI
-@@85:	MOV	U64 CMemUsed.caller2[RSI],RDI
+	JMP	@@90
+@@85:	MOV	RDI,U64 SF_RIP[RDI]
+	CMP	RDI,RDX
+	JB	@@90
+	XOR	RDI,RDI
+@@90:	MOV	U64 CMemUsed.caller2[RSI],RDI
 	POP	RDX
 
 #endif
@@ -177,19 +191,19 @@ MALLOC_ALMOST_DONE:
 	LEA	RAX,U64 CMemUsed.start[RSI]
 
 	TEST	U8 [SYS_SEMAS+SYS_SEMA_HEAPLOG_ACTIVE*SEMA_STRUCT_SIZE],1
-	JZ	@@100
+	JZ	@@105
 	PUSH	RAX
 	PUSH	RAX
 	MOV	RAX,U64 [SYS_EXTERN_TABLE]
 	MOV	RAX,U64 EXT_HEAPLOG_MALLOC*8[RAX]
 	TEST	RAX,RAX
-	JZ	@@90
+	JZ	@@95
 	CALL	RAX
-	JMP	@@95
-@@90:	ADD	RSP,8
-@@95:	POP	RAX
+	JMP	@@100
+@@95:	ADD	RSP,8
+@@100:	POP	RAX
 
-@@100:	TEST	U8 [SYS_HEAP_INIT_FLAG],1
+@@105:	TEST	U8 [SYS_HEAP_INIT_FLAG],1
 	JZ	MALLOC_FINAL_EXIT
 
 	PUSH	RAX

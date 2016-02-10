@@ -53,16 +53,16 @@ public I64 PopUpColorLighting(U8 *header=NULL)
 
 class CTransformForm
 {
-  F64 x_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"X Scale :%12.6f\"$$\n";
-  F64 y_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"Y Scale :%12.6f\"$$\n";
-  F64 z_scale	fmtstr "$$DA-TRM,32,RT=F64,A=\"Z Scale :%12.6f\"$$\n";
+  F64 x_scale	fmtstr "$$DA-TRM,RT=F64,A=\"X Scale :%12.6f\"$$\n";
+  F64 y_scale	fmtstr "$$DA-TRM,RT=F64,A=\"Y Scale :%12.6f\"$$\n";
+  F64 z_scale	fmtstr "$$DA-TRM,RT=F64,A=\"Z Scale :%12.6f\"$$\n";
   F64 é_z	fmtstr
-	"\nAngles are in degrees\n$$DA-TRM,32,RT=F64,A=\"Z-Axis  :%12.6f\"$$\n";
-  F64 é_y	fmtstr "$$DA-TRM,32,RT=F64,A=\"Y-Axis  :%12.6f\"$$\n";
-  F64 é_x	fmtstr "$$DA-TRM,32,RT=F64,A=\"X-Axis  :%12.6f\"$$\n";
-  F64 x_offset	fmtstr "\n$$DA-TRM,32,RT=F64,A=\"X Offset:%12.6f\"$$\n";
-  F64 y_offset	fmtstr "$$DA-TRM,32,RT=F64,A=\"Y Offset:%12.6f\"$$\n";
-  F64 z_offset	fmtstr "$$DA-TRM,32,RT=F64,A=\"Z Offset:%12.6f\"$$\n";
+	"\nAngles are in degrees\n$$DA-TRM,RT=F64,A=\"Z-Axis  :%12.6f\"$$\n";
+  F64 é_y	fmtstr "$$DA-TRM,RT=F64,A=\"Y-Axis  :%12.6f\"$$\n";
+  F64 é_x	fmtstr "$$DA-TRM,RT=F64,A=\"X-Axis  :%12.6f\"$$\n";
+  F64 x_offset	fmtstr "\n$$DA-TRM,RT=F64,A=\"X Offset:%12.6f\"$$\n";
+  F64 y_offset	fmtstr "$$DA-TRM,RT=F64,A=\"Y Offset:%12.6f\"$$\n";
+  F64 z_offset	fmtstr "$$DA-TRM,RT=F64,A=\"Z Offset:%12.6f\"$$\n";
 };
 
 Bool PopUpTransform(I64 *r)

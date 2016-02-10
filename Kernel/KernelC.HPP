@@ -525,12 +525,8 @@ public extern U8 *AMAllocIdentical(U8 *src);
 #help_index "Memory/BlkPool"
 public extern U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512);
 public extern U0 BlkPoolInit(CBlkPool *bp,I64 pages512);
-public extern U8 *Mem2MegAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL);
-public extern U0 Mem2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL);
-public extern U8 *Mem2MegUncachedAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL);
-public extern U8 *Mem2MegWriteThruAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL);
-public extern U8 *Mem512Alloc(I64 *_pages512,CBlkPool *bp=NULL);
-public extern U0 Mem512Free(CMemBlk *m,I64 pages512,CBlkPool *bp=NULL);
+public extern U8 *Mem512Alloc(I64 pages512,CBlkPool *bp=NULL);
+public extern U0 Mem512Free(CMemBlk *m,CBlkPool *bp=NULL);
 
 #help_index "Memory/Heap"
 public extern U8 *CAlloc(I64 size,CTask *mem_task=NULL);
@@ -546,7 +542,6 @@ public _extern _MSIZE I64 MSize(U8 *src);   //size of heap object
 public _extern _MSIZE2 I64 MSize2(U8 *src); //Internal size
 
 #help_index "Memory/HeapCtrl"
-public extern CHeapCtrl *HeapCtrlBPInit(CBlkPool *bp,I64 pages512);
 public extern U0 HeapCtrlDel(CHeapCtrl *hc);
 public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
@@ -584,7 +579,6 @@ extern U0 CoreAPSethTask();
 public extern U0 MPInt(U8 num,I64 cpu_num=1);
 public extern U0 MPIntAll(U8 num);
 public extern U0 MPNMInt();
-public extern U0 MPWake(I64 target_cpu);
 extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 	U8 *task_name=NULL,I64 target_cpu,
 	CTask *parent=NULL, //NULL means adam
@@ -640,8 +634,7 @@ public extern Bool Kill(CTask *task,Bool wait=TRUE);
 public extern Bool Suspend(CTask *task=NULL,Bool state=TRUE);
 _extern _TASK_CONTEXT_RESTORE U0 TaskContextRestore();
 _extern _TASK_END_NOW U0 TaskEndNow();
-extern U0 TaskFinishOff(CTask *task);
-extern U0 TaskFinishOffDying();
+extern U0 TaskKillDying();
 public extern U0 TaskQueIns(CTask *task,CTask *pred=NULL);
 public extern U0 TaskQueRem(CTask *task);
 public extern Bool TaskValidate(CTask *task);

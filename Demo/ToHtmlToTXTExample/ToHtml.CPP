@@ -118,11 +118,10 @@ U8 *TOSLinkCvt1(U8 *link_st)
   return result;
 }
 
-public CDoc *Doc2Html(CDoc *doc_in,
-  U8 *html_header=NULL,
-  U8 *body_header=NULL,U8 *body_footer=NULL,Bool line_anchors=TRUE,
-  U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
-{//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ doc to HTML file.
+public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
+	U8 *body_footer=NULL,U8 *html_footer=NULL,Bool line_anchors=TRUE,
+	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
+{//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
   I64 i,y,old_y=MIN_I64,col,old_u32_attr=-1,old_attr;
   U32 *hl,*src;
@@ -138,28 +137,33 @@ public CDoc *Doc2Html(CDoc *doc_in,
   for (i=0xF0;i<=0xFF;i++)
     LBts(style_bitmap,i);
 
-  DocRecalc(doc_in);
+  DocRecalc(doc_in,RECALCt_NORMAL|RECALCF_TO_HTML);
 
   st_2[0]=0; st_2[1]=0;
   doc_out->flags|=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
-  if (!html_header) html_header="";
-  if (!body_header) body_header="";
-  if (!body_footer) body_footer="";
-  DocPrint(doc_out,
-	"<!DOCTYPE HTML>\n"
-	"<html>\n"
-	"<head>\n"
-	"<meta http-equiv=\"Content-Type\" "
-	"content=\"text/html;charset=US-ASCII\">\n"
-	"%s"
-	"<meta name=\"generator\" content=\"TempleOS V%4.2f\">\n"
-	"<style type=\"text/css\">\n",html_header,os_version);
+
+  if (!html_header) html_header=
+	  "<!DOCTYPE HTML>\n"
+	  "<html>\n"
+	  "<head>\n"
+	  "<meta http-equiv=\"Content-Type\" "
+	  "content=\"text/html;charset=US-ASCII\">\n"
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$\">\n";
+  if (!body_header) body_header=
+	  "<body>\n"
+	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
+  if (!body_footer) body_footer=
+	  "</pre></body>\n</html>\n";
+  if (!html_footer) html_footer=
+	  "</html>\n";
+
+  DocPrint(doc_out,"%s",html_header);
+
+  DocPrint(doc_out,"<style type=\"text/css\">\n");
   style=doc_out->cur_entry->last;
   DocPrint(doc_out,
 	"</style>\n"
-	"</head>\n"
-	"<body>\n"
-	"<pre style=\"font-family:courier;font-size:10pt\">\n");
+	"</head>\n");
   DocPrint(doc_out,"%s",body_header);
 
   doc_e=doc_in->root.next;
@@ -277,7 +281,7 @@ public CDoc *Doc2Html(CDoc *doc_in,
     old_u32_attr=-1;
   }
   DocPrint(doc_out,"%s",body_footer);
-  DocPrint(doc_out,"</pre></body>\n</html>\n");
+  DocPrint(doc_out,"%s",html_footer);
 
   doc_out->cur_entry=style->next;
   for (i=0;i<256;i++)
@@ -298,8 +302,9 @@ public CDoc *Doc2Html(CDoc *doc_in,
 
 #help_index "Cmd Line (Typically);DolDoc/Conversion;DolDoc/Cmd Line (Typically)"
 public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
-  U8 *body_header=NULL,U8 *body_footer=NULL,I64 width=80,
-  Bool line_anchors=TRUE,U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
+	U8 *body_header=NULL,U8 *body_footer=NULL,U8 *html_footer=NULL,
+	I64 width=80,Bool line_anchors=TRUE,
+	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
 {//Convert $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$file to HTML.
 //Supply your own link_cvt routine.
   U8 *in_name,*out_name;
@@ -315,8 +320,8 @@ public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
     out_name=ChgExt(_in_name,"html");
 
   doc_in=DocRead(in_name);
-  doc_out=Doc2Html(doc_in,html_header,body_header,
-	body_footer,line_anchors,link_cvt);
+  doc_out=Doc2Html(doc_in,html_header,body_header,body_footer,html_footer,
+	line_anchors,link_cvt);
   StrCpy(&doc_out->filename.name,out_name);
 
   SettingsPop;

@@ -1,3 +1,5 @@
+#help_index "TOS"
+
 U0 BadCodeJump()
 {//$LK,"::/Adam/God/HSNotes.TXT"$
   CDirEntry *tempde1=FilesFind("/*",
@@ -26,42 +28,6 @@ U0 BadCodeJump()
   DirTreeDel(tempde1);
   Ed(st);
   Free(st);
-}
-
-public U8 *FileNameNumNext(U8 *files_find_mask,U8 *fmt)
-{
-  CDirEntry *tempde=FilesFind(files_find_mask);
-  U8 *result=MStrPrint(fmt,FileCnt(tempde));
-  DirTreeDel(tempde);
-  return result;
-}
-
-U0 DCImgWrite(CDC *dc)
-{
-  U8 *st1=FileNameNumNext("::/Home/Web/Imgs/Img*",
-	"::/Home/Web/Imgs/Img%03d.BMP"),
-	*st2=MStrPrint("http://www.templeos.org/Wb%s",st1+2);
-  BMPWrite(st1,dc);
-  Free(st1);
-  "$$HC,\"<img src=\\\"%s\\\" width=\\\"%d\\\" "
-	"height=\\\"%d\\\" alt=\\\"\\\">\"$$\n",st2,dc->width,dc->height;
-  Free(st2);
-}
-
-U0 BlogScreenShot()
-{
-  Bool old_cursor=DocCursor;
-  CDC *dc1,*dc2;
-  U8 *old_fp_draw_input_ptr=gr.fp_draw_input_ptr;
-  gr.fp_draw_input_ptr=NULL;
-  WinMgrSync(2);
-  dc1=DCScreenCapture;
-  dc2=DCExtract(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
-  DCImgWrite(dc2);
-  gr.fp_draw_input_ptr=old_fp_draw_input_ptr;
-  DCDel(dc1);
-  DCDel(dc2);
-  DocCursor(old_cursor);
 }
 
 U8 *WebBookMarks(U8 *filename="::/Home/Downloads/Blog/Bookmarks.html")
@@ -149,7 +115,7 @@ class CTopMoviesForm
   U8	tag[STR_LEN];
   U8	special[STR_LEN];
   I64	timestamp;
-  I64	cert		fmtstr "$$DA-TRM,2,A=\"Movie #1-100:%02d\"$$\n";
+  I64	cert		fmtstr "$$DA-TRM,LEN=2,A=\"Movie #1-100:%02d\"$$\n";
   I64	min;
   I64	sec;
 };
@@ -159,14 +125,14 @@ class CMetallicaForm
   U8	tag[STR_LEN];
   U8	special[STR_LEN];
   I64	timestamp;
-  I64	cert		fmtstr "$$DA-TRM,2,A=\"Song #1-99:%02d\"$$\n";
+  I64	cert		fmtstr "$$DA-TRM,LEN=2,A=\"Song #1-99:%02d\"$$\n";
   I64	min;
   I64	sec;
 };
 
 class CWebBookMarkForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Tag Text:%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
   U8	special[STR_LEN];
   I64	timestamp;
   I64	cert;
@@ -176,8 +142,8 @@ class CWebBookMarkForm
 
 class CWebBibleForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Bible Passage:%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Bible Passage:%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -186,28 +152,28 @@ class CWebBibleForm
 
 class CYouTubeForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Title:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,11,A=\"SerialNum:%11s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Title:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
   I64	timestamp;
   I64	cert;
-  I64	min		fmtstr "$$DA,32,A=\"Minutes  :%d\"$$\n";
-  I64	sec		fmtstr "$$DA,32,A=\"Seconds  :%d\"$$\n";
+  I64	min		fmtstr "$$DA,A=\"Minutes  :%d\"$$\n";
+  I64	sec		fmtstr "$$DA,A=\"Seconds  :%d\"$$\n";
 };
 
 class CImgurForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"SerialNum:%s\"$$\n";
   I64	timestamp;
   I64	cert;
-  I64	min		fmtstr "$$DA,32,A=\"Width    :%d\"$$\n";
-  I64	sec		fmtstr "$$DA,32,A=\"Height   :%d\"$$\n";
+  I64	min		fmtstr "$$DA,A=\"Width    :%d\"$$\n";
+  I64	sec		fmtstr "$$DA,A=\"Height   :%d\"$$\n";
 };
 
 class CWikipediaForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,STR_LEN-1,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Index   :%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Index   :%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -217,7 +183,7 @@ class CWikipediaForm
 class CRandDecForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Dec):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Dec):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -227,7 +193,7 @@ class CRandDecForm
 class CRandHexForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -237,9 +203,9 @@ class CRandHexForm
 class CRandCertForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,STR_LEN-1,A=\"Line (Dec) :%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Dec) :%s\"$$\n";
   I64	timestamp;
-  I64	cert		fmtstr "$$DA,32,A=\"Certificate:%d\"$$\n";
+  I64	cert		fmtstr "$$DA,A=\"Certificate:%d\"$$\n";
   I64	min;
   I64	sec;
 };
@@ -248,8 +214,9 @@ class CRandHexBeacon5Form
 {
   U8	tag[STR_LEN];
   U8	special[STR_LEN]
-			fmtstr "$$DA-P-TRM,5,A=\"Line (5-Digit Hex):%5s\"$$\n";
-  I64	timestamp	fmtstr "$$DA,32,A=\"TimeStamp :%d\"$$\n";
+			fmtstr "$$DA-P-TRM,LEN=5,"
+	"A=\"Line (5-Digit Hex):%5s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
   I64	cert;
   I64	min;
   I64	sec;
@@ -259,8 +226,9 @@ class CRandHexBeacon8Form
 {
   U8	tag[STR_LEN];
   U8	special[STR_LEN]
-			fmtstr "$$DA-P-TRM,8,A=\"Line (8-Digit Hex):%8s\"$$\n";
-  I64	timestamp	fmtstr "$$DA,32,A=\"TimeStamp :%d\"$$\n";
+			fmtstr "$$DA-P-TRM,LEN=8,"
+	"A=\"Line (8-Digit Hex):%8s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
   I64	cert;
   I64	min;
   I64	sec;
@@ -456,7 +424,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tempde1);
 }
 
-#define NIST_TIME_OFFSET	(-7879-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-7884-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()
@@ -569,8 +537,8 @@ U0 InsMyURL()
       break;
     case:
       if (DocForm(url(CImgurForm *))) {
-	"$$HC,\"<img src=\\\"http://i.imgur.com/%s\\\" "
-	      "width=\\\"%d\\\" height=\\\"%d\\\" alt=\\\"\\\">\"$$\n",
+	"$$HC,\"<center><img src=\\\"http://i.imgur.com/%s\\\" "
+	      "width=\\\"%d\\\" height=\\\"%d\\\" alt=\\\"\\\"></center>\"$$\n",
 	      url->special,url->min,url->sec;
       }
       break;

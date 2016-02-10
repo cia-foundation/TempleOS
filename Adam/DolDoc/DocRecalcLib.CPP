@@ -89,7 +89,7 @@ public U0 DocTop(CDoc *doc=NULL)
     DocUnlock(doc);
 }
 
-public U0 DocCenter(CDoc *doc=NULL,I64 recalc=DOC_RECALC)
+public U0 DocCenter(CDoc *doc=NULL,I64 recalc_flags=RECALCt_NORMAL)
 {//Center win on doc cursor, cur_entry.
   Bool unlock;
   CTask *task;
@@ -97,7 +97,7 @@ public U0 DocCenter(CDoc *doc=NULL,I64 recalc=DOC_RECALC)
     return;
   unlock=DocLock(doc);
   task=doc->win_task;
-  DocRecalc(doc,FALSE,recalc);
+  DocRecalc(doc,recalc_flags);
   if (!(doc->flags&DOCF_BORDER_DOC))
     doc->top_line_num=doc->y-(task->win_height+1)>>1;
   if (unlock)
@@ -135,6 +135,13 @@ public Bool DocCursor(Bool show=OFF,CDoc *doc=NULL)
   if (!doc && !(doc=DocPut))
     return FALSE;
   return !LBEqu(&doc->flags,DOCf_HIDE_CURSOR,!show);
+}
+
+public Bool DocHighlightCursor(Bool show=OFF,CDoc *doc=NULL)
+{//Highlight or Don't highlight cursor.
+  if (!doc && !(doc=DocPut))
+    return FALSE;
+  return !LBEqu(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR,!show);
 }
 
 public Bool DocScroll(Bool val=OFF,CDoc *doc=NULL)
@@ -192,12 +199,12 @@ U0 DocUpdateTaskDocs(CTask *task)
     if (task->border_src==BDS_ED_FILENAME_DRV)
       task->border_attr=DrvTextAttrGet(*doc->filename.name);
     if (task->title_src==TTS_ED_FILENAME)
-      MemCpy(task->task_title,doc->filename.name,TASK_TITLE_LEN);
-    DocRecalc(doc,TRUE,DOC_RECALC_TO_SCREEN);
+      MemCpy(task->task_title,doc->filename.name,STR_LEN-1);
+    DocRecalc(doc,RECALCt_TO_SCREEN|RECALCF_HAS_CURSOR);
   }
   if ((doc=DocBorder(task)) && !(doc->flags&DOCF_DONT_SHOW)) {
     WinScrollNull(task,&saved_scroll);
-    DocRecalc(doc,FALSE,DOC_RECALC_TO_SCREEN);
+    DocRecalc(doc,RECALCt_TO_SCREEN);
     WinScrollRestore(task,&saved_scroll);
   }
 }

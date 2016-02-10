@@ -388,7 +388,7 @@ $SP,"<17>",BI=17$
 U0 PsmMenu(I64 psm_octave)
 {
   DocClear;
-  "$$BD,WHITE$$$$FD,GREEN$$$$CM,0,12$$\n";
+  "$$BG,WHITE$$$$FD,GREEN$$$$CM,0,12$$\n";
   Sprite($IB,"<17>",BI=17$);
   '\n\n\n\n\n';
 

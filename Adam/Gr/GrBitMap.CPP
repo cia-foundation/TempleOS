@@ -4,11 +4,16 @@ public Bool GrPlot0(CDC *dc=gr.dc,I64 x,I64 y)
 {//2D. No clipping or transformation or pen width.
   U8 *dst;
   I32 *db;
-  I64 d;
+  I64 d,dist;
   CColorROPU32 c,color=dc->color,bkcolor=dc->bkcolor;
 
-  if (dc->flags & DCF_LOCATE_NEAREST)
-    dc->dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
+  if (dc->flags & DCF_LOCATE_NEAREST) {
+    dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
+    if (dist<dc->nearest_dist) {
+      dc->nearest_dist=dist;
+      dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+    }
+  }
   if (dc->flags & DCF_RECORD_EXTENTS) {
     if (x<dc->min_x) dc->min_x=x;
     if (x>dc->max_x) dc->max_x=x;
@@ -65,7 +70,7 @@ public I64 GrPeek0(CDC *dc=gr.dc,I64 x,I64 y)
 
 public I64 GrBlot(CDC *dc=gr.dc,I64 x,I64 y,CDC *img)
 {//2D. Clipping but not transformation..
-  I64 i,j,k,k1,kk,kk1,w1,h1,w2,h2,
+  I64 i,j,k,k1,kk,kk1,w1,h1,w2,h2,dist,
 	leading_pixels,leading_pixel_mask,whole_I64s,
 	trailing_pixels,trailing_pixel_mask,
 	reg bit_shift,win_z_buf_line_inc,win_z_buf_line_dec,win_z_num,
@@ -95,8 +100,13 @@ public I64 GrBlot(CDC *dc=gr.dc,I64 x,I64 y,CDC *img)
     x+=win_task->pix_left;
     y+=win_task->pix_top;
   }
-  if (dc->flags & DCF_LOCATE_NEAREST)
-    dc->dist=DistSqrI64(x+img->width>>1,y+img->height>>1,dc->cur_x,dc->cur_y);
+  if (dc->flags & DCF_LOCATE_NEAREST) {
+    dist=DistSqrI64(x+img->width>>1,y+img->height>>1,dc->cur_x,dc->cur_y);
+    if (dist<dc->nearest_dist) {
+      dc->nearest_dist=dist;
+      dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+    }
+  }
   if (dc->flags & DCF_SCREEN_BITMAP) {
     if (x+w1<0) w1=-x;
     if (x+w2>win_task->pix_right+1)
@@ -632,7 +642,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 {//2D. Clipping but not transformation.
   U8 reg *src,reg *dst,*font_ptr;
   I64 i,m,leading_pixels,trailing_pixels,leading_pixel_mask,trailing_pixel_mask,
-	j,k1,kk1,w1,h1,w2,h2,reg bit_shift,reg color_mask;
+	j,k1,kk1,w1,h1,w2,h2,reg bit_shift,reg color_mask,dist;
   CColorROPU32 color,c;
   CTask *win_task;
 
@@ -657,8 +667,13 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
     x+=win_task->pix_left;
     y+=win_task->pix_top;
   }
-  if (dc->flags & DCF_LOCATE_NEAREST)
-    dc->dist=DistSqrI64(x+w2>>1,y+h2>>1,dc->cur_x,dc->cur_y);
+  if (dc->flags & DCF_LOCATE_NEAREST) {
+    dist=DistSqrI64(x+w2>>1,y+h2>>1,dc->cur_x,dc->cur_y);
+    if (dist<dc->nearest_dist) {
+      dc->nearest_dist=dist;
+      dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+    }
+  }
   if (dc->flags & DCF_SCREEN_BITMAP) {
     if (x+w1<0) w1=-x;
     if (x+w2>win_task->pix_right+1)
@@ -910,7 +925,7 @@ public I64 GrVPrint(CDC *dc=gr.dc,I64 x,I64 y,U8 *fmt,...)
 public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 {//2D. Width Height. Clipping but not transformation.
 //Returns cnt of pixs changed.
-  I64 i,result=0,j,k1,kk1,w1,h1,w2,h2,
+  I64 i,result=0,j,k1,kk1,w1,h1,w2,h2,dist,
 	leading_pixels,original_leading_pixels,whole_I64s,
 	trailing_pixels,leading_pixel_mask,trailing_pixel_mask,
 	win_z_buf_line_inc,win_z_buf_line_dec,win_z_num,color_mask;
@@ -943,9 +958,13 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
   }
   if (dc->flags & DCF_LOCATE_NEAREST) {//TODO:Untested
     if (x<=dc->cur_x<=x+w && y<=dc->cur_y<=y+h)
-      dc->dist=0;
+      dist=0;
     else
-      dc->dist=DistSqrI64(x+w>>1,y+h>>1,dc->cur_x,dc->cur_y);
+      dist=DistSqrI64(x+w>>1,y+h>>1,dc->cur_x,dc->cur_y);
+    if (dist<dc->nearest_dist) {
+      dc->nearest_dist=dist;
+      dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+    }
   }
   if (dc->flags & DCF_SCREEN_BITMAP) {
     if (x+w1<0) w1=-x;
@@ -1418,7 +1437,7 @@ gr_done:
 I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 {
 //Returns cnt of pixs changed
-  I64 result=0,d,x=*x1,x2,x3,y3;
+  I64 result=0,d,x=*x1,x2,x3,y3,dist;
   Bool plot,dither,probability_dither,
 	not_color=ToBool(dc->flags&DCF_FILL_NOT_COLOR);
   U8 *dst,*dst2;
@@ -1494,8 +1513,13 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 
     if ((not_color && c!=dc->color2 ||
 	  !not_color && c==dc->color2) && plot) {
-      if (dc->flags & DCF_LOCATE_NEAREST)
-	dc->dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
+      if (dc->flags & DCF_LOCATE_NEAREST) {
+	dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
+	if (dist<dc->nearest_dist) {
+	  dc->nearest_dist=dist;
+	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+	}
+      }
       if (dc->flags & DCF_RECORD_EXTENTS) {
 	if (x3<dc->min_x) dc->min_x=x3;
 	if (x3>dc->max_x) dc->max_x=x3;
@@ -1566,8 +1590,13 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 
     if ((not_color && c!=dc->color2 ||
 	  !not_color && c==dc->color2) && plot) {
-      if (dc->flags & DCF_LOCATE_NEAREST)
-	dc->dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
+      if (dc->flags & DCF_LOCATE_NEAREST) {
+	dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
+	if (dist<dc->nearest_dist) {
+	  dc->nearest_dist=dist;
+	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+	}
+      }
       if (dc->flags & DCF_RECORD_EXTENTS) {
 	if (x3<dc->min_x) dc->min_x=x3;
 	if (x3>dc->max_x) dc->max_x=x3;
@@ -1692,7 +1721,10 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
     else
       dist=SqrI64(dc->cur_x-x2);
     dist+=SqrI64(y-dc->cur_y);
-    dc->dist=dist;
+    if (dist<dc->nearest_dist) {
+      dc->nearest_dist=dist;
+      dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
+    }
   }
   if (dc->flags & DCF_DONT_DRAW)
     goto gr_done;

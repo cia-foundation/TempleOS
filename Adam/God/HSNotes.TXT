@@ -88,7 +88,7 @@ Favorite animal?		$FG,4$"Elephant two"$FG$
 Favorite animal?		$FG,4$"Bears"$FG$
 Favorite color?			$FG,4$"Jude" (Jade Blue?)$FG$
 Favorite color?			$FG,4$"Gold"$FG$
-Favorite color?			$FG,4$$TX,"\"Iceberg\" blue",HTML="http://en.wikipedia.org/wiki/Blue_iceberg"$$FG$
+Favorite color?			$FG,4$$TX,"\"Iceberg\" blue",HTML="https://upload.wikimedia.org/wikipedia/commons/3/38/Blue_ice_in_South_Greenland_-_Visit_Greenland.jpg"$$FG$
 Money?				$FG,4$"Enough vehemently better"$FG$
 				$FG,4$"Pride [or] money, choose_one"$FG$
 Favorite car?			$FG,4$Beamer$FG$

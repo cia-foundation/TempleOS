@@ -1,5 +1,54 @@
 #help_index "Graphics/Sprite;Sprites"
 
+CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *root,I64 elem_num,
+	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_width=NULL,
+	I64 *_xx=NULL,I64 *_yy=NULL)
+{
+  CSprite *result=root->next;
+  I64 width=1,xx=0,yy=0;
+  CColorROPU32 color=BLACK;
+  if (dc) DCRst(dc);
+  while (elem_num-->0 && result!=root) {
+    switch (result->type) {
+      case SPT_COLOR:
+	color=result->c.color;
+	if (dc) dc->color=color;
+	break;
+      case SPT_DITHER_COLOR:
+	color=result->d.dither_color.u8[0]|
+	      result->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
+	if (dc) dc->color=color;
+	break;
+      case SPT_WIDTH:
+	width=result->w.width;
+	if (dc) dc->pen_width=width;
+	break;
+      case SPT_SHIFT:
+	xx+=result->p.x1;
+	yy+=result->p.y1;
+	x+=result->p.x1;
+	y+=result->p.y1;
+	break;
+      case SPT_PLANAR_SYMMETRY:
+	if (dc) {
+	  if (DCSymmetry3Set(dc,result->pp.x1+x,result->pp.y1+y,0,
+		result->pp.x2+x,result->pp.y2+y,0,
+		result->pp.x2+x,result->pp.y2+y,1))
+	    dc->flags|=DCF_SYMMETRY;
+	  else
+	    dc->flags&=~DCF_SYMMETRY;
+	}
+	break;
+    }
+    result=result->next;
+  }
+  if (_color) *_color=color;
+  if (_width) *_width=width;
+  if (_xx) *_xx=xx;
+  if (_yy) *_yy=yy;
+  return result;
+}
+
 Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
 {
   CSprite *tempg=CAlloc(SpriteElemQuedBaseSize(SPT_PT));
@@ -8,23 +57,6 @@ Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
   tempg->p.y1=y;
   QueIns(tempg,root->last);
   return TRUE;
-}
-
-CSprite *SpriteElemNum2QueEntry(CSprite *root,I64 elem_num,
-	I64 *_x=NULL,I64 *_y=NULL)
-{
-  I64 xx=0,yy=0;
-  CSprite *result=root->next;
-  while (result!=root && elem_num--) {
-    if (result->type==SPT_SHIFT) {
-      xx+=result->p.x1;
-      yy+=result->p.y1;
-    }
-    result=result->next;
-  }
-  if (_x) *_x=xx;
-  if (_y) *_y=yy;
-  return result;
 }
 
 CSprite *Sprite2SpriteQue(U8 *elems)
@@ -37,6 +69,7 @@ CSprite *Sprite2SpriteQue(U8 *elems)
     tempg1=MAlloc(SpriteElemSize(tempg)+offset(CSprite.start));
     s=SpriteElemSize(tempg);
     MemCpy(&tempg1->start,&tempg->start,s);
+    tempg1->selected=FALSE;
     QueIns(tempg1,result->last);
     tempg(U8 *)+=s;
   }
@@ -65,8 +98,9 @@ U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL)
   return result;
 }
 
-U0 SpriteEdUpdate(CDoc *doc,CDocBin *tempb,CSprite *root)
+U0 SpriteEdUpdate(CDoc *doc,CDocEntry *doc_ce,CSprite *root)
 {
+  CDocBin *tempb=doc_ce->bin_data;
   I64 size;
   Bool unlock=DocLock(doc);
   Free(tempb->data);
@@ -83,63 +117,64 @@ U0 SpriteSetOrigin(CSprite *root,I64 dx,I64 dy,I64 dz)
   CD3I32 *p;
   CSprite *tempg=root->next;
   while (tempg!=root) {
-    switch (tempg->type) {
-      case SPT_ARROW:
-      case SPT_LINE:
-      case SPT_PLANAR_SYMMETRY:
-      case SPT_RECT:
-      case SPT_ROTATED_RECT:
-	tempg->pp.x2+=dx;
-	tempg->pp.y2+=dy;
-      case SPT_PT:
-      case SPT_FLOOD_FILL:
-      case SPT_FLOOD_FILL_NOT:
-      case SPT_TEXT:
-      case SPT_TEXT_BOX:
-      case SPT_TEXT_DIAMOND:
-      case SPT_CIRCLE:
-      case SPT_BITMAP:
-      case SPT_ELLIPSE:
-      case SPT_POLYGON:
-	tempg->p.x1+=dx;
-	tempg->p.y1+=dy;
-	break;
-      case SPT_POLYLINE:
-	ptr=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++) {
-	  ptr[i<<1]+=dx;
-	  ptr[i<<1+1]+=dy;
-	}
-	break;
-      case SPT_POLYPT:
-	tempg->npu.x+=dx;
-	tempg->npu.y+=dy;
-	break;
-      case SPT_BSPLINE2:
-      case SPT_BSPLINE3:
-      case SPT_BSPLINE2_CLOSED:
-      case SPT_BSPLINE3_CLOSED:
-	p=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++,p++) {
-	  p->x+=dx;
-	  p->y+=dy;
-	  p->z+=dz;
-	}
-	break;
-      case SPT_MESH:
-	p=&tempg->mu.u;
-	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
-	  p->x+=dx;
-	  p->y+=dy;
-	  p->z+=dz;
-	}
-	break;
-      case SPT_SHIFTABLE_MESH:
-	tempg->pmu.x+=dx;
-	tempg->pmu.y+=dy;
-	tempg->pmu.z+=dz;
-	break;
-    }
+    if (tempg->selected)
+      switch (tempg->type) {
+	case SPT_ARROW:
+	case SPT_LINE:
+	case SPT_PLANAR_SYMMETRY:
+	case SPT_RECT:
+	case SPT_ROTATED_RECT:
+	  tempg->pp.x2+=dx;
+	  tempg->pp.y2+=dy;
+	case SPT_PT:
+	case SPT_FLOOD_FILL:
+	case SPT_FLOOD_FILL_NOT:
+	case SPT_TEXT:
+	case SPT_TEXT_BOX:
+	case SPT_TEXT_DIAMOND:
+	case SPT_CIRCLE:
+	case SPT_BITMAP:
+	case SPT_ELLIPSE:
+	case SPT_POLYGON:
+	  tempg->p.x1+=dx;
+	  tempg->p.y1+=dy;
+	  break;
+	case SPT_POLYLINE:
+	  ptr=&tempg->nu.u;
+	  for (i=0;i<tempg->nu.num;i++) {
+	    ptr[i<<1]+=dx;
+	    ptr[i<<1+1]+=dy;
+	  }
+	  break;
+	case SPT_POLYPT:
+	  tempg->npu.x+=dx;
+	  tempg->npu.y+=dy;
+	  break;
+	case SPT_BSPLINE2:
+	case SPT_BSPLINE3:
+	case SPT_BSPLINE2_CLOSED:
+	case SPT_BSPLINE3_CLOSED:
+	  p=&tempg->nu.u;
+	  for (i=0;i<tempg->nu.num;i++,p++) {
+	    p->x+=dx;
+	    p->y+=dy;
+	    p->z+=dz;
+	  }
+	  break;
+	case SPT_MESH:
+	  p=&tempg->mu.u;
+	  for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
+	    p->x+=dx;
+	    p->y+=dy;
+	    p->z+=dz;
+	  }
+	  break;
+	case SPT_SHIFTABLE_MESH:
+	  tempg->pmu.x+=dx;
+	  tempg->pmu.y+=dy;
+	  tempg->pmu.z+=dz;
+	  break;
+      }
     tempg=tempg->next;
   }
 }
@@ -168,6 +203,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tempg)
   tempg1->pwha.height=ToI64(m2)/0x10000;
   tempg1->pwha.angle=-a1;
 
+  tempg1->selected=tempg->selected;
   return tempg1;
 }
 
@@ -208,6 +244,7 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tempg)
   if (tempg1->pwha.height<1) tempg1->pwha.height=1;
   tempg1->pwha.angle=-a1;
 
+  tempg1->selected=tempg->selected;
   return tempg1;
 }
 
@@ -249,12 +286,13 @@ CSprite *SpriteTransformRect(I64 *r,CSprite *tempg,F64 é)
   tempg1->ppa.y2=tempg1->ppa.y1+h;
   tempg1->ppa.angle=-a1;
 
+  tempg1->selected=tempg->selected;
   return tempg1;
 }
 
-CSprite *SpriteTransformBitmap(I64 *r,CSprite *tempg)
+CSprite *SpriteTransformBitMap(I64 *r,CSprite *tempg)
 {
-  CDC *img,*tempb;
+  CDC *img,*dc3;
   U8 *elems;
   I64 x,y,z,minx,maxx,miny,maxy,minz,maxz;
   CSprite *tempg1;
@@ -292,7 +330,7 @@ CSprite *SpriteTransformBitmap(I64 *r,CSprite *tempg)
   if (z<minx) minz=z;
   if (z>maxx) maxz=z;
 
-  tempb=DCNew(maxx-minx+1,maxy-miny+1);
+  dc3=DCNew(maxx-minx+1,maxy-miny+1);
 
   img=CAlloc(sizeof(CDC));
   img->width=tempg->pwhu.width;
@@ -301,22 +339,22 @@ CSprite *SpriteTransformBitmap(I64 *r,CSprite *tempg)
   img->body=&tempg->pwhu.u;
   img->dc_signature=DCS_SIGNATURE_VAL;
 
-  tempb->color=TRANSPARENT;
-  GrRect(tempb,0,0,maxx-minx+1,maxy-miny+1);
+  dc3->color=TRANSPARENT;
+  GrRect(dc3,0,0,maxx-minx+1,maxy-miny+1);
 
-  Free(tempb->r);
-  DCMat4x4Set(tempb,r);
-  tempb->flags|=DCF_TRANSFORMATION;
+  Free(dc3->r);
+  DCMat4x4Set(dc3,r);
+  dc3->flags|=DCF_TRANSFORMATION;
 
-  tempb->x=-minx;
-  tempb->y=-miny;
-  tempb->z=-minz;
-  GrBlot3(tempb,0,0,0,img);
+  dc3->x=-minx;
+  dc3->y=-miny;
+  dc3->z=-minz;
+  GrBlot3(dc3,0,0,0,img);
   Free(img);
 
-  elems=DC2Sprite(tempb);
-  tempb->r=NULL;
-  DCDel(tempb);
+  elems=DC2Sprite(dc3);
+  dc3->r=NULL;
+  DCDel(dc3);
   tempg1=CAlloc(offset(CSprite.start)+MSize(elems));
   MemCpy(tempg1(U8 *)+offset(CSprite.start),elems,MSize(elems));
   tempg1->type=tempg->type;
@@ -342,175 +380,202 @@ U0 SpriteTransform(I64 *r,CSprite *root)
   CD3I32 *p;
   CSprite *tempg=root->next,root2,*tempg1,*tempg2,*tempg3;
   while (tempg!=root) {
-    switch (tempg->type) {
-      case SPT_WIDTH:
-	tempg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
-	if (tempg->w.width<0) tempg->w.width=0;
-	break;
-      case SPT_PLANAR_SYMMETRY:
-      case SPT_ARROW:
-      case SPT_LINE:
-	x=tempg->pp.x2; y=tempg->pp.y2; z=0;
-	Mat4x4MulXYZ(r,&x,&y,&z);
-	tempg->pp.x2=x;
-	tempg->pp.y2=y;
-      case SPT_PT:
-      case SPT_FLOOD_FILL:
-      case SPT_FLOOD_FILL_NOT:
-      case SPT_TEXT:
-      case SPT_TEXT_BOX:
-      case SPT_TEXT_DIAMOND:
-	x=tempg->p.x1; y=tempg->p.y1; z=0;
-	Mat4x4MulXYZ(r,&x,&y,&z);
-	tempg->p.x1=x;
-	tempg->p.y1=y;
-	break;
-      case SPT_BITMAP:
-	tempg1=SpriteTransformBitmap(r,tempg);
-	QueIns(tempg1,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg1;
-	break;
-      case SPT_ROTATED_RECT:
-	tempg1=SpriteTransformRect(r,tempg,tempg->ppa.angle);
-	QueIns(tempg1,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg1;
-	break;
-      case SPT_RECT:
-	tempg1=SpriteTransformRect(r,tempg,0);
-	QueIns(tempg1,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg1;
-	break;
-      case SPT_CIRCLE:
-	tempg1=SpriteTransformCircle(r,tempg);
-	QueIns(tempg1,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg1;
-	break;
-      case SPT_ELLIPSE:
-      case SPT_POLYGON:
-	tempg1=SpriteTransformEllipse(r,tempg);
-	QueIns(tempg1,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg1;
-	break;
-      case SPT_POLYLINE:
-	ptr=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++) {
-	  x=ptr[i<<1]; y=ptr[i<<1+1]; z=0;
+    if (tempg->selected)
+      switch (tempg->type) {
+	case SPT_WIDTH:
+	  tempg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
+	  if (tempg->w.width<0) tempg->w.width=0;
+	  break;
+	case SPT_PLANAR_SYMMETRY:
+	case SPT_ARROW:
+	case SPT_LINE:
+	  x=tempg->pp.x2; y=tempg->pp.y2; z=0;
 	  Mat4x4MulXYZ(r,&x,&y,&z);
-	  ptr[i<<1]=x;
-	  ptr[i<<1+1]=y;
-	}
-	break;
-      case SPT_POLYPT:
-	QueInit(&root2);
-	x=tempg->npu.x; y=tempg->npu.y; z=0;
-	x1=x; y1=y; z1=z;  //unrotated cur coordinates
-	Mat4x4MulXYZ(r,&x,&y,&z);
-	ptr=&tempg->npu.u;
-	k=tempg->npu.num*3;
-	x2=x; y2=y; z2=z;  //rotated start coordinates
-	x3=x; y3=y; z3=z;  //lag 1 rotated coordinates
-	for (i=0;i<k;i+=3) {
-	  j=BFieldExtU32(ptr,i,3);
-	  x1+=gr_x_offsets[j];
-	  y1+=gr_y_offsets[j];
-	  x=x1; y=y1; z=z1;
+	  tempg->pp.x2=x;
+	  tempg->pp.y2=y;
+	case SPT_PT:
+	case SPT_FLOOD_FILL:
+	case SPT_FLOOD_FILL_NOT:
+	case SPT_TEXT:
+	case SPT_TEXT_BOX:
+	case SPT_TEXT_DIAMOND:
+	  x=tempg->p.x1; y=tempg->p.y1; z=0;
 	  Mat4x4MulXYZ(r,&x,&y,&z);
-	  Line(&root2,x3-x2,y3-y2,0,x-x2,y-y2,0,&SpritePolyPtPlot);
-	  x3=x; y3=y; z3=z;
-	}
+	  tempg->p.x1=x;
+	  tempg->p.y1=y;
+	  break;
+	case SPT_BITMAP:
+	  tempg1=SpriteTransformBitMap(r,tempg);
+	  QueIns(tempg1,tempg);
+	  QueRem(tempg);
+	  Free(tempg);
+	  tempg=tempg1;
+	  break;
+	case SPT_ROTATED_RECT:
+	  tempg1=SpriteTransformRect(r,tempg,tempg->ppa.angle);
+	  QueIns(tempg1,tempg);
+	  QueRem(tempg);
+	  Free(tempg);
+	  tempg=tempg1;
+	  break;
+	case SPT_RECT:
+	  tempg1=SpriteTransformRect(r,tempg,0);
+	  QueIns(tempg1,tempg);
+	  QueRem(tempg);
+	  Free(tempg);
+	  tempg=tempg1;
+	  break;
+	case SPT_CIRCLE:
+	  tempg1=SpriteTransformCircle(r,tempg);
+	  QueIns(tempg1,tempg);
+	  QueRem(tempg);
+	  Free(tempg);
+	  tempg=tempg1;
+	  break;
+	case SPT_ELLIPSE:
+	case SPT_POLYGON:
+	  tempg1=SpriteTransformEllipse(r,tempg);
+	  QueIns(tempg1,tempg);
+	  QueRem(tempg);
+	  Free(tempg);
+	  tempg=tempg1;
+	  break;
+	case SPT_POLYLINE:
+	  ptr=&tempg->nu.u;
+	  for (i=0;i<tempg->nu.num;i++) {
+	    x=ptr[i<<1]; y=ptr[i<<1+1]; z=0;
+	    Mat4x4MulXYZ(r,&x,&y,&z);
+	    ptr[i<<1]=x;
+	    ptr[i<<1+1]=y;
+	  }
+	  break;
+	case SPT_POLYPT:
+	  QueInit(&root2);
+	  x=tempg->npu.x; y=tempg->npu.y; z=0;
+	  x1=x; y1=y; z1=z;  //unrotated cur coordinates
+	  Mat4x4MulXYZ(r,&x,&y,&z);
+	  ptr=&tempg->npu.u;
+	  k=tempg->npu.num*3;
+	  x2=x; y2=y; z2=z;  //rotated start coordinates
+	  x3=x; y3=y; z3=z;  //lag 1 rotated coordinates
+	  for (i=0;i<k;i+=3) {
+	    j=BFieldExtU32(ptr,i,3);
+	    x1+=gr_x_offsets[j];
+	    y1+=gr_y_offsets[j];
+	    x=x1; y=y1; z=z1;
+	    Mat4x4MulXYZ(r,&x,&y,&z);
+	    Line(&root2,x3-x2,y3-y2,0,x-x2,y-y2,0,&SpritePolyPtPlot);
+	    x3=x; y3=y; z3=z;
+	  }
 
-	num=0;
-	tempg1=root2.next;
-	x3=0; y3=0; z3=0;
-	while (tempg1!=&root2) {
-	  tempg2=tempg1->next;
-	  if (tempg1->p.x1==x3 && tempg1->p.y1==y3) {
+	  num=0;
+	  tempg1=root2.next;
+	  x3=0; y3=0; z3=0;
+	  while (tempg1!=&root2) {
+	    tempg2=tempg1->next;
+	    if (tempg1->p.x1==x3 && tempg1->p.y1==y3) {
+	      QueRem(tempg1);
+	      Free(tempg1);
+	    } else {
+	      num++;
+	      x3=tempg1->p.x1;
+	      y3=tempg1->p.y1;
+	    }
+	    tempg1=tempg2;
+	  }
+
+	  tempg3=CAlloc(SpriteElemQuedBaseSize(SPT_POLYPT)+(num*3+7)>>3);
+	  tempg3->npu.x=x2;
+	  tempg3->npu.y=y2;
+	  ptr=&tempg3->npu.u;
+	  x3=0;y3=0; z3=0;
+	  i=0;
+	  tempg1=root2.next;
+	  while (tempg1!=&root2) {
+	    tempg2=tempg1->next;
+	    BFieldOrU32(ptr,i,
+		  polypt_map[SignI64(tempg1->p.x1-x3)+1+
+		  3*(SignI64(tempg1->p.y1-y3)+1)]);
+	    i+=3;
+	    x3=tempg1->p.x1;y3=tempg1->p.y1;
 	    QueRem(tempg1);
 	    Free(tempg1);
-	  } else {
-	    num++;
-	    x3=tempg1->p.x1;
-	    y3=tempg1->p.y1;
+	    tempg1=tempg2;
 	  }
-	  tempg1=tempg2;
-	}
-
-	tempg3=CAlloc(SpriteElemQuedBaseSize(SPT_POLYPT)+(num*3+7)>>3);
-	tempg3->npu.x=x2;
-	tempg3->npu.y=y2;
-	ptr=&tempg3->npu.u;
-	x3=0;y3=0; z3=0;
-	i=0;
-	tempg1=root2.next;
-	while (tempg1!=&root2) {
-	  tempg2=tempg1->next;
-	  BFieldOrU32(ptr,i,
-		polypt_map[SignI64(tempg1->p.x1-x3)+1+
-		3*(SignI64(tempg1->p.y1-y3)+1)]);
-	  i+=3;
-	  x3=tempg1->p.x1;y3=tempg1->p.y1;
-	  QueRem(tempg1);
-	  Free(tempg1);
-	  tempg1=tempg2;
-	}
-	tempg3->type=SPT_POLYPT;
-	tempg3->npu.num=num;
-	QueIns(tempg3,tempg);
-	QueRem(tempg);
-	Free(tempg);
-	tempg=tempg3;
-	break;
-      case SPT_BSPLINE2:
-      case SPT_BSPLINE3:
-      case SPT_BSPLINE2_CLOSED:
-      case SPT_BSPLINE3_CLOSED:
-	p=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++,p++) {
-	  x=p->x; y=p->y; z=p->z;
+	  tempg3->type=SPT_POLYPT;
+	  tempg3->npu.num=num;
+	  QueIns(tempg3,tempg);
+	  QueRem(tempg);
+	  tempg3->selected=tempg->selected;
+	  Free(tempg);
+	  tempg=tempg3;
+	  break;
+	case SPT_BSPLINE2:
+	case SPT_BSPLINE3:
+	case SPT_BSPLINE2_CLOSED:
+	case SPT_BSPLINE3_CLOSED:
+	  p=&tempg->nu.u;
+	  for (i=0;i<tempg->nu.num;i++,p++) {
+	    x=p->x; y=p->y; z=p->z;
+	    Mat4x4MulXYZ(r,&x,&y,&z);
+	    p->x=x;
+	    p->y=y;
+	    p->z=z;
+	  }
+	  break;
+	case SPT_SHIFTABLE_MESH:
+	  x=tempg->pmu.x; y=tempg->pmu.y; z=tempg->pmu.z;
 	  Mat4x4MulXYZ(r,&x,&y,&z);
-	  p->x=x;
-	  p->y=y;
-	  p->z=z;
-	}
-	break;
-      case SPT_SHIFTABLE_MESH:
-	x=tempg->pmu.x; y=tempg->pmu.y; z=tempg->pmu.z;
-	Mat4x4MulXYZ(r,&x,&y,&z);
-	tempg->pmu.x=x;
-	tempg->pmu.y=y;
-	tempg->pmu.z=z;
-	p=&tempg->pmu.u;
-	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
-	  x=p->x; y=p->y; z=p->z;
-	  Mat4x4MulXYZ(r,&x,&y,&z);
-	  p->x=x;
-	  p->y=y;
-	  p->z=z;
-	}
-	break;
-      case SPT_MESH:
-	p=&tempg->mu.u;
-	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
-	  x=p->x; y=p->y; z=p->z;
-	  Mat4x4MulXYZ(r,&x,&y,&z);
-	  p->x=x;
-	  p->y=y;
-	  p->z=z;
-	}
-	break;
-    }
+	  tempg->pmu.x=x;
+	  tempg->pmu.y=y;
+	  tempg->pmu.z=z;
+	  p=&tempg->pmu.u;
+	  for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
+	    x=p->x; y=p->y; z=p->z;
+	    Mat4x4MulXYZ(r,&x,&y,&z);
+	    p->x=x;
+	    p->y=y;
+	    p->z=z;
+	  }
+	  break;
+	case SPT_MESH:
+	  p=&tempg->mu.u;
+	  for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
+	    x=p->x; y=p->y; z=p->z;
+	    Mat4x4MulXYZ(r,&x,&y,&z);
+	    p->x=x;
+	    p->y=y;
+	    p->z=z;
+	  }
+	  break;
+      }
     tempg=tempg->next;
   }
+}
+
+I64 SpriteQueSelectCnt(CSprite *root,Bool val=TRUE)
+{
+  I64 result=0;
+  CSprite *tempg=root->next;
+  val=ToBool(val);
+  while (tempg!=root) {
+    if (ToBool(tempg->selected)==val)
+      result++;
+    tempg=tempg->next;
+  }
+  return result;
+}
+
+I64 SpriteQueSelectAll(CSprite *root,Bool val=TRUE)
+{
+  I64 result=0;
+  CSprite *tempg=root->next;
+  while (tempg!=root) {
+    tempg->selected=val;
+    result++;
+    tempg=tempg->next;
+  }
+  return result;
 }
 
 CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
@@ -522,9 +587,10 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
   QueInit(result);
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_MENU_VAL && doc_e->left_exp>=0) {
-      tempg=SpriteElemNum2QueEntry(root,doc_e->left_exp);
+      tempg=SpriteSetSettings(,root,doc_e->left_exp);
       if (tempg!=root) {
 	tempg=MAllocIdentical(tempg);
+	tempg->selected=Bt(&doc_e->type,DOCEt_SELECTED);
 	if (*_cur_elem_num==doc_e->left_exp) {
 	  *_cur_elem_num=num;
 	  found=TRUE;
@@ -545,36 +611,36 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
 U0 SpriteSideBarPickNew(CDoc *doc,CSprite *root,I64 old_num)
 {
   CSprite *tempg;
-  CDocEntry *doc_e=NULL;
+  CDocEntry *doc_cur_e=NULL,*doc_e;
   I64 cur_elem_num=0;
   U8 *st;
-
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite SideBar\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\","
 	"A=\"FI:::/Doc/SpriteSideBar.TXT.Z\"$$\n\n");
-
   tempg=root->next;
   while (tempg!=root) {
     st=SpriteElem2Summary(tempg);
     if (cur_elem_num==old_num) {
       DocPrint(doc,"$$LTRED$$");
-      doc_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
+      doc_e=doc_cur_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
     } else {
       DocPrint(doc,"$$LTBLUE$$");
-      DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
+      doc_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
     }
+    BEqu(&doc_e->de_flags,DOCEf_SELECTED,tempg->selected);
+    BEqu(&doc_e->type,DOCEt_SELECTED,tempg->selected);
     Free(st);
     tempg=tempg->next;
   }
   if (cur_elem_num==old_num) {
     DocPrint(doc,"$$LTRED$$");
-    doc_e=DocPrint(doc,"$$MU-UL,\"END\",LE=%d$$\n",cur_elem_num);
+    doc_cur_e=DocPrint(doc,"$$MU-UL,\"END\",LE=%d$$\n",cur_elem_num);
   } else {
     DocPrint(doc,"$$LTBLUE$$");
     DocPrint(doc,"$$MU-UL,\"END\",LE=%d$$\n",cur_elem_num);
   }
-  if (doc_e)
-    doc->cur_entry=doc_e;
+  if (doc_cur_e)
+    doc->cur_entry=doc_cur_e;
 }
 
 U0 SpriteSideBarTask2(CTask *grand_parent)
@@ -601,6 +667,7 @@ U0 SpriteSideBarTask(CTask *parent,CSprite **_root,I64 *_cur_elem_num)
   doc->flags|=DOCF_MIN_SIZE|DOCF_FORM;
   while (TRUE) {
     SpriteSideBarPickNew(doc,*_root,*_cur_elem_num);
+    DocHighlightCursor(,doc);
     View;
     doc_e=doc->cur_entry;
     if (doc_e->type_u8==DOCT_MENU_VAL)
@@ -648,24 +715,26 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
   return result;
 }
 
-#define GED_SHIFT_PTS		0
-#define GED_SHIFT_RECTS		1
-#define GED_TEXT_ED		2
-#define GED_TRANSFORM		3
-#define GED_SET_ORIGIN		4
-#define GED_SHIFT_ORIGIN	5
-#define GED_SHIFT_SUB_ORIGIN	6
-#define GED_PICK_GRAPHICALLY	7
-#define GED_DELETE		8
-#define GED_INS_CLIPBOARD	9
-#define GED_MAIN_MENU		10
-#define GED_EXIT		11
+#define GED_SELECT_UNSELECT_ALL	0
+#define GED_SELECT		1
+#define GED_UNSELECT		2
+#define GED_SHIFT_PTS		3
+#define GED_SHIFT_RECTS		4
+#define GED_SHIFT_SELECTED	5
+#define GED_TRANSFORM_SELECTED	6
+#define GED_SET_ORIGIN		7
+#define GED_SHIFT_SUB_ORIGIN	8
+#define GED_TEXT_ED		9
+#define GED_INS_CLIPBOARD	10
+#define GED_MAIN_MENU		11
+#define GED_EXIT		12
 
 U0 GrInit3()
 {
-  DefineLstLoad("ST_SPRITE_ED_MENU","Shift Points\0Shift Rects\0"
-	"Edit as Text\0Transform\0Set Origin\0Shift Origin\0Shift SubOrigin\0"
-	"Pick Graphically\0Delete Object\0Insert Clipboard\0Main Menu\0");
+  DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unslesct All\0"
+	"Select\0Unselect\0Shift Points\0Shift Rects\0Shift Selected\0"
+	"Transform Selected\0Set Origin\0Insert Shift SubOrigin\0"
+	"Edit as Text\0Insert Clipboard\0Main Menu\0");
 }
 GrInit3;
 
@@ -677,18 +746,18 @@ I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteEd.TXT.Z\"$$\n\n"
-	"$$LTBLUE$$$$MU-UL,\"Shift Points\",LE=GED_SHIFT_PTS$$\n"
+	"$$LTBLUE$$$$MU-UL,\"Select/Unselect All\",LE=GED_SELECT_UNSELECT_ALL$$\n"
+	"$$MU-UL,\"Select Elems\",LE=GED_SELECT$$\n"
+	"$$MU-UL,\"Unselect Elems\",LE=GED_UNSELECT$$\n\n"
+	"$$MU-UL,\"Shift Points\",LE=GED_SHIFT_PTS$$\n"
 	"$$MU-UL,\"Shift Points with Rects\",LE=GED_SHIFT_RECTS$$\n"
-	"$$MU-UL,\"Edit as Text\",LE=GED_TEXT_ED$$\n"
-	"$$MU-UL,\"Transform\",LE=GED_TRANSFORM$$\n"
+	"$$MU-UL,\"Shift Selected Elems\",LE=GED_SHIFT_SELECTED$$\n"
+	"$$MU-UL,\"Transform Selected Elems\",LE=GED_TRANSFORM_SELECTED$$\n\n"
 	"$$MU-UL,\"Set Origin\",LE=GED_SET_ORIGIN$$\n"
-	"$$MU-UL,\"Shift Origin\",LE=GED_SHIFT_ORIGIN$$\n"
-	"$$MU-UL,\"Insert Shift SubOrigin\",LE=GED_SHIFT_SUB_ORIGIN$$\n"
-	"$$MU-UL,\"Pick or Delete Objects Graphically\","
-	"LE=GED_PICK_GRAPHICALLY$$\n"
-	"$$MU-UL,\"Delete\",LE=GED_DELETE$$\n"
-	"$$MU-UL,\"Insert Clipboard Sprite's\",LE=GED_INS_CLIPBOARD$$\n"
-	"\n$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=GED_MAIN_MENU$$$$LTBLUE$$\n"
+	"$$MU-UL,\"Insert Shift SubOrigin\",LE=GED_SHIFT_SUB_ORIGIN$$\n\n"
+	"$$MU-UL,\"Edit as Text\",LE=GED_TEXT_ED$$\n"
+	"$$MU-UL,\"Insert Clipboard Sprite's\",LE=GED_INS_CLIPBOARD$$\n\n"
+	"$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=GED_MAIN_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=GED_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$");
   st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_elem_num);
@@ -1007,72 +1076,64 @@ gs_done:
   return result;
 }
 
-I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
+I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	CSprite **_root,I64 *_cur_elem_num)
 {
   CDocEntry *doc_e2;
   CDocBin *tempb;
-  Bool unlock,del_down;
+  Bool unlock;
   I64 i,r[16],msg_code,a1,a2,xx,yy,
 	old_de_flags;
   CSprite *cur_elem,*root2,*next,*last,*tempg,*insert_pt;
 
-  old_de_flags=doc_e->de_flags;
-  tempb=doc_e->bin_data;
+  old_de_flags=doc_ce->de_flags;
+  tempb=doc_ce->bin_data;
   DocUnlock(doc);
+  SpriteQueSelectAll(*_root,FALSE);
   do {
     if (winmgr.fps<10)
-      doc_e->de_flags|=DOCEF_DONT_DRAW;
+      doc_ce->de_flags|=DOCEF_DONT_DRAW;
     StrCpy(Fs->task_title,"Sprite Edit Menu");
     i=PopUpSpriteEd(_root,_cur_elem_num);
-    SpriteEdUpdate(doc,tempb,*_root);
+    SpriteEdUpdate(doc,doc_ce,*_root);
     if (0<=i<GED_EXIT) {
       StrCpy(Fs->task_title,DefineSub(i,"ST_SPRITE_ED_MENU"));
       switch (i) {
-	case GED_PICK_GRAPHICALLY:
-	  RegOneTimePopUp(ARf_CSPRITE_PICK_GRAPHICALLY,
-		"You can delete elements by\n"
-		"holding $$GREEN$$Delete$$FG$$ and clicking.\n");
-	  doc_e->de_flags=old_de_flags;
+	case GED_SELECT_UNSELECT_ALL:
+	  if (!SpriteQueSelectCnt(*_root))
+	    SpriteQueSelectAll(*_root);
+	  else
+	    SpriteQueSelectAll(*_root,FALSE);
+	  break;
+	case GED_SELECT:
+	case GED_UNSELECT:
+	  doc_ce->de_flags=old_de_flags;
 	  doc->cur_sprite=tempb->data;
-	  doc->nearest_sprite_elem_num=0;
-	  del_down=FALSE;
 	  do {
-	    msg_code=GetMsg(&a1,&a2,
-		  1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN|1<<MSG_KEY_UP);
-	    if (a2.u8[0]==SC_DELETE&& !(a2&SCF_IP_L_DOWN)) {
-	      if (msg_code==MSG_KEY_DOWN)
-		del_down=TRUE;
-	      else if (msg_code==MSG_KEY_UP)
-		del_down=FALSE;
-	    }
-	    if (msg_code==MSG_IP_L_UP && kbd.scan_code&SCF_DELETE ||
-		  msg_code==MSG_KEY_DOWN && a2&SCF_IP_L_DOWN &&
-		  a2.u8[0]==SC_DELETE) {
+	    doc->nearest_sprite_elem_num=0;
+	    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP);
+	    WinMgrSync(2);
+	    if (msg_code==MSG_IP_L_DOWN) {
 	      *_cur_elem_num=doc->nearest_sprite_elem_num;
-	      cur_elem=SpriteElemNum2QueEntry(*_root,*_cur_elem_num);
-	      if (cur_elem!=*_root) {
-		QueRem(cur_elem);
-		Free(cur_elem);
-		SpriteEdUpdate(doc,tempb,*_root);
-	      }
-	      doc->cur_sprite=tempb->data;
-	      doc->nearest_sprite_elem_num=0;
-	      if (msg_code==MSG_KEY_DOWN)
-		GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
+	      cur_elem=SpriteSetSettings(,*_root,*_cur_elem_num);
+	      cur_elem->selected=ToBool(i==GED_SELECT);
+	      GetMsg(,,1<<MSG_IP_L_UP);
 	    }
-	  } while (del_down || msg_code!=MSG_IP_L_UP && msg_code!=MSG_IP_R_UP);
-	  *_cur_elem_num=doc->nearest_sprite_elem_num;
+	  } while (msg_code!=MSG_IP_R_UP);
 	  doc->cur_sprite=NULL;
 	  break;
 	case GED_SET_ORIGIN:
-	  doc_e->de_flags=old_de_flags;
+	  SpriteQueSelectAll(*_root);
+	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
 	  SpriteSetOrigin(*_root,x-a1,y-a2,0);
-	  SpriteEdUpdate(doc,tempb,*_root);
+	  SpriteEdUpdate(doc,doc_ce,*_root);
+	  SpriteQueSelectAll(*_root,FALSE);
 	  break;
-	case GED_SHIFT_ORIGIN:
-	  doc_e->de_flags=old_de_flags;
+	case GED_SHIFT_SELECTED:
+	  if (!SpriteQueSelectCnt(*_root))
+	    SpriteQueSelectAll(*_root);
+	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
 	  xx=a1; yy=a2;
 	  do {
@@ -1080,8 +1141,10 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	    SpriteSetOrigin(*_root,a1-xx,a2-yy,0);
 	    xx=a1; yy=a2;
-	    SpriteEdUpdate(doc,tempb,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  } while (msg_code!=MSG_IP_L_UP);
+	  if (!SpriteQueSelectCnt(*_root,FALSE))
+	    SpriteQueSelectAll(*_root,FALSE);
 	  break;
 	case GED_SHIFT_PTS:
 	case GED_SHIFT_RECTS:
@@ -1090,24 +1153,28 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
 		"and rectangles with '$$GREEN$$p$$FG$$' and '$$GREEN$$r$$FG$$'.\n"
 		"Press '$$GREEN$$r$$FG$$' after one rectangle\n"
 		"to OR another rectangle.\n");
-	  doc_e->de_flags=old_de_flags;
+	  doc_ce->de_flags=old_de_flags;
 	  if (SpriteShiftPts(tempb->data,x,y,_cur_elem_num,i)) {
 	    QueDel(*_root);
 	    Free(*_root);
 	    *_root=Sprite2SpriteQue(tempb->data);
 	  } else
-	    SpriteEdUpdate(doc,tempb,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  break;
-	case GED_TRANSFORM:
+	case GED_TRANSFORM_SELECTED:
+	  if (!SpriteQueSelectCnt(*_root))
+	    SpriteQueSelectAll(*_root);
 	  if (PopUpTransform(r)) {
 	    SpriteTransform(r,*_root);
-	    SpriteEdUpdate(doc,tempb,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  }
+	  if (!SpriteQueSelectCnt(*_root,FALSE))
+	    SpriteQueSelectAll(*_root,FALSE);
 	  break;
 	case GED_SHIFT_SUB_ORIGIN:
-	  doc_e->de_flags=old_de_flags;
-	  insert_pt=SpriteElemNum2QueEntry(*_root,*_cur_elem_num);
-	  tempg=MAlloc(SpriteElemQuedBaseSize(SPT_SHIFT));
+	  doc_ce->de_flags=old_de_flags;
+	  insert_pt=SpriteSetSettings(,*_root,*_cur_elem_num);
+	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_SHIFT));
 	  tempg->type=SPT_SHIFT;
 	  tempg->p.x1=0;
 	  tempg->p.y1=0;
@@ -1119,7 +1186,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	    tempg->p.x1=a1-xx;
 	    tempg->p.y1=a2-yy;
-	    SpriteEdUpdate(doc,tempb,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  } while (msg_code!=MSG_IP_L_UP);
 	  *_cur_elem_num+=1;
 	  break;
@@ -1130,7 +1197,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
 		"'Insert shift sub-origin' after picking the\n"
 		"element to insert before.  Or,\n"
 		"use 'shift points'.\n");
-	  insert_pt=SpriteElemNum2QueEntry(*_root,*_cur_elem_num);
+	  insert_pt=SpriteSetSettings(,*_root,*_cur_elem_num);
 	  unlock=DocLock(sys_clipboard_doc);
 	  doc_e2=sys_clipboard_doc->root.next;
 	  while (doc_e2!=sys_clipboard_doc) {
@@ -1155,24 +1222,16 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_e,I64 x,I64 y,
 	  }
 	  if (unlock)
 	    DocUnlock(sys_clipboard_doc);
-	  SpriteEdUpdate(doc,tempb,*_root);
-	  break;
-	case GED_DELETE:
-	  cur_elem=SpriteElemNum2QueEntry(*_root,*_cur_elem_num);
-	  if (cur_elem!=*_root) {
-	    QueRem(cur_elem);
-	    Free(cur_elem);
-	    SpriteEdUpdate(doc,tempb,*_root);
-	  }
+	  SpriteEdUpdate(doc,doc_ce,*_root);
 	  break;
 	case GED_TEXT_ED:
 	  if (SpriteEdText(_root,_cur_elem_num))
-	    SpriteEdUpdate(doc,tempb,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  break;
       }
     }
   } while (i!=DOCM_CANCEL && i!=GED_EXIT && i!=GED_MAIN_MENU);
-  doc_e->de_flags=old_de_flags;
+  doc_ce->de_flags=old_de_flags;
 
   switch (i) {
     case DOCM_CANCEL:	return GE_ABORT;

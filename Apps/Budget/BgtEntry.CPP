@@ -23,11 +23,11 @@ U0 BgtIns(CBgtEntry *tempb)
 
 class CBgtEntryForm
 {
-  U8	date[512]	fmtstr "$$DA-P,511,A=\"Date       :%s\"$$\n";
-  F64	amount		fmtstr "Amount     $$$$$$DA,511,A=\"%6.2f\"$$\n";
-  U8	credit[512]	fmtstr "$$DA-P,511,A=\"Credit Acct:%s\"$$\n";
-  U8	debit [512]	fmtstr "$$DA-P,511,A=\"Debit  Acct:%s\"$$\n";
-  U8	desc  [512]	fmtstr "$$DA-P,511,A=\"Desc       :%s\"$$\n";
+  U8	date[512]	fmtstr "$$DA-P,LEN=511,A=\"Date       :%s\"$$\n";
+  F64	amount		fmtstr "Amount     $$$$$$DA,A=\"%6.2f\"$$\n";
+  U8	credit[512]	fmtstr "$$DA-P,LEN=511,A=\"Credit Acct:%s\"$$\n";
+  U8	debit [512]	fmtstr "$$DA-P,LEN=511,A=\"Debit  Acct:%s\"$$\n";
+  U8	desc  [512]	fmtstr "$$DA-P,LEN=511,A=\"Desc       :%s\"$$\n";
 };
 
 CBgtEntry *BgtEntryPmt(CBgtEntry *dft=NULL)

@@ -54,7 +54,6 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
     st1=buf;
     st2="";
   }
-
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite BitMap Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteBitMap.TXT.Z\"$$\n"
 	"\n$$LTBLUE$$$$MU-UL,\"Color        %s\",LE=GBM_COLOR$$\n"
@@ -262,12 +261,10 @@ bm_menu:
 	    case GBM_MAIN_MENU:
 	      result=GE_CONT;
 	      goto bm_done;
-
 	    case GBM_COLOR:
 	      i=PopUpColor(,,FALSE);
 	      if (i>=0) color=i;
 	      goto bm_menu;
-
 	    case GBM_FIND_AND_REPLACE:
 	      i=PopUpColor("Find Color\n",,FALSE);
 	      if (i>=0) {
@@ -278,12 +275,10 @@ bm_menu:
 		}
 	      }
 	      goto bm_menu;
-
 	    case GBM_TRIM_TO_EXTENTS:
 	      GrBitMapEdTrimToExtents(&img,&xx1,&yy1,&xx2,&yy2,bkcolor);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      goto bm_menu;
-
 	    case GBM_ADD_OUTLINE:
 	      i=PopUpRangeI64(1,16,1,"Outline Width\n");
 	      if (i>=0) {
@@ -291,7 +286,6 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      }
 	      goto bm_menu;
-
 	    case GBM_ETCH:
 	      i=PopUpRangeI64(1,16,1,"Etch Width\n");
 	      if (i>=0) {
@@ -299,39 +293,33 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      }
 	      goto bm_menu;
-
 	    case GBM_SAVE_BMP:
 	      *filename.name=0;
 	      if (DocForm(&filename) && *filename.name)
 		BMPWrite(filename.name,img);
 	      goto bm_menu;
-
 	    case GBM_SAVE_GRA:
 	      *filename.name=0;
 	      if (DocForm(&filename) && *filename.name)
 		GRAWrite(filename.name,img,DCSF_COMPRESSED|DCSF_PALETTE_GET);
 	      goto bm_menu;
-
 	    case GBM_DITHER_COLOR:
 	      i=PopUpColorDither;
 	      if (i>=0) color=i;
 	      goto bm_menu;
-
 	    case GBM_WIDTH:
 	      i=PopUpRangeI64(1,16,1,"Pen Width\n");
 	      if (i>=0) width=i;
 	      goto bm_menu;
-
 	    case GBM_UNDO:
 	      if (undo) {
-		Beep;
+		DCFill(img,bkcolor);
 		img->color=ROP_EQU;
 		GrBlot(img,0,0,undo);
 		DCDel(undo);
 		undo=NULL;
 	      }
 	      goto bm_menu;
-
 	    case GBM_PT:
 	    case GBM_LINE:
 	    case GBM_ARROW:
@@ -347,7 +335,6 @@ bm_menu:
 	    case GBM_PASTE_TRANSPARENT:
 	      mode=i;
 	      break;
-
 	    case GBM_TEXT:
 	    case GBM_TEXT_BOX:
 	    case GBM_TEXT_DIAMOND:
@@ -358,7 +345,6 @@ bm_menu:
 	      else
 		goto bm_menu;
 	      break;
-
 	  }
 	  DCDel(undo);
 	  undo=DCExtract(img,0,0,img->width-1,img->height-1);

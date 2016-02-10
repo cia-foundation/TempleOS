@@ -1,6 +1,50 @@
- $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
+$WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
+
+$IV,1$----02/10/16 13:51:44----$IV,0$
+
+$IV,1$----02/10/16 08:56:49----$IV,0$
+* Improved $FG,2$<CTRL-l>$FG$ prompting.
+
+$IV,1$----02/09/16 23:54:23----$IV,0$
+* Created $LK,"DOCEF_LEN",A="MN:DOCEF_LEN"$ with arg.  $LK,"DOCT_DATA",A="MN:DOCT_DATA"$ has default 64 len.
+
+$IV,1$----02/09/16 09:34:32----$IV,0$
+* $BK,1$TempleOS version 4.03 Released$BK,0$
+* Added $LK,"DOCEF_REMALLOC_DATA",A="MN:DOCEF_REMALLOC_DATA"$.
+
+$IV,1$----02/05/16 23:00:53----$IV,0$
+* Moved $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
+* Added $LK,"::/Demo/AcctExample/TOSToHtml.CPP"$.
+
+$IV,1$----02/03/16 18:47:00----$IV,0$
+* Refactored $LK,"SpriteMainEd",A="MN:SpriteMainEd"$().
+* Added tag edit to main sprite edit menu.
+
+$IV,1$----02/01/16 21:01:15----$IV,0$
+* Cleaned-up $LK,"TaskKillDying",A="MN:TaskKillDying"$().
+* Made multicore more professional.
+
+$IV,1$----02/01/16 06:02:41----$IV,0$
+* Moved $LK,"Mem2Meg.CPP",A="FI:::/Demo/Lectures/Mem/Mem2Meg.CPP"$ out of kernel.
+
+$IV,1$----01/31/16 04:07:50----$IV,0$
+* Fixed scheduler, so doesn't idle so high.
+* Fixed many memory leaks.
+* Changed args to  $LK,"Mem512Alloc",A="MN:Mem512Alloc"$(), $LK,"Mem512Free",A="MN:Mem512Free"$(), and $LK,"Mem512TaskAlloc",A="MN:Mem512TaskAlloc"$().
+
+$IV,1$----01/30/16 11:14:29----$IV,0$
+* Changed arg in $LK,"DocEntryNewTag",A="MN:DocEntryNewTag"$().
+* Added $LK,"DocEntryNewBase",A="MN:DocEntryNewBase"$().
+
+$IV,1$----01/29/16 02:44:38----$IV,0$
+* Overhauled $LK,"DocSave",A="MN:DocSave"$() and $LK,"DocRecalc",A="MN:DocRecalc"$().
+
+$IV,1$----01/28/16 20:45:35----$IV,0$
+* Fixed bug in locate sprite elem code.
+* Overhauled $FG,2$<CTRL-r>$FG$ sprite editor.
+* Added $LK,"DocHighlightCursor",A="MN:DocHighlightCursor"$() and $LK,"DOCf_DONT_HIGHLIGHT_CURSOR",A="MN:DOCf_DONT_HIGHLIGHT_CURSOR"$.
 
 $IV,1$----01/28/16 14:05:52----$IV,0$
 * Fixed bug in $LK,"AutoComplete",A="MN:AutoComplete"$() init.
