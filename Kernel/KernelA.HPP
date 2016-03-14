@@ -1609,7 +1609,7 @@ public class CAutoCompleteDictGlbls
 
 class CICArg
 {
-  U8	type,type_pointed;
+  U8	type,type_pointed_to;
   U16	reg; //low is reg, high is index_reg+scale<<6
   I64	disp;
 };

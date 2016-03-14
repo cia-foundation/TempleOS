@@ -222,7 +222,7 @@ I64 ICModr1(I64 r,I64 t2,I64 r2,I64 d2)
 
 U0 ICModr2(CIntermediateCode *tempi,I64 i,I64 d,I64 ip=0)
 {//t=0 means no SIB
-  nobound_switch (i.u8[0]) {
+  switch [i.u8[0]] {
     case MDR_REG:
       break;
     case MDR_INDIRECT_REG:
@@ -648,8 +648,8 @@ U0 ICDeref(CIntermediateCode *tempi,I64 ip)
 {
   I64 t;
   t=tempi->r.type&RT_MASK;
-  if (t>tempi->a1.type_pointed)
-    t=tempi->a1.type_pointed;
+  if (t>tempi->a1.type_pointed_to)
+    t=tempi->a1.type_pointed_to;
   if (tempi->a1.type&TY_MASK==TY_REG)
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 	  TY_DISP+t,tempi->a1.reg,tempi->a1.disp,ip);

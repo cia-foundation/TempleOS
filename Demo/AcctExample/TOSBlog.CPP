@@ -4,7 +4,7 @@ U8 *BlogLocalDir(CDate cdt=0)
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
   Date2Struct(&ds,cdt);
-  StrPrint(dir,"::/Home/Web/" PERSONAL_INITIALS "/Blog/%d%Z",
+  StrPrint(dir,BLOG_LOCAL_BASE "/%d%Z",
 	ds.year,ds.mon-1,"ST_MONTHS");
   if (!FileFind(dir,,FUF_JUST_DIRS))
     MkDir(dir);
@@ -28,7 +28,7 @@ U8 *BlogWebDir(CDate cdt=0)
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
   Date2Struct(&ds,cdt);
-  StrPrint(dir,PERSONAL_WEB "/Home/Web/" PERSONAL_INITIALS "/Blog/%d%Z",
+  StrPrint(dir,BLOG_WEB_BASE "/%d%Z",
 	ds.year,ds.mon-1,"ST_MONTHS");
   return dir;
 }
@@ -85,23 +85,32 @@ U0 BlogScreenShot()
 
 public U0 MakeWebSitePartial()
 {
+  MkDir("D:/Wb");
+  MkDir("D:/Wb/Home");
+  MkDir("D:/Wb/Home/Web");
+  MkDir("D:/Wb/Home/Web/TAD");
+  MkDir("D:/Wb/Home/Web/TAD/Blog");
+
   FreshenWebDir("/Home/Web");
   FreshenWebDir("/Home/Web/" PERSONAL_INITIALS);
   FreshenWebDir(BlogLocalDir+2);
   Drv('C');
 }
 
-U0 Blog()
+public U0 Blog()
 {
   if (!FileFind(BlogLocalFile,,FUF_JUST_FILES))
     Copy("::/Home/Downloads/Blog/DailyBlogHeader.TXT.Z",BlogLocalFile);
-  WinMax;
   AutoComplete;
+  WinBorder;
+  WinMax;
   Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
   Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
   Msg(MSG_KEY_DOWN_UP,'\n',0);
   if (Ed(BlogLocalFile,EDF_WAS_WRITE)) {
-    Copy(BlogLocalFile,"::Home/Web/" PERSONAL_INITIALS "/DailyBlog.TXT.Z");
-    MakeWebSitePartial;
+    Copy(BlogLocalFile,"::" DAILY_BASE ".TXT.Z");
+    Copy(BlogLocalFile,"D:" DAILY_BASE ".TXT.Z");
+    Copy(BlogLocalFile,"D:/Wb" DAILY_BASE ".TXT.Z");
+    TOSWebFile("D:/Wb" DAILY_BASE ".TXT.Z");
   }
 }

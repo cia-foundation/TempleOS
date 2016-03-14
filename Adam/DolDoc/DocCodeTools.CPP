@@ -103,6 +103,16 @@ U0 EdRIExp(CRILex *rx)
       rx->depth-=3;
       if (rx->depth<0) rx->depth=0;
     }
+  } else if (rx->cc1->token=='[') {
+    if (!rx->exp_depth++)
+      rx->depth+=3;
+    EdRILex(rx);
+    while (rx->cc1->token && rx->cc1->token!=']')
+      EdRIExp(rx);
+    if (!--rx->exp_depth) {
+      rx->depth-=3;
+      if (rx->depth<0) rx->depth=0;
+    }
   }
   EdRILex(rx);
 }
@@ -171,7 +181,6 @@ U0 EdRIStmt(CRILex *rx,Bool indent)
 	    EdRILex(rx);
 	  break;
 	case KW_SWITCH:
-	case KW_NOBOUND_SWITCH:
 	  EdRILex(rx);
 	  EdRIExp(rx);
 	  if (rx->cc1->token=='{') {

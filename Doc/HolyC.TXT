@@ -106,6 +106,8 @@ $ID,2$
 $FG,2$if (13<=age<20)
   "Teen-ager";
 $FG$$ID,-2$
+* if you know a switch stmt will not exceed the lowest or highest case values.  $FG,2$switch []$FG$ is a little faster because it doesn't check.
+
 * $FG,2$switch$FG$ stmts always use a jump table.  Don't use them with cases with really big, sparse ranges.
 
 * Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ stmts.
@@ -122,8 +124,6 @@ for (i=0;i<20;i++)
     case 10: "Ten\n";	break;
     case: "Eleven\n";	break; //One plus previous case.
   }$FG$$ID,-2$
-
-* $FG,2$nobound_switch$FG$ can be used if you know a switch stmt will not exceed the lowest or highest case values.  It's a little faster because it doesn't check.
 
 * $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$ allow a new type of nested-switch control flow.  (Don't goto, throw exception or return out of $FG,2$sub_switch_start$FG$ front porch area.)  See $LK,"::/Demo/SubSwitch.CPP"$.
 

@@ -179,7 +179,7 @@ I64 GrFloodFillRay(CDC *dc,I64 x,I64 y,I64 z,I32 *db)
   f->y=y;
   f->state=0;
   do {
-    nobound_switch (f->state) {
+    switch [f->state] {
       case 0:
 	f->state++;
 	result+=f->ray_len=GrRayLen(dc,&f->x,f->y,z,db);

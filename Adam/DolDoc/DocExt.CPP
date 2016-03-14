@@ -4,8 +4,8 @@ extern I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 	Bool exited,I64 *_has_action=NULL);
 extern U0 DocFormBwd(CDoc *doc,Bool giveup=FALSE);
 extern U0 DocLoad(CDoc *doc,U8 *src2,I64 size);
-extern U0 DocPrintAtomic(CDoc *doc,U8 *fmt,...);
-extern U0 DocPrintPartial(CDoc *doc,U8 *fmt,...);
+extern U0 DocPrintAtomic(CDoc *doc=NULL,U8 *fmt,...);
+extern U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...);
 extern CDocEntry *DocPutS(CDoc *doc,U8 *st);
 extern U8 *DocSave(CDoc *doc,I64 *_size=NULL);
 extern I64 EdLeftClickLink(CDoc *doc,CDocEntry *doc_e);

@@ -73,7 +73,7 @@ U0 PrsExpression2(CCmpCtrl *cc,I64 *_max_prec,CPrsStk *ps)
 
   goto pe_unary_term1;
   while (TRUE) {
-    nobound_switch (state) {
+    switch [state] {
       case PE_UNARY_TERM1:
 pe_unary_term1:
 	unary_pre_prec=PREC_NULL;

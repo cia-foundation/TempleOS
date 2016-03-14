@@ -62,22 +62,25 @@ U0 KbdLEDsSet(I64 sc)
     Fs->catch_except=TRUE;
 }
 
-U0 KbdMouseCmdAck(U8 val)
+U0 KbdMouseCmdAck(...)
 {
-  I64 ack,timeout=5;
-  do {
-    ack=0;
-    try {
-      KbdCmdSend(KBD_CTRL,0xD4);
-      KbdCmdSend(KBD_PORT,val);
-      ack=KbdCmdRead;
-    } catch {
-      KbdCmdFlush;
-      Fs->catch_except=TRUE;
-    }
-  } while (ack!=0xFA && --timeout);
-  if (!timeout)
-    throw;
+  I64 i,ack,timeout;
+  for (i=0;i<argc;i++) {
+    timeout=5;
+    do {
+      ack=0;
+      try {
+	KbdCmdSend(KBD_CTRL,0xD4);
+	KbdCmdSend(KBD_PORT,argv[i]);
+	ack=KbdCmdRead;
+      } catch {
+	KbdCmdFlush;
+	Fs->catch_except=TRUE;
+      }
+    } while (ack!=0xFA && --timeout);
+    if (!timeout)
+      throw;
+  }
 }
 
 U0 KbdTypeMatic(U8 delay)
@@ -200,7 +203,7 @@ U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
   I64 i;
   U8 buf[STR_LEN];
   if (ch<=CH_SPACE) {
-    nobound_switch (ch) {
+    switch [ch] {
       case '\n':
 	StrCpy(buf,"ENTER");
 	break;
@@ -216,7 +219,7 @@ U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
       case CH_SHIFT_ESC:
 	StrCpy(buf,"SHIFT_ESC");
 	break;
-      case 0: //nobound_switch
+      case 0: //nobound switch
       case 29:
       case 30:
 	*buf=0;

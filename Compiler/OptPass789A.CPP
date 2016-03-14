@@ -147,7 +147,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  }
 	}
       }
-      nobound_switch (tempi->ic_code) {
+      switch [tempi->ic_code] {
 	sub_switch_start:
 	  sub_switch_start:
 	    case IC_ABS_ADDR:
@@ -667,14 +667,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICAssignPostIncDec(tempi,SLASH_OP_DEC,ip2);
 	  break;
 	case IC_SHL_EQU:
-	  ICShiftEqu(tempi,tempi->a1.type_pointed,
+	  ICShiftEqu(tempi,tempi->a1.type_pointed_to,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		0xE0D1E0D3E0C1,0xE0D1E0D3E0C1,ip2);
 	  break;
 	case IC_SHR_EQU:
-	  ICShiftEqu(tempi,tempi->a1.type_pointed,
+	  ICShiftEqu(tempi,tempi->a1.type_pointed_to,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
@@ -709,7 +709,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_ADD_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
+	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed_to,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
@@ -719,7 +719,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_SUB_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed,
+	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed_to,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,

@@ -121,7 +121,7 @@ public U8 *GodDoodleSprite(U8 *hex=NULL)
     for (i=0;i<3;i++) {
       god.doodle_dc->color=RED;
       for (j=0;j<29;j++)
-	nobound_switch (GodDoodleBits(3)) {
+	switch [GodDoodleBits(3)] {
 	  case 0:
 	    GrEllipse3(god.doodle_dc,
 		  (w-1)*GodDoodleBits(5)/15.5-w/2,
@@ -149,7 +149,7 @@ public U8 *GodDoodleSprite(U8 *hex=NULL)
       for (j=0;j<6;j++) {
 	x=(w-1)*GodDoodleBits(5)/31+w/64;
 	y=(h-1)*GodDoodleBits(5)/31+h/64;
-	nobound_switch (GodDoodleBits(2)) {
+	switch [GodDoodleBits(2)] {
 	  case 0: god.doodle_dc->color=BLACK;	break;
 	  case 1: god.doodle_dc->color=DKGRAY;	break;
 	  case 2: god.doodle_dc->color=LTGRAY;	break;

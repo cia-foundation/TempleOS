@@ -73,14 +73,14 @@ Bool OptIC4(CIntermediateCode *tempi)
 	  ty=ty1;
 	tempil1->a2.type=tempil2->a1.type&TY_MASK+ty;
 
-	pt=tempil1->a2.type_pointed;
-	pt1=tempil2->a1.type_pointed;
+	pt=tempil1->a2.type_pointed_to;
+	pt1=tempil2->a1.type_pointed_to;
 	if (pt1 && pt1<pt && pt!=RT_F64)
 	  pt=pt1;
-	pt1=tempil2->r.type_pointed;
+	pt1=tempil2->r.type_pointed_to;
 	if (pt1 && pt1<pt && pt!=RT_F64)
 	  pt=pt1;
-	tempil1->a2.type_pointed=pt;
+	tempil1->a2.type_pointed_to=pt;
 
 	tempil1->a2.reg=tempil2->a1.reg;
 	tempil1->a2.disp=tempil2->a1.disp;
@@ -113,14 +113,14 @@ Bool OptIC4(CIntermediateCode *tempi)
 	  ty=ty1;
 	tempil1->a1.type=tempil2->a1.type&TY_MASK+ty;
 
-	pt=tempil1->a1.type_pointed;
-	pt1=tempil2->a1.type_pointed;
+	pt=tempil1->a1.type_pointed_to;
+	pt1=tempil2->a1.type_pointed_to;
 	if (pt1 && pt1<pt && pt!=RT_F64)
 	  pt=pt1;
-	pt1=tempil2->r.type_pointed;
+	pt1=tempil2->r.type_pointed_to;
 	if (pt1 && pt1<pt && pt!=RT_F64)
 	  pt=pt1;
-	tempil1->a1.type_pointed=pt;
+	tempil1->a1.type_pointed_to=pt;
 
 	tempil1->a1.reg=tempil2->a1.reg;
 	tempil1->a1.disp=tempil2->a1.disp;
@@ -138,7 +138,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	      !Bt(&cmp.non_ptr_vars_mask,tempil2->a1.reg)) {
 	  tempil1->ic_flags|=tempil2->ic_flags;
 	  tempil1->ic_code=IC_MOV;
-	  tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed;
+	  tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed_to;
 	  tempil1->a1.reg=tempil2->a1.reg;
 	  tempil1->a1.disp=i;
 	  OptSetNOP2(tempil2,-1);
@@ -149,7 +149,7 @@ Bool OptIC4(CIntermediateCode *tempi)
 	    tempil1->a1.type&TY_MASK==TY_STK) {
 	tempil1->ic_flags|=tempil2->ic_flags;
 	tempil1->ic_code=IC_MOV;
-	tempil1->a1.type=tempil2->a1.type&TY_MASK+tempil1->a1.type_pointed;
+	tempil1->a1.type=tempil2->a1.type&TY_MASK+tempil1->a1.type_pointed_to;
 	tempil1->a1.reg=tempil2->a1.reg;
 	tempil1->a1.disp=tempil2->a1.disp;
 	OptFree(tempil2);
@@ -159,7 +159,7 @@ Bool OptIC4(CIntermediateCode *tempi)
   }
   if (tempil1->ic_code==IC_DEREF) {
     if (tempil1->a1.type&TY_MASK==TY_REG) {
-      tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed;
+      tempil1->a1.type=TY_DISP+tempil1->a1.type_pointed_to;
       tempil1->a1.disp=0;
       tempil1->ic_code=IC_MOV;
       return TRUE;
@@ -204,7 +204,7 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 	  tempil2=tempil3=&cmp.ic_nop;
       } else
 	tempil1=tempil2=tempil3=&cmp.ic_nop;
-      nobound_switch (intermediate_code_table[code].arg_cnt) {
+      switch [intermediate_code_table[code].arg_cnt] {
 	case IS_V_ARG:
 	  ps->ptr-=tempi->ic_data>>3;
 	  break;
@@ -215,10 +215,10 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 	  tempi1=PrsPop(ps);
 	  tempc1=tempi1->ic_class;
 	  break;
-	case IS_0_ARG: //nobound_switch
+	case IS_0_ARG: //nobound switch
 	  break;
       }
-      nobound_switch (code) {
+      switch [code] {
 	case IC_IMM_I64:
 	case IC_TYPE:
 	  tempi->a1.type=TY_IMM+RT_I64;
@@ -228,7 +228,7 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 	case IC_IMM_F64:
 	  tempi->a1.type=TY_IMM+RT_I64;
 	  tempi->a1.disp=tempi->ic_data;
-	  tempi->a1.type_pointed=RT_F64;
+	  tempi->a1.type_pointed_to=RT_F64;
 	  tempi->ic_code=IC_MOV;
 	  break;
 	case IC_MOV:
@@ -267,7 +267,7 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 	      tempi->a1.disp=tempi1->a1.disp;
 	    tempi->ic_flags|=tempi1->ic_flags;
 	    tempi->ic_code=IC_MOV;
-	    tempi->a1.type=TY_RIP_DISP32+tempi->a1.type_pointed;
+	    tempi->a1.type=TY_RIP_DISP32+tempi->a1.type_pointed_to;
 	    tempi->a1.reg=REG_RIP;
 	    OptFree(tempi1);
 	  }
@@ -313,7 +313,7 @@ p4_lea_gone:
 	      tempi->a1.disp=tempi1->ic_data;
 	    else
 	      tempi->a1.disp=tempi1->a1.disp;
-	    tempi->a1.type=TY_RIP_DISP32+tempi->a1.type_pointed;
+	    tempi->a1.type=TY_RIP_DISP32+tempi->a1.type_pointed_to;
 	    tempi->a1.reg=REG_RIP;
 	    tempi->ic_flags|=ICF_NOT_ADDR;
 	    OptFree(tempi1);
@@ -339,7 +339,7 @@ p4_sib:
 
 		tempi->ic_code=IC_LEA;
 		tempi->a1.type=TY_SIB+RT_I64;
-		tempi->a1.type_pointed=RT_I64;
+		tempi->a1.type_pointed_to=RT_I64;
 
 		tempi->a2.type=TY_NULL+tempi->a2.type&RT_MASK;
 	      }

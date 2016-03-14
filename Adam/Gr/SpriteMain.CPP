@@ -433,7 +433,7 @@ CSprite *SMPolyLineFamily(I64 eletype,CDC *dc,I64 x,I64 y,I64 a1,I64 a2,
     }
   } while (msg_code!=MSG_IP_R_UP);
 
-  switch(eletype) {
+  switch (eletype) {
     case SPT_POLYLINE:
       if (num>1) {
 	result=CAlloc(SpriteElemQuedBaseSize(SPT_POLYLINE)+num*sizeof(CD2I32));

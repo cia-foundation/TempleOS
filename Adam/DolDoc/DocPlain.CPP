@@ -81,7 +81,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       }
     buf2=MStrPrint("%s,",buf);
     Free(buf); buf=buf2;
-    nobound_switch (doc_e->type_u8) {
+    switch [doc_e->type_u8] {
       case DOCT_HEX_ED:
 	buf2=MStrPrint("%s%d,",buf,doc_e->len);
 	Free(buf); buf=buf2;
@@ -114,14 +114,14 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	  buf2=MStrPrint("%s%d,",buf,doc_e->attr);
 	  Free(buf); buf=buf2;
 	}
-      case DOCT_NUM_TYPES-1: //nobound_switch
+      case DOCT_NUM_TYPES-1: //nobound switch
 	break;
     }
     de_flags=doc_e->de_flags & DOCEG_HAS_ARG;
     while (de_flags) {
       j=Bsf(de_flags);
       Btr(&de_flags,j);
-      nobound_switch (j) {
+      switch [j] {
 	case DOCEf_TAG:
 	  if (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_MACRO &&
 		(doc_e->de_flags&DOCEF_LEFT_MACRO &&
@@ -202,7 +202,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	case DOCEf_USER_DATA:
 	  buf2=MStrPrint("%sU=0x%X,",buf,doc_e->user_data);
 	  break;
-	case DOCEf_NUM_FLAGS-1: //nobound_switch
+	case DOCEf_NUM_FLAGS-1: //nobound switch
 	  break;
       }
       Free(buf); buf=buf2;
@@ -243,7 +243,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
       doc_e->len=DOCE_LEN_DFT;
       j=PrsDocFlags(cc,&doc_e->de_flags,&doc_e->type);
       cc->htc.hash_table_lst=old_hash_table_lst;
-      nobound_switch (i) {
+      switch [i] {
 	case DOCT_CHECK_BOX:
 	  doc_e->raw_type=RT_I8;
 	  break;
@@ -305,7 +305,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  j=Bsf(de_flags);
 	if (j<0 || Bts(&processed_flags,j))
 	  goto pd_err;
-	nobound_switch (j) {//TODO: Might check for expression errors
+	switch [j] {//TODO: Might check for expression errors
 	  case DOCEf_TAG:
 	    if (!doc_e->tag) {
 //If a $$MA,LM=""$$, Tag is filled when the LM is processed.
@@ -458,7 +458,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	    else
 	      goto pd_err;
 	    break;
-	  case DOCEf_NUM_FLAGS-1: //nobound_switch
+	  case DOCEf_NUM_FLAGS-1: //nobound switch
 	    break;
 	}
       }

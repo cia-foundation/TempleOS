@@ -8,7 +8,7 @@ I64 HashTypeNum(CHash *temph)
 
 I64 HashVal(CHash *temph)
 {//Returns most likely desired value.
-  nobound_switch (HashTypeNum(temph)) {
+  switch [HashTypeNum(temph)] {
     case HTt_EXPORT_SYS_SYM:
       return temph(CHashExport *)->val;
     case HTt_IMPORT_SYS_SYM:
@@ -40,8 +40,8 @@ I64 HashVal(CHash *temph)
     case HTt_FRAME_PTR:
       return temph(CHashGeneric *)->user_data0;
 
-    case -1:		//nobound_switch
-    case HTt_NUM_TYPES: //nobound_switch
+    case -1:		//nobound switch
+    case HTt_NUM_TYPES: //nobound switch
     default:
       return 0;
   }

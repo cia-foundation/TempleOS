@@ -9,7 +9,7 @@ U0 CmpNoteFloatOp(CCmpCtrl *cc,CIntermediateCode *tempi,
   Bool link=FALSE;
   if (cc->pass==7 && cc->last_float_op_ic &&
 	cc->last_dont_popable && dont_pushable) {
-    nobound_switch (pos) {
+    switch [pos] {
       case CN_A2:
 	if (cc->last_float_op_ic!=tempi && cc->dont_push_float)
 	  link=TRUE;
@@ -589,15 +589,15 @@ U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
   if (tempi->ic_flags & ICF_NOT_ADDR) {
     if (dont_push_float) {
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,FALSE,ip);
     } else if (tempi->ic_flags & ICF_A1_FIRST) {
       ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
@@ -605,28 +605,28 @@ U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
       ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
     }
 //TODO: unpushable,unpop?  Not sure
     ICCopyTemplate(cc,tempi,CMP_TEMPLATE_MOD,FALSE,FALSE,FALSE,CN_MAIN);
-    if (tempi->a1.type_pointed!=RT_F64)
+    if (tempi->a1.type_pointed_to!=RT_F64)
       ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,TRUE,ip);
-    ICMov(tempi,tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+    ICMov(tempi,tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	  tempi->a1.reg,tempi->a1.disp,TY_REG+RT_I64,REG_RAX,0,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
   } else {
     if (dont_push_float) {
       ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
 	    tempi->a1.reg,tempi->a1.disp,ip);
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    TY_DISP+tempi->a1.type_pointed,REG_RCX,0,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,FALSE,ip);
     } else if (tempi->ic_flags & ICF_A1_FIRST) {
       ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
@@ -634,8 +634,8 @@ U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
       ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    TY_DISP+tempi->a1.type_pointed,REG_RCX,0,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
     } else {
       ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
@@ -643,15 +643,15 @@ U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
       ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
 	    tempi->a1.reg,tempi->a1.disp,ip);
       ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    TY_DISP+tempi->a1.type_pointed,REG_RCX,0,ip);
-      if (tempi->a1.type_pointed!=RT_F64)
+	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
+      if (tempi->a1.type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
     }
 //TODO: unpushable,unpop?  Not sure
     ICCopyTemplate(cc,tempi,CMP_TEMPLATE_MOD,FALSE,FALSE,FALSE,CN_MAIN);
-    if (tempi->a1.type_pointed!=RT_F64)
+    if (tempi->a1.type_pointed_to!=RT_F64)
       ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,TRUE,ip);
-    ICMov(tempi,TY_DISP+tempi->a1.type_pointed,REG_RCX,0,
+    ICMov(tempi,TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,
 	  TY_REG+RT_I64,REG_RAX,0,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,

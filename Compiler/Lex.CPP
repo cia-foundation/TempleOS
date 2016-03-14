@@ -116,7 +116,7 @@ lgc_start1:
       cc->cur_buf_ptr=NULL;
       goto lgc_here;
     }
-    nobound_switch (cc->last_U16=*src++) {
+    switch [cc->last_U16=*src++] {
       case 0:
 lgc_here:
 	tempf=cc->lex_include_stk;
@@ -127,7 +127,7 @@ lgc_here:
 lgc_start2:
 	  if (doc_e!=doc) {
 	    tempf->cur_entry=doc_e;
-	    nobound_switch (doc_e->type_u8) {
+	    switch [doc_e->type_u8] {
 	      case DOCT_TEXT:
 		if (doc_e->de_flags & ~(DOCEF_TAG|DOCEF_DEFINE|DOCEF_TAG_CB|
 		      DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
@@ -203,7 +203,7 @@ lgc_start2:
 	      case DOCT_CURSOR:
 		doc_e=doc_e->next;
 		goto lgc_start2;
-	      case 0xFF: //nobound_switch
+	      case 0xFF: //nobound switch
 	      default:
 		if (LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
 		  tempf->line_num=doc_e->y+1;
@@ -254,7 +254,7 @@ lgc_start2:
 	  tempf->line_start=src;
 	}
 	break;
-      case 0xFF: //nobound_switch
+      case 0xFF: //nobound switch
     }
 lgc_done:
     if (cc->last_U16==CH_SHIFT_SPACE)
@@ -448,7 +448,7 @@ I64 Lex(CCmpCtrl *cc)
   cc->last_line_num=cc->lex_include_stk->line_num;
   while (TRUE) {
 lex_cont:
-    nobound_switch (ch=LexGetChar(cc)) {
+    switch [ch=LexGetChar(cc)] {
       case 0:
 	return cc->token=TK_EOF;
       case TK_SUPERSCRIPT:

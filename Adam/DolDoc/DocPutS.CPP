@@ -155,7 +155,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
   return result;
 }
 
-public CDocEntry *DocPrint(CDoc *doc,U8 *fmt,...)
+public CDocEntry *DocPrint(CDoc *doc=NULL,U8 *fmt,...)
 {//You must not print partial doc cmds.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   CDocEntry *result=DocPutS(doc,buf);
@@ -163,13 +163,13 @@ public CDocEntry *DocPrint(CDoc *doc,U8 *fmt,...)
   return result;
 }
 
-public U0 DocPrintPartial(CDoc *doc,U8 *fmt,...)
+public U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...)
 {//Lets you print half a doc cmd, if you like.
   U8 *buf,*st,*src,*dst,*ptr,*ptr2;
   Bool unlock;
   CDocEntry *doc_ce,*doc_ne;
   I64 ch,i,j;
-  if (!fmt)
+  if (!doc && !(doc=DocPut))
     return;
   buf=StrPrintJoin(NULL,fmt,argc,argv);
   ptr=buf;
@@ -238,7 +238,7 @@ Bool KDDocPutS(U8 *st)
   return FALSE;
 }
 
-public U0 DocPrintAtomic(CDoc *doc,U8 *fmt,...)
+public U0 DocPrintAtomic(CDoc *doc=NULL,U8 *fmt,...)
 {//Prints multiple whole cmds all-at-once. Might need this when printing trees.
   U8 *buf;
   Bool unlock;

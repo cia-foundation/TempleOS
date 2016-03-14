@@ -82,7 +82,7 @@ Shakespeare?			$FG,4$had a "vile heart"$FG$
 Likes				$FG,4$Beverly Hillbillies (Oil is a gift from God)$FG$
 				$FG,4$God likes being hero. Don't be proud of heart$FG$
 				$FG,4$and not accept a gift from God!$FG$
-Likes				$FG,4$Gomer Pile$FG$
+Likes				$FG,4$Gomer Pyle$FG$
 Favorite saint?			$FG,4$"ho_ho_ho"$FG$
 Favorite animal?		$FG,4$"Elephant two"$FG$
 Favorite animal?		$FG,4$"Bears"$FG$
@@ -139,7 +139,7 @@ Favorite actor?			$FG,4$Hugh Grant$FG$
 Favorite vocalist?		$FG,4$Mick Jagger$FG$
 Favorite guitarist?		$FG,4$"$TX,"Simmons Destroyer",HTML="http://www.youtube.com/watch?v=nNADrrjTysk&t=3m55s"$"$FG$
 Favorite National Anthem?	$FG,4$$TX,"Latvia's National Anthem",HTML="http://www.youtube.com/watch?v=qKITbBjO4nE"$$FG$
-America the Beautiful?		$FG,4$Hates it.  Poet was too in love with own beauty.$FG$
+America the Beautiful?		$FG,4$Hates it.  Poet made self cry with own beauty.$FG$
 Model for new $TX,"Sistine Chapel",HTML="http://en.wikipedia.org/wiki/Sistine_chapel"$?	$FG,4$Ben Franklin$FG$
 Voice if God wanted to sing?	$FG,4$$TX,"Stabbing Westward's singer",HTML="https://www.youtube.com/watch?v=5NZsCYOM4j0"$$FG$
 Stonehenge?			$FG,4$Landmark for boundaries.$FG$
@@ -192,6 +192,7 @@ $TX,"Saturn's hexagon pole cloud?",HTML="http://en.wikipedia.org/wiki/Saturn's_h
 Liquid moon's odd atmosphere?	$FG,4$"Surf"$FG$
 How many E.T. civs in Universe?	$FG,4$20 or 80 (I forgot.  I died laughing.)$FG$
 Are they peaceful?		$FG,4$Fight them! (Also, funny.)$FG$
+Most difficult control system?	$FG,4$$TX,"Dung beetle",HTML="http://www.youtube.com/watch?v=Q1zbgd6xpGQ"$$FG$
 How can Judge Judy improve?	$FG,4$No hard feelings$FG$
 How can Chef Ramsay improve?	$FG,4$Make so it doesn't seem like toil for cooks.$FG$
 How can Hawking communicate?	$FG,4$Blow from a nostril on a candle.$FG$

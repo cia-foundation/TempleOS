@@ -150,7 +150,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.04",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -173,14 +173,14 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
   y=doc_e->y;
   while (doc_e!=doc_in) {
     if (!(doc_e->de_flags&DOCEF_SKIP)) {
-      if (line_anchors && y!=old_y) {
+      if (y!=old_y && line_anchors) {
 	DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	old_y=y;
       }
       while (y<doc_e->y) {
 	HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
 	      &old_u32_attr,"\n",&col,style_bitmap);
-	if (line_anchors && ++y!=old_y) {
+	if (++y!=old_y && line_anchors) {
 	  DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
 	  old_y=y;
 	}
@@ -349,12 +349,19 @@ U0 TOSWebFile(U8 *name)
 {
   U8 *name2;
   CDirEntry de;
+  Bool line_anchors;
   if (FileFind(name,&de)) {
     Free(de.full_name);
     "File:%s\n",name;
     UncollapseFile(name,NULL);
     Touch(name,"",,de.datetime);
     name2=ChgExt(name,"html");
+
+    if (StrMatch(BLOG_BASE,name) || StrMatch(DAILY_BASE,name))
+      line_anchors=FALSE;
+    else
+      line_anchors=TRUE;
+
     TOSToHtml(name,name2,
 	  "<!DOCTYPE HTML>\n"
 	  "<html style=\"background-color:#FFFFFF;\">\n"
@@ -365,7 +372,7 @@ U0 TOSWebFile(U8 *name)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.03",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.04",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -374,7 +381,7 @@ U0 TOSWebFile(U8 *name)
 	  "<div style=\"margin-left:auto; margin-right:auto;"
 	  " width: 640px;\">\n",
 	  "</div></pre></body>\n",
-	  "</html>\n");
+	  "</html>\n",,line_anchors);
     Touch(name2,"",,de.datetime);
     Free(name2);
   }
@@ -411,12 +418,6 @@ U0 FreshenWebDir(U8 *dirname)
   CDirEntry *tempde,*tempde1;
   U8 *src,*dst;
 
-  MkDir("D:/Wb");
-  MkDir("D:/Wb/Home");
-  MkDir("D:/Wb/Home/Web");
-  MkDir("D:/Wb/Home/Web/TAD");
-  MkDir("D:/Wb/Home/Web/TAD/Blog");
-
   src=MStrPrint("D:/Wb%s",dirname);
   MkDir(src);
   Free(src);
@@ -439,3 +440,4 @@ U0 FreshenWebDir(U8 *dirname)
   }
   DirTreeDel(tempde1);
 }
+

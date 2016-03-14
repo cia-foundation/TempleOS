@@ -572,17 +572,21 @@ class CSwitchCase {
   CSubSwitch *ss;
 };
 
-U0 PrsSwitch(CCmpCtrl *cc,Bool nobound,I64 try_cnt)
+U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
 {
   CSwitchCase *header=NULL,*temps,*temps1;	//Leaks on except
   CSubSwitch root,*tempss;			//Leaks on except
   CCodeMisc *lb_dft,*lb_fwd_case,*mc_jt,*lb_entry,**jmp_table;
   CIntermediateCode *tempi_sub,*tempi_cmp,*tempi_jmp,*tempi_start;
-  Bool dft_found=FALSE;
+  Bool dft_found=FALSE,nobound;
   I64 i,k_start=MIN_I64,k_end,lo=MAX_I64,hi=MIN_I64,range;
 
-  if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+  if (cc->token=='(')
+    nobound=FALSE;
+  else if (cc->token=='[')
+    nobound=TRUE;
+  else
+    LexExcept(cc,"expecting '(' or '[' at ");
   Lex(cc);
   QueInit(&root);
 
@@ -598,12 +602,15 @@ U0 PrsSwitch(CCmpCtrl *cc,Bool nobound,I64 try_cnt)
   tempi_sub=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
   ICAdd(cc,IC_SUB,0,cmp.internal_types[RT_I64]);
   tempi_cmp=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
-  if (nobound)
+  if (nobound) {
     ICAdd(cc,IC_NOBOUND_SWITCH,mc_jt,0);
-  else
+    if (cc->token!=']')
+      LexExcept(cc,"missing ']' at ");
+  } else {
     ICAdd(cc,IC_SWITCH,mc_jt,0);
-  if (cc->token!=')')
-    LexExcept(cc,"missing ')' at ");
+    if (cc->token!=')')
+      LexExcept(cc,"missing ')' at ");
+  }
   if (Lex(cc)!='{')
     LexExcept(cc,"expecting '{' at ");
   Lex(cc);
@@ -925,8 +932,8 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 	  if (tempex=cc->hash_entry) {
 	    if (tempex->type & HTT_KEYWORD) {
 	      i=tempex(CHashGeneric *)->user_data0;
-	      nobound_switch (i) {
-		case KW_NUM_KEYWORDS-1: //nobound_switch
+	      switch [i] {
+		case KW_NUM_KEYWORDS-1: //nobound switch
 		default: //A keyword that is not valid here is just a symbol.
 		  goto sm_not_keyword_afterall;
 		sub_switch_start:
@@ -971,11 +978,8 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		    case KW_DO:
 		      PrsDoWhile(cc,try_cnt);
 		      break;
-		    case KW_NOBOUND_SWITCH:
-		      PrsSwitch(cc,TRUE,try_cnt);
-		      break;
 		    case KW_SWITCH:
-		      PrsSwitch(cc,FALSE,try_cnt);
+		      PrsSwitch(cc,try_cnt);
 		      break;
 		  sub_switch_end:
 		sub_switch_end:

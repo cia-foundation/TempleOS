@@ -258,7 +258,7 @@ U8 *ExpandBuf(CArcCompress *arc,CTask *mem_task=NULL)
 
   result=MAlloc(arc->expanded_size+1,mem_task);
   result[arc->expanded_size]=0; //terminate
-  nobound_switch (arc->compression_type) {
+  switch [arc->compression_type] {
     case CT_NONE:
       MemCpy(result,&arc->body,arc->expanded_size);
       break;

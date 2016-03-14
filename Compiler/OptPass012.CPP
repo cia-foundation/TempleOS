@@ -44,7 +44,7 @@ args.
     tempi->ic_class2=tempc;
     tempi_push=tempi;
     MemSet(&tempi->a1,0,sizeof(CICArg)*4);
-    nobound_switch (intermediate_code_table[code].arg_cnt) {
+    switch [intermediate_code_table[code].arg_cnt] {
       case IS_V_ARG:
 	ps->ptr-=tempi->ic_data>>2;
 	break;
@@ -59,12 +59,12 @@ args.
 	tempi->t.a1t=tempi1;
 	tempi->t.a1c=PrsPop(ps);
 	break;
-      case IS_0_ARG: //nobound_switch
+      case IS_0_ARG: //nobound switch
 	break;
     }
     if (intermediate_code_table[code].not_const)
       cc->flags|=CCF_NOT_CONST;
-    nobound_switch (code) {
+    switch [code] {
       case IC_IMM_F64:
 	tempi->ic_flags&=~ICF_R_TO_F64;
 	if (cc->pass==2 && tempi->ic_flags&ICF_R_TO_INT) {

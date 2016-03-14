@@ -8,7 +8,7 @@ U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _temp_u32_attr)
   I64 ch,ch1,last_ch,temp_u32_attr,mask_temp_u32_attr=_temp_u32_attr&0xFFFFF000,
 	comment_depth,brace_depth=s->brace_depth,paren_depth=s->paren_depth;
   CHash *temph;
-  nobound_switch (s->state) {
+  switch [s->state] {
     case DOCSS_NORMAL:
 hl_normal:
       while (len) {

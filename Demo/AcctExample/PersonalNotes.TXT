@@ -27,8 +27,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * $LK,"DOCEF_REMALLOC_DATA",A="FF:::/Adam/DolDoc/DocChar.CPP,DOCEF_REMALLOC_DATA"$ HexEdit Remalloc.
 
-* No way to clear $LK,"DOCEf_HOLD",A="MN:DOCEf_HOLD"$ entries.
-
 * $LK,"DOCF_DBL_DOLLARS",A="MN:DOCF_DBL_DOLLARS"$ in $LK,"Reindention",A="MN:EdCodeTools2"$.
 
 * Compiler Optimization: Local array vars --> reg.  Might exist.
@@ -41,8 +39,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
 * 01/10/2016 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Web/TAD/CounterRenaissance.TXT"$ "Rennaisance"
 * 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
-
-* Document $$DA zero terminator.  Explain str or not.
 
 * Document, perhaps with video, $LK,"GetStr",A="MN:GetStr"$() all the way down into $LK,"PutKey",A="MN:PutKey"$() code.
 
@@ -173,7 +169,7 @@ CHashFun *fun_ptr;
 $ID,-5$
 * extern of fun with dft arg of str?
 
-* Might want to warn switch() dup case numbers.
+* Might want to warn switch[] dup case numbers.
 
 * Make $LK,"Clamp",A="MN:Clamp"$(), $LK,"Min",A="MN:Min"$(), $LK,"Max",A="MN:Max"$() into asm routines?
 
@@ -392,12 +388,13 @@ Offer only in approved place		$TX,"Deuteronomy 12:13-18",HTML="http://www.bibleg
 Jesus' zeal for the Temple		$TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
 Famine not for bread			$TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
 Meek and humble of heart		$TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
+There is no council against the Lord	$TX,"Proverbs 21:30",HTML="http://www.biblegateway.com/verse/en/Proverbs%2021:30"$
 
 
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17358 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17364 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
@@ -406,11 +403,16 @@ Frosting	$HC,"<center><img src=\"http://www.templeos.org/images/Frosting.jpg\" w
 Soap Carvings	$HC,"<center><img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
 CottonTail	$HC,"<center><img src=\"http://www.templeos.org/images/CttnTail.jpg\" width=\"644\" height=\"1113\" alt=\"\"></center>"$
 TempleOS Logo	$HC,"<center><img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\"></center>"$
+Pew Pew Pew	$HC,"<center><img src=\"http://i.imgur.com/sMpJ0ch.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
+Iceberg		$HC,"<center><img src=\"https://upload.wikimedia.org/wikipedia/commons/3/38/Blue_ice_in_South_Greenland_-_Visit_Greenland.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
+I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\" height=\"800\" alt=\"\"></center>"$
+NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
 $TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
+$TX,"Graphic Technologies",HTML="https://web.archive.org/web/20020811060541/http://www.graphic-technologies.com/"$	$TX,"Lexmark vs Static Control",HTML="https://en.wikipedia.org/wiki/Lexmark_International,_Inc._v._Static_Control_Components,_Inc."$
 
 
 $FG,5$$TX+CX,"Web Bookmarks"$$FG$
@@ -422,12 +424,16 @@ $TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?
 $TX,"The sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-newton-list-of-sins"$
 $TX,"Stalin's Tanks",HTML="https://boardgamegeek.com/boardgame/5198/stalins-tanks"$
 $TX,"Lamp shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
+$TX,"The Original Jewish Temple",HTML="http://www.jewishvirtuallibrary.org/jsource/Judaism/The_Temple.html"$
 $TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
 $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
 $TX,"Dwight: Nerd torture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
+$TX,"TOSZ Compression",HTML="http://www.templeos.org/Wb/Linux/TOSZ.CPP"$
 $TX,"ATA/ATAPI spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
 
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
+$TX,"NIST Beacon",HTML="http://www.nist.gov/itl/csd/ct/nist_beacon.cfm"$
+$TX,"The Perfect Coin Toss",HTML="http://hackaday.com/2014/12/19/nist-randomness-beacon"$
 $TX,"BBC",HTML="http://www.knpr.org"$
 $TX,"KNPR",HTML="http://www.knpr.org"$
 $TX,"BBC_News_24",HTML="http://www.wherever.tv/tv-channels/BBC-News-24.jsf"$

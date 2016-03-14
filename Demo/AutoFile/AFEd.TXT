@@ -99,7 +99,7 @@
 
 #define IC_JMP			0x52
 #define IC_SWITCH		0x53
-#define IC_NOBOUND_SWITCH	0x54
+#define IC_NOBOUND_SWITCH		0x54
 
 #define IC_ADD_RSP		0x55
 #define IC_ADD_RSP1		0xC1

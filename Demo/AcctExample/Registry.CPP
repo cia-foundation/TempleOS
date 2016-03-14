@@ -2,7 +2,7 @@ $TR-UL,"Adam"$
 $ID,2$$TR,"SysMsgFlags"$
 $ID,2$sys_msg_flags[0]=0xFF;
 $ID,-2$$TR,"SysRegVer"$
-$ID,2$registry_version=4.030;
+$ID,2$registry_version=4.040;
 $ID,-2$$ID,-2$$TR-UL,"TempleOS"$
 $ID,2$$TR,"TOS"$
 $ID,2$I64 tos_code_walk_thru=105,tos_after_egypt_in_action=46;
@@ -39,7 +39,7 @@ $ID,-2$$TR,"BomberGolf"$
 $ID,2$I64 best_score=175;
 $ID,-2$$ID,-2$$TR,"DemoCompany"$
 $ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=166.32939;
+$ID,2$F64 best_score=1344.86889;
 $TR,"SimpleVal"$
-$ID,2$1298;
+$ID,2$1300;
 $ID,-2$$ID,-2$$ID,-2$

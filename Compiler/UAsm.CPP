@@ -95,7 +95,7 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 	if (m=o1-o2)
 	  goto ief_compare_done;
       } else
-	nobound_switch (tempi->uasm_slash_val) {
+	switch [tempi->uasm_slash_val] {
 	  case 0...7:
 	    if (!(m=ip[n]>>3&7-tempi->slash_val)) {
 	      if ((Bt(&uasm.mem_arg_mask,a1) || Bt(&uasm.mem_arg_mask,a2)) &&

@@ -2,6 +2,10 @@
 
 #define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
 #define PERSONAL_INITIALS	"TAD"
+#define BLOG_BASE		"/Home/Web/" PERSONAL_INITIALS "/Blog"
+#define DAILY_BASE		"/Home/Web/" PERSONAL_INITIALS "/DailyBlog"
+#define BLOG_LOCAL_BASE		"::" BLOG_BASE
+#define BLOG_WEB_BASE		PERSONAL_WEB BLOG_BASE
 
 #define SLOP	BLK_SIZE
 U0 TOSBootRescueDrv1()

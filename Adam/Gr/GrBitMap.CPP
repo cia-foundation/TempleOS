@@ -44,7 +44,7 @@ public Bool GrPlot0(CDC *dc=gr.dc,I64 x,I64 y)
     }
   }
   dst=dc->body+d;
-  nobound_switch (color.c0.rop) {
+  switch [color.c0.rop] {
     case ROPB_EQU:
     case ROPB_MONO:
       *dst=color.c0.color;
@@ -733,7 +733,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 	  src=font_ptr;
 	  if (bit_shift)
 	    src--;
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      for (j=h2-h1;j;j--) {
@@ -763,7 +763,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 	  src=font_ptr+1;
 	  if (bit_shift)
 	    src--;
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      for (j=h2-h1;j;j--) {
@@ -792,7 +792,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 	  src=font_ptr;
 	  if (bit_shift)
 	    src--;
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      for (j=h1;j<h2;j++) {
@@ -826,7 +826,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 	  src=font_ptr+1;
 	  if (bit_shift)
 	    src--;
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      for (j=h1;j<h2;j++) {
@@ -1047,7 +1047,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	    color.c0=dither_colors.c1;
 	  else
 	    color.c0=dither_colors.c0;
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      if (win_z_buf_ptr) {
@@ -1163,7 +1163,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	} else {
 	  if (((x+w1-original_leading_pixels)^(y+h1))&1)
 	    SwapU16(&color.c0,&color.c1);
-	  nobound_switch (color.c0.rop) {
+	  switch [color.c0.rop] {
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      if (win_z_buf_ptr) {
@@ -1271,7 +1271,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	}
       } else {
 	color_mask=gr.to_8_colors[color.c0.color];
-	nobound_switch (color.c0.rop) {
+	switch [color.c0.rop] {
 	  case ROPB_EQU:
 	  case ROPB_MONO:
 	    if (win_z_buf_ptr) {
@@ -1537,7 +1537,7 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  if ((x3^y3)&1)
 	    c=color.c1.color;
       }
-      nobound_switch (color.c0.rop) {
+      switch [color.c0.rop] {
 	case ROPB_EQU:
 	case ROPB_MONO:
 	  *dst=c;
@@ -1614,7 +1614,7 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  if ((x3^y3)&1)
 	    c=color.c1.color;
       }
-      nobound_switch (color.c0.rop) {
+      switch [color.c0.rop] {
 	case ROPB_EQU:
 	case ROPB_MONO:
 	  *dst=c;
@@ -1765,7 +1765,7 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
       if (plot) {
 	dst=dc->body+d;
 	c=color.c0.color;
-	nobound_switch (color.c0.rop) {
+	switch [color.c0.rop] {
 	  case ROPB_EQU:
 	  case ROPB_MONO:
 	    *dst=c;

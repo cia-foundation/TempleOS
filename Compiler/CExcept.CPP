@@ -140,10 +140,10 @@ U0 ICClassPut(CHashClass *c)
 
 U0 ICArgPut(CICArg *a)
 {
-  if (a->type_pointed)
+  if (a->type_pointed_to)
     "%Z %Z %Z ",
 	  a->type&RT_MASK,"ST_RAW_TYPES",
-	  a->type_pointed&RT_MASK,"ST_RAW_TYPES",
+	  a->type_pointed_to&RT_MASK,"ST_RAW_TYPES",
 	  a->type>>4,"ST_TY_TYPES";
   else
     "%Z %Z ",

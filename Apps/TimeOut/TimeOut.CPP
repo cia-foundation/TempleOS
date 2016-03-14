@@ -596,9 +596,9 @@ U0 TimeOut()
 	x+=Fs->pix_width;
 
 	//It takes too much CPU do do all these all the time.
-      nobound_switch (main_loop_pass&7) {
+      switch [main_loop_pass&7] {
 	case 0:
-	  nobound_switch (main_loop_pass>>3&7) {
+	  switch [main_loop_pass>>3&7] {
 	    case 0:
 	      if (--y<20)
 		game_over=TRUE;

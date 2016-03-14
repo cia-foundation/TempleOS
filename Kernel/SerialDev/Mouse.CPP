@@ -75,27 +75,11 @@ Bool MouseRst()
     catch
       Fs->catch_except=TRUE;
 
-    KbdMouseCmdAck(0xF3);
-    KbdMouseCmdAck(200);
-    KbdMouseCmdAck(0xF3); // enable Mouse
-    KbdMouseCmdAck(100); // Set Rate
-    KbdMouseCmdAck(0xF3);
-    KbdMouseCmdAck(80); //Resolution
-
-    MouseGetDevType; // enable Mouse
-
-    KbdMouseCmdAck(0xF3);
-    KbdMouseCmdAck(10);
-    MouseGetDevType; // enable Mouse
-
-    KbdMouseCmdAck(0xE8); //Resolution
-    KbdMouseCmdAck(0x03);
-    KbdMouseCmdAck(0xE6);
-
-    KbdMouseCmdAck(0xF3); // Set Rate
-    KbdMouseCmdAck(100);
-
-    KbdMouseCmdAck(0xF4); // enable Mouse
+    KbdMouseCmdAck(0xF3,200,0xF3,100,0xF3,80);
+    MouseGetDevType;
+    KbdMouseCmdAck(0xF3,10);
+    MouseGetDevType;
+    KbdMouseCmdAck(0xE8,0x03,0xE6,0xF3,100,0xF4);
     result=TRUE;
 
     //Enable IRQ 12
@@ -263,9 +247,7 @@ U0 KbdMouseHandler(Bool poll_kbd,Bool poll_mouse)
   if (kbd.rst)
     KbdMouseRst;
   else {
-    if (poll_mouse &&
-	  mouse.installed &&
-	  !mouse.irqs_working) {
+    if (poll_mouse && mouse.installed && !mouse.irqs_working) {
       PUSHFD
       CLI
       while (InU8(KBD_CTRL)&1)

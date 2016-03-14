@@ -22,12 +22,12 @@ U0 DocDelToNum(CDoc *doc,I64 num)
   }
 }
 
-U0 DocDelToEntry(CDoc *doc,CDocEntry *clear_entry)
+U0 DocDelToEntry(CDoc *doc,CDocEntry *clear_entry,Bool clear_holds)
 {
   CDocEntry *doc_e=doc->root.next,*doc_e2;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
-    if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
+    if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))||clear_holds) {
       if (doc_e==doc->cur_entry) {
 	doc->cur_entry=doc_e2;
 	doc->cur_col=doc_e2->min_col;
@@ -117,14 +117,17 @@ public U0 DocBottom(CDoc *doc=NULL)
     DocUnlock(doc);
 }
 
-public U0 DocClear(CDoc *doc=NULL)
+public U0 DocClear(CDoc *doc=NULL,Bool clear_holds=FALSE)
 {//Clear all doc entries, except +H, hold entries.
   Bool unlock;
   if (!doc && !(doc=DocPut))
     return;
   unlock=DocLock(doc);
   DocBottom(doc);
-  DocPrint(doc,"$$CL$$");
+  if (clear_holds)
+    DocPrint(doc,"$$CL+H$$");
+  else
+    DocPrint(doc,"$$CL$$");
   DocRecalc(doc);
   if (unlock)
     DocUnlock(doc);
@@ -171,7 +174,7 @@ public U0 DocCollapse(Bool collapse=TRUE,CDoc *doc=NULL)
 
 #help_index "DolDoc/Cmd Line (Typically);Cmd Line (Typically)"
 public I64 DocMax(I64 i=MAX_I64)
-{//Set max document entries. (Cmd line buffer.)
+{//Set max document entries. (Cmd line buffer size.)
 //Adjusts the size of the cmd line buf.
   //Normally, the cmd line deletes entries
   //when more are added and the old scroll up.

@@ -184,7 +184,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
   while (tempa) {
     tempa1=tempa->next;
     ptr=ip2+tempa->ip;
-    nobound_switch (tempa->type) {
+    switch [tempa->type] {
       case AAT_ADD_U8:	*ptr(U8 *) +=ip2; break;
       case AAT_SUB_U8:	*ptr(U8 *) -=ip2; break;
       case AAT_ADD_U16:	*ptr(U16 *)+=ip2; break;
@@ -250,7 +250,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 	}
 	if (tempex || g_lb) {
 	  ptr=tempie->ip+ip2;
-	  nobound_switch (tempie->type) {
+	  switch [tempie->type] {
 	    case IET_REL_I0:
 	    case IET_IMM_U0:
 	      break;
@@ -313,7 +313,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
     tempa1=tempa->next;
     tempa->next=aotc->abss;
     ptr=tempaot->buf+tempaot->ip+tempa->ip;
-    nobound_switch (tempa->type) {
+    switch [tempa->type] {
       case AAT_ADD_U8:	*ptr(U8 *)+=ip2;	break;
       case AAT_SUB_U8:	*ptr(U8 *)-=ip2;	break;
       case AAT_ADD_U16:	*ptr(U16 *)+=ip2;	break;
@@ -350,7 +350,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
     ptr=tempaot->buf+tempaot->ip+tempie->ip;
     if (g_lb) {
       i=g_lb->addr+tempaot->buf;
-      nobound_switch (tempie->type) {
+      switch [tempie->type] {
 	case IET_REL_I0:
 	case IET_IMM_U0:
 	  break;

@@ -2,7 +2,19 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----02/10/16 13:51:44----$IV,0$
+$IV,1$----03/14/16 05:57:27----$IV,0$
+* $BK,1$TempleOS version 4.04 Released$BK,0$
+* Changed $FG,2$nobound_switch$FG$ so it uses [].
+* Changed $LK,"KbdMouseCmdAck",A="MN:KbdMouseCmdAck"$().
+
+$IV,1$----02/19/16 18:48:51----$IV,0$
+* Fixed bug in $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
+
+$IV,1$----02/15/16 23:31:15----$IV,0$
+* Improved $LK,"::/Demo/Games/RawHide.CPP"$.
+
+$IV,1$----02/13/16 17:02:34----$IV,0$
+* Added $FG,2$$$CL+H$$$FG$ to clear all, including hold entries.
 
 $IV,1$----02/10/16 08:56:49----$IV,0$
 * Improved $FG,2$<CTRL-l>$FG$ prompting.

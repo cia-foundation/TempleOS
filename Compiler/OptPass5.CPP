@@ -51,14 +51,14 @@ U0 OptPass5(CCmpCtrl *cc)
 	    ty=ty1;
 	  tempi->a2.type=tempi1->a1.type&TY_MASK+ty;
 
-	  pt=tempi->a2.type_pointed;
-	  pt1=tempi1->a1.type_pointed;
+	  pt=tempi->a2.type_pointed_to;
+	  pt1=tempi1->a1.type_pointed_to;
 	  if (pt1 && pt1<pt && pt!=RT_F64)
 	    pt=pt1;
-	  pt1=tempi1->r.type_pointed;
+	  pt1=tempi1->r.type_pointed_to;
 	  if (pt1 && pt1<pt && pt!=RT_F64)
 	    pt=pt1;
-	  tempi->a2.type_pointed=pt;
+	  tempi->a2.type_pointed_to=pt;
 
 	  tempi->a2.reg=tempi1->a1.reg;
 	  tempi->a2.disp=tempi1->a1.disp;
@@ -95,14 +95,14 @@ U0 OptPass5(CCmpCtrl *cc)
 	    ty=ty1;
 	  tempi->a1.type=tempi1->a1.type&TY_MASK+ty;
 
-	  pt=tempi->a1.type_pointed;
-	  pt1=tempi1->a1.type_pointed;
+	  pt=tempi->a1.type_pointed_to;
+	  pt1=tempi1->a1.type_pointed_to;
 	  if (pt1 && pt1<pt && pt!=RT_F64)
 	    pt=pt1;
-	  pt1=tempi1->r.type_pointed;
+	  pt1=tempi1->r.type_pointed_to;
 	  if (pt1 && pt1<pt && pt!=RT_F64)
 	    pt=pt1;
-	  tempi->a1.type_pointed=pt;
+	  tempi->a1.type_pointed_to=pt;
 
 	  tempi->a1.reg=tempi1->a1.reg;
 	  tempi->a1.disp=tempi1->a1.disp;

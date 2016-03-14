@@ -397,17 +397,17 @@ U0 ICPreIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
   if (tempi->ic_flags & ICF_NOT_ADDR) {
     if (tempc->ptr_stars_cnt && tempc1->size!=1) {
       ICAddSubEctImm(tempi,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,tempc1->size,op.u16[3],ip);
     } else
       ICSlashOp(tempi,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,op,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
   } else {
     if (tempi->a1.type&TY_MASK==TY_REG)
@@ -419,15 +419,15 @@ U0 ICPreIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
     }
     if (tempc->ptr_stars_cnt &&
 	  tempc1->size!=1) {
-      ICAddSubEctImm(tempi,TY_DISP+tempi->a1.type_pointed,r,0,
-	    TY_DISP+tempi->a1.type_pointed,r,0,
+      ICAddSubEctImm(tempi,TY_DISP+tempi->a1.type_pointed_to,r,0,
+	    TY_DISP+tempi->a1.type_pointed_to,r,0,
 	    tempc1->size,op.u16[3],ip);
     } else
       ICSlashOp(tempi,
-	    TY_DISP+tempi->a1.type_pointed,r,0,op,ip);
+	    TY_DISP+tempi->a1.type_pointed_to,r,0,op,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    TY_DISP+tempi->a1.type_pointed,r,0,ip);
+	    TY_DISP+tempi->a1.type_pointed_to,r,0,ip);
   }
 }
 
@@ -438,17 +438,17 @@ U0 ICPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
   if (tempi->ic_flags & ICF_NOT_ADDR) {
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
     if (tempc->ptr_stars_cnt &&	tempc1->size!=1)
       ICAddSubEctImm(tempi,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,tempc1->size,op.u16[3],ip);
     else
       ICSlashOp(tempi,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed,
+	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,op,ip);
   } else {
     if (tempi->a1.type&TY_MASK==TY_REG &&
@@ -461,12 +461,12 @@ U0 ICPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
     }
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    TY_DISP+tempi->a1.type_pointed,r,0,ip);
+	    TY_DISP+tempi->a1.type_pointed_to,r,0,ip);
     if (tempc->ptr_stars_cnt &&	tempc1->size!=1)
-      ICAddSubEctImm(tempi,TY_DISP+tempi->a1.type_pointed,r,0,
-	    TY_DISP+tempi->a1.type_pointed,r,0,tempc1->size,op.u16[3],ip);
+      ICAddSubEctImm(tempi,TY_DISP+tempi->a1.type_pointed_to,r,0,
+	    TY_DISP+tempi->a1.type_pointed_to,r,0,tempc1->size,op.u16[3],ip);
     else
-      ICSlashOp(tempi,TY_DISP+tempi->a1.type_pointed,r,0,op,ip);
+      ICSlashOp(tempi,TY_DISP+tempi->a1.type_pointed_to,r,0,op,ip);
   }
 }
 
@@ -475,8 +475,8 @@ U0 ICDerefPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
   I64 t,r;
   CHashClass *tempc1=tempi->ic_class;
   t=tempi->r.type&RT_MASK;
-  if (t>tempi->a1.type_pointed)
-    t=tempi->a1.type_pointed;
+  if (t>tempi->a1.type_pointed_to)
+    t=tempi->a1.type_pointed_to;
   if (tempi->ic_flags & ICF_NOT_ADDR) {
     if (tempi->a1.type&TY_MASK==TY_REG)
       r=tempi->a1.reg;
@@ -526,7 +526,7 @@ U0 ICAssignPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
 	    tempi->a1.type&TY_MASK+RT_I64,tempi->a1.reg,tempi->a1.disp,ip);
       r=REG_RDX;
     }
-    ICMov(tempi,TY_DISP+tempi->a1.type_pointed,r,0,
+    ICMov(tempi,TY_DISP+tempi->a1.type_pointed_to,r,0,
 	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
@@ -540,7 +540,7 @@ U0 ICAssignPostIncDec(CIntermediateCode *tempi,I64 op,I64 ip)
     ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
 	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
     ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,TY_DISP+RT_I64,REG_RDX,0,ip);
-    ICMov(tempi,TY_DISP+tempi->a1.type_pointed,REG_RCX,0,
+    ICMov(tempi,TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,
 	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
     if (tempi->r.type&TY_MASK)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
