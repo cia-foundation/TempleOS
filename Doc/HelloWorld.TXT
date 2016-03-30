@@ -58,7 +58,7 @@ asm {
 _HELLO_WORLD::
 //You can only clobber RAX,RBX,RCX,RDX
 	MOV	RAX,'Hello '
-	CALL	PUT_CHARS //Up to 8 chars packed into one 64-bit integer.
+	CALL	PUT_CHARS //Up to 8 chars packed into one 64-bit int.
 	MOV	RAX,'World\n'
 	CALL	PUT_CHARS
 	RET

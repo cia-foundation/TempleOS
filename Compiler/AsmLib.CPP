@@ -30,8 +30,7 @@ U0 AOTStoreCodeU8(CCmpCtrl *cc,U8 b)
 U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64	i=aotc->ip>>AOT_BIN_BLK_BITS,
-	j=(aotc->ip+sizeof(U32))>>AOT_BIN_BLK_BITS;
+  I64 i=aotc->ip>>AOT_BIN_BLK_BITS,j=(aotc->ip+sizeof(U32))>>AOT_BIN_BLK_BITS;
   U32 *_d;
   CAOTBinBlk *tempbin;
   if (i!=j)
@@ -69,8 +68,7 @@ U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
 U0 AOTStoreCodeU64(CCmpCtrl *cc,U64 q)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64	i=aotc->ip>>AOT_BIN_BLK_BITS,
-	j=(aotc->ip+sizeof(I64))>>AOT_BIN_BLK_BITS,
+  I64 i=aotc->ip>>AOT_BIN_BLK_BITS,j=(aotc->ip+sizeof(I64))>>AOT_BIN_BLK_BITS,
 	*_q;
   CAOTBinBlk *tempbin;
   if (i!=j)
@@ -139,7 +137,7 @@ I64 AsmLexExpression(CCmpCtrl *cc)
     if (cc->abs_cnts.externs)
       LexExcept(cc,"Extern Not Allowed at ");
     if (cc->flags & CCF_UNRESOLVED)
-      LexExcept(cc,"undefined sym at ");
+      LexExcept(cc,"Undefined sym at ");
     result=Call(machine_code);
     Free(machine_code);
   }

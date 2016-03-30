@@ -2,7 +2,7 @@ CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
 {
   CHashClass *tempc,*base_class;
   if (cc->token!=TK_IDENT)
-    LexExcept(cc,"expecting identifier at ");
+    LexExcept(cc,"Expecting identifier at ");
   if (is_extern) {
     tempc=PrsClassNew;
     tempc->str=cc->cur_str;
@@ -50,7 +50,7 @@ CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
     if (Lex(cc)==':') {
       if (Lex(cc)!=TK_IDENT || !(base_class=cc->hash_entry) ||
 	    !(base_class->type&HTT_CLASS))
-	LexExcept(cc,"invalid class at ");
+	LexExcept(cc,"Invalid class at ");
       if (Lex(cc)==',')
 	LexExcept(cc,"Only one base class allowed at this time at ");
       tempc->base_class=base_class;
@@ -91,7 +91,7 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,
   } else
     tempf=NULL;
   if (tempf) {
-    tempf->used_reg_mask=REGG_C_CLOBBERED+REGG_SAVED+REGG_C_TEMP_CLOBBERED;
+    tempf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TEMP;
     Free(tempf->src_link);
     tempf->src_link=NULL;
     Free(tempf->index);
@@ -100,8 +100,8 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,
     MemberLstDel(tempf);
   } else {
     tempf=PrsFunNew;
-    tempf->used_reg_mask=REGG_C_CLOBBERED+REGG_SAVED+REGG_C_TEMP_CLOBBERED;
-    tempf->clobbered_reg_mask=REGG_C_CLOBBERED+REGG_C_TEMP_CLOBBERED;
+    tempf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TEMP;
+    tempf->clobbered_reg_mask=REGG_CLOBBERED+REGG_STK_TEMP;
     tempf->str=name;
     if (cc->flags&CCF_AOT_COMPILE)
       tempf->executable_addr=aotc->ip;
@@ -214,9 +214,8 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
   while (TRUE) {
     tempc=PrsType(cc,&saved_tempc,&saved_mode,NULL,&st,
 	  &tempf_fun_ptr,&tempex,&tempad,fsp_flags);
-    if (!st)
-      return;
 
+    if (!st) return;
     if (tempad.next)
       is_array=TRUE;
     else if (tempad.total_cnt<0) {
@@ -228,7 +227,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
     val=saved_val;
     mode=saved_mode;
     if (tempex && mode&255==PRS0_EXTERN && !(cc->flags&CCF_AOT_COMPILE) &&
-	  tempex->type & HTT_EXPORT_SYS_SYM) {
+	  tempex->type&HTT_EXPORT_SYS_SYM) {
       val=tempex->val;
       mode=PRS0__EXTERN|PRS1_NULL;
     }
@@ -352,7 +351,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	      tempg->type=HTT_GLBL_VAR | HTF_EXPORT;
 	      if (tempex && tempex->type & HTT_GLBL_VAR)
 		has_alias=TRUE;
-	      if (sys_var_init_flag&1)
+	      if (sys_var_init_flag)
 		for (k=0;k<j;k++)
 		  AOTStoreCodeU8(cc,sys_var_init_val);
 	      else
@@ -373,7 +372,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 		  tempex->type&HTF_UNRESOLVED &&
 		  MHeapCtrl(tempex)==MHeapCtrl(tempg))
 	      has_alias=TRUE;
-	    if (sys_var_init_flag&1)
+	    if (sys_var_init_flag)
 	      MemSet(tempg->data_addr,sys_var_init_val,j);
 	  }
       }
@@ -413,14 +412,14 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	  if (temphg)
 	    temphg->size=tempg->size;
 	  if (cc->flags&CCF_AOT_COMPILE) {
-	    if (sys_var_init_flag&1)
+	    if (sys_var_init_flag)
 	      for (k=0;k<tempg->size;k++)
 		AOTStoreCodeU8(cc,sys_var_init_val);
 	    else
 	      for (k=0;k<tempg->size;k++)
 		AOTStoreCodeU8(cc,0);
 	  } else
-	    if (sys_var_init_flag&1)
+	    if (sys_var_init_flag)
 	      MemSet(tempg->data_addr,sys_var_init_val,k);
 	  LexPopRestore(cc);
 	}
@@ -445,7 +444,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	Lex(cc);
       else {
 	if (cc->token!=';')
-	  LexExcept(cc,"missing ';' at");
+	  LexExcept(cc,"Missing ';' at");
 	Lex(cc);
 	return;
       }
@@ -458,12 +457,12 @@ U0 PrsIf(CCmpCtrl *cc,I64 try_cnt,CCodeMisc *lb_break)
   CCodeMisc *lb,*lb1;
   I64 k;
   if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc);
   if (!PrsExpression(cc,NULL,FALSE))
     throw('Compiler');
   if (cc->token!=')')
-    LexExcept(cc,"missing ')' at ");
+    LexExcept(cc,"Missing ')' at ");
   Lex(cc);
   lb=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_BR_ZERO,lb,0);
@@ -484,14 +483,14 @@ U0 PrsWhile(CCmpCtrl *cc,I64 try_cnt)
 {
   CCodeMisc *lb,*lb_done;
   if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc);
   lb=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_LABEL,lb,0);
   if (!PrsExpression(cc,NULL,FALSE))
     throw('Compiler');
   if (cc->token!=')')
-    LexExcept(cc,"missing ')' at ");
+    LexExcept(cc,"Missing ')' at ");
   Lex(cc);
   lb_done=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_BR_ZERO,lb_done,0);
@@ -508,18 +507,18 @@ U0 PrsDoWhile(CCmpCtrl *cc,I64 try_cnt)
   ICAdd(cc,IC_LABEL,lb,0);
   PrsStmt(cc,try_cnt,lb_done);
   if (PrsKeyWord(cc)!=KW_WHILE)
-    LexExcept(cc,"missing 'while' at");
+    LexExcept(cc,"Missing 'while' at");
   if (Lex(cc)!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc);
   if (!PrsExpression(cc,NULL,FALSE))
     throw('Compiler');
   if (cc->token!=')')
-    LexExcept(cc,"missing ')' at ");
+    LexExcept(cc,"Missing ')' at ");
   ICAdd(cc,IC_BR_NOT_ZERO,lb,0);
   ICAdd(cc,IC_LABEL,lb_done,0);
   if (Lex(cc)!=';')
-    LexExcept(cc,"missing ';' at");
+    LexExcept(cc,"Missing ';' at");
   Lex(cc);
 }
 
@@ -529,7 +528,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   CCodeMisc *lb,*lb_done;
 
   if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc);
   PrsStmt(cc,try_cnt);
 
@@ -540,7 +539,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   lb_done=COCMiscNew(cc,CMT_LABEL);
   ICAdd(cc,IC_BR_ZERO,lb_done,0);
   if (cc->token!=';')
-    LexExcept(cc,"missing ';' at");
+    LexExcept(cc,"Missing ';' at");
   Lex(cc);
 
   COCPush(cc);
@@ -551,7 +550,7 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   tempcbh=COCPopNoFree(cc);
   COCPop(cc);
   if (cc->token!=')')
-    LexExcept(cc,"missing ')' at ");
+    LexExcept(cc,"Missing ')' at ");
   Lex(cc);
 
   PrsStmt(cc,try_cnt,lb_done);
@@ -586,7 +585,7 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
   else if (cc->token=='[')
     nobound=TRUE;
   else
-    LexExcept(cc,"expecting '(' or '[' at ");
+    LexExcept(cc,"Expecting '(' or '[' at ");
   Lex(cc);
   QueInit(&root);
 
@@ -605,14 +604,14 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
   if (nobound) {
     ICAdd(cc,IC_NOBOUND_SWITCH,mc_jt,0);
     if (cc->token!=']')
-      LexExcept(cc,"missing ']' at ");
+      LexExcept(cc,"Missing ']' at ");
   } else {
     ICAdd(cc,IC_SWITCH,mc_jt,0);
     if (cc->token!=')')
-      LexExcept(cc,"missing ')' at ");
+      LexExcept(cc,"Missing ')' at ");
   }
   if (Lex(cc)!='{')
-    LexExcept(cc,"expecting '{' at ");
+    LexExcept(cc,"Expecting '{' at ");
   Lex(cc);
   ICAdd(cc,IC_LABEL,mc_jt->begin,0);
   while (TRUE) {
@@ -625,7 +624,7 @@ sw_cont:
 	  if (Lex(cc)==':')
 	    Lex(cc);
 	  else
-	    LexExcept(cc,"expecting ':' at ");
+	    LexExcept(cc,"Expecting ':' at ");
 	  tempss=MAlloc(sizeof(CSubSwitch));
 	  QueIns(tempss,root.last);
 	  root.last->lb_break=COCMiscNew(cc,CMT_LABEL);
@@ -707,10 +706,11 @@ sw_cont:
 		temps->next=header;
 		header=temps;
 	      }
+	      k_start=k_end;
 	    } else
-	      LexExcept(cc,"expecting ':' at ");
+	      LexExcept(cc,"Expecting ':' at ");
 	  } else
-	    LexExcept(cc,"expecting ':' at ");
+	    LexExcept(cc,"Expecting ':' at ");
 	  break;
 	case KW_DFT:
 	  if (root.next!=&root) {
@@ -722,7 +722,7 @@ sw_cont:
 	  if (cc->token==':')
 	    Lex(cc);
 	  else
-	    LexExcept(cc,"expecting ':' at ");
+	    LexExcept(cc,"Expecting ':' at ");
 	  if (root.next!=&root) {
 	    tempss=root.next;
 	    while (tempss!=&root) {
@@ -743,18 +743,18 @@ sw_sub_end:
     ICAdd(cc,IC_LABEL,tempss->lb_break,0);
     if (tempss==&root) {
       if (cc->token!='}')
-	LexExcept(cc,"missing '}' at ");
+	LexExcept(cc,"Missing '}' at ");
       Lex(cc);
       break;
     } else {
       QueRem(tempss);
       Free(tempss);
       if (PrsKeyWord(cc)!=KW_SUB_SWITCH_END)
-	LexExcept(cc,"missing 'sub_switch_end' at ");
+	LexExcept(cc,"Missing 'sub_switch_end' at ");
       if (Lex(cc)==':')
 	Lex(cc);
       else
-	LexExcept(cc,"expecting ':' at ");
+	LexExcept(cc,"Expecting ':' at ");
     }
   }
   if (!dft_found)
@@ -789,12 +789,12 @@ U0 PrsNoUnusedWarn(CCmpCtrl *cc)
   CMemberLst *tempm;
   while (cc->token==TK_IDENT) {
     if (!(tempm=cc->local_var_entry))
-      LexExcept(cc,"expecting local var at ");
+      LexExcept(cc,"Expecting local var at ");
     tempm->flags|=MLF_NO_UNUSED_WARN;
     if (Lex(cc)==',')
       Lex(cc);
     else if (cc->token!=';')
-      LexExcept(cc,"expecting ',' at ");
+      LexExcept(cc,"Expecting ',' at ");
   }
 }
 
@@ -817,7 +817,7 @@ U0 PrsStreamBlk(CCmpCtrl *cc)
   if (cc->token=='{')
     Lex(cc);
   else
-    LexExcept(cc,"missing '}' at ");
+    LexExcept(cc,"Missing '}' at ");
   while (cc->token && cc->token!='}')
     ExeCmdLine(cc);
 
@@ -888,7 +888,7 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   ICAdd(cc,IC_JMP,lb_done,0);
 
   if (PrsKeyWord(cc)!=KW_CATCH)
-    LexExcept(cc,"missing 'catch' at");
+    LexExcept(cc,"Missing 'catch' at");
 
   Lex(cc);
   ICAdd(cc,IC_LABEL,lb_catch,0);
@@ -995,26 +995,26 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		    if (cc->flags&CCF_AOT_COMPILE) {
 		      if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			    !(tempex->type & HTT_EXPORT_SYS_SYM))
-			LexExcept(cc,"expecting System sym at ");
+			LexExcept(cc,"Expecting System sym at ");
 		      i=tempex->val;
 		      Lex(cc);
 		    } else
 		      i=LexExpressionI64(cc);
 		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0__EXTERN|PRS1_NULL,tempex,i,fsp_flags);
 		    break;
 		  case KW__IMPORT:
 sm_underscore_import:
 		    if (cc->token!=TK_IDENT)
-		      LexExcept(cc,"expecting System sym at ");
+		      LexExcept(cc,"Expecting System sym at ");
 		    import_name=cc->cur_str;
 		    cc->cur_str=0;
 		    if (Lex(cc)!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0__IMPORT|PRS1_NULL,tempex,
 			  import_name,FALSE);
@@ -1022,7 +1022,7 @@ sm_underscore_import:
 		    break;
 		  case KW_EXTERN:
 		    if (cc->token!=TK_IDENT)
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 		    tempex=cc->hash_entry;
 		    i=PrsKeyWord(cc);
 		    if (i==KW_CLASS||i==KW_UNION) {
@@ -1033,7 +1033,7 @@ sm_underscore_import:
 		    }
 		    if (!tempex ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 		    if (Bt(&cc->opts,OPTf_EXTERNS_TO_IMPORTS))
 		      goto sm_import;
 		    Lex(cc);
@@ -1042,7 +1042,7 @@ sm_underscore_import:
 		  case KW_IMPORT:
 		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 sm_import:
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0_IMPORT|PRS1_NULL,tempex,0,FALSE);
@@ -1051,7 +1051,7 @@ sm_import:
 		    i=LexExpressionI64(cc);
 		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-		      LexExcept(cc,"expecting type at ");
+		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0__INTERN|PRS1_NULL,tempex,i,fsp_flags);
 		    break;
@@ -1115,7 +1115,7 @@ sm_import:
 		  goto sm_semicolon;
 		case KW_GOTO:
 		  if (Lex(cc)!=TK_IDENT)
-		    LexExcept(cc,"expecting identifier at ");
+		    LexExcept(cc,"Expecting identifier at ");
 		  if (!(g_lb=COCGoToLabelFind(cc,cc->cur_str))) {
 		    g_lb=COCMiscNew(cc,CMT_GOTO_LABEL);
 		    g_lb->str=cc->cur_str;
@@ -1188,7 +1188,7 @@ sm_not_keyword_afterall:
 	    if (Lex(cc)==':') //skip cur_str
 	      Lex(cc); //skip colon
 	    else
-	      LexExcept(cc,"undefined identifier at ");
+	      LexExcept(cc,"Undefined identifier at ");
 	    if (!cc->htc.fun)
 	      LexExcept(cc,"No global labels at ");
 	    if (cc->token!=',') goto sm_done;
@@ -1205,7 +1205,7 @@ sm_semicolon:
 	    if (cc->token==';')
 	      Lex(cc);
 	    else if (cc->token!=',')
-	      LexExcept(cc,"missing ';' at");
+	      LexExcept(cc,"Missing ';' at");
 	  }
 	  if (cc->token!=',') goto sm_done;
 	} else

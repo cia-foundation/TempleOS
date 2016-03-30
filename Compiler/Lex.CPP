@@ -200,6 +200,7 @@ lgc_start2:
 		  goto lgc_done;
 		}
 		break;
+	      case DOCT_MARKER:
 	      case DOCT_CURSOR:
 		doc_e=doc_e->next;
 		goto lgc_start2;
@@ -529,7 +530,7 @@ lex_ident:
 	    } else {
 	      cc->cur_i64=i;
 	      cc->flags|=CCF_USE_LAST_U16;
-	      cc->token=TK_INTEGER;
+	      cc->token=TK_INT;
 	      goto lex_end;
 	    }
 	  }
@@ -543,7 +544,7 @@ lex_ident:
 	    else {
 	      cc->cur_i64=i;
 	      cc->flags|=CCF_USE_LAST_U16;
-	      cc->token=TK_INTEGER;
+	      cc->token=TK_INT;
 	      goto lex_end;
 	    }
 	  }
@@ -556,7 +557,7 @@ lex_ident:
 lex_is_int:
 	    cc->cur_i64=i;
 	    cc->flags|=CCF_USE_LAST_U16;
-	    cc->token=TK_INTEGER;
+	    cc->token=TK_INT;
 	    goto lex_end;
 	  }
 	  ch=LexGetChar(cc);

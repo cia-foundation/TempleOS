@@ -1,4 +1,4 @@
-/*"Fixed point" means you use integers
+/*"Fixed point" means you use ints
 that are scaled by a value.  A common
 example would be using number of pennies
 instead of dollars with a float.
@@ -9,7 +9,7 @@ floats.  It also depends on the compiler
 and my compiler used to do floats poorly.
 
 I often use 64-bit ints with upper 32-bits
-as integer and lower 32-bits as fraction.
+as int and lower 32-bits as fraction.
 
 See $LK,"::/Demo/SubIntAccess.CPP"$ for how
 to access upper or lower 32-bits.

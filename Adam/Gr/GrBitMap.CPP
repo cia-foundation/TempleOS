@@ -9,7 +9,7 @@ public Bool GrPlot0(CDC *dc=gr.dc,I64 x,I64 y)
 
   if (dc->flags & DCF_LOCATE_NEAREST) {
     dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
-    if (dist<dc->nearest_dist) {
+    if (dist<=dc->nearest_dist) {
       dc->nearest_dist=dist;
       dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
     }
@@ -102,7 +102,7 @@ public I64 GrBlot(CDC *dc=gr.dc,I64 x,I64 y,CDC *img)
   }
   if (dc->flags & DCF_LOCATE_NEAREST) {
     dist=DistSqrI64(x+img->width>>1,y+img->height>>1,dc->cur_x,dc->cur_y);
-    if (dist<dc->nearest_dist) {
+    if (dist<=dc->nearest_dist) {
       dc->nearest_dist=dist;
       dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
     }
@@ -669,7 +669,7 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
   }
   if (dc->flags & DCF_LOCATE_NEAREST) {
     dist=DistSqrI64(x+w2>>1,y+h2>>1,dc->cur_x,dc->cur_y);
-    if (dist<dc->nearest_dist) {
+    if (dist<=dc->nearest_dist) {
       dc->nearest_dist=dist;
       dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
     }
@@ -961,7 +961,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
       dist=0;
     else
       dist=DistSqrI64(x+w>>1,y+h>>1,dc->cur_x,dc->cur_y);
-    if (dist<dc->nearest_dist) {
+    if (dist<=dc->nearest_dist) {
       dc->nearest_dist=dist;
       dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
     }
@@ -1515,7 +1515,7 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  !not_color && c==dc->color2) && plot) {
       if (dc->flags & DCF_LOCATE_NEAREST) {
 	dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
-	if (dist<dc->nearest_dist) {
+	if (dist<=dc->nearest_dist) {
 	  dc->nearest_dist=dist;
 	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
 	}
@@ -1592,7 +1592,7 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  !not_color && c==dc->color2) && plot) {
       if (dc->flags & DCF_LOCATE_NEAREST) {
 	dist=DistSqrI64(x3,y3,dc->cur_x,dc->cur_y);
-	if (dist<dc->nearest_dist) {
+	if (dist<=dc->nearest_dist) {
 	  dc->nearest_dist=dist;
 	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
 	}
@@ -1721,7 +1721,7 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
     else
       dist=SqrI64(dc->cur_x-x2);
     dist+=SqrI64(y-dc->cur_y);
-    if (dist<dc->nearest_dist) {
+    if (dist<=dc->nearest_dist) {
       dc->nearest_dist=dist;
       dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
     }

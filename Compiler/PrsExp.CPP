@@ -203,7 +203,7 @@ pe_do_binary_op:
 	  tempc=OptClassFwd(tempi->ic_class);
 	  if (intermediate_code_table[tempi->ic_code].type!=IST_DEREF ||
 		!tempc->ptr_stars_cnt && !Bt(&tempc->flags,Cf_INTERNAL_TYPE))
-	    LexExcept(cc,"invalid lval at ");
+	    LexExcept(cc,"Invalid lval at ");
 	  tempi->ic_code=IC_NOP1; //Important for setting class (pretty sure)
 	  cur_op.u8[2]=PREC_ASSIGN|ASSOCF_RIGHT;
 	}
@@ -302,7 +302,7 @@ U0 PrsSizeOf(CCmpCtrl *cc)
   CDbgInfo *dbg_info;
   I64 i;
   if (cc->token!=TK_IDENT)
-    LexExcept(cc,"invalid class at ");
+    LexExcept(cc,"Invalid class at ");
   if (tempm=cc->local_var_entry) {
     tempc=tempm->member_class;
     i=tempc->size*tempm->dim.total_cnt;
@@ -312,7 +312,7 @@ U0 PrsSizeOf(CCmpCtrl *cc)
     if (!(tempc=cc->hash_entry) || !(tempc->type &
 	  (HTT_CLASS|HTT_INTERNAL_TYPE|HTT_GLBL_VAR|
 	  HTT_FUN|HTT_EXPORT_SYS_SYM)))
-      LexExcept(cc,"invalid class at ");
+      LexExcept(cc,"Invalid class at ");
     if (tempc->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
       if (!(dbg_info=tempc(CHashFun *)->dbg_info))
 	LexExcept(cc,"Size not defined at ");
@@ -324,11 +324,11 @@ U0 PrsSizeOf(CCmpCtrl *cc)
       while (Lex(cc)=='.') {
 pu_sizeof_member:
 	if (!(tempc->type & (HTT_CLASS|HTT_GLBL_VAR)))
-	  LexExcept(cc,"invalid class at ");
+	  LexExcept(cc,"Invalid class at ");
 	else if (tempc->type & HTT_GLBL_VAR)
 	  tempc=tempc(CHashGlblVar *)->var_class;
 	if (Lex(cc)!=TK_IDENT || !(tempm=MemberFind(cc->cur_str,tempc)))
-	  LexExcept(cc,"invalid member at ");
+	  LexExcept(cc,"Invalid member at ");
 	else if (cc->local_var_entry)
 	  cc->local_var_entry->use_cnt--;
 	tempc=tempm->member_class;
@@ -351,22 +351,22 @@ U0 PrsOffsetOf(CCmpCtrl *cc)
   CMemberLst *tempm;
   I64 i;
   if (cc->token!=TK_IDENT)
-    LexExcept(cc,"invalid class at ");
+    LexExcept(cc,"Invalid class at ");
   if (tempm=cc->local_var_entry)
     tempc=tempm->member_class;
   else {
     tempc=cc->hash_entry;
     if (!tempc || !(tempc->type & (HTT_CLASS|HTT_GLBL_VAR)))
-      LexExcept(cc,"invalid class at ");
+      LexExcept(cc,"Invalid class at ");
     else if (tempc->type & HTT_GLBL_VAR)
       tempc=tempc(CHashGlblVar *)->var_class;
   }
   if (Lex(cc)!='.')
-    LexExcept(cc,"expecting '.' at ");
+    LexExcept(cc,"Expecting '.' at ");
   i=0;
   do {
     if (Lex(cc)!=TK_IDENT || !(tempm=MemberFind(cc->cur_str,tempc)))
-      LexExcept(cc,"invalid member at ");
+      LexExcept(cc,"Invalid member at ");
     else if (cc->local_var_entry)
       cc->local_var_entry->use_cnt--;
     i+=tempm->offset;
@@ -437,13 +437,13 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 	if (cc->token==',')
 	  Lex(cc);
 	else if (cc->token!=';')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
       } else {
 	if (needs_right_paren) {
 	  if (cc->token==',')
 	    Lex(cc);
 	  else if (cc->token!=')')
-	    LexExcept(cc,"expecting ',' at ");
+	    LexExcept(cc,"Expecting ',' at ");
 	}
       }
     }
@@ -494,7 +494,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 	    if (cc->token==',')
 	      Lex(cc);
 	    else
-	      LexExcept(cc,"expecting ',' at ");
+	      LexExcept(cc,"Expecting ',' at ");
 	  }
 	  COCInit(cc);
 	  if (!PrsExpression(cc,NULL,FALSE,ps))
@@ -511,7 +511,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 	    if (cc->token==',')
 	      Lex(cc);
 	    else
-	      LexExcept(cc,"expecting ',' at ");
+	      LexExcept(cc,"Expecting ',' at ");
 	  }
 	  COCInit(cc);
 	  if (!PrsExpression(cc,NULL,FALSE,ps))
@@ -528,7 +528,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
     if (cc->token==')')
       Lex(cc);
     else
-      LexExcept(cc,"missing ')' at ");
+      LexExcept(cc,"Missing ')' at ");
   }
   tempcbh1=tempcbh->coc_next;
   tempcbh->coc_next=cc->coc.coc_next;
@@ -622,8 +622,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 		if (Bt(&tempf->flags,Cf_EXTERN)) {
 		  if (cc->flags&CCF_AOT_COMPILE) {
 		    if (cc->flags&CCF_ASM_EXPRESSIONS) {
-		      if (tempex=HashFind(
-			    tempf->str,cc->htc.hash_table_lst,
+		      if (tempex=HashFind(tempf->str,cc->htc.hash_table_lst,
 			    HTT_EXPORT_SYS_SYM))
 			goto pu_export_sys_sym;
 		      else
@@ -634,8 +633,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 		  cc->abs_cnts.externs++;
 		  ICAdd(cc,IC_IMM_I64,
 			&tempf->executable_addr,cmp.internal_types[RT_PTR]);
-		  ICAdd(cc,IC_DEREF,0,
-			cmp.internal_types[RT_PTR]);
+		  ICAdd(cc,IC_DEREF,0,cmp.internal_types[RT_PTR]);
 		} else {
 		  if (cc->flags&CCF_AOT_COMPILE) {
 		    ICAdd(cc,IC_ABS_ADDR,
@@ -673,7 +671,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       return PE_UNARY_TERM2;
 
     sub_switch_start:
-      case TK_INTEGER:
+      case TK_INT:
       case TK_CHAR_CONST:
       case TK_INS_BIN_SIZE:
 	if (cc->cur_i64<0)
@@ -737,7 +735,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	if (!paren_warn)
 	  *paren_prec=PREC_NULL;
 	if (cc->token!=')')
-	  LexExcept(cc,"missing ')' at ");
+	  LexExcept(cc,"Missing ')' at ");
 	Lex(cc); //skip )
 	cc->flags= cc->flags & ~CCF_ARRAY | CCF_RAX | CCF_PAREN;
 	return PE_UNARY_MODIFIERS;
@@ -782,7 +780,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	    i=PrsPop(ps);
 	    ps->ptr--;
 	    if (i.u16[0]!=IC_ADDR)
-	      LexExcept(cc,"expecting '&' at ");
+	      LexExcept(cc,"Expecting '&' at ");
 	    ICAdd(cc,IC_IMM_I64,tempm->offset,cmp.internal_types[RT_PTR]);
 	    *_local_var=tempm;
 	    Lex(cc);
@@ -805,7 +803,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 pu_ident_but_not_local_var:
       if (!(tempex=cc->hash_entry)) {
 	if (!(cc->flags & CCF_ASM_EXPRESSIONS))
-	  LexExcept(cc,"invalid lval at ");
+	  LexExcept(cc,"Invalid lval at ");
 	tempc=NULL;
 pu_new_sys_sym:
 	tempex=CAlloc(sizeof(CHashExport),Fs->code_heap);
@@ -912,7 +910,7 @@ pu_export_sys_sym:
 	      PrsSizeOf(cc);
 	      while (j--) {
 		if (cc->token!=')')
-		  LexExcept(cc,"missing ')' at ");
+		  LexExcept(cc,"Missing ')' at ");
 		Lex(cc);
 	      }
 	      return PE_MAYBE_MODIFIERS;
@@ -925,7 +923,7 @@ pu_export_sys_sym:
 	      PrsOffsetOf(cc);
 	      while (j--) {
 		if (cc->token!=')')
-		  LexExcept(cc,"missing ')' at ");
+		  LexExcept(cc,"Missing ')' at ");
 		Lex(cc);
 	      }
 	      return PE_MAYBE_MODIFIERS;
@@ -943,14 +941,14 @@ pu_export_sys_sym:
 	      Lex(cc);
 	      while (j--) {
 		if (cc->token!=')')
-		  LexExcept(cc,"missing ')' at ");
+		  LexExcept(cc,"Missing ')' at ");
 		Lex(cc);
 	      }
 	      return PE_MAYBE_MODIFIERS;
 	  }
       }
   }
-  LexExcept(cc,"missing expression at ");
+  LexExcept(cc,"Missing expression at ");
 }
 
 I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
@@ -987,10 +985,10 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       if (!(cc->flags & CCF_RAX))
 	tempc--;
       if (!(tempc->type & HTT_CLASS))
-	LexExcept(cc,"invalid class at ");
+	LexExcept(cc,"Invalid class at ");
       if (Lex(cc)!=TK_IDENT ||
 	    !(tempm=MemberFind(cc->cur_str,tempc)))
-	LexExcept(cc,"invalid member at ");
+	LexExcept(cc,"Invalid member at ");
       else if (cc->local_var_entry)
 	cc->local_var_entry->use_cnt--;
       Lex(cc);	//skip member name
@@ -1017,7 +1015,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       if (!*unary_post_prec)
 	*unary_post_prec=PREC_TERM;
       if (Lex(cc)!=TK_IDENT)
-	LexExcept(cc,"invalid class at ");
+	LexExcept(cc,"Invalid class at ");
       if (Btr(&cc->flags,CCf_FUN_EXP))
 	ps->ptr2--;
       cc->flags&=~CCF_ARRAY;
@@ -1044,7 +1042,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       tempi->ic_class=tempc;
       ICAdd(cc,IC_HOLYC_TYPECAST,was_paren,tempc);
       if (cc->token!=')')
-	LexExcept(cc,"missing ')' at ");
+	LexExcept(cc,"Missing ')' at ");
       Lex(cc);
       return PE_UNARY_MODIFIERS;
     case '[':
@@ -1053,11 +1051,11 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       Lex(cc);
       tempc=OptClassFwd(cc->coc.coc_root.last->ic_class);
       if (!tempc->ptr_stars_cnt)
-	LexExcept(cc,"not array or ptr ");
+	LexExcept(cc,"Not array or ptr ");
       if (!(cc->flags & (CCF_ARRAY | CCF_RAX))) {
 	tempc=OptClassFwd(tempc-1);
 	if (!tempc->ptr_stars_cnt)
-	  LexExcept(cc,"not array or ptr ");
+	  LexExcept(cc,"Not array or ptr ");
 	ICAdd(cc,IC_DEREF+PREC_UNARY_PRE<<16,0,tempc);
       }
       tempc1=tempc-1;
@@ -1069,7 +1067,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	    throw('Compiler');
 	  cc->flags=cc->flags&~CCF_FUN_EXP|old_flags&CCF_FUN_EXP;
 	  if (cc->token!=']')
-	    LexExcept(cc,"missing ']' at ");
+	    LexExcept(cc,"Missing ']' at ");
 	  Lex(cc); //skip ]
 	  tempi1=cc->coc.coc_root.last;
 	  tempi1->ic_flags|=ICF_R_TO_INT;
@@ -1085,7 +1083,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	throw('Compiler');
       cc->flags=cc->flags&~CCF_FUN_EXP|old_flags&CCF_FUN_EXP;
       if (cc->token!=']')
-	LexExcept(cc,"missing ']' at ");
+	LexExcept(cc,"Missing ']' at ");
       Lex(cc); //skip ]
       tempi1=cc->coc.coc_root.last;
       tempi1->ic_flags|=ICF_R_TO_INT;

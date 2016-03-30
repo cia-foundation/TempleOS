@@ -9,7 +9,7 @@ $FG,2$"/*.TXT*;~*/Bible*"$FG$	BaseDir: $FG,2$Root$FG$		Mask: $FG,2$*.TXT*$FG$ bu
 
 See $LK,"FilesFindMatch",A="MN:FilesFindMatch"$().
 
-Flags are either text or integer values.
+Flags are either text or int values.
 
   $LK,"FUF_RECURSE",A="MN:FUF_RECURSE"$		$FG,2$+r$FG$ Recurse
   $LK,"FUF_SINGLE",A="MN:FUF_SINGLE"$		$FG,2$+s$FG$ Single File (Optimization for one file in mask.)

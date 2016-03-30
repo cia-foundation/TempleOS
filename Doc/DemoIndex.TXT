@@ -59,8 +59,9 @@ $LK,"::/Demo/Graphics/RotateTank.CPP"$
 $LK,"::/Demo/Games/Wenceslas.CPP"$
 $LK,"::/Demo/ScreenCodes.CPP"$
 $LK,"::/Demo/Graphics/PanText.CPP"$
-$LK,"::/Demo/Graphics/CharGraphics.CPP"$
+$LK,"::/Demo/Graphics/CharAnimation.CPP"$
 $LK,"::/Demo/Games/Maze.CPP"$
+$LK,"::/Demo/Games/CharDemo.CPP"$
 $LK,"::/Demo/Graphics/FontEd.CPP"$
 $LK,"::/Demo/ExtendedChars.CPP"$
 $LK,"::/Demo/TimeIns.CPP"$

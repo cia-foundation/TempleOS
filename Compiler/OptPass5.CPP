@@ -26,30 +26,29 @@ U0 OptPass5(CCmpCtrl *cc)
 	  if (Bt(&tempi->ic_data,i))
 	    ps->ptr--;
       }
-      if (tempi->a2.type&TY_MASK==TY_STK) {
+      if (tempi->a2.type&MDF_STK) {
 	tempi1=PrsPop(ps);
-	if (tempi1->ic_code==IC_MOV ||
-	      tempi1->ic_code==IC_REG) {
+	if (tempi1->ic_code==IC_MOV || tempi1->ic_code==IC_REG) {
 	  if (tempi1->ic_flags & ICF_R_TO_INT) {
-	    if (tempi1->a1.type&TY_MASK==TY_IMM)
+	    if (tempi1->a1.type&MDF_IMM)
 	      tempi1->a1.disp=tempi1->a1.disp(F64);
 	    else
 	      tempi->ic_flags|=ICF_A2_TO_INT;
 	  } else if (tempi1->ic_flags&ICF_R_TO_F64) {
-	    if (tempi1->a1.type&TY_MASK==TY_IMM)
+	    if (tempi1->a1.type&MDF_IMM)
 	      tempi1->a1.disp(F64)=tempi1->a1.disp;
 	    else
 	      tempi->ic_flags|=ICF_A2_TO_F64;
 	  }
 
-	  ty=tempi->a2.type&RT_MASK;
-	  ty1=tempi1->a1.type&RT_MASK;
+	  ty=tempi->a2.type.raw_type;
+	  ty1=tempi1->a1.type.raw_type;
 	  if (ty1 && ty1<ty)
 	    ty=ty1;
-	  ty1=tempi1->r.type&RT_MASK;
+	  ty1=tempi1->r.type.raw_type;
 	  if (ty1 && ty1<ty)
 	    ty=ty1;
-	  tempi->a2.type=tempi1->a1.type&TY_MASK+ty;
+	  tempi->a2.type=tempi1->a1.type&MDG_MASK+ty;
 
 	  pt=tempi->a2.type_pointed_to;
 	  pt1=tempi1->a1.type_pointed_to;
@@ -67,18 +66,17 @@ U0 OptPass5(CCmpCtrl *cc)
 	}
       }
 
-      if (tempi->a1.type&TY_MASK==TY_STK) {
+      if (tempi->a1.type&MDF_STK) {
 	tempi1=PrsPop(ps);
-	if (tempi1->ic_code==IC_MOV ||
-	      tempi1->ic_code==IC_REG) {
+	if (tempi1->ic_code==IC_MOV || tempi1->ic_code==IC_REG) {
 	  if (tempi1->ic_flags & ICF_R_TO_INT) {
-	    if (tempi1->a1.type&TY_MASK==TY_IMM)
+	    if (tempi1->a1.type&MDF_IMM)
 	      tempi1->a1.disp=tempi1->a1.disp(F64);
 	    else
 	      tempi->ic_flags|=ICF_A1_TO_INT;
 	  } else if (tempi1->ic_flags&ICF_R_TO_F64) {
-	    if (tempi1->a1.type&TY_MASK==TY_IMM) {
-	      if (tempi1->a1.type & 1) //signed/unsigned
+	    if (tempi1->a1.type&MDF_IMM) {
+	      if (tempi1->a1.type&RTF_UNSIGNED)
 		tempi1->a1.disp(F64)=tempi1->a1.disp(U64);
 	      else
 		tempi1->a1.disp(F64)=tempi1->a1.disp(I64);
@@ -86,14 +84,14 @@ U0 OptPass5(CCmpCtrl *cc)
 	      tempi->ic_flags|=ICF_A1_TO_F64;
 	  }
 
-	  ty=tempi->a1.type&RT_MASK;
-	  ty1=tempi1->a1.type&RT_MASK;
+	  ty=tempi->a1.type.raw_type;
+	  ty1=tempi1->a1.type.raw_type;
 	  if (ty1 && ty1<ty)
 	    ty=ty1;
-	  ty1=tempi1->r.type&RT_MASK;
+	  ty1=tempi1->r.type.raw_type;
 	  if (ty1 && ty1<ty)
 	    ty=ty1;
-	  tempi->a1.type=tempi1->a1.type&TY_MASK+ty;
+	  tempi->a1.type=tempi1->a1.type&MDG_MASK+ty;
 
 	  pt=tempi->a1.type_pointed_to;
 	  pt1=tempi1->a1.type_pointed_to;
@@ -110,7 +108,7 @@ U0 OptPass5(CCmpCtrl *cc)
 	  OptSetNOP2(tempi1);
 	}
       }
-      if (tempi->r.type&TY_MASK==TY_STK &&
+      if (tempi->r.type&MDF_STK &&
 	    !(tempi->ic_flags&ICF_NO_DEPEND_RESULT))
 	PrsPush(ps,tempi);
     }

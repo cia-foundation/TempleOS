@@ -123,21 +123,29 @@ Examples: <CTRL-t> to see
 $ID,-2$$TR,"BT Button"$
 $ID,2$See $LK,"::/Demo/DolDoc/MenuButton.CPP"$.
 $ID,-2$$TR,"DA Data"$
-$ID,2$Used for forms that prompt for data.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms that prompt for data or just displaying a value.  Use $FG,2$<CTRL-l>$FG$ to help you generate the DolDoc command text you need in your $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's $FG,2$fmtstr$FG$ meta-data for $LK,"DocForm",A="MN:DocForm"$().  See $LK,"::/Demo/DolDoc/Form.CPP"$, $LK,"::/Demo/Dsk/DataBase.CPP"$, and $LK,"::/Adam/DolDoc/DocWidgetWiz.CPP"$.
 
-The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+If you are not using $LK,"DocForm",A="MN:DocForm"$(), make a $FG,2$$$DA...$$$FG$ statement with $LK,"DocPrint",A="MN:DocPrint"$() and fill-in the $FG,2$->data$FG$ addr.  See $LK,"task_title",A="FF:::/Adam/DolDoc/DocEd.CPP,&Fs->task_title"$.   
 
-The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the format string.
+The default raw data type for the $FG,2$$$DA...$$$FG$ command is $FG,2$RT=I64$FG$.  $LK,"DocForm",A="MN:DocForm"$() will automatically reset the raw type to the value from the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's definition if you leave it set to the default.  Or, if not using $LK,"DocForm",A="MN:DocForm"$(), specify a raw data type of $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 
-If there is a ':', the space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
+The $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str arg $FG,2$A=""$FG$ is used for the print/scan format string.
+
+The default field length is $FG,2$LEN=64$FG$ characters.  For U8 arrays[], $LK,"DocForm",A="MN:DocForm"$() will automatically reset the field length to the string length from the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's definition.  The length measures starting after the ':' in the $FG,2$A=""$FG$ format string.
+
+The space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
 $ID,-2$$TR,"CB Check Box"$
-$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$(), $LK,"CEdFindText",A="MN:CEdFindText"$ and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms.  Use $FG,2$<CTRL-l>$FG$ to help you generate the DolDoc command text you need in your $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's $FG,2$fmtstr$FG$ meta-data for $LK,"DocForm",A="MN:DocForm"$().  See $LK,"::/Demo/DolDoc/Form.CPP"$$FG$ and $LK,"CEdFindText",A="MN:CEdFindText"$.
 
-The default data-type for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+If you are not using $LK,"DocForm",A="MN:DocForm"$(), make a $FG,2$$$CB...$$$FG$ statement with $LK,"DocPrint",A="MN:DocPrint"$() and fill-in the $FG,2$->data$FG$ addr.  See $LK,"task_title",A="FF:::/Adam/DolDoc/DocEd.CPP,&Fs->task_title"$.   
+
+The default raw data type for the $FG,2$$$CB...$$$FG$ command is $FG,2$RT=I8$FG$ which is $FG,2$Bool$FG$$FG$.  $LK,"DocForm",A="MN:DocForm"$() will automatically reset the raw type to the value from the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's definition if you leave it set to the default.  Or, if not using $LK,"DocForm",A="MN:DocForm"$(), specify a raw data type of $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"LS List Widget"$
-$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ as a text widgets editor to help you generate the text you need in your "$FG,2$fmtstr$FG$" cmd in a $FG,2$class$FG$.  If you add it directly with $LK,"DocPrint",A="MN:DocPrint"$(), you'll need to fill-in the data addr.  See $LK,"DocForm",A="MN:DocForm"$() and $LK,"::/Demo/DolDoc/Form.CPP"$.
+$ID,2$Used for forms that prompt for data.  You must specify a define list, $FG,2$D=""$FG$.  Use $FG,2$<CTRL-l>$FG$ to help you generate the DolDoc command text you need in your $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's $FG,2$fmtstr$FG$ meta-data for $LK,"DocForm",A="MN:DocForm"$().  See $LK,"::/Demo/DolDoc/Form.CPP"$.
 
-The default data-type for the $FG,2$$$LS...$$$FG$ command is $FG,2$I64$FG$.  You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, or $FG,2$U64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+If you are not using $LK,"DocForm",A="MN:DocForm"$(), make a $FG,2$$$LS...$$$FG$ statement with $LK,"DocPrint",A="MN:DocPrint"$() and fill-in the data addr.  See $LK,"task_title",A="FF:::/Adam/DolDoc/DocEd.CPP,&Fs->task_title"$.   
+
+The default raw data type for the $FG,2$$$LS...$$$FG$ command is $FG,2$RT=I64$FG$.  $LK,"DocForm",A="MN:DocForm"$() will automatically reset the raw type to the value from the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's definition if you leave it set to the default.  Or, if not using $LK,"DocForm",A="MN:DocForm"$(), specify a raw data type of $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"MA Macro"$
 $ID,2$A left macro arg, $FG,2$LM=""$FG$, will send text when the left mouse is clicked.
 
@@ -215,6 +223,10 @@ $ID,-2$
 <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$>  See $LK,"Arg Defines",A="MN:DOCEf_TAG"$.
 $TR,"T=\"\" Tag Str"$
 $ID,2$Some cmds have a tag by default.  See $LK,"TX+T",A="FF:::/Adam/DolDoc/DocInit.CPP,TX+T"$.  You can code $FG,2$T="tag_text"$FG$ as just $FG,2$"tag_text"$FG$ with no $FG,2$T=$FG$. 
+$ID,-2$$TR,"LEN=\"\" Field Length"$
+$ID,2$The default field length for $FG,2$$$DA...$$$FG$ commands is $FG,2$LEN=64$FG$ characters.  For U8 arrays[], $LK,"DocForm",A="MN:DocForm"$() will automatically reset the field length to the string length from the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ $FG,2$class$FG$ member's definition.  The length measures starting after the ':' in the $FG,2$A=""$FG$ format string.
+
+The space after the first ':' in the format string marks the first valid cursor pos.  See $LK,"Data Tag Width",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$.
 $ID,-2$$TR,"A=\"\" Auxilliary Str"$
 $ID,2$Some cmds need auxilliary strings.  $FG,2$A="str"$FG$ means an $LK,"CDocEntry",A="MN:CDocEntry"$.aux_str is present.  aux_str is used for song note text, link text, anchor text, and $FG,2$$$DA...$$$FG$ format string text.
 $ID,-2$$TR,"D=\"\" Define Str"$
@@ -245,9 +257,9 @@ $ID,2$The BinPtrLink flags lets you specify a filename and bin num to import a b
 $FG,2$$$SP,"<tag>",BI=1,BP="filename,1"$$$FG$ will import bin num "1" from filename.
 $FG,2$$$SP,"<1>",BI=1,BP="::/Demo/Graphics/Mountain.CPP.Z,Mountain"$$$FG$ will import bin with tag name "Mountain" from "::/Demo/Graphics/Mountain.CPP.Z".
 $ID,-2$$TR,"RT=<raw_data_type>"$
-$ID,2$The default data-type for the $FG,2$$$DA...$$$FG$ command is $FG,2$I64$FG$.  The default for the $FG,2$$$CB...$$$FG$ command is $FG,2$I8$FG$ which is $FG,2$Bool$FG$.
+$ID,2$The default data-type for the $FG,2$$$DA...$$$FG$ and $FG,2$$$LS...$$$FG$ commands is $FG,2$RT=I64$FG$.  If you do not specify a raw type and are using $LK,"DocForm",A="MN:DocForm"$(), it will use the $FG,2$class$FG$ member's raw type, automatically.  The default for the $FG,2$$$CB...$$$FG$ command is $FG,2$RT=I8$FG$ which is $FG,2$Bool$FG$.
 
-You can change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
+If not using $LK,"DocForm",A="MN:DocForm"$(), change it to $FG,2$I8$FG$, $FG,2$U8$FG$, $FG,2$I16$FG$, $FG,2$U16$FG$, $FG,2$I32$FG$, $FG,2$U32$FG$, $FG,2$I64$FG$, $FG,2$U64$FG$, or $FG,2$F64$FG$.  See $LK,"DocDataFmt",A="MN:DocDataFmt"$() and $LK,"DocDataScan",A="MN:DocDataScan"$().
 $ID,-2$$TR,"SX=<Exp> Shift X"$
 $ID,2$Shift tag text $FG,2$+$FG$/$FG,2$- 7$FG$ X pixels off the grid.
 $ID,-2$$TR,"SY=<Exp> Shift Y"$

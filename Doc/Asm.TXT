@@ -1,12 +1,12 @@
 $WW,1$$FG,5$$TX+CX,"Assembler"$$FG$
 
-See $LK,"::/Compiler/OpCodes.TXT"$ for opcodes.  They're not standard.  Some invalid instructions are not flagged and some valid instructions are not implemented. 16-bit asm support is limited.
+See $LK,"::/Compiler/OpCodes.TXT"$ for opcodes.  They're not standard.  Some invalid insts are not flagged and some valid insts are not implemented. 16-bit asm support is limited.
 
-Here are example instruction formats:
+Here are example inst formats:
 $HL,1$	ADD	RAX,I64 FS:DISP[RSI+RDI*8]
 $HL,0$$HL,1$	ADD	RAX,I64 [DISP]
 $HL,0$
-$FG,2$$$$FG$ Current compiler output pos (instruction ptr).  Even works in HolyC expressions.
+$FG,2$$$$FG$ Current compiler output pos (inst ptr).  Even works in HolyC expressions.
 
 $FG,2$$$$FG$ works in $FG,2$class$FG$es.
   $FG,2$class MyFun

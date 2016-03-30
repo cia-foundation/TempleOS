@@ -17,7 +17,7 @@ $ID,2$TempleOS compiles, doesn't $FG,2$interpret$FG$, and uses no $FG,2$byte cod
 $ID,-2$$TR,"Are you a Creationist?"$
 $ID,2$I am an evolutionist.  $FG,2$Adam$FG$ is a better term for the first father of all tasks than $FG,2$root$FG$ was!
 $ID,-2$$TR,"Is 'Bt()' in the code Bit Torrent?"$
-$ID,2$$LK,"Bt",A="MN:Bt"$() is $FG,2$bit test$FG$, like the $FG,2$x86$FG$ instruction, not $FG,2$bit torrent$FG$.
+$ID,2$$LK,"Bt",A="MN:Bt"$() is $FG,2$bit test$FG$, like the $FG,2$x86$FG$ inst, not $FG,2$bit torrent$FG$.
 $ID,-2$$TR,"Is 'Fs->' in the code file system?"$
 $ID,2$$LK,"Fs",A="MN:Fs"$ is a segment reg, not $FG,2$file system$FG$.  ($LK,"Fs",A="MN:Fs"$ is kept pointing to the current task's record.)  There is no memory segmentation.  It is 64-bit and flat. FS and GS are used as general purpose regs, more or less.
 $ID,-2$$TR,"Is it Pascal?"$
@@ -49,7 +49,7 @@ $ID,2$TempleOS identity-maps all memory, all the time.  It is like paging is not
 $ID,-2$$TR,"Why does it run code from stack addresses?"$
 $ID,2$TempleOS puts all code in the lowest 2 Gig, known as the $LK,"Code Heap",A="FF:::/Doc/Glossary.TXT,Code and Data Heaps"$, so that the $FG,2$REL32$FG$ addressing mode can be used.  TempleOS is 64-bit, but $FG,2$2 Gig$FG$ is enough for code.  It actually puts global variables there, too, but you can turn that off with $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$.  $LK,"MAlloc",A="MN:MAlloc"$() allocs higher memory.
 $ID,-2$$TR,"How does it SYSCALL?"$
-$ID,2$TempleOS doesn't use software interrupts or $FG,2$SYSCALL$FG$ instructions because it never needs to change out of ring-0, even running user programs.  Calls are always $FG,2$CALL REL32$FG$ instructions.
+$ID,2$TempleOS doesn't use software interrupts or $FG,2$SYSCALL$FG$ insts because it never needs to change out of ring-0, even running user programs.  Calls are always $FG,2$CALL REL32$FG$ insts.
 $ID,-2$$TR,"How do you fault-in stack?"$
 $ID,2$The stack does not grow, so do not do deep recursion.  In theory, memory gets fragmented, too.
 $ID,-2$$TR,"How do I set the PATH?"$
@@ -62,7 +62,7 @@ $ID,-2$$TR,"Why is there some 16-Bit code?"$
 $ID,2$TempleOS is 64-bit.  Like all PC operating systems, the boot-loader starts in 16-bit real-mode.  TempleOS calls a few $FG,2$BIOS$FG$ info routines, switches to VGA-640x480x4bit, switches to 32-bit, then, 64-bit mode.  There is an odd thing called a $FG,2$$TX,"PCI BIOS",HTML="http://www.o3one.org/hwdocs/bios_doc/pci_bios_21.pdf"$$FG$ which is 32-bit used for $FG,2$PCI$FG$ config space access.  TempleOS calls $LK,"that",A="FI:::/Kernel/PCIBIOS.CPP"$ a couple times.  It must temporarily drop-out-of 64-bit mode for that and stop multi-tasking.
 $ID,-2$$TR,"Why are you pushing 32-bit values on the stack?"$
 $ID,2$$FG,2$PUSH EAX$FG$ : All stack operations in 64-bit mode are 64-bits.
-$ID,-2$$TR,"Why are you using 32-bit instructions and not setting high 32-bits?"$
+$ID,-2$$TR,"Why are you using 32-bit insts and not setting high 32-bits?"$
 $ID,2$$FG,2$XOR EAX,EAX$FG$ : Operations on 32-bit regs clear the high 32-bits.
 $ID,-2$$TR,"How do you use the FS and GS segment registers."$
 $ID,2$$FG,2$MOV RAX,FS:[RAX]$FG$ : FS can be set with a $FG,2$WRMSR$FG$, but displacement is RIP relative, so it's tricky to use.  FS is used for the current $LK,"CTask",A="MN:CTask"$, GS for $LK,"CCPU",A="MN:CCPU"$.

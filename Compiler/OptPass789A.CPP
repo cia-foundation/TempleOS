@@ -61,90 +61,36 @@ cc->pass==10 is final pass, code is placed into buf.
       if (cc->pass==7)
 	cc->dont_push_float=Btr(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0);
       MemCpy(saved_p123,&tempi->a1,3*sizeof(CICArg));
-      if (intermediate_code_table[tempi->ic_code].arg_cnt==IS_2_ARG &&
-	    tempi->a1.type&TY_MASK==TY_REG && tempi->a1.reg==REG_RAX)
-	tempi->ic_flags|=ICF_A1_FIRST;
       tempi->ic_cnt=0;
       tempi->ic_last_cnt=-1;
-      if (tempi->ic_flags & ICF_A1_FIRST) {
-	if (tempi->a1.type&TY_MASK) {
-	  if (tempi->ic_flags & ICF_A1_TO_F64) {
-	    ICFCvt(cc,tempi,REG_RDX,
-		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,FALSE,CN_A1,ip2);
-	    tempi->a1.type=TY_REG+RT_I64;
-	    tempi->a1.reg=REG_RDX;
-	    tempi->a1.disp=0;
-	    tempi->ic_flags&=~ICF_A1_FIRST;
-	  } else if (tempi->ic_flags & ICF_A1_TO_INT) {
-	    ICFCvt(cc,tempi,REG_RDX,
-		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,TRUE,CN_A1,ip2);
-	    tempi->a1.type=TY_REG+RT_I64;
-	    tempi->a1.reg=REG_RDX;
-	    tempi->a1.disp=0;
-	    tempi->ic_flags&=~ICF_A1_FIRST;
-	  }
+      if (tempi->a2.type.mode) {
+	if (tempi->ic_flags & ICF_A2_TO_F64) {
+	  ICFCvt(cc,tempi,REG_RAX,
+		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,FALSE,CN_A2,ip2);
+	  tempi->a2.type=MDF_REG+RT_I64;
+	  tempi->a2.reg=REG_RAX;
+	  tempi->a2.disp=0;
+	} else if (tempi->ic_flags & ICF_A2_TO_INT) {
+	  ICFCvt(cc,tempi,REG_RAX,
+		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,TRUE,CN_A2,ip2);
+	  tempi->a2.type=MDF_REG+RT_I64;
+	  tempi->a2.reg=REG_RAX;
+	  tempi->a2.disp=0;
 	}
-	if (tempi->a2.type&TY_MASK) {
-	  if (tempi->ic_flags & ICF_A2_TO_F64) {
-	    if (tempi->ic_flags&ICF_A1_FIRST) {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	      tempi->a1.type=TY_REG+RT_I64;
-	      tempi->a1.reg=REG_RDX;
-	      tempi->a1.disp=0;
-	      tempi->ic_flags&=~ICF_A1_FIRST;
-	    }
-	    ICFCvt(cc,tempi,REG_RAX,
-		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,FALSE,CN_A2,ip2);
-	    tempi->a2.type=TY_REG+RT_I64;
-	    tempi->a2.reg=REG_RAX;
-	    tempi->a2.disp=0;
-	  } else if (tempi->ic_flags & ICF_A2_TO_INT) {
-	    if (tempi->ic_flags&ICF_A1_FIRST) {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	      tempi->a1.type=TY_REG+RT_I64;
-	      tempi->a1.reg=REG_RDX;
-	      tempi->a1.disp=0;
-	      tempi->ic_flags&=~ICF_A1_FIRST;
-	    }
-	    ICFCvt(cc,tempi,REG_RAX,
-		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,TRUE,CN_A2,ip2);
-	    tempi->a2.type=TY_REG+RT_I64;
-	    tempi->a2.reg=REG_RAX;
-	    tempi->a2.disp=0;
-	  }
-	}
-      } else {
-	if (tempi->a2.type&TY_MASK) {
-	  if (tempi->ic_flags & ICF_A2_TO_F64) {
-	    ICFCvt(cc,tempi,REG_RAX,
-		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,FALSE,CN_A2,ip2);
-	    tempi->a2.type=TY_REG+RT_I64;
-	    tempi->a2.reg=REG_RAX;
-	    tempi->a2.disp=0;
-	  } else if (tempi->ic_flags & ICF_A2_TO_INT) {
-	    ICFCvt(cc,tempi,REG_RAX,
-		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,TRUE,CN_A2,ip2);
-	    tempi->a2.type=TY_REG+RT_I64;
-	    tempi->a2.reg=REG_RAX;
-	    tempi->a2.disp=0;
-	  }
-	}
-	if (tempi->a1.type&TY_MASK) {
-	  if (tempi->ic_flags & ICF_A1_TO_F64) {
-	    ICFCvt(cc,tempi,REG_RDX,
-		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,FALSE,CN_A1,ip2);
-	    tempi->a1.type=TY_REG+RT_I64;
-	    tempi->a1.reg=REG_RDX;
-	    tempi->a1.disp=0;
-	  } else if (tempi->ic_flags & ICF_A1_TO_INT) {
-	    ICFCvt(cc,tempi,REG_RDX,
-		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,TRUE,CN_A1,ip2);
-	    tempi->a1.type=TY_REG+RT_I64;
-	    tempi->a1.reg=REG_RDX;
-	    tempi->a1.disp=0;
-	  }
+      }
+      if (tempi->a1.type.mode) {
+	if (tempi->ic_flags & ICF_A1_TO_F64) {
+	  ICFCvt(cc,tempi,REG_RDX,
+		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,FALSE,CN_A1,ip2);
+	  tempi->a1.type=MDF_REG+RT_I64;
+	  tempi->a1.reg=REG_RDX;
+	  tempi->a1.disp=0;
+	} else if (tempi->ic_flags & ICF_A1_TO_INT) {
+	  ICFCvt(cc,tempi,REG_RDX,
+		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,TRUE,CN_A1,ip2);
+	  tempi->a1.type=MDF_REG+RT_I64;
+	  tempi->a1.reg=REG_RDX;
+	  tempi->a1.disp=0;
 	}
       }
       switch [tempi->ic_code] {
@@ -191,8 +137,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	    case IC_RIP:
 	      ICU16(tempi,0xB848);
 	      ICU64(tempi,ip2+tempi->ic_cnt-2);
-	      if (cc->flags&CCF_AOT_COMPILE && buf &&
-		    !(cc->flags&CCF_NO_ABSS)) {
+	      if (cc->flags&CCF_AOT_COMPILE && buf &&!(cc->flags&CCF_NO_ABSS)) {
 		tempa=CAlloc(sizeof(CAOTAbsAddr));
 		tempa->next=aotc->abss;
 		tempa->type=AAT_ADD_U64;
@@ -202,7 +147,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	      break;
 	  sub_switch_end:
 	    ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		  TY_REG+RT_I64,REG_RAX,0,ip2);
+		  MDF_REG+RT_I64,REG_RAX,0,ip2);
 	    break;
 	  case IC_BR_CARRY:
 	    ICFlagBranch(tempi,ip,0x72820F,buf);
@@ -356,7 +301,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	    else
 	      i=lb->addr+buf;
 	    ICLea(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		  TY_RIP_DISP32+RT_PTR,0,i,cc,buf,ip2);
+		  MDF_RIP_DISP32+RT_PTR,0,i,cc,buf,ip2);
 	    break;
 	  case IC_ASM:
 	    tempaot=tempi->ic_data;
@@ -442,12 +387,11 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_LEAVE:
 	  if (cc->htc.fun) {
 	    if (Bt(&cc->htc.fun->flags,Ff_INTERRUPT))
-	      ICPopRegs(tempi,REGG_C_CLOBBERED|cc->htc.fun->used_reg_mask&
-		    (REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS|
-		    REGG_C_TEMP_CLOBBERED));
+	      ICPopRegs(tempi,REGG_CLOBBERED|cc->htc.fun->used_reg_mask&
+		    (REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS|REGG_STK_TEMP));
 	    else
 	      ICPopRegs(tempi,cc->htc.fun->used_reg_mask&
-		    (REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS));
+		    (REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS));
 	  }
 	  if (tempi->ic_data<=MAX_I16) {
 	    if (tempi->ic_data)
@@ -487,14 +431,16 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICU8(tempi,0x64);
 //It's ugly to use ic_class here
 	  ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		TY_DISP+CmpRawType(tempi->ic_class),REG_RAX,tempi->ic_data,ip2);
+		MDF_DISP+CmpRawType(tempi->ic_class),REG_RAX,tempi->ic_data,
+		ip2);
 	  break;
 	case IC_MOV_GS:
 	  ICZero(tempi,REG_RAX);
 	  ICU8(tempi,0x65);
 //It's ugly to use ic_class here
 	  ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		TY_DISP+CmpRawType(tempi->ic_class),REG_RAX,tempi->ic_data,ip2);
+		MDF_DISP+CmpRawType(tempi->ic_class),REG_RAX,tempi->ic_data,
+		ip2);
 	  break;
 	case IC_HOLYC_TYPECAST:
 	  ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
@@ -507,7 +453,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICNot(tempi,ip2);
 	  break;
 	case IC_UNARY_MINUS:
-	  if (tempi->r.type&RT_MASK==RT_F64)
+	  if (tempi->r.type.raw_type==RT_F64)
 	    ICFUnaryMinus(cc,tempi,buf,ip2);
 	  else
 	    ICUnaries(tempi,SLASH_OP_NEG,ip2);
@@ -730,13 +676,13 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_SHL_CONST:
 	  ICShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
-		TY_IMM+RT_I64,0,tempi->ic_data,
+		MDF_IMM+RT_I64,0,tempi->ic_data,
 		0xE0D1E0D3E0C1,0xE0D1E0D3E0C1,ip2);
 	  break;
 	case IC_SHR_CONST:
 	  ICShift(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
-		TY_IMM+RT_I64,0,tempi->ic_data,
+		MDF_IMM+RT_I64,0,tempi->ic_data,
 		0xE8D1E8D3E8C1,0xF8D1F8D3F8C1,ip2);
 	  break;
 	case IC_ADD_CONST:
@@ -755,20 +701,18 @@ cc->pass==10 is final pass, code is placed into buf.
 	    ICAddRSP(tempi,-tempi->ic_data,FALSE);
 	  if (cc->htc.fun) {
 	    if (Bt(&cc->htc.fun->flags,Ff_INTERRUPT))
-	      ICPushRegs(tempi,REGG_C_CLOBBERED|cc->htc.fun->used_reg_mask&
-		    (REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS|
-		    REGG_C_TEMP_CLOBBERED));
+	      ICPushRegs(tempi,REGG_CLOBBERED|cc->htc.fun->used_reg_mask&
+		    (REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS|REGG_STK_TEMP));
 	    else {
-	      if (sys_var_init_flag&1 && i)
+	      if (sys_var_init_flag && i)
 		ICLocalVarInit(tempi);
 	      ICPushRegs(tempi,cc->htc.fun->used_reg_mask
-		    &(REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS));
+		    &(REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS));
 	    }
 	    for (i=0;i<NUM_REGS;i++)
 	      if (reg_offsets[i]>0 && reg_offsets[i].offset!=MAX_I64) {
 		tempc=OptClassFwd(reg_offsets[i].m->member_class);
-		ICMov(tempi,TY_REG+RT_I64,i,0,
-		      TY_DISP+tempc->raw_type,
+		ICMov(tempi,MDF_REG+RT_I64,i,0,MDF_DISP+tempc->raw_type,
 		      REG_RBP,reg_offsets[i].offset,ip2);
 	      }
 	  }
@@ -792,18 +736,18 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICU8(tempi,0x58);
 	  break;
 	case IC_INVLPG:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICU24(tempi,0x38010F);
 	  break;
 	case IC_CLFLUSH:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICU24(tempi,0x38AE0F);
 	  break;
 	case IC_GET_RFLAGS:
 	  ICU8(tempi,0x9C);
-	  ICPop(tempi,TY_REG+RT_I64,REG_RAX,0,ip2);
+	  ICPop(tempi,MDF_REG+RT_I64,REG_RAX,0,ip2);
 	  break;
 	case IC_CARRY:
 	  ICU24(tempi,0xC0920F); //SETC AL
@@ -820,24 +764,24 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICU8(tempi,0x9D);
 	  break;
 	case IC_GET_RBP:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		TY_REG+RT_I64,REG_RBP,0,ip2);
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+		MDF_REG+RT_I64,REG_RBP,0,ip2);
 	  break;
 	case IC_SET_RBP:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RBP,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RBP,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  break;
 	case IC_GET_RSP:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		TY_REG+RT_I64,REG_RSP,0,ip2);
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+		MDF_REG+RT_I64,REG_RSP,0,ip2);
 	  break;
 	case IC_SET_RSP:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RSP,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RSP,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  break;
 	case IC_RETURN_VAL:
 	case IC_SET_RAX:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  break;
 	case IC_RETURN_VAL2:
@@ -863,21 +807,21 @@ cc->pass==10 is final pass, code is placed into buf.
 		0xBB0F,0x38BA0F,ip2);
 	  break;
 	case IC_BSF:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICU32(tempi,0xC0BC0F48);
 	  ICU16(tempi,0x0375);
 	  ICU24(tempi,0xD0F748);
 	  break;
 	case IC_BSR:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICU32(tempi,0xC0BD0F48);
 	  ICU16(tempi,0x0375);
 	  ICU24(tempi,0xD0F748);
 	  break;
 	case IC_SIGN_I64:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICCopyTemplate(cc,tempi,CMP_TEMPLATE_SIGN_I64,
 		TRUE,FALSE,FALSE,CN_MAIN);
@@ -916,7 +860,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICFTemplateFun(cc,tempi,CMP_TEMPLATE_ATAN,ip2);
 	  break;
 	case IC_ABS_I64:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICU24(tempi,0xC08548);
 	  ICU16(tempi,0x0379);
@@ -962,12 +906,12 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICQueRem(tempi,ip2);
 	  break;
 	case IC_STRLEN:
-	  ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	  ICCopyTemplate(cc,tempi,CMP_TEMPLATE_STRLEN,TRUE,FALSE,FALSE,CN_MAIN);
 	  break;
 	case IC_IN_U32:
-	  if (tempi->a1.type&TY_MASK==TY_IMM) {
+	  if (tempi->a1.type&MDF_IMM) {
 	    ICU16(tempi,0xC033);
 	    if (tempi->a1.disp<=MAX_U8)
 	      ICU16(tempi,0xE5+tempi->a1.disp<<8);
@@ -976,14 +920,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU8(tempi,0xED);
 	    }
 	  } else {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU16(tempi,0xC033);
 	    ICU8(tempi,0xED);
 	  }
 	  break;
 	case IC_IN_U16:
-	  if (tempi->a1.type&TY_MASK==TY_IMM) {
+	  if (tempi->a1.type&MDF_IMM) {
 	    ICU16(tempi,0xC033);
 	    if (tempi->a1.disp<=MAX_U8)
 	      ICU24(tempi,0xE500+OC_OP_SIZE_PREFIX+tempi->a1.disp<<16);
@@ -992,14 +936,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU16(tempi,0xED00+OC_OP_SIZE_PREFIX);
 	    }
 	  } else {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU16(tempi,0xC033);
 	    ICU16(tempi,0xED00+OC_OP_SIZE_PREFIX);
 	  }
 	  break;
 	case IC_IN_U8:
-	  if (tempi->a1.type&TY_MASK==TY_IMM) {
+	  if (tempi->a1.type&MDF_IMM) {
 	    ICU16(tempi,0xC033);
 	    if (tempi->a1.disp<=MAX_U8)
 	      ICU16(tempi,0xE4+tempi->a1.disp<<8);
@@ -1008,15 +952,15 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU8(tempi,0xEC);
 	    }
 	  } else {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU16(tempi,0xC033);
 	    ICU8(tempi,0xEC);
 	  }
 	  break;
 	case IC_OUT_U32:
-	  if (tempi->a2.type&TY_MASK==TY_IMM) {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  if (tempi->a2.type&MDF_IMM) {
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    if (tempi->a2.disp<=MAX_U8)
 	      ICU16(tempi,0xE7+tempi->a2.disp<<8);
@@ -1025,23 +969,16 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU8(tempi,0xEF);
 	    }
 	  } else {
-	    if (tempi->ic_flags & ICF_A1_FIRST) {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	    } else {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	    }
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU8(tempi,0xEF);
 	  }
 	  break;
 	case IC_OUT_U16:
-	  if (tempi->a2.type&TY_MASK==TY_IMM) {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  if (tempi->a2.type&MDF_IMM) {
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    if (tempi->a2.disp<=MAX_U8)
 	      ICU24(tempi,0xE700+OC_OP_SIZE_PREFIX+tempi->a2.disp<<16);
@@ -1050,23 +987,16 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU16(tempi,0xEF00+OC_OP_SIZE_PREFIX);
 	    }
 	  } else {
-	    if (tempi->ic_flags & ICF_A1_FIRST) {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	    } else {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	    }
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU16(tempi,0xEF00+OC_OP_SIZE_PREFIX);
 	  }
 	  break;
 	case IC_OUT_U8:
-	  if (tempi->a2.type&TY_MASK==TY_IMM) {
-	    ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	  if (tempi->a2.type&MDF_IMM) {
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    if (tempi->a2.disp<=MAX_U8)
 	      ICU16(tempi,0xE6+tempi->a2.disp<<8);
@@ -1075,17 +1005,10 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICU8(tempi,0xEE);
 	    }
 	  } else {
-	    if (tempi->ic_flags & ICF_A1_FIRST) {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	    } else {
-	      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-		    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-	      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-		    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-	    }
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+	    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
 	    ICU8(tempi,0xEE);
 	  }
 	  break;
@@ -1105,9 +1028,9 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_CALL_END:
 	  ICPopRegs(tempi,tempi->ic_data);
-	  if (tempi->r.type&TY_MASK)
+	  if (tempi->r.type.mode)
 	    ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		  TY_REG+RT_I64,REG_RAX,0,ip2);
+		  MDF_REG+RT_I64,REG_RAX,0,ip2);
 	  break;
 	case IC_POP_REGS:
 	  ICPopRegs(tempi,tempi->ic_data);
@@ -1122,24 +1045,24 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICPut(cc,tempi);
 	  LexExcept(cc,"Compiler Optimization Error at ");
       }
-      if (tempi->r.type&TY_MASK) {
+      if (tempi->r.type.mode) {
 	if (tempi->ic_flags & ICF_R_TO_F64) {
 	  if (tempi->ic_code==IC_PUSH_CMP) {
-	    ICU24(tempi,0xDC8B48);
-	    ICU24(tempi,0x2BDF48);
-	    ICU24(tempi,0x1BDD48);
-	    ICU8(tempi,0x9B);
+	    ICU24(tempi,0x242CDF); //FILD U64 [RSP]
+	    ICU24(tempi,0x241CDD); //FSTP U64 [RSP]
 	  } else {
 	    ICFCvt(cc,tempi,REG_RAX,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  FALSE,CN_R,ip2);
-	    ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		  TY_REG+RT_I64,REG_RAX,0,ip2);
+	    if (!Bt(&tempi->ic_flags,ICf_DONT_POP_FLOAT0+
+		  cc->cur_ic_float_op_num-1))
+	      ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
+		    MDF_REG+RT_I64,REG_RAX,0,ip2);
 	  }
 	} else if (tempi->ic_flags & ICF_R_TO_INT) {
 	  ICFCvt(cc,tempi,REG_RAX,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		TRUE,CN_R,ip2);
 	  ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		TY_REG+RT_I64,REG_RAX,0,ip2);
+		MDF_REG+RT_I64,REG_RAX,0,ip2);
 	}
       }
     }

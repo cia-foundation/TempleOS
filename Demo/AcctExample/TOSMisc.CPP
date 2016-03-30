@@ -241,7 +241,7 @@ U0 TOSRegWrite()
 
 class CYouTubeForm2
 {
-  U8 special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8 special[STR_LEN] fmtstr "$$DA-P,A=\"SerialNum:%s\"$$\n";
 };
 
 U8 *TOSYouTube()

@@ -2,6 +2,39 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
+$IV,1$----03/29/16 17:59:14----$IV,0$
+
+$IV,1$----03/29/16 05:53:45----$IV,0$
+* $BK,1$TempleOS version 4.05 Released$BK,0$
+
+$IV,1$----03/24/16 16:26:50----$IV,0$
+* Added $LK,"::/Demo/Games/CharDemo.CPP"$.
+
+$IV,1$----03/22/16 16:58:25----$IV,0$
+* Added $LK,"DOCEF_DFT_RAW_TYPE",A="MN:DOCEF_DFT_RAW_TYPE"$.  Modified $LK,"DocForm",A="MN:DocForm"$() to look-up raw type automatically from the compiler's class information.
+* Added $LK,"DOCEF_DFT_LEN",A="MN:DOCEF_DFT_LEN"$.  Modified $LK,"DocForm",A="MN:DocForm"$() to look-up string length automatically from the compiler's class information.
+
+$IV,1$----03/21/16 07:28:35----$IV,0$
+* Added $LK,"OCF_ALIAS",A="MN:OCF_ALIAS"$.
+* $LK,"R",A="MN:R"$("Integer","Int");
+* Added aliases to $LK,"::/Compiler/OpCodes.TXT"$.
+
+$IV,1$----03/21/16 02:12:08----$IV,0$
+* Added $LK,"DOCT_MARKER",A="MN:DOCT_MARKER"$.
+* Added $LK,"CICType",A="MN:CICType"$.
+* Optimized $LK,"MDG_MASK",A="MN:MDG_MASK"$ and $LK,"RTG_MASK",A="MN:RTG_MASK"$ values.
+
+$IV,1$----03/19/16 09:15:11----$IV,0$
+* Fixed bug in $LK,"EdFindReplace",A="MN:EdFindReplace"$().
+
+$IV,1$----03/19/16 06:22:36----$IV,0$
+* Fixed $LK,"UAsm",A="MN:Ui"$() bug.
+* Got rids of $FG,4$ICF_A1_FIRST$FG$.
+* Cleaned-up compiler $LK,"REGG_CLOBBERED",A="MN:REGG_CLOBBERED"$ and $LK,"REGG_STK_TEMP",A="MN:REGG_STK_TEMP"$.
+
+$IV,1$----03/18/16 09:53:33----$IV,0$
+* Made $LK,"SpriteEd",A="MN:SpriteEd"$() select foreground elem.
+
 $IV,1$----03/14/16 05:57:27----$IV,0$
 * $BK,1$TempleOS version 4.04 Released$BK,0$
 * Changed $FG,2$nobound_switch$FG$ so it uses [].
@@ -123,7 +156,7 @@ $IV,1$----01/06/16 11:01:57----$IV,0$
 
 $IV,1$----01/03/16 17:15:41----$IV,0$
 * Updated $LK,"::/Misc/PCIDevices.TXT"$.
-* Added null case option.  Next higher integer with "$FG,2$case:$FG$" in $FG,2$switch$FG$ stmts.  See  $LK,"::/Demo/NullCase.CPP"$.
+* Added null case option.  Next higher int with "$FG,2$case:$FG$" in $FG,2$switch$FG$ stmts.  See  $LK,"::/Demo/NullCase.CPP"$.
 
 $IV,1$----12/31/15 00:44:44----$IV,0$
 * Made $LK,"ASM_KEYWORD",A="FF:::/Compiler/OpCodes.TXT,ASM_KEYWORD"$s usable in HolyC outside asm{} blocks.

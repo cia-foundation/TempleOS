@@ -3,7 +3,7 @@ U0 LexPutToken(CCmpCtrl *cc)
   '"';
   if (cc->token==TK_IDENT || cc->token==TK_STR)
     "%s",cc->cur_str;
-  else if (cc->token==TK_INTEGER)
+  else if (cc->token==TK_INT)
     "INT:%X",cc->cur_i64;
   else if (cc->token==TK_CHAR_CONST)
     "U8:%X",cc->cur_i64;
@@ -141,31 +141,29 @@ U0 ICClassPut(CHashClass *c)
 U0 ICArgPut(CICArg *a)
 {
   if (a->type_pointed_to)
-    "%Z %Z %Z ",
-	  a->type&RT_MASK,"ST_RAW_TYPES",
-	  a->type_pointed_to&RT_MASK,"ST_RAW_TYPES",
-	  a->type>>4,"ST_TY_TYPES";
+    "%Z %Z %Z ",a->type.raw_type,"ST_RAW_TYPES",
+	  a->type_pointed_to,"ST_RAW_TYPES",
+	  Bsr(a->type>>8)+1,"ST_TY_TYPES";
   else
-    "%Z %Z ",
-	  a->type&RT_MASK,"ST_RAW_TYPES",
-	  a->type>>4,"ST_TY_TYPES";
-  switch (a->type>>4) {
-    case TY_STK>>4:
+    "%Z %Z ",a->type.raw_type,"ST_RAW_TYPES",
+	  Bsr(a->type>>8)+1,"ST_TY_TYPES";
+  switch (Bsr(a->type)) {
+    case MDf_STK:
       "STK";
       break;
-    case TY_IMM>>4:
+    case MDf_IMM:
       "#%X",a->disp;
       break;
-    case TY_REG>>4:
+    case MDf_REG:
       "%Z",a->reg,"ST_U64_REGS";
       break;
-    case TY_DISP>>4:
+    case MDf_DISP:
       "%X[%Z]",a->disp,a->reg,"ST_U64_REGS";
       break;
-    case TY_RIP_DISP32>>4:
+    case MDf_RIP_DISP32:
       "[%X]",a->disp;
       break;
-    case TY_SIB>>4:
+    case MDf_SIB:
       if (a->disp)
 	"%X",a->disp;
       if (a->reg==REG_RIP)
@@ -189,14 +187,14 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
   if (opcode>=IC_END_EXP && opcode!=IC_NOP2) {
     "%15ts %016X ",intermediate_code_table[opcode].name,tempi->ic_data;
     if (cc->pass) {
-      if (tempi->r.type&TY_MASK) {
+      if (tempi->r.type.mode) {
 	ICArgPut(&tempi->r);
 	"<-";
       }
-      if (tempi->a1.type&TY_MASK)
+      if (tempi->a1.type.mode)
 	ICArgPut(&tempi->a1);
       ',';
-      if (tempi->a2.type&TY_MASK)
+      if (tempi->a2.type.mode)
 	ICArgPut(&tempi->a2);
       '' CH_SPACE;
     }
@@ -225,8 +223,8 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
       "-DEP ";
     if (tempi->ic_flags & ICF_DEPEND_RESULT)
       "+DEP ";
-    if (tempi->ic_flags & ICF_NOT_ADDR)
-      "NOT_ADDR ";
+    if (tempi->ic_flags & ICF_BY_VAL)
+      "BY_VAL ";
     if (tempi->ic_flags & ICF_PUSH_RESULT)
       "PUSH ";
     if (tempi->ic_flags & ICF_PUSH_CMP)
@@ -234,16 +232,16 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
     if (tempi->ic_flags & ICF_POP_CMP)
       "POP_CMP ";
     if (tempi->ic_flags & ICF_DEL_PREVIOUS_INS)
-      "DELPREV ";
+      "DEL_PREV ";
     if (tempi->ic_flags & ICF_PREVIOUS_DELETED)
-      "PREVDEL ";
+      "PREV_DEL ";
     for (i=0;i<3;i++) {
       if (Bt(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0+i))
 	"DONT_PUSH#%d ",i;
       if (Bt(&tempi->ic_flags,ICf_DONT_POP_FLOAT0+i))
 	"DONT_POP#%d ",i;
     }
-    if (tempi->ic_flags & ICF_ALTERNATE_TEMPLATE)
+    if (tempi->ic_flags & ICF_ALT_TEMPLATE)
       "ALT_TEMP ";
     '\n';
   }

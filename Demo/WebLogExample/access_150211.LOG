@@ -584,7 +584,7 @@
 52.53.176.137 - - [10/Feb/2015:13:44:27 -0800] "GET /files/?D=A HTTP/1.1" 200 1522 "-" "Mozilla/5.0 (compatible; AhrefsBot/5.0; +http://ahrefs.com/robot/)" "www.templeos.org"
 52.81.208.207 - - [10/Feb/2015:13:45:31 -0800] "GET /Wb/Adam/Gr/GrPrimatives.html HTTP/1.1" 200 743387 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0" "www.templeos.org"
 130.158.66.124 - - [10/Feb/2015:13:47:09 -0800] "GET /files/BIBLE.TXT HTTP/1.1" 200 4345143 "http://www.templeos.org/" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.63 Safari/537.36" "www.templeos.org"
-150.176.164.55 - - [10/Feb/2015:13:47:55 -0800] "GET /Wb/Demo/Graphics/CharGraphics.html HTTP/1.1" 200 15754 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0" "www.templeos.org"
+150.176.164.55 - - [10/Feb/2015:13:47:55 -0800] "GET /Wb/Demo/Graphics/CharAnimation.html HTTP/1.1" 200 15754 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0" "www.templeos.org"
 150.176.164.55 - - [10/Feb/2015:13:51:30 -0800] "GET / HTTP/1.1" 200 6329 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0" "www.templeos.org"
 150.176.164.55 - - [10/Feb/2015:13:51:58 -0800] "GET /Wb/Home/Web/History.html HTTP/1.1" 200 7745 "http://www.templeos.org/" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0" "www.templeos.org"
 210.63.49.147 - - [10/Feb/2015:13:53:23 -0800] "GET /test/wp-admin/ HTTP/1.1" 404 89 "-" "-" "templeos.org"

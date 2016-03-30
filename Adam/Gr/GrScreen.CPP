@@ -172,7 +172,7 @@ U0 GrUpdateTextBG()
   Bool blink_flag=Blink;
   U8 *dst2=dst;
 
-  if (gr.pan_text_x) {
+  if (gr.pan_text_x||gr.hide_col) {
     gr.pan_text_x=ClampI64(gr.pan_text_x,-7,7);
     j=AbsI64(gr.pan_text_x)/FONT_WIDTH+1;
     num_cols-=j;
@@ -197,7 +197,7 @@ U0 GrUpdateTextBG()
   }
   dst=dst2;
 
-  if (gr.pan_text_y) {
+  if (gr.pan_text_y||gr.hide_row) {
     gr.pan_text_y=ClampI64(gr.pan_text_y,-7,7);
     j=AbsI64(gr.pan_text_y)/FONT_HEIGHT+1;
     num_rows-=j;
@@ -261,7 +261,7 @@ U0 GrUpdateTextFG()
   U8 *dst_start=gr.dc2->body,*dst_end=dst_start+w1*gr.dc2->height-7*w1-8;
   Bool blink_flag=Blink;
 
-  if (gr.pan_text_x) {
+  if (gr.pan_text_x||gr.hide_col) {
     gr.pan_text_x=ClampI64(gr.pan_text_x,-7,7);
     j=AbsI64(gr.pan_text_x)/FONT_WIDTH+1;
     num_cols-=j;
@@ -273,7 +273,7 @@ U0 GrUpdateTextFG()
     w2+=j*FONT_WIDTH;
   }
 
-  if (gr.pan_text_y) {
+  if (gr.pan_text_y||gr.hide_row) {
     gr.pan_text_y=ClampI64(gr.pan_text_y,-7,7);
     j=AbsI64(gr.pan_text_y)/FONT_HEIGHT+1;
     num_rows-=j;

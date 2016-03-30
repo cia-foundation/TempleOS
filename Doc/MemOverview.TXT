@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Memory Overview"$$FG$
 
 Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual identical to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used, except the first 2 Meg, which uses 4K page tables entries.  Nothing swaps to disk, either.
 
-In TempleOS, the lowest 2 Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL instructions because 64-bit CALLs take two instructions.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
+In TempleOS, the lowest 2 Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL insts because 64-bit CALLs take two insts.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
 
 You can create new, independent heaps using $LK,"HeapCtrlInit",A="MN:HeapCtrlInit"$().  Then, use the $LK,"CHeapCtrl",A="MN:CHeapCtrl"$ as the 2nd arg to $LK,"MAlloc",A="MN:MAlloc"$().  See $LK,"HeapLog",A="MN:HeapLog"$() for an example.
 

@@ -1,6 +1,6 @@
 $WW,1$$LK,"CDC",A="MN:CDC"$'s have a 4x4 matrix for rotating, scaling, skewing and shifting in 3 dimensions.  To make the graphics routines use the transform, you must set the $LK,"DCF_TRANSFORMATION",A="MN:DCF_TRANSFORMATION"$ flag.
 
-The matrix consists of integers that have been scaled 32 bits ($LK,"GR_SCALE",A="MN:GR_SCALE"$).  See $LK,"::/Demo/Lectures/FixedPoint.CPP"$ to learn why.
+The matrix consists of ints that have been scaled 32 bits ($LK,"GR_SCALE",A="MN:GR_SCALE"$).  See $LK,"::/Demo/Lectures/FixedPoint.CPP"$ to learn why.
 
 See $LK,"Mat4x4IdentEqu",A="MN:Mat4x4IdentEqu"$(), $LK,"Mat4x4IdentNew",A="MN:Mat4x4IdentNew"$(), $LK,"Mat4x4Equ",A="MN:Mat4x4Equ"$() and $LK,"Mat4x4New",A="MN:Mat4x4New"$().  See $LK,"Mat4x4RotX",A="MN:Mat4x4RotX"$(), $LK,"Mat4x4RotY",A="MN:Mat4x4RotY"$(), $LK,"Mat4x4RotZ",A="MN:Mat4x4RotZ"$() and $LK,"Mat4x4Scale",A="MN:Mat4x4Scale"$() to rotate about axes and scale.  Combine them with $LK,"Mat4x4MulMat4x4Equ",A="MN:Mat4x4MulMat4x4Equ"$()/$LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$() and assign them to the $LK,"CDC",A="MN:CDC"$.$FG,2$dc$FG$ with $LK,"DCMat4x4Set",A="MN:DCMat4x4Set"$().  See $LK,"::/Demo/Graphics/Box.CPP"$.
 

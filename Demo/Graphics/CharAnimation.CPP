@@ -3,11 +3,9 @@ U8 *old_font=text.font;
 // See $LK,"::/Kernel/Font8x8.CPP"$, $LK,"::/Demo/ScreenCodes.CPP"$,
 //$LK,"::/Demo/ExtendedChars.CPP"$, and $LK,"::/Demo/Graphics/FontEd.CPP"$.
 
-U8 waves[8*4]={
-0x00,0x11,0xAA,0x44,0x00,0x11,0xAA,0x44,
-0x00,0x22,0x55,0x88,0x00,0x22,0x55,0x88,
-0x00,0x44,0xAA,0x11,0x00,0x44,0xAA,0x11,
-0x00,0x88,0x55,0x22,0x00,0x88,0x55,0x22};
+U64 waves[4]={
+0x0011AA440011AA44,0x0022558800225588,
+0x0044AA110044AA11,0x0088552200885522};
 
 U0 AnimateEndCB()
 {
@@ -18,12 +16,12 @@ U0 AnimateEndCB()
 U0 AnimateTask(I64)
 {
   I64 i;
-  U8 *font=MAlloc(256*8);
+  U64 *font=MAlloc(256*8);
   Fs->task_end_cb=&AnimateEndCB;
   MemCpy(font,text.font,256*8);
   text.font=font;
   while (TRUE) {
-    MemCpy(font+CH_SPACE*FONT_HEIGHT,waves+8*(i++&0x3),8);
+    font[CH_SPACE]=waves[i++&0x3];
     Sleep(100);
   }
 }

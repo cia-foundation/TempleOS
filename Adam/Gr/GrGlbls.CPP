@@ -36,7 +36,8 @@ public class CGrGlbls
   I64	screen_zoom,sx,sy;
 
   //When zoomed, this keeps the mouse centered.
-  Bool	continuous_scroll;
+  Bool	continuous_scroll,
+	hide_row,hide_col;
 } gr;
 
 //See $LK,"RLf_VGA",A="FF:::/Kernel/KStart.CPP,RLf_VGA"$

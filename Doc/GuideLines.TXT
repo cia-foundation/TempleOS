@@ -114,7 +114,7 @@ See $LK,"::/Doc/Asm.TXT"$.
 
 * Don't change the segment regs unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$ and $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$.
 
-* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REGG_C_LOCAL_VARS"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
+* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REGG_LOCAL_VARS"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
 
 * I recommend using the standard stk frame for functions because $LK,"Caller",A="MN:Caller"$() is used to display the call stk, such as for the wallpaper.
 $FG,2$	PUSH	RBP

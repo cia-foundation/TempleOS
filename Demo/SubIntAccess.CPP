@@ -1,6 +1,6 @@
 /*TempleOS has a feature that allows
 access to bytes and words of larger
-integers.
+ints.
 
 See $LK,"U64i union",A="FF:::/Kernel/KernelA.HPP,U64i union"$.
  

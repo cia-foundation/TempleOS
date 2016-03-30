@@ -197,14 +197,14 @@ public I64 FileOcc(U8 *needle_str,
 
 class CFind
 {
-  U8	find_text[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,"
+  U8	find_text[STR_LEN] fmtstr "$$DA-P,"
 	"A=\"FIND        :%s\"$$\n";
-  U8	replace_text[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,"
+  U8	replace_text[STR_LEN] fmtstr "$$DA-P,"
 	"A=\"REPLACE     :%s\"$$\n";
   Bool	replace		fmtstr "$$CB,\"REPLACE\"$$\n";
   Bool	match_case	fmtstr "$$CB,\"MATCH CASE\"$$\n";
   Bool	whole_labels	fmtstr "$$CB,\"WHOLE LABELS\"$$\n";
-  U8	filemask[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"FILE MASK   :%s\"$$\n";
+  U8	filemask[STR_LEN] fmtstr "$$DA-P,A=\"FILE MASK   :%s\"$$\n";
   Bool	recurse		fmtstr "$$CB,\"RECURSE\"$$\n";
 };
 

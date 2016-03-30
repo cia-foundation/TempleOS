@@ -30,7 +30,7 @@
 
 * $FG,2$64-bit pointers$FG$.  All memory, even more than 4 Gig, can be directly accessed by all tasks on all cores at all times.
 
-* $FG,2$Ring-0-only$FG$.  Highest CPU privileged mode at all times.  No off-limits instructions.  No time lost changing modes or address maps.  Switches tasks in half a microsecond.
+* $FG,2$Ring-0-only$FG$.  Highest CPU privileged mode at all times.  No off-limits insts.  No time lost changing modes or address maps.  Switches tasks in half a microsecond.
 
 * $FG,2$2D/3D$FG$ graphics library
 

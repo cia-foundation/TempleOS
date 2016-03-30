@@ -213,7 +213,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   CMemberLst *ml;
   CDocEntry *doc_e;
   U8 *fmtstr;
-  CHashClass *tempc;
+  CHashClass *tempc,*tempc2;
   CDoc *doc;
   Bool result=FALSE;
   I64 old_border_src=Fs->border_src,has_action;
@@ -227,8 +227,28 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     doc->flags|=DOCF_MIN_SIZE;
   ml=tempc->member_lst_and_root;
   while (ml) {
-    if (fmtstr=MemberMetaData("fmtstr",ml)) {
-      doc_e=DocPrint(doc,"%s",fmtstr);
+    if ((fmtstr=MemberMetaData("fmtstr",ml)) &&
+	  (doc_e=DocPrint(doc,"%s",fmtstr))) {
+      tempc2=ml->member_class;
+      if ((doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_LST ||
+	    doc_e->type_u8==DOCT_CHECK_BOX) && !tempc2->ptr_stars_cnt) {
+	tempc2=OptClassFwd(tempc2);
+	tempc2-=tempc2->ptr_stars_cnt;
+	if (tempc2->type & HTT_INTERNAL_TYPE) {
+	  if (ml->dim.next) { //Array
+	    if (tempc2->raw_type==RT_U8 &&
+		  LBtr(&doc_e->de_flags,&DOCEf_DFT_LEN)) {
+	      doc_e->len=ml->dim.total_cnt;
+	      if (doc_e->de_flags&DOCEF_HAS_TERMINATOR)
+		doc_e->len--;
+	      Free(doc_e->tag);  //See $LK,"DataTagWidth",A="FA:::/Adam/DolDoc/DocPlain.CPP,DataTagWidth"$
+	      doc_e->tag=MAlloc(doc_e->len+doc_e->min_col+2,
+		    doc->mem_task); //+2 because "_\0"
+	    }
+	  } else if (LBtr(&doc_e->de_flags,DOCEf_DFT_RAW_TYPE))
+	    doc_e->raw_type=tempc2->raw_type;
+	}
+      }
       if (doc_e->de_flags&DOCEF_REMALLOC_DATA) {
 	doc_e->user_data=_d+ml->offset;
 	doc_e->data=*doc_e->user_data(U8 **);

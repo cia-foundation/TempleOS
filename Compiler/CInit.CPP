@@ -211,7 +211,7 @@ U0 CmpLoadDefines()
 	"I8\0U8\0I16\0U16\0I32\0U32\0I64\0U64\0F64\0String\0");
   DefineLstLoad("ST_INT_SIZE_TYPES",
 	"I8\0U8\0I16\0U16\0I32\0U32\0I64\0U64\0");
-  DefineLstLoad("ST_TY_TYPES","NULL\0IMM\0REG\0DISP\0SIB\0RIP\0STK\0");
+  DefineLstLoad("ST_TY_TYPES","NULL\0STK\0IMM\0REG\0DISP\0SIB\0RIP\0");
   DefineLstLoad("ST_U8_REGS","AL\0CL\0DL\0BL\0AH\0CH\0DH\0BH\0"
 	"R8u8\0R9u8\0R10u8\0R11u8\0R12u8\0R13u8\0R14u8\0R15u8\0");
   DefineLstLoad("ST_U8_REX_REGS","AL\0CL\0DL\0BL\0RSPu8\0RBPu8\0RSIu8\0RDIu8\0"
@@ -239,67 +239,22 @@ U0 CmpLoadDefines()
 
 U0 CmpFillTables()
 {
-  I64 i,k;
+  I64 i;
   U32 *d;
 
   cmp.to_reg_vars_map=CAlloc(NUM_REGS*sizeof(U8));
   cmp.num_reg_vars=0;
-  cmp.reg_vars_mask=REGG_C_LOCAL_VARS;
+  cmp.reg_vars_mask=REGG_LOCAL_VARS;
   for (i=0;i<NUM_REGS;i++)
     if (Bt(&cmp.reg_vars_mask,i))
       cmp.to_reg_vars_map[cmp.num_reg_vars++]=i;
 
   cmp.non_ptr_vars_map=CAlloc(NUM_REGS*sizeof(U8));
   cmp.num_non_ptr_vars=0;
-  cmp.non_ptr_vars_mask=REGG_C_LOCAL_NON_PTR_VARS;
+  cmp.non_ptr_vars_mask=REGG_LOCAL_NON_PTR_VARS;
   for (i=0;i<NUM_REGS;i++)
     if (Bt(&cmp.non_ptr_vars_mask,i))
       cmp.non_ptr_vars_map[cmp.num_non_ptr_vars++]=i;
-
-      /* STK TEMP ALLOCATION: See $LK,"::/Compiler/OptPass6.CPP"$.
-
-Expressions are evaluated with a stack machine.
-
-1+(2+3)*4
-
-STK[2]: 1    1	 1   1	 1   1	 21
-STK[1]:      2	 2   5	 5  20
-STK[0]: 	 3	 4
-
-The top of the stack is stored in RAX.
-
-STK[2]: RAX  1	 1   1	 1   1	 RAX
-STK[1]:     RAX  2  RAX  5  RAX
-STK[0]: 	RAX	RAX
-
-Two regs are alloced for stk temps.
-
-STK[0]:
-R9 : RAX R9	R9  R9	R9  R9	 RAX
-R8 :	 RAX R8  RAX R8  RAX
-:	RAX	RAX
-
-Every other funtion, the regs are reversed.  This is to reduce
-pushes before function calls.  R8 is used in even numbered functions
-while R9 is used in odd, so maybe we can avoid pushes if only one
-stk temp reg is used.
-
-STK[0]:
-R9 : RAX R8	R8  R8	R8  R8	 RAX
-R8 :	 RAX R9  RAX R9  RAX
-:	RAX	RAX
-*/
-  cmp.to_stk_temps_map_odd =CAlloc(NUM_REGS*sizeof(U8));
-  cmp.to_stk_temps_map_even=CAlloc(NUM_REGS*sizeof(U8));
-  cmp.num_stk_temps=0;
-  cmp.stk_temps_mask=REGG_C_TEMP_CLOBBERED;
-  for (i=0;i<NUM_REGS;i++)
-    if (Bt(&cmp.stk_temps_mask,i))
-      cmp.to_stk_temps_map_even[cmp.num_stk_temps++]=i;
-  k=cmp.num_stk_temps;
-  for (i=0;i<NUM_REGS;i++)
-    if (Bt(&cmp.stk_temps_mask,i))
-      cmp.to_stk_temps_map_odd[--k]=i;
 
   cmp.dual_U16_tokens1=d=CAlloc(sizeof(U32)*TK_NUM_TK);
   d['!']=TK_NOT_EQU<<16+'=';

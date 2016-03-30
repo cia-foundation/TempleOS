@@ -112,7 +112,7 @@ $FG$$ID,-2$
 
 * Allows ranges like "$FG,2$case 4...7:$FG$" in $FG,2$switch$FG$ stmts.
 
-* A no case number causes next higher integer case in $FG,2$switch$FG$ stmts.  See $LK,"::/Demo/NullCase.CPP"$.
+* A no case number causes next higher int case in $FG,2$switch$FG$ stmts.  See $LK,"::/Demo/NullCase.CPP"$.
 
 $ID,2$$FG,2$I64 i;
 for (i=0;i<20;i++) 
@@ -153,7 +153,7 @@ $ID,-2$
 
 $ID,2$$FG,2$U0 Main()
 {
-  //Only use $LK,"REGG_C_LOCAL_VARS",A="MN:REGG_C_LOCAL_VARS"$ or $LK,"REGG_C_LOCAL_NON_PTR_VARS",A="MN:REGG_C_LOCAL_NON_PTR_VARS"$ for reg vars or else clobbered.
+  //Only use $LK,"REGG_LOCAL_VARS",A="MN:REGG_LOCAL_VARS"$ or $LK,"REGG_LOCAL_NON_PTR_VARS",A="MN:REGG_LOCAL_NON_PTR_VARS"$ for reg vars or else clobbered.
   I64 reg R15 i=5, noreg j=4;
   nounusedwarn i;
   asm {
@@ -219,7 +219,7 @@ $FG$$ID,-2$
 
 * Can't use $FG,2$<>$FG$ with $FG,2$#include$FG$, use $FG,2$""$FG$.
 
-* "$FG,2$$$$FG$" is an escape character.  Two dollar signs signify an ordinary $$.  See $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$.  In $FG,2$asm$FG$ or $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ code, it also refers to the instruction's address or the offset in a $FG,2$class$FG$ definition. 
+* "$FG,2$$$$FG$" is an escape character.  Two dollar signs signify an ordinary $$.  See $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$.  In $FG,2$asm$FG$ or $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ code, it also refers to the inst's address or the offset in a $FG,2$class$FG$ definition. 
 
 * $FG,2$union$FG$ is more like a class, so you don't reference it with a $FG,2$union$FG$ label after you define it.  Some common unions are declared in $LK,"KernelA.HPP",A="MN:U16"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.  See $LK,"::/Demo/SubIntAccess.CPP"$. 
 
@@ -233,7 +233,7 @@ $FG$$ID,-2$
 
 * There is no $FG,2$continue$FG$ stmt.  Use $FG,2$goto$FG$.
 
-* $FG,2$lock{}$FG$ can be used to apply asm $FG,2$LOCK$FG$ prefixes to code for safe multicore read-modify-write accesses.  The code bracked with have $FG,2$LOCK$FG$ asm prefix's applied to relevant instructions within.  It's a little shoddy.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
+* $FG,2$lock{}$FG$ can be used to apply asm $FG,2$LOCK$FG$ prefixes to code for safe multicore read-modify-write accesses.  The code bracked with have $FG,2$LOCK$FG$ asm prefix's applied to relevant insts within.  It's a little shoddy.  See $LK,"::/Demo/MultiCore/Lock.CPP"$.
 
 * There is a function called $LK,"MSize",A="MN:MSize"$() which gives the size of an object alloced off the heap.  For larger size allocations, the system rounds-up to a power of two, so $FG,2$MSize()$FG$ lets you know the real size and you can take full advantage of it.
 

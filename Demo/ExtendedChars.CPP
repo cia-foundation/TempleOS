@@ -30,7 +30,7 @@ U0 SrcExample()
 }
 
 SrcExample;
-//See $LK,"::/Demo/ScreenCodes.CPP"$, $LK,"::/Demo/Graphics/CharGraphics.CPP"$,
-//and $LK,"::/Demo/Graphics/FontEd.CPP"$.
+//See $LK,"::/Demo/ScreenCodes.CPP"$, $LK,"::/Demo/Graphics/CharAnimation.CPP"$,
+//$LK,"::/Demo/Games/CharDemo.CPP"$ and $LK,"::/Demo/Graphics/FontEd.CPP"$.
 
 //See $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ and $LK,"chars_bmp_alpha_numeric",A="MN:chars_bmp_alpha_numeric"$.

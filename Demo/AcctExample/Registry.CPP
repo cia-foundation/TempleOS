@@ -2,7 +2,7 @@ $TR-UL,"Adam"$
 $ID,2$$TR,"SysMsgFlags"$
 $ID,2$sys_msg_flags[0]=0xFF;
 $ID,-2$$TR,"SysRegVer"$
-$ID,2$registry_version=4.040;
+$ID,2$registry_version=4.050;
 $ID,-2$$ID,-2$$TR-UL,"TempleOS"$
 $ID,2$$TR,"TOS"$
 $ID,2$I64 tos_code_walk_thru=105,tos_after_egypt_in_action=46;
@@ -26,8 +26,6 @@ $ID,-2$$TR,"FlapBat"$
 $ID,2$F64 best_score=16.4090;
 $ID,-2$$TR,"TimeOut"$
 $ID,2$I64 best_score=22202;
-$ID,-2$$TR,"RawHide"$
-$ID,2$F64 best_score=96.1279;
 $ID,-2$$TR,"KeepAway"$
 $ID,2$I64 best_score0=0,best_score1=9999;
 $ID,-2$$TR,"XCaliber"$
@@ -37,9 +35,11 @@ $ID,-2$$TR,"Wenceslas"$
 $ID,2$F64 best_score=49.8074;
 $ID,-2$$TR,"BomberGolf"$
 $ID,2$I64 best_score=175;
+$ID,-2$$TR,"RawHide"$
+$ID,2$F64 best_score=96.1279;
 $ID,-2$$ID,-2$$TR,"DemoCompany"$
 $ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=1344.86889;
+$ID,2$F64 best_score=481.84264;
 $TR,"SimpleVal"$
-$ID,2$1300;
+$ID,2$1309;
 $ID,-2$$ID,-2$$ID,-2$

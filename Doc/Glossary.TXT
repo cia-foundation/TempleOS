@@ -7,6 +7,7 @@ $FG,2$Acct$FG$	Account
 $FG,2$ACD$FG$	AutoComplete Dictionary
 $FG,2$Addr$FG$	Address
 $FG,2$Alloc$FG$	Allocate
+$FG,2$Alt$FG$	Alternate
 $FG,2$AOT$FG$	Ahead-of-Time
 $FG,2$AP$FG$	ApplicationProcessor (Core1 - Core7)
 $FG,2$Arg$FG$	Argument
@@ -65,7 +66,8 @@ $FG,2$Ident$FG$	Identifier, Identity
 $FG,2$IDT$FG$	Interrupt Descriptor Table
 $FG,2$Init$FG$	Initialize
 $FG,2$Ins$FG$	Insert
-$FG,2$Int$FG$	Interrupt
+$FG,2$Inst$FG$	Instruction
+$FG,2$Int$FG$	Interrupt, Integer
 $FG,2$ip_$FG$	Input Pointer.  See $LK,"InputPointer.CPP",A="FI:::/Kernel/SerialDev/InputPointer.CPP"$.
 $FG,2$Irq$FG$	Interrupt (Request)
 $FG,2$JIT$FG$	Just-in-Time
@@ -148,11 +150,11 @@ $ID,2$This is Adam, as in Adam and Eve, the parent of all tasks and immortal.  T
 $ID,-2$$TR,"Seth Task"$
 $ID,2$$FG,2$Seth$FG$ is Adam and Eve's child.  Each CPU core has an executive task called $FG,2$Seth$FG$ that is immortal.  The Adam task on $FG,2$CPU#0$FG$ is also it's $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
-$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ instruction, exclusively, and that instruction is limited to calling routines $FG,2$+/-2 Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2 Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:Mem512Alloc"$ heaps.
+$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ inst, exclusively, and that inst is limited to calling routines $FG,2$+/-2 Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2 Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:Mem512Alloc"$ heaps.
 $ID,-2$$TR,"Parent, Child and PopUp Tasks"$
 $ID,2$Often a task will $LK,"Spawn",A="MN:Spawn"$() or $LK,"PopUp",A="MN:PopUp"$() a task as a helper.  The helper is known as a child Task, though you can $LK,"Spawn",A="MN:Spawn"$ a task and assign it a different parent... like $FG,2$Adam$FG$.  Links are kept as to who's whose child, so when one task is $LK,"Kill",A="MN:Kill"$()ed the child helper tasks die, too.  You can get a report of current system tasks with $LK,"TaskRep",A="MN:TaskRep"$().  There is just one window per task, so child tasks are needed for pop-ups.
 $ID,-2$$TR,"HolyC"$
-$ID,2$$LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ is more than $FG,2$C$FG$ and less than $FG,2$C++$FG$.  It has the default args of $FG,2$C++$FG$ and uses $FG,2$class$FG$ in place of $FG,2$struct$FG$.  It uses $FG,2$U0,U8,U16,U32,I64$FG$ and $FG,2$I0,I8,I16,I32,I64$FG$ for signed and unsigned integers.  It has different $LK,"operator precedence",A="FF:::/Doc/HolyC.TXT,operator precedence"$.  It has $FG,2$PASCAL$FG$-like function calls with no parens, but requires an $FG,2$&$FG,2$$FG$ when referring to function addresses.
+$ID,2$$LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ is more than $FG,2$C$FG$ and less than $FG,2$C++$FG$.  It has the default args of $FG,2$C++$FG$ and uses $FG,2$class$FG$ in place of $FG,2$struct$FG$.  It uses $FG,2$U0,U8,U16,U32,I64$FG$ and $FG,2$I0,I8,I16,I32,I64$FG$ for signed and unsigned ints.  It has different $LK,"operator precedence",A="FF:::/Doc/HolyC.TXT,operator precedence"$.  It has $FG,2$PASCAL$FG$-like function calls with no parens, but requires an $FG,2$&$FG,2$$FG$ when referring to function addresses.
 $ID,-2$$TR,"AOT Compile Mode"$
 $ID,2$$FG,2$Ahead-of-Time$FG$ compiling is conventional compilation mode.  Do not use $FG,2$AOT$FG$, use $FG,2$JIT$FG$ compiling.
 
@@ -162,7 +164,7 @@ There is no $FG,2$main()$FG$ routine.  Instead, stmts outside functions are auto
 $ID,-2$$TR,"JIT Compile Mode"$
 $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$
-$ID,2$The compiler generates instructions one step before making actual assembly (machine) language instructions.  This code is reverse polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
+$ID,2$The compiler generates insts one step before making actual assembly (machine) language insts.  This code is reverse polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
 $ID,-2$$TR,"Drive/Partition"$
 $ID,2$There is no distinction between $FG,2$drive$FG$ or $FG,2$partition$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
 
@@ -179,7 +181,7 @@ $LK,"Hash Table",A="HI:Hash"$
 $LK,"RedSea File System",A="FI:::/Doc/RedSea.TXT"$
 $LK,"Sprite",A="HI:Graphics/Sprite"$
 $TR,"CLI, STI, PUSHFD, POPFD"$
-$ID,2$These are x86 assembly instructions.
+$ID,2$These are x86 assembly insts.
 $FG,2$CLI$FG$ disable interrupts.
 $FG,2$STI$FG$ enable interrupts.
 $FG,2$PUSHFD$FG$ pushes the CPU flags.

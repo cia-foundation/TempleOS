@@ -1,5 +1,5 @@
-
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
+
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
 * Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
@@ -37,7 +37,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Bug: Find-and-replace text on $$PT$$ line before it.
 * 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
-* 01/10/2016 find-replace editor hung on $LK,"CounterRenaissance",A="FI:::/Home/Web/TAD/CounterRenaissance.TXT"$ "Rennaisance"
 * 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
 
 * Document, perhaps with video, $LK,"GetStr",A="MN:GetStr"$() all the way down into $LK,"PutKey",A="MN:PutKey"$() code.
@@ -103,6 +102,8 @@ $FG,5$$TX+CX,"TODO: Too Hard, or Not Worth Doing."$$FG$
 * Would be nice to have a routine telling how much free memory, so apps can plan a big alloc.  This is doable, depending on how.
 
 * Log-to-file is inefficient because we load and save whole file.
+
+* $LK,"ICMov",A="MN:ICMov"$() $LK,"PUSH_CMP",A="FF:::/Compiler/BackLib.CPP,PUSH_CMP"$ and $LK,"MDf_STK",A="MN:MDf_STK"$?  Perhaps, it's okay.
 
 * Short FAT32 ~ names.
 
@@ -368,7 +369,7 @@ and blotted at the end.
 
 * static var off of data heap.
 * could add "const" to not set CCF_NOT_CONST flag for trig, etc.
-* could make glblvar imports use TY_RIP_DISP32.
+* could make glblvar imports use MDF_RIP_DISP32.
 * PUSH_CMP allocs reg R9 or whatever
 * Might be problem with NOP in OPT pass1 for NO_PUSH in expressions besides
 assignments.  Is ShiftNoPush fully implemented?
@@ -387,14 +388,16 @@ Lord does not repeat			$TX,"Job 33:14",HTML="http://www.biblegateway.com/verse/e
 Offer only in approved place		$TX,"Deuteronomy 12:13-18",HTML="http://www.biblegateway.com/passage/?search=Deuteronomy%2012:13-18&version=NIV"$
 Jesus' zeal for the Temple		$TX,"John 2:14-19",HTML="http://www.biblegateway.com/passage/?search=John%202:14-19&version=NIV"$
 Famine not for bread			$TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
+To the honest, you are honest		$TX,"Psalm 18:26",HTML="http://www.biblegateway.com/verse/en/Psalm%2018:26"$
 Meek and humble of heart		$TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
+MOses hgets Aaron			$TX,"Exodus 4:10-16",HTML="http://www.biblegateway.com/passage/?search=Exodus%204:10-16&version=NIV"$
 There is no council against the Lord	$TX,"Proverbs 21:30",HTML="http://www.biblegateway.com/verse/en/Proverbs%2021:30"$
-
+Human help is worthless			$TX,"Psalm 108:12",HTML="http://www.biblegateway.com/verse/en/Psalm%20108:12"$
 
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17364 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17362 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
@@ -407,6 +410,7 @@ Pew Pew Pew	$HC,"<center><img src=\"http://i.imgur.com/sMpJ0ch.jpg\" width=\"640
 Iceberg		$HC,"<center><img src=\"https://upload.wikimedia.org/wikipedia/commons/3/38/Blue_ice_in_South_Greenland_-_Visit_Greenland.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
 I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\" height=\"800\" alt=\"\"></center>"$
 NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
+Purple Frog	$HC,"<center><img src=\"https://s-media-cache-ak0.pinimg.com/736x/fb/08/2a/fb082a53bd798f5957a474ff9095e6d4.jpg\" width=\"640\" height=\"420\" alt=\"\"></center>"$
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
@@ -430,6 +434,7 @@ $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5
 $TX,"Dwight: Nerd torture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
 $TX,"TOSZ Compression",HTML="http://www.templeos.org/Wb/Linux/TOSZ.CPP"$
 $TX,"ATA/ATAPI spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
+$TX,"Streaming Terry A. Davis",HTML="https://www.youtube.com/channel/UCdX4uJUwSFwiY3XBvu-F_-Q/live"$
 
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
 $TX,"NIST Beacon",HTML="http://www.nist.gov/itl/csd/ct/nist_beacon.cfm"$

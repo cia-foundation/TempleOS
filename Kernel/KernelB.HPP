@@ -255,14 +255,14 @@ public _intern IC_SET_RBP U0 SetRBP(U8 *d); //Set RBP register value.
 public _intern IC_SET_RFLAGS U0 SetRFlags(I64 d); //Set RFlags register value.
 public _intern IC_SET_RSP U0 SetRSP(U8 *d); //Set RSP register value.
 public _extern _CPUID U0 CPUId(
-	U32 rax,CRAXRBCRCXRDX *result); //Do CPUID instruction.
+	U32 rax,CRAXRBCRCXRDX *result); //Do CPUID inst.
 public _extern _LXCHG_I64 I64 LXchgI64(I64 *dst,I64 d); //Locked eXchange I64s.
 public _extern _LXCHG_U16 U16 LXchgU16(U16 *dst,U16 d); //Locked eXchange U16s.
 public _extern _LXCHG_U32 U32 LXchgU32(U32 *dst,U32 d); //Locked eXchange U32s.
 public _extern _LXCHG_U8  U8 LXchgU8(U8 *dst,U8 d); //Locked eXchange U8s.
 public _extern _SET_MSR U0 SetMSR(
 	I64 model_specific_reg,I64 val); //Model Specific Reg See $LK,"MSRs",A="MN:IA32_EFER"$.
-public _extern _SYS_HLT U0 SysHlt(); //Loops doing HLT instruction.
+public _extern _SYS_HLT U0 SysHlt(); //Loops doing HLT inst.
 public _extern _XCHG_I64 I64 XchgI64(I64 *dst,I64 d); //eXchange I64s.
 public _extern _XCHG_U16 U16 XchgU16(U16 *dst,U16 d); //eXchange U16s.
 public _extern _XCHG_U32 U32 XchgU32(U32 *dst,U32 d); //eXchange U32s.
@@ -272,11 +272,11 @@ public _extern SYS_CACHE_LINE_WIDTH
 _extern SYS_GDT CGDT sys_gdt;
 
 #help_index "Processor/Cache;Memory/Cache"
-public _intern IC_CLFLUSH U0 CLFlush(U8 *a); //Flush cache line instruction.
+public _intern IC_CLFLUSH U0 CLFlush(U8 *a); //Flush cache line inst.
 
 #help_index "Processor/Page Tables;Memory/Page Tables"
 public _intern IC_INVLPG
-	U0 InvlPg(U8 *a); //Invalidate page at addr instruction.
+	U0 InvlPg(U8 *a); //Invalidate page at addr inst.
 
 #help_index "Task;Processor"
 public _intern IC_FS CTask *Fs(); //FS seg reg points to the current $LK,"CTask",A="MN:CTask"$.

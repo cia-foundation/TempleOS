@@ -13,7 +13,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,
   tempc=OptClassFwd(tempc);
   if (tempm=tempc->member_lst_and_root) {
     if (cc->token!='{')
-      LexExcept(cc,"expecting '{' at ");
+      LexExcept(cc,"Expecting '{' at ");
     LexPopNoRestore(cc);
     LexPush(cc);
     Lex(cc);
@@ -26,7 +26,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,
     }
     LexPopNoRestore(cc);
     if (cc->token!='}')
-      LexExcept(cc,"missing '}' at ");
+      LexExcept(cc,"Missing '}' at ");
     Lex(cc);
   } else {
     if (tempc->ptr_stars_cnt==1 &&
@@ -278,7 +278,7 @@ Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
       tempad->total_cnt=1;
       dim->total_cnt*=j;
       if (cc->token!=']')
-	LexExcept(cc,"missing ']' at ");
+	LexExcept(cc,"Missing ']' at ");
     } while (Lex(cc)=='[');
   }
   return result;
@@ -296,7 +296,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tempc1,
 
   pt_start:
   if (!tempc1 || !(tempc1->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-    LexExcept(cc,"invalid class at ");
+    LexExcept(cc,"Invalid class at ");
 
   ptr_stars_cnt=0;
   while (cc->token=='*') {
@@ -323,7 +323,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tempc1,
 
   if (cc->token=='(') {
     if (Lex(cc)!='*')
-      LexExcept(cc,"expecting '*' at ");
+      LexExcept(cc,"Expecting '*' at ");
     ptr_stars_cnt=1; //fun_ptr
     while (Lex(cc)=='*')
       ptr_stars_cnt++; //fun_ptr
@@ -346,15 +346,15 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tempc1,
 	*_ident=StrNew("_anon_");
 	tempm->flags|=MLF_NO_UNUSED_WARN;
       } else
-	LexExcept(cc,"expecting identifier at ");
+	LexExcept(cc,"Expecting identifier at ");
     }
   }
 
   if (ptr_stars_cnt>=0) { //fun_ptr
     if (cc->token!=')')
-      LexExcept(cc,"missing ')' at ");
+      LexExcept(cc,"Missing ')' at ");
     if (Lex(cc)!='(')
-      LexExcept(cc,"expecting '(' at ");
+      LexExcept(cc,"Expecting '(' at ");
     fun_ptr=PrsFunJoin(cc,tempc1,NULL,fsp_flags)+ptr_stars_cnt;
     tempc1=cmp.internal_types[RT_PTR]+ptr_stars_cnt;
   }
@@ -437,7 +437,7 @@ U0 PrsVarLst(CCmpCtrl *cc,CHashClass *tempc,I64 mode,I64 union_base=0)
       cc->class_ip=tempc->size;
     while (cc->token=='$$') {
       if (Lex(cc)!='=') //skip $$
-	LexExcept(cc,"expecting '=' at ");
+	LexExcept(cc,"Expecting '=' at ");
       Lex(cc); //skip =
       cc->class_ip=LexExpression(cc);
       if (-cc->class_ip>tempc->neg_offset)
@@ -447,7 +447,7 @@ U0 PrsVarLst(CCmpCtrl *cc,CHashClass *tempc,I64 mode,I64 union_base=0)
       else
 	tempc->size=cc->class_ip;
       if (cc->token!=';')
-	LexExcept(cc,"missing ';' at");
+	LexExcept(cc,"Missing ';' at");
       Lex(cc); //skip ;
     }
     if (cc->token==')' || cc->token=='}') {
@@ -482,14 +482,14 @@ pvl_restart1:
     else
       temph=NULL;
     if (!temph)
-      LexExcept(cc,"expecting type at ");
+      LexExcept(cc,"Expecting type at ");
     k=PrsKeyWord(cc);
     if (k==KW_UNION) {
       Lex(cc);
       PrsVarLst(cc,tempc,mode|PRSF_UNION,tempc->size);
     } else {
       if (!(temph->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
-	LexExcept(cc,"expecting type at ");
+	LexExcept(cc,"Expecting type at ");
       first=TRUE;
 pvl_restart2:
       tempc1=temph;
@@ -555,7 +555,7 @@ pvl_restart3:
 	  if (cc->flags&CCF_AOT_COMPILE)	{
 	    tempm->static_data_ip=cc->aotc->ip;
 	    k>>=3;
-	    if (sys_var_init_flag&1) {
+	    if (sys_var_init_flag) {
 	      k<<=3;
 	      while (k--)
 		AOTStoreCodeU8(cc,sys_var_init_val);
@@ -563,7 +563,7 @@ pvl_restart3:
 	      while (k--)
 		AOTStoreCodeU64(cc,0);
 	  } else
-	    if (sys_var_init_flag&1)
+	    if (sys_var_init_flag)
 	      MemSet(tempm->static_data,sys_var_init_val,k);
 	  LexPopNoRestore(cc);
 	  if (cc->token=='=') {
@@ -579,7 +579,7 @@ pvl_restart3:
 	      k=(i+7)&~7;
 	      if (cc->flags&CCF_AOT_COMPILE)	{
 		k>>=3;
-		if (sys_var_init_flag&1) {
+		if (sys_var_init_flag) {
 		  k<<=3;
 		  while (k--)
 		    AOTStoreCodeU8(cc,sys_var_init_val);
@@ -587,7 +587,7 @@ pvl_restart3:
 		  while (k--)
 		    AOTStoreCodeU64(cc,0);
 	      } else
-		if (sys_var_init_flag&1)
+		if (sys_var_init_flag)
 		  MemSet(tempm->static_data,sys_var_init_val,k);
 	      LexPopRestore(cc);
 	    }
@@ -724,7 +724,7 @@ pvl_restart3:
 	    goto pvl_done;
 	  break;
 	default:
-	  LexExcept(cc,"missing ';' at");
+	  LexExcept(cc,"Missing ';' at");
       }
     }
   }

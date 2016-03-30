@@ -6,9 +6,9 @@ $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://w
 
 * Windows, Linux and VMware (because of mounted drives) must support $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is actually bad, just as more than one driver for the same type of device is bad.
 $LK,"::/Kernel/BlkDev/FileSysRedSea.CPP"$
-$LK,"::/Kernel/BlkDev/FileSysFAT.CPP"$	:965 lines for FAT32 gets eliminated.
-$LK,"::/Kernel/BlkDev/FileSysISO.CPP"$	:284 lines for ISO9660 gets eliminated.
-$LK,"::/Adam/Opt/Boot/DskISOFile.CPP"$	:536 lines for making ISO files gets reduced.
+$LK,"::/Kernel/BlkDev/FileSysFAT.CPP"$	:973 lines for FAT32 gets eliminated.
+$LK,"::/Kernel/BlkDev/FileSysISO.CPP"$	:293 lines for ISO9660 gets eliminated.
+$LK,"::/Adam/Opt/Boot/DskISOFile.CPP"$	:535 lines for making ISO files gets reduced.
 $LK,"::/Kernel/BlkDev/DskCluster.CPP"$	:152 All the cluster operations become blk.
 
 * Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot because it has no networking. Real hardware as opposed to VMware is like the difference between looking in a telescope eye piece vs just looking at an off-line image.  God said the C64/Apple II generation owned ancestral lands.  VMware is like being taken off of our land and moved onto a reservation.  In this case, however, it will not stand.
@@ -17,19 +17,19 @@ $LK,"::/Kernel/BlkDev/DskCluster.CPP"$	:152 All the cluster operations become bl
 
 * VMware has a bug stretching 640x480 16 color to full screen.
 
-* VMware has a bug starting-up multicore, sometimes.  $LK,"APIC MP Start",A="FF:::/Kernel/MultiProc.CPP,IPI"$
+* VMware has a bug starting-up multicore, sometimes.  $LK,"APIC MP Start",A="FF:::/Kernel/MultiProc.CPP,IPI"$ Fixed?
 
 * VMware PC speaker's distortion is a good idea, but it is too much for hymns.
 
 * VMware and others must list TempleOS as an official 64-bit operating system.
 
 * Until super simple block devices are available, hard disk should be placed at IDE primary master 1F0/3F6 and CD/DVD/Blu-ray should be placed at the IDE secondary master 170/376.
-$LK,"/Kernel/BlkDev/DskATAId.CPP",A="FI:::/Kernel/BlkDev/DskATAId.CPP"$	:280 lines to figure-out I/O ports is gone.
+$LK,"/Kernel/BlkDev/DskATAId.CPP",A="FI:::/Kernel/BlkDev/DskATAId.CPP"$	:285 lines to figure-out I/O ports is gone.
 $LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminated, but maybe we will keep it so people can play with PCI devices.
 
 * Until super simple serial ports are available, PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
 
-* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetResult",A="MN:ATAGetResult"$().  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
+* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetResult",A="MN:ATAGetResult"$().  We don't want to do DMA.  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
 
 * Perhaps, a new interrupt descriptor table entry type or a new x86 CPU mode can be made that cause fast software interrupts, doing exactly what the CALL REL32 does, but with IDT as indirection.  We don't need to change privilege levels or stacks.
 

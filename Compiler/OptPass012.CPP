@@ -186,7 +186,7 @@ args.
 	      tempi->ic_code=IC_IMM_F64;
 	    }
 	  }
-	  if (tempc1->type&HTT_INTERNAL_TYPE && tempc1->raw_type& 1)
+	  if (tempc1->type&HTT_INTERNAL_TYPE && tempc1->raw_type&RTF_UNSIGNED)
 	    tempi->ic_class=cmp.internal_types[tempc1->raw_type-1];
 	  break;
 	case IC_SHL_CONST:
@@ -449,7 +449,7 @@ args.
 	  } else if (cc->pass==2 && tempi2->ic_code==IC_IMM_I64 &&
 		(i=tempi2->ic_data) && Bsf(i)==Bsr(i) &&
 		tempi_push->ic_class->raw_type!=RT_F64 &&
-		tempi_push->ic_class->raw_type&1) {//do only unsigned
+		tempi_push->ic_class->raw_type&RTF_UNSIGNED) {//do only unsigned
 	    tempi2->ic_data=i-1;
 	    tempi->ic_code=IC_AND;
 	  }
@@ -665,8 +665,7 @@ args.
 		    OptSetNOP1(tempi2);
 		    OptSetNOP1(tempi);
 		  } else
-		    if (tempi1->ic_code==IC_ADD ||
-			  tempi1->ic_code==IC_SUB) {
+		    if (tempi1->ic_code==IC_ADD || tempi1->ic_code==IC_SUB) {
 		      if (tempi1->t.a1t->ic_code==IC_IMM_F64) {
 			tempi1->ic_flags|=tempi->ic_flags|tempi2->ic_flags;
 			tempi1->t.a1t->ic_data(F64)-=tempi2->ic_data(F64);
@@ -826,8 +825,7 @@ args.
 	  LexWarn(cc,"Assign U0 ");
 	sub_switch_start:
 	  case IC_MUL_EQU:
-	    if (tempi2->ic_code==IC_IMM_I64 &&
-		  tempc->raw_type!=RT_F64 &&
+	    if (tempi2->ic_code==IC_IMM_I64 && tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64) {
 	      if (i=tempi2->ic_data) {
 		if (Bsf(i)==Bsr(i)) {
@@ -838,8 +836,7 @@ args.
 	    }
 	    break;
 	  case IC_DIV_EQU:
-	    if (tempi2->ic_code==IC_IMM_I64 &&
-		  tempc->raw_type!=RT_F64 &&
+	    if (tempi2->ic_code==IC_IMM_I64 && tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64 &&
 		  (i=tempi2->ic_data) && Bsf(i)==Bsr(i)) {
 	      tempi2->ic_data=Bsf(i);
@@ -847,8 +844,7 @@ args.
 	    }
 	    break;
 	  case IC_MOD_EQU:
-	    if (tempi2->ic_code==IC_IMM_I64 &&
-		  tempc->raw_type!=RT_F64 &&
+	    if (tempi2->ic_code==IC_IMM_I64 && tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64 &&
 		  (i=tempi2->ic_data) && Bsf(i)==Bsr(i)) {
 	      tempi2->ic_data=i-1;
@@ -1286,9 +1282,7 @@ args.
     "Pass:%d Stk:%08X\n",cc->pass,ps->ptr;
     LexExcept(cc,"Compiler Optimization Error at ");
   }
-/*This is for determining type conversions
-for passing args to funs.
-*/
+//This is for determining type conversions for passing args to funs.
   return last_with_class;
 }
 

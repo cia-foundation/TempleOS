@@ -24,7 +24,7 @@ F64 Max(F64 n1,F64 n2)
 }
 
 F64 Pow10I64(I64 i)
-{//F64 integer powers of ten.
+{//F64 int powers of ten.
   if (i>308)
     return ì;
   else if (i<-308)
@@ -34,23 +34,23 @@ F64 Pow10I64(I64 i)
 }
 
 U64 FloorU64(U64 num,U64 to)
-{//Integer multiples of num.
+{//Int multiples of num.
   return num-num%to;
 }
 
 U64 CeilU64(U64 num,U64 to)
-{//Integer multiples of num.
+{//Int multiples of num.
   num+=to-1;
   return num-num%to;
 }
 
 I64 RoundI64(I64 num,I64 to)
-{//Integer multiples of num.
+{//Int multiples of num.
   return num-num%to;
 }
 
 I64 FloorI64(I64 num,I64 to)
-{//Integer multiples of num.
+{//Int multiples of num.
   if (num>=0)
     return num-num%to;
   else {
@@ -60,7 +60,7 @@ I64 FloorI64(I64 num,I64 to)
 }
 
 I64 CeilI64(I64 num,I64 to)
-{//Integer multiples of num.
+{//Int multiples of num.
   if (num>=0) {
     num+=to-1;
     return num-num%to;

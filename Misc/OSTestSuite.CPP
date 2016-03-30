@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=167;
+  progress4_max=168;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -871,12 +871,23 @@ U0 DoExtendedChars()
   XTalk(task,"Exit;\n");
 }
 
-U0 DoCharGraphics()
+U0 DoCharAnimation()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/Graphics/CharGraphics\";\n");
+  XTalkWait(task,"#include \"::/Demo/Graphics/CharAnimation\";\n");
   Sleep(750);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  XTalk(task,"Exit;\n");
+}
+
+U0 DoCharDemo()
+{
+  CTask *task=User;
+  XTalkWait(task,"#include \"::/Demo/Games/CharDemo\";\n");
+  PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_LEFT);
+  Sleep(750);
+  PostMsg(task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
   XTalk(task,"Exit;\n");
 }
 
@@ -2381,7 +2392,8 @@ U0 OSTestSuite()
   TS; DoScreenCodes;
   TS; DoExtendedChars;
   TS; DoPanText;
-  TS; DoCharGraphics;
+  TS; DoCharAnimation;
+  TS; DoCharDemo;
   TS; DoDateTime;
   TS; DoSubSwitch;
   TS; DoNullCase;

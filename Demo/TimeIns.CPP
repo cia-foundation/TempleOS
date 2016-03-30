@@ -1,4 +1,4 @@
-/*Allows you to time instructions.
+/*Allows you to time insts.
 Results vary because the CPU does
 parallel and out-of-order execution.
 */
@@ -20,7 +20,7 @@ U0 TimeIns()
   start=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++) {
     #exe {PassTrace(0b10000000000);};
-//Time these instructions
+//Time these insts
     d*=1.00001;
     #exe {PassTrace(0);};
   }

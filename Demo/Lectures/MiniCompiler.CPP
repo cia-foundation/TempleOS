@@ -11,7 +11,7 @@ $ID,-2$
 $TR,"Mini Compiler"$
 $ID,2$For this mini compiler, some things you should know about 64-bit asm:
 
-* Putting a 0x48, known as the REX byte, in front of an instruction makes it 64-bit size.
+* Putting a 0x48, known as the REX byte, in front of an inst makes it 64-bit size.
 
 * "PUSH EAX", "POP EAX" and "XOR EAX,EAX" will behave as 64-bit even without REX because the stk is always 64 bit and because the XOR clears the upper 32-bits.
 
@@ -112,7 +112,7 @@ U0 PrsTerm(U8 **_src,U8 **_dst,I64 prec)
 
 I64 Parse(U8 **_src,U8 **_dst)
 {//See $LK,"PrsExpression",A="MN:PrsExpression"$().
-//See $LK,"Opcode Fmts",A="FF:::/Compiler/OpCodes.TXT,IDIV"$ for details on asm instructions.
+//See $LK,"Opcode Fmts",A="FF:::/Compiler/OpCodes.TXT,IDIV"$ for details on asm insts.
   I64 i;
   U8 *dst=*_dst;
   switch (Lex(_src,&i)) {
@@ -204,7 +204,7 @@ U0 Main()
 
   while (TRUE) {
     "This will compile an expression\n"
-	  "consisting of integers, parentheses\n"
+	  "consisting of ints, parentheses\n"
 	  "and the operators +,-,* and /.\n";
     src=GetStr;
     if (*src) {

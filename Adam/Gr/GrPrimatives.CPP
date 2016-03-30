@@ -384,7 +384,7 @@ public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
       }
       if (dc->flags & DCF_LOCATE_NEAREST) {
 	dist=DistSqrI64(x,y,dc->cur_x,dc->cur_y);
-	if (dist<dc->nearest_dist) {
+	if (dist<=dc->nearest_dist) {
 	  dc->nearest_dist=dist;
 	  dc->nearest_sprite_elem_num=dc->cur_sprite_elem_num;
 	}

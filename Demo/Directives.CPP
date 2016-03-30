@@ -6,8 +6,8 @@ U0 Directives()
   "Dir  :%s\n",__DIR__;
   "Line :%d\n",__LINE__;
   "Depth:%d\n",__DEPTH__;
-  "Instruction1:%P:%08X\n",$$,$$;
-  "Instruction2:%P:%08X\n",$$,$$;
+  "Inst1:%P:%08X\n",$$,$$;
+  "Inst2:%P:%08X\n",$$,$$;
 }
 
 Directives;

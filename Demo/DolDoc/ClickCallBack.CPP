@@ -20,7 +20,7 @@ U0 ClickCallBack()
   //Flags are explained here:
   //$LK,"::/Doc/DolDocOverview.TXT"$	$LK,"::/Doc/Widget.TXT"$
   //$LK,"Dollar Flags",A="MN:DOCEf_TAG"$		$LK,"ST_DOC_FLAGS",A="FF:::/Adam/DolDoc/DocInit.CPP,ST_DOC_FLAGS"$
-  "(Not preserved when <CTRL-t> and back.)\n\n";
+  "(Not preserved if you press <CTRL-t>.)\n\n";
   doc_e->left_cb=&MyLeftCB1;
   DocUnlock(DocPut);
 }
@@ -32,15 +32,16 @@ I64 MyLeftCB2(CDoc *,CDocEntry *)
   return cnts.jiffies;
 }
 
-U0 PopUpJiffiesCallBack()
+U0 PopUpJiffiesCallBack(I64 i)
 {
   CDoc *doc=DocNew;
-  CDocEntry *doc_e=DocPrint(doc,"\n\n\n$$BT+LC,\"Jiffies\"$$\n\n\n");
+  CDocEntry *doc_e=DocPrint(doc,
+	"Click %d more times\n\n\n$$BT+LC,\"Jiffies\"$$\n\n\n",i);
   doc_e->left_cb=&MyLeftCB2;
   "Current Jiffies:%d\n",PopUpMenu(doc);
   DocDel(doc);
 }
 
-PopUpJiffiesCallBack;
-PopUpJiffiesCallBack;
-PopUpJiffiesCallBack;
+PopUpJiffiesCallBack(3);
+PopUpJiffiesCallBack(2);
+PopUpJiffiesCallBack(1);

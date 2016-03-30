@@ -10,7 +10,7 @@ PUT_DEC_U64::
 //but this function will be nice for ASM callers if it saves all regs.
 	PUSH_C_REGS
 
-	PUSH	RSI	      //See $LK,"REGG_C_LOCAL_VARS",A="MN:REGG_C_LOCAL_VARS"$&$LK,"REGG_C_LOCAL_NON_PTR_VARS",A="MN:REGG_C_LOCAL_NON_PTR_VARS"$
+	PUSH	RSI	      //See $LK,"REGG_LOCAL_VARS",A="MN:REGG_LOCAL_VARS"$&$LK,"REGG_LOCAL_NON_PTR_VARS",A="MN:REGG_LOCAL_NON_PTR_VARS"$
 	LEA	RSI,-1[RBP]	//Load addr of end of buffer.
 				//We picked RSI because of PUT_STR
 				//We'll move bwd

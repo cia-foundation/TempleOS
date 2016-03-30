@@ -129,20 +129,26 @@ U0 DocRecalcXY(CDoc *doc,CDocEntry *doc_e,
 }
 
 CDocEntry *DocSplitTag(CDoc *doc,CDocEntry *doc_e,I64 i,I64 x,I64 y,I64 type_u8)
-{//Split tag at i, insert DOCT_SOFT_NEW_LINE or DOCT_CURSOR
+{//Split tag at i, insert DOCT_SOFT_NEW_LINE, DOCT_MARKER or DOCT_CURSOR
   U8 *ptr;
-  CDocEntry *doc_e2=MAllocIdentical(doc_e,doc->mem_task);
-  doc_e2->tag=StrNew(doc_e->tag+i,doc->mem_task);
-  doc_e2->de_flags=doc_e->de_flags&~DOCEG_HAS_ALLOC|DOCEF_TAG;
-  QueIns(doc_e2,doc_e);
-  if (doc->cur_entry==doc_e && doc->cur_col>=i) {
-    doc->cur_entry=doc_e2;
-    doc->cur_col=doc->cur_col-i;
-  }
-  doc_e->tag[i]=0;
-  ptr=StrNew(doc_e->tag,doc->mem_task);
-  Free(doc_e->tag);
-  doc_e->tag=ptr;
+  CDocEntry *doc_e2;
+  if (doc_e->type_u8==DOCT_TEXT && i) {
+    if (i<StrLen(doc_e->tag)) {
+      doc_e2=MAllocIdentical(doc_e,doc->mem_task);
+      doc_e2->tag=StrNew(doc_e->tag+i,doc->mem_task);
+      doc_e2->de_flags=doc_e->de_flags&~DOCEG_HAS_ALLOC|DOCEF_TAG;
+      QueIns(doc_e2,doc_e);
+      if (doc->cur_entry==doc_e && doc->cur_col>=i) {
+	doc->cur_entry=doc_e2;
+	doc->cur_col=doc->cur_col-i;
+      }
+      doc_e->tag[i]=0;
+      ptr=StrNew(doc_e->tag,doc->mem_task);
+      Free(doc_e->tag);
+      doc_e->tag=ptr;
+    }
+  } else
+    doc_e=doc_e->last;
   doc_e2=DocEntryNewBase(doc,type_u8|doc_e->type & 0xFFFFFF00,
 	doc_e->de_flags&~DOCEG_HAS_ARG,x,y,doc_e->page_line_num);
   MemCpy(&doc_e2->settings,&doc_e->settings,sizeof(CDocSettings));

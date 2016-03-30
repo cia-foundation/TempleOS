@@ -21,17 +21,19 @@ U0 CmpNoteFloatOp(CCmpCtrl *cc,CIntermediateCode *tempi,
       case CN_MAIN:
 	if (cc->last_float_op_ic!=tempi) {
 	  if (cc->dont_push_float) {
-	    if (!(tempi->ic_flags & ICF_A1_FIRST))
-	      tempi->ic_flags|=ICF_ALTERNATE_TEMPLATE;
+	    if (intermediate_code_table[tempi->ic_code].arg_cnt==IS_2_ARG &&
+		  cc->last_float_op_ic->r.reg!=REG_R8)
+	      tempi->ic_flags|=ICF_ALT_TEMPLATE;
 	    else
-	      tempi->ic_flags&=~ICF_ALTERNATE_TEMPLATE;
+	      tempi->ic_flags&=~ICF_ALT_TEMPLATE;
 	    link=TRUE;
 	  }
 	} else {
-	  if (cc->last_float_op_pos==CN_A1 ^^ !(tempi->ic_flags & ICF_A1_FIRST))
-	    tempi->ic_flags|=ICF_ALTERNATE_TEMPLATE;
+	  if (intermediate_code_table[tempi->ic_code].arg_cnt==IS_2_ARG &&
+		cc->last_float_op_pos!=CN_A1)
+	    tempi->ic_flags|=ICF_ALT_TEMPLATE;
 	  else
-	    tempi->ic_flags&=~ICF_ALTERNATE_TEMPLATE;
+	    tempi->ic_flags&=~ICF_ALT_TEMPLATE;
 	  link=TRUE;
 	}
 	break;
@@ -79,7 +81,7 @@ U0 ICCopyTemplate(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,
   U8 *ptr;
   I64 i=0;
   if (!off_the_record) {
-    if (tempi->ic_flags&ICF_ALTERNATE_TEMPLATE)
+    if (tempi->ic_flags&ICF_ALT_TEMPLATE)
       alt=TRUE;
     else
       alt=FALSE;
@@ -118,8 +120,8 @@ U0 ICCopyTemplate(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,
   tempi->ic_cnt+=i;
 }
 
-U0 ICFCvt(CCmpCtrl *cc,CIntermediateCode *tempi,
-	I64 r1,I64 t2,I64 r2,I64 d2,Bool to_int,I64 pos,I64 ip)
+U0 ICFCvt(CCmpCtrl *cc,CIntermediateCode *tempi,I64 r1,
+	CICType t2,I64 r2,I64 d2,Bool to_int,I64 pos,I64 ip)
 {
   I64 rsp_size=0,op1,op2;
   Bool dont_push_float,dont_pop_float;
@@ -134,12 +136,9 @@ U0 ICFCvt(CCmpCtrl *cc,CIntermediateCode *tempi,
 
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
   if (!dont_push_float) {
-    if (!(t2&RT_MASK>=RT_I64 &&
-	  (t2&TY_MASK==TY_DISP ||
-	  t2&TY_MASK==TY_RIP_DISP32 ||
-	  t2&TY_MASK==TY_SIB))) {
+    if (!(t2.raw_type>=RT_I64 && t2&MDG_DISP_SIB_RIP)) {
       ICPush(tempi,t2,r2,d2,ip);
-      t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+      t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
       rsp_size=8;
     } else {
       if (!dont_pop_float) {
@@ -162,13 +161,13 @@ U0 ICFCvt(CCmpCtrl *cc,CIntermediateCode *tempi,
     if (rsp_size)
       ICAddRSP(tempi,rsp_size);
   } else {
-    ICSlashOp(tempi,TY_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,op2,ip);
-    ICPop(tempi,TY_REG+RT_I64,r1,0,ip);
+    ICSlashOp(tempi,MDF_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,op2,ip);
+    ICPop(tempi,MDF_REG+RT_I64,r1,0,ip);
   }
 }
 
-U0 ICFCvt2(CCmpCtrl *cc,CIntermediateCode *tempi,
-	I64 r1,I64 t2,I64 r2,I64 d2,Bool to_int,I64 ip)
+U0 ICFCvt2(CCmpCtrl *cc,CIntermediateCode *tempi,I64 r1,
+	CICType t2,I64 r2,I64 d2,Bool to_int,I64 ip)
 {
   I64 rsp_size=0,op1,op2;
   if (to_int) {
@@ -178,20 +177,17 @@ U0 ICFCvt2(CCmpCtrl *cc,CIntermediateCode *tempi,
     op1=SLASH_OP_FILD;
     op2=SLASH_OP_FSTP;
   }
-  if (!(t2&RT_MASK>=RT_I64 &&
-	(t2&TY_MASK==TY_DISP ||
-	t2&TY_MASK==TY_RIP_DISP32 ||
-	t2&TY_MASK==TY_SIB))) {
+  if (!(t2.raw_type>=RT_I64 && t2&MDG_DISP_SIB_RIP)) {
     ICPush(tempi,t2,r2,d2,ip);
-    t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+    t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
     rsp_size=8;
   } else {
     rsp_size=8;
     ICAddRSP(tempi,-8);
   }
   ICSlashOp(tempi,t2,r2,d2,op1,ip);
-  ICSlashOp(tempi,TY_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,op2,ip);
-  ICPop(tempi,TY_REG+RT_I64,r1,0,ip);
+  ICSlashOp(tempi,MDF_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,op2,ip);
+  ICPop(tempi,MDF_REG+RT_I64,r1,0,ip);
   cc->last_dont_pushable=cc->last_dont_popable=FALSE; //TODO: improve this
 }
 
@@ -206,23 +202,20 @@ U0 ICFUnaryMinus(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf2,I64 ip)
 
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
   if (!dont_push_float) {
-    if (a1->type&RT_MASK>=RT_I64 &&
-	  (a1->type&TY_MASK==TY_DISP ||
-	  a1->type&TY_MASK==TY_RIP_DISP32 ||
-	  a1->type&TY_MASK==TY_SIB)) {
+    if (a1->type.raw_type>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
       t1=a1->type;
       r1=a1->reg;
       d1=a1->disp;
     } else {
-      if (a1->type&TY_MASK==TY_IMM) {
+      if (a1->type&MDF_IMM) {
 	if (!(builtin1=ICBuiltInFloatConst(a1->disp(F64)))) {
-	  t1=TY_RIP_DISP32+RT_I64;
+	  t1=MDF_RIP_DISP32+RT_I64;
 	  r1=REG_RIP;
 	  d1=COCFloatConstFind(cc,a1->disp(F64))+buf2;
 	}
       } else {
 	ICPush(tempi,a1->type,a1->reg,a1->disp,ip);
-	t1=TY_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
+	t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	rsp_size+=8;
       }
     }
@@ -241,7 +234,7 @@ U0 ICFUnaryMinus(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf2,I64 ip)
     if (rsp_size)
       ICAddRSP(tempi,rsp_size);
   } else {
-    ICSlashOp(tempi,TY_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,SLASH_OP_FSTP,ip);
+    ICSlashOp(tempi,MDF_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,SLASH_OP_FSTP,ip);
     ICPop(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,ip);
   }
 }
@@ -251,30 +244,23 @@ U0 ICFMod(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
   Bool dont_push_float,dont_pop_float;
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
   if (dont_push_float) {
-    if (tempi->ic_flags&ICF_ALTERNATE_TEMPLATE)
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+    if (tempi->ic_flags&ICF_ALT_TEMPLATE)
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
     else
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
   } else {
-    if (tempi->ic_flags & ICF_A1_FIRST) {
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-    } else {
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-    }
+    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
   }
 //TODO: unpushable,unpop?  Not sure
   ICCopyTemplate(cc,tempi,CMP_TEMPLATE_MOD,FALSE,FALSE,FALSE,CN_MAIN);
   if (!dont_pop_float)
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	  TY_REG+RT_I64,REG_RAX,0,ip);
+	  MDF_REG+RT_I64,REG_RAX,0,ip);
 }
 
 U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
@@ -284,17 +270,10 @@ U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
   CHashExport *tempex=HashFind("SYS_POW",
 	cc->htc.hash_table_lst,HTT_EXPORT_SYS_SYM);
 
-  if (tempi->ic_flags & ICF_A1_FIRST) {
-    ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-    ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-  } else {
-    ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-    ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-  }
+  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+  ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
   if (cc->flags&CCF_AOT_COMPILE) {
     if (!tempex) {
       tempex=CAlloc(sizeof(CHashExport));
@@ -354,17 +333,16 @@ U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
   }
   tempi->ic_flags&=~ICF_CODE_FINAL;
   ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	TY_REG+RT_I64,REG_RAX,0,ip);
+	MDF_REG+RT_I64,REG_RAX,0,ip);
 }
 
 U0 ICFOp(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 {//for ADD,SUB,DIV,MUL
   CICArg *a1,*a2;
   Bool dont_push_float,dont_pop_float,alt;
-  I64 rsp_size=0,builtin1=0,builtin2=0,
-	t1,r1,d1,t2,r2,d2;
+  I64 rsp_size=0,builtin1=0,builtin2=0,t1,r1,d1,t2,r2,d2;
 
-  if (tempi->ic_flags&ICF_ALTERNATE_TEMPLATE) {
+  if (tempi->ic_flags&ICF_ALT_TEMPLATE) {
     a1=&tempi->a2;
     a2=&tempi->a1;
     alt=TRUE;
@@ -379,122 +357,115 @@ U0 ICFOp(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
   if (dont_push_float) {
-    if (a2->type&RT_MASK>=RT_I64 && (a2->type&TY_MASK==TY_DISP ||
-	  a2->type&TY_MASK==TY_RIP_DISP32 || a2->type&TY_MASK==TY_SIB)) {
+    if (a2->type.raw_type>=RT_I64 && a2->type&MDG_DISP_SIB_RIP) {
       t2=a2->type;
       r2=a2->reg;
       d2=a2->disp;
     } else {
-      if (a2->type&TY_MASK==TY_IMM) {
+      if (a2->type&MDF_IMM) {
 	if (!(builtin2=ICBuiltInFloatConst(a2->disp(F64)))) {
-	  t2=TY_RIP_DISP32+RT_I64;
+	  t2=MDF_RIP_DISP32+RT_I64;
 	  r2=REG_RIP;
 	  d2=COCFloatConstFind(cc,a2->disp(F64))+buf2;
 	}
       } else {
 	ICPush(tempi,a2->type,a2->reg,a2->disp,ip);
-	t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+	t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
 	rsp_size+=8;
       }
     }
   } else {
-    if (tempi->ic_flags & ICF_A1_FIRST^^alt) {
-      if (a2->type&TY_MASK!=TY_STK) {
-	if (a1->type&RT_MASK>=RT_I64 && (a1->type&TY_MASK==TY_DISP ||
-	      a1->type&TY_MASK==TY_RIP_DISP32 || a1->type&TY_MASK==TY_SIB)) {
+    if (alt) {
+      if (!(a2->type&MDF_STK)) {
+	if (a1->type.raw_type>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
 	  t1=a1->type;
 	  r1=a1->reg;
 	  d1=a1->disp;
 	} else {
-	  if (a1->type&TY_MASK==TY_IMM) {
+	  if (a1->type&MDF_IMM) {
 	    if (!(builtin1=ICBuiltInFloatConst(a1->disp(F64)))) {
-	      t1=TY_RIP_DISP32+RT_I64;
+	      t1=MDF_RIP_DISP32+RT_I64;
 	      r1=REG_RIP;
 	      d1=COCFloatConstFind(cc,a1->disp(F64))+buf2;
 	    }
 	  } else {
 	    ICPush(tempi,a1->type,a1->reg,a1->disp,ip);
-	    t1=TY_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
+	    t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	    rsp_size+=8;
 	  }
 	}
-	if (a2->type&RT_MASK>=RT_I64 && (a2->type&TY_MASK==TY_DISP ||
-	      a2->type&TY_MASK==TY_RIP_DISP32 || a2->type&TY_MASK==TY_SIB)) {
+	if (a2->type.raw_type>=RT_I64 && a2->type&MDG_DISP_SIB_RIP) {
 	  t2=a2->type;
 	  r2=a2->reg;
 	  d2=a2->disp;
 	} else {
-	  if (a2->type&TY_MASK==TY_IMM) {
+	  if (a2->type&MDF_IMM) {
 	    if (!(builtin2=ICBuiltInFloatConst(a2->disp(F64)))) {
-	      t2=TY_RIP_DISP32+RT_I64;
+	      t2=MDF_RIP_DISP32+RT_I64;
 	      r2=REG_RIP;
 	      d2=COCFloatConstFind(cc,a2->disp(F64))+buf2;
 	    }
 	  } else {
 	    ICPush(tempi,a2->type,a2->reg,a2->disp,ip);
-	    t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+	    t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
 	    rsp_size+=8;
 	    if (r1==REG_RSP+REG_RSP<<8)
 	      d1+=8;
 	  }
 	}
       } else {
-	ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	      a1->type,a1->reg,a1->disp,ip);
-	ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	      a2->type,a2->reg,a2->disp,ip);
+	ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip);
+	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,a2->type,a2->reg,a2->disp,ip);
 	ICU16(tempi,0x5052);	//PUSH EDX PUSH EAX
 	rsp_size=16;
-	t1=TY_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=8;
-	t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+	t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=8;
+	t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
       }
     } else {
-      if (a1->type&TY_MASK!=TY_STK) {
-	if (a2->type&RT_MASK>=RT_I64 && (a2->type&TY_MASK==TY_DISP ||
-	      a2->type&TY_MASK==TY_RIP_DISP32 || a2->type&TY_MASK==TY_SIB)) {
+      if (!(a1->type&MDF_STK)) {
+	if (a2->type.raw_type>=RT_I64 && a2->type&MDG_DISP_SIB_RIP) {
 	  t2=a2->type;
 	  r2=a2->reg;
 	  d2=a2->disp;
 	} else {
-	  if (a2->type&TY_MASK==TY_IMM) {
+	  if (a2->type&MDF_IMM) {
 	    if (!(builtin2=ICBuiltInFloatConst(a2->disp(F64)))) {
-	      t2=TY_RIP_DISP32+RT_I64;
+	      t2=MDF_RIP_DISP32+RT_I64;
 	      r2=REG_RIP;
 	      d2=COCFloatConstFind(cc,a2->disp(F64))+buf2;
 	    }
 	  } else {
 	    ICPush(tempi,a2->type,a2->reg,a2->disp,ip);
-	    t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+	    t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
 	    rsp_size+=8;
 	  }
 	}
-	if (a1->type&RT_MASK>=RT_I64 && (a1->type&TY_MASK==TY_DISP ||
-	      a1->type&TY_MASK==TY_RIP_DISP32 || a1->type&TY_MASK==TY_SIB)) {
+	if (a1->type.raw_type>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
 	  t1=a1->type;
 	  r1=a1->reg;
 	  d1=a1->disp;
 	} else {
-	  if (a1->type&TY_MASK==TY_IMM) {
+	  if (a1->type&MDF_IMM) {
 	    if (!(builtin1=ICBuiltInFloatConst(a1->disp(F64)))) {
-	      t1=TY_RIP_DISP32+RT_I64;
+	      t1=MDF_RIP_DISP32+RT_I64;
 	      r1=REG_RIP;
 	      d1=COCFloatConstFind(cc,a1->disp(F64))+buf2;
 	    }
 	  } else {
 	    ICPush(tempi,a1->type,a1->reg,a1->disp,ip);
-	    t1=TY_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
+	    t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	    rsp_size+=8;
 	    if (r2==REG_RSP+REG_RSP<<8)
 	      d2+=8;
 	  }
 	}
       } else {
-	ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,a2->type,a2->reg,a2->disp,ip);
-	ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip);
+	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,a2->type,a2->reg,a2->disp,ip);
+	ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip);
 	ICU16(tempi,0x5052);	//PUSH EDX PUSH EAX
 	rsp_size=16;
-	t1=TY_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=8;
-	t2=TY_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
+	t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=8;
+	t2=MDF_SIB+RT_I64; r2=REG_RSP+REG_RSP<<8; d2=0;
       }
     }
   }
@@ -531,10 +502,9 @@ U0 ICFOp(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
       ICAddRSP(tempi,rsp_size);
   } else {
     if (rsp_size==8)
-      ICSlashOp(tempi,TY_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,
-	    SLASH_OP_FSTP,ip);
+      ICSlashOp(tempi,MDF_SIB+RT_I64,REG_RSP+REG_RSP<<8,0,SLASH_OP_FSTP,ip);
     else if (rsp_size>8) {
-      ICSlashOp(tempi,TY_SIB+RT_I64,REG_RSP+REG_RSP<<8,rsp_size-8,
+      ICSlashOp(tempi,MDF_SIB+RT_I64,REG_RSP+REG_RSP<<8,rsp_size-8,
 	    SLASH_OP_FSTP,ip);
       ICAddRSP(tempi,rsp_size-8);
     }
@@ -547,114 +517,87 @@ U0 ICFCmp(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,I64 ip)
   Bool dont_push_float,dont_pop_float;
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
   if (dont_push_float) {
-    if (tempi->ic_flags&ICF_ALTERNATE_TEMPLATE) {
+    if (tempi->ic_flags&ICF_ALT_TEMPLATE) {
       if (tempi->ic_flags&ICF_POP_CMP)
 	ICPopRegs(tempi,1<<REG_RAX);
       else
-	ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	      tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
     } else
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
   } else {
-    if (tempi->ic_flags & ICF_A1_FIRST) {
-      if (tempi->ic_flags&ICF_POP_CMP)
-	ICPopRegs(tempi,1<<REG_RDX);
-      else
-	ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	      tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-    } else {
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      if (tempi->ic_flags&ICF_POP_CMP)
-	ICPopRegs(tempi,1<<REG_RDX);
-      else
-	ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	      tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-    }
+    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+    if (tempi->ic_flags&ICF_POP_CMP)
+      ICPopRegs(tempi,1<<REG_RDX);
+    else
+      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
   }
   if (tempi->ic_flags&ICF_PUSH_CMP)
     ICPushRegs(tempi,1<<REG_RAX);
   ICCopyTemplate(cc,tempi,op,FALSE,TRUE,FALSE,CN_MAIN);
   ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	TY_REG+RT_I64,REG_RAX,0,ip);
+	MDF_REG+RT_I64,REG_RAX,0,ip);
 }
 
 U0 ICFModEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip)
 {
   Bool dont_push_float,dont_pop_float;
   CmpSetFloatOpPushPop(cc,tempi,&dont_push_float,&dont_pop_float);
-  if (tempi->ic_flags & ICF_NOT_ADDR) {
+  if (tempi->ic_flags & ICF_BY_VAL) {
     if (dont_push_float) {
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+	    tempi->a1.type&MDG_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
       if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,FALSE,ip);
-    } else if (tempi->ic_flags & ICF_A1_FIRST) {
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
-	    tempi->a1.reg,tempi->a1.disp,ip);
-      if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,FALSE,ip);
     } else {
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+	    tempi->a1.type&MDG_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
       if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
+	ICFCvt2(cc,tempi,REG_RDX,MDF_REG+RT_I64,REG_RDX,0,FALSE,ip);
     }
 //TODO: unpushable,unpop?  Not sure
     ICCopyTemplate(cc,tempi,CMP_TEMPLATE_MOD,FALSE,FALSE,FALSE,CN_MAIN);
     if (tempi->a1.type_pointed_to!=RT_F64)
-      ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,TRUE,ip);
-    ICMov(tempi,tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
-	  tempi->a1.reg,tempi->a1.disp,TY_REG+RT_I64,REG_RAX,0,ip);
-    if (tempi->r.type&TY_MASK)
+      ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,TRUE,ip);
+    ICMov(tempi,tempi->a1.type&MDG_MASK+tempi->a1.type_pointed_to,
+	  tempi->a1.reg,tempi->a1.disp,MDF_REG+RT_I64,REG_RAX,0,ip);
+    if (tempi->r.type.mode)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    tempi->a1.type&TY_MASK+tempi->a1.type_pointed_to,
+	    tempi->a1.type&MDG_MASK+tempi->a1.type_pointed_to,
 	    tempi->a1.reg,tempi->a1.disp,ip);
   } else {
     if (dont_push_float) {
-      ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,tempi->a1.type,
 	    tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+	    MDF_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
       if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,FALSE,ip);
-    } else if (tempi->ic_flags & ICF_A1_FIRST) {
-      ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
-	    tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
-      if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
+	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,FALSE,ip);
     } else {
-      ICMov(tempi,TY_REG+RT_I64,REG_RAX,0,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
 	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RCX,0,tempi->a1.type,
+      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,tempi->a1.type,
 	    tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,TY_REG+RT_I64,REG_RDX,0,
-	    TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
+      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
+	    MDF_DISP+tempi->a1.type_pointed_to,REG_RCX,0,ip);
       if (tempi->a1.type_pointed_to!=RT_F64)
-	ICFCvt2(cc,tempi,REG_RDX,TY_REG+RT_I64,REG_RDX,0,FALSE,ip);
+	ICFCvt2(cc,tempi,REG_RDX,MDF_REG+RT_I64,REG_RDX,0,FALSE,ip);
     }
 //TODO: unpushable,unpop?  Not sure
     ICCopyTemplate(cc,tempi,CMP_TEMPLATE_MOD,FALSE,FALSE,FALSE,CN_MAIN);
     if (tempi->a1.type_pointed_to!=RT_F64)
-      ICFCvt2(cc,tempi,REG_RAX,TY_REG+RT_I64,REG_RAX,0,TRUE,ip);
-    ICMov(tempi,TY_DISP+tempi->a1.type_pointed_to,REG_RCX,0,
-	  TY_REG+RT_I64,REG_RAX,0,ip);
-    if (tempi->r.type&TY_MASK)
+      ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,TRUE,ip);
+    ICMov(tempi,MDF_DISP+tempi->a1.type_pointed_to,REG_RCX,0,
+	  MDF_REG+RT_I64,REG_RAX,0,ip);
+    if (tempi->r.type.mode)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    TY_REG+RT_I64,REG_RAX,0,ip);
+	    MDF_REG+RT_I64,REG_RAX,0,ip);
   }
 }

@@ -106,6 +106,13 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	      } else
 		DocPrint(doc,"%08X ",*ptr(U32 *)++);
 	      break;
+	    case RT_U64:
+	      if (dynamic) {
+		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U64,A=\"%%08X\"$$ ");
+		doc_e->data=ptr(U64 *)++;
+	      } else
+		DocPrint(doc,"%08X ",*ptr(U64 *)++);
+	      break;
 	    case RT_F64:
 	      if (dynamic) {
 		doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=F64,A=\"%%16g\"$$ ");

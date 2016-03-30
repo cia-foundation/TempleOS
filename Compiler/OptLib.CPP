@@ -18,16 +18,16 @@ U0 OptSetNOP1(CIntermediateCode *tempi)
 {
   tempi->ic_code=IC_NOP1;
   tempi->ic_flags=0;
-  tempi->a1.type=TY_NULL+tempi->a1.type&RT_MASK;
-  tempi->r.type =TY_NULL+tempi->r.type &RT_MASK;
+  tempi->a1.type=MDF_NULL+tempi->a1.type.raw_type;
+  tempi->r.type =MDF_NULL+tempi->r.type.raw_type;
 }
 
 U0 OptSetNOP2(CIntermediateCode *tempi,I64 stk_delta=1)
 {
   tempi->ic_code=IC_NOP2;
   tempi->ic_data=stk_delta;
-  tempi->a1.type=TY_NULL+tempi->a1.type&RT_MASK;
-  tempi->r.type =TY_NULL+tempi->r.type &RT_MASK;
+  tempi->a1.type=MDF_NULL+tempi->a1.type.raw_type;
+  tempi->r.type =MDF_NULL+tempi->r.type.raw_type;
 }
 
 CIntermediateCode *OptFree(CIntermediateCode *tempi)
@@ -168,7 +168,7 @@ fb_here2:
 	return FBO1_NOT_CONST;
     }
   }
-  *is_unsigned=tempc1->raw_type&1 || tempc2->raw_type&1;
+  *is_unsigned=tempc1->raw_type&RTF_UNSIGNED || tempc2->raw_type&RTF_UNSIGNED;
   if (tempi1->ic_code==IC_IMM_I64 && tempi2->ic_code==IC_IMM_I64 &&
 	!(tempi->ic_flags&(ICF_PUSH_CMP|ICF_POP_CMP))) {
     tempi->ic_flags|=tempi1->ic_flags|tempi2->ic_flags;
@@ -193,8 +193,7 @@ Bool OptFixupBinaryOp2(CIntermediateCode **tempi1,CIntermediateCode **tempi2)
   return FALSE;
 }
 
-Bool OptFixupUnaryOp(CIntermediateCode *tempi,
-     CIntermediateCode *tempi1,
+Bool OptFixupUnaryOp(CIntermediateCode *tempi, CIntermediateCode *tempi1,
      Bool *is_unsigned)
 {
   CHashClass *tempc,*tempc1;
@@ -217,7 +216,7 @@ Bool OptFixupUnaryOp(CIntermediateCode *tempi,
     } else
       return FBO1_NOT_CONST;
   }
-  *is_unsigned=tempc1->raw_type&1;
+  *is_unsigned=tempc1->raw_type&RTF_UNSIGNED;
   if (tempi1->ic_code==IC_IMM_I64) {
     tempi->ic_flags|=tempi1->ic_flags;
     OptSetNOP1(tempi1);
@@ -305,7 +304,7 @@ CIntermediateCode *OptBrZero(CCmpCtrl *cc,CIntermediateCode *tempi)
 	  !(tempi->ic_flags&ICF_USE_F64)) {
       tempi->ic_code+=IC_BR_EQU_EQU2-IC_BR_EQU_EQU;
       tempi->ic_flags&=~ICF_PUSH_CMP;
-      tempii=tempi->next; //IC_PUSH_CMP instruction
+      tempii=tempi->next; //IC_PUSH_CMP inst
       while (tempii->ic_code!=IC_PUSH_CMP)
 	tempii=tempii->next;
       tempii->t.a1t=tempi;
@@ -432,7 +431,7 @@ CIntermediateCode *OptBrNotZero(CCmpCtrl *cc,CIntermediateCode *tempi)
 	  !(tempi->ic_flags&ICF_USE_F64)) {
       tempi->ic_code+=IC_BR_EQU_EQU2-IC_BR_EQU_EQU;
       tempi->ic_flags&=~ICF_PUSH_CMP;
-      tempii=tempi->next; //IC_PUSH_CMP instruction
+      tempii=tempi->next; //IC_PUSH_CMP inst
       while (tempii->ic_code!=IC_PUSH_CMP)
 	tempii=tempii->next;
       tempii->t.a1t=tempi;

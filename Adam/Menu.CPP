@@ -62,9 +62,9 @@ CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
       if (cc->token!=',' && cc->token!=')')
 	tempme->a2=LexExpressionI64(cc);
       if (cc->token!=')')
-	LexExcept(cc,"missing ')' at ");
+	LexExcept(cc,"Missing ')' at ");
       if (Lex(cc)!=';')
-	LexExcept(cc,"missing ';' at");
+	LexExcept(cc,"Missing ';' at");
       Lex(cc); //Skip ;
     } else if (cc->token=='{') {
       Lex(cc); //Skip {
@@ -73,11 +73,11 @@ CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
       while (tempse && cc->token!='}')
 	tempse=tempse->next=MenuNewSub(cc,task);
       if (cc->token!='}')
-	LexExcept(cc,"missing '}' at ");
+	LexExcept(cc,"Missing '}' at ");
       else
 	Lex(cc); //Skip }
     } else
-      LexExcept(cc,"expecting '{' at ");
+      LexExcept(cc,"Expecting '{' at ");
   }
   return tempme;
 }

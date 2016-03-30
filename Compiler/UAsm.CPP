@@ -1,4 +1,4 @@
-I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
+I64 InstEntriesCompare(CInst *tempi1,CInst *tempi2)
 {
   I64 i1,i2,j=0,result=0,oc_cnt1=tempi1->opcode_cnt,oc_cnt2=tempi2->opcode_cnt;
   if (tempi1->flags&IEF_STI_LIKE)
@@ -44,9 +44,9 @@ I64 InstEntriesCompare(CInstruction *tempi1,CInstruction *tempi2)
 }
 
 /*
-U0 DumpUAsmIns(CInstruction *tempi)
+U0 DumpUAsmIns(CInst *tempi)
 {
-  CHashOpcode *tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInstruction)
+  CHashOpcode *tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInst)
   -offset(CHashOpcode.ins);
   "%10s:%02d,%02d SV:%02d\n",tempo->str,
 	tempi->arg1,tempi->arg2,tempi->slash_val;
@@ -63,10 +63,10 @@ U0 DumpUAsmTables()
 }
 */
 
-CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
+CInst *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 {//Binary Search
   I64 i,j,n,m,k,a1,a2,o1,o2,oc_cnt;
-  CInstruction *tempi,**table;
+  CInst *tempi,**table;
   i=0;
   if (seg_size==64) {
     table=uasm.table_64;
@@ -123,7 +123,9 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 		      tempi->flags&IEF_48_REX)
 		  m=-1;
 	      }
-	    }
+	    } else if ((Bt(&uasm.mem_arg_mask,a1)||Bt(&uasm.mem_arg_mask,a2)) &&
+		  ip[n]&0xC0==0xC0)
+	      m=1;
 	    goto ief_compare_done;
 	  case SV_I_REG:
 	    m=ip[n]>>3-tempi->opcode[tempi->opcode_cnt-1]>>3;
@@ -147,10 +149,8 @@ CInstruction *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 	      }
 	    }
 	    if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
-	      if (!Bt(&uasm.ins64_arg_mask,a1) &&
-		    !Bt(&uasm.ins64_arg_mask,a2) &&
-		    !(tempi->flags&IEF_48_REX)&&
-		    !(a2==ARGT_NO &&
+	      if (!Bt(&uasm.ins64_arg_mask,a1) &&!Bt(&uasm.ins64_arg_mask,a2) &&
+		    !(tempi->flags&IEF_48_REX)&& !(a2==ARGT_NO &&
 		    (ARGT_UIMM8<=a1<=ARGT_UIMM64 || ARGT_IMM8<=a1<=ARGT_IMM64)))
 		m=1;
 	      else if (tempi->arg2==ARGT_IMM64 || tempi->arg2==ARGT_UIMM64) {
@@ -188,7 +188,7 @@ ief_compare_done:
 U0 UAsmHashLoad()
 {
   CHashOpcode *temph;
-  CInstruction *tempi;
+  CInst *tempi;
   I64 i,j1,j2,k;
 
   uasm.ins64_arg_mask=0x0880888880+1<<ARGT_ST0+1<<ARGT_STI;
@@ -200,9 +200,9 @@ U0 UAsmHashLoad()
   for (i=0;i<=cmp.asm_hash->mask;i++) {
     temph=cmp.asm_hash->body[i];
     while (temph) {
-      if (temph->type==HTT_OPCODE) {
+      if (temph->type==HTT_OPCODE && !(temph->oc_flags&OCF_ALIAS)) {
 	tempi=&temph->ins;
-	for (k=0;k<temph->instruction_entry_cnt;k++) {
+	for (k=0;k<temph->inst_entry_cnt;k++) {
 	  uasm.table_16_32_entries++;
 	  if (!(tempi->flags&IEF_NOT_IN_64_BIT))
 	    uasm.table_64_entries++;
@@ -219,9 +219,9 @@ U0 UAsmHashLoad()
   for (i=0;i<=cmp.asm_hash->mask;i++) {
     temph=cmp.asm_hash->body[i];
     while (temph) {
-      if (temph->type==HTT_OPCODE) {
+      if (temph->type==HTT_OPCODE && !(temph->oc_flags&OCF_ALIAS)) {
 	tempi=&temph->ins;
-	for (k=0;k<temph->instruction_entry_cnt;k++) {
+	for (k=0;k<temph->inst_entry_cnt;k++) {
 	  uasm.table_16_32[j1++]=tempi;
 	  if (!(tempi->flags&IEF_NOT_IN_64_BIT))
 	    uasm.table_64[j2++]=tempi;
@@ -236,14 +236,14 @@ U0 UAsmHashLoad()
 }
 
 U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
-{//Unassembles one instruction
+{//Unassembles one inst
   I64 i,disp,imm,opsize,opadd,
 	a1,a2,reloced_a1,reloced_a2,
 	a1_size=0,a2_size=0,reloced_a1_size,reloced_a2_size,
 	ModrM=-1,SIB=-1,scale,r1,r2,
 	Mod=-1,RM1=-1,RM2=-1,REX=-1,REX_r=0,REX_x=0,REX_b=0;
   Bool cont;
-  CInstruction *tempi,*tempi2;
+  CInst *tempi,*tempi2;
   CHashOpcode *tempo;
   U8 *ip=*_ip,*ptr,*reloced_a1_st,*reloced_a2_st,
 	*bin_data_area1,*bin_data_area2,
@@ -328,14 +328,13 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
   tempi=InstEntryFind(ip,opsize,seg_size);
   if (opsize==32 && seg_size==64) {
     tempi2=InstEntryFind(ip,64,seg_size);
-    if (tempi2!=tempi &&
-	  tempi2->flags&IEF_REX_ONLY_R8_R15 ||
+    if (tempi2!=tempi && tempi2->flags&IEF_REX_ONLY_R8_R15 ||
 	  tempi2->flags&IEF_REX_XOR_LIKE&& ip[1]>>3&7==ip[1]&7)
       tempi=tempi2;
   }
 
   ip+=tempi->opcode_cnt;
-  tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInstruction)
+  tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInst)
   -offset(CHashOpcode.ins);
   if (just_ins)
     *line1=0;
@@ -393,12 +392,9 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     }
   }
 
-  if (ARGT_RM8<=a1<=ARGT_RM64 ||
-	ARGT_M8<=a1<=ARGT_M64 ||
-	ARGT_RM8<=a2<=ARGT_RM64 ||
-	ARGT_M8<=a2<=ARGT_M64) {
-    if (ARGT_RM8<=a2<=ARGT_RM64 ||
-	  ARGT_M8<=a2<=ARGT_M64) {
+  if (ARGT_RM8<=a1<=ARGT_RM64 || ARGT_M8<=a1<=ARGT_M64 ||
+	ARGT_RM8<=a2<=ARGT_RM64 || ARGT_M8<=a2<=ARGT_M64) {
+    if (ARGT_RM8<=a2<=ARGT_RM64 || ARGT_M8<=a2<=ARGT_M64) {
       reloced_a1=a2;
       reloced_a2=a1;
       reloced_a1_size=a2_size;
@@ -647,7 +643,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
 }
 
 U8 *U(U8 *ip,I64 cnt=20,I64 seg_size=64)
-{//Unassembles a num of instructions.
+{//Unassembles a num of insts.
   I64 i;
   U8 buf[1024];
   if (seg_size==16)

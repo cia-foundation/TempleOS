@@ -132,7 +132,7 @@ class CMetallicaForm
 
 class CWebBookMarkForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
   U8	special[STR_LEN];
   I64	timestamp;
   I64	cert;
@@ -142,8 +142,8 @@ class CWebBookMarkForm
 
 class CWebBibleForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Bible Passage:%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Bible Passage:%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -152,7 +152,7 @@ class CWebBibleForm
 
 class CYouTubeForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Title:%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Title:%s\"$$\n";
   U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
   I64	timestamp;
   I64	cert;
@@ -163,7 +163,7 @@ class CYouTubeForm
 class CImgurForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"SerialNum:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"SerialNum:%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min		fmtstr "$$DA,A=\"Width    :%d\"$$\n";
@@ -172,8 +172,8 @@ class CImgurForm
 
 class CWikipediaForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Index   :%s\"$$\n";
+  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Index   :%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -183,7 +183,7 @@ class CWikipediaForm
 class CRandDecForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Dec):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Line (Dec):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -193,7 +193,7 @@ class CRandDecForm
 class CRandHexForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Hex):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Line (Hex):%s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -203,7 +203,7 @@ class CRandHexForm
 class CRandCertForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,LEN=STR_LEN-1,A=\"Line (Dec) :%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Line (Dec) :%s\"$$\n";
   I64	timestamp;
   I64	cert		fmtstr "$$DA,A=\"Certificate:%d\"$$\n";
   I64	min;
@@ -213,8 +213,7 @@ class CRandCertForm
 class CRandHexBeacon5Form
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]
-			fmtstr "$$DA-P-TRM,LEN=5,"
+  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=5,"
 	"A=\"Line (5-Digit Hex):%5s\"$$\n";
   I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
   I64	cert;
@@ -225,8 +224,7 @@ class CRandHexBeacon5Form
 class CRandHexBeacon8Form
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN]
-			fmtstr "$$DA-P-TRM,LEN=8,"
+  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=8,"
 	"A=\"Line (8-Digit Hex):%8s\"$$\n";
   I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
   I64	cert;
@@ -427,7 +425,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tempde1);
 }
 
-#define NIST_TIME_OFFSET	(-7900-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-7916-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()

@@ -38,7 +38,7 @@ _MALLOC::
 	CLI
 @@25:	LOCK
 	BTS	U32 CHeapCtrl.locked_flags[RDX],HClf_LOCKED
-	PAUSE	//don't know if this instruction helps
+	PAUSE	//don't know if this inst helps
 	JC	@@25
 
 	CMP	RAX,MEM_HEAP_HASH_SIZE

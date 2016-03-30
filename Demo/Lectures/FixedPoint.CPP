@@ -1,4 +1,4 @@
-/*"Fixed point" means you use integers
+/*"Fixed point" means you use ints
 that are scaled by a value.  A common
 example would be using number of pennies
 instead of dollars with a float.
@@ -10,7 +10,7 @@ and my compiler used to do floats poorly.
 It's a little better.
 
 I often use 64-bit ints with upper 32-bits
-as integer and lower 32-bits as fraction.
+as int and lower 32-bits as fraction.
 
 See $LK,"::/Demo/SubIntAccess.CPP"$ for how
 to access upper or lower 32-bits.
@@ -29,7 +29,7 @@ U0 Main()
   t0=tS;
   for (i=1000000000;i;i--)
     i_sum+=i_val;
-  "Integer Sum:%.9f Time:%7.3fs\n",i_sum/ToF64(0x100000000),tS-t0;
+  "Int Sum:%.9f Time:%7.3fs\n",i_sum/ToF64(0x100000000),tS-t0;
 
   f_val= 2.0000002;
   t0=tS;
@@ -47,7 +47,7 @@ U0 DoIt2()
   "i&0xFFFFFFFF=%X\n",i&0xFFFFFFFF;
   "i>>32       =%X\n",i>>32;
 
-  /*  Standard integer types are declared
+  /*  Standard int types are declared
 with a special compiler feature which
 allows a structure to be accessed as a
 whole.  That's why the i variable can
@@ -87,7 +87,7 @@ DoIt2;
 /*Program Output$HL,0$$WW+H,1$$FD,1$
 
 8 Cores 2.660GHz
-Integer Sum:2000000199.768689408 Time:	0.787s
+Int Sum:2000000199.768689408 Time:	0.787s
 Float	Sum:2000000225.656126208 Time:	3.918s
 
 i	    =123456789ABCDEF0

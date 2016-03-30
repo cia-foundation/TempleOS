@@ -1,8 +1,8 @@
 /*The moral of this story is simple
-instruction level optimizations
+inst level optimizations
 don't matter much on a modern Intel CPU
-because they convert complex instructions
-to a stream of RISC instructions.
+because they convert complex insts
+to a stream of RISC insts.
 
 I learned this the hard way when I thought
 I was greatly improving my compiler by
@@ -61,7 +61,7 @@ _WELL_OPTIMIZED3::
 	XOR	RAX,RAX
 	MOV	RCX,SAMPLES-1
 @@05:	ADD	RAX,RCX
-	LOOP	@@05	//Instruction sucks in speed, but saves code size.
+	LOOP	@@05	//Inst sucks in speed, but saves code size.
 	RET
 }
 

@@ -16,11 +16,11 @@ U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tempu,U8 *label,Bool undefined)
       }
       tempauh=tempauh->next; //Technically, more than one won't work.
     }
-  } else if (!(tempu->type&1))	{//Rel?
+  } else if (!(tempu->type&IEF_IMM_NOT_REL)) {
     r-=tempu->rel_ip;
     if (tempu->type==IET_REL_I8 && !(MIN_I8<=r<=MAX_I8) ||
 	  tempu->type==IET_REL_I16 && !(MIN_I16<=r<=MAX_I16)) {
-      PrintErr("branch out of range at line:%04d %s\n",
+      PrintErr("Branch out of range at line:%04d %s\n",
 	    tempu->line_num,label);
       LexExcept(cc);
     }
@@ -53,7 +53,7 @@ U0 AOTLocalsResolve(CCmpCtrl *cc)
     tempauh=tempu->asm_undef_hash;
     while (tempauh) {
       if (tempauh->hash->type & HTF_UNRESOLVED) {
-	PrintErr("undefined sym at line:%04d %s %s\n",
+	PrintErr("Undefined sym at line:%04d %s %s\n",
 	      tempu->line_num,aotc->last_label,tempauh->hash->str);
 	LexExcept(cc);
       }
@@ -94,8 +94,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
     while (tempauh) {
       if (tempauh->hash->type & HTF_UNRESOLVED) {
 	tempex=tempauh->hash;
-	if (tempex->type & HTT_EXPORT_SYS_SYM &&
-	      tempex->type & HTF_UNRESOLVED &&
+	if (tempex->type & HTT_EXPORT_SYS_SYM&& tempex->type & HTF_UNRESOLVED &&
 	      !(tempex->type & HTF_IMPORT) &&
 	      (tempf=HashFind(tempex->str,cc->htc.hash_table_lst,HTT_FUN)) &&
 	      !Bt(&tempf->flags,Cf_EXTERN)) {
@@ -108,7 +107,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
 	      tempex->type|=HTF_GOTO_LABEL;
 	      tempex->use_cnt++;
 	    } else {
-	      PrintErr("undefined sym at line:%04d %s\n",
+	      PrintErr("Undefined sym at line:%04d %s\n",
 		    tempu->line_num,tempex->str);
 	      LexExcept(cc);
 	    }
@@ -150,7 +149,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
 	}
       } else if (tempex->type & (HTF_EXPORT|HTF_RESOLVE)) {
 	if (tempex->type & HTF_UNRESOLVED) {
-	  PrintErr("undefined sym at %s\n",tempex->str);
+	  PrintErr("Undefined sym at %s\n",tempex->str);
 	  LexExcept(cc);
 	}
 	if (tempex->type & HTF_RESOLVE) {

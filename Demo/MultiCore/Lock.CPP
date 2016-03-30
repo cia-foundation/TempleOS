@@ -1,8 +1,8 @@
 /*lock{} is a compiler stmt
-which places asm LOCK instruction
+which places asm LOCK inst
 prefixes on code.  Only use it on
 read-modify-write stmts.
-It will generate invalid instructions
+It will generate invalid insts
 if you misuse it and it will crash.
 $LK,"U",A="MN:U"$() to see what code was generated.
 */

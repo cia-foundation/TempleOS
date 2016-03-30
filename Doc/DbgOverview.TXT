@@ -6,7 +6,7 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 
 * While debugging, you specify addresses of assembly routines with just the label, as in $FG,2$_MALLOC+0x20$FG$.  You specify $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ function names with $FG,2$&$FG$ before functions as in $FG,2$&Print+0x10$FG$.
 
-* I use $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ for debugging because they show on the wallpaper.  They're just global integer vars.
+* I use $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ for debugging because they show on the wallpaper.  They're just global int vars.
 
 * You can use $LK,"AdamLog",A="MN:AdamLog"$() to send text to the Adam task window.  It works like $LK,"Print",A="MN:Print"$().  I never use that.  Instead, I use $LK,"RawPrint",A="MN:RawPrint"$().
 

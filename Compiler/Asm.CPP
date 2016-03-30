@@ -1,7 +1,7 @@
 Bool PrsAsmImm(CCmpCtrl *cc,CAsmArg *arg)
 {
   if (arg->imm_or_off_present)
-    LexExcept(cc,"already one immediate at ");
+    LexExcept(cc,"Already one immediate at ");
   arg->imm_or_off_present=TRUE;
   arg->num.local_asm_undef_hash=NULL;
   arg->num.glbl_asm_undef_hash=NULL;
@@ -146,8 +146,8 @@ pa_asm_direct_imm:
 	    goto pa_asm_indirect_imm;
 	} else if (cc->token=='*') {
 	  Lex(cc);
-	  if (cc->token!=TK_INTEGER)
-	    LexExcept(cc,"expecting scale factor at ");
+	  if (cc->token!=TK_INT)
+	    LexExcept(cc,"Expecting scale factor at ");
 	  arg->scale=cc->cur_i64;
 	  Lex(cc); //skip scale
 	  if (arg->reg2!=REG_NONE)
@@ -161,7 +161,7 @@ pa_asm_indirect_imm:
 	}
       }
       if (cc->token!=']')
-	LexExcept(cc,"missing ']' at ");
+	LexExcept(cc,"Missing ']' at ");
       Lex(cc); //skip ]
       return;
     } else
@@ -276,7 +276,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	      num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 	      U8_avail);
       else if (!num2->imm_flag && !(MIN_I8<=num2->num.i<=MAX_I8))
-	LexExcept(cc,"branch out of range at ");
+	LexExcept(cc,"Branch out of range at ");
       if (num2->imm_flag) {
 	if (num2->num.abs_cnts.abs_addres&1) {
 	  tempa=CAlloc(sizeof(CAOTAbsAddr));
@@ -303,7 +303,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 		num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 		U8_avail);
 	else if (!num2->imm_flag && !(MIN_I16<=num2->num.i<=MAX_I16))
-	  LexExcept(cc,"branch out of range at ");
+	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
 	    tempa=CAlloc(sizeof(CAOTAbsAddr));
@@ -330,7 +330,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 		num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 		U8_avail);
 	else if (!num2->imm_flag && !(MIN_I32<=num2->num.i<=MAX_I32))
-	  LexExcept(cc,"branch out of range at ");
+	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
 	    tempa=CAlloc(sizeof(CAOTAbsAddr));
@@ -387,13 +387,13 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 
 U8 asm_seg_prefixes[6]={0x26,0x2E,0x36,0x3E,0x64,0x65};
 
-Bool PrsAsmInstruction(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
+Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 {
   CAOTCtrl *aotc=cc->aotc;
   I64 i,j,a1,a2,om,seg,arg1mask,arg2mask;
   CAsmArg *tempa1,*tempa2;
   Bool ModrM_complete,U8_avail=FALSE,found_second_possible=FALSE;
-  CInstruction *tempi;
+  CInst *tempi;
 
   CAsmIns cur,best;
   best.U8_cnt=255;
@@ -406,12 +406,12 @@ Bool PrsAsmInstruction(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
     arg2mask=AsmMakeArgMask(cc,&aotc->arg2);
   else
     arg2mask=1;
-  for (i=0;i<tempo->instruction_entry_cnt;i++) {
+  for (i=0;i<tempo->inst_entry_cnt;i++) {
     tempi=&tempo->ins[i];
     if (tempi->arg1==ARGT_REL8 || tempi->arg2==ARGT_REL8)
       U8_avail=TRUE;
     if (Bt(&arg1mask,tempi->arg1) && Bt(&arg2mask,tempi->arg2) &&
-	(!(tempi->flags&IEF_NOT_IN_64_BIT) || aotc->seg_size!=64)) {
+	  (!(tempi->flags&IEF_NOT_IN_64_BIT) || aotc->seg_size!=64)) {
       MemSet(&cur,0,sizeof(CAsmIns));
       cur.tempi=tempi;
       ModrM_complete=FALSE;
@@ -559,8 +559,7 @@ Bool PrsAsmInstruction(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	      }
 	    }
 	  }
-	} else if (ARGT_REL8<=a1<=ARGT_REL32 ||
-	      ARGT_IMM8<=a1<=ARGT_IMM64 ||
+	} else if (ARGT_REL8<=a1<=ARGT_REL32 || ARGT_IMM8<=a1<=ARGT_IMM64 ||
 	      ARGT_UIMM8<=a1<=ARGT_UIMM64) {
 	  if (a1==ARGT_IMM64 || a2==ARGT_UIMM64)
 	    cur.REX|=8;
@@ -596,12 +595,11 @@ Bool PrsAsmInstruction(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	      cur.last_opcode_U8|=tempa2->fstk;
 	  }
 	}
-	if (a1==ARGT_RM64 || a2==ARGT_RM64 ||
-	      a1==ARGT_M64 || a2==ARGT_M64 ||
+	if (a1==ARGT_RM64 || a2==ARGT_RM64 || a1==ARGT_M64 || a2==ARGT_M64 ||
 	      a1==ARGT_R64 || a2==ARGT_R64)
 	  cur.REX|=8;
 	if (ARGT_RM8<=a1<=ARGT_RM64 || ARGT_RM8<=a2<=ARGT_RM64 ||
-	      ARGT_M8 <=a1<=ARGT_M64  || ARGT_M8 <=a2<=ARGT_M64) {
+	      ARGT_M8<=a1<=ARGT_M64  || ARGT_M8<=a2<=ARGT_M64) {
 	  if (aotc->seg_size==16)
 	    cur.has_addr_prefix=TRUE;
 	  cur.has_ModrM=TRUE;
@@ -801,11 +799,11 @@ Bool PrsAsmInstruction(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
       if (!AsmStoreNum(cc,&best.imm,1,U8_avail))
 	return FALSE;
     }
-    if (tempi->flags&IEF_ENDING_ZERO) //ENTER instruction
+    if (tempi->flags&IEF_ENDING_ZERO) //ENTER inst
       AOTStoreCodeU8(cc,0);
     return TRUE;
   }
-  LexExcept(cc,"invalid instruction at ");
+  LexExcept(cc,"Invalid inst at ");
 }
 
 U0 PrsAsmDefine(CCmpCtrl *cc,I64 U8_cnt)
@@ -853,11 +851,11 @@ U0 PrsAsmDefine(CCmpCtrl *cc,I64 U8_cnt)
 	      cc->hash_entry->user_data0==AKW_DUP) {
 	  is_dup=TRUE;
 	  if (Lex(cc)!='(')
-	    LexExcept(cc,"expecting '(' at ");
+	    LexExcept(cc,"Expecting '(' at ");
 	  Lex(cc); //skip (
 	  dup_val=AsmLexExpression(cc);
 	  if (cc->token!=')')
-	    LexExcept(cc,"expecting ')' at ");
+	    LexExcept(cc,"Expecting ')' at ");
 	  Lex(cc); //SKIP )
 	}
       }
@@ -866,7 +864,7 @@ U0 PrsAsmDefine(CCmpCtrl *cc,I64 U8_cnt)
       num2.num.abs_cnts=cc->abs_cnts;
       if (is_dup) {
 	if (num2.num.local_asm_undef_hash || num2.num.glbl_asm_undef_hash)
-	  LexExcept(cc,"undefined DUP cnt at ");
+	  LexExcept(cc,"Undefined DUP cnt at ");
 	num2.num.i=dup_val;
 	AsmStoreNum(cc,&num2,i,FALSE);
       } else {
@@ -878,7 +876,7 @@ U0 PrsAsmDefine(CCmpCtrl *cc,I64 U8_cnt)
       Lex(cc);
   }
   if (cc->token!=';')
-    LexExcept(cc,"missing ';' at");
+    LexExcept(cc,"Missing ';' at");
   Lex(cc);
 }
 
@@ -887,14 +885,14 @@ U0 PrsBinFile(CCmpCtrl *cc)
   I64 i,size;
   U8 *buf,*st;
   if (cc->token!=TK_STR)
-    LexExcept(cc,"expecting string at ");
+    LexExcept(cc,"Expecting string at ");
   st=DftExt(cc->cur_str,"BIN");
   buf=FileRead(st,&size);
   Free(st);
   for (i=0;i<size;i++)
     AOTStoreCodeU8(cc,buf[i]);
   if (Lex(cc)!=';')
-    LexExcept(cc,"missing ';' at");
+    LexExcept(cc,"Missing ';' at");
   Lex(cc);
 }
 
@@ -912,7 +910,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
   cc->flags|=CCF_ASM_EXPRESSIONS;
   if (!(cmp_flags&CMPF_ONE_ASM_INS)) {
     if (cc->token!='{')
-      LexExcept(cc,"expecting '{' at ");
+      LexExcept(cc,"Expecting '{' at ");
     Lex(cc);
   }
   while (cc->token && cc->token!='}') {
@@ -925,7 +923,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	  case AKW_IMPORT:
 	    while (cc->token && cc->token!=';') {
 	      if (cc->token!=TK_IDENT)
-		LexExcept(cc,"expecting identifier at ");
+		LexExcept(cc,"Expecting identifier at ");
 	      else {
 		tempex=NULL;
 		tempex=CAlloc(sizeof(CHashExport));
@@ -939,7 +937,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	      }
 	    }
 	    if (cc->token!=';')
-	      LexExcept(cc,"missing ';' at");
+	      LexExcept(cc,"Missing ';' at");
 	    Lex(cc); //skip ';';
 	    break;
 	  case AKW_MODULE_ORG:
@@ -963,7 +961,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	    if (j>aotc->max_align_bits) aotc->max_align_bits=j;
 	    i=CeilU64(aotc->ip,i);
 	    if (cc->token!=',')
-	      LexExcept(cc,"expecting ',' at ");
+	      LexExcept(cc,"Expecting ',' at ");
 	    Lex(cc);
 	    k=AsmLexExpression(cc);
 	    for (j=aotc->ip;j<i;j++)
@@ -1000,7 +998,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	    aotc->seg_size=64;
 	    break;
 	  default:
-	    LexExcept(cc,"syntax error at ");
+	    LexExcept(cc,"Syntax error at ");
 	}
       } else if (cc->hash_entry->type & HTT_OPCODE) {
 	tempo=cc->hash_entry;
@@ -1015,7 +1013,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	  if (tempo->ins[0].arg2) {
 	    argcnt++;
 	    if (cc->token!=',')
-	      LexExcept(cc,"expecting ',' at ");
+	      LexExcept(cc,"Expecting ',' at ");
 	    else {
 	      Lex(cc); //skip ','
 	      if (ARGT_REL8<=tempo->ins[0].arg2<=ARGT_REL32)
@@ -1025,13 +1023,13 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	    }
 	  }
 	}
-	PrsAsmInstruction(cc,tempo,argcnt);
+	PrsAsmInst(cc,tempo,argcnt);
       } else if (cc->hash_entry->type & HTT_EXPORT_SYS_SYM) {
 	if (Btr(&cc->hash_entry->type,HTf_UNRESOLVED)) {
 	  if (cc->hash_entry->type & HTF_LOCAL) {
 	    cc->hash_entry(CHashExport *)->val=aotc->ip;
 	    if (Lex(cc)!=':')
-	      LexExcept(cc,"expecting ':' at ");
+	      LexExcept(cc,"Expecting ':' at ");
 	    Lex(cc);
 	  } else {
 	    if (cc->hash_entry->type & HTF_IMPORT)
@@ -1040,7 +1038,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	    next_last_label=cc->hash_entry->str;
 	    Lex(cc); //Skip cur_str
 	    if (cc->token!=':' && cc->token!=TK_DBL_COLON)
-	      LexExcept(cc,"expecting ':' at ");
+	      LexExcept(cc,"Expecting ':' at ");
 	    if (cc->token==TK_DBL_COLON) {
 	      cc->hash_entry->type|=HTF_EXPORT;
 	      HashSrcFileSet(cc,cc->hash_entry);
@@ -1053,12 +1051,12 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	} else if (cc->hash_entry(CHashExport *)->val==aotc->ip) {
 	  Lex(cc); //Skip cur_str
 	  if (cc->token!=':' && cc->token!=TK_DBL_COLON)
-	    LexExcept(cc,"expecting ':' at ");
+	    LexExcept(cc,"Expecting ':' at ");
 	  Lex(cc);
 	} else
-	  LexExcept(cc,"redefinition at ");
+	  LexExcept(cc,"Redefinition at ");
       } else
-	LexExcept(cc,"syntax error at ");
+	LexExcept(cc,"Syntax error at ");
     } else if (cc->token==TK_IDENT) {
       tempex=CAlloc(sizeof(CHashExport));
       tempex->str=cc->cur_str;
@@ -1067,11 +1065,11 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
       tempex->val=aotc->ip;
       Lex(cc);	//Skip cur_str
       if (cc->token!=':' && cc->token!=TK_DBL_COLON)
-	LexExcept(cc,"expecting ':' at ");
+	LexExcept(cc,"Expecting ':' at ");
       else {
 	if (*tempex->str=='@' && tempex->str[1]=='@') {
 	  if (cc->token==TK_DBL_COLON)
-	    LexExcept(cc,"no local glbl exports at ");
+	    LexExcept(cc,"No local glbl exports at ");
 	  HashAdd(tempex,cc->htc.local_hash_table);
 	} else
 	  HashAdd(tempex,cc->htc.glbl_hash_table);
@@ -1099,7 +1097,7 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
     } else if (cc->token==';')
       Lex(cc);
     else
-      LexExcept(cc,"syntax error at ");
+      LexExcept(cc,"Syntax error at ");
     if (cmp_flags&CMPF_ONE_ASM_INS && (cc->token!=TK_IDENT ||
 	  !(tempo=cc->hash_entry) ||
 	  !(tempo->type&(HTT_OPCODE|HTT_ASM_KEYWORD))))

@@ -238,7 +238,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	g.type=type;
 	LexD2I32(cc,&g.pp.x1);
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	LexD2I32(cc,&g.pp.x2);
 	break;
@@ -247,7 +247,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	Lex(cc); //Skip {
 	LexD2I32(cc,&g.pp.x1);
 	if (cc->token!=':')
-	  LexExcept(cc,"expecting ':' at ");
+	  LexExcept(cc,"Expecting ':' at ");
 	Lex(cc); //Skip :
 	LexD2I32(cc,&g.pp.x2);
 	g.ppa.x2+=g.pp.x1;
@@ -289,7 +289,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	g.type=SPT_CIRCLE;
 	LexD2I32(cc,&g.pr.x1);
 	if (cc->token!=':')
-	  LexExcept(cc,"expecting ':' at ");
+	  LexExcept(cc,"Expecting ':' at ");
 	Lex(cc); //Skip :
 	g.pr.radius=LexExpressionI64(cc);
 	break;
@@ -297,17 +297,17 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	Lex(cc); //Skip {
 	g.pwhas.sides=LexExpressionI64(cc);
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
       case SPT_ELLIPSE:
 	Lex(cc); //Skip {
 	g.type=type;
 	LexD2I32(cc,&g.pwha.x1);
 	if (cc->token!=':')
-	  LexExcept(cc,"expecting ':' at ");
+	  LexExcept(cc,"Expecting ':' at ");
 	Lex(cc); //Skip :
 	LexD2I32(cc,&g.pwha.width);
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	g.pwha.angle=ã/180*LexExpressionF64(cc);
 	break;
@@ -323,11 +323,11 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       g.type=type;
       LexD2I32(cc,&g.ps.x1);
       if (cc->token!=',')
-	LexExcept(cc,"expecting ',' at ");
+	LexExcept(cc,"Expecting ',' at ");
       if (Lex(cc)==TK_STR)  //Skip ,
 	st=LexExtStr(cc);
       else
-	LexExcept(cc,"expecting string at ");
+	LexExcept(cc,"Expecting string at ");
       size=SpriteElemQuedBaseSize(type);
       i=StrLen(st)+1;
       result=MAlloc(size+i);
@@ -348,7 +348,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	  Lex(cc); //Skip ,
       }
       if (g.nu.num<2)
-	LexExcept(cc,"expecting point at ");
+	LexExcept(cc,"Expecting point at ");
       size=SpriteElemQuedBaseSize(SPT_POLYLINE);
       result=MAlloc(size+g.nu.num*sizeof(CD2I32));
       MemCpy(result,&g,size);
@@ -377,7 +377,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	  Lex(cc); //Skip ,
       }
       if (g.nu.num<2)
-	LexExcept(cc,"expecting point at ");
+	LexExcept(cc,"Expecting point at ");
       size=SpriteElemQuedBaseSize(type);
       result=MAlloc(size+g.nu.num*sizeof(CD3I32));
       if (LexExpressionI64(cc)) {
@@ -406,11 +406,11 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       Lex(cc); //Skip {
       LexD2I32(cc,&g.npu.x);
       if (cc->token!=',')
-	LexExcept(cc,"expecting ',' at ");
+	LexExcept(cc,"Expecting ',' at ");
       tempv=QueVectU8New;
       while (TRUE) {
 	if (!(i=LexGetChar(cc)))
-	  LexExcept(cc,"expecting '}' at ");
+	  LexExcept(cc,"Expecting '}' at ");
 	if (i=='}')
 	  break;
 	if ('0'<=i<='7')
@@ -431,16 +431,16 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       Lex(cc); //Skip {
       LexD2I32(cc,&g.pwhu.x1);
       if (cc->token!=':')
-	LexExcept(cc,"expecting ':' at ");
+	LexExcept(cc,"Expecting ':' at ");
       Lex(cc); //Skip :
       LexD2I32(cc,&g.pwhu.width);
       if (cc->token!=',')
-	LexExcept(cc,"expecting ',' at ");
+	LexExcept(cc,"Expecting ',' at ");
       tempv=QueVectU8New;
       num1=0;
       while (TRUE) {
 	if (!(i=ToUpper(LexGetChar(cc))))
-	  LexExcept(cc,"expecting '}' at ");
+	  LexExcept(cc,"Expecting '}' at ");
 	if (i=='}')
 	  break;
 	if ('0'<=i<='9')
@@ -469,16 +469,16 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       if (LexExpressionI64(cc)) {
 	g.type=SPT_SHIFTABLE_MESH;
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	LexD3I32(cc,&g.pmu.x);
 	if (cc->token!=':')
-	  LexExcept(cc,"expecting ':' at ");
+	  LexExcept(cc,"Expecting ':' at ");
 	Lex(cc); //Skip :
       } else {
 	g.type=SPT_MESH;
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
       }
       num1=0;
@@ -492,7 +492,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	  Lex(cc); //Skip ,
       }
       if (cc->token!=':')
-	LexExcept(cc,"expecting ':' at ");
+	LexExcept(cc,"Expecting ':' at ");
       Lex(cc); //Skip :
       num2=0;
       QueInit(&roott);
@@ -503,19 +503,19 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	Free(st);
 	Lex(cc); //Skip color
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	tempt->nums[0]=LexExpressionI64(cc);
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	tempt->nums[1]=LexExpressionI64(cc);
 	if (cc->token!=',')
-	  LexExcept(cc,"expecting ',' at ");
+	  LexExcept(cc,"Expecting ',' at ");
 	Lex(cc); //Skip ,
 	tempt->nums[2]=LexExpressionI64(cc);
 	if (cc->token!=')')
-	  LexExcept(cc,"expecting ')' at ");
+	  LexExcept(cc,"Expecting ')' at ");
 	Lex(cc); //Skip )
 	QueIns(tempt,roott.last);
 	num2++;
@@ -553,9 +553,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       break;
   }
   if (cc->token!='}')
-    LexExcept(cc,"expecting '}' at ");
+    LexExcept(cc,"Expecting '}' at ");
   if (Lex(cc)!=';')
-    LexExcept(cc,"expecting ';' at ");
+    LexExcept(cc,"Expecting ';' at ");
   return result;
 }
 
@@ -580,7 +580,7 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
 	if (Lex(cc)=='{') //Skip ident
 	  QueIns(Code2SpriteElem(cc,i),root.last);
       } else if (cc->token)
-	LexExcept(cc,"expecting sprite element type name at ");
+	LexExcept(cc,"Expecting sprite element type name at ");
     } while (cc->token);
     okay=TRUE;
   } catch {

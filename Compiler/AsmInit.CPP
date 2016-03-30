@@ -1,4 +1,4 @@
-U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
+U0 AsmPrsInsFlags(CCmpCtrl *cc,CInst *tempi)
 {
   I64 i;
   while (TRUE) {
@@ -9,7 +9,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
 	  break;
 	} else
 	  return;
-      case TK_INTEGER:
+      case TK_INT:
 	if (cc->cur_i64==16)
 	  tempi->flags|=IEF_OP_SIZE16;
 	else if (cc->cur_i64==32)
@@ -20,7 +20,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
       case '+':
 	tempi->flags|=IEF_PLUS_OPCODE;
       case '/':
-	if (Lex(cc)==TK_INTEGER && cc->cur_i64<8)
+	if (Lex(cc)==TK_INT && cc->cur_i64<8)
 	  tempi->slash_val=cc->cur_i64;
 	else if (cc->token==TK_IDENT) {
 	  if (!StrCmp(cc->cur_str,"R"))
@@ -49,13 +49,13 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInstruction *tempi)
 
 U0 AsmHashLoad()
 {//See $LK,"::/Compiler/OpCodes.TXT"$.
-  I64 i,j,size,size1;
+  I64 i,j,size,size_max;
   CInternalType *tempit;
   CCmpCtrl *cc;
   CHashGeneric *temph;
   CHashReg *tempr;
-  CHashOpcode *tempo,*tempo1;
-  CInstruction *tempi;
+  CHashOpcode *tempo,*tempo2,*tempo_max;
+  CInst *tempi;
   CHashClass *tempc;
 
   cmp.size_arg_mask[0]=0x3FF0FFFFFE;
@@ -65,42 +65,57 @@ U0 AsmHashLoad()
   cmp.size_arg_mask[8]=0x0880888880;
 
   cmp.asm_hash=HashTableNew(1024);
-  size1=offset(CHashOpcode.ins)+sizeof(CInstruction)<<5;
-  tempo=MAlloc(size1);
+  size_max=offset(CHashOpcode.ins)+sizeof(CInst)<<5;
+  tempo_max=MAlloc(size_max);
 
   cc=CmpCtrlNew(FileRead("OpCodes.TXT"),,"OpCodes.TXT.Z");
   cc->htc.hash_table_lst=NULL;
   Lex(cc);
   while (cc->token) {
     if (cc->token!=TK_IDENT)
-      LexExcept(cc,"expecting identifier at ");
+      LexExcept(cc,"Expecting identifier at ");
     i=LstMatch(cc->cur_str,"R8\0R16\0R32\0R64\0SEG\0FSTK\0"
 	  "MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
     if (i<0)
       LexExcept(cc,"Unknown Stmt");
     Lex(cc); //skip keyword
     if (cc->token!=TK_IDENT)
-      LexExcept(cc,"expecting identifier at ");
+      LexExcept(cc,"Expecting identifier at ");
     switch (i) {
-      case 8: //OPCODE
-	MemSet(tempo,0,size1);
-	tempo->type=HTT_OPCODE;
-	tempo->instruction_entry_cnt=0;
-	tempo->str=cc->cur_str;
+      case REGT_R8...REGT_XMM:
+	tempr=CAlloc(sizeof(CHashReg));
+	tempr->str=cc->cur_str;
+	cc->cur_str=NULL;
+	Lex(cc); //skip keyword name
+	if (cc->token!=TK_INT)
+	  LexExcept(cc,"Expecting int at ");
+	tempr->type=HTT_REG;
+	tempr->reg_type=i;
+	tempr->reg_num=cc->cur_i64;
+	HashAdd(tempr,cmp.asm_hash);
+	Lex(cc); //Skip INT
+	break;
+      case: //OPCODE
+	if (cc->token!=TK_IDENT)
+	  LexExcept(cc,"Expecting opcode at ");
+	MemSet(tempo_max,0,size_max);
+	tempo_max->type=HTT_OPCODE;
+	tempo_max->inst_entry_cnt=0;
+	tempo_max->str=cc->cur_str;
 	cc->cur_str=0;
 	Lex(cc);	//Skip OPCODE
-	while (cc->token && cc->token!=';') {
-	  tempi=&tempo->ins[tempo->instruction_entry_cnt];
-	  tempi->ins_entry_num=tempo->instruction_entry_cnt++;
+	while (cc->token && cc->token!=';' && cc->token!=':') {
+	  tempi=&tempo_max->ins[tempo_max->inst_entry_cnt];
+	  tempi->ins_entry_num=tempo_max->inst_entry_cnt++;
 	  tempi->slash_val=SV_NONE; //Not zero!!
-	  while (cc->token==TK_INTEGER) {
+	  while (cc->token==TK_INT) {
 	    tempi->opcode[tempi->opcode_cnt++]=cc->cur_i64;
 	    Lex(cc);
 	  }
 	  if (cc->token==',')
 	    Lex(cc);
 	  else if (cc->token!=';')
-	    LexExcept(cc,"expecting ',' at ");
+	    LexExcept(cc,"Expecting ',' at ");
 
 	  AsmPrsInsFlags(cc,tempi);
 
@@ -136,24 +151,34 @@ U0 AsmHashLoad()
 	    }
 	  }
 	}
-	size=offset(CHashOpcode.ins)+
-	      sizeof(CInstruction)*tempo->instruction_entry_cnt;
-
-	tempo1=MAlloc(size);
-	MemCpy(tempo1,tempo,size);
-	tempo1->use_cnt=0;
-	if (HashFind(tempo1->str,cmp.asm_hash,HTT_OPCODE))
+	size=offset(CHashOpcode.ins)+sizeof(CInst)*tempo_max->inst_entry_cnt;
+	tempo=MAlloc(size);
+	MemCpy(tempo,tempo_max,size);
+	tempo->use_cnt=0;
+	if (HashFind(tempo->str,cmp.asm_hash,HTT_OPCODE))
 	  LexExcept(cc,"Duplicate OPCODE entry ");
-	HashAdd(tempo1,cmp.asm_hash);
+	HashAdd(tempo,cmp.asm_hash);
+	//Parse aliases.
+	if (cc->token==':') {
+	  while (Lex(cc)==TK_IDENT) {
+	    tempo2=MAllocIdentical(tempo);
+	    tempo2->str=cc->cur_str;
+	    cc->cur_str=0;
+	    tempo2->oc_flags|=OCF_ALIAS;
+	    if (HashFind(tempo2->str,cmp.asm_hash,HTT_OPCODE))
+	      LexExcept(cc,"Duplicate OPCODE ALIAS entry ");
+	    HashAdd(tempo2,cmp.asm_hash);
+	  }
+	}
 	break;
-      case 9:  //KEYWORD
-      case 10: //ASM_KEYWORD
+      case: //KEYWORD
+      case: //ASM_KEYWORD
 	temph=CAlloc(sizeof(CHashGeneric));
 	temph->str=cc->cur_str;
 	cc->cur_str=NULL;
 	Lex(cc); //skip keyword name
-	if (cc->token!=TK_INTEGER)
-	  LexExcept(cc,"expecting integer at ");
+	if (cc->token!=TK_INT)
+	  LexExcept(cc,"Expecting int at ");
 	temph->user_data0=cc->cur_i64;
 	if (i==9)
 	  temph->type=HTT_KEYWORD;
@@ -162,32 +187,12 @@ U0 AsmHashLoad()
 	HashAdd(temph,cmp.asm_hash);
 	Lex(cc); //Skip INT
 	break;
-      case REGT_R8:
-      case REGT_R16:
-      case REGT_R32:
-      case REGT_R64:
-      case REGT_SEG:
-      case REGT_FSTK:
-      case REGT_MM:
-      case REGT_XMM:
-	tempr=CAlloc(sizeof(CHashReg));
-	tempr->str=cc->cur_str;
-	cc->cur_str=NULL;
-	Lex(cc); //skip keyword name
-	if (cc->token!=TK_INTEGER)
-	  LexExcept(cc,"expecting integer at ");
-	tempr->type=HTT_REG;
-	tempr->reg_type=i;
-	tempr->reg_num=cc->cur_i64;
-	HashAdd(tempr,cmp.asm_hash);
-	Lex(cc); //Skip INT
-	break;
     }
     if (cc->token!=';')
-      LexExcept(cc,"missing ';' at");
+      LexExcept(cc,"Missing ';' at");
     Lex(cc); //Skip ';'
   }
-  Free(tempo);
+  Free(tempo_max);
   CmpCtrlDel(cc);
   for (i=0;i<NUM_INTERNAL_TYPES;i++) {
     tempit=&internal_types_table[i];

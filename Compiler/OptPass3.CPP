@@ -40,12 +40,10 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	mv[member_cnt].offset_start=tempm->offset;
 	mv[member_cnt].offset_end=tempm->offset+MaxI64(1,tempm->size);
 	mv[member_cnt++].m=tempm;
-      } else {
-	if (tempm->reg==REG_ALLOC)
-	  PrintWarn("Can't reg var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
-		cc->lex_include_stk->full_name,
-		cc->lex_include_stk->line_num,tempm->str,cc->htc.fun->str);
-      }
+      } else if (tempm->reg==REG_ALLOC)
+	PrintWarn("Can't reg var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
+	      cc->lex_include_stk->full_name,
+	      cc->lex_include_stk->line_num,tempm->str,cc->htc.fun->str);
       tempm=tempm->next;
     }
   } else
@@ -75,7 +73,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    tempc2=cmp.internal_types[RT_I64];
 	  else
 	    tempc2=tempi->t.a2c;
-	  tempi->a2.type=TY_STK+CmpRawType(tempc2);
+	  tempi->a2.type=MDF_STK+CmpRawType(tempc2);
 	  tempi->a2.type_pointed_to=CmpRawTypePointed(tempc2);
 	  tempi->ic_flags|=ICF_A2_WAS_STK;
 	case IS_1_ARG:
@@ -86,7 +84,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    tempc1=cmp.internal_types[RT_I64];
 	  else
 	    tempc1=tempi->t.a1c;
-	  tempi->a1.type=TY_STK+CmpRawType(tempc1);
+	  tempi->a1.type=MDF_STK+CmpRawType(tempc1);
 	  tempi->a1.type_pointed_to=CmpRawTypePointed(tempc1);
 	  tempi->ic_flags|=ICF_A1_WAS_STK;
 	  break;
@@ -94,7 +92,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  break;
       }
       if (intermediate_code_table[code].result_cnt) {
-	tempi->r.type=TY_STK+CmpRawType(tempc);
+	tempi->r.type=MDF_STK+CmpRawType(tempc);
 	tempi->r.type_pointed_to=CmpRawTypePointed(tempc);
 	tempi->ic_flags|=ICF_R_WAS_STK;
 	PrsPush(ps,tempi);
@@ -121,12 +119,12 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  tempi->a1.reg=REG_RBP;
 	  break;
 	case IC_DEREF:
-	  tempi->a1.type_pointed_to=tempi->r.type&RT_MASK;
+	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
 	  if (tempi1->ic_code==IC_LEA) {
 	    tempi->ic_flags|=tempi1->ic_flags;
 	    tempi->a1.reg=tempi1->a1.reg;
 	    tempi->a1.disp=tempi1->a1.disp;
-	    tempi->a1.type=TY_DISP+tempi->r.type&RT_MASK;
+	    tempi->a1.type=MDF_DISP+tempi->r.type.raw_type;
 	    tempi->a1.type_pointed_to=tempi->r.type_pointed_to;
 	    tempi->ic_code=IC_MOV;
 	    OptFree(tempi1);
@@ -142,7 +140,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	      tempi->ic_flags|=tempil2->ic_flags|tempil1->ic_flags;
 	      tempi->a1.reg=tempil2->a1.reg;
 	      tempi->a1.disp=tempi->ic_data;
-	      tempi->a1.type=TY_DISP+tempi->r.type&RT_MASK;
+	      tempi->a1.type=MDF_DISP+tempi->r.type.raw_type;
 	      tempi->a1.type_pointed_to=tempi->r.type_pointed_to;
 	      tempi->ic_code=IC_MOV;
 	      OptFree(tempil2);
@@ -157,8 +155,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  tempi->r.type_pointed_to=CmpRawTypePointed(tempi->t.a1c);
 	case IC_DEREF_PP:
 	case IC_DEREF_MM:
-	  if (tempi1->ic_code==IC_LEA &&
-		tempi1->a1.type&TY_MASK==TY_DISP &&
+	  if (tempi1->ic_code==IC_LEA && tempi1->a1.type&MDF_DISP &&
 		tempi1->a1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
 	      if (mv[i].offset_start==tempi1->a1.disp) {
@@ -166,7 +163,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		mv[i].score++;
 		break;
 	      }
-	  tempi->a1.type_pointed_to=tempi->r.type&RT_MASK;
+	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
 	  break;
 	case IC_MUL:
 	case IC_DIV:
@@ -186,15 +183,14 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	      tempi->t.a1c=tempi->t.a2c;
 	    tempi->ic_data=tempi1->ic_data;
 	    tempi->ic_code=IC_ADD_CONST;
-	    tempi->a1.type_pointed_to=tempi->r.type&RT_MASK;
-	    tempi->a2.type=TY_NULL;
+	    tempi->a1.type_pointed_to=tempi->r.type.raw_type;
+	    tempi->a2.type=MDF_NULL;
 	    OptFree(tempi1);
-	    if (tempil2->ic_code==IC_REG &&
-		  tempil2->a1.reg==REG_RBP) {
+	    if (tempil2->ic_code==IC_REG && tempil2->a1.reg==REG_RBP) {
 	      tempi->ic_flags|=tempil2->ic_flags;
 	      tempi->ic_code=IC_LEA;
 	      tempi->a1.reg=REG_RBP;
-	      tempi->a1.type=TY_DISP+tempi->a1.type&RT_MASK;
+	      tempi->a1.type=MDF_DISP+tempi->a1.type.raw_type;
 	      tempi->a1.disp=tempi->ic_data;
 	      for (i=0;i<member_cnt;i++)
 		if (mv[i].offset_start<=tempi->ic_data<mv[i].offset_end) {
@@ -215,7 +211,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    tempi->ic_flags|=tempi2->ic_flags;
 	    tempi->ic_data=tempi2->ic_data;
 	    tempi->ic_code=IC_SUB_CONST;
-	    tempi->a2.type=TY_NULL;
+	    tempi->a2.type=MDF_NULL;
 	    OptFree(tempi2);
 	  }
 	  break;
@@ -241,8 +237,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	case IC_AND_EQU:
 	case IC_OR_EQU:
 	case IC_XOR_EQU:
-	  if (tempi1->ic_code==IC_LEA &&
-		tempi1->a1.type&TY_MASK==TY_DISP &&
+	  if (tempi1->ic_code==IC_LEA && tempi1->a1.type&MDF_DISP &&
 		tempi1->a1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
 	      if (mv[i].offset_start==tempi1->a1.disp) {
@@ -250,7 +245,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		mv[i].score++;
 		break;
 	      }
-	  tempi->a1.type_pointed_to=tempi->r.type&RT_MASK;
+	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
 	  tempi->r.type_pointed_to=CmpRawTypePointed(tempi->t.a1c);
 	  break;
 	case IC_RETURN_VAL:
@@ -295,7 +290,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		tempi1->ic_code==IC_IMM_F64) && !tempi1->ic_data) {
 	    OptFree(tempi1);
 	    MemCpy(&tempi->a1,&tempi->a2,sizeof(CICArg));
-	    tempi->a2.type=TY_NULL;
+	    tempi->a2.type=MDF_NULL;
 	    if (code==IC_BR_EQU_EQU)
 	      code=tempi->ic_code=IC_BR_ZERO;
 	    else
@@ -305,7 +300,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  } else if ((tempi2->ic_code==IC_IMM_I64 ||
 		tempi2->ic_code==IC_IMM_F64) && !tempi2->ic_data) {
 	    OptFree(tempi2);
-	    tempi->a2.type=TY_NULL;
+	    tempi->a2.type=MDF_NULL;
 	    if (code==IC_BR_EQU_EQU)
 	      code=tempi->ic_code=IC_BR_ZERO;
 	    else
@@ -317,7 +312,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  if (tempi1->ic_code==IC_IMM_I64 || tempi1->ic_code==IC_IMM_F64) {
 	    if (code==IC_BR_ZERO ^^ tempi1->ic_data) {
 	      OptFree(tempi1);
-	      tempi->a1.type=TY_NULL;
+	      tempi->a1.type=MDF_NULL;
 	      tempi->ic_code=IC_JMP;
 	    } else {
 	      OptFree(tempi1);
@@ -331,7 +326,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    i=Bsr(tempi1->ic_data);
 	    if (0<=i==Bsf(tempi1->ic_data)) {
 	      tempi1->ic_data=i;
-	      tempi->ic_flags|=ICF_NOT_ADDR;
+	      tempi->ic_flags|=ICF_BY_VAL;
 	      tempi->ic_code=IC_BR_NOT_BT;
 	      goto here1;
 	    }
@@ -340,7 +335,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    i=Bsr(tempi2->ic_data);
 	    if (0<=i==Bsf(tempi2->ic_data)) {
 	      tempi2->ic_data=i;
-	      tempi->ic_flags|=ICF_SWAP|ICF_NOT_ADDR;
+	      tempi->ic_flags|=ICF_SWAP|ICF_BY_VAL;
 	      tempi->ic_code=IC_BR_NOT_BT;
 	    }
 	  }
@@ -350,7 +345,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    i=Bsr(tempi1->ic_data);
 	    if (0<=i==Bsf(tempi1->ic_data)) {
 	      tempi1->ic_data=i;
-	      tempi->ic_flags|=ICF_NOT_ADDR;
+	      tempi->ic_flags|=ICF_BY_VAL;
 	      tempi->ic_code=IC_BR_BT;
 	      goto here1;
 	    }
@@ -359,15 +354,14 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    i=Bsr(tempi2->ic_data);
 	    if (0<=i==Bsf(tempi2->ic_data)) {
 	      tempi2->ic_data=i;
-	      tempi->ic_flags|=ICF_SWAP|ICF_NOT_ADDR;
+	      tempi->ic_flags|=ICF_SWAP|ICF_BY_VAL;
 	      tempi->ic_code=IC_BR_BT;
 	    }
 	  }
 	  goto here1;
 	case IC_BR_MM_ZERO:
 	case IC_BR_MM_NOT_ZERO:
-	  if (tempi1->ic_code==IC_LEA &&
-		tempi1->a1.type&TY_MASK==TY_DISP &&
+	  if (tempi1->ic_code==IC_LEA && tempi1->a1.type&MDF_DISP &&
 		tempi1->a1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
 	      if (mv[i].offset_start==tempi1->a1.disp) {
@@ -541,7 +535,7 @@ R12 and R13 as non-pointer register variables, such as index variables i,j,k.
 */
   if (cc->htc.fun) {
     cc->htc.fun->used_reg_mask=cc->htc.fun->used_reg_mask&
-	  ~(REGG_C_LOCAL_VARS|REGG_C_LOCAL_NON_PTR_VARS)|used_reg_mask;
+	  ~(REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS)|used_reg_mask;
     if (!Bt(&cc->opts,OPTf_NO_REG_VAR) &&
 	  !(cc->flags & CCF_NO_REG_OPT)) {
       QSort(mv,member_cnt,sizeof(COptMemberVar),&OptMVCompare);

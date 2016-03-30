@@ -2,8 +2,8 @@
 
 CDocEntry *DocPutS(CDoc *doc,U8 *st)
 {//Don't use this.  Use $LK-UL,"DocPrint",A="MN:DocPrint"$().
-//Does not handle partial Doc entries
-  //Returns last newly created dollar-sign CDocEntry.
+//Does not handle partial Doc entries.
+  //Returns last newly created dollar-sign CDocEntry or NULL.
   U8 *ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src,
 	*char_bitmap;
   Bool unlock;
@@ -157,6 +157,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 
 public CDocEntry *DocPrint(CDoc *doc=NULL,U8 *fmt,...)
 {//You must not print partial doc cmds.
+//Returns last newly created dollar-sign CDocEntry or NULL.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   CDocEntry *result=DocPutS(doc,buf);
   Free(buf);

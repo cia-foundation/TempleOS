@@ -16,7 +16,7 @@ I64 PassTrace(I64 i=0b10001111101)
   return old;
 }
 
-Bool Trace(Bool val)
+Bool Trace(Bool val=ON)
 {//Displays assembly code output from compiler.
   return Option(OPTf_TRACE,val);
 }
@@ -52,15 +52,15 @@ U0 StreamDir()
 CD2I32 *LexD2I32(CCmpCtrl *cc,CD2I32 *p)
 {//Not HolyC. Sprite-like lex 2D point.
   if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc); //Skip (
   p->x=LexExpressionI64(cc);
   if (cc->token!=',')
-    LexExcept(cc,"expecting ',' at ");
+    LexExcept(cc,"Expecting ',' at ");
   Lex(cc); //Skip ,
   p->y=LexExpressionI64(cc);
   if (cc->token!=')')
-    LexExcept(cc,"expecting ')' at ");
+    LexExcept(cc,"Expecting ')' at ");
   Lex(cc); //Skip )
   return p;
 }
@@ -68,19 +68,19 @@ CD2I32 *LexD2I32(CCmpCtrl *cc,CD2I32 *p)
 CD3I32 *LexD3I32(CCmpCtrl *cc,CD3I32 *p)
 {//Not HolyC. Sprite-like lex 3D point.
   if (cc->token!='(')
-    LexExcept(cc,"expecting '(' at ");
+    LexExcept(cc,"Expecting '(' at ");
   Lex(cc); //Skip (
   p->x=LexExpressionI64(cc);
   if (cc->token!=',')
-    LexExcept(cc,"expecting ',' at ");
+    LexExcept(cc,"Expecting ',' at ");
   Lex(cc); //Skip ,
   p->y=LexExpressionI64(cc);
   if (cc->token!=',')
-    LexExcept(cc,"expecting ',' at ");
+    LexExcept(cc,"Expecting ',' at ");
   Lex(cc); //Skip ,
   p->z=LexExpressionI64(cc);
   if (cc->token!=')')
-    LexExcept(cc,"expecting ')' at ");
+    LexExcept(cc,"Expecting ')' at ");
   Lex(cc); //Skip )
   return p;
 }

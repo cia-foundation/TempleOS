@@ -256,7 +256,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 	      break;
 	    case IET_REL_I8:
 	      if (!(MIN_I8<=i-ptr-1<=MAX_I8))
-		LexExcept(cc,"branch out of range at ");
+		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U8 *) =i-ptr-1;
 	      break;
 	    case IET_IMM_U8:
@@ -264,7 +264,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 	      break;
 	    case IET_REL_I16:
 	      if (!(MIN_I16<=i-ptr-2<=MAX_I16))
-		LexExcept(cc,"branch out of range at ");
+		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U16 *)=i-ptr-2;
 	      break;
 	    case IET_IMM_U16:
@@ -272,7 +272,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 	      break;
 	    case IET_REL_I32:
 	      if (!(MIN_I32<=i-ptr-4<=MAX_I32))
-		LexExcept(cc,"branch out of range at ");
+		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U32 *)=i-ptr-4;
 	      break;
 	    case IET_IMM_U32:
@@ -356,7 +356,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
 	  break;
 	case IET_REL_I8:
 	  if (!(MIN_I8<=i-ptr-1<=MAX_I8))
-	    LexExcept(cc,"branch out of range at ");
+	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U8 *) =i-ptr-1;
 	  break;
 	case IET_IMM_U8:
@@ -364,7 +364,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
 	  break;
 	case IET_REL_I16:
 	  if (!(MIN_I16<=i-ptr-2<=MAX_I16))
-	    LexExcept(cc,"branch out of range at ");
+	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U16 *)=i-ptr-2;
 	  break;
 	case IET_IMM_U16:
@@ -372,7 +372,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
 	  break;
 	case IET_REL_I32:
 	  if (!(MIN_I32<=i-ptr-4<=MAX_I32))
-	    LexExcept(cc,"branch out of range at ");
+	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U32 *)=i-ptr-4;
 	  break;
 	case IET_IMM_U32:
@@ -440,7 +440,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
     cnt=0;
     tempa=tempaot->abss;
     while (tempa) {
-      if (!(tempa->type&1))
+      if (!(tempa->type&IEF_IMM_NOT_REL))
 	cnt++;
       tempa=tempa->next;
     }
@@ -451,7 +451,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
       tempa=tempaot->abss;
       while (tempa) {
 	tempa1=tempa->next;
-	if (!(tempa->type&1))
+	if (!(tempa->type&IEF_IMM_NOT_REL))
 	  *ptr(U32 *)++ =tempa->ip;
 	Free(tempa);
 	tempa=tempa1;
@@ -655,8 +655,7 @@ I64 ExePrint2(U8 *fmt,...)
 I64 ExeFile2(U8 *name,Bool just_load=FALSE)
 {//throws exceptions
   I64 result;
-  U8 *name2=DftExt(name,"CPP.Z"),
-	*st=MStrPrint("#include \"%s\";",name2);
+  U8 *name2=DftExt(name,"CPP.Z"),*st=MStrPrint("#include \"%s\";",name2);
   result=ExePutS2(st,name,just_load);
   Free(st);
   Free(name2);

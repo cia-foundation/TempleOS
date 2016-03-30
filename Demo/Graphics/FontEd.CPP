@@ -14,7 +14,8 @@ save to a file with this font editor program
 and cut and paste the code into $LK,"::/Kernel/Font8x8.CPP"$.
 You will need to recompile Kernel by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 
-See $LK,"::/Demo/ExtendedChars.CPP"$ and $LK,"::/Demo/ScreenCodes.CPP"$.
+See $LK,"::/Demo/ExtendedChars.CPP"$, $LK,"::/Demo/Games/CharDemo.CPP"$,
+$LK,"::/Demo/Graphics/CharAnimation.CPP"$ and $LK,"::/Demo/ScreenCodes.CPP"$.
 */
 
 #define BLOW_UP_CHAR_X	(18*FONT_WIDTH)
