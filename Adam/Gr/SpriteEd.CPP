@@ -4,49 +4,49 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *root,I64 elem_num,
 	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_width=NULL,
 	I64 *_xx=NULL,I64 *_yy=NULL)
 {
-  CSprite *result=root->next;
+  CSprite *res=root->next;
   I64 width=1,xx=0,yy=0;
   CColorROPU32 color=BLACK;
   if (dc) DCRst(dc);
-  while (elem_num-->0 && result!=root) {
-    switch (result->type) {
+  while (elem_num-->0 && res!=root) {
+    switch (res->type) {
       case SPT_COLOR:
-	color=result->c.color;
+	color=res->c.color;
 	if (dc) dc->color=color;
 	break;
       case SPT_DITHER_COLOR:
-	color=result->d.dither_color.u8[0]|
-	      result->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
+	color=res->d.dither_color.u8[0]|
+	      res->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	if (dc) dc->color=color;
 	break;
       case SPT_WIDTH:
-	width=result->w.width;
+	width=res->w.width;
 	if (dc) dc->pen_width=width;
 	break;
       case SPT_SHIFT:
-	xx+=result->p.x1;
-	yy+=result->p.y1;
-	x+=result->p.x1;
-	y+=result->p.y1;
+	xx+=res->p.x1;
+	yy+=res->p.y1;
+	x+=res->p.x1;
+	y+=res->p.y1;
 	break;
       case SPT_PLANAR_SYMMETRY:
 	if (dc) {
-	  if (DCSymmetry3Set(dc,result->pp.x1+x,result->pp.y1+y,0,
-		result->pp.x2+x,result->pp.y2+y,0,
-		result->pp.x2+x,result->pp.y2+y,1))
+	  if (DCSymmetry3Set(dc,res->pp.x1+x,res->pp.y1+y,0,
+		res->pp.x2+x,res->pp.y2+y,0,
+		res->pp.x2+x,res->pp.y2+y,1))
 	    dc->flags|=DCF_SYMMETRY;
 	  else
 	    dc->flags&=~DCF_SYMMETRY;
 	}
 	break;
     }
-    result=result->next;
+    res=res->next;
   }
   if (_color) *_color=color;
   if (_width) *_width=width;
   if (_xx) *_xx=xx;
   if (_yy) *_yy=yy;
-  return result;
+  return res;
 }
 
 Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
@@ -62,31 +62,31 @@ Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
 CSprite *Sprite2SpriteQue(U8 *elems)
 {
   I64 s;
-  CSprite *result=CAlloc(sizeof(CSprite)),
+  CSprite *res=CAlloc(sizeof(CSprite)),
 	*tempg=elems-offset(CSprite.start),*tempg1;
-  QueInit(result);
+  QueInit(res);
   while (tempg->type) {
     tempg1=MAlloc(SpriteElemSize(tempg)+offset(CSprite.start));
     s=SpriteElemSize(tempg);
     MemCpy(&tempg1->start,&tempg->start,s);
     tempg1->selected=FALSE;
-    QueIns(tempg1,result->last);
+    QueIns(tempg1,res->last);
     tempg(U8 *)+=s;
   }
-  return result;
+  return res;
 }
 
 U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL)
 {
   I64 i,size=sprite_elem_base_sizes[SPT_END];
   CSprite *tempg=root->next;
-  U8 *result,*dst;
+  U8 *res,*dst;
   while (tempg!=root) {
     size+=SpriteElemSize(tempg);
     tempg=tempg->next;
   }
   if (_size) *_size=size;
-  result=dst=MAlloc(size);
+  res=dst=MAlloc(size);
   tempg=root->next;
   while (tempg!=root) {
     i=SpriteElemSize(tempg);
@@ -95,7 +95,7 @@ U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL)
     tempg=tempg->next;
   }
   *dst=SPT_END;
-  return result;
+  return res;
 }
 
 U0 SpriteEdUpdate(CDoc *doc,CDocEntry *doc_ce,CSprite *root)
@@ -555,47 +555,47 @@ U0 SpriteTransform(I64 *r,CSprite *root)
 
 I64 SpriteQueSelectCnt(CSprite *root,Bool val=TRUE)
 {
-  I64 result=0;
+  I64 res=0;
   CSprite *tempg=root->next;
   val=ToBool(val);
   while (tempg!=root) {
     if (ToBool(tempg->selected)==val)
-      result++;
+      res++;
     tempg=tempg->next;
   }
-  return result;
+  return res;
 }
 
 I64 SpriteQueSelectAll(CSprite *root,Bool val=TRUE)
 {
-  I64 result=0;
+  I64 res=0;
   CSprite *tempg=root->next;
   while (tempg!=root) {
     tempg->selected=val;
-    result++;
+    res++;
     tempg=tempg->next;
   }
-  return result;
+  return res;
 }
 
 CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
 {//For the side-bar
-  CSprite *result=CAlloc(sizeof(CSprite)),*tempg;
+  CSprite *res=CAlloc(sizeof(CSprite)),*tempg;
   CDocEntry *doc_e=doc->root.next;
   Bool found=FALSE;
   I64 num=0;
-  QueInit(result);
+  QueInit(res);
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_MENU_VAL && doc_e->left_exp>=0) {
       tempg=SpriteSetSettings(,root,doc_e->left_exp);
       if (tempg!=root) {
-	tempg=MAllocIdentical(tempg);
+	tempg=MAllocIdent(tempg);
 	tempg->selected=Bt(&doc_e->type,DOCEt_SELECTED);
 	if (*_cur_elem_num==doc_e->left_exp) {
 	  *_cur_elem_num=num;
 	  found=TRUE;
 	}
-	QueIns(tempg,result->last);
+	QueIns(tempg,res->last);
 	num++;
       }
     }
@@ -605,7 +605,7 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
     *_cur_elem_num=num;
   QueDel(root);
   Free(root);
-  return result;
+  return res;
 }
 
 U0 SpriteSideBarPickNew(CDoc *doc,CSprite *root,I64 old_num)
@@ -679,7 +679,7 @@ U0 SpriteSideBarTask(CTask *parent,CSprite **_root,I64 *_cur_elem_num)
 
 Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
 {
-  Bool result;
+  Bool res;
   CSprite *root=*_root;
   U8 *elems=SpriteQue2Sprite(root);
   CDoc *doc=DocNew,*doc2,*old_put=DocPut;
@@ -690,7 +690,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
   Sprite2Code(doc,elems);
   Free(elems);
   while (TRUE) {
-    if (result=PopUpPrint("DocEd(0x%X,0x%X);",doc,0)) {
+    if (res=PopUpPrint("DocEd(0x%X,0x%X);",doc,0)) {
       Fs->put_doc=doc2=DocNew;
       "$$WW,1$$";
       if (elems=Code2Sprite(doc)) {
@@ -712,7 +712,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
   }
   DocDel(doc);
   if (_root) *_root=root;
-  return result;
+  return res;
 }
 
 #define GED_SELECT_UNSELECT_ALL	0
@@ -955,7 +955,7 @@ U0 SpriteCtrlPtsMove(CEdSprite *root,I64 dx,I64 dy)
 Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 {
   I64 msg_code,a1,a2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
-  Bool result=TRUE;
+  Bool res=TRUE;
   CDC *dc=DCAlias;
   CEdSprite root,*temppe,*best_pe;
 
@@ -1048,7 +1048,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 gs_key:
 	  switch (a1.u8[0]) {
 	    case CH_SHIFT_ESC:
-	      result=FALSE;
+	      res=FALSE;
 	    case CH_ESC:
 	      GetMsg(&a1,&a2,1<<MSG_KEY_UP);
 	      goto gs_done;
@@ -1071,9 +1071,9 @@ gs_done:
   }
   DCFill(dc);
   DCDel(dc);
-  if (_cur_elem_num && result)
+  if (_cur_elem_num && res)
     *_cur_elem_num=cur_elem_num;
-  return result;
+  return res;
 }
 
 I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,

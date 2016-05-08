@@ -1,5 +1,5 @@
 /*Allows you to time insts.
-Results vary because the CPU does
+Ress vary because the CPU does
 parallel and out-of-order execution.
 */
 

@@ -213,7 +213,7 @@ I64 FindWiz()
   CDoc *doc;
   U8 buf[32],*dir,*st;
   CFind *g=CAlloc(sizeof(CFind));
-  I64 result=0;
+  I64 res=0;
   g->recurse=TRUE;
   StrCpy(g->filemask,FILEMASK_TXT);
   if (doc=DocPut) {
@@ -248,10 +248,10 @@ I64 FindWiz()
 	st=MStrPrint("\"$$$$WW+H,1$$$$\";Cd(\"%s\");"
 	      "Find(\"%Q\",\"%Q\",\"%Q\");UserTaskCont;",
 	      dir,g->find_text,g->filemask,buf);
-      result=PopUp(st);
+      res=PopUp(st);
     }
     Free(dir);
   }
   Free(g);
-  return result;
+  return res;
 }

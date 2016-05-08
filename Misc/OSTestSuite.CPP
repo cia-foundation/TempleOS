@@ -1261,10 +1261,10 @@ U0 DoRadixSort()
   XTalk(task,"Exit;\n");
 }
 
-U0 DoPageTableEntries2()
+U0 DoPageTableEntries()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/Lectures/Mem/PageTableEntries2\";\n");
+  XTalkWait(task,"#include \"::/Demo/Lectures/Mem/PageTableEntries\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -2438,7 +2438,7 @@ U0 OSTestSuite()
   TS; DoDivByHand;
   TS; DoBuzzFizz;
   TS; DoPutDec;
-  TS; DoPageTableEntries2;
+  TS; DoPageTableEntries;
   DoReps;
   TSEnd;
 }

@@ -42,7 +42,7 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
   I64 tn_len=StrLen(_test_name),mask_len=StrLen(files_find_mask);
   U8 *mask1=MAlloc(mask_len+1),*mask2=MAlloc(mask_len+1),
 	*ptr,*test_name1,*test_name2;
-  Bool result=FALSE;
+  Bool res=FALSE;
   StrCpy(mask1,files_find_mask);
   if (StrOcc(_test_name,'/')) {
     test_name1=MAlloc(tn_len+1);
@@ -62,33 +62,33 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
     if (*mask2) {
       if (*mask2=='~') {
 	if (WildMatch(ptr,mask2+1)) {
-	  result=FALSE;
+	  res=FALSE;
 	  break;
 	}
       } else {
 	if (WildMatch(ptr,mask2)) {
 	  if (Bt(&fuf_flags,FUf_JUST_TXT) &&
 		!FilesFindMatch(_test_name,FILEMASK_TXT)) {
-	    result=FALSE;
+	    res=FALSE;
 	    break;
 	  } else if (Bt(&fuf_flags,FUf_JUST_SRC) &&
 		!FilesFindMatch(_test_name,FILEMASK_SRC)) {
-	    result=FALSE;
+	    res=FALSE;
 	    break;
 	  } else if (Bt(&fuf_flags,FUf_JUST_AOT) &&
 		!FilesFindMatch(_test_name,FILEMASK_AOT)) {
-	    result=FALSE;
+	    res=FALSE;
 	    break;
 	  } else if (Bt(&fuf_flags,FUf_JUST_JIT) &&
 		!FilesFindMatch(_test_name,FILEMASK_JIT)) {
-	    result=FALSE;
+	    res=FALSE;
 	    break;
 	  } else if (Bt(&fuf_flags,FUf_JUST_GRA) &&
 		!FilesFindMatch(_test_name,FILEMASK_GRA)) {
-	    result=FALSE;
+	    res=FALSE;
 	    break;
 	  } else
-	    result=TRUE;
+	    res=TRUE;
 	}
       }
     } else
@@ -98,13 +98,13 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
   Free(test_name2);
   Free(mask1);
   Free(mask2);
-  return result;
+  return res;
 }
 
 U8 *DirNameAbs(U8 *_dirname)
 {//MAlloc absolute dir string with drv letter.
   I64 maxlen;
-  U8 drv[3],*result,*buf,*buf2,*buf3,*buf4,*dirname,*free_dirname;
+  U8 drv[3],*res,*buf,*buf2,*buf3,*buf4,*dirname,*free_dirname;
   if (!Fs->cur_dir || !*Fs->cur_dir)
     return StrNew(_dirname);
   free_dirname=dirname=MStrUtil(_dirname,
@@ -148,19 +148,19 @@ U8 *DirNameAbs(U8 *_dirname)
     }
   }
   Free(buf);
-  result=MAlloc(StrLen(buf3)+3);
-  StrCpy(result,drv);
-  StrCpy(result+2,buf3);
+  res=MAlloc(StrLen(buf3)+3);
+  StrCpy(res,drv);
+  StrCpy(res+2,buf3);
   Free(buf2);
   Free(buf3);
   Free(buf4);
   Free(free_dirname);
-  return result;
+  return res;
 }
 
 U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0)
 {//Absolute filename. Accepts $LK,"FUF_Z_OR_NOT_Z",A="MN:FUF_Z_OR_NOT_Z"$, $LK,"FUF_SCAN_PARENTS",A="MN:FUF_SCAN_PARENTS"$.
-  U8 *result,*filename,*buf,*buf_file,*buf_dir,*free_filename,*free_buf;
+  U8 *res,*filename,*buf,*buf_file,*buf_dir,*free_filename,*free_buf;
   CDirEntry de;
   free_filename=filename=MStrUtil(_filename,
 	SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
@@ -175,37 +175,37 @@ U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0)
     StrCpy(buf,"/");
   buf_dir=DirNameAbs(free_buf);
   Free(free_buf);
-  result=MAlloc(StrLen(buf_dir)+1+StrLen(buf_file)+1);
-  StrCpy(result,buf_dir);
-  if (result[StrLen(result)-1]!='/')
-    CatPrint(result,"/");
-  CatPrint(result,buf_file);
+  res=MAlloc(StrLen(buf_dir)+1+StrLen(buf_file)+1);
+  StrCpy(res,buf_dir);
+  if (res[StrLen(res)-1]!='/')
+    CatPrint(res,"/");
+  CatPrint(res,buf_file);
   Free(buf_file);
   Free(buf_dir);
   Free(free_filename);
-  if (fuf_flags && FileFind(result,&de,fuf_flags|FUF_JUST_FILES)) {
-    Free(result);
-    result=de.full_name;
+  if (fuf_flags && FileFind(res,&de,fuf_flags|FUF_JUST_FILES)) {
+    Free(res);
+    res=de.full_name;
   }
-  return result;
+  return res;
 }
 
 U8 *ChgExt(U8 *filename,U8 *extension)
 {//Change filename extension.
-  U8 *result=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
-  StrCpy(result,filename);
+  U8 *res=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
+  StrCpy(res,filename);
   if (FileExtDot(filename))
-    FileExtRem(result);
-  return CatPrint(result,".%s",extension);
+    FileExtRem(res);
+  return CatPrint(res,".%s",extension);
 }
 
 U8 *DftExt(U8 *filename,U8 *extension)
 {//Give extension if has none.
-  U8 *result=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
-  StrCpy(result,filename);
+  U8 *res=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
+  StrCpy(res,filename);
   if (!FileExtDot(filename))
-    CatPrint(result,".%s",extension);
-  return result;
+    CatPrint(res,".%s",extension);
+  return res;
 }
 
 CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name)
@@ -254,13 +254,13 @@ Bool FileNameChk(U8 *filename)
 
 U8 *ToggleZorNotZ(U8 *name)
 {//MAlloc name with Z if not Z or vice versa.
-  U8 *result;
+  U8 *res;
   if (IsDotZ(name)) {
-    result=StrNew(name);
-    result[StrLen(name)-2]=0;
+    res=StrNew(name);
+    res[StrLen(name)-2]=0;
   } else
-    result=MStrPrint("%s.Z",name);
-  return result;
+    res=MStrPrint("%s.Z",name);
+  return res;
 }
 
 U8 *FileNameTempTxt()
@@ -290,7 +290,7 @@ returns default.
 ("/Kernel/BlkDev",NULL,"PRJ.Z")		returns "D:/Kernel/Kernel.PRJ.Z"
 ("/Apps/Psalmody","Load","CPP.Z")	returns "D:/Apps/Psalmody/Load.CPP.Z"
 */
-  U8 *st=DirNameAbs(dirname),*st2,*st3,*result,*dft=NULL,*ext;
+  U8 *st=DirNameAbs(dirname),*st2,*st3,*res,*dft=NULL,*ext;
   if (_extension && *_extension) {
     if (*_extension=='.')
       ext=StrNew(_extension);
@@ -306,22 +306,22 @@ returns default.
     StrLastRem(st2,"/",st3);
 
     if (name)
-      result=MStrPrint("%s/%s%s",st,name,ext);
+      res=MStrPrint("%s/%s%s",st,name,ext);
     else {
       if (*ext)
-	result=MStrPrint("%s/%s%s",st,st3,ext);
+	res=MStrPrint("%s/%s%s",st,st3,ext);
       else
-	result=StrNew(st);
+	res=StrNew(st);
     }
     if (!dft)
-      dft=StrNew(result);
-    if (!*ext && (!name||!*name) || FileFind(result)) {
+      dft=StrNew(res);
+    if (!*ext && (!name||!*name) || FileFind(res)) {
       Free(st3);
       Free(st2);
       Free(st);
       Free(dft);
       Free(ext);
-      return result;
+      return res;
     }
     Free(st);
     st=st2;

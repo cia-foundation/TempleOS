@@ -201,7 +201,7 @@ public U0 Sprite2Code(CDoc *doc=NULL,U8 *elems)
 CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 {
   I64 i,num1,num2,size;
-  CSprite *result,g;
+  CSprite *res,g;
   CColorROPU32 color;
   U8 *st,*ptr;
   CQueD3I32 rootp,*tempp,*tempa1;
@@ -313,8 +313,8 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	break;
     sub_switch_end:
       size=SpriteElemSize(&g)+offset(CSprite.start);
-      result=MAlloc(size);
-      MemCpy(result,&g,size);
+      res=MAlloc(size);
+      MemCpy(res,&g,size);
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
@@ -330,9 +330,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	LexExcept(cc,"Expecting string at ");
       size=SpriteElemQuedBaseSize(type);
       i=StrLen(st)+1;
-      result=MAlloc(size+i);
-      MemCpy(result,&g,size);
-      MemCpy(result(U8 *)+size,st,i);
+      res=MAlloc(size+i);
+      MemCpy(res,&g,size);
+      MemCpy(res(U8 *)+size,st,i);
       Free(st);
       break;
     case SPT_POLYLINE:
@@ -350,9 +350,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       if (g.nu.num<2)
 	LexExcept(cc,"Expecting point at ");
       size=SpriteElemQuedBaseSize(SPT_POLYLINE);
-      result=MAlloc(size+g.nu.num*sizeof(CD2I32));
-      MemCpy(result,&g,size);
-      ptr=&result->nu.u;
+      res=MAlloc(size+g.nu.num*sizeof(CD2I32));
+      MemCpy(res,&g,size);
+      ptr=&res->nu.u;
       tempp=rootp.next;
       while (tempp!=&rootp) {
 	tempa1=tempp->next;
@@ -379,7 +379,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       if (g.nu.num<2)
 	LexExcept(cc,"Expecting point at ");
       size=SpriteElemQuedBaseSize(type);
-      result=MAlloc(size+g.nu.num*sizeof(CD3I32));
+      res=MAlloc(size+g.nu.num*sizeof(CD3I32));
       if (LexExpressionI64(cc)) {
 	if (type==SPT_BSPLINE2||type==SPT_BSPLINE2_CLOSED)
 	  g.type=SPT_BSPLINE2_CLOSED;
@@ -391,8 +391,8 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	else
 	  g.type=SPT_BSPLINE3;
       }
-      MemCpy(result,&g,size);
-      ptr=&result->nu.u;
+      MemCpy(res,&g,size);
+      ptr=&res->nu.u;
       tempp=rootp.next;
       while (tempp!=&rootp) {
 	tempa1=tempp->next;
@@ -420,9 +420,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       Lex(cc); //Load '}'
       g.type=SPT_POLYPT;
       size=SpriteElemQuedBaseSize(SPT_POLYPT);
-      result=CAlloc(size+(g.npu.num*3+7)>>3);
-      MemCpy(result,&g,size);
-      ptr=&result->npu.u;
+      res=CAlloc(size+(g.npu.num*3+7)>>3);
+      MemCpy(res,&g,size);
+      ptr=&res->npu.u;
       for (i=0;i<g.npu.num;i++)
 	BFieldOrU32(ptr,i*3,QueVectU8Get(tempv,i));
       QueVectU8Del(tempv);
@@ -456,9 +456,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       Lex(cc); //Load '}'
       g.type=SPT_BITMAP;
       size=SpriteElemQuedBaseSize(SPT_BITMAP);
-      result=CAlloc(size+num1);
-      MemCpy(result,&g,size);
-      ptr=&result->pwhu.u;
+      res=CAlloc(size+num1);
+      MemCpy(res,&g,size);
+      ptr=&res->pwhu.u;
       for (i=0;i<num1;i++)
 	*ptr++=QueVectU8Get(tempv,i);
       QueVectU8Del(tempv);
@@ -531,9 +531,9 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	g.pmu.tri_cnt=num2;
       }
       size=SpriteElemQuedBaseSize(g.type);
-      result=MAlloc(size+num1*sizeof(CD3I32)+num2*sizeof(CMeshTri));
-      MemCpy(result,&g,size);
-      ptr=result(U8 *)+size;
+      res=MAlloc(size+num1*sizeof(CD3I32)+num2*sizeof(CMeshTri));
+      MemCpy(res,&g,size);
+      ptr=res(U8 *)+size;
       tempp=rootp.next;
       while (tempp!=&rootp) {
 	tempa1=tempp->next;
@@ -556,13 +556,13 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
     LexExcept(cc,"Expecting '}' at ");
   if (Lex(cc)!=';')
     LexExcept(cc,"Expecting ';' at ");
-  return result;
+  return res;
 }
 
 public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
 {//Text to sprite.
   CSprite root;
-  U8 *result;
+  U8 *res;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
   CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
   CHashTable *old_hash_table_lst=cc->htc.hash_table_lst;
@@ -591,12 +591,12 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
     DocUnlock(doc);
   if (okay) {
     CmpCtrlDel(cc); //TODO: can crash
-    result=SpriteQue2Sprite(&root,&size);
+    res=SpriteQue2Sprite(&root,&size);
   } else {
-    result=NULL;
+    res=NULL;
     size=0;
   }
   if (_size) *_size=size;
   QueDel(&root);
-  return result;
+  return res;
 }

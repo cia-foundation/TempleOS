@@ -3,7 +3,7 @@
 I64 DocOptEntry(CDoc *,CDocEntry *doc_e,I64 fuf_flags)
 {
   U8 *st,*st2,**_dst;
-  I64 i,result=0;
+  I64 i,res=0;
 
   if (doc_e->de_flags&DOCEF_LINK && doc_e->de_flags&(DOCEF_AUX_STR|DOCEF_TAG)) {
     if (doc_e->de_flags & DOCEF_AUX_STR && doc_e->de_flags & DOCEF_TAG &&
@@ -12,7 +12,7 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e,I64 fuf_flags)
       Free(doc_e->aux_str);
       doc_e->aux_str=NULL;
       doc_e->de_flags&=~DOCEF_AUX_STR;
-      result++;
+      res++;
     }
     if (doc_e->de_flags & DOCEF_AUX_STR)
       _dst=&doc_e->aux_str;
@@ -26,7 +26,7 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e,I64 fuf_flags)
 	i=StrLen(st);
 	if ((st2=StrMatch(st,*_dst)) && st2[i]=='.' && st2[i+1]=='Z') {
 	  StrCpy(st2+i,st2+i+2);
-	  result++;
+	  res++;
 	}
       }
       Free(st);
@@ -35,66 +35,66 @@ I64 DocOptEntry(CDoc *,CDocEntry *doc_e,I64 fuf_flags)
       if (doc_e->de_flags & DOCEF_AUX_STR) {
 	if (st=StrMatch(".Z",doc_e->aux_str)) {
 	  StrCpy(st,st+2);
-	  result++;
+	  res++;
 	}
       }
       if (doc_e->de_flags&DOCEF_TAG) {
 	if (st=StrMatch(".Z",doc_e->tag)) {
 	  StrCpy(st,st+2);
-	  result++;
+	  res++;
 	}
       }
     }
   }
-  return result;
+  return res;
 }
 
 I64 DocOptDoc(CDoc *doc,I64 fuf_flags)
 {//Optimize Doc.
   Bool unlock=DocLock(doc);
-  I64 result=0;
+  I64 res=0;
   CDocEntry *doc_e;
   DocRecalc(doc);
   doc_e=doc->root.next;
   while (doc_e!=doc) {
-    if (result+=DocOptEntry(doc,doc_e,fuf_flags))
-      result+=DocOptEntry(doc,doc_e,fuf_flags);
+    if (res+=DocOptEntry(doc,doc_e,fuf_flags))
+      res+=DocOptEntry(doc,doc_e,fuf_flags);
     doc_e=doc_e->next;
   }
   DocRecalc(doc);
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 I64 DocOptFile(U8 *filename,I64 fuf_flags)
 {//Optimize File.
-  I64 result;
+  I64 res;
   CDoc *doc=DocRead(filename);
-  if (result=DocOptDoc(doc,fuf_flags)) {
-    "-%d:%s\n",result,doc->filename.name;
+  if (res=DocOptDoc(doc,fuf_flags)) {
+    "-%d:%s\n",res,doc->filename.name;
     DocWrite(doc);
   }
   DocDel(doc);
-  return result;
+  return res;
 }
 I64 DocOptLst(CDirEntry *tempde,I64 fuf_flags)
 {
-  I64 result=0;
+  I64 res=0;
   CDirEntry *tempde1;
   while (tempde) {
     tempde1=tempde->next;
     if (tempde->attr & RS_ATTR_DIR) {
       if (tempde->sub) {
 	"Scanning Directory: %s\n",tempde->full_name;
-	result+=DocOptLst(tempde->sub,fuf_flags);
+	res+=DocOptLst(tempde->sub,fuf_flags);
       }
     } else
-      result+=DocOptFile(tempde->full_name,fuf_flags);
+      res+=DocOptFile(tempde->full_name,fuf_flags);
     DirEntryDel(tempde);
     tempde=tempde1;
   }
-  return result;
+  return res;
 }
 public I64 DocOpt(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Optimize $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ Files, eliminating aux_str's and .Z's.

@@ -31,22 +31,22 @@ class CFMUncollapsedLst
 CFMUncollapsedLst *FMCollectUncollapsedLst(CDoc *doc)
 {
   CDocEntry *doc_e=doc->root.next;
-  CFMUncollapsedLst *result=NULL,*tempc;
+  CFMUncollapsedLst *res=NULL,*tempc;
   CDirEntry *tempde;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TREE) {
       if (!(doc_e->de_flags&DOCEF_CHECKED_COLLAPSED)) {
 	if (tempde=doc_e->user_data) {
 	  tempc=MAlloc(sizeof(CFMUncollapsedLst));
-	  tempc->next=result;
-	  result=tempc;
+	  tempc->next=res;
+	  res=tempc;
 	  tempc->name=StrNew(tempde->full_name);
 	}
       }
     }
     doc_e=doc_e->next;
   }
-  return result;
+  return res;
 }
 
 U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,
@@ -549,7 +549,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   CDirEntry *root=NULL,*tempde,*tempde1,*tempde2;
   I64 sc,ch,a1,a2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
-  U8 *result=NULL,*st,*st2,*old_cur_dir=CurDir;
+  U8 *res=NULL,*st,*st2,*old_cur_dir=CurDir;
   CDocEntry *doc_ce=NULL,*doc_e;
   Bool okay;
 
@@ -706,13 +706,13 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    doc_ce=doc->cur_entry;
 	    tempde=doc_ce->user_data;
 	    if (mode==FM_PICK_FILE && doc_ce->type_u8==DOCT_MENU_VAL)
-	      result=StrNew(tempde->full_name,mem_task);
+	      res=StrNew(tempde->full_name,mem_task);
 	    else if (mode==FM_PICK_DIR) {
 	      if (doc_ce->type_u8==DOCT_TREE)
-		result=StrNew(tempde->full_name,mem_task);
+		res=StrNew(tempde->full_name,mem_task);
 	      else if (doc_ce->type_u8==DOCT_MENU_VAL &&
 		    (tempde=tempde->parent))
-		result=StrNew(tempde->full_name,mem_task);
+		res=StrNew(tempde->full_name,mem_task);
 	    }
 	    break;
 	  default:
@@ -747,8 +747,8 @@ fm_regular_key:
   DirTreeDel(root);
   Cd(old_cur_dir);
   Free(old_cur_dir);
-  if (mode!=FM_NORMAL && !result)
-    result=StrNew("",mem_task);
+  if (mode!=FM_NORMAL && !res)
+    res=StrNew("",mem_task);
   MenuPop;
-  return result;
+  return res;
 }

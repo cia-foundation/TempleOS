@@ -91,7 +91,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	case IS_0_ARG: //nobound switch
 	  break;
       }
-      if (intermediate_code_table[code].result_cnt) {
+      if (intermediate_code_table[code].res_cnt) {
 	tempi->r.type=MDF_STK+CmpRawType(tempc);
 	tempi->r.type_pointed_to=CmpRawTypePointed(tempc);
 	tempi->ic_flags|=ICF_R_WAS_STK;
@@ -524,9 +524,9 @@ the times the offset is dereferenced.  If the address was calculated more times
 than the offset was dereferenced, the variable's address was passed or assigned
 and we cannot use a register because you can't take address of a reg var.
 
-RAX,RBX,RCX,RDX are free to be clobbered by each intermediate code.  RAX links
-intermediate codes together.  R8 and R9 are used for stack machine temporaries.
-RBP is used as stack frame.
+RAX,RBX,RCX,RDX, R8 are free to be clobbered by each intermediate code.
+RAX and R8 links intermediate codes together.  R9 is used for stack machine
+temporaries.  RBP is used as stack frame.
 
 RSI,RDI,R10,R11,R12,R13,R14,R15 are used for reg vars.	R12 and R13, however,
 have a unusual ModR addressing mode in the x86_64 architecture, so I only use

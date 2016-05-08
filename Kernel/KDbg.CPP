@@ -30,31 +30,31 @@ Bool ChkCodePtr(U8 *ptr)
 
 Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
 {//Check if addr is valid stk addr.
-  Bool result=FALSE;
+  Bool res=FALSE;
   PUSHFD
   CLI
   if (task) {
     if (&task->stk->stk_base<=ptr<=
 	  (&task->stk->stk_base)(U8 *)+task->stk->stk_size)
-      result=TRUE;
+      res=TRUE;
   } else if (sys_heap_base<=ptr<=sys_heap_limit)
-    result=TRUE;
+    res=TRUE;
   POPFD
-  return result;
+  return res;
 }
 
 I64 UnusedStk(CTask *task=NULL)
 {//Count of usused bytes in task's stk.
-  I64 result;
+  I64 res;
   if (!task) task=Fs;
   PUSHFD
   CLI
   if (task==Fs)
-    result=GetRSP()(U8 *)-(&task->stk->stk_base)(U8 *);
+    res=GetRSP()(U8 *)-(&task->stk->stk_base)(U8 *);
   else
-    result=task->rsp(U8 *)-(&task->stk->stk_base)(U8 *);
+    res=task->rsp(U8 *)-(&task->stk->stk_base)(U8 *);
   POPFD
-  return result;
+  return res;
 }
 
 U8 *Caller(I64 num=1)
@@ -343,7 +343,7 @@ U8 *SysGetStr2(I64)
 
 CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
 {
-  CBpt *result=NULL,*tempb,*tempb1,*tempb2;
+  CBpt *res=NULL,*tempb,*tempb1,*tempb2;
   if (!haystack_task) haystack_task=Fs;
   PUSHFD
   CLI
@@ -352,7 +352,7 @@ CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
   while (tempb) {
     tempb2=tempb->next;
     if (tempb->addr==needle_addr) {
-      result=tempb;
+      res=tempb;
       if (rem)
 	tempb1->next=tempb2;
       else
@@ -362,13 +362,13 @@ CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
     tempb=tempb2;
   }
   POPFD
-  return result;
+  return res;
 }
 
 Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 {//Set breakpoint.
   CBpt *tempb;
-  Bool result=TRUE;
+  Bool res=TRUE;
   if (!task) task=Fs;
   PUSHFD
   CLI
@@ -376,53 +376,53 @@ Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
     tempb=CAlloc(sizeof(CBpt),task);
     tempb->addr=addr;
     tempb->val=*addr;
-    result=FALSE;
+    res=FALSE;
     tempb->next=task->bpt_lst;
     task->bpt_lst=tempb;
     if (task==Fs && live)
       *addr=OC_BPT;
   }
   POPFD
-  return result;
+  return res;
 }
 
 Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE)
 {//Rem breakpoint.
   CBpt *tempb;
-  Bool result=FALSE;
+  Bool res=FALSE;
   if (!task) task=Fs;
   PUSHFD
   CLI
   if (tempb=BptFind(addr,task,rem)) {
     if (task==Fs && live)
       *tempb->addr=tempb->val;
-    result=TRUE;
+    res=TRUE;
     if (rem)
       Free(tempb);
   }
   POPFD
-  return result;
+  return res;
 }
 
 Bool B(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 {//Toggle breakpoint.
 //Return: TRUE if removed.
-  Bool result=FALSE;
+  Bool res=FALSE;
   PUSHFD
   CLI
   if (BptFind(addr,task,FALSE)) {
     BptR(addr,task,live,TRUE);
-    result=TRUE;
+    res=TRUE;
   } else
     BptS(addr,task,live);
   POPFD
-  return result;
+  return res;
 }
 
 I64 B2(CTask *task=NULL,Bool live=TRUE)
 {//Rem all breakpoints.
 //Return: cnt of removed.
-  I64 result=0;
+  I64 res=0;
   CBpt *tempb,*tempb1;
   if (!task) task=Fs;
   PUSHFD
@@ -435,10 +435,10 @@ I64 B2(CTask *task=NULL,Bool live=TRUE)
       *tempb->addr=tempb->val;
     Free(tempb);
     tempb=tempb1;
-    result++;
+    res++;
   }
   POPFD
-  return result;
+  return res;
 }
 
 U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
@@ -509,7 +509,7 @@ U0 DbgHelp()
 	">CallerRep;\t\t\t//Stack trace report.\n"
 	">Da(_RSP);\t\t\t//Dump stk.\n"
 	">Dr;\t\t\t\t//Dump Regs.\n"
-	">1+2*3+&Print;\t\t\t//Show calculation result.\n"
+	">1+2*3+&Print;\t\t\t//Show calculation res.\n"
 	">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
 	">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
 	">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
@@ -561,10 +561,8 @@ U0 Dbg2()
 U0 Fault3(I64 fault_num,I64 fault_err_code)
 {
   nounusedwarn fault_err_code;
-  Bool was_in_dbg;
   PUSHFD
   CLI
-  was_in_dbg=InDbg(ON);
   if (Gs->num && dbg.mp_crash) {
     mp_cnt=1;
     dbg.mp_crash->cpu_num=Gs->num;
@@ -588,14 +586,13 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
   }
   CallerRep;
   Dbg2;
-  InDbg(was_in_dbg);
   POPFD
 }
 
 U0 Fault2(I64 fault_num,I64 fault_err_code)
 {//Called from $LK,"Fault2",A="FF:::/Kernel/KInts.CPP,Fault2"$.
 //$BK,1$Be careful not to swap-out and ruin the saved context$BK,0$
-  Bool was_raw,was_single_user,was_silent;
+  Bool was_raw,was_single_user,was_silent,was_in_dbg;
   I64  i,old_raw_flags=text.raw_flags;
   was_single_user=SingleUser(ON);
   if (!IsDbg)
@@ -615,6 +612,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
     "\"\n";
     "Fault:0x%02X %Z\t\tErr Code:%08X\n",
 	  fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
+    was_in_dbg=InDbg(ON);
     "RIP:%08X",Fs->rip; //Sometimes crashes on %p, so do this first
     ":%p  RSP:%08X\n",Fs->rip,Fs->rsp;
     if (fault_num==I_PAGE_FAULT) {
@@ -623,7 +621,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
       "Fault Addr:%08X:%p\n",i,i;
     }
     Fault3(fault_num,fault_err_code);
-
+    InDbg(was_in_dbg);
     Silent(was_silent);
     Raw(was_raw);
     text.raw_flags=old_raw_flags;

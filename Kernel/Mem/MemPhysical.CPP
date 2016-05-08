@@ -55,24 +55,11 @@ U0 Mem32DevInit()
   }
 }
 
-Bool MemLowPagesProtect(Bool val=TRUE)
-{//Mark low memory not present. Catch NULL deref.
-//Returns: FALSE if any were not protected.
-  U8 *a=0;
-  Bool result=TRUE;
-  while (a<=MEM_PROTECTED_LOW_LIMIT) {
-    result&=!MemPagePresentMark(a,!val);
-    a+=MemPageSize(a);
-  }
-  return result;
-}
-
 U0 MemPagesNotPresentMark()
 {
   U8 *a,*max_physical=NULL;
   U16		*m01=SYS_MEM_E801;
   CMemE820	*m20=SYS_MEM_E820;
-  MemLowPagesProtect;
   while (m20->type) {
     a=m20->base+m20->len;
     if (a>max_physical)
@@ -83,7 +70,7 @@ U0 MemPagesNotPresentMark()
     a=(max_physical+0x1FFFFF)&~0x1FFFFF;
     while (a<MEM_MAPPED_SPACE) {
       MemPagePresentMark(a,FALSE);
-      a+=MemPageSize(a);
+      a+=0x200000;
     }
   }
 }
@@ -140,7 +127,7 @@ U0 Mem32DevFree(U8 *base)
 
 U8 *Mem64DevAlloc(I64 *_pages2Meg)
 {//Alloc 64-bit addr space for device.
-  U8 *result;
+  U8 *res;
   I64 i=*_pages2Meg,*pte;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
@@ -150,9 +137,9 @@ U8 *Mem64DevAlloc(I64 *_pages2Meg)
     *pte=*pte&~0x18 |0x11; //Uncached and present
     InvlPg(dev.mem64_ptr);
   }
-  result=dev.mem64_ptr;
+  res=dev.mem64_ptr;
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
-  return result;
+  return res;
 }
 
 U0 Mem64DevFree(U8 *base,I64 pages2Meg)
@@ -164,6 +151,14 @@ U0 Mem64DevFree(U8 *base,I64 pages2Meg)
     dev.mem64_ptr+=pages2Meg*0x200000;
 //else not freed
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
+}
+
+U8 *MemVGAAlloc()
+{
+  I64 i=1,*a=Mem64DevAlloc(&i),*pte=MemPageTable(a);
+  *pte=0x18F;
+  InvlPg(a);
+  return a;
 }
 
 I64 BIOSTotalMem()

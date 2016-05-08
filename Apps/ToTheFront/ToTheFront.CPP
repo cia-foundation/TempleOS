@@ -199,11 +199,11 @@ U0 Toward(I64 *_row,I64 *_col,I64 direction)
 
 I64 FacingChg(I64 f1,I64 f2)
 {
-  I64 result=(f1+6-f2)%6;
-  if (result>=3)
-    return 6-result;
+  I64 res=(f1+6-f2)%6;
+  if (res>=3)
+    return 6-res;
   else
-    return result;
+    return res;
 }
 
 U0 RowCol2XY(F64 *_x,F64 *_y,I64 row,I64 col)
@@ -335,7 +335,7 @@ U0 RVMerge(I64 player)
 
 Bool MPRecalcVisible(MPCtrl1 *job)
 {
-  Bool result=FALSE,seen;
+  Bool res=FALSE,seen;
   I64 i,j,row,col;
   F64 x1,y1,x2,y2,dd,range;
   Unit *ut0,*ut1;
@@ -376,7 +376,7 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	      LOS(row,col,ut1->row,ut1->col)) {
 	  LBts(&visible_unit_bitmap[enemy_player],
 		job->tempu->num+i*((MAX_UNITS+7)&~7));
-	  result=TRUE;
+	  res=TRUE;
 	} else
 	  LBtr(&visible_unit_bitmap[enemy_player],
 		job->tempu->num+i*((MAX_UNITS+7)&~7));
@@ -416,13 +416,13 @@ Bool MPRecalcVisible(MPCtrl1 *job)
 	    LBtr(&visible_unit_bitmap[enemy_player],j+i*((MAX_UNITS+7)&~7));
       break;
   }
-  return result;
+  return res;
 }
 
 Bool RecalcVisible(I64 mode,Unit *tempu=NULL)
 {
   I64 i,hi,k,cnt;
-  Bool result;
+  Bool res;
 /*The compiler doesn't go out of it's way
 to know if something is const.;-)  This
 just compiles with the val at compile
@@ -462,15 +462,15 @@ $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
     job[i].lo=k;
   }
 
-  result=FALSE;
+  res=FALSE;
   for (i=0;i<cnt;i++)
     cmd[i]=JobQue(&MPRecalcVisible,&job[i],i,0);
   for (i=0;i<cnt;i++)
-    if (JobResultGet(cmd[i]))
-      result=TRUE;
+    if (JobResGet(cmd[i]))
+      res=TRUE;
   if (mode==RV_UPDATE_FRIENDLY_UNIT)
     RVMerge(cur_player);
-  return result;
+  return res;
 }
 
 class MPCtrl2
@@ -512,30 +512,30 @@ U0 RecalcVisibleMap(I64 row,I64 col)
   for (i=0;i<cnt;i++)
     cmd[i]=JobQue(&MPRecalcVisibleMap,&job[i],i,0);
   for (i=0;i<cnt;i++)
-    JobResultGet(cmd[i]);
+    JobResGet(cmd[i]);
 }
 
 I64 MoveCost(Unit *tempu,I64 r,I64 c,I64 facing)
 {
-  I64 result;
+  I64 res;
   if (tempu->infantry)
-    result=0;
+    res=0;
   else {
-    result=FacingChg(facing,tempu->facing);
-    if (result>0) result--;
+    res=FacingChg(facing,tempu->facing);
+    if (res>0) res--;
   }
   if (roads[r][c] && roads[tempu->row][tempu->col])
-    result+=1;
+    res+=1;
   else {
     if (tempu->infantry)
-      result+=2;
+      res+=2;
     else {
-      result+=movement_costs[terrain[r][c]];
+      res+=movement_costs[terrain[r][c]];
       if (rivers[r][c])
-	result=tempu->movement;
+	res=tempu->movement;
     }
   }
-  return result;
+  return res;
 }
 
 I64 MoveOneHex(I64 *_row,I64 *_col,F64 x,F64 y)
@@ -1633,7 +1633,7 @@ U0 TaskEndCB()
 
 I64 DoPhase()
 {
-  I64 result='ExitGame';
+  I64 res='ExitGame';
   NewPhase;
   try {
     if (phase&~1==PHASE_PLOT)
@@ -1643,15 +1643,15 @@ I64 DoPhase()
     else
       Call(fire_routines[cur_player]);
   } catch {
-    result=Fs->except_ch;
+    res=Fs->except_ch;
     Fs->catch_except=TRUE;
   }
-  return result;
+  return res;
 }
 
 U0 ToTheFront()
 {
-  I64 result,ch;
+  I64 res,ch;
   map_dc=DCNew(MAP_WIDTH,MAP_HEIGHT);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
@@ -1697,8 +1697,8 @@ U0 ToTheFront()
 
   try {
     do {
-      result=DoPhase;
-      if (result=='GameOver') {
+      res=DoPhase;
+      if (res=='GameOver') {
 	while (TRUE) {
 	  msg_off_timeout=0;
 	  StrCpy(msg_buf,"Game Over");
@@ -1709,18 +1709,18 @@ U0 ToTheFront()
 	    Init;
 	    break;
 	  } else if (ch==CH_ESC || ch==CH_SHIFT_ESC) {
-	    result='ExitGame';
+	    res='ExitGame';
 	    break;
 	  } else if (ch=='1')
 	    SetViewPlayer(0);
 	  else if (ch=='2')
 	    SetViewPlayer(1);
 	}
-      } else if (result=='NewGame') {
+      } else if (res=='NewGame') {
 	CleanUp;
 	Init;
       }
-    } while (result!='ExitGame');
+    } while (res!='ExitGame');
   } catch
     PutExcept;
   ProgressBarsRst;

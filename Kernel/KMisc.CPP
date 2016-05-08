@@ -6,42 +6,42 @@ U0 PortNop()
 
 U16 EndianU16(U16 d)
 {//Swap big<-->little endian.
-  I64 result=0;
-  result.u8[1]=d.u8[0];
-  result.u8[0]=d.u8[1];
-  return result;
+  I64 res=0;
+  res.u8[1]=d.u8[0];
+  res.u8[0]=d.u8[1];
+  return res;
 }
 
 U32 EndianU32(U32 d)
 {//Swap big<-->little endian.
-  I64 result=0;
-  result.u8[3]=d.u8[0];
-  result.u8[2]=d.u8[1];
-  result.u8[1]=d.u8[2];
-  result.u8[0]=d.u8[3];
-  return result;
+  I64 res=0;
+  res.u8[3]=d.u8[0];
+  res.u8[2]=d.u8[1];
+  res.u8[1]=d.u8[2];
+  res.u8[0]=d.u8[3];
+  return res;
 }
 
 I64 EndianI64(I64 d)
 {//Swap big<-->little endian.
-  U64 result;
-  result.u8[7]=d.u8[0];
-  result.u8[6]=d.u8[1];
-  result.u8[5]=d.u8[2];
-  result.u8[4]=d.u8[3];
-  result.u8[3]=d.u8[4];
-  result.u8[2]=d.u8[5];
-  result.u8[1]=d.u8[6];
-  result.u8[0]=d.u8[7];
-  return result;
+  U64 res;
+  res.u8[7]=d.u8[0];
+  res.u8[6]=d.u8[1];
+  res.u8[5]=d.u8[2];
+  res.u8[4]=d.u8[3];
+  res.u8[3]=d.u8[4];
+  res.u8[2]=d.u8[5];
+  res.u8[1]=d.u8[6];
+  res.u8[0]=d.u8[7];
+  return res;
 }
 
 I64 BCnt(I64 d)
 {//Count set bits in I64.
-  I64 result=0,i;
+  I64 res=0,i;
   for (i=0;i<8;i++)
-    result+=set_bits_table[d.u8[i]];
-  return result;
+    res+=set_bits_table[d.u8[i]];
+  return res;
 }
 
 U0 IntCore0TimerHandler(CTask *)
@@ -60,7 +60,7 @@ U0 IntCore0TimerHandler(CTask *)
 
 I64 SysTimerRead()
 {//System timer count with overflow already handled.
-  I64 i,result;
+  I64 i,res;
   PUSHFD
   CLI
   if (mp_cnt>1)
@@ -71,15 +71,10 @@ I64 SysTimerRead()
     if (InU8(0x20) & 1)
       i=-1;
   }
-  result=cnts.timer+SYS_TIMER0_PERIOD-i;
+  res=cnts.timer+SYS_TIMER0_PERIOD-i;
   LBtr(&sys_semas[SYS_SEMA_SYS_TIMER],0);
   POPFD
-  return result;
-}
-
-I64 TaskTotalTime()
-{//Total CPU cycles given to current task.
-  return GetTSC-Fs->time_slice_start+Fs->total_time;
+  return res;
 }
 
 I64 TimeStampFreqCal()
@@ -203,16 +198,16 @@ U0 Beep(I64 freq=500,Bool busy=FALSE)
 
 Bool Mute(Bool val)
 {//Turn-off or on sound.
-  Bool result;
+  Bool res;
   if (val) {
     PUSHFD
     CLI
     Snd(0);
-    result=LBts(&sys_semas[SYS_SEMA_MUTE],0);
+    res=LBts(&sys_semas[SYS_SEMA_MUTE],0);
     POPFD
   } else
-    result=LBtr(&sys_semas[SYS_SEMA_MUTE],0);
-  return result;
+    res=LBtr(&sys_semas[SYS_SEMA_MUTE],0);
+  return res;
 }
 
 Bool IsMute()

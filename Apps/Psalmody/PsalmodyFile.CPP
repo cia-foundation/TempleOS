@@ -6,7 +6,7 @@ U0 PsmNoteDel(PsmNote *tempo)
 
 PsmNote *PsmNoteCopy(PsmNote *tempo)
 {
-  PsmNote *tempo1=MAllocIdentical(tempo);
+  PsmNote *tempo1=MAllocIdent(tempo);
   if (tempo->word)
     tempo1->word=StrNew(tempo->word);
   else

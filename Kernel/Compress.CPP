@@ -9,7 +9,7 @@ U0 ArcEntryGet(CArcCtrl *c)
   CArcEntry *temp,*temp1;
 
   if (c->entry_used) {
-    i=c->free_index;
+    i=c->free_idx;
 
     c->entry_used=FALSE;
     c->cur_entry=c->next_entry;
@@ -35,7 +35,7 @@ U0 ArcEntryGet(CArcCtrl *c)
 	  temp1=temp1->next;
       }
     }
-    c->free_index=i;
+    c->free_idx=i;
   }
 }
 ****/
@@ -47,7 +47,7 @@ _ARC_ENTRY_GET::
 	MOV	RSI,U64 SF_ARG1[RBP]
 	BTR	U64 CArcCtrl.entry_used[RSI],0
 	JNC	I32 @@30
-	MOV	RDX,U64 CArcCtrl.free_index[RSI]
+	MOV	RDX,U64 CArcCtrl.free_idx[RSI]
 	MOV	RAX,U64 CArcCtrl.next_entry[RSI]
 	MOV	U64 CArcCtrl.cur_entry[RSI],RAX
 	MOV	RCX,U64 CArcCtrl.next_bits_in_use[RSI]
@@ -90,7 +90,7 @@ _ARC_ENTRY_GET::
 	JMP	@@25
 @@20:	MOV	RCX,RAX
 	JMP	@@15
-@@25:	MOV	U64 CArcCtrl.free_index[RSI],RDX
+@@25:	MOV	U64 CArcCtrl.free_idx[RSI],RDX
 @@30:	POP	RDI
 	POP	RSI
 	POP	RBP
@@ -231,7 +231,7 @@ CArcCtrl *ArcCtrlNew(Bool expand,I64 compression_type=CT_8_BIT)
   else
     c->min_bits=8;
   c->min_table_entry=1<<c->min_bits;
-  c->free_index=c->min_table_entry;
+  c->free_idx=c->min_table_entry;
   c->next_bits_in_use=c->min_bits+1;
   c->free_limit=1<<c->next_bits_in_use;
   c->saved_basecode=MAX_U32;
@@ -250,17 +250,17 @@ U0 ArcCtrlDel(CArcCtrl *c)
 U8 *ExpandBuf(CArcCompress *arc,CTask *mem_task=NULL)
 {//See $LK,"::/Demo/Dsk/SerializeTree.CPP"$.
   CArcCtrl *c;
-  U8 *result;
+  U8 *res;
 
   if (!(CT_NONE<=arc->compression_type<=CT_8_BIT) ||
 	arc->expanded_size>MEM_MAPPED_SPACE)
     throw('Compress');
 
-  result=MAlloc(arc->expanded_size+1,mem_task);
-  result[arc->expanded_size]=0; //terminate
+  res=MAlloc(arc->expanded_size+1,mem_task);
+  res[arc->expanded_size]=0; //terminate
   switch [arc->compression_type] {
     case CT_NONE:
-      MemCpy(result,&arc->body,arc->expanded_size);
+      MemCpy(res,&arc->body,arc->expanded_size);
       break;
     case CT_7_BIT:
     case CT_8_BIT:
@@ -269,13 +269,13 @@ U8 *ExpandBuf(CArcCompress *arc,CTask *mem_task=NULL)
       c->src_pos=sizeof(CArcCompress)<<3;
       c->src_buf=arc;
       c->dst_size=arc->expanded_size;
-      c->dst_buf=result;
+      c->dst_buf=res;
       c->dst_pos=0;
       ArcExpandBuf(c);
       ArcCtrlDel(c);
       break;
   }
-  return result;
+  return res;
 }
 
 CArcCompress *CompressBuf(U8 *src,I64 size,CTask *mem_task=NULL)

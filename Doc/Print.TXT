@@ -73,7 +73,7 @@ $LK,"GrPrint",A="MN:GrPrint"$(CDC *dc,I64 x,I64 y,U8 *fmt,...) and $LK,"GrVPrint
 
 $LK,"TextPrint",A="MN:TextPrint"$(CTask *task,I64 x,I64 y,I64 attr,U8 *fmt,...) plots to $LK,"gr.text_base",A="HI:TextBase Layer"$.
 
-$LK,"ExePrint",A="MN:ExePrint"$(U8 *fmt,...) compiles and execute a string.  Note: It returns the result of the last executed expression.
+$LK,"ExePrint",A="MN:ExePrint"$(U8 *fmt,...) compiles and execute a string.  Note: It returns the res of the last executed expression.
 
 $LK,"AFPrint",A="MN:AFPrint"$(I64 mS,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
 
@@ -81,7 +81,7 @@ $LK,"RawPrint",A="MN:RawPrint"$(I64 mS,U8 *fmt,...) sends direct to screen memor
 
 $LK,"User",A="MN:User"$(U8 *fmt,...) Spawns a user and execute a string on start-up.
 
-$LK,"PopUpPrint",A="MN:PopUpPrint"$(U8 *fmt,...) compiles and execute a string in a pop-up win.  Note: It returns the result of the last executed expression.
+$LK,"PopUpPrint",A="MN:PopUpPrint"$(U8 *fmt,...) compiles and execute a string in a pop-up win.  Note: It returns the res of the last executed expression.
 $LK,"PopUpViewPrint",A="MN:PopUpViewPrint"$(U8 *fmt,...) creates a pop-up window and views text.
 
 $BK,1$Note:$BK,0$ Use $FG,2$Print("%s",src)$FG$ if you need an unmodified string.

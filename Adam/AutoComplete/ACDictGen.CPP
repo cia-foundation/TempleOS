@@ -56,7 +56,7 @@ $$	--> $$$$
 I64 ACDNextCmd(U8 **_ptr)
 {
   U8 *ptr=*_ptr,*ptr2;
-  I64 ch,result=-1;
+  I64 ch,res=-1;
   do {
     do {
       if (!(ch=*ptr++)) goto ncmd_done;
@@ -67,22 +67,22 @@ I64 ACDNextCmd(U8 **_ptr)
       if (!(ch=*ptr2++)) goto ncmd_done;
     } while (ch!='>');
     *--ptr2=0;
-    result=LstMatch(ptr,"h1\0/h1\0def\0/def\0hw\0/hw\0tt\0/tt\0"
+    res=LstMatch(ptr,"h1\0/h1\0def\0/def\0hw\0/hw\0tt\0/tt\0"
 	  "ety\0@fld\0@cd\0@blockquote\0@wordforms\0@note\0@altname\0@chform\0"
 	  "@cref\0@syn\0/ety\0@/fld\0@/cd\0@/blockquote\0@/wordforms\0@/note\0"
 	  "@/altname\0@/chform\0@/cref\0@/syn\0");
     *ptr2++='>';
     ptr=ptr2;
-  } while (result<0);
+  } while (res<0);
 
   ncmd_done:
   *_ptr=ptr;
-  return result;
+  return res;
 }
 
 U8 *ACDNextEntry(U8 **_ptr)
 {
-  U8 *result,*ignore,*ptr=*_ptr,buf[ACD_BLK_SIZE],*out_ptr=buf;
+  U8 *res,*ignore,*ptr=*_ptr,buf[ACD_BLK_SIZE],*out_ptr=buf;
   I64 ch,l;
   while (TRUE) {
     while (TRUE) {
@@ -111,9 +111,9 @@ U8 *ACDNextEntry(U8 **_ptr)
   }
 nentry_done:
   *out_ptr++=0;
-  result=StrNew(buf);
+  res=StrNew(buf);
   *_ptr=ptr-1;
-  return result;
+  return res;
 }
 
 I64 ACDCompareWords(U8 *e1,U8 *e2)

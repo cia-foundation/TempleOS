@@ -389,7 +389,7 @@ public U0 DskView(U8 drv_let=0)
 I64 RedSeaUnusedDrvSpace(U8 drv_let=0)
 {
   CDrv *dv=Let2Drv(drv_let);
-  I64 result=0,i,l;
+  I64 res=0,i,l;
   U8 *bitmap;
   try {
     l=(dv->size+dv->spc-1)/dv->spc;
@@ -398,16 +398,16 @@ I64 RedSeaUnusedDrvSpace(U8 drv_let=0)
     RBlks(dv,bitmap,dv->fat1,i);
     for (i=0;i<l;i++)
       if (!Bt(bitmap,i))
-	result++;
+	res++;
     Free(bitmap);
   } catch
     DrvUnlock(dv);
-  return result*BLK_SIZE*dv->spc;
+  return res*BLK_SIZE*dv->spc;
 }
 I64 FAT32UnusedDrvSpace(U8 drv_let=0)
 {
   CDrv *dv=Let2Drv(drv_let);
-  I64 result=0,i,l;
+  I64 res=0,i,l;
   U32 *bitmap;
   try {
     l=(dv->size+dv->spc-1)/dv->spc;
@@ -416,24 +416,24 @@ I64 FAT32UnusedDrvSpace(U8 drv_let=0)
     RBlks(dv,bitmap,dv->fat1,i);
     for (i=0;i<l;i++)
       if (!bitmap[i])
-	result++;
+	res++;
     Free(bitmap);
   } catch
     DrvUnlock(dv);
-  return result*BLK_SIZE*dv->spc;
+  return res*BLK_SIZE*dv->spc;
 }
 public I64 UnusedDrvSpace(U8 drv_let=0)
 {//Returns unused size in bytes.
   CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
   U8 *old_dir=StrNew(Fs->cur_dir);
-  I64 result=0;
+  I64 res=0;
   Drv(drv_let);
   switch (dv->fs_type) {
     case FSt_REDSEA:
-      result=RedSeaUnusedDrvSpace(drv_let);
+      res=RedSeaUnusedDrvSpace(drv_let);
       break;
     case FSt_FAT32:
-      result=FAT32UnusedDrvSpace(drv_let);
+      res=FAT32UnusedDrvSpace(drv_let);
       break;
     default:
       PrintErr("File System Not Supported\n");
@@ -441,5 +441,5 @@ public I64 UnusedDrvSpace(U8 drv_let=0)
   Drv(Drv2Let(old_dv));
   Cd(old_dir);
   Free(old_dir);
-  return result;
+  return res;
 }

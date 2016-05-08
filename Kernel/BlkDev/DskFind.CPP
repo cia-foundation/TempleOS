@@ -1,30 +1,30 @@
 CDirEntry *FilesFind2(U8 *files_find_mask,I64 fuf_flags)
 {
   CDrv *dv=Fs->cur_dv;
-  CDirEntry *result=NULL;
+  CDirEntry *res=NULL;
   DrvChk(dv);
   switch (dv->fs_type) {
     case FSt_REDSEA:
-      result=RedSeaFilesFind(files_find_mask,fuf_flags);
+      res=RedSeaFilesFind(files_find_mask,fuf_flags);
       break;
     case FSt_FAT32:
-      result=FAT32FilesFind(files_find_mask,fuf_flags);
+      res=FAT32FilesFind(files_find_mask,fuf_flags);
       break;
     case FSt_ISO9660:
-      result=ISO1FilesFind(files_find_mask,fuf_flags);
+      res=ISO1FilesFind(files_find_mask,fuf_flags);
       break;
     default:
       PrintErr("File System Not Supported\n");
-      result=NULL;
+      res=NULL;
   }
-  if (result) {
-    DirFilesSort(&result,SK_NAME);
+  if (res) {
+    DirFilesSort(&res,SK_NAME);
     if (fuf_flags&(FUF_FLATTEN_TREE|FUF_JUST_FILES))
-      DirFilesFlatten(result,&result,fuf_flags);
+      DirFilesFlatten(res,&res,fuf_flags);
     if (fuf_flags&FUF_CLUSTER_ORDER)
-      DirFilesSort(&result,SK_CLUSTER);
+      DirFilesSort(&res,SK_CLUSTER);
   }
-  return result;
+  return res;
 }
 
 CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0)
@@ -36,22 +36,22 @@ When done, you free with $LK,"DirEntryDel",A="MN:DirEntryDel"$(),$LK,"DirEntryDe
 $LK,"DirTreeDel",A="MN:DirTreeDel"$() or $LK,"DirTreeDel2",A="MN:DirTreeDel2"$().
 
 */
-  CDirEntry *result;
+  CDirEntry *res;
   CDirContext *dirc;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
   if (fuf_flags&FUF_SINGLE) {
-    result=MAlloc(sizeof(CDirEntry));
-    if (!FileFind(files_find_mask,result)) {
-      Free(result);
+    res=MAlloc(sizeof(CDirEntry));
+    if (!FileFind(files_find_mask,res)) {
+      Free(res);
       return NULL;
     }
   } else if (dirc=DirContextNew(files_find_mask,TRUE)) {
-    result=FilesFind2(dirc->mask,fuf_flags);
+    res=FilesFind2(dirc->mask,fuf_flags);
     DirContextDel(dirc);
   } else
     return NULL;
-  return result;
+  return res;
 }
 
 Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
@@ -61,7 +61,7 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
   U8 *altname,*curname,*full_name=NULL;
   CDirEntry de;
   CDirContext *dirc;
-  Bool result=FALSE,old_silent;
+  Bool res=FALSE,old_silent;
   if (fuf_flags&~FUG_FILE_FIND)
     throw('FUF');
   if (!filename || *filename && filename[1]==':' && !Let2Drv(*filename,FALSE))
@@ -71,7 +71,7 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
     j=2;
   else
     j=1;
-  for (i=0;i<j && !result;i++) {
+  for (i=0;i<j && !res;i++) {
     if (!i)
       curname=filename;
     else
@@ -84,21 +84,21 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
       cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
       switch (dirc->dv->fs_type) {
 	case FSt_REDSEA:
-	  result=RedSeaFileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=RedSeaFileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	case FSt_FAT32:
-	  result=FAT32FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=FAT32FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	case FSt_ISO9660:
-	  result=ISO1FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=ISO1FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	default:
 	  PrintErr("File System Not Supported\n");
       }
-      if (result && _de) {
+      if (res && _de) {
 	if (StrCmp(Fs->cur_dir,"/"))
 	  full_name=MStrPrint("%C:%s/%s",
 		Drv2Let(Fs->cur_dv),Fs->cur_dir,de.name);
@@ -108,7 +108,7 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
       DirContextDel(dirc);
     }
   }
-  for (i=0;i<j && !result && fuf_flags&FUF_SCAN_PARENTS;i++) {
+  for (i=0;i<j && !res && fuf_flags&FUF_SCAN_PARENTS;i++) {
     if (!i)
       curname=filename;
     else
@@ -119,27 +119,27 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
     else {
       Silent(old_silent);
       cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
-      while (!result && StrCmp(Fs->cur_dir,"/")) {
+      while (!res && StrCmp(Fs->cur_dir,"/")) {
 	Cd("..");
 	cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
 	switch (dirc->dv->fs_type) {
 	  case FSt_REDSEA:
-	    result=RedSeaFileFind(dirc->dv,cur_dir_cluster,
+	    res=RedSeaFileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  case FSt_FAT32:
-	    result=FAT32FileFind(dirc->dv,cur_dir_cluster,
+	    res=FAT32FileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  case FSt_ISO9660:
-	    result=ISO1FileFind(dirc->dv,cur_dir_cluster,
+	    res=ISO1FileFind(dirc->dv,cur_dir_cluster,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  default:
 	    PrintErr("File System Not Supported\n");
 	}
       }
-      if (result && _de) {
+      if (res && _de) {
 	if (StrCmp(Fs->cur_dir,"/"))
 	  full_name=MStrPrint("%C:%s/%s",
 		Drv2Let(Fs->cur_dv),Fs->cur_dir,de.name);
@@ -151,12 +151,12 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
     }
   }
   if (_de) {
-    if (result) {
+    if (res) {
       MemCpy(_de,&de,sizeof(CDirEntry));
       _de->full_name=full_name;
     } else
       MemSet(_de,0,sizeof(CDirEntry));
   }
   Free(altname);
-  return result;
+  return res;
 }

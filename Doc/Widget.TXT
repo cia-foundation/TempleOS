@@ -28,7 +28,7 @@ $FG,5$Tree$FG$ The item will behave like a tree widget, with this as the root.
 $FG,5$Collapsed$FG$ The tree or hidden widget will begin collapsed.
 $FG,5$Define Str$FG$ will substitute a $FG,2$#define$FG$ or $LK,"DefineLoad",A="MN:DefineLoad"$() string for the tag.
 
-$FG,5$Quote$FG$ Make the result suitable for including in a program, in quotes, especially $FG,2$fmtstr$FG$ entries in class definitions.
+$FG,5$Quote$FG$ Make the res suitable for including in a program, in quotes, especially $FG,2$fmtstr$FG$ entries in class definitions.
 
 $FG,5$X Expression$FG$ For cursor movements, the horizontal value.
 $FG,5$Y Expression$FG$ For cursor movements, the vertical value.

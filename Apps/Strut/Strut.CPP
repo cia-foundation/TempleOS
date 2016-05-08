@@ -194,7 +194,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   while (tempm1!=&ode->next_mass) {
     tempm2=tempm1->next;
     while (tempm2!=&ode->next_mass) {
-      D3Sub(&tempm2->state->x,&tempm1->state->x,&p);
+      D3Sub(&p,&tempm2->state->x,&tempm1->state->x);
       dd=D3NormSqr(&p);
       if (dd<=Sqr(2*RADIUS)) {
 	d=Sqrt(dd)+0.0001;
@@ -212,7 +212,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   while (temps!=&ode->next_spring) {
     if (main_mode_button.state==MMD_PLAY && temps->type==EMD_THRUSTER &&
 	  Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
-      D3Sub(&temps->end2->state->x,&temps->end1->state->x,&p);
+      D3Sub(&p,&temps->end2->state->x,&temps->end1->state->x);
       D3Unit(&p);
       D3MulEqu(&p,2000);
       D3AddEqu(&temps->end1->DstateDt->DxDt,&p);

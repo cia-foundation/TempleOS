@@ -168,41 +168,41 @@ public U0 DCExtentsInit(CDC *dc=NULL)
 public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
 {//Create alias of dc, so can change pen, color, etc.
 //NULL means gr.dc
-  CDC *result;
+  CDC *res;
   if (!dc)   dc=gr.dc;
   if (!task) task=Fs;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
     throw('Graphics');
-  result=MAlloc(sizeof(CDC),task);
-  MemCpy(result,dc,sizeof(CDC));
-  result->win_task=result->mem_task=task;
-  result->r=MAlloc(16*sizeof(I64),task);
-  DCRst(result);
-  result->flags|=DCF_ALIAS;
-  result->alias=dc;
-  return result;
+  res=MAlloc(sizeof(CDC),task);
+  MemCpy(res,dc,sizeof(CDC));
+  res->win_task=res->mem_task=task;
+  res->r=MAlloc(16*sizeof(I64),task);
+  DCRst(res);
+  res->flags|=DCF_ALIAS;
+  res->alias=dc;
+  return res;
 }
 
 public CDC *DCNew(I64 width,I64 height,CTask *task=NULL,Bool null_bitmap=FALSE)
 {//Create new width x height device context.
 //Internally only allows widths which are divisible by 8.
   //Don't forget these $MA-X+PU,"sizeof(CDC)",LM="Find(\"sizeof(CDC)\",\"/*\");View;"$.
-  CDC *result;
+  CDC *res;
   if (!task) task=Fs;
-  result=CAlloc(sizeof(CDC),task);
-  result->win_task=task;
-  result->mem_task=task;
-  result->width=width;
-  result->width_internal=(width+7)&~7;
-  result->height=height;
+  res=CAlloc(sizeof(CDC),task);
+  res->win_task=task;
+  res->mem_task=task;
+  res->width=width;
+  res->width_internal=(width+7)&~7;
+  res->height=height;
   if (null_bitmap)
-    result->flags|=DCF_DONT_DRAW;
+    res->flags|=DCF_DONT_DRAW;
   else
-    result->body=CAlloc(result->width_internal*result->height,task);
-  result->r=MAlloc(16*sizeof(I64),task);
-  DCRst(result);
-  result->dc_signature=DCS_SIGNATURE_VAL;
-  return result;
+    res->body=CAlloc(res->width_internal*res->height,task);
+  res->r=MAlloc(16*sizeof(I64),task);
+  DCRst(res);
+  res->dc_signature=DCS_SIGNATURE_VAL;
+  return res;
 }
 
 public U0 DCDel(CDC *dc)
@@ -241,16 +241,16 @@ public U0 DCDepthBufAlloc(CDC *dc)
 
 public CDC *DCCopy(CDC *dc,CTask *task=NULL)
 {//Alloc copy of dc, including image body, rot mat and depth buf.
-  CDC *result;
+  CDC *res;
   if (!dc) return NULL;
   if (dc->dc_signature!=DCS_SIGNATURE_VAL)
     throw('Graphics');
-  result=MAllocIdentical(dc,task);
-  DCMat4x4Set(result,Mat4x4New(dc->r,task));
-  result->mem_task=task;
-  result->body=MAllocIdentical(dc->body,task);
-  result->depth_buf=MAllocIdentical(dc->depth_buf,task);
-  return result;
+  res=MAllocIdent(dc,task);
+  DCMat4x4Set(res,Mat4x4New(dc->r,task));
+  res->mem_task=task;
+  res->body=MAllocIdent(dc->body,task);
+  res->depth_buf=MAllocIdent(dc->depth_buf,task);
+  return res;
 }
 
 public U0 DCMono(CDC *dc,
@@ -269,22 +269,22 @@ public U0 DCMono(CDC *dc,
 
 public I64 DCColorChg(CDC *dc,I64 src_color,I64 dst_color=TRANSPARENT)
 {//Find and replace src color with dst in device context.
-  I64 i,result=0;
+  I64 i,res=0;
   U8 *dst;
   dst=dc->body;
   i=dc->width_internal*dc->height;
   while (i--)
     if (*dst==src_color) {
       *dst++=dst_color;
-      result++;
+      res++;
     } else
       dst++;
-  return result;
+  return res;
 }
 
 public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
 {//Stores device context to mem, perhaps, with compression.
-  U8 *result,*ptr,*body;
+  U8 *res,*ptr,*body;
   CArcCompress *arc;
   I64 body_size=dc->width_internal*dc->height,total_size,flags;
   CBGR48 palette[NUM_COLORS];
@@ -313,7 +313,7 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
     total_size+=NUM_COLORS*sizeof(CBGR48);
   }
 
-  ptr=result=MAlloc(total_size);
+  ptr=res=MAlloc(total_size);
 
 #assert !offset(CDC.start)
   MemCpy(ptr,&dc->start,offset(CDC.end)-offset(CDC.start));
@@ -331,45 +331,45 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
 
   Free(arc);
   if (_size) *_size=total_size;
-  return result;
+  return res;
 }
 
 public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
 {//Loads device context from mem.
-  CDC *result;
+  CDC *res;
   U8 *ptr=src;
   CArcCompress *arc;
   I64 body_size;
   if (!task) task=Fs;
-  result=CAlloc(sizeof(CDC),task);
-  result->win_task=task;
-  result->mem_task=task;
-  MemCpy(&result->start,ptr,offset(CDC.end)-offset(CDC.start));
+  res=CAlloc(sizeof(CDC),task);
+  res->win_task=task;
+  res->mem_task=task;
+  MemCpy(&res->start,ptr,offset(CDC.end)-offset(CDC.start));
   ptr+=offset(CDC.end)-offset(CDC.start);
 
-  if (result->flags&DCF_PALETTE) {
-    MemCpy(&result->palette,ptr,NUM_COLORS*sizeof(CBGR48));
+  if (res->flags&DCF_PALETTE) {
+    MemCpy(&res->palette,ptr,NUM_COLORS*sizeof(CBGR48));
     ptr+=NUM_COLORS*sizeof(CBGR48);
   } else
-    MemCpy(&result->palette,gr_palette_std,NUM_COLORS*sizeof(CBGR48));
+    MemCpy(&res->palette,gr_palette_std,NUM_COLORS*sizeof(CBGR48));
 
-  body_size=result->width_internal*result->height;
-  if (result->flags&DCF_COMPRESSED) {
-    result->flags&=~DCF_COMPRESSED;
+  body_size=res->width_internal*res->height;
+  if (res->flags&DCF_COMPRESSED) {
+    res->flags&=~DCF_COMPRESSED;
     arc=ptr;
-    result->body=ExpandBuf(arc,task);
+    res->body=ExpandBuf(arc,task);
     ptr+=arc->compressed_size;
   } else {
-    result->body=MAlloc(body_size,task);
-    MemCpy(result->body,ptr,body_size);
+    res->body=MAlloc(body_size,task);
+    MemCpy(res->body,ptr,body_size);
     ptr+=body_size;
   }
-  result->pen_width=1;
-  result->r=Mat4x4IdentNew(task);
-  result->r_norm.u32[1]=1;
-  result->dc_signature=DCS_SIGNATURE_VAL;
+  res->pen_width=1;
+  res->r=Mat4x4IdentNew(task);
+  res->r_norm.u32[1]=1;
+  res->dc_signature=DCS_SIGNATURE_VAL;
   if (_size) *_size=ptr-src;
-  return result;
+  return res;
 }
 
 #help_index "Graphics/GRA Files"

@@ -2,7 +2,7 @@
 class CWho
 {
   CHashGeneric *h;
-  U8 *index;
+  U8 *idx;
 };
 
 I64 HashEntriesCompare(CWho *h1,CWho *h2)
@@ -28,11 +28,11 @@ I64 HashEntriesCompare2(CWho *h1,CWho *h2)
   return i1-i2;
 }
 
-I64 HelpIndexCnt(U8 *ptr,U8 *index)
+I64 HelpIndexCnt(U8 *ptr,U8 *idx)
 {
-  I64 cnt=0,ch,index_len=StrLen(index);
+  I64 cnt=0,ch,idx_len=StrLen(idx);
   while (*ptr) {
-    if (!StrNCmp(ptr,index,index_len))
+    if (!StrNCmp(ptr,idx,idx_len))
       cnt++;
     while (ch=*ptr++)
       if (ch==';')
@@ -43,10 +43,10 @@ I64 HelpIndexCnt(U8 *ptr,U8 *index)
   return cnt;
 }
 
-U8 *HelpIndexStr(U8 **_ptr,U8 *index)
+U8 *HelpIndexStr(U8 **_ptr,U8 *idx)
 {
-  U8 *ptr=*_ptr,*ptr2,*result;
-  I64 ch,index_len=StrLen(index);
+  U8 *ptr=*_ptr,*ptr2,*res;
+  I64 ch,idx_len=StrLen(idx);
   while (*ptr) {
     ptr2=ptr;
     while (ch=*ptr++)
@@ -55,13 +55,13 @@ U8 *HelpIndexStr(U8 **_ptr,U8 *index)
     if (!ch)
       ptr--;
     *_ptr=ptr;
-    if (!StrNCmp(ptr2,index,index_len)) {
+    if (!StrNCmp(ptr2,idx,idx_len)) {
       if (ch==';')
 	ptr--;
       *ptr=0;
-      result=StrNew(ptr2);
+      res=StrNew(ptr2);
       *ptr=ch;
-      return result;
+      return res;
     }
   }
   return NULL;
@@ -71,7 +71,7 @@ U8 *HelpComment(CTask *task,CHash *temph,U8 *_src_link)
 {
   CDoc *doc;
   CDocEntry *doc_e;
-  U8 *result=NULL,*ptr,*ptr2,*src_link=StrNew(_src_link);
+  U8 *res=NULL,*ptr,*ptr2,*src_link=StrNew(_src_link);
 
   if (*src_link=='F' && src_link[2]==':')
     *src_link='P';
@@ -102,35 +102,35 @@ U8 *HelpComment(CTask *task,CHash *temph,U8 *_src_link)
 	ptr+=6;
       while (*ptr==CH_SPACE)
 	ptr++;
-      result=StrNew(ptr);
+      res=StrNew(ptr);
       doc_e=doc_e->next;
     }
     while (doc_e!=doc && doc_e->type_u8!=DOCT_NEW_LINE) {
       if (doc_e->type_u8==DOCT_TAB) {
-	ptr=MStrPrint("%s ",result);
-	Free(result);
-	result=ptr;
+	ptr=MStrPrint("%s ",res);
+	Free(res);
+	res=ptr;
       } else if (doc_e->de_flags&DOCEF_TAG) {
-	ptr=MStrPrint("%s%s",result,doc_e->tag);
-	Free(result);
-	result=ptr;
+	ptr=MStrPrint("%s%s",res,doc_e->tag);
+	Free(res);
+	res=ptr;
       }
       doc_e=doc_e->next;
     }
   }
   XTalkWait(task,"%c",CH_SHIFT_ESC);
-  if (result) {
-    ptr=MStrUtil(result,SUF_REM_TRAILING|SUF_REM_LEADING|SUF_SINGLE_SPACE);
-    Free(result);
-    result=ptr;
+  if (res) {
+    ptr=MStrUtil(res,SUF_REM_TRAILING|SUF_REM_LEADING|SUF_SINGLE_SPACE);
+    Free(res);
+    res=ptr;
   }
-  return result;
+  return res;
 }
 
 I64 HashEntriesCompare3(CWho *h1,CWho *h2)
 {
   I64 i,i1=0,i2=0;
-  i=StrCmp(h1->index,h2->index);
+  i=StrCmp(h1->idx,h2->idx);
   if (i)
     return i;
   else {
@@ -147,7 +147,7 @@ I64 HashEntriesCompare3(CWho *h1,CWho *h2)
 }
 
 public U0 Who(U8 *fu_flags=NULL,CHashTable *h=NULL,
-U8 *index=NULL,CDoc *doc=NULL)
+U8 *idx=NULL,CDoc *doc=NULL)
 {//Dump hash symbol table.
 // "+p" for only public symbols
   // "+m" to order by number (normally alphabetical)
@@ -157,7 +157,7 @@ U8 *index=NULL,CDoc *doc=NULL)
   CHashGeneric *ptr;
   CWho *lst;
   I64 cnt,i,j,k,f=0;
-  U8 buf[512],*st,*last_index=StrNew(""),*cur_index,*comment;
+  U8 buf[512],*st,*last_idx=StrNew(""),*cur_idx,*comment;
   Bool recurse,publics,map;
   CTask *task;
 
@@ -171,7 +171,7 @@ U8 *index=NULL,CDoc *doc=NULL)
 
   if (!h) h=Fs->hash_table;
 
-  if (index) {
+  if (idx) {
     task=User;
     TaskWait(task);
     LBtr(&task->display_flags,DISPLAYf_SHOW);
@@ -186,10 +186,10 @@ U8 *index=NULL,CDoc *doc=NULL)
       while (temph) {
 	if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
 	      (temph->type & HTF_PUBLIC || !publics)) {
-	  if (!index)
+	  if (!idx)
 	    cnt++;
-	  else if (temph->type&HTG_SRC_SYM && (cur_index=temph->index))
-	    cnt+=HelpIndexCnt(cur_index,index);
+	  else if (temph->type&HTG_SRC_SYM && (cur_idx=temph->idx))
+	    cnt+=HelpIndexCnt(cur_idx,idx);
 	}
 	temph=temph->next;
       }
@@ -210,12 +210,12 @@ U8 *index=NULL,CDoc *doc=NULL)
       while (temph) {
 	if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
 	      (temph->type & HTF_PUBLIC || !publics))
-	  if (!index)
+	  if (!idx)
 	    lst[j++].h=temph;
-	  else if (temph->type&HTG_SRC_SYM && (cur_index=temph->index) &&
-		(k=HelpIndexCnt(cur_index,index)))
+	  else if (temph->type&HTG_SRC_SYM && (cur_idx=temph->idx) &&
+		(k=HelpIndexCnt(cur_idx,idx)))
 	    while (k--) {
-	      lst[j].index=HelpIndexStr(&cur_index,index);
+	      lst[j].idx=HelpIndexStr(&cur_idx,idx);
 	      lst[j++].h=temph;
 	    }
 	temph=temph->next;
@@ -229,30 +229,30 @@ U8 *index=NULL,CDoc *doc=NULL)
 
   if (map)
     QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare2);
-  else if (index)
+  else if (idx)
     QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare3);
   else
     QSort(lst,cnt,sizeof(CWho),&HashEntriesCompare);
 
-  if (index) {
+  if (idx) {
     progress1_max=cnt;
     progress1=0;
   }
   for (i=0;i<cnt;i++) {
     comment=NULL;
     ptr=lst[i].h;
-    if (index)
-      if (cur_index=lst[i].index) {
-	if (StrCmp(cur_index,last_index)) {
-	  Free(last_index);
-	  last_index=StrNew(cur_index);
+    if (idx)
+      if (cur_idx=lst[i].idx) {
+	if (StrCmp(cur_idx,last_idx)) {
+	  Free(last_idx);
+	  last_idx=StrNew(cur_idx);
 	  if (i)
 	    DocPrint(doc,"\n\n");
-	  DocPrint(doc,"$$WW,0$$$$PURPLE$$$$TX+CX,\"%Q\"$$$$FG$$\n",cur_index);
+	  DocPrint(doc,"$$WW,0$$$$PURPLE$$$$TX+CX,\"%Q\"$$$$FG$$\n",cur_idx);
 	}
       }
 
-    if (index && ptr->type & HTT_HELP_FILE) {
+    if (idx && ptr->type & HTT_HELP_FILE) {
       DocPrint(doc,"$$WW,1$$");
       DocType(doc,ptr->str);
       DocPrint(doc,"$$WW,0$$");
@@ -260,12 +260,12 @@ U8 *index=NULL,CDoc *doc=NULL)
       if (ptr->type&HTG_SRC_SYM && ptr(CHashSrcSym *)->src_link) {
 	DocPrint(doc,"$$LK,\"%-20s\",A=\"%s\"$$",
 	      ptr->str,ptr(CHashSrcSym *)->src_link);
-	if (index)
+	if (idx)
 	  comment=HelpComment(task,ptr,ptr(CHashSrcSym *)->src_link);
       } else
 	DocPrint(doc,"%-20s",ptr->str);
 
-      if (!index) {
+      if (!idx) {
 	if (ptr->type & HTT_DEFINE_STR) {
 	  st=MStrUtil(ptr(CHashDefineStr *)->data,SUF_SAFE_DOLLAR);
 	  j=ptr(CHashDefineStr *)->cnt;
@@ -305,12 +305,12 @@ U8 *index=NULL,CDoc *doc=NULL)
       }
       DocPrint(doc,"\n");
     }
-    Free(lst[i].index);
-    if (index)
+    Free(lst[i].idx);
+    if (idx)
       progress1++;
   }
   Free(lst);
-  if (index)
+  if (idx)
     progress1=progress1_max=0;
 
 wh_done:
@@ -320,7 +320,7 @@ wh_done:
     else
       DocRecalc(doc);
   }
-  Free(last_index);
+  Free(last_idx);
   Kill(task);
 }
 
@@ -357,15 +357,15 @@ public I64 HashDepthRep(CHashTable *table=NULL)
 #help_index "Help System"
 #help_file "::/Doc/HelpSystem"
 
-public U0 DocHelpIndex(CDoc *doc,U8 *index)
-{//Put to doc report for given help index.
-  Who("+p",,index,doc);
+public U0 DocHelpIndex(CDoc *doc,U8 *idx)
+{//Put to doc report for given help idx.
+  Who("+p",,idx,doc);
 }
 
-public U0 PopUpHelpIndex(U8 *index,CTask *parent=NULL)
-{//PopUp win report for given help index.
+public U0 PopUpHelpIndex(U8 *idx,CTask *parent=NULL)
+{//PopUp win report for given help idx.
   U8 *buf;
-  buf=MStrPrint("DocHelpIndex(DocPut,\"%s\");View;",index);
+  buf=MStrPrint("DocHelpIndex(DocPut,\"%s\");View;",idx);
   PopUp(buf,parent);
   Free(buf);
 }

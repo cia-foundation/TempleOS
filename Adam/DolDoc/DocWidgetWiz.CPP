@@ -164,13 +164,13 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	Bool *_quote,U8 **_html_link)
 {
   CEdFileLink *e=CAlloc(sizeof(CEdFileLink));
-  Bool result=FALSE;
+  Bool res=FALSE;
   if (type>=0) {
     e->num=1;
     switch (type) {
       case LK_FILE:
 	if (DocForm(e,,,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
 	  else
@@ -180,7 +180,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_PLAIN:
 	if (DocForm(e,,,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
 	  else
@@ -190,7 +190,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_FILE_ANCHOR:
 	if (DocForm(e,"CEdFileAnchorLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
 	  else
@@ -200,7 +200,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_FILE_FIND:
 	if (DocForm(e,"CEdFileFindLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (e->num==1) {
 	    if (!*e->tag)
 	      *_tag=StrNew(e->aux);
@@ -218,7 +218,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_PLAIN_FIND:
 	if (DocForm(e,"CEdFileFindLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (e->num==1) {
 	    if (!*e->tag)
 	      *_tag=StrNew(e->aux);
@@ -236,7 +236,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_FILE_LINE:
 	if (DocForm(e,"CEdFileLineLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
 	  else
@@ -246,7 +246,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_PLAIN_LINE:
 	if (DocForm(e,"CEdFileLineLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->file);
 	  else
@@ -256,7 +256,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_MAN_PAGE:
 	if (DocForm(e,"CEdManPageLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
 	  else
@@ -266,7 +266,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_PLACE_ANCHOR:
 	if (DocForm(e,"CEdPlaceAnchor",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag) {
 	    if (e->hide)
 	      *_tag=StrNew("");
@@ -279,7 +279,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_BIBLE_FIND:
 	if (DocForm(e,"CEdBibleLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=MStrPrint("%Z,%s",e->book,"ST_BIBLE_BOOKS",e->aux);
 	  else
@@ -290,7 +290,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
       case LK_DEF:
 	e->num=-1;
 	if (DocForm(e,"CEdDefLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
 	  else
@@ -304,7 +304,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	break;
       case LK_HELP_INDEX:
 	if (DocForm(e,"CEdManPageLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (!*e->tag)
 	    *_tag=StrNew(e->aux);
 	  else
@@ -315,7 +315,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
       case LK_ADDR:
 	e->num=DFT_ADDR_LINK_BIN_SIZE;
 	if (DocForm(e,"CEdAddrLink",,,ctrl_L_footer)) {
-	  result=TRUE;
+	  res=TRUE;
 	  if (e->num==DFT_ADDR_LINK_BIN_SIZE) {
 	    if (!*e->tag)
 	      *_tag=StrNew(e->aux);
@@ -346,7 +346,7 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
   else
     *_quote=FALSE;
   Free(e);
-  return result;
+  return res;
 }
 
 U0 EdInsLink()
@@ -1092,15 +1092,15 @@ class CEdMenuSprite
 
 U8 *EdSpriteLink(Bool *_pop_up,U8 **_html_link)
 {
-  U8 *result=NULL,*tag=NULL,*link=NULL;
+  U8 *res=NULL,*tag=NULL,*link=NULL;
   Bool quote=FALSE;
   I64 type=PopUpLinkType(FALSE);
   *_html_link=NULL;
   if (type>=0 && GetLink(type,&tag,&link,_pop_up,&quote,_html_link))
-    result=MStrPrint("\"%Q\",A=\"%Q\"",tag,link);
+    res=MStrPrint("\"%Q\",A=\"%Q\"",tag,link);
   Free(tag);
   Free(link);
-  return result;
+  return res;
 }
 
 U8 *EdSprite(I64 bin_num)

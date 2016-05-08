@@ -99,17 +99,17 @@ U0 DrawIt(CTask *task,CDC *dc)
 Unit *FindUnit(I64 x,I64 y,I64 player)
 {
   I64 i,dd,best_dd=MAX_I64;
-  Unit *result=NULL;
+  Unit *res=NULL;
   for (i=0;i<NUM_UNITS;i++) {
     if (u[i].player==player && u[i].alive) {
       dd=SqrI64(u[i].x-x)+SqrI64(u[i].y-y);
       if (dd<best_dd) {
 	best_dd=dd;
-	result=&u[i];
+	res=&u[i];
       }
     }
   }
-  return result;
+  return res;
 }
 
 U0 CheckForKills(I64 x1,I64 y1,I64 player)

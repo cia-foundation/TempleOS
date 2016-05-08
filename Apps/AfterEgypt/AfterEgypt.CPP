@@ -65,7 +65,7 @@ U0 HoldCourt()
 Bool TakeTurn()
 {
   I64 i;
-  Bool result,old_form=LBts(&(DocPut)->flags,DOCf_FORM);
+  Bool res,old_form=LBts(&(DocPut)->flags,DOCf_FORM);
   num_people*=1.0+0.01*((RandU16%100)-30);
   if (num_people>MAX_PEOPLE)
     num_people=MAX_PEOPLE;
@@ -96,7 +96,7 @@ Bool TakeTurn()
   DocBottom;
 
   if (!(0<=i<T_QUIT))
-    result=FALSE;
+    res=FALSE;
   else {
     switch (i) {
       case T_BREAK_CAMP:
@@ -130,11 +130,11 @@ Bool TakeTurn()
 	PopUpOk("Add your own story-line...\nLike old school toys.\n");
 	break;
     }
-    result=TRUE;
+    res=TRUE;
   }
   WinMgrSync;
   Fs->song_task=NULL;
-  return result;
+  return res;
 }
 
 U0 TMsg(CDC *dc,U8 *msg)

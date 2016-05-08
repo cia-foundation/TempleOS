@@ -1,11 +1,11 @@
 CLexFile *LexFilePush(CCmpCtrl *cc)
 {//#include file push.
-  CLexFile *result=CAlloc(sizeof(CLexFile));
-  if (result->next=cc->lex_include_stk)
-    result->depth=result->next->depth+1;
+  CLexFile *res=CAlloc(sizeof(CLexFile));
+  if (res->next=cc->lex_include_stk)
+    res->depth=res->next->depth+1;
   else
-    result->depth=-1; //Include depth starts with -1.
-  return cc->lex_include_stk=result;
+    res->depth=-1; //Include depth starts with -1.
+  return cc->lex_include_stk=res;
 }
 
 CLexFile *LexFilePop(CCmpCtrl *cc)
@@ -62,7 +62,7 @@ U0 CmpCtrlDel(CCmpCtrl *cc)
   LinkedLstDel(cc->htc.next);
   Free(cc->ps);
   Free(cc->cur_str);
-  Free(cc->cur_help_index);
+  Free(cc->cur_help_idx);
   Free(cc->dollar_buf);
   Free(cc);
 }
@@ -70,22 +70,22 @@ U0 CmpCtrlDel(CCmpCtrl *cc)
 I64 CmpCtrlSize(CCmpCtrl *cc)
 {//Mem size of CCmpCtrl and its members.
   CLexFile *tempf=cc->lex_include_stk;
-  I64 result=0;
+  I64 res=0;
   while (tempf) {
     if (tempf->next || !(cc->flags & CCF_DONT_FREE_BUF)) {
       if (tempf->flags & LFSF_DOC) {
 	if (tempf->doc)
-	  result+=DocSize(tempf->doc);
+	  res+=DocSize(tempf->doc);
       } else
-	result+=MSize2(tempf->buf);
+	res+=MSize2(tempf->buf);
     }
-    result+=MSize2(tempf->full_name);
-    result+=MSize2(tempf);
+    res+=MSize2(tempf->full_name);
+    res+=MSize2(tempf);
     tempf=tempf->next;
   }
-  result+=MSize2(cc->cur_str);
-  result+=MSize2(cc);
-  return result;
+  res+=MSize2(cc->cur_str);
+  res+=MSize2(cc);
+  return res;
 }
 
 U32 lex_zeros=0;
@@ -276,7 +276,7 @@ U0 LexSkipEol(CCmpCtrl *cc)
 
 U8 *LexFirstRem(CCmpCtrl *cc,U8 *marker,I64 _len=NULL)
 {//$LK,"LexGetChar",A="MN:LexGetChar"$() chars making str until marker.
-  U8 *result,*ptr;
+  U8 *res,*ptr;
   CQueVectU8 *tempv=QueVectU8New;
   I64 i,len=0;
   while (TRUE) {
@@ -287,13 +287,13 @@ U8 *LexFirstRem(CCmpCtrl *cc,U8 *marker,I64 _len=NULL)
   }
   if (i)
     Bts(&cc->flags,CCf_USE_LAST_U16);
-  result=ptr=MAlloc(len+1);
+  res=ptr=MAlloc(len+1);
   for (i=0;i<len;i++)
     *ptr++=QueVectU8Get(tempv,i);
   *ptr=0;
   QueVectU8Del(tempv);
   if (_len) *_len=len;
-  return result;
+  return res;
 }
 
 U0 LexIncludeStr(CCmpCtrl *cc,U8 *abs_filename,U8 *src,Bool actual_file)
@@ -530,7 +530,7 @@ lex_ident:
 	    } else {
 	      cc->cur_i64=i;
 	      cc->flags|=CCF_USE_LAST_U16;
-	      cc->token=TK_INT;
+	      cc->token=TK_I64;
 	      goto lex_end;
 	    }
 	  }
@@ -544,7 +544,7 @@ lex_ident:
 	    else {
 	      cc->cur_i64=i;
 	      cc->flags|=CCF_USE_LAST_U16;
-	      cc->token=TK_INT;
+	      cc->token=TK_I64;
 	      goto lex_end;
 	    }
 	  }
@@ -557,7 +557,7 @@ lex_ident:
 lex_is_int:
 	    cc->cur_i64=i;
 	    cc->flags|=CCF_USE_LAST_U16;
-	    cc->token=TK_INT;
+	    cc->token=TK_I64;
 	    goto lex_end;
 	  }
 	  ch=LexGetChar(cc);
@@ -1020,8 +1020,8 @@ lex_ifjit:
 	  case KW_HELP_INDEX:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
-	    Free(cc->cur_help_index);
-	    cc->cur_help_index=LexExtStr(cc,,FALSE);
+	    Free(cc->cur_help_idx);
+	    cc->cur_help_idx=LexExtStr(cc,,FALSE);
 	    break;
 	  case KW_HELP_FILE:
 	    if (Lex(cc)!=TK_STR)

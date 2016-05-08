@@ -47,9 +47,9 @@ U8 *BlogWebFile(CDate cdt=0)
 public U8 *FileNameNumNext(U8 *files_find_mask,U8 *fmt)
 {
   CDirEntry *tempde=FilesFind(files_find_mask);
-  U8 *result=MStrPrint(fmt,FileCnt(tempde));
+  U8 *res=MStrPrint(fmt,FileCnt(tempde));
   DirTreeDel(tempde);
-  return result;
+  return res;
 }
 
 U0 BlogDCImgWrite(CDC *dc,CDate cdt=0)

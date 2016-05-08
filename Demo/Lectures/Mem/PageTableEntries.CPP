@@ -1,4 +1,4 @@
-I64 *addr=VGAM_GRAPHICS,
+I64 *addr=text.vga_alias,
    *pte_addr=MemPageTable(addr),
    err_code=0,
    *reported_fault_addr;
@@ -22,7 +22,7 @@ interrupt haserrcode U0 IntPageFault()
   reported_fault_addr=GetRAX;
 }
 
-U0 PageTableDemo2()
+U0 PageTableDemo()
 {
   U8 *old_idte=IntEntrySet(I_PAGE_FAULT,&IntPageFault,IDTET_IRQ);
   err_code=0;
@@ -34,4 +34,4 @@ U0 PageTableDemo2()
   "Err Code:%X Addr:%X\n",err_code,reported_fault_addr;
 }
 
-PageTableDemo2;
+PageTableDemo;

@@ -137,7 +137,7 @@ U0 EdInsCapturedMacro()
 
 I64 PopUpMacroMenu()
 {
-  I64 result=0;
+  I64 res=0;
   U8 buf[STR_LEN];
   CSrvCmd *tempc;
   CDoc *doc=DocNew;
@@ -164,13 +164,13 @@ I64 PopUpMacroMenu()
   LBts(&sys_macro_task->display_flags,DISPLAYf_WIN_ON_TOP);
   tempc=TaskExe(sys_macro_task,Fs,buf,
 	1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-  JobResultScan(tempc,&result);
+  JobResScan(tempc,&res);
   Fs->popup_task=NULL;
   Kill(sys_macro_task);
   sys_macro_task=NULL;
   DocDataScan(doc,doc_e);
   DocDel(doc);
-  return result;
+  return res;
 }
 
 U0 MacroTask(I64)

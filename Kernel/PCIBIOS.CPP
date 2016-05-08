@@ -133,7 +133,7 @@ C32_ADD:: DU32	0;
 	MOV	U32 [C32_EDI],EDI
 
 	PUSH	U32 0	//Return from next call will be 64-bit
-	CALL	SYS_EM64T
+	CALL	SYS_ENTER_LONG_MODE
 
 USE64	MOV	RSP,U64 [C32_RSP]
 	POP	RAX
@@ -162,7 +162,7 @@ _extern _FAR_CALL32 Bool FarCall32(U0 (*fp_addr)());//Not reentrant.For PCIBIOS.
 
 U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
 {//Read U8 in PCI configspace at bus,dev,fun,reg.
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -171,17 +171,17 @@ U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   if (FarCall32(sys_pci_services))
-    result=c32_ecx.u8[0];
+    res=c32_ecx.u8[0];
   else
-    result=0xFF;
+    res=0xFF;
   LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
   POPFD
-  return result;
+  return res;
 }
 
 U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
 {//Read U16 in PCI configspace at bus,dev,fun,reg.
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -190,17 +190,17 @@ U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   if (FarCall32(sys_pci_services))
-    result=c32_ecx.u16[0];
+    res=c32_ecx.u16[0];
   else
-    result=0xFFFF;
+    res=0xFFFF;
   LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
   POPFD
-  return result;
+  return res;
 }
 
 U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
 {//Read U32 in PCI configspace at bus,dev,fun,reg.
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -209,12 +209,12 @@ U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   if (FarCall32(sys_pci_services))
-    result=c32_ecx;
+    res=c32_ecx;
   else
-    result=0xFFFFFFFF;
+    res=0xFFFFFFFF;
   LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
   POPFD
-  return result;
+  return res;
 }
 
 U0 PCIWriteU8(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
@@ -270,7 +270,7 @@ n is index starting at zero
 Return: -1 not found
 else bus,dev,fun.
 */
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
@@ -279,11 +279,11 @@ else bus,dev,fun.
   c32_esi=n;
   c32_ecx=class_code;
   if (FarCall32(sys_pci_services) && !c32_eax.u8[1])
-    result=c32_ebx.u8[1]<<16+(c32_ebx&0xF8)<<5+c32_ebx&7;
+    res=c32_ebx.u8[1]<<16+(c32_ebx&0xF8)<<5+c32_ebx&7;
   else
-    result=-1;
+    res=-1;
   LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
   POPFD
-  return result;
+  return res;
 }
 

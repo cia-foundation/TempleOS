@@ -41,6 +41,7 @@ class MyMass:CMass
   F64 temperature;
   F64 radius;
   I64 color;
+  Bool no_overlap;
 };
 
 class MySpring:CSpring
@@ -52,9 +53,26 @@ class MySpring:CSpring
 #define SPIN_GAIN		0.25
 #define MAX_MASSES		8
 #define MAX_SPRINGS		16
+#define MAX_MISSILES		2
 #define ST_HUMAN1		0
 #define ST_ENEMY1		1
 #define ST_ENEMY2		2
+extern class Ship;
+
+#define MISSILE_LEN		5
+class Missile
+{
+  Missile *next,*last;
+  F64 explosion_radius;
+  F64 fuse_time,die_timeout;
+  MyMass p_front,p_back;
+  MySpring s[5];
+  U8 *img;
+  Ship *owner,*target;
+  Bool active,launched,exploding;
+  U8 label[5];
+} missile_root;
+
 class Ship
 {
   Ship *next,*last;
@@ -66,19 +84,20 @@ class Ship
   F64 die_time,die_timeout;
   I64 spacewalk_side;
   F64 laser_temperature;
+  Missile missiles[MAX_MISSILES];
   Bool lasering,exploding,laser_overheat;
-} *human;
+} ship_root,*human;
 
 F64 human_t_left,human_t_right,human_antispin;
 
 class Shot
 {
   Shot *next,*last;
-  F64 radius;
+  F64 radius,explosion_radius;
   F64 fuse_time,die_timeout;
   MyMass p;
   Bool exploding;
-};
+} shot_root;
 
 #define MAX_THRUST	200.0
 #define MAX_ANTISPIN	25.0
@@ -95,8 +114,6 @@ Bool game_over,show_level_msg;
 #define NUM_STARS	100
 I64 stars_x[NUM_STARS],stars_y[NUM_STARS];
 
-Ship ship_root;
-Shot shot_root;
 CMathODE *ode=NULL;
 I64 level,score,remaining;
 
@@ -114,6 +131,10 @@ $SP,"<5>",BI=5$
 
 $SP,"<6>",BI=6$
 
+$SP,"<7>",BI=7$
+
+$SP,"<8>",BI=8$
+
 $BG$
 //********************************** Ship
 Bool CheckOverlap()
@@ -124,8 +145,8 @@ Bool CheckOverlap()
   while (tempm!=&ode->next_mass) {
     tempm1=ode->next_mass;
     while (tempm1!=&ode->next_mass) {
-      if (tempm!=tempm1) {
-	D3Sub(&tempm->x,&tempm1->x,&p);
+      if (tempm!=tempm1 && !tempm->no_overlap && !tempm1->no_overlap) {
+	D3Sub(&p,&tempm->x,&tempm1->x);
 	if (D3NormSqr(&p)<=Sqr(tempm->radius+tempm1->radius))
 	  return TRUE;
       }
@@ -134,6 +155,63 @@ Bool CheckOverlap()
     tempm=tempm->next;
   }
   return FALSE;
+}
+
+U0 MissileNew(Ship *tempsp,I64 n)
+{
+  I64 i;
+  CD3 p,p1,p2;
+  Missile *tempmi=&tempsp->missiles[n];
+  MemSet(tempmi,0,sizeof(Missile));
+
+  D3Equ(&tempmi->p_front.x,
+	(tempsp->p[n+1].x+tempsp->p[n+3].x)/2,
+	(tempsp->p[n+1].y+tempsp->p[n+3].y)/2,0);
+  D3Copy(&tempmi->p_back.x,&tempmi->p_front.x);
+
+  if (n&1)
+    StrCpy(tempmi->label,"L");
+  else
+    StrCpy(tempmi->label,"R");
+  tempmi->owner=tempsp;
+  tempmi->explosion_radius=5;
+  tempmi->p_front.mass=0.1;
+  tempmi->p_back.mass =0.1;
+  tempmi->p_front.radius=2;
+  tempmi->p_back.radius =2;
+  tempmi->p_front.no_overlap=TRUE;
+  tempmi->p_back.no_overlap =TRUE;
+  D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[1].x);
+  D3Sub(&p2,&tempsp->p[0].x,&tempsp->p[2].x);
+  D3Unit(D3Add(&p,&p1,&p2));
+  D3AddEqu(&tempmi->p_front.x,D3MulEqu(D3Copy(&p1,&p),MISSILE_LEN/2+1));
+  D3SubEqu(&tempmi->p_back.x ,D3MulEqu(D3Copy(&p1,&p),MISSILE_LEN/2-1));
+  D3Copy(&tempmi->p_front.DxDt,&tempsp->p[n].DxDt);
+  D3Copy(&tempmi->p_back.DxDt,&tempsp->p[n].DxDt);
+  QueIns(&tempmi->p_front,ode->last_mass);
+  QueIns(&tempmi->p_back, ode->last_mass);
+
+  tempmi->s[0].end1=&tempmi->p_front;
+  tempmi->s[0].end2=&tempmi->p_back;
+  tempmi->s[1].end1=&tempmi->p_front;
+  tempmi->s[1].end2=&tempsp->p[n+1];
+  tempmi->s[2].end1=&tempmi->p_back;
+  tempmi->s[2].end2=&tempsp->p[n+1];
+  tempmi->s[3].end1=&tempmi->p_front;
+  tempmi->s[3].end2=&tempsp->p[n+3];
+  tempmi->s[4].end1=&tempmi->p_back;
+  tempmi->s[4].end2=&tempsp->p[n+3];
+ 
+  for (i=0;i<5;i++) {
+    tempmi->s[i].const=10000;
+    tempmi->s[i].strength  =20000;
+    tempmi->s[i].color=BLACK;
+    tempmi->s[i].rest_len=D3Dist(&tempmi->s[i].end1->x,&tempmi->s[i].end2->x);
+    QueIns(&tempmi->s[i],ode->last_spring);
+  }
+  tempmi->img=$IB,"<7>",BI=7$;
+  tempmi->active=TRUE;
+  QueIns(tempmi,missile_root.last);
 }
 
 Ship *ShipNew(I64 x,I64 y,I64 type)
@@ -195,6 +273,8 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 	  tempsp->s[i].color=LTGRAY;
 	QueIns(&tempsp->s[i],ode->last_spring);
       }
+      MissileNew(tempsp,0);
+      MissileNew(tempsp,1);
       remaining=0;
 
       break;
@@ -289,6 +369,19 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
   return tempsp;
 }
 
+U0 MissileDel(Missile *tempmi)
+{
+  I64 i;
+  if (tempmi->active) {
+    QueRem(tempmi);
+    for(i=0;i<5;i++)
+      QueRem(&tempmi->s[i]);
+    QueRem(&tempmi->p_front);
+    QueRem(&tempmi->p_back);
+    tempmi->active=FALSE;
+  }
+}
+
 U0 ShipDel(Ship *tempsp)
 {
   I64 i;
@@ -297,6 +390,8 @@ U0 ShipDel(Ship *tempsp)
     QueRem(&tempsp->p[i]);
   for (i=0;i<tempsp->springs;i++)
     QueRem(&tempsp->s[i]);
+  for (i=0;i<2;i++)
+    MissileDel(&tempsp->missiles[i]);
   QueRem(tempsp);
   Free(tempsp);
   remaining--;
@@ -323,12 +418,12 @@ I64 Tweaked()
 {
   CD3 p,p1,p2;
   if (human) {
-    D3Sub(&human->p[0].x,&human->p[1].x,&p1);
-    D3Sub(&human->p[0].x,&human->p[2].x,&p2);
-    D3Add(&p1,&p2,&p);
+    D3Sub(&p1,&human->p[0].x,&human->p[1].x);
+    D3Sub(&p2,&human->p[0].x,&human->p[2].x);
+    D3Add(&p,&p1,&p2);
     D3Unit(&p);
-    D3Sub(&human->p[0].x,&human->p[3].x,&p1);
-    D3Sub(&human->p[0].x,&human->p[4].x,&p2);
+    D3Sub(&p1,&human->p[0].x,&human->p[3].x);
+    D3Sub(&p2,&human->p[0].x,&human->p[4].x);
     D3Unit(&p1);
     D3Unit(&p2);
     if (!(human->s[3].flags&SSF_INACTIVE) && D3Dot(&p,&p1)>Cos(20*ã/180))
@@ -373,6 +468,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   F64 arg;
   Ship *tempsp;
   Shot *temps;
+  Missile *tempmi;
   CD3 p,p1,p2;
   F64 t_left,t_right,spin,d,x,y;
   MySpring *tempsps;
@@ -398,12 +494,34 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   tempsps=ode->next_spring;
   while (tempsps!=&ode->next_spring) {
-    if (!(tempsps->flags&SSF_INACTIVE)) {
+    if (!(tempsps->flags&SSF_INACTIVE) && tempsps->color) {
       dc->color=tempsps->color;
       GrLine(dc,tempsps->end1->x,tempsps->end1->y,
 	    tempsps->end2->x,tempsps->end2->y);
     }
     tempsps=tempsps->next;
+  }
+
+  tempmi=missile_root.next;
+  while (tempmi!=&missile_root) {
+    if (tempmi->active) {
+      if (tempmi->launched && tempmi->exploding) {
+	d=(tS-tempmi->fuse_time)/(tempmi->die_timeout-tempmi->fuse_time);
+	d=7*Sin(ã*d)*tempmi->explosion_radius+1;
+	for (i=1;i<d;i++) {
+	  if (i&1)
+	    dc->color=YELLOW;
+	  else
+	    dc->color=LTRED;
+	  GrCircle(dc,tempmi->p_front.x,tempmi->p_front.y,i);
+	}
+      } else
+	SpriteZ3B(dc,(tempmi->p_front.x+tempmi->p_back.x)/2,
+	      (tempmi->p_front.y+tempmi->p_back.y)/2,0,tempmi->img,
+	      Arg(tempmi->p_front.x-tempmi->p_back.x,
+	      tempmi->p_front.y-tempmi->p_back.y));
+    }
+    tempmi=tempmi->next;
   }
 
   tempsp=ship_root.next;
@@ -415,18 +533,18 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    t_left=0;
 	    t_right=0;
 	  } else {
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1))) {
-	      D3Sub(&tempsp->p[0].DxDt,&tempsp->p[1].DxDt,&p2);
-	      D3Cross(&p1,&p2,&p);
+	    if (d=D3Norm(D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[1].x))) {
+	      D3Sub(&p2,&tempsp->p[0].DxDt,&tempsp->p[1].DxDt);
+	      D3Cross(&p,&p1,&p2);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
 		  0,MAX_THRUST);
 
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p1))) {
-	      D3Sub(&tempsp->p[0].DxDt,&tempsp->p[2].DxDt,&p2);
-	      D3Cross(&p1,&p2,&p);
+	    if (d=D3Norm(D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[2].x))) {
+	      D3Sub(&p2,&tempsp->p[0].DxDt,&tempsp->p[2].DxDt);
+	      D3Cross(&p,&p1,&p2);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
@@ -434,13 +552,13 @@ U0 DrawIt(CTask *task,CDC *dc)
 		  0,MAX_THRUST);
 	  }
 
-	  D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1);
-	  D3Sub(&tempsp->p[2].x,&tempsp->p[0].x,&p2);
-	  D3Unit(D3Add(&p1,&p2,&p));
+	  D3Sub(&p1,&tempsp->p[1].x,&tempsp->p[0].x);
+	  D3Sub(&p2,&tempsp->p[2].x,&tempsp->p[0].x);
+	  D3Unit(D3Add(&p,&p1,&p2));
 
 	  if (!(tempsp->s[3].flags&SSF_INACTIVE)) {
 	    dc->color=YELLOW;
-	    D3AddEqu(D3Mul(t_left/25,&p,&p1),&tempsp->p[3].x);
+	    D3AddEqu(D3Mul(&p1,t_left/25,&p),&tempsp->p[3].x);
 	    GrLine(dc,tempsp->p[1].x,tempsp->p[1].y,p1.x,p1.y);
 	    arg=Arg(p.x,p.y);
 	    SpriteZ3B(dc,tempsp->p[3].x,tempsp->p[3].y,0,$IB,"<thruster>",BI=1$,arg);
@@ -448,7 +566,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 	  if (!(tempsp->s[5].flags&SSF_INACTIVE)) {
 	    dc->color=YELLOW;
-	    D3AddEqu(D3Mul(t_right/25,&p,&p2),&tempsp->p[4].x);
+	    D3AddEqu(D3Mul(&p2,t_right/25,&p),&tempsp->p[4].x);
 	    GrLine(dc,tempsp->p[2].x,tempsp->p[2].y,p2.x,p2.y);
 	    arg=Arg(p.x,p.y);
 	    SpriteZ3B(dc,tempsp->p[4].x,tempsp->p[4].y,0,$IB,"<thruster>",BI=1$,arg);
@@ -522,9 +640,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    GrCircle(dc,tempsp->p[i].x,tempsp->p[i].y,tempsp->p[i].radius);
 	  }
 	case ST_ENEMY1:
-	  D3DivEqu(D3Sub(&tempsp->p[1].x,&tempsp->p[0].x,&p1),2.0);
-	  D3DivEqu(D3Sub(&tempsp->p[2].x,&tempsp->p[0].x,&p2),2.0);
-	  D3Unit(D3Add(&p1,&p2,&p));
+	  D3DivEqu(D3Sub(&p1,&tempsp->p[1].x,&tempsp->p[0].x),2.0);
+	  D3DivEqu(D3Sub(&p2,&tempsp->p[2].x,&tempsp->p[0].x),2.0);
+	  D3Unit(D3Add(&p,&p1,&p2));
 	  if (tS>tempsp->reload_timeout)
 	    img=$IB,"<gun_ready>",BI=2$;
 	  else
@@ -562,9 +680,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   temps=shot_root.next;
   while (temps!=&shot_root) {
-    if (tS>temps->fuse_time) {
+    if (temps->exploding) {
       d=(tS-temps->fuse_time)/(temps->die_timeout-temps->fuse_time);
-      d=7*Sin(ã*d)*temps->radius+1;
+      d=7*Sin(ã*d)*temps->explosion_radius+1;
       for (i=1;i<d;i++) {
 	if (i&1)
 	  dc->color=YELLOW;
@@ -589,16 +707,26 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   if (human && draw_laser_line) {
-    D3Sub(&human->p[1].x,&human->p[0].x,&p1);
-    D3Sub(&human->p[2].x,&human->p[0].x,&p2);
-    D3Unit(D3Add(&p1,&p2,&p));
+    D3Sub(&p1,&human->p[1].x,&human->p[0].x);
+    D3Sub(&p2,&human->p[2].x,&human->p[0].x);
+    D3Unit(D3Add(&p,&p1,&p2));
     dc->color=LTBLUE;
     Line(dc,human->p[0].x-10*p.x,human->p[0].y-10*p.y,0,
 	  human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
   }
+
+  tempmi=missile_root.next;
+  while (tempmi!=&missile_root) {
+    if (tempsp=tempmi->target) {
+      dc->color=LTRED;
+      GrCircle(dc,tempsp->p[0].x,tempsp->p[0].y,10);
+      GrPrint(dc,tempsp->p[0].x+12,tempsp->p[0].y-4,tempmi->label);
+    }
+    tempmi=tempmi->next;
+  }
 }
 
-U0 Explosion(MyMass *tempm1,F64 r)
+U0 Explosion(MyMass *tempm1,MyMass *tempm2,F64 r)
 {
   MyMass *tempm;
   CD3 p1;
@@ -606,8 +734,8 @@ U0 Explosion(MyMass *tempm1,F64 r)
 
   tempm=ode->next_mass;
   while (tempm!=&ode->next_mass) {
-    if (tempm!=tempm1) {
-      D3Sub(&tempm->state->x,&tempm1->state->x,&p1);
+    if (tempm!=tempm1 && tempm!=tempm2) {
+      D3Sub(&p1,&tempm->state->x,&tempm1->state->x);
       d=D3NormSqr(&p1)-tempm->radius*tempm->radius;
       if (d<100.0*100.0) {
 	if (d<1)
@@ -624,14 +752,42 @@ U0 Explosion(MyMass *tempm1,F64 r)
   }
 }
 
+Ship TargetGet(Missile *tempmi)
+{
+  Ship *tempsp,*res=NULL;
+  F64 dd,best_dd=MAX_F64;
+  I64 i;
+  CD3 p,p1,p2;
+  D3Unit(D3Sub(&p,&tempmi->p_front.state->x,&tempmi->p_back.state->x));
+  tempsp=ship_root.next;
+  while (tempsp!=&ship_root) {
+    if (!tempsp->exploding && tempsp!=tempmi->owner)
+      for (i=0;i<tempsp->masses;i++) {
+	D3Sub(&p1,&tempsp->p[i].state->x,&tempmi->p_front.state->x);
+	D3Unit(D3Copy(&p2,&p1));
+	D3Cross(&p1,&p,&p2);
+	if (D3Dot(&p,&p2)>0 && D3Norm(&p1)<=ã/16) {
+	  dd=D3NormSqr(&p1);
+	  if (dd<best_dd) {
+	    best_dd=dd;
+	    res=tempsp;
+	  }
+	}
+      }
+    tempsp=tempsp->next;
+  }
+  return res;
+}
+
 U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 {
   I64 i;
-  F64 d,dd,dd2,spin,t_left,t_right;
+  F64 d,dd,dd2,spin,t_left,t_right,é_err,é_thrust,DéDt;
   CTask *task=ode->win_task;
   CD3 p,p1,p2;
-  Shot *temps;
   Ship *tempsp;
+  Shot *temps;
+  Missile *tempmi;
   MyMass *tempm,*tempm1;
 
   tempm=ode->next_mass;
@@ -650,7 +806,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tempm1=ode->next_mass;
     while (tempm1!=&ode->next_mass) {
       if (tempm!=tempm1) {
-	D3Sub(&tempm->state->x,&tempm1->state->x,&p);
+	D3Sub(&p,&tempm->state->x,&tempm1->state->x);
 	dd=D3NormSqr(&p);
 	dd2=Sqr(tempm->radius+tempm1->radius);
 	if (dd<=dd2) {
@@ -669,7 +825,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   while (tempsp!=&ship_root) {
     if (tempsp->exploding && tempsp->die_time<=tS<=tempsp->die_timeout)
       for (i=0;i<tempsp->masses;i++)
-	Explosion(&tempsp->p[i],tempsp->p[i].radius/3.0);
+	Explosion(&tempsp->p[i],NULL,tempsp->p[i].radius/3.0);
     switch (tempsp->type) {
       case ST_HUMAN1:
 	if (!tempsp->exploding) {
@@ -678,7 +834,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	    t_right=0;
 	    d=1.0-(tempsp->spacewalk_timeout-tS)/SPACEWALK_TIME;
 	    if (0.485<d<0.515) {
-	      D3Unit(D3Sub(&tempsp->p[2].state->x,&tempsp->p[1].state->x,&p));
+	      D3Unit(D3Sub(&p,&tempsp->p[2].state->x,&tempsp->p[1].state->x));
 	      if (tempsp->spacewalk_side==3) {
 		tempsp->p[3].DstateDt->DxDt-=10*MAX_THRUST*p.x;
 		tempsp->p[3].DstateDt->DyDt-=10*MAX_THRUST*p.y;
@@ -692,35 +848,35 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	      }
 	    }
 	  } else {
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,
-		  &tempsp->p[1].state->x,&p1))) {
-	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[1].state->DxDt,&p2);
-	      D3Cross(&p1,&p2,&p);
+	    if (d=D3Norm(D3Sub(&p1,&tempsp->p[0].state->x,
+		  &tempsp->p[1].state->x))) {
+	      D3Sub(&p2,&tempsp->p[0].state->DxDt,&tempsp->p[1].state->DxDt);
+	      D3Cross(&p,&p1,&p2);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
 		  0,MAX_THRUST);
 
-	    if (d=D3Norm(D3Sub(&tempsp->p[0].state->x,
-		  &tempsp->p[2].state->x,&p1))) {
-	      D3Sub(&tempsp->p[0].state->DxDt,&tempsp->p[2].state->DxDt,&p2);
-	      D3Cross(&p1,&p2,&p);
+	    if (d=D3Norm(D3Sub(&p1,&tempsp->p[0].state->x,
+		  &tempsp->p[2].state->x))) {
+	      D3Sub(&p2,&tempsp->p[0].state->DxDt,&tempsp->p[2].state->DxDt);
+	      D3Cross(&p,&p1,&p2);
 	      spin=p.z/d;
 	    } else
 	      spin=0;
 	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,
 		  0,MAX_THRUST);
 
-	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[1].state->x,&p1);
-	    D3Sub(&tempsp->p[0].state->x,&tempsp->p[2].state->x,&p2);
-	    D3Unit(D3Add(&p1,&p2,&p));
+	    D3Sub(&p1,&tempsp->p[0].state->x,&tempsp->p[1].state->x);
+	    D3Sub(&p2,&tempsp->p[0].state->x,&tempsp->p[2].state->x);
+	    D3Unit(D3Add(&p,&p1,&p2));
 	    if (!(tempsp->s[3].flags&SSF_INACTIVE)) {
-	      D3Mul(t_left,&p,&p1);
+	      D3Mul(&p1,t_left,&p);
 	      D3AddEqu(&tempsp->p[3].DstateDt->DxDt,&p1);
 	    }
 	    if (!(tempsp->s[5].flags&SSF_INACTIVE)) {
-	      D3Mul(t_right,&p,&p2);
+	      D3Mul(&p2,t_right,&p);
 	      D3AddEqu(&tempsp->p[4].DstateDt->DxDt,&p2);
 	    }
 	  }
@@ -732,9 +888,43 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 
   temps=shot_root.next;
   while (temps!=&shot_root) {
-    if (temps->fuse_time<=tS<=temps->die_timeout)
-      Explosion(&temps->p,temps->radius);
+    if (temps->exploding)
+      Explosion(&temps->p,NULL,temps->explosion_radius);
     temps=temps->next;
+  }
+
+  tempmi=missile_root.next;
+  while (tempmi!=&missile_root) {
+    if (tempmi->active) {
+      if (tempmi->launched) {
+	if (tempmi->exploding)
+	  Explosion(&tempmi->p_front,&tempmi->p_back,tempmi->explosion_radius);
+	else {
+//Guide missile
+	  if (tempsp=tempmi->target) {
+	    D3Unit(D3Sub(&p,&tempmi->p_front.state->x,
+		  &tempmi->p_back.state->x));
+	    D3Sub(&p1,&tempsp->p[0].state->x,&tempmi->p_front.state->x);
+	    d=D3Norm(&p1);
+	    D3Unit(&p1);
+	    é_err=D3Dot(&p,&p1);
+	    D3Sub(&p1,&tempmi->p_front.state->DxDt,&tempmi->p_back.state->DxDt);
+	    D3Cross(&p2,&p,&p1);
+	    DéDt=D3Norm(&p2);
+	    if (p2.z<0)
+	      DéDt=-DéDt;
+	    é_thrust=Clamp(200*(é_err+2*DéDt)/(d+200),-ã/8,ã/8);
+	    p2.x=p.x*Cos(é_thrust)-p.y*Sin(é_thrust);
+	    p2.y=p.y*Cos(é_thrust)+p.x*Sin(é_thrust);
+	    p2.z=0;
+	    D3AddEqu(&tempmi->p_back.DstateDt->DxDt,D3MulEqu(&p2,MAX_THRUST));
+	  }
+	}
+      } else
+	tempmi->target=TargetGet(tempmi);
+    } else
+      tempmi->target=NULL;
+    tempmi=tempmi->next;
   }
 }
 
@@ -764,9 +954,9 @@ U0 CheckDamage()
 	Snd(0);
       } else {
 	human->laser_temperature+=1.0;
-	D3Sub(&human->p[0].x,&human->p[1].x,&p1);
-	D3Sub(&human->p[0].x,&human->p[2].x,&p2);
-	D3Unit(D3Add(&p1,&p2,&p));
+	D3Sub(&p1,&human->p[0].x,&human->p[1].x);
+	D3Sub(&p2,&human->p[0].x,&human->p[2].x);
+	D3Unit(D3Add(&p,&p1,&p2));
 	p2.x=p.y;
 	p2.y=-p.x;
 	p2.z=0;
@@ -774,7 +964,7 @@ U0 CheckDamage()
 	best_distance=MAX_F64;
 	tempm=ode->next_mass;
 	while (tempm!=&ode->next_mass) {
-	  D3Sub(&human->p[0].x,&tempm->x,&p1);
+	  D3Sub(&p1,&human->p[0].x,&tempm->x);
 	  if (Abs(D3Dot(&p1,&p2))<tempm->radius &&
 		D3Dot(&p1,&p)<0.0) {
 	    d=D3NormSqr(&p1);
@@ -803,8 +993,13 @@ U0 CheckDamage()
 	  }
 	} else
 	  for (i=0;i<tempsp->springs;i++) {
-	    if (Abs(tempsp->s[i].f)>tempsp->s[i].strength)
+	    if (Abs(tempsp->s[i].f)>tempsp->s[i].strength) {
 	      tempsp->s[i].flags|=SSF_INACTIVE;
+	      if (i==4)
+		MissileDel(&tempsp->missiles[0]);
+	      else if (i==5)
+		MissileDel(&tempsp->missiles[1]);
+	    }
 	    if (tempsp->s[i].flags&SSF_INACTIVE) {
 	      if (i<3) {
 		if (!tempsp->exploding) {
@@ -856,33 +1051,47 @@ U0 CheckDamage()
 
 //********************************** Shots
 
-U0 FireOneGun(Ship *tempsp,I64 g,F64 r,F64 fuse_time)
+U0 FireOneGun(Ship *tempsp,I64 n,F64 r,F64 fuse_time)
 {
   CD3 p,p1,p2;
   Shot *temps;
 
   temps=CAlloc(sizeof(Shot));
-  D3Copy(&temps->p.x,&tempsp->p[g].x);
-  temps->radius=r;
+  D3Copy(&temps->p.x,&tempsp->p[n].x);
+  temps->explosion_radius=temps->radius=r;
   temps->fuse_time=tS+1.5*fuse_time;
   temps->die_timeout=temps->fuse_time+0.125;
   temps->p.mass=0.3*r*r*r;
-  D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1);
-  D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p2);
-  D3Add(&p1,&p2,&p);
-  D3AddEqu(&temps->p.x,
-	D3MulEqu(D3Copy(&p1,D3Unit(&p)),r+tempsp->p[0].radius+5));
-  D3AddEqu(D3MulEqu(&p,1000/(r+1)),&tempsp->p[g].DxDt);
+  D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[1].x);
+  D3Sub(&p2,&tempsp->p[0].x,&tempsp->p[2].x);
+  D3Unit(D3Add(&p,&p1,&p2));
+  D3AddEqu(&temps->p.x,D3MulEqu(D3Copy(&p1,&p),r+tempsp->p[0].radius+5));
+  D3AddEqu(D3MulEqu(&p,1000/(r+1)),&tempsp->p[n].DxDt);
   D3Copy(&temps->p.DxDt,&p);
-  D3MulEqu(&p,temps->p.mass/tempsp->p[g].mass/100.0);
-  D3SubEqu(&tempsp->p[g].DxDt,&p);
+  D3MulEqu(&p,temps->p.mass/tempsp->p[n].mass/100.0);
+  D3SubEqu(&tempsp->p[n].DxDt,&p);
   QueIns(&temps->p,ode->last_mass);
   QueIns(temps,shot_root.last);
   tempsp->reload_timeout=tS+r/tempsp->fire_rate;
   Noise(100,r*200,r*400);
 }
 
-U0 HumanFireBegin()
+U0 FireOneMissile(Ship *tempsp,I64 n)
+{
+  I64 i;
+  Missile *tempmi=&tempsp->missiles[n];
+  if (!tempmi->launched && tempmi->target) {
+    tempmi->fuse_time=tS+1.0;
+    tempmi->die_timeout=tempmi->fuse_time+0.125;
+    tempmi->img=$IB,"<8>",BI=8$;
+    for (i=1;i<5;i++)
+      tempmi->s[i].flags|=SSF_INACTIVE;
+    tempmi->launched=TRUE;
+    Sweep(250,300,350);
+  }
+}
+
+U0 HumanFireGunBegin()
 {
   F64 r=3.0*ctrl_panel.shot_radius/CTRL_PANEL_RANGE+0.5,
 	fuse_time=ToF64(ctrl_panel.fuse_time+1)/CTRL_PANEL_RANGE;
@@ -902,41 +1111,72 @@ U0 HumanFireBegin()
 	case 1:
 	  FireOneGun(human,0,r,fuse_time);
 	  break;
-	default:
-	  human->lasering=TRUE;
       }
   }
 }
 
-U0 HumanFireEnd()
+U0 HumanFireMissileBegin(I64 n)
 {
-  if (human && !human->exploding)
-    switch (level) {
-      case 3:
-      case 2:
-      case 1:
-	break;
-      default:
-	human->lasering=FALSE;
-	Snd(0);
-    }
+  if (human && !human->exploding &&
+	!human->spacewalk_side && tS>human->reload_timeout)
+    FireOneMissile(human,n);
+}
+
+U0 HumanFireLaserBegin()
+{
+  if (human && !human->exploding &&
+	!human->spacewalk_side && tS>human->reload_timeout)
+    human->lasering=TRUE;
+}
+U0 HumanFireLaserEnd()
+{
+  if (human && !human->exploding) {
+    human->lasering=FALSE;
+    Snd(0);
+  }
 }
 
 U0 ExpireShots()
 {
-  Shot *temps=shot_root.next,*tempb1;
+  Shot *temps=shot_root.next,*temps1;
   while (temps!=&shot_root) {
-    tempb1=temps->next;
-    if (tS>temps->fuse_time && !temps->exploding) {
+    temps1=temps->next;
+    if (!temps->exploding && tS>temps->fuse_time) {
       temps->exploding=TRUE;
       Noise(50,3000,6000);
-    }
-    if (tS>temps->die_timeout) {
+    } else if (tS>temps->die_timeout) {
       QueRem(temps);
       QueRem(&temps->p);
       Free(temps);
     }
-    temps=tempb1;
+    temps=temps1;
+  }
+}
+
+U0 ExpireMissiles()
+{
+  I64 i;
+  F64 dd,best_dd;
+  Missile *tempmi=missile_root.next,*tempm1;
+  while (tempmi!=&missile_root) {
+    tempm1=tempmi->next;
+    if (tempmi->launched) {
+      best_dd=MAX_F64;
+      if (tempmi->target)
+	for (i=0;i<tempmi->target->masses;i++) {
+	  dd=D3DistSqr(&tempmi->p_front.x,&tempmi->target->p[i].x);
+	  if (dd<best_dd)
+	    best_dd=dd;
+	}
+      if (!tempmi->exploding && (best_dd<30*30 || tS>tempmi->fuse_time)) {
+	tempmi->p_front.mass=10.0; //They go flying, if too light.
+	tempmi->p_back.mass =10.0;
+	tempmi->exploding=TRUE;
+	Noise(50,3000,6000);
+      } else if (tS>tempmi->die_timeout)
+	MissileDel(tempmi);
+    }
+    tempmi=tempm1;
   }
 }
 
@@ -948,10 +1188,10 @@ U0 AI()
   Ship *tempsp=ship_root.next;
   if (human && !human->exploding) {
     while (tempsp!=&ship_root) {
-      D3Sub(&tempsp->p[0].x,&tempsp->p[1].x,&p1);
-      D3Sub(&tempsp->p[0].x,&tempsp->p[2].x,&p2);
-      D3Add(&p1,&p2,&p);
-      D3Sub(&human->p[0].x,&tempsp->p[0].x,&p1);
+      D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[1].x);
+      D3Sub(&p2,&tempsp->p[0].x,&tempsp->p[2].x);
+      D3Add(&p,&p1,&p2);
+      D3Sub(&p1,&human->p[0].x,&tempsp->p[0].x);
       if (D3Dot(D3Unit(&p),D3Unit(&p1))>0.995 &&
 	    tS>tempsp->reload_timeout) {
 	FireOneGun(tempsp,0,1.5+.5,.4);
@@ -983,8 +1223,9 @@ U0 Init()
   score=0;
   level=1;
 
-  ship_root.next=ship_root.last=&ship_root;
-  shot_root.next=shot_root.last=&shot_root;
+  QueInit(&ship_root);
+  QueInit(&shot_root);
+  QueInit(&missile_root);
 
   for (i=0;i<NUM_STARS;i++) {
     stars_x[i]=RandU16%GR_WIDTH;
@@ -1011,13 +1252,19 @@ U0 XCaliber()
 	"  Abort(,CH_SHIFT_ESC);"
 	"  Exit(,CH_ESC);"
 	"}"
-	"Play {"
+	"Game {"
 	"  Restart(,'\n');"
+	"  LevelUp(,'+');"
+	"  LevelDown(,'-');"
+	"}"
+	"Play {"
 	"  Fire(,CH_SPACE);"
 	"  Thrust(,,SC_CURSOR_UP);"
 	"  StopSpin(,,SC_CURSOR_DOWN);"
 	"  Left(,,SC_CURSOR_LEFT);"
 	"  Right(,,SC_CURSOR_RIGHT);"
+	"  LeftMissile(,'l');"
+	"  RightMissile(,'r');"
 	"  Spackwalk(,'w');"
 	"  LongerFuse(,,SC_CURSOR_RIGHT|SCF_SHIFT);"
 	"  ShorterFuse(,,SC_CURSOR_LEFT|SCF_SHIFT);"
@@ -1079,10 +1326,25 @@ U0 XCaliber()
 		}
 		break;
 	      case CH_SPACE:
-		HumanFireBegin;
+		if (level<4)
+		  HumanFireGunBegin;
+		else
+		  HumanFireLaserBegin;
+		break;
+	      case 'l':
+		HumanFireMissileBegin(1);
+		break;
+	      case 'r':
+		HumanFireMissileBegin(0);
 		break;
 	      case 'w':
 		ctrl_panel.spacewalk=TRUE;
+		break;
+	      case '+':
+		level++;
+		break;
+	      case '-':
+		level--;
 		break;
 	    }
 	    break;
@@ -1110,7 +1372,8 @@ U0 XCaliber()
 		ch=0;
 		break;
 	      case CH_SPACE:
-		HumanFireEnd;
+		if (level>=4)
+		  HumanFireLaserEnd;
 		break;
 	    }
 	    break;
@@ -1118,6 +1381,7 @@ U0 XCaliber()
       }
       AI;
       ExpireShots;
+      ExpireMissiles;
       CheckDamage;
       WinMgrSync; //msgs are only qued by winmngr
       if (show_level_msg) {
@@ -1196,4 +1460,4 @@ U0 XCaliber()
    ùÿÿÿ   þÿÿÿ        –      	   úÿÿÿûÿÿÿ    ÿÿÿÿÿÿÿÿ    ÿÿÿÿ       úÿÿÿ          úÿÿÿüÿÿÿ    þÿÿÿ       úÿÿÿ       
 ýÿÿÿ   ùÿÿÿ   
 ùÿÿÿ   ùÿÿÿÿÿÿÿ
-ùÿÿÿÿÿÿÿýÿÿÿÿÿÿÿ 
+ùÿÿÿÿÿÿÿýÿÿÿÿÿÿÿ        b      üÿÿÿþÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ        b      ÷ÿÿÿþÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ 

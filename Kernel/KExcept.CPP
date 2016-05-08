@@ -141,14 +141,14 @@ Bool BreakLock(CTask *task=NULL)
 
 Bool BreakUnlock(CTask *task=NULL)
 {//Reenables <CTRL-ALT-c> and issues any pending breaks.
-  Bool result;
+  Bool res;
   if (!task) task=Fs;
-  result=LBtr(&task->task_flags,TASKf_BREAK_LOCKED);
+  res=LBtr(&task->task_flags,TASKf_BREAK_LOCKED);
   if (LBtr(&task->task_flags,TASKf_PENDING_BREAK)) {
     if (task==Fs)
       ThrowBreak;
     else
       task->rip=&ThrowBreak;
   }
-  return result;
+  return res;
 }

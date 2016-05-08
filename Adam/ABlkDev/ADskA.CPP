@@ -63,7 +63,7 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
 //If the name ends in ".Z", it will
   //be stored compressed.  If not ".Z"
   //it will be stored uncompressed.
-  Bool result=TRUE;
+  Bool res=TRUE;
   CDirContext *dirc;
   CDirEntry *tempde,*tempde1;
   U8 *st;
@@ -76,7 +76,7 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
 	if (!(tempde->attr & RS_ATTR_DIR)) {
 	  st=FileNameAbs(tempde->name);
 	  if (!CopySingle(tempde->full_name,st))
-	    result=FALSE;
+	    res=FALSE;
 	  Free(st);
 	}
 	tempde=tempde->next;
@@ -84,7 +84,7 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
       DirContextDel(dirc);
     }
     DirTreeDel(tempde1);
-    return result;
+    return res;
   } else {
     DirTreeDel(tempde1);
     return CopySingle(src_files_find_mask,dst_files_find_mask);
@@ -103,21 +103,21 @@ public Bool Move(U8 *f1,U8 *f2)
 I64 CopyTree2(CDirEntry *tempde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
 {
   U8 *st;
-  I64 result=1;
+  I64 res=1;
   while (tempde) {
     st=MAlloc(StrLen(tempde->full_name)+dst_dir_len+2);
     MemCpy(st,dst_dir,dst_dir_len);
     StrCpy(st+dst_dir_len,tempde->full_name+src_dir_len);
     if (tempde->attr & RS_ATTR_DIR) {
       MkDir(st);
-      result+=CopyTree2(tempde->sub,src_dir_len,dst_dir_len,dst_dir);
+      res+=CopyTree2(tempde->sub,src_dir_len,dst_dir_len,dst_dir);
     } else
       if (CopySingle(tempde->full_name,st))
-	result++;
+	res++;
     Free(st);
     tempde=tempde->next;
   }
-  return result;
+  return res;
 }
 public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
 	Bool no_mask=TRUE)
@@ -125,7 +125,7 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
 //Returns the count of copied files (not dirs).
   CDirContext *dirc;
   CDirEntry *tempde=NULL;
-  I64 result=0,i1,i2;
+  I64 res=0,i1,i2;
   U8 *st1,*st2;
 
   st1=DirNameAbs(src_files_find_mask);
@@ -148,60 +148,60 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
       st2=CurDir;
       i2=StrLen(st2);
       if (i2==3) i2--;
-      result=CopyTree2(tempde,i1,i2,st2);
+      res=CopyTree2(tempde,i1,i2,st2);
       DirContextDel(dirc);
       Free(st2);
     }
     DirTreeDel(tempde);
     Free(st1);
   }
-  return result;
+  return res;
 }
 
 I64 DelTreeDirs(CDirEntry *tempde1)
 {
-  I64 result=0;
+  I64 res=0;
   CDirEntry *tempde2;
   while (tempde1) {
     tempde2=tempde1->next;
     if (tempde1->attr & RS_ATTR_DIR) {
       if (tempde1->sub)
-	result+=DelTreeDirs(tempde1->sub);
-      result+=Del(tempde1->full_name,TRUE,TRUE);
+	res+=DelTreeDirs(tempde1->sub);
+      res+=Del(tempde1->full_name,TRUE,TRUE);
     }
     DirEntryDel(tempde1);
     tempde1=tempde2;
   }
-  return result;
+  return res;
 }
 I64 DelTreeFiles(CDirEntry *tempde1)
 {
-  I64 result=0;
+  I64 res=0;
   CDirEntry *tempde2;
   while (tempde1) {
     tempde2=tempde1->next;
     if (tempde1->attr & RS_ATTR_DIR) {
       if (tempde1->sub)
-	result+=DelTreeFiles(tempde1->sub);
+	res+=DelTreeFiles(tempde1->sub);
     } else
-      result+=Del(tempde1->full_name,FALSE,TRUE);
+      res+=Del(tempde1->full_name,FALSE,TRUE);
     DirEntryDel(tempde1);
     tempde1=tempde2;
   }
-  return result;
+  return res;
 }
 public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
 {//Delete directory tree.
-  I64 result=0,fuf_flags=0;
+  I64 res=0,fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (IsDir(files_find_mask)) {
-    result=DelTreeDirs(FilesFind(files_find_mask,fuf_flags));
-    result+=Del(files_find_mask,TRUE,TRUE);
-    result+=Del(files_find_mask,FALSE,TRUE);
+    res=DelTreeDirs(FilesFind(files_find_mask,fuf_flags));
+    res+=Del(files_find_mask,TRUE,TRUE);
+    res+=Del(files_find_mask,FALSE,TRUE);
   } else
-    result=DelTreeFiles(FilesFind(files_find_mask,fuf_flags));
-  return result;
+    res=DelTreeFiles(FilesFind(files_find_mask,fuf_flags));
+  return res;
 }
 
 U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)

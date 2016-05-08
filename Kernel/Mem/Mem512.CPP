@@ -16,7 +16,7 @@ so a ptr to a page count is passed.
 
 Return: NULL if out of memory.
 */
-  CMemBlk *result=NULL,*m;
+  CMemBlk *res=NULL,*m;
   I64 i;
   if (!bp) bp=sys_code_bp;
   PUSHFD
@@ -24,8 +24,8 @@ Return: NULL if out of memory.
   while (LBts(&bp->locked_flags,BPlf_LOCKED))
     PAUSE
   if (pages512<MEM_FREE_PAGE_HASH_SIZE) {
-    if (result=bp->free_page_hash[pages512]) {
-      bp->free_page_hash[pages512]=result->next;
+    if (res=bp->free_page_hash[pages512]) {
+      bp->free_page_hash[pages512]=res->next;
       goto at_done;
     }
     i=Bsr(MEM_FREE_PAGE_HASH_SIZE)+1;
@@ -38,37 +38,37 @@ Return: NULL if out of memory.
     pages512-=MEM_EXTRA_HASH2_PAGES;
     i=Bsr(pages512)+1;
     pages512=1<<i+MEM_EXTRA_HASH2_PAGES;
-    if (result=bp->free_page_hash2[i]) {
-      bp->free_page_hash2[i]=result->next;
+    if (res=bp->free_page_hash2[i]) {
+      bp->free_page_hash2[i]=res->next;
       goto at_done;
     }
   }
   m=&bp->mem_free_lst;
   while (TRUE) {
-    if (!(result=m->next)) {
+    if (!(res=m->next)) {
 //We're probably out of luck, but lets search for a
       //freed larger size block... and, screw-it, return the whole thing.
       do {
-	if (result=bp->free_page_hash2[++i]) {
+	if (res=bp->free_page_hash2[++i]) {
 	  pages512=1<<i+MEM_EXTRA_HASH2_PAGES;
-	  bp->free_page_hash2[i]=result->next;
+	  bp->free_page_hash2[i]=res->next;
 	  goto at_done;
 	}
       } while (i<64-MEM_PAGE_BITS-1);
       pages512=0;
-      result=NULL; //Out of memory
+      res=NULL; //Out of memory
       goto at_done;
     }
-    if (result->pages<pages512)
-      m=result;
+    if (res->pages<pages512)
+      m=res;
     else {
-      if (result->pages==pages512) {
-	m->next=result->next;
+      if (res->pages==pages512) {
+	m->next=res->next;
 	goto at_done;
       } else {
-	result->pages-=pages512;
-	result(U8 *)+=result->pages<<MEM_PAGE_BITS;
-	result->pages=pages512;
+	res->pages-=pages512;
+	res(U8 *)+=res->pages<<MEM_PAGE_BITS;
+	res->pages=pages512;
 	goto at_done;
       }
     }
@@ -77,7 +77,7 @@ at_done:
   bp->used_u8s+=pages512<<MEM_PAGE_BITS;
   LBtr(&bp->locked_flags,BPlf_LOCKED);
   POPFD
-  return result;
+  return res;
 }
 
 U0 Mem512Free(CMemBlk *m,CBlkPool *bp=NULL)
@@ -116,13 +116,13 @@ CMemBlk *Mem512TaskAlloc(I64 pages512,CHeapCtrl *hc)
 Currently, this is only called from $LK,"MAlloc",A="MN:MAlloc"$().
 Return: NULL if out of memory.
 */
-  CMemBlk *result;
+  CMemBlk *res;
   I64 threshold,cnt,size;
   CMemUnused *uum,**_uum,**_ptr;
-  if (result=Mem512Alloc(pages512,hc->bp)) {
-    QueIns(result,hc->last_mem_blk);
-    result->mb_signature=MBS_USED_SIGNATURE_VAL;
-    hc->alloced_u8s+=result->pages<<MEM_PAGE_BITS;
+  if (res=Mem512Alloc(pages512,hc->bp)) {
+    QueIns(res,hc->last_mem_blk);
+    res->mb_signature=MBS_USED_SIGNATURE_VAL;
+    hc->alloced_u8s+=res->pages<<MEM_PAGE_BITS;
 
     //Tidy-up free lst (Move into heap hash)
     //because if free lst gets long, delay causes crash
@@ -147,7 +147,7 @@ Return: NULL if out of memory.
       threshold<<=1;
     } while (cnt>8 && threshold<=MEM_HEAP_HASH_SIZE);
   }
-  return result;
+  return res;
 }
 
 U0 Mem512TaskFree(CMemBlk *m,CHeapCtrl *hc)

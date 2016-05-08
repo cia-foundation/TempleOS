@@ -6,7 +6,7 @@ public Bool DocTreeFind(CDoc *haystack_doc,U8 *needle_path,
 {//Find registry-like tree widget start and end.
   I64 i=0,k=0;
   U8 *st1=StrNew(needle_path),*st2=MAlloc(StrLen(needle_path)+1);
-  Bool result=FALSE,unlock_doc=DocLock(haystack_doc);
+  Bool res=FALSE,unlock_doc=DocLock(haystack_doc);
   CDocEntry *doc_e=haystack_doc->root.next;
   if (_tree_entry) *_tree_entry=haystack_doc;
   if (_start_indent) *_start_indent=haystack_doc;
@@ -35,7 +35,7 @@ public Bool DocTreeFind(CDoc *haystack_doc,U8 *needle_path,
 		  i+=doc_e->attr;
 		  if (i<=0) {
 		    if (_end_indent) *_end_indent=doc_e;
-		    result=TRUE;
+		    res=TRUE;
 		    break;
 		  }
 		}
@@ -55,7 +55,7 @@ ft_done:
     DocUnlock(haystack_doc);
   Free(st1);
   Free(st2);
-  return result;
+  return res;
 }
 
 public Bool DocTreeMake(CDoc *doc,U8 *path)
@@ -64,7 +64,7 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
   U8 *st1=StrNew(path),
 	*st2=MAlloc(StrLen(path)+1),
 	*st3=StrNew(path);
-  Bool result=TRUE,unlock_doc=DocLock(doc);
+  Bool res=TRUE,unlock_doc=DocLock(doc);
   CDocEntry *doc_e=doc->root.next;
   doc->cur_entry=doc;
   doc->cur_col=0;
@@ -85,7 +85,7 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
 	  st3=StrNew(st1);
 	  j=i;
 	  if (!*st1)
-	    result=FALSE;
+	    res=FALSE;
 	  else
 	    break;
 	}
@@ -95,7 +95,7 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
     }
   }
 mt_done:
-  if (result) {
+  if (res) {
     while (*st3) {
       StrFirstRem(st3,"/",st2);
       if (*st2) {
@@ -110,13 +110,13 @@ mt_done:
   Free(st1);
   Free(st2);
   Free(st3);
-  return result;
+  return res;
 }
 
 #help_index "DolDoc/Compiler;Compiler"
 public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
 {//JIT Compile and execute a document.
-  I64 result;
+  I64 res;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
   CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
   if (just_load)
@@ -127,12 +127,12 @@ public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
   LexAttachDoc(cc,,doc);
   try {
     Lex(cc);
-    result=ExeCmdLine(cc);
+    res=ExeCmdLine(cc);
   } catch {
     if (Fs->except_ch=='Compiler' || Fs->except_ch=='Break') {
       Fs->catch_except=TRUE;
       okay=FALSE;
-      result=0;
+      res=0;
     }
   }
   QueRem(cc);
@@ -140,7 +140,7 @@ public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
     CmpCtrlDel(cc); //TODO: can crash
   if (unlock_doc)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public I64 DocTreeBranchExe(CDoc *doc,U8 *path)
@@ -148,22 +148,22 @@ public I64 DocTreeBranchExe(CDoc *doc,U8 *path)
   CDoc *doc2;
   Bool unlock_doc=DocLock(doc);
   CDocEntry *tree_branch,*start_indent,*end_indent;
-  I64 result=0;
+  I64 res=0;
   if (DocTreeFind(doc,path,&tree_branch,&start_indent,&end_indent)) {
     doc2=DocCopy(doc,tree_branch,end_indent);
-    result=ExeDoc(doc2);
+    res=ExeDoc(doc2);
     DocDel(doc2);
   }
   if (unlock_doc)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public I64 ExeTreeBranch(U8 *registry_file,U8 *path)
 {//JIT Compile and execute a specified branch in a specified file.
-  I64 result;
+  I64 res;
   CDoc *doc=DocRead(registry_file);
-  result=DocTreeBranchExe(doc,path);
+  res=DocTreeBranchExe(doc,path);
   DocDel(doc);
-  return result;
+  return res;
 }

@@ -3,10 +3,10 @@
 
 CTask *MenuTask()
 {
-  CTask *result=sys_focus_task;
-  while (result && !result->cur_menu)
-    result=result->parent_task;
-  return result;
+  CTask *res=sys_focus_task;
+  while (res && !res->cur_menu)
+    res=res->parent_task;
+  return res;
 }
 
 CMenuEntry *sys_cur_submenu_entry=NULL;
@@ -138,13 +138,13 @@ public U0 MenuDel(CMenu *m)
 
 I64 MenuEntryWidth(CMenuEntry *tempme)
 {
-  I64 result=StrLen(tempme->name);
+  I64 res=StrLen(tempme->name);
   CMenuEntry *tempse=tempme->sub;
   while (tempse) {
-    result=MaxI64(result,StrLen(tempse->name));
+    res=MaxI64(res,StrLen(tempse->name));
     tempse=tempse->next;
   }
-  return result+1;
+  return res+1;
 }
 
 public CMenu *MenuPush(U8 *st)

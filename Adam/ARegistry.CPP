@@ -18,7 +18,7 @@ Bool RegCache()
 
 public Bool RegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
 {//Add code doc tree branch to registry.
-  Bool result,unlock_doc;
+  Bool res,unlock_doc;
   RegCache;
   unlock_doc=DocLock(sys_registry_doc);
   if (!DocTreeFind(sys_registry_doc,path)) {
@@ -32,12 +32,12 @@ public Bool RegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
     }
     if (DrvIsWritable(':'))
       DocWrite(sys_registry_doc);
-    result=FALSE;
+    res=FALSE;
   } else
-    result=TRUE;
+    res=TRUE;
   if (unlock_doc)
     DocUnlock(sys_registry_doc);
-  return result;
+  return res;
 }
 
 public I64 RegExeBranch(U8 *path)
@@ -48,12 +48,12 @@ public I64 RegExeBranch(U8 *path)
 
 public Bool RegWriteBranch(U8 *path,U8 *fmt,...)
 {//Rewrite doc tree branch in registry.
-  Bool result,unlock_doc;
+  Bool res,unlock_doc;
   CDocEntry *tree_branch,*start_indent,*end_indent;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   RegCache;
   unlock_doc=DocLock(sys_registry_doc);
-  if (result=DocTreeFind(sys_registry_doc,path,
+  if (res=DocTreeFind(sys_registry_doc,path,
 	&tree_branch,&start_indent,&end_indent))
     DocCut(sys_registry_doc,tree_branch,end_indent);
   DocTreeMake(sys_registry_doc,path);
@@ -63,12 +63,12 @@ public Bool RegWriteBranch(U8 *path,U8 *fmt,...)
   if (unlock_doc)
     DocUnlock(sys_registry_doc);
   Free(buf);
-  return result;
+  return res;
 }
  
 public Bool OneTimePopUp(U8 *_flags,I64 flag_num,U8 *msg)
 {//See $LK,"::/Apps/X-Caliber/X-Caliber.CPP"$.
-  Bool result=FALSE;
+  Bool res=FALSE;
   CDoc *doc=DocNew;
   CDocEntry *doc_e;
   if (!Bt(_flags,flag_num)) {
@@ -77,11 +77,11 @@ public Bool OneTimePopUp(U8 *_flags,I64 flag_num,U8 *msg)
     DocPrint(doc,"$$CM+CX,0,4$$$$BT,\"OKAY\",LE=1$$\n");
     if (PopUpMenu(doc)==1 && doc_e->de_flags&DOCEF_CHECKED_COLLAPSED) {
       LBts(_flags,flag_num);
-      result=TRUE;
+      res=TRUE;
     }
     DocDel(doc);
   }
-  return result;
+  return res;
 }
 
 U0 RegOneTimePopUp(I64 flag_num,U8 *msg)

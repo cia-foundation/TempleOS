@@ -185,7 +185,7 @@ U8 *BMPPaletteNew(CFileBMP *bmp)
 {
   I64 i,j,best,score,best_score;
   CBGR48 palette[NUM_COLORS];
-  U8 *result=CAlloc(NUM_BMP_COLORS*sizeof(U8));
+  U8 *res=CAlloc(NUM_BMP_COLORS*sizeof(U8));
   GrPaletteGet(palette);
 #assert NUM_COLORS==NUM_BMP_COLORS
   for (i=0;i<NUM_BMP_COLORS;i++) {
@@ -200,39 +200,39 @@ U8 *BMPPaletteNew(CFileBMP *bmp)
 	best_score=score;
       }
     }
-    result[i]=best;
+    res[i]=best;
   }
-  return result;
+  return res;
 }
 
 U8 ms_paint_palette[NUM_BMP_COLORS]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
 
 I64 BMP24Color(CBGR24 *ptr,Bool dither_probability)
 {
-  I64 result,k;
+  I64 res,k;
   if (dither_probability) {
     k=RandU32;
     if (SqrI64(ptr->r)+SqrI64(ptr->g)+SqrI64(ptr->b)>=3*SqrI64(k.u8[0]))
-      result=8;
+      res=8;
     else
-      result=0;
-    if (ptr->r>=k.u8[1]) result|=RED;
-    if (ptr->g>=k.u8[2]) result|=GREEN;
-    if (ptr->b>=k.u8[3]) result|=BLUE;
+      res=0;
+    if (ptr->r>=k.u8[1]) res|=RED;
+    if (ptr->g>=k.u8[2]) res|=GREEN;
+    if (ptr->b>=k.u8[3]) res|=BLUE;
   } else {
     if (SqrI64(ptr->r)+SqrI64(ptr->g)+SqrI64(ptr->b)>=SqrI64(0x80)) {
-      result=8;
-      if (ptr->r>=0x80) result|=RED;
-      if (ptr->g>=0x80) result|=GREEN;
-      if (ptr->b>=0x80) result|=BLUE;
+      res=8;
+      if (ptr->r>=0x80) res|=RED;
+      if (ptr->g>=0x80) res|=GREEN;
+      if (ptr->b>=0x80) res|=BLUE;
     } else {
-      result=0;
-      if (ptr->r>=0x40) result|=RED;
-      if (ptr->g>=0x40) result|=GREEN;
-      if (ptr->b>=0x40) result|=BLUE;
+      res=0;
+      if (ptr->r>=0x40) res|=RED;
+      if (ptr->g>=0x40) res|=GREEN;
+      if (ptr->b>=0x40) res|=BLUE;
     }
   }
-  return result;
+  return res;
 }
 
 public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
@@ -242,11 +242,11 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
   U8 *palette_map,*ptr;
   Bool rle;
   CFileBMP *bmp;
-  CDC *result=NULL;
+  CDC *res=NULL;
   if (ptr=FileRead(filename)) {
     bmp=ptr;
     if (0<bmp->width<MAX_I32 && 0<bmp->height<MAX_I32) {
-      result=DCNew(bmp->width,bmp->height);
+      res=DCNew(bmp->width,bmp->height);
       ptr+=bmp->data_offset;
       if (bmp->compression==2)
 	rle=TRUE;
@@ -262,30 +262,30 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
 	    j=0;
 	    while (cnt=*ptr++) {
 	      if (cnt==1) {
-		result->color=palette_map[*ptr++&15];
-		GrPlot(result,j++,i);
+		res->color=palette_map[*ptr++&15];
+		GrPlot(res,j++,i);
 	      } else {
 		if (cnt==2 && *ptr>>4!=*ptr&15) {
-		  result->color=palette_map[*ptr&15];
-		  GrPlot(result,j+1,i);
-		  result->color=palette_map[*ptr>>4];
-		  GrPlot(result,j,i);
+		  res->color=palette_map[*ptr&15];
+		  GrPlot(res,j+1,i);
+		  res->color=palette_map[*ptr>>4];
+		  GrPlot(res,j,i);
 		  ptr++;
 		  j+=2;
 		} else {
-		  result->color=palette_map[*ptr++&15];
+		  res->color=palette_map[*ptr++&15];
 		  while (cnt--)
-		    GrPlot(result,j++,i);
+		    GrPlot(res,j++,i);
 		}
 	      }
 	    }
 	    ptr++;
 	  } else
 	    for (j=0;j<(bmp->width+7)&~7;) {
-	      result->color=palette_map[*ptr&15];
-	      GrPlot(result,j+1,i);
-	      result->color=palette_map[*ptr>>4];
-	      GrPlot(result,j,i);
+	      res->color=palette_map[*ptr&15];
+	      GrPlot(res,j+1,i);
+	      res->color=palette_map[*ptr>>4];
+	      GrPlot(res,j,i);
 	      ptr++;
 	      j+=2;
 	    }
@@ -294,8 +294,8 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
       } else if (bmp->bit_cnt==24) {
 	for (i=bmp->height-1;i>=0;i--) {
 	  for (j=0;j<bmp->width;j++,ptr+=3) {
-	    result->color=BMP24Color(ptr,dither_probability);
-	    GrPlot(result,j,i);
+	    res->color=BMP24Color(ptr,dither_probability);
+	    GrPlot(res,j,i);
 	  }
 	  ptr+=bmp->width&3;
 	}
@@ -304,21 +304,21 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
       } else if (bmp->bit_cnt>=32) {
 	for (i=bmp->height-1;i>=0;i--)
 	  for (j=0;j<bmp->width;j++,ptr+=4) {
-	    result->color=BMP24Color(ptr,dither_probability);
-	    GrPlot(result,j,i);
+	    res->color=BMP24Color(ptr,dither_probability);
+	    GrPlot(res,j,i);
 	  }
 	if (!use_ms_paint_palette)
 	  Free(palette_map);
       } else {
 	"Format Not Supported.\n";
-	DCDel(result);
-	result=NULL;
+	DCDel(res);
+	res=NULL;
       }
     } else
       "Invalid BMP File\n";
     Free(bmp);
   }
-  return result;
+  return res;
 }
 
 #help_index "Graphics/Sprite;Graphics/Windows BMP Files;"\

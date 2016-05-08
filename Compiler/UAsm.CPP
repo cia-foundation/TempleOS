@@ -1,40 +1,40 @@
 I64 InstEntriesCompare(CInst *tempi1,CInst *tempi2)
 {
-  I64 i1,i2,j=0,result=0,oc_cnt1=tempi1->opcode_cnt,oc_cnt2=tempi2->opcode_cnt;
+  I64 i1,i2,j=0,res=0,oc_cnt1=tempi1->opcode_cnt,oc_cnt2=tempi2->opcode_cnt;
   if (tempi1->flags&IEF_STI_LIKE)
     oc_cnt1--;
   if (tempi2->flags&IEF_STI_LIKE)
     oc_cnt2--;
   while (TRUE) {
     if (j<oc_cnt1 && j<oc_cnt2) {
-      if (result=tempi1->opcode[j]-tempi2->opcode[j])
-	return result;
+      if (res=tempi1->opcode[j]-tempi2->opcode[j])
+	return res;
       j++;
     } else {
-      if (result=oc_cnt1-oc_cnt2)
-	return result;
+      if (res=oc_cnt1-oc_cnt2)
+	return res;
 
       if (tempi1->flags&IEF_STI_LIKE && tempi2->flags&IEF_STI_LIKE)
 	return tempi1->opcode[j]-tempi2->opcode[j];
 
-      if (result=tempi1->flags&IEF_STI_LIKE - tempi2->flags&IEF_STI_LIKE)
-	return result;
+      if (res=tempi1->flags&IEF_STI_LIKE - tempi2->flags&IEF_STI_LIKE)
+	return res;
 
-      if (result=tempi1->slash_val-tempi2->slash_val)
-	return result;
+      if (res=tempi1->slash_val-tempi2->slash_val)
+	return res;
 
-      if (result=tempi1->flags&IEF_OP_SIZE32 - tempi2->flags&IEF_OP_SIZE32)
-	return result;
+      if (res=tempi1->flags&IEF_OP_SIZE32 - tempi2->flags&IEF_OP_SIZE32)
+	return res;
 
       i1=Bt(&uasm.ins64_arg_mask,tempi1->arg1) ||
 	    Bt(&uasm.ins64_arg_mask,tempi1->arg2);
       i2=Bt(&uasm.ins64_arg_mask,tempi2->arg1) ||
 	    Bt(&uasm.ins64_arg_mask,tempi2->arg2);
-      if (result=i1-i2)
-	return result;
+      if (res=i1-i2)
+	return res;
 
-      if (result=tempi1->flags&IEF_48_REX - tempi2->flags&IEF_48_REX)
-	return result;
+      if (res=tempi1->flags&IEF_48_REX - tempi2->flags&IEF_48_REX)
+	return res;
 
       i1=tempi1->arg2==ARGT_IMM64 || tempi1->arg2==ARGT_UIMM64;
       i2=tempi2->arg2==ARGT_IMM64 || tempi2->arg2==ARGT_UIMM64;
@@ -150,7 +150,7 @@ CInst *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 	    }
 	    if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
 	      if (!Bt(&uasm.ins64_arg_mask,a1) &&!Bt(&uasm.ins64_arg_mask,a2) &&
-		    !(tempi->flags&IEF_48_REX)&& !(a2==ARGT_NO &&
+		    !(tempi->flags&IEF_48_REX)&& !(a2==ARGT_NONE &&
 		    (ARGT_UIMM8<=a1<=ARGT_UIMM64 || ARGT_IMM8<=a1<=ARGT_IMM64)))
 		m=1;
 	      else if (tempi->arg2==ARGT_IMM64 || tempi->arg2==ARGT_UIMM64) {

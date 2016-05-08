@@ -74,21 +74,21 @@ CMeshEdTri *MeshTriNew(CMeshFrame *e,CColorROPU32 color,
 
 CMeshEdVertex *MeshVertexFindScrPt(CMeshFrame *e,I64 x,I64 y)
 {//Screen coordinates
-  CMeshEdVertex *result=NULL,*tempv=e->vertex_root.next;
+  CMeshEdVertex *res=NULL,*tempv=e->vertex_root.next;
   I64 dd,dz,best_dd=MAX_I64,best_dz=MAX_I64;
   while (tempv!=&e->vertex_root) {
     if (!(tempv->flags&VF_IGNORE)) {
       dd=SqrI64(x-tempv->pt.x)+SqrI64(y-tempv->pt.y);
       dz=AbsI64(e->my_ip_z-tempv->p.z);
       if (dd<best_dd || dd==best_dd && dz<best_dz) {
-	result=tempv;
+	res=tempv;
 	best_dd=dd;
 	best_dz=dz;
       }
     }
     tempv=tempv->next;
   }
-  return result;
+  return res;
 }
 
 CMeshEdVertex *MeshVertexFindNum(CMeshFrame *haystack_e,I64 needle_num)
@@ -248,20 +248,20 @@ U0 MeshTriSelectRect(CMeshFrame *e,I64 mode,I64 x1,I64 x2,I64 y1,I64 y2)
 
 I64 MeshSelectCnt(CMeshFrame *e)
 {
-  I64 result=0;
+  I64 res=0;
   CMeshEdVertex *tempv=e->vertex_root.next;
   CMeshEdTri *tempt=e->tri_root.next;
   while (tempv!=&e->vertex_root) {
     if (tempv->flags&VF_SELECTED)
-      result++;
+      res++;
     tempv=tempv->next;
   }
   while (tempt!=&e->tri_root) {
     if (tempt->flags&TF_SELECTED)
-      result++;
+      res++;
     tempt=tempt->next;
   }
-  return result;
+  return res;
 }
 
 U0 MeshSwapAxes(CMeshFrame *e,I64 o1,I64 o2)
@@ -823,7 +823,7 @@ I64 MeshSize(CMeshFrame *e)
 I32 *MeshSave(CMeshFrame *e,I64 *_size=NULL)
 {
   I64 size=MeshSize(e);
-  U8 *result=MAlloc(size),*dst=result;
+  U8 *res=MAlloc(size),*dst=res;
   CMeshEdVertex	*tempv=e->vertex_root.next;
   CMeshEdTri	*tempt=e->tri_root.next;
 
@@ -845,7 +845,7 @@ I32 *MeshSave(CMeshFrame *e,I64 *_size=NULL)
     tempt=tempt->next;
   }
   if (_size) *_size=size;
-  return result;
+  return res;
 }
 
 U0 MeshCleanUp(CMeshFrame *e)

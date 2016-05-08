@@ -1,7 +1,7 @@
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
 I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 {//If _doc, called by $LK,"::/Kernel/KCfg.CPP"$ else called by $LK,"Mount",A="MN:Mount"$().
-  I64 cnt,result=0,num_hints,drv_let,type,unit;
+  I64 cnt,res=0,num_hints,drv_let,type,unit;
   U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN];
   CATARep *root=NULL,*tempha;
   Bool one_drv,make_free;
@@ -103,9 +103,9 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	DocDel(doc);
       }
     }
-    result+=cnt;
-  } while (cnt || !result && _doc); //At least 1 if Called by $LK,"::/Kernel/KCfg.CPP"$
-  return result;
+    res+=cnt;
+  } while (cnt || !res && _doc); //At least 1 if Called by $LK,"::/Kernel/KCfg.CPP"$
+  return res;
 }
 
 public I64 Mount(Bool repartition=FALSE)

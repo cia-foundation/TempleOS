@@ -52,7 +52,7 @@ Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
 
 U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=FSt_FAT32)
 {//Format hard drive or RAM drive.
-//$BK,1$Warning:$BK,0$ Destroys all previous info.
+//$BK,1$Warning:$BK,0$ Destroys all prev info.
   //quick=FALSE means fill entire drive with zeros.
   //Choose $LK,"FSt_FAT32",A="MN:FSt_FAT32"$ or $LK,"FSt_REDSEA",A="MN:FSt_REDSEA"$.
   //You don't format a CD/DVD with this.

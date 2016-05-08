@@ -9,7 +9,7 @@ so a ptr to a page count is passed.
 Return: NULL if out of memory.
 */
   I64 i,j,*pte,num=*_pages2Meg;
-  CMemBlk *result=NULL,*m,*m1;
+  CMemBlk *res=NULL,*m,*m1;
 
   if (!bp) bp=sys_code_bp;
   PUSHFD
@@ -20,18 +20,18 @@ Return: NULL if out of memory.
 
   m=&bp->mem_free_2meg_lst;
   while (TRUE) {
-    if (!(result=m->next))
+    if (!(res=m->next))
       break;
-    if (result->pages<num)
-      m=result;
+    if (res->pages<num)
+      m=res;
     else {
-      if (result->pages==num) {
-	m->next=result->next;
+      if (res->pages==num) {
+	m->next=res->next;
 	goto am_done;
       } else {
-	result->pages-=num;
-	result(U8 *)+=result->pages<<MEM_PAGE_BITS;
-	result->pages=num;
+	res->pages-=num;
+	res(U8 *)+=res->pages<<MEM_PAGE_BITS;
+	res->pages=num;
 	goto am_done;
       }
     }
@@ -39,36 +39,36 @@ Return: NULL if out of memory.
 
   m=&bp->mem_free_lst;
   while (TRUE) {
-    if (!(result=m->next)) {
+    if (!(res=m->next)) {
       num=0;
-      result=NULL; //Out of memory
+      res=NULL; //Out of memory
       goto am_done;
     }
-    if (result->pages<num)
-      m=result;
+    if (res->pages<num)
+      m=res;
     else {
-      if (result->pages==num) {
-	if (result(U8 *)&0x1FFFFF)
-	  m=result;
+      if (res->pages==num) {
+	if (res(U8 *)&0x1FFFFF)
+	  m=res;
 	else {
-	  m->next=result->next;
+	  m->next=res->next;
 	  goto am_done;
 	}
       } else {
-	if (i=(result(U8 *)&0x1FFFFF)>>MEM_PAGE_BITS) {
+	if (i=(res(U8 *)&0x1FFFFF)>>MEM_PAGE_BITS) {
 	  j=1<<(21-MEM_PAGE_BITS)-i;
-	  if (result->pages<num+j)
-	    m=result;
-	  else if (result->pages==num+j) {
-	    result->pages-=num;
-	    result(U8 *)+=result->pages<<MEM_PAGE_BITS;
-	    result->pages=num;
+	  if (res->pages<num+j)
+	    m=res;
+	  else if (res->pages==num+j) {
+	    res->pages-=num;
+	    res(U8 *)+=res->pages<<MEM_PAGE_BITS;
+	    res->pages=num;
 	    goto am_done;
 	  } else {
-	    m1=result;
-	    result(U8 *)+=j<<MEM_PAGE_BITS;
-	    result->pages=num;
-	    m=result(U8 *)+num<<MEM_PAGE_BITS;
+	    m1=res;
+	    res(U8 *)+=j<<MEM_PAGE_BITS;
+	    res->pages=num;
+	    m=res(U8 *)+num<<MEM_PAGE_BITS;
 	    m->pages=m1->pages-num-j;
 	    m1->pages=j;
 	    m->next=m1->next;
@@ -77,11 +77,11 @@ Return: NULL if out of memory.
 	    goto am_done;
 	  }
 	} else {
-	  m=m->next=result(U8 *)+num<<MEM_PAGE_BITS;
-	  m->next=result->next;
-	  m->pages=result->pages-num;
+	  m=m->next=res(U8 *)+num<<MEM_PAGE_BITS;
+	  m->next=res->next;
+	  m->pages=res->pages-num;
 	  m->mb_signature=MBS_UNUSED_SIGNATURE_VAL;
-	  result->pages=num;
+	  res->pages=num;
 	  goto am_done;
 	}
       }
@@ -92,17 +92,17 @@ am_done:
   bp->used_u8s+=i;
   num>>=21-MEM_PAGE_BITS;
   *_pages2Meg=num;
-  m=result;
+  m=res;
   m1=m(U8 *)+i;
   while (m<m1) {
     pte=MemPageTable(m);
     *pte &= ~0x18;
     InvlPg(m);
-    m(U8 *)+=MemPageSize(m);
+    m(U8 *)+=0x200000;
   }
   LBtr(&bp->locked_flags,BPlf_LOCKED);
   POPFD
-  return result;
+  return res;
 }
 
 U8 *Mem2MegUncachedAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
@@ -113,20 +113,20 @@ so a ptr to a page count is passed.
 
 Return: NULL if out of memory.
 */
-  CMemBlk *result,*m,*m1;
+  CMemBlk *res,*m,*m1;
   I64 num=*_pages2Meg,*pte;
-  if (result=Mem2MegAlloc(_pages2Meg,bp)) {
+  if (res=Mem2MegAlloc(_pages2Meg,bp)) {
     num=*_pages2Meg;
-    m=result;
+    m=res;
     m1=m(U8 *)+num<<21;
     while (m<m1) {
       pte=MemPageTable(m);
       *pte= *pte& ~0x18 |0x10;
       InvlPg(m);
-      m(U8 *)+=MemPageSize(m);
+      m(U8 *)+=0x200000;
     }
   }
-  return result;
+  return res;
 }
 
 U8 *Mem2MegWriteThruAlloc(I64 *_pages2Meg,CBlkPool *bp=NULL)
@@ -137,20 +137,20 @@ so a ptr to a page count is passed.
 
 Return: NULL if out of memory.
 */
-  CMemBlk *result,*m,*m1;
+  CMemBlk *res,*m,*m1;
   I64 num=*_pages2Meg,*pte;
-  if (result=Mem2MegAlloc(_pages2Meg,bp)) {
+  if (res=Mem2MegAlloc(_pages2Meg,bp)) {
     num=*_pages2Meg;
-    m=result;
+    m=res;
     m1=m(U8 *)+num<<21;
     while (m<m1) {
       pte=MemPageTable(m);
       *pte= *pte& ~0x18 |8;
       InvlPg(m);
-      m(U8 *)+=MemPageSize(m);
+      m(U8 *)+=0x200000;
     }
   }
-  return result;
+  return res;
 }
 
 U0 Mem2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
@@ -165,7 +165,7 @@ U0 Mem2MegFree(CMemBlk *m,I64 pages2Meg,CBlkPool *bp=NULL)
       pte=MemPageTable(m2);
       *pte=*pte & ~0x18;
       InvlPg(m2);
-      m2(U8 *)+=MemPageSize(m2);
+      m2(U8 *)+=0x200000;
     }
     PUSHFD
     CLI

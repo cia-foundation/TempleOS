@@ -3,7 +3,7 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
 {//MAlloc str holding single dict definition of word.
   CFile *f;
   CHashGeneric *temph;
-  U8 *result=NULL,*buf,*in_ptr,
+  U8 *res=NULL,*buf,*in_ptr,
 	*st2=MStrUtil(st,SUF_TO_UPPER);
   temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
@@ -31,7 +31,7 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
 		in_ptr++;
 	    }
 	    if (*in_ptr++==ACD_DEF_CHAR) {
-	      result=StrNew(in_ptr);
+	      res=StrNew(in_ptr);
 	      break;
 	    }
 	  }
@@ -40,14 +40,14 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
       Free(buf);
     }
   }
-  return result;
+  return res;
 }
 
 public U8 *ACDDefsGet(U8 *st)
 {//MAlloc str with all dict definitions of word.
   CFile *f;
   CHashGeneric *temph;
-  U8 *result=NULL,*buf,*in_ptr,*in_ptr2,
+  U8 *res=NULL,*buf,*in_ptr,*in_ptr2,
 	*st2=MStrUtil(st,SUF_TO_UPPER);
   temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
@@ -70,9 +70,9 @@ public U8 *ACDDefsGet(U8 *st)
 		  && in_ptr2<buf+ACD_BLK_SIZE*2) {
 	      in_ptr2++;
 	    }
-	    result=MAlloc(in_ptr2+1-in_ptr);
-	    MemCpy(result,in_ptr,in_ptr2-in_ptr);
-	    result[in_ptr2-in_ptr]=ACD_END_CHAR;
+	    res=MAlloc(in_ptr2+1-in_ptr);
+	    MemCpy(res,in_ptr,in_ptr2-in_ptr);
+	    res[in_ptr2-in_ptr]=ACD_END_CHAR;
 	    break;
 	  }
 	}
@@ -80,7 +80,7 @@ public U8 *ACDDefsGet(U8 *st)
       Free(buf);
     }
   }
-  return result;
+  return res;
 }
 
 /*Fmt of word lst entry:

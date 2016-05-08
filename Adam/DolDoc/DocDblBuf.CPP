@@ -2,30 +2,30 @@
 public CDoc *DocPut(CTask *task=NULL)
 {//Current document that StdOut Put() goes to.
 //Basically, StdOut unless double buffering.
-  CDoc *result;
+  CDoc *res;
   if (!task) task=Fs;
-  if ((result=task->put_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
-    return result;
+  if ((res=task->put_doc) && res->doc_signature==DOC_SIGNATURE_VAL)
+    return res;
   else
     return NULL;
 }
 
 public CDoc *DocDisplay(CTask *task=NULL)
 {//StdOut displayed unless double buffering.
-  CDoc *result;
+  CDoc *res;
   if (!task) task=Fs;
-  if ((result=task->display_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
-    return result;
+  if ((res=task->display_doc) && res->doc_signature==DOC_SIGNATURE_VAL)
+    return res;
   else
     return NULL;
 }
 
 public CDoc *DocBorder(CTask *task=NULL)
 {//Doc holding border of window text.
-  CDoc *result;
+  CDoc *res;
   if (!task) task=Fs;
-  if ((result=task->border_doc) && result->doc_signature==DOC_SIGNATURE_VAL)
-    return result;
+  if ((res=task->border_doc) && res->doc_signature==DOC_SIGNATURE_VAL)
+    return res;
   else
     return NULL;
 }
@@ -33,36 +33,36 @@ public CDoc *DocBorder(CTask *task=NULL)
 public CDoc *DocDblBufStart(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
   Bool unlock_ddoc;
-  CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task),*result;
+  CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task),*res;
   if (!pdoc || !ddoc || pdoc!=ddoc)
-    result=NULL; //Already Double buffering
+    res=NULL; //Already Double buffering
   else {
     if (!task) task=Fs;
     unlock_ddoc=DocLock(ddoc); //dont change during winupdate, so lock DocPut$WW,0$
-    result=DocNew(,task);
-    result->win_task		=ddoc->win_task;
-    result->max_entries		=ddoc->max_entries;
-    MemCpy(result->find_replace,ddoc->find_replace,sizeof(CEdFindText));
-    MemCpy(&result->filename,&ddoc->filename,sizeof(CEdFileName));
-    result->left_click_link	=ddoc->left_click_link;
-    result->right_click_link	=ddoc->right_click_link;
-    result->user_put_data	=ddoc->user_put_data;
-    result->user_put_key	=ddoc->user_put_key;
-    result->user_put_s		=ddoc->user_put_s;
-    result->parent_doc		=ddoc->parent_doc;
-    result->desc		=ddoc->desc;
-    result->user_data		=ddoc->user_data;
-    result->flags|=ddoc->flags&DOCG_DBL_BUF_FLAGS | DOCF_DONT_SHOW;
-    task->put_doc=result;
+    res=DocNew(,task);
+    res->win_task		=ddoc->win_task;
+    res->max_entries		=ddoc->max_entries;
+    MemCpy(res->find_replace,ddoc->find_replace,sizeof(CEdFindText));
+    MemCpy(&res->filename,&ddoc->filename,sizeof(CEdFileName));
+    res->left_click_link	=ddoc->left_click_link;
+    res->right_click_link	=ddoc->right_click_link;
+    res->user_put_data	=ddoc->user_put_data;
+    res->user_put_key	=ddoc->user_put_key;
+    res->user_put_s		=ddoc->user_put_s;
+    res->parent_doc		=ddoc->parent_doc;
+    res->desc		=ddoc->desc;
+    res->user_data		=ddoc->user_data;
+    res->flags|=ddoc->flags&DOCG_DBL_BUF_FLAGS | DOCF_DONT_SHOW;
+    task->put_doc=res;
     if (unlock_ddoc)
       DocUnlock(ddoc);
   }
-  return result;
+  return res;
 }
 
 public Bool DocDblBufEnd(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
-  Bool result=FALSE;
+  Bool res=FALSE;
   CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
   if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
     if (!task) task=Fs;
@@ -72,14 +72,14 @@ public Bool DocDblBufEnd(CTask *task=NULL)
     task->display_doc=pdoc;
     DocUnlock(ddoc);
     DocDel(ddoc);
-    result=TRUE;
+    res=TRUE;
   }
-  return result;
+  return res;
 }
 
 public Bool DocDblBufSwap(CTask *task=NULL)
 {//See $LK,"::/Demo/Spy.CPP"$
-  Bool result=FALSE;
+  Bool res=FALSE;
   CDoc *pdoc=DocPut(task),*ddoc=DocDisplay(task);
   if (pdoc && ddoc && pdoc!=ddoc) {//Double buffering?
     if (!task) task=Fs;
@@ -102,7 +102,7 @@ public Bool DocDblBufSwap(CTask *task=NULL)
     ddoc->desc			=pdoc->desc;
     ddoc->user_data		=pdoc->user_data;
     task->put_doc=ddoc;
-    result=TRUE;
+    res=TRUE;
   }
-  return result;
+  return res;
 }

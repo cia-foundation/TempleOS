@@ -133,7 +133,7 @@ U0 DirFilesSort(CDirEntry **_tempde,I64 key)
   }
 }
 
-CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
+CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_res,I64 fuf_flags)
 {//Returns last node
   CDirEntry *tempde1;
   Bool del;
@@ -141,12 +141,12 @@ CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
     while (TRUE) {
       tempde1=tempde->next;
       if (!(tempde->attr&RS_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
-	_result=*_result=tempde;
+	_res=*_res=tempde;
 	del=FALSE;
       } else
 	del=TRUE;
       if (tempde->sub) {
-	_result=DirFilesFlatten(tempde->sub,_result,fuf_flags);
+	_res=DirFilesFlatten(tempde->sub,_res,fuf_flags);
 	tempde->sub=NULL;
       }
       if (del)
@@ -156,8 +156,8 @@ CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_result,I64 fuf_flags)
       else
 	break;
     }
-  *_result=NULL;
-  return _result;
+  *_res=NULL;
+  return _res;
 }
 
 U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)

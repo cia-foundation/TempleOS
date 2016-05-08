@@ -1,5 +1,5 @@
 U0 StructName(U8 *d,U8 *class_name=lastclass)
-{//lastclass is the previous fun arg's class as a string.
+{//lastclass is the prev fun arg's class as a string.
   "%X is a \"%s\".\n",d,class_name;
 }
 

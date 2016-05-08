@@ -17,7 +17,7 @@ if (YorN) {
 
 Bool Quit()
 {
-  Bool result;
+  Bool res;
   U8 *st;
   I64 i;
   while (TRUE) {
@@ -25,12 +25,12 @@ Bool Quit()
     st=GetStr;
     i=DefineMatch(st,"ST_NO_YES_LST",LMF_IGNORE_CASE);
     if (i>=0) {
-      result=i;
+      res=i;
       break;
     }
     Free(st);
   }
-  return result;
+  return res;
 }
 
 Quit;

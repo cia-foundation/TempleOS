@@ -31,8 +31,8 @@ CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
     if (tempc) {
       Free(tempc->src_link);
       tempc->src_link=NULL;
-      Free(tempc->index);
-      tempc->index=NULL;
+      Free(tempc->idx);
+      tempc->idx=NULL;
     } else {
       tempc=PrsClassNew;
       tempc->str=cc->cur_str;
@@ -94,8 +94,8 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,
     tempf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TEMP;
     Free(tempf->src_link);
     tempf->src_link=NULL;
-    Free(tempf->index);
-    tempf->index=NULL;
+    Free(tempf->idx);
+    tempf->idx=NULL;
     Free(name);
     MemberLstDel(tempf);
   } else {
@@ -852,8 +852,8 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   lb_untry=COCMiscNew(cc,CMT_LABEL);
 
   ICAdd(cc,IC_CALL_START,0,0);
-  ICAdd(cc,IC_GET_LABEL,lb_untry,tempc,ICF_PUSH_RESULT);
-  ICAdd(cc,IC_GET_LABEL,lb_catch,tempc,ICF_PUSH_RESULT);
+  ICAdd(cc,IC_GET_LABEL,lb_untry,tempc,ICF_PUSH_RES);
+  ICAdd(cc,IC_GET_LABEL,lb_catch,tempc,ICF_PUSH_RES);
   if (Bt(&temp_try->flags,Cf_EXTERN)) {
     cc->abs_cnts.externs++;
     if (cc->flags&CCF_AOT_COMPILE)
@@ -868,7 +868,7 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   else
     ICAdd(cc,IC_ADD_RSP,16,tempc);
   ICAdd(cc,IC_CALL_END,0,tempc);
-  ICAdd(cc,IC_END_EXP,0,0,ICF_NO_DEPEND_RESULT);
+  ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
 
   PrsStmt(cc,try_cnt+1);
 
@@ -883,7 +883,7 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   } else
     ICAdd(cc,IC_CALL,temp_untry->executable_addr,tempc);
   ICAdd(cc,IC_CALL_END,0,tempc);
-  ICAdd(cc,IC_END_EXP,0,0,ICF_NO_DEPEND_RESULT);
+  ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
 
   ICAdd(cc,IC_JMP,lb_done,0);
 

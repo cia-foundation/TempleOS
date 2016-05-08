@@ -7,7 +7,7 @@ CIPStateGlbls old_ip={IP_NULL,{-1000,-1000,0},{-1000,-1000,0},{-1000,-1000,0},
   FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
 };
 
-public CWinMgrGlbls winmgr={0,0,0,WMG_FPS,tS,NULL,NULL,FALSE,FALSE,FALSE};
+public CWinMgrGlbls winmgr={0,0,0,WINMGR_FPS,tS,NULL,NULL,FALSE,FALSE,FALSE};
 winmgr.t=CAlloc(sizeof(CWinMgrTimingGlbls));
 winmgr.t->last_calc_idle_time=tS;
 
@@ -252,7 +252,7 @@ public CTask *WinRefocus(CTask *task=NULL)
 I64 WinOnTopWindows()
 {
   CTask *task,*task1,*first_moved_fwd=NULL;
-  I64 result=0;
+  I64 res=0;
   PUSHFD
   CLI //TODO Multiprocessor safe
   task=sys_winmgr_task->next_task;
@@ -260,26 +260,26 @@ I64 WinOnTopWindows()
     task1=task->next_task;
     if (!TaskValidate(task)) {
       POPFD
-      return result;
+      return res;
     }
     if (Bt(&task->display_flags,DISPLAYf_WIN_ON_TOP) &&
 	  task!=sys_winmgr_task->last_task) {
       TaskQueRem(task);
       TaskQueIns(task,sys_winmgr_task);
-      result++;
+      res++;
       if (!first_moved_fwd)
 	first_moved_fwd=task;
     }
     task=task1;
   }
   POPFD
-  return result;
+  return res;
 }
 
 public I64 WinToTop(CTask *task=NULL,Bool update_z_buf=TRUE)
 {//Put task's win on top of window stack.
   CTask *task1;
-  I64 result=0;
+  I64 res=0;
   if (!task) task=Fs;
   if (!TaskValidate(task) || task->gs->num)
     return 0;
@@ -295,27 +295,27 @@ public I64 WinToTop(CTask *task=NULL,Bool update_z_buf=TRUE)
   if (task!=sys_winmgr_task->last_task) {
     TaskQueRem(task);
     TaskQueIns(task,sys_winmgr_task);
-    result++;
+    res++;
   }
   if (!Bt(&task->win_inhibit,WIf_SELF_FOCUS))
     sys_focus_task=task;
-  if (result && !Bt(&task->display_flags,DISPLAYf_CHILDREN_NOT_ON_TOP)) {
+  if (res && !Bt(&task->display_flags,DISPLAYf_CHILDREN_NOT_ON_TOP)) {
     task1=task->next_child_task;
     while (task1!=&task->next_child_task) {
       if (!TaskValidate(task1))
 	break;
-      result+=WinToTop(task1,FALSE);
+      res+=WinToTop(task1,FALSE);
       task1=task1->next_sibling_task;
     }
     if (task->popup_task &&
 	  task->popup_task->parent_task==task)
-      result+=WinToTop(task->popup_task,FALSE);
+      res+=WinToTop(task->popup_task,FALSE);
   }
   POPFD
-  result+=WinOnTopWindows;
-  if (result && update_z_buf)
+  res+=WinOnTopWindows;
+  if (res && update_z_buf)
     WinZBufUpdate;
-  return result;
+  return res;
 }
 ext[EXT_WIN_TO_TOP]=&WinToTop;
 

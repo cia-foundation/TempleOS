@@ -34,7 +34,7 @@ class CArcCtrl //control structure
   CArcEntry *cur_entry,*next_entry;
   DWORD cur_bits_in_use,next_bits_in_use;
   BYTE *stk_ptr,*stk_base;
-  DWORD free_index,free_limit,
+  DWORD free_idx,free_limit,
 	saved_basecode,
 	entry_used,
 	last_ch;
@@ -59,21 +59,21 @@ int Bt(int bit_num, BYTE *bit_field)
 
 int Bts(int bit_num, BYTE *bit_field)
 {
-  int result;
+  int res;
   bit_field+=bit_num>>3;
   bit_num&=7;
-  result=*bit_field & (1<<bit_num);
+  res=*bit_field & (1<<bit_num);
   *bit_field|=(1<<bit_num);
-  return (result) ? 1:0;
+  return (res) ? 1:0;
 }
 
 DWORD BFieldExtU32(BYTE *src,DWORD pos,DWORD bits)
 {
-  DWORD i,result=0;
+  DWORD i,res=0;
   for (i=0;i<bits;i++)
     if (Bt(pos+i,src))
-      Bts(i,(BYTE *)&result);
-  return result;
+      Bts(i,(BYTE *)&res);
+  return res;
 }
 
 void ArcEntryGet(CArcCtrl *c)
@@ -82,7 +82,7 @@ void ArcEntryGet(CArcCtrl *c)
   CArcEntry *temp,*temp1;
 
   if (c->entry_used) {
-    i=c->free_index;
+    i=c->free_idx;
 
     c->entry_used=FALSE;
     c->cur_entry=c->next_entry;
@@ -104,7 +104,7 @@ void ArcEntryGet(CArcCtrl *c)
       if (temp1)
 	temp1->next=temp->next;
     }
-    c->free_index=i;
+    c->free_idx=i;
   }
 }
 
@@ -178,7 +178,7 @@ CArcCtrl *ArcCtrlNew(DWORD expand,DWORD compression_type)
   else
     c->min_bits=8;
   c->min_table_entry=1<<c->min_bits;
-  c->free_index=c->min_table_entry;
+  c->free_idx=c->min_table_entry;
   c->next_bits_in_use=c->min_bits+1;
   c->free_limit=1<<c->next_bits_in_use;
   c->saved_basecode=0xFFFFFFFFl;
@@ -197,17 +197,17 @@ void ArcCtrlDel(CArcCtrl *c)
 BYTE *ExpandBuf(CArcCompress *arc)
 {
   CArcCtrl *c;
-  BYTE *result;
+  BYTE *res;
 
   if (!(CT_NONE<=arc->compression_type && arc->compression_type<=CT_8_BIT) ||
 	arc->expanded_size>=0x20000000l)
     return NULL;
 
-  result=(BYTE *)malloc(arc->expanded_size+1);
-  result[arc->expanded_size]=0; //terminate
+  res=(BYTE *)malloc(arc->expanded_size+1);
+  res[arc->expanded_size]=0; //terminate
   switch (arc->compression_type) {
     case CT_NONE:
-      memcpy(result,arc->body,arc->expanded_size);
+      memcpy(res,arc->body,arc->expanded_size);
       break;
     case CT_7_BIT:
     case CT_8_BIT:
@@ -216,22 +216,22 @@ BYTE *ExpandBuf(CArcCompress *arc)
       c->src_pos=(sizeof(CArcCompress)-1)*8;
       c->src_buf=(BYTE *)arc;
       c->dst_size=arc->expanded_size;
-      c->dst_buf=result;
+      c->dst_buf=res;
       c->dst_pos=0;
       ArcExpandBuf(c);
       ArcCtrlDel(c);
       break;
   }
-  return result;
+  return res;
 }
 
 long FSize(FILE *f)
 {
-  long	result,original=ftell(f);
+  long	res,original=ftell(f);
   fseek(f,0,SEEK_END);
-  result=ftell(f);
+  res=ftell(f);
   fseek(f,original,SEEK_SET);
-  return result;
+  return res;
 }
 
 BOOL Cvt(char *in_name,char *out_name,BOOL cvt_ascii)

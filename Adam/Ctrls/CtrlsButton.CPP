@@ -43,7 +43,7 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
 	I64 num_states=1,U8 *state_texts,
 	I32 *state_colors,CCtrlButtonState *_s=NULL)
 {//Create button ctrl. See $LK,"::/Apps/Strut/Strut.CPP"$.
-  CCtrl *result;
+  CCtrl *res;
   CCtrlButtonState *s;
   I64 i,j,l;
   U8 *st;
@@ -57,7 +57,7 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
     width=BUTTON_BORDER*4+l*FONT_WIDTH;
   }
   if (height<0) height=BUTTON_BORDER*4+FONT_HEIGHT;
-  result=CAlloc(sizeof(CCtrl));
+  res=CAlloc(sizeof(CCtrl));
   if (_s) {
     s=_s;
     MemSet(s,0,sizeof(CCtrlButtonState));
@@ -68,18 +68,18 @@ public CCtrl *CtrlButtonNew(I64 x,I64 y,I64 width=-1,I64 height=-1,
   s->num_states=num_states;
   s->state_texts=state_texts;
   s->state_colors=state_colors;
-  result->win_task=Fs;
-  result->flags=CTRLF_SHOW;
-  result->type=CTRLT_GENERIC;
-  result->state=s;
-  result->draw_it=&DrawCtrlButton;
-  result->left_click=&LeftClickCtrlButton;
-  result->left=x;
-  result->top=y;
-  result->right=result->left+width-1;
-  result->bottom=result->top+height-1;
-  QueIns(result,Fs->last_ctrl);
-  return result;
+  res->win_task=Fs;
+  res->flags=CTRLF_SHOW;
+  res->type=CTRLT_GENERIC;
+  res->state=s;
+  res->draw_it=&DrawCtrlButton;
+  res->left_click=&LeftClickCtrlButton;
+  res->left=x;
+  res->top=y;
+  res->right=res->left+width-1;
+  res->bottom=res->top+height-1;
+  QueIns(res,Fs->last_ctrl);
+  return res;
 }
 
 public U0 CtrlButtonDel(CCtrl *c)

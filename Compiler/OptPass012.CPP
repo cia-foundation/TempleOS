@@ -991,7 +991,7 @@ args.
 	    tempi2=tempi2->next;
 
 	  tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&
-		~(ICF_R_TO_F64|ICF_PUSH_RESULT)|tempi2->ic_flags;
+		~(ICF_R_TO_F64|ICF_PUSH_RES)|tempi2->ic_flags;
 	  OptSetNOP1(tempi2);
 
 	  tempi1->ic_class=cmp.internal_types[RT_I64];
@@ -1056,7 +1056,7 @@ args.
 	    tempi2=tempi2->next;
 
 	  tempi1->ic_flags=tempi->ic_flags|tempi1->ic_flags&
-		~(ICF_R_TO_INT|ICF_PUSH_RESULT)|tempi2->ic_flags;
+		~(ICF_R_TO_INT|ICF_PUSH_RES)|tempi2->ic_flags;
 	  OptSetNOP1(tempi2);
 
 	  tempi1->ic_class=cmp.internal_types[RT_F64];
@@ -1093,12 +1093,12 @@ args.
 	tempi_push=OptBrNotZero(cc,tempi);
 	break;
       case IC_NOP1:
-	if (tempi->ic_flags&ICF_PUSH_RESULT) {
+	if (tempi->ic_flags&ICF_PUSH_RES) {
 	  tempi1=tempi;
 	  do tempi1=tempi1->last;
 	  while (tempi1->ic_code==IC_NOP1);
-	  tempi1->ic_flags|=ICF_PUSH_RESULT;
-	  tempi->ic_flags&=~ICF_PUSH_RESULT;
+	  tempi1->ic_flags|=ICF_PUSH_RES;
+	  tempi->ic_flags&=~ICF_PUSH_RES;
 	}
 	break;
       case IC_NOP2:
@@ -1264,7 +1264,7 @@ args.
 	OptFixSizeOf(tempi2,tempi_push,tempi1->ic_class);
       }
     }
-    if (intermediate_code_table[tempi_push->ic_code].result_cnt) {
+    if (intermediate_code_table[tempi_push->ic_code].res_cnt) {
       PrsPush(ps,tempi->ic_class2);
       PrsPush(ps,tempi_push);
     }

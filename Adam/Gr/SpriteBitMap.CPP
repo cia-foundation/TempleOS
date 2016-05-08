@@ -202,7 +202,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
 	I64 *_xx2,I64 *_yy2,CDC **_img,CColorROPU32 bkcolor)
 {
   I64 i,j,mode=GBM_LINE,color=BLACK,width=1,msg_code,a1,a2,x1,y1,x11,y11,
-	x22,y22,result,xx1=*_xx1,yy1=*_yy1,xx2=*_xx2,yy2=*_yy2,
+	x22,y22,res,xx1=*_xx1,yy1=*_yy1,xx2=*_xx2,yy2=*_yy2,
 	old_de_flags=doc_e->de_flags;
   Bool down=FALSE;
   U8 *st=NULL;
@@ -228,10 +228,10 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
 	case MSG_KEY_DOWN:
 	  switch (a1) {
 	    case CH_SHIFT_ESC:
-	      result=GE_ABORT;
+	      res=GE_ABORT;
 	      goto bm_key_up_done;
 	    case CH_ESC:
-	      result=GE_CONT;
+	      res=GE_CONT;
 	      goto bm_key_up_done;
 	    case 'c': //eye-dropper
 	      dc2=DCScreenCapture(FALSE);
@@ -253,13 +253,13 @@ bm_menu:
 	    StrCpy(Fs->task_title,DefineSub(i,"ST_SPRITE_BITMAP_MENU"));
 	  switch (i) {
 	    case DOCM_CANCEL:
-	      result=GE_ABORT;
+	      res=GE_ABORT;
 	      goto bm_done;
 	    case GBM_EXIT:
-	      result=GE_EXIT;
+	      res=GE_EXIT;
 	      goto bm_done;
 	    case GBM_MAIN_MENU:
-	      result=GE_CONT;
+	      res=GE_CONT;
 	      goto bm_done;
 	    case GBM_COLOR:
 	      i=PopUpColor(,,FALSE);
@@ -672,5 +672,5 @@ bm_done:
   doc_e->de_flags=old_de_flags;
   *_img=img;
   *_xx1=xx1,*_yy1=yy1,*_xx2=xx2,*_yy2=yy2;
-  return result;
+  return res;
 }

@@ -80,7 +80,7 @@ U0 FrameGrabberTask(I64)
 
 I64 CopyVideo()
 {
-  I64 result=0;
+  I64 res=0;
   Del("D:/Temp/*.SND");
   if (fg_mode==FG_JUST_AUDIO)
     SndFileCreate("D:/Temp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35,2.5);
@@ -88,14 +88,14 @@ I64 CopyVideo()
     SndFileCreate("D:/Temp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35);
     DelTree("D:/Temp/ScreenShots");
     if (fg_mode==FG_RAM_DRV) {
-      result=CopyTree("B:/Temp/ScreenShots","D:/Temp/ScreenShots");
+      res=CopyTree("B:/Temp/ScreenShots","D:/Temp/ScreenShots");
       "Unused Space: %12.6fMeg\n",UnusedDrvSpace('B')/1024.0/1024.0;
     } else
-      result=CopyTree("::/Temp/ScreenShots","D:/Temp/ScreenShots");
+      res=CopyTree("::/Temp/ScreenShots","D:/Temp/ScreenShots");
     "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",
-	  result,result/60.0/VIDEO_FRAME_RATE;
+	  res,res/60.0/VIDEO_FRAME_RATE;
   }
-  return result;
+  return res;
 }
 
 public U0 FrameGrabberToggle()
@@ -246,10 +246,10 @@ class CYouTubeForm2
 
 U8 *TOSYouTube()
 {
-  U8 *result;
+  U8 *res;
   CYouTubeForm2 *url=CAlloc(sizeof(CYouTubeForm2));
   if (DocForm(url(CYouTubeForm2 *)) && *url->special)
-    result=MStrPrint("$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\">"
+    res=MStrPrint("$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\">"
 	  "<param name=\\\"movie\\\" "
 	  "value=\\\"http://www.youtube.com/v/%s\\\"></param><param "
 	  "name=\\\"allowscriptaccess\\\" value=\\\"always\\\"></param><embed "
@@ -259,9 +259,9 @@ U8 *TOSYouTube()
 	  "width=\\\"640\\\" height=\\\"520\\\"></embed></object>\"$$",
 	  url->special,url->special);
   else
-    result=NULL;
+    res=NULL;
   Free(url);
-  return result;
+  return res;
 }
 
 U0 AfterEgyptInAction()

@@ -88,7 +88,7 @@ CD3I32 *LexD3I32(CCmpCtrl *cc,CD3I32 *p)
 U8 *CmdLinePmt()
 {
   I64 i;
-  U8 *result,*st;
+  U8 *res,*st;
   if (Fs->new_answer) {
     if (Fs->answer_type==RT_F64)
       "%8.6fs ansf=%15.7g\n",Fs->answer_time,Fs->answer;
@@ -106,17 +106,17 @@ U8 *CmdLinePmt()
   st=GetStr(,,GSF_SHIFT_ESC_EXIT);
 
   i=StrLen(st);
-  result=MAlloc(i+1+2);
-  MemCpy(result,st,i+1);
+  res=MAlloc(i+1+2);
+  MemCpy(res,st,i+1);
   i--;
-  while (i>=0 && Bt(chars_bmp_white_space,result[i]))
+  while (i>=0 && Bt(chars_bmp_white_space,res[i]))
     i--;
   i++;
-  if (i>0 && result[i-1]==';')
-    result[i++]=';'; //The Lex goes one beyond
-  result[i++]='\n';//#define goes to '\n'
-  result[i]=0;
+  if (i>0 && res[i-1]==';')
+    res[i++]=';'; //The Lex goes one beyond
+  res[i++]='\n';//#define goes to '\n'
+  res[i]=0;
 
   Free(st);
-  return result;
+  return res;
 }

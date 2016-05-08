@@ -12,7 +12,7 @@
 	
 class CIntermediateStruct
 {
-  U8 arg_cnt,result_cnt,type;
+  U8 arg_cnt,res_cnt,type;
   Bool fpop,not_const,pad[3];
   U8 *name;
 };

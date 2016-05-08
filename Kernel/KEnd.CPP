@@ -66,6 +66,7 @@ U0 SysGrInit()
   text.font=sys_font_8x8;
   text.aux_font=MAlloc(256*FONT_HEIGHT);
   MemCpy(text.aux_font,text.font,256*FONT_HEIGHT);
+  text.vga_alias=MemVGAAlloc+VGAM_GRAPHICS;
   if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
     text.cols=80;
     text.rows=25;
@@ -73,9 +74,9 @@ U0 SysGrInit()
   } else { //if 640x480 16 color
     text.cols=GR_WIDTH/FONT_WIDTH;
     text.rows=GR_HEIGHT/FONT_HEIGHT;
-    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_IDX,VGAR_MAP_MASK);
     OutU8(VGAP_DATA,0x0F);
-    MemSet(VGAM_GRAPHICS,0,GR_WIDTH*GR_HEIGHT>>3);
+    MemSet(text.vga_alias,0,GR_WIDTH*GR_HEIGHT>>3);
     text.raw_screen_image=CAlloc(GR_WIDTH*GR_HEIGHT/8);
   }
 }
@@ -115,12 +116,10 @@ U0 TimersInit()
 
 U0 Reboot()
 {//Hardware reset.
-  U16 *_w=0x472;
   CLI
   if (mp_cnt>1)
     MPHalt;
-  MemPagePresentMark(_w,TRUE);
-  *_w=0;
+  *0x472(U16 *)=0;
   OutU8(0x70,0x8F);
   OutU8(0x71,0x00);
   OutU8(0x70,0x00);

@@ -9,33 +9,33 @@ U0 LinkedLstDel(U8 **_lst)
 }
 
 U8 *LinkedLstCopy(U8 **_lst,CTask *mem_task=NULL)
-{//MAlloc identical copy of entire linked-list.
-  U8 *result=NULL,**templ=&result;
+{//MAlloc ident copy of entire linked-list.
+  U8 *res=NULL,**templ=&res;
   while (_lst) {
-    templ=*templ=MAllocIdentical(_lst,mem_task);
+    templ=*templ=MAllocIdent(_lst,mem_task);
     _lst=*_lst;
   }
-  return result;
+  return res;
 }
 
 I64 LinkedLstCnt(U8 **_lst)
 {//Count of nodes in linked-list.
-  I64 result=0;
+  I64 res=0;
   while (_lst) {
-    result++;
+    res++;
     _lst=*_lst;
   }
-  return result;
+  return res;
 }
 
 I64 LinkedLstSize(U8 **_lst)
 {//Mem size of all nodes in linked-list.
-  I64 result=0;
+  I64 res=0;
   while (_lst) {
-    result+=MSize2(_lst);
+    res+=MSize2(_lst);
     _lst=*_lst;
   }
-  return result;
+  return res;
 }
 
 U0 QueDel(CQue *root,Bool querem=FALSE)
@@ -51,65 +51,65 @@ U0 QueDel(CQue *root,Bool querem=FALSE)
 }
 
 CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
-{//MAlloc identical copy of entire queue and root.
-  CQue *result=MAllocIdentical(root,mem_task),*tempq=root->next,*tempq1;
-  QueInit(result);
+{//MAlloc ident copy of entire queue and root.
+  CQue *res=MAllocIdent(root,mem_task),*tempq=root->next,*tempq1;
+  QueInit(res);
   while (tempq!=root) {
-    tempq1=MAllocIdentical(tempq,mem_task);
-    QueIns(tempq1,result->last);
+    tempq1=MAllocIdent(tempq,mem_task);
+    QueIns(tempq1,res->last);
     tempq=tempq->next;
   }
-  return result;
+  return res;
 }
 
 I64 QueCnt(CQue *root)
 {//Count of nodes in queue, not root.
   CQue *tempq=root->next;
-  I64 result=0;
+  I64 res=0;
   while (tempq!=root) {
-    result++;
+    res++;
     tempq=tempq->next;
   }
-  return result;
+  return res;
 }
 
 I64 QueSize(CQue *root)
 {//Mem size of all nodes in queue, not root.
   CQue *tempq=root->next;
-  I64 result=0;
+  I64 res=0;
   while (tempq!=root) {
-    result+=MSize2(tempq);
+    res+=MSize2(tempq);
     tempq=tempq->next;
   }
-  return result;
+  return res;
 }
 
-CQueVectU8 *QueVectU8New(I64 min_index=0)
+CQueVectU8 *QueVectU8New(I64 min_idx=0)
 {//Create new queue vecter.
-  CQueVectU8 *result=MAlloc(sizeof(CQueVectU8));
-  QueInit(result);
-  result->total_cnt=result->node_cnt=0;
-  result->min_index=min_index;
-  return result;
+  CQueVectU8 *res=MAlloc(sizeof(CQueVectU8));
+  QueInit(res);
+  res->total_cnt=res->node_cnt=0;
+  res->min_idx=min_idx;
+  return res;
 }
 
-U0 QueVectU8Put(CQueVectU8 *v,I64 index,U8 ch)
-{//Put U8 at index i.
+U0 QueVectU8Put(CQueVectU8 *v,I64 idx,U8 ch)
+{//Put U8 at idx i.
   CQueVectU8 *tempv;
-  index-=v->min_index;
-  if (index<0) return;
-  if (index<v->total_cnt) {
+  idx-=v->min_idx;
+  if (idx<0) return;
+  if (idx<v->total_cnt) {
     tempv=v;
     do {
-      index-=tempv->node_cnt;
-      if (index<0) {
-	tempv->body[index+tempv->node_cnt]=ch;
+      idx-=tempv->node_cnt;
+      if (idx<0) {
+	tempv->body[idx+tempv->node_cnt]=ch;
 	return;
       }
       tempv=tempv->next;
     } while (tempv!=v);
   } else
-    index-=v->total_cnt;
+    idx-=v->total_cnt;
 
   while (TRUE) {
     tempv=v->last;
@@ -118,7 +118,7 @@ U0 QueVectU8Put(CQueVectU8 *v,I64 index,U8 ch)
       tempv->node_cnt=0;
       QueIns(tempv,v->last);
     }
-    if (index--) {
+    if (idx--) {
       tempv->body[tempv->node_cnt++]=0;
       v->total_cnt++;
     } else {
@@ -137,16 +137,16 @@ U0 QueVectU8Del(CQueVectU8 *v)
   }
 }
 
-I64 QueVectU8Get(CQueVectU8 *v,I64 index)
-{//Get U8 at index i.
+I64 QueVectU8Get(CQueVectU8 *v,I64 idx)
+{//Get U8 at idx i.
   CQueVectU8 *tempv;
-  index-=v->min_index;
-  if (!(0<=index<v->total_cnt)) return 0;
+  idx-=v->min_idx;
+  if (!(0<=idx<v->total_cnt)) return 0;
   tempv=v;
   do {
-    index-=tempv->node_cnt;
-    if (index<0)
-      return tempv->body[index+tempv->node_cnt];
+    idx-=tempv->node_cnt;
+    if (idx<0)
+      return tempv->body[idx+tempv->node_cnt];
     tempv=tempv->next;
   } while (tempv!=v);
   return 0;
@@ -226,15 +226,15 @@ U0 FifoU8Flush(CFifoU8 *f)
 
 I64 FifoU8Cnt(CFifoU8 *f)
 {//Count of U8's in fifo.
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   if (f->out_ptr>f->in_ptr)
-    result=f->mask+1-(f->out_ptr-f->in_ptr);
+    res=f->mask+1-(f->out_ptr-f->in_ptr);
   else
-    result=f->in_ptr-f->out_ptr;
+    res=f->in_ptr-f->out_ptr;
   POPFD
-  return result;
+  return res;
 }
 
 CFifoI64 *FifoI64New(I64 size,CTask *mem_task=NULL)
@@ -311,13 +311,13 @@ U0 FifoI64Flush(CFifoI64 *f)
 
 I64 FifoI64Cnt(CFifoI64 *f)
 {//Count of I64's in fifo.
-  I64 result;
+  I64 res;
   PUSHFD
   CLI
   if (f->out_ptr>f->in_ptr)
-    result=f->mask+1-(f->out_ptr-f->in_ptr);
+    res=f->mask+1-(f->out_ptr-f->in_ptr);
   else
-    result=f->in_ptr-f->out_ptr;
+    res=f->in_ptr-f->out_ptr;
   POPFD
-  return result;
+  return res;
 }

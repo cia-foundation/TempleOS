@@ -9,7 +9,7 @@ Bool OptIC4(CIntermediateCode *tempi)
   if (!(tempil2=OptLag1(tempil1)))
     return FALSE;
 
-  if (tempil2->r.type&MDF_STK && !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
+  if (tempil2->r.type&MDF_STK && !(tempil2->ic_flags&ICF_PUSH_RES)) {
     if (tempil1->ic_code==IC_ADD_CONST && tempil1->a1.type&MDF_STK) {
       if ((tempil2->ic_code==IC_REG || tempil2->ic_code==IC_MOV) &&
 	    tempil2->a1.type&MDF_REG) {
@@ -556,9 +556,9 @@ p4_sib:
 	  break;
 	case IC_CALL_END:
 	case IC_END_EXP:
-	  if (!(tempil1->ic_flags&ICF_PUSH_RESULT)) {
-	    if (tempi->ic_flags&ICF_NO_DEPEND_RESULT) {
-	      tempil1->ic_flags|=ICF_NO_DEPEND_RESULT;
+	  if (!(tempil1->ic_flags&ICF_PUSH_RES)) {
+	    if (tempi->ic_flags&ICF_RES_NOT_USED) {
+	      tempil1->ic_flags|=ICF_RES_NOT_USED;
 	      tempil1->r.type=MDF_NULL+tempil1->r.type.raw_type;
 	    } else if (tempi->a1.type&MDF_STK &&
 		  tempil1->r.type&MDF_STK) {
@@ -694,7 +694,7 @@ p4_sib:
       if (tempi) {
 	while (OptIC4(tempi));
 	code=tempi->ic_code;
-	if (intermediate_code_table[code].result_cnt)
+	if (intermediate_code_table[code].res_cnt)
 	  PrsPush(ps,tempi);
       }
     }

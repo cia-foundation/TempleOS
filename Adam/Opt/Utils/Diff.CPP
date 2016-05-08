@@ -146,7 +146,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 {
   I64 i,i1=0,i2=0,i2b,j1,j2,n,
 	best_j1,best_j2,best_score=0,score;
-  Bool result=FALSE;
+  Bool res=FALSE;
 
   if (j1_lo>=j1_hi || j2_lo>=j2_hi) {
     if (j1_lo<j1_hi || j2_lo<j2_hi) {
@@ -208,12 +208,12 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
   } else {
     if (DiffSub(doc,_df_flags,j1_lo,best_j1,j2_lo,best_j2,cnt1,cnt2,
 	  doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
-      result=TRUE;
+      res=TRUE;
     if (DiffSub(doc,_df_flags,best_j1+best_score,j1_hi,best_j2+best_score,
 	  j2_hi,cnt1,cnt2,
 	  doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2))
-      result=TRUE;
-    return result;
+      res=TRUE;
+    return res;
   }
 }
 
@@ -241,7 +241,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
 	*doc2=DocRead(src_file,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   CDocEntry *doc_e,**doc_sorted1,**doc_sorted2,**doc_unsorted1,**doc_unsorted2;
   I64 i,cnt1=0,cnt2=0,df_flags;
-  Bool result=FALSE;
+  Bool res=FALSE;
 
   if (_df_flags)
     df_flags=*_df_flags;
@@ -291,14 +291,14 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   doc_unsorted2[i]=doc2;
   QSortI64(doc_sorted2,cnt2,&DiffEntriesCompare);
 
-  result=DiffSub(doc1,&df_flags,0,cnt1,0,cnt2,cnt1,cnt2,
+  res=DiffSub(doc1,&df_flags,0,cnt1,0,cnt2,cnt1,cnt2,
 	doc_sorted1,doc_sorted2,doc_unsorted1,doc_unsorted2);
   if (df_flags&DF_MODIFIED && !(df_flags&DF_DONT_MODIFIED))
     DocWrite(doc1);
 
   if (DiffBins(doc1,doc2)) {
     "$$RED$$Bin Data is Different$$FG$$\n";
-    result=TRUE;
+    res=TRUE;
   }
 
   DocDel(doc1);
@@ -309,7 +309,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   Free(doc_unsorted2);
   if (_df_flags)
     *_df_flags=df_flags;
-  return result;
+  return res;
 }
 
 #help_index "Cmd Line (Typically);Info"

@@ -26,21 +26,21 @@ public F64 tM()
 
 public F64 Beat()
 {//Time in music beats.
-  F64 result,cur_tM;
+  F64 res,cur_tM;
   PUSHFD
   CLI
   if (mp_cnt>1)
     while (LBts(&sys_semas[SYS_SEMA_TMBEAT],0))
       PAUSE
   cur_tM=tM;
-  result=music.last_Beat;
+  res=music.last_Beat;
   if (music.tempo)
-    result+=(cur_tM-music.last_tM)*music.tempo;
+    res+=(cur_tM-music.last_tM)*music.tempo;
   music.last_tM=cur_tM;
-  music.last_Beat=result;
+  music.last_Beat=res;
   LBtr(&sys_semas[SYS_SEMA_TMBEAT],0);
   POPFD
-  return result;
+  return res;
 }
 
 #help_index "Snd/Music"

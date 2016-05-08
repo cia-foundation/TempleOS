@@ -21,9 +21,9 @@ extern U8 *CatPrint(U8 *dst,U8 *fmt,...);
 extern Bool Cd(U8 *name,Bool make_dirs=FALSE);
 extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
 extern U0 DbgHelp();
-extern U8 *Define(U8 *name);
-extern I64 DefineMatch(U8 *needle,U8 *haystack_lst_name,I64 flags=0);
-extern U8 *DefineSub(I64 sub,U8 *name);
+extern U8 *Define(U8 *dname);
+extern I64 DefineMatch(U8 *needle,U8 *haystack_lst_dname,I64 flags=0);
+extern U8 *DefineSub(I64 sub,U8 *dname);
 extern I64 Del(U8 *files_find_mask,Bool make_mask=FALSE,
 	Bool del_dir=FALSE,Bool print_msg=TRUE);
 extern U8 *DftExt(U8 *name,U8 *extension);
@@ -41,7 +41,7 @@ extern Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempdee,
 	Bool free_old_chain);
 extern U0 FAT32DrvInit(CDrv *dv);
 extern Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
-	CDirEntry *_result,I64 fuf_flags=0);
+	CDirEntry *_res,I64 fuf_flags=0);
 extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 extern U8 *FileNameAbs(U8 *name,I64 fuf_flags=0);
@@ -53,7 +53,7 @@ extern I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE);
 extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
 extern Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
-	CDirEntry *_result,I64 fuf_flags=0);
+	CDirEntry *_res,I64 fuf_flags=0);
 extern Bool ISODrvInit(CDrv *dv,I64 blk);
 extern Bool IsDbg();
 extern Bool IsDir(U8 *dir_name);
@@ -76,7 +76,7 @@ extern Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempdee,
 extern U0 RedSeaDrvInit(CDrv *dv);
 extern Bool RedSeaDrvValidate(U8 drv_let);
 extern Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
-	CDirEntry *_result,I64 fuf_flags=0);
+	CDirEntry *_res,I64 fuf_flags=0);
 extern U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE);
 extern U0 RedSeaFreeFreeLst(CDrv *dv);
 extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,

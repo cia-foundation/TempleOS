@@ -269,10 +269,10 @@ CORE0_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
 	CALL	SYS_FIND_PCI_SERVICES
 
 	MOV	U32 [SYS_HEAP_BASE],SYS_FIXED_AREA+sizeof(CSysFixedArea)
-	CALL	SYS_INIT_MEM
+	CALL	SYS_INIT_PAGE_TABLES
 
 	PUSH	U32 0	//Return from next call will be 64-bit
-	CALL	SYS_EM64T
+	CALL	SYS_ENTER_LONG_MODE
 USE64
 	BTS	U32 [SYS_RUN_LEVEL],RLf_64BIT
 
@@ -315,7 +315,7 @@ USE64
 
 //************************************
 USE32
-SYS_EM64T:: //Switch to long 64-bit mode
+SYS_ENTER_LONG_MODE:: //Switch to long 64-bit mode
 	MOV_EAX_CR4
 	OR	EAX,0xB0
 	MOV_CR4_EAX

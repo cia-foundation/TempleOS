@@ -5,7 +5,7 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 {//Do action on final entry selected by user.
 //Sometimes returns locked, sometimes unlocked
   U8 ch=doc->cmd_U8,*st;
-  I64 result=DOCM_CANCEL,has_action=FALSE;
+  I64 res=DOCM_CANCEL,has_action=FALSE;
   CHashDefineStr *temph;
   DocLock(doc);
   if (!exited) {
@@ -25,19 +25,19 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
   try {
     if (ch==CH_SPACE) {
       if (doc_e->de_flags & DOCEF_LINK && doc->left_click_link) {
-	result=(*doc->left_click_link)(doc,doc_e);
+	res=(*doc->left_click_link)(doc,doc_e);
 	has_action=TRUE;
       }
       if (doc_e->de_flags & DOCEF_LEFT_EXP) {
-	result=doc_e->left_exp;
+	res=doc_e->left_exp;
 	has_action=TRUE;
-	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_LEFT_CB && doc_e->left_cb) {
 	DocUnlock(doc);
-	result=(*doc_e->left_cb)(doc,doc_e);
+	res=(*doc_e->left_cb)(doc,doc_e);
 	has_action=TRUE;
-	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_LEFT_MACRO) {
 	if (doc_e->de_flags & DOCEF_POPUP) {
@@ -57,26 +57,26 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 	    doc_e->de_flags & DOCEF_DEFINE &&
 	    (temph=HashFind(doc_e->define_str,
 	    doc->win_task->hash_table,HTT_DEFINE_STR)) &&
-	    (result=PopUpPickLst(temph->data))!=DOCM_CANCEL) {
-	DocDataFmt(doc,doc_e,result);
+	    (res=PopUpPickLst(temph->data))!=DOCM_CANCEL) {
+	DocDataFmt(doc,doc_e,res);
 	DocDataScan(doc,doc_e);
 	has_action=TRUE;
       }
     } else if (ch=='\n') {
       if (doc_e->de_flags & DOCEF_LINK && doc->right_click_link) {
-	result=(*doc->right_click_link)(doc,doc_e);
+	res=(*doc->right_click_link)(doc,doc_e);
 	has_action=TRUE;
       }
       if (doc_e->de_flags & DOCEF_RIGHT_EXP) {
-	result=doc_e->right_exp;
+	res=doc_e->right_exp;
 	has_action=TRUE;
-	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_RIGHT_CB && doc_e->right_cb) {
 	DocUnlock(doc);
-	result=(*doc_e->right_cb)(doc,doc_e);
+	res=(*doc_e->right_cb)(doc,doc_e);
 	has_action=TRUE;
-	Msg(MSG_CMD,result,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_RIGHT_MACRO) {
 	if (doc_e->de_flags & DOCEF_POPUP) {
@@ -99,5 +99,5 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
   doc->cmd_U8=CH_SPACE;
 er_done:
   if (_has_action) *_has_action=has_action;
-  return result;
+  return res;
 }

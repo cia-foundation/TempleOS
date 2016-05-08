@@ -155,9 +155,9 @@ public extern I64	LinkedLstSize(U8 **_lst);
 
 #help_index "Data Types/Queue Vector"
 public extern U0	QueVectU8Del(CQueVectU8 *v);
-public extern I64	QueVectU8Get(CQueVectU8 *v,I64 index);
-public extern CQueVectU8 *QueVectU8New(I64 min_index=0);
-public extern U0	QueVectU8Put(CQueVectU8 *v,I64 index,U8 ch);
+public extern I64	QueVectU8Get(CQueVectU8 *v,I64 idx);
+public extern CQueVectU8 *QueVectU8New(I64 min_idx=0);
+public extern U0	QueVectU8Put(CQueVectU8 *v,I64 idx,U8 ch);
 
 #help_index "Debugging"
 public extern U8 *Caller(I64 num=1);
@@ -228,17 +228,17 @@ public extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
 
 #help_index "Define;Char/Define"
 #help_file "::/Doc/Define"
-public extern U8 *Define(U8 *name);
-public extern CHashDefineStr *DefineLoad(U8 *name,U8 *st);
-public extern U0 DefinePrint(U8 *name,U8 *src,...);
+public extern U8 *Define(U8 *dname);
+public extern CHashDefineStr *DefineLoad(U8 *dname,U8 *st);
+public extern U0 DefinePrint(U8 *dname,U8 *src,...);
 
 #help_index "Define;Char/Define;Char/Lists"
-public extern I64 DefineCnt(U8 *name);
-public extern CHashDefineStr *DefineLstLoad(U8 *name,U8 *st);
-public extern I64 DefineMatch(U8 *needle,U8 *haystack_lst_name,I64 flags=0);
-public extern U8 *DefineSub(I64 sub,U8 *name);
+public extern I64 DefineCnt(U8 *dname);
+public extern CHashDefineStr *DefineLstLoad(U8 *dname,U8 *lst);
+public extern I64 DefineMatch(U8 *needle,U8 *haystack_lst_dname,I64 flags=0);
+public extern U8 *DefineSub(I64 sub,U8 *dname);
 
-#help_index "Devices"
+#help_index "Devices;Memory/Page Tables"
 public extern U8 *Mem32DevAlloc(I64 size,I64 alignment);
 public extern U0 Mem32DevFree(U8 *base);
 public extern U8 *Mem64DevAlloc(I64 *_pages2Meg);
@@ -283,7 +283,7 @@ public extern Bool Drv(U8 drv_let);
 public extern Bool MkDir(U8 *filename);
 
 #help_index "File/Cmd Line (Typically);Cmd Line (Typically);Install"
-public extern Bool MapDrv(U8 drv_let,CDrv *dv);
+public extern Bool DrvMap(U8 drv_let,CDrv *dv);
 
 #help_index "File/FileNames"
 extern CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name);
@@ -402,7 +402,6 @@ public _extern _HASH_SINGLE_TABLE_FIND CHash *HashSingleTableFind(
 	U8 *needle_str,CHashTable *haystack_table,I64 mask,I64 instance=1);
 public _extern _HASH_STR I64 HashStr(U8 *st);
 public extern CHashTable *HashTableNew(I64 size,CTask *mem_task=NULL);
-
 #help_index "Hash/Frame"
 #help_file "::/Doc/Frame"
 public extern I64 FramePtr(U8 *name,CTask *task=NULL);
@@ -427,7 +426,7 @@ extern U0 SysSymImportsResolve(U8 *sptr,I64 ld_flags=0);
 public extern I64 HashLstAdd(U8 *lst,I64 type,CHashTable *table);
 
 #help_index "Hash/System;Define;Char/Define;Char/Lists"
-public extern I64 HashDefineLstAdd(U8 *name,I64 type,CHashTable *table);
+public extern I64 HashDefineLstAdd(U8 *dname,I64 type,CHashTable *table);
 
 #help_index "Help System;Debugging/Debugger"
 public extern U0 Help();
@@ -501,7 +500,7 @@ public extern CKbdStateGlbls	kbd;
 #help_index "Math"
 public extern I64 CeilI64(I64 num,I64 to);
 public extern U64 CeilU64(U64 num,U64 to);
-public extern F64 Clamp(F64 num,F64 lo,F64 hi);
+public extern F64 Clamp(F64 d,F64 lo,F64 hi);
 public extern I64 FloorI64(I64 num,I64 to);
 public extern U64 FloorU64(U64 num,U64 to);
 public extern F64 Max(F64 n1,F64 n2);
@@ -520,7 +519,7 @@ public extern I64 Seed(I64 seed=0,CTask *task=NULL);
 #help_index "Memory/Adam Heap"
 public extern U8 *ACAlloc(I64 size);
 public extern U8 *AMAlloc(I64 size);
-public extern U8 *AMAllocIdentical(U8 *src);
+public extern U8 *AMAllocIdent(U8 *src);
 
 #help_index "Memory/BlkPool"
 public extern U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512);
@@ -536,7 +535,7 @@ public _extern _FREE U0 Free(U8 *addr);
 public _extern _MALLOC U8 *MAlloc(I64 size,CTask *mem_task=NULL);
 public extern U8 *MAllocAligned(I64 size,I64 alignment,
 	CTask *mem_task=NULL,I64 misalignment=0);
-public extern U8 *MAllocIdentical(U8 *src,CTask *mem_task=NULL);
+public extern U8 *MAllocIdent(U8 *src,CTask *mem_task=NULL);
 public _extern _MHEAP_CTRL CHeapCtrl *MHeapCtrl(U8 *src);
 public _extern _MSIZE I64 MSize(U8 *src);   //size of heap object
 public _extern _MSIZE2 I64 MSize2(U8 *src); //Internal size
@@ -547,9 +546,7 @@ public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
 
 #help_index "Memory/Page Tables"
-public extern Bool MemLowPagesProtect(Bool val=TRUE);
 public extern Bool MemPagePresentMark(U8 *a,Bool val);
-public extern I64 MemPageSize(U8 *a)
 public extern I64 *MemPageTable(U8 *a);
 
 #help_index "Messages"
@@ -682,8 +679,8 @@ public extern I64 ExeCmdLine(CCmpCtrl *cc);
 public extern U0 UserTaskCont();
 
 #help_index "Task/Srv/Exe;MultiCore"
-public extern I64 JobResultGet(CSrvCmd *rqst=NULL);
-public extern Bool JobResultScan(CSrvCmd *rqst=NULL,I64 *_result=NULL);
+public extern I64 JobResGet(CSrvCmd *rqst=NULL);
+public extern Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL);
 
 #help_index "Task/Srv/Text & Msgs"
 public extern CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags);
@@ -710,10 +707,6 @@ public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 	U8 *task_name=NULL,I64 target_cpu=-1,	//-1 means current CPU
 	CTask *parent=NULL, //NULL means adam
 	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
-
-#help_index "Time/CPU Cycles"
-#help_file "::/Doc/TimeCycles"
-public extern I64 TaskTotalTime();
 
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;

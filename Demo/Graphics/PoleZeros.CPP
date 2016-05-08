@@ -9,22 +9,22 @@ Complex *PoleZeroFind(I64 x,I64 y)
 {
   I64 i;
   F64 dd,best_dd=MAX_F64;
-  Complex *result=NULL;
+  Complex *res=NULL;
   for (i=0;i<NUM_POLES;i++) {
     dd=Sqr(poles[i].x-x)+Sqr(poles[i].y-y);
     if (dd<best_dd) {
       best_dd=dd;
-      result=&poles[i];
+      res=&poles[i];
     }
   }
   for (i=0;i<NUM_ZEROS;i++) {
     dd=Sqr(zeros[i].x-x)+Sqr(zeros[i].y-y);
     if (dd<best_dd) {
       best_dd=dd;
-      result=&zeros[i];
+      res=&zeros[i];
     }
   }
-  return result;
+  return res;
 }
 
 F64 F(Complex *x)
@@ -32,9 +32,9 @@ F64 F(Complex *x)
   F64 m,a;
   Complex num,denom,n1;
 
-  CPoly(&num,  x,zeros,NUM_ZEROS);
-  CPoly(&denom,x,poles,NUM_POLES);
-  CDiv(&num,&denom,&n1);
+  CPoly(&num,  NUM_ZEROS,zeros,x);
+  CPoly(&denom,NUM_POLES,poles,x);
+  CDiv(&n1,&num,&denom);
 
   R2P(&m,&a,n1.x,n1.y);
   if (ip.rb)
@@ -74,7 +74,7 @@ U0 Draw()
       tempm[i]=JobQue(&MPDraw,Fs,i,0);
     y_total=0;
     for (i=0;i<mp_cnt;i++)
-      y_total+=JobResultGet(tempm[i])(F64);
+      y_total+=JobResGet(tempm[i])(F64);
 
     if (!y_total) break;
     scale*=7*GR_WIDTH*GR_HEIGHT/y_total;

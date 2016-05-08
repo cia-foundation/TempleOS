@@ -30,7 +30,7 @@ U0 WZeroBlks(CDrv *dv,I64 blk,I64 cnt)
 
 Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {//Read blk cnt from Drv to buf.
-  Bool result=TRUE,unlock;
+  Bool res=TRUE,unlock;
   CBlkDev *bd=dv->bd;
   if (cnt<=0) return TRUE;
   DrvChk(dv);
@@ -50,7 +50,7 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:
-	  result=ATARBlks(dv,buf,blk,cnt);
+	  res=ATARBlks(dv,buf,blk,cnt);
 	  break;
       }
       bd->last_time=tS;
@@ -62,12 +62,12 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
   } catch
     if (unlock)
       DrvUnlock(dv);
-  return result;
+  return res;
 }
 
 Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {//Write blk cnt from buf to Drv.
-  Bool result=TRUE,unlock;
+  Bool res=TRUE,unlock;
   CBlkDev *bd=dv->bd;
   if (cnt<=0) return TRUE;
   DrvChk(dv);
@@ -86,7 +86,7 @@ Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:
-	  result=ATAWBlks(dv,buf,blk,cnt);
+	  res=ATAWBlks(dv,buf,blk,cnt);
 	  break;
       }
       bd->last_time=tS;
@@ -98,5 +98,5 @@ Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
   } catch
     if (unlock)
       DrvUnlock(dv);
-  return result;
+  return res;
 }

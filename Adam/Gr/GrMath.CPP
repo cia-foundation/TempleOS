@@ -465,22 +465,22 @@ public Bool RegPoly(U8 *aux_data,
 
 #help_index "Graphics/Data Types/D3I32;Math/Data Types/D3I32;Data Types/D3I32"
 public F64 D3I32Dist(CD3I32 *p1,CD3I32 *p2)
-{//Dist between p1 and p2.
+{//Distance
   return Sqrt(SqrI64(p1->x-p2->x)+SqrI64(p1->y-p2->y)+SqrI64(p1->z-p2->z));
 }
 
 public I64 D3I32DistSqr(CD3I32 *p1,CD3I32 *p2)
-{//Dist Squared between p1 and p2.
+{//Distance Squared
   return SqrI64(p1->x-p2->x)+SqrI64(p1->y-p2->y)+SqrI64(p1->z-p2->z);
 }
 
 public F64 D3I32Norm(CD3I32 *p)
-{//Norm of p.
+{//Norm
   return Sqrt(SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z));
 }
 
 public I64 D3I32NormSqr(CD3I32 *p)
-{//Norm Squared of p.
+{//Norm Squared
   return SqrI64(p->x)+SqrI64(p->y)+SqrI64(p->z);
 }
 

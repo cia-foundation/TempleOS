@@ -127,7 +127,7 @@ Bool TestSameSlope(I64 x,I64 y,I64 w,I64 h)
   s=&normals[y][x];
   for (k2=0;k2<h;k2++)
     for (k1=0;k1<w;k1++)
-      if (D3NormSqr(D3Sub(&normals[y+k2][x+k1],s,&p))>.10)
+      if (D3NormSqr(D3Sub(&p,&normals[y+k2][x+k1],s))>.10)
 	return FALSE;
   return TRUE;
 }
@@ -416,7 +416,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   dc->x=cx;
   dc->y=cy;
 
-  //dc->x and the translation part of dc->r are identical in effect,
+  //dc->x and the translation part of dc->r are ident in effect,
   //but we use both to show-off.	We could add offsets together and
   //use one or the other.
 

@@ -151,15 +151,15 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
 }
 
 Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
-	CDirEntry *_result,I64 fuf_flags=0)
+	CDirEntry *_res,I64 fuf_flags=0)
 {//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   CDirEntry *buf,*buf2,*ptr;
   U8 dname[CDIR_FILENAME_LEN];
   I64 ch;
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   if (fuf_flags&~FUG_FILE_FIND)
     throw('FUF');
-  MemSet(_result,0,sizeof(CDirEntry));
+  MemSet(_res,0,sizeof(CDirEntry));
   DrvChk(dv);
   if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
@@ -186,8 +186,8 @@ Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	      !(fuf_flags&FUF_JUST_DIRS && !(ptr->attr & RS_ATTR_DIR)) &&
 	      !(fuf_flags&FUF_JUST_FILES && ptr->attr & RS_ATTR_DIR) &&
 	      !StrCmp(dname,ptr->name)) {
-	  MemCpy(&_result->attr,&ptr->attr,CDIR_SIZE);
-	  result=TRUE;
+	  MemCpy(&_res->attr,&ptr->attr,CDIR_SIZE);
+	  res=TRUE;
 	  goto rsff_done;
 	}
 	ptr(U8 *)+=CDIR_SIZE;
@@ -199,7 +199,7 @@ rsff_done:
     } catch
       if (unlock)
 	DrvUnlock(dv);
-  return result;
+  return res;
 }
 
 U8 *RedSeaFileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
@@ -457,7 +457,7 @@ I64 RedSeaFilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
 		     Bool del_dir,Bool print_msg)
 {
   CDirEntry *buf,*buf2,*ptr;
-  I64 i=0,result=0,ch,j=0,n=BLK_SIZE/CDIR_SIZE,cur_dir_cluster;
+  I64 i=0,res=0,ch,j=0,n=BLK_SIZE/CDIR_SIZE,cur_dir_cluster;
   Bool unlock_break;
   try {
     unlock_break=BreakLock;
@@ -480,7 +480,7 @@ I64 RedSeaFilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
       else if (!(ptr->attr & RS_ATTR_DELETED) && ch!='.' && (del_dir ||
 	    !(ptr->attr & RS_ATTR_DIR)) &&
 	    FilesFindMatch(ptr->name,files_find_mask,fuf_flags)) {
-	if (!(ptr->attr & RS_ATTR_DIR)) result++;
+	if (!(ptr->attr & RS_ATTR_DIR)) res++;
 	if (print_msg)
 	  "Del %s\n",ptr->name;
 	ptr->attr|=RS_ATTR_DELETED;
@@ -503,7 +503,7 @@ I64 RedSeaFilesDel(CDrv *dv,U8 *cur_dir,U8 *files_find_mask,I64 fuf_flags,
     if (unlock_break)
       BreakUnlock;
   }
-  return result;
+  return res;
 }
 
 I64 RedSeaFileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
@@ -538,7 +538,7 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	CDirEntry *parent=NULL)
 {
   CDrv *dv=Fs->cur_dv;
-  CDirEntry *buf,*buf2,*ptr,*result=NULL,*tempde;
+  CDirEntry *buf,*buf2,*ptr,*res=NULL,*tempde;
   I64 ch,cur_dir_cluster;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
@@ -568,8 +568,8 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	tempde->parent=parent;
 	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR &&
 	      *tempde->name!='.') {
-	  tempde->next=result;
-	  result=tempde;
+	  tempde->next=res;
+	  res=tempde;
 	  tempde->full_name=DirNameAbs(tempde->name);
 	  DrvUnlock(dv);
 	  if (Cd(tempde->name)) {
@@ -584,8 +584,8 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
 		!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' &&
 		tempde->attr&RS_ATTR_DIR) &&
 		FilesFindMatch(tempde->full_name,files_find_mask,fuf_flags)) {
-	    tempde->next=result;
-	    result=tempde;
+	    tempde->next=res;
+	    res=tempde;
 	  } else
 	    DirEntryDel(tempde);
 	}
@@ -596,7 +596,7 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
     DrvUnlock(dv);
   } catch
     DrvUnlock(dv);
-  return result;
+  return res;
 }
 
 Bool RedSeaMkDir(CDrv *dv,U8 *cur_dir,U8 *name)

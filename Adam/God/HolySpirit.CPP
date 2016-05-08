@@ -62,15 +62,15 @@ public U0 GodHexIns(U8 *st)
 public I64 GodBits(I64 num_bits,U8 *msg=NULL)
 {//Return N bits. If low on entropy pop-up okay.
   U8 b;
-  I64 result=0;
+  I64 res=0;
   while (num_bits) {
     if (FifoU8Rem(god.fifo,&b)) {
-      result=result<<1+b;
+      res=res<<1+b;
       num_bits--;
     } else
       GodBitsIns(GOD_GOOD_BITS,GodPick(msg));
   }
-  return result;
+  return res;
 }
 
 public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.TXT*",U8 *fu_flags=NULL)

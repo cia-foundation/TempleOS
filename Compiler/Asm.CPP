@@ -37,16 +37,16 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
   CHashGeneric *temph,*temph1;
   CHashReg *tempr;
   MemSet(arg,0,sizeof(CAsmArg));
-  arg->seg=REG_NONE;
+  arg->seg =REG_NONE;
   arg->reg1=REG_NONE;
   arg->reg2=REG_NONE;
-  arg->fstk=REG_NONE;
   arg->scale=1;
   while (TRUE) {
     if (cc->token==TK_IDENT) {
       if (temph=cc->hash_entry) {
 	if (temph->type&HTG_TYPE_MASK==HTT_REG) {
 	  tempr=temph;
+	  arg->reg1_type=tempr->reg_type;
 	  switch (tempr->reg_type) {
 	    sub_switch_start:
 	      case REGT_R8:
@@ -74,8 +74,10 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 		Lex(cc); //skip ":"
 	      break;
 	    case REGT_FSTK:
+	    case REGT_MM:
+	    case REGT_XMM:
 	      arg->size=8;
-	      arg->fstk=tempr->reg_num;
+	      arg->reg1=tempr->reg_num;
 	      Lex(cc);
 	      return;
 	  }
@@ -131,6 +133,7 @@ pa_asm_direct_imm:
 	    if (temph->type&HTG_TYPE_MASK==HTT_REG &&
 		  REGT_R16<=temph(CHashReg *)->reg_type<=REGT_R64) {
 	      tempr=temph;
+	      arg->reg2_type=tempr->reg_type;
 	      if (arg->reg1==REG_NONE) {
 		if (tempr->reg_num&7==REG_RSP) {
 		  arg->reg1=4;
@@ -146,12 +149,14 @@ pa_asm_direct_imm:
 	    goto pa_asm_indirect_imm;
 	} else if (cc->token=='*') {
 	  Lex(cc);
-	  if (cc->token!=TK_INT)
+	  if (cc->token!=TK_I64)
 	    LexExcept(cc,"Expecting scale factor at ");
 	  arg->scale=cc->cur_i64;
 	  Lex(cc); //skip scale
-	  if (arg->reg2!=REG_NONE)
+	  if (arg->reg2!=REG_NONE) {
 	    SwapI64(&arg->reg1,&arg->reg2);
+	    SwapI64(&arg->reg1_type,&arg->reg2_type);
+	  }
 	} else if (cc->token=='+') {
 	  Lex(cc); //skip '+'
 	} else {
@@ -172,92 +177,92 @@ pa_asm_indirect_imm:
 I64 AsmMakeArgMask(CCmpCtrl *cc,CAsmArg *arg)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64 result;
+  I64 res;
   if (arg->just_seg) {
     switch (arg->seg) {
-      case 0: result=1<<ARGT_ES|1<<ARGT_SREG; break;
-      case 1: result=1<<ARGT_CS|1<<ARGT_SREG; break;
-      case 2: result=1<<ARGT_SS|1<<ARGT_SREG; break;
-      case 3: result=1<<ARGT_DS|1<<ARGT_SREG; break;
-      case 4: result=1<<ARGT_FS|1<<ARGT_SREG; break;
-      case 5: result=1<<ARGT_GS|1<<ARGT_SREG; break;
+      case 0: res=1<<ARGT_ES|1<<ARGT_SREG; break;
+      case 1: res=1<<ARGT_CS|1<<ARGT_SREG; break;
+      case 2: res=1<<ARGT_SS|1<<ARGT_SREG; break;
+      case 3: res=1<<ARGT_DS|1<<ARGT_SREG; break;
+      case 4: res=1<<ARGT_FS|1<<ARGT_SREG; break;
+      case 5: res=1<<ARGT_GS|1<<ARGT_SREG; break;
     }
     goto mm_done;
   }
-  if (arg->fstk!=REG_NONE) {
-    if (arg->fstk)
-      result=1<<ARGT_STI;
+  if (arg->reg1_type==REGT_FSTK) {
+    if (arg->reg1)
+      res=1<<ARGT_STI;
     else
-      result=1<<ARGT_ST0|1<<ARGT_STI;
+      res=1<<ARGT_ST0|1<<ARGT_STI;
     goto mm_done;
   }
-  result=cmp.size_arg_mask[arg->size];
+  res=cmp.size_arg_mask[arg->size];
   if (aotc->seg_size==64)
-    result&=0xFF0FFFFFFF;
+    res&=0xFF0FFFFFFF;
 
   if (arg->reg1!=REG_NONE && arg->imm_or_off_present && !arg->num.i &&
 	!arg->num.glbl_asm_undef_hash && !arg->num.local_asm_undef_hash)
     arg->imm_or_off_present=FALSE;  //Zero displacement
 
   if (arg->reg2!=REG_NONE || arg->scale!=1) {
-    result&=0x0000FF0000;
+    res&=0x0000FF0000;
     goto mm_done;
   }
 
   if (arg->indirect) {
     if (arg->imm_or_off_present)
-      result&=0x00FFFF0000;
+      res&=0x00FFFF0000;
     else
-      result&=0x000FFF0000;
+      res&=0x000FFF0000;
   } else {
     if (arg->imm_or_off_present)
-      result&=0x000F000FFE;
+      res&=0x000F000FFE;
     else
-      result&=0x3F0FFFF000;
+      res&=0x3F0FFFF000;
   }
   if (arg->seg!=REG_NONE)
-    result&=0x00FFFF0000;
+    res&=0x00FFFF0000;
   if (arg->reg1==REG_NONE) {
     if (arg->indirect)
-      result&=0x00FFFF0000;
+      res&=0x00FFFF0000;
     else if (arg->num.i<0) {
       if (arg->num.i>=MIN_I8)
-	result&=0x8FE;
+	res&=0x8FE;
       else if (arg->num.i>=MIN_I16)
-	result&=0x8EE;
+	res&=0x8EE;
       else if (arg->num.i>=MIN_I32)
-	result&=0x8CE;
+	res&=0x8CE;
       else
-	result&=0x88E;
+	res&=0x88E;
     } else {
       if (arg->num.i<=MAX_I8)
-	result&=0xFFE;
+	res&=0xFFE;
       else if (arg->num.i<=MAX_U8)
-	result&=0xFEE;
+	res&=0xFEE;
       else if (arg->num.i<=MAX_I16)
-	result&=0xEEE;
+	res&=0xEEE;
       else if (arg->num.i<=MAX_U16)
-	result&=0xECE;
+	res&=0xECE;
       else if (arg->num.i<=MAX_I32)
-	result&=0xCCE;
+	res&=0xCCE;
       else if (arg->num.i<=MAX_U32)
-	result&=0xC8E;
+	res&=0xC8E;
       else
-	result&=0x88E;
+	res&=0x88E;
     }
   } else {
-    result&=  0x3F00FFF000;
+    res&=  0x3F00FFF000;
     if (!arg->indirect) //M8-M64
-      result&=0xFFFF0FFFFF;
+      res&=0xFFFF0FFFFF;
   }
   switch (arg->reg1) {
-    case REG_RAX: result&=~0x3000000000; break;
-    case REG_RCX: result&=~0x2F00000000; break;
-    case REG_RDX: result&=~0x1F00000000; break;
-    default:	  result&=~0x3F00000000;
+    case REG_RAX: res&=~0x3000000000; break;
+    case REG_RCX: res&=~0x2F00000000; break;
+    case REG_RDX: res&=~0x1F00000000; break;
+    default:	  res&=~0x3F00000000;
   }
 mm_done:
-  return result;
+  return res;
 }
 
 Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
@@ -471,8 +476,8 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	    if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 	      cur.has_REX=TRUE;
 	  } else {//SV_I_REG
-	    if (tempa1->fstk!=REG_NONE)
-	      cur.last_opcode_U8+=tempa1->fstk;
+	    if (tempa1->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8+=tempa1->reg1;
 	  }
 	}
 	if (a1==ARGT_R64 || a1==ARGT_RM64 || a1==ARGT_M64)
@@ -589,10 +594,10 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 		cur.has_REX=TRUE;
 	    }
 	  } else {//SV_I_REG
-	    if (tempa1->fstk!=REG_NONE)
-	      cur.last_opcode_U8|=tempa1->fstk;
-	    if (tempa2->fstk!=REG_NONE)
-	      cur.last_opcode_U8|=tempa2->fstk;
+	    if (tempa1->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8|=tempa1->reg1;
+	    if (tempa2->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8|=tempa2->reg1;
 	  }
 	}
 	if (a1==ARGT_RM64 || a2==ARGT_RM64 || a1==ARGT_M64 || a2==ARGT_M64 ||

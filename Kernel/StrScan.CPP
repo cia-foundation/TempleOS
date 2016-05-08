@@ -3,7 +3,7 @@ I64 Str2I64(U8 *st,I64 radix=10,U8 **_end_ptr=NULL)
 //Allows radix change with "0x20" "0b1010" "0d123" "0o18".
   //Be careful of Str2I64("0b101",16)-->0xB101.
   Bool neg=FALSE;
-  I64 ch,result=0;
+  I64 ch,res=0;
   if (!st || !(2<=radix<=36)) {
     if (_end_ptr) *_end_ptr=st;
     return 0;
@@ -35,21 +35,21 @@ ai_cont:
   while (ch=ToUpper(*st++)) {
     if (radix>10) {
       if ('0'<=ch<='9')
-	result=result*radix+ch-'0';
+	res=res*radix+ch-'0';
       else if ('A'<=ch<='A'+radix-11)
-	result=result*radix+ch-'A'+10;
+	res=res*radix+ch-'A'+10;
       else
 	break;
     } else if ('0'<=ch<='0'+radix-1)
-      result=result*radix+ch-'0';
+      res=res*radix+ch-'0';
     else
       break;
   }
   if (_end_ptr) *_end_ptr=st-1;
   if (neg)
-    return -result;
+    return -res;
   else
-    return result;
+    return res;
 }
 
 F64 Str2F64(U8 *src,U8 **_end_ptr=NULL)
@@ -148,7 +148,7 @@ and it will return the 3rd day after
 the start of mon for seven days before
 today.
 */
-  CDate result=0;
+  CDate res=0;
   CDateStruct ds,ds_now;
   U8 *src=MStrUtil(_src,SUF_REM_SPACES|SUF_TO_UPPER),
 	*v=StrNew(src),
@@ -173,8 +173,8 @@ today.
   if (*ptr=='*') {
     ptr++;
     if (*ptr=='+' || *ptr=='-')
-      result.date=Str2I64(ptr,,&ptr);
-    result+=Now+local_time_offset;
+      res.date=Str2I64(ptr,,&ptr);
+    res+=Now+local_time_offset;
   } else {
     StrFirstRem(ptr,"/",v); //Put mon into v
     ds.mon=Str2I64(v);
@@ -189,24 +189,24 @@ today.
       Date2Struct(&ds_now,Now+local_time_offset);
       ds.year=ds_now.year;
     }
-    result=Struct2Date(&ds);
+    res=Struct2Date(&ds);
   }
   if (*ptr==')') ptr++;
 
   if (start_mon)
-    result.date=FirstDayOfMon(result.date);
+    res.date=FirstDayOfMon(res.date);
   else if (end_mon)
-    result.date=LastDayOfMon(result.date);
+    res.date=LastDayOfMon(res.date);
   else if (start_year)
-    result.date=FirstDayOfYear(result.date);
+    res.date=FirstDayOfYear(res.date);
   else if (end_year)
-    result.date=LastDayOfYear(result.date);
+    res.date=LastDayOfYear(res.date);
 
   if (*ptr=='+' || *ptr=='-')
-    result.date+=Str2I64(ptr);
+    res.date+=Str2I64(ptr);
   Free(src);
   Free(v);
-  return result-local_time_offset;
+  return res-local_time_offset;
 }
 
 U8 *StrScan(U8 *src,U8 *fmt,...)

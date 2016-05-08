@@ -5,23 +5,23 @@ F64 CompileDemo(U8 *st)
   I64 type;
   U8 *machine_code;
   CCmpCtrl *cc=CmpCtrlNew(st,CCF_DONT_FREE_BUF);
-  F64 result=0;
+  F64 res=0;
   Lex(cc);  //Gotta get it started
   "Compile \"%s\"\n",st;
   do {
     if (machine_code=LexExpression2Bin(cc,&type)) {
       if (type!=RT_F64)
-	result=ToF64(Call(machine_code));
+	res=ToF64(Call(machine_code));
       else
-	result=Call(machine_code)(F64);
+	res=Call(machine_code)(F64);
       Free(machine_code);
     }
-    "result=%9.4f\n",result;
+    "res=%9.4f\n",res;
     if (cc->token==';')
       Lex(cc);
   } while (cc->token!=TK_EOF);	//end of file?
   CmpCtrlDel(cc);
-  return result;
+  return res;
 }
 
 CompileDemo("2+Cos(ã)");

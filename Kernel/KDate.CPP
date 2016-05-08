@@ -122,12 +122,12 @@ I64 LastDayOfYear(I64 i)
 
 I64 Bcd2Bin(U64 b)
 {
-  I64 i,result=0;
+  I64 i,res=0;
   for (i=0;i<16;i++) {
-    result=result*10+b>>60;
+    res=res*10+b>>60;
     b<<=4;
   }
-  return result;
+  return res;
 }
 
 U0 NowDateTimeStruct(CDateStruct *_ds)

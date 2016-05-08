@@ -124,7 +124,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 I64 DitherColor2(U8 *header=NULL)
 {
-  I64 msg_code,a1,a2,result=-1,i,j;
+  I64 msg_code,a1,a2,res=-1,i,j;
   DocClear;
   "%s",header;
   DocRecalc(DocPut);
@@ -140,7 +140,7 @@ I64 DitherColor2(U8 *header=NULL)
       if (a1>=0 && a2>=0 && 0<=j<17 && 0<=i<17) {
 	if (j==16) j=TRANSPARENT;
 	if (i==16) i=TRANSPARENT;
-	result=j+i<<16+ROPF_DITHER;
+	res=j+i<<16+ROPF_DITHER;
 	goto dc_done;
       }
     }
@@ -150,7 +150,7 @@ I64 DitherColor2(U8 *header=NULL)
 dc_done:
   SettingsPop;
   FramePtrDel("DitherFrame");
-  return result;
+  return res;
 }
 
 public I64 PopUpColorDither(U8 *header=NULL)

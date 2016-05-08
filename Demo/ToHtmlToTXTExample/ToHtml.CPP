@@ -68,28 +68,28 @@ U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,
 U8 *TOSLinkCvt2(U8 *filename,I64 line_num)
 {// ::/  --> http://www.templeos.org/Wb/
 //Make your own LinkCvt routine
-  U8 *result=NULL,*st;
+  U8 *res=NULL,*st;
   if (filename) {
     st=ChgExt(filename,"html");
     if (st && StrLen(st)>3 && !StrNCmp(st+1,":/",2))
-      result=MStrPrint("http://www.templeos.org/Wb/%s#l%d",st+3,line_num);
+      res=MStrPrint("http://www.templeos.org/Wb/%s#l%d",st+3,line_num);
     Free(st);
   }
-  return result;
+  return res;
 }
 
 U8 *TOSLinkCvt1(U8 *link_st)
 {
   static CDoc *bible=NULL;
   static I64 locks=0;
-  U8 *result=NULL,*filename,*needle;
+  U8 *res=NULL,*filename,*needle;
   I64 i,num;
   if (link_st) {
     switch (i=EdLinkCvt(link_st,&filename,&needle,&num)) {
       case LK_FILE_LINE:
       case LK_PLAIN_LINE:
       case LK_FILE:
-	result=TOSLinkCvt2(filename,num);
+	res=TOSLinkCvt2(filename,num);
 	break;
       case -1:
       case LK_DEF:
@@ -105,17 +105,17 @@ U8 *TOSLinkCvt1(U8 *link_st)
 	if (!bible)
 	  bible=Adam("DocRead(\"%s\");",filename);
 	if (DocFind(bible,num,needle))
-	  result=TOSLinkCvt2(filename,bible->cur_entry->y+1);
+	  res=TOSLinkCvt2(filename,bible->cur_entry->y+1);
 	LBtr(&locks,0);
 	break;
       default:
 	if (DocFileEd(i,filename,needle,&num,EDF_UNCOLLAPSE|EDF_BAIL))
-	  result=TOSLinkCvt2(filename,num);
+	  res=TOSLinkCvt2(filename,num);
     }
     Free(filename);
     Free(needle);
   }
-  return result;
+  return res;
 }
 
 public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
@@ -148,7 +148,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";

@@ -11,7 +11,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   U8 *in_name,*out_name,*st;
   CDoc *doc;
   CDocEntry *doc_e,*doc_e1,**a;
-  I64 i,j,cnt=0,result;
+  I64 i,j,cnt=0,res;
 
   if (!_in_name) return 0;
   in_name=DftExt(_in_name,"TXT.Z");
@@ -41,7 +41,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   }
   QSort(a,cnt/entry_lines,entry_lines*sizeof(CDocEntry *),&DEPtrCompare);
 
-  result=0;
+  res=0;
   st=NULL;
   for (i=0;i<cnt;) {
     if (!unique || !st || StrCmp(a[i]->tag,st)) {
@@ -52,7 +52,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
 	doc->cur_col=0;
 	DocPrint(doc,"\n");
       }
-      result++;
+      res++;
     } else
       for (j=0;j<entry_lines && i<cnt;j++,i++) {
 	QueIns(a[i],doc->root.last);
@@ -66,13 +66,13 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   DocDel(doc);
   Free(in_name);
   Free(out_name);
-  return result; //Num Entries
+  return res; //Num Entries
 }
 
 I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
 {
   U8 *ptr,*ptr2;
-  I64 result=0,ch;
+  I64 res=0,ch;
   CDoc *doc_in=DocRead(filename);
   CDocEntry *doc_e=doc_in->root.next;
   while (doc_e!=doc_in) {
@@ -90,7 +90,7 @@ I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
 	*ptr=0;
 	if (*ptr2) {
 	  DocPrint(doc_out,"%s\n",ptr2);
-	  result++;
+	  res++;
 	}
 	*ptr=ch;
       }
@@ -98,59 +98,59 @@ I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
     doc_e=doc_e->next;
   }
   DocDel(doc_in);
-  return result;
+  return res;
 }
 public I64 Words(U8 *files_find_mask="*",U32 *chars_bmp=chars_bmp_alpha,
 	U8 *fu_flags=NULL)
 {//Break file into list of not-unique words.
-  I64 fuf_flags=0,result=0;
+  I64 fuf_flags=0,res=0;
   CDoc *doc_out=DocNew;
   CDirEntry *tempde,*tempde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
   while (tempde) {
-    result+=DocWordsFile(doc_out,tempde->full_name,chars_bmp);
+    res+=DocWordsFile(doc_out,tempde->full_name,chars_bmp);
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
   DocInsDoc(NULL,doc_out);
   DocDel(doc_out);
-  return result;
+  return res;
 }
 
 I64 LongLinesFile(U8 *filename,I64 cols)
 {
-  I64 result=0;
+  I64 res=0;
   CDoc *doc=DocRead(filename);
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_NEW_LINE && doc_e->x>=cols+1)
-      result++;
+      res++;
     doc_e=doc_e->next;
   }
   DocDel(doc);
-  if (result) {
-    "%04d ",result;
+  if (res) {
+    "%04d ",res;
     PutFileLink(filename);
     '\n';
   }
-  return result;
+  return res;
 }
 public I64 LongLines(U8 *files_find_mask="*",I64 cols=80,U8 *fu_flags=NULL)
 {//Report files with lines of too many cols.
-  I64 result=0,fuf_flags=0;
+  I64 res=0,fuf_flags=0;
   CDirEntry *tempde,*tempde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+S");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
   while (tempde) {
     if (LongLinesFile(tempde->full_name,cols))
-      result++;
+      res++;
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
-  return result;
+  return res;
 }
 
 U0 SUFile(U8 *filename,I64 suf_flags,F64 indent_scale_factor)

@@ -41,7 +41,7 @@ If no message fit mask, return NULL immediately.
 Remove desired message, return $LK,"msg_code",A="MN:MSG_CMD"$.
 Note: This delivers messages from parent down to pop-up.
 */
-  I64 result,old_flags;
+  I64 res,old_flags;
   CSrvCmd *tempc,*tempc1;
   if (!task) task=Fs;
   old_flags=GetRFlags;
@@ -57,20 +57,20 @@ Note: This delivers messages from parent down to pop-up.
       if (tempc->cmd_code==SVCT_MSG) {
 	QueRem(tempc);
 	SetRFlags(old_flags);
-	result=tempc->msg_code;
+	res=tempc->msg_code;
 	if (_a1)
 	  *_a1=tempc->aux1;
 	if (_a2)
 	  *_a2=tempc->aux2;
 	SrvCmdDel(tempc);
-	if ((result!=MSG_KEY_DOWN || !(tempc->aux2&SCF_KEY_DESC) ||
-	      !Bt(&task->win_inhibit,WIf_SELF_KEY_DESC)) && Bt(&mask,result))
+	if ((res!=MSG_KEY_DOWN || !(tempc->aux2&SCF_KEY_DESC) ||
+	      !Bt(&task->win_inhibit,WIf_SELF_KEY_DESC)) && Bt(&mask,res))
 	  goto sm_done;
       }
     }
     SetRFlags(old_flags);
   }
-  result=MSG_NULL;
+  res=MSG_NULL;
   if (_a1)
     *_a1=0;
   if (_a2)
@@ -81,30 +81,30 @@ Note: This delivers messages from parent down to pop-up.
   }
 sm_done:
   SetRFlags(old_flags);
-  return result;
+  return res;
 }
 
 I64 FlushMsgs(CTask *task=NULL)
 {//Throw away all messages.  Return count.
-  I64 result=0,a1,a2;
+  I64 res=0,a1,a2;
   while (ScanMsg(&a1,&a2,~1,task))
-    result++;
-  return result;
+    res++;
+  return res;
 }
 
 I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL)
 {//Wait for a message of type specified by a one in the mask.
 //Throw-out all messages not in mask.
   //Returns $LK,"msg_code",A="MN:MSG_CMD"$. See $LK,"::/Demo/MsgLoop.CPP"$.
-  I64 result;
+  I64 res;
   if (!task) task=Fs;
   LBtr(&task->task_flags,TASKf_IDLE);
-  while (!(result=ScanMsg(_a1,_a2,mask,task))) {
+  while (!(res=ScanMsg(_a1,_a2,mask,task))) {
     LBts(&task->task_flags,TASKf_IDLE);
     Yield;
   }
   LBtr(&task->task_flags,TASKf_IDLE);
-  return result;
+  return res;
 }
 
 I64 ScanChar()

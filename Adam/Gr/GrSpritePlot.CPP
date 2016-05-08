@@ -331,33 +331,33 @@ public U0 SpriteExtents(U8 *elems,I64 *min_x=NULL,I64 *max_x=NULL,
 
 public CDC *Sprite2DC(U8 *elems)
 {//Convert sprite to device context.
-  CDC *result;
+  CDC *res;
   I64 min_x,max_x,min_y,max_y;
   SpriteExtents(elems,&min_x,&max_x,&min_y,&max_y);
-  result=DCNew(max_x-min_x+1,max_y-min_y+1);
-  Sprite3(result,-min_x,-min_y,0,elems);
-  return result;
+  res=DCNew(max_x-min_x+1,max_y-min_y+1);
+  Sprite3(res,-min_x,-min_y,0,elems);
+  return res;
 }
 
-public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
-{//The two CSprite should be identical except for points shifted around.
+public U8 *SpriteInterpolate(F64 t,U8 *elems0,U8 *elems1)
+{//The two CSprite should be ident except for points shifted around.
 //t ranges from 0.0 to 1.0.
   I64 i,t1=GR_SCALE*t,t0=GR_SCALE-t1;
   I32 *ptr0,*ptr1,*ptrr;
   CD3I32 *p0,*p1,*pr;
-  U8 *result;
+  U8 *res;
   CSprite *tempg0=elems0-offset(CSprite.start),
 	*tempg1=elems1-offset(CSprite.start),*tempgr;
   if (t<0.5) {
     i=SpriteSize(elems0),
-	  result=MAlloc(i);
-    MemCpy(result,elems0,i);
+	  res=MAlloc(i);
+    MemCpy(res,elems0,i);
   } else {
     i=SpriteSize(elems1),
-	  result=MAlloc(i);
-    MemCpy(result,elems1,i);
+	  res=MAlloc(i);
+    MemCpy(res,elems1,i);
   }
-  tempgr=result-offset(CSprite.start);
+  tempgr=res-offset(CSprite.start);
   while (tempg0->type) {
     if (tempg0->type!=tempg1->type)
       throw('Graphics');
@@ -447,7 +447,7 @@ public U8 *SpriteInterpolate(U8 *elems0,U8 *elems1,F64 t)
     tempg1(U8 *)+=SpriteElemSize(tempg1);
     tempgr(U8 *)+=SpriteElemSize(tempgr);
   }
-  return result;
+  return res;
 }
 
 #help_index "Graphics/Sprite;DolDoc/Output;StdOut/DolDoc"

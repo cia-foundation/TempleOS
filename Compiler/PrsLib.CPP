@@ -45,8 +45,8 @@ to a class by advancing 1 struct fwd
 for one * and two fwd for two **.
 */
   I64 i;
-  CHashClass *result=CAlloc(sizeof(CHashClass)*(MAX_PTR_STARS+1),Fs->code_heap),
-	*tempc=result;
+  CHashClass *res=CAlloc(sizeof(CHashClass)*(MAX_PTR_STARS+1),Fs->code_heap),
+	*tempc=res;
   for (i=0;i<=MAX_PTR_STARS;i++) {
     tempc->type=HTT_CLASS;
     tempc->raw_type=RT_PTR;
@@ -54,16 +54,16 @@ for one * and two fwd for two **.
     tempc->ptr_stars_cnt=i;
     tempc++;
   }
-  result->last_in_member_lst=&result->member_lst_and_root;
-  result->size=0;
-  return result;
+  res->last_in_member_lst=&res->member_lst_and_root;
+  res->size=0;
+  return res;
 }
 
 CHashFun *PrsFunNew()
 {
   I64 i;
-  CHashFun *result=CAlloc(sizeof(CHashFun)*(MAX_PTR_STARS+1),Fs->code_heap),
-	*tempf=result;
+  CHashFun *res=CAlloc(sizeof(CHashFun)*(MAX_PTR_STARS+1),Fs->code_heap),
+	*tempf=res;
   for (i=0;i<=MAX_PTR_STARS;i++) {
     tempf->type=HTT_FUN;
     tempf->raw_type=RT_PTR;
@@ -71,9 +71,9 @@ CHashFun *PrsFunNew()
     tempf->ptr_stars_cnt=i;
     tempf++;
   }
-  result->last_in_member_lst=&result->member_lst_and_root;
-  result->size=0;
-  return result;
+  res->last_in_member_lst=&res->member_lst_and_root;
+  res->size=0;
+  return res;
 }
 
 CIntermediateCode *ICAdd(CCmpCtrl *cc,
@@ -142,11 +142,11 @@ U0 COCAppend(CCmpCtrl *cc, CCodeCtrl *tempcbh)
 
 CCodeMisc *COCMiscNew(CCmpCtrl *cc,I64 ty)
 {
-  CCodeMisc *result=CAlloc(sizeof(CCodeMisc));
-  result->addr=INVALID_PTR;
-  result->type=ty;
-  QueIns(result,cc->coc.coc_last_misc);
-  return result;
+  CCodeMisc *res=CAlloc(sizeof(CCodeMisc));
+  res->addr=INVALID_PTR;
+  res->type=ty;
+  QueIns(res,cc->coc.coc_last_misc);
+  return res;
 }
 
 CCodeMisc *COCGoToLabelFind(CCmpCtrl *cc,U8 *name)
@@ -248,7 +248,7 @@ U0 COCHeaderPut(CCmpCtrl *cc,I64 pass,Bool put)
 
 U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
 {
-  U8 *result;
+  U8 *res;
   CCodeMisc *lb;
   I64 i,code_size,last_code_size;
 
@@ -296,25 +296,25 @@ U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
   } while (code_size<last_code_size);
 
   if (cc->flags&CCF_AOT_COMPILE)
-    result=MAlloc(code_size);
+    res=MAlloc(code_size);
   else
-    result=MAlloc(code_size,Fs->code_heap);
+    res=MAlloc(code_size,Fs->code_heap);
   COCHeaderPut(cc,10,FALSE);
-  code_size=OptPass789A(cc,reg_offsets,result,_dbg);
+  code_size=OptPass789A(cc,reg_offsets,res,_dbg);
 
   COCDel(cc,&cc->coc);
   if (Bt(&cc->opts,OPTf_TRACE)) {
     if (cc->flags&CCF_AOT_COMPILE) {
       if (cc->aotc->seg_size==16)
-	Un(result,code_size,16);
+	Un(res,code_size,16);
       else if (cc->aotc->seg_size==64)
-	Un(result,code_size,64);
+	Un(res,code_size,64);
       else
-	Un(result,code_size,32);
+	Un(res,code_size,32);
     } else
-      Un(result,code_size,64);
+      Un(res,code_size,64);
   }
   if (_code_size) *_code_size=code_size;
   cc->saved_pass_trace=cc->pass_trace;
-  return result;
+  return res;
 }

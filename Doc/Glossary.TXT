@@ -62,8 +62,9 @@ $FG,2$Glbl$FG$	Global
 $FG,2$Gr$FG$	Graphic
 $FG,2$IDE$FG$	Integrated Drive Electronics, Integrated Development Environment
 $FG,2$Id$FG$	Identification
-$FG,2$Ident$FG$	Identifier, Identity
+$FG,2$Ident$FG$	Identifier, Identity, Identical
 $FG,2$IDT$FG$	Interrupt Descriptor Table
+$FG,2$Idx$FG$	Index
 $FG,2$Init$FG$	Initialize
 $FG,2$Ins$FG$	Insert
 $FG,2$Inst$FG$	Instruction
@@ -98,12 +99,13 @@ $FG,2$Poly$FG$	Polygon
 $FG,2$Pos$FG$	Position
 $FG,2$Pow$FG$	Power
 $FG,2$Prec$FG$	Precedence
+$FG,2$Prev$FG$	Previous
 $FG,2$Pri$FG$	Primary
 $FG,2$Prod$FG$	Product, Production
 $FG,2$Prof$FG$	Profile, Profiler
 $FG,2$Prs$FG$	Parse, Parser
 $FG,2$Prt$FG$	Partition
-$FG,2$FunSeg$FG$	Program Section
+$FG,2$FunSeg$FG$ Program Section
 $FG,2$Pt$FG$	Point
 $FG,2$Ptr$FG$	Pointer
 $FG,2$Que$FG$	Queue
@@ -112,6 +114,7 @@ $FG,2$Ref$FG$	Reference
 $FG,2$Reg$FG$	Register, Registry, Regular
 $FG,2$Rem$FG$	Remove
 $FG,2$Rep$FG$	Report, Repeat
+$FG,2$Res$FG$	Result
 $FG,2$Rqst$FG$	Request
 $FG,2$Rst$FG$	Reset
 $FG,2$Rot$FG$	Rotation
@@ -233,7 +236,7 @@ $FG,5$lower_case$FG$
   Local function vars and glbl vars are lower case.  Class member names are also lower_case.
 
 $FG,5$_lower_case$FG$
-  Function args which are outputs (passed as ptrs) have leading underscores.  Also, args which have identically named local variable counterparts have leading underscores. 
+  Function args which are outputs (passed as ptrs) have leading underscores.  Also, args which have idently named local variable counterparts have leading underscores. 
 
 $FG,5$DOCf_????$FG$
   Flags bit nums instead of bit values are designated with a lower case $FG,2$f$FG$.
@@ -241,7 +244,7 @@ $FG,5$DOCf_????$FG$
 $FG,5$DOCG_????$FG$
   Flag groups are designated with "$FG,2$G$FG$".
 
-$FG,5$result$FG$ is reserved for local variables that hold the function return val.
+$FG,5$res$FG$ is reserved for local variables that hold the function return val.
 
 $FG,5$*$FG$ I used C++ like naming.  I place $FG,2$New$FG$, $FG,2$Del$FG$, $FG,2$Init$FG$, $FG,2$Rst$FG$, ect. on the end of a function name instead of at the beginning.  $FG,2$RstMusicSettings$FG$ should be $FG,2$MusicSettingsRst$FG$.
 $ID,-2$$TR,"Fs"$

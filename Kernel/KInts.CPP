@@ -89,14 +89,14 @@ INT_FAULT_ERR_CODE_BITMAP::
 
 U8 *IntEntryGet(I64 irq)
 {//Get interrupt vector.
-  U8 *result;
+  U8 *res;
   I64 *src;
   src=dev.idt(U8 *)+irq*16;
-  result(I64).u16[0]=*src(U16 *);
+  res(I64).u16[0]=*src(U16 *);
   src(U8 *)+=6;
-  result(I64).u16[1]=*src(U16 *)++;
-  result(I64).u32[1]=*src(U32 *);
-  return result;
+  res(I64).u16[1]=*src(U16 *)++;
+  res(I64).u32[1]=*src(U32 *);
+  return res;
 }
 
 U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
@@ -104,10 +104,10 @@ U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
 //See $LK,"::/Demo/Lectures/InterruptDemo.CPP"$.
   //See $LK,"::/Demo/MultiCore/Interrupts.CPP"$.
   I64 fp=fp_new_handler;
-  U8 *result,*dst;
+  U8 *res,*dst;
   PUSHFD
   CLI
-  result=IntEntryGet(irq);
+  res=IntEntryGet(irq);
   dst=dev.idt(U8 *)+irq*16;
   *dst(U16 *)++=fp.u16[0];
   *dst(U16 *)++=offset(CGDT.cs64);
@@ -116,7 +116,7 @@ U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
   *dst(U32 *)++=fp.u32[1];
   *dst(U32 *)=0;
   POPFD
-  return result;
+  return res;
 }
 
 U0 IntsInit()
@@ -159,7 +159,7 @@ interrupt U0 IntDivZero()
 U8 *IntFaultHandlersNew()
 {
   I64 i;
-  U8 *result=MAlloc(256*7,Fs->code_heap),*dst=result;
+  U8 *res=MAlloc(256*7,Fs->code_heap),*dst=res;
   for (i=0;i<256;i++) {
     *dst++=0x6A; //PUSH I8 xx
     *dst(I8 *)++=i;
@@ -167,7 +167,7 @@ U8 *IntFaultHandlersNew()
     *dst(I32 *)=INT_FAULT-dst-4;
     dst+=4;
   }
-  return result;
+  return res;
 }
 
 U0 IntInit1()

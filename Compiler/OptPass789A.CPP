@@ -57,7 +57,7 @@ cc->pass==10 is final pass, code is placed into buf.
     cc->cur_ic_float_op_num=0;
     if (!(tempi->ic_flags &ICF_CODE_FINAL)) {
       tempi->ic_flags=tempi->ic_flags&
-	    ~(ICF_PREVIOUS_DELETED|ICF_DONT_RESTORE)|ICF_CODE_FINAL;
+	    ~(ICF_PREV_DELETED|ICF_DONT_RESTORE)|ICF_CODE_FINAL;
       if (cc->pass==7)
 	cc->dont_push_float=Btr(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0);
       MemCpy(saved_p123,&tempi->a1,3*sizeof(CICArg));
@@ -1067,10 +1067,10 @@ cc->pass==10 is final pass, code is placed into buf.
       }
     }
     cnt=tempi->ic_cnt;
-    if (tempi->ic_flags&ICF_DEL_PREVIOUS_INS) {
+    if (tempi->ic_flags&ICF_DEL_PREV_INS) {
       if (cc->pass>8)
 	cnt=tempi->ic_last_cnt;
-      tempi->ic_flags&=~ICF_DEL_PREVIOUS_INS;
+      tempi->ic_flags&=~ICF_DEL_PREV_INS;
     }
     if (cnt && buf)
       MemCpy(buf+ip,tempi->ic_body,cnt);

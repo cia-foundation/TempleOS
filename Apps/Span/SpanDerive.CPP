@@ -14,7 +14,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   while (tempm1!=&ode->next_mass) {
     tempm2=tempm1->next;
     while (tempm2!=&ode->next_mass) {
-      D3Sub(&tempm2->state->x,&tempm1->state->x,&p);
+      D3Sub(&p,&tempm2->state->x,&tempm1->state->x);
       dd=D3NormSqr(&p);
       if (dd<=Sqr(tempm1->radius+tempm2->radius)) {
 	d=Sqrt(dd)+0.0001;
@@ -39,7 +39,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     p2.x=ip.pos.x-task->pix_left-task->scroll_x;
     p2.y=ip.pos.y-task->pix_top-task->scroll_y;
     p2.z=0;
-    D3Sub(&p2,&cursor_mass->state->x,&p);
+    D3Sub(&p,&p2,&cursor_mass->state->x);
     d=10.0*D3NormSqr(&p);
     D3MulEqu(&p,d);
     D3AddEqu(&cursor_mass->DstateDt->DxDt,&p);

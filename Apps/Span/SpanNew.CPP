@@ -25,7 +25,7 @@ U0 SpanDel(CMathODE *ode)
 U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
 {
   I64 cnt;
-  U8 *result,*ptr;
+  U8 *res,*ptr;
   MyMass   *tempm;
   MySpring *temps;
   SpanHeader h;
@@ -43,7 +43,7 @@ U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
 
   cnt=sizeof(SpanHeader)+h.num_masses*M_SIZE+h.num_springs*S_SIZE;
 
-  ptr=result=MAlloc(cnt);
+  ptr=res=MAlloc(cnt);
   MemCpy(ptr,&h,sizeof(SpanHeader));
   ptr+=sizeof(SpanHeader);
 
@@ -61,25 +61,25 @@ U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
     temps=temps->next;
   }
   if (_size) *_size=cnt;
-  return result;
+  return res;
 }
 
 Bool SpanWrite(CMathODE *ode)
 {
   U8 *name,*buf;
   I64 size;
-  Bool result=FALSE,old_silent=Silent;
+  Bool res=FALSE,old_silent=Silent;
   MkDir("::/Home/Span");
   Silent(old_silent);
   if (name=PopUpFileName("::/Home/Span/Game.DAT")) {
     if (buf=SpanSave(ode,&size)) {
       FileWrite(name,buf,size);
       Free(buf);
-      result=TRUE;
+      res=TRUE;
     }
     Free(name);
   }
-  return result;
+  return res;
 }
 
 U0 SpanLoad(CMathODE *ode,U8 *src)

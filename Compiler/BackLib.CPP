@@ -4,7 +4,7 @@ RAX,RBX,RCX and RDX can be clobbered by
 each intermediate code's output code.
 However, intermediate codes must be
 coupled together based on the arg and
-result type specifications in the
+res type specifications in the
 $LK,"CICArg",A="MN:CICArg"$.  RAX is the most common reg
 for coupling intermediate codes.
 
@@ -94,9 +94,9 @@ U0 ICAddRSP(CIntermediateCode *tempi,I64 i,Bool optimize=TRUE)
       if (tempi==tempil1) {
 	tempi->ic_cnt=tempi->ic_last_cnt;
 	i+=j;
-      } else if (!(tempi->ic_flags&ICF_PREVIOUS_DELETED)) {
-	tempil1->ic_flags|=ICF_DEL_PREVIOUS_INS;
-	tempi->ic_flags=tempi->ic_flags&~ICF_CODE_FINAL|ICF_PREVIOUS_DELETED;
+      } else if (!(tempi->ic_flags&ICF_PREV_DELETED)) {
+	tempil1->ic_flags|=ICF_DEL_PREV_INS;
+	tempi->ic_flags=tempi->ic_flags&~ICF_CODE_FINAL|ICF_PREV_DELETED;
 	i+=j;
       }
     }
@@ -137,81 +137,81 @@ extern U0 ICMov(CIntermediateCode *tempi,
 #define MODR_RIP_REL			7
 
 I64 ICModr1(I64 r,CICType t2,I64 r2,I64 d2)
-{//result.u8[0] is type
-//result.u8[1] is REX
-  //result.u8[2] is ModR
-  //result.u8[3] is SIB
-  I64 result=0;
+{//res.u8[0] is type
+//res.u8[1] is REX
+  //res.u8[2] is ModR
+  //res.u8[3] is SIB
+  I64 res=0;
   if (t2.raw_type<RT_I64)
-    result.u8[1]=0x40;
+    res.u8[1]=0x40;
   else
-    result.u8[1]=0x48;
+    res.u8[1]=0x48;
   if (r>7) {
-    result.u8[1]+=4;
+    res.u8[1]+=4;
     r&=7;
   }
   switch (Bsr(t2)) {
     case MDf_REG:
       if (r2>7) {
-	result.u8[1]++;
+	res.u8[1]++;
 	r2&=7;
       }
-      result.u8[2]=0xC0+r<<3+r2;
-      result.u8[0]=MODR_REG;
-      if (result.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4 && r2<4))
-	result.u8[1]=0;
+      res.u8[2]=0xC0+r<<3+r2;
+      res.u8[0]=MODR_REG;
+      if (res.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4 && r2<4))
+	res.u8[1]=0;
       break;
     case MDf_DISP:
       if (r2>7) {
-	result.u8[1]++;
+	res.u8[1]++;
 	r2&=7;
       }
       if (!d2 && r2!=REG_RBP) {
-	result.u8[2]=r<<3+r2;
-	result.u8[0]=MODR_INDIRECT_REG;
+	res.u8[2]=r<<3+r2;
+	res.u8[0]=MODR_INDIRECT_REG;
       } else if (MIN_I8<=d2<=MAX_I8) {
-	result.u8[2]=0x40+r<<3+r2;
-	result.u8[0]=MODR_D8_INDIRECT_REG;
+	res.u8[2]=0x40+r<<3+r2;
+	res.u8[0]=MODR_D8_INDIRECT_REG;
       } else {
-	result.u8[2]=0x80+r<<3+r2;
-	result.u8[0]=MODR_D32_INDIRECT_REG;
+	res.u8[2]=0x80+r<<3+r2;
+	res.u8[0]=MODR_D32_INDIRECT_REG;
       }
-      if (result.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
-	result.u8[1]=0;
+      if (res.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
+	res.u8[1]=0;
       break;
     case MDf_SIB:
       if (7<r2.u8[0]<REG_NONE)
-	result.u8[1]++;
+	res.u8[1]++;
       if (r2.u8[1]&15>7)
-	result.u8[1]+=2;
+	res.u8[1]+=2;
       if (r2.u8[0]==REG_NONE) {
-	result.u8[3]=5+(r2.u8[1]&7)<<3+r2.u8[1]&0xC0;
-	result.u8[2]=4+r<<3;
-	result.u8[0]=MODR_SIB_D32_INDIRECT_REG;
+	res.u8[3]=5+(r2.u8[1]&7)<<3+r2.u8[1]&0xC0;
+	res.u8[2]=4+r<<3;
+	res.u8[0]=MODR_SIB_D32_INDIRECT_REG;
       } else {
-	result.u8[3]=r2.u8[0]&7+(r2.u8[1]&7)<<3+r2.u8[1]&0xC0;
+	res.u8[3]=r2.u8[0]&7+(r2.u8[1]&7)<<3+r2.u8[1]&0xC0;
 	if (!d2 && r2.u8[0]&7!=REG_RBP) {
-	  result.u8[2]=4+r<<3;
-	  result.u8[0]=MODR_SIB_INDIRECT_REG;
+	  res.u8[2]=4+r<<3;
+	  res.u8[0]=MODR_SIB_INDIRECT_REG;
 	} else if (MIN_I8<=d2<=MAX_I8) {
-	  result.u8[2]=0x44+r<<3;
-	  result.u8[0]=MODR_SIB_D8_INDIRECT_REG;
+	  res.u8[2]=0x44+r<<3;
+	  res.u8[0]=MODR_SIB_D8_INDIRECT_REG;
 	} else {
-	  result.u8[2]=0x84+r<<3;
-	  result.u8[0]=MODR_SIB_D32_INDIRECT_REG;
+	  res.u8[2]=0x84+r<<3;
+	  res.u8[0]=MODR_SIB_D32_INDIRECT_REG;
 	}
       }
-      if (result.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
-	result.u8[1]=0;
+      if (res.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
+	res.u8[1]=0;
       break;
     case MDf_RIP_DISP32:
-      result.u8[2]=0x05+r<<3;
-      result.u8[0]=MODR_RIP_REL;
-      if (result.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
-	result.u8[1]=0;
+      res.u8[2]=0x05+r<<3;
+      res.u8[0]=MODR_RIP_REL;
+      if (res.u8[1]==0x40 && (t2.raw_type>=RT_I16 || r<4))
+	res.u8[1]=0;
       break;
   }
-  return result;
+  return res;
 }
 
 U0 ICModr2(CIntermediateCode *tempi,I64 i,I64 d,I64 ip=0)

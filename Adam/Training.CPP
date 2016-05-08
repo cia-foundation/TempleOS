@@ -4,7 +4,7 @@ U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
 	U8 *desc,CTask *task=NULL)
 {
   I64 i=9,k,c;
-  U8 *st,*st2,*result,*ptr;
+  U8 *st,*st2,*res,*ptr;
   CHashTable *old_hash=Fs->hash_table;
   st=ScanCode2KeyName(sc);
   if (sc&SCF_CTRL)	i+=5;
@@ -21,19 +21,19 @@ U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
   else if (k=='Cmd ')	c=RED;
   else			c=BLACK;
 
-  result=MStrPrint("%-*s $$FG,%d$$$$TX+UL+L+PU,\"%Q\",A=\"%s\"$$$$FG$$\n",
+  res=MStrPrint("%-*s $$FG,%d$$$$TX+UL+L+PU,\"%Q\",A=\"%s\"$$$$FG$$\n",
 	i,st,c,desc,st2);
   Free(st);
   Free(st2);
 
-  ptr=result;
+  ptr=res;
   while (*ptr) {
     if (*ptr==CH_SPACE)
       *ptr=CH_SHIFT_SPACE;
     ptr++;
   }
 
-  return result;
+  return res;
 }
 
 U0 KeyMapKeyPrint(I64 sc,U0 (*fp_handler)(I64 sc),U8 *desc,CTask *task=NULL)

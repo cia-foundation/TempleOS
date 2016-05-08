@@ -56,7 +56,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   CDocBin *b;
   Bool unlock=DocLock(doc);
   I64 ch,cnt=1;//terminator
-  U8 *st,*result,*dst,*src;
+  U8 *st,*res,*dst,*src;
 
   if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)))
     DocBinsValidate(doc);
@@ -103,8 +103,8 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   for (b=doc->bin_root.next;b!=&doc->bin_root;b=b->next)
     if (b->use_cnt>b->temp_use_cnt)
       cnt+=offset(CDocBin.end)-offset(CDocBin.start)+b->size;
-  result=MAlloc(cnt);
-  dst=result;
+  res=MAlloc(cnt);
+  dst=res;
   doc_e=doc->root.next;
   while (doc_e!=doc) {
     doc_e1=doc_e->next;
@@ -167,7 +167,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   if (_size) *_size=cnt;
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public Bool DocWrite(CDoc *doc,Bool prompt=FALSE)
@@ -244,7 +244,7 @@ public U0 StreamDoc(CDoc *doc)
 #help_index "DolDoc"
 Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
 {
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   I64 time_stamp,flags;
   CDocUndo *u;
   if (doc->flags&DOCF_ALLOW_UNDO) {
@@ -263,12 +263,12 @@ Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
       doc->flags&=~DOCF_UNDO_DIRTY;
       doc->undo_cnt++;
       u->doc_flags=doc->flags;
-      result=TRUE;
+      res=TRUE;
     }
     if (unlock)
       DocUnlock(doc);
   }
-  return result;
+  return res;
 }
  
 U0 DocUndoRestore(CDoc *doc)
@@ -298,7 +298,7 @@ U0 DocUndoRestore(CDoc *doc)
 	"DolDoc/Output;StdOut/DolDoc"
 public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to document.
-  Bool result=FALSE;
+  Bool res=FALSE;
   CDoc *doc2;
   if (!doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
     return FALSE;
@@ -308,20 +308,20 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
     if (IsRaw)
       DocDump(doc2,100000);
     DocDel(doc2);
-    result=TRUE;
+    res=TRUE;
   } else if (FilesFindMatch(filename,"*.BMP.Z")) {
     DocBMP(doc,filename,,FALSE);
-    result=TRUE;
+    res=TRUE;
   } else if (FilesFindMatch(filename,"*.BMP;*.bmp")) {
     DocBMP(doc,filename,,TRUE);
-    result=TRUE;
+    res=TRUE;
   } else if (FilesFindMatch(filename,"*.GRA*")) {
     DocGRA(doc,filename);
-    result=TRUE;
+    res=TRUE;
   }
-  if (result)
+  if (res)
     DocPrint(doc,"%h*c",trailing_new_lines,'\n');
-  return result;
+  return res;
 }
 
 #help_index "Graphics/Windows BMP Files;Graphics/GRA Files;"\

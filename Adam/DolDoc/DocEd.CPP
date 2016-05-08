@@ -79,7 +79,7 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
 	old_top =Fs->win_top, old_bottom=Fs->win_bottom,
 	old_left=Fs->win_left,old_right =Fs->win_right,
 	old_title_src=Fs->title_src;
-  Bool result,unlock;
+  Bool res,unlock;
   U8 *old_task_title;
   if (dof_flags&DOF_WIN_MAX)
     WinMax;
@@ -155,10 +155,10 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
     if (doc->flags&DOCF_MIN_SIZE)
       WinMgrSync(2,TRUE);
   }
-  result=View;
+  res=View;
 
   DocLock(doc);
-  if (result) {
+  if (res) {
     doc_e=doc->root.next;
     while (doc_e!=doc) {
       if (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_CHECK_BOX)
@@ -182,7 +182,7 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
     WinHorz(old_left,old_right);
     WinVert(old_top,old_bottom);
   }
-  return result;
+  return res;
 }
 
 #help_index "DolDoc/Cmd Line (Typically);Cmd Line (Typically)"
@@ -190,7 +190,7 @@ public Bool Ed(U8 *link_st,I64 edf_dof_flags=0)
 {//Invoke document editor.
   U8 *filename,*needle_str;
   I64 i,num;
-  Bool cont,result=FALSE;
+  Bool cont,res=FALSE;
   CDoc *doc;
 
   switch (i=EdLinkCvt(link_st,&filename,&needle_str,&num,edf_dof_flags)) {
@@ -211,11 +211,11 @@ ej_doc:
 	DocDel(doc);
       }
       if (!(edf_dof_flags&EDF_WAS_WRITE))
-	result=TRUE;
+	res=TRUE;
       break;
     default:
       if (IsRaw)
-	result=EdLite(filename,num,edf_dof_flags);
+	res=EdLite(filename,num,edf_dof_flags);
       else {
 	cont=TRUE;
 	if (!(edf_dof_flags&EDF_BAIL) && !(LK_DOC<=i<=LK_DOC_LINE) &&
@@ -223,28 +223,28 @@ ej_doc:
 	      !PopUpCancelOk(ST_WARN_ST "Not Text File\n\n"))
 	  cont=FALSE;
 	if (cont)
-	  result=DocFileEd(i,filename,needle_str,&num,edf_dof_flags);
+	  res=DocFileEd(i,filename,needle_str,&num,edf_dof_flags);
       }
   }
   Free(filename);
   Free(needle_str);
-  return result;
+  return res;
 }
 
 public Bool Plain(U8 *filename,I64 edf_dof_flags=0)
 {//Edit document in plain text mode, so dollar signs are not special.
-  Bool result;
+  Bool res;
   U8 *st=MStrPrint("PI:%s",filename);
-  result=Ed(st,edf_dof_flags);
+  res=Ed(st,edf_dof_flags);
   Free(st);
-  return result;
+  return res;
 }
 
 #help_index "DolDoc;Task/Srv/Exe"
 public I64 PopUpEd(U8 *filename,CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Create PopUp win task and edit a doc.
   U8 *st=MStrPrint("Ed(\"%Q\");",filename);
-  I64 result=PopUp(st,parent,_pu_task);
+  I64 res=PopUp(st,parent,_pu_task);
   Free(st);
-  return result;
+  return res;
 }

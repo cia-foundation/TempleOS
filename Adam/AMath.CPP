@@ -18,12 +18,12 @@ public U0 P2R(F64 *_x=NULL,F64 *_y=NULL,F64 mag,F64 arg)
 
 public F64 Wrap(F64 é,F64 base=-ã)
 {//Returns angle in range [base,base+2*ã)
-  F64 result=é%(2*ã);
-  if (result>=base+2*ã)
-    result-=2*ã;
-  else if (result<base)
-    result+=2*ã;
-  return result;
+  F64 res=é%(2*ã);
+  if (res>=base+2*ã)
+    res-=2*ã;
+  else if (res<base)
+    res+=2*ã;
+  return res;
 }
 
 public I64 DistSqrI64(I64 x1,I64 y1,I64 x2,I64 y2)
@@ -65,29 +65,29 @@ public F64 Cosh(F64 x)
 }
 
 #help_index "Math/Complex;Data Types/Complex"
-public Complex *CAdd(Complex *n1,Complex *n2,Complex *sum)
-{//n1 + n2 -->sum
+public Complex *CAdd(Complex *sum,Complex *n1,Complex *n2)
+{//sum=n1+n2
   sum->x=n1->x+n2->x;
   sum->y=n1->y+n2->y;
   return sum;
 }
 
-public Complex *CSub(Complex *n1,Complex *n2,Complex *diff)
-{//n1 - n2 -->diff
+public Complex *CSub(Complex *diff,Complex *n1,Complex *n2)
+{//diff=n1-n2
   diff->x=n1->x-n2->x;
   diff->y=n1->y-n2->y;
   return diff;
 }
 
-public Complex *CMul(Complex *n1,Complex *n2,Complex *prod)
-{//n1 * n2 -->prod
+public Complex *CMul(Complex *prod,Complex *n1,Complex *n2)
+{//prod=n1*n2
   prod->x=n1->x*n2->x-n1->y*n2->y;
   prod->y=n1->x*n2->y+n1->y*n2->x;
   return prod;
 }
 
-public Complex *CDiv(Complex *n1,Complex *n2,Complex *quot)
-{//n1 / n2 -->quot
+public Complex *CDiv(Complex *quot,Complex *n1,Complex *n2)
+{//quot=n1/n2
   F64 m1,a1,m2,a2;
   R2P(&m1,&a1,n1->x,n1->y);
   R2P(&m2,&a2,n2->x,n2->y);
@@ -99,7 +99,7 @@ public Complex *CDiv(Complex *n1,Complex *n2,Complex *quot)
 }
 
 public Complex *CScale(Complex *dst,F64 s)
-{//dst *= s
+{//dst*=s
   dst->x*=s;
   dst->y*=s;
   return dst;
@@ -113,22 +113,21 @@ public Complex *CCopy(Complex *dst,Complex *src)
 }
 
 public Complex *CEqu(Complex *dst,F64 x,F64 y)
-{//dst=x,y
+{//dst=(x,y)
   dst->x=x;
   dst->y=y;
   return dst;
 }
 
-public Complex *CPoly(Complex *dst,Complex *x,Complex *zeros,I64 n)
-{//Eval complex polynomial.
+public Complex *CPoly(Complex *dst,I64 n,Complex *zeros,Complex *x)
+{//Eval complex polynomial
   I64 i;
   Complex n1,n2;
   if (n>0) {
-    CSub(x,&zeros[0],dst);
+    CSub(dst,x,&zeros[0]);
     for (i=1;i<n;i++) {
       CCopy(&n1,dst);
-      CSub(x,&zeros[i],&n2);
-      CMul(&n1,&n2,dst);
+      CMul(dst,&n1,CSub(&n2,x,&zeros[i]));
     }
   } else
     CEqu(dst,1.0,0.0);

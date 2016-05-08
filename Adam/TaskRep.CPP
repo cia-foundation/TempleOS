@@ -6,9 +6,8 @@ U0 TaskRepTask(CTask *task,I64 indent)
   st=MStrPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
   "%h*c%s $$TX,\"%Q...\",SCX=16$$ Mem:%08X\n",indent,CH_SPACE,
 	st,desc,TaskMemAlloced(task);
-  "%h*cFlags:%04X:%04X Time:%0.2fm\n",indent+2,CH_SPACE,
-	task->task_flags,task->display_flags,
-	task->total_time/60.0/cnts.time_stamp_freq_initial;
+  "%h*cFlags:%04X:%04X:%08X\n",indent+2,CH_SPACE,
+	task->task_flags,task->display_flags,task->win_inhibit;
   Free(st);
   Free(desc);
   task1=task->next_child_task;

@@ -1,10 +1,10 @@
-F64 Clamp(F64 num,F64 lo,F64 hi)
+F64 Clamp(F64 d,F64 lo,F64 hi)
 {//Clamp to F64 [] range.
-  if (num<lo)
+  if (d<lo)
     return lo;
-  if (num>hi)
+  if (d>hi)
     return hi;
-  return num;
+  return d;
 }
 
 F64 Min(F64 n1,F64 n2)
@@ -121,8 +121,8 @@ U64 RandU64()
 
 F64 Rand()
 {//Random F64.
-  I64 result=RandI64&0x3FFFFFFFFFFFFFFF;
-  return result/ToF64(0x4000000000000000);
+  I64 res=RandI64&0x3FFFFFFFFFFFFFFF;
+  return res/ToF64(0x4000000000000000);
 }
 
 I64 Seed(I64 seed=0,CTask *task=NULL)

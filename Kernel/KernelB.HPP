@@ -121,9 +121,9 @@ public _intern IC_TO_I64 I64 ToI64(F64 d);  //Convert to I64. Truncates.
 public _extern _ARG F64 Arg(F64 x,F64 y); //Polar coordinate angle.
 public _extern _CEIL F64 Ceil(F64 d); //Ceiling of F64.
 public _extern _CLAMP_I64 I64 ClampI64(
-	I64 dv,I64 lo,I64 hi); //Clamp to I64 [] range.
+	I64 num,I64 lo,I64 hi); //Clamp to I64 [] range.
 public _extern _CLAMP_U64 U64 ClampU64(
-	U64 dv,U64 lo,U64 hi); //Clamp to U64 [] range.
+	U64 num,U64 lo,U64 hi); //Clamp to U64 [] range.
 public _extern _EXP F64 Exp(F64 d); //Exponential function.
 _extern _FCLEX U0 Fclex();
 _extern _FLDCW U0 Fldcw(U16 w);
@@ -143,30 +143,24 @@ public _extern _TRUNC F64 Trunc(F64 d); //Truncate F64.
 
 #help_index "Math/CD3;Data Types/CD3"
 #help_file "::/Doc/D3"
-public _extern _D3_ADD CD3 *D3Add(
-	CD3 *d1,CD3 *d2,CD3 *sum); //d1+d2 -->sum
-public _extern _D3_ADD_EQU CD3 *D3AddEqu(
-	CD3 *sum,CD3 *d); //sum+=d
-public _extern _D3_COPY CD3 *D3Copy(
-	CD3 *dst,CD3 *src); //dst=src
-public _extern _D3_CROSS CD3 *D3Cross(
-	CD3 *d1,CD3 *d2,CD3 *prod); //d1 x d2 -->prod
-public _extern _D3_DIST F64 D3Dist(
-	CD3 *d1,CD3 *d2); //Dist between d1 & d2
-public _extern _D3_DIST_SQR F64 D3DistSqr(
-	CD3 *d1,CD3 *d2); //Dist Squared between d1 & d2
-public _extern _D3_DIV CD3 *D3Div(F64 s,CD3 *d,CD3 *quot); //1/s * d -->quot
-public _extern _D3_DIV_EQU CD3 *D3DivEqu(CD3 *quot,F64 s); //quot *= 1/s
+public _extern _D3_ADD CD3 *D3Add(CD3 *sum,CD3 *d1,CD3 *d2); //sum=d1+d2
+public _extern _D3_ADD_EQU CD3 *D3AddEqu(CD3 *sum,CD3 *d); //sum+=d
+public _extern _D3_COPY CD3 *D3Copy(CD3 *dst,CD3 *src); //dst=src
+public _extern _D3_CROSS CD3 *D3Cross(CD3 *prod,CD3 *d1,CD3 *d2); //prod=d1xd2
+public _extern _D3_DIST F64 D3Dist(CD3 *d1,CD3 *d2); //Distance
+public _extern _D3_DIST_SQR F64 D3DistSqr(CD3 *d1,CD3 *d2); //Distance Squared
+public _extern _D3_DIV CD3 *D3Div(CD3 *quot,CD3 *d,F64 s); //quot=d/s
+public _extern _D3_DIV_EQU CD3 *D3DivEqu(CD3 *quot,F64 s); //quot/=s
 public _extern _D3_DOT F64 D3Dot(CD3 *d1,CD3 *d2); //d1 dot d2
-public _extern _D3_EQU CD3 *D3Equ(CD3 *dst,F64 x,F64 y,F64 z); // dst=x,y,z
-public _extern _D3_MUL CD3 *D3Mul(F64 s,CD3 *d,CD3 *prod); //s * d -->prod
-public _extern _D3_MUL_EQU CD3 *D3MulEqu(CD3 *prod,F64 s); //prod *= s
-public _extern _D3_NORM F64 D3Norm(CD3 *d); //Norm d
-public _extern _D3_NORM_SQR F64 D3NormSqr(CD3 *d); //Norm Squared d
-public _extern _D3_SUB CD3 *D3Sub(CD3 *d1,CD3 *d2,CD3 *diff); //d1-d2 -->diff
+public _extern _D3_EQU CD3 *D3Equ(CD3 *dst,F64 x,F64 y,F64 z); //dst=(x,y,z)
+public _extern _D3_MUL CD3 *D3Mul(CD3 *prod,F64 s,CD3 *d); //prod=s*d
+public _extern _D3_MUL_EQU CD3 *D3MulEqu(CD3 *prod,F64 s); //prod*=s
+public _extern _D3_NORM F64 D3Norm(CD3 *d); //Norm
+public _extern _D3_NORM_SQR F64 D3NormSqr(CD3 *d); //Norm Squared
+public _extern _D3_SUB CD3 *D3Sub(CD3 *diff,CD3 *d1,CD3 *d2); //diff=d1-d2
 public _extern _D3_SUB_EQU CD3 *D3SubEqu(CD3 *diff,CD3 *d); //diff-=d
-public _extern _D3_UNIT CD3 *D3Unit(CD3 *d); //Convert to unit vect
-public _extern _D3_ZERO CD3 *D3Zero(CD3 *dst); //Convert to zero
+public _extern _D3_UNIT CD3 *D3Unit(CD3 *d); //To unit vect
+public _extern _D3_ZERO CD3 *D3Zero(CD3 *dst); //To zero
 
 #help_index "Memory"
 public _extern _MEMCMP I64 MemCmp(
@@ -255,7 +249,7 @@ public _intern IC_SET_RBP U0 SetRBP(U8 *d); //Set RBP register value.
 public _intern IC_SET_RFLAGS U0 SetRFlags(I64 d); //Set RFlags register value.
 public _intern IC_SET_RSP U0 SetRSP(U8 *d); //Set RSP register value.
 public _extern _CPUID U0 CPUId(
-	U32 rax,CRAXRBCRCXRDX *result); //Do CPUID inst.
+	U32 rax,CRAXRBCRCXRDX *res); //Do CPUID inst.
 public _extern _LXCHG_I64 I64 LXchgI64(I64 *dst,I64 d); //Locked eXchange I64s.
 public _extern _LXCHG_U16 U16 LXchgU16(U16 *dst,U16 d); //Locked eXchange U16s.
 public _extern _LXCHG_U32 U32 LXchgU32(U32 *dst,U32 d); //Locked eXchange U32s.
@@ -282,6 +276,7 @@ public _intern IC_INVLPG
 public _intern IC_FS CTask *Fs(); //FS seg reg points to the current $LK,"CTask",A="MN:CTask"$.
 
 #help_index "Time/CPU Cycles"
+#help_file "::/Doc/TimeCycles"
 public _intern IC_RDTSC I64 GetTSC(); //Get time stamp counter.
 
 #help_index "Time/HPET"

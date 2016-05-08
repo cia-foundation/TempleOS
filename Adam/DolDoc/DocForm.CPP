@@ -111,7 +111,7 @@ U0 DocDataFmt(CDoc *doc,CDocEntry *doc_e,I64 d=DOCM_CANCEL)
     } else if (doc_e->de_flags & DOCEF_LST) {
       if (doc_e->de_flags & DOCEF_DEFINE && (temph=HashFind(doc_e->define_str,
 	    doc->win_task->hash_table,HTT_DEFINE_STR)) && 0<=d<temph->cnt) {
-	ptr=MStrPrint("[%s]",temph->sub_lst[d]);
+	ptr=MStrPrint("[%s]",temph->sub_idx[d]);
 	Free(doc_e->tag);
 	doc_e->tag=StrNew(ptr,doc->mem_task);
 	Free(ptr);
@@ -215,7 +215,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   U8 *fmtstr;
   CHashClass *tempc,*tempc2;
   CDoc *doc;
-  Bool result=FALSE;
+  Bool res=FALSE;
   I64 old_border_src=Fs->border_src,has_action;
   if (!(tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS)))
     return FALSE;
@@ -265,10 +265,10 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     DocRecalc(doc);
     if (DocEd(doc,dof_flags)) {
       doc_e=doc->cur_entry;
-      result=TRUE;
+      res=TRUE;
       if (doc_e!=doc) {
 	if (DocEntryRun(doc,doc_e,TRUE,&has_action)==DOCM_CANCEL && has_action)
-	  result=FALSE;
+	  res=FALSE;
 	DocUnlock(doc);
       }
     }
@@ -283,7 +283,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   }
   DocDel(doc);
   Fs->border_src=old_border_src;
-  return result;
+  return res;
 }
 
 U0 DocMenuEndTaskCB()
@@ -297,7 +297,7 @@ public I64 DocMenu(CDoc *m,I64 dof_flags=0)
   U8 *old_end_cb=Fs->task_end_cb;
   Bool old_break_shift_esc=LBts(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC);
   CDocEntry *doc_e;
-  I64 old_border_src=Fs->border_src,result=DOCM_CANCEL,has_action;
+  I64 old_border_src=Fs->border_src,res=DOCM_CANCEL,has_action;
   Fs->task_end_cb=&DocMenuEndTaskCB;
   try {
     if (m) {
@@ -307,10 +307,10 @@ dm_restart:
       if (DocEd(m,dof_flags)) {
 	doc_e=m->cur_entry;
 	if (doc_e!=m) {
-	  result=DocEntryRun(m,doc_e,TRUE,&has_action);
+	  res=DocEntryRun(m,doc_e,TRUE,&has_action);
 	  DocUnlock(m);
 	  if (!has_action) {
-	    result=DOCM_CANCEL;
+	    res=DOCM_CANCEL;
 	    dof_flags|=DOF_DONT_HOME;
 	    goto dm_restart;
 	  }
@@ -327,7 +327,7 @@ dm_restart:
   LBEqu(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC,old_break_shift_esc);
   Fs->border_src=old_border_src;
   Fs->task_end_cb=old_end_cb;
-  return result;
+  return res;
 }
 
 public I64 PopUpMenu(CDoc *doc,I64 dof_flags=0)

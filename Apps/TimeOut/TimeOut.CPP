@@ -198,7 +198,7 @@ U0 MPDrawMen(CDC *dc2)
 	tt=4*Wrap(tempm->phase+5*ts,0)/(2*ã);
       }
       phase=tt; tt%=1.0;
-      temps=SpriteInterpolate(_temps[phase&3],_temps[(phase+1)&3],tt);
+      temps=SpriteInterpolate(tt,_temps[phase&3],_temps[(phase+1)&3]);
       SpriteMat3B(dc,tempm->x,yy,GR_Z_ALL,temps,r);
       Free(temps);
     }

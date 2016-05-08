@@ -1,31 +1,31 @@
 #help_index "Memory/Task"
 public I64 TaskMemAlloced(CTask *task=NULL,Bool override_validate=FALSE)
 {//Count of bytes alloced to a task, used+unused.
-  I64 result;
+  I64 res;
   if (!task) task=Fs;
   if (override_validate || TaskValidate(task)) {
-    result=task->code_heap->alloced_u8s;
+    res=task->code_heap->alloced_u8s;
     if (task->code_heap!=task->data_heap)
-      result+=task->data_heap->alloced_u8s;
-    return result;
+      res+=task->data_heap->alloced_u8s;
+    return res;
   } else
     return 0;
 }
 
 public I64 TaskMemUsed(CTask *task=NULL,Bool override_validate=FALSE)
 {//Count of bytes alloced to a task and in use.
-  I64 result;
+  I64 res;
   if (!task) task=Fs;
   if (override_validate || TaskValidate(task)) {
-    result=task->code_heap->used_u8s;
+    res=task->code_heap->used_u8s;
     if (task->data_heap!=task->code_heap)
-      result+=task->data_heap->used_u8s;
-    return result;
+      res+=task->data_heap->used_u8s;
+    return res;
   } else
     return 0;
 }
 
-#help_index "Memory/Task;Debugging/Heap"
+#help_index "Memory/Task;Debugging/Heap;Memory/Debugging"
 public Bool HeapRep(CTask *task)
 {//Report status of task's heap.
   I64 i,cnt;
@@ -85,7 +85,7 @@ public Bool HeapRep(CTask *task)
   '\n';
 }
 
-#help_index "Memory/HeapCtrl;Debugging/Heap"
+#help_index "Memory/HeapCtrl;Debugging/Heap;Memory/Debugging"
 public Bool IsInHeapCtrl(U8 *a,CHeapCtrl *hc,Bool lock=TRUE)
 {//Check addr if in HeapCtrl.
   CMemBlk *m;
@@ -156,7 +156,7 @@ public Bool HeapCtrlWalk(CHeapCtrl *hc)
   return FALSE;
 }
 
-#help_index "Memory/Task;Debugging/Heap"
+#help_index "Memory/Task;Debugging/Heap;Memory/Debugging"
 public Bool IsInHeap(U8 *a,CTask *task=NULL,Bool lock=TRUE)
 {//Check addr if in task's heaps.
   if (!task) task=Fs;

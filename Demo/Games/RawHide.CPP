@@ -132,7 +132,7 @@ U0 RiverDel()
 class RiverDrop
 {
   RiverDrop *next,*last;
-  I64 index,dx,dy;
+  I64 idx,dx,dy;
 } rd_root;
 Bool rd_lock;
 
@@ -153,27 +153,27 @@ U0 RiverDropsNext(CTask *mem_task)
   tempr=rd_root.next;
   while (tempr!=&rd_root) {
     tempr1=tempr->next;
-    if (++tempr->index>river_hi) {
+    if (++tempr->idx>river_hi) {
       QueRem(tempr);
       Free(tempr);
     } else {
       do {
-	if (RandU16&1 && GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
-	      r_y[tempr->index]+tempr->dy)==BLUE)
+	if (RandU16&1 && GrPeek(map_dc,r_x[tempr->idx]+tempr->dx,
+	      r_y[tempr->idx]+tempr->dy)==BLUE)
 	  break;
-	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->index]/2,
-	      r_width[tempr->index]/2);
-	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->index]/2,
-	      r_width[tempr->index]/2);
-      } while (GrPeek(map_dc,r_x[tempr->index]+tempr->dx,
-	    r_y[tempr->index]+tempr->dy)!=BLUE &&
-	    GrPeek(map_dc,r_x[tempr->index],
-	    r_y[tempr->index])==BLUE); //Might be reinitializing
+	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->idx]/2,
+	      r_width[tempr->idx]/2);
+	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->idx]/2,
+	      r_width[tempr->idx]/2);
+      } while (GrPeek(map_dc,r_x[tempr->idx]+tempr->dx,
+	    r_y[tempr->idx]+tempr->dy)!=BLUE &&
+	    GrPeek(map_dc,r_x[tempr->idx],
+	    r_y[tempr->idx])==BLUE); //Might be reinitializing
     }
     tempr=tempr1;
   }
   tempr=MAlloc(sizeof(RiverDrop),mem_task);
-  tempr->index=river_lo;
+  tempr->idx=river_lo;
   tempr->dx=0;
   tempr->dy=0;
   QueIns(tempr,rd_root.last);
@@ -188,7 +188,7 @@ U0 RiverDropsDraw(CDC *dc,I64 cx,I64 cy)
     Yield;
   tempr=rd_root.next;
   while (tempr!=&rd_root) {
-    GrPlot(dc,r_x[tempr->index]+tempr->dx-cx,r_y[tempr->index]+tempr->dy-cy);
+    GrPlot(dc,r_x[tempr->idx]+tempr->dx-cx,r_y[tempr->idx]+tempr->dy-cy);
     tempr=tempr->next;
   }
   LBtr(&rd_lock,0);

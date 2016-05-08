@@ -263,7 +263,7 @@ pe_done:
 
 Bool PrsExpression(CCmpCtrl *cc,I64 *_max_prec,Bool end_exp,CPrsStk *_ps=NULL)
 {
-  Bool result=TRUE;
+  Bool res=TRUE;
   I64 old_flags=cc->flags;
   CPrsStk *ps;
   if (_ps)
@@ -280,7 +280,7 @@ Bool PrsExpression(CCmpCtrl *cc,I64 *_max_prec,Bool end_exp,CPrsStk *_ps=NULL)
 	  PrsExpression2(cc,_max_prec,ps);
   catch {
     if (Fs->except_ch=='Compiler') {
-      result=FALSE;
+      res=FALSE;
       Fs->catch_except=TRUE;
     }
   }
@@ -289,10 +289,10 @@ Bool PrsExpression(CCmpCtrl *cc,I64 *_max_prec,Bool end_exp,CPrsStk *_ps=NULL)
       LexExcept(cc,"Compiler Parse Error at ");
     Free(ps);
   }
-  if (end_exp && result)
-    ICAdd(cc,IC_END_EXP,0,0,ICF_NO_DEPEND_RESULT);
+  if (end_exp && res)
+    ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
   cc->flags|=old_flags&(CCF_PREINC|CCF_PREDEC);
-  return result;
+  return res;
 }
 
 U0 PrsSizeOf(CCmpCtrl *cc)
@@ -544,7 +544,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
     tempcbh1=tempcbh->coc_next;
     COCAppend(cc,tempcbh);
     if (!Bt(&tempf->flags,Ff_INTERNAL))
-      cc->coc.coc_root.last->ic_flags|=ICF_PUSH_RESULT;
+      cc->coc.coc_root.last->ic_flags|=ICF_PUSH_RES;
     tempcbh=tempcbh1;
   }
   if (Bt(&tempf->flags,Ff_INTERNAL))
@@ -580,7 +580,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
   if (!is_template_fun)
     ICAdd(cc,IC_CALL_END,tempf,tempf->return_class);
   if (is_print||is_putchars)
-    ICAdd(cc,IC_END_EXP,0,0,ICF_NO_DEPEND_RESULT);
+    ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
   cc->flags=(cc->flags|CCF_RAX) & ~(CCF_ARRAY|CCF_FUN_EXP);
   return PE_UNARY_MODIFIERS;
 }
@@ -671,7 +671,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       return PE_UNARY_TERM2;
 
     sub_switch_start:
-      case TK_INT:
+      case TK_I64:
       case TK_CHAR_CONST:
       case TK_INS_BIN_SIZE:
 	if (cc->cur_i64<0)
@@ -1109,7 +1109,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 
 U8 *LexExpression2Bin(CCmpCtrl *cc,I64 *_type=NULL)
 {//Compile cc expression. You call the code.
-  U8 *result;
+  U8 *res;
   I64 size;
   Bool old_trace=Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
   COCPush(cc);
@@ -1117,12 +1117,12 @@ U8 *LexExpression2Bin(CCmpCtrl *cc,I64 *_type=NULL)
   if (PrsExpression(cc,NULL,FALSE)) {
     ICAdd(cc,IC_RETURN_VAL,0,0);
     ICAdd(cc,IC_RET,0,0);
-    result=COCCompile(cc,&size,NULL,_type);
+    res=COCCompile(cc,&size,NULL,_type);
   } else
-    result=NULL;
+    res=NULL;
   COCPop(cc);
   BEqu(&cc->flags,CCf_PASS_TRACE_PRESENT,old_trace);
-  return result;
+  return res;
 }
 
 Bool IsLexExpression2Bin(CCmpCtrl *cc,U8 **_machine_code)
@@ -1133,39 +1133,39 @@ Bool IsLexExpression2Bin(CCmpCtrl *cc,U8 **_machine_code)
 I64 LexExpressionI64(CCmpCtrl *cc)
 {//Compile cc expression, forcing to I64 and eval.
   U8 *machine_code;
-  I64 result,type;
+  I64 res,type;
   if (machine_code=LexExpression2Bin(cc,&type)) {
-    result=Call(machine_code);
+    res=Call(machine_code);
     Free(machine_code);
     if (type==RT_F64)
-      result=ToI64(result(F64));
+      res=ToI64(res(F64));
   } else
-    result=0;
-  return result;
+    res=0;
+  return res;
 }
 
 F64 LexExpressionF64(CCmpCtrl *cc)
 {//Compile cc expression, forcing to F64 and eval.
   U8 *machine_code;
-  I64 result,type;
+  I64 res,type;
   if (machine_code=LexExpression2Bin(cc,&type)) {
-    result=Call(machine_code);
+    res=Call(machine_code);
     Free(machine_code);
     if (type!=RT_F64)
-      result(F64)=ToF64(result);
+      res(F64)=ToF64(res);
   } else
-    result=0;
-  return result(F64);
+    res=0;
+  return res(F64);
 }
 
 I64 LexExpression(CCmpCtrl *cc)
 {//Compile cc expression and eval.  Might be I64 or F64.
   U8 *machine_code;
-  I64 result;
+  I64 res;
   if (machine_code=LexExpression2Bin(cc)) {
-    result=Call(machine_code);
+    res=Call(machine_code);
     Free(machine_code);
   } else
-    result=0;
-  return result;
+    res=0;
+  return res;
 }

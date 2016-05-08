@@ -62,7 +62,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
   CDocEntry *doc_e;
   CDoc *doc;
   Bool old_silent=Bt(&Fs->display_flags,DISPLAYf_SILENT),
-	result=FALSE,other_found=FALSE;
+	res=FALSE,other_found=FALSE;
   U8 *st1,*st2;
   try {
     switch (type) {
@@ -93,7 +93,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
 
     if (LK_DOC<=_type<=LK_DOC_LINE) {
       doc=Str2I64(filename);//See $LK,"SpriteEdText",A="MN:SpriteEdText"$()
-      result=TRUE;
+      res=TRUE;
     } else {
 
       st1=StrNew(filename);
@@ -105,9 +105,9 @@ Bool DocFileEd(I64 _type,U8 *filename,
       else {
 	Silent;
 	if (Bt(&edf_dof_flags,EDf_BAIL)) //if bail, scan parents
-	  result=FileFind(filename,,
+	  res=FileFind(filename,,
 		FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
-	else if (!(result=FileFind(filename,,
+	else if (!(res=FileFind(filename,,
 	      FUF_JUST_FILES)))
 	  other_found=FileFind(filename,,
 		FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
@@ -121,26 +121,26 @@ Bool DocFileEd(I64 _type,U8 *filename,
       Free(st2);
     }
     if (!doc||doc->doc_signature!=DOC_SIGNATURE_VAL)
-      result=FALSE;
+      res=FALSE;
     else {
       if (Bt(&edf_dof_flags,EDf_COLLAPSE))
 	DocCollapse(TRUE,doc);
       else if (Bt(&edf_dof_flags,EDf_UNCOLLAPSE))
 	DocCollapse(FALSE,doc);
 
-      if (result || other_found)
+      if (res || other_found)
 	switch (type) {
 	  case LK_FILE_LINE:
-	    result=DocLineNumGoTo(doc,*_num);
+	    res=DocLineNumGoTo(doc,*_num);
 	    break;
 	  case LK_FILE_ANCHOR:
-	    result=DocAnchorFind(doc,needle_str);
+	    res=DocAnchorFind(doc,needle_str);
 	    break;
 	  case LK_FILE_FIND:
-	    result=DocFind(doc,,needle_str,*_num);
+	    res=DocFind(doc,,needle_str,*_num);
 	    break;
 	  case LK_BIBLE_FIND:
-	    result=DocFind(doc,*_num,needle_str);
+	    res=DocFind(doc,*_num,needle_str);
 	    break;
 	  default:
 	    DocCenter(doc);
@@ -148,7 +148,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
       *_num=doc->cur_entry->y+1;
 
       if (edf_dof_flags&EDF_WAS_WRITE)
-	result=FALSE;
+	res=FALSE;
       if (!(edf_dof_flags&EDF_BAIL) && DocEd(doc,edf_dof_flags|DOF_DONT_HOME)) {
 	DocLock(doc);
 	doc_e=doc->cur_entry;
@@ -158,7 +158,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
 	if (!(LK_DOC<=_type<=LK_DOC_LINE)) {
 	  DocWrite(doc);
 	  if (edf_dof_flags&EDF_WAS_WRITE)
-	    result=TRUE;
+	    res=TRUE;
 	}
       }
       if (!(LK_DOC<=_type<=LK_DOC_LINE))
@@ -166,10 +166,10 @@ Bool DocFileEd(I64 _type,U8 *filename,
     }
   } catch {
     Silent(old_silent);
-    result=FALSE;
+    res=FALSE;
   }
   Fs->border_src=old_border_src;
-  return result;
+  return res;
 }
 
 #define DFT_ADDR_LINK_BIN_SIZE	64
@@ -177,8 +177,8 @@ Bool DocFileEd(I64 _type,U8 *filename,
 public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
 	I64 *_num=NULL,I64 edf_dof_flags=0)
 {//$LK,"Editor Link",A="MN:LK_FILE"$--> filename, needle_str and line number.
-  U8 *st,*ptr,*filename=NULL,*needle_str=NULL,*filename2;
-  I64 result,i,num=1;
+  U8 *st,*ptr,*src,*filename=NULL,*needle_str=NULL,*filename2;
+  I64 res,i,num=1;
   CHashSrcSym *temph;
   if (!link_st||!*link_st) {
     if (edf_dof_flags&EDF_BAIL)
@@ -186,17 +186,17 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
     link_st=blkdev.temp_filename;
   }
   st=StrNew(link_st);
-  result=LK_FILE;
+  res=LK_FILE;
   if (StrLen(st)>3 && st[2]==':') {
     st[2]=0;
     filename2=st+3;
-    switch (result=DefineMatch(st,"ST_LINK_TYPES",LMF_IGNORE_CASE)) {
+    switch (res=DefineMatch(st,"ST_LINK_TYPES",LMF_IGNORE_CASE)) {
       case LK_MAN_PAGE:
 	if (temph=HashFind(filename2,Fs->hash_table,HTG_SRC_SYM))
-	  result=EdLinkCvt(temph->src_link,&filename,
+	  res=EdLinkCvt(temph->src_link,&filename,
 		&needle_str,&num,edf_dof_flags);
 	else
-	  result=-1;
+	  res=-1;
 	goto lc_done;
       case LK_ADDR:
 	if (ptr=StrLastOcc(filename2,",")) {
@@ -205,10 +205,10 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
 	} else
 	  i=DFT_ADDR_LINK_BIN_SIZE;
 	if (ptr=SrcEdLink(ExePrint("%s;",filename2),i)) {
-	  result=EdLinkCvt(ptr,&filename,&needle_str,&num,edf_dof_flags);
+	  res=EdLinkCvt(ptr,&filename,&needle_str,&num,edf_dof_flags);
 	  Free(ptr);
 	} else
-	  result=-1;
+	  res=-1;
 	goto lc_done;
       case LK_DEF:
 	if (ptr=StrLastOcc(filename2,",")) {
@@ -225,11 +225,17 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
       case LK_BIBLE_FIND:
 	if (ptr=StrLastOcc(filename2,",")) {
 	  *ptr=0;
+	  src=ptr+1;
+	  while (*src) { //We do not allow ending verse
+	    if (*src=='-')
+	      *src=0;
+	    src++;
+	  }
 	  needle_str=StrNew(ptr+1);
 	}
 	i=DefineMatch(filename2,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
 	if (i<0)
-	  result=-1;
+	  res=-1;
 	else {
 	  num=Str2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
 	  filename2=BIBLE_FILENAME;
@@ -265,8 +271,8 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
     }
   } else
     filename2=st;
-  if (result>=0) {
-    if (LK_DOC<=result<=LK_DOC_LINE)
+  if (res>=0) {
+    if (LK_DOC<=res<=LK_DOC_LINE)
       filename=StrNew(filename2); //Holds document address as number.
     else
       filename=FileNameAbs(filename2,FUF_Z_OR_NOT_Z);
@@ -283,13 +289,13 @@ lc_done:
     Free(needle_str);
   if (_num)
     *_num=num;
-  return result;
+  return res;
 }
 
 public Bool DocLinkChk(U8 *link_st)
 {//Check for bad $LK,"Editor Link",A="MN:LK_FILE"$.
   U8 *filename,*st;
-  Bool result=FALSE;
+  Bool res=FALSE;
   if (link_st) {
     switch (EdLinkCvt(link_st,&filename)) {
       case -1:
@@ -298,7 +304,7 @@ public Bool DocLinkChk(U8 *link_st)
       case LK_PLAIN_LINE:
       case LK_FILE:
 //We don't check line number
-	result=FileFind(filename,,
+	res=FileFind(filename,,
 	      FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
 	break;
       case LK_BIBLE_FIND:
@@ -306,21 +312,21 @@ public Bool DocLinkChk(U8 *link_st)
 	if (StrOcc(st,','))
 	  StrLastRem(st,",");
 	if (DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE)>=0)
-	  result=TRUE;
+	  res=TRUE;
 	Free(st);
 	break;
       default://TODO: Need to validate HI: and DN:
 	if (Ed(link_st,EDF_BAIL))
-	  result=TRUE;
+	  res=TRUE;
     }
     Free(filename);
   }
-  return result;
+  return res;
 }
 
 public U8 *DocLinkFile(U8 *link_st,CTask *mem_task=NULL)
 {//Return the file for an $LK,"Editor Link Types",A="MN:LK_FILE"$.
-  U8 *filename=NULL,*st,*result=NULL;
+  U8 *filename=NULL,*st,*res=NULL;
   if (link_st) {
     switch (EdLinkCvt(link_st,&filename)) {
       case LK_FILE:
@@ -331,14 +337,14 @@ public U8 *DocLinkFile(U8 *link_st,CTask *mem_task=NULL)
       case LK_PLAIN_FIND:
       case LK_PLAIN_LINE:
 	st=FileNameAbs(filename,FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
-	result=StrNew(st);
+	res=StrNew(st);
 	Free(st);
 	break;
       case LK_BIBLE_FIND:
-	result=StrNew(BIBLE_FILENAME,mem_task);
+	res=StrNew(BIBLE_FILENAME,mem_task);
 	break;
     }
     Free(filename);
   }
-  return result;
+  return res;
 }

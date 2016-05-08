@@ -41,7 +41,7 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
 {//Start at entry in doc,make and return one line as str.
   CDocEntry *doc_e2=doc_e;
   Bool unlock=DocLock(doc);
-  U8 *dst,*src,*start,*result;
+  U8 *dst,*src,*start,*res;
   I64 i=0;
   if (cur_col)
     *cur_col=-1;
@@ -53,8 +53,8 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
       i++;
     doc_e2=doc_e2->next;
   }
-  result=MAlloc(i+1);
-  dst=result;
+  res=MAlloc(i+1);
+  dst=res;
   while (doc_e!=doc && doc_e->type_u8!=DOCT_NEW_LINE) {
     start=dst;
     if (doc_e->de_flags&DOCEF_TAG && doc_e->tag) {
@@ -64,23 +64,23 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
     } else if (doc_e->type_u8==DOCT_TAB)
       *dst++='\t';
     if (doc_e==doc->cur_entry && cur_col)
-      *cur_col=start-result+doc->cur_col;
+      *cur_col=start-res+doc->cur_col;
     doc_e=doc_e->next;
   }
   if (_do_e_end) *_do_e_end=doc_e;
   *dst=0;
   if (doc_e==doc->cur_entry && cur_col && !doc->cur_col)
-    *cur_col=dst-result;
+    *cur_col=dst-res;
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 U8 *DocGetStr2(I64 flags=0)
 {//$LK,"Flags",A="MN:GSF_SHIFT_ESC_EXIT"$
   CDoc *doc;
   CDocEntry *doc_e,*doc_e_end;
-  U8 *st,*st2,*result;
+  U8 *st,*st2,*res;
   I64 ch,sc;
   "$$PT$$";
   do {
@@ -102,7 +102,7 @@ U8 *DocGetStr2(I64 flags=0)
       if (flags&GSF_SHIFT_ESC_EXIT)
 	Exit;
       else {
-	result=StrNew("");
+	res=StrNew("");
 	goto gs_done;
       }
     }
@@ -117,16 +117,16 @@ U8 *DocGetStr2(I64 flags=0)
     do doc_e=doc_e->last;
     while (doc_e!=doc && doc_e->type_u8!=DOCT_PMT);
     doc_e=doc_e->next;
-    if (result=DocScanLine(doc,doc_e,NULL,&doc_e_end)) {
+    if (res=DocScanLine(doc,doc_e,NULL,&doc_e_end)) {
       while (doc_e_end!=doc && doc_e_end->type_u8==DOCT_NEW_LINE) {
-	st2=MStrPrint("%s\n",result);
-	Free(result);
-	result=st2;
+	st2=MStrPrint("%s\n",res);
+	Free(res);
+	res=st2;
 	if (st=DocScanLine(doc,doc_e_end->next,NULL,&doc_e_end)) {
-	  st2=MStrPrint("%s%s",result,st);
+	  st2=MStrPrint("%s%s",res,st);
 	  Free(st);
-	  Free(result);
-	  result=st2;
+	  Free(res);
+	  res=st2;
 	}
       }
     }
@@ -141,12 +141,12 @@ U8 *DocGetStr2(I64 flags=0)
 	    doc_e->type_u8!=DOCT_PMT);
     }
     doc_e=doc_e->next;
-    result=DocScanLine(doc,doc_e,NULL);
+    res=DocScanLine(doc,doc_e,NULL);
   }
   DocUnlock(doc);
 gs_done:
   "$$PT$$$$FG$$$$BG$$";
-  return result;
+  return res;
 }
 
 #help_index "Keyboard Devices;Char/Input;StdIn"
@@ -154,7 +154,7 @@ public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
 {//Prompt user for I64 expression.
   Bool okay;
   U8 *st;
-  I64 result;
+  I64 res;
   while (TRUE) {
     if (msg)
       "" msg,dft;
@@ -164,15 +164,15 @@ public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
       return dft;
     }
     try {
-      result=ExePrint2("ToI64(%s);",st);
+      res=ExePrint2("ToI64(%s);",st);
       okay=TRUE;
     } catch {
       Fs->catch_except=TRUE;
       okay=FALSE;
     }
     Free(st);
-    if (okay && lo<=result<=hi)
-      return result;
+    if (okay && lo<=res<=hi)
+      return res;
   }
 }
 
@@ -180,7 +180,7 @@ public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
 {//Prompt user for F64 expression.
   Bool okay;
   U8 *st;
-  F64 result;
+  F64 res;
   while (TRUE) {
     if (msg)
       "" msg,dft;
@@ -190,15 +190,15 @@ public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
       return dft;
     }
     try {
-      result=ExePrint2("ToF64(%s);",st)(F64);
+      res=ExePrint2("ToF64(%s);",st)(F64);
       okay=TRUE;
     } catch {
       Fs->catch_except=TRUE;
       okay=FALSE;
     }
     Free(st);
-    if (okay && lo<=result<=hi)
-      return result;
+    if (okay && lo<=res<=hi)
+      return res;
   }
 }
 
@@ -206,7 +206,7 @@ public CDate GetDate(U8 *msg=NULL,CDate dft=MIN_I64,
 	CDate lo=MIN_I64,CDate hi=MAX_I64)
 {//Prompt user for date expression. (Use $LK,"Now",A="MN:Now"$() if you want current time.)
   U8 *st;
-  CDate result;
+  CDate res;
   if (dft==MIN_I64) dft=Now;
   while (TRUE) {
     if (msg)
@@ -216,9 +216,9 @@ public CDate GetDate(U8 *msg=NULL,CDate dft=MIN_I64,
       Free(st);
       return dft;
     }
-    result=Str2Date(st);
+    res=Str2Date(st);
     Free(st);
-    if (result>=lo && result<=hi)
-      return result;
+    if (res>=lo && res<=hi)
+      return res;
   }
 }

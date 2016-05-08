@@ -87,15 +87,15 @@ public I64 SpriteSize(U8 *elems)
 
 I64 SpriteTypeMask(U8 *elems)
 {
-  I64 result=0;
+  I64 res=0;
   CSprite *tempg=elems-offset(CSprite.start);
   while (tempg->type) {
     if (tempg->type>=SPT_NUM_TYPES)
       return 1<<SPT_NUM_TYPES;
-    Bts(&result,tempg->type);
+    Bts(&res,tempg->type);
     tempg(U8 *)+=SpriteElemSize(tempg);
   }
-  return result;
+  return res;
 }
 
 public U8 *DC2Sprite(CDC *tempb)

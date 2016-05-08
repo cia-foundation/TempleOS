@@ -37,7 +37,7 @@ public U0 RAMReboot(U8 *filename)
 	reg *sys_ram_reboot;
 
   do if (!(hi_image=FileRead(filename,&size))) return;
-  while (hi_image<0x100000);
+  while (hi_image<0x100000); //If alloc from low 640K, just get another copy.
 
   do sys_ram_reboot=MAlloc(SYS_RAM_REBOOT_END-SYS_RAM_REBOOT,Fs->code_heap);
   while (sys_ram_reboot<0x100000);

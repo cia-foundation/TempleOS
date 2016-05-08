@@ -78,31 +78,31 @@ CPURep;
 "Bad Code\n";
 t0=tS;
 i=Loop1;
-"Result:%d Time:%9.6f\n",i,tS-t0;
+"Res:%d Time:%9.6f\n",i,tS-t0;
 
 "Good Code #1\n";
 t0=tS;
 i=Loop2;
-"Result:%d Time:%9.6f\n",i,tS-t0;
+"Res:%d Time:%9.6f\n",i,tS-t0;
 
 "Good Code #2\n";
 t0=tS;
 i=Loop3;
-"Result:%d Time:%9.6f\n",i,tS-t0;
+"Res:%d Time:%9.6f\n",i,tS-t0;
 
 "Good Code #3\n";
 t0=tS;
 i=Loop4;
-"Result:%d Time:%9.6f\n",i,tS-t0;
+"Res:%d Time:%9.6f\n",i,tS-t0;
 
 /*  Program Output$HL,0$$WW+H,1$$FD,1$
 8 Cores 2.660GHz
 Bad Code
-Result:3200000040000000 Time: 0.069966
+Res:3200000040000000 Time: 0.069966
 Good Code #1
-Result:3200000040000000 Time: 0.062567
+Res:3200000040000000 Time: 0.062567
 Good Code #2
-Result:3200000040000000 Time: 0.062907
+Res:3200000040000000 Time: 0.062907
 Good Code #3
-Result:3200000040000000 Time: 0.156359
+Res:3200000040000000 Time: 0.156359
 $HL,1$*/

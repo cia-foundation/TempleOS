@@ -7,54 +7,86 @@ I64 HasLower(U8 *src)
   return FALSE;
 }
 
+U0 HashFunSegFind(CHashTable *h,U8 *addr,
+	Bool *_has_lower,U64 *_best,CHash **_res)
+{
+  Bool *has_lower=*_has_lower;
+  CHashExport *tempex;
+  U64 i,j,best=*_best;
+  CHash *res=*_res;
+  for (i=0;i<=h->mask;i++) {
+    tempex=h->body[i];
+    while (tempex) {
+      j=0;
+      if (tempex->type&HTT_FUN) {
+	if (!Bt(&tempex(CHashFun *)->flags,Cf_EXTERN) &&
+	      !Bt(&tempex(CHashFun *)->flags,Ff_INTERNAL))
+	  j=tempex(CHashFun *)->executable_addr;
+      } else if (tempex->type&HTT_EXPORT_SYS_SYM)
+	j=tempex->val;
+      if (j) {
+	j=addr(I64)-j;
+	if (0<=j<=best) {
+	  if (tempex->type&HTT_EXPORT_SYS_SYM) {
+	    if (j<best || j==best && !has_lower) {
+	      has_lower=HasLower(tempex->str);
+	      best=j;
+	      res=tempex;
+	    }
+	  } else if (tempex->type&HTT_FUN) {
+	    if (j<best || j==best &&
+		  (res && res->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
+	      has_lower=HasLower(tempex->str);
+	      best=j;
+	      res=tempex;
+	    }
+	  }
+	}
+      }
+      tempex=tempex->next;
+    }
+  }
+  *_has_lower=has_lower;
+  *_best=best;
+  *_res =res;
+}
+
 CHash *FunSegFind(U8 *addr,I64 *_offset)
 {//See $LK,"Hash",A="HI:Hash"$.
-  CHash *result=NULL;
-  CHashExport *tempex;
+  CHash *res=NULL;
   Bool has_lower=FALSE;
-  CHashTable *h=Fs->hash_table;
-  U64 i,j,best=0xFFFF;
+  CTask *task;
+  CHashTable *h;
+  CCPU *c;
+  U64 i,best=0xFFFF;
   if (!ChkCodePtr(addr)) {
     *_offset=best;
     return NULL;
   }
-  while (h) {
-    for (i=0;i<=h->mask;i++) {
-      tempex=h->body[i];
-      while (tempex) {
-	j=0;
-	if (tempex->type&HTT_FUN) {
-	  if (!Bt(&tempex(CHashFun *)->flags,Cf_EXTERN) &&
-		!Bt(&tempex(CHashFun *)->flags,Ff_INTERNAL))
-	    j=tempex(CHashFun *)->executable_addr;
-	} else if (tempex->type&HTT_EXPORT_SYS_SYM)
-	  j=tempex->val;
-	if (j) {
-	  j=addr(I64)-j;
-	  if (0<=j<=best) {
-	    if (tempex->type&HTT_EXPORT_SYS_SYM) {
-	      if (j<best || j==best && !has_lower) {
-		has_lower=HasLower(tempex->str);
-		best=j;
-		result=tempex;
-	      }
-	    } else if (tempex->type&HTT_FUN) {
-	      if (j<best || j==best &&
-		    (result && result->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
-		has_lower=HasLower(tempex->str);
-		best=j;
-		result=tempex;
-	      }
-	    }
-	  }
+  if (IsDbg)
+    for (i=0;i<mp_cnt;i++) {
+      c=&cpu_structs[i];
+      task=c->seth_task;
+      do {
+	if (!TaskValidate(task)) goto fs_abort_task;
+	h=task->hash_table;
+	while (h) {
+	  HashFunSegFind(h,addr,&has_lower,&best,&res);
+	  h=h->next;
 	}
-	tempex=tempex->next;
-      }
+	task=task->next_task;
+      } while (task!=c->seth_task);
+fs_abort_task:
     }
-    h=h->next;
+  else {
+    h=Fs->hash_table;
+    while (h) {
+      HashFunSegFind(h,addr,&has_lower,&best,&res);
+      h=h->next;
+    }
   }
   *_offset=best;
-  return result;
+  return res;
 }
 
 U0 FunSegCacheAdd(CHash *temps,U8 *addr)
@@ -270,29 +302,29 @@ Bool PutSrcLink(U8 *addr,I64 cnt=1,U8 *buf=NULL)
 Bool E(U8 *addr,I64 cnt=512,I64 edf_dof_flags=0)
 {//Edit src at addr.
   U8 *st;
-  Bool result=FALSE;
+  Bool res=FALSE;
   if (st=SrcEdLink(addr,cnt)) {
     if (IsRaw)
-      result=EdLiteFileLine(st,edf_dof_flags);
+      res=EdLiteFileLine(st,edf_dof_flags);
     else
-      result=Ed(st,edf_dof_flags);
+      res=Ed(st,edf_dof_flags);
     Free(st);
   }
-  return result;
+  return res;
 }
 
 Bool Man(U8 *st,I64 edf_dof_flags=0)
 {//Owner's manual for symbol.  Edit src code for symbol.
-  Bool result=FALSE;
+  Bool res=FALSE;
   U8 **st2;
   CHashSrcSym *temph;
   if (IsRaw) {
     if ((temph=HashFind(st,Fs->hash_table,HTG_SRC_SYM)) && temph->src_link)
-      result=EdLiteFileLine(temph->src_link,edf_dof_flags);
+      res=EdLiteFileLine(temph->src_link,edf_dof_flags);
   } else {
     st2=MStrPrint("MN:%s",st);
-    result=Ed(st2,edf_dof_flags);
+    res=Ed(st2,edf_dof_flags);
     Free(st2);
   }
-  return result;
+  return res;
 }

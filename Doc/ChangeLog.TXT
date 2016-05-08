@@ -2,7 +2,55 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----03/29/16 17:59:14----$IV,0$
+$IV,1$----05/07/16 20:39:10----$IV,0$
+
+$IV,1$----05/07/16 08:55:59----$IV,0$
+* $BK,1$TempleOS version 4.06 Released$BK,0$
+
+$IV,1$----05/03/16 19:26:45----$IV,0$
+* Made $LK,"FunSegFind",A="MN:FunSegFind"$() search all hash tables when $LK,"IsDbg",A="MN:IsDbg"$.
+* Added missiles to $LK,"::/Apps/X-Caliber/X-Caliber.CPP"$.
+* Fixed bug in $LK,"D3Unit",A="MN:D3Unit"$().
+
+$IV,1$----05/01/16 15:12:31----$IV,0$
+* $LK,"R",A="MN:R"$("Identical","Ident");
+* $LK,"R",A="MN:R"$("Previous","Prev");
+* $LK,"R",A="MN:R"$("Result","Res");
+* Started assembler MMX/SSE.  Not done.
+* Changed a couple Bible related things.
+
+$IV,1$----04/26/16 01:18:57----$IV,0$
+* $LK,"R",A="MN:R"$("MapDrv","$LK,"DrvMap",A="MN:DrvMap"$");
+
+$IV,1$----04/25/16 13:17:49----$IV,0$
+* Changed args in $LK,"CAdd",A="MN:CAdd"$(), $LK,"CSub",A="MN:CSub"$(), $LK,"CMul",A="MN:CMul"$(), $LK,"CDiv",A="MN:CDiv"$() and $LK,"CPoly",A="MN:CPoly"$().
+* Changed args in $LK,"D3Add",A="MN:D3Add"$(), $LK,"D3Sub",A="MN:D3Sub"$(), $LK,"D3Mul",A="MN:D3Mul"$(), $LK,"D3Div",A="MN:D3Div"$() and $LK,"D3Cross",A="MN:D3Cross"$().
+
+$IV,1$----04/25/16 03:42:30----$IV,0$
+* $LK,"R",A="MN:R"$("TK_INT","TK_I64");
+* Added $LK,"::/Demo/Templates/Game1.CPP"$.
+* Added $LK,"::/Demo/Templates/Lex1.CPP"$.
+* Added $LK,"::/Demo/Templates/MultiCore1.CPP"$.
+* Added $LK,"::/Demo/Templates/ODE1.CPP"$.
+* Added $LK,"::/Demo/Templates/Registry1.CPP"$.
+* Added $LK,"::/Demo/Templates/Util1.CPP"$.
+* Added $LK,"::/Demo/Templates/Util2.CPP"$.
+
+$IV,1$----04/23/16 13:20:24----$IV,0$
+* Got rid of low protected memory area that caught NULL deref.
+* Got rid of 4K page tables by making $LK,"text",A="MN:text"$.vga_alias.  All pages are 2Meg size.
+
+$IV,1$----04/15/16 13:39:25----$IV,0$
+* Fixed bug in $LK,"EdCodeTools",A="MN:EdCodeTools"$().
+* Fixed double $FG,2$ASCII#5$FG$ cursor bug.
+
+$IV,1$----04/01/16 14:59:49----$IV,0$
+* Changed $LK,"SpriteInterpolate",A="MN:SpriteInterpolate"$() args.
+* $LK,"R",A="MN:R"$("Index","Idx");
+
+$IV,1$----03/31/16 11:20:13----$IV,0$
+* Changed $LK,"::/Adam/WallPaper.CPP"$.
+* Got rid of $FG,4$CTask.time_slice_start$FG$ and $FG,4$CTask.total_time$FG$.
 
 $IV,1$----03/29/16 05:53:45----$IV,0$
 * $BK,1$TempleOS version 4.05 Released$BK,0$

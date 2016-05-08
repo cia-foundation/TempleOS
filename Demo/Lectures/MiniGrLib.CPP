@@ -2,7 +2,7 @@
 U8 reverse[256],	//The VGA bits are bwd
 
    image[640*480/8];	//We need read-modify write.
-			//0xA0000 memory can't be read.
+			//0xA0000 alias memory can't be read.
  
 U0 MGInit()
 {
@@ -18,10 +18,10 @@ U0 MGInit()
 U0 MGUpdate()
 {//Copy image to VGA memory
 //For better performance we could only write what's changed.
-  //0xA0000 is slower than normal RAM.
-  OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+  //0xA0000 alias is slower than normal RAM.
+  OutU8(VGAP_IDX,VGAR_MAP_MASK);
   OutU8(VGAP_DATA,0xF);//All color planes at once -- Black and White
-  MemCpy(0xA0000,image,sizeof(image));
+  MemCpy(text.vga_alias,image,sizeof(image)); //Alias of 0xA0000
 }
  
 U0 MGPlot(I64 x,I64 y)

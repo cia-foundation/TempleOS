@@ -24,8 +24,8 @@ U0 UnlockedInc()
   glbl=0;
   tempm0=JobQue(&MPUnlockedInc,NULL,0,0);
   tempm1=JobQue(&MPUnlockedInc,NULL,1,0);
-  JobResultGet(tempm0);
-  JobResultGet(tempm1);
+  JobResGet(tempm0);
+  JobResGet(tempm1);
   "Correct Cnt:%X Actual Cnt:%X\n",CNT*2,glbl;
 }
 
@@ -43,8 +43,8 @@ U0 LockedInc()
   glbl=0;
   tempm0=JobQue(&MPLockedInc,NULL,0,0);
   tempm1=JobQue(&MPLockedInc,NULL,1,0);
-  JobResultGet(tempm0);
-  JobResultGet(tempm1);
+  JobResGet(tempm0);
+  JobResGet(tempm1);
   "Correct Cnt:%X Actual Cnt:%X\n",CNT*2,glbl;
 }
 

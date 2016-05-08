@@ -2,7 +2,7 @@ $PURPLE$$TX+CX,"Scoping and Linkage"$$FG$
 $WW,1$
 $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$ makes use of the current task's hash sym table and its parent tasks' tables.  It fetches syms from parent tasks' tables if not found locally in the current task's table and it places new syms in the current task's table.  Conceptually, syms are at the scope of environment vars in other operating systems.
 
-When a sym is placed into a table, older syms with identical names will be overshadowed if they exist.  Duplicates are not allowed in many cases, especially in asm blks.  Dupicates are allowed, by design in other cases, so that you can repeatedly $GREEN$#include$FG$ the same file from the cmd line while developing it.  Or, so you can repeatedly declare a function with a standard name, like $GREEN$DrawIt()$FG$.  This case might occur when the $GREEN$adam task$FG$ is starting-up loading-in many little utilities.
+When a sym is placed into a table, older syms with ident names will be overshadowed if they exist.  Duplicates are not allowed in many cases, especially in asm blks.  Dupicates are allowed, by design in other cases, so that you can repeatedly $GREEN$#include$FG$ the same file from the cmd line while developing it.  Or, so you can repeatedly declare a function with a standard name, like $GREEN$DrawIt()$FG$.  This case might occur when the $GREEN$adam task$FG$ is starting-up loading-in many little utilities.
 
 $GREEN$extern$FG$ binds a new $LK,"HTT_FUN",A="MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",A="MN:HTT_GLBL_VAR"$ sym to an existing sym of the same name if it exists in the sym table (just in just-in-time code).  It also can be used to generate a fwd reference.
 

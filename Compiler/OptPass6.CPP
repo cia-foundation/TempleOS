@@ -77,7 +77,7 @@ U0 OptPass6Lag(CCmpCtrl *cc,CPrsStk *ps,CIntermediateCode *tempi,
       tempi->a1.disp=0;
     }
   }
-  if (tempi->r.type&MDF_STK && !(tempi->ic_flags & ICF_PUSH_RESULT)) {
+  if (tempi->r.type&MDF_STK && !(tempi->ic_flags & ICF_PUSH_RES)) {
     stk_ptr++;
     if (stk_ptr<=reg_stk_size) {
       tempi->r.type=MDF_REG+tempi->r.type.raw_type;
@@ -115,9 +115,9 @@ U0 OptPass6(CCmpCtrl *cc)
       tempil1=tempi;
       if (tempi->a2.type&MDF_STK) {
 	if (tempil2->r.type&MDF_STK &&
-	      !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
+	      !(tempil2->ic_flags&ICF_PUSH_RES)) {
 	  if (tempi->ic_code==IC_ASSIGN && tempi->ic_flags&ICF_BY_VAL &&
-		tempi->ic_flags&ICF_NO_DEPEND_RESULT &&
+		tempi->ic_flags&ICF_RES_NOT_USED &&
 		tempil2->ic_code!=IC_CALL_END &&
 		tempil2->ic_code!=IC_CALL_END2 &&
 		tempil2->ic_code!=IC_SET_RAX &&
@@ -128,9 +128,8 @@ U0 OptPass6(CCmpCtrl *cc)
 	    tempil2->r.reg  =tempi->a1.reg;
 	    tempil2->r.disp =tempi->a1.disp;
 	    tempil2->ic_flags=tempil2->ic_flags
-		  &~(ICF_NO_DEPEND_RESULT|ICF_R_WAS_STK)
-	    |tempi->ic_flags&~(ICF_BY_VAL|ICF_A1_WAS_STK|ICF_A2_WAS_STK)
-	    |ICF_DEPEND_RESULT;
+		  &~(ICF_RES_NOT_USED|ICF_R_WAS_STK)
+	    |tempi->ic_flags&~(ICF_BY_VAL|ICF_A1_WAS_STK|ICF_A2_WAS_STK);
 	    old_tempil2=NULL;
 	    OptSetNOP1(tempi);
 	  } else {
@@ -143,7 +142,7 @@ U0 OptPass6(CCmpCtrl *cc)
 	  }
 	}
       } else if (tempi->a1.type&MDF_STK && tempil2->r.type&MDF_STK &&
-	    !(tempil2->ic_flags&ICF_PUSH_RESULT)) {
+	    !(tempil2->ic_flags&ICF_PUSH_RES)) {
 	tempi->a1.type=MDF_REG+tempi->a1.type.raw_type;
 	tempi->a1.disp=0;
 	tempil2->r.type=MDF_REG+tempil2->r.type.raw_type;
@@ -156,7 +155,7 @@ U0 OptPass6(CCmpCtrl *cc)
 	  tempil2->r.reg=REG_RAX;
 	}
       }
-      if (tempi->ic_flags & ICF_PUSH_RESULT)
+      if (tempi->ic_flags & ICF_PUSH_RES)
 	tempi->r.type==MDF_STK+tempi->r.type.raw_type;
       if (old_tempil2!=tempil2) {
 	if (tempil2->ic_code>IC_NOP2)

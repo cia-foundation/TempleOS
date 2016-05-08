@@ -134,7 +134,7 @@ CDocEntry *DocSplitTag(CDoc *doc,CDocEntry *doc_e,I64 i,I64 x,I64 y,I64 type_u8)
   CDocEntry *doc_e2;
   if (doc_e->type_u8==DOCT_TEXT && i) {
     if (i<StrLen(doc_e->tag)) {
-      doc_e2=MAllocIdentical(doc_e,doc->mem_task);
+      doc_e2=MAllocIdent(doc_e,doc->mem_task);
       doc_e2->tag=StrNew(doc_e->tag+i,doc->mem_task);
       doc_e2->de_flags=doc_e->de_flags&~DOCEG_HAS_ALLOC|DOCEF_TAG;
       QueIns(doc_e2,doc_e);
@@ -256,14 +256,14 @@ I64 DocTempAttr(CDoc *doc,CDocEntry *doc_e,I64 cur_u8_attr)
 public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 {//Recalc and fmt.  Also used by WinMgr to draw on screen.
   I64 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I64,xx,yy,zz,
-	num_entries=0,ijif,cur_u8_attr,temp_u32_attr,
+	num_entries=0,i_jif,cur_u8_attr,temp_u32_attr,
 	cursor_y=MIN_I64,left_margin,right_margin,y_plot_top,y_plot_bottom,
 	top,left,bottom,right,width,height,scroll_x,scroll_y,pix_top,pix_left;
   CDocEntry reg *doc_e,reg *doc_e2,*best_doc_e,*next_clear_found=NULL,
 	*added_cursor=NULL;
   CDocBin *tempb;
   CDocSettings *s;
-  Bool del_cl,skipped_update,tree_collapsed,same_win,more=FALSE,
+  Bool del_doc_e,skipped_update,tree_collapsed,same_win,more=FALSE,
 	find_cursor=FALSE,blink_flag,full_refresh=TRUE,unlock,clear_holds;
   CTask *win_task,*mem_task;
   CDC *dc;
@@ -276,11 +276,12 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 
   if (!doc || doc->doc_signature!=DOC_SIGNATURE_VAL) return FALSE;
 
+  //WinMgr updates all wins $TX,"30",D="WINMGR_FPS"$, 33.33333mS
   if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN && doc->owning_task!=Fs) {
-    ijif=cnts.jiffies+JIFFY_FREQ/240;
+    i_jif=cnts.jiffies+JIFFY_FREQ/250; //4 mS
     while (Bt(&doc->locked_flags,DOClf_LOCKED)) {
-      if (cnts.jiffies>=ijif)
-	return FALSE;
+      if (cnts.jiffies>=i_jif)
+	return FALSE; //Bail-out if doc locked.
       Yield;
     }
   }
@@ -426,7 +427,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
   }
   while (doc_e!=doc) {
     while (TRUE) {
-      del_cl=FALSE;
+      del_doc_e=FALSE;
       if (doc_e->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)) {
 	doc_e2=doc_e;
 	goto rc_skip;
@@ -485,7 +486,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
     temp_u32_attr=DocTempAttr(doc,doc_e,cur_u8_attr);
     if (doc_e==doc->cur_entry) {
       cursor_y=doc_e->y;
-      if (recalc_flags&RECALCF_ADD_CURSOR && doc_e!=added_cursor) {
+      if (recalc_flags&RECALCF_ADD_CURSOR && !added_cursor) {
 	if (doc_e->type_u8==DOCT_TEXT && 0<doc->cur_col<k &&
 	      !(doc_e->de_flags & ~(DOCEF_TAG|DOCG_BL_IV_UL|DOCEF_WORD_WRAP|
 	      DOCEF_HIGHLIGHT|DOCEF_SKIP|DOCEF_FILTER_SKIP)) &&
@@ -545,14 +546,13 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
       if (doc_e->de_flags & DOCEF_SCROLLING_X) {
 	j=StrLen(doc_e->tag);
 	if (j && doc_e->scroll_len) {
-	  ijif=cur_time*FONT_WIDTH*DOC_SCROLL_SPEED;
-	  ijif%=j*FONT_WIDTH;
+	  i_jif=ToI64(cur_time*FONT_WIDTH*DOC_SCROLL_SPEED)%(j*FONT_WIDTH);
 	  temp_u32_attr=temp_u32_attr & 0xFFE0FF00|
-		(FONT_WIDTH-1-ijif&(FONT_WIDTH-1))<<16;
+		(FONT_WIDTH-1-i_jif&(FONT_WIDTH-1))<<16;
 #assert FONT_WIDTH==8
-	  ijif>>=3;
+	  i_jif>>=3;
 	  for (k=0;k<doc_e->scroll_len;k++) {
-	    ch=ptr[(ijif+k)%j];
+	    ch=ptr[(i_jif+k)%j];
 	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
 	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
@@ -631,7 +631,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	if (!col2 && !(doc_e->de_flags
 	      &(DOCEF_TREE|DOCEF_LST|DOCEF_TAG_CB|DOCEF_DEFINE|
 	      DOCEF_AUX_STR|DOCEF_HTML_LINK|DOCEF_BIN_PTR_LINK)))
-	  del_cl=TRUE;
+	  del_doc_e=TRUE;
 	break;
       case DOCT_HEX_ED:
 	if (doc_e->de_flags&DOCEF_DEREF_DATA &&
@@ -944,7 +944,7 @@ rc_adjust_xy:
 	  doc->cur_col=doc->cur_entry->min_col;
 	}
 	if (doc_e!=added_cursor)
-	  del_cl=TRUE;
+	  del_doc_e=TRUE;
 	break;
       case DOCT_SPRITE:
 	if (!doc_e->bin_data && doc->flags&DOCEF_HAS_BIN)
@@ -1136,7 +1136,7 @@ rc_skip:
     }
 
     if (full_refresh) {
-      if (del_cl) {
+      if (del_doc_e) {
 	if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
 	  if (doc_e==doc->cur_entry) {
 	    doc->cur_entry=doc_e2;

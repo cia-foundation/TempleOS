@@ -38,7 +38,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
   CDrv *dv;
   CFAT32Boot br;
   CDirEntry de;
-  Bool result=FALSE;
+  Bool res=FALSE;
   I64 i,type;
   try {
     if (!src_drv) src_drv=Drv2Let(Fs->cur_dv);
@@ -57,7 +57,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
     switch (type) {
       case BDT_ATAPI:
 	Move("/Kernel/Kernel.BIN.Z",BOOT_DIR_KERNEL_BIN_C);
-	result=TRUE;
+	res=TRUE;
 	break;
       case BDT_RAM:
       case BDT_ATA:
@@ -80,7 +80,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
 	  for (;i<sizeof(CFAT32Boot.code);i++)
 	    br.code[i]=0;
 	  WBlks(dv,&br,dv->base_offset,1);
-	  result=TRUE;
+	  res=TRUE;
 	}
 	break;
     }
@@ -88,7 +88,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
     PutExcept;
     Beep;
   }
-  return result;
+  return res;
 }
 
 public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
@@ -154,7 +154,7 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
   CDirEntry de;
   I64 i,j,size,*_q;
   U8 *menu_ptr,*ptr,ch,buf[STR_LEN];
-  Bool result=FALSE;
+  Bool res=FALSE;
 
   try {
     if (drv_lst) {
@@ -223,10 +223,10 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
 
 	ATAWriteBlks(bd,&mbr,0,1);
 	BlkDevUnlock(bd);
-	result=TRUE;
+	res=TRUE;
       }
     }
   } catch
     PutExcept;
-  return result;
+  return res;
 }

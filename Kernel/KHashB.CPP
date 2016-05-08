@@ -63,7 +63,7 @@ U0 HashDel(CHashSrcSym *temph)
     Free(temph->str);
   if (temph->type & HTG_SRC_SYM) {
     Free(temph->src_link);
-    Free(temph->index);
+    Free(temph->idx);
     Free(temph->import_name);
     LinkedLstDel(temph->ie_lst);
     if (temph->type & (HTT_FUN | HTT_EXPORT_SYS_SYM))
@@ -106,7 +106,7 @@ U0 HashTableDel(CHashTable *table)
 
 I64 HashTablePurge(CHashTable *table)
 {//Eliminate ExportSysSyms that have been usurped.
-  I64 i,result=0;
+  I64 i,res=0;
   CHashSrcSym *temph,*temph1,*temph2;
   if (!table) return 0;
   PUSHFD
@@ -124,7 +124,7 @@ I64 HashTablePurge(CHashTable *table)
 	    if (temph2->type&HTG_TYPE_MASK==HTT_INVALID)
 	      temph2->type=HTT_KEYWORD;//Won't delete HTT_INVALID
 	    HashRemDel(temph2,table);
-	    result++;
+	    res++;
 	    break;
 	  }
 	  temph2=temph2->next;
@@ -134,21 +134,21 @@ I64 HashTablePurge(CHashTable *table)
     }
   }
   POPFD
-  return result;
+  return res;
 }
 
 CHashGeneric *HashGenericAdd(U8 *name,I64 type,
 	I64 u0=0,I64 u1=0,I64 u2=0,CTask *task=NULL)
 {//Add any type to task hash_table, 3 user_data values.
   if (!task) task=Fs;
-  CHashGeneric *result=CAlloc(sizeof(CHashGeneric),task);
-  result->type=type;
-  result->user_data0=u0;
-  result->user_data1=u1;
-  result->user_data2=u2;
-  result->str=StrNew(name,task);
-  HashAdd(result,task->hash_table);
-  return result;
+  CHashGeneric *res=CAlloc(sizeof(CHashGeneric),task);
+  res->type=type;
+  res->user_data0=u0;
+  res->user_data1=u1;
+  res->user_data2=u2;
+  res->str=StrNew(name,task);
+  HashAdd(res,task->hash_table);
+  return res;
 }
 
 U0 HashSrcFileSet(CCmpCtrl *cc,CHashSrcSym *h,I64 line_num_offset=0)
@@ -160,24 +160,24 @@ U0 HashSrcFileSet(CCmpCtrl *cc,CHashSrcSym *h,I64 line_num_offset=0)
   h->src_link=MStrPrint("FL:%s,%d",tempf->full_name,line_num);
   if (Bt(&cc->opts,OPTf_KEEP_PRIVATE))
     h->type|=HTF_PRIVATE;
-  Free(h->index);
-  if (cc->cur_help_index && *cc->cur_help_index)
-    h->index=StrNew(cc->cur_help_index);
+  Free(h->idx);
+  if (cc->cur_help_idx && *cc->cur_help_idx)
+    h->idx=StrNew(cc->cur_help_idx);
   else
-    h->index=NULL;
+    h->idx=NULL;
 }
 
 CHashGeneric *HashPublic(U8 *st,I64 mask,Bool val=TRUE)
 {//Mark a hash entry as public and $LK,"HashSrcFileSet",A="MN:HashSrcFileSet"$().
-  CHashGeneric *result;
-  if (result=HashFind(st,Fs->hash_table,mask)) {
+  CHashGeneric *res;
+  if (res=HashFind(st,Fs->hash_table,mask)) {
     if (val)
-      result->type|=HTF_PUBLIC;
+      res->type|=HTF_PUBLIC;
     else
-      result->type&=~HTF_PUBLIC;
-    if (result->type&HTG_SRC_SYM)
-      HashSrcFileSet(Fs->last_lex,result);
-    return result;
+      res->type&=~HTF_PUBLIC;
+    if (res->type&HTG_SRC_SYM)
+      HashSrcFileSet(Fs->last_lex,res);
+    return res;
   } else
     return NULL;
 }
@@ -203,10 +203,10 @@ I64 HashLstAdd(U8 *lst,I64 type,CHashTable *table)
   return i;
 }
 
-I64 HashDefineLstAdd(U8 *name,I64 type,CHashTable *table)
+I64 HashDefineLstAdd(U8 *dname,I64 type,CHashTable *table)
 {//Add define list to a hash table. See $LK,"::/Adam/DolDoc/DocInit.CPP",A="FF:::/Adam/DolDoc/DocInit.CPP,HashDefineLstAdd"$.
   CHashDefineStr *temph;
-  if (temph=HashFind(name,Fs->hash_table,HTT_DEFINE_STR))
+  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
     return HashLstAdd(temph->data,type,table);
   else
     return 0;
@@ -240,11 +240,11 @@ I64 FramePtrSet(U8 *name,I64 val,CTask *task=NULL)
 I64 FramePtrDel(U8 *name,CTask *task=NULL)
 {//Remove entry and delete.
   CHashGeneric *temph;
-  I64 result=0;
+  I64 res=0;
   if (!task) task=Fs;
   if (temph=HashFind(name,task->hash_table,HTT_FRAME_PTR)) {
-    result=temph->user_data0;
+    res=temph->user_data0;
     HashRemDel(temph,task->hash_table);
   }
-  return result;
+  return res;
 }

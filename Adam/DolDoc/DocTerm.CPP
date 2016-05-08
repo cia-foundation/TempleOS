@@ -87,22 +87,22 @@ I64 PopUpTermRight(U8 *header)
 
 I64 EdLeftClickLink(CDoc *doc,CDocEntry *doc_e)
 {//Called with doc locked, exit unlocked
-  Bool result;
+  Bool res;
   U8 *st;
   if (st=DocEntryLink(doc,doc_e)) {
     DocUnlock(doc);
     if (doc_e->de_flags & DOCEF_POPUP)
-      result=PopUpEd(st);
+      res=PopUpEd(st);
     else
-      result=Ed(st);
+      res=Ed(st);
     Free(st);
-    return result;
+    return res;
   }
 }
 
 I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 {//Called with doc locked, exit unlocked
-  Bool send_new_line=FALSE,result=FALSE;
+  Bool send_new_line=FALSE,res=FALSE;
   U8 *st,*st2;
   I64 i;
   CEdFileName fn;
@@ -122,7 +122,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    "#include \"%s\";\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
 	    ExeFile(st);
-	    result=TRUE;
+	    res=TRUE;
 	    break;
 	  case RIGHT_AINCLUDE:
 	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_JIT)) {
@@ -134,35 +134,35 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    "Adam(\"#include \\\"%s\\\"\" );\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
 	    AdamFile(st,FALSE);
-	    result=TRUE;
+	    res=TRUE;
 	    break;
 	  case RIGHT_COPY:
 	    StrCpy(fn.name,st);
 	    if (DocForm(&fn)) {
-	      result=ToBool(Copy(st,fn.name));
+	      res=ToBool(Copy(st,fn.name));
 	    } else
 	      send_new_line=TRUE;
 	    break;
 	  case RIGHT_MOVE:
 	    StrCpy(fn.name,st);
 	    if (DocForm(&fn))
-	      result=Move(st,fn.name);
+	      res=Move(st,fn.name);
 	    else
 	      send_new_line=TRUE;
 	    break;
 	  case RIGHT_DELETE:
-	    result=ToBool(Del(st));
+	    res=ToBool(Del(st));
 	    break;
 	  case RIGHT_TYPE:
-	    result=Type(st);
+	    res=Type(st);
 	    break;
 	  case RIGHT_ED:
 	    "Ed(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
-	    result=Ed(st);
+	    res=Ed(st);
 	    break;
 	  case RIGHT_PLAIN:
 	    "Plain(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
-	    result=Plain(st);
+	    res=Plain(st);
 	    break;
 	  case RIGHT_AUTOFILE:
 	    if (FileExtDot(st) && !FilesFindMatch(st,"*.AUT*")) {
@@ -174,7 +174,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    "AutoFile(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
 	    AutoFile(st);
-	    result=TRUE;
+	    res=TRUE;
 	    break;
 	}
       } else
@@ -189,5 +189,5 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
   "$$PT$$$$FG$$$$BG$$";
   if (send_new_line)
     '\n';
-  return result;
+  return res;
 }

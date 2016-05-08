@@ -6,9 +6,9 @@ F64 VGAPattern(I64 p)
   F64 start=tS;
   I64 plane;
   for (plane=1;plane<0x10;plane<<=1) {
-    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_IDX,VGAR_MAP_MASK);
     OutU8(VGAP_DATA,plane);
-    MemSetI64(0xA0000,p,640*480/64);
+    MemSetI64(text.vga_alias,p,640*480/64);
   }
   return tS-start;
 }

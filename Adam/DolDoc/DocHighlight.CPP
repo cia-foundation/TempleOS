@@ -2,7 +2,7 @@
 
 U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _temp_u32_attr)
 {//Be aware of $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
-  U32 *result=MAlloc((len+1)*sizeof(U32)),*dst=result;
+  U32 *res=MAlloc((len+1)*sizeof(U32)),*dst=res;
   U8 *ptr;
   CDocSettings *s=&doc_e->settings;
   I64 ch,ch1,last_ch,temp_u32_attr,mask_temp_u32_attr=_temp_u32_attr&0xFFFFF000,
@@ -151,5 +151,5 @@ hl_cpp_comment:
   s->paren_depth=paren_depth;
   s->brace_depth=brace_depth;
   *dst=0;
-  return result;
+  return res;
 }

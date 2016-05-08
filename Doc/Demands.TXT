@@ -29,7 +29,7 @@ $LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminate
 
 * Until super simple serial ports are available, PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
 
-* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetResult",A="MN:ATAGetResult"$().  We don't want to do DMA.  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
+* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetRes",A="MN:ATAGetRes"$().  We don't want to do DMA.  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?
 
 * Perhaps, a new interrupt descriptor table entry type or a new x86 CPU mode can be made that cause fast software interrupts, doing exactly what the CALL REL32 does, but with IDT as indirection.  We don't need to change privilege levels or stacks.
 

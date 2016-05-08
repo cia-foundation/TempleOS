@@ -9,7 +9,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInst *tempi)
 	  break;
 	} else
 	  return;
-      case TK_INT:
+      case TK_I64:
 	if (cc->cur_i64==16)
 	  tempi->flags|=IEF_OP_SIZE16;
 	else if (cc->cur_i64==32)
@@ -20,7 +20,7 @@ U0 AsmPrsInsFlags(CCmpCtrl *cc,CInst *tempi)
       case '+':
 	tempi->flags|=IEF_PLUS_OPCODE;
       case '/':
-	if (Lex(cc)==TK_INT && cc->cur_i64<8)
+	if (Lex(cc)==TK_I64 && cc->cur_i64<8)
 	  tempi->slash_val=cc->cur_i64;
 	else if (cc->token==TK_IDENT) {
 	  if (!StrCmp(cc->cur_str,"R"))
@@ -74,9 +74,9 @@ U0 AsmHashLoad()
   while (cc->token) {
     if (cc->token!=TK_IDENT)
       LexExcept(cc,"Expecting identifier at ");
-    i=LstMatch(cc->cur_str,"R8\0R16\0R32\0R64\0SEG\0FSTK\0"
+    i=LstMatch(cc->cur_str,"NONE\0R8\0R16\0R32\0R64\0SEG\0FSTK\0"
 	  "MM\0XMM\0OPCODE\0KEYWORD\0ASM_KEYWORD\0");
-    if (i<0)
+    if (i<=0)
       LexExcept(cc,"Unknown Stmt");
     Lex(cc); //skip keyword
     if (cc->token!=TK_IDENT)
@@ -87,7 +87,7 @@ U0 AsmHashLoad()
 	tempr->str=cc->cur_str;
 	cc->cur_str=NULL;
 	Lex(cc); //skip keyword name
-	if (cc->token!=TK_INT)
+	if (cc->token!=TK_I64)
 	  LexExcept(cc,"Expecting int at ");
 	tempr->type=HTT_REG;
 	tempr->reg_type=i;
@@ -108,7 +108,7 @@ U0 AsmHashLoad()
 	  tempi=&tempo_max->ins[tempo_max->inst_entry_cnt];
 	  tempi->ins_entry_num=tempo_max->inst_entry_cnt++;
 	  tempi->slash_val=SV_NONE; //Not zero!!
-	  while (cc->token==TK_INT) {
+	  while (cc->token==TK_I64) {
 	    tempi->opcode[tempi->opcode_cnt++]=cc->cur_i64;
 	    Lex(cc);
 	  }
@@ -161,7 +161,7 @@ U0 AsmHashLoad()
 	//Parse aliases.
 	if (cc->token==':') {
 	  while (Lex(cc)==TK_IDENT) {
-	    tempo2=MAllocIdentical(tempo);
+	    tempo2=MAllocIdent(tempo);
 	    tempo2->str=cc->cur_str;
 	    cc->cur_str=0;
 	    tempo2->oc_flags|=OCF_ALIAS;
@@ -177,10 +177,10 @@ U0 AsmHashLoad()
 	temph->str=cc->cur_str;
 	cc->cur_str=NULL;
 	Lex(cc); //skip keyword name
-	if (cc->token!=TK_INT)
+	if (cc->token!=TK_I64)
 	  LexExcept(cc,"Expecting int at ");
 	temph->user_data0=cc->cur_i64;
-	if (i==9)
+	if (i==10)
 	  temph->type=HTT_KEYWORD;
 	else
 	  temph->type=HTT_ASM_KEYWORD;

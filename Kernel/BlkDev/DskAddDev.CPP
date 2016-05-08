@@ -22,16 +22,16 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
 
 I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 {
-  I64 i,j,ext_base,offset,result=0;
+  I64 i,j,ext_base,offset,res=0;
   CDrv *dv;
   CRedSeaBoot br;
   CMasterBoot mbr;
 
   bd->bd_signature=BD_SIGNATURE_VAL;
   if (make_free)
-    dv=DrvMakeFree(bd->first_drv_let+result);
+    dv=DrvMakeFree(bd->first_drv_let+res);
   else
-    dv=DrvNextFree(bd->first_drv_let+result);
+    dv=DrvNextFree(bd->first_drv_let+res);
   dv->bd=bd;
   dv->size=bd->max_blk+1;
   switch (bd->type) {
@@ -46,7 +46,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
       //will be alloced on a just-in-time
       //basis.
       if (BlkDevInit(bd))
-	result++;
+	res++;
       else
 	dv->dv_signature=0;
       break;
@@ -58,7 +58,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	dv->dv_signature=0; //Revoke validation
 	if (one_drv) {
 	  dv->dv_signature=DRV_SIGNATURE_VAL;
-	  result++;
+	  res++;
 	  dv->fs_type=FSt_REDSEA;
 	  dv->size=bd->max_blk+1;
 //The following read is a test read.
@@ -76,16 +76,16 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	  for (i=0;i<4;i++) {
 	    if (mbr.p[i].type) {
 	      if (make_free)
-		dv=DrvMakeFree(bd->first_drv_let+result);
+		dv=DrvMakeFree(bd->first_drv_let+res);
 	      else
-		dv=DrvNextFree(bd->first_drv_let+result);
+		dv=DrvNextFree(bd->first_drv_let+res);
 	      dv->bd=bd;
 	      dv->base_offset=mbr.p[i].offset+offset;
 	      dv->size	=mbr.p[i].size;
 	      switch (mbr.p[i].type) {
 		case MBR_PT_REDSEA:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
-		  result++;
+		  res++;
 		  dv->fs_type=FSt_REDSEA;
 		  RedSeaDrvInit(dv);
 		  break;
@@ -97,7 +97,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		case MBR_PT_FAT32f:
 		  ATAReadBlks(bd,&br,dv->base_offset,1);
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
-		  result++;
+		  res++;
 		  if (br.signature==MBR_PT_REDSEA) {
 		    dv->fs_type=FSt_REDSEA;
 		    RedSeaDrvInit(dv);
@@ -108,7 +108,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		  break;
 		case MBR_PT_NTFS:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
-		  result++;
+		  res++;
 		  dv->fs_type=FSt_NTFS;
 		  break;
 		case 5:
@@ -117,7 +117,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		  break;
 		default:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
-		  result++;
+		  res++;
 		  dv->fs_type=FSt_UNKNOWN;
 	      }
 	    }
@@ -136,16 +136,16 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
       break;
     case BDT_ATAPI:
       dv->dv_signature=DRV_SIGNATURE_VAL;
-      result++;
+      res++;
       dv->fs_type=FSt_ISO9660; //Start with this
       dv->size =0;
       break;
   }
-  if (result)
+  if (res)
     BlkDevLockFwdingSet(bd);
   else
     MemSet(bd,0,sizeof(CBlkDev));
-  return result;
+  return res;
 }
 
 Bool DrvEnable(U8 drv_let,Bool val)

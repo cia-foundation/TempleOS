@@ -4,22 +4,22 @@ I64 MPSum(I64 my_mp_cnt)
 {//We could use the formula n*(n+1)/2
   I64 lo=mp_n*Gs->num/my_mp_cnt,
 	hi=mp_n*(Gs->num+1)/my_mp_cnt,
-	result=0,i;
+	res=0,i;
   for (i=lo;i<hi;i++)
-    result+=i;
-  return result;
+    res+=i;
+  return res;
 }
 
 I64 Sum(I64 n,I64 my_mp_cnt)
 {
   CSrvCmd *tempm[MP_MAX_PROCESSORS];
-  I64 result=0,i;
+  I64 res=0,i;
   mp_n=n+1;
   for (i=0;i<my_mp_cnt;i++)
     tempm[i]=JobQue(&MPSum,my_mp_cnt,i,0);
   for (i=0;i<my_mp_cnt;i++)
-    result+=JobResultGet(tempm[i]);
-  return result;
+    res+=JobResGet(tempm[i]);
+  return res;
 }
 
 #define SAMPLE_SIZE 100
@@ -48,14 +48,14 @@ U0 MPAdd()
   I64 i,n,
 	h=Fs->pix_width,
 	v=Fs->pix_height;
-  F64 t1,t2,results[NUM_TESTS];
+  F64 t1,t2,ress[NUM_TESTS];
   CDC *dc=DCAlias;
 
   for (i=0,n=MIN_VAL;i<NUM_TESTS;i++,n*=10) {
     t1=Test(n,1);
     t2=Test(n,mp_cnt);
-    results[i]=t2*100.0/t1;
-    "$$GREEN$$%8.4f%%$$FG$$\n\n",results[i];
+    ress[i]=t2*100.0/t1;
+    "$$GREEN$$%8.4f%%$$FG$$\n\n",ress[i];
   }
   PressAKey;
 
@@ -70,8 +70,8 @@ U0 MPAdd()
   for (i=0;i<NUM_TESTS-1;i++) {
     dc->color=RED;
     dc->pen_width=2;
-    GrLine3(dc,i*h/(NUM_TESTS-1),      v-results[i  ]/MAX_PERCENT*v,0,
-	  (i+1)*h/(NUM_TESTS-1),v-results[i+1]/MAX_PERCENT*v,0);
+    GrLine3(dc,i*h/(NUM_TESTS-1),      v-ress[i  ]/MAX_PERCENT*v,0,
+	  (i+1)*h/(NUM_TESTS-1),v-ress[i+1]/MAX_PERCENT*v,0);
     dc->color=GREEN;
     GrPrint(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
     GrLine(dc,i*h/(NUM_TESTS-1),0,i*h/(NUM_TESTS-1),v);

@@ -98,7 +98,7 @@ $FG,5$$TX+CX,"Hash Sym Tables"$$FG$
 
 * $FG,2$adam_task->hash_table$FG$ holds the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ syms loaded in on start-up.
 
-* $FG,2$Fs->hash_table$FG$ holds user HolyC syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the previous sym.  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp",A="MN:PopUp"$() a task to run the application and kill it when it's done.
+* $FG,2$Fs->hash_table$FG$ holds user HolyC syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the prev sym.  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp",A="MN:PopUp"$() a task to run the application and kill it when it's done.
 
 * To display the contents of a hash table, use the $LK,"Who",A="MN:Who"$() routine or the varients.  $LK,"HashDepthRep",A="MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
 

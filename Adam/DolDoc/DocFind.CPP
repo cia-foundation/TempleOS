@@ -2,7 +2,7 @@
 
 public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
 {//Nearest to specified line num.  Move cur_entry & center.
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   if (doc) {
     unlock=DocLock(doc);
     doc->x=0;
@@ -10,32 +10,32 @@ public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
     DocRecalc(doc,RECALCt_FIND_CURSOR);
     DocCenter(doc);
     if (doc->cur_entry->y==line_num-1)
-      result=TRUE;
+      res=TRUE;
     if (unlock)
       DocUnlock(doc);
   }
-  return result;
+  return res;
 }
 
 public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=MIN_I64,
 U8 *needle,I64 match=1)
 {//Find str by searching tags. Move cur_entry & center.
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   CDocEntry *doc_e;
   U8 *ptr;
   I64 i;
   if (haystack_doc) {
     unlock=DocLock(haystack_doc);
     if (start_line_num==MIN_I64) {
-      result=TRUE;
+      res=TRUE;
       doc_e=haystack_doc->root.next;
     } else {
-      result=DocLineNumGoTo(haystack_doc,start_line_num);
+      res=DocLineNumGoTo(haystack_doc,start_line_num);
       doc_e=haystack_doc->cur_entry;
     }
-    if (result) {
+    if (res) {
       if (needle) {
-	result=FALSE;
+	res=FALSE;
 	while (doc_e!=haystack_doc) {
 	  if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
 //TODO: handle multi-DocEntry strs
@@ -46,26 +46,26 @@ U8 *needle,I64 match=1)
 	      if (i<doc_e->min_col) i=doc_e->min_col;
 	      if (i>doc_e->max_col) i=doc_e->max_col;
 	      haystack_doc->cur_col=i;
-	      result=TRUE;
+	      res=TRUE;
 	      break;
 	    }
 	  }
 	  doc_e=doc_e->next;
 	}
       } else
-	result=FALSE;
+	res=FALSE;
     }
-    if (!result) DocBottom(haystack_doc);
+    if (!res) DocBottom(haystack_doc);
     DocCenter(haystack_doc);
     if (unlock)
       DocUnlock(haystack_doc);
   }
-  return result;
+  return res;
 }
 
 public Bool DocAnchorFind(CDoc *haystack_doc,U8 *needle_str)
 {//Find named anchor. Move cur_entry & center.
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   CDocEntry *doc_e;
   if (haystack_doc) {
     unlock=DocLock(haystack_doc);
@@ -76,18 +76,18 @@ public Bool DocAnchorFind(CDoc *haystack_doc,U8 *needle_str)
 	  if (!StrCmp(needle_str,doc_e->aux_str)) {
 	    haystack_doc->cur_entry=doc_e;
 	    haystack_doc->cur_col=doc_e->min_col;
-	    result=TRUE;
+	    res=TRUE;
 	    break;
 	  }
 	}
 	doc_e=doc_e->next;
       }
-    if (!result) DocBottom(haystack_doc);
+    if (!res) DocBottom(haystack_doc);
     DocCenter(haystack_doc);
     if (unlock)
       DocUnlock(haystack_doc);
   }
-  return result;
+  return res;
 }
 
 public U0 EdFindNext(CDoc *doc)
@@ -182,7 +182,7 @@ public U0 EdSelectAll(CDoc *doc,Bool select)
 public Bool EdFindPaired(CDoc *doc,U8 plus,U8 minus,
 Bool fwd,Bool abort_on_dbl_colon=FALSE)
 {//Find { } or ( ) pair. Move cur_entry & center.
-  Bool unlock=DocLock(doc),result=FALSE;
+  Bool unlock=DocLock(doc),res=FALSE;
   U8 *ptr;
   I64 ch,levels=0,colons=0,original_col=doc->cur_col;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e=doc_ce,*original_ce=doc_ce;
@@ -209,7 +209,7 @@ Bool fwd,Bool abort_on_dbl_colon=FALSE)
 		doc->cur_entry=doc_e;
 		doc->cur_col=ptr-doc_e->tag-1;
 		EdCursorLeft(doc);
-		result=FALSE;
+		res=FALSE;
 		goto pa_done;
 	      }
 	    } else {
@@ -220,7 +220,7 @@ Bool fwd,Bool abort_on_dbl_colon=FALSE)
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
 		  doc->cur_col=ptr-doc_e->tag-1;
-		  result=doc->cur_entry!=original_ce ||
+		  res=doc->cur_entry!=original_ce ||
 			doc->cur_col!=original_col;
 		  goto pa_done;
 		}
@@ -241,7 +241,7 @@ Bool fwd,Bool abort_on_dbl_colon=FALSE)
 	      if (++colons==2) {
 		doc->cur_entry=doc_e;
 		doc->cur_col=ptr-doc_e->tag+1;
-		result=FALSE;
+		res=FALSE;
 		goto pa_done;
 	      }
 	    } else {
@@ -252,7 +252,7 @@ Bool fwd,Bool abort_on_dbl_colon=FALSE)
 		if (!levels--) {
 		  doc->cur_entry=doc_e;
 		  doc->cur_col=ptr-doc_e->tag+1;
-		  result=doc->cur_entry!=original_ce ||
+		  res=doc->cur_entry!=original_ce ||
 			doc->cur_col!=original_col;
 		  goto pa_done;
 		}
@@ -273,12 +273,12 @@ pa_done:
   DocCenter(doc);
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public Bool EdGoToFun(CDoc *doc,Bool fwd,Bool abort_on_dbl_colon)
 {//Move cur_entry to start of cur fun and center.(Shoddy)
-  Bool unlock=DocLock(doc),result=FALSE;
+  Bool unlock=DocLock(doc),res=FALSE;
   I64 ch,levels,colons;
   if (fwd) {
     levels=0;
@@ -301,22 +301,22 @@ public Bool EdGoToFun(CDoc *doc,Bool fwd,Bool abort_on_dbl_colon)
     }
     DocRecalc(doc);
     if (doc->cur_entry!=doc)
-      result=TRUE;
+      res=TRUE;
   } else {
     while (EdFindPaired(doc,'}','{',FALSE,abort_on_dbl_colon));
     if (doc->cur_entry!=doc) {
       ch=EdCurU8(doc);
       if (abort_on_dbl_colon && ch==':')
-	result=TRUE;
+	res=TRUE;
       else {
 	if (ch=='{')
-	  result=TRUE;
+	  res=TRUE;
       }
     }
   }
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public U0 EdSelectFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
@@ -383,7 +383,7 @@ I64 PopUpReplaceSkipAllCancel(U8 *header=NULL,U8 *footer=NULL)
 I64 EdFindReplace(CDoc *doc)
 {
   Bool found,unlock;
-  I64 cmd,i,j,plen,rlen,dlen,result=-1,sf_flags;
+  I64 cmd,i,j,plen,rlen,dlen,res=-1,sf_flags;
   U8 *src,*dst,*dst2;
   CDocEntry *doc_ce,*doc_e,*doc_marker=NULL;
   if (doc->find_replace->pmt)
@@ -391,7 +391,7 @@ I64 EdFindReplace(CDoc *doc)
   else
     cmd=RSAC_ALL;
   if (!doc->find_replace->pmt || DocForm(doc->find_replace)) {
-    result=0;
+    res=0;
     unlock=DocLock(doc);
     if (doc->find_replace->match_case || doc->find_replace->local_var)
       sf_flags=0;
@@ -407,7 +407,7 @@ I64 EdFindReplace(CDoc *doc)
 	      !(doc_ce->de_flags&DOCEF_FILTER_SKIP) &&
 	      StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
 	  doc_ce->type|=DOCET_SELECTED;
-	  result++;
+	  res++;
 	} else
 	  doc_ce->type&=~DOCET_SELECTED;
 	doc_ce=doc_ce->next;
@@ -516,7 +516,7 @@ I64 EdFindReplace(CDoc *doc)
 		}
 		doc_e=doc->cur_entry;
 		src=doc->cur_col+doc_e->tag;
-		result++;
+		res++;
 	      } else
 		src++;
 	    }
@@ -537,7 +537,7 @@ fr_unlock_done:
     if (unlock)
       DocUnlock(doc);
   }
-  return result;
+  return res;
 }
 
 public I64 EdReplace(CDoc *doc,U8 *find,U8 *replace,
@@ -545,7 +545,7 @@ Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
 {//Find & replace using editor's cmd.
   CEdFindText old_find_replace;
   Bool unlock;
-  I64 i,result=-1;
+  I64 i,res=-1;
   if (!doc) return -1;
   unlock=DocLock(doc);
   MemCpy(&old_find_replace,doc->find_replace,sizeof(CEdFindText));
@@ -561,13 +561,13 @@ Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
       doc->find_replace->match_case=match_case;
       doc->find_replace->whole_labels=whole_labels;
       doc->find_replace->pmt=FALSE;
-      result=EdFindReplace(doc);
+      res=EdFindReplace(doc);
     }
   }
   MemCpy(doc->find_replace,&old_find_replace,sizeof(CEdFindText));
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 class CEdLineGoTo

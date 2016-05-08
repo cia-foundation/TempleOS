@@ -152,8 +152,8 @@ F64 Dipé(I64 x,I64 z,F64 é)
 
 Track *TrackFind(Track *_tempt,I64 x,I64 z)
 {
-  Track *result=_tempt,*tempt;
-  I64 dd,best=SqrI64(result->x-x)+SqrI64(result->z-z);
+  Track *res=_tempt,*tempt;
+  I64 dd,best=SqrI64(res->x-x)+SqrI64(res->z-z);
 
   tempt=_tempt;
   while (TRUE) {
@@ -163,7 +163,7 @@ Track *TrackFind(Track *_tempt,I64 x,I64 z)
     dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
     if (dd<best) {
       best=dd;
-      result=tempt;
+      res=tempt;
     } else
       break;
   }
@@ -175,11 +175,11 @@ Track *TrackFind(Track *_tempt,I64 x,I64 z)
     dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
     if (dd<best) {
       best=dd;
-      result=tempt;
+      res=tempt;
     } else
       break;
   }
-  return result;
+  return res;
 }
 
 U0 TrackSlice(F64 *_x,F64 *_z,F64 é,F64 d)
@@ -646,12 +646,12 @@ U0 Varoom()
 	"Play {"
 	"  Restart(,'\n');"
 	"  Accelerator(,,SC_CURSOR_UP);"
-	"  Break(,,SC_CURSOR_DOWN);"
+	"  Brake(,,SC_CURSOR_DOWN);"
 	"  Left(,,SC_CURSOR_LEFT);"
 	"  Right(,,SC_CURSOR_RIGHT);"
 	"}"
 	);
-  SettingsPush(,TSF_SAME_SONG); //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   try {
     Fs->text_attr=YELLOW<<4+BLUE;
     Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
@@ -695,7 +695,7 @@ vr_done: //Don't goto out of try
   } catch
     PutExcept;
   CleanUp;
-  SettingsPop(,TSF_SAME_SONG);
+  SettingsPop;
   MenuPop;
   RegWriteBranch("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
 }

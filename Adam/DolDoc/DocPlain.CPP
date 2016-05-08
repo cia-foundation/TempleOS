@@ -2,30 +2,30 @@
 
 I64 PrsDocFlagSingle(CCmpCtrl *cc,I64 *_de_flags,U32 *_type,Bool turn_on)
 {
-  I64 result=-1;
+  I64 res=-1;
   CHashGeneric *temph;
   if (cc->token==TK_IDENT &&
 	(temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_FLAG))) {
-    result=temph->user_data0;
-    if (result<64) {
-      BEqu(_de_flags,result,turn_on);
-      switch (result) {
+    res=temph->user_data0;
+    if (res<64) {
+      BEqu(_de_flags,res,turn_on);
+      switch (res) {
 	case DOCEf_SELECTED:
 	case DOCEf_UNDERLINE:
 	case DOCEf_INVERT:
 	case DOCEf_BLINK:
-	  BEqu(_type,result,turn_on);
+	  BEqu(_type,res,turn_on);
 	  break;
       }
     }
     Lex(cc);	//skip flag
   }
-  return result;
+  return res;
 }
 
 I64 PrsDocFlags(CCmpCtrl *cc,I64 *_de_flags,U32 *_type)
 {
-  I64 result=-1;
+  I64 res=-1;
   Bool turn_on;
   while (TRUE) {
     if (cc->token=='+')
@@ -35,9 +35,9 @@ I64 PrsDocFlags(CCmpCtrl *cc,I64 *_de_flags,U32 *_type)
     else
       break;
     Lex(cc);
-    result=PrsDocFlagSingle(cc,_de_flags,_type,turn_on);
+    res=PrsDocFlagSingle(cc,_de_flags,_type,turn_on);
   }
-  return result;
+  return res;
 }
 
 U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)

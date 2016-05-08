@@ -30,7 +30,7 @@ public CTask *PopUpViewPrint(U8 *fmt,...)
 #help_index "DolDoc/Input;File/FileNames;StdIn/DolDoc"
 public U8 *PopUpPickFile(U8 *dir=NULL)
 {//Filename chooser.  Uses $LK,"FileMgr",A="MN:FileMgr"$().
-  U8 *result,*st,*st2;
+  U8 *res,*st,*st2;
   if (dir)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",dir);
   else {
@@ -38,14 +38,14 @@ public U8 *PopUpPickFile(U8 *dir=NULL)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",st2);
     Free(st2);
   }
-  result=PopUp(st,Fs);
+  res=PopUp(st,Fs);
   Free(st);
-  return result;
+  return res;
 }
 
 public U8 *PopUpPickDir(U8 *dir=NULL)
 {//File dir name chooser.  Uses $LK,"FileMgr",A="MN:FileMgr"$().
-  U8 *result,*st,*st2;
+  U8 *res,*st,*st2;
   if (dir)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",dir);
   else {
@@ -53,9 +53,9 @@ public U8 *PopUpPickDir(U8 *dir=NULL)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",st2);
     Free(st2);
   }
-  result=PopUp(st,Fs);
+  res=PopUp(st,Fs);
   Free(st);
-  return result;
+  return res;
 }
 
 public U8 *FileNameForm(U8 *dft=NULL,I64 dof_flags=0,CTask *mem_task=NULL)
@@ -74,22 +74,22 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 dof_flags=0,CTask *mem_task=NULL)
 public U8 *PopUpFileName(U8 *dft=NULL,I64 dof_flags=0)
 {//Filename chooser. Uses form, not $LK,"FileMgr",A="MN:FileMgr"$().
   U8 *st=MStrPrint("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",
-	dft,dof_flags|DOF_MIN_SIZE),*result=PopUp(st,Fs);
+	dft,dof_flags|DOF_MIN_SIZE),*res=PopUp(st,Fs);
   Free(st);
-  return result;
+  return res;
 }
 
 #help_index "DolDoc"
 Bool PopUpCd()
 {
-  Bool result;
+  Bool res;
   U8 *st=PopUpPickDir;
   if (st) {
-    result=Cd(st);
+    res=Cd(st);
     Free(st);
   } else
-    result=FALSE;
-  return result;
+    res=FALSE;
+  return res;
 }
 
 #help_index "DolDoc/Input;Char/Lists;StdIn/DolDoc"
@@ -112,9 +112,9 @@ public U8 *PopUpPickLst(U8 *lst)
   return i;
 }
 
-public U8 *PopUpPickDefineSub(U8 *st)
+public U8 *PopUpPickDefineSub(U8 *dname)
 {//Prompt for $LK,"Define",A="HI:Define"$ lst entry in PopUp win task.
-  return PopUpPickLst(Define(st));
+  return PopUpPickLst(Define(dname));
 }
 
 #help_index "DolDoc/Input;StdIn/DolDoc"
@@ -166,37 +166,37 @@ public Bool PopUpCancelOk(U8 *header=NULL,U8 *footer=NULL)
 
 U8 *PopUpGetStr2(U8 *header,CTask *mem_task)
 {
-  U8 *result,*st;
+  U8 *res,*st;
   if (header)
     "%s",header;
   st=GetStr(,,GSF_WITH_NEW_LINE);
-  result=StrNew(st,mem_task);
+  res=StrNew(st,mem_task);
   Free(st);
-  return result;
+  return res;
 }
 
 public U8 *PopUpGetStr(U8 *header=NULL)
 {//Prompt for text str in PopUp win task.
   U8 *st=MStrPrint("PopUpGetStr2(0x%X,0x%X);",header,Fs),
-	*result=PopUp(st,Fs);
+	*res=PopUp(st,Fs);
   Free(st);
-  return result;
+  return res;
 }
 
 public I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
 {//Prompt for I64 text expression in PopUp win task.
   U8 *st=MStrPrint("GetI64(0x%X,0x%X,0x%X,0x%X);",msg,dft,lo,hi);
-  I64 result=PopUp(st,Fs);
+  I64 res=PopUp(st,Fs);
   Free(st);
-  return result;
+  return res;
 }
 
 public F64 PopUpGetF64(U8 *msg,F64 dft,F64 lo=MIN_F64,F64 hi=MAX_F64)
 {//Prompt for F64 text expression in PopUp win task.
   U8 *st=MStrPrint("GetF64(0x%X,0x%X(F64),0x%X(F64),0x%X(F64));",msg,dft,lo,hi);
-  F64 result=PopUp(st,Fs)(F64);
+  F64 res=PopUp(st,Fs)(F64);
   Free(st);
-  return result;
+  return res;
 }
 
 public I64 PopUpRangeI64(I64 lo,I64 hi,I64 step=1,
@@ -270,16 +270,16 @@ public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
   Bool okay=TRUE;
   U8 *name=FileNameAbs(filename),
 	*name2=DftExt(name,"CPP.Z");
-  I64 result=0;
+  I64 res=0;
   if (warn_ext &&
 	!FilesFindMatch(name2,FILEMASK_JIT) &&
 	!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
     okay=FALSE;
   if (okay)
-    result=Adam("#include \"%s\";",name2);
+    res=Adam("#include \"%s\";",name2);
   Free(name2);
   Free(name);
-  return result;
+  return res;
 }
 
 public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
@@ -288,7 +288,7 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
   Bool okay=TRUE;
   U8 *st,*name=FileNameAbs(filename),
 	*name2=DftExt(name,"CPP.Z");
-  I64 result=0;
+  I64 res=0;
   if (warn_ext &&
 	!FilesFindMatch(name2,FILEMASK_JIT) &&
 	!PopUpCancelOk(ST_WARN_ST "Not .CPP File\n\n"))
@@ -297,10 +297,10 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
     st=MStrPrint(
 	  "\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\");\\n\");UserTaskCont;",
 	  name2);
-    result=PopUp(st,parent,_pu_task);
+    res=PopUp(st,parent,_pu_task);
     Free(st);
   }
   Free(name2);
   Free(name);
-  return result;
+  return res;
 }

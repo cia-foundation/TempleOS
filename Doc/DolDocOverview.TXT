@@ -27,7 +27,7 @@ $ID,2$The cursor pos is stored as a ASCII#5 character and is not bracketed with 
 $ID,-2$$TR,"TB Tab"$
 $ID,2$Tabs are normally not bracketed with '$FG,2$$$$FG$', but are ASCII#9.
 $ID,-2$$TR,"CL Clear"$
-$ID,2$Clear all previous entries except ones with hold($FG,2$+H$FG$) flags.  You might want $FG,2$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear",A="MN:DocClear"$().
+$ID,2$Clear all prev entries except ones with hold($FG,2$+H$FG$) flags.  You might want $FG,2$+H$FG$ on word wrap entries.  Alternatively, you can use $LK,"DocClear",A="MN:DocClear"$().
 $ID,-2$$TR,"PB Page Break"$
 $ID,2$Page break.
 $ID,-2$$TR,"PL Page Length"$

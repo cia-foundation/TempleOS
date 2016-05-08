@@ -54,7 +54,7 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
       ptr[0]=ch;
       ptr[1]=BLACK<<4+WHITE;
     } else {
-      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_IDX,VGAR_MAP_MASK);
       OutU8(VGAP_DATA,0x0F); //All planes -- WHITE
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
 //Scroll cached image
@@ -64,14 +64,14 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 	MemSet(text.raw_screen_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,
 	      GR_WIDTH*FONT_HEIGHT>>3);
 
-	MemCpy(VGAM_GRAPHICS,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
+	MemCpy(text.vga_alias,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
       }
       PUSHFD
       CLI
       ptr=ptr1=col+row*GR_WIDTH*FONT_HEIGHT>>3;
-      ptr+=VGAM_GRAPHICS;
+      ptr+=text.vga_alias;
       ptr1+=text.raw_screen_image; //Write to cached image as well
       ptr2=&text.font[ch&255];
       for (i=0;i<FONT_HEIGHT;i++) {

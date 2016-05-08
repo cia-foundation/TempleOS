@@ -6,8 +6,8 @@ one for fun.
 U8 *SuggestMatchForm(U8 *src)
 {
   I64 ch,ch1=0;
-  U8 *result=MStrUtil(src,SUF_TO_UPPER),*dst;
-  dst=src=result;
+  U8 *res=MStrUtil(src,SUF_TO_UPPER),*dst;
+  dst=src=res;
   while (ch=*src++)  {
     if (!StrOcc("AEIOU",ch)) {
       if (ch=='C') ch='K';
@@ -18,7 +18,7 @@ U8 *SuggestMatchForm(U8 *src)
     ch1=ch;
   }
   *dst=0;
-  return result;
+  return res;
 }
 
 /*Fmt of word lst entry:

@@ -10,18 +10,18 @@ F64 Cost(CMathODE *ode)
 {
   MyMass   *tempm;
   MySpring *temps;
-  F64 result=0;
+  F64 res=0;
   tempm=ode->next_mass;
   while (tempm!=&ode->next_mass) {
-    result+=tempm->cost;
+    res+=tempm->cost;
     tempm=tempm->next;
   }
   temps=ode->next_spring;
   while (temps!=&ode->next_spring) {
-    result+=temps->cost;
+    res+=temps->cost;
     temps=temps->next;
   }
-  return result;
+  return res;
 }
 
 U0 DrawIt(CTask *task,CDC *dc)

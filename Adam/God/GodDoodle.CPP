@@ -72,10 +72,10 @@ U0 GodDoodleHexIns(U8 *st)
 I64 GodDoodleBits(I64 num_bits)
 {
   U8 b;
-  I64 result=0;
+  I64 res=0;
   while (num_bits) {
     if (FifoU8Rem(god.doodle_fifo,&b)) {
-      result=result<<1+b;
+      res=res<<1+b;
       num_bits--;
     } else {
       god.doodle_ch=GetChar(,FALSE);
@@ -90,7 +90,7 @@ I64 GodDoodleBits(I64 num_bits)
 	GodDoodleBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
     }
   }
-  return result;
+  return res;
 }
 
 public U8 *GodDoodleSprite(U8 *hex=NULL)

@@ -111,7 +111,7 @@ public U0 SettingsPop(CTask *task=NULL,I64 flags=0)
 	Suspend(task->song_task,FALSE);
     }
 
-    SettingsPop2(task,tempse); //Do it to get results fast
+    SettingsPop2(task,tempse); //Do it to get ress fast
     WinMgrSync(,TRUE);
     SettingsPop2(task,tempse); //Redo in case was lost by old update
 

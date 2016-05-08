@@ -54,7 +54,7 @@ AP_32BIT_INIT:
 	PUSH	U32 RFLAGG_START
 	POPFD
 	PUSH	U32 0	//Return from next call will be 64-bit
-	CALL	SYS_EM64T
+	CALL	SYS_ENTER_LONG_MODE
 USE64
 	FNINIT
 	MOV	RAX,RSI
@@ -214,7 +214,7 @@ CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
        I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
        I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
 {//Queue multicore jobs, handled by Seth tasks.
-//Set flags to zero if you wish to get the result.
+//Set flags to zero if you wish to get the res.
   //See $LK,"::/Demo/MultiCore/Lock.CPP"$
   CSrvCtrl *ctrl;
   CSrvCmd *tempc;
@@ -249,7 +249,7 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
 	I64 target_cpu, CTask *parent=NULL, //NULL means adam
 	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
 {
-  CTask *result;
+  CTask *res;
   CSrvCmd *tempc=JobQue(fp_addr,data,target_cpu,
 	flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
   CSrvCtrl *ctrl;
@@ -260,7 +260,7 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   }
   LBtr(&Fs->task_flags,TASKf_IDLE);
 
-  result=tempc->spawned_task;
+  res=tempc->spawned_task;
   ctrl=tempc->ctrl;
   PUSHFD
   CLI
@@ -270,7 +270,7 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   LBtr(&ctrl->flags,SVCRf_LOCKED);
   POPFD
   SrvCmdDel(tempc);
-  return result;
+  return res;
 }
 
 U0 CoreAPSethInit()
@@ -278,7 +278,6 @@ U0 CoreAPSethInit()
 //as the first thing a CPU does before waiting for jobs.
   MPAPICInit;
   Fs->rip=&CoreAPSethTask;
-  Fs->time_slice_start=GetTSC;
   TaskContextRestore;
 }
 
@@ -365,7 +364,6 @@ U0 Core0Init()
   //Must be in code heap because init code uses 32 bit addr of cpu_struct
   adam_task->gs=cpu_structs=
 	CAlloc(sizeof(CCPU)*MP_MAX_PROCESSORS,Fs->code_heap);
-  adam_task->time_slice_start=GetTSC;
   CPUStructInit(0,cpu_structs,adam_task);
   asm {//RAX has GS
     IMPORT SET_GS_BASE;

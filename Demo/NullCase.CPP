@@ -1,6 +1,6 @@
 //This shows a switch stmt with some null cases.
 //If no number for the case,
-//it uses one plus previous case number.
+//it uses one plus prev case number.
 
 U0 NullCase()
 {
@@ -8,11 +8,11 @@ U0 NullCase()
   for (i=0;i<20;i++)
     switch (i) {
       case: "Zero\n";	break; //Starts at zero
-      case: "One\n";	break; //One plus previous case.
+      case: "One\n";	break; //One plus prev case.
       case: "Two\n";	break;
       case: "Three\n";	break;
       case 10: "Ten\n";	break;
-      case: "Eleven\n";	break; //One plus previous case.
+      case: "Eleven\n";	break; //One plus prev case.
     }
 }
 

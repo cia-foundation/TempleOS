@@ -143,7 +143,7 @@ U0 BibleInit()
 
 public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
 {//Line number to verse str, Malloc()ed.
-//Separate with <SPACE> or ','.
+//Separate with <SPACE> or ','.  If you pass '%', it uses "%20".
   CDoc *doc;
   CDocEntry *doc_e;
   I64 i=0,cnt=DefineCnt("ST_BIBLE_BOOKS"),start=0,last_start=0;
@@ -167,7 +167,10 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
       while ('0'<=*ptr2<='9' || *ptr2==':')
 	ptr2++;
       *ptr2=0;
-      ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
+      if (separate_ch=='%')
+	ptr=MStrPrint("%Z%%20%s",i,"ST_BIBLE_BOOKS",ptr);
+      else
+	ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
     } else {
       while (TRUE) {
 	doc_e=doc_e->last;
@@ -195,7 +198,10 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
 	      while ('0'<=*ptr2<='9')
 		ptr2++;
 	      *ptr2=0;
-	      ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
+	      if (separate_ch=='%')
+		ptr=MStrPrint("%Z%%20%s",i,"ST_BIBLE_BOOKS",ptr);
+	      else
+		ptr=MStrPrint("%Z%c%s",i,"ST_BIBLE_BOOKS",separate_ch,ptr);
 	      break;
 	    }
 	  }
@@ -272,8 +278,8 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
 
 public CDoc *BibleDoc()
 {//Return Bible as DolDoc with trees.
-  CDoc	*result=DocRead(BIBLE_FILENAME);
-  CDocEntry *doc_e=result->root.next,*doc_e1;
+  CDoc	*res=DocRead(BIBLE_FILENAME);
+  CDocEntry *doc_e=res->root.next,*doc_e1;
   Bool open_chapter=FALSE;
   U8	*ptr=Define("ST_BIBLE_BOOK_LINES");
   I64	book,book_cnt=DefineCnt("ST_BIBLE_BOOK_LINES")-1,
@@ -283,47 +289,47 @@ public CDoc *BibleDoc()
   for (book=0;book<book_cnt;book++) {
     while (doc_e->y+1<line) {
       doc_e1=doc_e->next;
-      DocEntryDel(result,doc_e);
+      DocEntryDel(res,doc_e);
       doc_e=doc_e1;
     }
-    result->cur_entry=doc_e;
-    result->cur_col=0;
-    DocPrint(result,"$$TR,\"%Z\"$$\n$$ID,2$$",book,"ST_BIBLE_BOOKS");
+    res->cur_entry=doc_e;
+    res->cur_col=0;
+    DocPrint(res,"$$TR,\"%Z\"$$\n$$ID,2$$",book,"ST_BIBLE_BOOKS");
     line=Str2I64(ptr,,&ptr);
     ptr++;
     chapter=1;
     while (doc_e->y+1<line) {
       doc_e1=doc_e->next;
       if (doc_e->type_u8==DOCT_TEXT && StrMatch(":1 ",doc_e->tag)) {
-	result->cur_entry=doc_e;
-	result->cur_col=0;
+	res->cur_entry=doc_e;
+	res->cur_col=0;
 	if (open_chapter) {
-	  DocPrint(result,"$$ID,-2$$");
+	  DocPrint(res,"$$ID,-2$$");
 	  open_chapter=FALSE;
 	}
-	DocPrint(result,"$$TR,\"%d\"$$\n$$ID,2$$",chapter++);
+	DocPrint(res,"$$TR,\"%d\"$$\n$$ID,2$$",chapter++);
 	open_chapter=TRUE;
       } else if (chapter==1) {
 	doc_e1=doc_e->next;
-	DocEntryDel(result,doc_e);
+	DocEntryDel(res,doc_e);
 	doc_e=doc_e1;
       }
       doc_e=doc_e1;
     }
-    result->cur_entry=doc_e;
-    result->cur_col=0;
+    res->cur_entry=doc_e;
+    res->cur_col=0;
     if (open_chapter) {
-      DocPrint(result,"$$ID,-2$$");
+      DocPrint(res,"$$ID,-2$$");
       open_chapter=FALSE;
     }
-    DocPrint(result,"$$ID,-2$$");
+    DocPrint(res,"$$ID,-2$$");
   }
-  while (doc_e!=result) {
+  while (doc_e!=res) {
     doc_e1=doc_e->next;
-    DocEntryDel(result,doc_e);
+    DocEntryDel(res,doc_e);
     doc_e=doc_e1;
   }
-  return result;
+  return res;
 }
 
 public U0 BibleView()

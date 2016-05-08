@@ -17,7 +17,7 @@ F64 angles[ANGLES]={
 class Turtle
 {
   F64 x,y,z,speed,é,w;
-  I64 dé_index;
+  I64 dé_idx;
   CColorROPU16 edge,middle;
   Bool ends,first;
 } tt;
@@ -39,7 +39,7 @@ U0 TurtleMicroMove(Turtle *t,F64 dt)
 {
   t->x+=dt*t->speed*Cos(t->é);
   t->y+=dt*t->speed*Sin(t->é);
-  t->é=Wrap(t->é+dt*angles[t->dé_index]);
+  t->é=Wrap(t->é+dt*angles[t->dé_idx]);
 }
 
 U0 TurtleEnd(CDC *dc,Turtle *t,CColorROPU16 edge,CColorROPU16 middle,F64 é)
@@ -88,7 +88,7 @@ U0 TurtleInit(Turtle *t)
   t->z=5;
   t->edge=BLACK;
   t->middle=YELLOW;
-  t->dé_index=ANGLES/2;
+  t->dé_idx=ANGLES/2;
   t->first=TRUE;
   t->ends=TRUE;
 }
@@ -98,7 +98,7 @@ U0 DrawIt(CTask *,CDC *dc)
   Turtle t2;
   MemCpy(&t2,&tt,sizeof(Turtle));
   GrPrint(dc,0,0,"Layer:%f Speed:%f é:%5.1f dé:%5.1f Width:%f",
-	tt.z,tt.speed,tt.é*180/ã,angles[tt.dé_index]*180/ã,tt.w);
+	tt.z,tt.speed,tt.é*180/ã,angles[tt.dé_idx]*180/ã,tt.w);
 
   TurtleMove(dc,&t2,RED,LTRED);
   dc->color=LTRED;
@@ -205,12 +205,12 @@ U0 Lattice()
 	    case 0:
 	      switch (a2.u8[0]) {
 		case SC_CURSOR_LEFT:
-		  if (tt.dé_index)
-		    tt.dé_index--;
+		  if (tt.dé_idx)
+		    tt.dé_idx--;
 		  break;
 		case SC_CURSOR_RIGHT:
-		  if (tt.dé_index<ANGLES-1)
-		    tt.dé_index++;
+		  if (tt.dé_idx<ANGLES-1)
+		    tt.dé_idx++;
 		  break;
 		case SC_CURSOR_UP:
 		  tt.speed+=TURTLE_SPEED_STEP;

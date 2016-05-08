@@ -64,7 +64,7 @@ U8 *YouTubeGet(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",U8 *needle)
   I64 i=0,line=MIN_I64;
   CDoc	*doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR),
 	*doc2=DocNew;
-  U8 *title,*code,*result;
+  U8 *title,*code,*res;
   while (DocFind(doc,line,needle)) {
     if (!(doc->cur_entry->y&1)) {
       title=doc->cur_entry->tag;
@@ -79,21 +79,21 @@ U8 *YouTubeGet(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",U8 *needle)
   }
   switch (i) {
     case 0:
-      result=NULL;
+      res=NULL;
       break;
     case 1:
-      result=StrNew(code);
+      res=StrNew(code);
       break;
     default:
-      result=PopUpMenu(doc2);
-      if (result==DOCM_CANCEL)
-	result=NULL;
+      res=PopUpMenu(doc2);
+      if (res==DOCM_CANCEL)
+	res=NULL;
       else
-	result=StrNew(result);
+	res=StrNew(res);
   }
   DocDel(doc);
   DocDel(doc2);
-  return result;
+  return res;
 }
 
 U0 YouTubeAdd(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",
@@ -232,19 +232,50 @@ class CRandHexBeacon8Form
   I64	sec;
 };
 
+U8 *URLPercentSpaces(U8 *src)
+{
+  U8 buf[2048],*dst=buf;
+  while (*src) {
+    if (*src==CH_SPACE) {
+      *dst++='%';
+      *dst++='%';
+      *dst++='2';
+      *dst++='0';
+      src++;
+    } else
+      *dst++=*src++;
+  }
+  *dst=0;
+  return StrNew(buf);
+}
+
+U8 *URLPlusSpaces(U8 *src)
+{
+  U8 buf[2048],*dst=buf;
+  while (*src) {
+    if (*src==CH_SPACE) {
+      *dst++='+';
+      src++;
+    } else
+      *dst++=*src++;
+  }
+  *dst=0;
+  return StrNew(buf);
+}
+
 U8 *RandVideoRead(U8 *filename,I64 line)
 {
-  U8 *result=NULL;
+  U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   if (DocLineNumGoTo(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
-    result=StrNew(doc->cur_entry->tag);
+    res=StrNew(doc->cur_entry->tag);
   DocDel(doc);
-  return result;
+  return res;
 }
 
 U8 *RandVideoWrite(U8 *filename,I64 line,U8 *st)
 {
-  U8 *result=NULL;
+  U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
   if (DocLineNumGoTo(doc,line-1)) {
     if (doc->cur_entry->type_u8==DOCT_TEXT) {
@@ -256,12 +287,12 @@ U8 *RandVideoWrite(U8 *filename,I64 line,U8 *st)
     DocWrite(doc);
   }
   DocDel(doc);
-  return result;
+  return res;
 }
 
 U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,U8 *filename)
 {
-  U8 *st;
+  U8 *st,*st2;
   if (st=RandVideoRead(filename,url->cert*2)) {
     StrCpy(url->tag,st);
     Free(st);
@@ -277,9 +308,18 @@ U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,U8 *filename)
       } else
 	st=NULL;
     }
-    "God's response:\n"
-	  "$$TX,\"%s\",HTML=\"%s\"$$\n"
-	  "#%s\n",title,webpage,url->tag;
+    if (StrIMatch("Metallica",filename)) {
+      st2=URLPlusSpaces(url->tag+3);
+      "God's response:\n"
+	    "$$TX,\"%s\",HTML=\"%s\"$$\n"
+	    "$$TX,\"%s (Lyrics)\","
+	    "HTML=\"http://lmgtfy.com/?q=Metallica+lyrics+%s\"$$\n",
+	    title,webpage,url->tag,st2;
+      Free(st2);
+    } else
+      "God's response:\n"
+	    "$$TX,\"%s\",HTML=\"%s\"$$\n"
+	    "#%s\n",title,webpage,url->tag;
     if (st) {
       "$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\">"
 	    "<param name=\\\"movie\\\" "
@@ -294,23 +334,6 @@ U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,U8 *filename)
       Free(st);
     }
   }
-}
-
-U8 *URLPercentSpaces(U8 *src)
-{
-  U8 buf[1024],*dst=buf;
-  while (*src) {
-    if (*src==CH_SPACE) {
-      *dst++='%';
-      *dst++='%';
-      *dst++='2';
-      *dst++='0';
-      src++;
-    } else
-      *dst++=*src++;
-  }
-  *dst=0;
-  return StrNew(buf);
 }
 
 U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
@@ -425,7 +448,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tempde1);
 }
 
-#define NIST_TIME_OFFSET	(-7916-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-7923-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()

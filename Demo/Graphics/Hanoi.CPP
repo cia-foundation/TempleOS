@@ -22,11 +22,11 @@ I64 TopDisk(I64 pole)
 
 I64 PosInStk(I64 pole,I64 disk)
 {
-  I64 result=0,i;
+  I64 res=0,i;
   for (i=NUM_DISKS-1;i>disk;i--)
     if (disks_pole[i]==pole)
-      result++;
-  return result;
+      res++;
+  return res;
 }
 
 U0 SetDisksRestXY()

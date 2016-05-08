@@ -1,6 +1,6 @@
 U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
 {//Compile one cc stmt to bin code.
-  I64 size,i,j,k,*result=INVALID_PTR;
+  I64 size,i,j,k,*res=INVALID_PTR;
   CCodeCtrl *tempcbh;
   if (_type) *_type=RT_I64;
   Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
@@ -9,17 +9,17 @@ U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
   COCInit(cc);
   if (!PrsStmt(cc,,,cmp_flags)) {
     if (cc->coc.coc_root.next!=&cc->coc.coc_root) {
-      cc->coc.coc_root.last->ic_flags&=~ICF_NO_DEPEND_RESULT;
+      cc->coc.coc_root.last->ic_flags&=~ICF_RES_NOT_USED;
       ICAdd(cc,IC_RETURN_VAL2,0,0);
       ICAdd(cc,IC_RET,0,0);
-      if (result=COCCompile(cc,&size,NULL,_type)) {
+      if (res=COCCompile(cc,&size,NULL,_type)) {
 	if (cc->flags&CCF_AOT_COMPILE) {
 	  j=cc->aotc->ip;
 	  k=(size+7)>>3;
 	  for (i=0;i<k;i++)
-	    AOTStoreCodeU64(cc,result[i]);
-	  Free(result);
-	  result=j;
+	    AOTStoreCodeU64(cc,res[i]);
+	  Free(res);
+	  res=j;
 	}
       }
     } //TODO: else del misc?
@@ -29,7 +29,7 @@ U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
     tempcbh=COCPopNoFree(cc);
     COCAppend(cc,tempcbh);
   }
-  return result;
+  return res;
 }
 
 CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
@@ -41,15 +41,15 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
   CAOTImportExport *tempie;
   Bool okay=TRUE;
   CLexHashTableContext *htc=MAlloc(sizeof(CLexHashTableContext));
-  CAOT *result=CAlloc(sizeof(CAOT)),*parent;
+  CAOT *res=CAlloc(sizeof(CAOT)),*parent;
   if (parent=cc->aot) {
-    result->parent_aot=parent;
-    QueIns(result,parent->last);
+    res->parent_aot=parent;
+    QueIns(res,parent->last);
   } else
-    QueInit(result);
-  cc->aot=result;
+    QueInit(res);
+  cc->aot=res;
 
-  result->next_ie=result->last_ie=&result->next_ie;
+  res->next_ie=res->last_ie=&res->next_ie;
   cc->aotc=aotc=CAlloc(sizeof(CAOTCtrl));
   cc->aot_depth++;
 
@@ -86,14 +86,14 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
 	  tempie=CAlloc(sizeof(CAOTImportExport));
 	  tempie->type=IET_MAIN;
 	  tempie->ip=buf;
-	  QueIns(tempie,result->last_ie);
+	  QueIns(tempie,res->last_ie);
 	}
 	if (cmp_flags&CMPF_ASM_BLK)
 	  break;
       }
     } else
       PrsStmt(cc,,,cmp_flags);
-    AOTGlblsResolve(cc,result);
+    AOTGlblsResolve(cc,res);
   } catch {
     if (Fs->except_ch=='Compiler' && !(cmp_flags&CMPF_ASM_BLK)) {
       LexPutPos(cc);
@@ -104,10 +104,10 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
   if (!okay) {
     if (cc->error_cnt<1)
       cc->error_cnt=1;
-    cc->aot=result->parent_aot;
-    Free(result);
+    cc->aot=res->parent_aot;
+    Free(res);
     LinkedLstDel(aotc->bin);
-    result=NULL;
+    res=NULL;
   } else {
     if (map_name)
       MapFileWrite(cc->htc.glbl_hash_table,map_name,mapfile_drv_let);
@@ -115,17 +115,17 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
     HashTableDel(cc->htc.glbl_hash_table);
 
     if (!aotc->num_bin_U8s)
-      result->buf=NULL;
+      res->buf=NULL;
     else {
       if (cc->flags&CCF_AOT_COMPILE)
-	result->buf=MAlloc(aotc->num_bin_U8s);
+	res->buf=MAlloc(aotc->num_bin_U8s);
       else {
 	if (aotc->module_org==INVALID_PTR)
-	  result->buf=MAlloc(aotc->num_bin_U8s,Fs->code_heap);
+	  res->buf=MAlloc(aotc->num_bin_U8s,Fs->code_heap);
 	else
-	  result->buf=aotc->module_org;
+	  res->buf=aotc->module_org;
       }
-      result->aot_U8s=aotc->num_bin_U8s;
+      res->aot_U8s=aotc->num_bin_U8s;
       tempbin=aotc->bin;
       j=0;
       l=aotc->num_bin_U8s;
@@ -133,17 +133,17 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
 	i=l;
 	if (i>AOT_BIN_BLK_SIZE)
 	  i=AOT_BIN_BLK_SIZE;
-	MemCpy(result->buf+j,tempbin->body,i);
+	MemCpy(res->buf+j,tempbin->body,i);
 	j+=i;
 	l-=i;
 	tempbin=tempbin->next;
       }
     }
     LinkedLstDel(aotc->bin);
-    result->abss=aotc->abss;
-    result->heap_glbls=aotc->heap_glbls;
-    result->max_align_bits=aotc->max_align_bits;
-    result->module_org=aotc->module_org;
+    res->abss=aotc->abss;
+    res->heap_glbls=aotc->heap_glbls;
+    res->max_align_bits=aotc->max_align_bits;
+    res->module_org=aotc->module_org;
   }
   cc->aot=parent;
   MemCpy(&cc->htc,htc,sizeof(CLexHashTableContext));
@@ -151,24 +151,24 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
   Free(aotc);
   cc->aotc=old_aot;
   cc->aot_depth--;
-  return result;
+  return res;
 }
 
 CAOT *CmpBuf(U8 *buf,U8 *map_name=NULL,
   I64 *error_cnt=NULL, I64 *warning_cnt=NULL,U8 mapfile_drv_let=0)
 {
   CCmpCtrl *cc;
-  CAOT *result=NULL;
+  CAOT *res=NULL;
   cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF);
   cc->flags|=CCF_AOT_COMPILE;
   QueIns(cc,Fs->last_lex);
-  result=CmpJoin(cc,CMPF_LEX_FIRST,map_name,mapfile_drv_let);
+  res=CmpJoin(cc,CMPF_LEX_FIRST,map_name,mapfile_drv_let);
   if (error_cnt)   *error_cnt=cc->error_cnt;
   if (warning_cnt) *warning_cnt=cc->warning_cnt;
   QueRem(cc);
-  if (result)
+  if (res)
     CmpCtrlDel(cc);
-  return result;
+  return res;
 }
 
 U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
@@ -571,7 +571,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 I64 ExePutS(U8 *buf,U8 *filename=NULL,
 	Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
 {//JIT Compile and execute text from a puts("").
-  I64 result;
+  I64 res;
   Bool okay=TRUE;
   CCmpCtrl *cc;
   if (!filename)
@@ -590,43 +590,43 @@ I64 ExePutS(U8 *buf,U8 *filename=NULL,
   QueIns(cc,Fs->last_lex);
   try {
     Lex(cc);
-    result=ExeCmdLine(cc);
+    res=ExeCmdLine(cc);
   } catch {
     if (Fs->except_ch=='Compiler' || Fs->except_ch=='Break') {
       Fs->catch_except=TRUE;
       okay=FALSE;
-      result=0;
+      res=0;
     }
   }
   QueRem(cc);
   if (okay)
     CmpCtrlDel(cc); //TODO: can crash
-  return result;
+  return res;
 }
 
 I64 ExePrint(U8 *fmt,...)
 {//JIT Compile and execute text from a printf().
-  I64 result;
+  I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  result=ExePutS(buf);
+  res=ExePutS(buf);
   Free(buf);
-  return result;
+  return res;
 }
 
 I64 ExeFile(U8 *name,Bool just_load=FALSE)
 {//JIT Compile and execute a file.
-  I64 result;
+  I64 res;
   U8 *name2=DftExt(name,"CPP.Z"),
 	*st=MStrPrint("#include \"%s\";",name2);
-  result=ExePutS(st,name,just_load);
+  res=ExePutS(st,name,just_load);
   Free(st);
   Free(name2);
-  return result;
+  return res;
 }
 
 I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
 {//throws exceptions
-  I64 result;
+  I64 res;
   CCmpCtrl *cc;
   if (!filename)
     filename=blkdev.temp_filename;
@@ -637,35 +637,35 @@ I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
     cc->opts=Fs->last_lex->opts;
   QueIns(cc,Fs->last_lex);
   Lex(cc);
-  result=ExeCmdLine(cc);
+  res=ExeCmdLine(cc);
   QueRem(cc);
   CmpCtrlDel(cc);
-  return result;
+  return res;
 }
 
 I64 ExePrint2(U8 *fmt,...)
 {//throws exceptions
-  I64 result;
+  I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  result=ExePutS2(buf);
+  res=ExePutS2(buf);
   Free(buf);
-  return result;
+  return res;
 }
 
 I64 ExeFile2(U8 *name,Bool just_load=FALSE)
 {//throws exceptions
-  I64 result;
+  I64 res;
   U8 *name2=DftExt(name,"CPP.Z"),*st=MStrPrint("#include \"%s\";",name2);
-  result=ExePutS2(st,name,just_load);
+  res=ExePutS2(st,name,just_load);
   Free(st);
   Free(name2);
-  return result;
+  return res;
 }
 
 I64 StreamExePrint(U8 *fmt,...)
 {//Causes value from stream to be used in an #exe{} block.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  I64 result=0;
+  I64 res=0;
   CLexHashTableContext *htc;
   CCmpCtrl *cc=Fs->last_lex;
   if (cc==&Fs->next_lex)
@@ -674,10 +674,10 @@ I64 StreamExePrint(U8 *fmt,...)
     if (!(cc->flags&CCF_EXE_BLK))
       LexExcept(cc,"StreamExePrint only allowed in AOT compiled #exe{} mode.");
     if (htc=cc->htc.next)
-      result=ExePutS(buf,,,htc);
+      res=ExePutS(buf,,,htc);
   }
   Free(buf);
-  return result;
+  return res;
 }
 
 U0 CInit()

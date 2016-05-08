@@ -1,8 +1,8 @@
-CHashDefineStr *DefineLoad(U8 *name,U8 *st)
+CHashDefineStr *DefineLoad(U8 *dname,U8 *st)
 {//Create DEFINE hash entry with string.
   CHashDefineStr *temph=CAlloc(sizeof(CHashDefineStr));
   temph->type=HTT_DEFINE_STR;
-  temph->str=StrNew(name);
+  temph->str=StrNew(dname);
   temph->data=StrNew(st);
   temph->cnt=-1;
   temph->src_link=MStrPrint("AD:0x%X",Caller);
@@ -10,29 +10,29 @@ CHashDefineStr *DefineLoad(U8 *name,U8 *st)
   return temph;
 }
 
-CHashDefineStr *DefineLstLoad(U8 *name,U8 *st)
+CHashDefineStr *DefineLstLoad(U8 *dname,U8 *lst)
 {//Create DEFINE list. Not efficient, but handy.
   I64 cnt=0;
-  U8 *ptr,**lst;
+  U8 *ptr,**idx;
   CHashDefineStr *temph=CAlloc(sizeof(CHashDefineStr));
   temph->type=HTT_DEFINE_STR;
-  temph->str=StrNew(name);
+  temph->str=StrNew(dname);
   temph->src_link=MStrPrint("AD:0x%X",Caller);
-  ptr=st;
+  ptr=lst;
   while (*ptr) {
     if (*ptr!='@')
       cnt++;
     while (*ptr++);
   }
-  temph->data=MAlloc(ptr+1-st);
-  MemCpy(temph->data,st,ptr+1-st);
+  temph->data=MAlloc(ptr+1-lst);
+  MemCpy(temph->data,lst,ptr+1-lst);
   temph->cnt=cnt;
 
-  lst=temph->sub_lst=MAlloc(cnt*sizeof(U8 *));
-  ptr=st;
+  idx=temph->sub_idx=MAlloc(cnt*sizeof(U8 *));
+  ptr=lst;
   while (*ptr) {
     if (*ptr!='@')
-      *lst++=ptr;
+      *idx++=ptr;
     while (*ptr++);
   }
 
@@ -40,57 +40,57 @@ CHashDefineStr *DefineLstLoad(U8 *name,U8 *st)
   return temph;
 }
 
-U0 UndefinedDefine(U8 *name)
+U0 UndefinedDefine(U8 *dname)
 {
-  ST_ERR_ST "Undefined Define: '%s'.\n",name;
+  ST_ERR_ST "Undefined Define: '%s'.\n",dname;
   throw('UndefDef');
 }
 
-U8 *Define(U8 *name)
+U8 *Define(U8 *dname)
 {//Look for DEFINE named in hash table, return ptr string.
   CHashDefineStr *temph;
-  if (temph=HashFind(name,Fs->hash_table,HTT_DEFINE_STR))
+  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
     return temph->data;
-  else if (name)
-    UndefinedDefine(name);
+  else if (dname)
+    UndefinedDefine(dname);
   else
     return NULL;
 }
 
-U8 *DefineSub(I64 sub,U8 *name)
+U8 *DefineSub(I64 sub,U8 *dname)
 {//Return DEFINE list entry indexed by number.
   CHashDefineStr *temph;
-  if (temph=HashFind(name,Fs->hash_table,HTT_DEFINE_STR)) {
+  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR)) {
     if (0<=sub<temph->cnt)
-      return temph->sub_lst[sub];
+      return temph->sub_idx[sub];
     else
       return NULL;
-  } else if (name)
-    UndefinedDefine(name);
+  } else if (dname)
+    UndefinedDefine(dname);
   else
     return NULL;
 }
 
-I64 DefineCnt(U8 *name)
+I64 DefineCnt(U8 *dname)
 {//Return cnt of entries in define list.
   CHashDefineStr *temph;
-  if (temph=HashFind(name,Fs->hash_table,HTT_DEFINE_STR))
+  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
     return temph->cnt;
-  else if (name)
-    UndefinedDefine(name);
+  else if (dname)
+    UndefinedDefine(dname);
   else
     return -1;
 }
 
-I64 DefineMatch(U8 *needle,U8 *haystack_lst_name,I64 flags=0)
+I64 DefineMatch(U8 *needle,U8 *haystack_lst_dname,I64 flags=0)
 {//Find match for string in define list.
-  return LstMatch(needle,Define(haystack_lst_name),flags);
+  return LstMatch(needle,Define(haystack_lst_dname),flags);
 }
 
-U0 DefinePrint(U8 *name,U8 *src,...)
+U0 DefinePrint(U8 *dname,U8 *src,...)
 {//Create DEFINE entry with $LK,"Print",A="FI:::/Doc/Print.TXT"$()ed string.
   U8 *buf=StrPrintJoin(NULL,src,argc,argv);
-  DefineLoad(name,buf);
+  DefineLoad(dname,buf);
   Free(buf);
 }
 
@@ -156,13 +156,13 @@ U8 *str2color_lst="/,)}>";
 
 CColorROPU16 Str2ColorU16(U8 *st)
 {//$LK,"DCLighting",A="MN:DCLighting"$ color str with flags to $LK,"CColorROPU16",A="MN:CColorROPU16"$.
-  CColorROPU16 result=COLOR_INVALID;
+  CColorROPU16 res=COLOR_INVALID;
   I64 i;
   U8 *ptr,*ptr2,*st2;
   if (!st) return COLOR_INVALID;
   while (TRUE) {
     if (!*st||StrOcc(str2color_lst,*st))
-      return result;
+      return res;
     if (Bt(chars_bmp_alpha,*st)) {
       ptr=st;
       while (Bt(chars_bmp_alpha_numeric,*ptr))
@@ -172,13 +172,13 @@ CColorROPU16 Str2ColorU16(U8 *st)
 	*ptr2++=*st++;
       *ptr2++=0;
       if (!StrICmp(st2,"TWO"))
-	result.rop|=ROPBF_TWO_SIDED;
+	res.rop|=ROPBF_TWO_SIDED;
       else if (!StrICmp(st2,"HALF"))
-	result.rop|=ROPBF_HALF_RANGE_COLOR;
+	res.rop|=ROPBF_HALF_RANGE_COLOR;
       else if ((i=DefineMatch(st2,"ST_COLORS",LMF_IGNORE_CASE))>=0)
-	result.color=i;
+	res.color=i;
       else if (!StrICmp(st2,"TRANSPARENT"))
-	result.color=TRANSPARENT;
+	res.color=TRANSPARENT;
       else {
 	Free(st2);
 	return COLOR_INVALID;
@@ -189,7 +189,7 @@ CColorROPU16 Str2ColorU16(U8 *st)
     else if ('0'<=*st<='9') {
       i=Str2I64(st,10,&ptr);
       if (0<=i<=0xFF) {
-	result.color=i;
+	res.color=i;
 	st=ptr;
       } else
 	return COLOR_INVALID;
@@ -201,17 +201,17 @@ CColorROPU16 Str2ColorU16(U8 *st)
 CColorROPU32 Str2ColorU32(U8 *st)
 {//$LK,"DCLighting",A="MN:DCLighting"$ color str with flags to $LK,"CColorROPU32",A="MN:CColorROPU32"$.
   U8 *st2;
-  CColorROPU32 result=0;
+  CColorROPU32 res=0;
   if (!st) return COLOR_INVALID;
   st2=MAlloc(StrLen(st)+1);
   StrFirstRem(st,str2color_lst,st2);
-  result.c0=Str2ColorU16(st2);
+  res.c0=Str2ColorU16(st2);
   if (*st) {
-    result.c1=Str2ColorU16(st);
-    result|=ROPF_DITHER;
+    res.c1=Str2ColorU16(st);
+    res|=ROPF_DITHER;
   }
-  if (result.c0.color==COLOR_INVALID||result.c1.color==COLOR_INVALID)
+  if (res.c0.color==COLOR_INVALID||res.c1.color==COLOR_INVALID)
     return COLOR_INVALID;
   else
-    return result;
+    return res;
 }

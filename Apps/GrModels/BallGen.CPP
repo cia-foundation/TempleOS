@@ -47,21 +47,21 @@ I64 AddVertex(BallDefineStruct *,I64 x,I64 y,I64 z)
 
 I64 AddTri(BallDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
 {
-  I64 result=b->tri_cnt++;
-  b->t[result].color=c;
-  b->t[result].nums[0]=n0;
-  b->t[result].nums[1]=n1;
-  b->t[result].nums[2]=n2;
-  return result;
+  I64 res=b->tri_cnt++;
+  b->t[res].color=c;
+  b->t[res].nums[0]=n0;
+  b->t[res].nums[1]=n1;
+  b->t[res].nums[2]=n2;
+  return res;
 }
 
 U8 *Ball2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
-  U8 *result=MAlloc(sizeof(CSpriteMeshU8s)+
+  U8 *res=MAlloc(sizeof(CSpriteMeshU8s)+
 	b->vertex_cnt*sizeof(CD3I32)+b->tri_cnt*sizeof(CMeshTri)
   +sprite_elem_base_sizes[SPT_END]),
-	*dst=result;
+	*dst=res;
   *dst++ =SPT_MESH;
   *dst(I32 *)++ =b->vertex_cnt;
   *dst(I32 *)++ =b->tri_cnt;
@@ -70,12 +70,12 @@ U8 *Ball2CSprite()
   MemCpy(dst,&b->t,b->tri_cnt*sizeof(CMeshTri));
   dst+=b->tri_cnt*sizeof(CMeshTri);
   *dst++ =SPT_END;
-  return result;
+  return res;
 }
 
 public U8 *BallGen()
 {
-  U8 *result;
+  U8 *res;
   I64 i,j,n,m,c,p1,p2,p3,p4;
   BallDefineStruct bd1,bd2;
   F64 r,r1,r2,z1,z2,d_a1,d_a2;
@@ -112,17 +112,17 @@ public U8 *BallGen()
       }
     }
 
-    result=Ball2CSprite;
+    res=Ball2CSprite;
     "%h7c",'\n';
-    Sprite(result,"\t\t$$SP,\"<1>\",BI=%d$$");
+    Sprite(res,"\t\t$$SP,\"<1>\",BI=%d$$");
     "%h7c",'\n';
     "Vertices:%d\n",b->vertex_cnt;
     Free(b);
     "Do another";
     if (YorN)
-      Free(result);
+      Free(res);
     else
       break;
   }
-  return result;
+  return res;
 }

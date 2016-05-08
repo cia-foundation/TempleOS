@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Memory Overview"$$FG$
 
-Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual identical to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used, except the first 2 Meg, which uses 4K page tables entries.  Nothing swaps to disk, either.
+Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual ident to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used.  Nothing swaps to disk.
 
 In TempleOS, the lowest 2 Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL insts because 64-bit CALLs take two insts.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
 
@@ -14,10 +14,7 @@ See $LK,"MemRep",A="MN:MemRep"$() and $LK,"::/Demo/MemDemo.CPP"$.
 
 $FG,5$$TX+CX,"Single System-wide Mem Map"$
 
-$FG,2$ 0x0000000000- 0x00$TX,"00006FFF",D="DD_PROTECTED_LOW"$$FG$
-$ID,2$Pages marked not present so NULL ptr dereference causes a fault.
-$ID,-2$
-$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"0003460F",D="DD_KERNEL_END"$$FG$
+$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"000347DF",D="DD_KERNEL_END"$$FG$
 $ID,2$Kernel module, placed here by the boot-loader, $LK,"BOOT_RAM_BASE",A="MN:BOOT_RAM_BASE"$.
 $ID,-2$
 $FG,2$ 0x00$TX,"00096600",D="DD_BOOT_HIGH_LOC_DVD"$- 0x00$TX,"00096FFF",D="DD_BOOT_HIGH_LOC_DVD_END"$$FG$
@@ -30,12 +27,12 @@ $FG,2$~0x000009F000- 0x000009FFFF
 $ID,2$$FG$Extended BIOS data area.
 $ID,-2$
 $FG,2$ 0x00000A0000- 0x00000BFFFF$FG$
-$ID,2$VGA graphics mem, marked as write-through cache.
+$ID,2$VGA graphics mem, marked as write-through cache in $LK,"text",A="MN:text"$.vga_alias.
 $ID,-2$
-$FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"001845FF",D="DD_SYS_FIXED_AREA_END"$$FG$
+$FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"001835FF",D="DD_SYS_FIXED_AREA_END"$$FG$
 $ID,2$$LK,"CSysFixedArea",A="MN:CSysFixedArea"$ for page tables and misc.  $TX,"128 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ of address space mapped.
 $ID,-2$
-$FG,2$ 0x00$TX,"00184600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"3FFE3DFF",D="DD_SYS_HEAP_LIMIT"$$FG$
+$FG,2$ 0x00$TX,"00183600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"3FFE3DFF",D="DD_SYS_HEAP_LIMIT"$$FG$
 $ID,2$Code Heap mem.
 $ID,-2$
 $FG,2$             - 0x007FFFFFFF$FG$

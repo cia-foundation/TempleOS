@@ -2,7 +2,7 @@ Bool BootDVDProve(CBlkDev *bd)
 {
   CKernel *img=CAlloc(DVD_BLK_SIZE);
   I64 i;
-  Bool result=FALSE;
+  Bool res=FALSE;
   "Port: %04X,%04X Unit: %02X  ",bd->base0,bd->base1,bd->unit;
   if (ATAProbe(bd->base0,bd->base1,bd->unit)==BDT_ATAPI) {
     " ATAPI";
@@ -22,7 +22,7 @@ Bool BootDVDProve(CBlkDev *bd)
   }
   " Nope\n";
   Free(img);
-  return result;
+  return res;
 }
 
 Bool BootDVDProbeAll(CBlkDev *bd)
@@ -204,21 +204,21 @@ CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num)
 CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,
 		CATARep **_ata_drv,CATARep **_atapi_drv)
 {//This is for when trying to sort-out main hard drives and CD/DVD drives.
-  CATARep *result=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
+  CATARep *res=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
   Bool was_silent=Silent;
   bd=Let2BlkDev(_sys_boot_drv,FALSE);
   Silent(was_silent);
   while (tempha) {
-    if (!result && bd && bd->type==tempha->type) {
+    if (!res && bd && bd->type==tempha->type) {
       if (bd->type==BDT_ATAPI &&
 	    bd->base0==tempha->base0 && bd->unit==tempha->unit)
-	result=atapi_drv=tempha;
+	res=atapi_drv=tempha;
       else if (bd->type==BDT_ATA && bd->base0==tempha->base0 &&
 	    bd->base1==tempha->base1 && bd->unit==tempha->unit)
-	result=ata_drv=tempha;
+	res=ata_drv=tempha;
     }
-    if (!result || result->type!=tempha->type) {
+    if (!res || res->type!=tempha->type) {
       if (tempha->type==BDT_ATA) {
 	if (!ata_drv || tempha->unit<ata_drv->unit ||
 	      tempha->unit==ata_drv->unit && tempha->num<ata_drv->num)
@@ -233,20 +233,20 @@ CATARep *ATAIDDrvs(CATARep *root,I64 _sys_boot_drv,
   }
   if (_ata_drv)   *_ata_drv  =ata_drv;
   if (_atapi_drv) *_atapi_drv=atapi_drv;
-  return result;
+  return res;
 }
 
 CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
 {
-  CBlkDev *result;
+  CBlkDev *res;
   if (0<=first_drv_let-'A'<NUM_DRVS && (type==BDT_ATA || type==BDT_ATAPI) &&
 	0<=unit<=1) {
-    result=BlkDevNextFree(first_drv_let,type);
-    result->unit=unit;
-    result->base0=base0;
-    result->base1=base1;
-    if (BlkDevAdd(result,FALSE,FALSE))
-      return result;
+    res=BlkDevNextFree(first_drv_let,type);
+    res->unit=unit;
+    res->base0=base0;
+    res->base1=base1;
+    if (BlkDevAdd(res,FALSE,FALSE))
+      return res;
   }
   return NULL;
 }
@@ -255,30 +255,30 @@ I64 AutoMountIDE()
 {//Try to mount hard drive and CD/DVD, automatically. (Kernel.Cfg option).
 //It uses 'C' and 'T' as first drive letters or whatever you set
   //in config when compiling Kernel.BIN.
-  I64 result=0;
+  I64 res=0;
   CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
   ATARep(FALSE,TRUE,&root);
   ATAIDDrvs(root,blkdev.boot_drv_let,&ata_drv,&atapi_drv);
   if (ata_drv && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
 	ata_drv->base0,ata_drv->base1,ata_drv->unit))
-    result++;
+    res++;
   if (atapi_drv && ATAMount(blkdev.first_dvd_drv_let,BDT_ATAPI,
 	atapi_drv->base0,atapi_drv->base1,atapi_drv->unit))
-    result++;
+    res++;
   tempha=root;
   while (tempha) {
     if (tempha!=ata_drv && tempha!=atapi_drv) {
       if (tempha->type==BDT_ATA && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
 	    tempha->base0,tempha->base1,tempha->unit))
-	result++;
+	res++;
       else if (tempha->type==BDT_ATAPI &&
 	    ATAMount(blkdev.first_dvd_drv_let,BDT_ATAPI,
 	    tempha->base0,tempha->base1,tempha->unit))
-	result++;
+	res++;
     }
     tempha=tempha->next;
   }
   LinkedLstDel(root);
-  blkdev.auto_mount_ide_cnt=result;
-  return result;
+  blkdev.auto_mount_ide_cnt=res;
+  return res;
 }

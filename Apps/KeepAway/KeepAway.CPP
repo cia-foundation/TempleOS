@@ -279,9 +279,9 @@ U0 DrawObj(CDC *dc,Obj *o,F64 tt)
   if (o==ball)
     Sprite3(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,$IB,"<1>",BI=1$);
   else {
-    temps=SpriteInterpolate(imgs[o->last_img].img[o->team],
-	  imgs[o->next_img].img[o->team],
-	  (tt-o->last_t0)/(o->next_t0-o->last_t0));
+    temps=SpriteInterpolate((tt-o->last_t0)/(o->next_t0-o->last_t0),
+	  imgs[o->last_img].img[o->team],
+	  imgs[o->next_img].img[o->team]);
     SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,temps,o->ay);
     Free(temps);
   }

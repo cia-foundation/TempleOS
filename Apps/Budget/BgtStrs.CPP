@@ -6,7 +6,7 @@ public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
   CDoc		*doc=DocRead(name,DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
   CDocEntry	*doc_e=doc->root.next;
   I64		i,max_num=0;
-  U8		*ptr,**result,*colors;
+  U8		*ptr,**res,*colors;
 
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT) {
@@ -25,12 +25,12 @@ public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
     doc_e=doc_e->next;
   }
 
-  result=CAlloc(sizeof(U8 *)*(max_num+1));
+  res=CAlloc(sizeof(U8 *)*(max_num+1));
   colors=CAlloc(sizeof(U8)*(max_num+1));
   doc_e=doc->root.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT && 0<=doc_e->user_data<=max_num) {
-      result[doc_e->user_data]=doc_e->tag;
+      res[doc_e->user_data]=doc_e->tag;
       doc_e->tag=NULL;
       colors[doc_e->user_data]=doc_e->type.u8[1]&15;
     }
@@ -43,7 +43,7 @@ public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
     *_colors=colors;
   else
     Free(colors);
-  return result;
+  return res;
 }
 
 public U0 StrFileArrDel(U8 **a,I64 max_num)

@@ -45,6 +45,8 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Good $LK,"spell checker",A="MN:ACMisspelledFind"$.
 * Good Bible search.
 
+* Can $LK,"MEM_EXTRA_HASH2_PAGES",A="MN:MEM_EXTRA_HASH2_PAGES"$ be just one?
+
 * Bible ranges in $LK,"BibleVerse",A="MN:BibleVerse"$(). 
 
 * $LK,"::/Demo/Games/FlatTops.CPP"$ is torpedo, not bombs.
@@ -154,7 +156,7 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * 5/7/14:Something like $LK,"AFSetIP",A="MN:AFSetIP"$ caused hang, then reboot in TestSuite.
 * 5/7/14:#63 Maybe, $LK,"::/Demo/Graphics/Pick3D.CPP"$ crashed in TestSuite.
-* 6/8/14:After or in $LK,"PageTableEntries2",A="FF:::/Misc/OSTestSuite.CPP,PageTableEntries2"$ in TestSuite crash.
+* 6/8/14:After or in $LK,"PageTableEntries",A="FF:::/Misc/OSTestSuite.CPP,PageTableEntries"$ in TestSuite crash.
 
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (Forgot what this is talking about.)
 
@@ -202,7 +204,6 @@ $ID,-5$
 
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
-* FunSeg does not scan all task tables.
 
 * Improve editor undo, add redo.
 
@@ -210,8 +211,6 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * International Date output: $LK,"MPrintDate",A="MN:MPrintDate"$().  Every country make own version?
 * International Date input: $LK,"Str2Date",A="MN:Str2Date"$().
-
-* Might want to move kernel code out of low 2Meg.  Might be faster.
 
 * $LK,"DCF_SYMMETRY",A="MN:DCF_SYMMETRY"$ before transformation? (Currently, it's after.) 
 
@@ -323,7 +322,7 @@ $ID,-5$
 $FG,5$$TX+CX,"Test"$$FG$
 * $LK,"SpriteBitMap",A="FI:::/Adam/Gr/SpriteBitMap.CPP"$: Grabscroll? 
 
-* Return results for $LK,"GrBlot",A="MN:GrBlot"$, $LK,"GrRect",A="MN:GrRect"$, $LK,"GrPutChar",A="MN:GrPutChar"$?
+* Return ress for $LK,"GrBlot",A="MN:GrBlot"$, $LK,"GrRect",A="MN:GrRect"$, $LK,"GrPutChar",A="MN:GrPutChar"$?
 * Collision cnts for $LK,"GrBlot",A="MN:GrBlot"$, $LK,"GrRect",A="MN:GrRect"$, $LK,"GrPutChar",A="MN:GrPutChar"$?
 
 * $LK,"GetStr",A="MN:GetStr"$() or $LK,"GetChar",A="MN:GetChar"$() in $LK,"OSInstall",A="FI:::/Misc/OSInstall.CPP"$ didn't like focus change.
@@ -390,14 +389,15 @@ Jesus' zeal for the Temple		$TX,"John 2:14-19",HTML="http://www.biblegateway.com
 Famine not for bread			$TX,"Amos 8:11-12",HTML="http://www.biblegateway.com/passage/?search=Amos%208:11-12&version=NIV"$
 To the honest, you are honest		$TX,"Psalm 18:26",HTML="http://www.biblegateway.com/verse/en/Psalm%2018:26"$
 Meek and humble of heart		$TX,"Matthew 11:29",HTML="http://www.biblegateway.com/verse/en/Matthew%2011:29"$
-MOses hgets Aaron			$TX,"Exodus 4:10-16",HTML="http://www.biblegateway.com/passage/?search=Exodus%204:10-16&version=NIV"$
+Moses gets Aaron			$TX,"Exodus 4:10-16",HTML="http://www.biblegateway.com/passage/?search=Exodus%204:10-16&version=NIV"$
 There is no council against the Lord	$TX,"Proverbs 21:30",HTML="http://www.biblegateway.com/verse/en/Proverbs%2021:30"$
 Human help is worthless			$TX,"Psalm 108:12",HTML="http://www.biblegateway.com/verse/en/Psalm%20108:12"$
+Do not seek your own wealth		$TX,"1 Corinthians 10:24",HTML="http://www.biblegateway.com/verse/en/1%20Corinthians%2010:24"$
 
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17362 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17380 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
@@ -418,6 +418,9 @@ $TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/al
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
 $TX,"Graphic Technologies",HTML="https://web.archive.org/web/20020811060541/http://www.graphic-technologies.com/"$	$TX,"Lexmark vs Static Control",HTML="https://en.wikipedia.org/wiki/Lexmark_International,_Inc._v._Static_Control_Components,_Inc."$
 
+
+3qEeEGCAsBABAqFDBeE2G33qEeEGCAsBABAqFDBeE2G33qCsBDBDq2G3s2G3F2G3FqAet2G32G3AEDAqF3qCsBDBDq2G3s2G3F2G3FqAet2G32G3AEDAqF
+qFeDAsBDeDqCeF2G3sGGeF2sG3C2G3CBCeF
 
 $FG,5$$TX+CX,"Web Bookmarks"$$FG$
 Cop tying shoe	$HC,"<center><img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\"></center>"$

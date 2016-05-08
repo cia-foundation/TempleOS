@@ -38,7 +38,7 @@ ones which need initialization on the code heap.
 
 You can't dynamically initialize data heap
 glbls--they are consts.  This might be a silly
-point, but might result in odd differences, perhaps
+point, but might res in odd differences, perhaps
 from the order things are evaluated.
 
 Data heap glbls are good for AOT modules

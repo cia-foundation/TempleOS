@@ -6,7 +6,7 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
   Bool found,unlock=DocLock(doc);
   CDoc *old_doc;
   CDocEntry *doc_e=doc->root.next;
-  I64 result=0;
+  I64 res=0;
   while (doc_e!=doc) {
     if (ScanKey) {
       LBts(_fuf_flags,FUf_CANCEL);
@@ -22,38 +22,38 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
       if (!found) {
 	PutFileLink(doc->filename.name,doc_e->y);
 	"$$RED$$ %04d:%s\n$$FG$$",doc_e->y,st;
-	result++;
+	res++;
       }
       Free(st);
     } else if (doc_e->type_u8==DOCT_ERROR) {
       PutFileLink(doc->filename.name,doc_e->y);
       "$$RED$$ Doc Error\n$$FG$$";
-      result++;
+      res++;
     }
     doc_e=doc_e->next;
   }
   if (unlock) DocUnlock(doc);
-  return result;
+  return res;
 }
 
 I64 LinkChkFile(U8 *filename,I64 *_fuf_flags)
 {
   CDoc *doc=DocRead(filename,DOCF_NO_CURSOR);
-  I64 result=LinkChkDoc(doc,_fuf_flags);
+  I64 res=LinkChkDoc(doc,_fuf_flags);
   DocDel(doc);
-  return result;
+  return res;
 }
 public I64 LinkChk(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
 {//Check documents for broken file links.
-  I64 fuf_flags=0,result=0;
+  I64 fuf_flags=0,res=0;
   CDirEntry *tempde,*tempde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
   while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    result+=LinkChkFile(tempde->full_name,&fuf_flags);
+    res+=LinkChkFile(tempde->full_name,&fuf_flags);
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
-  return result;
+  return res;
 }

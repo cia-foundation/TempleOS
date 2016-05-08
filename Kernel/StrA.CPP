@@ -1,12 +1,12 @@
 U8 *StrPrintHex(U8 *dst,I64 num;I64 width)
 {
-  U8 *result=dst+width;
-  dst=result;
+  U8 *res=dst+width;
+  dst=res;
   while (width--) {
     *--dst="0123456789ABCDEF"(U8 *)[num&15];
     num>>=4;
   }
-  return result;
+  return res;
 }
 
 U0 PutHex(I64 num,I64 width)
@@ -422,7 +422,7 @@ I64 LstMatch(U8 *needle, U8 *haystack_lst,I64 flags=0)
 {//-2 if Ambiguous
 // -1 if not found
   // Not efficient. Use hash tables for efficiency.
-  I64 n,sub=0,result=-1;
+  I64 n,sub=0,res=-1;
   U8 *ptr;
   Bool exact_match=FALSE;
   if (!haystack_lst) return -1;
@@ -447,12 +447,12 @@ I64 LstMatch(U8 *needle, U8 *haystack_lst,I64 flags=0)
       if (!*haystack_lst)	//Did we reach end of haystack_lst?
 	return sub;		//Found Exact match
       else {
-	if (result!=-1) {
+	if (res!=-1) {
 	  if (!exact_match)
-	    result=-2;		//Ambiguous unless later exact match.
+	    res=-2;		//Ambiguous unless later exact match.
 	} else {
 	  if (!(flags & LMF_EXACT))
-	    result=sub;
+	    res=sub;
 	}
       }
     }
@@ -461,7 +461,7 @@ I64 LstMatch(U8 *needle, U8 *haystack_lst,I64 flags=0)
     haystack_lst++;		//Skip trailing zero
     sub++;
   }
-  return result;
+  return res;
 }
 
 I64 StrOcc(U8 *src, I64 ch)
@@ -582,7 +582,7 @@ U8 *StrFirstOcc(U8 *src,U8 *marker)
 U8 *StrFirstRem(U8 *src,U8 *marker,U8 *dst=NULL)
 {//Remove first str segment and place in dst buf or NULL.
   I64 ch;
-  U8 *ptr=src,*result=dst;
+  U8 *ptr=src,*res=dst;
   if (dst) {
     while ((ch=*ptr++) && !StrOcc(marker,ch))
       *dst++=ch;
@@ -593,17 +593,17 @@ U8 *StrFirstRem(U8 *src,U8 *marker,U8 *dst=NULL)
     StrCpy(src,ptr);
   else
     *src=0;
-  return result;
+  return res;
 }
 
 U8 *StrLastOcc(U8 *src,U8 *marker)
 {//Point to last occurrence of market set in str.
   I64 ch;
-  U8 *result=NULL;
+  U8 *res=NULL;
   while (ch=*src++)
     if (StrOcc(marker,ch))
-      result=src-1;
-  return result;
+      res=src-1;
+  return res;
 }
 
 U8 *StrLastRem(U8 *src,U8 *marker,U8 *dst=NULL)

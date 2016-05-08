@@ -83,12 +83,6 @@ It's a little faster.
 	PUSH	RCX
 	MOV	RSP,RAX
 
-	RDTSC
-	SHL	RDX,32
-	ADD	RAX,RDX
-	SUB	RAX,U64 CTask.time_slice_start[RSI]
-	ADD	U64 CTask.total_time[RSI],RAX
-
 	MOV	RAX,U64 CTask.fpu_mmx[RSI]
 	FXSAVE	U64 [RAX]
 
@@ -123,11 +117,6 @@ _TASK_CONTEXT_RESTORE::
 
 	MOV	RAX,U64 CTask.fpu_mmx[RSI]
 	FXRSTOR	U64 [RAX]
-
-	RDTSC
-	SHL	RDX,32
-	ADD	RAX,RDX
-	MOV	U64 CTask.time_slice_start[RSI],RAX
 
 	MOV	RAX,RSP
 	LEA	RSP,U64 CTask.rcx[RSI]

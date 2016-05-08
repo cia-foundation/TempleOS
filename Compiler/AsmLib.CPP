@@ -127,7 +127,7 @@ U0 AOTStoreCodeU8At(CCmpCtrl *cc,I64 ip,...)
 I64 AsmLexExpression(CCmpCtrl *cc)
 {
   U8 *machine_code;
-  I64 result=0;
+  I64 res=0;
   cc->asm_undef_hash=NULL;
   cc->flags&=~(CCF_UNRESOLVED+CCF_LOCAL);
   cc->abs_cnts=0;
@@ -138,10 +138,10 @@ I64 AsmLexExpression(CCmpCtrl *cc)
       LexExcept(cc,"Extern Not Allowed at ");
     if (cc->flags & CCF_UNRESOLVED)
       LexExcept(cc,"Undefined sym at ");
-    result=Call(machine_code);
+    res=Call(machine_code);
     Free(machine_code);
   }
-  return result;
+  return res;
 }
 
 U0 AsmLineLst(CCmpCtrl *cc)

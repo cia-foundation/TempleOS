@@ -37,20 +37,20 @@ U0 DrvsRelease()
 
 CDrv *DrvMakeFree(U8 drv_let)
 {//Make a slot free for a new drv, like during $LK,"Mount",A="MN:Mount"$().
-//!!! drv_let is not a $LK,"remapped",A="MN:MapDrv"$ drv.
+//!!! drv_let is not a $LK,"remapped",A="MN:DrvMap"$ drv.
   I64 i=ToUpper(drv_let)-'A';
-  CDrv *result;
+  CDrv *res;
   if (!(0<=i<NUM_DRVS))
     throw('Drv');
-  result=&blkdev.drvs[i];
-  MemSet(result,0,sizeof(CDrv));
-  result->drv_let='A'+i;
-  return result;
+  res=&blkdev.drvs[i];
+  MemSet(res,0,sizeof(CDrv));
+  res->drv_let='A'+i;
+  return res;
 }
 
 CDrv *DrvNextFree(U8 first_drv_let='C')
 {//Locate free slot for new drv, like during $LK,"Mount",A="MN:Mount"$().
-//!!! first_drv_let is not a $LK,"remapped",A="MN:MapDrv"$ drv.
+//!!! first_drv_let is not a $LK,"remapped",A="MN:DrvMap"$ drv.
   I64 i=ToUpper(first_drv_let)-'A';
   if (!(0<=i<NUM_DRVS))
     throw('Drv');
@@ -209,7 +209,7 @@ U0 ChgDsk(U8 drv_let=0)
   RedSeaFreeFreeLst(dv);
 }
 
-Bool MapDrv(U8 drv_let,CDrv *dv)
+Bool DrvMap(U8 drv_let,CDrv *dv)
 {//Make drive letter map to another.
   drv_let=ToUpper(drv_let);
   if ('A'<=drv_let<='Z') {
@@ -248,31 +248,31 @@ Bool Drv(U8 drv_let)
 U8 *DrvSerialNum(U8 drv_let=0)
 {//20 bytes max.
   CBlkDev *bd=Let2BlkDev(drv_let);
-  U16 *st,*result=NULL;
+  U16 *st,*res=NULL;
   I64 i;
   if (bd->dev_id_record) {
     st=CAlloc(20+1);
     for (i=0;i<10;i++)
       st[i]=EndianU16(bd->dev_id_record[10+i]);
-    result=MStrUtil(st,SUF_REM_LEADING|SUF_REM_TRAILING);
+    res=MStrUtil(st,SUF_REM_LEADING|SUF_REM_TRAILING);
     Free(st);
   }
-  return result;
+  return res;
 }
 
 U8 *DrvModelNum(U8 drv_let=0)
 {//40 bytes max.
   CBlkDev *bd=Let2BlkDev(drv_let);
-  U16 *st,*result=NULL;
+  U16 *st,*res=NULL;
   I64 i;
   if (bd->dev_id_record) {
     st=CAlloc(40+1);
     for (i=0;i<20;i++)
       st[i]=EndianU16(bd->dev_id_record[27+i]);
-    result=MStrUtil(st,SUF_REM_LEADING|SUF_REM_TRAILING);
+    res=MStrUtil(st,SUF_REM_LEADING|SUF_REM_TRAILING);
     Free(st);
   }
-  return result;
+  return res;
 }
 
 U8 blkdev_text_attr[BDT_NUM_TYPES]={BLACK,LTCYAN,WHITE,LTBLUE};

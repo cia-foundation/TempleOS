@@ -44,16 +44,16 @@ Bool Kill(CTask *task,Bool wait=TRUE)
 
 Bool Suspend(CTask *task=NULL,Bool state=TRUE)
 {//Tell scheduler to skip task.
-  Bool result;
+  Bool res;
   if (!task) task=Fs;
   PUSHFD
   CLI
   if (TaskValidate(task))
-    result=LBEqu(&task->task_flags,TASKf_SUSPENDED,state);
+    res=LBEqu(&task->task_flags,TASKf_SUSPENDED,state);
   else
-    result=FALSE;
+    res=FALSE;
   POPFD
-  return result;
+  return res;
 }
 
 Bool IsSuspended(CTask *task=NULL)
@@ -80,7 +80,7 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
 {//Grow stk in call with any fixed num of args.
 //See $LK,"::/Demo/StkGrow.CPP"$.
   CTaskStk *temps,*temps2,**_stk;
-  I64 result,*rsp,*rsp2,*old_stk;
+  I64 res,*rsp,*rsp2,*old_stk;
 
   if (UnusedStk>=stk_size_threshold) {
 
@@ -119,7 +119,7 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
       POPFD
 
       CALL	U64 &fp_addr[RBP]
-      MOV	U64 &result[RBP],RAX
+      MOV	U64 &res[RBP],RAX
 
       PUSHFD
       POP	RDX	//flags
@@ -136,7 +136,7 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
 
       MOV	RDX,U64 &old_stk[RBP]
       MOV	RBX,U64 8[RBP]
-      MOV	RAX,U64 &result[RBP]
+      MOV	RAX,U64 &res[RBP]
       MOV	RBP,U64 [RBP]
       MOV	RSP,RDX
       JMP	RBX	//return
@@ -267,7 +267,7 @@ U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
 
 I64 ExeCmdLine(CCmpCtrl *cc)
 {//Terminal JIT-compile-and-execute loop for CCmpCtrl.
-  I64 result=0,type,old_title_src=Fs->title_src;
+  I64 res=0,type,old_title_src=Fs->title_src;
   U8 *ptr,*ptr2,*ptr3,*machine_code,*old_task_title=StrNew(Fs->task_title);
   F64 t0;
   CDocEntry *doc_e;
@@ -306,8 +306,8 @@ I64 ExeCmdLine(CCmpCtrl *cc)
     if (machine_code!=INVALID_PTR) {
       if (!(cc->flags&CCF_JUST_LOAD)) {
 	t0=tS;
-	result=Call(machine_code);
-	Fs->answer=result;
+	res=Call(machine_code);
+	Fs->answer=res;
 	Fs->answer_type=type;
 	Fs->answer_time=tS-t0;
 	Fs->new_answer=TRUE;
@@ -328,7 +328,7 @@ I64 ExeCmdLine(CCmpCtrl *cc)
     else
       return TRUE;
   } else
-    return result;
+    return res;
 }
 
 U0 SrvTaskCont()

@@ -379,18 +379,18 @@ U0 GrUpdateVGAGraphics()
   dst=gr.screen_image->body;
   if (LBtr(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0)) {
     for (plane=1;plane<0x10;plane<<=1) {
-      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_IDX,VGAR_MAP_MASK);
       OutU8(VGAP_DATA,plane);
-      vga=VGAM_GRAPHICS;
+      vga=text.vga_alias;
       row=gr.zoomed_dc->height;
       while (row--)
 	GrUpdateLine64FlushCache(&vga,&src,d,&dst);
     }
   } else {
     for (plane=1;plane<0x10;plane<<=1) {
-      OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+      OutU8(VGAP_IDX,VGAR_MAP_MASK);
       OutU8(VGAP_DATA,plane);
-      vga=VGAM_GRAPHICS;
+      vga=text.vga_alias;
       row=gr.zoomed_dc->height;
       while (row--)
 	GrUpdateLine64(&vga,&src,d,&dst);

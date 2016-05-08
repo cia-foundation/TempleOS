@@ -2,54 +2,18 @@ asm {
 // $LK,"::/Doc/MemOverview.TXT"$
 
 USE32
-SYS_INIT_MEM::
+SYS_INIT_PAGE_TABLES::
 //Set page tables to identity map everything.
 	MOV	EDI,SYS_FIXED_AREA
 	XOR	EAX,EAX
 	MOV	ECX,sizeof(CSysFixedArea)/4
 	REP_STOSD			//Init entire SYS_FIXED_AREA to zero
 
-//PML1
-	MOV	EAX,0x107
-	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml1
-	MOV	ECX,MEM_NUM_PML1*0x200
-@@05:	MOV	U32 [EDI],EAX
-	ADD	EDI,4
-	MOV	U32 [EDI],EDX
-	ADD	EDI,4
-	ADD	EAX,0x1000
-	ADC	EDX,0
-	LOOP	@@05
-
-//0xA0000-0xBFFFF: video ram=write thru
-	MOV	EAX,0xF
-	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml1+0xA0*8
-	MOV	ECX,0xC0-0xA0
-@@10:	OR	U32 [EDI],EAX
-	ADD	EDI,4
-	OR	U32 [EDI],EDX
-	ADD	EDI,4
-	LOOP	@@10
-
 //PML2
-	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml1+7
+	MOV	EAX,0x87 //bit 7 is page size (1==2Meg)
 	XOR	EDX,EDX
 	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2
-	MOV	ECX,MEM_NUM_PML1
-@@15:	MOV	U32 [EDI],EAX
-	ADD	EDI,4
-	MOV	U32 [EDI],EDX
-	ADD	EDI,4
-	ADD	EAX,0x1000
-	ADC	EDX,0
-	LOOP	@@15
-
-	MOV	EAX,MEM_NUM_PML1*0x200000+0x87 //bit 7 is page size (1==2Meg)
-	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2+8*MEM_NUM_PML1
-	MOV	ECX,MEM_NUM_PML2*0x200-MEM_NUM_PML1
+	MOV	ECX,MEM_NUM_PML2*0x200
 @@20:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
@@ -151,31 +115,20 @@ pain without MAlloc up-and-running.
 	RET
 }
 
-I64 MemPageSize(U8 *a)
-{//Size of page table at addr.Either 4K or 2Meg.
-  if (a<MEM_NUM_PML1*0x1000*0x200)
-    return 0x1000;
-  else
-    return 0x200000;
-}
-
 I64 *MemPageTable(U8 *a)
 {//Point to page table entry for addr.
-  if (a<MEM_NUM_PML1*0x1000*0x200)
-    return SYS_FIXED_AREA+offset(CSysFixedArea.pml1)+a>>12*8;
-  else
-    return SYS_FIXED_AREA+offset(CSysFixedArea.pml2)+a>>21*8;
+  return SYS_FIXED_AREA+offset(CSysFixedArea.pml2)+a>>21*8;
 }
 
 Bool MemPagePresentMark(U8 *a,Bool val)
 {//Mark an addr's page present or not-present.
   I64 *pte=MemPageTable(a);
-  Bool result=*pte&1;
+  Bool res=*pte&1;
   if (val)
     *pte=*pte|1;  //Mark present
   else
     *pte=*pte&~1; //Mark not present
   InvlPg(a);
-  return result;
+  return res;
 }
 

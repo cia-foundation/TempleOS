@@ -1,7 +1,7 @@
 U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
 {//Read whole file from disk.
   CHashGeneric *temph;
-  U8 *absname,*altname,*curname,*result=NULL;
+  U8 *absname,*altname,*curname,*res=NULL;
   I64 i,size=0,attr=0;
   CDirContext *dirc;
   CArcCompress *arc;
@@ -10,12 +10,12 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
   if ((temph=HashFind(absname,adam_task->hash_table,HTT_FILE))||
 	(temph=HashFind(altname,adam_task->hash_table,HTT_FILE))) {
     size=temph->user_data1;
-    result=MAlloc(size+1);
-    MemCpy(result,temph->user_data0,size);
-    result[size]=0; //Terminate
+    res=MAlloc(size+1);
+    MemCpy(res,temph->user_data0,size);
+    res[size]=0; //Terminate
     attr=FileAttr(temph->str,attr);
   } else {
-    for (i=0;i<2 && !result;i++) {//Try name, then altname
+    for (i=0;i<2 && !res;i++) {//Try name, then altname
       if (!i)
 	curname=absname;
       else
@@ -23,15 +23,15 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
       if (dirc=DirContextNew(curname)) {
 	switch (dirc->dv->fs_type) {
 	  case FSt_REDSEA:
-	    result=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	    res=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
 	  case FSt_FAT32:
-	    result=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	    res=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
 	  case FSt_ISO9660:
-	    result=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	    res=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		  &size,&attr);
 	    break;
 	  default:
@@ -42,25 +42,25 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
     }
 
     //Search parent directories.
-    for (i=0;i<2 && !result;i++) {//Try name, then altname
+    for (i=0;i<2 && !res;i++) {//Try name, then altname
       if (!i)
 	curname=absname;
       else
 	curname=altname;
       if (dirc=DirContextNew(curname)) {
-	while (!result && StrCmp(Fs->cur_dir,"/")) {
+	while (!res && StrCmp(Fs->cur_dir,"/")) {
 	  Cd("..");
 	  switch (Fs->cur_dv->fs_type) {
 	    case FSt_REDSEA:
-	      result=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	      res=RedSeaFileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
 	    case FSt_FAT32:
-	      result=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	      res=FAT32FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
 	    case FSt_ISO9660:
-	      result=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
+	      res=ISO1FileRead(dirc->dv,Fs->cur_dir,dirc->mask,
 		    &size,&attr);
 	      break;
 	    default:
@@ -70,25 +70,25 @@ U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL)
 	DirContextDel(dirc);
       }
     }
-    if (!result) {
+    if (!res) {
       "%s ",filename;
       PrintErr("File not found.\n");
     }
-    if (result && attr & RS_ATTR_RESIDENT)
+    if (res && attr & RS_ATTR_RESIDENT)
       HashGenericAdd(curname,HTT_FILE,
-	    AMAllocIdentical(result),size,0,adam_task);
+	    AMAllocIdent(res),size,0,adam_task);
   }
-  if (result && attr & RS_ATTR_COMPRESSED) {
-    arc=result;
+  if (res && attr & RS_ATTR_COMPRESSED) {
+    arc=res;
     size=arc->expanded_size;
-    result=ExpandBuf(arc);
+    res=ExpandBuf(arc);
     Free(arc);
   }
   if (_attr) *_attr=attr;
   if (_size) *_size=size;
   Free(absname);
   Free(altname);
-  return result;
+  return res;
 }
 
 I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0)
@@ -124,12 +124,12 @@ I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0)
     if (temph=HashFind(absname,adam_task->hash_table,HTT_FILE)) {
       if (attr & RS_ATTR_RESIDENT) {
 	Free(temph->user_data0);
-	temph->user_data0=AMAllocIdentical(fbuf);
+	temph->user_data0=AMAllocIdent(fbuf);
 	temph->user_data1=size;
       } else
 	HashRemDel(temph,adam_task->hash_table);
     } else if (attr & RS_ATTR_RESIDENT)
-      HashGenericAdd(absname,HTT_FILE,AMAllocIdentical(fbuf),size,0,adam_task);
+      HashGenericAdd(absname,HTT_FILE,AMAllocIdent(fbuf),size,0,adam_task);
     Free(fbuf2);
     DirContextDel(dirc);
   }

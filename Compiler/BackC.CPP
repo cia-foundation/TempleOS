@@ -541,7 +541,7 @@ U0 ICAndEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_NO_DEPEND_RESULT) {
+	tempi->ic_flags&ICF_RES_NOT_USED) {
     i=~tempi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i)) {
@@ -562,7 +562,7 @@ U0 ICOrEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_NO_DEPEND_RESULT) {
+	tempi->ic_flags&ICF_RES_NOT_USED) {
     i=tempi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i) && i>MAX_I8) {
@@ -583,7 +583,7 @@ U0 ICXorEqu(CIntermediateCode *tempi,I64 ip2)
 {
   I64 i,bit;
   if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_NO_DEPEND_RESULT) {
+	tempi->ic_flags&ICF_RES_NOT_USED) {
     i=tempi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i)) {

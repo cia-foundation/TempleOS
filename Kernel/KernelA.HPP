@@ -161,7 +161,7 @@ public class CD3 //Three dimensional F64 pt
 public class CQueVectU8
 {
   CQueVectU8	*next,*last;
-  I64	total_cnt,node_cnt,min_index;
+  I64	total_cnt,node_cnt,min_idx;
   U8	body[QUE_VECT_U8_CNT];
 };
 
@@ -207,7 +207,8 @@ public class COrder2D3
 public class CMass
 {
   CMass	*next,*last;
-  COrder2D3 *state,*DstateDt;
+  COrder2D3 *state, //Point to entries in $LK,"CMathODE",A="MN:CMathODE"$.state[]
+	*DstateDt;  //Point to entries in $LK,"CMathODE",A="MN:CMathODE"$.DstateDt[]
 
   U0	start;
   U32	flags,num;
@@ -721,7 +722,7 @@ class CDbgInfo
 public class CHashSrcSym:CHash
 {
   U8	*src_link,
-	*index;
+	*idx;
   CDbgInfo *dbg_info;
   U8	*import_name;
   CAOTImportExport *ie_lst;
@@ -732,14 +733,15 @@ public class CHashGeneric:CHash
   I64	user_data0,user_data1,user_data2;
 };
 
-#define REGT_R8		0
-#define REGT_R16	1
-#define REGT_R32	2
-#define REGT_R64	3
-#define REGT_SEG	4
-#define REGT_FSTK	5
-#define REGT_MM		6
-#define REGT_XMM	7
+#define REGT_NONE	0
+#define REGT_R8		1
+#define REGT_R16	2
+#define REGT_R32	3
+#define REGT_R64	4
+#define REGT_SEG	5
+#define REGT_FSTK	6
+#define REGT_MM		7
+#define REGT_XMM	8
 
 public class CHashReg:CHash
 {
@@ -819,7 +821,7 @@ class CExternUsage
 #help_index "Hash/System;Compiler/Internal"
 public class CHashDefineStr:CHashSrcSym
 {
-  U8	*data,**sub_lst;
+  U8	*data,**sub_idx;
   I64	cnt;
 };
 
@@ -1031,7 +1033,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEG_DONT_EDIT	(DOCEF_DEFINE|DOCEF_HTML_LINK|\
   DOCEF_AUX_STR|DOCEF_BIN_PTR_LINK|DOCEF_SCROLLING_X|DOCEF_TAG_CB)
 
-//These are identical to Doc flags
+//These are ident to Doc flags
 #define DOCEF_HIGHLIGHT		0x4000000
 #define DOCEF_WORD_WRAP		0x8000000
 #define DOCEF_BLINK		ATTRF_BLINK
@@ -1460,7 +1462,7 @@ class CWinMgrTimingGlbls
   I64	calc_idle_cnt;
 };
 
-#define WMG_FPS			30
+#define WINMGR_FPS			30
 
 public class CWinMgrGlbls
 {
@@ -1593,29 +1595,28 @@ public class CAutoCompleteDictGlbls
 #define ICF_USE_F64			0x000000040
 #define ICF_USE_UNSIGNED		0x000000080
 #define ICF_USE_INT			0x000000100 //highest priority
-#define ICF_NO_DEPEND_RESULT		0x000000200
+#define ICF_RES_NOT_USED		0x000000200
 #define ICF_CODE_FINAL			0x000000400
 #define ICF_BY_VAL			0x000000800 //By value, not ref.
 #define ICF_SHORT_JMP			0x000001000
-#define ICF_PUSH_RESULT			0x000002000
+#define ICF_PUSH_RES			0x000002000
 #define ICF_PASS_TRACE			0x000004000
 #define ICF_R_WAS_STK			0x000008000
 #define ICF_A1_WAS_STK			0x000010000
 #define ICF_A2_WAS_STK			0x000020000
 #define ICF_PUSH_CMP			0x000040000 //for 50<i<j<=100 exps
 #define ICF_POP_CMP			0x000080000 //for 50<i<j<=100 exps
-#define ICF_DEPEND_RESULT		0x000100000
-#define ICF_SWAP			0x000200000
-#define ICf_DONT_PUSH_FLOAT0		22 // 3bits
-#define ICf_DONT_POP_FLOAT0		25 // 3bits
-#define ICF_ALT_TEMPLATE		0x010000000
-#define ICF_LOCK			0x020000000
-#define ICf_LOCK			29
-#define ICF_NO_RIP			0x040000000
-#define ICF_DEL_PREVIOUS_INS		0x080000000
-#define ICF_PREVIOUS_DELETED		0x100000000
-#define ICF_DONT_RESTORE		0x200000000
-#define ICG_NO_CVT_MASK			0x3FFFFFF00
+#define ICF_SWAP			0x000100000
+#define ICf_DONT_PUSH_FLOAT0		21 // 3bits
+#define ICf_DONT_POP_FLOAT0		24 // 3bits
+#define ICF_ALT_TEMPLATE		0x008000000
+#define ICF_LOCK			0x010000000
+#define ICf_LOCK			28
+#define ICF_NO_RIP			0x020000000
+#define ICF_DEL_PREV_INS		0x040000000
+#define ICF_PREV_DELETED		0x080000000
+#define ICF_DONT_RESTORE		0x100000000
+#define ICG_NO_CVT_MASK			0x1FFFFFF00
 
 #define IC_BODY_SIZE			0x80
 
@@ -1661,7 +1662,7 @@ class CIntermediateCode:CIntermediateCodeBase
     U8 ic_body[IC_BODY_SIZE];
 //Tree Links are created in OptPass012.  An ADD opcode, for exmaple,
     //points back to its two earlier addend insts, not MAlloced,
-    //just pointers to previous CIntermediate codes in the array.
+    //just pointers to prev CIntermediate codes in the array.
 
     //Tree links get destroyed during Pass789A when they get overwrites
     //by machine code.	(Saves room to union the output machine code buffer
@@ -1844,7 +1845,8 @@ class CAsmArg
 {
   CAsmNum num;
   I64	seg,size, //Size in bytes
-	reg1,reg2,fstk,
+	reg1,reg2,
+	reg1_type,reg2_type,
 	scale;
   Bool	indirect,imm_or_off_present,just_seg,pad[5];
 };
@@ -1872,7 +1874,7 @@ class CAsmUnresolvedRef
 #define OM_IW 6
 #define OM_ID 7
 
-#define ARGT_NO		0
+#define ARGT_NONE	0
 #define ARGT_REL8	1
 #define ARGT_REL16	2
 #define ARGT_REL32	3
@@ -2068,7 +2070,7 @@ class CAOTCtrl
 #define TK_NORMALSCRIPT	0x003
 #define TK_IDENT	0x100
 #define TK_STR		0x101
-#define TK_INT		0x102
+#define TK_I64		0x102
 #define TK_CHAR_CONST	0x103
 #define TK_F64		0x104
 #define TK_PLUS_PLUS	0x105
@@ -2158,7 +2160,7 @@ class CLexHashTableContext
 #define CCF_PAREN		0x1000000000
 #define CCf_PAREN		36
 #define CCF_CLASS_IP		0x2000000000
-#define CCF_DONT_MAKE_RESULT	0x4000000000
+#define CCF_DONT_MAKE_RES	0x4000000000
 
 public class CCmpCtrl
 {
@@ -2172,7 +2174,7 @@ public class CCmpCtrl
 	class_ip;
   U8	*dollar_buf;
   I64	dollar_cnt;
-  U8	*cur_help_index;
+  U8	*cur_help_idx;
   I64	last_U16,
 	min_line,max_line,last_line_num,
 	lock_cnt;
@@ -2821,22 +2823,21 @@ class CMemUsed
 #endif
 
 #help_index "Memory/BlkPool"
-/*TempleOS does not mess with page tables after it
-identity-maps them during boot -- $LK,"SYS_INIT_MEM",A="MN:SYS_INIT_MEM"$.
-$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$ is arbitrary, and is not related to CPU hardware.
-I need some unit for memory allocation so I invented "$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$".
+/*TempleOS does not mess with page tables after setting them up
+during boot -- $LK,"SYS_INIT_PAGE_TABLES",A="MN:SYS_INIT_PAGE_TABLES"$.
 
-All virtual addresses are identical to physical, always.
+$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$, the unit size for alloications, is arbitrary,
+and is not related to CPU hardware.
+
+All virtual addresses are ident to physical at all times.
+text.vga_alias is not identity-mapped, however.
+
 There is no high kernel memory because RAM's physical
 addresses are low.  (All motherboards that I know of
 put RAM in low addresses of 64-bit address space.)
 It's ring-0-only so all (or none) is kernel, remember.
-
-2 Meg hardware pages are use except the first 2 Meg.
-0xA0000-0xBFFFF must be write thru.  Hardware pages
-don't matter except the caching bit.	Remember, it is ring-0-only
-and identity-mapped!	Do I need to repeat?
-Ring-0-only and 100% identity-mapped, all the time.
+2 Meg hardware pages are used. Only the caching bits matter.
+Remember, it is ring-0-only and identity-mapped!
 
 All code is placed in just the lowest 2 Gig, so the CALL REL32
 inst always works.  It never changes out of ring-0, remember,
@@ -2869,7 +2870,7 @@ class CMemRange
 #define MEM_HEAP_HASH_SIZE	1024
 #define MEM_FREE_PAGE_HASH_SIZE	0x100
 //It is common to $LK,"MAlloc",A="MN:MAlloc"$() exact powers of two.  There is some overhead.
-//We add $TX,"2",D="MEM_EXTRA_HASH2_PAGES"$ pages, so a request is not rounded-up to next power of two.
+//We add 2 pages, so a request is not rounded-up to next power of two.
 #define MEM_EXTRA_HASH2_PAGES	2
 
 #define MEM_ADAM_STK		(MEM_PAGE_SIZE*512) //Like 16384*MEM_PAGE_SIZE
@@ -3196,7 +3197,7 @@ class CSrvCmd
 
   U8	*aux_str;
   I64	aux1,aux2, //Sometimes called arg1 and arg2. (Windows msg param1 param2)
-	result;
+	res;
 
   CTask	*spawned_task,
 	*master_task;
@@ -3247,7 +3248,7 @@ public class CTaskSettings
   CTask *song_task,*animate_task;
   I64	scroll_x,scroll_y,scroll_z;
   CBGR48 palette[NUM_COLORS];
-  U32	win_inhibit;;
+  U32	win_inhibit;
   U8	text_attr,title_src,
 	border_attr,border_src,
 	task_title[STR_LEN];
@@ -3346,9 +3347,7 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
 	r8,r9,r10,r11,r12,r13,r14,r15;
   CCPU	*gs;
   CFPU	*fpu_mmx;
-  I64	time_slice_start,
-	total_time, //Cycles
-	swap_cnter;
+  I64	swap_cnter;
 
   U0	(*draw_it)(CTask *task,CDC *dc);
 
@@ -3456,17 +3455,15 @@ public class CCPU //The Gs segment reg points to current CCPU.
 #help_index "Memory/Page Tables"
 #define MEM_MIN_MEG		512 //512 Meg minimum.
 #define MEM_MAPPED_SPACE	0x2000000000 //Arbitrarily set to 128 Gig.
-#define MEM_NUM_PML1		1 //First 2 Meg are 4K resolution.
 #define MEM_NUM_PML2		(MEM_MAPPED_SPACE>>(9+21))
 #define MEM_NUM_PML3		1
 #define MEM_NUM_PML4		1
-#define MEM_PROTECTED_LOW_LIMIT	0x6FFF
 
 #define SYS_FIXED_AREA	0x100000
 public class CSysFixedArea
 {
-  U8	pml1[MEM_NUM_PML1*0x1000],pml2[MEM_NUM_PML2*0x1000],
-	pml3[MEM_NUM_PML3*0x1000],pml4[MEM_NUM_PML4*0x1000];
+  U8	pml2[MEM_NUM_PML2*0x1000],pml3[MEM_NUM_PML3*0x1000],
+	pml4[MEM_NUM_PML4*0x1000];
   $$=($$+15)&-16;
   CFPU	init_fpu_mmx;
   CCPU	boot_cpu;
@@ -3599,6 +3596,7 @@ public class CTextGlbls
   U8	*raw_screen_image;
   I64	rows,cols;		//Use TEXT_ROWS,TEXT_COLS
   U64	*font,*aux_font;
+  U8	*vga_alias;
 };
 
 #define FONT_WIDTH	8
@@ -3722,7 +3720,7 @@ public class CDC
 #define VGAP_ATTR_DATA_WRITE	0x03C0 //alias
 #define VGAP_ATTR_DATA_READ	0x03C1
 #define VGAP_MISC_OUTPUT	0x03C2
-#define VGAP_INDEX		0x03C4
+#define VGAP_IDX		0x03C4
 #define VGAP_DATA		0x03C5
 #define VGAP_PALETTE_MASK	0x03C6
 #define VGAP_REG_READ		0x03C7
@@ -3758,7 +3756,7 @@ public class CArcCtrl
   CArcEntry *cur_entry,*next_entry;
   I64	cur_bits_in_use,next_bits_in_use;
   U8	*stk_ptr,*stk_base;
-  I64	free_index,free_limit,
+  I64	free_idx,free_limit,
 	saved_basecode,
 	entry_used,
 	last_ch;

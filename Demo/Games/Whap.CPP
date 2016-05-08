@@ -66,7 +66,7 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
 
   D3Equ(&p2,task->pix_width>>1,task->pix_height>>1,0);
   for (i=1;i<NUM_BALLS;i++) {
-    D3Sub(&p2,&balls[i].state->x,&p);
+    D3Sub(&p,&p2,&balls[i].state->x);
     if (d=D3Norm(&p)) {
 //Gravity would be /(d*d*d), but that's too exponential.
       D3MulEqu(&p,GRAVITY/d);
@@ -76,7 +76,7 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
 
   for (i=0;i<NUM_BALLS;i++)
     for (j=i+1;j<NUM_BALLS;j++) {
-      D3Sub(&balls[j].state->x,&balls[i].state->x,&p);
+      D3Sub(&p,&balls[j].state->x,&balls[i].state->x);
       dd=D3NormSqr(&p);
       if (dd<=(2*BALL_RADIUS)*(2*BALL_RADIUS)) {
 	if (t-collision_t>0.05) {

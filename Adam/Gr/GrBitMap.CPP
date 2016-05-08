@@ -619,7 +619,7 @@ U8 *GrBitMap1ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor)
 public CDC *DCExtract(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
 	CTask *task=NULL)
 {//Extract new device context rect from device context.
-  CDC *result;
+  CDC *res;
   CTask *win_task;
   if (x1>x2) SwapI64(&x1,&x2);
   if (y1>y2) SwapI64(&y1,&y2);
@@ -630,10 +630,10 @@ public CDC *DCExtract(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
     x2+=win_task->pix_left+win_task->scroll_x;
     y2+=win_task->pix_top +win_task->scroll_y;
   }
-  result=DCNew(x2-x1+1,y2-y1+1,task);
-  DCFill(result);
-  GrBlot(result,-x1,-y1,dc);
-  return result;
+  res=DCNew(x2-x1+1,y2-y1+1,task);
+  DCFill(res);
+  GrBlot(res,-x1,-y1,dc);
+  return res;
 }
 
 #help_index "Graphics/Char;Char/Graphics"
@@ -862,10 +862,10 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 
 I64 GrPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
 {//Use $LK,"GrPrint",A="MN:GrPrint"$()
-  I64 x0,ch,result;
+  I64 x0,ch,res;
   if (!_s) return 0;
   x0=x;
-  result=0;
+  res=0;
   while (ch=*_s++) {
     if (ch=='\n') {
       x=x0;
@@ -873,20 +873,20 @@ I64 GrPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
     } else if (ch=='\t')
       x=x0+CeilU64(x-x0+FONT_WIDTH,8*FONT_WIDTH);
     else {
-      result+=GrPutChar(dc,x,y,ch);
+      res+=GrPutChar(dc,x,y,ch);
       x+=FONT_WIDTH;
     }
   }
-  return result;
+  return res;
 }
 
 I64 GrVPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
 {//Vertical Text.  Use $LK,"GrVPrint",A="MN:GrVPrint"$()
-  I64 y0,result;
+  I64 y0,res;
   U8 buf[2];
   if (!_s) return 0;
   y0=y;
-  result=0;
+  res=0;
 
   buf[1]=0;
   while (*buf=*_s++) {
@@ -896,36 +896,36 @@ I64 GrVPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
     } else if (*buf=='\t')
       y=y0+CeilU64(y-y0+FONT_HEIGHT,8*FONT_HEIGHT);
     else {
-      result+=GrPutS(dc,x,y,buf);
+      res+=GrPutS(dc,x,y,buf);
       y+=FONT_HEIGHT;
     }
   }
-  return result;
+  return res;
 }
 
 public I64 GrPrint(CDC *dc=gr.dc,I64 x,I64 y,U8 *fmt,...)
 {//2D. Clipping but not transformation.
-  I64 result;
+  I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  result=GrPutS(dc,x,y,buf);
+  res=GrPutS(dc,x,y,buf);
   Free(buf);
-  return result;
+  return res;
 }
 
 public I64 GrVPrint(CDC *dc=gr.dc,I64 x,I64 y,U8 *fmt,...)
 {//2D. Vertical text. Clipping but not transformation.
-  I64 result;
+  I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  result=GrVPutS(dc,x,y,buf);
+  res=GrVPutS(dc,x,y,buf);
   Free(buf);
-  return result;
+  return res;
 }
 
 #help_index "Graphics"
 public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 {//2D. Width Height. Clipping but not transformation.
 //Returns cnt of pixs changed.
-  I64 i,result=0,j,k1,kk1,w1,h1,w2,h2,dist,
+  I64 i,res=0,j,k1,kk1,w1,h1,w2,h2,dist,
 	leading_pixels,original_leading_pixels,whole_I64s,
 	trailing_pixels,leading_pixel_mask,trailing_pixel_mask,
 	win_z_buf_line_inc,win_z_buf_line_dec,win_z_num,color_mask;
@@ -1009,13 +1009,13 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
     trailing_pixel_mask=gr.to_8_bits[0xFF<<trailing_pixels&0xFF];
     if (leading_pixels+trailing_pixels>w2-w1) {
       leading_pixel_mask|=trailing_pixel_mask;
-      leading_pixels=w2-w1; //Correct so it's right for result.
+      leading_pixels=w2-w1; //Correct so it's right for res.
       trailing_pixels=0;
     }
     if (color.c0.rop==ROPB_COLLISION) {//TODO: Might want to check win_z_buf
       color =dc->bkcolor.c0.color;
       k1=(h1+y)*dc->width_internal+x;
-      result=-dc->collision_cnt;
+      res=-dc->collision_cnt;
       for (j=h2-h1;j;j--) {
 	for (i=w1;i<w2;i++) {
 	  c=dc->body[k1+i];
@@ -1024,7 +1024,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	}
 	k1+=dc->width_internal;
       }
-      result+=dc->collision_cnt;
+      res+=dc->collision_cnt;
     } else {
       if (!(dc->flags & DCF_SCREEN_BITMAP) || dc->flags&DCF_ON_TOP)
 	win_z_buf_ptr=NULL;
@@ -1051,7 +1051,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      if (win_z_buf_ptr) {
-		result=0;
+		res=0;
 		for (j=h1;j<h2;j++) {
 		  color_mask=gr.to_8_colors[color.c0.color];
 		  dst=dc->body+kk1&~7;
@@ -1059,19 +1059,19 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			    color_mask&~leading_pixel_mask;
-		      result+=leading_pixels;
+		      res+=leading_pixels;
 		    }
 		    dst(I64 *)++;
 		  }
 		  for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=color_mask;
-		      result+=8;
+		      res+=8;
 		    }
 		  if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			  color_mask&~trailing_pixel_mask;
-		    result+=trailing_pixels;
+		    res+=trailing_pixels;
 		  }
 		  if ((j+y)&7==7)
 		    win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1101,12 +1101,12 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		  else
 		    color.c0=dither_colors.c0;
 		}
-		result=(h2-h1)*(w2-w1);
+		res=(h2-h1)*(w2-w1);
 	      }
 	      break;
 	    case ROPB_XOR:
 	      if (win_z_buf_ptr) {
-		result=0;
+		res=0;
 		for (j=h1;j<h2;j++) {
 		  color_mask=gr.to_8_colors[color.c0.color];
 		  dst=dc->body+kk1&~7;
@@ -1114,19 +1114,19 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			    *dst(I64 *)^color_mask&~leading_pixel_mask;
-		      result+=leading_pixels;
+		      res+=leading_pixels;
 		    }
 		    dst(I64 *)++;
 		  }
 		  for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)^=color_mask;
-		      result+=8;
+		      res+=8;
 		    }
 		  if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			  *dst(I64 *)^color_mask&~trailing_pixel_mask;
-		    result+=trailing_pixels;
+		    res+=trailing_pixels;
 		  }
 		  if ((j+y)&7==7)
 		    win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1156,7 +1156,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		  else
 		    color.c0=dither_colors.c0;
 		}
-		result=(h2-h1)*(w2-w1);
+		res=(h2-h1)*(w2-w1);
 	      }
 	      break;
 	  }
@@ -1167,7 +1167,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	    case ROPB_EQU:
 	    case ROPB_MONO:
 	      if (win_z_buf_ptr) {
-		result=0;
+		res=0;
 		for (j=h1;j<h2;j++) {
 		  color_mask=gr.to_8_bits[0x55]&gr.to_8_colors[color.c0.color]|
 			gr.to_8_bits[0xAA]&gr.to_8_colors[color.c1.color];
@@ -1176,19 +1176,19 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			    color_mask&~leading_pixel_mask;
-		      result+=leading_pixels;
+		      res+=leading_pixels;
 		    }
 		    dst(I64 *)++;
 		  }
 		  for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=color_mask;
-		      result+=8;
+		      res+=8;
 		    }
 		  if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			  color_mask&~trailing_pixel_mask;
-		    result+=trailing_pixels;
+		    res+=trailing_pixels;
 		  }
 		  if ((j+y)&7==7)
 		    win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1213,12 +1213,12 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		  kk1+=dc->width_internal;
 		  SwapU16(&color.c0,&color.c1);
 		}
-		result=(h2-h1)*(w2-w1);
+		res=(h2-h1)*(w2-w1);
 	      }
 	      break;
 	    case ROPB_XOR:
 	      if (win_z_buf_ptr) {
-		result=0;
+		res=0;
 		for (j=h1;j<h2;j++) {
 		  color_mask=gr.to_8_bits[0x55]&gr.to_8_colors[color.c0.color]|
 			gr.to_8_bits[0xAA]&gr.to_8_colors[color.c1.color];
@@ -1227,19 +1227,19 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			    *dst(I64 *)^color_mask&~leading_pixel_mask;
-		      result+=leading_pixels;
+		      res+=leading_pixels;
 		    }
 		    dst(I64 *)++;
 		  }
 		  for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		    if (win_z_num>=*win_z_buf_ptr++) {
 		      *dst(I64 *)^=color_mask;
-		      result+=8;
+		      res+=8;
 		    }
 		  if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			  *dst(I64 *)^color_mask&~trailing_pixel_mask;
-		    result+=trailing_pixels;
+		    res+=trailing_pixels;
 		  }
 		  if ((j+y)&7==7)
 		    win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1264,7 +1264,7 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 		  kk1+=dc->width_internal;
 		  SwapU16(&color.c0,&color.c1);
 		}
-		result=(h2-h1)*(w2-w1);
+		res=(h2-h1)*(w2-w1);
 	      }
 	      break;
 	  }
@@ -1275,26 +1275,26 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 	  case ROPB_EQU:
 	  case ROPB_MONO:
 	    if (win_z_buf_ptr) {
-	      result=0;
+	      res=0;
 	      for (j=h1;j<h2;j++) {
 		dst=dc->body+kk1&~7;
 		if (leading_pixels) {
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			  color_mask&~leading_pixel_mask;
-		    result+=leading_pixels;
+		    res+=leading_pixels;
 		  }
 		  dst(I64 *)++;
 		}
 		for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=color_mask;
-		    result+=8;
+		    res+=8;
 		  }
 		if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		  *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			color_mask&~trailing_pixel_mask;
-		  result+=trailing_pixels;
+		  res+=trailing_pixels;
 		}
 		if ((j+y)&7==7)
 		  win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1315,31 +1315,31 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 			color_mask&~trailing_pixel_mask;
 		kk1+=dc->width_internal;
 	      }
-	      result=(h2-h1)*(w2-w1);
+	      res=(h2-h1)*(w2-w1);
 	    }
 	    break;
 	  case ROPB_XOR:
 	    if (win_z_buf_ptr) {
-	      result=0;
+	      res=0;
 	      for (j=h1;j<h2;j++) {
 		dst=dc->body+kk1&~7;
 		if (leading_pixels) {
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)=*dst(I64 *)&leading_pixel_mask|
 			  *dst(I64 *)^color_mask&~leading_pixel_mask;
-		    result+=leading_pixels;
+		    res+=leading_pixels;
 		  }
 		  dst(I64 *)++;
 		}
 		for (i=0;i<whole_I64s;i++,dst(I64 *)++)
 		  if (win_z_num>=*win_z_buf_ptr++) {
 		    *dst(I64 *)^=color_mask;
-		    result+=8;
+		    res+=8;
 		  }
 		if (trailing_pixels && win_z_num>=*win_z_buf_ptr++) {
 		  *dst(I64 *)=*dst(I64 *)&trailing_pixel_mask|
 			*dst(I64 *)^color_mask&~trailing_pixel_mask;
-		  result+=trailing_pixels;
+		  res+=trailing_pixels;
 		}
 		if ((j+y)&7==7)
 		  win_z_buf_ptr(U8 *)+=win_z_buf_line_inc;
@@ -1360,20 +1360,20 @@ public I64 GrRect(CDC *dc=gr.dc,I64 x,I64 y,I64 w,I64 h)
 			*dst(I64 *)^color_mask&~trailing_pixel_mask;
 		kk1+=dc->width_internal;
 	      }
-	      result=(h2-h1)*(w2-w1);
+	      res=(h2-h1)*(w2-w1);
 	    }
 	    break;
 	}
       }
     }
   }
-  return result;
+  return res;
 }
 
 I64 GrRayLenMinus(CDC *dc,I64 x,I64 y)
 {
 //Returns cnt of pixs changed
-  I64 result=0,c,x3,y3,d;
+  I64 res=0,c,x3,y3,d;
   U8 *dst,*dst2;
   Bool not_color=ToBool(dc->flags&DCF_FILL_NOT_COLOR);
   CTask *win_task;
@@ -1417,19 +1417,19 @@ I64 GrRayLenMinus(CDC *dc,I64 x,I64 y)
     c=*dst;
     if (not_color) {
       if (c!=dc->color2) {
-	result++;
+	res++;
 	x--;
       } else
 	break;
     } else {
       if (c==dc->color2) {
-	result++;
+	res++;
 	x--;
       } else
 	break;
     }
   }
-  return result;
+  return res;
 gr_done:
   return 0;
 }
@@ -1437,7 +1437,7 @@ gr_done:
 I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 {
 //Returns cnt of pixs changed
-  I64 result=0,d,x=*x1,x2,x3,y3,dist;
+  I64 res=0,d,x=*x1,x2,x3,y3,dist;
   Bool plot,dither,probability_dither,
 	not_color=ToBool(dc->flags&DCF_FILL_NOT_COLOR);
   U8 *dst,*dst2;
@@ -1551,7 +1551,7 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  *dst^=c;
 	  break;
       }
-      result++;
+      res++;
       x++;
     } else
       break;
@@ -1628,12 +1628,12 @@ I64 GrRayLen(CDC *dc,I64 *x1,I64 y,I64 z=0,I32 *db=NULL)
 	  *dst^=c;
 	  break;
       }
-      result++;
+      res++;
       x--;
     } else
       break;
   }
-  return result;
+  return res;
 gr_done:
   return 0;
 }
@@ -1642,7 +1642,7 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
 {//3D. No transformation or pen width.
 //Returns cnt of pixs changed
   //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
-  I64 dist,dx,dz,z,result=0,i,j,d;
+  I64 dist,dx,dz,z,res=0,i,j,d;
   U8 *dst;
   CColorROPU32 c,c2,color=dc->color,bkcolor=dc->bkcolor,dither_colors;
   I32 *db;
@@ -1779,7 +1779,7 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
 	    *dst^=c;
 	    break;
 	}
-	result++;
+	res++;
       }
     }
     if (dither) {
@@ -1806,5 +1806,5 @@ public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
     }
   }
 gr_done:
-  return result;
+  return res;
 }

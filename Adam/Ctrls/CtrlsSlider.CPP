@@ -16,18 +16,18 @@ CTemplateCS *CtrlSliderGet()
 {
   CTemplateCSSlider *temps;
   U8 *st,pmt[STR_LEN];
-  CTemplateCS *result=CAlloc(sizeof(CTemplateCS));
+  CTemplateCS *res=CAlloc(sizeof(CTemplateCS));
 
   "$$PURPLE$$Ctrl Slider$$FG$$\n\n";
 
-  result->glbl_name=GetStr("Glbl Struct Name (ENTER for No Glbl):");
-  result->range=GetI64	("Range   (%4d):",30);
-  result->spacing=GetI64("Spacing (%4d):",20);
-  result->border=GetI64 ("Border  (%4d):",2);
+  res->glbl_name=GetStr("Glbl Struct Name (ENTER for No Glbl):");
+  res->range=GetI64	("Range   (%4d):",30);
+  res->spacing=GetI64("Spacing (%4d):",20);
+  res->border=GetI64 ("Border  (%4d):",2);
 
-  result->next_slider=result->last_slider=&result->next_slider;
+  res->next_slider=res->last_slider=&res->next_slider;
   while (TRUE) {
-    StrPrint(pmt,"Slider #%d Name:",result->num_sliders+1);
+    StrPrint(pmt,"Slider #%d Name:",res->num_sliders+1);
     st=GetStr(pmt);
     if (!*st) {
       Free(st);
@@ -35,10 +35,10 @@ CTemplateCS *CtrlSliderGet()
     }
     temps=CAlloc(sizeof(CTemplateCSSlider));
     temps->name=st;
-    QueIns(temps,result->last_slider);
-    temps->num=result->num_sliders++;
+    QueIns(temps,res->last_slider);
+    temps->num=res->num_sliders++;
   }
-  return result;
+  return res;
 }
 
 U0 TemplateCtrlSlider(CDoc *doc)

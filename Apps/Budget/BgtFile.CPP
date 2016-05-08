@@ -19,9 +19,9 @@ U0 BgtDataRead()
     for (i=0;i<cnt;i++) {
       tempb=CAlloc(sizeof(CBgtEntry));
       MemCpy(&tempb->start,ptr,BE_SIZE);
-      tempb->credit=StrNew(s[tempb->credit_index]);
-      tempb->debit =StrNew(s[tempb->debit_index]);
-      tempb->desc  =StrNew(s[tempb->desc_index]);
+      tempb->credit=StrNew(s[tempb->credit_idx]);
+      tempb->debit =StrNew(s[tempb->debit_idx]);
+      tempb->desc  =StrNew(s[tempb->desc_idx]);
       QueIns(tempb,b_root.last);
       ptr+=BE_SIZE;
     }
@@ -33,9 +33,9 @@ U0 BgtDataRead()
       ptr+=BT_SIZE;
       MemCpy(&tempt->b.start,ptr,BE_SIZE);
       ptr+=BE_SIZE;
-      tempt->b.credit=StrNew(s[tempt->b.credit_index]);
-      tempt->b.debit =StrNew(s[tempt->b.debit_index]);
-      tempt->b.desc  =StrNew(s[tempt->b.desc_index]);
+      tempt->b.credit=StrNew(s[tempt->b.credit_idx]);
+      tempt->b.debit =StrNew(s[tempt->b.debit_idx]);
+      tempt->b.desc  =StrNew(s[tempt->b.desc_idx]);
       QueIns(tempt,t_root.last);
     }
   }
@@ -67,9 +67,9 @@ U0 BgtDataWrite()
   cnt1=0;
   while (tempb!=&b_root) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
-      tempb->credit_index	=StrFileAdd(tempb->credit,&num,table);
-      tempb->debit_index	=StrFileAdd(tempb->debit,&num,table);
-      tempb->desc_index		=StrFileAdd(tempb->desc,&num,table);
+      tempb->credit_idx	=StrFileAdd(tempb->credit,&num,table);
+      tempb->debit_idx	=StrFileAdd(tempb->debit,&num,table);
+      tempb->desc_idx		=StrFileAdd(tempb->desc,&num,table);
       cnt1++;
     }
     tempb=tempb->next;
@@ -78,9 +78,9 @@ U0 BgtDataWrite()
   tempt=t_root.next;
   cnt2=0;
   while (tempt!=&t_root) {
-    tempt->b.credit_index	=StrFileAdd(tempt->b.credit,&num,table);
-    tempt->b.debit_index	=StrFileAdd(tempt->b.debit,&num,table);
-    tempt->b.desc_index		=StrFileAdd(tempt->b.desc,&num,table);
+    tempt->b.credit_idx	=StrFileAdd(tempt->b.credit,&num,table);
+    tempt->b.debit_idx	=StrFileAdd(tempt->b.debit,&num,table);
+    tempt->b.desc_idx		=StrFileAdd(tempt->b.desc,&num,table);
     cnt2++;
     tempt=tempt->next;
   }

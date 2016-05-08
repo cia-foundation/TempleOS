@@ -119,9 +119,9 @@ I64 DocBinPtrRst(CDoc *doc,CDocEntry *doc_e)
 	  }
 	} else
 	  bin_num=doc->cur_bin_num++;
-	tempb=MAllocIdentical(tempb2,doc->mem_task);
+	tempb=MAllocIdent(tempb2,doc->mem_task);
 	tempb->use_cnt=i;
-	tempb->data=MAllocIdentical(tempb2->data,doc->mem_task);
+	tempb->data=MAllocIdent(tempb2->data,doc->mem_task);
 	tempb->num=bin_num;
 	doc_e->bin_data=tempb;
 	if (doc_e->de_flags&DOCEF_TAG && doc_e->tag && *doc_e->tag)

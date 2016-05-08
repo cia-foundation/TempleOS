@@ -76,7 +76,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,
 	    tempi->ic_flags=0;
 	  }
 	  ICAdd(cc,IC_ASSIGN,0,tempc);
-	  ICAdd(cc,IC_END_EXP,0,tempc,ICF_NO_DEPEND_RESULT);
+	  ICAdd(cc,IC_END_EXP,0,tempc,ICF_RES_NOT_USED);
 	  ICAdd(cc,IC_RET,0,0);
 	  if (machine_code=COCCompile(cc,&size,NULL,NULL)) {
 	    tempie=CAlloc(sizeof(CAOTImportExport));
@@ -249,7 +249,7 @@ Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
 //dim->next!=0 for array
   CArrayDim *tempad,*tempad1;
   I64 j;
-  Bool result=TRUE;
+  Bool res=TRUE;
   dim->next=NULL;
   dim->cnt=0;
   dim->total_cnt=1;
@@ -260,7 +260,7 @@ Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
     do {
       if (Lex(cc)==']' && !dim->next) {
 	j=-1;
-	result=FALSE;
+	res=FALSE;
       } else {
 	if ((j=LexExpressionI64(cc))<0)
 	  LexExcept(cc,"Invalid array size at ");
@@ -281,7 +281,7 @@ Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
 	LexExcept(cc,"Missing ']' at ");
     } while (Lex(cc)=='[');
   }
-  return result;
+  return res;
 }
 
 CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tempc1,
@@ -422,7 +422,7 @@ U0 PrsVarLst(CCmpCtrl *cc,CHashClass *tempc,I64 mode,I64 union_base=0)
   CMemberLstMeta *temp_meta;
   U8 *machine_code;
   Bool undef_array_size,first;
-  cc->flags|=CCF_DONT_MAKE_RESULT;
+  cc->flags|=CCF_DONT_MAKE_RES;
   if (mode.u8[1]==PRS1B_CLASS)
     cc->flags|=CCF_CLASS_IP;
   if ((mode.u8[1]!=PRS1B_LOCAL_VAR && mode.u8[1]!=PRS1B_STATIC_LOCAL_VAR ||
@@ -568,7 +568,7 @@ pvl_restart3:
 	  LexPopNoRestore(cc);
 	  if (cc->token=='=') {
 	    cc->flags=cc->flags&
-		  ~CCF_DONT_MAKE_RESULT|old_flags&CCF_DONT_MAKE_RESULT;
+		  ~CCF_DONT_MAKE_RES|old_flags&CCF_DONT_MAKE_RES;
 	    if (undef_array_size) {
 	      LexPush(cc);
 	      LexPush(cc);
@@ -600,7 +600,7 @@ pvl_restart3:
 		AOTStoreCodeU8At(cc,tempm->static_data_ip+k,
 		      tempm->static_data[k]);
 	    tempm->use_cnt=0;
-	    cc->flags|=CCF_DONT_MAKE_RESULT;
+	    cc->flags|=CCF_DONT_MAKE_RES;
 	  }
 	  if (cc->flags&CCF_AOT_COMPILE)
 	    Free(tempm->static_data);
@@ -623,14 +623,14 @@ pvl_restart3:
 	  tempm->offset=tempc->size;
 	  tempm->size=i;
 	  if (cc->token=='=') {
-	    cc->flags=cc->flags&~CCF_DONT_MAKE_RESULT|
-		  old_flags&CCF_DONT_MAKE_RESULT;
+	    cc->flags=cc->flags&~CCF_DONT_MAKE_RES|
+		  old_flags&CCF_DONT_MAKE_RES;
 	    LexPopRestore(cc);
 	    Lex(cc);
 	    if (!PrsExpression(cc,NULL,TRUE))
 	      throw('Compiler');
 	    tempm->use_cnt=0;
-	    cc->flags|=CCF_DONT_MAKE_RESULT;
+	    cc->flags|=CCF_DONT_MAKE_RES;
 	  } else
 	    LexPopNoRestore(cc);
 	  break;
@@ -715,10 +715,10 @@ pvl_restart3:
 	  Lex(cc);
 	  goto pvl_done;
 	case ';':
-	  cc->flags=cc->flags&~CCF_DONT_MAKE_RESULT|
-		old_flags&CCF_DONT_MAKE_RESULT;
+	  cc->flags=cc->flags&~CCF_DONT_MAKE_RES|
+		old_flags&CCF_DONT_MAKE_RES;
 	  Lex(cc);
-	  cc->flags|=CCF_DONT_MAKE_RESULT;
+	  cc->flags|=CCF_DONT_MAKE_RES;
 	  if ((mode.u8[1]==PRS1B_LOCAL_VAR||mode.u8[1]==
 		PRS1B_STATIC_LOCAL_VAR) && !(mode&PRSF_UNION))
 	    goto pvl_done;
@@ -729,6 +729,6 @@ pvl_restart3:
     }
   }
 pvl_done:
-  cc->flags=cc->flags&~(CCF_CLASS_IP|CCF_DONT_MAKE_RESULT)|
-	old_flags& (CCF_CLASS_IP|CCF_DONT_MAKE_RESULT);
+  cc->flags=cc->flags&~(CCF_CLASS_IP|CCF_DONT_MAKE_RES)|
+	old_flags& (CCF_CLASS_IP|CCF_DONT_MAKE_RES);
 }

@@ -109,7 +109,7 @@ U0 UpdateDerivedCtrlPanelCtrl(CCtrl *c)
 	CTRL_PANEL_RANGE+CTRL_PANEL_BUTTON_SIZE);
   c->bottom=c->top+CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE;
 
-  s->shot_radius =ClampI64(s->shot_radius,0,CTRL_PANEL_RANGE-1);
+  s->shot_radius=ClampI64(s->shot_radius,0,CTRL_PANEL_RANGE-1);
   s->fuse_time=ClampI64(s->fuse_time,0,CTRL_PANEL_RANGE-1);
 }
 

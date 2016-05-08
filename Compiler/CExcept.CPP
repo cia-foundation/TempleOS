@@ -3,7 +3,7 @@ U0 LexPutToken(CCmpCtrl *cc)
   '"';
   if (cc->token==TK_IDENT || cc->token==TK_STR)
     "%s",cc->cur_str;
-  else if (cc->token==TK_INT)
+  else if (cc->token==TK_I64)
     "INT:%X",cc->cur_i64;
   else if (cc->token==TK_CHAR_CONST)
     "U8:%X",cc->cur_i64;
@@ -219,21 +219,19 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
       "[unsigned] ";
     if (tempi->ic_flags & ICF_USE_INT)
       "[int] ";
-    if (tempi->ic_flags & ICF_NO_DEPEND_RESULT)
-      "-DEP ";
-    if (tempi->ic_flags & ICF_DEPEND_RESULT)
-      "+DEP ";
+    if (tempi->ic_flags & ICF_RES_NOT_USED)
+      "NO_RES ";
     if (tempi->ic_flags & ICF_BY_VAL)
       "BY_VAL ";
-    if (tempi->ic_flags & ICF_PUSH_RESULT)
+    if (tempi->ic_flags & ICF_PUSH_RES)
       "PUSH ";
     if (tempi->ic_flags & ICF_PUSH_CMP)
       "PUSH_CMP ";
     if (tempi->ic_flags & ICF_POP_CMP)
       "POP_CMP ";
-    if (tempi->ic_flags & ICF_DEL_PREVIOUS_INS)
+    if (tempi->ic_flags & ICF_DEL_PREV_INS)
       "DEL_PREV ";
-    if (tempi->ic_flags & ICF_PREVIOUS_DELETED)
+    if (tempi->ic_flags & ICF_PREV_DELETED)
       "PREV_DEL ";
     for (i=0;i<3;i++) {
       if (Bt(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0+i))

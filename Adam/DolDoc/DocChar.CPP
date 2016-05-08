@@ -4,18 +4,18 @@ public I64 EdCurU8(CDoc *doc)
 {//Return cur U8. See $LK,"EdRenumAsm",A="MN:EdRenumAsm"$ for an example.
   Bool unlock=DocLock(doc);
   CDocEntry *doc_ce=doc->cur_entry;
-  I64 result=-1;
+  I64 res=-1;
   if (doc_ce->type_u8==DOCT_TEXT &&
 	doc_ce->min_col<=doc->cur_col<doc_ce->max_col)
-    result=doc_ce->tag[doc->cur_col];
+    res=doc_ce->tag[doc->cur_col];
   else if (doc_ce->type_u8==DOCT_TAB)
-    result='\t';
+    res='\t';
   else if (doc_ce->type_u8==DOCT_NEW_LINE ||
 	doc_ce->type_u8==DOCT_SOFT_NEW_LINE)
-    result='\n';
+    res='\n';
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)

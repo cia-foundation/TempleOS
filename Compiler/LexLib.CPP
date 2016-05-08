@@ -15,7 +15,7 @@ U0 LexPush(CCmpCtrl *cc)
   LexBackupLastChar(cc);
   if (cc->lex_include_stk->last_U16)
     cc->flags|=CCF_USE_LAST_U16;
-  tempf=MAllocIdentical(cc->lex_include_stk);
+  tempf=MAllocIdent(cc->lex_include_stk);
   tempf->next=cc->lex_prs_stk;
   cc->lex_prs_stk=tempf;
 }
@@ -149,9 +149,9 @@ U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
 
 CMemberLst *MemberLstNew(I64 _reg)
 {
-  CMemberLst *result=CAlloc(sizeof(CMemberLst));
-  result->reg=_reg;
-  return result;
+  CMemberLst *res=CAlloc(sizeof(CMemberLst));
+  res->reg=_reg;
+  return res;
 }
 
 U0 MemberLstDel(CHashClass *tempc)
@@ -192,27 +192,27 @@ I64 MemberLstSize(CHashClass *tempc)
 {
   CMemberLst *tempm;
   CMemberLstMeta *temp_meta;
-  I64 result=0;
+  I64 res=0;
   tempm=tempc->member_lst_and_root;
   while (tempm) {
-    result+=MSize2(tempm->str);
-    result+=LinkedLstSize(tempm->dim.next);
+    res+=MSize2(tempm->str);
+    res+=LinkedLstSize(tempm->dim.next);
     if (tempm->flags & MLF_STR_DFT_AVAILABLE)
-      result+=MSize2(tempm->dft_val);
+      res+=MSize2(tempm->dft_val);
     if (tempm->flags & MLF_FUN)
-      result+=HashEntrySize2(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
+      res+=HashEntrySize2(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
     temp_meta=tempm->meta;
     while (temp_meta) {
-      result+=MSize2(temp_meta->str);
+      res+=MSize2(temp_meta->str);
       if (temp_meta->flags&MLMF_IS_STR)
-	result+=MSize2(temp_meta->user_data);
-      result+=MSize2(temp_meta);
+	res+=MSize2(temp_meta->user_data);
+      res+=MSize2(temp_meta);
       temp_meta=temp_meta->next;
     }
-    result+=MSize2(tempm);
+    res+=MSize2(tempm);
     tempm=tempm->next;
   }
-  return result;
+  return res;
 }
 
 U8 *LexExtStr(CCmpCtrl *cc,I64 *_size=NULL,Bool lex_next=TRUE)

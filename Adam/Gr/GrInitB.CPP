@@ -60,10 +60,10 @@ U0 GrSetUpTables()
     MemSet(VGAM_TEXT,0,TEXT_ROWS*TEXT_COLS*sizeof(U16));
     MemSet(gr.vga_text_cache,0,TEXT_ROWS*TEXT_COLS*sizeof(U16));
   } else {
-    OutU8(VGAP_INDEX,VGAR_MAP_MASK);
+    OutU8(VGAP_IDX,VGAR_MAP_MASK);
     OutU8(VGAP_DATA,0x0F);
 //Virtual Box crashes on the following for some reason.
-    //	  MemSet(VGAM_GRAPHICS,0,GR_HEIGHT*GR_WIDTH>>3);
+    //	  MemSet(text.vga_alias,0,GR_HEIGHT*GR_WIDTH>>3);
     MemSet(gr.screen_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
   }
   for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++) {

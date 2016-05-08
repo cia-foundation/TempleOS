@@ -1,33 +1,33 @@
 #help_index "File/Internal"
 I64 DirTreeSerializeSize(CDirEntry *tempde)
 {
-  I64 result=0;
+  I64 res=0;
   while (tempde) {
-    result+=CDIR_SIZE+1;
+    res+=CDIR_SIZE+1;
     if (tempde->attr & RS_ATTR_DIR)
-      result+=DirTreeSerializeSize(tempde->sub);
+      res+=DirTreeSerializeSize(tempde->sub);
     tempde=tempde->next;
   }
-  return result+1;
+  return res+1;
 }
 I64 DirTreeSerializeFill(CDirEntry *tempde,U8 *dst)
 {
-  I64 result=0,i;
+  I64 res=0,i;
   while (tempde) {
     *dst++=1;
-    result++;
+    res++;
     MemCpy(dst,&tempde->start,CDIR_SIZE);
     dst+=CDIR_SIZE;
-    result+=CDIR_SIZE;
+    res+=CDIR_SIZE;
     if (tempde->attr & RS_ATTR_DIR) {
       i=DirTreeSerializeFill(tempde->sub,dst);
       dst+=i;
-      result+=i;
+      res+=i;
     }
     tempde=tempde->next;
   }
   *dst=0;
-  return result+1;
+  return res+1;
 }
 public U8 *DirTreeSerialize(CDirEntry *tempde,I64 *_size=NULL)
 {//Serialize tree returned from $LK,"FilesFind",A="MN:FilesFind"$() into a one contiguous U8 array.
@@ -80,7 +80,7 @@ U0 FOFlatten(CDirEntry *tempde,CDirEntry **a,I64 *i)
 I64 Size1(CDirEntry *tempde,I64 *_fuf_flags,I64 round_to)
 {
   U8 buf[BLK_SIZE];
-  I64 result=0,i;
+  I64 res=0,i;
   CDrv *dv;
   while (tempde) {
     if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
@@ -95,25 +95,25 @@ I64 Size1(CDirEntry *tempde,I64 *_fuf_flags,I64 round_to)
     if (tempde->attr&RS_ATTR_DIR)
       i+=Size1(tempde->sub,_fuf_flags,round_to);
     tempde->user_data=i;
-    result+=i;
+    res+=i;
     tempde=tempde->next;
   }
-  return result;
+  return res;
 }
 public I64 Size(U8 *files_find_mask="/*",U8 *fu_flags=NULL,I64 round_to=0)
 {//Total size of files in mask. "+x" for expanded size.
 //Does not include directory size of base directory, but
   //does include size of sub directories.
-  I64 fuf_flags=0,result=0;
+  I64 fuf_flags=0,res=0;
   CDirEntry *tempde1=NULL;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (tempde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND)) {
     fuf_flags&=FUF_EXPAND;
-    result=Size1(tempde1,&fuf_flags,round_to);
+    res=Size1(tempde1,&fuf_flags,round_to);
     DirTreeDel(tempde1);
   }
-  return result;
+  return res;
 }
 
 public I64 FileCnt(CDirEntry *tempde)
@@ -151,20 +151,20 @@ public I64 Zip(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Compress files by moving to .Z filename.
   U8 *st;
   CDirEntry *tempde,*tempde1;
-  I64 result=0,fuf_flags=0;
+  I64 res=0,fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
   while (tempde) {
     if (!IsDotZ(tempde->full_name)) {
       st=MStrPrint("%s.Z",tempde->full_name);
-      result+=Move(tempde->full_name,st);
+      res+=Move(tempde->full_name,st);
       Free(st);
     }
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
-  return result;
+  return res;
 }
 
 public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
@@ -173,7 +173,7 @@ public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
   //It automatically unzips ".Z" files.
   U8 *st;
   CDirEntry *tempde,*tempde1;
-  I64 result=0,fuf_flags=0;
+  I64 res=0,fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
@@ -181,11 +181,11 @@ public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
     if (IsDotZ(tempde->full_name)) {
       st=StrNew(tempde->full_name);
       StrLastRem(st,".");
-      result+=Move(tempde->full_name,st);
+      res+=Move(tempde->full_name,st);
       Free(st);
     }
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
-  return result;
+  return res;
 }

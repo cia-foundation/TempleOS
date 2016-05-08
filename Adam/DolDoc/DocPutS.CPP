@@ -8,7 +8,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	*char_bitmap;
   Bool unlock;
   I64 ch,j;
-  CDocEntry *doc_e=NULL,*result=NULL,*doc_ce;
+  CDocEntry *doc_e=NULL,*res=NULL,*doc_ce;
   if (!st || !doc && !(doc=DocPut) || doc->doc_signature!=DOC_SIGNATURE_VAL)
     return NULL;
   unlock=DocLock(doc);
@@ -128,7 +128,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	      }
 	      *ptr4=0;
 	      if (doc_e=PrsDollarCmd(doc,st2)) {
-		result=doc_e;
+		res=doc_e;
 		DocInsEntry(doc,doc_e);
 	      }
 	      Free(st2);
@@ -152,16 +152,16 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
   }
   if (unlock)
     DocUnlock(doc);
-  return result;
+  return res;
 }
 
 public CDocEntry *DocPrint(CDoc *doc=NULL,U8 *fmt,...)
 {//You must not print partial doc cmds.
 //Returns last newly created dollar-sign CDocEntry or NULL.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  CDocEntry *result=DocPutS(doc,buf);
+  CDocEntry *res=DocPutS(doc,buf);
   Free(buf);
-  return result;
+  return res;
 }
 
 public U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...)

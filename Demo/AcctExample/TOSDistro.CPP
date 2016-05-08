@@ -4,11 +4,11 @@
 
 U8 TOSGetDrv()
 {
-  I64 result;
+  I64 res;
   "Drive (%s):",TOS_HDS;
-  result=ToUpper(GetChar);
+  res=ToUpper(GetChar);
   '\n';
-  return result;
+  return res;
 }
 
 U0 TOSMakeOSDrvBootInstall(U8 drv_let)
@@ -175,7 +175,7 @@ I64 MakeLineRepFile()
 {
   U8 *st;
   CDoc *doc;
-  I64 result,official;
+  I64 res,official;
   CDocEntry *tree_branch,*start_indent,*end_indent;
 
   DocClear;
@@ -189,7 +189,7 @@ I64 MakeLineRepFile()
 
   DocMax;
   DocClear;
-  result=LineRep;
+  res=LineRep;
   if (doc=DocPut) {
     st=StrNew(doc->filename.name);
     StrCpy(doc->filename.name,"B:/TOS/Web/LineRep.TXT.Z");
@@ -211,18 +211,16 @@ I64 MakeLineRepFile()
   DocCut(doc,start_indent->next,end_indent->last);
   doc->cur_entry=start_indent->next;
   doc->cur_col=0;
-
-  DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",result);
+  DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",res);
   DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC_OFFICIAL\",\"%,d\");\n",official);
-
-  DefinePrint("DD_TEMPLEOS_LOC","%,d",result);
-  DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","%,d",official);
-
   DocWrite(doc);
   DocDel(doc);
 
-  "Total LOC:%12,d\n\n",result;
-  return result;
+  DefinePrint("DD_TEMPLEOS_LOC","%,d",res);
+  DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","%,d",official);
+
+  "Total LOC:%12,d\n\n",res;
+  return res;
 }
 
 U0 TOSDistroPrep()
@@ -245,7 +243,7 @@ U0 MakeTOSDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSTS_SIZE",
-	"Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -280,7 +278,7 @@ U0 MakeDbgDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -328,7 +326,7 @@ U0 MakeLiteDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -361,7 +359,7 @@ U0 MakeUltraDistro()
   ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -370,12 +368,12 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.05",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);

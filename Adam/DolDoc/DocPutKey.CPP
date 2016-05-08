@@ -485,8 +485,11 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	  if (sc&SCF_SHIFT) {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Cmd /Code Tools");
-	    else
+	    else {
+	      DocUnlock(doc);
 	      EdCodeTools(doc);
+	      DocLock(doc);
+	    }
 	  } else {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Cmd /Insert Text Widgets Wizard");

@@ -31,7 +31,7 @@ Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE)
 Bool BlkDevInit(CBlkDev *bd)
 {
   CDrv *dv=Let2Drv(bd->first_drv_let);
-  Bool result=FALSE;
+  Bool res=FALSE;
   if (!LBts(&bd->flags,BDf_INITIALIZED)) {
     bd->flags|=BDF_INIT_IN_PROGRESS;
     switch (bd->type) {
@@ -46,12 +46,12 @@ Bool BlkDevInit(CBlkDev *bd)
 	  RedSeaDrvInit(dv);
 	else
 	  RedSeaFmt(bd->first_drv_let);
-	result=TRUE;
+	res=TRUE;
 	break;
       case BDT_ATA:
 	bd->max_reads=128;
 	bd->max_writes=1;
-	result=ATAInit(bd);
+	res=ATAInit(bd);
 	break;
       case BDT_ATAPI:
 //0xFFFF*4 is too big for my taste
@@ -62,16 +62,16 @@ Bool BlkDevInit(CBlkDev *bd)
 	if (bd->max_reads<128)
 	  bd->max_reads=128;
 	bd->max_writes=0xFFFF*4;
-	if (result=ATAInit(bd))
+	if (res=ATAInit(bd))
 	  dv->size=bd->max_blk+1;
 	break;
     }
-    if (result && bd->flags & BDF_READ_CACHE)
+    if (res && bd->flags & BDF_READ_CACHE)
       DskCacheInvalidate(dv);
     bd->flags&=~BDF_INIT_IN_PROGRESS;
   } else
-    result=TRUE;
-  return result;
+    res=TRUE;
+  return res;
 }
 
 U0 BlkDevsRelease()
@@ -88,28 +88,28 @@ U0 BlkDevsRelease()
 CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
 {//Locate free slot for new BlkDev, like during $LK,"Mount",A="MN:Mount"$().
   I64 i=0;
-  CBlkDev *result;
+  CBlkDev *res;
   do {
-    result=&blkdev.blkdevs[i];
-    if (result->bd_signature!=BD_SIGNATURE_VAL) {
-      MemSet(result,0,sizeof(CBlkDev));
-      result->first_drv_let=first_drv_let;
-      result->type=type;
+    res=&blkdev.blkdevs[i];
+    if (res->bd_signature!=BD_SIGNATURE_VAL) {
+      MemSet(res,0,sizeof(CBlkDev));
+      res->first_drv_let=first_drv_let;
+      res->type=type;
       if (type==BDT_ATAPI)
-	result->flags=BDF_REMOVABLE;
+	res->flags=BDF_REMOVABLE;
       else
-	result->flags=0;
+	res->flags=0;
       if (type!=BDT_RAM)
-	result->flags|=BDF_READ_CACHE;
+	res->flags|=BDF_READ_CACHE;
 
       if (type==BDT_ATAPI) {
-	result->blk_size=DVD_BLK_SIZE;
-	result->flags|=BDF_READ_ONLY;
+	res->blk_size=DVD_BLK_SIZE;
+	res->flags|=BDF_READ_ONLY;
       } else
-	result->blk_size=BLK_SIZE;
+	res->blk_size=BLK_SIZE;
 
-      result->max_blk=0xEFFFFFFF;
-      return result;
+      res->max_blk=0xEFFFFFFF;
+      return res;
     }
   } while (++i<NUM_BLKDEVS);
   throw('BlkDev');

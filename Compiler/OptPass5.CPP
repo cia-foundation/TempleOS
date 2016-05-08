@@ -109,7 +109,7 @@ U0 OptPass5(CCmpCtrl *cc)
 	}
       }
       if (tempi->r.type&MDF_STK &&
-	    !(tempi->ic_flags&ICF_NO_DEPEND_RESULT))
+	    !(tempi->ic_flags&ICF_RES_NOT_USED))
 	PrsPush(ps,tempi);
     }
     tempi=tempi->next;

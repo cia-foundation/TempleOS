@@ -8,7 +8,7 @@ Bool ISODrvInit(CDrv *dv,I64 blk)
   I64 spc=bd->blk_size>>BLK_SIZE_BITS,i=blk/spc;
   CISO1PriDesc *iso=MAlloc(bd->blk_size);
   CISO1DirEntry *de;
-  Bool unlock,result=FALSE;
+  Bool unlock,res=FALSE;
   U8 buf[8];
 
   try {
@@ -31,7 +31,7 @@ Bool ISODrvInit(CDrv *dv,I64 blk)
 	      de=&iso->root_dir_record;
 	      dv->root_cluster=de->loc.little;
 	      dv->size=iso->vol_space_size.little*bd->blk_size>>BLK_SIZE_BITS;
-	      result=TRUE;
+	      res=TRUE;
 	      goto ipi_done;
 	    case ISO1T_TERMINATOR:
 	      throw('Drv');
@@ -55,7 +55,7 @@ ipi_done:
     if (unlock)
       DrvUnlock(dv);
   }
-  return result;
+  return res;
 }
 
 U0 Date2ISO1(CISO1Date *dst,CDate cdt)
@@ -115,24 +115,24 @@ Bool ISO1FromName(U8 *dst,U8 *src)
 
 Bool ISO1CDirFill(CDirEntry *tempde,CISO1DirEntry *de)
 {
-  Bool result;
+  Bool res;
   MemSet(tempde,0,sizeof(CDirEntry));
-  result=ISO1FromName(tempde->name,&de->name_len);
+  res=ISO1FromName(tempde->name,&de->name_len);
   tempde->cluster=de->loc.little;
   tempde->size=de->size.little;
   tempde->attr=FileAttr(tempde->name);
   if (de->flags & ISO1_ATTR_DIR)
     tempde->attr|=RS_ATTR_DIR;
   tempde->datetime=ISO1DateStruct2CDate(&de->date);
-  return result;
+  return res;
 }
 
 Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
-	CDirEntry *_result,I64 fuf_flags=0)
+	CDirEntry *_res,I64 fuf_flags=0)
 {//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   CISO1DirEntry *isoptr,*buf;
   U8 dname[CDIR_FILENAME_LEN];
-  Bool result=FALSE,unlock;
+  Bool res=FALSE,unlock;
   I64 i;
   if (fuf_flags&~FUG_FILE_FIND)
     throw('FUF');
@@ -163,14 +163,14 @@ Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	  ISO1FromName(dname,&isoptr->name_len);
 	  if (*dname) {
 	    if (!StrCmp(name,dname)) {
-	      result=ISO1CDirFill(_result,isoptr);
-	      if (result &&
+	      res=ISO1CDirFill(_res,isoptr);
+	      if (res &&
 		    !(fuf_flags&FUF_JUST_DIRS &&
-		    !(_result->attr & RS_ATTR_DIR)) &&
-		    !(fuf_flags&FUF_JUST_FILES && _result->attr & RS_ATTR_DIR) )
+		    !(_res->attr & RS_ATTR_DIR)) &&
+		    !(fuf_flags&FUF_JUST_FILES && _res->attr & RS_ATTR_DIR) )
 		goto iff_done;
 	      else
-		result=FALSE;
+		res=FALSE;
 	    }
 	  }
 	  i-=isoptr->len;
@@ -184,7 +184,7 @@ iff_done:
     } catch
       if (unlock)
 	DrvUnlock(dv);
-  return result;
+  return res;
 }
 
 U8 *ISO1FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
@@ -236,7 +236,7 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
   CDrv *dv=Fs->cur_dv;
   CISO1DirEntry *buf,*buf2,*isoptr;
   I64 i,cur_dir_cluster=Name2DirCluster(dv,Fs->cur_dir);
-  CDirEntry *result=NULL,*tempde;
+  CDirEntry *res=NULL,*tempde;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
   isoptr=MAlloc(dv->spc<<BLK_SIZE_BITS);
@@ -262,8 +262,8 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
 	tempde->parent=parent;
 	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR &&
 	      *tempde->name!='.') {
-	  tempde->next=result;
-	  result=tempde;
+	  tempde->next=res;
+	  res=tempde;
 	  tempde->full_name=DirNameAbs(tempde->name);
 	  if (Cd(tempde->name)) {
 	    tempde->sub=ISO1FilesFind(files_find_mask,fuf_flags,tempde);
@@ -276,8 +276,8 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
 		!(Bt(&fuf_flags,FUf_RECURSE) &&
 		*tempde->name=='.' && tempde->attr&RS_ATTR_DIR) &&
 		FilesFindMatch(tempde->full_name,files_find_mask,fuf_flags)) {
-	    tempde->next=result;
-	    result=tempde;
+	    tempde->next=res;
+	    res=tempde;
 	  } else
 	    DirEntryDel(tempde);
 	}
@@ -288,5 +288,5 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
     }
   }
   Free(buf2);
-  return result;
+  return res;
 }

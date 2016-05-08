@@ -133,7 +133,7 @@ public U0 AFSetIP(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
 
 public Bool AFView()
 {//Let user type until <ESC> or <SHIFT-ESC>.
-  Bool result=View;
+  Bool res=View;
   DocBottom;
-  return result;
+  return res;
 }

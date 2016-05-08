@@ -263,7 +263,7 @@ class RangeJob
 
 I64 TestCoreSubRange(RangeJob *r)
 {
-  I64 i,j,m,n,n2,sf,result=0,range=r->hi-r->lo,
+  I64 i,j,m,n,n2,sf,res=0,range=r->hi-r->lo,
 	*sumfacts=MAlloc(range*sizeof(I64)),
 	*residue =MAlloc(range*sizeof(I64));
   U16 *pow_cnt =MAlloc(range*sizeof(U16));
@@ -303,21 +303,21 @@ I64 TestCoreSubRange(RangeJob *r)
       if (r->lo<=n2<r->hi && sumfacts[n2-r->lo]-n2-1==n ||
 	    TestSumFact(n2,sf,r->sqrt_primes,r->cbrt_primes,r->primes)) {
 	DocPrint(r->doc,"%u:%u\n",n,sf-n-1);
-	result++;
+	res++;
       }
     }
   }
   Free(pow_cnt);
   Free(residue);
   Free(sumfacts);
-  return result;
+  return res;
 }
 
 #define CORE_SUB_RANGE	0x1000
 
 I64 TestCoreRange(RangeJob *r)
 {
-  I64 i,result=0;
+  I64 i,res=0;
   RangeJob rj;
   MemCpy(&rj,r,sizeof(RangeJob));
   for (i=r->lo;i<r->hi;i+=CORE_SUB_RANGE) {
@@ -325,15 +325,15 @@ I64 TestCoreRange(RangeJob *r)
     rj.hi=i+CORE_SUB_RANGE;
     if (rj.hi>r->hi)
       rj.hi=r->hi;
-    result+=TestCoreSubRange(&rj);
+    res+=TestCoreSubRange(&rj);
   }
-  return result;
+  return res;
 }
 
 I64 MagicPairs(I64 N)
 {
   F64 t0=tS;
-  I64 result=0;
+  I64 res=0;
   I64 sqrt_primes,cbrt_primes,num_powprimes,
 	i,k,n=(N-1)/mp_cnt+1;
   Prime *primes=PrimesNew(N,&sqrt_primes,&cbrt_primes);
@@ -355,11 +355,11 @@ I64 MagicPairs(I64 N)
     rj[i].cmd=JobQue(&TestCoreRange,&rj[i],i,0);
   }
   for (i=0;i<mp_cnt;i++)
-    result+=JobResultGet(rj[i].cmd);
+    res+=JobResGet(rj[i].cmd);
   Free(powprimes);
   Free(primes);
-  "Found:%u Time:%9.4f\n",result,tS-t0;
-  return result;
+  "Found:%u Time:%9.4f\n",res,tS-t0;
+  return res;
 }
 
 MagicPairs(1000000);

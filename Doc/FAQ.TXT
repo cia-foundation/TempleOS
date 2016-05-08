@@ -35,7 +35,7 @@ $ID,2$TempleOS is 100% open src.  All the src code is included in the distro.  U
 $ID,-2$$TR,"Where are object files?  How do I link?"$
 $ID,2$TempleOS does not use object files or a linker.  $LK,"AOT Compile Mode",A="FF:::/Doc/Glossary.TXT,AOT Compile Mode"$ is used to directly create flat binary files, $FG,2$/Kernel.BIN.C$FG$ and $FG,2$/Compiler/Compiler.BIN.Z$FG$ with no object files and linking.$FG$  $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.TXT,JIT Compile Mode"$ place code in memory, ready to run, with no object files or linking.  Linking is done when $FG,2$BIN$FG$ modules are $LK,"Load",A="MN:Load"$()ed.
 $ID,-2$$TR,"What is the FPS refresh rate?"$
-$ID,2$The refresh rate is $TX,"30",D="WMG_FPS"$ frames-per-second.  That is how often TempleOS updates screen mem.  It is not syncronized to the hardware.
+$ID,2$The refresh rate is $TX,"30",D="WINMGR_FPS"$ frames-per-second.  That is how often TempleOS updates screen mem.  It is not syncronized to the hardware.
 $ID,-2$$TR,"How does a task own the speaker?"$
 $ID,2$No task or application has a lock on the speaker so apps will interfere with each other.
 $ID,-2$$TR,"Why does it leak memory?"$

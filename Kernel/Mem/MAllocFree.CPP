@@ -145,7 +145,7 @@ _MALLOC::
 @@75:	ADD	RSI,U64 CMemUnused.size[RSI]
 
 MALLOC_ALMOST_DONE:
-//RSI=result-CMemUsed.size
+//RSI=res-CMemUsed.size
 //RAX=size+CMemUsed.size
 //RDX=HeapCtrl
 	ADD	U64 CHeapCtrl.used_u8s[RDX],RAX
@@ -394,9 +394,9 @@ U8 *AMAlloc(I64 size)
 
 U8 *CAlloc(I64 size,CTask *mem_task=NULL)
 {//Accepts a $LK,"CTask",A="MN:CTask"$ or $LK,"CHeapCtrl",A="MN:CHeapCtrl"$.  NULL allocs off current task's heap.
-  U8 *result=MAlloc(size,mem_task);
-  MemSet(result,0,size);
-  return result;
+  U8 *res=MAlloc(size,mem_task);
+  MemSet(res,0,size);
+  return res;
 }
 
 U8 *ACAlloc(I64 size)
@@ -404,20 +404,20 @@ U8 *ACAlloc(I64 size)
   return CAlloc(size,adam_task);
 }
 
-U8 *MAllocIdentical(U8 *src,CTask *mem_task=NULL)
+U8 *MAllocIdent(U8 *src,CTask *mem_task=NULL)
 {//Accepts a $LK,"CTask",A="MN:CTask"$ or $LK,"CHeapCtrl",A="MN:CHeapCtrl"$.  NULL allocs off current task's heap.
-  U8 *result;
+  U8 *res;
   I64 size;
   if (!src) return NULL;
   size=MSize(src);
-  result=MAlloc(size,mem_task);
-  MemCpy(result,src,size);
-  return result;
+  res=MAlloc(size,mem_task);
+  MemCpy(res,src,size);
+  return res;
 }
 
-U8 *AMAllocIdentical(U8 *src)
-{//Alloc in Adam's heap, identical copy of heap node.
-  return MAllocIdentical(src,adam_task);
+U8 *AMAllocIdent(U8 *src)
+{//Alloc in Adam's heap, ident copy of heap node.
+  return MAllocIdent(src,adam_task);
 }
 
 U8 *MAllocAligned(I64 size,I64 alignment,
@@ -425,10 +425,10 @@ U8 *MAllocAligned(I64 size,I64 alignment,
 {//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
-	*result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
-  result(I64 *)[-1]=ptr-result;
+	*res=(ptr+sizeof(I64)+mask)&~mask+misalignment;
+  res(I64 *)[-1]=ptr-res;
 #assert offset(CMemUsed.size)==offset(CMemUsed.start)-sizeof(I64)
-  return result;
+  return res;
 }
 
 U8 *CAllocAligned(I64 size,I64 alignment,
@@ -436,26 +436,26 @@ U8 *CAllocAligned(I64 size,I64 alignment,
 {//Only powers of two alignment. This is awful.
   I64 mask=alignment-1;
   U8 *ptr=MAlloc(size+mask+sizeof(I64)+misalignment,mem_task),
-	*result=(ptr+sizeof(I64)+mask)&~mask+misalignment;
-  result(I64 *)[-1]=ptr-result;
+	*res=(ptr+sizeof(I64)+mask)&~mask+misalignment;
+  res(I64 *)[-1]=ptr-res;
 #assert offset(CMemUsed.size)==offset(CMemUsed.start)-sizeof(I64)
-  MemSet(result,0,size);
-  return result;
+  MemSet(res,0,size);
+  return res;
 }
 
 U8 *StrNew(U8 *buf,CTask *mem_task=NULL)
 {//Accepts a $LK,"CTask",A="MN:CTask"$ or $LK,"CHeapCtrl",A="MN:CHeapCtrl"$.  NULL allocs off current task's heap.
-  U8 *result;
+  U8 *res;
   I64 size;
   if (buf) {
     size=StrLen(buf)+1;
-    result=MAlloc(size,mem_task);
-    MemCpy(result,buf,size);
+    res=MAlloc(size,mem_task);
+    MemCpy(res,buf,size);
   } else {
-    result=MAlloc(1,mem_task);
-    *result=0;
+    res=MAlloc(1,mem_task);
+    *res=0;
   }
-  return result;
+  return res;
 }
 
 U8 *AStrNew(U8 *buf)

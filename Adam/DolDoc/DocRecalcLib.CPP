@@ -179,12 +179,12 @@ public I64 DocMax(I64 i=MAX_I64)
   //Normally, the cmd line deletes entries
   //when more are added and the old scroll up.
   //See $LK,"max_entries",A="FF:::/Adam/DolDoc/DocTerm.CPP,max_entries"$.
-  I64 result;
+  I64 res;
   CDoc *doc;
   if (doc=DocPut) {
-    result=doc->max_entries;
+    res=doc->max_entries;
     doc->max_entries=i;
-    return result;
+    return res;
   } else
     return 0;
 }

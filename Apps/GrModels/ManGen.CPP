@@ -142,21 +142,21 @@ U0 MDCorrect(ManDefineStruct *md)
 
 I64 AddVertex(ManDefineStruct *md,I64 x,I64 y,I64 z)
 {
-  I64 result=m->vertex_cnt++;
-  m->v[result].x=-x;
-  m->v[result].y=-y-md->leg_len-md->foot_rad*2;
-  m->v[result].z=-z;
-  return result;
+  I64 res=m->vertex_cnt++;
+  m->v[res].x=-x;
+  m->v[res].y=-y-md->leg_len-md->foot_rad*2;
+  m->v[res].z=-z;
+  return res;
 }
 
 I64 AddTri(ManDefineStruct *,I64 c,I64 n0,I64 n1,I64 n2)
 {
-  I64 result=m->tri_cnt++;
-  m->t[result].color=c;
-  m->t[result].nums[0]=n1;
-  m->t[result].nums[1]=n0;
-  m->t[result].nums[2]=n2;
-  return result;
+  I64 res=m->tri_cnt++;
+  m->t[res].color=c;
+  m->t[res].nums[0]=n1;
+  m->t[res].nums[1]=n0;
+  m->t[res].nums[2]=n2;
+  return res;
 }
 
 U0 AddBox(ManDefineStruct *md,I64 c,I64 x1,I64 y1,I64 z1,
@@ -212,10 +212,10 @@ U0 AddBox(ManDefineStruct *md,I64 c,I64 x1,I64 y1,I64 z1,
 U8 *Man2CSprite()
 {
 //See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.
-  U8 *result=MAlloc(sizeof(CSpriteMeshU8s)+
+  U8 *res=MAlloc(sizeof(CSpriteMeshU8s)+
 	m->vertex_cnt*sizeof(CD3I32)+m->tri_cnt*sizeof(CMeshTri)+
 	sprite_elem_base_sizes[SPT_END]),
-	*dst=result;
+	*dst=res;
   *dst++ =SPT_MESH;
   *dst(I32 *)++ =m->vertex_cnt;
   *dst(I32 *)++ =m->tri_cnt;
@@ -224,12 +224,12 @@ U8 *Man2CSprite()
   MemCpy(dst,&m->t,m->tri_cnt*sizeof(CMeshTri));
   dst+=m->tri_cnt*sizeof(CMeshTri);
   *dst++ =SPT_END;
-  return result;
+  return res;
 }
 
 public U8 *ManGen()
 {
-  U8 *result;
+  U8 *res;
   I64 x,y,z,c1,c2,c3,c4;
   ManDefineStruct md1,md2;
   MDInit(&md1);
@@ -305,16 +305,16 @@ public U8 *ManGen()
 	  md2.leg_rad*2,-md2.foot_len,md2.foot_rad*2,md2.leg_rad,0,
 	  md2.l_hip_a2,0,md2.l_ankle_a,&x,&y,&z);
 
-    result=Man2CSprite;
+    res=Man2CSprite;
     "%h7c",'\n';
-    Sprite(result,"\t\t$$SP,\"<1>\",BI=%d$$");
+    Sprite(res,"\t\t$$SP,\"<1>\",BI=%d$$");
     "%h7c",'\n';
     Free(m);
     "Do another";
     if (YorN)
-      Free(result);
+      Free(res);
     else
       break;
   }
-  return result;
+  return res;
 }

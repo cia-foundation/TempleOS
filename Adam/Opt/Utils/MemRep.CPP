@@ -7,36 +7,36 @@ I64 TSSSize(CTSS *tss)
 
 I64 PenBrushesSize()
 {
-  I64 result=0,i;
+  I64 res=0,i;
   for (i=0;i<GR_NUM_PEN_BRUSHES;i++)
-    result+=DCSize(gr.pen_brushes[i])+DCSize(gr.collision_pen_brushes[i])+
+    res+=DCSize(gr.pen_brushes[i])+DCSize(gr.collision_pen_brushes[i])+
 	  DCSize(gr.even_pen_brushes[i])+DCSize(gr.odd_pen_brushes[i]);
-  return result;
+  return res;
 }
 
 I64 ScreenZoomTablesSize()
 {
-  I64 result=0,i;
+  I64 res=0,i;
   for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++)
-    result+=MSize2(gr.screen_zoom_tables[i]);
-  return result;
+    res+=MSize2(gr.screen_zoom_tables[i]);
+  return res;
 }
 
 I64 TaskStkSize(CTask *task)
 {
   CTaskStk *temps=task->stk;
-  I64 result=0;
+  I64 res=0;
   while (temps) {
-    result+=MSize2(temps);
+    res+=MSize2(temps);
     temps=temps->next_stk;
   }
-  return result;
+  return res;
 }
 
 I64 TaskQueSize(CTask *task)
 {
   CSrvCmd *tempc,*tempc1;
-  I64 result=0;
+  I64 res=0;
   PUSHFD
   CLI
   while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
@@ -45,25 +45,25 @@ I64 TaskQueSize(CTask *task)
   tempc1=&task->srv_ctrl.next_waiting;
   tempc=tempc1->next;
   while (tempc!=tempc1) {
-    result+=MSize2(tempc)+MSize2(tempc->aux_str);
+    res+=MSize2(tempc)+MSize2(tempc->aux_str);
     tempc=tempc->next;
   }
 
   tempc1=&task->srv_ctrl.next_done;
   tempc=tempc1->next;
   while (tempc!=tempc1) {
-    result+=MSize2(tempc)+MSize2(tempc->aux_str);
+    res+=MSize2(tempc)+MSize2(tempc->aux_str);
     tempc=tempc->next;
   }
 
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
   POPFD
-  return result;
+  return res;
 }
 
 I64 BlkDevsSize()
 {
-  I64 i,result=MSize2(blkdev.blkdevs);
+  I64 i,res=MSize2(blkdev.blkdevs);
   CBlkDev *bd;
   for (i=0;i<NUM_BLKDEVS;i++) {
     bd=&blkdev.blkdevs[i];
@@ -72,18 +72,18 @@ I64 BlkDevsSize()
 	"RAMDsk %C\t:%010X Unused:%010X\n",
 	      bd->first_drv_let,(bd->max_blk+1)<<BLK_SIZE_BITS,
 	      UnusedDrvSpace(bd->first_drv_let);
-      result+=MSize2(bd->dev_id_record);
+      res+=MSize2(bd->dev_id_record);
     }
   }
-  return result;
+  return res;
 }
 
 I64 DrvsSize()
 {
-  I64 i,result=MSize2(blkdev.drvs);
+  I64 i,res=MSize2(blkdev.drvs);
   for (i=0;i<NUM_DRVS;i++)
-    result+=MSize2(blkdev.drvs[i].cur_fat_blk)+MSize2(blkdev.drvs[i].fis);
-  return result;
+    res+=MSize2(blkdev.drvs[i].cur_fat_blk)+MSize2(blkdev.drvs[i].fis);
+  return res;
 }
 
 Bool MemRepTask(CTask *task,Bool override_validate=FALSE)

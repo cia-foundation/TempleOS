@@ -61,7 +61,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
 	old_raw_flags=text.raw_flags;
   CLine root,*templ,*templ1,*cur_line;
-  Bool	result=FALSE,
+  Bool	res=FALSE,
 	old_raw=Raw(ON),
 	old_debug=InDbg(ON),
 	old_single=SingleUser(ON);
@@ -104,19 +104,19 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
       MemCpy(bin_data,src,bin_size);
     }
     Free(buf);
-    result=TRUE;
+    res=TRUE;
   }
 
   cur_line=root.next;
   if (--num<0)
-    result=FALSE;
+    res=FALSE;
   else {
     if (num<=cnt)
       while (num--)
 	cur_line=cur_line->next;
     else {
       cur_line=&root;
-      result=FALSE;
+      res=FALSE;
     }
   }
   do {
@@ -254,7 +254,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 
   if (ch!=CH_ESC) {
     if (edf_dof_flags&EDF_WAS_WRITE)
-      result=FALSE;
+      res=FALSE;
   } else {
     size=bin_size;
 
@@ -279,7 +279,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
     Free(buf);
 
     if (edf_dof_flags&EDF_WAS_WRITE)
-      result=TRUE;
+      res=TRUE;
   }
 
   templ=root.next;
@@ -297,7 +297,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   SingleUser(old_single);
   text.raw_flags=text.raw_flags&~RWF_SHOW_DOLLAR|old_raw_flags&RWF_SHOW_DOLLAR;
   POPFD
-  return result;
+  return res;
 }
 
 U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum)
@@ -315,13 +315,13 @@ U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum)
 
 Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0)
 {
-  Bool result;
+  Bool res;
   U8 *filename;
   I64 linenum;
   ToFileLine(fl_file_line,&filename,&linenum);
-  result=EdLite(filename,linenum,edf_dof_flags);
+  res=EdLite(filename,linenum,edf_dof_flags);
   Free(filename);
-  return result;
+  return res;
 }
 
 U0 FixSet(U8 *filename,I64 line)
@@ -337,7 +337,7 @@ U0 FixSet(U8 *filename,I64 line)
 Bool Fix(I64 edf_dof_flags=0)
 {//Jump to last err src code to fix it.
   U8 *st;
-  Bool result=FALSE;
+  Bool res=FALSE;
 
   while (LBts(&sys_semas[SYS_SEMA_FIX],0))
     Yield;
@@ -346,10 +346,10 @@ Bool Fix(I64 edf_dof_flags=0)
 
   if (st) {
     if (IsRaw)
-      result=EdLiteFileLine(st,edf_dof_flags);
+      res=EdLiteFileLine(st,edf_dof_flags);
     else
-      result=Ed(st,edf_dof_flags);
+      res=Ed(st,edf_dof_flags);
   }
   Free(st);
-  return result;
+  return res;
 }

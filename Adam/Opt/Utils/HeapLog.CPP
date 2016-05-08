@@ -1,4 +1,4 @@
-#help_index "Debugging/Heap"
+#help_index "Debugging/Heap;Memory/Debugging"
 #help_file "::/Doc/HeapDbg"
 
 #define HL_CALLER_DEPTH	5 //Feel free to change this.
