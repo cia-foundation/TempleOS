@@ -1,5 +1,5 @@
 class FDStruct
-{//Use <CTRL-l> and select "Data", "List" or "Check Box"
+{//Use <CTRL-l> and sel "Data", "List" or "Check Box"
 //to generate the fmtstrs.
   F64 num1	fmtstr "$$DA-TRM,A=\"Float 1:%12.8f\"$$\n";
   F64 num2	fmtstr "$$DA-TRM,A=\"Float 2:%12e\"$$\n";

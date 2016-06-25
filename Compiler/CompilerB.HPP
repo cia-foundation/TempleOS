@@ -1,12 +1,12 @@
 #help_index "Compiler"
 extern U0 CInit(Bool first);
-public extern I64 ExeFile(U8 *name,Bool just_load=FALSE);
-public extern I64 ExeFile2(U8 *name,Bool just_load=FALSE);
+public extern I64 ExeFile(U8 *name,I64 ccf_flags=0);
+public extern I64 ExeFile2(U8 *name,I64 ccf_flags=0);
 public extern I64 ExePrint(U8 *fmt,...);
 public extern I64 ExePrint2(U8 *fmt,...);
-public extern I64 ExePutS(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE,
+public extern I64 ExePutS(U8 *buf,U8 *filename=NULL,I64 ccf_flags=0,
 	CLexHashTableContext *htc=NULL);
-public extern I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE);
+public extern I64 ExePutS2(U8 *buf,U8 *filename=NULL,I64 ccf_flags=0);
 public extern CCmpGlbls cmp;
 
 #help_index "Compiler/Directive"

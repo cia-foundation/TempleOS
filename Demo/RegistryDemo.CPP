@@ -1,4 +1,4 @@
-/*The /Home/Registry.CPP.Z file is HolyC code.
+/*The ~/Registry.CPP.Z file is HolyC code.
 You can execute a tree branch of it.  The Adam
 branch is executed in the Adam task boot phase.
 Normally, you will place var declarations

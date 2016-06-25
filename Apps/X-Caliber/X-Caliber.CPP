@@ -1263,8 +1263,8 @@ U0 XCaliber()
 	"  StopSpin(,,SC_CURSOR_DOWN);"
 	"  Left(,,SC_CURSOR_LEFT);"
 	"  Right(,,SC_CURSOR_RIGHT);"
-	"  LeftMissile(,'l');"
-	"  RightMissile(,'r');"
+	"  LeftMissile(,,SC_CURSOR_LEFT|SCF_CTRL);"
+	"  RightMissile(,,SC_CURSOR_RIGHT|SCF_CTRL);"
 	"  Spackwalk(,'w');"
 	"  LongerFuse(,,SC_CURSOR_RIGHT|SCF_SHIFT);"
 	"  ShorterFuse(,,SC_CURSOR_LEFT|SCF_SHIFT);"
@@ -1298,12 +1298,16 @@ U0 XCaliber()
 	      case 0:
 		switch (sc.u8[0]) {
 		  case SC_CURSOR_RIGHT:
+		    if (sc&SCF_CTRL)
+		      HumanFireMissileBegin(0);
 		    if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time+=2;
 		    else
 		      human_t_right=MAX_THRUST;
 		    break;
 		  case SC_CURSOR_LEFT:
+		    if (sc&SCF_CTRL)
+		      HumanFireMissileBegin(1);
 		    if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time-=2;
 		    else
@@ -1330,12 +1334,6 @@ U0 XCaliber()
 		  HumanFireGunBegin;
 		else
 		  HumanFireLaserBegin;
-		break;
-	      case 'l':
-		HumanFireMissileBegin(1);
-		break;
-	      case 'r':
-		HumanFireMissileBegin(0);
 		break;
 	      case 'w':
 		ctrl_panel.spacewalk=TRUE;

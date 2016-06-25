@@ -49,7 +49,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
   return FALSE;
 }
 
-public U0 JukeBox(U8 *dirname="::/Home/Psalmody",U8 **_filename=NULL)
+public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
 {//_filename is for using this as a song-chooser program.
   I64 i=0,rating;
   U8 *st,*st2;

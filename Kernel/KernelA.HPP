@@ -1,18 +1,19 @@
 // Main TempleOS header
 
 #help_index ""
-extern class CTask;
-extern class CDoc;
+extern class CAOT;
+extern class CAOTHeapGlbl;
+extern class CAOTImportExport;
 extern class CCPU;
+extern class CDC;
+extern class CDoc;
+extern class CFile;
 extern class CHashClass;
 extern class CHashFun;
-extern class CAOTImportExport;
 extern class CHeapCtrl;
-extern class CAOTHeapGlbl;
-extern class CAOT;
-extern class CDC;
-extern class CSrvCtrl;
 extern class CIntermediateCode;
+extern class CSrvCtrl;
+extern class CTask;
 
 #define NULL	0
 #define TRUE	1
@@ -419,6 +420,7 @@ class CKernel
   CBinFile h;
   U32	jmp,
 	boot_src,
+	boot_blk,
 	boot_patch_table_base,
 	sys_run_level;
   CDate	compile_time;
@@ -427,9 +429,9 @@ class CKernel
   U32	boot_base;
   U16	sys_mem_E801[2];
   CMemE820 sys_mem_E820[MEM_NUM_E820_ENTRIES];
-  CGDT	sys_gdt;
   CSysLimitBase sys_gdt_ptr;
   U16	sys_pci_busses;
+  CGDT	sys_gdt;
 };
 
 //Run-Levels
@@ -886,12 +888,12 @@ public class CHashGlblVar:CHashSrcSym
 //See $LK,"TextBase Layer",A="HI:TextBase Layer"$.
 #define ATTRF_BLINK	0x10000000
 #define ATTRF_INVERT	0x20000000
-#define ATTRF_SELECTED	0x40000000
+#define ATTRF_SEL	0x40000000
 #define ATTRF_UNDERLINE	0x80000000
 
 #define ATTRf_BLINK		28
 #define ATTRf_INVERT		29
-#define ATTRf_SELECTED		30
+#define ATTRf_SEL		30
 #define ATTRf_UNDERLINE		31
 
 //CDocEntry.type codes (Low 8 bits)
@@ -944,13 +946,13 @@ public class CHashGlblVar:CHashSrcSym
 //CDocEntry.type flags upper bits
 #define DOCET_BLINK		ATTRF_BLINK
 #define DOCET_INVERT		ATTRF_INVERT
-#define DOCET_SELECTED		ATTRF_SELECTED
+#define DOCET_SEL		ATTRF_SEL
 #define DOCET_UNDERLINE		ATTRF_UNDERLINE
 #define DOCG_BL_IV_UL		0xB0000000
 
 #define DOCEt_BLINK		ATTRf_BLINK
 #define DOCEt_INVERT		ATTRf_INVERT
-#define DOCEt_SELECTED		ATTRf_SELECTED
+#define DOCEt_SEL		ATTRf_SEL
 #define DOCEt_UNDERLINE		ATTRf_UNDERLINE
 
 #define DOCG_DBL_BUF_FLAGS	(DOCF_OVERSTRIKE|DOCF_PLAIN_TEXT|\
@@ -1038,13 +1040,13 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEF_WORD_WRAP		0x8000000
 #define DOCEF_BLINK		ATTRF_BLINK
 #define DOCEF_INVERT		ATTRF_INVERT
-#define DOCEF_SELECTED		ATTRF_SELECTED
+#define DOCEF_SEL		ATTRF_SEL
 #define DOCEF_UNDERLINE		ATTRF_UNDERLINE
 #define DOCEf_HIGHLIGHT		26
 #define DOCEf_WORD_WRAP		27
 #define DOCEf_BLINK		ATTRf_BLINK
 #define DOCEf_INVERT		ATTRf_INVERT
-#define DOCEf_SELECTED		ATTRf_SELECTED
+#define DOCEf_SEL		ATTRf_SEL
 #define DOCEf_UNDERLINE		ATTRf_UNDERLINE
 
 //CDocEntry.de_flags.  These first 16 are arg=
@@ -1227,7 +1229,7 @@ class CEdFindText
 	"A=\"Replace     :%s\"$$\n";
   Bool	replace			fmtstr "$$CB,\"Replace\"$$\n",
 	scan_fwd		fmtstr "$$CB,\"Fwd\"$$\n",
-	scan_selected_text	fmtstr "$$CB,\"Selection\"$$\n",
+	scan_sel_text	fmtstr "$$CB,\"Sellection\"$$\n",
 	match_case		fmtstr "$$CB,\"Match Case\"$$\n",
 	whole_labels		fmtstr "$$CB,\"Whole Labels\"$$\n",
 	local_var		fmtstr "$$CB,\"Rename Local Var\"$$\n",
@@ -1280,7 +1282,7 @@ class CEdFileName
 #define DOCF_WORD_WRAP		DOCEF_WORD_WRAP
 #define DOCF_BLINK		DOCEF_BLINK
 #define DOCF_INVERT		DOCEF_INVERT
-#define DOCF_SELECTED		DOCEF_SELECTED
+#define DOCF_SEL		DOCEF_SEL
 #define DOCF_UNDERLINE		DOCEF_UNDERLINE
 
 #define DOCF_OVERSTRIKE 	0x100000000
@@ -1317,7 +1319,7 @@ class CEdFileName
 #define DOCf_WORD_WRAP		DOCEf_WORD_WRAP
 #define DOCf_BLINK		DOCEf_BLINK
 #define DOCf_INVERT		DOCEf_INVERT
-#define DOCf_SELECTED		DOCEf_SELECTED
+#define DOCf_SEL		DOCEf_SEL
 #define DOCf_UNDERLINE		DOCEf_UNDERLINE
 
 #define DOCf_OVERSTRIKE 	32
@@ -1618,7 +1620,7 @@ public class CAutoCompleteDictGlbls
 #define ICF_DONT_RESTORE		0x100000000
 #define ICG_NO_CVT_MASK			0x1FFFFFF00
 
-#define IC_BODY_SIZE			0x80
+#define IC_BODY_SIZE			0x83
 
 #define ECF_HAS_PUSH_CMP		0x01 //for 50<i<j<=100 exps
 
@@ -1630,8 +1632,7 @@ U16 class CICType
 class CICArg
 {
   CICType type;
-  U8	type_pointed_to,pad;
-  U16	reg,pad; //low is reg, high is index_reg+scale<<6
+  U16	reg; //low is reg, high is index_reg+scale<<6
   I64	disp;
 };
 
@@ -1648,7 +1649,7 @@ class CIntermediateCodeBase
   U16	ic_code,
 	ic_precedence;
   I16	ic_cnt,
-	ic_last_cnt;
+	ic_last_start;
 };
 
 class CIntermediateCode:CIntermediateCodeBase
@@ -1658,9 +1659,10 @@ class CIntermediateCode:CIntermediateCodeBase
 	ic_line;
   CHashClass *ic_class,*ic_class2;
   CICArg a1,a2,r;
+  U8	a1_type_pointed_to; //Used for $LK,"IST_ASSIGN",A="MN:IST_ASSIGN"$ and $LK,"IST_DEREF",A="MN:IST_DEREF"$ $LK,"ic_codes",A="MN:intermediate_code_table"$.
   union {
     U8 ic_body[IC_BODY_SIZE];
-//Tree Links are created in OptPass012.  An ADD opcode, for exmaple,
+    //Tree Links are created in OptPass012.  An ADD opcode, for example,
     //points back to its two earlier addend insts, not MAlloced,
     //just pointers to prev CIntermediate codes in the array.
 
@@ -2024,8 +2026,8 @@ class CCodeCtrl
 #define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
 #define __LINE__ #exe{StreamPrint("%d",\
 	Fs->last_lex->lex_include_stk->line_num);}
-#define __DEPTH__ #exe{StreamPrint("%d",\
-	Fs->last_lex->lex_include_stk->depth);}
+#define __CMD_LINE__ #exe{StreamPrint("%d",Fs->last_lex->flags&CCF_CMD_LINE &&\
+	Fs->last_lex->lex_include_stk->depth<2);}
 #define __FILE__ #exe{StreamPrint("\"%s\"",\
 	Fs->last_lex->lex_include_stk->full_name);}
 #define __DIR__  #exe{StreamDir;}
@@ -2122,18 +2124,19 @@ class CLexHashTableContext
 };
 
 //CmpCtrl flags
-#define CCF_PMT			1
-#define CCf_PMT			0
-#define CCF_QUESTION_HELP	2
-#define CCF_DONT_FREE_BUF	4
-#define CCF_NO_DEFINES		8
-#define CCF_IN_IF		16
-#define CCF_JUST_LOAD		32
-#define CCF_KEEP_NEW_LINES	64
-#define CCF_KEEP_DOT		128
-#define CCF_KEEP_NUM_SIGN	256
-#define CCF_KEEP_AT_SIGN	512
-#define CCf_PASS_TRACE_PRESENT	10
+#define CCF_CMD_LINE		0x001
+#define CCF_PMT			0x002
+#define CCf_PMT			1
+#define CCF_QUESTION_HELP	0x004
+#define CCF_DONT_FREE_BUF	0x008
+#define CCF_NO_DEFINES		0x010
+#define CCF_IN_IF		0x020
+#define CCF_JUST_LOAD		0x040
+#define CCF_KEEP_NEW_LINES	0x080
+#define CCF_KEEP_DOT		0x100
+#define CCF_KEEP_NUM_SIGN	0x200
+#define CCF_KEEP_AT_SIGN	0x400
+#define CCf_PASS_TRACE_PRESENT	11
 #define CCF_NOT_CONST		0x0000010000
 #define CCF_NO_REG_OPT		0x0000020000
 #define CCF_IN_QUOTES		0x0000040000
@@ -2277,7 +2280,7 @@ public class CATARep
 #define ATAR0_SECT	3
 #define ATAR0_LCYL	4
 #define ATAR0_HCYL	5
-#define ATAR0_SELECT	6
+#define ATAR0_SEL	6
 #define ATAR0_STAT	7
 #define ATAR0_CMD	7
 #define ATAR1_CTRL	2
@@ -2293,7 +2296,6 @@ public class CATARep
 #define BLK_SIZE_BITS	9
 #define BLK_SIZE	(1<<BLK_SIZE_BITS)
 #define DVD_BLK_SIZE	(4*BLK_SIZE)
-#define DVD_FILE_OFFSET	80
 #define INVALID_CLUSTER (-1)
 
 class CMBRPrt
@@ -2321,7 +2323,7 @@ class CRedSeaBoot
 {
   U8	jump_and_nop[3],
 	signature,reserved[4]; //MBR_PT_REDSEA=0x88. Distinguish from real FAT32
-  I64	base_offset,	//For CD/DVD image copy.
+  I64	drv_offset,	//For CD/DVD image copy.
 	sects,
 	root_cluster,
 	bitmap_sects,
@@ -2543,8 +2545,7 @@ class CISO1PriDesc
 #help_index "File/Low Level;File/Program Routines"
 //CDirEntry flags (Used by $LK,"FileMgr",A="MN:FileMgr"$())
 #define DEF_PROCESSED		1
-#define DEF_REMOVABLE		2
-#define DEF_NOT_INITIALIZED	4
+#define DEF_NOT_INITIALIZED	2
 
 #define CDIR_FILENAME_LEN	38 //Must include terminator zero
 public class CDirEntry
@@ -2627,8 +2628,9 @@ public class CDirEntry
 #define BDT_NULL		0
 #define BDT_RAM			1
 #define BDT_ATA			2
-#define BDT_ATAPI		3
-#define BDT_NUM_TYPES		4
+#define BDT_FILE		3
+#define BDT_ATAPI		4
+#define BDT_NUM_TYPES		5
 
 #define BDF_REMOVABLE		0x001
 #define BDF_INITIALIZED		0x002
@@ -2664,9 +2666,12 @@ public class CBlkDev
   U8	first_drv_let,unit,pad[2];
   U32	base0,base1,
 	blk_size;
-  I64	min_blk,max_blk;
+  I64	drv_offset,init_root_dir_blks,
+	max_blk;
   U16	*dev_id_record;
-  U8	*RAM_dsk;
+  U8	*RAM_dsk,
+	*file_dsk_name;
+  CFile *file_dsk;
   CTask *owning_task;
   F64	last_time;
   U32	max_reads,max_writes;
@@ -2716,7 +2721,7 @@ public class CDrv
   U32	dv_signature;
   U8	drv_let,pad;
   U16	fs_type;
-  I64	base_offset,
+  I64	drv_offset,
 	size,
 	file_system_info_sect,
 	fat1,fat2,
@@ -2751,6 +2756,7 @@ public class CBlkDevGlbls
   CBlkDev *blkdevs;
   U8	*dft_iso_filename;  //See $LK,"blkdev.dft_iso_filename",A="FF:::/Kernel/KEnd.CPP,blkdev.dft_iso_filename"$
   U8	*temp_filename;
+  U8	*home_dir;
   CCacheBlk *cache_base,*cache_ctrl,**cache_hash_table;
   I64	cache_size,read_cnt,write_cnt;
   CDrv	*drvs,*let_to_drv[32];
@@ -2909,7 +2915,7 @@ public class CHeapCtrl
   CMemUnused *heap_hash[MEM_HEAP_HASH_SIZE/sizeof(U8 *)];
 };
 
-#help_index "Devices"
+#help_index "Devices;Memory/Page Tables"
 public class CDevGlbls
 {
   I64	*idt;
@@ -3364,7 +3370,7 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   CExcept *next_except,*last_except;
   I64	except_rbp,	//throw routine's RBP
 	except_ch;	//throw(ch)
-  U8	*except_caller1,*except_caller2;
+  U8	*except_caller1,*except_caller2,*except_caller3,*except_caller4;
 
   Bool	catch_except;
   Bool	new_answer;
@@ -3596,7 +3602,8 @@ public class CTextGlbls
   U8	*raw_screen_image;
   I64	rows,cols;		//Use TEXT_ROWS,TEXT_COLS
   U64	*font,*aux_font;
-  U8	*vga_alias;
+  U8	*vga_alias,*vga_text_alias;
+  U8	border_chars[16];
 };
 
 #define FONT_WIDTH	8
@@ -3877,9 +3884,10 @@ public class CDbgGlbls
 #define BOOT_STK_SIZE		BLK_SIZE
 
 #define BOOT_SRC_NULL		0
-#define BOOT_SRC_RAM		1
-#define BOOT_SRC_HARDDRV	2
-#define BOOT_SRC_DVD		3
+#define BOOT_SRC_ROM		1
+#define BOOT_SRC_RAM		2
+#define BOOT_SRC_HARDDRV	3
+#define BOOT_SRC_DVD		4
 
 // $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 #define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"

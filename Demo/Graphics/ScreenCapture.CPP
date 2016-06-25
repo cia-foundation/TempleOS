@@ -13,11 +13,11 @@ U0 Main()
 {
   "Capture screen...\n";
   PressAKey;
-  GRAScreenCapture("::/Home/ScreenShot");
+  GRAScreenCapture("~/DemoScreenShot");
 
   "View captured screen...\n";
   PressAKey;
-  ViewScreenCapture("::/Home/ScreenShot");
+  ViewScreenCapture("~/DemoScreenShot");
 
   PressAKey;
   DCFill;

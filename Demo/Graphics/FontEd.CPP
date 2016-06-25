@@ -11,7 +11,7 @@ You can load it with:
 
 If you want to change the system font permanently,
 save to a file with this font editor program
-and cut and paste the code into $LK,"::/Kernel/Font8x8.CPP"$.
+and cut and paste the code into $LK,"::/Kernel/FontStd.CPP"$.
 You will need to recompile Kernel by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
 
 See $LK,"::/Demo/ExtendedChars.CPP"$, $LK,"::/Demo/Games/CharDemo.CPP"$,

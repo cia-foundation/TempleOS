@@ -1,4 +1,4 @@
-U0 ATABlkSelect(CBlkDev *bd,I64 blk,I64 cnt)
+U0 ATABlkSel(CBlkDev *bd,I64 blk,I64 cnt)
 {
   if (bd->type!=BDT_ATAPI && bd->base1)
     OutU8(bd->base1+ATAR1_CTRL,0x8);
@@ -11,13 +11,13 @@ U0 ATABlkSelect(CBlkDev *bd,I64 blk,I64 cnt)
     OutU8(bd->base0+ATAR0_SECT,blk);
     OutU8(bd->base0+ATAR0_LCYL,blk.u8[1]);
     OutU8(bd->base0+ATAR0_HCYL,blk.u8[2]);
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   } else { //28 Bit LBA
     OutU8(bd->base0+ATAR0_NSECT,cnt);
     OutU8(bd->base0+ATAR0_SECT,blk);
     OutU8(bd->base0+ATAR0_LCYL,blk.u8[1]);
     OutU8(bd->base0+ATAR0_HCYL,blk.u8[2]);
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4|blk.u8[3]);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4|blk.u8[3]);
   }
 }
 
@@ -48,9 +48,9 @@ Bool ATAWaitDRQ(CBlkDev *bd,F64 timeout)
 Bool ATANop(CBlkDev *bd,F64 timeout)
 {
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_FEAT,0);
   OutU8(bd->base0+ATAR0_CMD,ATA_NOP);
   return ATAWaitNotBUSY(bd,timeout);
@@ -118,9 +118,9 @@ Bool ATAPIWritePktWord(CBlkDev *bd,F64 timeout,...)
 Bool ATAPISetMaxSpeed(CBlkDev *bd)
 {
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_LCYL,0);
   OutU8(bd->base0+ATAR0_HCYL,0);
   ATACmd(bd,ATA_PACKET);
@@ -131,9 +131,9 @@ Bool ATAPISetMaxSpeed(CBlkDev *bd)
 Bool ATAPISeek(CBlkDev *bd,I64 native_blk)
 {
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_LCYL,0);
   OutU8(bd->base0+ATAR0_HCYL,0);
   ATACmd(bd,ATA_PACKET);
@@ -149,9 +149,9 @@ Bool ATAPIStartStop(CBlkDev *bd,F64 timeout,Bool start)
   else
     i=0;
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   ATACmd(bd,ATA_PACKET);
 //Start/Stop
   if (ATAPIWritePktWord(bd,timeout,0x1B00,0,i,0,0,0))
@@ -167,9 +167,9 @@ I64 ATAGetDevId(CBlkDev *bd,F64 timeout,U16 **_id_record)
   if (bd->type!=BDT_ATAPI && bd->base1)
     OutU8(bd->base1+ATAR1_CTRL,0x8);
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   ATACmd(bd,ATA_ID_DEV);
   if (!ATAWaitNotBUSY(bd,timeout))
     return BDT_NULL;
@@ -191,9 +191,9 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
 
   if (bd->type==BDT_ATAPI) {
     if (bd->flags & BDF_EXT_SIZE)
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
     else
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
     ATACmd(bd,ATA_DEV_RST);
     if (!ATAWaitNotBUSY(bd,0))
       okay=FALSE;
@@ -217,7 +217,7 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
   if (okay) {
     if (bd->flags & BDF_EXT_SIZE && bd->base1) {
       OutU8(bd->base1+ATAR1_CTRL,0x8);
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
       ATACmd(bd,ATA_READ_NATIVE_MAX_EXT);
       if (ATAWaitNotBUSY(bd,timeout)) {
 	res.u8[0]=InU8(bd->base0+ATAR0_SECT);
@@ -237,13 +237,13 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
     } else {
       if (bd->type!=BDT_ATAPI && bd->base1)
 	OutU8(bd->base1+ATAR1_CTRL,0x8);
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
       ATACmd(bd,ATA_READ_NATIVE_MAX);
       if (ATAWaitNotBUSY(bd,timeout)) {
 	res.u8[0]=InU8(bd->base0+ATAR0_SECT);
 	res.u8[1]=InU8(bd->base0+ATAR0_LCYL);
 	res.u8[2]=InU8(bd->base0+ATAR0_HCYL);
-	res.u8[3]=InU8(bd->base0+ATAR0_SELECT) & 0xF;
+	res.u8[3]=InU8(bd->base0+ATAR0_SEL) & 0xF;
       }
     }
   }
@@ -257,9 +257,9 @@ I64 ATAPIReadCapacity(CBlkDev *bd,I64 *_blk_size=NULL)
   U32 buf[2];
   if (ATAWaitNotBUSY(bd,0)) {
     if (bd->flags & BDF_EXT_SIZE)
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
     else
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
     OutU8(bd->base0+ATAR0_LCYL,8);
     OutU8(bd->base0+ATAR0_HCYL,0);
     ATACmd(bd,ATA_PACKET);
@@ -280,9 +280,9 @@ CATAPITrack *ATAPIReadTrackInfo(CBlkDev *bd,I64 blk)
   Bool unlock=BlkDevLock(bd);
   if (ATAWaitNotBUSY(bd,0)) {
     if (bd->flags & BDF_EXT_SIZE)
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
     else
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
     OutU8(bd->base0+ATAR0_LCYL,sizeof(CATAPITrack)&0xFF);
     OutU8(bd->base0+ATAR0_HCYL,sizeof(CATAPITrack)>>8);
     ATACmd(bd,ATA_PACKET);
@@ -311,7 +311,7 @@ Bool ATAInit(CBlkDev *bd)
 
   if (ATAReadNativeMax(bd,tS+0.1)) {
 
-    ATABlkSelect(bd,bd->max_blk,0);
+    ATABlkSel(bd,bd->max_blk,0);
     if (bd->flags&BDF_EXT_SIZE)
       ATACmd(bd,ATA_SET_MAX_EXT);
     else
@@ -353,7 +353,7 @@ U0 ATAReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
   Bool unlock=BlkDevLock(bd);
 
   retry:
-  ATABlkSelect(bd,blk,cnt);
+  ATABlkSel(bd,blk,cnt);
   if (bd->flags & BDF_EXT_SIZE)
     ATACmd(bd,ATA_READ_MULTI_EXT);
   else
@@ -392,9 +392,9 @@ Bool ATAPIReadBlks2(CBlkDev *bd,F64 timeout,U8 *buf,
     unlock=BlkDevLock(bd);
   if (ATAPIWaitReady(bd,timeout)) {
     if (bd->flags & BDF_EXT_SIZE)
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
     else
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
     OutU8(bd->base0+ATAR0_LCYL,bd->blk_size);
     OutU8(bd->base0+ATAR0_HCYL,bd->blk_size.u8[1]);
     ATACmd(bd,ATA_PACKET);
@@ -421,8 +421,8 @@ U0 ATAPIReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
       blk2=0;
     else
       blk2=FloorU64(blk-bd->max_reads,spc);
-    if (blk2+l2>dv->size)
-      l2=dv->size-blk2;
+    if (blk2+l2>dv->size+dv->drv_offset)
+      l2=dv->size+dv->drv_offset-blk2;
     n=(l2+spc-1)/spc;
 
     retry=4;
@@ -465,7 +465,7 @@ U0 ATAWriteBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
   F64 timeout;
   Bool unlock=BlkDevLock(bd);
 retry:
-  ATABlkSelect(bd,blk,cnt);
+  ATABlkSel(bd,blk,cnt);
   if (bd->flags&BDF_EXT_SIZE)
     ATACmd(bd,ATA_WRITE_MULTI_EXT);
   else
@@ -505,9 +505,9 @@ Bool ATAPISync(CBlkDev *bd)
     okay=FALSE;
   else {
     if (bd->flags & BDF_EXT_SIZE)
-      OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
     else
-      OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+      OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
     OutU8(bd->base0+ATAR0_LCYL,0);
     OutU8(bd->base0+ATAR0_HCYL,0);
     ATACmd(bd,ATA_PACKET);
@@ -522,9 +522,9 @@ U0 ATAPIClose(CBlkDev *bd,I64 close_field=0x200,I64 track=0)
 {//0x200 CD/DVD part 1
 // 0x300    DVD part 2
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_LCYL,0);
   OutU8(bd->base0+ATAR0_HCYL,0);
   ATACmd(bd,ATA_PACKET);
@@ -543,9 +543,9 @@ U0 ATAPIWriteBlks(CBlkDev *bd,U8 *buf, I64 native_blk, I64 cnt)
   OutU8(bd->base0+ATAR0_LCYL,bd->blk_size);
   OutU8(bd->base0+ATAR0_HCYL,bd->blk_size.u8[1]);
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_CMD,ATA_PACKET);
   ATAPIWritePktWord(bd,0,0x0400,native_blk.u16[1],native_blk,cnt.u16[1],cnt,0);
   bd->flags|=BDF_LAST_WAS_WRITE;
@@ -554,9 +554,9 @@ U0 ATAPIWriteBlks(CBlkDev *bd,U8 *buf, I64 native_blk, I64 cnt)
   ATAPISeek(bd,native_blk);
 
   if (bd->flags & BDF_EXT_SIZE)
-    OutU8(bd->base0+ATAR0_SELECT,0xEF|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
   else
-    OutU8(bd->base0+ATAR0_SELECT,0xE0|bd->unit<<4);
+    OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   OutU8(bd->base0+ATAR0_LCYL,bd->blk_size);
   OutU8(bd->base0+ATAR0_HCYL,bd->blk_size.u8[1]);
   ATACmd(bd,ATA_PACKET);

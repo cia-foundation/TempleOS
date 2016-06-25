@@ -8,7 +8,7 @@ $WW,1$$FG,5$$TX+CX,"Tips"$$FG$
 
 * See $MA-X+PU,"Key Map",LM="KeyMap;View;\n"$ for a list of defined keys.  Define your own keys in $LK,"MyPutKey",A="MN:MyPutKey"$().  See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
 
-* $FG,2$<ALT-m>$FG$ maximizes a window.  $FG,2$<ALT-SHIFT-w>$FG$ closes AutoComplete.  $FG,2$<ALT-w>$FG$ brings back AutoComplete.  $FG,2$<ALT-v>$FG$ vertically tiles windows.  $FG,2$<ALT-h>$FG$ horizontally tiles windows.  The $FG,2$ALT$FG$ keys are defined in $LK,"::/Home/HomeKeyPlugIns.CPP"$.  You can customize them.
+* $FG,2$<ALT-m>$FG$ maximizes a window.  $FG,2$<ALT-SHIFT-w>$FG$ closes AutoComplete.  $FG,2$<ALT-w>$FG$ brings back AutoComplete.  $FG,2$<ALT-v>$FG$ vertically tiles windows.  $FG,2$<ALT-h>$FG$ horizontally tiles windows.  The $FG,2$ALT$FG$ keys are defined in $LK,"~/HomeKeyPlugIns.CPP"$.  You can customize them.
 
 * If you make changes to TempleOS files in your $FG,2$/Home$FG$ directory, generally you reboot to make them take effect.  (You don't compile anything.)  You should have two TempleOS partitions on your hard drive because a syntax error in a start-up file will make the partition unbootable.  Boot to the second partition or boot to a standard TempleOS CD/DVD and use $LK,"Mount",A="MN:Mount"$() to mount your hard drive.
 
@@ -21,9 +21,9 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use the PullDown menu at the top of the screen to learn commands, or for finding the keyboard controls to games.
 
-* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:/Home/HomeLocalize.CPP,mouse.scale"$.
+* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:~/HomeLocalize.CPP,mouse.scale"$.
 
-* You can set your local time zone by setting the $LK,"local_time_offset",A="MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:/Home/HomeLocalize.CPP,local_time"$.
+* You can set your local time zone by setting the $LK,"local_time_offset",A="MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:~/HomeLocalize.CPP,local_time"$.
 
 * $FG,2$<CTRL-SHIFT-L>$FG$ in the editor to reindent a $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ function or renumber an asm routine's local labels.
 
@@ -33,7 +33,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
 
-* You can permanently disable $FG,2$AutoComplete$FG$ commenting-out $LK,"ACInit",A="FF:/Home/HomeSys.CPP,ACInit"$() in $LK,"::/Home/HomeSys.CPP",A="FF:/Home/HomeSys.CPP,ACInit"$.
+* You can permanently disable $FG,2$AutoComplete$FG$ commenting-out $LK,"ACInit",A="FF:/Home/HomeSys.CPP,ACInit"$() in $LK,"~/HomeSys.CPP",A="FF:/Home/HomeSys.CPP,ACInit"$.
 
 * Boolean expressions $BK,1$not$BK,0$ in $FG,2$if$FG$ stmts don't have short circuit logic and are compiled inefficiently.
 
@@ -69,13 +69,15 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $FG,2$<CTRL-ALT-a>$FG$ to enter an extended ASCII char.
 
+* Use $FG,2$<CTRL-ALT-f>$FG$ to toggle between $LK,"Std Font",A="FI:::/Kernel/FontStd.CPP"$ and $LK,"Cyrillic Font",A="FI:::/Kernel/FontCyrillic.CPP"$.
+
 * Use $FG,2$<CTRL-ALT-s>$FG$ will capture the screen as a sprite on the clipboard.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
 
 * You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 
 * You can eye-dropper colors in the $FG,2$<CTRL-r>$FG$ sprite editor by pressing $FG,2$'c'$FG$.  Press $FG,2$'t'$FG$ for transparent.
 
-* There are handy functions--$FG,2$F(),R(),FD()$FG$ and $FG,2$RD()$FG$ which are defined in $LK,"::/Home/HomeWrappers.CPP"$.  You are encouraged to change them and add more.  They will perform find-and-replace operations accross multiple files.  The $FG,2$+l$FG$ flag is particularly useful since it limits to whole labels.  The $FG,2$+lb$FG$ and $FG,2$+la$FG$ flags limit to whole labels just before or after.  You are encouraged to add or modify handy wrapper functions to make cmd line operations easier.
+* There are handy functions--$FG,2$F(),R(),FD()$FG$ and $FG,2$RD()$FG$ which are defined in $LK,"~/HomeWrappers.CPP"$.  You are encouraged to change them and add more.  They will perform find-and-replace operations accross multiple files.  The $FG,2$+l$FG$ flag is particularly useful since it limits to whole labels.  The $FG,2$+lb$FG$ and $FG,2$+la$FG$ flags limit to whole labels just before or after.  You are encouraged to add or modify handy wrapper functions to make cmd line operations easier.
 
 * When using $LK,"Find",A="MN:Find"$() while modifying code, work from the bottom-up so that line numbers are correct.  If you work top-down, then inserting or deleting lines causes the lower file links will be incorrect.
 
@@ -117,11 +119,11 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Using a sub-int array, $FG,2$i.u8[3]$FG$, for example, will force a local var to non-reg.
 
-* You can delete the $FG,4$/Home/Registry.CPP.Z$FG$ file.  The policy is that deleting it will restore defaults.  It is a text doc, if you want to edit it.  Be careful of tree indentations.
+* You can delete the $FG,4$~/Registry.CPP.Z$FG$ file.  The policy is that deleting it will restore defaults.  It is a text doc, if you want to edit it.  Be careful of tree indentations.
 
 * Study $LK,"::/Adam/Opt/Utils/MemRep.CPP"$ and $LK,"WallPaper",A="MN:WallPaper"$() to learn how the system resources are put together.
 
-* The editor's select-text mechanism allows for disjoint portions of selected text.  This is a feature, not a bug -- you can cut-and-paste disjoint text.
+* The editor's sel-text mechanism allows for disjoint portions of sel text.  This is a feature, not a bug -- you can cut-and-paste disjoint text.
 
 * $LK,"cnts.time_stamp_freq",A="MN:CCntsGlbls"$ is continuously calibrated.  Be careful because expressions might decrease.  Take a snap-shot, like this: $FG,2$timeout=$LK,"GetTSC",A="MN:GetTSC"$+$LK,"cnts.time_stamp_freq",A="MN:CCntsGlbls"$ x seconds;$FG$ and compare against $LK,"GetTSC",A="MN:GetTSC"$().  I recommend just using $LK,"tS",A="MN:tS"$ or $LK,"cnts.jiffies",A="MN:CCntsGlbls"$.
 
@@ -141,7 +143,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * $LK,"ZipRep",A="MN:ZipRep"$() can highlight src files with lots of redundancy.
 
-* With $FG,2$sub_switch_start$FG$/$FG,2$sub_switch_end$FG$, common trailing code is fast.  Common leading code is slow.$FG$
+* With $FG,2$start$FG$/$FG,2$end$FG$, common trailing code is fast.  Common leading code is slow.$FG$
 
 * The first line of the $MA-X+PU,"Psalmody",LM="#include \"::/Apps/Psalmody/Run\"\n"$ $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
 

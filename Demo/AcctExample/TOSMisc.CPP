@@ -124,7 +124,7 @@ public U0 JukeSong(I64 num)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Downloads/Psalmody",,num,num+1);
+  JukeSongsPuppet("~/Downloads/Psalmody",,num,num+1);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -134,7 +134,7 @@ public U0 JukeLines(I64 start_line,I64 end_line)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Downloads/Psalmody",,start_line*5,end_line*5);
+  JukeSongsPuppet("~/Downloads/Psalmody",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -273,7 +273,7 @@ U0 AfterEgyptInAction()
   WinMax;
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  Ed("::/Home/Videos/AfterEgypt.TXT.Z");
+  Ed("~/Videos/AfterEgypt.TXT.Z");
   Msg(MSG_KEY_DOWN_UP,CH_SPACE,0x3900000039); //<SPACE>
   ExeFile("::/Apps/AfterEgypt/Run");
   SettingsPop;
@@ -289,7 +289,7 @@ U0 CodeWalkThru()
   WinMax;
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  Ed("::/Home/Videos/RandomCode.TXT.Z");
+  Ed("~/Videos/RandomCode.TXT.Z");
   SettingsPop;
   Msg(MSG_KEY_DOWN_UP,'b',0x83000000830); //<ALT-b>
   tos_code_walk_thru++;
@@ -300,7 +300,7 @@ U0 TempleOSTheme()
 {
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  ExeFile("::/Home/Downloads/Graphics/TempleOSTheme.CPP");
+  ExeFile("~/Downloads/Graphics/TempleOSTheme.CPP");
   DocClear;
 }
 
@@ -310,6 +310,6 @@ U0 TOSJukeVideo(I64 start=0,I64 end=10)
   Free(buf);
   AutoComplete;
   FrameGrabberToggle;
-  JukeSongsPuppet("::/Home/Downloads/Psalmody",,start,end);
+  JukeSongsPuppet("~/Downloads/Psalmody",,start,end);
   FrameGrabberToggle;
 }

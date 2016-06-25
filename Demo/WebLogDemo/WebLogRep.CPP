@@ -2,6 +2,10 @@
 #define DOWNLOAD_FILE1_SIZE	17000000
 #define DOWNLOAD_FILE2		"TempleOSUltra.ISO"
 #define DOWNLOAD_FILE2_SIZE	 1900000
+#define DOWNLOAD_FILE3		"TempleOSCDRS.ISO"
+#define DOWNLOAD_FILE3_SIZE	16000000
+#define DOWNLOAD_FILE4		"TempleOSUltraRS.ISO"
+#define DOWNLOAD_FILE4_SIZE	 1600000
 
 #define MAX_HOURS		(24*3)
 
@@ -211,7 +215,11 @@ Bool IsDownLoad(LogStruct *templg)
   if (StrMatch(DOWNLOAD_FILE1,templg->file)&&templg->size>=
 	DOWNLOAD_FILE1_SIZE ||
 	StrMatch(DOWNLOAD_FILE2,templg->file)&&templg->size>=
-	DOWNLOAD_FILE2_SIZE )
+	DOWNLOAD_FILE2_SIZE ||
+	StrMatch(DOWNLOAD_FILE3,templg->file)&&templg->size>=
+	DOWNLOAD_FILE3_SIZE ||
+	StrMatch(DOWNLOAD_FILE4,templg->file)&&templg->size>=
+	DOWNLOAD_FILE4_SIZE)
     return TRUE;
   else
     return FALSE;
@@ -509,9 +517,7 @@ U0 WebLogRep(U8 *mask,U8 *output_filename)
   LogLstDel(root);
 }
 
-//This is so I can use this file stand alone
-//or as a component of a program.
-#if __DEPTH__<1
+#if __CMD_LINE__
 Cd(__DIR__);;
-WebLogRep("*.LOG*","WebLogRep.TXT.Z");
+WebLogRep("*.LOG*","~/DemoWebLog.TXT.Z");
 #endif

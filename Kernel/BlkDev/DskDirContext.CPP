@@ -34,6 +34,8 @@ CDirContext *DirContextNew(U8 *_mask,Bool make_mask=FALSE,
       valid=FALSE;
     mask+=2;
   }
+  if (*mask=='~' && Fs->cur_dv!=Let2Drv('~') && !Drv('~'))
+    valid=FALSE;
   dirc->dv=Fs->cur_dv;
   DrvChk(dirc->dv);
   buf=MAlloc(mask_len+2);

@@ -121,7 +121,7 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    }
 	    "#include \"%s\";\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
-	    ExeFile(st);
+	    ExeFile(st,CCF_CMD_LINE);
 	    res=TRUE;
 	    break;
 	  case RIGHT_AINCLUDE:

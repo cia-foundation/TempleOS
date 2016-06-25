@@ -69,7 +69,7 @@ CSprite *Sprite2SpriteQue(U8 *elems)
     tempg1=MAlloc(SpriteElemSize(tempg)+offset(CSprite.start));
     s=SpriteElemSize(tempg);
     MemCpy(&tempg1->start,&tempg->start,s);
-    tempg1->selected=FALSE;
+    tempg1->sel=FALSE;
     QueIns(tempg1,res->last);
     tempg(U8 *)+=s;
   }
@@ -117,7 +117,7 @@ U0 SpriteSetOrigin(CSprite *root,I64 dx,I64 dy,I64 dz)
   CD3I32 *p;
   CSprite *tempg=root->next;
   while (tempg!=root) {
-    if (tempg->selected)
+    if (tempg->sel)
       switch (tempg->type) {
 	case SPT_ARROW:
 	case SPT_LINE:
@@ -203,7 +203,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tempg)
   tempg1->pwha.height=ToI64(m2)/0x10000;
   tempg1->pwha.angle=-a1;
 
-  tempg1->selected=tempg->selected;
+  tempg1->sel=tempg->sel;
   return tempg1;
 }
 
@@ -244,7 +244,7 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tempg)
   if (tempg1->pwha.height<1) tempg1->pwha.height=1;
   tempg1->pwha.angle=-a1;
 
-  tempg1->selected=tempg->selected;
+  tempg1->sel=tempg->sel;
   return tempg1;
 }
 
@@ -286,7 +286,7 @@ CSprite *SpriteTransformRect(I64 *r,CSprite *tempg,F64 é)
   tempg1->ppa.y2=tempg1->ppa.y1+h;
   tempg1->ppa.angle=-a1;
 
-  tempg1->selected=tempg->selected;
+  tempg1->sel=tempg->sel;
   return tempg1;
 }
 
@@ -380,7 +380,7 @@ U0 SpriteTransform(I64 *r,CSprite *root)
   CD3I32 *p;
   CSprite *tempg=root->next,root2,*tempg1,*tempg2,*tempg3;
   while (tempg!=root) {
-    if (tempg->selected)
+    if (tempg->sel)
       switch (tempg->type) {
 	case SPT_WIDTH:
 	  tempg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
@@ -506,7 +506,7 @@ U0 SpriteTransform(I64 *r,CSprite *root)
 	  tempg3->npu.num=num;
 	  QueIns(tempg3,tempg);
 	  QueRem(tempg);
-	  tempg3->selected=tempg->selected;
+	  tempg3->sel=tempg->sel;
 	  Free(tempg);
 	  tempg=tempg3;
 	  break;
@@ -553,25 +553,25 @@ U0 SpriteTransform(I64 *r,CSprite *root)
   }
 }
 
-I64 SpriteQueSelectCnt(CSprite *root,Bool val=TRUE)
+I64 SpriteQueSelCnt(CSprite *root,Bool val=TRUE)
 {
   I64 res=0;
   CSprite *tempg=root->next;
   val=ToBool(val);
   while (tempg!=root) {
-    if (ToBool(tempg->selected)==val)
+    if (ToBool(tempg->sel)==val)
       res++;
     tempg=tempg->next;
   }
   return res;
 }
 
-I64 SpriteQueSelectAll(CSprite *root,Bool val=TRUE)
+I64 SpriteQueSelAll(CSprite *root,Bool val=TRUE)
 {
   I64 res=0;
   CSprite *tempg=root->next;
   while (tempg!=root) {
-    tempg->selected=val;
+    tempg->sel=val;
     res++;
     tempg=tempg->next;
   }
@@ -590,7 +590,7 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
       tempg=SpriteSetSettings(,root,doc_e->left_exp);
       if (tempg!=root) {
 	tempg=MAllocIdent(tempg);
-	tempg->selected=Bt(&doc_e->type,DOCEt_SELECTED);
+	tempg->sel=Bt(&doc_e->type,DOCEt_SEL);
 	if (*_cur_elem_num==doc_e->left_exp) {
 	  *_cur_elem_num=num;
 	  found=TRUE;
@@ -627,8 +627,8 @@ U0 SpriteSideBarPickNew(CDoc *doc,CSprite *root,I64 old_num)
       DocPrint(doc,"$$LTBLUE$$");
       doc_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
     }
-    BEqu(&doc_e->de_flags,DOCEf_SELECTED,tempg->selected);
-    BEqu(&doc_e->type,DOCEt_SELECTED,tempg->selected);
+    BEqu(&doc_e->de_flags,DOCEf_SEL,tempg->sel);
+    BEqu(&doc_e->type,DOCEt_SEL,tempg->sel);
     Free(st);
     tempg=tempg->next;
   }
@@ -715,13 +715,13 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
   return res;
 }
 
-#define GED_SELECT_UNSELECT_ALL	0
-#define GED_SELECT		1
-#define GED_UNSELECT		2
+#define GED_SEL_UNSEL_ALL	0
+#define GED_SEL			1
+#define GED_UNSEL		2
 #define GED_SHIFT_PTS		3
 #define GED_SHIFT_RECTS		4
-#define GED_SHIFT_SELECTED	5
-#define GED_TRANSFORM_SELECTED	6
+#define GED_SHIFT_SEL		5
+#define GED_TRANSFORM_SEL	6
 #define GED_SET_ORIGIN		7
 #define GED_SHIFT_SUB_ORIGIN	8
 #define GED_TEXT_ED		9
@@ -731,7 +731,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
 
 U0 GrInit3()
 {
-  DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unslesct All\0"
+  DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unselect All\0"
 	"Select\0Unselect\0Shift Points\0Shift Rects\0Shift Selected\0"
 	"Transform Selected\0Set Origin\0Insert Shift SubOrigin\0"
 	"Edit as Text\0Insert Clipboard\0Main Menu\0");
@@ -746,13 +746,13 @@ I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteEd.TXT.Z\"$$\n\n"
-	"$$LTBLUE$$$$MU-UL,\"Select/Unselect All\",LE=GED_SELECT_UNSELECT_ALL$$\n"
-	"$$MU-UL,\"Select Elems\",LE=GED_SELECT$$\n"
-	"$$MU-UL,\"Unselect Elems\",LE=GED_UNSELECT$$\n\n"
+	"$$LTBLUE$$$$MU-UL,\"Select/Unselect All\",LE=GED_SEL_UNSEL_ALL$$\n"
+	"$$MU-UL,\"Select Elems\",LE=GED_SEL$$\n"
+	"$$MU-UL,\"Unsel Elems\",LE=GED_UNSEL$$\n\n"
 	"$$MU-UL,\"Shift Points\",LE=GED_SHIFT_PTS$$\n"
 	"$$MU-UL,\"Shift Points with Rects\",LE=GED_SHIFT_RECTS$$\n"
-	"$$MU-UL,\"Shift Selected Elems\",LE=GED_SHIFT_SELECTED$$\n"
-	"$$MU-UL,\"Transform Selected Elems\",LE=GED_TRANSFORM_SELECTED$$\n\n"
+	"$$MU-UL,\"Shift Selected Elems\",LE=GED_SHIFT_SEL$$\n"
+	"$$MU-UL,\"Transform Selected Elems\",LE=GED_TRANSFORM_SEL$$\n\n"
 	"$$MU-UL,\"Set Origin\",LE=GED_SET_ORIGIN$$\n"
 	"$$MU-UL,\"Insert Shift SubOrigin\",LE=GED_SHIFT_SUB_ORIGIN$$\n\n"
 	"$$MU-UL,\"Edit as Text\",LE=GED_TEXT_ED$$\n"
@@ -775,7 +775,7 @@ I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
 #define GSPT_SIMPLE_PT		0
 #define GSPT_WIDTH_HEIGHT	1
 
-#define GSPF_SELECTED		1
+#define GSPF_SEL		1
 
 class CEdSprite
 {
@@ -920,7 +920,7 @@ U0 SpriteCtrlPtsDraw(CDC *dc,CEdSprite *root)
 	  y=*temppe->h+*temppe->y+temppe->yy;
 	  break;
       }
-      if (temppe->flags&GSPF_SELECTED)
+      if (temppe->flags&GSPF_SEL)
 	dc->color=RED;
       else
 	dc->color=BLACK;
@@ -937,7 +937,7 @@ U0 SpriteCtrlPtsMove(CEdSprite *root,I64 dx,I64 dy)
   CEdSprite *temppe;
   temppe=root->next;
   while (temppe!=root) {
-    if (temppe->flags&GSPF_SELECTED)
+    if (temppe->flags&GSPF_SEL)
       switch (temppe->type) {
 	case GSPT_SIMPLE_PT:
 	  if (temppe->x) *temppe->x+=dx;
@@ -990,7 +990,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 		temppe=temppe->next;
 	      }
 	      cur_elem_num=best_pe->num;
-	      best_pe->flags|=GSPF_SELECTED;
+	      best_pe->flags|=GSPF_SEL;
 	      break;
 	    case GED_SHIFT_RECTS:
 	      xx2=xx=a1; yy2=yy=a2;
@@ -1013,12 +1013,12 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 		  case GSPT_SIMPLE_PT:
 		    if (xx<=*temppe->x+temppe->xx<=xx2 &&
 			  yy<=*temppe->y+temppe->yy<=yy2)
-		      temppe->flags|=GSPF_SELECTED;
+		      temppe->flags|=GSPF_SEL;
 		    break;
 		  case GSPT_WIDTH_HEIGHT:
 		    if (xx<=*temppe->x+*temppe->w+temppe->xx<=xx2 &&
 			  yy<=*temppe->y+*temppe->h+temppe->yy<=yy2)
-		      temppe->flags|=GSPF_SELECTED;
+		      temppe->flags|=GSPF_SEL;
 		    break;
 		}
 		temppe=temppe->next;
@@ -1040,7 +1040,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	  } while (msg_code!=MSG_IP_L_UP);
 	  temppe=root.next;
 	  while (temppe!=&root) {
-	    temppe->flags&=~GSPF_SELECTED;
+	    temppe->flags&=~GSPF_SEL;
 	    temppe=temppe->next;
 	  }
 	  break;
@@ -1089,7 +1089,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
   old_de_flags=doc_ce->de_flags;
   tempb=doc_ce->bin_data;
   DocUnlock(doc);
-  SpriteQueSelectAll(*_root,FALSE);
+  SpriteQueSelAll(*_root,FALSE);
   do {
     if (winmgr.fps<10)
       doc_ce->de_flags|=DOCEF_DONT_DRAW;
@@ -1099,14 +1099,14 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
     if (0<=i<GED_EXIT) {
       StrCpy(Fs->task_title,DefineSub(i,"ST_SPRITE_ED_MENU"));
       switch (i) {
-	case GED_SELECT_UNSELECT_ALL:
-	  if (!SpriteQueSelectCnt(*_root))
-	    SpriteQueSelectAll(*_root);
+	case GED_SEL_UNSEL_ALL:
+	  if (!SpriteQueSelCnt(*_root))
+	    SpriteQueSelAll(*_root);
 	  else
-	    SpriteQueSelectAll(*_root,FALSE);
+	    SpriteQueSelAll(*_root,FALSE);
 	  break;
-	case GED_SELECT:
-	case GED_UNSELECT:
+	case GED_SEL:
+	case GED_UNSEL:
 	  doc_ce->de_flags=old_de_flags;
 	  doc->cur_sprite=tempb->data;
 	  do {
@@ -1116,23 +1116,23 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	    if (msg_code==MSG_IP_L_DOWN) {
 	      *_cur_elem_num=doc->nearest_sprite_elem_num;
 	      cur_elem=SpriteSetSettings(,*_root,*_cur_elem_num);
-	      cur_elem->selected=ToBool(i==GED_SELECT);
+	      cur_elem->sel=ToBool(i==GED_SEL);
 	      GetMsg(,,1<<MSG_IP_L_UP);
 	    }
 	  } while (msg_code!=MSG_IP_R_UP);
 	  doc->cur_sprite=NULL;
 	  break;
 	case GED_SET_ORIGIN:
-	  SpriteQueSelectAll(*_root);
+	  SpriteQueSelAll(*_root);
 	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
 	  SpriteSetOrigin(*_root,x-a1,y-a2,0);
 	  SpriteEdUpdate(doc,doc_ce,*_root);
-	  SpriteQueSelectAll(*_root,FALSE);
+	  SpriteQueSelAll(*_root,FALSE);
 	  break;
-	case GED_SHIFT_SELECTED:
-	  if (!SpriteQueSelectCnt(*_root))
-	    SpriteQueSelectAll(*_root);
+	case GED_SHIFT_SEL:
+	  if (!SpriteQueSelCnt(*_root))
+	    SpriteQueSelAll(*_root);
 	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
 	  xx=a1; yy=a2;
@@ -1143,8 +1143,8 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	    xx=a1; yy=a2;
 	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  } while (msg_code!=MSG_IP_L_UP);
-	  if (!SpriteQueSelectCnt(*_root,FALSE))
-	    SpriteQueSelectAll(*_root,FALSE);
+	  if (!SpriteQueSelCnt(*_root,FALSE))
+	    SpriteQueSelAll(*_root,FALSE);
 	  break;
 	case GED_SHIFT_PTS:
 	case GED_SHIFT_RECTS:
@@ -1161,15 +1161,15 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  } else
 	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  break;
-	case GED_TRANSFORM_SELECTED:
-	  if (!SpriteQueSelectCnt(*_root))
-	    SpriteQueSelectAll(*_root);
+	case GED_TRANSFORM_SEL:
+	  if (!SpriteQueSelCnt(*_root))
+	    SpriteQueSelAll(*_root);
 	  if (PopUpTransform(r)) {
 	    SpriteTransform(r,*_root);
 	    SpriteEdUpdate(doc,doc_ce,*_root);
 	  }
-	  if (!SpriteQueSelectCnt(*_root,FALSE))
-	    SpriteQueSelectAll(*_root,FALSE);
+	  if (!SpriteQueSelCnt(*_root,FALSE))
+	    SpriteQueSelAll(*_root,FALSE);
 	  break;
 	case GED_SHIFT_SUB_ORIGIN:
 	  doc_ce->de_flags=old_de_flags;

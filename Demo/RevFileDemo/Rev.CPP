@@ -1,11 +1,11 @@
 /*We use the internal routines from the text editor
-to cut and paste lines to reverse the order of
+to cut and paste lines to rev the order of
 lines in a text file.
 */
 
 Cd(__DIR__);;
 
-U0 Reverse(U8 *in_name,U8 *out_name)
+U0 Rev(U8 *in_name,U8 *out_name)
 {
   CDoc	*doc_in =DocRead(in_name),
 	*doc_out=DocNew(out_name);
@@ -19,4 +19,4 @@ U0 Reverse(U8 *in_name,U8 *out_name)
   DocWrite(doc_out);
 }
 
-Reverse("PoemBackward.TXT.Z","PoemForeward.TXT.Z");
+Rev("DemoPoemBwd.TXT.Z","~/DemoPoemFwd.TXT.Z");

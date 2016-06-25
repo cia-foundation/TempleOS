@@ -1,7 +1,12 @@
 #help_index "TOS"
 
+RegSetDftEntry("TempleOS/Staff",
+"#define PERSONAL_INITIALS \"TAD\"\n"
+"#define MACHINE_CFG 0\n"
+);
+RegExeBranch("TempleOS/Staff");
+
 #define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
-#define PERSONAL_INITIALS	"TAD"
 #define BLOG_BASE		"/Home/Web/" PERSONAL_INITIALS "/Blog"
 #define DAILY_BASE		"/Home/Web/" PERSONAL_INITIALS "/DailyBlog"
 #define BLOG_LOCAL_BASE		"::" BLOG_BASE
@@ -29,16 +34,29 @@ U0 TOSBootRescueDrv2()
 
 U0 TOSInit()
 {
-  DefinePrint("CFG_RAM_DRVS",
-	"\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
-  DefinePrint("CFG_HARD_DRVS","\"\"");
-  DefinePrint("CFG_DVD_DRVS","\"\"");
-  DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
-  DefinePrint("TOS_HDS","\"CD\"");
-  DefinePrint("TOS_MASTER_BOOT_DRVS","\"C\"");
+  switch (MACHINE_CFG) {
+    case 1: //TAD Native Machine
+      DefinePrint("CFG_RAM_DRVS",
+	    "\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
+      DefinePrint("CFG_HARD_DRVS","\"cs0xFE00\n0xFE10\n0\"");
+      DefinePrint("CFG_DVD_DRVS","\"ts0x1F0\n1\"");
+      DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
+      DefinePrint("TOS_HDS","\"CD\"");
+      DefinePrint("TOS_MASTER_BOOT_DRVS","\"C\"");
+      break;
+    default:
+      DefinePrint("CFG_RAM_DRVS",
+	    "\"b\nScale2Mem(2048,0x100000,4*1024*1024*1024)\n\"");
+      DefinePrint("CFG_HARD_DRVS","\"\"");
+      DefinePrint("CFG_DVD_DRVS","\"\"");
+      DefinePrint("CFG_DSK_CACHE","\"Scale2Mem(0x80000,0x8000000)\n\"");
+      DefinePrint("TOS_HDS","\"CD\"");
+      DefinePrint("TOS_MASTER_BOOT_DRVS","\"C\"");
+  }
 } TOSInit;
 
 #define TOS_ISO_NAME	"B:/TempleOSCD.ISO"
+#define TOS_ISO_C_NAME	"B:/TempleOSCD.ISO.C"
 #define TOS_DISTRO_DIR	"B:/Distro"
 #define CFG_OPTS	"AutoMountIDE\nCT\n"
 #define CFG_DBG_OPTS	"AutoMountIDE\nCT"\

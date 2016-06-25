@@ -389,7 +389,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
       Free(tempie);
     } else {
       switch (tempie->type) {
-	sub_switch_start:
+	start:
 	  case IET_REL32_EXPORT:
 	  case IET_IMM32_EXPORT:
 	  case IET_REL64_EXPORT:
@@ -405,7 +405,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tempaot)
 	  case IET_REL_I16:	    *ptr(U16 *)-=ip2;	    break;
 	  case IET_REL_I32:	    *ptr(U32 *)-=ip2;	    break;
 	  case IET_REL_I64:	    *ptr(I64 *)-=ip2;	    break;
-	sub_switch_end:
+	end:
 	  tempie->ip+=ip2;
 	  break;
       }
@@ -569,16 +569,14 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 }
 
 I64 ExePutS(U8 *buf,U8 *filename=NULL,
-	Bool just_load=FALSE,CLexHashTableContext *htc=NULL)
+	I64 ccf_flags=0,CLexHashTableContext *htc=NULL)
 {//JIT Compile and execute text from a puts("").
   I64 res;
   Bool okay=TRUE;
   CCmpCtrl *cc;
   if (!filename)
     filename=blkdev.temp_filename;
-  cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
-  if (just_load)
-    cc->flags|=CCF_JUST_LOAD;
+  cc=CmpCtrlNew(buf,ccf_flags|CCF_DONT_FREE_BUF,filename);
   if (Fs->last_lex!=&Fs->next_lex) {
     cc->opts=Fs->last_lex->opts;
     if (htc) {
@@ -613,26 +611,24 @@ I64 ExePrint(U8 *fmt,...)
   return res;
 }
 
-I64 ExeFile(U8 *name,Bool just_load=FALSE)
+I64 ExeFile(U8 *name,I64 ccf_flags=0)
 {//JIT Compile and execute a file.
   I64 res;
   U8 *name2=DftExt(name,"CPP.Z"),
 	*st=MStrPrint("#include \"%s\";",name2);
-  res=ExePutS(st,name,just_load);
+  res=ExePutS(st,name,ccf_flags);
   Free(st);
   Free(name2);
   return res;
 }
 
-I64 ExePutS2(U8 *buf,U8 *filename=NULL,Bool just_load=FALSE)
+I64 ExePutS2(U8 *buf,U8 *filename=NULL,I64 ccf_flags=0)
 {//throws exceptions
   I64 res;
   CCmpCtrl *cc;
   if (!filename)
     filename=blkdev.temp_filename;
-  cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF,filename);
-  if (just_load)
-    cc->flags|=CCF_JUST_LOAD;
+  cc=CmpCtrlNew(buf,ccf_flags|CCF_DONT_FREE_BUF,filename);
   if (Fs->last_lex!=&Fs->next_lex)
     cc->opts=Fs->last_lex->opts;
   QueIns(cc,Fs->last_lex);
@@ -652,11 +648,11 @@ I64 ExePrint2(U8 *fmt,...)
   return res;
 }
 
-I64 ExeFile2(U8 *name,Bool just_load=FALSE)
+I64 ExeFile2(U8 *name,I64 ccf_flags=0)
 {//throws exceptions
   I64 res;
   U8 *name2=DftExt(name,"CPP.Z"),*st=MStrPrint("#include \"%s\";",name2);
-  res=ExePutS2(st,name,just_load);
+  res=ExePutS2(st,name,ccf_flags);
   Free(st);
   Free(name2);
   return res;

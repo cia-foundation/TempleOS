@@ -645,20 +645,4 @@ _FSTSW::
 _FCLEX::
 	FCLEX
 	RET
-//************************************
-_FXSAVE::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	RAX,U64 SF_ARG1[RBP]
-	FXSAVE	U64 [RAX]
-	POP	RBP
-	RET1	8
-//************************************
-_FXRSTOR::
-	PUSH	RBP
-	MOV	RBP,RSP
-	MOV	RAX,U64 SF_ARG1[RBP]
-	FXRSTOR	U64 [RAX]
-	POP	RBP
-	RET1	8
 }

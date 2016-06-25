@@ -22,7 +22,7 @@ public class CRedSeaBoot //RedSea is type FAT32 in partition table to fool BIOS.
 {
   U8 jump_and_nop[3];
   U8 signature,reserved[4]; //MBR_PT_REDSEA=0x88. Distinguish from real FAT32.
-  I64 base_offset;	//For CD/DVD image copy.
+  I64 drv_offset;	//For CD/DVD image copy.
   I64 sects;
   I64 root_cluster; (root_blk)
   I64 bitmap_sects;
@@ -31,10 +31,9 @@ public class CRedSeaBoot //RedSea is type FAT32 in partition table to fool BIOS.
   U16 signature2;	//0xAA55
 };
 $HL,0$
-See $LK,"implementation of RedSea file system",A="::/Kernel/BlkDev/FileSysRedSea.CPP"$.
+See $LK,"::/Kernel/BlkDev/FileSysRedSea.CPP"$ and $LK,"::/Adam/Opt/Boot/DskISORedSea.CPP"$.
 
-File with names ending in .Z are stored compressed.
-See $LK,"implementation of LZW compression",A="::/Kernel/Compress.CPP"$.
+Files with names ending in .Z are compressed.  See $LK,"::/Kernel/Compress.CPP"$.
 
 To replace ISO9660, make hard-drive partition image of a measured size and copy onto a CD/DVD starting at about sector 20, with EL TORITO booting.  512-byte sectors will be placed on top of 2048-byte CD/DCD sectors, so there will be four blocks per CD/DVD sector.
 

@@ -29,7 +29,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
   if (sc>=0 && sc&SCF_CTRL) {
     while (doc_ce->last!=doc && (doc_ce->last->y==y ||
 	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)))
-      doc_ce=doc_ce->last;  //TODO: select? recurse?
+      doc_ce=doc_ce->last;  //TODO: sel? recurse?
     cc=doc_ce->min_col;
   } else {
     if (cc>doc_ce->min_col) {
@@ -51,7 +51,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
 	cc=doc_ce->min_col;
       }
       if (sc>=0)
-	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
     } else {
       cc=doc_ce->min_col;
       while (doc_ce->last!=doc &&
@@ -60,7 +60,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
 	    doc_ce->last->de_flags&(DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
 	doc_ce=doc_ce->last;
 	if (sc>=0)
-	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	  BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
       }
       if (doc_ce->last!=doc) {
 	doc_ce=doc_ce->last;
@@ -78,7 +78,7 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
 	} else
 	  cc=doc_ce->max_col;
 	if (sc>=0)
-	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	  BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
       }
     }
   }
@@ -123,7 +123,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
       old_de_flags=doc_ce->de_flags;
       old_color=doc_ce->type;
       if (sc>=0)
-	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
       if (IsEditableText(doc_ce) && cc<doc_ce->max_col) {
 	dst=doc_ce->tag+cc;
 	doc_ne=DocEntryNewTag(doc,doc_ce,dst);
@@ -141,17 +141,17 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
     } else {
       if (doc_ce!=doc) {
 	if (cc<=doc_ce->min_col && sc>=0)
-	  BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	  BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 	doc_ce=doc_ce->next;
 	while (doc_ce!=doc && doc_ce->de_flags&(DOCEF_SKIP|DOCEF_FILTER_SKIP)) {
 	  if (sc>=0)
-	    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 	  doc_ce=doc_ce->next;
 	}
 	cc=doc_ce->min_col;
 	if (doc_ce->type_u8==DOCT_SOFT_NEW_LINE) {
 	  if (sc>=0)
-	    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 	  doc_ce=doc_ce->next;
 	  cc=doc_ce->min_col;
 	}
@@ -198,7 +198,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   } else if (doc_ce->last!=doc)
     doc_ce=doc_ce->last;
   if (sc>=0)
-    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
   doc->cur_entry=doc_ce;
   DocFormBwd(doc);
   doc_ce=doc->cur_entry;
@@ -206,14 +206,14 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
 	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
     doc_ce=doc_ce->last;
     if (sc>=0)
-      BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+      BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
   }
   y=doc_ce->y;
   doc->y=y;
   while (doc_ce!=doc && (doc_ce->y>=y && doc_ce->x>=x ||
 	doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP))) {
     if (sc>=0)
-      BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+      BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
     doc_ce=doc_ce->last;
   }
 
@@ -222,7 +222,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   else {
     if (!IsEditableText(doc_ce)) {
       if (sc>=0)
-	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
     } else {
       if (doc_ce->next->x==x) {
 	doc_ce=doc_ce->next;
@@ -259,9 +259,9 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
       *dst=0;
       if (sc>=0) {
 	if (sc&SCF_SHIFT)
-	  doc_ne->type=doc_ce->type | DOCET_SELECTED;
+	  doc_ne->type=doc_ce->type | DOCET_SEL;
 	else
-	  doc_ne->type=doc_ce->type & ~DOCET_SELECTED;
+	  doc_ne->type=doc_ce->type & ~DOCET_SEL;
       }
       doc_ne->x=doc_ce->x+doc->cur_col;
       doc_ce->max_col=doc->cur_col;
@@ -305,9 +305,9 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
       *dst=0;
       if (sc>=0) {
 	if (sc&SCF_SHIFT)
-	  doc_ne->type=doc_ce->type | DOCET_SELECTED;
+	  doc_ne->type=doc_ce->type | DOCET_SEL;
 	else
-	  doc_ne->type=doc_ce->type & ~DOCET_SELECTED;
+	  doc_ne->type=doc_ce->type & ~DOCET_SEL;
       }
       doc_ne->x=doc_ce->x+doc->cur_col;
       doc_ce->max_col=doc->cur_col;
@@ -345,7 +345,7 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
 	  doc_ce2->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP) ||
 	  doc_ce2->x==x && !doc_ce2->max_col &&
 	  Bt(doldoc.type_flags_nontag_invisible,doc_ce2->type_u8)) && sc>=0)
-      BEqu(&doc_ce2->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+      BEqu(&doc_ce2->type,DOCEt_SEL,sc&SCF_SHIFT);
     if (doc_ce2==doc_ce) break;
     doc_ce2=doc_ce2->next;
   }
@@ -377,7 +377,7 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
   if (!(doc->flags & DOCF_FORM))
     while (doc_ce!=doc && doc_ce!=doc->cur_entry) {
       if (sc>=0)
-	BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+	BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
       doc_ce=doc_ce->next;
     }
   doc->x=doc->cur_entry->x+doc->cur_col;

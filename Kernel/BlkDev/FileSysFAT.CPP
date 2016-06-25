@@ -26,9 +26,9 @@ U0 FAT32DrvInit(CDrv *dv)
   try {
     unlock=DrvLock(dv);
     dv->fs_type=FSt_FAT32;
-    RBlks(dv,&br32,dv->base_offset,1);
-    dv->file_system_info_sect=dv->base_offset+br32.file_system_info_sect;
-    dv->fat1=dv->base_offset+br32.reserved_sects;
+    RBlks(dv,&br32,dv->drv_offset,1);
+    dv->file_system_info_sect=dv->drv_offset+br32.file_system_info_sect;
+    dv->fat1=dv->drv_offset+br32.reserved_sects;
     dv->fat2=dv->fat1+br32.sects_per_fat;
     dv->data_area=dv->fat2+br32.sects_per_fat
 	  -2*br32.sects_per_cluster; //Starts at Cluster 2
@@ -50,7 +50,7 @@ Bool FAT32DrvValidate(U8 drv_let)
   CDrv *dv;
   CFAT32Boot br;
   if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_FAT32 &&
-	RBlks(dv,&br,dv->base_offset,1) && br.signature==0xAA55 &&
+	RBlks(dv,&br,dv->drv_offset,1) && br.signature==0xAA55 &&
 	br.sects==dv->size)
     return TRUE;
   else
@@ -111,14 +111,14 @@ U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
       i=br->reserved_sects+2*l+4*br->sects_per_cluster;
     else
       i=dv->size;
-    WZeroBlks(dv,dv->base_offset,i);
+    WZeroBlks(dv,dv->drv_offset,i);
 
-    WBlks(dv,fis,dv->base_offset+br->file_system_info_sect,1);
-    WBlks(dv,br,dv->base_offset,1);
+    WBlks(dv,fis,dv->drv_offset+br->file_system_info_sect,1);
+    WBlks(dv,br,dv->drv_offset,1);
     FAT32DrvInit(dv);
     ClustersAlloc(dv,0,1,FALSE); //Alloc #1
     br->root_cluster=ClustersAlloc(dv,0,1,FALSE);
-    WBlks(dv,br,dv->base_offset,1);
+    WBlks(dv,br,dv->drv_offset,1);
     FAT32DrvInit(dv);
     DrvUnlock(dv);
   } catch
@@ -462,7 +462,7 @@ I64 FAT32AllocClusters(CDrv *dv,I64 c,I64 cnt)
   try {
     unlock_break=BreakLock;
     unlock=DrvLock(dv);
-    l=(dv->size+dv->base_offset-dv->data_area)/dv->spc-1;
+    l=(dv->size+dv->drv_offset-dv->data_area)/dv->spc-1;
     j=dv->fis->most_recently_alloced;
     while (cnt-->0) {
       while (TRUE) {
@@ -525,7 +525,7 @@ I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt)
       i=0;
       cont=TRUE;
       while (cont && i<cnt) {
-	if ((first+i+1)*dv->spc+dv->data_area>dv->size+dv->base_offset)
+	if ((first+i+1)*dv->spc+dv->data_area>dv->size+dv->drv_offset)
 	  throw('Drv');
 	DrvFATBlkSet(dv,first+i);
 	if (dv->cur_fat_blk[(first+i)&(BLK_SIZE/4-1)])
@@ -930,10 +930,11 @@ CDirEntry *FAT32FilesFind(U8 *files_find_mask,
   return res;
 }
 
-Bool FAT32MkDir(CDrv *dv,U8 *cur_dir,U8 *name)
+Bool FAT32MkDir(CDrv *dv,U8 *cur_dir,U8 *name,I64 entry_cnt)
 {
-  I64 size=dv->spc<<BLK_SIZE_BITS,c,
-	cur_dir_cluster=Name2DirCluster(dv,cur_dir);
+  I64 c,cur_dir_cluster=Name2DirCluster(dv,cur_dir),
+//Rough estimate of size
+	size=CeilU64((entry_cnt+2)<<FAT32_ENTRIES_BITS,dv->spc<<BLK_SIZE_BITS);
   U8 *buf=CAlloc(size);
   CDirEntry d_native;
   CFAT32DirEntry *dFAT=buf;

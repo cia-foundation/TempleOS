@@ -1,7 +1,7 @@
 U0 OptPass5(CCmpCtrl *cc)
 {
   CIntermediateCode *tempi,*tempi1;
-  I64 code,i,ty,pt,ty1,pt1;
+  I64 code,i;
   CPrsStk *ps=cc->ps;
   ps->ptr=0;
   ps->ptr2=0;
@@ -40,25 +40,9 @@ U0 OptPass5(CCmpCtrl *cc)
 	    else
 	      tempi->ic_flags|=ICF_A2_TO_F64;
 	  }
-
-	  ty=tempi->a2.type.raw_type;
-	  ty1=tempi1->a1.type.raw_type;
-	  if (ty1 && ty1<ty)
-	    ty=ty1;
-	  ty1=tempi1->r.type.raw_type;
-	  if (ty1 && ty1<ty)
-	    ty=ty1;
-	  tempi->a2.type=tempi1->a1.type&MDG_MASK+ty;
-
-	  pt=tempi->a2.type_pointed_to;
-	  pt1=tempi1->a1.type_pointed_to;
-	  if (pt1 && pt1<pt && pt!=RT_F64)
-	    pt=pt1;
-	  pt1=tempi1->r.type_pointed_to;
-	  if (pt1 && pt1<pt && pt!=RT_F64)
-	    pt=pt1;
-	  tempi->a2.type_pointed_to=pt;
-
+	  tempi->a2.type=tempi1->a1.type&MDG_MASK+
+		MinI64(tempi->a2.type.raw_type,
+		MinI64(tempi1->r.type.raw_type,tempi1->a1.type.raw_type));
 	  tempi->a2.reg=tempi1->a1.reg;
 	  tempi->a2.disp=tempi1->a1.disp;
 	  tempi->ic_flags|=tempi1->ic_flags&ICG_NO_CVT_MASK;
@@ -83,25 +67,10 @@ U0 OptPass5(CCmpCtrl *cc)
 	    } else
 	      tempi->ic_flags|=ICF_A1_TO_F64;
 	  }
-
-	  ty=tempi->a1.type.raw_type;
-	  ty1=tempi1->a1.type.raw_type;
-	  if (ty1 && ty1<ty)
-	    ty=ty1;
-	  ty1=tempi1->r.type.raw_type;
-	  if (ty1 && ty1<ty)
-	    ty=ty1;
-	  tempi->a1.type=tempi1->a1.type&MDG_MASK+ty;
-
-	  pt=tempi->a1.type_pointed_to;
-	  pt1=tempi1->a1.type_pointed_to;
-	  if (pt1 && pt1<pt && pt!=RT_F64)
-	    pt=pt1;
-	  pt1=tempi1->r.type_pointed_to;
-	  if (pt1 && pt1<pt && pt!=RT_F64)
-	    pt=pt1;
-	  tempi->a1.type_pointed_to=pt;
-
+	  tempi->a1.type=tempi1->a1.type&MDG_MASK+
+		MinI64(tempi->a1.type.raw_type,
+		MinI64(tempi1->r.type.raw_type,tempi1->a1.type.raw_type));
+	  CmpMinTypePointed(tempi,tempi1->a1_type_pointed_to);
 	  tempi->a1.reg=tempi1->a1.reg;
 	  tempi->a1.disp=tempi1->a1.disp;
 	  tempi->ic_flags|=tempi1->ic_flags&ICG_NO_CVT_MASK;

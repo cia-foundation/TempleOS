@@ -603,10 +603,10 @@ U0 Strut()
   DocCursor;
   DocClear;
   "\n$$WW,1$$$$PURPLE$$$$TX+CX,\"Build a ship.\"$$$$FG$$\n\n"
-	"Select mass mode.\tLeft-click to place masses.\n"
-	"Select spring mode.\tLeft-drag to make members.\n"
-	"Select thruster mode.\tPress a digit, 0-9.  Drag to make thruster.\n"
-	"Select connector mode.\tPress a digit, 0-9.  "
+	"Sel mass mode.\tLeft-click to place masses.\n"
+	"Sel spring mode.\tLeft-drag to make members.\n"
+	"Sel thruster mode.\tPress a digit, 0-9.  Drag to make thruster.\n"
+	"Sel connector mode.\tPress a digit, 0-9.  "
 	"Drag to make breakable connector.\n\n"
 	"Press $$GREEN$$<SPACE>$$FG$$ to run the game.  Press digits to operate "
 	"thrusters and break connectors.\n\n"

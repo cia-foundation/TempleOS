@@ -217,17 +217,15 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
   DocPrint(doc,"$$LTBLUE$$");
   for (i=0;i<NUM_DRVS;i++) {
     dv=&blkdev.drvs[i];
-    if (dv->fs_type==FSt_REDSEA||dv->fs_type==FSt_FAT32)
-      FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
-    else if (dv->fs_type==FSt_ISO9660) {
+    if (dv->bd->type==BDT_ATAPI) {
       if (dv->bd->flags&BDF_INITIALIZED)
 	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
       else {
 	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,FALSE);
 	tempde->flags|=DEF_NOT_INITIALIZED;
       }
-      tempde->flags|=DEF_REMOVABLE;
-    }
+    } else if (dv->fs_type==FSt_REDSEA || dv->fs_type==FSt_FAT32)
+      FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
   }
   DocTop(doc);
   FMMarkUncollapsed(doc,tempc,cur_entry,next_entry);
@@ -382,7 +380,7 @@ U0 FMMakeISO(CDoc *doc)
 	st=MStrPrint("%s*",tempde->full_name);
       else
 	st=MStrPrint("%s/*",tempde->full_name);
-      ISOFileCreate(,st);
+      ISO9660ISO(,st);
       Free(st);
       Silent(OFF);
     }
@@ -566,8 +564,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   }
   do {
     DocUnlock(doc);
-    do msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+    do msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	    1<<MSG_IP_R_UP);
     while (Fs!=sys_focus_task);
     DocLock(doc);
@@ -655,7 +652,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    FMRightClick;
 	    DocLock(doc);
 	    break;
-	  sub_switch_start:
+	  start:
 	    DocUnlock(doc);
 	    case CH_CTRLV:
 	      FMCopy(doc);
@@ -681,7 +678,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    case 'f':
 	      FMFmtDrv(doc);
 	      break;
-	  sub_switch_end:
+	  end:
 	    FMRebuildDoc(&doc,&root,mode);
 	    break;
 	  case CH_SHIFT_ESC:

@@ -148,7 +148,7 @@ U0 UpdateDerivedCtrlSlider(CCtrl *c)
 
 U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool down)
 {
-  nounusedwarn down;
+  no_warn down;
   CSliderState *s=c->state;
 ");
 

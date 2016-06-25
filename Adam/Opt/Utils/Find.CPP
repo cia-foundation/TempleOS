@@ -57,7 +57,7 @@ I64 FindFile(U8 *needle_str,U8 *haystack_filename,
 	  cnt++;
 	  if (first_on_line || Bt(_fuf_flags,FUf_REPLACE)) {
 	    first_on_line=FALSE;
-	    PutFileLink(haystack_filename,doc_e->y+1,TRUE);
+	    PutFileLink(haystack_filename,,doc_e->y+1,TRUE);
 	    name_buf=MStrPrint("%s,%d",haystack_filename,doc_e->y+1);
 	    if (cur_l=DocPut) {
 	      old_flags=cur_l->flags&DOCF_PLAIN_TEXT;

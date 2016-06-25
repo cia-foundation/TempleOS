@@ -48,7 +48,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
     if (!Drv(src_drv))
       throw;
     MakeAll;
-    if ((bd=Let2BlkDev(dst_drv,FALSE)) && (dv=Let2Drv(dst_drv,FALSE)))
+    if ((dv=Let2Drv(dst_drv,FALSE)) && (bd=dv->bd))
       type=bd->type;
     else {
       type=BDT_ATAPI;
@@ -56,6 +56,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
     }
     switch (type) {
       case BDT_ATAPI:
+      case BDT_FILE:
 	Move("/Kernel/Kernel.BIN.Z",BOOT_DIR_KERNEL_BIN_C);
 	res=TRUE;
 	break;
@@ -67,7 +68,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
 	else {
 	  Free(de.full_name);
 	  "Modifying partition boot record.\n";
-	  RBlks(dv,&br,dv->base_offset,1);
+	  RBlks(dv,&br,dv->drv_offset,1);
 	  br.jump_and_nop[0]=OC_JMP_REL8;
 	  br.jump_and_nop[1]=offset(CFAT32Boot.code)-2;
 #assert offset(CFAT32Boot.code)>=offset(CRedSeaBoot.code)
@@ -79,7 +80,7 @@ public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
 #assert sizeof(CFAT32Boot.code)>=BHD_END-BHD_CODE
 	  for (;i<sizeof(CFAT32Boot.code);i++)
 	    br.code[i]=0;
-	  WBlks(dv,&br,dv->base_offset,1);
+	  WBlks(dv,&br,dv->drv_offset,1);
 	  res=TRUE;
 	}
 	break;
@@ -172,7 +173,7 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
     if (dv->fs_type!=FSt_REDSEA && dv->fs_type!=FSt_FAT32)
       PrintErr("File System Not Supported\n");
     else {
-      bd=Let2BlkDev(drv_let);
+      bd=dv->bd;
       if (!FileFind(BOOT_DIR_OLDMBR_BIN_C,,FUF_JUST_FILES))
 	MasterBootOldRead(drv_let,drv_let);
 
@@ -190,14 +191,14 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
 
       ptr=buf;
       while (ch=*ptr++) {
-	if ((p1=Let2Drv(ch,FALSE)) && (bd1=Let2BlkDev(ch,FALSE)) && bd1==bd) {
-	  *_q=p1->base_offset;
+	if ((p1=Let2Drv(ch,FALSE)) && (bd1=p1->bd) && bd1==bd) {
+	  *_q=p1->drv_offset;
 	  "Drive %C:%16X\n",Drv2Let(p1),*_q;
 	  CatPrint(menu_ptr,"%d. Drive %C\n\r",j++,Drv2Let(p1));
 	  _q++;
 	}
       }
-      CatPrint(menu_ptr,"\n\rSelection:");
+      CatPrint(menu_ptr,"\n\rSellection:");
 
       size=BMHD2_END-BMHD2_START;
       FileWrite(BOOT_DIR_BOOTMHD2_BIN_C,BMHD2_START,size);

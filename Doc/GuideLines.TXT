@@ -20,19 +20,19 @@ $FG,2$/0000Boot$FG$ Boot files go here.  Stage 2 of the TempleOS hard drive mast
 
 $FG,5$$TX+CX,"::/Home Files"$$FG$
 
-An empty $FG,2$::/Home$FG$ directory should be valid because it will get default files from the root directory. 
+The home dir is specified with $FG,2$'~'$FG$.  The home dir is $FG,2$::/Home$FG$ unless you change it with $LK,"HomeSet",A="MN:HomeSet"$() or compile the kernel with a cfg option.  An empty $FG,2$/Home$FG$ dir should be valid because it will get default files from the root dir. 
 
-$LK,"::/Home/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+$LK,"~/PersonalMenu.TXT"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
 
-$LK,"::/Home/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+$LK,"~/PersonalNotes.TXT"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
 
-$LK,"::/Home/MakeHome.CPP"$ a file compiled by the $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$ during $LK,"StartOS",A="FF:::/StartOS.CPP,MakeHome"$.
+$LK,"~/MakeHome.CPP"$ a file compiled by the $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$ during $LK,"StartOS",A="FF:::/StartOS.CPP,MakeHome"$.
 
-$FG,4$::/Home/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$::/Home$FG$ and customize them.  These files are invoked when the adam task starts-up.
+$FG,4$~/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$~$FG$ and customize them.  These files are invoked when the adam task starts-up.
 
-$LK,"::/Home/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
+$LK,"~/DoOnce.CPP"$ a file invoked at the start-up of the first user.  Customize this!
 
-$LK,"::/Home/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
+$LK,"~/Registry.CPP"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
 
 
 
@@ -79,8 +79,6 @@ $ID,-5$
 * Avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte signed int -- nothing forces it to $FG,2$1$FG$ or $FG,2$0$FG$.  There is a $LK,"ToBool",A="MN:ToBool"$() function that will for to $FG,2$1$FG$ ot $FG,2$0$FG$, however.
 
 * Glbl vars in $FG,2$AOT$FG$ BIN modules are initialized to zero.  They occupy space in BIN files.
-
-* If you use floats in your interrupt routine, save and restore the fpu state with $LK,"Fxsave",A="MN:Fxsave"$() and $LK,"Fxrstor",A="MN:Fxrstor"$().  The timer interrupt does this.  The keyboard and mouse don't use floats.
 
 * Bracketing code with $FG,2$PUSHFD CLI$FG$ and $FG,2$POPFD$FG$ will protect against simultaneous accesses from tasks on $UL,1$one$UL,0$ core.  To protect against multiple cores, you need a locked semaphore.  I think semiphores need to be in their own cache line, but I'm not sure.  I use lock bits in a lot of places not aligned.
 

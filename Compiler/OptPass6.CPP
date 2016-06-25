@@ -10,14 +10,14 @@ Bool OptIC6(CIntermediateCode *tempi)
     if (tempil1->a1.type&MDF_REG) {
       tempi->ic_flags=tempi->ic_flags&~ICF_A1_WAS_STK | tempil1->ic_flags;
       tempi->ic_code=IC_MOV;
-      tempi->a1.type=MDF_DISP+tempi->a1.type_pointed_to;
+      tempi->a1.type=MDF_DISP+tempi->a1_type_pointed_to;
       tempi->a1.reg=tempil1->a1.reg;
       tempi->a1.disp=tempil1->ic_data;
       OptSetNOP2(tempil1,-1);
     } else {
       tempil1->ic_code=IC_MOV;
       tempi->ic_code=IC_MOV;
-      tempi->a1.type=MDF_DISP+tempi->a1.type_pointed_to;
+      tempi->a1.type=MDF_DISP+tempi->a1_type_pointed_to;
       tempi->a1.disp=tempil1->ic_data;
     }
     return TRUE;
@@ -123,8 +123,7 @@ U0 OptPass6(CCmpCtrl *cc)
 		tempil2->ic_code!=IC_SET_RAX &&
 		!(tempi->ic_flags&(ICF_A2_TO_F64|ICF_A2_TO_INT)) &&
 		!(tempil2->ic_flags&(ICF_R_TO_F64|ICF_R_TO_INT))) {
-	    tempil2->r.type =tempi->a1.type&MDG_MASK+tempi->a1.type_pointed_to;
-	    tempil2->r.type_pointed_to=tempi->a1.type_pointed_to;
+	    tempil2->r.type =tempi->a1.type&MDG_MASK+tempi->a1_type_pointed_to;
 	    tempil2->r.reg  =tempi->a1.reg;
 	    tempil2->r.disp =tempi->a1.disp;
 	    tempil2->ic_flags=tempil2->ic_flags

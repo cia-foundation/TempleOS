@@ -63,18 +63,18 @@ U8 *gate_type_lst="NULL\0OUTPUT\0INPUT\0"
 #define GT_XOR		8
 #define GT_AND3		9
 #define GT_OR3		10
-#define GT_NAND3		11
+#define GT_NAND3	11
 #define GT_NOR3		12
 #define GT_NUM_ENTRIES	13
 
-#define MAX_SELECTED_GATES 128
+#define MAX_SEL_GATES	128
 
 CSprite *imgs[GT_NUM_ENTRIES]={NULL,NULL,NULL,
 $IB,"<NOT>",BI=1$,$IB,"<AND>",BI=2$,$IB,"<OR>",BI=3$,$IB,"<NAND>",BI=4$,$IB,"<NOR>",BI=5$,$IB,"<XOR>",BI=6$,$IB,"<AND3>",BI=7$,$IB,"<OR3>",BI=8$,$IB,"<NAND3>",BI=9$,$IB,"<NOR3>",BI=10$};
 
 I64 num_inputs_entered,num_outputs_entered;
-I64 num_selected_gates,
-    selected_gates[MAX_SELECTED_GATES];
+I64 num_sel_gates,
+    sel_gates[MAX_SEL_GATES];
 
 U0 GetGates()
 {
@@ -87,9 +87,9 @@ U0 GetGates()
     "%z ",i,gate_type_lst;
   '\n';
 
-  num_selected_gates=0;
-  while (num_selected_gates<GT_NUM_ENTRIES) {
-    "%d",num_selected_gates;
+  num_sel_gates=0;
+  while (num_sel_gates<GT_NUM_ENTRIES) {
+    "%d",num_sel_gates;
     st=GetStr(" Gate: ");
     if (!*st) {
       Free(st);
@@ -100,7 +100,7 @@ U0 GetGates()
     if (i<GT_FIRST_REAL_GATE)
       "Invalid response\n";
     else
-      selected_gates[num_selected_gates++]=i;
+      sel_gates[num_sel_gates++]=i;
   }
 }
 
@@ -527,9 +527,9 @@ I64 FillGateTable()
     "Pass : %d\n",passes++;
     chged=FALSE;
     MemSet(added_this_pass,0,(table_size+7)/8);
-    for (current_gate=0;current_gate<num_selected_gates &&
+    for (current_gate=0;current_gate<num_sel_gates &&
 	  num_outputs_found<num_outputs_entered;current_gate++) {
-      switch (selected_gates[current_gate]) {
+      switch (sel_gates[current_gate]) {
 	case GT_NOT:   FillNot	(&chged,&num_outputs_found); break;
 	case GT_AND:   FillAnd	(&chged,&num_outputs_found); break;
 	case GT_OR:    FillOr	(&chged,&num_outputs_found); break;

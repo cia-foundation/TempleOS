@@ -241,7 +241,7 @@ U0 PsmLeftClickStaffBox(I64 x,I64 y)
     GrBorder(oc.dc2,x,y,a1,a2);
     if (msg_code==MSG_IP_L_UP) {
       if (x>a1) SwapI64(&x,&a1);
-      PsmMarkSelected(x,a1,TRUE);
+      PsmMarkSel(x,a1,TRUE);
     }
   } while (msg_code!=MSG_IP_L_UP);
   DrawDC2;
@@ -396,7 +396,7 @@ U0 PsmPopMode()
 #define PSMF_CD		1
 #define PSMF_INCOMPLETE	2
 
-U0 Psalmody(U8 *dirname="::/Home/Psalmody")
+U0 Psalmody(U8 *dirname="~/Psalmody")
 {
   Bool was_playing;
   I64 a1,a2,msg_code=0,col,
@@ -536,7 +536,7 @@ mo_got_msg:
 	    col=0;
 	  } else {
 	    switch (a1) {
-	      sub_switch_start:
+	      start:
 		case 'a': note=7; octave--; break;
 		case 's': note=8; octave--; break;
 		case 'e': note=9; octave--; break;
@@ -556,7 +556,7 @@ mo_got_msg:
 		case '[': note=11; break;
 		case '\'': note=0; octave++; break;
 		case ']': note=1; octave++; break;
-	      sub_switch_end:
+	      end:
 		f=Note2Freq(note,octave);
 		break;
 	      case CH_SPACE:
@@ -572,13 +572,13 @@ mo_got_msg:
 		      while (oc.cur_note->last!=&oc.root) {
 			oc.cur_note=oc.cur_note->last;
 			if (oc.cur_note!=&oc.root)
-			  LBEqu(&oc.cur_note->flags,PSMf_SELECTED,a2&SCF_SHIFT);
+			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 		      }
 		    } else {
 		      if (oc.cur_note->last!=&oc.root) {
 			oc.cur_note=oc.cur_note->last;
 			if (oc.cur_note!=&oc.root)
-			  LBEqu(&oc.cur_note->flags,PSMf_SELECTED,a2&SCF_SHIFT);
+			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 		      }
 		    }
 		    break;
@@ -586,13 +586,13 @@ mo_got_msg:
 		    if (a2&SCF_CTRL) {
 		      while (oc.cur_note!=&oc.root) {
 			if (oc.cur_note!=&oc.root)
-			  LBEqu(&oc.cur_note->flags,PSMf_SELECTED,a2&SCF_SHIFT);
+			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 			oc.cur_note=oc.cur_note->next;
 		      }
 		    } else {
 		      if (oc.cur_note!=&oc.root) {
 			if (oc.cur_note!=&oc.root)
-			  LBEqu(&oc.cur_note->flags,PSMf_SELECTED,a2&SCF_SHIFT);
+			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 			oc.cur_note=oc.cur_note->next;
 		      }
 		    }
@@ -638,7 +638,7 @@ mo_got_msg:
 	      case CH_CTRLO:
 		PsmPopMode;
 		RegOneTimePopUp(ARf_PSALMODY_JUKEBOX,
-		      "Select a song and preview it.\n"
+		      "Sel a song and preview it.\n"
 		      "$$GREEN$$<SHIFT-ESC>$$FG$$ to load it into Psalmody.\n\n"
 		      ST_WARN_ST " Graphics and other embelishments\n"
 		      "will be lost because Psalmody can't\n"

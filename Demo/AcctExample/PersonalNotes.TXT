@@ -1,14 +1,11 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
+* $LK,"::/Demo/Games/RawHide.CPP"$ fix waterfall code so not in center.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
 * Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
 
 * $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.CPP"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
-
-* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: $LK,"R",A="MN:R"$("Mesh",...);?
-* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: Add change triangle color.
-* $LK,"SpriteMesh",A="FI:::/Adam/Gr/SpriteMesh.CPP"$: Add make-prism.
 
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
 * Backward <SHIFT-F3> is broken?
@@ -57,12 +54,22 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Use pen_width and pen_height when clipping with pen_width>1.
 
+* $LK,"~/Downloads/Games/Rocks.CPP"$.
+
 * Asm LIST NOLIST bugs.
 
 * Review writing to same cache-line from multicore.  Do $LK,"CTask",A="MN:CTask"$->task_flags and others need to be in separate cache lines?
 
 * Fix $LK,"KbdLEDsSet",A="MN:KbdLEDsSet"$().
 * NumLock comes on with break key.
+
+* Hymns: mightest, finger
+
+* Get rid of JIFFY and HPET and just use tS.
+
+* Change %h*c so the character is not a arg?
+
+* $LK,"GrLineFat3",A="MN:GrLineFat3"$() needs work.
 
 
 $FG,5$$TX+CX,"TODO? Meh"$$FG$
@@ -152,7 +159,7 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.  I don't know if I fixed this.
 
-* 1/?/2015,8/10/2015 Macro select in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
+* 1/?/2015,8/10/2015 Macro sel in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
 
 * 5/7/14:Something like $LK,"AFSetIP",A="MN:AFSetIP"$ caused hang, then reboot in TestSuite.
 * 5/7/14:#63 Maybe, $LK,"::/Demo/Graphics/Pick3D.CPP"$ crashed in TestSuite.
@@ -204,6 +211,8 @@ $ID,-5$
 
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
+
+* $LK,"MP DepthBuf",A="FF:::/Adam/Gr/SpriteMesh.CPP,dc->depth_buf=e->"$ is a kludge because of dc->depth_buf=NULL in various graphics routines.
 
 * Improve editor undo, add redo.
 
@@ -261,7 +270,9 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * Note: We will never put multiple $LK,"Keyboard Tables",A="FI:::/Kernel/SerialDev/Keyboard.CPP"$.  Each country must make their own version of TempleOS.  The $LK,"Intel Factory ROM",A="FF:::/Doc/Demands.TXT,English"$ will have just English.  Our $LK,"Charter",A="FI:::/Doc/Charter.TXT"$ bans multiple country or architectures in the same version.
 
-* We are not doing UTF, but we will add cyrillic 8-bit Russian font on aux_font. <CTRL-ALT-f> will toggle fonts.  Or, we will redefine upper 128-255 ASCII characters and move 12 border chars to screen font codes 0-26?  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$().  Add aux_font option with $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ configured for any aux_font?
+* 12 border chars in screen font codes 0x02-0x0D.  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$()  LineFeed shows-up in $FG,2$<CTRL-m>$FG$ PersonalMenu.
+
+* Super-simple high speed serial needs flow control.  $FG,2$<CTRL-s>$FG$ and $FG,2$<CTRL-q>$FG$?
 
 
 $FG,5$$TX+CX,"Inspirational Ideas"$$FG$
@@ -354,7 +365,7 @@ $FG,5$$TX+CX,"Uncategorized"$$FG$
 
 * $LK,"gr.screen_image",A="MN:CGrGlbls"$
   >Might want to do ZOOM in U8 graphics and convert screen capture to U8
-  >Might want to reverse bit order
+  >Might want to rev bit order
 
 * This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/SrvCmd.CPP,Fs->catch_except=TRUE"$ causes problems because it
 catches divide and out-of-mem.  Not sure what to do, yet.
@@ -397,7 +408,7 @@ Do not seek your own wealth		$TX,"1 Corinthians 10:24",HTML="http://www.biblegat
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17380 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17400 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$

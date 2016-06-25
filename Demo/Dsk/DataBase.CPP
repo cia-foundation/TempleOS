@@ -1,4 +1,4 @@
-#define DB_FILENAME	"::/Home/DataBaseDemo.BIN"
+#define DB_FILENAME	"~/DataBaseDemo.BIN"
 #define DB_MAX_ACCT	100
 #define DB_ACCT_BLKS	1
 

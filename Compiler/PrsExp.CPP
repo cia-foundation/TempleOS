@@ -601,16 +601,16 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
   *_local_var=NULL;
   *paren_prec=PREC_NULL;
   switch (cc->token) {
-    sub_switch_start:
+    start:
       if (PREC_UNARY_PRE>*max_prec)
 	*max_prec=PREC_UNARY_PRE;
       *unary_pre_prec=PREC_UNARY_PRE;
-      sub_switch_start:
+      start:
 	case '~': i=IC_COM;		break;
 	case '!': i=IC_NOT;		break;
 	case '-': i=IC_UNARY_MINUS;	break;
 	case '*': i=IC_DEREF;		break;
-      sub_switch_end:
+      end:
 	Lex(cc); //Skip op
 	break;
       case '&':
@@ -665,12 +665,12 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	}
 	i=IC_ADDR;
 	break;
-    sub_switch_end:
+    end:
       PrsPush(ps,tempc);
       PrsPush(ps,PREC_UNARY_PRE<<16+i);
       return PE_UNARY_TERM2;
 
-    sub_switch_start:
+    start:
       case TK_I64:
       case TK_CHAR_CONST:
       case TK_INS_BIN_SIZE:
@@ -714,7 +714,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	}
 	Lex(cc);
 	break;
-    sub_switch_end:
+    end:
       if (PREC_TERM>*max_prec)
 	*max_prec=PREC_TERM;
       return PE_MAYBE_MODIFIERS;
@@ -741,11 +741,11 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	return PE_UNARY_MODIFIERS;
       }
 
-    sub_switch_start:
+    start:
       case '+': 				  break;
       case TK_PLUS_PLUS:   cc->flags|=CCF_PREINC; break;
       case TK_MINUS_MINUS: cc->flags|=CCF_PREDEC; break;
-    sub_switch_end:
+    end:
       if (PREC_UNARY_PRE>*max_prec)
 	*max_prec=PREC_UNARY_PRE;
       *unary_pre_prec=PREC_UNARY_PRE;
@@ -1091,14 +1091,14 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       ICAdd(cc,IC_ADD,0,tempc);
       cc->flags&=~(CCF_RAX|CCF_ARRAY);
       return PE_UNARY_MODIFIERS;
-    sub_switch_start:
+    start:
       case TK_PLUS_PLUS:
 	cc->flags|=CCF_POSTINC;
 	break;
       case TK_MINUS_MINUS:
 	cc->flags|=CCF_POSTDEC;
 	break;
-    sub_switch_end:
+    end:
       if (!*unary_post_prec)
 	*unary_post_prec=PREC_UNARY_POST;
       Lex(cc);

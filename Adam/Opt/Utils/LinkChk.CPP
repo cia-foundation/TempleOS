@@ -20,13 +20,13 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
       Fs->put_doc=old_doc;
       DocUnlock(old_doc);
       if (!found) {
-	PutFileLink(doc->filename.name,doc_e->y);
+	PutFileLink(doc->filename.name,,doc_e->y);
 	"$$RED$$ %04d:%s\n$$FG$$",doc_e->y,st;
 	res++;
       }
       Free(st);
     } else if (doc_e->type_u8==DOCT_ERROR) {
-      PutFileLink(doc->filename.name,doc_e->y);
+      PutFileLink(doc->filename.name,,doc_e->y);
       "$$RED$$ Doc Error\n$$FG$$";
       res++;
     }

@@ -9,7 +9,7 @@ _GR_UPDATE_LINE64::
 
 	MOV	RAX,U64 SF_ARG2[RBP]
 	MOV	RSI,U64 [RAX]		//rsi=src
-	MOV	RBX,U64 [&reverse_bits_table]
+	MOV	RBX,U64 [&rev_bits_table]
 	MOV	RCX,U64 SF_ARG3[RBP]	//rcx=d
 	MOV	RAX,U64 SF_ARG4[RBP]
 	MOV	RDI,U64 [RAX]		//rdi=image
@@ -62,7 +62,7 @@ _GR_UPDATE_LINE64_FLUSH_CACHE::
 
 	MOV	RAX,U64 SF_ARG2[RBP]
 	MOV	RSI,U64 [RAX]		//rsi=src
-	MOV	RBX,U64 [&reverse_bits_table]
+	MOV	RBX,U64 [&rev_bits_table]
 	MOV	RCX,U64 SF_ARG3[RBP]	//rcx=d
 	MOV	RAX,U64 SF_ARG4[RBP]
 	MOV	RDI,U64 [RAX]		//rdi=image

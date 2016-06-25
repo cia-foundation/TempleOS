@@ -450,7 +450,7 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
 	  ">S;\t\t\t//Single step\n"
 	  ">B2;\t\t\t//Clear all break points\n"
 	  ">G2;\t\t\t//Clear all break points and Go\n\n"
-	  "After resuming, <CTRL-ALT-t> changes focus task\n"
+	  "After resuming, <CTRL-ALT-n> next focus task\n"
 	  "After resuming, <CTRL-ALT-v> flushes screen VGA cache\n";
   else {
     LBtr(&task->task_flags,TASKf_DISABLE_BPTS);
@@ -526,7 +526,7 @@ U0 DbgHelp()
 	">G;\t\t\t\t//Resume execution.\n"
 	">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
 	">Exit;\t\t\t\t//Exit (kill) task.\n\n"
-	"After resuming, <CTRL-ALT-t> changes focus task.\n"
+	"After resuming, <CTRL-ALT-n> next focus task.\n"
 	"After resuming, <CTRL-ALT-v> flushes screen VGA cache.\n\n";
 }
 
@@ -560,7 +560,7 @@ U0 Dbg2()
 
 U0 Fault3(I64 fault_num,I64 fault_err_code)
 {
-  nounusedwarn fault_err_code;
+  no_warn fault_err_code;
   PUSHFD
   CLI
   if (Gs->num && dbg.mp_crash) {

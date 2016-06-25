@@ -36,7 +36,7 @@ U0 PDAnswer(U8 *a,I64 len)
 
 U0 MPPalindrome(I64 dummy=0)
 {
-  nounusedwarn dummy;
+  no_warn dummy;
   U8 *src=buf+BORDER_CHARS+size*Gs->num/mp_cnt,
 	*f,*b;
   I64 len,best=0,

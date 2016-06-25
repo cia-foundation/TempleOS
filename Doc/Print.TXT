@@ -47,7 +47,7 @@ $FG,2$"%Z"$FG$ $LK,"DefineLstLoad",A="MN:DefineLstLoad"$() subentry.  Pass sub_e
 
 $FG,2$"%Q"$FG$ convert "\" to "\\" and quote to backslash quote. (For use in creating strs in strs.)
 
-$FG,2$"%q"$FG$ reverse a $FG,2$"%Q"$FG$.
+$FG,2$"%q"$FG$ rev a $FG,2$"%Q"$FG$.
 $ID,-2$
 
 $FG,5$$TX+CX,"Print Family"$$FG$

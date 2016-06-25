@@ -25,7 +25,7 @@ U0 RedSeaFreeLstBuild(CDrv *dv)
 {
   Bool unlock;
   CFreeLst *tempf;
-  I64 i,first=dv->data_area,max_blk=dv->size+dv->base_offset;
+  I64 i,first=dv->data_area,max_blk=dv->size+dv->drv_offset;
   try {
     unlock=DrvLock(dv);
     if (dv->next_free)
@@ -61,16 +61,16 @@ U0 RedSeaDrvInit(CDrv *dv)
   Bool unlock;
   try {
     unlock=DrvLock(dv);
-    RBlks(dv,&br,dv->base_offset,1);
+    RBlks(dv,&br,dv->drv_offset,1);
     if (br.signature!=MBR_PT_REDSEA || br.signature2!=0xAA55)
       throw('Drv');
     dv->fs_type=FSt_REDSEA;
     RedSeaFreeFreeLst(dv);
     dv->spc=1;
     dv->size=br.sects;
-    dv->data_area=dv->base_offset+br.bitmap_sects;
+    dv->data_area=dv->drv_offset+br.bitmap_sects;
     dv->root_cluster=br.root_cluster;
-    dv->fat1=dv->fat2=dv->base_offset+1;
+    dv->fat1=dv->fat2=dv->drv_offset+1;
     DrvFATBlkAlloc(dv);
     if (unlock)
       DrvUnlock(dv);
@@ -84,7 +84,7 @@ Bool RedSeaDrvValidate(U8 drv_let)
   CDrv *dv;
   CRedSeaBoot br;
   if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_REDSEA &&
-	RBlks(dv,&br,dv->base_offset,1) && br.signature==MBR_PT_REDSEA &&
+	RBlks(dv,&br,dv->drv_offset,1) && br.signature==MBR_PT_REDSEA &&
 	br.signature2==0xAA55 && br.sects==dv->size)
     return TRUE;
   else
@@ -97,7 +97,7 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
   CDirEntry *d_native;
   CRedSeaBoot *br=CAlloc(BLK_SIZE);
   CDrv *dv=Let2Drv(drv_let);
-  I64 i,n;
+  I64 i,n,root_dir_blks;
   try {
     DrvLock(dv);
 //	DrvTypeSet(drv_let,FSt_REDSEA);
@@ -105,7 +105,7 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
     dv->fs_type=FSt_REDSEA;
     br->signature=MBR_PT_REDSEA;
     br->signature2=0xAA55;
-    br->base_offset=dv->base_offset; //For CD/DVD image copy.
+    br->drv_offset=dv->drv_offset; //For CD/DVD image copy.
     br->sects=dv->size;
     n=(br->sects+BLK_SIZE<<3-1)/BLK_SIZE<<3;
     br->bitmap_sects=n;
@@ -116,21 +116,23 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
       i=n+1;
     else
       i=dv->size;
-    WZeroBlks(dv,dv->base_offset,i);
+    WZeroBlks(dv,dv->drv_offset,i);
 
-    WBlks(dv,br,dv->base_offset,1);
+    WBlks(dv,br,dv->drv_offset,1);
     RedSeaDrvInit(dv);
     ClustersAlloc(dv,0,1,FALSE);	//Alloc #1
-    br->root_cluster=ClustersAlloc(dv,0,1,FALSE);
-    WBlks(dv,br,dv->base_offset,1);
-    root_dir=CAlloc(BLK_SIZE);
+
+    root_dir_blks=MaxI64(1,dv->bd->init_root_dir_blks);
+    br->root_cluster=ClustersAlloc(dv,0,root_dir_blks,FALSE);
+    WBlks(dv,br,dv->drv_offset,1);
+    root_dir=CAlloc(BLK_SIZE*root_dir_blks);
 
     d_native=root_dir-offset(CDirEntry.start);
 
     d_native->attr=RS_ATTR_DIR|RS_ATTR_CONTIGUOUS;
     *d_native->name='.';
     d_native->cluster=br->root_cluster;
-    d_native->size=BLK_SIZE;
+    d_native->size=BLK_SIZE*root_dir_blks;
     d_native->datetime=Now;
 
     d_native(U8 *)+=CDIR_SIZE;
@@ -141,7 +143,7 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
     d_native->cluster=br->root_cluster;
     d_native->datetime=Now;
 
-    WBlks(dv,root_dir,br->root_cluster,1);
+    WBlks(dv,root_dir,br->root_cluster,root_dir_blks);
     RedSeaDrvInit(dv);
     DrvUnlock(dv);
   } catch
@@ -389,9 +391,9 @@ Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *de,Bool free_old_chain)
 	  WBlks(dv,buf,c,dir_size>>BLK_SIZE_BITS);
 	  if (cur_dir_cluster==dv->root_cluster) {
 	    br=CAlloc(BLK_SIZE);
-	    RBlks(dv,br,dv->base_offset,1);
+	    RBlks(dv,br,dv->drv_offset,1);
 	    br->root_cluster=c;
-	    WBlks(dv,br,dv->base_offset,1);
+	    WBlks(dv,br,dv->drv_offset,1);
 	    Free(br);
 	    dv->root_cluster=c;
 	  } else {
@@ -599,13 +601,14 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
   return res;
 }
 
-Bool RedSeaMkDir(CDrv *dv,U8 *cur_dir,U8 *name)
-{
-  I64 size=BLK_SIZE,c,cur_dir_cluster=Name2DirCluster(dv,cur_dir);
+Bool RedSeaMkDir(CDrv *dv,U8 *cur_dir,U8 *name,I64 entry_cnt)
+{//entry_cnt is for preallocating dir blks.
+  I64	c,cur_dir_cluster=Name2DirCluster(dv,cur_dir),
+	size=CeilU64((entry_cnt+3)<<6,BLK_SIZE);
+#assert CDIR_SIZE==64
   U8 *buf=CAlloc(size);
   CDirEntry *d_native=buf-offset(CDirEntry.start);
   Bool unlock_break;
-
   try {
     unlock_break=BreakLock;
     c=FileWrite(name,buf,size,0,RS_ATTR_DIR);

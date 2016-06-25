@@ -114,13 +114,11 @@ mt_done:
 }
 
 #help_index "DolDoc/Compiler;Compiler"
-public I64 ExeDoc(CDoc *doc,Bool just_load=FALSE)
+public I64 ExeDoc(CDoc *doc,I64 ccf_flags=0)
 {//JIT Compile and execute a document.
   I64 res;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
-  CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
-  if (just_load)
-    cc->flags|=CCF_JUST_LOAD;
+  CCmpCtrl *cc=CmpCtrlNew(,ccf_flags|CCF_DONT_FREE_BUF);
   if (Fs->last_lex!=&Fs->next_lex)
     cc->opts=Fs->last_lex->opts;
   QueIns(cc,Fs->last_lex);

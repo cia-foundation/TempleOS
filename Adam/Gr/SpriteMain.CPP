@@ -581,7 +581,7 @@ U0 SMTextFamily(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *root,CDC *dc,
 
 I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *root,
 	CDC *dc,I64 xx,I64 yy,I64 a1,I64 a2,CColorROPU32 bm_bkcolor,
-	Bool select,I64 xx1=0,I64 yy1=0,I64 xx2=0,I64 yy2=0,I64 *_cur_elem_num)
+	Bool sel,I64 xx1=0,I64 yy1=0,I64 xx2=0,I64 yy2=0,I64 *_cur_elem_num)
 {
   I64 i,msg_code,x=xx,y=yy,x1=a1,y1=a2,x2=a1,y2=a2,old_width;
   CSprite *tempg,*tempg1,*insert_pt;
@@ -590,7 +590,7 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *root,
   insert_pt=SpriteSetSettings(,root,*_cur_elem_num,xx,yy,,,&x,&y);
   x+=xx; y+=yy;
 
-  if (select) {
+  if (sel) {
     xx1=a1; yy1=a2;
     xx2=a1; yy2=a2;
     old_width=dc->pen_width;
@@ -1077,7 +1077,7 @@ I64 SpriteMainEd(CDoc *doc)
 	  break;
 	case MSG_IP_L_DOWN:
 	  switch (eletype) {
-	    sub_switch_start:
+	    start:
 	      case SPT_LINE:
 		tempg=SMLine(dc,x,y,a1,a2,color);
 		break;
@@ -1124,7 +1124,7 @@ I64 SpriteMainEd(CDoc *doc)
 	      case SPT_POLYPT:
 		tempg=SMPolyPoint(dc,x,y,a1,a2,color);
 		break;
-	    sub_switch_end:
+	    end:
 	      if (tempg) {
 		QueIns(tempg,insert_pt->last);
 		SpriteEdUpdate(doc,doc_ce,root);

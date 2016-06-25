@@ -1,3 +1,11 @@
+U0 HomeSet(U8 *dirname)
+{//Change home directory.
+  dirname=DirNameAbs(dirname);
+  Free(blkdev.home_dir);
+  blkdev.home_dir=AStrNew(dirname);
+  Free(dirname);
+}
+
 Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
 {//Change directory. Optionally, make directories, too.
   I64 maxlen,cur_dir_cluster=0;
@@ -5,7 +13,7 @@ Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
   CDrv *dv;
   Bool res=TRUE;
   if (!dirname)
-    dirname="::/Home";
+    dirname="~";
   else if (!*dirname)
     return TRUE;
   if (dirname[1]==':') {
@@ -36,6 +44,12 @@ Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
       StrLastRem(new_cur_dir,"/");
       if (!*new_cur_dir)
 	StrCpy(new_cur_dir,"/");
+    } else if (!StrCmp(buf,"~")) {
+      Free(new_cur_dir);
+      new_cur_dir=MAlloc(StrLen(blkdev.home_dir+2)+1+StrLen(chg_to_buf)+1);
+      StrCpy(new_cur_dir,blkdev.home_dir+2);
+      if (Fs->cur_dv!=Let2Drv('~') && !Drv('~'))
+	return FALSE;
     } else if (StrCmp(buf,".") && *buf) {
       dv=Fs->cur_dv;
       cur_dir_cluster=Name2DirCluster(dv,new_cur_dir);
@@ -99,6 +113,11 @@ I64 Dir(U8 *files_find_mask,Bool full)
     PrintErr("Invalid Drive\n");
   else {
     if (tempde1) {
+      Free(st);
+      st=MAllocIdent(tempde1->full_name);
+      StrLastRem(st,"/");
+      if (!st[2])
+	StrCpy(st+2,"/");
 //Find max columns
       tempde2=tempde1;
       while (tempde2) {
@@ -129,9 +148,9 @@ I64 Dir(U8 *files_find_mask,Bool full)
 		csize,tempde1->size;
 	}
 	if (tempde1->attr & RS_ATTR_DIR)
-	  PutDirLink(tempde1->name);
+	  PutDirLink(tempde1->name,tempde1->full_name);
 	else
-	  PutFileLink(tempde1->name);
+	  PutFileLink(tempde1->name,tempde1->full_name);
 	'\n';
 	DirEntryDel(tempde1);
 	tempde1=tempde2;
@@ -143,8 +162,9 @@ I64 Dir(U8 *files_find_mask,Bool full)
   return res;
 }
 
-Bool MkDir(U8 *filename)
+Bool MkDir(U8 *filename,I64 entry_cnt=0)
 {//Make directory. $LK,"Cd",A="MN:Cd"$() can also make directories.
+//entry_cnt is for preallocating dir blks, leave it zero if you like.
   U8 *name;
   CDirContext *dirc;
   Bool res=FALSE;
@@ -160,10 +180,10 @@ Bool MkDir(U8 *filename)
 	      SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
 	switch (dirc->dv->fs_type) {
 	  case FSt_REDSEA:
-	    res=RedSeaMkDir(dirc->dv,Fs->cur_dir,name);
+	    res=RedSeaMkDir(dirc->dv,Fs->cur_dir,name,entry_cnt);
 	    break;
 	  case FSt_FAT32:
-	    res=FAT32MkDir(dirc->dv,Fs->cur_dir,name);
+	    res=FAT32MkDir(dirc->dv,Fs->cur_dir,name,entry_cnt);
 	    break;
 	  case FSt_ISO9660:
 	    PrintErr("Not Writable\n");

@@ -12,7 +12,7 @@ U0 TXTPutS(CDoc *doc,U8 *st,I64 *_col)
 	} while (*_col&7);
 	break;
 
-      sub_switch_start:
+      start:
 	case 'ã':	ptr="pi";	break;
 	case 'é':	ptr="theta";	break;
 	case 'è':	ptr="phi";	break;
@@ -20,7 +20,7 @@ U0 TXTPutS(CDoc *doc,U8 *st,I64 *_col)
 	case 'ì':	ptr="inf";	break;
 	case 'æ':	ptr="u";	break;
 	case CH_SHIFT_SPACE: ptr=" ";	break;
-      sub_switch_end:
+      end:
 	DocPrint(doc,ptr);
 	*_col=*_col+StrLen(ptr);
 	break;

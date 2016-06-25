@@ -62,6 +62,15 @@ CDrv *DrvNextFree(U8 first_drv_let='C')
   return NULL; //never gets here
 }
 
+U0 DrvDel(CDrv *dv)
+{//Delete drv
+  if (dv->fs_type==FSt_REDSEA && dv->next_free)
+    RedSeaFreeFreeLst(dv);
+  Free(dv->cur_fat_blk);
+  Free(dv->fis);
+  MemSet(dv,0,sizeof(CDrv));
+}
+
 U0 DrvFATBlkAlloc(CDrv *dv)
 {
   DrvChk(dv);
@@ -72,7 +81,7 @@ U0 DrvFATBlkAlloc(CDrv *dv)
   RBlks(dv,dv->cur_fat_blk,dv->fat1,1);
 }
 
-U0 DrvFATBlkClean(CDrv *dv,I64 fat_select=3)
+U0 DrvFATBlkClean(CDrv *dv,I64 fat_sel=3)
 {
   if ((dv->fs_type==FSt_FAT32 || dv->fs_type==FSt_REDSEA) &&
        Bt(&dv->fat_blk_dirty,0)) {
@@ -80,9 +89,9 @@ U0 DrvFATBlkClean(CDrv *dv,I64 fat_select=3)
       WBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
       LBtr(&dv->fat_blk_dirty,0);
     } else {
-      if (fat_select==3 || !fat_select)
+      if (fat_sel==3 || !fat_sel)
 	WBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
-      if (fat_select==3 || fat_select==1) {
+      if (fat_sel==3 || fat_sel==1) {
 	WBlks(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
 	LBtr(&dv->fat_blk_dirty,0);
       }
@@ -90,7 +99,7 @@ U0 DrvFATBlkClean(CDrv *dv,I64 fat_select=3)
   }
 }
 
-U0 DrvFATBlkSet(CDrv *dv,I64 c,I64 fat_select=3)
+U0 DrvFATBlkSet(CDrv *dv,I64 c,I64 fat_sel=3)
 {
   I64 fat_blk_num;
   if (c==INVALID_CLUSTER)
@@ -106,9 +115,9 @@ U0 DrvFATBlkSet(CDrv *dv,I64 c,I64 fat_select=3)
       throw('Drv');
   }
   if (fat_blk_num!=dv->cur_fat_blk_num) {
-    DrvFATBlkClean(dv,fat_select);
+    DrvFATBlkClean(dv,fat_sel);
     dv->cur_fat_blk_num=fat_blk_num;
-    if (fat_select==3 || !fat_select)
+    if (fat_sel==3 || !fat_sel)
       RBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
     else
       RBlks(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
@@ -139,8 +148,10 @@ I64 Let2BlkDevType(U8 drv_let)
   drv_let=ToUpper(drv_let);
   if ('A'<=drv_let<='B')
     return BDT_RAM;
-  if ('C'<=drv_let<='S')
+  if ('C'<=drv_let<='L')
     return BDT_ATA;
+  if ('M'<=drv_let<='S')
+    return BDT_FILE;
   if ('T'<=drv_let<='Z')
     return BDT_ATAPI;
   return BDT_NULL;
@@ -154,6 +165,8 @@ CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE)
   else {
     if (drv_let==':')
       drv_let=blkdev.boot_drv_let;
+    else if (drv_let=='~')
+      drv_let=*blkdev.home_dir;
     drv_let=ToUpper(drv_let);
     if (!('A'<=drv_let<='Z')) {
       if (except)
@@ -188,7 +201,7 @@ U0 DskCacheInvalidate(CDrv *dv)
     BlkDevInit(bd);
     if (bd->flags & BDF_READ_CACHE)
       DskCacheInvalidate2(dv);
-    if (dv->fs_type==FSt_ISO9660 && !(bd->flags & BDF_READ_ONLY_OVERRIDE))
+    if (bd->type==BDT_ATAPI && !(bd->flags & BDF_READ_ONLY_OVERRIDE))
       ISODrvInit(dv,(32767/bd->blk_size+1)*bd->blk_size>>BLK_SIZE_BITS);
     if (unlock)
       DrvUnlock(dv);
@@ -228,7 +241,7 @@ Bool Drv(U8 drv_let)
   if (dv!=Fs->cur_dv) {
     if (bd->flags & BDF_REMOVABLE && !(bd->flags & BDF_INITIALIZED))
       ChgDsk(Drv2Let(dv));
-    if (bd->type==BDT_RAM)
+    if (bd->type==BDT_RAM || bd->type=BDT_FILE)
       BlkDevInit(bd);
   }
   Fs->cur_dv=dv;
@@ -275,7 +288,7 @@ U8 *DrvModelNum(U8 drv_let=0)
   return res;
 }
 
-U8 blkdev_text_attr[BDT_NUM_TYPES]={BLACK,LTCYAN,WHITE,LTBLUE};
+U8 blkdev_text_attr[BDT_NUM_TYPES]={BLACK,LTCYAN,WHITE,LTGREEN,LTBLUE};
 U8 drv_text_attr[3]={BLACK,BLUE,RED};
 
 U8 DrvTextAttrGet(U8 drv_let=0)
@@ -284,6 +297,8 @@ U8 DrvTextAttrGet(U8 drv_let=0)
     drv_let=Drv2Let(Fs->cur_dv);
   else if (drv_let==':')
     drv_let=blkdev.boot_drv_let;
+  else if (drv_let=='~')
+    drv_let=*blkdev.home_dir;
   drv_let=ToUpper(drv_let);
   if ('A'<=drv_let<='Z')
     return blkdev_text_attr[Let2BlkDevType(drv_let)]<<4|
@@ -298,7 +313,7 @@ U0 DrvRep()
   CBlkDev *bd;
   I64 ch,i,drv_let,attr;
   U8 *st;
-  "\nDefined Drives:\n\n";
+  "\nDefined Drives:\n";
   for (i=0,dv=blkdev.drvs;i<NUM_DRVS;i++,dv++) {
     if (dv->dv_signature==DRV_SIGNATURE_VAL) {
       bd=dv->bd;
@@ -321,9 +336,8 @@ U0 DrvRep()
 	"   Serial#:%s\n",st;
 	Free(st);
       }
-      "   %016X-%016X\n$$FG$$$$BG$$",
-	    dv->base_offset,dv->base_offset+dv->size-1;
-      dv->base_offset,dv->base_offset+dv->size-1;
+      "   %016X-%016X\n$$FG$$$$BG$$",dv->drv_offset,dv->drv_offset+dv->size-1;
     }
   }
+  "Home Dir:\"%s\"\n",blkdev.home_dir;
 }

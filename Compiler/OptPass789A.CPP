@@ -8,7 +8,7 @@ cc->pass==10 is final pass, code is placed into buf.
 */
   CIntermediateCode *tempi,*tempi_next;
   I64 i,cnt,num_lines=cc->max_line+1-cc->min_line,ip=0,ip2;
-  U8  *ptr;
+  U8  *ptr,saved_a1_a2_r[3*sizeof(CICArg)];
   CCodeMisc *lb;
   CAOT *tempaot;
   CAOTAbsAddr *tempa;
@@ -18,7 +18,6 @@ cc->pass==10 is final pass, code is placed into buf.
   CDbgInfo *dbg_info;
   CAOTCtrl *aotc=cc->aotc;
   Bool short_jmp;
-  CICArg saved_p123[3];
   CHashClass *tempc;
   CHashFun *tempf;
   CHashGlblVar *tempg;
@@ -42,8 +41,8 @@ cc->pass==10 is final pass, code is placed into buf.
 
   cc->last_float_op_ic=NULL;
   tempi=&cc->coc.coc_root;
+  tempi->ic_last_start=-1;
   tempi->ic_cnt=0;
-  tempi->ic_last_cnt=-1;
   tempi=tempi->next;
   while (tempi->ic_code) {
     tempi_next=tempi->next;
@@ -60,9 +59,9 @@ cc->pass==10 is final pass, code is placed into buf.
 	    ~(ICF_PREV_DELETED|ICF_DONT_RESTORE)|ICF_CODE_FINAL;
       if (cc->pass==7)
 	cc->dont_push_float=Btr(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0);
-      MemCpy(saved_p123,&tempi->a1,3*sizeof(CICArg));
+      MemCpy(saved_a1_a2_r,&tempi->a1,3*sizeof(CICArg));
       tempi->ic_cnt=0;
-      tempi->ic_last_cnt=-1;
+      tempi->ic_last_start=-1;
       if (tempi->a2.type.mode) {
 	if (tempi->ic_flags & ICF_A2_TO_F64) {
 	  ICFCvt(cc,tempi,REG_RAX,
@@ -93,9 +92,10 @@ cc->pass==10 is final pass, code is placed into buf.
 	  tempi->a1.disp=0;
 	}
       }
+
       switch [tempi->ic_code] {
-	sub_switch_start:
-	  sub_switch_start:
+	start:
+	  start:
 	    case IC_ABS_ADDR:
 	      ICU16(tempi,0xB848);
 	      ICU64(tempi,tempi->ic_data);
@@ -145,7 +145,7 @@ cc->pass==10 is final pass, code is placed into buf.
 		tempa->ip=ip2+tempi->ic_cnt-8;
 	      }
 	      break;
-	  sub_switch_end:
+	  end:
 	    ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  MDF_REG+RT_I64,REG_RAX,0,ip2);
 	    break;
@@ -381,7 +381,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	      }
 	    }
 	    break;
-	sub_switch_end:
+	end:
 	  tempi->ic_flags&=~ICF_CODE_FINAL;
 	  break;
 	case IC_LEAVE:
@@ -613,14 +613,14 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICAssignPostIncDec(tempi,SLASH_OP_DEC,ip2);
 	  break;
 	case IC_SHL_EQU:
-	  ICShiftEqu(tempi,tempi->a1.type_pointed_to,
+	  ICShiftEqu(tempi,tempi->a1_type_pointed_to,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
 		0xE0D1E0D3E0C1,0xE0D1E0D3E0C1,ip2);
 	  break;
 	case IC_SHR_EQU:
-	  ICShiftEqu(tempi,tempi->a1.type_pointed_to,
+	  ICShiftEqu(tempi,tempi->a1_type_pointed_to,
 		tempi->r.type,tempi->r.reg,tempi->r.disp,
 		tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
@@ -655,7 +655,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_ADD_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed_to,
+	    ICAddSubEctEqu(tempi,tempi->a1_type_pointed_to,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
@@ -665,7 +665,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_SUB_EQU:
 	  if (tempi->ic_flags&ICF_USE_INT)
-	    ICAddSubEctEqu(tempi,tempi->a1.type_pointed_to,
+	    ICAddSubEctEqu(tempi,tempi->a1_type_pointed_to,
 		  tempi->r.type,tempi->r.reg,tempi->r.disp,
 		  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
 		  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,
@@ -1069,7 +1069,7 @@ cc->pass==10 is final pass, code is placed into buf.
     cnt=tempi->ic_cnt;
     if (tempi->ic_flags&ICF_DEL_PREV_INS) {
       if (cc->pass>8)
-	cnt=tempi->ic_last_cnt;
+	cnt=tempi->ic_last_start;
       tempi->ic_flags&=~ICF_DEL_PREV_INS;
     }
     if (cnt && buf)
@@ -1090,7 +1090,7 @@ op789A_skip_copy:
       "$$FG$$";
     }
     if (!(tempi->ic_flags&(ICF_CODE_FINAL|ICF_DONT_RESTORE)))
-      MemCpy(&tempi->a1,saved_p123,3*sizeof(CICArg));
+      MemCpy(&tempi->a1,saved_a1_a2_r,3*sizeof(CICArg));
     ip+=cnt;
     if (tempi->ic_cnt>=IC_BODY_SIZE && tempi->ic_code!=IC_ASM)
       throw('Compiler');

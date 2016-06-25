@@ -123,4 +123,4 @@ U0 TourMenu()
 WinMgrSync(2);
 TourMenu;
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
-"Cd(\"::/Home\");Dir;\n";
+"Cd;Dir;\n";

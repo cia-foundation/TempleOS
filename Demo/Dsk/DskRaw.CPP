@@ -17,19 +17,19 @@ U0 RawAccess(I64 drv_let=0)
   //Temporarily change partition range to full device.
   //Normally, you are limited to just your partition.
   //This is obviously $BK,1$dangerous$BK,0$!
-  old_offset=dv->base_offset;
+  old_offset=dv->drv_offset;
   old_size  =dv->size;
-  dv->base_offset=bd->min_blk;
-  dv->size=bd->max_blk-bd->min_blk+1;
+  dv->drv_offset=0;
+  dv->size=bd->max_blk+1;
 
   try {
-    blk=GetI64("Blk to Read: ",old_offset,bd->min_blk,bd->max_blk);
+    blk=GetI64("Blk to Read: ",old_offset,0,bd->max_blk);
     RBlks(dv,buf,blk,1);
     D(buf,BLK_SIZE);
   } catch
     PutExcept;
 
-  dv->base_offset=old_offset;
+  dv->drv_offset=old_offset;
   dv->size  =old_size;
 
   Free(buf);

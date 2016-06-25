@@ -48,11 +48,11 @@ extern U0 DrawCtrls(CTask *task);
 extern Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
 extern U0 EdCodeTools(CDoc *doc);
 extern U8 *EdSprite(I64 bin_num);
-extern I64 ExeDoc(CDoc *doc,Bool just_load=FALSE);
+extern I64 ExeDoc(CDoc *doc,I64 ccf_flags=0);
 extern I64 FindWiz();
 extern I64 GetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64);
 extern U0 GrPlot0(CDC *dc,I64 x,I64 y);
-extern I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
+extern I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL);
 extern CMenuEntry *MenuEntryFind(CMenu *m,U8 *full_name);
 extern CMenu *MenuFilePush(U8 *filename);
@@ -70,6 +70,7 @@ extern I64 PopUpFile(U8 *filename,
 	Bool warn_ext=TRUE,CTask *parent=NULL,CTask **_pu_task=NULL);
 extern Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,
 	I64 dof_flags=DOF_MIN_SIZE,U8 *header=NULL,U8 *footer=NULL);
+extern I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64);
 extern U8 *PopUpGetStr(U8 *header=NULL);
 extern I64 PopUpMenu(CDoc *doc,I64 dof_flags=0);
 extern Bool PopUpNoYes(U8 *header=NULL,U8 *footer=NULL);

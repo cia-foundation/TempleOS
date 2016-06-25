@@ -860,7 +860,7 @@ U0 EdInsCheckBox()
 
 class CEdLst
 {
-  U8	tag[512]	fmtstr "$$DA-P,A=\"Dft Select    :%s\"$$\n",
+  U8	tag[512]	fmtstr "$$DA-P,A=\"Dft Sel    :%s\"$$\n",
 	define_str[512]	fmtstr "$$DA-P,A=\"Define Str    :%s\"$$\n";
   Bool	refresh		fmtstr "$$CB,\"Refresh Data\"$$\n";
   I64	type		fmtstr "$$LS,D=\"ST_INT_SIZE_TYPES\"$$\n";

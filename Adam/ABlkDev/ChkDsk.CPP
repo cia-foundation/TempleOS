@@ -55,7 +55,7 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 
   Drv(drv_let);
   "Scanning...\n";
-  size=(dv->size-(dv->data_area-dv->base_offset))/dv->spc;
+  size=(dv->size-(dv->data_area-dv->drv_offset))/dv->spc;
   bpc=dv->spc<<BLK_SIZE_BITS;
   bits=CAlloc((size+7)>>3);
   bits2=CAlloc((size+7)>>3+BLK_SIZE);
@@ -159,7 +159,7 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   U32 *bits2;
   Drv(drv_let);
   "Scanning...\n";
-  size=(dv->size-(dv->data_area-dv->base_offset))/dv->spc;
+  size=(dv->size-(dv->data_area-dv->drv_offset))/dv->spc;
   bpc=dv->spc<<BLK_SIZE_BITS;
   bits=CAlloc((size+7)>>3);
   bits2=CAlloc(size*4+BLK_SIZE);
@@ -232,15 +232,14 @@ public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
 U0 RedSeaDrvView(U8 drv_let=0)
 {
   CDrv *dv=Let2Drv(drv_let);
-  I64 lohi,c1,i,x,y,l,s;
+  I64 lohi,c1,i,x,y,l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
+	s=dv->size+dv->drv_offset-dv->data_area;
   U8 *bitmap;
   CDC *dc=DCAlias;
 
-  l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
-	s=(dv->size+dv->spc-1)/dv->spc;
-
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
+  WinBorder(ON);
   DocCursor;
   DocClear;
   DCFill;
@@ -275,14 +274,14 @@ U0 RedSeaDrvView(U8 drv_let=0)
 U0 FAT32DrvView(U8 drv_let=0)
 {
   CDrv *dv=Let2Drv(drv_let);
-  I64 lohi,c1,i,x,y,l,s;
+  I64 lohi,c1,i,x,y,l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
+	s=(dv->size+dv->spc-1)/dv->spc-(2+dv->data_area-dv->drv_offset);
   U32 *bitmap;
   CDC *dc=DCAlias;
-  l=(GR_HEIGHT-3*FONT_HEIGHT)*(GR_WIDTH-FONT_WIDTH<<1),
-	s=(dv->size+dv->spc-1)/dv->spc;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinMax;
+  WinBorder(ON);
   DocCursor;
   DocClear;
   DCFill;
@@ -357,8 +356,8 @@ public U0 DskView(U8 drv_let=0)
   for (i=0;i<NUM_DRVS;i++) {
     dv=&blkdev.drvs[i];
     if (bd==dv->bd && dv->fs_type) {
-      sect_start=-(dv->base_offset*2*ã/(bd->max_blk+1));
-      sect_end	=-((dv->base_offset+dv->size)*2*ã/(bd->max_blk+1));
+      sect_start=-(dv->drv_offset*2*ã/(bd->max_blk+1));
+      sect_end	=-((dv->drv_offset+dv->size)*2*ã/(bd->max_blk+1));
       dc->color=BLACK;
       GrLine(dc,h>>1,v>>1,
 	    h>>1+radius*Cos(sect_start),
@@ -392,7 +391,7 @@ I64 RedSeaUnusedDrvSpace(U8 drv_let=0)
   I64 res=0,i,l;
   U8 *bitmap;
   try {
-    l=(dv->size+dv->spc-1)/dv->spc;
+    l=dv->size+dv->drv_offset-dv->data_area;
     i=((l+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
     RBlks(dv,bitmap,dv->fat1,i);
@@ -410,7 +409,7 @@ I64 FAT32UnusedDrvSpace(U8 drv_let=0)
   I64 res=0,i,l;
   U32 *bitmap;
   try {
-    l=(dv->size+dv->spc-1)/dv->spc;
+    l=(dv->size+dv->spc-1)/dv->spc-(2+dv->data_area-dv->drv_offset);
     i=(l*4+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
     RBlks(dv,bitmap,dv->fat1,i);

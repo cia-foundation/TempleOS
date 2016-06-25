@@ -30,19 +30,39 @@ Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE)
 
 Bool BlkDevInit(CBlkDev *bd)
 {
+  CDirEntry de;
+  U8 buf[STR_LEN];
   CDrv *dv=Let2Drv(bd->first_drv_let);
-  Bool res=FALSE;
+  Bool res=FALSE,invalid=FALSE;
   if (!LBts(&bd->flags,BDf_INITIALIZED)) {
     bd->flags|=BDF_INIT_IN_PROGRESS;
     switch (bd->type) {
-      case BDT_RAM:
-	if (!bd->RAM_dsk) {
-	  bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);
-	  bd->max_blk=MSize(bd->RAM_dsk)>>BLK_SIZE_BITS-1;
-	}
+      start:
+	case BDT_RAM:
+	  if (!bd->RAM_dsk) {
+	    bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);
+	    bd->max_blk=MSize(bd->RAM_dsk)>>BLK_SIZE_BITS-1;
+	  }
+	  break;
+	case BDT_FILE:
+	  if (!bd->file_dsk_name) {
+	    StrPrint(buf,"%C:/Drv%C.DRV.C",
+		  blkdev.boot_drv_let,bd->first_drv_let);
+	    bd->file_dsk_name=AStrNew(buf);
+	  }
+	  if (FileFind(bd->file_dsk_name,&de,FUF_JUST_FILES))
+	    bd->max_blk=de.size>>BLK_SIZE_BITS-1;
+	  else {
+	    invalid=TRUE;
+	    if (bd->max_blk<7)
+	      bd->max_blk=7;
+	  }
+	  bd->file_dsk=FOpen(bd->file_dsk_name,"wc+",bd->max_blk+1);
+	  break;
+      end:
 	dv->fs_type=FSt_REDSEA;
-	dv->size=bd->max_blk+1;
-	if (RedSeaDrvValidate(bd->first_drv_let))
+	dv->size=bd->max_blk+1-bd->drv_offset;
+	if (!invalid && RedSeaDrvValidate(bd->first_drv_let))
 	  RedSeaDrvInit(dv);
 	else
 	  RedSeaFmt(bd->first_drv_let);
@@ -89,6 +109,8 @@ CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
 {//Locate free slot for new BlkDev, like during $LK,"Mount",A="MN:Mount"$().
   I64 i=0;
   CBlkDev *res;
+  if (Let2BlkDevType(first_drv_let)!=type)
+    throw('BlkDev');
   do {
     res=&blkdev.blkdevs[i];
     if (res->bd_signature!=BD_SIGNATURE_VAL) {
@@ -114,6 +136,14 @@ CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
   } while (++i<NUM_BLKDEVS);
   throw('BlkDev');
   return NULL; //never gets here
+}
+
+U0 BlkDevDel(CBlkDev *bd)
+{//Delete BlkDev
+  FClose(bd->file_dsk);
+  Free(bd->file_dsk_name);
+  Free(bd->dev_id_record);
+  MemSet(bd,0,sizeof(CBlkDev));
 }
 
 CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE)

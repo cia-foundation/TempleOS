@@ -537,7 +537,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     case ARGT_UIMM64:
       CatPrint(a1_st,"%016X",*ip(I64 *)++);
       break;
-    sub_switch_start:
+    start:
       case ARGT_REL8:
 	disp=*ip(I8 *)++;
 	break;
@@ -547,7 +547,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
       case ARGT_REL32:
 	disp=*ip(I32 *)++;
 	break;
-    sub_switch_end:
+    end:
       disp+=ip;
       if (IsDbg)
 	CatPrint(a1_st,"%p ",disp);

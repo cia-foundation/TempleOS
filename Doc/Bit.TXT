@@ -10,5 +10,5 @@ $FG$Bit operations are "atomic", no interrupt between the reading and writing th
 
 $FG,5$These don't take a pointer, but the actual field.$FG$
 $FG,2$Bsf$FG$:	Bit Scan Fwd (Pos of first low one bit or -1)
-$FG,2$Bsr$FG$:	Bit Scan Reverse (Pos of first high one bit or -1)
+$FG,2$Bsr$FG$:	Bit Scan Rev (Pos of first high one bit or -1)
 $FG,2$BCnt$FG$:	Bit Cnt (Cnt of set bits)

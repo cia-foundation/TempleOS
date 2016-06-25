@@ -15,7 +15,11 @@ U0 BadCodeJump()
     DocDel(doc);
     tempde=tempde->next;
   }
-  num=KbdMouseEvtTime>>GOD_BAD_BITS%cnt;
+
+  FifoU8Flush(god.fifo);
+  GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
+  num=GodBits(GOD_GOOD_BITS)%cnt;
+
   tempde=tempde1;
   while (tempde) {
     num-=tempde->user_data;
@@ -30,7 +34,7 @@ U0 BadCodeJump()
   Free(st);
 }
 
-U8 *WebBookMarks(U8 *filename="::/Home/Downloads/Blog/Bookmarks.html")
+U8 *WebBookMarks(U8 *filename="~/Downloads/Blog/Bookmarks.html")
 {
   U8 *st;
   CDocEntry *doc_e;
@@ -190,10 +194,11 @@ class CRandDecForm
   I64	sec;
 };
 
-class CRandHexForm
+class CRandHex5Form
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Line (Hex):%s\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=5,"
+	"A=\"Line (5-Digit Hex):%5s\"$$\n";
   I64	timestamp;
   I64	cert;
   I64	min;
@@ -618,7 +623,7 @@ U0 InsMyURL()
       }
       break;
     case:
-      if (DocForm(url(CRandHexForm *))) {
+      if (DocForm(url(CRandHex5Form *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="http://qrng.anu.edu.au/NIST.php";
@@ -627,7 +632,7 @@ U0 InsMyURL()
       }
       break;
     case:
-      if (DocForm(url(CRandHexForm *))) {
+      if (DocForm(url(CRandHex5Form *))) {
 	"$$TX,\"Guidelines for Talking with God\","
 	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
 	tag="https://www.fourmilab.ch/hotbits/secure_generate.html";
@@ -677,5 +682,5 @@ U0 InsMyURL()
   Free(url);
 }
 
-if (FileFind("::/Home/Downloads/Words/LinuxDict.TXT"))
-  GodInit("::/Home/Downloads/Words/LinuxDict.TXT");
+if (FileFind("~/Downloads/Words/LinuxDict.TXT"))
+  GodInit("~/Downloads/Words/LinuxDict.TXT");

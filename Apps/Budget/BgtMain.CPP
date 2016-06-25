@@ -2,7 +2,7 @@ extern U0 BgtRegen();
 
 Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
 {//ch=ASCII; sc=scan_code
-  nounusedwarn sc;
+  no_warn sc;
   CBgtEntry *tempb,*tempb1;
   CBgtTemplate *tempt,*tempt1;
   CDocEntry *doc_ce;
@@ -51,7 +51,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
     case 'a':
       PopUpOk(	"Set the name and color of your accounts.\n"
 	    "To delete accounts, manually edit\n"
-	    "$$GREEN$$/Home/Budget/Accts.TXT.Z$$FG$$.");
+	    "$$GREEN$$~/Budget/Accts.TXT.Z$$FG$$.");
       if (PopUpEd(BGT_ACCTS_FILE,Fs)) {
 	BgtAcctsRead;
 	BgtRegen;

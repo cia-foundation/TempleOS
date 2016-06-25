@@ -240,16 +240,17 @@ I64 score0,score1;
 
 #define NUM_PER_SIDE	3
 #define NUM_OBJS	(NUM_PER_SIDE*2+1)
-Bool someone_shooting;
-
+Bool someone_shooting,someone_has_ball;
+F64 shot_land_t;
+	
 class Obj
 {
   I64 team; //-1 is ball
-  F64 x,y,z,DxDt,DyDt,DzDt,ay,radius,stolen_t0;
-  F64 last_t0,next_t0,foul_t0;
+  F64 x,y,z,DxDt,DyDt,DzDt,é,radius,stolen_t0;
+  F64 get_ball_dt,get_ball_é,nearest_man_dd,last_t0,next_t0,foul_t0;
   I64 last_img,next_img;
-  Bool stopped,shooting,has_ball,pad[5];
-} objs[NUM_OBJS],*ball,*human;
+  Bool stopped,shooting,has_ball,nearest_ball,pad[4];
+} objs[NUM_OBJS],*ball,*human,*last_owner;
 
 /*Just to be different, I didn't use the built-in
 DCF_TRANSFORMATION flag in this game.
@@ -282,7 +283,7 @@ U0 DrawObj(CDC *dc,Obj *o,F64 tt)
     temps=SpriteInterpolate((tt-o->last_t0)/(o->next_t0-o->last_t0),
 	  imgs[o->last_img].img[o->team],
 	  imgs[o->next_img].img[o->team]);
-    SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,temps,o->ay);
+    SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,temps,o->é);
     Free(temps);
   }
 }
@@ -316,9 +317,9 @@ U0 DrawIt(CTask *task,CDC *dc)
     o=o_sort[i]=&objs[i];
     if (o!=ball) {
       if (o->has_ball) {
-	ball->x=o->x+HAND_X_OFFSET*Cos(o->ay-ã/2)+HAND_Y_OFFSET*Cos(o->ay);
+	ball->x=o->x+HAND_X_OFFSET*Cos(o->é-ã/2)+HAND_Y_OFFSET*Cos(o->é);
 //The factor 2 is because the man is not transformed.
-	ball->y=o->y+HAND_X_OFFSET*Sin(o->ay-ã/2)/2+HAND_Y_OFFSET*Sin(o->ay)/2;
+	ball->y=o->y+HAND_X_OFFSET*Sin(o->é-ã/2)/2+HAND_Y_OFFSET*Sin(o->é)/2;
 	if (ball->z+ball->radius*2>o->z+HAND_Z_OFFSET)
 	  ball->z=o->z+HAND_Z_OFFSET-ball->radius*2;
       } else if (o->shooting) {
@@ -355,10 +356,12 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    o->next_img=FIRST_SHOOTING;
 	  if (o->next_img>LAST_SHOOTING) {
 	    o->next_img=FIRST_STANDING;
-	    someone_shooting=o->has_ball=o->shooting=FALSE;
-	    ball->DxDt=o->DxDt+SHOT_VELOCITY/sqrt2*Cos(o->ay-ã/2);
-	    ball->DyDt=o->DyDt+SHOT_VELOCITY/sqrt2*Sin(o->ay-ã/2);
+	    someone_has_ball=someone_shooting=o->has_ball=o->shooting=FALSE;
+	    ball->DxDt=o->DxDt+SHOT_VELOCITY/sqrt2*Cos(o->é-ã/2);
+	    ball->DyDt=o->DyDt+SHOT_VELOCITY/sqrt2*Sin(o->é-ã/2);
 	    ball->DzDt=o->DzDt+SHOT_VELOCITY/sqrt2;
+	    shot_land_t=tt+(ball->DzDt+Sqrt(Sqr(ball->DzDt)+
+		2*GRAVITY_ACCELERATION*ball->z))/GRAVITY_ACCELERATION;
 	  } else {
 	    ball->DxDt=0;
 	    ball->DyDt=0;
@@ -426,9 +429,9 @@ U0 Shoot(Obj *o)
 U0 AnimateTask(CTask *parent_task)
 {
   F64 d,dx,dy,dt,dx2,dy2,t0=tS;
-  I64 i,j,team;
-  Bool gets_ball,ball_stolen;
-  Obj *o;
+  I64 i,j;
+  Bool gets_ball;
+  Obj *o,*nearest_ball[2];
   while (TRUE) {
     dt=tS-t0;
     t0=tS;
@@ -444,10 +447,29 @@ U0 AnimateTask(CTask *parent_task)
       }
     }
 
-    if (game_t_end)
+    if (game_t_end) {
+      MemSet(&nearest_ball,0,sizeof(nearest_ball));
       for (i=0;i<NUM_OBJS;i++) {
 	o=&objs[i];
+	o->nearest_ball=FALSE;
+	if (o!=ball) {
+	  d=0;
+	  for (j=0;j<5;j++) //Iterative estimate of how long to get ball.
+	    d=Sqrt(Sqr(ball->DxDt*d+ball->x-o->x)+
+		  Sqr(ball->DyDt*d+ball->y-o->y))/MAN_VELOCITY;
+	  o->get_ball_dt=d;
+	  o->get_ball_é=Arg(ball->DxDt*d+ball->x-o->x,
+		ball->DyDt*d+ball->y-o->y);
+	  if (o!=last_owner && !nearest_ball[o->team] ||
+		o->get_ball_dt<nearest_ball[o->team]->get_ball_dt)
+	    nearest_ball[o->team]=o;
+	}
+      }
+      nearest_ball[0]->nearest_ball=TRUE;
+      nearest_ball[1]->nearest_ball=TRUE;
 
+      for (i=0;i<NUM_OBJS;i++) {
+	o=&objs[i];
 	if (o==ball) {
 	  o->x+=dt*o->DxDt;
 	  o->y+=dt*o->DyDt;
@@ -460,32 +482,31 @@ U0 AnimateTask(CTask *parent_task)
 	      dy=ball->y-o->y;
 	      if (dx*dx+dy*dy<HAND_SQR_OFFSET && ball->z<o->z+HAND_Z_OFFSET) {
 		gets_ball=TRUE;
-		ball_stolen=FALSE;
 		for (j=0;j<NUM_PER_SIDE*2;j++)
 		  if (j!=i && objs[j].has_ball) {
 		    if (Rand<2.0*dt) {
 		      objs[j].stolen_t0=t0;
 		      objs[j].has_ball=FALSE;
-		      ball_stolen=TRUE;
-		      team=objs[j].team;
 		    } else
 		      gets_ball=FALSE;
 		  }
 		if (gets_ball) {
-		  o->has_ball=TRUE;
-		  if (o==human) {
-		    if (ball_stolen && team) {
-		      Noise(250,2000,2000);
-		      score0+=2;
-		    }
-		  } else {
+		  someone_has_ball=o->has_ball=TRUE;
+		  if (o!=last_owner) {
 		    if (o->team) {
+		      if (t0<shot_land_t+0.1)
+			score1+=6;
+		      else
+			score1+=2;
 		      Noise(250,1000,1000);
-		      score1+=2;
 		    } else {
+		      if (t0<shot_land_t+0.1)
+			score0+=6;
+		      else
+			score0+=2;
 		      Noise(250,2000,2000);
-		      score0+=2;
 		    }
+		    last_owner=o;
 		  }
 		}
 	      }
@@ -497,19 +518,29 @@ U0 AnimateTask(CTask *parent_task)
 	      dx=(ip.pos.x-parent_task->pix_left-parent_task->scroll_x)-o->x;
 	      dy=(ip.pos.y-parent_task->pix_top-parent_task->scroll_y)*2-o->y;
 	    } else {
-	      dx=o->DxDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
-	      dy=o->DyDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
+	      if (!someone_has_ball && o->nearest_man_dd>4*MAN_SQR_RADIUS &&
+		    o->nearest_ball) {
+		dx=o->DxDt=MAN_VELOCITY*Cos(o->get_ball_é);
+		dy=o->DyDt=MAN_VELOCITY*Sin(o->get_ball_é);
+	      } else {
+		dx=o->DxDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
+		dy=o->DyDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
+	      }
 	    }
 	    d=Sqrt(dx*dx+dy*dy);
 	    if (d>=1.0) {
-	      o->ay=Arg(dx,dy)+ã/2;
+	      o->é=Arg(dx,dy)+ã/2;
 	      dx*=MAN_VELOCITY/sqrt2*dt/d;
 	      dy*=MAN_VELOCITY/sqrt2*dt/d;
+	      o->nearest_man_dd=MAX_F64;
 	      for (j=0;j<NUM_PER_SIDE*2;j++)
 		if (j!=i) {
 		  dx2=objs[j].x-o->x;
 		  dy2=objs[j].y-o->y;
-		  if ((d=Sqr(dx2)+Sqr(dy2))<MAN_SQR_RADIUS) {
+		  d=Sqr(dx2)+Sqr(dy2);
+		  if (d<o->nearest_man_dd)
+		    o->nearest_man_dd=d;
+		  if (d<MAN_SQR_RADIUS) {
 		    if (d) {
 		      d=Sqrt(d);
 		      dx2/=d;
@@ -584,7 +615,7 @@ U0 AnimateTask(CTask *parent_task)
 	  o->DzDt*=d;
 	}
       }
-
+    }
     WinMgrSync;
   }
 }
@@ -593,6 +624,7 @@ U0 Init()
 {
   I64 i;
   someone_shooting=FALSE;
+  shot_land_t=0;
   MemSet(&objs,0,sizeof(objs));
   for (i=0;i<NUM_PER_SIDE*2;i++) {
     objs[i].team=i&1;
@@ -600,6 +632,7 @@ U0 Init()
     objs[i].y=2*Fs->pix_height/2;
     objs[i].next_img=objs[i].last_img=FIRST_RUNNING;
   }
+  last_owner=NULL;
   human=&objs[0];
   ball =&objs[i];
   ball->team=-1;
@@ -612,27 +645,25 @@ U0 Init()
   foul_t_end=0;
 }
 
-U0 CleanUp()
-{
-}
-
 U0 KeepAway()
 {
   I64 msg_code,a1,a2;
 
   PopUpOk(
-	"$$RED$$Pass or hand-off to score points.$$FG$$\n\n"
-	"Left-Click to pass.\n"
-	"Right-Click to jump.\n");
+	"Pass or hand-off to your team to score points.$$FG$$\n\n"
+	"\t2 points for successful hand-off.\n"
+	"\t6 points for successful pass.\n"
+	"\t1 point penalty for foul.\n\n"
+	"Left-Click\tto pass.\n\n"
+	"Right-Click\tto jump.\n");
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK+YELLOW<<4;
+  Fs->win_inhibit|=WIG_DBL_CLICK;
   AutoComplete;
   WinBorder;
   WinMax;
   DocCursor;
   DocClear;
-
-  Fs->win_inhibit|=WIG_DBL_CLICK;
 
   MenuPush(
 	"File {"
@@ -666,7 +697,6 @@ ka_jump:
 	case MSG_KEY_DOWN:
 	  switch (a1) {
 	    case '\n':
-	      CleanUp;
 	      Init;
 	      break;
 	    case 'j':
@@ -687,7 +717,6 @@ ka_done: //Don't goto out of try
   SettingsPop;
   RegWriteBranch("TempleOS/KeepAway","I64 best_score0=%d,best_score1=%d;\n",
 	best_score0,best_score1);
-  CleanUp;
   MenuPop;
 }
         Ê     p   ¨      ­ÿÿÿûÿÿÿûÿÿÿ­ÿÿÿûÿÿÿ   ·ÿÿÿûÿÿÿûÿÿÿ·ÿÿÿûÿÿÿ   ­ÿÿÿ   ûÿÿÿ­ÿÿÿ      ·ÿÿÿ   ûÿÿÿ·ÿÿÿ   

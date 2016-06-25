@@ -1,0 +1,86 @@
+$WW,1$$FG,5$$TX+CX,"The Standard TempleOS PC",HTML="http://www.templeos.org/Wb/Home/Web/TAD/TAD.html"$$FG$
+
+All desktop PCs will have 8-channel OCTART super-simple high speed serial ports to replace USB.  They are simpler because the driver is as simple as old school $LK,"RS232 Serial",A="FI:::/Doc/Comm.CPP"$, they have no USB end-points and they have no USB human interface device reports.  Computer mice will all have exactly two buttons and one wheel.  Game controllers will all be the standard deluxe $TX,"game console controllers",HTML="http://www.gamestop.com/pc/accessories/steam-controller/121865"$ that are popular today.  It will have 8 big TX and 8 big RX fifos that allow flow control characters to jump the queue.  It should be locked-down to as few options as possible, like 8-1-N only, although hardware may use a USB frame, not an RS232, so stop bits might not be relevant.  Perhaps, just two baud rates -- high and low speed are needed.  Low speed is good for slow microcontrollers and allows longer cable length.  Keyboard, mouse and game controller can be low speed.
+
+The USB creators banned generic devices, requiring a signed, certified driver for everything!  That's no good.  We allow any device and will communicate, generically, using a serial terminal program like the old school HyperTerminal, XTalk or Telnet.
+
+A mouse packet interface should be similar to this:
+
+$ID,5$TX:	<ENTER>
+RX:	X:+3 Y:+0 Wheel:+0 LB:OFF RB:OFF
+TX:	<ENTER>
+RX:	X:+0 Y:-1 Wheel:+0 LB:ON  RB:OFF
+$ID,-5$
+We aspire to be as simple as a Commodore 64 joystick driver:
+
+$ID,5$VAL=PEEK(56321)
+if VAL AND 1 THEN y=y-1
+if VAL AND 2 THEN y=y+1
+if VAL AND 4 THEN x=x-1
+if VAL AND 8 THEN x=x+1
+$ID,-5$
+The game controller will be more complicated, but much simpler than USB.  It will use a standard text packet of some kind.
+
+On the other end, you might hook-up a thermostat microcontroller and interface as a generic serial device.  The microcontroller in the thermostat would have something simple, not a crazy overkill ethernet connection.
+
+$ID,5$$HL,1$U8 b;
+while (TRUE) {
+  b=ReadU8(2); //Read byte from high speed serial channel 2.
+//(Has been configured for low baud because thermostat should be slow.)
+  if (b==CMD_UP)
+    temperature++;
+  else if (b==CMD_DOWN)
+    temperature--;
+}$HL,0$
+$ID,-5$
+Super-simple block devices will replace ATA/ATAPI hard drives and CD/DVD/BlueRays.  Today, the industry is in flux with nonvolitile memory just invented.  We want a super-simple block device interface for non-volitile memory and for what is currently USB memory sticks, but only if they can be made without bad blocks.  I don't think we want to deal with bad block memory, so maybe we will not do NV-memory.  The standard TempleOS desktop will require a hard disk.
+
+There will be minimal commands:  READ_BLOCK, WRITE_BLOCK, GET_CAPACITY, GET_MODEL, GET_SERIAL_NUM, and EJECT.
+
+We want a CPU mode with virtual IO port addresses similar to how paging creates virtual memory addresses.  We want a 65536 word look-up table that converts virtual IO port numbers to physical IO port numbers.  There will be a standard IO port configuration, so port numbers can be fixed in the code.  We want the primary hard drive on one set of ports and the primary CD/DVD/Blu-ray on another set of ports.  Choose a contiguous set of IO ports.
+
+Meanwhile, a complicated PCI interface can be designed along-side the TempleOS interface for Windows and Linux.  It would almost be possible to carry-on separate lives, however, the super-simple serial requires getting rid of USB since super-simple serial is a new hardware standard.  People can add USB ports with a PCI device card.
+
+God said He wants single audio voice for the sound.  I think we want a word-sized IO port for period with zero causing it to be off.  The period should allow for 20Hz to 20,000 Hz.  The PIT period register for PC speaker seems okay, whatever it is.
+
+The video will be a linear frame buffer 640x480 16 color with one-byte-per-pixel even though it is only 16 color with is 4-bit.  Perhaps, we have a interrupt to sync with the refresh.
+
+I am tempted to help amateur hardware device designers by making the hardware interface for the PC simple.  I have fond memories of 1993, when I made a wire-wrapped ISA data acquisition card which plugged into my 486 and had some analog-to-digital and digital-to-analog convertors.  I am not designing a bus.  Earlier, I said the super-simple high speed serial port replacement could be USB-like in hardware as long as the software driver interface was simple like old school RS232 serial ports.  Requiring a complicated hardware handshake raises the bar, slightly, for the lowest level hardware designers.  Most people will be connecting a microcontroller or something that already has a serial communication design, but if it's not a problem, maybe we should keep it simple at all stages.  It was nice putting an oscilloscope on my serial port wires.
+
+The original PC had general purpose digital IO through the parallel port.  That was fun.  I have enough battles to fight, so I'll leave being a savior to hobbiest hardware engineers to somebody else.
+
+Digital cameras will be super-simple high speed serial, but TempleOS is forever limited to 16 colors and multimedia is banned because large files being loaded into memory fragments memory, so cameras are somewhat unwelcome.  I have enough problems without making the Brits anxious about autonomous gun turrets and killer robots.  The reason I say cameras will be super-simple serial is because we are replacing USB ports with super-simple serial.  Windows/Linux will have only super-simple serial ports unless people buy a USB PCI expansion card.  So, the digital cameras will be super-simple serial.
+
+
+$FG,5$$TX+CX,"Version One"$$FG$
+
+We will make a spec for a $$4,000, perfectly standardized, cryogenically-cooled, monster desktop PC.  It will have 16 cores, integrated 4K graphics, and, hopefully, 6 Ghz continuous operation.  Perhaps, 64 Gig of RAM will be standard? God said to help to poor buy them.  It is pointless to have a high powered machine if other people have wimpy machines and cannot run programs you write.  Therefore, everybody in the developed world will buy a Standard TempleOS IBM PC over the next ten years, so that will be a quantity of 400 million, perhaps.  God said to pay the US national debt with the revenue.  We will standardize everything, not just the TempleOS related items.  The display will be 4K (and of course 640x480 16 color) and no others.  Everybody gets just one monitor, unless you buy special PCI cards.  Everybody gets two speakers, a headphone, a mic and a webcam.  We make the audio one sample rate and one sample size, but TempleOS still gets just a square wave.  (HD Audio is really screwed-up and requires complicated artificial intelligence, just to route output to speakers.)
+
+The Standard Temple IBM PC will be a full-sized tower.  We should set the size at exactly 2.5 feet by 1.5 feet by 1.5 feet as in the $LK,"Exodus,25:10-10",A="BF:Exodus,25:10-10"$ for all time.  If there is extra room, make a storage shelf for DVDs.  We do not want a race-to-the-bottom, shrinking the size.  Instead of making it smaller, make it more powerful.  We want to remove all cost pressure from making things small.  It must have a CD/DVD/Blu-ray drive.  We need a network connection, possibly implemented as a super-simple high speed serial device.  What about standard monitor and speakers?  The C64's success was partially due to wide spread, completely standard, hardware.  I think TempleOS will not do bad block devices, so we need a hard drive, not just NV-memory or SSD.
+
+TempleOS will have the priority over Windows or Linux on hardware decisions.  We could make it heterogenious multicore.  I think we want 16 non-hyperthreaded cores.  Core#0 is the only full-featured core needed.  The other cores will have long mode, but not some of these: real mode, protected mode, ring-3, paging, interrupts, in/out port instructions, SSE instructions,  MMX instructions.  This $LK,"Graphics Job",A="FI:~/Web/TAD/GraphicsPerformance.TXT"$ is what to optimize for.
+
+God said Intel should do a simulation of heat produced by gates and try spreading-out the heat producing gate circuits on the chip.
+
+God said Linux's Wine should replace Windows.  We will install a standard software set-up on all Standard Temple IBM PC's.
+
+
+$FG,5$$TX+CX,"Usage"$$FG$
+
+TempleOS is primarily for user developers, like the Commodore 64 was.  I created a total of 50 Meg of content over ten years, so you shouldn't need much room, either.  The installed hard drive space should stay small because the resolution is low, multimedia is banned, 3rd party libraries are banned, and applications can be distributed with ISO files or DVDs.
+
+The ROM will have a command that copies the ROM onto the hard drive, creating identical C and D partitions, so you can have fun modifying TempleOS.  You will have confidence you can fix it easily if you break it.  It should be able to run everything from just the ROM, too.  You will need to specify a /Home directory that is not in the ROM, but on the hard drive. 
+
+The standard set-up will be a C primary drive and a D back-up drive.  Keep the size on each hard drive under 512 Meg and periodically copy all of C to D, so they stay mirrored.  The file manager and other programs read the entire directory structures, so too many files causes problems (unbearably slow).  Third party software should be distributed as ISO files or DVDs, like $FG,4$$TX,"TextAdventure.ISO",HTML="https://github.com/jwhitham/frotz"$$FG$.  No 3rd party libraries are permitted because they circumvent the intent of the 100,000 line of code limit which is keeping it cognatively small enough to see the light at the end of the tunnel and easily master everything.  Therefore, 3rd party ISO files must bring all required software components with them, except what is found in the TempleOS ROM.
+
+The Temple PC will stay unchanged for seven years at a time.  The Bible speaks of a seven year release in $LK,"Deuteronomy,15:1",A="BF:Deuteronomy,15:1",HTML="http://www.biblegateway.com/verse/en/Deutoronomy%2015:1"$.  The Commodore stayed unchanged for many years and people became intimately familiar with every aspect.
+
+Having all your 3rd party software on separate DVDs or ISO files and TempleOS running from a ROM, keeps it delightfully simple so you have complete understanding of what is going on.  You will have complete confidence and it will be a joy to use.  3rd party applications can store saved data files into your /Home hard drive directory.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/bs_jcTuwPKo\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/bs_jcTuwPKo\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+I thought 2.5' x 1.5' x 1.5' was ridiculously big, but it looks like it is reasonable for super-cooled refrigeration systems!
+$FG,8$
+* "Commodore 64" was a trademark of Commodore Business Machines.
+* "Linux" is probably a trademark owned by Linus Torvalds.
+* "Windows" is a trademark of MicroSoft Corp.$FG$

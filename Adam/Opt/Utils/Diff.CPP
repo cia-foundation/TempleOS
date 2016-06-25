@@ -34,7 +34,7 @@ I64 DiffEntriesCompare(CDocEntry *doc_e1,CDocEntry *doc_e2)
 #define DF_ABORT_ALL_FILES		0x20
 #define DF_NO_MORE_PMTS_THIS_FILE	0x40
 
-U0 DiffSelect(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
+U0 DiffSel(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,
 	I64 j2_lo,I64 j2_hi,I64 cnt1,I64 cnt2,
 	CDocEntry **doc_unsorted1,CDocEntry **doc_unsorted2)
 {
@@ -150,7 +150,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 
   if (j1_lo>=j1_hi || j2_lo>=j2_hi) {
     if (j1_lo<j1_hi || j2_lo<j2_hi) {
-      DiffSelect(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
+      DiffSel(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
 	    doc_unsorted1,doc_unsorted2);
       return TRUE;
     } else
@@ -202,7 +202,7 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
     }
   }
   if (!best_score) {
-    DiffSelect(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
+    DiffSel(doc,_df_flags,j1_lo,j1_hi,j2_lo,j2_hi,cnt1,cnt2,
 	  doc_unsorted1,doc_unsorted2);
     return TRUE;
   } else {

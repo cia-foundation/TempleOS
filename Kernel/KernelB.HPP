@@ -35,6 +35,7 @@ public _extern _LBEQU Bool LBEqu(
 
 #help_index "Boot"
 _extern SYS_BOOT_BASE U32 sys_boot_base;
+_extern SYS_BOOT_BLK U32 sys_boot_blk;
 _extern SYS_BOOT_PATCH_TABLE_BASE U32 sys_boot_patch_table_base;
 _extern SYS_BOOT_SRC U32 sys_boot_src;
 _extern SYS_RUN_LEVEL U32 sys_run_level;
@@ -66,7 +67,7 @@ public _intern IC_QUE_INIT U0 QueInit(
 public _intern IC_QUE_INS U0 QueIns(
 	CQue *entry,CQue *pred);//Insert item into que after predecessor.
 public _intern IC_QUE_INS_REV U0 QueInsRev(
-	CQue *entry,CQue *succ);//Reversed insert into que.
+	CQue *entry,CQue *succ);//Revd insert into que.
 //Ins item into que before successor.
 public _intern IC_QUE_REM U0 QueRem(CQue *entry); //Remove item from queue.
 
@@ -130,8 +131,6 @@ _extern _FLDCW U0 Fldcw(U16 w);
 public _extern _FLOOR F64 Floor(F64 d); //Floor of F64.
 _extern _FSTCW U16 Fstcw();
 _extern _FSTSW U16 Fstsw();
-_extern _FXRSTOR U0 Fxrstor(CFPU *fpu_mmx);
-_extern _FXSAVE  U0 Fxsave(CFPU *fpu_mmx);
 public _extern _LN  F64 Ln(F64 d); //Logarithm.
 public _extern _LOG10 F64 Log10(F64 d); //Log base 10.
 public _extern _LOG2 F64 Log2(F64 d); //Log base 2.

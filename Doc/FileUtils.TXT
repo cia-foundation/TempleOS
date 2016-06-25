@@ -1,11 +1,11 @@
 $WW,1$$FG,5$$TX+CX,"File Utils"$$FG$
 
-File util $LK,"FilesFind",A="MN:FilesFind"$() wildcard mask consists of a single base dir with multiple file masks separated by $FG,2$';'$FG$.  The $FG,2$'*'$FG$ and $FG,2$'?'$FG$ wildcard chars are accepted.  A $FG,2$'~'$FG$ indicates an exclusion mask.
+File util $LK,"FilesFind",A="MN:FilesFind"$() wildcard mask consists of a single base dir with multiple file masks separated by $FG,2$';'$FG$.  The $FG,2$'*'$FG$ and $FG,2$'?'$FG$ wildcard chars are accepted.  The $FG,2$'~'$FG$ is your home directory and $FG,2$'!'$FG$ indicates an exclusion mask.
 
  
 $FG,2$"/Kernel/*"$FG$		BaseDir: $FG,2$/Kernel$FG$	Mask: $FG,2$*$FG$
 $FG,2$"/Demo/*.BMP*;*.GRA*"$FG$	BaseDir: $FG,2$/Demo$FG$		Mask: $FG,2$*.BMP*$FG$ | $FG,2$*.GRA*$FG$
-$FG,2$"/*.TXT*;~*/Bible*"$FG$	BaseDir: $FG,2$Root$FG$		Mask: $FG,2$*.TXT*$FG$ but not $FG,2$*/Bible*$FG$
+$FG,2$"/*.TXT*;!*/Bible*"$FG$	BaseDir: $FG,2$Root$FG$		Mask: $FG,2$*.TXT*$FG$ but not $FG,2$*/Bible*$FG$
 
 See $LK,"FilesFindMatch",A="MN:FilesFindMatch"$().
 

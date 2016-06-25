@@ -319,7 +319,7 @@ U0 Span()
 	"\t$$GREEN$$'c'$$FG$$oncrete\n"
 	"\t$$GREEN$$'s'$$FG$$teel\n"
 	"\t$$GREEN$$'w'$$FG$$ire\n"
-	"\nto select materials.\n");
+	"\nto sel materials.\n");
 
   try {
     while (TRUE) {

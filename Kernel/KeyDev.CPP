@@ -61,26 +61,28 @@ U0 KeyDescSet(U8 *fmt,...)
   Free(buf);
 }
 
-CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
-	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE)
-{//Places hook in StdOut chain. See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
-  CKeyDevEntry *tempp,*tempp1=keydev.put_key_root.last;
-  tempp=ACAlloc(sizeof(CKeyDevEntry));
-  tempp->put_key=fp_put_key;
-  tempp->put_s=fp_puts;
-  tempp->priority=priority;
-  if (key_descs)
-    tempp->flags|=KDF_HAS_DESCS;
-  while (tempp1->priority>priority)
-    tempp1=tempp1->last;
-  QueIns(tempp,tempp1);
-  return tempp;
-}
-
 U0 KeyDevRem(CKeyDevEntry *tempp)
 {//Remove StdOut hook and free.
   QueRem(tempp);
   Free(tempp);
+}
+
+CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
+	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE)
+{//Places hook in StdOut chain. See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
+  CKeyDevEntry *tempp=keydev.put_key_root.last,
+	*tempp1=ACAlloc(sizeof(CKeyDevEntry));
+  tempp1->put_key=fp_put_key;
+  tempp1->put_s=fp_puts;
+  tempp1->priority=priority;
+  if (key_descs)
+    tempp1->flags|=KDF_HAS_DESCS;
+  while (tempp->priority>priority)
+    tempp=tempp->last;
+  QueIns(tempp1,tempp);
+  if (tempp->priority==priority)
+    KeyDevRem(tempp);
+  return tempp1;
 }
 
 Bool KDRawPutKey(I64 ch,I64)
@@ -143,11 +145,6 @@ U0 CtrlAltD(I64)
   }
 }
 
-U0 CtrlAltE(I64)
-{
-  User;
-}
-
 U0 CtrlAltF(I64)
 {
   SwapI64(&text.font,&text.aux_font);
@@ -158,9 +155,14 @@ U0 CtrlAltM(I64)
   Mute(!IsMute);
 }
 
-U0 CtrlAltT(I64)
+U0 CtrlAltN(I64)
 {
   LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_TAB);
+}
+
+U0 CtrlAltT(I64)
+{
+  User;
 }
 
 U0 CtrlAltV(I64)
@@ -208,10 +210,10 @@ U0 KeyDevInit()
   KeyDevAdd(&KDRawPutKey,&KDRawPutS,0x60000000,FALSE);
   CtrlAltCBSet('C',&CtrlAltC,"Cmd /Break Execution",,TRUE);
   CtrlAltCBSet('D',&CtrlAltD,"Cmd /Enter Debugger",,TRUE);
-  CtrlAltCBSet('E',&CtrlAltE,"Cmd /Spawn New User Task");
   CtrlAltCBSet('F',&CtrlAltF,"Cmd /Toggle Aux Font");
   CtrlAltCBSet('M',&CtrlAltM,"Cmd /Toggle Mute");
-  CtrlAltCBSet('T',&CtrlAltT,"Cmd /Switch Focus to Next Task",,TRUE);
+  CtrlAltCBSet('N',&CtrlAltN,"Cmd /Next Focus Task",,TRUE);
+  CtrlAltCBSet('T',&CtrlAltT,"Cmd /Terminal Window");
   CtrlAltCBSet('V',&CtrlAltV,"Cmd /VGA Flush",,TRUE);
   CtrlAltCBSet('X',&CtrlAltX,"Cmd /Kill Focused Task",,TRUE);
 }

@@ -1,8 +1,8 @@
 #help_index "Cmd Line (Typically)"
 
-#define FILEMASK_OFF_LIMITS "~*/Misc/PCIDevices.TXT*;~*/Misc/Bible.TXT*;"\
-	"~*/Downloads/Text/*;~*/Downloads/Words/*;~*/Downloads/Bin/*;"\
-	"~*/God/Vocab.TXT*"
+#define FILEMASK_OFF_LIMITS "!*/Misc/PCIDevices.TXT*;!*/Misc/Bible.TXT*;"\
+	"!*/Downloads/Text/*;!*/Downloads/Words/*;!*/Downloads/Bin/*;"\
+	"!*/God/Vocab.TXT*"
 
 public I64 F(U8 *needle_str,U8 *fu_flags=NULL)
 {//Find text in all text files.

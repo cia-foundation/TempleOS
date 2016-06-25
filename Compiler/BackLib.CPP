@@ -56,52 +56,48 @@ U0 ICU64(CIntermediateCode *tempi,U64 q)
   tempi->ic_cnt+=8;
 }
 
-CIntermediateCode *ICLastIns(CIntermediateCode *tempi)
-{
-  if (tempi->ic_last_cnt>=0)
-    return tempi;
-  else if (!tempi->ic_cnt &&(tempi=OptLag1(tempi)) && tempi->ic_last_cnt>=0)
-    return tempi;
-  else
-    return NULL;
-}
-
 U0 ICAddRSP(CIntermediateCode *tempi,I64 i,Bool optimize=TRUE)
 {
-  I64 j,last_cnt;
+  I64 j,last_start;
   CIntermediateCode *tempil1;
-  if (optimize && (tempil1=ICLastIns(tempi))) {
-    j=tempil1->ic_cnt;
-    if (tempil1->ic_last_cnt==j-4 && tempil1->ic_body[j-3]==0x83 &&
-	  tempil1->ic_body[j-4]==0x48) {
-      if (tempil1->ic_body[j-2]==0xEC)
-	j=-tempil1->ic_body[j-1](I8);
-      else if (tempil1->ic_body[j-2]==0xC4)
-	j=tempil1->ic_body[j-1](I8);
-      else
+  if (optimize) {
+    tempil1=tempi;
+    if (tempi->ic_last_start<0 && !tempi->ic_cnt &&
+	  (tempil1=OptLag1(tempi)) && tempil1->ic_last_start<0)
+      tempil1=NULL;
+    if (tempil1) {
+      j=tempil1->ic_cnt;
+      if (tempil1->ic_last_start==j-4 && tempil1->ic_body[j-3]==0x83 &&
+	    tempil1->ic_body[j-4]==0x48) {
+	if (tempil1->ic_body[j-2]==0xEC)
+	  j=-tempil1->ic_body[j-1](I8);
+	else if (tempil1->ic_body[j-2]==0xC4)
+	  j=tempil1->ic_body[j-1](I8);
+	else
+	  j=0;
+      } else if (tempil1->ic_last_start==j-7 && tempil1->ic_body[j-6]==0x81 &&
+	    tempil1->ic_body[j-7]==0x48) {
+	if (tempil1->ic_body[j-5]==0xEC)
+	  j=-tempil1->ic_body[j-4](I32);
+	else if (tempil1->ic_body[j-5]==0xC4)
+	  j=tempil1->ic_body[j-4](I32);
+	else
+	  j=0;
+      } else
 	j=0;
-    } else if (tempil1->ic_last_cnt==j-7 && tempil1->ic_body[j-6]==0x81 &&
-	  tempil1->ic_body[j-7]==0x48) {
-      if (tempil1->ic_body[j-5]==0xEC)
-	j=-tempil1->ic_body[j-4](I32);
-      else if (tempil1->ic_body[j-5]==0xC4)
-	j=tempil1->ic_body[j-4](I32);
-      else
-	j=0;
-    } else
-      j=0;
-    if (j) {
-      if (tempi==tempil1) {
-	tempi->ic_cnt=tempi->ic_last_cnt;
-	i+=j;
-      } else if (!(tempi->ic_flags&ICF_PREV_DELETED)) {
-	tempil1->ic_flags|=ICF_DEL_PREV_INS;
-	tempi->ic_flags=tempi->ic_flags&~ICF_CODE_FINAL|ICF_PREV_DELETED;
-	i+=j;
+      if (j) {
+	if (tempi==tempil1) {
+	  tempi->ic_cnt=tempi->ic_last_start;
+	  i+=j;
+	} else if (!(tempi->ic_flags&ICF_PREV_DELETED)) {
+	  tempil1->ic_flags|=ICF_DEL_PREV_INS;
+	  tempi->ic_flags=tempi->ic_flags&~ICF_CODE_FINAL|ICF_PREV_DELETED;
+	  i+=j;
+	}
       }
     }
   }
-  last_cnt=tempi->ic_cnt;
+  last_start=tempi->ic_cnt;
   if (i>0) {
     if (i<=MAX_I8)
       ICU32(tempi,0xC48348+i<<24);
@@ -120,8 +116,8 @@ U0 ICAddRSP(CIntermediateCode *tempi,I64 i,Bool optimize=TRUE)
     } else
       throw('Compiler');
   }
-  if (optimize && tempi->ic_cnt>last_cnt)
-    tempi->ic_last_cnt=last_cnt;
+  if (optimize && tempi->ic_cnt>last_start)
+    tempi->ic_last_start=last_start;
 }
 
 extern U0 ICMov(CIntermediateCode *tempi,
@@ -430,7 +426,8 @@ I64 ICBuiltInFloatConst(F64 d)
 U0 ICMov(CIntermediateCode *tempi,
 	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 ip)
 {
-  I64 i,j,last_cnt=tempi->ic_cnt;
+  I64 i,cnt1,cnt2,b1_rex,b2_rex,b1,b2,b1_modr,b2_modr,
+	b1_r1,b1_r2,b2_r1,b2_r2,last_start=tempi->ic_cnt;
   CIntermediateCode *tempil1;
   Bool old_lock=Btr(&tempi->ic_flags,ICf_LOCK);
   switch (Bsr(t1)) {
@@ -492,19 +489,8 @@ U0 ICMov(CIntermediateCode *tempi,
       else {
 	if (r1==r2 && t2&MDF_REG)
 	  goto move_done;
-	if (t2&MDF_REG) {
+	if (t2&MDF_REG)
 	  t2=MDF_REG+RT_I64;
-	  if (tempil1=ICLastIns(tempi)) {
-	    i=tempil1->ic_cnt;
-	    j=0x48+(r1>7);
-	    if (r2>7) j+=4;
-	    if (tempil1->ic_last_cnt==i-3 && tempil1->ic_body[i-2]==0x8B &&
-		  tempil1->ic_body[i-1]==0xC0+r1&7+(r2&7)<<3 &&
-		  tempil1->ic_body[i-3]==j) {
-	      goto move_done;
-	    }
-	  }
-	}
 	i=ICModr1(r1,t2,r2,d2);
 	if (t2.raw_type!=RT_U32)
 	  i|=0x4800;
@@ -605,9 +591,87 @@ U0 ICMov(CIntermediateCode *tempi,
       break;
   }
 move_done:
+  if (!((t1|t2)&(MDF_STK|MDF_RIP_DISP32))) {
+    tempil1=tempi;
+    if (tempi->ic_last_start<0 && (tempil1=OptLag1(tempi)) &&
+	  tempil1->ic_last_start<0)
+      tempil1=NULL;
+    if (tempil1) {
+      if (tempil1==tempi)
+	cnt1=last_start-tempil1->ic_last_start;
+      else {
+	if (!(tempil1->ic_flags&ICF_CODE_FINAL))
+	  tempi->ic_flags&=~ICF_CODE_FINAL;
+	if (last_start)
+	  cnt1=0;
+	else
+	  cnt1=tempil1->ic_cnt-tempil1->ic_last_start;
+      }
+      cnt2=tempi->ic_cnt-last_start;
+      if (cnt1 && cnt1==cnt2) {
+	b1_rex=tempil1->ic_body[tempil1->ic_last_start];
+	b2_rex=tempi->ic_body[last_start];
+	if (b1_rex&0x48==0x48 && b2_rex&0x48==0x48) {
+	  for (i=1;i<cnt1;i++)
+	    if ((b1=tempil1->ic_body[tempil1->ic_last_start+i])==
+		  (b2=tempi->ic_body[last_start+i])) {
+	      if (i==1 && (b2==0x89 || b2==0x8B)) {
+		b1_modr=tempil1->ic_body[tempil1->ic_last_start+2];
+		b1_r1=b1_modr&7	+Bt(&b1_rex,0)<<3;
+		b1_r2=b1_modr>>3&7+Bt(&b1_rex,2)<<3;
+		b2_modr=tempi->ic_body[last_start+2];
+		b2_r1=b2_modr&7	  +Bt(&b2_rex,0)<<3;
+		b2_r2=b2_modr>>3&7+Bt(&b2_rex,2)<<3;
+		if (cnt1==3 && b2_modr&0xC0==0xC0) {
+		  if (b2_r1==b2_r2)
+		    goto move_redundant;
+		  if (b1_modr&0xC0==0xC0) {
+		    if (b1_r1==b2_r2 && b2_r1==b1_r2)
+		      goto move_redundant;
+		  }
+		} else if (b1_rex!=b2_rex || b1_r1==b1_r2 || (t1|t2)&MDF_SIB)
+		  break;
+	      } else if (b1_rex!=b2_rex)
+		break;
+	    } else if (i!=1)
+	      break;
+	    else if (b2!=0x89 && b2!=0x8B)
+	      break;
+	    else {
+	      b1_modr=tempil1->ic_body[tempil1->ic_last_start+2];
+	      b1_r1=b1_modr&7	+Bt(&b1_rex,0)<<3;
+	      b1_r2=b1_modr>>3&7+Bt(&b1_rex,2)<<3;
+	      b2_modr=tempi->ic_body[last_start+2];
+	      b2_r1=b2_modr&7	+Bt(&b2_rex,0)<<3;
+	      b2_r2=b2_modr>>3&7+Bt(&b2_rex,2)<<3;
+	      if (cnt1==3 && b2_modr&0xC0==0xC0) {
+		if (b2_r1==b2_r2)
+		  goto move_redundant;
+		if (b1==0x89 && b2==0x8B || b1==0x8B && b2==0x89) {
+		  if (b1_modr&0xC0==0xC0) {
+		    if (b1_r1==b2_r1 && b1_r2==b2_r2 ||
+			  b1_r1==b2_r2 && b2_r1==b1_r2)
+		      goto move_redundant;
+		  }
+		  if (b1_rex!=b2_rex)
+		    break;
+		} else
+		  break;
+	      } else if (b1_r1==b1_r2 || (t1|t2)&MDF_SIB || b1_rex!=b2_rex ||
+		    !(b1==0x89 && b2==0x8B || b1==0x8B && b2==0x89))
+		break;
+	    }
+	  if (i==cnt1) {
+move_redundant:
+	    tempi->ic_cnt=last_start;
+	  }
+	}
+      }
+    }
+  }
+  if (tempi->ic_cnt>last_start>tempi->ic_last_start)
+    tempi->ic_last_start=last_start;
   BEqu(&tempi->ic_flags,ICf_LOCK,old_lock);
-  if (tempi->ic_cnt>last_cnt>tempi->ic_last_cnt)
-    tempi->ic_last_cnt=last_cnt;
 }
 
 U0 ICLea(CIntermediateCode *tempi,CICType t1,I64 r1,I64 d1,
@@ -646,8 +710,8 @@ U0 ICDeref(CIntermediateCode *tempi,I64 ip)
 {
   CICType t;
   t=tempi->r.type.raw_type;
-  if (t>tempi->a1.type_pointed_to)
-    t=tempi->a1.type_pointed_to;
+  if (t>tempi->a1_type_pointed_to)
+    t=tempi->a1_type_pointed_to;
   if (tempi->a1.type&MDF_REG)
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 	  MDF_DISP+t,tempi->a1.reg,tempi->a1.disp,ip);

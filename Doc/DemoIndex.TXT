@@ -28,7 +28,6 @@ $LK,"::/Demo/KeyBitMap.CPP"$
 $LK,"::/Demo/Graphics/WinZBuf.CPP"$
 $LK,"::/Demo/Graphics/Elephant.CPP"$
 $LK,"::/Demo/Graphics/Mountain.CPP"$
-$LK,"::/Demo/Games/Coach.CPP"$
 $LK,"::/Demo/Graphics/WallPaperFish.CPP"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Games/Digits.CPP"$
 $LK,"::/Demo/Progress.CPP"$ //has some ASM, just ignore
@@ -126,11 +125,11 @@ $ID,2$$LK,"::/Misc/DoDistro.CPP"$
 $LK,"::/Demo/DbgDemo.CPP"$
 $LK,"::/Demo/SubSwitch.CPP"$
 $LK,"::/Demo/DateTime.CPP"$
-$LK,"::/Demo/ReverseFileExample/Reverse.CPP"$
-$LK,"::/Demo/ToHtmlToTXTExample/HtmlGen.CPP"$
-$LK,"::/Demo/ToHtmlToTXTExample/TXTGen.CPP"$
-$LK,"::/Demo/SortFileExample/F64FileGen.CPP"$
-$LK,"::/Demo/SortFileExample/F64FileSort.CPP"$
+$LK,"::/Demo/RevFileDemo/Rev.CPP"$
+$LK,"::/Demo/ToHtmlToTXTDemo/HtmlGen.CPP"$
+$LK,"::/Demo/ToHtmlToTXTDemo/TXTGen.CPP"$
+$LK,"::/Demo/SortFileDemo/F64FileGen.CPP"$
+$LK,"::/Demo/SortFileDemo/F64FileSort.CPP"$
 $LK,"::/Demo/PhoneNumWords.CPP"$
 $LK,"::/Demo/SuggestSpelling.CPP"$
 $LK,"::/Demo/WordSearch.CPP"$
@@ -145,8 +144,8 @@ $LK,"::/Demo/Lectures/MiniGrLib.CPP"$
 $LK,"::/Demo/Lectures/MiniCompiler.CPP"$
 $LK,"::/Demo/MagicPairs.CPP"$
 $LK,"::/Demo/Graphics/PoleZeros.CPP"$
-$LK,"::/Demo/WebLogExample/WebLogRep.CPP"$
-$LK,"::/Demo/WebLogExample/WebLogScramble.CPP"$
+$LK,"::/Demo/WebLogDemo/WebLogRep.CPP"$
+$LK,"::/Demo/WebLogDemo/WebLogScramble.CPP"$
 $MA-X+PU,"::/Apps/TimeClock",LM="Cd(\"::/Apps/TimeClock\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Logic",LM="Cd(\"::/Apps/Logic\");Dir;View;\n"$
 $MA-X+PU,"::/Demo/Lectures",LM="Cd(\"::/Demo/Lectures\");Dir;View;\n"$

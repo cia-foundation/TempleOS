@@ -7,7 +7,7 @@ public extern CAutoCompleteDictGlbls acd;
 
 #help_index "Bit"
 public extern I64 BCnt(I64 d);
-public extern U8 *reverse_bits_table,*set_bits_table;
+public extern U8 *rev_bits_table,*set_bits_table;
 
 #help_index "Boot"
 #help_file "::/Doc/Boot"
@@ -60,7 +60,6 @@ public extern I64 LstMatch(U8 *needle, U8 *haystack_lst,I64 flags=0);
 public extern U8 *LstSub(I64 sub, U8 *lst);
 
 #help_index "Char/Operations"
-public extern U8 *CatPrint(U8 *dst,U8 *fmt,...);
 public extern U8 *MStrPrint(U8 *fmt,...);
 public extern U8 *MStrUtil(U8 *src,I64 flags,F64 indent_scale_factor=0);
 public extern U8 *ScaleIndent(U8 *src,F64 indent_scale_factor);
@@ -83,6 +82,9 @@ public extern U8 *StrPrintJoin(U8 *dst,U8 *fmt,I64 argc,I64 *argv);
 public extern U8 *StrUtil(U8 *_src,I64 flags);
 public extern U8 *Tabs2Spaces(U8 *src);
 public extern Bool WildMatch(U8 *test_str,U8 *wild_str);
+
+#help_index "Char/Operations;Memory"
+public extern U8 *CatPrint(U8 *dst,U8 *fmt,...);
 
 #help_index "Char/Operations;Memory/Adam Heap"
 public extern U8 *AStrNew(U8 *buf);
@@ -280,7 +282,8 @@ public extern I64 Del(U8 *files_find_mask,Bool make_mask=FALSE,
 	Bool del_dir=FALSE,Bool print_msg=TRUE);
 public extern I64 Dir(U8 *files_find_mask="*",Bool full=FALSE);
 public extern Bool Drv(U8 drv_let);
-public extern Bool MkDir(U8 *filename);
+public extern U0 HomeSet(U8 *dirname);
+public extern Bool MkDir(U8 *filename,I64 entry_cnt=0);
 
 #help_index "File/Cmd Line (Typically);Cmd Line (Typically);Install"
 public extern Bool DrvMap(U8 drv_let,CDrv *dv);
@@ -302,8 +305,9 @@ public extern Bool FilesFindMatch(U8 *_test_name,
 public extern Bool IsDir(U8 *dir_name);
 public extern Bool IsDotC(U8 *filename);
 public extern Bool IsDotZ(U8 *filename);
-public extern U0 PutDirLink(U8 *dirname);
-public extern U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE);
+public extern U0 PutDirLink(U8 *dirname,U8 *full_name=NULL);
+public extern U0 PutFileLink(U8 *filename,U8 *full_name=NULL,
+	I64 line=0,Bool plain_text=FALSE);
 public extern U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum);
 public extern U8 *ToggleZorNotZ(U8 *name);
 
@@ -321,6 +325,7 @@ extern I64 FileAttr(U8 *name,I64 old_attr=0);
 #help_index "File/Low Level"
 #help_file "::/Doc/FileLowLevel"
 public extern CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE);
+public extern U0 BlkDevDel(CBlkDev *bd);
 public extern Bool BlkDevLock(CBlkDev *bd);
 public extern CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type);
 public extern Bool BlkDevUnlock(CBlkDev *bd,Bool rst=FALSE);
@@ -332,6 +337,7 @@ public extern I64 ClustersAlloc(CDrv *dv,I64 c=0,
 extern Bool CopySingle(U8 *f1,U8 *f2); //Just one file
 public extern U8 Drv2Let(CDrv *dv=NULL);
 public extern CDrv *DrvChk(CDrv *dv,Bool except=TRUE);
+public extern U0 DrvDel(CDrv *dv);
 public extern Bool DrvLock(CDrv *dv);
 public extern CDrv *DrvMakeFree(U8 drv_let);
 public extern U8 *DrvModelNum(U8 drv_let=0);
@@ -369,8 +375,8 @@ public extern I64 FileWrite(U8 *filename,
 public extern CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0);
 
 #help_index "File/System"
-public extern CATARep *ATAIDDrvs(CATARep *root,
-	I64 _sys_boot_drv,CATARep **_ata_drv,CATARep **_atapi_drv);
+public extern CATARep *ATAIDDrvs(CATARep *root,CATARep **_ata_drv,
+	CATARep **_atapi_drv);
 extern CBlkDev *ATAMount(U8 first_drv_let,
 	I64 type,I64 base0,I64 base1,I64 unit);
 extern Bool ATAPIStartStop(CBlkDev *bd,F64 timeout,Bool start);
@@ -388,7 +394,6 @@ extern U0 (*fp_set_std_palette)();
 public extern U8 *Color2Str(U8 *buf,CColorROPU32 c);
 public extern CColorROPU16 Str2ColorU16(U8 *st);
 public extern CColorROPU32 Str2ColorU32(U8 *st);
-
 #help_index "Hash"
 #help_file "::/Doc/Hash"
 public _extern _HASH_ADD U0 HashAdd(CHash *temph,CHashTable *table);
@@ -402,6 +407,7 @@ public _extern _HASH_SINGLE_TABLE_FIND CHash *HashSingleTableFind(
 	U8 *needle_str,CHashTable *haystack_table,I64 mask,I64 instance=1);
 public _extern _HASH_STR I64 HashStr(U8 *st);
 public extern CHashTable *HashTableNew(I64 size,CTask *mem_task=NULL);
+
 #help_index "Hash/Frame"
 #help_file "::/Doc/Frame"
 public extern I64 FramePtr(U8 *name,CTask *task=NULL);

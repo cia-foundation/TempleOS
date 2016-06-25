@@ -74,7 +74,6 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  else
 	    tempc2=tempi->t.a2c;
 	  tempi->a2.type=MDF_STK+CmpRawType(tempc2);
-	  tempi->a2.type_pointed_to=CmpRawTypePointed(tempc2);
 	  tempi->ic_flags|=ICF_A2_WAS_STK;
 	case IS_1_ARG:
 	  tempi1=PrsPop(ps);
@@ -85,7 +84,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  else
 	    tempc1=tempi->t.a1c;
 	  tempi->a1.type=MDF_STK+CmpRawType(tempc1);
-	  tempi->a1.type_pointed_to=CmpRawTypePointed(tempc1);
+	  tempi->a1_type_pointed_to=CmpRawTypePointed(tempc1);
 	  tempi->ic_flags|=ICF_A1_WAS_STK;
 	  break;
 	case IS_0_ARG: //nobound switch
@@ -93,7 +92,6 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
       }
       if (intermediate_code_table[code].res_cnt) {
 	tempi->r.type=MDF_STK+CmpRawType(tempc);
-	tempi->r.type_pointed_to=CmpRawTypePointed(tempc);
 	tempi->ic_flags|=ICF_R_WAS_STK;
 	PrsPush(ps,tempi);
       }
@@ -119,13 +117,13 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  tempi->a1.reg=REG_RBP;
 	  break;
 	case IC_DEREF:
-	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
+	  tempi->a1_type_pointed_to=tempi->r.type.raw_type;
 	  if (tempi1->ic_code==IC_LEA) {
 	    tempi->ic_flags|=tempi1->ic_flags;
 	    tempi->a1.reg=tempi1->a1.reg;
 	    tempi->a1.disp=tempi1->a1.disp;
 	    tempi->a1.type=MDF_DISP+tempi->r.type.raw_type;
-	    tempi->a1.type_pointed_to=tempi->r.type_pointed_to;
+	    tempi->a1_type_pointed_to=CmpRawTypePointed(tempc);
 	    tempi->ic_code=IC_MOV;
 	    OptFree(tempi1);
 	    if (tempi->a1.reg==REG_RBP)
@@ -141,7 +139,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	      tempi->a1.reg=tempil2->a1.reg;
 	      tempi->a1.disp=tempi->ic_data;
 	      tempi->a1.type=MDF_DISP+tempi->r.type.raw_type;
-	      tempi->a1.type_pointed_to=tempi->r.type_pointed_to;
+	      tempi->a1_type_pointed_to=CmpRawTypePointed(tempc);
 	      tempi->ic_code=IC_MOV;
 	      OptFree(tempil2);
 	      OptFree(tempil1);
@@ -152,7 +150,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	case IC__MM:
 	case IC_PP_:
 	case IC_MM_:
-	  tempi->r.type_pointed_to=CmpRawTypePointed(tempi->t.a1c);
+	  CmpMinTypePointed(tempi,CmpRawTypePointed(tempi->t.a1c));
 	case IC_DEREF_PP:
 	case IC_DEREF_MM:
 	  if (tempi1->ic_code==IC_LEA && tempi1->a1.type&MDF_DISP &&
@@ -163,7 +161,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		mv[i].score++;
 		break;
 	      }
-	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
+	  tempi->a1_type_pointed_to=tempi->r.type.raw_type;
 	  break;
 	case IC_MUL:
 	case IC_DIV:
@@ -183,7 +181,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	      tempi->t.a1c=tempi->t.a2c;
 	    tempi->ic_data=tempi1->ic_data;
 	    tempi->ic_code=IC_ADD_CONST;
-	    tempi->a1.type_pointed_to=tempi->r.type.raw_type;
+	    tempi->a1_type_pointed_to=tempi->r.type.raw_type;
 	    tempi->a2.type=MDF_NULL;
 	    OptFree(tempi1);
 	    if (tempil2->ic_code==IC_REG && tempil2->a1.reg==REG_RBP) {
@@ -245,8 +243,8 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		mv[i].score++;
 		break;
 	      }
-	  tempi->a1.type_pointed_to=tempi->r.type.raw_type;
-	  tempi->r.type_pointed_to=CmpRawTypePointed(tempi->t.a1c);
+	  tempi->a1_type_pointed_to=tempi->r.type.raw_type;
+	  CmpMinTypePointed(tempi,CmpRawTypePointed(tempi->t.a1c));
 	  break;
 	case IC_RETURN_VAL:
 	case IC_RETURN_VAL2:
@@ -369,7 +367,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 		mv[i].score++;
 		break;
 	      }
-	  tempi->a1.type_pointed_to=CmpRawType(tempc);
+	  tempi->a1_type_pointed_to=CmpRawType(tempc);
 	  goto here1;
 	case IC_BR_LESS:
 	case IC_BR_GREATER_EQU:

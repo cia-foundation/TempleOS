@@ -32,25 +32,25 @@ U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,
 	} while (*_col&7);
 	break;
 
-      sub_switch_start:
+      start:
 	case 'ã':	ptr="pi";	break;
 	case 'é':	ptr="theta";	break;
 	case 'è':	ptr="phi";	break;
 	case 'ê':	ptr="omega";	break;
 	case 'ì':	ptr="inf";	break;
 	case 'æ':	ptr="u";	break;
-      sub_switch_end:
+      end:
 	DocPrint(doc,ptr);
 	*_col=*_col+StrLen(ptr);
 	break;
 
-      sub_switch_start:
+      start:
 	case CH_SHIFT_SPACE: ptr=" ";	break;
 	case '&':	ptr="&amp;";	break;
 	case '<':	ptr="&lt;";	break;
 	case '>':	ptr="&gt;";	break;
 	case '"':	ptr="&quot;";	break;
-      sub_switch_end:
+      end:
 	DocPrint(doc,ptr);
 	*_col=*_col+1;
 	break;
@@ -148,7 +148,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";

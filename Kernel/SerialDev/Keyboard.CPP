@@ -362,9 +362,9 @@ U0 KbdBuildSC(U8 raw_byte,Bool in_irq,U8 *_last_raw_byte,I64 *_last_sc)
 	CtrlAltDel(sc);
       else {
 	if (sc&255==SC_ESC)
-	  ch='e';
-	else if (sc&255==SC_TAB)
 	  ch='t';
+	else if (sc&255==SC_TAB)
+	  ch='n';
 	else
 	  ch=ScanCode2Char(sc&255);
 	if ('a'<=ch<='z') {

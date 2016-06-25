@@ -1,5 +1,5 @@
 #help_index "Misc/Registry"
-#define REGISTRY_FILENAME "::/Home/Registry.CPP.Z"
+#define REGISTRY_FILENAME "~/Registry.CPP.Z"
 CDoc *sys_registry_doc=NULL;
 I64 sys_msg_flags[1]={0};
 F64 registry_version;
@@ -30,7 +30,7 @@ public Bool RegSetDftEntry(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
       else
 	Adam("%s",val);
     }
-    if (DrvIsWritable(':'))
+    if (DrvIsWritable(*sys_registry_doc->filename.name))
       DocWrite(sys_registry_doc);
     res=FALSE;
   } else
@@ -58,7 +58,7 @@ public Bool RegWriteBranch(U8 *path,U8 *fmt,...)
     DocCut(sys_registry_doc,tree_branch,end_indent);
   DocTreeMake(sys_registry_doc,path);
   DocPrint(sys_registry_doc,"%s",buf);
-  if (DrvIsWritable(':'))
+  if (DrvIsWritable(*sys_registry_doc->filename.name))
     DocWrite(sys_registry_doc);
   if (unlock_doc)
     DocUnlock(sys_registry_doc);

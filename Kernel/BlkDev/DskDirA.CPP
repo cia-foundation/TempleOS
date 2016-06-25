@@ -160,9 +160,9 @@ CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_res,I64 fuf_flags)
   return _res;
 }
 
-U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
+U0 PutFileLink(U8 *filename,U8 *full_name=NULL,I64 line=0,Bool plain_text=FALSE)
 {//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ file,line link to StdOut, $LK,"DocPut",A="MN:DocPut"$.
-  U8 *buf;
+  U8 *st;
   if (!filename) return;
   if (IsRaw) {
     if (line)
@@ -177,32 +177,38 @@ U0 PutFileLink(U8 *filename,I64 line=0,Bool plain_text=FALSE)
       else
 	"$$LK,\"%s\",A=\"AI:%s\"$$",filename+3,filename+3;
     } else {
-      buf=FileNameAbs(filename);
+      if (!full_name)
+	full_name=st=FileNameAbs(filename);
+      else
+	st=NULL;
       if (plain_text) {
 	if (line)
-	  "$$LK,\"%s,%04d\",A=\"PL:%s,%d\"$$",filename,line,buf,line;
+	  "$$LK,\"%s,%04d\",A=\"PL:%s,%d\"$$",filename,line,full_name,line;
 	else
-	  "$$LK,\"%s\",A=\"PI:%s\"$$",filename,buf;
+	  "$$LK,\"%s\",A=\"PI:%s\"$$",filename,full_name;
       } else {
 	if (line)
-	  "$$LK,\"%s,%04d\",A=\"FL:%s,%d\"$$",filename,line,buf,line;
+	  "$$LK,\"%s,%04d\",A=\"FL:%s,%d\"$$",filename,line,full_name,line;
 	else
-	  "$$LK,\"%s\",A=\"FI:%s\"$$",filename,buf;
+	  "$$LK,\"%s\",A=\"FI:%s\"$$",filename,full_name;
       }
-      Free(buf);
+      Free(st);
     }
   }
 }
 
-U0 PutDirLink(U8 *dirname)
+U0 PutDirLink(U8 *dirname,U8 *full_name=NULL)
 {//Put $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ dir macro to StdOut, $LK,"DocPut",A="MN:DocPut"$.
-  U8 *buf;
+  U8 *st;
   if (!dirname) return;
   if (IsRaw)
     "%s",dirname;
   else {
-    buf=DirNameAbs(dirname);
-    "$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$",dirname,buf;
-    Free(buf);
+    if (!full_name)
+      full_name=st=DirNameAbs(dirname);
+    else
+      st=NULL;
+    "$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$",dirname,full_name;
+    Free(st);
   }
 }

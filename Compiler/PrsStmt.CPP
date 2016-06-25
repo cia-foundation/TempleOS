@@ -186,7 +186,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   while (tempm) {
     if (tempm->flags & MLF_NO_UNUSED_WARN) {
       if (tempm->use_cnt>1&&StrCmp(tempm->str,"_anon_"))
-	PrintWarn("Unneeded nounusedwarn\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
+	PrintWarn("Unneeded no_warn\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 	      cc->lex_include_stk->full_name,cc->lex_include_stk->line_num,
 	      tempm->str,cc->htc.fun->str);
     } else if (!tempm->use_cnt && GetOption(OPTf_WARN_UNUSED_VAR))
@@ -618,9 +618,9 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
     while (cc->token && cc->token!='}') {
 sw_cont:
       switch (PrsKeyWord(cc)) {
-	case KW_SUB_SWITCH_END:
+	case KW_END:
 	  goto sw_sub_end;
-	case KW_SUB_SWITCH_START:
+	case KW_START:
 	  if (Lex(cc)==':')
 	    Lex(cc);
 	  else
@@ -636,10 +636,10 @@ sw_cont:
 	  tempi_start=ICAdd(cc,IC_LABEL,tempss->lb_start,0);
 	  while (cc->token && cc->token!='}') {
 	    switch (PrsKeyWord(cc)) {
-	      case KW_SUB_SWITCH_END:
+	      case KW_END:
 		OptFree(tempi_jmp);
 		goto sw_sub_end;
-	      case KW_SUB_SWITCH_START:
+	      case KW_START:
 	      case KW_CASE:
 	      case KW_DFT:
 		if (cc->coc.coc_root.last==tempi_start) {
@@ -749,8 +749,8 @@ sw_sub_end:
     } else {
       QueRem(tempss);
       Free(tempss);
-      if (PrsKeyWord(cc)!=KW_SUB_SWITCH_END)
-	LexExcept(cc,"Missing 'sub_switch_end' at ");
+      if (PrsKeyWord(cc)!=KW_END)
+	LexExcept(cc,"Missing 'end' at ");
       if (Lex(cc)==':')
 	Lex(cc);
       else
@@ -784,7 +784,7 @@ sw_sub_end:
   mc_jt->range=range;
 }
 
-U0 PrsNoUnusedWarn(CCmpCtrl *cc)
+U0 PrsNoWarn(CCmpCtrl *cc)
 {
   CMemberLst *tempm;
   while (cc->token==TK_IDENT) {
@@ -936,7 +936,7 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		case KW_NUM_KEYWORDS-1: //nobound switch
 		default: //A keyword that is not valid here is just a symbol.
 		  goto sm_not_keyword_afterall;
-		sub_switch_start:
+		start:
 		  case KW_ASM:
 		    if (cc->htc.fun) {
 		      if (tempaot=CmpJoin(cc,CMPF_ASM_BLK))
@@ -956,7 +956,7 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		      fsp_flags=FSF_ASM;
 		    }
 		    break;
-		  sub_switch_start:
+		  start:
 		    Lex(cc);
 		    case KW_LOCK:
 		      cc->lock_cnt++;
@@ -981,11 +981,11 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		    case KW_SWITCH:
 		      PrsSwitch(cc,try_cnt);
 		      break;
-		  sub_switch_end:
-		sub_switch_end:
+		  end:
+		end:
 		  if (cc->token!=',') goto sm_done;
 		  break;
-		sub_switch_start:
+		start:
 		  if (cc->htc.fun)
 		    LexExcept(cc,"Not allowed in fun");
 		  Lex(cc);
@@ -1055,10 +1055,10 @@ sm_import:
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0__INTERN|PRS1_NULL,tempex,i,fsp_flags);
 		    break;
-		sub_switch_end:
+		end:
 		  fsp_flags&=FSF_ASM;
 		  break;
-		sub_switch_start:
+		start:
 		  case KW_STATIC:
 		    fsp_flags=FSF_STATIC|fsp_flags&FSF_ASM;
 		    break;
@@ -1078,7 +1078,7 @@ sm_import:
 		  case KW_PUBLIC:
 		    fsp_flags=FSF_PUBLIC|fsp_flags&(FSG_FUN_FLAGS2|FSF_ASM);
 		    break;
-		sub_switch_end:
+		end:
 		  Lex(cc);
 		  break;
 		case KW_RETURN:
@@ -1131,9 +1131,9 @@ sm_import:
 		    LexExcept(cc,"'break' not allowed\n");
 		  ICAdd(cc,IC_JMP,lb_break,0);
 		  goto sm_semicolon;
-		case KW_NOUNUSEDWARN:
+		case KW_NO_WARN:
 		  Lex(cc);
-		  PrsNoUnusedWarn(cc);
+		  PrsNoWarn(cc);
 		  goto sm_semicolon;
 		case KW_UNION:
 		case KW_CLASS:

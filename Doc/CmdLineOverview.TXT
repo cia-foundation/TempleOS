@@ -18,7 +18,7 @@ Directories are referenced with $FG,2$/$FG$ not $FG,2$\$FG$.  There is a current
 
 Most filenames end in $FG,2$.Z$FG$ because they are stored compressed.
 
-Drives are specified with a letter.  The boot drive is specified with a '$FG,2$:$FG$'.
+Drives are specified with a letter.  The boot drive is specified with a '$FG,2$:$FG$'.  The home dir drive is specified with a $FG,2$'~'$FG$.
 
 >$FG,2$Drv('B');$FG$	B drive
 
@@ -27,11 +27,13 @@ The drive can be specified in a $LK,"Cd",A="MN:Cd"$() command as in:
 >$FG,2$Cd("B:/Temp");$FG$	B drive
 >$FG,2$Cd("::/Demo");$FG$	Boot drive
 
->$FG,2$Cd("::/Home/Psalmody");$FG$	See $LK,"::/Home dir",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.
+The home directory is specified with a $FG,2$'~'$FG$.
+
+>$FG,2$Cd("~/Psalmody");$FG$	See $LK,"::/Home dir",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.
 
 If a file is not found, $FG,2$.Z$FG$ is added or removed and a search is done, again.  If a file is still not found, all parent directories are searched.
 
-You can place macros in your $LK,"PersonalMenu",A="FI:/Home/PersonalMenu.TXT"$ for $LK,"Cd",A="MN:Cd"$() commands.  $FG,2$<CTRL-m>$FG$ to access your menu.
+You can place macros in your $LK,"PersonalMenu",A="FI:~/PersonalMenu.TXT"$ for $LK,"Cd",A="MN:Cd"$() commands.  $FG,2$<CTRL-m>$FG$ to access your menu.
 
 >$FG,2$Find("needle","/Demo/*.CPP.Z;*.TXT.Z;");$FG$ See $LK,"File Utils",A="FI:::/Doc/FileUtils.TXT"$.
 

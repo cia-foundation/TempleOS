@@ -5,6 +5,9 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
   switch (bd->type) {
     case BDT_RAM:
       break;
+    case BDT_FILE:
+      bd->lock_fwding=Let2BlkDev(*bd->file_dsk_name);
+      break;
     case BDT_ATA:
     case BDT_ATAPI:
       for (i=0;i<NUM_BLKDEVS;i++) {
@@ -33,9 +36,11 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
   else
     dv=DrvNextFree(bd->first_drv_let+res);
   dv->bd=bd;
-  dv->size=bd->max_blk+1;
+  dv->drv_offset=bd->drv_offset;
+  dv->size=bd->max_blk+1-bd->drv_offset;
   switch (bd->type) {
     case BDT_RAM:
+    case BDT_FILE:
       dv->dv_signature=DRV_SIGNATURE_VAL;
       dv->fs_type=FSt_REDSEA;
 //This is to force creation of a RAM
@@ -60,7 +65,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	  dv->dv_signature=DRV_SIGNATURE_VAL;
 	  res++;
 	  dv->fs_type=FSt_REDSEA;
-	  dv->size=bd->max_blk+1;
+	  dv->size=bd->max_blk+1-bd->drv_offset;
 //The following read is a test read.
 	  //if it hangs, the drive is not supported.
 	  ATAReadBlks(bd,&mbr,0,1);
@@ -80,7 +85,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	      else
 		dv=DrvNextFree(bd->first_drv_let+res);
 	      dv->bd=bd;
-	      dv->base_offset=mbr.p[i].offset+offset;
+	      dv->drv_offset=mbr.p[i].offset+offset;
 	      dv->size	=mbr.p[i].size;
 	      switch (mbr.p[i].type) {
 		case MBR_PT_REDSEA:
@@ -95,7 +100,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		case MBR_PT_FAT32d:
 		case MBR_PT_FAT32e:
 		case MBR_PT_FAT32f:
-		  ATAReadBlks(bd,&br,dv->base_offset,1);
+		  ATAReadBlks(bd,&br,dv->drv_offset,1);
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
 		  res++;
 		  if (br.signature==MBR_PT_REDSEA) {
@@ -122,6 +127,8 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	      }
 	    }
 	  }
+	  if (Let2BlkDevType(bd->first_drv_let+res)!=bd->type)
+	    break;
 	  if (j<0)
 	    break;
 	  if (!mbr.p[j].offset)
@@ -138,7 +145,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
       dv->dv_signature=DRV_SIGNATURE_VAL;
       res++;
       dv->fs_type=FSt_ISO9660; //Start with this
-      dv->size =0;
+      dv->size=0;
       break;
   }
   if (res)
@@ -220,5 +227,4 @@ U0 BlkDevsInitAll()
     StreamDoc(kernel_cfg->add_dev);
     StreamPrint("#exe {Option(OPTf_WARN_PAREN,ON);}");
   };
-  DrvRep;
 }

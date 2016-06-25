@@ -37,16 +37,18 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
   try {
     unlock=DrvLock(dv);
     BlkDevInit(bd);
-    if (dv->base_offset && blk<dv->base_offset ||
-	  blk+cnt>dv->base_offset+dv->size)
+    if (dv->drv_offset && blk<dv->drv_offset ||
+	  blk+cnt>dv->drv_offset+dv->size)
       throw('Drv');
-
     if (bd->flags & BDF_READ_CACHE)
       RCache(dv,&buf,&blk,&cnt);
     if (cnt>0) {
       switch (bd->type) {
 	case BDT_RAM:
 	  MemCpy(buf,bd->RAM_dsk+blk<<BLK_SIZE_BITS,cnt<<BLK_SIZE_BITS);
+	  break;
+	case BDT_FILE:
+	  FRBlks(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:
@@ -76,13 +78,16 @@ Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
     BlkDevInit(bd);
     if (bd->flags&BDF_READ_ONLY && !(bd->flags & BDF_READ_ONLY_OVERRIDE))
       throw('BlkDev');
-    if (dv->base_offset && blk<dv->base_offset ||
-	  blk+cnt>dv->base_offset+dv->size)
+    if (dv->drv_offset && blk<dv->drv_offset ||
+	  blk+cnt>dv->drv_offset+dv->size)
       throw('Drv');
     if (cnt>0) {
       switch (bd->type) {
 	case BDT_RAM:
 	  MemCpy(bd->RAM_dsk+blk<<BLK_SIZE_BITS,buf,cnt<<BLK_SIZE_BITS);
+	  break;
+	case BDT_FILE:
+	  FWBlks(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:

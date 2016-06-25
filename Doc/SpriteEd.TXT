@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Sprite Edit Menu Help"$$FG$
 
-Order of elements matters.  They are executed in the order they appear in the side-bar.  You can select or unselect elements graphically, or with text in the sidebar.  Then, cut, copy, paste, shift or transform them.
+Order of elements matters.  They are executed in the order they appear in the side-bar.  You can sel or unsel elements graphically, or with text in the sidebar.  Then, cut, copy, paste, shift or transform them.
 
 You can set the current insert point element by clicking the element in the side-bar and making it RED.
 

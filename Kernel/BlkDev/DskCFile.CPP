@@ -55,8 +55,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 	f->flags&=~FF_NEW_FILE;
       }
       DirContextDel(dirc);
-      if (!contiguous || cnt>0)
-	return f;
+      return f;
     }
   } else {
     if (FileFind(full_name,&f->de,FUF_JUST_FILES)) {

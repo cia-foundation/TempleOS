@@ -216,7 +216,7 @@ U0 KbdMouseRst()
 
 Bool MouseDriverInstall(I64 dummy=0) //can be spawned
 {
-  nounusedwarn dummy;
+  no_warn dummy;
   I64 i;
   mouse.install_in_progress=TRUE;
   OutU8(0xA1,InU8(0xA1)|0x10);

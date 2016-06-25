@@ -1,7 +1,7 @@
 #help_index "DolDoc/Misc"
 
 U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _temp_u32_attr)
-{//Be aware of $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
+{//Be aware of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.CPP"$.
   U32 *res=MAlloc((len+1)*sizeof(U32)),*dst=res;
   U8 *ptr;
   CDocSettings *s=&doc_e->settings;

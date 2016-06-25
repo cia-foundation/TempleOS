@@ -100,7 +100,8 @@ public U0 MakeWebSitePartial()
 public U0 Blog()
 {
   if (!FileFind(BlogLocalFile,,FUF_JUST_FILES))
-    Copy("::/Home/Downloads/Blog/DailyBlogHeader.TXT.Z",BlogLocalFile);
+    Copy("~/Web/" PERSONAL_INITIALS "/DailyBlogHeader.TXT.Z",
+	  BlogLocalFile);
   AutoComplete;
   WinBorder;
   WinMax;

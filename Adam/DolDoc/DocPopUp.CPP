@@ -112,6 +112,7 @@ public U8 *PopUpPickLst(U8 *lst)
   return i;
 }
 
+#help_index "DolDoc/Input;Char/Lists;Char/Define;StdIn/DolDoc"
 public U8 *PopUpPickDefineSub(U8 *dname)
 {//Prompt for $LK,"Define",A="HI:Define"$ lst entry in PopUp win task.
   return PopUpPickLst(Define(dname));
@@ -295,7 +296,8 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
     okay=FALSE;
   if (okay) {
     st=MStrPrint(
-	  "\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\");\\n\");UserTaskCont;",
+	  "\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\",CCF_CMD_LINE);\\n\");"
+	  "UserTaskCont;",
 	  name2);
     res=PopUp(st,parent,_pu_task);
     Free(st);

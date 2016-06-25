@@ -86,7 +86,8 @@ BHD_HISTART:
 @@10:	POP	CX
 	LOOP	@@05
 
-	MOV	EBX,BOOT_SRC_HARDDRV //$MA-X+PU,"See sys_boot_src",LM="Find(\"sys_boot_src\",\"/*\");View;\n"$
+	XOR	EBX,EBX
+	MOV	EAX,BOOT_SRC_HARDDRV //$MA-X+PU,"See sys_boot_src",LM="Find(\"sys_boot_src\",\"/*\");View;\n"$
 //My assembler doesn't support 16-bit very well.
 	DU8	0xEA;	//JMP BOOT_RAM_BASE:0000
 	DU16	0,BOOT_RAM_BASE/16;

@@ -1,5 +1,5 @@
-if (!FileFind("::/Home/TimeClock",,FUF_JUST_DIRS)) {
-  MkDir("::/Home/TimeClock");
+if (!FileFind("~/TimeClock",,FUF_JUST_DIRS)) {
+  MkDir("~/TimeClock");
   DocClear;
   "After Loading, type $$GREEN$$PunchIn;$$FG$$, "
   "$$GREEN$$PunchOut;$$FG$$ or $$GREEN$$TimeRep;$$FG$$\n"

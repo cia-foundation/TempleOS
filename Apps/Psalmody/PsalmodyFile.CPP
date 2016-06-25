@@ -33,11 +33,11 @@ U0 PsmCutToClipboard()
   tempo=oc.root.next;
   while (tempo!=&oc.root) {
     tempo1=tempo->next;
-    if (tempo->flags&PSMF_SELECTED) {
+    if (tempo->flags&PSMF_SEL) {
       if (oc.cur_note==tempo)
 	oc.cur_note=tempo->next;
       QueRem(tempo);
-      tempo->flags&=~PSMF_SELECTED;
+      tempo->flags&=~PSMF_SEL;
       QueIns(tempo,oc.clipboard.last);
     }
     tempo=tempo1;
@@ -61,8 +61,8 @@ U0 PsmCopyToClipboard()
   PsmSongDel(&oc.clipboard);
   tempo=oc.root.next;
   while (tempo!=&oc.root) {
-    if (tempo->flags&PSMF_SELECTED) {
-      tempo->flags&=~PSMF_SELECTED;
+    if (tempo->flags&PSMF_SEL) {
+      tempo->flags&=~PSMF_SEL;
       tempo1=PsmNoteCopy(tempo);
       QueIns(tempo1,oc.clipboard.last);
     }

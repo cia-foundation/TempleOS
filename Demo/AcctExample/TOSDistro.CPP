@@ -1,4 +1,4 @@
-//The CFG defines are $LK,"::/Home/TOSCfg.CPP",A="FI:::/Demo/AcctExample/TOSCfg.CPP"$.
+//The CFG defines are $LK,"~/TOSCfg.CPP",A="FI:::/Demo/AcctExample/TOSCfg.CPP"$.
 
 #help_index "TOS"
 
@@ -68,10 +68,7 @@ public U0 CopySongs(U8 threshold='7')
 
 U0 DistroPrep()
 {
-  Del("/Demo/WebLogExample/WebLogRep.TXT*");
-  Del("/Demo/ReverseFileExample/PoemForeward.TXT*");
-  Del("/Demo/ToHtmlToTXTExample/Out*");
-  Del("/Home/NumBible.TXT.Z");
+  Del("/Home/Demo*");
   DelTree("/Home/*Temp.TXT.Z");
   if (FileFind("/Home/Downloads/Psalmody"))
     CopySongs;
@@ -97,7 +94,7 @@ U0 DistroPrep()
   if (FileFind("/Home/Downloads/Blog/YouTube.TXT.Z"))
     Sort("/Home/Downloads/Blog/YouTube.TXT.Z",,2);
 
-  //Once in a while, do $LK,"::/Home/Downloads/Utils/DblSpaceScan.CPP"$.
+  //Once in a while, do $LK,"~/Downloads/Utils/DblSpaceScan.CPP"$.
 
   CursorRem("/*");
   DelTree("/Demo/*.BI*");
@@ -223,7 +220,7 @@ I64 MakeLineRepFile()
   return res;
 }
 
-U0 TOSDistroPrep()
+U0 StaffDistroPrep()
 {/*This is the TempleOS internal distro.  Only run this on a
 virtual machine, not bare metal hardware because it's settings could cause
 problems.  The hard drive must be partitioned.	Install Std Distro, then
@@ -233,17 +230,18 @@ install this on top.
   DistroPrep;
   Auto(TOS_DVD_CFG);
   MakeOSDrvBootInstall('C','T');
+  Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
 }
-U0 MakeTOSDistro()
+U0 MakeStaffDistro()
 {
-  TOSDistroPrep;
-  ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
+  StaffDistroPrep;
+  ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
-  DefinePrint("DD_TEMPLEOSTS_SIZE",
-	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+  DefinePrint("DD_TEMPLEOSSTAFF_SIZE",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -267,6 +265,7 @@ I call $LK,"MakeBootDrvFile",A="FF:::/Demo/AcctExample/TOSDistro.CPP,MakeBootRes
   MakeBootRescueDrvFile;
   Auto(TOS_DVD_DBG_CFG);
   MakeOSDrvBootInstall('C','T');
+  Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
@@ -275,10 +274,10 @@ I call $LK,"MakeBootDrvFile",A="FF:::/Demo/AcctExample/TOSDistro.CPP,MakeBootRes
 U0 MakeDbgDistro()
 {
   DbgDistroPrep;
-  ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
+  ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -289,6 +288,7 @@ U0 StdDistroPrep()
   DistroPrep;
   Auto(STD_DISTRO_DVD_CFG);
   MakeOSDrvBootInstall('C','T');
+  Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   DelTree(TOS_DISTRO_DIR "/Home");
@@ -300,8 +300,20 @@ U0 StdDistroPrep()
 U0 MakeStdDistro()
 {
   StdDistroPrep;
-  ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
+  ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
+  DefinePrint("DD_TEMPLEOSCD_SIZE",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
+  Drv('C');
+}
+U0 MakeStdRedSeaDistro()
+{
+  StdDistroPrep;
+  RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
+  DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+	0.1*(10*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
 
@@ -323,10 +335,10 @@ Demos, Documentation.
 U0 MakeLiteDistro()
 {
   LiteDistroPrep;
-  ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
+  ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -356,11 +368,20 @@ FileManager, WindowManager, PCSpeaker, Documentation.
 U0 MakeUltraDistro()
 {
   UltraDistroPrep;
-  ISOFileCreate(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
+  ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - UltraLite Distro (%0.1f MB)",
-	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	0.01*(100*Size(TOS_ISO_NAME,"+s")/1024/1024));
+  Drv('C');
+}
+U0 MakeUltraRedSeaDistro()
+{
+  UltraDistroPrep;
+  RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
+  DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
+	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
 
@@ -368,26 +389,38 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
+
+    DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
+	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+	  0.1*(10*Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024/1024));
+    DefinePrint("DD_TEMPLEOSCD_RS_K_SIZE",
+	  "%d KB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
+
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.1f MB)",
-	  0.1*(10*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
+	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	  0.01*(100*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
+
+    DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
+	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+	  0.01*(100*Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024/1024));
+    DefinePrint("DD_TEMPLEOSULTRA_RS_K_SIZE",
+	  "%d KB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);
   } catch
     Fs->catch_except=TRUE;
 }
-
 UpdateISODocDefines;
 
 public U0 MakeDistrosAndBackUp()
 {
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   progress4=*progress4_desc=0;
-  progress4_max=14;
+  progress4_max=19;
   AutoComplete;
   WinBorder;
   WinMax;
@@ -401,11 +434,23 @@ public U0 MakeDistrosAndBackUp()
 
   MakeStdDistro; progress4++;
   DocClear;
-  Copy(TOS_ISO_NAME,"D:/Wb/TempleOSCD.ISO"); progress4++;
+  Move(TOS_ISO_NAME,"D:/Wb/TempleOSCD.ISO"); progress4++;
+
+  MakeStdRedSeaDistro; progress4++;
+  DocClear;
+  Move(TOS_ISO_C_NAME,"D:/Wb/TempleOSCDRS.ISO"); progress4++;
 
   MakeUltraDistro; progress4++;
   DocClear;
-  Copy(TOS_ISO_NAME,"D:/Wb/TempleOSUltra.ISO"); progress4++;
+  Move(TOS_ISO_NAME,"D:/Wb/TempleOSUltra.ISO"); progress4++;
+
+  MakeUltraRedSeaDistro; progress4++;
+  DocClear;
+  Move(TOS_ISO_C_NAME,"D:/Wb/TempleOSUltraRS.ISO"); progress4++;
+
+  MakeStaffDistro; progress4++;
+  DocClear;
+  Move(TOS_ISO_NAME,"D:/Wb/TempleOSStaff.ISO"); progress4++;
 
   UpdateISODocDefines;
 

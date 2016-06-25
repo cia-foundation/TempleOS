@@ -398,11 +398,13 @@ public U0 MapFileLoad(U8 *filename)
 	if (*doc_e->tag) {
 	  Free(temph->src_link);
 	  temph->src_link=doc_e->aux_str;
-
 	  ptr=temph->src_link;
-	  if (ptr[0] && ptr[1] && ptr[2]==':' && ptr[3]==':')
-	    ptr[3]=blkdev.boot_drv_let;
-
+	  if (ptr[0] && ptr[1] && ptr[2]==':') {
+	    if (ptr[3]==':')
+	      ptr[3]=blkdev.boot_drv_let;
+	    else if (ptr[3]=='~')
+	      ptr[3]=*blkdev.home_dir;
+	  }
 	  doc_e->aux_str=NULL;
 	}
 	if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM) &&

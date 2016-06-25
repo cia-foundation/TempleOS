@@ -361,7 +361,7 @@ bm_menu:
 	      GrPlot3(img,a1-xx1,a2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
-	    sub_switch_start:
+	    start:
 	      if (down)
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      x1=a1; y1=a2;
@@ -386,7 +386,7 @@ bm_menu:
 		dc->pen_width=1;
 		GrBorder(dc,x1,y1,x1,y1);
 		break;
-	    sub_switch_end:
+	    end:
 	      break;
 	    case GBM_PASTE:
 	    case GBM_PASTE_TRANSPARENT:

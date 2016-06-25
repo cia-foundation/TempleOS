@@ -196,9 +196,11 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->win_top		=13;
   task->win_bottom	=text.rows-2;
 
-  if (blkdev.boot_drv_let) //Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart.CPP,TaskInit"$. I guess ok until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.CPP,ChgDsk"$().
-    task->cur_dv=blkdev.let_to_drv[ToUpper(blkdev.boot_drv_let)-'A'];
-  task->cur_dir=StrNew("/Home",task);
+  if (blkdev.home_dir) {//Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart.CPP,TaskInit"$. I guess ok until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.CPP,ChgDsk"$().
+    task->cur_dv=blkdev.let_to_drv[*blkdev.home_dir-'A'];
+    task->cur_dir=StrNew(blkdev.home_dir+2,task);
+  } else
+    task->cur_dir=StrNew("/Home",task);
 
   Seed(,task);
 
@@ -353,7 +355,7 @@ U0 UserTaskCont()
   CDoc *doc;
   Bool cont=TRUE;
   do {
-    cc=CmpCtrlNew(,CCF_PMT|CCF_QUESTION_HELP);
+    cc=CmpCtrlNew(,CCF_CMD_LINE|CCF_PMT|CCF_QUESTION_HELP);
     QueIns(cc,Fs->last_lex);
     try {
       Lex(cc);
@@ -371,7 +373,7 @@ U0 UserTaskCont()
 
 U0 SrvCmdLine(I64 dummy=0)
 {
-  nounusedwarn dummy;
+  no_warn dummy;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
   if (HashFind("SrvStartUp",adam_task->hash_table,HTT_FUN))
     CallExtStr("SrvStartUp");
@@ -380,7 +382,7 @@ U0 SrvCmdLine(I64 dummy=0)
 
 U0 UserCmdLine(I64 dummy=0)
 {//A user task ends-up calling this.
-  nounusedwarn dummy;
+  no_warn dummy;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
   if (HashFind("UserStartUp",adam_task->hash_table,HTT_FUN))
     CallExtStr("UserStartUp");

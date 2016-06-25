@@ -29,8 +29,8 @@ $WW,1$$WW,0$*/
 #define PSMT_NOTE	1
 #define PSMT_METER	2
 
-#define PSMf_SELECTED	0
-#define PSMF_SELECTED	1
+#define PSMf_SEL	0
+#define PSMF_SEL	1
 #define PSMf_SHARP	1
 #define PSMf_FLAT	2
 #define PSMf_TIE	3

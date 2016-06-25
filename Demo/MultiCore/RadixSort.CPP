@@ -63,14 +63,14 @@ U0 QSortU32(I32 *base,I64 num)
 
 U0 MPSort(I64 dummy=0)
 {
-  nounusedwarn dummy;
+  no_warn dummy;
   QSortU32(b[Gs->num],bn[Gs->num]);
   LBtr(&mp_not_done_flags,Gs->num);
 }
 
 U0 MPRadixSortDemo(I64 dummy=0)
 {
-  nounusedwarn dummy;
+  no_warn dummy;
   I64 i,j,k1,k2;
   F64 t0;
   a1=MAlloc(NUM*sizeof(I32));

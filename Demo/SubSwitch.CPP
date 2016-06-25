@@ -6,12 +6,12 @@ U0 SubSwitch()
       case 0: "Zero ";	break;
       case 2: "Two ";	break;
       case 4: "Four ";	break;
-      sub_switch_start:
+      start:
 	"[";
 	case 1: "One";	break;
 	case 3: "Three";break;
 	case 5: "Five";	break;
-      sub_switch_end:
+      end:
 	"] ";
 	break;
     }

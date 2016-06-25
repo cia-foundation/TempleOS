@@ -1,4 +1,4 @@
-#define TIME_FILENAME	"::/Home/TimeClock/TimeFile.DAT.Z"
+#define TIME_FILENAME	"~/TimeClock/TimeFile.DAT.Z"
 
 #define TET_EOF		0
 #define TET_PUNCH_IN	1

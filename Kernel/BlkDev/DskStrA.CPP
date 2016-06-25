@@ -60,7 +60,7 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
     else
       ptr=test_name2;
     if (*mask2) {
-      if (*mask2=='~') {
+      if (*mask2=='!') {
 	if (WildMatch(ptr,mask2+1)) {
 	  res=FALSE;
 	  break;
@@ -115,6 +115,8 @@ U8 *DirNameAbs(U8 *_dirname)
   if (*dirname && dirname[1]==':') {
     if (*dirname==':')
       *drv=blkdev.boot_drv_let;
+    else if (*dirname=='~')
+      *drv=*blkdev.home_dir;
     else
       *drv=*dirname;
     dirname=dirname+2;
@@ -139,9 +141,13 @@ U8 *DirNameAbs(U8 *_dirname)
       StrLastRem(buf3,"/");
       if (!*buf3)
 	StrCpy(buf3,"/");
-    } else if (!StrCmp(buf4,".")) {
-      ;
-    } else if (*buf4) {
+    } else if (!StrCmp(buf4,"~")) {
+      Free(buf3);
+      buf3=MAlloc(StrLen(blkdev.home_dir+2)+1+StrLen(buf2)+1);
+      StrCpy(buf3,blkdev.home_dir+2);
+      *drv=*blkdev.home_dir;
+    } else if (!StrCmp(buf4,"."));
+    else if (*buf4) {
       if (StrCmp(buf3,"/"))
 	CatPrint(buf3,"/");
       CatPrint(buf3,buf4);
@@ -265,7 +271,7 @@ U8 *ToggleZorNotZ(U8 *name)
 
 U8 *FileNameTempTxt()
 {//Make pretty-safe temp filename in home dir.
-  return MStrPrint("::/Home/SysTemp%X.TXT.Z",GetTSC>>8&0xFFFFFFFF);
+  return MStrPrint("~/SysTemp%X.TXT.Z",GetTSC>>8&0xFFFFFFFF);
 }
 
 U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL)

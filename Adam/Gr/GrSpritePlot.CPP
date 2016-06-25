@@ -172,7 +172,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	  GrPlot3(dc,x1+x,y1+y,z);
 	}
 	break;
-      sub_switch_start:
+      start:
 	p=&tempg->nu.u;
 	for (i=0;i<tempg->nu.num;i++,p++) {
 	  p->x+=x;
@@ -191,7 +191,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	case SPT_BSPLINE3_CLOSED:
 	  Gr3BSpline3(dc,&tempg->nu.u,tempg->nu.num,TRUE);
 	  break;
-      sub_switch_end:
+      end:
 	p=&tempg->nu.u;
 	for (i=0;i<tempg->nu.num;i++,p++) {
 	  p->x-=x;

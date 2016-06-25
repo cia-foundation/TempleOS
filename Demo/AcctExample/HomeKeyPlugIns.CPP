@@ -321,7 +321,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /JukeBox(Home/Downloads)");
 	else
-	  JukeBox("::/Home/Downloads/Psalmody");
+	  JukeBox("~/Downloads/Psalmody");
 	return TRUE;
       case 'P':
 	if (sc&SCF_KEY_DESC)

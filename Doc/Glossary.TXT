@@ -115,13 +115,15 @@ $FG,2$Reg$FG$	Register, Registry, Regular
 $FG,2$Rem$FG$	Remove
 $FG,2$Rep$FG$	Report, Repeat
 $FG,2$Res$FG$	Result
+$FG,2$Rev$FG$	Reverse, Reversed
 $FG,2$Rqst$FG$	Request
 $FG,2$Rst$FG$	Reset
 $FG,2$Rot$FG$	Rotation
 $FG,2$Rx$FG$	Receive
 $FG,2$Sched$FG$	Sceduler
 $FG,2$Sec$FG$	Second, Secondary
-$FG,2$$FG,2$Sect$FG$	Sector
+$FG,2$Sect$FG$	Sector
+$FG,2$Sel$FG$	Select, Selected
 $FG,2$Seq$FG$	Sequence
 $FG,2$Snd$FG$	Sound
 $FG,2$SP$FG$	SingleProcessor
@@ -167,7 +169,7 @@ There is no $FG,2$main()$FG$ routine.  Instead, stmts outside functions are auto
 $ID,-2$$TR,"JIT Compile Mode"$
 $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$
-$ID,2$The compiler generates insts one step before making actual assembly (machine) language insts.  This code is reverse polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
+$ID,2$The compiler generates insts one step before making actual assembly (machine) language insts.  This code is rev polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
 $ID,-2$$TR,"Drive/Partition"$
 $ID,2$There is no distinction between $FG,2$drive$FG$ or $FG,2$partition$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
 

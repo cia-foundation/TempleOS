@@ -139,7 +139,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
       switch (ch) {
 	case '\\':
 	  switch (ch1) {
-	    sub_switch_start:
+	    start:
 	      case 'n':
 		SPutChar(_dst,'\n',_buf);
 		break;
@@ -164,7 +164,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	      case '0':
 		SPutChar(_dst,0,_buf);
 		break;
-	    sub_switch_end:
+	    end:
 	      ptr++;
 	      break;
 
@@ -281,7 +281,7 @@ to avoid this.
       aux_fmt_num=0;
       while (TRUE) {
 	switch (*fmt) {
-	  sub_switch_start:
+	  start:
 	    case '$$':
 	      flags|=SPF_DOLLAR;
 	      break;
@@ -296,7 +296,7 @@ to avoid this.
 	      break;
 	    case 'l': //harmless
 	      break;
-	  sub_switch_end:
+	  end:
 	    fmt++;
 	    break;
 
@@ -332,7 +332,7 @@ to avoid this.
       sp_arg:
       k=0;
       switch (*fmt++) {
-	sub_switch_start:
+	start:
 	  case 'F':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
@@ -365,12 +365,12 @@ to avoid this.
 	      throw('StrPrint');
 	    ptr=MPrintTime(argv[cur_arg++]);
 	    break;
-	sub_switch_end:
+	end:
 	  OutStr(ptr,_buf,_dst,len,flags);
 	  Free(ptr);
 	  break;
 
-	sub_switch_start:
+	start:
 	  case 's':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
@@ -393,11 +393,11 @@ to avoid this.
 	    ptr=DefineSub(argv[cur_arg],argv[cur_arg+1]);
 	    cur_arg=cur_arg+2;
 	    break;
-	sub_switch_end:
+	end:
 	  OutStr(ptr,_buf,_dst,len,flags);
 	  break;
 
-	sub_switch_start:
+	start:
 	  case 'c':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
@@ -415,7 +415,7 @@ to avoid this.
 	      ptr++;
 	    }
 	    break;
-	sub_switch_end:
+	end:
 	  if (!(flags&SPF_AUX_FMT_NUM))
 	    aux_fmt_num=1;
 	  while (aux_fmt_num-->0)

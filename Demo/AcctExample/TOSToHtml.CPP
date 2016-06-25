@@ -1,4 +1,4 @@
-//This is a customized version of $LK,"::/Demo/ToHtmlToTXTExample/ToHtml.CPP"$.
+//This is a customized version of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.CPP"$.
 
 #help_index "DolDoc/Conversion"
 //See $LK,"::/Doc/Credits.TXT"$.
@@ -33,25 +33,25 @@ U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,
 	} while (*_col&7);
 	break;
 
-      sub_switch_start:
+      start:
 	case 'ã':	ptr="pi";	break;
 	case 'é':	ptr="theta";	break;
 	case 'è':	ptr="phi";	break;
 	case 'ê':	ptr="omega";	break;
 	case 'ì':	ptr="inf";	break;
 	case 'æ':	ptr="u";	break;
-      sub_switch_end:
+      end:
 	DocPrint(doc,ptr);
 	*_col=*_col+StrLen(ptr);
 	break;
 
-      sub_switch_start:
+      start:
 	case CH_SHIFT_SPACE: ptr=" ";	break;
 	case '&':	ptr="&amp;";	break;
 	case '<':	ptr="&lt;";	break;
 	case '>':	ptr="&gt;";	break;
 	case '"':	ptr="&quot;";	break;
-      sub_switch_end:
+      end:
 	DocPrint(doc,ptr);
 	*_col=*_col+1;
 	break;
@@ -83,7 +83,7 @@ U8 *URLBibleGateway(U8 *src)
 {
   U8 buf[STR_LEN],*dst=buf;
   if (!MemCmp(src,"BF:",3))
-   src+=3;
+    src+=3;
   while (*src) {
     if (*src==CH_SPACE || *src==',')
       *dst++='+';
@@ -92,8 +92,12 @@ U8 *URLBibleGateway(U8 *src)
     src++;
   }
   *dst=0;
-  return MStrPrint(
-	"http://www.biblegateway.com/passage/?search=%s&version=NIV",buf);
+  if (StrOcc(buf,'-'))
+    return MStrPrint(
+	  "http://www.biblegateway.com/passage/?search=%s&version=NIV",buf);
+  else
+    return MStrPrint(
+	  "http://www.biblegateway.com/verse/en/%s",buf);
 }
 
 U8 *TOSLinkCvt1(U8 *link_st)
@@ -122,12 +126,8 @@ U8 *TOSLinkCvt1(U8 *link_st)
 	  Yield;
 	if (!bible)
 	  bible=Adam("DocRead(\"%s\");",filename);
-	if (DocFind(bible,num,needle)) {
-	  if (StrOcc(link_st,'-'))
-	    res=URLBibleGateway(link_st);
-	  else
-	    res=TOSLinkCvt2(filename,bible->cur_entry->y+1);
-	}
+	if (DocFind(bible,num,needle))
+	  res=URLBibleGateway(link_st);
 	LBtr(&locks,0);
 	break;
       default:
@@ -171,7 +171,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -393,7 +393,7 @@ U0 TOSWebFile(U8 *name)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.06",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;

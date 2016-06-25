@@ -45,7 +45,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Cursor Down, Select");
+		    KeyDescSet("Edit/Cursor Down, Sel");
 		  else
 		    KeyDescSet("Edit/Cursor Down");
 		} else
@@ -58,12 +58,12 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/GoTo Doc End, Select");
+		    KeyDescSet("Edit/GoTo Doc End, Sel");
 		  else
 		    KeyDescSet("Edit/GoTo Doc End");
 		} else {
 		  while (doc_ce!=doc) {
-		    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+		    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 		    doc_ce=doc->cur_entry=doc_ce->next;
 		  }
 		  doc->cur_col=doc_ce->min_col;
@@ -75,7 +75,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Cursor Up, Select");
+		    KeyDescSet("Edit/Cursor Up, Sel");
 		  else
 		    KeyDescSet("Edit/Cursor Up");
 		} else
@@ -88,13 +88,13 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/GoTo Top of Doc, Select");
+		    KeyDescSet("Edit/GoTo Top of Doc, Sel");
 		  else
 		    KeyDescSet("Edit/GoTo Top of Doc");
 		} else {
 		  if (doc_ce==doc) doc_ce=doc_ce->last;
 		  while (doc_ce!=doc) {
-		    BEqu(&doc_ce->type,DOCEt_SELECTED,sc&SCF_SHIFT);
+		    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 		    doc_ce=doc->cur_entry=doc_ce->last;
 		  }
 		  doc_ce=doc->cur_entry=doc->root.next;
@@ -107,7 +107,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Page Down, Select");
+		    KeyDescSet("Edit/Page Down, Sel");
 		  else
 		    KeyDescSet("Edit/Page Down");
 		} else {
@@ -131,7 +131,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Page Up, Select");
+		    KeyDescSet("Edit/Page Up, Sel");
 		  else
 		    KeyDescSet("Edit/Page Up");
 		}else {
@@ -158,7 +158,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		  KeyDescSet("Edit/GoTo Start of Line");
 		else {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Cursor Left, Select");
+		    KeyDescSet("Edit/Cursor Left, Sel");
 		  else
 		    KeyDescSet("Edit/Cursor Left");
 		}
@@ -171,7 +171,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		  KeyDescSet("Edit/GoTo End of Line");
 		else {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Cursor Right, Select");
+		    KeyDescSet("Edit/Cursor Right, Sel");
 		  else
 		    KeyDescSet("Edit/Cursor Right");
 		}
@@ -505,12 +505,12 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Cmd /Personal Notes");
 	    else
-	      Ed("::/Home/PersonalNotes.TXT.Z");
+	      Ed("~/PersonalNotes.TXT.Z");
 	  } else {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Cmd /Personal Menu");
 	    else {
-	      m=DocRead("::/Home/PersonalMenu.TXT.Z");
+	      m=DocRead("~/PersonalMenu.TXT.Z");
 	      DocMenu(m);
 	      DocDel(m);
 	    }

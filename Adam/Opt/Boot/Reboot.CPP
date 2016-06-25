@@ -43,6 +43,7 @@ public U0 RAMReboot(U8 *filename)
   while (sys_ram_reboot<0x100000);
 
   hi_image->boot_src=BOOT_SRC_RAM;
+  hi_image->boot_blk=0;
   hi_image->boot_patch_table_base=lo_image(U8 *)+hi_image->h.patch_table_offset;
   hi_image->sys_run_level =lo_image->sys_run_level&(RLF_VGA|RLF_16BIT);
   MemCpy(&hi_image->start,&lo_image->start,

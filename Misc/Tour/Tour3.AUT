@@ -67,9 +67,9 @@ AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 TourPut(
 "$$GREEN$$<CTRL-ALT-a>$$FG$$\tExtended ASCII.\n"
 "$$GREEN$$<CTRL-ALT-c>$$FG$$\tBreak(interrupt) program.\n"
-"$$GREEN$$<CTRL-ALT-e>$$FG$$\tSpawn new user terminal window.\n"
 "$$GREEN$$<CTRL-ALT-m>$$FG$$\tMutes sound.\n"
-"$$GREEN$$<CTRL-ALT-t>$$FG$$\tSwitch tasks.\n"
+"$$GREEN$$<CTRL-ALT-n>$$FG$$\tNext tasks.\n"
+"$$GREEN$$<CTRL-ALT-t>$$FG$$\tTerminal window.\n"
 "$$GREEN$$<CTRL-ALT-x>$$FG$$\tKill task (window).\n",TRUE);
 
 AFPrint(50,"Ed(\"CastleFrankenstein.CPP.Z\");\n");

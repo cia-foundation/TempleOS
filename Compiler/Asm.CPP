@@ -48,7 +48,7 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 	  tempr=temph;
 	  arg->reg1_type=tempr->reg_type;
 	  switch (tempr->reg_type) {
-	    sub_switch_start:
+	    start:
 	      case REGT_R8:
 		arg->size=1;
 		break;
@@ -61,7 +61,7 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 	      case REGT_R64:
 		arg->size=8;
 		break;
-	    sub_switch_end:
+	    end:
 	      arg->reg1=tempr->reg_num;
 	      Lex(cc);
 	      return;

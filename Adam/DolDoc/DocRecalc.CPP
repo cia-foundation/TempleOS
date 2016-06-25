@@ -968,7 +968,7 @@ rc_adjust_xy:
 	    i=cur_u8_attr>>4 &0xF ^ win_task->text_attr>>4 & 0xF;
 	  else {
 	    i=temp_u32_attr>>12&0xF ^ win_task->text_attr>>4 & 0xF;
-	    if (temp_u32_attr & DOCET_SELECTED)
+	    if (temp_u32_attr & DOCET_SEL)
 	      i^=0xF;
 	    if (temp_u32_attr & DOCET_INVERT)
 	      i^=0xF;

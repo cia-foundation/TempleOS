@@ -53,9 +53,9 @@ U0 KeyMapCtrlAltFamily(Bool no_shift,Bool shift)
   if (no_shift) KeyMapKeyPrint(SC_DELETE+SCF_CTRL+SCF_ALT+no_shift_f,
 	  &Reboot,"Cmd /Reboot");
   if (no_shift) KeyMapKeyPrint(SC_ESC+SCF_CTRL+SCF_ALT+no_shift_f,
-	  &User,"Cmd /Spawn New User Task");
+	  &User,"Cmd /Terminal Window");
   if (no_shift) KeyMapKeyPrint(SC_TAB+SCF_CTRL+SCF_ALT+no_shift_f,
-	  &WinToTop,"Cmd /Switch Focus to Next Task");
+	  &WinToTop,"Cmd /Next Focus Task");
 
   for (i=0;i<26;i++)
     if (keydev.fp_ctrl_alt_cbs[i]) {

@@ -27,7 +27,7 @@ U0 MenuButton()
   Bool done=FALSE;
   I64 i,j=0,freq=100;
   I64 old_flags=DocPut->flags;
-//This allows keyboard navigation to skip nonselectible entries.
+//This allows keyboard navigation to skip nonselible entries.
   DocPut->flags|=DOCF_FORM;
   do {
     DocClear;

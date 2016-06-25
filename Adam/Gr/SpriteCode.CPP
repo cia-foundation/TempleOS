@@ -209,7 +209,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
   CQueVectU8 *tempv;
   MemSet(&g,0,sizeof(CSprite));
   switch (type) {
-    sub_switch_start:
+    start:
       case SPT_COLOR:
       case SPT_DITHER_COLOR:
 	st=LexFirstRem(cc,"}");
@@ -311,7 +311,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	Lex(cc); //Skip ,
 	g.pwha.angle=ã/180*LexExpressionF64(cc);
 	break;
-    sub_switch_end:
+    end:
       size=SpriteElemSize(&g)+offset(CSprite.start);
       res=MAlloc(size);
       MemCpy(res,&g,size);

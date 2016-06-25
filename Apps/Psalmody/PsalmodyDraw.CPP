@@ -86,15 +86,15 @@ Bool PsmIsDotted(I64 duration)
     return FALSE;
 }
 
-U0 PsmMarkSelected(I64 x1,I64 x2,Bool sel)
+U0 PsmMarkSel(I64 x1,I64 x2,Bool sel)
 {
   PsmNote *tempo=oc.root.next;
   while (tempo!=&oc.root) {
     if (sel) {
       if (x1<=tempo->x<=x2)
-	tempo->flags|=PSMF_SELECTED;
+	tempo->flags|=PSMF_SEL;
     } else
-      tempo->flags&=~PSMF_SELECTED;
+      tempo->flags&=~PSMF_SEL;
     tempo=tempo->next;
   }
 }
@@ -236,7 +236,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       if (tempo==oc.cur_note && PsmBlink) {
 	dc->color=BROWN;
 	GrPrint(dc,x+8,y,"%s",tempo->word);
-      } else if (tempo->flags&PSMF_SELECTED)
+      } else if (tempo->flags&PSMF_SEL)
 	dc->color=RED;
       else {
 	if (tempo->note!=NOTE_REST)
@@ -331,7 +331,7 @@ Bool PsmGetPickToolBox(I64 xx,I64 yy)
 {
   if (PSM_TOOLS_X<=xx<PSM_TOOLS_X+27 &&
 	PSM_TOOLS_Y<=yy<PSM_TOOLS_Y+15) {
-    PsmMarkSelected(0,0,FALSE);
+    PsmMarkSel(0,0,FALSE);
     if (xx<PSM_TOOLS_X+13)
       oc.tool=PSMTT_BOX_TOOL;
     else

@@ -106,8 +106,8 @@ public U0 EdFindNext(CDoc *doc)
     if (doc_e!=doc) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag &&
 	    !(doc_e->de_flags&(DOCEG_DONT_EDIT|DOCEF_FILTER_SKIP))) {
-	if (doc_e->type & DOCET_SELECTED ||
-	      !doc->find_replace->scan_selected_text) {
+	if (doc_e->type & DOCET_SEL ||
+	      !doc->find_replace->scan_sel_text) {
 	  if (doc->find_replace->scan_fwd) {
 	    if (doc_e==doc_ce) {
 	      ptr=doc_ce->tag+doc->cur_col+1;
@@ -167,12 +167,12 @@ fn_skip:
     DocUnlock(doc);
 }
 
-public U0 EdSelectAll(CDoc *doc,Bool select)
-{//Set state of $LK,"DOCET_SELECTED",A="MN:DOCET_SELECTED"$ on all entries.
+public U0 EdSelAll(CDoc *doc,Bool sel)
+{//Set state of $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ on all entries.
   Bool unlock=DocLock(doc);
   CDocEntry *doc_e=doc->root.next;
   while (doc_e!=doc) {
-    BEqu(&doc_e->type,DOCEt_SELECTED,select);
+    BEqu(&doc_e->type,DOCEt_SEL,sel);
     doc_e=doc_e->next;
   }
   if (unlock)
@@ -319,13 +319,13 @@ public Bool EdGoToFun(CDoc *doc,Bool fwd,Bool abort_on_dbl_colon)
   return res;
 }
 
-public U0 EdSelectFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
-{//Set $LK,"DOCET_SELECTED",A="MN:DOCET_SELECTED"$ on all entries in cur fun.
+public U0 EdSelFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
+{//Set $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ on all entries in cur fun.
   Bool unlock=DocLock(doc);
   U8 *ptr;
   I64 ch,levels=0,colons=0;
   CDocEntry *doc_e;
-  EdSelectAll(doc,FALSE);
+  EdSelAll(doc,FALSE);
   EdGoToFun(doc,FALSE,abort_on_dbl_colon);
   if (EdCurU8(doc)=='{')
     levels--;
@@ -336,7 +336,7 @@ public U0 EdSelectFun(CDoc *doc,Bool abort_on_dbl_colon=FALSE)
   }
   doc_e=doc->cur_entry;
   while (doc_e!=doc) {
-    doc_e->type|=DOCET_SELECTED;
+    doc_e->type|=DOCET_SEL;
     if (doc_e->de_flags&DOCEF_TAG && doc_e->tag) {
       ptr=doc_e->tag;
       if (doc_e==doc->cur_entry)
@@ -406,10 +406,10 @@ I64 EdFindReplace(CDoc *doc)
 	if (doc_ce->de_flags&DOCEF_TAG && doc_ce->tag &&
 	      !(doc_ce->de_flags&DOCEF_FILTER_SKIP) &&
 	      StrFind(doc->find_replace->find_text,doc_ce->tag,sf_flags)) {
-	  doc_ce->type|=DOCET_SELECTED;
+	  doc_ce->type|=DOCET_SEL;
 	  res++;
 	} else
-	  doc_ce->type&=~DOCET_SELECTED;
+	  doc_ce->type&=~DOCET_SEL;
 	doc_ce=doc_ce->next;
       }
 
@@ -420,7 +420,7 @@ I64 EdFindReplace(CDoc *doc)
 
 	  doc_e=doc_ce;
 	  while (doc_e!=doc && doc_e->y>doc_ce->y-i) {
-	    if (doc_e->type&DOCET_SELECTED) {
+	    if (doc_e->type&DOCET_SEL) {
 	      found=TRUE;
 	      break;
 	    } else
@@ -430,7 +430,7 @@ I64 EdFindReplace(CDoc *doc)
 	  if (!found) {
 	    doc_e=doc_ce;
 	    while (doc_e!=doc && doc_e->y<doc_ce->y+i) {
-	      if (doc_e->type&DOCET_SELECTED) {
+	      if (doc_e->type&DOCET_SEL) {
 		found=TRUE;
 		break;
 	      } else
@@ -444,12 +444,12 @@ I64 EdFindReplace(CDoc *doc)
 
 	doc_ce=doc_ce->next;
       }
-      EdSelectAll(doc,FALSE);
+      EdSelAll(doc,FALSE);
       goto fr_unlock_done;
     }
 
     if (doc->find_replace->local_var)
-      EdSelectFun(doc);
+      EdSelFun(doc);
 
     if (!doc->find_replace->replace && !doc->find_replace->local_var) {
       EdFindNext(doc);
@@ -473,8 +473,8 @@ I64 EdFindReplace(CDoc *doc)
 	}
 	if (doc_e->type_u8==DOCT_TEXT &&
 	      !(doc_e->de_flags&(DOCEG_DONT_EDIT|DOCEF_FILTER_SKIP)) &&
-	      (doc_e->type & DOCET_SELECTED ||
-	      !doc->find_replace->scan_selected_text&&
+	      (doc_e->type & DOCET_SEL ||
+	      !doc->find_replace->scan_sel_text&&
 	      !doc->find_replace->local_var)) {
 	  src=doc_e->tag;
 	  while (src) {
@@ -541,7 +541,7 @@ fr_unlock_done:
 }
 
 public I64 EdReplace(CDoc *doc,U8 *find,U8 *replace,
-Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
+Bool sel=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
 {//Find & replace using editor's cmd.
   CEdFindText old_find_replace;
   Bool unlock;
@@ -557,7 +557,7 @@ Bool selected=TRUE,Bool match_case=TRUE,Bool whole_labels=FALSE)
     if (i<sizeof(CEdFindText.replace_text)) {
       MemCpy(doc->find_replace->replace_text,replace,i+1);
       doc->find_replace->replace=TRUE;
-      doc->find_replace->scan_selected_text=selected;
+      doc->find_replace->scan_sel_text=sel;
       doc->find_replace->match_case=match_case;
       doc->find_replace->whole_labels=whole_labels;
       doc->find_replace->pmt=FALSE;

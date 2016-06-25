@@ -44,13 +44,13 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
     col=text.raw_col%text.cols;
     if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
-	MemCpy(VGAM_TEXT,VGAM_TEXT+text.cols,
+	MemCpy(text.vga_text_alias,text.vga_text_alias+text.cols*2,
 	      text.cols*(text.rows-1)*2);
-	MemSet(VGAM_TEXT+text.cols*(text.rows-1)*2,0,text.cols*2);
+	MemSet(text.vga_text_alias+text.cols*(text.rows-1)*2,0,text.cols*2);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
       }
-      ptr=VGAM_TEXT+(row*text.cols+col)*2;
+      ptr=text.vga_text_alias+(row*text.cols+col)*2;
       ptr[0]=ch;
       ptr[1]=BLACK<<4+WHITE;
     } else {
@@ -75,7 +75,7 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
       ptr1+=text.raw_screen_image; //Write to cached image as well
       ptr2=&text.font[ch&255];
       for (i=0;i<FONT_HEIGHT;i++) {
-	*ptr=*ptr1=reverse_bits_table[*ptr2++];
+	*ptr=*ptr1=rev_bits_table[*ptr2++];
 	ptr+=GR_WIDTH>>3;
 	ptr1+=GR_WIDTH>>3;
       }

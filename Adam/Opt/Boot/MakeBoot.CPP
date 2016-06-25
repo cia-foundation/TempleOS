@@ -3,7 +3,8 @@ Cd(__DIR__);;
 #include "BootHD"
 #include "BootMHD"
 #include "BootMHD2"
-#include "DskISOFile"
+#include "DskISORedSea"
+#include "DskISO9660"
 #include "BootIns"
 #include "Reboot"
 Cd("..");;

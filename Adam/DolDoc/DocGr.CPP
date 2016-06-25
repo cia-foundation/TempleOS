@@ -24,8 +24,8 @@ public I64 PopUpColorLighting(U8 *header=NULL)
   CDoc *doc=DocNew;
   if (header)
     DocPrint(doc,"%s",header);
-  DocPrint(doc,"\nSingle-Sided means both sides same color."
-	"\nDouble-Sided means back side darker."
+  DocPrint(doc,"\nSingle-Sided means front and back different."
+	"\nDouble-Sided means front and back same."
 	"\n"
 	"\nHalf-Range means 0 to [0,7]"
 	"\n                 [8,15]-8 to [8,15]"

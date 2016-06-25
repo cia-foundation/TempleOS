@@ -1,5 +1,5 @@
 Cd(__DIR__);;
-if (!FileFind("::/Home/Budget",,FUF_JUST_DIRS)) {
-  MkDir("::/Home/Budget");
-  Copy("Accts.TXT.Z","::/Home/Budget");
+if (!FileFind("~/Budget",,FUF_JUST_DIRS)) {
+  MkDir("~/Budget");
+  Copy("Accts.TXT.Z","~/Budget");
 }

@@ -3,7 +3,7 @@
 
 U0 PlotXY(I64 x,I64 y)
 {
-//Screen bits are reversed
+//Screen bits are revd
   LBts(text.vga_alias,y*GR_WIDTH+x^7);
 }
 
@@ -29,9 +29,9 @@ U0 Main()
   OutU8(VGAP_DATA,BLUE);
   for (i=0;i<200;i++)
     PlotXY(200-i,i);
-/*If you want a mixed color select multiple planes
-but you have to be sure the unselected planes
-are zero, so select them and make them zero.
+/*If you want a mixed color sel multiple planes
+but you have to be sure the unseled planes
+are zero, so sel them and make them zero.
 You can't do reads on VGA memory, by the way.
 That means no read-modify-writes, too.
 */

@@ -42,6 +42,10 @@ extern Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempdee,
 extern U0 FAT32DrvInit(CDrv *dv);
 extern Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0);
+extern U0 FClose(CFile *f);
+extern CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0);
+extern Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1);
+extern Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1);
 extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 extern U8 *FileNameAbs(U8 *name,I64 fuf_flags=0);
@@ -59,10 +63,11 @@ extern Bool IsDbg();
 extern Bool IsDir(U8 *dir_name);
 extern Bool IsRaw();
 extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
+extern I64 Let2BlkDevType(U8 drv_let=0);
 extern CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE);
 extern U0 MPInt(I64 num,I64 cpu_num=1);
 extern U8 *MStrPrint(U8 *fmt,...);
-extern Bool MkDir(U8 *filename);
+extern Bool MkDir(U8 *filename,I64 entry_cnt=0);
 extern U0 MouseIPSet(I64 x,I64 y,I64 z,I64 l,I64 r);
 extern U0 Msg(I64 code,I64 a1,I64 a2,I64 flags=0);
 extern I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL);

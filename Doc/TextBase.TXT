@@ -7,7 +7,7 @@ Bits 16-20	Signed X pos shift val
 Bits 21-25	Signed Y pos shift val
 Bit  28		$LK,"Blink",A="MN:ATTRF_BLINK"$
 Bit  29		$LK,"Invert",A="MN:ATTRF_INVERT"$ed (Swap foreground and background)
-Bit  30		$LK,"Selected",A="MN:ATTRF_SELECTED"$ (XOR colors with FF)
+Bit  30		$LK,"Sel",A="MN:ATTRF_SEL"$ (XOR colors with FF)
 Bit  31		$LK,"Underline",A="MN:ATTRF_UNDERLINE"$
 
 $LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$() calls $LK,"DocUpdateTaskDocs",A="MN:DocUpdateTaskDocs"$() which calls $LK,"DocRecalc",A="MN:DocRecalc"$() where the document text is plotted into $LK,"gr.text_base",A="MN:CGrGlbls"$.  Then, $LK,"GrUpdateTextBG",A="MN:GrUpdateTextBG"$() and $LK,"GrUpdateTextFG",A="MN:GrUpdateTextFG"$() render the $LK,"gr.text_base",A="MN:CGrGlbls"$ onto $LK,"gr.dc2",A="MN:CGrGlbls"$, a raw graphic bitmap.

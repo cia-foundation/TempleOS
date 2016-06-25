@@ -1,28 +1,14 @@
 #help_index "File/CD DVD"
 
-U0 FillU16Palindrome(CPalindromeU16 *dst,U16 w)
-{
-  dst->big=EndianU16(w);
-  dst->little=w;
-}
-
-U0 FillU32Palindrome(CPalindromeU32 *dst,I64 d)
-{
-  dst->big=EndianU32(d);
-  dst->little=d;
-}
-
 class CCDVDUserData //Create DVD
 {
   I64 loc,path_entry_num,
 	short_dir_blks,long_dir_blks;
 };
 
-I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,
-		    CISO1DirEntry *tempi,CISO1DirEntry *tempi2,
-		    I64 *_cur_blk,
-		    CDirEntry *parent,Bool write,
-		    U8 *stage2_filename,I64 *_stage2_blk)
+I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
+	CISO1DirEntry *tempi2,I64 *_cur_blk,CDirEntry *parent,Bool write,
+	U8 *stage2_filename,I64 *_stage2_blk)
 {
   CCDVDUserData *tempc;
   CDirEntry *tempde1,*tempde2;
@@ -65,7 +51,7 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,
   de2->flags=ISO1_ATTR_DIR;
   de2->name_len=1;
   de2->name=0;
-  de2->len=de2->len+de2->name_len;
+  de2->len+=de2->name_len;
   de2(U8 *)+=de2->len;
 
   de2->len=sizeof(CISO1DirEntry)-1;
@@ -315,20 +301,7 @@ U0 DVDFillPathTable(CDirEntry *tempde,
   }
 }
 
-class CElTorito
-{
-  U16 w[16];
-  U8 bootable; //88=bootable 00=not bootable
-  U8 media_type; //0=no emulation 4=hard disk
-  U16 load_seg; //0000->07C0
-  U8 sys_type;
-  U8 zero;
-  U16 sect_cnt;
-  U32 load_rba; //start addr of virtual disk
-  U8 zero2[20];
-};
-
-public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
+public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL)
 {//See $LK,"::/Misc/DoDistro.CPP"$
 //Use "C:/Distro/*" if you want all files in the C:/Distro directory.
@@ -338,7 +311,7 @@ public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
 	*iso_sup=CAlloc(DVD_BLK_SIZE),
 	*iso_term=CAlloc(DVD_BLK_SIZE);
   CDirEntry *rootdir=CAlloc(sizeof(CDirEntry));
-  I64 i,j,stage2_blk=(DVD_FILE_OFFSET+1<<2+DVD_BOOT_LOADER_SIZE/BLK_SIZE)>>2,
+  I64 i,j,stage2_blk=(20<<2+1<<2+DVD_BOOT_LOADER_SIZE/BLK_SIZE)>>2,
 	stage2_size,cur_blk=0,tabsize,tabsize2,first_free,max_depth,fuf_flags=0;
   U32 *d;
   CElTorito *et=CAlloc(DVD_BLK_SIZE);
@@ -369,13 +342,12 @@ public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
   tempc=rootdir->user_data;
   tempc->path_entry_num=1;
 
-  cur_blk=DVD_FILE_OFFSET>>2;
+  cur_blk=20<<2>>2;
   if (stage2_filename) //preboot and bootloader
     cur_blk+=1+DVD_BOOT_LOADER_SIZE/DVD_BLK_SIZE;
-  DVDFileCreate2(out_file,rootdir,
-	&iso_pri->root_dir_record,
-	&iso_sup->root_dir_record,
-	&cur_blk,rootdir,FALSE,stage2_filename,&stage2_blk);
+  DVDFileCreate2(out_file,rootdir,&iso_pri->root_dir_record,
+	&iso_sup->root_dir_record,&cur_blk,rootdir,FALSE,
+	stage2_filename,&stage2_blk);
   tabsize=sizeof(CISO1PathEntry);
   tabsize2=sizeof(CISO1PathEntry);
   max_depth=DVDTableLen(rootdir,&tabsize,&tabsize2,1);
@@ -394,7 +366,7 @@ public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
   if (!out_file)
     goto cf_done;
 
-  while (cur_blk<DVD_FILE_OFFSET>>2)
+  while (cur_blk<20<<2>>2)
     FWBlks(out_file,zero_buf,cur_blk++<<2,4);
 
   iso_pri->type=ISO1T_PRI_VOL_DESC;
@@ -418,7 +390,7 @@ public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
   iso_boot->version=1;
   StrCpy(iso_boot(U8 *)+7,"EL TORITO SPECIFICATION");
 
-  cur_blk=DVD_FILE_OFFSET>>2;
+  cur_blk=20<<2>>2;
 
   if (stage2_filename) {
     d=iso_boot(U8 *)+0x47;
@@ -511,7 +483,7 @@ public I64 ISOFileCreate(U8 *_filename=NULL,U8 *src_files_find_mask,
     "$$RED$$!!! Boot Stage 2 !!! %X-%X$$FG$$\n",
 	  stage2_blk,stage2_blk+stage2_size-1;
     FWBlks(out_file,stage1_buf,
-	  DVD_FILE_OFFSET+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
+	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
   } else {
     FWBlks(out_file,iso_sup,17<<2,4);
     FWBlks(out_file,iso_term,18<<2,4);

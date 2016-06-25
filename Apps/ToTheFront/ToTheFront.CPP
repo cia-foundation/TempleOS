@@ -1371,7 +1371,7 @@ U0 PickAI(U8 *dirname,I64 player)
   st=MStrPrint("%s/*.CPP*",dirname);
   tempde=FilesFind(st);
   Free(st);
-  tempde2=FilesFind("::/Home/ToTheFront/*.CPP*");
+  tempde2=FilesFind("~/ToTheFront/*.CPP*");
   tempde1=tempde;
   Silent(old_silent);
 
@@ -1395,7 +1395,7 @@ U0 PickAI(U8 *dirname,I64 player)
     Free(st);
     tempde1=tempde1->next;
   }
-  DocPrint(doc,"\n\n\n$$FG$$Create your own AI in /Home/ToTheFront.");
+  DocPrint(doc,"\n\n\n$$FG$$Create your own AI in ~/ToTheFront.");
   while ((tempde1=PopUpMenu(doc))<=0);
   ExeFile(tempde1->full_name);
   DocDel(doc);

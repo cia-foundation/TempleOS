@@ -2,7 +2,7 @@
 
 public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 	Bool exited,I64 *_has_action=NULL)
-{//Do action on final entry selected by user.
+{//Do action on final entry sel by user.
 //Sometimes returns locked, sometimes unlocked
   U8 ch=doc->cmd_U8,*st;
   I64 res=DOCM_CANCEL,has_action=FALSE;

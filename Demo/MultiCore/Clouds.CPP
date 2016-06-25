@@ -200,8 +200,6 @@ U0 CloudScene()
   CleanUp;
 }
 
-//This is so I can use this file stand alone
-//or as a component of a program.
-#if __DEPTH__<2
+#if __CMD_LINE__
 CloudScene;
 #endif

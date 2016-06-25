@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=168;
+  progress4_max=167;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -281,16 +281,6 @@ U0 DoMountain()
   Kill(task);
 }
 
-U0 DoCoach()
-{
-  CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/Games/Coach\";\n");
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  Sleep(1000);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
-  XTalk(task,"Exit;\n");
-}
-
 U0 DoDigits()
 {
   CTask *task=User;
@@ -356,7 +346,7 @@ U0 DoScreenCapture()
   Sleep(750);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   XTalk(task,"Exit;\n");
-  Del("/Home/ScreenShot.GRA.Z");
+  Del("~/DemoScreenShot.GRA*");
 }
 
 /*
@@ -1765,11 +1755,11 @@ U0 DoFPrintF()
 {
   CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Dsk/FPrintF\";\n");
-  XTalkWait(task,"::/Demo/Dsk/FPrintF.TXT");
+  XTalkWait(task,"~/DemoFPrintF.TXT.Z");
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);
-  XTalkWait(task,"Type(\"::/Demo/Dsk/FPrintF.TXT\");\n");
+  XTalkWait(task,"Type(\"~/DemoFPrintF.TXT.Z\");\n");
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_CTRLO,0);
-  XTalkWait(task,"Del(\"::/Demo/Dsk/FPrintF.TXT\");\n");
+  XTalkWait(task,"Del(\"~/DemoFPrintF.TXT*\");\n");
   Sleep(500);
   XTalk(task,"Exit;\n");
 }
@@ -1850,7 +1840,7 @@ U0 DoMiniGrLib()
 U0 DoWebLog()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/WebLogExample/WebLogRep\";\n");
+  XTalkWait(task,"#include \"::/Demo/WebLogDemo/WebLogRep\";\n");
   PostMsgWait(task,MSG_KEY_DOWN_UP,'\n',0);
   PostMsgWait(task,MSG_KEY_DOWN_UP,'\n',0);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);
@@ -1858,12 +1848,12 @@ U0 DoWebLog()
   XTalk(task,"Exit;\n");
 }
 
-U0 DoReverseFile()
+U0 DoRevFile()
 {
   CTask *task=User;
-  Del("::/Demo/ReverseFileExample/PoemForward.TXT.Z");
-  XTalkWait(task,"#include \"::/Demo/ReverseFileExample/Reverse\";\n");
-  XTalkWait(task,"Type(\"::/Demo/ReverseFileExample/PoemForeward.TXT.Z\");\n");
+  Del("~/DemoPoemForward.TXT*");
+  XTalkWait(task,"#include \"::/Demo/RevFileDemo/Rev\";\n");
+  XTalkWait(task,"Type(\"~/DemoPoemFwd.TXT.Z\");\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -1871,8 +1861,8 @@ U0 DoReverseFile()
 U0 DoSortFile()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/SortFileExample/F64FileGen\";\n");
-  XTalkWait(task,"#include \"::/Demo/SortFileExample/F64FileSort\";\n");
+  XTalkWait(task,"#include \"::/Demo/SortFileDemo/F64FileGen\";\n");
+  XTalkWait(task,"#include \"::/Demo/SortFileDemo/F64FileSort\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -1880,8 +1870,8 @@ U0 DoSortFile()
 U0 DoToHtmlToTXT()
 {
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTExample/HtmlGen\";\n");
-  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTExample/TXTGen\";\n");
+  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTDemo/HtmlGen\";\n");
+  XTalkWait(task,"#include \"::/Demo/ToHtmlToTXTDemo/TXTGen\";\n");
   Sleep(750);
   XTalk(task,"Exit;\n");
 }
@@ -1984,7 +1974,7 @@ U0 DoNumBible()
 {
   CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/DolDoc/NumBible\";\n");
-  Del("::/Home/NumBible.TXT.Z");
+  Del("~/DemoNumBible.TXT*");
   XTalk(task,"Exit;\n");
 }
 
@@ -2287,7 +2277,7 @@ U0 OSTestSuite()
 {
   TSStart;
   TS; DoBlackDiamond;
-  TS; if (DrvIsWritable(':')) DoEagleDive;
+  TS; DoEagleDive;
   TS; DoFlatTops;
   TS; DoDunGen;
   TS; DoFPS;
@@ -2314,7 +2304,7 @@ U0 OSTestSuite()
   TS; if (FileFind(BIBLE_FILENAME)) DoPalindrome;
   TS; DoClouds;
   TS; if (mp_cnt>1) DoRadixSort;
-  TS; if (mp_cnt>1) DoLoadTest;
+  TS; if (mp_cnt>1 && DrvIsWritable(':')) DoLoadTest;
   TS; if (mp_cnt>1) DoMPPrint;
   TS; if (mp_cnt>1) DoLock;
   TS; if (mp_cnt>1) DoInterrupts;
@@ -2346,11 +2336,10 @@ U0 OSTestSuite()
   TS; DoSpeedLine;
   TS; DoKeyBitMap;
   TS; DoMountain;
-  TS; DoCoach;
   TS; DoBSpline;
   TS; DoGrModels;
   TS; DoBlot;
-  TS; if (DrvIsWritable(':')) DoScreenCapture;
+  TS; if (DrvIsWritable('~')) DoScreenCapture;
   TS; DoGrid;
   TS; DoPick;
   TS; DoPick3D;
@@ -2386,7 +2375,7 @@ U0 OSTestSuite()
   TS; DoUnusedSpaceRep;
   TS; DoBlkDevRep;
   TS; DoLastClass;
-  TS; if (DrvIsWritable(':')) DoFPrintF;
+  TS; if (DrvIsWritable('~')) DoFPrintF;
   TS; DoSerializeTree;
   TS; DoExceptions;
   TS; DoScreenCodes;
@@ -2407,11 +2396,11 @@ U0 OSTestSuite()
   TS; DoLogic;
   TS; DoCompileDemo;
   TS; DoPrompt;
-  TS; if (DrvIsWritable(':')) DoWebLog;
-  TS; if (DrvIsWritable(':')) DoReverseFile;
-  TS; if (DrvIsWritable(':')) DoSortFile;
-  TS; if (DrvIsWritable(':')) DoToHtmlToTXT;
-  TS; if (DrvIsWritable(':')) DoRegistryDemo;
+  TS; if (DrvIsWritable('~')) DoWebLog;
+  TS; if (DrvIsWritable('~')) DoRevFile;
+  TS; if (DrvIsWritable('~')) DoSortFile;
+  TS; if (DrvIsWritable('~')) DoToHtmlToTXT;
+  TS; if (DrvIsWritable('~')) DoRegistryDemo;
   TS; DoDefine;
   TS; DoGlblVars;
   TS; DoFileRead;
@@ -2420,7 +2409,7 @@ U0 OSTestSuite()
   TS; DoData;
   TS; DoCallBack;
   TS; DoClassMeta;
-  TS; if (DrvIsWritable(':')) DoNumBible;
+  TS; if (DrvIsWritable('~')) DoNumBible;
   TS; DoForm;
   TS; DoClickCallBack;
   TS; DoMenuButton;

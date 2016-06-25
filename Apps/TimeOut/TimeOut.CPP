@@ -521,20 +521,21 @@ U0 TimeOut()
   WinMax;
   DocCursor;
   DocClear;
+
   "\n\nYou're sent back through time to help fight some bad guys.  "
 	"($$LTPURPLE$$Purple$$FG$$)\n"
 	"Perhaps, you are an angel helping the Jews in the Bible?\n\n"
 	"Scoring:\n"
-	"  Enemy Killed\t\t+5\n"
-	"  Enemy by Friendly\t+10\n"
-	"  Friendly Fire\t\t-200\n"
-	"  Bullets Fired\t\t-1\n"
-	"  Game Time\t\t-10 per second\n"
-	"  Surviving Friendlies\t+500\n\n"
+	"\tEnemy Killed\t\t+5\n"
+	"\tEnemy by Friendly\t+10\n"
+	"\tFriendly Fire\t\t-200\n"
+	"\tBullets Fired\t\t-1\n"
+	"\tGame Time\t\t-10 per second\n"
+	"\tSurviving Friendlies\t+500\n\n"
 	"Sweep side-to-side while shooting, "
 	"holding down $$GREEN$$<SPACE>$$FG$$.\n\n";
-
   PressAKey;
+
   Fs->text_attr=YELLOW<<4+CYAN;
   Init;
   DocClear;

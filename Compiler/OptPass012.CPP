@@ -43,7 +43,8 @@ args.
     tempc=tempi->ic_class;
     tempi->ic_class2=tempc;
     tempi_push=tempi;
-    MemSet(&tempi->a1,0,sizeof(CICArg)*4);
+    MemSet(&tempi->a1,0,3*sizeof(CICArg));
+    tempi->a1_type_pointed_to=0;
     switch [intermediate_code_table[code].arg_cnt] {
       case IS_V_ARG:
 	ps->ptr-=tempi->ic_data>>2;
@@ -158,7 +159,7 @@ args.
 	}
 	tempi_push->ic_class2=cmp.internal_types[RT_I64];
 	break;
-      sub_switch_start:
+      start:
 	case IC_NOT:
 	  if (tempc->raw_type==RT_F64) {
 	    if (tempi1->ic_code==IC_IMM_F64) {
@@ -263,7 +264,7 @@ args.
 	    OptSetNOP1(tempi2);
 	  }
 	  break;
-      sub_switch_end:
+      end:
 	if (!tempi_push->ic_class->ptr_stars_cnt) {
 	  if (tempi_push->ic_class->raw_type==RT_F64)
 	    tempi_push->ic_class2=cmp.internal_types[RT_F64];
@@ -303,7 +304,7 @@ args.
 	  tempi2->ic_flags|=ICF_R_TO_F64;
 	tempi_push->ic_class2=cmp.internal_types[RT_F64];
 	break;
-      sub_switch_start:
+      start:
 	case IC_MUL:
 	  if (i=OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    if (i==FBO1_INT) {
@@ -710,7 +711,7 @@ args.
 	  }
 	  tempi->ic_class=cmp.internal_types[RT_I64];
 	  break;
-      sub_switch_end:
+      end:
 	if (!tempi_push->ic_class->ptr_stars_cnt) {
 	  if (tempi_push->ic_class->raw_type==RT_F64)
 	    tempi_push->ic_class2=cmp.internal_types[RT_F64];
@@ -720,7 +721,7 @@ args.
 	    tempi_push->ic_class2=cmp.internal_types[RT_I64];
 	}
 	break;
-      sub_switch_start:
+      start:
 	case IC_EQU_EQU:
 	  if (OptFixupBinaryOp1(tempi,tempi1,tempi2,&is_unsigned)) {
 	    tempi->ic_data=tempi1->ic_data==tempi2->ic_data;
@@ -805,7 +806,7 @@ args.
 	      tempi->ic_flags|=ICF_USE_F64;
 	  }
 	  break;
-      sub_switch_end:
+      end:
 	tempi->ic_flags&=~ICF_R_TO_INT;
 	if (!tempi_push->ic_class->ptr_stars_cnt) {
 	  if (tempi_push->ic_class->raw_type==RT_F64)
@@ -820,10 +821,10 @@ args.
 	else
 	  tempi->ic_class=cmp.internal_types[RT_I64];
 	break;
-      sub_switch_start:
+      start:
 	if (cc->pass==2 && (!tempc->size||!tempc2->size))
 	  LexWarn(cc,"Assign U0 ");
-	sub_switch_start:
+	start:
 	  case IC_MUL_EQU:
 	    if (tempi2->ic_code==IC_IMM_I64 && tempc->raw_type!=RT_F64 &&
 		  tempc2->raw_type!=RT_F64) {
@@ -854,7 +855,7 @@ args.
 	  case IC_ADD_EQU:
 	  case IC_SUB_EQU:
 	    break;
-	sub_switch_end:
+	end:
 	  if (tempi2->ic_class->raw_type==RT_F64)
 	    tempi->ic_flags=tempi->ic_flags|ICF_USE_F64;
 	  if (tempc->raw_type==RT_F64) {
@@ -892,7 +893,7 @@ args.
 	  if (tempc2->raw_type==RT_F64)
 	    tempi2->ic_flags|=ICF_R_TO_INT;
 	  break;
-      sub_switch_end:
+      end:
 	break;
       case IC_ENTER:
       case IC_LEAVE:
@@ -1257,7 +1258,7 @@ args.
 	LexExcept(cc,"Compiler Optimization Error at ");
     }
     if (intermediate_code_table[code].arg_cnt==IS_2_ARG) {
-      if (tempi_push->ic_precedence.u8[0]&~ASSOC_MASK==PREC_ASSIGN)
+      if (tempi_push->ic_precedence&~ASSOC_MASK==PREC_ASSIGN)
 	OptFixSizeOf(tempi2,tempi_push,tempi1->ic_class-1);
       else {
 	OptFixSizeOf(tempi1,tempi_push,tempi2->ic_class);

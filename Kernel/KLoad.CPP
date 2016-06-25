@@ -104,14 +104,14 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	}
 	break;
 
-      sub_switch_start:
+      start:
 	case IET_CODE_HEAP:
 	  ptr3=MAlloc(*src(I32 *)++,Fs->code_heap);
 	  break;
 	case IET_ZEROED_CODE_HEAP:
 	  ptr3=CAlloc(*src(I32 *)++,Fs->code_heap);
 	  break;
-      sub_switch_end:
+      end:
 	if (*st_ptr) {
 	  tempex=CAlloc(sizeof(CHashExport));
 	  tempex->str=StrNew(st_ptr);
@@ -126,14 +126,14 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	}
 	break;
 
-      sub_switch_start:
+      start:
 	case IET_DATA_HEAP:
 	  ptr3=MAlloc(*src(I64 *)++);
 	  break;
 	case IET_ZEROED_DATA_HEAP:
 	  ptr3=CAlloc(*src(I64 *)++);
 	  break;
-      sub_switch_end:
+      end:
 	if (*st_ptr) {
 	  tempex=CAlloc(sizeof(CHashExport));
 	  tempex->str=StrNew(st_ptr);

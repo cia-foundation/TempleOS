@@ -26,7 +26,7 @@ The scheduler checks for a few keys:
 
 <CTRL-ALT-x> kill a task.
 <CTRL-ALT-DEL> reboots.
-<CTRL-ALT-t> changes focus to next task.
+<CTRL-ALT-n> Next task.
 <CTRL-ALT-c> breaks execution of a program.
 
 Each core has its own circular task queue.

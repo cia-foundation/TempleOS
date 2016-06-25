@@ -17,7 +17,7 @@ HashTablePurge(adam_task->hash_table);
 
 #help_index "Misc"
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
-public F64 os_version=4.060;//Operating system version.
+public F64 os_version=4.080;//Operating system version.
 
 #include "/Adam/MakeAdam"
 

@@ -8,11 +8,11 @@ $LK,"Features",A="FI:::/Doc/Features.TXT"$				$LK,"The Charter",A="FI:::/Doc/Cha
 
 $LK,"TempleOS Help",A="FI:::/Doc/HelpIndex.TXT"$				$TX,"Instructional YouTube Videos",HTML="http://www.templeos.org/Wb/Home/Web/TempleOSVideos.html"$
 
-$LK,"Source Code By File",A="FF:::/Home/Web/LineRep.TXT,KStart.CPP"$			$TX,"Source Code (Raw)",HTML="http://www.templeos.org/Wb/"$
+$LK,"Source Code By File",A="FF:~/Web/LineRep.TXT,KStart.CPP"$			$TX,"Source Code (Raw)",HTML="http://www.templeos.org/Wb/"$
 
 $TX,"Source Code By Sym",HTML="http://www.templeos.org/Wb/Home/Web/SymsAlpha.html"$			$TX,"Source Code By Address",HTML="http://www.templeos.org/Wb/Home/Web/SymsAddress.html"$
 
-$TX,"Misc TempleOS Files For Download",HTML="http://www.templeos.org/Wb/Home/Downloads"$	$LK,"3rd-Party TempleOS Files For Download",A="FI:::/Home/Web/3rdParty.TXT"$
+$TX,"Misc TempleOS Files For Download",HTML="http://www.templeos.org/Wb/Home/Downloads"$	$LK,"3rd-Party TempleOS Files For Download",A="FI:~/Web/3rdParty.TXT"$
 
 $LK,"Change Log",A="FI:::/Doc/ChangeLog.TXT"$				$TX,"The History of TempleOS",HTML="http://www.templeos.org/Wb/Home/Web/History.html"$		
 
@@ -41,7 +41,7 @@ $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://w
 
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/W_b4zMxfLvA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/W_b4zMxfLvA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
-I wrote all $LK,"118,851",A="FF:::/Home/Web/LineRep.TXT,Kernel.PRJ",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the last $TX,"12.5",D="DD_TEMPLEOS_AGE"$ years, full-time, including the 64-bit compiler.  It was called, at various times, "$FG,4$$TX,"Hoppy",HTML="http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX,"The J Operating System",HTML="http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$", "$FG,4$$TX,"LoseThos",HTML="http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$" and "$FG,4$$TX,"SparrowOS",HTML="http://web.archive.org/web/*/http://www.sparrowos.com/*"$$FG$".  Here are my $FG,4$$TX,"college transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
+I wrote all $LK,"118,851",A="FF:~/Web/LineRep.TXT,Kernel.PRJ",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the last $TX,"12.5",D="DD_TEMPLEOS_AGE"$ years, full-time, including the 64-bit compiler.  It was called, at various times, "$FG,4$$TX,"Hoppy",HTML="http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX,"The J Operating System",HTML="http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$", "$FG,4$$TX,"LoseThos",HTML="http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$" and "$FG,4$$TX,"SparrowOS",HTML="http://web.archive.org/web/*/http://www.sparrowos.com/*"$$FG$".  Here are my $FG,4$$TX,"college transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
 
 $FG,8$
 * "Commodore 64" was a trademark of Commodore Business Machines.

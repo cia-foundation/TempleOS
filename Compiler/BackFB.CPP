@@ -16,32 +16,32 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
   if (tempi->ic_flags & ICF_BY_VAL) {
     p1_mem=FALSE;
     if (dont_push_float) {
-      if (a1->type_pointed_to!=RT_F64) {
+      if (tempi->a1_type_pointed_to!=RT_F64) {
 	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	      a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
+	      a1->type&MDG_MASK+tempi->a1_type_pointed_to,a1->reg,a1->disp,ip);
 	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,FALSE,ip);
 	ICPush(tempi,MDF_REG+RT_I64,REG_RAX,0,ip);
 	t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	rsp_size+=8;
       } else {
-	if (a1->type_pointed_to>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
-	  t1=a1->type&MDG_MASK+a1->type_pointed_to;
+	if (tempi->a1_type_pointed_to>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
+	  t1=a1->type&MDG_MASK+tempi->a1_type_pointed_to;
 	  r1=a1->reg;
 	  d1=a1->disp;
 	  p1_mem=TRUE;
 	} else {
-	  ICPush(tempi,
-		a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
+	  ICPush(tempi,a1->type&MDG_MASK+tempi->a1_type_pointed_to,
+		a1->reg,a1->disp,ip);
 	  t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	  rsp_size+=8;
 	}
       }
     } else {
-      if (a1->type_pointed_to!=RT_F64 || a1->type&MDF_STK) {
+      if (tempi->a1_type_pointed_to!=RT_F64 || a1->type&MDF_STK) {
 	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,a2->type,a2->reg,a2->disp,ip);
 	ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	      a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
-	if (a1->type_pointed_to!=RT_F64)
+	      a1->type&MDG_MASK+tempi->a1_type_pointed_to,a1->reg,a1->disp,ip);
+	if (tempi->a1_type_pointed_to!=RT_F64)
 	  ICFCvt2(cc,tempi,REG_RDX,MDF_REG+RT_I64,REG_RDX,0,FALSE,ip);
 	ICU16(tempi,0x5052);	//PUSH EDX PUSH EAX
 	rsp_size=16;
@@ -65,14 +65,14 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 	    rsp_size+=8;
 	  }
 	}
-	if (a1->type_pointed_to>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
-	  t1=a1->type&MDG_MASK+a1->type_pointed_to;
+	if (tempi->a1_type_pointed_to>=RT_I64 && a1->type&MDG_DISP_SIB_RIP) {
+	  t1=a1->type&MDG_MASK+tempi->a1_type_pointed_to;
 	  r1=a1->reg;
 	  d1=a1->disp;
 	  p1_mem=TRUE;
 	} else {
-	  ICPush(tempi,
-		a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
+	  ICPush(tempi,a1->type&MDG_MASK+tempi->a1_type_pointed_to,
+		a1->reg,a1->disp,ip);
 	  t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	  rsp_size+=8;
 	  if (r2==REG_RSP+REG_RSP<<8)
@@ -80,7 +80,7 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 	}
       }
     }
-    if (!rsp_size && !(p1_mem && a1->type_pointed_to==RT_F64)) {
+    if (!rsp_size && !(p1_mem && tempi->a1_type_pointed_to==RT_F64)) {
       rsp_size=8;
       ICAddRSP(tempi,-8);
     }
@@ -96,7 +96,7 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
     }
     ICSlashOp(tempi,t1,r1,d1,op,ip);
     CmpNoteFloatOp(cc,tempi,TRUE,FALSE,CN_MAIN);
-    if (p1_mem && a1->type_pointed_to==RT_F64) {
+    if (p1_mem && tempi->a1_type_pointed_to==RT_F64) {
       ICSlashOp(tempi,t1,r1,d1,SLASH_OP_FSTP,ip);
       if (rsp_size)
 	ICAddRSP(tempi,rsp_size);
@@ -108,40 +108,41 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 	      SLASH_OP_FSTP,ip);
 	ICAddRSP(tempi,rsp_size-8);
       }
-      if (a1->type_pointed_to!=RT_F64) {
+      if (tempi->a1_type_pointed_to!=RT_F64) {
 	ICPop(tempi,MDF_REG+RT_I64,REG_RAX,0,ip);
 	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,TRUE,ip);
-	ICMov(tempi,a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,
-	      MDF_REG+RT_I64,REG_RAX,0,ip);
+	ICMov(tempi,a1->type&MDG_MASK+tempi->a1_type_pointed_to,a1->reg,
+	      a1->disp,MDF_REG+RT_I64,REG_RAX,0,ip);
       } else
-	ICPop(tempi,a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
+	ICPop(tempi,a1->type&MDG_MASK+tempi->a1_type_pointed_to,
+	      a1->reg,a1->disp,ip);
     }
     if (tempi->r.type.mode)
       ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	    a1->type&MDG_MASK+a1->type_pointed_to,a1->reg,a1->disp,ip);
+	    a1->type&MDG_MASK+tempi->a1_type_pointed_to,a1->reg,a1->disp,ip);
   } else {
-    if (a1->type_pointed_to>=RT_I64)
+    if (tempi->a1_type_pointed_to>=RT_I64)
       p1_mem=TRUE;
     else
       p1_mem=FALSE;
     if (dont_push_float) {
       ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,a1->type,a1->reg,a1->disp,ip);
-      if (a1->type_pointed_to!=RT_F64) {
+      if (tempi->a1_type_pointed_to!=RT_F64) {
 	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	      MDF_DISP+a1->type_pointed_to,REG_RCX,0,ip);
+	      MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,ip);
 	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,FALSE,ip);
 	ICPush(tempi,MDF_REG+RT_I64,REG_RAX,0,ip);
       } else
-	ICPush(tempi,MDF_DISP+a1->type_pointed_to,REG_RCX,0,ip);
+	ICPush(tempi,MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,ip);
       t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
       rsp_size+=8;
     } else {
-      if (a1->type_pointed_to!=RT_F64 || a1->type&MDF_STK) {
+      if (tempi->a1_type_pointed_to!=RT_F64 || a1->type&MDF_STK) {
 	ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,a2->type,a2->reg,a2->disp,ip);
 	ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,a1->type,a1->reg,a1->disp,ip);
 	ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	      MDF_DISP+a1->type_pointed_to,REG_RCX,0,ip);
-	if (a1->type_pointed_to!=RT_F64)
+	      MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,ip);
+	if (tempi->a1_type_pointed_to!=RT_F64)
 	  ICFCvt2(cc,tempi,REG_RDX,MDF_REG+RT_I64,REG_RDX,0,FALSE,ip);
 	ICU16(tempi,0x5052);	//PUSH EDX PUSH EAX
 	rsp_size=16;
@@ -166,14 +167,14 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 	  }
 	}
 	ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,a1->type,a1->reg,a1->disp,ip);
-	ICPush(tempi,MDF_DISP+a1->type_pointed_to,REG_RCX,0,ip);
+	ICPush(tempi,MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,ip);
 	t1=MDF_SIB+RT_I64; r1=REG_RSP+REG_RSP<<8; d1=0;
 	rsp_size+=8;
 	if (r2==REG_RSP+REG_RSP<<8)
 	  d2+=8;
       }
     }
-    if (!rsp_size && !(p1_mem && a1->type_pointed_to==RT_F64)) {
+    if (!rsp_size && !(p1_mem && tempi->a1_type_pointed_to==RT_F64)) {
       rsp_size=8;
       ICAddRSP(tempi,-8);
     }
@@ -190,8 +191,9 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
     }
     ICSlashOp(tempi,t1,r1,d1,op,ip);
     CmpNoteFloatOp(cc,tempi,TRUE,FALSE,CN_MAIN);
-    if (p1_mem && a1->type_pointed_to==RT_F64) {
-      ICSlashOp(tempi,MDF_DISP+a1->type_pointed_to,REG_RCX,0,SLASH_OP_FSTP,ip);
+    if (p1_mem && tempi->a1_type_pointed_to==RT_F64) {
+      ICSlashOp(tempi,MDF_DISP+tempi->a1_type_pointed_to,
+	    REG_RCX,0,SLASH_OP_FSTP,ip);
       if (rsp_size)
 	ICAddRSP(tempi,rsp_size);
     } else {
@@ -203,9 +205,9 @@ U0 ICFOpEqu(CCmpCtrl *cc,CIntermediateCode *tempi,I64 op,U8 *buf2,I64 ip)
 	ICAddRSP(tempi,rsp_size-8);
       }
       ICPop(tempi,MDF_REG+RT_I64,REG_RAX,0,ip);
-      if (a1->type_pointed_to!=RT_F64)
+      if (tempi->a1_type_pointed_to!=RT_F64)
 	ICFCvt2(cc,tempi,REG_RAX,MDF_REG+RT_I64,REG_RAX,0,TRUE,ip);
-      ICMov(tempi,MDF_DISP+a1->type_pointed_to,REG_RCX,0,
+      ICMov(tempi,MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,
 	    MDF_REG+RT_I64,REG_RAX,0,ip);
     }
     if (tempi->r.type.mode)
@@ -474,13 +476,13 @@ U0 ICFCmpAndBranch(CCmpCtrl *cc,CIntermediateCode *tempi,I64 ip,
 
 U0 ICFMul(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
 {
-  if (tempi->a1.type&MDF_IMM && tempi->a1.type_pointed_to==RT_F64 &&
+  if (tempi->a1.type&MDF_IMM && tempi->a1.type&RTG_MASK==RT_F64 &&
 	tempi->a1.disp(F64)==1.0) {
     CmpNoteFloatOp(cc,tempi,FALSE,FALSE,CN_MAIN);
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
   } else if (tempi->a2.type&MDF_IMM &&
-	tempi->a2.type_pointed_to==RT_F64&& tempi->a2.disp(F64)==1.0) {
+	tempi->a2.type&RTG_MASK==RT_F64&& tempi->a2.disp(F64)==1.0) {
     CmpNoteFloatOp(cc,tempi,FALSE,FALSE,CN_MAIN);
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
 	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
@@ -490,7 +492,7 @@ U0 ICFMul(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
 
 U0 ICFDiv(CCmpCtrl *cc,CIntermediateCode *tempi,U8 *buf,I64 ip)
 {
-  if (tempi->a2.type&MDF_IMM && tempi->a2.type_pointed_to==RT_F64 &&
+  if (tempi->a2.type&MDF_IMM && tempi->a2.type&RTG_MASK==RT_F64 &&
 	tempi->a2.disp(F64)==1.0) {
     CmpNoteFloatOp(cc,tempi,FALSE,FALSE,CN_MAIN);
     ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,

@@ -26,7 +26,7 @@ U0 Doodle()
 	x1=a1; y1=a2;
 	x2=a1; y2=a2;
 	dc->color=ROP_XOR+color^TRANSPARENT;
-	dc->pen_width=1;
+	dc->pen_width=7;
 	while (msg_code!=MSG_IP_L_UP) {
 	  GrLine3(dc,x1,y1,0,x2,y2,0);
 	  msg_code=GetMsg(&a1,&a2,

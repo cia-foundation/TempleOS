@@ -1,5 +1,5 @@
 //See $LK,"::/Demo/Lectures/GraphicsCPULoad.CPP"$
-U8 reverse[256],	//The VGA bits are bwd
+U8 rev[256],	//The VGA bits are bwd
 
    image[640*480/8];	//We need read-modify write.
 			//0xA0000 alias memory can't be read.
@@ -8,11 +8,11 @@ U0 MGInit()
 {
   I64 i,j;
   MemSet(image,0,sizeof(image));
-  MemSet(reverse,0,sizeof(reverse));
+  MemSet(rev,0,sizeof(rev));
   for (i=0;i<256;i++)
     for (j=0;j<8;j++)
       if (Bt(&i,j))
-	Bts(&reverse[i],7-j);
+	Bts(&rev[i],7-j);
 }
  
 U0 MGUpdate()
@@ -41,15 +41,15 @@ U0 MGHLine(I64 x1,I64 x2,I64 y)
   leading =8-x1&7;
   trailing=(x2+1)&7;
   if (leading+trailing>w)
-    *ptr|=reverse[(0xFF00>>leading&(0x00FF<<trailing)>>8)];
+    *ptr|=rev[(0xFF00>>leading&(0x00FF<<trailing)>>8)];
   else {
     whole_bytes=(w-leading-trailing)>>3;
     if (leading)
-      *ptr++|=reverse[(0xFF00>>leading)&0xFF];
+      *ptr++|=rev[(0xFF00>>leading)&0xFF];
     for (i=0;i<whole_bytes;i++)
       *ptr++=0xFF;
     if (trailing)
-      *ptr++|=reverse[(0x00FF<<trailing)>>8];
+      *ptr++|=rev[(0x00FF<<trailing)>>8];
   }
 }
  

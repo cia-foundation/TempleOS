@@ -109,7 +109,7 @@ I64 CopyTree2(CDirEntry *tempde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
     MemCpy(st,dst_dir,dst_dir_len);
     StrCpy(st+dst_dir_len,tempde->full_name+src_dir_len);
     if (tempde->attr & RS_ATTR_DIR) {
-      MkDir(st);
+      MkDir(st,LinkedLstCnt(tempde->sub));
       res+=CopyTree2(tempde->sub,src_dir_len,dst_dir_len,dst_dir);
     } else
       if (CopySingle(tempde->full_name,st))

@@ -8,15 +8,15 @@ public U0 ClipboardDel()
 }
 
 public U0 EdCopyToClipboard(CDoc *doc)
-{//Copy $LK,"DOCET_SELECTED",A="MN:DOCET_SELECTED"$ flagged entries to clipboard.
+{//Copy $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ flagged entries to clipboard.
   CDoc *doc2=sys_clipboard_doc;
   Bool unlock_doc=DocLock(doc),
 	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_e=doc->root.next,*doc_ne;
   ClipboardDel;
   while (doc_e!=doc) {
-    if (doc_e->type & DOCET_SELECTED) {
-      doc_e->type&=~DOCET_SELECTED;
+    if (doc_e->type & DOCET_SEL) {
+      doc_e->type&=~DOCET_SEL;
       if (!Bt(doldoc.type_flags_data,doc_e->type_u8)) {
 	doc_ne=DocEntryCopy(doc2,doc_e);
 	QueIns(doc_ne,doc2->root.last);
@@ -31,7 +31,7 @@ public U0 EdCopyToClipboard(CDoc *doc)
 }
 
 public U0 EdCutToClipboard(CDoc *doc)
-{//Remove selected entries and place on clipboard.
+{//Remove sel entries and place on clipboard.
   CDoc *doc2=sys_clipboard_doc;
   Bool unlock_doc=DocLock(doc),
 	unlock_doc2=DocLock(doc2);
@@ -39,8 +39,8 @@ public U0 EdCutToClipboard(CDoc *doc)
   ClipboardDel;
   while (doc_e!=doc) {
     doc_e1=doc_e->next;
-    if (doc_e->type & DOCET_SELECTED) {
-      doc_e->type&=~DOCET_SELECTED;
+    if (doc_e->type & DOCET_SEL) {
+      doc_e->type&=~DOCET_SEL;
       if (!Bt(doldoc.type_flags_data,doc_e->type_u8)) {
 	doc_ne=DocEntryCopy(doc2,doc_e);
 	QueIns(doc_ne,doc2->root.last);

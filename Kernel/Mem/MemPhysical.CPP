@@ -36,8 +36,8 @@ U0 Mem32DevInit()
   tempmr=AMAlloc(sizeof(CMemRange));
   tempmr->type=MRT_UNUSED;
   tempmr->flags=0;
-//Maybe !!! Change this to 0xE0000000 !!!
-  tempmr->base=0xF0000000;
+//Maybe !!! Change this to 0xF0000000 !!!
+  tempmr->base=0xE0000000;
   tempmr->size=0x10000000;
   QueIns(tempmr,dev.mem32_root.last);
 
@@ -156,7 +156,7 @@ U0 Mem64DevFree(U8 *base,I64 pages2Meg)
 U8 *MemVGAAlloc()
 {
   I64 i=1,*a=Mem64DevAlloc(&i),*pte=MemPageTable(a);
-  *pte=0x18F;
+  *pte=0x197;
   InvlPg(a);
   return a;
 }

@@ -54,7 +54,7 @@ U0 LexPutPos(CCmpCtrl *cc)
   if (IsRaw)
     "%s,%d ",cc->lex_include_stk->full_name,cc->lex_include_stk->line_num;
   else {
-    PutFileLink(cc->lex_include_stk->full_name,cc->lex_include_stk->line_num);
+    PutFileLink(cc->lex_include_stk->full_name,,cc->lex_include_stk->line_num);
     AdamErr("%s,%d\n",
 	  cc->lex_include_stk->full_name,cc->lex_include_stk->line_num);
     '' CH_SPACE;
@@ -138,12 +138,11 @@ U0 ICClassPut(CHashClass *c)
   '' CH_SPACE;
 }
 
-U0 ICArgPut(CICArg *a)
+U0 ICArgPut(CICArg *a,I64 type_pointed_to)
 {
-  if (a->type_pointed_to)
-    "%Z %Z %Z ",a->type.raw_type,"ST_RAW_TYPES",
-	  a->type_pointed_to,"ST_RAW_TYPES",
-	  Bsr(a->type>>8)+1,"ST_TY_TYPES";
+  if (type_pointed_to)
+    "[%Z](%Z) %Z ",a->type.raw_type,"ST_RAW_TYPES",
+	  type_pointed_to,"ST_RAW_TYPES",Bsr(a->type>>8)+1,"ST_TY_TYPES";
   else
     "%Z %Z ",a->type.raw_type,"ST_RAW_TYPES",
 	  Bsr(a->type>>8)+1,"ST_TY_TYPES";
@@ -179,6 +178,7 @@ U0 ICArgPut(CICArg *a)
       }
       break;
   }
+  '' CH_SPACE;
 }
 
 U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
@@ -188,15 +188,22 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
     "%15ts %016X ",intermediate_code_table[opcode].name,tempi->ic_data;
     if (cc->pass) {
       if (tempi->r.type.mode) {
-	ICArgPut(&tempi->r);
-	"<-";
+	"$$PURPLE$$R:$$FG$$";
+	ICArgPut(&tempi->r,0);
       }
-      if (tempi->a1.type.mode)
-	ICArgPut(&tempi->a1);
-      ',';
-      if (tempi->a2.type.mode)
-	ICArgPut(&tempi->a2);
-      '' CH_SPACE;
+      if (tempi->a1.type.mode) {
+	"$$PURPLE$$A1:$$FG$$";
+	if (intermediate_code_table[tempi->ic_code].type==IST_DEREF ||
+	      intermediate_code_table[tempi->ic_code].type==IST_ASSIGN)
+	  ICArgPut(&tempi->a1,tempi->a1_type_pointed_to);
+	else
+	  ICArgPut(&tempi->a1,0);
+      }
+      if (tempi->a2.type.mode) {
+	"$$PURPLE$$A2:$$FG$$";
+	ICArgPut(&tempi->a2,0);
+      }
+      "$$PURPLE$$:$$FG$$";
     }
     ICClassPut(tempi->ic_class);
     if (tempi->ic_flags & ICF_LOCK)

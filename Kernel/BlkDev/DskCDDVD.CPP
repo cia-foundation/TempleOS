@@ -1,7 +1,75 @@
+//ISO1 is ISO9660
+//ISO2 is ISO13490
+//ISO3 is ISO13346
+
+Bool ISODrvInit(CDrv *dv,I64 blk)
+{
+  CBlkDev *bd=dv->bd;
+  I64 spc=bd->blk_size>>BLK_SIZE_BITS,i=blk/spc,drv_offset=0;
+  CISO1PriDesc *iso=MAlloc(bd->blk_size);
+  CISO1DirEntry *de;
+  Bool unlock,res=FALSE;
+  U8 buf[8];
+
+  try {
+    unlock=DrvLock(dv);
+    dv->fs_type=FSt_ISO9660; //default
+    dv->spc=spc;
+    dv->drv_offset=bd->drv_offset=dv->data_area=dv->root_cluster=dv->size=0;
+    while (TRUE) {
+      dv->size=MaxI64(dv->size,(i+1)*spc);
+      RBlks(dv,iso,i*spc,spc);
+      buf[0](U32)=iso->id[0](U32);
+      buf[4](U16)=iso->id[4](U8);
+      switch (LstMatch(buf,"CD001\0CDW02\0BEA01\0BOOT2\0NSR02\0NSR03\0TEA01\0",
+	    LMF_EXACT)) {
+	case 0:
+	  switch (iso->type) {
+	    case ISO1T_BOOT_RECORD:
+	      drv_offset+=(2*DVD_BLK_SIZE+DVD_BLK_SIZE)/BLK_SIZE;
+	      break;
+	    case ISO1T_SUPPLEMENTARY_DESC:
+	      de=&iso->root_dir_record;
+	      dv->root_cluster=de->loc.little;
+	      dv->size=iso->vol_space_size.little*bd->blk_size>>BLK_SIZE_BITS;
+	      if (!StrCmp(iso->publisher_id,"TempleOS RedSea")) {
+		dv->fs_type=FSt_REDSEA;
+		bd->drv_offset=dv->drv_offset=19<<2+drv_offset;
+		bd->max_blk=dv->size-1;
+		dv->size-=bd->drv_offset;
+		RedSeaDrvInit(dv);
+	      }
+	      res=TRUE;
+	      goto ipi_done;
+	    case ISO1T_TERMINATOR:
+	      throw('Drv');
+	  }
+	  break;
+	default: //Its normal for ISO13346 to read NULL blk as terminator
+	  PrintErr("File System Not Supported\n");
+	  throw('Drv');
+      }
+      i++;
+    }
+ipi_done:
+    Free(iso);
+    if (unlock)
+      DrvUnlock(dv);
+  } catch {
+    dv->fs_type=FSt_ISO9660;
+    dv->spc=spc;
+    dv->drv_offset=bd->drv_offset=dv->data_area=dv->root_cluster=0;
+    Free(iso);
+    if (unlock)
+      DrvUnlock(dv);
+  }
+  return res;
+}
+
 U0 DVDImageRead(U8 dvd_drv_let,U8 *out_name)
 {//Read entire CD/DVD image into ISO file.
-  CBlkDev *bd=Let2BlkDev(dvd_drv_let);
   CDrv *dv=Let2Drv(dvd_drv_let);
+  CBlkDev *bd=dv->bd;
   U8 *buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS),
 	*out_name2=DftExt(out_name,"ISO");
   CFile *f=FOpen(out_name2,"w");

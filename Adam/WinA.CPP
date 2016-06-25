@@ -104,7 +104,7 @@ U0 ExtendedASCII()
 {
   I64 i;
   CDoc *doc=DocNew;
-  DocPrint(doc,"Select Char and Press <ESC>\n$$LTBLUE$$");
+  DocPrint(doc,"Sel Char and Press <ESC>\n$$LTBLUE$$");
   for (i=0;i<256;i++) {
     if (i>=CH_SHIFT_SPACE && i!=0x7F) {
       if (i==CH_SHIFT_SPACE)

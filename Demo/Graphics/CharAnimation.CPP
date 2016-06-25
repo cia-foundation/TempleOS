@@ -1,6 +1,6 @@
 U8 *old_font=text.font;
 
-// See $LK,"::/Kernel/Font8x8.CPP"$, $LK,"::/Demo/ScreenCodes.CPP"$,
+// See $LK,"::/Kernel/FontStd.CPP"$, $LK,"::/Demo/ScreenCodes.CPP"$,
 //$LK,"::/Demo/ExtendedChars.CPP"$, and $LK,"::/Demo/Graphics/FontEd.CPP"$.
 
 U64 waves[4]={

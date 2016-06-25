@@ -10,7 +10,7 @@ I64 PrsDocFlagSingle(CCmpCtrl *cc,I64 *_de_flags,U32 *_type,Bool turn_on)
     if (res<64) {
       BEqu(_de_flags,res,turn_on);
       switch (res) {
-	case DOCEf_SELECTED:
+	case DOCEf_SEL:
 	case DOCEf_UNDERLINE:
 	case DOCEf_INVERT:
 	case DOCEf_BLINK:
@@ -56,7 +56,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
     f1=doldoc.dft_de_flags[doc_e->type_u8];
     t1=doc_e->type_u8|doldoc.dft_type_flags[doc_e->type_u8];
 
-    de_flags=doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_SELECTED|
+    de_flags=doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_SEL|
 	  DOCEF_HIGHLIGHT|DOCEF_WORD_WRAP|DOCEF_SKIP|DOCEF_FILTER_SKIP);
     for (i=0;i<DOCEf_NUM_FLAGS;i++)
       if (Bt(&f1,i)!=Bt(&de_flags,i)) {
@@ -70,7 +70,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	  Free(buf); buf=buf2;
 	}
       }
-    type=doc_e->type&~DOCET_SELECTED;
+    type=doc_e->type&~DOCET_SEL;
     for (i=DOCEt_BLINK;i<=DOCEt_UNDERLINE;i++)
       if (Bt(&t1,i)!=Bt(&type,i)) {
 	if (Bt(&type,i))

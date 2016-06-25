@@ -1,3 +1,22 @@
+U0 InstallDrv(U8 drv_let)
+{
+  U8 *st;
+  ExePrint("CopyTree(\"::/\",\"%C:/\");",drv_let);
+  ExePrint("MkDir(\"%C:/Temp\");",drv_let);
+  ExePrint("MkDir(\"%C:/Temp/ScreenShots\");",drv_let);
+  ExePrint("MkDir(\"%C:/Home\");",drv_let);
+
+  st=MStrPrint("%C:/Home/DoDistro.CPP.Z",drv_let);
+  if (!FileFind(st))
+    Copy("::/Misc/DoDistro.CPP.Z",st);
+  Free(st);
+
+  st=MStrPrint("%C:/Home/MakeHome.CPP.Z",drv_let);
+  if (!FileFind(st))
+    Copy("::/MakeHome.CPP.Z",st);
+  Free(st);
+}
+
 Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
 {
   if (ata_drv) {
@@ -8,23 +27,11 @@ Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
     return FALSE;
 }
 
-U0 VMInstallBoot(CTask *task,U8 dvd_drv,U8 drv_let,
+U0 VMInstallDrv(CTask *task,U8 drv_let,
 	CATARep *ata_drv,CATARep *atapi_drv)
 {
-  U8 *st1,*st2;
-
-  st1=MStrPrint("%C:/",dvd_drv);  st2=MStrPrint("%C:/",drv_let);
-  CopyTree(st1,st2);
-  Free(st1); Free(st2);
-
-  st1=MStrPrint("%C:/Home",drv_let);
-  MkDir(st1);
-  Copy("::/Misc/DoDistro.CPP.Z",st1);
-  Copy("::/MakeHome.CPP.Z",st1);
-  Free(st1);
-
-  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n"
-	"\nB\n0x20000\n",drv_let);
+  InstallDrv(drv_let);
+  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n\nB\n0x20000\n",drv_let);
   if (ata_drv)
     XTalkWait(task,"Cp%d\n",ata_drv->num);
   if (atapi_drv)
@@ -51,10 +58,10 @@ U0 VMInstallWiz()
   WinToTop(Fs);
 
   ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,blkdev.boot_drv_let,&ata_drv,&atapi_drv);
+  ATAIDDrvs(root,&ata_drv,&atapi_drv);
   if (VMPrtDsk(task,ata_drv)) {
-    VMInstallBoot(task,blkdev.boot_drv_let,'C',ata_drv,atapi_drv);
-    VMInstallBoot(task,blkdev.boot_drv_let,'D',ata_drv,atapi_drv);
+    VMInstallDrv(task,'C',ata_drv,atapi_drv);
+    VMInstallDrv(task,'D',ata_drv,atapi_drv);
     MasterBootInstall('C');
   }
   LinkedLstDel(root);
@@ -65,7 +72,7 @@ U0 VMInstallWiz()
 U0 RegularInstallWiz()
 {
   I64 unit,drv_let;
-  U8 *st,*base0,*base1,*st1,*st2,*new_home_str;
+  U8 *st,*base0,*base1;
   CATARep *root=NULL,*tempha;
   I64 ch,num_hints;
   CTask *task;
@@ -123,8 +130,6 @@ U0 RegularInstallWiz()
     Free(st);
   } while (!('A'<=drv_let<='Z'));
   '\n';
-  st1=MStrPrint("%C:/",blkdev.boot_drv_let);
-  st2=MStrPrint("%C:/",drv_let);
 
   "$$RED$$Format %C Partition?$$FG$$\n",drv_let;
   if (YorN) {
@@ -141,26 +146,15 @@ U0 RegularInstallWiz()
     else
       Fmt(drv_let,,FALSE,FSt_REDSEA);
   }
-  CopyTree(st1,st2);
-  st2=MStrPrint("%C:/Temp",drv_let);
-  MkDir(st2);
-  Free(st2);
-
-  new_home_str=MStrPrint("%C:/Home",drv_let);
-  MkDir(new_home_str);
-  Copy("::/Misc/DoDistro.CPP.Z",new_home_str);
-  Copy("::/MakeHome.CPP.Z",new_home_str);
-  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n"
-	"\nB\n0x20000\n"
-	"Cs%s\n%s\n%C"
-	"\n\n\n", //Exit Drives,Dsk Cache,Options
+  InstallDrv(drv_let);
+  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n\nB\n0x20000\n"
+	"Cs%s\n%s\n%C\n\n\n", //Exit Drives,Dsk Cache,Options
 	drv_let,base0,base1,'0'+unit);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {
     '\n';
     MasterBootInstall(drv_let);
   }
-  Free(new_home_str);
   Free(base0);
   Free(base1);
 
@@ -182,9 +176,9 @@ U0 DoInstructions()
   }
 }
 
-U0 DoInstall()
+Bool DoInstall(Bool pmt_reboot)
 {
-  I64 vm_install,pmt_reboot;
+  I64 res=FALSE,vm_install;
   "\n\n\n\n\nAre you installing inside VMware, QEMU, VirtualBox "
 	"or a similar virtual machine? ";
   vm_install=YorN;
@@ -192,21 +186,32 @@ U0 DoInstall()
 
   if (vm_install) {
     VMInstallWiz();
-    pmt_reboot=TRUE;
+    res=TRUE;
   } else {
     "\n\nThis wizard works if you have a partition ready.  "
 	  "You can partition the drive or MakeOSDrvBootInstall() "
 	  "with more options if you do it by hand, not using this wizard.\n\n"
 	  "Continue Install Wizard ";
-    if (pmt_reboot=YorN)
+    if (YorN) {
       RegularInstallWiz();
+      res=TRUE;
+    } else
+      pmt_reboot=FALSE;
   }
   if (pmt_reboot) {
     "Reboot Now ";
     if (YorN)
       Reboot;
   }
+  return res;
 }
 
-DoInstructions;
-DoInstall;
+Bool OSInstall(Bool pmt_reboot=TRUE)
+{
+  DoInstructions;
+  return DoInstall(pmt_reboot);
+}
+
+#if __CMD_LINE__
+OSInstall(TRUE);
+#endif

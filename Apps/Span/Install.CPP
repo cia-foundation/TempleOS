@@ -1,1 +1,1 @@
-MkDir("::/Home/Span");
+MkDir("~/Span");

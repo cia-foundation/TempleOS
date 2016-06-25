@@ -274,6 +274,141 @@ ff_done:
   return res;
 }
 
+I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
+{//2D. Clipping but not transformation.
+  I64 res=0,i,k,r=diameter>>1,rr;
+  if (diameter>=1)
+    switch (n) {
+      case 0:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=0;i<r;i++)
+	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
+		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=0;i<r;i++)
+	    res+=GrHLine(dc,-Sqrt(rr-SqrI64(r-i))+cx,
+		  Sqrt(rr-SqrI64(r-i))+cx,cy+i-r,z,z);
+	}
+	break;
+      case 1:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=r+1;i<diameter;i++)
+	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
+		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=r+1;i<k;i++)
+	    res+=GrHLine(dc,-Sqrt(rr-SqrI64(i-r))+cx,
+		  Sqrt(rr-SqrI64(i-r))+cx,cy+i-r,z,z);
+	}
+	break;
+      case 2:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=0;i<r;i++)
+	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
+		  gr.circle_hi[diameter][i]+cy,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=0;i<r;i++)
+	    res+=GrVLine(dc,cx+i-r,-Sqrt(rr-SqrI64(r-i))+cy,
+		  Sqrt(rr-SqrI64(r-i))+cy,z,z);
+	}
+	break;
+      case 3:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=r+1;i<diameter;i++)
+	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
+		  gr.circle_hi[diameter][i]+cy,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=r+1;i<k;i++)
+	    res+=GrVLine(dc,cx+i-r,-Sqrt(rr-SqrI64(i-r))+cy,
+		  Sqrt(rr-SqrI64(i-r))+cy,z,z);
+	}
+	break;
+      case 4:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=0;i<r;i++)
+	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
+		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=0;i<r;i++)
+	    res+=GrHLine(dc,-Sqrt(rr-SqrI64(r-i))+cx,
+		  Sqrt(rr-SqrI64(r-i))+cx,cy+i-r,z,z);
+	}
+	break;
+      case 5:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=r+1;i<diameter;i++)
+	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
+		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=r+1;i<k;i++)
+	    res+=GrHLine(dc,-Sqrt(rr-SqrI64(i-r))+cx,
+		  Sqrt(rr-SqrI64(i-r))+cx,cy+i-r,z,z);
+	}
+	break;
+      case 6:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=0;i<r;i++)
+	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
+		  gr.circle_hi[diameter][i]+cy,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=0;i<r;i++)
+	    res+=GrVLine(dc,cx+i-r,-Sqrt(rr-SqrI64(r-i))+cy,
+		  Sqrt(rr-SqrI64(r-i))+cy,z,z);
+	}
+	break;
+      case 7:
+	if (diameter<GR_NUM_PEN_BRUSHES)
+	  for (i=r+1;i<diameter;i++)
+	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
+		  gr.circle_hi[diameter][i]+cy,z,z);
+	else {
+	  k=diameter+1;
+	  rr=SqrI64((k+1)>>1);
+	  for (i=r+1;i<k;i++)
+	    res+=GrVLine(dc,cx+i-r,-Sqrt(rr-SqrI64(i-r))+cy,
+		  Sqrt(rr-SqrI64(i-r))+cy,z,z);
+	}
+	break;
+    }
+  return res;
+}
+
+public I64 GrFillCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter)
+{//2D. Clipping but not transformation.
+  I64 res=0,i,k,r=diameter>>1,rr;
+  if (diameter>=1) {
+    if (diameter<GR_NUM_PEN_BRUSHES)
+      for (i=0;i<diameter;i++)
+	res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
+	      gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
+    else {
+      k=diameter+1;
+      rr=SqrI64((k+1)>>1);
+      for (i=0;i<=r;i++)
+	res+=GrHLine(dc,-Sqrt(rr-SqrI64(r-i))+cx,
+	      Sqrt(rr-SqrI64(r-i))+cx,cy+i-r,z,z);
+      for (;i<k;i++)
+	res+=GrHLine(dc,-Sqrt(rr-SqrI64(i-r))+cx,
+	      Sqrt(rr-SqrI64(i-r))+cx,cy+i-r,z,z);
+    }
+  }
+  return res;
+}
+
 public Bool GrPlot3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
 {//3D. Clipping and transformation but no pen_width.
   I64 _x,_y,_z;
@@ -305,7 +440,7 @@ gr_done:
 
 public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
 {//3D. Clipping and transformation and pen width.
-  I64 _x,_y,_z,i,j,w,dist;
+  I64 _x,_y,_z,w,dist;
   CColorROPU32 old_color=dc->color;
   Bool record,was_transform=FALSE,was_symmetry=FALSE;
   CTask *win_task;
@@ -401,15 +536,8 @@ public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
 	}
       }
     }
-  } else if (dc->pen_width & 1) {//TODO Dither
-    for (i=-w;i<=w;i++)
-      for (j=-w;j<=w;j++)
-	GrPlot1(dc,x+i,y+j);
-  } else {
-    for (i=-w;i<w;i++)
-      for (j=-w;j<w;j++)
-	GrPlot1(dc,x+i,y+j);
-  }
+  } else
+    GrFillCircle(dc,x,y,dc->db_z,dc->pen_width);
 gr_done:
   dc->color=old_color;
   if (was_transform)
@@ -519,6 +647,128 @@ public Bool Gr3BSpline(CDC *dc=gr.dc,CD3I32 *ctrl,I64 cnt,Bool closed=FALSE)
   return BSpline3(dc,ctrl,cnt,&GrLinePlot,closed);
 }
 
+I64 GrLineFat3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,
+	I64 width,I64 start=0)
+{//Step through line segment calling callback.
+//Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.CPP"$.
+  I64 res=0,i,j,d,dx=x2-x1,dy=y2-y1,dz=z2-z1,_x,_y,_z,d_lo,d_hi,
+	adx=AbsI64(dx),ady=AbsI64(dy),adz=AbsI64(dz);
+  if (width>0) {
+    if (adx>=ady) {
+      if (adx>=adz) {
+	if (d=adx) {
+	  if (dx>=0)
+	    dx=0x100000000;
+	  else
+	    dx=-0x100000000;
+	  dy=dy<<32/d;
+	  dz=dz<<32/d;
+	}
+      } else {
+	if (d=adz) {
+	  dx=dx<<32/d;
+	  dy=dy<<32/d;
+	  if (dz>=0)
+	    dz=0x100000000;
+	  else
+	    dz=-0x100000000;
+	}
+      }
+      x1<<=32; y1<<=32; z1<<=32;
+      for (j=0;j<start;j++) {
+	x1+=dx; y1+=dy; z1+=dz;
+      }
+      if (start>=d)
+	res+=GrFillCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width);
+      else {
+	if (width==1)
+	  for (i=start;i<=d;i++) {
+	    dc->db_z=z1.i32[1];
+	    res+=GrPlot1(dc,x1.i32[1],y1.i32[1]);
+	    _x=x1.i32[1]; _y=y1.i32[1]; _z=z1.i32[1];
+	    x1+=dx; y1+=dy; z1+=dz;
+	  }
+	else {
+	  i=width*Sqrt(SqrI64(adx)+SqrI64(ady))/adx;
+	  d_lo=i>>1; d_hi=(i-1)>>1;
+
+	  if (dx>=0)
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,2);
+	  else
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,7);
+	  for (i=start;i<=d;i++) {
+	    res+=GrVLine(dc,x1.i32[1],y1.i32[1]-d_lo,y1.i32[1]+d_hi,
+		  z1.i32[1],z1.i32[1]);
+	    _x=x1.i32[1]; _y=y1.i32[1]; _z=z1.i32[1];
+	    x1+=dx; y1+=dy; z1+=dz;
+	  }
+	  x1-=dx; y1-=dy; z1-=dz;
+	  if (dx>=0)
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,3);
+	  else
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,6);
+	}
+      }
+    } else {
+      if (ady>=adz) {
+	if (d=ady) {
+	  dx=dx<<32/d;
+	  if (dy>=0)
+	    dy=0x100000000;
+	  else
+	    dy=-0x100000000;
+	  dz=dz<<32/d;
+	}
+      } else {
+	if (d=adz) {
+	  dx=dx<<32/d;
+	  dy=dy<<32/d;
+	  if (dz>=0)
+	    dz=0x100000000;
+	  else
+	    dz=-0x100000000;
+	}
+      }
+      x1<<=32; y1<<=32; z1<<=32;
+      for (j=0;j<start;j++) {
+	x1+=dx; y1+=dy; z1+=dz;
+      }
+      if (start>=d)
+	res+=GrFillCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width);
+      else {
+	if (width==1)
+	  for (i=start;i<=d;i++) {
+	    dc->db_z=z1.i32[1];
+	    res+=GrPlot1(dc,x1.i32[1],y1.i32[1]);
+	    _x=x1.i32[1]; _y=y1.i32[1]; _z=z1.i32[1];
+	    x1+=dx; y1+=dy; z1+=dz;
+	  }
+	else {
+	  i=width*Sqrt(SqrI64(ady)+SqrI64(adx))/ady;
+	  d_lo=i>>1; d_hi=(i-1)>>1;
+
+	  if (dy>=0)
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,0);
+	  else
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,5);
+	  for (i=start;i<=d;i++) {
+	    res+=GrHLine(dc,x1.i32[1]-d_lo,x1.i32[1]+d_hi,y1.i32[1],
+		  z1.i32[1],z1.i32[1]);
+	    _x=x1.i32[1]; _y=y1.i32[1]; _z=z1.i32[1];
+	    x1+=dx; y1+=dy; z1+=dz;
+	  }
+	  x1-=dx; y1-=dy; z1-=dz;
+	  if (dy>=0)
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,1);
+	  else
+	    res+=GrFillSemiCircle(dc,x1.i32[1],y1.i32[1],z1.i32[1],width,4);
+	}
+      }
+    }
+  }
+  return res;
+}
+
 public Bool GrLine3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,
 	I64 step=1,I64 start=0)
 {//3D. Transformation with pen width.
@@ -536,20 +786,28 @@ public Bool GrLine3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,I64 x2,I64 y2,I64 z2,
     _x2=x2; _y2=y2; _z2=z2;
     DCReflect(dc,&_x2,&_y2,&_z2);
     dc->flags&=~DCF_SYMMETRY;
-    if (step==1 && !start && !dc->brush && dc->pen_width<2 &&
-	  !dc->depth_buf) {//TODO: clip z for depth buf
-      if (DCClipLine(dc,&_x1,&_y1,&_x2,&_y2))
-	res=Line(dc,_x1,_y1,0,_x2,_y2,0,&GrLinePlot0,step,start);
+    if (step==1 && !dc->brush) {
+      if (!start && dc->pen_width<2 && !dc->depth_buf) {//TODO: clip z depbuf
+	if (DCClipLine(dc,&_x1,&_y1,&_x2,&_y2))
+	  res=Line(dc,_x1,_y1,0,_x2,_y2,0,&GrLinePlot0,step,start);
+      } else {
+	if (GrLineFat3(dc,_x1,_y1,_z1,_x2,_y2,_z2,dc->pen_width,start))
+	  res=TRUE;
+      }
     } else
       res=Line(dc,_x1,_y1,_z1,_x2,_y2,_z2,&GrPlot3,step,start);
     was_symmetry=TRUE;
     if (dc->flags&DCF_JUST_MIRROR)
       goto gr_done;
   }
-  if (step==1 && !start && !dc->brush && dc->pen_width<2 &&
-	!dc->depth_buf) {//TODO: clip z for depth buf
-    if (DCClipLine(dc,&x1,&y1,&x2,&y2))
-      res|=Line(dc,x1,y1,0,x2,y2,0,&GrLinePlot0,step,start);
+  if (step==1 && !dc->brush) {
+    if (!start && dc->pen_width<2 && !dc->depth_buf) {//TODO: clip z depbuf
+      if (DCClipLine(dc,&x1,&y1,&x2,&y2))
+	res|=Line(dc,x1,y1,0,x2,y2,0,&GrLinePlot0,step,start);
+    } else {
+      if (GrLineFat3(dc,x1,y1,z1,x2,y2,z2,dc->pen_width,start))
+	res=TRUE;
+    }
   } else
     res|=Line(dc,x1,y1,z1,x2,y2,z2,&GrPlot3,step,start);
 gr_done:
