@@ -2,9 +2,10 @@
 
 #define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
 
-U0 MakeMyISO(U8 *out_iso_filename)
+U0 MakeMyISO(U8 *_out_iso_filename)
 {//Does everything with current drive.
 //If you have not recompiled $FG,2$Kernel$FG$ and defined your CD/DVD drive, use $LK,"Mount",A="MN:Mount"$.
+  U8 *out_iso_filename=FileNameAbs(_out_iso_filename);
   if (!DrvIsWritable) {
     "Drive must be writable.  Install on Hard drive, first.\n";
     return;
@@ -14,7 +15,7 @@ U0 MakeMyISO(U8 *out_iso_filename)
 
   MkDir("/Distro");
   Auto(STD_DISTRO_DVD_CFG);
-  MakeOSDrvBootInstall(,'T');
+  BootDVDIns;
 
   Copy("/*","/Distro");
   Del("/Distro/" KERNEL_BIN_C);
@@ -43,8 +44,9 @@ U0 MakeMyISO(U8 *out_iso_filename)
   //DVDImageWrite('T',out_iso_filename,MT_DVD); //Uncomment to burn.
 
   //DelTree("/Distro");
+  Free(out_iso_filename);
 }
 
-MakeMyISO("/MyDistro.ISO");
+MakeMyISO("/Temp/MyDistro.ISO");
 
 // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$.

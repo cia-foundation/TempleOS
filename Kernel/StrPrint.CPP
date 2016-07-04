@@ -1,16 +1,3 @@
-#define SPF_PAD_ZERO		0x001
-#define SPF_LEFT_JUSTIFY	0x002
-#define SPF_TRUNCATE		0x004
-#define SPF_COMMA		0x008
-#define SPF_DOLLAR		0x010
-#define SPF_SLASH		0x020
-#define SPF_QUESTION		0x040
-#define SPF_AUX_FMT_NUM		0x080
-#define SPF_DECIMAL		0x100
-#define SPF_NEG			0x200
-#define SPF_NEG_E		0x400
-#define SPF_NEG_AUX_FMT_NUM	0x800
-
 U0 SPutChar(U8 **_dst,U8 ch,U8 **_buf)
 {
   I64 i;
@@ -425,19 +412,13 @@ to avoid this.
 	case 'p':
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
-	  if (flags&SPF_TRUNCATE)
-	    StrPrintFunSeg(temp_buf,argv[cur_arg++],len);
-	  else
-	    StrPrintFunSeg(temp_buf,argv[cur_arg++],0);
+	  StrPrintFunSeg(temp_buf,argv[cur_arg++],len,flags);
 	  OutStr(temp_buf,_buf,_dst,len,flags);
 	  break;
 	case 'P':
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
-	  if (flags&SPF_TRUNCATE)
-	    StrPrintFunSeg(temp_buf,argv[cur_arg],len);
-	  else
-	    StrPrintFunSeg(temp_buf,argv[cur_arg],0);
+	  StrPrintFunSeg(temp_buf,argv[cur_arg],len,flags);
 	  if (!IsRaw || !_buf) {
 	    StrPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",
 		  temp_buf,argv[cur_arg]);

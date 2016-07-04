@@ -375,7 +375,7 @@ sch_done:
 }
 
 I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
-{//Execute code text in PopUp win task.
+{//Execute code in $LK,"PopUp",A="MN:PopUp"$ task.
   I64 res;
   CSrvCmd *tempc;
   CTask *task=Spawn(&SrvCmdLine,NULL,"Servant",,parent);
@@ -396,7 +396,7 @@ I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
 }
 
 I64 PopUpPrint(U8 *fmt,...)
-{//Execute code text in PopUp win task.
+{//Execute code in $LK,"PopUp",A="MN:PopUp"$ task.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   I64 res;
   res=PopUp(buf,Fs);
@@ -405,7 +405,7 @@ I64 PopUpPrint(U8 *fmt,...)
 }
 
 I64 Adam(U8 *fmt,...)
-{//Sends text to the adam task which gets compiled and run.
+{//Make adam_task execute code.
   I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   CSrvCmd *tempc;
@@ -422,7 +422,7 @@ I64 Adam(U8 *fmt,...)
 }
 
 U0 AdamLog(U8 *fmt,...)
-{//Sends text to the adam task which gets displayed.
+{//Display text in adam_task.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   if (Fs==adam_task)
     "%s",buf;
@@ -432,7 +432,7 @@ U0 AdamLog(U8 *fmt,...)
 }
 
 U0 AdamErr(U8 *fmt,...)
-{//Sends text to the adam task which gets displayed as red and blinking.
+{//Display red blinking Err text in adam_task.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),
 	*st=MStrPrint(ST_ERR_ST "%s",buf);
   if (Fs==adam_task)

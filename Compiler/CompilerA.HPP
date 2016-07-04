@@ -361,6 +361,7 @@ class CIntermediateStruct
 #define FSF_PUBLIC		0x01
 #define FSF_ASM			0x02
 #define FSF_STATIC		0x04
+#define FSF__			0x08
 #define FSF_INTERRUPT		(1<<Ff_INTERRUPT)
 #define FSF_HASERRCODE		(1<<Ff_HASERRCODE)
 #define FSF_ARGPOP		(1<<Ff_ARGPOP)
@@ -388,6 +389,8 @@ class CIntermediateStruct
 #define PRS1_CLASS		0x000300
 #define PRS1B_STATIC_LOCAL_VAR	4
 #define PRS1_STATIC_LOCAL_VAR	0x000400
+#define PRS1B__EXTERN_IMPORT	5
+#define PRS1_NOT_REALLY__EXTERN	0x000500
 
 #define PRSF_UNION		0x010000
 

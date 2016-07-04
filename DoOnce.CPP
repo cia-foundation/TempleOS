@@ -23,8 +23,7 @@ U0 DoOnce()
 	    "Install onto hard drive ";
       if (YorN) {
 	DocBottom;
-	ExeFile("::/Misc/OSInstall");
-	ExePrint("OSInstall(TRUE);");
+	RunFile("::/Misc/OSInstall",,TRUE);
       }
       if (FileFind("::/Misc/Tour")) {
 	"\nTake Tour";

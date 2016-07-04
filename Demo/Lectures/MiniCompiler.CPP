@@ -217,7 +217,7 @@ U0 Main()
 	"$$RED$$This code is not efficient, but the compiler is simple.$$FG$$\n";
 	Un(code,dst-code); //Unassemble the code we created.
 //$LK,"Call",A="MN:Call"$() is a function.  See $LK,"_CALL",A="FF:::/Kernel/KUtils.CPP,_CALL"$::
-	//See also $LK,"CallInd",A="MN:CallInd"$().  See $LK,"_CALLIND",A="FF:::/Kernel/KUtils.CPP,_CALLIND"$::
+	//See also $LK,"CallInd",A="MN:CallInd"$().  See $LK,"_CALL_IND",A="FF:::/Kernel/KUtils.CPP,_CALL_IND"$::
 	"$$LTBLUE$$Answer:%d$$FG$$\n",Call(code);
       } catch {
 	"$$RED$$Error$$FG$$\n";

@@ -119,9 +119,9 @@ public I64 ExeDoc(CDoc *doc,I64 ccf_flags=0)
   I64 res;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
   CCmpCtrl *cc=CmpCtrlNew(,ccf_flags|CCF_DONT_FREE_BUF);
-  if (Fs->last_lex!=&Fs->next_lex)
-    cc->opts=Fs->last_lex->opts;
-  QueIns(cc,Fs->last_lex);
+  if (Fs->last_cc!=&Fs->next_cc)
+    cc->opts=Fs->last_cc->opts;
+  QueIns(cc,Fs->last_cc);
   LexAttachDoc(cc,,doc);
   try {
     Lex(cc);

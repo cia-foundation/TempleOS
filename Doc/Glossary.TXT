@@ -66,7 +66,7 @@ $FG,2$Ident$FG$	Identifier, Identity, Identical
 $FG,2$IDT$FG$	Interrupt Descriptor Table
 $FG,2$Idx$FG$	Index
 $FG,2$Init$FG$	Initialize
-$FG,2$Ins$FG$	Insert
+$FG,2$Ins$FG$	Insert, Install
 $FG,2$Inst$FG$	Instruction
 $FG,2$Int$FG$	Interrupt, Integer
 $FG,2$ip_$FG$	Input Pointer.  See $LK,"InputPointer.CPP",A="FI:::/Kernel/SerialDev/InputPointer.CPP"$.
@@ -165,7 +165,7 @@ $ID,2$$FG,2$Ahead-of-Time$FG$ compiling is conventional compilation mode.  Do no
 
 In $FG,2$AOT$FG$ mode, $FG,2$.PRJ$FG$ files are compiled to $FG,2$.BIN$FG$ files, skipping $FG,2$.OBJ$FG$ files.  After compiling, $FG,2$.BIN$FG$ files are $LK,"Load",A="MN:Load"$()ed.
 
-There is no $FG,2$main()$FG$ routine.  Instead, stmts outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
+There is no $FG,2$main()$FG$ routine.  Instead, stmts outside functions are automatically executed upon loading.  There is no way to unload except by killing the task.  To invoke $FG,2$AOT Compiled Mode$FG$, $LK,"Cmp",A="MN:Cmp"$() is used.  The $FG,2$Kernel$FG$ module and compiler are made in $FG,2$AOT$FG$ compiled mode.  See $LK,"BootHDIns",A="MN:BootHDIns"$()  which calls $LK,"MakeAll",A="MN:MakeAll"$() where $FG,2$Kernel.BIN.C$FG$ and $FG,2$Compiler.BIN.Z$FG$ are created.
 $ID,-2$$TR,"JIT Compile Mode"$
 $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memory alloced from the heap, incrementally, making them immediately ready for in-place execution.  This mode is used during cmd line operations.  When you $FG,2$#include$FG$ a file, it is compiled function by function and code ends-up all over in the memory, at least in the first 2Gig of memory.  The $LK,"ExeFile",A="MN:ExeFile"$() routine is the same as $FG,2$#include$FG$ but can be used in programs.  $LK,"ExePrint",A="MN:ExePrint"$() routine will compile and run a string.
 $ID,-2$$TR,"Compiler Intermediate Code"$
@@ -222,14 +222,14 @@ $LK,"FILEMASK_SRC",A="MN:FILEMASK_SRC"$
 $LK,"FILEMASK_AOT",A="MN:FILEMASK_AOT"$
 $LK,"FILEMASK_JIT",A="MN:FILEMASK_JIT"$
 $LK,"FILEMASK_GRA",A="MN:FILEMASK_GRA"$
-$ID,-2$$TR,"Naming Convention"$
+$ID,-2$$TR-C,"Naming Convention"$
 $ID,2$Since there are no $FG,2$namespaces$FG$ and I don't plan to implement name spaces, I highly recommend putting a 2-3 character module code prefix on syms. e.g. $FG,2$WS$FG$, $FG,2$Doc$FG$, $FG,2$Lex$FG$
 
 $FG,5$ALL_CAPS$FG$
   Assembly Language labels are capitalized with underscores between words.  So are $FG,2$#define$FG$'s.
 
 $FG,5$_ALL_CAPS$FG$
-  Asm routines which are $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ callible should have a leading underscore.
+  Asm routines which are $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ callable must have a leading underscore.
 
 $FG,5$MixedCaps$FG$
   $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ Functions and class names are MixedCaps.

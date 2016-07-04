@@ -98,7 +98,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
 	      !(tempex->type & HTF_IMPORT) &&
 	      (tempf=HashFind(tempex->str,cc->htc.hash_table_lst,HTT_FUN)) &&
 	      !Bt(&tempf->flags,Cf_EXTERN)) {
-	  tempex->val=tempf->executable_addr;
+	  tempex->val=tempf->exe_addr;
 	  tempex->type&=~HTF_UNRESOLVED;
 	  label=tempauh->hash->str;
 	} else {
@@ -157,7 +157,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
 	  tempeu=tempf->ext_lst;
 	  while (tempeu) {
 	    tempeu8=tempeu->next;
-	    j=tempf->executable_addr-(tempeu->ip+4);
+	    j=tempf->exe_addr-(tempeu->ip+4);
 	    AOTStoreCodeU8At(cc,tempeu->ip,j.u8[0],j.u8[1],j.u8[2],j.u8[3]);
 	    Free(tempeu);
 	    tempeu=tempeu8;
@@ -167,7 +167,7 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
 	  tempie=CAlloc(sizeof(CAOTImportExport));
 	  tempie->type=IET_REL32_EXPORT;
 	  if (tempex->type & HTT_FUN)
-	    tempie->ip=tempf->executable_addr;
+	    tempie->ip=tempf->exe_addr;
 	  else if (tempex->type & HTT_GLBL_VAR)
 	    tempie->ip=tempex(CHashGlblVar *)->data_addr_ip;
 	  else

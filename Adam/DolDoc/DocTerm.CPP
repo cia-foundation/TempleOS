@@ -59,8 +59,9 @@ public U0 DocTermNew()
 #define RIGHT_DELETE	4
 #define RIGHT_TYPE	5
 #define RIGHT_ED	6
-#define RIGHT_PLAIN	7
-#define RIGHT_AUTOFILE	8
+#define RIGHT_MOUNT	7
+#define RIGHT_PLAIN	8
+#define RIGHT_AUTOFILE	9
 
 I64 PopUpTermRight(U8 *header)
 {
@@ -76,9 +77,10 @@ I64 PopUpTermRight(U8 *header)
 	"$$CM+LX,1,3 $$$$BT,\"DELETE              \",LE=RIGHT_DELETE$$"
 	"$$CM+LX,26,0$$$$BT,\"TYPE         TXT;GRA\",LE=RIGHT_TYPE$$"
 	"$$CM+LX,1,3 $$$$BT,\"ED               TXT\",LE=RIGHT_ED$$"
-	"$$CM+LX,26,0$$$$BT,\"PLAIN ED         TXT\",LE=RIGHT_PLAIN$$"
-	"$$CM+LX,1,3 $$$$BT,\"CANCEL              \",LE=DOCM_CANCEL$$"
-	"$$CM+LX,26,0$$$$BT,\"AUTOFILE         AUT\",LE=RIGHT_AUTOFILE$$\n",
+	"$$CM+LX,26,0$$$$BT,\"MOUNT          ISO.C\",LE=RIGHT_MOUNT$$"
+	"$$CM+LX,1,3 $$$$BT,\"PLAIN ED         TXT\",LE=RIGHT_PLAIN$$"
+	"$$CM+LX,26,0$$$$BT,\"AUTOFILE         AUT\",LE=RIGHT_AUTOFILE$$\n"
+	"$$CM+LX,1,3 $$$$BT,\"CANCEL              \",LE=DOCM_CANCEL$$",
 	FILEMASK_TXT,FILEMASK_JIT,FILEMASK_GRA);
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -159,6 +161,18 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	  case RIGHT_ED:
 	    "Ed(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    res=Ed(st);
+	    break;
+	  case RIGHT_MOUNT:
+	    if (FileExtDot(st) && !FilesFindMatch(st,"*.ISO.C")) {
+	      if (!PopUpCancelOk(ST_WARN_ST "Not .ISO.C File\n\n")) {
+		send_new_line=TRUE;
+		break;
+	      }
+	    }
+	    "MountFile(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
+	    WinZBufUpdate;
+	    MountFile(st);
+	    res=TRUE;
 	    break;
 	  case RIGHT_PLAIN:
 	    "Plain(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;

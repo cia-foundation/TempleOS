@@ -30,7 +30,7 @@ I64 HashVal(CHash *temph)
       if (Bt(&temph(CHashFun *)->flags,Cf_EXTERN))
 	return temph;
       else
-	return temph(CHashFun *)->executable_addr;
+	return temph(CHashFun *)->exe_addr;
     case HTt_REG:
       return temph(CHashReg *)->reg_num|temph(CHashReg *)->reg_type<<8;
     case HTt_KEYWORD:
@@ -176,7 +176,7 @@ CHashGeneric *HashPublic(U8 *st,I64 mask,Bool val=TRUE)
     else
       res->type&=~HTF_PUBLIC;
     if (res->type&HTG_SRC_SYM)
-      HashSrcFileSet(Fs->last_lex,res);
+      HashSrcFileSet(Fs->last_cc,res);
     return res;
   } else
     return NULL;

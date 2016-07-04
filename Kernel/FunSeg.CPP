@@ -21,7 +21,7 @@ U0 HashFunSegFind(CHashTable *h,U8 *addr,
       if (tempex->type&HTT_FUN) {
 	if (!Bt(&tempex(CHashFun *)->flags,Cf_EXTERN) &&
 	      !Bt(&tempex(CHashFun *)->flags,Ff_INTERNAL))
-	  j=tempex(CHashFun *)->executable_addr;
+	  j=tempex(CHashFun *)->exe_addr;
       } else if (tempex->type&HTT_EXPORT_SYS_SYM)
 	j=tempex->val;
       if (j) {
@@ -131,12 +131,14 @@ U8 *FunSegCacheFind(U8 *addr,I64 *_offset)
   }
 }
 
-U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len)
+U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
 {
   I64 offset;
   CHashExport *tempex;
   U8 *str,*str2;
   Bool is_fun=FALSE;
+  if (!(flags&SPF_TRUNCATE))
+    field_len=0;
   if (addr) {
     if (str=FunSegCacheFind(addr,&offset)) {
       if (addr!=SYS_IDLE_PT)
@@ -153,21 +155,27 @@ U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len)
       if (offset>0xFFFF) offset=0xFFFF;
       if (is_fun) {
 	str2=MStrPrint("&%s",str);
-	if (field_len>7)
-	  StrPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
-	else
+	if (field_len>7) {
+	  if (flags&SPF_LEFT_JUSTIFY && StrLen(str2)<field_len-7)
+	    StrPrint(buf,"%s+0x%04X",str2,offset);
+	  else
+	    StrPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
+	} else
 	  StrPrint(buf,"%s+0x%04X",str2,offset);
 	Free(str2);
       } else {
-	if (field_len>7)
-	  StrPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
-	else
+	if (field_len>7) {
+	  if (flags&SPF_LEFT_JUSTIFY && StrLen(str)<field_len-7)
+	    StrPrint(buf,"%s+0x%04X",str,offset);
+	  else
+	    StrPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
+	} else
 	  StrPrint(buf,"%s+0x%04X",str,offset);
       }
       return;
     }
   }
-  if (field_len)
+  if (flags&SPF_TRUNCATE)
     StrPrint(buf,"%*tX",field_len,addr);
   else
     StrPrint(buf,"%X",addr);

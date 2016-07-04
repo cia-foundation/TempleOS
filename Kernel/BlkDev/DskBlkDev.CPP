@@ -33,39 +33,51 @@ Bool BlkDevInit(CBlkDev *bd)
   CDirEntry de;
   U8 buf[STR_LEN];
   CDrv *dv=Let2Drv(bd->first_drv_let);
-  Bool res=FALSE,invalid=FALSE;
+  Bool res=FALSE;
   if (!LBts(&bd->flags,BDf_INITIALIZED)) {
     bd->flags|=BDF_INIT_IN_PROGRESS;
     switch (bd->type) {
-      start:
-	case BDT_RAM:
-	  if (!bd->RAM_dsk) {
-	    bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);
-	    bd->max_blk=MSize(bd->RAM_dsk)>>BLK_SIZE_BITS-1;
-	  }
-	  break;
-	case BDT_FILE:
-	  if (!bd->file_dsk_name) {
-	    StrPrint(buf,"%C:/Drv%C.DRV.C",
-		  blkdev.boot_drv_let,bd->first_drv_let);
-	    bd->file_dsk_name=AStrNew(buf);
-	  }
-	  if (FileFind(bd->file_dsk_name,&de,FUF_JUST_FILES))
-	    bd->max_blk=de.size>>BLK_SIZE_BITS-1;
-	  else {
-	    invalid=TRUE;
-	    if (bd->max_blk<7)
-	      bd->max_blk=7;
-	  }
-	  bd->file_dsk=FOpen(bd->file_dsk_name,"wc+",bd->max_blk+1);
-	  break;
-      end:
+      case BDT_RAM:
+	if (!bd->RAM_dsk) {
+	  bd->RAM_dsk=AMAlloc((bd->max_blk+1)<<BLK_SIZE_BITS);
+	  bd->max_blk=MSize(bd->RAM_dsk)>>BLK_SIZE_BITS-1;
+	}
 	dv->fs_type=FSt_REDSEA;
 	dv->size=bd->max_blk+1-bd->drv_offset;
-	if (!invalid && RedSeaDrvValidate(bd->first_drv_let))
+	if (RedSeaDrvValidate(bd->first_drv_let))
 	  RedSeaDrvInit(dv);
 	else
 	  RedSeaFmt(bd->first_drv_let);
+	res=TRUE;
+	break;
+      case BDT_FILE_READ:
+	if (FileFind(bd->file_dsk_name,&de,FUF_JUST_FILES)) {
+	  bd->max_blk=de.size>>BLK_SIZE_BITS-1;
+	  try bd->file_dsk=FOpen(bd->file_dsk_name,"rc",bd->max_blk+1);
+	  catch
+	    Fs->catch_except=TRUE;
+	  if (bd->file_dsk) {
+	    dv->fs_type=FSt_REDSEA;
+	    dv->size=bd->max_blk+1-bd->drv_offset;
+	    if (RedSeaDrvValidate(bd->first_drv_let)) {
+	      RedSeaDrvInit(dv);
+	      res=TRUE;
+	    }
+	  }
+	}
+	break;
+      case BDT_FILE_WRITE:
+	if (!bd->file_dsk_name) {
+	  StrPrint(buf,"%C:/Drv%C.DRV.C",
+		blkdev.boot_drv_let,bd->first_drv_let);
+	  bd->file_dsk_name=AStrNew(buf);
+	}
+	if (bd->max_blk<7)
+	  bd->max_blk=7;
+	bd->file_dsk=FOpen(bd->file_dsk_name,"wc",bd->max_blk+1);
+	dv->fs_type=FSt_REDSEA;
+	dv->size=bd->max_blk+1-bd->drv_offset;
+	RedSeaFmt(bd->first_drv_let);
 	res=TRUE;
 	break;
       case BDT_ATA:
@@ -105,7 +117,7 @@ U0 BlkDevsRelease()
   }
 }
 
-CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
+CBlkDev *BlkDevNextFreeSlot(U8 first_drv_let,I64 type)
 {//Locate free slot for new BlkDev, like during $LK,"Mount",A="MN:Mount"$().
   I64 i=0;
   CBlkDev *res;
@@ -117,20 +129,21 @@ CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
       MemSet(res,0,sizeof(CBlkDev));
       res->first_drv_let=first_drv_let;
       res->type=type;
-      if (type==BDT_ATAPI)
-	res->flags=BDF_REMOVABLE;
-      else
-	res->flags=0;
-      if (type!=BDT_RAM)
-	res->flags|=BDF_READ_CACHE;
-
-      if (type==BDT_ATAPI) {
-	res->blk_size=DVD_BLK_SIZE;
-	res->flags|=BDF_READ_ONLY;
-      } else
-	res->blk_size=BLK_SIZE;
-
+      res->flags=BDF_READ_CACHE;
+      res->blk_size=BLK_SIZE;
       res->max_blk=0xEFFFFFFF;
+      switch (type) {
+	case BDT_RAM:
+	  res->flags&=~BDF_READ_CACHE;
+	  break;
+	case BDT_FILE_READ:
+	  res->flags|=BDF_READ_ONLY;
+	  break;
+	case BDT_ATAPI:
+	  res->flags|=BDF_REMOVABLE|BDF_READ_ONLY;
+	  res->blk_size=DVD_BLK_SIZE;
+	  break;
+      }
       return res;
     }
   } while (++i<NUM_BLKDEVS);
@@ -140,6 +153,7 @@ CBlkDev *BlkDevNextFree(U8 first_drv_let,I64 type)
 
 U0 BlkDevDel(CBlkDev *bd)
 {//Delete BlkDev
+  DrvBlkDevDel(bd);
   FClose(bd->file_dsk);
   Free(bd->file_dsk_name);
   Free(bd->dev_id_record);

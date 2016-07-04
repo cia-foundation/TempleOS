@@ -8,9 +8,9 @@ $FG,2$/Demo$FG$ Here you can find lots of sample code to do various things.
 
 $FG,2$/Doc$FG$ Here you can find documentation.
 
-$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a $FG,2$kernel$FG$ is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  It is loaded by the boot loader and must fit in 640K.
+$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a $FG,2$kernel$FG$ is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"BootHDIns",A="MN:BootHDIns"$().  It is loaded by the boot loader and must fit in 640K.
 
-$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
+$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"BootHDIns",A="MN:BootHDIns"$().
 
 $FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.  The $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$ is the father of all tasks, like Adam and Eve.
 

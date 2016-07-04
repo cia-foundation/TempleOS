@@ -73,7 +73,6 @@ I64 strip_height,x,y,z,game_score;
 Bool game_over;
 
 class MPCtrl {
-  I64 mp_cnt;
   I64 init_not_done_flags,update_not_done_flags,app_not_done_flags;
   I64 strip_width[MP_MAX_PROCESSORS];
   Bool app_done;
@@ -139,8 +138,8 @@ U0 MPDoPanels(CTask *task)
   Panel *tempp,*start_ptr=NULL,*end_ptr=NULL;
   CD3I32 *poly;
   Fish *tempf;
-  lo=Gs->num*(MAP_HEIGHT-1)/mp.mp_cnt;
-  hi=(Gs->num+1)*(MAP_HEIGHT-1)/mp.mp_cnt;
+  lo=Gs->num*(MAP_HEIGHT-1)/mp_cnt;
+  hi=(Gs->num+1)*(MAP_HEIGHT-1)/mp_cnt;
   for (threshold=8;threshold>=1;threshold--)
     for (j=lo;j<hi;j++) {
       for (i=0;i<MAP_WIDTH-1;i++) {
@@ -280,22 +279,14 @@ U0 InitMap()
 and convert it to panels. "panels[][]" holds the panels
 for each spot.
 */
-  I64 i,x,y,xx,yy;
-
+  I64 i;
   InitElevations;
-
   MemSet(panels,0,sizeof(panels));
-  xx=x/(MAP_SCALE*COORDINATE_SCALE);
-  yy=y/(MAP_SCALE*COORDINATE_SCALE);
-  z+=elevations[yy][xx]*COORDINATE_SCALE;
-
   CalcNormals;
-
   panel_root=NULL;
   num_panels=0;
-
-  mp.init_not_done_flags=1<<mp.mp_cnt-1;
-  for (i=0;i<mp.mp_cnt;i++)
+  mp.init_not_done_flags=1<<mp_cnt-1;
+  for (i=0;i<mp_cnt;i++)
     Spawn(&MPDoPanels,Fs,"Do Panels",i);
   while (mp.init_not_done_flags)
     Sleep(1);
@@ -434,10 +425,11 @@ U0 MPDrawIt(CTask *task,CDC *dc)
 {
   I64 j,strip_width,*s2w,x1,y1,z1, xx,yy,
 	xh,yh,zh,yh2,xh2,x1h,y1h,x1wa,y1wa,x1wb,y1wb,
-	x3,y3,z3,
+	x3,y3,z3,dd,dd_old,
 	cx=task->pix_width>>1,
 	cy=task->pix_height>>1;
   Panel reg *tempp;
+  Bool	w_on_map,h_on_map;
 
   xx=x/(MAP_SCALE*COORDINATE_SCALE);
   yy=y/(MAP_SCALE*COORDINATE_SCALE);
@@ -514,9 +506,12 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   //Take half steps to cover whole grid.
   xh>>=1;  yh>>=1;
   xh2>>=1; yh2>>=1;
+  w_on_map=FALSE;
+  dd_old=MAX_I64;
   for (strip_width=0;cnts.jiffies<update_jiffy_limit;strip_width++) {
     x1h=x1wa;
     y1h=y1wa;
+    h_on_map=FALSE;
     for (j=0;j<strip_height && cnts.jiffies<update_jiffy_limit;j++) {
       x1=x1h>>8; y1=y1h>>8;
       if (0<=x1<MAP_WIDTH && 0<=y1<MAP_HEIGHT) {
@@ -528,9 +523,17 @@ U0 MPDrawIt(CTask *task,CDC *dc)
 	  } else
 	    tempp->cnt++;
 	}
-      }
+	h_on_map=TRUE;
+      } else if (h_on_map)
+	break;
       x1h+=xh;
       y1h+=yh;
+    }
+    if (h_on_map)
+      w_on_map=TRUE;
+    else if (w_on_map) {
+      strip_width=MAX_I64;
+      break;
     }
     x1wb-=yh2;
     y1wb+=xh2;
@@ -540,6 +543,12 @@ U0 MPDrawIt(CTask *task,CDC *dc)
     } else {
       x1wa+=x1wb;
       y1wa+=y1wb;
+    }
+    if (!w_on_map) {
+      dd=SqrI64(x1wa>>8-MAP_WIDTH>>1)+SqrI64(y1wa>>8-MAP_HEIGHT>>1);
+      if (dd>dd_old)
+	break;
+      dd_old=dd;
     }
   }
 
@@ -573,6 +582,12 @@ U0 DrawHorizon(CDC *dc)
   CD3I32 p[4];
   I32 *old_db=dc->depth_buf;
   dc->depth_buf=NULL;
+  CColorROPU32 ground_color;
+
+  if (z/COORDINATE_SCALE<(WATER_ELEVATION+3)*MAP_SCALE)
+    ground_color=BLUE;
+  else
+    ground_color=LTGREEN;
 
   Mat4x4IdentEqu(dc->r);
   Mat4x4RotZ(dc->r,é2);
@@ -616,12 +631,12 @@ U0 DrawHorizon(CDC *dc)
     if (-ã/2<=é1<ã/2 ^^ -ã/2<=Wrap(è-ã/2)<ã/2)
       dc->color=LTCYAN;
     else
-      dc->color=LTGREEN;
+      dc->color=ground_color;
     GrFillPoly3(dc,4,p);
     p[0].y=dc->height-1;
     p[1].y=dc->height-1;
     if (-ã/2<=é1<ã/2 ^^ -ã/2<=Wrap(è-ã/2)<ã/2)
-      dc->color=LTGREEN;
+      dc->color=ground_color;
     else
       dc->color=LTCYAN;
     GrFillPoly3(dc,4,p);
@@ -642,12 +657,12 @@ U0 DrawHorizon(CDC *dc)
       if (x1<x2 ^^ -ã/2<=é1<ã/2 ^^ -ã/2<=Wrap(è-ã/2)<ã/2)
 	dc->color=LTCYAN;
       else
-	dc->color=LTGREEN;
+	dc->color=ground_color;
       GrFillPoly3(dc,4,p);
       p[0].x=dc->width-1;
       p[1].x=dc->width-1;
       if (x1<x2 ^^ -ã/2<=é1<ã/2 ^^ -ã/2<=Wrap(è-ã/2)<ã/2)
-	dc->color=LTGREEN;
+	dc->color=ground_color;
       else
 	dc->color=LTCYAN;
       GrFillPoly3(dc,4,p);
@@ -659,7 +674,7 @@ U0 DrawHorizon(CDC *dc)
 U0 Core0EagleDive()
 {
   CDC *dc=DCAlias(main_dc,Fs);
-  I64 i,xx,yy,height,bkcolor,cx=Fs->pix_width>>1,cy=Fs->pix_height>>1;
+  I64 i,xx,yy,elev,height,bkcolor,cx=Fs->pix_width>>1,cy=Fs->pix_height>>1;
   F64 min_strip_width,roll,pitch,heading;
   Fish *tempf;
 
@@ -668,9 +683,14 @@ U0 Core0EagleDive()
 
   xx=x/(MAP_SCALE*COORDINATE_SCALE);
   yy=y/(MAP_SCALE*COORDINATE_SCALE);
-  height=z/COORDINATE_SCALE-elevations[yy][xx];
+  if (0<=xx<MAP_WIDTH && 0<=yy<MAP_HEIGHT)
+    elev=elevations[yy][xx];
+  else
+    elev=MAX_I64;
+
+  height=z/COORDINATE_SCALE-elev;
   if (height<0) {
-    if (elevations[yy][xx]>WATER_ELEVATION*MAP_SCALE) {
+    if (elev>WATER_ELEVATION*MAP_SCALE) {
       dc->color=bkcolor=BLACK;
       if (!game_over) {
 	GrRect(dc,0,0,dc->width,dc->height);
@@ -688,7 +708,7 @@ U0 Core0EagleDive()
     DrawHorizon(dc);
     DCDepthBufRst(dc);
 
-    mp.update_not_done_flags=1<<mp.mp_cnt-1;
+    mp.update_not_done_flags=1<<mp_cnt-1;
     MPDrawIt(Fs,dc);
 
     xx=x/COORDINATE_SCALE;
@@ -704,7 +724,7 @@ U0 Core0EagleDive()
       Sleep(1);
 
     min_strip_width=MAX_F64;
-    for (i=0;i<mp.mp_cnt;i++)
+    for (i=0;i<mp_cnt;i++)
       min_strip_width=Min(min_strip_width,32.0*mp.strip_width[i]/(i+32.0));
     strip_height=ClampI64(
 	  strip_height*Clamp(0.25*min_strip_width/strip_height,0.9,1.1),
@@ -772,7 +792,7 @@ Fish *FishFind(I64 x1,I64 y1,I64 *_dd)
 U0 AnimateTask(I64)
 {//Steadily moves the airplane fwd.
   I64 *s2w,x1,y1,z1,dx,dy,dz,dd;
-  F64 t0=tS,mS,é,d;
+  F64 t0=tS,mS,é,d,pitch;
   Fish *tempf;
   while (TRUE) {
     mS=1000*(tS-t0);
@@ -792,7 +812,17 @@ U0 AnimateTask(I64)
       x1=x/COORDINATE_SCALE; y1=y/COORDINATE_SCALE; z1=z/COORDINATE_SCALE;
 
       if (z1<(WATER_ELEVATION+3)*MAP_SCALE) {
-	speed=0.5;
+	if (z1<WATER_ELEVATION*MAP_SCALE) {
+	  z=WATER_ELEVATION*MAP_SCALE*COORDINATE_SCALE;
+	  pitch=Wrap(-è-ã/2,-ã);
+	  if (Abs(pitch)>ã/2) {
+	    pitch=Wrap(ã-pitch,-ã);
+	    if (pitch<-ã/8)
+	      è+=mS/1000.0*Sign(3*ã/8-è);
+	  } else if (pitch<-ã/8)
+	    è+=mS/1000.0*Sign(-3*ã/8-è);
+	}
+	speed=1.0;
 	if (tempf=FishFind(x1,y1,&dd)) {
 	  d=Sqrt(dd);
 	  x1-=tempf->p.x;
@@ -831,7 +861,7 @@ U0 AnimateTask(I64)
 U0 MPEnd()
 {
   update_jiffy_limit=0;
-  mp.app_not_done_flags=1<<mp.mp_cnt-1-1;
+  mp.app_not_done_flags=1<<mp_cnt-1-1;
   mp.app_done=TRUE;
 //Wait for all cores to exit
   while (mp.app_not_done_flags)
@@ -855,18 +885,15 @@ U0 SongTask(I64)
   }
 }
 
-U0 Init(I64 _mp_cnt)
+U0 Init()
 {
-  I64 i;
+  I64 i,xx,yy;
   main_dc=DCNew(GR_WIDTH,GR_HEIGHT);
   critical_section_flag=0;
   game_over=FALSE;
   game_score=0;
+
   MemSet(&mp,0,sizeof(MPCtrl));
-  if (_mp_cnt<=mp_cnt)
-    mp.mp_cnt=_mp_cnt;
-  else
-    mp.mp_cnt=mp_cnt;
   QueInit(&fish_root);
   InitMap;
   DCDepthBufAlloc(main_dc);
@@ -876,13 +903,17 @@ U0 Init(I64 _mp_cnt)
   é1=  0.0*ã/180.0;
   é2=  0.0*ã/180.0;
   speed =  2.5;
+  claws_down=0;
 
   x=MAP_WIDTH>>1 *COORDINATE_SCALE*MAP_SCALE;
   y=MAP_HEIGHT>>1*COORDINATE_SCALE*MAP_SCALE;
   z=64		 *COORDINATE_SCALE*MAP_SCALE;
-  claws_down=0;
 
-  for (i=1;i<mp.mp_cnt;i++)
+  xx=x/(MAP_SCALE*COORDINATE_SCALE);
+  yy=y/(MAP_SCALE*COORDINATE_SCALE);
+  z+=elevations[yy][xx]*COORDINATE_SCALE;
+
+  for (i=1;i<mp_cnt;i++)
     Spawn(&CoreAPEagleDiveTask,Fs,"AP EagleDive",i);
   Fs->task_end_cb=&TaskEndCB;
   game_t0=tS;
@@ -911,7 +942,7 @@ U0 CleanUp()
   DCDel(main_dc);
 }
 
-U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
+U0 EagleDive()
 {
   I64 ch,sc;
   F64 pp,tt1,tt2;
@@ -937,7 +968,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
   DocClear;
   "Initializing...\n";
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
-  Init(_mp_cnt);
+  Init;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   Fs->draw_it=&DrawIt;
   try //in case <CTRL-ALT-c> is pressed.
@@ -967,7 +998,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
 	    Fs->draw_it=NULL;
 	    CleanUp;
 	    WinMgrSync;
-	    Init(_mp_cnt);
+	    Init;
 	    Fs->draw_it=&DrawIt;
 	    break;
 	}
@@ -981,9 +1012,7 @@ U0 EagleDive(I64 _mp_cnt=MP_MAX_PROCESSORS)
     PutExcept;
   SettingsPop;
   CleanUp;
-#ifjit
   RegWriteBranch("TempleOS/EagleDive","I64 best_score=%d;\n",best_score);
-#endif
   MenuPop;
 }
 

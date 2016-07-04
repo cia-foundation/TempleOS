@@ -241,7 +241,7 @@ CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
   CBlkDev *res;
   if (0<=first_drv_let-'A'<NUM_DRVS && (type==BDT_ATA || type==BDT_ATAPI) &&
 	0<=unit<=1) {
-    res=BlkDevNextFree(first_drv_let,type);
+    res=BlkDevNextFreeSlot(first_drv_let,type);
     res->unit=unit;
     res->base0=base0;
     res->base1=base1;

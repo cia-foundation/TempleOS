@@ -13,10 +13,10 @@ TourPut(
 "We will now place some text on the command line and jump to source code.\n",
 TRUE);
 
-"MakeOS";
+"BootHD";
 
 TourPut(
-"Look at the $$GREEN$$MakeOSDrvBootInstall$$FG$$ entry in the AutoComplete "
+"Look at the $$GREEN$$BootHDIns$$FG$$ entry in the AutoComplete "
 "window.  Notice it is underlined.  This means a source code link is "
 "available.\n\n"
 "Press $$GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");

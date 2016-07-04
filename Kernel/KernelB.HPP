@@ -45,7 +45,7 @@ public _extern _CALL I64 Call(U8 *machine_code); //Call addr with no args.
 public _extern _CALLEXTSTR I64 CallExtStr(
 	/*argpop*/ U8 *name,...); //Search sym table for fun and pass it args.
 //Can have any fixed number of arguments.
-public _extern _CALLIND I64 CallInd(
+public _extern _CALL_IND I64 CallInd(
 	/*argpop*/I64 (*fp_addr)(...),...); //Call with fixed number of args.
 
 #help_index "Call/System Extern Num"

@@ -42,6 +42,12 @@ $ID,-2$
 $FG,2$'f'$FG$
 $ID,2$Format drive.
 $ID,-2$
+$FG,2$'i'$FG$
+$ID,2$Mount ISO.C file.
+$ID,-2$
+$FG,2$'u'$FG$
+$ID,2$Unmount drive(s).
+$ID,-2$
 $FG,2$'M'$FG$
 $ID,2$Make CD/DVD ISO file.  This creates a file image of the dir the cursor is on.  The name of the ISO file is $LK,"blkdev.dft_iso_filename",A="MN:CBlkDevGlbls"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
 $ID,-2$

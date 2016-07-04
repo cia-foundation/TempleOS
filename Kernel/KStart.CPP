@@ -55,12 +55,12 @@ GDT_TR_RING3:	DU8	MP_MAX_PROCESSORS*16 DUP(0);
 
 //************************************
 CORE0_16BIT_INIT::
-//EAX is $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. (Val passed from boot blk, $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.)
+//EAX is $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. (Val passed from boot blk, $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/BootRAM.CPP,BOOT_SRC_RAM"$.)
 	MOV	ECX,EAX
 	MOV	AX,(BOOT_RAM_LIMIT-BOOT_STK_SIZE)/16
 	MOV	SS,AX
 	MOV	SP,BOOT_STK_SIZE
-	PUSH	ECX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$ & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.
+	PUSH	ECX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart.CPP,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$ & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/BootRAM.CPP,BOOT_SRC_RAM"$.
 	PUSH	EBX
 	MOV	AX,VGAM_TEXT/16
 	MOV	ES,AX
@@ -139,7 +139,7 @@ GET_IP:	POP	BX
 	OUT	0x92,AL
 
 	POP	U32 [SYS_BOOT_BLK]
-	POP	U32 [SYS_BOOT_SRC]	//See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/Reboot.CPP,BOOT_SRC_RAM"$.
+	POP	U32 [SYS_BOOT_SRC]	//See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.CPP,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.CPP,BOOT_SRC_DVD"$, & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/BootRAM.CPP,BOOT_SRC_RAM"$.
 
 	CLD
 	XOR	EAX,EAX
@@ -236,7 +236,7 @@ SYS_CACHE_LINE_WIDTH::	DU64	DFT_CACHE_LINE_WIDTH;
 SYS_SEMAS::		DU8	NUM_SYS_SEMAS*SEMA_STRUCT_SIZE DUP(0);
 //************************************
 	ALIGN	16,OC_NOP
-CORE0_32BIT_INIT:: //Entry point for $LK,"RAMReboot",A="MN:RAMReboot"$.
+CORE0_32BIT_INIT:: //Entry point for $LK,"BootRAM",A="MN:BootRAM"$.
 	PUSH	U32 RFLAGG_START
 	POPFD
 	MOV	EAX,SYS_START_CR0
@@ -350,7 +350,7 @@ USE64
 	RET
 
 //************************************
-SYS_RAM_REBOOT:: //This gets copied high.  $LK,"SYS_RAM_REBOOT",A="FF:::/Adam/Opt/Boot/Reboot.CPP,SYS_RAM_REBOOT:2"$
+SYS_RAM_REBOOT:: //This gets copied high.  $LK,"SYS_RAM_REBOOT",A="FF:::/Adam/Opt/Boot/BootRAM.CPP,SYS_RAM_REBOOT:2"$
 	PUSH	U32 CGDT.ds		//stk seg
 	PUSH	U32 BOOT_RAM_LIMIT	//stk
 	PUSH	U32 0			//flags

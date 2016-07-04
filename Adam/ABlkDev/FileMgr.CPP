@@ -323,7 +323,7 @@ U0 FMDelete(CDoc *doc)
   }
 }
 
-U0 FMMount(CDoc *doc)
+U0 FMChgDsk(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
   CDirEntry *tempde;
@@ -337,6 +337,32 @@ U0 FMMount(CDoc *doc)
     Silent;
     ChgDsk(*tempde->full_name);
     Silent(OFF);
+  }
+}
+
+U0 FMMountISO(CDoc *doc)
+{
+  CDocEntry *doc_ce=doc->cur_entry;
+  CDirEntry *tempde;
+  if (doc_ce->type_u8==DOCT_MENU_VAL && (tempde=doc_ce->user_data))
+    MountFile(tempde->full_name);
+}
+
+U0 FMUnmount(CDoc *doc)
+{
+  CDocEntry *doc_ce=doc->cur_entry;
+  CDirEntry *tempde;
+  I64 drv_let;
+  if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
+    tempde=doc_ce->user_data;
+  else
+    tempde=NULL;
+  if (tempde) {
+    while (tempde->parent)
+      tempde=tempde->parent;
+    drv_let=*tempde->full_name;
+    if (Let2BlkDev(drv_let)!=Let2BlkDev(':'))
+      Unmount(drv_let);
   }
 }
 
@@ -460,9 +486,11 @@ U0 FMCopy(CDoc *doc)
 #define FMR_PASTE		6
 #define FMR_CHG_DSK		7
 #define FMR_FORMAT		8
-#define FMR_MAKE_ISO		9
-#define FMR_BURN_ISO		10
-#define FMR_HELP		11
+#define FMR_MOUNT_ISO		9
+#define FMR_UNMOUNT		10
+#define FMR_MAKE_ISO		11
+#define FMR_BURN_ISO		12
+#define FMR_HELP		13
 
 I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 {
@@ -478,6 +506,8 @@ I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 	"$$CM+LX,1,3 $$$$BT,\"PASTE CLIPBOARD FILES \",LE=FMR_PASTE$$"
 	"$$CM+LX,27,0$$$$BT,\"CHANGE DISK(MOUNT IT) \",LE=FMR_CHG_DSK$$"
 	"$$CM+LX,1,3 $$$$BT,\"FORMAT                \",LE=FMR_FORMAT$$"
+	"$$CM+LX,1,3 $$$$BT,\"MOUNT ISO.C FILE      \",LE=FMR_MOUNT_ISO$$"
+	"$$CM+LX,27,0$$$$BT,\"UNMOUNT               \",LE=FMR_UNMOUNT$$"
 	"$$CM+LX,1,3 $$$$BT,\"MAKE ISO (CD/DVD) FILE\",LE=FMR_MAKE_ISO$$"
 	"$$CM+LX,27,0$$$$BT,\"BURN ISO (CD/DVD) FILE\",LE=FMR_BURN_ISO$$"
 	"$$CM+LX,1,3 $$$$BT,\"HELP                  \",LE=FMR_HELP$$"
@@ -517,6 +547,12 @@ U0 FMRightClick()
       break;
     case FMR_FORMAT:
       Msg(MSG_KEY_DOWN,'f',0);
+      break;
+    case FMR_MOUNT_ISO:
+      Msg(MSG_KEY_DOWN,'i',0);
+      break;
+    case FMR_UNMOUNT:
+      Msg(MSG_KEY_DOWN,'u',0);
       break;
     case FMR_MAKE_ISO:
       Msg(MSG_KEY_DOWN,'M',0);
@@ -667,7 +703,13 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	      FMDelete(doc);
 	      break;
 	    case 'm':
-	      FMMount(doc);
+	      FMChgDsk(doc);
+	      break;
+	    case 'i':
+	      FMMountISO(doc);
+	      break;
+	    case 'u':
+	      FMUnmount(doc);
 	      break;
 	    case 'M':
 	      FMMakeISO(doc);

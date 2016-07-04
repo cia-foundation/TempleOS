@@ -5,7 +5,8 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
   switch (bd->type) {
     case BDT_RAM:
       break;
-    case BDT_FILE:
+    case BDT_FILE_READ:
+    case BDT_FILE_WRITE:
       bd->lock_fwding=Let2BlkDev(*bd->file_dsk_name);
       break;
     case BDT_ATA:
@@ -32,15 +33,16 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 
   bd->bd_signature=BD_SIGNATURE_VAL;
   if (make_free)
-    dv=DrvMakeFree(bd->first_drv_let+res);
+    dv=DrvMakeFreeSlot(bd->first_drv_let+res);
   else
-    dv=DrvNextFree(bd->first_drv_let+res);
+    dv=DrvMakeFreeSlot(DrvNextFreeLet(bd->first_drv_let+res));
   dv->bd=bd;
   dv->drv_offset=bd->drv_offset;
   dv->size=bd->max_blk+1-bd->drv_offset;
   switch (bd->type) {
     case BDT_RAM:
-    case BDT_FILE:
+    case BDT_FILE_READ:
+    case BDT_FILE_WRITE:
       dv->dv_signature=DRV_SIGNATURE_VAL;
       dv->fs_type=FSt_REDSEA;
 //This is to force creation of a RAM
@@ -81,9 +83,9 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	  for (i=0;i<4;i++) {
 	    if (mbr.p[i].type) {
 	      if (make_free)
-		dv=DrvMakeFree(bd->first_drv_let+res);
+		dv=DrvMakeFreeSlot(bd->first_drv_let+res);
 	      else
-		dv=DrvNextFree(bd->first_drv_let+res);
+		dv=DrvMakeFreeSlot(DrvNextFreeLet(bd->first_drv_let+res));
 	      dv->bd=bd;
 	      dv->drv_offset=mbr.p[i].offset+offset;
 	      dv->size	=mbr.p[i].size;
@@ -151,7 +153,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
   if (res)
     BlkDevLockFwdingSet(bd);
   else
-    MemSet(bd,0,sizeof(CBlkDev));
+    BlkDevDel(bd);
   return res;
 }
 

@@ -67,40 +67,36 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let,I64 stage2_blk=0,I64 stage2_size=0)
     iso_term->type=ISO1T_TERMINATOR;
     StrCpy(iso_term->id,"CD001");
     iso_term->version=1;
-    if (stage2_blk) {
-      d=iso_boot(U8 *)+0x47;
-      *d=20<<2>>2;
-      FWBlks(out_file,iso_boot,17<<2,4);
 
-      FWBlks(out_file,iso_sup,18<<2,4);
-      FWBlks(out_file,iso_term,19<<2,4);
+    d=iso_boot(U8 *)+0x47;
+    *d=20<<2>>2;
+    FWBlks(out_file,iso_boot,17<<2,4);
 
-      et->w[0]=1;
-      StrCpy(&et->w[2],"TempleOS");
-      et->w[15]=0xAA55;
-      j=0;
-      for (i=0;i<16;i++) //Checksum
-	j+=et->w[i];
-      et->w[14]=-j;
-      et->bootable=0x88;
-      et->media_type=0;//0=no emu 2=1.44meg 4=hard drive
-      et->sect_cnt=4;  //5 seems like the limit, 4 is safer
-      et->load_rba=20<<2>>2+1;
-      FWBlks(out_file,et,20<<2,4);
+    FWBlks(out_file,iso_sup,18<<2,4);
+    FWBlks(out_file,iso_term,19<<2,4);
 
-      MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
-      *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=stage2_blk>>2;
-      *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)=
-	(stage2_size+DVD_BLK_SIZE-1)>>(BLK_SIZE_BITS+2);
-      *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=stage2_blk&3;
-      if (stage2_blk&3)
-	*(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)+=1;
-      FWBlks(out_file,stage1_buf,
-	    20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
-    } else {
-      FWBlks(out_file,iso_sup,17<<2,4);
-      FWBlks(out_file,iso_term,18<<2,4);
-    }
+    et->w[0]=1;
+    StrCpy(&et->w[2],"TempleOS");
+    et->w[15]=0xAA55;
+    j=0;
+    for (i=0;i<16;i++) //Checksum
+      j+=et->w[i];
+    et->w[14]=-j;
+    et->bootable=0x88;
+    et->media_type=0;//0=no emu 2=1.44meg 4=hard drive
+    et->sect_cnt=4;  //5 seems like the limit, 4 is safer
+    et->load_rba=20<<2>>2+1;
+    FWBlks(out_file,et,20<<2,4);
+
+    MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
+    *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=stage2_blk>>2;
+    *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)=
+	  (stage2_size+DVD_BLK_SIZE-1)>>(BLK_SIZE_BITS+2);
+    *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=stage2_blk&3;
+    if (stage2_blk&3)
+      *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)+=1;
+    FWBlks(out_file,stage1_buf,
+	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
     FClose(out_file);
   }
   Free(zero_buf);
@@ -135,8 +131,8 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
   I64 i,res,root_cnt,root_dir_blks,bitmap_blks,bitmap_blks1;
   CDirEntry *tempde,de;
   U8 buf[STR_LEN],*iso_filename,*src_dir,*stage2_filename;
-  CDrv *dv=DrvNextFree('M'); //First $LK,"BDT_FILE",A="MN:BDT_FILE"$
-  CBlkDev *bd=BlkDevNextFree(dv->drv_let,BDT_FILE);
+  CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('Q')); //First $LK,"BDT_FILE_WRITE",A="MN:BDT_FILE_WRITE"$
+  CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_FILE_WRITE);
 
   if (!_iso_filename)
     _iso_filename=blkdev.dft_iso_filename;
@@ -155,10 +151,7 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
   root_cnt=LinkedLstCnt(tempde)+3;
   root_dir_blks=CeilU64(root_cnt<<6,BLK_SIZE)>>BLK_SIZE_BITS;
   if (res=RedSeaISOPass1(tempde)>>BLK_SIZE_BITS) {
-    bd->drv_offset=19<<2;
-    if (stage2_filename) //preboot and bootloader
-      bd->drv_offset+=(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
-
+    bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
     bitmap_blks=1;
     do {
       bitmap_blks1=bitmap_blks;

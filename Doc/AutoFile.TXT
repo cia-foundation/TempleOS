@@ -4,4 +4,4 @@ When an $FG,2$AutoFile$FG$ runs, a child task is $LK,"Spawn",A="MN:Spawn"$()ed w
 
 See $LK,"::/Demo/AutoFile/AFDir.AUT"$.
 
-Note: $LK,"Auto",A="MN:Auto"$("") can be used if all you need is to send ASCII characters.  It differs from $LK,"AutoStr",A="MN:AutoStr"$().  You'll probably use $LK,"Auto",A="MN:Auto"$() a lot and not $LK,"AutoStr",A="MN:AutoStr"$().  With $LK,"Auto",A="MN:Auto"$(), for example, you can place answers to the prompts for recompiling the $FG,2$Kernel$FG$ module during $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
+Note: $LK,"Auto",A="MN:Auto"$("") can be used if all you need is to send ASCII characters.  It differs from $LK,"AutoStr",A="MN:AutoStr"$().  You'll probably use $LK,"Auto",A="MN:Auto"$() a lot and not $LK,"AutoStr",A="MN:AutoStr"$().  With $LK,"Auto",A="MN:Auto"$(), for example, you can place answers to the prompts for recompiling the $FG,2$Kernel$FG$ module during $LK,"BootHDIns",A="MN:BootHDIns"$().

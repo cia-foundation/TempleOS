@@ -1,98 +1,18 @@
 //See $LK,"Install Documentation",A="FI:::/Doc/Install.TXT"$ or $LK,"Upgrading Documentation",A="FI:::/Doc/Upgrade.TXT"$.
+//Study my account examples: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$
+
+#include "BootMHD"
+#include "BootMHD2"
 
 #help_index "Install"
 
-#define KERNEL_BIN_C	"Kernel.BIN.C"
 #define BOOT_DIR	"/0000Boot"
-#define BOOT_DIR_KERNEL_BIN_C	BOOT_DIR "/0000" KERNEL_BIN_C
 //Stage 2 of master boot loader
 #define BOOT_DIR_BOOTMHD2_BIN_C	BOOT_DIR "/BootMHD2.BIN.C"
 //Old master boot record
 #define BOOT_DIR_OLDMBR_BIN_C	BOOT_DIR "/OldMBR.BIN.C"
 
-public U0 MakeAll()
-{//Use $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$. Loader must be patched.
-//These 2 modules (and bootloaders at top) are the only AOT
-  //compiled code in TempleOS.	Everything else is JIT.
-  //You are doing it wrong if you make AOT compiled code.
-  if (Cmp("/Compiler/Compiler","Compiler",,':'))
-    throw;
-  if (Cmp("/Kernel/Kernel","Kernel",,':'))
-    throw;
-}
-
-public Bool MakeOSDrvBootInstall(U8 src_drv=0,U8 dst_drv=0)
-{// Does $LK,"MakeAll",A="MN:MakeAll"$and installs new boot-loader.
-
-  //Normally, you just supply a src_drv.	It will compile
-  //the code on that drive and update the boot sect.
-
-  //If you are making a bootable CD/DVD, you supply a dst_drv.
-  //See $LK,"::/Misc/DoDistro.CPP"$
-
-  //See $LK,"Install Documentation",A="FI:::/Doc/Install.TXT"$
-
-  //Study my account examples my technique: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$
-
-  CBlkDev *bd;
-  CDrv *dv;
-  CFAT32Boot br;
-  CDirEntry de;
-  Bool res=FALSE;
-  I64 i,type;
-  try {
-    if (!src_drv) src_drv=Drv2Let(Fs->cur_dv);
-    src_drv=ToUpper(src_drv);
-    if (!dst_drv) dst_drv=src_drv;
-    dst_drv=ToUpper(dst_drv);
-    if (!Drv(src_drv))
-      throw;
-    MakeAll;
-    if ((dv=Let2Drv(dst_drv,FALSE)) && (bd=dv->bd))
-      type=bd->type;
-    else {
-      type=BDT_ATAPI;
-      PrintWarn("Defaulting to CD/DVD dst.\n");
-    }
-    switch (type) {
-      case BDT_ATAPI:
-      case BDT_FILE:
-	Move("/Kernel/Kernel.BIN.Z",BOOT_DIR_KERNEL_BIN_C);
-	res=TRUE;
-	break;
-      case BDT_RAM:
-      case BDT_ATA:
-	Move("/Kernel/Kernel.BIN.Z","/" KERNEL_BIN_C);
-	if (!FileFind("/" KERNEL_BIN_C,&de,FUF_JUST_FILES))
-	  "No Kernel.BIN.C\n";
-	else {
-	  Free(de.full_name);
-	  "Modifying partition boot record.\n";
-	  RBlks(dv,&br,dv->drv_offset,1);
-	  br.jump_and_nop[0]=OC_JMP_REL8;
-	  br.jump_and_nop[1]=offset(CFAT32Boot.code)-2;
-#assert offset(CFAT32Boot.code)>=offset(CRedSeaBoot.code)
-	  br.jump_and_nop[2]=OC_NOP;
-	  *BHD_BLK_CNT(U16 *)=(de.size+BLK_SIZE-1)>>BLK_SIZE_BITS;
-	  *BHD_DAP_BLK(I64 *)=Cluster2Blk(dv,de.cluster);
-	  for (i=0;i<BHD_END-BHD_CODE;i++)
-	    br.code[i]=BHD_CODE(U8 *)[i];
-#assert sizeof(CFAT32Boot.code)>=BHD_END-BHD_CODE
-	  for (;i<sizeof(CFAT32Boot.code);i++)
-	    br.code[i]=0;
-	  WBlks(dv,&br,dv->drv_offset,1);
-	  res=TRUE;
-	}
-	break;
-    }
-  } catch {
-    PutExcept;
-    Beep;
-  }
-  return res;
-}
-
-public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
+public U0 BootMHDOldRead(U8 src_drv,U8 dst_drv)
 {//Reads MBR from disk drive containing src partition.
 //Writes a single blk file to dst BOOT_DIR.
   CBlkDev *bd=Let2BlkDev(src_drv);
@@ -114,7 +34,7 @@ public U0 MasterBootOldRead(U8 src_drv,U8 dst_drv)
   }
 }
 
-public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
+public U0 BootMHDOldWrite(U8 src_drv,U8 dst_drv)
 {//Reads OldMBR from src drive BOOT_DIR.
 //writes it to the MBR of the drive with dst partition.
   CBlkDev *bd=Let2BlkDev(dst_drv);
@@ -129,7 +49,7 @@ public U0 MasterBootOldWrite(U8 src_drv,U8 dst_drv)
   Free(mbr);
 }
 
-public U0 MasterBootZero(U8 dst_drv)
+public U0 BootMHDZero(U8 dst_drv)
 {//Set MBR of disk with dst partition to zero.
 
   //This is dangerous!!
@@ -146,7 +66,7 @@ public U0 MasterBootZero(U8 dst_drv)
   BlkDevUnlock(bd);
 }
 
-public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
+public Bool BootMHDIns(U8 drv_let,U8 *drv_lst=NULL)
 {//Create new MBR on the disk that has drv_let as a partition.
 //Puts stage 2 in BOOT_DIR of drv_let.
   CBlkDev *bd,*bd1;
@@ -167,7 +87,6 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
 	buf[j++]=i;
       buf[j++]=0;
     }
-
     Drv(drv_let);
     dv=Fs->cur_dv;
     if (dv->fs_type!=FSt_REDSEA && dv->fs_type!=FSt_FAT32)
@@ -175,7 +94,7 @@ public Bool MasterBootInstall(U8 drv_let,U8 *drv_lst=NULL)
     else {
       bd=dv->bd;
       if (!FileFind(BOOT_DIR_OLDMBR_BIN_C,,FUF_JUST_FILES))
-	MasterBootOldRead(drv_let,drv_let);
+	BootMHDOldRead(drv_let,drv_let);
 
       _q=BMHD2_BLK_ARRAY;
       MemSet(_q,0,sizeof(I64)*8);

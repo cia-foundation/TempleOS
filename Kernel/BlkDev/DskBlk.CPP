@@ -47,7 +47,8 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	case BDT_RAM:
 	  MemCpy(buf,bd->RAM_dsk+blk<<BLK_SIZE_BITS,cnt<<BLK_SIZE_BITS);
 	  break;
-	case BDT_FILE:
+	case BDT_FILE_READ:
+	case BDT_FILE_WRITE:
 	  FRBlks(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:
@@ -86,7 +87,8 @@ Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	case BDT_RAM:
 	  MemCpy(bd->RAM_dsk+blk<<BLK_SIZE_BITS,buf,cnt<<BLK_SIZE_BITS);
 	  break;
-	case BDT_FILE:
+	case BDT_FILE_READ:
+	case BDT_FILE_WRITE:
 	  FWBlks(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:

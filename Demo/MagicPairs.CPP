@@ -326,6 +326,7 @@ I64 TestCoreRange(RangeJob *r)
     if (rj.hi>r->hi)
       rj.hi=r->hi;
     res+=TestCoreSubRange(&rj);
+    Yield;
   }
   return res;
 }

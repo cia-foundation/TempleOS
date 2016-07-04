@@ -171,7 +171,7 @@ I64 TaskInit(CTask *task,I64 stk_size)
 	(&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
 
   SrvCtrlInit(&task->srv_ctrl);
-  QueInit(&task->next_lex);
+  QueInit(&task->next_cc);
   QueInit(&task->next_except);
   QueInit(&task->next_ctrl);
   QueInit(&task->next_ode);
@@ -356,7 +356,7 @@ U0 UserTaskCont()
   Bool cont=TRUE;
   do {
     cc=CmpCtrlNew(,CCF_CMD_LINE|CCF_PMT|CCF_QUESTION_HELP);
-    QueIns(cc,Fs->last_lex);
+    QueIns(cc,Fs->last_cc);
     try {
       Lex(cc);
       ExeCmdLine(cc);

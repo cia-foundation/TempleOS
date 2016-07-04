@@ -29,9 +29,9 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can use $FG,2$filter_lines$FG$ in the editor text search form ($FG,2$<CTRL-f>$FG$) to temporarily display just lines near each match.  A value of $FG,2$filter lines$FG$ set to $FG,2$5$FG$ will display lines within 5 lines of matches.  Then, you can do another find to a different string and achieve a $FG,2$AND$FG$ search.  When finished, press $FG,2$<ESC>$FG$.
  
-* You can recompile and reinstall the kernel with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().  You'll probably want to make a function for recompiling that uses the $LK,"Auto",A="MN:Auto"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$.
+* You can recompile and reinstall the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  You'll probably want to make a function for recompiling that uses the $LK,"Auto",A="MN:Auto"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.CPP,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.CPP,1"$.
 
-* $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
+* $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"BootHDIns",A="MN:BootHDIns"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
 
 * You can permanently disable $FG,2$AutoComplete$FG$ commenting-out $LK,"ACInit",A="FF:/Home/HomeSys.CPP,ACInit"$() in $LK,"~/HomeSys.CPP",A="FF:/Home/HomeSys.CPP,ACInit"$.
 

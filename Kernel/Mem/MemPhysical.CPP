@@ -181,7 +181,7 @@ I64 BIOSTotalMem()
 
 I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024)
 {//Helps pick DiskCache and RAMDisk sizes.
-//Can be used in $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() config scripts.
+//Can be used in $LK,"BootHDIns",A="MN:BootHDIns"$() config scripts.
   I64 i;
   if (sys_data_bp)
     i=sys_data_bp->alloced_u8s;

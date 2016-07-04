@@ -297,8 +297,11 @@ U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
 
   if (cc->flags&CCF_AOT_COMPILE)
     res=MAlloc(code_size);
-  else
+  else {
     res=MAlloc(code_size,Fs->code_heap);
+    if (cc->htc.fun)
+      Fs->last_fun=cc->htc.fun;
+  }
   COCHeaderPut(cc,10,FALSE);
   code_size=OptPass789A(cc,reg_offsets,res,_dbg);
 

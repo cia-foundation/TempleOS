@@ -21,7 +21,7 @@ $ID,2$This will perform a special $LK,"Mount",A="MN:Mount"$() automatically.
 $BK,1$WARNING:$BK,0$  This command erases everything on a hard drive.  It repartitions a whole drive and formats the partitions$FG$.  This command should be skipped if you already have your hard drive partitioned.
 
 
-$BK,1$WARNING:$BK,0$  This command doesn't play well with other operating systems.  You'll need to do a $LK,"MasterBootZero",A="MN:MasterBootZero"$() to restore your drive to a state where other operating systems can partition it.
+$BK,1$WARNING:$BK,0$  This command doesn't play well with other operating systems.  You'll need to do a $LK,"BootMHDZero",A="MN:BootMHDZero"$() to restore your drive to a state where other operating systems can partition it.
 $ID,-2$
 $ID,-2$2) $LK,"Fmt",A="MN:Fmt"$($FG,2$'D'$FG$,$FG,2$TRUE,FALSE,FSt_FAT32$FG$)
 $ID,2$This command formats a drive with $FG,2$FAT32$FG$ or the $LK,"RedSea",A="FI:::/Doc/RedSea.TXT"$ file system type.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
@@ -31,12 +31,12 @@ $BK,1$WARNING:$BK,0$  If you are upgrading, be sure not to lose the file, $FG,2$
 $ID,-2$3) $LK,"CopyTree",A="MN:CopyTree"$($FG,2$"T:/"$FG$,$FG,2$"D:/"$FG$)
 $ID,2$This command is used to copy files onto a hard drive partition from the CD/DVD.  Use the drive letter of the partition in place of $FG,2$'D'$FG$.
 
-$ID,-2$4) $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$($FG,2$'D'$FG$)
+$ID,-2$4) $LK,"BootHDIns",A="MN:BootHDIns"$($FG,2$'D'$FG$)
 $ID,2$This command recompiles the source code on a drive and writes to the $UL,1$drive's$UL,0$ boot record.  You'll need to reenter the $LK,"Mount",A="MN:Mount"$ information so it can be stored in the kernel.
 
-$ID,-2$5) Use Linux's $LK,"Grub",A="FI:::/Doc/Grub.TXT"$ or TempleOS' $LK,"MasterBootInstall",A="MN:MasterBootInstall"$($FG,2$'D'$FG$)
+$ID,-2$5) Use Linux's $LK,"Grub",A="FI:::/Doc/Grub.TXT"$ or TempleOS' $LK,"BootMHDIns",A="MN:BootMHDIns"$($FG,2$'D'$FG$)
 $ID,2$
-The $LK,"MasterBootInstall",A="MN:MasterBootInstall"$() command places a boot loader on a drive.  It saves the old master boot record to $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ and replaces it.  When you boot, you will have the option of booting the old master boot record.  This command can be skipped if you already have a boot loader.  Be sure not to lose the copy of the old boot record, like if you reformat the drive.
+The $LK,"BootMHDIns",A="MN:BootMHDIns"$() command places a boot loader on a drive.  It saves the old master boot record to $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ and replaces it.  When you boot, you will have the option of booting the old master boot record.  This command can be skipped if you already have a boot loader.  Be sure not to lose the copy of the old boot record, like if you reformat the drive.
 
 Delete $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ if you want to get a fresh copy of a mbr, like if installing from your own custom CD containing it's own $FG,2$/0000Adam/Opt/Boot/OldMBR.BIN.C$FG$ onto a system with a non-TempleOS boot loader.
 

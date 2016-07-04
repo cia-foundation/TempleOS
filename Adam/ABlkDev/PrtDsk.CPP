@@ -32,7 +32,7 @@ public I64 PrtDsk(U8 drv_let=0)
 	"make your hard drive impossible\n"
 	"to repartition with other operating\n"
 	"until you set block zero to zero\n"
-	"with $$LK,\"MasterBootZero\",\"MN:MasterBootZero\"$$()\n\n\n"
+	"with $$LK,\"BootMHDZero\",\"MN:BootMHDZero\"$$()\n\n\n"
 	"Continue";
   if (!YorN) return 0;
   if (drv_let && !Let2BlkDev(drv_let,FALSE))

@@ -858,7 +858,7 @@ public class CHashFun:CHashClass
   CHashClass *return_class;
   U32	arg_cnt,pad,
 	used_reg_mask,clobbered_reg_mask;
-  U8	*executable_addr;
+  U8	*exe_addr;
   CExternUsage *ext_lst;
 };
 
@@ -2025,11 +2025,11 @@ class CCodeCtrl
 #define __DATE__ #exe{StreamPrint("\"%D\"",Now);}
 #define __TIME__ #exe{StreamPrint("\"%T\"",Now);}
 #define __LINE__ #exe{StreamPrint("%d",\
-	Fs->last_lex->lex_include_stk->line_num);}
-#define __CMD_LINE__ #exe{StreamPrint("%d",Fs->last_lex->flags&CCF_CMD_LINE &&\
-	Fs->last_lex->lex_include_stk->depth<2);}
+	Fs->last_cc->lex_include_stk->line_num);}
+#define __CMD_LINE__ #exe{StreamPrint("%d",Fs->last_cc->flags&CCF_CMD_LINE &&\
+	Fs->last_cc->lex_include_stk->depth<2);}
 #define __FILE__ #exe{StreamPrint("\"%s\"",\
-	Fs->last_lex->lex_include_stk->full_name);}
+	Fs->last_cc->lex_include_stk->full_name);}
 #define __DIR__  #exe{StreamDir;}
 
 #define LFSF_DOC	1
@@ -2296,6 +2296,7 @@ public class CATARep
 #define BLK_SIZE_BITS	9
 #define BLK_SIZE	(1<<BLK_SIZE_BITS)
 #define DVD_BLK_SIZE	(4*BLK_SIZE)
+#define DVD_BOOT_LOADER_SIZE	DVD_BLK_SIZE*1
 #define INVALID_CLUSTER (-1)
 
 class CMBRPrt
@@ -2628,9 +2629,10 @@ public class CDirEntry
 #define BDT_NULL		0
 #define BDT_RAM			1
 #define BDT_ATA			2
-#define BDT_FILE		3
-#define BDT_ATAPI		4
-#define BDT_NUM_TYPES		5
+#define BDT_FILE_READ		3
+#define BDT_FILE_WRITE		4
+#define BDT_ATAPI		5
+#define BDT_NUM_TYPES		6
 
 #define BDF_REMOVABLE		0x001
 #define BDF_INITIALIZED		0x002
@@ -3386,7 +3388,8 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   CHashTable *hash_table;
 
   CSrvCtrl srv_ctrl;
-  CCmpCtrl *next_lex,*last_lex;
+  CCmpCtrl *next_cc,*last_cc;
+  CHashFun *last_fun;
 
   I64	win_old_left,win_old_right,win_old_top,win_old_bottom;
 
@@ -3889,7 +3892,7 @@ public class CDbgGlbls
 #define BOOT_SRC_HARDDRV	3
 #define BOOT_SRC_DVD		4
 
-// $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
+// $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"BootHDIns",A="MN:BootHDIns"$().
 #define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
 
 #help_index "Misc/Registry"
@@ -3910,5 +3913,19 @@ class CProgress
   I64	val,max;
   U8	desc[PROGRESS_DESC_LEN];
 };
+
+#help_index "Char/Operations"
+#define SPF_PAD_ZERO		0x001
+#define SPF_LEFT_JUSTIFY	0x002
+#define SPF_TRUNCATE		0x004
+#define SPF_COMMA		0x008
+#define SPF_DOLLAR		0x010
+#define SPF_SLASH		0x020
+#define SPF_QUESTION		0x040
+#define SPF_AUX_FMT_NUM		0x080
+#define SPF_DECIMAL		0x100
+#define SPF_NEG			0x200
+#define SPF_NEG_E		0x400
+#define SPF_NEG_AUX_FMT_NUM	0x800
 
 #help_index ""

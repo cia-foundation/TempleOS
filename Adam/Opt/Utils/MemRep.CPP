@@ -63,15 +63,15 @@ I64 TaskQueSize(CTask *task)
 
 I64 BlkDevsSize()
 {
-  I64 i,res=MSize2(blkdev.blkdevs);
+  I64 i,j,res=MSize2(blkdev.blkdevs);
   CBlkDev *bd;
   for (i=0;i<NUM_BLKDEVS;i++) {
     bd=&blkdev.blkdevs[i];
     if (bd->bd_signature==BD_SIGNATURE_VAL) {
+      j=(bd->max_blk+1)<<BLK_SIZE_BITS;
       if (bd->type==BDT_RAM)
-	"RAMDsk %C\t:%010X Unused:%010X\n",
-	      bd->first_drv_let,(bd->max_blk+1)<<BLK_SIZE_BITS,
-	      UnusedDrvSpace(bd->first_drv_let);
+	"RAMDsk %C\t:%010X/%010X\n",
+	      bd->first_drv_let,j-UnusedDrvSpace(bd->first_drv_let),j;
       res+=MSize2(bd->dev_id_record);
     }
   }
@@ -101,18 +101,19 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   if (task==Fs)
     task->rsp=GetRSP;
   st=MStrUtil(task->task_title,SUF_REM_CTRL_CHARS|SUF_SAFE_DOLLAR);
-  "$$GREEN$$Task:%010X$$CYAN$$ %-30ts$$FG$$\n$$ID,2$$",task,st;
+  "$$BLACK$$%-25ts %010X$$FG$$\n$$ID,2$$",st,task;
   Free(st);
-  "$$PURPLE$$Alloced:%010X Used:%010X$$FG$$\n",
-	TaskMemAlloced(task,override_validate),
-	TaskMemUsed(task,override_validate);
-  "HashTable\t:%010X\n",HashTableSize2(task->hash_table);
+  "Heap\t:%010X/%010X\n",TaskMemUsed(task,override_validate),
+	TaskMemAlloced(task,override_validate);
 
   i=UnusedStk(task);
+  j=TaskStkSize(task);
   if (0<=i<=task->stk->stk_size)
-    "Stk Size\t:%010X Unused:%010X\n",TaskStkSize(task),i;
+    "Stk\t\t:%010X/%010X\n",j-i,j;
   else
-    "Stk Size\t:%010X $$RED$$$$BK,1$$Overflow$$BK,0$$$$FG$$\n",TaskStkSize(task);
+    "Stk\t\t:$$RED$$$$BK,1$$Overflow$$BK,0$$$$FG$$/%010X\n",j;
+
+  "HashTable\t:%010X\n",HashTableSize2(task->hash_table);
 
   if (pdoc=DocPut(task))
     "PutDoc\t:%010X\n",DocSize(pdoc);
@@ -121,8 +122,8 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   if (bdoc=DocBorder(task))
     "BorderDoc\t:%010X\n",DocSize(bdoc);
 
-  cc=task->next_lex;
-  while (cc!=&task->next_lex) {
+  cc=task->next_cc;
+  while (cc!=&task->next_cc) {
     "Lex\t\t:%010X\n",CmpCtrlSize(cc);
     cc=cc->next;
   }
@@ -207,17 +208,17 @@ public U0 MemRep()
   "$$ID,-2$$";
 
   if (sys_data_bp) {
-    "$$BLACK$$Code Heap:%010X Used:%010X$$FG$$\n",
-	  sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
-    "$$BLACK$$Data Heap:%010X Used:%010X$$FG$$\n",
-	  sys_data_bp->alloced_u8s,sys_data_bp->used_u8s;
+    "$$BLACK$$Code Heap\t:%010X/%010X$$FG$$\n",
+	  sys_code_bp->used_u8s,sys_code_bp->alloced_u8s;
+    "$$BLACK$$Data Heap\t:%010X/%010X$$FG$$\n",
+	  sys_data_bp->used_u8s,sys_data_bp->alloced_u8s;
   } else
-    "$$BLACK$$Code/Data Heap:%010X Used:%010X$$FG$$\n",
-	  sys_code_bp->alloced_u8s,sys_code_bp->used_u8s;
+    "$$BLACK$$Code/Data Heap\t:%010X/%010X$$FG$$\n",
+	  sys_code_bp->used_u8s,sys_code_bp->alloced_u8s;
 
   for (i=0;i<mp_cnt;i++) {
     c=&cpu_structs[i];
-    "$$GREEN$$CPU%d$$FG$$\n$$ID,2$$",i;
+    "$$PURPLE$$CPU%d$$FG$$\n$$ID,2$$",i;
     task=c->seth_task;
     do {
       if (!MemRepTask(task))
@@ -227,5 +228,4 @@ public U0 MemRep()
     MemRepTask(c->idle_task,TRUE);
     "$$ID,-2$$";
   }
-  "$$ID,-2$$\n";
 }

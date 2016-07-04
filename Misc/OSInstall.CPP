@@ -31,7 +31,7 @@ U0 VMInstallDrv(CTask *task,U8 drv_let,
 	CATARep *ata_drv,CATARep *atapi_drv)
 {
   InstallDrv(drv_let);
-  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n\nB\n0x20000\n",drv_let);
+  XTalkWait(task,"BootHDIns('%C');\n\nB\n0x20000\n",drv_let);
   if (ata_drv)
     XTalkWait(task,"Cp%d\n",ata_drv->num);
   if (atapi_drv)
@@ -62,7 +62,7 @@ U0 VMInstallWiz()
   if (VMPrtDsk(task,ata_drv)) {
     VMInstallDrv(task,'C',ata_drv,atapi_drv);
     VMInstallDrv(task,'D',ata_drv,atapi_drv);
-    MasterBootInstall('C');
+    BootMHDIns('C');
   }
   LinkedLstDel(root);
   WinVert(task->win_top,Fs->win_bottom);
@@ -147,13 +147,13 @@ U0 RegularInstallWiz()
       Fmt(drv_let,,FALSE,FSt_REDSEA);
   }
   InstallDrv(drv_let);
-  XTalkWait(task,"MakeOSDrvBootInstall('%C');\n\nB\n0x20000\n"
+  XTalkWait(task,"BootHDIns('%C');\n\nB\n0x20000\n"
 	"Cs%s\n%s\n%C\n\n\n", //Exit Drives,Dsk Cache,Options
 	drv_let,base0,base1,'0'+unit);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {
     '\n';
-    MasterBootInstall(drv_let);
+    BootMHDIns(drv_let);
   }
   Free(base0);
   Free(base1);
@@ -189,7 +189,7 @@ Bool DoInstall(Bool pmt_reboot)
     res=TRUE;
   } else {
     "\n\nThis wizard works if you have a partition ready.  "
-	  "You can partition the drive or MakeOSDrvBootInstall() "
+	  "You can partition the drive or BootHDIns() "
 	  "with more options if you do it by hand, not using this wizard.\n\n"
 	  "Continue Install Wizard ";
     if (YorN) {

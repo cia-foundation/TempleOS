@@ -4,9 +4,9 @@ U0 TaskRepTask(CTask *task,I64 indent)
   CTask *task1;
   U8 *st,*desc=MStrUtil(task->task_title,SUF_SAFE_DOLLAR);
   st=MStrPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
-  "%h*c%s $$TX,\"%Q...\",SCX=16$$ Mem:%08X\n",indent,CH_SPACE,
-	st,desc,TaskMemAlloced(task);
-  "%h*cFlags:%04X:%04X:%08X\n",indent+2,CH_SPACE,
+  "%h*c%s $$TX,\"%Q...\",SCX=16$$\n",indent,CH_SPACE,
+	st,desc;
+  "%h*c%08X %04X:%04X:%08X\n",indent+2,CH_SPACE,TaskMemAlloced(task),
 	task->task_flags,task->display_flags,task->win_inhibit;
   Free(st);
   Free(desc);
@@ -26,7 +26,7 @@ public U0 TaskRep()
   CLI
   for (i=0;i<mp_cnt;i++) {
     c=&cpu_structs[i];
-    "$$RED$$CPU:%d$$FG$$\n",i;
+    "$$PURPLE$$CPU:%d$$FG$$\n",i;
     TaskRepTask(c->seth_task,2);
   }
   POPFD

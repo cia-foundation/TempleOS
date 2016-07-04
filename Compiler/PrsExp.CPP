@@ -407,7 +407,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
     is_putchars=FALSE;
   }
 
-  if (Bt(&tempf->flags,Ff_INTERNAL)&& IC_SQR<=tempf->executable_addr<=IC_ATAN)
+  if (Bt(&tempf->flags,Ff_INTERNAL)&& IC_SQR<=tempf->exe_addr<=IC_ATAN)
     is_template_fun=TRUE;
   else
     is_template_fun=FALSE;
@@ -548,7 +548,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
     tempcbh=tempcbh1;
   }
   if (Bt(&tempf->flags,Ff_INTERNAL))
-    ICAdd(cc,tempf->executable_addr,0,tempf->return_class);
+    ICAdd(cc,tempf->exe_addr,0,tempf->return_class);
   else {
     if (indirect)
       ICAdd(cc,IC_CALL_INDIRECT,
@@ -561,9 +561,9 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
 	else
 	  ICAdd(cc,IC_CALL_EXTERN,tempf,tempf->return_class);
       } else
-	ICAdd(cc,IC_CALL_INDIRECT2,&tempf->executable_addr,tempf->return_class);
+	ICAdd(cc,IC_CALL_INDIRECT2,&tempf->exe_addr,tempf->return_class);
     } else
-      ICAdd(cc,IC_CALL,tempf->executable_addr,tempf->return_class);
+      ICAdd(cc,IC_CALL,tempf->exe_addr,tempf->return_class);
     if ((Bt(&tempf->flags,Ff_RET1) || Bt(&tempf->flags,Ff_ARGPOP)) &&
 	  !Bt(&tempf->flags,Ff_NOARGPOP)) {
       if (indirect) {
@@ -632,17 +632,17 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 		  }
 		  cc->abs_cnts.externs++;
 		  ICAdd(cc,IC_IMM_I64,
-			&tempf->executable_addr,cmp.internal_types[RT_PTR]);
+			&tempf->exe_addr,cmp.internal_types[RT_PTR]);
 		  ICAdd(cc,IC_DEREF,0,cmp.internal_types[RT_PTR]);
 		} else {
 		  if (cc->flags&CCF_AOT_COMPILE) {
 		    ICAdd(cc,IC_ABS_ADDR,
-			  tempf->executable_addr,cmp.internal_types[RT_PTR]);
+			  tempf->exe_addr,cmp.internal_types[RT_PTR]);
 		    if (cc->flags&CCF_ASM_EXPRESSIONS)
 		      cc->abs_cnts.abs_addres++;
 		  } else
 		    ICAdd(cc,IC_IMM_I64,
-			  tempf->executable_addr,cmp.internal_types[RT_PTR]);
+			  tempf->exe_addr,cmp.internal_types[RT_PTR]);
 		}
 		cc->abs_cnts.c_addres++;
 		Lex(cc);

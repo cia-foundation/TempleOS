@@ -104,9 +104,9 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,
     tempf->clobbered_reg_mask=REGG_CLOBBERED+REGG_STK_TEMP;
     tempf->str=name;
     if (cc->flags&CCF_AOT_COMPILE)
-      tempf->executable_addr=aotc->ip;
+      tempf->exe_addr=aotc->ip;
     else
-      tempf->executable_addr=&UndefinedExtern;
+      tempf->exe_addr=&UndefinedExtern;
     LBts(&tempf->flags,Cf_EXTERN);
     tempf->flags|=fsp_flags&FSG_FUN_FLAGS1;
     if (name) //if not fun_ptr
@@ -161,7 +161,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   ICAdd(cc,IC_LEAVE,0,cc->htc.fun->return_class);
   cc->htc.fun->size&=~7;
   if (cc->flags&CCF_AOT_COMPILE) {
-    cc->htc.fun->executable_addr=cc->aotc->ip;
+    cc->htc.fun->exe_addr=cc->aotc->ip;
     cc->htc.fun->type|=HTF_EXPORT|HTF_RESOLVE;
     r=COCCompile(cc,&size,&cc->htc.fun->dbg_info,NULL);
     if (r) {
@@ -172,11 +172,11 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
     }
   } else {
     old_trace=Btr(&cc->opts,OPTf_TRACE);
-    cc->htc.fun->executable_addr=COCCompile(
+    cc->htc.fun->exe_addr=COCCompile(
 	  cc,&size,&cc->htc.fun->dbg_info,NULL);
     if (old_trace) {
       Bts(&cc->opts,OPTf_TRACE);
-      Un(cc->htc.fun->executable_addr,size,64);
+      Un(cc->htc.fun->exe_addr,size,64);
     }
     SysSymImportsResolve(cc->htc.fun->str);
   }
@@ -229,19 +229,21 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
     if (tempex && mode&255==PRS0_EXTERN && !(cc->flags&CCF_AOT_COMPILE) &&
 	  tempex->type&HTT_EXPORT_SYS_SYM) {
       val=tempex->val;
-      mode=PRS0__EXTERN|PRS1_NULL;
+      mode=PRS0__EXTERN|PRS1_NOT_REALLY__EXTERN;
     }
     if (cc->token=='(') {
       switch (mode&255) {
 	case PRS0__INTERN:
 	  tempf=PrsFunJoin(cc,tempc,st,fsp_flags);
-	  tempf->executable_addr=val;
+	  tempf->exe_addr=val;
 	  Bts(&tempf->flags,Ff_INTERNAL);
 	  LBtr(&tempf->flags,Cf_EXTERN);
 	  return;
 	case PRS0__EXTERN:
+	  if (!(fsp_flags&FSF__) && !(mode&PRS1_NOT_REALLY__EXTERN))
+	    LexExcept(cc,"Expecting label with underscore at ");
 	  tempf=PrsFunJoin(cc,tempc,st,fsp_flags);
-	  tempf->executable_addr=val;
+	  tempf->exe_addr=val;
 	  SysSymImportsResolve(tempf->str);
 	  LBtr(&tempf->flags,Cf_EXTERN);
 	  if (saved_mode&255==PRS0__EXTERN)
@@ -252,8 +254,10 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	case PRS0_EXTERN:
 	  PrsFunJoin(cc,tempc,st,fsp_flags);
 	  return;
-	case PRS0_IMPORT:
 	case PRS0__IMPORT:
+	  if (!(fsp_flags&FSF__))
+	    LexExcept(cc,"Expecting label with underscore at ");
+	case PRS0_IMPORT:
 	  if (!(cc->flags&CCF_AOT_COMPILE))
 	    LexExcept(cc,"import not needed at ");
 	  else {
@@ -859,9 +863,9 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
     if (cc->flags&CCF_AOT_COMPILE)
       ICAdd(cc,IC_CALL_IMPORT,temp_try,tempc);
     else
-      ICAdd(cc,IC_CALL_INDIRECT2,&temp_try->executable_addr,tempc);
+      ICAdd(cc,IC_CALL_INDIRECT2,&temp_try->exe_addr,tempc);
   } else
-    ICAdd(cc,IC_CALL,temp_try->executable_addr,tempc);
+    ICAdd(cc,IC_CALL,temp_try->exe_addr,tempc);
   if ((Bt(&temp_try->flags,Ff_RET1) ||
 	Bt(&temp_try->flags,Ff_ARGPOP)) && !Bt(&temp_try->flags,Ff_NOARGPOP))
     ICAdd(cc,IC_ADD_RSP1,16,tempc);
@@ -879,9 +883,9 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
     if (cc->flags&CCF_AOT_COMPILE)
       ICAdd(cc,IC_CALL_IMPORT,temp_untry,tempc);
     else
-      ICAdd(cc,IC_CALL_INDIRECT2,&temp_untry->executable_addr,tempc);
+      ICAdd(cc,IC_CALL_INDIRECT2,&temp_untry->exe_addr,tempc);
   } else
-    ICAdd(cc,IC_CALL,temp_untry->executable_addr,tempc);
+    ICAdd(cc,IC_CALL,temp_untry->exe_addr,tempc);
   ICAdd(cc,IC_CALL_END,0,tempc);
   ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
 
@@ -992,14 +996,13 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		  case KW__EXTERN:
 		    if (Bt(&cc->opts,OPTf_EXTERNS_TO_IMPORTS))
 		      goto sm_underscore_import;
-		    if (cc->flags&CCF_AOT_COMPILE) {
-		      if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			    !(tempex->type & HTT_EXPORT_SYS_SYM))
-			LexExcept(cc,"Expecting System sym at ");
-		      i=tempex->val;
-		      Lex(cc);
-		    } else
-		      i=LexExpressionI64(cc);
+		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
+			  !(tempex->type & HTT_EXPORT_SYS_SYM))
+		      LexExcept(cc,"Expecting system sym at ");
+		    if (*cc->cur_str=='_')
+		      fsp_flags|=FSF__;
+		    i=tempex->val;
+		    Lex(cc);
 		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
 			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
@@ -1009,7 +1012,9 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		  case KW__IMPORT:
 sm_underscore_import:
 		    if (cc->token!=TK_IDENT)
-		      LexExcept(cc,"Expecting System sym at ");
+		      LexExcept(cc,"Expecting system sym at ");
+		    if (*cc->cur_str=='_')
+		      fsp_flags|=FSF__;
 		    import_name=cc->cur_str;
 		    cc->cur_str=0;
 		    if (Lex(cc)!=TK_IDENT || !(tempex=cc->hash_entry) ||
@@ -1017,7 +1022,7 @@ sm_underscore_import:
 		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
 		    PrsGlblVarLst(cc,PRS0__IMPORT|PRS1_NULL,tempex,
-			  import_name,FALSE);
+			  import_name,fsp_flags);
 		    Free(import_name);
 		    break;
 		  case KW_EXTERN:
@@ -1045,7 +1050,7 @@ sm_underscore_import:
 		      LexExcept(cc,"Expecting type at ");
 sm_import:
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0_IMPORT|PRS1_NULL,tempex,0,FALSE);
+		    PrsGlblVarLst(cc,PRS0_IMPORT|PRS1_NULL,tempex,0,fsp_flags);
 		    break;
 		  case KW__INTERN:
 		    i=LexExpressionI64(cc);
@@ -1095,10 +1100,10 @@ sm_import:
 				temp_untry,cmp.internal_types[RT_PTR]);
 			else
 			  ICAdd(cc,IC_CALL_INDIRECT2,
-				&temp_untry->executable_addr,
+				&temp_untry->exe_addr,
 				cmp.internal_types[RT_PTR]);
 		      } else
-			ICAdd(cc,IC_CALL,temp_untry->executable_addr,
+			ICAdd(cc,IC_CALL,temp_untry->exe_addr,
 			      cmp.internal_types[RT_PTR]);
 		    }
 		  }

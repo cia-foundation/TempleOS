@@ -10,7 +10,6 @@ MapFileLoad("::/Kernel/Kernel");
 MapFileLoad("::/Compiler/Compiler");
 
 #include "::/Apps/Psalmody/Load"
-#include "::/Demo/WebLogDemo/WebLogRep"
 #include "~/TOSCfg"
 #include "~/TOSMisc"
 #include "~/TOSToHtml"

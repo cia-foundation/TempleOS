@@ -682,5 +682,7 @@ U0 InsMyURL()
   Free(url);
 }
 
-if (FileFind("~/Downloads/Words/LinuxDict.TXT"))
-  GodInit("~/Downloads/Words/LinuxDict.TXT");
+//if (FileFind("~/Downloads/Words/LinuxDict.TXT"))
+//  GodInit("~/Downloads/Words/LinuxDict.TXT");
+if (FileFind("~/Downloads/Words/HappyWords.TXT"))
+  GodInit("~/Downloads/Words/HappyWords.TXT");

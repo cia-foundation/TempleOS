@@ -1,5 +1,5 @@
-//Compile this by calling $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$().
-//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootIns.CPP,Cmp(\"/Kernel/Kernel\""$.
+//Compile this by calling $LK,"BootHDIns",A="MN:BootHDIns"$().
+//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootHDIns.CPP,Cmp(\"/Kernel/Kernel\""$.
 
 #exe {
   Cd(__DIR__);;

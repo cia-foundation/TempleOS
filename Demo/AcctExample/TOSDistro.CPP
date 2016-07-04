@@ -11,13 +11,13 @@ U8 TOSGetDrv()
   return res;
 }
 
-U0 TOSMakeOSDrvBootInstall(U8 drv_let)
+U0 TOSBootHDIns(U8 drv_let)
 {
   drv_let=ToUpper(drv_let);
   Auto(TOS_CFG);
-  MakeOSDrvBootInstall(drv_let);
+  BootHDIns(drv_let);
   if (StrOcc(TOS_MASTER_BOOT_DRVS,drv_let))
-    MasterBootInstall(drv_let);
+    BootMHDIns(drv_let);
 }
 
 U0 TOSCopyDrv(U8 src,U8 dst)
@@ -34,7 +34,7 @@ U0 TOSCopyDrv(U8 src,U8 dst)
 
   DocClear;
   Drv(dst);
-  TOSMakeOSDrvBootInstall(dst);
+  TOSBootHDIns(dst);
 }
 
 U0 TOSPromptAndCopyDrv()
@@ -229,7 +229,7 @@ install this on top.
   Drv('C');
   DistroPrep;
   Auto(TOS_DVD_CFG);
-  MakeOSDrvBootInstall('C','T');
+  BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -241,7 +241,7 @@ U0 MakeStaffDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSSTAFF_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -264,7 +264,7 @@ I call $LK,"MakeBootDrvFile",A="FF:::/Demo/AcctExample/TOSDistro.CPP,MakeBootRes
   DistroPrep;
   MakeBootRescueDrvFile;
   Auto(TOS_DVD_DBG_CFG);
-  MakeOSDrvBootInstall('C','T');
+  BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -277,7 +277,7 @@ U0 MakeDbgDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -287,7 +287,7 @@ U0 StdDistroPrep()
   Drv('C');
   DistroPrep;
   Auto(STD_DISTRO_DVD_CFG);
-  MakeOSDrvBootInstall('C','T');
+  BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
@@ -303,7 +303,7 @@ U0 MakeStdDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -312,7 +312,7 @@ U0 MakeStdRedSeaDistro()
   StdDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -338,7 +338,7 @@ U0 MakeLiteDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSLITE_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Lite Distro (%0.1f MB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -371,7 +371,7 @@ U0 MakeUltraDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
 	0.01*(100*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -380,7 +380,7 @@ U0 MakeUltraRedSeaDistro()
   UltraDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-	"Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+	"Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -389,25 +389,25 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
 
     DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_RS_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
 
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	  "Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
 
     DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-	  "Download $TX,"TempleOS V4.08",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+	  "Download $TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_RS_K_SIZE",
 	  "%d KB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);

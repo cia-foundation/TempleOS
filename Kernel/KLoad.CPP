@@ -32,7 +32,7 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
     if (tempex) {
       ptr2=module_base+i;
       if (tempex->type & HTT_FUN)
-	i=tempex(CHashFun *)->executable_addr;
+	i=tempex(CHashFun *)->exe_addr;
       else if (tempex->type & HTT_GLBL_VAR)
 	i=tempex(CHashGlblVar *)->data_addr;
       else

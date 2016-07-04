@@ -2,7 +2,26 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----06/24/16 21:56:10----$IV,0$
+$IV,1$----07/04/16 14:13:54----$IV,0$
+* $BK,1$TempleOS version 4.09 Released$BK,0$
+* Improved $LK,"::/Demo/Games/EagleDive.CPP"$.
+* Improved $LK,"GrFillTri0",A="MN:GrFillTri0"$().
+
+$IV,1$----07/03/16 04:30:05----$IV,0$
+* Added $LK,"Unmount",A="MN:Unmount"$().
+* Made BootLoader mandatory in $LK,"RedSeaISO",A="MN:RedSeaISO"$().
+* Added $LK,"BDT_FILE_READ",A="MN:BDT_FILE_READ"$.
+
+$IV,1$----07/01/16 05:29:08----$IV,0$
+* Made underscore mandatory on $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ callable asm functions.
+
+$IV,1$----06/28/16 13:15:08----$IV,0$
+* Changed $LK,"TaskRep",A="MN:TaskRep"$() and $LK,"MemRep",A="MN:MemRep"$().
+* Changed $LK,"::/Adam/WallPaper.CPP"$.
+
+$IV,1$----06/26/16 14:01:16----$IV,0$
+* Added $LK,"LastFun",A="MN:LastFun"$(), $LK,"RunFile",A="MN:RunFile"$(), $LK,"RunFile2",A="MN:RunFile2"$() and $LK,"PopUpRunFile",A="MN:PopUpRunFile"$().
+* Made boot code modular.
 
 $IV,1$----06/24/16 14:15:13----$IV,0$
 * Added A.I. to $LK,"::/Apps/KeepAway/KeepAway.CPP"$ and changed scoring.
@@ -48,7 +67,7 @@ $IV,1$----05/23/16 01:30:28----$IV,0$
 * $LK,"R",A="MN:R"$("ISOFileCreate","$LK,"ISO9660ISO",A="MN:ISO9660ISO"$");
 
 $IV,1$----05/19/16 02:16:09----$IV,0$
-* Added $LK,"BDT_FILE",A="MN:BDT_FILE"$.
+* Added $LK,"BDT_FILE_WRITE",A="MN:BDT_FILE_WRITE"$.
 
 $IV,1$----05/17/16 07:16:38----$IV,0$
 * Worked on compiler $LK,"CICArg",A="MN:CICArg"$.a1_type_pointed_to.
@@ -246,7 +265,7 @@ $IV,1$----01/12/16 19:17:12----$IV,0$
 
 $IV,1$----01/12/16 10:06:18----$IV,0$
 * $BK,1$TempleOS version 4.01 Released$BK,0$
-* Standardized drive letters.  Your $LK,"Auto",A="MN:Auto"$() config scripts for compiling the kernel with $LK,"MakeOSDrvBootInstall",A="MN:MakeOSDrvBootInstall"$() must be changed.
+* Standardized drive letters.  Your $LK,"Auto",A="MN:Auto"$() config scripts for compiling the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$() must be changed.
 * Added $LK,"CCF_QUESTION_HELP",A="MN:CCF_QUESTION_HELP"$.
 
 $IV,1$----01/11/16 00:04:38----$IV,0$

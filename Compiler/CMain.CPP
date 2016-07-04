@@ -161,7 +161,7 @@ CAOT *CmpBuf(U8 *buf,U8 *map_name=NULL,
   CAOT *res=NULL;
   cc=CmpCtrlNew(buf,CCF_DONT_FREE_BUF);
   cc->flags|=CCF_AOT_COMPILE;
-  QueIns(cc,Fs->last_lex);
+  QueIns(cc,Fs->last_cc);
   res=CmpJoin(cc,CMPF_LEX_FIRST,map_name,mapfile_drv_let);
   if (error_cnt)   *error_cnt=cc->error_cnt;
   if (warning_cnt) *warning_cnt=cc->warning_cnt;
@@ -239,7 +239,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tempaot)
 	      "Unresolved Reference:%s\n",str;
 	    else {
 	      if (tempex->type & HTT_FUN)
-		i=tempex(CHashFun *)->executable_addr;
+		i=tempex(CHashFun *)->exe_addr;
 	      else if (tempex->type & HTT_GLBL_VAR)
 		i=tempex(CHashGlblVar *)->data_addr;
 	      else
@@ -577,15 +577,15 @@ I64 ExePutS(U8 *buf,U8 *filename=NULL,
   if (!filename)
     filename=blkdev.temp_filename;
   cc=CmpCtrlNew(buf,ccf_flags|CCF_DONT_FREE_BUF,filename);
-  if (Fs->last_lex!=&Fs->next_lex) {
-    cc->opts=Fs->last_lex->opts;
+  if (Fs->last_cc!=&Fs->next_cc) {
+    cc->opts=Fs->last_cc->opts;
     if (htc) {
       cc->flags=cc->flags &~CCF_ASM_EXPRESSIONS |
 	    htc->old_flags&CCF_ASM_EXPRESSIONS;
       MemCpy(&cc->htc,htc,sizeof(CLexHashTableContext));
     }
   }
-  QueIns(cc,Fs->last_lex);
+  QueIns(cc,Fs->last_cc);
   try {
     Lex(cc);
     res=ExeCmdLine(cc);
@@ -622,6 +622,12 @@ I64 ExeFile(U8 *name,I64 ccf_flags=0)
   return res;
 }
 
+I64 RunFile(U8 *name,I64 ccf_flags=0,...)
+{//$LK,"ExeFile",A="MN:ExeFile"$() with args using $LK,"LastFun",A="MN:LastFun"$().
+  ExeFile(name,ccf_flags);
+  return LastFun(argc,argv);
+}
+
 I64 ExePutS2(U8 *buf,U8 *filename=NULL,I64 ccf_flags=0)
 {//throws exceptions
   I64 res;
@@ -629,9 +635,9 @@ I64 ExePutS2(U8 *buf,U8 *filename=NULL,I64 ccf_flags=0)
   if (!filename)
     filename=blkdev.temp_filename;
   cc=CmpCtrlNew(buf,ccf_flags|CCF_DONT_FREE_BUF,filename);
-  if (Fs->last_lex!=&Fs->next_lex)
-    cc->opts=Fs->last_lex->opts;
-  QueIns(cc,Fs->last_lex);
+  if (Fs->last_cc!=&Fs->next_cc)
+    cc->opts=Fs->last_cc->opts;
+  QueIns(cc,Fs->last_cc);
   Lex(cc);
   res=ExeCmdLine(cc);
   QueRem(cc);
@@ -658,13 +664,19 @@ I64 ExeFile2(U8 *name,I64 ccf_flags=0)
   return res;
 }
 
+I64 RunFile2(U8 *name,I64 ccf_flags=0,...)
+{//$LK,"ExeFile2",A="MN:ExeFile2"$() with args using $LK,"LastFun",A="MN:LastFun"$(). throws exceptions.
+  ExeFile2(name,ccf_flags);
+  return LastFun(argc,argv);
+}
+
 I64 StreamExePrint(U8 *fmt,...)
 {//Causes value from stream to be used in an #exe{} block.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   I64 res=0;
   CLexHashTableContext *htc;
-  CCmpCtrl *cc=Fs->last_lex;
-  if (cc==&Fs->next_lex)
+  CCmpCtrl *cc=Fs->last_cc;
+  if (cc==&Fs->next_cc)
     PrintErr("Not Compiling\n");
   else {
     if (!(cc->flags&CCF_EXE_BLK))

@@ -16,8 +16,7 @@ U0 DoOnce()
 	    "Install onto hard drive ";
       if (YorN) {
 	DocBottom;
-	ExeFile("::/Misc/OSInstall");
-	if (ExePrint("OSInstall(FALSE);")) {
+	if (RunFile("::/Misc/OSInstall",,FALSE)) {
 	  *sys_registry_doc->filename.name='C';
 	  "\n\n1) TAD\n\n";
 	  switch (GetI64("Staff Member Number:")) {
@@ -40,7 +39,8 @@ U0 DoOnce()
   }
   if (FileFind("D:/Temp/Logs/access.log")) {
     Auto("\n\n%C",CH_ESC);
-    WebLogRep("D:/Temp/Logs/*.log","D:/Temp/LogRep.TXT");
+    RunFile("::/Demo/WebLogDemo/WebLogRep",,
+	  "D:/Temp/Logs/*.log","D:/Temp/LogRep.TXT");
     Del("D:/Temp/Logs/*.log");
   }
 }

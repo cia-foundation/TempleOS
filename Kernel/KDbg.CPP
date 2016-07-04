@@ -457,9 +457,9 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
     LBtr(&task->rflags,RFLAGf_TRAP);//No single step
     Suspend(task,FALSE);
     if (task==Fs) {
-      if (IsDbg && task->next_lex!=&task->next_lex) {
+      if (IsDbg && task->next_cc!=&task->next_cc) {
 	"Exit Dbg\n";
-	Btr(&task->last_lex->flags,CCf_PMT);
+	Btr(&task->last_cc->flags,CCf_PMT);
       }
     } else
       Exit;
@@ -487,8 +487,8 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
   Suspend(task,FALSE);
   if (task==Fs) {
     if (IsDbg) {
-      if (task->next_lex!=&task->next_lex)
-	Btr(&task->last_lex->flags,CCf_PMT);
+      if (task->next_cc!=&task->next_cc)
+	Btr(&task->last_cc->flags,CCf_PMT);
     }
   } else
     Exit;
