@@ -141,7 +141,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	c,x1w,y1w,x1h,y1h,xh,yh,zh,
 	cx=task->pix_width/2,
 	cy=task->pix_height/2;
-  CSprite *temps;
+  U8 *temps;
   F64 tt;
   CD3I32 poly[4];
   Monster *tempm;

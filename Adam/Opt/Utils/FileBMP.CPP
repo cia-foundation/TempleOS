@@ -327,7 +327,7 @@ public U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,
 	Bool use_ms_paint_palette=FALSE)
 {//Put a BMP file into a document as a sprite.
   CDC *dc=BMPRead(filename,dither_probability,use_ms_paint_palette);
-  CSprite *elems=DC2Sprite(dc);
+  U8 *elems=DC2Sprite(dc);
   DocSprite(doc,elems);
   Free(elems);
   DCDel(dc);

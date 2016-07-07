@@ -48,6 +48,6 @@ $LK,"::/Kernel/Mem/PageTables.CPP"$	:135 lines to identity-map gets eliminated.
 
 * We will make a $LK,"Standard TempleOS PC",A="FI:::/Doc/StdTempleOSPC.TXT"$.
 $FG,8$
-* "VMware" is a trademark of VMware, Inc.
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "Windows" and "Paint" are trademarks of MicroSoft Corp.$FG$
+* "VMware" is a trademark owned by VMware, Inc.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "Windows" and "Paint" are trademarks owned by MicroSoft Corp.$FG$

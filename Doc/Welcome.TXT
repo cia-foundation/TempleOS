@@ -7,19 +7,19 @@ $ID,2$* Professionals doing hobby projects
 * Teenagers doing projects
 * Non-professional, older-persons projects
 $ID,-2$
-Simplicity is a goal to $LK,"keep the line count down",A="FI:::/Doc/Strategy.TXT"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX,"80,120",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a $LK,"Hello World",A="FI:::/Doc/HelloWorld.TXT"$ application in one line of code and can put graphics on the screen with a three line program!
+Simplicity is a goal to $LK,"keep the line count down",A="FI:::/Doc/Strategy.TXT"$, so it's easy to tinker with.  As it turns-out, simplicity makes it faster in some ways, too.  It never switches privilege levels, never changes address maps, tends to load whole contiguous files and other, similar things which boost speed.  It's only $TX,"81,056",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code including the kernel, the 64-bit compiler, the graphics library and all the tools.  More importantly, it's designed to keep the user's line count down -- you can do a $LK,"Hello World",A="FI:::/Doc/HelloWorld.TXT"$ application in one line of code and can put graphics on the screen with a three line program!
 
-It's a kayak, not a Titanic -- it will crash if you do something wrong.  You quickly reboot, however.  DOS and the 8-bit home computers of the 80's worked fine without memory protection and most computers in the world -- the embedded ones -- operate without protection.  The resing simplicity of no protections is why TempleOS has value.  In facts, that's the point of TempleOS.  See the $LK,"TempleOS Charter",A="FI:::/Doc/Charter.TXT"$.
+It's a kayak, not a Titanic -- it will crash if you do something wrong.  You quickly reboot, however.  DOS and the 8-bit home computers of the 80's worked fine without memory protection and most computers in the world -- the embedded ones -- operate without protection.  The resulting simplicity of no protections is why TempleOS has value.  In facts, that's the point of TempleOS.  See the $LK,"TempleOS Charter",A="FI:::/Doc/Charter.TXT"$.
 
-Conventional thinking is "failure is not an option" for general purpose operating systems.  Since this OS is used in addition to Windows or Linux, however, failure is an option -- just use Windows if you can't do something.  I cherry-pick what it will and won't do to make it maximally beautiful.
+Conventional thinking is "failure is not an option" for general purpose operating systems.  Since this OS is used in addition to Windows or Linux, however, failure is an option -- just use Windows or Linux if you can't do something.  I cherry-pick what it will and won't do to make it maximally beautiful.
 
 Two things to know about TempleOS are that $UL,1$tasks$UL,0$ have $LK,"MAlloc",A="MN:MAlloc"$/$LK,"Free",A="MN:Free"$ heap memory, not applications, and tasks have compiler symbol tables that persist at a scope like environment variables in other operating systems, and the symbols can include functions.
 
-In other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$TempleOS$FG$, the command line feeds right into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler, line by line, and it places code into memory it $LK,"MAlloc",A="MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.
+For other operating systems, I hated learning one language for command line scripts and another for programming.  With $FG,2$TempleOS$FG$, the command line feeds right into the $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ compiler, line by line, and it places code into memory it $LK,"MAlloc",A="MN:MAlloc"$()s.  The compiler is paused at the command line, waiting for input.  Naturally, you $FG,2$#include$FG$ a program to load it into memory and, usually, start it.
 
-During the boot process, many files get $LK,"compiled",A="FI:::/StartOS.CPP"$ before you have access to the command line.  (Don't worry, booting takes only a couple of seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,2$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ machine code, nothing is $FG,2$interpreted$FG$ and there is no $FG,2$byte code$FG$.
+During the boot process, many files get $LK,"compiled",A="FI:::/StartOS.CPP"$ before you have access to the command line.  (Don't worry, booting takes only two seconds.)  All the header declarations for the operating system are compiled and are available for use in your programs without needing to $FG,2$#include $FG$them.  Everything is truly compiled to native $FG,2$$TX,"x86_64",HTML="http://en.wikipedia.org/wiki/Amd64#AMD64"$$FG$ machine code, nothing is $FG,2$interpreted$FG$ and there is no $FG,2$byte code$FG$.
 
-Stmts at the global scope -- outside the scope of functions -- execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a stmt in the global scope, usually at the bottom of your file.
+Statements at the global scope -- outside the scope of functions -- execute immediately.  There is no $FG,2$main()$FG$ function.  Instead, you give meaningful names to what would be $FG,2$main()$FG$ functions and you invoke them by calling them with a statement in the global scope, usually at the bottom of your file.
 
 I started with $FG,2$C$FG$ syntax, but didn't like the command line for a directory listing looking like this:
 
@@ -33,7 +33,7 @@ $FG$I didn't like that, so I made parentheses optional on calls with no args and
 
 >$FG,2$Dir;$FG$
 
-The syntax change created an ambiguity when specifying function addresses.  To resolve it, I  made a '$FG,2$&$FG$' required in front of function names when specifying an address of a function, which is better anyway.
+The syntax change created an ambiguity when specifying function addresses, like for calling $LK,"QSort",A="MN:QSort"$().  To resolve it, I  made a '$FG,2$&$FG$' required in front of function names when specifying an address of a function, which is better anyway.
 
 Once I was no longer using standard C/C++ syntax, I decided to change everything I didn't like and call it $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$.  Here are the new $LK,"operator precedence",A="FF:::/Doc/HolyC.TXT,operator precedence"$ rules.  It's Biblical!  See $LK,"Luke,5:37",A="BF:Luke,5:37"$.
 
@@ -57,7 +57,7 @@ In $FG,2$TempleOS$FG$, $LK,"Adam Task",A="FF:::/Doc/Glossary.TXT,Adam Task"$$FG$
 
 For easy back-ups, place everything you author in your $FG,2$/Home$FG$ directory and subdirectories.  Then, use $LK,"CopyTree",A="MN:CopyTree"$().  That should make upgrading easy, too.  Customizable start-up scripts go in your $FG,2$/Home$FG$ directory.  The default start-up scripts are in the root directory.  Copy the start-up files you wish to customize into $FG,2$/Home$FG$ and modify them.  See $LK,"Home Files",A="FF:::/Doc/GuideLines.TXT,/Home Files"$.  You can make your own distro that includes everything and is a bootable live CD with $LK,"::/Misc/DoDistro.CPP"$.
 
-Typically, your usage pattern through the day will be repeatedly left or right clicking on filenames in a cmd line $LK,"Dir",A="MN:Dir"$() listing.  You left-click files to edit them and right-click to $FG,2$#include$FG$ them.  To begin a project, type $LK,"Ed",A="MN:Ed"$("filename");, supplying a filename.  You can also run programs with $FG,2$<F5>$FG$ when in the editor.  $FG,2$<ESC>$FG$ to save and exit the file.  You'll need to do a new $LK,"Dir",A="MN:Dir"$() cmd, periodically, so make a macro on your PersonalMenu.  Access your PersonalMenu by pressing $FG,2$<CTRL-m>$FG$, cursoring until you are on top of it and pressing $FG,2$<SPACE>$FG$.
+Typically, your usage pattern through the day will be repeatedly left or right clicking on filenames in a cmd line $LK,"Dir",A="MN:Dir"$() listing.  You left-click files to edit them and right-click to $FG,2$#include$FG$ them.  To begin a project, type $LK,"Ed",A="MN:Ed"$("filename");, supplying a filename.  You can also run programs with $FG,2$<F5>$FG$ when in the editor. $FG,2$<ESC>$FG$ to save and exit the file.  You'll need to do a new $LK,"Dir",A="MN:Dir"$() cmd, periodically, so make a macro on your PersonalMenu.  Access your PersonalMenu by pressing $FG,2$<CTRL-m>$FG$, cursoring until you are on top of it and pressing $FG,2$<SPACE>$FG$.
 
 $FG,2$<CTRL-t>$FG$ toggles plain text mode, showing format commands, a little like viewing html code.
 $FG,2$<CTRL-l>$FG$ inserts a text widgets.
@@ -73,6 +73,7 @@ $FG,2$<ALT-h>$FG$ horizontally tiles windows.
 The $FG,2$ALT$FG$ keys are defined in $LK,"~/HomeKeyPlugIns.CPP"$.  You can customize them.
 
 $FG,2$<CTRL-ALT-t>$FG$ new terminal window.
+$FG,2$$FG,2$<CTRL-ALT-n>$FG$ switches to the next window.
 $FG,2$<CTRL-ALT-x>$FG$ kills a window.
 
 $LK,"Find",A="MN:Find"$() is your best friend.  There's a wrapper function called $LK,"F",A="MN:F"$() in your $FG,2$~/HomeWrappers.CPP.Z$FG$ file.  Feel free to make wrapper functions for functions you use often and customize the args.  By the way, $LK,"Find",A="MN:Find"$() or $LK,"R",A="MN:R"$() can be used to replace strings across multiple files.  You can access $LK,"Find",A="MN:Find"$() using $FG,2$<CTRL-SHIFT-f>$FG$.
@@ -81,10 +82,14 @@ As you browse code, use the $FG,2$AutoComplete$FG$ window to look-up functions, 
 
 Use the $LK,"Help & Index",A="FI:::/Doc/HelpIndex.TXT"$ or $LK,"Demo Index",A="FI:::/Doc/DemoIndex.TXT"$ to find-out what exists.  Press $FG,2$<F1>$FG$ for help or use the links on your menu ($FG,2$<CTRL-m>$FG$).  Also, look in the $FG,2$/Demo$FG$ or $FG,2$/Apps$FG$ directories for inspiration.
 
+3rd parties can make TempleOS software.  It will be distributed as $LK,"RedSea ISO Files",A="MN:RedSeaISO"$.  Burn a CD/DVD, or in a $FG,2$QEMU$FG$$FG$, $FG,2$VMware$FG$ or $FG,2$VirtualBox$FG$, set your CD/DVD to point to the ISO file.  Then, access the $FG,2$'T'$FG$ drive.  Or, $LK,"Mount",A="MN:Mount"$() the ISO file and access the $FG,2$'M'$FG$ drive.  Ideally, do not install applications such as games onto your hard drive because we wish to keep hard drive usage low, so the whole $FG,2$'C'$FG$ drive can quickly be copied to $FG,2$'D'$FG$.  Also, the $LK,"FileMgr",A="MN:FileMgr"$() starts too slowly with lots of hard drive files.
 
 $MA-X+PU,"Take Tour",LM="User(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$
 
 $FG,8$
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "Windows" is a trademark of MicroSoft Corp.
-$FG$
+* "Linux" is a trademark owned by Linus Torvalds.
+* "Windows" is a trademark owned by MicroSoft Corp.
+* "QEMU" is a trademark owned by Fabrice Bellard.
+* "VMware" is a trademark owned by VMware, Inc.
+* "VirtualBox" is a trademark owned by Oracle.
+$FG$$FG$

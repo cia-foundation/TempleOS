@@ -48,8 +48,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * $LK,"::/Demo/Games/FlatTops.CPP"$ is torpedo, not bombs.
 
-* $LK,"::/Demo/Games/EagleDive.CPP"$ foreground clipping issues.
-
 * Reset MPs with $LK,"Core0StartMP",A="MN:Core0StartMP"$() after boot.  Free old task memory?
 
 * Use pen_width and pen_height when clipping with pen_width>1.
@@ -69,7 +67,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Change %h*c so the character is not a arg?
 
-* $LK,"GrLineFat3",A="MN:GrLineFat3"$() needs work.
+* $LK,"GrLineFat3",A="MN:GrLineFat3"$() needs a little work.
 
 
 $FG,5$$TX+CX,"TODO? Meh"$$FG$
@@ -406,13 +404,13 @@ Moses gets Aaron			$TX,"Exodus 4:10-16",HTML="http://www.biblegateway.com/passag
 There is no council against the Lord	$TX,"Proverbs 21:30",HTML="http://www.biblegateway.com/verse/en/Proverbs%2021:30"$
 Human help is worthless			$TX,"Psalm 108:12",HTML="http://www.biblegateway.com/verse/en/Psalm%20108:12"$
 Do not seek your own wealth		$TX,"1 Corinthians 10:24",HTML="http://www.biblegateway.com/verse/en/1%20Corinthians%2010:24"$
-The stone rejected is conrerstone	$TX,"Matthew 21:42",HTML="http://www.biblegateway.com/verse/en/Matthew%2021:42"$
+The stone rejected is cornerstone	$TX,"Matthew 21:42",HTML="http://www.biblegateway.com/verse/en/Matthew%2021:42"$
 New wineskins				$TX,"Mark 2:22",HTML="http://www.biblegateway.com/verse/en/Mark%202:22"$
 
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17408 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17412 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$

@@ -154,7 +154,7 @@ $SP,"<5>",BI=5$
 
 $SP,"<6>",BI=6$
 $BG$
-CSprite *imgs[NUM_PLAYERS][OT_NUM_TYPES]={{$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$}};
+U8 *imgs[NUM_PLAYERS][OT_NUM_TYPES]={{$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$}};
 
 U0 DrawIt(CTask *task,CDC *dc)
 {

@@ -44,6 +44,6 @@ If you have anti-virus software, it might object to having a different master bo
 $ID,-2$
 
 $FG,8$
-* "Windows" is a trademark of MicroSoft Corp.
-* "Linux" is probably a trademark owned by Linus Torvalds.
+* "Windows" is a trademark owned by MicroSoft Corp.
+* "Linux" is a trademark owned by Linus Torvalds.
 $FG$

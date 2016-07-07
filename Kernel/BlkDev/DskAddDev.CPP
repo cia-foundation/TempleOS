@@ -5,8 +5,8 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
   switch (bd->type) {
     case BDT_RAM:
       break;
-    case BDT_FILE_READ:
-    case BDT_FILE_WRITE:
+    case BDT_ISO_FILE_READ:
+    case BDT_ISO_FILE_WRITE:
       bd->lock_fwding=Let2BlkDev(*bd->file_dsk_name);
       break;
     case BDT_ATA:
@@ -41,8 +41,8 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
   dv->size=bd->max_blk+1-bd->drv_offset;
   switch (bd->type) {
     case BDT_RAM:
-    case BDT_FILE_READ:
-    case BDT_FILE_WRITE:
+    case BDT_ISO_FILE_READ:
+    case BDT_ISO_FILE_WRITE:
       dv->dv_signature=DRV_SIGNATURE_VAL;
       dv->fs_type=FSt_REDSEA;
 //This is to force creation of a RAM

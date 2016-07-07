@@ -81,6 +81,6 @@ $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://w
 
 I thought 2.5' x 1.5' x 1.5' was ridiculously big, but it looks like it is reasonable for super-cooled refrigeration systems!
 $FG,8$
-* "Commodore 64" was a trademark of Commodore Business Machines.
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "Windows" is a trademark of MicroSoft Corp.$FG$
+* "Commodore 64" was a trademark owned by Commodore Business Machines.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "Windows" is a trademark owned by MicroSoft Corp.$FG$

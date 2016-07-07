@@ -62,9 +62,9 @@ $ID,-5$
 * $FG,4$No multimedia$FG$.  Sounds and images will be primarily calculated in real-time, not fetched from storage.
 
 $FG,8$
-* "Commodore 64" was a trademark of Commodore Business Machines.
-* "The Simpsons" is a trademark of Fox.
-* "Windows" is a trademark of MicroSoft Corp.
+* "Commodore 64" was a trademark owned by Commodore Business Machines.
+* "The Simpsons" is a trademark owned by Fox.
+* "Windows" is a trademark owned by MicroSoft Corp.
 $FG$
 
 

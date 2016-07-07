@@ -53,7 +53,7 @@ $ID,-8$
 F64 psm_durations[PSM_NUM_DURATIONS+1]={
 2*.25/3,.25,2*.5/3,.5,2.0/3.0,0.5*1.5,1.0,1.5,2.0,3.0,4.0,6.0,1000000.0};
 U8 *psm_duration_lst="st\0s\0et\0e\0qt\0e.\0q\0q.\0h\0h.\0w\0w.\0";
-CSprite *psm_duration_imgs[PSM_NUM_DURATIONS]={$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,
+U8 *psm_duration_imgs[PSM_NUM_DURATIONS]={$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,
 			$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<3>",BI=3$,
 			$IB,"<4>",BI=4$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<5>",BI=5$};
 Bool psm_triplet_durations[PSM_NUM_DURATIONS]={TRUE,FALSE,TRUE,

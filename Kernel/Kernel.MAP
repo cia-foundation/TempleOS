@@ -1585,7 +1585,6 @@ $LK,"_MEMSET",A="FL:::/Kernel/KUtils.CPP.Z,3"$
 $LK,"ROP_COLLISION",A="FL:::/Kernel/KernelA.HPP,2943"$
 $LK,"TK_PLUS_PLUS",A="FL:::/Kernel/KernelA.HPP,2078"$
 $LK,"sys_heap_init_val",A="FL:::/Kernel/KernelB.HPP,181"$
-$LK,"BDT_FILE_WRITE",A="FL:::/Kernel/KernelA.HPP,2633"$
 $LK,"MemVGAAlloc",A="FL:::/Kernel/Mem/MemPhysical.CPP.Z,156",BI=355$
 $LK,"DOCEF_DEREF_DATA",A="FL:::/Kernel/KernelA.HPP,1011"$
 $LK,"VGAP_REG_WRITE",A="FL:::/Kernel/KernelA.HPP,3737"$
@@ -1748,7 +1747,6 @@ $LK,"SUF_REM_LEADING",A="FL:::/Kernel/KernelA.HPP,3793"$
 $LK,"OPTf_USE_IMM64",A="FL:::/Kernel/KernelA.HPP,1547"$
 $LK,"Raw",A="FL:::/Kernel/KMisc.CPP.Z,238",BI=396$
 $LK,"Msg",A="FL:::/Kernel/SrvCmd.CPP.Z,257",BI=397$
-$LK,"BDT_FILE_READ",A="FL:::/Kernel/KernelA.HPP,2632"$
 $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="FL:::/Kernel/KernelA.HPP,1544"$
 $LK,"KbdInit",A="FL:::/Kernel/SerialDev/Keyboard.CPP.Z,424",BI=398$
 $LK,"chars_bmp_zero_tab_ff_cr_nl_cursor_dollar",A="FL:::/Kernel/StrA.CPP.Z,368"$
@@ -2121,6 +2119,7 @@ $LK,"MBS_USED_SIGNATURE_VAL",A="FL:::/Kernel/KernelA.HPP,2856"$
 $LK,"HeapCtrlDel",A="FL:::/Kernel/Mem/HeapCtrl.CPP.Z,15",BI=471$
 $LK,"_CALLEXTSTR",A="FL:::/Kernel/KUtils.CPP.Z,392"$
 $LK,"FF_USE_OLD_DATETIME",A="FL:::/Kernel/KernelA.HPP,2785"$
+$LK,"BDT_ISO_FILE_READ",A="FL:::/Kernel/KernelA.HPP,2632"$
 $LK,"CCf_PAREN",A="FL:::/Kernel/KernelA.HPP,2164"$
 $LK,"CCF_PAREN",A="FL:::/Kernel/KernelA.HPP,2163"$
 $LK,"ACD_BLK_SIZE",A="FL:::/Kernel/KernelA.HPP,1513"$
@@ -2308,6 +2307,7 @@ $LK,"FifoU8Cnt",A="FL:::/Kernel/KDataTypes.CPP.Z,227",BI=506$
 $LK,"C:/Doc/TimeHPET.TXT.Z",A="FL:::/Kernel/KernelB.HPP,283"$
 $LK,"DOCf_PLAIN_TEXT",A="FL:::/Kernel/KernelA.HPP,1294"$
 $LK,"CArcEntry",A="FL:::/Kernel/KernelA.HPP,3752"$
+$LK,"BDT_ISO_FILE_WRITE",A="FL:::/Kernel/KernelA.HPP,2633"$
 $LK,"AOT_BIN_BLK_SIZE",A="FL:::/Kernel/KernelA.HPP,1798"$
 $LK,"DOCf_FORM",A="FL:::/Kernel/KernelA.HPP,1302"$
 $LK,"DOCF_FORM",A="FL:::/Kernel/KernelA.HPP,1266"$

@@ -83,8 +83,8 @@ RegExeBranch("TempleOS/Wenceslas");
 	$SP,"<11>",BI=11$
 
 
-CSprite *king_imgs[4]={$IB,"<2>",BI=2$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$};
-CSprite *peasant_imgs[4]={$IB,"<5>",BI=5$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$};
+U8 *king_imgs[4]={$IB,"<2>",BI=2$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$};
+U8 *peasant_imgs[4]={$IB,"<5>",BI=5$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$};
 
 
 #define NUM_TREES	8
@@ -121,8 +121,7 @@ class Step
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 r[16],i,w=task->pix_width,h=task->pix_height,x,y;
-  U8 *img;
-  CSprite *temps;
+  U8 *img,*temps;
   Step *tempst;
   Peasant *tempp;
   F64 tt;

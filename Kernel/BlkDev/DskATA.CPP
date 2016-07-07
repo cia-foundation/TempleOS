@@ -229,7 +229,7 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
 	res.u8[4]=InU8(bd->base0+ATAR0_LCYL);
 	res.u8[5]=InU8(bd->base0+ATAR0_HCYL);
 
-	if (res>>24==res&0xFFFFFF) {//Kludge to make qemu-kvm work
+	if (res>>24==res&0xFFFFFF) {//Kludge to make QEMU work
 	  bd->flags&=~BDF_EXT_SIZE;
 	  res&=0xFFFFFF;
 	}

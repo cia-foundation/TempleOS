@@ -15,8 +15,8 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
     "\n****** Mount Drives ******\n"
 	  "$$GREEN$$A$$FG$$-$$GREEN$$B$$FG$$ are RAM drives.\n"
 	  "$$GREEN$$C$$FG$$-$$GREEN$$L$$FG$$ are ATA hard drives.\n"
-	  "$$GREEN$$M$$FG$$-$$GREEN$$P$$FG$$ are file read drives.\n"
-	  "$$GREEN$$Q$$FG$$-$$GREEN$$S$$FG$$ are file write drives.\n"
+	  "$$GREEN$$M$$FG$$-$$GREEN$$P$$FG$$ are ISO file read drives.\n"
+	  "$$GREEN$$Q$$FG$$-$$GREEN$$S$$FG$$ are ISO file write drives.\n"
 	  "$$GREEN$$T$$FG$$-$$GREEN$$Z$$FG$$ are ATAPI CD/DVD drives.\n"
 	  "\nDrive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
     drv_let=ToUpper(GetChar);
@@ -36,11 +36,11 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	case BDT_RAM:
 	  "Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";
 	  GetS(addr_buf,STR_LEN);
-	case BDT_FILE_WRITE:
+	case BDT_ISO_FILE_WRITE:
 	  "Blks of 512 bytes:";
 	  GetS(blks_buf,STR_LEN);
 	  break;
-	case BDT_FILE_READ:
+	case BDT_ISO_FILE_READ:
 	  filename=GetStr("File Name:");
 	  break;
 	case BDT_ATA:
@@ -84,11 +84,11 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	case BDT_RAM:
 	  if (!*addr_buf) StrCpy(addr_buf,"0");
 	  DocPrint(doc,"bd->RAM_dsk=%s;\n",addr_buf);
-	case BDT_FILE_WRITE:
+	case BDT_ISO_FILE_WRITE:
 	  if (!*blks_buf) StrCpy(blks_buf,"0");
 	  DocPrint(doc,"bd->max_blk=(%s)-1;\n",blks_buf);
 	  break;
-	case BDT_FILE_READ:
+	case BDT_ISO_FILE_READ:
 	  filename2=FileNameAbs(filename);
 	  DocPrint(doc,"bd->file_dsk_name=AStrNew(\"%s\");\n",filename2);
 	  DocPrint(doc,"bd->drv_offset=19<<2+"
@@ -137,8 +137,8 @@ public U0 Unmount(U8 drv_let=0)
 public U8 MountFile(U8 *filename)
 {//Mount ISO.C file.
   U8 *filename2=DftExt(filename,"ISO.C"),*filename3=FileNameAbs(filename2);
-  CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('M')); //First $LK,"BDT_FILE_READ",A="MN:BDT_FILE_READ"$
-  CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_FILE_READ);
+  CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('M')); //First $LK,"BDT_ISO_FILE_READ",A="MN:BDT_ISO_FILE_READ"$
+  CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_READ);
   bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
   bd->file_dsk_name=AStrNew(filename3);
   BlkDevAdd(bd,TRUE,TRUE);

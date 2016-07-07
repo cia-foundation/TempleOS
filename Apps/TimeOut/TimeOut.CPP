@@ -55,7 +55,7 @@ $BG,14$
 
 
 
-CSprite *friendly_imgs[4]={$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$};
+U8 *friendly_imgs[4]={$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$};
 
 
 
@@ -75,7 +75,7 @@ CSprite *friendly_imgs[4]={$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"
 
 
 
-CSprite *friendly_hacking_imgs[4]={$IB,"<6>",BI=6$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$,$IB,"<7>",BI=7$};
+U8 *friendly_hacking_imgs[4]={$IB,"<6>",BI=6$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$,$IB,"<7>",BI=7$};
 
 
 
@@ -92,7 +92,7 @@ CSprite *friendly_hacking_imgs[4]={$IB,"<6>",BI=6$,$IB,"<5>",BI=5$,$IB,"<6>",BI=
 
 
 
-CSprite *enemy_imgs[4]={$IB,"<9>",BI=9$,$IB,"<8>",BI=8$,$IB,"<9>",BI=9$,$IB,"<10>",BI=10$};
+U8 *enemy_imgs[4]={$IB,"<9>",BI=9$,$IB,"<8>",BI=8$,$IB,"<9>",BI=9$,$IB,"<10>",BI=10$};
 
 
 
@@ -112,7 +112,7 @@ CSprite *enemy_imgs[4]={$IB,"<9>",BI=9$,$IB,"<8>",BI=8$,$IB,"<9>",BI=9$,$IB,"<10
 
 
 
-CSprite *enemy_hacking_imgs[4]={$IB,"<12>",BI=12$,$IB,"<11>",BI=11$,$IB,"<12>",BI=12$,$IB,"<13>",BI=13$};
+U8 *enemy_hacking_imgs[4]={$IB,"<12>",BI=12$,$IB,"<11>",BI=11$,$IB,"<12>",BI=12$,$IB,"<13>",BI=13$};
 
 
 
@@ -155,7 +155,7 @@ CSprite *enemy_hacking_imgs[4]={$IB,"<12>",BI=12$,$IB,"<11>",BI=11$,$IB,"<12>",B
 
 $BG$
 
-CSprite *landscape_imgs[LANDSCAPE_TYPES]=
+U8 *landscape_imgs[LANDSCAPE_TYPES]=
   {$IB,"<tree>",BI=14$,$IB,"<rock>",BI=15$,$IB,"<mountain>",BI=16$,$IB,"<castle>",BI=17$};
 
 #define MAX_LANDSCAPE 64
@@ -173,7 +173,7 @@ U0 MPDrawMen(CDC *dc2)
   I64 i,r[16],lo=Gs->num*MAX_MAN/mp_cnt,hi=(Gs->num+1)*MAX_MAN/mp_cnt,
 	yy,phase,scroll_y=MAP_HEIGHT-100-100*(tS-t0);
   Man *tempm;
-  CSprite *temps,**_temps;
+  U8 *temps,**_temps;
   F64 tt,ts=tS;
 
   for (i=lo;i<hi;i++) {
@@ -215,7 +215,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   F64 tt,ts=tS;
   Man *tempm;
   Bullet *tempb;
-  CSprite *temps;
+  U8 *temps;
 
   for (i=0;i<MAX_LANDSCAPE;i++) {
     yy=(ls[i].y-scroll_y)&(MAP_HEIGHT-1);

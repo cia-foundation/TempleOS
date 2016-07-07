@@ -166,9 +166,9 @@ I64 Let2BlkDevType(U8 drv_let)
   if ('C'<=drv_let<='L')
     return BDT_ATA;
   if ('M'<=drv_let<='P')
-    return BDT_FILE_READ;
+    return BDT_ISO_FILE_READ;
   if ('Q'<=drv_let<='S')
-    return BDT_FILE_WRITE;
+    return BDT_ISO_FILE_WRITE;
   if ('T'<=drv_let<='Z')
     return BDT_ATAPI;
   return BDT_NULL;
@@ -259,7 +259,7 @@ Bool Drv(U8 drv_let)
     if (bd->flags & BDF_REMOVABLE && !(bd->flags & BDF_INITIALIZED))
       ChgDsk(Drv2Let(dv));
     if (bd->type==BDT_RAM ||
-	bd->type==BDT_FILE_READ || bd->type==BDT_FILE_WRITE)
+	bd->type==BDT_ISO_FILE_READ || bd->type==BDT_ISO_FILE_WRITE)
       BlkDevInit(bd);
   }
   Fs->cur_dv=dv;
@@ -354,7 +354,7 @@ U0 DrvRep()
 	"   Serial#:%s\n",st;
 	Free(st);
       }
-      if (bd->type==BDT_FILE_READ || bd->type==BDT_FILE_WRITE)
+      if (bd->type==BDT_ISO_FILE_READ || bd->type==BDT_ISO_FILE_WRITE)
 	"   File=\"%s\"\n",bd->file_dsk_name;
       "   %016X-%016X\n$$FG$$$$BG$$",dv->drv_offset,dv->drv_offset+dv->size-1;
     }

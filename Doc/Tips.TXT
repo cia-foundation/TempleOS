@@ -148,5 +148,5 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 * The first line of the $MA-X+PU,"Psalmody",LM="#include \"::/Apps/Psalmody/Run\"\n"$ $LK,"HolyC",A="FI:::/Doc/HolyC.TXT"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.CPP,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
 
 $FG,8$
-* "Linux" is probably a trademark owned by Linus Torvalds.
+* "Linux" is a trademark owned by Linus Torvalds.
 $FG$

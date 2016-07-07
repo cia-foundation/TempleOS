@@ -50,7 +50,7 @@ Bool BlkDevInit(CBlkDev *bd)
 	  RedSeaFmt(bd->first_drv_let);
 	res=TRUE;
 	break;
-      case BDT_FILE_READ:
+      case BDT_ISO_FILE_READ:
 	if (FileFind(bd->file_dsk_name,&de,FUF_JUST_FILES)) {
 	  bd->max_blk=de.size>>BLK_SIZE_BITS-1;
 	  try bd->file_dsk=FOpen(bd->file_dsk_name,"rc",bd->max_blk+1);
@@ -66,7 +66,7 @@ Bool BlkDevInit(CBlkDev *bd)
 	  }
 	}
 	break;
-      case BDT_FILE_WRITE:
+      case BDT_ISO_FILE_WRITE:
 	if (!bd->file_dsk_name) {
 	  StrPrint(buf,"%C:/Drv%C.DRV.C",
 		blkdev.boot_drv_let,bd->first_drv_let);
@@ -136,7 +136,7 @@ CBlkDev *BlkDevNextFreeSlot(U8 first_drv_let,I64 type)
 	case BDT_RAM:
 	  res->flags&=~BDF_READ_CACHE;
 	  break;
-	case BDT_FILE_READ:
+	case BDT_ISO_FILE_READ:
 	  res->flags|=BDF_READ_ONLY;
 	  break;
 	case BDT_ATAPI:

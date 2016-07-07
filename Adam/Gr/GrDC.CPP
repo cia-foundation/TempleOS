@@ -226,17 +226,18 @@ public I64 DCSize(CDC *dc)
     return 0;
 }
 
-public U0 DCDepthBufRst(CDC *dc)
+public I32 *DCDepthBufRst(CDC *dc)
 {//Reset device context depth buf to far away.
   if (dc->depth_buf)
     MemSetU32(dc->depth_buf,MAX_I32,dc->width_internal*dc->height);
+  return dc->depth_buf;
 }
 
-public U0 DCDepthBufAlloc(CDC *dc)
+public I32 *DCDepthBufAlloc(CDC *dc)
 {//Alloc a 32-bit depth buffer for device context.
   Free(dc->depth_buf);
   dc->depth_buf=MAlloc(dc->width_internal*dc->height*sizeof(I32),dc->mem_task);
-  DCDepthBufRst(dc);
+  return DCDepthBufRst(dc);
 }
 
 public CDC *DCCopy(CDC *dc,CTask *task=NULL)

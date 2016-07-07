@@ -68,6 +68,6 @@ U0 TOSInit()
 #define TOS_DVD_CFG	"Tb\n0x20000\nt \n\n\nAutoMountIDE\nCT\n"
 #define TOS_DVD_DBG_CFG "A" CFG_BOOT_RESCUE_DRV\
 			"b\nScale2Mem(2048,0x40000)\n\n\n"\
-			"DontProbe\nBootRescueDrv\n"\
+			"NoMP\nTextMode\nDontProbe\nBootRescueDrv\n"\
 			"C:" CFG_BOOT_RESCUE_DRV_FILE "\n"\
 			CFG_BOOT_RESCUE_DRV_START "\n\n"

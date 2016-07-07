@@ -88,8 +88,9 @@ $ID,-2$$TR,"Why does it finds files that aren't there?"$
 $ID,2$If not found, $FG,2$.Z$FG$ is added or removed from filename and a search is done again.  If a file is still not found, the parent directories are searched for a file of the same name.
 $ID,-2$
 $FG,8$
-* "Windows" is a trademark of MicroSoft Corp.
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "VMware" is a trademark of VMware, Inc.
-* "VirtualBox" is a trademark of Oracle.
+* "Windows" is a trademark owned by MicroSoft Corp.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "QEMU" is a trademark owned by Fabrice Bellard.
+* "VMware" is a trademark owned by VMware, Inc.
+* "VirtualBox" is a trademark owned by Oracle.
 $FG$

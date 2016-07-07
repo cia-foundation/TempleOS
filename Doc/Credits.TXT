@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
-I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"120,268",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"12.9",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
+I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"121,193",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"12.9",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
 
 *) $LK,"::/Kernel/FontStd.CPP"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.  It's public domain.
 
@@ -49,12 +49,13 @@ I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"120,268",D="DD_TEMPLEOS_LOC"$ lines 
 *) The random number generator is from Donald Knuth in the wikipedia entry for $TX,"Linear_congruential_generator",HTML="http://en.wikipedia.org/wiki/Linear_congruential_generator"$.
 
 $FG,8$
-* "MSDOS", "Windows", "MovieMaker" "MS Paint" and "FAT32" are trademarks of MicroSoft Corp.
-* "SiteBuilder" is a trademark of Yahoo! Inc.
-* "MagicISO" is a trademark of MagicISO Corp.
-* "MATLAB" is a trademark of The Math Works, Inc.
-* "$TX,"FreeDOS",HTML="http://www.freedos.org"$" is a trademark of Jim Hall.
-* "VAX" is a trademark of Digital Equipment Corp.
-* "Linux" is probably a trademark owned by Linus Torvalds.
-* "VAXTMOS" is a trademark of Ticketmaster.
+* "MSDOS", "Windows", "MovieMaker", "MS Paint" and "FAT32" are trademarks owned by MicroSoft Corp.
+* "SiteBuilder" is a trademark owned by Yahoo! Inc.
+* "MagicISO" is a trademark owned by MagicISO Corp.
+* "MATLAB" is a trademark owned by The Math Works, Inc.
+* "$TX,"FreeDOS",HTML="http://www.freedos.org"$" is a trademark owned by Jim Hall.
+* "QEMU" is a trademark owned by Fabrice Bellard.
+* "VAX" is a trademark owned by Digital Equipment Corp.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "VAXTMOS" is a trademark owned by Ticketmaster.
 $FG$

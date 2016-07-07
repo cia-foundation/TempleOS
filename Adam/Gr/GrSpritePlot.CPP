@@ -26,7 +26,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
   I32 *ptr;
   CColorROPU32 old_color=dc->color;
   CDC *img;
-  CD3I32 *p;
+  CD3I32 *p,*p2;
   CGrSym old_sym;
   MemCpy(&old_sym,&dc->sym,sizeof(CGrSym));
   if (dc->flags & DCF_LOCATE_NEAREST) {
@@ -173,47 +173,39 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	}
 	break;
       start:
-	p=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++,p++) {
-	  p->x+=x;
-	  p->y+=y;
-	  p->z+=z;
+	p2=p=MAlloc(tempg->nu.num*sizeof(CD3I32));
+	MemCpy(p,&tempg->nu.u,tempg->nu.num*sizeof(CD3I32));
+	for (i=0;i<tempg->nu.num;i++,p2++) {
+	  p2->x+=x;
+	  p2->y+=y;
+	  p2->z+=z;
 	}
 	case SPT_BSPLINE2:
-	  Gr2BSpline3(dc,&tempg->nu.u,tempg->nu.num,FALSE);
+	  Gr2BSpline3(dc,p,tempg->nu.num,FALSE);
 	  break;
 	case SPT_BSPLINE3:
-	  Gr3BSpline3(dc,&tempg->nu.u,tempg->nu.num,FALSE);
+	  Gr3BSpline3(dc,p,tempg->nu.num,FALSE);
 	  break;
 	case SPT_BSPLINE2_CLOSED:
-	  Gr2BSpline3(dc,&tempg->nu.u,tempg->nu.num,TRUE);
+	  Gr2BSpline3(dc,p,tempg->nu.num,TRUE);
 	  break;
 	case SPT_BSPLINE3_CLOSED:
-	  Gr3BSpline3(dc,&tempg->nu.u,tempg->nu.num,TRUE);
+	  Gr3BSpline3(dc,p,tempg->nu.num,TRUE);
 	  break;
       end:
-	p=&tempg->nu.u;
-	for (i=0;i<tempg->nu.num;i++,p++) {
-	  p->x-=x;
-	  p->y-=y;
-	  p->z-=z;
-	}
+	Free(p);
 	break;
       case SPT_MESH:
-	p=&tempg->mu.u;
-	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
-	  p->x+=x;
-	  p->y+=y;
-	  p->z+=z;
+	p2=p=MAlloc(tempg->mu.vertex_cnt*sizeof(CD3I32));
+	MemCpy(p,&tempg->mu.u,tempg->mu.vertex_cnt*sizeof(CD3I32));
+	for (i=0;i<tempg->mu.vertex_cnt;i++,p2++) {
+	  p2->x+=x;
+	  p2->y+=y;
+	  p2->z+=z;
 	}
-	Gr3Mesh(dc,tempg->mu.vertex_cnt,&tempg->mu.u,tempg->mu.tri_cnt,
+	Gr3Mesh(dc,tempg->mu.vertex_cnt,p,tempg->mu.tri_cnt,
 	      (&tempg->mu.u)(U8 *)+sizeof(CD3I32)*tempg->mu.vertex_cnt);
-	p=&tempg->mu.u;
-	for (i=0;i<tempg->mu.vertex_cnt;i++,p++) {
-	  p->x-=x;
-	  p->y-=y;
-	  p->z-=z;
-	}
+	Free(p);
 	break;
       case SPT_SHIFTABLE_MESH:
 	if (dc->flags&DCF_TRANSFORMATION) {
@@ -228,20 +220,16 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	  y1=tempg->pmu.y+y;
 	  z1=tempg->pmu.z+z;
 	}
-	p=&tempg->pmu.u;
-	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
-	  p->x+=x1;
-	  p->y+=y1;
-	  p->z+=z1;
+	p2=p=MAlloc(tempg->pmu.vertex_cnt*sizeof(CD3I32));
+	MemCpy(p,&tempg->pmu.u,tempg->pmu.vertex_cnt*sizeof(CD3I32));
+	for (i=0;i<tempg->pmu.vertex_cnt;i++,p2++) {
+	  p2->x+=x1;
+	  p2->y+=y1;
+	  p2->z+=z1;
 	}
-	Gr3Mesh(dc,tempg->pmu.vertex_cnt,&tempg->pmu.u,tempg->pmu.tri_cnt,
+	Gr3Mesh(dc,tempg->pmu.vertex_cnt,p,tempg->pmu.tri_cnt,
 	      (&tempg->pmu.u)(U8 *)+sizeof(CD3I32)*tempg->pmu.vertex_cnt);
-	p=&tempg->pmu.u;
-	for (i=0;i<tempg->pmu.vertex_cnt;i++,p++) {
-	  p->x-=x1;
-	  p->y-=y1;
-	  p->z-=z1;
-	}
+	Free(p);
 	if (dc->flags&DCF_TRANSFORMATION) {
 	  dc->x-=tempg->pmu.x;
 	  dc->y-=tempg->pmu.y;

@@ -2629,8 +2629,8 @@ public class CDirEntry
 #define BDT_NULL		0
 #define BDT_RAM			1
 #define BDT_ATA			2
-#define BDT_FILE_READ		3
-#define BDT_FILE_WRITE		4
+#define BDT_ISO_FILE_READ	3
+#define BDT_ISO_FILE_WRITE	4
 #define BDT_ATAPI		5
 #define BDT_NUM_TYPES		6
 
