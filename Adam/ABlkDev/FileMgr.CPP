@@ -30,7 +30,7 @@ class CFMUncollapsedLst
 
 CFMUncollapsedLst *FMCollectUncollapsedLst(CDoc *doc)
 {
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   CFMUncollapsedLst *res=NULL,*tempc;
   CDirEntry *tempde;
   while (doc_e!=doc) {
@@ -52,7 +52,7 @@ CFMUncollapsedLst *FMCollectUncollapsedLst(CDoc *doc)
 U0 FMMarkUncollapsed(CDoc *doc,CFMUncollapsedLst *tempc,
 	U8 *cur_entry,U8 *next_entry)
 {
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   CFMUncollapsedLst *tempc1;
   CDirEntry *tempde;
   while (doc_e!=doc) {
@@ -112,7 +112,7 @@ U0 FMDelUncollapsedLst(CFMUncollapsedLst *tempc)
   }
 }
 
-CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_root,Bool init)
+CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_head,Bool init)
 {
   CDirEntry *tempde,*tempde1;
   U8 *st;
@@ -126,8 +126,8 @@ CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_root,Bool init)
     tempde1=NULL;
   Free(st);
   tempde->user_data=DocPrint(doc,"$$TR,\"%s\",U=0x%X$$",tempde->full_name,tempde);
-  tempde->next=*_root;
-  *_root=tempde;
+  tempde->next=*_head;
+  *_head=tempde;
   DocPrint(doc,"\n$$ID,+2$$");
   DocBottom(doc);
   if (init) {
@@ -141,7 +141,7 @@ CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_root,Bool init)
   return tempde;
 }
 
-U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
+U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode)
 {
   CDrv *dv;
   I64 i;
@@ -192,9 +192,9 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
     tempc=FMCollectUncollapsedLst(doc);
     DocDel(doc);
   }
-  if (*_root) {
-    DirTreeDel(*_root);
-    *_root=NULL;
+  if (*_head) {
+    DirTreeDel(*_head);
+    *_head=NULL;
   }
   doc=DocNew;
   doc->desc='FileMan';
@@ -219,13 +219,13 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_root,I64 mode)
     dv=&blkdev.drvs[i];
     if (dv->bd->type==BDT_ATAPI) {
       if (dv->bd->flags&BDF_INITIALIZED)
-	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
+	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_head,TRUE);
       else {
-	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_root,FALSE);
+	tempde=FMRebuildDocDrv(Drv2Let(dv),doc,_head,FALSE);
 	tempde->flags|=DEF_NOT_INITIALIZED;
       }
     } else if (dv->fs_type==FSt_REDSEA || dv->fs_type==FSt_FAT32)
-      FMRebuildDocDrv(Drv2Let(dv),doc,_root,TRUE);
+      FMRebuildDocDrv(Drv2Let(dv),doc,_head,TRUE);
   }
   DocTop(doc);
   FMMarkUncollapsed(doc,tempc,cur_entry,next_entry);
@@ -437,7 +437,7 @@ U0 FMCopy(CDoc *doc)
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
   CDirEntry *tempde,*tempde1=NULL,*tempde2;
   Bool unlock_doc2=DocLock(doc2);
-  doc_e=doc2->root.next;
+  doc_e=doc2->head.next;
 
   tempde1=doc_ce->user_data;
   if (doc_ce->type_u8==DOCT_MENU_VAL)
@@ -580,7 +580,7 @@ U0 FMFinalScreenUpdate(CDC *dc)
 
 public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 {//File manager. Also, used to choose files and dirs.
-  CDirEntry *root=NULL,*tempde,*tempde1,*tempde2;
+  CDirEntry *head=NULL,*tempde,*tempde1,*tempde2;
   I64 sc,ch,a1,a2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
   U8 *res=NULL,*st,*st2,*old_cur_dir=CurDir;
@@ -590,8 +590,8 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   fp_old_final_screen_update=gr.fp_final_screen_update;
   MenuFilePush("::/Doc/FileMgrPullDown.TXT");
-  FMRebuildDoc(&doc,&root,mode);
-  if (tempde1=Cd2DirEntry(root,old_cur_dir))
+  FMRebuildDoc(&doc,&head,mode);
+  if (tempde1=Cd2DirEntry(head,old_cur_dir))
     doc->cur_entry=tempde1->user_data;
   while (tempde1) {
     if (tempde1->attr&RS_ATTR_DIR)
@@ -636,7 +636,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 		Silent;
 		Move(tempde->full_name,st2);
 		Silent(OFF);
-		FMRebuildDoc(&doc,&root,mode);
+		FMRebuildDoc(&doc,&head,mode);
 	      } else if (st2 && doc_ce->type_u8==DOCT_TREE) {
 		tempde=doc_ce->user_data;
 		okay=TRUE;
@@ -659,7 +659,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 		    CopyTree(tempde->full_name,st);
 		    DelTree(tempde->full_name);
 		    Silent(OFF);
-		    FMRebuildDoc(&doc,&root,mode);
+		    FMRebuildDoc(&doc,&head,mode);
 		  }
 		  Free(st);
 		}
@@ -721,7 +721,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	      FMFmtDrv(doc);
 	      break;
 	  end:
-	    FMRebuildDoc(&doc,&root,mode);
+	    FMRebuildDoc(&doc,&head,mode);
 	    break;
 	  case CH_SHIFT_ESC:
 	    break;
@@ -757,7 +757,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	  default:
 	    if (sc.u8[0]==SC_INS && sc&SCF_SHIFT && !(sc&SCF_CTRL)) {
 	      FMCopy(doc);
-	      FMRebuildDoc(&doc,&root,mode);
+	      FMRebuildDoc(&doc,&head,mode);
 	    } else if (sc.u8[0]==SC_F5) {
 	      if (doc->cur_entry->type_u8==DOCT_MENU_VAL) {
 		tempde=doc->cur_entry->user_data;
@@ -783,7 +783,7 @@ fm_regular_key:
   Fs->display_doc=old_display_doc;
   SettingsPop;
   DocDel(doc);
-  DirTreeDel(root);
+  DirTreeDel(head);
   Cd(old_cur_dir);
   Free(old_cur_dir);
   if (mode!=FM_NORMAL && !res)

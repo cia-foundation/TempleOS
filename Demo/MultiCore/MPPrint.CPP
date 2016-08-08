@@ -2,7 +2,7 @@ U0 Job(CDoc *doc)
 {
   I64 i;
   for (i=0;i<2;i++)
-    DocPrint(doc,"$$FG,%d$$CPU%d ",Gs->num,Gs->num);
+    DocPrint(doc,"$$FG,%d$$CPU%d ",Gs->num&15,Gs->num);
 }
 
 U0 MPPrintDemo()

@@ -11,8 +11,8 @@ U0 LoadDocDefines()
   //This is cut and replaced when I generate a distro.
   //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOSDistro.CPP,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","121,410");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,046");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","121,488");
+DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,126");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;
@@ -30,6 +30,7 @@ $ID,-4$
   DefinePrint("DD_SYS_HEAP_BASE","%08X",sys_heap_base);
   DefinePrint("DD_SYS_HEAP_LIMIT","%08X",sys_heap_limit);
   DefinePrint("DD_MEM_MIN_MEG","%d Meg",MEM_MIN_MEG);
+  DefinePrint("DD_UNCACHED_ALIAS","%010X",dev.uncached_alias);
   DefinePrint("DD_MEM_MAPPED_SPACE_GIG","%d Gig",MEM_MAPPED_SPACE/0x40000000);
   DefinePrint("DD_MEM_MAPPED_SPACE_END","%010X",MEM_MAPPED_SPACE-1);
   DefinePrint("DD_JIFFY_HZ","%d Hz",JIFFY_FREQ);

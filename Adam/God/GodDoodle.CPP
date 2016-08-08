@@ -23,7 +23,7 @@ U0 GodDoodleDraw(CTask *task,CDC *dc)
 
 U0 GodDoodleSmooth(I64 num)
 {
-  CDC *dc=DCExtract(god.doodle_dc,0,0,
+  CDC *dc=DCExt(god.doodle_dc,0,0,
 	god.doodle_dc->width-1,god.doodle_dc->height-1);
   I64 i,x,y,x1,y1,c,histogram[16],best,best_cnt,c_old=god.doodle_dc->color;
   for (y=0;y<god.doodle_dc->height;y++)

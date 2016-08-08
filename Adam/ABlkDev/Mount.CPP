@@ -4,7 +4,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
   I64 cnt,res=0,num_hints,drv_let,type,unit;
   U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN],
 	*filename=NULL,*filename2=NULL;
-  CATARep *root=NULL,*tempha;
+  CATARep *head=NULL,*tempha;
   Bool one_drv,make_free;
   CDoc *doc;
   boot_drv_let=ToUpper(boot_drv_let);
@@ -45,7 +45,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:
-	  num_hints=ATARep(,,&root);
+	  num_hints=ATARep(,,&head);
 	  if (type==BDT_ATAPI && boot_drv_let)
 	    "<ENTER> to use booted CD/DVD\n"; //Only $LK,"::/Kernel/KCfg.CPP"$
 	  do {
@@ -57,7 +57,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	    GetS(base0_buf,STR_LEN);
 	  } while (!Str2I64(base0_buf) && (type!=BDT_ATAPI || !boot_drv_let));
 	  if (1<=Str2I64(base0_buf)<=num_hints) {
-	    tempha=ATARepFind(root,Str2I64(base0_buf));
+	    tempha=ATARepFind(head,Str2I64(base0_buf));
 	    StrPrint(base0_buf,"0x%X",tempha->base0);
 	    StrPrint(base1_buf,"0x%X",tempha->base1);
 	    unit=tempha->unit;
@@ -75,7 +75,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	    } while (!(0<=unit<=1));
 	    '\n';
 	  }
-	  LinkedLstDel(root);
+	  LinkedLstDel(head);
 	  break;
       }
       DocPrint(doc,"bd=BlkDevNextFreeSlot(\'%C\',%d);bd->unit=%d;\n",

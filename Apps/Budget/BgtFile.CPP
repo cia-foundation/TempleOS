@@ -7,12 +7,12 @@ U0 BgtDataRead()
   I64		max_num;
   U8		**s=StrFileRead(BGT_STRINGS_FILE,&max_num);
 
-  MemSet(&b_root,0,sizeof(CBgtEntry));
-  QueInit(&b_root);
-  b_root.date=Now;
-  MemSet(&t_root,0,sizeof(CBgtTemplate));
-  QueInit(&t_root);
-  t_root.b.date=Now;
+  MemSet(&b_head,0,sizeof(CBgtEntry));
+  QueInit(&b_head);
+  b_head.date=Now;
+  MemSet(&t_head,0,sizeof(CBgtTemplate));
+  QueInit(&t_head);
+  t_head.b.date=Now;
 
   if (ptr=b=FileRead(BGT_DATA_FILE,&size)) {
     cnt=*ptr(I64 *)++;
@@ -22,7 +22,7 @@ U0 BgtDataRead()
       tempb->credit=StrNew(s[tempb->credit_idx]);
       tempb->debit =StrNew(s[tempb->debit_idx]);
       tempb->desc  =StrNew(s[tempb->desc_idx]);
-      QueIns(tempb,b_root.last);
+      QueIns(tempb,b_head.last);
       ptr+=BE_SIZE;
     }
 
@@ -36,7 +36,7 @@ U0 BgtDataRead()
       tempt->b.credit=StrNew(s[tempt->b.credit_idx]);
       tempt->b.debit =StrNew(s[tempt->b.debit_idx]);
       tempt->b.desc  =StrNew(s[tempt->b.desc_idx]);
-      QueIns(tempt,t_root.last);
+      QueIns(tempt,t_head.last);
     }
   }
 
@@ -63,9 +63,9 @@ U0 BgtDataWrite()
     }
   }
 
-  tempb=b_root.next;
+  tempb=b_head.next;
   cnt1=0;
-  while (tempb!=&b_root) {
+  while (tempb!=&b_head) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
       tempb->credit_idx	=StrFileAdd(tempb->credit,&num,table);
       tempb->debit_idx	=StrFileAdd(tempb->debit,&num,table);
@@ -75,9 +75,9 @@ U0 BgtDataWrite()
     tempb=tempb->next;
   }
 
-  tempt=t_root.next;
+  tempt=t_head.next;
   cnt2=0;
-  while (tempt!=&t_root) {
+  while (tempt!=&t_head) {
     tempt->b.credit_idx	=StrFileAdd(tempt->b.credit,&num,table);
     tempt->b.debit_idx	=StrFileAdd(tempt->b.debit,&num,table);
     tempt->b.desc_idx		=StrFileAdd(tempt->b.desc,&num,table);
@@ -92,8 +92,8 @@ U0 BgtDataWrite()
 
   MemCpy(ptr,&cnt1,sizeof(I64));
   ptr+=sizeof(I64);
-  tempb=b_root.next;
-  while (tempb!=&b_root) {
+  tempb=b_head.next;
+  while (tempb!=&b_head) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
       MemCpy(ptr,&tempb->start,BE_SIZE);
       ptr+=BE_SIZE;
@@ -103,8 +103,8 @@ U0 BgtDataWrite()
 
   MemCpy(ptr,&cnt2,sizeof(I64));
   ptr+=sizeof(I64);
-  tempt=t_root.next;
-  while (tempt!=&t_root) {
+  tempt=t_head.next;
+  while (tempt!=&t_head) {
     MemCpy(ptr,&tempt->start,BT_SIZE);
     ptr+=BT_SIZE;
     MemCpy(ptr,&tempt->b.start,BE_SIZE);
@@ -120,15 +120,15 @@ U0 BgtDel()
 {
   CBgtEntry	*tempb,*tempb1;
   CBgtTemplate	*tempt,*tempt1;
-  tempb=b_root.next;
-  while (tempb!=&b_root) {
+  tempb=b_head.next;
+  while (tempb!=&b_head) {
     tempb1=tempb->next;
     BgtEntryDel2(tempb);
     Free(tempb);
     tempb=tempb1;
   }
-  tempt=t_root.next;
-  while (tempt!=&t_root) {
+  tempt=t_head.next;
+  while (tempt!=&t_head) {
     tempt1=tempt->next;
     BgtEntryDel2(&tempt->b);
     Free(tempt);

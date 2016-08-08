@@ -1,7 +1,7 @@
 Bool Mem32DevIns(CMemRange *tempmr)
 {
-  CMemRange *tempmr1=dev.mem32_root.next,*tempmr2;
-  while (tempmr1!=&dev.mem32_root) {
+  CMemRange *tempmr1=dev.mem32_head.next,*tempmr2;
+  while (tempmr1!=&dev.mem32_head) {
     if (!tempmr1->type && tempmr->base>=tempmr1->base &&
 	  tempmr->base+tempmr->size<=tempmr1->base+tempmr1->size) {
       if (tempmr->base>tempmr1->base) {
@@ -32,14 +32,14 @@ U0 Mem32DevInit()
   CMemRange *tempmr;
   CMemE820 *m20=SYS_MEM_E820;
 
-  QueInit(&dev.mem32_root);
+  QueInit(&dev.mem32_head);
   tempmr=AMAlloc(sizeof(CMemRange));
   tempmr->type=MRT_UNUSED;
   tempmr->flags=0;
 //Maybe !!! Change this to 0xF0000000 !!!
   tempmr->base=0xE0000000;
   tempmr->size=0x10000000;
-  QueIns(tempmr,dev.mem32_root.last);
+  QueIns(tempmr,dev.mem32_head.last);
 
   if (m20->type) {
     while (m20->type) {
@@ -67,10 +67,13 @@ U0 MemPagesNotPresentMark()
     m20++;
   }
   if (max_physical>=0x1000000+m01[1]<<16) {
-    a=(max_physical+0x1FFFFF)&~0x1FFFFF;
+    if (sys_gig_pages)
+      a=(max_physical+0x3FFFFFFF)&~0x3FFFFFFF;
+    else
+      a=(max_physical+0x1FFFFF)&~0x1FFFFF;
     while (a<MEM_MAPPED_SPACE) {
       MemPagePresentMark(a,FALSE);
-      a+=0x200000;
+      a+=MemPageSize(a);
     }
   }
 }
@@ -83,8 +86,8 @@ U8 *Mem32DevAlloc(I64 size,I64 alignment)
   CMemRange *tempmr,*tempmr1;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr1=dev.mem32_root.next;
-  while (tempmr1!=&dev.mem32_root) {
+  tempmr1=dev.mem32_head.next;
+  while (tempmr1!=&dev.mem32_head) {
     base=(tempmr1->base+alignment-1)&~(alignment-1);
     limit=base+size-1;
     if (!tempmr1->type &&
@@ -114,8 +117,8 @@ U0 Mem32DevFree(U8 *base)
   if (!base) return;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=dev.mem32_root.next;
-  while (tempmr!=&dev.mem32_root) {
+  tempmr=dev.mem32_head.next;
+  while (tempmr!=&dev.mem32_head) {
     if (tempmr->base==base) {
       tempmr->type=MRT_UNUSED;
       break;
@@ -125,40 +128,47 @@ U0 Mem32DevFree(U8 *base)
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 }
 
-U8 *Mem64DevAlloc(I64 *_pages2Meg)
+U8 *Mem64DevAlloc(I64 *_pages1Gig)
 {//Alloc 64-bit addr space for device.
-  U8 *res;
-  I64 i=*_pages2Meg,*pte;
+  U8 *a;
+  I64 i=*_pages1Gig,*pte;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
   while (i--) {
-    dev.mem64_ptr-=0x200000;
-    pte=MemPageTable(dev.mem64_ptr);
-    *pte=*pte&~0x18 |0x11; //Uncached and present
-    InvlPg(dev.mem64_ptr);
+    a=dev.mem64_ptr-=1<<30;
+    do {
+      pte=MemPageTable(a);
+      *pte=*pte&~0x18 |0x11; //Uncached and present
+      InvlPg(dev.mem64_ptr);
+      a+=MemPageSize(a);
+    } while (a-dev.mem64_ptr<1<<30);
   }
-  res=dev.mem64_ptr;
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
-  return res;
+  return dev.mem64_ptr;
 }
 
-U0 Mem64DevFree(U8 *base,I64 pages2Meg)
+U0 Mem64DevFree(U8 *base,I64 pages1Gig)
 {//Free 64-bit device address space.
   if (!base) return;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
   if (base==dev.mem64_ptr)
-    dev.mem64_ptr+=pages2Meg*0x200000;
+    dev.mem64_ptr+=pages1Gig*1<<30;
 //else not freed
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 }
 
-U8 *MemVGAAlloc()
+U0 UncachedAliasAlloc() //Make uncached alias for 4 lowest Gig.
 {
-  I64 i=1,*a=Mem64DevAlloc(&i),*pte=MemPageTable(a);
-  *pte=0x197;
-  InvlPg(a);
-  return a;
+  I64 i=4,*pte;
+  U8 *a;
+  a=dev.uncached_alias=Mem64DevAlloc(&i);
+  do {
+    pte=MemPageTable(a);
+    *pte=0x197+a-dev.uncached_alias;
+    InvlPg(a);
+    a+=MemPageSize(a);
+  } while (a-dev.uncached_alias<1<<32);
 }
 
 I64 BIOSTotalMem()
@@ -191,4 +201,4 @@ I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024)
     return max;
   else
     return min+(max-min)*i/limit;
-}
+  }

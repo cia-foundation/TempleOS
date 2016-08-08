@@ -88,8 +88,8 @@ Bool PsmIsDotted(I64 duration)
 
 U0 PsmMarkSel(I64 x1,I64 x2,Bool sel)
 {
-  PsmNote *tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  PsmNote *tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     if (sel) {
       if (x1<=tempo->x<=x2)
 	tempo->flags|=PSMF_SEL;
@@ -150,12 +150,12 @@ U0 DrawTimeSignature(CDC *dc,I64 x,I64 y,I64 top,I64 bottom)
 U0 PsmRecalcNoteXY()
 {
   F64 measure_len=4,measure_left=measure_len;
-  PsmNote *tempo=oc.root.next;
+  PsmNote *tempo=oc.head.next;
   I64 x=8-oc.screen_x,note,octave;
   while (TRUE) {
     tempo->x=x;
     tempo->y=50;
-    if (tempo==&oc.root)
+    if (tempo==&oc.head)
       break;
     else {
       if (tempo->type!=PSMT_METER) {
@@ -215,8 +215,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     PsmRecalcNoteXY;
   }
 
-  tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     x=tempo->x;
     y=tempo->y;
     if (measure_left<0.001) {
@@ -258,11 +258,11 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempo=tempo->next;
   }
 
-  if (oc.cur_note==&oc.root && PsmBlink)
+  if (oc.cur_note==&oc.head && PsmBlink)
     dc->color=BROWN;
   else
     dc->color=BLACK;
-  Sprite3(dc,oc.root.x,50,0,$IB,"<12>",BI=12$);
+  Sprite3(dc,oc.head.x,50,0,$IB,"<12>",BI=12$);
 }
 
 #define PSM_NOTE_BOX_X	220

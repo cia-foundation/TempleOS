@@ -109,14 +109,14 @@ class Peasant
   Peasant *next,*last;
   F64 x,y,é,door_opened_t0;
   Bool stopped;
-} peasant_root;
+} peasant_head;
 
 class Step
 {
   Step *next,*last;
   U16 x,y;
   F64 t0;
-} step_root,king_step_root;
+} step_head,king_step_head;
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
@@ -157,8 +157,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     }
   }
 
-  tempst=step_root.next;
-  while (tempst!=&step_root) {
+  tempst=step_head.next;
+  while (tempst!=&step_head) {
     if (tS-tempst->t0<2.0)
       dc->color=DKGRAY;
     else
@@ -171,8 +171,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   DCDepthBufAlloc(dc);
   dc->flags|=DCF_TRANSFORMATION;
   dc->pen_width=1;
-  tempp=peasant_root.next;
-  while (tempp!=&peasant_root) {
+  tempp=peasant_head.next;
+  while (tempp!=&peasant_head) {
     Mat4x4IdentEqu(r);
     Mat4x4RotY(r,tempp->é+ã/2);
     Mat4x4RotX(r,ã/6);
@@ -230,7 +230,7 @@ U0 StepNew(CTask *task,I64 x,I64 y,F64 é,Bool left_right,Bool king)
     temps->x=x;
     temps->y=y;
     temps->t0=tS;
-    QueIns(temps,king_step_root.last);
+    QueIns(temps,king_step_head.last);
   }
 
   if (left_right) {
@@ -238,23 +238,23 @@ U0 StepNew(CTask *task,I64 x,I64 y,F64 é,Bool left_right,Bool king)
     temps->x=x-3.5*Sin(é)+2.0*Cos(é);
     temps->y=y+3.5*Cos(é)+2.0*Sin(é);
     temps->t0=tS;
-    QueIns(temps,step_root.last);
+    QueIns(temps,step_head.last);
     temps=MAlloc(sizeof(Step),task);
     temps->x=x-3.5*Sin(é)+5.0*Cos(é);
     temps->y=y+3.5*Cos(é)+5.0*Sin(é);
     temps->t0=tS;
-    QueIns(temps,step_root.last);
+    QueIns(temps,step_head.last);
   } else {
     temps=MAlloc(sizeof(Step),task);
     temps->x=x+3.5*Sin(é)+0.0*Cos(é);
     temps->y=y-3.5*Cos(é)+0.0*Sin(é);
     temps->t0=tS;
-    QueIns(temps,step_root.last);
+    QueIns(temps,step_head.last);
     temps=MAlloc(sizeof(Step),task);
     temps->x=x+3.5*Sin(é)+3.0*Cos(é);
     temps->y=y-3.5*Cos(é)+3.0*Sin(é);
     temps->t0=tS;
-    QueIns(temps,step_root.last);
+    QueIns(temps,step_head.last);
   }
 }
 
@@ -275,11 +275,11 @@ U0 Init()
     trees[i].fire_frame_idx=0;
   }
 
-  QueInit(&step_root);
-  QueInit(&king_step_root);
+  QueInit(&step_head);
+  QueInit(&king_step_head);
 
   SpriteExtents($IB,"<12>",BI=12$,&min_x,&max_x,&min_y,&max_y);
-  QueInit(&peasant_root);
+  QueInit(&peasant_head);
   for (i=0;i<NUM_PEASANTS;i++) {
     tempp=MAlloc(sizeof(Peasant));
     tempp->x=RandU16%(w-2*BORDER-(max_x-min_x+1))+BORDER-min_x;
@@ -287,7 +287,7 @@ U0 Init()
     tempp->é=ã*2*Rand;
     tempp->door_opened_t0=0;
     tempp->stopped=FALSE;
-    QueIns(tempp,peasant_root.last);
+    QueIns(tempp,peasant_head.last);
   }
   animate_phase=0;
   animate_mS=0;
@@ -305,16 +305,16 @@ U0 Init()
 U0 CleanUp()
 {
   DCDel(snow_tile);
-  QueDel(&peasant_root,TRUE);
-  QueDel(&step_root,TRUE);
-  QueDel(&king_step_root,TRUE);
+  QueDel(&peasant_head,TRUE);
+  QueDel(&step_head,TRUE);
+  QueDel(&king_step_head,TRUE);
 }
 
 U0 Follow(CTask *,Peasant *tempp)
 {
-  Step *temps=king_step_root.next;
+  Step *temps=king_step_head.next;
   F64 d,best_d=MAX_F64;
-  while (temps!=&king_step_root) {
+  while (temps!=&king_step_head) {
     if ((d=Sqr(temps->x-tempp->x)+Sqr(temps->y-tempp->y)) &&
 	  d<15*15) {
       d+=1000*Sqr(tS-temps->t0);
@@ -336,8 +336,8 @@ U0 AnimateTask(I64)
     w=Fs->parent_task->pix_width;
     h=Fs->parent_task->pix_height;
 
-    temps=step_root.next;
-    while (temps!=&step_root) {
+    temps=step_head.next;
+    while (temps!=&step_head) {
       temps1=temps->next;
       if (tS-temps->t0>5.0) {
 	QueRem(temps);
@@ -346,8 +346,8 @@ U0 AnimateTask(I64)
       temps=temps1;
     }
 
-    temps=king_step_root.next;
-    while (temps!=&king_step_root) {
+    temps=king_step_head.next;
+    while (temps!=&king_step_head) {
       temps1=temps->next;
       if (tS-temps->t0>3.0) {
 	QueRem(temps);
@@ -357,8 +357,8 @@ U0 AnimateTask(I64)
     }
 
     not_stopped_cnt=0;
-    tempp=peasant_root.next;
-    while (tempp!=&peasant_root) {
+    tempp=peasant_head.next;
+    while (tempp!=&peasant_head) {
       if (tempp->stopped) {
 	if (tempp->door_opened_t0 && tS>tempp->door_opened_t0+1.0) {
 	  tempp->door_opened_t0=0;

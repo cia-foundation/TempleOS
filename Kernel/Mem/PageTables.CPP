@@ -7,37 +7,59 @@ SYS_INIT_PAGE_TABLES::
 	MOV	EDI,SYS_FIXED_AREA
 	XOR	EAX,EAX
 	MOV	ECX,sizeof(CSysFixedArea)/4
-	REP_STOSD			//Init entire SYS_FIXED_AREA to zero
+	REP_STOSD	//Init entire SYS_FIXED_AREA to zero
 
-//PML2
-	MOV	EAX,0x87 //bit 7 is page size (1==2Meg)
+	MOV	EAX,0x80000001
+	CPUID
+	BT	EDX,26
+	JC	@@15
+
+	MOV	U8 [SYS_GIG_PAGES],FALSE
+//PML2: Use 2Meg PAges
+	MOV	EAX,0x87 //bit 7 is page size (2Meg)
 	XOR	EDX,EDX
 	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2
-	MOV	ECX,MEM_NUM_PML2*0x200
-@@20:	MOV	U32 [EDI],EAX
+	MOV	ECX,MEM_NUM_2MEG
+@@05:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
 	ADD	EDI,4
 	ADD	EAX,0x200000
 	ADC	EDX,0
-	LOOP	@@20
-
-//0xE0000000-0xFFFFFFFF: PCI Devs
-	MOV	EAX,0x17	//Cache disabled
-	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2+8*0x700
-	MOV	ECX,0x800-0x700
-@@25:	OR	U32 [EDI],EAX
-	ADD	EDI,4
-	OR	U32 [EDI],EDX
-	ADD	EDI,4
-	LOOP	@@25
-
-//PML3
+	LOOP	@@05
+//PML3: Use 2Meg Pages
 	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml2+7
 	XOR	EDX,EDX
 	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml3
-	MOV	ECX,MEM_NUM_PML2
+	MOV	ECX,MEM_NUM_USED_1GIG
+@@10:	MOV	U32 [EDI],EAX
+	ADD	EDI,4
+	MOV	U32 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x1000
+	ADC	EDX,0
+	LOOP	@@10
+	JMP	@@25
+
+@@15:	MOV	U8 [SYS_GIG_PAGES],TRUE
+//PML3: Use 1Gig Pages
+	MOV	EAX,0x87 //bit 7 is page size (1Gig)
+	XOR	EDX,EDX
+	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml3
+	MOV	ECX,MEM_NUM_USED_1GIG
+@@20:	MOV	U32 [EDI],EAX
+	ADD	EDI,4
+	MOV	U32 [EDI],EDX
+	ADD	EDI,4
+	ADD	EAX,0x40000000
+	ADC	EDX,0
+	LOOP	@@20
+
+//PML4
+@@25:	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml3+7
+	XOR	EDX,EDX
+	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml4
+	MOV	ECX,MEM_NUM_1GIG/(0x1000/8)
 @@30:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
@@ -45,19 +67,6 @@ SYS_INIT_PAGE_TABLES::
 	ADD	EAX,0x1000
 	ADC	EDX,0
 	LOOP	@@30
-
-//PML4
-	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml3+7
-	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml4
-	MOV	ECX,MEM_NUM_PML3
-@@35:	MOV	U32 [EDI],EAX
-	ADD	EDI,4
-	MOV	U32 [EDI],EDX
-	ADD	EDI,4
-	ADD	EAX,0x1000
-	ADC	EDX,0
-	LOOP	@@35
 
 	MOV	U32 [SYS_CODE_BP],SYS_FIXED_AREA+CSysFixedArea.adam_bp
 	MOV	U32 [SYS_CODE_BP+4],0
@@ -93,7 +102,7 @@ pain without MAlloc up-and-running.
 
 //EBX=BASE EAX=SIZE
 	TEST	U8 [SYS_MEM_INIT_FLAG],1
-	JZ	@@40
+	JZ	@@35
 	PUSH	EAX
 	MOV	EDI,EBX
 	MOV	ECX,EAX
@@ -101,7 +110,7 @@ pain without MAlloc up-and-running.
 	REP_STOSB
 	POP	EAX
 
-@@40:	SHR	EAX,MEM_PAGE_BITS
+@@35:	SHR	EAX,MEM_PAGE_BITS
 	MOV	ESI,SYS_FIXED_AREA+CSysFixedArea.adam_bp
 	MOV	EDI,U32 CBlkPool.mem_free_lst[ESI]
 	MOV	U32 CMemBlk.next[EBX],EDI
@@ -117,7 +126,18 @@ pain without MAlloc up-and-running.
 
 I64 *MemPageTable(U8 *a)
 {//Point to page table entry for addr.
-  return SYS_FIXED_AREA+offset(CSysFixedArea.pml2)+a>>21*8;
+  if (sys_gig_pages)
+    return SYS_FIXED_AREA+offset(CSysFixedArea.pml3)+a>>30*8;
+  else
+    return SYS_FIXED_AREA+offset(CSysFixedArea.pml2)+a>>21*8;
+}
+
+I64 MemPageSize(U8 *)
+{//Page table entry size for addr.
+  if (sys_gig_pages)
+    return 1<<30; //1Gig
+  else
+    return 1<<21; //2Meg
 }
 
 Bool MemPagePresentMark(U8 *a,Bool val)

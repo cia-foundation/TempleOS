@@ -4,7 +4,7 @@ class CLine
   U8 *line;
 };
 
-U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
+U0 EdLiteUpdate(CLine *head,CLine *cur_line,I64 cur_col,I64 line_start_col)
 {
   I64 ch,i,j,k,k2,cursor_col,cursor_row=-1;
   U8 *st;
@@ -12,7 +12,7 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
   Bool done_eof=FALSE;
   text.raw_col=0;
   for (i=0;i<text.rows/2;i++)
-    if (templ->last!=root)
+    if (templ->last!=head)
       templ=templ->last;
   for (i=0;i<text.rows;i++) {
     if (cursor_row<0 && templ==cur_line) {
@@ -25,7 +25,7 @@ U0 EdLiteUpdate(CLine *root,CLine *cur_line,I64 cur_col,I64 line_start_col)
       cursor_col=k;
       cursor_row=i;
     }
-    if (templ!=root) {
+    if (templ!=head) {
       st=templ->line;
       k=0;
       j=0;
@@ -60,7 +60,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   U8 *src,*src2,*src3,*dst,*buf,*bin_data=NULL;
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
 	old_raw_flags=text.raw_flags;
-  CLine root,*templ,*templ1,*cur_line;
+  CLine head,*templ,*templ1,*cur_line;
   Bool	res=FALSE,
 	old_raw=Raw(ON),
 	old_debug=InDbg(ON),
@@ -73,8 +73,8 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   CLI
   text.raw_flags=text.raw_flags&~RWF_SCROLL|RWF_SHOW_DOLLAR;
   kbd.scan_code=0;
-  QueInit(&root);
-  root.line=StrNew("");
+  QueInit(&head);
+  head.line=StrNew("");
 
   if (buf) {
     src=buf;
@@ -95,7 +95,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 
       templ=MAlloc(sizeof(CLine));
       templ->line=StrNew(src2);
-      QueIns(templ,root.last);
+      QueIns(templ,head.last);
       cnt++;
     }
 
@@ -107,7 +107,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
     res=TRUE;
   }
 
-  cur_line=root.next;
+  cur_line=head.next;
   if (--num<0)
     res=FALSE;
   else {
@@ -115,29 +115,29 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
       while (num--)
 	cur_line=cur_line->next;
     else {
-      cur_line=&root;
+      cur_line=&head;
       res=FALSE;
     }
   }
   do {
-    if (cur_line==&root)
+    if (cur_line==&head)
       cur_col=0;
     while (cur_col-line_start_col<0)
       line_start_col-=8;
     while (cur_col-line_start_col>=text.cols)
       line_start_col+=8;
-    EdLiteUpdate(&root,cur_line,cur_col,line_start_col);
+    EdLiteUpdate(&head,cur_line,cur_col,line_start_col);
     switch (ch=GetKey(&sc,FALSE,TRUE)) {
       case 0:
 	switch (sc.u8[0]) {
 	  case SC_CURSOR_UP:
-	    if (cur_line->last!=&root)
+	    if (cur_line->last!=&head)
 	      cur_line=cur_line->last;
 	    if (cur_col>StrLen(cur_line->line))
 	      cur_col=StrLen(cur_line->line);
 	    break;
 	  case SC_CURSOR_DOWN:
-	    if (cur_line!=&root)
+	    if (cur_line!=&head)
 	      cur_line=cur_line->next;
 	    if (cur_col>StrLen(cur_line->line))
 	      cur_col=StrLen(cur_line->line);
@@ -146,7 +146,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	    cur_col++;
 	    if (cur_col>StrLen(cur_line->line)) {
 	      templ=cur_line->next;
-	      if (templ!=&root) {
+	      if (templ!=&head) {
 		cur_col=0;
 		cur_line=templ;
 	      } else
@@ -158,7 +158,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	      cur_col--;
 	    else {
 	      templ=cur_line->last;
-	      if (templ!=&root) {
+	      if (templ!=&head) {
 		cur_line=templ;
 		cur_col=StrLen(templ->line);
 	      }
@@ -166,7 +166,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	    break;
 	  case SC_PAGE_UP:
 	    for (i=1;i<text.rows;i++) {
-	      if (cur_line->last!=&root)
+	      if (cur_line->last!=&head)
 		cur_line=cur_line->last;
 	      if (cur_col>StrLen(cur_line->line))
 		cur_col=StrLen(cur_line->line);
@@ -174,7 +174,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	    break;
 	  case SC_PAGE_DOWN:
 	    for (i=1;i<text.rows;i++) {
-	      if (cur_line!=&root)
+	      if (cur_line!=&head)
 		cur_line=cur_line->next;
 	      if (cur_col>StrLen(cur_line->line))
 		cur_col=StrLen(cur_line->line);
@@ -183,7 +183,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	  case SC_DELETE:
 	    if (cur_col==StrLen(cur_line->line)) {
 	      templ=cur_line->next;
-	      if (cur_line!=&root && templ!=&root) {
+	      if (cur_line!=&head && templ!=&head) {
 		src=MStrPrint("%s%s",cur_line->line,templ->line);
 		Free(cur_line->line);
 		Free(templ->line);
@@ -209,7 +209,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	if (cur_col) {
 	  StrCpy(cur_line->line+cur_col-1,cur_line->line+cur_col);
 	  cur_col--;
-	} else if (cur_line!=&root && cur_line->last!=&root) {
+	} else if (cur_line!=&head && cur_line->last!=&head) {
 	  templ=cur_line->last;
 	  src=MStrPrint("%s%s",templ->line,cur_line->line);
 	  cur_col=StrLen(templ->line);
@@ -222,7 +222,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	}
 	break;
       case CH_CTRLY:
-	if (cur_line!=&root) {
+	if (cur_line!=&head) {
 	  templ=cur_line;
 	  cur_line=cur_line->next;
 	  QueRem(templ);
@@ -233,10 +233,10 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	break;
       default:
 	if (Bt(chars_bmp_getkey,ch)) {
-	  if (cur_line==&root) {
+	  if (cur_line==&head) {
 	    cur_line=MAlloc(sizeof(CLine));
 	    cur_line->line=StrNew("");
-	    QueIns(cur_line,root.last);
+	    QueIns(cur_line,head.last);
 	  }
 	  src=MAlloc(StrLen(cur_line->line)+2);
 	  MemCpy(src,cur_line->line,cur_col);
@@ -258,15 +258,15 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   } else {
     size=bin_size;
 
-    templ=root.next;
-    while (templ!=&root) {
+    templ=head.next;
+    while (templ!=&head) {
       size+=StrLen(templ->line)+1;
       templ=templ->next;
     }
 
     buf=dst=MAlloc(size);
-    templ=root.next;
-    while (templ!=&root) {
+    templ=head.next;
+    while (templ!=&head) {
       i=StrLen(templ->line);
       MemCpy(dst,templ->line,i);
       dst+=i;
@@ -282,15 +282,15 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
       res=TRUE;
   }
 
-  templ=root.next;
-  while (templ!=&root) {
+  templ=head.next;
+  while (templ!=&head) {
     templ1=templ->next;
     QueRem(templ);
     Free(templ->line);
     Free(templ);
     templ=templ1;
   }
-  Free(root.line);
+  Free(head.line);
   Free(bin_data);
   Raw(old_raw);
   InDbg(old_debug);

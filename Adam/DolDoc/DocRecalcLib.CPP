@@ -8,7 +8,7 @@ I64 DocCharDist(CDoc *doc,I64 x,I64 y)
 
 U0 DocDelToNum(CDoc *doc,I64 num)
 {
-  CDocEntry *doc_e=doc->root.next,*doc_e2;
+  CDocEntry *doc_e=doc->head.next,*doc_e2;
   while (num-->0 && doc_e!=doc) {
     doc_e2=doc_e->next;
     if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))) {
@@ -24,7 +24,7 @@ U0 DocDelToNum(CDoc *doc,I64 num)
 
 U0 DocDelToEntry(CDoc *doc,CDocEntry *clear_entry,Bool clear_holds)
 {
-  CDocEntry *doc_e=doc->root.next,*doc_e2;
+  CDocEntry *doc_e=doc->head.next,*doc_e2;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
     if (!(doc_e->de_flags & (DOCEF_HOLD|DOCEF_FILTER_SKIP))||clear_holds) {
@@ -76,7 +76,7 @@ public U0 DocTop(CDoc *doc=NULL)
   if (!doc && !(doc=DocPut))
     return;
   unlock=DocLock(doc);
-  doc->cur_entry=doc->root.next;
+  doc->cur_entry=doc->head.next;
   doc->cur_col=doc->cur_entry->min_col;
   doc->x=0;
   doc->y=0;
@@ -161,7 +161,7 @@ public U0 DocCollapse(Bool collapse=TRUE,CDoc *doc=NULL)
   if (!doc && !(doc=DocPut))
     return;
   unlock=DocLock(doc);
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->de_flags&DOCEF_TREE)
       BEqu(&doc_e->de_flags,DOCEf_CHECKED_COLLAPSED,collapse);

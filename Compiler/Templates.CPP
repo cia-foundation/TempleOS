@@ -4,8 +4,7 @@ CMP_TEMPLATES::
 	DU32	@@05,@@10,@@15,@@25,@@30,
 		@@35,@@40,@@45,@@55,@@60,
 		@@75,@@80,@@85,@@90,@@95,
-		@@100,@@105,@@110,@@115,@@125,
-		@@135;
+		@@100,@@105,@@110,@@120,@@130;
 
 @@05:	//INC
 	PUSH	RAX
@@ -109,77 +108,72 @@ CMP_TEMPLATES::
 @@70:
 @@75:
 @@80:
-@@85:
-	MOV	EAX,HPET_MAIN_CNT
-	MOV	RAX,U64 [RAX]
-
-@@90: //Sqr
+@@85: //Sqr
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FMUL	ST0,ST0
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@95: //Abs
+@@90: //Abs
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FABS
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@100: //Sqrt
+@@95: //Sqrt
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FSQRT
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@105: //Sin
+@@100: //Sin
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FSIN
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@110: //Cos
+@@105: //Cos
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FCOS
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@115: //Tan
+@@110: //Tan
 	PUSH	RAX
 	FLD	U64 [RSP]
-@@120:	FPTAN
+@@115:	FPTAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@120
+	JNZ	@@115
 	FFREE	ST0
 	FINCSTP
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@125: //Atan
+@@120: //Atan
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FLD1
-@@130:	FPATAN
+@@125:	FPATAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@130
+	JNZ	@@125
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@135:
+@@130:
 
 //************************************
 CMP_TEMPLATES_DONT_POP::
 	DU32	@@05,@@10,@@15,@@20,@@25,
 		@@30,@@35,@@40,@@45,@@50,
 		@@55,@@60,@@65,@@70,@@75,
-		@@80,@@85,@@90,@@95,@@105,
-		@@115;
+		@@80,@@85,@@90,@@100,@@110;
 
 @@05:	//INC
 	PUSH	RAX
@@ -208,67 +202,65 @@ CMP_TEMPLATES_DONT_POP::
 	PUSH	RAX
 	FLD	U64 [RSP]
 	ADD	RSP,8
-@@65:
 
-@@70: //Sqr
+@@65: //Sqr
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FMUL	ST0,ST0
 	ADD	RSP,8
 
-@@75: //Abs
+@@70: //Abs
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FABS
 	ADD	RSP,8
 
-@@80: //Sqrt
+@@75: //Sqrt
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FSQRT
 	ADD	RSP,8
 
-@@85: //Sin
+@@80: //Sin
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FSIN
 	ADD	RSP,8
 
-@@90: //Cos
+@@85: //Cos
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FCOS
 	ADD	RSP,8
 
-@@95: //Tan
+@@90: //Tan
 	PUSH	RAX
 	FLD	U64 [RSP]
-@@100:	FPTAN
+@@95:	FPTAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@100
+	JNZ	@@95
 	FFREE	ST0
 	FINCSTP
 	ADD	RSP,8
 
-@@105: //Atan
+@@100: //Atan
 	PUSH	RAX
 	FLD	U64 [RSP]
 	FLD1
-@@110:	FPATAN
+@@105:	FPATAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@110
+	JNZ	@@105
 	ADD	RSP,8
-@@115:
+@@110:
 
 //************************************
 CMP_TEMPLATES_DONT_PUSH::
 	DU32	@@05,@@10,@@15,@@20,@@30,
 		@@35,@@40,@@50,@@55,@@60,
 		@@65,@@70,@@75,@@80,@@85,
-		@@90,@@95,@@100,@@105,@@115,
-		@@125;
+		@@90,@@95,@@100,@@110,@@120;
 
 @@05:	//INC
 	SUB	RSP,8
@@ -336,66 +328,64 @@ CMP_TEMPLATES_DONT_PUSH::
 	FSTP	U64 [RSP]
 	POP	RAX
 @@70:
-@@75:
-@@80: //Sqr
+@@75: //Sqr
 	SUB	RSP,8
 	FMUL	ST0,ST0
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@85: //Abs
+@@80: //Abs
 	SUB	RSP,8
 	FABS
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@90: //Sqrt
+@@85: //Sqrt
 	SUB	RSP,8
 	FSQRT
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@95: //Sin
+@@90: //Sin
 	SUB	RSP,8
 	FSIN
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@100: //Cos
+@@95: //Cos
 	SUB	RSP,8
 	FCOS
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@105: //Tan
+@@100: //Tan
 	SUB	RSP,8
-@@110:	FPTAN
+@@105:	FPTAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@110
+	JNZ	@@105
 	FFREE	ST0
 	FINCSTP
 	FSTP	U64 [RSP]
 	POP	RAX
 
-@@115: //Atan
+@@110: //Atan
 	SUB	RSP,8
 	FLD1
-@@120:	FPATAN
+@@115:	FPATAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@120
+	JNZ	@@115
 	FSTP	U64 [RSP]
 	POP	RAX
-@@125:
+@@120:
 
 //************************************
 CMP_TEMPLATES_DONT_PUSH_POP::
 	DU32	@@05,@@10,@@15,@@20,@@25,
 		@@30,@@35,@@40,@@45,@@50,
 		@@55,@@60,@@65,@@70,@@75,
-		@@80,@@85,@@90,@@95,@@100,
-		@@110;
+		@@80,@@85,@@90,@@95,@@105;
 
 @@05:	//INC
 	SUB	RSP,8
@@ -421,45 +411,43 @@ CMP_TEMPLATES_DONT_PUSH_POP::
 @@50:
 @@55:
 @@60:
-@@65:
-@@70: //Sqr
+@@65: //Sqr
 	FMUL	ST0,ST0
 
-@@75: //Abs
+@@70: //Abs
 	FABS
 
-@@80: //Sqrt
+@@75: //Sqrt
 	FSQRT
 
-@@85: //Sin
+@@80: //Sin
 	FSIN
 
-@@90: //Cos
+@@85: //Cos
 	FCOS
 
-@@95: //Tan
+@@90: //Tan
 	FPTAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@95
+	JNZ	@@90
 	FFREE	ST0
 	FINCSTP
 
-@@100: //Atan
+@@95: //Atan
 	FLD1
-@@105:	FPATAN
+@@100:	FPATAN
 	FSTSW
 	TEST	AX,0x400
-	JNZ	@@105
-@@110:
+	JNZ	@@100
+@@105:
 
 //************************************
 CMP_TEMPLATES_DONT_PUSH2::
 	DU32	@@05,@@10,@@15,@@20,@@25,
 		@@35,@@45,@@50,@@55,@@60,
 		@@65,@@70,@@75,@@80,@@85,
-		@@90,@@95,@@100,@@105,@@110,
-		@@115;
+		@@90,@@95,@@100,@@105,@@110;
 
 @@05:
 @@10:
@@ -521,5 +509,4 @@ CMP_TEMPLATES_DONT_PUSH2::
 @@100:
 @@105:
 @@110:
-@@115:
 }

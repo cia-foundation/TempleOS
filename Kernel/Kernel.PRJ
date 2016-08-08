@@ -11,7 +11,9 @@
 };
 
 #include "KernelA.HPP"
-#include "KStart"
+#include "KStart16"
+#include "KStart32"
+#include "KStart64"
 #include "KMathA"
 #include "KUtils"
 #exe {Option(OPTf_KEEP_PRIVATE,ON);};

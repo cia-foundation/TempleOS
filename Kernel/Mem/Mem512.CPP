@@ -57,7 +57,7 @@ Return: NULL if out of memory.
       } while (i<64-MEM_PAGE_BITS-1);
       pages512=0;
       res=NULL; //Out of memory
-      goto at_done;
+      goto at_done2;
     }
     if (res->pages<pages512)
       m=res;
@@ -74,7 +74,8 @@ Return: NULL if out of memory.
     }
   }
 at_done:
-  bp->used_u8s+=pages512<<MEM_PAGE_BITS;
+  bp->used_u8s+=res->pages<<MEM_PAGE_BITS;
+at_done2:
   LBtr(&bp->locked_flags,BPlf_LOCKED);
   POPFD
   return res;

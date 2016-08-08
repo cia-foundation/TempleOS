@@ -2,8 +2,8 @@ U0 BgtAcctsUpdate()
 {
   CBgtEntry	*tempb;
   CBgtTemplate	*tempt;
-  tempb=b_root.next;
-  while (tempb!=&b_root) {
+  tempb=b_head.next;
+  while (tempb!=&b_head) {
     if (tempb->type!=BE_TEMPLATE_COPY) {
       tempb->credit_idx=StrFileAdd(tempb->credit,
 	    &accts_table_strs,accts_table);
@@ -12,8 +12,8 @@ U0 BgtAcctsUpdate()
     }
     tempb=tempb->next;
   }
-  tempt=t_root.next;
-  while (tempt!=&t_root) {
+  tempt=t_head.next;
+  while (tempt!=&t_head) {
     tempt->b.credit_idx=StrFileAdd(tempt->b.credit,
 	  &accts_table_strs,accts_table);
     tempt->b.debit_idx =StrFileAdd(tempt->b.debit,

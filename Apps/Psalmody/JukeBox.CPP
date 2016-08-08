@@ -32,7 +32,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       if (StrLen(doc_ce->tag)>1)
 	doc_ce->tag[0]=ch;
       s=DocRead(tempde->full_name);
-      doc_e=s->root.next;
+      doc_e=s->head.next;
       while (doc_e!=s && doc_e->type_u8!=DOCT_TEXT)
 	doc_e=doc_e->next;
       if (doc_e!=s && doc_e->type_u8==DOCT_TEXT && StrLen(doc_e->tag)>=3) {
@@ -77,7 +77,7 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
       st=StrNew(tempde->name);
       FileExtRem(st);
       s=DocRead(tempde->full_name);
-      doc_e=s->root.next;
+      doc_e=s->head.next;
       while (doc_e!=s && doc_e->type_u8!=DOCT_TEXT)
 	doc_e=doc_e->next;
       rating='0';

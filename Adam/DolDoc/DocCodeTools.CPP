@@ -343,7 +343,7 @@ I64 EdRAGetU8(CDoc *doc)
   return res;
 }
 
-U0 EdRACollect(CDoc *doc,CRenum *root)
+U0 EdRACollect(CDoc *doc,CRenum *head)
 {
   I64 ch,i;
   CRenum *tempr;
@@ -373,7 +373,7 @@ U0 EdRACollect(CDoc *doc,CRenum *root)
 	    ch=EdRAGetU8(doc);
 	    tempr=MAlloc(sizeof(CRenum));
 	    StrCpy(tempr->label,buf);
-	    QueIns(tempr,root->last);
+	    QueIns(tempr,head->last);
 	  }
 	}
       }
@@ -388,16 +388,16 @@ U0 EdRenumAsm(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
   I64 num=0;
-  CRenum root,*tempr,*tempr1;
+  CRenum head,*tempr,*tempr1;
   U8	buf[sizeof(CEdFindText.find_text)],
 	buf2[sizeof(CEdFindText.find_text)];
 
-  QueInit(&root);
+  QueInit(&head);
   EdSelFun(doc,TRUE);
-  EdRACollect(doc,&root);
+  EdRACollect(doc,&head);
 
-  tempr=root.next;
-  while (tempr!=&root) {
+  tempr=head.next;
+  while (tempr!=&head) {
     tempr1=tempr->next;
     num+=ASM_RENUM_SPACING;
     StrPrint(buf,"@#%02d",num);
@@ -531,7 +531,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 		x=doc_e->x+1;
 		while (i>8) {
 		  doc_ne=DocEntryNewBase(doc,
-			DOCT_TAB|doc->settings_root.dft_text_attr<<8,,
+			DOCT_TAB|doc->settings_head.dft_text_attr<<8,,
 			x,doc_e->y,doc_e->page_line_num);
 		  MemCpy(&doc_ne->settings,
 			&doc_e->settings,sizeof(CDocSettings));
@@ -544,7 +544,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 		  MemSet(b,CH_SPACE,i);
 		  b[i]=0;
 		  doc_ne=DocEntryNewBase(doc,
-			DOCT_TEXT|doc->settings_root.dft_text_attr<<8,,
+			DOCT_TEXT|doc->settings_head.dft_text_attr<<8,,
 			x,doc_e->y,doc_e->page_line_num);
 		  doc_ne->tag=b;
 		  doc_ne->max_col=1;

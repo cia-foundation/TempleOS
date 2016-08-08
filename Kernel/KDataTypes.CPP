@@ -38,10 +38,10 @@ I64 LinkedLstSize(U8 **_lst)
   return res;
 }
 
-U0 QueDel(CQue *root,Bool querem=FALSE)
-{//Free entries in queue, not root.
-  CQue *tempq=root->next,*tempq1;
-  while (tempq!=root) {
+U0 QueDel(CQue *head,Bool querem=FALSE)
+{//Free entries in queue, not head.
+  CQue *tempq=head->next,*tempq1;
+  while (tempq!=head) {
     tempq1=tempq->next;
     if (querem)
       QueRem(tempq);
@@ -50,11 +50,11 @@ U0 QueDel(CQue *root,Bool querem=FALSE)
   }
 }
 
-CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
-{//MAlloc ident copy of entire queue and root.
-  CQue *res=MAllocIdent(root,mem_task),*tempq=root->next,*tempq1;
+CQue *QueCopy(CQue *head,CTask *mem_task=NULL)
+{//MAlloc ident copy of entire queue and head.
+  CQue *res=MAllocIdent(head,mem_task),*tempq=head->next,*tempq1;
   QueInit(res);
-  while (tempq!=root) {
+  while (tempq!=head) {
     tempq1=MAllocIdent(tempq,mem_task);
     QueIns(tempq1,res->last);
     tempq=tempq->next;
@@ -62,22 +62,22 @@ CQue *QueCopy(CQue *root,CTask *mem_task=NULL)
   return res;
 }
 
-I64 QueCnt(CQue *root)
-{//Count of nodes in queue, not root.
-  CQue *tempq=root->next;
+I64 QueCnt(CQue *head)
+{//Count of nodes in queue, not head.
+  CQue *tempq=head->next;
   I64 res=0;
-  while (tempq!=root) {
+  while (tempq!=head) {
     res++;
     tempq=tempq->next;
   }
   return res;
 }
 
-I64 QueSize(CQue *root)
-{//Mem size of all nodes in queue, not root.
-  CQue *tempq=root->next;
+I64 QueSize(CQue *head)
+{//Mem size of all nodes in queue, not head.
+  CQue *tempq=head->next;
   I64 res=0;
-  while (tempq!=root) {
+  while (tempq!=head) {
     res+=MSize2(tempq);
     tempq=tempq->next;
   }

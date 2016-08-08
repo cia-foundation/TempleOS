@@ -14,24 +14,24 @@ PsmNote *PsmNoteCopy(PsmNote *tempo)
   return tempo1;
 }
 
-U0 PsmSongDel(PsmNote *root)
+U0 PsmSongDel(PsmNote *head)
 {
   PsmNote *tempo,*tempo1;
-  tempo=root->next;
-  while (tempo!=root) {
+  tempo=head->next;
+  while (tempo!=head) {
     tempo1=tempo->next;
     PsmNoteDel(tempo);
     tempo=tempo1;
   }
-  QueInit(root);
+  QueInit(head);
 }
 
 U0 PsmCutToClipboard()
 {
   PsmNote *tempo,*tempo1;
   PsmSongDel(&oc.clipboard);
-  tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     tempo1=tempo->next;
     if (tempo->flags&PSMF_SEL) {
       if (oc.cur_note==tempo)
@@ -59,8 +59,8 @@ U0 PsmCopyToClipboard()
 {
   PsmNote *tempo,*tempo1;
   PsmSongDel(&oc.clipboard);
-  tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     if (tempo->flags&PSMF_SEL) {
       tempo->flags&=~PSMF_SEL;
       tempo1=PsmNoteCopy(tempo);
@@ -72,10 +72,10 @@ U0 PsmCopyToClipboard()
 
 PsmNote *PsmFindNote(I64 x,I64)
 {
-  PsmNote *tempo=oc.root.next;
+  PsmNote *tempo=oc.head.next;
   PsmRecalcNoteXY;
   x+=PSM_NOTE_SPACING/2;
-  while (x>tempo->next->x && tempo!=&oc.root)
+  while (x>tempo->next->x && tempo!=&oc.head)
     tempo=tempo->next;
   return tempo;
 }
@@ -129,7 +129,7 @@ U0 PsmLoadSongStr(U8 *st,I64 *psm_octave,F64 *psm_duration)
 	else
 	  tempo1->meter_bottom=4;
 	PsmSetWidth(tempo1);
-	QueIns(tempo1,oc.root.last);
+	QueIns(tempo1,oc.head.last);
       }
       while (*st=='(') {
 	Bts(&tempo->flags,PSMf_TIE);
@@ -212,7 +212,7 @@ U0 PsmLoadSong(U8 *filename,I64 *psm_octave,F64 *psm_duration)
       if (!StrCmp(cc->cur_str,"Play")) {
 	if (Lex(cc)=='(')
 	  if (Lex(cc)==TK_STR) {
-	    tempo=oc.root.last;
+	    tempo=oc.head.last;
 	    st=LexExtStr(cc);
 	    PsmLoadSongStr(st,psm_octave,psm_duration);
 	    if (cc->token==',') {
@@ -220,8 +220,8 @@ U0 PsmLoadSong(U8 *filename,I64 *psm_octave,F64 *psm_duration)
 		st=LexExtStr(cc);
 		do {
 		  do tempo=tempo->next;
-		  while (tempo!=&oc.root && tempo->type==PSMT_METER);
-		  if (tempo!=&oc.root)
+		  while (tempo!=&oc.head && tempo->type==PSMT_METER);
+		  if (tempo!=&oc.head)
 		    tempo->word=StrNew(st);
 		  st+=StrLen(st)+1;
 		} while (*st);
@@ -254,10 +254,10 @@ U8 *PsmCvtSong()
   I64 i,note,octave,last_octave,last_duration;
 
   i=0;
-  tempo=oc.root.next;
+  tempo=oc.head.next;
   last_octave=OCTAVE_REST;
   last_duration=-1;
-  while (tempo!=&oc.root) {
+  while (tempo!=&oc.head) {
     dst=&tempo->ascii;
     if (tempo->type==PSMT_METER) {
       *dst++='M';
@@ -313,8 +313,8 @@ U8 *PsmCvtSong()
 
   st=MAlloc(i+1);
   dst=st;
-  tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     StrCpy(dst,tempo->ascii);
     dst+=StrLen(tempo->ascii);
     tempo=tempo->next;
@@ -338,8 +338,8 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
   music.stacatto_factor=0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
 
   has_words=FALSE;
-  tempo=oc.root.next;
-  while (tempo!=&oc.root) {
+  tempo=oc.head.next;
+  while (tempo!=&oc.head) {
     if (PsmHasWords(tempo->word)) has_words=TRUE;
     tempo=tempo->next;
   }
@@ -361,10 +361,10 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
 	"    while (!ScanKey) {\n"
 	"\tPlay(\"",music.tempo+0.0005,music.stacatto_factor+0.0005);
 
-  tempo=oc.root.next;
+  tempo=oc.head.next;
   tempo1=tempo;
   has_words=FALSE;
-  while (tempo!=&oc.root) {
+  while (tempo!=&oc.head) {
     DocPrint(doc,"%s",tempo->ascii);
     if (PsmHasWords(tempo->word)) has_words=TRUE;
     if (tempo->type==PSMT_METER) {
@@ -373,7 +373,7 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
     } else
       two_measure_left-=psm_durations[tempo->duration];
     tempo=tempo->next;
-    if (two_measure_left<0.001 && tempo!=&oc.root) {
+    if (two_measure_left<0.001 && tempo!=&oc.head) {
       if (has_words) {
 	DocPrint(doc,"\",\n\t\t\"");
 	while (tempo1!=tempo) {

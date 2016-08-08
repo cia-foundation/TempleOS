@@ -96,7 +96,7 @@ Bool LexDollar(CCmpCtrl *cc,CDoc *doc,CDocEntry *doc_e)
   if (cc->flags&CCF_IN_QUOTES) {
     Free(cc->dollar_buf);
     st=Doc2PlainText(doc,doc_e);
-    cc->dollar_buf=MStrPrint("$$%Q$$",st);
+    cc->dollar_buf=MStrPrint("$$%$$Q$$",st);
     cc->dollar_cnt=2;
     Free(st);
     return TRUE;
@@ -217,7 +217,7 @@ lgc_start2:
 	  }
 	  if (doc_e!=doc)
 	    goto lgc_start1;
-	  tempf->cur_entry=doc->root.last; //When take next, will still be end.
+	  tempf->cur_entry=doc->head.last; //When take next, will still be end.
 	}
 	tempf=cc->lex_include_stk;
 	if (tempf->next) {
@@ -338,7 +338,7 @@ U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
     tempf=LexFilePush(cc);
   }
   if (!doc_e)
-    doc_e=doc->root.next;
+    doc_e=doc->head.next;
   tempf->full_name=StrNew(doc->filename.name);
   tempf->doc=doc;
   while (doc_e!=doc) {
@@ -372,7 +372,7 @@ U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
 
 I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
 {
-  I64 i=0,j,ch;
+  I64 i=0,j,k,ch;
   *done=TRUE;
   while (i<size-1) {
     ch=LexGetChar(cc);
@@ -381,14 +381,8 @@ I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
       return i;
     } else if (ch=='\\') {
       switch (ch=LexGetChar(cc)) {
-	case 'n':
-	  buf[i++]='\n';
-	  break;
-	case 'r':
-	  buf[i++]='\r';
-	  break;
-	case '"':
-	  buf[i++]='"';
+	case '0':
+	  buf[i++]=0;
 	  break;
 	case '\'':
 	  buf[i++]='\'';
@@ -399,27 +393,37 @@ I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
 	case '\\':
 	  buf[i++]='\\';
 	  break;
+	case '"':
+	  buf[i++]='"';
+	  break;
+	case 'd':
+	  buf[i++]='$$';
+	  break;
+	case 'n':
+	  buf[i++]='\n';
+	  break;
+	case 'r':
+	  buf[i++]='\r';
+	  break;
 	case 't':
 	  buf[i++]='\t';
-	  break;
-	case '0':
-	  buf[i++]=0;
 	  break;
 	case 'x':
 	case 'X':
 	  j=0;
-	  while (TRUE) {
+	  for (k=0;k<2;k++) {
 	    ch=ToUpper(LexGetChar(cc));
 	    if (Bt(chars_bmp_hex_numeric,ch)) {
 	      if (ch<='9')
 		j=j<<4+ch-'0';
 	      else
 		j=j<<4+ch-'A'+10;
-	    } else
+	    } else {
+	      cc->flags|=CCF_USE_LAST_U16;
 	      break;
+	    }
 	  }
 	  buf[i++]=j;
-	  cc->flags|=CCF_USE_LAST_U16;
 	  break;
 	default:
 	  cc->flags|=CCF_USE_LAST_U16;
@@ -442,7 +446,7 @@ I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
 
 I64 Lex(CCmpCtrl *cc)
 {//Fetch next token.
-  I64 i,j,k,ch;
+  I64 i,j,k,l,ch;
   CHash *temph;
   Bool str_done,neg_e;
   U8 *fbuf,*buf2,*buf3,buf[STR_LEN];
@@ -640,29 +644,31 @@ lex_float_start:
 	    break;
 	  if (ch=='\\') {
 	    switch (ch=LexGetChar(cc)) {
-	      case 'n':		k.u8[j]='\n';	break;
-	      case 'r':		k.u8[j]='\r';	break;
-	      case '"':		k.u8[j]='"';	break;
+	      case '0':		k.u8[j]=0;	break;
 	      case '\'':	k.u8[j]='\'';	break;
 	      case '\`':	k.u8[j]='\`';	break;
+	      case '"':		k.u8[j]='"';	break;
 	      case '\\':	k.u8[j]='\\';	break;
+	      case 'd':		k.u8[j]='$$';	break;
+	      case 'n':		k.u8[j]='\n';	break;
+	      case 'r':		k.u8[j]='\r';	break;
 	      case 't':		k.u8[j]='\t';	break;
-	      case '0':		k.u8[j]=0;	break;
 	      case 'x':
 	      case 'X':
 		i=0;
-		while (TRUE) {
+		for (l=0;l<2;l++) {
 		  ch=ToUpper(LexGetChar(cc));
 		  if (Bt(chars_bmp_hex_numeric,ch)) {
 		    if (ch<='9')
 		      i=i<<4+ch-'0';
 		    else
 		      i=i<<4+ch-'A'+10;
-		  } else
+		  } else {
+		    cc->flags|=CCF_USE_LAST_U16;
 		    break;
+		  }
 		}
 		k.u8[j]=i;
-		cc->flags|=CCF_USE_LAST_U16;
 		break;
 	      default:
 		k.u8[j]='\\';

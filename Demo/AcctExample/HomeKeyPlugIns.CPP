@@ -41,7 +41,7 @@ U0 DocHiddenDel(CDoc *doc=NULL)
   if (doc) {
     unlock=DocLock(doc);
     DocRecalc(doc);
-    doc_e=doc->root.next;
+    doc_e=doc->head.next;
     while (doc_e!=doc) {
       doc_e1=doc_e->next;
       if (doc_e->de_flags&(DOCEF_FILTER_SKIP|DOCEF_SKIP))
@@ -165,7 +165,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	      else {
 		FifoU8Flush(god.fifo);
 		GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
-		GodBooksPassage("C:/Home/Downloads/Text/*");
+		GodBooksPassage("C:/Home/Sup1/Sup1Texts/*");
 	      }
 	    } else {
 	      if (sc&SCF_KEY_DESC)
@@ -319,9 +319,9 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'p':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /JukeBox(Home/Downloads)");
+	  KeyDescSet("Cmd /JukeBox(Home/Sup1)");
 	else
-	  JukeBox("~/Downloads/Psalmody");
+	  JukeBox("~/Sup1/Sup1Psalmody");
 	return TRUE;
       case 'P':
 	if (sc&SCF_KEY_DESC)

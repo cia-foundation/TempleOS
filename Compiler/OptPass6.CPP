@@ -105,7 +105,7 @@ U0 OptPass6(CCmpCtrl *cc)
   else
     reg_stk_size=1;
 #assert REGG_STK_TEMP==1<<9
-  tempi=cc->coc.coc_root.next;
+  tempi=cc->coc.coc_head.next;
   old_tempil2=NULL;
   tempil1=tempil2=&cmp.ic_nop;
   while (tempi->ic_code) {

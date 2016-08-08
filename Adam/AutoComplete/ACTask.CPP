@@ -126,7 +126,7 @@ U0 ACPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task,
 	      temph->src_link) {
 	  if (temph->type&HTF_PUBLIC)
 	    "$$RED$$";
-	  "$$TX+UL+L+PU,\"%Q\",A=\"%s\"$$$$FG$$\n",st,temph->src_link;
+	  "$$TX+UL+L+PU,\"%$$Q\",A=\"%s\"$$$$FG$$\n",st,temph->src_link;
 	} else
 	  "%s\n",st;
       }

@@ -70,7 +70,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,CArrayDim *tempad,
 	  ICAdd(cc,IC_ADD,0,tempc+1);
 	  if (!PrsExpression(cc,NULL,TRUE))
 	    throw('Compiler');
-	  tempi=cc->coc.coc_root.last;
+	  tempi=cc->coc.coc_head.last;
 	  if (tempi->ic_code==IC_END_EXP) {
 	    tempi->ic_code=IC_NOP1;
 	    tempi->ic_flags=0;
@@ -125,7 +125,7 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,
 {
   I64 i,j,cnt;
   U8 *st,*_b;
-  CVI2 root,*tempvi,*tempvi1;
+  CVI2 head,*tempvi,*tempvi1;
   CArrayDim *tempad1;
   tempc=OptClassFwd(tempc);
   if (tempad1=tempad->next) {
@@ -157,13 +157,13 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,
 	Lex(cc);
       }
       if (tempad1->cnt<0) {//[]
-	QueInit(&root);
+	QueInit(&head);
 	cnt=0;
 	while (cc->token!='}') {
 	  tempvi=MAlloc(offset(CVI2.base)+tempad1->total_cnt*tempc->size);
 	  _b=&tempvi->base;
 	  PrsVarInit2(cc,&_b,tempc,tempad1,data_addr_ip,_base,data_heap,pass);
-	  QueIns(tempvi,root.last);
+	  QueIns(tempvi,head.last);
 	  if (cc->token==',')
 	    Lex(cc);
 	  cnt++;
@@ -178,8 +178,8 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tempc,
 	  *_base=_b=MAlloc(i);
 	else
 	  *_base=_b=MAlloc(i,Fs->code_heap);
-	tempvi=root.next;
-	while (tempvi!=&root) {
+	tempvi=head.next;
+	while (tempvi!=&head) {
 	  tempvi1=tempvi->next;
 	  MemCpy(_b,&tempvi->base,j);
 	  _b+=j;
@@ -226,7 +226,7 @@ U0 PrsStaticInit(CCmpCtrl *cc,CMemberLst *tempm,I64 pass)
   PrsVarInit2(cc,&dst,tempc,&tempm->dim,tempm->static_data_ip,
 	&tempm->static_data,Bt(&cc->flags,CCf_AOT_COMPILE),pass);
   if (cc->flags&CCF_AOT_COMPILE && pass==2) {
-    if (cc->coc.coc_root.next!=&cc->coc.coc_root) {
+    if (cc->coc.coc_head.next!=&cc->coc.coc_head) {
       ICAdd(cc,IC_RET,0,0);
       if (machine_code=COCCompile(cc,&size,NULL,NULL)) {
 	if (pass==2) {

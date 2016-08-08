@@ -5,7 +5,7 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
   U8 *st;
   Bool found,unlock=DocLock(doc);
   CDoc *old_doc;
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   I64 res=0;
   while (doc_e!=doc) {
     if (ScanKey) {
@@ -38,8 +38,9 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
 
 I64 LinkChkFile(U8 *filename,I64 *_fuf_flags)
 {
+  I64 res;
   CDoc *doc=DocRead(filename,DOCF_NO_CURSOR);
-  I64 res=LinkChkDoc(doc,_fuf_flags);
+  res=LinkChkDoc(doc,_fuf_flags);
   DocDel(doc);
   return res;
 }

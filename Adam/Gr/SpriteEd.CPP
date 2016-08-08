@@ -1,14 +1,14 @@
 #help_index "Graphics/Sprite;Sprites"
 
-CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *root,I64 elem_num,
+CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
 	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_width=NULL,
 	I64 *_xx=NULL,I64 *_yy=NULL)
 {
-  CSprite *res=root->next;
+  CSprite *res=head->next;
   I64 width=1,xx=0,yy=0;
   CColorROPU32 color=BLACK;
   if (dc) DCRst(dc);
-  while (elem_num-->0 && res!=root) {
+  while (elem_num-->0 && res!=head) {
     switch (res->type) {
       case SPT_COLOR:
 	color=res->c.color;
@@ -49,13 +49,13 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *root,I64 elem_num,
   return res;
 }
 
-Bool SpritePolyPtPlot(CSprite *root,I64 x,I64 y,I64)
+Bool SpritePolyPtPlot(CSprite *head,I64 x,I64 y,I64)
 {
   CSprite *tempg=CAlloc(SpriteElemQuedBaseSize(SPT_PT));
   tempg->type=SPT_PT;
   tempg->p.x1=x;
   tempg->p.y1=y;
-  QueIns(tempg,root->last);
+  QueIns(tempg,head->last);
   return TRUE;
 }
 
@@ -76,19 +76,19 @@ CSprite *Sprite2SpriteQue(U8 *elems)
   return res;
 }
 
-U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL)
+U8 *SpriteQue2Sprite(CSprite *head,I64 *_size=NULL)
 {
   I64 i,size=sprite_elem_base_sizes[SPT_END];
-  CSprite *tempg=root->next;
+  CSprite *tempg=head->next;
   U8 *res,*dst;
-  while (tempg!=root) {
+  while (tempg!=head) {
     size+=SpriteElemSize(tempg);
     tempg=tempg->next;
   }
   if (_size) *_size=size;
   res=dst=MAlloc(size);
-  tempg=root->next;
-  while (tempg!=root) {
+  tempg=head->next;
+  while (tempg!=head) {
     i=SpriteElemSize(tempg);
     MemCpy(dst,&tempg->start,i);
     dst+=i;
@@ -98,25 +98,25 @@ U8 *SpriteQue2Sprite(CSprite *root,I64 *_size=NULL)
   return res;
 }
 
-U0 SpriteEdUpdate(CDoc *doc,CDocEntry *doc_ce,CSprite *root)
+U0 SpriteEdUpdate(CDoc *doc,CDocEntry *doc_ce,CSprite *head)
 {
   CDocBin *tempb=doc_ce->bin_data;
   I64 size;
   Bool unlock=DocLock(doc);
   Free(tempb->data);
-  tempb->data=SpriteQue2Sprite(root,&size);
+  tempb->data=SpriteQue2Sprite(head,&size);
   tempb->size=size;
   if (unlock)
     DocUnlock(doc);
 }
 
-U0 SpriteSetOrigin(CSprite *root,I64 dx,I64 dy,I64 dz)
+U0 SpriteSetOrigin(CSprite *head,I64 dx,I64 dy,I64 dz)
 {
   I64 i;
   I32 *ptr;
   CD3I32 *p;
-  CSprite *tempg=root->next;
-  while (tempg!=root) {
+  CSprite *tempg=head->next;
+  while (tempg!=head) {
     if (tempg->sel)
       switch (tempg->type) {
 	case SPT_ARROW:
@@ -372,14 +372,14 @@ CSprite *SpriteTransformBitMap(I64 *r,CSprite *tempg)
   return tempg1;
 }
 
-U0 SpriteTransform(I64 *r,CSprite *root)
+U0 SpriteTransform(I64 *r,CSprite *head)
 {
   I64 i,j,k,num,
 	x,y,z,x1,y1,z1,x2,y2,z2,x3,y3,z3;
   I32 *ptr;
   CD3I32 *p;
-  CSprite *tempg=root->next,root2,*tempg1,*tempg2,*tempg3;
-  while (tempg!=root) {
+  CSprite *tempg=head->next,head2,*tempg1,*tempg2,*tempg3;
+  while (tempg!=head) {
     if (tempg->sel)
       switch (tempg->type) {
 	case SPT_WIDTH:
@@ -450,7 +450,7 @@ U0 SpriteTransform(I64 *r,CSprite *root)
 	  }
 	  break;
 	case SPT_POLYPT:
-	  QueInit(&root2);
+	  QueInit(&head2);
 	  x=tempg->npu.x; y=tempg->npu.y; z=0;
 	  x1=x; y1=y; z1=z;  //unrotated cur coordinates
 	  Mat4x4MulXYZ(r,&x,&y,&z);
@@ -464,14 +464,14 @@ U0 SpriteTransform(I64 *r,CSprite *root)
 	    y1+=gr_y_offsets[j];
 	    x=x1; y=y1; z=z1;
 	    Mat4x4MulXYZ(r,&x,&y,&z);
-	    Line(&root2,x3-x2,y3-y2,0,x-x2,y-y2,0,&SpritePolyPtPlot);
+	    Line(&head2,x3-x2,y3-y2,0,x-x2,y-y2,0,&SpritePolyPtPlot);
 	    x3=x; y3=y; z3=z;
 	  }
 
 	  num=0;
-	  tempg1=root2.next;
+	  tempg1=head2.next;
 	  x3=0; y3=0; z3=0;
-	  while (tempg1!=&root2) {
+	  while (tempg1!=&head2) {
 	    tempg2=tempg1->next;
 	    if (tempg1->p.x1==x3 && tempg1->p.y1==y3) {
 	      QueRem(tempg1);
@@ -490,8 +490,8 @@ U0 SpriteTransform(I64 *r,CSprite *root)
 	  ptr=&tempg3->npu.u;
 	  x3=0;y3=0; z3=0;
 	  i=0;
-	  tempg1=root2.next;
-	  while (tempg1!=&root2) {
+	  tempg1=head2.next;
+	  while (tempg1!=&head2) {
 	    tempg2=tempg1->next;
 	    BFieldOrU32(ptr,i,
 		  polypt_map[SignI64(tempg1->p.x1-x3)+1+
@@ -553,12 +553,12 @@ U0 SpriteTransform(I64 *r,CSprite *root)
   }
 }
 
-I64 SpriteQueSelCnt(CSprite *root,Bool val=TRUE)
+I64 SpriteQueSelCnt(CSprite *head,Bool val=TRUE)
 {
   I64 res=0;
-  CSprite *tempg=root->next;
+  CSprite *tempg=head->next;
   val=ToBool(val);
-  while (tempg!=root) {
+  while (tempg!=head) {
     if (ToBool(tempg->sel)==val)
       res++;
     tempg=tempg->next;
@@ -566,11 +566,11 @@ I64 SpriteQueSelCnt(CSprite *root,Bool val=TRUE)
   return res;
 }
 
-I64 SpriteQueSelAll(CSprite *root,Bool val=TRUE)
+I64 SpriteQueSelAll(CSprite *head,Bool val=TRUE)
 {
   I64 res=0;
-  CSprite *tempg=root->next;
-  while (tempg!=root) {
+  CSprite *tempg=head->next;
+  while (tempg!=head) {
     tempg->sel=val;
     res++;
     tempg=tempg->next;
@@ -578,17 +578,17 @@ I64 SpriteQueSelAll(CSprite *root,Bool val=TRUE)
   return res;
 }
 
-CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
+CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *head,I64 *_cur_elem_num)
 {//For the side-bar
   CSprite *res=CAlloc(sizeof(CSprite)),*tempg;
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   Bool found=FALSE;
   I64 num=0;
   QueInit(res);
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_MENU_VAL && doc_e->left_exp>=0) {
-      tempg=SpriteSetSettings(,root,doc_e->left_exp);
-      if (tempg!=root) {
+      tempg=SpriteSetSettings(,head,doc_e->left_exp);
+      if (tempg!=head) {
 	tempg=MAllocIdent(tempg);
 	tempg->sel=Bt(&doc_e->type,DOCEt_SEL);
 	if (*_cur_elem_num==doc_e->left_exp) {
@@ -603,12 +603,12 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *root,I64 *_cur_elem_num)
   }
   if (!found)
     *_cur_elem_num=num;
-  QueDel(root);
-  Free(root);
+  QueDel(head);
+  Free(head);
   return res;
 }
 
-U0 SpriteSideBarPickNew(CDoc *doc,CSprite *root,I64 old_num)
+U0 SpriteSideBarPickNew(CDoc *doc,CSprite *head,I64 old_num)
 {
   CSprite *tempg;
   CDocEntry *doc_cur_e=NULL,*doc_e;
@@ -617,15 +617,15 @@ U0 SpriteSideBarPickNew(CDoc *doc,CSprite *root,I64 old_num)
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite SideBar\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\","
 	"A=\"FI:::/Doc/SpriteSideBar.TXT.Z\"$$\n\n");
-  tempg=root->next;
-  while (tempg!=root) {
+  tempg=head->next;
+  while (tempg!=head) {
     st=SpriteElem2Summary(tempg);
     if (cur_elem_num==old_num) {
       DocPrint(doc,"$$LTRED$$");
       doc_e=doc_cur_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
     } else {
       DocPrint(doc,"$$LTBLUE$$");
-      doc_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
+      doc_e=DocPrint(doc,"$$MU-UL,\"%$$Q\",LE=%d$$\n",st,cur_elem_num++);
     }
     BEqu(&doc_e->de_flags,DOCEf_SEL,tempg->sel);
     BEqu(&doc_e->type,DOCEt_SEL,tempg->sel);
@@ -659,29 +659,29 @@ U0 SpriteSideBarTask2(CTask *grand_parent)
   }
 }
 
-U0 SpriteSideBarTask(CTask *parent,CSprite **_root,I64 *_cur_elem_num)
+U0 SpriteSideBarTask(CTask *parent,CSprite **_head,I64 *_cur_elem_num)
 {
   CDocEntry *doc_e;
   CDoc *doc=DocPut;
   Spawn(&SpriteSideBarTask2,parent,"CSpriteTask",,Fs);
   doc->flags|=DOCF_MIN_SIZE|DOCF_FORM;
   while (TRUE) {
-    SpriteSideBarPickNew(doc,*_root,*_cur_elem_num);
+    SpriteSideBarPickNew(doc,*_head,*_cur_elem_num);
     DocHighlightCursor(,doc);
     View;
     doc_e=doc->cur_entry;
     if (doc_e->type_u8==DOCT_MENU_VAL)
       *_cur_elem_num=doc_e->left_exp;
-    *_root=SpriteSideBar2SpriteQue(doc,*_root,_cur_elem_num);
+    *_head=SpriteSideBar2SpriteQue(doc,*_head,_cur_elem_num);
     DocClear(doc);
   }
 }
 
-Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
+Bool SpriteEdText(CSprite **_head,I64 *_cur_elem_num)
 {
   Bool res;
-  CSprite *root=*_root;
-  U8 *elems=SpriteQue2Sprite(root);
+  CSprite *head=*_head;
+  U8 *elems=SpriteQue2Sprite(head);
   CDoc *doc=DocNew,*doc2,*old_put=DocPut;
   StrPrint(doc->filename.name,"AI:0x%X",doc);
   DocPrint(doc,"//$$PURPLE$$$$TX+CX,\"Sprite Edit as Text\"$$$$FG$$\n"
@@ -696,11 +696,11 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
       if (elems=Code2Sprite(doc)) {
 	DocDel(doc2);
 	Fs->put_doc=old_put;
-	QueDel(root);
-	Free(root);
-	root=Sprite2SpriteQue(elems);
+	QueDel(head);
+	Free(head);
+	head=Sprite2SpriteQue(elems);
 	Free(elems);
-	*_cur_elem_num=QueCnt(root); //TODO: Might want to improve this.
+	*_cur_elem_num=QueCnt(head); //TODO: Might want to improve this.
 	break;
       } else {
 	PopUpPrint("DocEd(0x%X,0x%X);",doc2,0);
@@ -711,7 +711,7 @@ Bool SpriteEdText(CSprite **_root,I64 *_cur_elem_num)
       break;
   }
   DocDel(doc);
-  if (_root) *_root=root;
+  if (_head) *_head=head;
   return res;
 }
 
@@ -738,7 +738,7 @@ U0 GrInit3()
 }
 GrInit3;
 
-I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
+I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 {
   U8 *st;
   CTask *pu_task;
@@ -760,12 +760,12 @@ I64 PopUpSpriteEd(CSprite **_root,I64 *_cur_elem_num)
 	"$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=GED_MAIN_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=GED_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$");
-  st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_root,_cur_elem_num);
+  st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_head,_cur_elem_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
   i=PopUpMenu(doc);
   if (TaskValidate(pu_task)) {
-    *_root=SpriteSideBar2SpriteQue(DocPut(pu_task),*_root,_cur_elem_num);
+    *_head=SpriteSideBar2SpriteQue(DocPut(pu_task),*_head,_cur_elem_num);
     Kill(pu_task);
   }
   DocDel(doc);
@@ -784,14 +784,14 @@ class CEdSprite
   I32 *x,*y,*z,*w,*h;
 };
 
-U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *root)
+U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *head)
 {
   I64 i,num=0;
   I32 *ptr;
   CD3I32 *p;
   CEdSprite *temppe;
   CSprite *tempg=elems-offset(CSprite.start);
-  QueInit(root);
+  QueInit(head);
   while (tempg->type) {
     switch (tempg->type) {
       case SPT_ELLIPSE:
@@ -805,7 +805,7 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *root)
 	temppe->w=&tempg->pwha.width;
 	temppe->h=&tempg->pwha.height;
 	temppe->num=num;
-	QueIns(temppe,root->last);
+	QueIns(temppe,head->last);
 	goto pq_x1_y1;
       case SPT_RECT:
       case SPT_ROTATED_RECT:
@@ -819,7 +819,7 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *root)
 	temppe->x=&tempg->pp.x2;
 	temppe->y=&tempg->pp.y2;
 	temppe->num=num;
-	QueIns(temppe,root->last);
+	QueIns(temppe,head->last);
       case SPT_TEXT:
       case SPT_TEXT_BOX:
       case SPT_TEXT_DIAMOND:
@@ -836,7 +836,7 @@ pq_x1_y1:
 	temppe->x=&tempg->p.x1;
 	temppe->y=&tempg->p.y1;
 	temppe->num=num;
-	QueIns(temppe,root->last);
+	QueIns(temppe,head->last);
 	break;
       case SPT_SHIFT:
 	x+=tempg->p.x1;
@@ -852,7 +852,7 @@ pq_x1_y1:
 	  temppe->x=&ptr[i<<1];
 	  temppe->y=&ptr[i<<1+1];
 	  temppe->num=num;
-	  QueIns(temppe,root->last);
+	  QueIns(temppe,head->last);
 	}
 	break;
       case SPT_POLYPT:
@@ -863,7 +863,7 @@ pq_x1_y1:
 	temppe->x=&tempg->npu.x;
 	temppe->y=&tempg->npu.y;
 	temppe->num=num;
-	QueIns(temppe,root->last);
+	QueIns(temppe,head->last);
 	break;
       case SPT_BSPLINE2:
       case SPT_BSPLINE3:
@@ -879,7 +879,7 @@ pq_x1_y1:
 	  temppe->y=&p[i].y;
 	  temppe->z=&p[i].z;
 	  temppe->num=num;
-	  QueIns(temppe,root->last);
+	  QueIns(temppe,head->last);
 	}
 	break;
       case SPT_MESH:
@@ -893,7 +893,7 @@ pq_x1_y1:
 	temppe->y=&tempg->pmu.y;
 	temppe->z=&tempg->pmu.z;
 	temppe->num=num;
-	QueIns(temppe,root->last);
+	QueIns(temppe,head->last);
 	break;
     }
     tempg(U8 *)+=SpriteElemSize(tempg);
@@ -901,15 +901,15 @@ pq_x1_y1:
   }
 }
 
-U0 SpriteCtrlPtsDraw(CDC *dc,CEdSprite *root)
+U0 SpriteCtrlPtsDraw(CDC *dc,CEdSprite *head)
 {
   I64 x,y;
   CEdSprite *temppe;
   WinMgrSync;
   DCFill(dc);
   if (Blink(20)) {
-    temppe=root->next;
-    while (temppe!=root) {
+    temppe=head->next;
+    while (temppe!=head) {
       switch (temppe->type) {
 	case GSPT_SIMPLE_PT:
 	  x=*temppe->x+temppe->xx;
@@ -932,11 +932,11 @@ U0 SpriteCtrlPtsDraw(CDC *dc,CEdSprite *root)
   }
 }
 
-U0 SpriteCtrlPtsMove(CEdSprite *root,I64 dx,I64 dy)
+U0 SpriteCtrlPtsMove(CEdSprite *head,I64 dx,I64 dy)
 {
   CEdSprite *temppe;
-  temppe=root->next;
-  while (temppe!=root) {
+  temppe=head->next;
+  while (temppe!=head) {
     if (temppe->flags&GSPF_SEL)
       switch (temppe->type) {
 	case GSPT_SIMPLE_PT:
@@ -957,13 +957,13 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
   I64 msg_code,a1,a2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
   Bool res=TRUE;
   CDC *dc=DCAlias;
-  CEdSprite root,*temppe,*best_pe;
+  CEdSprite head,*temppe,*best_pe;
 
-  SpritePtQueNew(elems,x,y,&root);
+  SpritePtQueNew(elems,x,y,&head);
   cur_elem_num=0;
-  if (root.next!=&root) {
+  if (head.next!=&head) {
     while (TRUE) {
-      SpriteCtrlPtsDraw(dc,&root); //has WinMgrSync
+      SpriteCtrlPtsDraw(dc,&head); //has WinMgrSync
       switch (msg_code=ScanMsg(&a1,&a2,
 	    1<<MSG_IP_R_UP|1<<MSG_IP_L_DOWN|1<<MSG_KEY_DOWN)) {
 	case MSG_IP_L_DOWN:
@@ -971,8 +971,8 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	    case GED_SHIFT_PTS:
 	      xx=a1; yy=a2;
 	      best_dd=MAX_I64;
-	      temppe=root.next;
-	      while (temppe!=&root) {
+	      temppe=head.next;
+	      while (temppe!=&head) {
 		switch (temppe->type) {
 		  case GSPT_SIMPLE_PT:
 		    dd=SqrI64(*temppe->x+temppe->xx-xx)+
@@ -995,7 +995,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	    case GED_SHIFT_RECTS:
 	      xx2=xx=a1; yy2=yy=a2;
 	      while (TRUE) {
-		SpriteCtrlPtsDraw(dc,&root);
+		SpriteCtrlPtsDraw(dc,&head);
 		dc->color=ROPF_DITHER+WHITE<<16+RED;
 		GrBorder(dc,xx,yy,xx2,yy2);
 		if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
@@ -1007,8 +1007,8 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	      }
 	      if (xx2<xx) SwapI64(&xx,&xx2);
 	      if (yy2<yy) SwapI64(&yy,&yy2);
-	      temppe=root.next;
-	      while (temppe!=&root) {
+	      temppe=head.next;
+	      while (temppe!=&head) {
 		switch (temppe->type) {
 		  case GSPT_SIMPLE_PT:
 		    if (xx<=*temppe->x+temppe->xx<=xx2 &&
@@ -1024,7 +1024,7 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 		temppe=temppe->next;
 	      }
 	      do {
-		SpriteCtrlPtsDraw(dc,&root);
+		SpriteCtrlPtsDraw(dc,&head);
 		msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN);
 		if (msg_code==MSG_KEY_DOWN) goto gs_key;
 	      } while (msg_code!=MSG_IP_L_DOWN);
@@ -1032,14 +1032,14 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	      break;
 	  }
 	  do {
-	    SpriteCtrlPtsDraw(dc,&root);
+	    SpriteCtrlPtsDraw(dc,&head);
 	    if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
-	      SpriteCtrlPtsMove(&root,a1-xx,a2-yy);
+	      SpriteCtrlPtsMove(&head,a1-xx,a2-yy);
 	      xx=a1;yy=a2;
 	    }
 	  } while (msg_code!=MSG_IP_L_UP);
-	  temppe=root.next;
-	  while (temppe!=&root) {
+	  temppe=head.next;
+	  while (temppe!=&head) {
 	    temppe->flags&=~GSPF_SEL;
 	    temppe=temppe->next;
 	  }
@@ -1067,7 +1067,7 @@ gs_key:
       }
     }
 gs_done:
-    QueDel(&root,TRUE);
+    QueDel(&head,TRUE);
   }
   DCFill(dc);
   DCDel(dc);
@@ -1077,33 +1077,33 @@ gs_done:
 }
 
 I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
-	CSprite **_root,I64 *_cur_elem_num)
+	CSprite **_head,I64 *_cur_elem_num)
 {
   CDocEntry *doc_e2;
   CDocBin *tempb;
   Bool unlock;
   I64 i,r[16],msg_code,a1,a2,xx,yy,
 	old_de_flags;
-  CSprite *cur_elem,*root2,*next,*last,*tempg,*insert_pt;
+  CSprite *cur_elem,*head2,*next,*last,*tempg,*insert_pt;
 
   old_de_flags=doc_ce->de_flags;
   tempb=doc_ce->bin_data;
   DocUnlock(doc);
-  SpriteQueSelAll(*_root,FALSE);
+  SpriteQueSelAll(*_head,FALSE);
   do {
     if (winmgr.fps<10)
       doc_ce->de_flags|=DOCEF_DONT_DRAW;
     StrCpy(Fs->task_title,"Sprite Edit Menu");
-    i=PopUpSpriteEd(_root,_cur_elem_num);
-    SpriteEdUpdate(doc,doc_ce,*_root);
+    i=PopUpSpriteEd(_head,_cur_elem_num);
+    SpriteEdUpdate(doc,doc_ce,*_head);
     if (0<=i<GED_EXIT) {
       StrCpy(Fs->task_title,DefineSub(i,"ST_SPRITE_ED_MENU"));
       switch (i) {
 	case GED_SEL_UNSEL_ALL:
-	  if (!SpriteQueSelCnt(*_root))
-	    SpriteQueSelAll(*_root);
+	  if (!SpriteQueSelCnt(*_head))
+	    SpriteQueSelAll(*_head);
 	  else
-	    SpriteQueSelAll(*_root,FALSE);
+	    SpriteQueSelAll(*_head,FALSE);
 	  break;
 	case GED_SEL:
 	case GED_UNSEL:
@@ -1115,7 +1115,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	    WinMgrSync(2);
 	    if (msg_code==MSG_IP_L_DOWN) {
 	      *_cur_elem_num=doc->nearest_sprite_elem_num;
-	      cur_elem=SpriteSetSettings(,*_root,*_cur_elem_num);
+	      cur_elem=SpriteSetSettings(,*_head,*_cur_elem_num);
 	      cur_elem->sel=ToBool(i==GED_SEL);
 	      GetMsg(,,1<<MSG_IP_L_UP);
 	    }
@@ -1123,28 +1123,28 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  doc->cur_sprite=NULL;
 	  break;
 	case GED_SET_ORIGIN:
-	  SpriteQueSelAll(*_root);
+	  SpriteQueSelAll(*_head);
 	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
-	  SpriteSetOrigin(*_root,x-a1,y-a2,0);
-	  SpriteEdUpdate(doc,doc_ce,*_root);
-	  SpriteQueSelAll(*_root,FALSE);
+	  SpriteSetOrigin(*_head,x-a1,y-a2,0);
+	  SpriteEdUpdate(doc,doc_ce,*_head);
+	  SpriteQueSelAll(*_head,FALSE);
 	  break;
 	case GED_SHIFT_SEL:
-	  if (!SpriteQueSelCnt(*_root))
-	    SpriteQueSelAll(*_root);
+	  if (!SpriteQueSelCnt(*_head))
+	    SpriteQueSelAll(*_head);
 	  doc_ce->de_flags=old_de_flags;
 	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
 	  xx=a1; yy=a2;
 	  do {
 	    msg_code=GetMsg(&a1,&a2,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-	    SpriteSetOrigin(*_root,a1-xx,a2-yy,0);
+	    SpriteSetOrigin(*_head,a1-xx,a2-yy,0);
 	    xx=a1; yy=a2;
-	    SpriteEdUpdate(doc,doc_ce,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  } while (msg_code!=MSG_IP_L_UP);
-	  if (!SpriteQueSelCnt(*_root,FALSE))
-	    SpriteQueSelAll(*_root,FALSE);
+	  if (!SpriteQueSelCnt(*_head,FALSE))
+	    SpriteQueSelAll(*_head,FALSE);
 	  break;
 	case GED_SHIFT_PTS:
 	case GED_SHIFT_RECTS:
@@ -1155,25 +1155,25 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 		"to OR another rectangle.\n");
 	  doc_ce->de_flags=old_de_flags;
 	  if (SpriteShiftPts(tempb->data,x,y,_cur_elem_num,i)) {
-	    QueDel(*_root);
-	    Free(*_root);
-	    *_root=Sprite2SpriteQue(tempb->data);
+	    QueDel(*_head);
+	    Free(*_head);
+	    *_head=Sprite2SpriteQue(tempb->data);
 	  } else
-	    SpriteEdUpdate(doc,doc_ce,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  break;
 	case GED_TRANSFORM_SEL:
-	  if (!SpriteQueSelCnt(*_root))
-	    SpriteQueSelAll(*_root);
+	  if (!SpriteQueSelCnt(*_head))
+	    SpriteQueSelAll(*_head);
 	  if (PopUpTransform(r)) {
-	    SpriteTransform(r,*_root);
-	    SpriteEdUpdate(doc,doc_ce,*_root);
+	    SpriteTransform(r,*_head);
+	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  }
-	  if (!SpriteQueSelCnt(*_root,FALSE))
-	    SpriteQueSelAll(*_root,FALSE);
+	  if (!SpriteQueSelCnt(*_head,FALSE))
+	    SpriteQueSelAll(*_head,FALSE);
 	  break;
 	case GED_SHIFT_SUB_ORIGIN:
 	  doc_ce->de_flags=old_de_flags;
-	  insert_pt=SpriteSetSettings(,*_root,*_cur_elem_num);
+	  insert_pt=SpriteSetSettings(,*_head,*_cur_elem_num);
 	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_SHIFT));
 	  tempg->type=SPT_SHIFT;
 	  tempg->p.x1=0;
@@ -1186,7 +1186,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
 	    tempg->p.x1=a1-xx;
 	    tempg->p.y1=a2-yy;
-	    SpriteEdUpdate(doc,doc_ce,*_root);
+	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  } while (msg_code!=MSG_IP_L_UP);
 	  *_cur_elem_num+=1;
 	  break;
@@ -1197,36 +1197,36 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 		"'Insert shift sub-origin' after picking the\n"
 		"element to insert before.  Or,\n"
 		"use 'shift points'.\n");
-	  insert_pt=SpriteSetSettings(,*_root,*_cur_elem_num);
+	  insert_pt=SpriteSetSettings(,*_head,*_cur_elem_num);
 	  unlock=DocLock(sys_clipboard_doc);
-	  doc_e2=sys_clipboard_doc->root.next;
+	  doc_e2=sys_clipboard_doc->head.next;
 	  while (doc_e2!=sys_clipboard_doc) {
 	    if (doc_e2->type_u8==DOCT_SPRITE) {
-	      root2=Sprite2SpriteQue(doc_e2->bin_data->data);
-	      if (root2->next!=root2) {
-		tempg=root2->next;
-		while (tempg!=root2) {
+	      head2=Sprite2SpriteQue(doc_e2->bin_data->data);
+	      if (head2->next!=head2) {
+		tempg=head2->next;
+		while (tempg!=head2) {
 		  *_cur_elem_num+=1;
 		  tempg=tempg->next;
 		}
-		next=root2->next;
-		last=root2->last;
+		next=head2->next;
+		last=head2->last;
 		insert_pt->last->next=next;
 		next->last=insert_pt->last;
 		insert_pt->last=last;
 		last->next=insert_pt;
 	      }
-	      Free(root2);
+	      Free(head2);
 	    }
 	    doc_e2=doc_e2->next;
 	  }
 	  if (unlock)
 	    DocUnlock(sys_clipboard_doc);
-	  SpriteEdUpdate(doc,doc_ce,*_root);
+	  SpriteEdUpdate(doc,doc_ce,*_head);
 	  break;
 	case GED_TEXT_ED:
-	  if (SpriteEdText(_root,_cur_elem_num))
-	    SpriteEdUpdate(doc,doc_ce,*_root);
+	  if (SpriteEdText(_head,_cur_elem_num))
+	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  break;
       }
     }

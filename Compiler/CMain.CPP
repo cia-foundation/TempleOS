@@ -8,8 +8,8 @@ U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
     COCPush(cc);
   COCInit(cc);
   if (!PrsStmt(cc,,,cmp_flags)) {
-    if (cc->coc.coc_root.next!=&cc->coc.coc_root) {
-      cc->coc.coc_root.last->ic_flags&=~ICF_RES_NOT_USED;
+    if (cc->coc.coc_head.next!=&cc->coc.coc_head) {
+      cc->coc.coc_head.last->ic_flags&=~ICF_RES_NOT_USED;
       ICAdd(cc,IC_RETURN_VAL2,0,0);
       ICAdd(cc,IC_RET,0,0);
       if (res=COCCompile(cc,&size,NULL,_type)) {
@@ -24,7 +24,7 @@ U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
       }
     } //TODO: else del misc?
   } else //TODO: too dangerous to del Misc?
-    QueDel(&cc->coc.coc_root.next);
+    QueDel(&cc->coc.coc_head.next);
   if (cc->aot_depth==2) {
     tempcbh=COCPopNoFree(cc);
     COCAppend(cc,tempcbh);

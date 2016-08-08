@@ -16,7 +16,7 @@ U0 GrUpdateTaskODEs(CTask *task)
 }
 
 U0 GrUpdateTaskWin(CTask *task)
-{ //Draw core0 task win.
+{ //Draw a win.  Only core0 tasks have a win.
   CDC *dc;
   CD3I64 saved_scroll;
   sys_task_being_screen_updated=task;

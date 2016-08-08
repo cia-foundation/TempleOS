@@ -1,5 +1,5 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
-* $LK,"::/Demo/Games/RawHide.CPP"$ fix waterfall code so not in center.
+* Cursor in $LK,"::/Home/TOSToHtml.CPP"$.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.CPP,Sleep(1)"$.
 
@@ -10,8 +10,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.CPP,41"$
 * Backward <SHIFT-F3> is broken?
 
-* Cannot entering a '$$' in $$TX command's tag.
-
+* Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
 
 * Editor overstrike mode at cmd line with menu macro?  Probably, many other overstrike issues.
@@ -19,8 +18,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * $LK,"DOCT_HEX_ED",A="MN:DOCT_HEX_ED"$ with odd size, ASCII cannot be edited.
 
 * $LK,"FL:::/Adam/Gr/SpriteEd.CPP,789"$ Resize bitmap?
-
-* Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.CPP,AD"$ search string.
 
 * $LK,"DOCEF_REMALLOC_DATA",A="FF:::/Adam/DolDoc/DocChar.CPP,DOCEF_REMALLOC_DATA"$ HexEdit Remalloc.
 
@@ -52,7 +49,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Use pen_width and pen_height when clipping with pen_width>1.
 
-* $LK,"~/Downloads/Games/Rocks.CPP"$.
+* $LK,"~/Sup1/Sup1Games/Rocks.CPP"$.
 
 * Asm LIST NOLIST bugs.
 
@@ -68,6 +65,8 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Change %h*c so the character is not a arg?
 
 * $LK,"GrLineFat3",A="MN:GrLineFat3"$() needs a little work.
+
+* $LK,"GrFillTri0",A="MN:GrFillTri0"$() with both $LK,"GrHLine",A="MN:GrHLine"$() and $LK,"GrVLine",A="MN:GrVLine"$() don't match in $LK,"::/Demo/Games/CastleFrankenstein.CPP"$ causing wall spot pixels.
 
 
 $FG,5$$TX+CX,"TODO? Meh"$$FG$
@@ -153,7 +152,6 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 * 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
 
 * 4/13/14 Strut or RawHide crashed when $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ was set during testsuite.  Perhaps, floodfill?
-* 3/19/14: RESET during RawHide. 
 
 * $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.  I don't know if I fixed this.
 
@@ -268,7 +266,7 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * Note: We will never put multiple $LK,"Keyboard Tables",A="FI:::/Kernel/SerialDev/Keyboard.CPP"$.  Each country must make their own version of TempleOS.  The $LK,"Intel Factory ROM",A="FF:::/Doc/Demands.TXT,English"$ will have just English.  Our $LK,"Charter",A="FI:::/Doc/Charter.TXT"$ bans multiple country or architectures in the same version.
 
-* 12 border chars in screen font codes 0x02-0x0D.  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$()  LineFeed shows-up in $FG,2$<CTRL-m>$FG$ PersonalMenu.
+* 12 border chars in screen font codes 0x02-0x0D.  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$() $LK,"::/Demo/Games/CharDemo.CPP"$. LineFeed shows-up in $FG,2$<CTRL-m>$FG$ PersonalMenu.
 
 * Super-simple high speed serial needs flow control.  $FG,2$<CTRL-s>$FG$ and $FG,2$<CTRL-q>$FG$?
 
@@ -410,10 +408,10 @@ New wineskins				$TX,"Mark 2:22",HTML="http://www.biblegateway.com/verse/en/Mark
 $FG,5$$TX+CX,"Misc Notes"$$FG$
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17412 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17422 KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
-$TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Downloads/Blog/Bookmarks"$
+$TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
 Machine		$HC,"<center><img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
 Frosting	$HC,"<center><img src=\"http://www.templeos.org/images/Frosting.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
 Soap Carvings	$HC,"<center><img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
@@ -437,7 +435,6 @@ qFeDAsBDeDqCeF2G3sGGeF2sG3C2G3CBCeF
 
 $FG,5$$TX+CX,"Web Bookmarks"$$FG$
 Cop tying shoe	$HC,"<center><img src=\"https://goodtimestories.files.wordpress.com/2013/04/cop-tying-shoe-cambridge-county-pd.jpg\" width=\"480\" height=\"376\" alt=\"\"></center>"$
-$TX,"Good Time Bad Times Lyrics",HTML="https://www.google.com/#q=led+zep+good+times+bad+times+lyrics"$
 $TX,"Unikernels",HTML="https://ma.ttias.be/what-is-a-unikernel"$
 $TX,"Handford school",HTML="https:/pinterest.com/pin/255368241346360278"$
 $TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
@@ -445,8 +442,9 @@ $TX,"The sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-ne
 $TX,"Stalin's Tanks",HTML="https://boardgamegeek.com/boardgame/5198/stalins-tanks"$
 $TX,"Lamp shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
 $TX,"The Original Jewish Temple",HTML="http://www.jewishvirtuallibrary.org/jsource/Judaism/The_Temple.html"$
-$TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/files/NumBible.TXT"$
+$TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$
 $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
+$TX,"The Number Bleem",HTML="http://www.strangehorizons.com/2000/20001120/secret_number.shtml"$
 $TX,"Dwight: Nerd torture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$
 $TX,"TOSZ Compression",HTML="http://www.templeos.org/Wb/Linux/TOSZ.CPP"$
 $TX,"ATA/ATAPI spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$

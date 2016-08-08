@@ -10,8 +10,8 @@ U0 BadCodeJump()
   U8 *st;
   while (tempde) {
     doc=DocRead(tempde->full_name);
-    tempde->user_data=doc->root.y;
-    cnt+=doc->root.y;
+    tempde->user_data=doc->head.y;
+    cnt+=doc->head.y;
     DocDel(doc);
     tempde=tempde->next;
   }
@@ -34,7 +34,7 @@ U0 BadCodeJump()
   Free(st);
 }
 
-U8 *WebBookMarks(U8 *filename="~/Downloads/Blog/Bookmarks.html")
+U8 *WebBookMarks(U8 *filename="~/Sup1/Sup1Blog/Bookmarks.html")
 {
   U8 *st;
   CDocEntry *doc_e;
@@ -42,7 +42,7 @@ U8 *WebBookMarks(U8 *filename="~/Downloads/Blog/Bookmarks.html")
   CCmpCtrl *cc=CmpCtrlNew(MStrPrint("#include \"%s\"",filename));
   while (Lex(cc))
     if (cc->token==TK_STR && *cc->cur_str(U32 *)=='http') {
-      DocPrint(doc,"$$MU-UL,\"%Q\",LE=0x%X$$\n",cc->cur_str,cc->cur_str);
+      DocPrint(doc,"$$MU-UL,\"%$$Q\",LE=0x%X$$\n",cc->cur_str,cc->cur_str);
       cc->cur_str=NULL;
     }
   CmpCtrlDel(cc);
@@ -52,7 +52,7 @@ U8 *WebBookMarks(U8 *filename="~/Downloads/Blog/Bookmarks.html")
   else
     st=NULL;
 
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_MENU_VAL)
       Free(doc_e->left_exp);
@@ -63,7 +63,7 @@ U8 *WebBookMarks(U8 *filename="~/Downloads/Blog/Bookmarks.html")
   return st;
 }
 
-U8 *YouTubeGet(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",U8 *needle)
+U8 *YouTubeGet(U8 *filename="C:/Home/Sup1/Sup1Blog/YouTube.TXT.Z",U8 *needle)
 {
   I64 i=0,line=MIN_I64;
   CDoc	*doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR),
@@ -100,7 +100,7 @@ U8 *YouTubeGet(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",U8 *needle)
   return res;
 }
 
-U0 YouTubeAdd(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",
+U0 YouTubeAdd(U8 *filename="C:/Home/Sup1/Sup1Blog/YouTube.TXT.Z",
 	U8 *title,U8 *code)
 {
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
@@ -117,9 +117,10 @@ U0 YouTubeAdd(U8 *filename="C:/Home/Downloads/Blog/YouTube.TXT.Z",
 class CTopMoviesForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN];
-  I64	timestamp;
-  I64	cert		fmtstr "$$DA-TRM,LEN=2,A=\"Movie #1-100:%02d\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,"
+	"A=\"Movie #1-100 (2 Decimal Digits from Hex):%s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
+  I64	cert;
   I64	min;
   I64	sec;
 };
@@ -127,9 +128,10 @@ class CTopMoviesForm
 class CMetallicaForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN];
-  I64	timestamp;
-  I64	cert		fmtstr "$$DA-TRM,LEN=2,A=\"Song #1-99:%02d\"$$\n";
+  U8	special[STR_LEN] fmtstr "$$DA-P,"
+	"A=\"Song #1-99 (2 Decimal Digits from Hex):%s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
+  I64	cert;
   I64	min;
   I64	sec;
 };
@@ -215,7 +217,7 @@ class CRandCertForm
   I64	sec;
 };
 
-class CRandHexBeacon5Form
+class CRandHex5BeaconForm
 {
   U8	tag[STR_LEN];
   U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=5,"
@@ -226,12 +228,32 @@ class CRandHexBeacon5Form
   I64	sec;
 };
 
-class CRandHexBeacon8Form
+class CRandHex8BeaconForm
 {
   U8	tag[STR_LEN];
   U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=8,"
 	"A=\"Line (8-Digit Hex):%8s\"$$\n";
   I64	timestamp	fmtstr "$$DA,A=\"TimeStamp :%d\"$$\n";
+  I64	cert;
+  I64	min;
+  I64	sec;
+};
+
+class CRandExtDec5Form
+{
+  U8	tag[STR_LEN];
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"5 Decimal Digits from Hex:%s\"$$\n";
+  I64	timestamp;
+  I64	cert;
+  I64	min;
+  I64	sec;
+};
+
+class CRandExtDec5BeaconForm
+{
+  U8	tag[STR_LEN];
+  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"5 Decimal Digits from Hex:%s\"$$\n";
+  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
   I64	cert;
   I64	min;
   I64	sec;
@@ -268,6 +290,20 @@ U8 *URLPlusSpaces(U8 *src)
   return StrNew(buf);
 }
 
+I64 ExtDecFromHex(U8 *st,I64 digits)
+{
+  I64 res=0,ch;
+  do {
+    if (!(ch=*st++))
+      throw;
+    if ('0'<=ch<='9') {
+      res=10*res+ch-'0';
+      digits--;
+    }
+  } while (digits);
+  return res;
+}
+
 U8 *RandVideoRead(U8 *filename,I64 line)
 {
   U8 *res=NULL;
@@ -295,21 +331,23 @@ U8 *RandVideoWrite(U8 *filename,I64 line,U8 *st)
   return res;
 }
 
-U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,U8 *filename)
+U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,I64 digits,U8 *filename)
 {
   U8 *st,*st2;
-  if (st=RandVideoRead(filename,url->cert*2)) {
+  I64 i=ExtDecFromHex(url->special,digits);
+  if (st=RandVideoRead(filename,i*2)) {
     StrCpy(url->tag,st);
     Free(st);
-    if (!(st=RandVideoRead(filename,url->cert*2+1))||!*st) {
+    if (!(st=RandVideoRead(filename,i*2+1))||!*st) {
       Free(st);
+      *url->special=0;
       if (DocForm(url(CYouTubeForm *)) && *url->special) {
 	if (url->min || url->sec)
 	  st=MStrPrint("%s&hl=enUS&start=%d",
 		url->special,url->min*60+url->sec);
 	else
 	  st=StrNew(url->special);
-	RandVideoWrite(filename,url->cert*2+1,st);
+	RandVideoWrite(filename,i*2+1,st);
       } else
 	st=NULL;
     }
@@ -342,23 +380,27 @@ U0 RandVideo(U8 *title,U8 *webpage,CTopMoviesForm *url,U8 *filename)
 }
 
 U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
-{
+{//Radix<0 means extract N dec digits from hex.
   CDoc *doc_out,*doc_in;
   CDocEntry *doc_e;
   I64 i,start;
   U8 *verse;
   if (*st && (doc_out=DocPut)) {
-    i=Str2I64(st,radix);
+    if (radix<0)
+      i=ExtDecFromHex(st,-radix);
+    else
+      i=Str2I64(st,radix);
+    if (radix<0)
+      DocPrint(doc_out,"'%s'-->(Taking first %d decimal digits)",st,-radix);
+    else if (radix==16)
+      DocPrint(doc_out,"0x%s-->",st);
     if (modulo) {
-      if (radix==16)
-	DocPrint(doc_out,"0x%s-->",st);
       DocPrint(doc_out,"(%d remainder when divided by %d)",
 	    i,ST_BIBLE_LINES-(num_lines-1));
       start=i%(ST_BIBLE_LINES-(num_lines-1));
     } else {
-      if (radix==16)
-	DocPrint(doc_out,"0x%s-->",st);
-      DocPrint(doc_out,"%d",i);
+      if (radix>=0 || plus_one)
+	DocPrint(doc_out,"%d",i);
       start=i;
     }
     if (plus_one) {
@@ -368,13 +410,13 @@ U0 MyBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
     DocPrint(doc_out,"-->Line:%d\n",start);
 
     verse=BibleLine2Verse(start);
-    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/files/NumBible.TXT"$ (%s)\n\nGod says...\n$$RED$$",verse);
+    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$ (%s)\n\nGod says...\n$$RED$$",verse);
     Free(verse);
 
     doc_in=DocNew;
-    BibleLines(doc_in,start,num_lines);
+    BibleLines(doc_in,start,num_lines,"::/Home/Sup1/Sup1Blog/NumBible.TXT");
     while (TRUE) {//Del leading blanks
-      doc_e=doc_in->root.next;
+      doc_e=doc_in->head.next;
       if (doc_e==doc_in)
 	break;
       else {
@@ -453,7 +495,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tempde1);
 }
 
-#define NIST_TIME_OFFSET	(-7923-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-7976-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
 
 public U0 NISTSync()
@@ -471,6 +513,19 @@ public U0 NISTSync()
   }
 }
 
+U0 NISTBeaconURL(I64 timestamp)
+{
+  U8 *tag;
+  CDateStruct ds;
+  CDate dt=(timestamp-NIST_TIME_OFFSET)*CDATE_FREQ+Str2Date("1/1/1970");
+  Date2Struct(&ds,dt+local_time_offset);
+  "$$TX,\"NIST Beacon Date:%D Time:%02d:%02d Unix TimeStamp:%u\","
+	"HTML=\"https://beacon.nist.gov/home\"$$\n",dt,ds.hour,ds.min,timestamp;
+  tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",timestamp);
+  "$$TX,\"NIST Beacon Record:%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+  Free(tag);
+}
+
 U0 InsMyURL()
 {
   U8 *tag,*st,*st2;
@@ -478,211 +533,233 @@ U0 InsMyURL()
   url->timestamp=
 	FloorI64((Now-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET-
 	NIST_TIME_TO_SWITCH,60);
-  switch (PopUpPickLst("NISTBeacon5Bible\0NISTBeacon8Passage\0"
-	"BibleGatewaySearch\0BibleGatewayVerse\0"
-	"YouTube\0Imgur\0Wikipedia\0RandomNumbers.info\0"
-	"Random.org\0PassWord\0VirtualNotary\0ANU_NIST\0HotBits\0"
-	"GenerateData\0WebBookMark\0Roulette\0Movie\0Metallica\0")) {
-    case:
-      if (DocForm(url(CRandHexBeacon5Form *))) {
-	"$$TX,\"Guidelines for Talking with God.\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\t";
-	"$$TX,\"How this random Bible passage was chosen.\","
-	      "HTML=\"http://www.templeos.org/Wb"
-	      "/Home/Web/TAD/NISTPassage.html\"$$\n";
-	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	Free(tag);
-	MyBibleLines(url->special,20,16,TRUE,TRUE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandHexBeacon8Form *))) {
-	"$$TX,\"Guidelines for Talking with God.\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\t";
-	"$$TX,\"How this random book pick was chosen.\","
-	      "HTML=\"http://www.templeos.org/Wb"
-	      "/Home/Web/TAD/NISTPick001.html\"$$\n";
-	tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",url->timestamp);
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	Free(tag);
-	GodBooksPassage("C:/Home/Downloads/Text/*",,
-	      Str2I64(url->special,16),GBP_MEDIUM);
-      }
-      break;
-    case:
-      if (DocForm(url(CWebBibleForm *))) {
-	tag=url->special;
-	st2=URLPercentSpaces(url->special);
-	st=MStrPrint(
-	      "http://www.biblegateway.com/passage/?search=%s&version=NIV",st2);
-	Free(st2);
-	if (*url->tag)
-	  tag=url->tag;
-	"$$TX,\"%Q\",HTML=\"%Q\"$$",tag,st;
-	Free(st);
-      }
-      break;
-    case:
-      if (DocForm(url(CWebBibleForm *))) {
-	tag=url->special;
-	st2=URLPercentSpaces(url->special);
-	st=MStrPrint(
-	      "http://www.biblegateway.com/verse/en/%s",st2);
-	Free(st2);
-	if (*url->tag)
-	  tag=url->tag;
-	"$$TX,\"%Q\",HTML=\"%Q\"$$",tag,st;
-	Free(st);
-      }
-      break;
-    case:
-      if (DocForm(url(CYouTubeForm *))) {
-	if (*url->special==CH_SPACE)
-	  st2=YouTubeGet(,url->tag);
-	else
-	  st2=StrNew(url->special);
-	if (st2 && *st2!=CH_SPACE) {
-	  if (url->min || url->sec)
-	    st=MStrPrint("%s&hl=enUS&start=%d",st2,url->min*60+url->sec);
-	  else
-	    st=StrNew(st2);
-	  if (*url->special!=CH_SPACE && *url->tag)
-	    YouTubeAdd(,url->tag,st);
-	  "$$HC,\"<object width=\\\"640\\\" "
-		"height=\\\"520\\\"><param name=\\\"movie\\\" "
-		"value=\\\"http://www.youtube.com/v/%s\\\"></param><param "
-		"name=\\\"allowscriptaccess\\\" "
-		"value=\\\"always\\\"></param><embed "
-		"src=\\\"http://www.youtube.com/v/%s\\\" "
-		"type=\\\"application/x-shockwave-flash\\\" "
-		"allowscriptaccess=\\\"always\\\" "
-		"width=\\\"640\\\" height=\\\"520\\\">"
-		"</embed></object>\"$$\n",st,st;
-	  Free(st);
-	  Free(st2);
+  try {
+    switch (PopUpPickLst("NISTExtDec5Bible\0NISTHex5Bible\0NISTHex8Passage\0"
+	  "BibleGatewaySearch\0BibleGatewayVerse\0"
+	  "YouTube\0Imgur\0Wikipedia\0ExtDec5Bible\0Random.org\0"
+	  "RandomNumbers.info\0PassWord\0VirtualNotary\0ANU_NIST\0HotBits\0"
+	  "GenerateData\0WebBookMark\0Roulette\0NISTMovie\0NISTMetallica\0")) {
+      case:
+	if (DocForm(url(CRandExtDec5BeaconForm *))) {
+	  "$$TX,\"Guidelines for Talking with God.\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\t";
+	  NISTBeaconURL(url->timestamp);
+	  MyBibleLines(url->special,20,-5,FALSE,FALSE);
 	}
-      }
-      break;
-    case:
-      if (DocForm(url(CImgurForm *))) {
-	"$$HC,\"<center><img src=\\\"http://i.imgur.com/%s\\\" "
-	      "width=\\\"%d\\\" height=\\\"%d\\\" alt=\\\"\\\"></center>\"$$\n",
-	      url->special,url->min,url->sec;
-      }
-      break;
-    case:
-      if (DocForm(url(CWikipediaForm *))) {
-	tag=url->special;
-	st=MStrPrint("http://en.wikipedia.org/wiki/%s",url->special);
-	if (*url->tag)
-	  tag=url->tag;
-	"$$TX,\"%Q\",HTML=\"%Q\"$$",tag,st;
-	Free(st);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="http://www.randomnumbers.info";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,10,FALSE,TRUE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="http://www.random.org";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,10,FALSE,FALSE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="https://passed.pw";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,10,FALSE,FALSE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandCertForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="http://virtual-notary.org";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	tag="Here is the certificate";
-	st=MStrPrint("http://www.templeos.org/Certs/virtual-notary-cert"
-	      "-randomnum-%d.p12",url->cert);
-	"\n$$TX,\"%Q: %d\",HTML=\"%Q\"$$.\n",tag,url->cert,st;
-	Free(st);
-	MyBibleLines(url->special,20,10,FALSE,FALSE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandHex5Form *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="http://qrng.anu.edu.au/NIST.php";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,16,TRUE,TRUE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandHex5Form *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="https://www.fourmilab.ch/hotbits/secure_generate.html";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,16,TRUE,TRUE);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="http://www.generatedata.com";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,10,FALSE,FALSE);
-      }
-      break;
-    case:
-      if (DocForm(url(CWebBookMarkForm *))) {
-	tag=st=WebBookMarks;
-	if (*url->tag)
-	  tag=url->tag;
-	"$$TX,\"%Q\",HTML=\"%Q\"$$",tag,st;
-	Free(st);
-      }
-      break;
-    case:
-      if (DocForm(url(CRandDecForm *))) {
-	"$$TX,\"Guidelines for Talking with God\","
-	      "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
-	tag="https://www.dublinbet.com";
-	"$$TX,\"%Q\",HTML=\"%Q\"$$\n",tag,tag;
-	MyBibleLines(url->special,20,10,FALSE,FALSE);
-      }
-      break;
-    case:
-      if (DocForm(url(CTopMoviesForm *)))
-	RandVideo("Top 100 Movies","http://www.afi.com/100years/movies10.aspx",
-	      url,"C:/Home/Downloads/Blog/Movies.TXT.Z");
-      break;
-    case:
-      if (DocForm(url(CMetallicaForm *)))
-	RandVideo("Metallica Song",
-	      "http://home.hccnet.nl/a.r.adams/lyrics/metallica/songindex.html",
-	      url,"C:/Home/Downloads/Blog/Metallica.TXT.Z");
-      break;
+	break;
+      case:
+	if (DocForm(url(CRandHex5BeaconForm *))) {
+	  "$$TX,\"Guidelines for Talking with God.\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\t";
+	  "$$TX,\"How this random Bible passage was chosen.\","
+		"HTML=\"http://www.templeos.org/Wb"
+		"/Home/Web/TAD/NISTPassage.html\"$$\n";
+	  NISTBeaconURL(url->timestamp);
+	  MyBibleLines(url->special,20,16,TRUE,TRUE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandHex8BeaconForm *))) {
+	  "$$TX,\"Guidelines for Talking with God.\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\t";
+	  "$$TX,\"How this random book pick was chosen.\","
+		"HTML=\"http://www.templeos.org/Wb"
+		"/Home/Web/TAD/NISTPick001.html\"$$\n";
+	  NISTBeaconURL(url->timestamp);
+	  GodBooksPassage("C:/Home/Sup1/Sup1Texts/*",,
+		Str2I64(url->special,16),GBP_MEDIUM);
+	}
+	break;
+      case:
+	if (DocForm(url(CWebBibleForm *))) {
+	  tag=url->special;
+	  st2=URLPercentSpaces(url->special);
+	  st=MStrPrint("http://www.biblegateway.com/passage/"
+		"?search=%s&version=NIV",st2);
+	  Free(st2);
+	  if (*url->tag)
+	    tag=url->tag;
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$",tag,st;
+	  Free(st);
+	}
+	break;
+      case:
+	if (DocForm(url(CWebBibleForm *))) {
+	  tag=url->special;
+	  st2=URLPercentSpaces(url->special);
+	  st=MStrPrint(
+		"http://www.biblegateway.com/verse/en/%s",st2);
+	  Free(st2);
+	  if (*url->tag)
+	    tag=url->tag;
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$",tag,st;
+	  Free(st);
+	}
+	break;
+      case:
+	if (DocForm(url(CYouTubeForm *))) {
+	  if (*url->special==CH_SPACE)
+	    st2=YouTubeGet(,url->tag);
+	  else
+	    st2=StrNew(url->special);
+	  if (st2 && *st2!=CH_SPACE) {
+	    if (url->min || url->sec)
+	      st=MStrPrint("%s&hl=enUS&start=%d",st2,url->min*60+url->sec);
+	    else
+	      st=StrNew(st2);
+	    if (*url->special!=CH_SPACE && *url->tag)
+	      YouTubeAdd(,url->tag,st);
+	    "$$HC,\"<object width=\\\"640\\\" "
+		  "height=\\\"520\\\"><param name=\\\"movie\\\" "
+		  "value=\\\"http://www.youtube.com/v/%s\\\"></param><param "
+		  "name=\\\"allowscriptaccess\\\" "
+		  "value=\\\"always\\\"></param><embed "
+		  "src=\\\"http://www.youtube.com/v/%s\\\" "
+		  "type=\\\"application/x-shockwave-flash\\\" "
+		  "allowscriptaccess=\\\"always\\\" "
+		  "width=\\\"640\\\" height=\\\"520\\\">"
+		  "</embed></object>\"$$\n",st,st;
+	    Free(st);
+	    Free(st2);
+	  }
+	}
+	break;
+      case:
+	if (DocForm(url(CImgurForm *))) {
+	  "$$HC,\"<center><img src=\\\"http://i.imgur.com/%s\\\" "
+		"width=\\\"%d\\\" height=\\\"%d\\\" "
+		"alt=\\\"\\\"></center>\"$$\n",
+		url->special,url->min,url->sec;
+	}
+	break;
+      case:
+	if (DocForm(url(CWikipediaForm *))) {
+	  tag=url->special;
+	  st=MStrPrint("http://en.wikipedia.org/wiki/%s",url->special);
+	  if (*url->tag)
+	    tag=url->tag;
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$",tag,st;
+	  Free(st);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandExtDec5Form *))) {
+	  "$$TX,\"Guidelines for Talking with God.\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  MyBibleLines(url->special,20,-5,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandDecForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="http://www.random.org";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,10,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandDecForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="http://www.randomnumbers.info";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,10,FALSE,TRUE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandDecForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="https://passed.pw";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,10,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandCertForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="http://virtual-notary.org";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  tag="Here is the certificate";
+	  st=MStrPrint("http://www.templeos.org/Certs/virtual-notary-cert"
+		"-randomnum-%d.p12",url->cert);
+	  "\n$$TX,\"%$$Q: %d\",HTML=\"%$$Q\"$$.\n",tag,url->cert,st;
+	  Free(st);
+	  MyBibleLines(url->special,20,10,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandHex5Form *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="http://qrng.anu.edu.au/NIST.php";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,16,TRUE,TRUE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandHex5Form *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="https://www.fourmilab.ch/hotbits/secure_generate.html";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,16,TRUE,TRUE);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandDecForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="http://www.generatedata.com";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,10,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CWebBookMarkForm *))) {
+	  tag=st=WebBookMarks;
+	  if (*url->tag)
+	    tag=url->tag;
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$",tag,st;
+	  Free(st);
+	}
+	break;
+      case:
+	if (DocForm(url(CRandDecForm *))) {
+	  "$$TX,\"Guidelines for Talking with God\","
+		"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+	  tag="https://www.dublinbet.com";
+	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	  MyBibleLines(url->special,20,10,FALSE,FALSE);
+	}
+	break;
+      case:
+	if (DocForm(url(CTopMoviesForm *))) {
+	  NISTBeaconURL(url->timestamp);
+	  RandVideo("Top 100 Movies",
+		"http://www.afi.com/100years/movies10.aspx",
+		url,2,"C:/Home/Sup1/Sup1Blog/Movies.TXT.Z");
+	}
+	break;
+      case:
+	if (DocForm(url(CMetallicaForm *))) {
+	  NISTBeaconURL(url->timestamp);
+	  RandVideo("Metallica Song","http://home.hccnet.nl/a.r.adams/lyrics/"
+		"metallica/songindex.html",
+		url,2,"C:/Home/Sup1/Sup1Blog/Metallica.TXT.Z");
+	}
+	break;
+    }
+  } catch {
+    Fs->catch_except=TRUE;
+    Beep; Beep;
   }
   Free(url);
 }
 
-//if (FileFind("~/Downloads/Words/LinuxDict.TXT"))
-//  GodInit("~/Downloads/Words/LinuxDict.TXT");
-if (FileFind("~/Downloads/Words/HappyWords.TXT"))
-  GodInit("~/Downloads/Words/HappyWords.TXT");
+//if (FileFind("~/Sup1/Sup1Words/LinuxDict.TXT"))
+//  GodInit("~/Sup1/Sup1Words/LinuxDict.TXT");
+if (FileFind("~/Sup1/Sup1Words/HappyWords.TXT"))
+  GodInit("~/Sup1/Sup1Words/HappyWords.TXT");

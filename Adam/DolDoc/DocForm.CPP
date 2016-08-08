@@ -260,7 +260,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     ml=ml->next;
   }
   if (footer) DocPrint(doc,"%s",footer);
-  if (doc->root.next!=doc)	{
+  if (doc->head.next!=doc)	{
     Fs->border_src=BDS_CONST;
     DocRecalc(doc);
     if (DocEd(doc,dof_flags)) {
@@ -273,7 +273,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
       }
     }
   }
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->de_flags&DOCEF_REMALLOC_DATA) {
       *doc_e->user_data(U8 **)=doc_e->data;

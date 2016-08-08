@@ -44,7 +44,7 @@ I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"121,193",D="DD_TEMPLEOS_LOC"$ lines 
 
 *) I hired an artist, Cody Rigby, for $$3,000 worth of pixel art.
 
-*) Erik van der Karbargenbok made $LK,"TempleBot",A="PI:::/Linux/TempleBot",HTML="http://www.templeos.org/Wb/Home/Downloads/Bin/TempleBot.html"$.
+*) Erik van der Karbargenbok made $LK,"TempleBot",A="PI:::/Linux/TempleBot",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Bin/TempleBot.html"$.
 
 *) The random number generator is from Donald Knuth in the wikipedia entry for $TX,"Linear_congruential_generator",HTML="http://en.wikipedia.org/wiki/Linear_congruential_generator"$.
 

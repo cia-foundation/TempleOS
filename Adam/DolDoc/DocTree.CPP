@@ -7,7 +7,7 @@ public Bool DocTreeFind(CDoc *haystack_doc,U8 *needle_path,
   I64 i=0,k=0;
   U8 *st1=StrNew(needle_path),*st2=MAlloc(StrLen(needle_path)+1);
   Bool res=FALSE,unlock_doc=DocLock(haystack_doc);
-  CDocEntry *doc_e=haystack_doc->root.next;
+  CDocEntry *doc_e=haystack_doc->head.next;
   if (_tree_entry) *_tree_entry=haystack_doc;
   if (_start_indent) *_start_indent=haystack_doc;
   if (_end_indent) *_end_indent=haystack_doc;
@@ -65,7 +65,7 @@ public Bool DocTreeMake(CDoc *doc,U8 *path)
 	*st2=MAlloc(StrLen(path)+1),
 	*st3=StrNew(path);
   Bool res=TRUE,unlock_doc=DocLock(doc);
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   doc->cur_entry=doc;
   doc->cur_col=0;
   while (*st1 && doc_e!=doc) {

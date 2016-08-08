@@ -128,10 +128,10 @@ public extern U0 ArcExpandBuf(CArcCtrl *c);
 public extern Bool ArcFinishCompression(CArcCtrl *c);
 
 #help_index "Data Types/Circular Queue"
-public extern I64	QueCnt(CQue *root);
-public extern CQue	*QueCopy(CQue *root,CTask *mem_task=NULL);
-public extern U0	QueDel(CQue *root,Bool querem=FALSE);
-public extern I64	QueSize(CQue *root);
+public extern I64	QueCnt(CQue *head);
+public extern CQue	*QueCopy(CQue *head,CTask *mem_task=NULL);
+public extern U0	QueDel(CQue *head,Bool querem=FALSE);
+public extern I64	QueSize(CQue *head);
 
 #help_index "Data Types/Fifo"
 public extern I64	FifoI64Cnt(CFifoI64 *f);
@@ -243,8 +243,8 @@ public extern U8 *DefineSub(I64 sub,U8 *dname);
 #help_index "Devices;Memory/Page Tables"
 public extern U8 *Mem32DevAlloc(I64 size,I64 alignment);
 public extern U0 Mem32DevFree(U8 *base);
-public extern U8 *Mem64DevAlloc(I64 *_pages2Meg);
-public extern U0 Mem64DevFree(U8 *base,I64 pages2Meg);
+public extern U8 *Mem64DevAlloc(I64 *_pages1Gig);
+public extern U0 Mem64DevFree(U8 *base,I64 pages1Gig);
 public extern CDevGlbls dev;
 
 #help_index "DolDoc/Clipboard"
@@ -375,7 +375,7 @@ public extern I64 FileWrite(U8 *filename,
 public extern CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0);
 
 #help_index "File/System"
-public extern CATARep *ATAIDDrvs(CATARep *root,CATARep **_ata_drv,
+public extern CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,
 	CATARep **_atapi_drv);
 extern CBlkDev *ATAMount(U8 first_drv_let,
 	I64 type,I64 base0,I64 base1,I64 unit);
@@ -460,7 +460,7 @@ extern CMouseStateGlbls mouse_last;
 
 #help_index "Install"
 #help_file "::/Doc/Install"
-extern CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num);
+extern CATARep *ATARepFind(CATARep *haystack_head,I64 needle_num);
 public extern Bool DrvEnable(U8 drv_let,Bool val);
 
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
@@ -479,7 +479,7 @@ public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
 public extern U0 KeyDevRem(CKeyDevEntry *tempp);
 extern CKeyDevGlbls keydev;
-extern CSrvCmd sys_macro_root;
+extern CSrvCmd sys_macro_head;
 extern CTask *sys_macro_task;
 
 #help_index "Keyboard Devices;Char/Input;StdIn"
@@ -554,6 +554,7 @@ public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 
 #help_index "Memory/Page Tables"
 public extern Bool MemPagePresentMark(U8 *a,Bool val);
+public extern I64 MemPageSize(U8 *a);
 public extern I64 *MemPageTable(U8 *a);
 
 #help_index "Messages"
@@ -611,7 +612,7 @@ public _extern SYS_PCI_SERVICES
 
 #help_index "PCI;Info;File/System;Devices"
 public extern I64 ATARep(Bool pmt=TRUE,
-	Bool just_ide=FALSE,CATARep **_root=NULL);
+	Bool just_ide=FALSE,CATARep **_head=NULL);
 
 #help_index "Processor"
 public extern U8 *IntEntryGet(I64 irq);
@@ -727,7 +728,6 @@ extern U8 *MPrintTime(CDate cdt);
 public extern CDate Now();
 public extern CDate Struct2Date(CDateStruct *_ds);
 public extern CDate local_time_offset;
-
 #help_index "Time/Date;Date"
 #help_file "::/Doc/Date"
 public extern I64 DayOfWeek(I64 i);
@@ -738,6 +738,10 @@ public extern I64 LastDayOfYear(I64 i);
 public extern I64 YearStartDate(I64 year);
 public extern U16 mon_start_days1[12];
 public extern U16 mon_start_days2[12];
+
+#help_index "Time/HPET"
+#help_file "::/Doc/TimeHPET"
+public extern I64 HPET();
 
 #help_index "Time/Jiffies"
 #help_file "::/Doc/TimeJiffy"

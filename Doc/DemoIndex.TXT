@@ -66,6 +66,7 @@ $LK,"::/Demo/ExtendedChars.CPP"$
 $LK,"::/Demo/TimeIns.CPP"$
 $LK,"::/Demo/Snd/WaterFowl.CPP"$
 $MA-X+PU,"::/Apps/Psalmody/Examples",LM="Cd(\"::/Apps/Psalmody/Examples\");Dir;View;\n"$
+$LK,"::/Demo/MultiCore/RateCores.CPP"$
 $LK,"::/Demo/MultiCore/MPPrint.CPP"$
 $LK,"::/Demo/Graphics/PredatorPrey.CPP"$
 $LK,"::/Demo/Graphics/Cartesian.CPP"$

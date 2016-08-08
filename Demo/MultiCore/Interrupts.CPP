@@ -1,12 +1,12 @@
 interrupt U0 IntBeepOn()
 {
-  *LAPIC_EOI(U32 *)=0; //signal end of interrupt
+  *(dev.uncached_alias+LAPIC_EOI)(U32 *)=0; //signal end of interrupt
   Snd(100);
 }
 
 interrupt U0 IntBeepOff()
 {
-  *LAPIC_EOI(U32 *)=0;
+  *(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
   Snd(0);
 }
 

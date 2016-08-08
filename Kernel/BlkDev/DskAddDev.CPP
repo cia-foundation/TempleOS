@@ -203,7 +203,7 @@ Bool GetBaseUnit(CBlkDev *bd)
       while (!('0'<=ch<='1'));
       '' ch;
       bd->unit=ch-'0';
-      blkdev.dvd_boot_is_good=BootDVDProve(bd);
+      blkdev.dvd_boot_is_good=BootDVDProbe(bd);
       return TRUE;
     } else {
       blkdev.dvd_boot_is_good=FALSE;

@@ -18,7 +18,7 @@ U0 StadiumGen()
 
   WinMgrSync(2,TRUE);
   dc2=DCScreenCapture;
-  dc=DCExtract(dc2,0,FONT_HEIGHT,GR_WIDTH,GR_HEIGHT);
+  dc=DCExt(dc2,0,FONT_HEIGHT,GR_WIDTH,GR_HEIGHT);
   DCDel(dc2);
 
   GRAWrite("StadiumBG",dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);

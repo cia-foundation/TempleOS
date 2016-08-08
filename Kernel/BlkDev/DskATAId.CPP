@@ -1,4 +1,4 @@
-Bool BootDVDProve(CBlkDev *bd)
+Bool BootDVDProbe(CBlkDev *bd)
 {
   U8 *img=CAlloc(DVD_BLK_SIZE);
   I64 i;
@@ -12,7 +12,7 @@ Bool BootDVDProve(CBlkDev *bd)
 	if (ATAPIReadBlks2(bd,tS+7.0,img,sys_boot_blk,1,FALSE)) {
 	  if ((img+sys_boot_src.u16[1]<<BLK_SIZE_BITS)(CKernel *)
 		->compile_time==sys_compile_time) {
-	    " Found";
+	    " Found\n";
 	    return TRUE;
 	  } else
 	    " Read";
@@ -43,10 +43,10 @@ Bool BootDVDProbeAll(CBlkDev *bd)
       if (d1&1 && d2&1) {
 	if (bd->base0=d1&~7) {
 	  bd->unit=0;
-	  if (BootDVDProve(bd))
+	  if (BootDVDProbe(bd))
 	    return TRUE;
 	  bd->unit=1;
-	  if (BootDVDProve(bd))
+	  if (BootDVDProbe(bd))
 	    return TRUE;
 	}
       }
@@ -55,10 +55,10 @@ Bool BootDVDProbeAll(CBlkDev *bd)
       if (d1&1 && d2&1) {
 	if (bd->base0=d1&~7) {
 	  bd->unit=0;
-	  if (BootDVDProve(bd))
+	  if (BootDVDProbe(bd))
 	    return TRUE;
 	  bd->unit=1;
-	  if (BootDVDProve(bd))
+	  if (BootDVDProbe(bd))
 	    return TRUE;
 	}
       }
@@ -69,10 +69,10 @@ Bool BootDVDProbeAll(CBlkDev *bd)
   d2=0x3F6;
   if (bd->base0=d1&~7) {
     bd->unit=0;
-    if (BootDVDProve(bd))
+    if (BootDVDProbe(bd))
       return TRUE;
     bd->unit=1;
-    if (BootDVDProve(bd))
+    if (BootDVDProbe(bd))
       return TRUE;
   }
 
@@ -80,16 +80,16 @@ Bool BootDVDProbeAll(CBlkDev *bd)
   d2=0x376;
   if (bd->base0=d1&~7) {
     bd->unit=0;
-    if (BootDVDProve(bd))
+    if (BootDVDProbe(bd))
       return TRUE;
     bd->unit=1;
-    if (BootDVDProve(bd))
+    if (BootDVDProbe(bd))
       return TRUE;
   }
 }
 
 U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
-		CATARep **_root,I64 *num_hints)
+		CATARep **_head,I64 *num_hints)
 {
   I64 type;
   base0&=-8;
@@ -104,10 +104,10 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
       "$$RED$$CD/DVD Drive $$LTBLUE$$ATAPI ";
     "%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
 	  msg,base0,base1,irq,unit;
-    if (_root) {
+    if (_head) {
       tempha=CAlloc(sizeof(CATARep));
-      tempha->next=*_root;
-      *_root=tempha;
+      tempha->next=*_head;
+      *_head=tempha;
       tempha->num=*num_hints;
       tempha->type=type;
       tempha->base0=base0;
@@ -128,11 +128,11 @@ Bool ATARepExitAllApplications()
     return FALSE;
 }
 
-public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
+public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_head=NULL)
 {//Report possible ATA devices by probing.  Hard disks and CD/DVDs.
   I64 d1,d2,d3,i,j,k,cnt=0,unlock_flags=0,num_hints=0;
 #assert NUM_BLKDEVS<=64
-  if (_root) *_root=NULL;
+  if (_head) *_head=NULL;
 
   if (pmt && ATARepExitAllApplications)
     return 0;
@@ -157,33 +157,33 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
 	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x14);
 	d3=PCIReadU8(j.u8[2],j.u8[1],j.u8[0],0x3C);
 	if (d1&1 && d2&1) {
-	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
 	} else {
 	  d1=0x1F0; d2=0x3F6; d3=14;
-	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
 	}
 	d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x18);
 	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x1C);
 	if (d1&1 && d2&1) {
-	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
 	} else {
 	  d1=0x170; d2=0x376; d3=15;
-	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
 	}
       }
     }
   if (!cnt) {
     d1=0x1F0; d2=0x3F6; d3=14;
-    ATARepEntry(d1,d2,0,d3,"Primary IDE",_root,&num_hints);
-    ATARepEntry(d1,d2,1,d3,"Primary IDE",_root,&num_hints);
+    ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
+    ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
 
     d1=0x170; d2=0x376; d3=15;
-    ATARepEntry(d1,d2,0,d3,"Secondary IDE",_root,&num_hints);
-    ATARepEntry(d1,d2,1,d3,"Secondary IDE",_root,&num_hints);
+    ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
+    ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
   }
   '\n\n';
   for (i=0;i<NUM_BLKDEVS;i++)
@@ -192,19 +192,19 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_root=NULL)
   return num_hints;
 }
 
-CATARep *ATARepFind(CATARep *haystack_root,I64 needle_num)
+CATARep *ATARepFind(CATARep *haystack_head,I64 needle_num)
 {
-  while (haystack_root) {
-    if (haystack_root->num==needle_num)
-      return haystack_root;
-    haystack_root=haystack_root->next;
+  while (haystack_head) {
+    if (haystack_head->num==needle_num)
+      return haystack_head;
+    haystack_head=haystack_head->next;
   }
   return NULL;
 }
 
-CATARep *ATAIDDrvs(CATARep *root,CATARep **_ata_drv,CATARep **_atapi_drv)
+CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,CATARep **_atapi_drv)
 {//This is for when trying to sort-out main hard drives and CD/DVD drives.
-  CATARep *res=NULL,*tempha=root,*ata_drv=NULL,*atapi_drv=NULL;
+  CATARep *res=NULL,*tempha=head,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
   Bool was_silent=Silent;
   bd=Let2BlkDev(':',FALSE);
@@ -256,16 +256,16 @@ I64 AutoMountIDE()
 //It uses 'C' and 'T' as first drive letters or whatever you set
   //in config when compiling Kernel.BIN.
   I64 res=0;
-  CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
-  ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,&ata_drv,&atapi_drv);
+  CATARep *head=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
+  ATARep(FALSE,TRUE,&head);
+  ATAIDDrvs(head,&ata_drv,&atapi_drv);
   if (ata_drv && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
 	ata_drv->base0,ata_drv->base1,ata_drv->unit))
     res++;
   if (atapi_drv && ATAMount(blkdev.first_dvd_drv_let,BDT_ATAPI,
 	atapi_drv->base0,atapi_drv->base1,atapi_drv->unit))
     res++;
-  tempha=root;
+  tempha=head;
   while (tempha) {
     if (tempha!=ata_drv && tempha!=atapi_drv) {
       if (tempha->type==BDT_ATA && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
@@ -278,7 +278,7 @@ I64 AutoMountIDE()
     }
     tempha=tempha->next;
   }
-  LinkedLstDel(root);
+  LinkedLstDel(head);
   blkdev.auto_mount_ide_cnt=res;
   return res;
 }

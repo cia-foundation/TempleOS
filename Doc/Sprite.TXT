@@ -1,4 +1,4 @@
-$WW,1$A $LK,"CSprite",A="MN:CSprite"$ is an ordered list of $LK,"these",A="MN:SPT_END"$ elements, created with $FG,2$<CTRL-r>$FG$$FG$.  Normally, they are packed together in a list and the address of the first is passed to routines.
+$WW,1$A $LK,"CSprite",A="MN:CSprite"$ is an ordered list of $LK,"these",A="MN:SPT_END"$ elements, created with $FG,2$<CTRL-r>$FG$.  Normally, they are packed together in a list and the address of the first is passed to routines.
 
 See $LK,"::/Demo/Graphics/SpritePlot.CPP"$, $LK,"::/Demo/Graphics/SpritePlot3D.CPP"$, $LK,"::/Demo/Graphics/SpritePut.CPP"$, $LK,"::/Demo/Graphics/SpriteRaw.CPP"$ and $LK,"SpriteMeshEd",A="MN:SpriteMeshEd"$().
 

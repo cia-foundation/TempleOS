@@ -144,7 +144,7 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
   if (_type)
     *_type=RT_I64;
 
-  tempi=cc->coc.coc_root.next;
+  tempi=cc->coc.coc_head.next;
   while (code=tempi->ic_code) {
     tempi_next=tempi->next;
     if (dead_code&&code!=IC_LABEL) {
@@ -587,7 +587,6 @@ p4_sib:
 	case IC_GET_RFLAGS:
 	case IC_CARRY:
 	case IC_RDTSC:
-	case IC_HPET:
 	case IC_SET_RFLAGS:
 	case IC_GET_RBP:
 	case IC_SET_RBP:

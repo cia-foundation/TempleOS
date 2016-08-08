@@ -6,7 +6,7 @@ U0 TSStart()
 U0 TS()
 {
   progress4=ts_num++;
-  progress4_max=167;
+  progress4_max=168;
   *progress4_desc=0;
 }
 U0 TSEnd()
@@ -976,6 +976,14 @@ U0 Do()
 }
 
 */
+
+U0 DoRateCores()
+{
+  CTask *task=User;
+  XTalkWait(task,"#include \"::/Demo/MultiCore/RateCores\";\n");
+  Sleep(750);
+  XTalk(task,"Exit;\n");
+}
 
 U0 DoMPPrint()
 {
@@ -2305,6 +2313,7 @@ U0 OSTestSuite()
   TS; DoClouds;
   TS; if (mp_cnt>1) DoRadixSort;
   TS; if (mp_cnt>1 && DrvIsWritable(':')) DoLoadTest;
+  TS; if (mp_cnt>1) DoRateCores;
   TS; if (mp_cnt>1) DoMPPrint;
   TS; if (mp_cnt>1) DoLock;
   TS; if (mp_cnt>1) DoInterrupts;

@@ -13,10 +13,6 @@ BHD_CODE::
 
 	CLD
 
-	MOV	AX,VGAM_TEXT/16
-	MOV	FS,AX
-	MOV	U32 FS:[0],'B'+GREEN<<12+('2'+GREEN<<12)<<16
-
 	MOV	AX,BOOT_HIGH_LOC_HD
 	MOV	ES,AX
 
@@ -91,7 +87,7 @@ BHD_HISTART:
 //My assembler doesn't support 16-bit very well.
 	DU8	0xEA;	//JMP BOOT_RAM_BASE:0000
 	DU16	0,BOOT_RAM_BASE/16;
-//Continues here $LK,"::/Kernel/KStart.CPP",A="FL:::/Kernel/KStart.CPP,1"$
+//Continues here $LK,"::/Kernel/KStart16.CPP",A="FL:::/Kernel/KStart16.CPP,1"$
 BHD_END::
 #assert BHD_END-BHD_START<MODULE_SIZE-2
 }

@@ -49,7 +49,7 @@ $FG,2$Elem$FG$	Element
 $FG,2$Equ$FG$	Equal
 $FG,2$Evt$FG$	Event
 $FG,2$Exe$FG$	Execute
-$FG,2$Ext$FG$	Extern, Extended
+$FG,2$Ext$FG$	Extern, Extended, Extract
 $FG,2$Feat$FG$	Feature
 $FG,2$FG$FG$	Foreground
 $FG,2$Fmt$FG$	Format
@@ -94,7 +94,7 @@ $FG,2$ODE$FG$	Ordinary Differential Equation
 $FG,2$Opt$FG$	Option, Optimize
 $FG,2$Paren$FG$	Parenthesis
 $FG,2$Pix$FG$	Pixel
-$FG,2$$FG,2$Pkg$FG$	Package
+$FG,2$Pkg$FG$	Package
 $FG,2$Poly$FG$	Polygon
 $FG,2$Pos$FG$	Position
 $FG,2$Pow$FG$	Power
@@ -255,8 +255,6 @@ $ID,-2$$TR,"Gs"$
 $ID,2$The CPU GS segment reg.  This reg points to the current core's $LK,"CCPU",A="MN:CCPU"$.
 $ID,-2$$TR,"Heap"$
 $ID,2$Programs can dynamically request chunks of memory alloced from a $FG,2$heap$FG$ using $LK,"MAlloc",A="MN:MAlloc"$().  They must $LK,"Free",A="MN:Free"$() it when finished.  Ptrs are used to refer to the chunk.  The $FG,2$heap$FG$ is dynamically alloced mem.
-$ID,-2$$TR,"Root"$
-$ID,2$The base of a binary tree or the head of a queue is the $FG,2$root$FG$.  (I don't like the word $FG,2$head$FG$.)
 $ID,-2$$TR,"Join"$
 $ID,2$When two parts of a program have a common low-level routine, that routine is often labeled SomethingJoin.
 $ID,-2$$TR,"user_data"$

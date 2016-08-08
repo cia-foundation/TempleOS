@@ -32,7 +32,7 @@ U0 PsmRightClick(I64 x,I64 y)
   I64 i,old_doc_flags;
   if (DocPut) old_doc_flags=DocPut->flags;
   oc.cur_note=tempo=PsmFindNote(x,y);
-  if (tempo!=&oc.root) {
+  if (tempo!=&oc.head) {
     Fs->win_inhibit=WIG_USER_TASK_DFT;
     i=PopUpDuration;
     if (0<=i<PSM_NUM_DURATIONS) {
@@ -133,10 +133,10 @@ U0 PsmLeftClickPickNoteBox(I64 duration)
     }
   } while (msg_code!=MSG_IP_L_UP);
   if (a2<13*FONT_HEIGHT) {
-    if (a1>oc.root.last->x)
-      tempo1=oc.root.last;
-    else if (a1<oc.root.next->x)
-      tempo1=&oc.root;
+    if (a1>oc.head.last->x)
+      tempo1=oc.head.last;
+    else if (a1<oc.head.next->x)
+      tempo1=&oc.head;
     else
       tempo1=PsmFindNote(a1-PSM_NOTE_SPACING/2,a2);
     tempo=CAlloc(sizeof(PsmNote));
@@ -172,10 +172,10 @@ U0 PsmLeftClickPickMeterBox(I64 top,I64 bottom)
     }
   } while (msg_code!=MSG_IP_L_UP);
   if (a2<13*FONT_HEIGHT) {
-    if (a1>=oc.root.x)
-      tempo1=oc.root.last;
-    else if (a1<oc.root.next->x)
-      tempo1=&oc.root;
+    if (a1>=oc.head.x)
+      tempo1=oc.head.last;
+    else if (a1<oc.head.next->x)
+      tempo1=&oc.head;
     else
       tempo1=PsmFindNote(a1-PSM_NOTE_SPACING/2,a2);
     tempo=CAlloc(sizeof(PsmNote));
@@ -194,7 +194,7 @@ U0 PsmLeftClickStaffPtr(I64 x,I64 y)
   PsmNote *tempo,*tempo1;
   I64 o,n,msg_code,a1,a2,n_original,o_original;
   oc.cur_note=tempo=PsmFindNote(x,y);
-  if (tempo!=&oc.root) {
+  if (tempo!=&oc.head) {
     if (tempo->type==PSMT_NOTE) {
       n_original=tempo->note;
       o_original=tempo->octave;
@@ -202,7 +202,7 @@ U0 PsmLeftClickStaffPtr(I64 x,I64 y)
 	msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
 	if (msg_code==MSG_IP_L_UP) {
 	  tempo1=PsmFindNote(a1,a2);
-	  if (tempo1==&oc.root || tempo1==tempo)
+	  if (tempo1==&oc.head || tempo1==tempo)
 	    goto move_note;
 	  else {
 	    Free(tempo1->word);
@@ -420,9 +420,9 @@ U0 Psalmody(U8 *dirname="~/Psalmody")
 
   MemSet(&oc,0,sizeof(PsmCtrl));
   oc.screen_x=0;
-  oc.root.next=oc.root.last=&oc.root;
+  oc.head.next=oc.head.last=&oc.head;
   oc.clipboard.next=oc.clipboard.last=&oc.clipboard;
-  oc.cur_note=&oc.root;
+  oc.cur_note=&oc.head;
   oc.dc2=DCAlias;
 
   MenuPush(
@@ -569,29 +569,29 @@ mo_got_msg:
 		switch (a2.u8[0]) {
 		  case SC_CURSOR_LEFT:
 		    if (a2&SCF_CTRL) {
-		      while (oc.cur_note->last!=&oc.root) {
+		      while (oc.cur_note->last!=&oc.head) {
 			oc.cur_note=oc.cur_note->last;
-			if (oc.cur_note!=&oc.root)
+			if (oc.cur_note!=&oc.head)
 			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 		      }
 		    } else {
-		      if (oc.cur_note->last!=&oc.root) {
+		      if (oc.cur_note->last!=&oc.head) {
 			oc.cur_note=oc.cur_note->last;
-			if (oc.cur_note!=&oc.root)
+			if (oc.cur_note!=&oc.head)
 			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 		      }
 		    }
 		    break;
 		  case SC_CURSOR_RIGHT:
 		    if (a2&SCF_CTRL) {
-		      while (oc.cur_note!=&oc.root) {
-			if (oc.cur_note!=&oc.root)
+		      while (oc.cur_note!=&oc.head) {
+			if (oc.cur_note!=&oc.head)
 			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 			oc.cur_note=oc.cur_note->next;
 		      }
 		    } else {
-		      if (oc.cur_note!=&oc.root) {
-			if (oc.cur_note!=&oc.root)
+		      if (oc.cur_note!=&oc.head) {
+			if (oc.cur_note!=&oc.head)
 			  LBEqu(&oc.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
 			oc.cur_note=oc.cur_note->next;
 		      }
@@ -603,7 +603,7 @@ mo_got_msg:
 		    else {
 		      tempo=oc.cur_note;
 		      oc.cur_note=tempo->next;
-		      if (tempo!=&oc.root) {
+		      if (tempo!=&oc.head) {
 			QueRem(tempo);
 			PsmNoteDel(tempo);
 		      }
@@ -650,11 +650,11 @@ mo_got_msg:
 		  oc.screen_x=0;
 		  psm_duration=1.0;
 		  psm_octave=3;
-		  PsmSongDel(&oc.root);
-		  oc.cur_note=&oc.root;
+		  PsmSongDel(&oc.head);
+		  oc.cur_note=&oc.head;
 		  PsmLoadSong(filename,&psm_octave,&psm_duration);
 		  oc.record_entry->checked=FALSE;
-		  oc.cur_note=oc.root.next;
+		  oc.cur_note=oc.head.next;
 		}
 		PsmPushMode(psm_octave);
 		col=0;
@@ -680,12 +680,12 @@ mo_got_msg:
 		filename=NULL;
 		psm_duration=1.0;
 		psm_octave=3;
-		PsmSongDel(&oc.root);
-		oc.cur_note=&oc.root;
+		PsmSongDel(&oc.head);
+		oc.cur_note=&oc.head;
 		oc.screen_x=0;
 		break;
 	      case '\n':
-		if (oc.cur_note!=&oc.root)
+		if (oc.cur_note!=&oc.head)
 		  PsmRightClick(oc.cur_note->x,oc.cur_note->y);
 		break;
 	      case 'x':
@@ -695,7 +695,7 @@ mo_got_msg:
 		oc.playing=TRUE;
 		PsmMenu(psm_octave);
 		tempo=oc.cur_note;
-		while (tempo!=&oc.root) {
+		while (tempo!=&oc.head) {
 		  if (tempo->type!=PSMT_METER) {
 		    timeout_val=cnts.jiffies;
 		    if (ip.pos_text.y-Fs->win_top<18)
@@ -748,7 +748,7 @@ mo_got_msg:
 		  }
 		  tempo=tempo->next;
 		}
-		oc.cur_note=&oc.root;
+		oc.cur_note=&oc.head;
 		oc.screen_x+=oc.cur_note->x-GR_WIDTH/2;
 		oc.playing=FALSE;
 		PsmMenu(psm_octave);
@@ -758,7 +758,7 @@ mo_got_msg:
 		break;
 	      case CH_BACKSPACE:
 		tempo=oc.cur_note->last;
-		if (tempo!=&oc.root) {
+		if (tempo!=&oc.head) {
 		  QueRem(tempo);
 		  PsmNoteDel(tempo);
 		}
@@ -860,7 +860,7 @@ mo_done:
   } catch
     PutExcept;
   PsmPopMode;
-  PsmSongDel(&oc.root);
+  PsmSongDel(&oc.head);
   PsmSongDel(&oc.clipboard);
   TempoDel(c);
   Kill(play_task);

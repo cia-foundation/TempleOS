@@ -92,16 +92,16 @@ CIntermediateCode *ICAdd(CCmpCtrl *cc,
     flags|=ICF_LOCK;
   tempi->ic_flags=flags;
   tempi->ic_line=cc->last_line_num;
-  QueIns(tempi,cc->coc.coc_root.last);
+  QueIns(tempi,cc->coc.coc_head.last);
   return tempi;
 }
 
 U0 COCInit(CCmpCtrl *cc)
 {
   CCodeCtrl *tempcbh=&cc->coc;
-  QueInit(&tempcbh->coc_root.next);
+  QueInit(&tempcbh->coc_head.next);
   QueInit(&tempcbh->coc_next_misc);
-  tempcbh->coc_root.ic_code=IC_END;
+  tempcbh->coc_head.ic_code=IC_END;
 }
 
 U0 COCPush(CCmpCtrl *cc)
@@ -125,11 +125,11 @@ U0 COCPop(CCmpCtrl *cc)
 
 U0 COCAppend(CCmpCtrl *cc, CCodeCtrl *tempcbh)
 {
-  if (tempcbh->coc_root.next!=&cc->coc.coc_root.next) {
-    cc->coc.coc_root.last->next=tempcbh->coc_root.next;
-    tempcbh->coc_root.next->last=cc->coc.coc_root.last;
-    cc->coc.coc_root.last=tempcbh->coc_root.last;
-    tempcbh->coc_root.last->next=&cc->coc.coc_root.next;
+  if (tempcbh->coc_head.next!=&cc->coc.coc_head.next) {
+    cc->coc.coc_head.last->next=tempcbh->coc_head.next;
+    tempcbh->coc_head.next->last=cc->coc.coc_head.last;
+    cc->coc.coc_head.last=tempcbh->coc_head.last;
+    tempcbh->coc_head.last->next=&cc->coc.coc_head.next;
   }
   if (tempcbh->coc_next_misc!=&cc->coc.coc_next_misc) {
     cc->coc.coc_last_misc->next=tempcbh->coc_next_misc;
@@ -187,7 +187,7 @@ U0 COCDel(CCmpCtrl *cc,CCodeCtrl *coc)
 {
   CCodeMisc *cm,*cm1;
   U8 *undef=NULL;
-  QueDel(&coc->coc_root.next);
+  QueDel(&coc->coc_head.next);
   cm=coc->coc_next_misc;
   while (cm!=&coc->coc_next_misc) {
     cm1=cm->next;
@@ -233,7 +233,7 @@ U0 COCHeaderPut(CCmpCtrl *cc,I64 pass,Bool put)
     if (put) {
       if (Bt(&cc->saved_pass_trace,pass-1)) {
 	"$$IV,1$$Pass %d:$$IV,0$$\n",pass-1;
-	tempi=cc->coc.coc_root.next;
+	tempi=cc->coc.coc_head.next;
 	while (tempi->ic_code) {
 	  if (tempi->ic_flags&ICF_PASS_TRACE)
 	    ICPut(cc,tempi);

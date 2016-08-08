@@ -198,11 +198,11 @@ $FG$$ID,-2$
   $FG,2$^$FG$
   $FG,2$|$FG$
   $FG,2$+$FG$,$FG,2$-$FG$
-  $FG,2$$FG,2$<$FG$,$FG,2$>$FG$,$FG,2$<=$FG$,$FG,2$>=$FG$
+  $FG,2$<$FG$,$FG,2$>$FG$,$FG,2$<=$FG$,$FG,2$>=$FG$
   $FG,2$==$FG$,$FG,2$!=$FG$
   $FG,2$&&$FG$
-  $FG,2$$FG,2$^^$FG$
-  $FG,2$||$FG$$FG$
+  $FG,2$^^$FG$
+  $FG,2$||$FG$
   $FG,2$=$FG$,$FG,2$<<=$FG$,$FG,2$>>=$FG$,$FG,2$*=$FG$,$FG,2$/=$FG$,$FG,2$&=$FG$,$FG,2$|=$FG$,$FG,2$^=$FG$,$FG,2$+=$FG$,$FG,2$-=$FG$
 
 * You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_PAREN",A="MN:OPTf_WARN_PAREN"$,ON) to find unnecessary parentheses in code.

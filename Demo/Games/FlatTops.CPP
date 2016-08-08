@@ -46,14 +46,14 @@ class Obj
   I32 torpedos,max_torpedos;
   F64 torpedos_range;
   U8  fire[(FIRE_WIDTH*FIRE_HEIGHT+7)/8];
-} obj_root;
+} obj_head;
 
 class Torpedo
 {
   Torpedo *next,*last;
   Obj *target;
   F64 x,y,é,speed,timeout;
-} torpedo_root;
+} torpedo_head;
 
 #define SA_PARKED	0
 #define SA_LAUNCHING	1
@@ -96,9 +96,9 @@ Obj *ObjFind(F64 x,F64 y,
 	     I64 flag_mask=OF_ACTIVE|OF_RETURNING,I64 flag_val=OF_ACTIVE,
 	     I64 type_mask=-1,I64 player_mask=-1,F64 *_d=NULL)
 {
-  Obj *tempo=obj_root.next,*best=NULL;
+  Obj *tempo=obj_head.next,*best=NULL;
   F64 dd,best_dd=MAX_F64;
-  while (tempo!=&obj_root) {
+  while (tempo!=&obj_head) {
     if (tempo->flags&flag_mask==flag_val &&
 	  Bt(&type_mask,tempo->type)&&Bt(&player_mask,tempo->player)) {
       dd=Sqr(tempo->x-x)+Sqr(tempo->y-y);
@@ -163,15 +163,15 @@ U0 DrawIt(CTask *task,CDC *dc)
   Obj *tempo;
   Torpedo *tempt;
 
-  tempt=torpedo_root.next;
-  while (tempt!=&torpedo_root) {
+  tempt=torpedo_head.next;
+  while (tempt!=&torpedo_head) {
     dc->color=WHITE;
     GrPlot(dc,tempt->x,tempt->y);
     tempt=tempt->next;
   }
 
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     if (tempo->flags&OF_ACTIVE && tempo->flags&OF_SHIP) {
       SpriteZ3B(dc,tempo->x,tempo->y,0,
 	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
@@ -221,8 +221,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempo=tempo->next;
   }
 
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_SHIP))
       SpriteZ3B(dc,tempo->x,tempo->y,0,
 	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
@@ -279,8 +279,8 @@ U0 Init()
 	w=Fs->pix_width,h=Fs->pix_height;
   Squadron *temps;
   Obj *tempo,*tempo1;
-  QueInit(&obj_root);
-  QueInit(&torpedo_root);
+  QueInit(&obj_head);
+  QueInit(&torpedo_head);
 
   next_noise=tS;
   Fs->scroll_x=0;
@@ -309,7 +309,7 @@ U0 Init()
       tempo1->torpedos =tempo1->max_torpedos=0;
       tempo1->torpedos_range =0.0;
       tempo1->next_action_time=0;
-      QueIns(tempo1,obj_root.last);
+      QueIns(tempo1,obj_head.last);
     }
 
     for (ship=0;ship<num_carriers[player];ship++) {
@@ -330,7 +330,7 @@ U0 Init()
       tempo1->torpedos =tempo1->max_torpedos=0;
       tempo1->torpedos_range =0.0;
       tempo1->next_action_time=0;
-      QueIns(tempo1,obj_root.last);
+      QueIns(tempo1,obj_head.last);
 
       for (squadron=0;squadron<num_squadrons_per_carrier[player];
 	    squadron++,num_squadrons++) {
@@ -349,7 +349,7 @@ U0 Init()
 	  tempo->ship_guns=0;		tempo->ship_guns_range=0.0;
 	  tempo->torpedos =tempo->max_torpedos=1;
 	  tempo->torpedos_range =20.0;
-	  QueIns(tempo,obj_root.last);
+	  QueIns(tempo,obj_head.last);
 	}
       }
     }
@@ -359,8 +359,8 @@ U0 Init()
     temps->next_in_squadron=temps->last_in_squadron=temps;
     temps->squadron=i;
   }
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     if (tempo->squadron>=0) {
       temps=&squadrons[tempo->squadron];
       temps->host  =tempo->host;
@@ -374,8 +374,8 @@ U0 Init()
 
 U0 CleanUp()
 {
-  QueDel(&obj_root,TRUE);
-  QueDel(&torpedo_root,TRUE);
+  QueDel(&obj_head,TRUE);
+  QueDel(&torpedo_head,TRUE);
   Free(squadrons);
 }
 
@@ -389,8 +389,8 @@ Obj *ObjLaunch(I64 player,I64 squadron=-1,
   if (host && cur_time>host->next_action_time) {
     if (é==MAX_F64)
       é=Arg(x-host->x,y-host->y);
-    tempo=obj_root.next;
-    while (tempo!=&obj_root) {
+    tempo=obj_head.next;
+    while (tempo!=&obj_head) {
       if (tempo->host==host && (squadron<0||tempo->squadron==squadron) &&
 	    !(tempo->flags&OF_ACTIVE) &&
 	    (tempo->squadron<0||squadrons[tempo->squadron].action==SA_PARKED||
@@ -564,8 +564,8 @@ U0 SquadronActions()
 U0 AI(I64 player,F64 period)
 {
   Obj *tempo;
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     if (tempo->player==player) {
       if (tempo->type==OT_CARRIER && Rand<5*period)
 	SquadronLaunch(player,tempo->x,tempo->y);
@@ -620,8 +620,8 @@ U0 Combat(F64 period)
   F64 d;
   Obj *tempo,*tempo1;
   Torpedo *tempt;
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     tempo->flags&=~OF_SHOOTING;
     if (tempo->flags&OF_ACTIVE &&
 	  (tempo1=ObjFind(tempo->x,tempo->y,OF_ACTIVE,OF_ACTIVE,,
@@ -639,7 +639,7 @@ U0 Combat(F64 period)
 	  tempo1->death_time=tempt->timeout=tS+d;
 	  tempt->target=tempo1;
 	  tempt->é=Arg(tempo1->x-tempo->x,tempo1->y-tempo->y);
-	  QueIns(tempt,torpedo_root.last);
+	  QueIns(tempt,torpedo_head.last);
 	  Sweep(2000,2000,300);
 	} else if (tempo->ship_guns>0 && d<tempo->ship_guns_range) {
 	  tempo->flags|=OF_SHOOTING;
@@ -670,8 +670,8 @@ U0 Combat(F64 period)
     }
     tempo=tempo->next;
   }
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     tempo1=tempo->next;
     if (tempo->type==OT_FIGHTER &&
 	  (tempo->life_percent<=0.0 || tempo->flags&OF_ACTIVE &&
@@ -680,8 +680,8 @@ U0 Combat(F64 period)
       ObjDel(tempo);
     tempo=tempo1;
   }
-  tempo=obj_root.next;
-  while (tempo!=&obj_root) {
+  tempo=obj_head.next;
+  while (tempo!=&obj_head) {
     tempo1=tempo->next;
     if (tempo->life_percent<=0.0)
       ObjDel(tempo);
@@ -700,8 +700,8 @@ U0 AnimateTask(I64)
     period=GAME_SPEED_SCALE*game_speed/ANIMATE_FREQ;
     SquadronActions;
 
-    tempo=obj_root.next;
-    while (tempo!=&obj_root) {
+    tempo=obj_head.next;
+    while (tempo!=&obj_head) {
       if (tempo->flags&OF_ACTIVE && tempo->fuel>0) {
 	if (tempo->dé) {
 	  d=tempo->dé;
@@ -717,8 +717,8 @@ U0 AnimateTask(I64)
       tempo=tempo->next;
     }
 
-    tempt=torpedo_root.next;
-    while (tempt!=&torpedo_root) {
+    tempt=torpedo_head.next;
+    while (tempt!=&torpedo_head) {
       tempt1=tempt->next;
       if (tS>tempt->timeout) {
 	tempo=tempt->target;
@@ -736,8 +736,8 @@ U0 AnimateTask(I64)
       tempt=tempt1;
     }
 
-    tempo=obj_root.next;
-    while (tempo!=&obj_root) {
+    tempo=obj_head.next;
+    while (tempo!=&obj_head) {
       if (tempo->host && !(tempo->flags&OF_ACTIVE)) {
 	tempo->x=tempo->host->x;
 	tempo->y=tempo->host->y;
@@ -745,8 +745,8 @@ U0 AnimateTask(I64)
       tempo=tempo->next;
     }
 
-    tempo=obj_root.next;
-    while (tempo!=&obj_root) {
+    tempo=obj_head.next;
+    while (tempo!=&obj_head) {
       if (tempo->flags&OF_ACTIVE) {
 	if (tempo->host) {
 	  d=Sqrt(Sqr(tempo->x-tempo->host->x)+Sqr(tempo->y-tempo->host->y));

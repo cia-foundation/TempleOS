@@ -456,7 +456,7 @@ public CDocEntry *DocSprite(CDoc *doc=NULL,U8 *elems,U8 *fmt=NULL)
   MemCpy(tempb->data,elems,size);
   tempb->num=doc->cur_bin_num;
   tempb->use_cnt=1;
-  QueIns(tempb,doc->bin_root.last);
+  QueIns(tempb,doc->bin_head.last);
   if (fmt)
     st=MStrPrint(fmt,doc->cur_bin_num++);
   else

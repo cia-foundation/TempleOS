@@ -641,7 +641,7 @@ class IndirectOrders
   IndirectOrders *next,*last;
   Unit *attacker;
   I64 row,col;
-} indirect_root;
+} indirect_head;
 
 U0 PlotShot(Unit *tempu,I64 row,I64 col)
 {
@@ -653,7 +653,7 @@ U0 PlotShot(Unit *tempu,I64 row,I64 col)
   tempi->attacker=tempu;
   tempi->row=row;
   tempi->col=col;
-  QueIns(tempi,indirect_root.last);
+  QueIns(tempi,indirect_head.last);
 }
 
 Bool firing=FALSE;
@@ -798,8 +798,8 @@ U0 IndirectFireResolve()
   F64 x1,y1,x2,y2,d,dammage=0,range_factor;
   Unit *tempu,*target;
   Bool hit;
-  IndirectOrders *tempi=indirect_root.next,*tempi1;
-  while (tempi!=*indirect_root) {
+  IndirectOrders *tempi=indirect_head.next,*tempi1;
+  while (tempi!=*indirect_head) {
     tempi1=tempi->next;
     tempu=tempi->attacker;
     RowCol2XY(&x1,&y1,tempu->row,tempu->col);
@@ -1303,7 +1303,7 @@ U0 Init()
   Fs->horz_scroll.pos=0;
   Fs->vert_scroll.pos=0;
   InitUnits;
-  QueInit(&indirect_root);
+  QueInit(&indirect_head);
   turn=0;
   fire_radius=0;
   show_visible_row=-1;
@@ -1315,7 +1315,7 @@ U0 Init()
 
 U0 CleanUp()
 {
-  QueDel(&indirect_root,TRUE);
+  QueDel(&indirect_head,TRUE);
 }
 
 U0 HandleChar(U8 ch)
@@ -1543,8 +1543,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     GrCircle(dc,fire_radius_x-h,fire_radius_y-v,fire_radius);
   }
   if (Blink(10)) {
-    tempi=indirect_root.next;
-    while (tempi!=&indirect_root) {
+    tempi=indirect_head.next;
+    while (tempi!=&indirect_head) {
       if (tempi->attacker->player==view_player) {
 	RowCol2XY(&x,&y,tempi->row,tempi->col);
 	Sprite3(dc,x-task->horz_scroll.pos,y-task->vert_scroll.pos,0,$IB,"<5>",BI=5$);

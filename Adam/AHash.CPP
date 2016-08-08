@@ -248,7 +248,7 @@ U8 *idx=NULL,CDoc *doc=NULL)
 	  last_idx=StrNew(cur_idx);
 	  if (i)
 	    DocPrint(doc,"\n\n");
-	  DocPrint(doc,"$$WW,0$$$$PURPLE$$$$TX+CX,\"%Q\"$$$$FG$$\n",cur_idx);
+	  DocPrint(doc,"$$WW,0$$$$PURPLE$$$$TX+CX,\"%$$Q\"$$$$FG$$\n",cur_idx);
 	}
       }
 
@@ -315,7 +315,7 @@ U8 *idx=NULL,CDoc *doc=NULL)
 
 wh_done:
   if (doc) {
-    if (doc->root.next==doc)
+    if (doc->head.next==doc)
       DocPrint(doc,"No Match");
     else
       DocRecalc(doc);
@@ -387,7 +387,7 @@ public U0 MapFileLoad(U8 *filename)
     base=temph(CHashGeneric *)->user_data0+sizeof(CBinFile);
 
   if (!doc) return;
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_LINK) {
       if (*doc_e->tag)

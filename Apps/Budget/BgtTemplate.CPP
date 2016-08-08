@@ -1,8 +1,8 @@
 U0 BgtTemplatePurge(CBgtTemplate *tempt)
 {
   CBgtEntry	*tempb,*tempb1;
-  tempb=b_root.next;
-  while (tempb!=&b_root) {
+  tempb=b_head.next;
+  while (tempb!=&b_head) {
     tempb1=tempb->next;
     if (tempb->template==tempt) {
       QueRem(tempb);
@@ -110,8 +110,8 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
 
 U0 CBgtTemplatesExpand()
 {
-  CBgtTemplate	*tempt=t_root.next;
-  while (tempt!=&t_root) {
+  CBgtTemplate	*tempt=t_head.next;
+  while (tempt!=&t_head) {
     BgtTemplateExpand(tempt);
     tempt=tempt->next;
   }

@@ -75,7 +75,7 @@ U0 BlogScreenShot()
   gr.fp_draw_input_ptr=NULL;
   WinMgrSync(2);
   dc1=DCScreenCapture;
-  dc2=DCExtract(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
+  dc2=DCExt(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
   BlogDCImgWrite(dc2);
   gr.fp_draw_input_ptr=old_fp_draw_input_ptr;
   DCDel(dc1);
@@ -89,7 +89,7 @@ public U0 MakeWebSitePartial()
   MkDir("D:/Wb/Home");
   MkDir("D:/Wb/Home/Web");
   MkDir("D:/Wb/Home/Web/TAD");
-  MkDir("D:/Wb/Home/Web/TAD/Blog");
+  MkDir("D:/Wb/Home/Web/TAD/BlogDir");
 
   FreshenWebDir("/Home/Web");
   FreshenWebDir("/Home/Web/" PERSONAL_INITIALS);
@@ -109,6 +109,7 @@ public U0 Blog()
   Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
   Msg(MSG_KEY_DOWN_UP,'\n',0);
   if (Ed(BlogLocalFile,EDF_WAS_WRITE)) {
+    DocOpt(BlogLocalFile,"-r");
     Copy(BlogLocalFile,"::" DAILY_BASE ".TXT.Z");
     Copy(BlogLocalFile,"D:" DAILY_BASE ".TXT.Z");
     Copy(BlogLocalFile,"D:/Wb" DAILY_BASE ".TXT.Z");

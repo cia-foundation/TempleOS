@@ -53,13 +53,23 @@ I64 DocOptDoc(CDoc *doc,I64 fuf_flags)
 {//Optimize Doc.
   Bool unlock=DocLock(doc);
   I64 res=0;
-  CDocEntry *doc_e;
+  CDocEntry *doc_e,*doc_e1,*doc_e_last;
   DocRecalc(doc);
-  doc_e=doc->root.next;
+  doc_e_last=NULL;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
+    doc_e1=doc_e->next;
     if (res+=DocOptEntry(doc,doc_e,fuf_flags))
       res+=DocOptEntry(doc,doc_e,fuf_flags);
-    doc_e=doc_e->next;
+    if (doc_e_last && doc_e_last->type&~0xFF00==doc_e->type&~0xFF00 &&
+       doc_e_last->de_flags==doc_e->de_flags &&
+       Bt(doldoc.type_flags_chk_dup,doc_e->type_u8) &&
+       doc_e_last->attr==doc_e->attr) {
+      DocEntryDel(doc,doc_e);
+      res++;
+    } else
+      doc_e_last=doc_e;
+    doc_e=doc_e1;
   }
   DocRecalc(doc);
   if (unlock)

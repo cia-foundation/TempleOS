@@ -139,7 +139,7 @@ U0 GrBitMapEdTrimToExtents(CDC **_img,I64 *_xx1,I64 *_yy1,
   }
 
   tr_done:
-  *_img=DCExtract(img,x1,y1,x2,y2);
+  *_img=DCExt(img,x1,y1,x2,y2);
   *_xx1+=x1;		    *_yy1+=y1;
   *_xx2+=x2-(img->width-1); *_yy2+=y2-(img->height-1); //not inclusive
   DCDel(img);
@@ -155,7 +155,7 @@ U0 GrBitMapEdAddOutline(CDC *img,I64 width,
     old_color=img->color;
     img->color=color;
     while (width-->0) {
-      src=DCExtract(img,0,0,img->width-1,img->height-1);
+      src=DCExt(img,0,0,img->width-1,img->height-1);
       for (i=0;i<img->height;i++)
 	for (j=0;j<img->width;j++)
 	  if (GrPeek(src,j,i)==bkcolor)
@@ -181,7 +181,7 @@ U0 GrBitMapEdEtch(CDC *img,I64 width,CColorROPU32 bkcolor)
     old_color=img->color;
     img->color=bkcolor;
     while (width-->0) {
-      src=DCExtract(img,0,0,img->width-1,img->height-1);
+      src=DCExt(img,0,0,img->width-1,img->height-1);
       for (i=0;i<img->height;i++)
 	for (j=0;j<img->width;j++)
 	  if (GrPeek(src,j,i)!=bkcolor)
@@ -347,7 +347,7 @@ bm_menu:
 	      break;
 	  }
 	  DCDel(undo);
-	  undo=DCExtract(img,0,0,img->width-1,img->height-1);
+	  undo=DCExt(img,0,0,img->width-1,img->height-1);
 	  undo->bkcolor=bkcolor;
 	  WinMgrSync(2,TRUE);	//Let popup close
 	  GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
@@ -612,7 +612,7 @@ bm_menu:
 		y22=y1;
 	      }
 	      DCDel(clipboard);
-	      clipboard=DCExtract(img,x11-xx1,y11-yy1,x22-xx1,y22-yy1);
+	      clipboard=DCExt(img,x11-xx1,y11-yy1,x22-xx1,y22-yy1);
 	      clipboard->bkcolor=bkcolor;
 	      if (mode==GBM_DELETE) {
 		img->color=bkcolor;

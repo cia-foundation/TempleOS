@@ -159,7 +159,7 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
 
   DocLock(doc);
   if (res) {
-    doc_e=doc->root.next;
+    doc_e=doc->head.next;
     while (doc_e!=doc) {
       if (doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_CHECK_BOX)
 	DocDataScan(doc,doc_e);

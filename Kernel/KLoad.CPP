@@ -242,7 +242,7 @@ U0 LoadKernel()
   HashGenericAdd(KERNEL_MODULE_NAME,HTT_MODULE|HTF_PUBLIC,
 	sys_boot_base-sizeof(CBinFile));
 
-  //Abs patches done here $LK,"CPatchTableAbsAddr",A="FF:D:/Kernel/KStart.CPP,CPatchTableAbsAddr"$.
+  //Abs patches done here $LK,"CPatchTableAbsAddr",A="FF:D:/Kernel/KStart32.CPP,CPatchTableAbsAddr"$.
   LoadPass1(sys_boot_patch_table_base,sys_boot_base,LDF_NO_ABSS|LDF_SILENT);
 
   //No main routines

@@ -363,22 +363,23 @@ U0 EdInsLink()
       switch (type) {
 	case LK_PLACE_ANCHOR:
 	  if (html_link)
-	    st=MStrPrint("$$AN,\"%Q\",A=\"%Q\",HTML=\"%Q\"$$",tag,link,html_link);
+	    st=MStrPrint("$$AN,\"%$$Q\",A=\"%$$Q\",HTML=\"%$$Q\"$$",
+		  tag,link,html_link);
 	  else
-	    st=MStrPrint("$$AN,\"%Q\",A=\"%Q\"$$",tag,link);
+	    st=MStrPrint("$$AN,\"%$$Q\",A=\"%$$Q\"$$",tag,link);
 	  break;
 	default:
 	  if (html_link)
-	    st=MStrPrint("$$LK%s,\"%Q\",A=\"%Q\",HTML=\"%Q\"$$",
+	    st=MStrPrint("$$LK%s,\"%$$Q\",A=\"%$$Q\",HTML=\"%$$Q\"$$",
 		  pop_up_st,tag,link,html_link);
 	  else
-	    st=MStrPrint("$$LK%s,\"%Q\",A=\"%Q\"$$",pop_up_st,tag,link);
+	    st=MStrPrint("$$LK%s,\"%$$Q\",A=\"%$$Q\"$$",pop_up_st,tag,link);
       }
     }
   }
   if (st) {
     if (quote)
-      "%Q",st;
+      "%$$Q",st;
     else
       "%s",st;
   }
@@ -540,7 +541,7 @@ U0 EdInsText()
     if (e->tree)      CatPrint(buf,"+TR");
     if (e->collapsed) CatPrint(buf,"+C");
     st=MStrPrint("%q",e->tag);
-    "$$TX%s,\"%Q\"",buf,st;
+    "$$TX%s,\"%$$Q\"",buf,st;
     Free(st);
     if (*e->shift_x)
       ",SX=%s",e->shift_x;
@@ -550,12 +551,12 @@ U0 EdInsText()
       ",SCX=%s",e->scroll_x;
     if (*e->define_str) {
       st=MStrPrint("%q",e->define_str);
-      ",D=\"%Q\"",st;
+      ",D=\"%$$Q\"",st;
       Free(st);
     }
     if (*e->html_link) {
       st=MStrPrint("%q",e->html_link);
-      ",HTML=\"%Q\"",st;
+      ",HTML=\"%$$Q\"",st;
       Free(st);
     }
     "$$";
@@ -573,7 +574,7 @@ U0 EdInsSong()
 {
   CEdSong *e=CAlloc(sizeof(CEdSong));
   if (DocForm(e,,,,ctrl_L_footer))
-    "$$SO,\"%Q\",A=\"%s\"$$",e->tag,e->song;
+    "$$SO,\"%$$Q\",A=\"%s\"$$",e->tag,e->song;
   Free(e);
 }
 
@@ -586,7 +587,7 @@ U0 EdInsHtml()
 {
   CEdHtmlCode *e=CAlloc(sizeof(CEdHtmlCode));
   if (DocForm(e,,,,ctrl_L_footer))
-    "$$HC,\"%Q\"$$",e->tag;
+    "$$HC,\"%$$Q\"$$",e->tag;
   Free(e);
 }
 
@@ -632,20 +633,20 @@ U0 EdInsMacroMenu(Bool is_macro)
       if (is_macro) {
 	if (*e->tag) {
 	  st=MStrPrint("%q",e->tag);
-	  "$$MA%s,\"%Q\"",buf,st;
+	  "$$MA%s,\"%$$Q\"",buf,st;
 	  Free(st);
 	} else
 	  "$$MA%s",buf;
       } else {
 	st=MStrPrint("%q",e->tag);
-	"$$MU%s,\"%Q\"",buf,st;
+	"$$MU%s,\"%$$Q\"",buf,st;
 	Free(st);
       }
       if (*e->left_exp)
 	",LE=%s",e->left_exp;
       if (*e->left_macro) {
 	st=MStrPrint("%q",e->left_macro);
-	",LM=\"%Q\"",st;
+	",LM=\"%$$Q\"",st;
 	Free(st);
       }
       if (*e->shift_x)
@@ -692,25 +693,25 @@ U0 EdInsButton()
     if (*e->tag) {
       if (e->quote) {
 	st=MStrPrint("%q",e->tag);
-	"$$$$BT%s,\\\"%Q\\\"",buf,st;
+	"$$$$BT%s,\\\"%$$Q\\\"",buf,st;
 	Free(st);
 	if (*e->left_exp)
 	  ",LE=%s",e->left_exp;
 	if (*e->left_macro) {
 	  st=MStrPrint("%q",e->left_macro);
-	  ",LM=\\\"%Q\\\"",st;
+	  ",LM=\\\"%$$Q\\\"",st;
 	  Free(st);
 	}
 	"$$$$";
       } else {
 	st=MStrPrint("%q",e->tag);
-	"$$BT%s,\"%Q\"",buf,st;
+	"$$BT%s,\"%$$Q\"",buf,st;
 	Free(st);
 	if (*e->left_exp)
 	  ",LE=%s",e->left_exp;
 	if (*e->left_macro) {
 	  st=MStrPrint("%q",e->left_macro);
-	  ",LM=\"%Q\"",st;
+	  ",LM=\"%$$Q\"",st;
 	  Free(st);
 	}
 	"$$";
@@ -820,11 +821,11 @@ U0 EdInsData()
 
       st=MStrPrint("%q",e->fmt_str);
       if (e->remalloc)
-	"$$$$DA%s,A=\\\"%Q\\\"$$$$",buf,st;
+	"$$$$DA%s,A=\\\"%$$Q\\\"$$$$",buf,st;
       else if (e->len==DOCE_LEN_DFT)
-	"$$$$DA%s%s,A=\\\"%Q\\\"$$$$",buf,raw_type,st;
+	"$$$$DA%s%s,A=\\\"%$$Q\\\"$$$$",buf,raw_type,st;
       else
-	"$$$$DA%s,LEN=%d%s,A=\\\"%Q\\\"$$$$",buf,e->len,raw_type,st;
+	"$$$$DA%s,LEN=%d%s,A=\\\"%$$Q\\\"$$$$",buf,e->len,raw_type,st;
       Free(st);
     }
   }
@@ -852,7 +853,7 @@ U0 EdInsCheckBox()
       StrPrint(raw_type,",RT=%Z",e->type,"ST_RAW_TYPES");
     if (e->refresh)  CatPrint(buf,"+RD");
     st=MStrPrint("%q",e->tag);
-    "$$$$CB%s%s,\\\"%Q\\\"$$$$",buf,raw_type,st;
+    "$$$$CB%s%s,\\\"%$$Q\\\"$$$$",buf,raw_type,st;
     Free(st);
   }
   Free(e);
@@ -885,9 +886,9 @@ U0 EdInsLst()
       st1=MStrPrint("%q",e->tag);
     st2=MStrPrint("%q",e->define_str);
     if (st1)
-      "$$$$LS%s%s,\\\"%Q\\\",D=\\\"%Q\\\"$$$$",buf,raw_type,st1,st2;
+      "$$$$LS%s%s,\\\"%$$Q\\\",D=\\\"%$$Q\\\"$$$$",buf,raw_type,st1,st2;
     else
-      "$$$$LS%s%s,D=\\\"%Q\\\"$$$$",buf,raw_type,st2;
+      "$$$$LS%s%s,D=\\\"%$$Q\\\"$$$$",buf,raw_type,st2;
     Free(st1);
     Free(st2);
   }
@@ -940,14 +941,14 @@ U0 EdInsBin(I64 bin_num,I64 type)
 	"bin tag.\n\n",ctrl_L_footer)) {
     if (*e->bin_ptr_link_file) {
       if (*e->bin_ptr_link_tag)
-	"$$%Z,\"%Q\",BI=%d,BP=\"%s,%s\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
+	"$$%Z,\"%$$Q\",BI=%d,BP=\"%s,%s\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
 	      e->bin_ptr_link_file,e->bin_ptr_link_tag;
       else
-	"$$%Z,\"%Q\",BI=%d,BP=\"%s,%d\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
+	"$$%Z,\"%$$Q\",BI=%d,BP=\"%s,%d\"$$",type,"ST_DOC_CMDS",e->tag,e->bin_num,
 	      e->bin_ptr_link_file,e->bin_ptr_link_bin_num;
     } else {
       if (DocBinFindNum(DocPut,e->bin_num))
-	"$$%Z,\"%Q\",BI=%d$$",type,"ST_DOC_CMDS",e->tag,e->bin_num;
+	"$$%Z,\"%$$Q\",BI=%d$$",type,"ST_DOC_CMDS",e->tag,e->bin_num;
       else
 	PopUpOk("Invalid Binary Num");
     }
@@ -972,7 +973,7 @@ U0 EdInsTree()
     *buf=0;
     if (!e->collapsed)	CatPrint(buf,"-C");
     st1=MStrPrint("%q",e->tag);
-    st2=MStrPrint("$$TR%s,\"%Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
+    st2=MStrPrint("$$TR%s,\"%$$Q\"$$\n$$ID,%d$$*\n$$ID,%d$$",
 	  buf,st1,e->indent,-e->indent);
     DocPrintAtomic(DocPut,"%s",st2);
     Free(st1);
@@ -1097,7 +1098,7 @@ U8 *EdSpriteLink(Bool *_pop_up,U8 **_html_link)
   I64 type=PopUpLinkType(FALSE);
   *_html_link=NULL;
   if (type>=0 && GetLink(type,&tag,&link,_pop_up,&quote,_html_link))
-    res=MStrPrint("\"%Q\",A=\"%Q\"",tag,link);
+    res=MStrPrint("\"%$$Q\",A=\"%$$Q\"",tag,link);
   Free(tag);
   Free(link);
   return res;
@@ -1122,7 +1123,7 @@ U8 *EdSprite(I64 bin_num)
 	if (e->popup)	CatPrint(buf,"+PU");
 	if (e->escape)	CatPrint(buf,"+X");
 	st=MStrPrint("%q",e->exp);
-	st1=MStrPrint("\"%Q\",LM=\"%Q\"",e->tag,st);
+	st1=MStrPrint("\"%$$Q\",LM=\"%$$Q\"",e->tag,st);
 	Free(st);
       }
       break;
@@ -1130,7 +1131,7 @@ U8 *EdSprite(I64 bin_num)
       e->escape=TRUE;
       if (DocForm(e,"CEdMenuSprite",,,ctrl_L_footer)) {
 	if (e->escape)	CatPrint(buf,"+X");
-	st1=MStrPrint("\"%Q\",LE=%s",e->tag,e->exp);
+	st1=MStrPrint("\"%$$Q\",LE=%s",e->tag,e->exp);
       }
       break;
     case EST_SPRITE_LINK:
@@ -1151,7 +1152,7 @@ U8 *EdSprite(I64 bin_num)
   }
   if (st1) {
     if (html_link)
-      st2=MStrPrint("$$SP%s,%s,HTML=\"%Q\",BI=%d$$",buf,st1,html_link,bin_num);
+      st2=MStrPrint("$$SP%s,%s,HTML=\"%$$Q\",BI=%d$$",buf,st1,html_link,bin_num);
     else
       st2=MStrPrint("$$SP%s,%s,BI=%d$$",buf,st1,bin_num);
     Free(st1);

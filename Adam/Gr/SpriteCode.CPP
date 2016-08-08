@@ -204,8 +204,8 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
   CSprite *res,g;
   CColorROPU32 color;
   U8 *st,*ptr;
-  CQueD3I32 rootp,*tempp,*tempa1;
-  CQueMeshTri roott,*tempt,*tempt1;
+  CQueD3I32 headp,*tempp,*tempa1;
+  CQueMeshTri headt,*tempt,*tempt1;
   CQueVectU8 *tempv;
   MemSet(&g,0,sizeof(CSprite));
   switch (type) {
@@ -338,11 +338,11 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
     case SPT_POLYLINE:
       Lex(cc); //Skip {
       g.type=SPT_POLYLINE;
-      QueInit(&rootp);
+      QueInit(&headp);
       while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
 	LexD2I32(cc,&tempp->p);
-	QueIns(tempp,rootp.last);
+	QueIns(tempp,headp.last);
 	g.nu.num++;
 	if (cc->token==',')
 	  Lex(cc); //Skip ,
@@ -353,8 +353,8 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       res=MAlloc(size+g.nu.num*sizeof(CD2I32));
       MemCpy(res,&g,size);
       ptr=&res->nu.u;
-      tempp=rootp.next;
-      while (tempp!=&rootp) {
+      tempp=headp.next;
+      while (tempp!=&headp) {
 	tempa1=tempp->next;
 	MemCpy(ptr,&tempp->p,sizeof(CD2I32));
 	ptr+=sizeof(CD2I32);
@@ -367,11 +367,11 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
     case SPT_BSPLINE2_CLOSED:
     case SPT_BSPLINE3_CLOSED:
       Lex(cc); //Skip {
-      QueInit(&rootp);
+      QueInit(&headp);
       while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
 	LexD3I32(cc,&tempp->p);
-	QueIns(tempp,rootp.last);
+	QueIns(tempp,headp.last);
 	g.nu.num++;
 	if (cc->token==',')
 	  Lex(cc); //Skip ,
@@ -393,8 +393,8 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       }
       MemCpy(res,&g,size);
       ptr=&res->nu.u;
-      tempp=rootp.next;
-      while (tempp!=&rootp) {
+      tempp=headp.next;
+      while (tempp!=&headp) {
 	tempa1=tempp->next;
 	MemCpy(ptr,&tempp->p,sizeof(CD3I32));
 	ptr+=sizeof(CD3I32);
@@ -482,11 +482,11 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	Lex(cc); //Skip ,
       }
       num1=0;
-      QueInit(&rootp);
+      QueInit(&headp);
       while (cc->token=='(') {
 	tempp=CAlloc(sizeof(CQueD3I32));
 	LexD3I32(cc,&tempp->p);
-	QueIns(tempp,rootp.last);
+	QueIns(tempp,headp.last);
 	num1++;
 	if (cc->token==',')
 	  Lex(cc); //Skip ,
@@ -495,7 +495,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	LexExcept(cc,"Expecting ':' at ");
       Lex(cc); //Skip :
       num2=0;
-      QueInit(&roott);
+      QueInit(&headt);
       while (cc->token=='(') {
 	tempt=CAlloc(sizeof(CQueMeshTri));
 	st=LexFirstRem(cc,",");
@@ -517,7 +517,7 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	if (cc->token!=')')
 	  LexExcept(cc,"Expecting ')' at ");
 	Lex(cc); //Skip )
-	QueIns(tempt,roott.last);
+	QueIns(tempt,headt.last);
 	num2++;
 	if (cc->token==',')
 	  Lex(cc); //Skip ,
@@ -534,16 +534,16 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
       res=MAlloc(size+num1*sizeof(CD3I32)+num2*sizeof(CMeshTri));
       MemCpy(res,&g,size);
       ptr=res(U8 *)+size;
-      tempp=rootp.next;
-      while (tempp!=&rootp) {
+      tempp=headp.next;
+      while (tempp!=&headp) {
 	tempa1=tempp->next;
 	MemCpy(ptr,&tempp->p,sizeof(CD3I32));
 	ptr+=sizeof(CD3I32);
 	Free(tempp);
 	tempp=tempa1;
       }
-      tempt=roott.next;
-      while (tempt!=&roott) {
+      tempt=headt.next;
+      while (tempt!=&headt) {
 	tempt1=tempt->next;
 	MemCpy(ptr,&tempt->start,sizeof(CMeshTri));
 	ptr+=sizeof(CMeshTri);
@@ -561,14 +561,14 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 
 public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
 {//Text to sprite.
-  CSprite root;
+  CSprite head;
   U8 *res;
   Bool okay=TRUE,unlock_doc=DocLock(doc);
   CCmpCtrl *cc=CmpCtrlNew(,CCF_DONT_FREE_BUF);
   CHashTable *old_hash_table_lst=cc->htc.hash_table_lst;
   CHashGeneric *temph;
   I64 i,size=0;
-  QueInit(&root);
+  QueInit(&head);
   LexAttachDoc(cc,,doc);
   try {
     do {
@@ -578,7 +578,7 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
 	i=temph->user_data0;
 	cc->htc.hash_table_lst=old_hash_table_lst;
 	if (Lex(cc)=='{') //Skip ident
-	  QueIns(Code2SpriteElem(cc,i),root.last);
+	  QueIns(Code2SpriteElem(cc,i),head.last);
       } else if (cc->token)
 	LexExcept(cc,"Expecting sprite element type name at ");
     } while (cc->token);
@@ -591,12 +591,12 @@ public U8 *Code2Sprite(CDoc *doc,I64 *_size=NULL)
     DocUnlock(doc);
   if (okay) {
     CmpCtrlDel(cc); //TODO: can crash
-    res=SpriteQue2Sprite(&root,&size);
+    res=SpriteQue2Sprite(&head,&size);
   } else {
     res=NULL;
     size=0;
   }
   if (_size) *_size=size;
-  QueDel(&root);
+  QueDel(&head);
   return res;
 }

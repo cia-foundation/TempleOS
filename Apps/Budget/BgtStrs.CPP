@@ -4,7 +4,7 @@ public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
 	U8 **_colors=NULL,Bool no_nums=FALSE)
 {
   CDoc		*doc=DocRead(name,DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
-  CDocEntry	*doc_e=doc->root.next;
+  CDocEntry	*doc_e=doc->head.next;
   I64		i,max_num=0;
   U8		*ptr,**res,*colors;
 
@@ -27,7 +27,7 @@ public U8 **StrFileRead(U8 *name,I64 *_max_num=NULL,
 
   res=CAlloc(sizeof(U8 *)*(max_num+1));
   colors=CAlloc(sizeof(U8)*(max_num+1));
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT && 0<=doc_e->user_data<=max_num) {
       res[doc_e->user_data]=doc_e->tag;

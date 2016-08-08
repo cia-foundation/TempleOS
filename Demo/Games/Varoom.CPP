@@ -109,7 +109,7 @@ class Track
   I64 x,z;
   F64 é,d;
   CD3I32 left[4],center[4],right[4];
-} track_root,
+} track_head,
   *track_start[MP_MAX_PROCESSORS],*track_end[MP_MAX_PROCESSORS];
 
 CDC *track_map;
@@ -158,7 +158,7 @@ Track *TrackFind(Track *_tempt,I64 x,I64 z)
   tempt=_tempt;
   while (TRUE) {
     tempt=tempt->next;
-    if (tempt==&track_root)
+    if (tempt==&track_head)
       tempt=tempt->next;
     dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
     if (dd<best) {
@@ -170,7 +170,7 @@ Track *TrackFind(Track *_tempt,I64 x,I64 z)
   tempt=_tempt;
   while (TRUE) {
     tempt=tempt->last;
-    if (tempt==&track_root)
+    if (tempt==&track_head)
       tempt=tempt->last;
     dd=SqrI64(tempt->x-x)+SqrI64(tempt->z-z);
     if (dd<best) {
@@ -185,8 +185,8 @@ Track *TrackFind(Track *_tempt,I64 x,I64 z)
 U0 TrackSlice(F64 *_x,F64 *_z,F64 é,F64 d)
 {
   F64 x=*_x,z=*_z,c=Cos(é),s=Sin(é),dx=d*s,dz=-d*c;
-  Track *tempt,*last=track_root.last;
-  if (last==&track_root)
+  Track *tempt,*last=track_head.last;
+  if (last==&track_head)
     last=NULL;
 
   tempt=CAlloc(sizeof(Track));
@@ -226,10 +226,10 @@ U0 TrackSlice(F64 *_x,F64 *_z,F64 é,F64 d)
   tempt->x=x;
   tempt->z=z;
   tempt->é=é;
-  tempt->num=track_root.last->num+1;
-  tempt->d  =track_root.last->d+d;
+  tempt->num=track_head.last->num+1;
+  tempt->d  =track_head.last->d+d;
 
-  QueIns(tempt,track_root.last);
+  QueIns(tempt,track_head.last);
 
   if (tempt->num&1)
     tempt->c=RED;
@@ -254,7 +254,7 @@ U0 TrackSlice(F64 *_x,F64 *_z,F64 é,F64 d)
 
 U0 CoupleEnds()
 {
-  Track *first=track_root.next,*last=track_root.last;
+  Track *first=track_head.next,*last=track_head.last;
   MemCpy(&first->center[0],&last->center[3],sizeof(CD3I32));
   MemCpy(&first->center[1],&last->center[2],sizeof(CD3I32));
   MemCpy(&first->left[0]  ,&last->left[3]  ,sizeof(CD3I32));
@@ -269,8 +269,8 @@ U0 InitTrack()
   Track *tempt;
   F64 x,z,é,d;
 
-  MemSet(&track_root,0,sizeof(Track));
-  QueInit(&track_root);
+  MemSet(&track_head,0,sizeof(Track));
+  QueInit(&track_head);
 
   t_minx=t_minz=MAX_I64;
   t_maxx=t_maxz=MIN_I64;
@@ -295,11 +295,11 @@ U0 InitTrack()
 
   CoupleEnds;
 
-  tempt=track_root.next;
+  tempt=track_head.next;
   for (i=0;i<mp_cnt;i++) {
-    j=(i+1)*track_root.last->num/mp_cnt+1;
+    j=(i+1)*track_head.last->num/mp_cnt+1;
     track_start[i]=tempt;
-    while (tempt!=&track_root && tempt->num!=j)
+    while (tempt!=&track_head && tempt->num!=j)
       tempt=tempt->next;
     track_end[i]=tempt;
   }
@@ -311,10 +311,10 @@ U0 InitTrack()
 
   track_map->color=LTGRAY;
   GrRect(track_map,0,0,track_map->width,track_map->height);
-  tempt=track_root.next;
+  tempt=track_head.next;
   track_map->color=YELLOW;
   track_map->pen_width=3;
-  while (tempt!=&track_root) {
+  while (tempt!=&track_head) {
     GrPlot3(track_map,track_map->width-(tempt->x-t_minx)>>MAP_BITS,
 	  (tempt->z-t_minz)>>MAP_BITS,0);
     tempt=tempt->next;
@@ -498,7 +498,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     s=tS-t0;
   dc->color=BLACK;
   GrPrint(dc,0,0,"%0.1f%% Time:%0.2f Best:%0.2f",
-	100.0*distance/track_root.last->d,s,best_score);
+	100.0*distance/track_head.last->d,s,best_score);
 }
 
 U0 AnimateTask(I64)
@@ -520,7 +520,7 @@ U0 AnimateTask(I64)
       if (i) {
 	if (tempt!=tempc->t) {
 	  tempt2=tempt->next;
-	  if (tempt2==&track_root)
+	  if (tempt2==&track_head)
 	    tempt2=tempt2->next;
 	  tempc->é=Arg(-tempt2->z+tempc->p.z,-tempt2->x+tempc->p.x);
 	}
@@ -548,7 +548,7 @@ U0 AnimateTask(I64)
 	}
       if (!game_over) {
 	distance+=0.01*c[0].speed;
-	if (distance>track_root.last->d&& c[0].t->num<track_root.last->num>>1) {
+	if (distance>track_head.last->d&& c[0].t->num<track_head.last->num>>1) {
 	  tf=tS;
 	  game_over=TRUE;
 	  Beep;
@@ -601,7 +601,7 @@ U0 Init()
 
   InitTrack;
   InitBushes;
-  tempt=track_root.next;
+  tempt=track_head.next;
   for (i=0;i<NUM_CARS;i++) {
     tempc=&c[i];
     tempc->t=tempt;
@@ -617,8 +617,8 @@ U0 Init()
       tempc->img=$IB,"<6>",BI=6$;
       tempc->speed=2500.0;
     }
-    d=(i+1)*track_root.last->d/NUM_CARS;
-    while (tempt->next!=&track_root && tempt->d<d)
+    d=(i+1)*track_head.last->d/NUM_CARS;
+    while (tempt->next!=&track_head && tempt->d<d)
       tempt=tempt->next;
   }
   distance=0;
@@ -631,7 +631,7 @@ U0 CleanUp()
 {
   while (mp_not_done_flags)
     Yield;
-  QueDel(&track_root,TRUE);
+  QueDel(&track_head,TRUE);
   DCDel(track_map);
 }
 

@@ -14,7 +14,7 @@
 
 CIntermediateCode *PrsAddOp(CCmpCtrl *cc,I64 stk_op,CHashClass *tempc)
 {
-  CIntermediateCode *tempi=cc->coc.coc_root.last;
+  CIntermediateCode *tempi=cc->coc.coc_head.last;
   Bool div_sizeof=FALSE;
   switch (stk_op.u16[0]) {
     case IC_ADD:
@@ -108,7 +108,7 @@ pe_unary_term1:
 	    i=IC_PP_+PREC_UNARY_PRE<<16;
 	  cc->flags&=~(CCF_PREINC|CCF_PREDEC|CCF_POSTINC|CCF_POSTDEC);
 	}
-	tempi=cc->coc.coc_root.last;
+	tempi=cc->coc.coc_head.last;
 	if (cc->flags & (CCF_RAX|CCF_ARRAY)) {
 	  if (tempi->ic_code==IC_DEREF)
 	    tempi->ic_code=i;
@@ -142,11 +142,11 @@ pe_check_binary_ops2:
 	  left_prec=cur_op.i8[2];
 	  PrsPush(ps,tempc);
 	  PrsPush(ps,stk_op);
-	  PrsPush(ps,cc->coc.coc_root.last->ic_class);
+	  PrsPush(ps,cc->coc.coc_head.last->ic_class);
 	  PrsPush(ps,cur_op);
 	  goto pe_unary_term1;
 	} else {
-	  tempi=cc->coc.coc_root.last;
+	  tempi=cc->coc.coc_head.last;
 	  tempc=tempi->ic_class;
 	  if (stk_op.u16[0]==IC_DEREF && tempc->ptr_stars_cnt)
 	    tempc--;
@@ -172,7 +172,7 @@ pe_do_binary_op:
 	switch (cur_op.u16[0]) {
 	  case IC_ADD:
 	  case IC_SUB:
-	    tempi=cc->coc.coc_root.last;
+	    tempi=cc->coc.coc_head.last;
 	    if (!tempi->ic_class->ptr_stars_cnt &&
 		  tempi->ic_class->raw_type!=RT_F64) {
 	      ICAdd(cc,IC_SIZEOF,1,cmp.internal_types[RT_I64]);
@@ -199,7 +199,7 @@ pe_do_binary_op:
 	  max_prec=cur_op.u8[2];
 	left_prec=cur_op.u8[2];
 	if (intermediate_code_table[cur_op.u16[0]].type==IST_ASSIGN) {
-	  tempi=cc->coc.coc_root.last;
+	  tempi=cc->coc.coc_head.last;
 	  tempc=OptClassFwd(tempi->ic_class);
 	  if (intermediate_code_table[tempi->ic_code].type!=IST_DEREF ||
 		!tempc->ptr_stars_cnt && !Bt(&tempc->flags,Cf_INTERNAL_TYPE))
@@ -236,7 +236,7 @@ pe_pop_higher:
 pe_push_lower:
 	PrsPush(ps,tempc);
 	PrsPush(ps,stk_op);
-	PrsPush(ps,cc->coc.coc_root.last->ic_class);
+	PrsPush(ps,cc->coc.coc_head.last->ic_class);
 	PrsPush(ps,cur_op);
 	goto pe_unary_term1;
 
@@ -415,7 +415,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
   if (indirect) {
     if (!(cc->flags & (CCF_RAX | CCF_ARRAY)))
       ICAdd(cc,IC_DEREF,0,cmp.internal_types[RT_PTR]);
-    cc->coc.coc_root.last->ic_class=cmp.internal_types[RT_PTR];
+    cc->coc.coc_head.last->ic_class=cmp.internal_types[RT_PTR];
     ICAdd(cc,IC_SET_RAX,0,cmp.internal_types[RT_PTR]);
     ICAdd(cc,IC_NOP2,1,cmp.internal_types[RT_PTR]); //balance the books
   }
@@ -544,7 +544,7 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tempf)
     tempcbh1=tempcbh->coc_next;
     COCAppend(cc,tempcbh);
     if (!Bt(&tempf->flags,Ff_INTERNAL))
-      cc->coc.coc_root.last->ic_flags|=ICF_PUSH_RES;
+      cc->coc.coc_head.last->ic_flags|=ICF_PUSH_RES;
     tempcbh=tempcbh1;
   }
   if (Bt(&tempf->flags,Ff_INTERNAL))
@@ -970,7 +970,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       goto um_join;
 
     case TK_DEREFERENCE:
-      tempi=cc->coc.coc_root.last;
+      tempi=cc->coc.coc_head.last;
       if (!(cc->flags & (CCF_RAX | CCF_ARRAY)))
 	ICAdd(cc,IC_DEREF+PREC_UNARY_PRE<<16,0,tempi->ic_class-1);
       else
@@ -979,7 +979,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	um_join:
       if (!*unary_post_prec)
 	*unary_post_prec=PREC_TERM;
-      tempc=cc->coc.coc_root.last->ic_class;
+      tempc=cc->coc.coc_head.last->ic_class;
       if ((!tempc->ptr_stars_cnt || cc->flags & CCF_ARRAY) && cc->token=='.')
 	LexExcept(cc,"Must be address, not value ");
       if (!(cc->flags & CCF_RAX))
@@ -1038,7 +1038,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       }
       if (!(cc->flags&(CCF_RAX|CCF_ARRAY)))
 	tempc++;
-      tempi=cc->coc.coc_root.last;
+      tempi=cc->coc.coc_head.last;
       tempi->ic_class=tempc;
       ICAdd(cc,IC_HOLYC_TYPECAST,was_paren,tempc);
       if (cc->token!=')')
@@ -1049,7 +1049,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       if (!*unary_post_prec)
 	*unary_post_prec=PREC_TERM;
       Lex(cc);
-      tempc=OptClassFwd(cc->coc.coc_root.last->ic_class);
+      tempc=OptClassFwd(cc->coc.coc_head.last->ic_class);
       if (!tempc->ptr_stars_cnt)
 	LexExcept(cc,"Not array or ptr ");
       if (!(cc->flags & (CCF_ARRAY | CCF_RAX))) {
@@ -1069,7 +1069,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	  if (cc->token!=']')
 	    LexExcept(cc,"Missing ']' at ");
 	  Lex(cc); //skip ]
-	  tempi1=cc->coc.coc_root.last;
+	  tempi1=cc->coc.coc_head.last;
 	  tempi1->ic_flags|=ICF_R_TO_INT;
 	  ICAdd(cc,IC_MUL,0,tempc);
 	  ICAdd(cc,IC_ADD,0,tempc);
@@ -1085,7 +1085,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
       if (cc->token!=']')
 	LexExcept(cc,"Missing ']' at ");
       Lex(cc); //skip ]
-      tempi1=cc->coc.coc_root.last;
+      tempi1=cc->coc.coc_head.last;
       tempi1->ic_flags|=ICF_R_TO_INT;
       ICAdd(cc,IC_MUL,0,tempc);
       ICAdd(cc,IC_ADD,0,tempc);

@@ -123,9 +123,9 @@ U0 DocUndoDel(CDoc *,CDocUndo *u)
 U0 DocUndoCntSet(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
-  CDocUndo *u=doc->undo_root.next;
+  CDocUndo *u=doc->undo_head.next;
   doc->undo_cnt=0;
-  while (u!=&doc->undo_root) {
+  while (u!=&doc->undo_head) {
     doc->undo_cnt++;
     u=u->next;
   }
@@ -165,7 +165,7 @@ public CDocEntry *DocEntryCopy(CDoc *doc,CDocEntry *doc_e)
       tempb->tag=StrNew(doc_e->tag,task);
     else
       tempb->tag=NULL;
-    QueIns(tempb,doc->bin_root.last);
+    QueIns(tempb,doc->bin_head.last);
   }
   if (doc_e->de_flags & DOCEF_REMALLOC_DATA)
     doc_ne->data=MAllocIdent(doc_e->data,task);
@@ -179,7 +179,7 @@ U0 DocRemSoftNewLines(CDoc *doc=NULL,CDocEntry *doc_e=NULL)
   if (!doc && !(doc=DocPut))
     return;
   unlock=DocLock(doc);
-  if (!doc_e) doc_e=doc->root.next;
+  if (!doc_e) doc_e=doc->head.next;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
     if (doc_e->type_u8==DOCT_SOFT_NEW_LINE) {
@@ -244,20 +244,20 @@ public U0 DocRst(CDoc *doc,Bool is_old)
     return;
   unlock=DocLock(doc);
   if (is_old) {
-    doc_e=doc->root.next;
+    doc_e=doc->head.next;
     while (doc_e!=doc) {
       doc_e2=doc_e->next;
       DocEntryDel(doc,doc_e);
       doc_e=doc_e2;
     }
-    u=doc->undo_root.next;
-    while (u!=&doc->undo_root) {
+    u=doc->undo_head.next;
+    while (u!=&doc->undo_head) {
       u8=u->next;
       DocUndoDel(doc,u);
       u=u8;
     }
-    b=doc->bin_root.next;
-    while (b!=&doc->bin_root) {
+    b=doc->bin_head.next;
+    while (b!=&doc->bin_head) {
       b1=b->next;
       QueRem(b);
       Free(b->data);
@@ -267,10 +267,10 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   }
 //Check $LK,"DocInsDoc",A="MN:DocInsDoc"$
   doc->flags&=DOCF_BREAK_UNLOCKED;
-  doc->root.next=doc->root.last=doc;
-  QueInit(&doc->bin_root);
-  QueInit(&doc->undo_root);
-  doc->undo_root.time_stamp=0;
+  doc->head.next=doc->head.last=doc;
+  QueInit(&doc->bin_head);
+  QueInit(&doc->undo_head);
+  doc->undo_head.time_stamp=0;
   doc->undo_cnt=0;
   doc->cur_bin_num=1;
   doc->dollar_buf_ptr=0;
@@ -278,7 +278,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   doc->page_line_num=0;
   doc->best_d=MAX_I64;
 
-  s=&doc->settings_root;
+  s=&doc->settings_head;
   s->left_margin=DOC_DFT;
   s->right_margin=DOC_DFT;
   s->indent=0;
@@ -293,7 +293,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   s->shifted_y=0;
   s->cur_text_attr=s->dft_text_attr=DOC_ATTR_DFT_TEXT;
 
-  doc_e=&doc->root;
+  doc_e=&doc->head;
   doc_e->type=DOCT_ERROR;
   doc_e->de_flags=0;
   doc_e->x=0;
@@ -331,21 +331,21 @@ public I64 DocSize(CDoc *doc)
   if (!doc || doc->doc_signature!=DOC_SIGNATURE_VAL) return 0;
   unlock=DocLock(doc);
 
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     res+=DocEntrySize(doc,doc_e);
     doc_e=doc_e->next;
   }
 
-  u=doc->undo_root.next;
-  while (u!=&doc->undo_root) {
+  u=doc->undo_head.next;
+  while (u!=&doc->undo_head) {
     res+=MSize2(u->body);
     res+=MSize2(u);
     u=u->next;
   }
 
-  b=doc->bin_root.next;
-  while (b!=&doc->bin_root) {
+  b=doc->bin_head.next;
+  while (b!=&doc->bin_head) {
     res+=MSize2(b->data);
     res+=MSize2(b);
     b=b->next;

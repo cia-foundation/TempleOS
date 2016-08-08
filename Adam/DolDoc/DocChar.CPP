@@ -540,7 +540,7 @@ ic_overstrike:
 	goto ic_done;
       }
       doc_ne=DocEntryNewTag(doc,doc_ce,&ch);
-      doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
+      doc_ne->type=DOCT_TEXT | doc->settings_head.dft_text_attr<<8;
       doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
       QueIns(doc_ne,doc_ce->last);
     } else if (ch=='\n') {
@@ -557,10 +557,10 @@ ic_not_overstrike:
   if (ch=='\n') {
     if (sc&SCF_CTRL && !(sc&SCF_SHIFT)) {
       doc_ne=DocEntryNewBase(doc,
-	    DOCT_PAGE_BREAK|doc->settings_root.dft_text_attr<<8);
+	    DOCT_PAGE_BREAK|doc->settings_head.dft_text_attr<<8);
     } else {
       doc_ne=DocEntryNewBase(doc,
-	    DOCT_NEW_LINE|doc->settings_root.dft_text_attr<<8);
+	    DOCT_NEW_LINE|doc->settings_head.dft_text_attr<<8);
     }
     DocInsEntry(doc,doc_ne);
   } else if (ch=='\t') {
@@ -574,7 +574,7 @@ ic_form_tab:
       DocFormFwd(doc);
       goto ic_done;
     } else {
-      doc_ne=DocEntryNewBase(doc,DOCT_TAB|doc->settings_root.dft_text_attr<<8);
+      doc_ne=DocEntryNewBase(doc,DOCT_TAB|doc->settings_head.dft_text_attr<<8);
       DocInsEntry(doc,doc_ne);
     }
   } else {
@@ -616,7 +616,7 @@ ic_form_tab:
 	doc->cur_col++;
       } else {
 	doc_ne=DocEntryNewTag(doc,doc_ce,&ch);
-	doc_ne->type=DOCT_TEXT | doc->settings_root.dft_text_attr<<8;
+	doc_ne->type=DOCT_TEXT | doc->settings_head.dft_text_attr<<8;
 	doc_ne->de_flags=doldoc.dft_de_flags[DOCT_TEXT];
 	doc_ne->x=doc_ce->x+1;
 	QueIns(doc_ne,doc_ce->last);

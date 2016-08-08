@@ -2,8 +2,8 @@
 
 CDocBin *DocBinFindNum(CDoc *haystack_doc,I64 needle_num)
 {
-  CDocBin *b=haystack_doc->bin_root.next;
-  while (b!=&haystack_doc->bin_root) {
+  CDocBin *b=haystack_doc->bin_head.next;
+  while (b!=&haystack_doc->bin_head) {
     if (b->num==needle_num)
       return b;
     b=b->next;
@@ -15,8 +15,8 @@ CDocBin *DocBinFindTag(CDoc *haystack_doc,U8 *needle_tag)
 {
   CDocBin *b;
   if (needle_tag) {
-    b=haystack_doc->bin_root.next;
-    while (b!=&haystack_doc->bin_root) {
+    b=haystack_doc->bin_head.next;
+    while (b!=&haystack_doc->bin_head) {
       if (b->tag && !StrCmp(b->tag,needle_tag))
 	return b;
       b=b->next;
@@ -31,8 +31,8 @@ U0 DocBinsValidate(CDoc *doc)
   CDocBin *b,*b1;
   CDocEntry *doc_e,*doc_e2;
   I64 renum_num=0;
-  b=doc->bin_root.next;
-  while (b!=&doc->bin_root) {
+  b=doc->bin_head.next;
+  while (b!=&doc->bin_head) {
     b->use_cnt=0;
     b->temp_use_cnt=0;
     b->renum_num=-1;
@@ -40,7 +40,7 @@ U0 DocBinsValidate(CDoc *doc)
     b->tag=NULL;
     b=b->next;
   }
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
     if (doc_e->de_flags & DOCEF_HAS_BIN) {
@@ -61,9 +61,9 @@ U0 DocBinsValidate(CDoc *doc)
     doc_e=doc_e2;
   }
 
-  b=doc->bin_root.next;
+  b=doc->bin_head.next;
   doc->cur_bin_num=1;
-  while (b!=&doc->bin_root) {
+  while (b!=&doc->bin_head) {
     b1=b->next;
     if (!b->use_cnt) {
       QueRem(b);
@@ -128,7 +128,7 @@ I64 DocBinPtrRst(CDoc *doc,CDocEntry *doc_e)
 	  tempb->tag=StrNew(doc_e->tag,doc->mem_task);
 	else
 	  tempb->tag=NULL;
-	QueIns(tempb,doc->bin_root.last);
+	QueIns(tempb,doc->bin_head.last);
       } else
 	bin_num=0;
       DocDel(doc2);

@@ -214,13 +214,14 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
     return NULL;
 }
 
-public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines)
+public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines,
+	U8 *bible_filename=BIBLE_FILENAME)
 {//Put N line starting at line M into doc.
   CDoc *doc_in;
   CDocEntry *doc_e;
   if (!doc_out) doc_out=DocPut;
-  if (doc_out && FileFind(BIBLE_FILENAME)) {
-    doc_in=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
+  if (doc_out && FileFind(bible_filename)) {
+    doc_in=DocRead(bible_filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
     DocLineNumGoTo(doc_in,start); //one based
     doc_e=doc_in->cur_entry;
     while (lines>0 && doc_e!=doc_in) {
@@ -279,7 +280,7 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
 public CDoc *BibleDoc()
 {//Return Bible as DolDoc with trees.
   CDoc	*res=DocRead(BIBLE_FILENAME);
-  CDocEntry *doc_e=res->root.next,*doc_e1;
+  CDocEntry *doc_e=res->head.next,*doc_e1;
   Bool open_chapter=FALSE;
   U8	*ptr=Define("ST_BIBLE_BOOK_LINES");
   I64	book,book_cnt=DefineCnt("ST_BIBLE_BOOK_LINES")-1,

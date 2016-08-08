@@ -578,7 +578,7 @@ class CSwitchCase {
 U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
 {
   CSwitchCase *header=NULL,*temps,*temps1;	//Leaks on except
-  CSubSwitch root,*tempss;			//Leaks on except
+  CSubSwitch head,*tempss;			//Leaks on except
   CCodeMisc *lb_dft,*lb_fwd_case,*mc_jt,*lb_entry,**jmp_table;
   CIntermediateCode *tempi_sub,*tempi_cmp,*tempi_jmp,*tempi_start;
   Bool dft_found=FALSE,nobound;
@@ -591,10 +591,10 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
   else
     LexExcept(cc,"Expecting '(' or '[' at ");
   Lex(cc);
-  QueInit(&root);
+  QueInit(&head);
 
-  root.last->lb_break=COCMiscNew(cc,CMT_LABEL);
-  root.last->lb_break->use_cnt++;
+  head.last->lb_break=COCMiscNew(cc,CMT_LABEL);
+  head.last->lb_break->use_cnt++;
   lb_dft=COCMiscNew(cc,CMT_LABEL);
   lb_dft->use_cnt++;
   mc_jt=COCMiscNew(cc,CMT_JMP_TABLE);
@@ -630,9 +630,9 @@ sw_cont:
 	  else
 	    LexExcept(cc,"Expecting ':' at ");
 	  tempss=MAlloc(sizeof(CSubSwitch));
-	  QueIns(tempss,root.last);
-	  root.last->lb_break=COCMiscNew(cc,CMT_LABEL);
-	  root.last->lb_break->use_cnt++;
+	  QueIns(tempss,head.last);
+	  head.last->lb_break=COCMiscNew(cc,CMT_LABEL);
+	  head.last->lb_break->use_cnt++;
 	  lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
 	  tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);
 
@@ -646,7 +646,7 @@ sw_cont:
 	      case KW_START:
 	      case KW_CASE:
 	      case KW_DFT:
-		if (cc->coc.coc_root.last==tempi_start) {
+		if (cc->coc.coc_head.last==tempi_start) {
 		  OptFree(tempi_jmp);
 		  tempss->lb_start=NULL;
 		} else {
@@ -661,7 +661,7 @@ sw_cont:
 	  }
 	  break;
 	case KW_CASE:
-	  if (root.next!=&root) {
+	  if (head.next!=&head) {
 	    lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
 	    tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
 	  }
@@ -669,9 +669,9 @@ sw_cont:
 	  lb_entry=COCMiscNew(cc,CMT_LABEL);
 	  ICAdd(cc,IC_LABEL,lb_entry,0);
 	  lb_entry->use_cnt++;
-	  if (root.next!=&root) {
-	    tempss=root.next;
-	    while (tempss!=&root) {
+	  if (head.next!=&head) {
+	    tempss=head.next;
+	    while (tempss!=&head) {
 	      if (tempss->lb_start)
 		ICAdd(cc,IC_SUB_CALL,tempss->lb_start,0);
 	      tempss=tempss->next;
@@ -717,7 +717,7 @@ sw_cont:
 	    LexExcept(cc,"Expecting ':' at ");
 	  break;
 	case KW_DFT:
-	  if (root.next!=&root) {
+	  if (head.next!=&head) {
 	    lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
 	    tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
 	  }
@@ -727,9 +727,9 @@ sw_cont:
 	    Lex(cc);
 	  else
 	    LexExcept(cc,"Expecting ':' at ");
-	  if (root.next!=&root) {
-	    tempss=root.next;
-	    while (tempss!=&root) {
+	  if (head.next!=&head) {
+	    tempss=head.next;
+	    while (tempss!=&head) {
 	      if (tempss->lb_start)
 		ICAdd(cc,IC_SUB_CALL,tempss->lb_start,0);
 	      tempss=tempss->next;
@@ -739,13 +739,13 @@ sw_cont:
 	  dft_found=TRUE;
 	  break;
 	default:
-	  PrsStmt(cc,try_cnt,root.last->lb_break);
+	  PrsStmt(cc,try_cnt,head.last->lb_break);
       }
     }
 sw_sub_end:
-    tempss=root.last;
+    tempss=head.last;
     ICAdd(cc,IC_LABEL,tempss->lb_break,0);
-    if (tempss==&root) {
+    if (tempss==&head) {
       if (cc->token!='}')
 	LexExcept(cc,"Missing '}' at ");
       Lex(cc);

@@ -71,7 +71,7 @@ class Missile
   Ship *owner,*target;
   Bool active,launched,exploding;
   U8 label[5];
-} missile_root;
+} missile_head;
 
 class Ship
 {
@@ -86,7 +86,7 @@ class Ship
   F64 laser_temperature;
   Missile missiles[MAX_MISSILES];
   Bool lasering,exploding,laser_overheat;
-} ship_root,*human;
+} ship_head,*human;
 
 F64 human_t_left,human_t_right,human_antispin;
 
@@ -97,7 +97,7 @@ class Shot
   F64 fuse_time,die_timeout;
   MyMass p;
   Bool exploding;
-} shot_root;
+} shot_head;
 
 #define MAX_THRUST	200.0
 #define MAX_ANTISPIN	25.0
@@ -211,7 +211,7 @@ U0 MissileNew(Ship *tempsp,I64 n)
   }
   tempmi->img=$IB,"<7>",BI=7$;
   tempmi->active=TRUE;
-  QueIns(tempmi,missile_root.last);
+  QueIns(tempmi,missile_head.last);
 }
 
 Ship *ShipNew(I64 x,I64 y,I64 type)
@@ -365,7 +365,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
       remaining++;
       break;
   }
-  QueIns(tempsp,ship_root.last);
+  QueIns(tempsp,ship_head.last);
   return tempsp;
 }
 
@@ -438,14 +438,14 @@ U0 AllDel(CMathODE *ode)
 {
   Ship *tempsp,*tempsp1;
   QueRem(ode);
-  tempsp=ship_root.next;
-  while (tempsp!=&ship_root) {
+  tempsp=ship_head.next;
+  while (tempsp!=&ship_head) {
     tempsp1=tempsp->next;
     ShipDel(tempsp);
     tempsp=tempsp1;
   }
   human=NULL;
-  QueDel(&shot_root,TRUE);
+  QueDel(&shot_head,TRUE);
   ODEDel(ode);
 }
 
@@ -502,8 +502,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempsps=tempsps->next;
   }
 
-  tempmi=missile_root.next;
-  while (tempmi!=&missile_root) {
+  tempmi=missile_head.next;
+  while (tempmi!=&missile_head) {
     if (tempmi->active) {
       if (tempmi->launched && tempmi->exploding) {
 	d=(tS-tempmi->fuse_time)/(tempmi->die_timeout-tempmi->fuse_time);
@@ -524,8 +524,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempmi=tempmi->next;
   }
 
-  tempsp=ship_root.next;
-  while (tempsp!=&ship_root) {
+  tempsp=ship_head.next;
+  while (tempsp!=&ship_head) {
     if (!tempsp->exploding)
       switch (tempsp->type) {
 	case ST_HUMAN1:
@@ -678,8 +678,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     tempsp=tempsp->next;
   }
 
-  temps=shot_root.next;
-  while (temps!=&shot_root) {
+  temps=shot_head.next;
+  while (temps!=&shot_head) {
     if (temps->exploding) {
       d=(tS-temps->fuse_time)/(temps->die_timeout-temps->fuse_time);
       d=7*Sin(ã*d)*temps->explosion_radius+1;
@@ -715,8 +715,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  human->p[0].x-800*p.x,human->p[0].y-800*p.y,0,&LaserPlot);
   }
 
-  tempmi=missile_root.next;
-  while (tempmi!=&missile_root) {
+  tempmi=missile_head.next;
+  while (tempmi!=&missile_head) {
     if (tempsp=tempmi->target) {
       dc->color=LTRED;
       GrCircle(dc,tempsp->p[0].x,tempsp->p[0].y,10);
@@ -759,8 +759,8 @@ Ship TargetGet(Missile *tempmi)
   I64 i;
   CD3 p,p1,p2;
   D3Unit(D3Sub(&p,&tempmi->p_front.state->x,&tempmi->p_back.state->x));
-  tempsp=ship_root.next;
-  while (tempsp!=&ship_root) {
+  tempsp=ship_head.next;
+  while (tempsp!=&ship_head) {
     if (!tempsp->exploding && tempsp!=tempmi->owner)
       for (i=0;i<tempsp->masses;i++) {
 	D3Sub(&p1,&tempsp->p[i].state->x,&tempmi->p_front.state->x);
@@ -821,8 +821,8 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tempm=tempm->next;
   }
 
-  tempsp=ship_root.next;
-  while (tempsp!=&ship_root) {
+  tempsp=ship_head.next;
+  while (tempsp!=&ship_head) {
     if (tempsp->exploding && tempsp->die_time<=tS<=tempsp->die_timeout)
       for (i=0;i<tempsp->masses;i++)
 	Explosion(&tempsp->p[i],NULL,tempsp->p[i].radius/3.0);
@@ -886,15 +886,15 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tempsp=tempsp->next;
   }
 
-  temps=shot_root.next;
-  while (temps!=&shot_root) {
+  temps=shot_head.next;
+  while (temps!=&shot_head) {
     if (temps->exploding)
       Explosion(&temps->p,NULL,temps->explosion_radius);
     temps=temps->next;
   }
 
-  tempmi=missile_root.next;
-  while (tempmi!=&missile_root) {
+  tempmi=missile_head.next;
+  while (tempmi!=&missile_head) {
     if (tempmi->active) {
       if (tempmi->launched) {
 	if (tempmi->exploding)
@@ -981,8 +981,8 @@ U0 CheckDamage()
     }
   }
 
-  tempsp=ship_root.next;
-  while (tempsp!=&ship_root) {
+  tempsp=ship_head.next;
+  while (tempsp!=&ship_head) {
     tempsp1=tempsp->next;
     switch (tempsp->type) {
       case ST_HUMAN1:
@@ -1071,7 +1071,7 @@ U0 FireOneGun(Ship *tempsp,I64 n,F64 r,F64 fuse_time)
   D3MulEqu(&p,temps->p.mass/tempsp->p[n].mass/100.0);
   D3SubEqu(&tempsp->p[n].DxDt,&p);
   QueIns(&temps->p,ode->last_mass);
-  QueIns(temps,shot_root.last);
+  QueIns(temps,shot_head.last);
   tempsp->reload_timeout=tS+r/tempsp->fire_rate;
   Noise(100,r*200,r*400);
 }
@@ -1138,8 +1138,8 @@ U0 HumanFireLaserEnd()
 
 U0 ExpireShots()
 {
-  Shot *temps=shot_root.next,*temps1;
-  while (temps!=&shot_root) {
+  Shot *temps=shot_head.next,*temps1;
+  while (temps!=&shot_head) {
     temps1=temps->next;
     if (!temps->exploding && tS>temps->fuse_time) {
       temps->exploding=TRUE;
@@ -1157,8 +1157,8 @@ U0 ExpireMissiles()
 {
   I64 i;
   F64 dd,best_dd;
-  Missile *tempmi=missile_root.next,*tempm1;
-  while (tempmi!=&missile_root) {
+  Missile *tempmi=missile_head.next,*tempm1;
+  while (tempmi!=&missile_head) {
     tempm1=tempmi->next;
     if (tempmi->launched) {
       best_dd=MAX_F64;
@@ -1185,9 +1185,9 @@ U0 ExpireMissiles()
 U0 AI()
 {
   CD3 p,p1,p2;
-  Ship *tempsp=ship_root.next;
+  Ship *tempsp=ship_head.next;
   if (human && !human->exploding) {
-    while (tempsp!=&ship_root) {
+    while (tempsp!=&ship_head) {
       D3Sub(&p1,&tempsp->p[0].x,&tempsp->p[1].x);
       D3Sub(&p2,&tempsp->p[0].x,&tempsp->p[2].x);
       D3Add(&p,&p1,&p2);
@@ -1223,9 +1223,9 @@ U0 Init()
   score=0;
   level=1;
 
-  QueInit(&ship_root);
-  QueInit(&shot_root);
-  QueInit(&missile_root);
+  QueInit(&ship_head);
+  QueInit(&shot_head);
+  QueInit(&missile_head);
 
   for (i=0;i<NUM_STARS;i++) {
     stars_x[i]=RandU16%GR_WIDTH;

@@ -3,7 +3,7 @@
 U0 EdUndoFilter(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
-  CDocEntry *doc_ce=doc->root.next;
+  CDocEntry *doc_ce=doc->head.next;
   while (doc_ce!=doc) {
     doc_ce->de_flags&=~DOCEF_FILTER_SKIP;
     doc_ce=doc_ce->next;

@@ -41,7 +41,7 @@ U0 VMInstallDrv(CTask *task,U8 drv_let,
 
 U0 VMInstallWiz()
 {
-  CATARep *root=NULL,*ata_drv=NULL,*atapi_drv=NULL;
+  CATARep *head=NULL,*ata_drv=NULL,*atapi_drv=NULL;
   CTask *task;
   "\nIt's normal for this to freeze for a moment or two.\n";
   PressAKey;
@@ -57,14 +57,14 @@ U0 VMInstallWiz()
   WinVert(task->win_bottom+3,Fs->win_bottom);
   WinToTop(Fs);
 
-  ATARep(FALSE,TRUE,&root);
-  ATAIDDrvs(root,&ata_drv,&atapi_drv);
+  ATARep(FALSE,TRUE,&head);
+  ATAIDDrvs(head,&ata_drv,&atapi_drv);
   if (VMPrtDsk(task,ata_drv)) {
     VMInstallDrv(task,'C',ata_drv,atapi_drv);
     VMInstallDrv(task,'D',ata_drv,atapi_drv);
     BootMHDIns('C');
   }
-  LinkedLstDel(root);
+  LinkedLstDel(head);
   WinVert(task->win_top,Fs->win_bottom);
   Kill(task);
 }
@@ -73,7 +73,7 @@ U0 RegularInstallWiz()
 {
   I64 unit,drv_let;
   U8 *st,*base0,*base1;
-  CATARep *root=NULL,*tempha;
+  CATARep *head=NULL,*tempha;
   I64 ch,num_hints;
   CTask *task;
 
@@ -92,7 +92,7 @@ U0 RegularInstallWiz()
   WinToTop(Fs);
   XTalk(task,"Mount;\nCp");
 
-  num_hints=ATARep(FALSE,,&root);
+  num_hints=ATARep(FALSE,,&head);
   "\nInclude '$$PURPLE$$0x$$FG$$' for hexidecimal numbers.\n\n";
   while (TRUE) {
     base0=GetStr("Hard Drive I/O Port Base0  : ");
@@ -101,7 +101,7 @@ U0 RegularInstallWiz()
     Free(base0);
   }
   if (1<=Str2I64(base0)<=num_hints) {
-    tempha=ATARepFind(&root,Str2I64(base0));
+    tempha=ATARepFind(&head,Str2I64(base0));
     Free(base0);
     base0=MStrPrint("0x%X",tempha->base0);
     base1=MStrPrint("0x%X",tempha->base1);
@@ -121,7 +121,7 @@ U0 RegularInstallWiz()
       Free(st);
     } while (!(0<=unit<=1));
   }
-  LinkedLstDel(root);
+  LinkedLstDel(head);
   XTalkWait(task,"%s\n%s\n%C\n",base0,base1,'0'+unit);
   DrvRep;
   do {

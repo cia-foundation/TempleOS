@@ -2,8 +2,7 @@
 
 public U0 CursorRemFile(U8 *filename)
 {
-  CDoc *doc;
-  doc=DocRead(filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
+  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
   DocWrite(doc);
   DocDel(doc);
 }
@@ -124,7 +123,7 @@ public U0 JukeSong(I64 num)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("~/Downloads/Psalmody",,num,num+1);
+  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,num,num+1);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -134,7 +133,7 @@ public U0 JukeLines(I64 start_line,I64 end_line)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("~/Downloads/Psalmody",,start_line*5,end_line*5);
+  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -300,7 +299,7 @@ U0 TempleOSTheme()
 {
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  ExeFile("~/Downloads/Graphics/TempleOSTheme.CPP");
+  ExeFile("~/Sup1/Sup1Graphics/TempleOSTheme.CPP");
   DocClear;
 }
 
@@ -310,6 +309,16 @@ U0 TOSJukeVideo(I64 start=0,I64 end=10)
   Free(buf);
   AutoComplete;
   FrameGrabberToggle;
-  JukeSongsPuppet("~/Downloads/Psalmody",,start,end);
+  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,start,end);
   FrameGrabberToggle;
+}
+
+#define MEM_TEST_SIZE	128*0x100000
+U0 MemTest()
+{
+  while (sys_data_bp->alloced_u8s-sys_data_bp->used_u8s>MEM_TEST_SIZE*2) {
+    MemSet(MAlloc(MEM_TEST_SIZE),0x88,MEM_TEST_SIZE);
+    "%X\n",sys_data_bp->alloced_u8s-sys_data_bp->used_u8s;
+    Yield;
+  }
 }

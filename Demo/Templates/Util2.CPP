@@ -4,7 +4,7 @@ I64 MyUtilDoc(CDoc *doc,I64 fuf_flags)
   I64 res=0;
   CDocEntry *doc_e;
   DocRecalc(doc);
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     res++;
     doc_e=doc_e->next;

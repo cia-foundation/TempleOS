@@ -3,10 +3,14 @@ INT_MP_CRASH_ADDR:: //Forward reference to work around compiler
 	DU32	&IntMPCrash;
 
 INT_WAKE::
+	PUSH	RDX
 	PUSH	RAX
-	MOV	EAX,U32 LAPIC_EOI
-	MOV	U32 [RAX],0
+	MOV	EAX,&dev
+	MOV	EDX,U32 LAPIC_EOI
+	MOV	RAX,U64 CDevGlbls.uncached_alias[RAX]
+	MOV	U32 [RAX+RDX],0
 	POP	RAX
+	POP	RDX
 	IRET
 
 IRQ_TIMER::  //I_TIMER
@@ -42,9 +46,12 @@ IRQ_TIMER::  //I_TIMER
 	TEST	RAX,RAX
 	JZ	@@20
 
-	MOV	EAX,U32 LAPIC_EOI
-	MOV	U32 [RAX],0
+	MOV	EAX,&dev
+	MOV	EDX,U32 LAPIC_EOI
+	MOV	RAX,U64 CDevGlbls.uncached_alias[RAX]
+	MOV	U32 [RAX+RDX],0
 	JMP	@@25
+
 @@20:	CALL	&IntCore0TimerHandler	//Only Core 0 calls this.
 @@25:	XOR	RAX,RAX
 	CMP	RSI,U64 GS:CCPU.idle_task[RAX]
@@ -137,7 +144,7 @@ interrupt U0 IntNop()
 {//Make unplanned IRQs stop by all means!
   OutU8(0xA0,0x20);
   OutU8(0x20,0x20);
-  *LAPIC_EOI(U32 *)=0;
+  *(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
 }
 
 interrupt U0 IntDivZero()

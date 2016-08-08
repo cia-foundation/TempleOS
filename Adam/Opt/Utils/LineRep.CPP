@@ -10,8 +10,8 @@ I64 LineRep1(CDirEntry *tempde)
       i=LineRep1(tempde->sub);
     else {
       doc=DocRead(tempde->full_name);
-      if (doc->root.next!=doc)
-	i=doc->root.last->y+2;
+      if (doc->head.next!=doc)
+	i=doc->head.last->y+2;
       DocDel(doc);
     }
     tempde->user_data=i;

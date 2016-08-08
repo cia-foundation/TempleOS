@@ -40,7 +40,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  "$$FG$$$$IV,0$$$$BK,0$$";
 
   cc->last_float_op_ic=NULL;
-  tempi=&cc->coc.coc_root;
+  tempi=&cc->coc.coc_head;
   tempi->ic_last_start=-1;
   tempi->ic_cnt=0;
   tempi=tempi->next;
@@ -755,9 +755,6 @@ cc->pass==10 is final pass, code is placed into buf.
 	  break;
 	case IC_RDTSC:
 	  ICCopyTemplate(cc,tempi,CMP_TEMPLATE_RDTSC,TRUE,FALSE,FALSE,CN_MAIN);
-	  break;
-	case IC_HPET:
-	  ICCopyTemplate(cc,tempi,CMP_TEMPLATE_HPET,TRUE,FALSE,FALSE,CN_MAIN);
 	  break;
 	case IC_SET_RFLAGS:
 	  ICPush(tempi,tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);

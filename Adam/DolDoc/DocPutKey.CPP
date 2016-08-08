@@ -97,7 +97,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		    BEqu(&doc_ce->type,DOCEt_SEL,sc&SCF_SHIFT);
 		    doc_ce=doc->cur_entry=doc_ce->last;
 		  }
-		  doc_ce=doc->cur_entry=doc->root.next;
+		  doc_ce=doc->cur_entry=doc->head.next;
 		  doc->cur_col=doc_ce->min_col;
 		  DocFormFwd(doc);
 		}
@@ -142,7 +142,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 			(doc_ce->type_u8!=DOCT_HEX_ED && doc_ce->y>i ||
 			doc_ce->type_u8==DOCT_HEX_ED &&
 			doc_ce->y+doc->cur_col/3/doc_ce->hex_ed_width>i) &&
-			doc_ce->y!=doc->root.next->y) {
+			doc_ce->y!=doc->head.next->y) {
 		    EdLineUp(doc,sc);
 //paranoid check for stuck on same node
 		    if (doc->cur_entry==doc_ce && doc_ce->type_u8!=DOCT_HEX_ED)
@@ -256,7 +256,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 			if (TaskValidate(sys_macro_task))
 			  PostMsgWait(sys_macro_task,
 				MSG_KEY_DOWN_UP,CH_SHIFT_ESC,0);
-			SysMacroStripKey(&sys_macro_root,ch,sc);
+			SysMacroStripKey(&sys_macro_head,ch,sc);
 			PlaySysMacro;
 		      } else
 			EdMacroUtil;

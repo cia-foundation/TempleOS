@@ -32,7 +32,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
 
   snd.record=FALSE;
 
-  dt=snd.record_root.last->time-snd.record_root.next->time;
+  dt=snd.record_head.last->time-snd.record_head.next->time;
   if (!dt) return 0;
   cnt=dt*SNDFILE_SAMPLE_RATE;
   cnt++; //Terminator
@@ -48,9 +48,9 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
   s->channels=EndianU32(1);
 
   if (time_shift) {
-    d=snd.record_root.next;
+    d=snd.record_head.next;
     d->time-=time_shift;
-    while (d->next!=&snd.record_root) {
+    while (d->next!=&snd.record_head) {
       d1=d->next;
       dt=d1->time-d->time;
       if (dt<0) {
@@ -61,9 +61,9 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
     }
   }
 
-  d=snd.record_root.next;
+  d=snd.record_head.next;
   k=0;
-  while (d->next!=&snd.record_root) {
+  while (d->next!=&snd.record_head) {
     d1=d->next;
     dt=d1->time-d->time;
     cnt2=dt*SNDFILE_SAMPLE_RATE;
@@ -103,8 +103,8 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
 
   s->body[cnt-1]=0;
 
-  d=snd.record_root.next;
-  while (d!=&snd.record_root) {
+  d=snd.record_head.next;
+  while (d!=&snd.record_head) {
     d1=d->next;
     QueRem(d);
     Free(d);

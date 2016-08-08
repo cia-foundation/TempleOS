@@ -53,7 +53,7 @@ U0 UnusedDefineScan()
 	      Find(temph->str,"/*","+l-i+T");
 	      Fs->put_doc=old_put_doc;
 	      Fs->display_doc=old_display_doc;
-	      doc_e=doc->root.next;
+	      doc_e=doc->head.next;
 	      while (doc_e!=doc) {
 		if (doc_e->type_u8==DOCT_LINK) {
 		  "%s ",temph->str;

@@ -23,6 +23,8 @@ $LK,"::/Kernel/BlkDev/DskCluster.CPP"$	:152 All the cluster operations become bl
 
 * VMware and others must list TempleOS as an official 64-bit operating system.
 
+* VMware needs to support more than 16 cores.
+
 * Until super-simple block devices are available, hard disk should be placed at IDE primary master 1F0/3F6 and CD/DVD/Blu-ray should be placed at the IDE secondary master 170/376.
 $LK,"/Kernel/BlkDev/DskATAId.CPP",A="FI:::/Kernel/BlkDev/DskATAId.CPP"$	:286 lines to figure-out I/O ports is gone.
 $LK,"/Kernel/PCIBIOS.CPP",A="FI:::/Kernel/PCIBIOS.CPP"$		:290 could be eliminated, but maybe we will keep it so people can play with PCI devices.

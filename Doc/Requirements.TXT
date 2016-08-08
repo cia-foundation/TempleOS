@@ -10,7 +10,7 @@ $FG,5$Supported Hardware$FG$
 
 * Most$FG$ keyboards and mice.
 
-* Minimum $TX,"512 Meg",D="DD_MEM_MIN_MEG"$ RAM; Maximum $TX,"128 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ RAM (easily increased).
+* Minimum $TX,"512 Meg",D="DD_MEM_MIN_MEG"$ RAM; Maximum $TX,"256 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ RAM ($LK,"easily increased",A="MN:MEM_MAPPED_SPACE"$).
 
 * Internal PC Speakers.
 

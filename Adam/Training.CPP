@@ -21,7 +21,7 @@ U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
   else if (k=='Cmd ')	c=RED;
   else			c=BLACK;
 
-  res=MStrPrint("%-*s $$FG,%d$$$$TX+UL+L+PU,\"%Q\",A=\"%s\"$$$$FG$$\n",
+  res=MStrPrint("%-*s $$FG,%d$$$$TX+UL+L+PU,\"%$$Q\",A=\"%s\"$$$$FG$$\n",
 	i,st,c,desc,st2);
   Free(st);
   Free(st2);
@@ -162,7 +162,7 @@ public U0 TipOfDay(U8 *tip_file="::/Doc/Tips.TXT")
 {//Print random tip-of-day from ::/Doc/Tips.TXT.
   I64 i=RandU16;
   CDoc *doc=DocRead(tip_file),*doc2=DocNew;
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   "$$WW,1$$\n";
   while (TRUE) {
     if (doc_e->type_u8==DOCT_TEXT && *doc_e->tag=='*')

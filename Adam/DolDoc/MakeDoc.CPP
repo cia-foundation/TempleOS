@@ -25,6 +25,7 @@ public class CDolDocGlbls
 	type_flags_nontag_invisible [(DOCT_NUM_TYPES+63)/64],
 	type_flags_form		[(DOCT_NUM_TYPES+63)/64],
 	type_flags_data		[(DOCT_NUM_TYPES+63)/64],
+	type_flags_chk_dup	[(DOCT_NUM_TYPES+63)/64],
 	clean_scan_codes	[4];
   I32	dft_type_flags		[DOCT_NUM_TYPES];
 } doldoc;

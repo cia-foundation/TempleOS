@@ -6,7 +6,7 @@ U0 OptPass5(CCmpCtrl *cc)
   ps->ptr=0;
   ps->ptr2=0;
 
-  tempi=cc->coc.coc_root.next;
+  tempi=cc->coc.coc_head.next;
   while (code=tempi->ic_code) {
     if (code>IC_NOP2) {
       if (tempi->ic_flags&ICF_PASS_TRACE) {

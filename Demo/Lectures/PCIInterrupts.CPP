@@ -11,25 +11,25 @@
 interrupt U0 IntMy40()
 {
   lock {progress1++;}
-*LAPIC_EOI(U32 *)=0;
+*(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
 }
 
 interrupt U0 IntMy41()
 {
   lock {progress2++;}
-*LAPIC_EOI(U32 *)=0;
+*(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
 }
 
 interrupt U0 IntMy42()
 {
   lock {progress3++;}
-*LAPIC_EOI(U32 *)=0;
+*(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
 }
 
 interrupt U0 IntMy43()
 {
   lock {progress4++;}
-*LAPIC_EOI(U32 *)=0;
+*(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
 }
 
 I64 vect[4]={&IntMy40,&IntMy41,&IntMy42,&IntMy43};
@@ -37,8 +37,8 @@ I64 vect[4]={&IntMy40,&IntMy41,&IntMy42,&IntMy43};
 U0 Main()
 {
   I64 i;
-  U8 *da=IOAPIC_REG;
-  U32 *_d=IOAPIC_DATA;
+  U8 *da=dev.uncached_alias+IOAPIC_REG;
+  U32 *_d=dev.uncached_alias+IOAPIC_DATA;
 
   ProgressBarsRst;
   for (i=I_USER;i<I_USER+4;i++)

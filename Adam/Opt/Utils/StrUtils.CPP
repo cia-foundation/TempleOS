@@ -21,14 +21,14 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
     out_name=StrNew(in_name);
 
   doc=DocRead(in_name,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT)
       cnt++;
     doc_e=doc_e->next;
   }
   a=MAlloc(cnt*sizeof(CDocEntry *));
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   i=0;
   while (doc_e!=doc) {
     doc_e1=doc_e->next;
@@ -47,15 +47,15 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
     if (!unique || !st || StrCmp(a[i]->tag,st)) {
       st=a[i]->tag;
       for (j=0;j<entry_lines && i<cnt;j++,i++) {
-	QueIns(a[i],doc->root.last);
-	doc->cur_entry=&doc->root;
+	QueIns(a[i],doc->head.last);
+	doc->cur_entry=&doc->head;
 	doc->cur_col=0;
 	DocPrint(doc,"\n");
       }
       res++;
     } else
       for (j=0;j<entry_lines && i<cnt;j++,i++) {
-	QueIns(a[i],doc->root.last);
+	QueIns(a[i],doc->head.last);
 	DocEntryDel(doc,a[i]);
       }
   }
@@ -74,7 +74,7 @@ I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
   U8 *ptr,*ptr2;
   I64 res=0,ch;
   CDoc *doc_in=DocRead(filename);
-  CDocEntry *doc_e=doc_in->root.next;
+  CDocEntry *doc_e=doc_in->head.next;
   while (doc_e!=doc_in) {
     if (doc_e->de_flags & DOCEF_TAG) {
       ptr=doc_e->tag;
@@ -123,7 +123,7 @@ I64 LongLinesFile(U8 *filename,I64 cols)
 {
   I64 res=0;
   CDoc *doc=DocRead(filename);
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_NEW_LINE && doc_e->x>=cols+1)
       res++;
@@ -160,7 +160,7 @@ U0 SUFile(U8 *filename,I64 suf_flags,F64 indent_scale_factor)
   Bool chged=FALSE;
   I64 reduced=0;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT) {
       dst=MStrUtil(doc_e->tag,suf_flags,indent_scale_factor);

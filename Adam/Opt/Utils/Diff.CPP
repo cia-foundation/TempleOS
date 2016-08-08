@@ -219,12 +219,12 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 
 Bool DiffBins(CDoc *doc1,CDoc *doc2)
 {
-  CDocBin *tempb1=doc1->bin_root.next,
-	*tempb2=doc2->bin_root.next;
+  CDocBin *tempb1=doc1->bin_head.next,
+	*tempb2=doc2->bin_head.next;
 
   if (tempb1->last->last->num!=tempb2->last->last->num)
     return TRUE;
-  while (tempb1!=&doc1->bin_root) {
+  while (tempb1!=&doc1->bin_head) {
     if (tempb1->size!=tempb2->size ||
 	  MemCmp(tempb1->data,tempb2->data,tempb1->size))
       return TRUE;
@@ -249,14 +249,14 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
     df_flags=0;
   df_flags&=DF_ABORT_ALL_FILES;
 
-  doc_e=doc1->root.next;
+  doc_e=doc1->head.next;
   while (doc_e!=doc1) {
     if (doc_e->type_u8==DOCT_TEXT)
       doc_e->user_data=cnt1++; //user_data is the new y
     doc_e=doc_e->next;
   }
 
-  doc_e=doc2->root.next;
+  doc_e=doc2->head.next;
   while (doc_e!=doc2) {
     if (doc_e->type_u8==DOCT_TEXT)
       doc_e->user_data=cnt2++; //user_data is the new y
@@ -266,7 +266,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   doc_sorted1=MAlloc(cnt1*sizeof(CDocEntry *));
   doc_unsorted1=MAlloc((cnt1+1)*sizeof(CDocEntry *));
   i=0;
-  doc_e=doc1->root.next;
+  doc_e=doc1->head.next;
   while (doc_e!=doc1) {
     if (doc_e->type_u8==DOCT_TEXT) {
       doc_sorted1[i]=doc_e;
@@ -280,7 +280,7 @@ public Bool Diff(U8 *dst_file,U8 *src_file,I64 *_df_flags=NULL)
   doc_sorted2=MAlloc(cnt2*sizeof(CDocEntry *));
   doc_unsorted2=MAlloc((cnt2+1)*sizeof(CDocEntry *));
   i=0;
-  doc_e=doc2->root.next;
+  doc_e=doc2->head.next;
   while (doc_e!=doc2) {
     if (doc_e->type_u8==DOCT_TEXT) {
       doc_sorted2[i]=doc_e;

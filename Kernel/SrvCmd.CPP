@@ -4,10 +4,10 @@ U0 SrvCmdDel(CSrvCmd *tempc)
   Free(tempc);
 }
 
-U0 SrvCmdQueDel(CSrvCmd *root)
+U0 SrvCmdQueDel(CSrvCmd *head)
 {
-  CSrvCmd *tempc=root->next,*tempc1;
-  while (tempc!=root) {
+  CSrvCmd *tempc=head->next,*tempc1;
+  while (tempc!=head) {
     tempc1=tempc->next;
     QueRem(tempc);
     SrvCmdDel(tempc);
@@ -136,7 +136,7 @@ CSrvCmd *TaskMsg(CTask *_srv,CTask *master,I64 msg_code,I64 a1,I64 a2,I64 flags)
 	srv!=sys_macro_task && msg_code==MSG_KEY_DOWN) {
     tempc1=AMAllocIdent(tempc);
     CLI
-    QueIns(tempc1,sys_macro_root.last);
+    QueIns(tempc1,sys_macro_head.last);
   }
   CLI
   while (Bt(&srv->task_flags,TASKf_FILTER_INPUT) &&

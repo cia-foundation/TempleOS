@@ -38,7 +38,7 @@ args.
     ps=cc->ps=MAlloc(sizeof(CPrsStk));
   ps->ptr=0;
   ps->ptr2=0;
-  tempi=cc->coc.coc_root.next;
+  tempi=cc->coc.coc_head.next;
   while (code=tempi->ic_code) {
     tempc=tempi->ic_class;
     tempi->ic_class2=tempc;
@@ -1214,7 +1214,6 @@ args.
       case IC_GET_LABEL:
       case IC_TYPE:
       case IC_RDTSC:
-      case IC_HPET:
       case IC_SET_RFLAGS:
       case IC_SET_RBP:
       case IC_SET_RSP:

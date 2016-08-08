@@ -7,7 +7,7 @@ RegSetDftEntry("TempleOS/Staff",
 RegExeBranch("TempleOS/Staff");
 
 #define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
-#define BLOG_BASE		"/Home/Web/" PERSONAL_INITIALS "/Blog"
+#define BLOG_BASE		"/Home/Web/" PERSONAL_INITIALS "/BlogDir"
 #define DAILY_BASE		"/Home/Web/" PERSONAL_INITIALS "/DailyBlog"
 #define BLOG_LOCAL_BASE		"::" BLOG_BASE
 #define BLOG_WEB_BASE		PERSONAL_WEB BLOG_BASE

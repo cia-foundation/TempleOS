@@ -310,7 +310,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 	*iso_boot=CAlloc(DVD_BLK_SIZE),
 	*iso_sup=CAlloc(DVD_BLK_SIZE),
 	*iso_term=CAlloc(DVD_BLK_SIZE);
-  CDirEntry *rootdir=CAlloc(sizeof(CDirEntry));
+  CDirEntry *headdir=CAlloc(sizeof(CDirEntry));
   I64 i,j,stage2_blk=(20<<2+1<<2+DVD_BOOT_LOADER_SIZE/BLK_SIZE)>>2,
 	stage2_size,cur_blk=0,tabsize,tabsize2,first_free,max_depth,fuf_flags=0;
   U32 *d;
@@ -335,22 +335,22 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   else
     stage2_filename=NULL;
 
-  rootdir->attr=RS_ATTR_DIR;
-  rootdir->sub=FilesFind(src_files_find_mask,fuf_flags);
-  rootdir->datetime=Now;
-  rootdir->user_data=CAlloc(sizeof(CCDVDUserData));
-  tempc=rootdir->user_data;
+  headdir->attr=RS_ATTR_DIR;
+  headdir->sub=FilesFind(src_files_find_mask,fuf_flags);
+  headdir->datetime=Now;
+  headdir->user_data=CAlloc(sizeof(CCDVDUserData));
+  tempc=headdir->user_data;
   tempc->path_entry_num=1;
 
   cur_blk=20<<2>>2;
   if (stage2_filename) //preboot and bootloader
     cur_blk+=1+DVD_BOOT_LOADER_SIZE/DVD_BLK_SIZE;
-  DVDFileCreate2(out_file,rootdir,&iso_pri->root_dir_record,
-	&iso_sup->root_dir_record,&cur_blk,rootdir,FALSE,
+  DVDFileCreate2(out_file,headdir,&iso_pri->root_dir_record,
+	&iso_sup->root_dir_record,&cur_blk,headdir,FALSE,
 	stage2_filename,&stage2_blk);
   tabsize=sizeof(CISO1PathEntry);
   tabsize2=sizeof(CISO1PathEntry);
-  max_depth=DVDTableLen(rootdir,&tabsize,&tabsize2,1);
+  max_depth=DVDTableLen(headdir,&tabsize,&tabsize2,1);
   FillU32Palindrome(&iso_pri->path_table_size,tabsize);
   FillU32Palindrome(&iso_sup->path_table_size,tabsize2);
   tabsize=(tabsize+DVD_BLK_SIZE-1)/DVD_BLK_SIZE;
@@ -412,8 +412,8 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
     cur_blk+=DVD_BOOT_LOADER_SIZE/DVD_BLK_SIZE;
   }
 
-  DVDFileCreate2(out_file,rootdir,&iso_pri->root_dir_record,
-	&iso_sup->root_dir_record,&cur_blk,rootdir,TRUE,
+  DVDFileCreate2(out_file,headdir,&iso_pri->root_dir_record,
+	&iso_sup->root_dir_record,&cur_blk,headdir,TRUE,
 	stage2_filename,&stage2_blk);
 
   tabbuf=CAlloc(tabsize*DVD_BLK_SIZE);
@@ -432,7 +432,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   itabbuf2=tabbuf2+1;
   first_free=2;
   for (i=1;i<=max_depth;i++)
-    DVDFillPathTable(rootdir,&itabbuf,&itabbuf2,1,FALSE,&first_free,1,i);
+    DVDFillPathTable(headdir,&itabbuf,&itabbuf2,1,FALSE,&first_free,1,i);
   "%X: Path Table 0\n",cur_blk;
   FWBlks(out_file,tabbuf,cur_blk<<2,tabsize<<2);
   cur_blk+=tabsize;
@@ -456,7 +456,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   itabbuf2=tabbuf2+1;
   first_free=2;
   for (i=1;i<=max_depth;i++)
-    DVDFillPathTable(rootdir,&itabbuf,&itabbuf2,1,TRUE,&first_free,1,i);
+    DVDFillPathTable(headdir,&itabbuf,&itabbuf2,1,TRUE,&first_free,1,i);
   "%X: Path Table 2\n",cur_blk;
   FWBlks(out_file,tabbuf,cur_blk<<2,tabsize<<2);
   cur_blk+=tabsize;
@@ -464,7 +464,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
-  DirTreeDel2(rootdir);
+  DirTreeDel2(headdir);
   FillU32Palindrome(&iso_pri->vol_space_size,cur_blk);
   FillU32Palindrome(&iso_sup->vol_space_size,cur_blk);
   FWBlks(out_file,iso_pri,16<<2,4);

@@ -132,7 +132,7 @@ U0 MPRadixSortDemo(I64 dummy=0)
 
 MPRadixSortDemo;
 
-/*$HL,0$ Ress on 8 Cores 3.397GHz Core i7:
+/*$HL,0$ Results on 8 Cores 3.397GHz Core i7:
 $FG,2$QSort$FG$
 Time: 0.759998
 $FG,2$QSortU32$FG$

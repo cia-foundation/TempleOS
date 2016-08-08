@@ -7,7 +7,7 @@ U0 SysGlblsInit()
   sys_cache_line_width=ee.rbx.u8[1]*8;
 
   sys_focus_task=Fs;
-  QueInit(&sys_macro_root);
+  QueInit(&sys_macro_head);
 
   blkdev.dft_iso_filename=AStrNew("::/Temp/CDDVD.ISO");
   blkdev.temp_filename=AStrNew("~/Temp.TXT.Z");
@@ -47,14 +47,14 @@ U0 SysGlblsInit()
   for (i=-308;i<309;i++)
     pow10_I64[i+309]=Pow10(i);
 
-  QueInit(&snd.record_root);
-  snd.record_root.time=tS;
+  QueInit(&snd.record_head);
+  snd.record_head.time=tS;
 
   ProgressBarsRst;
 
   //$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
   i=1; //Rqst 1 blk, we might get more.
-  QueInit(&dev.pci_root);
+  QueInit(&dev.pci_head);
   dev.mem64_ptr=MEM_MAPPED_SPACE;
 
   dbg.fun_seg_cache=CAlloc(FUN_SEG_CACHE_SIZE*sizeof(CFunSegCache));
@@ -63,11 +63,10 @@ U0 SysGlblsInit()
 
 U0 SysGrInit()
 {
-  U8 *vga_page=MemVGAAlloc;
   text.font=sys_font_std;
   text.aux_font=sys_font_cyrillic;
-  text.vga_alias	=vga_page+VGAM_GRAPHICS;
-  text.vga_text_alias	=vga_page+VGAM_TEXT;
+  text.vga_alias	=dev.uncached_alias+VGAM_GRAPHICS;
+  text.vga_text_alias	=dev.uncached_alias+VGAM_TEXT;
   if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
     text.cols=80;
     text.rows=25;
@@ -104,12 +103,12 @@ U0 TimersInit()
     *_d=*_d&3|0x80;
   }
 
-  _q=HPET_GCAP_ID;
+  _q=dev.uncached_alias+HPET_GCAP_ID;
   i=*_q; //i.u32[1]= period in femtoS (10e-15)
   if (100000<i.u32[1]<1000000000) {
     cnts.HPET_freq    =1000000000000000/i.u32[1];
     cnts.HPET_kHz_freq=1000000000000/i.u32[1];
-    _q=HPET_GEN_CONF;
+    _q=dev.uncached_alias+HPET_GEN_CONF;
     *_q|=1; //Enable counting
     cnts.HPET_initial=HPET;
   } else {
@@ -133,7 +132,7 @@ U0 Reboot()
 }
 
 U0 KernelMain()
-{//Continued from $LK,"Kernel",A="FF:::/Kernel/KStart.CPP,I32 &Kernel"$
+{//Continued from $LK,"Kernel",A="FF:::/Kernel/KStart64.CPP,I32 &Kernel"$
   OutU8(0x61,InU8(0x61)&~3); //Snd(0);
   adam_task=Fs;
   BlkPoolsInit;
@@ -141,6 +140,7 @@ U0 KernelMain()
   SysGlblsInit;
   Mem32DevInit;
   MemPagesNotPresentMark;
+  UncachedAliasAlloc;
   LoadKernel;
   SysGrInit;
   StrCpy(Fs->task_name,"Adam Task CPU#0");

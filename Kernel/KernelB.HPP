@@ -26,7 +26,7 @@ public _intern IC_LBTS Bool LBts(
 	U8 *bit_field,I64 bit); //Locked bit test and set to one.
 public _extern _BEQU Bool BEqu(
 	U8 *bit_field,I64 bit,Bool val);//Set bit equ to val.
-public _extern _BIT_FIELD_EXTRACT_U32 U32 BFieldExtU32(
+public _extern _BIT_FIELD_EXT_U32 U32 BFieldExtU32(
 	U8 *bit_field,I64 bit,I64 size); //Extract U32 from bit field.
 public _extern _BIT_FIELD_OR_U32 U0 BFieldOrU32(
 	U8 *bit_field,I64 bit,U32 pattern); //Or U32 into bit field.
@@ -63,7 +63,7 @@ public _intern IC_STRLEN I64 StrLen(U8 *st); //String length.
 #help_index "Data Types/Circular Queue"
 #help_file "::/Doc/Que"
 public _intern IC_QUE_INIT U0 QueInit(
-	CQue *root); //Init queue root links.
+	CQue *head); //Init queue head links.
 public _intern IC_QUE_INS U0 QueIns(
 	CQue *entry,CQue *pred);//Insert item into que after predecessor.
 public _intern IC_QUE_INS_REV U0 QueInsRev(
@@ -106,7 +106,7 @@ public _intern IC_SIN F64 Sin(F64 d); //Sine.
 public _intern IC_SQR F64 Sqr(F64 d); //Square of F64.
 public _intern IC_SQR_I64  I64 SqrI64(I64 i); //Square of I64.
 public _intern IC_SQR_U64  U64 SqrU64(U64 i); //Square of U64.
-public _intern IC_SQRT F64 Sqrt(F64 d); //Square root of F64.
+public _intern IC_SQRT F64 Sqrt(F64 d); //Square head of F64.
 public _intern IC_SWAP_I64 U0 SwapI64(
 	I64 *n1,I64 *n2); //Swap two I64s. Not atomic.
 public _intern IC_SWAP_U16 U0 SwapU16(
@@ -176,6 +176,7 @@ public _extern _MEMSET_U32 U32 *MemSetU32(
 	U32 *dst,I64 val,I64 U32cnt); //Set chunk of U32s to value.
 public _extern _MEMSET U8 *MemSetU8(
 	U8 *dst,I64 val,I64 U8cnt); //Set chunk of U8s to value.
+_extern SYS_GIG_PAGES		U8 sys_gig_pages;
 _extern SYS_HEAP_DBG_FLAG	U8 sys_heap_dbg;
 _extern SYS_HEAP_INIT_FLAG	U8 sys_heap_init_flag;
 _extern SYS_HEAP_INIT_VAL	U8 sys_heap_init_val;
@@ -277,9 +278,5 @@ public _intern IC_FS CTask *Fs(); //FS seg reg points to the current $LK,"CTask"
 #help_index "Time/CPU Cycles"
 #help_file "::/Doc/TimeCycles"
 public _intern IC_RDTSC I64 GetTSC(); //Get time stamp counter.
-
-#help_index "Time/HPET"
-#help_file "::/Doc/TimeHPET"
-public _intern IC_HPET I64 HPET(); //Get high precision event timer.
 
 #help_index ""

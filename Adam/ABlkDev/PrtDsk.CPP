@@ -18,7 +18,7 @@ public I64 PrtDsk(U8 drv_let=0)
 //drv_let=0 means add new drive that
   //is not already mounted.
   CBlkDev *bd;
-  CPlannedDrv root,*temppp;
+  CPlannedDrv head,*temppp;
   CMasterBoot mbr;
   Bool pri=TRUE;
   I64 ext_base,drv_let2,pri_cnt=0,
@@ -45,7 +45,7 @@ public I64 PrtDsk(U8 drv_let=0)
     return 0;
 
   drv_dsk_dsk_size=bd->max_blk+1;
-  QueInit(&root);
+  QueInit(&head);
   drv_let2=bd->first_drv_let;
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO);
   while (FloorU64(remaining,ROUND_DRV_TO)>=ROUND_DRV_TO) {
@@ -68,15 +68,15 @@ public I64 PrtDsk(U8 drv_let=0)
       temppp->size=CeilU64(GetI64("Size in Blocks  :",
 	    remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
     } while (!(ROUND_DRV_TO<=temppp->size<=FloorU64(remaining,ROUND_DRV_TO)));
-    QueIns(temppp,root.last);
+    QueIns(temppp,head.last);
     remaining-=temppp->size;
     drv_let2++;
   }
 
   "\n\n!!! Repartition Drive !!!\n\n";
-  temppp=root.next;
+  temppp=head.next;
   drv_let2=bd->first_drv_let;
-  while (temppp!=&root) {
+  while (temppp!=&head) {
     "Drive %C:%08X ",drv_let2,temppp->size;
     if (temppp->pri)
       "Primary\n";
@@ -89,7 +89,7 @@ public I64 PrtDsk(U8 drv_let=0)
     goto pd_done;
 
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO)-ROUND_DRV_TO;
-  temppp=root.next;
+  temppp=head.next;
   MemSet(&mbr,0,BLK_SIZE);
   mbr.signature=0xAA55;
   offset=0;
@@ -107,7 +107,7 @@ public I64 PrtDsk(U8 drv_let=0)
     temppp=temppp->next;
   }
   if (!i) i++;
-  if (temppp!=&root) {
+  if (temppp!=&head) {
     mbr.p[i].active=0x80;
     mbr.p[i].start_head=0;
     mbr.p[i].start_cyl=0x101;
@@ -120,7 +120,7 @@ public I64 PrtDsk(U8 drv_let=0)
   }
   ATAWriteBlks(bd,&mbr,0,1);
 
-  while (temppp!=&root) {
+  while (temppp!=&head) {
     start_offset=offset;
     MemSet(&mbr,0,BLK_SIZE);
     mbr.signature=0xAA55;
@@ -135,7 +135,7 @@ public I64 PrtDsk(U8 drv_let=0)
     mbr.p[0].size=temppp->size-DRV_HEADER;
     offset+=temppp->size;
     temppp=temppp->next;
-    if (temppp!=&root) {
+    if (temppp!=&head) {
       mbr.p[1].active=0x80;
       mbr.p[1].start_head=0;
       mbr.p[1].start_cyl=0x101;
@@ -154,8 +154,8 @@ public I64 PrtDsk(U8 drv_let=0)
     Fmt(i,,FALSE);
 
 pd_done:
-  while (root.next!=&root) {
-    temppp=root.next;
+  while (head.next!=&head) {
+    temppp=head.next;
     QueRem(temppp);
     Free(temppp);
   }

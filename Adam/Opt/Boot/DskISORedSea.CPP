@@ -142,7 +142,7 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
     stage2_filename=FileNameAbs(_stage2_filename);
     *stage2_filename=dv->drv_let;
     i=StrLen(src_dir);
-    if (i!=3)	//If not root
+    if (i!=3)	//If not head
       i++;	//Skip slash
     StrCpy(stage2_filename+3,stage2_filename+i);
   } else

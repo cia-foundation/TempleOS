@@ -46,7 +46,7 @@ public CDoc *Doc2TXT(CDoc *doc_in)
 
   doc_out->flags|=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
 
-  doc_e=doc_in->root.next;
+  doc_e=doc_in->head.next;
   col=doc_e->x;
   y=doc_e->y;
   while (doc_e!=doc_in) {
@@ -93,7 +93,7 @@ public CDoc *Doc2TXT(CDoc *doc_in)
     y++;
     col=0;
   }
-  doc_out->cur_entry=&doc_out->root;
+  doc_out->cur_entry=&doc_out->head;
   DocRecalc(doc_out);
 
   if (unlock_doc_in)

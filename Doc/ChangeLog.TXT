@@ -2,7 +2,38 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----07/07/16 00:41:12----$IV,0$
+$IV,1$----08/08/16 08:32:26----$IV,0$
+
+$IV,1$----07/17/16 13:03:12----$IV,0$
+* Improved $LK,"DocOpt",A="MN:DocOpt"$().
+
+$IV,1$----07/17/16 03:23:53----$IV,0$
+* Improved $LK,"::/Demo/Games/RawHide.CPP"$.
+
+$IV,1$----07/15/16 10:11:10----$IV,0$
+* $BK,1$TempleOS version 4.10 Released$BK,0$
+* Improved $LK,"::/Demo/Games/EagleDive.CPP"$.
+
+$IV,1$----07/15/16 05:17:24----$IV,0$
+* Created $LK,"CDevGlbls",A="MN:CDevGlbls"$.uncached_alias.
+* Added 1 Gig page table support.
+
+$IV,1$----07/13/16 17:21:19----$IV,0$
+* Added $LK,"::/Demo/MultiCore/RateCores.CPP"$.
+
+$IV,1$----07/09/16 08:46:36----$IV,0$
+* Changed scoring in $LK,"::/Demo/Games/EagleDive.CPP"$.
+* Replaced many $FG,2$"%Q"$FG$ with $FG,2$"%$$Q"$FG$.
+* Fixed $FG,2$'\x24'$FG$.
+* Added $FG,2$'\d'$FG$ for $FG,2$'$$'$FG$.
+
+$IV,1$----07/08/16 14:30:19----$IV,0$
+* $LK,"R",A="MN:R"$("root","head");
+* Fixed $FG,2$REP_STOSB$FG$ and $LK,"MemSet",A="MN:MemSet"$() for 64-bit.
+
+$IV,1$----07/07/16 07:21:03----$IV,0$
+* $LK,"DocRead",A="MN:DocRead"$() changes to file's dir so relative filenames work.
+* Added AppStore to website with Supplemental #1 ISO for download.
 
 $IV,1$----07/06/16 23:45:30----$IV,0$
 * Fixed multicore bug in $LK,"Sprite3",A="MN:Sprite3"$().

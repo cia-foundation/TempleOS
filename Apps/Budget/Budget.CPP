@@ -24,7 +24,7 @@ class CBgtEntry
   U8 *credit,*debit,*desc;
   CBgtTemplate *template;
   CDocEntry *doc_e;
-} b_root;
+} b_head;
 #define BE_SIZE	(offset(CBgtEntry.end)-offset(CBgtEntry.start))
 
 #define BT_NULL		0
@@ -50,7 +50,7 @@ class CBgtTemplate
   U0 end;
 
   CBgtEntry b;
-} t_root;
+} t_head;
 #define BT_SIZE	(offset(CBgtTemplate.end)-offset(CBgtTemplate.start))
 
 U8 view_acct[512];
@@ -63,9 +63,9 @@ CDate MyStr2Date(U8 *st)
   CDate		res;
   if (st&&*st) {
     if (StrOcc(st,'['))
-      res=b_root.next->date;
+      res=b_head.next->date;
     else if (StrOcc(st,']'))
-      res=b_root.last->date;
+      res=b_head.last->date;
     else
       res=Str2Date(st);
   } else

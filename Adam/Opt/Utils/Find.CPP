@@ -47,7 +47,7 @@ I64 FindFile(U8 *needle_str,U8 *haystack_filename,
   plen=StrLen(needle_str);
   if (replace_text)
     rlen=StrLen(replace_text);
-  doc_e=doc->root.next;
+  doc_e=doc->head.next;
   while (doc_e!=doc && cont) {
     if (doc_e->type_u8==DOCT_TEXT) {
       src=doc_e->tag;

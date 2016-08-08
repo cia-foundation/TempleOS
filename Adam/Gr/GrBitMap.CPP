@@ -616,7 +616,7 @@ U8 *GrBitMap1ToBitMap8(U8 *dst,U8 *src,I64 src_size,I64 bkcolor)
   return dst;
 }
 
-public CDC *DCExtract(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
+public CDC *DCExt(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
 	CTask *task=NULL)
 {//Extract new device context rect from device context.
   CDC *res;

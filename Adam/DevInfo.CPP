@@ -15,7 +15,7 @@ public U0 PCIDevFileGen()
   Bool first=TRUE,del=FALSE,del2=FALSE,cont=FALSE;
   CDoc *doc=DocRead(PCI_DEV_FILE,
 	DOCF_PLAIN_TEXT|DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
-  CDocEntry *doc_e=doc->root.next,*doc_e2;
+  CDocEntry *doc_e=doc->head.next,*doc_e2;
   while (doc_e!=doc) {
     doc_e2=doc_e->next;
     if (first) {
@@ -53,7 +53,7 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
 {
   Bool first=TRUE;
   U8 buf[8],*vendor=NULL,*dev=NULL;
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   while (doc_e!=doc) {
     if (first) {
       if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[0]!=';' &&
@@ -120,7 +120,7 @@ U0 PCILookUpDevs()
   CPCIDev *temppci;
   I64 w1,w2,b,d,f,timeout=32*8*2;
   CDoc *doc;
-  if (dev.pci_root.next!=&dev.pci_root)
+  if (dev.pci_head.next!=&dev.pci_head)
     return;
   doc=DocRead(PCI_DEV_FILE,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
   for (b=0;b<sys_pci_busses;b++)
@@ -137,7 +137,7 @@ U0 PCILookUpDevs()
 	  temppci->sub_code=PCIReadU8(b,d,f,0xA);
 	  temppci->base_code=PCIReadU8(b,d,f,0xB);
 	  PCILookUpSingle(doc,w1,w2,&temppci->vendor_str,&temppci->dev_id_str);
-	  QueIns(temppci,dev.pci_root.last);
+	  QueIns(temppci,dev.pci_head.last);
 	  timeout=32*8*2;
 	} else if (sys_pci_busses==256 && --timeout<=0)
 	  goto lud_done;
@@ -155,8 +155,8 @@ public U0 PCIRep()
     return;
   }
   PCILookUpDevs;
-  temppci=dev.pci_root.next;
-  while (temppci!=&dev.pci_root) {
+  temppci=dev.pci_head.next;
+  while (temppci!=&dev.pci_head) {
     "%02X:%02X:%01X %02X%02X $$GREEN$$%s $$CYAN$$%s$$FG$$\n",
 	  temppci->bus,temppci->dev,temppci->fun,
 	  temppci->base_code,temppci->sub_code,
@@ -183,8 +183,8 @@ public U0 MemBIOSRep()
 	"32 Bit Device Mem\n";
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=dev.mem32_root.next;
-  while (tempmr!=&dev.mem32_root) {
+  tempmr=dev.mem32_head.next;
+  while (tempmr!=&dev.mem32_head) {
     "%02X:0x%016X-0x%016X\n",
 	  tempmr->type,tempmr->base,tempmr->base+tempmr->size-1;
     tempmr=tempmr->next;

@@ -18,7 +18,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
 	    BgtTemplatePurge(tempt);
 	    BgtEntryDel2(&tempt->b);
 	    Free(tempt);
-	    QueIns(tempt1,t_root.last);
+	    QueIns(tempt1,t_head.last);
 	    BgtTemplateExpand(tempt1);
 	    BgtRegen;
 	  }
@@ -71,7 +71,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       return TRUE;
     case 't':
       if (tempt1=BgtTemplatePmt) {
-	QueIns(tempt1,t_root.last);
+	QueIns(tempt1,t_head.last);
 	BgtTemplateExpand(tempt1);
 	BgtRegen;
       }
@@ -97,10 +97,10 @@ U0 BgtRegen()
   F64 balance=0;
   CDoc *doc,*pdoc,*ddoc;
   CDocEntry *doc_ce;
-  CBgtEntry *tempb=b_root.next,*tempb_ce;
+  CBgtEntry *tempb=b_head.next,*tempb_ce;
   doc=DocNew;
   doc->flags|=DOCF_FORM;
-  while (tempb!=&b_root) {
+  while (tempb!=&b_head) {
     if (!StrCmp(view_acct,tempb->credit))
       balance-=tempb->amount;
     if (!StrCmp(view_acct,tempb->debit))
@@ -111,7 +111,7 @@ U0 BgtRegen()
       DocPrint(doc,"$$FG,%d$$",color);
     }
     tempb->doc_e=DocPrint(doc,
-	  "$$MU-UL,\"%D %8ts %8ts:%8.2f %8.2f:%Q\",U=0x%X$$\n",
+	  "$$MU-UL,\"%D %8ts %8ts:%8.2f %8.2f:%$$Q\",U=0x%X$$\n",
 	  tempb->date,tempb->credit,tempb->debit,balance,
 	  tempb->amount,tempb->desc,tempb);
     tempb=tempb->next;
@@ -134,8 +134,8 @@ U0 BgtRegen()
 	doc_ce=doc_ce->next;
 	if (doc_ce==pdoc) goto br_cont;
       }
-      tempb=b_root.next;
-      while (tempb!=&b_root) {
+      tempb=b_head.next;
+      while (tempb!=&b_head) {
 	if (tempb==tempb_ce) {
 	  doc->cur_entry=tempb->doc_e;
 	  doc->cur_col=0;

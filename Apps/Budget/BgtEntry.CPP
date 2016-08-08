@@ -15,8 +15,8 @@ U0 BgtEntryDel(CBgtEntry *tempb)
 
 U0 BgtIns(CBgtEntry *tempb)
 {
-  CBgtEntry	*tempb1=b_root.next;
-  while (tempb1!=&b_root && tempb1->date<tempb->date)
+  CBgtEntry	*tempb1=b_head.next;
+  while (tempb1!=&b_head && tempb1->date<tempb->date)
     tempb1=tempb1->next;
   QueIns(tempb,tempb1->last);
 }

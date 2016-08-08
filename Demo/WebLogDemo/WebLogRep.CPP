@@ -39,11 +39,11 @@ U0 LogStructDel(LogStruct *templg)
   Free(templg);
 }
 
-U0 PrsSingleLogFile(LogStruct *root,U8 *name,CDate *_start,CDate *_end)
+U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
 {
   CDoc *doc=DocRead(name,
 	DOCF_PLAIN_TEXT_TABS|DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   U8 *src,*src2,*mon_lst=Define("ST_MONTHS");
   LogStruct *templg;
   CDateStruct ds;
@@ -117,7 +117,7 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name,CDate *_start,CDate *_end)
 	  templg->link=StrNew(src);
 	  src=++src2;
 
-	  QueIns(templg,root->last);
+	  QueIns(templg,head->last);
 	} else if (!StrNCmp(src,"HEAD ",5)) {
 	  LogStructDel(templg);
 	} else
@@ -135,38 +135,38 @@ U0 PrsSingleLogFile(LogStruct *root,U8 *name,CDate *_start,CDate *_end)
 
 LogStruct *PrsLogFiles(U8 *files_find_mask,CDate *_start,CDate *_end)
 {
-  LogStruct *root=CAlloc(sizeof(LogStruct));
+  LogStruct *head=CAlloc(sizeof(LogStruct));
   CDirEntry *tempde=FilesFind(files_find_mask),*tempde1=tempde;
-  QueInit(root);
+  QueInit(head);
   while (tempde) {
-    PrsSingleLogFile(root,tempde->full_name,_start,_end);
+    PrsSingleLogFile(head,tempde->full_name,_start,_end);
     tempde=tempde->next;
   }
   DirTreeDel(tempde1);
-  return root;
+  return head;
 }
 
-U0 LogLstDel(LogStruct *root)
+U0 LogLstDel(LogStruct *head)
 {
-  LogStruct *templg=root->next,*templg1;
-  while (templg!=root) {
+  LogStruct *templg=head->next,*templg1;
+  while (templg!=head) {
     templg1=templg->next;
     LogStructDel(templg);
     templg=templg1;
   }
 }
 
-U0 BlockedStructAdd(BlockedStruct *root,U32 ip_num)
+U0 BlockedStructAdd(BlockedStruct *head,U32 ip_num)
 {
   BlockedStruct *tempb=CAlloc(sizeof(BlockedStruct));
   tempb->ip_num=ip_num;
-  QueIns(tempb,root->last);
+  QueIns(tempb,head->last);
 }
 
-Bool IsBlocked(BlockedStruct *root,U32 ip_num)
+Bool IsBlocked(BlockedStruct *head,U32 ip_num)
 {
-  BlockedStruct *tempb=root->next;
-  while (tempb!=root) {
+  BlockedStruct *tempb=head->next;
+  while (tempb!=head) {
     if (tempb->ip_num==ip_num)
       return TRUE;
     tempb=tempb->next;
@@ -174,40 +174,41 @@ Bool IsBlocked(BlockedStruct *root,U32 ip_num)
   return FALSE;
 }
 
-U0 BlockIPNums(LogStruct *root)
+U0 BlockIPNums(LogStruct *head)
 {
-  BlockedStruct blocked_root;
-  LogStruct *templg=root->next,*templg1;
+  BlockedStruct blocked_head;
+  LogStruct *templg=head->next,*templg1;
 
-  QueInit(&blocked_root);
+  QueInit(&blocked_head);
 
-  BlockedStructAdd(&blocked_root,70<<24+173<<16+110<<8+214);
-  BlockedStructAdd(&blocked_root,68<<24+224<<16+130<<8+96);
-  BlockedStructAdd(&blocked_root,68<<24+96<<16+100<<8+126);
-  BlockedStructAdd(&blocked_root,68<<24+96<<16+110<<8+213);
-  BlockedStructAdd(&blocked_root,68<<24+96<<16+242<<8+108);
-  BlockedStructAdd(&blocked_root,68<<24+227<<16+61<<8+11);
+  BlockedStructAdd(&blocked_head,70<<24+173<<16+110<<8+214);
+  BlockedStructAdd(&blocked_head,68<<24+224<<16+130<<8+96);
+  BlockedStructAdd(&blocked_head,68<<24+96<<16+100<<8+126);
+  BlockedStructAdd(&blocked_head,68<<24+96<<16+110<<8+213);
+  BlockedStructAdd(&blocked_head,68<<24+96<<16+242<<8+108);
+  BlockedStructAdd(&blocked_head,68<<24+227<<16+61<<8+11);
+  BlockedStructAdd(&blocked_head,68<<24+227<<16+61<<8+139);
 
   //pass 1: collect robot lst
-  while (templg!=root) {
+  while (templg!=head) {
     if (StrIMatch("ROBOT",templg->file) &&
-	  !IsBlocked(&blocked_root,templg->ip_num))
-      BlockedStructAdd(&blocked_root,templg->ip_num);
+	  !IsBlocked(&blocked_head,templg->ip_num))
+      BlockedStructAdd(&blocked_head,templg->ip_num);
     templg=templg->next;
   }
 
   //pass 2: removed blocked ip_nums
-  templg=root->next;
-  while (templg!=root) {
+  templg=head->next;
+  while (templg!=head) {
     templg1=templg->next;
-    if (IsBlocked(&blocked_root,templg->ip_num)) {
+    if (IsBlocked(&blocked_head,templg->ip_num)) {
       QueRem(templg);
       LogStructDel(templg);
     }
     templg=templg1;
   }
 
-  QueDel(&blocked_root);
+  QueDel(&blocked_head);
 }
 
 Bool IsDownLoad(LogStruct *templg)
@@ -235,24 +236,24 @@ Bool IsIndex(LogStruct *templg)
     return FALSE;
 }
 
-Bool IPNumTreeAdd(LogStruct **_root,LogStruct *templg)
+Bool IPNumTreeAdd(LogStruct **_head,LogStruct *templg)
 {
-  LogStruct *root;
+  LogStruct *head;
   if (UnusedStk<0x200) {
     PrintErr("Stk Overflow");
     ThrowBreak;
   }
-  if (root=*_root) {
-    if (templg->ip_num==root->ip_num)
+  if (head=*_head) {
+    if (templg->ip_num==head->ip_num)
       return TRUE;
-    else if (templg->ip_num<root->ip_num)
-      return IPNumTreeAdd(&root->ip_num_left,templg);
+    else if (templg->ip_num<head->ip_num)
+      return IPNumTreeAdd(&head->ip_num_left,templg);
     else
-      return IPNumTreeAdd(&root->ip_num_right,templg);
+      return IPNumTreeAdd(&head->ip_num_right,templg);
   } else {
     templg->ip_num_left=NULL;
     templg->ip_num_right=NULL;
-    *_root=templg;
+    *_head=templg;
     return FALSE;
   }
 }
@@ -339,12 +340,12 @@ U0 FileTreeTraverse(LinkStruct *root)
   }
 }
 
-U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
+U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
 {
   I64 i,j,cnt,dups,
 	hours_start,hours_end,*hour_cnts,*dup_cnts,
 	days_start,days_end,*day_cnts,*day_dup_cnts;
-  LogStruct *templg=root->next,*dup_root=NULL;
+  LogStruct *templg=head->next,*dup_head=NULL;
   LinkStruct *link_root=NULL;
   CDateStruct ds;
 
@@ -359,13 +360,13 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
   day_cnts =CAlloc((days_end-days_start+1)*sizeof(I64));
   day_dup_cnts=CAlloc((days_end-days_start+1)*sizeof(I64));
   dups=cnt=0;
-  while (templg!=root) {
+  while (templg!=head) {
     if (start<=templg->datetime<=end && IsDownLoad(templg)) {
       i=templg->datetime*24;
       hour_cnts[i.u32[1]-hours_start]++;
       day_cnts[(templg->datetime+local_time_offset)>>32-days_start]++;
       cnt++;
-      if (IPNumTreeAdd(&dup_root,templg)) {
+      if (IPNumTreeAdd(&dup_head,templg)) {
 	day_dup_cnts[(templg->datetime+local_time_offset)>>32-days_start]++;
 	dup_cnts[i.u32[1]-hours_start]++;
 	dups++;
@@ -408,11 +409,11 @@ U0 DownLoadRep(LogStruct *root,CDate start,CDate end)
   Free(day_dup_cnts);
 }
 
-U0 FileRep(LogStruct *root,CDate start,CDate end)
+U0 FileRep(LogStruct *head,CDate start,CDate end)
 {
-  LogStruct *templg=root->next;
+  LogStruct *templg=head->next;
   LinkStruct *file_root=NULL;
-  while (templg!=root) {
+  while (templg!=head) {
     if (start<=templg->datetime<=end)
       FileTreeAdd(&file_root,templg);
     templg=templg->next;
@@ -423,12 +424,12 @@ U0 FileRep(LogStruct *root,CDate start,CDate end)
   FileTreeDel(file_root);
 }
 
-U0 IndexRep(LogStruct *root,CDate start,CDate end)
+U0 IndexRep(LogStruct *head,CDate start,CDate end)
 {
   I64 i,j,cnt,dups,
 	hours_start,hours_end,*hour_cnts,*dup_cnts,
 	days_start,days_end,*day_cnts,*day_dup_cnts;
-  LogStruct *templg=root->next,*dup_root=NULL;
+  LogStruct *templg=head->next,*dup_head=NULL;
   LinkStruct *link_root=NULL;
   CDateStruct ds;
 
@@ -443,13 +444,13 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
   day_cnts =CAlloc((days_end-days_start+1)*sizeof(I64));
   day_dup_cnts=CAlloc((days_end-days_start+1)*sizeof(I64));
   dups=cnt=0;
-  while (templg!=root) {
+  while (templg!=head) {
     if (start<=templg->datetime<=end && IsIndex(templg)) {
       i=templg->datetime*24;
       hour_cnts[i.u32[1]-hours_start]++;
       day_cnts[(templg->datetime+local_time_offset)>>32-days_start]++;
       cnt++;
-      if (IPNumTreeAdd(&dup_root,templg)) {
+      if (IPNumTreeAdd(&dup_head,templg)) {
 	day_dup_cnts[(templg->datetime+local_time_offset)>>32-days_start]++;
 	dup_cnts[i.u32[1]-hours_start]++;
 	dups++;
@@ -494,27 +495,27 @@ U0 IndexRep(LogStruct *root,CDate start,CDate end)
 
 U0 WebLogRep(U8 *mask,U8 *output_filename)
 {
-  LogStruct *root;
+  LogStruct *head;
   CDate start=MAX_I64,end=MIN_I64;
 
   DocMax;
 
-  root=PrsLogFiles(mask,&start,&end);
+  head=PrsLogFiles(mask,&start,&end);
   start=GetDate("Start(%D):",start);
   end  =GetDate("End  (%D):",end);
-  BlockIPNums(root);
+  BlockIPNums(head);
 
   DocClear;
   "$$WW,0$$";
-  IndexRep(root,start,end);
-  FileRep(root,start,end);
-  DownLoadRep(root,start,end);
+  IndexRep(head,start,end);
+  FileRep(head,start,end);
+  DownLoadRep(head,start,end);
 
   StrCpy(DocPut->filename.name,output_filename);
   DocWrite(DocPut,TRUE);
 
   "$$WW,1$$";
-  LogLstDel(root);
+  LogLstDel(head);
 }
 
 #if __CMD_LINE__

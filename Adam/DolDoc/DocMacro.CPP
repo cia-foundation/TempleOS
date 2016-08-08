@@ -5,11 +5,11 @@ StrCpy(captured_macro_name,"Test");
 
 I64 sys_macro_repeat_n=1;
 
-U0 SysMacroStripKey(CSrvCmd *macro_root,I64 a1,I64 a2)
+U0 SysMacroStripKey(CSrvCmd *macro_head,I64 a1,I64 a2)
 {
   CSrvCmd *tempc,*tempc1;
-  tempc=macro_root->next;
-  while (tempc!=macro_root) {
+  tempc=macro_head->next;
+  while (tempc!=macro_head) {
     tempc1=tempc->next;
     if (tempc->cmd_code==SVCT_MSG &&
 	  (tempc->msg_code==MSG_KEY_DOWN || tempc->msg_code==MSG_KEY_UP ||
@@ -50,20 +50,20 @@ CMacroTemp *Cmd2MT(CSrvCmd *tempc)
   return tempmt;
 }
 
-U8 *SysMacro2Str(CSrvCmd *macro_root)
+U8 *SysMacro2Str(CSrvCmd *macro_head)
 {
   CSrvCmd *tempc;
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
-  CMacroTemp *tempmt,*tempmt1,root;
+  CMacroTemp *tempmt,*tempmt1,head;
   LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
 
-  QueInit(&root);
-  root.type=MT_NULL;
-  tempc=macro_root->next;
-  while (tempc!=macro_root) {
+  QueInit(&head);
+  head.type=MT_NULL;
+  tempc=macro_head->next;
+  while (tempc!=macro_head) {
     tempmt=Cmd2MT(tempc);
-    QueIns(tempmt,root.last);
+    QueIns(tempmt,head.last);
     cnt+=StrLen(tempmt->buf);
     if (tempmt->type==MT_CHAR) {
       if (tempmt->last->type!=MT_CHAR)
@@ -77,8 +77,8 @@ U8 *SysMacro2Str(CSrvCmd *macro_root)
   m=MAlloc(cnt);
   ptr=m;
 
-  tempmt=root.next;
-  while (tempmt!=&root) {
+  tempmt=head.next;
+  while (tempmt!=&head) {
     tempmt1=tempmt->next;
     if (tempmt->type==MT_MSG) {
       StrCpy(ptr, tempmt->buf);
@@ -108,7 +108,7 @@ U0 PlaySysMacro(I64 n=1)
   U8 *m;
   if (TaskValidate(task)) {
     LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
-    m=SysMacro2Str(&sys_macro_root);
+    m=SysMacro2Str(&sys_macro_head);
     while (n-- && TaskValidate(task)) {
       if (task==Fs)
 	AutoStr("%s",m);
@@ -121,9 +121,9 @@ U0 PlaySysMacro(I64 n=1)
 
 U0 EdInsCapturedMacro()
 {
-  U8 *st=SysMacro2Str(&sys_macro_root);
+  U8 *st=SysMacro2Str(&sys_macro_head);
   if (sys_focus_task) {
-    XTalk(sys_focus_task,"$$MA+LA,T=\"%s\",LM=\"%Q\"$$",
+    XTalk(sys_focus_task,"$$MA+LA,T=\"%s\",LM=\"%$$Q\"$$",
 	  captured_macro_name,st);
     Free(st);
   }
@@ -184,7 +184,7 @@ U0 MacroTask(I64)
     switch (i) {
       case SM_RECORD:
 	LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
-	QueDel(&sys_macro_root,TRUE);
+	QueDel(&sys_macro_head,TRUE);
 	LBts(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
 	break;
       case SM_PLAY:

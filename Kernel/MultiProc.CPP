@@ -139,10 +139,10 @@ U0 MPInt(U8 num,I64 cpu_num=1)
   }
   PUSHFD
   CLI //Multitasking safe because each core has a local apic and IRQ's are off
-  while (*LAPIC_ICR_LOW(U32 *)&0x1000)
+  while (*(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)&0x1000)
     PAUSE
-  *LAPIC_ICR_HIGH(U32 *)=dev.mp_apic_ids[cpu_num]<<24;
-  *LAPIC_ICR_LOW(U32 *)=0x4000+num;
+  *(dev.uncached_alias+LAPIC_ICR_HIGH)(U32 *)=dev.mp_apic_ids[cpu_num]<<24;
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0x4000+num;
   POPFD
 }
 
@@ -150,15 +150,15 @@ U0 MPIntAll(U8 num)
 {//Generate interrupt for all but own core.
   PUSHFD
   CLI //Multitasking safe because each core has a local apic and IRQ's are off
-  while (*LAPIC_ICR_LOW(U32 *)&0x1000)
+  while (*(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)&0x1000)
     PAUSE
-  *LAPIC_ICR_LOW(U32 *)=0xC4800+num;
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4800+num;
   POPFD
 }
 
 U0 MPNMInt()
 {//Generate nonmaskable interrupt.
-  *LAPIC_ICR_LOW(U32 *)=0xC4400;
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4400;
 }
 
 U0 MPHalt()
@@ -172,14 +172,14 @@ U0 MPAPICInit()
 {//Called by adam during start-up
 //and other cores during initialization
   //after $LK,"Core0StartMP",A="MN:Core0StartMP"$().
-  *LAPIC_SVR(U32 *)|=LAPICF_APIC_ENABLED;
-  dev.mp_apic_ids[Gs->num]=*LAPIC_APIC_ID(U32 *)>>24;
-  *LAPIC_LDR(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
-  *LAPIC_DFR(U32 *)=0xF0000000;
+  *(dev.uncached_alias+LAPIC_SVR)(U32 *)|=LAPICF_APIC_ENABLED;
+  dev.mp_apic_ids[Gs->num]=*(dev.uncached_alias+LAPIC_APIC_ID)(U32 *)>>24;
+  *(dev.uncached_alias+LAPIC_LDR)(U32 *)=dev.mp_apic_ids[Gs->num]<<24;
+  *(dev.uncached_alias+LAPIC_DFR)(U32 *)=0xF0000000;
 
-  //  MemSet(LAPIC_IRR,0,0x20);
-  //  MemSet(LAPIC_ISR,0,0x20);
-  //  MemSet(LAPIC_TMR,0,0x20);
+  //  MemSet(dev.uncached_alias+LAPIC_IRR,0,0x20);
+  //  MemSet(dev.uncached_alias+LAPIC_ISR,0,0x20);
+  //  MemSet(dev.uncached_alias+LAPIC_TMR,0,0x20);
 
   SetRAX(Gs->tss->tr);
   LTR	AX
@@ -315,15 +315,16 @@ U0 Core0StartMP()
   mp_cnt_initial=mp_cnt=1;
   mp_cnt_lock=0;
 
-  *LAPIC_LVT_ERR(U32 *)=*LAPIC_LVT_ERR(U32 *)&0xFFFFFF00+MPN_VECT;
+  *(dev.uncached_alias+LAPIC_LVT_ERR)(U32 *)=
+	*(dev.uncached_alias+LAPIC_LVT_ERR)(U32 *)&0xFFFFFF00+MPN_VECT;
   WBINVD //Not sure why this is needed.	Might just need delay. $LK,"MemCpy",A="MN:MemCpy"$ above?
 
-  *LAPIC_ICR_LOW(U32 *)=0xC4500; //assert init IPI
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4500; //assert init IPI
   BusyWait(10000);
 
-  *LAPIC_ICR_LOW(U32 *)=0xC4600+MPN_VECT; //start-up
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4600+MPN_VECT; //start-up
   BusyWait(200);
-  *LAPIC_ICR_LOW(U32 *)=0xC4600+MPN_VECT;
+  *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4600+MPN_VECT;
 
   BusyWait(100000);
   for (i=0;i<10000;i++)
@@ -371,7 +372,7 @@ U0 Core0Init()
   }
   if (Bt(&ee.rdx,9)) {
 //Unnecessary?
-    //	  SetMSR(IA32_LAPIC_BASE,LAPIC_BASE+0x900);
+    //	  SetMSR(IA32_LAPIC_BASE,dev.uncached_alias+LAPIC_BASE+0x900);
     MPAPICInit;
   }
 }
@@ -379,7 +380,7 @@ U0 Core0Init()
 interrupt U0 IntMPCrash()
 {//Entering the debugger from another core causes an interrupt on core0
 //Which calls this routine.
-  *LAPIC_EOI(U32 *)=0;
+  *(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
   mp_cnt=1;
   Raw(ON);
   text.raw_flags|=RWF_SHOW_DOLLAR;

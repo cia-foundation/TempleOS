@@ -148,7 +148,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -166,7 +166,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	"</head>\n");
   DocPrint(doc_out,"%s",body_header);
 
-  doc_e=doc_in->root.next;
+  doc_e=doc_in->head.next;
   col=doc_e->x;
   y=doc_e->y;
   while (doc_e!=doc_in) {
@@ -219,7 +219,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	case DOCT_TEXT:
 	  if (doc_e->de_flags&DOCEF_HIGHLIGHT) {
 	    if (doc_e->last==doc_in)
-	      MemCpy(&doc_e->settings,&doc_in->settings_root,
+	      MemCpy(&doc_e->settings,&doc_in->settings_head,
 		    sizeof(CDocSettings));
 	    else
 	      MemCpy(&doc_e->settings,&doc_e->last->settings,
@@ -290,7 +290,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	    ".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",
 	    i,p[i&15].r>>8,p[i&15].g>>8,p[i&15].b>>8,
 	    p[i/16].r>>8,p[i/16].g>>8,p[i/16].b>>8);
-  doc_out->cur_entry=&doc_out->root;
+  doc_out->cur_entry=&doc_out->head;
   DocRecalc(doc_out);
 
   doc_in->win_task->text_attr=old_attr;

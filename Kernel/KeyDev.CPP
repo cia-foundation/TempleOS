@@ -2,12 +2,12 @@ U0 PutKey(I64 ch=0,I64 sc=0)
 {//See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
   CKeyDevEntry *tempp;
   if (ch||sc) {
-    tempp=keydev.put_key_root.next;
+    tempp=keydev.put_key_head.next;
     if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
       if (kbd.scan_code & SCF_SCROLL && sys_focus_task==Fs)
 	while (kbd.scan_code & SCF_SCROLL)
 	  Yield; //Wait on SCROLL LOCK Key
-      while (tempp!=&keydev.put_key_root) {
+      while (tempp!=&keydev.put_key_head) {
 	if ((!(sc&SCF_KEY_DESC) || tempp->flags & KDF_HAS_DESCS) &&
 	      (*tempp->put_key)(ch,sc))
 	  break;
@@ -33,12 +33,12 @@ U0 PutS(U8 *st)
   U8 *ptr;
   Bool cont=TRUE;
   if (!st) return;
-  CKeyDevEntry *tempp=keydev.put_key_root.next;
+  CKeyDevEntry *tempp=keydev.put_key_head.next;
   if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
     if (kbd.scan_code & SCF_SCROLL && sys_focus_task==Fs)
       while (kbd.scan_code & SCF_SCROLL)
 	Yield;
-    while (cont && tempp!=&keydev.put_key_root) {
+    while (cont && tempp!=&keydev.put_key_head) {
       if (tempp->put_s) {
 	if ((*tempp->put_s)(st))
 	  break;
@@ -70,7 +70,7 @@ U0 KeyDevRem(CKeyDevEntry *tempp)
 CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE)
 {//Places hook in StdOut chain. See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
-  CKeyDevEntry *tempp=keydev.put_key_root.last,
+  CKeyDevEntry *tempp=keydev.put_key_head.last,
 	*tempp1=ACAlloc(sizeof(CKeyDevEntry));
   tempp1->put_key=fp_put_key;
   tempp1->put_s=fp_puts;
@@ -204,8 +204,8 @@ U0 KeyDevInit()
   keydev.ctrl_alt_no_shift_descs=CAlloc(26*sizeof(U8 *));
   keydev.ctrl_alt_shift_descs	=CAlloc(26*sizeof(U8 *));
   keydev.ctrl_alt_in_irq_flags	=0;
-  MemSet(&keydev.put_key_root,0,sizeof(CKeyDevEntry));
-  QueInit(&keydev.put_key_root);
+  MemSet(&keydev.put_key_head,0,sizeof(CKeyDevEntry));
+  QueInit(&keydev.put_key_head);
   KeyDevAdd(&KDInputFilterPutKey,&KDInputFilterPutS,0x40000000,FALSE);
   KeyDevAdd(&KDRawPutKey,&KDRawPutS,0x60000000,FALSE);
   CtrlAltCBSet('C',&CtrlAltC,"Cmd /Break Execution",,TRUE);

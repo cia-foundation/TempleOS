@@ -67,9 +67,7 @@ U8 *MPrintQ(U8 *ptr,I64 flags)
 	case '$$':
 	  if (flags&SPF_DOLLAR) {
 	    SPutChar(_dst,'\\',_buf);
-	    SPutChar(_dst,'x',_buf);
-	    SPutChar(_dst,'2',_buf);
-	    SPutChar(_dst,'4',_buf);
+	    SPutChar(_dst,'d',_buf);
 	  } else {
 	    SPutChar(_dst,ch,_buf);
 	    SPutChar(_dst,ch,_buf);
@@ -115,7 +113,7 @@ U8 *MPrintQ(U8 *ptr,I64 flags)
 U8 *MPrintq(U8 *ptr,I64 flags)
 {
   U8 **_buf,*buf,**_dst,*dst;
-  I64 i,ch,ch1;
+  I64 i,j,ch,ch1;
   buf=MAlloc(STR_LEN);
   _buf=&buf;
   dst=buf;
@@ -127,14 +125,8 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	case '\\':
 	  switch (ch1) {
 	    start:
-	      case 'n':
-		SPutChar(_dst,'\n',_buf);
-		break;
-	      case 'r':
-		SPutChar(_dst,'\r',_buf);
-		break;
-	      case '"':
-		SPutChar(_dst,'"',_buf);
+	      case '0':
+		SPutChar(_dst,0,_buf);
 		break;
 	      case '\'':
 		SPutChar(_dst,'\'',_buf);
@@ -142,14 +134,23 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	      case '\`':
 		SPutChar(_dst,'\`',_buf);
 		break;
+	      case '"':
+		SPutChar(_dst,'"',_buf);
+		break;
 	      case '\\':
 		SPutChar(_dst,'\\',_buf);
 		break;
+	      case 'd':
+		SPutChar(_dst,'$$',_buf);
+		break;
+	      case 'n':
+		SPutChar(_dst,'\n',_buf);
+		break;
+	      case 'r':
+		SPutChar(_dst,'\r',_buf);
+		break;
 	      case 't':
 		SPutChar(_dst,'\t',_buf);
-		break;
-	      case '0':
-		SPutChar(_dst,0,_buf);
 		break;
 	    end:
 	      ptr++;
@@ -159,18 +160,19 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	    case 'X':
 	      i=0;
 	      ptr++;
-	      while (TRUE) {
+	      for (j=0;j<2;j++) {
 		ch1=ToUpper(*ptr++);
 		if (Bt(chars_bmp_hex_numeric,ch1)) {
 		  if (ch1<='9')
 		    i=i<<4+ch1-'0';
 		  else
 		    i=i<<4+ch1-'A'+10;
-		} else
+		} else {
+		  ptr--;
 		  break;
+		}
 	      }
 	      SPutChar(_dst,i,_buf);
-	      ptr--;
 	      break;
 
 	    default:

@@ -4,7 +4,7 @@ U0 TaskRepTask(CTask *task,I64 indent)
   CTask *task1;
   U8 *st,*desc=MStrUtil(task->task_title,SUF_SAFE_DOLLAR);
   st=MStrPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
-  "%h*c%s $$TX,\"%Q...\",SCX=16$$\n",indent,CH_SPACE,
+  "%h*c%s $$TX,\"%$$Q...\",SCX=16$$\n",indent,CH_SPACE,
 	st,desc;
   "%h*c%08X %04X:%04X:%08X\n",indent+2,CH_SPACE,TaskMemAlloced(task),
 	task->task_flags,task->display_flags,task->win_inhibit;

@@ -171,7 +171,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -189,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	"</head>\n");
   DocPrint(doc_out,"%s",body_header);
 
-  doc_e=doc_in->root.next;
+  doc_e=doc_in->head.next;
   col=doc_e->x;
   y=doc_e->y;
   while (doc_e!=doc_in) {
@@ -242,7 +242,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	case DOCT_TEXT:
 	  if (doc_e->de_flags&DOCEF_HIGHLIGHT) {
 	    if (doc_e->last==doc_in)
-	      MemCpy(&doc_e->settings,&doc_in->settings_root,
+	      MemCpy(&doc_e->settings,&doc_in->settings_head,
 		    sizeof(CDocSettings));
 	    else
 	      MemCpy(&doc_e->settings,&doc_e->last->settings,
@@ -320,7 +320,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	    ".c%02X{color:#%02x%02x%02x;background-color:#%02x%02x%02x;}\n",
 	    i,p[i&15].r>>8,p[i&15].g>>8,p[i&15].b>>8,
 	    p[i/16].r>>8,p[i/16].g>>8,p[i/16].b>>8);
-  doc_out->cur_entry=&doc_out->root;
+  doc_out->cur_entry=&doc_out->head;
   DocRecalc(doc_out);
 
   doc_in->win_task->text_attr=old_attr;
@@ -393,7 +393,7 @@ U0 TOSWebFile(U8 *name)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.09",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -417,7 +417,7 @@ public U0 MakeWebSite()
   DelTree("D:/Wb/Home/Private");
   Del("D:/Wb/Home/*");
   Touch("D:/Wb/Home/Web/index.TXT.Z","");
-  Touch("D:/Wb/Home/Web/Downloads.TXT.Z","");
+  Touch("D:/Wb/Home/Web/DownloadOS.TXT.Z","");
   Touch("D:/Wb/Home/Web/TempleOS.TXT.Z","");
   tempde=tempde1=FilesFind("*",
 	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
@@ -425,11 +425,11 @@ public U0 MakeWebSite()
     TOSWebFile(tempde->full_name);
     tempde=tempde->next;
   }
-  Copy(	"D:/Wb/Home/Downloads/Bin/TempleBot",
-	"D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  ToDolDoc("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  TOSToHtml("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
-  Del("D:/Wb/Home/Downloads/Bin/TempleBot.TXT");
+  Copy(	"D:/Wb/Home/Sup1/Sup1Bin/TempleBot",
+	"D:/Wb/Home/Sup1/Sup1Bin/TempleBot.TXT");
+  ToDolDoc("D:/Wb/Home/Sup1/Sup1Bin/TempleBot.TXT");
+  TOSToHtml("D:/Wb/Home/Sup1/Sup1Bin/TempleBot.TXT");
+  Del("D:/Wb/Home/Sup1/Sup1Bin/TempleBot.TXT");
   DirTreeDel(tempde1);
   Drv('C');
 }

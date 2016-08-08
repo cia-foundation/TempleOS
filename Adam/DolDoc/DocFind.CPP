@@ -28,7 +28,7 @@ U8 *needle,I64 match=1)
     unlock=DocLock(haystack_doc);
     if (start_line_num==MIN_I64) {
       res=TRUE;
-      doc_e=haystack_doc->root.next;
+      doc_e=haystack_doc->head.next;
     } else {
       res=DocLineNumGoTo(haystack_doc,start_line_num);
       doc_e=haystack_doc->cur_entry;
@@ -69,7 +69,7 @@ public Bool DocAnchorFind(CDoc *haystack_doc,U8 *needle_str)
   CDocEntry *doc_e;
   if (haystack_doc) {
     unlock=DocLock(haystack_doc);
-    doc_e=haystack_doc->root.next;
+    doc_e=haystack_doc->head.next;
     if (needle_str)
       while (doc_e!=haystack_doc) {
 	if (doc_e->type_u8==DOCT_ANCHOR && doc_e->de_flags & DOCEF_AUX_STR) {
@@ -170,7 +170,7 @@ fn_skip:
 public U0 EdSelAll(CDoc *doc,Bool sel)
 {//Set state of $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ on all entries.
   Bool unlock=DocLock(doc);
-  CDocEntry *doc_e=doc->root.next;
+  CDocEntry *doc_e=doc->head.next;
   while (doc_e!=doc) {
     BEqu(&doc_e->type,DOCEt_SEL,sel);
     doc_e=doc_e->next;
@@ -401,7 +401,7 @@ I64 EdFindReplace(CDoc *doc)
       sf_flags|=SFG_WHOLE_LABELS;
 
     if (i=doc->find_replace->filter_lines) {
-      doc_ce=doc->root.next;
+      doc_ce=doc->head.next;
       while (doc_ce!=doc) {
 	if (doc_ce->de_flags&DOCEF_TAG && doc_ce->tag &&
 	      !(doc_ce->de_flags&DOCEF_FILTER_SKIP) &&
@@ -413,7 +413,7 @@ I64 EdFindReplace(CDoc *doc)
 	doc_ce=doc_ce->next;
       }
 
-      doc_ce=doc->root.next;
+      doc_ce=doc->head.next;
       while (doc_ce!=doc) {
 	if (!(doc_ce->de_flags&DOCEF_FILTER_SKIP)) {
 	  found=FALSE;
@@ -459,7 +459,7 @@ I64 EdFindReplace(CDoc *doc)
     if (!plen)
       goto fr_unlock_done;
     rlen=StrLen(doc->find_replace->replace_text);
-    if (doc->root.next!=doc) {
+    if (doc->head.next!=doc) {
       doc_e=doc_marker=DocSplitTag(doc,doc->cur_entry,doc->cur_col,
 	    doc->cur_entry->x+doc->cur_col,doc->cur_entry->y,DOCT_MARKER);
       do {

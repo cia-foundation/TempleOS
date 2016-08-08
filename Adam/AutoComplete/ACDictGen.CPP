@@ -20,7 +20,7 @@ $$	--> $$$$
   CDoc *doc;
   CDocEntry *doc_e;
   if (doc=DocRead(in_name,DOCF_PLAIN_TEXT_TABS|DOCF_DBL_DOLLARS)) {
-    doc_e=doc->root.next;
+    doc_e=doc->head.next;
     while (doc_e!=doc) {
       if (doc_e->type_u8==DOCT_TEXT) {
 	src=dst=doc_e->tag;

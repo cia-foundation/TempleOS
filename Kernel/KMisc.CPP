@@ -77,6 +77,11 @@ I64 SysTimerRead()
   return res;
 }
 
+I64 HPET()
+{ //Get high precision event timer.
+  return *(dev.uncached_alias+HPET_MAIN_CNT)(I64 *);
+}
+
 I64 TimeStampFreqCal()
 {
   static I64 time_stamp_start=0,timer_start=0,HPET_start=0;
@@ -176,7 +181,7 @@ U0 Snd(F64 freq)
       d=ACAlloc(sizeof(CSndData));
       d->freq=freq;
       d->time=tS;
-      QueIns(d,snd.record_root.last);
+      QueIns(d,snd.record_head.last);
     }
     LBtr(&sys_semas[SYS_SEMA_SND],0);
   }

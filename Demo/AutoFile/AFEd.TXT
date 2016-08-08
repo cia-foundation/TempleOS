@@ -149,7 +149,6 @@
 #define IC_RIP			0x7F
 
 #define IC_RDTSC		0x80
-#define IC_HPET			0x81
 
 #define IC_BT			0x82
 #define IC_BTS	 		0x83
