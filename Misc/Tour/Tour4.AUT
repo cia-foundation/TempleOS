@@ -3,7 +3,7 @@ Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\nCd(\"::/Demo/Games\");Dir;\n";
 
 TourPut(
-"Now, we're going to add the CastleFrankenstein.CPP.Z program "
+"Now, we're going to add the CastleFrankenstein.HC.Z program "
 "to your PersonalMenu.\n\n"
 "Press $$GREEN$$<CTRL-m>$$FG$$ to get to your PersonalMenu.\n");
 AFGetChar(CH_CTRLM);

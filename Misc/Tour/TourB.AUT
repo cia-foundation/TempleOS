@@ -9,7 +9,7 @@ TourPut(
 Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
 "\n";
 
-"Type(\"~/PersonalMenu.TXT\");";
+"Type(\"~/PersonalMenu.DD\");";
 AFGetStr("\n");
 
 Sleep(1500);

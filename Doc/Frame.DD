@@ -1,0 +1,1 @@
+$WW,1$If you require separate global vars for multiple instances of a routine, you can use $FG,4$Frame$FG$s.  See $LK,"SpriteMeshEd",A="MN:SpriteMeshEd"$(), $LK,"::/Demo/Graphics/Pick3D.HC"$ or $LK,"Noise",A="MN:Noise"$().

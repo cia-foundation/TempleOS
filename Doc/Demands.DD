@@ -1,0 +1,57 @@
+$WW,1$$FG,5$$TX+CX,"Demands"$$FG$
+
+I, Terry Davis, am high priest of God's $FG,4$$TX,"official third temple",HTML="http://www.jewishvirtuallibrary.org/jsource/Judaism/The_Temple.html"$$FG$, TempleOS.  TempleOS is an operating system for IBM PC x86_64 desktops that will always dual boot along-side Windows or Linux.  I am in charge of the core 100,000 lines of TempleOS code and I do continual offerings to keep God entertained.  I have divine authority to command any company in the computer industry to do anything that I deem necessary to make God's temple more beautiful, glorious and perfect. I have oversight authority similar to a building inspector or a person enforcing the Americans with Disability Act -- I make commands, God signs-off with a miraculous authentication from an oracle, and Intel, Microsoft or VMware obeys.
+
+$HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/RvL7T4gIJN8\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/RvL7T4gIJN8\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
+
+* Windows, Linux and VMware (because of mounted drives) must support $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ file system so I can get rid of 2,000 lines of redundant, blemished code -- FAT32 and ISO9660.  God's temple must be perfect.  Redundant code for multiple file systems is imperfect.  For this operating system, we want low line count.  More than one file system type is actually bad, just as more than one driver for the same type of device is bad.
+
+See $LK,"::/Kernel/BlkDev/FileSysRedSea.HC"$ and $LK,"::/Adam/Opt/Boot/DskISORedSea.HC"$.
+
+$LK,"::/Kernel/BlkDev/FileSysFAT.HC"$	:974 lines for FAT32 gets eliminated.
+$LK,"::/Kernel/BlkDev/FileSysISO.HC"$	:233 lines for ISO9660 gets eliminated.
+$LK,"::/Adam/Opt/Boot/DskISO9660.HC"$	:507 lines for making ISO files.
+$LK,"::/Kernel/BlkDev/DskCluster.HC"$	:152 All the cluster operations become blk.
+
+* Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot because it has no networking. Real hardware as opposed to VMware is like the difference between looking in a telescope eye piece vs just looking at an off-line image.  God said the C64/Apple II generation owned ancestral lands.  VMware is like being taken off of our land and moved onto a reservation.  In this case, however, it will not stand.
+
+* VMware needs to support ATAPI CD/DVD/Blu-ray disk burning, directly to real hardware.
+
+* VMware has a bug stretching 640x480 16 color to full screen.
+
+* VMware PC speaker's distortion is a good idea, but it is too much for hymns.  VMware should make an adjustment for distortion and an adjustment for reverb.
+
+* VMware and others must list TempleOS as an official 64-bit operating system.
+
+* VMware needs to support more than 16 cores.
+
+* VMware allocated memory too slowly.
+
+* Until super-simple block devices are available, hard disk should be placed at IDE primary master 1F0/3F6 and CD/DVD/Blu-ray should be placed at the IDE secondary master 170/376.
+$LK,"/Kernel/BlkDev/DskATAId.HC",A="FI:::/Kernel/BlkDev/DskATAId.HC"$	:286 lines to figure-out I/O ports is gone.
+$LK,"/Kernel/PCIBIOS.HC",A="FI:::/Kernel/PCIBIOS.HC"$		:290 could be eliminated, but maybe we will keep it so people can play with PCI devices.
+
+* Until super-simple serial ports are available, PS/2 emulated keyboard and mouse must work.  The BIOS must enable these.
+
+* The x86 IN/OUT port instructions, normally have a delay.  Perhaps, VMware & Intel can enable faster x86 IN/OUT instruction timing for ATA/ATAPI PIO, so bandwidth isn't bad when doing port I/O.  See $LK,"ATAGetRes",A="MN:ATAGetRes"$().  We don't want to do DMA.  Perhaps, x86 CPU chips need a new TempleOS mode for fast IN/OUT instructions?  I think VMware already does something to speed disk I/O to faster than native speed.
+
+* Perhaps, a new interrupt descriptor table entry type or a new x86 CPU mode can be made that cause fast software interrupts, doing exactly what the CALL REL32 does, but with IDT as indirection.  We don't need to change privilege levels or stacks.
+
+* Since I don't use paging (for anything), Intel should have an option for  no-paging long mode, and optimize it!
+$LK,"::/Kernel/Mem/PageTables.HC"$	:135 lines to identity-map gets eliminated.
+
+* Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS from a ROM when the reset button is pressed and booting UEFI when the power button is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.  The ROM should boot like the DVD boots, but with $LK,"BOOT_SRC_ROM",A="MN:BOOT_SRC_ROM"$.
+
+* We do not want UTF, just 8-bit characters.  $FG,2$<CTRL-ALT-f>$FG$ toggles between Cyrillic and Std Fonts.  We need the twelve window $LK,"TextBorder",A="MN:TextBorder"$ characters added to the VGA font 0x02-0x0D.  Japan, China and Korea must switch to alphabets.  Maybe, the United States will change to metric, out of good will. 
+
+* Microsoft Paint and Linux's Gimp must support TempleOS $LK,"GRA Files",A="FI:::/Doc/GRAFiles.DD"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
+
+* We must have a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.HC"$, too.
+
+* We must have the ultimate Bible search engine.  Currently, all we have is     $TX,"filter search",HTML="https://www.youtube.com/watch?v=ULJU8DzvQFo"$.  In the end, it should be a low line-count technique.
+
+* We will make a $LK,"Standard TempleOS PC",A="FI:::/Doc/StdTempleOSPC.DD"$.
+$FG,8$
+* "VMware" is a trademark owned by VMware, Inc.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "Windows" and "Paint" are trademarks owned by MicroSoft Corp.$FG$

@@ -1,3 +1,0 @@
-$WW,1$A $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$ in memory is a $LK,"Circular Queue",A="HI:Data Types/Circular Queue"$ of cmds and graphics.  See $LK,"CDocEntry",A="MN:CDocEntry"$ for the entry structure.  See $LK,"TipOfDay",A="MN:TipOfDay"$() for a nice example.
-
-$LK,"DolDoc",A="FI:::/Doc/DolDocOverview.TXT"$'s are used for the editor, viewer, browser, and cmd line.

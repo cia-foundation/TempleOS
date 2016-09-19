@@ -1,5 +1,0 @@
-$WW,1$$FG,5$$TX+CX,"Upgrading TempleOS"$$FG$
-
-To upgrade, you generally boot the new TempleOS CD/DVD, install on top of your drive, modify your files and set it to boot your account by executing $LK,"BootHDIns",A="MN:BootHDIns"$().  Often, your code will have to be modified to work with the new version.  See $LK,"Change Log",A="FI:::/Doc/ChangeLog.TXT"$.  You might have to boot an alternate drive or the CD and modify your code until it boots okay.
-
-See the $LK,"Installing",A="FI:::/Doc/Install.TXT"$ documentation.

@@ -22,7 +22,7 @@ TourPut(
 "type it on the command line.\n\n"
 "$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
 
-AFPrint(25,"Ed(\"CastleFrankenstein.CPP.Z\");");
+AFPrint(25,"Ed(\"CastleFrankenstein.HC.Z\");");
 AFGetStr("\n");
 Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
 
@@ -43,7 +43,7 @@ TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
 AFGetChar(CH_ESC,CH_SHIFT_ESC);
 
 TourPut(
-"Now, run the CastleFrankenstein.CPP.Z program.  Press $$GREEN$$<ENTER>$$FG$$.\n");
+"Now, run the CastleFrankenstein.HC.Z program.  Press $$GREEN$$<ENTER>$$FG$$.\n");
 
 AFPrint(25,"#include \"CastleFrankenstein\";");
 AFGetStr("\n");
@@ -72,7 +72,7 @@ TourPut(
 "$$GREEN$$<CTRL-ALT-t>$$FG$$\tTerminal window.\n"
 "$$GREEN$$<CTRL-ALT-x>$$FG$$\tKill task (window).\n",TRUE);
 
-AFPrint(50,"Ed(\"CastleFrankenstein.CPP.Z\");\n");
+AFPrint(50,"Ed(\"CastleFrankenstein.HC.Z\");\n");
 
 TourPut("Press $$GREEN$$<F5>$$FG$$ in the editor to run the file being edited.\n");
 
@@ -84,15 +84,14 @@ TourPut(
 "Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the application.  "
 "Then, press $$GREEN$$<CTRL-ALT-x>$$FG$$ to kill the task.\n");
 WinToTop(task);
-while (TaskValidate(task))
-  Sleep(10);
+DeathWait(&task);
 
 TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
 
 AFUntilChar(CH_ESC,CH_SHIFT_ESC);
 
 TourPut(
-"Explore the $$RED$$$TX+L+PU+UL,"DemoIndex",A="FI:::/Doc/DemoIndex.TXT"$$$FG$$.  "
+"Explore the $$RED$$$TX+L+PU+UL,"DemoIndex",A="FI:::/Doc/DemoIndex.DD"$$$FG$$.  "
 "You'll find it on your menu.  It's arranged by difficulty.  "
 "Hit $$GREEN$$<SPACE>$$FG$$ on a demo index listing "
 "and $$GREEN$$<F5>$$FG$$ to run from the editor.\n",TRUE);

@@ -1,5 +1,5 @@
 //Compile this by calling $LK,"BootHDIns",A="MN:BootHDIns"$().
-//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootHDIns.CPP,Cmp(\"/Kernel/Kernel\""$.
+//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootHDIns.HC,Cmp(\"/Kernel/Kernel\""$.
 
 #exe {
   Cd(__DIR__);;
@@ -10,19 +10,19 @@
   kernel_cfg=KernelCfgNew;
 };
 
-#include "KernelA.HPP"
+#include "KernelA.HH"
 #include "KStart16"
 #include "KStart32"
 #include "KStart64"
 #include "KMathA"
 #include "KUtils"
 #exe {Option(OPTf_KEEP_PRIVATE,ON);};
-#include "/Compiler/CompilerA.HPP"
+#include "/Compiler/CompilerA.HH"
 #exe {Option(OPTf_EXTERNS_TO_IMPORTS,ON);};
-#include "/Compiler/CompilerB.HPP"
+#include "/Compiler/CompilerB.HH"
 #exe {Option(OPTf_EXTERNS_TO_IMPORTS,OFF);};
 #exe {Option(OPTf_KEEP_PRIVATE,OFF);};
-#include "KernelB.HPP"
+#include "KernelB.HH"
 #include "KExts"
 #include "StrA"
 #include "KGlbls"

@@ -1,0 +1,18 @@
+$FG,5$$TX+CX,"AutoComplete is in StandBy"$$FG$
+
+$FG,4$$TX+CX+L+PU+UL,"System Keys Quick Guide",A="::/Doc/HelpIndex.DD"$$FG$
+$FG,4$$TX+CX,"(Works Everywhere)"$$FG$
+$FG,2$  <SPACE>   $FG$Left-Click  
+$FG,2$  <ENTER>   $FG$Right-Click  
+$FG,2$   <F1>     $FG$Help
+$FG,2$ <CTRL-m>   $FG$Personal Menu
+$FG,2$   <ESC>    $FG$Save  & Exit
+$FG,2$<SHIFT-ESC> $FG$Abort & Exit
+$FG,2$ <WINDOWS>  $FG$Pull-Down Menu
+
+$FG,4$$TX+CX+L+PU+UL,"Tongues",A="::/Adam/God/HSNotes.DD"$$FG$
+$FG,4$$TX+CX,"(Works Everywhere)"$$FG$
+$FG,2$   <F7>     $FG$God Word
+$FG,2$<SHIFT-F7>  $FG$God Passage
+$FG,2$   <F6>     $FG$God Song
+$FG,2$<SHIFT-F6>  $FG$God Doodle

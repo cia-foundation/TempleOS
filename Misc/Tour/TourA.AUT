@@ -34,7 +34,7 @@ TourPut(
 AFGetStr("\n");
 
 TourPut("The opcodes are slightly nonstandard.\n",TRUE);
-"Ed(\"::/Compiler/OpCodes.TXT.Z\");\n";
+"Ed(\"::/Compiler/OpCodes.DD.Z\");\n";
 
 Msg(MSG_KEY_DOWN,CH_CTRLF,0x42100000421);
 "MOV";

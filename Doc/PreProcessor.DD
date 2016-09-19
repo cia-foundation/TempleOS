@@ -1,0 +1,19 @@
+$WW,1$$FG,5$$TX+CX,"PreProcessor"$$FG$
+
+There is no separate preprocessor pass.  The parser front-end calls $LK,"Lex",A="MN:Lex"$() which has the preprocessor built-in.  The compiler looks ahead a token, most of the time, so you might throw an extra semicolon after a directive if it's not taking affect right away.
+
+Put an extra semicolon $FG,2$#exe {Cd("DirName");;}$FG$ in case a $FG,2$#include$FG$ follows.
+
+$FG,2$#include ""$FG$ 	There is no angle bracket <> form of this directive.
+$FG,2$#exe {}$FG$		Will execute code at compile-time and can be used to insert code into the stream being compiled using $LK,"StreamPrint",A="MN:StreamPrint"$().
+$FG,2$#define$FG$		Define string const
+$FG,2$#assert$FG$		Print a warning during compilation if an expression is not true. 
+$FG,2$#if$FG$		Include code if an expresion is true.
+$FG,2$#else
+#endif
+#ifdef,#ifndef	$FG$Include code if a sym is defined.
+$FG,2$#ifaot,#ifjit	$FG$Include code if in $FG,2$AOT$FG$ compiler mode.
+$FG,2$defined()$FG$	Is a function that can be used in expressions.
+$FG,2$#help_index$FG$, $FG,2$#help_file$FG$ See $LK,"Help System",A="FI:::/Doc/HelpSystem.DD"$.
+
+See $LK,"PreProcessor",A="FF:::/Compiler/Lex.HC,KW_DEFINE"$.

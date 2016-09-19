@@ -1,0 +1,60 @@
+$WW,1$$FG,5$$TX+CX,"Memory Overview"$$FG$
+
+Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual identical to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used.  Nothing swaps to disk.  You can adjust $LK,"MEM_MAPPED_SPACE",A="MN:MEM_MAPPED_SPACE"$ for more RAM.
+
+In TempleOS, the lowest 2 Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL insts because 64-bit CALLs take two insts.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
+
+You can create new, independent heaps using $LK,"HeapCtrlInit",A="MN:HeapCtrlInit"$().  Then, use the $LK,"CHeapCtrl",A="MN:CHeapCtrl"$ as the 2nd arg to $LK,"MAlloc",A="MN:MAlloc"$().  See $LK,"HeapLog",A="MN:HeapLog"$() for an example.
+
+Memory alloced by a task will be freed when the task is killed.
+
+Eventually, memory will become fragmented, requiring a reboot.
+
+See $LK,"MemRep",A="MN:MemRep"$() and $LK,"::/Demo/MemDemo.HC"$.
+
+$FG,5$$TX+CX,"Single System-wide Mem Map"$
+
+$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"00035F3F",D="DD_KERNEL_END"$$FG$
+$ID,2$Kernel module, placed here by the boot-loader, $LK,"BOOT_RAM_BASE",A="MN:BOOT_RAM_BASE"$.
+$ID,-2$
+$FG,2$ 0x00$TX,"00096600",D="DD_BOOT_HIGH_LOC_DVD"$- 0x00$TX,"00096FFF",D="DD_BOOT_HIGH_LOC_DVD_END"$$FG$
+$ID,2$$FG$Boot block relocated here before loading the Kernel module, $LK,"BootDVD",A="FI:::/Adam/Opt/Boot/BootDVD.HC"$ & $LK,"BootHD",A="FI:::/Adam/Opt/Boot/BootHD.HC"$.
+$ID,-2$
+$FG,2$ 0x00$TX,"00097000",D="DD_MP_VECT"$- 0x00$TX,"00097030",D="DD_MP_VECT_END"$$FG$
+$ID,2$Multicore start-up vect code, $LK,"MPN_VECT",A="MN:MPN_VECT"$.
+$ID,-2$
+$FG,2$~0x000009F000- 0x000009FFFF
+$ID,2$$FG$Extended BIOS data area.
+$ID,-2$
+$FG,2$ 0x00000A0000- 0x00000BFFFF$FG$
+$ID,2$VGA graphics mem, marked as write-through cache in $LK,"text",A="MN:text"$.vga_alias.
+$ID,-2$
+$FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"002037FF",D="DD_SYS_FIXED_AREA_END"$$FG$
+$ID,2$$LK,"CSysFixedArea",A="MN:CSysFixedArea"$ for page tables and misc.  $TX,"256 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ of address space mapped.
+$ID,-2$
+$FG,2$ 0x00$TX,"00203800",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"7FFFFFFF",D="DD_SYS_HEAP_LIMIT"$$FG$
+$ID,2$Code Heap mem.
+$ID,-2$
+$FG,2$             - 0x007FFFFFFF$FG$
+$ID,2$Data Heap mem.  (This exists if there is less than 2 Gig of code heap.)
+$ID,-2$
+$FG,2$ 0x00E0000000- 0x00FFFFFFFF$FG$
+$ID,2$32-bit devices could alloc memory at 0xF0000000 going up, but this is wrong, since some PCs already have devices at 0xF0000000.  No PCI devices are supported, so $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() flaws are not an issue.
+$ID,-2$
+$FG,2$ 0x0080000000-~0x00DFFFFFFF$FG$
+$FG,2$ 0x0100000000-~0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
+$ID,2$Data Heap mem.  (The physical memory that exists in this range is data heap.)
+$ID,-2$
+$FG,2$ 0x$TX,"3F00000000",D="DD_UNCACHED_ALIAS"$- 0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
+$ID,2$Uncached alias of first 4 Gig.  (For 32-bit device access.)
+$ID,-2$
+$FG,2$             - 0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
+$ID,2$64-bit devices are alloced with $LK,"Mem64DevAlloc",A="MN:Mem64DevAlloc"$() counting bwd from $TX,"256 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$, but no PCI devices are actually supported$WW,0$.
+$ID,-2$
+
+
+$WW,1$* Note: There is a break in the data-heap block pool.  This has no effect except the obvious effect that fragmentation has on contiguous requests.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 8 Gig chunk on my 12 Gig machine.
+
+* Note: For systems with less than 2 Gig RAM, the code and data heap block pools are the same.  For systems with 2-4 Gig of RAM, the code heap is 1/4 of the total.  See $LK,"BlkPoolsInit",A="MN:BlkPoolsInit"$().
+
+* See $LK,"Independent HeapCtrl Example",A="FA:::/Kernel/KEnd.HC,Independent HeapCtrl Example"$.

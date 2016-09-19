@@ -1,7 +1,0 @@
-$WW,1$A $LK,"CSprite",A="MN:CSprite"$ is an ordered list of $LK,"these",A="MN:SPT_END"$ elements, created with $FG,2$<CTRL-r>$FG$.  Normally, they are packed together in a list and the address of the first is passed to routines.
-
-See $LK,"::/Demo/Graphics/SpritePlot.CPP"$, $LK,"::/Demo/Graphics/SpritePlot3D.CPP"$, $LK,"::/Demo/Graphics/SpritePut.CPP"$, $LK,"::/Demo/Graphics/SpriteRaw.CPP"$ and $LK,"SpriteMeshEd",A="MN:SpriteMeshEd"$().
-
-Be aware that copying $FG,2$SP$FG$, $FG,2$IB$FG$, or $FG,2$IS$FG$ entries with the clipboard ress in duplicate entries with different nums.  You can manually remove dups by editing with $FG,2$<CTRL-t>$FG$ and setting to the original num.
-
-See $LK,"::/Adam/Gr/GrSpritePlot.CPP",A="FL:::/Adam/Gr/GrSpritePlot.CPP,1"$ for how CSprite are stored.$FG$

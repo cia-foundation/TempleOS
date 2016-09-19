@@ -1,0 +1,87 @@
+$WW,1$$FG,5$$TX+CX,"Print Fmt Strs"$$FG$
+
+<fmt_arg> := $FG,2$%$FG$[$FG,2$-$FG$][$FG,2$0$FG$][<width>][$FG,2$.$FG$<decimals>][<flags>][$FG,2$h$FG$<aux_fmt_num>]<fmt_code>
+
+See $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().
+
+<flags>:
+
+$ID,2$$FG,2$'t'$FG$ truncate to <width>.
+$FG,2$','$FG$ add commas every three digits or four nibbles.
+$FG,2$'$$'$FG$ makes $FG,2$%Q$FG$ convert $FG,2$'$$'$FG$ to $FG,2$"\x24"$FG$.
+$FG,2$'/'$FG$ makes $FG,2$%Q$FG$ and $FG,2$%q$FG$ convert $FG,2$'%'$FG$ to $FG,2$"%%"$FG$.
+$ID,-2$
+<aux_fmt_num>:
+
+$ID,2$For $FG,2$"%n"$FG$, $FG,2$"%d"$FG$ or $FG,2$"%u"$FG$, the <aux_fmt_num> causes thousands mode.  $FG,2$"%h?n"$FG$ will pick a var exponent multiples of three unit, while $FG,2$"%h-3n"$FG$ will display milli units or $FG,2$"%h6n"$FG$ will display mega units.  The $FG,2$'k'$FG$ flag is always on for $FG,2$"%n"$FG$.  See $LK,"::/Demo/Print.HC"$.
+
+For $FG,2$"%c"$FG$ or $FG,2$"%C"$FG$, the <aux_fmt_num> repeats the char that many times.$ID,-2$
+
+<fmt_code>:
+
+$ID,2$$FG,2$"%n"$FG$ floating point in engineering notation, exponents being multiples of three.  If it has a <aux_fmt> code, it will display scientific units letters.
+
+$FG,2$"%S"$FG$ $LK,"Define",A="MN:Define"$() entry.
+
+$FG,2$"%C"$FG$ $LK,"ToUpper",A="MN:ToUpper"$() character.
+
+$FG,2$"%h25c",'\n';$FG$ 25 new-lines.
+
+$FG,2$"%h*c",25,'\n';$FG$ 25 new-lines.
+
+$FG,2$"%F"$FG$ text file by filename.
+
+$FG,2$"%$$F"$FG$ $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ file in memory.
+
+$FG,2$"%p"$FG$ ptr.
+
+$FG,2$"%P"$FG$ link to ptr.
+
+$FG,2$"%D"$FG$ date.  Pass a $LK,"CDate",A="MN:CDate"$.
+
+$FG,2$"%T"$FG$ time.  Pass a $LK,"CDate",A="MN:CDate"$.
+
+$FG,2$"%z"$FG$ sub_entry of an enumerated list of text entries.  See $LK,"LstSub",A="MN:LstSub"$().  Pass sub_entry_num first, list second.
+
+$FG,2$"%Z"$FG$ $LK,"DefineLstLoad",A="MN:DefineLstLoad"$() subentry.  Pass sub_entry_num first, define_name second.
+
+$FG,2$"%Q"$FG$ convert "\" to "\\" and quote to backslash quote. (For use in creating strs in strs.)
+
+$FG,2$"%q"$FG$ rev a $FG,2$"%Q"$FG$.
+$ID,-2$
+
+$FG,5$$TX+CX,"Print Family"$$FG$
+
+$LK,"MStrPrint",A="MN:MStrPrint"$(U8 *fmt,...) is like $LK,"StrPrint",A="MN:StrPrint"$(U8 *dst,U8 *fmt,...) but it returns a $LK,"MAlloc",A="MN:MAlloc"$ated str.  It is vary handy because you don't have to worry about overflow.
+
+$LK,"CatPrint",A="MN:CatPrint"$(U8 *_dst,U8 *fmt,...) concatenates a formated string.
+
+$LK,"Auto",A="MN:Auto"$(U8 *fmt,...) sends text to the current task's input buffer.
+$LK,"AutoStr",A="MN:AutoStr"$(U8 *fmt,...) sends text of an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$ to the keyboard stream of the current TASK but can also do mouse cmds.
+
+$LK,"XTalk",A="MN:XTalk"$(CTask *task,U8 *fmt,...) and text to another task's input buffer.
+$LK,"XTalkStr",A="MN:XTalkStr"$(CTask *task,U8 *fmt,...) sends text of an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$ to the keyboard stream of another TASK but can also do mouse cmds.
+
+$LK,"DocPrint",A="MN:DocPrint"$(CDoc *doc,U8 *fmt,...) sends text to a document.  You can buffer to a Doc and save it, providing the functionality of $FG,2$fprintf$FG$.  See $LK,"::/Demo/Dsk/FPrintF.HC"$.
+
+$LK,"Adam",A="MN:Adam"$(U8 *fmt,...) sends text to the adam task to be compiled and run.
+$LK,"AdamLog",A="MN:AdamLog"$(U8 *fmt,...) and $LK,"AdamErr",A="MN:AdamErr"$(U8 *fmt,...) send text to the adam task to be displayed.
+
+$LK,"StreamPrint",A="MN:StreamPrint"$(U8 *fmt,...) sends text to the stream of code being compiled and must reside in a $FG,2$#exe{}$FG$ blk.
+
+$LK,"GrPrint",A="MN:GrPrint"$(CDC *dc,I64 x,I64 y,U8 *fmt,...) and $LK,"GrVPrint",A="MN:GrVPrint"$() plots text in graphics mode.
+
+$LK,"TextPrint",A="MN:TextPrint"$(CTask *task,I64 x,I64 y,I64 attr,U8 *fmt,...) plots to $LK,"gr.text_base",A="HI:TextBase Layer"$.
+
+$LK,"ExePrint",A="MN:ExePrint"$(U8 *fmt,...) compiles and execute a string.  Note: It returns the res of the last executed expression.
+
+$LK,"AFPrint",A="MN:AFPrint"$(I64 ms,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
+
+$LK,"RawPrint",A="MN:RawPrint"$(I64 ms,U8 *fmt,...) sends direct to screen memory, bypassing window manager.
+
+$LK,"User",A="MN:User"$(U8 *fmt,...) Spawns a user and execute a string on start-up.
+
+$LK,"PopUpPrint",A="MN:PopUpPrint"$(U8 *fmt,...) compiles and execute a string in a pop-up win.  Note: It returns the res of the last executed expression.
+$LK,"PopUpViewPrint",A="MN:PopUpViewPrint"$(U8 *fmt,...) creates a pop-up window and views text.
+
+$BK,1$Note:$BK,0$ Use $FG,2$Print("%s",src)$FG$ if you need an unmodified string.

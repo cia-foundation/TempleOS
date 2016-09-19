@@ -1,0 +1,1507 @@
+#help_index "Graphics/Mesh"
+#define MESH_WORKSPACE_SIZE	4000
+
+#define VF_SEL		1
+#define VF_COPIED	2
+#define VF_IGNORE	4
+
+class CMeshEdVertex
+{
+  CMeshEdVertex *next,*last,*copy;
+
+  U0 start;
+  CD3I32 p;  //World coordinates of the point.
+  U0 end;
+  CD3I32 p0,
+	pt; //Transformed coordinates.	(Screen)
+  I32 num,flags;
+};
+
+#define TF_SEL	1
+#define TF_COPIED	2
+
+class CMeshEdTri
+{
+  CMeshEdTri *next,*last;
+
+  U0 start;
+  CMeshTri mt;
+  U0 end;
+
+  I32 cpu_num,flags; //Draw different tris with different cores.
+  CMeshEdVertex *t[3];
+};
+
+class CMeshFrame
+{
+  I64 ip_z,thickness; //Input pointer (mouse) Z-coordinate
+  I64 ed_mode,cx,cy;
+  CColorROPU32 cur_color;
+  Bool grid_on,flip_y,sel_rect,vertex_on,closed,pad[3];
+  I64 mp_not_done_flags; //Used for multiprocessing signaling.
+  F64 view_scale;
+  CDC *dc;
+  I32 *depth_buf;
+  I64 *w2s,*s2w; //Screen-to-world and world-to-screen transform matrices.
+  I64 vertex_cnt,tri_cnt; //Set by MeshSize
+  CMeshEdVertex vertex_head,*cur_vertex,*chain_pred;
+  CMeshEdTri	tri_head,*cur_tri;
+  I64 x1,y1,x2,y2,cur_snap;
+};
+
+CMeshEdVertex *MeshVertexNew(CMeshFrame *e,I64 x,I64 y,I64 z)
+{
+  CMeshEdVertex *tempv=CAlloc(sizeof(CMeshEdVertex));
+  tempv->p.x=x;
+  tempv->p.y=y;
+  tempv->p.z=z;
+  QueIns(tempv,e->vertex_head.last);
+  return tempv;
+}
+
+CMeshEdTri *MeshTriNew(CMeshFrame *e,CColorROPU32 color,
+	CMeshEdVertex *v1,CMeshEdVertex *v2,CMeshEdVertex *v3)
+{
+  static I64 cpu_num=0;
+  CMeshEdTri *tempt=CAlloc(sizeof(CMeshEdTri));
+  tempt->cpu_num=cpu_num++%mp_cnt;
+  tempt->mt.color=color;
+  tempt->t[0]=v1;
+  tempt->t[1]=v2;
+  tempt->t[2]=v3;
+  QueIns(tempt,e->tri_head.last);
+  return tempt;
+}
+
+CMeshEdVertex *MeshVertexFindScrPt(CMeshFrame *e,I64 x,I64 y)
+{//Screen coordinates
+  CMeshEdVertex *res=NULL,*tempv=e->vertex_head.next;
+  I64 dd,dz,best_dd=MAX_I64,best_dz=MAX_I64;
+  while (tempv!=&e->vertex_head) {
+    if (!(tempv->flags&VF_IGNORE)) {
+      dd=SqrI64(x-tempv->pt.x)+SqrI64(y-tempv->pt.y);
+      dz=AbsI64(e->ip_z-tempv->p.z);
+      if (dd<best_dd || dd==best_dd && dz<best_dz) {
+	res=tempv;
+	best_dd=dd;
+	best_dz=dz;
+      }
+    }
+    tempv=tempv->next;
+  }
+  return res;
+}
+
+CMeshEdVertex *MeshVertexFindNum(CMeshFrame *haystack_e,I64 needle_num)
+{
+  CMeshEdVertex *tempv=haystack_e->vertex_head.next;
+  while (tempv!=&haystack_e->vertex_head) {
+    if (tempv->num==needle_num)
+      return tempv;
+    tempv=tempv->next;
+  }
+  return NULL;
+}
+
+U0 MeshTriDel(CMeshFrame *e,CMeshEdTri *tempt)
+{
+  if (tempt) {
+    if (tempt==e->cur_tri)
+      e->cur_tri=NULL;
+    QueRem(tempt);
+    Free(tempt);
+  }
+}
+
+U0 MeshVertexDel(CMeshFrame *e,CMeshEdVertex *tempv)
+{
+  I64 i;
+  CMeshEdTri *tempt,*tempt1;
+  if (tempv) {
+    tempt=e->tri_head.next;
+    while (tempt!=&e->tri_head) {
+      tempt1=tempt->next;
+      for (i=0;i<3;i++)
+	if (tempt->t[i]==tempv)
+	  break;
+      if (i<3)
+	MeshTriDel(e,tempt);
+      tempt=tempt1;
+    }
+    if (tempv==e->cur_vertex)
+      e->cur_vertex=NULL;
+    if (tempv==e->chain_pred)
+      e->chain_pred=NULL;
+    QueRem(tempv);
+    Free(tempv);
+  }
+}
+
+U0 MeshFence(CMeshFrame *e)
+{
+  CMeshEdVertex *tempv,*tempv1,*tempv_last=NULL,*tempv1_last=NULL,
+	*start=e->chain_pred->next,*end=e->vertex_head.last;
+  tempv=start;
+  while (TRUE) {
+    tempv1=MeshVertexNew(e,tempv->p.x,tempv->p.y,tempv->p.z+e->thickness);
+    if (tempv_last) {
+      MeshTriNew(e,e->cur_color,tempv_last,tempv,tempv1);
+      MeshTriNew(e,e->cur_color,tempv1,tempv1_last,tempv_last);
+    }
+    tempv_last=tempv;
+    tempv1_last=tempv1;
+    if (tempv==end)
+      break;
+    tempv=tempv->next;
+  }
+  if (e->closed && tempv_last) {
+    MeshTriNew(e,e->cur_color,tempv_last,start,end->next);
+    MeshTriNew(e,e->cur_color,end->next,tempv1_last,tempv_last);
+  }
+}
+
+U0 MeshPolygon(CMeshFrame *e,CMeshEdVertex *start,CMeshEdVertex *end,Bool rev)
+{
+  CMeshEdVertex *tempv,*tempv1;
+  if (start!=end) {
+    tempv=start;
+    tempv1=tempv->next;
+    while (tempv1!=end) {
+      if (rev)
+	MeshTriNew(e,e->cur_color,tempv1,tempv,end);
+      else
+	MeshTriNew(e,e->cur_color,tempv,tempv1,end);
+      tempv=tempv->next;
+      tempv1=tempv1->next;
+    }
+  }
+}
+
+U0 MeshPrism(CMeshFrame *e)
+{
+  CMeshEdVertex *start=e->chain_pred->next,*end=e->vertex_head.last;
+  MeshFence(e);
+  MeshPolygon(e,start,end,FALSE);
+  MeshPolygon(e,end->next,e->vertex_head.last,TRUE);
+}
+
+U0 MeshVertexSelAll(CMeshFrame *e,Bool val)
+{
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    if (val)
+      tempv->flags|=VF_SEL;
+    else
+      tempv->flags&=~VF_SEL;
+    tempv=tempv->next;
+  }
+}
+
+U0 MeshTriSelAll(CMeshFrame *e,Bool val)
+{
+  CMeshEdTri *tempt=e->tri_head.next;
+  while (tempt!=&e->tri_head) {
+    if (val)
+      tempt->flags|=TF_SEL;
+    else
+      tempt->flags&=~TF_SEL;
+    tempt=tempt->next;
+  }
+}
+
+U0 MeshVertexIgnoreSet(CMeshFrame *e,Bool val)
+{
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    tempv->flags&=~VF_IGNORE;
+    if (tempv->flags&VF_SEL && val)
+      tempv->flags|=VF_IGNORE;
+    tempv=tempv->next;
+  }
+}
+
+U0 MeshP0Capture(CMeshFrame *e)
+{
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    MemCpy(&tempv->p0,&tempv->p,sizeof(CD3I32));
+    tempv=tempv->next;
+  }
+}
+
+U0 MeshP0Offset(CMeshFrame *e,I64 dx,I64 dy,I64 dz)
+{
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    if (tempv->flags&VF_SEL) {
+      tempv->p.x=tempv->p0.x+dx;
+      tempv->p.y=tempv->p0.y+dy;
+      tempv->p.z=tempv->p0.z+dz;
+    }
+    tempv=tempv->next;
+  }
+}
+
+#define SEL_MESH_EQU	0
+#define SEL_MESH_OR	1
+#define SEL_MESH_AND	2
+
+U0 MeshVertexSelRect(CMeshFrame *e,I64 sel_mode,I64 x1,I64 x2,I64 y1,I64 y2)
+{
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  if (x1>x2) SwapI64(&x1,&x2);
+  if (y1>y2) SwapI64(&y1,&y2);
+  while (tempv!=&e->vertex_head) {
+    if (x1<=tempv->pt.x<=x2 &&
+	  y1<=tempv->pt.y<=y2) {
+      if (sel_mode==SEL_MESH_AND)
+	tempv->flags&=~VF_SEL;
+      else
+	tempv->flags|=VF_SEL;
+    } else if (sel_mode==SEL_MESH_EQU)
+      tempv->flags&=~VF_SEL;
+    tempv=tempv->next;
+  }
+}
+
+U0 MeshTriSelRect(CMeshFrame *e,I64 sel_mode,I64 x1,I64 x2,I64 y1,I64 y2)
+{
+  CMeshEdTri *tempt=e->tri_head.next;
+  if (x1>x2) SwapI64(&x1,&x2);
+  if (y1>y2) SwapI64(&y1,&y2);
+  while (tempt!=&e->tri_head) {
+    if (x1<=tempt->t[0]->pt.x<=x2 &&
+	  y1<=tempt->t[0]->pt.y<=y2 &&
+	  x1<=tempt->t[1]->pt.x<=x2 &&
+	  y1<=tempt->t[1]->pt.y<=y2 &&
+	  x1<=tempt->t[2]->pt.x<=x2 &&
+	  y1<=tempt->t[2]->pt.y<=y2) {
+      if (sel_mode==SEL_MESH_AND)
+	tempt->flags&=~TF_SEL;
+      else
+	tempt->flags|=TF_SEL;
+    } else {
+      if (sel_mode==SEL_MESH_EQU)
+	tempt->flags&=~TF_SEL;
+      else if (sel_mode==SEL_MESH_AND) {
+	if (x1<=tempt->t[0]->pt.x<=x2 &&
+	      y1<=tempt->t[0]->pt.y<=y2 ||
+	      x1<=tempt->t[1]->pt.x<=x2 &&
+	      y1<=tempt->t[1]->pt.y<=y2 ||
+	      x1<=tempt->t[2]->pt.x<=x2 &&
+	      y1<=tempt->t[2]->pt.y<=y2)
+	  tempt->flags&=~TF_SEL;
+      }
+    }
+    tempt=tempt->next;
+  }
+}
+
+I64 MeshSelCnt(CMeshFrame *e)
+{
+  I64 res=0;
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  CMeshEdTri *tempt=e->tri_head.next;
+  while (tempv!=&e->vertex_head) {
+    if (tempv->flags&VF_SEL)
+      res++;
+    tempv=tempv->next;
+  }
+  while (tempt!=&e->tri_head) {
+    if (tempt->flags&TF_SEL)
+      res++;
+    tempt=tempt->next;
+  }
+  return res;
+}
+
+U0 MeshSwapAxes(CMeshFrame *e,I64 o1,I64 o2)
+{
+  Bool unsel;
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  if (!MeshSelCnt(e)) {
+    MeshVertexSelAll(e,TRUE);
+    unsel=TRUE;
+  } else
+    unsel=FALSE;
+  while (tempv!=&e->vertex_head) {
+    if (tempv->flags&VF_SEL)
+      SwapU32((&tempv->p)(U8 *)+o1,(&tempv->p)(U8 *)+o2);
+    tempv=tempv->next;
+  }
+  if (unsel)
+    MeshVertexSelAll(e,FALSE);
+}
+
+U0 MeshInvertAxis(CMeshFrame *e,I64 o)
+{
+  Bool unsel;
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  if (!MeshSelCnt(e)) {
+    MeshVertexSelAll(e,TRUE);
+    unsel=TRUE;
+  } else
+    unsel=FALSE;
+  while (tempv!=&e->vertex_head) {
+    if (tempv->flags&VF_SEL)
+      *((&tempv->p)(U8 *)+o)(I32 *)=-*((&tempv->p)(U8 *)+o)(I32 *);
+    tempv=tempv->next;
+  }
+  if (unsel)
+    MeshVertexSelAll(e,FALSE);
+}
+
+U0 MeshTransformSel(CMeshFrame *e)
+{
+  Bool unsel;
+  I64 r[16],x,y,z;
+  CMeshEdVertex *tempv=e->vertex_head.next;
+  if (PopUpTransform(r)) {
+    if (!MeshSelCnt(e)) {
+      MeshVertexSelAll(e,TRUE);
+      unsel=TRUE;
+    } else
+      unsel=FALSE;
+    while (tempv!=&e->vertex_head) {
+      if (tempv->flags&VF_SEL) {
+	x=tempv->p.x; y=tempv->p.y; z=tempv->p.z;
+	Mat4x4MulXYZ(r,&x,&y,&z);
+	tempv->p.x=x; tempv->p.y=y; tempv->p.z=z;
+      }
+      tempv=tempv->next;
+    }
+    if (unsel)
+      MeshVertexSelAll(e,FALSE);
+  }
+}
+
+U0 MeshColorTris(CMeshFrame *e)
+{
+  Bool unsel;
+  CMeshEdTri *tempt=e->tri_head.next;
+  if (!MeshSelCnt(e)) {
+    MeshTriSelAll(e,TRUE);
+    unsel=TRUE;
+  } else
+    unsel=FALSE;
+  while (tempt!=&e->tri_head) {
+    if (tempt->flags & TF_SEL)
+      tempt->mt.color=e->cur_color;
+    tempt=tempt->next;
+  }
+  if (unsel)
+    MeshTriSelAll(e,FALSE);
+}
+
+U0 MeshRevTris(CMeshFrame *e)
+{
+  Bool unsel;
+  CMeshEdTri *tempt=e->tri_head.next;
+  if (!MeshSelCnt(e)) {
+    MeshTriSelAll(e,TRUE);
+    unsel=TRUE;
+  } else
+    unsel=FALSE;
+  while (tempt!=&e->tri_head) {
+    if (tempt->flags & TF_SEL)
+      SwapI64(&tempt->t[1],&tempt->t[2]);
+    tempt=tempt->next;
+  }
+  if (unsel)
+    MeshTriSelAll(e,FALSE);
+}
+
+U0 MeshRecalcCxCy(CTask *task,CMeshFrame *e)
+{
+  e->cx=RoundI64(task->pix_width/2 -task->horz_scroll.pos,e->cur_snap);
+  e->cy=RoundI64(task->pix_height/2-task->vert_scroll.pos,e->cur_snap);
+}
+
+U0 MeshCurSnap(CMeshFrame *e)
+{
+  I64 x1,y1,z1,x2,y2,z2;
+  if (e->w2s) {
+    x1=e->cur_snap<<16; y1=0; z1=0;
+    Mat4x4MulXYZ(e->w2s,&x1,&y1,&z1);
+    x2=0; y2=e->cur_snap<<16; z2=0;
+    Mat4x4MulXYZ(e->w2s,&x2,&y2,&z2);
+    ip_grid.x=Max(1,MaxI64(x1,x2)>>16);
+    ip_grid.y=Max(1,MaxI64(y1,y2)>>16);
+    ip_grid.z=Min(ip_grid.x,ip_grid.y);
+  }
+}
+
+U0 MeshScaleZoom(CMeshFrame *e,F64 scale)
+{
+  CTask *task=Fs;
+  I64	x=ip.pos.x-task->pix_left-task->scroll_x-task->pix_width/2,
+	y=ip.pos.y-task->pix_top-task->scroll_y-task->pix_height/2;
+  task->horz_scroll.pos*=scale;
+  task->vert_scroll.pos*=scale;
+  task->horz_scroll.pos+=scale*x-x;
+  task->vert_scroll.pos+=scale*y-y;
+  e->view_scale*=scale;
+  MeshRecalcCxCy(task,e);
+  MeshCurSnap(e);
+}
+
+U0 MPDrawIt(CMeshFrame *e)
+{//Multiprocessing draw it, called by each core.
+
+  //Makes a copy of e->dc so we can change dc->color member and stuff.
+  CDC *dc=DCAlias(e->dc,e->dc->win_task);
+
+  CMeshEdTri *tempt=e->tri_head.next;
+  I64 i,*old_r=dc->r;
+
+  //$LK,"DCAlias",A="MN:DCAlias"$() allocs a new identity rotation matrix.
+  //We want e->dc's rotation matrix.
+  dc->r=e->dc->r;
+  dc->depth_buf=e->depth_buf;
+  MemCpy(&dc->ls,&e->dc->ls,sizeof(CD3I32));
+
+  //... and translation (shift) vals.
+  dc->x=e->dc->x;
+  dc->y=e->dc->y;
+  dc->z=e->dc->z;
+  dc->flags|=DCF_TRANSFORMATION;
+
+  if (e->grid_on)
+//Draw grid with different cores.
+    for (i=-500+25*Gs->num;i<=500;i+=25*mp_cnt) {
+      if (i) {
+	dc->color=DKGRAY;
+	GrLine3(dc,i,-500,0,i,500,0);
+	dc->color=LTGRAY;
+	GrLine3(dc,-500,i,0,500,i,0);
+      }
+    }
+  if (!Gs->num) {
+    dc->color=RED;	//Y-Axis red
+    GrLine3(dc,0,0,0,0,500,0);
+    dc->color=ROPF_DITHER+RED;	 //Y-Axis red
+    GrLine3(dc,0,-500,0,0,0,0);
+
+    dc->color=YELLOW;	//X-Axis yellow
+    GrLine3(dc,0,0,0,500,0,0);
+    dc->color=ROPF_DITHER+YELLOW;	 //X-Axis yellow
+    GrLine3(dc,-500,0,0,0,0,0);
+
+    dc->color=GREEN;	//Z-Axis green
+    GrLine3(dc,0,0,0,0,0,500);
+    dc->color=ROPF_DITHER+GREEN;	 //Z-Axis green
+    GrLine3(dc,0,0,-500,0,0,0);
+  }
+
+  while (tempt!=&e->tri_head) {
+    if (tempt->cpu_num==Gs->num) {
+      if (tempt->flags & TF_SEL) {
+	if (Blink)
+	  dc->color=ROPF_DITHER+WHITE<<16+RED;
+	else
+	  dc->color=ROPF_DITHER+RED<<16+WHITE;
+	GrFillTri0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
+      } else {
+	(*dc->lighting)(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,
+	      &tempt->t[2]->pt,tempt->mt.color);
+	GrFillTri0(dc,&tempt->t[0]->pt,&tempt->t[1]->pt,&tempt->t[2]->pt);
+      }
+    }
+    tempt=tempt->next;
+  }
+  dc->r=old_r;
+
+  //e->dc's depth buf was copied but we don't want it freed during $LK,"DCDel",A="MN:DCDel"$().
+  dc->depth_buf=NULL;
+
+  DCDel(dc);
+  LBtr(&e->mp_not_done_flags,Gs->num);
+}
+
+I64 *MeshW2S(CMeshFrame *e,CTask *task)
+{//World to screen coordinate transform matrix.
+  CCtrl *c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES);
+  CViewAngles *s=c->state;
+  I64 *r=Mat4x4IdentNew(task);
+  Mat4x4Scale(r,e->view_scale);
+  Mat4x4RotZ(r,s->az);
+  Mat4x4RotY(r,s->ay);
+  if (e->flip_y)
+    Mat4x4RotX(r,s->ax);
+  else
+    Mat4x4RotX(r,s->ax+ã);
+  return r;
+}
+
+I64 *MeshS2W(CMeshFrame *e,CTask *task)
+{//Screen to world coordinate transform matrix.
+  CCtrl *c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES);
+  CViewAngles *s=c->state;
+  I64 *r=Mat4x4IdentNew(task);
+  if (e->flip_y)
+    Mat4x4RotX(r,-s->ax);
+  else
+    Mat4x4RotX(r,-(s->ax+ã));
+  Mat4x4RotY(r,-s->ay);
+  Mat4x4RotZ(r,-s->az);
+  Mat4x4Scale(r,1/e->view_scale);
+  return r;
+}
+
+I64 *MeshSetW2S(CMeshFrame *e,CTask *task)
+{
+  Free(e->w2s);
+  e->w2s=MeshW2S(e,task);
+  Free(e->s2w);
+  e->s2w=MeshS2W(e,task);
+//returned matrix is assigned to dc->r and will be freed by $LK,"DCDel",A="MN:DCDel"$().
+  return Mat4x4New(e->w2s,task);
+}
+
+U0 MeshCursorW(CMeshFrame *e,CTask *task,I64 *_x,I64 *_y,I64 *_z)
+{
+  I64	x_shadow,y_shadow,z_shadow,
+	xc=ip.pos.x-task->pix_left-task->scroll_x-e->cx,
+	yc=ip.pos.y-task->pix_top-task->scroll_y-e->cy,zc=0,
+	x=0,y=0,z=e->ip_z,
+	i,x2,y2,z2;
+  Mat4x4MulXYZ(e->w2s,&x,&y,&z); //screen of Z vect
+
+  //Converges onto a solution for zc, an unknown.
+  for (i=0;i<128;i++) {
+    x_shadow=xc-x; //Shadow of mouse cursor on xy plane
+    y_shadow=yc-y;
+    z_shadow=zc-z;
+    Mat4x4MulXYZ(e->s2w,&x_shadow,&y_shadow,&z_shadow);
+    x2=0; y2=0; z2=-z_shadow;
+    Mat4x4MulXYZ(e->w2s,&x2,&y2,&z2);
+    zc+=Round(Sqrt(x2*x2+y2*y2+z2*z2))*SignI64(z2);
+  }
+
+  x=xc-x;
+  y=yc-y;
+  z=zc-z;
+  Mat4x4MulXYZ(e->s2w,&x,&y,&z);
+  x=RoundI64(x,e->cur_snap);
+  y=RoundI64(y,e->cur_snap);
+  z=RoundI64(e->ip_z,e->cur_snap);
+  *_x=x; *_y=y; *_z=z;
+}
+
+CMeshEdVertex	sys_clipboard_vertex_head;
+CMeshEdTri	sys_clipboard_tri_head;
+
+U0 MeshClipboardInit()
+{
+  QueInit(&sys_clipboard_vertex_head);
+  QueInit(&sys_clipboard_tri_head);
+}
+
+U0 MeshClipboardRst()
+{
+  QueDel(&sys_clipboard_vertex_head,TRUE);
+  QueDel(&sys_clipboard_tri_head,TRUE);
+  MeshClipboardInit;
+}
+
+U0 MeshClipboardCopy(CMeshFrame *e)
+{
+  CMeshEdVertex	*tempv=e->vertex_head.next,*tempv2;
+  CMeshEdTri	*tempt=e->tri_head.next,*tempt2;
+
+  MeshClipboardRst;
+  while (tempv!=&e->vertex_head) {
+    if (tempv->flags&VF_SEL) {
+      tempv->copy=tempv2=ACAlloc(sizeof(CMeshEdVertex));
+      MemCpy(&tempv2->p,&tempv->p,sizeof(CD3I32));
+      QueIns(tempv2,sys_clipboard_vertex_head.last);
+      tempv->flags|=VF_COPIED;
+      tempv->flags&=~VF_SEL;
+    } else {
+      tempv->copy=NULL;
+      tempv->flags&=~(VF_COPIED|VF_SEL);
+    }
+    tempv=tempv->next;
+  }
+  while (tempt!=&e->tri_head) {
+    if (tempt->flags&TF_SEL &&
+	  tempt->t[0]->copy && tempt->t[1]->copy && tempt->t[2]->copy) {
+      tempt2=ACAlloc(sizeof(CMeshEdTri));
+      tempt2->t[0]=tempt->t[0]->copy;
+      tempt2->t[1]=tempt->t[1]->copy;
+      tempt2->t[2]=tempt->t[2]->copy;
+      tempt2->mt.color=tempt->mt.color;
+      QueIns(tempt2,sys_clipboard_tri_head.last);
+      tempt->flags|=TF_COPIED;
+      tempt->flags&=~TF_SEL;
+    } else
+      tempt->flags&=~(TF_COPIED|TF_SEL);
+    tempt=tempt->next;
+  }
+}
+
+U0 MeshClipboardCut(CMeshFrame *e)
+{
+  CMeshEdVertex	*tempv=e->vertex_head.next,*tempv1;
+  CMeshEdTri	*tempt=e->tri_head.next,*tempt1;
+  MeshClipboardCopy(e);
+  while (tempt!=&e->tri_head) {
+    tempt1=tempt->next;
+    if (tempt->flags&TF_COPIED)
+      MeshTriDel(e,tempt);
+    tempt=tempt1;
+  }
+  while (tempv!=&e->vertex_head) {
+    tempv1=tempv->next;
+    if (tempv->flags&VF_COPIED)
+      MeshVertexDel(e,tempv);
+    tempv=tempv1;
+  }
+}
+
+U0 MeshClipboardDel(CMeshFrame *e)
+{//Technically not clipboard
+  CMeshEdVertex	*tempv=e->vertex_head.next,*tempv1;
+  CMeshEdTri	*tempt=e->tri_head.next,*tempt1;
+  while (tempt!=&e->tri_head) {
+    tempt1=tempt->next;
+    if (tempt->flags&TF_SEL)
+      MeshTriDel(e,tempt);
+    tempt=tempt1;
+  }
+  while (tempv!=&e->vertex_head) {
+    tempv1=tempv->next;
+    if (tempv->flags&VF_SEL)
+      MeshVertexDel(e,tempv);
+    tempv=tempv1;
+  }
+}
+
+U0 MeshClipboardPaste(CMeshFrame *e)
+{
+  CMeshEdVertex	*tempv2=sys_clipboard_vertex_head.next,*tempv;
+  CMeshEdTri	*tempt2=sys_clipboard_tri_head.next,*tempt;
+
+  MeshVertexSelAll(e,FALSE);
+  MeshTriSelAll(e,FALSE);
+  while (tempv2!=&sys_clipboard_vertex_head) {
+    tempv2->copy=tempv=CAlloc(sizeof(CMeshEdVertex));
+    MemCpy(&tempv->p,&tempv2->p,sizeof(CD3I32));
+    QueIns(tempv,e->vertex_head.last);
+    tempv->flags|=VF_SEL;
+    tempv2=tempv2->next;
+  }
+
+  while (tempt2!=&sys_clipboard_tri_head) {
+    tempt=MeshTriNew(e,tempt2->mt.color,tempt2->t[0]->copy,
+	  tempt2->t[1]->copy,tempt2->t[2]->copy);
+    tempt->flags|=TF_SEL;
+    tempt2=tempt2->next;
+  }
+}
+
+MeshClipboardInit;
+
+U0 DrawIt(CTask *task,CDC *dc)
+{
+  CMeshFrame *e=FramePtr("CMeshFrame",task);
+  CCtrl *c=CtrlFindUnique(task,CTRLT_VIEWING_ANGLES);
+  F64 d;
+  I64 i,x,y,z;
+  CMeshEdVertex *tempv;
+
+  task->horz_scroll.min=-(MESH_WORKSPACE_SIZE-task->pix_width)/2;
+  task->horz_scroll.max= (MESH_WORKSPACE_SIZE-task->pix_width)/2;
+  task->vert_scroll.min=-(MESH_WORKSPACE_SIZE-task->pix_height)/2;
+  task->vert_scroll.max= (MESH_WORKSPACE_SIZE-task->pix_height)/2;
+  TaskDerivedValsUpdate(task);
+  MeshRecalcCxCy(task,e);
+
+  dc->flags|=DCF_TRANSFORMATION;
+
+  Free(dc->r); //Set rotmat doesn't free old dc->r matrix.
+  DCMat4x4Set(dc,MeshSetW2S(e,task));
+
+  dc->x=e->cx;
+  dc->y=e->cy;
+//z-vals less than zero are in front of screen and not drawn.
+  //we want to shift all Z-vals into a drawable range.
+  //GR_Z_ALL is set to half of the Z-range which is an I32.
+  dc->z=GR_Z_ALL;
+
+  //Light source set to input pointer (mouse).
+  MeshCursorW(e,task,&x,&y,&z);
+  dc->ls.x=x;
+  dc->ls.y=y;
+  dc->ls.z=z;
+  d=1<<16/D3I32Norm(&dc->ls); //Light source normalized to 65536.
+  dc->ls.x*=d;
+  dc->ls.y*=d;
+  dc->ls.z*=d;
+
+  DCDepthBufAlloc(dc);
+
+  tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    x=tempv->p.x; y=tempv->p.y; z=tempv->p.z;
+    (*dc->transform)(dc,&x,&y,&z);
+    tempv->pt.x=x; tempv->pt.y=y; tempv->pt.z=z;
+    tempv=tempv->next;
+  }
+
+  e->mp_not_done_flags=1<<mp_cnt-1; //Issue jobs to all cores.
+  e->dc=dc;
+  e->depth_buf=dc->depth_buf;
+  for (i=0;i<mp_cnt;i++)
+    JobQue(&MPDrawIt,e,i);
+
+  tempv=e->vertex_head.next;
+  while (tempv!=&e->vertex_head) {
+    x=tempv->pt.x; y=tempv->pt.y; z=tempv->pt.z;
+    if (e->vertex_on) {
+      if (Blink(10)) //This blinks at 10 Hz.
+	dc->color=ROPF_DITHER+BLACK<<16+WHITE;
+      else
+	dc->color=ROPF_DITHER+WHITE<<16+BLACK;
+      GrLine(dc,x-3,y-3,x+3,y+3);
+      GrLine(dc,x-3,y+3,x+3,y-3);
+    }
+    if (tempv->flags&VF_SEL) {
+      if (e->ed_mode=='t') {
+	if (Blink(10)) //This blinks at 10 Hz.
+	  dc->color=ROPF_DITHER+e->cur_color.c0.color<<16+
+		e->cur_color.c0.color^8;
+	else
+	  dc->color=ROPF_DITHER+(e->cur_color.c0.color^8)<<16+
+		e->cur_color.c0.color;
+      } else {
+	if (Blink)
+	  dc->color=ROPF_DITHER+RED<<16+WHITE;
+	else
+	  dc->color=ROPF_DITHER+WHITE<<16+RED;
+      }
+      GrCircle(dc,x,y,3);
+    }
+    tempv=tempv->next;
+  }
+
+  if (CtrlInside(c,ip.presnap.x,ip.presnap.y)||winmgr.show_menu) {
+    GridInit;
+    task->win_inhibit=WIF_SELF_DOC;
+  } else {
+    MeshCurSnap(e);
+    task->win_inhibit=WIG_TASK_DFT|WIF_SELF_DOC-WIF_SELF_FOCUS-WIF_SELF_BORDER
+	  -WIF_SELF_CTRLS-WIF_FOCUS_TASK_MENU-WIF_SELF_GRAB_SCROLL;
+  }
+
+  MeshCursorW(e,task,&x,&y,&z);
+  if (z<0)
+    dc->color=ROP_XOR+RED^TRANSPARENT;
+  else
+    dc->color=ROP_XOR+TRANSPARENT;
+  GrPrint(dc,0,0,"%6.3f%% (%d,%d,%d)",e->view_scale*100,x,y,z);
+  dc->pen_width=1;
+  dc->color&=0xF;
+  if (Blink(10))
+    dc->color^=0xF;
+  GrLine3(dc,x,y,z,x,y,0);
+
+  if (e->sel_rect) {
+    dc->flags&=~DCF_TRANSFORMATION;
+    dc->pen_width=1;
+    if (Blink)
+      dc->color=ROPF_DITHER+RED<<16+WHITE;
+    else
+      dc->color=ROPF_DITHER+WHITE<<16+RED;
+    GrBorder(dc,e->x1,e->y1,e->x2,e->y2);
+  }
+//Wait for all cores to complete.
+  while (e->mp_not_done_flags)
+    Yield;
+}
+
+U0 MeshInit(CMeshFrame *e,Bool flip_y)
+{
+  MemSet(e,0,sizeof(CMeshFrame));
+  QueInit(&e->vertex_head);
+  QueInit(&e->tri_head);
+  e->ed_mode='v';
+  e->grid_on=TRUE;
+  e->vertex_on=TRUE;
+  e->ip_z=0;
+  e->thickness=25;
+  e->closed=TRUE;
+  e->view_scale=1.0;
+  e->w2s=NULL;
+  e->s2w=NULL;
+  e->cur_color=RED;
+  e->cur_snap=5;
+  e->flip_y=flip_y;
+  e->sel_rect=FALSE;
+  e->cur_tri=NULL;
+  e->cur_vertex=NULL;
+  e->chain_pred=NULL;
+}
+
+U0 MeshLoad(CMeshFrame *e,U8 *src)
+{
+  I64 i,j,x,y,z;
+  CColorROPU32 color;
+  CMeshEdVertex *tempv,*va[3];
+
+  QueInit(&e->vertex_head);
+  QueInit(&e->tri_head);
+
+  e->vertex_cnt  =*src(I32 *)++;
+  e->tri_cnt=*src(I32 *)++;
+  for (i=0;i<e->vertex_cnt;i++) {
+    x=*src(I32 *)++;
+    y=*src(I32 *)++;
+    z=*src(I32 *)++;
+    tempv=MeshVertexNew(e,x,y,z);
+    tempv->num=i;
+  }
+  for (i=0;i<e->tri_cnt;i++) {
+    color=*src(I32 *)++;
+    for (j=0;j<3;j++)
+      va[j]=MeshVertexFindNum(e,*src(I32 *)++);
+    MeshTriNew(e,color,va[0],va[1],va[2]);
+  }
+}
+
+I64 MeshSize(CMeshFrame *e)
+{
+  I64 i;
+  CMeshEdVertex	*tempv=e->vertex_head.next;
+  CMeshEdTri	*tempt=e->tri_head.next;
+
+  e->vertex_cnt=0;
+  while (tempv!=&e->vertex_head) {
+    tempv->num=e->vertex_cnt++;
+    tempv=tempv->next;
+  }
+
+  e->tri_cnt=0;
+  while (tempt!=&e->tri_head) {
+    e->tri_cnt++;
+    for (i=0;i<3;i++)
+      tempt->mt.nums[i]=tempt->t[i]->num;
+    tempt=tempt->next;
+  }
+  return sizeof(I32)*2+
+	(offset(CMeshEdVertex.end)-offset(CMeshEdVertex.start))*e->vertex_cnt+
+	(offset(CMeshEdTri.end)-offset(CMeshEdTri.start))*e->tri_cnt;
+}
+
+I32 *MeshSave(CMeshFrame *e,I64 *_size=NULL)
+{
+  I64 size=MeshSize(e);
+  U8 *res=MAlloc(size),*dst=res;
+  CMeshEdVertex	*tempv=e->vertex_head.next;
+  CMeshEdTri	*tempt=e->tri_head.next;
+
+  *dst(I32 *)++=e->vertex_cnt;
+  *dst(I32 *)++=e->tri_cnt;
+
+  e->vertex_cnt=0;
+  while (tempv!=&e->vertex_head) {
+    MemCpy(dst,&tempv->start,offset(CMeshEdVertex.end)
+    -offset(CMeshEdVertex.start));
+    dst+=offset(CMeshEdVertex.end)-offset(CMeshEdVertex.start);
+    tempv=tempv->next;
+  }
+
+  e->tri_cnt=0;
+  while (tempt!=&e->tri_head) {
+    MemCpy(dst,&tempt->start,offset(CMeshEdTri.end)-offset(CMeshEdTri.start));
+    dst+=offset(CMeshEdTri.end)-offset(CMeshEdTri.start);
+    tempt=tempt->next;
+  }
+  if (_size) *_size=size;
+  return res;
+}
+
+U0 MeshCleanUp(CMeshFrame *e)
+{
+  QueDel(&e->vertex_head,TRUE);
+  QueDel(&e->tri_head,TRUE);
+  Free(e->w2s);
+  Free(e->s2w);
+}
+
+U0 MeshUpdateMenu(CMeshFrame *e)
+{
+  CMenuEntry *tempse;
+  if (tempse=MenuEntryFind(Fs->cur_menu,"View/Grid"))
+    tempse->checked=ToBool(e->grid_on);
+  if (tempse=MenuEntryFind(Fs->cur_menu,"View/Vertex"))
+    tempse->checked=ToBool(e->vertex_on);
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/PlaceVertex"))
+    tempse->checked=ToBool(e->ed_mode=='v');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/MoveVertex"))
+    tempse->checked=ToBool(e->ed_mode=='m');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/MoveVertexZ"))
+    tempse->checked=ToBool(e->ed_mode=='M');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/Triangle"))
+    tempse->checked=ToBool(e->ed_mode=='t');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/Polygon"))
+    tempse->checked=ToBool(e->ed_mode=='n');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/Fence"))
+    tempse->checked=ToBool(e->ed_mode=='f');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"Mode/Prism"))
+    tempse->checked=ToBool(e->ed_mode=='p');
+  if (tempse=MenuEntryFind(Fs->cur_menu,"View/FlipY"))
+    tempse->checked=ToBool(e->flip_y);
+}
+
+I32 *SpriteMeshEd(I32 *head=NULL,I64 *_size=NULL,Bool flip_y=FALSE)
+{/*Fmt for mesh:
+{
+I32 vertex_cnt;
+I32 tri_cnt;
+CD3I32 vertices[];
+CMeshTri tris[];
+}
+
+If head points to a mesh, it will load it.
+
+Returns a newly malloced mesh or NULL.
+
+See $LK,"::/Demo/Graphics/SpritePlot3D.HC"$.
+$WW,0$*/
+  CCtrl *c=CtrlFindUnique(Fs,CTRLT_VIEWING_ANGLES);
+  CViewAngles *s,*old_s;
+  I64 i,msg_code,sel_mode,a1,a2,make_tri_vertex_num=0,x,y,z;
+  CD3I32 p0a,p0b;
+  CMeshEdVertex *va[3],*tempv;
+  Bool adjusting_z=FALSE,moving,save_and_exit;
+  CMeshFrame e;
+
+  if (c) {
+    old_s=MAlloc(sizeof(CViewAngles));
+    MemCpy(old_s,c->state,sizeof(CViewAngles));
+  } else {
+    c=ViewAnglesNew;
+    old_s=NULL;
+  }
+
+  s=c->state;
+  s->sx=0;
+  s->sy=0;
+  s->sz=0;
+  s->cx=YELLOW;
+  s->cy=RED;
+  s->cz=GREEN;
+
+  MenuPush(
+	"File {"
+	"  Abort(,CH_SHIFT_ESC);"
+	"  Exit(,CH_ESC);"
+	"}"
+	"Edit {"
+	"  Delete(,,SC_DELETE);"
+	"  DelLast(,CH_BACKSPACE);"
+	"  Cut(,CH_CTRLX);"
+	"  Copy(,CH_CTRLC);"
+	"  Paste(,CH_CTRLV);"
+	"  SelectAll(,'A');"
+	"  UnSelectAll(,'U');"
+	"  SelectRect(,'a');"
+	"  UnSelectRect(,'u');"
+	"  OrSelectRect(,'o');"
+	"  JumpToZ(,'j');"
+	"  ResetColor(,'C');"
+	"  ReverseTri(,'r');"
+	"}"
+	"Mode {"
+	"  PlaceVertex(,'v');"
+	"  MoveVertex(,'m');"
+	"  MoveVertexZ(,'M');"
+	"  Triangle(,'t');"
+	"  Polygon(,'n');"
+	"  Fence(,'f');"
+	"  Prism(,'p');"
+	"}"
+	"Settings {"
+	"  Color(,'c');"
+	"  Snap(,'s');"
+	"}"
+	"View {"
+	"  ZoomIn(,'z');"
+	"  ZoomOut(,'Z');"
+	"  NullAngles(,'N');"
+	"  FlipY(,'y');"
+	"  Grid(,'g');"
+	"  Vertex(,'V');"
+	"  ToggleBorder(,CH_CTRLB);"
+	"}"
+	"Transforms {"
+	"  Transform(,'T');"
+	"  SwapXY(,'1');"
+	"  SwapXZ(,'2');"
+	"  SwapYZ(,'3');"
+	"  InvertX(,'4');"
+	"  InvertY(,'5');"
+	"  InvertZ(,'6');"
+	"  ReverseTri(,'R');"
+	"}");
+
+  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
+  AutoComplete;
+  RegOneTimePopUp(ARf_MESH_ED,
+	"$$GREEN$$Right Mouse$$FG$$: Hold and move to shift cursor z\n"
+	"$$GREEN$$'j'$$FG$$: Jump cursor Z to nearest vertex's Z\n"
+	"$$GREEN$$'v'$$FG$$: Place Vertex Mode\n"
+	"$$GREEN$$'m'$$FG$$: Move Vertex Mode\n"
+	"$$GREEN$$'M'$$FG$$: Move Vertex Z\n"
+	"$$GREEN$$'t'$$FG$$: Form Triangle Mode\n"
+	"$$GREEN$$'n'$$FG$$: Polygon Mode\n"
+	"$$GREEN$$'f'$$FG$$: Fence Mode\n"
+	"$$GREEN$$'p'$$FG$$: Prism Mode\n"
+	"$$GREEN$$'c'$$FG$$: Set color\n"
+	"$$GREEN$$'s'$$FG$$: Set snap\n"
+	"\nSee menu at top of screen for more.\n");
+
+  Fs->win_inhibit=WIG_TASK_DFT|WIF_SELF_DOC-WIF_SELF_FOCUS-WIF_SELF_BORDER
+	-WIF_SELF_CTRLS-WIF_FOCUS_TASK_MENU-WIF_SELF_GRAB_SCROLL;
+  Fs->horz_scroll.pos=0;
+  Fs->vert_scroll.pos=0;
+  MeshInit(&e,flip_y);
+  if (head)
+    MeshLoad(&e,head);
+  FramePtrAdd("CMeshFrame",&e);
+  Fs->draw_it=&DrawIt;
+  MeshCurSnap(&e);
+  MeshRecalcCxCy(Fs,&e);
+
+  try {//In case of <CTRL-ALT-c>
+    while (TRUE) {
+      MeshUpdateMenu(&e);
+      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|
+	    1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP);
+me_restart:
+      switch (msg_code) {
+	case MSG_KEY_DOWN:
+	  switch (a1) {
+	    case 0:
+	      switch (a2.u8[0]) {
+		case SC_DELETE:
+		  if (a2&SCF_SHIFT)
+		    goto me_clipboard_cut;
+		  else {
+		    if (MeshSelCnt(&e))
+		      MeshClipboardDel(&e);
+		    else if (e.ed_mode!='t')
+		      MeshVertexDel(&e,MeshVertexFindScrPt(&e,
+			    ip.presnap.x-Fs->pix_left-Fs->scroll_x,
+			    ip.presnap.y-Fs->pix_top-Fs->scroll_y));
+		    MeshVertexSelAll(&e,FALSE);
+		    MeshTriSelAll(&e,FALSE);
+		    make_tri_vertex_num=0;
+		  }
+		  break;
+		case SC_INS:
+		  if (a2&SCF_CTRL)
+		    goto me_clipboard_copy;
+		  else if (a2&SCF_SHIFT)
+		    goto me_clipboard_paste;
+	      }
+	      break;
+	    case CH_BACKSPACE:
+	      switch (e.ed_mode) {
+		case 'n':
+		case 'f':
+		case 'p':
+		case 'v':
+		  MeshVertexDel(&e,e.cur_vertex);
+		  break;
+		case 't':
+		  if (make_tri_vertex_num) {
+		    MeshVertexSelAll(&e,FALSE);
+		    MeshTriSelAll(&e,FALSE);
+		    make_tri_vertex_num=0;
+		  } else
+		    MeshTriDel(&e,e.cur_tri);
+		  break;
+	      }
+	      break;
+	    case 'f':
+	    case 'p':
+	      e.thickness=PopUpGetI64("Thickness (%d):",e.thickness);
+	    case 'n':
+	      if (a1=='n' || a1=='p')
+		e.closed=TRUE;
+	      else
+		e.closed=PopUpNoYes("Closed?\n");
+me_chain:
+	      e.chain_pred=e.vertex_head.last;
+	    case 't':
+	      MeshVertexSelAll(&e,FALSE);
+	      MeshTriSelAll(&e,FALSE);
+	    case 'v':
+	    case 'm':
+	    case 'M':
+	      adjusting_z=FALSE;
+	      moving=FALSE;
+	      e.ed_mode=a1;
+	      make_tri_vertex_num=0;
+	      Snd(0);
+	      break;
+	    case 'T':
+	      MeshTransformSel(&e);
+	      break;
+	    case 'A':
+	      MeshTriSelAll(&e,TRUE);
+	      if (e.ed_mode!='t')
+		MeshVertexSelAll(&e,TRUE);
+	      else
+		MeshVertexSelAll(&e,FALSE);
+	      make_tri_vertex_num=0;
+	      break;
+	    case 'U':
+	      MeshTriSelAll(&e,FALSE);
+	      MeshVertexSelAll(&e,FALSE);
+	      make_tri_vertex_num=0;
+	      break;
+	    case 'a':
+	    case 'u':
+	    case 'o':
+	      if (a1=='a')
+		sel_mode=SEL_MESH_EQU;
+	      else if (a1=='u')
+		sel_mode=SEL_MESH_AND;
+	      else
+		sel_mode=SEL_MESH_OR;
+	      if ((msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|
+		    1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP))
+		    !=MSG_IP_L_DOWN) {
+		Beep; Beep;
+		goto me_restart;
+	      }
+	      e.x1=a1; e.y1=a2;
+	      e.x2=a1; e.y2=a2;
+	      e.sel_rect=TRUE;
+	      while (TRUE) {
+		msg_code=GetMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|
+		      1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|
+		      1<<MSG_IP_R_UP);
+		if (msg_code==MSG_IP_MOVE) {
+		  e.x2=a1; e.y2=a2;
+		} else if (msg_code==MSG_IP_L_UP) {
+		  e.x2=a1; e.y2=a2;
+		  break;
+		} else {
+		  e.sel_rect=FALSE;
+		  Beep; Beep;
+		  goto me_restart;
+		}
+	      }
+	      e.sel_rect=FALSE;
+	      MeshTriSelRect(&e,sel_mode,e.x1,e.x2,e.y1,e.y2);
+	      if (e.ed_mode!='t')
+		MeshVertexSelRect(&e,sel_mode,e.x1,e.x2,e.y1,e.y2);
+	      else
+		MeshVertexSelAll(&e,FALSE);
+	      make_tri_vertex_num=0;
+	      break;
+	    case CH_CTRLB:
+	      WinBorder(Bt(&Fs->display_flags,DISPLAYf_NO_BORDER));
+	      break;
+	    case CH_CTRLC:
+me_clipboard_copy:
+	      if (e.ed_mode=='t') {
+		Beep;Beep;
+	      } else
+		MeshClipboardCopy(&e);
+	      break;
+	    case CH_CTRLV:
+me_clipboard_paste:
+	      if (e.ed_mode=='t') {
+		Beep;Beep;
+	      } else {
+		MeshClipboardPaste(&e);
+		e.ed_mode='m';
+	      }
+	      break;
+	    case CH_CTRLX:
+me_clipboard_cut:
+	      if (e.ed_mode=='t') {
+		Beep;Beep;
+	      } else
+		MeshClipboardCut(&e);
+	      break;
+	    case CH_SHIFT_ESC:
+	      save_and_exit=FALSE;
+	      goto me_done;
+	    case CH_ESC:
+	      save_and_exit=TRUE;
+	      goto me_done;
+	    case 'z':
+	      MeshScaleZoom(&e,1.5);
+	      break;
+	    case 'Z':
+	      MeshScaleZoom(&e,1/1.5);
+	      break;
+	    case 'c':
+	      e.cur_color=PopUpColorLighting;
+	      break;
+	    case 's':
+	      i=PopUpRangeI64(1,25,1,"New Snap\n");
+	      if (i>=1)
+		e.cur_snap=i;
+	      MeshCurSnap(&e);
+	      MeshRecalcCxCy(Fs,&e);
+	      break;
+	    case 'g':
+	      e.grid_on=!e.grid_on;
+	      break;
+	    case 'V':
+	      e.vertex_on=!e.vertex_on;
+	      break;
+	    case 'N':
+	      s->sx=s->sy=s->sz=0;
+	      break;
+	    case 'y':
+	      e.flip_y=!e.flip_y;
+	      break;
+	    case 'j':
+	      if (moving)
+		MeshVertexIgnoreSet(&e,TRUE);
+	      if (tempv=MeshVertexFindScrPt(&e,
+		    ip.pos.x-Fs->pix_left-Fs->scroll_x,
+		    ip.pos.y-Fs->pix_top-Fs->scroll_y)) {
+		Noise(25,2000,8000);
+		e.ip_z=RoundI64(tempv->p.z,e.cur_snap);
+	      } else {
+		Beep; Beep;
+		e.ip_z=0;
+	      }
+	      MeshVertexIgnoreSet(&e,FALSE);
+	      if (moving) {
+		MeshCursorW(&e,Fs,&x,&y,&z);
+		if (adjusting_z)
+		  MeshP0Offset(&e,0,0,z-p0a.z);
+		else
+		  MeshP0Offset(&e,x-p0a.x,y-p0a.y,z-p0a.z);
+		p0a.x=x;
+		p0a.y=y;
+		p0a.z=z;
+		MeshP0Capture(&e);
+	      }
+	      break;
+	    case '1':
+	      MeshSwapAxes(&e,offset(CD3I32.x),offset(CD3I32.y));
+	      break;
+	    case '2':
+	      MeshSwapAxes(&e,offset(CD3I32.x),offset(CD3I32.z));
+	      break;
+	    case '3':
+	      MeshSwapAxes(&e,offset(CD3I32.y),offset(CD3I32.z));
+	      break;
+	    case '4':
+	      MeshInvertAxis(&e,offset(CD3I32.x));
+	      break;
+	    case '5':
+	      MeshInvertAxis(&e,offset(CD3I32.y));
+	      break;
+	    case '6':
+	      MeshInvertAxis(&e,offset(CD3I32.z));
+	      break;
+	    case 'r':
+	      if (e.cur_tri)
+		SwapI64(&e.cur_tri->t[1],&e.cur_tri->t[2]);
+	      break;
+	    case 'C':
+	      MeshColorTris(&e);
+	      break;
+	    case 'R':
+	      MeshRevTris(&e);
+	      break;
+	  }
+	  break;
+	case MSG_IP_L_DOWN:
+	  switch (e.ed_mode) {
+	    case 'm':
+	      if (!moving) {
+		if (!MeshSelCnt(&e) &&
+		      (tempv=MeshVertexFindScrPt(&e,a1,a2))) {
+		  tempv->flags|=VF_SEL;
+		  e.ip_z=RoundI64(tempv->p.z,e.cur_snap);
+		}
+		if (MeshSelCnt(&e)) {
+		  MeshCursorW(&e,Fs,&x,&y,&z);
+		  p0a.x=x;
+		  p0a.y=y;
+		  p0a.z=z;
+		  MeshP0Capture(&e);
+		  moving=TRUE;
+		}
+	      }
+	      break;
+	    case 'M':
+	      if (!adjusting_z && !moving) {
+		if (!MeshSelCnt(&e) &&
+		      (tempv=MeshVertexFindScrPt(&e,a1,a2))) {
+		  tempv->flags|=VF_SEL;
+		  e.ip_z=RoundI64(tempv->p.z,e.cur_snap);
+		}
+		if (MeshSelCnt(&e)) {
+		  MeshCursorW(&e,Fs,&x,&y,&z);
+		  p0a.x=x;
+		  p0a.y=y;
+		  p0a.z=z;
+		  MeshP0Capture(&e);
+		  moving=TRUE;
+
+		  p0b.x=ip.presnap.x;
+		  p0b.y=ip.presnap.y;
+		  p0b.z=e.ip_z;
+		  adjusting_z=TRUE;
+		  Snd(ClampI64(3*e.ip_z+1500,0,15000));
+		}
+	      }
+	      break;
+	  }
+	  break;
+	case MSG_IP_L_UP:
+	  switch (e.ed_mode) {
+	    case 'n':
+	    case 'f':
+	    case 'p':
+	    case 'v':
+	      Noise(25,2000,8000);
+	      MeshCursorW(&e,Fs,&x,&y,&z);
+	      e.cur_vertex=MeshVertexNew(&e,x,y,z);
+	      break;
+	    case 'm':
+	    case 'M':
+	      if (moving) {
+		if (adjusting_z) {
+		  e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
+		  *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+		  +p0b.z,e.cur_snap);
+		  Snd(0);
+		  adjusting_z=FALSE;
+		  MeshCursorW(&e,Fs,&x,&y,&z);
+		  MeshP0Offset(&e,0,0,z-p0a.z);
+		} else {
+		  MeshCursorW(&e,Fs,&x,&y,&z);
+		  MeshP0Offset(&e,x-p0a.x,y-p0a.y,z-p0a.z);
+		}
+		MeshTriSelAll(&e,FALSE);
+		MeshVertexSelAll(&e,FALSE);
+		moving=FALSE;
+	      }
+	      break;
+	    case 't':
+	      if (tempv=MeshVertexFindScrPt(&e,a1,a2)) {
+		for (i=0;i<make_tri_vertex_num;i++)
+		  if (va[i]==tempv) {
+		    Beep; Beep;
+		    break;
+		  }
+		if (i==make_tri_vertex_num) {
+		  Noise(25,2000,8000);
+		  va[make_tri_vertex_num++]=tempv;
+		  tempv->flags|=VF_SEL;
+		  if (make_tri_vertex_num==3) {
+		    e.cur_tri=MeshTriNew(&e,e.cur_color,va[0],va[1],va[2]);
+		    for (i=0;i<make_tri_vertex_num;i++)
+		      va[i]->flags&=~VF_SEL;
+		    make_tri_vertex_num=0;
+		  }
+		}
+	      }
+	      break;
+	  }
+	  break;
+	case MSG_IP_R_DOWN:
+	  if (!adjusting_z && e.ed_mode!='M' &&
+		(e.chain_pred==e.vertex_head.last ||
+		e.ed_mode!='n' && e.ed_mode!='f' && e.ed_mode!='p')) {
+	    if (moving) {
+	      MeshCursorW(&e,Fs,&x,&y,&z);
+	      MeshP0Offset(&e,x-p0a.x,y-p0a.y,z-p0a.z);
+	      p0a.x=x;
+	      p0a.y=y;
+	      p0a.z=z;
+	      MeshP0Capture(&e);
+	    }
+	    p0b.x=ip.presnap.x;
+	    p0b.y=ip.presnap.y;
+	    p0b.z=e.ip_z;
+	    adjusting_z=TRUE;
+	    Snd(ClampI64(3*e.ip_z+1500,0,15000));
+	  }
+	  break;
+	case MSG_IP_R_UP:
+	  if (adjusting_z) {
+	    e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
+	    *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+	    +p0b.z,e.cur_snap);
+	    Snd(0);
+	    adjusting_z=FALSE;
+	    if (moving) {
+	      MeshCursorW(&e,Fs,&x,&y,&z);
+	      MeshP0Offset(&e,0,0,z-p0a.z);
+	      p0a.x=x;
+	      p0a.y=y;
+	      p0a.z=z;
+	      MeshP0Capture(&e);
+	    }
+	  } else  if (e.ed_mode=='n') {
+	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
+	      MeshPolygon(&e,e.chain_pred->next,e.vertex_head.last,FALSE);
+	    a1=e.ed_mode;
+	    goto me_chain;
+	  } else if (e.ed_mode=='f') {
+	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
+	      MeshFence(&e);
+	    a1=e.ed_mode;
+	    goto me_chain;
+	  } else if (e.ed_mode=='p') {
+	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
+	      MeshPrism(&e);
+	    a1=e.ed_mode;
+	    goto me_chain;
+	  }
+	  break;
+	case MSG_IP_MOVE:
+	  if (adjusting_z) {
+	    e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
+	    *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+	    +p0b.z,e.cur_snap);
+	    Snd(ClampI64(3*e.ip_z+1500,0,15000));
+	  }
+	  if (moving) {
+	    MeshCursorW(&e,Fs,&x,&y,&z);
+	    if (adjusting_z)
+	      MeshP0Offset(&e,0,0,z-p0a.z);
+	    else
+	      MeshP0Offset(&e,x-p0a.x,y-p0a.y,z-p0a.z);
+	    p0a.x=x;
+	    p0a.y=y;
+	    p0a.z=z;
+	    MeshP0Capture(&e);
+	  }
+	  break;
+      }
+    }
+me_done:
+  } catch
+    Fs->catch_except=TRUE;
+  SettingsPop;
+  MenuPop;
+  if (save_and_exit)
+    head=MeshSave(&e,_size);
+  else
+    head=NULL;
+  MeshCleanUp(&e);
+  FramePtrDel("CMeshFrame");
+  if (old_s) {
+    MemCpy(c->state,old_s,sizeof(CViewAngles));
+    Free(old_s);
+  } else
+    ViewAnglesDel;
+  return head;
+}

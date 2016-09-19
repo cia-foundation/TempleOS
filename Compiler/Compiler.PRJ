@@ -4,11 +4,11 @@
   Option(OPTf_WARN_DUP_TYPES,ON);
   Option(OPTf_KEEP_PRIVATE,ON);
 }
-#include "/Kernel/KernelA.HPP"
-#include "/Compiler/CompilerA.HPP"
+#include "/Kernel/KernelA.HH"
+#include "/Compiler/CompilerA.HH"
 #exe {Option(OPTf_EXTERNS_TO_IMPORTS,ON);};
-#include "/Kernel/KernelB.HPP"
-#include "/Kernel/KernelC.HPP"
+#include "/Kernel/KernelB.HH"
+#include "/Kernel/KernelC.HH"
 #exe {Option(OPTf_EXTERNS_TO_IMPORTS,OFF);};
 #exe {Option(OPTf_KEEP_PRIVATE,OFF);};
 #include "Templates"

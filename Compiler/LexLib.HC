@@ -1,0 +1,275 @@
+U0 LexBackupLastChar(CCmpCtrl *cc)
+{
+  CLexFile *tempf=cc->lex_include_stk;
+  tempf->buf_ptr=cc->cur_buf_ptr;
+  if (cc->flags & CCF_USE_LAST_U16) {
+    tempf->last_U16=cc->last_U16;
+    cc->flags&=~CCF_USE_LAST_U16;
+  } else
+    tempf->last_U16=0;
+}
+
+U0 LexPush(CCmpCtrl *cc)
+{//Create token-stream save point.
+  CLexFile *tempf;
+  LexBackupLastChar(cc);
+  if (cc->lex_include_stk->last_U16)
+    cc->flags|=CCF_USE_LAST_U16;
+  tempf=MAllocIdent(cc->lex_include_stk);
+  tempf->next=cc->lex_prs_stk;
+  cc->lex_prs_stk=tempf;
+}
+
+U0 LexPopRestore(CCmpCtrl *cc)
+{//Restore token-stream saved-point.
+//Bad things can happen if you cross an #include file boundary.
+  CLexFile *tempf=cc->lex_prs_stk;
+  cc->cur_buf_ptr=tempf->buf_ptr;
+  if (cc->last_U16=tempf->last_U16)
+    cc->flags|=CCF_USE_LAST_U16;
+  else
+    cc->flags&=~CCF_USE_LAST_U16;
+  MemCpy(cc->lex_include_stk(U8 *)+sizeof(U8 *),tempf(U8 *)+sizeof(U8 *),
+	sizeof(CLexFile)-sizeof(U8 *));
+  cc->lex_prs_stk=tempf->next;
+  Free(tempf);
+}
+
+U0 LexPopNoRestore(CCmpCtrl *cc)
+{//Don't restore token-stream saved-point.
+  CLexFile *tempf=cc->lex_prs_stk;
+  cc->lex_prs_stk=tempf->next;
+  Free(tempf);
+}
+
+I64 MemberMetaData(U8 *needle_str,CMemberLst *haystack_member_lst)
+{//Find meta data name, return meta data val. See $LK,"::/Demo/ClassMeta.HC"$.
+  CMemberLstMeta *meta=haystack_member_lst->meta;
+  while (meta) {
+    if (!StrCmp(meta->str,needle_str))
+      return meta->user_data;
+    meta=meta->next;
+  }
+  return 0;
+}
+
+CMemberLstMeta *MemberMetaFind(U8 *needle_str,CMemberLst *haystack_member_lst)
+{//Find meta data name, return meta data struct. See $LK,"::/Demo/ClassMeta.HC"$.
+  CMemberLstMeta *meta=haystack_member_lst->meta;
+  while (meta) {
+    if (!StrCmp(meta->str,needle_str))
+      return meta;
+    meta=meta->next;
+  }
+  return NULL;
+}
+
+CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class)
+{//Find class member. See $LK,"ClassRep",A="MN:ClassRep"$() and $LK,"DocForm",A="MN:DocForm"$().
+  I64 i;
+  CMemberLst *tempm;
+  do {
+    tempm=haystack_class->member_lst_and_root;
+    while (tempm) {
+      if (!(i=StrCmp(tempm->str,needle_str))) {
+	tempm->use_cnt++;
+	return tempm;
+      }
+      if (i<=0)
+	tempm=tempm->left;
+      else
+	tempm=tempm->right;
+    }
+  } while (haystack_class=haystack_class->base_class);
+  return NULL;
+}
+
+CMemberLst *MemberClassBaseFind(CHashClass *needle_class,
+	CHashClass *haystack_class)
+{//Find class member class base. For finding dup class local vars.
+  CMemberLst *tempm;
+  tempm=haystack_class->member_class_base_root;
+  while (tempm) {
+    if (needle_class==tempm->member_class_base)
+      return tempm;
+    if (needle_class<tempm->member_class_base)
+      tempm=tempm->left_class_base;
+    else
+      tempm=tempm->right_class_base;
+  }
+  return NULL;
+}
+
+U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
+{
+  U8 *st=tempm->str;
+  CMemberLst **tempm1,*tempm2;
+
+  if (MemberFind(st,tempc) && StrCmp(st,"pad") &&
+	StrCmp(st,"reserved") && StrCmp(st,"_anon_"))
+    LexExcept(cc,"Duplicate member at ");
+  tempm1=&tempc->member_lst_and_root;
+  while (tempm2=*tempm1) {
+    if (StrCmp(tempm2->str,st)<=0)
+      tempm1=&tempm2->left;
+    else
+      tempm1=&tempm2->right;
+  }
+  *tempm1=tempm;
+
+  if (mode==PRS1B_LOCAL_VAR) {
+    tempm->member_class_base=
+	tempm->member_class-tempm->member_class->ptr_stars_cnt;
+    if (Bt(&cc->opts,OPTf_WARN_DUP_TYPES) &&
+	 MemberClassBaseFind(tempm->member_class_base,tempc))
+      LexWarn(cc,"Duplicate type at ");
+    tempm1=&tempc->member_class_base_root;
+    while (tempm2=*tempm1) {
+      if (tempm->member_class_base<tempm2->member_class_base)
+	tempm1=&tempm2->left_class_base;
+      else if (tempm->member_class_base>tempm2->member_class_base)
+	tempm1=&tempm2->right_class_base;
+      else {
+	tempm1=NULL;
+	break;
+      }
+    }
+    if (tempm1)
+      *tempm1=tempm;
+  } else
+    tempm->member_class_base=NULL;
+
+  tempm->left=NULL;
+  tempm->right=NULL;
+  tempm->left_class_base=NULL;
+  tempm->right_class_base=NULL;
+  tempm2=tempc->last_in_member_lst;
+  tempm2->next=tempc->last_in_member_lst=tempm;
+}
+
+CMemberLst *MemberLstNew(I64 _reg)
+{
+  CMemberLst *res=CAlloc(sizeof(CMemberLst));
+  res->reg=_reg;
+  return res;
+}
+
+Bool  MemberLstCmp(CMemberLst *tempm1,CMemberLst *tempm2,I64 cnt=MAX_I64)
+{
+  while (tempm1 && tempm2 && cnt--) {
+    if (StrCmp(tempm1->str,tempm2->str) ||
+	  tempm1->member_class!=tempm2->member_class ||
+	  tempm1->member_class_base!=tempm2->member_class_base)
+      return FALSE;
+    if (tempm1->flags&MLF_DFT_AVAILABLE || tempm2->flags&MLF_DFT_AVAILABLE) {
+      if (tempm1->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE)!=
+	    tempm2->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE))
+	return FALSE;
+      if (tempm1->flags&MLF_STR_DFT_AVAILABLE) {
+	if (StrCmp(tempm1->dft_val,tempm2->dft_val))
+	  return FALSE;
+      } else if (tempm1->dft_val!=tempm2->dft_val)
+	return FALSE;
+    }
+    tempm1=tempm1->next;
+    tempm2=tempm2->next;
+  }
+  if (cnt<0 || !tempm1 && !tempm2)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+U0 MemberLstDel(CMemberLst *tempm)
+{
+  CMemberLst *tempm1;
+  CMemberLstMeta *temp_meta,*temp_meta1;
+  while (tempm) {
+    tempm1=tempm->next;
+    Free(tempm->str);
+    LinkedLstDel(tempm->dim.next);
+    if (tempm->flags & MLF_STR_DFT_AVAILABLE)
+      Free(tempm->dft_val);
+    if (tempm->flags & MLF_FUN)
+      HashDel(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
+    temp_meta=tempm->meta;
+    while (temp_meta) {
+      temp_meta1=temp_meta->next;
+      Free(temp_meta->str);
+      if (temp_meta->flags&MLMF_IS_STR)
+	Free(temp_meta->user_data);
+      Free(temp_meta);
+      temp_meta=temp_meta1;
+    }
+    Free(tempm);
+    tempm=tempm1;
+  }
+}
+
+U0 ClassMemberLstDel(CHashClass *tempc)
+{
+  MemberLstDel(tempc->member_lst_and_root);
+  tempc->size=0;
+  tempc->last_in_member_lst=&tempc->member_lst_and_root;
+  tempc->member_lst_and_root=NULL;
+  tempc->member_class_base_root=NULL;
+  tempc->member_cnt=0;
+  if (tempc->type&HTT_FUN)
+    tempc(CHashFun *)->arg_cnt=0;
+}
+
+I64 MemberLstSize(CHashClass *tempc)
+{
+  CMemberLst *tempm;
+  CMemberLstMeta *temp_meta;
+  I64 res=0;
+  tempm=tempc->member_lst_and_root;
+  while (tempm) {
+    res+=MSize2(tempm->str);
+    res+=LinkedLstSize(tempm->dim.next);
+    if (tempm->flags & MLF_STR_DFT_AVAILABLE)
+      res+=MSize2(tempm->dft_val);
+    if (tempm->flags & MLF_FUN)
+      res+=HashEntrySize2(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
+    temp_meta=tempm->meta;
+    while (temp_meta) {
+      res+=MSize2(temp_meta->str);
+      if (temp_meta->flags&MLMF_IS_STR)
+	res+=MSize2(temp_meta->user_data);
+      res+=MSize2(temp_meta);
+      temp_meta=temp_meta->next;
+    }
+    res+=MSize2(tempm);
+    tempm=tempm->next;
+  }
+  return res;
+}
+
+U8 *LexExtStr(CCmpCtrl *cc,I64 *_size=NULL,Bool lex_next=TRUE)
+{//Lex $LK,"TK_STR",A="MN:TK_STR"$'s to one combined str. _size includes terminator.
+  I64 len=cc->cur_str_len,len1,len2;
+  U8 *st=cc->cur_str,*st1,*st2;
+  cc->cur_str=NULL;
+  while (cc->token==TK_STR) {
+    st1=st;
+    len1=len;
+    if (!lex_next && LexGetChar(cc)!='\\') {
+      cc->flags|=CCF_USE_LAST_U16;
+      break;
+    }
+    if (Lex(cc)==TK_STR) {
+      len2=cc->cur_str_len;
+      st2=cc->cur_str;
+      cc->cur_str=NULL;
+      len=len1+len2-1;
+      st=MAlloc(len);
+      if (len1>1)
+	MemCpy(st,st1,len1-1);
+      MemCpy(st+len1-1,st2,len2);
+      Free(st1);
+      Free(st2);
+    }
+  }
+  if (_size) *_size=len;
+  return st;
+}

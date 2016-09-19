@@ -1,0 +1,5 @@
+$WW+H,1$$PURPLE$$TX+CX,"TempleOS V2.18",D="DD_OS_NAME_VERSION"$$FG$
+
+$TX+CX,"Public Domain Operating System"$
+
+$LK,"Help & Index",A="FI:::/Doc/HelpIndex.DD"$, $LK,"Quick Start: Cmd line",A="FI:::/Doc/CmdLineOverview.DD"$

@@ -1,0 +1,61 @@
+$WW,1$$FG,5$$TX+CX,"Credits"$$FG$
+
+I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"120,264",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"13.1",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
+
+*) $LK,"::/Kernel/FontStd.HC"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.  It's public domain.
+
+*) $LK,"::/Kernel/FontCyrillic.HC"$, is taken from $FG,4$$TX,"OrientDisplay",HTML="http://www.orientdisplay.com/images/cyrillic-Russian-fonts.gif"$$FG$ without permission.
+
+*) $LK,"ATA Reg and Cmd Definitions",A="MN:ATA_NOP"$ are originally from Linux.  Later, I got the spec.
+
+*) The heap algorithm, $LK,"::/Kernel/Mem/MAllocFree.HC"$, is adapted from one I saw at Ticketmaster when I worked on their VAX operating system.
+
+*) The LZW compression algorithm, $LK,"::/Kernel/Compress.HC"$, came from a magazine and I implemented it when I worked for Ticketmaster.
+
+*) The adaptive-step-size-Runge-Kutta algorithm, $LK,"::/Adam/AMathODE.HC"$, is adapted from the book, $UL,1$Numeric Recipies in C$UL,0$.
+
+*) The mountain, palm trees, sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.  The wolf in BlackDiamond is also from there.  I took watermarked photos and converted to 16 color.
+
+*) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
+
+*) A few features were inspired by $FG,2$MATLAB$FG$, such as $FG,2$ans$FG$ in expressions at the command-line.  There is a lot of $FG,2$MSDOS$FG$ , $FG,2$Windows$FG$, $FG,2$VAXTMOS$FG$ (VAX Ticketmaster O.S.) and $FG,2$Unix$FG$ inspiration, too, such as drive letters, command names, etc.
+
+*) I included $LK,"PCIDevice Lst File",A="FI:::/Misc/PCIDevices.DD",HTML="http://www.pcidatabase.com/reports.php?type=tab-delimeted"$.
+
+*) Thanks to whoever wrote this $FG,4$$TX,"CppHtml.HC.Z",HTML="http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
+
+*) I used $FG,4$$TX,"MagicISO",HTML="http://www.magiciso.com"$$FG$ to burn test CD's to help me understand the ISO9660 file system format.  I mostly used the $FG,4$$TX,"ISO9660",HTML="http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"$$FG$ spec.
+
+*) I looked at bootable CD boot sects, but didn't learn anything, finding it easier to make my own.
+
+*) I think I got my original PC speaker code from $FG,2$Borland C$FG$.
+
+*) I found PS/2 keyboard and mouse code on the net and documentation.  My code is very different.  I found VGA reg info on the net.
+
+*) Thanks to $FG,4$$TX,"http://www.osdev.org",HTML="http://www.osdev.org"$$FG$ for a couple tips.
+
+*) God told me to stick with 640x480 16 color,  a single audio voice and kept me from zombie-walking into making child windows like $FG,2$Windows$FG$.  Instead, I made one window per task with no child windows.  He also guided my progress, very obviously.
+
+*) I got $FG,4$$TX,"Webster's Dictionary",HTML="http://www.templeos.org/files/DICTIONARY.DD"$$FG$ and $FG,4$$TX,"The King James Bible",HTML="http://www.templeos.org/files/BIBLE.DD"$$FG$ from $FG,4$$TX,"Project Gutenberg",HTML="http://web.archive.org/web/20110730111436/http://promo.net/pg/"$$FG$.
+
+*) John Carmack inspired me to use "$LK,"Clamp",A="MN:Clamp"$" as a name instead of "Limit".  He inspired me to use "needle" and "haystack" as names.  He inspired me to simplify my Frames-Per-Second code.
+
+*) Bill Gates inspired me to add comments to my $LK,"Help & Index",A="FI:::/Doc/HelpIndex.DD"$.
+
+*) I hired an artist, Cody Rigby, for $$3,000 worth of pixel art.
+
+*) Erik van der Karbargenbok wrote /Linux shell scripts -- GodPassage, GodWords.
+
+*) The random number generator is from Donald Knuth in the wikipedia entry for $TX,"Linear_congruential_generator",HTML="http://en.wikipedia.org/wiki/Linear_congruential_generator"$.
+
+$FG,8$
+* "MSDOS", "Windows", "MovieMaker", "MS Paint" and "FAT32" are trademarks owned by MicroSoft Corp.
+* "SiteBuilder" is a trademark owned by Yahoo! Inc.
+* "MagicISO" is a trademark owned by MagicISO Corp.
+* "MATLAB" is a trademark owned by The Math Works, Inc.
+* "$TX,"FreeDOS",HTML="http://www.freedos.org"$" is a trademark owned by Jim Hall.
+* "QEMU" is a trademark owned by Fabrice Bellard.
+* "VAX" is a trademark owned by Digital Equipment Corp.
+* "Linux" is a trademark owned by Linus Torvalds.
+* "VAXTMOS" is a trademark owned by Ticketmaster.
+$FG$

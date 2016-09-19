@@ -7,7 +7,7 @@ TourPut("Press $$GREEN$$<F1>$$FG$$ for the main help index.\n"
 	"The $$GREEN$$<F1>$$FG$$ key works both in "
 	"the editor and at the command line.\n"
 	"\n"
-	"You can find the $LK+PU,"Demo Index",A="FI:::/Doc/DemoIndex.TXT"$ on the help index.\n");
+	"You can find the $LK+PU,"Demo Index",A="FI:::/Doc/DemoIndex.DD"$ on the help index.\n");
 AFGetKey(SC_F1);
 
 TourPut(
