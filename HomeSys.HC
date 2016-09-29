@@ -28,9 +28,9 @@ U0 StartUpTasks()
   WinTileVert;
   "Boot Time:%7.3fs\n",tS;
   XTalk(user1,"Cd;#include \"DoOnce\";\n");
-  Silent;	//no output to screen
+  Silent;	//no output to scrn
   ACInit("/*;!*/Bible.TXT*");
-  Silent(OFF); //no output to screen
+  Silent(OFF); //no output to scrn
 }
 
 StartUpTasks;

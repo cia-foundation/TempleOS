@@ -1,55 +1,55 @@
-Bool Mem32DevIns(CMemRange *tempmr)
+Bool Mem32DevIns(CMemRange *tmpmr)
 {
-  CMemRange *tempmr1=dev.mem32_head.next,*tempmr2;
-  while (tempmr1!=&dev.mem32_head) {
-    if (!tempmr1->type && tempmr->base>=tempmr1->base &&
-	  tempmr->base+tempmr->size<=tempmr1->base+tempmr1->size) {
-      if (tempmr->base>tempmr1->base) {
-	tempmr2=AMAlloc(sizeof(CMemRange));
-	tempmr2->type=MRT_UNUSED;
-	tempmr2->flags=0;
-	tempmr2->base=tempmr1->base;
-	tempmr2->size=tempmr->base-tempmr1->base;
-	QueInsRev(tempmr2,tempmr1);
+  CMemRange *tmpmr1=dev.mem32_head.next,*tmpmr2;
+  while (tmpmr1!=&dev.mem32_head) {
+    if (!tmpmr1->type && tmpmr->base>=tmpmr1->base &&
+	  tmpmr->base+tmpmr->size<=tmpmr1->base+tmpmr1->size) {
+      if (tmpmr->base>tmpmr1->base) {
+	tmpmr2=AMAlloc(sizeof(CMemRange));
+	tmpmr2->type=MRT_UNUSED;
+	tmpmr2->flags=0;
+	tmpmr2->base=tmpmr1->base;
+	tmpmr2->size=tmpmr->base-tmpmr1->base;
+	QueInsRev(tmpmr2,tmpmr1);
       }
-      QueInsRev(tempmr,tempmr1);
-      tempmr1->size=tempmr1->base+tempmr1->size-
-	    (tempmr->base+tempmr->size);
-      tempmr1->base=tempmr->base+tempmr->size;
-      if (!tempmr1->size) {
-	QueRem(tempmr1);
-	Free(tempmr1);
+      QueInsRev(tmpmr,tmpmr1);
+      tmpmr1->size=tmpmr1->base+tmpmr1->size-
+	    (tmpmr->base+tmpmr->size);
+      tmpmr1->base=tmpmr->base+tmpmr->size;
+      if (!tmpmr1->size) {
+	QueRem(tmpmr1);
+	Free(tmpmr1);
       }
       return TRUE;
     }
-    tempmr1=tempmr1->next;
+    tmpmr1=tmpmr1->next;
   }
   return FALSE;
 }
 
 U0 Mem32DevInit()
 {
-  CMemRange *tempmr;
+  CMemRange *tmpmr;
   CMemE820 *m20=SYS_MEM_E820;
 
   QueInit(&dev.mem32_head);
-  tempmr=AMAlloc(sizeof(CMemRange));
-  tempmr->type=MRT_UNUSED;
-  tempmr->flags=0;
+  tmpmr=AMAlloc(sizeof(CMemRange));
+  tmpmr->type=MRT_UNUSED;
+  tmpmr->flags=0;
 //Maybe !!! Change this to 0xF0000000 !!!
-  tempmr->base=0xE0000000;
-  tempmr->size=0x10000000;
-  QueIns(tempmr,dev.mem32_head.last);
+  tmpmr->base=0xE0000000;
+  tmpmr->size=0x10000000;
+  QueIns(tmpmr,dev.mem32_head.last);
 
   if (m20->type) {
     while (m20->type) {
-      tempmr=AMAlloc(sizeof(CMemRange));
-      tempmr->type=m20->type;
-      tempmr->flags=0;
-      tempmr->base=m20->base;
-      tempmr->size=m20->len;
-      if (!Mem32DevIns(tempmr))
-	Free(tempmr);
+      tmpmr=AMAlloc(sizeof(CMemRange));
+      tmpmr->type=m20->type;
+      tmpmr->flags=0;
+      tmpmr->base=m20->base;
+      tmpmr->size=m20->len;
+      if (!Mem32DevIns(tmpmr))
+	Free(tmpmr);
       m20++;
     }
   }
@@ -83,29 +83,29 @@ U8 *Mem32DevAlloc(I64 size,I64 alignment)
 //For this to work the BIOS E820 map must be searched for gaps in
   //the 32-bit range and the pool initialized to the gaps.
   U8 *base,*limit;
-  CMemRange *tempmr,*tempmr1;
+  CMemRange *tmpmr,*tmpmr1;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr1=dev.mem32_head.next;
-  while (tempmr1!=&dev.mem32_head) {
-    base=(tempmr1->base+alignment-1)&~(alignment-1);
+  tmpmr1=dev.mem32_head.next;
+  while (tmpmr1!=&dev.mem32_head) {
+    base=(tmpmr1->base+alignment-1)&~(alignment-1);
     limit=base+size-1;
-    if (!tempmr1->type &&
-	  limit<tempmr1->base+tempmr1->size) {
-      tempmr=AMAlloc(sizeof(CMemRange));
-      tempmr->type=MRT_DEV;
-      tempmr->flags=0;
-      tempmr->base=base;
-      tempmr->size=size;
-      if (!Mem32DevIns(tempmr)) {
-	Free(tempmr);
+    if (!tmpmr1->type &&
+	  limit<tmpmr1->base+tmpmr1->size) {
+      tmpmr=AMAlloc(sizeof(CMemRange));
+      tmpmr->type=MRT_DEV;
+      tmpmr->flags=0;
+      tmpmr->base=base;
+      tmpmr->size=size;
+      if (!Mem32DevIns(tmpmr)) {
+	Free(tmpmr);
 	LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 	return NULL;
       }
       LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
-      return tempmr->base;
+      return tmpmr->base;
     }
-    tempmr1=tempmr1->next;
+    tmpmr1=tmpmr1->next;
   }
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
   return NULL;
@@ -113,17 +113,17 @@ U8 *Mem32DevAlloc(I64 size,I64 alignment)
 
 U0 Mem32DevFree(U8 *base)
 {//Free 32-bit device address space.
-  CMemRange *tempmr;
+  CMemRange *tmpmr;
   if (!base) return;
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=dev.mem32_head.next;
-  while (tempmr!=&dev.mem32_head) {
-    if (tempmr->base==base) {
-      tempmr->type=MRT_UNUSED;
+  tmpmr=dev.mem32_head.next;
+  while (tmpmr!=&dev.mem32_head) {
+    if (tmpmr->base==base) {
+      tmpmr->type=MRT_UNUSED;
       break;
     }
-    tempmr=tempmr->next;
+    tmpmr=tmpmr->next;
   }
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 }

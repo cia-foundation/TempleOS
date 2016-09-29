@@ -17,7 +17,7 @@ HashTablePurge(adam_task->hash_table);
 
 #help_index "Misc"
 //Use Dbg("Type 'G;'"); to debug before window mgr is running.
-public F64 os_version=4.110;//Operating system version.
+public F64 os_version=4.120;//Operating system version.
 
 #include "/Adam/MakeAdam"
 
@@ -35,7 +35,7 @@ LBts(&sys_run_level,RLf_REGISTRY);
 WallPaperInit;
 
 if (DrvIsWritable)
-  MkDir("/Temp"); //Good to have a Temp
+  MkDir("/Tmp"); //Good to have a Tmp
 
 Option(OPTf_WARN_PAREN,OFF);
 Option(OPTf_WARN_DUP_TYPES,OFF);

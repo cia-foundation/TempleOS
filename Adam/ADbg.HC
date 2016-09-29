@@ -6,32 +6,32 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
   CMemberLst *ml;
   CDocEntry *doc_e;
   Bool unlock;
-  CHashClass *tempc,*tempc2;
+  CHashClass *tmpc,*tmpc2;
   if (depth>=max_depth) return TRUE;
-  if (!(tempc=HashFind(class_name,Fs->hash_table,types))) {
+  if (!(tmpc=HashFind(class_name,Fs->hash_table,types))) {
     DocPrint(doc,"Class Not Found.\n");
     return FALSE;
   }
-  if (!ChkPtr(_d) || !ChkPtr(_d(U8 *)+tempc->size)) {
+  if (!ChkPtr(_d) || !ChkPtr(_d(U8 *)+tmpc->size)) {
     DocPrint(doc,"Bad Ptr:%016X\n",_d);
     return FALSE;
   }
-  if (tempc->base_class && !ClassRep2(doc,_d,tempc->base_class->str,
+  if (tmpc->base_class && !ClassRep2(doc,_d,tmpc->base_class->str,
 	depth,max_depth,dynamic,types,offset))
     return FALSE;
   unlock=DocLock(doc);
   DocPrint(doc,"Class:\"%s\"\n",class_name);
-  ml=tempc->member_lst_and_root;
+  ml=tmpc->member_lst_and_root;
   while (ml) {
-    tempc2=ml->member_class;
+    tmpc2=ml->member_class;
     ptr=_d(U8 *)+ml->offset;
     DocPrint(doc,"%08X ",ptr(U8 *)+offset);
-    stars=tempc2->ptr_stars_cnt;
-    tempc2=OptClassFwd(tempc2);
-    tempc2-=tempc2->ptr_stars_cnt;
-    if (tempc2->type & HTT_INTERNAL_TYPE) {
+    stars=tmpc2->ptr_stars_cnt;
+    tmpc2=OptClassFwd(tmpc2);
+    tmpc2-=tmpc2->ptr_stars_cnt;
+    if (tmpc2->type & HTT_INTERNAL_TYPE) {
       DocPrint(doc,"$$GREEN$$%-20ts:$$FG$$",ml->str);
-      if (stars==1 && (tempc2->raw_type==RT_I8 || tempc2->raw_type==RT_U8)) {
+      if (stars==1 && (tmpc2->raw_type==RT_I8 || tmpc2->raw_type==RT_U8)) {
 	ptr=*ptr;
 	if (ChkPtr(ptr)) {
 	  if (dynamic) {
@@ -43,7 +43,7 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	}
       } else if (!stars) {
 	j=MinI64(ml->dim.total_cnt,32);
-	if (tempc2->raw_type==RT_I8 || tempc2->raw_type==RT_U8) {
+	if (tmpc2->raw_type==RT_I8 || tmpc2->raw_type==RT_U8) {
 	  if (j==1) {
 	    if (dynamic) {
 	      doc_e=DocPrint(doc,"$$DA-TRM+RD+UD,RT=U8,A=\"%%c\"$$\n");
@@ -60,7 +60,7 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	  }
 	}
 	for (i=0;i<j;i++) {
-	  switch (tempc2->raw_type) {
+	  switch (tmpc2->raw_type) {
 	    case RT_I0:
 	    case RT_U0:
 	      break;
@@ -143,9 +143,9 @@ Bool ClassRep2(CDoc *doc,U8 *_d,U8 *class_name=lastclass,
 	  DocPrint(doc,"$$TR,\"%s\"$$\n",ml->str);
 	  DocPrint(doc,"$$ID,2$$");
 	  if (!stars)
-	    ClassRep2(doc,ptr,tempc2->str,depth+1,max_depth,dynamic);
+	    ClassRep2(doc,ptr,tmpc2->str,depth+1,max_depth,dynamic);
 	  else if (stars==1)
-	    ClassRep2(doc,*ptr,tempc2->str,depth+1,max_depth,dynamic);
+	    ClassRep2(doc,*ptr,tmpc2->str,depth+1,max_depth,dynamic);
 	  DocPrint(doc,"$$ID,-2$$");
 	}
       } else
@@ -202,15 +202,15 @@ public U0 ClassRepD(U8 *_d,U8 *class_name=lastclass,
   }
 }
 
-U0 UpdateRegVarImg(CHashFun *tempf,U8 *_b,CTask *task)
+U0 UpdateRegVarImg(CHashFun *tmpf,U8 *_b,CTask *task)
 {
   CMemberLst *ml;
-  CHashClass *tempc;
-  ml=tempf->member_lst_and_root;
+  CHashClass *tmpc;
+  ml=tmpf->member_lst_and_root;
   while (ml) {
     if (ml->reg!=REG_NONE) {
-      tempc=OptClassFwd(ml->member_class);
-      MemCpy(_b+ml->offset,TaskRegAddr(task,ml->reg),tempc->size);
+      tmpc=OptClassFwd(ml->member_class);
+      MemCpy(_b+ml->offset,TaskRegAddr(task,ml->reg),tmpc->size);
     }
     ml=ml->next;
   }
@@ -220,32 +220,32 @@ public U0 FunRep(U8 *st,U8 *rbp=NULL,I64 max_depth=2,CTask *task=NULL)
 {//Shows names and vals of a fun's local vars using compiler's info.
   I64 size;
   U8 *img;
-  CHashFun *tempf=HashFind(st,Fs->hash_table,HTT_FUN);
-  CMemberLst *tempm;
-  if (tempf) {
+  CHashFun *tmpf=HashFind(st,Fs->hash_table,HTT_FUN);
+  CMemberLst *tmpm;
+  if (tmpf) {
     if (rbp) {
       if (task) {
-//tempf->size is negative.  It's the bottom
+//tmpf->size is negative.  It's the bottom
 	//of the fun local var space relative to RBP .
-	size=tempf->arg_cnt*8-tempf->size+16;
+	size=tmpf->arg_cnt*8-tmpf->size+16;
 
 	img=MAlloc(size);
-	MemCpy(img,rbp+tempf->size,size);
-	UpdateRegVarImg(tempf,img-tempf->size,task);
-	ClassRep(img-tempf->size,st,max_depth,TRUE,rbp-img+tempf->size);
+	MemCpy(img,rbp+tmpf->size,size);
+	UpdateRegVarImg(tmpf,img-tmpf->size,task);
+	ClassRep(img-tmpf->size,st,max_depth,TRUE,rbp-img+tmpf->size);
 	Free(img);
       } else
 	ClassRep(rbp,st,max_depth,TRUE);
     } else {
-      tempm=tempf->member_lst_and_root;
-      while (tempm) {
-	if (0<=tempm->reg<NUM_REGS)
-	  "%08Z %s\n",tempm->reg,"ST_U64_REGS",tempm->str;
+      tmpm=tmpf->member_lst_and_root;
+      while (tmpm) {
+	if (0<=tmpm->reg<NUM_REGS)
+	  "%08Z %s\n",tmpm->reg,"ST_U64_REGS",tmpm->str;
 	else
-	  "%08tX %s\n",tempm->offset,tempm->str;
-	tempm=tempm->next;
+	  "%08tX %s\n",tmpm->offset,tmpm->str;
+	tmpm=tmpm->next;
       }
-      "%08tX Stk Size\n",tempf->size;
+      "%08tX Stk Size\n",tmpf->size;
     }
   }
 }
@@ -254,17 +254,17 @@ public U0 FunRep(U8 *st,U8 *rbp=NULL,I64 max_depth=2,CTask *task=NULL)
 public U0 Uf(U8 *st)
 {//Unassembles a named fun
   I64 i;
-  CHashSrcSym *tempf;
+  CHashSrcSym *tmpf;
   CDbgInfo *dbg_info;
-  if (tempf=HashFind(st,Fs->hash_table,HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-    if (tempf->type&HTT_FUN)
+  if (tmpf=HashFind(st,Fs->hash_table,HTT_FUN|HTT_EXPORT_SYS_SYM)) {
+    if (tmpf->type&HTT_FUN)
       FunRep(st);
-    if (dbg_info=tempf->dbg_info) {
+    if (dbg_info=tmpf->dbg_info) {
       i=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line]
 	    -dbg_info->body[0];
       Un(dbg_info->body[0],i);
       "Code Size:%04X\n",i;
     } else
-      U(HashVal(tempf));
+      U(HashVal(tmpf));
   }
 }

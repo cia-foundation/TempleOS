@@ -9,7 +9,7 @@ U0 UserStartUp()
   WinToTop;
   WinZBufUpdate;
   Dir;
-  "$TX,"81,208",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
+  "$TX,"81,223",D="DD_TEMPLEOS_LOC_OFFICIAL"$LOC:";
   CPURep;
 }
 
@@ -38,8 +38,8 @@ U0 StartUpTasks()
 }
 
 if (DrvIsWritable(':')) {
-  DelTree("::/Temp/ScreenShots");
-  MkDir("::/Temp/ScreenShots");
+  DelTree("::/Tmp/ScrnShots");
+  MkDir("::/Tmp/ScrnShots");
 }
 
 StartUpTasks;

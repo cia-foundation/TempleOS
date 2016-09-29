@@ -114,21 +114,21 @@ U0 SetMenu()
 {
   I64 i;
   U8 buf[STR_LEN];
-  CMenuEntry *tempse;
+  CMenuEntry *tmpse;
   for (i=0;i<=9;i++) {
     StrPrint(buf,"Settings/Layer%d",i);
-    if (tempse=MenuEntryFind(Fs->cur_menu,buf)) {
+    if (tmpse=MenuEntryFind(Fs->cur_menu,buf)) {
       if (i==tt.z)
-	tempse->checked=TRUE;
+	tmpse->checked=TRUE;
       else
-	tempse->checked=FALSE;
+	tmpse->checked=FALSE;
     }
   }
-  if (tempse=MenuEntryFind(Fs->cur_menu,"Settings/Ends")) {
+  if (tmpse=MenuEntryFind(Fs->cur_menu,"Settings/Ends")) {
     if (tt.ends)
-      tempse->checked=TRUE;
+      tmpse->checked=TRUE;
     else
-      tempse->checked=FALSE;
+      tmpse->checked=FALSE;
   }
 }
 

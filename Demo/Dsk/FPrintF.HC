@@ -4,28 +4,28 @@ hold the file until you are done.  The $LK,"CDoc",A="MN:CDoc"$
 framework is convenient for this.
 */
 
-U0 TreeSub(CDoc *doc,CDirEntry *tempde)
+U0 TreeSub(CDoc *doc,CDirEntry *tmpde)
 {
-  CDirEntry *tempde1;
-  while (tempde) {
-    tempde1=tempde->next;
-    if (tempde->attr & RS_ATTR_DIR) {
+  CDirEntry *tmpde1;
+  while (tmpde) {
+    tmpde1=tmpde->next;
+    if (tmpde->attr & RS_ATTR_DIR) {
       DocPrint(doc,"$$TR,\"\"$$");
       DocPrint(doc,"$$MA,T=\"%s\",LM=\"Cd(\\\"%s\\\");Dir;\n\"$$\n",
-	    tempde->name,tempde->full_name);
-      if (tempde->sub) {
+	    tmpde->name,tmpde->full_name);
+      if (tmpde->sub) {
 	DocPrint(doc,"$$ID,+2$$");
-	TreeSub(doc,tempde->sub);
+	TreeSub(doc,tmpde->sub);
 	DocPrint(doc,"$$ID,-2$$");
       }
     } else
       DocPrint(doc,"$$LK,\"%s\",A=\"FI:%s\"$$\n",
-	    tempde->name,tempde->full_name);
+	    tmpde->name,tmpde->full_name);
 //Note there is also a routine
       //to delete an entire CDirEntry tree.
       //See $LK,"DirTreeDel",A="MN:DirTreeDel"$().
-    DirEntryDel(tempde);
-    tempde=tempde1;
+    DirEntryDel(tmpde);
+    tmpde=tmpde1;
   }
 }
 

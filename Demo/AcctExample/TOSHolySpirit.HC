@@ -76,11 +76,11 @@ U0 TOSBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
     DocPrint(doc_out,"-->Line:%d\n",start);
 
     verse=BibleLine2Verse(start);
-    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.DD"$ (%s)\n\nGod says...\n$$RED$$",verse);
+    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$ (%s)\n\nGod says...\n$$RED$$",verse);
     Free(verse);
 
     doc_in=DocNew;
-    BibleLines(doc_in,start,num_lines,"::/Home/Sup1/Sup1Blog/NumBible.DD");
+    BibleLines(doc_in,start,num_lines,"::/Home/Sup1/Sup1Blog/NumBible.TXT");
     while (TRUE) {//Del leading blanks
       doc_e=doc_in->head.next;
       if (doc_e==doc_in)
@@ -116,23 +116,23 @@ U0 TOSBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
 public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
 	I64 rand_i32=MIN_I64,I64 verbosity=GBP_SHORT)
 {//Make God pick a book passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  CDirEntry *tempde=FilesFind(files_find_mask,
+  CDirEntry *tmpde=FilesFind(files_find_mask,
 	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT),
-	*tempde1=tempde;
+	*tmpde1=tmpde;
   I64 i=0;
   U8 *st,*st2=NULL;
-  while (tempde) {
-    st=FileRead(tempde->full_name);
-    tempde->user_data=StrLen(st);
+  while (tmpde) {
+    st=FileRead(tmpde->full_name);
+    tmpde->user_data=StrLen(st);
     if (verbosity==GBP_LONG)
       "%08X-",i;
-    if (tempde->user_data>=len)
-      i+=tempde->user_data+1-len;
+    if (tmpde->user_data>=len)
+      i+=tmpde->user_data+1-len;
     if (verbosity==GBP_LONG)
       "%08X:$$LK,\"%s\",A=\"FI:%s\"$$\n",
-	    i-1,tempde->full_name+2,tempde->full_name;
+	    i-1,tmpde->full_name+2,tmpde->full_name;
     Free(st);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   if (rand_i32<0)
     rand_i32=GodBits(32);
@@ -144,21 +144,21 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   if (verbosity>=GBP_MEDIUM)
     "=%08X.%08X\n",i.u32[1],i.u32[0];
   i=i.u32[1];
-  tempde=tempde1;
-  while (tempde) {
-    if (!st2 && tempde->user_data>=len) {
-      i-=tempde->user_data+1-len;
+  tmpde=tmpde1;
+  while (tmpde) {
+    if (!st2 && tmpde->user_data>=len) {
+      i-=tmpde->user_data+1-len;
       if (i<0) {
-	st=FileRead(tempde->full_name);
-	st2=st+(tempde->user_data+1-len)+i;
+	st=FileRead(tmpde->full_name);
+	st2=st+(tmpde->user_data+1-len)+i;
 	st2[len]=0;
-	"%s\nGod says...\n$$RED$$%s$$FG$$\n",tempde->full_name,st2;
+	"%s\nGod says...\n$$RED$$%s$$FG$$\n",tmpde->full_name,st2;
 	Free(st);
       }
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 U8 *GodVideoRead(U8 *filename,I64 line)
@@ -386,20 +386,20 @@ class CCertRandDec5Form
 U0 GodWordBatch(CHexWordForm *url)
 {
   I64 i=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
 
   FifoU8Flush(god.fifo);
   GodHexIns(url->rnd0);
   GodHexIns(url->rnd1);
   GodHexIns(url->rnd2);
   GodHexIns(url->rnd3);
-  tempde=tempde1=FilesFind(god.word_file_mask,god.word_fuf_flags);
-  while (tempde) {
-    PutFileLink(tempde->full_name);
+  tmpde=tmpde1=FilesFind(god.word_file_mask,god.word_fuf_flags);
+  while (tmpde) {
+    PutFileLink(tmpde->full_name);
     '\n';
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 
   "\n$$RED$$";
   if (*url->rnd0)
@@ -443,7 +443,7 @@ U0 NISTBeaconURL(I64 timestamp)
   U8 *tag;
   CDateStruct ds;
   CDate dt=(timestamp-NIST_TIME_OFFSET)*CDATE_FREQ+Str2Date("1/1/1970");
-  Date2Struct(&ds,dt+local_time_offset);
+  Date2Struct(&ds,dt+local_time_offset+30*CDATE_FREQ);
   "$$TX,\"NIST Beacon Date:%D Time:%02d:%02d Unix TimeStamp:%u\","
 	"HTML=\"https://beacon.nist.gov/home\"$$\n",dt,ds.hour,ds.min,timestamp;
   tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",timestamp);
@@ -816,34 +816,34 @@ U0 TOSInsMisc()
 
 U0 GodCodeJmp()
 {//$LK,"::/Adam/God/HSNotes.DD"$
-  CDirEntry *tempde1=FilesFind("/*",
+  CDirEntry *tmpde1=FilesFind("/*",
 	FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUSTER_ORDER),
-	*tempde=tempde1;
+	*tmpde=tmpde1;
   I64 cnt=0,num;
   CDoc *doc;
   U8 *st;
-  while (tempde) {
-    doc=DocRead(tempde->full_name);
-    tempde->user_data=doc->head.y;
+  while (tmpde) {
+    doc=DocRead(tmpde->full_name);
+    tmpde->user_data=doc->head.y;
     cnt+=doc->head.y;
     DocDel(doc);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
 
   FifoU8Flush(god.fifo);
   GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
   num=GodBits(GOD_GOOD_BITS)%cnt;
 
-  tempde=tempde1;
-  while (tempde) {
-    num-=tempde->user_data;
+  tmpde=tmpde1;
+  while (tmpde) {
+    num-=tmpde->user_data;
     if (num<0) {
-      st=MStrPrint("FL:%s,%d",tempde->full_name,-num);
+      st=MStrPrint("FL:%s,%d",tmpde->full_name,-num);
       break;
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   Ed(st);
   Free(st);
 }

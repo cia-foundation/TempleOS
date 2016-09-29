@@ -344,7 +344,7 @@ public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
     if ((doc_ce2->y<y || doc_ce2->x<x ||
 	  doc_ce2->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP) ||
 	  doc_ce2->x==x && !doc_ce2->max_col &&
-	  Bt(doldoc.type_flags_nontag_invisible,doc_ce2->type_u8)) && sc>=0)
+	  Bt(doldoc.type_flags_nontag_invis,doc_ce2->type_u8)) && sc>=0)
       BEqu(&doc_ce2->type,DOCEt_SEL,sc&SCF_SHIFT);
     if (doc_ce2==doc_ce) break;
     doc_ce2=doc_ce2->next;
@@ -455,7 +455,7 @@ U0 EdCharIns(I64 ch,I64 sc,CDoc *doc)
       } else {
 	doc->dollar_buf[doc->dollar_buf_ptr]=0;
 	doc->flags&=~DOCF_IN_DOLLAR;
-	DocPrint(doc,doc->dollar_buf);
+	DocPrint(doc,"%s",doc->dollar_buf);
 	doc->dollar_buf_ptr=0;
 	goto ic_done;
       }
@@ -475,8 +475,8 @@ U0 EdCharIns(I64 ch,I64 sc,CDoc *doc)
 	!(sc & (SCF_CTRL|SCF_SHIFT)) &&
 	doc_ce->de_flags &
 	(DOCEF_LINK|DOCEF_TREE|DOCEF_LST|DOCEF_CHECK_COLLAPSABLE|
-	DOCEF_LEFT_MACRO|DOCEF_LEFT_EXP|DOCEF_LEFT_CB|DOCEF_LEFT_AUTO |
-	DOCEF_RIGHT_MACRO|DOCEF_RIGHT_EXP|DOCEF_RIGHT_CB|DOCEF_RIGHT_AUTO)) {
+	DOCEF_LEFT_MACRO|DOCEF_LEFT_EXP|DOCEF_LEFT_CB|DOCEF_LEFT_IN_STR |
+	DOCEF_RIGHT_MACRO|DOCEF_RIGHT_EXP|DOCEF_RIGHT_CB|DOCEF_RIGHT_IN_STR)) {
     doc->cmd_U8=ch;
     DocEntryRun(doc,doc_ce,FALSE);
     DocLock(doc);

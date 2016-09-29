@@ -83,7 +83,7 @@ $SP,"<1>",BI=1$
 
 
 
-#define SCREEN_SCALE		512
+#define SCRN_SCALE		512
 #define PLOT_GRID_WIDTH		24
 #define PLOT_GRID_HEIGHT	24
 #define MAN_HEIGHT		125
@@ -110,10 +110,10 @@ U0 CFTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 {
   I64 zz;
   Mat4x4MulXYZ(dc->r,x,y,z);
-  zz=SCREEN_SCALE/3+*z;
+  zz=SCRN_SCALE/3+*z;
   if (zz<1) zz=1;
-  *x=SCREEN_SCALE/2* *x/zz;
-  *y=SCREEN_SCALE/2* (*y+MAN_HEIGHT)/zz;
+  *x=SCRN_SCALE/2* *x/zz;
+  *y=SCRN_SCALE/2* (*y+MAN_HEIGHT)/zz;
   *x+=dc->x;
   *y+=dc->y;
   *z+=dc->z;
@@ -131,8 +131,8 @@ Bool LOSPlot(U8 *,I64 x,I64 y,I64)
 
 Bool LOS(I64 x1,I64 y1,I64 x2,I64 y2)
 {//Line of sight
-  return Line(NULL,x1*LOS_SCALE/SCREEN_SCALE,y1*LOS_SCALE/SCREEN_SCALE,0,
-	x2*LOS_SCALE/SCREEN_SCALE,y2*LOS_SCALE/SCREEN_SCALE,0,&LOSPlot);
+  return Line(NULL,x1*LOS_SCALE/SCRN_SCALE,y1*LOS_SCALE/SCRN_SCALE,0,
+	x2*LOS_SCALE/SCRN_SCALE,y2*LOS_SCALE/SCRN_SCALE,0,&LOSPlot);
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -141,28 +141,28 @@ U0 DrawIt(CTask *task,CDC *dc)
 	c,x1w,y1w,x1h,y1h,xh,yh,zh,
 	cx=task->pix_width/2,
 	cy=task->pix_height/2;
-  U8 *temps;
+  U8 *tmps;
   F64 tt;
   CD3I32 poly[4];
-  Monster *tempm;
+  Monster *tmpm;
 
   DCDepthBufAlloc(dc);
   MemSet(panels_processed_bitmap,0,(map_width*map_height+7)>>3);
 
-  //World to screen
+  //World to scrn
   Mat4x4RotZ(dc->r,man_é+ã/2);
   Mat4x4RotX(dc->r,ã/2);
   DCMat4x4Set(dc,dc->r);
 
-  xh=-man_xx/SCREEN_SCALE; yh=-man_yy/SCREEN_SCALE; zh=0;
+  xh=-man_xx/SCRN_SCALE; yh=-man_yy/SCRN_SCALE; zh=0;
   Mat4x4MulXYZ(dc->r,&xh,&yh,&zh);
   Mat4x4TranslationEqu(dc->r,xh,yh,zh);
 
-  //Screen to world
+  //Scrn to world
   s2w=Mat4x4IdentNew(task);
   Mat4x4RotX(s2w,-ã/2);
   Mat4x4RotZ(s2w,-man_é-ã/2);
-  xh=0; yh=0; zh=SCREEN_SCALE;
+  xh=0; yh=0; zh=SCRN_SCALE;
   Mat4x4MulXYZ(s2w,&xh,&yh,&zh);
 
   //Rotate light source
@@ -194,12 +194,12 @@ U0 DrawIt(CTask *task,CDC *dc)
     x1w=x1h;
     y1w=y1h;
     for (i=0;i<PLOT_GRID_WIDTH*4;i++) {
-      xx=x1w/SCREEN_SCALE; yy=y1w/SCREEN_SCALE;
-      x=xx*SCREEN_SCALE-man_xx; y=yy*SCREEN_SCALE-man_yy;
+      xx=x1w/SCRN_SCALE; yy=y1w/SCRN_SCALE;
+      x=xx*SCRN_SCALE-man_xx; y=yy*SCRN_SCALE-man_yy;
       if (1<=xx<map_width-1 && 1<=yy<map_height-1 &&
 	    !LBts(panels_processed_bitmap,yy*map_width+xx)) {
 	if ((c=map[yy*map_width+xx]) &&
-	      LOS(xx*SCREEN_SCALE+SCREEN_SCALE/2,yy*SCREEN_SCALE+SCREEN_SCALE/2,
+	      LOS(xx*SCRN_SCALE+SCRN_SCALE/2,yy*SCRN_SCALE+SCRN_SCALE/2,
 	      man_xx,man_yy)) {
 	  if (c==YELLOW)
 	    dc->color=DKGRAY;
@@ -208,62 +208,62 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  poly[0].x=x;
 	  poly[0].y=y;
 	  poly[0].z=0;
-	  poly[1].x=x+SCREEN_SCALE;
+	  poly[1].x=x+SCRN_SCALE;
 	  poly[1].y=y;
 	  poly[1].z=0;
-	  poly[2].x=x+SCREEN_SCALE;
-	  poly[2].y=y+SCREEN_SCALE;
+	  poly[2].x=x+SCRN_SCALE;
+	  poly[2].y=y+SCRN_SCALE;
 	  poly[2].z=0;
 	  poly[3].x=x;
-	  poly[3].y=y+SCREEN_SCALE;
+	  poly[3].y=y+SCRN_SCALE;
 	  poly[3].z=0;
 	  GrFillPoly3(dc,4,poly);
 	  if (c==GREEN) {
-	    x1=x+SCREEN_SCALE/2;
-	    y1=y+SCREEN_SCALE/2;
+	    x1=x+SCRN_SCALE/2;
+	    y1=y+SCRN_SCALE/2;
 	    z1=0;
 	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
-	      SpriteMat3B(dc,x+SCREEN_SCALE/2,y+SCREEN_SCALE/2,0,$IB,"<5>",BI=5$,r3);
+	      SpriteMat3B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<5>",BI=5$,r3);
 	  } else if (c==YELLOW) {
-	    x1=x+SCREEN_SCALE/2;
-	    y1=y+SCREEN_SCALE/2;
+	    x1=x+SCRN_SCALE/2;
+	    y1=y+SCRN_SCALE/2;
 	    z1=0;
 	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
-	      SpriteMat3B(dc,x+SCREEN_SCALE/2,y+SCREEN_SCALE/2,0,$IB,"<6>",BI=6$,r3);
+	      SpriteMat3B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<6>",BI=6$,r3);
 	  }
 
 	  if (!map[(yy+1)*map_width+xx]) {
 	    dc->color=LTGRAY;
 	    poly[0].x=x;
-	    poly[0].y=y+SCREEN_SCALE;
+	    poly[0].y=y+SCRN_SCALE;
 	    poly[0].z=0;
-	    poly[1].x=x+SCREEN_SCALE;
-	    poly[1].y=y+SCREEN_SCALE;
+	    poly[1].x=x+SCRN_SCALE;
+	    poly[1].y=y+SCRN_SCALE;
 	    poly[1].z=0;
-	    poly[2].x=x+SCREEN_SCALE;
-	    poly[2].y=y+SCREEN_SCALE;
-	    poly[2].z=SCREEN_SCALE;
+	    poly[2].x=x+SCRN_SCALE;
+	    poly[2].y=y+SCRN_SCALE;
+	    poly[2].z=SCRN_SCALE;
 	    poly[3].x=x;
-	    poly[3].y=y+SCREEN_SCALE;
-	    poly[3].z=SCREEN_SCALE;
+	    poly[3].y=y+SCRN_SCALE;
+	    poly[3].z=SCRN_SCALE;
 	    GrFillPoly3(dc,4,poly);
 	  }
 	  if (!map[yy*map_width+xx+1]) {
 	    dc->color=WHITE;
-	    poly[0].x=x+SCREEN_SCALE;
+	    poly[0].x=x+SCRN_SCALE;
 	    poly[0].y=y;
 	    poly[0].z=0;
-	    poly[1].x=x+SCREEN_SCALE;
-	    poly[1].y=y+SCREEN_SCALE;
+	    poly[1].x=x+SCRN_SCALE;
+	    poly[1].y=y+SCRN_SCALE;
 	    poly[1].z=0;
-	    poly[2].x=x+SCREEN_SCALE;
-	    poly[2].y=y+SCREEN_SCALE;
-	    poly[2].z=SCREEN_SCALE;
-	    poly[3].x=x+SCREEN_SCALE;
+	    poly[2].x=x+SCRN_SCALE;
+	    poly[2].y=y+SCRN_SCALE;
+	    poly[2].z=SCRN_SCALE;
+	    poly[3].x=x+SCRN_SCALE;
 	    poly[3].y=y;
-	    poly[3].z=SCREEN_SCALE;
+	    poly[3].z=SCRN_SCALE;
 	    GrFillPoly3(dc,4,poly);
 	  }
 	  if (!map[(yy-1)*map_width+xx]) {
@@ -271,15 +271,15 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    poly[0].x=x;
 	    poly[0].y=y;
 	    poly[0].z=0;
-	    poly[1].x=x+SCREEN_SCALE;
+	    poly[1].x=x+SCRN_SCALE;
 	    poly[1].y=y;
 	    poly[1].z=0;
-	    poly[2].x=x+SCREEN_SCALE;
+	    poly[2].x=x+SCRN_SCALE;
 	    poly[2].y=y;
-	    poly[2].z=SCREEN_SCALE;
+	    poly[2].z=SCRN_SCALE;
 	    poly[3].x=x;
 	    poly[3].y=y;
-	    poly[3].z=SCREEN_SCALE;
+	    poly[3].z=SCRN_SCALE;
 	    GrFillPoly3(dc,4,poly);
 	  }
 	  if (!map[yy*map_width+xx-1]) {
@@ -288,14 +288,14 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    poly[0].y=y;
 	    poly[0].z=0;
 	    poly[1].x=x;
-	    poly[1].y=y+SCREEN_SCALE;
+	    poly[1].y=y+SCRN_SCALE;
 	    poly[1].z=0;
 	    poly[2].x=x;
-	    poly[2].y=y+SCREEN_SCALE;
-	    poly[2].z=SCREEN_SCALE;
+	    poly[2].y=y+SCRN_SCALE;
+	    poly[2].z=SCRN_SCALE;
 	    poly[3].x=x;
 	    poly[3].y=y;
-	    poly[3].z=SCREEN_SCALE;
+	    poly[3].z=SCRN_SCALE;
 	    GrFillPoly3(dc,4,poly);
 	  }
 	}
@@ -308,9 +308,9 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   //Draw Monsters
-  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
-    x=tempm->x;
-    y=tempm->y;
+  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+    x=tmpm->x;
+    y=tmpm->y;
     if (LOS(x,y,man_xx,man_yy)) {
       x-=man_xx;
       y-=man_yy;
@@ -319,13 +319,13 @@ U0 DrawIt(CTask *task,CDC *dc)
       zz=0;
       DCTransform(dc,&xx,&yy,&zz);
       if (zz>0) {
-	if (tempm->dead)
+	if (tmpm->dead)
 	  SpriteMat3B(dc,x,y,0,$IB,"<2>",BI=2$,r2);
 	else {
 	  tt=Tri(tS,1.0);
-	  temps=SpriteInterpolate(tt,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$);
-	  SpriteMat3B(dc,x,y,0,temps,r1);
-	  Free(temps);
+	  tmps=SpriteInterpolate(tt,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$);
+	  SpriteMat3B(dc,x,y,0,tmps,r1);
+	  Free(tmps);
 	}
       }
     }
@@ -350,12 +350,12 @@ U0 DrawIt(CTask *task,CDC *dc)
 
     //Draw Things on heads-up Map
   dc->color=LTPURPLE;
-  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++)
-    if (!tempm->dead)
-      GrPlot3(dc,2*(tempm->x/SCREEN_SCALE),
-	    2*(map_height-1-tempm->y/SCREEN_SCALE),0);
+  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+    if (!tmpm->dead)
+      GrPlot3(dc,2*(tmpm->x/SCRN_SCALE),
+	    2*(map_height-1-tmpm->y/SCRN_SCALE),0);
   dc->color=LTCYAN;
-  GrPlot3(dc,2*(man_xx/SCREEN_SCALE),2*(map_height-1-man_yy/SCREEN_SCALE),0);
+  GrPlot3(dc,2*(man_xx/SCRN_SCALE),2*(map_height-1-man_yy/SCRN_SCALE),0);
 
   if (tf) {
     dc->color=LTRED;
@@ -378,13 +378,13 @@ U0 Fire()
 {
   I64 i,x,y;
   F64 d,dx,dy,xx=Cos(man_é),yy=Sin(man_é);
-  Monster *tempm;
+  Monster *tmpm;
 
   Noise(100,300,1000);
-  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
-    x=tempm->x;
-    y=tempm->y;
-    if (!tempm->dead &&
+  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+    x=tmpm->x;
+    y=tmpm->y;
+    if (!tmpm->dead &&
 	  LOS(x,y,man_xx,man_yy)) {
       dx=x-man_xx;
       dy=man_yy-y;
@@ -392,7 +392,7 @@ U0 Fire()
 	dx/=d;
 	dy/=d;
 	if (dx*xx+dy*yy>0.995) {
-	  tempm->dead=TRUE;
+	  tmpm->dead=TRUE;
 	  if (!--monsters_left) {
 	    tf=tS;
 	    if (tf-t0<best_score)
@@ -408,7 +408,7 @@ U0 Init()
 {
   I64 i,x,y;
   CDC *dc;
-  Monster *tempm;
+  Monster *tmpm;
 
   DocClear;
   "$$BG,BLACK$$%h*c",TEXT_ROWS/2,'\n';
@@ -424,16 +424,16 @@ U0 Init()
     for (x=0;x<map_width-2;x++)
       map[(map_height-2-y)*map_width+x+1]=GrPeek(dc,x*MAP_SCALE,y*MAP_SCALE);
   DCDel(dc);
-  man_xx=(1+MAN_START_X)*SCREEN_SCALE;
-  man_yy=(map_height-1-MAN_START_Y)*SCREEN_SCALE;
+  man_xx=(1+MAN_START_X)*SCRN_SCALE;
+  man_yy=(map_height-1-MAN_START_Y)*SCRN_SCALE;
   man_é=0;
 
-  for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++) {
-    tempm->dead=FALSE;
+  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+    tmpm->dead=FALSE;
     do {
-      tempm->x=RandU64%((map_width-2)*SCREEN_SCALE)+SCREEN_SCALE;
-      tempm->y=RandU64%((map_height-2)*SCREEN_SCALE)+SCREEN_SCALE;
-    } while (!map[(tempm->y/SCREEN_SCALE)*map_width+tempm->x/SCREEN_SCALE]);
+      tmpm->x=RandU64%((map_width-2)*SCRN_SCALE)+SCRN_SCALE;
+      tmpm->y=RandU64%((map_height-2)*SCRN_SCALE)+SCRN_SCALE;
+    } while (!map[(tmpm->y/SCRN_SCALE)*map_width+tmpm->x/SCRN_SCALE]);
   }
   monsters_left=NUM_MONSTERS;
   tf=0;
@@ -443,33 +443,33 @@ U0 Init()
 U0 AnimateTask(I64)
 {
   I64 i,x,y,dd;
-  Monster *tempm;
+  Monster *tmpm;
 
   while (TRUE) {
-    dd=0.25*SCREEN_SCALE*Sin(tS/2);
-    for (i=0,tempm=monsters;i<NUM_MONSTERS;i++,tempm++)
-      if (!tempm->dead) {
-	x=tempm->x;
-	y=tempm->y;
+    dd=0.25*SCRN_SCALE*Sin(tS/2);
+    for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+      if (!tmpm->dead) {
+	x=tmpm->x;
+	y=tmpm->y;
 	if (i&1)
 	  x+=dd;
 	else
 	  y+=dd;
-	if (0<=x<=map_width*SCREEN_SCALE &&
-	      0<=y<=map_height*SCREEN_SCALE &&
-	      map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE]) {
-	  if (!map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE+1] &&
-		x-RoundI64(x,SCREEN_SCALE)>SCREEN_SCALE/2 ||
-		!map[(y/SCREEN_SCALE)*map_width+x/SCREEN_SCALE-1] &&
-		x-RoundI64(x,SCREEN_SCALE)<SCREEN_SCALE/2)
-	    x=RoundI64(x,SCREEN_SCALE)+SCREEN_SCALE/2;
-	  if (!map[(y/SCREEN_SCALE+1)*map_width+x/SCREEN_SCALE] &&
-		y-RoundI64(y,SCREEN_SCALE)>SCREEN_SCALE/2 ||
-		!map[(y/SCREEN_SCALE-1)*map_width+x/SCREEN_SCALE] &&
-		y-RoundI64(y,SCREEN_SCALE)<SCREEN_SCALE/2)
-	    y=RoundI64(y,SCREEN_SCALE)+SCREEN_SCALE/2;
-	  tempm->x=x;
-	  tempm->y=y;
+	if (0<=x<=map_width*SCRN_SCALE &&
+	      0<=y<=map_height*SCRN_SCALE &&
+	      map[(y/SCRN_SCALE)*map_width+x/SCRN_SCALE]) {
+	  if (!map[(y/SCRN_SCALE)*map_width+x/SCRN_SCALE+1] &&
+		x-RoundI64(x,SCRN_SCALE)>SCRN_SCALE/2 ||
+		!map[(y/SCRN_SCALE)*map_width+x/SCRN_SCALE-1] &&
+		x-RoundI64(x,SCRN_SCALE)<SCRN_SCALE/2)
+	    x=RoundI64(x,SCRN_SCALE)+SCRN_SCALE/2;
+	  if (!map[(y/SCRN_SCALE+1)*map_width+x/SCRN_SCALE] &&
+		y-RoundI64(y,SCRN_SCALE)>SCRN_SCALE/2 ||
+		!map[(y/SCRN_SCALE-1)*map_width+x/SCRN_SCALE] &&
+		y-RoundI64(y,SCRN_SCALE)<SCRN_SCALE/2)
+	    y=RoundI64(y,SCRN_SCALE)+SCRN_SCALE/2;
+	  tmpm->x=x;
+	  tmpm->y=y;
 	}
       }
     Sleep(20);
@@ -497,13 +497,13 @@ U0 SongTask(I64)
 
 U0 MoveMan(F64 é)
 {
-  I64 x,y,color,step=SCREEN_SCALE/2;
+  I64 x,y,color,step=SCRN_SCALE/2;
   do {
     x=man_xx+step*Cos(é);
     y=man_yy-step*Sin(é);
-    x=Clamp(x,0,map_width*SCREEN_SCALE);
-    y=Clamp(y,0,map_height*SCREEN_SCALE);
-    color=map[y/SCREEN_SCALE*map_width+x/SCREEN_SCALE];
+    x=Clamp(x,0,map_width*SCRN_SCALE);
+    y=Clamp(y,0,map_height*SCRN_SCALE);
+    color=map[y/SCRN_SCALE*map_width+x/SCRN_SCALE];
     if (color==DKGRAY || color==GREEN) {
       man_xx=x;
       man_yy=y;

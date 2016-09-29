@@ -74,7 +74,7 @@ ANSWERS:
 
 7) You can access the lowest byte of any reg.  You can access AH but not the second-to-lowest byte of ESI.
 
-8) To call a subroutine farther than 2 Gig away, you put the address into RAX, then CALL RAX.
+8) To call a subroutine farther than 2Gig away, you put the address into RAX, then CALL RAX.
 
 9) CALL REL32 is significantly faster.  See $LK,"::/Demo/Lectures/InterruptDemo.HC"$.
 

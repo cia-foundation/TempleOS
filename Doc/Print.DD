@@ -56,16 +56,16 @@ $LK,"MStrPrint",A="MN:MStrPrint"$(U8 *fmt,...) is like $LK,"StrPrint",A="MN:StrP
 
 $LK,"CatPrint",A="MN:CatPrint"$(U8 *_dst,U8 *fmt,...) concatenates a formated string.
 
-$LK,"Auto",A="MN:Auto"$(U8 *fmt,...) sends text to the current task's input buffer.
-$LK,"AutoStr",A="MN:AutoStr"$(U8 *fmt,...) sends text of an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$ to the keyboard stream of the current TASK but can also do mouse cmds.
+$LK,"In",A="MN:In"$(U8 *fmt,...) sends text to the current task's input buffer.
+$LK,"InStr",A="MN:InStr"$(U8 *fmt,...) sends text of an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$ to the keyboard stream of the current TASK but can also do mouse cmds.
 
 $LK,"XTalk",A="MN:XTalk"$(CTask *task,U8 *fmt,...) and text to another task's input buffer.
-$LK,"XTalkStr",A="MN:XTalkStr"$(CTask *task,U8 *fmt,...) sends text of an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$ to the keyboard stream of another TASK but can also do mouse cmds.
+$LK,"XTalkStr",A="MN:XTalkStr"$(CTask *task,U8 *fmt,...) sends text of an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$ to the keyboard stream of another TASK but can also do mouse cmds.
 
 $LK,"DocPrint",A="MN:DocPrint"$(CDoc *doc,U8 *fmt,...) sends text to a document.  You can buffer to a Doc and save it, providing the functionality of $FG,2$fprintf$FG$.  See $LK,"::/Demo/Dsk/FPrintF.HC"$.
 
-$LK,"Adam",A="MN:Adam"$(U8 *fmt,...) sends text to the adam task to be compiled and run.
-$LK,"AdamLog",A="MN:AdamLog"$(U8 *fmt,...) and $LK,"AdamErr",A="MN:AdamErr"$(U8 *fmt,...) send text to the adam task to be displayed.
+$LK,"Adam",A="MN:Adam"$(U8 *fmt,...) sends text to the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ to be compiled and run.
+$LK,"AdamLog",A="MN:AdamLog"$(U8 *fmt,...) and $LK,"AdamErr",A="MN:AdamErr"$(U8 *fmt,...) send text to the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ to be displayed.
 
 $LK,"StreamPrint",A="MN:StreamPrint"$(U8 *fmt,...) sends text to the stream of code being compiled and must reside in a $FG,2$#exe{}$FG$ blk.
 
@@ -75,9 +75,9 @@ $LK,"TextPrint",A="MN:TextPrint"$(CTask *task,I64 x,I64 y,I64 attr,U8 *fmt,...) 
 
 $LK,"ExePrint",A="MN:ExePrint"$(U8 *fmt,...) compiles and execute a string.  Note: It returns the res of the last executed expression.
 
-$LK,"AFPrint",A="MN:AFPrint"$(I64 ms,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
+$LK,"InPrint",A="MN:InPrint"$(I64 ms,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
 
-$LK,"RawPrint",A="MN:RawPrint"$(I64 ms,U8 *fmt,...) sends direct to screen memory, bypassing window manager.
+$LK,"RawPrint",A="MN:RawPrint"$(I64 ms,U8 *fmt,...) sends direct to scrn memory, bypassing window manager.
 
 $LK,"User",A="MN:User"$(U8 *fmt,...) Spawns a user and execute a string on start-up.
 

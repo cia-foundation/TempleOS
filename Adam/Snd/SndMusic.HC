@@ -197,7 +197,7 @@ U0 MusicSettingsRst()
   music.note_len=1.0;
   music.meter_top=4;
   music.meter_bottom=4;
-
+  SndRst;
   PUSHFD
   CLI
   if (mp_cnt>1)

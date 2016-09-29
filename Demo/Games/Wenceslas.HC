@@ -121,9 +121,9 @@ class Step
 U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 r[16],i,w=task->pix_width,h=task->pix_height,x,y;
-  U8 *img,*temps;
-  Step *tempst;
-  Peasant *tempp;
+  U8 *img,*tmps;
+  Step *tmpst;
+  Peasant *tmpp;
   F64 tt;
 
   dc->pen_width=1;
@@ -157,35 +157,35 @@ U0 DrawIt(CTask *task,CDC *dc)
     }
   }
 
-  tempst=step_head.next;
-  while (tempst!=&step_head) {
-    if (tS-tempst->t0<2.0)
+  tmpst=step_head.next;
+  while (tmpst!=&step_head) {
+    if (tS-tmpst->t0<2.0)
       dc->color=DKGRAY;
     else
       dc->color=LTGRAY;
     dc->pen_width=4;
-    GrPlot3(dc,tempst->x,tempst->y,0);
-    tempst=tempst->next;
+    GrPlot3(dc,tmpst->x,tmpst->y,0);
+    tmpst=tmpst->next;
   }
 
   DCDepthBufAlloc(dc);
   dc->flags|=DCF_TRANSFORMATION;
   dc->pen_width=1;
-  tempp=peasant_head.next;
-  while (tempp!=&peasant_head) {
+  tmpp=peasant_head.next;
+  while (tmpp!=&peasant_head) {
     Mat4x4IdentEqu(r);
-    Mat4x4RotY(r,tempp->é+ã/2);
+    Mat4x4RotY(r,tmpp->é+ã/2);
     Mat4x4RotX(r,ã/6);
-    if (tempp->stopped)
-      SpriteMat3B(dc,tempp->x,tempp->y,GR_Z_ALL,peasant_imgs[0],r);
+    if (tmpp->stopped)
+      SpriteMat3B(dc,tmpp->x,tmpp->y,GR_Z_ALL,peasant_imgs[0],r);
     else {
-      temps=SpriteInterpolate(Saw(animate_mS/250.0,1.0),
+      tmps=SpriteInterpolate(Saw(animate_mS/250.0,1.0),
 	    peasant_imgs[ animate_phase   &3],
 	    peasant_imgs[(animate_phase+1)&3]);
-      SpriteMat3B(dc,tempp->x,tempp->y,GR_Z_ALL,temps,r);
-      Free(temps);
+      SpriteMat3B(dc,tmpp->x,tmpp->y,GR_Z_ALL,tmps,r);
+      Free(tmps);
     }
-    tempp=tempp->next;
+    tmpp=tmpp->next;
   }
 
   dc->pen_width=1;
@@ -195,11 +195,11 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (tS>king_timeout)
     SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,king_imgs[0],r);
   else {
-    temps=SpriteInterpolate(Saw(king_mS/250.0,1.0),
+    tmps=SpriteInterpolate(Saw(king_mS/250.0,1.0),
 	  king_imgs[ king_phase   &3],
 	  king_imgs[(king_phase+1)&3]);
-    SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,temps,r);
-    Free(temps);
+    SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,tmps,r);
+    Free(tmps);
   }
 
   dc->pen_width=1;
@@ -223,38 +223,38 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 U0 StepNew(CTask *task,I64 x,I64 y,F64 é,Bool left_right,Bool king)
 {
-  Step *temps;
+  Step *tmps;
 
   if (king) {
-    temps=MAlloc(sizeof(Step),task);
-    temps->x=x;
-    temps->y=y;
-    temps->t0=tS;
-    QueIns(temps,king_step_head.last);
+    tmps=MAlloc(sizeof(Step),task);
+    tmps->x=x;
+    tmps->y=y;
+    tmps->t0=tS;
+    QueIns(tmps,king_step_head.last);
   }
 
   if (left_right) {
-    temps=MAlloc(sizeof(Step),task);
-    temps->x=x-3.5*Sin(é)+2.0*Cos(é);
-    temps->y=y+3.5*Cos(é)+2.0*Sin(é);
-    temps->t0=tS;
-    QueIns(temps,step_head.last);
-    temps=MAlloc(sizeof(Step),task);
-    temps->x=x-3.5*Sin(é)+5.0*Cos(é);
-    temps->y=y+3.5*Cos(é)+5.0*Sin(é);
-    temps->t0=tS;
-    QueIns(temps,step_head.last);
+    tmps=MAlloc(sizeof(Step),task);
+    tmps->x=x-3.5*Sin(é)+2.0*Cos(é);
+    tmps->y=y+3.5*Cos(é)+2.0*Sin(é);
+    tmps->t0=tS;
+    QueIns(tmps,step_head.last);
+    tmps=MAlloc(sizeof(Step),task);
+    tmps->x=x-3.5*Sin(é)+5.0*Cos(é);
+    tmps->y=y+3.5*Cos(é)+5.0*Sin(é);
+    tmps->t0=tS;
+    QueIns(tmps,step_head.last);
   } else {
-    temps=MAlloc(sizeof(Step),task);
-    temps->x=x+3.5*Sin(é)+0.0*Cos(é);
-    temps->y=y-3.5*Cos(é)+0.0*Sin(é);
-    temps->t0=tS;
-    QueIns(temps,step_head.last);
-    temps=MAlloc(sizeof(Step),task);
-    temps->x=x+3.5*Sin(é)+3.0*Cos(é);
-    temps->y=y-3.5*Cos(é)+3.0*Sin(é);
-    temps->t0=tS;
-    QueIns(temps,step_head.last);
+    tmps=MAlloc(sizeof(Step),task);
+    tmps->x=x+3.5*Sin(é)+0.0*Cos(é);
+    tmps->y=y-3.5*Cos(é)+0.0*Sin(é);
+    tmps->t0=tS;
+    QueIns(tmps,step_head.last);
+    tmps=MAlloc(sizeof(Step),task);
+    tmps->x=x+3.5*Sin(é)+3.0*Cos(é);
+    tmps->y=y-3.5*Cos(é)+3.0*Sin(é);
+    tmps->t0=tS;
+    QueIns(tmps,step_head.last);
   }
 }
 
@@ -262,7 +262,7 @@ U0 Init()
 {
   I64 i,min_x,max_x,min_y,max_y,
 	w=Fs->pix_width,h=Fs->pix_height;
-  Peasant *tempp;
+  Peasant *tmpp;
 
   snow_x=snow_y=0;
   new_snow_mS=0;
@@ -281,13 +281,13 @@ U0 Init()
   SpriteExtents($IB,"<12>",BI=12$,&min_x,&max_x,&min_y,&max_y);
   QueInit(&peasant_head);
   for (i=0;i<NUM_PEASANTS;i++) {
-    tempp=MAlloc(sizeof(Peasant));
-    tempp->x=RandU16%(w-2*BORDER-(max_x-min_x+1))+BORDER-min_x;
-    tempp->y=RandU16%(h-2*BORDER-(max_y-min_y+1))+BORDER-min_y;
-    tempp->é=ã*2*Rand;
-    tempp->door_opened_t0=0;
-    tempp->stopped=FALSE;
-    QueIns(tempp,peasant_head.last);
+    tmpp=MAlloc(sizeof(Peasant));
+    tmpp->x=RandU16%(w-2*BORDER-(max_x-min_x+1))+BORDER-min_x;
+    tmpp->y=RandU16%(h-2*BORDER-(max_y-min_y+1))+BORDER-min_y;
+    tmpp->é=ã*2*Rand;
+    tmpp->door_opened_t0=0;
+    tmpp->stopped=FALSE;
+    QueIns(tmpp,peasant_head.last);
   }
   animate_phase=0;
   animate_mS=0;
@@ -310,88 +310,88 @@ U0 CleanUp()
   QueDel(&king_step_head,TRUE);
 }
 
-U0 Follow(CTask *,Peasant *tempp)
+U0 Follow(CTask *,Peasant *tmpp)
 {
-  Step *temps=king_step_head.next;
+  Step *tmps=king_step_head.next;
   F64 d,best_d=MAX_F64;
-  while (temps!=&king_step_head) {
-    if ((d=Sqr(temps->x-tempp->x)+Sqr(temps->y-tempp->y)) &&
+  while (tmps!=&king_step_head) {
+    if ((d=Sqr(tmps->x-tmpp->x)+Sqr(tmps->y-tmpp->y)) &&
 	  d<15*15) {
-      d+=1000*Sqr(tS-temps->t0);
+      d+=1000*Sqr(tS-tmps->t0);
       if (d<best_d) {
 	best_d=d;
-	tempp->é=Arg(temps->x-tempp->x,temps->y-tempp->y);
+	tmpp->é=Arg(tmps->x-tmpp->x,tmps->y-tmpp->y);
       }
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 }
 
 U0 AnimateTask(I64)
 {
-  Step *temps,*temps1;
-  Peasant *tempp;
+  Step *tmps,*tmps1;
+  Peasant *tmpp;
   I64 i,w,h;
   while (TRUE) {
     w=Fs->parent_task->pix_width;
     h=Fs->parent_task->pix_height;
 
-    temps=step_head.next;
-    while (temps!=&step_head) {
-      temps1=temps->next;
-      if (tS-temps->t0>5.0) {
-	QueRem(temps);
-	Free(temps);
+    tmps=step_head.next;
+    while (tmps!=&step_head) {
+      tmps1=tmps->next;
+      if (tS-tmps->t0>5.0) {
+	QueRem(tmps);
+	Free(tmps);
       }
-      temps=temps1;
+      tmps=tmps1;
     }
 
-    temps=king_step_head.next;
-    while (temps!=&king_step_head) {
-      temps1=temps->next;
-      if (tS-temps->t0>3.0) {
-	QueRem(temps);
-	Free(temps);
+    tmps=king_step_head.next;
+    while (tmps!=&king_step_head) {
+      tmps1=tmps->next;
+      if (tS-tmps->t0>3.0) {
+	QueRem(tmps);
+	Free(tmps);
       }
-      temps=temps1;
+      tmps=tmps1;
     }
 
     not_stopped_cnt=0;
-    tempp=peasant_head.next;
-    while (tempp!=&peasant_head) {
-      if (tempp->stopped) {
-	if (tempp->door_opened_t0 && tS>tempp->door_opened_t0+1.0) {
-	  tempp->door_opened_t0=0;
-	  tempp->y=tempp->x=-9999;
+    tmpp=peasant_head.next;
+    while (tmpp!=&peasant_head) {
+      if (tmpp->stopped) {
+	if (tmpp->door_opened_t0 && tS>tmpp->door_opened_t0+1.0) {
+	  tmpp->door_opened_t0=0;
+	  tmpp->y=tmpp->x=-9999;
 	}
       } else {
-	if (Sqr(tempp->x-w/2)+Sqr(tempp->y-h/2)<20*20) {
-	  tempp->stopped=TRUE;
-	  tempp->door_opened_t0=door_open_t0=tS;
+	if (Sqr(tmpp->x-w/2)+Sqr(tmpp->y-h/2)<20*20) {
+	  tmpp->stopped=TRUE;
+	  tmpp->door_opened_t0=door_open_t0=tS;
 	}
 	for (i=0;i<NUM_TREES;i++) //Hang-out by fire
 	  if (trees[i].fire_frame_idx &&
-		Sqr(tempp->x-trees[i].x)+Sqr(tempp->y-trees[i].y)<20*20) {
-	    tempp->stopped=TRUE;
+		Sqr(tmpp->x-trees[i].x)+Sqr(tmpp->y-trees[i].y)<20*20) {
+	    tmpp->stopped=TRUE;
 	    break;
 	  }
-	if (!tempp->stopped) {
-	  Follow(Fs->parent_task,tempp);
-	  tempp->x+=Cos(tempp->é)/100;
-	  tempp->y+=Sin(tempp->é)/100;
-	  if (!(BORDER/2<=tempp->x<w-BORDER/2) ||
-		!(BORDER/2<=tempp->y<h-BORDER/2)) {
-	    tempp->é+=ã;
-	    tempp->x+=3*Cos(tempp->é)/100;
-	    tempp->y+=3*Sin(tempp->é)/100;
+	if (!tmpp->stopped) {
+	  Follow(Fs->parent_task,tmpp);
+	  tmpp->x+=Cos(tmpp->é)/100;
+	  tmpp->y+=Sin(tmpp->é)/100;
+	  if (!(BORDER/2<=tmpp->x<w-BORDER/2) ||
+		!(BORDER/2<=tmpp->y<h-BORDER/2)) {
+	    tmpp->é+=ã;
+	    tmpp->x+=3*Cos(tmpp->é)/100;
+	    tmpp->y+=3*Sin(tmpp->é)/100;
 	  }
 	  if (!animate_mS && animate_phase&1)
-	    StepNew(Fs->parent_task,tempp->x,tempp->y,tempp->é,
+	    StepNew(Fs->parent_task,tmpp->x,tmpp->y,tmpp->é,
 		  animate_phase&2,FALSE);
 	  not_stopped_cnt++;
 	}
       }
-      tempp=tempp->next;
+      tmpp=tmpp->next;
     }
     if (!not_stopped_cnt && !tf) {
       tf=tS;

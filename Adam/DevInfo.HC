@@ -117,7 +117,7 @@ U0 PCILookUpSingle(CDoc *doc,I64 m,I64 d,U8 **_vendor,U8 **_dev)
 
 U0 PCILookUpDevs()
 {
-  CPCIDev *temppci;
+  CPCIDev *tmppci;
   I64 w1,w2,b,d,f,timeout=32*8*2;
   CDoc *doc;
   if (dev.pci_head.next!=&dev.pci_head)
@@ -128,16 +128,16 @@ U0 PCILookUpDevs()
       for (f=0;f<8;f++) {
 	w1=PCIReadU16(b,d,f,0);
 	if (w1!=0xFFFF) {
-	  temppci=ACAlloc(sizeof(CPCIDev));
-	  temppci->bus=b;
-	  temppci->dev=d;
-	  temppci->fun=f;
-	  temppci->vendor=w1;
-	  temppci->dev_id=w2=PCIReadU16(b,d,f,2);
-	  temppci->sub_code=PCIReadU8(b,d,f,0xA);
-	  temppci->base_code=PCIReadU8(b,d,f,0xB);
-	  PCILookUpSingle(doc,w1,w2,&temppci->vendor_str,&temppci->dev_id_str);
-	  QueIns(temppci,dev.pci_head.last);
+	  tmppci=ACAlloc(sizeof(CPCIDev));
+	  tmppci->bus=b;
+	  tmppci->dev=d;
+	  tmppci->fun=f;
+	  tmppci->vendor=w1;
+	  tmppci->dev_id=w2=PCIReadU16(b,d,f,2);
+	  tmppci->sub_code=PCIReadU8(b,d,f,0xA);
+	  tmppci->base_code=PCIReadU8(b,d,f,0xB);
+	  PCILookUpSingle(doc,w1,w2,&tmppci->vendor_str,&tmppci->dev_id_str);
+	  QueIns(tmppci,dev.pci_head.last);
 	  timeout=32*8*2;
 	} else if (sys_pci_busses==256 && --timeout<=0)
 	  goto lud_done;
@@ -148,20 +148,20 @@ lud_done:
 
 public U0 PCIRep()
 {//Report description of PCI devices.
-  CPCIDev *temppci;
+  CPCIDev *tmppci;
   "PCI Busses:%d\n",sys_pci_busses;
   if (!FileFind(PCI_DEV_FILE)) {
     "You don't have the PCI device file.\n";
     return;
   }
   PCILookUpDevs;
-  temppci=dev.pci_head.next;
-  while (temppci!=&dev.pci_head) {
+  tmppci=dev.pci_head.next;
+  while (tmppci!=&dev.pci_head) {
     "%02X:%02X:%01X %02X%02X $$GREEN$$%s $$CYAN$$%s$$FG$$\n",
-	  temppci->bus,temppci->dev,temppci->fun,
-	  temppci->base_code,temppci->sub_code,
-	  temppci->vendor_str,temppci->dev_id_str;
-    temppci=temppci->next;
+	  tmppci->bus,tmppci->dev,tmppci->fun,
+	  tmppci->base_code,tmppci->sub_code,
+	  tmppci->vendor_str,tmppci->dev_id_str;
+    tmppci=tmppci->next;
   }
 }
 
@@ -243,18 +243,18 @@ public U0 MemBIOSRep()
 {//Report the memory ranges reported by the BIOS at boot.
   U16		*m01=SYS_MEM_E801;
   CMemE820	*m20=SYS_MEM_E820;
-  CMemRange	*tempmr;
+  CMemRange	*tmpmr;
   "Standard Addresses\n"
 	"0x000A0000-0x000BFFFF VGA\n"
 	"0xFEE00000-0xFEE00FFF See $$LK,\"APIC\",A=\"MN:LAPIC_BASE\"$$\n\n"
 	"32 Bit Device Mem\n";
   while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
     Yield;
-  tempmr=dev.mem32_head.next;
-  while (tempmr!=&dev.mem32_head) {
+  tmpmr=dev.mem32_head.next;
+  while (tmpmr!=&dev.mem32_head) {
     "%02X:0x%016X-0x%016X\n",
-	  tempmr->type,tempmr->base,tempmr->base+tempmr->size-1;
-    tempmr=tempmr->next;
+	  tmpmr->type,tmpmr->base,tmpmr->base+tmpmr->size-1;
+    tmpmr=tmpmr->next;
   }
   LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
 

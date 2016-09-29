@@ -88,7 +88,7 @@ U0 AnimateTask(I64)
   Cloud *c;
   CloudPen *cp;
   while (TRUE) {
-    WinMgrSync;
+    Refresh;
 
     for (i=0,cp=cloud_pens;i<CLOUD_PENS;i++,cp++) {
       DCClear(cp->img);
@@ -193,7 +193,7 @@ U0 CloudScene()
 
     Fs->draw_it=&DrawIt;
     GetChar;
-    WinMgrSync;
+    Refresh;
   } catch
     PutExcept;
   SettingsPop;

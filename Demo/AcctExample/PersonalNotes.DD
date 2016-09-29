@@ -1,4 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
+* $LK,"::/Demo/RandDemo.HC"$ Rand is kinda crappy.
+
 * Cursor in $LK,"::/Home/TOSToHtml.HC"$.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.HC,Sleep(1)"$.
@@ -139,7 +141,7 @@ $FG,5$$TX+CX,"Bugs"$$FG$
 
 
 $FG,5$$TX+CX,"3rd Party Bugs"$$FG$
-* VMware: Stretch to full screen
+* VMware: Stretch to full scrn
 * VMware: PC speaker sound distorted.
 * VMware: 8/2/2015 start-up. Probably multicore.
 * VMware: $LK,"CtrlAltDel",A="FF:::/Kernel/SerialDev/Keyboard.HC,CtrlAltDel"$ on <CTRL-ALT-INS>
@@ -149,7 +151,7 @@ $FG,5$$TX+CX,"3rd Party Bugs"$$FG$
 $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 * $LK,"Mount",A="MN:Mount"$() crashes on bad drive.
 
-* Graphics clipping: screen y+top<0 for top<0?
+* Graphics clipping: scrn y+top<0 for top<0?
 
 * 1/1/2015 Bug messing-up keyboard, like no CTRL key.  Was working on Sprites.
 
@@ -159,9 +161,8 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * 1/?/2015,8/10/2015 Macro sel in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
 
-* 5/7/14:Something like $LK,"AFSetIP",A="MN:AFSetIP"$ caused hang, then reboot in TestSuite.
+* 5/7/14:Something like $LK,"InSetIP",A="MN:InSetIP"$ caused hang, then reboot in TestSuite.
 * 5/7/14:#63 Maybe, $LK,"::/Demo/Graphics/Pick3D.HC"$ crashed in TestSuite.
-* 6/8/14:After or in $LK,"PageTableEntries",A="FF:::/Misc/OSTestSuite.HC,PageTableEntries"$ in TestSuite crash.
 
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (Forgot what this is talking about.)
 
@@ -264,7 +265,7 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * Note: We will never put multiple $LK,"Keyboard Tables",A="FI:::/Kernel/SerialDev/Keyboard.HC"$.  Each country must make their own version of TempleOS.  The $LK,"Intel Factory ROM",A="FF:::/Doc/Demands.DD,English"$ will have just English.  Our $LK,"Charter",A="FI:::/Doc/Charter.DD"$ bans multiple country or architectures in the same version.
 
-* 12 border chars in screen font codes 0x02-0x0D.  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$() $LK,"::/Demo/Games/CharDemo.HC"$. LineFeed shows-up in $FG,2$<CTRL-m>$FG$ PersonalMenu.
+* 12 border chars in scrn font codes 0x02-0x0D.  $LK,"TextBorder",A="MN:TextBorder"$() $LK,"RawDr",A="MN:RawDr"$() $LK,"::/Demo/Games/CharDemo.HC"$. LineFeed shows-up in $FG,2$<CTRL-m>$FG$ PersonalMenu.
 
 * Super-simple high speed serial needs flow control.  $FG,2$<CTRL-s>$FG$ and $FG,2$<CTRL-q>$FG$?
 
@@ -338,7 +339,7 @@ $FG,5$$TX+CX,"Test"$$FG$
 
 * $LK,"ICDivEqu",A="MN:ICDivEqu"$() assumes RBX.  Is it okay?
 
-* Autofile PopUp of PopUp?
+* InFile PopUp of PopUp?
 
 * $LK,"FileMgr",A="MN:FileMgr"$() help link scrolls out of window.
 
@@ -359,8 +360,8 @@ $FG,5$$TX+CX,"Uncategorized"$$FG$
 
 * MOV U8 [RSP+RCX],DL
 
-* $LK,"gr.screen_image",A="MN:CGrGlbls"$
-  >Might want to do ZOOM in U8 graphics and convert screen capture to U8
+* $LK,"gr.scrn_image",A="MN:CGrGlbls"$
+  >Might want to do ZOOM in U8 graphics and convert scrn capture to U8
   >Might want to rev bit order
 
 * This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/SrvCmd.HC,Fs->catch_except=TRUE"$ causes problems because it
@@ -410,7 +411,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:::/Home/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"20932 KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17416KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -444,7 +445,7 @@ $TX,"The sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-ne
 $TX,"Stalin's Tanks",HTML="https://boardgamegeek.com/boardgame/5198/stalins-tanks"$
 $TX,"Lamp shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
 $TX,"The Original Jewish Temple",HTML="http://www.jewishvirtuallibrary.org/jsource/Judaism/The_Temple.html"$
-$TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.DD"$
+$TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$
 $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
 $TX,"The Number Bleem",HTML="http://www.strangehorizons.com/2000/20001120/secret_number.shtml"$
 $TX,"Dwight: Nerd torture",HTML="http://www.noob.us/humor/the-office-dwight-faces-nerd-torture-of-the-highest-form"$

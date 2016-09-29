@@ -217,32 +217,32 @@ CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
 //Set flags to zero if you wish to get the res.
   //See $LK,"::/Demo/MultiCore/Lock.HC"$
   CSrvCtrl *ctrl;
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   CTask *seth;
   if (!(0<=target_cpu<mp_cnt))
     throw('MultCore');
-  tempc=ACAlloc(sizeof(CSrvCmd));
+  tmpc=ACAlloc(sizeof(CSrvCmd));
   if (aux_str)
-    tempc->aux_str=AStrNew(aux_str);
-  tempc->cmd_code=cmd_code;
-  tempc->addr=fp_addr;
-  tempc->fun_arg=data;
-  tempc->target_cpu=target_cpu;
-  tempc->flags=flags;
-  tempc->aux1=aux1;
-  tempc->aux2=aux2;
+    tmpc->aux_str=AStrNew(aux_str);
+  tmpc->cmd_code=cmd_code;
+  tmpc->addr=fp_addr;
+  tmpc->fun_arg=data;
+  tmpc->target_cpu=target_cpu;
+  tmpc->flags=flags;
+  tmpc->aux1=aux1;
+  tmpc->aux2=aux2;
   seth=cpu_structs[target_cpu].seth_task;
-  tempc->ctrl=ctrl=&seth->srv_ctrl;
+  tmpc->ctrl=ctrl=&seth->srv_ctrl;
   PUSHFD
   CLI
   while (LBts(&ctrl->flags,SVCRf_LOCKED))
     Yield;
   if (ctrl->next_waiting==ctrl && LBtr(&seth->task_flags,TASKf_AWAITING_MSG))
     MPInt(I_WAKE,target_cpu);
-  QueIns(tempc,ctrl->last_waiting);
+  QueIns(tmpc,ctrl->last_waiting);
   LBtr(&ctrl->flags,SVCRf_LOCKED);
   POPFD
-  return tempc;
+  return tmpc;
 }
 
 CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
@@ -250,26 +250,26 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
 	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
 {
   CTask *res;
-  CSrvCmd *tempc=JobQue(fp_addr,data,target_cpu,
+  CSrvCmd *tmpc=JobQue(fp_addr,data,target_cpu,
 	flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
   CSrvCtrl *ctrl;
 
-  while (!Bt(&tempc->flags,SVCf_DONE)) {
+  while (!Bt(&tmpc->flags,SVCf_DONE)) {
     LBts(&Fs->task_flags,TASKf_IDLE);
     Yield;
   }
   LBtr(&Fs->task_flags,TASKf_IDLE);
 
-  res=tempc->spawned_task;
-  ctrl=tempc->ctrl;
+  res=tmpc->spawned_task;
+  ctrl=tmpc->ctrl;
   PUSHFD
   CLI
   while (LBts(&ctrl->flags,SVCRf_LOCKED))
     Yield;
-  QueRem(tempc);
+  QueRem(tmpc);
   LBtr(&ctrl->flags,SVCRf_LOCKED);
   POPFD
-  SrvCmdDel(tempc);
+  SrvCmdDel(tmpc);
   return res;
 }
 
@@ -378,7 +378,7 @@ U0 Core0Init()
 }
 
 interrupt U0 IntMPCrash()
-{//Entering the debugger from another core causes an interrupt on core0
+{//Entering the debugger from another core causes an interrupt on Core0
 //Which calls this routine.
   *(dev.uncached_alias+LAPIC_EOI)(U32 *)=0;
   mp_cnt=1;

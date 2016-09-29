@@ -5,24 +5,24 @@ public U0 DocLoad(CDoc *doc,U8 *src2,I64 size)
   I64 i;
   U8 *src;
   Bool unlock=DocLock(doc);
-  CDocBin *tempb;
+  CDocBin *tmpb;
   doc->find_replace->filter_lines=0;
   if (src2) {
     DocPutS(doc,src2); //Too big $LK,"DocPrint",A="MN:DocPrint"$() is wasteful.
     src=src2+StrLen(src2)+1;
     i=size-(offset(CDocBin.end)-offset(CDocBin.start));
     while (src<=src2+i) {
-      tempb=CAlloc(sizeof(CDocBin),doc->mem_task);
-      MemCpy(&tempb->start,src,offset(CDocBin.end)-offset(CDocBin.start));
+      tmpb=CAlloc(sizeof(CDocBin),doc->mem_task);
+      MemCpy(&tmpb->start,src,offset(CDocBin.end)-offset(CDocBin.start));
       src+=offset(CDocBin.end)-offset(CDocBin.start);
-      tempb->data=MAlloc(tempb->size,doc->mem_task);
-      if (tempb->size) {
-	MemCpy(tempb->data,src,tempb->size);
-	src+=tempb->size;
+      tmpb->data=MAlloc(tmpb->size,doc->mem_task);
+      if (tmpb->size) {
+	MemCpy(tmpb->data,src,tmpb->size);
+	src+=tmpb->size;
       }
-      QueIns(tempb,doc->bin_head.last);
-      if (tempb->num>=doc->cur_bin_num)
-	doc->cur_bin_num=tempb->num+1;
+      QueIns(tmpb,doc->bin_head.last);
+      if (tmpb->num>=doc->cur_bin_num)
+	doc->cur_bin_num=tmpb->num+1;
     }
   }
   if (!(doc->flags & (DOCF_PLAIN_TEXT|DOCF_PLAIN_TEXT_TABS)))
@@ -38,7 +38,7 @@ public CDoc *DocRead(U8 *name=NULL,I64 flags=0)
   U8 *src,*name2;
   I64 size=0;
   CDirContext *dirc;
-  if (!name) name=blkdev.temp_filename;
+  if (!name) name=blkdev.tmp_filename;
   doc->flags|=flags;
   name2=FileNameAbs(name);
   StrCpy(doc->filename.name,name2);
@@ -104,7 +104,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
     }
   }
   for (b=doc->bin_head.next;b!=&doc->bin_head;b=b->next)
-    if (b->use_cnt>b->temp_use_cnt)
+    if (b->use_cnt>b->tmp_use_cnt)
       cnt+=offset(CDocBin.end)-offset(CDocBin.start)+b->size;
   res=MAlloc(cnt);
   dst=res;
@@ -157,7 +157,7 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
   b=doc->bin_head.next;
   if (b!=&doc->bin_head) {
     do {
-      if (b->use_cnt>b->temp_use_cnt) {
+      if (b->use_cnt>b->tmp_use_cnt) {
 	MemCpy(dst,&b->start,offset(CDocBin.end)-offset(CDocBin.start));
 	dst+=offset(CDocBin.end)-offset(CDocBin.start);
 	MemCpy(dst,b->data,b->size);
@@ -297,7 +297,7 @@ U0 DocUndoRestore(CDoc *doc)
     DocUnlock(doc);
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;"\
+#help_index "Graphics/Windows BMP Files;Graphics/GR Files;"\
 	"DolDoc/Output;StdOut/DolDoc"
 public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to document.
@@ -318,8 +318,8 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   } else if (FilesFindMatch(filename,"*.BMP;*.bmp")) {
     DocBMP(doc,filename,,TRUE);
     res=TRUE;
-  } else if (FilesFindMatch(filename,"*.GRA*")) {
-    DocGRA(doc,filename);
+  } else if (FilesFindMatch(filename,"*.GR*")) {
+    DocGR(doc,filename);
     res=TRUE;
   }
   if (res)
@@ -327,7 +327,7 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   return res;
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GRA Files;"\
+#help_index "Graphics/Windows BMP Files;Graphics/GR Files;"\
 	"File/Cmd Line (Typically);DolDoc/Cmd Line (Typically);"\
 	"StdOut;Cmd Line (Typically)"
 public Bool Type(U8 *filename,I64 trailing_new_lines=1)

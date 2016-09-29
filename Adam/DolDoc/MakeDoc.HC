@@ -5,10 +5,10 @@ Cd(__DIR__);;
 
 /*
 TempleOS DolDoc's can have "cursor movement" cmds which can move the cursor up
-the screen and layer on existing text.  It can also have callback funs which
+the scrn and layer on existing text.  It can also have callback funs which
 supply live, changing text.  For these reasons, you can't assume you know
-where the visible portion of the document is and must process much
-of the document each time it is placed on the screen, becoming CPU
+where the vis portion of the document is and must process much
+of the document each time it is placed on the scrn, becoming CPU
 intensive on big documents.
 See $LK,"::/Doc/DolDocOverview.DD"$
 */
@@ -22,7 +22,7 @@ public class CDolDocGlbls
 {
   CHashTable *hash;
   I64	dft_de_flags		[DOCT_NUM_TYPES],
-	type_flags_nontag_invisible [(DOCT_NUM_TYPES+63)/64],
+	type_flags_nontag_invis [(DOCT_NUM_TYPES+63)/64],
 	type_flags_form		[(DOCT_NUM_TYPES+63)/64],
 	type_flags_data		[(DOCT_NUM_TYPES+63)/64],
 	type_flags_chk_dup	[(DOCT_NUM_TYPES+63)/64],

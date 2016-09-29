@@ -4,4 +4,4 @@ If you had a remote term and sent key $LK,"Scan Codes",A="MN:SC_INS"$, the user 
 
 See $LK,"Char Overview",A="FI:::/Doc/CharOverview.DD"$ and $LK,"Char Routines",A="HI:Char"$.
 
-You can send characters into $FG,2$StdIn$FG$.  See $LK,"Auto",A="MN:Auto"$(), $LK,"XTalk",A="MN:XTalk"$() and $LK,"AutoFile",A="HI:AutoFile"$.
+You can send characters into $FG,2$StdIn$FG$.  See $LK,"In",A="MN:In"$(), $LK,"XTalk",A="MN:XTalk"$() and $LK,"InFile",A="HI:InFile"$.

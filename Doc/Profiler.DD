@@ -1,4 +1,4 @@
-$WW,1$The profiler records where the CPU was executing when the $TX,"1000 Hz",D="DD_JIFFY_HZ"$ timer interrupt occured, so you can learn where time is spent.
+$WW,1$The profiler records where the CPU was executing when the $TX,"1000Hz",D="DD_JIFFY_HZ"$ timer interrupt occured, so you can learn where time is spent.
 
 Use the $LK,"Prof",A="MN:Prof"$() depth argument to record a hit in the N routines which called the current routine, as well.
 

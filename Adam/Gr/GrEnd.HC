@@ -1,4 +1,4 @@
-#help_index "Graphics/Screen"
+#help_index "Graphics/Scrn"
 
 U0 CtrlAltZ(I64 sc)
 {
@@ -10,9 +10,9 @@ U0 CtrlAltZ(I64 sc)
 CtrlAltCBSet('Z',&CtrlAltZ,"Cmd /Zoom In",
 	"Cmd /Zoom Out");
 
-U0 Screen2Clipboard(I64)
+U0 Scrn2Clipboard(I64)
 {
-  CDC *dc=DCScreenCapture;
+  CDC *dc=DCScrnCapture;
   U8 *elems=DC2Sprite(dc);
   Bool unlock_doc=DocLock(sys_clipboard_doc);
   ClipboardDel;
@@ -24,6 +24,6 @@ U0 Screen2Clipboard(I64)
 }
 U0 CtrlAltS(I64)
 {
-  Spawn(&Screen2Clipboard);
+  Spawn(&Scrn2Clipboard);
 }
-CtrlAltCBSet('S',&CtrlAltS,"Cmd /Screen Shot to Clipboard");
+CtrlAltCBSet('S',&CtrlAltS,"Cmd /Scrn Shot to Clipboard");

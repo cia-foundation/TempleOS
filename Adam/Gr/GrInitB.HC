@@ -1,4 +1,4 @@
-#help_index "Graphics/Screen"
+#help_index "Graphics/Scrn"
 
 U0 GrSetUpTables()
 {
@@ -75,10 +75,10 @@ U0 GrSetUpTables()
     OutU8(VGAP_DATA,0x0F);
 //Virtual Box crashes on the following for some reason.
     //	  MemSet(text.vga_alias,0,GR_HEIGHT*GR_WIDTH>>3);
-    MemSet(gr.screen_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
+    MemSet(gr.scrn_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
   }
-  for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++) {
-    dst=gr.screen_zoom_tables[i]=MAlloc(256*i);
+  for (i=1;i<=GR_MAX_SCRN_ZOOM;i++) {
+    dst=gr.scrn_zoom_tables[i]=MAlloc(256*i);
     for (j=0;j<256;j++) {
       m=0;
       for (k=0;k<8;k++) {
@@ -93,7 +93,7 @@ U0 GrSetUpTables()
   }
 }
 
-#help_index "Graphics/Screen;Windows"
+#help_index "Graphics/Scrn;Windows"
 
 U0 WinZBufFill(CTask *task)
 {//Not public
@@ -175,7 +175,7 @@ U0 GrInit2()
   MemSet(&gr,0,sizeof(CGrGlbls));
   gr.sprite_hash=HashTableNew(512);
   HashDefineLstAdd("ST_SPRITE_ELEM_CODES",SPHT_ELEM_CODE,gr.sprite_hash);
-  gr.screen_zoom=1;
+  gr.scrn_zoom=1;
 
   PaletteSetStd;
   fp_set_std_palette=&PaletteSetStd;
@@ -191,19 +191,19 @@ U0 GrInit2()
   gr.win_z_buf=MAlloc(TEXT_ROWS*TEXT_COLS*sizeof(U16));
 
   gr.dc2=DCNew(GR_WIDTH,GR_HEIGHT);
-  gr.dc2->flags|=DCF_SCREEN_BITMAP;
+  gr.dc2->flags|=DCF_SCRN_BITMAP;
   gr.dc_cache=DCNew(GR_WIDTH,GR_HEIGHT);
 
   gr.dc=DCNew(GR_WIDTH,GR_HEIGHT);
-  gr.dc->flags|=DCF_SCREEN_BITMAP|DCF_ON_TOP;
+  gr.dc->flags|=DCF_SCRN_BITMAP|DCF_ON_TOP;
   DCFill;
 
   gr.dc1=DCNew(GR_WIDTH,GR_HEIGHT);
-  gr.dc1->flags|=DCF_SCREEN_BITMAP;
+  gr.dc1->flags|=DCF_SCRN_BITMAP;
 
-  gr.screen_image=DCNew(GR_WIDTH,GR_HEIGHT); //4-bit
+  gr.scrn_image=DCNew(GR_WIDTH,GR_HEIGHT); //4-bit
   gr.zoomed_dc	 =DCNew(GR_WIDTH,GR_HEIGHT); //4-bit
-  gr.zoomed_dc->flags|=DCF_SCREEN_BITMAP;
+  gr.zoomed_dc->flags|=DCF_SCRN_BITMAP;
 }
 
 GrInit2;

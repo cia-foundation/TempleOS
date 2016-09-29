@@ -119,14 +119,14 @@ U0 MiniGrLibDemo()
 We are returning graphics to normal operations under TempleOS.
 It is not normal to by-pass the TempleOS graphcis routines.
 The TempleOS graphics don't know VGA has changed.
-This bit tells TempleOS to update whole screen.
+This bit tells TempleOS to update whole scrn.
 */
-  //<CTRL-ALT-v> will flush screen VGA cache.
+  //<CTRL-ALT-v> will flush scrn VGA cache.
   VGAFlush;
 }
  
 MiniGrLibDemo;
 
 //See $LK,"RawPutChar",A="MN:RawPutChar"$() for text.
-//See $LK,"::/Demo/Lectures/ScreenMemory.HC"$ for color.
+//See $LK,"::/Demo/Lectures/ScrnMemory.HC"$ for color.
 //See $LK,"::/Demo/Lectures/GraphicsCPULoad.HC"$.

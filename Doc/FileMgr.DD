@@ -1,13 +1,13 @@
 $WW,1$$FG,5$$TX+CX,"File Manager"$$FG$
 
 $FG,2$<SHIFT CURSOR>$FG$
-$ID,2$Sel files.
+$ID,2$Select files.
 $ID,-2$
 $FG,2$<CTRL-y> or <DELETE>$FG$
 $ID,2$Delete file or tree.
 $ID,-2$
 $FG,2$<CTRL-c> or <CTRL-INS>$FG$
-$ID,2$Copy sel files to clipboard.
+$ID,2$Copy select files to clipboard.
 $ID,-2$
 $FG,2$<CTRL-v> or <SHIFT-INS>$FG$
 $ID,2$Paste clipboard.

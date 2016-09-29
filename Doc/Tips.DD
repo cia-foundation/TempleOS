@@ -19,7 +19,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can use $FG,2$ans$FG$ in cmd line expressions.  It holds the res the last cmd line operation.  You can use the cmd prompt as a calculator by just entering expressions like $FG,2$1+2*3;$FG$.  $FG,2$F64$FG$ ress can be accessed with $FG,2$ansf$FG$.
 
-* Use the PullDown menu at the top of the screen to learn commands, or for finding the keyboard controls to games.
+* Use the PullDown menu at the top of the scrn to learn commands, or for finding the keyboard controls to games.
 
 * You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:~/HomeLocalize.HC,mouse.scale"$.
 
@@ -29,7 +29,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * You can use $FG,2$filter_lines$FG$ in the editor text search form ($FG,2$<CTRL-f>$FG$) to temporarily display just lines near each match.  A value of $FG,2$filter lines$FG$ set to $FG,2$5$FG$ will display lines within 5 lines of matches.  Then, you can do another find to a different string and achieve a $FG,2$AND$FG$ search.  When finished, press $FG,2$<ESC>$FG$.
  
-* You can recompile and reinstall the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  You'll probably want to make a function for recompiling that uses the $LK,"Auto",A="MN:Auto"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.HC,1"$.
+* You can recompile and reinstall the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  You'll probably want to make a function for recompiling that uses the $LK,"In",A="MN:In"$() function to answer the cfg questions.  See my technique $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.HC,1"$.
 
 * $LK,"Scale2Mem",A="MN:Scale2Mem"$(min,max,limit=2*1024*1024*1024) can be used for cfg questions when recompiling.  The $LK,"BootHDIns",A="MN:BootHDIns"$() cfg prompts accept expressions, not just numbers.  The dft disk cache is $FG,2$Scale2Mem(0x80000,0x8000000)$FG$.
 
@@ -59,19 +59,19 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $LK,"Plain",A="MN:Plain"$() to edit a plain text file.  You'll need this if your file has $FG,2$$$$FG$'s.  Use the $LK,"ToDolDoc",A="MN:ToDolDoc"$() utility to convert plain text to DolDoc's by doubling $FG,2$$$$FG$'s.
 
-* Use $LK,"Silent",A="MN:Silent"$() to disable screen text output.
+* Use $LK,"Silent",A="MN:Silent"$() to disable scrn text output.
 
 * Grab-scroll any window at any time with $FG,2${CTRL-LEFT-MOUSE-DRAG}$FG$.  Null grab-scrolling with $FG,2${CTRL-RIGHT-MOUSE}$FG$.
 
 * Use $FG,2$<CTRL-ALT-z>$FG$ to zoom-in and $FG,2$<CTRL-ALT-SHIFT-Z>$FG$ to zoom-out.  You can scroll by moving to the edge of the window.  Set $LK,"gr.continuous_scroll",A="MN:CGrGlbls"$ to $FG,2$TRUE$FG$ if you want. 
 
-* Use $FG,2$<CTRL-ALT-g>$FG$ and $FG,2$<CTRL-ALT-SHIFT-G>$FG$ to display a grid on the screen.
+* Use $FG,2$<CTRL-ALT-g>$FG$ and $FG,2$<CTRL-ALT-SHIFT-G>$FG$ to display a grid on the scrn.
 
 * Use $FG,2$<CTRL-ALT-a>$FG$ to enter an extended ASCII char.
 
 * Use $FG,2$<CTRL-ALT-f>$FG$ to toggle between $LK,"Std Font",A="FI:::/Kernel/FontStd.HC"$ and $LK,"Cyrillic Font",A="FI:::/Kernel/FontCyrillic.HC"$.
 
-* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the screen as a sprite on the clipboard.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
+* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clipboard.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
 
 * You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 
@@ -131,7 +131,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * For advanced heap debugging, play with $LK,"_CFG_HEAP_DBG",A="MN:_CFG_HEAP_DBG"$.  You're on your own.
 
-* You can use $LK,"Type",A="MN:Type"$() to display $FG,2$.BMP$FG$ or $FG,2$.GRA$FG$ files.
+* You can use $LK,"Type",A="MN:Type"$() to display $FG,2$.BMP$FG$ or $FG,2$.GR$FG$ files.
 
 * Use $LK,"Man",A="MN:Man"$() to jump to short sym name src code.
 

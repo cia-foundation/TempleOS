@@ -1,33 +1,33 @@
 #help_index "DolDoc/Misc"
 
-U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _temp_u32_attr)
+U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _tmp_u32_attr)
 {//Be aware of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
   U32 *res=MAlloc((len+1)*sizeof(U32)),*dst=res;
   U8 *ptr;
   CDocSettings *s=&doc_e->settings;
-  I64 ch,ch1,last_ch,temp_u32_attr,mask_temp_u32_attr=_temp_u32_attr&0xFFFFF000,
+  I64 ch,ch1,last_ch,tmp_u32_attr,mask_tmp_u32_attr=_tmp_u32_attr&0xFFFFF000,
 	comment_depth,brace_depth=s->brace_depth,paren_depth=s->paren_depth;
-  CHash *temph;
+  CHash *tmph;
   switch [s->state] {
     case DOCSS_NORMAL:
 hl_normal:
       while (len) {
 	while (len && !Bt(chars_bmp_alpha_numeric,*src)) {
-	  temp_u32_attr=_temp_u32_attr;
+	  tmp_u32_attr=_tmp_u32_attr;
 	  ch1=*src++;
 	  switch (ch1) {
 	    case '/':
 	      if (len>=2) {
 		if (*src=='/') {
-		  temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
-		  *dst++=ch1+temp_u32_attr;
-		  *dst++=*src++ +temp_u32_attr;
+		  tmp_u32_attr=DOC_COLOR_COMMENT<<8|mask_tmp_u32_attr;
+		  *dst++=ch1+tmp_u32_attr;
+		  *dst++=*src++ +tmp_u32_attr;
 		  len-=2;
 		  goto hl_cpp_comment;
 		} else if (*src=='*') {
-		  temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
-		  *dst++=ch1+temp_u32_attr;
-		  *dst++=*src++ +temp_u32_attr;
+		  tmp_u32_attr=DOC_COLOR_COMMENT<<8|mask_tmp_u32_attr;
+		  *dst++=ch1+tmp_u32_attr;
+		  *dst++=*src++ +tmp_u32_attr;
 		  len-=2;
 		  comment_depth=1;
 		  goto hl_comment;
@@ -35,33 +35,33 @@ hl_normal:
 	      }
 	      break;
 	    case '\'':
-	      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
-	      *dst++=ch1+temp_u32_attr;
+	      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+	      *dst++=ch1+tmp_u32_attr;
 	      len--;
 	      goto hl_single_quote;
 	    case '\"':
-	      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
-	      *dst++=ch1+temp_u32_attr;
+	      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+	      *dst++=ch1+tmp_u32_attr;
 	      len--;
 	      goto hl_dbl_quote;
 	    case '(':
 	      if (paren_depth++&1)
-		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
+		tmp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_tmp_u32_attr;
 	      break;
 	    case ')':
 	      if (--paren_depth&1)
-		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
+		tmp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_tmp_u32_attr;
 	      break;
 	    case '{':
 	      if (brace_depth++&1)
-		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
+		tmp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_tmp_u32_attr;
 	      break;
 	    case '}':
 	      if (--brace_depth&1)
-		temp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_temp_u32_attr;
+		tmp_u32_attr=DOC_COLOR_ALT_TEXT<<8|mask_tmp_u32_attr;
 	      break;
 	  }
-	  *dst++=ch1+temp_u32_attr;
+	  *dst++=ch1+tmp_u32_attr;
 	  if (!--len) goto hl_normal_done;
 	}
 	ptr=src;
@@ -71,16 +71,16 @@ hl_normal:
 	}
 	ch=*src;
 	*src=0;
-	if (temph=HashFind(ptr,cmp.asm_hash,
+	if (tmph=HashFind(ptr,cmp.asm_hash,
 	      HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE|HTT_REG)) {
-	  if (temph->type&(HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE))
-	    temp_u32_attr=DOC_COLOR_KEYWORD<<8|mask_temp_u32_attr;
+	  if (tmph->type&(HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE))
+	    tmp_u32_attr=DOC_COLOR_KEYWORD<<8|mask_tmp_u32_attr;
 	  else
-	    temp_u32_attr=DOC_COLOR_KEYWORD2<<8|mask_temp_u32_attr;
+	    tmp_u32_attr=DOC_COLOR_KEYWORD2<<8|mask_tmp_u32_attr;
 	} else
-	  temp_u32_attr=_temp_u32_attr;
+	  tmp_u32_attr=_tmp_u32_attr;
 	while (ch1=*ptr++)
-	  *dst++=ch1+temp_u32_attr;
+	  *dst++=ch1+tmp_u32_attr;
 	*src=ch;
       }
 hl_normal_done:
@@ -88,12 +88,12 @@ hl_normal_done:
       s->comment_depth=0;
       break;
     case DOCSS_SINGLE_QUOTE:
-      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
 hl_single_quote:
       last_ch=0;
       while (len--) {
 	ch1=*src++;
-	*dst++=ch1+temp_u32_attr;
+	*dst++=ch1+tmp_u32_attr;
 	if (last_ch!='\\' && ch1=='\'')
 	  goto hl_normal;
 	if (last_ch=='\\' && ch1=='\\')
@@ -105,12 +105,12 @@ hl_single_quote:
       s->comment_depth=0;
       break;
     case DOCSS_DBL_QUOTE:
-      temp_u32_attr=DOC_COLOR_QUOTE<<8|mask_temp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
 hl_dbl_quote:
       last_ch=0;
       while (len--) {
 	ch1=*src++;
-	*dst++=ch1+temp_u32_attr;
+	*dst++=ch1+tmp_u32_attr;
 	if (last_ch!='\\' && ch1=='\"')
 	  goto hl_normal;
 	if (last_ch=='\\' && ch1=='\\')
@@ -122,13 +122,13 @@ hl_dbl_quote:
       s->comment_depth=0;
       break;
     case DOCSS_COMMENT:
-      temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_COMMENT<<8|mask_tmp_u32_attr;
       comment_depth=s->comment_depth;
 hl_comment:
       last_ch=0;
       while (len--) {
 	ch1=*src++;
-	*dst++=ch1+temp_u32_attr;
+	*dst++=ch1+tmp_u32_attr;
 	if (last_ch=='*' && ch1=='/') {
 	  if (!--comment_depth)
 	    goto hl_normal;
@@ -140,10 +140,10 @@ hl_comment:
       s->comment_depth=comment_depth;
       break;
     case DOCSS_CPP_Z_COMMENT:
-      temp_u32_attr=DOC_COLOR_COMMENT<<8|mask_temp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_COMMENT<<8|mask_tmp_u32_attr;
 hl_cpp_comment:
       while (len--)
-	*dst++=*src++ +temp_u32_attr;
+	*dst++=*src++ +tmp_u32_attr;
       s->state=DOCSS_CPP_Z_COMMENT;
       s->comment_depth=0;
       break;

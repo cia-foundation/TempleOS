@@ -8,7 +8,7 @@ ASCII #5  is the cursor location in a saved file.
 ASCII #28 is $FG,2$<SHIFT-ESC>$FG$.
 ASCII #31 is a $FG,2$<SHIFT-SPACE>$FG$.
 
-TempleOS ASCII is 8-bit instead of 7-bit, so it also uses the range from 128-255.  Press $FG,2$<CTRL-ALT-a>$FG$ to see shapes for 128-255.  Technically, $FG,2$<CTRL-ALT-a>$FG$ are $LK,"screen codes",A="HI:TextBase Layer"$.
+TempleOS ASCII is 8-bit instead of 7-bit, so it also uses the range from 128-255.  Press $FG,2$<CTRL-ALT-a>$FG$ to see shapes for 128-255.  Technically, $FG,2$<CTRL-ALT-a>$FG$ are $LK,"scrn codes",A="HI:TextBase Layer"$.
 
 A $FG,2$Key$FG$ is typically specified with a scan code.  TempleOS scan codes contain the key value in the lowest $FG,2$U8$FG$, and flags in the upper 3 bytes.  See $LK,"Scan Code Flags",A="MN:SCF_CTRL"$ and $LK,"Scan Codes",A="MN:SC_INS"$.
 

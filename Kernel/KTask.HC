@@ -1,10 +1,10 @@
 U0 Exit()
 {//Terminate own task.
-  if (Fs==sys_focus_task && IsDbg) {
+  if (Fs==sys_focus_task && IsDbgMode) {
     LBts(&Fs->task_flags,TASKf_KILL_AFTER_DBG);
     G;
   } else {
-    if (!Gs->num && !IsDbg)
+    if (!Gs->num && !IsDbgMode)
       SingleUser(OFF);
     Fs->rflags=GetRFlags;
     Fs->rsp=GetRSP;
@@ -25,14 +25,19 @@ Bool TaskValidate(CTask *task)
     return TRUE;
 }
 
-U0 BirthWait(CTask **_task,I64 task_num=-1)
+I64 BirthWait(CTask **_task,I64 task_num=-1)
 {//Wait for task valid and not task_num.
   while (!TaskValidate(*_task)||(*_task)->task_num==task_num)
     Yield;
+  return (*_task)->task_num;
 }
 
-U0 DeathWait(CTask **_task)
+U0 DeathWait(CTask **_task,Bool send_exit=FALSE)
 {//Wait for task death.
+  if (send_exit && TaskValidate(*_task)) {
+    TaskWait(*_task,TRUE);
+    XTalk(*_task,"Exit;\n");
+  }
   while (TaskValidate(*_task))
     Yield;
 }
@@ -79,11 +84,11 @@ Bool IsSuspended(CTask *task=NULL)
 
 CTaskStk *TaskStkNew(I64 stk_size,CTask *task)
 {
-  CTaskStk *temps=MAlloc(stk_size+offset(CTaskStk.stk_base),task);
-  temps->next_stk=NULL;
-  temps->stk_ptr=NULL;
-  temps->stk_size=MSize(temps)-offset(CTaskStk.stk_base);
-  return temps;
+  CTaskStk *tmps=MAlloc(stk_size+offset(CTaskStk.stk_base),task);
+  tmps->next_stk=NULL;
+  tmps->stk_ptr=NULL;
+  tmps->stk_size=MSize(tmps)-offset(CTaskStk.stk_base);
+  return tmps;
 }
 
 #exe {Option(OPTf_NO_REG_VAR,ON);};
@@ -91,7 +96,7 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
 			/*argpop*/I64 (*fp_addr)(...),...)
 {//Grow stk in call with any fixed num of args.
 //See $LK,"::/Demo/StkGrow.HC"$.
-  CTaskStk *temps,*temps2,**_stk;
+  CTaskStk *tmps,*tmps2,**_stk;
   I64 res,*rsp,*rsp2,*old_stk;
 
   if (UnusedStk>=stk_size_threshold) {
@@ -108,14 +113,14 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
 
   } else {
 
-    temps2=TaskStkNew(stk_size,Fs);
-    temps2->next_stk=temps=Fs->stk;
-    rsp2=(&temps2->stk_base)(U8 *)+temps2->stk_size;
+    tmps2=TaskStkNew(stk_size,Fs);
+    tmps2->next_stk=tmps=Fs->stk;
+    rsp2=(&tmps2->stk_base)(U8 *)+tmps2->stk_size;
     old_stk=rsp=&argv[argc];
     while (argc-->0)
       *--rsp2=*--rsp;
     _stk=&Fs->stk;
-    temps->stk_ptr=rsp=GetRSP;
+    tmps->stk_ptr=rsp=GetRSP;
     asm {
       IMPORT	_FREE;	//We are in a function, not at glbl scope.
 //The compiler treats these in isolation.
@@ -123,9 +128,9 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
       PUSHFD
       POP	RDX	//flags
       CLI
-      MOV	RBX,U64 &temps2[RBP]
+      MOV	RBX,U64 &tmps2[RBP]
       MOV	RAX,&_stk[RBP]
-      MOV	U64 [RAX],RBX	//Fs->stk=temps2
+      MOV	U64 [RAX],RBX	//Fs->stk=tmps2
       MOV	RSP,U64 &rsp2[RBP]
       PUSH	RDX
       POPFD
@@ -136,14 +141,14 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
       PUSHFD
       POP	RDX	//flags
       CLI
-      MOV	RBX,U64 &temps[RBP]
+      MOV	RBX,U64 &tmps[RBP]
       MOV	RAX,&_stk[RBP]
-      MOV	U64 [RAX],RBX	//Fs->stk=temps
+      MOV	U64 [RAX],RBX	//Fs->stk=tmps
       MOV	RSP,U64 &rsp[RBP]
       PUSH	RDX
       POPFD
 
-      PUSH	U64 &temps2[RBP]
+      PUSH	U64 &tmps2[RBP]
       CALL	_FREE
 
       MOV	RDX,U64 &old_stk[RBP]
@@ -161,7 +166,7 @@ argpop I64 CallStkGrow(I64 stk_size_threshold,I64 stk_size,
 
 I64 TaskInit(CTask *task,I64 stk_size)
 {//Returns Fs of task
-  CTaskStk *temps;
+  CTaskStk *tmps;
 
   QueInit(&task->code_heap->next_mem_blk);
   task->code_heap->last_mergable=NULL;
@@ -196,8 +201,8 @@ I64 TaskInit(CTask *task,I64 stk_size)
 
   if (!stk_size)
     stk_size=MEM_DFT_STK;
-  task->stk=temps=TaskStkNew(stk_size,task);
-  task->rsp=(&temps->stk_base)(U8 *)+temps->stk_size;
+  task->stk=tmps=TaskStkNew(stk_size,task);
+  task->rsp=(&tmps->stk_base)(U8 *)+tmps->stk_size;
 
   task->text_attr	=WHITE<<4+BLUE;
   task->border_src	=BDS_CONST;
@@ -426,8 +431,8 @@ U0 TaskDel(CTask *task)
 
 I64 TaskEnd()
 {//Called with irq's off.
-  CTask *task=Fs,*tempt,*tempt1;
-  if (task==sys_task_being_screen_updated) {
+  CTask *task=Fs,*tmpt,*tmpt1;
+  if (task==sys_task_being_scrn_updated) {
     LBts(&task->task_flags,TASKf_KILL_TASK);
     return task->next_task;
   }
@@ -448,13 +453,13 @@ I64 TaskEnd()
 
   DrvsRelease;
   BlkDevsRelease;
-  tempt1=(&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
-  tempt=tempt1->next_sibling_task;
-  if (tempt!=tempt1) {
+  tmpt1=(&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
+  tmpt=tmpt1->next_sibling_task;
+  if (tmpt!=tmpt1) {
     do {
-      LBts(&tempt->task_flags,TASKf_KILL_TASK);
-      tempt=tempt->next_sibling_task;
-    } while (tempt!=tempt1);
+      LBts(&tmpt->task_flags,TASKf_KILL_TASK);
+      tmpt=tmpt->next_sibling_task;
+    } while (tmpt!=tmpt1);
     return task->next_task;
   }
   if (LBtr(&task->display_flags,DISPLAYf_SHOW))
@@ -482,17 +487,17 @@ I64 TaskEnd()
   //QueRem
   task->task_signature(I64)=0;
 
-  tempt =task->next_input_filter_task;
-  tempt1=task->last_input_filter_task;
-  tempt1->next_input_filter_task=tempt;
-  tempt ->last_input_filter_task=tempt1;
+  tmpt =task->next_input_filter_task;
+  tmpt1=task->last_input_filter_task;
+  tmpt1->next_input_filter_task=tmpt;
+  tmpt ->last_input_filter_task=tmpt1;
 
-  tempt =task->next_sibling_task;
-  tempt1=task->last_sibling_task;
-  tempt1->next_sibling_task=tempt;
-  tempt ->last_sibling_task=tempt1;
+  tmpt =task->next_sibling_task;
+  tmpt1=task->last_sibling_task;
+  tmpt1->next_sibling_task=tmpt;
+  tmpt ->last_sibling_task=tmpt1;
 
-  tempt =task->next_task; //save to return
+  tmpt =task->next_task; //save to return
   TaskQueRem(task);
 
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
@@ -504,7 +509,7 @@ I64 TaskEnd()
   QueIns(task,Gs->last_dying);
   LBtr(&Gs->cpu_flags,CPUf_DYING_TASK_QUE);
 
-  return tempt;
+  return tmpt;
 }
 
 U0 TaskKillDying()

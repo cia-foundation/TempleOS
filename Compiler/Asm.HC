@@ -34,8 +34,8 @@ Bool PrsAsmImm(CCmpCtrl *cc,CAsmArg *arg)
 
 U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 {
-  CHashGeneric *temph,*temph1;
-  CHashReg *tempr;
+  CHashGeneric *tmph,*tmph1;
+  CHashReg *tmpr;
   MemSet(arg,0,sizeof(CAsmArg));
   arg->seg =REG_NONE;
   arg->reg1=REG_NONE;
@@ -43,11 +43,11 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
   arg->scale=1;
   while (TRUE) {
     if (cc->token==TK_IDENT) {
-      if (temph=cc->hash_entry) {
-	if (temph->type&HTG_TYPE_MASK==HTT_REG) {
-	  tempr=temph;
-	  arg->reg1_type=tempr->reg_type;
-	  switch (tempr->reg_type) {
+      if (tmph=cc->hash_entry) {
+	if (tmph->type&HTG_TYPE_MASK==HTT_REG) {
+	  tmpr=tmph;
+	  arg->reg1_type=tmpr->reg_type;
+	  switch (tmpr->reg_type) {
 	    start:
 	      case REGT_R8:
 		arg->size=1;
@@ -62,11 +62,11 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 		arg->size=8;
 		break;
 	    end:
-	      arg->reg1=tempr->reg_num;
+	      arg->reg1=tmpr->reg_num;
 	      Lex(cc);
 	      return;
 	    case REGT_SEG:
-	      arg->seg=tempr->reg_num;
+	      arg->seg=tmpr->reg_num;
 	      if (Lex(cc)!=':') {
 		arg->just_seg=TRUE;
 		return;
@@ -77,17 +77,17 @@ U0 PrsAsmArg(CCmpCtrl *cc,CAsmArg *arg,Bool rel)
 	    case REGT_MM:
 	    case REGT_XMM:
 	      arg->size=8;
-	      arg->reg1=tempr->reg_num;
+	      arg->reg1=tmpr->reg_num;
 	      Lex(cc);
 	      return;
 	  }
 	} else {
-	  if ((temph->type&HTG_TYPE_MASK==HTT_CLASS||
-		temph->type&HTG_TYPE_MASK==HTT_INTERNAL_TYPE) &&
-		(temph1=HashFind(cc->cur_str,cmp.asm_hash,HTT_ASM_KEYWORD)))
-	    temph=temph1;
-	  if (temph->type&HTG_TYPE_MASK==HTT_ASM_KEYWORD) {
-	    switch (temph->user_data0) {
+	  if ((tmph->type&HTG_TYPE_MASK==HTT_CLASS||
+		tmph->type&HTG_TYPE_MASK==HTT_INTERNAL_TYPE) &&
+		(tmph1=HashFind(cc->cur_str,cmp.asm_hash,HTT_ASM_KEYWORD)))
+	    tmph=tmph1;
+	  if (tmph->type&HTG_TYPE_MASK==HTT_ASM_KEYWORD) {
+	    switch (tmph->user_data0) {
 	      case AKW_I8:
 	      case AKW_U8:
 		arg->size=1;
@@ -129,19 +129,19 @@ pa_asm_direct_imm:
       Lex(cc); // skip [
       while (cc->token && cc->token!=']') {
 	if (cc->token==TK_IDENT) {
-	  if (temph=cc->hash_entry) {
-	    if (temph->type&HTG_TYPE_MASK==HTT_REG &&
-		  REGT_R16<=temph(CHashReg *)->reg_type<=REGT_R64) {
-	      tempr=temph;
-	      arg->reg2_type=tempr->reg_type;
+	  if (tmph=cc->hash_entry) {
+	    if (tmph->type&HTG_TYPE_MASK==HTT_REG &&
+		  REGT_R16<=tmph(CHashReg *)->reg_type<=REGT_R64) {
+	      tmpr=tmph;
+	      arg->reg2_type=tmpr->reg_type;
 	      if (arg->reg1==REG_NONE) {
-		if (tempr->reg_num&7==REG_RSP) {
+		if (tmpr->reg_num&7==REG_RSP) {
 		  arg->reg1=4;
-		  arg->reg2=tempr->reg_num;
+		  arg->reg2=tmpr->reg_num;
 		} else
-		  arg->reg1=tempr->reg_num;
+		  arg->reg1=tmpr->reg_num;
 	      } else
-		arg->reg2=tempr->reg_num;
+		arg->reg2=tmpr->reg_num;
 	      Lex(cc);
 	    } else
 	      goto pa_asm_indirect_imm;
@@ -269,7 +269,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 {
   CAOTCtrl *aotc=cc->aotc;
   I64 i;
-  CAOTAbsAddr *tempa;
+  CAOTAbsAddr *tmpa;
 
   if (!num2->imm_flag)
     num2->num.i-=num2->rel;
@@ -284,19 +284,19 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	LexExcept(cc,"Branch out of range at ");
       if (num2->imm_flag) {
 	if (num2->num.abs_cnts.abs_addres&1) {
-	  tempa=CAlloc(sizeof(CAOTAbsAddr));
-	  tempa->next=aotc->abss;
-	  aotc->abss=tempa;
-	  tempa->ip=aotc->ip;
-	  tempa->type=AAT_ADD_U8;
+	  tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	  tmpa->next=aotc->abss;
+	  aotc->abss=tmpa;
+	  tmpa->ip=aotc->ip;
+	  tmpa->type=AAT_ADD_U8;
 	}
       } else {
 	if (num2->num.abs_cnts.c_addres&1) {
-	  tempa=CAlloc(sizeof(CAOTAbsAddr));
-	  tempa->next=aotc->abss;
-	  aotc->abss=tempa;
-	  tempa->ip=aotc->ip;
-	  tempa->type=AAT_SUB_U8;
+	  tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	  tmpa->next=aotc->abss;
+	  aotc->abss=tmpa;
+	  tmpa->ip=aotc->ip;
+	  tmpa->type=AAT_SUB_U8;
 	}
       }
       AOTStoreCodeU8(cc,num2->num.i);
@@ -311,19 +311,19 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_ADD_U16;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_ADD_U16;
 	  }
 	} else {
 	  if (num2->num.abs_cnts.c_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_SUB_U16;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_SUB_U16;
 	  }
 	}
 	AOTStoreCodeU8(cc,num2->num.i.u8[0]);
@@ -338,19 +338,19 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_ADD_U32;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_ADD_U32;
 	  }
 	} else {
 	  if (num2->num.abs_cnts.c_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_SUB_U32;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_SUB_U32;
 	  }
 	}
 	AOTStoreCodeU32(cc,num2->num.i);
@@ -362,19 +362,19 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 		U8_avail);
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_ADD_U64;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_ADD_U64;
 	  }
 	} else {
 	  if (num2->num.abs_cnts.c_addres&1) {
-	    tempa=CAlloc(sizeof(CAOTAbsAddr));
-	    tempa->next=aotc->abss;
-	    aotc->abss=tempa;
-	    tempa->ip=aotc->ip;
-	    tempa->type=AAT_SUB_U64;
+	    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+	    tmpa->next=aotc->abss;
+	    aotc->abss=tmpa;
+	    tmpa->ip=aotc->ip;
+	    tmpa->type=AAT_SUB_U64;
 	  }
 	}
 	AOTStoreCodeU64(cc,num2->num.i);
@@ -392,17 +392,16 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 
 U8 asm_seg_prefixes[6]={0x26,0x2E,0x36,0x3E,0x64,0x65};
 
-Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
+Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tmpo,I64 argcnt)
 {
   CAOTCtrl *aotc=cc->aotc;
   I64 i,j,a1,a2,om,seg,arg1mask,arg2mask;
-  CAsmArg *tempa1,*tempa2;
+  CAsmArg *tmpa1,*tmpa2;
   Bool ModrM_complete,U8_avail=FALSE,found_second_possible=FALSE;
-  CInst *tempi;
-
+  CInst *tmpins;
   CAsmIns cur,best;
-  best.U8_cnt=255;
 
+  best.U8_cnt=255;
   if (argcnt>0)
     arg1mask=AsmMakeArgMask(cc,&aotc->arg1);
   else
@@ -411,38 +410,38 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
     arg2mask=AsmMakeArgMask(cc,&aotc->arg2);
   else
     arg2mask=1;
-  for (i=0;i<tempo->inst_entry_cnt;i++) {
-    tempi=&tempo->ins[i];
-    if (tempi->arg1==ARGT_REL8 || tempi->arg2==ARGT_REL8)
+  for (i=0;i<tmpo->inst_entry_cnt;i++) {
+    tmpins=&tmpo->ins[i];
+    if (tmpins->arg1==ARGT_REL8 || tmpins->arg2==ARGT_REL8)
       U8_avail=TRUE;
-    if (Bt(&arg1mask,tempi->arg1) && Bt(&arg2mask,tempi->arg2) &&
-	  (!(tempi->flags&IEF_NOT_IN_64_BIT) || aotc->seg_size!=64)) {
+    if (Bt(&arg1mask,tmpins->arg1) && Bt(&arg2mask,tmpins->arg2) &&
+	  (!(tmpins->flags&IEF_NOT_IN_64_BIT) || aotc->seg_size!=64)) {
       MemSet(&cur,0,sizeof(CAsmIns));
-      cur.tempi=tempi;
+      cur.tmpins=tmpins;
       ModrM_complete=FALSE;
-      cur.is_dft=ToBool(tempi->flags & IEF_DFT);
+      cur.is_dft=ToBool(tmpins->flags & IEF_DFT);
       if (aotc->seg_size==64) {
-	if (tempi->flags & IEF_48_REX)
+	if (tmpins->flags & IEF_48_REX)
 	  cur.REX=0x48;
 	else
 	  cur.REX=0x40;
       }
       cur.disp.imm_flag=TRUE;
       cur.imm.imm_flag=TRUE;
-      om=tempi->opcode_modifier;
-      a1=tempi->arg1;
-      a2=tempi->arg2;
-      tempa1=&aotc->arg1;
-      tempa2=&aotc->arg2;
-      cur.last_opcode_U8=tempi->opcode[tempi->opcode_cnt-1];
+      om=tmpins->opcode_modifier;
+      a1=tmpins->arg1;
+      a2=tmpins->arg2;
+      tmpa1=&aotc->arg1;
+      tmpa2=&aotc->arg2;
+      cur.last_opcode_U8=tmpins->opcode[tmpins->opcode_cnt-1];
 
-      if (tempi->slash_val<8) {
-	cur.ModrM|=tempi->slash_val<<3;
+      if (tmpins->slash_val<8) {
+	cur.ModrM|=tmpins->slash_val<<3;
 	cur.has_ModrM=TRUE;
       }
 
-      if (aotc->seg_size==16 && tempi->flags & IEF_OP_SIZE32 ||
-	    aotc->seg_size!=16 && tempi->flags & IEF_OP_SIZE16)
+      if (aotc->seg_size==16 && tmpins->flags & IEF_OP_SIZE32 ||
+	    aotc->seg_size!=16 && tmpins->flags & IEF_OP_SIZE16)
 	cur.has_operand_prefix=TRUE;
 
       if (om==OM_IB)	  cur.imm.U8_cnt=1;
@@ -468,16 +467,16 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 		  cc->lex_include_stk->full_name,
 		  cc->lex_include_stk->line_num-1);
 	}
-	if (tempi->flags & IEF_PLUS_OPCODE) {
-	  if (tempi->slash_val==SV_R_REG) {
-	    cur.last_opcode_U8|=tempa1->reg1&7;
-	    if (tempa1->reg1&15>7)
+	if (tmpins->flags & IEF_PLUS_OPCODE) {
+	  if (tmpins->slash_val==SV_R_REG) {
+	    cur.last_opcode_U8|=tmpa1->reg1&7;
+	    if (tmpa1->reg1&15>7)
 	      cur.REX|=1;
-	    if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	    if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 	      cur.has_REX=TRUE;
 	  } else {//SV_I_REG
-	    if (tempa1->reg1_type==REGT_FSTK)
-	      cur.last_opcode_U8+=tempa1->reg1;
+	    if (tmpa1->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8+=tmpa1->reg1;
 	  }
 	}
 	if (a1==ARGT_R64 || a1==ARGT_RM64 || a1==ARGT_M64)
@@ -487,52 +486,52 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	    cur.has_addr_prefix=TRUE;
 
 	  cur.has_ModrM=TRUE;
-	  if (tempa1->imm_or_off_present && tempa1->indirect &&
-		tempa1->reg1==REG_NONE) {
+	  if (tmpa1->imm_or_off_present && tmpa1->indirect &&
+		tmpa1->reg1==REG_NONE) {
 	    cur.ModrM=cur.ModrM+5;
-	    MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	    MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 	    cur.disp.U8_cnt=4;
 	    if (aotc->seg_size==64)
 	      cur.disp.imm_flag=FALSE;
 	  } else {
-	    if (tempa1->reg2==REG_NONE && tempa1->scale==1) {
-	      cur.ModrM|=tempa1->reg1&7;
-	      if (tempa1->reg1&15>7)
+	    if (tmpa1->reg2==REG_NONE && tmpa1->scale==1) {
+	      cur.ModrM|=tmpa1->reg1&7;
+	      if (tmpa1->reg1&15>7)
 		cur.REX|=1;
-	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
 	    } else {
 	      cur.ModrM|=4;
 	      cur.has_SIB=TRUE;
-	      if (tempa1->scale==1)
+	      if (tmpa1->scale==1)
 		cur.SIB=0;
-	      else if (tempa1->scale==2)
+	      else if (tmpa1->scale==2)
 		cur.SIB=0x40;
-	      else if (tempa1->scale==4)
+	      else if (tmpa1->scale==4)
 		cur.SIB=0x80;
-	      else if (tempa1->scale==8)
+	      else if (tmpa1->scale==8)
 		cur.SIB=0xC0;
-	      if (tempa1->reg2==REG_NONE) {
+	      if (tmpa1->reg2==REG_NONE) {
 		ModrM_complete=TRUE;
-		cur.SIB|=(tempa1->reg1&7)<<3+REG_RBP;
-		if (tempa1->reg1&15>7)
+		cur.SIB|=(tmpa1->reg1&7)<<3+REG_RBP;
+		if (tmpa1->reg1&15>7)
 		  cur.REX|=2;
-		if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+		if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		  cur.has_REX=TRUE;
-		MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+		MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 		cur.disp.U8_cnt=4;
 	      } else {
-		cur.SIB|=(tempa1->reg1&7)<<3+tempa1->reg2&7;
-		if (tempa1->reg1&15>7)
+		cur.SIB|=(tmpa1->reg1&7)<<3+tmpa1->reg2&7;
+		if (tmpa1->reg1&15>7)
 		  cur.REX|=2;
-		if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+		if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		  cur.has_REX=TRUE;
-		if (tempa1->reg2&15>7)
+		if (tmpa1->reg2&15>7)
 		  cur.REX|=1;
-		if (tempa1->reg2>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+		if (tmpa1->reg2>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		  cur.has_REX=TRUE;
-		if (tempa1->reg2&7==REG_RBP &&
-		      !tempa1->imm_or_off_present && tempa1->indirect) {
+		if (tmpa1->reg2&7==REG_RBP &&
+		      !tmpa1->imm_or_off_present && tmpa1->indirect) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		  ModrM_complete=TRUE;
@@ -540,8 +539,8 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	      }
 	    }
 	    if (!ModrM_complete) {
-	      if (tempa1->imm_or_off_present) {
-		MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	      if (tmpa1->imm_or_off_present) {
+		MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 		if (!cur.disp.num.machine_code &&
 		      MIN_I8<=cur.disp.num.i<=MAX_I8) {
 		  cur.ModrM|=0x40;
@@ -553,11 +552,11 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 		  cur.ModrM|=0x80;
 		  cur.disp.U8_cnt=4;
 		}
-	      } else if (!tempa1->indirect) {
+	      } else if (!tmpa1->indirect) {
 		cur.has_addr_prefix=FALSE;
 		cur.ModrM|=0xC0;
 	      } else {
-		if (tempa1->reg1&7==REG_RBP) {
+		if (tmpa1->reg1&7==REG_RBP) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		}
@@ -568,7 +567,7 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	      ARGT_UIMM8<=a1<=ARGT_UIMM64) {
 	  if (a1==ARGT_IMM64 || a2==ARGT_UIMM64)
 	    cur.REX|=8;
-	  MemCpy(&cur.imm.num,&tempa1->num,sizeof(CAsmNum));
+	  MemCpy(&cur.imm.num,&tmpa1->num,sizeof(CAsmNum));
 	}
       } else if (argcnt==2) {
 	if (best.U8_cnt!=255 && !found_second_possible && !best.is_dft) {
@@ -578,26 +577,26 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 		  cc->lex_include_stk->full_name,
 		  cc->lex_include_stk->line_num-1);
 	}
-	if (tempi->flags & IEF_PLUS_OPCODE) {
-	  if (tempi->slash_val==SV_R_REG) {
+	if (tmpins->flags & IEF_PLUS_OPCODE) {
+	  if (tmpins->slash_val==SV_R_REG) {
 	    if (ARGT_AL<=a1<=ARGT_RAX) {
-	      cur.last_opcode_U8|=tempa2->reg1&7;
-	      if (tempa2->reg1&15>7)
+	      cur.last_opcode_U8|=tmpa2->reg1&7;
+	      if (tmpa2->reg1&15>7)
 		cur.REX|=1;
-	      if (tempa2->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa2->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
 	    } else {
-	      cur.last_opcode_U8|=tempa1->reg1&7;
-	      if (tempa1->reg1&15>7)
+	      cur.last_opcode_U8|=tmpa1->reg1&7;
+	      if (tmpa1->reg1&15>7)
 		cur.REX|=1;
-	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
 	    }
 	  } else {//SV_I_REG
-	    if (tempa1->reg1_type==REGT_FSTK)
-	      cur.last_opcode_U8|=tempa1->reg1;
-	    if (tempa2->reg1_type==REGT_FSTK)
-	      cur.last_opcode_U8|=tempa2->reg1;
+	    if (tmpa1->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8|=tmpa1->reg1;
+	    if (tmpa2->reg1_type==REGT_FSTK)
+	      cur.last_opcode_U8|=tmpa2->reg1;
 	  }
 	}
 	if (a1==ARGT_RM64 || a2==ARGT_RM64 || a1==ARGT_M64 || a2==ARGT_M64 ||
@@ -609,68 +608,68 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	    cur.has_addr_prefix=TRUE;
 	  cur.has_ModrM=TRUE;
 	  if (ARGT_RM8<=a2<=ARGT_RM64 || ARGT_M8<=a2<=ARGT_M64) {
-	    tempa1=&aotc->arg2;
-	    tempa2=&aotc->arg1;
+	    tmpa1=&aotc->arg2;
+	    tmpa2=&aotc->arg1;
 	  }
-	  if (tempi->slash_val==SV_R_REG) {
-	    if (tempa2->just_seg)
-	      cur.ModrM|=tempa2->seg<<3;
+	  if (tmpins->slash_val==SV_R_REG) {
+	    if (tmpa2->just_seg)
+	      cur.ModrM|=tmpa2->seg<<3;
 	    else {
-	      if (tempa2->reg1==REG_NONE) {
-		cur.ModrM|=(tempa1->reg1&7)<<3;
-		if (tempa1->reg1&15>7)
+	      if (tmpa2->reg1==REG_NONE) {
+		cur.ModrM|=(tmpa1->reg1&7)<<3;
+		if (tmpa1->reg1&15>7)
 		  cur.REX|=4;
-		if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+		if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		  cur.has_REX=TRUE;
 	      } else {
-		cur.ModrM|=(tempa2->reg1&7)<<3;
-		if (tempa2->reg1&15>7)
+		cur.ModrM|=(tmpa2->reg1&7)<<3;
+		if (tmpa2->reg1&15>7)
 		  cur.REX|=4;
-		if (tempa2->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+		if (tmpa2->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		  cur.has_REX=TRUE;
 	      }
 	    }
 	  }
-	  if (tempa1->reg2==REG_NONE && tempa1->scale==1) {
-	    if (tempa1->reg1!=REG_NONE) {
-	      cur.ModrM|=tempa1->reg1&7;
-	      if (tempa1->reg1&15>7)
+	  if (tmpa1->reg2==REG_NONE && tmpa1->scale==1) {
+	    if (tmpa1->reg1!=REG_NONE) {
+	      cur.ModrM|=tmpa1->reg1&7;
+	      if (tmpa1->reg1&15>7)
 		cur.REX|=1;
-	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
 	    }
 	  } else {
 	    cur.ModrM|=4;
 	    cur.has_SIB=TRUE;
-	    if (tempa1->scale==1)
+	    if (tmpa1->scale==1)
 	      cur.SIB=0;
-	    else if (tempa1->scale==2)
+	    else if (tmpa1->scale==2)
 	      cur.SIB=0x40;
-	    else if (tempa1->scale==4)
+	    else if (tmpa1->scale==4)
 	      cur.SIB=0x80;
-	    else if (tempa1->scale==8)
+	    else if (tmpa1->scale==8)
 	      cur.SIB=0xC0;
-	    if (tempa1->reg2==REG_NONE) {
+	    if (tmpa1->reg2==REG_NONE) {
 	      ModrM_complete=TRUE;
-	      cur.SIB|=(tempa1->reg1&7)<<3+5;
-	      if (tempa1->reg1&15>7)
+	      cur.SIB|=(tmpa1->reg1&7)<<3+5;
+	      if (tmpa1->reg1&15>7)
 		cur.REX|=2;
-	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
-	      MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	      MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 	      cur.disp.U8_cnt=4;
 	    } else {
-	      cur.SIB|=(tempa1->reg1&7)<<3+tempa1->reg2&7;
-	      if (tempa1->reg1&15>7)
+	      cur.SIB|=(tmpa1->reg1&7)<<3+tmpa1->reg2&7;
+	      if (tmpa1->reg1&15>7)
 		cur.REX|=2;
-	      if (tempa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg1>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
-	      if (tempa1->reg2&15>7)
+	      if (tmpa1->reg2&15>7)
 		cur.REX|=1;
-	      if (tempa1->reg2>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
+	      if (tmpa1->reg2>=20) //RBPu8,RSPu8,RSIu8,RDIu8?
 		cur.has_REX=TRUE;
-	      if (tempa1->reg2&7==REG_RBP &&
-		    !tempa1->imm_or_off_present && tempa1->indirect) {
+	      if (tmpa1->reg2&7==REG_RBP &&
+		    !tmpa1->imm_or_off_present && tmpa1->indirect) {
 		cur.ModrM|=0x40;
 		cur.disp.U8_cnt=1;
 		ModrM_complete=TRUE;
@@ -678,16 +677,16 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	    }
 	  }
 	  if (!ModrM_complete) {
-	    if (tempa1->imm_or_off_present &&
-		  tempa1->indirect && tempa1->reg1==REG_NONE) {
+	    if (tmpa1->imm_or_off_present &&
+		  tmpa1->indirect && tmpa1->reg1==REG_NONE) {
 	      cur.ModrM=cur.ModrM&0xF8+5;
-	      MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	      MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 	      cur.disp.U8_cnt=4;
 	      if (aotc->seg_size==64)
 		cur.disp.imm_flag=FALSE;
 	    } else {
-	      if (tempa1->imm_or_off_present) {
-		MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	      if (tmpa1->imm_or_off_present) {
+		MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 		if (!cur.disp.num.machine_code &&
 		      MIN_I8<=cur.disp.num.i<=MAX_I8) {
 		  cur.ModrM|=0x40;
@@ -699,11 +698,11 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 		  cur.ModrM|=0x80;
 		  cur.disp.U8_cnt=4;
 		}
-	      } else if (!tempa1->indirect) {
+	      } else if (!tmpa1->indirect) {
 		cur.has_addr_prefix=FALSE;
 		cur.ModrM|=0xC0;
 	      } else {
-		if (tempa1->reg1&7==REG_RBP) {
+		if (tmpa1->reg1&7==REG_RBP) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		}
@@ -711,14 +710,14 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	    }
 	  }
 	} else if (ARGT_MOFFS8<=a1<=ARGT_MOFFS64) {
-	  MemCpy(&cur.disp.num,&tempa1->num,sizeof(CAsmNum));
+	  MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 	  if (aotc->seg_size==16)
 	    cur.disp.U8_cnt=2;
 	  else
 	    cur.disp.U8_cnt=4;
 	  cur.has_addr_prefix=FALSE;
 	} else if (ARGT_MOFFS8<=a2<=ARGT_MOFFS64) {
-	  MemCpy(&cur.disp.num,&tempa2->num,sizeof(CAsmNum));
+	  MemCpy(&cur.disp.num,&tmpa2->num,sizeof(CAsmNum));
 	  if (aotc->seg_size==16)
 	    cur.disp.U8_cnt=2;
 	  else
@@ -726,7 +725,7 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	  cur.has_addr_prefix=FALSE;
 	} else if (ARGT_IMM8<=a1<=ARGT_IMM64 ||
 	      ARGT_UIMM8<=a1<=ARGT_UIMM64) {
-	  MemCpy(&cur.imm.num,&tempa1->num,sizeof(CAsmNum));
+	  MemCpy(&cur.imm.num,&tmpa1->num,sizeof(CAsmNum));
 	  if (a1==ARGT_IMM8 || a1==ARGT_UIMM8) cur.imm.U8_cnt=1;
 	  else if (a1==ARGT_IMM16 || a1==ARGT_UIMM16) cur.imm.U8_cnt=2;
 	  else if (a1==ARGT_IMM32 || a1==ARGT_UIMM32) cur.imm.U8_cnt=4;
@@ -737,12 +736,12 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	}
 	if (ARGT_IMM8<=a2<=ARGT_IMM64 ||
 	      ARGT_UIMM8<=a2<=ARGT_UIMM64) {
-	  MemCpy(&cur.imm.num,&tempa2->num,sizeof(CAsmNum));
+	  MemCpy(&cur.imm.num,&tmpa2->num,sizeof(CAsmNum));
 	  if (a2==ARGT_IMM8 || a2==ARGT_UIMM8) cur.imm.U8_cnt=1;
 	  else if (a2==ARGT_IMM16 || a2==ARGT_UIMM16) cur.imm.U8_cnt=2;
 	  else if (a2==ARGT_IMM32 || a2==ARGT_UIMM32) {
 	    cur.imm.U8_cnt=4;
-	    if (tempi->flags&IEF_REX_ONLY_R8_R15 && a2==ARGT_UIMM32)
+	    if (tmpins->flags&IEF_REX_ONLY_R8_R15 && a2==ARGT_UIMM32)
 	      cur.REX&=~8;
 	  } else {
 	    cur.imm.U8_cnt=8;
@@ -750,23 +749,23 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
 	  }
 	}
       }
-      cur.U8_cnt=tempi->opcode_cnt+cur.disp.U8_cnt+cur.imm.U8_cnt;
+      cur.U8_cnt=tmpins->opcode_cnt+cur.disp.U8_cnt+cur.imm.U8_cnt;
       if (cur.has_ModrM) cur.U8_cnt++;
       if (cur.has_SIB) cur.U8_cnt++;
       if (aotc->seg_size==64 && cur.REX&0x40==0x40 &&
 	    (cur.REX!=0x40 || cur.has_REX) &&
-	    (cur.REX&7 || !(tempi->flags&IEF_REX_ONLY_R8_R15 ||
-	    tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 &&
+	    (cur.REX&7 || !(tmpins->flags&IEF_REX_ONLY_R8_R15 ||
+	    tmpins->flags&IEF_REX_XOR_LIKE && tmpa1->reg1==tmpa2->reg1 &&
 	    cur.ModrM&0xC0==0xC0)))
 	cur.U8_cnt++;
       if (cur.U8_cnt<best.U8_cnt &&
-	    !(tempi->flags & IEF_DONT_SWITCH_MODES &&
+	    !(tmpins->flags & IEF_DONT_SWITCH_MODES &&
 	    (cur.has_addr_prefix || cur.has_operand_prefix)))
 	MemCpy(&best,&cur,sizeof(CAsmIns));
     }
   }
   if (best.U8_cnt<255) {
-    tempi=best.tempi;
+    tmpins=best.tmpins;
     seg=REG_NONE;
     if (argcnt>1 && aotc->arg2.seg!=REG_NONE && !aotc->arg2.just_seg)
       seg=aotc->arg2.seg;
@@ -780,12 +779,12 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
       AOTStoreCodeU8(cc,OC_ADDR_SIZE_PREFIX); //Operand size override
     if (aotc->seg_size==64 && best.REX&0x40==0x40 &&
 	  (best.REX!=0x40 || best.has_REX) &&
-	  (best.REX&7||!(tempi->flags&IEF_REX_ONLY_R8_R15 ||
-	  tempi->flags&IEF_REX_XOR_LIKE && tempa1->reg1==tempa2->reg1 &&
+	  (best.REX&7||!(tmpins->flags&IEF_REX_ONLY_R8_R15 ||
+	  tmpins->flags&IEF_REX_XOR_LIKE && tmpa1->reg1==tmpa2->reg1 &&
 	  best.ModrM&0xC0==0xC0)))
       AOTStoreCodeU8(cc,best.REX);
-    for (j=0;j<tempi->opcode_cnt-1;j++)
-      AOTStoreCodeU8(cc,tempi->opcode[j]);
+    for (j=0;j<tmpins->opcode_cnt-1;j++)
+      AOTStoreCodeU8(cc,tmpins->opcode[j]);
     AOTStoreCodeU8(cc,best.last_opcode_U8);
 
     if (best.has_ModrM)
@@ -804,7 +803,7 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tempo,I64 argcnt)
       if (!AsmStoreNum(cc,&best.imm,1,U8_avail))
 	return FALSE;
     }
-    if (tempi->flags&IEF_ENDING_ZERO) //ENTER inst
+    if (tmpins->flags&IEF_ENDING_ZERO) //ENTER inst
       AOTStoreCodeU8(cc,0);
     return TRUE;
   }
@@ -906,8 +905,8 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
   CAOTCtrl *aotc=cc->aotc;
   I64 i,j,k,argcnt,
 	old_flags=cc->flags & CCF_ASM_EXPRESSIONS;
-  CHashOpcode *tempo;
-  CHashExport *tempex;
+  CHashOpcode *tmpo;
+  CHashExport *tmpex;
   U8 *next_last_label;
   CCodeMisc *g_lb;
 
@@ -930,13 +929,13 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	      if (cc->token!=TK_IDENT)
 		LexExcept(cc,"Expecting identifier at ");
 	      else {
-		tempex=NULL;
-		tempex=CAlloc(sizeof(CHashExport));
-		tempex->str=cc->cur_str;
+		tmpex=NULL;
+		tmpex=CAlloc(sizeof(CHashExport));
+		tmpex->str=cc->cur_str;
 		cc->cur_str=0;
-		tempex->type=HTT_EXPORT_SYS_SYM|HTF_UNRESOLVED;
-		HashAdd(tempex,cc->htc.glbl_hash_table);
-		tempex->type|=HTF_IMPORT;
+		tmpex->type=HTT_EXPORT_SYS_SYM|HTF_UNRESOLVED;
+		HashAdd(tmpex,cc->htc.glbl_hash_table);
+		tmpex->type|=HTF_IMPORT;
 		if (Lex(cc)==',')
 		  Lex(cc); //skip ','
 	      }
@@ -1006,29 +1005,29 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	    LexExcept(cc,"Syntax error at ");
 	}
       } else if (cc->hash_entry->type & HTT_OPCODE) {
-	tempo=cc->hash_entry;
+	tmpo=cc->hash_entry;
 	Lex(cc); //skip opcode
 	argcnt=0;
-	if (tempo->ins[0].arg1) {
+	if (tmpo->ins[0].arg1) {
 	  argcnt++;
-	  if (ARGT_REL8<=tempo->ins[0].arg1<=ARGT_REL32)
+	  if (ARGT_REL8<=tmpo->ins[0].arg1<=ARGT_REL32)
 	    PrsAsmArg(cc,&aotc->arg1,TRUE);
 	  else
 	    PrsAsmArg(cc,&aotc->arg1,FALSE);
-	  if (tempo->ins[0].arg2) {
+	  if (tmpo->ins[0].arg2) {
 	    argcnt++;
 	    if (cc->token!=',')
 	      LexExcept(cc,"Expecting ',' at ");
 	    else {
 	      Lex(cc); //skip ','
-	      if (ARGT_REL8<=tempo->ins[0].arg2<=ARGT_REL32)
+	      if (ARGT_REL8<=tmpo->ins[0].arg2<=ARGT_REL32)
 		PrsAsmArg(cc,&aotc->arg2,TRUE);
 	      else
 		PrsAsmArg(cc,&aotc->arg2,FALSE);
 	    }
 	  }
 	}
-	PrsAsmInst(cc,tempo,argcnt);
+	PrsAsmInst(cc,tmpo,argcnt);
       } else if (cc->hash_entry->type & HTT_EXPORT_SYS_SYM) {
 	if (Btr(&cc->hash_entry->type,HTf_UNRESOLVED)) {
 	  if (cc->hash_entry->type & HTF_LOCAL) {
@@ -1063,25 +1062,25 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
       } else
 	LexExcept(cc,"Syntax error at ");
     } else if (cc->token==TK_IDENT) {
-      tempex=CAlloc(sizeof(CHashExport));
-      tempex->str=cc->cur_str;
+      tmpex=CAlloc(sizeof(CHashExport));
+      tmpex->str=cc->cur_str;
       cc->cur_str=0;
-      tempex->type=HTT_EXPORT_SYS_SYM;
-      tempex->val=aotc->ip;
+      tmpex->type=HTT_EXPORT_SYS_SYM;
+      tmpex->val=aotc->ip;
       Lex(cc);	//Skip cur_str
       if (cc->token!=':' && cc->token!=TK_DBL_COLON)
 	LexExcept(cc,"Expecting ':' at ");
       else {
-	if (*tempex->str=='@' && tempex->str[1]=='@') {
+	if (*tmpex->str=='@' && tmpex->str[1]=='@') {
 	  if (cc->token==TK_DBL_COLON)
 	    LexExcept(cc,"No local glbl exports at ");
-	  HashAdd(tempex,cc->htc.local_hash_table);
+	  HashAdd(tmpex,cc->htc.local_hash_table);
 	} else
-	  HashAdd(tempex,cc->htc.glbl_hash_table);
+	  HashAdd(tmpex,cc->htc.glbl_hash_table);
 	if (cc->htc.local_var_lst) {//AsmBlk in fun? Also add goto-like label.
-	  if (!(g_lb=COCGoToLabelFind(cc,tempex->str))) {
+	  if (!(g_lb=COCGoToLabelFind(cc,tmpex->str))) {
 	    g_lb=COCMiscNew(cc,CMT_ASM_LABEL);
-	    g_lb->str=StrNew(tempex->str);
+	    g_lb->str=StrNew(tmpex->str);
 	  } else if (g_lb->flags&CMF_DEFINED)
 	    LexExcept(cc,"Duplicate goto label at ");
 	  g_lb->type=CMT_ASM_LABEL;
@@ -1091,11 +1090,11 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	  ICAdd(cc,IC_LABEL,g_lb,0);
 	}
 	if (cc->token==TK_DBL_COLON) {
-	  tempex->type|=HTF_EXPORT;
-	  HashSrcFileSet(cc,tempex);
+	  tmpex->type|=HTF_EXPORT;
+	  HashSrcFileSet(cc,tmpex);
 
 	  AOTLocalsResolve(cc);
-	  aotc->last_label=tempex->str;
+	  aotc->last_label=tmpex->str;
 	}
 	Lex(cc);
       }
@@ -1104,8 +1103,8 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
     else
       LexExcept(cc,"Syntax error at ");
     if (cmp_flags&CMPF_ONE_ASM_INS && (cc->token!=TK_IDENT ||
-	  !(tempo=cc->hash_entry) ||
-	  !(tempo->type&(HTT_OPCODE|HTT_ASM_KEYWORD))))
+	  !(tmpo=cc->hash_entry) ||
+	  !(tmpo->type&(HTT_OPCODE|HTT_ASM_KEYWORD))))
       break;
   }
   AOTLocalsResolve(cc);

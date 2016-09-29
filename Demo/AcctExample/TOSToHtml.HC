@@ -171,7 +171,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -393,7 +393,7 @@ U0 TOSWebFile(U8 *name)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -410,7 +410,7 @@ U0 TOSWebFile(U8 *name)
 
 public U0 MakeWebSite()
 {
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   DocClear;
   Cd("D:/Wb");
   DelTree("D:/Wb/Home/Budget");
@@ -419,19 +419,19 @@ public U0 MakeWebSite()
   Touch("D:/Wb/Home/Web/index.DD.Z","");
   Touch("D:/Wb/Home/Web/DownloadOS.DD.Z","");
   Touch("D:/Wb/Home/Web/TempleOS.DD.Z","");
-  tempde=tempde1=FilesFind("*",
+  tmpde=tmpde1=FilesFind("*",
 	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
-  while (tempde) {
-    TOSWebFile(tempde->full_name);
-    tempde=tempde->next;
+  while (tmpde) {
+    TOSWebFile(tmpde->full_name);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   Drv('C');
 }
 
 U0 FreshenWebDir(U8 *dirname)
 {//No recurse
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   U8 *src,*dst;
 
   src=MStrPrint("D:/Wb%s",dirname);
@@ -449,11 +449,11 @@ U0 FreshenWebDir(U8 *dirname)
   Free(dst);
 
   src=MStrPrint("D:/Wb%s/*",dirname);
-  tempde=tempde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
-  while (tempde) {
-    TOSWebFile(tempde->full_name);
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
+  while (tmpde) {
+    TOSWebFile(tmpde->full_name);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 

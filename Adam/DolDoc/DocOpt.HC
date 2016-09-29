@@ -88,21 +88,21 @@ I64 DocOptFile(U8 *filename,I64 fuf_flags)
   DocDel(doc);
   return res;
 }
-I64 DocOptLst(CDirEntry *tempde,I64 fuf_flags)
+I64 DocOptLst(CDirEntry *tmpde,I64 fuf_flags)
 {
   I64 res=0;
-  CDirEntry *tempde1;
-  while (tempde) {
-    tempde1=tempde->next;
-    if (tempde->attr & RS_ATTR_DIR) {
-      if (tempde->sub) {
-	"Scanning Directory: %s\n",tempde->full_name;
-	res+=DocOptLst(tempde->sub,fuf_flags);
+  CDirEntry *tmpde1;
+  while (tmpde) {
+    tmpde1=tmpde->next;
+    if (tmpde->attr & RS_ATTR_DIR) {
+      if (tmpde->sub) {
+	"Scanning Directory: %s\n",tmpde->full_name;
+	res+=DocOptLst(tmpde->sub,fuf_flags);
       }
     } else
-      res+=DocOptFile(tempde->full_name,fuf_flags);
-    DirEntryDel(tempde);
-    tempde=tempde1;
+      res+=DocOptFile(tmpde->full_name,fuf_flags);
+    DirEntryDel(tmpde);
+    tmpde=tmpde1;
   }
   return res;
 }
@@ -110,7 +110,7 @@ public I64 DocOpt(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Optimize $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ Files, eliminating aux_str's and .Z's.
 //+R flag for aggressively risky.
   I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+$$");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   return DocOptLst(FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND),
 	fuf_flags&~FUG_FILES_FIND);

@@ -14,46 +14,46 @@ I64 PenBrushesSize()
   return res;
 }
 
-I64 ScreenZoomTablesSize()
+I64 ScrnZoomTablesSize()
 {
   I64 res=0,i;
-  for (i=1;i<=GR_MAX_SCREEN_ZOOM;i++)
-    res+=MSize2(gr.screen_zoom_tables[i]);
+  for (i=1;i<=GR_MAX_SCRN_ZOOM;i++)
+    res+=MSize2(gr.scrn_zoom_tables[i]);
   return res;
 }
 
 I64 TaskStkSize(CTask *task)
 {
-  CTaskStk *temps=task->stk;
+  CTaskStk *tmps=task->stk;
   I64 res=0;
-  while (temps) {
-    res+=MSize2(temps);
-    temps=temps->next_stk;
+  while (tmps) {
+    res+=MSize2(tmps);
+    tmps=tmps->next_stk;
   }
   return res;
 }
 
 I64 TaskQueSize(CTask *task)
 {
-  CSrvCmd *tempc,*tempc1;
+  CSrvCmd *tmpc,*tmpc1;
   I64 res=0;
   PUSHFD
   CLI
   while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
     PAUSE
 
-  tempc1=&task->srv_ctrl.next_waiting;
-  tempc=tempc1->next;
-  while (tempc!=tempc1) {
-    res+=MSize2(tempc)+MSize2(tempc->aux_str);
-    tempc=tempc->next;
+  tmpc1=&task->srv_ctrl.next_waiting;
+  tmpc=tmpc1->next;
+  while (tmpc!=tmpc1) {
+    res+=MSize2(tmpc)+MSize2(tmpc->aux_str);
+    tmpc=tmpc->next;
   }
 
-  tempc1=&task->srv_ctrl.next_done;
-  tempc=tempc1->next;
-  while (tempc!=tempc1) {
-    res+=MSize2(tempc)+MSize2(tempc->aux_str);
-    tempc=tempc->next;
+  tmpc1=&task->srv_ctrl.next_done;
+  tmpc=tmpc1->next;
+  while (tmpc!=tmpc1) {
+    res+=MSize2(tmpc)+MSize2(tmpc->aux_str);
+    tmpc=tmpc->next;
   }
 
   LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
@@ -136,7 +136,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
 
   if (task==sys_winmgr_task) {
     "gr.pen_brushes\t:%010X\n",PenBrushesSize;
-    "gr_screen_zoom_tbles:%010X\n",ScreenZoomTablesSize;
+    "gr_scrn_zoom_tbles:%010X\n",ScrnZoomTablesSize;
   } else if (task==adam_task) {
     j=0;k=0;m=0;n=0;
     for (i=0;i<mp_cnt;i++) {
@@ -182,7 +182,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
     "gr.dc1\t\t:%010X\n",DCSize(gr.dc1);
     "gr.dc2\t\t:%010X\n",DCSize(gr.dc2);
     "gr.dc_cache\t\t:%010X\n",DCSize(gr.dc_cache);
-    "gr.screen_image\t:%010X\n",DCSize(gr.screen_image);
+    "gr.scrn_image\t:%010X\n",DCSize(gr.scrn_image);
     "gr.zoomed_dc\t:%010X\n",DCSize(gr.zoomed_dc);
   }
   "$$ID,-2$$";

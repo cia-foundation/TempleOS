@@ -373,13 +373,13 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
   return res;
 }
 
-#help_index "Graphics/GRA Files"
-#help_file "::/Doc/GRAFiles"
-#help_index "Graphics/Device Contexts;Graphics/GRA Files"
-public I64 GRAWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
-{//TempleOS GRA File.
+#help_index "Graphics/GR Files"
+#help_file "::/Doc/GRFiles"
+#help_index "Graphics/Device Contexts;Graphics/GR Files"
+public I64 GRWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
+{//TempleOS GR File.
   I64 size;
-  U8 *st=DftExt(filename,"GRA.Z"),
+  U8 *st=DftExt(filename,"GR.Z"),
 	*src=DCSave(dc,&size,dcsf_flags);
   FileWrite(st,src,size);
   Free(st);
@@ -387,10 +387,10 @@ public I64 GRAWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
   return size;
 }
 
-public CDC *GRARead(U8 *filename,CTask *task=NULL)
-{//TempleOS GRA File.
+public CDC *GRRead(U8 *filename,CTask *task=NULL)
+{//TempleOS GR File.
   CDC *dc=NULL;
-  U8 *st=DftExt(filename,"GRA.Z"),
+  U8 *st=DftExt(filename,"GR.Z"),
 	*src=FileRead(st);
   if (src)
     dc=DCLoad(src,,task);
@@ -399,27 +399,27 @@ public CDC *GRARead(U8 *filename,CTask *task=NULL)
   return dc;
 }
 
-#help_index "Graphics/Sprite;Graphics/GRA Files;DolDoc/Output;StdOut/DolDoc"
-public U0 DocGRA(CDoc *doc=NULL,U8 *filename)
-{//Put a GRA file into a document as asprite.
-  CDC *dc=GRARead(filename);
+#help_index "Graphics/Sprite;Graphics/GR Files;DolDoc/Output;StdOut/DolDoc"
+public U0 DocGR(CDoc *doc=NULL,U8 *filename)
+{//Put a GR file into a document as asprite.
+  CDC *dc=GRRead(filename);
   CSprite *elems=DC2Sprite(dc);
   DocSprite(doc,elems);
   Free(elems);
   DCDel(dc);
 }
 
-#help_index "Graphics/Device Contexts;Graphics/Screen"
-public CDC *DCScreenCapture(Bool include_zoom=TRUE,CTask *task=NULL)
-{//Capture screen to a device context.
+#help_index "Graphics/Device Contexts;Graphics/Scrn"
+public CDC *DCScrnCapture(Bool include_zoom=TRUE,CTask *task=NULL)
+{//Capture scrn to a device context.
   CDC *dc;
   U8 *dst;
-  WinMgrSync(2,TRUE);
+  Refresh(2,TRUE);
   if (include_zoom)
-    dc=DCCopy(gr.screen_image,task);
+    dc=DCCopy(gr.scrn_image,task);
   else
     dc=DCCopy(gr.dc1,task);
-  dc->flags&=~DCF_SCREEN_BITMAP;
+  dc->flags&=~DCF_SCRN_BITMAP;
   dst=MAlloc(dc->width_internal*dc->height,task);
 //Pick background color that never occurs. COLOR_INVALID
   GrBitMap4ToBitMap8(dst,dc->body,
@@ -429,12 +429,12 @@ public CDC *DCScreenCapture(Bool include_zoom=TRUE,CTask *task=NULL)
   return dc;
 }
 
-#help_index "Graphics/GRA Files;Graphics/Screen"
-public I64 GRAScreenCapture(U8 *filename,Bool include_zoom=TRUE)
-{//Capture screen to a TempleOS GRA File.
+#help_index "Graphics/GR Files;Graphics/Scrn"
+public I64 GRScrnCapture(U8 *filename,Bool include_zoom=TRUE)
+{//Capture scrn to a TempleOS GR File.
   I64 size;
-  CDC *dc=DCScreenCapture(include_zoom);
-  size=GRAWrite(filename,dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
+  CDC *dc=DCScrnCapture(include_zoom);
+  size=GRWrite(filename,dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
   DCDel(dc);
   return size;
 }

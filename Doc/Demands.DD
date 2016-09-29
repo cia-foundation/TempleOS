@@ -17,7 +17,7 @@ $LK,"::/Kernel/BlkDev/DskCluster.HC"$	:152 All the cluster operations become blk
 
 * VMware needs to support ATAPI CD/DVD/Blu-ray disk burning, directly to real hardware.
 
-* VMware has a bug stretching 640x480 16 color to full screen.
+* VMware has a bug stretching 640x480 16 color to full scrn.
 
 * VMware PC speaker's distortion is a good idea, but it is too much for hymns.  VMware should make an adjustment for distortion and an adjustment for reverb.
 
@@ -44,7 +44,7 @@ $LK,"::/Kernel/Mem/PageTables.HC"$	:135 lines to identity-map gets eliminated.
 
 * We do not want UTF, just 8-bit characters.  $FG,2$<CTRL-ALT-f>$FG$ toggles between Cyrillic and Std Fonts.  We need the twelve window $LK,"TextBorder",A="MN:TextBorder"$ characters added to the VGA font 0x02-0x0D.  Japan, China and Korea must switch to alphabets.  Maybe, the United States will change to metric, out of good will. 
 
-* Microsoft Paint and Linux's Gimp must support TempleOS $LK,"GRA Files",A="FI:::/Doc/GRAFiles.DD"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
+* Microsoft Paint and Linux's Gimp must support TempleOS $LK,"GR Files",A="FI:::/Doc/GRFiles.DD"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
 
 * We must have a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.HC"$, too.
 

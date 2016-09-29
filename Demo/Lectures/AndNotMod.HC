@@ -5,7 +5,7 @@
 U0 TimeIns()
 {
   I64 start1,end1,start2,end2,overhead_time,test_time;
-  I64 reg i,reg temp;
+  I64 reg i,reg tmp;
 
   CPURep;
 
@@ -19,7 +19,7 @@ U0 TimeIns()
   //Measure remainder...
   start2=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
-    temp=i%0x400;
+    tmp=i%0x400;
   end2=GetTSC;
   test_time=end2-start2;
   "Remainder Version #1 Cycles\t: %10.5f\n",
@@ -28,7 +28,7 @@ U0 TimeIns()
   //Measure remainder...
   start2=GetTSC;
   for (i=0;i<SAMPLE_SIZE;i++)
-    temp=i&0x3FF;
+    tmp=i&0x3FF;
   end2=GetTSC;
   test_time=end2-start2;
   "Remainder Version #2 Cycles\t: %10.5f\n",

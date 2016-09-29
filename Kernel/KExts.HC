@@ -38,7 +38,7 @@ extern U0 DskCacheInvalidate(CDrv *dv);
 extern U0 Exit();
 extern I64 FAT32AllocClusters(CDrv *dv,I64 c,I64 cnt);
 extern I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt);
-extern Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,
+extern Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,
 	Bool free_old_chain);
 extern U0 FAT32DrvInit(CDrv *dv);
 extern Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
@@ -60,7 +60,7 @@ extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 extern Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0);
 extern Bool ISODrvInit(CDrv *dv,I64 blk);
-extern Bool IsDbg();
+extern Bool IsDbgMode();
 extern Bool IsDir(U8 *dir_name);
 extern Bool IsRaw();
 extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
@@ -77,7 +77,7 @@ extern U0 PutChars(U64 ch);
 extern U0 PutS(U8 *st); //Use $LK,"Print",A="MN:Print"$()
 extern Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
 extern I64 RedSeaAllocClusters(CDrv *dv,I64 cnt);
-extern Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,
+extern Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,
 	Bool free_old_chain);
 extern U0 RedSeaDrvInit(CDrv *dv);
 extern Bool RedSeaDrvValidate(U8 drv_let);
@@ -88,7 +88,7 @@ extern U0 RedSeaFreeFreeLst(CDrv *dv);
 extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
     U8 *task_name=NULL,I64 target_cpu,CTask *parent=NULL, //NULL means adam
     I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
-extern U0 SrvCmdDel(CSrvCmd *tempc);
+extern U0 SrvCmdDel(CSrvCmd *tmpc);
 extern U0 SrvCmdQueDel(CSrvCmd *head);
 extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
 extern U0 SrvCtrlInit(CSrvCtrl *ctrl);
@@ -99,7 +99,7 @@ extern CSrvCmd *TaskMsg(CTask *_srv,CTask *master,
 	I64 msg_code,I64 a1,I64 a2,I64 flags);
 extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
 extern Bool TaskValidate(CTask *task);
-extern U0 TaskWait(CTask *task=NULL);
+extern U0 TaskWait(CTask *task=NULL,Bool cmd_line_pmt=FALSE);
 extern CTask *User(U8 *fmt=NULL,...);
 extern U0 UserTaskCont();
 extern Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);

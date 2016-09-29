@@ -65,16 +65,16 @@ F64 MPDraw(CTask *task)
 
 U0 Draw()
 {
-  CSrvCmd *tempm[MP_MAX_PROCESSORS];
+  CSrvCmd *tmpm[MP_MAX_PROCESSORS];
   F64 y_total,old_y_total=MAX_F64;
   I64 i,w=Fs->pix_width,h=Fs->pix_height,cx=w/2,cy=h/2;
   CDC *dc=DCAlias;
   while (TRUE) {
     for (i=0;i<mp_cnt;i++)
-      tempm[i]=JobQue(&MPDraw,Fs,i,0);
+      tmpm[i]=JobQue(&MPDraw,Fs,i,0);
     y_total=0;
     for (i=0;i<mp_cnt;i++)
-      y_total+=JobResGet(tempm[i])(F64);
+      y_total+=JobResGet(tmpm[i])(F64);
 
     if (!y_total) break;
     scale*=7*GR_WIDTH*GR_HEIGHT/y_total;
@@ -95,13 +95,13 @@ U0 Draw()
 U0 PoleZeros()
 {
   I64 msg_code,a1,a2,p11,p22,cx,cy;
-  Complex *tempc=NULL;
+  Complex *tmpc=NULL;
 
   PopUpOk(
 	"Drag the poles and zeros with left mouse.\n"
 	"Hold right mouse for phase plot.\n"
 	);
-  WinMgrSync;
+  Refresh;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
@@ -125,10 +125,10 @@ pz_msg:
       cy=Fs->pix_height/2;
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
-	  tempc=PoleZeroFind(a1-cx,cy-a2);
+	  tmpc=PoleZeroFind(a1-cx,cy-a2);
 	  break;
 	case MSG_IP_MOVE:
-	  if (tempc) {
+	  if (tmpc) {
 	    p11=a1;p22=a2;
 //get to last mouse move
 	    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
@@ -139,16 +139,16 @@ pz_msg:
 	      } else
 		goto pz_msg;
 
-	    tempc->x=p11-cx;
-	    tempc->y=cy-p22;
+	    tmpc->x=p11-cx;
+	    tmpc->y=cy-p22;
 	    Draw;
 	  }
 	  break;
 	case MSG_IP_L_UP:
-	  if (tempc) {
-	    tempc->x=a1-cx;
-	    tempc->y=cy-a2;
-	    tempc=NULL;
+	  if (tmpc) {
+	    tmpc->x=a1-cx;
+	    tmpc->y=cy-a2;
+	    tmpc=NULL;
 	    Draw;
 	  }
 	  break;
@@ -160,7 +160,7 @@ pz_msg:
 	  if (a1==CH_SHIFT_ESC||a1==CH_ESC)
 	    goto pz_done;
       }
-      WinMgrSync;
+      Refresh;
     }
 pz_done:
     GetMsg(,,1<<MSG_KEY_UP);

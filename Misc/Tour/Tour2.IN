@@ -1,0 +1,68 @@
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+TourPut(
+"You are now at the command line.\n"
+"\n"
+"The syntax is like $$GREEN$$C/C++$$FG$$ except you don't need $$GREEN$$()$$FG$$ "
+"if there are no args.\n"
+"\n"
+"Type \"$$GREEN$$Dir;$$FG$$\" and press $$GREEN$$<ENTER>$$FG$$.\n\n"
+"You must remember the semicolon.\n");
+InGetStr("Dir;\n");
+
+TourPut(
+"Press $$GREEN$$<CTRL-m>$$FG$$.\n\n"
+"This will access your PersonalMenu.  You can customize it.  "
+"It's like your START menu and desktop.\n");
+
+InGetChar(CH_CTRLM);
+TourPut(
+"You can also get to your PersonalMenu by clicking on the word "
+"\"$$GREEN$$MENU$$FG$$\" in the title bar.\n",TRUE);
+
+TourPut("Press $$GREEN$$<CURSOR-DOWN>$$FG$$ nine times.\n");
+
+//Puts the cursor at the top
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+
+I64 i;
+for (i=0;i<9;i++)
+  InGetKey(SC_CURSOR_DOWN);
+
+TourPut(
+"Keyboard commands are:\n\n"
+"$$GREEN$$<SPACE>$$FG$$\t\tLeft-action\n"
+"$$GREEN$$<ENTER>$$FG$$\t\tRight-action\n"
+"$$GREEN$$<ESC>$$FG$$\t\tSave and exit\n"
+"$$GREEN$$<SHIFT-ESC>$$FG$$\tAbort and exit\n",TRUE);
+
+TourPut(
+"The cursor is now on top of a macro we wish to run.\n"
+"\n"
+"Press $$GREEN$$<SPACE>$$FG$$.\n");
+InGetStr(" ");
+
+TourPut(
+"The macro changed directories and did a $$GREEN$$Dir;$$FG$$ command.  "
+"The $$RED$$RED$$FG$$ filenames listed are file links.  Left-clicking will "
+"edit/view them.  Right-clicking or pressing $$GREEN$$<ENTER>$$FG$$ when the "
+"cursor is on top will bring-up a menu of options.\n\n"
+"The $$LTBLUE$$BLUE$$FG$$ underline entries \"$$LTBLUE$$.$$FG$$\" "
+"and \"$$LTBLUE$$..$$FG$$\""
+"are macros and will change directories.\n",TRUE);
+
+TourPut(
+"Press $$GREEN$$<CTRL-t>$$FG$$ to toggle to plain text mode.\n\n"
+"These are \"DolDoc\" commands.");
+InGetChar(CH_CTRLT);
+
+TourPut(
+"The DolDoc widgets are bracketed with dollar sign characters.\n\n"
+"\"LK\" stands \"link\".\n"
+"\"MA\" stands for \"macro\".\n\n"
+"Now, $$GREEN$$<CTRL-t>$$FG$$ to toggle back to regular mode.\n");
+InGetChar(CH_CTRLT);
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+

@@ -2,7 +2,55 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----09/18/16 17:15:54----$IV,0$
+$IV,1$----09/29/16 11:52:04----$IV,0$
+
+$IV,1$----09/29/16 10:13:14----$IV,0$
+* $BK,1$TempleOS version 4.12 Released$BK,0$
+* Added $LK,"TASKf_CMD_LINE_PMT",A="MN:TASKf_CMD_LINE_PMT"$.
+* Improved $LK,"TaskWait",A="MN:TaskWait"$().
+* Improved $LK,"DeathWait",A="MN:DeathWait"$().
+
+$IV,1$----09/27/16 12:40:21----$IV,0$
+* Added $LK,"SndRst",A="MN:SndRst"$().
+* Got rid of crappy reverb in $LK,"::/Apps/Psalmody/PsalmodyMain.HC"$.
+
+$IV,1$----09/27/16 11:09:25----$IV,0$
+* Improved $LK,"::/Misc/OSTestSuite.HC"$.
+* Fixed bug in $LK,"EdCharIns",A="MN:EdCharIns"$() printing $$ cmds.
+* Added $LK,"FUF_JUST_DD",A="MN:FUF_JUST_DD"$ and $LK,"FILEMASK_DD",A="MN:FILEMASK_DD"$.
+
+$IV,1$----09/27/16 01:05:52----$IV,0$
+* Improved $LK,"::/Doc/MemOverview.DD"$.
+* Got rid of $FG,4$::/Demo/Lectures/Mem$FG$.
+* Made filename paths relative to document location in DolDoc links.
+* $LK,"R",A="MN:R"$("Temp","Tmp");
+
+$IV,1$----09/26/16 00:44:42----$IV,0$
+* Added CloseAssault and OverRun to $LK,"::/Apps/ToTheFront/ToTheFront.HC"$.
+
+$IV,1$----09/22/16 07:53:20----$IV,0$
+* Improved $LK,"::/Demo/Graphics/Box.HC"$.
+* Improved $LK,"::/Demo/Graphics/SpritePlot3D.HC"$.
+
+$IV,1$----09/21/16 17:09:40----$IV,0$
+* Fixed bug in $LK,"::/Demo/Games/BomberGolf.HC"$.
+
+$IV,1$----09/20/16 15:57:30----$IV,0$
+* $LK,"R",A="MN:R"$("Screen","Scrn");
+* $LK,"R",A="MN:R"$("WinMgrSync","$LK,"Refresh",A="MN:Refresh"$");
+* $LK,"R",A="MN:R"$("InDbg","$LK,"DbgMode",A="MN:DbgMode"$");
+* Improved $LK,"::/Doc/Boot.DD"$.
+
+$IV,1$----09/20/16 07:31:52----$IV,0$
+* $LK,"R",A="MN:R"$("DAT","DATA");
+* $LK,"R",A="MN:R"$("Auto","In");
+* $LK,"R",A="MN:R"$("AutoStr","InStr");
+* $LK,"R",A="MN:R"$("AutoFile","InFile");
+* $LK,"R",A="MN:R"$("AUT","IN");
+* $LK,"R",A="MN:R"$("GRA","GR");
+
+$IV,1$----09/18/16 20:40:44----$IV,0$
+* Added $LK,"::/Doc/WhyNotMore.DD"$.
 
 $IV,1$----09/18/16 12:52:03----$IV,0$
 * $BK,1$TempleOS version 4.11 Released$BK,0$
@@ -146,7 +194,7 @@ $IV,1$----05/07/16 08:55:59----$IV,0$
 * $BK,1$TempleOS version 4.06 Released$BK,0$
 
 $IV,1$----05/03/16 19:26:45----$IV,0$
-* Made $LK,"FunSegFind",A="MN:FunSegFind"$() search all hash tables when $LK,"IsDbg",A="MN:IsDbg"$.
+* Made $LK,"FunSegFind",A="MN:FunSegFind"$() search all hash tables when $LK,"IsDbgMode",A="MN:IsDbgMode"$.
 * Added missiles to $LK,"::/Apps/X-Caliber/X-Caliber.HC"$.
 * Fixed bug in $LK,"D3Unit",A="MN:D3Unit"$().
 
@@ -216,7 +264,7 @@ $IV,1$----03/19/16 09:15:11----$IV,0$
 $IV,1$----03/19/16 06:22:36----$IV,0$
 * Fixed $LK,"UAsm",A="MN:Ui"$() bug.
 * Got rids of $FG,4$ICF_A1_FIRST$FG$.
-* Cleaned-up compiler $LK,"REGG_CLOBBERED",A="MN:REGG_CLOBBERED"$ and $LK,"REGG_STK_TEMP",A="MN:REGG_STK_TEMP"$.
+* Cleaned-up compiler $LK,"REGG_CLOBBERED",A="MN:REGG_CLOBBERED"$ and $LK,"REGG_STK_TMP",A="MN:REGG_STK_TMP"$.
 
 $IV,1$----03/18/16 09:53:33----$IV,0$
 * Made $LK,"SpriteEd",A="MN:SpriteEd"$() sel foreground elem.
@@ -258,7 +306,7 @@ $IV,1$----02/01/16 21:01:15----$IV,0$
 * Made multicore more professional.
 
 $IV,1$----02/01/16 06:02:41----$IV,0$
-* Moved $LK,"Mem2Meg.HC",A="FI:::/Demo/Lectures/Mem/Mem2Meg.HC"$ out of kernel.
+* Moved Sup1CodeScraps/Mem/Mem2Meg.HC out of kernel.
 
 $IV,1$----01/31/16 04:07:50----$IV,0$
 * Fixed scheduler, so doesn't idle so high.
@@ -325,7 +373,7 @@ $IV,1$----01/12/16 19:17:12----$IV,0$
 
 $IV,1$----01/12/16 10:06:18----$IV,0$
 * $BK,1$TempleOS version 4.01 Released$BK,0$
-* Standardized drive letters.  Your $LK,"Auto",A="MN:Auto"$() config scripts for compiling the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$() must be changed.
+* Standardized drive letters.  Your $LK,"In",A="MN:In"$() config scripts for compiling the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$() must be changed.
 * Added $LK,"CCF_QUESTION_HELP",A="MN:CCF_QUESTION_HELP"$.
 
 $IV,1$----01/11/16 00:04:38----$IV,0$

@@ -1,17 +1,17 @@
 U0 PutKey(I64 ch=0,I64 sc=0)
 {//See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
-  CKeyDevEntry *tempp;
+  CKeyDevEntry *tmpk;
   if (ch||sc) {
-    tempp=keydev.put_key_head.next;
+    tmpk=keydev.put_key_head.next;
     if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
       if (kbd.scan_code & SCF_SCROLL && sys_focus_task==Fs)
 	while (kbd.scan_code & SCF_SCROLL)
 	  Yield; //Wait on SCROLL LOCK Key
-      while (tempp!=&keydev.put_key_head) {
-	if ((!(sc&SCF_KEY_DESC) || tempp->flags & KDF_HAS_DESCS) &&
-	      (*tempp->put_key)(ch,sc))
+      while (tmpk!=&keydev.put_key_head) {
+	if ((!(sc&SCF_KEY_DESC) || tmpk->flags & KDF_HAS_DESCS) &&
+	      (*tmpk->put_key)(ch,sc))
 	  break;
-	tempp=tempp->next;
+	tmpk=tmpk->next;
       }
     }
   }
@@ -33,22 +33,22 @@ U0 PutS(U8 *st)
   U8 *ptr;
   Bool cont=TRUE;
   if (!st) return;
-  CKeyDevEntry *tempp=keydev.put_key_head.next;
+  CKeyDevEntry *tmpk=keydev.put_key_head.next;
   if (!Bt(&Fs->display_flags,DISPLAYf_SILENT)) {
     if (kbd.scan_code & SCF_SCROLL && sys_focus_task==Fs)
       while (kbd.scan_code & SCF_SCROLL)
 	Yield;
-    while (cont && tempp!=&keydev.put_key_head) {
-      if (tempp->put_s) {
-	if ((*tempp->put_s)(st))
+    while (cont && tmpk!=&keydev.put_key_head) {
+      if (tmpk->put_s) {
+	if ((*tmpk->put_s)(st))
 	  break;
       } else {
 	ptr=st;
 	while (ch=*ptr++)
-	  if ((*tempp->put_key)(ch,0))
+	  if ((*tmpk->put_key)(ch,0))
 	    cont=FALSE;
       }
-      tempp=tempp->next;
+      tmpk=tmpk->next;
     }
   }
 }
@@ -61,28 +61,28 @@ U0 KeyDescSet(U8 *fmt,...)
   Free(buf);
 }
 
-U0 KeyDevRem(CKeyDevEntry *tempp)
+U0 KeyDevRem(CKeyDevEntry *tmpk)
 {//Remove StdOut hook and free.
-  QueRem(tempp);
-  Free(tempp);
+  QueRem(tmpk);
+  Free(tmpk);
 }
 
 CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE)
 {//Places hook in StdOut chain. See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.
-  CKeyDevEntry *tempp=keydev.put_key_head.last,
-	*tempp1=ACAlloc(sizeof(CKeyDevEntry));
-  tempp1->put_key=fp_put_key;
-  tempp1->put_s=fp_puts;
-  tempp1->priority=priority;
+  CKeyDevEntry *tmpk=keydev.put_key_head.last,
+	*tmpk1=ACAlloc(sizeof(CKeyDevEntry));
+  tmpk1->put_key=fp_put_key;
+  tmpk1->put_s=fp_puts;
+  tmpk1->priority=priority;
   if (key_descs)
-    tempp1->flags|=KDF_HAS_DESCS;
-  while (tempp->priority>priority)
-    tempp=tempp->last;
-  QueIns(tempp1,tempp);
-  if (tempp->priority==priority)
-    KeyDevRem(tempp);
-  return tempp1;
+    tmpk1->flags|=KDF_HAS_DESCS;
+  while (tmpk->priority>priority)
+    tmpk=tmpk->last;
+  QueIns(tmpk1,tmpk);
+  if (tmpk->priority==priority)
+    KeyDevRem(tmpk);
+  return tmpk1;
 }
 
 Bool KDRawPutKey(I64 ch,I64)
@@ -137,7 +137,7 @@ U0 CtrlAltC(I64)
 
 U0 CtrlAltD(I64)
 {
-  if (!IsDbg) {
+  if (!IsDbgMode) {
     if (Fs==Gs->idle_task)
       BptS(sys_winmgr_task->rip,sys_winmgr_task);
     else

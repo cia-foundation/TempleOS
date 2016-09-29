@@ -31,7 +31,7 @@ $ID,-5$
 
 * Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
 
-* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"80,901",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,223",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
  
 * Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 
@@ -55,14 +55,14 @@ $ID,-5$
 
 * $FG,2$100% open source$FG$ with all source included.
 
-* Documents are not for printing.  They're dynamic, intended for the screen.
+* Documents are not for printing.  They're dynamic, intended for the scrn.
 
 * Just one 8x8 fixed-width font.  $FG,4$No Unicode, just Extended ASCII$FG$.  Other countries can make their own versions.  The versions should be just for one language and platform.
 
 * $FG,4$No multimedia$FG$.  Sounds and images will be primarily calculated in real-time, not fetched from storage.
 
 $FG,8$
-* "Commodore 64" was a trademark owned by Commodore Business Machines.
+* "Commodore 64" is a trademark owned by Polabe Holding NV.
 * "The Simpsons" is a trademark owned by Fox.
 * "Windows" is a trademark owned by MicroSoft Corp.
 $FG$

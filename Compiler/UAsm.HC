@@ -1,55 +1,55 @@
-I64 InstEntriesCompare(CInst *tempi1,CInst *tempi2)
+I64 InstEntriesCompare(CInst *tmpins1,CInst *tmpins2)
 {
-  I64 i1,i2,j=0,res=0,oc_cnt1=tempi1->opcode_cnt,oc_cnt2=tempi2->opcode_cnt;
-  if (tempi1->flags&IEF_STI_LIKE)
+  I64 i1,i2,j=0,res=0,oc_cnt1=tmpins1->opcode_cnt,oc_cnt2=tmpins2->opcode_cnt;
+  if (tmpins1->flags&IEF_STI_LIKE)
     oc_cnt1--;
-  if (tempi2->flags&IEF_STI_LIKE)
+  if (tmpins2->flags&IEF_STI_LIKE)
     oc_cnt2--;
   while (TRUE) {
     if (j<oc_cnt1 && j<oc_cnt2) {
-      if (res=tempi1->opcode[j]-tempi2->opcode[j])
+      if (res=tmpins1->opcode[j]-tmpins2->opcode[j])
 	return res;
       j++;
     } else {
       if (res=oc_cnt1-oc_cnt2)
 	return res;
 
-      if (tempi1->flags&IEF_STI_LIKE && tempi2->flags&IEF_STI_LIKE)
-	return tempi1->opcode[j]-tempi2->opcode[j];
+      if (tmpins1->flags&IEF_STI_LIKE && tmpins2->flags&IEF_STI_LIKE)
+	return tmpins1->opcode[j]-tmpins2->opcode[j];
 
-      if (res=tempi1->flags&IEF_STI_LIKE - tempi2->flags&IEF_STI_LIKE)
+      if (res=tmpins1->flags&IEF_STI_LIKE - tmpins2->flags&IEF_STI_LIKE)
 	return res;
 
-      if (res=tempi1->slash_val-tempi2->slash_val)
+      if (res=tmpins1->slash_val-tmpins2->slash_val)
 	return res;
 
-      if (res=tempi1->flags&IEF_OP_SIZE32 - tempi2->flags&IEF_OP_SIZE32)
+      if (res=tmpins1->flags&IEF_OP_SIZE32 - tmpins2->flags&IEF_OP_SIZE32)
 	return res;
 
-      i1=Bt(&uasm.ins64_arg_mask,tempi1->arg1) ||
-	    Bt(&uasm.ins64_arg_mask,tempi1->arg2);
-      i2=Bt(&uasm.ins64_arg_mask,tempi2->arg1) ||
-	    Bt(&uasm.ins64_arg_mask,tempi2->arg2);
+      i1=Bt(&uasm.ins64_arg_mask,tmpins1->arg1) ||
+	    Bt(&uasm.ins64_arg_mask,tmpins1->arg2);
+      i2=Bt(&uasm.ins64_arg_mask,tmpins2->arg1) ||
+	    Bt(&uasm.ins64_arg_mask,tmpins2->arg2);
       if (res=i1-i2)
 	return res;
 
-      if (res=tempi1->flags&IEF_48_REX - tempi2->flags&IEF_48_REX)
+      if (res=tmpins1->flags&IEF_48_REX - tmpins2->flags&IEF_48_REX)
 	return res;
 
-      i1=tempi1->arg2==ARGT_IMM64 || tempi1->arg2==ARGT_UIMM64;
-      i2=tempi2->arg2==ARGT_IMM64 || tempi2->arg2==ARGT_UIMM64;
+      i1=tmpins1->arg2==ARGT_IMM64 || tmpins1->arg2==ARGT_UIMM64;
+      i2=tmpins2->arg2==ARGT_IMM64 || tmpins2->arg2==ARGT_UIMM64;
       return i1-i2;
     }
   }
 }
 
 /*
-U0 DumpUAsmIns(CInst *tempi)
+U0 DumpUAsmIns(CInst *tmpins)
 {
-  CHashOpcode *tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInst)
+  CHashOpcode *tmpo=tmpins(U8 *)-tmpins->ins_entry_num*sizeof(CInst)
   -offset(CHashOpcode.ins);
-  "%10s:%02d,%02d SV:%02d\n",tempo->str,
-	tempi->arg1,tempi->arg2,tempi->slash_val;
+  "%10s:%02d,%02d SV:%02d\n",tmpo->str,
+	tmpins->arg1,tmpins->arg2,tmpins->slash_val;
 }
 U0 DumpUAsmTables()
 {
@@ -66,7 +66,7 @@ U0 DumpUAsmTables()
 CInst *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 {//Binary Search
   I64 i,j,n,m,k,a1,a2,o1,o2,oc_cnt;
-  CInst *tempi,**table;
+  CInst *tmpins,**table;
   i=0;
   if (seg_size==64) {
     table=uasm.table_64;
@@ -77,50 +77,50 @@ CInst *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
   }
   while (TRUE) {
     k=(i+j)>>1;  //binary search
-    tempi=table[k];
-//DumpUAsmIns(tempi);
+    tmpins=table[k];
+//DumpUAsmIns(tmpins);
     m=0;
     n=0;
     while (TRUE) { //ief_compare_start
-      a1=tempi->arg1;
-      a2=tempi->arg2;
-      oc_cnt=tempi->opcode_cnt;
-      if (tempi->flags&IEF_STI_LIKE)
+      a1=tmpins->arg1;
+      a2=tmpins->arg2;
+      oc_cnt=tmpins->opcode_cnt;
+      if (tmpins->flags&IEF_STI_LIKE)
 	oc_cnt--;
       if (n<oc_cnt) {
 	o1=ip[n];
-	if (n==tempi->opcode_cnt-1 && tempi->flags & IEF_PLUS_OPCODE)
+	if (n==tmpins->opcode_cnt-1 && tmpins->flags & IEF_PLUS_OPCODE)
 	  o1&=-8;
-	o2=tempi->opcode[n++];
+	o2=tmpins->opcode[n++];
 	if (m=o1-o2)
 	  goto ief_compare_done;
       } else
-	switch [tempi->uasm_slash_val] {
+	switch [tmpins->uasm_slash_val] {
 	  case 0...7:
-	    if (!(m=ip[n]>>3&7-tempi->slash_val)) {
+	    if (!(m=ip[n]>>3&7-tmpins->slash_val)) {
 	      if ((Bt(&uasm.mem_arg_mask,a1) || Bt(&uasm.mem_arg_mask,a2)) &&
 		    ip[n]&0xC0==0xC0) {
 		m=1;
 		goto ief_compare_done;
 	      }
 	      if (opsize==16) {
-		if (tempi->flags & IEF_OP_SIZE32) {
+		if (tmpins->flags & IEF_OP_SIZE32) {
 		  m=-1;
 		  goto ief_compare_done;
 		}
 	      } else {
-		if (tempi->flags & IEF_OP_SIZE16) {
+		if (tmpins->flags & IEF_OP_SIZE16) {
 		  m=1;
 		  goto ief_compare_done;
 		}
 	      }
 	      if (opsize==64||a1==ARGT_M64||a2==ARGT_M64) {
 		if (!Bt(&uasm.ins64_arg_mask,a1)&&
-		      !Bt(&uasm.ins64_arg_mask,a2)&&!(tempi->flags&IEF_48_REX))
+		      !Bt(&uasm.ins64_arg_mask,a2)&&!(tmpins->flags&IEF_48_REX))
 		  m=1;
 	      } else {
 		if (Bt(&uasm.ins64_arg_mask,a1)||Bt(&uasm.ins64_arg_mask,a2) ||
-		      tempi->flags&IEF_48_REX)
+		      tmpins->flags&IEF_48_REX)
 		  m=-1;
 	      }
 	    } else if ((Bt(&uasm.mem_arg_mask,a1)||Bt(&uasm.mem_arg_mask,a2)) &&
@@ -128,39 +128,39 @@ CInst *InstEntryFind(U8 *ip,I64 opsize,I64 seg_size)
 	      m=1;
 	    goto ief_compare_done;
 	  case SV_I_REG:
-	    m=ip[n]>>3-tempi->opcode[tempi->opcode_cnt-1]>>3;
+	    m=ip[n]>>3-tmpins->opcode[tmpins->opcode_cnt-1]>>3;
 	    goto ief_compare_done;
 	  case SV_STI_LIKE:
-	    if (!(m=ip[n]>>3-tempi->opcode[tempi->opcode_cnt-1]>>3))
-	      m=ip[n]-tempi->opcode[tempi->opcode_cnt-1];
+	    if (!(m=ip[n]>>3-tmpins->opcode[tmpins->opcode_cnt-1]>>3))
+	      m=ip[n]-tmpins->opcode[tmpins->opcode_cnt-1];
 	    goto ief_compare_done;
 	  case SV_R_REG:
 	  case SV_NONE:
 	    m=0;
 	    if (opsize==16) {
-	      if (tempi->flags & IEF_OP_SIZE32) {
+	      if (tmpins->flags & IEF_OP_SIZE32) {
 		m=-1;
 		goto ief_compare_done;
 	      }
 	    } else {
-	      if (tempi->flags & IEF_OP_SIZE16) {
+	      if (tmpins->flags & IEF_OP_SIZE16) {
 		m=1;
 		goto ief_compare_done;
 	      }
 	    }
 	    if (opsize==64 || a1==ARGT_M64 || a2==ARGT_M64) {
 	      if (!Bt(&uasm.ins64_arg_mask,a1) &&!Bt(&uasm.ins64_arg_mask,a2) &&
-		    !(tempi->flags&IEF_48_REX)&& !(a2==ARGT_NONE &&
+		    !(tmpins->flags&IEF_48_REX)&& !(a2==ARGT_NONE &&
 		    (ARGT_UIMM8<=a1<=ARGT_UIMM64 || ARGT_IMM8<=a1<=ARGT_IMM64)))
 		m=1;
-	      else if (tempi->arg2==ARGT_IMM64 || tempi->arg2==ARGT_UIMM64) {
+	      else if (tmpins->arg2==ARGT_IMM64 || tmpins->arg2==ARGT_UIMM64) {
 		if (a2!=ARGT_IMM64&&a2!=ARGT_UIMM64)
 		  m=1;
 	      } else if (a2==ARGT_IMM64||a2==ARGT_UIMM64)
 		m=-1;
 	    } else {
 	      if (Bt(&uasm.ins64_arg_mask,a1) || Bt(&uasm.ins64_arg_mask,a2) ||
-		    tempi->flags&IEF_48_REX)
+		    tmpins->flags&IEF_48_REX)
 		m=-1;
 	    }
 	    goto ief_compare_done;
@@ -187,8 +187,8 @@ ief_compare_done:
 
 U0 UAsmHashLoad()
 {
-  CHashOpcode *temph;
-  CInst *tempi;
+  CHashOpcode *tmph;
+  CInst *tmpins;
   I64 i,j1,j2,k;
 
   uasm.ins64_arg_mask=0x0880888880+1<<ARGT_ST0+1<<ARGT_STI;
@@ -198,18 +198,18 @@ U0 UAsmHashLoad()
 
   uasm.table_16_32_entries=uasm.table_64_entries=0;
   for (i=0;i<=cmp.asm_hash->mask;i++) {
-    temph=cmp.asm_hash->body[i];
-    while (temph) {
-      if (temph->type==HTT_OPCODE && !(temph->oc_flags&OCF_ALIAS)) {
-	tempi=&temph->ins;
-	for (k=0;k<temph->inst_entry_cnt;k++) {
+    tmph=cmp.asm_hash->body[i];
+    while (tmph) {
+      if (tmph->type==HTT_OPCODE && !(tmph->oc_flags&OCF_ALIAS)) {
+	tmpins=&tmph->ins;
+	for (k=0;k<tmph->inst_entry_cnt;k++) {
 	  uasm.table_16_32_entries++;
-	  if (!(tempi->flags&IEF_NOT_IN_64_BIT))
+	  if (!(tmpins->flags&IEF_NOT_IN_64_BIT))
 	    uasm.table_64_entries++;
-	  tempi++;
+	  tmpins++;
 	}
       }
-      temph=temph->next;
+      tmph=tmph->next;
     }
   }
 
@@ -217,18 +217,18 @@ U0 UAsmHashLoad()
   uasm.table_16_32=MAlloc(uasm.table_16_32_entries*sizeof(U8 *));
   uasm.table_64   =MAlloc(uasm.table_64_entries   *sizeof(U8 *));
   for (i=0;i<=cmp.asm_hash->mask;i++) {
-    temph=cmp.asm_hash->body[i];
-    while (temph) {
-      if (temph->type==HTT_OPCODE && !(temph->oc_flags&OCF_ALIAS)) {
-	tempi=&temph->ins;
-	for (k=0;k<temph->inst_entry_cnt;k++) {
-	  uasm.table_16_32[j1++]=tempi;
-	  if (!(tempi->flags&IEF_NOT_IN_64_BIT))
-	    uasm.table_64[j2++]=tempi;
-	  tempi++;
+    tmph=cmp.asm_hash->body[i];
+    while (tmph) {
+      if (tmph->type==HTT_OPCODE && !(tmph->oc_flags&OCF_ALIAS)) {
+	tmpins=&tmph->ins;
+	for (k=0;k<tmph->inst_entry_cnt;k++) {
+	  uasm.table_16_32[j1++]=tmpins;
+	  if (!(tmpins->flags&IEF_NOT_IN_64_BIT))
+	    uasm.table_64[j2++]=tmpins;
+	  tmpins++;
 	}
       }
-      temph=temph->next;
+      tmph=tmph->next;
     }
   }
   QSortI64(uasm.table_16_32,uasm.table_16_32_entries,&InstEntriesCompare);
@@ -243,8 +243,8 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
 	ModrM=-1,SIB=-1,scale,r1,r2,
 	Mod=-1,RM1=-1,RM2=-1,REX=-1,REX_r=0,REX_x=0,REX_b=0;
   Bool cont;
-  CInst *tempi,*tempi2;
-  CHashOpcode *tempo;
+  CInst *tmpins,*tmpins2;
+  CHashOpcode *tmpo;
   U8 *ip=*_ip,*ptr,*reloced_a1_st,*reloced_a2_st,
 	*bin_data_area1,*bin_data_area2,
 	line1[512],line2[512],buf2[512],a1_st[512],a2_st[512],seg_overrides[32];
@@ -325,41 +325,41 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
       break;
   }
 
-  tempi=InstEntryFind(ip,opsize,seg_size);
+  tmpins=InstEntryFind(ip,opsize,seg_size);
   if (opsize==32 && seg_size==64) {
-    tempi2=InstEntryFind(ip,64,seg_size);
-    if (tempi2!=tempi && tempi2->flags&IEF_REX_ONLY_R8_R15 ||
-	  tempi2->flags&IEF_REX_XOR_LIKE&& ip[1]>>3&7==ip[1]&7)
-      tempi=tempi2;
+    tmpins2=InstEntryFind(ip,64,seg_size);
+    if (tmpins2!=tmpins && tmpins2->flags&IEF_REX_ONLY_R8_R15 ||
+	  tmpins2->flags&IEF_REX_XOR_LIKE&& ip[1]>>3&7==ip[1]&7)
+      tmpins=tmpins2;
   }
 
-  ip+=tempi->opcode_cnt;
-  tempo=tempi(U8 *)-tempi->ins_entry_num*sizeof(CInst)
+  ip+=tmpins->opcode_cnt;
+  tmpo=tmpins(U8 *)-tmpins->ins_entry_num*sizeof(CInst)
   -offset(CHashOpcode.ins);
   if (just_ins)
     *line1=0;
-  CatPrint(line1,tempo->str);
+  CatPrint(line1,tmpo->str);
 
-  a1=tempi->arg1;
-  a2=tempi->arg2;
+  a1=tmpins->arg1;
+  a2=tmpins->arg2;
 
-  if (a1_size=tempi->size1) {
+  if (a1_size=tmpins->size1) {
     if (Bt(&uasm.signed_arg_mask,a1))
       CatPrint(a1_st,"I%d ",a1_size);
     else
       CatPrint(a1_st,"U%d ",a1_size);
   }
 
-  if (a2_size=tempi->size2) {
+  if (a2_size=tmpins->size2) {
     if (Bt(&uasm.signed_arg_mask,a2))
       CatPrint(a2_st,"I%d ",a2_size);
     else
       CatPrint(a2_st,"U%d ",a2_size);
   }
 
-  if (tempi->flags & IEF_PLUS_OPCODE) {
+  if (tmpins->flags & IEF_PLUS_OPCODE) {
     ip--;
-    RM1=*ip++ - tempi->opcode[tempi->opcode_cnt-1]+REX_b;
+    RM1=*ip++ - tmpins->opcode[tmpins->opcode_cnt-1]+REX_b;
     ptr=NULL;
     if (ARGT_R8<=a1<=ARGT_R64) {
       if (a1_size==8) {
@@ -424,7 +424,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
       disp=*ip(U32 *)++;
       CatPrint(reloced_a1_st,"%08X",disp);
     }
-    if (tempi->slash_val<8)
+    if (tmpins->slash_val<8)
       RM2=-1;
     else {
       ptr=NULL;
@@ -522,7 +522,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
     case ARGT_UIMM8:
       imm=*ip(U8 *)++;
       CatPrint(a1_st,"%02X",imm);
-      if (tempi->opcode[0]==0xCD && (ptr=DefineSub(imm,"ST_INT_NAMES")))
+      if (tmpins->opcode[0]==0xCD && (ptr=DefineSub(imm,"ST_INT_NAMES")))
 	CatPrint(a1_st," %s",ptr);
       break;
     case ARGT_IMM16:
@@ -549,7 +549,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
 	break;
     end:
       disp+=ip;
-      if (IsDbg)
+      if (IsDbgMode)
 	CatPrint(a1_st,"%p ",disp);
       else if (PutSrcLink(disp,512,buf2))
 	CatPrint(a1_st,"%s ",buf2);
@@ -574,7 +574,7 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
       break;
     case ARGT_STI:
       ip--;
-      CatPrint(a1_st,"%Z",*ip++ - tempi->opcode[tempi->opcode_cnt-1],
+      CatPrint(a1_st,"%Z",*ip++ - tmpins->opcode[tmpins->opcode_cnt-1],
 	    "ST_FSTK_REGS");
       break;
   }
@@ -613,11 +613,11 @@ U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,I64 *_jmp_dst=NULL,Bool just_ins=FALSE)
       break;
     case ARGT_STI:
       ip--;
-      CatPrint(a2_st,"%Z",*ip++ -tempi->opcode[tempi->opcode_cnt-1],
+      CatPrint(a2_st,"%Z",*ip++ -tmpins->opcode[tmpins->opcode_cnt-1],
 	    "ST_FSTK_REGS");
       break;
   }
-  if (tempi->flags&IEF_ENDING_ZERO)
+  if (tmpins->flags&IEF_ENDING_ZERO)
     ip++;
 
   if (*a1_st)

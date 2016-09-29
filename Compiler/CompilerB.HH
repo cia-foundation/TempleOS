@@ -31,7 +31,7 @@ public extern I64 CmpCtrlSize(CCmpCtrl *cc);
 public extern I64 IsLexExpression2Bin(
 	CCmpCtrl *cc,U8 **machine_code); //FALSE=no err
 public extern I64 Lex(CCmpCtrl *cc);
-public extern U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
+public extern U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tmpf=NULL,
 	CDoc *doc=NULL,U8 *abs_filename=NULL,CDocEntry *doc_e=NULL,I64 col=0);
 public extern CD2I32 *LexD2I32(CCmpCtrl *cc,CD2I32 *p);
 public extern CD3I32 *LexD3I32(CCmpCtrl *cc,CD3I32 *p);
@@ -56,12 +56,11 @@ public extern U0 LexWarn(CCmpCtrl *cc,U8 *str=NULL);
 extern CMemberLst *MemberClassBaseFind(
 	CHashClass *needle_class,CHashClass *haystack_class);
 public extern CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class);
-extern U0 MemberLstDel(CMemberLst *tempm);
+extern U0 MemberLstDel(CMemberLst *tmpm);
 public extern I64 MemberMetaData(U8 *st,CMemberLst *ml);
 public extern CMemberLstMeta *MemberMetaFind(U8 *st,CMemberLst *ml);
-public extern CHashClass *OptClassFwd(CHashClass *tempc);
+public extern CHashClass *OptClassFwd(CHashClass *tmpc);
 public extern I64 PrsKeyWord(CCmpCtrl *cc);
-
 #help_index "Compiler;Cmd Line (Typically)"
 extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);
@@ -74,6 +73,6 @@ public extern I64 Un(U8 *ip,I64 cnt=0x80,I64 seg_size=64);
 extern CUAsmGlbls uasm;
 
 #help_index "Hash/System"
-public extern I64 HashEntrySize(CHashSrcSym *temph);
-public extern I64 HashEntrySize2(CHashSrcSym *temph);
+public extern I64 HashEntrySize(CHashSrcSym *tmph);
+public extern I64 HashEntrySize2(CHashSrcSym *tmph);
 public extern I64 HashTableSize2(CHashTable *table);

@@ -132,7 +132,7 @@ Bool TakeTurn()
     }
     res=TRUE;
   }
-  WinMgrSync;
+  Refresh;
   Fs->song_task=NULL;
   return res;
 }
@@ -151,7 +151,7 @@ U0 TMsg(CDC *dc,U8 *msg)
     dc->color=YELLOW;
     GrPrint(dc,(GR_WIDTH-StrLen(msg)*FONT_WIDTH)/2,
 	  GR_HEIGHT-5*FONT_HEIGHT/2,"%s",msg);
-    WinMgrSync;
+    Refresh;
     if (ScanChar)
       throw;
   }

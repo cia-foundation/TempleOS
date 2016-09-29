@@ -4,7 +4,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
   I64 cnt,res=0,num_hints,drv_let,type,unit;
   U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN],
 	*filename=NULL,*filename2=NULL;
-  CATARep *head=NULL,*tempha;
+  CATARep *head=NULL,*tmpha;
   Bool one_drv,make_free;
   CDoc *doc;
   boot_drv_let=ToUpper(boot_drv_let);
@@ -57,10 +57,10 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	    GetS(base0_buf,STR_LEN);
 	  } while (!Str2I64(base0_buf) && (type!=BDT_ATAPI || !boot_drv_let));
 	  if (1<=Str2I64(base0_buf)<=num_hints) {
-	    tempha=ATARepFind(head,Str2I64(base0_buf));
-	    StrPrint(base0_buf,"0x%X",tempha->base0);
-	    StrPrint(base1_buf,"0x%X",tempha->base1);
-	    unit=tempha->unit;
+	    tmpha=ATARepFind(head,Str2I64(base0_buf));
+	    StrPrint(base0_buf,"0x%X",tmpha->base0);
+	    StrPrint(base1_buf,"0x%X",tmpha->base1);
+	    unit=tmpha->unit;
 	  } else if (type!=BDT_ATAPI || *base0_buf) {
 	    if (type==BDT_ATAPI)
 	      StrCpy(base1_buf,"0");

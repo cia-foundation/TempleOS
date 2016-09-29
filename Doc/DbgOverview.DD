@@ -8,7 +8,7 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 
 * I use $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ for debugging because they show on the wallpaper.  They're just global int vars.
 
-* You can use $LK,"AdamLog",A="MN:AdamLog"$() to send text to the Adam task window.  It works like $LK,"Print",A="MN:Print"$().  I never use that.  Instead, I use $LK,"RawPrint",A="MN:RawPrint"$().
+* You can use $LK,"AdamLog",A="MN:AdamLog"$() to send text to the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ window.  It works like $LK,"Print",A="MN:Print"$().  I never use that.  Instead, I use $LK,"RawPrint",A="MN:RawPrint"$().
 
 * $LK,"D",A="MN:D"$(), $LK,"DocD",A="MN:DocD"$(), $LK,"RawD",A="MN:RawD"$() to do 16 column hex dump mem with numbering from zero.  With $LK,"DocD",A="MN:DocD"$ the values are updated continually and you can alter mem by editing.
 
@@ -20,9 +20,9 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 
 * $LK,"ClassRep",A="MN:ClassRep"$() and the dynamic version $LK,"ClassRepD",A="MN:ClassRepD"$() can be used to dump structures.
 
-* $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/AutoFile/AFProfile.AUT"$ (This is an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$.)
+* $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/InFile/INProfile.IN"$ (This is an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$.)
 
-* Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The $FG,2$WinMgr$FG$ runs on $FG,2$core0$FG$ and will overwrite raw text from other cores when it updates the screen.
+* Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The $FG,2$WinMgr$FG$ runs on $FG,2$Core0$FG$ and will overwrite raw text from other cores when it updates the scrn.
 
 * Use $LK,"SysDbg",A="MN:SysDbg"$() to set a flag which you can read with $LK,"IsSysDbg",A="MN:IsSysDbg"$() when you wish to trigger some debug activity.  It's just a handy simple flag, nothing fancy.
 

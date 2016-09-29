@@ -22,7 +22,7 @@ U0 TOSBootRescueDrv1()
   DefinePrint("TOS_BOOT_RESCUE_DRV_END",  "0x%X",FloorI64(
 	(BOOT_RAM_LIMIT-(BOOT_STK_SIZE+DVD_BOOT_LOADER_SIZE))>>4<<4-
 	(bfh(I64)-SYS_KERNEL_END)-SLOP,BLK_SIZE));
-  DefinePrint("CFG_BOOT_RESCUE_DRV_FILE","\"/Temp/BootRescueDrv.BIN.Z\"");
+  DefinePrint("CFG_BOOT_RESCUE_DRV_FILE","\"/Tmp/BootRescueDrv.BIN.Z\"");
 } TOSBootRescueDrv1;
 
 U0 TOSBootRescueDrv2()

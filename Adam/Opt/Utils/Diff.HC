@@ -219,17 +219,17 @@ Bool DiffSub(CDoc *doc,I64 *_df_flags,I64 j1_lo,I64 j1_hi,I64 j2_lo,I64 j2_hi,
 
 Bool DiffBins(CDoc *doc1,CDoc *doc2)
 {
-  CDocBin *tempb1=doc1->bin_head.next,
-	*tempb2=doc2->bin_head.next;
+  CDocBin *tmpb1=doc1->bin_head.next,
+	*tmpb2=doc2->bin_head.next;
 
-  if (tempb1->last->last->num!=tempb2->last->last->num)
+  if (tmpb1->last->last->num!=tmpb2->last->last->num)
     return TRUE;
-  while (tempb1!=&doc1->bin_head) {
-    if (tempb1->size!=tempb2->size ||
-	  MemCmp(tempb1->data,tempb2->data,tempb1->size))
+  while (tmpb1!=&doc1->bin_head) {
+    if (tmpb1->size!=tmpb2->size ||
+	  MemCmp(tmpb1->data,tmpb2->data,tmpb1->size))
       return TRUE;
-    tempb1=tempb1->next;
-    tempb2=tempb2->next;
+    tmpb1=tmpb1->next;
+    tmpb2=tmpb2->next;
   }
   return FALSE;
 }
@@ -323,24 +323,24 @@ public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
 //Dft is just src files.  (Used to spot
   //src files with redundancy in them.)
   I64 i=0,cnt,size,fuf_flags=0;
-  CDirEntry *tempde,*tempde1,**sort_buf;
+  CDirEntry *tmpde,*tmpde1,**sort_buf;
   U8 *buf;
   CArcCompress *arc;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+F+S");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  cnt=FileCnt(tempde);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  cnt=FileCnt(tmpde);
   sort_buf=MAlloc(sizeof(CDirEntry *)*cnt);
-  while (tempde) {
-    sort_buf[i++]=tempde;
-    buf=FileRead(tempde->full_name,&size);
+  while (tmpde) {
+    sort_buf[i++]=tmpde;
+    buf=FileRead(tmpde->full_name,&size);
     if (just_text_not_graphics)
       size=StrLen(buf);
     arc=CompressBuf(buf,size);
     Free(buf);
-    tempde->user_data(F64)=100.0*arc->compressed_size/arc->expanded_size;
+    tmpde->user_data(F64)=100.0*arc->compressed_size/arc->expanded_size;
     Free(arc);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   QSortI64(sort_buf,cnt,&ZRepCompare);
   for (i=0;i<cnt;i++) {
@@ -349,5 +349,5 @@ public U0 ZipRep(U8 *files_find_mask="/*",U8 *fu_flags=NULL,
     '\n';
   }
   Free(sort_buf);
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }

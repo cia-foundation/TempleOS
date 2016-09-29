@@ -2,18 +2,18 @@ U0 AnimateTask(I64)
 {
   I64 i;
   F64 t;
-  Obj *tempo;
+  Obj *tmpo;
   while (TRUE) {
     t=tS;
     for (i=0;i<O_NUM_OBJS+O_NUM_PEBBLES;i++) {
-      tempo=&objs[i];
-      if (tempo->type==OT_SHEEP ||
-	    tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
-	tempo->x+=tempo->dx;
-	tempo->y+=tempo->dy;
-	tempo->z+=tempo->dz;
-	tempo->dx=5*Cos(0.5*t+tempo->é);
-	tempo->dz=5*Sin(0.5*t+tempo->é);
+      tmpo=&objs[i];
+      if (tmpo->type==OT_SHEEP ||
+	    tmpo->type==OT_GOAT1 || tmpo->type==OT_GOAT2) {
+	tmpo->x+=tmpo->dx;
+	tmpo->y+=tmpo->dy;
+	tmpo->z+=tmpo->dz;
+	tmpo->dx=5*Cos(0.5*t+tmpo->é);
+	tmpo->dz=5*Sin(0.5*t+tmpo->é);
       }
     }
     Sleep(20);
@@ -22,7 +22,7 @@ U0 AnimateTask(I64)
 
 U0 Init()
 {
-  Obj *tempo;
+  Obj *tmpo;
   I64 i,j,k,total=0;
 
   for (i=0;i<OT_NUM_TYPES;i++)
@@ -30,13 +30,13 @@ U0 Init()
 
   MemSet(objs,0,sizeof(objs));
   for (i=0;i<O_NUM_OBJS+O_NUM_PEBBLES;i++) {
-    tempo=&objs[i];
-    tempo->num=i;
-    tempo->x=RandU32&0x1FFF-0x1000;
-    tempo->y=0;
-    tempo->z=RandU32&0x1FFF-0x1000;
-    tempo->é=2*ã*Rand;
-    tempo->sym=RandU16&1;
+    tmpo=&objs[i];
+    tmpo->num=i;
+    tmpo->x=RandU32&0x1FFF-0x1000;
+    tmpo->y=0;
+    tmpo->z=RandU32&0x1FFF-0x1000;
+    tmpo->é=2*ã*Rand;
+    tmpo->sym=RandU16&1;
 
     if (i<O_NUM_OBJS) {
       k=0;
@@ -48,9 +48,9 @@ U0 Init()
 	else
 	  k++;
       }
-      tempo->type=k;
+      tmpo->type=k;
     } else
-      tempo->type=OT_PEBBLE;
+      tmpo->type=OT_PEBBLE;
   }
   objs[O_BURNING_BUSH].type=OT_BUSH1;
 

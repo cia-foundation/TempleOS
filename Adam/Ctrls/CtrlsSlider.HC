@@ -14,7 +14,7 @@ class CTemplateCS
 
 CTemplateCS *CtrlSliderGet()
 {
-  CTemplateCSSlider *temps;
+  CTemplateCSSlider *tmps;
   U8 *st,pmt[STR_LEN];
   CTemplateCS *res=CAlloc(sizeof(CTemplateCS));
 
@@ -33,10 +33,10 @@ CTemplateCS *CtrlSliderGet()
       Free(st);
       break;
     }
-    temps=CAlloc(sizeof(CTemplateCSSlider));
-    temps->name=st;
-    QueIns(temps,res->last_slider);
-    temps->num=res->num_sliders++;
+    tmps=CAlloc(sizeof(CTemplateCSSlider));
+    tmps->name=st;
+    QueIns(tmps,res->last_slider);
+    tmps->num=res->num_sliders++;
   }
   return res;
 }
@@ -45,7 +45,7 @@ U0 TemplateCtrlSlider(CDoc *doc)
 {
   CTask *task;
   CTemplateCS *m=NULL;
-  CTemplateCSSlider *temps;
+  CTemplateCSSlider *tmps;
   I64 i;
 
   DocUnlock(doc);
@@ -65,10 +65,10 @@ class CSliderState
 {
 ",m->range,m->spacing,m->border);
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
-    DocPrint(doc,"  I64 %s;\n",temps->name);
-    temps=temps->next;
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
+    DocPrint(doc,"  I64 %s;\n",tmps->name);
+    tmps=tmps->next;
   }
   if (*m->glbl_name)
     DocPrint(doc,"} %s;\n",m->glbl_name);
@@ -98,32 +98,32 @@ U0 DrawCtrlSlider(CDC *dc,CCtrl *c)
 
   DocPrint(doc,"  dc->color=LTRED;\n");
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
     DocPrint(doc,
 "  GrPrint(dc,c->left+%d*SLIDER_SPACING+%d-FONT_WIDTH/2,
     c->top+SLIDER_SPACING+SLIDER_RANGE+3,
     \"%%d\",s->%s*10/SLIDER_RANGE);\n",
-      temps->num+1,temps->num,temps->name);
-    temps=temps->next;
+      tmps->num+1,tmps->num,tmps->name);
+    tmps=tmps->next;
   }
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
     DocPrint(doc,
 	"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-3,"
 	"c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-2,7,5);\n",
-      temps->num+1,temps->num,temps->name);
-    temps=temps->next;
+      tmps->num+1,tmps->num,tmps->name);
+    tmps=tmps->next;
   }
   DocPrint(doc,"  dc->color=YELLOW;\n");
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
     DocPrint(doc,"  GrRect(dc,c->left+%d*SLIDER_SPACING+%d-2,"
 	"c->top+SLIDER_SPACING+SLIDER_RANGE-1-s->%s-1,5,3);\n",
-      temps->num+1,temps->num,temps->name);
-    temps=temps->next;
+      tmps->num+1,tmps->num,tmps->name);
+    tmps=tmps->next;
   }
   DocPrint(doc,
 "}
@@ -137,11 +137,11 @@ U0 UpdateDerivedCtrlSlider(CCtrl *c)
   c->bottom=c->top+SLIDER_SPACING*2+SLIDER_RANGE;
 ",m->num_sliders+1,m->num_sliders);
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
     DocPrint(doc,"  s->%s=ClampI64(s->%s,0,SLIDER_RANGE-1);\n",
-	temps->name,temps->name);
-    temps=temps->next;
+	tmps->name,tmps->name);
+    tmps=tmps->next;
   }
   DocPrint(doc,
 "}
@@ -152,19 +152,19 @@ U0 LeftClickSlider(CCtrl *c,I64 x,I64 y,Bool down)
   CSliderState *s=c->state;
 ");
 
-  temps=m->next_slider;
-  while (temps!=&m->next_slider) {
+  tmps=m->next_slider;
+  while (tmps!=&m->next_slider) {
     DocPrint(doc,"  ");
-    if (temps!=m->next_slider)
+    if (tmps!=m->next_slider)
       DocPrint(doc,"else ");
-    if (temps->next==&m->next_slider)
+    if (tmps->next==&m->next_slider)
       DocPrint(doc,"\n");
     else
       DocPrint(doc,"if (x<c->left+%d*SLIDER_SPACING+%d+SLIDER_SPACING/2)\n",
-	temps->num+1,temps->num);
+	tmps->num+1,tmps->num);
     DocPrint(doc,"    s->%s=SLIDER_RANGE-1-(y-(c->top+SLIDER_SPACING));\n",
-       temps->name);
-    temps=temps->next;
+       tmps->name);
+    tmps=tmps->next;
   }
  
   DocPrint(doc,

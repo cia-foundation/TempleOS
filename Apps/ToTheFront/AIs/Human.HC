@@ -1,158 +1,164 @@
-U0 TanksPlot()
+U0 PlayerIndirect()
 {
-  Unit *tempu=NULL;
-  I64 msg_code,a1,a2;
+  Unit *tmpu=NULL;
+  I64 i,remaining=0,msg_code,a1,a2;
   F64 target_x,target_y;
-  SetViewPlayer(cur_player);
-  while (TRUE) {
+  ViewPlayerSet(cur_player);
+  for (i=0;i<MAX_UNITS;i++) {
+    tmpu=&units[cur_player][i];
+    if (tmpu->life>0 && tmpu->indirect_fire)
+      remaining++;
+  }
+  while (remaining) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(a1);
+	CharDo(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
-	  if (tempu=FindUnit(cursor_row,cursor_col)) {
-	    if (tempu->player==enemy_player || tempu->fired ||
-		  !tempu->indirect_fire)
-	      tempu=NULL;
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
+	  if (tmpu=UnitFind(cursor_row,cursor_col)) {
+	    if (tmpu->player==enemy_player || tmpu->fired ||
+		  !tmpu->indirect_fire)
+	      tmpu=NULL;
 	    else {
-	      RowCol2XY(&fire_radius_x,&fire_radius_y,tempu->row,tempu->col);
-	      fire_radius=tempu->range*2*HEX_RADIUS;
+	      RowCol2XY(&fire_radius_x,&fire_radius_y,tmpu->row,tmpu->col);
+	      fire_radius=tmpu->range*2*HEX_RADIUS;
 	    }
 	  }
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
 	  RowCol2XY(&target_x,&target_y,cursor_row,cursor_col);
-	  if (!tempu)
+	  if (!tmpu)
 	    Beep;
 	  else {
 	    if (Sqrt(Sqr(fire_radius_x-target_x)+Sqr(fire_radius_y-target_y))>
 		  fire_radius)
 	      Beep;
-	    else
-	      PlotShot(tempu,cursor_row,cursor_col);
+	    else {
+	      IndirectAdd(tmpu,cursor_row,cursor_col);
+	      remaining--;
+	    }
 	  }
 	}
-	tempu=NULL;
+	tmpu=NULL;
 	fire_radius=0;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,a1,a2))
+	if (CursorInWin(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }
   }
+  throw('PhaseOvr',TRUE);
 }
 
-U0 TanksMove()
+U0 PlayerMove()
 {
-  Unit *tempu=NULL,*target;
+  Unit *tmpu=NULL;
   I64 msg_code,a1,a2;
-  SetViewPlayer(cur_player);
+  ViewPlayerSet(cur_player);
   while (TRUE) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(a1);
+	CharDo(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
-	  if (tempu=FindUnit(cursor_row,cursor_col)) {
-	    if (tempu->player==enemy_player || !tempu->remaining_movement)
-	      tempu=NULL;
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
+	  if (tmpu=UnitFind(cursor_row,cursor_col)) {
+	    if (tmpu->player==enemy_player || !tmpu->remaining_movement)
+	      tmpu=NULL;
 	  }
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
-	  target=FindUnit(cursor_row,cursor_col);
-	  if (!tempu)
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
+	  if (!tmpu)
 	    Beep;
 	  else {
-	    if (target)
-	      Beep;
-	    else
-	      MoveUnit(tempu,a1+Fs->horz_scroll.pos,
-		    a2+Fs->vert_scroll.pos);
+	    UnitMove(tmpu,a1,a2);
 	    break;
 	  }
 	}
-	tempu=NULL;
+	tmpu=NULL;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,a1,a2))
+	if (CursorInWin(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }
   }
 }
 
-U0 TanksFire()
+U0 PlayerDirect()
 {
-  Unit *tempu=NULL,*target;
+  Unit *tmpu=NULL,*target;
   I64 msg_code,a1,a2;
-  SetViewPlayer(cur_player);
+  ViewPlayerSet(cur_player);
   while (TRUE) {
     if (!alive_cnt[0] || !alive_cnt[1])
       throw('GameOver',TRUE);
-    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-	  1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
 	  1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	HandleChar(a1);
+	CharDo(a1);
 	break;
       case MSG_IP_L_DOWN:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
-	  if (tempu=FindUnit(cursor_row,cursor_col)) {
-	    if (tempu->player==enemy_player || tempu->fired ||
-		  tempu->indirect_fire)
-	      tempu=NULL;
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
+	  if (tmpu=UnitFind(cursor_row,cursor_col)) {
+	    if (tmpu->player==enemy_player || tmpu->fired ||
+		  tmpu->indirect_fire)
+	      tmpu=NULL;
 	    else {
-	      RVSetUp(cur_player);
-	      RowCol2XY(&fire_radius_x,&fire_radius_y,tempu->row,tempu->col);
-	      fire_radius=tempu->range*2*HEX_RADIUS;
-	      RecalcVisible(RV_ONE_FRIENDLY_UNIT,tempu);
+	      VRSetUp(cur_player);
+	      RowCol2XY(&fire_radius_x,&fire_radius_y,tmpu->row,tmpu->col);
+	      fire_radius=tmpu->range*2*HEX_RADIUS;
+	      VisRecalc(VR_ONE_FRIENDLY_UNIT,tmpu);
 	    }
 	  }
 	}
 	break;
       case MSG_IP_L_UP:
-	if (CursorInWindow(Fs,a1,a2)) {
-	  UpdateCursor(Fs,a1,a2);
-	  target=FindUnit(cursor_row,cursor_col);
-	  if (!tempu)
+	if (CursorInWin(Fs,a1,a2)) {
+	  a1-=x0; a2-=y0;
+	  CursorUpdate(Fs,a1,a2);
+	  target=UnitFind(cursor_row,cursor_col);
+	  if (!tmpu)
 	    Beep;
 	  else {
 	    if (!target || target->player!=enemy_player ||
-		  !Bt(&target->visible,0))
+		  !Bt(&target->vis,0))
 	      Beep;
 	    else
-	      FireShot(tempu,target);
-	    RecalcVisible(RV_UPDATE_FRIENDLY_UNIT,tempu);
+	      UnitDirectFire(tmpu,target);
+	    VisRecalc(VR_UPDATE_FRIENDLY_UNIT,tmpu);
 	  }
 	}
-	tempu=NULL;
+	tmpu=NULL;
 	fire_radius=0;
 	break;
       case MSG_IP_R_UP:
-	if (CursorInWindow(Fs,a1,a2))
+	if (CursorInWin(Fs,a1,a2))
 	  throw('PhaseOvr',TRUE);
 	break;
     }

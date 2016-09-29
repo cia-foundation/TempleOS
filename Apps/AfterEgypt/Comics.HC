@@ -2,25 +2,25 @@ U0 ViewComics()
 {
   I64 i=0;
   U8 *st;
-  CDirEntry *tempde=FilesFind("Comics/*.DD*"),*tempde1=tempde;
+  CDirEntry *tmpde=FilesFind("Comics/*.DD*"),*tmpde1=tmpde;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$LTBLUE$$");
-  while (tempde) {
-    st=StrNew(tempde->name);
+  while (tmpde) {
+    st=StrNew(tmpde->name);
     FileExtRem(st);
-    tempde->user_data=DocPrint(doc,"$$MU-UL,\"%-10ts\",LE=%d$$ ",st,tempde);
+    tmpde->user_data=DocPrint(doc,"$$MU-UL,\"%-10ts\",LE=%d$$ ",st,tmpde);
     Free(st);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
     if ((i++&3)==3)
       DocPrint(doc,"\n");
   }
   while (TRUE) {
-    if ((tempde=PopUpMenu(doc))>0)
-      Ed(tempde->full_name);
+    if ((tmpde=PopUpMenu(doc))>0)
+      Ed(tmpde->full_name);
     else
       break;
   }
   DocDel(doc);
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 

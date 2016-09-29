@@ -18,20 +18,20 @@ CTask *SingleSong(U8 *msg,U8 *name)
 Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
 {//ch=ASCII; sc=scan_code
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
-  CDirEntry *tempde;
+  CDirEntry *tmpde;
   CDoc *s;
   if (!(sc&(SCF_ALT|SCF_CTRL|SCF_SHIFT))
 	&& doc_ce->type_u8==DOCT_MENU_VAL && doc_ce->left_exp>=0) {
-    tempde=doc_ce->left_exp;
+    tmpde=doc_ce->left_exp;
     if (sc.u8[0]==SC_DELETE ) {
       Beep;
       Silent;
-      Del(tempde->full_name);
+      Del(tmpde->full_name);
       Silent(OFF);
     } else if ('0'<=ch<='9') {
       if (StrLen(doc_ce->tag)>1)
 	doc_ce->tag[0]=ch;
-      s=DocRead(tempde->full_name);
+      s=DocRead(tmpde->full_name);
       doc_e=s->head.next;
       while (doc_e!=s && doc_e->type_u8!=DOCT_TEXT)
 	doc_e=doc_e->next;
@@ -42,7 +42,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       DocDel(s);
       return TRUE;
     } else if (ch==CH_SPACE||ch==CH_ESC)
-      tempde->user_data++; //JB_RUN_LEVEL++
+      tmpde->user_data++; //JB_RUN_LEVEL++
 //<SPACE> is followed by <ESC> --> JB_RUN_LEVEL_TWO
       //Actual <ESC> just exits          --> JB_RUN_LEVEL_ONE
   }
@@ -53,7 +53,7 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
 {//_filename is for using this as a song-chooser program.
   I64 i=0,rating;
   U8 *st,*st2;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   CDoc *doc=DocNew,*s;
   CDocEntry *doc_e;
   CTask *task=NULL;
@@ -61,7 +61,7 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
     *_filename=NULL;
   dirname=StrNew(dirname);
   st=MStrPrint("%s/*.HC.Z",dirname);
-  tempde=tempde1=FilesFind(st);
+  tmpde=tmpde1=FilesFind(st);
   Free(st);
   Free(dirname);
   doc->user_put_key=&JBPutKey;
@@ -70,13 +70,13 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
 	"$$BLACK$$Incomplete $$CYAN$$Special$$FG$$\n\n"
 	"$$GREEN$$<DELETE>$$FG$$ to delete a song.\n"
 	"Press a number to rate a song.\n");
-  while (tempde) {
+  while (tmpde) {
     if (!(i++%5))
       DocPrint(doc,"\n");
-    if (FileOcc("Play(",tempde->full_name,"")) {
-      st=StrNew(tempde->name);
+    if (FileOcc("Play(",tmpde->full_name,"")) {
+      st=StrNew(tmpde->name);
       FileExtRem(st);
-      s=DocRead(tempde->full_name);
+      s=DocRead(tmpde->full_name);
       doc_e=s->head.next;
       while (doc_e!=s && doc_e->type_u8!=DOCT_TEXT)
 	doc_e=doc_e->next;
@@ -94,7 +94,7 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
 	  DocPrint(doc,"$$CYAN$$");
 	else if (StrMatch("no nothing",doc_e->tag)) {
 	  DocPrint(doc,"$$RED$$");
-	  if (FileOcc("\\0",tempde->full_name,"")) {
+	  if (FileOcc("\\0",tmpde->full_name,"")) {
 	    s->cur_entry=doc_e->next;
 	    s->cur_col=0;
 	    DocEntryDel(s,doc_e);
@@ -102,37 +102,37 @@ public U0 JukeBox(U8 *dirname="~/Psalmody",U8 **_filename=NULL)
 	    DocWrite(s);
 	  }
 	}
-	DocPrint(doc,"$$MU-UL,\"%c%-8ts\",LE=%d$$ ",rating,st,tempde);
-	tempde->user_data=JB_RUN_LEVEL_NULL;
+	DocPrint(doc,"$$MU-UL,\"%c%-8ts\",LE=%d$$ ",rating,st,tmpde);
+	tmpde->user_data=JB_RUN_LEVEL_NULL;
       }
       DocDel(s);
       Free(st);
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   DocPrint(doc,"\n$$CYAN$$$$MU-UL,\"DONE\",LE=%d$$\n",DOCM_CANCEL);
   while (TRUE) {
     if (_filename)
-      tempde=PopUpMenu(doc,DOF_INTERCEPT_TASK_END);
+      tmpde=PopUpMenu(doc,DOF_INTERCEPT_TASK_END);
     else
-      tempde=PopUpMenu(doc);
+      tmpde=PopUpMenu(doc);
     if (task)
       Kill(task);
-    if (tempde<=0) break;
-    st2=StrNew(tempde->name);
+    if (tmpde<=0) break;
+    st2=StrNew(tmpde->name);
     if (_filename) {
       Free(*_filename);
-      *_filename=StrNew(tempde->full_name);
+      *_filename=StrNew(tmpde->full_name);
     }
-    if (tempde->user_data==JB_RUN_LEVEL_ONE) break; //<ESC>
-    tempde->user_data=JB_RUN_LEVEL_NULL; //Rst from <SPACE>
+    if (tmpde->user_data==JB_RUN_LEVEL_ONE) break; //<ESC>
+    tmpde->user_data=JB_RUN_LEVEL_NULL; //Rst from <SPACE>
     FileExtRem(st2);
-    st=MStrPrint("ExeFile(\"%s\");",tempde->full_name);
+    st=MStrPrint("ExeFile(\"%s\");",tmpde->full_name);
     MusicSettingsRst;
     task=SingleSong(st,st2);
     Free(st2);
     Free(st);
   }
   DocDel(doc);
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }

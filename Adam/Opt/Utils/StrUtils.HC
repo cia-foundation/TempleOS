@@ -105,15 +105,15 @@ public I64 Words(U8 *files_find_mask="*",U32 *chars_bmp=chars_bmp_alpha,
 {//Break file into list of not-unique words.
   I64 fuf_flags=0,res=0;
   CDoc *doc_out=DocNew;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    res+=DocWordsFile(doc_out,tempde->full_name,chars_bmp);
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    res+=DocWordsFile(doc_out,tmpde->full_name,chars_bmp);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   DocInsDoc(NULL,doc_out);
   DocDel(doc_out);
   return res;
@@ -140,16 +140,16 @@ I64 LongLinesFile(U8 *filename,I64 cols)
 public I64 LongLines(U8 *files_find_mask="*",I64 cols=80,U8 *fu_flags=NULL)
 {//Report files with lines of too many cols.
   I64 res=0,fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+S");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    if (LongLinesFile(tempde->full_name,cols))
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    if (LongLinesFile(tmpde->full_name,cols))
       res++;
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return res;
 }
 
@@ -187,15 +187,15 @@ public U0 SU(U8 *files_find_mask,I64 suf_flags,U8 *fu_flags=NULL,
   //or removing trailing spaces on lines.
   //See $LK,"SUF Flags",A="MN:SUF_SINGLE_SPACE"$.
   I64 fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+f+F+T");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    SUFile(tempde->full_name,suf_flags,indent_scale_factor);
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    SUFile(tmpde->full_name,suf_flags,indent_scale_factor);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 public U0 S2T(U8 *files_find_mask,U8 *fu_flags=NULL)

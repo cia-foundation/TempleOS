@@ -2,15 +2,15 @@
 
 U0 RedSeaFreeFreeLst(CDrv *dv)
 {
-  CFreeLst *tempf,*tempf1;
+  CFreeLst *tmpf,*tmpf1;
   Bool unlock;
   try {
     unlock=DrvLock(dv);
-    if (tempf=dv->next_free) {
-      while (tempf!=&dv->next_free) {
-	tempf1=tempf->next;
-	Free(tempf);
-	tempf=tempf1;
+    if (tmpf=dv->next_free) {
+      while (tmpf!=&dv->next_free) {
+	tmpf1=tmpf->next;
+	Free(tmpf);
+	tmpf=tmpf1;
       }
     }
     dv->next_free=NULL;
@@ -24,7 +24,7 @@ U0 RedSeaFreeFreeLst(CDrv *dv)
 U0 RedSeaFreeLstBuild(CDrv *dv)
 {
   Bool unlock;
-  CFreeLst *tempf;
+  CFreeLst *tmpf;
   I64 i,first=dv->data_area,max_blk=dv->size+dv->drv_offset;
   try {
     unlock=DrvLock(dv);
@@ -41,10 +41,10 @@ U0 RedSeaFreeLstBuild(CDrv *dv)
 	  i++;
       }
       if (i) {
-	tempf=AMAlloc(sizeof(CFreeLst));
-	tempf->size=i;
-	tempf->start=first;
-	QueIns(tempf,dv->last_free);
+	tmpf=AMAlloc(sizeof(CFreeLst));
+	tmpf->size=i;
+	tmpf->start=first;
+	QueIns(tmpf,dv->last_free);
       }
       first+=i+1;
     }
@@ -249,7 +249,7 @@ Bool RedSeaCd(U8 *name,I64 cur_dir_cluster)
 
 U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt)
 {
-  CFreeLst *tempf;
+  CFreeLst *tmpf;
   Bool found=FALSE,unlock,unlock_break;
   DrvChk(dv);
   if (!c) return;
@@ -261,23 +261,23 @@ U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt)
       unlock=DrvLock(dv);
       if (!dv->next_free)
 	RedSeaFreeLstBuild(dv);
-      tempf=dv->next_free;
-      while (!found && tempf!=&dv->next_free) {
-	if (tempf->start+tempf->size==c) {
-	  tempf->size+=cnt;
+      tmpf=dv->next_free;
+      while (!found && tmpf!=&dv->next_free) {
+	if (tmpf->start+tmpf->size==c) {
+	  tmpf->size+=cnt;
 	  found=TRUE;
-	} else if (c+cnt==tempf->start) {
-	  tempf->size+=cnt;
-	  tempf->start=c;
+	} else if (c+cnt==tmpf->start) {
+	  tmpf->size+=cnt;
+	  tmpf->start=c;
 	  found=TRUE;
 	}
-	tempf=tempf->next;
+	tmpf=tmpf->next;
       }
       if (!found) {
-	tempf=AMAlloc(sizeof(CFreeLst));
-	tempf->size=cnt;
-	tempf->start=c;
-	QueIns(tempf,dv->last_free);
+	tmpf=AMAlloc(sizeof(CFreeLst));
+	tmpf->size=cnt;
+	tmpf->start=c;
+	QueIns(tmpf,dv->last_free);
       }
       while (cnt-->0) {
 	DrvFATBlkSet(dv,c);
@@ -301,7 +301,7 @@ U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt)
 
 I64 RedSeaAllocClusters(CDrv *dv,I64 cnt)
 {
-  CFreeLst *tempf,*best_free=NULL;
+  CFreeLst *tmpf,*best_free=NULL;
   I64 i,first,best_size=MAX_I64;
   Bool unlock,unlock_break;
   if (cnt<=0)
@@ -311,15 +311,15 @@ I64 RedSeaAllocClusters(CDrv *dv,I64 cnt)
     unlock=DrvLock(dv);
     if (!dv->next_free)
       RedSeaFreeLstBuild(dv);
-    tempf=dv->next_free;
-    while (tempf!=&dv->next_free) {
-      if (tempf->size>=cnt && tempf->size<best_size) {
-	best_free=tempf;
-	best_size=tempf->size;
-	if (tempf->size==cnt)
+    tmpf=dv->next_free;
+    while (tmpf!=&dv->next_free) {
+      if (tmpf->size>=cnt && tmpf->size<best_size) {
+	best_free=tmpf;
+	best_size=tmpf->size;
+	if (tmpf->size==cnt)
 	  break;
       }
-      tempf=tempf->next;
+      tmpf=tmpf->next;
     }
     if (!best_free)
       throw('Drv');
@@ -349,16 +349,16 @@ I64 RedSeaAllocClusters(CDrv *dv,I64 cnt)
   return first;
 }
 
-Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
+Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,Bool free_old_chain)
 {
   CDirEntry *buf,*buf2,*ptr,de2;
   CRedSeaBoot *br;
   I64 c,ch,i=1,j=0,n=BLK_SIZE/CDIR_SIZE,dir_size,cur_dir_cluster;
   Bool written=FALSE,unlock,unlock_break;
-  U8 *temp,*parent_dir;
+  U8 *tmp,*parent_dir;
   try {
     unlock_break=BreakLock;
-    tempde->attr|=RS_ATTR_CONTIGUOUS;
+    tmpde->attr|=RS_ATTR_CONTIGUOUS;
     unlock=DrvLock(dv);
     cur_dir_cluster=Name2DirCluster(dv,cur_dir);
     buf2=MAlloc(BLK_SIZE);
@@ -374,7 +374,7 @@ Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
     while (TRUE) {
       if (!(ch=*ptr->name)) {
 	if (!written)
-	  MemCpy(&ptr->start,&tempde->start,CDIR_SIZE);
+	  MemCpy(&ptr->start,&tmpde->start,CDIR_SIZE);
 	if ((i+1)*CDIR_SIZE+j<<BLK_SIZE_BITS<dir_size)
 	  WBlks(dv,buf(U8 *)+j<<BLK_SIZE_BITS,cur_dir_cluster+j,1);
 	else {
@@ -397,38 +397,38 @@ Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain)
 	    Free(br);
 	    dv->root_cluster=c;
 	  } else {
-	    temp=StrNew(cur_dir);
+	    tmp=StrNew(cur_dir);
 	    parent_dir=StrNew(cur_dir);
-	    StrLastRem(parent_dir,"/",temp);
+	    StrLastRem(parent_dir,"/",tmp);
 	    if (!*parent_dir) {
 	      Free(parent_dir);
 	      parent_dir=StrNew("/");
 	    }
 	    if (RedSeaFileFind(dv,Name2DirCluster(dv,parent_dir),
-		  temp,&de2,FUF_JUST_DIRS)) {
+		  tmp,&de2,FUF_JUST_DIRS)) {
 	      de2.cluster=c;
 	      de2.size=dir_size;
 	      RedSeaDirNew(dv,parent_dir,&de2,FALSE);
 	    } else
 	      throw('Drv');
-	    Free(temp);
+	    Free(tmp);
 	    Free(parent_dir);
 	  }
 	}
 	break;
       } else if (ptr->attr & RS_ATTR_DELETED) {
 	if (!written) {
-	  MemCpy(&ptr->start,&tempde->start,CDIR_SIZE);
+	  MemCpy(&ptr->start,&tmpde->start,CDIR_SIZE);
 	  WBlks(dv,buf(U8 *)+j<<BLK_SIZE_BITS,cur_dir_cluster+j,1);
 	  written=TRUE;
 	}
       } else {
-	if (!StrCmp(tempde->name,ptr->name)) {
+	if (!StrCmp(tmpde->name,ptr->name)) {
 	  if (free_old_chain)
 	    RedSeaFreeClusters(dv,ptr->cluster,
 		  (ptr->size+BLK_SIZE-1)>>BLK_SIZE_BITS);
 	  if (!written)
-	    MemCpy(&ptr->start,&tempde->start,CDIR_SIZE);
+	    MemCpy(&ptr->start,&tmpde->start,CDIR_SIZE);
 	  else
 	    ptr->attr|=RS_ATTR_DELETED;
 	  WBlks(dv,buf(U8 *)+j<<BLK_SIZE_BITS,cur_dir_cluster+j,1);
@@ -540,7 +540,7 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	CDirEntry *parent=NULL)
 {
   CDrv *dv=Fs->cur_dv;
-  CDirEntry *buf,*buf2,*ptr,*res=NULL,*tempde;
+  CDirEntry *buf,*buf2,*ptr,*res=NULL,*tmpde;
   I64 ch,cur_dir_cluster;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
@@ -565,31 +565,31 @@ CDirEntry *RedSeaFilesFind(U8 *files_find_mask,I64 fuf_flags,
       if (!(ch=*ptr->name))
 	break;
       else if (!(ptr->attr & RS_ATTR_DELETED)) {
-	tempde=CAlloc(sizeof(CDirEntry));
-	MemCpy(&tempde->start,&ptr->start,CDIR_SIZE);
-	tempde->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR &&
-	      *tempde->name!='.') {
-	  tempde->next=res;
-	  res=tempde;
-	  tempde->full_name=DirNameAbs(tempde->name);
+	tmpde=CAlloc(sizeof(CDirEntry));
+	MemCpy(&tmpde->start,&ptr->start,CDIR_SIZE);
+	tmpde->parent=parent;
+	if (Bt(&fuf_flags,FUf_RECURSE) && tmpde->attr&RS_ATTR_DIR &&
+	      *tmpde->name!='.') {
+	  tmpde->next=res;
+	  res=tmpde;
+	  tmpde->full_name=DirNameAbs(tmpde->name);
 	  DrvUnlock(dv);
-	  if (Cd(tempde->name)) {
-	    tempde->sub=RedSeaFilesFind(files_find_mask,fuf_flags,tempde);
+	  if (Cd(tmpde->name)) {
+	    tmpde->sub=RedSeaFilesFind(files_find_mask,fuf_flags,tmpde);
 	    Cd("..");
 	  }
 	  DrvLock(dv);
 	} else {
-	  tempde->full_name=FileNameAbs(tempde->name);
-	  if ((tempde->attr&RS_ATTR_DIR ||
+	  tmpde->full_name=FileNameAbs(tmpde->name);
+	  if ((tmpde->attr&RS_ATTR_DIR ||
 		!Bt(&fuf_flags,FUf_JUST_DIRS)) &&
-		!(Bt(&fuf_flags,FUf_RECURSE) && *tempde->name=='.' &&
-		tempde->attr&RS_ATTR_DIR) &&
-		FilesFindMatch(tempde->full_name,files_find_mask,fuf_flags)) {
-	    tempde->next=res;
-	    res=tempde;
+		!(Bt(&fuf_flags,FUf_RECURSE) && *tmpde->name=='.' &&
+		tmpde->attr&RS_ATTR_DIR) &&
+		FilesFindMatch(tmpde->full_name,files_find_mask,fuf_flags)) {
+	    tmpde->next=res;
+	    res=tmpde;
 	  } else
-	    DirEntryDel(tempde);
+	    DirEntryDel(tmpde);
 	}
       }
       ptr(U8 *)+=CDIR_SIZE;

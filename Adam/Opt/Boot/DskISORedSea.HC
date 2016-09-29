@@ -108,18 +108,18 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let,I64 stage2_blk=0,I64 stage2_size=0)
   Free(iso_term);
 }
 
-I64 RedSeaISOPass1(CDirEntry *tempde)
+I64 RedSeaISOPass1(CDirEntry *tmpde)
 {
-  I64 dir_entry_cnt=3+LinkedLstCnt(tempde),res=0;
-  while (tempde) {
-    if (tempde->attr & RS_ATTR_DIR) {
-      if (tempde->sub)
-	res+=RedSeaISOPass1(tempde->sub);
+  I64 dir_entry_cnt=3+LinkedLstCnt(tmpde),res=0;
+  while (tmpde) {
+    if (tmpde->attr & RS_ATTR_DIR) {
+      if (tmpde->sub)
+	res+=RedSeaISOPass1(tmpde->sub);
       else
 	res+=BLK_SIZE; //Empty dir
     } else
-      res+=CeilU64(tempde->size,BLK_SIZE);
-    tempde=tempde->next;
+      res+=CeilU64(tmpde->size,BLK_SIZE);
+    tmpde=tmpde->next;
   }
   res+=CeilU64(dir_entry_cnt<<6,BLK_SIZE); //Size in bytes
 #assert CDIR_SIZE==64
@@ -129,7 +129,7 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
 	U8 *_stage2_filename=NULL)
 {//See $LK,"::/Misc/DoDistro.HC"$. Must be ISO.C
   I64 i,res,root_cnt,root_dir_blks,bitmap_blks,bitmap_blks1;
-  CDirEntry *tempde,de;
+  CDirEntry *tmpde,de;
   U8 buf[STR_LEN],*iso_filename,*src_dir,*stage2_filename;
   CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('Q')); //First $LK,"BDT_ISO_FILE_WRITE",A="MN:BDT_ISO_FILE_WRITE"$
   CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_WRITE);
@@ -147,10 +147,10 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
     StrCpy(stage2_filename+3,stage2_filename+i);
   } else
     stage2_filename=NULL;
-  tempde=FilesFind(src_dir,FUF_RECURSE);
-  root_cnt=LinkedLstCnt(tempde)+3;
+  tmpde=FilesFind(src_dir,FUF_RECURSE);
+  root_cnt=LinkedLstCnt(tmpde)+3;
   root_dir_blks=CeilU64(root_cnt<<6,BLK_SIZE)>>BLK_SIZE_BITS;
-  if (res=RedSeaISOPass1(tempde)>>BLK_SIZE_BITS) {
+  if (res=RedSeaISOPass1(tmpde)>>BLK_SIZE_BITS) {
     bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
     bitmap_blks=1;
     do {

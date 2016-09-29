@@ -15,7 +15,7 @@ and cut and paste the code into $LK,"::/Kernel/FontStd.HC"$.
 You will need to recompile Kernel by calling $LK,"BootHDIns",A="MN:BootHDIns"$().
 
 See $LK,"::/Demo/ExtChars.HC"$, $LK,"::/Demo/Games/CharDemo.HC"$,
-$LK,"::/Demo/Graphics/CharAnimation.HC"$ and $LK,"::/Demo/ScreenCodes.HC"$.
+$LK,"::/Demo/Graphics/CharAnimation.HC"$ and $LK,"::/Demo/ScrnCodes.HC"$.
 */
 
 #define BLOW_UP_CHAR_X	(18*FONT_WIDTH)

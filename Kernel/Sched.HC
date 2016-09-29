@@ -1,6 +1,6 @@
 /*On each core, tasks are linked in a
 circular doubly-linked list queue with
-the Seth task as the head.  On core0,
+the Seth task as the head.  On Core0,
 the queue order represents the front-to-back
 window stack order with the window mgr
 as the wallpaper.

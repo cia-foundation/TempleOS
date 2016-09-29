@@ -4,7 +4,7 @@ File util $LK,"FilesFind",A="MN:FilesFind"$() wildcard mask consists of a single
 
  
 $FG,2$"/Kernel/*"$FG$		BaseDir: $FG,2$/Kernel$FG$	Mask: $FG,2$*$FG$
-$FG,2$"/Demo/*.BMP*;*.GRA*"$FG$	BaseDir: $FG,2$/Demo$FG$		Mask: $FG,2$*.BMP*$FG$ | $FG,2$*.GRA*$FG$
+$FG,2$"/Demo/*.BMP*;*.GR*"$FG$	BaseDir: $FG,2$/Demo$FG$		Mask: $FG,2$*.BMP*$FG$ | $FG,2$*.GR*$FG$
 $FG,2$"/*.DD*;!*/Bible*"$FG$	BaseDir: $FG,2$Root$FG$		Mask: $FG,2$*.DD*$FG$ but not $FG,2$*/Bible*$FG$
 
 See $LK,"FilesFindMatch",A="MN:FilesFindMatch"$().
@@ -18,9 +18,10 @@ Flags are either text or int values.
   $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$	$FG,2$+F$FG$ just files (Flattens trees)
   $LK,"FUF_CLUSTER_ORDER",A="MN:FUF_CLUSTER_ORDER"$	$FG,2$+O$FG$ sort by cluster (move head one direction)
   $LK,"FUF_JUST_TXT",A="MN:FUF_JUST_TXT"$		$FG,2$+T$FG$ just text files	: $LK,"FILEMASK_TXT",A="MN:FILEMASK_TXT"$
+  $LK,"FUF_JUST_DD",A="MN:FUF_JUST_DD"$		$FG,2$+$$$FG$ just $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ files	: $LK,"FILEMASK_DD",A="MN:FILEMASK_DD"$
   $LK,"FUF_JUST_SRC",A="MN:FUF_JUST_SRC"$		$FG,2$+S$FG$ just src files	: $LK,"FILEMASK_SRC",A="MN:FILEMASK_SRC"$
   $LK,"FUF_JUST_AOT",A="MN:FUF_JUST_AOT"$		$FG,2$+A$FG$ just aot files	: $LK,"FILEMASK_AOT",A="MN:FILEMASK_AOT"$
   $LK,"FUF_JUST_JIT",A="MN:FUF_JUST_JIT"$		$FG,2$+J$FG$ just jit files	: $LK,"FILEMASK_JIT",A="MN:FILEMASK_JIT"$
-  $LK,"FUF_JUST_GRA",A="MN:FUF_JUST_GRA"$		$FG,2$+G$FG$ just graphic files	: $LK,"FILEMASK_GRA",A="MN:FILEMASK_GRA"$
+  $LK,"FUF_JUST_GR",A="MN:FUF_JUST_GR"$		$FG,2$+G$FG$ just graphic files	: $LK,"FILEMASK_GR",A="MN:FILEMASK_GR"$
 
 See $LK,"ST_FILE_UTIL_FLAGS",A="MN:ST_FILE_UTIL_FLAGS"$ when used in calling program taking text flags.

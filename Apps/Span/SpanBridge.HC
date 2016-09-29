@@ -21,27 +21,27 @@ U0 SpanBridge1Init(CMathODE *)
 {
   I64 i;
 
-  MyMass *tempm;
-  tempm=PlaceMass(GR_WIDTH-FIXED_X1,FIXED_Y1);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(GR_WIDTH-FIXED_X2,FIXED_Y1);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(GR_WIDTH-FIXED_X1,FIXED_Y2);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(FIXED_X1,FIXED_Y1);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(FIXED_X2,FIXED_Y1);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(FIXED_X1,FIXED_Y2);
-  tempm->flags|=MSF_FIXED;
-  tempm=PlaceMass(FIXED_X3,FIXED_Y3);
-  tempm->flags|=MSF_FIXED;
+  MyMass *tmpm;
+  tmpm=PlaceMass(GR_WIDTH-FIXED_X1,FIXED_Y1);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(GR_WIDTH-FIXED_X2,FIXED_Y1);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(GR_WIDTH-FIXED_X1,FIXED_Y2);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(FIXED_X1,FIXED_Y1);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(FIXED_X2,FIXED_Y1);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(FIXED_X1,FIXED_Y2);
+  tmpm->flags|=MSF_FIXED;
+  tmpm=PlaceMass(FIXED_X3,FIXED_Y3);
+  tmpm->flags|=MSF_FIXED;
 
   for (i=0;i<LOAD_WEIGHTS;i++) {
-    tempm=PlaceMass(FIXED_X1+(i+1)*(GR_WIDTH-2*FIXED_X1)/(LOAD_WEIGHTS+1),
+    tmpm=PlaceMass(FIXED_X1+(i+1)*(GR_WIDTH-2*FIXED_X1)/(LOAD_WEIGHTS+1),
 	  FIXED_Y1);
-    tempm->load_t=(i+1.0)/LOAD_WEIGHTS;
-    tempm->color=RED;
+    tmpm->load_t=(i+1.0)/LOAD_WEIGHTS;
+    tmpm->color=RED;
   }
 
   DocClear;
@@ -62,19 +62,19 @@ U0 SpanBridge1Init(CMathODE *)
 
 U0 AdjustLoads(CMathODE *ode)
 {
-  MyMass *tempm=ode->next_mass;
+  MyMass *tmpm=ode->next_mass;
   F64 d,tt=SpanTime/10.0;
-  while (tempm!=&ode->next_mass) {
-    if (tempm->load_t) {
+  while (tmpm!=&ode->next_mass) {
+    if (tmpm->load_t) {
       if (tt) {
-	d=Abs(Sin(tempm->load_t*ã+tt)); //0.0<=d<=1.0
-	tempm->mass=100.0*Sqr(Sqr(d+1.0));
-	tempm->radius=7.0*d+2.0;
+	d=Abs(Sin(tmpm->load_t*ã+tt)); //0.0<=d<=1.0
+	tmpm->mass=100.0*Sqr(Sqr(d+1.0));
+	tmpm->radius=7.0*d+2.0;
       } else {
-	tempm->mass=MASS_MASS;
-	tempm->radius=MASS_RADIUS;
+	tmpm->mass=MASS_MASS;
+	tmpm->radius=MASS_RADIUS;
       }
     }
-    tempm=tempm->next;
+    tmpm=tmpm->next;
   }
 }

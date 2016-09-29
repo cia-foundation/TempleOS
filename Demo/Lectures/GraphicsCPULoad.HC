@@ -1,4 +1,4 @@
-//This is the fastest you can update the whole screen.
+//This is the fastest you can update the whole scrn.
 //See $LK,"::/Demo/Lectures/MiniGrLib.HC"$ if this interests you.
 
 F64 VGAPattern(I64 p)
@@ -27,7 +27,7 @@ U0 GrDemo()
     "$$GREEN$$Rate:$$RED$$%5.1f FPS$$FG$$"
 	  "  $$GREEN$$Load@30Hz:$$RED$$%5.1f%%$$FG$$\n",1/t,100*t*30.0;
   }
-//<CTRL-ALT-v> will flush screen VGA cache.
+//<CTRL-ALT-v> will flush scrn VGA cache.
   VGAFlush;
 }
 

@@ -1,20 +1,22 @@
 $WW,1$$FG,5$$TX+CX,"Memory Overview"$$FG$
 
-Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual identical to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2 Meg page table entries are used.  Nothing swaps to disk.  You can adjust $LK,"MEM_MAPPED_SPACE",A="MN:MEM_MAPPED_SPACE"$ for more RAM.
+Paging is practically not used.  64-bit mode requires paging, however, so it is identity-mapped, virtual identical to physical.  All tasks on all cores use the same page table map, just as though all addresses are physical addresses.  2Meg or 1Gig page table entries are used.  Nothing swaps to disk.  You can adjust $LK,"MEM_MAPPED_SPACE",A="MN:MEM_MAPPED_SPACE"$ for more RAM.
 
-In TempleOS, the lowest 2 Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL insts because 64-bit CALLs take two insts.  With signed +/- 32-bit values, code can only call a function within 2 Gig distance.  Therefore, TempleOS keeps all code in the lowest 2 Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
+In TempleOS, the lowest 2Gig of memory is called the $FG,2$code heap$FG$.  TempleOS's compiler always uses 32-bit signed relative JMP & CALL insts because 64-bit CALLs take two insts.  With signed +/- 32-bit values, code can only call a function within 2Gig distance.  Therefore, TempleOS keeps all code in the lowest 2Gig memory addresses including what would normally be called "the kernel".  Two Gig is plenty for code, don't worry.
 
 You can create new, independent heaps using $LK,"HeapCtrlInit",A="MN:HeapCtrlInit"$().  Then, use the $LK,"CHeapCtrl",A="MN:CHeapCtrl"$ as the 2nd arg to $LK,"MAlloc",A="MN:MAlloc"$().  See $LK,"HeapLog",A="MN:HeapLog"$() for an example.
 
-Memory alloced by a task will be freed when the task is killed.
+Memory alloced by a task will be freed when the task is killed.  The $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ is a task that never dies.  His memory is like kernel memory in other operating systems.  See $LK,"ACAlloc",A="MN:ACAlloc"$(), $LK,"AMAlloc",A="MN:AMAlloc"$(), $LK,"AMAllocIdent",A="MN:AMAllocIdent"$() and $LK,"AStrNew",A="MN:AStrNew"$().
 
-Eventually, memory will become fragmented, requiring a reboot.
+All of the regular page tables are marked, "cached".  When accessing hardware, however, you need uncached page table.  The lowest 4Gig of addresses have an alias used to access hardware located toward the top of mapped space.  It is currently at $FG,2$0x$TX,"3F00000000",D="DD_UNCACHED_ALIAS"$$FG$ but can change if $LK,"MEM_MAPPED_SPACE",A="MN:MEM_MAPPED_SPACE"$ is adjusted.  See $LK,"dev.uncached_alias",A="FF:::/Kernel/KEnd.HC,dev.uncached_alias"$.
+
+During an extended powered-on session of TempleOS, in theory, memory will become fragmented, requiring a reboot.  It has never happened to me.
 
 See $LK,"MemRep",A="MN:MemRep"$() and $LK,"::/Demo/MemDemo.HC"$.
 
 $FG,5$$TX+CX,"Single System-wide Mem Map"$
 
-$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"00035F3F",D="DD_KERNEL_END"$$FG$
+$FG,2$ 0x00$TX,"00007C00",D="DD_KERNEL"$- 0x00$TX,"0003654F",D="DD_KERNEL_END"$$FG$
 $ID,2$Kernel module, placed here by the boot-loader, $LK,"BOOT_RAM_BASE",A="MN:BOOT_RAM_BASE"$.
 $ID,-2$
 $FG,2$ 0x00$TX,"00096600",D="DD_BOOT_HIGH_LOC_DVD"$- 0x00$TX,"00096FFF",D="DD_BOOT_HIGH_LOC_DVD_END"$$FG$
@@ -29,14 +31,14 @@ $ID,-2$
 $FG,2$ 0x00000A0000- 0x00000BFFFF$FG$
 $ID,2$VGA graphics mem, marked as write-through cache in $LK,"text",A="MN:text"$.vga_alias.
 $ID,-2$
-$FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"002037FF",D="DD_SYS_FIXED_AREA_END"$$FG$
-$ID,2$$LK,"CSysFixedArea",A="MN:CSysFixedArea"$ for page tables and misc.  $TX,"256 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ of address space mapped.
+$FG,2$ 0x00$TX,"00100000",D="DD_SYS_FIXED_AREA_BASE"$- 0x00$TX,"002035FF",D="DD_SYS_FIXED_AREA_END"$$FG$
+$ID,2$$LK,"CSysFixedArea",A="MN:CSysFixedArea"$ for page tables and misc.  $TX,"256Gig",D="DD_MEM_MAPPED_SPACE_GIG"$ of address space mapped.
 $ID,-2$
-$FG,2$ 0x00$TX,"00203800",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"7FFFFFFF",D="DD_SYS_HEAP_LIMIT"$$FG$
+$FG,2$ 0x00$TX,"00203600",D="DD_SYS_HEAP_BASE"$- 0x00$TX,"7FFFFFFF",D="DD_SYS_HEAP_LIMIT"$$FG$
 $ID,2$Code Heap mem.
 $ID,-2$
 $FG,2$             - 0x007FFFFFFF$FG$
-$ID,2$Data Heap mem.  (This exists if there is less than 2 Gig of code heap.)
+$ID,2$Data Heap mem.  (This exists if there is less than 2Gig of code heap.)
 $ID,-2$
 $FG,2$ 0x00E0000000- 0x00FFFFFFFF$FG$
 $ID,2$32-bit devices could alloc memory at 0xF0000000 going up, but this is wrong, since some PCs already have devices at 0xF0000000.  No PCI devices are supported, so $LK,"Mem32DevAlloc",A="MN:Mem32DevAlloc"$() flaws are not an issue.
@@ -46,15 +48,27 @@ $FG,2$ 0x0100000000-~0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
 $ID,2$Data Heap mem.  (The physical memory that exists in this range is data heap.)
 $ID,-2$
 $FG,2$ 0x$TX,"3F00000000",D="DD_UNCACHED_ALIAS"$- 0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
-$ID,2$Uncached alias of first 4 Gig.  (For 32-bit device access.)
+$ID,2$Uncached alias of first 4Gig.  (For 32-bit device access.)
 $ID,-2$
 $FG,2$             - 0x$TX,"3FFFFFFFFF",D="DD_MEM_MAPPED_SPACE_END"$$FG$
-$ID,2$64-bit devices are alloced with $LK,"Mem64DevAlloc",A="MN:Mem64DevAlloc"$() counting bwd from $TX,"256 Gig",D="DD_MEM_MAPPED_SPACE_GIG"$, but no PCI devices are actually supported$WW,0$.
+$ID,2$64-bit devices are alloced with $LK,"Mem64DevAlloc",A="MN:Mem64DevAlloc"$() counting bwd from $TX,"256Gig",D="DD_MEM_MAPPED_SPACE_GIG"$, but no PCI devices are actually supported$WW,0$.
 $ID,-2$
 
 
-$WW,1$* Note: There is a break in the data-heap block pool.  This has no effect except the obvious effect that fragmentation has on contiguous requests.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 8 Gig chunk on my 12 Gig machine.
+$WW,1$* Note: There is a break in the data-heap block pool.  This has no effect except the obvious effect that fragmentation has on contiguous requests.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 8Gig chunk on my 12Gig machine.  I can $LK,"MAlloc",A="MN:MAlloc"$() an 32Gig chunk on my 64Gig machine.  
 
-* Note: For systems with less than 2 Gig RAM, the code and data heap block pools are the same.  For systems with 2-4 Gig of RAM, the code heap is 1/4 of the total.  See $LK,"BlkPoolsInit",A="MN:BlkPoolsInit"$().
+* Note: For systems with less than 2Gig RAM, the code and data heap block pools are the same.  For systems with 2-4Gig of RAM, the code heap is 1/4 of the total.  See $LK,"BlkPoolsInit",A="MN:BlkPoolsInit"$().
 
-* See $LK,"Independent HeapCtrl Example",A="FA:::/Kernel/KEnd.HC,Independent HeapCtrl Example"$.
+
+
+$FG,5$$TX+CX,"History"$$FG$
+
+In 2003, I wanted to make a no-paging ring-0-only 64-bit operating system for super speed with simplicity and full access.  With paging, every memory request requires 5 accesses -- it must access the address itself, 4K, 2Meg, 1Gig, and 512Gig page tables, but the CPU's translation look-aside buffer mostly removes the penalty for using paging.  So, I did not want to use paging, but long mode requires it.  I did the next best thing -- I identity-mapped everything and achieved the simplicity I was after with subtle performance boosts, not wasting time changing address maps.  And, I look forward to the day I command Intel to make an optimized no-paging long mode.
+
+I needed VGA A0000-BFFFF memory to be write-through and 0xE0000000-0xFFFFFFFF to be uncached for various devices.  All 64-bit computers allow stopping address translation at 2Meg page size, not using 4K.  I wanted to use 2Meg for everything because it's faster, with one less level of page tables.  I had to make A0000-BFFFF write-through, though, so I could not use 2Meg size on the lowest page.  I did the lowest 2Meg area as 4K pages.  I also unmapped the first 4K to cause a fault when dereferencing NULL.
+
+In 2016, I came-up with an alternate idea.  I double mapped the lowest memory with an alias that was uncached.  Accessing the lowest 2Meg area directly was cached but the alias I created up at the $LK,"top of address space",A="MN:MEM_MAPPED_SPACE"$ was uncached.  Unfortunately, I could no longer boast of the simplicity of identity mapping everything.  Since many of my users are familiar with A0000-BFFFF, it is actually pretty seriously unfortunate that they cannot use the easy-to-understand numbers of A0000-BFFFF, but must access the relocated alias location.  See $LK,"text.vga_alias",A="FF:::/Kernel/KEnd.HC,text.vga_alias"$.  I also no longer cause a fault when dereferencing NULL.
+
+Then, I switched to 1Gig page sizes.  For the lowest 4Gig, I set-up an alias up at the $LK,"top of address space",A="MN:MEM_MAPPED_SPACE"$.  Not all computers support 1Gig page tables, however, so I also support 2Meg.
+
+My original plan was to allow changing the page tables as needed, so I had code for taking control of 2Meg pages and marking them uncached or whatever.  When I did a HDAudio driver, I requested some 32-bit address space as uncached.  Today, all of the first 4Gig can be accessed without caching at the $LK,"dev.uncached_alias",A="FF:::/Kernel/KEnd.HC,dev.uncached_alias"$.

@@ -26,8 +26,8 @@ U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
 {
   I64 cnt;
   U8 *res,*ptr;
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
   SpanHeader h;
 
   ODERenum(ode);
@@ -47,18 +47,18 @@ U8 *SpanSave(CMathODE *ode,I64 *_size=NULL)
   MemCpy(ptr,&h,sizeof(SpanHeader));
   ptr+=sizeof(SpanHeader);
 
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    MemCpy(ptr,&tempm->start,M_SIZE);
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    MemCpy(ptr,&tmpm->start,M_SIZE);
     ptr+=M_SIZE;
-    tempm=tempm->next;
+    tmpm=tmpm->next;
   }
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    MemCpy(ptr,&temps->start,S_SIZE);
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    MemCpy(ptr,&tmps->start,S_SIZE);
     ptr+=S_SIZE;
-    temps=temps->next;
+    tmps=tmps->next;
   }
   if (_size) *_size=cnt;
   return res;
@@ -71,7 +71,7 @@ Bool SpanWrite(CMathODE *ode)
   Bool res=FALSE,old_silent=Silent;
   MkDir("~/Span");
   Silent(old_silent);
-  if (name=PopUpFileName("~/Span/Game.DAT")) {
+  if (name=PopUpFileName("~/Span/Game.DATA")) {
     if (buf=SpanSave(ode,&size)) {
       FileWrite(name,buf,size);
       Free(buf);
@@ -85,8 +85,8 @@ Bool SpanWrite(CMathODE *ode)
 U0 SpanLoad(CMathODE *ode,U8 *src)
 {
   I64 i;
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
   SpanHeader h;
 
   if (!src) return;
@@ -95,19 +95,19 @@ U0 SpanLoad(CMathODE *ode,U8 *src)
   src+=sizeof(SpanHeader);
 
   for (i=0;i<h.num_masses;i++) {
-    tempm=CAlloc(sizeof(MyMass));
-    MemCpy(&tempm->start,src,M_SIZE);
+    tmpm=CAlloc(sizeof(MyMass));
+    MemCpy(&tmpm->start,src,M_SIZE);
     src+=M_SIZE;
-    QueIns(tempm,ode->last_mass);
+    QueIns(tmpm,ode->last_mass);
   }
 
   for (i=0;i<h.num_springs;i++) {
-    temps=CAlloc(sizeof(MySpring));
-    MemCpy(&temps->start,src,S_SIZE);
+    tmps=CAlloc(sizeof(MySpring));
+    MemCpy(&tmps->start,src,S_SIZE);
     src+=S_SIZE;
-    QueIns(temps,ode->last_spring);
-    temps->end1=MassFindNum(ode,temps->end1_num);
-    temps->end2=MassFindNum(ode,temps->end2_num);
+    QueIns(tmps,ode->last_spring);
+    tmps->end1=MassFindNum(ode,tmps->end1_num);
+    tmps->end2=MassFindNum(ode,tmps->end2_num);
   }
 }
 

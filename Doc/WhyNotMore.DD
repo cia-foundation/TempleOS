@@ -1,0 +1,32 @@
+$WW,1$$FG,5$$TX+CX,"Why Not More?"$$FG$
+
+If a feature cannot be made to work correctly and consistently, professional companies usually remove the feature.  Because PC hardware is so diverse, getting things to work on all people's computers is really difficult.  For one thing, you practically have to own all the different hardware to write drivers for it.  If a company wanted to sell a PC operating system, they would offer a warranty and, therefore, could not get away with amateur behavior.  TempleOS absolutely requires 64-bit computers, so we leave behind much trouble, but plenty remains.
+
+The PCI bus interface is what modern hardware uses.  Before PCI, life was simple and devices used I/O ports.  After studying $LK,"PCI Interrupts",A="FI:::/Demo/Lectures/PCIInterrupts.HC"$ and attempting to do a HDAudio driver, I came to realize that modern PCI devices require ten times more code and I cannot even come close to making them work on everyone's machine because with PCI devices there are several models to worry about, unlike with the older ISA bus devices which can be done with one driver.
+
+Currently, I have no PCI drivers.  My drivers use I/O ports and operate in ISA bus mode.  At this point, I only have one driver for each type of device and it is delightfully simple that way.  I have one $LK,"keyboard",A="FI:::/Kernel/SerialDev/Keyboard.HC"$ driver, one $LK,"mouse",A="FI:::/Kernel/SerialDev/Mouse.HC"$ driver, one $LK,"ATA hard drive",A="FI:::/Kernel/BlkDev/DskATA.HC"$ driver, one $LK,"ATAPI CD/DVD",A="FI:::/Kernel/BlkDev/DskATA.HC"$ driver, one $LK,"VGA 640x480 16 color",A="FI:::/Adam/Gr/GrScrn.HC"$ video driver and one $LK,"PC Speaker",A="MN:Snd"$ driver.  I use the $LK,"PIT and HPET timers",A="MN:TimersInit"$ and $LK,"PIC Interrupt Controller",A="MN:IntsInit"$.  I use  IRQ0 for timer, IRQ1 for keyboard, and IRQ12 for mouse.  If IRQ12 is not firing, I am able to poll the mouse.
+
+In the CPU department, I have state of the art 64-bit $LK,"long mode",A="FI:::/Kernel/KStart64.HC"$ with $LK,"multicore",A="FI:::/Kernel/MultiProc.HC"$ support.  I use the $LK,"APIC",A="MN:MPAPICInit"$ and start-up $LK,"multicore",A="MN:Core0StartMP"$ operation.
+
+I have made an incredible accomplishment by getting it to work on practically everyone's computer as long as it is 64-bit and they run inside VMware, QEMU or VirtualBox.
+
+Adding a USB driver would be really ugly with UHCI, EHCI, OHCI, USB1, USB2, USB3, ICH6, ICH7, ICH8, ICH9, ICH10, ICH11, ICH12, boot mode and regular mode for keyboard/mouse and a diversity of HID reports.  It's hopeless.  I could never offer anything but crappy, limited support and it would just add a ton of crappy code that mostly didn't work.  What would I gain?  Nothing.  A keyboard or mouse would not be improved.  Solid State USB drives would be really nice, but it's not going to happen.
+
+The same story is basically true for GPUs, audio, networking and AHCI hard drive drivers.  God said 640x480 16 color was a covenant like circumcision, so the video will never change, even if a $LK,"Standard PC",A="FI:::/Doc/StdTempleOSPC.DD"$ was made.  If you attempt multimedia, everything will break because memory will get fragmented with huge multimedia files.  Some day, if super-simple high speed serial allows networking, there will be no browser within the 100,000 line limit and, with only 16 colors, the world wide web is not tolerable.  FTP and telnet might be possible, in the far distant future, if they could fit within the 100,000 line limit.  Currently, there are $TX,"81,223",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.
+
+I don't stand a chance working on native hardware, anymore.  I could install and run natively on hardware from about 2005-2010.  It requires BIOS's being nice enough to write USB mode PS/2 legacy keyboard/mouse support.  As it turns-out, sometimes the BIOS has PS/2 drivers but purposely disables them, just to be mean.  The CIA and whole industry is trying to mess everything up, on purpose.  Perhaps, at a point of sale in a store, a thief could hack a credit card machine.  Therefore, the BIOS companies actually want it difficult to make drivers and purposely make it broken.
+
+The ATA/ATAPI hard drives often can be run with I/O ports if you can $LK,"find them",A="FI:::/Kernel/BlkDev/DskATAId.HC"$.  $FG,2$lspci -v$FG$ on Linux or system information on Windows can help you locate the SATA IO ports the hard drive and CD/DVD have.  They no longer are enabled by the BIOS.  It's hopeless.  I'm stuck with very slow drive performance, but it works for everybody.
+
+UEFI is pointless.  If I am forced to run in VMware, QEMU or VirtualBox, they will always support non-UEFI mode.  Without working, native hard drive and CD/DVD drivers, you can't get very far with UEFI on a native install, not to mention SecureBoot.  UEFI is, first of all, redundant.  If non-UEFI works in a virtual machine, supporting UEFI would only be redundant, ugly nasty code.  My compiler does not create an ELF or PE format.  I would have to ruin the beauty of my compiler, which would make me cry many tears.
+
+God talks.  It seems reasonable that I will get to make the rules for the whole industry, in the future when God is announced publically to the World.
+
+I made $LK,"::/Doc/Demands.DD"$.
+
+When the PC was created, they wanted flexibility because they did not know the future.  Now, the industry is mature and it is time to make a 100% standard PC that everybody uses.  $LK,"::/Doc/StdTempleOSPC.DD"$
+
+$FG,8$
+* "QEMU" is a trademark owned by Fabrice Bellard.
+* "VMware" is a trademark owned by VMware, Inc.
+* "VirtualBox" is a trademark owned by Oracle.

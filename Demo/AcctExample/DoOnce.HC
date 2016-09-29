@@ -37,11 +37,11 @@ U0 DoOnce()
       }
       break;
   }
-  if (FileFind("D:/Temp/Logs/access.log")) {
-    Auto("\n\n%C",CH_ESC);
+  if (FileFind("D:/Tmp/Logs/access.log")) {
+    In("\n\n%C",CH_ESC);
     RunFile("::/Demo/WebLogDemo/WebLogRep",,
-	  "D:/Temp/Logs/*.log","D:/Home/WebLogRep.DD");
-    Del("D:/Temp/Logs/*.log");
+	  "D:/Tmp/Logs/*.log","D:/Home/WebLogRep.DD");
+    Del("D:/Tmp/Logs/*.log");
   }
 }
 

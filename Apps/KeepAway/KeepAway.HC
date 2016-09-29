@@ -267,7 +267,7 @@ just to be different.
 
 U0 DrawObj(CDC *dc,Obj *o,F64 tt)
 {
-  U8 *temps;
+  U8 *tmps;
   F64 r1=Max(9-0.1*o->z,1),r2=Max(r1/4,1);
 
   if (o==human)
@@ -280,11 +280,11 @@ U0 DrawObj(CDC *dc,Obj *o,F64 tt)
   if (o==ball)
     Sprite3(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,$IB,"<1>",BI=1$);
   else {
-    temps=SpriteInterpolate((tt-o->last_t0)/(o->next_t0-o->last_t0),
+    tmps=SpriteInterpolate((tt-o->last_t0)/(o->next_t0-o->last_t0),
 	  imgs[o->last_img].img[o->team],
 	  imgs[o->next_img].img[o->team]);
-    SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,temps,o->é);
-    Free(temps);
+    SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,tmps,o->é);
+    Free(tmps);
   }
 }
 
@@ -616,7 +616,7 @@ U0 AnimateTask(CTask *parent_task)
 	}
       }
     }
-    WinMgrSync;
+    Refresh;
   }
 }
 

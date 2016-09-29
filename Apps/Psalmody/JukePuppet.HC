@@ -2,13 +2,13 @@ U0 SongPuppet(CTask *task,I64 passes)
 {
   CDbgInfo *dbg_info;
   I64 i,start,end,rip,last_rip;
-  CHashFun *tempf=NULL;
+  CHashFun *tmpf=NULL;
   for (i=0;i<250 && TaskValidate(task);i++) {
-    if (tempf=HashFind("Song",task->hash_table,HTT_FUN))
+    if (tmpf=HashFind("Song",task->hash_table,HTT_FUN))
       break;
     Sleep(1);
   }
-  if (tempf && (dbg_info=tempf->dbg_info)) {
+  if (tmpf && (dbg_info=tmpf->dbg_info)) {
     start=dbg_info->body[0];
     end  =dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
     last_rip=0;
@@ -74,16 +74,16 @@ public U0 JukeSongsPuppet(U8 *dirname="~/Psalmody",I64 passes=2,
 			I64 start_song=0,I64 end_song=MAX_I64)
 {//Help make music video by puppeting JukeBox task.
   I64 i;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   CTask *juke_task=User("JukeBox(0x%X);\n",dirname);
   Cd(dirname);
-  tempde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
-  for (tempde=tempde1,i=0;tempde && i<start_song;i++)
-    tempde=tempde->next;
-  for (i=start_song;tempde && i<end_song;i++) {
-    JukeSongPuppet(juke_task,passes,i,tempde->name);
-    tempde=tempde->next;
+  tmpde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
+  for (tmpde=tmpde1,i=0;tmpde && i<start_song;i++)
+    tmpde=tmpde->next;
+  for (i=start_song;tmpde && i<end_song;i++) {
+    JukeSongPuppet(juke_task,passes,i,tmpde->name);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   Kill(juke_task);
 }

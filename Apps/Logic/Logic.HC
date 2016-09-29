@@ -580,7 +580,7 @@ U0 DigitalLogic()
       Fs->draw_it=&DrawIt;
       GetChar;
       DocClear;
-      WinMgrSync(2,TRUE);
+      Refresh(2,TRUE);
       DocBottom;
     }
   } catch

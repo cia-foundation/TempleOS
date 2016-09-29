@@ -1,24 +1,24 @@
-U0 BgtEntryDel2(CBgtEntry *tempb)
+U0 BgtEntryDel2(CBgtEntry *tmpb)
 {
-  if (tempb->type!=BE_TEMPLATE_COPY) {
-    Free(tempb->credit);
-    Free(tempb->debit);
-    Free(tempb->desc);
+  if (tmpb->type!=BE_TEMPLATE_COPY) {
+    Free(tmpb->credit);
+    Free(tmpb->debit);
+    Free(tmpb->desc);
   }
 }
 
-U0 BgtEntryDel(CBgtEntry *tempb)
+U0 BgtEntryDel(CBgtEntry *tmpb)
 {
-  BgtEntryDel2(tempb);
-  Free(tempb);
+  BgtEntryDel2(tmpb);
+  Free(tmpb);
 }
 
-U0 BgtIns(CBgtEntry *tempb)
+U0 BgtIns(CBgtEntry *tmpb)
 {
-  CBgtEntry	*tempb1=b_head.next;
-  while (tempb1!=&b_head && tempb1->date<tempb->date)
-    tempb1=tempb1->next;
-  QueIns(tempb,tempb1->last);
+  CBgtEntry	*tmpb1=b_head.next;
+  while (tmpb1!=&b_head && tmpb1->date<tmpb->date)
+    tmpb1=tmpb1->next;
+  QueIns(tmpb,tmpb1->last);
 }
 
 class CBgtEntryForm
@@ -33,7 +33,7 @@ class CBgtEntryForm
 CBgtEntry *BgtEntryPmt(CBgtEntry *dft=NULL)
 {
   CBgtEntryForm b;
-  CBgtEntry *tempb;
+  CBgtEntry *tmpb;
   U8 *st;
   MemSet(&b,0,sizeof(CBgtEntryForm));
   StrCpy(&b.date,"*");
@@ -55,16 +55,16 @@ CBgtEntry *BgtEntryPmt(CBgtEntry *dft=NULL)
 	if (st!=DOCM_CANCEL)
 	  StrCpy(b.debit,st);
       } else {
-	tempb=CAlloc(sizeof(CBgtEntry));
-	tempb->date  =Str2Date(b.date);
-	tempb->amount=b.amount;
-	tempb->credit=StrNew(b.credit);
-	tempb->debit =StrNew(b.debit);
-	tempb->desc  =StrNew(b.desc);
-	tempb->type  =BE_NORMAL;
-	StrFileAdd(tempb->credit,&accts_table_strs,accts_table);
-	StrFileAdd(tempb->debit,&accts_table_strs,accts_table);
-	return tempb;
+	tmpb=CAlloc(sizeof(CBgtEntry));
+	tmpb->date  =Str2Date(b.date);
+	tmpb->amount=b.amount;
+	tmpb->credit=StrNew(b.credit);
+	tmpb->debit =StrNew(b.debit);
+	tmpb->desc  =StrNew(b.desc);
+	tmpb->type  =BE_NORMAL;
+	StrFileAdd(tmpb->credit,&accts_table_strs,accts_table);
+	StrFileAdd(tmpb->debit,&accts_table_strs,accts_table);
+	return tmpb;
       }
     } else
       return NULL;

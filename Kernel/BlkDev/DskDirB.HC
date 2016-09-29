@@ -104,28 +104,28 @@ Bool IsDir(U8 *dir_name)
 
 I64 Dir(U8 *files_find_mask,Bool full)
 {//List directory.
-  CDirEntry *tempde1=NULL,*tempde2;
+  CDirEntry *tmpde1=NULL,*tmpde2;
   U8 *st;
   CDateStruct ds;
   I64 csize=0xFFFF,c=0xFFFF,res=0;
-  tempde1=FilesFind(files_find_mask);
+  tmpde1=FilesFind(files_find_mask);
   if (!(st=CurDir))
     PrintErr("Invalid Drive\n");
   else {
-    if (tempde1) {
+    if (tmpde1) {
       Free(st);
-      st=MAllocIdent(tempde1->full_name);
+      st=MAllocIdent(tmpde1->full_name);
       StrLastRem(st,"/");
       if (!st[2])
 	StrCpy(st+2,"/");
 //Find max columns
-      tempde2=tempde1;
-      while (tempde2) {
-	if (tempde2->size>csize)
-	  csize=tempde2->size;
-	if (tempde2->cluster>c)
-	  c=tempde2->cluster;
-	tempde2=tempde2->next;
+      tmpde2=tmpde1;
+      while (tmpde2) {
+	if (tmpde2->size>csize)
+	  csize=tmpde2->size;
+	if (tmpde2->cluster>c)
+	  c=tmpde2->cluster;
+	tmpde2=tmpde2->next;
       }
       csize=Bsr(csize)/4+1;
       c=Bsr(c)/4+1;
@@ -136,24 +136,24 @@ I64 Dir(U8 *files_find_mask,Bool full)
 	      csize,"SIZE",c,"CLUSTER";
       else
 	"DATE_ TIME_ %*ts\n",csize,"SIZE";
-      while (tempde1) {
-	tempde2=tempde1->next;
+      while (tmpde1) {
+	tmpde2=tmpde1->next;
 	res++;
 	if (full)
-	  "%D %T %0*tX %0*tX ",tempde1->datetime,tempde1->datetime,
-		csize,tempde1->size,c,tempde1->cluster;
+	  "%D %T %0*tX %0*tX ",tmpde1->datetime,tmpde1->datetime,
+		csize,tmpde1->size,c,tmpde1->cluster;
 	else {
-	  Date2Struct(&ds,tempde1->datetime+local_time_offset);
+	  Date2Struct(&ds,tmpde1->datetime+local_time_offset);
 	  "%02d/%02d %02d:%02d %0*tX ",ds.mon,ds.day_of_mon,ds.hour,ds.min,
-		csize,tempde1->size;
+		csize,tmpde1->size;
 	}
-	if (tempde1->attr & RS_ATTR_DIR)
-	  PutDirLink(tempde1->name,tempde1->full_name);
+	if (tmpde1->attr & RS_ATTR_DIR)
+	  PutDirLink(tmpde1->name,tmpde1->full_name);
 	else
-	  PutFileLink(tempde1->name,tempde1->full_name);
+	  PutFileLink(tmpde1->name,tmpde1->full_name);
 	'\n';
-	DirEntryDel(tempde1);
-	tempde1=tempde2;
+	DirEntryDel(tmpde1);
+	tmpde1=tmpde2;
       }
     } else
       "No matching entries\n";

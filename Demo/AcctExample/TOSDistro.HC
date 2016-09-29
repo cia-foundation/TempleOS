@@ -14,7 +14,7 @@ U8 TOSGetDrv()
 U0 TOSBootHDIns(U8 drv_let)
 {
   drv_let=ToUpper(drv_let);
-  Auto(TOS_CFG);
+  In(TOS_CFG);
   BootHDIns(drv_let);
   if (StrOcc(TOS_MASTER_BOOT_DRVS,drv_let))
     BootMHDIns(drv_let);
@@ -51,31 +51,31 @@ public U0 CopySongs(U8 threshold='7')
 {
   CDoc *doc;
   CDocEntry *doc_e;
-  CDirEntry *tempde=FilesFind("/Home/Sup1/Sup1Psalmody/*.HC*",
-	FUF_CLUSTER_ORDER),*tempde1=tempde;
+  CDirEntry *tmpde=FilesFind("/Home/Sup1/Sup1Psalmody/*.HC*",
+	FUF_CLUSTER_ORDER),*tmpde1=tmpde;
   DelTree("/Apps/Psalmody/Examples");
   MkDir("/Apps/Psalmody/Examples");
-  while (tempde) {
-    doc=DocRead(tempde->full_name);
+  while (tmpde) {
+    doc=DocRead(tmpde->full_name);
     doc_e=doc->head.next;
     if (doc_e->type_u8==DOCT_TEXT && doc_e->tag[2]>=threshold)
-      Copy(tempde->full_name,"/Apps/Psalmody/Examples");
+      Copy(tmpde->full_name,"/Apps/Psalmody/Examples");
     DocDel(doc);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 U0 DistroPrep()
 {
   Del("/Home/Demo*");
-  DelTree("/Home/*Temp.DD.Z");
+  DelTree("/Home/*Tmp.DD.Z");
   if (FileFind("/Home/Sup1/Sup1Psalmody"))
     CopySongs;
 
-  DelTree("/Temp");
-  MkDir("/Temp");
-  MkDir("/Temp/ScreenShots");
+  DelTree("/Tmp");
+  MkDir("/Tmp");
+  MkDir("/Tmp/ScrnShots");
 
   Touch("/PersonalMenu.DD.Z","+T");
   Touch("/Home/PersonalMenu.DD.Z","+T");
@@ -108,7 +108,7 @@ U0 MakeBootRescueDrvFile()
 {
   CBlkDev *bd;
   if (!Let2Drv('A',FALSE)) {
-    Auto(CFG_BOOT_RESCUE_DRV "\n");
+    In(CFG_BOOT_RESCUE_DRV "\n");
     Mount;
   }
   bd=Let2BlkDev('A');
@@ -198,7 +198,7 @@ I64 MakeLineRepFile()
   DocClear;
   official=LineRep("C:/*","-r")+
 	LineRep("C:/Adam/*")+
-	LineRep("C:/Compiler/*","-S+T")+
+	LineRep("C:/Compiler/*","-S+$$")+
 	LineRep("C:/Kernel/*");
   DocClear;
   CopyTree("B:/TOS","C:/Home");
@@ -225,7 +225,7 @@ U0 StaffDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  Auto(TOS_DVD_CFG);
+  In(TOS_DVD_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
@@ -238,7 +238,7 @@ U0 MakeStaffDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSSTAFF_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -248,7 +248,7 @@ U0 DbgDistroPrep()
   Drv('C');
   DistroPrep;
   MakeBootRescueDrvFile;
-  Auto(TOS_DVD_DBG_CFG);
+  In(TOS_DVD_DBG_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
@@ -266,7 +266,7 @@ U0 MakeDbgDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -275,7 +275,7 @@ U0 StdDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  Auto(STD_DISTRO_DVD_CFG);
+  In(STD_DISTRO_DVD_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
@@ -292,7 +292,7 @@ U0 MakeStdDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -301,7 +301,7 @@ U0 MakeStdRedSeaDistro()
   StdDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -311,7 +311,7 @@ U0 UltraDistroPrep()
   StdDistroPrep;
   DelTree(TOS_DISTRO_DIR "/Linux");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
-  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACDefs.DAT*");
+  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACDefs.DATA*");
   Del(TOS_DISTRO_DIR "/Misc/PCIDevices.DD.Z");
   Del(TOS_DISTRO_DIR "/Misc/Bible.TXT.Z");
 
@@ -320,7 +320,7 @@ U0 UltraDistroPrep()
   DelTree(TOS_DISTRO_DIR "/Demo");
   DelTree(TOS_DISTRO_DIR "/Misc/Tour");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
-  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACWords.DAT*");
+  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACWords.DATA*");
   Del(TOS_DISTRO_DIR "/Adam/God/Vocab.DD.Z");
   Del(TOS_DISTRO_DIR "/Misc/OSTestSuite.HC.Z");
   Copy("C:/Home/Sup1/Sup1Distro/UltraMenu.DD.Z",
@@ -334,7 +334,7 @@ U0 MakeUltraDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -343,7 +343,7 @@ U0 MakeUltraRedSeaDistro()
   UltraDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-	"Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -351,8 +351,7 @@ U0 MakeUltraRedSeaDistro()
 U0 MakeSup1ISO()
 {
   RedSeaISO(TOS_ISO_C_NAME,"::/Home/Sup1");
-  DefinePrint("DD_TEMPLEOS_SUP1_SIZE",
-	"Supplemental ISO #1 (%0.2f MB)",
+  DefinePrint("DD_TEMPLEOS_SUP1_SIZE","Supplemental ISO #1 (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -361,40 +360,39 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1f MB)",
+	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
-	  "%d KB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
+	  "%dKB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-//	  "Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1f MB)",
+//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 //	  0.1*(10*Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSCD_RS_K_SIZE",
-//	  "%d KB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
+//	  "%dKB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
 
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2f MB)",
+	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
-	  "%d KB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
+	  "%dKB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-//	  "Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2f MB)",
+//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 //	  0.01*(100*Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSULTRA_RS_K_SIZE",
-//	  "%d KB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);
+//	  "%dKB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSDBG_SIZE",
-//	  "Download $TX,"TempleOS V4.10",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.2f MB)",
+//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.2fMB)",
 //	  0.01*(100*Size("D:/Wb/TempleOSDbg.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSDBG_K_SIZE",
-//	  "%d KB",Size("D:/Wb/TempleOSDbg.ISO","+s")/1024);
+//	  "%dKB",Size("D:/Wb/TempleOSDbg.ISO","+s")/1024);
 
-    DefinePrint("DD_TEMPLEOS_SUP1_SIZE",
-	  "Supplemental ISO #1 (%0.2f MB)",
+    DefinePrint("DD_TEMPLEOS_SUP1_SIZE","Supplemental ISO #1 (%0.2fMB)",
 	  0.01*(100*Size("D:/Wb/TempleOSSup1.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOS_SUP1_K_SIZE",
-	  "%d KB",Size("D:/Wb/TempleOSSup1.ISO","+s")/1024);
+	  "%dKB",Size("D:/Wb/TempleOSSup1.ISO","+s")/1024);
   } catch
     Fs->catch_except=TRUE;
 }

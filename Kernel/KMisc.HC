@@ -177,7 +177,7 @@ U0 Snd(F64 freq)
       } else
 	OutU8(0x61,InU8(0x61)&~3);
     }
-    if (!IsDbg && snd.record) {
+    if (!IsDbgMode && snd.record) {
       d=ACAlloc(sizeof(CSndData));
       d->freq=freq;
       d->time=tS;
@@ -185,6 +185,18 @@ U0 Snd(F64 freq)
     }
     LBtr(&sys_semas[SYS_SEMA_SND],0);
   }
+}
+
+U0 SndRst()
+{//Fix stuck sound.
+  if (Bt(&sys_semas[SYS_SEMA_SND],0)) {
+    Sleep(1);
+    if (Bt(&sys_semas[SYS_SEMA_SND],0)) {
+      Sleep(1);
+      LBtr(&sys_semas[SYS_SEMA_SND],0);
+    }
+  }
+  Snd(0);
 }
 
 U0 Beep(I64 freq=500,Bool busy=FALSE)
@@ -202,7 +214,7 @@ U0 Beep(I64 freq=500,Bool busy=FALSE)
 }
 
 Bool Mute(Bool val)
-{//Turn-off or on sound.
+{//Turn-off sound.
   Bool res;
   if (val) {
     PUSHFD
@@ -221,55 +233,55 @@ Bool IsMute()
 }
 
 Bool Silent(Bool val=ON)
-{//Turns-off StdOut console text output, not sound.
+{//Turn-off StdOut console text. (Not sound.)
   return LBEqu(&Fs->display_flags,DISPLAYf_SILENT,val);
 }
 
 Bool IsSilent()
-{//Is StdOut turned-off?
+{//Return StdOut turned-off?
   return Bt(&Fs->display_flags,DISPLAYf_SILENT);
 }
 
 Bool SysDbg(Bool val)
-{//Sets or resets sysdbg bit you can use while debugging.
+{//Set SysDbg bit you can use while debugging.
   return LBEqu(&sys_semas[SYS_SEMA_DEBUG],0,val);
 }
 
 Bool IsSysDbg()
-{//Is sysdbg bit set?
+{//Return SysDbg bit.
   return Bt(&sys_semas[SYS_SEMA_DEBUG],0);
 }
 
 Bool Raw(Bool val)
-{//Switches to direct screen, non-windowed output.
+{//Set to direct scrn, BLACK & WHITE, non-windowed output mode.
   if (!val)
     VGAFlush;
   return !LBEqu(&Fs->display_flags,DISPLAYf_NOT_RAW,!val);
 }
 
 Bool IsRaw()
-{//Are we in BLACK & WHITE raw screen mode?
+{//Are we in BLACK & WHITE raw scrn mode?
   return !Bt(&Fs->display_flags,DISPLAYf_NOT_RAW);
 }
 
 Bool SingleUser(Bool val)
-{//Sets or resets single-user mode bit.
+{//Set single-user mode.
   return LBEqu(&sys_semas[SYS_SEMA_SINGLE_USER],0,val);
 }
 
 Bool IsSingleUser()
-{//Are we in single-user mode?
+{//Return single-user mode.
   return Bt(&sys_semas[SYS_SEMA_SINGLE_USER],0);
 }
 
-Bool InDbg(Bool val)
-{//Set in-debugger flag.
-  return LBEqu(&sys_semas[SYS_SEMA_IN_DEBUGGER],0,val);
+Bool DbgMode(Bool val)
+{//Set dbg-mode.
+  return LBEqu(&sys_semas[SYS_SEMA_DBG_MODE],0,val);
 }
 
-Bool IsDbg()
-{//Return in-debugger flag.
-  return Bt(&sys_semas[SYS_SEMA_IN_DEBUGGER],0);
+Bool IsDbgMode()
+{//Return dbg-mode.
+  return Bt(&sys_semas[SYS_SEMA_DBG_MODE],0);
 }
 
 U0 ProgressBarsRst()

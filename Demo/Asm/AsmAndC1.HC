@@ -13,7 +13,7 @@ asm {
 
 _BEEPS::
 //You can always clobber RAX,RBX,RCX,RDX,R8,R9.  The compiler expects that.
-//See $LK,"REGG_CLOBBERED",A="MN:REGG_CLOBBERED"$ and $LK,"REGG_STK_TEMP",A="MN:REGG_STK_TEMP"$.
+//See $LK,"REGG_CLOBBERED",A="MN:REGG_CLOBBERED"$ and $LK,"REGG_STK_TMP",A="MN:REGG_STK_TMP"$.
 	PUSH	RBP
 	MOV	RBP,RSP
 	MOV	RCX,U64 SF_ARG1[RBP]  //$LK,"SF_ARG1",A="FF:::/Kernel/KernelA.HH,SF_ARG1"$

@@ -5,116 +5,116 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
 //It saves many settings so they can be restored
   //at the end of the application with $LK,"SettingsPop",A="MN:SettingsPop"$().
 
-  CTaskSettings *tempse;
+  CTaskSettings *tmpse;
   CDoc *doc;
   if (!task) task=Fs;
   if (!TaskValidate(task)) return NULL;
-  tempse=CAlloc(sizeof(CTaskSettings),task);
-  tempse->cur_dir=CurDir(task,task);
-  tempse->draw_it=task->draw_it;
-  GrPaletteGet(tempse->palette);
-  tempse->task_end_cb=task->task_end_cb;
+  tmpse=CAlloc(sizeof(CTaskSettings),task);
+  tmpse->cur_dir=CurDir(task,task);
+  tmpse->draw_it=task->draw_it;
+  GrPaletteGet(tmpse->palette);
+  tmpse->task_end_cb=task->task_end_cb;
 
   if (!(flags&TSF_SAME_SONG)) {
-    if (tempse->song_task=task->song_task) {
+    if (tmpse->song_task=task->song_task) {
       Suspend(task->song_task);
       Snd(0);
     }
     task->song_task=NULL;
   }
 
-  if (tempse->animate_task=task->animate_task)
+  if (tmpse->animate_task=task->animate_task)
     Suspend(task->animate_task);
   task->animate_task=NULL;
 
   if (doc=DocPut(task)) {
-    tempse->hide_cursor=!Bt(&doc->flags,DOCf_HIDE_CURSOR);
-    tempse->highlight_cursor=!Bt(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR);
-    tempse->scroll=!Bt(&doc->flags,DOCf_NO_SCROLL_BARS);
+    tmpse->hide_cursor=!Bt(&doc->flags,DOCf_HIDE_CURSOR);
+    tmpse->highlight_cursor=!Bt(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR);
+    tmpse->scroll=!Bt(&doc->flags,DOCf_NO_SCROLL_BARS);
   }
 
-  tempse->left=task->win_left;
-  tempse->right=task->win_right;
-  tempse->top=task->win_top;
-  tempse->bottom=task->win_bottom;
+  tmpse->left=task->win_left;
+  tmpse->right=task->win_right;
+  tmpse->top=task->win_top;
+  tmpse->bottom=task->win_bottom;
 
-  tempse->scroll_x=task->scroll_x;
-  tempse->scroll_y=task->scroll_y;
-  tempse->scroll_z=task->scroll_z;
+  tmpse->scroll_x=task->scroll_x;
+  tmpse->scroll_y=task->scroll_y;
+  tmpse->scroll_z=task->scroll_z;
 
-  tempse->win_inhibit=task->win_inhibit;
-  tempse->text_attr=task->text_attr;
-  StrCpy(tempse->task_title,task->task_title);
-  tempse->title_src  =task->title_src;
-  tempse->border_attr=task->border_attr;
-  tempse->border_src =task->border_src;
-  tempse->border=!Bt(&task->display_flags,DISPLAYf_NO_BORDER);
+  tmpse->win_inhibit=task->win_inhibit;
+  tmpse->text_attr=task->text_attr;
+  StrCpy(tmpse->task_title,task->task_title);
+  tmpse->title_src  =task->title_src;
+  tmpse->border_attr=task->border_attr;
+  tmpse->border_src =task->border_src;
+  tmpse->border=!Bt(&task->display_flags,DISPLAYf_NO_BORDER);
   if (TaskValidate(ac.task))
-    tempse->autocomplete=TRUE;
+    tmpse->autocomplete=TRUE;
   else
-    tempse->autocomplete=FALSE;
+    tmpse->autocomplete=FALSE;
 
-  tempse->next=task->next_settings;
-  task->next_settings=tempse;
-  return tempse;
+  tmpse->next=task->next_settings;
+  task->next_settings=tmpse;
+  return tmpse;
 }
 
-U0 SettingsPop2(CTask *task,CTaskSettings *tempse)
+U0 SettingsPop2(CTask *task,CTaskSettings *tmpse)
 {
   CDoc *doc;
 
   if (doc=DocPut(task)) {
-    LBEqu(&doc->flags,DOCf_HIDE_CURSOR,!tempse->hide_cursor);
-    LBEqu(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR,!tempse->highlight_cursor);
-    LBEqu(&doc->flags,DOCf_NO_SCROLL_BARS,!tempse->scroll);
+    LBEqu(&doc->flags,DOCf_HIDE_CURSOR,!tmpse->hide_cursor);
+    LBEqu(&doc->flags,DOCf_DONT_HIGHLIGHT_CURSOR,!tmpse->highlight_cursor);
+    LBEqu(&doc->flags,DOCf_NO_SCROLL_BARS,!tmpse->scroll);
   }
 
-  WinBorder(tempse->border,task);
-  WinHorz(tempse->left,tempse->right,task);
-  WinVert(tempse->top,tempse->bottom,task);
-  task->scroll_x=tempse->scroll_x;
-  task->scroll_y=tempse->scroll_y;
-  task->scroll_z=tempse->scroll_z;
-  task->win_inhibit=tempse->win_inhibit;
-  task->text_attr=tempse->text_attr;
-  task->border_attr=tempse->border_attr;
-  task->border_src =tempse->border_src;
-  task->title_src  =tempse->title_src;
-  StrCpy(task->task_title,tempse->task_title);
-  AutoComplete(tempse->autocomplete);
-  GrPaletteSet(tempse->palette);
+  WinBorder(tmpse->border,task);
+  WinHorz(tmpse->left,tmpse->right,task);
+  WinVert(tmpse->top,tmpse->bottom,task);
+  task->scroll_x=tmpse->scroll_x;
+  task->scroll_y=tmpse->scroll_y;
+  task->scroll_z=tmpse->scroll_z;
+  task->win_inhibit=tmpse->win_inhibit;
+  task->text_attr=tmpse->text_attr;
+  task->border_attr=tmpse->border_attr;
+  task->border_src =tmpse->border_src;
+  task->title_src  =tmpse->title_src;
+  StrCpy(task->task_title,tmpse->task_title);
+  AutoComplete(tmpse->autocomplete);
+  GrPaletteSet(tmpse->palette);
   Snd(0);
 }
 
 public U0 SettingsPop(CTask *task=NULL,I64 flags=0)
 {//Typically, called at end of an application.
-  CTaskSettings *tempse;
+  CTaskSettings *tmpse;
   if (!task) task=Fs;
   if (!TaskValidate(task))
     return;
-  if (tempse=task->next_settings) {
-    task->next_settings=tempse->next;
-    Cd(tempse->cur_dir);
-    Free(tempse->cur_dir);
-    task->draw_it=tempse->draw_it;
-    task->task_end_cb=tempse->task_end_cb;
+  if (tmpse=task->next_settings) {
+    task->next_settings=tmpse->next;
+    Cd(tmpse->cur_dir);
+    Free(tmpse->cur_dir);
+    task->draw_it=tmpse->draw_it;
+    task->task_end_cb=tmpse->task_end_cb;
 
     if (task->animate_task)
       Kill(task->animate_task);
-    if (task->animate_task=tempse->animate_task)
+    if (task->animate_task=tmpse->animate_task)
       Suspend(task->animate_task,FALSE);
 
     if (!(flags&TSF_SAME_SONG)) {
       if (task->song_task)
 	Kill(task->song_task);
-      if (task->song_task=tempse->song_task)
+      if (task->song_task=tmpse->song_task)
 	Suspend(task->song_task,FALSE);
     }
 
-    SettingsPop2(task,tempse); //Do it to get ress fast
-    WinMgrSync(,TRUE);
-    SettingsPop2(task,tempse); //Redo in case was lost by old update
+    SettingsPop2(task,tmpse); //Do it to get ress fast
+    Refresh(,TRUE);
+    SettingsPop2(task,tmpse); //Redo in case was lost by old update
 
-    Free(tempse);
+    Free(tmpse);
   }
 }

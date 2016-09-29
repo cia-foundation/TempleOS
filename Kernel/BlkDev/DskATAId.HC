@@ -94,7 +94,7 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
   I64 type;
   base0&=-8;
   base1&=-4;
-  CATARep *tempha;
+  CATARep *tmpha;
   if (type=ATAProbe(base0,base1,unit)) {
     *num_hints+=1;
     "\n\n$$PURPLE$$ $$BT+X,\"%d\",LM=\"%d\\n\"$$$$FG$$$$LM,4$$",*num_hints,*num_hints;
@@ -105,14 +105,14 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
     "%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
 	  msg,base0,base1,irq,unit;
     if (_head) {
-      tempha=CAlloc(sizeof(CATARep));
-      tempha->next=*_head;
-      *_head=tempha;
-      tempha->num=*num_hints;
-      tempha->type=type;
-      tempha->base0=base0;
-      tempha->base1=base1;
-      tempha->unit=unit;
+      tmpha=CAlloc(sizeof(CATARep));
+      tmpha->next=*_head;
+      *_head=tmpha;
+      tmpha->num=*num_hints;
+      tmpha->type=type;
+      tmpha->base0=base0;
+      tmpha->base1=base1;
+      tmpha->unit=unit;
     }
   }
 }
@@ -204,32 +204,32 @@ CATARep *ATARepFind(CATARep *haystack_head,I64 needle_num)
 
 CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,CATARep **_atapi_drv)
 {//This is for when trying to sort-out main hard drives and CD/DVD drives.
-  CATARep *res=NULL,*tempha=head,*ata_drv=NULL,*atapi_drv=NULL;
+  CATARep *res=NULL,*tmpha=head,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
   Bool was_silent=Silent;
   bd=Let2BlkDev(':',FALSE);
   Silent(was_silent);
-  while (tempha) {
-    if (!res && bd && bd->type==tempha->type) {
+  while (tmpha) {
+    if (!res && bd && bd->type==tmpha->type) {
       if (bd->type==BDT_ATAPI &&
-	    bd->base0==tempha->base0 && bd->unit==tempha->unit)
-	res=atapi_drv=tempha;
-      else if (bd->type==BDT_ATA && bd->base0==tempha->base0 &&
-	    bd->base1==tempha->base1 && bd->unit==tempha->unit)
-	res=ata_drv=tempha;
+	    bd->base0==tmpha->base0 && bd->unit==tmpha->unit)
+	res=atapi_drv=tmpha;
+      else if (bd->type==BDT_ATA && bd->base0==tmpha->base0 &&
+	    bd->base1==tmpha->base1 && bd->unit==tmpha->unit)
+	res=ata_drv=tmpha;
     }
-    if (!res || res->type!=tempha->type) {
-      if (tempha->type==BDT_ATA) {
-	if (!ata_drv || tempha->unit<ata_drv->unit ||
-	      tempha->unit==ata_drv->unit && tempha->num<ata_drv->num)
-	  ata_drv=tempha;
-      } else if (tempha->type==BDT_ATAPI) {
-	if (!atapi_drv || tempha->unit<atapi_drv->unit ||
-	      tempha->unit==atapi_drv->unit && tempha->num<atapi_drv->num)
-	  atapi_drv=tempha;
+    if (!res || res->type!=tmpha->type) {
+      if (tmpha->type==BDT_ATA) {
+	if (!ata_drv || tmpha->unit<ata_drv->unit ||
+	      tmpha->unit==ata_drv->unit && tmpha->num<ata_drv->num)
+	  ata_drv=tmpha;
+      } else if (tmpha->type==BDT_ATAPI) {
+	if (!atapi_drv || tmpha->unit<atapi_drv->unit ||
+	      tmpha->unit==atapi_drv->unit && tmpha->num<atapi_drv->num)
+	  atapi_drv=tmpha;
       }
     }
-    tempha=tempha->next;
+    tmpha=tmpha->next;
   }
   if (_ata_drv)   *_ata_drv  =ata_drv;
   if (_atapi_drv) *_atapi_drv=atapi_drv;
@@ -256,7 +256,7 @@ I64 AutoMountIDE()
 //It uses 'C' and 'T' as first drive letters or whatever you set
   //in config when compiling Kernel.BIN.
   I64 res=0;
-  CATARep *head=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tempha;
+  CATARep *head=NULL,*ata_drv=NULL,*atapi_drv=NULL,*tmpha;
   ATARep(FALSE,TRUE,&head);
   ATAIDDrvs(head,&ata_drv,&atapi_drv);
   if (ata_drv && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
@@ -265,18 +265,18 @@ I64 AutoMountIDE()
   if (atapi_drv && ATAMount(blkdev.first_dvd_drv_let,BDT_ATAPI,
 	atapi_drv->base0,atapi_drv->base1,atapi_drv->unit))
     res++;
-  tempha=head;
-  while (tempha) {
-    if (tempha!=ata_drv && tempha!=atapi_drv) {
-      if (tempha->type==BDT_ATA && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
-	    tempha->base0,tempha->base1,tempha->unit))
+  tmpha=head;
+  while (tmpha) {
+    if (tmpha!=ata_drv && tmpha!=atapi_drv) {
+      if (tmpha->type==BDT_ATA && ATAMount(blkdev.first_hd_drv_let,BDT_ATA,
+	    tmpha->base0,tmpha->base1,tmpha->unit))
 	res++;
-      else if (tempha->type==BDT_ATAPI &&
+      else if (tmpha->type==BDT_ATAPI &&
 	    ATAMount(blkdev.first_dvd_drv_let,BDT_ATAPI,
-	    tempha->base0,tempha->base1,tempha->unit))
+	    tmpha->base0,tmpha->base1,tmpha->unit))
 	res++;
     }
-    tempha=tempha->next;
+    tmpha=tmpha->next;
   }
   LinkedLstDel(head);
   blkdev.auto_mount_ide_cnt=res;

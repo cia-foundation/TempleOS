@@ -80,13 +80,13 @@ U0 DrawIt(CTask *,CDC *dc)
 {
   I64 i;
   F64 é,d,x1,y1,x2,y2;
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
 
-  tempm=ode->next_mass;
-  if (tempm!=&ode->next_mass) {
-    task->scroll_x=-tempm->x*zoom+task->pix_width >>1;
-    task->scroll_y=-tempm->y*zoom+task->pix_height>>1;
+  tmpm=ode->next_mass;
+  if (tmpm!=&ode->next_mass) {
+    task->scroll_x=-tmpm->x*zoom+task->pix_width >>1;
+    task->scroll_y=-tmpm->y*zoom+task->pix_height>>1;
   }
 
   dc->flags|=DCF_TRANSFORMATION;
@@ -117,34 +117,34 @@ U0 DrawIt(CTask *,CDC *dc)
     }
   }
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    if (temps->type==EMD_SPRING) {
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    if (tmps->type==EMD_SPRING) {
       dc->color=LTCYAN;
-      GrLine3(dc,temps->end1->x,temps->end1->y,0,
-	    temps->end2->x,temps->end2->y,0);
-    } else if (temps->type==EMD_CONNECTOR) {
+      GrLine3(dc,tmps->end1->x,tmps->end1->y,0,
+	    tmps->end2->x,tmps->end2->y,0);
+    } else if (tmps->type==EMD_CONNECTOR) {
       dc->color=CYAN;
-      GrLine3(dc,temps->end1->x,temps->end1->y,0,
-	    temps->end2->x,temps->end2->y,0);
+      GrLine3(dc,tmps->end1->x,tmps->end1->y,0,
+	    tmps->end2->x,tmps->end2->y,0);
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 
   dc->color=LTGRAY;
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    Sprite3(dc,tempm->x,tempm->y,0,tempm->img);
-    tempm=tempm->next;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    Sprite3(dc,tmpm->x,tmpm->y,0,tmpm->img);
+    tmpm=tmpm->next;
   }
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    x1=temps->end1->x; y1=temps->end1->y;
-    x2=temps->end2->x; y2=temps->end2->y;
-    if (temps->type==EMD_THRUSTER) {
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    x1=tmps->end1->x; y1=tmps->end1->y;
+    x2=tmps->end2->x; y2=tmps->end2->y;
+    if (tmps->type==EMD_THRUSTER) {
       é=Arg(x2-x1,y2-y1);
-      if (Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
+      if (Bt(kbd.down_bitmap,action_scan_codes[tmps->action_key-'0'])) {
 	dc->flags|=DCF_SYMMETRY;
 	DCSymmetry3Set(dc,x1,y1,256,x1,y1,0,x1-256*Cos(é),y1-256*Sin(é),0);
 	for (i=0;i<8;i++) {
@@ -167,15 +167,15 @@ U0 DrawIt(CTask *,CDC *dc)
       SpriteZ3B(dc,x1,y1,0,$IB,"<3>",BI=3$,é);
       if (zoom>0.5) {
 	dc->color=YELLOW;
-	GrPutChar3(dc,(x1*7+x2)/8,(y1*7+y2)/8,0,temps->action_key);
+	GrPutChar3(dc,(x1*7+x2)/8,(y1*7+y2)/8,0,tmps->action_key);
       }
-    } else if (temps->type==EMD_CONNECTOR) {
+    } else if (tmps->type==EMD_CONNECTOR) {
       if (zoom>0.5) {
 	dc->color=CYAN;
-	GrPutChar3(dc,(x1*7+x2)/8,(y1*7+y2)/8,0,temps->action_key);
+	GrPutChar3(dc,(x1*7+x2)/8,(y1*7+y2)/8,0,tmps->action_key);
       }
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 }
 
@@ -187,103 +187,103 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   //here.
   F64 d,dd;
   CD3 p;
-  MyMass *tempm1,*tempm2;
-  MySpring *temps;
+  MyMass *tmpm1,*tmpm2;
+  MySpring *tmps;
 
-  tempm1=ode->next_mass;
-  while (tempm1!=&ode->next_mass) {
-    tempm2=tempm1->next;
-    while (tempm2!=&ode->next_mass) {
-      D3Sub(&p,&tempm2->state->x,&tempm1->state->x);
+  tmpm1=ode->next_mass;
+  while (tmpm1!=&ode->next_mass) {
+    tmpm2=tmpm1->next;
+    while (tmpm2!=&ode->next_mass) {
+      D3Sub(&p,&tmpm2->state->x,&tmpm1->state->x);
       dd=D3NormSqr(&p);
       if (dd<=Sqr(2*RADIUS)) {
 	d=Sqrt(dd)+0.0001;
 	dd=10.0*Sqr(Sqr(Sqr(2*RADIUS)-dd));
 	D3MulEqu(&p,dd/d);
-	D3AddEqu(&tempm2->DstateDt->DxDt,&p);
-	D3SubEqu(&tempm1->DstateDt->DxDt,&p);
+	D3AddEqu(&tmpm2->DstateDt->DxDt,&p);
+	D3SubEqu(&tmpm1->DstateDt->DxDt,&p);
       }
-      tempm2=tempm2->next;
+      tmpm2=tmpm2->next;
     }
-    tempm1=tempm1->next;
+    tmpm1=tmpm1->next;
   }
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    if (main_mode_button.state==MMD_PLAY && temps->type==EMD_THRUSTER &&
-	  Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
-      D3Sub(&p,&temps->end2->state->x,&temps->end1->state->x);
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    if (main_mode_button.state==MMD_PLAY && tmps->type==EMD_THRUSTER &&
+	  Bt(kbd.down_bitmap,action_scan_codes[tmps->action_key-'0'])) {
+      D3Sub(&p,&tmps->end2->state->x,&tmps->end1->state->x);
       D3Unit(&p);
       D3MulEqu(&p,2000);
-      D3AddEqu(&temps->end1->DstateDt->DxDt,&p);
+      D3AddEqu(&tmps->end1->DstateDt->DxDt,&p);
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 }
 
 MyMass *PlaceMass(I64 x, I64 y)
 {
-  MyMass *tempm=CAlloc(sizeof(MyMass));
-  tempm->mass=1.0;
-  tempm->drag_profile_factor=100.0;
-  tempm->x=x;
-  tempm->y=y;
-  QueIns(tempm,ode->last_mass);
-  return tempm;
+  MyMass *tmpm=CAlloc(sizeof(MyMass));
+  tmpm->mass=1.0;
+  tmpm->drag_profile_factor=100.0;
+  tmpm->x=x;
+  tmpm->y=y;
+  QueIns(tmpm,ode->last_mass);
+  return tmpm;
 }
 
-MySpring *PlaceSpring(MyMass *tempm1,MyMass *tempm2,I64 type)
+MySpring *PlaceSpring(MyMass *tmpm1,MyMass *tmpm2,I64 type)
 {
-  MySpring *temps=CAlloc(sizeof(MySpring));
-  F64 d=D3Dist(&tempm1->x,&tempm2->x);
-  temps->end1=tempm1;
-  temps->end2=tempm2;
-  temps->rest_len=d;
-  temps->type=type;
+  MySpring *tmps=CAlloc(sizeof(MySpring));
+  F64 d=D3Dist(&tmpm1->x,&tmpm2->x);
+  tmps->end1=tmpm1;
+  tmps->end2=tmpm2;
+  tmps->rest_len=d;
+  tmps->type=type;
   if (type==EMD_THRUSTER)
-    temps->const=0;
+    tmps->const=0;
   else
-    temps->const=2500000/Sqr(d);
-  temps->action_key=next_action_key;
-  QueIns(temps,ode->last_spring);
-  return temps;
+    tmps->const=2500000/Sqr(d);
+  tmps->action_key=next_action_key;
+  QueIns(tmps,ode->last_spring);
+  return tmps;
 }
 
 U0 CenterMasses()
 {
   CD3 p;
-  MyMass *tempm1,*tempm2;
-  tempm1=ode->next_mass;
-  if (tempm1!=&ode->next_mass) {
-    D3Copy(&p,&tempm1->x);
-    tempm2=ode->next_mass;
-    while (tempm2!=&ode->next_mass) {
-      D3SubEqu(&tempm2->x,&p);
-      tempm2=tempm2->next;
+  MyMass *tmpm1,*tmpm2;
+  tmpm1=ode->next_mass;
+  if (tmpm1!=&ode->next_mass) {
+    D3Copy(&p,&tmpm1->x);
+    tmpm2=ode->next_mass;
+    while (tmpm2!=&ode->next_mass) {
+      D3SubEqu(&tmpm2->x,&p);
+      tmpm2=tmpm2->next;
     }
   }
 }
 
 U0 NullSprings()
 {
-  MySpring *temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    temps->rest_len=D3Dist(&temps->end1->x,&temps->end2->x);
-    temps=temps->next;
+  MySpring *tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    tmps->rest_len=D3Dist(&tmps->end1->x,&tmps->end2->x);
+    tmps=tmps->next;
   }
 }
 
 U0 BreakConnectors()
 {
-  MySpring *temps=ode->next_spring,*temps1;
-  while (temps!=&ode->next_spring) {
-    temps1=temps->next;
-    if (temps->type==EMD_CONNECTOR &&
-	  Bt(kbd.down_bitmap,action_scan_codes[temps->action_key-'0'])) {
-      QueRem(temps);
-      Free(temps);
+  MySpring *tmps=ode->next_spring,*tmps1;
+  while (tmps!=&ode->next_spring) {
+    tmps1=tmps->next;
+    if (tmps->type==EMD_CONNECTOR &&
+	  Bt(kbd.down_bitmap,action_scan_codes[tmps->action_key-'0'])) {
+      QueRem(tmps);
+      Free(tmps);
     }
-    temps=temps1;
+    tmps=tmps1;
   }
 }
 
@@ -396,7 +396,7 @@ U0 PlayShip()
 	  }
 	  break;
       }
-      WinMgrSync;
+      Refresh;
     }
 ps_done: //Don't goto out of try
     okay=TRUE;
@@ -414,7 +414,7 @@ U0 EditShip()
   I64 a1,a2;
   F64 wx,wy;
   Bool okay;
-  MyMass *tempm1=NULL,*tempm2=NULL;
+  MyMass *tmpm1=NULL,*tmpm2=NULL;
   CCtrl *bt_edit_mode=CtrlButtonNew(0,5*FONT_HEIGHT+4,80,,EMD_NUM_MODES,
 	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_button);
   ode->flags|=ODEF_PAUSED;
@@ -460,20 +460,20 @@ U0 EditShip()
 	  switch (edit_mode_button.state) {
 	    case EMD_MASS:
 	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
-	      tempm1=PlaceMass(wx,wy);
-	      if (ode->next_mass==tempm1)
-		tempm1->img=$IB,"<1>",BI=1$;
+	      tmpm1=PlaceMass(wx,wy);
+	      if (ode->next_mass==tmpm1)
+		tmpm1->img=$IB,"<1>",BI=1$;
 	      else
-		tempm1->img=$IB,"<2>",BI=2$;
-	      tempm1=NULL;
+		tmpm1->img=$IB,"<2>",BI=2$;
+	      tmpm1=NULL;
 	      break;
 	    case EMD_SPRING:
 	    case EMD_CONNECTOR:
 	    case EMD_THRUSTER:
 	    case EMD_MOVE:
 	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
-	      tempm1=MassFind(ode,wx,wy);
-	      tempm2=NULL;
+	      tmpm1=MassFind(ode,wx,wy);
+	      tmpm2=NULL;
 	      break;
 	  }
 	  break;
@@ -485,19 +485,19 @@ U0 EditShip()
 	    case EMD_CONNECTOR:
 	    case EMD_THRUSTER:
 	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
-	      if (tempm1 && (tempm2=MassFind(ode,wx,wy)) && tempm1!=tempm2)
-		PlaceSpring(tempm1,tempm2,edit_mode_button.state);
-	      tempm1=tempm2=NULL;
+	      if (tmpm1 && (tmpm2=MassFind(ode,wx,wy)) && tmpm1!=tmpm2)
+		PlaceSpring(tmpm1,tmpm2,edit_mode_button.state);
+	      tmpm1=tmpm2=NULL;
 	      break;
 	    case EMD_MOVE:
 	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
-	      if (tempm1) {
-		tempm1->x=wx;
-		tempm1->y=wy;
-		tempm1->z=0;
+	      if (tmpm1) {
+		tmpm1->x=wx;
+		tmpm1->y=wy;
+		tmpm1->z=0;
 		NullSprings;
 	      }
-	      tempm1=tempm2=NULL;
+	      tmpm1=tmpm2=NULL;
 	      break;
 	  }
 	  break;
@@ -505,10 +505,10 @@ U0 EditShip()
 	  switch (edit_mode_button.state) {
 	    case EMD_MOVE:
 	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
-	      if (tempm1) {
-		tempm1->x=wx;
-		tempm1->y=wy;
-		tempm1->z=0;
+	      if (tmpm1) {
+		tmpm1->x=wx;
+		tmpm1->y=wy;
+		tmpm1->z=0;
 		NullSprings;
 	      }
 	      break;
@@ -578,7 +578,7 @@ U0 EditShip()
 	  }
 	  break;
       }
-      WinMgrSync;
+      Refresh;
     }
 es_done: //Don't goto out of try
     okay=TRUE;

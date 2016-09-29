@@ -296,7 +296,7 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
     okay=FALSE;
   if (okay) {
     st=MStrPrint(
-	  "\"$$$$WW+H,1$$$$\";Auto(\"ExeFile2(\\\"%s\\\",CCF_CMD_LINE);\\n\");"
+	  "\"$$$$WW+H,1$$$$\";In(\"ExeFile2(\\\"%s\\\",CCF_CMD_LINE);\\n\");"
 	  "UserTaskCont;",
 	  name2);
     res=PopUp(st,parent,_pu_task);

@@ -9,7 +9,7 @@ U0 SpyStkRep(CTask *task)
     '\n';
     "$$BK,1$$PRESS A KEY$$BK,0$$\n";
     DocDblBufSwap;
-    WinMgrSync;
+    Refresh;
   }
   if (DocPut==doc) DocDblBufSwap;
   DocDblBufEnd;
@@ -23,7 +23,7 @@ U0 SpyCallerRep(CTask *task)
     '\n';
     "$$BK,1$$PRESS A KEY$$BK,0$$\n";
     DocDblBufSwap;
-    WinMgrSync;
+    Refresh;
   }
   if (DocPut==doc) DocDblBufSwap;
   DocDblBufEnd;

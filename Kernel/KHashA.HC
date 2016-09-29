@@ -259,7 +259,7 @@ _extern _HASH_SINGLE_TABLE_FIND CHash *HashSingleTableFind(U8 *needle_str,
 	I64 mask,I64 instance=1);//Find string in single hash table.
 _extern _HASH_BUCKET_FIND CHash **HashBucketFind(U8 *needle_str,
 	CHashTable *haystack_table); //Find hash bucket.
-_extern _HASH_ADD U0 HashAdd(CHash *temph,
+_extern _HASH_ADD U0 HashAdd(CHash *tmph,
 	CHashTable *table); //Add entry to hash table.
-_extern _HASH_REM_DEL Bool HashRemDel(CHash *temph,CHashTable *table,
+_extern _HASH_REM_DEL Bool HashRemDel(CHash *tmph,CHashTable *table,
 	I64 instance=1);//Remove hash entry and del. Instance must match.

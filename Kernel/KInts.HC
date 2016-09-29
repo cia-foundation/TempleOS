@@ -180,15 +180,15 @@ U8 *IntFaultHandlersNew()
 U0 IntInit1()
 {//Interrupt descriptor table part1.
   I64 i;
-  CSysLimitBase temp_ptr;
+  CSysLimitBase tmp_ptr;
   if (!Gs->num) {//Gs cur $LK,"CCPU",A="MN:CCPU"$ struct
     dev.idt=CAlloc(16*256);
     for (i=0;i<256;i++)
       IntEntrySet(i,&IntNop);
   }
-  temp_ptr.limit=256*16-1;
-  temp_ptr.base =dev.idt;
-  SetRAX(&temp_ptr);
+  tmp_ptr.limit=256*16-1;
+  tmp_ptr.base =dev.idt;
+  SetRAX(&tmp_ptr);
   LIDT U64 [RAX]
 }
 

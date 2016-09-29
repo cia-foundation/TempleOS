@@ -1,7 +1,7 @@
 /*
 Char graphics are how games on the C64 were made.  You don't need to do it
 this way, unless for fun.  You can just make device context bigger than
-the screen and scroll around.
+the scrn and scroll around.
 
 See  $LK,"::/Demo/Games/RawHide.HC"$ or $LK,"::/Demo/Games/BigGuns.HC"$.
 
@@ -17,17 +17,17 @@ The nice thing about character graphics are the animations.
 
 U16 map[MAP_HEIGHT][MAP_WIDTH];
 
-I64 screen_pix_x,screen_pix_y;
+I64 scrn_pix_x,scrn_pix_y;
 
 U0 DrawIt(CTask *task,CDC *)
 {
   U16 *ptr;
-  I64 i,j,y=screen_pix_y>>3;
+  I64 i,j,y=scrn_pix_y>>3;
   gr.hide_col=gr.hide_row=TRUE;
-  gr.pan_text_x=7-screen_pix_x&7;
-  gr.pan_text_y=7-screen_pix_y&7;
+  gr.pan_text_x=7-scrn_pix_x&7;
+  gr.pan_text_y=7-scrn_pix_y&7;
   for (i=0;i<task->win_height;i++) {
-    ptr=&map[y++][screen_pix_x>>3];
+    ptr=&map[y++][scrn_pix_x>>3];
     for (j=0;j<task->win_width;j++)
 	//By the time you clip to window and handle Fs->scroll_x,Fs->scroll_y,
 	//it is too much trouble to do raw access to gr.text_base like we do
@@ -58,7 +58,7 @@ U0 AnimateTask(I64)
   while (TRUE) {
     font[CH_WATER]=waves[i++&0x3];
     Sleep(200);
-    WinMgrSync;
+    Refresh;
   }
 }
 
@@ -66,9 +66,9 @@ U0 ScrollTaskX(I64 sign)
 {
   I64 i;
   for (i=0;i<32;i++) {
-    screen_pix_x=ClampI64(screen_pix_x+sign,0,
+    scrn_pix_x=ClampI64(scrn_pix_x+sign,0,
 	  (MAP_WIDTH-TEXT_COLS+1)*FONT_WIDTH);
-    WinMgrSync;
+    Refresh;
   }
 }
 
@@ -76,17 +76,17 @@ U0 ScrollTaskY(I64 sign)
 {
   I64 i;
   for (i=0;i<32;i++) {
-    screen_pix_y=ClampI64(screen_pix_y+sign,0,
+    scrn_pix_y=ClampI64(scrn_pix_y+sign,0,
 	  (MAP_HEIGHT-TEXT_ROWS+2)*FONT_HEIGHT);
-    WinMgrSync;
+    Refresh;
   }
 }
 
 U0 Init()
 {
   I64 i,j,x,y;
-  screen_pix_x=(MAP_WIDTH-TEXT_COLS)>>1*FONT_WIDTH;
-  screen_pix_y=(MAP_HEIGHT-TEXT_ROWS)>>1*FONT_HEIGHT;
+  scrn_pix_x=(MAP_WIDTH-TEXT_COLS)>>1*FONT_WIDTH;
+  scrn_pix_y=(MAP_HEIGHT-TEXT_ROWS)>>1*FONT_HEIGHT;
 
   MemSetU16(map,CH_WATER+(BLUE<<4+LTBLUE)<<8,MAP_WIDTH*MAP_HEIGHT);
   for (i=1;i<MAP_WIDTH-1;i++)

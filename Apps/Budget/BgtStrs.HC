@@ -57,18 +57,18 @@ public U0 StrFileArrDel(U8 **a,I64 max_num)
 public I64 StrFileAdd(U8 *st,I64 *_num,
 	CHashTable *table,I64 color=COLOR_INVALID)
 {
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   if (!st) return 0;
-  if (!(temph=HashFind(st,table,SFT_GENERIC))) {
-    temph=CAlloc(sizeof(CHashGeneric));
-    temph->type=SFT_GENERIC;
-    temph->str=StrNew(st);
-    temph->user_data0=(*_num)++;
-    HashAdd(temph,table);
+  if (!(tmph=HashFind(st,table,SFT_GENERIC))) {
+    tmph=CAlloc(sizeof(CHashGeneric));
+    tmph->type=SFT_GENERIC;
+    tmph->str=StrNew(st);
+    tmph->user_data0=(*_num)++;
+    HashAdd(tmph,table);
   }
   if (color!=COLOR_INVALID)
-    temph->user_data1=color;
-  return temph->user_data0;
+    tmph->user_data1=color;
+  return tmph->user_data0;
 }
 
 I64 StrEntriesCompare(CHashGeneric *h1,CHashGeneric *h2)
@@ -80,7 +80,7 @@ public U0 StrFileWrite(U8 *name,CHashTable *table,Bool no_nums=FALSE)
 {
   I64 i,j,cnt,color=BLACK;
   CDoc *doc=DocNew(name);
-  CHashGeneric *temph,**a;
+  CHashGeneric *tmph,**a;
   if (table) {
     cnt=0;	//Count Strings
     for (i=0;i<=table->mask;i++)
@@ -88,23 +88,23 @@ public U0 StrFileWrite(U8 *name,CHashTable *table,Bool no_nums=FALSE)
     a=MAlloc(cnt*sizeof(CHashGeneric *));
     j=0;	//Load Strings
     for (i=0;i<=table->mask;i++) {
-      temph=table->body[i];
-      while (temph) {
-	a[j++]=temph;
-	temph=temph->next;
+      tmph=table->body[i];
+      while (tmph) {
+	a[j++]=tmph;
+	tmph=tmph->next;
       }
     }
     QSortI64(a,cnt,&StrEntriesCompare);
     for (i=0;i<cnt;i++) {
-      temph=a[i];
-      if (temph->user_data1&15!=color) {
-	DocPrint(doc,"$$FG,%d$$",temph->user_data1&15);
-	color=temph->user_data1&15;
+      tmph=a[i];
+      if (tmph->user_data1&15!=color) {
+	DocPrint(doc,"$$FG,%d$$",tmph->user_data1&15);
+	color=tmph->user_data1&15;
       }
       if (no_nums)
-	DocPrint(doc,"%s\n",temph->str);
+	DocPrint(doc,"%s\n",tmph->str);
       else
-	DocPrint(doc,"%d,%s\n",temph->user_data0,temph->str);
+	DocPrint(doc,"%d,%s\n",tmph->user_data0,tmph->str);
     }
     Free(a);
   }
@@ -116,15 +116,15 @@ public U0 StrFileWrite(U8 *name,CHashTable *table,Bool no_nums=FALSE)
 public U0 StrFileDel(CHashTable *table)
 {
   I64 i;
-  CHashGeneric *temph,*temph1;
+  CHashGeneric *tmph,*tmph1;
   if (!table) return;
   for (i=0;i<=table->mask;i++) {
-    temph=table->body[i];
-    while (temph) {
-      temph1=temph->next;
-      Free(temph->str);
-      Free(temph);
-      temph=temph1;
+    tmph=table->body[i];
+    while (tmph) {
+      tmph1=tmph->next;
+      Free(tmph->str);
+      Free(tmph);
+      tmph=tmph1;
     }
   }
   Free(table->body);

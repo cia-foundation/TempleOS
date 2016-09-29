@@ -97,7 +97,7 @@ public U0 GrPrint(CDC *dc,I64 x,I64 y,U8 *fmt,...)
   ...
 
   GrPrint(gr.dc,(GR_WIDTH-10*FONT_WIDTH)>>1,(GR_HEIGHT-FONT_HEIGHT)>>1,
-  	"Score:%4d",score);  //Print score in the center of the screen.
+  	"Score:%4d",score);  //Print score in the center of the scrn.
   ...
 
 $WW,1$$FG$$ID,-2$
@@ -168,7 +168,7 @@ $ID,2$$FG,2$U0 Main()
   }
 }
 $FG$$ID,-2$
-* $FG,2$interrupt$FG$, $FG,2$haserrcode$FG$, $FG,2$public$FG$, $FG,2$argpop$FG$ or $FG,2$noargpop$FG$ are function flags. See $LK,"::/Demo/Lectures/Mem/PageTableEntries.HC"$.
+* $FG,2$interrupt$FG$, $FG,2$haserrcode$FG$, $FG,2$public$FG$, $FG,2$argpop$FG$ or $FG,2$noargpop$FG$ are function flags. See $LK,"IRQKbd",A="MN:IRQKbd"$().
 
 * A single quote can encompass multiple characters.  $FG,2$'ABC'$FG$ is equ to $FG,2$0x434241$FG$.  $LK,"PutChars",A="MN:PutChars"$() takes multiple characters.
 

@@ -1,34 +1,34 @@
 CHashDefineStr *DefineLoad(U8 *dname,U8 *st)
 {//Create DEFINE hash entry with string.
-  CHashDefineStr *temph=CAlloc(sizeof(CHashDefineStr));
-  temph->type=HTT_DEFINE_STR;
-  temph->str=StrNew(dname);
-  temph->data=StrNew(st);
-  temph->cnt=-1;
-  temph->src_link=MStrPrint("AD:0x%X",Caller);
-  HashAdd(temph,Fs->hash_table);
-  return temph;
+  CHashDefineStr *tmph=CAlloc(sizeof(CHashDefineStr));
+  tmph->type=HTT_DEFINE_STR;
+  tmph->str=StrNew(dname);
+  tmph->data=StrNew(st);
+  tmph->cnt=-1;
+  tmph->src_link=MStrPrint("AD:0x%X",Caller);
+  HashAdd(tmph,Fs->hash_table);
+  return tmph;
 }
 
 CHashDefineStr *DefineLstLoad(U8 *dname,U8 *lst)
 {//Create DEFINE list. Not efficient, but handy.
   I64 cnt=0;
   U8 *ptr,**idx;
-  CHashDefineStr *temph=CAlloc(sizeof(CHashDefineStr));
-  temph->type=HTT_DEFINE_STR;
-  temph->str=StrNew(dname);
-  temph->src_link=MStrPrint("AD:0x%X",Caller);
+  CHashDefineStr *tmph=CAlloc(sizeof(CHashDefineStr));
+  tmph->type=HTT_DEFINE_STR;
+  tmph->str=StrNew(dname);
+  tmph->src_link=MStrPrint("AD:0x%X",Caller);
   ptr=lst;
   while (*ptr) {
     if (*ptr!='@')
       cnt++;
     while (*ptr++);
   }
-  temph->data=MAlloc(ptr+1-lst);
-  MemCpy(temph->data,lst,ptr+1-lst);
-  temph->cnt=cnt;
+  tmph->data=MAlloc(ptr+1-lst);
+  MemCpy(tmph->data,lst,ptr+1-lst);
+  tmph->cnt=cnt;
 
-  idx=temph->sub_idx=MAlloc(cnt*sizeof(U8 *));
+  idx=tmph->sub_idx=MAlloc(cnt*sizeof(U8 *));
   ptr=lst;
   while (*ptr) {
     if (*ptr!='@')
@@ -36,8 +36,8 @@ CHashDefineStr *DefineLstLoad(U8 *dname,U8 *lst)
     while (*ptr++);
   }
 
-  HashAdd(temph,Fs->hash_table);
-  return temph;
+  HashAdd(tmph,Fs->hash_table);
+  return tmph;
 }
 
 U0 UndefinedDefine(U8 *dname)
@@ -48,9 +48,9 @@ U0 UndefinedDefine(U8 *dname)
 
 U8 *Define(U8 *dname)
 {//Look for DEFINE named in hash table, return ptr string.
-  CHashDefineStr *temph;
-  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
-    return temph->data;
+  CHashDefineStr *tmph;
+  if (tmph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
+    return tmph->data;
   else if (dname)
     UndefinedDefine(dname);
   else
@@ -59,10 +59,10 @@ U8 *Define(U8 *dname)
 
 U8 *DefineSub(I64 sub,U8 *dname)
 {//Return DEFINE list entry indexed by number.
-  CHashDefineStr *temph;
-  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR)) {
-    if (0<=sub<temph->cnt)
-      return temph->sub_idx[sub];
+  CHashDefineStr *tmph;
+  if (tmph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR)) {
+    if (0<=sub<tmph->cnt)
+      return tmph->sub_idx[sub];
     else
       return NULL;
   } else if (dname)
@@ -73,9 +73,9 @@ U8 *DefineSub(I64 sub,U8 *dname)
 
 I64 DefineCnt(U8 *dname)
 {//Return cnt of entries in define list.
-  CHashDefineStr *temph;
-  if (temph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
-    return temph->cnt;
+  CHashDefineStr *tmph;
+  if (tmph=HashFind(dname,Fs->hash_table,HTT_DEFINE_STR))
+    return tmph->cnt;
   else if (dname)
     UndefinedDefine(dname);
   else
@@ -107,7 +107,7 @@ U0 SysDefinesLoad()
 	"June\0July\0August\0September\0October\0November\0December\0");
   DefineLstLoad("ST_FILE_ATTRS","R\0H\0S\0V\0D\0A\0 \0 \0X\0T\0Z\0C\0F\0");
   DefineLstLoad("ST_FILE_UTIL_FLAGS","r\0d\0i\0a\0c\0R\0p\0m\0x\0s\0"
-	"D\0F\0T\0S\0A\0J\0G\0Z\0O\0P\0f\0l\0lb\0la\0");
+	"D\0F\0T\0$$\0S\0A\0J\0G\0Z\0O\0P\0f\0l\0lb\0la\0");
   DefineLstLoad("ST_BLKDEV_TYPES",
 	"NULL\0RAM\0ATA\0FILE_READ\0FILE_WRITE\0ATAPI\0");
   DefineLstLoad("ST_DRV_TYPES",

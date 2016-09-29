@@ -4,10 +4,10 @@ $LK,"DolDoc",A="::/Doc/DolDocOverview.DD"$ is a TempleOS document type.
 
 $FG,2$"Expression"$FG$ a num or HolyC algebraic term with operators and HolyC syms can be entered.
 $FG,2$"Macro"$FG$ Most entries can behave like macro entries if you assign them macro strs.
-$FG,2$"AutoStr"$FG$ Like a macro except it is an $LK,"AutoFile",A="FF:::/Doc/Glossary.DD,AutoFile"$.  You can't have both an autostr and macro text defined.  
+$FG,2$"InStr"$FG$ Like a macro except it is an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$.  You can't have both an in_str and macro text defined.  
 
 $FG,5$Tag Text$FG$ is the text that will be displayed for the item.  For links, you can leave it blank and the details of the link will be shown.
-$FG,5$Hide$FG$ means display nothing, making an entry invisible.
+$FG,5$Hide$FG$ means display nothing, making an entry invis.
 
 $FG,5$Left X$FG$ relative to the left margin.
 $FG,5$Center X$FG$ relative to the horizontal center of the window.

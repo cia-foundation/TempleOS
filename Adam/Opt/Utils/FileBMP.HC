@@ -333,10 +333,10 @@ public U0 DocBMP(CDoc *doc=NULL,U8 *filename,Bool dither_probability=FALSE,
   DCDel(dc);
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/Screen"
-public I64 BMPScreenCapture(U8 *filename,I64 bits=4,Bool include_zoom=TRUE)
-{//Capture screen as BMP file.
-  CDC *dc=DCScreenCapture(include_zoom);
+#help_index "Graphics/Windows BMP Files;Graphics/Scrn"
+public I64 BMPScrnCapture(U8 *filename,I64 bits=4,Bool include_zoom=TRUE)
+{//Capture scrn as BMP file.
+  CDC *dc=DCScrnCapture(include_zoom);
   I64 size=BMPWrite(filename,dc,bits);
   DCDel(dc);
   return size;

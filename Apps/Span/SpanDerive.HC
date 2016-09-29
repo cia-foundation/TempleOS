@@ -7,32 +7,32 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   CTask *task=ode->win_task;
   F64 d,dd;
   CD3 p,p2;
-  MyMass *tempm1,*tempm2;
+  MyMass *tmpm1,*tmpm2;
 
   //Collisions
-  tempm1=ode->next_mass;
-  while (tempm1!=&ode->next_mass) {
-    tempm2=tempm1->next;
-    while (tempm2!=&ode->next_mass) {
-      D3Sub(&p,&tempm2->state->x,&tempm1->state->x);
+  tmpm1=ode->next_mass;
+  while (tmpm1!=&ode->next_mass) {
+    tmpm2=tmpm1->next;
+    while (tmpm2!=&ode->next_mass) {
+      D3Sub(&p,&tmpm2->state->x,&tmpm1->state->x);
       dd=D3NormSqr(&p);
-      if (dd<=Sqr(tempm1->radius+tempm2->radius)) {
+      if (dd<=Sqr(tmpm1->radius+tmpm2->radius)) {
 	d=Sqrt(dd)+0.0001;
-	dd=10.0*Sqr(Sqr(Sqr(tempm1->radius+tempm2->radius)-dd));
+	dd=10.0*Sqr(Sqr(Sqr(tmpm1->radius+tmpm2->radius)-dd));
 	D3MulEqu(&p,dd/d);
-	D3AddEqu(&tempm2->DstateDt->DxDt,&p);
-	D3SubEqu(&tempm1->DstateDt->DxDt,&p);
+	D3AddEqu(&tmpm2->DstateDt->DxDt,&p);
+	D3SubEqu(&tmpm1->DstateDt->DxDt,&p);
       }
-      tempm2=tempm2->next;
+      tmpm2=tmpm2->next;
     }
-    tempm1=tempm1->next;
+    tmpm1=tmpm1->next;
   }
 
-  tempm1=ode->next_mass;
-  while (tempm1!=&ode->next_mass) {
-    if (!(tempm1->flags&MSF_FIXED))
-      tempm1->DstateDt->DyDt+=10.0*tempm1->mass; //Gravity
-    tempm1=tempm1->next;
+  tmpm1=ode->next_mass;
+  while (tmpm1!=&ode->next_mass) {
+    if (!(tmpm1->flags&MSF_FIXED))
+      tmpm1->DstateDt->DyDt+=10.0*tmpm1->mass; //Gravity
+    tmpm1=tmpm1->next;
   }
 
   if (cursor_mass) {

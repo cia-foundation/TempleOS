@@ -30,7 +30,7 @@ U0 DoOnce()
 	if (YorN) {
 	  DocBottom;
 	  Cd("::/Misc/Tour");
-	  AutoFile("Tour");
+	  InFile("Tour");
 	}
       }
       break;
@@ -44,7 +44,7 @@ U0 DoOnce()
 	if (YorN) {
 	  DocBottom;
 	  Cd("::/Misc/Tour");
-	  AutoFile("Tour");
+	  InFile("Tour");
 	}
       }
       break;

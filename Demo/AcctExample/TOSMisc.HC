@@ -10,13 +10,13 @@ public U0 CursorRem(U8 *files_find_mask="*")
 {
   I64 fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
-  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
-  while (tempde) {
-    CursorRemFile(tempde->full_name);
-    Touch(tempde->full_name,"",,tempde->datetime);
-    tempde=tempde->next;
+  CDirEntry *tmpde=FilesFind(files_find_mask,fuf_flags),*tmpde1=tmpde;
+  while (tmpde) {
+    CursorRemFile(tmpde->full_name);
+    Touch(tmpde->full_name,"",,tmpde->datetime);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 U0 UncollapseFile(U8 *filename,I64 *)
@@ -29,15 +29,15 @@ U0 UncollapseFile(U8 *filename,I64 *)
 public U0 Uncollapse(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {
   I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T+O");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+$$+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  CDirEntry *tempde=FilesFind(files_find_mask,fuf_flags),*tempde1=tempde;
-  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    UncollapseFile(tempde->full_name,&fuf_flags);
-    Touch(tempde->full_name,"",,tempde->datetime);
-    tempde=tempde->next;
+  CDirEntry *tmpde=FilesFind(files_find_mask,fuf_flags),*tmpde1=tmpde;
+  while (tmpde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    UncollapseFile(tmpde->full_name,&fuf_flags);
+    Touch(tmpde->full_name,"",,tmpde->datetime);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 #define VIDEO_FRAME_RATE	30
@@ -50,21 +50,21 @@ Bool	fg_on =FALSE;
 
 U0 FrameGrabberTask(I64)
 {//#!/bin/bash
-//for f in ./ScreenShots/*.Z; do ./Bin/TOSZ $$f; done
+//for f in ./ScrnShots/*.Z; do ./Bin/TOSZ $$f; done
   //ffmpeg -r 8 -i VID%05d.BMP -y Movie.avi
   I64 frame_num=0;
   U8  buf[STR_LEN],buf2[STR_LEN],*st_dir;
   F64 end_time=tS;
-  Silent;	//no output to screen
+  Silent;	//no output to scrn
   if (fg_mode==FG_RAM_DRV)
-    st_dir="B:/Temp/ScreenShots";
+    st_dir="B:/Tmp/ScrnShots";
   else
-    st_dir="::/Temp/ScreenShots";
+    st_dir="::/Tmp/ScrnShots";
   MkDir(st_dir);
   while (fg_on) {
     StrPrint(buf,"%s/VID%05d.BMP.Z",st_dir,frame_num++);
     StrCpy(buf2,buf);
-    BMPScreenCapture(buf);
+    BMPScrnCapture(buf);
     while (TRUE) {
       end_time+=1.0/VIDEO_FRAME_RATE;
       if (end_time<tS) {
@@ -80,17 +80,17 @@ U0 FrameGrabberTask(I64)
 I64 CopyVideo()
 {
   I64 res=0;
-  Del("D:/Temp/*.SND");
+  Del("D:/Tmp/*.SND");
   if (fg_mode==FG_JUST_AUDIO)
-    SndFileCreate("D:/Temp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35,2.5);
+    SndFileCreate("D:/Tmp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35,2.5);
   else {
-    SndFileCreate("D:/Temp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35);
-    DelTree("D:/Temp/ScreenShots");
+    SndFileCreate("D:/Tmp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35);
+    DelTree("D:/Tmp/ScrnShots");
     if (fg_mode==FG_RAM_DRV) {
-      res=CopyTree("B:/Temp/ScreenShots","D:/Temp/ScreenShots");
+      res=CopyTree("B:/Tmp/ScrnShots","D:/Tmp/ScrnShots");
       "Unused Space: %12.6fMeg\n",UnusedDrvSpace('B')/1024.0/1024.0;
     } else
-      res=CopyTree("::/Temp/ScreenShots","D:/Temp/ScreenShots");
+      res=CopyTree("::/Tmp/ScrnShots","D:/Tmp/ScrnShots");
     "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",
 	  res,res/60.0/VIDEO_FRAME_RATE;
   }

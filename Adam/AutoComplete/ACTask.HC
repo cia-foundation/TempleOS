@@ -60,21 +60,21 @@ I64 ACPriorWordInStr(U8 *src,U8 *dst,I64 len,I64 buf_size)
   return i+1;
 }
 
-U0 ACFillInAdd(CHashAC *tempw)
+U0 ACFillInAdd(CHashAC *tmpw)
 {
   I64 k;
   if (ac.num_fillins<AC_MAX_FILLINS ||
-	tempw->hits>ac.fillin_hits[ac.num_fillins-1]) {
+	tmpw->hits>ac.fillin_hits[ac.num_fillins-1]) {
     for (k=ac.num_fillins-1;k>=0;k--) {
-      if (tempw->hits<=ac.fillin_hits[k])
+      if (tmpw->hits<=ac.fillin_hits[k])
 	break;
       else {
 	ac.fillin_matches[k+1]=ac.fillin_matches[k];
 	ac.fillin_hits[k+1]   =ac.fillin_hits[k];
       }
     }
-    ac.fillin_matches[k+1]=tempw;
-    ac.fillin_hits[k+1]   =tempw->hits;
+    ac.fillin_matches[k+1]=tmpw;
+    ac.fillin_hits[k+1]   =tmpw->hits;
     if (ac.num_fillins<AC_MAX_FILLINS)
       ac.num_fillins++;
   }
@@ -85,9 +85,9 @@ U0 ACPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task,
 {
   I64 i,data_col;
   U8 *buf,*buf1,*src=NULL,*st;
-  CHashAC *tempw;
+  CHashAC *tmpw;
   F64 timeout_time=tS+0.5;
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
 
   src=DocScanLine(focus_l,doc_e,&data_col);
   DocUnlock(focus_l);
@@ -108,11 +108,11 @@ U0 ACPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task,
     ac.num_fillins=0;
     if (*ac.cur_word)
       for (i=0;i<=ac.hash_table->mask && tS<timeout_time;i++) {
-	tempw=ac.hash_table->body[i];
-	while (tempw) {
-	  if (!MemCmp(ac.cur_word,tempw->str,StrLen(ac.cur_word)))
-	    ACFillInAdd(tempw);
-	  tempw=tempw->next;
+	tmpw=ac.hash_table->body[i];
+	while (tmpw) {
+	  if (!MemCmp(ac.cur_word,tmpw->str,StrLen(ac.cur_word)))
+	    ACFillInAdd(tmpw);
+	  tmpw=tmpw->next;
 	}
       }
     ACDocRst(51,13);
@@ -122,11 +122,11 @@ U0 ACPutChoices(CDoc *focus_l,CDocEntry *doc_e,CTask *focus_task,
 	st=ac.fillin_matches[i]->str;
 	"$$GREEN$$F%02d$$FG$$ ",i+1;
 	if (TaskValidate(focus_task) &&
-	      (temph=HashFind(st,focus_task->hash_table,HTG_SRC_SYM)) &&
-	      temph->src_link) {
-	  if (temph->type&HTF_PUBLIC)
+	      (tmph=HashFind(st,focus_task->hash_table,HTG_SRC_SYM)) &&
+	      tmph->src_link) {
+	  if (tmph->type&HTF_PUBLIC)
 	    "$$RED$$";
-	  "$$TX+UL+L+PU,\"%$$Q\",A=\"%s\"$$$$FG$$\n",st,temph->src_link;
+	  "$$TX+UL+L+PU,\"%$$Q\",A=\"%s\"$$$$FG$$\n",st,tmph->src_link;
 	} else
 	  "%s\n",st;
       }

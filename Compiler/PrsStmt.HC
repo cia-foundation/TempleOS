@@ -1,145 +1,145 @@
 CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
 {
-  CHashClass *tempc,*base_class;
+  CHashClass *tmpc,*base_class;
   if (cc->token!=TK_IDENT)
     LexExcept(cc,"Expecting identifier at ");
   if (is_extern) {
-    tempc=PrsClassNew;
-    tempc->str=cc->cur_str;
+    tmpc=PrsClassNew;
+    tmpc->str=cc->cur_str;
     cc->cur_str=NULL;
-    HashAdd(tempc,cc->htc.glbl_hash_table);
-    LBts(&tempc->flags,Cf_EXTERN);
-    HashSrcFileSet(cc,tempc);
+    HashAdd(tmpc,cc->htc.glbl_hash_table);
+    LBts(&tmpc->flags,Cf_EXTERN);
+    HashSrcFileSet(cc,tmpc);
     Lex(cc);
   } else {
     if (cc->flags&CCF_AOT_COMPILE)
-      tempc=HashFind(cc->cur_str,cc->htc.glbl_hash_table,HTT_CLASS);
+      tmpc=HashFind(cc->cur_str,cc->htc.glbl_hash_table,HTT_CLASS);
     else
-      tempc=HashSingleTableFind(cc->cur_str,cc->htc.glbl_hash_table,HTT_CLASS);
-    if (tempc) {
-      if (!Bt(&tempc->flags,Cf_EXTERN))
-	tempc=NULL;
-      else if (tempc->use_cnt<3)
-	UnusedExternWarning(cc,tempc);
+      tmpc=HashSingleTableFind(cc->cur_str,cc->htc.glbl_hash_table,HTT_CLASS);
+    if (tmpc) {
+      if (!Bt(&tmpc->flags,Cf_EXTERN))
+	tmpc=NULL;
+      else if (tmpc->use_cnt<3)
+	UnusedExternWarning(cc,tmpc);
     }
-    if (tempc) {
-      Free(tempc->src_link);
-      tempc->src_link=NULL;
-      Free(tempc->idx);
-      tempc->idx=NULL;
+    if (tmpc) {
+      Free(tmpc->src_link);
+      tmpc->src_link=NULL;
+      Free(tmpc->idx);
+      tmpc->idx=NULL;
     } else {
-      tempc=PrsClassNew;
-      tempc->str=cc->cur_str;
+      tmpc=PrsClassNew;
+      tmpc->str=cc->cur_str;
       cc->cur_str=NULL;
-      HashAdd(tempc,cc->htc.glbl_hash_table);
+      HashAdd(tmpc,cc->htc.glbl_hash_table);
     }
-    LBtr(&tempc->flags,Cf_EXTERN);
+    LBtr(&tmpc->flags,Cf_EXTERN);
     if (fsp_flags&FSF_PUBLIC)
-      tempc->type|=HTF_PUBLIC;
-    tempc->use_cnt=0;
+      tmpc->type|=HTF_PUBLIC;
+    tmpc->use_cnt=0;
     if (cc->last_U16=='\n')
-      HashSrcFileSet(cc,tempc,-1);
+      HashSrcFileSet(cc,tmpc,-1);
     else
-      HashSrcFileSet(cc,tempc,0);
+      HashSrcFileSet(cc,tmpc,0);
     if (Lex(cc)==':') {
       if (Lex(cc)!=TK_IDENT || !(base_class=cc->hash_entry) ||
 	    !(base_class->type&HTT_CLASS))
 	LexExcept(cc,"Invalid class at ");
       if (Lex(cc)==',')
 	LexExcept(cc,"Only one base class allowed at this time at ");
-      tempc->base_class=base_class;
-      tempc->size+=base_class->size;
+      tmpc->base_class=base_class;
+      tmpc->size+=base_class->size;
     }
     if (keyword==KW_UNION)
-      PrsVarLst(cc,tempc,PRS0_NULL|PRS1_CLASS|PRSF_UNION);
+      PrsVarLst(cc,tmpc,PRS0_NULL|PRS1_CLASS|PRSF_UNION);
     else
-      PrsVarLst(cc,tempc,PRS0_NULL|PRS1_CLASS);
-    tempc->size+=tempc->neg_offset;
+      PrsVarLst(cc,tmpc,PRS0_NULL|PRS1_CLASS);
+    tmpc->size+=tmpc->neg_offset;
   }
-  return tempc;
+  return tmpc;
 }
 
-CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *temp_return,
+CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *tmp_return,
 	U8 *name,I64 fsp_flags)
 {
-  CMemberLst *tempm,*header_lst;
+  CMemberLst *tmpm,*header_lst;
   CAOTCtrl *aotc=cc->aotc;
   CHashClass *header_return;
-  CHashFun *tempf;
+  CHashFun *tmpf;
   I64 header_arg_cnt;
   if (name) {//if not fun_ptr
     if (cc->flags&CCF_AOT_COMPILE) {
-      if ((tempf=HashFind(name,cc->htc.glbl_hash_table,HTT_FUN)) &&
-	    tempf->type & HTF_IMPORT)
-	tempf=NULL;
+      if ((tmpf=HashFind(name,cc->htc.glbl_hash_table,HTT_FUN)) &&
+	    tmpf->type & HTF_IMPORT)
+	tmpf=NULL;
     } else
-      if ((tempf=HashSingleTableFind(name,cc->htc.glbl_hash_table,HTT_FUN)) &&
-	    !Bt(&tempf->flags,Cf_EXTERN))
-	tempf=NULL;
-    if (tempf && tempf->use_cnt<3)
-      UnusedExternWarning(cc,tempf);
+      if ((tmpf=HashSingleTableFind(name,cc->htc.glbl_hash_table,HTT_FUN)) &&
+	    !Bt(&tmpf->flags,Cf_EXTERN))
+	tmpf=NULL;
+    if (tmpf && tmpf->use_cnt<3)
+      UnusedExternWarning(cc,tmpf);
   } else
-    tempf=NULL;
-  if (tempf) {
-    tempf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TEMP;
-    Free(tempf->src_link);
-    tempf->src_link=NULL;
-    Free(tempf->idx);
-    tempf->idx=NULL;
+    tmpf=NULL;
+  if (tmpf) {
+    tmpf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TMP;
+    Free(tmpf->src_link);
+    tmpf->src_link=NULL;
+    Free(tmpf->idx);
+    tmpf->idx=NULL;
     Free(name);
-    header_arg_cnt=tempf->arg_cnt;
-    header_lst=tempf->member_lst_and_root;
-    header_return=tempf->return_class;
-    tempf->member_lst_and_root=NULL;
-    ClassMemberLstDel(tempf);
+    header_arg_cnt=tmpf->arg_cnt;
+    header_lst=tmpf->member_lst_and_root;
+    header_return=tmpf->return_class;
+    tmpf->member_lst_and_root=NULL;
+    ClassMemberLstDel(tmpf);
   } else {
-    tempf=PrsFunNew;
+    tmpf=PrsFunNew;
     header_return=NULL;
-    tempf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TEMP;
-    tempf->clobbered_reg_mask=REGG_CLOBBERED+REGG_STK_TEMP;
-    tempf->str=name;
+    tmpf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TMP;
+    tmpf->clobbered_reg_mask=REGG_CLOBBERED+REGG_STK_TMP;
+    tmpf->str=name;
     if (cc->flags&CCF_AOT_COMPILE)
-      tempf->exe_addr=aotc->ip;
+      tmpf->exe_addr=aotc->ip;
     else
-      tempf->exe_addr=&UndefinedExtern;
-    LBts(&tempf->flags,Cf_EXTERN);
-    tempf->flags|=fsp_flags&FSG_FUN_FLAGS1;
+      tmpf->exe_addr=&UndefinedExtern;
+    LBts(&tmpf->flags,Cf_EXTERN);
+    tmpf->flags|=fsp_flags&FSG_FUN_FLAGS1;
     if (name) //if not fun_ptr
-      HashAdd(tempf,cc->htc.glbl_hash_table);
+      HashAdd(tmpf,cc->htc.glbl_hash_table);
   }
-  BEqu(&tempf->type,HTf_PUBLIC,fsp_flags&FSF_PUBLIC);
-  tempf->return_class=temp_return;
-  tempf->use_cnt=0;
-  HashSrcFileSet(cc,tempf);
-  PrsVarLst(cc,tempf,PRS0_NULL|PRS1_FUN_ARG);
-  tempf->arg_cnt=tempf->member_cnt;
-  if (0<tempf->arg_cnt<<3<=MAX_I16 && !Bt(&tempf->flags,Ff_DOT_DOT_DOT))
-    LBts(&tempf->flags,Ff_RET1);
-  tempm=tempf->member_lst_and_root;
-  while (tempm) {
-    tempm->offset+=16; //RBP+RETURN
-    tempm=tempm->next;
+  BEqu(&tmpf->type,HTf_PUBLIC,fsp_flags&FSF_PUBLIC);
+  tmpf->return_class=tmp_return;
+  tmpf->use_cnt=0;
+  HashSrcFileSet(cc,tmpf);
+  PrsVarLst(cc,tmpf,PRS0_NULL|PRS1_FUN_ARG);
+  tmpf->arg_cnt=tmpf->member_cnt;
+  if (0<tmpf->arg_cnt<<3<=MAX_I16 && !Bt(&tmpf->flags,Ff_DOT_DOT_DOT))
+    LBts(&tmpf->flags,Ff_RET1);
+  tmpm=tmpf->member_lst_and_root;
+  while (tmpm) {
+    tmpm->offset+=16; //RBP+RETURN
+    tmpm=tmpm->next;
   }
-  tempf->size=0;
+  tmpf->size=0;
   if (header_return) {
     if (GetOption(OPTf_WARN_HEADER_MISMATCH)) {
-      if (tempf->return_class!=header_return) {
-	PrintWarn("Fun Header return mismatch '%s'\n",tempf->str);
+      if (tmpf->return_class!=header_return) {
+	PrintWarn("Fun Header return mismatch '%s'\n",tmpf->str);
 	cc->warning_cnt++;
       }
-      if (!MemberLstCmp(tempf->member_lst_and_root,header_lst,header_arg_cnt)) {
-	PrintWarn("Fun header args mismatch '%s'\n",tempf->str);
+      if (!MemberLstCmp(tmpf->member_lst_and_root,header_lst,header_arg_cnt)) {
+	PrintWarn("Fun header args mismatch '%s'\n",tmpf->str);
 	cc->warning_cnt++;
       }
     }
     MemberLstDel(header_lst);
   }
-  return tempf;
+  return tmpf;
 }
 
-U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
+U0 PrsFun(CCmpCtrl *cc,CHashClass *tmp_return,U8 *name,I64 fsp_flags)
 {
-  CMemberLst *tempm;
+  CMemberLst *tmpm;
   CCodeMisc *saved_leave_label;
   I64 i,j,size,*r;
   Bool old_trace;
@@ -148,7 +148,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   cc->min_line=cc->max_line=cc->lex_include_stk->line_num;
 
   cc->flags&=~CCF_NO_REG_OPT;
-  cc->htc.local_var_lst=cc->htc.fun=PrsFunJoin(cc,temp_return,name,fsp_flags);
+  cc->htc.local_var_lst=cc->htc.fun=PrsFunJoin(cc,tmp_return,name,fsp_flags);
 
   COCPush(cc);
   Btr(&cc->flags,CCf_PASS_TRACE_PRESENT);
@@ -190,77 +190,77 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *temp_return,U8 *name,I64 fsp_flags)
   }
   LBtr(&cc->htc.fun->flags,Cf_EXTERN);
   COCPop(cc);
-  tempm=cc->htc.fun->member_lst_and_root;
-  while (tempm) {
-    if (tempm->flags & MLF_NO_UNUSED_WARN) {
-      if (tempm->use_cnt>1&&StrCmp(tempm->str,"_anon_"))
+  tmpm=cc->htc.fun->member_lst_and_root;
+  while (tmpm) {
+    if (tmpm->flags & MLF_NO_UNUSED_WARN) {
+      if (tmpm->use_cnt>1&&StrCmp(tmpm->str,"_anon_"))
 	PrintWarn("Unneeded no_warn\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 	      cc->lex_include_stk->full_name,cc->lex_include_stk->line_num,
-	      tempm->str,cc->htc.fun->str);
-    } else if (!tempm->use_cnt && GetOption(OPTf_WARN_UNUSED_VAR))
+	      tmpm->str,cc->htc.fun->str);
+    } else if (!tmpm->use_cnt && GetOption(OPTf_WARN_UNUSED_VAR))
       PrintWarn("Unused var\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 	    cc->lex_include_stk->full_name,cc->lex_include_stk->line_num,
-	    tempm->str,cc->htc.fun->str);
-    tempm=tempm->next;
+	    tmpm->str,cc->htc.fun->str);
+    tmpm=tmpm->next;
   }
   cc->htc.local_var_lst=cc->htc.fun=cc->fun_lex_file=NULL;
 }
 
-U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
+U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
   I64 saved_val,I64 fsp_flags)
 {
   I64 i,j,mode,k,val;
   U8 *st;
-  CHashExport *tempex;
-  CHashGlblVar *tempg;
+  CHashExport *tmpex;
+  CHashGlblVar *tmpg;
   CAOTCtrl *aotc=cc->aotc;
-  CAOTHeapGlbl *temphg;
-  CHashClass *tempc;
-  CHashFun *tempf,*tempf_fun_ptr;
-  CArrayDim tempad;
+  CAOTHeapGlbl *tmphg;
+  CHashClass *tmpc;
+  CHashFun *tmpf,*tmpf_fun_ptr;
+  CArrayDim tmpad;
   Bool has_alias,undef_array_size,is_array;
   while (TRUE) {
-    tempc=PrsType(cc,&saved_tempc,&saved_mode,NULL,&st,
-	  &tempf_fun_ptr,&tempex,&tempad,fsp_flags);
+    tmpc=PrsType(cc,&saved_tmpc,&saved_mode,NULL,&st,
+	  &tmpf_fun_ptr,&tmpex,&tmpad,fsp_flags);
 
     if (!st) return;
-    if (tempad.next)
+    if (tmpad.next)
       is_array=TRUE;
-    else if (tempad.total_cnt<0) {
+    else if (tmpad.total_cnt<0) {
       is_array=TRUE;
-      tempc--;
+      tmpc--;
     } else
       is_array=FALSE;
 
     val=saved_val;
     mode=saved_mode;
-    if (tempex && mode&255==PRS0_EXTERN && !(cc->flags&CCF_AOT_COMPILE) &&
-	  tempex->type&HTT_EXPORT_SYS_SYM) {
-      val=tempex->val;
+    if (tmpex && mode&255==PRS0_EXTERN && !(cc->flags&CCF_AOT_COMPILE) &&
+	  tmpex->type&HTT_EXPORT_SYS_SYM) {
+      val=tmpex->val;
       mode=PRS0__EXTERN|PRS1_NOT_REALLY__EXTERN;
     }
     if (cc->token=='(') {
       switch (mode&255) {
 	case PRS0__INTERN:
-	  tempf=PrsFunJoin(cc,tempc,st,fsp_flags);
-	  tempf->exe_addr=val;
-	  Bts(&tempf->flags,Ff_INTERNAL);
-	  LBtr(&tempf->flags,Cf_EXTERN);
+	  tmpf=PrsFunJoin(cc,tmpc,st,fsp_flags);
+	  tmpf->exe_addr=val;
+	  Bts(&tmpf->flags,Ff_INTERNAL);
+	  LBtr(&tmpf->flags,Cf_EXTERN);
 	  return;
 	case PRS0__EXTERN:
 	  if (!(fsp_flags&FSF__) && !(mode&PRS1_NOT_REALLY__EXTERN))
 	    LexExcept(cc,"Expecting label with underscore at ");
-	  tempf=PrsFunJoin(cc,tempc,st,fsp_flags);
-	  tempf->exe_addr=val;
-	  SysSymImportsResolve(tempf->str);
-	  LBtr(&tempf->flags,Cf_EXTERN);
+	  tmpf=PrsFunJoin(cc,tmpc,st,fsp_flags);
+	  tmpf->exe_addr=val;
+	  SysSymImportsResolve(tmpf->str);
+	  LBtr(&tmpf->flags,Cf_EXTERN);
 	  if (saved_mode&255==PRS0__EXTERN)
-	    LBts(&tempf->flags,Ff__EXTERN);
+	    LBts(&tmpf->flags,Ff__EXTERN);
 	  if (cc->flags&CCF_AOT_COMPILE)
-	    tempf->type|=HTF_RESOLVE;
+	    tmpf->type|=HTF_RESOLVE;
 	  return;
 	case PRS0_EXTERN:
-	  PrsFunJoin(cc,tempc,st,fsp_flags);
+	  PrsFunJoin(cc,tmpc,st,fsp_flags);
 	  return;
 	case PRS0__IMPORT:
 	  if (!(fsp_flags&FSF__))
@@ -269,66 +269,66 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	  if (!(cc->flags&CCF_AOT_COMPILE))
 	    LexExcept(cc,"import not needed at ");
 	  else {
-	    tempf=PrsFunJoin(cc,tempc,st,fsp_flags);
-	    tempf->type|=HTF_IMPORT;
+	    tmpf=PrsFunJoin(cc,tmpc,st,fsp_flags);
+	    tmpf->type|=HTF_IMPORT;
 	    if (mode&255==PRS0__IMPORT)
-	      tempf->import_name=StrNew(val);
+	      tmpf->import_name=StrNew(val);
 	    else
-	      tempf->import_name=StrNew(st);
+	      tmpf->import_name=StrNew(st);
 	  }
 	  return;
 	default:
-	  PrsFun(cc,tempc,st,fsp_flags);
+	  PrsFun(cc,tmpc,st,fsp_flags);
 	  return;
       }
     } else {
-      if (tempad.total_cnt<0) {
+      if (tmpad.total_cnt<0) {
 	i=0;
 	undef_array_size=TRUE;
       } else {
-	i=tempad.total_cnt;
+	i=tmpad.total_cnt;
 	undef_array_size=FALSE;
       }
-      if (tempf_fun_ptr)
+      if (tmpf_fun_ptr)
 	j=sizeof(U8 *);
       else
-	j=tempc->size;
+	j=tmpc->size;
       j*=i;
       has_alias=FALSE;
-      temphg=NULL;
+      tmphg=NULL;
       switch (mode&255) {
 	case PRS0__EXTERN:
 	  if (cc->flags&CCF_AOT_COMPILE) {
-	    tempg=CAlloc(sizeof(CHashGlblVar));
-	    tempg->data_addr_ip=val;
-	    tempg->type=HTT_GLBL_VAR | HTF_EXPORT;
+	    tmpg=CAlloc(sizeof(CHashGlblVar));
+	    tmpg->data_addr_ip=val;
+	    tmpg->type=HTT_GLBL_VAR | HTF_EXPORT;
 	  } else {
-	    tempg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
-	    tempg->data_addr=val;
-	    tempg->type=HTT_GLBL_VAR;
+	    tmpg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
+	    tmpg->data_addr=val;
+	    tmpg->type=HTT_GLBL_VAR;
 	  }
-	  tempg->flags|=GVF_ALIAS;
+	  tmpg->flags|=GVF_ALIAS;
 	  break;
 	case PRS0__IMPORT:
 	case PRS0_IMPORT:
 	  if (!(cc->flags&CCF_AOT_COMPILE))
 	    LexExcept(cc,"import not needed at ");
 	  else {
-	    tempg=CAlloc(sizeof(CHashGlblVar));
-	    tempg->type=HTT_GLBL_VAR | HTF_IMPORT;
+	    tmpg=CAlloc(sizeof(CHashGlblVar));
+	    tmpg->type=HTT_GLBL_VAR | HTF_IMPORT;
 	    if (mode&255==PRS0__IMPORT)
-	      tempg->import_name=StrNew(val);
+	      tmpg->import_name=StrNew(val);
 	    else
-	      tempg->import_name=StrNew(st);
+	      tmpg->import_name=StrNew(st);
 	  }
 	  break;
 	case PRS0_EXTERN:
 	  if (cc->flags&CCF_AOT_COMPILE) {
-	    tempg=CAlloc(sizeof(CHashGlblVar));
-	    tempg->type=HTT_GLBL_VAR;
+	    tmpg=CAlloc(sizeof(CHashGlblVar));
+	    tmpg->type=HTT_GLBL_VAR;
 	  } else {
-	    tempg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
-	    tempg->type=HTT_GLBL_VAR|HTF_UNRESOLVED;
+	    tmpg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
+	    tmpg->type=HTT_GLBL_VAR|HTF_UNRESOLVED;
 	  }
 	  break;
 	default:
@@ -336,32 +336,32 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	    if (Bt(&cc->opts,OPTf_GLBLS_ON_DATA_HEAP)) {
 	      if (cc->token=='=')
 		LexExcept(cc,"Can't init glbl var on data heap in AOT module ");
-	      tempg=CAlloc(sizeof(CHashGlblVar));
-	      temphg=tempg->heap_glbl=CAlloc(sizeof(CAOTHeapGlbl));
-	      temphg->size=j;
-	      temphg->str=StrNew(st);
-	      temphg->next=aotc->heap_glbls;
-	      aotc->heap_glbls=temphg;
-	      tempg->flags=GVF_DATA_HEAP;
-	      tempg->type=HTT_GLBL_VAR; //TODO: HTF_EXPORT
-	      if (tempex && tempex->type & HTT_GLBL_VAR) //TODO!! extern
+	      tmpg=CAlloc(sizeof(CHashGlblVar));
+	      tmphg=tmpg->heap_glbl=CAlloc(sizeof(CAOTHeapGlbl));
+	      tmphg->size=j;
+	      tmphg->str=StrNew(st);
+	      tmphg->next=aotc->heap_glbls;
+	      aotc->heap_glbls=tmphg;
+	      tmpg->flags=GVF_DATA_HEAP;
+	      tmpg->type=HTT_GLBL_VAR; //TODO: HTF_EXPORT
+	      if (tmpex && tmpex->type & HTT_GLBL_VAR) //TODO!! extern
 		LexExcept(cc,"Feature not implemented ");
 	    } else {
-	      tempg=CAlloc(sizeof(CHashGlblVar));
+	      tmpg=CAlloc(sizeof(CHashGlblVar));
 	      if (cc->token=='=')
-		tempg->data_addr=CAlloc(j);
-	      if (tempc->size>=8) //align
+		tmpg->data_addr=CAlloc(j);
+	      if (tmpc->size>=8) //align
 		while (aotc->ip&7)
 		  AOTStoreCodeU8(cc,0);
-	      else if (tempc->size==4)
+	      else if (tmpc->size==4)
 		while (aotc->ip&3)
 		  AOTStoreCodeU8(cc,0);
-	      else if (tempc->size==2)
+	      else if (tmpc->size==2)
 		while (aotc->ip&1)
 		  AOTStoreCodeU8(cc,0);
-	      tempg->data_addr_ip=aotc->ip;
-	      tempg->type=HTT_GLBL_VAR | HTF_EXPORT;
-	      if (tempex && tempex->type & HTT_GLBL_VAR)
+	      tmpg->data_addr_ip=aotc->ip;
+	      tmpg->type=HTT_GLBL_VAR | HTF_EXPORT;
+	      if (tmpex && tmpex->type & HTT_GLBL_VAR)
 		has_alias=TRUE;
 	      if (sys_var_init_flag)
 		for (k=0;k<j;k++)
@@ -372,85 +372,85 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tempc,
 	    }
 	  } else {
 	    if (Bt(&cc->opts,OPTf_GLBLS_ON_DATA_HEAP)) {
-	      tempg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
-	      tempg->data_addr=MAlloc(j);
-	      tempg->flags=GVF_DATA_HEAP;
+	      tmpg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
+	      tmpg->data_addr=MAlloc(j);
+	      tmpg->flags=GVF_DATA_HEAP;
 	    } else {
-	      tempg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
-	      tempg->data_addr=MAlloc(j,Fs->code_heap);
+	      tmpg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
+	      tmpg->data_addr=MAlloc(j,Fs->code_heap);
 	    }
-	    tempg->type=HTT_GLBL_VAR;
-	    if (tempex && tempex->type&HTT_GLBL_VAR &&
-		  tempex->type&HTF_UNRESOLVED &&
-		  MHeapCtrl(tempex)==MHeapCtrl(tempg))
+	    tmpg->type=HTT_GLBL_VAR;
+	    if (tmpex && tmpex->type&HTT_GLBL_VAR &&
+		  tmpex->type&HTF_UNRESOLVED &&
+		  MHeapCtrl(tmpex)==MHeapCtrl(tmpg))
 	      has_alias=TRUE;
 	    if (sys_var_init_flag)
-	      MemSet(tempg->data_addr,sys_var_init_val,j);
+	      MemSet(tmpg->data_addr,sys_var_init_val,j);
 	  }
       }
-      tempg->dim.next=tempad.next;
+      tmpg->dim.next=tmpad.next;
       if (fsp_flags&FSF_PUBLIC)
-	tempg->type|=HTF_PUBLIC;
-      tempg->var_class=tempc;
-      tempg->str=st;
-      tempg->size=j;
-      tempg->dim.total_cnt=i;
-      tempg->use_cnt=0;
+	tmpg->type|=HTF_PUBLIC;
+      tmpg->var_class=tmpc;
+      tmpg->str=st;
+      tmpg->size=j;
+      tmpg->dim.total_cnt=i;
+      tmpg->use_cnt=0;
       if (cc->last_U16=='\n')
-	HashSrcFileSet(cc,tempg,-1);
+	HashSrcFileSet(cc,tmpg,-1);
       else
-	HashSrcFileSet(cc,tempg,0);
+	HashSrcFileSet(cc,tmpg,0);
       if (mode&255==PRS0_IMPORT || mode&255==PRS0__IMPORT)
-	tempg->flags|=GVF_IMPORT;
+	tmpg->flags|=GVF_IMPORT;
       if (mode&255==PRS0_EXTERN)
-	tempg->flags|=GVF_EXTERN;
-      if (tempf_fun_ptr) {
-	tempg->fun_ptr=tempf_fun_ptr;
-	tempg->flags|=GVF_FUN;
+	tmpg->flags|=GVF_EXTERN;
+      if (tmpf_fun_ptr) {
+	tmpg->fun_ptr=tmpf_fun_ptr;
+	tmpg->flags|=GVF_FUN;
       }
       if (is_array)
-	tempg->flags|=GVF_ARRAY;
-      HashAdd(tempg,cc->htc.glbl_hash_table);
-      if (!(cc->flags&CCF_AOT_COMPILE) && !(tempg->flags&GVF_EXTERN))
-	SysSymImportsResolve(tempg->str);
+	tmpg->flags|=GVF_ARRAY;
+      HashAdd(tmpg,cc->htc.glbl_hash_table);
+      if (!(cc->flags&CCF_AOT_COMPILE) && !(tmpg->flags&GVF_EXTERN))
+	SysSymImportsResolve(tmpg->str);
       if (cc->token=='=') {
 	if (undef_array_size) {
 	  LexPush(cc);
 	  LexPush(cc);
 	  Lex(cc);
-	  PrsGlblInit(cc,tempg,1);
+	  PrsGlblInit(cc,tmpg,1);
 	  LexPopNoRestore(cc);
-	  tempg->size=tempg->dim.total_cnt*tempc->size;
-	  if (temphg)
-	    temphg->size=tempg->size;
+	  tmpg->size=tmpg->dim.total_cnt*tmpc->size;
+	  if (tmphg)
+	    tmphg->size=tmpg->size;
 	  if (cc->flags&CCF_AOT_COMPILE) {
 	    if (sys_var_init_flag)
-	      for (k=0;k<tempg->size;k++)
+	      for (k=0;k<tmpg->size;k++)
 		AOTStoreCodeU8(cc,sys_var_init_val);
 	    else
-	      for (k=0;k<tempg->size;k++)
+	      for (k=0;k<tmpg->size;k++)
 		AOTStoreCodeU8(cc,0);
 	  } else
 	    if (sys_var_init_flag)
-	      MemSet(tempg->data_addr,sys_var_init_val,k);
+	      MemSet(tmpg->data_addr,sys_var_init_val,k);
 	  LexPopRestore(cc);
 	}
 	LexPush(cc);
 	Lex(cc);
-	PrsGlblInit(cc,tempg,2);
+	PrsGlblInit(cc,tmpg,2);
 	if (cc->flags&CCF_AOT_COMPILE)
-	  for (k=0;k<tempg->size;k++)
-	    AOTStoreCodeU8At(cc,tempg->data_addr_ip+k,tempg->data_addr[k]);
+	  for (k=0;k<tmpg->size;k++)
+	    AOTStoreCodeU8At(cc,tmpg->data_addr_ip+k,tmpg->data_addr[k]);
 	LexPopNoRestore(cc);
       }
       if (has_alias) {
-	if (tempex(CHashGlblVar *)->use_cnt<2) {
-	  PrintWarn("Unused extern '%s'\n",tempex(CHashGlblVar *)->str);
+	if (tmpex(CHashGlblVar *)->use_cnt<2) {
+	  PrintWarn("Unused extern '%s'\n",tmpex(CHashGlblVar *)->str);
 	  cc->warning_cnt++;
 	}
-	tempex(CHashGlblVar *)->flags|=GVF_ALIAS;
-	tempex(CHashGlblVar *)->data_addr=tempg->data_addr;
-	tempex(CHashGlblVar *)->data_addr_ip=tempg->data_addr_ip;
+	tmpex(CHashGlblVar *)->flags|=GVF_ALIAS;
+	tmpex(CHashGlblVar *)->data_addr=tmpg->data_addr;
+	tmpex(CHashGlblVar *)->data_addr_ip=tmpg->data_addr_ip;
       }
       if (cc->token==',')
 	Lex(cc);
@@ -536,7 +536,7 @@ U0 PrsDoWhile(CCmpCtrl *cc,I64 try_cnt)
 
 U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
 {
-  CCodeCtrl *tempcbh;
+  CCodeCtrl *tmpcbh;
   CCodeMisc *lb,*lb_done;
 
   if (cc->token!='(')
@@ -559,14 +559,14 @@ U0 PrsFor(CCmpCtrl *cc,I64 try_cnt)
   if (cc->token!=')')
     PrsStmt(cc,try_cnt,NULL,0);
   COCPush(cc);
-  tempcbh=COCPopNoFree(cc);
+  tmpcbh=COCPopNoFree(cc);
   COCPop(cc);
   if (cc->token!=')')
     LexExcept(cc,"Missing ')' at ");
   Lex(cc);
 
   PrsStmt(cc,try_cnt,lb_done);
-  COCAppend(cc,tempcbh);
+  COCAppend(cc,tmpcbh);
   ICAdd(cc,IC_JMP,lb,0);
   ICAdd(cc,IC_LABEL,lb_done,0);
 }
@@ -585,10 +585,10 @@ class CSwitchCase {
 
 U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
 {
-  CSwitchCase *header=NULL,*temps,*temps1;	//Leaks on except
-  CSubSwitch head,*tempss;			//Leaks on except
+  CSwitchCase *header=NULL,*tmps,*tmps1;	//Leaks on except
+  CSubSwitch head,*tmpss;			//Leaks on except
   CCodeMisc *lb_dft,*lb_fwd_case,*mc_jt,*lb_entry,**jmp_table;
-  CIntermediateCode *tempi_sub,*tempi_cmp,*tempi_jmp,*tempi_start;
+  CIntermediateCode *tmpi_sub,*tmpi_cmp,*tmpi_jmp,*tmpi_start;
   Bool dft_found=FALSE,nobound;
   I64 i,k_start=MIN_I64,k_end,lo=MAX_I64,hi=MIN_I64,range;
 
@@ -610,9 +610,9 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
   mc_jt->begin->use_cnt++;
   if (!PrsExpression(cc,NULL,FALSE))
     throw('Compiler');
-  tempi_sub=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
+  tmpi_sub=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
   ICAdd(cc,IC_SUB,0,cmp.internal_types[RT_I64]);
-  tempi_cmp=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
+  tmpi_cmp=ICAdd(cc,IC_IMM_I64,0,cmp.internal_types[RT_I64]);
   if (nobound) {
     ICAdd(cc,IC_NOBOUND_SWITCH,mc_jt,0);
     if (cc->token!=']')
@@ -637,30 +637,30 @@ sw_cont:
 	    Lex(cc);
 	  else
 	    LexExcept(cc,"Expecting ':' at ");
-	  tempss=MAlloc(sizeof(CSubSwitch));
-	  QueIns(tempss,head.last);
+	  tmpss=MAlloc(sizeof(CSubSwitch));
+	  QueIns(tmpss,head.last);
 	  head.last->lb_break=COCMiscNew(cc,CMT_LABEL);
 	  head.last->lb_break->use_cnt++;
 	  lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
-	  tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);
+	  tmpi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);
 
-	  tempss->lb_start=COCMiscNew(cc,CMT_LABEL);
-	  tempi_start=ICAdd(cc,IC_LABEL,tempss->lb_start,0);
+	  tmpss->lb_start=COCMiscNew(cc,CMT_LABEL);
+	  tmpi_start=ICAdd(cc,IC_LABEL,tmpss->lb_start,0);
 	  while (cc->token && cc->token!='}') {
 	    switch (PrsKeyWord(cc)) {
 	      case KW_END:
-		OptFree(tempi_jmp);
+		OptFree(tmpi_jmp);
 		goto sw_sub_end;
 	      case KW_START:
 	      case KW_CASE:
 	      case KW_DFT:
-		if (cc->coc.coc_head.last==tempi_start) {
-		  OptFree(tempi_jmp);
-		  tempss->lb_start=NULL;
+		if (cc->coc.coc_head.last==tmpi_start) {
+		  OptFree(tmpi_jmp);
+		  tmpss->lb_start=NULL;
 		} else {
 		  ICAdd(cc,IC_RET,0,0);
 		  ICAdd(cc,IC_LABEL,lb_fwd_case,0);
-		  ICAdd(cc,IC_SUB_CALL,tempss->lb_start,0);//In case fall-thru
+		  ICAdd(cc,IC_SUB_CALL,tmpss->lb_start,0);//In case fall-thru
 		}
 		goto sw_cont;
 	      default:
@@ -671,18 +671,18 @@ sw_cont:
 	case KW_CASE:
 	  if (head.next!=&head) {
 	    lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
-	    tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
+	    tmpi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
 	  }
 	  Lex(cc);
 	  lb_entry=COCMiscNew(cc,CMT_LABEL);
 	  ICAdd(cc,IC_LABEL,lb_entry,0);
 	  lb_entry->use_cnt++;
 	  if (head.next!=&head) {
-	    tempss=head.next;
-	    while (tempss!=&head) {
-	      if (tempss->lb_start)
-		ICAdd(cc,IC_SUB_CALL,tempss->lb_start,0);
-	      tempss=tempss->next;
+	    tmpss=head.next;
+	    while (tmpss!=&head) {
+	      if (tmpss->lb_start)
+		ICAdd(cc,IC_SUB_CALL,tmpss->lb_start,0);
+	      tmpss=tmpss->next;
 	    }
 	    ICAdd(cc,IC_LABEL,lb_fwd_case,0);
 	  }
@@ -697,11 +697,11 @@ sw_cont:
 	  if (k_start>hi) hi=k_start;
 	  if (cc->token==':') {
 	    Lex(cc);
-	    temps=MAlloc(sizeof(CSwitchCase));
-	    temps->label=lb_entry;
-	    temps->val=k_start;
-	    temps->next=header;
-	    header=temps;
+	    tmps=MAlloc(sizeof(CSwitchCase));
+	    tmps->label=lb_entry;
+	    tmps->val=k_start;
+	    tmps->next=header;
+	    header=tmps;
 	  } else if (cc->token==TK_ELLIPSIS) {
 	    Lex(cc);
 	    k_end=LexExpressionI64(cc);
@@ -712,11 +712,11 @@ sw_cont:
 	      if (k_start>k_end)
 		SwapI64(&k_start,&k_end);
 	      for (i=k_start;i<=k_end;i++) {
-		temps=MAlloc(sizeof(CSwitchCase));
-		temps->label=lb_entry;
-		temps->val=i;
-		temps->next=header;
-		header=temps;
+		tmps=MAlloc(sizeof(CSwitchCase));
+		tmps->label=lb_entry;
+		tmps->val=i;
+		tmps->next=header;
+		header=tmps;
 	      }
 	      k_start=k_end;
 	    } else
@@ -727,7 +727,7 @@ sw_cont:
 	case KW_DFT:
 	  if (head.next!=&head) {
 	    lb_fwd_case=COCMiscNew(cc,CMT_LABEL);
-	    tempi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
+	    tmpi_jmp=ICAdd(cc,IC_JMP,lb_fwd_case,0);//In case fall-thru
 	  }
 	  Lex(cc);
 	  ICAdd(cc,IC_LABEL,lb_dft,0);
@@ -736,11 +736,11 @@ sw_cont:
 	  else
 	    LexExcept(cc,"Expecting ':' at ");
 	  if (head.next!=&head) {
-	    tempss=head.next;
-	    while (tempss!=&head) {
-	      if (tempss->lb_start)
-		ICAdd(cc,IC_SUB_CALL,tempss->lb_start,0);
-	      tempss=tempss->next;
+	    tmpss=head.next;
+	    while (tmpss!=&head) {
+	      if (tmpss->lb_start)
+		ICAdd(cc,IC_SUB_CALL,tmpss->lb_start,0);
+	      tmpss=tmpss->next;
 	    }
 	    ICAdd(cc,IC_LABEL,lb_fwd_case,0);
 	  }
@@ -751,16 +751,16 @@ sw_cont:
       }
     }
 sw_sub_end:
-    tempss=head.last;
-    ICAdd(cc,IC_LABEL,tempss->lb_break,0);
-    if (tempss==&head) {
+    tmpss=head.last;
+    ICAdd(cc,IC_LABEL,tmpss->lb_break,0);
+    if (tmpss==&head) {
       if (cc->token!='}')
 	LexExcept(cc,"Missing '}' at ");
       Lex(cc);
       break;
     } else {
-      QueRem(tempss);
-      Free(tempss);
+      QueRem(tmpss);
+      Free(tmpss);
       if (PrsKeyWord(cc)!=KW_END)
 	LexExcept(cc,"Missing 'end' at ");
       if (Lex(cc)==':')
@@ -779,17 +779,17 @@ sw_sub_end:
     LexExcept(cc,"switch range error at ");
   jmp_table=MAlloc((sizeof(CCodeMisc *)*range+0x1FF)&~0x1FF);
   MemSetI64(jmp_table,lb_dft,range);
-  tempi_sub->ic_data=lo;
-  tempi_cmp->ic_data=range;
-  temps=header;
-  while (temps) {
-    temps1=temps->next;
-    if (jmp_table[temps->val-lo]!=lb_dft)
+  tmpi_sub->ic_data=lo;
+  tmpi_cmp->ic_data=range;
+  tmps=header;
+  while (tmps) {
+    tmps1=tmps->next;
+    if (jmp_table[tmps->val-lo]!=lb_dft)
       LexExcept(cc,"Duplicate case at ");
     else
-      jmp_table[temps->val-lo]=temps->label;
-    Free(temps);
-    temps=temps1;
+      jmp_table[tmps->val-lo]=tmps->label;
+    Free(tmps);
+    tmps=tmps1;
   }
   mc_jt->dft=lb_dft;
   mc_jt->jmp_table=jmp_table;
@@ -798,11 +798,11 @@ sw_sub_end:
 
 U0 PrsNoWarn(CCmpCtrl *cc)
 {
-  CMemberLst *tempm;
+  CMemberLst *tmpm;
   while (cc->token==TK_IDENT) {
-    if (!(tempm=cc->local_var_entry))
+    if (!(tmpm=cc->local_var_entry))
       LexExcept(cc,"Expecting local var at ");
-    tempm->flags|=MLF_NO_UNUSED_WARN;
+    tmpm->flags|=MLF_NO_UNUSED_WARN;
     if (Lex(cc)==',')
       Lex(cc);
     else if (cc->token!=';')
@@ -813,9 +813,9 @@ U0 PrsNoWarn(CCmpCtrl *cc)
 U0 PrsStreamBlk(CCmpCtrl *cc)
 {
   CLexHashTableContext *htc=MAlloc(sizeof(CLexHashTableContext));
-  CStreamBlk *tempe=MAlloc(sizeof(CStreamBlk));
-  tempe->body=StrNew("");
-  QueIns(tempe,cc->last_stream_blk);
+  CStreamBlk *tmpe=MAlloc(sizeof(CStreamBlk));
+  tmpe->body=StrNew("");
+  QueIns(tmpe,cc->last_stream_blk);
   COCPush(cc);
   QueInit(&cc->coc.coc_next_misc);
 
@@ -838,23 +838,23 @@ U0 PrsStreamBlk(CCmpCtrl *cc)
 	htc->old_flags & (CCF_ASM_EXPRESSIONS|CCF_EXE_BLK|CCF_AOT_COMPILE);
   Free(htc);
   COCPop(cc);
-  QueRem(tempe);
-  if (*tempe->body)
-    LexIncludeStr(cc,"StreamBlk",tempe->body,FALSE);
+  QueRem(tmpe);
+  if (*tmpe->body)
+    LexIncludeStr(cc,"StreamBlk",tmpe->body,FALSE);
   else
-    Free(tempe->body);
-  Free(tempe);
+    Free(tmpe->body);
+  Free(tmpe);
   Lex(cc); //Skip '}'
 }
 
 U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
 {
   CCodeMisc	*lb_catch,*lb_done,*lb_untry;
-  CHashClass	*tempc=cmp.internal_types[RT_PTR];
-  CHashFun	*temp_try=HashFind("SysTry",cc->htc.hash_table_lst,HTT_FUN),
-	*temp_untry=HashFind("SysUntry",cc->htc.hash_table_lst,HTT_FUN);
+  CHashClass	*tmpc=cmp.internal_types[RT_PTR];
+  CHashFun	*tmp_try=HashFind("SysTry",cc->htc.hash_table_lst,HTT_FUN),
+	*tmp_untry=HashFind("SysUntry",cc->htc.hash_table_lst,HTT_FUN);
 
-  if (!temp_try || !temp_untry)
+  if (!tmp_try || !tmp_untry)
     LexExcept(cc,"Missing header for SysTry() and SysUntry() at ");
 
   cc->flags|=CCF_NO_REG_OPT; //TODO:Currently no reg vars in funs with try/catch
@@ -864,37 +864,37 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   lb_untry=COCMiscNew(cc,CMT_LABEL);
 
   ICAdd(cc,IC_CALL_START,0,0);
-  ICAdd(cc,IC_GET_LABEL,lb_untry,tempc,ICF_PUSH_RES);
-  ICAdd(cc,IC_GET_LABEL,lb_catch,tempc,ICF_PUSH_RES);
-  if (Bt(&temp_try->flags,Cf_EXTERN)) {
+  ICAdd(cc,IC_GET_LABEL,lb_untry,tmpc,ICF_PUSH_RES);
+  ICAdd(cc,IC_GET_LABEL,lb_catch,tmpc,ICF_PUSH_RES);
+  if (Bt(&tmp_try->flags,Cf_EXTERN)) {
     cc->abs_cnts.externs++;
     if (cc->flags&CCF_AOT_COMPILE)
-      ICAdd(cc,IC_CALL_IMPORT,temp_try,tempc);
+      ICAdd(cc,IC_CALL_IMPORT,tmp_try,tmpc);
     else
-      ICAdd(cc,IC_CALL_INDIRECT2,&temp_try->exe_addr,tempc);
+      ICAdd(cc,IC_CALL_INDIRECT2,&tmp_try->exe_addr,tmpc);
   } else
-    ICAdd(cc,IC_CALL,temp_try->exe_addr,tempc);
-  if ((Bt(&temp_try->flags,Ff_RET1) ||
-	Bt(&temp_try->flags,Ff_ARGPOP)) && !Bt(&temp_try->flags,Ff_NOARGPOP))
-    ICAdd(cc,IC_ADD_RSP1,16,tempc);
+    ICAdd(cc,IC_CALL,tmp_try->exe_addr,tmpc);
+  if ((Bt(&tmp_try->flags,Ff_RET1) ||
+	Bt(&tmp_try->flags,Ff_ARGPOP)) && !Bt(&tmp_try->flags,Ff_NOARGPOP))
+    ICAdd(cc,IC_ADD_RSP1,16,tmpc);
   else
-    ICAdd(cc,IC_ADD_RSP,16,tempc);
-  ICAdd(cc,IC_CALL_END,0,tempc);
+    ICAdd(cc,IC_ADD_RSP,16,tmpc);
+  ICAdd(cc,IC_CALL_END,0,tmpc);
   ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
 
   PrsStmt(cc,try_cnt+1);
 
   ICAdd(cc,IC_LABEL,lb_untry,0);
   ICAdd(cc,IC_CALL_START,0,0);
-  if (Bt(&temp_untry->flags,Cf_EXTERN)) {
+  if (Bt(&tmp_untry->flags,Cf_EXTERN)) {
     cc->abs_cnts.externs++;
     if (cc->flags&CCF_AOT_COMPILE)
-      ICAdd(cc,IC_CALL_IMPORT,temp_untry,tempc);
+      ICAdd(cc,IC_CALL_IMPORT,tmp_untry,tmpc);
     else
-      ICAdd(cc,IC_CALL_INDIRECT2,&temp_untry->exe_addr,tempc);
+      ICAdd(cc,IC_CALL_INDIRECT2,&tmp_untry->exe_addr,tmpc);
   } else
-    ICAdd(cc,IC_CALL,temp_untry->exe_addr,tempc);
-  ICAdd(cc,IC_CALL_END,0,tempc);
+    ICAdd(cc,IC_CALL,tmp_untry->exe_addr,tmpc);
+  ICAdd(cc,IC_CALL_END,0,tmpc);
   ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
 
   ICAdd(cc,IC_JMP,lb_done,0);
@@ -905,7 +905,7 @@ U0 PrsTryBlk(CCmpCtrl *cc,I64 try_cnt)
   Lex(cc);
   ICAdd(cc,IC_LABEL,lb_catch,0);
   PrsStmt(cc,try_cnt+1);
-  ICAdd(cc,IC_RET,0,tempc);
+  ICAdd(cc,IC_RET,0,tmpc);
   ICAdd(cc,IC_LABEL,lb_done,0);
 }
 
@@ -913,16 +913,16 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
   CCodeMisc *lb_break=NULL,I64 cmp_flags=CMPF_PRS_SEMICOLON)
 {
   I64 i,fsp_flags=0;
-  CHashExport *tempex;
+  CHashExport *tmpex;
   CCodeMisc *g_lb;
   U8 *import_name;
-  CHashFun *temp_untry;
-  CAOT *tempaot;
+  CHashFun *tmp_untry;
+  CAOT *tmpaot;
   if (cmp_flags&CMPF_ONE_ASM_INS) {
     if (cc->flags&CCF_AOT_COMPILE || cc->aot_depth)
       PrsAsmBlk(cc,CMPF_ONE_ASM_INS);
-    else if (tempaot=CmpJoin(cc,CMPF_ASM_BLK|CMPF_ONE_ASM_INS))
-      CmpFixUpJITAsm(cc,tempaot);
+    else if (tmpaot=CmpJoin(cc,CMPF_ASM_BLK|CMPF_ONE_ASM_INS))
+      CmpFixUpJITAsm(cc,tmpaot);
     fsp_flags=FSF_ASM;
   } else
     while (TRUE) {
@@ -941,9 +941,9 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 	if (cc->token!=',') goto sm_done;
       } else {
 	if (cc->token==TK_IDENT) {
-	  if (tempex=cc->hash_entry) {
-	    if (tempex->type & HTT_KEYWORD) {
-	      i=tempex(CHashGeneric *)->user_data0;
+	  if (tmpex=cc->hash_entry) {
+	    if (tmpex->type & HTT_KEYWORD) {
+	      i=tmpex(CHashGeneric *)->user_data0;
 	      switch [i] {
 		case KW_NUM_KEYWORDS-1: //nobound switch
 		default: //A keyword that is not valid here is just a symbol.
@@ -951,8 +951,8 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		start:
 		  case KW_ASM:
 		    if (cc->htc.fun) {
-		      if (tempaot=CmpJoin(cc,CMPF_ASM_BLK))
-			ICAdd(cc,IC_ASM,tempaot,0);
+		      if (tmpaot=CmpJoin(cc,CMPF_ASM_BLK))
+			ICAdd(cc,IC_ASM,tmpaot,0);
 		      Lex(cc); //Skip '}' of asm{}
 		    } else {
 		      if (cc->flags&CCF_AOT_COMPILE || cc->aot_depth) {
@@ -961,8 +961,8 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 			if (cc->flags&CCF_AOT_COMPILE && cc->aot_depth==1)
 			  Lex(cc); //Skip '}' of asm{}
 		      } else {
-			if (tempaot=CmpJoin(cc,CMPF_ASM_BLK))
-			  CmpFixUpJITAsm(cc,tempaot);
+			if (tmpaot=CmpJoin(cc,CMPF_ASM_BLK))
+			  CmpFixUpJITAsm(cc,tmpaot);
 			Lex(cc); //Skip '}' of asm{}
 		      }
 		      fsp_flags=FSF_ASM;
@@ -1004,18 +1004,18 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 		  case KW__EXTERN:
 		    if (Bt(&cc->opts,OPTf_EXTERNS_TO_IMPORTS))
 		      goto sm_underscore_import;
-		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			  !(tempex->type & HTT_EXPORT_SYS_SYM))
+		    if (cc->token!=TK_IDENT || !(tmpex=cc->hash_entry) ||
+			  !(tmpex->type & HTT_EXPORT_SYS_SYM))
 		      LexExcept(cc,"Expecting system sym at ");
 		    if (*cc->cur_str=='_')
 		      fsp_flags|=FSF__;
-		    i=tempex->val;
+		    i=tmpex->val;
 		    Lex(cc);
-		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		    if (cc->token!=TK_IDENT || !(tmpex=cc->hash_entry) ||
+			  !(tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0__EXTERN|PRS1_NULL,tempex,i,fsp_flags);
+		    PrsGlblVarLst(cc,PRS0__EXTERN|PRS1_NULL,tmpex,i,fsp_flags);
 		    break;
 		  case KW__IMPORT:
 sm_underscore_import:
@@ -1025,18 +1025,18 @@ sm_underscore_import:
 		      fsp_flags|=FSF__;
 		    import_name=cc->cur_str;
 		    cc->cur_str=0;
-		    if (Lex(cc)!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		    if (Lex(cc)!=TK_IDENT || !(tmpex=cc->hash_entry) ||
+			  !(tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0__IMPORT|PRS1_NULL,tempex,
+		    PrsGlblVarLst(cc,PRS0__IMPORT|PRS1_NULL,tmpex,
 			  import_name,fsp_flags);
 		    Free(import_name);
 		    break;
 		  case KW_EXTERN:
 		    if (cc->token!=TK_IDENT)
 		      LexExcept(cc,"Expecting type at ");
-		    tempex=cc->hash_entry;
+		    tmpex=cc->hash_entry;
 		    i=PrsKeyWord(cc);
 		    if (i==KW_CLASS||i==KW_UNION) {
 		      Lex(cc);
@@ -1044,29 +1044,29 @@ sm_underscore_import:
 		      fsp_flags&=FSF_ASM;
 		      goto sm_semicolon;
 		    }
-		    if (!tempex ||
-			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		    if (!tmpex ||
+			  !(tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
 		    if (Bt(&cc->opts,OPTf_EXTERNS_TO_IMPORTS))
 		      goto sm_import;
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0_EXTERN|PRS1_NULL,tempex,0,fsp_flags);
+		    PrsGlblVarLst(cc,PRS0_EXTERN|PRS1_NULL,tmpex,0,fsp_flags);
 		    break;
 		  case KW_IMPORT:
-		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		    if (cc->token!=TK_IDENT || !(tmpex=cc->hash_entry) ||
+			  !(tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
 sm_import:
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0_IMPORT|PRS1_NULL,tempex,0,fsp_flags);
+		    PrsGlblVarLst(cc,PRS0_IMPORT|PRS1_NULL,tmpex,0,fsp_flags);
 		    break;
 		  case KW__INTERN:
 		    i=LexExpressionI64(cc);
-		    if (cc->token!=TK_IDENT || !(tempex=cc->hash_entry) ||
-			  !(tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
+		    if (cc->token!=TK_IDENT || !(tmpex=cc->hash_entry) ||
+			  !(tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
 		      LexExcept(cc,"Expecting type at ");
 		    Lex(cc);
-		    PrsGlblVarLst(cc,PRS0__INTERN|PRS1_NULL,tempex,i,fsp_flags);
+		    PrsGlblVarLst(cc,PRS0__INTERN|PRS1_NULL,tmpex,i,fsp_flags);
 		    break;
 		end:
 		  fsp_flags&=FSF_ASM;
@@ -1098,20 +1098,20 @@ sm_import:
 		  if (!cc->htc.fun)
 		    LexExcept(cc,"Not in fun.  Can't return a val ");
 		  if (try_cnt) {
-		    temp_untry=HashFind("SysUntry",
+		    tmp_untry=HashFind("SysUntry",
 			  cc->htc.hash_table_lst,HTT_FUN);
 		    for (i=0;i<try_cnt;i++) {
-		      if (Bt(&temp_untry->flags,Cf_EXTERN)) {
+		      if (Bt(&tmp_untry->flags,Cf_EXTERN)) {
 			cc->abs_cnts.externs++;
 			if (cc->flags&CCF_AOT_COMPILE)
 			  ICAdd(cc,IC_CALL_IMPORT,
-				temp_untry,cmp.internal_types[RT_PTR]);
+				tmp_untry,cmp.internal_types[RT_PTR]);
 			else
 			  ICAdd(cc,IC_CALL_INDIRECT2,
-				&temp_untry->exe_addr,
+				&tmp_untry->exe_addr,
 				cmp.internal_types[RT_PTR]);
 		      } else
-			ICAdd(cc,IC_CALL,temp_untry->exe_addr,
+			ICAdd(cc,IC_CALL,tmp_untry->exe_addr,
 			      cmp.internal_types[RT_PTR]);
 		    }
 		  }
@@ -1151,9 +1151,9 @@ sm_import:
 		case KW_UNION:
 		case KW_CLASS:
 		  Lex(cc);
-		  tempex=PrsClass(cc,i,fsp_flags,FALSE);
+		  tmpex=PrsClass(cc,i,fsp_flags,FALSE);
 		  if (!cc->htc.fun && cc->token!=';') {
-		    PrsGlblVarLst(cc,PRS0_NULL|PRS1_NULL,tempex,0,fsp_flags);
+		    PrsGlblVarLst(cc,PRS0_NULL|PRS1_NULL,tmpex,0,fsp_flags);
 		    fsp_flags&=FSF_ASM;
 		    break;
 		  } else {
@@ -1163,7 +1163,7 @@ sm_import:
 	      }
 	    } else {//Ident, found in hash table, not keyword
 sm_not_keyword_afterall:
-	      if (tempex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)) {
+	      if (tmpex->type & (HTT_CLASS|HTT_INTERNAL_TYPE)) {
 		if (cc->htc.fun) {
 		  if (fsp_flags&FSF_STATIC)
 		    PrsVarLst(cc,cc->htc.fun,PRS0_NULL|PRS1_STATIC_LOCAL_VAR);
@@ -1172,13 +1172,13 @@ sm_not_keyword_afterall:
 		  if (cc->token=='}') goto sm_done;
 		} else {
 		  Lex(cc);
-		  PrsGlblVarLst(cc,PRS0_NULL|PRS1_NULL,tempex,0,fsp_flags);
+		  PrsGlblVarLst(cc,PRS0_NULL|PRS1_NULL,tmpex,0,fsp_flags);
 		}
 	      } else {
-		if (tempex->type & (HTT_OPCODE|HTT_ASM_KEYWORD)) {
+		if (tmpex->type & (HTT_OPCODE|HTT_ASM_KEYWORD)) {
 		  if (cc->htc.fun) {
-		    if (tempaot=CmpJoin(cc,CMPF_ASM_BLK|CMPF_ONE_ASM_INS))
-		      ICAdd(cc,IC_ASM,tempaot,0);
+		    if (tmpaot=CmpJoin(cc,CMPF_ASM_BLK|CMPF_ONE_ASM_INS))
+		      ICAdd(cc,IC_ASM,tmpaot,0);
 		  } else
 		    LexExcept(cc,"Use Asm Blk at ");
 		  if (cc->token!=',') goto sm_done;

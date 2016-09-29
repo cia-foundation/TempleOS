@@ -45,8 +45,9 @@ _extern _SAVE_EXCEPT_REGS U0 SaveExceptRegs(CExcept *t);
 U0 PutExcept(Bool catch_it=TRUE)
 {//Print exception msg and catch exception.
   "Except:%c:",Fs->except_ch;
-  "%P:%P:%P:%P\n",Fs->except_caller1,Fs->except_caller2,
-	Fs->except_caller3,Fs->except_caller4;
+  "%P:%P:%P:%P:%P:%P\n",Fs->except_caller1,Fs->except_caller2,
+	Fs->except_caller3,Fs->except_caller4,Fs->except_caller5,
+	Fs->except_caller6,Fs->except_caller7,Fs->except_caller8;
   Fs->catch_except=catch_it;
 }
 
@@ -63,46 +64,52 @@ class CTryStk
 U0 SysTry(U8 *catch_start,U8 *untry_start)
 {
   I64 *rbp=GetRBP;
-  CExcept *tempt=MAlloc(sizeof(CExcept));
-  tempt->handler_catch=catch_start;
-  tempt->handler_untry=untry_start;
-  tempt->rsp=rbp(U8 *)+sizeof(CTryStk);
-  tempt->rbp=*rbp;
-  tempt->rflags=GetRFlags;
-  SaveExceptRegs(tempt);
-  QueIns(tempt,Fs->last_except);
+  CExcept *tmpt=MAlloc(sizeof(CExcept));
+  tmpt->handler_catch=catch_start;
+  tmpt->handler_untry=untry_start;
+  tmpt->rsp=rbp(U8 *)+sizeof(CTryStk);
+  tmpt->rbp=*rbp;
+  tmpt->rflags=GetRFlags;
+  SaveExceptRegs(tmpt);
+  QueIns(tmpt,Fs->last_except);
 }
 
 U0 SysUntry()
 {
-  CExcept *tempt=Fs->last_except;
-  QueRem(tempt);
-  Free(tempt);
+  CExcept *tmpt=Fs->last_except;
+  QueRem(tmpt);
+  Free(tmpt);
 }
 
 U0 throw(I64 ch=0,Bool no_log=FALSE)
 {//ch can be up to 8 chars like $LK,"PutChars",A="MN:PutChars"$().
 //In the catcher, fetch ch from Fs->except_ch.
-  CExcept *tempt=Fs->last_except;
+  CExcept *tmpt=Fs->last_except;
   Bool was_raw;
   Fs->except_ch=ch;
   Fs->except_caller1=Caller(1);
   Fs->except_caller2=Caller(2);
   Fs->except_caller3=Caller(3);
   Fs->except_caller4=Caller(4);
+  Fs->except_caller5=Caller(5);
+  Fs->except_caller6=Caller(6);
+  Fs->except_caller7=Caller(7);
+  Fs->except_caller8=Caller(8);
   Fs->except_rbp=GetRBP;
   Fs->catch_except=FALSE;
   if (!no_log)
-    AdamLog("Except:%c:%p:%p:%p:%p\n",ch,Fs->except_caller1,Fs->except_caller2,
-	  Fs->except_caller3,Fs->except_caller4);
+    AdamLog("Except:%c:%p:%p:%p:%p:%p:%p\n",ch,Fs->except_caller1,
+	  Fs->except_caller2,Fs->except_caller3,Fs->except_caller4,
+	  Fs->except_caller5,Fs->except_caller6,Fs->except_caller7,
+	  Fs->except_caller8);
   while (Fs->next_except!=&Fs->next_except) {
     TestExcept;
     if (Fs->catch_except)
       TakeExcept;
     SetRBP(Fs->except_rbp);
-    tempt=Fs->last_except;
-    QueRem(tempt);
-    Free(tempt);
+    tmpt=Fs->last_except;
+    QueRem(tmpt);
+    Free(tmpt);
   }
   was_raw=Raw(ON);
   PutExcept(FALSE);

@@ -10,36 +10,36 @@ Bool ChkDskConfirm(Bool *_fix,Bool *_confirm)
   return *_fix;
 }
 
-I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tempde1,
+I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tmpde1,
 	U8 *bits,U8 *bits2,I64 size,I64 bpc)
 {
-  CDirEntry *tempde2;
+  CDirEntry *tmpde2;
   I64 i,j,errs=0;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (tempde1->attr & RS_ATTR_DIR && tempde1->sub)
-      errs+=RedSeaChkDskLst(dv,tempde1->sub,bits,bits2,size,bpc);
-    j=(tempde1->size+bpc-1)/bpc;
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (tmpde1->attr & RS_ATTR_DIR && tmpde1->sub)
+      errs+=RedSeaChkDskLst(dv,tmpde1->sub,bits,bits2,size,bpc);
+    j=(tmpde1->size+bpc-1)/bpc;
     for (i=0;i<j;i++) {
-      if (i+tempde1->cluster-dv->data_area>size) {
-	PrintErr("Invalid Cluster:%s Cluster:%X\n",tempde1->full_name,
-	      i+tempde1->cluster);
+      if (i+tmpde1->cluster-dv->data_area>size) {
+	PrintErr("Invalid Cluster:%s Cluster:%X\n",tmpde1->full_name,
+	      i+tmpde1->cluster);
 	errs++;
 	break;
       }
-      if (LBts(bits,i+tempde1->cluster-dv->data_area)) {
-	PrintErr("Dbl Alloc:%s Cluster:%X\n",tempde1->full_name,
-	      i+tempde1->cluster);
+      if (LBts(bits,i+tmpde1->cluster-dv->data_area)) {
+	PrintErr("Dbl Alloc:%s Cluster:%X\n",tmpde1->full_name,
+	      i+tmpde1->cluster);
 	errs++;
       }
-      if (!LBtr(bits2,i+tempde1->cluster-dv->data_area)) {
-	PrintErr("UnAlloc:%s Cluster:%X\n",tempde1->full_name,
-	      i+tempde1->cluster);
+      if (!LBtr(bits2,i+tmpde1->cluster-dv->data_area)) {
+	PrintErr("UnAlloc:%s Cluster:%X\n",tmpde1->full_name,
+	      i+tmpde1->cluster);
 	errs++;
       }
     }
-    DirEntryDel(tempde1);
-    tempde1=tempde2;
+    DirEntryDel(tmpde1);
+    tmpde1=tmpde2;
   }
   return errs;
 }
@@ -103,48 +103,48 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   return errs;
 }
 
-I64 FAT32ChkDskLst(CDrv *dv,CDirEntry *tempde1,
+I64 FAT32ChkDskLst(CDrv *dv,CDirEntry *tmpde1,
 	U8 *bits,U32 *bits2,I64 size,I64 bpc)
 {
-  CDirEntry *tempde2;
+  CDirEntry *tmpde2;
   I64 i,c,errs=0;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (tempde1->attr & RS_ATTR_DIR && tempde1->sub)
-      errs+=FAT32ChkDskLst(dv,tempde1->sub,bits,bits2,size,bpc);
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (tmpde1->attr & RS_ATTR_DIR && tmpde1->sub)
+      errs+=FAT32ChkDskLst(dv,tmpde1->sub,bits,bits2,size,bpc);
     i=0;
-    c=tempde1->cluster;
+    c=tmpde1->cluster;
     while (0<c<0x0FFFFFF8) {
       if (c>size) {
-	PrintErr("Invalid Cluster:%s Cluster:%X\n",tempde1->full_name,c);
+	PrintErr("Invalid Cluster:%s Cluster:%X\n",tmpde1->full_name,c);
 	errs++;
 	break;
       }
       if (LBts(bits,c)) {
-	PrintErr("Dbl Alloc:%s Cluster:%X\n",tempde1->full_name,c);
+	PrintErr("Dbl Alloc:%s Cluster:%X\n",tmpde1->full_name,c);
 	errs++;
       }
       if (!bits2[c]) {
-	PrintErr("UnAlloc:%s Cluster:%X\n",tempde1->full_name,c);
+	PrintErr("UnAlloc:%s Cluster:%X\n",tmpde1->full_name,c);
 	errs++;
       } else
 	bits2[c]=0;
       c=ClusterNumNext(dv,c);
       i++;
     }
-    if (!(tempde1->attr & RS_ATTR_DIR)) {
+    if (!(tmpde1->attr & RS_ATTR_DIR)) {
       i*=bpc;
-      if (tempde1->size>i) {
-	PrintErr("Alloced File Too Short:%s\n",tempde1->full_name);
+      if (tmpde1->size>i) {
+	PrintErr("Alloced File Too Short:%s\n",tmpde1->full_name);
 	errs++;
       }
-      if (i>tempde1->size+bpc-1) {
-	PrintWarn("Alloced File Too Long:%s\n",tempde1->full_name);
+      if (i>tmpde1->size+bpc-1) {
+	PrintWarn("Alloced File Too Long:%s\n",tmpde1->full_name);
 	errs++;
       }
     }
-    DirEntryDel(tempde1);
-    tempde1=tempde2;
+    DirEntryDel(tmpde1);
+    tmpde1=tmpde2;
   }
   return errs;
 }

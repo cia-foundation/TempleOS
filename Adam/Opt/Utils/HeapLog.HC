@@ -25,19 +25,19 @@ CHeapLogHash *heaplog_head=NULL;
 
 U0 HeapLogMAlloc(U8 *addr)
 {
-  CHeapLog *temphl;
+  CHeapLog *tmphl;
   I64 i;
   if (MHeapCtrl(addr)==heaplog_hc_watched) {
-    temphl=MAlloc(sizeof(CHeapLog),heaplog_hc);
-    temphl->addr=addr;
+    tmphl=MAlloc(sizeof(CHeapLog),heaplog_hc);
+    tmphl->addr=addr;
     for (i=0;i<HL_CALLER_DEPTH;i++)
-      temphl->caller[i]=Caller(i+2);
+      tmphl->caller[i]=Caller(i+2);
     i=addr>>3 &(HL_HASH_SIZE-1);
     PUSHFD
     CLI
     while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
       PAUSE
-    QueIns(temphl,heaplog_head[i].last);
+    QueIns(tmphl,heaplog_head[i].last);
     LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
     POPFD
   }
@@ -46,7 +46,7 @@ U0 HeapLogMAlloc(U8 *addr)
 U0 HeapLogFree(U8 *addr)
 {
   I64 i;
-  CHeapLog *temphl;
+  CHeapLog *tmphl;
   if (!addr) return;
   if (MHeapCtrl(addr)==heaplog_hc_watched) {
     i=addr>>3 &(HL_HASH_SIZE-1);
@@ -54,16 +54,16 @@ U0 HeapLogFree(U8 *addr)
     CLI
     while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
       PAUSE
-    temphl=heaplog_head[i].next;
-    while (temphl!=&heaplog_head[i]) {
-      if (addr==temphl->addr) {
-	QueRem(temphl);
+    tmphl=heaplog_head[i].next;
+    while (tmphl!=&heaplog_head[i]) {
+      if (addr==tmphl->addr) {
+	QueRem(tmphl);
 	LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
 	POPFD
-	Free(temphl);
+	Free(tmphl);
 	return;
       }
-      temphl=temphl->next;
+      tmphl=tmphl->next;
     }
     LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
     POPFD
@@ -115,7 +115,7 @@ public Bool HeapLog(Bool val=ON,CTask *task=NULL)
 public U0 HeapLogAddrRep(Bool leave_it=OFF)
 {//Call $LK,"HeapLog",A="MN:HeapLog"$() first and collect data.
   I64 i,j,total=0;
-  CHeapLog *temphl,hl;
+  CHeapLog *tmphl,hl;
   if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
     "HeapLog Not Active\n";
     return;
@@ -124,16 +124,16 @@ public U0 HeapLogAddrRep(Bool leave_it=OFF)
   while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
     PAUSE
   for (i=0;i<HL_HASH_SIZE;i++) {
-    temphl=heaplog_head[i].next;
-    while (temphl!=&heaplog_head[i]) {
+    tmphl=heaplog_head[i].next;
+    while (tmphl!=&heaplog_head[i]) {
 //Take snapshot in case modified. (while we work)
-      MemCpy(&hl,temphl,sizeof(CHeapLog));
+      MemCpy(&hl,tmphl,sizeof(CHeapLog));
       "$$PURPLE$$%08X$$FG$$ %08X",MSize(hl.addr),hl.addr;
       for (j=0;j<HL_CALLER_DEPTH;j++)
 	" %P",hl.caller[j];
       '\n';
       total+=MSize(hl.addr);
-      temphl=hl.next;
+      tmphl=hl.next;
     }
   }
   LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
@@ -146,7 +146,7 @@ public U0 HeapLogAddrRep(Bool leave_it=OFF)
 public U0 HeapLogSizeRep(Bool leave_it=OFF)
 {//Call $LK,"HeapLog",A="MN:HeapLog"$() first and collect data.
   I64 i,j,k,total=0;
-  CHeapLog *temphla,hla,*temphls,*temphls1;
+  CHeapLog *tmphla,hla,*tmphls,*tmphls1;
   CHeapLogHash *size_head;
   if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
     "HeapLog Not Active\n";
@@ -161,45 +161,45 @@ public U0 HeapLogSizeRep(Bool leave_it=OFF)
   while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
     PAUSE
   for (i=0;i<HL_HASH_SIZE;i++) {
-    temphla=heaplog_head[i].next;
-    while (temphla!=&heaplog_head[i]) {
+    tmphla=heaplog_head[i].next;
+    while (tmphla!=&heaplog_head[i]) {
 //Take snapshot in case modified. (while we work)
-      MemCpy(&hla,temphla,sizeof(CHeapLog));
+      MemCpy(&hla,tmphla,sizeof(CHeapLog));
       k=(MSize(hla.addr)>>3+hla.caller[0])&(HL_HASH_SIZE-1);
-      temphls=size_head[k].next;
-      while (temphls!=&size_head[k]) {
-	if (MSize(hla.addr)==temphls->size) {
+      tmphls=size_head[k].next;
+      while (tmphls!=&size_head[k]) {
+	if (MSize(hla.addr)==tmphls->size) {
 	  for (j=0;j<HL_CALLER_DEPTH;j++)
-	    if (hla.caller[j]!=temphls->caller[j])
+	    if (hla.caller[j]!=tmphls->caller[j])
 	      goto hl_next;
-	  temphls->cnt++;
+	  tmphls->cnt++;
 	  goto hl_found;
 	}
 hl_next:
-	temphls=temphls->next;
+	tmphls=tmphls->next;
       }
-      temphls=MAlloc(sizeof(CHeapLog),heaplog_hc);
-      MemCpy(temphls,&hla,sizeof(CHeapLog));
-      temphls->cnt=1;
-      temphls->size=MSize(hla.addr);
-      QueIns(temphls,size_head[k].last);
+      tmphls=MAlloc(sizeof(CHeapLog),heaplog_hc);
+      MemCpy(tmphls,&hla,sizeof(CHeapLog));
+      tmphls->cnt=1;
+      tmphls->size=MSize(hla.addr);
+      QueIns(tmphls,size_head[k].last);
 hl_found:
-      temphla=hla.next;
+      tmphla=hla.next;
     }
   }
   LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
 
   for (i=0;i<HL_HASH_SIZE;i++) {
-    temphls=size_head[i].next;
-    while (temphls!=&size_head[i]) {
-      temphls1=temphls->next;
-      "%08X*%08X=%08X",temphls->size,temphls->cnt,temphls->size*temphls->cnt;
+    tmphls=size_head[i].next;
+    while (tmphls!=&size_head[i]) {
+      tmphls1=tmphls->next;
+      "%08X*%08X=%08X",tmphls->size,tmphls->cnt,tmphls->size*tmphls->cnt;
       for (j=0;j<HL_CALLER_DEPTH;j++)
-	" %P",temphls->caller[j];
+	" %P",tmphls->caller[j];
       '\n';
-      total+=temphls->size*temphls->cnt;
-      Free(temphls);
-      temphls=temphls1;
+      total+=tmphls->size*tmphls->cnt;
+      Free(tmphls);
+      tmphls=tmphls1;
     }
   }
   Free(size_head);

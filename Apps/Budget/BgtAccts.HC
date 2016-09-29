@@ -1,24 +1,24 @@
 U0 BgtAcctsUpdate()
 {
-  CBgtEntry	*tempb;
-  CBgtTemplate	*tempt;
-  tempb=b_head.next;
-  while (tempb!=&b_head) {
-    if (tempb->type!=BE_TEMPLATE_COPY) {
-      tempb->credit_idx=StrFileAdd(tempb->credit,
+  CBgtEntry	*tmpb;
+  CBgtTemplate	*tmpt;
+  tmpb=b_head.next;
+  while (tmpb!=&b_head) {
+    if (tmpb->type!=BE_TEMPLATE_COPY) {
+      tmpb->credit_idx=StrFileAdd(tmpb->credit,
 	    &accts_table_strs,accts_table);
-      tempb->debit_idx =StrFileAdd(tempb->debit,
+      tmpb->debit_idx =StrFileAdd(tmpb->debit,
 	    &accts_table_strs,accts_table);
     }
-    tempb=tempb->next;
+    tmpb=tmpb->next;
   }
-  tempt=t_head.next;
-  while (tempt!=&t_head) {
-    tempt->b.credit_idx=StrFileAdd(tempt->b.credit,
+  tmpt=t_head.next;
+  while (tmpt!=&t_head) {
+    tmpt->b.credit_idx=StrFileAdd(tmpt->b.credit,
 	  &accts_table_strs,accts_table);
-    tempt->b.debit_idx =StrFileAdd(tempt->b.debit,
+    tmpt->b.debit_idx =StrFileAdd(tmpt->b.debit,
 	  &accts_table_strs,accts_table);
-    tempt=tempt->next;
+    tmpt=tmpt->next;
   }
 }
 
@@ -44,9 +44,9 @@ U0 BgtAcctsRead()
 
 I64 BgtAcctColor(U8 *st)
 {
-  CHashGeneric *temph;
-  if (temph=HashFind(st,accts_table,SFT_GENERIC))
-    return temph->user_data1;
+  CHashGeneric *tmph;
+  if (tmph=HashFind(st,accts_table,SFT_GENERIC))
+    return tmph->user_data1;
   else
     return BLACK;
 }
@@ -57,19 +57,19 @@ U8 *BgtPopUpAcct(U8 *header=NULL,U8 *dft=NULL)
   U8 *res;
   CDoc *doc=DocNew;
   CDocEntry *doc_e,*doc_dft=NULL;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
 
   if (header)
     DocPrint(doc,"%s",header);
 
   for (i=0;i<=accts_table->mask;i++) {
-    temph=accts_table->body[i];
-    while (temph) {
+    tmph=accts_table->body[i];
+    while (tmph) {
       doc_e=DocPrint(doc,"$$FG,%d$$$$MU-UL,\"%s\",LE=0x%X$$\n",
-	    temph->user_data1,temph->str,temph->str);
-      if (dft && !StrCmp(dft,temph->str))
+	    tmph->user_data1,tmph->str,tmph->str);
+      if (dft && !StrCmp(dft,tmph->str))
 	doc_dft=doc_e;
-      temph=temph->next;
+      tmph=tmph->next;
     }
   }
 

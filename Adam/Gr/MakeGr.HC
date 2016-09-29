@@ -10,14 +10,14 @@ Cd(__DIR__);;
 #include "GrDC"
 #include "GrInitB"
 #include "GrMath"
-#include "GrScreen"
+#include "GrScrn"
 #include "GrBitMap"
 #include "GrPrimatives"
 #include "GrComposites"
 
-#define GE_ABORT	(-1)
-#define GE_EXIT		0
-#define GE_CONT		1
+#define SPE_ABORT	(-1)
+#define SPE_EXIT	0
+#define SPE_CONT	1
 #include "SpriteNew"
 #include "GrSpritePlot"
 #include "SpriteMesh"

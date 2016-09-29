@@ -45,18 +45,18 @@ U0 DocBorderLstDraw(CDoc *doc)
   CTask *win_task=doc->win_task;
   I64 i,y=-1,attr=win_task->border_attr<<8;
   U64 ch;
-  CDoc *templ=doc;
+  CDoc *tmpl=doc;
   CD3I64 saved_scroll;
-  while (templ && templ->doc_signature==DOC_SIGNATURE_VAL) {
-    y+=(Bsr(templ->desc)+7)>>3+1; //StrLen+1
-    templ=templ->parent_doc;
+  while (tmpl && tmpl->doc_signature==DOC_SIGNATURE_VAL) {
+    y+=(Bsr(tmpl->desc)+7)>>3+1; //StrLen+1
+    tmpl=tmpl->parent_doc;
   }
-  templ=doc;
+  tmpl=doc;
   if (y>win_task->win_height)
     y=win_task->win_height;
   WinScrollNull(win_task,&saved_scroll);
-  while (templ && templ->doc_signature==DOC_SIGNATURE_VAL) {
-    ch=templ->desc;
+  while (tmpl && tmpl->doc_signature==DOC_SIGNATURE_VAL) {
+    ch=tmpl->desc;
     i=(Bsr(ch)+7)>>3;	//StrLen
     ch=EndianI64(ch<<((8-i)<<3));
     attr=win_task->border_attr<<8;
@@ -65,7 +65,7 @@ U0 DocBorderLstDraw(CDoc *doc)
       ch>>=8;
     }
     y--;
-    templ=templ->parent_doc;
+    tmpl=tmpl->parent_doc;
   }
   WinScrollRestore(win_task,&saved_scroll);
 }
@@ -203,11 +203,11 @@ U0 DocUpdateTaskDocs(CTask *task)
       task->border_attr=DrvTextAttrGet(*doc->filename.name);
     if (task->title_src==TTS_ED_FILENAME)
       MemCpy(task->task_title,doc->filename.name,STR_LEN-1);
-    DocRecalc(doc,RECALCt_TO_SCREEN|RECALCF_HAS_CURSOR);
+    DocRecalc(doc,RECALCt_TO_SCRN|RECALCF_HAS_CURSOR);
   }
   if ((doc=DocBorder(task)) && !(doc->flags&DOCF_DONT_SHOW)) {
     WinScrollNull(task,&saved_scroll);
-    DocRecalc(doc,RECALCt_TO_SCREEN);
+    DocRecalc(doc,RECALCt_TO_SCRN);
     WinScrollRestore(task,&saved_scroll);
   }
 }

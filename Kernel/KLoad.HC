@@ -2,8 +2,8 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 {
   U8 *src=*_src,*ptr2,*st_ptr;
   I64 i,etype;
-  CHashExport *tempex=NULL;
-  CHashImport *tempiss;
+  CHashExport *tmpex=NULL;
+  CHashImport *tmpiss;
   Bool first=TRUE;
 
   while (etype=*src++) {
@@ -16,27 +16,27 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 	return;
       } else {
 	first=FALSE;
-	if (!(tempex=HashFind(st_ptr,
+	if (!(tmpex=HashFind(st_ptr,
 	      Fs->hash_table,HTG_ALL-HTT_IMPORT_SYS_SYM))) {
 	  if (!(ld_flags & LDF_SILENT))
 	    "Unresolved Reference:%s\n",st_ptr;
-	  tempiss=CAlloc(sizeof(CHashImport));
-	  tempiss->str=StrNew(st_ptr);
-	  tempiss->type=HTT_IMPORT_SYS_SYM;
-	  tempiss->module_header_entry=st_ptr-5;
-	  tempiss->module_base=module_base;
-	  HashAdd(tempiss,Fs->hash_table);
+	  tmpiss=CAlloc(sizeof(CHashImport));
+	  tmpiss->str=StrNew(st_ptr);
+	  tmpiss->type=HTT_IMPORT_SYS_SYM;
+	  tmpiss->module_header_entry=st_ptr-5;
+	  tmpiss->module_base=module_base;
+	  HashAdd(tmpiss,Fs->hash_table);
 	}
       }
     }
-    if (tempex) {
+    if (tmpex) {
       ptr2=module_base+i;
-      if (tempex->type & HTT_FUN)
-	i=tempex(CHashFun *)->exe_addr;
-      else if (tempex->type & HTT_GLBL_VAR)
-	i=tempex(CHashGlblVar *)->data_addr;
+      if (tmpex->type & HTT_FUN)
+	i=tmpex(CHashFun *)->exe_addr;
+      else if (tmpex->type & HTT_GLBL_VAR)
+	i=tmpex(CHashGlblVar *)->data_addr;
       else
-	i=tempex->val;
+	i=tmpex->val;
       switch (etype) {
 	case IET_REL_I8:  *ptr2(U8 *) =i-ptr2-1; break;
 	case IET_IMM_U8:  *ptr2(U8 *) =i;  break;
@@ -54,13 +54,13 @@ U0 LoadOneImport(U8 **_src,U8 *module_base,I64 ld_flags)
 
 U0 SysSymImportsResolve(U8 *st_ptr,I64 ld_flags)
 {
-  CHashImport *tempiss;
+  CHashImport *tmpiss;
   U8 *ptr;
-  while (tempiss=HashSingleTableFind(st_ptr,
+  while (tmpiss=HashSingleTableFind(st_ptr,
 	Fs->hash_table,HTT_IMPORT_SYS_SYM)) {
-    ptr=tempiss->module_header_entry;
-    LoadOneImport(&ptr,tempiss->module_base,ld_flags);
-    tempiss->type=HTT_INVALID;
+    ptr=tmpiss->module_header_entry;
+    LoadOneImport(&ptr,tmpiss->module_base,ld_flags);
+    tmpiss->type=HTT_INVALID;
   }
 }
 
@@ -68,7 +68,7 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 {
   U8 *ptr2,*ptr3,*st_ptr;
   I64 i,j,cnt,etype;
-  CHashExport *tempex=NULL;
+  CHashExport *tmpex=NULL;
   while (etype=*src++) {
     i=*src(U32 *)++;
     st_ptr=src;
@@ -78,14 +78,14 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
       case IET_IMM32_EXPORT:
       case IET_REL64_EXPORT:
       case IET_IMM64_EXPORT:
-	tempex=CAlloc(sizeof(CHashExport));
-	tempex->str=StrNew(st_ptr);
-	tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
+	tmpex=CAlloc(sizeof(CHashExport));
+	tmpex->str=StrNew(st_ptr);
+	tmpex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
 	if (etype==IET_IMM32_EXPORT||etype==IET_IMM64_EXPORT)
-	  tempex->val=i;
+	  tmpex->val=i;
 	else
-	  tempex->val=i+module_base;
-	HashAdd(tempex,Fs->hash_table);
+	  tmpex->val=i+module_base;
+	HashAdd(tmpex,Fs->hash_table);
 	SysSymImportsResolve(st_ptr,ld_flags);
 	break;
       case IET_REL_I0...IET_IMM_I64:
@@ -113,11 +113,11 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	  break;
       end:
 	if (*st_ptr) {
-	  tempex=CAlloc(sizeof(CHashExport));
-	  tempex->str=StrNew(st_ptr);
-	  tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
-	  tempex->val=ptr3;
-	  HashAdd(tempex,Fs->hash_table);
+	  tmpex=CAlloc(sizeof(CHashExport));
+	  tmpex->str=StrNew(st_ptr);
+	  tmpex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
+	  tmpex->val=ptr3;
+	  HashAdd(tmpex,Fs->hash_table);
 	}
 	cnt=i;
 	for (j=0;j<cnt;j++) {
@@ -135,11 +135,11 @@ U0 LoadPass1(U8 *src,U8 *module_base,I64 ld_flags)
 	  break;
       end:
 	if (*st_ptr) {
-	  tempex=CAlloc(sizeof(CHashExport));
-	  tempex->str=StrNew(st_ptr);
-	  tempex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
-	  tempex->val=ptr3;
-	  HashAdd(tempex,Fs->hash_table);
+	  tmpex=CAlloc(sizeof(CHashExport));
+	  tmpex->str=StrNew(st_ptr);
+	  tmpex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
+	  tmpex->val=ptr3;
+	  HashAdd(tmpex,Fs->hash_table);
 	}
 	cnt=i;
 	for (j=0;j<cnt;j++) {

@@ -17,13 +17,13 @@ I64 HashEntriesCompare(CWho *h1,CWho *h2)
 
 I64 HashEntriesCompare2(CWho *h1,CWho *h2)
 {
-  CHashFun *tempf1=h1->h,*tempf2=h2->h;
-  I64 i1=HashVal(tempf1),i2=HashVal(tempf2);
+  CHashFun *tmpf1=h1->h,*tmpf2=h2->h;
+  I64 i1=HashVal(tmpf1),i2=HashVal(tmpf2);
   if (i1==i2) {
-    i1=HashTypeNum(tempf1);
-    i2=HashTypeNum(tempf2);
+    i1=HashTypeNum(tmpf1);
+    i2=HashTypeNum(tmpf2);
     if (i1==i2)
-      return StrCmp(tempf1->str,tempf2->str);
+      return StrCmp(tmpf1->str,tmpf2->str);
   }
   return i1-i2;
 }
@@ -67,7 +67,7 @@ U8 *HelpIndexStr(U8 **_ptr,U8 *idx)
   return NULL;
 }
 
-U8 *HelpComment(CTask *task,CHash *temph,U8 *_src_link)
+U8 *HelpComment(CTask *task,CHash *tmph,U8 *_src_link)
 {
   CDoc *doc;
   CDocEntry *doc_e;
@@ -80,9 +80,9 @@ U8 *HelpComment(CTask *task,CHash *temph,U8 *_src_link)
 
   doc=DocPut(task);
   doc_e=doc->cur_entry;
-  if (temph->type&HTT_FUN) {
-    if (Bt(&temph(CHashFun *)->flags,Ff__EXTERN) ||
-	  Bt(&temph(CHashFun *)->flags,Ff_INTERNAL))
+  if (tmph->type&HTT_FUN) {
+    if (Bt(&tmph(CHashFun *)->flags,Ff__EXTERN) ||
+	  Bt(&tmph(CHashFun *)->flags,Ff_INTERNAL))
       while (doc_e!=doc &&
 	    (!(doc_e->de_flags&DOCEF_TAG)||!StrOcc(doc_e->tag,';')))
 	doc_e=doc_e->next;
@@ -153,7 +153,7 @@ U8 *idx=NULL,CDoc *doc=NULL)
   // "+m" to order by number (normally alphabetical)
   // "-r" just local hash table
   CHashTable *table;
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   CHashGeneric *ptr;
   CWho *lst;
   I64 cnt,i,j,k,f=0;
@@ -182,16 +182,16 @@ U8 *idx=NULL,CDoc *doc=NULL)
   table=h;
   while (table) {
     for (i=0;i<=table->mask;i++) {
-      temph=table->body[i];
-      while (temph) {
-	if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	      (temph->type & HTF_PUBLIC || !publics)) {
+      tmph=table->body[i];
+      while (tmph) {
+	if (!(tmph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
+	      (tmph->type & HTF_PUBLIC || !publics)) {
 	  if (!idx)
 	    cnt++;
-	  else if (temph->type&HTG_SRC_SYM && (cur_idx=temph->idx))
+	  else if (tmph->type&HTG_SRC_SYM && (cur_idx=tmph->idx))
 	    cnt+=HelpIndexCnt(cur_idx,idx);
 	}
-	temph=temph->next;
+	tmph=tmph->next;
       }
     }
     if (recurse)
@@ -206,19 +206,19 @@ U8 *idx=NULL,CDoc *doc=NULL)
   table=h;
   while (table) {
     for (i=0;i<=table->mask;i++) {
-      temph=table->body[i];
-      while (temph) {
-	if (!(temph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
-	      (temph->type & HTF_PUBLIC || !publics))
+      tmph=table->body[i];
+      while (tmph) {
+	if (!(tmph->type & (HTF_IMPORT | HTF_PRIVATE)) &&
+	      (tmph->type & HTF_PUBLIC || !publics))
 	  if (!idx)
-	    lst[j++].h=temph;
-	  else if (temph->type&HTG_SRC_SYM && (cur_idx=temph->idx) &&
+	    lst[j++].h=tmph;
+	  else if (tmph->type&HTG_SRC_SYM && (cur_idx=tmph->idx) &&
 		(k=HelpIndexCnt(cur_idx,idx)))
 	    while (k--) {
 	      lst[j].idx=HelpIndexStr(&cur_idx,idx);
-	      lst[j++].h=temph;
+	      lst[j++].h=tmph;
 	    }
-	temph=temph->next;
+	tmph=tmph->next;
       }
     }
     if (recurse)
@@ -331,13 +331,13 @@ public I64 HashDepthRep(CHashTable *table=NULL)
 {//Hash table linked-list chain depth report.
 //Histogram of collision count.
   I64 i,j,longest=0,cnt=0,a[HDR_MAX];
-  CHash *temph;
+  CHash *tmph;
   if (!table) table=Fs->hash_table;
   MemSet(a,0,sizeof(a));
   for (i=0;i<=table->mask;i++) {
-    temph=table->body[i];
-    if (temph) {
-      j=LinkedLstCnt(temph);
+    tmph=table->body[i];
+    if (tmph) {
+      j=LinkedLstCnt(tmph);
       if (j<HDR_MAX)
 	a[j]++;
       cnt+=j;
@@ -377,14 +377,14 @@ public U0 MapFileLoad(U8 *filename)
 	*absname=FileNameAbs(name);
   CDoc *doc=DocRead(name);
   CDocEntry *doc_e;
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   I64 i,j,base=0;
   CDbgInfo *dbg_info;
 
   FileExtRem(absname);
   if (absname[1]==':' && StrLen(absname)>2 &&
-	(temph=HashSingleTableFind(absname+2,Fs->hash_table,HTT_MODULE)))
-    base=temph(CHashGeneric *)->user_data0+sizeof(CBinFile);
+	(tmph=HashSingleTableFind(absname+2,Fs->hash_table,HTT_MODULE)))
+    base=tmph(CHashGeneric *)->user_data0+sizeof(CBinFile);
 
   if (!doc) return;
   doc_e=doc->head.next;
@@ -394,11 +394,11 @@ public U0 MapFileLoad(U8 *filename)
 	st=MStrUtil(doc_e->tag,SUF_REM_TRAILING);
       else
 	st=MStrUtil(doc_e->aux_str,SUF_REM_TRAILING);
-      if (temph=HashSingleTableFind(st,Fs->hash_table,HTG_SRC_SYM)) {
+      if (tmph=HashSingleTableFind(st,Fs->hash_table,HTG_SRC_SYM)) {
 	if (*doc_e->tag) {
-	  Free(temph->src_link);
-	  temph->src_link=doc_e->aux_str;
-	  ptr=temph->src_link;
+	  Free(tmph->src_link);
+	  tmph->src_link=doc_e->aux_str;
+	  ptr=tmph->src_link;
 	  if (ptr[0] && ptr[1] && ptr[2]==':') {
 	    if (ptr[3]==':')
 	      ptr[3]=blkdev.boot_drv_let;
@@ -407,14 +407,14 @@ public U0 MapFileLoad(U8 *filename)
 	  }
 	  doc_e->aux_str=NULL;
 	}
-	if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM) &&
-	      !(dbg_info=temph->dbg_info) && doc_e->bin_data &&
+	if (tmph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM) &&
+	      !(dbg_info=tmph->dbg_info) && doc_e->bin_data &&
 	      (dbg_info=doc_e->bin_data->data)) {
 	  if (doc_e->bin_data->size>MSize(dbg_info))
 	    "Corrupt Map Entry\n";
 	  else {
 	    doc_e->bin_data->data=NULL;
-	    temph->dbg_info=dbg_info;
+	    tmph->dbg_info=dbg_info;
 	    for (i=dbg_info->min_line;i<=dbg_info->max_line+1;i++) {
 	      j=i-dbg_info->min_line;
 	      if (dbg_info->body[j])

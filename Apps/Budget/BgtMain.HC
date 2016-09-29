@@ -3,30 +3,30 @@ extern U0 BgtRegen();
 Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
 {//ch=ASCII; sc=scan_code
   no_warn sc;
-  CBgtEntry *tempb,*tempb1;
-  CBgtTemplate *tempt,*tempt1;
+  CBgtEntry *tmpb,*tmpb1;
+  CBgtTemplate *tmpt,*tmpt1;
   CDocEntry *doc_ce;
   U8 *st;
   switch (ch) {
     case '\n':
       if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
 	    doc_ce->type_u8==DOCT_MENU_VAL) {
-	tempb=doc_ce->user_data;
-	if (tempt=tempb->template) {
-	  if (tempt1=BgtTemplatePmt(tempt)) {
-	    QueRem(tempt);
-	    BgtTemplatePurge(tempt);
-	    BgtEntryDel2(&tempt->b);
-	    Free(tempt);
-	    QueIns(tempt1,t_head.last);
-	    BgtTemplateExpand(tempt1);
+	tmpb=doc_ce->user_data;
+	if (tmpt=tmpb->template) {
+	  if (tmpt1=BgtTemplatePmt(tmpt)) {
+	    QueRem(tmpt);
+	    BgtTemplatePurge(tmpt);
+	    BgtEntryDel2(&tmpt->b);
+	    Free(tmpt);
+	    QueIns(tmpt1,t_head.last);
+	    BgtTemplateExpand(tmpt1);
 	    BgtRegen;
 	  }
 	} else {
-	  if (tempb1=BgtEntryPmt(tempb)) {
-	    QueRem(tempb);
-	    BgtEntryDel(tempb);
-	    BgtIns(tempb1);
+	  if (tmpb1=BgtEntryPmt(tmpb)) {
+	    QueRem(tmpb);
+	    BgtEntryDel(tmpb);
+	    BgtIns(tmpb1);
 	    BgtRegen;
 	  }
 	}
@@ -35,15 +35,15 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
     case CH_CTRLY:
       if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
 	    doc_ce->type_u8==DOCT_MENU_VAL) {
-	tempb=doc_ce->user_data;
-	if (tempt=tempb->template) {
-	  QueRem(tempt);
-	  BgtTemplatePurge(tempt);
-	  BgtEntryDel2(&tempt->b);
-	  Free(tempt);
+	tmpb=doc_ce->user_data;
+	if (tmpt=tmpb->template) {
+	  QueRem(tmpt);
+	  BgtTemplatePurge(tmpt);
+	  BgtEntryDel2(&tmpt->b);
+	  Free(tmpt);
 	} else {
-	  QueRem(tempb);
-	  BgtEntryDel(tempb);
+	  QueRem(tmpb);
+	  BgtEntryDel(tmpb);
 	}
 	BgtRegen;
       }
@@ -64,26 +64,26 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       }
       return TRUE;
     case 'n':
-      if (tempb1=BgtEntryPmt) {
-	BgtIns(tempb1);
+      if (tmpb1=BgtEntryPmt) {
+	BgtIns(tmpb1);
 	BgtRegen;
       }
       return TRUE;
     case 't':
-      if (tempt1=BgtTemplatePmt) {
-	QueIns(tempt1,t_head.last);
-	BgtTemplateExpand(tempt1);
+      if (tmpt1=BgtTemplatePmt) {
+	QueIns(tmpt1,t_head.last);
+	BgtTemplateExpand(tmpt1);
 	BgtRegen;
       }
       return TRUE;
     case 'c':
       if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
 	    doc_ce->type_u8==DOCT_MENU_VAL)
-	tempb=doc_ce->user_data;
+	tmpb=doc_ce->user_data;
       else
-	tempb=NULL;
-      if (tempb1=BgtEntryPmt(tempb)) {
-	BgtIns(tempb1);
+	tmpb=NULL;
+      if (tmpb1=BgtEntryPmt(tmpb)) {
+	BgtIns(tmpb1);
 	BgtRegen;
       }
       return TRUE;
@@ -97,24 +97,24 @@ U0 BgtRegen()
   F64 balance=0;
   CDoc *doc,*pdoc,*ddoc;
   CDocEntry *doc_ce;
-  CBgtEntry *tempb=b_head.next,*tempb_ce;
+  CBgtEntry *tmpb=b_head.next,*tmpb_ce;
   doc=DocNew;
   doc->flags|=DOCF_FORM;
-  while (tempb!=&b_head) {
-    if (!StrCmp(view_acct,tempb->credit))
-      balance-=tempb->amount;
-    if (!StrCmp(view_acct,tempb->debit))
-      balance+=tempb->amount;
-    c=BgtAcctColor(tempb->credit);
+  while (tmpb!=&b_head) {
+    if (!StrCmp(view_acct,tmpb->credit))
+      balance-=tmpb->amount;
+    if (!StrCmp(view_acct,tmpb->debit))
+      balance+=tmpb->amount;
+    c=BgtAcctColor(tmpb->credit);
     if (c!=color) {
       color=c;
       DocPrint(doc,"$$FG,%d$$",color);
     }
-    tempb->doc_e=DocPrint(doc,
+    tmpb->doc_e=DocPrint(doc,
 	  "$$MU-UL,\"%D %8ts %8ts:%8.2f %8.2f:%$$Q\",U=0x%X$$\n",
-	  tempb->date,tempb->credit,tempb->debit,balance,
-	  tempb->amount,tempb->desc,tempb);
-    tempb=tempb->next;
+	  tmpb->date,tmpb->credit,tmpb->debit,balance,
+	  tmpb->amount,tmpb->desc,tmpb);
+    tmpb=tmpb->next;
   }
   DocRecalc(doc);
 
@@ -130,19 +130,19 @@ U0 BgtRegen()
     doc_ce=pdoc->cur_entry;
     timeout_jiffy=cnts.jiffies+JIFFY_FREQ; //Max one second.
     while (doc_ce!=pdoc && cnts.jiffies<timeout_jiffy) {
-      while (doc_ce->type_u8!=DOCT_MENU_VAL || !(tempb_ce=doc_ce->user_data)) {
+      while (doc_ce->type_u8!=DOCT_MENU_VAL || !(tmpb_ce=doc_ce->user_data)) {
 	doc_ce=doc_ce->next;
 	if (doc_ce==pdoc) goto br_cont;
       }
-      tempb=b_head.next;
-      while (tempb!=&b_head) {
-	if (tempb==tempb_ce) {
-	  doc->cur_entry=tempb->doc_e;
+      tmpb=b_head.next;
+      while (tmpb!=&b_head) {
+	if (tmpb==tmpb_ce) {
+	  doc->cur_entry=tmpb->doc_e;
 	  doc->cur_col=0;
 	  DocCenter(doc);
 	  goto br_cont;
 	}
-	tempb=tempb->next;
+	tmpb=tmpb->next;
       }
       doc_ce=doc_ce->next;
     }

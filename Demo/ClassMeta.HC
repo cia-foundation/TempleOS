@@ -29,14 +29,14 @@ class Test2Struct
 
 U0 DumpStruct(U8 *_d,U8 *class_name=lastclass)
 {//lastclass is keyword.  See $LK,"::/Demo/LastClass.HC"$.
-  CHashClass *tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS);
+  CHashClass *tmpc=HashFind(class_name,Fs->hash_table,HTT_CLASS);
   U8 *print_str;
   I64 *q,dft_val;
   U0 (* fp_output_fun)(I64 i);
   F64 percentile;
-  if (!tempc) return;
+  if (!tmpc) return;
   CMemberLst *ml;
-  ml=tempc->member_lst_and_root;
+  ml=tmpc->member_lst_and_root;
   while (ml) {
     "%s:",ml->str;
 

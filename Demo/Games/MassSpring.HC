@@ -11,22 +11,22 @@ CMathODE *ode=NULL;
 
 U0 DrawIt(CTask *,CDC *dc)
 {
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
 
   dc->color=RED;
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    GrLine(dc,temps->end1->x,temps->end1->y,
-	  temps->end2->x,temps->end2->y);
-    temps=temps->next;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    GrLine(dc,tmps->end1->x,tmps->end1->y,
+	  tmps->end2->x,tmps->end2->y);
+    tmps=tmps->next;
   }
 
   dc->color=BLACK;
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    GrCircle(dc,tempm->x,tempm->y,tempm->radius);
-    tempm=tempm->next;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    GrCircle(dc,tmpm->x,tmpm->y,tmpm->radius);
+    tmpm=tmpm->next;
   }
 }
 
@@ -36,46 +36,46 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   //We can add new forces here.
   F64 d,dd;
   CD3 p;
-  MyMass *tempm1,*tempm2;
+  MyMass *tmpm1,*tmpm2;
 
-  tempm1=ode->next_mass;
-  while (tempm1!=&ode->next_mass) {
-    tempm2=tempm1->next;
-    while (tempm2!=&ode->next_mass) {
-      D3Sub(&p,&tempm2->state->x,&tempm1->state->x);
+  tmpm1=ode->next_mass;
+  while (tmpm1!=&ode->next_mass) {
+    tmpm2=tmpm1->next;
+    while (tmpm2!=&ode->next_mass) {
+      D3Sub(&p,&tmpm2->state->x,&tmpm1->state->x);
       dd=D3NormSqr(&p);
-      if (dd<=Sqr(tempm1->radius+tempm2->radius)) {
+      if (dd<=Sqr(tmpm1->radius+tmpm2->radius)) {
 	d=Sqrt(dd)+0.0001;
-	dd=10.0*Sqr(Sqr(Sqr(tempm1->radius+tempm2->radius)-dd));
+	dd=10.0*Sqr(Sqr(Sqr(tmpm1->radius+tmpm2->radius)-dd));
 	D3MulEqu(&p,dd/d);
-	D3AddEqu(&tempm2->DstateDt->DxDt,&p);
-	D3SubEqu(&tempm1->DstateDt->DxDt,&p);
+	D3AddEqu(&tmpm2->DstateDt->DxDt,&p);
+	D3SubEqu(&tmpm1->DstateDt->DxDt,&p);
       }
-      tempm2=tempm2->next;
+      tmpm2=tmpm2->next;
     }
-    tempm1=tempm1->next;
+    tmpm1=tmpm1->next;
   }
 }
 
 U0 PlaceMass(I64 x, I64 y)
 {
-  MyMass *tempm=CAlloc(sizeof(MyMass));
-  tempm->mass=1.0;
-  tempm->drag_profile_factor=100.0;
-  tempm->x=x;
-  tempm->y=y;
-  tempm->radius=10*(Rand+0.25);
-  QueIns(tempm,ode->last_mass);
+  MyMass *tmpm=CAlloc(sizeof(MyMass));
+  tmpm->mass=1.0;
+  tmpm->drag_profile_factor=100.0;
+  tmpm->x=x;
+  tmpm->y=y;
+  tmpm->radius=10*(Rand+0.25);
+  QueIns(tmpm,ode->last_mass);
 }
 
-U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
+U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
 {
-  MySpring *temps=CAlloc(sizeof(MySpring));
-  temps->end1=tempm1;
-  temps->end2=tempm2;
-  temps->const=10000;
-  temps->rest_len=100;
-  QueIns(temps,ode->last_spring);
+  MySpring *tmps=CAlloc(sizeof(MySpring));
+  tmps->end1=tmpm1;
+  tmps->end2=tmpm2;
+  tmps->const=10000;
+  tmps->rest_len=100;
+  QueIns(tmps,ode->last_spring);
 }
 
 U0 Init()
@@ -100,7 +100,7 @@ U0 CleanUp()
 U0 MassSpringDemo()
 {
   I64 msg_code,a1,a2;
-  MyMass *tempm1=NULL,*tempm2=NULL;
+  MyMass *tmpm1=NULL,*tmpm2=NULL;
 
   PopUpOk("Left-Click to place mas\n"
 	"Right-Click and drag to\n"
@@ -137,13 +137,13 @@ U0 MassSpringDemo()
 	  PlaceMass(a1,a2);
 	  break;
 	case MSG_IP_R_DOWN:
-	  tempm1=MassFind(ode,a1,a2);
-	  tempm2=NULL;
+	  tmpm1=MassFind(ode,a1,a2);
+	  tmpm2=NULL;
 	  break;
 	case MSG_IP_R_UP:
-	  if (tempm1 && (tempm2=MassFind(ode,a1,a2)) && tempm1!=tempm2)
-	    PlaceSpring(tempm1,tempm2);
-	  tempm1=tempm2=NULL;
+	  if (tmpm1 && (tmpm2=MassFind(ode,a1,a2)) && tmpm1!=tmpm2)
+	    PlaceSpring(tmpm1,tmpm2);
+	  tmpm1=tmpm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
 	  switch (a1) {

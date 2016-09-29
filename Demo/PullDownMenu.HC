@@ -6,7 +6,7 @@
 U0 PullDownMenuDemo()
 {
   I64 msg_code,a1,a2;
-  CMenuEntry *tempse;
+  CMenuEntry *tmpse;
 
   MenuPush(
 	"File {"
@@ -30,7 +30,7 @@ U0 PullDownMenuDemo()
 
   "A pull-down menu will appear "
 	"if you move the mouse to the top "
-	"of the screen.\n\n";
+	"of the scrn.\n\n";
 
   do {
     msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_CMD);
@@ -70,13 +70,13 @@ U0 PullDownMenuDemo()
 	switch (a1) {
 	  case M_OPTION1:
 	    "Option # 1\n";
-	    if (tempse=MenuEntryFind(Fs->cur_menu,"Misc/Opt1"))
-	      tempse->checked=!tempse->checked;
+	    if (tmpse=MenuEntryFind(Fs->cur_menu,"Misc/Opt1"))
+	      tmpse->checked=!tmpse->checked;
 	    break;
 	  case M_OPTION2:
 	    "Option # 2\n";
-	    if (tempse=MenuEntryFind(Fs->cur_menu,"Misc/Opt2"))
-	      tempse->checked=!tempse->checked;
+	    if (tmpse=MenuEntryFind(Fs->cur_menu,"Misc/Opt2"))
+	      tmpse->checked=!tmpse->checked;
 	    break;
 	}
 	break;

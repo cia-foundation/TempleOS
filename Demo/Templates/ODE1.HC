@@ -11,15 +11,15 @@ CMathODE *ode=NULL;
 
 U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 {
-  MyMass *tempm1,*tempm2;
+  MyMass *tmpm1,*tmpm2;
 
-  tempm1=ode->next_mass;
-  while (tempm1!=&ode->next_mass) {
-    tempm2=tempm1->next;
-    while (tempm2!=&ode->next_mass) {
-      tempm2=tempm2->next;
+  tmpm1=ode->next_mass;
+  while (tmpm1!=&ode->next_mass) {
+    tmpm2=tmpm1->next;
+    while (tmpm2!=&ode->next_mass) {
+      tmpm2=tmpm2->next;
     }
-    tempm1=tempm1->next;
+    tmpm1=tmpm1->next;
   }
 }
 

@@ -13,32 +13,32 @@ Node *root;
 #define Y_SPACING	45
 #define ARROW_SPACING	3
  
-U0 ShowTree(CDC *dc,Node *tempn,I64 *_node_x,I64 *_tree_x,I64 y)
+U0 ShowTree(CDC *dc,Node *tmpn,I64 *_node_x,I64 *_tree_x,I64 y)
 {
   I64 node_x;
-  if (tempn) {
-    if (tempn->left) {
-      ShowTree(dc,tempn->left,&node_x,_tree_x,y+Y_SPACING);
+  if (tmpn) {
+    if (tmpn->left) {
+      ShowTree(dc,tmpn->left,&node_x,_tree_x,y+Y_SPACING);
       dc->color=BLUE;
       GrArrow3(dc,*_tree_x,y,0,
 	    node_x+ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
     }
-    if (tempn->n==n1 || tempn->n==n2) {
-      if (tempn->n==common_ancestor)
+    if (tmpn->n==n1 || tmpn->n==n2) {
+      if (tmpn->n==common_ancestor)
 	dc->color=YELLOW;
       else
 	dc->color=RED;
-    } else if (tempn->n==common_ancestor)
+    } else if (tmpn->n==common_ancestor)
       dc->color=GREEN;
     else
       dc->color=BLUE;
 
     *_node_x=*_tree_x;
-    GrPrint(dc,*_node_x,y,"%d",tempn->n);
+    GrPrint(dc,*_node_x,y,"%d",tmpn->n);
     *_tree_x+=X_SPACING;
 
-    if (tempn->right) {
-      ShowTree(dc,tempn->right,&node_x,_tree_x,y+Y_SPACING);
+    if (tmpn->right) {
+      ShowTree(dc,tmpn->right,&node_x,_tree_x,y+Y_SPACING);
       dc->color=BLUE;
       GrArrow3(dc,*_node_x,y,0,
 	    node_x-ARROW_SPACING,y+Y_SPACING-ARROW_SPACING,0);
@@ -52,33 +52,33 @@ U0 DrawIt(CTask *,CDC *dc)
   ShowTree(dc,root,&node_x,&tree_x,20);
 }
 
-U0 TreeAdd(Node **_root,Node *tempn)
+U0 TreeAdd(Node **_root,Node *tmpn)
 {
   Node *root=*_root;
   if (!root)
-    *_root=tempn;
-  else if (tempn->n==root->n)
-    Free(tempn);
-  else if (tempn->n<root->n)
-    TreeAdd(&root->left,tempn);
+    *_root=tmpn;
+  else if (tmpn->n==root->n)
+    Free(tmpn);
+  else if (tmpn->n<root->n)
+    TreeAdd(&root->left,tmpn);
   else
-    TreeAdd(&root->right,tempn);
+    TreeAdd(&root->right,tmpn);
 }
 
 U0 TreeNew()
 {
   I64 i;
-  Node *tempn;
+  Node *tmpn;
   for (i=0;i<N;i++) {
-    tempn=CAlloc(sizeof(Node));
-    tempn->n=RandU16%N;
+    tmpn=CAlloc(sizeof(Node));
+    tmpn->n=RandU16%N;
 
     if (i==N-1)
-      n1=tempn->n;
+      n1=tmpn->n;
     else if (i==N-2)
-      n2=tempn->n;
+      n2=tmpn->n;
 
-    TreeAdd(&root,tempn);
+    TreeAdd(&root,tmpn);
     Sleep(50);
   }
 }

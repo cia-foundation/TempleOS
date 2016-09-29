@@ -12,13 +12,13 @@ I64 MPSum(I64 my_mp_cnt)
 
 I64 Sum(I64 n,I64 my_mp_cnt)
 {
-  CSrvCmd *tempm[MP_MAX_PROCESSORS];
+  CSrvCmd *tmpm[MP_MAX_PROCESSORS];
   I64 res=0,i;
   mp_n=n+1;
   for (i=0;i<my_mp_cnt;i++)
-    tempm[i]=JobQue(&MPSum,my_mp_cnt,i,0);
+    tmpm[i]=JobQue(&MPSum,my_mp_cnt,i,0);
   for (i=0;i<my_mp_cnt;i++)
-    res+=JobResGet(tempm[i]);
+    res+=JobResGet(tmpm[i]);
   return res;
 }
 

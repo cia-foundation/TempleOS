@@ -98,7 +98,7 @@ U0 CircleTrace()
 	  //window mgr calls the UpdateWin() routine
 	  //and places msgs in the que, so there's
 	  //no need to do anything until the window mgr runs.
-	  WinMgrSync;
+	  Refresh;
 
 	} while (msg_code!=MSG_IP_L_UP);
 	music.mute=TRUE; Sleep(200);

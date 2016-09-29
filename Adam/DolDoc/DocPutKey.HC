@@ -364,8 +364,11 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	  if (!(sc&SCF_SHIFT)) {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Edit/Save As");
-	    else
-	      DocWrite(doc,TRUE);
+	    else if (DocWrite(doc,TRUE)&&(st=FileNameAbs(doc->filename.name))) {
+	      DirContextDel(doc->filename.dirc);
+	      doc->filename.dirc=DirContextNew(st);
+	      Free(st);
+	    }
 	  }
 	  break;
 	case CH_CTRLB:

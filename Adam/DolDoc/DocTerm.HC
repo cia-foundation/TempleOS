@@ -61,7 +61,7 @@ public U0 DocTermNew()
 #define RIGHT_ED	6
 #define RIGHT_MOUNT	7
 #define RIGHT_PLAIN	8
-#define RIGHT_AUTOFILE	9
+#define RIGHT_INFILE	9
 
 I64 PopUpTermRight(U8 *header)
 {
@@ -69,19 +69,19 @@ I64 PopUpTermRight(U8 *header)
   CDoc *doc=DocNew;
   if (header) DocPrint(doc,"%s",header);
   DocPrint(doc,"\n\n"
-	"TXT=%s\nJIT=%s\nGRA=%s"
-	"$$CM+LX,1,3 $$$$BT,\"INCLUDE          JIT\",LE=RIGHT_INCLUDE$$"
-	"$$CM+LX,26,0$$$$BT,\"ADAM_INCLUDE     JIT\",LE=RIGHT_AINCLUDE$$"
-	"$$CM+LX,1,3 $$$$BT,\"COPY                \",LE=RIGHT_COPY$$"
-	"$$CM+LX,26,0$$$$BT,\"MOVE OR RENAME      \",LE=RIGHT_MOVE$$"
-	"$$CM+LX,1,3 $$$$BT,\"DELETE              \",LE=RIGHT_DELETE$$"
-	"$$CM+LX,26,0$$$$BT,\"TYPE         TXT;GRA\",LE=RIGHT_TYPE$$"
-	"$$CM+LX,1,3 $$$$BT,\"ED               TXT\",LE=RIGHT_ED$$"
-	"$$CM+LX,26,0$$$$BT,\"MOUNT          ISO.C\",LE=RIGHT_MOUNT$$"
-	"$$CM+LX,1,3 $$$$BT,\"PLAIN ED         TXT\",LE=RIGHT_PLAIN$$"
-	"$$CM+LX,26,0$$$$BT,\"AUTOFILE         AUT\",LE=RIGHT_AUTOFILE$$\n"
-	"$$CM+LX,1,3 $$$$BT,\"CANCEL              \",LE=DOCM_CANCEL$$",
-	FILEMASK_TXT,FILEMASK_JIT,FILEMASK_GRA);
+	"TXT=%s\nDD =%s\nJIT=%s\nGR =%s"
+	"$$CM+LX,1,3 $$$$BT,\"INCLUDE           JIT\",LE=RIGHT_INCLUDE$$"
+	"$$CM+LX,25,0$$$$BT,\"ADAM_INCLUDE      JIT\",LE=RIGHT_AINCLUDE$$"
+	"$$CM+LX,1,3 $$$$BT,\"COPY                 \",LE=RIGHT_COPY$$"
+	"$$CM+LX,25,0$$$$BT,\"MOVE OR RENAME       \",LE=RIGHT_MOVE$$"
+	"$$CM+LX,1,3 $$$$BT,\"DELETE               \",LE=RIGHT_DELETE$$"
+	"$$CM+LX,25,0$$$$BT,\"TYPE           TXT;GR\",LE=RIGHT_TYPE$$"
+	"$$CM+LX,1,3 $$$$BT,\"DOLDOC EDIT        DD\",LE=RIGHT_ED$$"
+	"$$CM+LX,25,0$$$$BT,\"MOUNT           ISO.C\",LE=RIGHT_MOUNT$$"
+	"$$CM+LX,1,3 $$$$BT,\"PLAIN TEXT EDIT   TXT\",LE=RIGHT_PLAIN$$"
+	"$$CM+LX,25,0$$$$BT,\"INFILE             IN\",LE=RIGHT_INFILE$$"
+	"$$CM+LX,1,3 $$$$BT,\"CANCEL               \",LE=DOCM_CANCEL$$\n",
+	FILEMASK_TXT,FILEMASK_DD,FILEMASK_JIT,FILEMASK_GR);
   i=PopUpMenu(doc);
   DocDel(doc);
   return i;
@@ -159,6 +159,12 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    res=Type(st);
 	    break;
 	  case RIGHT_ED:
+	    if (FileExtDot(st) && !FilesFindMatch(st,FILEMASK_DD)) {
+	      if (!PopUpCancelOk(ST_WARN_ST "Not DolDoc File\n\n")) {
+		send_new_line=TRUE;
+		break;
+	      }
+	    }
 	    "Ed(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    res=Ed(st);
 	    break;
@@ -178,16 +184,16 @@ I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e)
 	    "Plain(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    res=Plain(st);
 	    break;
-	  case RIGHT_AUTOFILE:
-	    if (FileExtDot(st) && !FilesFindMatch(st,"*.AUT*")) {
-	      if (!PopUpCancelOk(ST_WARN_ST "Not .AUT File\n\n")) {
+	  case RIGHT_INFILE:
+	    if (FileExtDot(st) && !FilesFindMatch(st,"*.IN*")) {
+	      if (!PopUpCancelOk(ST_WARN_ST "Not .IN File\n\n")) {
 		send_new_line=TRUE;
 		break;
 	      }
 	    }
-	    "AutoFile(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
+	    "InFile(\"%s\");\n$$PT$$$$FG$$$$BG$$",st;
 	    WinZBufUpdate;
-	    AutoFile(st);
+	    InFile(st);
 	    res=TRUE;
 	    break;
 	}

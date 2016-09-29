@@ -96,7 +96,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 }
 
-Unit *FindUnit(I64 x,I64 y,I64 player)
+Unit *UnitFind(I64 x,I64 y,I64 player)
 {
   I64 i,dd,best_dd=MAX_I64;
   Unit *res=NULL;
@@ -112,7 +112,7 @@ Unit *FindUnit(I64 x,I64 y,I64 player)
   return res;
 }
 
-U0 CheckForKills(I64 x1,I64 y1,I64 player)
+U0 KillsChk(I64 x1,I64 y1,I64 player)
 {
   I64 i,j,x2,y2,dd;
   Bool found;
@@ -141,7 +141,7 @@ U0 CheckForKills(I64 x1,I64 y1,I64 player)
   }
 }
 
-Bool MoveUnit(Unit *tempu,I64 x2,I64 y2)
+Bool UnitMove(Unit *tmpu,I64 x2,I64 y2)
 {
   I64 i,r,c,r2,c2,x=start_x,y=start_y;
   S2W(&x2,&y2);
@@ -151,8 +151,8 @@ Bool MoveUnit(Unit *tempu,I64 x2,I64 y2)
     c=x; r=y;
     S2Circle(&c,&r);
     if (c==c2 && r==r2) {
-      end_x=tempu->x=x2;
-      end_y=tempu->y=y2;
+      end_x=tmpu->x=x2;
+      end_y=tmpu->y=y2;
       return TRUE;
     }
     if (r2!=r) {
@@ -284,7 +284,7 @@ U0 CleanUp()
 U0 TreeCheckers()
 {
   I64 msg_code,a1,a2,ch,sc;
-  Unit *tempu;
+  Unit *tmpu;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   MenuPush(
@@ -307,7 +307,7 @@ U0 TreeCheckers()
   try {
 cn_start:
     Init;
-    tempu=NULL;
+    tmpu=NULL;
     show_start=FALSE;
     Fs->draw_it=&DrawIt;
     while (TRUE) {
@@ -326,21 +326,21 @@ cn_start:
 	  break;
 	case MSG_IP_L_DOWN:
 	  if (num_alive[0]>1 && num_alive[1]>1) {
-	    tempu=FindUnit(a1,a2,cur_player);
-	    end_x=start_x=tempu->x;
-	    end_y=start_y=tempu->y;
+	    tmpu=UnitFind(a1,a2,cur_player);
+	    end_x=start_x=tmpu->x;
+	    end_y=start_y=tmpu->y;
 	    show_start=TRUE;
 	  }
 	  break;
 	case MSG_IP_MOVE:
-	  if (tempu)
-	    MoveUnit(tempu,a1,a2);
+	  if (tmpu)
+	    UnitMove(tmpu,a1,a2);
 	  break;
 	case MSG_IP_L_UP:
-	  MoveUnit(tempu,a1,a2);
-	  CheckForKills(tempu->x,tempu->y,cur_player);
+	  UnitMove(tmpu,a1,a2);
+	  KillsChk(tmpu->x,tmpu->y,cur_player);
 	  show_start=FALSE;
-	  tempu=NULL;
+	  tmpu=NULL;
 	  cur_player=1-cur_player;
 	  break;
       }

@@ -5,7 +5,7 @@ acd.has_defs =FileFind(ACD_DEF_FILENAME)||FileFind(ACD_DEF_FILENAME_Z);
 public U0 ACDWordsLoad()
 {//Put words from word list into hash table.
   I64 size;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   U8 *in_ptr,*in_start,*st2;
   U16 *d;
   acd.num_words=0;
@@ -21,17 +21,17 @@ public U0 ACDWordsLoad()
 	in_ptr++;
       if (*in_ptr) {
 	st2=MStrUtil(in_ptr,SUF_TO_UPPER);
-	temph=ACAlloc(sizeof(CHashGeneric)+StrLen(st2)+1);
-	StrCpy(temph+1,st2);
+	tmph=ACAlloc(sizeof(CHashGeneric)+StrLen(st2)+1);
+	StrCpy(tmph+1,st2);
 	Free(st2);
 	in_ptr+=StrLen(in_ptr)+1;
-	temph->str=temph+1;
-	temph->use_cnt=1;
-	temph->type=HTT_DICT_WORD;
+	tmph->str=tmph+1;
+	tmph->use_cnt=1;
+	tmph->type=HTT_DICT_WORD;
 	d=in_ptr;
-	temph->user_data0=*d;
+	tmph->user_data0=*d;
 	in_ptr+=2;
-	HashAdd(temph,ac.hash_table);
+	HashAdd(tmph,ac.hash_table);
 	acd.num_words++;
       } else
 	in_ptr+=3;
@@ -43,19 +43,19 @@ public U0 ACDWordsLoad()
 #help_index "AutoComplete"
 CHashAC *ACHashAdd(U8 *w)
 {
-  CHashAC *tempw=HashFind(w,ac.hash_table,HTT_WORD);
-  if (tempw) {
-    tempw->hits++;
-    return tempw;
+  CHashAC *tmpw=HashFind(w,ac.hash_table,HTT_WORD);
+  if (tmpw) {
+    tmpw->hits++;
+    return tmpw;
   }
-  tempw=ACAlloc(sizeof(CHashAC));
-  tempw->str=AStrNew(w);
-  tempw->type=HTT_WORD;
-  tempw->use_cnt=1;
-  tempw->hits=1;
-  HashAdd(tempw,ac.hash_table);
+  tmpw=ACAlloc(sizeof(CHashAC));
+  tmpw->str=AStrNew(w);
+  tmpw->type=HTT_WORD;
+  tmpw->use_cnt=1;
+  tmpw->hits=1;
+  HashAdd(tmpw,ac.hash_table);
   ac.num_words++;
-  return tempw;
+  return tmpw;
 }
 
 U0 ACSingleFileAdd(U8 *buf)
@@ -93,20 +93,20 @@ U0 ACSingleFileAdd(U8 *buf)
 U0 ACMainFileLstTraverse(U8 *files_find_mask)
 {
   U8 *buf;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   try {
-    tempde=tempde1=FilesFind(files_find_mask,
+    tmpde=tmpde1=FilesFind(files_find_mask,
 	  FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES|FUF_CLUSTER_ORDER);
-    while (tempde) {
-      "%s\n",tempde->full_name;
-      buf=FileRead(tempde->full_name);
+    while (tmpde) {
+      "%s\n",tmpde->full_name;
+      buf=FileRead(tmpde->full_name);
       ACSingleFileAdd(buf);
       Free(buf);
-      tempde=tempde->next;
+      tmpde=tmpde->next;
     }
   } catch
     Fs->catch_except=TRUE;
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 U0 ACProgressTask(Bool *_start_flag)

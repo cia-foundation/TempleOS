@@ -21,7 +21,7 @@ RegExeBranch("TempleOS/EagleDive");
 #define ROCK_ELEVATION		45
 #define SNOW_ELEVATION		55
 
-//Too big makes off-screen draws take place.
+//Too big makes off-scrn draws take place.
 #define MAX_PANEL_SIZE		16
 
 
@@ -294,9 +294,9 @@ U0 MPDoPanels(CTask *task)
 {
   I64 i,j,l,k1,k2,w,h,threshold,lo,hi;
   Bool cont;
-  Panel *tempp,*start_ptr=NULL,*end_ptr=NULL;
+  Panel *tmpp,*start_ptr=NULL,*end_ptr=NULL;
   CD3I32 *poly;
-  Obj *tempo;
+  Obj *tmpo;
   lo=Gs->num*(MAP_HEIGHT-1)/mp_cnt;
   hi=(Gs->num+1)*(MAP_HEIGHT-1)/mp_cnt;
   for (threshold=8;threshold>=1;threshold--)
@@ -317,75 +317,75 @@ U0 MPDoPanels(CTask *task)
 	    }
 	  } while (cont);
 	  if (w>=threshold || h>=threshold) {
-	    tempp=CAlloc(sizeof(Panel),task);
-	    QueInit(&tempp->next_obj);
+	    tmpp=CAlloc(sizeof(Panel),task);
+	    QueInit(&tmpp->next_obj);
 	    l=elevations[j][i];
 	    if (l<=WATER_ELEVATION*MAP_SCALE &&
 		  elevations[j][i+w-1]<=WATER_ELEVATION*MAP_SCALE &&
 		  elevations[j+h-1][i]<=WATER_ELEVATION*MAP_SCALE &&
 		  elevations[j+h-1][i+w-1]<=WATER_ELEVATION*MAP_SCALE) {
-	      tempp->color=BLUE;
+	      tmpp->color=BLUE;
 	      if (Rand<0.05) {
-		tempo=MAlloc(sizeof(Obj),task);
-		tempo->p.x=(i+w/2)*MAP_SCALE;
-		tempo->p.y=(j+h/2)*MAP_SCALE;
+		tmpo=MAlloc(sizeof(Obj),task);
+		tmpo->p.x=(i+w/2)*MAP_SCALE;
+		tmpo->p.y=(j+h/2)*MAP_SCALE;
 		if (Rand<0.1) {
-		  tempo->fish=FALSE;
+		  tmpo->fish=FALSE;
 		  if (RandI16&1)
-		    tempo->img=$IB,"<2>",BI=2$; //Boat
+		    tmpo->img=$IB,"<2>",BI=2$; //Boat
 		  else
-		    tempo->img=$IB,"<3>",BI=3$; //Boat
-		  tempo->p.z=(WATER_ELEVATION+2)*MAP_SCALE;
+		    tmpo->img=$IB,"<3>",BI=3$; //Boat
+		  tmpo->p.z=(WATER_ELEVATION+2)*MAP_SCALE;
 		} else {
-		  tempo->fish=TRUE;
-		  tempo->img=$IB,"<1>",BI=1$; //Fish
-		  tempo->p.z=WATER_ELEVATION*MAP_SCALE;
+		  tmpo->fish=TRUE;
+		  tmpo->img=$IB,"<1>",BI=1$; //Fish
+		  tmpo->p.z=WATER_ELEVATION*MAP_SCALE;
 		}
-		QueIns(tempo,tempp->last_obj);
+		QueIns(tmpo,tmpp->last_obj);
 	      }
 	    } else {
 	      if (l<ROCK_ELEVATION*MAP_SCALE) {
 		if (RandI16&1)
-		  tempp->color=LTGREEN;
+		  tmpp->color=LTGREEN;
 		else
-		  tempp->color=GREEN+LTGREEN<<16+ROPF_DITHER;
+		  tmpp->color=GREEN+LTGREEN<<16+ROPF_DITHER;
 		if (Rand<0.03) {
-		  tempo=MAlloc(sizeof(Obj),task);
-		  tempo->p.x=(i+w/2)*MAP_SCALE;
-		  tempo->p.y=(j+h/2)*MAP_SCALE;
-		  tempo->p.z=l;
-		  tempo->img=$IB,"<4>",BI=4$; //Tree
-		  tempo->fish=FALSE;
-		  QueIns(tempo,tempp->last_obj);
+		  tmpo=MAlloc(sizeof(Obj),task);
+		  tmpo->p.x=(i+w/2)*MAP_SCALE;
+		  tmpo->p.y=(j+h/2)*MAP_SCALE;
+		  tmpo->p.z=l;
+		  tmpo->img=$IB,"<4>",BI=4$; //Tree
+		  tmpo->fish=FALSE;
+		  QueIns(tmpo,tmpp->last_obj);
 		}
 	      } else if (l<SNOW_ELEVATION*MAP_SCALE) {
 		if (!(RandU16&3)) {
 		  if (RandI16&1)
-		    tempp->color=LTGRAY;
+		    tmpp->color=LTGRAY;
 		  else
-		    tempp->color=DKGRAY+LTGRAY<<16+ROPF_DITHER;
+		    tmpp->color=DKGRAY+LTGRAY<<16+ROPF_DITHER;
 		} else {
 		  if (RandI16&1)
-		    tempp->color=LTGREEN;
+		    tmpp->color=LTGREEN;
 		  else
-		    tempp->color=GREEN+LTGREEN<<16+ROPF_DITHER;
+		    tmpp->color=GREEN+LTGREEN<<16+ROPF_DITHER;
 		}
 	      } else {
 		if (!(RandU16&3)) {
 		  if (RandI16&1)
-		    tempp->color=WHITE;
+		    tmpp->color=WHITE;
 		  else
-		    tempp->color=LTGRAY;
+		    tmpp->color=LTGRAY;
 		} else {
 		  if (RandI16&1)
-		    tempp->color=LTGRAY+WHITE<<16+ROPF_DITHER;
+		    tmpp->color=LTGRAY+WHITE<<16+ROPF_DITHER;
 		  else
-		    tempp->color=DKGRAY+LTGRAY<<16+ROPF_DITHER;
+		    tmpp->color=DKGRAY+LTGRAY<<16+ROPF_DITHER;
 		}
 	      }
 	    }
-	    tempp->num_sides=4;
-	    poly=tempp->pts=MAlloc(sizeof(CD3I32)*tempp->num_sides,task);
+	    tmpp->num_sides=4;
+	    poly=tmpp->pts=MAlloc(sizeof(CD3I32)*tmpp->num_sides,task);
 	    poly[0].x=MAP_SCALE*i;
 	    poly[0].y=MAP_SCALE*j;
 	    poly[0].z=elevations[j][i];
@@ -398,13 +398,13 @@ U0 MPDoPanels(CTask *task)
 	    poly[3].x=MAP_SCALE*i;
 	    poly[3].y=MAP_SCALE*(j+h);
 	    poly[3].z=elevations[j+h][i];
-	    tempp->next=start_ptr;
-	    start_ptr=tempp;
+	    tmpp->next=start_ptr;
+	    start_ptr=tmpp;
 	    if (!end_ptr)
-	      end_ptr=tempp;
+	      end_ptr=tmpp;
 	    for (k2=0;k2<h;k2++)
 	      for (k1=0;k1<w;k1++)
-		panels[j+k2][i+k1]=tempp;
+		panels[j+k2][i+k1]=tmpp;
 	  }
 	}
       }
@@ -602,21 +602,21 @@ U0 MPDrawIt(CTask *task,CDC *dc)
 	x3,y3,z3,dd,dd_old,
 	cx=task->pix_width>>1,
 	cy=task->pix_height>>1;
-  Panel reg *tempp;
-  Obj	*tempo;
+  Panel reg *tmpp;
+  Obj	*tmpo;
   Bool	w_on_map,h_on_map;
 
   xx=x/(MAP_SCALE*COORDINATE_SCALE);
   yy=y/(MAP_SCALE*COORDINATE_SCALE);
 
-  //World to screen coordinates
+  //World to scrn coordinates
   Mat4x4IdentEqu(dc->r);
   Mat4x4RotZ(dc->r,heading);
   Mat4x4RotX(dc->r,è);
   Mat4x4RotZ(dc->r,roll);
   DCMat4x4Set(dc,dc->r);
 
-  //Screen to world coordinates
+  //Scrn to world coordinates
 
   //This gives us the vects for stepping through the grid in
   //the direction the plane is facing. we step horizontally and vertically
@@ -635,7 +635,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
 
   //The layer for core1 is not cleared automatically
   //it is persistent.  I have carefully syncronized to the update
-  //cycle initiated by core0 to prevent flicker.
+  //cycle initiated by Core0 to prevent flicker.
 
   dc->flags|=DCF_TRANSFORMATION;
   dc->transform=&EDTransform;
@@ -691,17 +691,17 @@ U0 MPDrawIt(CTask *task,CDC *dc)
     for (j=0;j<strip_height && cnts.jiffies<update_jiffy_limit;j++) {
       x1=x1h>>8; y1=y1h>>8;
       if (0<=x1<MAP_WIDTH && 0<=y1<MAP_HEIGHT) {
-	if ((tempp=panels[y1][x1]) && tempp->update!=update) {
-	  tempp->update=update;
-	  if (tempp->cnt>8*(1.1-Gs->idle_factor)) {
-	    dc->color=tempp->color;
-	    tempp->cnt=GrFillPoly3(dc,tempp->num_sides,tempp->pts);
+	if ((tmpp=panels[y1][x1]) && tmpp->update!=update) {
+	  tmpp->update=update;
+	  if (tmpp->cnt>8*(1.1-Gs->idle_factor)) {
+	    dc->color=tmpp->color;
+	    tmpp->cnt=GrFillPoly3(dc,tmpp->num_sides,tmpp->pts);
 	  } else
-	    tempp->cnt++;
-	  tempo=tempp->next_obj;
-	  while (tempo!=&tempp->next_obj) {
-	    Sprite3(dc,tempo->p.x,tempo->p.y,tempo->p.z,tempo->img);
-	    tempo=tempo->next;
+	    tmpp->cnt++;
+	  tmpo=tmpp->next_obj;
+	  while (tmpo!=&tmpp->next_obj) {
+	    Sprite3(dc,tmpo->p.x,tmpo->p.y,tmpo->p.z,tmpo->img);
+	    tmpo=tmpo->next;
 	  }
 	}
 	h_on_map=TRUE;
@@ -938,28 +938,28 @@ U0 Core0EagleDive()
   //We made an alias of this we don't want freed.
   dc->depth_buf=NULL;
   DCDel(dc);
-  WinMgrSync;
+  Refresh;
 }
 
 
 Obj *FishFind(I64 x1,I64 y1,I64 *_dd)
 {
   I64 dd,best_dd=MAX_I64;
-  Obj *res=NULL,*tempo;
-  Panel *tempp=panel_head;
-  while (tempp) {
-    tempo=tempp->next_obj;
-    while (tempo!=&tempp->next_obj) {
-      if (tempo->fish) {
-	dd=SqrI64(tempo->p.x-x1)+SqrI64(tempo->p.y-y1);
+  Obj *res=NULL,*tmpo;
+  Panel *tmpp=panel_head;
+  while (tmpp) {
+    tmpo=tmpp->next_obj;
+    while (tmpo!=&tmpp->next_obj) {
+      if (tmpo->fish) {
+	dd=SqrI64(tmpo->p.x-x1)+SqrI64(tmpo->p.y-y1);
 	if (dd<best_dd) {
 	  best_dd=dd;
-	  res=tempo;
+	  res=tmpo;
 	}
       }
-      tempo=tempo->next;
+      tmpo=tmpo->next;
     }
-    tempp=tempp->next;
+    tmpp=tmpp->next;
   }
   *_dd=best_dd;
   return res;
@@ -971,12 +971,12 @@ U0 AnimateTask(I64)
 {//Steadily moves the airplane fwd.
   I64 *s2w,x1,y1,z1,dx,dy,dz,dd;
   F64 t0=tS,ms,é,d;
-  Obj *tempo;
+  Obj *tmpo;
   while (TRUE) {
     ms=1000*(tS-t0);
     t0=tS;
     if (!game_tf) {
-//Screen to world coordinates
+//Scrn to world coordinates
       s2w=Mat4x4IdentNew;
       Mat4x4RotZ(s2w,-roll);
       Mat4x4RotX(s2w,-è);
@@ -1000,12 +1000,12 @@ U0 AnimateTask(I64)
 	  WrapAngles;
 	}
 	speed=1.0;
-	if (rolled_over || !(tempo=FishFind(x1,y1,&dd)))
+	if (rolled_over || !(tmpo=FishFind(x1,y1,&dd)))
 	  claws_down=0;
 	else {
 	  d=Sqrt(dd);
-	  x1-=tempo->p.x;
-	  y1-=tempo->p.y;
+	  x1-=tmpo->p.x;
+	  y1-=tmpo->p.y;
 	  é=ACos((dx*x1+dy*y1)/(d*1<<16));
 	  if (é>0 && d<MAP_SCALE*4)
 	    claws_down=Saw(d,MAP_SCALE*4);
@@ -1017,8 +1017,8 @@ U0 AnimateTask(I64)
 	      if (game_tf-game_t0<best_score)
 		best_score=game_tf-game_t0;
 	    }
-	    QueRem(tempo);
-	    Free(tempo);
+	    QueRem(tmpo);
+	    Free(tmpo);
 	    music.mute=TRUE;
 	    Snd(1000); Sleep(200); Snd(0);
 	    music.mute=FALSE;
@@ -1035,7 +1035,7 @@ U0 AnimateTask(I64)
 	speed=Clamp(speed+(0.0005-0.0002*Abs(è)/(ã/4)),0.1,5.0);
       }
     }
-    WinMgrSync;
+    Refresh;
   }
 }
 
@@ -1104,14 +1104,14 @@ U0 Init()
 
 U0 CleanUp()
 {
-  Panel *tempp=panel_head,*tempp1;
+  Panel *tmpp=panel_head,*tmpp1;
   MPEnd;
-  while (tempp) {
-    tempp1=tempp->next;
-    QueDel(&tempp->next_obj);
-    Free(tempp->pts);
-    Free(tempp);
-    tempp=tempp1;
+  while (tmpp) {
+    tmpp1=tmpp->next;
+    QueDel(&tmpp->next_obj);
+    Free(tmpp->pts);
+    Free(tmpp);
+    tmpp=tmpp1;
   }
   DCDel(main_dc);
 }
@@ -1171,7 +1171,7 @@ U0 EagleDive()
 	  case '\n':
 	    Fs->draw_it=NULL;
 	    CleanUp;
-	    WinMgrSync;
+	    Refresh;
 	    Init;
 	    Fs->draw_it=&DrawIt;
 	    break;

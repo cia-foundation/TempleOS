@@ -1,9 +1,13 @@
 U0 RandPts()
 {
+  I64 i;
   F64 t0=tS;
   do {
-    gr.dc->color=RandI16&15;
-    GrPlot(gr.dc,RandI32%GR_WIDTH,RandI32%GR_HEIGHT);
+    for (i=0;i<1024;i++) {
+      gr.dc->color=RandU16&15;
+      GrPlot(gr.dc,RandU32%GR_WIDTH,RandU32%GR_HEIGHT);
+    }
+    Yield;
   } while (tS-t0<1);
   DCFill;
 }

@@ -10,7 +10,7 @@ extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
 extern U0 ClipboardDel();
 extern CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type);
 extern Bool CtrlInside(CCtrl *c,I64 x,I64 y);
-extern U8 *DC2Sprite(CDC *tempb);
+extern U8 *DC2Sprite(CDC *tmpb);
 extern U0 DocBMP(CDoc *doc=NULL,U8 *filename,
 	Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE);
 extern U0 DocBinDel(CDoc *doc,CDocBin *b);
@@ -78,6 +78,7 @@ extern Bool PopUpOk(U8 *header=NULL,U8 *footer=NULL);
 extern I64 PopUpRangeI64(
 	I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NULL);
 extern Bool PopUpTransform(I64 *r);
+extern U0 Refresh(I64 cnt=1,Bool force=FALSE);
 extern U0 RegOneTimePopUp(I64 flag_num,U8 *msg);
 extern U0 SettingsPop(CTask *task=NULL,I64 flags=0);
 extern CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0);
@@ -89,7 +90,6 @@ extern Bool WinBorder(Bool val=OFF,CTask *task=NULL);
 extern CDoc *WinCursorPosSet(CTask *task,I64 ipx,I64 ipy,Bool set_cursor=TRUE);
 extern Bool WinHorz(I64 left,I64 right,CTask *task=NULL);
 extern U0 WinMax(CTask *task=NULL);
-extern U0 WinMgrSync(I64 cnt=1,Bool force=FALSE);
 extern U0 WinScrollNull(CTask *task,CD3I64 *s);
 extern U0 WinScrollRestore(CTask *task,CD3I64 *s);
 extern U0 WinScrollsInit(CTask *task);

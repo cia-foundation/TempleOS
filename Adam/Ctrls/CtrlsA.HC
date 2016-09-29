@@ -18,15 +18,15 @@ U0 CtrlsUpdate(CTask *task)
     if (c->update_derived_vals)
       (*c->update_derived_vals)(c);
     if (c->flags&CTRLF_BORDER) {
-      c->screen_left  =gr.pan_text_x+task->pix_left+c->left-FONT_WIDTH;
-      c->screen_right =gr.pan_text_x+task->pix_left+c->right-FONT_WIDTH;
-      c->screen_top   =gr.pan_text_y+task->pix_top+c->top-FONT_HEIGHT;
-      c->screen_bottom=gr.pan_text_y+task->pix_top+c->bottom-FONT_HEIGHT;
+      c->scrn_left  =gr.pan_text_x+task->pix_left+c->left-FONT_WIDTH;
+      c->scrn_right =gr.pan_text_x+task->pix_left+c->right-FONT_WIDTH;
+      c->scrn_top   =gr.pan_text_y+task->pix_top+c->top-FONT_HEIGHT;
+      c->scrn_bottom=gr.pan_text_y+task->pix_top+c->bottom-FONT_HEIGHT;
     } else {
-      c->screen_left  =gr.pan_text_x+task->pix_left+c->left;
-      c->screen_right =gr.pan_text_x+task->pix_left+c->right;
-      c->screen_top   =gr.pan_text_y+task->pix_top+c->top;
-      c->screen_bottom=gr.pan_text_y+task->pix_top+c->bottom;
+      c->scrn_left  =gr.pan_text_x+task->pix_left+c->left;
+      c->scrn_right =gr.pan_text_x+task->pix_left+c->right;
+      c->scrn_top   =gr.pan_text_y+task->pix_top+c->top;
+      c->scrn_bottom=gr.pan_text_y+task->pix_top+c->bottom;
     }
     c=c->next;
   }
@@ -35,9 +35,9 @@ U0 CtrlsUpdate(CTask *task)
 fp_update_ctrls=&CtrlsUpdate;
 
 Bool CtrlInsideRect(CCtrl *c,I64 x,I64 y)
-{//screen coordinates
-  if (c->screen_left<=x<=c->screen_right &&
-	c->screen_top<=y<=c->screen_bottom)
+{//scrn coordinates
+  if (c->scrn_left<=x<=c->scrn_right &&
+	c->scrn_top<=y<=c->scrn_bottom)
     return TRUE;
   else
     return FALSE;

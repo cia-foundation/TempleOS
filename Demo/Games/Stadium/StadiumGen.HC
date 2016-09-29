@@ -1,4 +1,4 @@
-//Generate "StadiumBG.GRA.Z" from "StadiumBG.DD.Z"
+//Generate "StadiumBG.GR.Z" from "StadiumBG.DD.Z"
 
 U0 StadiumGen()
 {
@@ -13,19 +13,19 @@ U0 StadiumGen()
   DocClear;
   Type("StadiumBG.DD");
   "$$CM,0,%d$$",TEXT_ROWS-3;
-  fp_old_update=gr.fp_final_screen_update; //hide mouse cursor
-  gr.fp_final_screen_update=NULL;
+  fp_old_update=gr.fp_final_scrn_update; //hide mouse cursor
+  gr.fp_final_scrn_update=NULL;
 
-  WinMgrSync(2,TRUE);
-  dc2=DCScreenCapture;
+  Refresh(2,TRUE);
+  dc2=DCScrnCapture;
   dc=DCExt(dc2,0,FONT_HEIGHT,GR_WIDTH,GR_HEIGHT);
   DCDel(dc2);
 
-  GRAWrite("StadiumBG",dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
+  GRWrite("StadiumBG",dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
   DCDel(dc);
 
   DocCursor(ON);
-  gr.fp_final_screen_update=fp_old_update;
+  gr.fp_final_scrn_update=fp_old_update;
   DocClear;
 }
 

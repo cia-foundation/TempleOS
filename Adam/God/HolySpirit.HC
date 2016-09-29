@@ -77,7 +77,7 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
 {//Read God's vocab file for picking words.
   I64 i,ch,fuf_flags=0;
   U8 *buf,*ptr,*ptr2;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+T+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (fuf_flags&~FUG_FILES_FIND)
@@ -87,10 +87,10 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   god.word_file_mask=StrNew(files_find_mask);
   god.word_fuf_flags=fuf_flags;
 
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
   i=0;
-  while (tempde) {
-    if (buf=ptr=FileRead(tempde->full_name)) {
+  while (tmpde) {
+    if (buf=ptr=FileRead(tmpde->full_name)) {
       while (*ptr) {
 	while (*ptr && !Bt(chars_bmp_word,*ptr))
 	  ptr++;
@@ -103,17 +103,17 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
       }
       Free(buf);
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
 
   Free(god.words);
   god.num_words=i;
   god.words=MAlloc(i*sizeof(U8 *));
 
-  tempde=tempde1;
+  tmpde=tmpde1;
   i=0;
-  while (tempde) {
-    if (buf=ptr=FileRead(tempde->full_name)) {
+  while (tmpde) {
+    if (buf=ptr=FileRead(tmpde->full_name)) {
       while (*ptr) {
 	while (*ptr && !Bt(chars_bmp_word,*ptr))
 	  ptr++;
@@ -129,9 +129,9 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
       }
       Free(buf);
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return god.num_words;
 } GodInit;
 

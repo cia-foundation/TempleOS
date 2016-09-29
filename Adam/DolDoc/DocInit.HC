@@ -4,7 +4,7 @@ U0 DocInit()
 {//$LK-UL,"CMD Defines",A="MN:DOCT_TEXT"$
   CCmpCtrl *cc;
   I64 i;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
 
   DefineLstLoad("ST_DOC_CMDS",
 	"TX\0CR\0SR\0TB\0PB\0CU\0MK\0PT\0CL\0PL\0LM\0RM\0HD\0FO\0ID\0FG\0"
@@ -12,7 +12,7 @@ U0 DocInit()
 	"DA\0CB\0LS\0MA\0MU\0HX\0TR\0SP\0IB\0IS\0SO\0HC\0ER\0");
   DefineLstLoad("ST_DOC_FLAGS",
 	"T\0LEN\0A\0D\0HTML\0LE\0LM\0RE\0RM\0BI\0BP\0RT\0SX\0SY\0SCX\0U\0"
-	"LC\0LA\0RC\0RA\0LX\0CX\0RX\0TY\0CY\0BY\0"
+	"LC\0LIS\0RC\0RIS\0LX\0CX\0RX\0TY\0CY\0BY\0"
 	"HL\0WW\0BK\0IV\0SEL\0UL\0"
 	"TC\0PRY\0MRX\0WR\0L\0X\0Q\0FST\0B\0S\0BD\0C\0CA\0RD\0UD\0P\0M\0"
 	"TRM\0Z\0H\0TR\0LS\0SK\0PU\0SIF\0FS\0NC\0DD\0DL\0DRT\0");
@@ -32,8 +32,8 @@ U0 DocInit()
   cc->htc.hash_table_lst=NULL;
   Lex(cc);
   while (cc->token==TK_IDENT) {
-    if (temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD)) {
-      i=temph->user_data0;
+    if (tmph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD)) {
+      i=tmph->user_data0;
       Lex(cc);
       PrsDocFlags(cc,&doldoc.dft_de_flags[i],&doldoc.dft_type_flags[i]);
     }
@@ -51,7 +51,7 @@ U0 DocInit()
       Bts(doldoc.type_flags_form,i);
 
       //Don't forget $LK,"cmp_type_flags_src_code",A="MN:cmp_type_flags_src_code"$.
-  doldoc.type_flags_nontag_invisible[0]=
+  doldoc.type_flags_nontag_invis[0]=
 	1<<DOCT_PMT|
 	1<<DOCT_PAGE_LEN|
 	1<<DOCT_LEFT_MARGIN|

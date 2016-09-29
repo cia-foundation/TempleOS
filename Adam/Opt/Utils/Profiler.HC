@@ -27,7 +27,7 @@ U0 ProfTimerInt(CTask *task)
 public U0 Prof(I64 depth=0,I64 cpu_num=0)
 {/*Start collecting profiler statistics.
 Profilers report where time is spent
-by sampling RIP during the $TX,"1000 Hz",D="DD_JIFFY_HZ"$
+by sampling RIP during the $TX,"1000Hz",D="DD_JIFFY_HZ"$
 timer interrupt.
 
 Do a $LK,"ProfRep",A="MN:ProfRep"$(), (profiler report)

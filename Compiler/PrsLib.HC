@@ -21,18 +21,18 @@ I64 PrsPop2(CPrsStk *ps)
 U0 PrsPopDeref(CPrsStk *ps)
 {
   I64 i=PrsPop(ps);
-  CHashClass *tempc=PrsPop(ps);
+  CHashClass *tmpc=PrsPop(ps);
   if (i.u16[0]!=IC_DEREF) {
-    PrsPush(ps,tempc);
+    PrsPush(ps,tmpc);
     PrsPush(ps,i);
   }
 }
 
 I64 PrsKeyWord(CCmpCtrl *cc)
 {//Cvt cur token to $LK,"KEYWORD",A="FF:::/Compiler/OpCodes.DD,KEYWORD"$ or -1.
-  CHashGeneric *temph;
-  if (cc->token==TK_IDENT &&(temph=cc->hash_entry) && temph->type&HTT_KEYWORD)
-    return temph->user_data0;
+  CHashGeneric *tmph;
+  if (cc->token==TK_IDENT &&(tmph=cc->hash_entry) && tmph->type&HTT_KEYWORD)
+    return tmph->user_data0;
   else
     return -1;
 }
@@ -46,13 +46,13 @@ for one * and two fwd for two **.
 */
   I64 i;
   CHashClass *res=CAlloc(sizeof(CHashClass)*(MAX_PTR_STARS+1),Fs->code_heap),
-	*tempc=res;
+	*tmpc=res;
   for (i=0;i<=MAX_PTR_STARS;i++) {
-    tempc->type=HTT_CLASS;
-    tempc->raw_type=RT_PTR;
-    tempc->size=sizeof(U8 *);
-    tempc->ptr_stars_cnt=i;
-    tempc++;
+    tmpc->type=HTT_CLASS;
+    tmpc->raw_type=RT_PTR;
+    tmpc->size=sizeof(U8 *);
+    tmpc->ptr_stars_cnt=i;
+    tmpc++;
   }
   res->last_in_member_lst=&res->member_lst_and_root;
   res->size=0;
@@ -63,13 +63,13 @@ CHashFun *PrsFunNew()
 {
   I64 i;
   CHashFun *res=CAlloc(sizeof(CHashFun)*(MAX_PTR_STARS+1),Fs->code_heap),
-	*tempf=res;
+	*tmpf=res;
   for (i=0;i<=MAX_PTR_STARS;i++) {
-    tempf->type=HTT_FUN;
-    tempf->raw_type=RT_PTR;
-    tempf->size=sizeof(U8 *);
-    tempf->ptr_stars_cnt=i;
-    tempf++;
+    tmpf->type=HTT_FUN;
+    tmpf->raw_type=RT_PTR;
+    tmpf->size=sizeof(U8 *);
+    tmpf->ptr_stars_cnt=i;
+    tmpf++;
   }
   res->last_in_member_lst=&res->member_lst_and_root;
   res->size=0;
@@ -79,43 +79,43 @@ CHashFun *PrsFunNew()
 CIntermediateCode *ICAdd(CCmpCtrl *cc,
    I64 opcode_and_precedence,I64 arg, CHashClass *c,I64 flags=0)
 {
-  CIntermediateCode *tempi=MAlloc(sizeof(CIntermediateCode));
-  tempi->ic_code=opcode_and_precedence.u16[0];
-  tempi->ic_precedence=opcode_and_precedence.u16[1];
-  tempi->ic_data=arg;
-  tempi->ic_class=c;
+  CIntermediateCode *tmpi=MAlloc(sizeof(CIntermediateCode));
+  tmpi->ic_code=opcode_and_precedence.u16[0];
+  tmpi->ic_precedence=opcode_and_precedence.u16[1];
+  tmpi->ic_data=arg;
+  tmpi->ic_class=c;
   if (cc->pass_trace) {
     Bts(&cc->flags,CCf_PASS_TRACE_PRESENT);
     flags|=ICF_PASS_TRACE;
   }
   if (cc->lock_cnt)
     flags|=ICF_LOCK;
-  tempi->ic_flags=flags;
-  tempi->ic_line=cc->last_line_num;
-  QueIns(tempi,cc->coc.coc_head.last);
-  return tempi;
+  tmpi->ic_flags=flags;
+  tmpi->ic_line=cc->last_line_num;
+  QueIns(tmpi,cc->coc.coc_head.last);
+  return tmpi;
 }
 
 U0 COCInit(CCmpCtrl *cc)
 {
-  CCodeCtrl *tempcbh=&cc->coc;
-  QueInit(&tempcbh->coc_head.next);
-  QueInit(&tempcbh->coc_next_misc);
-  tempcbh->coc_head.ic_code=IC_END;
+  CCodeCtrl *tmpcbh=&cc->coc;
+  QueInit(&tmpcbh->coc_head.next);
+  QueInit(&tmpcbh->coc_next_misc);
+  tmpcbh->coc_head.ic_code=IC_END;
 }
 
 U0 COCPush(CCmpCtrl *cc)
 {
-  CCodeCtrl *tempcbh=MAlloc(sizeof(CCodeCtrl));
-  MemCpy(tempcbh,&cc->coc,sizeof(CCodeCtrl));
-  cc->coc.coc_next=tempcbh;
+  CCodeCtrl *tmpcbh=MAlloc(sizeof(CCodeCtrl));
+  MemCpy(tmpcbh,&cc->coc,sizeof(CCodeCtrl));
+  cc->coc.coc_next=tmpcbh;
 }
 
 CCmpCtrl *COCPopNoFree(CCmpCtrl *cc)
 {
-  CCodeCtrl *tempcbh=cc->coc.coc_next;
-  MemCpy(&cc->coc,tempcbh,sizeof(CCodeCtrl));
-  return tempcbh;
+  CCodeCtrl *tmpcbh=cc->coc.coc_next;
+  MemCpy(&cc->coc,tmpcbh,sizeof(CCodeCtrl));
+  return tmpcbh;
 }
 
 U0 COCPop(CCmpCtrl *cc)
@@ -123,21 +123,21 @@ U0 COCPop(CCmpCtrl *cc)
   Free(COCPopNoFree(cc));
 }
 
-U0 COCAppend(CCmpCtrl *cc, CCodeCtrl *tempcbh)
+U0 COCAppend(CCmpCtrl *cc, CCodeCtrl *tmpcbh)
 {
-  if (tempcbh->coc_head.next!=&cc->coc.coc_head.next) {
-    cc->coc.coc_head.last->next=tempcbh->coc_head.next;
-    tempcbh->coc_head.next->last=cc->coc.coc_head.last;
-    cc->coc.coc_head.last=tempcbh->coc_head.last;
-    tempcbh->coc_head.last->next=&cc->coc.coc_head.next;
+  if (tmpcbh->coc_head.next!=&cc->coc.coc_head.next) {
+    cc->coc.coc_head.last->next=tmpcbh->coc_head.next;
+    tmpcbh->coc_head.next->last=cc->coc.coc_head.last;
+    cc->coc.coc_head.last=tmpcbh->coc_head.last;
+    tmpcbh->coc_head.last->next=&cc->coc.coc_head.next;
   }
-  if (tempcbh->coc_next_misc!=&cc->coc.coc_next_misc) {
-    cc->coc.coc_last_misc->next=tempcbh->coc_next_misc;
-    tempcbh->coc_next_misc->last=cc->coc.coc_last_misc;
-    cc->coc.coc_last_misc=tempcbh->coc_last_misc;
-    tempcbh->coc_last_misc->next=&cc->coc.coc_next_misc;
+  if (tmpcbh->coc_next_misc!=&cc->coc.coc_next_misc) {
+    cc->coc.coc_last_misc->next=tmpcbh->coc_next_misc;
+    tmpcbh->coc_next_misc->last=cc->coc.coc_last_misc;
+    cc->coc.coc_last_misc=tmpcbh->coc_last_misc;
+    tmpcbh->coc_last_misc->next=&cc->coc.coc_next_misc;
   }
-  Free(tempcbh);
+  Free(tmpcbh);
 }
 
 CCodeMisc *COCMiscNew(CCmpCtrl *cc,I64 ty)
@@ -228,16 +228,16 @@ U0 COCDel(CCmpCtrl *cc,CCodeCtrl *coc)
 
 U0 COCHeaderPut(CCmpCtrl *cc,I64 pass,Bool put)
 {
-  CIntermediateCode *tempi;
+  CIntermediateCode *tmpi;
   if (Bt(&cc->flags,CCf_PASS_TRACE_PRESENT)) {
     if (put) {
       if (Bt(&cc->saved_pass_trace,pass-1)) {
 	"$$IV,1$$Pass %d:$$IV,0$$\n",pass-1;
-	tempi=cc->coc.coc_head.next;
-	while (tempi->ic_code) {
-	  if (tempi->ic_flags&ICF_PASS_TRACE)
-	    ICPut(cc,tempi);
-	  tempi=tempi->next;
+	tmpi=cc->coc.coc_head.next;
+	while (tmpi->ic_code) {
+	  if (tmpi->ic_flags&ICF_PASS_TRACE)
+	    ICPut(cc,tmpi);
+	  tmpi=tmpi->next;
 	}
       }
     } else if (Bt(&cc->saved_pass_trace,pass))

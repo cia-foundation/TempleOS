@@ -3,7 +3,7 @@
 public class CGrGlbls
 {
   I64	*to_8_bits,*to_8_colors;
-  CDC	*screen_image,	//Read only.
+  CDC	*scrn_image,	//Read only.
 	*dc,		//Persistent
 	*dc1,
 	*dc2,		//Updated every refresh
@@ -19,7 +19,7 @@ public class CGrGlbls
   I64	highest_uncovered;
   U16	*vga_text_cache;
   I64	pan_text_x,pan_text_y;	//[-7,7]
-  U0	(*fp_final_screen_update)(CDC *dc);//Mouse cursor is handled here.
+  U0	(*fp_final_scrn_update)(CDC *dc);//Mouse cursor is handled here.
   U0	(*fp_wall_paper)(CTask *task);
   U0	(*fp_draw_input_ptr)(CDC *dc,I64 x,I64 y);
   U0	(*fp_draw_grab_input_ptr)(CDC *dc,I64 x,I64 y,Bool closed);
@@ -33,9 +33,9 @@ public class CGrGlbls
   I8	circle_lo[GR_NUM_PEN_BRUSHES][GR_NUM_PEN_BRUSHES],
 	circle_hi[GR_NUM_PEN_BRUSHES][GR_NUM_PEN_BRUSHES];
 
-  #define GR_MAX_SCREEN_ZOOM	8
-  U8	*screen_zoom_tables[GR_MAX_SCREEN_ZOOM+1];
-  I64	screen_zoom,sx,sy;
+  #define GR_MAX_SCRN_ZOOM	8
+  U8	*scrn_zoom_tables[GR_MAX_SCRN_ZOOM+1];
+  I64	scrn_zoom,sx,sy;
 
   //When zoomed, this keeps the mouse centered.
   Bool	continuous_scroll,

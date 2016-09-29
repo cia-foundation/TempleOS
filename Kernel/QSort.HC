@@ -53,10 +53,10 @@ U0 QSort2a(U8 **base,I64 num,I64 (*fp_compare)(U8 **_e1,U8 **_e2))
     QSort2a(left,i,fp_compare);
 }
 U0 QSort2b(U8 *base,I64 num, I64 width,
-	I64 (*fp_compare)(U8 *e1,U8 *e2),U8 *temp)
+	I64 (*fp_compare)(U8 *e1,U8 *e2),U8 *tmp)
 {//Not public
   I64 i;
-  U8 *left,*right,*pivot=temp+width;
+  U8 *left,*right,*pivot=tmp+width;
   left =base;
   right=base+(num-1)*width;
   MemCpy(pivot,base+num/2*width,width);
@@ -67,9 +67,9 @@ U0 QSort2b(U8 *base,I64 num, I64 width,
       right-=width;
     if (left<=right) {
       if (left!=right) {
-	MemCpy(temp,right,width);
+	MemCpy(tmp,right,width);
 	MemCpy(right,left,width);
-	MemCpy(left,temp,width);
+	MemCpy(left,tmp,width);
       }
       left+=width;
       right-=width;
@@ -77,10 +77,10 @@ U0 QSort2b(U8 *base,I64 num, I64 width,
   } while (left<=right);
   i=1+(right-base)/width;
   if (1<i<num)
-    QSort2b(base,i,width,fp_compare,temp);
+    QSort2b(base,i,width,fp_compare,tmp);
   i=num+(base-left)/width;
   if (1<i<num)
-    QSort2b(left,i,width,fp_compare,temp);
+    QSort2b(left,i,width,fp_compare,tmp);
 }
 U0 QSort(U8 *base,I64 num, I64 width, I64 (*fp_compare)(U8 *e1,U8 *e2))
 {/*Quick Sort: fp_compare() passes by ref.
@@ -91,14 +91,14 @@ Don't return e1-e2 if numbers can overflow, return -1,0 or 1.
 
 Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.HC"$.
 */
-  U8 *temp;
+  U8 *tmp;
   if (width && num>1) {
     if (width==sizeof(U8 *))	//assign instead of MemCpy for width 8
       QSort2a(base,num,fp_compare);
     else {
-      temp=MAlloc(width*2);
-      QSort2b(base,num,width,fp_compare,temp);
-      Free(temp);
+      tmp=MAlloc(width*2);
+      QSort2b(base,num,width,fp_compare,tmp);
+      Free(tmp);
     }
   }
 }

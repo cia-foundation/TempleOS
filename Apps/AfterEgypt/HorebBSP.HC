@@ -12,7 +12,7 @@ U0 DrawHoreb(CTask *task,CDC *dc)
 	h=task->pix_height,r[16],
 	cx=w>>1,cy=h>>1;
   F64 s,m,a,x1,y1,x2,y2;
-  Obj *o_sort[O_NUM_OBJS+O_NUM_PEBBLES],*tempo;
+  Obj *o_sort[O_NUM_OBJS+O_NUM_PEBBLES],*tmpo;
 
   Mat4x4IdentEqu(r);
   Mat4x4RotY(r,-é);
@@ -30,46 +30,46 @@ U0 DrawHoreb(CTask *task,CDC *dc)
   }
 
   for (i=0;i<O_NUM_OBJS+O_NUM_PEBBLES;i++) {
-    tempo=&objs[i];
-    o_sort[i]=tempo;
-    tempo->x1=tempo->x+vx; tempo->y1=tempo->y; tempo->z1=tempo->z+vz;
-    Mat4x4MulXYZ(r,&tempo->x1,&tempo->y1,&tempo->z1);
-    if (tempo->type==OT_SHEEP ||
-	  tempo->type==OT_GOAT1 || tempo->type==OT_GOAT2) {
-      dx=100*tempo->dx; dy=100*tempo->dy; dz=100*tempo->dz;
+    tmpo=&objs[i];
+    o_sort[i]=tmpo;
+    tmpo->x1=tmpo->x+vx; tmpo->y1=tmpo->y; tmpo->z1=tmpo->z+vz;
+    Mat4x4MulXYZ(r,&tmpo->x1,&tmpo->y1,&tmpo->z1);
+    if (tmpo->type==OT_SHEEP ||
+	  tmpo->type==OT_GOAT1 || tmpo->type==OT_GOAT2) {
+      dx=100*tmpo->dx; dy=100*tmpo->dy; dz=100*tmpo->dz;
       Mat4x4MulXYZ(r,&dx,&dy,&dz);
       if (dx<0)
-	tempo->sym=TRUE;
+	tmpo->sym=TRUE;
       else
-	tempo->sym=FALSE;
+	tmpo->sym=FALSE;
     }
   }
   QSortI64(o_sort,O_NUM_OBJS+O_NUM_PEBBLES,&ObjCompare);
 
   for (i=0;i<O_NUM_OBJS+O_NUM_PEBBLES;i++) {
-    tempo=o_sort[i];
-    if (tempo->z1<0) break;
-    s=100.0/(AbsI64(tempo->z1)+50);
-    if (tempo->type) {
+    tmpo=o_sort[i];
+    if (tmpo->z1<0) break;
+    s=100.0/(AbsI64(tmpo->z1)+50);
+    if (tmpo->type) {
       Mat4x4IdentEqu(dc->r);
       Mat4x4Scale(dc->r,s*2);
       DCMat4x4Set(dc,dc->r);
       dc->flags|=DCF_TRANSFORMATION;
-      if (tempo->sym) {
+      if (tmpo->sym) {
 	dc->flags|=DCF_SYMMETRY|DCF_JUST_MIRROR;
-	DCSymmetrySet(dc,s*tempo->x1+cx,s*tempo->y1+h,
-	      s*tempo->x1+cx,s*tempo->y1+h+10);
+	DCSymmetrySet(dc,s*tmpo->x1+cx,s*tmpo->y1+h,
+	      s*tmpo->x1+cx,s*tmpo->y1+h+10);
       }
-      Sprite3B(dc,s*tempo->x1+cx,s*tempo->y1+h,0,imgs[tempo->type]);
+      Sprite3B(dc,s*tmpo->x1+cx,s*tmpo->y1+h,0,imgs[tmpo->type]);
     } else {
       dc->flags&=~DCF_TRANSFORMATION;
-      dc->color=pebble_colors[tempo->num&3];
-      GrPlot3(dc,s*tempo->x1+cx,s*tempo->y1+h,tempo->z1);
+      dc->color=pebble_colors[tmpo->num&3];
+      GrPlot3(dc,s*tmpo->x1+cx,s*tmpo->y1+h,tmpo->z1);
     }
     dc->flags&=~(DCF_SYMMETRY|DCF_JUST_MIRROR);
     if (o_sort[i]==&objs[O_BURNING_BUSH]) {//draw burning bush
-      dc->x=s*tempo->x1+cx;
-      dc->y=s*tempo->y1+h;
+      dc->x=s*tmpo->x1+cx;
+      dc->y=s*tmpo->y1+h;
       dc->z=0;
 
       dc->pen_width=1;
@@ -82,7 +82,7 @@ U0 DrawHoreb(CTask *task,CDC *dc)
 	GrLine3(dc,20*x1,20*y1-25,0,20*x2,20*y2-25,0);
       }
 
-      if (SqrI64(s*tempo->x1)+SqrI64(s*tempo->y1)<300*300)
+      if (SqrI64(s*tmpo->x1)+SqrI64(s*tmpo->y1)<300*300)
 	horeb_done=TRUE;
     }
   }

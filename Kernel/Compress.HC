@@ -6,7 +6,7 @@ asm {
 U0 ArcEntryGet(CArcCtrl *c)
 {
   I64 i;
-  CArcEntry *temp,*temp1;
+  CArcEntry *tmp,*tmp1;
 
   if (c->entry_used) {
     i=c->free_idx;
@@ -24,15 +24,15 @@ U0 ArcEntryGet(CArcCtrl *c)
       do if (++i==c->free_limit)
 	  i=c->min_table_entry;
       while (c->hash[i]);
-      temp=&c->compress[i];
-      c->next_entry=temp;
-      temp1=&c->hash[temp->basecode];
-      while (temp1) {
-	if (temp1->next==temp) {
-	  temp1->next=temp->next;
+      tmp=&c->compress[i];
+      c->next_entry=tmp;
+      tmp1=&c->hash[tmp->basecode];
+      while (tmp1) {
+	if (tmp1->next==tmp) {
+	  tmp1->next=tmp->next;
 	  break;
 	} else
-	  temp1=temp1->next;
+	  tmp1=tmp1->next;
       }
     }
     c->free_idx=i;
@@ -109,7 +109,7 @@ I64 ArcDetermineCompressionType(U8 *src,I64 size)
 
 U0 ArcCompressBuf(CArcCtrl *c)
 {//Use $LK,"CompressBuf",A="MN:CompressBuf"$() unless doing more than one buf.
-  CArcEntry *temp,*temp1;
+  CArcEntry *tmp,*tmp1;
   I64 ch,basecode;
   U8 *src_ptr,*src_limit;
 
@@ -126,24 +126,24 @@ U0 ArcCompressBuf(CArcCtrl *c)
 ac_start:
     if (src_ptr>=src_limit) goto ac_done;
     ch=*src_ptr++;
-    if (temp=c->hash[basecode])
+    if (tmp=c->hash[basecode])
       do {
-	if (temp->ch==ch) {
-	  basecode=temp-&c->compress[0];
+	if (tmp->ch==ch) {
+	  basecode=tmp-&c->compress[0];
 	  goto ac_start;
 	}
-      } while (temp=temp->next);
+      } while (tmp=tmp->next);
 
     BFieldOrU32(c->dst_buf,c->dst_pos,basecode);
     c->dst_pos+=c->cur_bits_in_use;
 
     c->entry_used=TRUE;
-    temp=c->cur_entry;
-    temp->basecode=basecode;
-    temp->ch=ch;
-    temp1=&c->hash[basecode];
-    temp->next=temp1->next;
-    temp1->next=temp;
+    tmp=c->cur_entry;
+    tmp->basecode=basecode;
+    tmp->ch=ch;
+    tmp1=&c->hash[basecode];
+    tmp->next=tmp1->next;
+    tmp1->next=tmp;
 
     basecode=ch;
   }
@@ -166,7 +166,7 @@ U0 ArcExpandBuf(CArcCtrl *c)
 {//Use $LK,"ExpandBuf",A="MN:ExpandBuf"$() unless you know what you're doing.
   U8 *dst_ptr,*dst_limit;
   I64 basecode,lastcode,code;
-  CArcEntry *temp,*temp1;
+  CArcEntry *tmp,*tmp1;
 
   dst_ptr=c->dst_buf+c->dst_pos;
   dst_limit=c->dst_buf+c->dst_size;
@@ -201,12 +201,12 @@ U0 ArcExpandBuf(CArcCtrl *c)
       c->last_ch=code;
 
       c->entry_used=TRUE;
-      temp=c->cur_entry;
-      temp->basecode=lastcode;
-      temp->ch=c->last_ch;
-      temp1=&c->hash[lastcode];
-      temp->next=temp1->next;
-      temp1->next=temp;
+      tmp=c->cur_entry;
+      tmp->basecode=lastcode;
+      tmp->ch=c->last_ch;
+      tmp1=&c->hash[lastcode];
+      tmp->next=tmp1->next;
+      tmp1->next=tmp;
 
       ArcEntryGet(c);
       while (dst_ptr<dst_limit && c->stk_ptr!=c->stk_base)

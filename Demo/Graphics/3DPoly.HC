@@ -101,7 +101,7 @@ U0 Main()
       poly[3].z=0;
       GrFillPoly3(dc,4,poly);
 
-      WinMgrSync;
+      Refresh;
       DCFill;
       é+=2.1*ã/180.0;
       è+=1.1*ã/180.0;

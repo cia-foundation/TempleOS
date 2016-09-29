@@ -1,4 +1,3 @@
-
 U8 face[8]={
 
 0b00111100,
@@ -30,7 +29,7 @@ U0 SrcExample()
 }
 
 SrcExample;
-//See $LK,"::/Demo/ScreenCodes.HC"$, $LK,"::/Demo/Graphics/CharAnimation.HC"$,
+//See $LK,"::/Demo/ScrnCodes.HC"$, $LK,"::/Demo/Graphics/CharAnimation.HC"$,
 //$LK,"::/Demo/Games/CharDemo.HC"$ and $LK,"::/Demo/Graphics/FontEd.HC"$.
 
 //See $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ and $LK,"chars_bmp_alpha_numeric",A="MN:chars_bmp_alpha_numeric"$.

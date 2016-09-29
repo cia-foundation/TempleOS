@@ -1,17 +1,17 @@
-U0 SrvCmdDel(CSrvCmd *tempc)
+U0 SrvCmdDel(CSrvCmd *tmpc)
 {//Free one cmd node.
-  Free(tempc->aux_str);
-  Free(tempc);
+  Free(tmpc->aux_str);
+  Free(tmpc);
 }
 
 U0 SrvCmdQueDel(CSrvCmd *head)
 {
-  CSrvCmd *tempc=head->next,*tempc1;
-  while (tempc!=head) {
-    tempc1=tempc->next;
-    QueRem(tempc);
-    SrvCmdDel(tempc);
-    tempc=tempc1;
+  CSrvCmd *tmpc=head->next,*tmpc1;
+  while (tmpc!=head) {
+    tmpc1=tmpc->next;
+    QueRem(tmpc);
+    SrvCmdDel(tmpc);
+    tmpc=tmpc1;
   }
 }
 
@@ -119,51 +119,51 @@ CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags)
 CSrvCmd *TaskMsg(CTask *_srv,CTask *master,I64 msg_code,I64 a1,I64 a2,I64 flags)
 {//Post message to servant task.  Tell who the master task is.
 //See $LK,"flags",A="MN:SVCf_WAKE_MASTER"$ and $LK,"msg_code",A="MN:MSG_CMD"$.
-  CSrvCmd *tempc1,*tempc;
+  CSrvCmd *tmpc1,*tmpc;
   CTask *srv=_srv;
   if (!TaskValidate(srv) || master && !TaskValidate(master)||
 	srv->popup_task && !Bt(&srv->task_flags,TASKf_FILTER_INPUT))
     return NULL;
-  tempc=ACAlloc(sizeof(CSrvCmd));
-  tempc->master_task=master;
-  tempc->cmd_code=SVCT_MSG;
-  tempc->msg_code=AbsI64(msg_code); //negative means do a down and up
-  tempc->aux1=a1;
-  tempc->aux2=a2;
-  tempc->flags=flags;
+  tmpc=ACAlloc(sizeof(CSrvCmd));
+  tmpc->master_task=master;
+  tmpc->cmd_code=SVCT_MSG;
+  tmpc->msg_code=AbsI64(msg_code); //negative means do a down and up
+  tmpc->aux1=a1;
+  tmpc->aux2=a2;
+  tmpc->flags=flags;
   PUSHFD
   if (Bt(&sys_semas[SYS_SEMA_RECORD_MACRO],0) &&
 	srv!=sys_macro_task && msg_code==MSG_KEY_DOWN) {
-    tempc1=AMAllocIdent(tempc);
+    tmpc1=AMAllocIdent(tmpc);
     CLI
-    QueIns(tempc1,sys_macro_head.last);
+    QueIns(tmpc1,sys_macro_head.last);
   }
   CLI
   while (Bt(&srv->task_flags,TASKf_FILTER_INPUT) &&
 	!Bt(&flags,SVCf_DONT_FILTER))
     srv=srv->next_input_filter_task;
-  tempc->ctrl=&srv->srv_ctrl;
+  tmpc->ctrl=&srv->srv_ctrl;
   while (LBts(&srv->srv_ctrl.flags,SVCRf_LOCKED))
     PAUSE
   if (!TaskValidate(srv)) {
-    SrvCmdDel(tempc);
-    tempc=NULL;
+    SrvCmdDel(tmpc);
+    tmpc=NULL;
   } else {
     LBtr(&srv->task_flags,TASKf_IDLE);
     TaskRstAwaitingMsg(srv);
-    QueIns(tempc,srv->srv_ctrl.last_waiting);
+    QueIns(tmpc,srv->srv_ctrl.last_waiting);
     LBtr(&srv->srv_ctrl.flags,SVCRf_LOCKED);
   }
   POPFD
   if (msg_code<0) //Down-Up
     TaskMsg(_srv,master,-msg_code+1,a1,a2,flags);
-  return tempc;
+  return tmpc;
 }
 
 Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL)
 {//Check rqst complete, return with or without.
   CSrvCtrl *ctrl;
-  CSrvCmd *tempc,*tempc1;
+  CSrvCmd *tmpc,*tmpc1;
   if (!rqst || Bt(&rqst->flags,SVCf_DONE)) {
     if (!rqst || rqst->master_task)
       ctrl=&Fs->srv_ctrl;
@@ -173,19 +173,19 @@ Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL)
     CLI
     while (LBts(&ctrl->flags,SVCRf_LOCKED))
       PAUSE
-    tempc1=&ctrl->next_done;
-    tempc=tempc1->next;
-    while (tempc!=tempc1) {
-      if (!rqst || rqst==tempc) {
-	QueRem(tempc);
+    tmpc1=&ctrl->next_done;
+    tmpc=tmpc1->next;
+    while (tmpc!=tmpc1) {
+      if (!rqst || rqst==tmpc) {
+	QueRem(tmpc);
 	LBtr(&ctrl->flags,SVCRf_LOCKED);
 	POPFD
 	if (_res)
-	  *_res=tempc->res;
-	SrvCmdDel(tempc);
+	  *_res=tmpc->res;
+	SrvCmdDel(tmpc);
 	return TRUE;
       }
-      tempc=tempc->next;
+      tmpc=tmpc->next;
     }
     LBtr(&ctrl->flags,SVCRf_LOCKED);
     POPFD
@@ -198,10 +198,10 @@ Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL)
 I64 JobResGet(CSrvCmd *rqst=NULL)
 {//See $LK,"::/Demo/MultiCore/Lock.HC"$
   I64 res;
-  CSrvCmd *tempc1;
+  CSrvCmd *tmpc1;
   if (!rqst) {
-    tempc1=&Fs->srv_ctrl.next_done;
-    while (tempc1==tempc1->next) {
+    tmpc1=&Fs->srv_ctrl.next_done;
+    while (tmpc1==tmpc1->next) {
       LBts(&Fs->task_flags,TASKf_IDLE);
       Yield;
     }
@@ -217,19 +217,20 @@ I64 JobResGet(CSrvCmd *rqst=NULL)
   return res;
 }
 
-U0 TaskWait(CTask *task=NULL)
+U0 TaskWait(CTask *task=NULL,Bool cmd_line_pmt=FALSE)
 {//Wait for idle.
   CTask *task1;
-  CSrvCmd *tempc1;
+  CSrvCmd *tmpc1;
   if (!task) task=Fs;
   if (TaskValidate(task)) {
     PUSHFD
     CLI
     while (TRUE) {
       task1=task->last_input_filter_task;
-      tempc1=&task1->srv_ctrl.next_waiting;
+      tmpc1=&task1->srv_ctrl.next_waiting;
       if (task1==Fs || !TaskValidate(task1) ||
-	    tempc1==tempc1->next && Bt(&task1->task_flags,TASKf_IDLE))
+	    tmpc1==tmpc1->next && Bt(&task1->task_flags,TASKf_IDLE) &&
+	    (!cmd_line_pmt || Bt(&task1->task_flags,TASKf_CMD_LINE_PMT)))
 	break;
       Yield;
     }
@@ -266,48 +267,48 @@ U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0)
 
 I64 SrvCmdRunOne(I64 run_flags,CSrvCtrl *ctrl)
 {//Called with ctrl->flags,SVCRf_LOCKED.
-  CSrvCmd *tempc=ctrl->next_waiting;
+  CSrvCmd *tmpc=ctrl->next_waiting;
   CTask   *master;
-  I64 res,flags=tempc->flags,old_flags=GetRFlags;
+  I64 res,flags=tmpc->flags,old_flags=GetRFlags;
   if (Bt(&flags,SVCf_EXIT_ON_COMPLETE))
     res=SCR_EXIT;
   else
     res=SCR_CONT;
-  switch (tempc->cmd_code) {
+  switch (tmpc->cmd_code) {
     case SVCT_SPAWN_TASK:
-      QueRem(tempc);
-      LBts(&tempc->flags,SVCf_DISPATCHED);
-      tempc->servant_cpu_num=Gs->num;
+      QueRem(tmpc);
+      LBts(&tmpc->flags,SVCf_DISPATCHED);
+      tmpc->servant_cpu_num=Gs->num;
       LBtr(&ctrl->flags,SVCRf_LOCKED);
-      if (tempc->aux_str)
-	tempc->spawned_task=Spawn(tempc->addr,tempc->fun_arg,
-	      tempc->aux_str,,tempc->aux1,tempc->aux2,tempc->flags);
+      if (tmpc->aux_str)
+	tmpc->spawned_task=Spawn(tmpc->addr,tmpc->fun_arg,
+	      tmpc->aux_str,,tmpc->aux1,tmpc->aux2,tmpc->flags);
       else
-	tempc->spawned_task=Spawn(tempc->addr,tempc->fun_arg,
-	      "Unnamed",,tempc->aux1,tempc->aux2,tempc->flags);
+	tmpc->spawned_task=Spawn(tmpc->addr,tmpc->fun_arg,
+	      "Unnamed",,tmpc->aux1,tmpc->aux2,tmpc->flags);
       break;
     case SVCT_CALL:
-      QueRem(tempc);
-      LBts(&tempc->flags,SVCf_DISPATCHED);
-      tempc->servant_cpu_num=Gs->num;
+      QueRem(tmpc);
+      LBts(&tmpc->flags,SVCf_DISPATCHED);
+      tmpc->servant_cpu_num=Gs->num;
       LBtr(&ctrl->flags,SVCRf_LOCKED);
       SetRFlags(run_flags);
       LBtr(&Fs->task_flags,TASKf_IDLE);
       try
-	      tempc->res=(*tempc->addr)(tempc->fun_arg);
+	      tmpc->res=(*tmpc->addr)(tmpc->fun_arg);
       catch
 	Fs->catch_except=TRUE;
       SetRFlags(old_flags);
       break;
     case SVCT_EXE_STR:
-      QueRem(tempc);
-      LBts(&tempc->flags,SVCf_DISPATCHED);
-      tempc->servant_cpu_num=Gs->num;
+      QueRem(tmpc);
+      LBts(&tmpc->flags,SVCf_DISPATCHED);
+      tmpc->servant_cpu_num=Gs->num;
       LBtr(&ctrl->flags,SVCRf_LOCKED);
       SetRFlags(run_flags);
       LBtr(&Fs->task_flags,TASKf_IDLE);
       try
-	      tempc->res=ExePrint("%s",tempc->aux_str);
+	      tmpc->res=ExePrint("%s",tmpc->aux_str);
       catch
 	Fs->catch_except=TRUE;
       SetRFlags(old_flags);
@@ -316,13 +317,13 @@ I64 SrvCmdRunOne(I64 run_flags,CSrvCtrl *ctrl)
       res=SCR_DONE;
   }
   if (res) {
-    if (master=tempc->master_task) {
+    if (master=tmpc->master_task) {
       if (!Bt(&flags,SVCf_FREE_ON_COMPLETE)) {
 	CLI
 	while (LBts(&master->srv_ctrl.flags,SVCRf_LOCKED))
 	  PAUSE
-	QueIns(tempc,master->srv_ctrl.last_done);
-	LBts(&tempc->flags,SVCf_DONE);
+	QueIns(tmpc,master->srv_ctrl.last_done);
+	LBts(&tmpc->flags,SVCf_DONE);
 	LBtr(&master->srv_ctrl.flags,SVCRf_LOCKED);
 	SetRFlags(old_flags);
       }
@@ -333,13 +334,13 @@ I64 SrvCmdRunOne(I64 run_flags,CSrvCtrl *ctrl)
 	Suspend(master,FALSE);
     }
     if (Bt(&flags,SVCf_FREE_ON_COMPLETE))
-      SrvCmdDel(tempc);
+      SrvCmdDel(tmpc);
     else if (!master) {
       CLI
       while (LBts(&ctrl->flags,SVCRf_LOCKED))
 	Yield;
-      QueIns(tempc,ctrl->last_done);
-      LBts(&tempc->flags,SVCf_DONE);
+      QueIns(tmpc,ctrl->last_done);
+      LBts(&tmpc->flags,SVCf_DONE);
       LBtr(&ctrl->flags,SVCRf_LOCKED);
       SetRFlags(old_flags);
     }
@@ -377,7 +378,7 @@ sch_done:
 I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Execute code in $LK,"PopUp",A="MN:PopUp"$ task.
   I64 res;
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   CTask *task=Spawn(&SrvCmdLine,NULL,"Servant",,parent);
   if (!parent) {
     TaskExe(task,parent,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
@@ -385,9 +386,9 @@ I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL)
     return 0;
   } else {
     Fs->popup_task=task;
-    tempc=TaskExe(task,parent,buf,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+    tmpc=TaskExe(task,parent,buf,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
     if (_pu_task) *_pu_task=task;
-    JobResScan(tempc,&res);
+    JobResScan(tmpc,&res);
     Fs->popup_task=NULL;
     Kill(task);
     if (_pu_task) *_pu_task=NULL;
@@ -408,15 +409,15 @@ I64 Adam(U8 *fmt,...)
 {//Make adam_task execute code.
   I64 res;
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   if (Fs==adam_task) {
-    tempc=TaskExe(adam_task,Fs,buf,0);
+    tmpc=TaskExe(adam_task,Fs,buf,0);
     SrvCmdsHandler(GetRFlags);
   } else {
     TaskWait(adam_task);
-    tempc=TaskExe(adam_task,Fs,buf,1<<SVCf_WAKE_MASTER);
+    tmpc=TaskExe(adam_task,Fs,buf,1<<SVCf_WAKE_MASTER);
   }
-  JobResScan(tempc,&res);
+  JobResScan(tmpc,&res);
   Free(buf);
   return res;
 }
@@ -462,8 +463,8 @@ U0 XTalkWait(CTask *task,U8 *fmt,...)
   TaskWait(task);
 }
 
-U0 AutoStr(U8 *fmt,...)
-{//Send AutoFile code to self.
+U0 InStr(U8 *fmt,...)
+{//Send InFile code to self.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   if (Bt(&Fs->task_flags,TASKf_INPUT_FILTER_TASK))
     ExePrint("%s",buf);
@@ -472,30 +473,30 @@ U0 AutoStr(U8 *fmt,...)
   Free(buf);
 }
 
-U0 AutoFile(U8 *filename)
-{//Send AutoFile code file to self.
-  U8 *name=DftExt(filename,"AUT.Z");
-  AutoStr("Cd(\"%C:%s\");;#include \"%s\"",
+U0 InFile(U8 *filename)
+{//Send InFile code file to self.
+  U8 *name=DftExt(filename,"IN.Z");
+  InStr("Cd(\"%C:%s\");;#include \"%s\"",
 	Drv2Let(Fs->cur_dv),Fs->cur_dir,name);
   Free(name);
 }
 
-U0 Auto(U8 *fmt,...)
+U0 In(U8 *fmt,...)
 {//Send text to own input buffer. See $LK,"::/Demo/AcctExample/TOSDistro.HC"$.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=AStrNew(buf);
-  AutoStr("\"%%s\",%d;Free(%d);",st,st);
+  InStr("\"%%s\",%d;Free(%d);",st,st);
   Free(buf);
 }
 
 U0 XTalkStr(CTask *task,U8 *fmt,...)
-{//Send AutoFile code to other task.
+{//Send InFile code to other task.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   TaskText(task,NULL,buf,0);
   Free(buf);
 }
 
 U0 XTalkStrWait(CTask *task,U8 *fmt,...)
-{//Send AutoFile code to other task and wait for it to idle.
+{//Send InFile code to other task and wait for it to idle.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   TaskText(task,NULL,buf,0);
   Free(buf);

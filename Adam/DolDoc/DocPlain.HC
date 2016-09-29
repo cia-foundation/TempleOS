@@ -3,10 +3,10 @@
 I64 PrsDocFlagSingle(CCmpCtrl *cc,I64 *_de_flags,U32 *_type,Bool turn_on)
 {
   I64 res=-1;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   if (cc->token==TK_IDENT &&
-	(temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_FLAG))) {
-    res=temph->user_data0;
+	(tmph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_FLAG))) {
+    res=tmph->user_data0;
     if (res<64) {
       BEqu(_de_flags,res,turn_on);
       switch (res) {
@@ -219,18 +219,18 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
   I64 i,j,de_flags,processed_flags,attr=DOC_DFT;
   U8 *ptr,*st2;
   CDocEntry *doc_e=NULL;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   CCmpCtrl *cc=CmpCtrlNew(st,CCF_DONT_FREE_BUF);
   CHashTable *old_hash_table_lst=cc->htc.hash_table_lst;
   try {
     cc->htc.hash_table_lst=NULL;
     if (Lex(cc)==TK_IDENT) {
-      if (temph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD|DHT_COLOR)) {
-	if (temph->type&DHT_DOC_CMD)
-	  i=temph->user_data0;
+      if (tmph=HashFind(cc->cur_str,doldoc.hash,DHT_DOC_CMD|DHT_COLOR)) {
+	if (tmph->type&DHT_DOC_CMD)
+	  i=tmph->user_data0;
 	else {//DHT_COLOR
 	  i=DOCT_FOREGROUND;
-	  attr=temph->user_data0;
+	  attr=tmph->user_data0;
 	}
       } else
 	goto pd_err;

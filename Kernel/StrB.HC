@@ -1,29 +1,29 @@
 U8 *Tabs2Spaces(U8 *src)
 {//MAlloc str with tabs to spaces.
   I64 ch,i,j,l=StrLen(src)<<1+2,col=0;
-  U8 *dst=MAlloc(l),*temp;
+  U8 *dst=MAlloc(l),*tmp;
   while (ch=*src++) {
     if (ch=='\t') {
       j=(col+8) & ~7;
       for (i=col;i<j;i++) {
 	dst[i]=CH_SPACE;
 	if (i>=l-2) {
-	  temp=MAlloc(l<<1);
-	  MemCpy(temp,dst,i+1);
+	  tmp=MAlloc(l<<1);
+	  MemCpy(tmp,dst,i+1);
 	  Free(dst);
 	  l<<=1;
-	  dst=temp;
+	  dst=tmp;
 	}
       }
       col=j;
     } else {
       dst[col]=ch;
       if (col>=l-2) {
-	temp=MAlloc(l<<1);
-	MemCpy(temp,dst,col+1);
+	tmp=MAlloc(l<<1);
+	MemCpy(tmp,dst,col+1);
 	Free(dst);
 	l<<=1;
-	dst=temp;
+	dst=tmp;
       }
       col++;
     }
@@ -57,12 +57,12 @@ U8 *ScaleIndent(U8 *src,F64 indent_scale_factor)
 
 U8 *MStrUtil(U8 *src,I64 flags,F64 indent_scale_factor=0)
 {//MAlloc $LK,"StrUtil",A="MN:StrUtil"$().
-  U8 *dst=StrNew(src),*dst2,*temp;
+  U8 *dst=StrNew(src),*dst2,*tmp;
   StrUtil(dst,flags);
   if (flags & SUF_T2S) {
-    temp=Tabs2Spaces(dst);
+    tmp=Tabs2Spaces(dst);
     Free(dst);
-    dst=temp;
+    dst=tmp;
   }
   if (flags & SUF_SCALE_INDENT)
     dst2=ScaleIndent(dst,indent_scale_factor);
@@ -114,7 +114,7 @@ Bool AreYouSure()
 
 U0 Help()
 {//Dbg help or master help index file.
-  if (IsDbg)
+  if (IsDbgMode)
     DbgHelp;
   else
     PopUp("Type(\"::/Doc/HelpIndex.DD\");DocTop;View;");

@@ -2,8 +2,8 @@ U0 InstallDrv(U8 drv_let)
 {
   U8 *st;
   ExePrint("CopyTree(\"::/\",\"%C:/\");",drv_let);
-  ExePrint("MkDir(\"%C:/Temp\");",drv_let);
-  ExePrint("MkDir(\"%C:/Temp/ScreenShots\");",drv_let);
+  ExePrint("MkDir(\"%C:/Tmp\");",drv_let);
+  ExePrint("MkDir(\"%C:/Tmp/ScrnShots\");",drv_let);
   ExePrint("MkDir(\"%C:/Home\");",drv_let);
 
   st=MStrPrint("%C:/Home/DoDistro.HC.Z",drv_let);
@@ -73,7 +73,7 @@ U0 RegularInstallWiz()
 {
   I64 unit,drv_let;
   U8 *st,*base0,*base1;
-  CATARep *head=NULL,*tempha;
+  CATARep *head=NULL,*tmpha;
   I64 ch,num_hints;
   CTask *task;
 
@@ -101,11 +101,11 @@ U0 RegularInstallWiz()
     Free(base0);
   }
   if (1<=Str2I64(base0)<=num_hints) {
-    tempha=ATARepFind(&head,Str2I64(base0));
+    tmpha=ATARepFind(&head,Str2I64(base0));
     Free(base0);
-    base0=MStrPrint("0x%X",tempha->base0);
-    base1=MStrPrint("0x%X",tempha->base1);
-    st	 =MStrPrint("0x%X",tempha->unit);
+    base0=MStrPrint("0x%X",tmpha->base0);
+    base1=MStrPrint("0x%X",tmpha->base1);
+    st	 =MStrPrint("0x%X",tmpha->unit);
     unit=Str2I64(st);
     Free(st);
   } else {

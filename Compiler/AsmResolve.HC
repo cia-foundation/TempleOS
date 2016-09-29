@@ -1,40 +1,40 @@
-U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tempu,U8 *label,Bool undefined)
+U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tmpu,U8 *label,Bool undefined)
 {
-  CAOTImportExport *tempie;
-  CAsmUndefHash *tempauh;
-  I64 r=Call(tempu->machine_code);
+  CAOTImportExport *tmpie;
+  CAsmUndefHash *tmpauh;
+  I64 r=Call(tmpu->machine_code);
   if (undefined) {
-    tempauh=tempu->asm_undef_hash;
-    while (tempauh) {
-      if (tempauh->hash->type & HTF_UNRESOLVED) {
-	tempie=CAlloc(sizeof(CAOTImportExport));
-	tempie->next=tempauh->hash->ie_lst;
-	tempauh->hash->ie_lst=tempie;
-	tempie->ip=tempu->ip;
-	tempie->aot=cc->aot;
-	tempie->type=tempu->type;
+    tmpauh=tmpu->asm_undef_hash;
+    while (tmpauh) {
+      if (tmpauh->hash->type & HTF_UNRESOLVED) {
+	tmpie=CAlloc(sizeof(CAOTImportExport));
+	tmpie->next=tmpauh->hash->ie_lst;
+	tmpauh->hash->ie_lst=tmpie;
+	tmpie->ip=tmpu->ip;
+	tmpie->aot=cc->aot;
+	tmpie->type=tmpu->type;
       }
-      tempauh=tempauh->next; //Technically, more than one won't work.
+      tmpauh=tmpauh->next; //Technically, more than one won't work.
     }
-  } else if (!(tempu->type&IEF_IMM_NOT_REL)) {
-    r-=tempu->rel_ip;
-    if (tempu->type==IET_REL_I8 && !(MIN_I8<=r<=MAX_I8) ||
-	  tempu->type==IET_REL_I16 && !(MIN_I16<=r<=MAX_I16)) {
+  } else if (!(tmpu->type&IEF_IMM_NOT_REL)) {
+    r-=tmpu->rel_ip;
+    if (tmpu->type==IET_REL_I8 && !(MIN_I8<=r<=MAX_I8) ||
+	  tmpu->type==IET_REL_I16 && !(MIN_I16<=r<=MAX_I16)) {
       PrintErr("Branch out of range at line:%04d %s\n",
-	    tempu->line_num,label);
+	    tmpu->line_num,label);
       LexExcept(cc);
     }
-    if (tempu->U8_avail && tempu->type>IET_IMM_U8 && -124<=r<=123)
+    if (tmpu->U8_avail && tmpu->type>IET_IMM_U8 && -124<=r<=123)
       PrintWarn("could use I8 displacement at line:%04d %s %s\n",
-	    tempu->line_num,cc->aotc->last_label,label);
+	    tmpu->line_num,cc->aotc->last_label,label);
   }
-  AOTStoreCodeU8At(cc,tempu->ip,r.u8[0]);
-  if (tempu->type>=IET_REL_I16) {
-    AOTStoreCodeU8At(cc,tempu->ip+1,r.u8[1]);
-    if (tempu->type>=IET_REL_I32) {
-      AOTStoreCodeU8At(cc,tempu->ip+2,r.u8[2],r.u8[3]);
-      if (tempu->type>=IET_REL_I64)
-	AOTStoreCodeU8At(cc,tempu->ip+4,r.u8[4],r.u8[5],r.u8[6],r.u8[7]);
+  AOTStoreCodeU8At(cc,tmpu->ip,r.u8[0]);
+  if (tmpu->type>=IET_REL_I16) {
+    AOTStoreCodeU8At(cc,tmpu->ip+1,r.u8[1]);
+    if (tmpu->type>=IET_REL_I32) {
+      AOTStoreCodeU8At(cc,tmpu->ip+2,r.u8[2],r.u8[3]);
+      if (tmpu->type>=IET_REL_I64)
+	AOTStoreCodeU8At(cc,tmpu->ip+4,r.u8[4],r.u8[5],r.u8[6],r.u8[7]);
     }
   }
 }
@@ -42,30 +42,30 @@ U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tempu,U8 *label,Bool undefined)
 U0 AOTLocalsResolve(CCmpCtrl *cc)
 {
   CAOTCtrl *aotc=cc->aotc;
-  CAsmUnresolvedRef *tempu=aotc->local_unresolved,*tempu1;
-  CAsmUndefHash *tempauh;
+  CAsmUnresolvedRef *tmpu=aotc->local_unresolved,*tmpu1;
+  CAsmUndefHash *tmpauh;
   Bool undefined;
   U8 *label=NULL;
 
-  while (tempu) {
+  while (tmpu) {
     undefined=FALSE;
-    tempu1=tempu->next;
-    tempauh=tempu->asm_undef_hash;
-    while (tempauh) {
-      if (tempauh->hash->type & HTF_UNRESOLVED) {
+    tmpu1=tmpu->next;
+    tmpauh=tmpu->asm_undef_hash;
+    while (tmpauh) {
+      if (tmpauh->hash->type & HTF_UNRESOLVED) {
 	PrintErr("Undefined sym at line:%04d %s %s\n",
-	      tempu->line_num,aotc->last_label,tempauh->hash->str);
+	      tmpu->line_num,aotc->last_label,tmpauh->hash->str);
 	LexExcept(cc);
       }
-      label=tempauh->hash->str;
-      tempauh=tempauh->next;
+      label=tmpauh->hash->str;
+      tmpauh=tmpauh->next;
     }
     if (!undefined)
-      AsmResolve(cc,tempu,label,FALSE);
-    Free(tempu->machine_code);
-    LinkedLstDel(tempu->asm_undef_hash);
-    Free(tempu);
-    tempu=tempu1;
+      AsmResolve(cc,tmpu,label,FALSE);
+    Free(tmpu->machine_code);
+    LinkedLstDel(tmpu->asm_undef_hash);
+    Free(tmpu);
+    tmpu=tmpu1;
   }
   HashTableDel(cc->htc.local_hash_table);
   cc->htc.hash_table_lst=cc->htc.local_hash_table=HashTableNew(16);
@@ -73,114 +73,114 @@ U0 AOTLocalsResolve(CCmpCtrl *cc)
   aotc->local_unresolved=NULL;
 }
 
-U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tempaot)
+U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tmpaot)
 {
   CAOTCtrl *aotc=cc->aotc;
-  CHashFun *tempf;
-  CAsmUnresolvedRef *tempu=aotc->glbl_unresolved,*tempu1;
+  CHashFun *tmpf;
+  CAsmUnresolvedRef *tmpu=aotc->glbl_unresolved,*tmpu1;
   I64 i,j;
-  CAOTImportExport *tempie,*tempie1;
-  CAsmUndefHash *tempauh;
-  CHashExport *tempex;
+  CAOTImportExport *tmpie,*tmpie1;
+  CAsmUndefHash *tmpauh;
+  CHashExport *tmpex;
   U8 *label;
   Bool undefined;
-  CExternUsage *tempeu,*tempeu8;
+  CExternUsage *tmpeu,*tmpeu8;
 
-  while (tempu) {
+  while (tmpu) {
     label=NULL;
     undefined=FALSE;
-    tempu1=tempu->next;
-    tempauh=tempu->asm_undef_hash;
-    while (tempauh) {
-      if (tempauh->hash->type & HTF_UNRESOLVED) {
-	tempex=tempauh->hash;
-	if (tempex->type & HTT_EXPORT_SYS_SYM&& tempex->type & HTF_UNRESOLVED &&
-	      !(tempex->type & HTF_IMPORT) &&
-	      (tempf=HashFind(tempex->str,cc->htc.hash_table_lst,HTT_FUN)) &&
-	      !Bt(&tempf->flags,Cf_EXTERN)) {
-	  tempex->val=tempf->exe_addr;
-	  tempex->type&=~HTF_UNRESOLVED;
-	  label=tempauh->hash->str;
+    tmpu1=tmpu->next;
+    tmpauh=tmpu->asm_undef_hash;
+    while (tmpauh) {
+      if (tmpauh->hash->type & HTF_UNRESOLVED) {
+	tmpex=tmpauh->hash;
+	if (tmpex->type & HTT_EXPORT_SYS_SYM&& tmpex->type & HTF_UNRESOLVED &&
+	      !(tmpex->type & HTF_IMPORT) &&
+	      (tmpf=HashFind(tmpex->str,cc->htc.hash_table_lst,HTT_FUN)) &&
+	      !Bt(&tmpf->flags,Cf_EXTERN)) {
+	  tmpex->val=tmpf->exe_addr;
+	  tmpex->type&=~HTF_UNRESOLVED;
+	  label=tmpauh->hash->str;
 	} else {
-	  if (!(tempex->type & HTF_IMPORT)) {
+	  if (!(tmpex->type & HTF_IMPORT)) {
 	    if (cc->htc.local_var_lst) {
-	      tempex->type|=HTF_GOTO_LABEL;
-	      tempex->use_cnt++;
+	      tmpex->type|=HTF_GOTO_LABEL;
+	      tmpex->use_cnt++;
 	    } else {
 	      PrintErr("Undefined sym at line:%04d %s\n",
-		    tempu->line_num,tempex->str);
+		    tmpu->line_num,tmpex->str);
 	      LexExcept(cc);
 	    }
 	  } else if (undefined) {
 	    PrintErr("Two imports in same expression "
 		  "not allowed at line:%04d %s\n",
-		  tempu->line_num,tempex->str);
+		  tmpu->line_num,tmpex->str);
 	    LexExcept(cc);
 	  }
 	  undefined=TRUE;
 	}
       } else
-	label=tempauh->hash->str;
-      tempauh=tempauh->next;
+	label=tmpauh->hash->str;
+      tmpauh=tmpauh->next;
     }
-    AsmResolve(cc,tempu,label,undefined);
-    Free(tempu->machine_code);
-    LinkedLstDel(tempu->asm_undef_hash);
-    Free(tempu);
-    tempu=tempu1;
+    AsmResolve(cc,tmpu,label,undefined);
+    Free(tmpu->machine_code);
+    LinkedLstDel(tmpu->asm_undef_hash);
+    Free(tmpu);
+    tmpu=tmpu1;
   }
 
   for (i=0;i<=cc->htc.glbl_hash_table->mask;i++) {
-    tempex=cc->htc.glbl_hash_table->body[i];
-    while (tempex) {
-      if (tempex->type & (HTF_IMPORT|HTF_GOTO_LABEL)) {
-	if (tempex->use_cnt && (tempie=tempex->ie_lst)) {
-	  if (tempex->type&HTF_GOTO_LABEL)
-	    tempie->flags|=IEF_GOTO_LABEL;
-	  if (tempex->import_name)
-	    tempie->str=StrNew(tempex->import_name);
+    tmpex=cc->htc.glbl_hash_table->body[i];
+    while (tmpex) {
+      if (tmpex->type & (HTF_IMPORT|HTF_GOTO_LABEL)) {
+	if (tmpex->use_cnt && (tmpie=tmpex->ie_lst)) {
+	  if (tmpex->type&HTF_GOTO_LABEL)
+	    tmpie->flags|=IEF_GOTO_LABEL;
+	  if (tmpex->import_name)
+	    tmpie->str=StrNew(tmpex->import_name);
 	  else
-	    tempie->str=StrNew(tempex->str);
+	    tmpie->str=StrNew(tmpex->str);
 	  do {
-	    tempie1=tempie->next;
-	    QueIns(tempie,tempaot->last_ie);
-	  } while (tempie=tempie1);
-	  tempex->ie_lst=NULL;
+	    tmpie1=tmpie->next;
+	    QueIns(tmpie,tmpaot->last_ie);
+	  } while (tmpie=tmpie1);
+	  tmpex->ie_lst=NULL;
 	}
-      } else if (tempex->type & (HTF_EXPORT|HTF_RESOLVE)) {
-	if (tempex->type & HTF_UNRESOLVED) {
-	  PrintErr("Undefined sym at %s\n",tempex->str);
+      } else if (tmpex->type & (HTF_EXPORT|HTF_RESOLVE)) {
+	if (tmpex->type & HTF_UNRESOLVED) {
+	  PrintErr("Undefined sym at %s\n",tmpex->str);
 	  LexExcept(cc);
 	}
-	if (tempex->type & HTF_RESOLVE) {
-	  tempf=tempex;
-	  tempeu=tempf->ext_lst;
-	  while (tempeu) {
-	    tempeu8=tempeu->next;
-	    j=tempf->exe_addr-(tempeu->ip+4);
-	    AOTStoreCodeU8At(cc,tempeu->ip,j.u8[0],j.u8[1],j.u8[2],j.u8[3]);
-	    Free(tempeu);
-	    tempeu=tempeu8;
+	if (tmpex->type & HTF_RESOLVE) {
+	  tmpf=tmpex;
+	  tmpeu=tmpf->ext_lst;
+	  while (tmpeu) {
+	    tmpeu8=tmpeu->next;
+	    j=tmpf->exe_addr-(tmpeu->ip+4);
+	    AOTStoreCodeU8At(cc,tmpeu->ip,j.u8[0],j.u8[1],j.u8[2],j.u8[3]);
+	    Free(tmpeu);
+	    tmpeu=tmpeu8;
 	  }
 	}
-	if (tempex->type & HTF_EXPORT) {
-	  tempie=CAlloc(sizeof(CAOTImportExport));
-	  tempie->type=IET_REL32_EXPORT;
-	  if (tempex->type & HTT_FUN)
-	    tempie->ip=tempf->exe_addr;
-	  else if (tempex->type & HTT_GLBL_VAR)
-	    tempie->ip=tempex(CHashGlblVar *)->data_addr_ip;
+	if (tmpex->type & HTF_EXPORT) {
+	  tmpie=CAlloc(sizeof(CAOTImportExport));
+	  tmpie->type=IET_REL32_EXPORT;
+	  if (tmpex->type & HTT_FUN)
+	    tmpie->ip=tmpf->exe_addr;
+	  else if (tmpex->type & HTT_GLBL_VAR)
+	    tmpie->ip=tmpex(CHashGlblVar *)->data_addr_ip;
 	  else
-	    tempie->ip=tempex->val;
-	  tempie->aot=cc->aot;
-	  if (tempex->type & HTF_IMM)
-	    tempie->type++;
-	  tempie->str=StrNew(tempex->str);
-	  tempie->src_link=StrNew(tempex->src_link);
-	  QueIns(tempie,tempaot->last_ie);
+	    tmpie->ip=tmpex->val;
+	  tmpie->aot=cc->aot;
+	  if (tmpex->type & HTF_IMM)
+	    tmpie->type++;
+	  tmpie->str=StrNew(tmpex->str);
+	  tmpie->src_link=StrNew(tmpex->src_link);
+	  QueIns(tmpie,tmpaot->last_ie);
 	}
       }
-      tempex=tempex->next;
+      tmpex=tmpex->next;
     }
   }
 }
@@ -189,28 +189,28 @@ U0 AsmUnresolvedAdd(CCmpCtrl *cc,U8 *machine_code,I64 type,I64 ip,I64 rel_ip,
 	CAsmUndefHash *local_asm_undef_hash,CAsmUndefHash *glbl_asm_undef_hash,
 	I64 line_num,Bool U8_avail)
 {
-  CAsmUnresolvedRef *tempu=MAlloc(sizeof(CAsmUnresolvedRef));
-  tempu->machine_code=machine_code;
-  tempu->type=type;
-  tempu->ip=ip;
-  tempu->rel_ip=rel_ip;
-  tempu->aot=cc->aot;
-  tempu->imm_flag=FALSE;
-  tempu->line_num=line_num;
-  tempu->U8_avail=U8_avail;
-  tempu->str=NULL;
+  CAsmUnresolvedRef *tmpu=MAlloc(sizeof(CAsmUnresolvedRef));
+  tmpu->machine_code=machine_code;
+  tmpu->type=type;
+  tmpu->ip=ip;
+  tmpu->rel_ip=rel_ip;
+  tmpu->aot=cc->aot;
+  tmpu->imm_flag=FALSE;
+  tmpu->line_num=line_num;
+  tmpu->U8_avail=U8_avail;
+  tmpu->str=NULL;
   if (local_asm_undef_hash) {
-    tempu->asm_undef_hash=local_asm_undef_hash;
-    tempu->next=cc->aotc->local_unresolved;
-    cc->aotc->local_unresolved=tempu;
+    tmpu->asm_undef_hash=local_asm_undef_hash;
+    tmpu->next=cc->aotc->local_unresolved;
+    cc->aotc->local_unresolved=tmpu;
   } else {
-    tempu->asm_undef_hash=glbl_asm_undef_hash;
-    tempu->next=cc->aotc->glbl_unresolved;
-    cc->aotc->glbl_unresolved=tempu;
+    tmpu->asm_undef_hash=glbl_asm_undef_hash;
+    tmpu->next=cc->aotc->glbl_unresolved;
+    cc->aotc->glbl_unresolved=tmpu;
     if (glbl_asm_undef_hash->hash->type & HTF_IMPORT) {
-      tempu->str=StrNew(glbl_asm_undef_hash->hash->str);
+      tmpu->str=StrNew(glbl_asm_undef_hash->hash->str);
       if (glbl_asm_undef_hash->hash->type & HTF_IMM)
-	tempu->imm_flag=TRUE;
+	tmpu->imm_flag=TRUE;
     }
   }
 }

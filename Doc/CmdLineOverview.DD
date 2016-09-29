@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Command Line Overview"$$FG$
 
-The cmd line feeds into the $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ compiler as you type.  A stmt outside a function executes immediately.  Remember to add a semicolon.$WW,1$
+The cmd line feeds into the $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ compiler line-by-line as you type.  A stmt outside a function executes immediately.  Remember to add a semicolon.$WW,1$
 
 Look-up the function headers with $FG,2$AutoComplete$FG$ by hitting $FG,2$<CTRL-SHIFT-F1>$FG$ after typing the first few letters.
 
@@ -24,7 +24,7 @@ Drives are specified with a letter.  The boot drive is specified with a '$FG,2$:
 
 The drive can be specified in a $LK,"Cd",A="MN:Cd"$() command as in:
 
->$FG,2$Cd("B:/Temp");$FG$	B drive
+>$FG,2$Cd("B:/Tmp");$FG$	B drive
 >$FG,2$Cd("::/Demo");$FG$	Boot drive
 
 The home directory is specified with a $FG,2$'~'$FG$.
@@ -39,4 +39,4 @@ You can place macros in your $LK,"PersonalMenu",A="FI:~/PersonalMenu.DD"$ for $L
 
 $LK,"Cmd Line Routines",A="HI:Cmd Line (Typically)"$
 
-$MA-X+PU,"Take Tour",LM="User(\"Cd(\\\"::/Misc/Tour\\\");;AutoFile(\\\"Tour\\\");\n\");"$
+$MA-X+PU,"Take Tour",LM="User(\"Cd(\\\"::/Misc/Tour\\\");;InFile(\\\"Tour\\\");\n\");"$

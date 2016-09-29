@@ -7,18 +7,18 @@ I64 sys_macro_repeat_n=1;
 
 U0 SysMacroStripKey(CSrvCmd *macro_head,I64 a1,I64 a2)
 {
-  CSrvCmd *tempc,*tempc1;
-  tempc=macro_head->next;
-  while (tempc!=macro_head) {
-    tempc1=tempc->next;
-    if (tempc->cmd_code==SVCT_MSG &&
-	  (tempc->msg_code==MSG_KEY_DOWN || tempc->msg_code==MSG_KEY_UP ||
-	  tempc->msg_code==MSG_KEY_DOWN_UP) &&
-	  a1 && tempc->aux1==a1 || !a1 && tempc->aux2==a2) {
-      QueRem(tempc);
-      SrvCmdDel(tempc);
+  CSrvCmd *tmpc,*tmpc1;
+  tmpc=macro_head->next;
+  while (tmpc!=macro_head) {
+    tmpc1=tmpc->next;
+    if (tmpc->cmd_code==SVCT_MSG &&
+	  (tmpc->msg_code==MSG_KEY_DOWN || tmpc->msg_code==MSG_KEY_UP ||
+	  tmpc->msg_code==MSG_KEY_DOWN_UP) &&
+	  a1 && tmpc->aux1==a1 || !a1 && tmpc->aux2==a2) {
+      QueRem(tmpc);
+      SrvCmdDel(tmpc);
     }
-    tempc=tempc1;
+    tmpc=tmpc1;
   }
 }
 
@@ -26,77 +26,77 @@ U0 SysMacroStripKey(CSrvCmd *macro_head,I64 a1,I64 a2)
 #define MT_MSG	1
 #define MT_CHAR	2
 
-class CMacroTemp
+class CMacroTmp
 {
-  CMacroTemp *next,*last;
+  CMacroTmp *next,*last;
   I64 type;
   U8 buf[STR_LEN];
 };
 
-CMacroTemp *Cmd2MT(CSrvCmd *tempc)
+CMacroTmp *Cmd2MT(CSrvCmd *tmpc)
 {
   U8 buf[8];
-  CMacroTemp *tempmt=CAlloc(sizeof(CMacroTemp));
-  if (Bt(chars_bmp_macro,tempc->aux1) && tempc->msg_code==MSG_KEY_DOWN) {
-    tempmt->type=MT_CHAR;
-    buf[0]=tempc->aux1;
+  CMacroTmp *tmpmt=CAlloc(sizeof(CMacroTmp));
+  if (Bt(chars_bmp_macro,tmpc->aux1) && tmpc->msg_code==MSG_KEY_DOWN) {
+    tmpmt->type=MT_CHAR;
+    buf[0]=tmpc->aux1;
     buf[1]=0;
-    StrPrint(tempmt->buf,"%Q",buf);
+    StrPrint(tmpmt->buf,"%Q",buf);
   } else {
-    tempmt->type=MT_MSG;
-    StrPrint(tempmt->buf,"Msg(0x%X,0x%X,0x%X);",
-	  tempc->msg_code,tempc->aux1,tempc->aux2);
+    tmpmt->type=MT_MSG;
+    StrPrint(tmpmt->buf,"Msg(0x%X,0x%X,0x%X);",
+	  tmpc->msg_code,tmpc->aux1,tmpc->aux2);
   }
-  return tempmt;
+  return tmpmt;
 }
 
 U8 *SysMacro2Str(CSrvCmd *macro_head)
 {
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
-  CMacroTemp *tempmt,*tempmt1,head;
+  CMacroTmp *tmpmt,*tmpmt1,head;
   LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
 
   QueInit(&head);
   head.type=MT_NULL;
-  tempc=macro_head->next;
-  while (tempc!=macro_head) {
-    tempmt=Cmd2MT(tempc);
-    QueIns(tempmt,head.last);
-    cnt+=StrLen(tempmt->buf);
-    if (tempmt->type==MT_CHAR) {
-      if (tempmt->last->type!=MT_CHAR)
+  tmpc=macro_head->next;
+  while (tmpc!=macro_head) {
+    tmpmt=Cmd2MT(tmpc);
+    QueIns(tmpmt,head.last);
+    cnt+=StrLen(tmpmt->buf);
+    if (tmpmt->type==MT_CHAR) {
+      if (tmpmt->last->type!=MT_CHAR)
 	cnt+=StrLen("\"");
-      if (tempmt->next->type!=MT_CHAR)
+      if (tmpmt->next->type!=MT_CHAR)
 	cnt+=StrLen("\";");
     }
-    tempc=tempc->next;
+    tmpc=tmpc->next;
   }
 
   m=MAlloc(cnt);
   ptr=m;
 
-  tempmt=head.next;
-  while (tempmt!=&head) {
-    tempmt1=tempmt->next;
-    if (tempmt->type==MT_MSG) {
-      StrCpy(ptr, tempmt->buf);
-      ptr+=StrLen(tempmt->buf);
+  tmpmt=head.next;
+  while (tmpmt!=&head) {
+    tmpmt1=tmpmt->next;
+    if (tmpmt->type==MT_MSG) {
+      StrCpy(ptr, tmpmt->buf);
+      ptr+=StrLen(tmpmt->buf);
     } else {
-      if (tempmt->last->type!=MT_CHAR) {
+      if (tmpmt->last->type!=MT_CHAR) {
 	StrCpy(ptr, "\"");
 	ptr+=StrLen("\"");
       }
-      StrCpy(ptr,tempmt->buf);
-      ptr+=StrLen(tempmt->buf);
-      if (tempmt->next->type!=MT_CHAR) {
+      StrCpy(ptr,tmpmt->buf);
+      ptr+=StrLen(tmpmt->buf);
+      if (tmpmt->next->type!=MT_CHAR) {
 	StrCpy(ptr, "\";");
 	ptr+=StrLen("\";");
       }
     }
-    Free(tempmt);
-    tempmt=tempmt1;
+    Free(tmpmt);
+    tmpmt=tmpmt1;
   }
   *ptr=0;
   return m;
@@ -111,7 +111,7 @@ U0 PlaySysMacro(I64 n=1)
     m=SysMacro2Str(&sys_macro_head);
     while (n-- && TaskValidate(task)) {
       if (task==Fs)
-	AutoStr("%s",m);
+	InStr("%s",m);
       else
 	XTalkStrWait(task,"%s",m);
     }
@@ -123,7 +123,7 @@ U0 EdInsCapturedMacro()
 {
   U8 *st=SysMacro2Str(&sys_macro_head);
   if (sys_focus_task) {
-    XTalk(sys_focus_task,"$$MA+LA,T=\"%s\",LM=\"%$$Q\"$$",
+    XTalk(sys_focus_task,"$$MA+LIS,T=\"%s\",LM=\"%$$Q\"$$",
 	  captured_macro_name,st);
     Free(st);
   }
@@ -139,7 +139,7 @@ I64 PopUpMacroMenu()
 {
   I64 res=0;
   U8 buf[STR_LEN];
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   CDoc *doc=DocNew;
   CDocEntry *doc_e=DocPrint(doc,"$$DA-P,LEN=STR_LEN-1,A=\"Name:%%s\"$$");
   doc_e->data=captured_macro_name;
@@ -162,9 +162,9 @@ I64 PopUpMacroMenu()
   sys_macro_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_task;
   LBts(&sys_macro_task->display_flags,DISPLAYf_WIN_ON_TOP);
-  tempc=TaskExe(sys_macro_task,Fs,buf,
+  tmpc=TaskExe(sys_macro_task,Fs,buf,
 	1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-  JobResScan(tempc,&res);
+  JobResScan(tmpc,&res);
   Fs->popup_task=NULL;
   Kill(sys_macro_task);
   sys_macro_task=NULL;

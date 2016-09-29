@@ -18,7 +18,7 @@ public I64 PrtDsk(U8 drv_let=0)
 //drv_let=0 means add new drive that
   //is not already mounted.
   CBlkDev *bd;
-  CPlannedDrv head,*temppp;
+  CPlannedDrv head,*tmppp;
   CMasterBoot mbr;
   Bool pri=TRUE;
   I64 ext_base,drv_let2,pri_cnt=0,
@@ -49,15 +49,15 @@ public I64 PrtDsk(U8 drv_let=0)
   drv_let2=bd->first_drv_let;
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO);
   while (FloorU64(remaining,ROUND_DRV_TO)>=ROUND_DRV_TO) {
-    temppp=MAlloc(sizeof(CPlannedDrv));
+    tmppp=MAlloc(sizeof(CPlannedDrv));
     do {
       "$$RED$$Partition %C$$FG$$\n",drv_let2;
-      temppp->pri=FALSE;
+      tmppp->pri=FALSE;
       if (pri) {
 	"Primary Partition";
 	if (YorN) {
 	  pri_cnt++;
-	  temppp->pri=TRUE;
+	  tmppp->pri=TRUE;
 	  if (pri_cnt==3)
 	    pri=FALSE;
 	} else
@@ -65,31 +65,31 @@ public I64 PrtDsk(U8 drv_let=0)
       }
       "Blocks Remaining:%d (0x%X)\n",
 	    remaining-DRV_HEADER,remaining-DRV_HEADER;
-      temppp->size=CeilU64(GetI64("Size in Blocks  :",
+      tmppp->size=CeilU64(GetI64("Size in Blocks  :",
 	    remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
-    } while (!(ROUND_DRV_TO<=temppp->size<=FloorU64(remaining,ROUND_DRV_TO)));
-    QueIns(temppp,head.last);
-    remaining-=temppp->size;
+    } while (!(ROUND_DRV_TO<=tmppp->size<=FloorU64(remaining,ROUND_DRV_TO)));
+    QueIns(tmppp,head.last);
+    remaining-=tmppp->size;
     drv_let2++;
   }
 
   "\n\n!!! Repartition Drive !!!\n\n";
-  temppp=head.next;
+  tmppp=head.next;
   drv_let2=bd->first_drv_let;
-  while (temppp!=&head) {
-    "Drive %C:%08X ",drv_let2,temppp->size;
-    if (temppp->pri)
+  while (tmppp!=&head) {
+    "Drive %C:%08X ",drv_let2,tmppp->size;
+    if (tmppp->pri)
       "Primary\n";
     else
       "Logical\n";
-    temppp=temppp->next;
+    tmppp=tmppp->next;
     drv_let2++;
   }
   if (!AreYouSure)
     goto pd_done;
 
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO)-ROUND_DRV_TO;
-  temppp=head.next;
+  tmppp=head.next;
   MemSet(&mbr,0,BLK_SIZE);
   mbr.signature=0xAA55;
   offset=0;
@@ -101,13 +101,13 @@ public I64 PrtDsk(U8 drv_let=0)
     mbr.p[i].end_head=0xFE;
     mbr.p[i].end_cyl=0xFFFF;
     mbr.p[i].offset=DRV_HEADER+offset;
-    mbr.p[i].size=temppp->size-DRV_HEADER;
-    offset+=temppp->size;
-    remaining-=temppp->size;
-    temppp=temppp->next;
+    mbr.p[i].size=tmppp->size-DRV_HEADER;
+    offset+=tmppp->size;
+    remaining-=tmppp->size;
+    tmppp=tmppp->next;
   }
   if (!i) i++;
-  if (temppp!=&head) {
+  if (tmppp!=&head) {
     mbr.p[i].active=0x80;
     mbr.p[i].start_head=0;
     mbr.p[i].start_cyl=0x101;
@@ -120,7 +120,7 @@ public I64 PrtDsk(U8 drv_let=0)
   }
   ATAWriteBlks(bd,&mbr,0,1);
 
-  while (temppp!=&head) {
+  while (tmppp!=&head) {
     start_offset=offset;
     MemSet(&mbr,0,BLK_SIZE);
     mbr.signature=0xAA55;
@@ -132,10 +132,10 @@ public I64 PrtDsk(U8 drv_let=0)
     mbr.p[0].end_head=0xFE;
     mbr.p[0].end_cyl=0xFFFF;
     mbr.p[0].offset=DRV_HEADER;
-    mbr.p[0].size=temppp->size-DRV_HEADER;
-    offset+=temppp->size;
-    temppp=temppp->next;
-    if (temppp!=&head) {
+    mbr.p[0].size=tmppp->size-DRV_HEADER;
+    offset+=tmppp->size;
+    tmppp=tmppp->next;
+    if (tmppp!=&head) {
       mbr.p[1].active=0x80;
       mbr.p[1].start_head=0;
       mbr.p[1].start_cyl=0x101;
@@ -143,7 +143,7 @@ public I64 PrtDsk(U8 drv_let=0)
       mbr.p[1].end_head=0xFE;
       mbr.p[1].end_cyl=0xFFFF;
       mbr.p[1].offset=offset-ext_base;
-      mbr.p[1].size=temppp->size;
+      mbr.p[1].size=tmppp->size;
     }
     ATAWriteBlks(bd,&mbr,start_offset,1);
   }
@@ -155,9 +155,9 @@ public I64 PrtDsk(U8 drv_let=0)
 
 pd_done:
   while (head.next!=&head) {
-    temppp=head.next;
-    QueRem(temppp);
-    Free(temppp);
+    tmppp=head.next;
+    QueRem(tmppp);
+    Free(tmppp);
   }
   return drv_dsk_dsk_size;
 }

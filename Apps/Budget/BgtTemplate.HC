@@ -1,37 +1,37 @@
-U0 BgtTemplatePurge(CBgtTemplate *tempt)
+U0 BgtTemplatePurge(CBgtTemplate *tmpt)
 {
-  CBgtEntry	*tempb,*tempb1;
-  tempb=b_head.next;
-  while (tempb!=&b_head) {
-    tempb1=tempb->next;
-    if (tempb->template==tempt) {
-      QueRem(tempb);
-      BgtEntryDel2(tempb);
-      Free(tempb);
+  CBgtEntry	*tmpb,*tmpb1;
+  tmpb=b_head.next;
+  while (tmpb!=&b_head) {
+    tmpb1=tmpb->next;
+    if (tmpb->template==tmpt) {
+      QueRem(tmpb);
+      BgtEntryDel2(tmpb);
+      Free(tmpb);
     }
-    tempb=tempb1;
+    tmpb=tmpb1;
   }
 }
 
-U0 BgtTemplateExpand(CBgtTemplate *tempt)
+U0 BgtTemplateExpand(CBgtTemplate *tmpt)
 {
   CDate		d,start,end;
   CDateStruct	ds;
-  CBgtEntry	*tempb;
+  CBgtEntry	*tmpb;
 
-  start=MyStr2Date(tempt->start_date);
-  end  =MyStr2Date(tempt->end_date);
-  tempt->b.template=tempt;
-  switch (tempt->type) {
+  start=MyStr2Date(tmpt->start_date);
+  end  =MyStr2Date(tmpt->end_date);
+  tmpt->b.template=tmpt;
+  switch (tmpt->type) {
     case BT_INTERVAL:
       d=start;
       while (d<=end) {
-	tempb=CAlloc(sizeof(CBgtEntry));
-	MemCpy(tempb,&tempt->b,sizeof(CBgtEntry));
-	tempb->date=d;
-	tempb->type=BE_TEMPLATE_COPY;
-	BgtIns(tempb);
-	d+=tempt->period*0x100000000;
+	tmpb=CAlloc(sizeof(CBgtEntry));
+	MemCpy(tmpb,&tmpt->b,sizeof(CBgtEntry));
+	tmpb->date=d;
+	tmpb->type=BE_TEMPLATE_COPY;
+	BgtIns(tmpb);
+	d+=tmpt->period*0x100000000;
       }
       break;
     case BT_MONTHLY:
@@ -39,11 +39,11 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
       while (TRUE) {
 	d=Struct2Date(&ds);
 	if (d<=end) {
-	  tempb=CAlloc(sizeof(CBgtEntry));
-	  MemCpy(tempb,&tempt->b,sizeof(CBgtEntry));
-	  tempb->date=d;
-	  tempb->type=BE_TEMPLATE_COPY;
-	  BgtIns(tempb);
+	  tmpb=CAlloc(sizeof(CBgtEntry));
+	  MemCpy(tmpb,&tmpt->b,sizeof(CBgtEntry));
+	  tmpb->date=d;
+	  tmpb->type=BE_TEMPLATE_COPY;
+	  BgtIns(tmpb);
 	} else
 	  break;
 	if (++ds.mon>11) {
@@ -57,11 +57,11 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
       while (TRUE) {
 	d=Struct2Date(&ds);
 	if (d<=end) {
-	  tempb=CAlloc(sizeof(CBgtEntry));
-	  MemCpy(tempb,&tempt->b,sizeof(CBgtEntry));
-	  tempb->date=d;
-	  tempb->type=BE_TEMPLATE_COPY;
-	  BgtIns(tempb);
+	  tmpb=CAlloc(sizeof(CBgtEntry));
+	  MemCpy(tmpb,&tmpt->b,sizeof(CBgtEntry));
+	  tmpb->date=d;
+	  tmpb->type=BE_TEMPLATE_COPY;
+	  BgtIns(tmpb);
 	} else
 	  break;
 	ds.mon+=2;
@@ -76,11 +76,11 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
       while (TRUE) {
 	d=Struct2Date(&ds);
 	if (d<=end) {
-	  tempb=CAlloc(sizeof(CBgtEntry));
-	  MemCpy(tempb,&tempt->b,sizeof(CBgtEntry));
-	  tempb->date=d;
-	  tempb->type=BE_TEMPLATE_COPY;
-	  BgtIns(tempb);
+	  tmpb=CAlloc(sizeof(CBgtEntry));
+	  MemCpy(tmpb,&tmpt->b,sizeof(CBgtEntry));
+	  tmpb->date=d;
+	  tmpb->type=BE_TEMPLATE_COPY;
+	  BgtIns(tmpb);
 	} else
 	  break;
 	ds.mon+=6;
@@ -95,11 +95,11 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
       while (TRUE) {
 	d=Struct2Date(&ds);
 	if (d<=end) {
-	  tempb=CAlloc(sizeof(CBgtEntry));
-	  MemCpy(tempb,&tempt->b,sizeof(CBgtEntry));
-	  tempb->date=d;
-	  tempb->type=BE_TEMPLATE_COPY;
-	  BgtIns(tempb);
+	  tmpb=CAlloc(sizeof(CBgtEntry));
+	  MemCpy(tmpb,&tmpt->b,sizeof(CBgtEntry));
+	  tmpb->date=d;
+	  tmpb->type=BE_TEMPLATE_COPY;
+	  BgtIns(tmpb);
 	} else
 	  break;
 	ds.year++;
@@ -110,17 +110,17 @@ U0 BgtTemplateExpand(CBgtTemplate *tempt)
 
 U0 CBgtTemplatesExpand()
 {
-  CBgtTemplate	*tempt=t_head.next;
-  while (tempt!=&t_head) {
-    BgtTemplateExpand(tempt);
-    tempt=tempt->next;
+  CBgtTemplate	*tmpt=t_head.next;
+  while (tmpt!=&t_head) {
+    BgtTemplateExpand(tmpt);
+    tmpt=tmpt->next;
   }
 }
 
 CBgtTemplate *BgtTemplatePmt(CBgtTemplate *dft_t=NULL)
 {
-  CBgtTemplate	t,*tempt;
-  CBgtEntry	*tempb,*dft_b;
+  CBgtTemplate	t,*tmpt;
+  CBgtEntry	*tmpb,*dft_b;
   MemSet(&t,0,sizeof(CBgtTemplate));
   if (dft_t) {
     MemCpy(&t.start,&dft_t->start,BT_SIZE);
@@ -134,12 +134,12 @@ CBgtTemplate *BgtTemplatePmt(CBgtTemplate *dft_t=NULL)
   while (TRUE)
     if (PopUpForm(&t) && ((t.type==BT_INTERVAL && t.period>0) ||
 	  t.type>BT_INTERVAL)) {
-      if (tempb=BgtEntryPmt(dft_b)) {
-	tempt=CAlloc(sizeof(CBgtTemplate));
-	MemCpy(&tempt->start,&t.start,BT_SIZE);
-	MemCpy(&tempt->b,tempb,sizeof(CBgtEntry));
-	Free(tempb);
-	return tempt;
+      if (tmpb=BgtEntryPmt(dft_b)) {
+	tmpt=CAlloc(sizeof(CBgtTemplate));
+	MemCpy(&tmpt->start,&t.start,BT_SIZE);
+	MemCpy(&tmpt->b,tmpb,sizeof(CBgtEntry));
+	Free(tmpb);
+	return tmpt;
       }
     } else
       break;

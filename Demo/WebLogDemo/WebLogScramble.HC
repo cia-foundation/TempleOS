@@ -45,14 +45,14 @@ U0 LogScrambleFile(U8 *name)
 }
 U0 WebLogScramble(U8 *files_find_mask)
 {
-  CDirEntry *tempde=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_FILES),
-	*tempde1=tempde;
+  CDirEntry *tmpde=FilesFind(files_find_mask,FUF_RECURSE|FUF_JUST_FILES),
+	*tmpde1=tmpde;
   InitKey;
-  while (tempde) {
-    LogScrambleFile(tempde->full_name);
-    tempde=tempde->next;
+  while (tmpde) {
+    LogScrambleFile(tmpde->full_name);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }
 
 U0 LogScrambleDemo()

@@ -46,9 +46,9 @@ U8 *BlogWebFile(CDate cdt=0)
 
 public U8 *FileNameNumNext(U8 *files_find_mask,U8 *fmt)
 {
-  CDirEntry *tempde=FilesFind(files_find_mask);
-  U8 *res=MStrPrint(fmt,FileCnt(tempde));
-  DirTreeDel(tempde);
+  CDirEntry *tmpde=FilesFind(files_find_mask);
+  U8 *res=MStrPrint(fmt,FileCnt(tmpde));
+  DirTreeDel(tmpde);
   return res;
 }
 
@@ -67,14 +67,14 @@ U0 BlogDCImgWrite(CDC *dc,CDate cdt=0)
   Free(st2);
 }
 
-U0 BlogScreenShot()
+U0 BlogScrnShot()
 {
   Bool old_cursor=DocCursor;
   CDC *dc1,*dc2;
   U8 *old_fp_draw_input_ptr=gr.fp_draw_input_ptr;
   gr.fp_draw_input_ptr=NULL;
-  WinMgrSync(2);
-  dc1=DCScreenCapture;
+  Refresh(2);
+  dc1=DCScrnCapture;
   dc2=DCExt(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
   BlogDCImgWrite(dc2);
   gr.fp_draw_input_ptr=old_fp_draw_input_ptr;

@@ -1,6 +1,6 @@
 U0 InputFilterTask()
 {
-  CSrvCmd *tempc,*tempc1;
+  CSrvCmd *tmpc,*tmpc1;
   Bool old_filter;
   I64 old_flags=GetRFlags;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
@@ -10,19 +10,19 @@ U0 InputFilterTask()
   while (TRUE) {
     CLI
     SrvCmdsHandler(old_flags);
-    tempc1=&Fs->srv_ctrl.next_waiting;
-    tempc=tempc1->next;
-    if (tempc==tempc1)
+    tmpc1=&Fs->srv_ctrl.next_waiting;
+    tmpc=tmpc1->next;
+    if (tmpc==tmpc1)
       break;
     else {
-      if (tempc->cmd_code==SVCT_TEXT_INPUT) {
-	QueRem(tempc);
+      if (tmpc->cmd_code==SVCT_TEXT_INPUT) {
+	QueRem(tmpc);
 	SetRFlags(old_flags);
 	try
-		ExePrint("%s",tempc->aux_str);
+		ExePrint("%s",tmpc->aux_str);
 	catch
 	  Fs->catch_except=TRUE;
-	SrvCmdDel(tempc);
+	SrvCmdDel(tmpc);
       } else
 	break;
     }
@@ -42,28 +42,28 @@ Remove desired message, return $LK,"msg_code",A="MN:MSG_CMD"$.
 Note: This delivers messages from parent down to pop-up.
 */
   I64 res,old_flags;
-  CSrvCmd *tempc,*tempc1;
+  CSrvCmd *tmpc,*tmpc1;
   if (!task) task=Fs;
   old_flags=GetRFlags;
-  tempc1=&task->srv_ctrl.next_waiting;
+  tmpc1=&task->srv_ctrl.next_waiting;
   while (TRUE) {
     CLI
     if (task==Fs)
       SrvCmdsHandler(old_flags);
-    tempc=tempc1->next;
-    if (tempc==tempc1)
+    tmpc=tmpc1->next;
+    if (tmpc==tmpc1)
       break;
     else {
-      if (tempc->cmd_code==SVCT_MSG) {
-	QueRem(tempc);
+      if (tmpc->cmd_code==SVCT_MSG) {
+	QueRem(tmpc);
 	SetRFlags(old_flags);
-	res=tempc->msg_code;
+	res=tmpc->msg_code;
 	if (_a1)
-	  *_a1=tempc->aux1;
+	  *_a1=tmpc->aux1;
 	if (_a2)
-	  *_a2=tempc->aux2;
-	SrvCmdDel(tempc);
-	if ((res!=MSG_KEY_DOWN || !(tempc->aux2&SCF_KEY_DESC) ||
+	  *_a2=tmpc->aux2;
+	SrvCmdDel(tmpc);
+	if ((res!=MSG_KEY_DOWN || !(tmpc->aux2&SCF_KEY_DESC) ||
 	      !Bt(&task->win_inhibit,WIf_SELF_KEY_DESC)) && Bt(&mask,res))
 	  goto sm_done;
       }
@@ -156,7 +156,7 @@ I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
       }
     }
     LBts(&Fs->task_flags,TASKf_IDLE);
-    if (IsDbg) {
+    if (IsDbgMode) {
 //We don't want interrupt-driven keyboard when in debugger
       //because that could have side-effects or crash, so we poll
       //keyboard when in debugger with interrupts off.
@@ -222,7 +222,7 @@ I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE)
     Free(st);
   } else {
     while (TRUE) {
-      ch=GetChar(,FALSE,IsDbg);
+      ch=GetChar(,FALSE,IsDbgMode);
       if (ch=='\n') {
 	'' ch;
 	break;

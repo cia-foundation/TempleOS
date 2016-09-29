@@ -60,7 +60,7 @@ U0 DocDataFmt(CDoc *doc,CDocEntry *doc_e,I64 d=DOCM_CANCEL)
 {
   I64 i;
   U8 *ptr,*ptr2;
-  CHashDefineStr *temph;
+  CHashDefineStr *tmph;
   if (doc_e->type_u8==DOCT_DATA && doc_e->de_flags&DOCEF_AUX_STR ||
 	doc_e->type_u8==DOCT_CHECK_BOX || doc_e->de_flags & DOCEF_LST) {
     if (d==DOCM_CANCEL) {
@@ -109,9 +109,9 @@ U0 DocDataFmt(CDoc *doc,CDocEntry *doc_e,I64 d=DOCM_CANCEL)
       }
       doc_e->max_col=i;
     } else if (doc_e->de_flags & DOCEF_LST) {
-      if (doc_e->de_flags & DOCEF_DEFINE && (temph=HashFind(doc_e->define_str,
-	    doc->win_task->hash_table,HTT_DEFINE_STR)) && 0<=d<temph->cnt) {
-	ptr=MStrPrint("[%s]",temph->sub_idx[d]);
+      if (doc_e->de_flags & DOCEF_DEFINE && (tmph=HashFind(doc_e->define_str,
+	    doc->win_task->hash_table,HTT_DEFINE_STR)) && 0<=d<tmph->cnt) {
+	ptr=MStrPrint("[%s]",tmph->sub_idx[d]);
 	Free(doc_e->tag);
 	doc_e->tag=StrNew(ptr,doc->mem_task);
 	Free(ptr);
@@ -132,7 +132,7 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
 {
   I64 i,d;
   U8 *ptr,*ptr1,*ptr2;
-  CHashDefineStr *temph;
+  CHashDefineStr *tmph;
   if (doc_e->type_u8==DOCT_DATA && doc_e->de_flags&DOCEF_AUX_STR ||
 	doc_e->type_u8==DOCT_CHECK_BOX || doc_e->de_flags & DOCEF_LST) {
     if (doc_e->de_flags&DOCEF_DEREF_DATA &&
@@ -166,7 +166,7 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
     } else if (doc_e->de_flags & DOCEF_LST) {
       d=0;
       if (doc_e->tag && doc_e->de_flags & DOCEF_DEFINE &&
-	    (temph=HashFind(doc_e->define_str,
+	    (tmph=HashFind(doc_e->define_str,
 	    doc->win_task->hash_table,HTT_DEFINE_STR))) {
 	ptr1=ptr2=StrNew(doc_e->tag);
 	if (*ptr2=='[') {
@@ -175,7 +175,7 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
 	  if (ptr2[i-1]==']')
 	    ptr2[i-1]=0;
 	}
-	d=LstMatch(ptr2,temph->data);
+	d=LstMatch(ptr2,tmph->data);
 	Free(ptr1);
       }
     } else {
@@ -213,11 +213,11 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   CMemberLst *ml;
   CDocEntry *doc_e;
   U8 *fmtstr;
-  CHashClass *tempc,*tempc2;
+  CHashClass *tmpc,*tmpc2;
   CDoc *doc;
   Bool res=FALSE;
   I64 old_border_src=Fs->border_src,has_action;
-  if (!(tempc=HashFind(class_name,Fs->hash_table,HTT_CLASS)))
+  if (!(tmpc=HashFind(class_name,Fs->hash_table,HTT_CLASS)))
     return FALSE;
   doc=DocNew;
   doc->desc='Form';
@@ -225,18 +225,18 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   doc->flags|=DOCF_OVERSTRIKE|DOCF_FORM;
   if (dof_flags&DOF_MIN_SIZE)
     doc->flags|=DOCF_MIN_SIZE;
-  ml=tempc->member_lst_and_root;
+  ml=tmpc->member_lst_and_root;
   while (ml) {
     if ((fmtstr=MemberMetaData("fmtstr",ml)) &&
 	  (doc_e=DocPrint(doc,"%s",fmtstr))) {
-      tempc2=ml->member_class;
+      tmpc2=ml->member_class;
       if ((doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_LST ||
-	    doc_e->type_u8==DOCT_CHECK_BOX) && !tempc2->ptr_stars_cnt) {
-	tempc2=OptClassFwd(tempc2);
-	tempc2-=tempc2->ptr_stars_cnt;
-	if (tempc2->type & HTT_INTERNAL_TYPE) {
+	    doc_e->type_u8==DOCT_CHECK_BOX) && !tmpc2->ptr_stars_cnt) {
+	tmpc2=OptClassFwd(tmpc2);
+	tmpc2-=tmpc2->ptr_stars_cnt;
+	if (tmpc2->type & HTT_INTERNAL_TYPE) {
 	  if (ml->dim.next) { //Array
-	    if (tempc2->raw_type==RT_U8 &&
+	    if (tmpc2->raw_type==RT_U8 &&
 		  LBtr(&doc_e->de_flags,&DOCEf_DFT_LEN)) {
 	      doc_e->len=ml->dim.total_cnt;
 	      if (doc_e->de_flags&DOCEF_HAS_TERMINATOR)
@@ -246,7 +246,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
 		    doc->mem_task); //+2 because "_\0"
 	    }
 	  } else if (LBtr(&doc_e->de_flags,DOCEf_DFT_RAW_TYPE))
-	    doc_e->raw_type=tempc2->raw_type;
+	    doc_e->raw_type=tmpc2->raw_type;
 	}
       }
       if (doc_e->de_flags&DOCEF_REMALLOC_DATA) {

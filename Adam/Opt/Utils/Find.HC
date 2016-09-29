@@ -161,21 +161,21 @@ before or after "dd" are label characters.
 "+la"=only checks for label chars after.
 */
   I64 cnt=0,fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+i+f+F+T");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (fuf_flags&~(FUG_FILES_FIND|FUF_IGNORE|FUF_ALL|
 	FUF_WHOLE_LABELS|FUF_WHOLE_LABELS_BEFORE|FUF_WHOLE_LABELS_AFTER))
     throw('FUF');
   LBEqu(&fuf_flags,FUf_REPLACE,replace_text);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND);
   fuf_flags&=FUF_ALL|FUF_REPLACE|FUF_IGNORE|FUF_WHOLE_LABELS|
 	FUF_WHOLE_LABELS_BEFORE|FUF_WHOLE_LABELS_AFTER;
-  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    cnt+=FindFile(needle_str,tempde->full_name,&fuf_flags,replace_text);
-    tempde=tempde->next;
+  while (tmpde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    cnt+=FindFile(needle_str,tmpde->full_name,&fuf_flags,replace_text);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return cnt;
 }
 

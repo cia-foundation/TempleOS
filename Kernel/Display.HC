@@ -2,9 +2,9 @@ U0 RawPutChar(I64 ch)
 {/*For RAW output during boot and in debugger.
 
 See $LK,"GrUpdateTextFG",A="MN:GrUpdateTextFG"$ for
-the normal screen text output routine.
+the normal scrn text output routine.
 
-See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
+See also $LK,"GrUpdateScrn",A="MN:GrUpdateScrn"$().
 */
   I64 i,row,col;
   U8 *ptr,*ptr1,*ptr2;
@@ -58,13 +58,13 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
       OutU8(VGAP_DATA,0x0F); //All planes -- WHITE
       if (text.raw_flags&RWF_SCROLL && text.raw_col && !row && !col) {
 //Scroll cached image
-	MemCpy(text.raw_screen_image,
-	      text.raw_screen_image+GR_WIDTH*FONT_HEIGHT>>3,
+	MemCpy(text.raw_scrn_image,
+	      text.raw_scrn_image+GR_WIDTH*FONT_HEIGHT>>3,
 	      GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3);
-	MemSet(text.raw_screen_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,
+	MemSet(text.raw_scrn_image+GR_WIDTH*(GR_HEIGHT-FONT_HEIGHT)>>3,0,
 	      GR_WIDTH*FONT_HEIGHT>>3);
 
-	MemCpy(text.vga_alias,text.raw_screen_image,GR_WIDTH*GR_HEIGHT>>3);
+	MemCpy(text.vga_alias,text.raw_scrn_image,GR_WIDTH*GR_HEIGHT>>3);
 	text.raw_col-=text.cols;
 	row=text.rows-1;
       }
@@ -72,7 +72,7 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
       CLI
       ptr=ptr1=col+row*GR_WIDTH*FONT_HEIGHT>>3;
       ptr+=text.vga_alias;
-      ptr1+=text.raw_screen_image; //Write to cached image as well
+      ptr1+=text.raw_scrn_image; //Write to cached image as well
       ptr2=&text.font[ch&255];
       for (i=0;i<FONT_HEIGHT;i++) {
 	*ptr=*ptr1=rev_bits_table[*ptr2++];
@@ -86,7 +86,7 @@ See also $LK,"GrUpdateScreen",A="MN:GrUpdateScreen"$().
 }
 
 U0 VGAFlush()
-{//Flush winmgr vga cache, so updates whole screen.
+{//Flush winmgr vga cache, so updates whole scrn.
   LBts(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0);
 }
 

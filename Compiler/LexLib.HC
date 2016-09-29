@@ -1,45 +1,45 @@
 U0 LexBackupLastChar(CCmpCtrl *cc)
 {
-  CLexFile *tempf=cc->lex_include_stk;
-  tempf->buf_ptr=cc->cur_buf_ptr;
+  CLexFile *tmpf=cc->lex_include_stk;
+  tmpf->buf_ptr=cc->cur_buf_ptr;
   if (cc->flags & CCF_USE_LAST_U16) {
-    tempf->last_U16=cc->last_U16;
+    tmpf->last_U16=cc->last_U16;
     cc->flags&=~CCF_USE_LAST_U16;
   } else
-    tempf->last_U16=0;
+    tmpf->last_U16=0;
 }
 
 U0 LexPush(CCmpCtrl *cc)
 {//Create token-stream save point.
-  CLexFile *tempf;
+  CLexFile *tmpf;
   LexBackupLastChar(cc);
   if (cc->lex_include_stk->last_U16)
     cc->flags|=CCF_USE_LAST_U16;
-  tempf=MAllocIdent(cc->lex_include_stk);
-  tempf->next=cc->lex_prs_stk;
-  cc->lex_prs_stk=tempf;
+  tmpf=MAllocIdent(cc->lex_include_stk);
+  tmpf->next=cc->lex_prs_stk;
+  cc->lex_prs_stk=tmpf;
 }
 
 U0 LexPopRestore(CCmpCtrl *cc)
 {//Restore token-stream saved-point.
 //Bad things can happen if you cross an #include file boundary.
-  CLexFile *tempf=cc->lex_prs_stk;
-  cc->cur_buf_ptr=tempf->buf_ptr;
-  if (cc->last_U16=tempf->last_U16)
+  CLexFile *tmpf=cc->lex_prs_stk;
+  cc->cur_buf_ptr=tmpf->buf_ptr;
+  if (cc->last_U16=tmpf->last_U16)
     cc->flags|=CCF_USE_LAST_U16;
   else
     cc->flags&=~CCF_USE_LAST_U16;
-  MemCpy(cc->lex_include_stk(U8 *)+sizeof(U8 *),tempf(U8 *)+sizeof(U8 *),
+  MemCpy(cc->lex_include_stk(U8 *)+sizeof(U8 *),tmpf(U8 *)+sizeof(U8 *),
 	sizeof(CLexFile)-sizeof(U8 *));
-  cc->lex_prs_stk=tempf->next;
-  Free(tempf);
+  cc->lex_prs_stk=tmpf->next;
+  Free(tmpf);
 }
 
 U0 LexPopNoRestore(CCmpCtrl *cc)
 {//Don't restore token-stream saved-point.
-  CLexFile *tempf=cc->lex_prs_stk;
-  cc->lex_prs_stk=tempf->next;
-  Free(tempf);
+  CLexFile *tmpf=cc->lex_prs_stk;
+  cc->lex_prs_stk=tmpf->next;
+  Free(tmpf);
 }
 
 I64 MemberMetaData(U8 *needle_str,CMemberLst *haystack_member_lst)
@@ -67,18 +67,18 @@ CMemberLstMeta *MemberMetaFind(U8 *needle_str,CMemberLst *haystack_member_lst)
 CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class)
 {//Find class member. See $LK,"ClassRep",A="MN:ClassRep"$() and $LK,"DocForm",A="MN:DocForm"$().
   I64 i;
-  CMemberLst *tempm;
+  CMemberLst *tmpm;
   do {
-    tempm=haystack_class->member_lst_and_root;
-    while (tempm) {
-      if (!(i=StrCmp(tempm->str,needle_str))) {
-	tempm->use_cnt++;
-	return tempm;
+    tmpm=haystack_class->member_lst_and_root;
+    while (tmpm) {
+      if (!(i=StrCmp(tmpm->str,needle_str))) {
+	tmpm->use_cnt++;
+	return tmpm;
       }
       if (i<=0)
-	tempm=tempm->left;
+	tmpm=tmpm->left;
       else
-	tempm=tempm->right;
+	tmpm=tmpm->right;
     }
   } while (haystack_class=haystack_class->base_class);
   return NULL;
@@ -87,64 +87,64 @@ CMemberLst *MemberFind(U8 *needle_str,CHashClass *haystack_class)
 CMemberLst *MemberClassBaseFind(CHashClass *needle_class,
 	CHashClass *haystack_class)
 {//Find class member class base. For finding dup class local vars.
-  CMemberLst *tempm;
-  tempm=haystack_class->member_class_base_root;
-  while (tempm) {
-    if (needle_class==tempm->member_class_base)
-      return tempm;
-    if (needle_class<tempm->member_class_base)
-      tempm=tempm->left_class_base;
+  CMemberLst *tmpm;
+  tmpm=haystack_class->member_class_base_root;
+  while (tmpm) {
+    if (needle_class==tmpm->member_class_base)
+      return tmpm;
+    if (needle_class<tmpm->member_class_base)
+      tmpm=tmpm->left_class_base;
     else
-      tempm=tempm->right_class_base;
+      tmpm=tmpm->right_class_base;
   }
   return NULL;
 }
 
-U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tempm,CHashClass *tempc,I64 mode)
+U0 MemberAdd(CCmpCtrl *cc,CMemberLst *tmpm,CHashClass *tmpc,I64 mode)
 {
-  U8 *st=tempm->str;
-  CMemberLst **tempm1,*tempm2;
+  U8 *st=tmpm->str;
+  CMemberLst **tmpm1,*tmpm2;
 
-  if (MemberFind(st,tempc) && StrCmp(st,"pad") &&
+  if (MemberFind(st,tmpc) && StrCmp(st,"pad") &&
 	StrCmp(st,"reserved") && StrCmp(st,"_anon_"))
     LexExcept(cc,"Duplicate member at ");
-  tempm1=&tempc->member_lst_and_root;
-  while (tempm2=*tempm1) {
-    if (StrCmp(tempm2->str,st)<=0)
-      tempm1=&tempm2->left;
+  tmpm1=&tmpc->member_lst_and_root;
+  while (tmpm2=*tmpm1) {
+    if (StrCmp(tmpm2->str,st)<=0)
+      tmpm1=&tmpm2->left;
     else
-      tempm1=&tempm2->right;
+      tmpm1=&tmpm2->right;
   }
-  *tempm1=tempm;
+  *tmpm1=tmpm;
 
   if (mode==PRS1B_LOCAL_VAR) {
-    tempm->member_class_base=
-	tempm->member_class-tempm->member_class->ptr_stars_cnt;
+    tmpm->member_class_base=
+	tmpm->member_class-tmpm->member_class->ptr_stars_cnt;
     if (Bt(&cc->opts,OPTf_WARN_DUP_TYPES) &&
-	 MemberClassBaseFind(tempm->member_class_base,tempc))
+	 MemberClassBaseFind(tmpm->member_class_base,tmpc))
       LexWarn(cc,"Duplicate type at ");
-    tempm1=&tempc->member_class_base_root;
-    while (tempm2=*tempm1) {
-      if (tempm->member_class_base<tempm2->member_class_base)
-	tempm1=&tempm2->left_class_base;
-      else if (tempm->member_class_base>tempm2->member_class_base)
-	tempm1=&tempm2->right_class_base;
+    tmpm1=&tmpc->member_class_base_root;
+    while (tmpm2=*tmpm1) {
+      if (tmpm->member_class_base<tmpm2->member_class_base)
+	tmpm1=&tmpm2->left_class_base;
+      else if (tmpm->member_class_base>tmpm2->member_class_base)
+	tmpm1=&tmpm2->right_class_base;
       else {
-	tempm1=NULL;
+	tmpm1=NULL;
 	break;
       }
     }
-    if (tempm1)
-      *tempm1=tempm;
+    if (tmpm1)
+      *tmpm1=tmpm;
   } else
-    tempm->member_class_base=NULL;
+    tmpm->member_class_base=NULL;
 
-  tempm->left=NULL;
-  tempm->right=NULL;
-  tempm->left_class_base=NULL;
-  tempm->right_class_base=NULL;
-  tempm2=tempc->last_in_member_lst;
-  tempm2->next=tempc->last_in_member_lst=tempm;
+  tmpm->left=NULL;
+  tmpm->right=NULL;
+  tmpm->left_class_base=NULL;
+  tmpm->right_class_base=NULL;
+  tmpm2=tmpc->last_in_member_lst;
+  tmpm2->next=tmpc->last_in_member_lst=tmpm;
 }
 
 CMemberLst *MemberLstNew(I64 _reg)
@@ -154,93 +154,93 @@ CMemberLst *MemberLstNew(I64 _reg)
   return res;
 }
 
-Bool  MemberLstCmp(CMemberLst *tempm1,CMemberLst *tempm2,I64 cnt=MAX_I64)
+Bool  MemberLstCmp(CMemberLst *tmpm1,CMemberLst *tmpm2,I64 cnt=MAX_I64)
 {
-  while (tempm1 && tempm2 && cnt--) {
-    if (StrCmp(tempm1->str,tempm2->str) ||
-	  tempm1->member_class!=tempm2->member_class ||
-	  tempm1->member_class_base!=tempm2->member_class_base)
+  while (tmpm1 && tmpm2 && cnt--) {
+    if (StrCmp(tmpm1->str,tmpm2->str) ||
+	  tmpm1->member_class!=tmpm2->member_class ||
+	  tmpm1->member_class_base!=tmpm2->member_class_base)
       return FALSE;
-    if (tempm1->flags&MLF_DFT_AVAILABLE || tempm2->flags&MLF_DFT_AVAILABLE) {
-      if (tempm1->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE)!=
-	    tempm2->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE))
+    if (tmpm1->flags&MLF_DFT_AVAILABLE || tmpm2->flags&MLF_DFT_AVAILABLE) {
+      if (tmpm1->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE)!=
+	    tmpm2->flags&(MLF_DFT_AVAILABLE|MLF_STR_DFT_AVAILABLE))
 	return FALSE;
-      if (tempm1->flags&MLF_STR_DFT_AVAILABLE) {
-	if (StrCmp(tempm1->dft_val,tempm2->dft_val))
+      if (tmpm1->flags&MLF_STR_DFT_AVAILABLE) {
+	if (StrCmp(tmpm1->dft_val,tmpm2->dft_val))
 	  return FALSE;
-      } else if (tempm1->dft_val!=tempm2->dft_val)
+      } else if (tmpm1->dft_val!=tmpm2->dft_val)
 	return FALSE;
     }
-    tempm1=tempm1->next;
-    tempm2=tempm2->next;
+    tmpm1=tmpm1->next;
+    tmpm2=tmpm2->next;
   }
-  if (cnt<0 || !tempm1 && !tempm2)
+  if (cnt<0 || !tmpm1 && !tmpm2)
     return TRUE;
   else
     return FALSE;
 }
 
-U0 MemberLstDel(CMemberLst *tempm)
+U0 MemberLstDel(CMemberLst *tmpm)
 {
-  CMemberLst *tempm1;
-  CMemberLstMeta *temp_meta,*temp_meta1;
-  while (tempm) {
-    tempm1=tempm->next;
-    Free(tempm->str);
-    LinkedLstDel(tempm->dim.next);
-    if (tempm->flags & MLF_STR_DFT_AVAILABLE)
-      Free(tempm->dft_val);
-    if (tempm->flags & MLF_FUN)
-      HashDel(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
-    temp_meta=tempm->meta;
-    while (temp_meta) {
-      temp_meta1=temp_meta->next;
-      Free(temp_meta->str);
-      if (temp_meta->flags&MLMF_IS_STR)
-	Free(temp_meta->user_data);
-      Free(temp_meta);
-      temp_meta=temp_meta1;
+  CMemberLst *tmpm1;
+  CMemberLstMeta *tmp_meta,*tmp_meta1;
+  while (tmpm) {
+    tmpm1=tmpm->next;
+    Free(tmpm->str);
+    LinkedLstDel(tmpm->dim.next);
+    if (tmpm->flags & MLF_STR_DFT_AVAILABLE)
+      Free(tmpm->dft_val);
+    if (tmpm->flags & MLF_FUN)
+      HashDel(tmpm->fun_ptr-tmpm->fun_ptr->ptr_stars_cnt);
+    tmp_meta=tmpm->meta;
+    while (tmp_meta) {
+      tmp_meta1=tmp_meta->next;
+      Free(tmp_meta->str);
+      if (tmp_meta->flags&MLMF_IS_STR)
+	Free(tmp_meta->user_data);
+      Free(tmp_meta);
+      tmp_meta=tmp_meta1;
     }
-    Free(tempm);
-    tempm=tempm1;
+    Free(tmpm);
+    tmpm=tmpm1;
   }
 }
 
-U0 ClassMemberLstDel(CHashClass *tempc)
+U0 ClassMemberLstDel(CHashClass *tmpc)
 {
-  MemberLstDel(tempc->member_lst_and_root);
-  tempc->size=0;
-  tempc->last_in_member_lst=&tempc->member_lst_and_root;
-  tempc->member_lst_and_root=NULL;
-  tempc->member_class_base_root=NULL;
-  tempc->member_cnt=0;
-  if (tempc->type&HTT_FUN)
-    tempc(CHashFun *)->arg_cnt=0;
+  MemberLstDel(tmpc->member_lst_and_root);
+  tmpc->size=0;
+  tmpc->last_in_member_lst=&tmpc->member_lst_and_root;
+  tmpc->member_lst_and_root=NULL;
+  tmpc->member_class_base_root=NULL;
+  tmpc->member_cnt=0;
+  if (tmpc->type&HTT_FUN)
+    tmpc(CHashFun *)->arg_cnt=0;
 }
 
-I64 MemberLstSize(CHashClass *tempc)
+I64 MemberLstSize(CHashClass *tmpc)
 {
-  CMemberLst *tempm;
-  CMemberLstMeta *temp_meta;
+  CMemberLst *tmpm;
+  CMemberLstMeta *tmp_meta;
   I64 res=0;
-  tempm=tempc->member_lst_and_root;
-  while (tempm) {
-    res+=MSize2(tempm->str);
-    res+=LinkedLstSize(tempm->dim.next);
-    if (tempm->flags & MLF_STR_DFT_AVAILABLE)
-      res+=MSize2(tempm->dft_val);
-    if (tempm->flags & MLF_FUN)
-      res+=HashEntrySize2(tempm->fun_ptr-tempm->fun_ptr->ptr_stars_cnt);
-    temp_meta=tempm->meta;
-    while (temp_meta) {
-      res+=MSize2(temp_meta->str);
-      if (temp_meta->flags&MLMF_IS_STR)
-	res+=MSize2(temp_meta->user_data);
-      res+=MSize2(temp_meta);
-      temp_meta=temp_meta->next;
+  tmpm=tmpc->member_lst_and_root;
+  while (tmpm) {
+    res+=MSize2(tmpm->str);
+    res+=LinkedLstSize(tmpm->dim.next);
+    if (tmpm->flags & MLF_STR_DFT_AVAILABLE)
+      res+=MSize2(tmpm->dft_val);
+    if (tmpm->flags & MLF_FUN)
+      res+=HashEntrySize2(tmpm->fun_ptr-tmpm->fun_ptr->ptr_stars_cnt);
+    tmp_meta=tmpm->meta;
+    while (tmp_meta) {
+      res+=MSize2(tmp_meta->str);
+      if (tmp_meta->flags&MLMF_IS_STR)
+	res+=MSize2(tmp_meta->user_data);
+      res+=MSize2(tmp_meta);
+      tmp_meta=tmp_meta->next;
     }
-    res+=MSize2(tempm);
-    tempm=tempm->next;
+    res+=MSize2(tmpm);
+    tmpm=tmpm->next;
   }
   return res;
 }

@@ -102,7 +102,7 @@ U0 Maze()
 	  ch=GetChar;
 	  break;
 	}
-	WinMgrSync;
+	Refresh;
       }
     } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
   catch

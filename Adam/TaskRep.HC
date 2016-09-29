@@ -2,14 +2,11 @@
 U0 TaskRepTask(CTask *task,I64 indent)
 {
   CTask *task1;
-  U8 *st,*desc=MStrUtil(task->task_title,SUF_SAFE_DOLLAR);
-  st=MStrPrint("$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$",task,task,task);
-  "%h*c%s $$TX,\"%$$Q...\",SCX=16$$\n",indent,CH_SPACE,
-	st,desc;
+  "%h*c$$MA,T=\"%08X\",LM=\"Kill(0x%X);\n\",$$ $$BLACK$$#%d$$FG$$ "
+	"$$TX,\"%$$Q...\",SCX=16$$\n",indent,CH_SPACE,task,task,task->task_num,
+	task->task_title;
   "%h*c%08X %04X:%04X:%08X\n",indent+2,CH_SPACE,TaskMemAlloced(task),
 	task->task_flags,task->display_flags,task->win_inhibit;
-  Free(st);
-  Free(desc);
   task1=task->next_child_task;
   while (task1!=(&task->next_child_task)(U8 *)
 	-offset(CTask.next_sibling_task)) {

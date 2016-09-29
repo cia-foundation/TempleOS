@@ -113,7 +113,7 @@ Examples: <CTRL-t> to see
 5)$LK,"File find link searching for 5th 'CTRL'",A="FF:::/Kernel/KernelA.HH,CTRL:5"$
 6)$LK,"Manual page link",A="MN:Print"$
 7)$LK,"File line num link",A="FL:::/Kernel/KernelA.HH,200"$
-8)$LK,"File anchor link -- <CTRL-t> to see anchor after you click",A="FA:::/Kernel/KEnd.HC,Independent HeapCtrl Example"$
+8)$LK,"File anchor link -- <CTRL-t> to see anchor after you click",A="FA:::/Kernel/Mem/PageTables.HC,ExpandHeap"$
 9)$LK,"Bible Link",A="BF:Acts,2:3"$ The chapter:verse actually just does a text search.
 10) $LK,"Help Index Link",A="HI:Doc"$.
 11) $LK,"Address Link",A="AD:0x12000"$.
@@ -149,9 +149,9 @@ The default raw data type for the $FG,2$$$LS...$$$FG$ command is $FG,2$RT=I64$FG
 $ID,-2$$TR,"MA Macro"$
 $ID,2$A left macro arg, $FG,2$LM=""$FG$, will send text when the left mouse is clicked.
 
-A left auto string, $FG,2$+LA$FG$, flag will cause text to be sent to $LK,"AutoStr",A="MN:AutoStr"$() instead of $LK,"Auto",A="MN:Auto"$().  An AutoStr runs code.  Literal text is in quotes and messages are sent with $LK,"Msg",A="MN:Msg"$().  See $MA-X+PU,LM="Dir(\"::/Demo/AutoFile\");View;"$.
+A left in string, $FG,2$+LIS$FG$, flag will cause text to be sent to $LK,"InStr",A="MN:InStr"$() instead of $LK,"In",A="MN:In"$().  An InStr runs code.  Literal text is in quotes and messages are sent with $LK,"Msg",A="MN:Msg"$().  See $MA-X+PU,LM="Dir(\"::/Demo/InFile\");View;"$.
 
-Macro's are usually in your $LK,"~/PersonalMenu.DD"$ and have the '$FG,2$+X$FG$' flag set by $LK,"default",A="MN:DocInit"$.  Adding '$FG,2$-X$FG$' prevents the usual $FG,2$<ESC>$FG$ from being sent (which exits the PersonalMenu screen).  Note: When you click a macro on the cmd line, it will go to the bottom and execute unless you cancel the $FG,2$<ESC>$FG$ with a '$FG,2$-X$FG$'.
+Macro's are usually in your $LK,"~/PersonalMenu.DD"$ and have the '$FG,2$+X$FG$' flag set by $LK,"default",A="MN:DocInit"$.  Adding '$FG,2$-X$FG$' prevents the usual $FG,2$<ESC>$FG$ from being sent (which exits the PersonalMenu scrn).  Note: When you click a macro on the cmd line, it will go to the bottom and execute unless you cancel the $FG,2$<ESC>$FG$ with a '$FG,2$-X$FG$'.
 $ID,-2$$TR,"MU Menu Value"$
 $ID,2$A left expression arg, $FG,2$LE=<Exp>$FG$, will return a number when clicked with the left mouse.
 
@@ -204,13 +204,13 @@ $ID,2$A PopUp flag on a $FG,2$MA$FG$ will cause the cmds to run in a new task, a
 $ID,-2$$TR,"+C Collapsed"$
 $ID,2$A collapsed flag on a $FG,2$TR$FG$ entry will cause it to start collapsed.  A $FG,2$-C$FG$ flag will make it start open.
 $ID,-2$$TR,"+X <ESC> (Exit)"$
-$ID,2$The exit flag will cause a $FG,2$$$MA...$$$FG$ macro to send an $FG,2$<ESC>$FG$ before running to exit the PersonalMenu screen and return to the cmd prompt.  Actually, the default $FG,2$$$MA...$$$FG$ has an exit flag set so you add a $FG,2$-X$FG$ to turn-off $FG,2$ESC$FG$, for a $FG,2$+PU$FG$ pop-up macro.  If an entry is already at the cmd prompt, the $FG,2$+X$FG$ will movement to the bottom of the window.
+$ID,2$The exit flag will cause a $FG,2$$$MA...$$$FG$ macro to send an $FG,2$<ESC>$FG$ before running to exit the PersonalMenu scrn and return to the cmd prompt.  Actually, the default $FG,2$$$MA...$$$FG$ has an exit flag set so you add a $FG,2$-X$FG$ to turn-off $FG,2$ESC$FG$, for a $FG,2$+PU$FG$ pop-up macro.  If an entry is already at the cmd prompt, the $FG,2$+X$FG$ will movement to the bottom of the window.
 $ID,-2$$TR,"+Q <SHIFT-ESC> (Abort Quit)"$
 $ID,2$A quit flag is similar to a $FG,2$+X$FG$ except a $FG,2$<SHIFT-ESC>$FG$ instead of an $FG,2$<ESC>$FG$ to exit.
 $ID,-2$$TR,"+Z Zero"$
 $ID,2$A zero flag on a $FG,2$HX$FG$ entry will cause the offset from zero.  A $FG,2$-X$FG$ will show the actual memory addr. By default, $FG,2$HX$FG$ has the zero flag set.
 $ID,-2$$TR,"+RD Refresh Data"$
-$ID,2$The Refresh Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value on the screen updated continuously.
+$ID,2$The Refresh Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value on the scrn updated continuously.
 $ID,-2$$TR,"+UD Update Data"$
 $ID,2$The Update Data flag on a $FG,2$DA$FG$ or a $FG,2$CB$FG$ makes the value in the $LK,"CDocEntry",A="MN:CDocEntry"$ updated when keys are typed on it.
 $ID,-2$$TR,"+TC Tag CallBack"$

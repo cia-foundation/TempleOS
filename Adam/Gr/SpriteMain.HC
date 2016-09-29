@@ -1,8 +1,8 @@
 #help_index "Graphics/Sprite;Sprites"
 
 #define SPT_MENU	-2
-#define SPT_INS_SCREEN_BITMAP			-3
-#define SPT_INS_TRANSPARENT_SCREEN_BITMAP	-4
+#define SPT_INS_SCRN_BITMAP		-3
+#define SPT_INS_TRANSPARENT_SCRN_BITMAP	-4
 #define SPT_ED_MENU	-5
 #define SPT_EXIT	-6
 
@@ -43,9 +43,9 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
 	"$$MU-UL,\"BSpline3\",LE=SPT_BSPLINE3$$\n"
 	"$$MU-UL,\"BSpline2 Closed\",LE=SPT_BSPLINE2_CLOSED$$\n"
 	"$$MU-UL,\"BSpline3 Closed\",LE=SPT_BSPLINE3_CLOSED$$\n"
-	"$$MU-UL,\"Insert Screen-Captured BitMap\",LE=SPT_INS_SCREEN_BITMAP$$\n"
-	"$$MU-UL,\"Insert Transparent Screen-Captured BitMap\","
-	"LE=SPT_INS_TRANSPARENT_SCREEN_BITMAP$$\n"
+	"$$MU-UL,\"Insert Scrn-Captured BitMap\",LE=SPT_INS_SCRN_BITMAP$$\n"
+	"$$MU-UL,\"Insert Transparent Scrn-Captured BitMap\","
+	"LE=SPT_INS_TRANSPARENT_SCRN_BITMAP$$\n"
 	"$$PURPLE$$$$MU-UL,\"+] Create or Edit 3D Mesh\",LE=SPT_MESH$$\n"
 	"$$MU-UL,\"+] Create or Edit Shiftable 3D Mesh\","
 	"LE=SPT_SHIFTABLE_MESH$$\n"
@@ -101,12 +101,12 @@ Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
   return i;
 }
 
-U0 SpriteScreenInit(CDC *dc,I64,I64)
+U0 SpriteScrnInit(CDC *dc,I64,I64)
 {
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   I64 xx,yy,old_pen_width=dc->pen_width;
   CColorROPU32 old_color=dc->color;
-  WinMgrSync;
+  Refresh;
   DCFill(dc);
   if (dc->flags&DCF_SYMMETRY) {
     dc->flags&=~DCF_SYMMETRY;
@@ -136,7 +136,7 @@ CSprite *SMLine(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     dc->color=color&COLORROP_NO_ROP0_MASK;
     GrLine3(dc,x1,y1,0,x2,y2,0);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   dc->color=color&COLORROP_NO_ROP0_MASK;
@@ -158,7 +158,7 @@ CSprite *SMArrow(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     dc->color=color&COLORROP_NO_ROP0_MASK;
     GrArrow3(dc,x1,y1,0,x2,y2,0);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   dc->color=color&COLORROP_NO_ROP0_MASK;
@@ -184,7 +184,7 @@ CSprite *SMPlanarSymmetry(CDC *dc,I64 x,I64 y,I64 a1,I64 a2)
     dc->color=ROPF_DITHER+WHITE<<16+BLACK;
     GrLine3(dc,x1,y1,0,x2,y2,0);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   dc->flags=old_flags&DCF_SYMMETRY|dc->flags&~DCF_SYMMETRY;
@@ -206,7 +206,7 @@ CSprite *SMRect(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     dc->color=color&COLORROP_NO_ROP0_MASK;
     GrRect3(dc,xx1,yy1,0,xx2-xx1,yy2-yy1);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
     if (x2<x1) {
       xx1=x2; xx2=x1;
@@ -230,7 +230,7 @@ CSprite *SMRect(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
   return res;
 }
 
-CSprite *SMScreenBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,I64 a1,I64 a2,
+CSprite *SMScrnBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,I64 a1,I64 a2,
 	CColorROPU32 bm_bkcolor)
 {
   I64 i,msg_code,x1=a1,y1=a2,x2=a1,y2=a2,xx1=a1,yy1=a2,xx2=a1,yy2=a2,old_width;
@@ -243,7 +243,7 @@ CSprite *SMScreenBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,I64 a1,I64 a2,
     GrBorder(dc2,xx1+Fs->pix_left+Fs->scroll_x,yy1+Fs->pix_top+Fs->scroll_y,
 	  xx2+Fs->pix_left+Fs->scroll_x,yy2+Fs->pix_top+Fs->scroll_y);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
     if (x2<x1) {
       xx1=x2; xx2=x1;
@@ -263,15 +263,15 @@ CSprite *SMScreenBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,I64 a1,I64 a2,
   res->pwhu.height=yy2-yy1;
   res->pwhu.x1=0;
   res->pwhu.y1=0;
-  SpriteScreenInit(dc,x,y);
-  i=gr.screen_zoom;
+  SpriteScrnInit(dc,x,y);
+  i=gr.scrn_zoom;
   GrScaleZoom(1.0/i);
-  WinMgrSync(2,TRUE);
+  Refresh(2,TRUE);
 
-  dc3=DCScreenCapture;
+  dc3=DCScrnCapture;
   img=DCExt(dc3,Fs->pix_left+Fs->scroll_x+xx1,Fs->pix_top+Fs->scroll_y+yy1,
 	Fs->pix_left+Fs->scroll_x+xx2-1,Fs->pix_top+Fs->scroll_y+yy2-1);
-  if (eletype==SPT_INS_TRANSPARENT_SCREEN_BITMAP)
+  if (eletype==SPT_INS_TRANSPARENT_SCRN_BITMAP)
     DCColorChg(img,bm_bkcolor);
   GrScaleZoom(i);
   MemCpy(&res->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
@@ -291,7 +291,7 @@ CSprite *SMCircle(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     dc->color=color&COLORROP_NO_ROP0_MASK;
     GrCircle3(dc,x1,y1,0,Sqrt(SqrI64(x1-x2)+SqrI64(y1-y2)));
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   dc->color=color&COLORROP_NO_ROP0_MASK;
@@ -313,7 +313,7 @@ CSprite *SMEllipse(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     dc->color=color&COLORROP_NO_ROP0_MASK;
     GrEllipse3(dc,(x1+x2)>>1,(y1+y2)>>1,0,AbsI64(x1-x2)>>1,AbsI64(y1-y2)>>1);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   res=CAlloc(SpriteElemQuedBaseSize(SPT_ELLIPSE));
@@ -335,7 +335,7 @@ CSprite *SMEllipse(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
     GrEllipse3(dc,res->pwha.x1+x,res->pwha.y1+y,0,
 	  res->pwha.width,res->pwha.height,res->pwha.angle);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   angle1=Arg(x2-(res->pwha.x1+x),y2-(res->pwha.y1+y));
@@ -360,7 +360,7 @@ CSprite *SMPolygon(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,I64 sides,
     GrRegPoly3(dc,(x1+x2)>>1,(y1+y2)>>1,0,
 	  AbsI64(x1-x2)>>1,AbsI64(y1-y2)>>1,sides);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   res=CAlloc(SpriteElemQuedBaseSize(SPT_POLYGON));
@@ -384,7 +384,7 @@ CSprite *SMPolygon(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,I64 sides,
 	  res->pwhas.width,res->pwhas.height,
 	  res->pwhas.sides,res->pwhas.angle);
     msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-    SpriteScreenInit(dc,x,y);
+    SpriteScrnInit(dc,x,y);
     x2=a1; y2=a2;
   } while (msg_code!=MSG_IP_L_UP);
   angle1=Arg(x2-(res->pwhas.x1+x),y2-(res->pwhas.y1+y));
@@ -405,7 +405,7 @@ CSprite *SMPolyLineFamily(I64 eletype,CDC *dc,I64 x,I64 y,I64 a1,I64 a2,
   I64 i,num=0,msg_code,x1=a1,y1=a2,x2=a1,y2=a2;
   I32 *ptr;
   CD3I32 *p;
-  CSprite *res,*tempg,*tempg1,head2;
+  CSprite *res,*tmpg,*tmpg1,head2;
 
   QueInit(&head2);
   do {
@@ -438,22 +438,22 @@ CSprite *SMPolyLineFamily(I64 eletype,CDC *dc,I64 x,I64 y,I64 a1,I64 a2,
       if (num>1) {
 	res=CAlloc(SpriteElemQuedBaseSize(SPT_POLYLINE)+num*sizeof(CD2I32));
 	ptr=&res->nu.u;
-	tempg1=head2.next;
+	tmpg1=head2.next;
 	for (i=0;i<num;i++) {
-	  tempg=tempg1->next;
-	  ptr[i<<1]=tempg1->p.x1;
-	  ptr[i<<1+1]=tempg1->p.y1;
-	  Free(tempg1);
-	  tempg1=tempg;
+	  tmpg=tmpg1->next;
+	  ptr[i<<1]=tmpg1->p.x1;
+	  ptr[i<<1+1]=tmpg1->p.y1;
+	  Free(tmpg1);
+	  tmpg1=tmpg;
 	}
 	res->type=SPT_POLYLINE;
 	res->nu.num=num;
       } else {
-	tempg1=head2.next;
+	tmpg1=head2.next;
 	for (i=0;i<num;i++) {
-	  tempg=tempg1->next;
-	  Free(tempg1);
-	  tempg1=tempg;
+	  tmpg=tmpg1->next;
+	  Free(tmpg1);
+	  tmpg1=tmpg;
 	}
 	res=NULL;
       }
@@ -465,22 +465,22 @@ CSprite *SMPolyLineFamily(I64 eletype,CDC *dc,I64 x,I64 y,I64 a1,I64 a2,
       if (num>2) {
 	res=CAlloc(SpriteElemQuedBaseSize(eletype)+num*sizeof(CD3I32));
 	p=&res->nu.u;
-	tempg1=head2.next;
+	tmpg1=head2.next;
 	for (i=0;i<num;i++) {
-	  tempg=tempg1->next;
-	  p[i].x=tempg1->p.x1;
-	  p[i].y=tempg1->p.y1;
-	  Free(tempg1);
-	  tempg1=tempg;
+	  tmpg=tmpg1->next;
+	  p[i].x=tmpg1->p.x1;
+	  p[i].y=tmpg1->p.y1;
+	  Free(tmpg1);
+	  tmpg1=tmpg;
 	}
 	res->type=eletype;
 	res->nu.num=num;
       } else {
-	tempg1=head2.next;
+	tmpg1=head2.next;
 	for (i=0;i<num;i++) {
-	  tempg=tempg1->next;
-	  Free(tempg1);
-	  tempg1=tempg;
+	  tmpg=tmpg1->next;
+	  Free(tmpg1);
+	  tmpg1=tmpg;
 	}
 	res=NULL;
       }
@@ -493,7 +493,7 @@ CSprite *SMPolyPoint(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
 {
   I64 i,num=0,msg_code,x1=a1,y1=a2,x2=a1,y2=a2,x3,y3;
   I32 *ptr;
-  CSprite *res,*tempg,*tempg1,head2;
+  CSprite *res,*tmpg,*tmpg1,head2;
 
   QueInit(&head2);
   x3=a1-x; y3=a2-y;
@@ -510,7 +510,7 @@ CSprite *SMPolyPoint(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
   res=head2.next;
   x1=x3; y1=y3;
   while (res!=&head2) {
-    tempg=res->next;
+    tmpg=res->next;
     if (res->p.x1==x1 && res->p.y1==y1) {
       QueRem(res);
       Free(res);
@@ -519,7 +519,7 @@ CSprite *SMPolyPoint(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
       x1=res->p.x1;
       y1=res->p.y1;
     }
-    res=tempg;
+    res=tmpg;
   }
 
   res=CAlloc(SpriteElemQuedBaseSize(SPT_POLYPT)+(num*3+7)>>3);
@@ -528,16 +528,16 @@ CSprite *SMPolyPoint(CDC *dc,I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color)
   ptr=&res->npu.u;
   x1=x3; y1=y3;
   i=0;
-  tempg1=head2.next;
-  while (tempg1!=&head2) {
-    tempg=tempg1->next;
-    BFieldOrU32(ptr,i,polypt_map[SignI64(tempg1->p.x1-x1)+1+
-	  3*(SignI64(tempg1->p.y1-y1)+1)]);
+  tmpg1=head2.next;
+  while (tmpg1!=&head2) {
+    tmpg=tmpg1->next;
+    BFieldOrU32(ptr,i,polypt_map[SignI64(tmpg1->p.x1-x1)+1+
+	  3*(SignI64(tmpg1->p.y1-y1)+1)]);
     i+=3;
-    x1=tempg1->p.x1;y1=tempg1->p.y1;
-    QueRem(tempg1);
-    Free(tempg1);
-    tempg1=tempg;
+    x1=tmpg1->p.x1;y1=tmpg1->p.y1;
+    QueRem(tmpg1);
+    Free(tmpg1);
+    tmpg1=tmpg;
   }
   res->type=SPT_POLYPT;
   res->npu.num=num;
@@ -548,7 +548,7 @@ U0 SMTextFamily(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,CDC *dc,
 	I64 x,I64 y,I64 a1,I64 a2,CColorROPU32 color,I64 *_cur_elem_num,
 	I64 old_de_flags)
 {
-  CSprite *tempg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num);
+  CSprite *tmpg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num);
   I64 msg_code,x1,y1;
   U8 *st;
   doc_ce->de_flags|=DOCEF_DONT_DRAW;
@@ -564,15 +564,15 @@ U0 SMTextFamily(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,CDC *dc,
 	case SPT_TEXT_DIAMOND:	GrTextDiamond3(dc,x1,y1,0,st);	break;
       }
       msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-      SpriteScreenInit(dc,x,y);
+      SpriteScrnInit(dc,x,y);
       x1=a1; y1=a2;
     } while (msg_code!=MSG_IP_L_UP);
-    tempg=CAlloc(SpriteElemQuedBaseSize(eletype)+StrLen(st)+1);
-    tempg->type=eletype;
-    tempg->ps.x1=x1-x;
-    tempg->ps.y1=y1-y;
-    StrCpy(tempg->ps.st,st);
-    QueIns(tempg,insert_pt->last);
+    tmpg=CAlloc(SpriteElemQuedBaseSize(eletype)+StrLen(st)+1);
+    tmpg->type=eletype;
+    tmpg->ps.x1=x1-x;
+    tmpg->ps.y1=y1-y;
+    StrCpy(tmpg->ps.st,st);
+    QueIns(tmpg,insert_pt->last);
     SpriteEdUpdate(doc,doc_ce,head);
     *_cur_elem_num+=1;
   }
@@ -584,7 +584,7 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
 	Bool sel,I64 xx1=0,I64 yy1=0,I64 xx2=0,I64 yy2=0,I64 *_cur_elem_num)
 {
   I64 i,msg_code,x=xx,y=yy,x1=a1,y1=a2,x2=a1,y2=a2,old_width;
-  CSprite *tempg,*tempg1,*insert_pt;
+  CSprite *tmpg,*tmpg1,*insert_pt;
   CDC *img;
 
   insert_pt=SpriteSetSettings(,head,*_cur_elem_num,xx,yy,,,&x,&y);
@@ -599,7 +599,7 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
       dc->color=ROPF_DITHER+WHITE<<16+BLACK;
       GrBorder(dc,xx1,yy1,xx2,yy2);
       msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-      SpriteScreenInit(dc,x,y);
+      SpriteScrnInit(dc,x,y);
       x2=a1; y2=a2;
       if (x2<x1) {
 	xx1=x2; xx2=x1;
@@ -616,18 +616,18 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
   }
 
   xx2++; yy2++;
-  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_BITMAP)+
+  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_BITMAP)+
 	((xx2-xx1+7)&~7)*(yy2-yy1));
-  tempg->type=SPT_BITMAP;
-  tempg->pwhu.width=xx2-xx1;
-  tempg->pwhu.height=yy2-yy1;
-  tempg->pwhu.x1=xx1-x;
-  tempg->pwhu.y1=yy1-y;
-  img=DCNew(tempg->pwhu.width,tempg->pwhu.height,Fs);
+  tmpg->type=SPT_BITMAP;
+  tmpg->pwhu.width=xx2-xx1;
+  tmpg->pwhu.height=yy2-yy1;
+  tmpg->pwhu.x1=xx1-x;
+  tmpg->pwhu.y1=yy1-y;
+  img=DCNew(tmpg->pwhu.width,tmpg->pwhu.height,Fs);
   img->color=bm_bkcolor;
-  GrRect(img,0,0,tempg->pwhu.width,tempg->pwhu.height);
-  tempg1=insert_pt;
-  if (tempg1==head || tempg1->type!=SPT_BITMAP) {
+  GrRect(img,0,0,tmpg->pwhu.width,tmpg->pwhu.height);
+  tmpg1=insert_pt;
+  if (tmpg1==head || tmpg1->type!=SPT_BITMAP) {
     SpriteSetSettings(img,head,0,-(xx1-x),-(yy1-y));
     x=xx; y=yy;
     Sprite3(img,-(xx1-x),-(yy1-y),0,doc_ce->bin_data->data);
@@ -636,29 +636,29 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
     *_cur_elem_num=1;
   } else {
     SpriteSetSettings(img,head,*_cur_elem_num,-(xx1-x),-(yy1-y));
-    Sprite3(img,-(xx1-x),-(yy1-y),0,&tempg1->start,TRUE);
-    insert_pt=tempg1->next;
-    QueRem(tempg1);
-    Free(tempg1);
+    Sprite3(img,-(xx1-x),-(yy1-y),0,&tmpg1->start,TRUE);
+    insert_pt=tmpg1->next;
+    QueRem(tmpg1);
+    Free(tmpg1);
   }
-  MemCpy(&tempg->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
+  MemCpy(&tmpg->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
 
   switch (i=SpriteBitMapEd(doc,doc_ce,dc,&xx1,&yy1,
 	&xx2,&yy2,&img,bm_bkcolor)) {
-    case GE_EXIT:
-    case GE_CONT:
-      Free(tempg);
-      tempg=CAlloc(SpriteElemQuedBaseSize(SPT_BITMAP)+
+    case SPE_EXIT:
+    case SPE_CONT:
+      Free(tmpg);
+      tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_BITMAP)+
 	    ((xx2-xx1+7)&~7)*(yy2-yy1));
-      tempg->type=eletype;
-      tempg->pwhu.width=xx2-xx1;
-      tempg->pwhu.height=yy2-yy1;
-      tempg->pwhu.x1=xx1-x;
-      tempg->pwhu.y1=yy1-y;
-      MemCpy(&tempg->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
+      tmpg->type=eletype;
+      tmpg->pwhu.width=xx2-xx1;
+      tmpg->pwhu.height=yy2-yy1;
+      tmpg->pwhu.x1=xx1-x;
+      tmpg->pwhu.y1=yy1-y;
+      MemCpy(&tmpg->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
       break;
   }
-  QueIns(tempg,insert_pt->last);
+  QueIns(tmpg,insert_pt->last);
   DCDel(img);
   SpriteEdUpdate(doc,doc_ce,head);
   return i;
@@ -666,46 +666,46 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
 
 U0 SMMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,I64 *_cur_elem_num)
 {
-  CSprite *tempg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num),
-	*tempg1=insert_pt;
+  CSprite *tmpg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num),
+	*tmpg1=insert_pt;
   CD3I32 *p;
   I64 i,size,x1,y1,z1;
   I32 *mesh,*old_mesh;
-  if (tempg1!=head && tempg1->type==SPT_MESH)
-    old_mesh=&tempg1->mu.vertex_cnt;
-  else if (tempg1!=head && tempg1->type==SPT_SHIFTABLE_MESH) {
-    x1=tempg1->pmu.x;
-    y1=tempg1->pmu.y;
-    z1=tempg1->pmu.z;
-    p=&tempg1->pmu.u;
-    for (i=0;i<tempg1->pmu.vertex_cnt;i++,p++) {
+  if (tmpg1!=head && tmpg1->type==SPT_MESH)
+    old_mesh=&tmpg1->mu.vertex_cnt;
+  else if (tmpg1!=head && tmpg1->type==SPT_SHIFTABLE_MESH) {
+    x1=tmpg1->pmu.x;
+    y1=tmpg1->pmu.y;
+    z1=tmpg1->pmu.z;
+    p=&tmpg1->pmu.u;
+    for (i=0;i<tmpg1->pmu.vertex_cnt;i++,p++) {
       p->x+=x1;
       p->y+=y1;
       p->z+=z1;
     }
-    old_mesh=&tempg1->pmu.vertex_cnt;
+    old_mesh=&tmpg1->pmu.vertex_cnt;
   } else
     old_mesh=NULL;
   if (mesh=SpriteMeshEd(old_mesh,&size,TRUE)) {
-    tempg=CAlloc(SpriteElemQuedBaseSize(SPT_MESH)-sizeof(I32)*2+size);
-    tempg->type=SPT_MESH;
-    MemCpy(&tempg->mu.vertex_cnt,mesh,size);
+    tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_MESH)-sizeof(I32)*2+size);
+    tmpg->type=SPT_MESH;
+    MemCpy(&tmpg->mu.vertex_cnt,mesh,size);
     Free(mesh);
-    QueIns(tempg,insert_pt->last);
+    QueIns(tmpg,insert_pt->last);
     SpriteEdUpdate(doc,doc_ce,head);
     if (old_mesh) {
-      insert_pt=tempg;
-      QueRem(tempg1);
-      Free(tempg1);
+      insert_pt=tmpg;
+      QueRem(tmpg1);
+      Free(tmpg1);
       SpriteEdUpdate(doc,doc_ce,head);
     } else
       *_cur_elem_num+=1;
-  } else if (old_mesh && tempg1->type==SPT_SHIFTABLE_MESH) {
-    x1=tempg1->pmu.x;
-    y1=tempg1->pmu.y;
-    z1=tempg1->pmu.z;
-    p=&tempg1->pmu.u;
-    for (i=0;i<tempg1->pmu.vertex_cnt;i++,p++) {
+  } else if (old_mesh && tmpg1->type==SPT_SHIFTABLE_MESH) {
+    x1=tmpg1->pmu.x;
+    y1=tmpg1->pmu.y;
+    z1=tmpg1->pmu.z;
+    p=&tmpg1->pmu.u;
+    for (i=0;i<tmpg1->pmu.vertex_cnt;i++,p++) {
       p->x-=x1;
       p->y-=y1;
       p->z-=z1;
@@ -716,72 +716,72 @@ U0 SMMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,I64 *_cur_elem_num)
 U0 SMShiftableMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,
 	I64 x,I64 y,I64 a1,I64 a2,I64 *_cur_elem_num)
 {
-  CSprite *tempg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num),
-	*tempg1=insert_pt;
+  CSprite *tmpg,*insert_pt=SpriteSetSettings(,head,*_cur_elem_num),
+	*tmpg1=insert_pt;
   CD3I32 *p;
   I64 i,size,z,x1,y1,z1;
   I32 *mesh,*old_mesh;
-  if (tempg1!=head && tempg1->type==SPT_MESH) {
+  if (tmpg1!=head && tmpg1->type==SPT_MESH) {
     z=0;
     x1=-(a1-x);
     y1=-(a2-y);
     z1=z;
-    p=&tempg1->mu.u;
-    for (i=0;i<tempg1->mu.vertex_cnt;i++,p++) {
+    p=&tmpg1->mu.u;
+    for (i=0;i<tmpg1->mu.vertex_cnt;i++,p++) {
       p->x+=x1;
       p->y+=y1;
       p->z+=z1;
     }
-    old_mesh=&tempg1->mu.vertex_cnt;
-  } else if (tempg1!=head && tempg1->type==SPT_SHIFTABLE_MESH) {
-    z=-tempg1->pmu.z;
-    x1=tempg1->pmu.x-(a1-x);
-    y1=tempg1->pmu.y-(a2-y);
-    z1=tempg1->pmu.z+z;
-    p=&tempg1->pmu.u;
-    for (i=0;i<tempg1->pmu.vertex_cnt;i++,p++) {
+    old_mesh=&tmpg1->mu.vertex_cnt;
+  } else if (tmpg1!=head && tmpg1->type==SPT_SHIFTABLE_MESH) {
+    z=-tmpg1->pmu.z;
+    x1=tmpg1->pmu.x-(a1-x);
+    y1=tmpg1->pmu.y-(a2-y);
+    z1=tmpg1->pmu.z+z;
+    p=&tmpg1->pmu.u;
+    for (i=0;i<tmpg1->pmu.vertex_cnt;i++,p++) {
       p->x+=x1;
       p->y+=y1;
       p->z+=z1;
     }
-    old_mesh=&tempg1->pmu.vertex_cnt;
+    old_mesh=&tmpg1->pmu.vertex_cnt;
   } else {
     z=0;
     old_mesh=NULL;
   }
   if (mesh=SpriteMeshEd(old_mesh,&size,TRUE)) {
-    tempg=CAlloc(SpriteElemQuedBaseSize(SPT_SHIFTABLE_MESH)-sizeof(I32)*2+size);
-    tempg->type=SPT_SHIFTABLE_MESH;
-    MemCpy(&tempg->pmu.vertex_cnt,mesh,size);
+    tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_SHIFTABLE_MESH)-sizeof(I32)*2+size);
+    tmpg->type=SPT_SHIFTABLE_MESH;
+    MemCpy(&tmpg->pmu.vertex_cnt,mesh,size);
     Free(mesh);
-    tempg->pmu.x=a1-x;
-    tempg->pmu.y=a2-y;
-    tempg->pmu.z=-z;
-    QueIns(tempg,insert_pt->last);
+    tmpg->pmu.x=a1-x;
+    tmpg->pmu.y=a2-y;
+    tmpg->pmu.z=-z;
+    QueIns(tmpg,insert_pt->last);
     SpriteEdUpdate(doc,doc_ce,head);
     if (old_mesh) {
-      insert_pt=tempg;
-      QueRem(tempg1);
-      Free(tempg1);
+      insert_pt=tmpg;
+      QueRem(tmpg1);
+      Free(tmpg1);
       SpriteEdUpdate(doc,doc_ce,head);
     } else
       *_cur_elem_num+=1;
-  } else if (old_mesh && tempg1->type==SPT_SHIFTABLE_MESH) {
-    x1=tempg1->pmu.x-(a1-x);
-    y1=tempg1->pmu.y-(a2-y);
-    z1=tempg1->pmu.z+z;
-    p=&tempg1->pmu.u;
-    for (i=0;i<tempg1->pmu.vertex_cnt;i++,p++) {
+  } else if (old_mesh && tmpg1->type==SPT_SHIFTABLE_MESH) {
+    x1=tmpg1->pmu.x-(a1-x);
+    y1=tmpg1->pmu.y-(a2-y);
+    z1=tmpg1->pmu.z+z;
+    p=&tmpg1->pmu.u;
+    for (i=0;i<tmpg1->pmu.vertex_cnt;i++,p++) {
       p->x-=x1;
       p->y-=y1;
       p->z-=z1;
     }
-  } else if (old_mesh && tempg1->type==SPT_MESH) {
+  } else if (old_mesh && tmpg1->type==SPT_MESH) {
     x1=-(a1-x);
     y1=-(a2-y);
     z1= z;
-    p=&tempg1->mu.u;
-    for (i=0;i<tempg1->mu.vertex_cnt;i++,p++) {
+    p=&tmpg1->mu.u;
+    for (i=0;i<tmpg1->mu.vertex_cnt;i++,p++) {
       p->x-=x1;
       p->y-=y1;
       p->z-=z1;
@@ -793,11 +793,11 @@ U0 SMTaskTitleSet(I64 eletype)
 {
   Fs->title_src=TTS_CONST; //Violates TTS_LOCKED_CONST
   switch (eletype) {
-    case SPT_INS_SCREEN_BITMAP:
-      StrCpy(Fs->task_title,"Insert Screen BitMap");
+    case SPT_INS_SCRN_BITMAP:
+      StrCpy(Fs->task_title,"Insert Scrn BitMap");
       break;
-    case SPT_INS_TRANSPARENT_SCREEN_BITMAP:
-      StrCpy(Fs->task_title,"Insert Transparent Screen BitMap");
+    case SPT_INS_TRANSPARENT_SCRN_BITMAP:
+      StrCpy(Fs->task_title,"Insert Transparent Scrn BitMap");
       break;
     default:
       if (eletype>=0)
@@ -813,13 +813,13 @@ I64 SpriteMainEd(CDoc *doc)
 	cur_elem_num,old_border_src=Fs->border_src,old_title_src=Fs->title_src,
 	old_de_flags=doc_ce->de_flags;
   CColorROPU32 bm_bkcolor,color;
-  CSprite *head,*tempg,*insert_pt;
+  CSprite *head,*tmpg,*insert_pt;
   CDC *dc=DCAlias(,Fs),*dc2=DCAlias(,sys_winmgr_task),*dc3;
   U8 *old_task_title=StrNew(Fs->task_title);
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   AutoComplete;
-  WinMgrSync(2,TRUE);
+  Refresh(2,TRUE);
   dc2->flags|=DCF_ON_TOP;
   head=Sprite2SpriteQue(doc_ce->bin_data->data);
   cur_elem_num=QueCnt(head);
@@ -873,10 +873,10 @@ I64 SpriteMainEd(CDoc *doc)
 	i=PopUpColor(,,FALSE);
 	if (i>=0) {
 	  color=i;
-	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
-	  tempg->type=SPT_COLOR;
-	  tempg->c.color=color;
-	  QueIns(tempg,insert_pt->last);
+	  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
+	  tmpg->type=SPT_COLOR;
+	  tmpg->c.color=color;
+	  QueIns(tmpg,insert_pt->last);
 	  SpriteEdUpdate(doc,doc_ce,head);
 	  cur_elem_num++;
 	}
@@ -888,10 +888,10 @@ I64 SpriteMainEd(CDoc *doc)
 	i=PopUpColorDither;
 	if (i>=0) {
 	  color=i;
-	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_DITHER_COLOR));
-	  tempg->type=SPT_DITHER_COLOR;
-	  tempg->d.dither_color=color.c0.color|color.c1.color<<8;
-	  QueIns(tempg,insert_pt->last);
+	  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_DITHER_COLOR));
+	  tmpg->type=SPT_DITHER_COLOR;
+	  tmpg->d.dither_color=color.c0.color|color.c1.color<<8;
+	  QueIns(tmpg,insert_pt->last);
 	  SpriteEdUpdate(doc,doc_ce,head);
 	  cur_elem_num++;
 	}
@@ -900,9 +900,9 @@ I64 SpriteMainEd(CDoc *doc)
 	break;
       case SPT_ED_MENU:
 	switch (SpriteEd(doc,doc_ce,x,y,&head,&cur_elem_num)) {
-	  case GE_ABORT:	eletype=DOCM_CANCEL;	break;
-	  case GE_EXIT:		eletype=SPT_EXIT;	break;
-	  case GE_CONT:		eletype=SPT_MENU;	break;
+	  case SPE_ABORT:	eletype=DOCM_CANCEL;	break;
+	  case SPE_EXIT:		eletype=SPT_EXIT;	break;
+	  case SPE_CONT:		eletype=SPT_MENU;	break;
 	}
 	break;
       case SPT_MESH:
@@ -934,7 +934,7 @@ I64 SpriteMainEd(CDoc *doc)
 	  PopUpOk("Select Origin.\n");
 	doc_ce->de_flags=old_de_flags;
 	break;
-      case SPT_INS_SCREEN_BITMAP:
+      case SPT_INS_SCRN_BITMAP:
 	doc_ce->de_flags|=DOCEF_DONT_DRAW;
 	PopUpOk("Drag-out a rect for the extents of the\nbitmap.\n");
 	doc_ce->de_flags=old_de_flags;
@@ -957,8 +957,8 @@ I64 SpriteMainEd(CDoc *doc)
 	    xx1+=xx; yy1+=yy;
 	    xx2+=xx; yy2+=yy;
 	    if (SMBitMap(eletype,doc,doc_ce,head,dc,xx,yy,a1,a2,bm_bkcolor,
-		  FALSE,xx1,yy1,xx2,yy2,&cur_elem_num)==GE_EXIT) {
-	      res=GE_EXIT;
+		  FALSE,xx1,yy1,xx2,yy2,&cur_elem_num)==SPE_EXIT) {
+	      res=SPE_EXIT;
 	      goto ei_done;
 	    }
 	    eletype=SPT_MENU;
@@ -966,7 +966,7 @@ I64 SpriteMainEd(CDoc *doc)
 	}
 	doc_ce->de_flags=old_de_flags;
 	break;
-      case SPT_INS_TRANSPARENT_SCREEN_BITMAP:
+      case SPT_INS_TRANSPARENT_SCRN_BITMAP:
 	doc_ce->de_flags|=DOCEF_DONT_DRAW;
 	i=PopUpColor("Color to Become Transparent\n\n",,FALSE);
 	if (i<0)
@@ -984,10 +984,10 @@ I64 SpriteMainEd(CDoc *doc)
 	i=PopUpRangeI64(1,16,1,"Pen Width\n");
 	if (i>=1) {
 	  width=i;
-	  tempg=CAlloc(SpriteElemQuedBaseSize(SPT_WIDTH));
-	  tempg->type=SPT_WIDTH;
-	  tempg->w.width=width;
-	  QueIns(tempg,insert_pt->last);
+	  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_WIDTH));
+	  tmpg->type=SPT_WIDTH;
+	  tmpg->w.width=width;
+	  QueIns(tmpg,insert_pt->last);
 	  SpriteEdUpdate(doc,doc_ce,head);
 	  cur_elem_num++;
 	}
@@ -996,12 +996,12 @@ I64 SpriteMainEd(CDoc *doc)
 	break;
       case SPT_TRANSFORM_ON:
       case SPT_TRANSFORM_OFF:
-	tempg=CAlloc(SpriteElemQuedBaseSize(SPT_TRANSFORM_ON));
+	tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_TRANSFORM_ON));
 	if (eletype==SPT_TRANSFORM_ON)
-	  tempg->type=SPT_TRANSFORM_ON;
+	  tmpg->type=SPT_TRANSFORM_ON;
 	else
-	  tempg->type=SPT_TRANSFORM_OFF;
-	QueIns(tempg,insert_pt->last);
+	  tmpg->type=SPT_TRANSFORM_OFF;
+	QueIns(tmpg,insert_pt->last);
 	SpriteEdUpdate(doc,doc_ce,head);
 	cur_elem_num++;
 	eletype=SPT_MENU;
@@ -1026,39 +1026,39 @@ I64 SpriteMainEd(CDoc *doc)
       insert_pt=SpriteSetSettings(dc,head,cur_elem_num,xx,yy,
 	    &color,&width,&x,&y);
       x+=xx; y+=yy;
-      SpriteScreenInit(dc,x,y);
+      SpriteScrnInit(dc,x,y);
       if (eletype==SPT_EXIT) {
-	res=GE_EXIT;
+	res=SPE_EXIT;
 	goto ei_done;
       } else if (eletype==DOCM_CANCEL) {
-	res=GE_ABORT;
+	res=SPE_ABORT;
 	goto ei_done;
       }
       switch (GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_R_UP|1<<MSG_IP_L_DOWN)) {
 	case MSG_KEY_DOWN:
 	  switch (a1) {
 	    case CH_ESC:
-	      res=GE_EXIT;
+	      res=SPE_EXIT;
 	      goto ei_done;
 	    case CH_SHIFT_ESC:
-	      res=GE_ABORT;
+	      res=SPE_ABORT;
 	      goto ei_done;
 	    case 'c': //eye-dropper
-	      dc3=DCScreenCapture(FALSE);
+	      dc3=DCScrnCapture(FALSE);
 	      color=GrPeek(dc3,ip.pos.x,ip.pos.y)^15;//Mouse cursor is XORed.
 	      DCDel(dc3);
-	      tempg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
-	      tempg->type=SPT_COLOR;
-	      tempg->c.color=color;
-	      QueIns(tempg,insert_pt->last);
+	      tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
+	      tmpg->type=SPT_COLOR;
+	      tmpg->c.color=color;
+	      QueIns(tmpg,insert_pt->last);
 	      SpriteEdUpdate(doc,doc_ce,head);
 	      cur_elem_num++;
 	      break;
 	    case 't': //Set to transparent color
-	      tempg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
-	      tempg->type=SPT_COLOR;
-	      tempg->c.color=TRANSPARENT;
-	      QueIns(tempg,insert_pt->last);
+	      tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_COLOR));
+	      tmpg->type=SPT_COLOR;
+	      tmpg->c.color=TRANSPARENT;
+	      QueIns(tmpg,insert_pt->last);
 	      SpriteEdUpdate(doc,doc_ce,head);
 	      cur_elem_num++;
 	      break;
@@ -1066,9 +1066,9 @@ I64 SpriteMainEd(CDoc *doc)
 	  break;
 	case MSG_IP_R_UP:
 	  if (eletype==SPT_PLANAR_SYMMETRY) {
-	    tempg=CAlloc(SpriteElemQuedBaseSize(SPT_PLANAR_SYMMETRY));
-	    tempg->type=SPT_PLANAR_SYMMETRY;
-	    QueIns(tempg,insert_pt->last);
+	    tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_PLANAR_SYMMETRY));
+	    tmpg->type=SPT_PLANAR_SYMMETRY;
+	    QueIns(tmpg,insert_pt->last);
 	    SpriteEdUpdate(doc,doc_ce,head);
 	    cur_elem_num++;
 	    eletype=SPT_MENU;
@@ -1079,62 +1079,62 @@ I64 SpriteMainEd(CDoc *doc)
 	  switch (eletype) {
 	    start:
 	      case SPT_LINE:
-		tempg=SMLine(dc,x,y,a1,a2,color);
+		tmpg=SMLine(dc,x,y,a1,a2,color);
 		break;
 	      case SPT_ARROW:
-		tempg=SMArrow(dc,x,y,a1,a2,color);
+		tmpg=SMArrow(dc,x,y,a1,a2,color);
 		break;
 	      case SPT_PLANAR_SYMMETRY:
-		tempg=SMPlanarSymmetry(dc,x,y,a1,a2);
+		tmpg=SMPlanarSymmetry(dc,x,y,a1,a2);
 		eletype=SPT_MENU;
 		break;
 	      case SPT_RECT:
-		tempg=SMRect(dc,x,y,a1,a2,color);
+		tmpg=SMRect(dc,x,y,a1,a2,color);
 		break;
-	      case SPT_INS_SCREEN_BITMAP:
-	      case SPT_INS_TRANSPARENT_SCREEN_BITMAP:
-		tempg=SMScreenBitMap(eletype,dc,dc2,x,y,a1,a2,bm_bkcolor);
+	      case SPT_INS_SCRN_BITMAP:
+	      case SPT_INS_TRANSPARENT_SCRN_BITMAP:
+		tmpg=SMScrnBitMap(eletype,dc,dc2,x,y,a1,a2,bm_bkcolor);
 		eletype=SPT_MENU;
 		break;
 	      case SPT_CIRCLE:
-		tempg=SMCircle(dc,x,y,a1,a2,color);
+		tmpg=SMCircle(dc,x,y,a1,a2,color);
 		break;
 	      case SPT_ELLIPSE:
-		tempg=SMEllipse(dc,x,y,a1,a2,color);
+		tmpg=SMEllipse(dc,x,y,a1,a2,color);
 		break;
 	      case SPT_POLYGON:
-		tempg=SMPolygon(dc,x,y,a1,a2,i,color);
+		tmpg=SMPolygon(dc,x,y,a1,a2,i,color);
 		eletype=SPT_MENU;
 		break;
 	      case SPT_PT:
 	      case SPT_FLOOD_FILL:
 	      case SPT_FLOOD_FILL_NOT:
-		tempg=CAlloc(SpriteElemQuedBaseSize(eletype));
-		tempg->type=eletype;
-		tempg->p.x1=a1-x;
-		tempg->p.y1=a2-y;
+		tmpg=CAlloc(SpriteElemQuedBaseSize(eletype));
+		tmpg->type=eletype;
+		tmpg->p.x1=a1-x;
+		tmpg->p.y1=a2-y;
 		break;
 	      case SPT_POLYLINE:
 	      case SPT_BSPLINE2:
 	      case SPT_BSPLINE3:
 	      case SPT_BSPLINE2_CLOSED:
 	      case SPT_BSPLINE3_CLOSED:
-		tempg=SMPolyLineFamily(eletype,dc,x,y,a1,a2,color);
+		tmpg=SMPolyLineFamily(eletype,dc,x,y,a1,a2,color);
 		break;
 	      case SPT_POLYPT:
-		tempg=SMPolyPoint(dc,x,y,a1,a2,color);
+		tmpg=SMPolyPoint(dc,x,y,a1,a2,color);
 		break;
 	    end:
-	      if (tempg) {
-		QueIns(tempg,insert_pt->last);
+	      if (tmpg) {
+		QueIns(tmpg,insert_pt->last);
 		SpriteEdUpdate(doc,doc_ce,head);
 		cur_elem_num++;
 	      }
 	      break;
 	    case SPT_BITMAP:
 	      if (SMBitMap(eletype,doc,doc_ce,head,dc,xx,yy,a1,a2,bm_bkcolor,
-		    TRUE,,,,,&cur_elem_num)==GE_EXIT) {
-		res=GE_EXIT;
+		    TRUE,,,,,&cur_elem_num)==SPE_EXIT) {
+		res=SPE_EXIT;
 		goto ei_done;
 	      }
 	      doc_ce->de_flags=old_de_flags;
@@ -1172,33 +1172,33 @@ U0 EdSpriteIns(CDoc *doc)
   Bool unlock;
   U8 *st;
   CDocEntry *doc_e;
-  CDocBin *tempb;
+  CDocBin *tmpb;
   if (Fs!=doc->mem_task)
     throw('Graphics');
   if (st=EdSprite(doc->cur_bin_num)) {
     unlock=DocLock(doc);
-    tempb=CAlloc(sizeof(CDocBin),doc->mem_task);
-    tempb->size=sprite_elem_base_sizes[SPT_END];
-    tempb->data=CAlloc(tempb->size,doc->mem_task);
-    tempb->num=doc->cur_bin_num++;
-    tempb->use_cnt=1;
-    QueIns(tempb,doc->bin_head.last);
+    tmpb=CAlloc(sizeof(CDocBin),doc->mem_task);
+    tmpb->size=sprite_elem_base_sizes[SPT_END];
+    tmpb->data=CAlloc(tmpb->size,doc->mem_task);
+    tmpb->num=doc->cur_bin_num++;
+    tmpb->use_cnt=1;
+    QueIns(tmpb,doc->bin_head.last);
     doc_e=DocPrint(doc,"%s",st);
-    doc_e->bin_data=tempb;
+    doc_e->bin_data=tmpb;
     Free(st);
     if (doc_e) {
       if (doc_e->de_flags&DOCEF_TAG && doc_e->tag && *doc_e->tag)
-	tempb->tag=StrNew(doc_e->tag,doc->mem_task);
+	tmpb->tag=StrNew(doc_e->tag,doc->mem_task);
       doc->cur_entry=doc_e;
       doc->cur_col=0;
       DocUnlock(doc);
       DocRecalc(doc);
-      if (SpriteMainEd(doc)==GE_ABORT) {
+      if (SpriteMainEd(doc)==SPE_ABORT) {
 	DocLock(doc);
 	DocEntryDel(doc,doc_e);
       }
     } else
-      DocBinDel(doc,tempb);
+      DocBinDel(doc,tmpb);
     if (unlock)
       DocUnlock(doc);
   }
@@ -1209,21 +1209,21 @@ U0 EdSpriteIns(CDoc *doc)
 U0 EdSpriteEd(CDoc *doc)
 {
   CDocEntry *doc_ce;
-  CDocBin *tempb;
+  CDocBin *tmpb;
   CSprite *old_csprite;
   I64	old_size;
   Bool unlock=DocLock(doc);
   doc_ce=doc->cur_entry;
-  tempb=doc_ce->bin_data;
-  old_size=tempb->size;
-  old_csprite=tempb->data;
-  tempb->data=MAllocIdent(old_csprite,doc->mem_task);
+  tmpb=doc_ce->bin_data;
+  old_size=tmpb->size;
+  old_csprite=tmpb->data;
+  tmpb->data=MAllocIdent(old_csprite,doc->mem_task);
   DocUnlock(doc);
-  if (SpriteMainEd(doc)==GE_ABORT) {
+  if (SpriteMainEd(doc)==SPE_ABORT) {
     DocLock(doc);
-    Free(tempb->data);
-    tempb->data=old_csprite;
-    tempb->size=old_size;
+    Free(tmpb->data);
+    tmpb->data=old_csprite;
+    tmpb->size=old_size;
   } else
     Free(old_csprite);
   if (unlock)

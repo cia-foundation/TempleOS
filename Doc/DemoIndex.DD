@@ -2,7 +2,7 @@ $FG,5$$TX+CX,"TempleOS Demo Index"$$FG$
 
 $WW,1$These are arranged in increasing order of difficulty, more or less.  This can be used as a tutorial if you start at the beginning and work your way fwd.
 
-$FG,2$<SPACE>$FG$ to edit a file and $FG,2$F5$FG$ to run it.
+$FG,2$<SPACE>$FG$ to edit a file and $FG,2$<F5>$FG$ to run it.
 
 $LK,"::/Doc/HelloWorld.DD"$
 
@@ -33,7 +33,7 @@ $LK,"::/Demo/Games/Digits.HC"$
 $LK,"::/Demo/Progress.HC"$ //has some ASM, just ignore
 $LK,"::/Demo/Graphics/Symmetry.HC"$
 $LK,"::/Demo/Graphics/Blot.HC"$
-$LK,"::/Demo/Graphics/ScreenCapture.HC"$
+$LK,"::/Demo/Graphics/ScrnCapture.HC"$
 $LK,"::/Demo/Graphics/EdSprite.HC"$
 $LK,"::/Demo/PullDownMenu.HC"$
 $LK,"::/Demo/Graphics/Palette.HC"$
@@ -56,7 +56,7 @@ $LK,"::/Demo/Graphics/SpritePlot3D.HC"$
 $LK,"::/Demo/Graphics/Balloon.HC"$
 $LK,"::/Demo/Graphics/RotateTank.HC"$
 $LK,"::/Demo/Games/Wenceslas.HC"$
-$LK,"::/Demo/ScreenCodes.HC"$
+$LK,"::/Demo/ScrnCodes.HC"$
 $LK,"::/Demo/Graphics/PanText.HC"$
 $LK,"::/Demo/Graphics/CharAnimation.HC"$
 $LK,"::/Demo/Games/Maze.HC"$
@@ -152,7 +152,7 @@ $MA-X+PU,"::/Apps/Logic",LM="Cd(\"::/Apps/Logic\");Dir;View;\n"$
 $MA-X+PU,"::/Demo/Lectures",LM="Cd(\"::/Demo/Lectures\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Budget",LM="Cd(\"::/Apps/Budget\");Dir;View;\n"$
 $ID,-2$$TR,"TempleOS Specific"$
-$ID,2$$MA-X+PU,"::/Demo/AutoFile",LM="Cd(\"::/Demo/AutoFile\");Dir;View;\n"$
+$ID,2$$MA-X+PU,"::/Demo/InFile",LM="Cd(\"::/Demo/InFile\");Dir;View;\n"$
 $LK,"::/Demo/Print.HC"$
 $LK,"::/Demo/SubIntAccess.HC"$
 $LK,"::/Demo/ParenWarn.HC"$

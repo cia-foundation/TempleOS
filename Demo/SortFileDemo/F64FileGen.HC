@@ -23,4 +23,4 @@ U0 F64FileGenDAT(U8 *filename,I64 n)
   FileWrite(filename,a,n*sizeof(F64));
   Free(a);
 }
-F64FileGenDAT("~/DemoUnsortedF64.DAT.Z",10);
+F64FileGenDAT("~/DemoUnsortedF64.DATA.Z",10);

@@ -66,7 +66,7 @@ I64 EdRILex(CRILex *rx)
 {
   rx->is_not_cont=FALSE;
   I64 i;
-  CLexFile *tempf;
+  CLexFile *tmpf;
   do {
     Lex(rx->cc1);
     Lex(rx->cc2);
@@ -77,10 +77,10 @@ I64 EdRILex(CRILex *rx)
       rx->is_not_cont=TRUE;
     if (rx->was_new_line && (rx->cc1->token!=':' || i==KW_CASE ||
 	  i==KW_DFT || i==KW_START || i==KW_END)) {
-      tempf=rx->cc2->lex_include_stk;
-      while (tempf->next)
-	tempf=tempf->next;
-      QueVectU8Put(rx->indent,tempf->cur_entry->y,rx->depth+rx->one_shot);
+      tmpf=rx->cc2->lex_include_stk;
+      while (tmpf->next)
+	tmpf=tmpf->next;
+      QueVectU8Put(rx->indent,tmpf->cur_entry->y,rx->depth+rx->one_shot);
       rx->one_shot=0;
     }
     if (rx->cc2->token=='\n')
@@ -346,7 +346,7 @@ I64 EdRAGetU8(CDoc *doc)
 U0 EdRACollect(CDoc *doc,CRenum *head)
 {
   I64 ch,i;
-  CRenum *tempr;
+  CRenum *tmpr;
   U8 buf[sizeof(CEdFindText.find_text)];
   ch=EdRAGetU8(doc);
   while (ch>=0) {
@@ -371,9 +371,9 @@ U0 EdRACollect(CDoc *doc,CRenum *head)
 	    ch=EdRAGetU8(doc);
 	  if (ch==':') {
 	    ch=EdRAGetU8(doc);
-	    tempr=MAlloc(sizeof(CRenum));
-	    StrCpy(tempr->label,buf);
-	    QueIns(tempr,head->last);
+	    tmpr=MAlloc(sizeof(CRenum));
+	    StrCpy(tmpr->label,buf);
+	    QueIns(tmpr,head->last);
 	  }
 	}
       }
@@ -388,7 +388,7 @@ U0 EdRenumAsm(CDoc *doc)
 {
   Bool unlock=DocLock(doc);
   I64 num=0;
-  CRenum head,*tempr,*tempr1;
+  CRenum head,*tmpr,*tmpr1;
   U8	buf[sizeof(CEdFindText.find_text)],
 	buf2[sizeof(CEdFindText.find_text)];
 
@@ -396,14 +396,14 @@ U0 EdRenumAsm(CDoc *doc)
   EdSelFun(doc,TRUE);
   EdRACollect(doc,&head);
 
-  tempr=head.next;
-  while (tempr!=&head) {
-    tempr1=tempr->next;
+  tmpr=head.next;
+  while (tmpr!=&head) {
+    tmpr1=tmpr->next;
     num+=ASM_RENUM_SPACING;
     StrPrint(buf,"@#%02d",num);
-    EdReplace(doc,tempr->label,buf,TRUE,TRUE,TRUE);
-    Free(tempr);
-    tempr=tempr1;
+    EdReplace(doc,tmpr->label,buf,TRUE,TRUE,TRUE);
+    Free(tmpr);
+    tmpr=tmpr1;
   }
 
   while (num) {
@@ -426,7 +426,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
   I64 i,start_y,end_y,x,r,goto_line_num;
   U8 *b,*st,*st2,*prj_file;
   CTask *task=NULL;
-  CSrvCmd *tempc;
+  CSrvCmd *tmpc;
   CQueVectU8 *indent;
 
   DocRecalc(doc);
@@ -442,12 +442,12 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
       task=Spawn(&SrvCmdLine,NULL,"Srv",,Fs);
       st2=CurDir;
       st=MStrPrint("Cd(\"%s\");",st2);
-      tempc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+      tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
       Free(st2);
       Free(st);
       WinHorz(Fs->win_left,Fs->win_right, task);
       WinVert(Fs->win_top, Fs->win_bottom,task);
-      if (JobResScan(tempc,&r)) {
+      if (JobResScan(tmpc,&r)) {
 	st=DirFile(doc->filename.name,,"PRJ.Z");
 	prj_file=FileNameAbs(st,FUF_Z_OR_NOT_Z);
 	Free(st);
@@ -455,24 +455,24 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	  st2=DirFile(prj_file),
 		st=MStrPrint("Cd(\"%s\");",st2);
 	  Free(st2);
-	  tempc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|
+	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|
 		1<<SVCf_FOCUS_MASTER|1<<SVCf_FREE_ON_COMPLETE);
 	  Free(st);
-	  st=MStrPrint("\"$$WW,1$$\";Cmp(\"%s\",\"SysTemp\",\"SysTemp\");",
+	  st=MStrPrint("\"$$WW,1$$\";Cmp(\"%s\",\"SysTmp\",\"SysTmp\");",
 		prj_file);
-	  tempc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
 	  Free(st);
-	  if (JobResScan(tempc,&r))
+	  if (JobResScan(tmpc,&r))
 	    if (!r) {
-	      tempc=TaskExe(task,Fs,
-		    "Load(\"SysTemp\",LDF_JUST_LOAD);",
+	      tmpc=TaskExe(task,Fs,
+		    "Load(\"SysTmp\",LDF_JUST_LOAD);",
 		    1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-	      if (JobResScan(tempc,&r))
+	      if (JobResScan(tmpc,&r))
 		okay=TRUE;
 	    }
-	  tempc=TaskExe(task,Fs,"Del(\"SysTemp.*\");",
+	  tmpc=TaskExe(task,Fs,"Del(\"SysTmp.*\");",
 		1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
-	  JobResScan(tempc,&r);
+	  JobResScan(tmpc,&r);
 	} else {
 	  Free(prj_file);
 	  st=DirFile(doc->filename.name,"Load","HC.Z");
@@ -483,9 +483,9 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	  else
 	    st=MStrPrint("\"$$WW,1$$\";ExeFile(\"%s\",CCF_JUST_LOAD);",
 		  doc->filename.name);
-	  tempc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
 	  Free(st);
-	  if (JobResScan(tempc,&r) && r)
+	  if (JobResScan(tmpc,&r) && r)
 	    okay=TRUE;
 	}
 	Free(prj_file);

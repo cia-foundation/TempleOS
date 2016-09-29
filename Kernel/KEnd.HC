@@ -9,8 +9,8 @@ U0 SysGlblsInit()
   sys_focus_task=Fs;
   QueInit(&sys_macro_head);
 
-  blkdev.dft_iso_filename=AStrNew("::/Temp/CDDVD.ISO");
-  blkdev.temp_filename=AStrNew("~/Temp.DD.Z");
+  blkdev.dft_iso_filename=AStrNew("::/Tmp/CDDVD.ISO");
+  blkdev.tmp_filename=AStrNew("~/Tmp.DD.Z");
   blkdev.dvd_boot_is_good=TRUE;
   #exe {
     if (!kernel_cfg->auto_mount_ide_hd_let)
@@ -23,7 +23,7 @@ U0 SysGlblsInit()
 	  kernel_cfg->auto_mount_ide_cd_let);
   }
 
-  InDbg(ON);
+  DbgMode(ON);
   rev_bits_table	=CAlloc(256);
   set_bits_table	=CAlloc(256);
   for (i=0;i<256;i++)
@@ -52,8 +52,6 @@ U0 SysGlblsInit()
 
   ProgressBarsRst;
 
-  //$AN,"Independent HeapCtrl Example",A="Independent HeapCtrl Example"$
-  i=1; //Rqst 1 blk, we might get more.
   QueInit(&dev.pci_head);
   dev.mem64_ptr=MEM_MAPPED_SPACE;
 
@@ -79,7 +77,7 @@ U0 SysGrInit()
     OutU8(VGAP_IDX,VGAR_MAP_MASK);
     OutU8(VGAP_DATA,0x0F);
     MemSet(text.vga_alias,0,GR_WIDTH*GR_HEIGHT>>3);
-    text.raw_screen_image=CAlloc(GR_WIDTH*GR_HEIGHT/8);
+    text.raw_scrn_image=CAlloc(GR_WIDTH*GR_HEIGHT/8);
     text.border_chars[2] (I64)=0x0908070605040302;
     text.border_chars[10](U32)=0x0D0C0B0A;
   }
@@ -159,7 +157,7 @@ U0 KernelMain()
   LBts(&sys_run_level,RLf_RAW);
   TimersInit;
   if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
-    RawPrint(4000,"!!! Requires $TX,"512 Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
+    RawPrint(4000,"!!! Requires $TX,"512Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
 
   IntsInit;
   "Enable IRQ's\n";
@@ -197,7 +195,7 @@ U0 KernelMain()
   Load("Compiler",LDF_SILENT);
   LBts(&sys_run_level,RLf_COMPILER);
 
-  InDbg(OFF);
+  DbgMode(OFF);
   cnts.time_stamp_freq_initial=TimeStampFreqCal;
   Cd("/");
   try ExeFile("StartOS"); //Continues $LK,"/StartOS.HC",A="FL:/StartOS.HC,1"$

@@ -31,15 +31,15 @@ BigShift;
 U0 Branch()
 {
   U64 i=0xFFCC3311,j;
-  "Branch\n";
+  'Branch\n';
   for (j=0;j<64;j++) {
     i<<=1;
     if (Carry)
-      "1";
+      '1';
     else
-      "0";
+      '0';
   }
-  "\n";
+  '\n';
 }
 
 Branch;

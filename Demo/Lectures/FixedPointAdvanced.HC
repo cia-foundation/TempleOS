@@ -3,18 +3,18 @@ that are scaled by a value.  A common
 example would be using number of pennies
 instead of dollars with a float.
 
-Fixed-point used to be much faster,
+Fixed-point used to be much $TX,"faster",HTML="http://en.wikipedia.org/wiki/X87"$,
 but modern processors do well with
 floats.  It also depends on the compiler
-and my compiler used to do floats poorly.
+and my compiler is poor with floats.
 
 I often use 64-bit ints with upper 32-bits
 as int and lower 32-bits as fraction.
 
 See $LK,"::/Demo/SubIntAccess.HC"$ for how
 to access upper or lower 32-bits.
-
 */
+
 #define SAMPLE_SIZE	10000000
 
 I32 coordinates[65536];
@@ -77,7 +77,7 @@ U0 Main()
 {
   I64 start,end,overhead_time,test_time;
   F64 d1,fsum;
-  I64 reg i,temp,reg d2,reg sum;
+  I64 reg i,tmp,reg d2,reg sum;
 
   CPURep;
 
@@ -113,8 +113,8 @@ U0 Main()
   sum=0;
   start=GetTSC;
   for (i=SAMPLE_SIZE-1;i>=0;i--) {
-    temp=d2*coordinates[i&65535];
-    sum+=temp.i32[1];
+    tmp=d2*coordinates[i&65535];
+    sum+=tmp.i32[1];
   }
   end=GetTSC;
   test_time=end-start;

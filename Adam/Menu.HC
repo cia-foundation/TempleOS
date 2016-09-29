@@ -26,41 +26,41 @@ public CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name)
 {//Find pulldown entry. Fs->cur_menu is probably the menu you want.
 //Just 2 levels -- across top and down are valid, currently.
   U8 *st,*st2;
-  CMenuEntry *tempse;
+  CMenuEntry *tmpse;
   if (!haystack_menu || !needle_full_name)
     return NULL;
   st=StrNew(needle_full_name);
   st2=StrNew(needle_full_name);
-  tempse=(&haystack_menu->sub)(U8 *)-offset(CMenuEntry.sub);
-  while (*st && tempse) {
+  tmpse=(&haystack_menu->sub)(U8 *)-offset(CMenuEntry.sub);
+  while (*st && tmpse) {
     StrFirstRem(st,"/",st2);
-    tempse=MenuSubEntryFind(tempse->sub,st2);
+    tmpse=MenuSubEntryFind(tmpse->sub,st2);
   }
   Free(st);
   Free(st2);
-  return tempse;
+  return tmpse;
 }
 
 CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
 {
-  CMenuEntry *tempme=NULL,*tempse;
+  CMenuEntry *tmpme=NULL,*tmpse;
   if (cc->token==TK_IDENT) {
-    tempme=CAlloc(sizeof(CMenuEntry),task);
+    tmpme=CAlloc(sizeof(CMenuEntry),task);
     if (StrLen(cc->cur_str)>31)
       cc->cur_str[31]=0;
-    StrCpy(tempme->name,cc->cur_str);
+    StrCpy(tmpme->name,cc->cur_str);
     if (Lex(cc)=='(') {
-      tempme->msg_code=MSG_KEY_DOWN_UP;
+      tmpme->msg_code=MSG_KEY_DOWN_UP;
       if (Lex(cc)!=',' && cc->token!=')')
-	tempme->msg_code=LexExpressionI64(cc);
+	tmpme->msg_code=LexExpressionI64(cc);
       if (cc->token==',')
 	Lex(cc);
       if (cc->token!=',' && cc->token!=')')
-	tempme->a1=LexExpressionI64(cc);
+	tmpme->a1=LexExpressionI64(cc);
       if (cc->token==',')
 	Lex(cc);
       if (cc->token!=',' && cc->token!=')')
-	tempme->a2=LexExpressionI64(cc);
+	tmpme->a2=LexExpressionI64(cc);
       if (cc->token!=')')
 	LexExcept(cc,"Missing ')' at ");
       if (Lex(cc)!=';')
@@ -68,10 +68,10 @@ CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
       Lex(cc); //Skip ;
     } else if (cc->token=='{') {
       Lex(cc); //Skip {
-      tempme->dir=TRUE;
-      tempse=&tempme->sub;
-      while (tempse && cc->token!='}')
-	tempse=tempse->next=MenuNewSub(cc,task);
+      tmpme->dir=TRUE;
+      tmpse=&tmpme->sub;
+      while (tmpse && cc->token!='}')
+	tmpse=tmpse->next=MenuNewSub(cc,task);
       if (cc->token!='}')
 	LexExcept(cc,"Missing '}' at ");
       else
@@ -79,13 +79,13 @@ CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
     } else
       LexExcept(cc,"Expecting '{' at ");
   }
-  return tempme;
+  return tmpme;
 }
 
 public CMenu *MenuNew(U8 *st,I64 flags=0,CTask *task=NULL)
 {//Parse a menu. You probably don't need this.
   CMenu *m;
-  CMenuEntry *tempse;
+  CMenuEntry *tmpse;
   CCmpCtrl *cc=CmpCtrlNew(st,CCF_DONT_FREE_BUF);
   if (!task) task=Fs;
   Lex(cc);
@@ -93,9 +93,9 @@ public CMenu *MenuNew(U8 *st,I64 flags=0,CTask *task=NULL)
   m->task=task;
   m->flags=flags;
   m->attr =BLUE<<4+YELLOW;
-  tempse=&m->sub;
-  while (tempse)
-    tempse=tempse->next=MenuNewSub(cc,task);
+  tmpse=&m->sub;
+  while (tmpse)
+    tmpse=tmpse->next=MenuNewSub(cc,task);
   CmpCtrlDel(cc);
   return m;
 }
@@ -109,40 +109,40 @@ public CMenu *MenuFile(U8 *filename,I64 flags=0,CTask *task=NULL)
   return m;
 }
 
-U0 MenuDelSub(CMenuEntry *tempme)
+U0 MenuDelSub(CMenuEntry *tmpme)
 {
-  CMenuEntry *tempse,*tempse1;
-  if (tempme) {
-    tempse=tempme->sub;
-    while (tempse) {
-      tempse1=tempse->next;
-      MenuDelSub(tempse);
-      tempse=tempse1;
+  CMenuEntry *tmpse,*tmpse1;
+  if (tmpme) {
+    tmpse=tmpme->sub;
+    while (tmpse) {
+      tmpse1=tmpse->next;
+      MenuDelSub(tmpse);
+      tmpse=tmpse1;
     }
-    Free(tempme);
+    Free(tmpme);
   }
 }
 
 public U0 MenuDel(CMenu *m)
 {//Delete a manu. You probably don't need this.
-  CMenuEntry *tempme,*tempme1;
+  CMenuEntry *tmpme,*tmpme1;
   if (!m) return;
-  tempme=m->sub;
-  while (tempme) {
-    tempme1=tempme->next;
-    MenuDelSub(tempme);
-    tempme=tempme1;
+  tmpme=m->sub;
+  while (tmpme) {
+    tmpme1=tmpme->next;
+    MenuDelSub(tmpme);
+    tmpme=tmpme1;
   }
   Free(m);
 }
 
-I64 MenuEntryWidth(CMenuEntry *tempme)
+I64 MenuEntryWidth(CMenuEntry *tmpme)
 {
-  I64 res=StrLen(tempme->name);
-  CMenuEntry *tempse=tempme->sub;
-  while (tempse) {
-    res=MaxI64(res,StrLen(tempse->name));
-    tempse=tempse->next;
+  I64 res=StrLen(tmpme->name);
+  CMenuEntry *tmpse=tmpme->sub;
+  while (tmpse) {
+    res=MaxI64(res,StrLen(tmpse->name));
+    tmpse=tmpse->next;
   }
   return res+1;
 }
@@ -174,7 +174,7 @@ public U0 MenuPop()
 U0 DrawMenu(CDC *dc)
 {
   CMenu *m;
-  CMenuEntry *tempme,*tempse,*cur_submenu=NULL;
+  CMenuEntry *tmpme,*tmpse,*cur_submenu=NULL;
   U8 *st=NULL;
   CTask *task=MenuTask;
   I64 i,w,x0,y0,x1=ip.pos.x,y1=ip.pos.y;
@@ -185,9 +185,9 @@ U0 DrawMenu(CDC *dc)
   dc->color=m->attr>>4;
   GrRect(dc,0,0,GR_WIDTH,FONT_HEIGHT);
   x0=0;
-  tempme=m->sub;
-  while (tempme) {
-    w=MenuEntryWidth(tempme)*FONT_WIDTH;
+  tmpme=m->sub;
+  while (tmpme) {
+    w=MenuEntryWidth(tmpme)*FONT_WIDTH;
     if (x0<=x1<x0+w) {
       if (0<=y1<FONT_HEIGHT) {
 	dc->color=m->attr&15;
@@ -195,26 +195,26 @@ U0 DrawMenu(CDC *dc)
 	dc->color=m->attr>>4;
       } else
 	dc->color=m->attr&15;
-      GrPrint(dc,x0,0,"%s",tempme->name);
+      GrPrint(dc,x0,0,"%s",tmpme->name);
       y0=FONT_HEIGHT;
-      tempse=tempme->sub;
-      while (tempse) {
-	if (tempse->checked)
+      tmpse=tmpme->sub;
+      while (tmpse) {
+	if (tmpse->checked)
 	  i=m->attr^0xFF;
 	else
 	  i=m->attr;
 	if (y0<=y1<y0+FONT_HEIGHT) {
-	  if (tempse->msg_code==MSG_KEY_DOWN||
-		tempse->msg_code==MSG_KEY_DOWN_UP) {
-	    if (!tempse->a2)
-	      tempse->a2=Char2ScanCode(tempse->a1);
-	    st=ScanCode2KeyName(tempse->a2);
+	  if (tmpse->msg_code==MSG_KEY_DOWN||
+		tmpse->msg_code==MSG_KEY_DOWN_UP) {
+	    if (!tmpse->a2)
+	      tmpse->a2=Char2ScanCode(tmpse->a1);
+	    st=ScanCode2KeyName(tmpse->a2);
 	  }
-	  sys_cur_submenu_entry=cur_submenu=tempse;
+	  sys_cur_submenu_entry=cur_submenu=tmpse;
 	  dc->color=i&15;
 	  GrRect(dc,x0,y0,w,FONT_HEIGHT);
 	  dc->color=i>>4;
-	  GrPrint(dc,x0,y0,"%s",tempse->name);
+	  GrPrint(dc,x0,y0,"%s",tmpse->name);
 	  if (st) {
 	    dc->color=i>>4;
 	    GrRect(dc,x0+w,y0-FONT_HEIGHT,
@@ -227,17 +227,17 @@ U0 DrawMenu(CDC *dc)
 	  dc->color=i>>4;
 	  GrRect(dc,x0,y0,w,FONT_HEIGHT);
 	  dc->color=i&15;
-	  GrPrint(dc,x0,y0,"%s",tempse->name);
+	  GrPrint(dc,x0,y0,"%s",tmpse->name);
 	}
 	y0+=FONT_HEIGHT;
-	tempse=tempse->next;
+	tmpse=tmpse->next;
       }
     } else {
       dc->color=m->attr&15;
-      GrPrint(dc,x0,0,"%s",tempme->name);
+      GrPrint(dc,x0,0,"%s",tmpme->name);
     }
     x0+=w;
-    tempme=tempme->next;
+    tmpme=tmpme->next;
   }
   sys_cur_submenu_entry=cur_submenu;
 }

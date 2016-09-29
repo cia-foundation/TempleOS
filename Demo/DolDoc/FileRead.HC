@@ -38,7 +38,7 @@ public U0 DocProfile(U8 *filename,I64 flags)
       "%4Z:%d\n",i,"ST_DOC_CMDS",cmd_stats[i];
 
   "\n$$GREEN$$'$$PURPLE$$doc_e->type.u8[1]$$GREEN$$' is "
-	"the screen color attr of the "
+	"the scrn color attr of the "
 	"entry.  '$$PURPLE$$doc_e->type.u16[1]"
 	"$$GREEN$$' is some flags for blinking and "
 	"stuff.  See $$LK,\"Doc Type Flag "

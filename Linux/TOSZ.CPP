@@ -79,7 +79,7 @@ DWORD BFieldExtU32(BYTE *src,DWORD pos,DWORD bits)
 void ArcEntryGet(CArcCtrl *c)
 {
   DWORD i;
-  CArcEntry *temp,*temp1;
+  CArcEntry *tmp,*tmp1;
 
   if (c->entry_used) {
     i=c->free_idx;
@@ -96,13 +96,13 @@ void ArcEntryGet(CArcCtrl *c)
     } else {
       do if (++i==c->free_limit) i=c->min_table_entry;
       while (c->hash[i]);
-      temp=&c->compress[i];
-      c->next_entry=temp;
-      temp1=(CArcEntry *)&c->hash[temp->basecode];
-      while (temp1 && temp1->next!=temp)
-	temp1=temp1->next;
-      if (temp1)
-	temp1->next=temp->next;
+      tmp=&c->compress[i];
+      c->next_entry=tmp;
+      tmp1=(CArcEntry *)&c->hash[tmp->basecode];
+      while (tmp1 && tmp1->next!=tmp)
+	tmp1=tmp1->next;
+      if (tmp1)
+	tmp1->next=tmp->next;
     }
     c->free_idx=i;
   }
@@ -112,7 +112,7 @@ void ArcExpandBuf(CArcCtrl *c)
 {
   BYTE *dst_ptr,*dst_limit;
   DWORD basecode,lastcode,code;
-  CArcEntry *temp,*temp1;
+  CArcEntry *tmp,*tmp1;
 
   dst_ptr=c->dst_buf+c->dst_pos;
   dst_limit=c->dst_buf+c->dst_size;
@@ -147,12 +147,12 @@ void ArcExpandBuf(CArcCtrl *c)
       c->last_ch=code;
 
       c->entry_used=TRUE;
-      temp=c->cur_entry;
-      temp->basecode=lastcode;
-      temp->ch=c->last_ch;
-      temp1=(CArcEntry *)&c->hash[lastcode];
-      temp->next=temp1->next;
-      temp1->next=temp;
+      tmp=c->cur_entry;
+      tmp->basecode=lastcode;
+      tmp->ch=c->last_ch;
+      tmp1=(CArcEntry *)&c->hash[lastcode];
+      tmp->next=tmp1->next;
+      tmp1->next=tmp;
 
       ArcEntryGet(c);
       while (dst_ptr<dst_limit && c->stk_ptr!=c->stk_base)
@@ -306,6 +306,6 @@ int main(int argc, char* argv[])
   } else
     puts("TOSZ [-ascii] in_name [out_name]\r\n\r\n"
 	  "TOSZ expands a single TempleOS file. The -ascii flag will convert "
-	  "nonstandard TempleOS ASCII characters to regular ASCII.\r\n");
+	  "nonstandard TempleOS ASCII characters to regular ASCII.\r\n");
   return EXIT_SUCCESS;
 }

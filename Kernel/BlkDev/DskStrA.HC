@@ -71,6 +71,10 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
 		!FilesFindMatch(_test_name,FILEMASK_TXT)) {
 	    res=FALSE;
 	    break;
+	  } else if (Bt(&fuf_flags,FUf_JUST_DD) &&
+		!FilesFindMatch(_test_name,FILEMASK_DD)) {
+	    res=FALSE;
+	    break;
 	  } else if (Bt(&fuf_flags,FUf_JUST_SRC) &&
 		!FilesFindMatch(_test_name,FILEMASK_SRC)) {
 	    res=FALSE;
@@ -83,8 +87,8 @@ Bool FilesFindMatch(U8 *_test_name,U8 *files_find_mask,I64 fuf_flags=0)
 		!FilesFindMatch(_test_name,FILEMASK_JIT)) {
 	    res=FALSE;
 	    break;
-	  } else if (Bt(&fuf_flags,FUf_JUST_GRA) &&
-		!FilesFindMatch(_test_name,FILEMASK_GRA)) {
+	  } else if (Bt(&fuf_flags,FUf_JUST_GR) &&
+		!FilesFindMatch(_test_name,FILEMASK_GR)) {
 	    res=FALSE;
 	    break;
 	  } else
@@ -214,19 +218,19 @@ U8 *DftExt(U8 *filename,U8 *extension)
   return res;
 }
 
-CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name)
+CDirEntry *Cd2DirEntry(CDirEntry *tmpde,U8 *abs_name)
 {
   I64 i;
-  while (tempde) {
-    i=StrLen(tempde->full_name);
-    if (StrNCmp(tempde->full_name,abs_name,i)||
-	  i && tempde->full_name[i-1]!='/' && abs_name[i] && abs_name[i]!='/')
-      tempde=tempde->next;
+  while (tmpde) {
+    i=StrLen(tmpde->full_name);
+    if (StrNCmp(tmpde->full_name,abs_name,i)||
+	  i && tmpde->full_name[i-1]!='/' && abs_name[i] && abs_name[i]!='/')
+      tmpde=tmpde->next;
     else
       if (StrLen(abs_name)==i)
-	return tempde;
+	return tmpde;
       else
-	return Cd2DirEntry(tempde->sub,abs_name);
+	return Cd2DirEntry(tmpde->sub,abs_name);
   }
   return NULL;
 }
@@ -269,9 +273,9 @@ U8 *ToggleZorNotZ(U8 *name)
   return res;
 }
 
-U8 *FileNameTempTxt()
-{//Make pretty-safe temp filename in home dir.
-  return MStrPrint("~/SysTemp%X.DD.Z",GetTSC>>8&0xFFFFFFFF);
+U8 *FileNameTmpTxt()
+{//Make pretty-safe tmp filename in home dir.
+  return MStrPrint("~/SysTmp%X.DD.Z",GetTSC>>8&0xFFFFFFFF);
 }
 
 U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL)

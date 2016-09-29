@@ -17,14 +17,14 @@ U0 ODERstPtrs(CMathODE *ode)
   ode->state_scale=ptr;		ptr(I64)+=s;
   ode->DstateDt=ptr;		ptr(I64)+=s;
   ode->initial_state=ptr;	ptr(I64)+=s;
-  ode->temp0=ptr;	ptr(I64)+=s;
-  ode->temp1=ptr;	ptr(I64)+=s;
-  ode->temp2=ptr;	ptr(I64)+=s;
-  ode->temp3=ptr;	ptr(I64)+=s;
-  ode->temp4=ptr;	ptr(I64)+=s;
-  ode->temp5=ptr;	ptr(I64)+=s;
-  ode->temp6=ptr;	ptr(I64)+=s;
-  ode->temp7=ptr;
+  ode->tmp0=ptr;	ptr(I64)+=s;
+  ode->tmp1=ptr;	ptr(I64)+=s;
+  ode->tmp2=ptr;	ptr(I64)+=s;
+  ode->tmp3=ptr;	ptr(I64)+=s;
+  ode->tmp4=ptr;	ptr(I64)+=s;
+  ode->tmp5=ptr;	ptr(I64)+=s;
+  ode->tmp6=ptr;	ptr(I64)+=s;
+  ode->tmp7=ptr;
 }
 
 public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
@@ -79,26 +79,26 @@ U0 ODESetMassesPtrs(CMathODE *ode,F64 *state,F64 *DstateDt)
 {
   COrder2D3 *ptr1=state(F64 *)+ode->n,
 	*ptr2=DstateDt(F64 *)+ode->n;
-  CMass *tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    tempm->state=ptr1++;
-    tempm->DstateDt=ptr2++;
-    tempm=tempm->next;
+  CMass *tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    tmpm->state=ptr1++;
+    tmpm->DstateDt=ptr2++;
+    tmpm=tmpm->next;
   }
 }
 
 U0 ODEState2Internal(CMathODE *ode)
 {
-  CMass *tempm;
+  CMass *tmpm;
   F64 *old_array_base;
   I64 mass_cnt;
 
   if (ode->flags&ODEF_HAS_MASSES) {
     mass_cnt=0;
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
       mass_cnt++;
-      tempm=tempm->next;
+      tmpm=tmpm->next;
     }
     old_array_base=ode->array_base;
     ode->n_internal=ode->n+6*mass_cnt;
@@ -107,10 +107,10 @@ U0 ODEState2Internal(CMathODE *ode)
     ODERstPtrs(ode);
 
     ODESetMassesPtrs(ode,ode->state_internal,ode->state_internal);
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      MemCpy(tempm->state,&tempm->saved_state,sizeof(COrder2D3));
-      tempm=tempm->next;
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      MemCpy(tmpm->state,&tmpm->saved_state,sizeof(COrder2D3));
+      tmpm=tmpm->next;
     }
   }
   MemCpy(ode->state_internal,ode->state,ode->n*sizeof(F64));
@@ -118,14 +118,14 @@ U0 ODEState2Internal(CMathODE *ode)
 
 U0 ODEInternal2State(CMathODE *ode)
 {
-  CMass *tempm;
+  CMass *tmpm;
   MemCpy(ode->state,ode->state_internal,ode->n*sizeof(F64));
   if (ode->flags&ODEF_HAS_MASSES) {
     ODESetMassesPtrs(ode,ode->state_internal,ode->state_internal);
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      MemCpy(&tempm->saved_state,tempm->state,sizeof(COrder2D3));
-      tempm=tempm->next;
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      MemCpy(&tmpm->saved_state,tmpm->state,sizeof(COrder2D3));
+      tmpm=tmpm->next;
     }
   }
 }
@@ -133,58 +133,58 @@ U0 ODEInternal2State(CMathODE *ode)
 public U0 ODERenum(CMathODE *ode)
 {//Renumber masses and springs.
   I64 i;
-  CSpring *temps;
-  CMass *tempm;
+  CSpring *tmps;
+  CMass *tmpm;
 
   i=0;
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    tempm->num=i++;
-    tempm=tempm->next;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    tmpm->num=i++;
+    tmpm=tmpm->next;
   }
 
   i=0;
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    temps->num=i++;
-    temps->end1_num=temps->end1->num;
-    temps->end2_num=temps->end2->num;
-    temps=temps->next;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    tmps->num=i++;
+    tmps->end1_num=tmps->end1->num;
+    tmps->end2_num=tmps->end2->num;
+    tmps=tmps->next;
   }
 }
 
 public CMass *MassFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 {//Search for mass nearest to x,y,z.
-  CMass *tempm,*best_mass=NULL;
+  CMass *tmpm,*best_mass=NULL;
   F64 dd,best_dd=MAX_F64;
 
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    dd=Sqr(tempm->x-x)+Sqr(tempm->y-y)+Sqr(tempm->z-z);
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    dd=Sqr(tmpm->x-x)+Sqr(tmpm->y-y)+Sqr(tmpm->z-z);
     if (dd<best_dd) {
       best_dd=dd;
-      best_mass=tempm;
+      best_mass=tmpm;
     }
-    tempm=tempm->next;
+    tmpm=tmpm->next;
   }
   return best_mass;
 }
 
 public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 {//Find spring midpoint nearest x,y,z.
-  CSpring *temps,*best_spring=NULL;
+  CSpring *tmps,*best_spring=NULL;
   F64 dd,best_dd=MAX_F64;
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    dd=Sqr((temps->end1->x+temps->end2->x)/2-x)+
-	  Sqr((temps->end1->y+temps->end2->y)/2-y)+
-	  Sqr((temps->end1->z+temps->end2->z)/2-z);
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    dd=Sqr((tmps->end1->x+tmps->end2->x)/2-x)+
+	  Sqr((tmps->end1->y+tmps->end2->y)/2-y)+
+	  Sqr((tmps->end1->z+tmps->end2->z)/2-z);
     if (dd<best_dd) {
       best_dd=dd;
-      best_spring=temps;
+      best_spring=tmps;
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
   return best_spring;
 }
@@ -193,31 +193,31 @@ public U0 MassOrSpringFind(
 	CMathODE *ode,CMass **res_mass,CSpring **res_spring,
 	F64 x,F64 y,F64 z=0)
 {//Find spring or mass nearest x,y,z.
-  CMass   *tempm,*best_mass=NULL;
-  CSpring *temps,*best_spring=NULL;
+  CMass   *tmpm,*best_mass=NULL;
+  CSpring *tmps,*best_spring=NULL;
   F64 dd,best_dd=MAX_F64;
 
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    dd=Sqr(tempm->x-x)+Sqr(tempm->y-y)+Sqr(tempm->z-z);
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    dd=Sqr(tmpm->x-x)+Sqr(tmpm->y-y)+Sqr(tmpm->z-z);
     if (dd<best_dd) {
       best_dd=dd;
-      best_mass=tempm;
+      best_mass=tmpm;
     }
-    tempm=tempm->next;
+    tmpm=tmpm->next;
   }
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    dd=Sqr((temps->end1->x+temps->end2->x)/2-x)+
-	  Sqr((temps->end1->y+temps->end2->y)/2-y)+
-	  Sqr((temps->end1->z+temps->end2->z)/2-z);
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    dd=Sqr((tmps->end1->x+tmps->end2->x)/2-x)+
+	  Sqr((tmps->end1->y+tmps->end2->y)/2-y)+
+	  Sqr((tmps->end1->z+tmps->end2->z)/2-z);
     if (dd<best_dd) {
       best_dd=dd;
-      best_spring=temps;
+      best_spring=tmps;
       best_mass=NULL;
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
   if (res_mass)   *res_mass  =best_mass;
   if (res_spring) *res_spring=best_spring;
@@ -225,126 +225,126 @@ public U0 MassOrSpringFind(
 
 public CMass *MassFindNum(CMathODE *ode,I64 num)
 {//Return mass number N.
-  CMass *tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    if (tempm->num==num)
-      return tempm;
-    tempm=tempm->next;
+  CMass *tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    if (tmpm->num==num)
+      return tmpm;
+    tmpm=tmpm->next;
   }
   return NULL;
 }
 
 public U0 ODERstInactive(CMathODE *ode)
 {//Set all masses and springs to ACTIVE for new trial.
-  CMass *tempm;
-  CSpring *temps;
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    tempm->flags&=~MSF_INACTIVE;
-    tempm=tempm->next;
+  CMass *tmpm;
+  CSpring *tmps;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    tmpm->flags&=~MSF_INACTIVE;
+    tmpm=tmpm->next;
   }
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    temps->flags&=~SSF_INACTIVE;
-    temps=temps->next;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    tmps->flags&=~SSF_INACTIVE;
+    tmps=tmps->next;
   }
 }
 
 U0 ODECalcSprings(CMathODE *ode)
 {
-  CSpring *temps=ode->next_spring;
+  CSpring *tmps=ode->next_spring;
   CMass *e1,*e2;
   F64 d;
   CD3 p;
-  while (temps!=&ode->next_spring) {
-    if (temps->flags&SSF_INACTIVE) {
-      temps->displacement=0;
-      temps->f=0;
+  while (tmps!=&ode->next_spring) {
+    if (tmps->flags&SSF_INACTIVE) {
+      tmps->displacement=0;
+      tmps->f=0;
     } else {
-      e1=temps->end1;
-      e2=temps->end2;
+      e1=tmps->end1;
+      e2=tmps->end2;
       d=D3Norm(D3Sub(&p,&e2->state->x,&e1->state->x));
-      temps->displacement=d-temps->rest_len;
-      temps->f=temps->displacement*temps->const;
-      if (temps->f>0 && temps->flags&SSF_NO_TENSION)
-	temps->f=0;
-      else if (temps->f<0 && temps->flags&SSF_NO_COMPRESSION)
-	temps->f=0;
+      tmps->displacement=d-tmps->rest_len;
+      tmps->f=tmps->displacement*tmps->const;
+      if (tmps->f>0 && tmps->flags&SSF_NO_TENSION)
+	tmps->f=0;
+      else if (tmps->f<0 && tmps->flags&SSF_NO_COMPRESSION)
+	tmps->f=0;
       if (d>0) {
-	D3MulEqu(&p,temps->f/d);
+	D3MulEqu(&p,tmps->f/d);
 	D3AddEqu(&e1->DstateDt->DxDt,&p);
 	D3SubEqu(&e2->DstateDt->DxDt,&p);
       }
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 }
 
 U0 ODECalcDrag(CMathODE *ode)
 {
-  CMass *tempm;
+  CMass *tmpm;
   F64 d,dd;
   CD3 p;
   if (ode->drag_v || ode->drag_v2 || ode->drag_v3) {
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      if (!(tempm->flags & MSF_INACTIVE) &&
-	    tempm->drag_profile_factor &&
-	    (dd=D3NormSqr(&tempm->state->DxDt))) {
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      if (!(tmpm->flags & MSF_INACTIVE) &&
+	    tmpm->drag_profile_factor &&
+	    (dd=D3NormSqr(&tmpm->state->DxDt))) {
 	d=ode->drag_v;
 	if (ode->drag_v2)
 	  d+=ode->drag_v2*Sqrt(dd);
 	if (ode->drag_v3)
 	  d+=dd*ode->drag_v3;
-	D3SubEqu(&tempm->DstateDt->DxDt,
-	      D3Mul(&p,d*tempm->drag_profile_factor,&tempm->state->DxDt));
+	D3SubEqu(&tmpm->DstateDt->DxDt,
+	      D3Mul(&p,d*tmpm->drag_profile_factor,&tmpm->state->DxDt));
       }
-      tempm=tempm->next;
+      tmpm=tmpm->next;
     }
   }
 }
 
 U0 ODEApplyAccelerationLimit(CMathODE *ode)
 {
-  CMass *tempm;
+  CMass *tmpm;
   F64 d;
   if (ode->acceleration_limit) {
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      if (!(tempm->flags & MSF_INACTIVE) &&
-	    (d=D3Norm(&tempm->DstateDt->DxDt))>ode->acceleration_limit)
-	D3MulEqu(&tempm->DstateDt->DxDt,ode->acceleration_limit/d);
-      tempm=tempm->next;
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      if (!(tmpm->flags & MSF_INACTIVE) &&
+	    (d=D3Norm(&tmpm->DstateDt->DxDt))>ode->acceleration_limit)
+	D3MulEqu(&tmpm->DstateDt->DxDt,ode->acceleration_limit/d);
+      tmpm=tmpm->next;
     }
   }
 }
 
 U0 ODECallDerivative(CMathODE *ode,F64 t,F64 *state,F64 *DstateDt)
 {
-  CMass *tempm;
+  CMass *tmpm;
   if (ode->flags&ODEF_HAS_MASSES) {
     ODESetMassesPtrs(ode,state,DstateDt);
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      if (!(tempm->flags&MSF_INACTIVE)) {
-	D3Zero(&tempm->DstateDt->DxDt);
-	D3Copy(&tempm->DstateDt->x,&tempm->state->DxDt);
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      if (!(tmpm->flags&MSF_INACTIVE)) {
+	D3Zero(&tmpm->DstateDt->DxDt);
+	D3Copy(&tmpm->DstateDt->x,&tmpm->state->DxDt);
       }
-      tempm=tempm->next;
+      tmpm=tmpm->next;
     }
     ODECalcSprings(ode);
     ODECalcDrag(ode);
     (*ode->derivative)(ode,t,state,DstateDt);
-    tempm=ode->next_mass;
-    while (tempm!=&ode->next_mass) {
-      if (!(tempm->flags&MSF_INACTIVE)) {
-	if (tempm->flags&MSF_FIXED) {
-	  D3Zero(&tempm->DstateDt->DxDt);
-	  D3Zero(&tempm->DstateDt->x);
-	} else if (tempm->mass)
-	  D3DivEqu(&tempm->DstateDt->DxDt,tempm->mass);
+    tmpm=ode->next_mass;
+    while (tmpm!=&ode->next_mass) {
+      if (!(tmpm->flags&MSF_INACTIVE)) {
+	if (tmpm->flags&MSF_FIXED) {
+	  D3Zero(&tmpm->DstateDt->DxDt);
+	  D3Zero(&tmpm->DstateDt->x);
+	} else if (tmpm->mass)
+	  D3DivEqu(&tmpm->DstateDt->DxDt,tmpm->mass);
       }
-      tempm=tempm->next;
+      tmpm=tmpm->next;
     }
     ODEApplyAccelerationLimit(ode);
   } else
@@ -365,10 +365,10 @@ U0 ODERK4OneStep(CMathODE *ode)
   I64 i,n=ode->n_internal;
   F64 xh,hh,h6,*dym,*dyt,*yt,*DstateDt;
 
-  dym =ode->temp0;
-  dyt =ode->temp1;
-  yt  =ode->temp2;
-  DstateDt=ode->temp3;
+  dym =ode->tmp0;
+  dyt =ode->tmp1;
+  yt  =ode->tmp2;
+  DstateDt=ode->tmp3;
   hh  =0.5*ode->h;
   h6  =ode->h / 6.0;
   xh  =ode->t + hh;
@@ -425,34 +425,34 @@ U0 ODECashKarp(CMathODE *ode)
   I64 i,n=ode->n_internal;
   F64 h=ode->h,*state=ode->state_internal,
 	*DstateDt=ode->DstateDt,*ak2,*ak3,*ak4,*ak5,*ak6,
-	*tempstate,*stateerr,*outstate;
+	*tmpstate,*stateerr,*outstate;
 
-  ak2=ode->temp0;
-  ak3=ode->temp1;
-  ak4=ode->temp2;
-  ak5=ode->temp3;
-  ak6=ode->temp4;
-  tempstate=ode->temp5;
-  outstate=ode->temp6;
-  stateerr=ode->temp7;
+  ak2=ode->tmp0;
+  ak3=ode->tmp1;
+  ak4=ode->tmp2;
+  ak5=ode->tmp3;
+  ak6=ode->tmp4;
+  tmpstate=ode->tmp5;
+  outstate=ode->tmp6;
+  stateerr=ode->tmp7;
 
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+ODEb21*h*DstateDt[i];
-  ODECallDerivative(ode,ode->t+ODEa2*h,tempstate,ak2);
+    tmpstate[i]=state[i]+ODEb21*h*DstateDt[i];
+  ODECallDerivative(ode,ode->t+ODEa2*h,tmpstate,ak2);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb31*DstateDt[i]+ODEb32*ak2[i]);
-  ODECallDerivative(ode,ode->t+ODEa3*h,tempstate,ak3);
+    tmpstate[i]=state[i]+h*(ODEb31*DstateDt[i]+ODEb32*ak2[i]);
+  ODECallDerivative(ode,ode->t+ODEa3*h,tmpstate,ak3);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb41*DstateDt[i]+ODEb42*ak2[i]+ODEb43*ak3[i]);
-  ODECallDerivative(ode,ode->t+ODEa4*h,tempstate,ak4);
+    tmpstate[i]=state[i]+h*(ODEb41*DstateDt[i]+ODEb42*ak2[i]+ODEb43*ak3[i]);
+  ODECallDerivative(ode,ode->t+ODEa4*h,tmpstate,ak4);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb51*DstateDt[i]+
+    tmpstate[i]=state[i]+h*(ODEb51*DstateDt[i]+
 	  ODEb52*ak2[i]+ODEb53*ak3[i]+ODEb54*ak4[i]);
-  ODECallDerivative(ode,ode->t+ODEa5*h,tempstate,ak5);
+  ODECallDerivative(ode,ode->t+ODEa5*h,tmpstate,ak5);
   for (i=0;i<n;i++)
-    tempstate[i]=state[i]+h*(ODEb61*DstateDt[i]+
+    tmpstate[i]=state[i]+h*(ODEb61*DstateDt[i]+
 	  ODEb62*ak2[i]+ODEb63*ak3[i]+ODEb64*ak4[i]+ODEb65*ak5[i]);
-  ODECallDerivative(ode,ode->t+ODEa6*h,tempstate,ak6);
+  ODECallDerivative(ode,ode->t+ODEa6*h,tmpstate,ak6);
   for (i=0;i<n;i++)
     outstate[i]=state[i]+h*(ODEc1*DstateDt[i]+
 	  ODEc3*ak3[i]+ODEc4*ak4[i]+ODEc6*ak6[i]);
@@ -469,23 +469,23 @@ U0 ODECashKarp(CMathODE *ode)
 U0 ODERK5OneStep(CMathODE *ode)
 {
   I64 i;
-  F64 errmax,temp,*tempstate=ode->temp6,*stateerr=ode->temp7;
+  F64 errmax,tmp,*tmpstate=ode->tmp6,*stateerr=ode->tmp7;
   while (TRUE) {
     ode->h=Clamp(ode->h,ode->h_min,ode->h_max);
     ODECashKarp(ode);
     errmax=0.0;
     for (i=0;i<ode->n_internal;i++) {
-      temp=Abs(stateerr[i]/ode->state_scale[i]);
-      if (temp>errmax)
-	errmax=temp;
+      tmp=Abs(stateerr[i]/ode->state_scale[i]);
+      if (tmp>errmax)
+	errmax=tmp;
     }
     errmax/=ode->tolerance_internal;
     if (errmax<=1.0 || ode->h==ode->h_min) break;
-    temp=ode->h*SAFETY*errmax`PSHRNK;
-    if (temp<0.1*ode->h)
+    tmp=ode->h*SAFETY*errmax`PSHRNK;
+    if (tmp<0.1*ode->h)
       ode->h*=0.1;
     else
-      ode->h=temp;
+      ode->h=tmp;
   }
   ode->t+=ode->h;
   if (errmax>ERRCON)
@@ -493,13 +493,13 @@ U0 ODERK5OneStep(CMathODE *ode)
   else
     ode->h*=5.0;
   ode->h=Clamp(ode->h,ode->h_min,ode->h_max);
-  MemCpy(ode->state_internal,tempstate,sizeof(F64)*ode->n_internal);
+  MemCpy(ode->state_internal,tmpstate,sizeof(F64)*ode->n_internal);
 }
 
 F64 ode_alloced_factor=0.75;
 
 U0 ODEsUpdate(CTask *task)
-{/* This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScreen.HC,ODEsUpdate"$ on a continuous
+{/* This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScrn.HC,ODEsUpdate"$ on a continuous
 basis to allow real-time simulation.  It is intended
 to provide ress good enough for games.  It uses a runge-kutta
 integrator which is a better algorithm than doing it with Euler.

@@ -277,8 +277,8 @@ public U0 DCReflect(CDC *dc,I64 *_x,I64 *_y,I64 *_z)
 }
 
 #help_index "Graphics/Math"
-#define SCALE1	24
-#define SCALE2	8
+#define GR_SCALE1_BITS	24
+#define GR_SCALE2_BITS	8
 public Bool Circle(U8 *aux_data,I64 cx,I64 cy,I64 cz,I64 radius,
 	Bool (*fp_plot)(U8 *aux,I64 x,I64 y,I64 z),
 	I64 step=1,F64 start_radians=0,F64 len_radians=2*ã)
@@ -288,13 +288,13 @@ public Bool Circle(U8 *aux_data,I64 cx,I64 cy,I64 cz,I64 radius,
   F64 t;
   if (radius<=0||!step) return TRUE;
   t=1.0/radius;
-  c=1<<SCALE1*Cos(t);
+  c=1<<GR_SCALE1_BITS*Cos(t);
   if (step<0) {
     step=-step;
-    s2=1<<SCALE1*Sin(t);
+    s2=1<<GR_SCALE1_BITS*Sin(t);
     s1=-s2;
   } else {
-    s1=1<<SCALE1*Sin(t);
+    s1=1<<GR_SCALE1_BITS*Sin(t);
     s2=-s1;
   }
   if (start_radians) {
@@ -304,14 +304,14 @@ public Bool Circle(U8 *aux_data,I64 cx,I64 cy,I64 cz,I64 radius,
     x=radius;
     y=0;
   }
-  x<<=SCALE2;
-  y<<=SCALE2;
+  x<<=GR_SCALE2_BITS;
+  y<<=GR_SCALE2_BITS;
   for (i=0;i<=len;i+=step) {
-    if (!(*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
+    if (!(*fp_plot)(aux_data,cx+x>>GR_SCALE2_BITS,cy+y>>GR_SCALE2_BITS,cz))
       return FALSE;
     for (j=0;j<step;j++) {
-      x1=(c*x+s1*y)>>SCALE1;
-      y1=(s2*x+c*y)>>SCALE1;
+      x1=(c*x+s1*y)>>GR_SCALE1_BITS;
+      y1=(s2*x+c*y)>>GR_SCALE1_BITS;
       x=x1; y=y1;
     }
   }
@@ -336,18 +336,18 @@ public Bool Ellipse(U8 *aux_data,I64 cx,I64 cy,I64 cz,
     len=Ceil(len_radians*y_radius);
   }
 
-  c=1<<SCALE1*Cos(t);
+  c=1<<GR_SCALE1_BITS*Cos(t);
   if (step<0) {
     step=-step;
-    s2=1<<SCALE1*Sin(t);
+    s2=1<<GR_SCALE1_BITS*Sin(t);
     s1=-s2;
   } else {
-    s1=1<<SCALE1*Sin(t);
+    s1=1<<GR_SCALE1_BITS*Sin(t);
     s2=-s1;
   }
 
-  c2=1<<SCALE1*Cos(rot_angle);
-  s12=1<<SCALE1*Sin(rot_angle);
+  c2=1<<GR_SCALE1_BITS*Cos(rot_angle);
+  s12=1<<GR_SCALE1_BITS*Sin(rot_angle);
   s22=-s12;
 
   if (start_radians) {
@@ -357,29 +357,29 @@ public Bool Ellipse(U8 *aux_data,I64 cx,I64 cy,I64 cz,
     x=x_radius;
     y=0;
   }
-  x<<=SCALE2;
-  y<<=SCALE2;
+  x<<=GR_SCALE2_BITS;
+  y<<=GR_SCALE2_BITS;
   x2=x;
   y2=y;
 
   y1=y2*y_radius/x_radius;
-  x=(c2*x2+s12*y1)>>SCALE1;
-  y=(s22*x2+c2*y1)>>SCALE1;
+  x=(c2*x2+s12*y1)>>GR_SCALE1_BITS;
+  y=(s22*x2+c2*y1)>>GR_SCALE1_BITS;
 
   for (i=0;i<=len;i+=step) {
-    if ((x>>SCALE2!=_x || y>>SCALE2!=_y || first) &&
-	  !(*fp_plot)(aux_data,cx+x>>SCALE2,cy+y>>SCALE2,cz))
+    if ((x>>GR_SCALE2_BITS!=_x || y>>GR_SCALE2_BITS!=_y || first) &&
+	  !(*fp_plot)(aux_data,cx+x>>GR_SCALE2_BITS,cy+y>>GR_SCALE2_BITS,cz))
       return FALSE;
 
-    _x=x>>SCALE2; _y=y>>SCALE2; first=FALSE;
+    _x=x>>GR_SCALE2_BITS; _y=y>>GR_SCALE2_BITS; first=FALSE;
     for (j=0;j<step;j++) {
-      x1=(c*x2+s1*y2)>>SCALE1;
-      y1=(s2*x2+c*y2)>>SCALE1;
+      x1=(c*x2+s1*y2)>>GR_SCALE1_BITS;
+      y1=(s2*x2+c*y2)>>GR_SCALE1_BITS;
       x2=x1;
       y2=y1;
       y1=y1*y_radius/x_radius;
-      x=(c2*x1+s12*y1)>>SCALE1;
-      y=(s22*x1+c2*y1)>>SCALE1;
+      x=(c2*x1+s12*y1)>>GR_SCALE1_BITS;
+      y=(s22*x1+c2*y1)>>GR_SCALE1_BITS;
     }
   }
   return TRUE;
@@ -401,13 +401,13 @@ public Bool RegPoly(U8 *aux_data,I64 cx,I64 cy,I64 cz,
   angle_step=2*ã/sides;
   n=len_radians*sides/(2*ã);
 
-  s1=1<<SCALE1*Sin(angle_step);
+  s1=1<<GR_SCALE1_BITS*Sin(angle_step);
   s2=-s1;
-  c=1<<SCALE1*Cos(angle_step);
+  c=1<<GR_SCALE1_BITS*Cos(angle_step);
 
-  s12=1<<SCALE1*Sin(rot_angle);
+  s12=1<<GR_SCALE1_BITS*Sin(rot_angle);
   s22=-s12;
-  c2=1<<SCALE1*Cos(rot_angle);
+  c2=1<<GR_SCALE1_BITS*Cos(rot_angle);
 
   if (start_radians) {
     x=x_radius*Cos(start_radians);
@@ -416,27 +416,27 @@ public Bool RegPoly(U8 *aux_data,I64 cx,I64 cy,I64 cz,
     x=x_radius;
     y=0;
   }
-  x<<=SCALE2;
-  y<<=SCALE2;
+  x<<=GR_SCALE2_BITS;
+  y<<=GR_SCALE2_BITS;
   x2=x;
   y2=y;
 
   y1=y2*y_radius/x_radius;
-  x=(c2*x2+s12*y1)>>SCALE1;
-  y=(s22*x2+c2*y1)>>SCALE1;
+  x=(c2*x2+s12*y1)>>GR_SCALE1_BITS;
+  y=(s22*x2+c2*y1)>>GR_SCALE1_BITS;
 
-  xx1=cx+x>>SCALE2;
-  yy1=cy+y>>SCALE2;
+  xx1=cx+x>>GR_SCALE2_BITS;
+  yy1=cy+y>>GR_SCALE2_BITS;
   for (i=0;i<n;i++) {
-    x1=(c*x2+s1*y2)>>SCALE1;
-    y1=(s2*x2+c*y2)>>SCALE1;
+    x1=(c*x2+s1*y2)>>GR_SCALE1_BITS;
+    y1=(s2*x2+c*y2)>>GR_SCALE1_BITS;
     x2=x1;
     y2=y1;
     y1=y1*y_radius/x_radius;
-    x=(c2*x1+s12*y1)>>SCALE1;
-    y=(s22*x1+c2*y1)>>SCALE1;
-    xx2=cx+x>>SCALE2;
-    yy2=cy+y>>SCALE2;
+    x=(c2*x1+s12*y1)>>GR_SCALE1_BITS;
+    y=(s22*x1+c2*y1)>>GR_SCALE1_BITS;
+    xx2=cx+x>>GR_SCALE2_BITS;
+    yy2=cy+y>>GR_SCALE2_BITS;
     if (!Line(aux_data,xx1,yy1,cz,xx2,yy2,cz,fp_plot,step))
       return FALSE;
     xx1=xx2; yy1=yy2;

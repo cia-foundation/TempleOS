@@ -1,102 +1,102 @@
 #help_index "File/Internal"
-I64 DirTreeSerializeSize(CDirEntry *tempde)
+I64 DirTreeSerializeSize(CDirEntry *tmpde)
 {
   I64 res=0;
-  while (tempde) {
+  while (tmpde) {
     res+=CDIR_SIZE+1;
-    if (tempde->attr & RS_ATTR_DIR)
-      res+=DirTreeSerializeSize(tempde->sub);
-    tempde=tempde->next;
+    if (tmpde->attr & RS_ATTR_DIR)
+      res+=DirTreeSerializeSize(tmpde->sub);
+    tmpde=tmpde->next;
   }
   return res+1;
 }
-I64 DirTreeSerializeFill(CDirEntry *tempde,U8 *dst)
+I64 DirTreeSerializeFill(CDirEntry *tmpde,U8 *dst)
 {
   I64 res=0,i;
-  while (tempde) {
+  while (tmpde) {
     *dst++=1;
     res++;
-    MemCpy(dst,&tempde->start,CDIR_SIZE);
+    MemCpy(dst,&tmpde->start,CDIR_SIZE);
     dst+=CDIR_SIZE;
     res+=CDIR_SIZE;
-    if (tempde->attr & RS_ATTR_DIR) {
-      i=DirTreeSerializeFill(tempde->sub,dst);
+    if (tmpde->attr & RS_ATTR_DIR) {
+      i=DirTreeSerializeFill(tmpde->sub,dst);
       dst+=i;
       res+=i;
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   *dst=0;
   return res+1;
 }
-public U8 *DirTreeSerialize(CDirEntry *tempde,I64 *_size=NULL)
+public U8 *DirTreeSerialize(CDirEntry *tmpde,I64 *_size=NULL)
 {//Serialize tree returned from $LK,"FilesFind",A="MN:FilesFind"$() into a one contiguous U8 array.
-  I64 size=DirTreeSerializeSize(tempde);
+  I64 size=DirTreeSerializeSize(tmpde);
   U8 *buf=MAlloc(size);
-  DirTreeSerializeFill(tempde,buf);
+  DirTreeSerializeFill(tmpde,buf);
   if (_size) *_size=size;
   return buf;
 }
 
-U8 *DirTreeUnserialize2(U8 *src,CDirEntry **tempde)
+U8 *DirTreeUnserialize2(U8 *src,CDirEntry **tmpde)
 {
-  CDirEntry *tempde1;
+  CDirEntry *tmpde1;
   if (*src++) {
-    tempde1=CAlloc(sizeof(CDirEntry));
-    *tempde=tempde1;
-    MemCpy(&tempde1->start,src,CDIR_SIZE);
+    tmpde1=CAlloc(sizeof(CDirEntry));
+    *tmpde=tmpde1;
+    MemCpy(&tmpde1->start,src,CDIR_SIZE);
     src+=CDIR_SIZE;
-    if (tempde1->attr & RS_ATTR_DIR)
-      src=DirTreeUnserialize2(src,&tempde1->sub);
-    src=DirTreeUnserialize2(src,&tempde1->next);
+    if (tmpde1->attr & RS_ATTR_DIR)
+      src=DirTreeUnserialize2(src,&tmpde1->sub);
+    src=DirTreeUnserialize2(src,&tmpde1->next);
   } else
-    *tempde=NULL;
+    *tmpde=NULL;
   return src;
 }
 public CDirEntry *DirTreeUnserialize(U8 *src)
 {//Unserialize tree to make it like a tree returned from $LK,"FilesFind",A="MN:FilesFind"$().
-  CDirEntry *tempde=NULL;
-  DirTreeUnserialize2(src,&tempde);
-  return tempde;
+  CDirEntry *tmpde=NULL;
+  DirTreeUnserialize2(src,&tmpde);
+  return tmpde;
 }
 
 #help_index "File/Program Routines"
-U0 FOFlatten(CDirEntry *tempde,CDirEntry **a,I64 *i)
+U0 FOFlatten(CDirEntry *tmpde,CDirEntry **a,I64 *i)
 {
-  CDirEntry *tempde1;
-  while (tempde) {
-    tempde1=tempde->next;
-    if (tempde->attr&RS_ATTR_DIR) {
-      FOFlatten(tempde->sub,a,i);
-      DirEntryDel(tempde);
+  CDirEntry *tmpde1;
+  while (tmpde) {
+    tmpde1=tmpde->next;
+    if (tmpde->attr&RS_ATTR_DIR) {
+      FOFlatten(tmpde->sub,a,i);
+      DirEntryDel(tmpde);
     } else {
-      a[*i]=tempde;
+      a[*i]=tmpde;
       *i=*i+1;
     }
-    tempde=tempde1;
+    tmpde=tmpde1;
   }
 }
 
-I64 Size1(CDirEntry *tempde,I64 *_fuf_flags,I64 round_to)
+I64 Size1(CDirEntry *tmpde,I64 *_fuf_flags,I64 round_to)
 {
   U8 buf[BLK_SIZE];
   I64 res=0,i;
   CDrv *dv;
-  while (tempde) {
-    if ((i=tempde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
-	  !(tempde->attr&RS_ATTR_DIR) &&
-	  FileAttr(tempde->name)&RS_ATTR_COMPRESSED) {
-      dv=Let2Drv(*tempde->full_name);
-      RBlks(dv,buf,Cluster2Blk(dv,tempde->cluster),1);
+  while (tmpde) {
+    if ((i=tmpde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
+	  !(tmpde->attr&RS_ATTR_DIR) &&
+	  FileAttr(tmpde->name)&RS_ATTR_COMPRESSED) {
+      dv=Let2Drv(*tmpde->full_name);
+      RBlks(dv,buf,Cluster2Blk(dv,tmpde->cluster),1);
       i=(&buf)(CArcCompress *)->expanded_size;
     }
     if (round_to)
-      i=CeilU64(tempde->size,round_to);
-    if (tempde->attr&RS_ATTR_DIR)
-      i+=Size1(tempde->sub,_fuf_flags,round_to);
-    tempde->user_data=i;
+      i=CeilU64(tmpde->size,round_to);
+    if (tmpde->attr&RS_ATTR_DIR)
+      i+=Size1(tmpde->sub,_fuf_flags,round_to);
+    tmpde->user_data=i;
     res+=i;
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   return res;
 }
@@ -105,26 +105,26 @@ public I64 Size(U8 *files_find_mask="/*",U8 *fu_flags=NULL,I64 round_to=0)
 //Does not include directory size of base directory, but
   //does include size of sub directories.
   I64 fuf_flags=0,res=0;
-  CDirEntry *tempde1=NULL;
+  CDirEntry *tmpde1=NULL;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  if (tempde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND)) {
+  if (tmpde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND)) {
     fuf_flags&=FUF_EXPAND;
-    res=Size1(tempde1,&fuf_flags,round_to);
-    DirTreeDel(tempde1);
+    res=Size1(tmpde1,&fuf_flags,round_to);
+    DirTreeDel(tmpde1);
   }
   return res;
 }
 
-public I64 FileCnt(CDirEntry *tempde)
+public I64 FileCnt(CDirEntry *tmpde)
 {//Cnt of files in $LK,"CDirEntry",A="MN:CDirEntry"$ tree.
   I64 cnt=0;
-  while (tempde) {
-    if (tempde->attr&RS_ATTR_DIR)
-      cnt+=FileCnt(tempde->sub);
+  while (tmpde) {
+    if (tmpde->attr&RS_ATTR_DIR)
+      cnt+=FileCnt(tmpde->sub);
     else
       cnt++;
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   return cnt;
 }
@@ -133,37 +133,37 @@ public I64 FileCnt(CDirEntry *tempde)
 public I64 FF(U8 *files_find_mask,U8 *fu_flags=NULL)
 {//Files find. List files matching mask.
   I64 cnt=0,fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    PutFileLink(tempde->full_name);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    PutFileLink(tmpde->full_name);
     '\n';
     cnt++;
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return cnt;
 }
 
 public I64 Zip(U8 *files_find_mask="*",U8 *fu_flags=NULL)
 {//Compress files by moving to .Z filename.
   U8 *st;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   I64 res=0,fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    if (!IsDotZ(tempde->full_name)) {
-      st=MStrPrint("%s.Z",tempde->full_name);
-      res+=Move(tempde->full_name,st);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    if (!IsDotZ(tmpde->full_name)) {
+      st=MStrPrint("%s.Z",tmpde->full_name);
+      res+=Move(tmpde->full_name,st);
       Free(st);
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return res;
 }
 
@@ -172,20 +172,20 @@ public I64 Unzip(U8 *files_find_mask="*.Z",U8 *fu_flags=NULL)
 //You don't have to do this for normal operation.
   //It automatically unzips ".Z" files.
   U8 *st;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   I64 res=0,fuf_flags=0;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    if (IsDotZ(tempde->full_name)) {
-      st=StrNew(tempde->full_name);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    if (IsDotZ(tmpde->full_name)) {
+      st=StrNew(tmpde->full_name);
       StrLastRem(st,".");
-      res+=Move(tempde->full_name,st);
+      res+=Move(tmpde->full_name,st);
       Free(st);
     }
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return res;
 }

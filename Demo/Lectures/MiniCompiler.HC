@@ -8,7 +8,7 @@ The main compiler optimizes   See $LK,"Intermediate Code Attributes",A="MN:inter
 
 The main compiler makes machine code in the back end.  See $LK,"IC Struct",A="MN:CIntermediateCode"$, $LK,"COCCompile",A="MN:COCCompile"$ and $LK,"OptPass789A",A="FF:::/Compiler/OptPass789A.HC,IC_MUL"$(), $LK,"BackEnd",A="FF:::/Compiler/BackA.HC,ICMul"$.  Set $LK,"Trace",A="MN:Trace"$(ON) to see the output of the backend.
 $ID,-2$
-$TR,"Mini Compiler"$
+$TR-C,"Mini Compiler"$
 $ID,2$For this mini compiler, some things you should know about 64-bit asm:
 
 * Putting a 0x48, known as the REX byte, in front of an inst makes it 64-bit size.
@@ -98,7 +98,7 @@ U0 PrsTerm(U8 **_src,U8 **_dst,I64 prec)
     src2=*_src;
     dst2=*_dst;
     while (TRUE) {
-//This is inefficient.  The main compiler doesn't back-up.
+//This is inefficient.  The main compiler doesn't back-up like this.
       i=Parse(&src2,&dst2);
       if (PREC_MUL<=i<prec) {
 	*_src=src2;

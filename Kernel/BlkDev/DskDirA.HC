@@ -1,10 +1,10 @@
-Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
+Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,Bool free_old_chain=TRUE)
 {//Makes a directory entry in the directory from a $LK,"CDirEntry",A="MN:CDirEntry"$ node.
   switch (dv->fs_type) {
     case FSt_REDSEA:
-      return RedSeaDirNew(dv,cur_dir,tempde,free_old_chain);
+      return RedSeaDirNew(dv,cur_dir,tmpde,free_old_chain);
     case FSt_FAT32:
-      return FAT32DirNew(dv,cur_dir,tempde,free_old_chain);
+      return FAT32DirNew(dv,cur_dir,tmpde,free_old_chain);
     case FSt_ISO9660:
       PrintErr("Not Writable\n");
       return FALSE;
@@ -14,48 +14,48 @@ Bool DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tempde,Bool free_old_chain=TRUE)
   }
 }
 
-U0 DirEntryDel(CDirEntry *tempde)
+U0 DirEntryDel(CDirEntry *tmpde)
 {//Free node returned from $LK,"FilesFind",A="MN:FilesFind"$().  Doesn't Free user_data.
 //Does not change the directory on disk.
-  if (tempde) {
-    Free(tempde->full_name);
-    Free(tempde);
+  if (tmpde) {
+    Free(tmpde->full_name);
+    Free(tmpde);
   }
 }
 
-U0 DirEntryDel2(CDirEntry *tempde)
+U0 DirEntryDel2(CDirEntry *tmpde)
 {//Free node returned from $LK,"FilesFind",A="MN:FilesFind"$().  Frees user_data
 //Does not change the directory on disk.
-  if (tempde) {
-    Free(tempde->full_name);
-    Free(tempde->user_data);
-    Free(tempde);
+  if (tmpde) {
+    Free(tmpde->full_name);
+    Free(tmpde->user_data);
+    Free(tmpde);
   }
 }
 
-U0 DirTreeDel(CDirEntry *tempde)
+U0 DirTreeDel(CDirEntry *tmpde)
 {//Free tree returned from $LK,"FilesFind",A="MN:FilesFind"$().  Doesn't Free user_data.
 //Does not change the directory on disk.
-  CDirEntry *tempde2;
-  while (tempde) {
-    tempde2=tempde->next;
-    if (tempde->sub)
-      DirTreeDel(tempde->sub);
-    DirEntryDel(tempde);
-    tempde=tempde2;
+  CDirEntry *tmpde2;
+  while (tmpde) {
+    tmpde2=tmpde->next;
+    if (tmpde->sub)
+      DirTreeDel(tmpde->sub);
+    DirEntryDel(tmpde);
+    tmpde=tmpde2;
   }
 }
 
-U0 DirTreeDel2(CDirEntry *tempde)
+U0 DirTreeDel2(CDirEntry *tmpde)
 {//Free tree returned from $LK,"FilesFind",A="MN:FilesFind"$().  Frees user_data
 //Does not change the directory on disk.
-  CDirEntry *tempde2;
-  while (tempde) {
-    tempde2=tempde->next;
-    if (tempde->sub)
-      DirTreeDel2(tempde->sub);
-    DirEntryDel2(tempde);
-    tempde=tempde2;
+  CDirEntry *tmpde2;
+  while (tmpde) {
+    tmpde2=tmpde->next;
+    if (tmpde->sub)
+      DirTreeDel2(tmpde->sub);
+    DirEntryDel2(tmpde);
+    tmpde=tmpde2;
   }
 }
 
@@ -89,19 +89,19 @@ I64 DirEntryCompareCluster(CDirEntry *e1,CDirEntry *e2)
 #define SK_NAME		0
 #define SK_CLUSTER	1
 
-U0 DirFilesSort(CDirEntry **_tempde,I64 key)
+U0 DirFilesSort(CDirEntry **_tmpde,I64 key)
 {
   I64 i,cnt;
-  CDirEntry *tempde=*_tempde,*tempde1,**sort_buf;
-  if (tempde) {
-    cnt=LinkedLstCnt(tempde);
+  CDirEntry *tmpde=*_tmpde,*tmpde1,**sort_buf;
+  if (tmpde) {
+    cnt=LinkedLstCnt(tmpde);
     if (cnt>1) {
       sort_buf=MAlloc(cnt*sizeof(U8 *));
       i=0;
-      tempde1=tempde;
-      while (tempde1) {
-	sort_buf[i++]=tempde1;
-	tempde1=tempde1->next;
+      tmpde1=tmpde;
+      while (tmpde1) {
+	sort_buf[i++]=tmpde1;
+	tmpde1=tmpde1->next;
       }
       switch [key] {
 	case SK_NAME:
@@ -111,48 +111,48 @@ U0 DirFilesSort(CDirEntry **_tempde,I64 key)
 	  QSortI64(sort_buf,cnt,&DirEntryCompareCluster);
 	  break;
       }
-      tempde=sort_buf[0];
-      *_tempde=tempde;
+      tmpde=sort_buf[0];
+      *_tmpde=tmpde;
       for (i=0;i<cnt-1;i++) {
-	tempde1=sort_buf[i];
-	tempde1->next=sort_buf[i+1];
+	tmpde1=sort_buf[i];
+	tmpde1->next=sort_buf[i+1];
       }
-      tempde1=sort_buf[i];
-      tempde1->next=NULL;
+      tmpde1=sort_buf[i];
+      tmpde1->next=NULL;
       Free(sort_buf);
 
-      tempde1=tempde;
-      while (tempde1) {
-	if (tempde1->sub)
-	  DirFilesSort(&tempde1->sub,key);
-	tempde1=tempde1->next;
+      tmpde1=tmpde;
+      while (tmpde1) {
+	if (tmpde1->sub)
+	  DirFilesSort(&tmpde1->sub,key);
+	tmpde1=tmpde1->next;
       }
     } else
-      if (tempde->sub)
-	DirFilesSort(&tempde->sub,key);
+      if (tmpde->sub)
+	DirFilesSort(&tmpde->sub,key);
   }
 }
 
-CDirEntry *DirFilesFlatten(CDirEntry *tempde,CDirEntry **_res,I64 fuf_flags)
+CDirEntry *DirFilesFlatten(CDirEntry *tmpde,CDirEntry **_res,I64 fuf_flags)
 {//Returns last node
-  CDirEntry *tempde1;
+  CDirEntry *tmpde1;
   Bool del;
-  if (tempde)
+  if (tmpde)
     while (TRUE) {
-      tempde1=tempde->next;
-      if (!(tempde->attr&RS_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
-	_res=*_res=tempde;
+      tmpde1=tmpde->next;
+      if (!(tmpde->attr&RS_ATTR_DIR)||!(fuf_flags&FUF_JUST_FILES)) {
+	_res=*_res=tmpde;
 	del=FALSE;
       } else
 	del=TRUE;
-      if (tempde->sub) {
-	_res=DirFilesFlatten(tempde->sub,_res,fuf_flags);
-	tempde->sub=NULL;
+      if (tmpde->sub) {
+	_res=DirFilesFlatten(tmpde->sub,_res,fuf_flags);
+	tmpde->sub=NULL;
       }
       if (del)
-	DirEntryDel(tempde);
-      if (tempde1)
-	tempde=tempde1;
+	DirEntryDel(tmpde);
+      if (tmpde1)
+	tmpde=tmpde1;
       else
 	break;
     }

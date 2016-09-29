@@ -10,28 +10,28 @@ CDirEntry MGFind(CDirEntry *needle_entry,CDirEntry *haystack_lst)
   return NULL;
 }
 
-U0 Merge2(CDirEntry *tempde1,CDirEntry *tempde2,I64 *_fuf_flags,I64 *_df_flags)
+U0 Merge2(CDirEntry *tmpde1,CDirEntry *tmpde2,I64 *_fuf_flags,I64 *_df_flags)
 {
-  CDirEntry *tempde;
-  while (tempde1 && !(*_df_flags & DF_ABORT_ALL_FILES)) {
-    tempde=MGFind(tempde1,tempde2);
-    if (!tempde)
-      "$$BROWN$$Does Not Exist:%s$$FG$$\n",tempde1->full_name;
+  CDirEntry *tmpde;
+  while (tmpde1 && !(*_df_flags & DF_ABORT_ALL_FILES)) {
+    tmpde=MGFind(tmpde1,tmpde2);
+    if (!tmpde)
+      "$$BROWN$$Does Not Exist:%s$$FG$$\n",tmpde1->full_name;
     else {
-      if (tempde1->attr & RS_ATTR_DIR)
-	Merge2(tempde1->sub,tempde->sub,_fuf_flags,_df_flags);
+      if (tmpde1->attr & RS_ATTR_DIR)
+	Merge2(tmpde1->sub,tmpde->sub,_fuf_flags,_df_flags);
       else {
-	if (AbsI64(tempde1->datetime-tempde->datetime)>CDATE_FREQ*2) {//slop
-	  "%s",tempde1->full_name;
+	if (AbsI64(tmpde1->datetime-tmpde->datetime)>CDATE_FREQ*2) {//slop
+	  "%s",tmpde1->full_name;
 	  '\n';
 	  if (Bt(_fuf_flags,FUf_DIFF)) {
-	    if (FilesFindMatch(tempde1->full_name,FILEMASK_TXT))
-	      Diff(tempde->full_name,tempde1->full_name,_df_flags);
+	    if (FilesFindMatch(tmpde1->full_name,FILEMASK_TXT))
+	      Diff(tmpde->full_name,tmpde1->full_name,_df_flags);
 	  }
 	}
       }
     }
-    tempde1=tempde1->next;
+    tmpde1=tmpde1->next;
   }
 }
 public U0 Merge(U8 *dst_files_find_mask="/*",U8 *src_files_find_mask="/*",
@@ -44,18 +44,18 @@ merge changes from source files into
 destination files.
 */
   I64 df_flags=0,fuf_flags=0;
-  CDirEntry *tempde1=NULL,*tempde2=NULL;
+  CDirEntry *tmpde1=NULL,*tmpde2=NULL;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   if (fuf_flags&~(FUG_FILES_FIND|FUF_DIFF))
     throw('FUF');
   PrintWarn("This is based strictly on file dates.\n");
-  tempde1=FilesFind(src_files_find_mask,fuf_flags&FUG_FILES_FIND);
-  tempde2=FilesFind(dst_files_find_mask,fuf_flags&FUG_FILES_FIND);
+  tmpde1=FilesFind(src_files_find_mask,fuf_flags&FUG_FILES_FIND);
+  tmpde2=FilesFind(dst_files_find_mask,fuf_flags&FUG_FILES_FIND);
   fuf_flags&=FUF_DIFF;
-  Merge2(tempde1,tempde2,&fuf_flags,&df_flags);
-  DirTreeDel(tempde1);
-  DirTreeDel(tempde2);
+  Merge2(tmpde1,tmpde2,&fuf_flags,&df_flags);
+  DirTreeDel(tmpde1);
+  DirTreeDel(tmpde2);
 }
 
 #help_index "Utils;Cmd Line (Typically)"
@@ -63,15 +63,15 @@ destination files.
 public U0 NewFiles(U8 *files_find_mask="/*",CDate cdt=0,U8 *fu_flags=NULL)
 {//Report files newer than a certain date.
   I64 fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   if (!cdt) cdt=sys_compile_time;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+F");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    if (tempde->datetime>cdt)
-      "%s\n",tempde->full_name;
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    if (tmpde->datetime>cdt)
+      "%s\n",tmpde->full_name;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }

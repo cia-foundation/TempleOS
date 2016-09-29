@@ -8,25 +8,25 @@ U0 EdLiteUpdate(CLine *head,CLine *cur_line,I64 cur_col,I64 line_start_col)
 {
   I64 ch,i,j,k,k2,cursor_col,cursor_row=-1;
   U8 *st;
-  CLine *templ=cur_line;
+  CLine *tmpl=cur_line;
   Bool done_eof=FALSE;
   text.raw_col=0;
   for (i=0;i<text.rows/2;i++)
-    if (templ->last!=head)
-      templ=templ->last;
+    if (tmpl->last!=head)
+      tmpl=tmpl->last;
   for (i=0;i<text.rows;i++) {
-    if (cursor_row<0 && templ==cur_line) {
+    if (cursor_row<0 && tmpl==cur_line) {
       k=0;
       for (j=0;j<cur_col;j++)
-	if (templ->line[j]=='\t')
+	if (tmpl->line[j]=='\t')
 	  k=(k+8)&~7;
 	else
 	  k++;
       cursor_col=k;
       cursor_row=i;
     }
-    if (templ!=head) {
-      st=templ->line;
+    if (tmpl!=head) {
+      st=tmpl->line;
       k=0;
       j=0;
       while (ch=*st++) {
@@ -42,7 +42,7 @@ U0 EdLiteUpdate(CLine *head,CLine *cur_line,I64 cur_col,I64 line_start_col)
       }
       if (j<text.cols)
 	'\n';
-      templ=templ->next;
+      tmpl=tmpl->next;
     } else {
       if (!done_eof) {
 	'<EOF>';
@@ -60,13 +60,13 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   U8 *src,*src2,*src3,*dst,*buf,*bin_data=NULL;
   I64 i,cnt=0,ch,sc,size,bin_size=0,line_start_col=0,cur_col=0,
 	old_raw_flags=text.raw_flags;
-  CLine head,*templ,*templ1,*cur_line;
+  CLine head,*tmpl,*tmpl1,*cur_line;
   Bool	res=FALSE,
 	old_raw=Raw(ON),
-	old_debug=InDbg(ON),
+	old_debug=DbgMode(ON),
 	old_single=SingleUser(ON);
 
-  if (!filename) filename=blkdev.temp_filename;
+  if (!filename) filename=blkdev.tmp_filename;
   buf=FileRead(filename,&size);
 
   PUSHFD
@@ -93,9 +93,9 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	  *dst++=ch;
       *dst=0;
 
-      templ=MAlloc(sizeof(CLine));
-      templ->line=StrNew(src2);
-      QueIns(templ,head.last);
+      tmpl=MAlloc(sizeof(CLine));
+      tmpl->line=StrNew(src2);
+      QueIns(tmpl,head.last);
       cnt++;
     }
 
@@ -145,10 +145,10 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	  case SC_CURSOR_RIGHT:
 	    cur_col++;
 	    if (cur_col>StrLen(cur_line->line)) {
-	      templ=cur_line->next;
-	      if (templ!=&head) {
+	      tmpl=cur_line->next;
+	      if (tmpl!=&head) {
 		cur_col=0;
-		cur_line=templ;
+		cur_line=tmpl;
 	      } else
 		cur_col=StrLen(cur_line->line);
 	    }
@@ -157,10 +157,10 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	    if (cur_col)
 	      cur_col--;
 	    else {
-	      templ=cur_line->last;
-	      if (templ!=&head) {
-		cur_line=templ;
-		cur_col=StrLen(templ->line);
+	      tmpl=cur_line->last;
+	      if (tmpl!=&head) {
+		cur_line=tmpl;
+		cur_col=StrLen(tmpl->line);
 	      }
 	    }
 	    break;
@@ -182,14 +182,14 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	    break;
 	  case SC_DELETE:
 	    if (cur_col==StrLen(cur_line->line)) {
-	      templ=cur_line->next;
-	      if (cur_line!=&head && templ!=&head) {
-		src=MStrPrint("%s%s",cur_line->line,templ->line);
+	      tmpl=cur_line->next;
+	      if (cur_line!=&head && tmpl!=&head) {
+		src=MStrPrint("%s%s",cur_line->line,tmpl->line);
 		Free(cur_line->line);
-		Free(templ->line);
+		Free(tmpl->line);
 		cur_line->line=src;
-		QueRem(templ);
-		Free(templ);
+		QueRem(tmpl);
+		Free(tmpl);
 	      }
 	    } else
 	      StrCpy(cur_line->line+cur_col,cur_line->line+cur_col+1);
@@ -198,11 +198,11 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	break;
       case '\n':
       case '\r':
-	templ=MAlloc(sizeof(CLine));
-	templ->line=StrNew(cur_line->line+cur_col);
+	tmpl=MAlloc(sizeof(CLine));
+	tmpl->line=StrNew(cur_line->line+cur_col);
 	cur_line->line[cur_col]=0;
-	QueIns(templ,cur_line);
-	cur_line=templ;
+	QueIns(tmpl,cur_line);
+	cur_line=tmpl;
 	cur_col=0;
 	break;
       case CH_BACKSPACE:
@@ -210,24 +210,24 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	  StrCpy(cur_line->line+cur_col-1,cur_line->line+cur_col);
 	  cur_col--;
 	} else if (cur_line!=&head && cur_line->last!=&head) {
-	  templ=cur_line->last;
-	  src=MStrPrint("%s%s",templ->line,cur_line->line);
-	  cur_col=StrLen(templ->line);
+	  tmpl=cur_line->last;
+	  src=MStrPrint("%s%s",tmpl->line,cur_line->line);
+	  cur_col=StrLen(tmpl->line);
 	  Free(cur_line->line);
-	  Free(templ->line);
-	  templ->line=src;
+	  Free(tmpl->line);
+	  tmpl->line=src;
 	  QueRem(cur_line);
 	  Free(cur_line);
-	  cur_line=templ;
+	  cur_line=tmpl;
 	}
 	break;
       case CH_CTRLY:
 	if (cur_line!=&head) {
-	  templ=cur_line;
+	  tmpl=cur_line;
 	  cur_line=cur_line->next;
-	  QueRem(templ);
-	  Free(templ->line);
-	  Free(templ);
+	  QueRem(tmpl);
+	  Free(tmpl->line);
+	  Free(tmpl);
 	  cur_col=0;
 	}
 	break;
@@ -258,20 +258,20 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
   } else {
     size=bin_size;
 
-    templ=head.next;
-    while (templ!=&head) {
-      size+=StrLen(templ->line)+1;
-      templ=templ->next;
+    tmpl=head.next;
+    while (tmpl!=&head) {
+      size+=StrLen(tmpl->line)+1;
+      tmpl=tmpl->next;
     }
 
     buf=dst=MAlloc(size);
-    templ=head.next;
-    while (templ!=&head) {
-      i=StrLen(templ->line);
-      MemCpy(dst,templ->line,i);
+    tmpl=head.next;
+    while (tmpl!=&head) {
+      i=StrLen(tmpl->line);
+      MemCpy(dst,tmpl->line,i);
       dst+=i;
       *dst++='\n';
-      templ=templ->next;
+      tmpl=tmpl->next;
     }
     if (bin_data)
       MemCpy(dst,bin_data,bin_size);
@@ -282,18 +282,18 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
       res=TRUE;
   }
 
-  templ=head.next;
-  while (templ!=&head) {
-    templ1=templ->next;
-    QueRem(templ);
-    Free(templ->line);
-    Free(templ);
-    templ=templ1;
+  tmpl=head.next;
+  while (tmpl!=&head) {
+    tmpl1=tmpl->next;
+    QueRem(tmpl);
+    Free(tmpl->line);
+    Free(tmpl);
+    tmpl=tmpl1;
   }
   Free(head.line);
   Free(bin_data);
   Raw(old_raw);
-  InDbg(old_debug);
+  DbgMode(old_debug);
   SingleUser(old_single);
   text.raw_flags=text.raw_flags&~RWF_SHOW_DOLLAR|old_raw_flags&RWF_SHOW_DOLLAR;
   POPFD

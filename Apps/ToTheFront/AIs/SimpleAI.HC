@@ -1,4 +1,4 @@
-Unit *FindNearestUnit(I64 row,I64 col,I64 player,Bool in_LOS,F64 range=-1)
+Unit *UnitNearestFind(I64 row,I64 col,I64 player,Bool in_LOS,F64 range=-1)
 {
   I64 i;
   F64 dd,best_dd=MAX_F64,x1,y1,x2,y2;
@@ -23,36 +23,36 @@ Unit *FindNearestUnit(I64 row,I64 col,I64 player,Bool in_LOS,F64 range=-1)
   return best;
 }
 
-U0 TanksPlot()
+U0 PlayerIndirect()
 {
-  Unit *target,*tempu;
+  Unit *target,*tmpu;
   I64 i;
   for (i=0;i<MAX_UNITS;i++) {
-    CheckUser;
-    tempu=&units[cur_player][i];
-    if (tempu->life>0 && tempu->indirect_fire &&
-	  (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,
-	  tempu->range*2*HEX_RADIUS)))
-      PlotShot(tempu,target->row,target->col);
+    UserChk;
+    tmpu=&units[cur_player][i];
+    if (tmpu->life>0 && tmpu->indirect_fire &&
+	  (target=UnitNearestFind(tmpu->row,tmpu->col,enemy_player,TRUE,
+	  tmpu->range*2*HEX_RADIUS)))
+      IndirectAdd(tmpu,target->row,target->col);
   }
   throw('PhaseOvr',TRUE);
 }
 
-U0 TanksMove()
+U0 PlayerMove()
 {
-  Unit *target,*tempu;
+  Unit *target,*tmpu;
   I64 i;
   F64 x,y;
   for (i=0;i<MAX_UNITS;i++) {
-    CheckUser;
-    tempu=&units[cur_player][i];
-    if (tempu->life>0) {
+    UserChk;
+    tmpu=&units[cur_player][i];
+    if (tmpu->life>0) {
 //Cheats because it violates Line-of-Sight
-      if (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,FALSE)) {
+      if (target=UnitNearestFind(tmpu->row,tmpu->col,enemy_player,FALSE)) {
 	RowCol2XY(&x,&y,target->row,target->col);
-	if (!MoveUnit(tempu,x,y)) {
-	  RowCol2XY(&x,&y,tempu->row,tempu->col);
-	  MoveUnit(tempu,x+RandI16,y+RandI16);
+	if (!UnitMove(tmpu,x,y)) {
+	  RowCol2XY(&x,&y,tmpu->row,tmpu->col);
+	  UnitMove(tmpu,x+RandI16,y+RandI16);
 	}
       }
     }
@@ -60,18 +60,18 @@ U0 TanksMove()
   throw('PhaseOvr',TRUE);
 }
 
-U0 TanksFire()
+U0 PlayerDirect()
 {
-  Unit *target,*tempu;
+  Unit *target,*tmpu;
   I64 i;
   for (i=0;i<MAX_UNITS;i++) {
-    CheckUser;
-    tempu=&units[cur_player][i];
-    if (tempu->life>0 && !tempu->indirect_fire &&
-	  (target=FindNearestUnit(tempu->row,tempu->col,enemy_player,TRUE,
-	  tempu->range*2*HEX_RADIUS))) {
-      FireShot(tempu,target);
-      Sleep(250*ANIMATION_DELAY);
+    UserChk;
+    tmpu=&units[cur_player][i];
+    if (tmpu->life>0 && !tmpu->indirect_fire &&
+	  (target=UnitNearestFind(tmpu->row,tmpu->col,enemy_player,TRUE,
+	  tmpu->range*2*HEX_RADIUS))) {
+      UnitDirectFire(tmpu,target);
+      Sleep(250*animation_delay);
     }
   }
   throw('PhaseOvr',TRUE);

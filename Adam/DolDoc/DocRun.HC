@@ -6,7 +6,7 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 //Sometimes returns locked, sometimes unlocked
   U8 ch=doc->cmd_U8,*st;
   I64 res=DOCM_CANCEL,has_action=FALSE;
-  CHashDefineStr *temph;
+  CHashDefineStr *tmph;
   DocLock(doc);
   if (!exited) {
     if (doc_e->de_flags & DOCEF_ESC) {
@@ -46,18 +46,18 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 	  PopUp(st,Fs);
 	  Free(st);
 	} else {
-	  if (doc_e->de_flags & DOCEF_LEFT_AUTO)
-	    AutoStr("%s",doc_e->left_macro);
+	  if (doc_e->de_flags & DOCEF_LEFT_IN_STR)
+	    InStr("%s",doc_e->left_macro);
 	  else
-	    Auto("%s",doc_e->left_macro);
+	    In("%s",doc_e->left_macro);
 	}
 	has_action=TRUE;
       }
       if (!exited && doc_e->de_flags & DOCEF_LST &&
 	    doc_e->de_flags & DOCEF_DEFINE &&
-	    (temph=HashFind(doc_e->define_str,
+	    (tmph=HashFind(doc_e->define_str,
 	    doc->win_task->hash_table,HTT_DEFINE_STR)) &&
-	    (res=PopUpPickLst(temph->data))!=DOCM_CANCEL) {
+	    (res=PopUpPickLst(tmph->data))!=DOCM_CANCEL) {
 	DocDataFmt(doc,doc_e,res);
 	DocDataScan(doc,doc_e);
 	has_action=TRUE;
@@ -85,10 +85,10 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
 	  PopUp(st,Fs);
 	  Free(st);
 	} else {
-	  if (doc_e->de_flags & DOCEF_RIGHT_AUTO)
-	    AutoStr("%s",doc_e->right_macro);
+	  if (doc_e->de_flags & DOCEF_RIGHT_IN_STR)
+	    InStr("%s",doc_e->right_macro);
 	  else
-	    Auto("%s",doc_e->right_macro);
+	    In("%s",doc_e->right_macro);
 	}
 	has_action=TRUE;
       }

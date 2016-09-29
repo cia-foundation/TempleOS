@@ -8,36 +8,36 @@ F64 SpanTime()
 
 F64 Cost(CMathODE *ode)
 {
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
   F64 res=0;
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    res+=tempm->cost;
-    tempm=tempm->next;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    res+=tmpm->cost;
+    tmpm=tmpm->next;
   }
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    res+=temps->cost;
-    temps=temps->next;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    res+=tmps->cost;
+    tmps=tmps->next;
   }
   return res;
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
-  MyMass   *tempm;
-  MySpring *temps;
+  MyMass   *tmpm;
+  MySpring *tmps;
 
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    if (!(temps->flags&SSF_INACTIVE)) {
-      dc->color=temps->color;
-      dc->pen_width=temps->pen_width;
-      GrLine3(dc,temps->end1->x,temps->end1->y,0,
-	    temps->end2->x,temps->end2->y,0);
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    if (!(tmps->flags&SSF_INACTIVE)) {
+      dc->color=tmps->color;
+      dc->pen_width=tmps->pen_width;
+      GrLine3(dc,tmps->end1->x,tmps->end1->y,0,
+	    tmps->end2->x,tmps->end2->y,0);
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 
   if (cursor_mass) {
@@ -48,19 +48,19 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  cursor_mass->x,cursor_mass->y,0);
   }
 
-  tempm=ode->next_mass;
-  while (tempm!=&ode->next_mass) {
-    if (!(tempm->flags&MSF_INACTIVE)) {
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    if (!(tmpm->flags&MSF_INACTIVE)) {
       dc->color=BLACK;
-      GrCircle(dc,tempm->x,tempm->y,tempm->radius);
-      GrFloodFill(dc,tempm->x,tempm->y,TRUE);
-      dc->color=tempm->color;
-      GrCircle(dc,tempm->x,tempm->y,tempm->radius);
-      GrFloodFill(dc,tempm->x,tempm->y,TRUE);
+      GrCircle(dc,tmpm->x,tmpm->y,tmpm->radius);
+      GrFloodFill(dc,tmpm->x,tmpm->y,TRUE);
+      dc->color=tmpm->color;
+      GrCircle(dc,tmpm->x,tmpm->y,tmpm->radius);
+      GrFloodFill(dc,tmpm->x,tmpm->y,TRUE);
       dc->color=BLACK;
-      GrCircle(dc,tempm->x,tempm->y,tempm->radius);
+      GrCircle(dc,tmpm->x,tmpm->y,tmpm->radius);
     }
-    tempm=tempm->next;
+    tmpm=tmpm->next;
   }
 
   dc->color=BLACK;
@@ -70,69 +70,69 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 MyMass *PlaceMass(I64 x, I64 y)
 {
-  MyMass *tempm=CAlloc(sizeof(MyMass));
-  tempm->drag_profile_factor=1.0;
-  tempm->x=x;
-  tempm->y=y;
-  tempm->mass=MASS_MASS;
-  tempm->radius=MASS_RADIUS;
-  tempm->cost=25.0*COST_SCALE;
-  tempm->color=YELLOW;
-  QueIns(tempm,ode->last_mass);
-  return tempm;
+  MyMass *tmpm=CAlloc(sizeof(MyMass));
+  tmpm->drag_profile_factor=1.0;
+  tmpm->x=x;
+  tmpm->y=y;
+  tmpm->mass=MASS_MASS;
+  tmpm->radius=MASS_RADIUS;
+  tmpm->cost=25.0*COST_SCALE;
+  tmpm->color=YELLOW;
+  QueIns(tmpm,ode->last_mass);
+  return tmpm;
 }
 
-U0 NullSpring(MySpring *temps,F64 scale)
+U0 NullSpring(MySpring *tmps,F64 scale)
 {
-  F64 d=D3Dist(&temps->end1->x,&temps->end2->x);
-  temps->rest_len=d*scale;
-  temps->compression_strength=
-	temps->base_compression_strength/(temps->rest_len+1.0);
-  temps->tensile_strength=temps->base_tensile_strength/(temps->rest_len+1.0);
-  temps->const=temps->base_const/(temps->rest_len+1.0);
-  temps->cost=temps->base_cost*temps->rest_len;
+  F64 d=D3Dist(&tmps->end1->x,&tmps->end2->x);
+  tmps->rest_len=d*scale;
+  tmps->compression_strength=
+	tmps->base_compression_strength/(tmps->rest_len+1.0);
+  tmps->tensile_strength=tmps->base_tensile_strength/(tmps->rest_len+1.0);
+  tmps->const=tmps->base_const/(tmps->rest_len+1.0);
+  tmps->cost=tmps->base_cost*tmps->rest_len;
 }
 
-U0 MoveMass(MyMass *tempm,I64 x, I64 y)
+U0 MoveMass(MyMass *tmpm,I64 x, I64 y)
 {
-  MySpring *temps;
-  tempm->x=x;
-  tempm->y=y;
-  tempm->DxDt=0;
-  tempm->DyDt=0;
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    if (temps->end1==tempm || temps->end2==tempm) {
-      if (temps->flags&SSF_NO_COMPRESSION)
-	NullSpring(temps,WIRE_PERCENT);
+  MySpring *tmps;
+  tmpm->x=x;
+  tmpm->y=y;
+  tmpm->DxDt=0;
+  tmpm->DyDt=0;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    if (tmps->end1==tmpm || tmps->end2==tmpm) {
+      if (tmps->flags&SSF_NO_COMPRESSION)
+	NullSpring(tmps,WIRE_PERCENT);
       else
-	NullSpring(temps,1.0);
+	NullSpring(tmps,1.0);
     }
-    temps=temps->next;
+    tmps=tmps->next;
   }
 }
 
-U0 DelSpring(MySpring *temps)
+U0 DelSpring(MySpring *tmps)
 {
-  QueRem(temps);
-  Free(temps);
+  QueRem(tmps);
+  Free(tmps);
 }
 
-U0 DelMass(MyMass *tempm)
+U0 DelMass(MyMass *tmpm)
 {
-  MySpring *temps,*temps1;
-  temps=ode->next_spring;
-  while (temps!=&ode->next_spring) {
-    temps1=temps->next;
-    if (temps->end1==tempm || temps->end2==tempm)
-      DelSpring(temps);
-    temps=temps1;
+  MySpring *tmps,*tmps1;
+  tmps=ode->next_spring;
+  while (tmps!=&ode->next_spring) {
+    tmps1=tmps->next;
+    if (tmps->end1==tmpm || tmps->end2==tmpm)
+      DelSpring(tmps);
+    tmps=tmps1;
   }
-  QueRem(tempm);
-  Free(tempm);
+  QueRem(tmpm);
+  Free(tmpm);
 }
 
-U0 DrawSpring(CDC *dc,MyMass *tempm,I64 x,I64 y)
+U0 DrawSpring(CDC *dc,MyMass *tmpm,I64 x,I64 y)
 {
   switch (mode_button.state) {
     case MD_CONCRETE:
@@ -148,66 +148,66 @@ U0 DrawSpring(CDC *dc,MyMass *tempm,I64 x,I64 y)
       dc->pen_width=1;
       break;
   }
-  GrLine3(dc,tempm->x,tempm->y,0,x,y,0);
+  GrLine3(dc,tmpm->x,tmpm->y,0,x,y,0);
 }
 
-U0 PlaceSpring(MyMass *tempm1,MyMass *tempm2)
+U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
 {
-  MySpring *temps=CAlloc(sizeof(MySpring));
-  temps->end1=tempm1;
-  temps->end2=tempm2;
+  MySpring *tmps=CAlloc(sizeof(MySpring));
+  tmps->end1=tmpm1;
+  tmps->end2=tmpm2;
   switch (mode_button.state) {
     case MD_CONCRETE:
-      temps->base_const	      = 3.00*SPRING_SCALE;
-      temps->base_compression_strength=10.00*STRENGTH_SCALE;
-      temps->base_tensile_strength    = 0.35*STRENGTH_SCALE;
-      temps->base_cost		      = 0.30*COST_SCALE;
-      NullSpring(temps,1.0);
-      temps->color=LTGRAY;
-      temps->pen_width=2;
+      tmps->base_const	      = 3.00*SPRING_SCALE;
+      tmps->base_compression_strength=10.00*STRENGTH_SCALE;
+      tmps->base_tensile_strength    = 0.35*STRENGTH_SCALE;
+      tmps->base_cost		      = 0.30*COST_SCALE;
+      NullSpring(tmps,1.0);
+      tmps->color=LTGRAY;
+      tmps->pen_width=2;
       break;
     case MD_STEEL:
-      temps->base_const	      = 1.00*SPRING_SCALE;
-      temps->base_compression_strength= 1.00*STRENGTH_SCALE;
-      temps->base_tensile_strength    = 1.00*STRENGTH_SCALE;
-      temps->base_cost		      = 1.00*COST_SCALE;
-      NullSpring(temps,1.0);
-      temps->color=DKGRAY;
-      temps->pen_width=2;
+      tmps->base_const	      = 1.00*SPRING_SCALE;
+      tmps->base_compression_strength= 1.00*STRENGTH_SCALE;
+      tmps->base_tensile_strength    = 1.00*STRENGTH_SCALE;
+      tmps->base_cost		      = 1.00*COST_SCALE;
+      NullSpring(tmps,1.0);
+      tmps->color=DKGRAY;
+      tmps->pen_width=2;
       break;
     case MD_WIRE:
-      temps->base_const	      = 0.25*SPRING_SCALE;
-      temps->base_compression_strength= 0.00;
-      temps->base_tensile_strength    = 0.50*STRENGTH_SCALE;
-      temps->base_cost		      = 0.10*COST_SCALE;
-      NullSpring(temps,WIRE_PERCENT);
-      temps->color=RED;
-      temps->pen_width=1;
-      temps->flags|=SSF_NO_COMPRESSION;
+      tmps->base_const	      = 0.25*SPRING_SCALE;
+      tmps->base_compression_strength= 0.00;
+      tmps->base_tensile_strength    = 0.50*STRENGTH_SCALE;
+      tmps->base_cost		      = 0.10*COST_SCALE;
+      NullSpring(tmps,WIRE_PERCENT);
+      tmps->color=RED;
+      tmps->pen_width=1;
+      tmps->flags|=SSF_NO_COMPRESSION;
       break;
   }
-  QueIns(temps,ode->last_spring);
+  QueIns(tmps,ode->last_spring);
 }
 
 U0 AnimateTask(SpanAnimateStruct *a)
 {
-  MySpring *temps,*temps1;
+  MySpring *tmps,*tmps1;
   Bool old_run=FALSE;
   F64 f;
   while (TRUE) {
-    temps=ode->next_spring;
-    while (temps!=&ode->next_spring) {
-      temps1=temps->next;
-      f=temps->f;
-      if (f>0 &&  f>temps->compression_strength &&
-	    !(temps->flags&SSF_NO_COMPRESSION)||
-	    f<0 && -f>temps->tensile_strength &&
-	    !(temps->flags&SSF_NO_TENSION))
-	temps->flags|=SSF_INACTIVE;
-      temps=temps1;
+    tmps=ode->next_spring;
+    while (tmps!=&ode->next_spring) {
+      tmps1=tmps->next;
+      f=tmps->f;
+      if (f>0 &&  f>tmps->compression_strength &&
+	    !(tmps->flags&SSF_NO_COMPRESSION)||
+	    f<0 && -f>tmps->tensile_strength &&
+	    !(tmps->flags&SSF_NO_TENSION))
+	tmps->flags|=SSF_INACTIVE;
+      tmps=tmps1;
     }
     AdjustLoads(ode);
-    WinMgrSync; //CMathODE updated once per refresh.
+    Refresh; //CMathODE updated once per refresh.
     if (old_run!=run_button.state) {
       if (run_button.state) {
 	if (!a->elapsed_t || !a->saved_ode) {
@@ -231,7 +231,7 @@ U0 Init(SpanAnimateStruct *a)
   ode=SpanNew;
 
   run_button.state=0;
-  WinMgrSync(2); //Allow stop to reg in animate task.
+  Refresh(2); //Allow stop to reg in animate task.
 
   if (a->saved_ode)
     SpanLoad(ode,a->saved_ode);
@@ -258,8 +258,8 @@ U0 SongTask(I64)
 U0 Span()
 {
   I64 msg_code,a1,a2;
-  MyMass   *tempm1=NULL,*tempm2=NULL;
-  MySpring *temps;
+  MyMass   *tmpm1=NULL,*tmpm2=NULL;
+  MySpring *tmps;
   CCtrl *bt_run,*bt_mode;
   U8 *src;
   CDC *dc=DCAlias;
@@ -328,7 +328,7 @@ U0 Span()
       DCFill(dc);
       switch (msg_code) {
 	case MSG_IP_L_DOWN:
-	  cursor_mass=tempm1=tempm2=NULL;
+	  cursor_mass=tmpm1=tmpm2=NULL;
 	  switch (mode_button.state) {
 	    case MD_MASS:
 	      PlaceMass(a1,a2);
@@ -336,21 +336,21 @@ U0 Span()
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      tempm1=MassFind(ode,a1,a2);
+	      tmpm1=MassFind(ode,a1,a2);
 	      break;
 	    case MD_MOVE:
 	      if (run_button.state)
 		cursor_mass=MassFind(ode,a1,a2);
 	      else
-		if (tempm1=MassFind(ode,a1,a2))
-		  MoveMass(tempm1,a1,a2);
+		if (tmpm1=MassFind(ode,a1,a2))
+		  MoveMass(tmpm1,a1,a2);
 	      break;
 	    case MD_DELETE:
-	      MassOrSpringFind(ode,&tempm1,&temps,a1,a2);
-	      if (tempm1)
-		DelMass(tempm1);
-	      if (temps)
-		DelSpring(temps);
+	      MassOrSpringFind(ode,&tmpm1,&tmps,a1,a2);
+	      if (tmpm1)
+		DelMass(tmpm1);
+	      if (tmps)
+		DelSpring(tmps);
 	      break;
 	  }
 	  break;
@@ -359,27 +359,27 @@ U0 Span()
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      if (tempm1 && (tempm2=MassFind(ode,a1,a2)) && tempm1!=tempm2)
-		PlaceSpring(tempm1,tempm2);
+	      if (tmpm1 && (tmpm2=MassFind(ode,a1,a2)) && tmpm1!=tmpm2)
+		PlaceSpring(tmpm1,tmpm2);
 	      break;
 	    case MD_MOVE:
-	      if (!run_button.state && tempm1)
-		MoveMass(tempm1,a1,a2);
+	      if (!run_button.state && tmpm1)
+		MoveMass(tmpm1,a1,a2);
 	      break;
 	  }
-	  cursor_mass=tempm1=tempm2=NULL;
+	  cursor_mass=tmpm1=tmpm2=NULL;
 	  break;
 	case MSG_IP_MOVE:
 	  switch (mode_button.state) {
 	    case MD_MOVE:
-	      if (!run_button.state && tempm1)
-		MoveMass(tempm1,a1,a2);
+	      if (!run_button.state && tmpm1)
+		MoveMass(tmpm1,a1,a2);
 	      break;
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      if (tempm1) {
-		DrawSpring(dc,tempm1,a1,a2);
+	      if (tmpm1) {
+		DrawSpring(dc,tmpm1,a1,a2);
 	      }
 	      break;
 	  }
@@ -388,7 +388,7 @@ U0 Span()
 	  mode_button.state++;
 	  if (mode_button.state>=MD_NUM_MODES)
 	    mode_button.state=0;
-	  cursor_mass=tempm1=tempm2=NULL;
+	  cursor_mass=tmpm1=tmpm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
 	  switch (a1) {

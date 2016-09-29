@@ -24,9 +24,9 @@ U0 OutStr(U8 *ptr,U8 **_buf,U8 **_dst,I64 len,I64 flags)
     i=0;
   else
     i=StrLen(ptr);
-  if (flags&SPF_TRUNCATE && i>len)
+  if (flags&PRTF_TRUNCATE && i>len)
     i=len;
-  if (flags&SPF_LEFT_JUSTIFY) {
+  if (flags&PRTF_LEFT_JUSTIFY) {
     for (j=0;j<i;j++)
       SPutChar(_dst,*ptr++,_buf);
     for (j=0;j<len-i;j++)
@@ -65,7 +65,7 @@ U8 *MPrintQ(U8 *ptr,I64 flags)
     while (ch=*ptr++) {
       switch (ch) {
 	case '$$':
-	  if (flags&SPF_DOLLAR) {
+	  if (flags&PRTF_DOLLAR) {
 	    SPutChar(_dst,'\\',_buf);
 	    SPutChar(_dst,'d',_buf);
 	  } else {
@@ -75,7 +75,7 @@ U8 *MPrintQ(U8 *ptr,I64 flags)
 	  break;
 	case '%':
 	  SPutChar(_dst,ch,_buf);
-	  if (flags&SPF_SLASH)
+	  if (flags&PRTF_SLASH)
 	    SPutChar(_dst,ch,_buf);
 	  break;
 	case '\n':
@@ -186,7 +186,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	  break;
 	case '%':
 	  SPutChar(_dst,ch,_buf);
-	  if (flags&SPF_SLASH && ch1=='%')
+	  if (flags&PRTF_SLASH && ch1=='%')
 	    ptr++;
 	  break;
 	default:
@@ -202,7 +202,7 @@ U8 *sys_pos_pows_lets=" KMGTPEZY",
    *sys_pos_pows_lst="kilo\0mega\0giga\0tera\0peta\0exa\0zetta\0yotta\0",
    *sys_neg_pows_lst="milli\0micro\0nano\0pico\0femto\0atto\0zepto\0yocto\0";
 
-#define TEMP_BUF_LEN	256
+#define TMP_BUF_LEN	256
 #define SLOP		8
 
 U8 *StrPrintJoin(U8 *dst,U8 *fmt,I64 argc,I64 *argv)
@@ -219,7 +219,7 @@ to avoid this.
   U64 m;
   F64 d,d1;
   CDoc *doc;
-  U8 *ptr,**_buf,*buf,**_dst,temp_buf[TEMP_BUF_LEN],temp_buf2[TEMP_BUF_LEN*2];
+  U8 *ptr,**_buf,*buf,**_dst,tmp_buf[TMP_BUF_LEN],tmp_buf2[TMP_BUF_LEN*2];
 
   if (!fmt)
     throw('StrPrint');
@@ -237,11 +237,11 @@ to avoid this.
     if (ch=='%') {
       flags=0;
       if (*fmt=='-') {
-	flags|=SPF_LEFT_JUSTIFY;
+	flags|=PRTF_LEFT_JUSTIFY;
 	fmt++;
       }
       if (*fmt=='0') {
-	flags|=SPF_PAD_ZERO;
+	flags|=PRTF_PAD_ZERO;
 	fmt++;
       }
       len=0;
@@ -264,7 +264,7 @@ to avoid this.
 	    throw('StrPrint');
 	  dec_len=argv[cur_arg++];
 	}
-	flags|=SPF_DECIMAL;
+	flags|=PRTF_DECIMAL;
       }
 
       aux_fmt_num=0;
@@ -272,16 +272,16 @@ to avoid this.
 	switch (*fmt) {
 	  start:
 	    case '$$':
-	      flags|=SPF_DOLLAR;
+	      flags|=PRTF_DOLLAR;
 	      break;
 	    case '/':
-	      flags|=SPF_SLASH;
+	      flags|=PRTF_SLASH;
 	      break;
 	    case ',':
-	      flags|=SPF_COMMA;
+	      flags|=PRTF_COMMA;
 	      break;
 	    case 't':
-	      flags|=SPF_TRUNCATE;
+	      flags|=PRTF_TRUNCATE;
 	      break;
 	    case 'l': //harmless
 	      break;
@@ -291,10 +291,10 @@ to avoid this.
 
 	  case 'h':
 	    fmt++;
-	    flags|=SPF_AUX_FMT_NUM;
+	    flags|=PRTF_AUX_FMT_NUM;
 	    if (*fmt=='?') {
 	      fmt++;
-	      flags|=SPF_QUESTION;
+	      flags|=PRTF_QUESTION;
 	    } else {
 	      if (*fmt=='*') {
 		fmt++;
@@ -304,11 +304,11 @@ to avoid this.
 	      } else {
 		if (*fmt=='-') {
 		  fmt++;
-		  flags|=SPF_NEG_AUX_FMT_NUM;
+		  flags|=PRTF_NEG_AUX_FMT_NUM;
 		}
 		while ('0'<=*fmt<='9')
 		  aux_fmt_num=aux_fmt_num*10+ *fmt++ -'0';
-		if (flags&SPF_NEG_AUX_FMT_NUM)
+		if (flags&PRTF_NEG_AUX_FMT_NUM)
 		  aux_fmt_num=-aux_fmt_num;
 	      }
 	    }
@@ -325,7 +325,7 @@ to avoid this.
 	  case 'F':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
-	    if (flags&SPF_DOLLAR) {
+	    if (flags&PRTF_DOLLAR) {
 	      doc=argv[cur_arg++];
 	      old_flags=doc->flags;
 	      doc->flags|=DOCF_NO_CURSOR;
@@ -390,43 +390,43 @@ to avoid this.
 	  case 'c':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
-	    temp_buf[0](I64)=argv[cur_arg++];
-	    temp_buf[8]=0;
+	    tmp_buf[0](I64)=argv[cur_arg++];
+	    tmp_buf[8]=0;
 	    break;
 	  case 'C':
 	    if (cur_arg>=argc)
 	      throw('StrPrint');
-	    temp_buf[0](I64)=argv[cur_arg++];
-	    temp_buf[8]=0;
-	    ptr=temp_buf;
+	    tmp_buf[0](I64)=argv[cur_arg++];
+	    tmp_buf[8]=0;
+	    ptr=tmp_buf;
 	    while (*ptr) {
 	      *ptr=ToUpper(*ptr);
 	      ptr++;
 	    }
 	    break;
 	end:
-	  if (!(flags&SPF_AUX_FMT_NUM))
+	  if (!(flags&PRTF_AUX_FMT_NUM))
 	    aux_fmt_num=1;
 	  while (aux_fmt_num-->0)
-	    OutStr(temp_buf,_buf,_dst,len,flags);
+	    OutStr(tmp_buf,_buf,_dst,len,flags);
 	  break;
 
 	case 'p':
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
-	  StrPrintFunSeg(temp_buf,argv[cur_arg++],len,flags);
-	  OutStr(temp_buf,_buf,_dst,len,flags);
+	  StrPrintFunSeg(tmp_buf,argv[cur_arg++],len,flags);
+	  OutStr(tmp_buf,_buf,_dst,len,flags);
 	  break;
 	case 'P':
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
-	  StrPrintFunSeg(temp_buf,argv[cur_arg],len,flags);
+	  StrPrintFunSeg(tmp_buf,argv[cur_arg],len,flags);
 	  if (!IsRaw || !_buf) {
-	    StrPrint(temp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",
-		  temp_buf,argv[cur_arg]);
-	    OutStr(temp_buf2,_buf,_dst,len,flags);
+	    StrPrint(tmp_buf2,"$$LK,\"%s\",A=\"AD:0x%X\"$$",
+		  tmp_buf,argv[cur_arg]);
+	    OutStr(tmp_buf2,_buf,_dst,len,flags);
 	  } else
-	    OutStr(temp_buf,_buf,_dst,len,flags);
+	    OutStr(tmp_buf,_buf,_dst,len,flags);
 	  cur_arg++;
 	  break;
 	case 'd':
@@ -434,38 +434,38 @@ to avoid this.
 	    throw('StrPrint');
 	  m=argv[cur_arg++];
 	  if (m(I64)<0) {
-	    flags|=SPF_NEG;
+	    flags|=PRTF_NEG;
 	    m=-m;
 	  }
 sp_out_dec:
-	  if (flags&SPF_AUX_FMT_NUM) {
+	  if (flags&PRTF_AUX_FMT_NUM) {
 	    if (!len) len=12;
 	    d=m;
 	    goto sp_out_eng;
 	  }
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=3;
 	    do {
-	      temp_buf[k++]=ModU64(&m,10)+'0';
+	      tmp_buf[k++]=ModU64(&m,10)+'0';
 	      if (!m) break;
 	      if (!--comma_cnt) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=3;
 	      }
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 sp_out_comma_num:
-	    if (flags&SPF_NEG)
+	    if (flags&PRTF_NEG)
 	      i=1;
 	    else
 	      i=0;
 	    if (len<0)
 	      len=0;
-	    if (flags&SPF_TRUNCATE && k+i>len)
+	    if (flags&PRTF_TRUNCATE && k+i>len)
 	      k=len-i;
 	    if (k<0)
 	      k=0;
-	    if (flags&SPF_PAD_ZERO) {
-	      if (flags&SPF_NEG)
+	    if (flags&PRTF_PAD_ZERO) {
+	      if (flags&PRTF_NEG)
 		SPutChar(_dst,'-',_buf);
 	      comma_cnt=(len-k-i+comma_fmt_cnt-comma_cnt+1)
 	      %(comma_fmt_cnt+1)+1;
@@ -481,39 +481,39 @@ sp_out_comma_num:
 	    } else {
 	      for (;i<len-k;i++)
 		SPutChar(_dst,CH_SPACE,_buf);
-	      if (flags&SPF_NEG)
+	      if (flags&PRTF_NEG)
 		SPutChar(_dst,'-',_buf);
 	    }
 	  } else {
 	    do {
-	      temp_buf[k++]=ModU64(&m,10)+'0';
+	      tmp_buf[k++]=ModU64(&m,10)+'0';
 	      if (!m) break;
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 sp_out_num:
-	    if (flags&SPF_NEG)
+	    if (flags&PRTF_NEG)
 	      i=1;
 	    else
 	      i=0;
 	    if (len<0)
 	      len=0;
-	    if (flags&SPF_TRUNCATE && k+i>len)
+	    if (flags&PRTF_TRUNCATE && k+i>len)
 	      k=len-i;
 	    if (k<0)
 	      k=0;
-	    if (flags&SPF_PAD_ZERO) {
-	      if (flags&SPF_NEG)
+	    if (flags&PRTF_PAD_ZERO) {
+	      if (flags&PRTF_NEG)
 		SPutChar(_dst,'-',_buf);
 	      for (;i<len-k;i++)
 		SPutChar(_dst,'0',_buf);
 	    } else {
 	      for (;i<len-k;i++)
 		SPutChar(_dst,CH_SPACE,_buf);
-	      if (flags&SPF_NEG)
+	      if (flags&PRTF_NEG)
 		SPutChar(_dst,'-',_buf);
 	    }
 	  }
 	  for (i=k-1;i>=0;i--)
-	    SPutChar(_dst,temp_buf[i],_buf);
+	    SPutChar(_dst,tmp_buf[i],_buf);
 	  break;
 	case 'u':
 	  if (cur_arg>=argc)
@@ -525,26 +525,26 @@ sp_out_num:
 	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
-	    flags|=SPF_NEG;
+	    flags|=PRTF_NEG;
 	    d=-d;
 	  }
 
 	  if (d==ì) {
 sp_out_inf:
-	    if (flags&SPF_NEG)
+	    if (flags&PRTF_NEG)
 	      i=1;
 	    else
 	      i=0;
 	    k=1;
 	    if (len<0)
 	      len=0;
-	    if (flags&SPF_TRUNCATE && k+i>len)
+	    if (flags&PRTF_TRUNCATE && k+i>len)
 	      k=len-i;
 	    if (k<0)
 	      k=0;
 	    for (;i<len-k;i++)
 	      SPutChar(_dst,CH_SPACE,_buf);
-	    if (flags&SPF_NEG)
+	    if (flags&PRTF_NEG)
 	      SPutChar(_dst,'-',_buf);
 	    for (i=0;i<k;i++)
 	      SPutChar(_dst,'ì',_buf);
@@ -556,7 +556,7 @@ sp_out_inf:
 	    dec_len=0;
 	  n=Log10(d);
 	  if (i=dec_len) {
-	    if (flags&SPF_COMMA)
+	    if (flags&PRTF_COMMA)
 	      i=i-i/4;
 	    if (n+i>17) {
 	      n+=i-17;
@@ -573,66 +573,66 @@ sp_out_inf:
 	    n=0;
 
 	  m=Round(d);
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    comma_cnt=i&3;
-	    while (i-- && k<TEMP_BUF_LEN-SLOP) {
+	    while (i-- && k<TMP_BUF_LEN-SLOP) {
 	      if (i>2 && !comma_cnt--) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=2;
 		if (!--i) break;
 	      }
 	      if (n) {
 		n--;
-		temp_buf[k++]='0';
+		tmp_buf[k++]='0';
 	      } else
-		temp_buf[k++]=ModU64(&m,10)+'0';
+		tmp_buf[k++]=ModU64(&m,10)+'0';
 	      if (!i) break;
 	    }
 	  } else {
-	    while (i-- && k<TEMP_BUF_LEN-SLOP) {
+	    while (i-- && k<TMP_BUF_LEN-SLOP) {
 	      if (n) {
 		n--;
-		temp_buf[k++]='0';
+		tmp_buf[k++]='0';
 	      } else
-		temp_buf[k++]=ModU64(&m,10)+'0';
+		tmp_buf[k++]=ModU64(&m,10)+'0';
 	    }
 	  }
 	  if (dec_len)
-	    temp_buf[k++]='.';
-	  if (flags&SPF_COMMA) {
+	    tmp_buf[k++]='.';
+	  if (flags&PRTF_COMMA) {
 	    comma_cnt=3;
 	    do {
 	      if (n) {
 		n--;
-		temp_buf[k++]='0';
+		tmp_buf[k++]='0';
 	      } else
-		temp_buf[k++]=ModU64(&m,10)+'0';
+		tmp_buf[k++]=ModU64(&m,10)+'0';
 	      if (!m) break;
 	      if (!--comma_cnt) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=3;
 	      }
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 	  } else {
 	    do {
 	      if (n) {
 		n--;
-		temp_buf[k++]='0';
+		tmp_buf[k++]='0';
 	      } else
-		temp_buf[k++]=ModU64(&m,10)+'0';
+		tmp_buf[k++]=ModU64(&m,10)+'0';
 	      if (!m) break;
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 	  }
 	  goto sp_out_num;
 	case 'e':
 	  if (!len) len=12;
-	  flags|=SPF_TRUNCATE;
+	  flags|=PRTF_TRUNCATE;
 
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
-	    flags|=SPF_NEG;
+	    flags|=PRTF_NEG;
 	    d=-d;
 	  }
 	  if (d==ì) goto sp_out_inf;
@@ -649,18 +649,18 @@ sp_out_e:
 	    n0=n;
 	    if (n<0) {
 	      n=-n;
-	      flags|=SPF_NEG_E;
+	      flags|=PRTF_NEG_E;
 	    } else
-	      flags&=~SPF_NEG_E;
+	      flags&=~PRTF_NEG_E;
 
 	    i=3;
-	    do temp_buf[k++]=ModU64(&n,10)+'0';
+	    do tmp_buf[k++]=ModU64(&n,10)+'0';
 	    while (n && i--);
-	    if (flags&SPF_NEG_E)
-	      temp_buf[k++]='-';
-	    temp_buf[k++]='e';
+	    if (flags&PRTF_NEG_E)
+	      tmp_buf[k++]='-';
+	    tmp_buf[k++]='e';
 	    dec_len=len-k-2;
-	    if (flags&SPF_NEG)
+	    if (flags&PRTF_NEG)
 	      dec_len--;
 
 	    if (d) {
@@ -682,12 +682,12 @@ sp_out_e:
 	  goto sp_out_f;
 	case 'g':
 	  if (!len) len=12;
-	  flags|=SPF_TRUNCATE;
+	  flags|=PRTF_TRUNCATE;
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
-	    flags|=SPF_NEG;
+	    flags|=PRTF_NEG;
 	    d=-d;
 	  }
 	  if (d==ì) goto sp_out_inf;
@@ -701,12 +701,12 @@ sp_out_e:
 	    goto sp_out_f;
 	case 'n':
 	  if (!len) len=12;
-	  flags|=SPF_TRUNCATE;
+	  flags|=PRTF_TRUNCATE;
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  d=argv[cur_arg++](F64);
 	  if (d<0) {
-	    flags|=SPF_NEG;
+	    flags|=PRTF_NEG;
 	    d=-d;
 	  }
 sp_out_eng: //Engineering notation
@@ -719,17 +719,17 @@ sp_out_eng: //Engineering notation
 
 	  if (n<0) {
 	    n=-n;
-	    flags|=SPF_NEG_E;
+	    flags|=PRTF_NEG_E;
 	  }
-	  if (flags&SPF_AUX_FMT_NUM && -24<=n<=24) {
-	    if (flags&SPF_QUESTION) {
-	      if (flags&SPF_NEG_E)
+	  if (flags&PRTF_AUX_FMT_NUM && -24<=n<=24) {
+	    if (flags&PRTF_QUESTION) {
+	      if (flags&PRTF_NEG_E)
 		i=-n/3;
 	      else
 		i=n/3;
 	      j=0;
 	    } else {
-	      if (flags&SPF_NEG_E)
+	      if (flags&PRTF_NEG_E)
 		j=-n-aux_fmt_num;
 	      else
 		j=n-aux_fmt_num;
@@ -737,17 +737,17 @@ sp_out_eng: //Engineering notation
 	      i=aux_fmt_num/3;
 	    }
 	    if (i<0)
-	      temp_buf[k++]=sys_neg_pows_lets[-i];
+	      tmp_buf[k++]=sys_neg_pows_lets[-i];
 	    else if (i>0)
-	      temp_buf[k++]=sys_pos_pows_lets[i];
+	      tmp_buf[k++]=sys_pos_pows_lets[i];
 	    else if (len!=0)
-	      temp_buf[k++]=CH_SPACE;
-	    if (!(flags&SPF_DECIMAL)) {
+	      tmp_buf[k++]=CH_SPACE;
+	    if (!(flags&PRTF_DECIMAL)) {
 	      dec_len=len-k-2;
-	      if (flags&SPF_NEG)
+	      if (flags&PRTF_NEG)
 		dec_len--;
 	      if (j>0) {
-		if (flags&SPF_COMMA)
+		if (flags&PRTF_COMMA)
 		  dec_len-=4*j/3;
 		else
 		  dec_len-=j;
@@ -761,14 +761,14 @@ sp_out_eng: //Engineering notation
 	    }
 	  } else {
 	    i=3;
-	    do temp_buf[k++]=ModU64(&n,10)+'0';
+	    do tmp_buf[k++]=ModU64(&n,10)+'0';
 	    while (n && i--);
-	    if (flags&SPF_NEG_E)
-	      temp_buf[k++]='-';
-	    temp_buf[k++]='e';
+	    if (flags&PRTF_NEG_E)
+	      tmp_buf[k++]='-';
+	    tmp_buf[k++]='e';
 	    if (!dec_len) {
 	      dec_len=len-k-2;
-	      if (flags&SPF_NEG)
+	      if (flags&PRTF_NEG)
 		dec_len--;
 	      d1=d+Pow10I64(-dec_len+1)/2;
 	      if (d1>=10) {
@@ -778,9 +778,9 @@ sp_out_eng: //Engineering notation
 	      }
 	    }
 	  }
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    if (len && dec_len>0 && !(dec_len&3))
-	      temp_buf[k++]=',';
+	      tmp_buf[k++]=',';
 	    dec_len-=dec_len/4;
 	  }
 	  goto sp_out_f;
@@ -788,54 +788,54 @@ sp_out_eng: //Engineering notation
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  m=argv[cur_arg++];
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
 	    do {
-	      temp_buf[k]= m&15 +'0';
-	      if (temp_buf[k]>'9') temp_buf[k]+='A'-0x3A;
+	      tmp_buf[k]= m&15 +'0';
+	      if (tmp_buf[k]>'9') tmp_buf[k]+='A'-0x3A;
 	      k++;
 	      m>>=4;
 	      if (!m) break;
 	      if (!--comma_cnt) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=4;
 	      }
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_comma_num;
 	  } else {
 	    do {
-	      temp_buf[k]= m&15 +'0';
-	      if (temp_buf[k]>'9') temp_buf[k]+='A'-0x3A;
+	      tmp_buf[k]= m&15 +'0';
+	      if (tmp_buf[k]>'9') tmp_buf[k]+='A'-0x3A;
 	      k++;
 	      m>>=4;
-	    } while (m && k<TEMP_BUF_LEN-SLOP);
+	    } while (m && k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_num;
 	  }
 	case 'x':
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  m=argv[cur_arg++];
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
 	    do {
-	      temp_buf[k]= m&15 +'0';
-	      if (temp_buf[k]>'9') temp_buf[k]+='a'-0x3A;
+	      tmp_buf[k]= m&15 +'0';
+	      if (tmp_buf[k]>'9') tmp_buf[k]+='a'-0x3A;
 	      k++;
 	      m>>=4;
 	      if (!m) break;
 	      if (!--comma_cnt) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=4;
 	      }
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_comma_num;
 	  } else {
 	    do {
-	      temp_buf[k]= m&15 +'0';
-	      if (temp_buf[k]>'9') temp_buf[k]+='a'-0x3A;
+	      tmp_buf[k]= m&15 +'0';
+	      if (tmp_buf[k]>'9') tmp_buf[k]+='a'-0x3A;
 	      k++;
 	      m>>=4;
-	    } while (m && k<TEMP_BUF_LEN-SLOP);
+	    } while (m && k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_num;
 	  }
 	case 'b':
@@ -843,23 +843,23 @@ sp_out_eng: //Engineering notation
 	  if (cur_arg>=argc)
 	    throw('StrPrint');
 	  m=argv[cur_arg++];
-	  if (flags&SPF_COMMA) {
+	  if (flags&PRTF_COMMA) {
 	    comma_fmt_cnt=comma_cnt=4;
 	    do {
-	      temp_buf[k++]= m&1 +'0';
+	      tmp_buf[k++]= m&1 +'0';
 	      m>>=1;
 	      if (!m) break;
 	      if (!--comma_cnt) {
-		temp_buf[k++]=',';
+		tmp_buf[k++]=',';
 		comma_cnt=4;
 	      }
-	    } while (k<TEMP_BUF_LEN-SLOP);
+	    } while (k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_comma_num;
 	  } else {
 	    do {
-	      temp_buf[k++]= m&1 +'0';
+	      tmp_buf[k++]= m&1 +'0';
 	      m>>=1;
-	    } while (m && k<TEMP_BUF_LEN-SLOP);
+	    } while (m && k<TMP_BUF_LEN-SLOP);
 	    goto sp_out_num;
 	  }
 	case '%':

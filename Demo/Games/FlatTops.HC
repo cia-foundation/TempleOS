@@ -96,36 +96,36 @@ Obj *ObjFind(F64 x,F64 y,
 	     I64 flag_mask=OF_ACTIVE|OF_RETURNING,I64 flag_val=OF_ACTIVE,
 	     I64 type_mask=-1,I64 player_mask=-1,F64 *_d=NULL)
 {
-  Obj *tempo=obj_head.next,*best=NULL;
+  Obj *tmpo=obj_head.next,*best=NULL;
   F64 dd,best_dd=MAX_F64;
-  while (tempo!=&obj_head) {
-    if (tempo->flags&flag_mask==flag_val &&
-	  Bt(&type_mask,tempo->type)&&Bt(&player_mask,tempo->player)) {
-      dd=Sqr(tempo->x-x)+Sqr(tempo->y-y);
+  while (tmpo!=&obj_head) {
+    if (tmpo->flags&flag_mask==flag_val &&
+	  Bt(&type_mask,tmpo->type)&&Bt(&player_mask,tmpo->player)) {
+      dd=Sqr(tmpo->x-x)+Sqr(tmpo->y-y);
       if (dd<best_dd) {
-	best=tempo;
+	best=tmpo;
 	best_dd=dd;
       }
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
   if (_d) *_d=Sqrt(best_dd);
   return best;
 }
 
-U0 ObjDel(Obj *tempo)
+U0 ObjDel(Obj *tmpo)
 {
-  if (tempo) {
-    if (tS<tempo->death_time)
-      tempo->flags&=~OF_ACTIVE;
+  if (tmpo) {
+    if (tS<tmpo->death_time)
+      tmpo->flags&=~OF_ACTIVE;
     else {
-      if (tempo->squadron>=0)
-	SquadronRem(tempo);
-      QueRem(tempo);
-      if (tempo->squadron>=0)
-	LBts(&squadrons[tempo->squadron].dead_mask,tempo->member_num);
-      num_alive[tempo->player]--;
-      Free(tempo);
+      if (tmpo->squadron>=0)
+	SquadronRem(tmpo);
+      QueRem(tmpo);
+      if (tmpo->squadron>=0)
+	LBts(&squadrons[tmpo->squadron].dead_mask,tmpo->member_num);
+      num_alive[tmpo->player]--;
+      Free(tmpo);
     }
   }
 }
@@ -160,53 +160,53 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,j,k;
   F64 d,cur_time=tS;
-  Obj *tempo;
-  Torpedo *tempt;
+  Obj *tmpo;
+  Torpedo *tmpt;
 
-  tempt=torpedo_head.next;
-  while (tempt!=&torpedo_head) {
+  tmpt=torpedo_head.next;
+  while (tmpt!=&torpedo_head) {
     dc->color=WHITE;
-    GrPlot(dc,tempt->x,tempt->y);
-    tempt=tempt->next;
+    GrPlot(dc,tmpt->x,tmpt->y);
+    tmpt=tmpt->next;
   }
 
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    if (tempo->flags&OF_ACTIVE && tempo->flags&OF_SHIP) {
-      SpriteZ3B(dc,tempo->x,tempo->y,0,
-	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    if (tmpo->flags&OF_ACTIVE && tmpo->flags&OF_SHIP) {
+      SpriteZ3B(dc,tmpo->x,tmpo->y,0,
+	    imgs[tmpo->player][tmpo->type],tmpo->é+ã/2);
 
       k=0;
       for (j=0;j<FIRE_HEIGHT;j++)
 	for (i=0;i<FIRE_WIDTH;i++)
-	  if (Bt(tempo->fire,k++)) {
+	  if (Bt(tmpo->fire,k++)) {
 	    dc->color=fire_colors[ToI64(k+10*tS)&(FIRE_COLORS-1)];
 	    GrPlot(dc,
-		  tempo->x+FIRE_X_SCALE*(i-FIRE_WIDTH /2+(11*tS+i)%1.7)
-	    *Cos(tempo->é)-
-		  FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(12*tS+j)%1.7)*Sin(tempo->é),
-		  tempo->y+FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(19*tS+j)%1.7)
-	    *Cos(tempo->é)+
-		  FIRE_X_SCALE*(i-FIRE_WIDTH /2+(13*tS+i)%1.7)*Sin(tempo->é));
+		  tmpo->x+FIRE_X_SCALE*(i-FIRE_WIDTH /2+(11*tS+i)%1.7)
+	    *Cos(tmpo->é)-
+		  FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(12*tS+j)%1.7)*Sin(tmpo->é),
+		  tmpo->y+FIRE_Y_SCALE*(j-FIRE_HEIGHT/2+(19*tS+j)%1.7)
+	    *Cos(tmpo->é)+
+		  FIRE_X_SCALE*(i-FIRE_WIDTH /2+(13*tS+i)%1.7)*Sin(tmpo->é));
 	  }
       if (Blink) {
 	dc->color=BLACK;
-	GrLine(dc,tempo->x+5,tempo->y,tempo->x+5+10,tempo->y);
+	GrLine(dc,tmpo->x+5,tmpo->y,tmpo->x+5+10,tmpo->y);
 
-	if (tempo->life_percent>0) {
-	  if (tempo->life_percent<33)
+	if (tmpo->life_percent>0) {
+	  if (tmpo->life_percent<33)
 	    dc->color=RED;
-	  else if (tempo->life_percent<66)
+	  else if (tmpo->life_percent<66)
 	    dc->color=YELLOW;
 	  else
 	    dc->color=GREEN;
-	  GrLine(dc,tempo->x+5,tempo->y,
-		tempo->x+5+10*tempo->life_percent/100,tempo->y);
+	  GrLine(dc,tmpo->x+5,tmpo->y,
+		tmpo->x+5+10*tmpo->life_percent/100,tmpo->y);
 	}
 
 	dc->color=BLACK;
-	GrLine(dc,tempo->x+5,tempo->y+2,tempo->x+5+10,tempo->y+2);
-	d=tempo->fuel*100/tempo->max_fuel;
+	GrLine(dc,tmpo->x+5,tmpo->y+2,tmpo->x+5+10,tmpo->y+2);
+	d=tmpo->fuel*100/tmpo->max_fuel;
 	if (d>0) {
 	  if (d<33)
 	    dc->color=RED;
@@ -214,23 +214,23 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    dc->color=YELLOW;
 	  else
 	    dc->color=GREEN;
-	  GrLine(dc,tempo->x+5,tempo->y+2,tempo->x+5+10*d/100,tempo->y+2);
+	  GrLine(dc,tmpo->x+5,tmpo->y+2,tmpo->x+5+10*d/100,tmpo->y+2);
 	}
       }
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
 
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_SHIP))
-      SpriteZ3B(dc,tempo->x,tempo->y,0,
-	    imgs[tempo->player][tempo->type],tempo->é+ã/2);
-    if (tempo->flags&OF_SHOOTING) {
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    if (tmpo->flags&OF_ACTIVE && !(tmpo->flags&OF_SHIP))
+      SpriteZ3B(dc,tmpo->x,tmpo->y,0,
+	    imgs[tmpo->player][tmpo->type],tmpo->é+ã/2);
+    if (tmpo->flags&OF_SHOOTING) {
       dc->color=LTRED;
-      GrLine(dc,tempo->x,tempo->y,tempo->target_x,tempo->target_y,3);
+      GrLine(dc,tmpo->x,tmpo->y,tmpo->target_x,tmpo->target_y,3);
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
 
   dc->flags|=DCF_TRANSFORMATION;
@@ -277,8 +277,8 @@ U0 Init()
 {
   I64 i,fighter,ship,player,squadron,
 	w=Fs->pix_width,h=Fs->pix_height;
-  Squadron *temps;
-  Obj *tempo,*tempo1;
+  Squadron *tmps;
+  Obj *tmpo,*tmpo1;
   QueInit(&obj_head);
   QueInit(&torpedo_head);
 
@@ -292,83 +292,83 @@ U0 Init()
   for (player=0;player<NUM_PLAYERS;player++) {
     num_alive[player]=0;
     for (ship=0;ship<num_cruisers[player];ship++) {
-      tempo1=CAlloc(sizeof(Obj));
+      tmpo1=CAlloc(sizeof(Obj));
       num_alive[player]++;
-      tempo1->type=OT_CRUISER;	tempo1->player=player;
-      tempo1->squadron=-1;	tempo1->member_num=ship;
-      tempo1->flags=OF_ACTIVE|OF_SHIP;
-      tempo1->x=0.8*w*(Rand-0.5)+w>>1; tempo1->y=0.8*h*(Rand-0.5)+h>>1;
-      tempo1->host=NULL;
-      tempo1->speed=35.0;	tempo1->turn_rate=2.5;
-      tempo1->é=2*ã*(Rand-0.5);	tempo1->dé=0;
-      tempo1->life_percent=100.0;
-      tempo1->fuel=tempo1->max_fuel=100000;
-      tempo1->fuel_burn_rate=100.0;
-      tempo1->air_guns =5000;	tempo1->air_guns_range =30.0;
-      tempo1->ship_guns=10000;	tempo1->ship_guns_range=30.0;
-      tempo1->torpedos =tempo1->max_torpedos=0;
-      tempo1->torpedos_range =0.0;
-      tempo1->next_action_time=0;
-      QueIns(tempo1,obj_head.last);
+      tmpo1->type=OT_CRUISER;	tmpo1->player=player;
+      tmpo1->squadron=-1;	tmpo1->member_num=ship;
+      tmpo1->flags=OF_ACTIVE|OF_SHIP;
+      tmpo1->x=0.8*w*(Rand-0.5)+w>>1; tmpo1->y=0.8*h*(Rand-0.5)+h>>1;
+      tmpo1->host=NULL;
+      tmpo1->speed=35.0;	tmpo1->turn_rate=2.5;
+      tmpo1->é=2*ã*(Rand-0.5);	tmpo1->dé=0;
+      tmpo1->life_percent=100.0;
+      tmpo1->fuel=tmpo1->max_fuel=100000;
+      tmpo1->fuel_burn_rate=100.0;
+      tmpo1->air_guns =5000;	tmpo1->air_guns_range =30.0;
+      tmpo1->ship_guns=10000;	tmpo1->ship_guns_range=30.0;
+      tmpo1->torpedos =tmpo1->max_torpedos=0;
+      tmpo1->torpedos_range =0.0;
+      tmpo1->next_action_time=0;
+      QueIns(tmpo1,obj_head.last);
     }
 
     for (ship=0;ship<num_carriers[player];ship++) {
-      tempo1=CAlloc(sizeof(Obj));
+      tmpo1=CAlloc(sizeof(Obj));
       num_alive[player]++;
-      tempo1->type=OT_CARRIER;	tempo1->player=player;
-      tempo1->squadron=-1;	tempo1->member_num=ship;
-      tempo1->flags=OF_ACTIVE|OF_SHIP;
-      tempo1->x=0.8*w*(Rand-0.5)+w>>1; tempo1->y=0.8*h*(Rand-0.5)+h>>1;
-      tempo1->host=NULL;
-      tempo1->speed=28.0;	tempo1->turn_rate=1.0;
-      tempo1->é=2*ã*(Rand-0.5);	tempo1->dé=0;
-      tempo1->life_percent=100.0;
-      tempo1->fuel=tempo1->max_fuel=750000;
-      tempo1->fuel_burn_rate=500.0;
-      tempo1->air_guns =5000;	tempo1->air_guns_range =20.0;
-      tempo1->ship_guns=2000;	tempo1->ship_guns_range=30.0;
-      tempo1->torpedos =tempo1->max_torpedos=0;
-      tempo1->torpedos_range =0.0;
-      tempo1->next_action_time=0;
-      QueIns(tempo1,obj_head.last);
+      tmpo1->type=OT_CARRIER;	tmpo1->player=player;
+      tmpo1->squadron=-1;	tmpo1->member_num=ship;
+      tmpo1->flags=OF_ACTIVE|OF_SHIP;
+      tmpo1->x=0.8*w*(Rand-0.5)+w>>1; tmpo1->y=0.8*h*(Rand-0.5)+h>>1;
+      tmpo1->host=NULL;
+      tmpo1->speed=28.0;	tmpo1->turn_rate=1.0;
+      tmpo1->é=2*ã*(Rand-0.5);	tmpo1->dé=0;
+      tmpo1->life_percent=100.0;
+      tmpo1->fuel=tmpo1->max_fuel=750000;
+      tmpo1->fuel_burn_rate=500.0;
+      tmpo1->air_guns =5000;	tmpo1->air_guns_range =20.0;
+      tmpo1->ship_guns=2000;	tmpo1->ship_guns_range=30.0;
+      tmpo1->torpedos =tmpo1->max_torpedos=0;
+      tmpo1->torpedos_range =0.0;
+      tmpo1->next_action_time=0;
+      QueIns(tmpo1,obj_head.last);
 
       for (squadron=0;squadron<num_squadrons_per_carrier[player];
 	    squadron++,num_squadrons++) {
 	for (fighter=0;fighter<num_planes_per_squadron[player];fighter++) {
-	  tempo=CAlloc(sizeof(Obj));
+	  tmpo=CAlloc(sizeof(Obj));
 	  num_alive[player]++;
-	  tempo->type=OT_FIGHTER;	 tempo->player=player;
-	  tempo->squadron=num_squadrons; tempo->member_num=fighter;
-	  tempo->flags=0;
-	  tempo->host=tempo1;
-	  tempo->speed=300.0;		tempo->turn_rate=25.0;
-	  tempo->life_percent=100.0;
-	  tempo->fuel=tempo->max_fuel=1000;
-	  tempo->fuel_burn_rate=1.0;
-	  tempo->air_guns =35000;	tempo->air_guns_range =8.0;
-	  tempo->ship_guns=0;		tempo->ship_guns_range=0.0;
-	  tempo->torpedos =tempo->max_torpedos=1;
-	  tempo->torpedos_range =20.0;
-	  QueIns(tempo,obj_head.last);
+	  tmpo->type=OT_FIGHTER;	 tmpo->player=player;
+	  tmpo->squadron=num_squadrons; tmpo->member_num=fighter;
+	  tmpo->flags=0;
+	  tmpo->host=tmpo1;
+	  tmpo->speed=300.0;		tmpo->turn_rate=25.0;
+	  tmpo->life_percent=100.0;
+	  tmpo->fuel=tmpo->max_fuel=1000;
+	  tmpo->fuel_burn_rate=1.0;
+	  tmpo->air_guns =35000;	tmpo->air_guns_range =8.0;
+	  tmpo->ship_guns=0;		tmpo->ship_guns_range=0.0;
+	  tmpo->torpedos =tmpo->max_torpedos=1;
+	  tmpo->torpedos_range =20.0;
+	  QueIns(tmpo,obj_head.last);
 	}
       }
     }
   }
   squadrons=CAlloc(num_squadrons*sizeof(Squadron));
-  for (i=0,temps=squadrons;i<num_squadrons;i++,temps++) {
-    temps->next_in_squadron=temps->last_in_squadron=temps;
-    temps->squadron=i;
+  for (i=0,tmps=squadrons;i<num_squadrons;i++,tmps++) {
+    tmps->next_in_squadron=tmps->last_in_squadron=tmps;
+    tmps->squadron=i;
   }
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    if (tempo->squadron>=0) {
-      temps=&squadrons[tempo->squadron];
-      temps->host  =tempo->host;
-      temps->player=tempo->player;
-      temps->total_mask=1<<num_planes_per_squadron[tempo->player]-1;
-      SquadronIns(tempo,temps->last_in_squadron);
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    if (tmpo->squadron>=0) {
+      tmps=&squadrons[tmpo->squadron];
+      tmps->host  =tmpo->host;
+      tmps->player=tmpo->player;
+      tmps->total_mask=1<<num_planes_per_squadron[tmpo->player]-1;
+      SquadronIns(tmpo,tmps->last_in_squadron);
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
 }
 
@@ -382,36 +382,36 @@ U0 CleanUp()
 Obj *ObjLaunch(I64 player,I64 squadron=-1,
 	Obj *host=NULL,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 {
-  Obj *tempo;
+  Obj *tmpo;
   F64 cur_time=tS;
   if (!host)
     host=ObjFind(x,y,,,1<<OT_CARRIER,1<<player);
   if (host && cur_time>host->next_action_time) {
     if (é==MAX_F64)
       é=Arg(x-host->x,y-host->y);
-    tempo=obj_head.next;
-    while (tempo!=&obj_head) {
-      if (tempo->host==host && (squadron<0||tempo->squadron==squadron) &&
-	    !(tempo->flags&OF_ACTIVE) &&
-	    (tempo->squadron<0||squadrons[tempo->squadron].action==SA_PARKED||
-	    squadrons[tempo->squadron].action==SA_LAUNCHING)) {
-	if (tempo->fuel<=0.0)
+    tmpo=obj_head.next;
+    while (tmpo!=&obj_head) {
+      if (tmpo->host==host && (squadron<0||tmpo->squadron==squadron) &&
+	    !(tmpo->flags&OF_ACTIVE) &&
+	    (tmpo->squadron<0||squadrons[tmpo->squadron].action==SA_PARKED||
+	    squadrons[tmpo->squadron].action==SA_LAUNCHING)) {
+	if (tmpo->fuel<=0.0)
 //When low on fuel, not zero, gets launched and captured.
-	  LBts(&squadrons[tempo->squadron].dead_mask,tempo->member_num);
+	  LBts(&squadrons[tmpo->squadron].dead_mask,tmpo->member_num);
 	else {
-	  tempo->flags=tempo->flags&~OF_RETURNING|OF_ACTIVE;
-	  tempo->é=host->é;
+	  tmpo->flags=tmpo->flags&~OF_RETURNING|OF_ACTIVE;
+	  tmpo->é=host->é;
 	  if (x==MAX_F64 || y==MAX_F64 || Sqr(x-host->x)+Sqr(y-host->y)>3*3)
-	    tempo->dé=Wrap(é-tempo->é,-ã);
+	    tmpo->dé=Wrap(é-tmpo->é,-ã);
 	  else
-	    tempo->dé=0;
-	  tempo->x=host->x;
-	  tempo->y=host->y;
+	    tmpo->dé=0;
+	  tmpo->x=host->x;
+	  tmpo->y=host->y;
 	  host->next_action_time=cur_time+0.25/game_speed;
-	  return tempo;
+	  return tmpo;
 	}
       }
-      tempo=tempo->next;
+      tmpo=tmpo->next;
     }
   }
   return NULL;
@@ -419,23 +419,23 @@ Obj *ObjLaunch(I64 player,I64 squadron=-1,
 
 Squadron *SquadronLaunch(I64 player,F64 x=MAX_F64,F64 y=MAX_F64)
 {
-  Squadron *temps;
-  Obj *tempo;
-  if (tempo=ObjLaunch(player,,,x,y)) {
+  Squadron *tmps;
+  Obj *tmpo;
+  if (tmpo=ObjLaunch(player,,,x,y)) {
     if (player==0) {
-      launch_unit_x1=tempo->x;
-      launch_unit_y1=tempo->y;
+      launch_unit_x1=tmpo->x;
+      launch_unit_y1=tmpo->y;
       launch_unit_x2=ip.pos.x-main_task->pix_left-main_task->scroll_x;
       launch_unit_y2=ip.pos.y-main_task->pix_top -main_task->scroll_y;
       launch_t=tS+0.5;
     }
-    if (tempo->squadron>=0) {
-      temps=&squadrons[tempo->squadron];
-      if (temps->action==SA_PARKED) {
-	temps->action=SA_LAUNCHING;
-	temps->é=tempo->é+tempo->dé;
+    if (tmpo->squadron>=0) {
+      tmps=&squadrons[tmpo->squadron];
+      if (tmps->action==SA_PARKED) {
+	tmps->action=SA_LAUNCHING;
+	tmps->é=tmpo->é+tmpo->dé;
       }
-      return temps;
+      return tmps;
     }
   }
   return NULL;
@@ -443,31 +443,31 @@ Squadron *SquadronLaunch(I64 player,F64 x=MAX_F64,F64 y=MAX_F64)
 
 Obj *ObjReturn(I64 player,F64 x,F64 y)
 {
-  Obj *tempo;
-  if (tempo=ObjFind(x,y,OF_ACTIVE,OF_ACTIVE,1<<OT_FIGHTER,1<<player))
-    tempo->flags|=OF_RETURNING;
-  return tempo;
+  Obj *tmpo;
+  if (tmpo=ObjFind(x,y,OF_ACTIVE,OF_ACTIVE,1<<OT_FIGHTER,1<<player))
+    tmpo->flags|=OF_RETURNING;
+  return tmpo;
 }
 
 Squadron *SquadronReturn(I64 player,F64 x,F64 y)
 {
-  Squadron *temps;
-  Obj *tempo;
-  if (tempo=ObjReturn(player,x,y)) {
+  Squadron *tmps;
+  Obj *tmpo;
+  if (tmpo=ObjReturn(player,x,y)) {
     if (player==0) {
-      return_unit_x1=tempo->x;
-      return_unit_y1=tempo->y;
-      if (tempo->host) {
-	return_unit_x2=tempo->host->x;
-	return_unit_y2=tempo->host->y;
+      return_unit_x1=tmpo->x;
+      return_unit_y1=tmpo->y;
+      if (tmpo->host) {
+	return_unit_x2=tmpo->host->x;
+	return_unit_y2=tmpo->host->y;
 	return_t=tS+0.5;
       }
     }
-    if (tempo->squadron>=0) {
-      temps=&squadrons[tempo->squadron];
-      if (temps->action==SA_FLYING)
-	temps->action=SA_RETURNING;
-      return temps;
+    if (tmpo->squadron>=0) {
+      tmps=&squadrons[tmpo->squadron];
+      if (tmps->action==SA_FLYING)
+	tmps->action=SA_RETURNING;
+      return tmps;
     }
   }
   return NULL;
@@ -475,36 +475,36 @@ Squadron *SquadronReturn(I64 player,F64 x,F64 y)
 
 Obj *ObjSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 {
-  Obj *tempo;
-  if ((tempo=ObjFind(x,y,,,,1<<player)) && tempo->flags&OF_ACTIVE &&
-	!(tempo->flags&OF_RETURNING)) {
+  Obj *tmpo;
+  if ((tmpo=ObjFind(x,y,,,,1<<player)) && tmpo->flags&OF_ACTIVE &&
+	!(tmpo->flags&OF_RETURNING)) {
     if (é==MAX_F64)
-      é=Arg(x-tempo->x,y-tempo->y);
-    tempo->dé+=Wrap(é-(tempo->é+tempo->dé),-ã);
-    return tempo;
+      é=Arg(x-tmpo->x,y-tmpo->y);
+    tmpo->dé+=Wrap(é-(tmpo->é+tmpo->dé),-ã);
+    return tmpo;
   }
   return NULL;
 }
 
 Squadron *SquadronSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 {
-  Squadron *temps;
-  Obj *tempo;
-  if (tempo=ObjSeté(player,x,y,é)) {
+  Squadron *tmps;
+  Obj *tmpo;
+  if (tmpo=ObjSeté(player,x,y,é)) {
     if (player==0) {
-      set_é_unit_x1=tempo->x;
-      set_é_unit_y1=tempo->y;
+      set_é_unit_x1=tmpo->x;
+      set_é_unit_y1=tmpo->y;
       set_é_unit_x2=ip.pos.x-main_task->pix_left-main_task->scroll_x;
       set_é_unit_y2=ip.pos.y-main_task->pix_top -main_task->scroll_y;
       set_é_t=tS+0.5;
     }
-    if (tempo->squadron>=0) {
-      temps=&squadrons[tempo->squadron];
-      if (temps->action==SA_FLYING) {
-	temps->action=SA_SET_é;
-	temps->é=tempo->é+tempo->dé;
+    if (tmpo->squadron>=0) {
+      tmps=&squadrons[tmpo->squadron];
+      if (tmps->action==SA_FLYING) {
+	tmps->action=SA_SET_é;
+	tmps->é=tmpo->é+tmpo->dé;
       }
-      return temps;
+      return tmps;
     }
   }
   return NULL;
@@ -513,76 +513,76 @@ Squadron *SquadronSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
 U0 SquadronActions()
 {
   I64 i,completed_mask;
-  Obj *tempo;
-  Squadron *temps;
-  for (i=0,temps=squadrons;i<num_squadrons;i++,temps++) {
+  Obj *tmpo;
+  Squadron *tmps;
+  for (i=0,tmps=squadrons;i<num_squadrons;i++,tmps++) {
     completed_mask=0;
-    switch (temps->action) {
+    switch (tmps->action) {
       case SA_LAUNCHING:
-	ObjLaunch(temps->player,i,temps->host,,,temps->é);
-	tempo=temps->next_in_squadron;
-	while (tempo!=temps) {
-	  LBEqu(&completed_mask,tempo->member_num,tempo->flags&OF_ACTIVE);
-	  tempo=tempo->next_in_squadron;
+	ObjLaunch(tmps->player,i,tmps->host,,,tmps->é);
+	tmpo=tmps->next_in_squadron;
+	while (tmpo!=tmps) {
+	  LBEqu(&completed_mask,tmpo->member_num,tmpo->flags&OF_ACTIVE);
+	  tmpo=tmpo->next_in_squadron;
 	}
-	if (completed_mask|temps->dead_mask==temps->total_mask)
-	  temps->action=SA_FLYING;
+	if (completed_mask|tmps->dead_mask==tmps->total_mask)
+	  tmps->action=SA_FLYING;
 	break;
       case SA_FLYING:
-	tempo=temps->next_in_squadron;
-	while (tempo!=temps) {
-	  LBEqu(&completed_mask,tempo->member_num,!(tempo->flags&OF_ACTIVE));
-	  tempo=tempo->next_in_squadron;
+	tmpo=tmps->next_in_squadron;
+	while (tmpo!=tmps) {
+	  LBEqu(&completed_mask,tmpo->member_num,!(tmpo->flags&OF_ACTIVE));
+	  tmpo=tmpo->next_in_squadron;
 	}
-	if (completed_mask|temps->dead_mask==temps->total_mask)
-	  temps->action=SA_PARKED;
+	if (completed_mask|tmps->dead_mask==tmps->total_mask)
+	  tmps->action=SA_PARKED;
 	break;
       case SA_SET_é:
-	tempo=temps->next_in_squadron;
-	while (tempo!=temps) {
-	  tempo->dé+=Wrap(temps->é-(tempo->é+tempo->dé),-ã);
-	  tempo=tempo->next_in_squadron;
+	tmpo=tmps->next_in_squadron;
+	while (tmpo!=tmps) {
+	  tmpo->dé+=Wrap(tmps->é-(tmpo->é+tmpo->dé),-ã);
+	  tmpo=tmpo->next_in_squadron;
 	}
-	temps->action=SA_FLYING;
+	tmps->action=SA_FLYING;
 	break;
       case SA_RETURNING:
-	tempo=temps->next_in_squadron;
-	while (tempo!=temps) {
-	  tempo->flags|=OF_RETURNING;
-	  LBEqu(&completed_mask,tempo->member_num,!(tempo->flags&OF_ACTIVE));
-	  tempo=tempo->next_in_squadron;
+	tmpo=tmps->next_in_squadron;
+	while (tmpo!=tmps) {
+	  tmpo->flags|=OF_RETURNING;
+	  LBEqu(&completed_mask,tmpo->member_num,!(tmpo->flags&OF_ACTIVE));
+	  tmpo=tmpo->next_in_squadron;
 	}
-	if (completed_mask|temps->dead_mask==temps->total_mask)
-	  temps->action=SA_PARKED;
+	if (completed_mask|tmps->dead_mask==tmps->total_mask)
+	  tmps->action=SA_PARKED;
 	break;
     }
-    if (temps->dead_mask==temps->total_mask)
-      temps->action=SA_DEAD;
+    if (tmps->dead_mask==tmps->total_mask)
+      tmps->action=SA_DEAD;
   }
 }
 
 U0 AI(I64 player,F64 period)
 {
-  Obj *tempo;
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    if (tempo->player==player) {
-      if (tempo->type==OT_CARRIER && Rand<5*period)
-	SquadronLaunch(player,tempo->x,tempo->y);
-      if (tempo->flags&OF_ACTIVE && !(tempo->flags&OF_RETURNING) &&
+  Obj *tmpo;
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    if (tmpo->player==player) {
+      if (tmpo->type==OT_CARRIER && Rand<5*period)
+	SquadronLaunch(player,tmpo->x,tmpo->y);
+      if (tmpo->flags&OF_ACTIVE && !(tmpo->flags&OF_RETURNING) &&
 	    Rand<10.0*period)
-	SquadronSeté(player,tempo->x,tempo->y,tempo->é+pi/2*(Rand-0.5));
+	SquadronSeté(player,tmpo->x,tmpo->y,tmpo->é+pi/2*(Rand-0.5));
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
 }
 
-U0 ShipDammage(Obj *tempo,F64 d)
+U0 ShipDamage(Obj *tmpo,F64 d)
 {
   I64 i,x=Rand*FIRE_WIDTH,y=Rand*FIRE_HEIGHT;
-  tempo->life_percent-=d;
+  tmpo->life_percent-=d;
   while (d>0) {
-    if (!Bts(tempo->fire,y*FIRE_WIDTH+x))
+    if (!Bts(tmpo->fire,y*FIRE_WIDTH+x))
       d-=500.0/(FIRE_WIDTH*FIRE_HEIGHT);
     else
       d-=25.0/(FIRE_WIDTH*FIRE_HEIGHT);
@@ -600,16 +600,16 @@ U0 ShipDammage(Obj *tempo,F64 d)
   }
 }
 
-U0 ShipFix(Obj *tempo,F64 d)
+U0 ShipFix(Obj *tmpo,F64 d)
 {
-  tempo->life_percent+=d;
-  if (tempo->life_percent>=100.0) {
-    tempo->life_percent=100.0;
-    MemSet(tempo->fire,0,sizeof(Obj.fire));
+  tmpo->life_percent+=d;
+  if (tmpo->life_percent>=100.0) {
+    tmpo->life_percent=100.0;
+    MemSet(tmpo->fire,0,sizeof(Obj.fire));
     return;
   }
   while (d>0)
-    if (Btr(tempo->fire,FIRE_WIDTH*FIRE_HEIGHT*Rand))
+    if (Btr(tmpo->fire,FIRE_WIDTH*FIRE_HEIGHT*Rand))
       d-=400.0/(FIRE_WIDTH*FIRE_HEIGHT);
     else
       d-=20.0/(FIRE_WIDTH*FIRE_HEIGHT);
@@ -618,35 +618,35 @@ U0 ShipFix(Obj *tempo,F64 d)
 U0 Combat(F64 period)
 {
   F64 d;
-  Obj *tempo,*tempo1;
-  Torpedo *tempt;
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    tempo->flags&=~OF_SHOOTING;
-    if (tempo->flags&OF_ACTIVE &&
-	  (tempo1=ObjFind(tempo->x,tempo->y,OF_ACTIVE,OF_ACTIVE,,
-	  1<<(tempo->player^1),&d))) {
-      tempo->target_x=tempo1->x;
-      tempo->target_y=tempo1->y;
-      if (tempo1->flags&OF_SHIP) {
-	if (tempo->torpedos && d<tempo->torpedos_range && Rand<125*period) {
-	  tempo->torpedos--;
-	  tempt=CAlloc(sizeof(Torpedo));
-	  tempt->x=tempo->x;
-	  tempt->y=tempo->y;
-	  tempt->speed=100;
-	  d/=tempt->speed*(GAME_SPEED_SCALE*game_speed);
-	  tempo1->death_time=tempt->timeout=tS+d;
-	  tempt->target=tempo1;
-	  tempt->é=Arg(tempo1->x-tempo->x,tempo1->y-tempo->y);
-	  QueIns(tempt,torpedo_head.last);
+  Obj *tmpo,*tmpo1;
+  Torpedo *tmpt;
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    tmpo->flags&=~OF_SHOOTING;
+    if (tmpo->flags&OF_ACTIVE &&
+	  (tmpo1=ObjFind(tmpo->x,tmpo->y,OF_ACTIVE,OF_ACTIVE,,
+	  1<<(tmpo->player^1),&d))) {
+      tmpo->target_x=tmpo1->x;
+      tmpo->target_y=tmpo1->y;
+      if (tmpo1->flags&OF_SHIP) {
+	if (tmpo->torpedos && d<tmpo->torpedos_range && Rand<125*period) {
+	  tmpo->torpedos--;
+	  tmpt=CAlloc(sizeof(Torpedo));
+	  tmpt->x=tmpo->x;
+	  tmpt->y=tmpo->y;
+	  tmpt->speed=100;
+	  d/=tmpt->speed*(GAME_SPEED_SCALE*game_speed);
+	  tmpo1->death_time=tmpt->timeout=tS+d;
+	  tmpt->target=tmpo1;
+	  tmpt->é=Arg(tmpo1->x-tmpo->x,tmpo1->y-tmpo->y);
+	  QueIns(tmpt,torpedo_head.last);
 	  Sweep(2000,2000,300);
-	} else if (tempo->ship_guns>0 && d<tempo->ship_guns_range) {
-	  tempo->flags|=OF_SHOOTING;
+	} else if (tmpo->ship_guns>0 && d<tmpo->ship_guns_range) {
+	  tmpo->flags|=OF_SHOOTING;
 	  if (Rand<125.0*period) {
-	    ShipDammage(tempo1,tempo->ship_guns*Rand*period);
+	    ShipDamage(tmpo1,tmpo->ship_guns*Rand*period);
 	    if (Rand<10.0*period)
-	      tempo1->fuel*=0.75*Rand+0.25;
+	      tmpo1->fuel*=0.75*Rand+0.25;
 	  }
 	  if (tS>next_noise) {
 	    Noise(100,75,200);
@@ -654,12 +654,12 @@ U0 Combat(F64 period)
 	  }
 	}
       } else {
-	if (tempo->air_guns>0 && d<tempo->air_guns_range) {
-	  tempo->flags|=OF_SHOOTING;
+	if (tmpo->air_guns>0 && d<tmpo->air_guns_range) {
+	  tmpo->flags|=OF_SHOOTING;
 	  if (Rand<125.0*period) {
-	    tempo1->life_percent-=tempo->air_guns*Rand*period;
+	    tmpo1->life_percent-=tmpo->air_guns*Rand*period;
 	    if (Rand<10.0*period)
-	      tempo1->fuel*=0.75*Rand+0.25;
+	      tmpo1->fuel*=0.75*Rand+0.25;
 	  }
 	  if (tS>next_noise) {
 	    Noise(25,500,2000);
@@ -668,109 +668,109 @@ U0 Combat(F64 period)
 	}
       }
     }
-    tempo=tempo->next;
+    tmpo=tmpo->next;
   }
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    tempo1=tempo->next;
-    if (tempo->type==OT_FIGHTER &&
-	  (tempo->life_percent<=0.0 || tempo->flags&OF_ACTIVE &&
-	  tempo->fuel<=0.0 || tempo->host &&
-	  !(tempo->flags&OF_ACTIVE) && tempo->host->life_percent<=0.0))
-      ObjDel(tempo);
-    tempo=tempo1;
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    tmpo1=tmpo->next;
+    if (tmpo->type==OT_FIGHTER &&
+	  (tmpo->life_percent<=0.0 || tmpo->flags&OF_ACTIVE &&
+	  tmpo->fuel<=0.0 || tmpo->host &&
+	  !(tmpo->flags&OF_ACTIVE) && tmpo->host->life_percent<=0.0))
+      ObjDel(tmpo);
+    tmpo=tmpo1;
   }
-  tempo=obj_head.next;
-  while (tempo!=&obj_head) {
-    tempo1=tempo->next;
-    if (tempo->life_percent<=0.0)
-      ObjDel(tempo);
-    tempo=tempo1;
+  tmpo=obj_head.next;
+  while (tmpo!=&obj_head) {
+    tmpo1=tmpo->next;
+    if (tmpo->life_percent<=0.0)
+      ObjDel(tmpo);
+    tmpo=tmpo1;
   }
 }
 
 #define ANIMATE_FREQ	50
 U0 AnimateTask(I64)
 {
-  Obj *tempo;
-  Torpedo *tempt,*tempt1;
+  Obj *tmpo;
+  Torpedo *tmpt,*tmpt1;
   F64 d,period;
 
   while (TRUE) {
     period=GAME_SPEED_SCALE*game_speed/ANIMATE_FREQ;
     SquadronActions;
 
-    tempo=obj_head.next;
-    while (tempo!=&obj_head) {
-      if (tempo->flags&OF_ACTIVE && tempo->fuel>0) {
-	if (tempo->dé) {
-	  d=tempo->dé;
-	  if (d> tempo->turn_rate*period) d= tempo->turn_rate*period;
-	  if (d<-tempo->turn_rate*period) d=-tempo->turn_rate*period;
-	  tempo->é +=d;
-	  tempo->dé-=d;
+    tmpo=obj_head.next;
+    while (tmpo!=&obj_head) {
+      if (tmpo->flags&OF_ACTIVE && tmpo->fuel>0) {
+	if (tmpo->dé) {
+	  d=tmpo->dé;
+	  if (d> tmpo->turn_rate*period) d= tmpo->turn_rate*period;
+	  if (d<-tmpo->turn_rate*period) d=-tmpo->turn_rate*period;
+	  tmpo->é +=d;
+	  tmpo->dé-=d;
 	}
-	tempo->x+=tempo->speed*Cos(tempo->é)*period*tempo->life_percent/100.0;
-	tempo->y+=tempo->speed*Sin(tempo->é)*period*tempo->life_percent/100.0;
-	tempo->fuel-=tempo->speed*tempo->fuel_burn_rate*period;
+	tmpo->x+=tmpo->speed*Cos(tmpo->é)*period*tmpo->life_percent/100.0;
+	tmpo->y+=tmpo->speed*Sin(tmpo->é)*period*tmpo->life_percent/100.0;
+	tmpo->fuel-=tmpo->speed*tmpo->fuel_burn_rate*period;
       }
-      tempo=tempo->next;
+      tmpo=tmpo->next;
     }
 
-    tempt=torpedo_head.next;
-    while (tempt!=&torpedo_head) {
-      tempt1=tempt->next;
-      if (tS>tempt->timeout) {
-	tempo=tempt->target;
+    tmpt=torpedo_head.next;
+    while (tmpt!=&torpedo_head) {
+      tmpt1=tmpt->next;
+      if (tS>tmpt->timeout) {
+	tmpo=tmpt->target;
 	if (Rand<0.333333) {
-	  ShipDammage(tempo,150*Rand*Rand);
+	  ShipDamage(tmpo,150*Rand*Rand);
 	  if (Rand<0.333333)
-	    tempo->fuel*=0.75*Rand+0.25;
+	    tmpo->fuel*=0.75*Rand+0.25;
 	}
-	QueRem(tempt);
-	Free(tempt);
+	QueRem(tmpt);
+	Free(tmpt);
       } else {
-	tempt->x+=tempt->speed*Cos(tempt->é)*period;
-	tempt->y+=tempt->speed*Sin(tempt->é)*period;
+	tmpt->x+=tmpt->speed*Cos(tmpt->é)*period;
+	tmpt->y+=tmpt->speed*Sin(tmpt->é)*period;
       }
-      tempt=tempt1;
+      tmpt=tmpt1;
     }
 
-    tempo=obj_head.next;
-    while (tempo!=&obj_head) {
-      if (tempo->host && !(tempo->flags&OF_ACTIVE)) {
-	tempo->x=tempo->host->x;
-	tempo->y=tempo->host->y;
+    tmpo=obj_head.next;
+    while (tmpo!=&obj_head) {
+      if (tmpo->host && !(tmpo->flags&OF_ACTIVE)) {
+	tmpo->x=tmpo->host->x;
+	tmpo->y=tmpo->host->y;
       }
-      tempo=tempo->next;
+      tmpo=tmpo->next;
     }
 
-    tempo=obj_head.next;
-    while (tempo!=&obj_head) {
-      if (tempo->flags&OF_ACTIVE) {
-	if (tempo->host) {
-	  d=Sqrt(Sqr(tempo->x-tempo->host->x)+Sqr(tempo->y-tempo->host->y));
-	  if (d<8 && tempo->max_fuel-tempo->fuel>30) {
-	    tempo->life_percent=100.0;
-	    if (tempo->host->fuel>0) {
-	      d=tempo->max_fuel-tempo->fuel;
-	      if (d>tempo->host->fuel) d=tempo->host->fuel;
-	      tempo->host->fuel-=d;
-	      tempo->fuel+=d;
+    tmpo=obj_head.next;
+    while (tmpo!=&obj_head) {
+      if (tmpo->flags&OF_ACTIVE) {
+	if (tmpo->host) {
+	  d=Sqrt(Sqr(tmpo->x-tmpo->host->x)+Sqr(tmpo->y-tmpo->host->y));
+	  if (d<8 && tmpo->max_fuel-tmpo->fuel>30) {
+	    tmpo->life_percent=100.0;
+	    if (tmpo->host->fuel>0) {
+	      d=tmpo->max_fuel-tmpo->fuel;
+	      if (d>tmpo->host->fuel) d=tmpo->host->fuel;
+	      tmpo->host->fuel-=d;
+	      tmpo->fuel+=d;
 	    }
-	    tempo->torpedos=tempo->max_torpedos;
-	    tempo->x=tempo->host->x;
-	    tempo->y=tempo->host->y;
-	    tempo->flags&=~OF_ACTIVE;
-	  } else if (d>tempo->fuel-250)
-	    tempo->flags|=OF_RETURNING;
-	  if (tempo->flags&OF_RETURNING)
-	    tempo->dé+=Wrap(Arg(tempo->host->x-tempo->x,
-		  tempo->host->y-tempo->y)-(tempo->é+tempo->dé),-ã);
-	} else if (tempo->type==OT_CARRIER)
-	  ShipFix(tempo,2.5*period);
+	    tmpo->torpedos=tmpo->max_torpedos;
+	    tmpo->x=tmpo->host->x;
+	    tmpo->y=tmpo->host->y;
+	    tmpo->flags&=~OF_ACTIVE;
+	  } else if (d>tmpo->fuel-250)
+	    tmpo->flags|=OF_RETURNING;
+	  if (tmpo->flags&OF_RETURNING)
+	    tmpo->dé+=Wrap(Arg(tmpo->host->x-tmpo->x,
+		  tmpo->host->y-tmpo->y)-(tmpo->é+tmpo->dé),-ã);
+	} else if (tmpo->type==OT_CARRIER)
+	  ShipFix(tmpo,2.5*period);
       }
-      tempo=tempo->next;
+      tmpo=tmpo->next;
     }
 
     AI(1,period);
@@ -793,7 +793,7 @@ U0 FlatTops()
   PopUpOk("$$GREEN$${Left-Mouse}$$FG$$\t\tChange Course\n"
 	"$$GREEN$${Right-Mouse}$$FG$$\t\tLaunch Squadron\n"
 	"$$GREEN$${Right-Double-Mouse}$$FG$$\tReturn Squadron\n"
-	"$$GREEN$${Ctrl-Left Grab}$$FG$$\tScroll Screen\n");
+	"$$GREEN$${Ctrl-Left Grab}$$FG$$\tScroll Scrn\n");
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"

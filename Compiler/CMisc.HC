@@ -69,11 +69,11 @@ U0 StreamPrint(U8 *fmt,...)
 {//Injects text into the compile stream. Used in #exe{} blocks.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st;
   CCmpCtrl *cc=Fs->last_cc;
-  CStreamBlk *tempe=cc->last_stream_blk;
-  if (tempe!=&cc->next_stream_blk) {
-    st=MStrPrint("%s%s",tempe->body,buf);
-    Free(tempe->body);
-    tempe->body=st;
+  CStreamBlk *tmpe=cc->last_stream_blk;
+  if (tmpe!=&cc->next_stream_blk) {
+    st=MStrPrint("%s%s",tmpe->body,buf);
+    Free(tmpe->body);
+    tmpe->body=st;
   } else
     PrintErr("No exe{} blk\n");
   Free(buf);
@@ -140,9 +140,12 @@ U8 *CmdLinePmt()
     Free(st);
   }
   '>';
-  if (IsDbg&&IsRaw)
+  if (IsDbgMode&&IsRaw)
     RawDr;
+ 
+  LBts(&Fs->task_flags,TASKf_CMD_LINE_PMT);
   st=GetStr(,,GSF_SHIFT_ESC_EXIT);
+  LBtr(&Fs->task_flags,TASKf_CMD_LINE_PMT);
 
   i=StrLen(st);
   res=MAlloc(i+1+2);

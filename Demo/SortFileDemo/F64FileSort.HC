@@ -56,7 +56,7 @@ U0 F64FileSortDAT(U8 *in_name,U8 *out_name)
   FileWrite(out_name,a,size);
   Free(a);
 }
-F64FileSortDAT("~/DemoUnsortedF64.DAT.Z","~/DemoSortedF64.DAT.Z");
+F64FileSortDAT("~/DemoUnsortedF64.DATA.Z","~/DemoSortedF64.DATA.Z");
 
 U0 F64FileDumpDAT(U8 *in_name)
 {//$LK,"File/CFile",A="HI:File/CFile"$, $LK,"::/Demo/Dsk/DataBase.HC"$
@@ -68,5 +68,5 @@ U0 F64FileDumpDAT(U8 *in_name)
     "%12.6f\n",a[i];
   Free(a);
 }
-F64FileDumpDAT("~/DemoUnsortedF64.DAT.Z");
-F64FileDumpDAT("~/DemoSortedF64.DAT.Z");
+F64FileDumpDAT("~/DemoUnsortedF64.DATA.Z");
+F64FileDumpDAT("~/DemoSortedF64.DATA.Z");

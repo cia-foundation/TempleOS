@@ -151,9 +151,9 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
 
   DocUnlock(doc);
   if (!(dof_flags&DOF_DONT_WINMGR_SYNC)) {
-    WinMgrSync(2,TRUE);
+    Refresh(2,TRUE);
     if (doc->flags&DOCF_MIN_SIZE)
-      WinMgrSync(2,TRUE);
+      Refresh(2,TRUE);
   }
   res=View;
 

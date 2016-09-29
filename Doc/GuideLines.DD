@@ -14,7 +14,7 @@ $FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is
 
 $FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.  The $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ is the father of all tasks, like Adam and Eve.
 
-$FG,2$/0000Boot$FG$ Boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $FG,2$0000Kernel.BIN.C$FG$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
+$FG,2$/0000Boot$FG$ Boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $LK,"0000Kernel.BIN.C",A="FI:::/Kernel/Kernel.PRJ"$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
 
 
 
@@ -28,7 +28,7 @@ $LK,"~/PersonalNotes.DD"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT
 
 $LK,"~/MakeHome.HC"$ a file compiled by the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ during $LK,"StartOS",A="FF:::/StartOS.HC,MakeHome"$.
 
-$FG,4$~/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$~$FG$ and customize them.  These files are invoked when the adam task starts-up.
+$FG,4$~/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$~$FG$ and customize them.  These files are invoked when the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ starts-up.
 
 $LK,"~/DoOnce.HC"$ a file invoked at the start-up of the first user.  Customize this!
 
@@ -46,7 +46,7 @@ $FG,5$$TX+CX,"Application Policies"$$FG$
 
 * Place user data in a subdirectory of $FG,2$/Home$FG$, preferably naming the subdirectory the same as the $FG,2$/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.HC.Z$FG$ file.  See $LK,"::/Demo/RegistryDemo.HC"$.
 
-* If the app needs files in the $FG,2$/Home$FG$ directory, make an $FG,2$/Apps$FG$ file called $FG,2$Install.HC.Z$FG$ or $FG,2$Install.AUT.Z$FG$ to create the $FG,2$/Home$FG$ subdirectory.
+* If the app needs files in the $FG,2$/Home$FG$ directory, make an $FG,2$/Apps$FG$ file called $FG,2$Install.HC.Z$FG$ or $FG,2$Install.IN.Z$FG$ to create the $FG,2$/Home$FG$ subdirectory.
 
  
 

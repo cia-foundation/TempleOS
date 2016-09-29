@@ -18,17 +18,17 @@ U0 InsFileLink()
 
 U0 InsDirLinks()
 {
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   U8 *st=PopUpPickDir,*st2;
   st[0]=':';  //This is my personal code, not production. LOL
   st2=MStrPrint("%s/*",st);
-  tempde=tempde1=FilesFind(st2,FUF_JUST_FILES);
-  while (tempde) {
-    tempde->full_name[0]=':';
-    "$$LK,\"%s\",A=\"FI:%s\"$$\n",tempde->full_name+2,tempde->full_name;
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(st2,FUF_JUST_FILES);
+  while (tmpde) {
+    tmpde->full_name[0]=':';
+    "$$LK,\"%s\",A=\"FI:%s\"$$\n",tmpde->full_name+2,tmpde->full_name;
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   Free(st);
   Free(st2);
 }
@@ -309,9 +309,9 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'g':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Edit/BlogScreenShot");
+	  KeyDescSet("Edit/BlogScrnShot");
 	else
-	  BlogScreenShot;
+	  BlogScrnShot;
 	return TRUE;
       case 'p':
 	if (sc&SCF_KEY_DESC)

@@ -11,39 +11,39 @@ U0 HashFunSegFind(CHashTable *h,U8 *addr,
 	Bool *_has_lower,U64 *_best,CHash **_res)
 {
   Bool *has_lower=*_has_lower;
-  CHashExport *tempex;
+  CHashExport *tmpex;
   U64 i,j,best=*_best;
   CHash *res=*_res;
   for (i=0;i<=h->mask;i++) {
-    tempex=h->body[i];
-    while (tempex) {
+    tmpex=h->body[i];
+    while (tmpex) {
       j=0;
-      if (tempex->type&HTT_FUN) {
-	if (!Bt(&tempex(CHashFun *)->flags,Cf_EXTERN) &&
-	      !Bt(&tempex(CHashFun *)->flags,Ff_INTERNAL))
-	  j=tempex(CHashFun *)->exe_addr;
-      } else if (tempex->type&HTT_EXPORT_SYS_SYM)
-	j=tempex->val;
+      if (tmpex->type&HTT_FUN) {
+	if (!Bt(&tmpex(CHashFun *)->flags,Cf_EXTERN) &&
+	      !Bt(&tmpex(CHashFun *)->flags,Ff_INTERNAL))
+	  j=tmpex(CHashFun *)->exe_addr;
+      } else if (tmpex->type&HTT_EXPORT_SYS_SYM)
+	j=tmpex->val;
       if (j) {
 	j=addr(I64)-j;
 	if (0<=j<=best) {
-	  if (tempex->type&HTT_EXPORT_SYS_SYM) {
+	  if (tmpex->type&HTT_EXPORT_SYS_SYM) {
 	    if (j<best || j==best && !has_lower) {
-	      has_lower=HasLower(tempex->str);
+	      has_lower=HasLower(tmpex->str);
 	      best=j;
-	      res=tempex;
+	      res=tmpex;
 	    }
-	  } else if (tempex->type&HTT_FUN) {
+	  } else if (tmpex->type&HTT_FUN) {
 	    if (j<best || j==best &&
 		  (res && res->type&HTT_EXPORT_SYS_SYM||!has_lower)) {
-	      has_lower=HasLower(tempex->str);
+	      has_lower=HasLower(tmpex->str);
 	      best=j;
-	      res=tempex;
+	      res=tmpex;
 	    }
 	  }
 	}
       }
-      tempex=tempex->next;
+      tmpex=tmpex->next;
     }
   }
   *_has_lower=has_lower;
@@ -63,7 +63,7 @@ CHash *FunSegFind(U8 *addr,I64 *_offset)
     *_offset=best;
     return NULL;
   }
-  if (IsDbg)
+  if (IsDbgMode)
     for (i=0;i<mp_cnt;i++) {
       c=&cpu_structs[i];
       task=c->seth_task;
@@ -89,25 +89,25 @@ fs_abort_task:
   return res;
 }
 
-U0 FunSegCacheAdd(CHash *temps,U8 *addr)
+U0 FunSegCacheAdd(CHash *tmps,U8 *addr)
 {
   I64 i;
   CDbgInfo *dbg_info;
-  CFunSegCache *tempfsc;
-  if (temps && temps->type&HTT_FUN &&
-	(dbg_info=temps(CHashFun *)->dbg_info)) {
+  CFunSegCache *tmpfsc;
+  if (tmps && tmps->type&HTT_FUN &&
+	(dbg_info=tmps(CHashFun *)->dbg_info)) {
     lock i=dbg.fun_seg_cache_index++;
-    tempfsc=&dbg.fun_seg_cache[i&(FUN_SEG_CACHE_SIZE-1)];
-    tempfsc->base=dbg_info->body[0];
-    if (addr<tempfsc->base)
-      tempfsc->base=addr;
-    tempfsc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
-    if (addr>=tempfsc->limit)
-      tempfsc->limit=addr+1;
-    i=MinI64(StrLen(temps->str),FUN_SEG_CACHE_STR_LEN-1);
-    MemCpy(tempfsc->str,temps->str,i);
-    tempfsc->str[i]=0;
-    tempfsc->time_stamp=tS;
+    tmpfsc=&dbg.fun_seg_cache[i&(FUN_SEG_CACHE_SIZE-1)];
+    tmpfsc->base=dbg_info->body[0];
+    if (addr<tmpfsc->base)
+      tmpfsc->base=addr;
+    tmpfsc->limit=dbg_info->body[dbg_info->max_line+1-dbg_info->min_line];
+    if (addr>=tmpfsc->limit)
+      tmpfsc->limit=addr+1;
+    i=MinI64(StrLen(tmps->str),FUN_SEG_CACHE_STR_LEN-1);
+    MemCpy(tmpfsc->str,tmps->str,i);
+    tmpfsc->str[i]=0;
+    tmpfsc->time_stamp=tS;
   }
 }
 
@@ -115,17 +115,17 @@ U8 *FunSegCacheFind(U8 *addr,I64 *_offset)
 {
   I64 i;
   F64 timeout;
-  CFunSegCache *tempfsc=dbg.fun_seg_cache;
+  CFunSegCache *tmpfsc=dbg.fun_seg_cache;
   if (addr==SYS_IDLE_PT) {
     *_offset=0;
     return "SYS_IDLE_PT";
   } else {
     timeout=tS+8.0;
-    for (i=0;i<FUN_SEG_CACHE_SIZE;i++,tempfsc++)
-      if (tempfsc->base<=addr<tempfsc->limit &&
-	    tempfsc->time_stamp>timeout) {
-	*_offset=addr-tempfsc->base;
-	return tempfsc->str;
+    for (i=0;i<FUN_SEG_CACHE_SIZE;i++,tmpfsc++)
+      if (tmpfsc->base<=addr<tmpfsc->limit &&
+	    tmpfsc->time_stamp>timeout) {
+	*_offset=addr-tmpfsc->base;
+	return tmpfsc->str;
       }
     return NULL;
   }
@@ -134,21 +134,21 @@ U8 *FunSegCacheFind(U8 *addr,I64 *_offset)
 U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
 {
   I64 offset;
-  CHashExport *tempex;
+  CHashExport *tmpex;
   U8 *str,*str2;
   Bool is_fun=FALSE;
-  if (!(flags&SPF_TRUNCATE))
+  if (!(flags&PRTF_TRUNCATE))
     field_len=0;
   if (addr) {
     if (str=FunSegCacheFind(addr,&offset)) {
       if (addr!=SYS_IDLE_PT)
 	is_fun=TRUE;
     } else  {
-      if (tempex=FunSegFind(addr,&offset)) {
-	if (tempex->type&HTT_FUN)
+      if (tmpex=FunSegFind(addr,&offset)) {
+	if (tmpex->type&HTT_FUN)
 	  is_fun=TRUE;
-	FunSegCacheAdd(tempex,addr);
-	str=tempex->str;
+	FunSegCacheAdd(tmpex,addr);
+	str=tmpex->str;
       }
     }
     if (str) {
@@ -156,7 +156,7 @@ U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
       if (is_fun) {
 	str2=MStrPrint("&%s",str);
 	if (field_len>7) {
-	  if (flags&SPF_LEFT_JUSTIFY && StrLen(str2)<field_len-7)
+	  if (flags&PRTF_LEFT_JUSTIFY && StrLen(str2)<field_len-7)
 	    StrPrint(buf,"%s+0x%04X",str2,offset);
 	  else
 	    StrPrint(buf,"%*ts+0x%04X",field_len-7,str2,offset);
@@ -165,7 +165,7 @@ U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
 	Free(str2);
       } else {
 	if (field_len>7) {
-	  if (flags&SPF_LEFT_JUSTIFY && StrLen(str)<field_len-7)
+	  if (flags&PRTF_LEFT_JUSTIFY && StrLen(str)<field_len-7)
 	    StrPrint(buf,"%s+0x%04X",str,offset);
 	  else
 	    StrPrint(buf,"%*ts+0x%04X",field_len-7,str,offset);
@@ -175,7 +175,7 @@ U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
       return;
     }
   }
-  if (flags&SPF_TRUNCATE)
+  if (flags&PRTF_TRUNCATE)
     StrPrint(buf,"%*tX",field_len,addr);
   else
     StrPrint(buf,"%X",addr);
@@ -183,14 +183,14 @@ U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags)
 
 I64 SrcLineNum(U8 *addr,I64 cnt=1)
 {//linenum for src of addr.
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   I64 cur_line,first_line,last_line,num_lines,offset;
   CDbgInfo *dbg_info;
   U32 *body;
   U8 *src,*src2;
-  if (temph=FunSegFind(addr,&offset)) {
-    if (temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-      if (dbg_info=temph->dbg_info) {
+  if (tmph=FunSegFind(addr,&offset)) {
+    if (tmph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
+      if (dbg_info=tmph->dbg_info) {
 	num_lines=dbg_info->max_line-dbg_info->min_line+1;
 	body=dbg_info->body;
 
@@ -222,9 +222,9 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
 	if (addr<body[cur_line]+cnt)
 	  return cur_line+dbg_info->min_line;
 
-      } else if (temph->src_link) {
-	src =StrNew(temph->src_link);
-	src2=StrNew(temph->src_link);
+      } else if (tmph->src_link) {
+	src =StrNew(tmph->src_link);
+	src2=StrNew(tmph->src_link);
 	StrLastRem(src,",",src2);
 	cur_line=Str2I64(src2);
 	Free(src);
@@ -238,14 +238,14 @@ I64 SrcLineNum(U8 *addr,I64 cnt=1)
 
 U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
 {//MAlloc filename for src of addr.
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   I64 i,j,ii,offset,best=NULL,d,best_d;
   U32 *body;
   CDbgInfo *dbg_info;
   U8 *src;
-  if ((temph=FunSegFind(addr,&offset)) &&
-	temph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
-    if (dbg_info=temph->dbg_info) {
+  if ((tmph=FunSegFind(addr,&offset)) &&
+	tmph->type&(HTT_FUN|HTT_EXPORT_SYS_SYM)) {
+    if (dbg_info=tmph->dbg_info) {
       j=dbg_info->max_line-dbg_info->min_line+1;
       body=dbg_info->body;
       best_d=MAX_I64;
@@ -258,13 +258,13 @@ U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
 	    d=addr(I64)-body[i];
 	    if (d<best_d) {
 	      best_d=d;
-	      best=temph->src_link;
+	      best=tmph->src_link;
 	    }
 	  }
 	}
       }
     } else
-      best=temph->src_link;
+      best=tmph->src_link;
   }
   if (best) {
     src=StrNew(best,mem_task);
@@ -325,10 +325,10 @@ Bool Man(U8 *st,I64 edf_dof_flags=0)
 {//Owner's manual for symbol.  Edit src code for symbol.
   Bool res=FALSE;
   U8 **st2;
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   if (IsRaw) {
-    if ((temph=HashFind(st,Fs->hash_table,HTG_SRC_SYM)) && temph->src_link)
-      res=EdLiteFileLine(temph->src_link,edf_dof_flags);
+    if ((tmph=HashFind(st,Fs->hash_table,HTG_SRC_SYM)) && tmph->src_link)
+      res=EdLiteFileLine(tmph->src_link,edf_dof_flags);
   } else {
     st2=MStrPrint("MN:%s",st);
     res=Ed(st2,edf_dof_flags);

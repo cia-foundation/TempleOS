@@ -10,17 +10,17 @@ CLexFile *LexFilePush(CCmpCtrl *cc)
 
 CLexFile *LexFilePop(CCmpCtrl *cc)
 {//#include file pop.
-  CLexFile *tempf;
-  if (tempf=cc->lex_include_stk) {
-    if ((cc->lex_include_stk=tempf->next) || !(cc->flags & CCF_DONT_FREE_BUF)) {
-      if (tempf->flags & LFSF_DOC) {
-	if (tempf->doc)
-	  DocDel(tempf->doc);
+  CLexFile *tmpf;
+  if (tmpf=cc->lex_include_stk) {
+    if ((cc->lex_include_stk=tmpf->next) || !(cc->flags & CCF_DONT_FREE_BUF)) {
+      if (tmpf->flags & LFSF_DOC) {
+	if (tmpf->doc)
+	  DocDel(tmpf->doc);
       } else
-	Free(tempf->buf);;
+	Free(tmpf->buf);;
     }
-    Free(tempf->full_name);
-    Free(tempf);
+    Free(tmpf->full_name);
+    Free(tmpf);
   }
   return cc->lex_include_stk;
 }
@@ -31,7 +31,7 @@ CCmpCtrl *CmpCtrlNew(U8 *buf=NULL,I64 flags=0,U8 *filename=NULL)
   //FileName is for error reporting.  If files are #included,
   //new names are used.  See $LK,"Psalmody CmpCtrlNew",A="FF:::/Apps/Psalmody/PsalmodyFile.HC,CmpCtrlNew"$.
   CCmpCtrl *cc=CAlloc(sizeof(CCmpCtrl));
-  CLexFile *tempf;
+  CLexFile *tmpf;
   QueInit(cc);
   cc->flags=flags;
   cc->opts=1<<OPTf_WARN_UNUSED_VAR|1<<OPTf_WARN_HEADER_MISMATCH;
@@ -42,16 +42,16 @@ CCmpCtrl *CmpCtrlNew(U8 *buf=NULL,I64 flags=0,U8 *filename=NULL)
     cc->chars_bmp_alpha_numeric=chars_bmp_alpha_numeric_no_at;
   else
     cc->chars_bmp_alpha_numeric=chars_bmp_alpha_numeric;
-  tempf=LexFilePush(cc);
+  tmpf=LexFilePush(cc);
   QueInit(&cc->next_stream_blk);
   if (filename)
-    tempf->full_name=FileNameAbs(filename);
+    tmpf->full_name=FileNameAbs(filename);
   else
-    tempf->full_name=StrNew(blkdev.temp_filename);
+    tmpf->full_name=StrNew(blkdev.tmp_filename);
   if (flags & CCF_PMT)
     buf=CAlloc(8);
-  tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=buf;
-  tempf->line_num=1;
+  tmpf->buf=tmpf->buf_ptr=tmpf->line_start=cc->cur_buf_ptr=buf;
+  tmpf->line_num=1;
   return cc;
 }
 
@@ -69,19 +69,19 @@ U0 CmpCtrlDel(CCmpCtrl *cc)
 
 I64 CmpCtrlSize(CCmpCtrl *cc)
 {//Mem size of CCmpCtrl and its members.
-  CLexFile *tempf=cc->lex_include_stk;
+  CLexFile *tmpf=cc->lex_include_stk;
   I64 res=0;
-  while (tempf) {
-    if (tempf->next || !(cc->flags & CCF_DONT_FREE_BUF)) {
-      if (tempf->flags & LFSF_DOC) {
-	if (tempf->doc)
-	  res+=DocSize(tempf->doc);
+  while (tmpf) {
+    if (tmpf->next || !(cc->flags & CCF_DONT_FREE_BUF)) {
+      if (tmpf->flags & LFSF_DOC) {
+	if (tmpf->doc)
+	  res+=DocSize(tmpf->doc);
       } else
-	res+=MSize2(tempf->buf);
+	res+=MSize2(tmpf->buf);
     }
-    res+=MSize2(tempf->full_name);
-    res+=MSize2(tempf);
-    tempf=tempf->next;
+    res+=MSize2(tmpf->full_name);
+    res+=MSize2(tmpf);
+    tmpf=tmpf->next;
   }
   res+=MSize2(cc->cur_str);
   res+=MSize2(cc);
@@ -107,7 +107,7 @@ Bool LexDollar(CCmpCtrl *cc,CDoc *doc,CDocEntry *doc_e)
 I64 LexGetChar(CCmpCtrl *cc)
 {//Get one char from stream. Allow put-back one.
   U8 *ptr,*src;
-  CLexFile *tempf;
+  CLexFile *tmpf;
   CDoc *doc;
   CDocEntry *doc_e;
   if (!Btr(&cc->flags,CCf_USE_LAST_U16)) {
@@ -119,50 +119,50 @@ lgc_start1:
     switch [cc->last_U16=*src++] {
       case 0:
 lgc_here:
-	tempf=cc->lex_include_stk;
-	if (tempf->flags & LFSF_DOC) {
-	  doc=tempf->doc;
-	  doc_e=tempf->cur_entry;
+	tmpf=cc->lex_include_stk;
+	if (tmpf->flags & LFSF_DOC) {
+	  doc=tmpf->doc;
+	  doc_e=tmpf->cur_entry;
 	  doc_e=doc_e->next;
 lgc_start2:
 	  if (doc_e!=doc) {
-	    tempf->cur_entry=doc_e;
+	    tmpf->cur_entry=doc_e;
 	    switch [doc_e->type_u8] {
 	      case DOCT_TEXT:
 		if (doc_e->de_flags & ~(DOCEF_TAG|DOCEF_DEFINE|DOCEF_TAG_CB|
 		      DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT|
 		      DOCEF_SKIP|DOCEF_FILTER_SKIP) &&
 		      LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
-		  tempf->line_num=doc_e->y+1;
-		  tempf->buf_ptr=cc->cur_buf_ptr=src;
+		  tmpf->line_num=doc_e->y+1;
+		  tmpf->buf_ptr=cc->cur_buf_ptr=src;
 		} else if (*(src=doc_e->tag))
-		  tempf->buf_ptr=cc->cur_buf_ptr=src;
+		  tmpf->buf_ptr=cc->cur_buf_ptr=src;
 		else {
 		  doc_e=doc_e->next;
 		  goto lgc_start2;
 		}
 		break;
 	      case DOCT_NEW_LINE:
-		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		tempf->line_start=doc_e->next;
-		tempf->line_num=doc_e->y+2;//+1 because NEW_LINE is on prev line
+		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		tmpf->line_start=doc_e->next;
+		tmpf->line_num=doc_e->y+2;//+1 because NEW_LINE is on prev line
 //+1 because doc y starts at zero
 		cmp.compiled_lines++;
 		cc->last_U16='\n';
 		goto lgc_done;
 	      case DOCT_TAB:
-		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		tempf->line_num=doc_e->y+1;
+		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		tmpf->line_num=doc_e->y+1;
 		cc->last_U16='\t';
 		goto lgc_done;
 	      case DOCT_PAGE_BREAK:
-		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		tempf->line_num=doc_e->y+2; //TODO: should be a page down
+		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		tmpf->line_num=doc_e->y+2; //TODO: should be a page down
 		cc->last_U16=CH_FORM_FEED;
 		goto lgc_done;
 	      case DOCT_INS_BIN:
-		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		tempf->line_num=doc_e->y+1;
+		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		tmpf->line_num=doc_e->y+1;
 		Free(cc->cur_str);
 		cc->cur_str=NULL;
 		cc->cur_str_len=0;
@@ -176,21 +176,21 @@ lgc_start2:
 		cc->last_U16=TK_INS_BIN;
 		goto lgc_done;
 	      case DOCT_INS_BIN_SIZE:
-		tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
 		if (doc_e->bin_data)
 		  cc->cur_i64=doc_e->bin_data->size;
 		else
 		  cc->cur_i64=0;
-		tempf->line_num=doc_e->y+1;
+		tmpf->line_num=doc_e->y+1;
 		cc->last_U16=TK_INS_BIN_SIZE;
 		goto lgc_done;
 	      case DOCT_SHIFTED_Y:
 		if (LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
-		  tempf->line_num=doc_e->y+1;
-		  tempf->buf_ptr=cc->cur_buf_ptr=src;
+		  tmpf->line_num=doc_e->y+1;
+		  tmpf->buf_ptr=cc->cur_buf_ptr=src;
 		} else {
-		  tempf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		  tempf->line_num=doc_e->y+1;
+		  tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
+		  tmpf->line_num=doc_e->y+1;
 		  if (doc_e->attr<0)
 		    cc->last_U16=TK_SUPERSCRIPT;
 		  else if (doc_e->attr>0)
@@ -207,8 +207,8 @@ lgc_start2:
 	      case 0xFF: //nobound switch
 	      default:
 		if (LexDollar(cc,doc,doc_e) && *(src=cc->dollar_buf)) {
-		  tempf->line_num=doc_e->y+1;
-		  tempf->buf_ptr=cc->cur_buf_ptr=src;
+		  tmpf->line_num=doc_e->y+1;
+		  tmpf->buf_ptr=cc->cur_buf_ptr=src;
 		} else {
 		  doc_e=doc_e->next;
 		  goto lgc_start2;
@@ -217,25 +217,25 @@ lgc_start2:
 	  }
 	  if (doc_e!=doc)
 	    goto lgc_start1;
-	  tempf->cur_entry=doc->head.last; //When take next, will still be end.
+	  tmpf->cur_entry=doc->head.last; //When take next, will still be end.
 	}
-	tempf=cc->lex_include_stk;
-	if (tempf->next) {
-	  tempf=LexFilePop(cc);
-	  cc->cur_buf_ptr=tempf->buf_ptr;
+	tmpf=cc->lex_include_stk;
+	if (tmpf->next) {
+	  tmpf=LexFilePop(cc);
+	  cc->cur_buf_ptr=tmpf->buf_ptr;
 	  cc->flags&=~CCF_USE_LAST_U16;
-	  if (!(cc->last_U16=tempf->last_U16))
+	  if (!(cc->last_U16=tmpf->last_U16))
 	    goto lgc_start1;
 	} else {
 	  if (cc->flags & CCF_PMT) {
-	    Free(tempf->buf);
+	    Free(tmpf->buf);
 	    ptr=CmdLinePmt;
 	    if (StrCmp(ptr,"\n") && !cc->pmt_line++ && !StrCmp(ptr,"?\n") &&
 		cc->flags & CCF_QUESTION_HELP) {
 	      Free(ptr);
 	      ptr=StrNew("Help;;\n");
 	    }
-	    tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=ptr;
+	    tmpf->buf=tmpf->buf_ptr=tmpf->line_start=cc->cur_buf_ptr=ptr;
 	    goto lgc_start1;
 	  } else {
 	    if (src)
@@ -248,11 +248,11 @@ lgc_start2:
       case CH_FORM_FEED:
 	goto lgc_start1;
       case '\n':
-	tempf=cc->lex_include_stk;
-	if (!(tempf->flags & LFSF_DOC)) {
-	  tempf->line_num++;
+	tmpf=cc->lex_include_stk;
+	if (!(tmpf->flags & LFSF_DOC)) {
+	  tmpf->line_num++;
 	  cmp.compiled_lines++;
-	  tempf->line_start=src;
+	  tmpf->line_start=src;
 	}
 	break;
       case 0xFF: //nobound switch
@@ -277,21 +277,21 @@ U0 LexSkipEol(CCmpCtrl *cc)
 U8 *LexFirstRem(CCmpCtrl *cc,U8 *marker,I64 _len=NULL)
 {//$LK,"LexGetChar",A="MN:LexGetChar"$() chars making str until marker.
   U8 *res,*ptr;
-  CQueVectU8 *tempv=QueVectU8New;
+  CQueVectU8 *tmpv=QueVectU8New;
   I64 i,len=0;
   while (TRUE) {
     i=LexGetChar(cc);
     if (!i||StrOcc(marker,i))
       break;
-    QueVectU8Put(tempv,len++,i);
+    QueVectU8Put(tmpv,len++,i);
   }
   if (i)
     Bts(&cc->flags,CCf_USE_LAST_U16);
   res=ptr=MAlloc(len+1);
   for (i=0;i<len;i++)
-    *ptr++=QueVectU8Get(tempv,i);
+    *ptr++=QueVectU8Get(tmpv,i);
   *ptr=0;
-  QueVectU8Del(tempv);
+  QueVectU8Del(tmpv);
   if (_len) *_len=len;
   return res;
 }
@@ -299,13 +299,13 @@ U8 *LexFirstRem(CCmpCtrl *cc,U8 *marker,I64 _len=NULL)
 U0 LexIncludeStr(CCmpCtrl *cc,U8 *abs_filename,U8 *src,Bool actual_file)
 {
   LexBackupLastChar(cc);
-  CLexFile *tempf=LexFilePush(cc);
+  CLexFile *tmpf=LexFilePush(cc);
   if (actual_file)
-    tempf->full_name=StrNew(abs_filename);
+    tmpf->full_name=StrNew(abs_filename);
   else
-    tempf->full_name=StrNew(blkdev.temp_filename);
-  tempf->line_num=1;
-  tempf->buf=tempf->buf_ptr=tempf->line_start=cc->cur_buf_ptr=src;
+    tmpf->full_name=StrNew(blkdev.tmp_filename);
+  tmpf->line_num=1;
+  tmpf->buf=tmpf->buf_ptr=tmpf->line_start=cc->cur_buf_ptr=src;
 }
 
 CDoc *LexDocRead(U8 *abs_filename,I64 flags)
@@ -328,19 +328,19 @@ CDoc *LexDocRead(U8 *abs_filename,I64 flags)
 I64 cmp_type_flags_src_code[(DOCT_NUM_TYPES+63)/64]={
   1<<DOCT_TEXT|1<<DOCT_TAB|1<<DOCT_INS_BIN|1<<DOCT_INS_BIN_SIZE};
 
-U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
+U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tmpf=NULL,
 	CDoc *doc=NULL,U8 *abs_filename=NULL,CDocEntry *doc_e=NULL,I64 col=0)
 {//Start lexing doc. Give either doc or abs_filename.
   if (!doc)
     doc=LexDocRead(abs_filename,DOCF_DBL_DOLLARS);
-  if (!tempf) {
+  if (!tmpf) {
     LexBackupLastChar(cc);
-    tempf=LexFilePush(cc);
+    tmpf=LexFilePush(cc);
   }
   if (!doc_e)
     doc_e=doc->head.next;
-  tempf->full_name=StrNew(doc->filename.name);
-  tempf->doc=doc;
+  tmpf->full_name=StrNew(doc->filename.name);
+  tmpf->doc=doc;
   while (doc_e!=doc) {
     if (Bt(cmp_type_flags_src_code,doc_e->type_u8))
       break;
@@ -349,25 +349,25 @@ U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tempf=NULL,
   }
   if (doc_e!=doc) {
     col=ClampI64(col,doc_e->min_col,doc_e->max_col);
-    tempf->line_start=doc_e;
-    tempf->buf=NULL;
-    tempf->line_num=doc_e->y+1;
+    tmpf->line_start=doc_e;
+    tmpf->buf=NULL;
+    tmpf->line_num=doc_e->y+1;
     if (doc_e->type_u8==DOCT_TEXT) {
-      tempf->cur_entry=doc_e;
-      tempf->buf_ptr=doc_e->tag;
+      tmpf->cur_entry=doc_e;
+      tmpf->buf_ptr=doc_e->tag;
     } else {
-      tempf->cur_entry=doc_e->last; //TODO: might be problem at begin of file
-      tempf->buf_ptr=&lex_zeros;
+      tmpf->cur_entry=doc_e->last; //TODO: might be problem at begin of file
+      tmpf->buf_ptr=&lex_zeros;
     }
-    tempf->flags=LFSF_DOC;
+    tmpf->flags=LFSF_DOC;
   } else {//TODO: DocDel(doc)?
     col=0;
-    tempf->buf=tempf->buf_ptr=tempf->line_start=CAlloc(1);
-    tempf->line_num=1;
-    tempf->flags=0;
+    tmpf->buf=tmpf->buf_ptr=tmpf->line_start=CAlloc(1);
+    tmpf->line_num=1;
+    tmpf->flags=0;
   }
-  cc->cur_buf_ptr=tempf->buf_ptr+col;
-  tempf->last_U16=0;
+  cc->cur_buf_ptr=tmpf->buf_ptr+col;
+  tmpf->last_U16=0;
 }
 
 I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
@@ -447,7 +447,7 @@ I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
 I64 Lex(CCmpCtrl *cc)
 {//Fetch next token.
   I64 i,j,k,l,ch;
-  CHash *temph;
+  CHash *tmph;
   Bool str_done,neg_e;
   U8 *fbuf,*buf2,*buf3,buf[STR_LEN];
   cc->last_line_num=cc->lex_include_stk->line_num;
@@ -496,23 +496,23 @@ lex_ident:
 	  }
 	}
 	buf[i++]=0;
-	temph=NULL;
+	tmph=NULL;
 	if (cc->htc.local_var_lst)
 	  cc->local_var_entry=MemberFind(buf,cc->htc.local_var_lst);
 	else
 	  cc->local_var_entry=NULL;
 	if (!cc->local_var_entry && cc->htc.hash_table_lst)
-	  temph=HashFind(buf,cc->htc.hash_table_lst,cc->htc.hash_mask);
-	if (temph)
-	  j=temph->type;
+	  tmph=HashFind(buf,cc->htc.hash_table_lst,cc->htc.hash_mask);
+	if (tmph)
+	  j=tmph->type;
 	else
 	  j=0;
 	if (j & HTT_DEFINE_STR && !(cc->flags & CCF_NO_DEFINES)) {
 	  LexIncludeStr(cc,
-		temph->str,StrNew(temph(CHashDefineStr *)->data),FALSE);
+		tmph->str,StrNew(tmph(CHashDefineStr *)->data),FALSE);
 	  cc->lex_include_stk->flags|=LFSF_DEFINE;
 	} else {
-	  cc->hash_entry=temph;
+	  cc->hash_entry=tmph;
 	  Free(cc->cur_str);
 	  cc->cur_str=StrNew(buf);
 	  cc->cur_str_len=i;
@@ -694,11 +694,11 @@ lex_float_start:
 	}
 	if (Lex(cc)!=TK_IDENT)	//skip '#'
 	  goto lex_end;
-	if (!(temph=cc->hash_entry))
+	if (!(tmph=cc->hash_entry))
 	  goto lex_end;
-	if (!(temph->type & HTT_KEYWORD))
+	if (!(tmph->type & HTT_KEYWORD))
 	  goto lex_end;
-	switch (i=temph(CHashGeneric *)->user_data0) {
+	switch (i=tmph(CHashGeneric *)->user_data0) {
 	  case KW_INCLUDE:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
@@ -714,11 +714,11 @@ lex_float_start:
 	  case KW_DEFINE:
 	    cc->flags|=CCF_NO_DEFINES;
 	    if (Lex(cc)==TK_IDENT) {
-	      temph=CAlloc(sizeof(CHashDefineStr));
-	      temph->str=cc->cur_str;
+	      tmph=CAlloc(sizeof(CHashDefineStr));
+	      tmph->str=cc->cur_str;
 	      cc->cur_str=0;
-	      temph->type=HTT_DEFINE_STR;
-	      HashSrcFileSet(cc,temph);
+	      tmph->type=HTT_DEFINE_STR;
+	      HashSrcFileSet(cc,tmph);
 
 	      do ch=LexGetChar(cc); //skip space between define name and start
 	      while (Bt(chars_bmp_non_eol_white_space,ch));
@@ -788,9 +788,9 @@ lex_float_start:
 		buf2=buf3;
 		MemCpy(buf2,buf,j);
 	      }
-	      temph(CHashDefineStr *)->data=buf2;
-	      temph(CHashDefineStr *)->cnt=-1;
-	      HashAdd(temph,cc->htc.define_hash_table);
+	      tmph(CHashDefineStr *)->data=buf2;
+	      tmph(CHashDefineStr *)->cnt=-1;
+	      HashAdd(tmph,cc->htc.define_hash_table);
 	    }
 	    cc->flags&=~CCF_NO_DEFINES;
 	    break;
@@ -1032,13 +1032,13 @@ lex_ifjit:
 	  case KW_HELP_FILE:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
-	    temph=CAlloc(sizeof(CHashSrcSym));
+	    tmph=CAlloc(sizeof(CHashSrcSym));
 	    fbuf=DftExt(cc->cur_str,"DD.Z");
-	    temph->str=FileNameAbs(fbuf);
+	    tmph->str=FileNameAbs(fbuf);
 	    Free(fbuf);
-	    temph->type=HTT_HELP_FILE|HTF_PUBLIC;
-	    HashSrcFileSet(cc,temph);
-	    HashAdd(temph,cc->htc.glbl_hash_table);
+	    tmph->type=HTT_HELP_FILE|HTF_PUBLIC;
+	    HashSrcFileSet(cc,tmph);
+	    HashAdd(tmph,cc->htc.glbl_hash_table);
 	    break;
 	}
 	break;

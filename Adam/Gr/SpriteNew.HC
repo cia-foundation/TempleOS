@@ -41,37 +41,37 @@ I64 SpriteElemQuedBaseSize(I64 type)
   return sprite_elem_base_sizes[type]+offset(CSprite.start);
 }
 
-I64 SpriteElemSize(CSprite *tempg)
+I64 SpriteElemSize(CSprite *tmpg)
 {
-  I64 i=sprite_elem_base_sizes[tempg->type];
-  switch (tempg->type) {
+  I64 i=sprite_elem_base_sizes[tmpg->type];
+  switch (tmpg->type) {
     case SPT_POLYLINE:
-      i+=tempg->nu.num*sizeof(CD2I32);
+      i+=tmpg->nu.num*sizeof(CD2I32);
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      i+=StrLen(tempg->ps.st)+1;
+      i+=StrLen(tmpg->ps.st)+1;
       break;
     case SPT_BITMAP:
-      i+=((tempg->pwhu.width+7)&~7)*tempg->pwhu.height;
+      i+=((tmpg->pwhu.width+7)&~7)*tmpg->pwhu.height;
       break;
     case SPT_POLYPT:
-      i+=(tempg->npu.num*3+7)>>3;
+      i+=(tmpg->npu.num*3+7)>>3;
       break;
     case SPT_BSPLINE2:
     case SPT_BSPLINE3:
     case SPT_BSPLINE2_CLOSED:
     case SPT_BSPLINE3_CLOSED:
-      i+=tempg->nu.num*sizeof(CD3I32);
+      i+=tmpg->nu.num*sizeof(CD3I32);
       break;
     case SPT_MESH:
-      i+=tempg->mu.vertex_cnt*sizeof(CD3I32)+
-	    tempg->mu.tri_cnt*sizeof(CMeshTri);
+      i+=tmpg->mu.vertex_cnt*sizeof(CD3I32)+
+	    tmpg->mu.tri_cnt*sizeof(CMeshTri);
       break;
     case SPT_SHIFTABLE_MESH:
-      i+=tempg->pmu.vertex_cnt*sizeof(CD3I32)+
-	    tempg->pmu.tri_cnt*sizeof(CMeshTri);
+      i+=tmpg->pmu.vertex_cnt*sizeof(CD3I32)+
+	    tmpg->pmu.tri_cnt*sizeof(CMeshTri);
       break;
   }
   return i;
@@ -79,101 +79,101 @@ I64 SpriteElemSize(CSprite *tempg)
 
 public I64 SpriteSize(U8 *elems)
 {//Walk sprite elements and return size of sprite as binary data.
-  CSprite *tempg=elems-offset(CSprite.start),*tempg1=tempg;
-  while (tempg->type)
-    tempg(U8 *)+=SpriteElemSize(tempg);
-  return tempg(U8 *)-tempg1(U8 *)+sprite_elem_base_sizes[SPT_END];
+  CSprite *tmpg=elems-offset(CSprite.start),*tmpg1=tmpg;
+  while (tmpg->type)
+    tmpg(U8 *)+=SpriteElemSize(tmpg);
+  return tmpg(U8 *)-tmpg1(U8 *)+sprite_elem_base_sizes[SPT_END];
 }
 
 I64 SpriteTypeMask(U8 *elems)
 {
   I64 res=0;
-  CSprite *tempg=elems-offset(CSprite.start);
-  while (tempg->type) {
-    if (tempg->type>=SPT_NUM_TYPES)
+  CSprite *tmpg=elems-offset(CSprite.start);
+  while (tmpg->type) {
+    if (tmpg->type>=SPT_NUM_TYPES)
       return 1<<SPT_NUM_TYPES;
-    Bts(&res,tempg->type);
-    tempg(U8 *)+=SpriteElemSize(tempg);
+    Bts(&res,tmpg->type);
+    tmpg(U8 *)+=SpriteElemSize(tmpg);
   }
   return res;
 }
 
-public U8 *DC2Sprite(CDC *tempb)
+public U8 *DC2Sprite(CDC *tmpb)
 {//Convert device context to sprite.
-  CSprite *tempg;
-  tempg=CAlloc(sprite_elem_base_sizes[SPT_BITMAP]+
-	tempb->width_internal*tempb->height+
+  CSprite *tmpg;
+  tmpg=CAlloc(sprite_elem_base_sizes[SPT_BITMAP]+
+	tmpb->width_internal*tmpb->height+
 	sprite_elem_base_sizes[SPT_END])
   (U8 *)-offset(CSprite.start);
-  tempg->type=SPT_BITMAP;
-  tempg->pwhu.width=tempb->width;
-  tempg->pwhu.height=tempb->height;
-  tempg->pwhu.x1=0;
-  tempg->pwhu.y1=0;
-  MemCpy(&tempg->pwhu.u,tempb->body,tempb->width_internal*tempb->height);
-  return tempg(U8 *)+offset(CSprite.start);
+  tmpg->type=SPT_BITMAP;
+  tmpg->pwhu.width=tmpb->width;
+  tmpg->pwhu.height=tmpb->height;
+  tmpg->pwhu.x1=0;
+  tmpg->pwhu.y1=0;
+  MemCpy(&tmpg->pwhu.u,tmpb->body,tmpb->width_internal*tmpb->height);
+  return tmpg(U8 *)+offset(CSprite.start);
 }
 
-public U8 *SpriteElem2Summary(CSprite *tempg)
+public U8 *SpriteElem2Summary(CSprite *tmpg)
 {//Study $LK,"::/Demo/Graphics/SpriteText.HC"$.
   U8 buf[STR_LEN],buf2[STR_LEN];
   I32 *ptr;
-  StrPrint(buf,"%Z",tempg->type,"ST_SPRITE_ELEM_TYPES");
-  switch (tempg->type) {
+  StrPrint(buf,"%Z",tmpg->type,"ST_SPRITE_ELEM_TYPES");
+  switch (tmpg->type) {
     case SPT_COLOR:
-      CatPrint(buf," %s",Color2Str(buf2,tempg->c.color));
+      CatPrint(buf," %s",Color2Str(buf2,tmpg->c.color));
       break;
     case SPT_DITHER_COLOR:
-      CatPrint(buf," %s",Color2Str(buf2,ROPF_DITHER|tempg->d.dither_color.u8[0]|
-	    tempg->d.dither_color.u8[1]<<COLORROP_BITS));
+      CatPrint(buf," %s",Color2Str(buf2,ROPF_DITHER|tmpg->d.dither_color.u8[0]|
+	    tmpg->d.dither_color.u8[1]<<COLORROP_BITS));
       break;
     case SPT_PT:
     case SPT_FLOOD_FILL:
     case SPT_FLOOD_FILL_NOT:
     case SPT_SHIFT:
-      CatPrint(buf," (%d,%d)",tempg->p.x1,tempg->p.y1);
+      CatPrint(buf," (%d,%d)",tmpg->p.x1,tmpg->p.y1);
       break;
     case SPT_LINE:
     case SPT_ARROW:
     case SPT_PLANAR_SYMMETRY:
     case SPT_RECT:
     case SPT_ROTATED_RECT:
-      CatPrint(buf," (%d,%d),(%d,%d)",tempg->pp.x1,tempg->pp.y1,
-	    tempg->pp.x2,tempg->pp.y2);
+      CatPrint(buf," (%d,%d),(%d,%d)",tmpg->pp.x1,tmpg->pp.y1,
+	    tmpg->pp.x2,tmpg->pp.y2);
       break;
     case SPT_CIRCLE:
-      CatPrint(buf," (%d,%d):%dR",tempg->pr.x1,tempg->pr.y1,tempg->pr.radius);
+      CatPrint(buf," (%d,%d):%dR",tmpg->pr.x1,tmpg->pr.y1,tmpg->pr.radius);
       break;
     case SPT_WIDTH:
-      CatPrint(buf," %d",tempg->w.width);
+      CatPrint(buf," %d",tmpg->w.width);
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      CatPrint(buf," %d,%d:%-16tQ",tempg->ps.x1,tempg->ps.y1,tempg->ps.st);
+      CatPrint(buf," %d,%d:%-16tQ",tmpg->ps.x1,tmpg->ps.y1,tmpg->ps.st);
       break;
     case SPT_POLYLINE:
     case SPT_POLYPT:
-      ptr=&tempg->npu.x;
-      CatPrint(buf," %d (%d,%d)",tempg->npu.num,ptr[0],ptr[1]);
+      ptr=&tmpg->npu.x;
+      CatPrint(buf," %d (%d,%d)",tmpg->npu.num,ptr[0],ptr[1]);
       break;
     case SPT_ELLIPSE:
     case SPT_POLYGON:
     case SPT_BITMAP:
-      CatPrint(buf," (%d,%d):%dW,%dH",tempg->pwhu.x1,tempg->pwhu.y1,
-	    tempg->pwhu.width,tempg->pwhu.height);
+      CatPrint(buf," (%d,%d):%dW,%dH",tmpg->pwhu.x1,tmpg->pwhu.y1,
+	    tmpg->pwhu.width,tmpg->pwhu.height);
       break;
     case SPT_BSPLINE2:
     case SPT_BSPLINE3:
     case SPT_BSPLINE2_CLOSED:
     case SPT_BSPLINE3_CLOSED:
-      CatPrint(buf," %d",tempg->nu.num);
+      CatPrint(buf," %d",tmpg->nu.num);
       break;
     case SPT_MESH:
-      CatPrint(buf," %dV,%dT",tempg->mu.vertex_cnt,tempg->mu.tri_cnt);
+      CatPrint(buf," %dV,%dT",tmpg->mu.vertex_cnt,tmpg->mu.tri_cnt);
       break;
     case SPT_SHIFTABLE_MESH:
-      CatPrint(buf," %dV,%dT",tempg->pmu.vertex_cnt,tempg->pmu.tri_cnt);
+      CatPrint(buf," %dV,%dT",tmpg->pmu.vertex_cnt,tmpg->pmu.tri_cnt);
       break;
   }
   return StrNew(buf);

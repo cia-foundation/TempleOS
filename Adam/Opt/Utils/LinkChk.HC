@@ -16,7 +16,7 @@ I64 LinkChkDoc(CDoc *doc,I64 *_fuf_flags)
       old_doc=DocPut;
       DocLock(old_doc);
       Fs->put_doc=doc;
-      found=DocLinkChk(st);
+      found=DocLinkChk(doc,st);
       Fs->put_doc=old_doc;
       DocUnlock(old_doc);
       if (!found) {
@@ -47,14 +47,14 @@ I64 LinkChkFile(U8 *filename,I64 *_fuf_flags)
 public I64 LinkChk(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
 {//Check documents for broken file links.
   I64 fuf_flags=0,res=0;
-  CDirEntry *tempde,*tempde1;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
+  CDirEntry *tmpde,*tmpde1;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+$$+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    res+=LinkChkFile(tempde->full_name,&fuf_flags);
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde && !Bt(&fuf_flags,FUf_CANCEL)) {
+    res+=LinkChkFile(tmpde->full_name,&fuf_flags);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
   return res;
 }

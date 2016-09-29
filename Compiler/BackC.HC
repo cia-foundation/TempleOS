@@ -1,4 +1,4 @@
-U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
+U0 ICAndBranch(CIntermediateCode *tmpi,I64 ip,I64 is,U8 *buf,I64 ip2)
 {
   U64 i;
   I64 it,t1,r1,d1,r2;
@@ -6,14 +6,14 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
   CCodeMisc *lb;
   CICArg *a1,*a2;
 
-  if (tempi->a1.type&MDF_IMM) {
+  if (tmpi->a1.type&MDF_IMM) {
     swap=TRUE;
-    a1=&tempi->a2;
-    a2=&tempi->a1;
+    a1=&tmpi->a2;
+    a2=&tmpi->a1;
   } else {
     swap=FALSE;
-    a1=&tempi->a1;
-    a2=&tempi->a2;
+    a1=&tmpi->a1;
+    a2=&tmpi->a2;
   }
 
   if (a2->type&MDF_IMM && a2->disp>MAX_U32)
@@ -28,14 +28,14 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
 
   i=a2->disp;
   if (a2->type&MDF_IMM && i<=MAX_U32) {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,a1->type,a1->reg,a1->disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,a1->type,a1->reg,a1->disp,ip2);
     if (i<=MAX_U8)
-      ICU16(tempi,i<<8+0xA8);
+      ICU16(tmpi,i<<8+0xA8);
     else if (i<=MAX_U16)
-      ICU32(tempi,i<<16+0xA900+OC_OP_SIZE_PREFIX);
+      ICU32(tmpi,i<<16+0xA900+OC_OP_SIZE_PREFIX);
     else {
-      ICU8(tempi,0xA9);
-      ICU32(tempi,i);
+      ICU8(tmpi,0xA9);
+      ICU32(tmpi,i);
     }
   } else {
     t1=MDF_REG+it;
@@ -55,13 +55,13 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
 	r2=REG_RDX;
       if (swap) {
 	if (!(a1->type&MDF_REG) || r1!=a1->reg)
-	  ICMov(tempi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
 	if (a2->type&MDG_REG_DISP_SIB_RIP) {
 	  t1=a2->type&MDG_MASK+it;
 	  r2=a2->reg;
 	  d1=a2->disp;
 	} else
-	  ICMov(tempi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
 	i=ICModr1(r1,t1,r2,d1);
       } else {
 	if (a1->type&MDG_REG_DISP_SIB_RIP) {
@@ -69,9 +69,9 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
 	  r1=a1->reg;
 	  d1=a1->disp;
 	} else
-	  ICMov(tempi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
 	if (!(a2->type&MDF_REG) || r2!=a2->reg)
-	  ICMov(tempi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
 	i=ICModr1(r2,t1,r1,d1);
       }
     } else {
@@ -95,43 +95,43 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
 	  r2=a2->reg;
 	  d1=a2->disp;
 	} else
-	  ICMov(tempi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
 	if (!(a1->type&MDF_REG) || r1!=a1->reg)
-	  ICMov(tempi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
 	i=ICModr1(r1,t1,r2,d1);
       } else {
 	if (!(a2->type&MDF_REG) || r2!=a2->reg)
-	  ICMov(tempi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r2,0,a2->type,a2->reg,a2->disp,ip2);
 	if (a1->type&MDG_REG_DISP_SIB_RIP) {
 	  t1=a1->type&MDG_MASK+it;
 	  r1=a1->reg;
 	  d1=a1->disp;
 	} else
-	  ICMov(tempi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
+	  ICMov(tmpi,MDF_REG+RT_I64,r1,0,a1->type,a1->reg,a1->disp,ip2);
 	i=ICModr1(r2,t1,r1,d1);
       }
     }
     switch (it) {
       case RT_I8:
       case RT_U8:
-	ICRex(tempi,i.u8[1]);
-	ICU16(tempi,i.u8[2]<<8+0x84);
+	ICRex(tmpi,i.u8[1]);
+	ICU16(tmpi,i.u8[2]<<8+0x84);
 	break;
       case RT_U16:
       case RT_I16:
-	ICOpSizeRex(tempi,i.u8[1]);
-	ICU16(tempi,i.u8[2]<<8+0x85);
+	ICOpSizeRex(tmpi,i.u8[1]);
+	ICU16(tmpi,i.u8[2]<<8+0x85);
 	break;
       default:
-	ICRex(tempi,i.u8[1]);
-	ICU16(tempi,i.u8[2]<<8+0x85);
+	ICRex(tmpi,i.u8[1]);
+	ICU16(tmpi,i.u8[2]<<8+0x85);
     }
-    ICModr2(tempi,i,d1,ip2+4);
+    ICModr2(tmpi,i,d1,ip2+4);
   }
 
-  ip+=tempi->ic_cnt;
-  lb=OptLabelFwd(tempi->ic_data);
-  short_jmp=ToBool(tempi->ic_flags&ICF_SHORT_JMP);
+  ip+=tmpi->ic_cnt;
+  lb=OptLabelFwd(tmpi->ic_data);
+  short_jmp=ToBool(tmpi->ic_flags&ICF_SHORT_JMP);
   if (!buf && lb->addr!=INVALID_PTR) {
     i=lb->addr-(ip+2);
     if (lb->flags&CMF_POP_CMP)
@@ -141,82 +141,82 @@ U0 ICAndBranch(CIntermediateCode *tempi,I64 ip,I64 is,U8 *buf,I64 ip2)
   }
 
   if (short_jmp) {
-    tempi->ic_flags|=ICF_SHORT_JMP;
+    tmpi->ic_flags|=ICF_SHORT_JMP;
     i=lb->addr-(ip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    ICU16(tempi,i<<8+is.u8[2]);
+    ICU16(tmpi,i<<8+is.u8[2]);
   } else {
-    tempi->ic_flags&=~ICF_SHORT_JMP;
+    tmpi->ic_flags&=~ICF_SHORT_JMP;
     i=lb->addr-(ip+6);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    ICU16(tempi,is.u16[0]);
-    ICU32(tempi,i);
+    ICU16(tmpi,is.u16[0]);
+    ICU32(tmpi,i);
   }
 }
 
-U0 ICAssign(CIntermediateCode *tempi,I64 ip)
+U0 ICAssign(CIntermediateCode *tmpi,I64 ip)
 {
-  CIntermediateCode *tempi1;
-  if (tempi->ic_flags & ICF_BY_VAL) {
-    ICMov(tempi,tempi->a1.type&MDG_MASK+tempi->a1_type_pointed_to,
-	  tempi->a1.reg,tempi->a1.disp,
-	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-    if (tempi->r.type.mode)
-      ICMov(tempi,tempi->r.type&MDG_MASK+tempi->a1_type_pointed_to,
-	    tempi->r.reg,tempi->r.disp,
-	    tempi->a1.type&MDG_MASK+tempi->a1_type_pointed_to,
-	    tempi->a1.reg,tempi->a1.disp,ip);
+  CIntermediateCode *tmpi1;
+  if (tmpi->ic_flags & ICF_BY_VAL) {
+    ICMov(tmpi,tmpi->a1.type&MDG_MASK+tmpi->a1_type_pointed_to,
+	  tmpi->a1.reg,tmpi->a1.disp,
+	  tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
+    if (tmpi->r.type.mode)
+      ICMov(tmpi,tmpi->r.type&MDG_MASK+tmpi->a1_type_pointed_to,
+	    tmpi->r.reg,tmpi->r.disp,
+	    tmpi->a1.type&MDG_MASK+tmpi->a1_type_pointed_to,
+	    tmpi->a1.reg,tmpi->a1.disp,ip);
   } else {
-    if (tempi->a1.type&MDF_REG) {
-      if (!(tempi1=OptLag1(tempi)) || tempi1->ic_code!=IC_ADD_CONST ||
-	    tempi1->r.type!=MDF_REG+RT_I64 || tempi1->r.reg!=tempi->a1.reg ||
-	    tempi1->a1.type!=MDF_REG+RT_I64 || tempi1->a1.reg!=tempi->a1.reg ||
-	    (tempi->a2.type&MDF_REG || tempi->a2.type&MDF_DISP) &&
-	    tempi->a2.reg==tempi->a1.reg ||
-	    tempi->r.type.mode || tempi1->ic_flags&~ICG_NO_CVT_MASK) {
-	ICMov(tempi,
-	      MDF_DISP+tempi->a1_type_pointed_to,tempi->a1.reg,tempi->a1.disp,
-	      tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-	if (tempi->r.type.mode)
-	  ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-		tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+    if (tmpi->a1.type&MDF_REG) {
+      if (!(tmpi1=OptLag1(tmpi)) || tmpi1->ic_code!=IC_ADD_CONST ||
+	    tmpi1->r.type!=MDF_REG+RT_I64 || tmpi1->r.reg!=tmpi->a1.reg ||
+	    tmpi1->a1.type!=MDF_REG+RT_I64 || tmpi1->a1.reg!=tmpi->a1.reg ||
+	    (tmpi->a2.type&MDF_REG || tmpi->a2.type&MDF_DISP) &&
+	    tmpi->a2.reg==tmpi->a1.reg ||
+	    tmpi->r.type.mode || tmpi1->ic_flags&~ICG_NO_CVT_MASK) {
+	ICMov(tmpi,
+	      MDF_DISP+tmpi->a1_type_pointed_to,tmpi->a1.reg,tmpi->a1.disp,
+	      tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
+	if (tmpi->r.type.mode)
+	  ICMov(tmpi,tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
+		tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
       } else {
-	tempi->ic_flags=(tempi->ic_flags|tempi1->ic_flags)&
+	tmpi->ic_flags=(tmpi->ic_flags|tmpi1->ic_flags)&
 	      ~ICF_CODE_FINAL|ICF_DONT_RESTORE;
-	tempi->a1.disp=tempi1->ic_data;
-	OptSetNOP1(tempi1); //This better not be last pass!
-	ICMov(tempi,MDF_DISP+tempi->a1_type_pointed_to,
-	      tempi->a1.reg,tempi->a1.disp,
-	      tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+	tmpi->a1.disp=tmpi1->ic_data;
+	OptSetNOP1(tmpi1); //This better not be last pass!
+	ICMov(tmpi,MDF_DISP+tmpi->a1_type_pointed_to,
+	      tmpi->a1.reg,tmpi->a1.disp,
+	      tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
       }
     } else {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip);
-      ICMov(tempi,MDF_DISP+tempi->a1_type_pointed_to,REG_RCX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
-      if (tempi->r.type.mode)
-	ICMov(tempi,tempi->r.type,tempi->r.reg,tempi->r.disp,
-	      tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,
+	    tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip);
+      ICMov(tmpi,MDF_DISP+tmpi->a1_type_pointed_to,REG_RCX,0,
+	    tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
+      if (tmpi->r.type.mode)
+	ICMov(tmpi,tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
+	      tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip);
     }
   }
 }
 
-U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,
+U0 ICBrBitOps(CIntermediateCode *tmpi,I64 ip,
 	I64 op,I64 op_imm,I64 is,U8 *buf,I64 ip2)
 {
   I64 i,t,r1,r2,d1,d2,t1,t2;
-  CICArg *a1=&tempi->a1,*a2=&tempi->a2;
+  CICArg *a1=&tmpi->a1,*a2=&tmpi->a2;
   Bool short_jmp;
   CCodeMisc *lb;
 
-  if (tempi->ic_flags & ICF_BY_VAL) {
-    if (tempi->ic_flags&ICF_SWAP && !(a2->type&MDF_REG) &&
+  if (tmpi->ic_flags & ICF_BY_VAL) {
+    if (tmpi->ic_flags&ICF_SWAP && !(a2->type&MDF_REG) &&
 	  (!(a2->type&MDF_IMM) ||a2->disp>63)||
-	  !(tempi->ic_flags&ICF_SWAP) && a2->type&MDF_IMM &&
+	  !(tmpi->ic_flags&ICF_SWAP) && a2->type&MDF_IMM &&
 	  a2->disp<64 || a2->type&MDF_STK) {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,a2->type,a2->reg,a2->disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,a2->type,a2->reg,a2->disp,ip2);
       t2=MDF_REG+RT_I64;
       r2=REG_RCX;
       d2=0;
@@ -228,11 +228,11 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,
 	r2=a2->reg;
       d2=a2->disp;
     }
-    if (!(tempi->ic_flags&ICF_SWAP) && !(a1->type&MDF_REG) &&
+    if (!(tmpi->ic_flags&ICF_SWAP) && !(a1->type&MDF_REG) &&
 	  (!(a1->type&MDF_IMM) || a1->disp>63) ||
-	  tempi->ic_flags&ICF_SWAP && a1->type&MDF_IMM &&
+	  tmpi->ic_flags&ICF_SWAP && a1->type&MDF_IMM &&
 	  a1->disp<64 || a1->type&MDF_STK) {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip2);
       t1=MDF_REG+RT_I64;
       r1=REG_RDX;
       d1=0;
@@ -251,23 +251,23 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,
     d2=0;
     if (a2->type&MDF_REG)
       r2=a2->reg;
-    else if (!(tempi->ic_flags&ICF_SWAP) || !(a2->type&MDF_IMM) ||
+    else if (!(tmpi->ic_flags&ICF_SWAP) || !(a2->type&MDF_IMM) ||
 	  a2->disp>63) {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,a2->type,a2->reg,a2->disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,a2->type,a2->reg,a2->disp,ip2);
       r2=REG_RCX;
     } else
       r2=0;
     if (a1->type&MDF_REG)
       r1=a1->reg;
-    else if (tempi->ic_flags&ICF_SWAP || !(a1->type&MDF_IMM) || a1->disp>63) {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip2);
+    else if (tmpi->ic_flags&ICF_SWAP || !(a1->type&MDF_IMM) || a1->disp>63) {
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,a1->type,a1->reg,a1->disp,ip2);
       r1=REG_RDX;
     } else
       r1=0;
   }
-  if (tempi->ic_flags&ICF_LOCK && op!=0xA30F)
-    ICU8(tempi,OC_LOCK_PREFIX);
-  if (tempi->ic_flags&ICF_SWAP) {
+  if (tmpi->ic_flags&ICF_LOCK && op!=0xA30F)
+    ICU8(tmpi,OC_LOCK_PREFIX);
+  if (tmpi->ic_flags&ICF_SWAP) {
     if (a2->type&MDF_IMM && a2->disp<32) {
       if (op==0xA30F && a2->disp<8) {
 	t=t1&MDG_MASK+RT_U8;
@@ -289,27 +289,27 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,
       t=t2;
     i=ICModr1(r1,t,r2,d2);
   }
-  ICRex(tempi,i.u8[1]);
+  ICRex(tmpi,i.u8[1]);
   if (op_imm==0xF6) {//TEST
-    ICU16(tempi,i.u8[2]<<8+op_imm);
-    ICModr2(tempi,i,a2->disp,ip2+5);
-    ICU8(tempi,1<<a1->disp);
+    ICU16(tmpi,i.u8[2]<<8+op_imm);
+    ICModr2(tmpi,i,a2->disp,ip2+5);
+    ICU8(tmpi,1<<a1->disp);
     if (is==0x72820F)
       is=0x75850F;
     else
       is=0x74840F;
   } else if (a1->type&MDF_IMM && a1->disp<64) {
-    ICU24(tempi,i.u8[2]<<16+op_imm);
-    ICModr2(tempi,i,a2->disp,ip2+5);
-    ICU8(tempi,a1->disp);
+    ICU24(tmpi,i.u8[2]<<16+op_imm);
+    ICModr2(tmpi,i,a2->disp,ip2+5);
+    ICU8(tmpi,a1->disp);
   } else {
-    ICU24(tempi,i.u8[2]<<16+op);
-    ICModr2(tempi,i,a2->disp,ip2+4);
+    ICU24(tmpi,i.u8[2]<<16+op);
+    ICModr2(tmpi,i,a2->disp,ip2+4);
   }
 
-  ip+=tempi->ic_cnt;
-  lb=OptLabelFwd(tempi->ic_data);
-  short_jmp=ToBool(tempi->ic_flags&ICF_SHORT_JMP);
+  ip+=tmpi->ic_cnt;
+  lb=OptLabelFwd(tmpi->ic_data);
+  short_jmp=ToBool(tmpi->ic_flags&ICF_SHORT_JMP);
   if (!buf && lb->addr!=INVALID_PTR) {
     i=lb->addr-(ip+2);
     if (lb->flags&CMF_POP_CMP)
@@ -319,180 +319,180 @@ U0 ICBrBitOps(CIntermediateCode *tempi,I64 ip,
   }
 
   if (short_jmp) {
-    tempi->ic_flags|=ICF_SHORT_JMP;
+    tmpi->ic_flags|=ICF_SHORT_JMP;
     i=lb->addr-(ip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    ICU16(tempi,i<<8+is.u8[2]);
+    ICU16(tmpi,i<<8+is.u8[2]);
   } else {
-    tempi->ic_flags&=~ICF_SHORT_JMP;
+    tmpi->ic_flags&=~ICF_SHORT_JMP;
     i=lb->addr-(ip+6);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    ICU16(tempi,is.u16[0]);
-    ICU32(tempi,i);
+    ICU16(tmpi,is.u16[0]);
+    ICU32(tmpi,i);
   }
 }
 
-U0 ICQueInit(CIntermediateCode *tempi,I64 ip2)
+U0 ICQueInit(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 r1;
-  if (tempi->a1.type==MDF_REG+RT_I64)
-    r1=tempi->a1.reg;
+  if (tmpi->a1.type==MDF_REG+RT_I64)
+    r1=tmpi->a1.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
     r1=REG_RAX;
   }
-  ICMov(tempi,MDF_DISP+RT_I64,r1,0,MDF_REG+RT_I64,r1,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r1,sizeof(U8 *),MDF_REG+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r1,0,MDF_REG+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r1,sizeof(U8 *),MDF_REG+RT_I64,r1,0,ip2);
 }
 
-U0 ICQueIns(CIntermediateCode *tempi,I64 ip2)
+U0 ICQueIns(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 r1,r2;
-  if (tempi->a2.type==MDF_REG+RT_I64 && tempi->a2.reg!=REG_RDX)
-    r2=tempi->a2.reg;
+  if (tmpi->a2.type==MDF_REG+RT_I64 && tmpi->a2.reg!=REG_RDX)
+    r2=tmpi->a2.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	  tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
     r2=REG_RAX;
   }
-  if (tempi->a1.type==MDF_REG+RT_I64)
-    r1=tempi->a1.reg;
+  if (tmpi->a1.type==MDF_REG+RT_I64)
+    r1=tmpi->a1.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
     r1=REG_RDX;
   }
-  ICMov(tempi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r1,0,MDF_REG+RT_I64,r2,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r2,0,MDF_REG+RT_I64,REG_RBX,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r2,sizeof(U8 *),MDF_REG+RT_I64,r1,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,REG_RBX,sizeof(U8 *),MDF_REG+RT_I64,r2,0,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r1,0,MDF_REG+RT_I64,r2,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r2,0,MDF_REG+RT_I64,REG_RBX,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r2,sizeof(U8 *),MDF_REG+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,REG_RBX,sizeof(U8 *),MDF_REG+RT_I64,r2,0,ip2);
 }
 
-U0 ICQueInsRev(CIntermediateCode *tempi,I64 ip2)
+U0 ICQueInsRev(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 r1,r2;
-  if (tempi->a2.type==MDF_REG+RT_I64 && tempi->a2.reg!=REG_RDX)
-    r2=tempi->a2.reg;
+  if (tmpi->a2.type==MDF_REG+RT_I64 && tmpi->a2.reg!=REG_RDX)
+    r2=tmpi->a2.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	  tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	  tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
     r2=REG_RAX;
   }
-  if (tempi->a1.type==MDF_REG+RT_I64)
-    r1=tempi->a1.reg;
+  if (tmpi->a1.type==MDF_REG+RT_I64)
+    r1=tmpi->a1.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
     r1=REG_RDX;
   }
-  ICMov(tempi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,sizeof(U8 *),ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,REG_RBX,0,MDF_REG+RT_I64,r2,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r2,0,MDF_REG+RT_I64,r1,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r2,sizeof(U8 *),MDF_REG+RT_I64,REG_RBX,0,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,r1,sizeof(U8 *),MDF_REG+RT_I64,r2,0,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,sizeof(U8 *),ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,REG_RBX,0,MDF_REG+RT_I64,r2,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r2,0,MDF_REG+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r2,sizeof(U8 *),MDF_REG+RT_I64,REG_RBX,0,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,r1,sizeof(U8 *),MDF_REG+RT_I64,r2,0,ip2);
 }
 
-U0 ICQueRem(CIntermediateCode *tempi,I64 ip2)
+U0 ICQueRem(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 r1;
-  if (tempi->a1.type==MDF_REG+RT_I64)
-    r1=tempi->a1.reg;
+  if (tmpi->a1.type==MDF_REG+RT_I64)
+    r1=tmpi->a1.reg;
   else {
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
     r1=REG_RAX;
   }
-  ICMov(tempi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,0,ip2);
-  ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_I64,r1,sizeof(U8 *),ip2);
-  ICU24(tempi,0x1A8948);
-  ICU32(tempi,sizeof(U8 *)<<24+0x538948);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,MDF_DISP+RT_I64,r1,0,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_I64,r1,sizeof(U8 *),ip2);
+  ICU24(tmpi,0x1A8948);
+  ICU32(tmpi,sizeof(U8 *)<<24+0x538948);
 }
 
-U0 ICMinMax(CIntermediateCode *tempi,I64 op,I64 ip2)
+U0 ICMinMax(CIntermediateCode *tmpi,I64 op,I64 ip2)
 {
   I64 r1,i1=0x48;
-  if (tempi->a2.type==MDF_REG+RT_I64 && tempi->a2.reg!=REG_RAX) {
-    r1=tempi->a2.reg;
+  if (tmpi->a2.type==MDF_REG+RT_I64 && tmpi->a2.reg!=REG_RAX) {
+    r1=tmpi->a2.reg;
     if (r1>7) {
       i1++;
       r1&=7;
     }
-    ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
   } else {
-    if (tempi->a1.reg==REG_RAX && tempi->a1.type&MDG_REG_DISP_SIB) {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+    if (tmpi->a1.reg==REG_RAX && tmpi->a1.type&MDG_REG_DISP_SIB) {
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,
+	    tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
       r1=REG_RDX;
-      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	    tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
     } else {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-      if (tempi->a1.type==MDF_REG+RT_I64) {
-	r1=tempi->a1.reg;
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	    tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
+      if (tmpi->a1.type==MDF_REG+RT_I64) {
+	r1=tmpi->a1.reg;
 	if (r1>7) {
 	  i1++;
 	  r1&=7;
 	}
       } else {
 	r1=REG_RDX;
-	ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,
-	      tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+	ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,
+	      tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
       }
     }
   }
-  ICU24(tempi,0xC03B00+r1<<16+i1);
-  ICU32(tempi,0xC0000F00+op<<16+r1<<24+i1);
+  ICU24(tmpi,0xC03B00+r1<<16+i1);
+  ICU32(tmpi,0xC0000F00+op<<16+r1<<24+i1);
 }
 
-U0 ICSqr(CIntermediateCode *tempi,I64 op,I64 ip2)
+U0 ICSqr(CIntermediateCode *tmpi,I64 op,I64 ip2)
 {
-  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
-	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-  ICSlashOp(tempi,MDF_REG+RT_I64,REG_RAX,0,op,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
+	tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
+  ICSlashOp(tmpi,MDF_REG+RT_I64,REG_RAX,0,op,ip2);
 }
 
-U0 ICModU64(CIntermediateCode *tempi,I64 ip2)
+U0 ICModU64(CIntermediateCode *tmpi,I64 ip2)
 {
   CICType t1;
   I64 r1,d1;
-  ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,
-	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-  if (tempi->a1.reg!=REG_RAX && tempi->a1.reg!=REG_RDX &&
-	tempi->a1.type&MDG_REG_DISP_SIB &&
-	tempi->a1.type.raw_type>=RT_I64) {
-    t1=tempi->a1.type;
-    r1=tempi->a1.reg;
-    d1=tempi->a1.disp;
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,
+	tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
+  if (tmpi->a1.reg!=REG_RAX && tmpi->a1.reg!=REG_RDX &&
+	tmpi->a1.type&MDG_REG_DISP_SIB &&
+	tmpi->a1.type.raw_type>=RT_I64) {
+    t1=tmpi->a1.type;
+    r1=tmpi->a1.reg;
+    d1=tmpi->a1.disp;
   } else {
     t1=MDF_REG+RT_I64;
     r1=REG_RBX;
     d1=0;
-    ICMov(tempi,MDF_REG+RT_I64,REG_RBX,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
   }
-  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,MDF_DISP+RT_I64,REG_RCX,0,ip2);
-  ICZero(tempi,REG_RDX);
-  ICSlashOp(tempi,t1,r1,d1,SLASH_OP_DIV,ip2);
-  ICMov(tempi,MDF_DISP+RT_I64,REG_RCX,0,MDF_REG+RT_I64,REG_RAX,0,ip2);
-  ICMov(tempi,MDF_REG+RT_I64,REG_RAX,0,
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,MDF_DISP+RT_I64,REG_RCX,0,ip2);
+  ICZero(tmpi,REG_RDX);
+  ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_DIV,ip2);
+  ICMov(tmpi,MDF_DISP+RT_I64,REG_RCX,0,MDF_REG+RT_I64,REG_RAX,0,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
 	MDF_REG+RT_I64,REG_RDX,0,ip2);
 }
 
-U0 ICSwap(CIntermediateCode *tempi,I64 ip2)
+U0 ICSwap(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 r1,r2;
-  if (tempi->a1.type&MDF_REG)
-    r1=tempi->a1.reg;
+  if (tmpi->a1.type&MDF_REG)
+    r1=tmpi->a1.reg;
   else
     r1=REG_RAX;
-  if (tempi->a2.type&MDF_REG)
-    r2=tempi->a2.reg;
+  if (tmpi->a2.type&MDF_REG)
+    r2=tmpi->a2.reg;
   else
     r2=REG_RAX;
   if (r1==r2) {
@@ -501,166 +501,166 @@ U0 ICSwap(CIntermediateCode *tempi,I64 ip2)
     else
       r2=REG_RAX;
   }
-  ICMov(tempi,MDF_REG+RT_I64,r2,0,
-	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-  ICMov(tempi,MDF_REG+RT_I64,r1,0,
-	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
-  switch (tempi->ic_code) {
+  ICMov(tmpi,MDF_REG+RT_I64,r2,0,
+	tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
+  ICMov(tmpi,MDF_REG+RT_I64,r1,0,
+	tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
+  switch (tmpi->ic_code) {
     case IC_SWAP_U8:
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U8,r1,0,ip2);
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U8,r2,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U8,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U8,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U8,r1,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U8,r2,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U8,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U8,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
       break;
     case IC_SWAP_U16:
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U16,r1,0,ip2);
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U16,r2,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U16,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U16,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U16,r1,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U16,r2,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U16,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U16,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
       break;
     case IC_SWAP_U32:
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U32,r1,0,ip2);
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U32,r2,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U32,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U32,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U32,r1,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U32,r2,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U32,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U32,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
       break;
     case IC_SWAP_I64:
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U64,r1,0,ip2);
-      ICMov(tempi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U64,r2,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U64,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
-      ICMov(tempi,MDF_DISP+RT_U64,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,MDF_DISP+RT_U64,r1,0,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RDX,0,MDF_DISP+RT_U64,r2,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U64,r2,0,MDF_REG+RT_I64,REG_RCX,0,ip2);
+      ICMov(tmpi,MDF_DISP+RT_U64,r1,0,MDF_REG+RT_I64,REG_RDX,0,ip2);
       break;
   }
 }
 
-U0 ICAndEqu(CIntermediateCode *tempi,I64 ip2)
+U0 ICAndEqu(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 i,bit;
-  if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_RES_NOT_USED) {
-    i=~tempi->a2.disp;
+  if (tmpi->a2.type&MDF_IMM && !(tmpi->a1.type&MDF_STK) &&
+	tmpi->ic_flags&ICF_RES_NOT_USED) {
+    i=~tmpi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i)) {
-      tempi->a2.disp=bit;
-      tempi->a2.reg=0;
-      tempi->a1.type=tempi->a1.type&MDG_MASK+RT_I64;
-      ICBitOps(tempi,&tempi->a2,&tempi->a1,tempi,0xB30F,0x30BA0F,ip2);
+      tmpi->a2.disp=bit;
+      tmpi->a2.reg=0;
+      tmpi->a1.type=tmpi->a1.type&MDG_MASK+RT_I64;
+      ICBitOps(tmpi,&tmpi->a2,&tmpi->a1,tmpi,0xB30F,0x30BA0F,ip2);
       return;
     }
   }
-  ICAddSubEctEqu(tempi,tempi->a1_type_pointed_to,
-	tempi->r.type,tempi->r.reg,tempi->r.disp,
-	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
-	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x210425240423,ip2);
+  ICAddSubEctEqu(tmpi,tmpi->a1_type_pointed_to,
+	tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
+	tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,
+	tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,0x210425240423,ip2);
 }
 
-U0 ICOrEqu(CIntermediateCode *tempi,I64 ip2)
+U0 ICOrEqu(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 i,bit;
-  if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_RES_NOT_USED) {
-    i=tempi->a2.disp;
+  if (tmpi->a2.type&MDF_IMM && !(tmpi->a1.type&MDF_STK) &&
+	tmpi->ic_flags&ICF_RES_NOT_USED) {
+    i=tmpi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i) && i>MAX_I8) {
-      tempi->a2.disp=bit;
-      tempi->a2.reg=0;
-      tempi->a1.type=tempi->a1.type&MDG_MASK+RT_I64;
-      ICBitOps(tempi,&tempi->a2,&tempi->a1,tempi,0xAB0F,0x28BA0F,ip2);
+      tmpi->a2.disp=bit;
+      tmpi->a2.reg=0;
+      tmpi->a1.type=tmpi->a1.type&MDG_MASK+RT_I64;
+      ICBitOps(tmpi,&tmpi->a2,&tmpi->a1,tmpi,0xAB0F,0x28BA0F,ip2);
       return;
     }
   }
-  ICAddSubEctEqu(tempi,tempi->a1_type_pointed_to,
-	tempi->r.type,tempi->r.reg,tempi->r.disp,
-	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
-	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x09010D0C010B,ip2);
+  ICAddSubEctEqu(tmpi,tmpi->a1_type_pointed_to,
+	tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
+	tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,
+	tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,0x09010D0C010B,ip2);
 }
 
-U0 ICXorEqu(CIntermediateCode *tempi,I64 ip2)
+U0 ICXorEqu(CIntermediateCode *tmpi,I64 ip2)
 {
   I64 i,bit;
-  if (tempi->a2.type&MDF_IMM && !(tempi->a1.type&MDF_STK) &&
-	tempi->ic_flags&ICF_RES_NOT_USED) {
-    i=tempi->a2.disp;
+  if (tmpi->a2.type&MDF_IMM && !(tmpi->a1.type&MDF_STK) &&
+	tmpi->ic_flags&ICF_RES_NOT_USED) {
+    i=tmpi->a2.disp;
     bit=Bsf(i);
     if (0<=bit==Bsr(i)) {
-      tempi->a2.disp=bit;
-      tempi->a2.reg=0;
-      tempi->a1.type=tempi->a1.type&MDG_MASK+RT_I64;
-      ICBitOps(tempi,&tempi->a2,&tempi->a1,tempi,0xBB0F,0x38BA0F,ip2);
+      tmpi->a2.disp=bit;
+      tmpi->a2.reg=0;
+      tmpi->a1.type=tmpi->a1.type&MDG_MASK+RT_I64;
+      ICBitOps(tmpi,&tmpi->a2,&tmpi->a1,tmpi,0xBB0F,0x38BA0F,ip2);
       return;
     }
   }
-  ICAddSubEctEqu(tempi,tempi->a1_type_pointed_to,
-	tempi->r.type,tempi->r.reg,tempi->r.disp,
-	tempi->a1.type,tempi->a1.reg,tempi->a1.disp,
-	tempi->a2.type,tempi->a2.reg,tempi->a2.disp,0x310635340633,ip2);
+  ICAddSubEctEqu(tmpi,tmpi->a1_type_pointed_to,
+	tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
+	tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,
+	tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,0x310635340633,ip2);
 }
 
-U0 ICSwitch(CIntermediateCode *tempi,I64 ip,
+U0 ICSwitch(CIntermediateCode *tmpi,I64 ip,
 	Bool nobound,CCmpCtrl *cc,U8 *buf,I64 ip2)
 {
   I64 i,j,cnt,min,max,begin,r;
   CCodeMisc *lb;
   Bool short_jmp;
-  CAOTAbsAddr *tempa;
-  if (!(tempi->a1.type&MDF_REG) || tempi->a1.reg&7==REG_RSP)
+  CAOTAbsAddr *tmpa;
+  if (!(tmpi->a1.type&MDF_REG) || tmpi->a1.reg&7==REG_RSP)
     r=REG_RDX;
   else
-    r=tempi->a1.reg;
+    r=tmpi->a1.reg;
   if (nobound)
-    ICMov(tempi,MDF_REG+RT_I64,r,0,
-	  tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    ICMov(tmpi,MDF_REG+RT_I64,r,0,
+	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
   else {
-    if (tempi->a2.type&MDF_IMM) {
-      j=tempi->a2.disp;
-      ICMov(tempi,MDF_REG+RT_I64,r,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+    if (tmpi->a2.type&MDF_IMM) {
+      j=tmpi->a2.disp;
+      ICMov(tmpi,MDF_REG+RT_I64,r,0,
+	    tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
       if (MIN_I8<=j<=MAX_I8) {
 	i=0xF88348+(r&7)<<16;
 	if (r>7) i++;
-	ICU24(tempi,i);
-	ICU8(tempi,j);
+	ICU24(tmpi,i);
+	ICU8(tmpi,j);
       } else if (MIN_I32<=j<=MAX_I32) {
 	i=0xF88148+(r&7)<<16;
 	if (r>7) i++;
-	ICU24(tempi,i);
-	ICU32(tempi,j);
+	ICU24(tmpi,i);
+	ICU32(tmpi,j);
       } else {
-	ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,
-	      tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
+	ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,
+	      tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
 	i=0xC13B48+(r&7)<<19;
 	if (r>7) i+=4;
-	ICU24(tempi,i);
+	ICU24(tmpi,i);
       }
     } else {
-      ICMov(tempi,MDF_REG+RT_I64,REG_RCX,0,
-	    tempi->a2.type,tempi->a2.reg,tempi->a2.disp,ip2);
-      ICMov(tempi,MDF_REG+RT_I64,r,0,
-	    tempi->a1.type,tempi->a1.reg,tempi->a1.disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,
+	    tmpi->a2.type,tmpi->a2.reg,tmpi->a2.disp,ip2);
+      ICMov(tmpi,MDF_REG+RT_I64,r,0,
+	    tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip2);
       i=0xC13B48+(r&7)<<19;
       if (r>7) i+=4;
-      ICU24(tempi,i);
+      ICU24(tmpi,i);
     }
 
-    ip+=tempi->ic_cnt;
-    lb=tempi->ic_data(CCodeMisc *)->dft;
-    short_jmp=ToBool(tempi->ic_flags&ICF_SHORT_JMP);
+    ip+=tmpi->ic_cnt;
+    lb=tmpi->ic_data(CCodeMisc *)->dft;
+    short_jmp=ToBool(tmpi->ic_flags&ICF_SHORT_JMP);
     if (!buf && lb->addr!=INVALID_PTR) {
       i=lb->addr-(ip+2);
       if (MIN_I8<=i<=MAX_I8)
 	short_jmp=TRUE;
     }
     if (short_jmp) {
-      tempi->ic_flags|=ICF_SHORT_JMP;
-      ICU16(tempi,(lb->addr-(ip+2))<<8+0x73);
+      tmpi->ic_flags|=ICF_SHORT_JMP;
+      ICU16(tmpi,(lb->addr-(ip+2))<<8+0x73);
     } else {
-      tempi->ic_flags&=~ICF_SHORT_JMP;
-      ICU16(tempi,0x830F);
-      ICU32(tempi,lb->addr-(ip+6));
+      tmpi->ic_flags&=~ICF_SHORT_JMP;
+      ICU16(tmpi,0x830F);
+      ICU32(tmpi,lb->addr-(ip+6));
     }
   }
 
-  lb=tempi->ic_data;
+  lb=tmpi->ic_data;
   begin=lb->begin->addr;
   if (!buf && begin!=INVALID_PTR) {
     min=MAX_I64;
@@ -688,81 +688,81 @@ U0 ICSwitch(CIntermediateCode *tempi,I64 ip,
 
   if (lb->flags&CMF_I8_JMP_TABLE) {
     if (r<8)
-      ICU8(tempi,0x48);
+      ICU8(tmpi,0x48);
     else
-      ICU8(tempi,0x49);
-    ICU24(tempi,0x98BE0F+(r&7)<<16);
+      ICU8(tmpi,0x49);
+    ICU24(tmpi,0x98BE0F+(r&7)<<16);
     cnt=1;
   } else if (lb->flags&CMF_U8_JMP_TABLE) {
     if (r<8)
       cnt=2;
     else {
-      ICU8(tempi,0x49);
+      ICU8(tmpi,0x49);
       cnt=1;
     }
-    ICU24(tempi,0x98B60F+(r&7)<<16);
+    ICU24(tmpi,0x98B60F+(r&7)<<16);
   } else if (lb->flags&CMF_I16_JMP_TABLE) {
     if (r<8)
-      ICU8(tempi,0x48);
+      ICU8(tmpi,0x48);
     else
-      ICU8(tempi,0x4A);
-    ICU32(tempi,0x451CBF0F+(r&7)<<27);
+      ICU8(tmpi,0x4A);
+    ICU32(tmpi,0x451CBF0F+(r&7)<<27);
     cnt=0;
   } else if (lb->flags&CMF_U16_JMP_TABLE) {
     if (r<8)
       cnt=1;
     else {
-      ICU8(tempi,0x4A);
+      ICU8(tmpi,0x4A);
       cnt=0;
     }
-    ICU32(tempi,0x451CB70F+(r&7)<<27);
+    ICU32(tmpi,0x451CB70F+(r&7)<<27);
   } else {
     if (r<8)
       cnt=2;
     else {
-      ICU8(tempi,0x42);
+      ICU8(tmpi,0x42);
       cnt=1;
     }
-    ICU24(tempi,0x851C8B+(r&7)<<19);
+    ICU24(tmpi,0x851C8B+(r&7)<<19);
   }
   if (buf && cc->flags&CCF_AOT_COMPILE) {
-    tempa=CAlloc(sizeof(CAOTAbsAddr));
-    tempa->next=cc->aotc->abss;
-    tempa->type=AAT_ADD_U32;
-    cc->aotc->abss=tempa;
-    tempa->ip=ip2+tempi->ic_cnt;
-    ICU32(tempi,lb->addr+cc->aotc->ip);
+    tmpa=CAlloc(sizeof(CAOTAbsAddr));
+    tmpa->next=cc->aotc->abss;
+    tmpa->type=AAT_ADD_U32;
+    cc->aotc->abss=tmpa;
+    tmpa->ip=ip2+tmpi->ic_cnt;
+    ICU32(tmpi,lb->addr+cc->aotc->ip);
   } else
-    ICU32(tempi,lb->addr+buf);
+    ICU32(tmpi,lb->addr+buf);
 
   if (lb->flags&(CMF_I8_JMP_TABLE|CMF_U8_JMP_TABLE|
 	CMF_I16_JMP_TABLE|CMF_U16_JMP_TABLE)) {
-    ICU16(tempi,0xC381); //ADD EBX,0x12345678
+    ICU16(tmpi,0xC381); //ADD EBX,0x12345678
     if (buf && cc->flags&CCF_AOT_COMPILE) {
-      tempa=CAlloc(sizeof(CAOTAbsAddr));
-      tempa->next=cc->aotc->abss;
-      tempa->type=AAT_ADD_U32;
-      cc->aotc->abss=tempa;
-      tempa->ip=ip2+tempi->ic_cnt;
-      ICU32(tempi,begin+cc->aotc->ip);
+      tmpa=CAlloc(sizeof(CAOTAbsAddr));
+      tmpa->next=cc->aotc->abss;
+      tmpa->type=AAT_ADD_U32;
+      cc->aotc->abss=tmpa;
+      tmpa->ip=ip2+tmpi->ic_cnt;
+      ICU32(tmpi,begin+cc->aotc->ip);
     } else
-      ICU32(tempi,begin+buf);
+      ICU32(tmpi,begin+buf);
   } else
     cnt+=6;
-  ICU16(tempi,0xE3FF); //JMP EBX
+  ICU16(tmpi,0xE3FF); //JMP EBX
   for (i=0;i<cnt;i++) //Code must always shrink, not expand
-    ICU8(tempi,OC_NOP);
-  tempi->ic_flags&=~ICF_CODE_FINAL;
+    ICU8(tmpi,OC_NOP);
+  tmpi->ic_flags&=~ICF_CODE_FINAL;
 }
 
-U0 ICLocalVarInit(CIntermediateCode *tempi)
+U0 ICLocalVarInit(CIntermediateCode *tmpi)
 {
-  ICU24(tempi,0xC48B48);
-  ICU16(tempi,0x5748);
-  ICU24(tempi,0xF88B48);
-  ICU24(tempi,0xC1C748);
-  ICU32(tempi,tempi->ic_data);
-  ICU16(tempi,sys_var_init_val<<8+0xB0);
-  ICU16(tempi,0xAAF3);
-  ICU16(tempi,0x5F48);
+  ICU24(tmpi,0xC48B48);
+  ICU16(tmpi,0x5748);
+  ICU24(tmpi,0xF88B48);
+  ICU24(tmpi,0xC1C748);
+  ICU32(tmpi,tmpi->ic_data);
+  ICU16(tmpi,sys_var_init_val<<8+0xB0);
+  ICU16(tmpi,0xAAF3);
+  ICU16(tmpi,0x5F48);
 }

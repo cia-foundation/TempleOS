@@ -6,6 +6,7 @@ extern class CAOTHeapGlbl;
 extern class CAOTImportExport;
 extern class CCPU;
 extern class CDC;
+extern class CDirContext;
 extern class CDoc;
 extern class CFile;
 extern class CHashClass;
@@ -268,8 +269,8 @@ public class CMathODE
 	*DstateDt,
 	*state_scale,
 	*initial_state,
-	*temp0,*temp1,*temp2,*temp3,
-	*temp4,*temp5,*temp6,*temp7;
+	*tmp0,*tmp1,*tmp2,*tmp3,
+	*tmp4,*tmp5,*tmp6,*tmp7;
   CTask	*mem_task,*win_task;
   U0	(*derivative)(CMathODE *o,F64 t,F64 *state,F64 *DstateDt);
   I64	user_data;
@@ -594,7 +595,7 @@ class CSema
 #define SYS_SEMA_RECORD_MACRO		1
 #define SYS_SEMA_SYS_TIMER		2
 #define SYS_SEMA_SYS_DATE		3
-#define SYS_SEMA_IN_DEBUGGER		4
+#define SYS_SEMA_DBG_MODE		4
 #define SYS_SEMA_SND			5
 #define SYS_SEMA_HEAPLOG_ACTIVE		6
 #define SYS_SEMA_HEAPLOG_LOCK		7
@@ -981,9 +982,9 @@ public class CHashGlblVar:CHashSrcSym
 
 //CDocEntry.de_flags.  These are +/- flags
 #define DOCEF_LEFT_CB		0x10000
-#define DOCEF_LEFT_AUTO		0x20000
+#define DOCEF_LEFT_IN_STR	0x20000
 #define DOCEF_RIGHT_CB		0x40000
-#define DOCEF_RIGHT_AUTO	0x80000
+#define DOCEF_RIGHT_IN_STR	0x80000
 #define DOCEF_LEFT_X		0x100000
 #define DOCEF_CENTER_X		0x200000
 #define DOCEF_RIGHT_X		0x400000
@@ -1069,9 +1070,9 @@ public class CHashGlblVar:CHashSrcSym
 
 //CDocEntry.de_flags.  These are +/- flags
 #define DOCEf_LEFT_CB		16
-#define DOCEf_LEFT_AUTO		17
+#define DOCEf_LEFT_IN_STR	17
 #define DOCEf_RIGHT_CB		18
-#define DOCEf_RIGHT_AUTO	19
+#define DOCEf_RIGHT_IN_STR	19
 #define DOCEf_LEFT_X		20
 #define DOCEf_CENTER_X		21
 #define DOCEf_RIGHT_X		22
@@ -1114,7 +1115,7 @@ public class CHashGlblVar:CHashSrcSym
 public class CDocBin
 {
   CDocBin *next,*last;
-  I32	temp_use_cnt,renum_num;
+  I32	tmp_use_cnt,renum_num;
   U8	*tag;
   U0	start;
   U32	num,flags,size,use_cnt;
@@ -1239,6 +1240,7 @@ class CEdFindText
 
 class CEdFileName
 {
+  CDirContext *dirc;
   U8	name[256] fmtstr "$$DA-P,LEN=255,A=\"FileName:%s\"$$";
 };
 
@@ -1344,7 +1346,7 @@ class CDocUndo
 
 #define RECALCt_NORMAL		0x00
 #define RECALCt_FIND_CURSOR	0x01
-#define RECALCt_TO_SCREEN	0x02
+#define RECALCt_TO_SCRN		0x02
 #define RECALCG_MASK		0xFF
 
 #define RECALCF_HAS_CURSOR	0x100
@@ -1495,9 +1497,9 @@ public class CAutoCompleteGlbls
 };
 
 #help_index "AutoComplete/Dictionary"
-#define ACD_WORD_FILENAME	"/Adam/AutoComplete/ACWords.DAT.Z"
-#define ACD_DEF_FILENAME	"/Adam/AutoComplete/ACDefs.DAT"
-#define ACD_DEF_FILENAME_Z	"/Adam/AutoComplete/ACDefs.DAT.Z"
+#define ACD_WORD_FILENAME	"/Adam/AutoComplete/ACWords.DATA.Z"
+#define ACD_DEF_FILENAME	"/Adam/AutoComplete/ACDefs.DATA"
+#define ACD_DEF_FILENAME_Z	"/Adam/AutoComplete/ACDefs.DATA.Z"
 
 #define ACD_H1			0
 #define ACD_H1_END		1
@@ -1790,7 +1792,7 @@ POP R8 POP RDI POP RSI POP RBP POP RBX POP RDX POP RCX POP RAX
 
 #define REGG_CLOBBERED		0x013F //RAX,RCX,RDX,RBX,R8
 #define REGG_SAVED		0x0030 //RBP,RSP
-#define REGG_STK_TEMP		0x0200 //R9
+#define REGG_STK_TMP		0x0200 //R9
 #define REGG_LOCAL_VARS		0xCCC0 //RSI,RDI,R10,R11,R14,R15
 #define REGG_LOCAL_NON_PTR_VARS	0x3000 //R12,R13
 
@@ -1833,7 +1835,7 @@ class CAsmNum2
 
 class CAsmIns
 {
-  CInst *tempi;
+  CInst *tmpins;
   CAsmNum2 imm,disp;
   I64	U8_cnt,last_opcode_U8,
 	REX,ModrM,SIB;
@@ -2220,7 +2222,7 @@ public class CCmpGlbls
   U32	*dual_U16_tokens1,*dual_U16_tokens2,*dual_U16_tokens3,
 	*binary_ops;
   I64	num_reg_vars,num_non_ptr_vars,
-	stk_temps_mask,reg_vars_mask,non_ptr_vars_mask;
+	stk_tmps_mask,reg_vars_mask,non_ptr_vars_mask;
   U8	*to_reg_vars_map,*non_ptr_vars_map;
   I64	size_arg_mask[9],
 	compiled_lines;
@@ -2288,9 +2290,10 @@ public class CATARep
 #help_index "File/FileNames"
 #define FILEMASK_JIT	"*.HC*;*.HH*"
 #define FILEMASK_AOT	"*.HC*;*.HH*;*.PRJ*"
-#define FILEMASK_SRC	"*.HC*;*.HH*;*.AUT*;*.PRJ*"
-#define FILEMASK_TXT	FILEMASK_SRC ";*.DD*;*.TXT*"
-#define FILEMASK_GRA	"*.GRA*;*.BMP*"
+#define FILEMASK_SRC	"*.HC*;*.HH*;*.IN*;*.PRJ*"
+#define FILEMASK_DD	FILEMASK_SRC ";*.DD*"
+#define FILEMASK_TXT	FILEMASK_DD ";*.TXT*"
+#define FILEMASK_GR	"*.GR*;*.BMP*"
 
 #help_index "File/Low Level"
 #define BLK_SIZE_BITS	9
@@ -2580,47 +2583,49 @@ public class CDirEntry
 #define FUf_JUST_DIRS		10
 #define FUf_JUST_FILES		11
 #define FUf_JUST_TXT		12
-#define FUf_JUST_SRC		13
-#define FUf_JUST_AOT		14
-#define FUf_JUST_JIT		15
-#define FUf_JUST_GRA		16
-#define FUf_Z_OR_NOT_Z		17
-#define FUf_CLUSTER_ORDER	18
-#define FUf_SCAN_PARENTS	19
-#define FUf_FLATTEN_TREE	20
-#define FUf_WHOLE_LABELS	21
-#define FUf_WHOLE_LABELS_BEFORE	22
-#define FUf_WHOLE_LABELS_AFTER	23
+#define FUf_JUST_DD		13
+#define FUf_JUST_SRC		14
+#define FUf_JUST_AOT		15
+#define FUf_JUST_JIT		16
+#define FUf_JUST_GR		17
+#define FUf_Z_OR_NOT_Z		18
+#define FUf_CLUSTER_ORDER	19
+#define FUf_SCAN_PARENTS	20
+#define FUf_FLATTEN_TREE	21
+#define FUf_WHOLE_LABELS	22
+#define FUf_WHOLE_LABELS_BEFORE	23
+#define FUf_WHOLE_LABELS_AFTER	24
 
-#define FUF_RECURSE		0x000001 //r
-#define FUF_DIFF		0x000002 //d
-#define FUF_IGNORE		0x000004 //i
-#define FUF_ALL			0x000008 //a
-#define FUF_CANCEL		0x000010 //c
-#define FUF_REPLACE		0x000020 //R
-#define FUF_RISKY		0x000020 //R
-#define FUF_PUBLIC		0x000040 //p
-#define FUF_MAP			0x000080 //m
-#define FUF_EXPAND		0x000100 //x
-#define FUF_SINGLE		0x000200 //s
-#define FUF_JUST_DIRS		0x000400 //D
-#define FUF_JUST_FILES		0x000800 //F
-#define FUF_JUST_TXT		0x001000 //T
-#define FUF_JUST_SRC		0x002000 //S
-#define FUF_JUST_AOT		0x004000 //A
-#define FUF_JUST_JIT		0x008000 //J
-#define FUF_JUST_GRA		0x010000 //G
-#define FUF_Z_OR_NOT_Z		0x020000 //Z
-#define FUF_CLUSTER_ORDER	0x040000 //O Move disk head one direction
-#define FUF_SCAN_PARENTS	0x080000 //P
-#define FUF_FLATTEN_TREE	0x100000 //f
-#define FUF_WHOLE_LABELS	0x200000 //l
-#define FUF_WHOLE_LABELS_BEFORE	0x400000 //lb
-#define FUF_WHOLE_LABELS_AFTER	0x800000 //la
+#define FUF_RECURSE		0x0000001 //r
+#define FUF_DIFF		0x0000002 //d
+#define FUF_IGNORE		0x0000004 //i
+#define FUF_ALL			0x0000008 //a
+#define FUF_CANCEL		0x0000010 //c
+#define FUF_REPLACE		0x0000020 //R
+#define FUF_RISKY		0x0000020 //R
+#define FUF_PUBLIC		0x0000040 //p
+#define FUF_MAP			0x0000080 //m
+#define FUF_EXPAND		0x0000100 //x
+#define FUF_SINGLE		0x0000200 //s
+#define FUF_JUST_DIRS		0x0000400 //D
+#define FUF_JUST_FILES		0x0000800 //F
+#define FUF_JUST_TXT		0x0001000 //T
+#define FUF_JUST_DD		0x0002000 //$$
+#define FUF_JUST_SRC		0x0004000 //S
+#define FUF_JUST_AOT		0x0008000 //A
+#define FUF_JUST_JIT		0x0010000 //J
+#define FUF_JUST_GR		0x0020000 //G
+#define FUF_Z_OR_NOT_Z		0x0040000 //Z
+#define FUF_CLUSTER_ORDER	0x0080000 //O Move disk head one direction
+#define FUF_SCAN_PARENTS	0x0100000 //P
+#define FUF_FLATTEN_TREE	0x0200000 //f
+#define FUF_WHOLE_LABELS	0x0400000 //l
+#define FUF_WHOLE_LABELS_BEFORE	0x0800000 //lb
+#define FUF_WHOLE_LABELS_AFTER	0x1000000 //la
 
 #define FUG_FILES_FIND	(FUF_RECURSE|FUF_SINGLE|FUF_CLUSTER_ORDER|\
-  FUF_JUST_DIRS|FUF_JUST_FILES|FUF_JUST_TXT|\
-  FUF_JUST_SRC|FUF_JUST_AOT|FUF_JUST_JIT|FUF_JUST_GRA|FUF_FLATTEN_TREE)
+  FUF_JUST_DIRS|FUF_JUST_FILES|FUF_JUST_TXT|FUF_JUST_DD|\
+  FUF_JUST_SRC|FUF_JUST_AOT|FUF_JUST_JIT|FUF_JUST_GR|FUF_FLATTEN_TREE)
 #define FUG_FILE_FIND	(FUF_JUST_DIRS|FUF_JUST_FILES|FUF_Z_OR_NOT_Z|\
   FUF_SCAN_PARENTS)
 
@@ -2757,7 +2762,7 @@ public class CBlkDevGlbls
 {
   CBlkDev *blkdevs;
   U8	*dft_iso_filename;  //See $LK,"blkdev.dft_iso_filename",A="FF:::/Kernel/KEnd.HC,blkdev.dft_iso_filename"$
-  U8	*temp_filename;
+  U8	*tmp_filename;
   U8	*home_dir;
   CCacheBlk *cache_base,*cache_ctrl,**cache_hash_table;
   I64	cache_size,read_cnt,write_cnt;
@@ -2844,10 +2849,10 @@ There is no high kernel memory because RAM's physical
 addresses are low.  (All motherboards that I know of
 put RAM in low addresses of 64-bit address space.)
 It's ring-0-only so all (or none) is kernel, remember.
-2 Meg hardware pages are used. Only the caching bits matter.
+2Meg hardware pages are used. Only the caching bits matter.
 Remember, it is ring-0-only and identity-mapped!
 
-All code is placed in just the lowest 2 Gig, so the CALL REL32
+All code is placed in just the lowest 2Gig, so the CALL REL32
 inst always works.  It never changes out of ring-0, remember,
 so I don't need to waste cycles on use SYSCALL or software interrupts.
 Everything just uses CALL REL32.
@@ -2894,7 +2899,7 @@ public class CBlkPool
 {
   I64	locked_flags,alloced_u8s,used_u8s;
   CMemBlk *mem_free_lst,
-	*mem_free_2meg_lst, //This is for $LK,"::/Demo/Lectures/Mem/Mem2Meg.HC"$
+	*mem_free_2meg_lst, //This is for Sup1CodeScraps/Mem/Mem2Meg.HC.
 	*free_page_hash[MEM_FREE_PAGE_HASH_SIZE],
 	*free_page_hash2[64-MEM_PAGE_BITS];
 };
@@ -2922,7 +2927,7 @@ public class CDevGlbls
 {
   I64	*idt;
   U8	*mem64_ptr;
-  U8	*uncached_alias; //Alias of lowest 4 Gig.
+  U8	*uncached_alias; //Alias of lowest 4Gig.
   U8	mp_apic_ids[MP_MAX_PROCESSORS];
   CMemRange mem32_head;
   CPCIDev pci_head;
@@ -3120,8 +3125,8 @@ public class CCtrl
   //win pix coordinates
   I64	left,right,top,bottom;
 
-  //screen pix coordinates (derived)
-  I64	screen_left,screen_right,screen_top,screen_bottom;
+  //scrn pix coordinates (derived)
+  I64	scrn_left,scrn_right,scrn_top,scrn_bottom;
 
   U8	*state;
 
@@ -3280,16 +3285,17 @@ public class CTaskSettings
 #define TASKf_KILL_TASK		1
 #define TASKf_SUSPENDED		2
 #define TASKf_IDLE		3
-#define TASKf_INPUT_FILTER_TASK	4
-#define TASKf_FILTER_INPUT	5
-#define TASKf_HAS_SONG		6
-#define TASKf_DISABLE_BPTS	7
-#define TASKf_AWAITING_MSG	8
-#define TASKf_BREAK_LOCKED	9
-#define TASKf_PENDING_BREAK	10
-#define TASKf_BREAK_TO_SHIFT_ESC 11
-#define TASKf_KILL_AFTER_DBG	12
-#define TASKf_NONTIMER_RAND	13
+#define TASKf_CMD_LINE_PMT	4
+#define TASKf_INPUT_FILTER_TASK	5
+#define TASKf_FILTER_INPUT	6
+#define TASKf_HAS_SONG		7
+#define TASKf_DISABLE_BPTS	8
+#define TASKf_AWAITING_MSG	9
+#define TASKf_BREAK_LOCKED	10
+#define TASKf_PENDING_BREAK	11
+#define TASKf_BREAK_TO_SHIFT_ESC 12
+#define TASKf_KILL_AFTER_DBG	13
+#define TASKf_NONTIMER_RAND	14
 
 //CTask.display_flags
 #define DISPLAYf_SHOW			0
@@ -3367,7 +3373,8 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   CExcept *next_except,*last_except;
   I64	except_rbp,	//throw routine's RBP
 	except_ch;	//throw(ch)
-  U8	*except_caller1,*except_caller2,*except_caller3,*except_caller4;
+  U8	*except_caller1,*except_caller2,*except_caller3,*except_caller4,
+	*except_caller5,*except_caller6,*except_caller7,*except_caller8;
 
   Bool	catch_except;
   Bool	new_answer;
@@ -3595,7 +3602,7 @@ public class CSysFixedArea
 public class CTextGlbls
 {
   I64	raw_col,raw_flags;
-  U8	*raw_screen_image;
+  U8	*raw_scrn_image;
   I64	rows,cols;		//Use TEXT_ROWS,TEXT_COLS
   U64	*font,*aux_font;
   U8	*vga_alias,*vga_text_alias;
@@ -3609,7 +3616,7 @@ public class CTextGlbls
 #define GR_WIDTH	640
 #define GR_HEIGHT	480
 
-//z-vals less than zero are in front of screen and not drawn.
+//z-vals less than zero are in front of scrn and not drawn.
 //we want to shift all Z-vals into a drawable range.
 //GR_Z_ALL is set to half of the Z-range which is an I32.
 #define GR_Z_ALL	(MAX_I32/2)
@@ -3632,7 +3639,7 @@ public class CTextGlbls
 #define DCF_LOCATE_NEAREST	0x800
 #define DCF_DONT_DRAW		0x1000
 #define DCF_ALIAS		0x2000
-#define DCF_SCREEN_BITMAP	0x4000
+#define DCF_SCRN_BITMAP		0x4000
 #define DCF_FILL_NOT_COLOR	0x8000
 #define DCF_RECORD_EXTENTS	0x10000
 #define DCF_ON_TOP		0x20000
@@ -3685,7 +3692,8 @@ public class CDC
 
   //Can be changed from the default $LK,"DCTransform",A="MN:DCTransform"$()
   U0	(*transform)(CDC *dc,I64 *x,I64 *y,I64 *z);
-//Can be changed from the default $LK,"DCLighting",A="MN:DCLighting"$()
+
+  //Can be changed from the default $LK,"DCLighting",A="MN:DCLighting"$()
   U0	(*lighting)(CDC *dc,CD3I32 *p1,CD3I32 *p2,
 	CD3I32 *p3,CColorROPU32 color);
 
@@ -3700,7 +3708,7 @@ public class CDC
   I64	collision_cnt;
 
   //Set by $LK,"DCF_RECORD_EXTENTS",A="MN:DCF_RECORD_EXTENTS"$
-  I64	min_x,max_x,min_y,max_y; //screen coordinates
+  I64	min_x,max_x,min_y,max_y; //scrn coordinates
 
   U32	dc_signature,pad;
   CTask	*mem_task,*win_task;
@@ -3885,7 +3893,7 @@ public class CDbgGlbls
 #define BOOT_SRC_HARDDRV	3
 #define BOOT_SRC_DVD		4
 
-// $LK,"Auto",A="MN:Auto"$("") StdIn for call to $LK,"BootHDIns",A="MN:BootHDIns"$().
+// $LK,"In",A="MN:In"$("") StdIn for call to $LK,"BootHDIns",A="MN:BootHDIns"$().
 #define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
 
 #help_index "Misc/Registry"
@@ -3908,17 +3916,17 @@ class CProgress
 };
 
 #help_index "Char/Operations"
-#define SPF_PAD_ZERO		0x001
-#define SPF_LEFT_JUSTIFY	0x002
-#define SPF_TRUNCATE		0x004
-#define SPF_COMMA		0x008
-#define SPF_DOLLAR		0x010
-#define SPF_SLASH		0x020
-#define SPF_QUESTION		0x040
-#define SPF_AUX_FMT_NUM		0x080
-#define SPF_DECIMAL		0x100
-#define SPF_NEG			0x200
-#define SPF_NEG_E		0x400
-#define SPF_NEG_AUX_FMT_NUM	0x800
+#define PRTF_PAD_ZERO		0x001
+#define PRTF_LEFT_JUSTIFY	0x002
+#define PRTF_TRUNCATE		0x004
+#define PRTF_COMMA		0x008
+#define PRTF_DOLLAR		0x010
+#define PRTF_SLASH		0x020
+#define PRTF_QUESTION		0x040
+#define PRTF_AUX_FMT_NUM	0x080
+#define PRTF_DECIMAL		0x100
+#define PRTF_NEG		0x200
+#define PRTF_NEG_E		0x400
+#define PRTF_NEG_AUX_FMT_NUM	0x800
 
 #help_index ""

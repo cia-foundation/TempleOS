@@ -101,9 +101,9 @@ U0 UndefinedExtern()
   throw('UndefExt');
 }
 
-U0 UnusedExternWarning(CCmpCtrl *cc,CHashClass *tempc)
+U0 UnusedExternWarning(CCmpCtrl *cc,CHashClass *tmpc)
 {
-  PrintWarn("Unused extern '%s'\n",tempc->str);
+  PrintWarn("Unused extern '%s'\n",tmpc->str);
   cc->warning_cnt++;
 }
 
@@ -181,73 +181,73 @@ U0 ICArgPut(CICArg *a,I64 type_pointed_to)
   '' CH_SPACE;
 }
 
-U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tempi)
+U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tmpi)
 {
-  I64 opcode=tempi->ic_code,i;
+  I64 opcode=tmpi->ic_code,i;
   if (opcode>=IC_END_EXP && opcode!=IC_NOP2) {
-    "%15ts %016X ",intermediate_code_table[opcode].name,tempi->ic_data;
+    "%15ts %016X ",intermediate_code_table[opcode].name,tmpi->ic_data;
     if (cc->pass) {
-      if (tempi->r.type.mode) {
+      if (tmpi->r.type.mode) {
 	"$$PURPLE$$R:$$FG$$";
-	ICArgPut(&tempi->r,0);
+	ICArgPut(&tmpi->r,0);
       }
-      if (tempi->a1.type.mode) {
+      if (tmpi->a1.type.mode) {
 	"$$PURPLE$$A1:$$FG$$";
-	if (intermediate_code_table[tempi->ic_code].type==IST_DEREF ||
-	      intermediate_code_table[tempi->ic_code].type==IST_ASSIGN)
-	  ICArgPut(&tempi->a1,tempi->a1_type_pointed_to);
+	if (intermediate_code_table[tmpi->ic_code].type==IST_DEREF ||
+	      intermediate_code_table[tmpi->ic_code].type==IST_ASSIGN)
+	  ICArgPut(&tmpi->a1,tmpi->a1_type_pointed_to);
 	else
-	  ICArgPut(&tempi->a1,0);
+	  ICArgPut(&tmpi->a1,0);
       }
-      if (tempi->a2.type.mode) {
+      if (tmpi->a2.type.mode) {
 	"$$PURPLE$$A2:$$FG$$";
-	ICArgPut(&tempi->a2,0);
+	ICArgPut(&tmpi->a2,0);
       }
       "$$PURPLE$$:$$FG$$";
     }
-    ICClassPut(tempi->ic_class);
-    if (tempi->ic_flags & ICF_LOCK)
+    ICClassPut(tmpi->ic_class);
+    if (tmpi->ic_flags & ICF_LOCK)
       "$$BROWN$$lock$$FG$$ ";
-    if (tempi->ic_flags & ICF_A2_TO_F64)
+    if (tmpi->ic_flags & ICF_A2_TO_F64)
       "$$LTBLUE$$a2d$$FG$$ ";
-    if (tempi->ic_flags & ICF_A2_TO_INT)
+    if (tmpi->ic_flags & ICF_A2_TO_INT)
       "$$GREEN$$a2i$$FG$$ ";
-    if (tempi->ic_flags & ICF_A1_TO_F64)
+    if (tmpi->ic_flags & ICF_A1_TO_F64)
       "$$LTBLUE$$a1d$$FG$$ ";
-    if (tempi->ic_flags & ICF_A1_TO_INT)
+    if (tmpi->ic_flags & ICF_A1_TO_INT)
       "$$GREEN$$a1i$$FG$$ ";
-    if (tempi->ic_flags & ICF_R_TO_F64)
+    if (tmpi->ic_flags & ICF_R_TO_F64)
       "$$LTBLUE$$rd$$FG$$ ";
-    if (tempi->ic_flags & ICF_R_TO_INT)
+    if (tmpi->ic_flags & ICF_R_TO_INT)
       "$$GREEN$$ri$$FG$$ ";
-    if (tempi->ic_flags & ICF_USE_F64)
+    if (tmpi->ic_flags & ICF_USE_F64)
       "[F64] ";
-    if (tempi->ic_flags & ICF_USE_UNSIGNED)
+    if (tmpi->ic_flags & ICF_USE_UNSIGNED)
       "[unsigned] ";
-    if (tempi->ic_flags & ICF_USE_INT)
+    if (tmpi->ic_flags & ICF_USE_INT)
       "[int] ";
-    if (tempi->ic_flags & ICF_RES_NOT_USED)
+    if (tmpi->ic_flags & ICF_RES_NOT_USED)
       "NO_RES ";
-    if (tempi->ic_flags & ICF_BY_VAL)
+    if (tmpi->ic_flags & ICF_BY_VAL)
       "BY_VAL ";
-    if (tempi->ic_flags & ICF_PUSH_RES)
+    if (tmpi->ic_flags & ICF_PUSH_RES)
       "PUSH ";
-    if (tempi->ic_flags & ICF_PUSH_CMP)
+    if (tmpi->ic_flags & ICF_PUSH_CMP)
       "PUSH_CMP ";
-    if (tempi->ic_flags & ICF_POP_CMP)
+    if (tmpi->ic_flags & ICF_POP_CMP)
       "POP_CMP ";
-    if (tempi->ic_flags & ICF_DEL_PREV_INS)
+    if (tmpi->ic_flags & ICF_DEL_PREV_INS)
       "DEL_PREV ";
-    if (tempi->ic_flags & ICF_PREV_DELETED)
+    if (tmpi->ic_flags & ICF_PREV_DELETED)
       "PREV_DEL ";
     for (i=0;i<3;i++) {
-      if (Bt(&tempi->ic_flags,ICf_DONT_PUSH_FLOAT0+i))
+      if (Bt(&tmpi->ic_flags,ICf_DONT_PUSH_FLOAT0+i))
 	"DONT_PUSH#%d ",i;
-      if (Bt(&tempi->ic_flags,ICf_DONT_POP_FLOAT0+i))
+      if (Bt(&tmpi->ic_flags,ICf_DONT_POP_FLOAT0+i))
 	"DONT_POP#%d ",i;
     }
-    if (tempi->ic_flags & ICF_ALT_TEMPLATE)
-      "ALT_TEMP ";
+    if (tmpi->ic_flags & ICF_ALT_TEMPLATE)
+      "ALT_TMP ";
     '\n';
   }
 }

@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Compiler Options"$$FG$
 
 Use $LK,"Option",A="MN:Option"$().  You might need to do $FG,2$#exe {Option();}$FG$.
 
-$LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ without this option, global vars are placed in the code heap which is limited to 2 Gig.  In $FG,2$AOT$FG$ modules, global vars take-up room in the $FG,2$.BIN$FG$ file, so you might want to use this option, instead.  You might wish to turn it on and off around specific vars.  A disadvantage of data heap global vars in $FG,2$AOT$FG$ modules is they can't be initialized.
+$LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ without this option, global vars are placed in the code heap which is limited to 2Gig.  In $FG,2$AOT$FG$ modules, global vars take-up room in the $FG,2$.BIN$FG$ file, so you might want to use this option, instead.  You might wish to turn it on and off around specific vars.  A disadvantage of data heap global vars in $FG,2$AOT$FG$ modules is they can't be initialized.
 
 $LK,"OPTf_EXTERNS_TO_IMPORTS",A="MN:OPTf_EXTERNS_TO_IMPORTS"$ and $LK,"OPTf_KEEP_PRIVATE",A="MN:OPTf_KEEP_PRIVATE"$ are strange options, you'll never need.  They're to allow the same header file for $FG,2$Kernel$FG$ to act as $FG,2$extern$FG$s when compiling itself and $FG,2$import$FG$s when compiled by $FG,2$AOT$FG$ modules.
 

@@ -14,7 +14,7 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   Del(out_iso_filename);
 
   MkDir("/Distro");
-  Auto(STD_DISTRO_DVD_CFG);
+  In(STD_DISTRO_DVD_CFG);
   BootDVDIns;
 
   Copy("/*","/Distro");
@@ -31,10 +31,10 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   CopyTree("/Misc",	"/Distro/Misc");
 
   //To save space, optionally delete dictionary.
-  //Del("/Distro/Adam/AutoComplete/ACDefs.DAT");
+  //Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
   CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
-  MkDir("/Distro/Temp");
-  MkDir("/Distro/Temp/ScreenShots");
+  MkDir("/Distro/Tmp");
+  MkDir("/Distro/Tmp/ScrnShots");
   ISO9660ISO(out_iso_filename,"/Distro/*",,"/Distro" BOOT_DIR_KERNEL_BIN_C);
 
   //If you want $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ filesystem, use this instead but make it ISO.C.
@@ -47,6 +47,6 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   Free(out_iso_filename);
 }
 
-MakeMyISO("/Temp/MyDistro.ISO");
+MakeMyISO("/Tmp/MyDistro.ISO");
 
 // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.HC,1"$.

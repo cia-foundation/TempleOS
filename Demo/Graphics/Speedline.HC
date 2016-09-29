@@ -15,9 +15,7 @@ public U0 SpeedLineDemo()
   DocClear;
   DCFill;
   do {
-    msg_code=GetMsg(&a1,&a2,
-	  1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
-	  1<<MSG_IP_R_UP);
+    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_UP);
     switch (msg_code) {
       case MSG_IP_R_UP:
 	color=PopUpColor;

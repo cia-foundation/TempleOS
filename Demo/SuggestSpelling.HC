@@ -24,7 +24,7 @@ U8 *SuggestMatchForm(U8 *src)
 /*Fmt of word lst entry:
   U8 ACD_WORD_CHAR
   U8 word[] with terminating zero
-  I16 block; //definition offset in ::/Adam/AutoComplete/ACDefs.DAT
+  I16 block; //definition offset in ::/Adam/AutoComplete/ACDefs.DATA
 */
 
 Bool SuggestSpelling(U8 *word)

@@ -181,6 +181,7 @@ public extern I64 B2(CTask *task=NULL,Bool live=TRUE);
 extern CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE);
 public extern Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE);
 public extern Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE);
+public extern Bool DbgMode(Bool val);
 public extern Bool E(U8 *addr,I64 cnt=512,I64 edf_dof_flags=0);
 public extern Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0);
 extern Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0);
@@ -188,8 +189,7 @@ public extern Bool Fix(I64 edf_dof_flags=0);
 public extern U0 FixSet(U8 *filename,I64 line);
 public extern U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL);
 public extern U0 G2(U8 *ip=INVALID_PTR,CTask *task=NULL);
-public extern Bool InDbg(Bool val);
-public extern Bool IsDbg();
+public extern Bool IsDbgMode();
 public extern U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL);
 
 #help_index "Debugging/Debugger;DolDoc/Cmd Line (Typically);"\
@@ -289,7 +289,7 @@ public extern Bool MkDir(U8 *filename,I64 entry_cnt=0);
 public extern Bool DrvMap(U8 drv_let,CDrv *dv);
 
 #help_index "File/FileNames"
-extern CDirEntry *Cd2DirEntry(CDirEntry *tempde,U8 *abs_name);
+extern CDirEntry *Cd2DirEntry(CDirEntry *tmpde,U8 *abs_name);
 public extern U8 *ChgExt(U8 *filename,U8 *extension);
 public extern U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL);
 public extern U8 *DftExt(U8 *filename,U8 *extension);
@@ -310,15 +310,16 @@ public extern U0 PutFileLink(U8 *filename,U8 *full_name=NULL,
 	I64 line=0,Bool plain_text=FALSE);
 public extern U0 ToFileLine(U8 *_fl_file_line,U8 **_filename,I64 *_linenum);
 public extern U8 *ToggleZorNotZ(U8 *name);
+
 #help_index "File/FileNames;Misc"
-public extern U8 *FileNameTempTxt();
+public extern U8 *FileNameTmpTxt();
 
 #help_index "File/Internal"
-public extern U0 DirContextDel(CDirContext *dirc);
+public extern U0 DirContextDel(CDirContext *dirc,Bool restore=TRUE);
 public extern CDirContext *DirContextNew(U8 *mask,
 	Bool make_mask=FALSE,Bool make_dirs=FALSE,Bool no_mask=FALSE);
 public extern Bool DirNew(CDrv *dv,U8 *cur_dir,
-	CDirEntry *tempde,Bool free_old_chain=TRUE);
+	CDirEntry *tmpde,Bool free_old_chain=TRUE);
 extern I64 FileAttr(U8 *name,I64 old_attr=0);
 
 #help_index "File/Low Level"
@@ -361,10 +362,10 @@ public extern I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks);
 public extern U0 WZeroBlks(CDrv *dv,I64 blk,I64 cnt);
 
 #help_index "File/Program Routines"
-public extern U0 DirEntryDel(CDirEntry *tempde);
-public extern U0 DirEntryDel2(CDirEntry *tempde);
-public extern U0 DirTreeDel(CDirEntry *tempde);
-public extern U0 DirTreeDel2(CDirEntry *tempde);
+public extern U0 DirEntryDel(CDirEntry *tmpde);
+public extern U0 DirEntryDel2(CDirEntry *tmpde);
+public extern U0 DirTreeDel(CDirEntry *tmpde);
+public extern U0 DirTreeDel2(CDirEntry *tmpde);
 public extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 public extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);
 public extern I64 FileWrite(U8 *filename,
@@ -393,11 +394,10 @@ extern U0 (*fp_set_std_palette)();
 public extern U8 *Color2Str(U8 *buf,CColorROPU32 c);
 public extern CColorROPU16 Str2ColorU16(U8 *st);
 public extern CColorROPU32 Str2ColorU32(U8 *st);
-
 #help_index "Hash"
 #help_file "::/Doc/Hash"
-public _extern _HASH_ADD U0 HashAdd(CHash *temph,CHashTable *table);
-public _extern _HASH_ADD_AFTER U0 HashAddAfter(CHash *temph,
+public _extern _HASH_ADD U0 HashAdd(CHash *tmph,CHashTable *table);
+public _extern _HASH_ADD_AFTER U0 HashAddAfter(CHash *tmph,
 	CHash *pred,CHashTable *table); //Add hash entry after entry.
 public _extern _HASH_BUCKET_FIND CHash **HashBucketFind(
 	U8 *needle_str,CHashTable *haystack_table);
@@ -416,16 +416,16 @@ public extern I64 FramePtrDel(U8 *name,CTask *task=NULL);
 public extern I64 FramePtrSet(U8 *name,I64 val,CTask *task=NULL);
 
 #help_index "Hash/System"
-public extern U0 HashDel(CHashSrcSym *temph);
+public extern U0 HashDel(CHashSrcSym *tmph);
 public extern CHashGeneric *HashGenericAdd(U8 *name,
 	I64 type,I64 val=0,I64 u8=0,I64 u16=0,CTask *task=NULL);
 public extern CHashGeneric *HashPublic(U8 *st,I64 mask,Bool val=TRUE);
-public _extern _HASH_REM_DEL Bool HashRemDel(CHash *temph,CHashTable *table,
-	I64 instance=1);//instance must match temph's
+public _extern _HASH_REM_DEL Bool HashRemDel(CHash *tmph,CHashTable *table,
+	I64 instance=1);//instance must match tmph's
 public extern U0 HashTableDel(CHashTable *table);
 public extern I64 HashTablePurge(CHashTable *table);
-public extern I64 HashTypeNum(CHash *temph);
-public extern I64 HashVal(CHash *temph);
+public extern I64 HashTypeNum(CHash *tmph);
+public extern I64 HashVal(CHash *tmph);
 extern U0 SysSymImportsResolve(U8 *sptr,I64 ld_flags=0);
 
 #help_index "Hash/System;Char/Lists"
@@ -476,7 +476,7 @@ public extern U0 CtrlAltCBSet(U8 ch,U0 (*fp_handler)(I64 sc),
 public extern U0 KeyDescSet(U8 *fmt,...);
 public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
-public extern U0 KeyDevRem(CKeyDevEntry *tempp);
+public extern U0 KeyDevRem(CKeyDevEntry *tmpk);
 extern CKeyDevGlbls keydev;
 extern CSrvCmd sys_macro_head;
 extern CTask *sys_macro_task;
@@ -623,6 +623,7 @@ public extern U0 Beep(I64 freq=500,Bool busy=FALSE);
 public extern Bool IsMute();
 public extern Bool Mute(Bool val);
 public extern U0 Snd(F64 freq);
+public extern U0 SndRst();
 public extern CSndGlbls snd;
 
 #help_index "StdIn"
@@ -632,8 +633,8 @@ public extern CSndGlbls snd;
 #help_file "::/Doc/Streams"
 
 #help_index "Task"
-public extern U0 BirthWait(CTask **_task,I64 task_num=-1);
-public extern U0 DeathWait(CTask **_task);
+public extern I64 BirthWait(CTask **_task,I64 task_num=-1);
+public extern U0 DeathWait(CTask **_task,Bool send_exit=FALSE);
 public extern U0 Exit();
 public extern Bool IsSuspended(CTask *task=NULL);
 public extern Bool Kill(CTask *task,Bool wait=TRUE);
@@ -644,13 +645,13 @@ extern U0 TaskKillDying();
 public extern U0 TaskQueIns(CTask *task,CTask *pred=NULL);
 public extern U0 TaskQueRem(CTask *task);
 public extern Bool TaskValidate(CTask *task);
-public extern U0 TaskWait(CTask *task=NULL);
+public extern U0 TaskWait(CTask *task=NULL,Bool cmd_line_pmt=FALSE);
 public extern CTask *User(U8 *fmt=NULL,...);
 public extern U0 UserCmdLine();
 public _extern _YIELD U0 Yield();
 public extern CTask *adam_task;
 public extern I64 sys_num_spawned_tasks;
-extern CTask *sys_winmgr_task,*sys_task_being_screen_updated;
+extern CTask *sys_winmgr_task,*sys_task_being_scrn_updated;
 
 #help_index "Task/Delay;Time/CPU Cycles"
 public extern U0 BusyWait(I64 ÊS); //Loosely timed
@@ -674,7 +675,7 @@ public extern U0 WinDerivedValsUpdate(CTask *task);
 public extern U0 AdamErr(U8 *fmt,...);
 public extern U0 AdamLog(U8 *fmt,...);
 public extern I64 ExeCmdLine(CCmpCtrl *cc);
-public extern U0 SrvCmdDel(CSrvCmd *tempc);
+public extern U0 SrvCmdDel(CSrvCmd *tmpc);
 extern U0 SrvCmdLine();
 public extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
 public extern U0 SrvTaskCont();
@@ -694,10 +695,10 @@ public extern Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL);
 #help_index "Task/Srv/Text & Msgs"
 public extern CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags);
 
-#help_index "Task/Srv/Text & Msgs;AutoFile;StdIn/AutoFile"
-public extern U0 Auto(U8 *fmt,...);
-public extern U0 AutoFile(U8 *filename);
-public extern U0 AutoStr(U8 *fmt,...);
+#help_index "Task/Srv/Text & Msgs;InFile;StdIn/InFile"
+public extern U0 In(U8 *fmt,...);
+public extern U0 InFile(U8 *filename);
+public extern U0 InStr(U8 *fmt,...);
 public extern U0 XTalk(CTask *task,U8 *fmt,...);
 public extern U0 XTalkStr(CTask *task,U8 *fmt,...);
 public extern U0 XTalkStrWait(CTask *task,U8 *fmt,...);

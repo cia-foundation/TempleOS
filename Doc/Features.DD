@@ -28,7 +28,7 @@
 
 * $FG,2$Graphics in source code$FG$, no resource files, $FG,2$graphic sprite editor$FG$. $FG,2$<CTRL-r>$FG$
 
-* $FG,2$64-bit pointers$FG$.  All memory, even more than 4 Gig, can be directly accessed by all tasks on all cores at all times.
+* $FG,2$64-bit pointers$FG$.  All memory, even more than 4Gig, can be directly accessed by all tasks on all cores at all times.
 
 * $FG,2$Ring-0-only$FG$.  Highest CPU privileged mode at all times.  No off-limits insts.  No time lost changing modes or address maps.  Switches tasks in half a microsecond.
 
@@ -38,7 +38,7 @@
 
 * Auto-completion, jump-to-source tool called $FG,2$AutoComplete$FG$ with Dictionary.
 
-* Window Manager.  Pan screen with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom screen on mouse cursor with $FG,2$<CTRL-ALT-z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
+* Window Manager.  Pan scrn with $FG,2$<CTRL-LeftDrag>$FG$.  Zoom scrn on mouse cursor with $FG,2$<CTRL-ALT-z>$FG$/$FG,2$<CTRL-ALT-SHIFT-Z>$FG$.
 
 * File Manager, $FG,2$<CTRL-d>$FG$.
 

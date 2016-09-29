@@ -17,23 +17,18 @@ CDC *map_dc;
 #define GATE_HEIGHT	7
 F64 gate_é,gate_t;
 
-$BG,10$#define GE_COW		0
-
+$BG,10$
 
 $SP,"<1>",BI=1$	$SP,"<2>",BI=2$	$SP,"<3>",BI=3$
-#define GE_BULL		1
 
 
 $SP,"<4>",BI=4$	$SP,"<5>",BI=5$	$SP,"<6>",BI=6$
-#define GE_HORSE	2
 
 
 $SP,"<7>",BI=7$	$SP,"<8>",BI=8$
-#define GE_NUM		3
 
 
 $SP,"<9>",BI=9$
-
 	$SP,"<10>",BI=10$
 
 
@@ -148,35 +143,35 @@ U0 RiverDropsDel()
 
 U0 RiverDropsNext(CTask *mem_task)
 {
-  RiverDrop *tempr,*tempr1;
+  RiverDrop *tmpr,*tmpr1;
   while (LBts(&rd_lock,0))
     Yield;
-  tempr=rd_head.next;
-  while (tempr!=&rd_head) {
-    tempr1=tempr->next;
-    if (++tempr->y>=MAP_HEIGHT-MAP_BORDER) {
-      QueRem(tempr);
-      Free(tempr);
+  tmpr=rd_head.next;
+  while (tmpr!=&rd_head) {
+    tmpr1=tmpr->next;
+    if (++tmpr->y>=MAP_HEIGHT-MAP_BORDER) {
+      QueRem(tmpr);
+      Free(tmpr);
     } else {
       do {
-	if (RandU16&1 && GrPeek(map_dc,r_x[tempr->y]+tempr->dx,
-	      tempr->y+tempr->dy)==BLUE)
+	if (RandU16&1 && GrPeek(map_dc,r_x[tmpr->y]+tmpr->dx,
+	      tmpr->y+tmpr->dy)==BLUE)
 	  break;
-	tempr->dx=ClampI64(tempr->dx+RandU16%3-1,-r_width[tempr->y]/2,
-	      r_width[tempr->y]/2);
-	tempr->dy=ClampI64(tempr->dy+RandU16%3-1,-r_width[tempr->y]/2,
-	      r_width[tempr->y]/2);
-      } while (GrPeek(map_dc,r_x[tempr->y]+tempr->dx,
-	    tempr->y+tempr->dy)!=BLUE &&
-	    GrPeek(map_dc,r_x[tempr->y],tempr->y)==BLUE);//Might be reiniting
+	tmpr->dx=ClampI64(tmpr->dx+RandU16%3-1,-r_width[tmpr->y]/2,
+	      r_width[tmpr->y]/2);
+	tmpr->dy=ClampI64(tmpr->dy+RandU16%3-1,-r_width[tmpr->y]/2,
+	      r_width[tmpr->y]/2);
+      } while (GrPeek(map_dc,r_x[tmpr->y]+tmpr->dx,
+	    tmpr->y+tmpr->dy)!=BLUE &&
+	    GrPeek(map_dc,r_x[tmpr->y],tmpr->y)==BLUE);//Might be reiniting
     }
-    tempr=tempr1;
+    tmpr=tmpr1;
   }
-  tempr=MAlloc(sizeof(RiverDrop),mem_task);
-  tempr->y=MAP_BORDER;
-  tempr->dx=0;
-  tempr->dy=0;
-  QueIns(tempr,rd_head.last);
+  tmpr=MAlloc(sizeof(RiverDrop),mem_task);
+  tmpr->y=MAP_BORDER;
+  tmpr->dx=0;
+  tmpr->dy=0;
+  QueIns(tmpr,rd_head.last);
   LBtr(&rd_lock,0);
 }
 
@@ -184,14 +179,14 @@ U0 RiverDropsDraw(CDC *dc,I64 cx,I64 cy)
 {
   I64 i;
   F64 t=tS;
-  RiverDrop *tempr;
+  RiverDrop *tmpr;
   while (LBts(&rd_lock,0))
     Yield;
-  tempr=rd_head.next;
+  tmpr=rd_head.next;
   dc->color=LTBLUE;
-  while (tempr!=&rd_head) {
-    GrPlot(dc,r_x[tempr->y]+tempr->dx-cx,tempr->y+tempr->dy-cy);
-    tempr=tempr->next;
+  while (tmpr!=&rd_head) {
+    GrPlot(dc,r_x[tmpr->y]+tmpr->dx-cx,tmpr->y+tmpr->dy-cy);
+    tmpr=tmpr->next;
   }
   LBtr(&rd_lock,0);
 
@@ -336,7 +331,7 @@ U0 AnimateTask(CTask *parent)
   I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,updates=0,
 	my_outside_cnt;
   F64 f,d,dx,dy,s,stress;
-  Animal *tempa,*tempa1;
+  Animal *tmpa,*tmpa1;
   while (TRUE) {
     max_speed=ClampU64(max_speed,MAX_U32/3,200*MAX_U32);
     cx=(MAP_WIDTH -parent->pix_width)/2,
@@ -349,30 +344,30 @@ U0 AnimateTask(CTask *parent)
       gate_t=tS;
     RedrawGate;
     for (i=0;i<NUM_ANIMALS;i++) {
-      tempa=&a[i];
-      if (!tempa->dead) {
+      tmpa=&a[i];
+      if (!tmpa->dead) {
 //Move away from horse
-	ddx=tempa->x.i32[1]-cursor_x;
-	ddy=tempa->y.i32[1]-cursor_y;
+	ddx=tmpa->x.i32[1]-cursor_x;
+	ddy=tmpa->y.i32[1]-cursor_y;
 	if (dd=SqrI64(ddx)+SqrI64(ddy)) {
 	  d=Sqrt(dd);
 	  dx=ddx/d;
 	  dy=ddy/d;
 	  f=5.0e2*MAX_U32/dd;
-	  tempa->dx+=f*dx;
-	  tempa->dy+=f*dy;
+	  tmpa->dx+=f*dx;
+	  tmpa->dy+=f*dy;
 	}
 
 	//Resel buddy about every NUM_ANIMALS*10ms=5.12 seconds
-	tempa1=&a[tempa->buddy];
-	if (tempa1->dead || i==updates%NUM_ANIMALS) {
+	tmpa1=&a[tmpa->buddy];
+	if (tmpa1->dead || i==updates%NUM_ANIMALS) {
 	  BuddySel(i);
-	  tempa1=&a[tempa->buddy];
+	  tmpa1=&a[tmpa->buddy];
 	}
 
 	//Move toward buddy
-	ddx=tempa->x.i32[1]-tempa1->x.i32[1];
-	ddy=tempa->y.i32[1]-tempa1->y.i32[1];
+	ddx=tmpa->x.i32[1]-tmpa1->x.i32[1];
+	ddy=tmpa->y.i32[1]-tmpa1->y.i32[1];
 	if (dd=SqrI64(ddx)+SqrI64(ddy)) {
 	  d=Sqrt(dd);
 	  s=d`1.25-80;
@@ -380,42 +375,42 @@ U0 AnimateTask(CTask *parent)
 	  dx=ddx/d;
 	  dy=ddy/d;
 	  f=-0.001*s*MAX_U32;
-	  tempa->dx+=f*dx;
-	  tempa->dy+=f*dy;
+	  tmpa->dx+=f*dx;
+	  tmpa->dy+=f*dy;
 	}
 
 	//Make velocity similar to buddy
-	tempa->dx+=0.1*(tempa1->dx-tempa->dx);
-	tempa->dy+=0.1*(tempa1->dy-tempa->dy);
+	tmpa->dx+=0.1*(tmpa1->dx-tmpa->dx);
+	tmpa->dy+=0.1*(tmpa1->dy-tmpa->dy);
 
 	//Add random movement, limit speed and dampen speed
-	tempa->dx=0.995*ClampI64(tempa->dx+RandI32/32,-max_speed,max_speed);
-	tempa->dy=0.995*ClampI64(tempa->dy+RandI32/32,-max_speed,max_speed);
+	tmpa->dx=0.995*ClampI64(tmpa->dx+RandI32/32,-max_speed,max_speed);
+	tmpa->dy=0.995*ClampI64(tmpa->dy+RandI32/32,-max_speed,max_speed);
 
 	//Slow in river
-	if (GrPeek(map_dc,tempa->x.i32[1],tempa->y.i32[1])!=LTGREEN) {
-	  tempa->dx/=2;
-	  tempa->dy/=2;
+	if (GrPeek(map_dc,tmpa->x.i32[1],tmpa->y.i32[1])!=LTGREEN) {
+	  tmpa->dx/=2;
+	  tmpa->dy/=2;
 	}
 
-	if (CheckMap((tempa->x+tempa->dx)>>32,(tempa->y+tempa->dy)>>32)) {
-	  tempa->x+=tempa->dx;
-	  tempa->y+=tempa->dy;
+	if (CheckMap((tmpa->x+tmpa->dx)>>32,(tmpa->y+tmpa->dy)>>32)) {
+	  tmpa->x+=tmpa->dx;
+	  tmpa->y+=tmpa->dy;
 	}
 
 	//Keep on map
 	if (!(MAP_BORDER+ANIMAL_WIDTH/2
-	      <=tempa->x.i32[1]<MAP_WIDTH-MAP_BORDER-ANIMAL_WIDTH/2)) {
-	  tempa->x -=tempa->dx;
-	  tempa->dx=-tempa->dx;
+	      <=tmpa->x.i32[1]<MAP_WIDTH-MAP_BORDER-ANIMAL_WIDTH/2)) {
+	  tmpa->x -=tmpa->dx;
+	  tmpa->dx=-tmpa->dx;
 	}
 	if (!(MAP_BORDER+ANIMAL_HEIGHT
-	      <=tempa->y.i32[1]<MAP_HEIGHT-MAP_BORDER)) {
-	  tempa->y -=tempa->dy;
-	  tempa->dy=-tempa->dy;
+	      <=tmpa->y.i32[1]<MAP_HEIGHT-MAP_BORDER)) {
+	  tmpa->y -=tmpa->dy;
+	  tmpa->dy=-tmpa->dy;
 	}
 	cnt++;
-	if (tempa->x>>32>=FENCE_WIDTH || tempa->y>>32>=FENCE_HEIGHT)
+	if (tmpa->x>>32>=FENCE_WIDTH || tmpa->y>>32>=FENCE_HEIGHT)
 	  my_outside_cnt++;
       }
     }

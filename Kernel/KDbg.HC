@@ -215,7 +215,7 @@ U0 Da(U8 **addr,I64 cnt=0x10)
 }
 
 U0 RawPrint(I64 ms=100,U8 *fmt,...)
-{//Print using $LK,"Raw",A="MN:Raw"$ screen output for a length of time.
+{//Print using $LK,"Raw",A="MN:Raw"$ scrn output for a length of time.
 //$BK,1$Your heap must be good.$BK,0$
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   Bool old_raw,old_input_filter;
@@ -233,7 +233,7 @@ U0 RawPrint(I64 ms=100,U8 *fmt,...)
 
 U0 RawD(I64 ms=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
-//screen output for a fixed length
+//scrn output for a fixed length
   //of time.
   Bool old_raw,old_input_filter;
   PUSHFD
@@ -249,7 +249,7 @@ U0 RawD(I64 ms=100,U8 *addr,I64 cnt=0x80)
 
 U0 RawDm(I64 ms=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
-//screen output for a fixed length
+//scrn output for a fixed length
   //of time.
   Bool old_raw,old_input_filter;
   PUSHFD
@@ -343,23 +343,23 @@ U8 *SysGetStr2(I64)
 
 CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
 {
-  CBpt *res=NULL,*tempb,*tempb1,*tempb2;
+  CBpt *res=NULL,*tmpb,*tmpb1,*tmpb2;
   if (!haystack_task) haystack_task=Fs;
   PUSHFD
   CLI
-  tempb1=&haystack_task->bpt_lst;
-  tempb=haystack_task->bpt_lst;
-  while (tempb) {
-    tempb2=tempb->next;
-    if (tempb->addr==needle_addr) {
-      res=tempb;
+  tmpb1=&haystack_task->bpt_lst;
+  tmpb=haystack_task->bpt_lst;
+  while (tmpb) {
+    tmpb2=tmpb->next;
+    if (tmpb->addr==needle_addr) {
+      res=tmpb;
       if (rem)
-	tempb1->next=tempb2;
+	tmpb1->next=tmpb2;
       else
-	tempb1=&tempb->next;
+	tmpb1=&tmpb->next;
     } else
-      tempb1=&tempb->next;
-    tempb=tempb2;
+      tmpb1=&tmpb->next;
+    tmpb=tmpb2;
   }
   POPFD
   return res;
@@ -367,18 +367,18 @@ CBpt *BptFind(U8 *needle_addr,CTask *haystack_task=NULL,Bool rem=FALSE)
 
 Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 {//Set breakpoint.
-  CBpt *tempb;
+  CBpt *tmpb;
   Bool res=TRUE;
   if (!task) task=Fs;
   PUSHFD
   CLI
-  if (!(tempb=BptFind(addr,task,FALSE))) {
-    tempb=CAlloc(sizeof(CBpt),task);
-    tempb->addr=addr;
-    tempb->val=*addr;
+  if (!(tmpb=BptFind(addr,task,FALSE))) {
+    tmpb=CAlloc(sizeof(CBpt),task);
+    tmpb->addr=addr;
+    tmpb->val=*addr;
     res=FALSE;
-    tempb->next=task->bpt_lst;
-    task->bpt_lst=tempb;
+    tmpb->next=task->bpt_lst;
+    task->bpt_lst=tmpb;
     if (task==Fs && live)
       *addr=OC_BPT;
   }
@@ -388,17 +388,17 @@ Bool BptS(U8 *addr,CTask *task=NULL,Bool live=TRUE)
 
 Bool BptR(U8 *addr,CTask *task=NULL,Bool live=TRUE,Bool rem=TRUE)
 {//Rem breakpoint.
-  CBpt *tempb;
+  CBpt *tmpb;
   Bool res=FALSE;
   if (!task) task=Fs;
   PUSHFD
   CLI
-  if (tempb=BptFind(addr,task,rem)) {
+  if (tmpb=BptFind(addr,task,rem)) {
     if (task==Fs && live)
-      *tempb->addr=tempb->val;
+      *tmpb->addr=tmpb->val;
     res=TRUE;
     if (rem)
-      Free(tempb);
+      Free(tmpb);
   }
   POPFD
   return res;
@@ -423,18 +423,18 @@ I64 B2(CTask *task=NULL,Bool live=TRUE)
 {//Rem all breakpoints.
 //Return: cnt of removed.
   I64 res=0;
-  CBpt *tempb,*tempb1;
+  CBpt *tmpb,*tmpb1;
   if (!task) task=Fs;
   PUSHFD
   CLI
-  tempb=task->bpt_lst;
+  tmpb=task->bpt_lst;
   task->bpt_lst=NULL;
-  while (tempb) {
-    tempb1=tempb->next;
+  while (tmpb) {
+    tmpb1=tmpb->next;
     if (task==Fs && live)
-      *tempb->addr=tempb->val;
-    Free(tempb);
-    tempb=tempb1;
+      *tmpb->addr=tmpb->val;
+    Free(tmpb);
+    tmpb=tmpb1;
     res++;
   }
   POPFD
@@ -451,13 +451,13 @@ U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL)
 	  ">B2;\t\t\t//Clear all break points\n"
 	  ">G2;\t\t\t//Clear all break points and Go\n\n"
 	  "After resuming, <CTRL-ALT-n> next focus task\n"
-	  "After resuming, <CTRL-ALT-v> flushes screen VGA cache\n";
+	  "After resuming, <CTRL-ALT-v> flushes scrn VGA cache\n";
   else {
     LBtr(&task->task_flags,TASKf_DISABLE_BPTS);
     LBtr(&task->rflags,RFLAGf_TRAP);//No single step
     Suspend(task,FALSE);
     if (task==Fs) {
-      if (IsDbg && task->next_cc!=&task->next_cc) {
+      if (IsDbgMode && task->next_cc!=&task->next_cc) {
 	"Exit Dbg\n";
 	Btr(&task->last_cc->flags,CCf_PMT);
       }
@@ -486,7 +486,7 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
   LBts(&task->rflags,RFLAGf_TRAP);
   Suspend(task,FALSE);
   if (task==Fs) {
-    if (IsDbg) {
+    if (IsDbgMode) {
       if (task->next_cc!=&task->next_cc)
 	Btr(&task->last_cc->flags,CCf_PMT);
     }
@@ -527,7 +527,7 @@ U0 DbgHelp()
 	">G2;\t\t\t\t//B2;VGAFlush;WinFocus;G;\n"
 	">Exit;\t\t\t\t//Exit (kill) task.\n\n"
 	"After resuming, <CTRL-ALT-n> next focus task.\n"
-	"After resuming, <CTRL-ALT-v> flushes screen VGA cache.\n\n";
+	"After resuming, <CTRL-ALT-v> flushes scrn VGA cache.\n\n";
 }
 
 U0 Dbg2()
@@ -595,7 +595,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
   Bool was_raw,was_single_user,was_silent,was_in_dbg;
   I64  i,old_raw_flags=text.raw_flags;
   was_single_user=SingleUser(ON);
-  if (!IsDbg)
+  if (!IsDbgMode)
     dbg.focus_task=sys_focus_task;
   sys_focus_task=NULL;
   if (fault_num==I_BPT)
@@ -612,7 +612,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
     "\"\n";
     "Fault:0x%02X %Z\t\tErr Code:%08X\n",
 	  fault_num,fault_num,"ST_INT_NAMES",fault_err_code;
-    was_in_dbg=InDbg(ON);
+    was_in_dbg=DbgMode(ON);
     "RIP:%08X",Fs->rip; //Sometimes crashes on %p, so do this first
     ":%p  RSP:%08X\n",Fs->rip,Fs->rsp;
     if (fault_num==I_PAGE_FAULT) {
@@ -621,7 +621,7 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
       "Fault Addr:%08X:%p\n",i,i;
     }
     Fault3(fault_num,fault_err_code);
-    InDbg(was_in_dbg);
+    DbgMode(was_in_dbg);
     Silent(was_silent);
     Raw(was_raw);
     text.raw_flags=old_raw_flags;

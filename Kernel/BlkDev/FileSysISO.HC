@@ -53,17 +53,17 @@ Bool ISO1FromName(U8 *dst,U8 *src)
   return FileNameChk(dst);
 }
 
-Bool ISO1CDirFill(CDirEntry *tempde,CISO1DirEntry *de)
+Bool ISO1CDirFill(CDirEntry *tmpde,CISO1DirEntry *de)
 {
   Bool res;
-  MemSet(tempde,0,sizeof(CDirEntry));
-  res=ISO1FromName(tempde->name,&de->name_len);
-  tempde->cluster=de->loc.little;
-  tempde->size=de->size.little;
-  tempde->attr=FileAttr(tempde->name);
+  MemSet(tmpde,0,sizeof(CDirEntry));
+  res=ISO1FromName(tmpde->name,&de->name_len);
+  tmpde->cluster=de->loc.little;
+  tmpde->size=de->size.little;
+  tmpde->attr=FileAttr(tmpde->name);
   if (de->flags & ISO1_ATTR_DIR)
-    tempde->attr|=RS_ATTR_DIR;
-  tempde->datetime=ISO1DateStruct2CDate(&de->date);
+    tmpde->attr|=RS_ATTR_DIR;
+  tmpde->datetime=ISO1DateStruct2CDate(&de->date);
   return res;
 }
 
@@ -176,7 +176,7 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
   CDrv *dv=Fs->cur_dv;
   CISO1DirEntry *buf,*buf2,*isoptr;
   I64 i,cur_dir_cluster=Name2DirCluster(dv,Fs->cur_dir);
-  CDirEntry *res=NULL,*tempde;
+  CDirEntry *res=NULL,*tmpde;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
   isoptr=MAlloc(dv->spc<<BLK_SIZE_BITS);
@@ -197,32 +197,32 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
       buf(U8 *)++;
       i--;
     } else {
-      tempde=MAlloc(sizeof(CDirEntry));
-      if (ISO1CDirFill(tempde,buf)) {
-	tempde->parent=parent;
-	if (Bt(&fuf_flags,FUf_RECURSE) && tempde->attr&RS_ATTR_DIR &&
-	      *tempde->name!='.') {
-	  tempde->next=res;
-	  res=tempde;
-	  tempde->full_name=DirNameAbs(tempde->name);
-	  if (Cd(tempde->name)) {
-	    tempde->sub=ISO1FilesFind(files_find_mask,fuf_flags,tempde);
+      tmpde=MAlloc(sizeof(CDirEntry));
+      if (ISO1CDirFill(tmpde,buf)) {
+	tmpde->parent=parent;
+	if (Bt(&fuf_flags,FUf_RECURSE) && tmpde->attr&RS_ATTR_DIR &&
+	      *tmpde->name!='.') {
+	  tmpde->next=res;
+	  res=tmpde;
+	  tmpde->full_name=DirNameAbs(tmpde->name);
+	  if (Cd(tmpde->name)) {
+	    tmpde->sub=ISO1FilesFind(files_find_mask,fuf_flags,tmpde);
 	    Cd("..");
 	  }
 	} else {
-	  tempde->full_name=FileNameAbs(tempde->name);
-	  if ((tempde->attr & RS_ATTR_DIR ||
+	  tmpde->full_name=FileNameAbs(tmpde->name);
+	  if ((tmpde->attr & RS_ATTR_DIR ||
 		!Bt(&fuf_flags,FUf_JUST_DIRS)) &&
 		!(Bt(&fuf_flags,FUf_RECURSE) &&
-		*tempde->name=='.' && tempde->attr&RS_ATTR_DIR) &&
-		FilesFindMatch(tempde->full_name,files_find_mask,fuf_flags)) {
-	    tempde->next=res;
-	    res=tempde;
+		*tmpde->name=='.' && tmpde->attr&RS_ATTR_DIR) &&
+		FilesFindMatch(tmpde->full_name,files_find_mask,fuf_flags)) {
+	    tmpde->next=res;
+	    res=tmpde;
 	  } else
-	    DirEntryDel(tempde);
+	    DirEntryDel(tmpde);
 	}
       } else
-	DirEntryDel(tempde);
+	DirEntryDel(tmpde);
       i-=buf->len;
       buf(U8 *)+=buf->len;
     }

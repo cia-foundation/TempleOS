@@ -136,7 +136,7 @@ U0 DocUndoCntSet(CDoc *doc)
 public CDocEntry *DocEntryCopy(CDoc *doc,CDocEntry *doc_e)
 {//Make copy of entry and all parts of entry.
   CDocEntry *doc_ne;
-  CDocBin *tempb;
+  CDocBin *tmpb;
   CTask *task=doc->mem_task;
   doc_ne=MAllocIdent(doc_e,task);
   doc_ne->next=doc_ne;
@@ -156,16 +156,16 @@ public CDocEntry *DocEntryCopy(CDoc *doc,CDocEntry *doc_e)
   if (doc_e->de_flags & DOCEF_BIN_PTR_LINK)
     doc_ne->bin_ptr_link=MAllocIdent(doc_e->bin_ptr_link,task);
   if (doc_e->de_flags & DOCEF_HAS_BIN) {
-    tempb=MAllocIdent(doc_e->bin_data,task);
-    tempb->data=MAllocIdent(doc_e->bin_data->data,task);
+    tmpb=MAllocIdent(doc_e->bin_data,task);
+    tmpb->data=MAllocIdent(doc_e->bin_data->data,task);
     doc_ne->bin_num=doc->cur_bin_num;
-    tempb->num=doc->cur_bin_num++;
-    doc_ne->bin_data=tempb;
+    tmpb->num=doc->cur_bin_num++;
+    doc_ne->bin_data=tmpb;
     if (doc_e->de_flags&DOCEF_TAG && doc_e->tag && *doc_e->tag)
-      tempb->tag=StrNew(doc_e->tag,task);
+      tmpb->tag=StrNew(doc_e->tag,task);
     else
-      tempb->tag=NULL;
-    QueIns(tempb,doc->bin_head.last);
+      tmpb->tag=NULL;
+    QueIns(tmpb,doc->bin_head.last);
   }
   if (doc_e->de_flags & DOCEF_REMALLOC_DATA)
     doc_ne->data=MAllocIdent(doc_e->data,task);
@@ -368,7 +368,7 @@ public CDoc *DocNew(U8 *filename=NULL,CTask *task=NULL)
   if (filename)
     StrCpy(doc->filename.name,filename);
   else
-    StrCpy(doc->filename.name,blkdev.temp_filename);
+    StrCpy(doc->filename.name,blkdev.tmp_filename);
   doc->find_replace=CAlloc(sizeof(CEdFindText),task);
   doc->find_replace->scan_fwd=TRUE;
   doc->find_replace->match_case=TRUE;

@@ -1,17 +1,19 @@
-U0 DirContextDel(CDirContext *dirc)
+U0 DirContextDel(CDirContext *dirc,Bool restore=TRUE)
 {//Change back to old cur_dir and drv.
   CBlkDev *bd;
   if (!dirc) return;
-  bd=dirc->old_dv->bd;
-  if (!(bd->flags & BDF_INIT_IN_PROGRESS)) {
-    if (dirc->old_dir) {
-      Drv(Drv2Let(dirc->old_dv));
-      Cd(dirc->old_dir);
+  if (restore) {
+    bd=dirc->old_dv->bd;
+    if (!(bd->flags & BDF_INIT_IN_PROGRESS)) {
+      if (dirc->old_dir) {
+	Drv(Drv2Let(dirc->old_dv));
+	Cd(dirc->old_dir);
+      }
+    } else {
+      Fs->cur_dv=dirc->old_dv;
+      Free(Fs->cur_dir);
+      Fs->cur_dir=StrNew("/");
     }
-  } else {
-    Fs->cur_dv=dirc->old_dv;
-    Free(Fs->cur_dir);
-    Fs->cur_dir=StrNew("/");
   }
   Free(dirc->old_dir);
   Free(dirc->mask);
@@ -23,12 +25,12 @@ CDirContext *DirContextNew(U8 *_mask,Bool make_mask=FALSE,
 {//Save cur_dir and drv. Change to new dir.
   Bool valid=TRUE,old_silent;
   I64 mask_len=StrLen(_mask);
-  U8 *buf,*mask,*temp_mask,*semicolon_mask;
+  U8 *buf,*mask,*tmp_mask,*semicolon_mask;
   CDirContext *dirc=CAlloc(sizeof(CDirContext));
   dirc->old_dir=StrNew(Fs->cur_dir);
   dirc->old_dv=Fs->cur_dv;
   mask=MStrUtil(_mask,SUF_REM_LEADING|SUF_REM_TRAILING|SUF_REM_CTRL_CHARS);
-  temp_mask=mask;
+  tmp_mask=mask;
   if (*mask && mask[1]==':') {
     if (Fs->cur_dv!=Let2Drv(*mask) && !Drv(*mask))
       valid=FALSE;
@@ -76,7 +78,7 @@ CDirContext *DirContextNew(U8 *_mask,Bool make_mask=FALSE,
     }
   }
   Free(buf);
-  Free(temp_mask);
+  Free(tmp_mask);
   if (!valid) {
     DirContextDel(dirc);
     dirc=NULL;

@@ -172,35 +172,35 @@ U0 MPDrawMen(CDC *dc2)
   CDC *dc=DCAlias(dc2,task);
   I64 i,r[16],lo=Gs->num*MAX_MAN/mp_cnt,hi=(Gs->num+1)*MAX_MAN/mp_cnt,
 	yy,phase,scroll_y=MAP_HEIGHT-100-100*(tS-t0);
-  Man *tempm;
-  U8 *temps,**_temps;
+  Man *tmpm;
+  U8 *tmps,**_tmps;
   F64 tt,ts=tS;
 
   for (i=lo;i<hi;i++) {
-    tempm=&m[i];
-    yy=(tempm->y-scroll_y)&(MAP_HEIGHT-1);
-    if (-32<=yy<=task->pix_bottom+32 && !tempm->dead) {
+    tmpm=&m[i];
+    yy=(tmpm->y-scroll_y)&(MAP_HEIGHT-1);
+    if (-32<=yy<=task->pix_bottom+32 && !tmpm->dead) {
       Mat4x4IdentEqu(r);
-      Mat4x4RotY(r,tempm->é+ã/2);
+      Mat4x4RotY(r,tmpm->é+ã/2);
       Mat4x4RotX(r,ã/6);
       Mat4x4Scale(r,0.3);
-      if (tempm->best_dd<(2*HACK_DIST)*(2*HACK_DIST)) {//It's neat so times 2.
-	if (tempm->friendly)
-	  _temps=friendly_hacking_imgs;
+      if (tmpm->best_dd<(2*HACK_DIST)*(2*HACK_DIST)) {//It's neat so times 2.
+	if (tmpm->friendly)
+	  _tmps=friendly_hacking_imgs;
 	else
-	  _temps=enemy_hacking_imgs;
-	tt=4*Wrap(tempm->phase+20*ts,0)/(2*ã);
+	  _tmps=enemy_hacking_imgs;
+	tt=4*Wrap(tmpm->phase+20*ts,0)/(2*ã);
       } else {
-	if (tempm->friendly)
-	  _temps=friendly_imgs;
+	if (tmpm->friendly)
+	  _tmps=friendly_imgs;
 	else
-	  _temps=enemy_imgs;
-	tt=4*Wrap(tempm->phase+5*ts,0)/(2*ã);
+	  _tmps=enemy_imgs;
+	tt=4*Wrap(tmpm->phase+5*ts,0)/(2*ã);
       }
       phase=tt; tt%=1.0;
-      temps=SpriteInterpolate(tt,_temps[phase&3],_temps[(phase+1)&3]);
-      SpriteMat3B(dc,tempm->x,yy,GR_Z_ALL,temps,r);
-      Free(temps);
+      tmps=SpriteInterpolate(tt,_tmps[phase&3],_tmps[(phase+1)&3]);
+      SpriteMat3B(dc,tmpm->x,yy,GR_Z_ALL,tmps,r);
+      Free(tmps);
     }
   }
 
@@ -213,9 +213,9 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 i,yy,scroll_y=MAP_HEIGHT-100-100*(tS-t0);
   F64 tt,ts=tS;
-  Man *tempm;
-  Bullet *tempb;
-  U8 *temps;
+  Man *tmpm;
+  Bullet *tmpb;
+  U8 *tmps;
 
   for (i=0;i<MAX_LANDSCAPE;i++) {
     yy=(ls[i].y-scroll_y)&(MAP_HEIGHT-1);
@@ -229,11 +229,11 @@ U0 DrawIt(CTask *task,CDC *dc)
 	GR_WIDTH,(finish_line-scroll_y)&(MAP_HEIGHT-1),0);
 
   dc->color=LTRED;
-  for (i=0,tempb=b;i<MAX_BULLETS;i++,tempb++)
-    if (!tempb->dead)
-      GrLine(dc,tempb->x>>32,tempb->y>>32,
-	    (tempb->x+tempb->dx*BULLET_LEN)>>32,
-	    (tempb->y+tempb->dy*BULLET_LEN)>>32);
+  for (i=0,tmpb=b;i<MAX_BULLETS;i++,tmpb++)
+    if (!tmpb->dead)
+      GrLine(dc,tmpb->x>>32,tmpb->y>>32,
+	    (tmpb->x+tmpb->dx*BULLET_LEN)>>32,
+	    (tmpb->y+tmpb->dy*BULLET_LEN)>>32);
 
   DCDepthBufAlloc(dc);
   mp_not_done_flags=1<<mp_cnt-1;
@@ -267,36 +267,36 @@ U0 DrawIt(CTask *task,CDC *dc)
 U0 CheckCollisions()
 {
   I64 i,x,y,scroll_y=MAP_HEIGHT-100-100*(tS-t0);
-  Man *tempm;
-  Bullet *tempb;
+  Man *tmpm;
+  Bullet *tmpb;
   CDC	*dc2=DCNew(GR_WIDTH,GR_HEIGHT);
   dc2->color=LTRED;
-  for (i=0,tempb=b;i<MAX_BULLETS;i++,tempb++)
-    if (!tempb->dead)
-      GrLine(dc2,tempb->x>>32,tempb->y>>32,
-	    (tempb->x+tempb->dx*BULLET_LEN)>>32,
-	    (tempb->y+tempb->dy*BULLET_LEN)>>32);
+  for (i=0,tmpb=b;i<MAX_BULLETS;i++,tmpb++)
+    if (!tmpb->dead)
+      GrLine(dc2,tmpb->x>>32,tmpb->y>>32,
+	    (tmpb->x+tmpb->dx*BULLET_LEN)>>32,
+	    (tmpb->y+tmpb->dy*BULLET_LEN)>>32);
 
   dc2->color  =ROP_COLLISION;
   dc2->bkcolor=BLACK;
-  for (i=0,tempm=m;i<MAX_MAN;i++,tempm++) {
-    if (!tempm->dead) {
-      x=tempm->x;
-      y=(tempm->y-scroll_y)&(MAP_HEIGHT-1);
+  for (i=0,tmpm=m;i<MAX_MAN;i++,tmpm++) {
+    if (!tmpm->dead) {
+      x=tmpm->x;
+      y=(tmpm->y-scroll_y)&(MAP_HEIGHT-1);
       if (0<=x<GR_WIDTH && 0<=y<GR_HEIGHT) {
 	dc2->collision_cnt=0;
 	GrRect(dc2,x-3,y-9,6,8);
 	if (dc2->collision_cnt) {
-	  tempm->dead=TRUE;
-	  tempm->corpse_timeout=tS+30.0;
-	  if (tempm->friendly) {
+	  tmpm->dead=TRUE;
+	  tmpm->corpse_timeout=tS+30.0;
+	  if (tmpm->friendly) {
 	    friendly_fire++;
 	    friendly_left--;
 	  } else
 	    enemy_left--;
 	  if (!snd_timeout) {
 	    snd_timeout=tS+0.01;
-	    if (tempm->friendly)
+	    if (tmpm->friendly)
 	      Snd(200);
 	    else
 	      Snd(50);
@@ -311,7 +311,7 @@ U0 CheckCollisions()
 U0 Init()
 {
   I64 i,xx,yy,scroll_y=MAP_HEIGHT-100;
-  Man *tempm;
+  Man *tmpm;
 
   snd_timeout=0;
   Snd(0);
@@ -337,27 +337,27 @@ U0 Init()
   ls[2].img=landscape_imgs[LANDSCAPE_TYPES-1]; //castle
 
   MemSet(m,0,sizeof(m));
-  for (i=0,tempm=m;i<MAX_MAN;i++,tempm++) {
+  for (i=0,tmpm=m;i<MAX_MAN;i++,tmpm++) {
     if (i<MAX_FRIENDLY) {
-      tempm->friendly=TRUE;
+      tmpm->friendly=TRUE;
       if (!(i&7)) {
 	xx=(Fs->pix_width-200)*RandU32/MAX_U32;
 	yy=(MAP_HEIGHT-200)*RandU32/MAX_U32;
       }
     } else {
-      tempm->friendly=FALSE;
+      tmpm->friendly=FALSE;
       if (!(i&31)) {
 	xx=(Fs->pix_width-200)*RandU32/MAX_U32;
 	yy=(MAP_HEIGHT-200)*RandU32/MAX_U32;
       }
     }
-    tempm->dead=FALSE;
-    tempm->x=xx+64*RandI32/MAX_I32+100;
-    tempm->y=yy+64*RandU32/MAX_I32-64+100;
-    tempm->best_dd=MAX_I64;
-    tempm->é=0;
-    tempm->phase=2*ã*Rand;
-    tempm->corpse_timeout=0;
+    tmpm->dead=FALSE;
+    tmpm->x=xx+64*RandI32/MAX_I32+100;
+    tmpm->y=yy+64*RandU32/MAX_I32-64+100;
+    tmpm->best_dd=MAX_I64;
+    tmpm->é=0;
+    tmpm->phase=2*ã*Rand;
+    tmpm->corpse_timeout=0;
   }
   for (i=0;i<MAX_BULLETS;i++)
     b[i].dead=TRUE;
@@ -374,25 +374,25 @@ U0 FireBullet()
 {
   I64 i,j;
   F64 a;
-  Bullet *tempb;
+  Bullet *tmpb;
   for (i=0;i<MAX_BULLETS-1;i++)
     if (b[i].dead)
       break;
-  tempb=&b[i];
+  tmpb=&b[i];
 
   j=x+24.0*Sin(é);
-  tempb->x=j<<32;
+  tmpb->x=j<<32;
 
   j=y-24.0*Cos(é);
-  tempb->y=j<<32;
+  tmpb->y=j<<32;
 
-  tempb->dx2=(BULLET_SPEED*Sin(é)+dx)*0x100000000;
-  tempb->dy2=-BULLET_SPEED*Cos(é)*0x100000000;
-  a=Arg(tempb->dx2,tempb->dy2);
-  tempb->dx=Cos(a)*0x100000000;
-  tempb->dy=Sin(a)*0x100000000;
+  tmpb->dx2=(BULLET_SPEED*Sin(é)+dx)*0x100000000;
+  tmpb->dy2=-BULLET_SPEED*Cos(é)*0x100000000;
+  a=Arg(tmpb->dx2,tmpb->dy2);
+  tmpb->dx=Cos(a)*0x100000000;
+  tmpb->dy=Sin(a)*0x100000000;
   bullets_fired++;
-  tempb->dead=FALSE;
+  tmpb->dead=FALSE;
   if (!snd_timeout) {
     snd_timeout=tS+0.0005;
     Snd(1000);

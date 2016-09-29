@@ -597,7 +597,7 @@ class CEdMacroMenu
 	left_macro[512]	fmtstr "$$DA-P,A=\"Left Click Macro          :%s\"$$\n",
 	left_exp[512]	fmtstr "$$DA-P,A=\"Left Click Expression     :%s\"$$\n";
   Bool	popup		fmtstr "$$CB,\"PopUp\"$$\n",
-	left_is_auto	fmtstr "$$CB,\"Left is AutoStr\"$$\n",
+	left_is_in_str	fmtstr "$$CB,\"Left is InStr\"$$\n",
 	left_x		fmtstr "$$CB,\"Left X \"$$\n",
 	center_x	fmtstr "$$CB,\"Center X \"$$\n",
 	right_x		fmtstr "$$CB,\"Right X \"$$\n",
@@ -628,7 +628,7 @@ U0 EdInsMacroMenu(Bool is_macro)
     if (e->invert)	CatPrint(buf,"+IV");
     if (!e->underline)	CatPrint(buf,"-UL");
     if (!e->escape)	CatPrint(buf,"-X");
-    if (e->left_is_auto) CatPrint(buf,"+LA");
+    if (e->left_is_in_str) CatPrint(buf,"+LIS");
     if (*e->tag || is_macro) {
       if (is_macro) {
 	if (*e->tag) {
@@ -671,7 +671,7 @@ class CEdButton
 	margin_rel fmtstr "$$CB,\"Margin Rel X\"$$\n",
 	escape	   fmtstr "$$CB,\"Escape\"$$\n";
   U8	left_macro[512]	fmtstr "$$DA-P,A=\"Left Click Macro:%s\"$$\n";
-  Bool	left_is_auto	fmtstr "$$CB,\"Left is AutoStr\"$$\n";
+  Bool	left_is_in_str	fmtstr "$$CB,\"Left is InStr\"$$\n";
   U8	left_exp[512]	fmtstr "$$DA-P,A=\"Left Click Expression:%s\"$$\n";
   Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
 };
@@ -689,7 +689,7 @@ U0 EdInsButton()
     if (e->right_x ) CatPrint(buf,"+RX");
     if (e->margin_rel) CatPrint(buf,"+MRX");
     if (!e->escape)	CatPrint(buf,"-X");
-    if (e->left_is_auto) CatPrint(buf,"+LA");
+    if (e->left_is_in_str) CatPrint(buf,"+LIS");
     if (*e->tag) {
       if (e->quote) {
 	st=MStrPrint("%q",e->tag);
@@ -1079,7 +1079,7 @@ class CEdMacroSprite
 	exp[512]	fmtstr "$$DA-P,A=\"Macro          :%s\"$$\n";
   Bool	escape		fmtstr "$$CB,\"Escape\"$$\n",
 	popup		fmtstr "$$CB,\"PopUp\"$$\n",
-	is_auto		fmtstr "$$CB,\"AutoStr\"$$\n";
+	is_in_str		fmtstr "$$CB,\"InStr\"$$\n";
 };
 
 class CEdMenuSprite
@@ -1088,7 +1088,7 @@ class CEdMenuSprite
 	exp[512]	fmtstr "$$DA-P,A=\"Expression     :%s\"$$\n";
   Bool	escape		fmtstr "$$CB,\"Escape\"$$\n",
 	popup,
-	is_auto;
+	is_in_str;
 };
 
 U8 *EdSpriteLink(Bool *_pop_up,U8 **_html_link)
@@ -1119,7 +1119,7 @@ U8 *EdSprite(I64 bin_num)
       e->escape=TRUE;
       if (DocForm(e,,,,ctrl_L_footer)) {
 	CatPrint(buf,"+UL");
-	if (e->is_auto) CatPrint(buf,"+LA");
+	if (e->is_in_str) CatPrint(buf,"+LIS");
 	if (e->popup)	CatPrint(buf,"+PU");
 	if (e->escape)	CatPrint(buf,"+X");
 	st=MStrPrint("%q",e->exp);

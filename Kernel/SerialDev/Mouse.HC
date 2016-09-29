@@ -108,11 +108,11 @@ Bool MouseRst()
 
 U0 MouseSpeedSet()
 {
-  I64 dd,temp;
+  I64 dd,tmp;
   if ((dd=SqrI64(mouse_last.pos.x-mouse.pos.x)
 	+SqrI64(mouse_last.pos.y-mouse.pos.y)) &&
-	(temp=mouse.timestamp-mouse_last.timestamp))
-    mouse.speed=Sqrt(dd)*cnts.time_stamp_freq/temp;
+	(tmp=mouse.timestamp-mouse_last.timestamp))
+    mouse.speed=Sqrt(dd)*cnts.time_stamp_freq/tmp;
   mouse_last.timestamp=mouse.timestamp;
 }
 

@@ -33,7 +33,7 @@ U0 SunMoon()
     gr.dc->dither_probability_u16=2*i;	//U16 can be [0,65535]
     GrFloodFill(gr.dc,x-0.75*radius,y);
 
-    WinMgrSync; //Typically 30 fps
+    Refresh; //Typically 30 fps
     DCFill;
   }
 

@@ -201,67 +201,67 @@ CDocEntry *DocWordWrapAdd(CDoc *doc,CDocEntry *doc_e,
   return NULL;
 }
 
-I64 DocTempAttr(CDoc *doc,CDocEntry *doc_e,I64 cur_u8_attr)
+I64 DocTmpAttr(CDoc *doc,CDocEntry *doc_e,I64 cur_u8_attr)
 {
-  I64 temp_u32_attr;
+  I64 tmp_u32_attr;
   doc_e->de_flags=doc->flags& (DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT) |
 	doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_WORD_WRAP|DOCEF_HIGHLIGHT);
-  temp_u32_attr=(cur_u8_attr&0xF0)<<8|
+  tmp_u32_attr=(cur_u8_attr&0xF0)<<8|
 	doc->flags&DOCG_BL_IV_UL|(doc_e->settings.shifted_x&0x1F)<<16|
 	(doc_e->settings.shifted_y&0x1F)<<21;
   if (doc_e->de_flags & DOCEF_HAS_BIN && *doc_e->tag=='<')
-    temp_u32_attr.u8[1]|=DOC_COLOR_BIN;
+    tmp_u32_attr.u8[1]|=DOC_COLOR_BIN;
   else
     switch (doc_e->type_u8) {
       case DOCT_SPRITE:
 	if (doc_e->de_flags & DOCEF_LEFT_EXP)
-	  temp_u32_attr.u8[1]|=cur_u8_attr&15;
+	  tmp_u32_attr.u8[1]|=cur_u8_attr&15;
 	else if (doc_e->de_flags & DOCEF_LINK)
-	  temp_u32_attr.u8[1]|=DOC_COLOR_LINK;
+	  tmp_u32_attr.u8[1]|=DOC_COLOR_LINK;
 	else if (doc_e->de_flags & DOCEF_LEFT_MACRO)
-	  temp_u32_attr.u8[1]|=DOC_COLOR_MACRO;
+	  tmp_u32_attr.u8[1]|=DOC_COLOR_MACRO;
 	else if (doc_e->de_flags & (DOCEF_TREE|DOCEF_LST))
-	  temp_u32_attr.u8[1]|=DOC_COLOR_TREE;
+	  tmp_u32_attr.u8[1]|=DOC_COLOR_TREE;
 	else
-	  temp_u32_attr.u8[1]|=DOC_COLOR_BIN;
+	  tmp_u32_attr.u8[1]|=DOC_COLOR_BIN;
 	break;
       case DOCT_HTML_CODE:
-	temp_u32_attr.u8[1]|=DOC_COLOR_BIN;
+	tmp_u32_attr.u8[1]|=DOC_COLOR_BIN;
 	break;
       case DOCT_LINK:
-	temp_u32_attr.u8[1]|=DOC_COLOR_LINK;
+	tmp_u32_attr.u8[1]|=DOC_COLOR_LINK;
 	break;
       case DOCT_MACRO:
-	temp_u32_attr.u8[1]|=DOC_COLOR_MACRO;
+	tmp_u32_attr.u8[1]|=DOC_COLOR_MACRO;
 	break;
       case DOCT_ANCHOR:
-	temp_u32_attr.u8[1]|=DOC_COLOR_ANCHOR;
+	tmp_u32_attr.u8[1]|=DOC_COLOR_ANCHOR;
 	break;
       case DOCT_TREE:
       case DOCT_LST:
-	temp_u32_attr.u8[1]|=DOC_COLOR_TREE;
+	tmp_u32_attr.u8[1]|=DOC_COLOR_TREE;
 	break;
       default:
-	temp_u32_attr.u8[1]|=cur_u8_attr&15;
+	tmp_u32_attr.u8[1]|=cur_u8_attr&15;
     }
-  doc_e->type.u8[1]=temp_u32_attr.u8[1];
-  temp_u32_attr|=doc_e->type&0xFFFF0000;
+  doc_e->type.u8[1]=tmp_u32_attr.u8[1];
+  tmp_u32_attr|=doc_e->type&0xFFFF0000;
   if (doc_e==doc->cur_entry && !(doc->flags&DOCF_DONT_HIGHLIGHT_CURSOR) &&
 	doc_e->type_u8!=DOCT_TEXT)
-    temp_u32_attr^=0xFF00;
-  doc_e->settings.final_u32_attr=temp_u32_attr;
-  return temp_u32_attr;
+    tmp_u32_attr^=0xFF00;
+  doc_e->settings.final_u32_attr=tmp_u32_attr;
+  return tmp_u32_attr;
 }
 
 public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
-{//Recalc and fmt.  Also used by WinMgr to draw on screen.
+{//Recalc and fmt.  Also used by WinMgr to draw on scrn.
   I64 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I64,xx,yy,zz,
-	num_entries=0,i_jif,cur_u8_attr,temp_u32_attr,
+	num_entries=0,i_jif,cur_u8_attr,tmp_u32_attr,
 	cursor_y=MIN_I64,left_margin,right_margin,y_plot_top,y_plot_bottom,
 	top,left,bottom,right,width,height,scroll_x,scroll_y,pix_top,pix_left;
   CDocEntry reg *doc_e,reg *doc_e2,*best_doc_e,*next_clear_found=NULL,
 	*added_cursor=NULL;
-  CDocBin *tempb;
+  CDocBin *tmpb;
   CDocSettings *s;
   Bool del_doc_e,skipped_update,tree_collapsed,same_win,more=FALSE,
 	find_cursor=FALSE,blink_flag,full_refresh=TRUE,unlock,clear_holds;
@@ -272,12 +272,12 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
   I32 *depth_buf=NULL;
   F64 cur_time=tS;
   CWinScroll *vss,*hss;
-  CHashDefineStr *temph;
+  CHashDefineStr *tmph;
 
   if (!doc || doc->doc_signature!=DOC_SIGNATURE_VAL) return FALSE;
 
   //WinMgr updates all wins $TX,"30",D="WINMGR_FPS"$, 33.33333mS
-  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN && doc->owning_task!=Fs) {
+  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN && doc->owning_task!=Fs) {
     i_jif=cnts.jiffies+JIFFY_FREQ/250; //4 ms
     while (Bt(&doc->locked_flags,DOClf_LOCKED)) {
       if (cnts.jiffies>=i_jif)
@@ -302,7 +302,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
       if (win_task)
 	dc=DCAlias(gr.dc2,win_task); //Necessary for sprites
       break;
-    case RECALCt_TO_SCREEN:
+    case RECALCt_TO_SCRN:
       if (doc->updates_cnt++%(ToI64(winmgr.fps/10)+1) &&
 	    !Bt(&doc->flags,DOCf_DO_FULL_REFRESH) &&
 	    !(doc->flags&DOCF_BWD_MOVEMENT))
@@ -352,7 +352,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
     doc->top_line_num=0;
     doc->line_start_col=0;
     recalc_flags&=~RECALCF_HAS_CURSOR;
-    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN)
+    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN)
       doc->settings_head.cur_text_attr=
 	    doc->settings_head.dft_text_attr=win_task->border_attr;
   } else {
@@ -373,7 +373,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	find_cursor=TRUE;
       }
     }
-    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN)
+    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN)
       doc->settings_head.cur_text_attr=
 	    doc->settings_head.dft_text_attr=win_task->text_attr;
   }
@@ -385,7 +385,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	right ==doc->old_win_right &&
 	doc->cur_entry==doc->old_cur_entry &&
 	doc->cur_col==doc->old_cur_col;
-  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN) {
+  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN) {
     y_plot_top=y0-scroll_y/FONT_HEIGHT;
     y_plot_bottom=y0+height-1-scroll_y/FONT_HEIGHT;
     if (!(doc->flags&DOCF_BORDER_DOC) &&
@@ -406,7 +406,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
   cur_u8_attr=s->cur_text_attr;
   if (doc_e==doc->head.next) {
     doc->flags&=~DOCF_BWD_MOVEMENT;
-    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN && full_refresh)
+    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN && full_refresh)
       doc->flags&=~DOCF_HAS_SONG;
   } else
     doc->flags=doc_e->de_flags& DOCEF_HIGHLIGHT |
@@ -443,9 +443,9 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	  else
 	    doc_e->tag=StrNew("",mem_task);
 	} else {
-	  if (temph=HashFind(doc_e->define_str,
+	  if (tmph=HashFind(doc_e->define_str,
 		win_task->hash_table,HTT_DEFINE_STR))
-	    doc_e->tag=StrNew(temph->data,mem_task);
+	    doc_e->tag=StrNew(tmph->data,mem_task);
 	  else
 	    doc_e->tag=CAlloc(1,mem_task);
 	}
@@ -483,7 +483,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
     }
     col2=0;
 
-    temp_u32_attr=DocTempAttr(doc,doc_e,cur_u8_attr);
+    tmp_u32_attr=DocTmpAttr(doc,doc_e,cur_u8_attr);
     if (doc_e==doc->cur_entry) {
       cursor_y=doc_e->y;
       if (recalc_flags&RECALCF_ADD_CURSOR && !added_cursor) {
@@ -547,20 +547,20 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	j=StrLen(doc_e->tag);
 	if (j && doc_e->scroll_len) {
 	  i_jif=ToI64(cur_time*FONT_WIDTH*DOC_SCROLL_SPEED)%(j*FONT_WIDTH);
-	  temp_u32_attr=temp_u32_attr & 0xFFE0FF00|
+	  tmp_u32_attr=tmp_u32_attr & 0xFFE0FF00|
 		(FONT_WIDTH-1-i_jif&(FONT_WIDTH-1))<<16;
 #assert FONT_WIDTH==8
 	  i_jif>>=3;
 	  for (k=0;k<doc_e->scroll_len;k++) {
 	    ch=ptr[(i_jif+k)%j];
 	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
-	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
-		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+ch);
 	      else
-		TextChar(win_task,FALSE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,FALSE,x-x0,y-y0,tmp_u32_attr+ch);
 	    }
 	    x++;
 	  }
@@ -574,9 +574,9 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 	      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER)) {
 	  while (ch=*ptr++) {
-	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW))
-	      TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
+	      TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+ch);
 	    else
 	      if (find_cursor) {
 		d2=DocCharDist(doc,x,y);
@@ -590,10 +590,10 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	  }
 	} else {
 	  if (doc_e->type_u8==DOCT_TEXT && doc_e->de_flags&DOCEF_HIGHLIGHT)
-	    hl=DocHighlight(doc_e,ptr,k,temp_u32_attr);
+	    hl=DocHighlight(doc_e,ptr,k,tmp_u32_attr);
 	  else
 	    hl=NULL;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		!(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 //Technically we should do this for scrolling_x, too.
 	    if (y>y_plot_bottom)
@@ -602,7 +602,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	      if (hl)
 		TextLenAttrStr(win_task,x-x0,y-y0,k,hl);
 	      else
-		TextLenStr(win_task,x-x0,y-y0,k,temp_u32_attr,ptr);
+		TextLenStr(win_task,x-x0,y-y0,k,tmp_u32_attr,ptr);
 	    }
 	    col2+=k;
 	    x+=k;
@@ -647,13 +647,13 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	    StrPrint(buf,"%08tX ",bptr);
 	  ptr=buf;
 	  while (ch=*ptr++) {
-	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
-		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+ch);
 	      else
-		TextChar(win_task,FALSE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,FALSE,x-x0,y-y0,tmp_u32_attr+ch);
 	    }
 	    if (find_cursor) {
 	      d2=DocCharDist(doc,x,y);
@@ -669,13 +669,13 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	    StrPrint(buf,"%02tX",*bptr++);
 	    ptr=buf;
 	    while (ch=*ptr++) {
-	      if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	      if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		    !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 		if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
-		  TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
+		  TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+ch);
 		else
-		  TextChar(win_task,FALSE,x-x0,y-y0,temp_u32_attr+ch);
+		  TextChar(win_task,FALSE,x-x0,y-y0,tmp_u32_attr+ch);
 	      }
 	      if (find_cursor) {
 		d2=DocCharDist(doc,x,y);
@@ -694,13 +694,13 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	  for (j=0;j<k;j++) {
 	    ch=*bptr++;
 	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
-	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 		    !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER))
-		TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+ch);
 	      else
-		TextChar(win_task,FALSE,x-x0,y-y0,temp_u32_attr+ch);
+		TextChar(win_task,FALSE,x-x0,y-y0,tmp_u32_attr+ch);
 	    }
 	    if (find_cursor) {
 	      d2=DocCharDist(doc,x,y);
@@ -718,7 +718,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	break;
       case DOCT_NEW_LINE:
       case DOCT_SOFT_NEW_LINE:
-	if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 	      !(doc_e->de_flags&DOCEF_DONT_DRAW)&&
 	      y_plot_top<=y<=y_plot_bottom)
 	  TextLenAttr(win_task,x-x0,y-y0,width-(x-x0),cur_u8_attr<<8);
@@ -779,9 +779,9 @@ rc_adjust_xy:
 	if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
 	      !Bt(&win_task->display_flags,DISPLAYf_NO_BORDER)) {
 	  while (x<k) {
-	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW))
-	      TextChar(win_task,TRUE,x-x0,y-y0,temp_u32_attr+CH_SPACE);
+	      TextChar(win_task,TRUE,x-x0,y-y0,tmp_u32_attr+CH_SPACE);
 	    if (find_cursor) {
 	      d2=DocCharDist(doc,x,y);
 	      if (d2<D)
@@ -791,10 +791,10 @@ rc_adjust_xy:
 	  }
 	} else {
 	  k-=x;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		!(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	    if (y_plot_top<=y<=y_plot_bottom)
-	      TextLenStr(win_task,x-x0,y-y0,k,temp_u32_attr,"        ");
+	      TextLenStr(win_task,x-x0,y-y0,k,tmp_u32_attr,"        ");
 	    x+=k;
 	  } else {
 	    if (find_cursor) {
@@ -956,16 +956,16 @@ rc_adjust_xy:
       case DOCT_SPRITE:
 	if (!doc_e->bin_data && doc->flags&DOCEF_HAS_BIN)
 	  doc_e->bin_data=DocBinFindNum(doc,doc_e->bin_num);
-	if ((tempb=doc_e->bin_data) &&
-	      !tempb->tag && doc_e->tag && *doc_e->tag)
-	  tempb->tag=StrNew(doc_e->tag,mem_task);
-	if (tempb && dc) {
+	if ((tmpb=doc_e->bin_data) &&
+	      !tmpb->tag && doc_e->tag && *doc_e->tag)
+	  tmpb->tag=StrNew(doc_e->tag,mem_task);
+	if (tmpb && dc) {
 	  DCRst(dc);
 	  dc->flags&=~(DCF_DONT_DRAW|DCF_LOCATE_NEAREST);
-	  if (recalc_flags&RECALCG_MASK!=RECALCt_TO_SCREEN ||
+	  if (recalc_flags&RECALCG_MASK!=RECALCt_TO_SCRN ||
 		doc_e->de_flags&DOCEF_DONT_DRAW)
 	    dc->flags|=DCF_DONT_DRAW;
-	  bptr=tempb->data;
+	  bptr=tmpb->data;
 	  ii=SpriteTypeMask(bptr);
 	  if (ii&1<<SPT_NUM_TYPES) {
 	    bptr=gr.empty_sprite;
@@ -974,19 +974,19 @@ rc_adjust_xy:
 	  if (ii&(1<<SPT_FLOOD_FILL|1<<SPT_FLOOD_FILL_NOT))
 	    i=cur_u8_attr>>4 &0xF ^ win_task->text_attr>>4 & 0xF;
 	  else {
-	    i=temp_u32_attr>>12&0xF ^ win_task->text_attr>>4 & 0xF;
-	    if (temp_u32_attr & DOCET_SEL)
+	    i=tmp_u32_attr>>12&0xF ^ win_task->text_attr>>4 & 0xF;
+	    if (tmp_u32_attr & DOCET_SEL)
 	      i^=0xF;
-	    if (temp_u32_attr & DOCET_INVERT)
+	    if (tmp_u32_attr & DOCET_INVERT)
 	      i^=0xF;
 	    if (blink_flag &&
-		  (doc_e==doc->cur_entry || temp_u32_attr&DOCET_BLINK))
+		  (doc_e==doc->cur_entry || tmp_u32_attr&DOCET_BLINK))
 	      i^=0xF;
 	  }
 	  dc->color=i;
 	  if (find_cursor)
 	    dc->flags|=DCF_LOCATE_NEAREST;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		doc->cur_sprite==bptr) {
 	    dc->flags|=DCF_LOCATE_NEAREST;
 	    dc->cur_x=ip.pos.x;
@@ -1024,7 +1024,7 @@ rc_adjust_xy:
 	  }
 	  Sprite3(dc,xx,yy,zz,bptr);
 	  dc->depth_buf=NULL;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		doc->cur_sprite==bptr)
 	    doc->nearest_sprite_elem_num=dc->nearest_sprite_elem_num;
 	  dc->flags&=~(DCF_LOCATE_NEAREST|DCF_DONT_DRAW|DCF_TRANSFORMATION);
@@ -1036,7 +1036,7 @@ rc_adjust_xy:
 	break;
       case DOCT_SONG:
 	if (sys_focus_task==win_task &&
-	      recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+	      recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 	      !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	  if (doc_e->aux_str &&
 		(!music.cur_song || StrCmp(music.cur_song,doc_e->aux_str))) {
@@ -1059,7 +1059,7 @@ rc_adjust_xy:
 
     if (doc_e->de_flags & DOCEF_HAS_BORDER)
       TextBorder(win_task,doc_e->x-x0,x-x0-1,doc_e->y-y0,y-y0,
-	    temp_u32_attr.u8[1],ToBool(doc_e->de_flags & DOCEF_SOLID_BORDER));
+	    tmp_u32_attr.u8[1],ToBool(doc_e->de_flags & DOCEF_SOLID_BORDER));
     if (full_refresh) {
       switch (doc_e->type_u8) {
 	case DOCT_CHECK_BOX:
@@ -1245,7 +1245,7 @@ rc_skip:
     doc->col=doc->x+1;
 
     if (recalc_flags&RECALCF_HAS_CURSOR) {
-      if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN) {
+      if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN) {
 	x=0;
 	y=0;
       } else {
@@ -1273,7 +1273,7 @@ rc_skip:
 	doc->line_start_col=doc->x+x;
     }
   }
-  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCREEN &&
+  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 	recalc_flags&RECALCF_HAS_CURSOR) {
     x=doc->x-doc->line_start_col+left +scroll_x/FONT_WIDTH;
     y=doc->y-doc->top_line_num+top+scroll_y/FONT_HEIGHT;

@@ -2,16 +2,16 @@
 public U8 *ACDDefGet(U8 *st,I64 def_num=1)
 {//MAlloc str holding single dict definition of word.
   CFile *f;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   U8 *res=NULL,*buf,*in_ptr,
 	*st2=MStrUtil(st,SUF_TO_UPPER);
-  temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
+  tmph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
-  if (temph) {
+  if (tmph) {
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+      FRBlks(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
 	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;
@@ -46,16 +46,16 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
 public U8 *ACDDefsGet(U8 *st)
 {//MAlloc str with all dict definitions of word.
   CFile *f;
-  CHashGeneric *temph;
+  CHashGeneric *tmph;
   U8 *res=NULL,*buf,*in_ptr,*in_ptr2,
 	*st2=MStrUtil(st,SUF_TO_UPPER);
-  temph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
+  tmph=HashFind(st2,ac.hash_table,HTT_DICT_WORD);
   Free(st2);
-  if (temph) {
+  if (tmph) {
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,temph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+      FRBlks(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
 	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;
@@ -143,7 +143,7 @@ U0 ACDFillin(I64 n)
     s=acd.fillins[n]+1;
     len=StrLen(s);
     if (len>ac.partial_len)
-      Auto(s+ac.partial_len);
+      In(s+ac.partial_len);
   }
 }
 
@@ -246,16 +246,16 @@ U0 ACFillIn(I64 n)
   if (0<=--n<ac.num_fillins) {
     s=ac.fillin_matches[n]->str;
     if (StrLen(s)>ac.partial_len)
-      Auto(s+ac.partial_len);
+      In(s+ac.partial_len);
   }
 }
 
 U0 ACMan(I64 n,CTask *parent_task=NULL)
 {
-  CHashAC *tempw;
-  CHashSrcSym *temph;
-  if (0<=--n<ac.num_fillins && (tempw=ac.fillin_matches[n]) &&
-	(temph=HashFind(tempw->str,Fs->hash_table,HTG_SRC_SYM)) &&
-	temph->src_link)
-    PopUpEd(temph->src_link,parent_task);
+  CHashAC *tmpw;
+  CHashSrcSym *tmph;
+  if (0<=--n<ac.num_fillins && (tmpw=ac.fillin_matches[n]) &&
+	(tmph=HashFind(tmpw->str,Fs->hash_table,HTG_SRC_SYM)) &&
+	tmph->src_link)
+    PopUpEd(tmph->src_link,parent_task);
 }

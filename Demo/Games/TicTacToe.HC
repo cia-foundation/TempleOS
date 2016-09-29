@@ -54,11 +54,11 @@ U0 TakeTurn(I64 player)
       Beep(1000);
     while (!ip.lb) {
       DrawBoard(player);
-      WinMgrSync;
+      Refresh;
     }
     while (ip.lb) {
       DrawBoard(player);
-      WinMgrSync;
+      Refresh;
     }
     x=ip.pos.x-Fs->pix_left;
     y=ip.pos.y-Fs->pix_top;

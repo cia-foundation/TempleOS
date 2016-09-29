@@ -65,28 +65,28 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
   //it will be stored uncompressed.
   Bool res=TRUE;
   CDirContext *dirc;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   U8 *st;
-  if (!(tempde1=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
+  if (!(tmpde1=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
     return FALSE;
   if (IsDir(dst_files_find_mask)) {
     if (dirc=DirContextNew(dst_files_find_mask,TRUE)) {
-      tempde=tempde1;
-      while (tempde) {
-	if (!(tempde->attr & RS_ATTR_DIR)) {
-	  st=FileNameAbs(tempde->name);
-	  if (!CopySingle(tempde->full_name,st))
+      tmpde=tmpde1;
+      while (tmpde) {
+	if (!(tmpde->attr & RS_ATTR_DIR)) {
+	  st=FileNameAbs(tmpde->name);
+	  if (!CopySingle(tmpde->full_name,st))
 	    res=FALSE;
 	  Free(st);
 	}
-	tempde=tempde->next;
+	tmpde=tmpde->next;
       }
       DirContextDel(dirc);
     }
-    DirTreeDel(tempde1);
+    DirTreeDel(tmpde1);
     return res;
   } else {
-    DirTreeDel(tempde1);
+    DirTreeDel(tmpde1);
     return CopySingle(src_files_find_mask,dst_files_find_mask);
   }
 }
@@ -100,22 +100,22 @@ public Bool Move(U8 *f1,U8 *f2)
   return FALSE;
 }
 
-I64 CopyTree2(CDirEntry *tempde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
+I64 CopyTree2(CDirEntry *tmpde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
 {
   U8 *st;
   I64 res=1;
-  while (tempde) {
-    st=MAlloc(StrLen(tempde->full_name)+dst_dir_len+2);
+  while (tmpde) {
+    st=MAlloc(StrLen(tmpde->full_name)+dst_dir_len+2);
     MemCpy(st,dst_dir,dst_dir_len);
-    StrCpy(st+dst_dir_len,tempde->full_name+src_dir_len);
-    if (tempde->attr & RS_ATTR_DIR) {
-      MkDir(st,LinkedLstCnt(tempde->sub));
-      res+=CopyTree2(tempde->sub,src_dir_len,dst_dir_len,dst_dir);
+    StrCpy(st+dst_dir_len,tmpde->full_name+src_dir_len);
+    if (tmpde->attr & RS_ATTR_DIR) {
+      MkDir(st,LinkedLstCnt(tmpde->sub));
+      res+=CopyTree2(tmpde->sub,src_dir_len,dst_dir_len,dst_dir);
     } else
-      if (CopySingle(tempde->full_name,st))
+      if (CopySingle(tmpde->full_name,st))
 	res++;
     Free(st);
-    tempde=tempde->next;
+    tmpde=tmpde->next;
   }
   return res;
 }
@@ -124,7 +124,7 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
 {//Copy directory tree.
 //Returns the count of copied files (not dirs).
   CDirContext *dirc;
-  CDirEntry *tempde=NULL;
+  CDirEntry *tmpde=NULL;
   I64 res=0,i1,i2;
   U8 *st1,*st2;
 
@@ -139,7 +139,7 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
   Free(st1);
   Free(st2);
   if (dirc=DirContextNew(src_files_find_mask,TRUE,,no_mask)) {
-    tempde=FilesFind(dirc->mask,FUF_RECURSE);
+    tmpde=FilesFind(dirc->mask,FUF_RECURSE);
     st1=CurDir;
     DirContextDel(dirc);
     i1=StrLen(st1);
@@ -148,45 +148,45 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
       st2=CurDir;
       i2=StrLen(st2);
       if (i2==3) i2--;
-      res=CopyTree2(tempde,i1,i2,st2);
+      res=CopyTree2(tmpde,i1,i2,st2);
       DirContextDel(dirc);
       Free(st2);
     }
-    DirTreeDel(tempde);
+    DirTreeDel(tmpde);
     Free(st1);
   }
   return res;
 }
 
-I64 DelTreeDirs(CDirEntry *tempde1)
+I64 DelTreeDirs(CDirEntry *tmpde1)
 {
   I64 res=0;
-  CDirEntry *tempde2;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (tempde1->attr & RS_ATTR_DIR) {
-      if (tempde1->sub)
-	res+=DelTreeDirs(tempde1->sub);
-      res+=Del(tempde1->full_name,TRUE,TRUE);
+  CDirEntry *tmpde2;
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (tmpde1->attr & RS_ATTR_DIR) {
+      if (tmpde1->sub)
+	res+=DelTreeDirs(tmpde1->sub);
+      res+=Del(tmpde1->full_name,TRUE,TRUE);
     }
-    DirEntryDel(tempde1);
-    tempde1=tempde2;
+    DirEntryDel(tmpde1);
+    tmpde1=tmpde2;
   }
   return res;
 }
-I64 DelTreeFiles(CDirEntry *tempde1)
+I64 DelTreeFiles(CDirEntry *tmpde1)
 {
   I64 res=0;
-  CDirEntry *tempde2;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (tempde1->attr & RS_ATTR_DIR) {
-      if (tempde1->sub)
-	res+=DelTreeFiles(tempde1->sub);
+  CDirEntry *tmpde2;
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (tmpde1->attr & RS_ATTR_DIR) {
+      if (tmpde1->sub)
+	res+=DelTreeFiles(tmpde1->sub);
     } else
-      res+=Del(tempde1->full_name,FALSE,TRUE);
-    DirEntryDel(tempde1);
-    tempde1=tempde2;
+      res+=Del(tmpde1->full_name,FALSE,TRUE);
+    DirEntryDel(tmpde1);
+    tmpde1=tmpde2;
   }
   return res;
 }
@@ -240,13 +240,13 @@ To Set DateL:
 Touch(filename,"",,datetime);
 */
   I64 fuf_flags=0;
-  CDirEntry *tempde,*tempde1;
+  CDirEntry *tmpde,*tmpde1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+f+F");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  tempde=tempde1=FilesFind(files_find_mask,fuf_flags);
-  while (tempde) {
-    TouchFile(tempde->full_name,attr,cdt);
-    tempde=tempde->next;
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
+  while (tmpde) {
+    TouchFile(tmpde->full_name,attr,cdt);
+    tmpde=tmpde->next;
   }
-  DirTreeDel(tempde1);
+  DirTreeDel(tmpde1);
 }

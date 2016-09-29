@@ -6,12 +6,12 @@ class CCDVDUserData //Create DVD
 	short_dir_blks,long_dir_blks;
 };
 
-I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
-	CISO1DirEntry *tempi2,I64 *_cur_blk,CDirEntry *parent,Bool write,
+I64 DVDFileCreate2(CFile *out_file,CDirEntry *tmpde,CISO1DirEntry *tmpi,
+	CISO1DirEntry *tmpi2,I64 *_cur_blk,CDirEntry *parent,Bool write,
 	U8 *stage2_filename,I64 *_stage2_blk)
 {
-  CCDVDUserData *tempc;
-  CDirEntry *tempde1,*tempde2;
+  CCDVDUserData *tmpc;
+  CDirEntry *tmpde1,*tmpde2;
   CFile *in_file;
   U8 *buf=MAlloc(DVD_BLK_SIZE),*ptr1,*ptr2;
   CISO1DirEntry *dir_blk_buf =CAlloc(DVD_BLK_SIZE*128),
@@ -20,12 +20,12 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
 	*de2=dir_blk_buf2,*de12;
   I64 i,n;
 
-  tempc=parent->user_data;
+  tmpc=parent->user_data;
 
   de->len=sizeof(CISO1DirEntry)-1;
   de->ext_attr_len=0;
   FillU16Palindrome(&de->vol_seq_num,1);
-  Date2ISO1(&de->date,tempde->datetime);
+  Date2ISO1(&de->date,tmpde->datetime);
   de->flags=ISO1_ATTR_DIR;
   de->name_len=1;
   de->name=0;
@@ -34,8 +34,8 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
 
   de->len=sizeof(CISO1DirEntry)-1;
   de->ext_attr_len=0;
-  FillU32Palindrome(&de->loc,tempc->loc);
-  FillU32Palindrome(&de->size,tempc->short_dir_blks*DVD_BLK_SIZE);
+  FillU32Palindrome(&de->loc,tmpc->loc);
+  FillU32Palindrome(&de->size,tmpc->short_dir_blks*DVD_BLK_SIZE);
   FillU16Palindrome(&de->vol_seq_num,1);
   Date2ISO1(&de->date,parent->datetime);
   de->flags=ISO1_ATTR_DIR;
@@ -47,7 +47,7 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
   de2->len=sizeof(CISO1DirEntry)-1;
   de2->ext_attr_len=0;
   FillU16Palindrome(&de2->vol_seq_num,1);
-  Date2ISO1(&de2->date,tempde->datetime);
+  Date2ISO1(&de2->date,tmpde->datetime);
   de2->flags=ISO1_ATTR_DIR;
   de2->name_len=1;
   de2->name=0;
@@ -56,8 +56,8 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
 
   de2->len=sizeof(CISO1DirEntry)-1;
   de2->ext_attr_len=0;
-  FillU32Palindrome(&de2->loc,tempc->loc+tempc->short_dir_blks);
-  FillU32Palindrome(&de2->size,tempc->long_dir_blks*DVD_BLK_SIZE);
+  FillU32Palindrome(&de2->loc,tmpc->loc+tmpc->short_dir_blks);
+  FillU32Palindrome(&de2->size,tmpc->long_dir_blks*DVD_BLK_SIZE);
   FillU16Palindrome(&de2->vol_seq_num,1);
   Date2ISO1(&de2->date,parent->datetime);
   de2->flags=ISO1_ATTR_DIR;
@@ -66,49 +66,49 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
   de2->len+=de2->name_len;
   de2(U8 *)+=de2->len;
 
-  tempde1=tempde->sub;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (!write) tempde1->user_data=CAlloc(sizeof(CCDVDUserData));
+  tmpde1=tmpde->sub;
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (!write) tmpde1->user_data=CAlloc(sizeof(CCDVDUserData));
     de1=de;
     de12=de2;
-    if (tempde1->attr & RS_ATTR_DIR) {
-      n=DVDFileCreate2(out_file,tempde1,de,de2,_cur_blk,
-	    tempde,write,stage2_filename,_stage2_blk);
+    if (tmpde1->attr & RS_ATTR_DIR) {
+      n=DVDFileCreate2(out_file,tmpde1,de,de2,_cur_blk,
+	    tmpde,write,stage2_filename,_stage2_blk);
       de(U8 *)+=sizeof(CISO1DirEntry)-1+n;
       de2(U8 *)+=sizeof(CISO1DirEntry)-1+n<<1;
     } else {
-      tempc=tempde1->user_data;
+      tmpc=tmpde1->user_data;
       de->len=sizeof(CISO1DirEntry)-1;
       de->ext_attr_len=0;
       FillU32Palindrome(&de->loc,*_cur_blk);
-      tempc->loc=*_cur_blk;
+      tmpc->loc=*_cur_blk;
       if (write) {
-	if (stage2_filename && !StrCmp(tempde1->full_name,stage2_filename)) {
+	if (stage2_filename && !StrCmp(tmpde1->full_name,stage2_filename)) {
 	  "$$RED$$!!! Boot Stage 2 !!!$$FG$$\n";
 	  if (_stage2_blk) *_stage2_blk=*_cur_blk;
 	}
-	"%X:%s\n",*_cur_blk,tempde1->full_name;
+	"%X:%s\n",*_cur_blk,tmpde1->full_name;
       }
-      FillU32Palindrome(&de->size,tempde1->size);
+      FillU32Palindrome(&de->size,tmpde1->size);
       FillU16Palindrome(&de->vol_seq_num,1);
-      Date2ISO1(&de->date,tempde1->datetime);
+      Date2ISO1(&de->date,tmpde1->datetime);
       de->flags=0;
-      de->name_len=StrLen(tempde1->name);
-      StrCpy(&de->name,tempde1->name);
+      de->name_len=StrLen(tmpde1->name);
+      StrCpy(&de->name,tmpde1->name);
       de->len=de->len+de->name_len;
       de(U8 *)+=de->len;
 
       de2->len=sizeof(CISO1DirEntry)-1;
       de2->ext_attr_len=0;
       FillU32Palindrome(&de2->loc,*_cur_blk);
-      FillU32Palindrome(&de2->size,tempde1->size);
+      FillU32Palindrome(&de2->size,tmpde1->size);
       FillU16Palindrome(&de2->vol_seq_num,1);
-      Date2ISO1(&de2->date,tempde1->datetime);
+      Date2ISO1(&de2->date,tmpde1->datetime);
       de2->flags=0;
-      de2->name_len=StrLen(tempde1->name)<<1;
+      de2->name_len=StrLen(tmpde1->name)<<1;
       ptr1=&de2->name;
-      ptr2=&tempde1->name;
+      ptr2=&tmpde1->name;
       for (i=0;i<de2->name_len;i=i+2) {
 	ptr1++;
 	*ptr1++=*ptr2++;
@@ -116,7 +116,7 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
       de2->len+=de2->name_len;
       de2(U8 *)+=de2->len;
 
-      in_file=FOpen(tempde1->full_name,"r");
+      in_file=FOpen(tmpde1->full_name,"r");
       for (i=0;i<(FSize(in_file)+DVD_BLK_SIZE-1)/DVD_BLK_SIZE;i++) {
 	n=4;
 	if ((i+1)<<2>(FSize(in_file)+BLK_SIZE-1)>>BLK_SIZE_BITS) {
@@ -151,66 +151,66 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
       MemCpy(de2,buf,i);
       de2(U8 *)+=i;
     }
-    tempde1=tempde2;
+    tmpde1=tmpde2;
   }
 
-  tempc=tempde->user_data;
+  tmpc=tmpde->user_data;
 
-  tempi->len=sizeof(CISO1DirEntry)-1;
-  tempi->ext_attr_len=0;
-  tempi->flags=ISO1_ATTR_DIR;
-  if (!tempde->name[0]) {
-    tempi->name_len=1;
-    tempi->name=1;
+  tmpi->len=sizeof(CISO1DirEntry)-1;
+  tmpi->ext_attr_len=0;
+  tmpi->flags=ISO1_ATTR_DIR;
+  if (!tmpde->name[0]) {
+    tmpi->name_len=1;
+    tmpi->name=1;
   } else {
-    tempi->name_len=StrLen(tempde->name);
-    StrCpy(&tempi->name,tempde->name);
+    tmpi->name_len=StrLen(tmpde->name);
+    StrCpy(&tmpi->name,tmpde->name);
   }
-  tempi->len+=tempi->name_len;
+  tmpi->len+=tmpi->name_len;
 
   n=de(U8 *)+1-dir_blk_buf(U8 *);
   n=(n+DVD_BLK_SIZE-1)/DVD_BLK_SIZE;
-  FillU32Palindrome(&tempi->size,n*DVD_BLK_SIZE);
-  FillU32Palindrome(&tempi->loc,*_cur_blk);
-  tempc->short_dir_blks=n;
-  tempc->loc=*_cur_blk;
+  FillU32Palindrome(&tmpi->size,n*DVD_BLK_SIZE);
+  FillU32Palindrome(&tmpi->loc,*_cur_blk);
+  tmpc->short_dir_blks=n;
+  tmpc->loc=*_cur_blk;
   FillU32Palindrome(&dir_blk_buf->size,n*DVD_BLK_SIZE);
   FillU32Palindrome(&dir_blk_buf->loc,*_cur_blk);
-  FillU16Palindrome(&tempi->vol_seq_num,1);
-  Date2ISO1(&tempi->date,tempde->datetime);
+  FillU16Palindrome(&tmpi->vol_seq_num,1);
+  Date2ISO1(&tmpi->date,tmpde->datetime);
   if (write)
-    "%X:%s\n",*_cur_blk,tempde->full_name;
+    "%X:%s\n",*_cur_blk,tmpde->full_name;
   if (write)
     FWBlks(out_file,dir_blk_buf,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
 
-  tempi2->len=sizeof(CISO1DirEntry)-1;
-  tempi2->ext_attr_len=0;
-  tempi2->flags=ISO1_ATTR_DIR;
-  if (!tempde->name[0]) {
-    tempi2->name_len=1;
-    tempi->name=1;
+  tmpi2->len=sizeof(CISO1DirEntry)-1;
+  tmpi2->ext_attr_len=0;
+  tmpi2->flags=ISO1_ATTR_DIR;
+  if (!tmpde->name[0]) {
+    tmpi2->name_len=1;
+    tmpi->name=1;
   } else {
-    tempi2->name_len=StrLen(tempde->name)<<1;
-    ptr1=&tempi2->name;
-    ptr2=&tempde->name;
-    for (i=0;i<tempi2->name_len;i=i+2) {
+    tmpi2->name_len=StrLen(tmpde->name)<<1;
+    ptr1=&tmpi2->name;
+    ptr2=&tmpde->name;
+    for (i=0;i<tmpi2->name_len;i=i+2) {
       ptr1++;
       *ptr1++=*ptr2++;
     }
   }
-  tempi2->len+=tempi2->name_len;
+  tmpi2->len+=tmpi2->name_len;
   n=de2(U8 *)+1-dir_blk_buf2(U8 *);
   n=(n+DVD_BLK_SIZE-1)/DVD_BLK_SIZE;
-  FillU32Palindrome(&tempi2->size,n*DVD_BLK_SIZE);
-  FillU32Palindrome(&tempi2->loc,*_cur_blk);
-  tempc->long_dir_blks=n;
+  FillU32Palindrome(&tmpi2->size,n*DVD_BLK_SIZE);
+  FillU32Palindrome(&tmpi2->loc,*_cur_blk);
+  tmpc->long_dir_blks=n;
   FillU32Palindrome(&dir_blk_buf2->size,n*DVD_BLK_SIZE);
   FillU32Palindrome(&dir_blk_buf2->loc,*_cur_blk);
-  FillU16Palindrome(&tempi2->vol_seq_num,1);
-  Date2ISO1(&tempi2->date,tempde->datetime);
+  FillU16Palindrome(&tmpi2->vol_seq_num,1);
+  Date2ISO1(&tmpi2->date,tmpde->datetime);
   if (write)
-    "%X:%s\n",*_cur_blk,tempde->full_name;
+    "%X:%s\n",*_cur_blk,tmpde->full_name;
   if (write)
     FWBlks(out_file,dir_blk_buf2,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
@@ -218,26 +218,26 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tempde,CISO1DirEntry *tempi,
   Free(dir_blk_buf);
   Free(dir_blk_buf2);
   Free(buf);
-  return tempi->name_len;
+  return tmpi->name_len;
 }
 
-I64 DVDTableLen(CDirEntry *tempde,I64 *size1,I64 *size2,I64 cur_depth)
+I64 DVDTableLen(CDirEntry *tmpde,I64 *size1,I64 *size2,I64 cur_depth)
 {//Returns depth
-  CDirEntry *tempde1=tempde->sub;
+  CDirEntry *tmpde1=tmpde->sub;
   I64 max_depth=cur_depth,i;
-  while (tempde1) {
-    if (tempde1->attr & RS_ATTR_DIR) {
-      *size1+=sizeof(CISO1PathEntry)-2+ (StrLen(tempde1->name)+1)&-0x2;
-      *size2+=sizeof(CISO1PathEntry)-2+StrLen(tempde1->name)<<1;
-      i=DVDTableLen(tempde1,size1,size2,cur_depth+1);
+  while (tmpde1) {
+    if (tmpde1->attr & RS_ATTR_DIR) {
+      *size1+=sizeof(CISO1PathEntry)-2+ (StrLen(tmpde1->name)+1)&-0x2;
+      *size2+=sizeof(CISO1PathEntry)-2+StrLen(tmpde1->name)<<1;
+      i=DVDTableLen(tmpde1,size1,size2,cur_depth+1);
       if (i>max_depth) max_depth=i;
     }
-    tempde1=tempde1->next;
+    tmpde1=tmpde1->next;
   }
   return max_depth;
 }
 
-U0 DVDFillPathTable(CDirEntry *tempde,
+U0 DVDFillPathTable(CDirEntry *tmpde,
   CISO1PathEntry **_itabbuf,CISO1PathEntry **_itabbuf2,
   I64 parent_entry_num,Bool big_endian,I64 *first_free,
   I64 cur_level,I64 output_level)
@@ -245,59 +245,59 @@ U0 DVDFillPathTable(CDirEntry *tempde,
   U8 *ptr1,*ptr2;
   I64 i;
   CISO1PathEntry *tabbuf=*_itabbuf,*tabbuf2=*_itabbuf2;
-  CDirEntry *tempde1=tempde->sub,*tempde2;
-  CCDVDUserData *tempc;
+  CDirEntry *tmpde1=tmpde->sub,*tmpde2;
+  CCDVDUserData *tmpc;
 
   if (cur_level==output_level) {
-    while (tempde1) {
-      if (tempde1->attr & RS_ATTR_DIR) {
-	tempc=tempde1->user_data;
-	tempc->path_entry_num=*first_free;
-	tabbuf->name_len=StrLen(tempde1->name);
+    while (tmpde1) {
+      if (tmpde1->attr & RS_ATTR_DIR) {
+	tmpc=tmpde1->user_data;
+	tmpc->path_entry_num=*first_free;
+	tabbuf->name_len=StrLen(tmpde1->name);
 	if (big_endian) {
-	  tabbuf->blk=EndianU32(tempc->loc);
+	  tabbuf->blk=EndianU32(tmpc->loc);
 	  tabbuf->parent_entry_num=EndianU16(parent_entry_num);
 	} else {
-	  tabbuf->blk=tempc->loc;
+	  tabbuf->blk=tmpc->loc;
 	  tabbuf->parent_entry_num=parent_entry_num;
 	}
-	StrCpy(&tabbuf->name,tempde1->name);
+	StrCpy(&tabbuf->name,tmpde1->name);
 
 	tabbuf(U8 *)+=sizeof(CISO1PathEntry)-2+
-	      (StrLen(tempde1->name)+1) & -0x2;
+	      (StrLen(tmpde1->name)+1) & -0x2;
 
-	tabbuf2->name_len=StrLen(tempde1->name)<<1;
+	tabbuf2->name_len=StrLen(tmpde1->name)<<1;
 	if (big_endian) {
-	  tabbuf2->blk=EndianU32(tempc->loc+tempc->short_dir_blks);
+	  tabbuf2->blk=EndianU32(tmpc->loc+tmpc->short_dir_blks);
 	  tabbuf2->parent_entry_num=EndianU16(parent_entry_num);
 	} else {
-	  tabbuf2->blk=tempc->loc+tempc->short_dir_blks;
+	  tabbuf2->blk=tmpc->loc+tmpc->short_dir_blks;
 	  tabbuf2->parent_entry_num=parent_entry_num;
 	}
 	ptr1=&tabbuf2->name;
-	ptr2=&tempde1->name;
+	ptr2=&tmpde1->name;
 	for (i=0;i<tabbuf2->name_len;i=i+2) {
 	  ptr1++;
 	  *ptr1++=*ptr2++;
 	}
 	tabbuf2(U8 *)+=sizeof(CISO1PathEntry)-2+
-	      StrLen(tempde1->name)<<1;
+	      StrLen(tmpde1->name)<<1;
 	*first_free+=1;
       }
-      tempde1=tempde1->next;
+      tmpde1=tmpde1->next;
     }
     *_itabbuf=tabbuf;
     *_itabbuf2=tabbuf2;
   }
-  tempde1=tempde->sub;
-  while (tempde1) {
-    tempde2=tempde1->next;
-    if (tempde1->attr & RS_ATTR_DIR) {
-      tempc=tempde1->user_data;
-      DVDFillPathTable(tempde1,_itabbuf,_itabbuf2,tempc->path_entry_num,
+  tmpde1=tmpde->sub;
+  while (tmpde1) {
+    tmpde2=tmpde1->next;
+    if (tmpde1->attr & RS_ATTR_DIR) {
+      tmpc=tmpde1->user_data;
+      DVDFillPathTable(tmpde1,_itabbuf,_itabbuf2,tmpc->path_entry_num,
 	    big_endian,first_free,cur_level+1,output_level);
     }
-    tempde1=tempde2;
+    tmpde1=tmpde2;
   }
 }
 
@@ -320,8 +320,8 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 	*zero_buf=CAlloc(DVD_BLK_SIZE);
   CISO1PathEntry *tabbuf=NULL,*tabbuf2=NULL,*itabbuf,*itabbuf2;
   CFile *out_file=NULL;
-  CISO1DirEntry *tempi;
-  CCDVDUserData *tempc;
+  CISO1DirEntry *tmpi;
+  CCDVDUserData *tmpc;
 
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
@@ -339,8 +339,8 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   headdir->sub=FilesFind(src_files_find_mask,fuf_flags);
   headdir->datetime=Now;
   headdir->user_data=CAlloc(sizeof(CCDVDUserData));
-  tempc=headdir->user_data;
-  tempc->path_entry_num=1;
+  tmpc=headdir->user_data;
+  tmpc->path_entry_num=1;
 
   cur_blk=20<<2>>2;
   if (stage2_filename) //preboot and bootloader
@@ -419,14 +419,14 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   tabbuf=CAlloc(tabsize*DVD_BLK_SIZE);
   iso_pri->type_l_path_table=cur_blk;
   tabbuf->name_len=2;  //Fill-in adam entry
-  tempi=&iso_pri->root_dir_record;
-  tabbuf->blk=tempi->loc.little;
+  tmpi=&iso_pri->root_dir_record;
+  tabbuf->blk=tmpi->loc.little;
   tabbuf->parent_entry_num=1;
   tabbuf2=CAlloc(tabsize2*DVD_BLK_SIZE);
   iso_sup->type_l_path_table=cur_blk+tabsize;
   tabbuf2->name_len=2;	//Fill-in adam entry
-  tempi=&iso_sup->root_dir_record;
-  tabbuf2->blk=tempi->loc.little;
+  tmpi=&iso_sup->root_dir_record;
+  tabbuf2->blk=tmpi->loc.little;
   tabbuf2->parent_entry_num=1;
   itabbuf=tabbuf+1;
   itabbuf2=tabbuf2+1;
@@ -443,14 +443,14 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   MemSet(tabbuf,0,tabsize*DVD_BLK_SIZE);
   iso_pri->type_m_path_table=EndianU32(cur_blk);
   tabbuf->name_len=2;  //Fill-in adam entry
-  tempi=&iso_pri->root_dir_record;
-  tabbuf->blk=tempi->loc.big;
+  tmpi=&iso_pri->root_dir_record;
+  tabbuf->blk=tmpi->loc.big;
   tabbuf->parent_entry_num=EndianU16(1);
   MemSet(tabbuf2,0,tabsize2*DVD_BLK_SIZE);
   iso_sup->type_m_path_table=EndianU32(cur_blk+tabsize);
   tabbuf2->name_len=2;	//Fill-in adam entry
-  tempi=&iso_sup->root_dir_record;
-  tabbuf2->blk=tempi->loc.big;
+  tmpi=&iso_sup->root_dir_record;
+  tabbuf2->blk=tmpi->loc.big;
   tabbuf2->parent_entry_num=EndianU16(1);
   itabbuf=tabbuf+1;
   itabbuf2=tabbuf2+1;

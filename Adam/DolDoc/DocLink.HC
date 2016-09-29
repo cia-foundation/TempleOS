@@ -95,11 +95,9 @@ Bool DocFileEd(I64 _type,U8 *filename,
       doc=Str2I64(filename);//See $LK,"SpriteEdText",A="MN:SpriteEdText"$()
       res=TRUE;
     } else {
-
       st1=StrNew(filename);
       st2=StrNew(filename);
       StrLastRem(st1,"/",st2); //st2 is name without dir
-
       if (!FileNameChk(st2))
 	doc=NULL;
       else {
@@ -107,8 +105,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
 	if (Bt(&edf_dof_flags,EDf_BAIL)) //if bail, scan parents
 	  res=FileFind(filename,,
 		FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
-	else if (!(res=FileFind(filename,,
-	      FUF_JUST_FILES)))
+	else if (!(res=FileFind(filename,,FUF_JUST_FILES)))
 	  other_found=FileFind(filename,,
 		FUF_JUST_FILES|FUF_Z_OR_NOT_Z|FUF_SCAN_PARENTS);
 	doc=DocRead(filename,flags);
@@ -116,7 +113,6 @@ Bool DocFileEd(I64 _type,U8 *filename,
 	Silent(old_silent);
 	Fs->border_src=BDS_ED_FILENAME_DRV;
       }
-
       Free(st1);
       Free(st2);
     }
@@ -149,17 +145,24 @@ Bool DocFileEd(I64 _type,U8 *filename,
 
       if (edf_dof_flags&EDF_WAS_WRITE)
 	res=FALSE;
-      if (!(edf_dof_flags&EDF_BAIL) && DocEd(doc,edf_dof_flags|DOF_DONT_HOME)) {
-	DocLock(doc);
-	doc_e=doc->cur_entry;
-	if (doc_e!=doc)
-	  DocEntryRun(doc,doc_e,TRUE);
-	DocUnlock(doc);
-	if (!(LK_DOC<=_type<=LK_DOC_LINE)) {
-	  DocWrite(doc);
-	  if (edf_dof_flags&EDF_WAS_WRITE)
-	    res=TRUE;
+      if (!(edf_dof_flags&EDF_BAIL)) {
+	if (*doc->filename.name)
+	  doc->filename.dirc=DirContextNew(doc->filename.name);
+	else
+	  doc->filename.dirc=NULL;
+	if (DocEd(doc,edf_dof_flags|DOF_DONT_HOME)) {
+	  DocLock(doc);
+	  doc_e=doc->cur_entry;
+	  if (doc_e!=doc)
+	    DocEntryRun(doc,doc_e,TRUE);
+	  DocUnlock(doc);
+	  if (!(LK_DOC<=_type<=LK_DOC_LINE)) {
+	    DocWrite(doc);
+	    if (edf_dof_flags&EDF_WAS_WRITE)
+	      res=TRUE;
+	  }
 	}
+	DirContextDel(doc->filename.dirc);
       }
       if (!(LK_DOC<=_type<=LK_DOC_LINE))
 	DocDel(doc);
@@ -179,11 +182,11 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
 {//$LK,"Editor Link",A="MN:LK_FILE"$--> filename, needle_str and line number.
   U8 *st,*ptr,*src,*filename=NULL,*needle_str=NULL,*filename2;
   I64 res,i,num=1;
-  CHashSrcSym *temph;
+  CHashSrcSym *tmph;
   if (!link_st||!*link_st) {
     if (edf_dof_flags&EDF_BAIL)
       return -1;
-    link_st=blkdev.temp_filename;
+    link_st=blkdev.tmp_filename;
   }
   st=StrNew(link_st);
   res=LK_FILE;
@@ -192,8 +195,8 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
     filename2=st+3;
     switch (res=DefineMatch(st,"ST_LINK_TYPES",LMF_IGNORE_CASE)) {
       case LK_MAN_PAGE:
-	if (temph=HashFind(filename2,Fs->hash_table,HTG_SRC_SYM))
-	  res=EdLinkCvt(temph->src_link,&filename,
+	if (tmph=HashFind(filename2,Fs->hash_table,HTG_SRC_SYM))
+	  res=EdLinkCvt(tmph->src_link,&filename,
 		&needle_str,&num,edf_dof_flags);
 	else
 	  res=-1;
@@ -292,11 +295,15 @@ lc_done:
   return res;
 }
 
-public Bool DocLinkChk(U8 *link_st)
+public Bool DocLinkChk(CDoc *doc,U8 *link_st)
 {//Check for bad $LK,"Editor Link",A="MN:LK_FILE"$.
   U8 *filename,*st;
   Bool res=FALSE;
+  CDirContext *dirc;
   if (link_st) {
+    st=FileNameAbs(doc->filename.name);
+    dirc=DirContextNew(st);
+    Free(st);
     switch (EdLinkCvt(link_st,&filename)) {
       case -1:
 	break;
@@ -320,6 +327,7 @@ public Bool DocLinkChk(U8 *link_st)
 	  res=TRUE;
     }
     Free(filename);
+    DirContextDel(dirc);
   }
   return res;
 }
