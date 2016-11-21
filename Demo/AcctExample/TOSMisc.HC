@@ -219,9 +219,9 @@ public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
   Free(out_name);
 }
 
-RegSetDftEntry("TempleOS/TOS",
+RegSetDftEntry("TempleOS/TOSVideos",
 	"I64 tos_code_walk_thru=1,tos_after_egypt_in_action=1;\n");
-RegExeBranch("TempleOS/TOS");
+RegExeBranch("TempleOS/TOSVideos");
 
 U0 TOSRegInit()
 {
@@ -232,7 +232,7 @@ U0 TOSRegInit()
 
 U0 TOSRegWrite()
 {
-  RegWriteBranch("TempleOS/TOS",
+  RegWriteBranch("TempleOS/TOSVideos",
 	"I64 tos_code_walk_thru=%d,tos_after_egypt_in_action=%d;\n",
 	tos_code_walk_thru,tos_after_egypt_in_action);
   TOSRegInit;

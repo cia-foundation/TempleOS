@@ -177,7 +177,6 @@ Bool GetBaseUnit(CBlkDev *bd)
 {
   I64 ch;
   Bool probe;
-  "            TempleOS\n\n\n";
   #exe {
     if (kernel_cfg->opts[CFG_DONT_PROBE])
       StreamPrint("probe=FALSE;");
@@ -221,7 +220,6 @@ U0 BlkDevsInitAll()
   blkdev.drvs=CAlloc(sizeof(CDrv)*NUM_DRVS);
   for (i=0;i<NUM_DRVS;i++)
     blkdev.let_to_drv[i]=&blkdev.drvs[i];
-  text.raw_col=0;
   #exe {
     if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
       StreamPrint("AutoMountIDE;");

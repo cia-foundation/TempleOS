@@ -135,13 +135,15 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   return god.num_words;
 } GodInit;
 
-public U0 GodWord(Bool show_num=FALSE)
+public U0 GodWord(I64 bits=17,Bool show_num=FALSE)
 {//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
   I64 i;
   if (god.num_words) {
-    i=GodBits(17);
+    i=GodBits(bits);
     if (show_num)
-      "%05X Mod %05X = %05X :",i,god.num_words,i%god.num_words;
+      "%05X Mod %05X = %05X (Line:%0*d):",
+	    i,god.num_words,i%god.num_words,
+	    ToI64(Log10(god.num_words)+1),i%god.num_words+1;
     "%s ",god.words[i%god.num_words];
     if (show_num)
       '\n';
@@ -154,5 +156,5 @@ public U0 GodBiblePassage(I64 num_lines=20)
   U8 *verse=BibleLine2Verse(start);
   "%s\n\n",verse;
   Free(verse);
-  BibleLines(,start,num_lines);
+  BookLines(,start,num_lines);
 }

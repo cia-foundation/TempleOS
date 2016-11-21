@@ -276,7 +276,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 
   if (!doc || doc->doc_signature!=DOC_SIGNATURE_VAL) return FALSE;
 
-  //WinMgr updates all wins $TX,"30",D="WINMGR_FPS"$, 33.33333mS
+    //WinMgr updates all wins $TX,"30",D="WINMGR_FPS"$, 33.33333mS
   if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN && doc->owning_task!=Fs) {
     i_jif=cnts.jiffies+JIFFY_FREQ/250; //4 ms
     while (Bt(&doc->locked_flags,DOClf_LOCKED)) {
@@ -986,15 +986,8 @@ rc_adjust_xy:
 	  dc->color=i;
 	  if (find_cursor)
 	    dc->flags|=DCF_LOCATE_NEAREST;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
-		doc->cur_sprite==bptr) {
-	    dc->flags|=DCF_LOCATE_NEAREST;
-	    dc->cur_x=ip.pos.x;
-	    dc->cur_y=ip.pos.y;
-	  } else {
-	    dc->cur_x=(doc->x-x0)*FONT_WIDTH+pix_left+scroll_x;
-	    dc->cur_y=(doc->y-y0)*FONT_HEIGHT+pix_top+scroll_y;
-	  }
+	  dc->cur_x=(doc->x-x0)*FONT_WIDTH+pix_left+scroll_x;
+	  dc->cur_y=(doc->y-y0)*FONT_HEIGHT+pix_top+scroll_y;
 	  dc->cur_z=0;
 	  dc->bkcolor=i;
 	  if (doc_e->de_flags & DOCEF_FROM_START) {
@@ -1024,9 +1017,6 @@ rc_adjust_xy:
 	  }
 	  Sprite3(dc,xx,yy,zz,bptr);
 	  dc->depth_buf=NULL;
-	  if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
-		doc->cur_sprite==bptr)
-	    doc->nearest_sprite_elem_num=dc->nearest_sprite_elem_num;
 	  dc->flags&=~(DCF_LOCATE_NEAREST|DCF_DONT_DRAW|DCF_TRANSFORMATION);
 	  if (dc->nearest_dist<=D) {
 	    D=dc->nearest_dist;

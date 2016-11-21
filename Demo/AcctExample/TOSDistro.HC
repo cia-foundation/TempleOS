@@ -238,7 +238,7 @@ U0 MakeStaffDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSSTAFF_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -266,7 +266,7 @@ U0 MakeDbgDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSDBG_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -292,7 +292,7 @@ U0 MakeStdDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -301,7 +301,7 @@ U0 MakeStdRedSeaDistro()
   StdDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -325,7 +325,7 @@ U0 UltraDistroPrep()
   Del(TOS_DISTRO_DIR "/Misc/OSTestSuite.HC.Z");
   Copy("C:/Home/Sup1/Sup1Distro/UltraMenu.DD.Z",
 	TOS_DISTRO_DIR "/PersonalMenu.DD.Z");
-  Copy("C:/Demo/Games/EagleDive.HC.Z",
+  Copy("C:/Demo/Games/Talons.HC.Z",
 	TOS_DISTRO_DIR "/Misc");
 }
 U0 MakeUltraDistro()
@@ -334,7 +334,7 @@ U0 MakeUltraDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -343,14 +343,14 @@ U0 MakeUltraRedSeaDistro()
   UltraDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-	"Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
+	"Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
 
 U0 MakeSup1ISO()
 {
-  RedSeaISO(TOS_ISO_C_NAME,"::/Home/Sup1");
+  RedSeaISO(TOS_ISO_C_NAME,"~/Sup1");
   DefinePrint("DD_TEMPLEOS_SUP1_SIZE","Supplemental ISO #1 (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
@@ -360,31 +360,31 @@ U0 UpdateISODocDefines()
 {
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+	  "Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
+//	  "Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 //	  0.1*(10*Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSCD_RS_K_SIZE",
 //	  "%dKB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
 
     DefinePrint("DD_TEMPLEOSULTRA_SIZE",
-	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
+	  "Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSULTRA_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSULTRA_RS_SIZE",
-//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
+//	  "Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 //	  0.01*(100*Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSULTRA_RS_K_SIZE",
 //	  "%dKB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);
 
 //    DefinePrint("DD_TEMPLEOSDBG_SIZE",
-//	  "Download $TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.2fMB)",
+//	  "Download $TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.2fMB)",
 //	  0.01*(100*Size("D:/Wb/TempleOSDbg.ISO","+s")/1024/1024));
 //    DefinePrint("DD_TEMPLEOSDBG_K_SIZE",
 //	  "%dKB",Size("D:/Wb/TempleOSDbg.ISO","+s")/1024);
@@ -403,6 +403,7 @@ public U0 MakeDistrosAndBackUp()
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   progress4=*progress4_desc=0;
   progress4_max=18;
+  progress4_t0=tS;
   AutoComplete;
   WinBorder;
   WinMax;
@@ -434,7 +435,7 @@ public U0 MakeDistrosAndBackUp()
   DocClear;
   Move(TOS_ISO_C_NAME,"D:/Wb/TempleOSSup1.ISO"); progress4++;
 
-//  MakeStaffDistro; progress4++;
+//  MakeDbgDistro; progress4++;
 //  DocClear;
 //  Move(TOS_ISO_NAME,"D:/Wb/TempleOSDbg.ISO"); progress4++;
 
@@ -446,21 +447,29 @@ public U0 MakeDistrosAndBackUp()
 
   Cd("C:/");
 
+  DocClear;
+  "$$PURPLE$$Lines longer than 80 columns:$$FG$$\n";
   if (LongLines)
     throw;
   progress4++;
 
+  DocClear;
+  "$$PURPLE$$Broken DolDoc Links:$$FG$$\n";
   if (LinkChk)
     throw;
   progress4++;
 
+  DocClear;
   MakeSymFiles; progress4++;
+
+  DocClear;
   MakeWebSite; progress4++;
 
   Drv('C');
   ChkAll; progress4++;
-  progress4=progress4_max=0;
   SettingsPop;
+  "Elapsed Time:%5.3f\n",tS-progress4_t0;
+  ProgressBarsRst;
 }
 
 public U0 PreBackUp()

@@ -94,7 +94,7 @@ $LK,"::/Demo/Games/Collision.HC"$
 $ID,-2$$TR,"Games: Advanced"$
 $ID,2$$LK,"::/Demo/MultiCore/LoadTest.HC"$
 $LK,"::/Demo/MultiCore/Primes.HC"$
-$LK,"::/Demo/MultiCore/RadixSort.HC"$
+$LK,"::/Demo/MultiCore/MPRadix.HC"$
 $LK,"::/Demo/MultiCore/Interrupts.HC"$
 $MA-X+PU,"::/Apps/AfterEgypt",LM="Cd(\"::/Apps/AfterEgypt\");Dir;View;\n"$
 $LK,"::/Demo/Games/Varoom.HC"$
@@ -117,7 +117,7 @@ $LK,"::/Demo/Games/Squirt.HC"$
 $MA-X+PU,"::/Apps/X-Caliber",LM="Cd(\"::/Apps/X-Caliber\");Dir;View;\n"$
 $LK,"::/Demo/Games/ZoneOut.HC"$
 $LK,"::/Demo/Games/CastleFrankenstein.HC"$
-$LK,"::/Demo/Games/EagleDive.HC"$
+$LK,"::/Demo/Games/Talons.HC"$
 $MA-X+PU,"::/Apps/Strut",LM="Cd(\"::/Apps/Strut\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Span",LM="Cd(\"::/Apps/Span\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/Psalmody",LM="Cd(\"::/Apps/Psalmody\");Dir;View;\n"$

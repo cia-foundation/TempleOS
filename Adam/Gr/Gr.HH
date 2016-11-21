@@ -114,6 +114,9 @@ public class CSpritePtMeshU8s : CSpriteBase
   U8  u[0];
 };
 
+#define SPF_SEL			128
+#define SPf_SEL			7
+
 #define SPT_END			0	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
 #define SPT_COLOR		1	//$LK,"CSpriteColor",A="MN:CSpriteColor"$
 #define SPT_DITHER_COLOR	2	//$LK,"CSpriteDitherColor",A="MN:CSpriteDitherColor"$
@@ -145,6 +148,7 @@ public class CSpritePtMeshU8s : CSpriteBase
 #define SPT_TEXT_BOX		28	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_TEXT_DIAMOND	29	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_NUM_TYPES		30
+#define SPG_TYPE_MASK		0x7F
 
 #help_index "Graphics/Sprite;Sprites;Sprites/Binary"
 
@@ -153,7 +157,6 @@ public class CSpritePtMeshU8s : CSpriteBase
 public class CSprite
 {
   CSprite *next,*last;
-  Bool sel;
   U0 start;
   union {
     U8 type;

@@ -627,7 +627,7 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
   img->color=bm_bkcolor;
   GrRect(img,0,0,tmpg->pwhu.width,tmpg->pwhu.height);
   tmpg1=insert_pt;
-  if (tmpg1==head || tmpg1->type!=SPT_BITMAP) {
+  if (tmpg1==head || tmpg1->type&SPG_TYPE_MASK!=SPT_BITMAP) {
     SpriteSetSettings(img,head,0,-(xx1-x),-(yy1-y));
     x=xx; y=yy;
     Sprite3(img,-(xx1-x),-(yy1-y),0,doc_ce->bin_data->data);
@@ -671,9 +671,9 @@ U0 SMMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,I64 *_cur_elem_num)
   CD3I32 *p;
   I64 i,size,x1,y1,z1;
   I32 *mesh,*old_mesh;
-  if (tmpg1!=head && tmpg1->type==SPT_MESH)
+  if (tmpg1!=head && tmpg1->type&SPG_TYPE_MASK==SPT_MESH)
     old_mesh=&tmpg1->mu.vertex_cnt;
-  else if (tmpg1!=head && tmpg1->type==SPT_SHIFTABLE_MESH) {
+  else if (tmpg1!=head && tmpg1->type&SPG_TYPE_MASK==SPT_SHIFTABLE_MESH) {
     x1=tmpg1->pmu.x;
     y1=tmpg1->pmu.y;
     z1=tmpg1->pmu.z;
@@ -700,7 +700,7 @@ U0 SMMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,I64 *_cur_elem_num)
       SpriteEdUpdate(doc,doc_ce,head);
     } else
       *_cur_elem_num+=1;
-  } else if (old_mesh && tmpg1->type==SPT_SHIFTABLE_MESH) {
+  } else if (old_mesh && tmpg1->type&SPG_TYPE_MASK==SPT_SHIFTABLE_MESH) {
     x1=tmpg1->pmu.x;
     y1=tmpg1->pmu.y;
     z1=tmpg1->pmu.z;
@@ -721,7 +721,7 @@ U0 SMShiftableMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,
   CD3I32 *p;
   I64 i,size,z,x1,y1,z1;
   I32 *mesh,*old_mesh;
-  if (tmpg1!=head && tmpg1->type==SPT_MESH) {
+  if (tmpg1!=head && tmpg1->type&SPG_TYPE_MASK==SPT_MESH) {
     z=0;
     x1=-(a1-x);
     y1=-(a2-y);
@@ -733,7 +733,7 @@ U0 SMShiftableMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,
       p->z+=z1;
     }
     old_mesh=&tmpg1->mu.vertex_cnt;
-  } else if (tmpg1!=head && tmpg1->type==SPT_SHIFTABLE_MESH) {
+  } else if (tmpg1!=head && tmpg1->type&SPG_TYPE_MASK==SPT_SHIFTABLE_MESH) {
     z=-tmpg1->pmu.z;
     x1=tmpg1->pmu.x-(a1-x);
     y1=tmpg1->pmu.y-(a2-y);
@@ -766,7 +766,7 @@ U0 SMShiftableMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,
       SpriteEdUpdate(doc,doc_ce,head);
     } else
       *_cur_elem_num+=1;
-  } else if (old_mesh && tmpg1->type==SPT_SHIFTABLE_MESH) {
+  } else if (old_mesh && tmpg1->type&SPG_TYPE_MASK==SPT_SHIFTABLE_MESH) {
     x1=tmpg1->pmu.x-(a1-x);
     y1=tmpg1->pmu.y-(a2-y);
     z1=tmpg1->pmu.z+z;
@@ -776,7 +776,7 @@ U0 SMShiftableMesh(CDoc *doc,CDocEntry *doc_ce,CSprite *head,
       p->y-=y1;
       p->z-=z1;
     }
-  } else if (old_mesh && tmpg1->type==SPT_MESH) {
+  } else if (old_mesh && tmpg1->type&SPG_TYPE_MASK==SPT_MESH) {
     x1=-(a1-x);
     y1=-(a2-y);
     z1= z;
@@ -901,8 +901,8 @@ I64 SpriteMainEd(CDoc *doc)
       case SPT_ED_MENU:
 	switch (SpriteEd(doc,doc_ce,x,y,&head,&cur_elem_num)) {
 	  case SPE_ABORT:	eletype=DOCM_CANCEL;	break;
-	  case SPE_EXIT:		eletype=SPT_EXIT;	break;
-	  case SPE_CONT:		eletype=SPT_MENU;	break;
+	  case SPE_EXIT:	eletype=SPT_EXIT;	break;
+	  case SPE_CONT:	eletype=SPT_MENU;	break;
 	}
 	break;
       case SPT_MESH:
@@ -1196,7 +1196,8 @@ U0 EdSpriteIns(CDoc *doc)
       if (SpriteMainEd(doc)==SPE_ABORT) {
 	DocLock(doc);
 	DocEntryDel(doc,doc_e);
-      }
+      } else
+	SpriteSelAll(tmpb->data,FALSE);
     } else
       DocBinDel(doc,tmpb);
     if (unlock)
@@ -1224,8 +1225,10 @@ U0 EdSpriteEd(CDoc *doc)
     Free(tmpb->data);
     tmpb->data=old_csprite;
     tmpb->size=old_size;
-  } else
+  } else {
+    SpriteSelAll(tmpb->data,FALSE);
     Free(old_csprite);
+  }
   if (unlock)
     DocUnlock(doc);
 }

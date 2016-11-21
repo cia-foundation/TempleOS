@@ -1,34 +1,3 @@
-/* I did not limit myself to real physics.  It's a game.
-I suppose the gun shoots plazma blobs that have a delayed
-explosion due to a chemical reaction timer.
-
-The caliber of the gun is adjustible.
-
-I did a simple anti-spin controller when you press cursor-down.
-It's intentionally not very good.  It needs to take into
-account flexing of the struts.  You'll notice when you
-try to shoot the laser.
-
-If you are interested in control theory, you might download
-SimStructure, a program I wrote.
-
-http://www.templeos.org/files/SimStrSetUp.zip
-
-There's not sound in space and explosions
-don't make shock waves, or something like that.
-In X-Caliber, ships are destroyed by
-causing springs to break due to acceleration
-differences on different masses in a ship.
-
-A real game would be dull with guided
-missiles that always hit and lasers
-that never miss.
-
-Don't be anal.  If you aspire to making
-games, do like Hollywood.  They know the
-public isn't interested in realism.
-*/
-
 #define  XMSGF_ANTISPIN	0
 RegSetDftEntry("TempleOS/XCaliber",
 	"I64 best_score=0;\n"
@@ -36,11 +5,16 @@ RegSetDftEntry("TempleOS/XCaliber",
 	);
 RegExeBranch("TempleOS/XCaliber");
 
+#define MT_HUMAN_SHIP		0
+#define MT_ENEMY_SHIP		1
+#define MT_SUPER_NAPALM_BALL	2
+#define MT_SUPER_NAPALM_SPLAT	3
+#define MT_MISSILE		4
+
 class MyMass:CMass
 {
-  F64 temperature;
-  F64 radius;
-  I64 color;
+  F64 temperature,radius,die_timeout;
+  I64 type;
   Bool no_overlap;
 };
 
@@ -63,8 +37,7 @@ extern class Ship;
 class Missile
 {
   Missile *next,*last;
-  F64 explosion_radius;
-  F64 fuse_time,die_timeout;
+  F64 tons,fuse_time,die_timeout;
   MyMass p_front,p_back;
   MySpring s[5];
   U8 *img;
@@ -93,10 +66,9 @@ F64 human_t_left,human_t_right,human_antispin;
 class Shot
 {
   Shot *next,*last;
-  F64 radius,explosion_radius;
-  F64 fuse_time,die_timeout;
+  F64 radius,fuse_time;
+  I64 splats;
   MyMass p;
-  Bool exploding;
 } shot_head;
 
 #define MAX_THRUST	200.0
@@ -174,9 +146,11 @@ U0 MissileNew(Ship *tmpsp,I64 n)
   else
     StrCpy(tmpmi->label,"R");
   tmpmi->owner=tmpsp;
-  tmpmi->explosion_radius=5;
+  tmpmi->tons=0.5;
   tmpmi->p_front.mass=0.1;
+  tmpmi->p_front.type=MT_MISSILE;
   tmpmi->p_back.mass =0.1;
+  tmpmi->p_back.type =MT_MISSILE;
   tmpmi->p_front.radius=2;
   tmpmi->p_back.radius =2;
   tmpmi->p_front.no_overlap=TRUE;
@@ -236,6 +210,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<tmpsp->masses;i++) {
 	tmpsp->p[i].mass=1;
+	tmpsp->p[i].type=MT_HUMAN_SHIP;
 	if (i<3)
 	  tmpsp->p[i].radius=2.5;
 	else
@@ -290,6 +265,7 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<tmpsp->masses;i++) {
 	tmpsp->p[i].mass=1;
+	tmpsp->p[i].type=MT_ENEMY_SHIP;
 	tmpsp->p[i].radius=7;
 	tmpsp->p[i].drag_profile_factor=3;
 	QueIns(&tmpsp->p[i],ode->last_mass);
@@ -329,9 +305,9 @@ Ship *ShipNew(I64 x,I64 y,I64 type)
 
       for (i=0;i<tmpsp->masses;i++) {
 	tmpsp->p[i].mass=1;
+	tmpsp->p[i].type=MT_ENEMY_SHIP;
 	tmpsp->p[i].radius=6;
 	tmpsp->p[i].drag_profile_factor=5;
-	tmpsp->p[i].color=PURPLE;
 	QueIns(&tmpsp->p[i],ode->last_mass);
       }
 
@@ -472,6 +448,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   CD3 p,p1,p2;
   F64 t_left,t_right,spin,d,x,y;
   MySpring *tmpsps;
+  MyMass *tmpm;
   U8 *img;
   Bool draw_laser_line=FALSE;
 
@@ -492,6 +469,15 @@ U0 DrawIt(CTask *task,CDC *dc)
   for (i=0;i<NUM_STARS;i++)
     GrPlot(dc,stars_x[i],stars_y[i]);
 
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    if (tmpm->type==MT_SUPER_NAPALM_SPLAT) {
+      dc->color=YELLOW;
+      GrPlot(dc,tmpm->x,tmpm->y);
+    }
+    tmpm=tmpm->next;
+  }
+
   tmpsps=ode->next_spring;
   while (tmpsps!=&ode->next_spring) {
     if (!(tmpsps->flags&SSF_INACTIVE) && tmpsps->color) {
@@ -507,7 +493,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     if (tmpmi->active) {
       if (tmpmi->launched && tmpmi->exploding) {
 	d=(tS-tmpmi->fuse_time)/(tmpmi->die_timeout-tmpmi->fuse_time);
-	d=7*Sin(ã*d)*tmpmi->explosion_radius+1;
+	d=70*Sin(ã*d)*tmpmi->tons+1;
 	for (i=1;i<d;i++) {
 	  if (i&1)
 	    dc->color=YELLOW;
@@ -526,7 +512,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   tmpsp=ship_head.next;
   while (tmpsp!=&ship_head) {
-    if (!tmpsp->exploding)
+    if (!tmpsp->exploding) {
       switch (tmpsp->type) {
 	case ST_HUMAN1:
 	  if (tmpsp->spacewalk_side) {
@@ -633,7 +619,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  break;
 	case ST_ENEMY2:
 	  for (i=3;i<tmpsp->masses;i++) {
-	    dc->color=tmpsp->p[i].color;
+	    dc->color=PURPLE;
 	    GrCircle(dc,tmpsp->p[i].x,tmpsp->p[i].y,tmpsp->p[i].radius);
 	    GrFloodFill(dc,tmpsp->p[i].x,tmpsp->p[i].y+2,TRUE);
 	    dc->color=WHITE;
@@ -655,14 +641,15 @@ U0 DrawIt(CTask *task,CDC *dc)
 	  arg=Arg(p2.x,p2.y);
 	  SpriteZ3B(dc,tmpsp->p[0].x+p2.x,tmpsp->p[0].y+p2.y,0,
 		$IB,"<EnemySide>",BI=5$,arg);
-	  for (i=0;i<tmpsp->masses;i++) {
-	    dc->color=YELLOW;
-	    if (tmpsp->p[i].temperature>=1.0)
-	      GrCircle(dc,tmpsp->p[i].x,tmpsp->p[i].y,
-		    tmpsp->p[i].temperature);
-	  }
 	  break;
       }
+      for (i=0;i<tmpsp->masses;i++) {
+	dc->color=YELLOW;
+	if (tmpsp->p[i].temperature>=1.0)
+	  GrCircle(dc,tmpsp->p[i].x,tmpsp->p[i].y,
+		tmpsp->p[i].temperature);
+      }
+    }
     else if (tmpsp->die_time<=tS<=tmpsp->die_timeout)
       for (j=0;j<tmpsp->masses;j++) {
 	d=(tS-tmpsp->die_time)/(tmpsp->die_timeout-tmpsp->die_time);
@@ -680,28 +667,16 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   tmps=shot_head.next;
   while (tmps!=&shot_head) {
-    if (tmps->exploding) {
-      d=(tS-tmps->fuse_time)/(tmps->die_timeout-tmps->fuse_time);
-      d=7*Sin(ã*d)*tmps->explosion_radius+1;
-      for (i=1;i<d;i++) {
-	if (i&1)
-	  dc->color=YELLOW;
-	else
-	  dc->color=LTRED;
-	GrCircle(dc,tmps->p.x,tmps->p.y,i);
-      }
+    if (tmps->radius<1.0) {
+      dc->color=LTGREEN;
+      GrPlot(dc,tmps->p.x,tmps->p.y);
     } else {
-      if (tmps->radius<1.0) {
-	dc->color=LTGREEN;
-	GrPlot(dc,tmps->p.x,tmps->p.y);
-      } else {
-	dc->color=YELLOW;
-	GrCircle(dc,tmps->p.x,tmps->p.y,tmps->radius);
-	if (tmps->radius>=2.0)
-	  GrFloodFill(dc,tmps->p.x,tmps->p.y,TRUE);
-	dc->color=LTGREEN;
-	GrCircle(dc,tmps->p.x,tmps->p.y,tmps->radius);
-      }
+      dc->color=YELLOW;
+      GrCircle(dc,tmps->p.x,tmps->p.y,tmps->radius);
+      if (tmps->radius>=2.0)
+	GrFloodFill(dc,tmps->p.x,tmps->p.y,TRUE);
+      dc->color=LTGREEN;
+      GrCircle(dc,tmps->p.x,tmps->p.y,tmps->radius);
     }
     tmps=tmps->next;
   }
@@ -726,7 +701,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 }
 
-U0 Explosion(MyMass *tmpm1,MyMass *tmpm2,F64 r)
+U0 Explosion(MyMass *tmpm1,MyMass *tmpm2,F64 tons)
 {
   MyMass *tmpm;
   CD3 p1;
@@ -742,8 +717,7 @@ U0 Explosion(MyMass *tmpm1,MyMass *tmpm2,F64 r)
 	  d=1;
 	else
 	  d=Sqrt(d);
-	d=2e8*r`7/d`6;
-	if (d>1e5) d=1e5;
+	d=250000*tons/d`2;
 	D3MulEqu(&p1,d);
 	D3AddEqu(&tmpm->DstateDt->DxDt,&p1);
       }
@@ -786,7 +760,6 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   CTask *task=ode->win_task;
   CD3 p,p1,p2;
   Ship *tmpsp;
-  Shot *tmps;
   Missile *tmpmi;
   MyMass *tmpm,*tmpm1;
 
@@ -803,20 +776,34 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
       tmpm->DstateDt->DyDt+=Sqr(Sqr(Sqr(d-tmpm->radius)));
     if (d+tmpm->radius>task->pix_height)
       tmpm->DstateDt->DyDt-=Sqr(Sqr(Sqr((d+tmpm->radius)-task->pix_height)));
-    tmpm1=ode->next_mass;
-    while (tmpm1!=&ode->next_mass) {
-      if (tmpm!=tmpm1) {
-	D3Sub(&p,&tmpm->state->x,&tmpm1->state->x);
-	dd=D3NormSqr(&p);
-	dd2=Sqr(tmpm->radius+tmpm1->radius);
-	if (dd<=dd2) {
-	  d=Sqrt(dd)+0.0001;
-	  D3MulEqu(&p,Sqr(Sqr(dd2-dd))/d);
-	  D3AddEqu(&tmpm ->DstateDt->DxDt,&p);
-	  D3SubEqu(&tmpm1->DstateDt->DxDt,&p);
+
+    if (tmpm->type!=MT_SUPER_NAPALM_SPLAT) {
+      tmpm1=ode->next_mass;
+      while (tmpm1!=&ode->next_mass) {
+	if (tmpm!=tmpm1) {
+	  if (tmpm1->type==MT_SUPER_NAPALM_SPLAT) {
+	    if (tmpm->type==MT_HUMAN_SHIP || tmpm->type==MT_ENEMY_SHIP) {
+	      D3Sub(&p,&tmpm->state->x,&tmpm1->state->x);
+	      dd=D3NormSqr(&p)+1;
+	      if (dd<100000) {
+		D3MulEqu(&p,100000/dd);
+		D3AddEqu(&tmpm1->DstateDt->DxDt,&p);
+	      }
+	    }
+	  } else {
+	    D3Sub(&p,&tmpm->state->x,&tmpm1->state->x);
+	    dd=D3NormSqr(&p);
+	    dd2=Sqr(tmpm->radius+tmpm1->radius);
+	    if (dd<=dd2) {
+	      d=Sqrt(dd)+0.0001;
+	      D3MulEqu(&p,Sqr(Sqr(dd2-dd))/d);
+	      D3AddEqu(&tmpm ->DstateDt->DxDt,&p);
+	      D3SubEqu(&tmpm1->DstateDt->DxDt,&p);
+	    }
+	  }
 	}
+	tmpm1=tmpm1->next;
       }
-      tmpm1=tmpm1->next;
     }
     tmpm=tmpm->next;
   }
@@ -825,7 +812,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
   while (tmpsp!=&ship_head) {
     if (tmpsp->exploding && tmpsp->die_time<=tS<=tmpsp->die_timeout)
       for (i=0;i<tmpsp->masses;i++)
-	Explosion(&tmpsp->p[i],NULL,tmpsp->p[i].radius/3.0);
+	Explosion(&tmpsp->p[i],NULL,tmpsp->p[i].radius/250.0);
     switch (tmpsp->type) {
       case ST_HUMAN1:
 	if (!tmpsp->exploding) {
@@ -886,19 +873,12 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
     tmpsp=tmpsp->next;
   }
 
-  tmps=shot_head.next;
-  while (tmps!=&shot_head) {
-    if (tmps->exploding)
-      Explosion(&tmps->p,NULL,tmps->explosion_radius);
-    tmps=tmps->next;
-  }
-
   tmpmi=missile_head.next;
   while (tmpmi!=&missile_head) {
     if (tmpmi->active) {
       if (tmpmi->launched) {
 	if (tmpmi->exploding)
-	  Explosion(&tmpmi->p_front,&tmpmi->p_back,tmpmi->explosion_radius);
+	  Explosion(&tmpmi->p_front,&tmpmi->p_back,tmpmi->tons);
 	else {
 //Guide missile
 	  if (tmpsp=tmpmi->target) {
@@ -930,17 +910,29 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 
 U0 CheckDamage()
 {
-  I64 i,j,k;
+  I64 i,j,death_score;
   Ship *tmpsp,*tmpsp1;
-  MyMass *tmpm,*best_mass;
+  MyMass *tmpm,*tmpm1,*best_mass;
   CD3 p,p1,p2;
   F64 d,best_distance;
 
   tmpm=ode->next_mass;
   while (tmpm!=&ode->next_mass) {
-    tmpm->temperature*=0.9;
+    if (tmpm->type==MT_SUPER_NAPALM_SPLAT) {
+      tmpm1=ode->next_mass;
+      while (tmpm1!=&ode->next_mass) {
+	if (tmpm1->type!=MT_SUPER_NAPALM_SPLAT) {
+	  D3Sub(&p,&tmpm1->x,&tmpm->x);
+	  if (D3NormSqr(&p)<Sqr(tmpm1->radius))
+	    tmpm1->temperature+=0.4;
+	}
+	tmpm1=tmpm1->next;
+      }
+    } else
+      tmpm->temperature*=0.9;
     tmpm=tmpm->next;
   }
+
   if (human) {
     human->laser_temperature*=0.975;
 
@@ -984,6 +976,7 @@ U0 CheckDamage()
   tmpsp=ship_head.next;
   while (tmpsp!=&ship_head) {
     tmpsp1=tmpsp->next;
+    death_score=0;
     switch (tmpsp->type) {
       case ST_HUMAN1:
 	if (tmpsp->exploding) {
@@ -1000,18 +993,8 @@ U0 CheckDamage()
 	      else if (i==5)
 		MissileDel(&tmpsp->missiles[1]);
 	    }
-	    if (tmpsp->s[i].flags&SSF_INACTIVE) {
-	      if (i<3) {
-		if (!tmpsp->exploding) {
-		  tmpsp->exploding=TRUE;
-		  tmpsp->die_time=tS;
-		  tmpsp->die_timeout=tS+0.75;
-		  game_over=TRUE;
-		  Noise(750,1000,2000);
-		  break;
-		}
-	      }
-	    }
+	    if (tmpsp->s[i].flags&SSF_INACTIVE && i<3)
+	      death_score++;
 	  }
 	break;
       default:
@@ -1032,18 +1015,22 @@ U0 CheckDamage()
 	      j++;
 	    }
 	  }
-	  k=0;
-	  for (i=0;i<tmpsp->masses;i++) {
-	    if (tmpsp->p[i].temperature>MASS_MAX_TEMP)
-	      k++;
-	  }
-	  if (j>1 || k) {
-	    tmpsp->exploding=TRUE;
-	    tmpsp->die_time=tS;
-	    tmpsp->die_timeout=tS+0.75;
-	    Noise(750,1000,3000);
-	  }
+	  if (j>1)
+	    death_score++;
 	}
+    }
+    if (!tmpsp->exploding) {
+      for (i=0;i<tmpsp->masses;i++)
+	if (tmpsp->p[i].temperature>MAX_MASS_TEMP)
+	  death_score++;
+      if (death_score) {
+	tmpsp->exploding=TRUE;
+	tmpsp->die_time=tS;
+	tmpsp->die_timeout=tS+0.75;
+	Noise(750,1000,3000);
+	if (tmpsp->type==ST_HUMAN1)
+	  game_over=TRUE;
+      }
     }
     tmpsp=tmpsp1;
   }
@@ -1058,10 +1045,11 @@ U0 FireOneGun(Ship *tmpsp,I64 n,F64 r,F64 fuse_time)
 
   tmps=CAlloc(sizeof(Shot));
   D3Copy(&tmps->p.x,&tmpsp->p[n].x);
-  tmps->explosion_radius=tmps->radius=r;
-  tmps->fuse_time=tS+1.5*fuse_time;
-  tmps->die_timeout=tmps->fuse_time+0.125;
+  tmps->radius=r;
+  tmps->splats=20*r;
+  tmps->fuse_time=tS+fuse_time;
   tmps->p.mass=0.3*r*r*r;
+  tmps->p.type=MT_SUPER_NAPALM_BALL;
   D3Sub(&p1,&tmpsp->p[0].x,&tmpsp->p[1].x);
   D3Sub(&p2,&tmpsp->p[0].x,&tmpsp->p[2].x);
   D3Unit(D3Add(&p,&p1,&p2));
@@ -1138,18 +1126,46 @@ U0 HumanFireLaserEnd()
 
 U0 ExpireShots()
 {
+  I64 i;
+  F64 é;
   Shot *tmps=shot_head.next,*tmps1;
+  MyMass *tmpm;
+
   while (tmps!=&shot_head) {
     tmps1=tmps->next;
-    if (!tmps->exploding && tS>tmps->fuse_time) {
-      tmps->exploding=TRUE;
-      Noise(50,3000,6000);
-    } else if (tS>tmps->die_timeout) {
+    if (tS>tmps->fuse_time) {
+      é=Arg(tmps->p.DxDt,tmps->p.DyDt);
+      for (i=0;i<tmps->splats;i++) {
+	tmpm=CAlloc(sizeof(MyMass));
+	D3Copy(&tmpm->x,&tmps->p.x);
+	tmpm->radius=1;
+	tmpm->mass=1;
+	tmpm->die_timeout=tS+0.2;
+	tmpm->type=MT_SUPER_NAPALM_SPLAT;
+	D3Copy(&tmpm->DxDt,&tmps->p.DxDt);
+	tmpm->DxDt+=50*Sqr(tmps->radius)*Rand*Sin(é+2*ã*i/tmps->splats);
+	tmpm->DyDt+=50*Sqr(tmps->radius)*Rand*Cos(é+2*ã*i/tmps->splats);
+	QueIns(tmpm,ode->last_mass);
+      }
       QueRem(tmps);
       QueRem(&tmps->p);
       Free(tmps);
     }
     tmps=tmps1;
+  }
+}
+
+U0 ExpireSplats()
+{
+  MyMass *tmpm,*tmpm1;
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    tmpm1=tmpm->next;
+    if (tmpm->type==MT_SUPER_NAPALM_SPLAT && tS>tmpm->die_timeout) {
+      QueRem(tmpm);
+      Free(tmpm);
+    }
+    tmpm=tmpm1;
   }
 }
 
@@ -1205,6 +1221,18 @@ U0 AI()
 U0 InitLevel()
 {
   I64 i;
+  MyMass *tmpm,*tmpm1;
+
+  tmpm=ode->next_mass;
+  while (tmpm!=&ode->next_mass) {
+    tmpm1=tmpm->next;
+    if (tmpm->type==MT_SUPER_NAPALM_SPLAT) {
+      QueRem(tmpm);
+      Free(tmpm);
+    }
+    tmpm=tmpm1;
+  }
+
   if (level==4)
     OneTimePopUp(&msg_flags,XMSGF_ANTISPIN,
 	  "Press $$GREEN$$<CURSOR-DOWN>$$FG$$ for anti-spin stabilizer.\n");
@@ -1300,7 +1328,7 @@ U0 XCaliber()
 		  case SC_CURSOR_RIGHT:
 		    if (sc&SCF_CTRL)
 		      HumanFireMissileBegin(0);
-		    if (sc&SCF_SHIFT)
+		    else if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time+=2;
 		    else
 		      human_t_right=MAX_THRUST;
@@ -1308,7 +1336,7 @@ U0 XCaliber()
 		  case SC_CURSOR_LEFT:
 		    if (sc&SCF_CTRL)
 		      HumanFireMissileBegin(1);
-		    if (sc&SCF_SHIFT)
+		    else if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time-=2;
 		    else
 		      human_t_left =MAX_THRUST;
@@ -1379,6 +1407,7 @@ U0 XCaliber()
       }
       AI;
       ExpireShots;
+      ExpireSplats;
       ExpireMissiles;
       CheckDamage;
       Refresh; //msgs are only qued by winmgr

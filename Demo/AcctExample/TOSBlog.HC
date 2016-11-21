@@ -97,7 +97,7 @@ public U0 MakeWebSitePartial()
   Drv('C');
 }
 
-public U0 Blog()
+public U0 Blog(Bool god_misc2=FALSE)
 {
   if (!FileFind(BlogLocalFile,,FUF_JUST_FILES))
     Copy("~/Web/" PERSONAL_INITIALS "/DailyBlogHeader.DD.Z",
@@ -106,8 +106,12 @@ public U0 Blog()
   WinBorder;
   WinMax;
   Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
-  Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
-  Msg(MSG_KEY_DOWN_UP,'\n',0);
+  if (god_misc2)
+    Msg(MSG_KEY_DOWN_UP,0,SC_F7|SCF_SHIFT|SCF_ALT);
+  else {
+    Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
+    Msg(MSG_KEY_DOWN_UP,'\n',0);
+  }
   if (Ed(BlogLocalFile,EDF_WAS_WRITE)) {
     DocOpt(BlogLocalFile,"-r");
     Copy(BlogLocalFile,"::" DAILY_BASE ".DD.Z");

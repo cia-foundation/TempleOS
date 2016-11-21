@@ -12,7 +12,8 @@ CTask *sys_winmgr_task,*sys_task_being_scrn_updated;
 U8 *rev_bits_table, //Table with U8 bits revd
    *set_bits_table; //Table with count of set bits in a U8
 CDate local_time_offset;
-F64 *pow10_I64;
+F64	*pow10_I64,
+	sys_os_version=4.130;
 
 CAutoCompleteDictGlbls acd;
 CAutoCompleteGlbls ac;

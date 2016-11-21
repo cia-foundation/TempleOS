@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
 
-RegSetDftEntry("TempleOS/EagleDive","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/EagleDive");
+RegSetDftEntry("TempleOS/Talons","F64 best_score=9999;\n");
+RegExeBranch("TempleOS/Talons");
 
 //Keep these power of two so shift is used instead of multiply
 //to index arrays.
@@ -738,7 +738,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   LBtr(&mp.update_not_done_flags,Gs->num);
 }
 
-U0 CoreAPEagleDiveTask(CTask *master_task)
+U0 CoreAPTalonsTask(CTask *master_task)
 {
   CDC *dc=DCAlias(main_dc,master_task);
   while (!mp.app_done) {
@@ -861,7 +861,7 @@ U0 DrawHorizon(CDC *dc)
   dc->depth_buf=old_db;
 }
 
-U0 Core0EagleDive()
+U0 Core0Talons()
 {
   CDC *dc=DCAlias(main_dc,Fs);
   I64 i,xx,yy,elev,height,cx=Fs->pix_width>>1,cy=Fs->pix_height>>1;
@@ -1097,7 +1097,7 @@ U0 Init()
   z+=elevations[yy][xx]*COORDINATE_SCALE;
 
   for (i=1;i<mp_cnt;i++)
-    Spawn(&CoreAPEagleDiveTask,Fs,"AP EagleDive",i);
+    Spawn(&CoreAPTalonsTask,Fs,"AP Talons",i);
   Fs->task_end_cb=&TaskEndCB;
   game_t0=tS;
 }
@@ -1116,7 +1116,7 @@ U0 CleanUp()
   DCDel(main_dc);
 }
 
-U0 EagleDive()
+U0 Talons()
 {
   I64 ch,sc;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
@@ -1177,17 +1177,17 @@ U0 EagleDive()
 	    break;
 	}
       } else
-	Core0EagleDive;
+	Core0Talons;
     } while (ch!=CH_SHIFT_ESC && ch!=CH_ESC);
   catch
     PutExcept;
   SettingsPop;
   CleanUp;
-  RegWriteBranch("TempleOS/EagleDive","F64 best_score=%5.4f;\n",best_score);
+  RegWriteBranch("TempleOS/Talons","F64 best_score=%5.4f;\n",best_score);
   MenuPop;
 }
 
-EagleDive;
+Talons;
         ê          
    ‡ˇˇˇ˝ˇˇˇ   
 ˝ˇˇˇ      "   

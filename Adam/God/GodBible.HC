@@ -214,14 +214,14 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
     return NULL;
 }
 
-public U0 BibleLines(CDoc *doc_out=NULL,I64 start,I64 lines,
-	U8 *bible_filename=BIBLE_FILENAME)
+public U0 BookLines(CDoc *doc_out=NULL,I64 start,I64 lines,
+	U8 *book_filename=BIBLE_FILENAME)
 {//Put N line starting at line M into doc.
   CDoc *doc_in;
   CDocEntry *doc_e;
   if (!doc_out) doc_out=DocPut;
-  if (doc_out && FileFind(bible_filename)) {
-    doc_in=DocRead(bible_filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
+  if (doc_out && FileFind(book_filename)) {
+    doc_in=DocRead(book_filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
     DocLineNumGoTo(doc_in,start); //one based
     doc_e=doc_in->cur_entry;
     while (lines>0 && doc_e!=doc_in) {

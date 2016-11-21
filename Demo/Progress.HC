@@ -9,8 +9,8 @@ U0 Main1()
   "\nWith description.\n";
   PressAKey;
   ProgressBarsRst;
-  StrCpy(progress1_desc,"Progress Demo"); //PROGRESS_DESC_LEN is max
   progress1_max=200;
+  StrCpy(progress1_desc,"Progress Demo"); //PROGRESS_DESC_LEN is max
   while (progress1++!=progress1_max)
     Sleep(20);
   progress1_max=0; //hide
@@ -19,6 +19,21 @@ U0 Main1()
 Main1;
 
 U0 Main2()
+{
+  "\nWith description and time.\n";
+  PressAKey;
+  ProgressBarsRst;
+  progress1_max=200;
+  progress1_t0=tS;
+  StrCpy(progress1_desc,"Progress Demo"); //PROGRESS_DESC_LEN is max
+  while (progress1++!=progress1_max)
+    Sleep(20);
+  progress1_max=0; //hide
+}
+
+Main2;
+
+U0 Main3()
 {
   "\nNo description.\n";
   PressAKey;
@@ -30,7 +45,7 @@ U0 Main2()
   progress1_max=0; //hide
 }
 
-Main2;
+Main3;
 
 "\n$$LTRED$$Now, from asm...  It's handy for debugging.$$FG$$\n"
 "$$LTRED$$Watch the progress on the wallpaper.$$FG$$\n";
@@ -39,8 +54,9 @@ PressAKey;
 
 asm {
 _PROGRESS_DEMO::
-	MOV	RCX,0x80000000
+	MOV	RCX,12000000
 @@05:	MOV	U64 [&progress1],RCX
+	CALL	&Yield
 	LOOP	@@05
 	MOV	U64 [&progress1],RCX
 	RET

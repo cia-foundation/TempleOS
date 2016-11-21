@@ -20,22 +20,17 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 {//Plot a sprite into a CDC.
   CSprite *tmpg=elems-offset(CSprite.start);
   I64 i,j,k,x1,y1,z1,x2,y2,
-	cur_sprite_elem_num=0,*old_r,*r2,
-	old_flags=dc->flags,
-	old_pen_width=dc->pen_width;
+	*old_r,*r2,old_flags=dc->flags,old_pen_width=dc->pen_width;
   I32 *ptr;
   CColorROPU32 old_color=dc->color;
   CDC *img;
   CD3I32 *p,*p2;
   CGrSym old_sym;
   MemCpy(&old_sym,&dc->sym,sizeof(CGrSym));
-  if (dc->flags & DCF_LOCATE_NEAREST) {
-    dc->nearest_sprite_elem_num=0;
+  if (dc->flags & DCF_LOCATE_NEAREST)
     dc->nearest_dist=MAX_I64;
-  }
-  while (tmpg->type) {
-    dc->cur_sprite_elem_num=cur_sprite_elem_num;
-    switch (tmpg->type) {
+  while (tmpg->type&SPG_TYPE_MASK) {
+    switch (tmpg->type&SPG_TYPE_MASK) {
       case SPT_COLOR:
 	dc->color=dc->color&~(COLORROP_COLORS_MASK|ROPF_DITHER)|tmpg->c.color;
 	break;
@@ -237,7 +232,6 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	}
 	break;
     }
-    cur_sprite_elem_num++;
     if (just_one_elem) break;
     tmpg(U8 *)+=SpriteElemSize(tmpg);
   }
@@ -346,10 +340,10 @@ public U8 *SpriteInterpolate(F64 t,U8 *elems0,U8 *elems1)
     MemCpy(res,elems1,i);
   }
   tmpgr=res-offset(CSprite.start);
-  while (tmpg0->type) {
-    if (tmpg0->type!=tmpg1->type)
+  while (tmpg0->type&SPG_TYPE_MASK) {
+    if (tmpg0->type&SPG_TYPE_MASK!=tmpg1->type&SPG_TYPE_MASK)
       throw('Graphics');
-    switch (tmpg0->type) {
+    switch (tmpg0->type&SPG_TYPE_MASK) {
       case SPT_ROTATED_RECT:
 	tmpgr->ppa.angle=(tmpg0->ppa.angle*t0+tmpg1->ppa.angle*t1)/GR_SCALE;
       case SPT_RECT:

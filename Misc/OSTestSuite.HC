@@ -1,7 +1,8 @@
-U0 TS(I64 i)
+U0 TS(I64 i,F64 t0)
 {
   progress4=i;
-  progress4_max=171;
+  progress4_max=172;
+  progress4_t0=t0;
   *progress4_desc=0;
 }
 U0 TSFile(U8 *name,I64 ms=750)
@@ -1287,11 +1288,11 @@ U0 DoFPS()
   DeathWait(&task,TRUE);
 }
 
-U0 DoEagleDive()
+U0 DoTalons()
 {
   I64 i;
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Demo/Games/EagleDive\";\n");
+  XTalkWait(task,"#include \"::/Demo/Games/Talons\";\n");
   Sleep(500);
   for (i=0;i<10;i++) {
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SC_CURSOR_UP);
@@ -1388,7 +1389,8 @@ U0 DoSortFile()
 U0 DoToHtmlToTXT()
 {
   CTask *task=User("#include \"::/Demo/ToHtmlToTXTDemo/HtmlGen\";"
-	"#include \"::/Demo/ToHtmlToTXTDemo/TXTGen\";Sleep(750);\n");
+	"#include \"::/Demo/ToHtmlToTXTDemo/TXTGen\";"
+	"Type(\"/Home/DemoOutPage.TXT\");Sleep(750);\n");
   DeathWait(&task,TRUE);
 }
 
@@ -1556,195 +1558,198 @@ U0 DoAsmAndC2()
 }
 
 U0 OSTestSuite()
-{ //$MA+LIS-X,"RENUM",LM="I64 i;for (i=0;i<171;i++){if(i)Msg(MSG_KEY_DOWN_UP,0,SC_F3);else\"%cTS(%c\",CH_CTRLF,CH_ESC;Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);\"%03d\",i;Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);\"%c%c%c\",CH_BACKSPACE,CH_BACKSPACE,CH_BACKSPACE;}"$
+{ //$MA+LIS-X,"RENUM",LM="I64 i;for (i=0;i<172;i++){if(i)Msg(MSG_KEY_DOWN_UP,0,SC_F3);else\"%cTS(%c\",CH_CTRLF,CH_ESC;Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);\"%03d\",i;Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);\"%c%c%c\",CH_BACKSPACE,CH_BACKSPACE,CH_BACKSPACE;}"$
+  F64 t0=tS;
   CTask *task;
-  TS(000); DoBlackDiamond;
-  TS(001); DoEagleDive;
-  TS(002); DoFlatTops;
-  TS(003); DoDunGen;
-  TS(004); DoFPS;
-  TS(005); DoZoneOut;
-  TS(006); DoVaroom;
-  TS(007); DoRocket;
-  TS(008); DoRocketScience;
-  TS(009); DoBattleLines;
-  TS(010); DoBigGuns;
-  TS(011); DoFlapBat;
-  TS(012); DoTimeOut;
-  TS(013); DoToTheFront;
-  TS(014); DoPsalmody;
-  TS(015); DoJukeBox;
-  TS(016); if (!sys_heap_init_flag) DoSpan; //Has FloodFill
-  TS(017); DoStrut;
-  TS(018); DoRawHide;
-  TS(019); DoKeepAway;
-  TS(020); DoAfterEgypt;
-  TS(021); DoXCaliber;
-  TS(022); DoWenceslas;
-  TS(023); DoBomberGolf;
-  TS(024); DoTheDead;
-  TS(025); DoTreeCheckers;
-  TS(026); DoMPAdd;
-  TS(027); TSFile("::/Demo/MultiCore/Primes");
-  TS(028); if (FileFind(BIBLE_FILENAME))
+  TS(000,t0); DoBlackDiamond;
+  TS(001,t0); DoTalons;
+  TS(002,t0); DoFlatTops;
+  TS(003,t0); DoDunGen;
+  TS(004,t0); DoFPS;
+  TS(005,t0); DoZoneOut;
+  TS(006,t0); DoVaroom;
+  TS(007,t0); DoRocket;
+  TS(008,t0); DoRocketScience;
+  TS(009,t0); DoBattleLines;
+  TS(010,t0); DoBigGuns;
+  TS(011,t0); DoFlapBat;
+  TS(012,t0); DoTimeOut;
+  TS(013,t0); DoToTheFront;
+  TS(014,t0); DoPsalmody;
+  TS(015,t0); DoJukeBox;
+  TS(016,t0); if (!sys_heap_init_flag) DoSpan; //Has FloodFill
+  TS(017,t0); DoStrut;
+  TS(018,t0); DoRawHide;
+  TS(019,t0); DoKeepAway;
+  TS(020,t0); DoAfterEgypt;
+  TS(021,t0); DoXCaliber;
+  TS(022,t0); DoWenceslas;
+  TS(023,t0); DoBomberGolf;
+  TS(024,t0); DoTheDead;
+  TS(025,t0); DoTreeCheckers;
+  TS(026,t0); TSFile("::/Demo/RadixSort");
+  TS(027,t0); DoMPAdd;
+  TS(028,t0); TSFile("::/Demo/MultiCore/Primes");
+  TS(029,t0); if (FileFind(BIBLE_FILENAME))
     TSFile("::/Demo/MultiCore/Palindrome");
-  TS(029); TSFileChar("::/Demo/MultiCore/Clouds");
-  TS(030); if (mp_cnt>1) TSFile("::/Demo/MultiCore/RadixSort");
-  TS(031); if (mp_cnt>1 && DrvIsWritable(':'))
+  TS(030,t0); TSFileChar("::/Demo/MultiCore/Clouds");
+  TS(031,t0); if (mp_cnt>1) TSFile("::/Demo/MultiCore/MPRadix");
+  TS(032,t0); if (mp_cnt>1 && DrvIsWritable(':'))
     TSFileChar("::/Demo/MultiCore/LoadTest");
-  TS(032); if (mp_cnt>1) TSFile("::/Demo/MultiCore/MPPrint");
-  TS(033); if (mp_cnt>1) TSFile("::/Demo/MultiCore/Lock");
-  TS(034); if (mp_cnt>1) TSFile("::/Demo/MultiCore/Interrupts");
-  TS(035); TSFileChar("::/Demo/Graphics/SpritePlot");
-  TS(036); TSFileChar("::/Demo/Graphics/Elephant",,CH_SHIFT_ESC);
-  TS(037); TSFileChar("::/Demo/Graphics/SpritePlot3D");
-  TS(038); TSFile("::/Demo/Graphics/SpritePut");
-  TS(039); TSFile("::/Demo/Graphics/SpritePutExt");
-  TS(040); TSFile("::/Demo/Graphics/SpriteText");
-  TS(041); TSFile("::/Demo/Graphics/SpriteRaw");
-  TS(042); TSFile("::/Demo/Graphics/EdSprite");
-  TS(043); TSFile("::/Demo/Graphics/Balloon",0);
-  TS(044); TSFile("::/Demo/Carry");
-  TS(045); TSFile("::/Demo/Directives");
-  TS(046); DoRandDemo;
-  TS(047); TSFileChar("::/Demo/Graphics/Extents");
-  TS(048); TSFileChar("::/Demo/Graphics/NetOfDots");
-  TS(049); TSFileChar("::/Demo/Graphics/SunMoon");
-  TS(050); DoLowPassFilter;
-  TS(051); DoMathAudioDemo;
-  TS(052); TSFileChar("::/Demo/Graphics/Lines");
-  TS(053); TSFileChar("::/Demo/Graphics/Bounce",,CH_SHIFT_ESC,FALSE);
-  TS(054); DoMsgLoop;
-  TS(055); DoASCIIOrgan;
-  TS(056); DoMorseCode;
-  TS(057); DoPixCollision;
-  TS(058); DoDoodle;
-  TS(059); DoMassSpring;
-  TS(060); DoSpeedLine;
-  TS(061); DoKeyBitMap;
-  TS(062); DoMountain;
-  TS(063); DoBSpline;
-  TS(064); DoGrModels;
-  TS(065); TSFileChar("::/Demo/Graphics/Blot",1800);
-  TS(066); if (DrvIsWritable('~')) DoScrnCapture;
-  TS(067); DoGrid;
-  TS(068); DoPick;
-  TS(069); DoPick3D;
-  TS(070); DoWhap;
-  TS(071); DoPalette;
-  TS(072); TSFile("::/Demo/Print");
-  TS(073); TSFileChar("::/Demo/Graphics/Shading",1500);
-  TS(074); TSFileChar("::/Demo/Graphics/RotateTank",1500);
-  TS(075); TSFileChar("::/Demo/Graphics/3DPoly",1500);
-  TS(076); TSFileChar("::/Demo/Graphics/Box",1500);
-  TS(077); DoSymmetry;
-  TS(078); TSFileChar("::/Demo/Graphics/Shadow",1500);
-  TS(079); TSFileChar("::/Demo/Graphics/Transform",,CH_SHIFT_ESC);
-  TS(080); DoPredatorPrey;
-  TS(081); DoPoleZeros;
-  TS(082); DoDigits;
-  TS(083); DoStadium;
-  TS(084); DoElephantWalk;
-  TS(085); DoHalogen;
-  TS(086); TSFileChar("::/Demo/Games/Maze",,CH_SHIFT_ESC);
-  TS(087); TSFileChar("::/Demo/Graphics/FontEd",,CH_SHIFT_ESC);
-  TS(088); DoLattice;
-  TS(089); DoCtrlR1;
-  TS(090); DoF2Macro;
-  TS(091); TSFile("::/Demo/SubIntAccess");
-  TS(092); DoDemoDoc;
-  TS(093); TSFile("::/Demo/DolDoc/TreeDemo");
-  TS(094); TSFile("::/Demo/DolDoc/TextDemo");
-  TS(095); TSFile("::/Demo/DolDoc/CursorMove");
-  TS(096); DoMiniCompiler;
-  TS(097); TSFile("::/Demo/Lectures/MiniGrLib",0);
-  TS(098); TSFileChar("::/Demo/TimeIns");
-  TS(099); DoPhoneNumWords;
-  TS(100); TSFile("::/Demo/Dsk/UnusedSpaceRep");
-  TS(101); TSFile("::/Demo/Dsk/BlkDevRep");
-  TS(102); DoLastClass;
-  TS(103); if (DrvIsWritable('~')) DoFPrintF;
-  TS(104); TSFile("::/Demo/Dsk/SerializeTree");
-  TS(105); DoExceptions;
-  TS(106); TSFileChar("::/Demo/ScrnCodes");
-  TS(107); TSFile("::/Demo/ExtChars");
-  TS(108); TSFile("::/Demo/Graphics/PanText",0);
-  TS(109); TSFile("::/Demo/Graphics/CharAnimation");
-  TS(110); DoCharDemo;
-  TS(111); TSFile("::/Demo/DateTime");
-  TS(112); TSFile("::/Demo/SubSwitch");
-  TS(113); TSFile("::/Demo/NullCase");
-  TS(114); TSFile("::/Demo/MagicPairs");
-  TS(115); TSFileChar("::/Demo/Graphics/Hanoi",3000);
-  TS(116); DoSquirt;
-  TS(117); TSFileChar("::/Demo/Graphics/CommonAncestor",1500,CH_SHIFT_ESC);
-  TS(118); DoCartesian;
-  TS(119); TSFileChar("::/Demo/Games/RainDrops",,CH_SHIFT_ESC);
-  TS(120); TSFileChar("::/Demo/Games/Collision",1500);
-  TS(121); DoLogic;
-  TS(122); TSFile("::/Demo/CompileDemo");
-  TS(123); DoPrompt;
-  TS(124); if (DrvIsWritable('~')) DoWebLog;
-  TS(125); if (DrvIsWritable('~')) DoRevFile;
-  TS(126); if (DrvIsWritable('~')) DoSortFile;
-  TS(127); if (DrvIsWritable('~')) DoToHtmlToTXT;
-  TS(128); if (DrvIsWritable('~')) TSFile("::/Demo/RegistryDemo");
-  TS(129); DoDefine;
-  TS(130); TSFile("::/Demo/GlblVars");
-  TS(131); DoFileRead;
-  TS(132); TSFile("::/Demo/ParenWarn");
-  TS(133); TSFile("::/Demo/DolDoc/DefineStr");
-  TS(134); TSFile("::/Demo/DolDoc/Data");
-  TS(135); TSFile("::/Demo/DolDoc/CallBack");
-  TS(136); TSFile("::/Demo/ClassMeta");
-  TS(137); if (DrvIsWritable('~')) DoNumBible;
-  TS(138); DoForm;
-  TS(139); DoClickCallBack;
-  TS(140); DoMenuButton;
-  TS(141); DoMenuSprite;
-  TS(142); DoSuggestedSpelling;
-  TS(143); TSFileChar("::/Demo/WordSearch");
-  TS(144); TSFile("::/Demo/StkGrow");
-  TS(145); TSFile("::/Demo/MemDemo");
-  TS(146); TSFileChar("::/Demo/Snd/WaterFowl");
-  TS(147); TSFile("::/Demo/Asm/AsmHelloWorld");
-  TS(148); DoAsmAndC1;
-  TS(149); DoAsmAndC2;
-  TS(150); TSFile("::/Demo/Asm/AsmAndC3");
-  TS(151); TSFile("::/Demo/Asm/MulByHand");
-  TS(152); TSFile("::/Demo/Asm/DivByHand");
-  TS(153); TSFile("::/Demo/Asm/BuzzFizz");
-  TS(154); TSFile("::/Demo/Asm/PutDec");
+  TS(033,t0); if (mp_cnt>1) TSFile("::/Demo/MultiCore/MPPrint");
+  TS(034,t0); if (mp_cnt>1) TSFile("::/Demo/MultiCore/Lock");
+  TS(035,t0); if (mp_cnt>1) TSFile("::/Demo/MultiCore/Interrupts");
+  TS(036,t0); TSFileChar("::/Demo/Graphics/SpritePlot");
+  TS(037,t0); TSFileChar("::/Demo/Graphics/Elephant",,CH_SHIFT_ESC);
+  TS(038,t0); TSFileChar("::/Demo/Graphics/SpritePlot3D");
+  TS(039,t0); TSFile("::/Demo/Graphics/SpritePut");
+  TS(040,t0); TSFile("::/Demo/Graphics/SpritePutExt");
+  TS(041,t0); TSFile("::/Demo/Graphics/SpriteText");
+  TS(042,t0); TSFile("::/Demo/Graphics/SpriteRaw");
+  TS(043,t0); TSFile("::/Demo/Graphics/EdSprite");
+  TS(044,t0); TSFile("::/Demo/Graphics/Balloon",0);
+  TS(045,t0); TSFile("::/Demo/Carry");
+  TS(046,t0); TSFile("::/Demo/Directives");
+  TS(047,t0); DoRandDemo;
+  TS(048,t0); TSFileChar("::/Demo/Graphics/Extents");
+  TS(049,t0); TSFileChar("::/Demo/Graphics/NetOfDots");
+  TS(050,t0); TSFileChar("::/Demo/Graphics/SunMoon");
+  TS(051,t0); DoLowPassFilter;
+  TS(052,t0); DoMathAudioDemo;
+  TS(053,t0); TSFileChar("::/Demo/Graphics/Lines");
+  TS(054,t0); TSFileChar("::/Demo/Graphics/Bounce",,CH_SHIFT_ESC,FALSE);
+  TS(055,t0); DoMsgLoop;
+  TS(056,t0); DoASCIIOrgan;
+  TS(057,t0); DoMorseCode;
+  TS(058,t0); DoPixCollision;
+  TS(059,t0); DoDoodle;
+  TS(060,t0); DoMassSpring;
+  TS(061,t0); DoSpeedLine;
+  TS(062,t0); DoKeyBitMap;
+  TS(063,t0); DoMountain;
+  TS(064,t0); DoBSpline;
+  TS(065,t0); DoGrModels;
+  TS(066,t0); TSFileChar("::/Demo/Graphics/Blot",1800);
+  TS(067,t0); if (DrvIsWritable('~')) DoScrnCapture;
+  TS(068,t0); DoGrid;
+  TS(069,t0); DoPick;
+  TS(070,t0); DoPick3D;
+  TS(071,t0); DoWhap;
+  TS(072,t0); DoPalette;
+  TS(073,t0); TSFile("::/Demo/Print");
+  TS(074,t0); TSFileChar("::/Demo/Graphics/Shading",1500);
+  TS(075,t0); TSFileChar("::/Demo/Graphics/RotateTank",1500);
+  TS(076,t0); TSFileChar("::/Demo/Graphics/3DPoly",1500);
+  TS(077,t0); TSFileChar("::/Demo/Graphics/Box",1500);
+  TS(078,t0); DoSymmetry;
+  TS(079,t0); TSFileChar("::/Demo/Graphics/Shadow",1500);
+  TS(080,t0); TSFileChar("::/Demo/Graphics/Transform",,CH_SHIFT_ESC);
+  TS(081,t0); DoPredatorPrey;
+  TS(082,t0); DoPoleZeros;
+  TS(083,t0); DoDigits;
+  TS(084,t0); DoStadium;
+  TS(085,t0); DoElephantWalk;
+  TS(086,t0); DoHalogen;
+  TS(087,t0); TSFileChar("::/Demo/Games/Maze",,CH_SHIFT_ESC);
+  TS(088,t0); TSFileChar("::/Demo/Graphics/FontEd",,CH_SHIFT_ESC);
+  TS(089,t0); DoLattice;
+  TS(090,t0); DoCtrlR1;
+  TS(091,t0); DoF2Macro;
+  TS(092,t0); TSFile("::/Demo/SubIntAccess");
+  TS(093,t0); DoDemoDoc;
+  TS(094,t0); TSFile("::/Demo/DolDoc/TreeDemo");
+  TS(095,t0); TSFile("::/Demo/DolDoc/TextDemo");
+  TS(096,t0); TSFile("::/Demo/DolDoc/CursorMove");
+  TS(097,t0); DoMiniCompiler;
+  TS(098,t0); TSFile("::/Demo/Lectures/MiniGrLib",0);
+  TS(099,t0); TSFileChar("::/Demo/TimeIns");
+  TS(100,t0); DoPhoneNumWords;
+  TS(101,t0); TSFile("::/Demo/Dsk/UnusedSpaceRep");
+  TS(102,t0); TSFile("::/Demo/Dsk/BlkDevRep");
+  TS(103,t0); DoLastClass;
+  TS(104,t0); if (DrvIsWritable('~')) DoFPrintF;
+  TS(105,t0); TSFile("::/Demo/Dsk/SerializeTree");
+  TS(106,t0); DoExceptions;
+  TS(107,t0); TSFileChar("::/Demo/ScrnCodes");
+  TS(108,t0); TSFile("::/Demo/ExtChars");
+  TS(109,t0); TSFile("::/Demo/Graphics/PanText",0);
+  TS(110,t0); TSFile("::/Demo/Graphics/CharAnimation");
+  TS(111,t0); DoCharDemo;
+  TS(112,t0); TSFile("::/Demo/DateTime");
+  TS(113,t0); TSFile("::/Demo/SubSwitch");
+  TS(114,t0); TSFile("::/Demo/NullCase");
+  TS(115,t0); TSFile("::/Demo/MagicPairs");
+  TS(116,t0); TSFileChar("::/Demo/Graphics/Hanoi",3000);
+  TS(117,t0); DoSquirt;
+  TS(118,t0); TSFileChar("::/Demo/Graphics/CommonAncestor",1500,CH_SHIFT_ESC);
+  TS(119,t0); DoCartesian;
+  TS(120,t0); TSFileChar("::/Demo/Games/RainDrops",,CH_SHIFT_ESC);
+  TS(121,t0); TSFileChar("::/Demo/Games/Collision",1500);
+  TS(122,t0); DoLogic;
+  TS(123,t0); TSFile("::/Demo/CompileDemo");
+  TS(124,t0); DoPrompt;
+  TS(125,t0); if (DrvIsWritable('~')) DoWebLog;
+  TS(126,t0); if (DrvIsWritable('~')) DoRevFile;
+  TS(127,t0); if (DrvIsWritable('~')) DoSortFile;
+  TS(128,t0); if (DrvIsWritable('~')) DoToHtmlToTXT;
+  TS(129,t0); if (DrvIsWritable('~')) TSFile("::/Demo/RegistryDemo");
+  TS(130,t0); DoDefine;
+  TS(131,t0); TSFile("::/Demo/GlblVars");
+  TS(132,t0); DoFileRead;
+  TS(133,t0); TSFile("::/Demo/ParenWarn");
+  TS(134,t0); TSFile("::/Demo/DolDoc/DefineStr");
+  TS(135,t0); TSFile("::/Demo/DolDoc/Data");
+  TS(136,t0); TSFile("::/Demo/DolDoc/CallBack");
+  TS(137,t0); TSFile("::/Demo/ClassMeta");
+  TS(138,t0); if (DrvIsWritable('~')) DoNumBible;
+  TS(139,t0); DoForm;
+  TS(140,t0); DoClickCallBack;
+  TS(141,t0); DoMenuButton;
+  TS(142,t0); DoMenuSprite;
+  TS(143,t0); DoSuggestedSpelling;
+  TS(144,t0); TSFileChar("::/Demo/WordSearch");
+  TS(145,t0); TSFile("::/Demo/StkGrow");
+  TS(146,t0); TSFile("::/Demo/MemDemo");
+  TS(147,t0); TSFileChar("::/Demo/Snd/WaterFowl");
+  TS(148,t0); TSFile("::/Demo/Asm/AsmHelloWorld");
+  TS(149,t0); DoAsmAndC1;
+  TS(150,t0); DoAsmAndC2;
+  TS(151,t0); TSFile("::/Demo/Asm/AsmAndC3");
+  TS(152,t0); TSFile("::/Demo/Asm/MulByHand");
+  TS(153,t0); TSFile("::/Demo/Asm/DivByHand");
+  TS(154,t0); TSFile("::/Demo/Asm/BuzzFizz");
+  TS(155,t0); TSFile("::/Demo/Asm/PutDec");
 
   task=User;
-  TS(155); XTalkWait(task,"DocMax;Prof;HeapLog(ON);\n");
-  TS(156); XTalkWait(task,"PCIRep;Sleep(750);\n");
-  TS(157); XTalkWait(task,"MemBIOSRep;Sleep(750);\n");
-  TS(158); XTalkWait(task,"MemRep;Sleep(750);\n");
-  TS(159); XTalkWait(task,"ZipRep;Sleep(750);\n");
-  TS(160); XTalkWait(task,"ProfRep;Sleep(750);\n");
-  TS(161); XTalkWait(task,"HeapLogSizeRep;Sleep(750);\n");
-  TS(162); if (mp_cnt>1) XTalkWait(task,"CPURep(TRUE);Sleep(750);\n");
-  TS(163); if (DrvIsWritable(':')) XTalkWait(task,"ChkDsk;Sleep(750);\n");
-  TS(164); if (DrvIsWritable(':')) {
+  TS(156,t0); XTalkWait(task,"DocMax;Prof;HeapLog(ON);\n");
+  TS(157,t0); XTalkWait(task,"PCIRep;Sleep(750);\n");
+  TS(158,t0); XTalkWait(task,"MemBIOSRep;Sleep(750);\n");
+  TS(159,t0); XTalkWait(task,"MemRep;Sleep(750);\n");
+  TS(160,t0); XTalkWait(task,"ZipRep;Sleep(750);\n");
+  TS(161,t0); XTalkWait(task,"ProfRep;Sleep(750);\n");
+  TS(162,t0); XTalkWait(task,"HeapLogSizeRep;Sleep(750);\n");
+  TS(163,t0); if (mp_cnt>1) XTalkWait(task,"CPURep(TRUE);Sleep(750);\n");
+  TS(164,t0); if (DrvIsWritable(':')) XTalkWait(task,"ChkDsk;Sleep(750);\n");
+  TS(165,t0); if (DrvIsWritable(':')) {
     XTalkWait(task,"DrvView;\n");
     Sleep(750);
     PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   }
-  TS(165); if (DrvIsWritable(':')) {
+  TS(166,t0); if (DrvIsWritable(':')) {
     XTalkWait(task,"DskView;\n");
     Sleep(250); //Short because ATARep takes time.
     PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
   }
-  TS(166); XTalkWait(task,"ATARep;\npSleep(750);\n");
-  TS(167); XTalkWait(task,
+  TS(167,t0); XTalkWait(task,"ATARep;\npSleep(750);\n");
+  TS(168,t0); XTalkWait(task,
 	"HashDepthRep(adam_task->hash_table);Sleep(750);\n");
-  TS(168); XTalkWait(task,"Who;Sleep(750);\n");
-  TS(169); XTalkWait(task,"DrvRep;Sleep(750);\n");
-  TS(170); XTalkWait(task,"TaskRep;Sleep(750);\n");
+  TS(169,t0); XTalkWait(task,"Who;Sleep(750);\n");
+  TS(170,t0); XTalkWait(task,"DrvRep;Sleep(750);\n");
+  TS(171,t0); XTalkWait(task,"TaskRep;Sleep(750);\n");
   DeathWait(&task,TRUE);
 
   ProgressBarsRst;
+  "Elapsed Time:%5.3f\n",tS-t0;
 }
 
 OSTestSuite;

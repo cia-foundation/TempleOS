@@ -105,8 +105,9 @@ public U8 *GodDoodleSprite(U8 *hex=NULL)
   WinBorder;
   WinMax;
 
-  PopUpOk("The $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.DD"$ can puppet you.\n\n"
-	"Press $$GREEN$$<SPACE>$$FG$$ until it finishes.");
+  if (!hex)
+    PopUpOk("The $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.DD"$ can puppet you.\n\n"
+	  "Press $$GREEN$$<SPACE>$$FG$$ until it finishes.");
 
   god.doodle_ch=0;
   god.doodle_dc=DCNew(Fs->pix_width,Fs->pix_height);
@@ -160,8 +161,11 @@ public U8 *GodDoodleSprite(U8 *hex=NULL)
       GodDoodleSmooth(3);
     }
     god.doodle_done=TRUE;
-    do ch=GetChar(,FALSE);
-    while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
+    if (!hex) {
+      do ch=GetChar(,FALSE);
+      while (ch!=CH_ESC && ch!=CH_SHIFT_ESC);
+    } else
+      ch=CH_ESC;
   } catch {
     Fs->catch_except=TRUE;
     ch=CH_SHIFT_ESC;

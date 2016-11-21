@@ -38,9 +38,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
 	tmpb=doc_ce->user_data;
 	if (tmpt=tmpb->template) {
 	  QueRem(tmpt);
-	  BgtTemplatePurge(tmpt);
-	  BgtEntryDel2(&tmpt->b);
-	  Free(tmpt);
+	  BgtTemplateDel(tmpt);
 	} else {
 	  QueRem(tmpb);
 	  BgtEntryDel(tmpb);
@@ -85,6 +83,17 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       if (tmpb1=BgtEntryPmt(tmpb)) {
 	BgtIns(tmpb1);
 	BgtRegen;
+      }
+      return TRUE;
+    case 'p':
+      if ((doc_ce=doc->cur_entry) && doc_ce!=doc &&
+	    doc_ce->type_u8==DOCT_MENU_VAL) {
+	tmpb=doc_ce->user_data;
+	if (tmpt1=BgtTemplatePmt(,tmpb)) {
+	  BgtTemplateExpand(tmpt1,TRUE);
+	  BgtTemplateDel(tmpt1);
+	  BgtRegen;
+	}
       }
       return TRUE;
   }
@@ -176,6 +185,7 @@ U0 Budget()
 	"Edit {"
 	"  NewEntry(,'n');"
 	"  CopyEntry(,'c');"
+	"  PeriodicEntry(,'p');"
 	"  EditEntry(,'\n');"
 	"  DeleteEntry(,CH_CTRLY);"
 	"  NewTemplate(,'t');"

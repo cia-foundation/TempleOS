@@ -1375,10 +1375,6 @@ public class CDoc //Linked Text File header
 	updates_cnt;
   CEdFindText *find_replace;
 
-  U8	*cur_sprite;//Set cur_sprite use (ip.pos.x,ip.pos.y) as input.
-//Output is nearest. See $LK,"*_cur_elem_num=",A="FF:::/Adam/Gr/SpriteEd.HC,*_cur_elem_num=doc->"$ and $LK,"::/Demo/Graphics/Pick.HC"$.
-  I64	nearest_sprite_elem_num;
-
   CEdFileName filename;
   I64	file_attr;
   I64	(*left_click_link)(CDoc *doc,CDocEntry *doc_e);
@@ -2138,34 +2134,35 @@ class CLexHashTableContext
 #define CCF_KEEP_DOT		0x100
 #define CCF_KEEP_NUM_SIGN	0x200
 #define CCF_KEEP_AT_SIGN	0x400
-#define CCf_PASS_TRACE_PRESENT	11
-#define CCF_NOT_CONST		0x0000010000
-#define CCF_NO_REG_OPT		0x0000020000
-#define CCF_IN_QUOTES		0x0000040000
-#define CCF_EXE_BLK		0x0000080000
-#define CCF_HAS_MISC_DATA	0x0000100000
-#define CCF_HAS_RETURN		0x0000200000
-#define CCF_ASM_EXPRESSIONS	0x0000400000
-#define CCF_UNRESOLVED		0x0000800000
-#define CCF_LOCAL		0x0001000000
-#define CCF_FUN_EXP		0x0002000000
-#define CCf_FUN_EXP		25
-#define CCF_POSTINC		0x0004000000
-#define CCF_POSTDEC		0x0008000000
-#define CCF_PREINC		0x0010000000
-#define CCF_PREDEC		0x0020000000
-#define CCF_ARRAY		0x0040000000
-#define CCF_RAX			0x0080000000
-#define CCF_USE_LAST_U16	0x0100000000
-#define CCf_USE_LAST_U16	32
-#define CCF_LAST_WAS_DOT	0x0200000000
-#define CCF_AOT_COMPILE		0x0400000000
-#define CCf_AOT_COMPILE		34
-#define CCF_NO_ABSS		0x0800000000
-#define CCF_PAREN		0x1000000000
-#define CCf_PAREN		36
-#define CCF_CLASS_IP		0x2000000000
-#define CCF_DONT_MAKE_RES	0x4000000000
+#define CCF_NO_CHAR_CONST	0x800
+#define CCf_PASS_TRACE_PRESENT	12
+#define CCF_NOT_CONST		0x0000020000
+#define CCF_NO_REG_OPT		0x0000040000
+#define CCF_IN_QUOTES		0x0000080000
+#define CCF_EXE_BLK		0x0000100000
+#define CCF_HAS_MISC_DATA	0x0000200000
+#define CCF_HAS_RETURN		0x0000400000
+#define CCF_ASM_EXPRESSIONS	0x0000800000
+#define CCF_UNRESOLVED		0x0001000000
+#define CCF_LOCAL		0x0002000000
+#define CCF_FUN_EXP		0x0004000000
+#define CCf_FUN_EXP		26
+#define CCF_POSTINC		0x0008000000
+#define CCF_POSTDEC		0x0010000000
+#define CCF_PREINC		0x0020000000
+#define CCF_PREDEC		0x0040000000
+#define CCF_ARRAY		0x0080000000
+#define CCF_RAX			0x0100000000
+#define CCF_USE_LAST_U16	0x0200000000
+#define CCf_USE_LAST_U16	33
+#define CCF_LAST_WAS_DOT	0x0400000000
+#define CCF_AOT_COMPILE		0x0800000000
+#define CCf_AOT_COMPILE		35
+#define CCF_NO_ABSS		0x1000000000
+#define CCF_PAREN		0x2000000000
+#define CCf_PAREN		37
+#define CCF_CLASS_IP		0x4000000000
+#define CCF_DONT_MAKE_RES	0x8000000000
 
 public class CCmpCtrl
 {
@@ -3295,6 +3292,7 @@ public class CTaskSettings
 #define TASKf_PENDING_BREAK	11
 #define TASKf_BREAK_TO_SHIFT_ESC 12
 #define TASKf_KILL_AFTER_DBG	13
+
 #define TASKf_NONTIMER_RAND	14
 
 //CTask.display_flags
@@ -3700,15 +3698,11 @@ public class CDC
   //Set by $LK,"DCSymmetrySet",A="MN:DCSymmetrySet"$() or $LK,"DCSymmetry3Set",A="MN:DCSymmetry3Set"$()
   CGrSym sym;
 
-  I64	nearest_dist,
-	cur_sprite_elem_num,
-	nearest_sprite_elem_num; //num in a CSprite elem lst
-
   I32	cur_x,cur_y,cur_z,pad;
   I64	collision_cnt;
 
-  //Set by $LK,"DCF_RECORD_EXTENTS",A="MN:DCF_RECORD_EXTENTS"$
-  I64	min_x,max_x,min_y,max_y; //scrn coordinates
+  I64	nearest_dist,
+	min_x,max_x,min_y,max_y; //Set by $LK,"DCF_RECORD_EXTENTS",A="MN:DCF_RECORD_EXTENTS"$ (scrn coordinates)
 
   U32	dc_signature,pad;
   CTask	*mem_task,*win_task;
@@ -3912,6 +3906,7 @@ public class CDbgGlbls
 class CProgress
 {
   I64	val,max;
+  F64	t0;
   U8	desc[PROGRESS_DESC_LEN];
 };
 

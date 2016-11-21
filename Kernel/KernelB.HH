@@ -206,19 +206,23 @@ _extern SYS_CTRL_ALT_FLAGS
 public _extern SYS_PROGRESS1 I64 progress1; //Current progress 1.
 public _extern SYS_PROGRESS1_DESC
 	U8 progress1_desc[PROGRESS_DESC_LEN]; //Progress 1 desc.
-public _extern SYS_PROGRESS1_MAX I64 progress1_max; //Max progress 1.
+public _extern SYS_PROGRESS1_MAX I64 progress1_max; //Progress 1 max.
+public _extern SYS_PROGRESS1_T0 F64 progress1_t0; //Progress 1 start time.
 public _extern SYS_PROGRESS2 I64 progress2; //Current progress 2.
 public _extern SYS_PROGRESS2_DESC
 	U8  progress2_desc[PROGRESS_DESC_LEN]; //Progress 2 desc.
-public _extern SYS_PROGRESS2_MAX I64 progress2_max; //Max progress 2.
+public _extern SYS_PROGRESS2_MAX I64 progress2_max; //Progress 2 max.
+public _extern SYS_PROGRESS2_T0 F64 progress2_t0; //Progress 2 start time.
 public _extern SYS_PROGRESS3 I64 progress3; //Current progress 3.
 public _extern SYS_PROGRESS3_DESC
 	U8  progress3_desc[PROGRESS_DESC_LEN]; //Progress 3 desc.
-public _extern SYS_PROGRESS3_MAX I64 progress3_max; //Max progress 3.
+public _extern SYS_PROGRESS3_MAX I64 progress3_max; //Progress 3 max.
+public _extern SYS_PROGRESS3_T0 F64 progress3_t0; //Progress 3 start time.
 public _extern SYS_PROGRESS4 I64 progress4; //Current progress 4.
 public _extern SYS_PROGRESS4_DESC
 	U8  progress4_desc[PROGRESS_DESC_LEN]; //Progress 4 desc.
-public _extern SYS_PROGRESS4_MAX I64 progress4_max; //Max progress 4.
+public _extern SYS_PROGRESS4_MAX I64 progress4_max; //Progress 4 max.
+public _extern SYS_PROGRESS4_T0 F64 progress4_t0; //Progress 4 start time.
 public _extern SYS_PROGRESSES
 	CProgress sys_progresses[NUM_PROGRESS_BARS]; //All progress bars.
 

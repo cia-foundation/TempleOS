@@ -13,7 +13,7 @@ Here is the grammar:
 
 The format of DolDoc cmds is a two character code, +/-flags, a comma and args separated by commas.  Some commands have mandatory args.  Optional args are indicated with <$LK,"ArgCode",A="FF:::/Adam/DolDoc/DocInit.HC,ST_DOC_FLAGS"$>$FG,2$=$FG$.  A $LK,"ColorName",A="MN:ST_COLORS"$ bracked by dollars, will change the foreground color.
 
-See $LK,"::/Doc/Widget.DD"$ and $LK,"::/Demo/DolDoc/DemoDoc.DD"$.
+See $LK,"::/Doc/Widget.DD"$, $LK,"::/Demo/DolDoc/DemoDoc.DD"$, and $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
 
 <$LK,"TwoLetterCmd",A="FF:::/Adam/DolDoc/DocInit.HC,ST_DOC_CMDS"$>  See $LK,"Type Defines",A="MN:DOCT_TEXT"$ and $LK,"PrsDollarCmd",A="MN:PrsDollarCmd"$().
 $TR,"TX Text"$

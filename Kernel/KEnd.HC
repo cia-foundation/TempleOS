@@ -155,6 +155,9 @@ U0 KernelMain()
   //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
   //to debug.  After this point, use $LK,"RawPrint",A="MN:RawPrint"$()
   LBts(&sys_run_level,RLf_RAW);
+  "TempleOS V%5.3f\t%D %T\n\n",
+	sys_os_version,sys_compile_time,sys_compile_time;
+
   TimersInit;
   if (BIOSTotalMem<ToI64(0.95*MEM_MIN_MEG*0x100000))
     RawPrint(4000,"!!! Requires $TX,"512Meg",D="DD_MEM_MIN_MEG"$ of RAM Memory !!!");
@@ -167,11 +170,8 @@ U0 KernelMain()
   LBts(&sys_run_level,RLf_INTERRUPTS);
 
   TimeStampFreqCal;
-
-  "Before BlkDevsInitAll\n";
   BlkDevsInitAll;
-  "After  BlkDevsInitAll\n";
-
+  "ChgDsk(':');\n";
   ChgDsk(':');
   #exe {StreamPrint("HomeSet(\"%s\");",kernel_cfg->home_dir);}
   Gs->idle_task->cur_dv=blkdev.let_to_drv[*blkdev.home_dir-'A'];

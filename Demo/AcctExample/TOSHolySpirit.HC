@@ -6,7 +6,6 @@ U8 *URLPercentSpaces(U8 *src)
   while (*src) {
     if (*src==CH_SPACE) {
       *dst++='%';
-      *dst++='%';
       *dst++='2';
       *dst++='0';
       src++;
@@ -45,7 +44,8 @@ I64 ExtDecFromHex(U8 *st,I64 digits)
   return res;
 }
 
-U0 TOSBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
+U0 TOSBookLines(U8 *book_filename,I64 book_lines,U8 *st,I64 num_lines,
+	I64 radix,Bool modulo,Bool plus_one)
 {//Radix<0 means extract N dec digits from hex.
   CDoc *doc_out,*doc_in;
   CDocEntry *doc_e;
@@ -62,8 +62,8 @@ U0 TOSBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
       DocPrint(doc_out,"0x%s-->",st);
     if (modulo) {
       DocPrint(doc_out,"(%d remainder when divided by %d)",
-	    i,ST_BIBLE_LINES-(num_lines-1));
-      start=i%(ST_BIBLE_LINES-(num_lines-1));
+	    i,book_lines-(num_lines-1));
+      start=i%(book_lines-(num_lines-1));
     } else {
       if (radix>=0 || plus_one)
 	DocPrint(doc_out,"%d",i);
@@ -75,12 +75,15 @@ U0 TOSBibleLines(U8 *st,I64 num_lines,I64 radix,Bool modulo,Bool plus_one)
     }
     DocPrint(doc_out,"-->Line:%d\n",start);
 
-    verse=BibleLine2Verse(start);
-    DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$ (%s)\n\nGod says...\n$$RED$$",verse);
-    Free(verse);
+    if (StrMatch("NumBible",book_filename)) {
+      verse=BibleLine2Verse(start);
+      DocPrint(doc_out,"$TX,"KingJamesBible",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$ (%s)\n\nGod says...\n$$RED$$",verse);
+      Free(verse);
+    } else if (StrMatch("Kosher",book_filename))
+      DocPrint(doc_out,"$TX,"KosherTexts",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Kosher.TXT"$\n\nGod says...\n$$RED$$");
 
     doc_in=DocNew;
-    BibleLines(doc_in,start,num_lines,"::/Home/Sup1/Sup1Blog/NumBible.TXT");
+    BookLines(doc_in,start,num_lines,book_filename);
     while (TRUE) {//Del leading blanks
       doc_e=doc_in->head.next;
       if (doc_e==doc_in)
@@ -161,7 +164,7 @@ public U0 GodBooksPassage(U8 *files_find_mask,I64 len=512,
   DirTreeDel(tmpde1);
 }
 
-U8 *GodVideoRead(U8 *filename,I64 line)
+U8 *FileDblRead(U8 *filename,I64 line)
 {
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
@@ -171,7 +174,7 @@ U8 *GodVideoRead(U8 *filename,I64 line)
   return res;
 }
 
-U8 *GodVideoWrite(U8 *filename,I64 line,U8 *st)
+U8 *FileDblWrite(U8 *filename,I64 line,U8 *st)
 {
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
@@ -201,10 +204,11 @@ U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
   U8 *st,*st2;
   CGodVideoForm *gvf=CAlloc(sizeof(CGodVideoForm));
   I64 i=ExtDecFromHex(rnd,digits);
-  if (st=GodVideoRead(filename,i*2)) {
+  if (!i) i=Round(10`digits);
+  if (st=FileDblRead(filename,i*2)) {
     StrCpy(gvf->title,st);
     Free(st);
-    if (!(st=GodVideoRead(filename,i*2+1))||!*st) {
+    if (!(st=FileDblRead(filename,i*2+1))||!*st) {
       Free(st);
       if (DocForm(gvf) && *gvf->serial) {
 	if (gvf->min || gvf->sec)
@@ -212,10 +216,11 @@ U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
 		gvf->serial,gvf->min*60+gvf->sec);
 	else
 	  st=StrNew(gvf->serial);
-	GodVideoWrite(filename,i*2+1,st);
+	FileDblWrite(filename,i*2+1,st);
       } else
 	st=NULL;
     }
+    "'%s'-->(Taking first 2 decimal digits) #%02d\n",rnd,i;
     if (StrIMatch("Metallica",filename)) {
       st2=URLPlusSpaces(gvf->title+3);
       "God's response:\n"
@@ -245,6 +250,21 @@ U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
   Free(gvf);
 }
 
+U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
+{
+  U8 *st1,*st2;
+  I64 i=ExtDecFromHex(rnd,digits);
+  if (!i) i=Round(10`digits);
+  "'%s'-->(Taking first 2 decimal digits) #%02d\n",rnd,i;
+  st1=FileDblRead(filename,i*2);
+  st2=FileDblRead(filename,i*2+1);
+  "God's response:\n";
+  "$$TX,\"%s\",HTML=\"%s\"$$\n",title,webpage;
+  "$$TX,\"%s\",HTML=\"%s\"$$\n",st1,st2;
+  Free(st1);
+  Free(st2);
+}
+
 class CRandExtDec5Form
 {
   I64	timestamp;
@@ -252,16 +272,14 @@ class CRandExtDec5Form
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
-  I64	cert;
-};
-
-class CNISTBeaconRandExtDec5Form
-{
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
-  U8	rnd0[512]	fmtstr "$$DA-P,A=\"5 Decimal Digits from Hex:%s\"$$\n";
-  U8	rnd1[512];
-  U8	rnd2[512];
-  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
@@ -272,6 +290,14 @@ class CHexWordForm
   U8	rnd1[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
   U8	rnd2[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
   U8	rnd3[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
+  U8	rnd4[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
+  U8	rnd5[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
+  U8	rnd6[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
+  U8	rnd7[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
+  U8	rnd8[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
+  U8	rnd9[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
+  U8	rndA[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
+  U8	rndB[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
   I64	cert;
 };
 
@@ -282,6 +308,14 @@ class CNISTBeaconHexWordForm
   U8	rnd1[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
   U8	rnd2[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
   U8	rnd3[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
+  U8	rnd4[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
+  U8	rnd5[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
+  U8	rnd6[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
+  U8	rnd7[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
+  U8	rnd8[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
+  U8	rnd9[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
+  U8	rndA[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
+  U8	rndB[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
   I64	cert;
 };
 
@@ -293,17 +327,14 @@ class CRandHex5Form
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
-  I64	cert;
-};
-
-class CNISTBeaconRandHex5Form
-{
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
-  U8	rnd0[512]	fmtstr "$$DA-P-TRM,LEN=5,"
-	"A=\"Line (5-Digit Hex):%5s\"$$\n";
-  U8	rnd1[512];
-  U8	rnd2[512];
-  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
@@ -315,17 +346,14 @@ class CRandHex8Form
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
-  I64	cert;
-};
-
-class CNISTBeaconRandHex8Form
-{
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
-  U8	rnd0[512]	fmtstr "$$DA-P-TRM,LEN=8,"
-	"A=\"Line (8-Digit Hex):%8s\"$$\n";
-  U8	rnd1[512];
-  U8	rnd2[512];
-  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
@@ -337,17 +365,33 @@ class CMoviesForm
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
-class CNISTMoviesForm
+class CPaintingsForm
 {
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
+  I64	timestamp;
   U8	rnd0[512]	fmtstr "$$DA-P,"
-	"A=\"Movie #1-100 (2 Decimal Digits from Hex):%s\"$$\n";
+	"A=\"Painting #00-99 (2 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
@@ -359,17 +403,14 @@ class CMetallicaForm
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
-  I64	cert;
-};
-
-class CNISTMetallicaForm
-{
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
-  U8	rnd0[512]	fmtstr "$$DA-P,"
-	"A=\"Song #1-99 (2 Decimal Digits from Hex):%s\"$$\n";
-  U8	rnd1[512];
-  U8	rnd2[512];
-  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert;
 };
 
@@ -380,19 +421,35 @@ class CCertRandDec5Form
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
   I64	cert		fmtstr "$$DA,A=\"Certificate:%d\"$$\n";
 };
 
-U0 GodWordBatch(CHexWordForm *url)
+U0 GodWordBatch(CHexWordForm *gm)
 {
   I64 i=0;
   CDirEntry *tmpde,*tmpde1;
 
   FifoU8Flush(god.fifo);
-  GodHexIns(url->rnd0);
-  GodHexIns(url->rnd1);
-  GodHexIns(url->rnd2);
-  GodHexIns(url->rnd3);
+  GodHexIns(gm->rnd0);
+  GodHexIns(gm->rnd1);
+  GodHexIns(gm->rnd2);
+  GodHexIns(gm->rnd3);
+  GodHexIns(gm->rnd4);
+  GodHexIns(gm->rnd5);
+  GodHexIns(gm->rnd6);
+  GodHexIns(gm->rnd7);
+  GodHexIns(gm->rnd8);
+  GodHexIns(gm->rnd9);
+  GodHexIns(gm->rndA);
+  GodHexIns(gm->rndB);
   tmpde=tmpde1=FilesFind(god.word_file_mask,god.word_fuf_flags);
   while (tmpde) {
     PutFileLink(tmpde->full_name);
@@ -402,36 +459,61 @@ U0 GodWordBatch(CHexWordForm *url)
   DirTreeDel(tmpde1);
 
   "\n$$RED$$";
-  if (*url->rnd0)
-    "%s\n",url->rnd0;
-  if (*url->rnd1)
-    "%s\n",url->rnd1;
-  if (*url->rnd2)
-    "%s\n",url->rnd2;
-  if (*url->rnd3)
-    "%s\n",url->rnd3;
+  if (*gm->rnd0)
+    "%s\n",gm->rnd0;
+  if (*gm->rnd1)
+    "%s\n",gm->rnd1;
+  if (*gm->rnd2)
+    "%s\n",gm->rnd2;
+  if (*gm->rnd3)
+    "%s\n",gm->rnd3;
+  if (*gm->rnd4)
+    "%s\n",gm->rnd4;
+  if (*gm->rnd5)
+    "%s\n",gm->rnd5;
+  if (*gm->rnd6)
+    "%s\n",gm->rnd6;
+  if (*gm->rnd7)
+    "%s\n",gm->rnd7;
+  if (*gm->rnd8)
+    "%s\n",gm->rnd8;
+  if (*gm->rnd9)
+    "%s\n",gm->rnd9;
+  if (*gm->rndA)
+    "%s\n",gm->rndA;
+  if (*gm->rndB)
+    "%s\n",gm->rndB;
   '\n';
   while (FifoU8Cnt(god.fifo)>20) {
-     GodBits(3);
      "%02d: ",i++;
-     GodWord(TRUE);
+     GodWord(20,TRUE);
   }
   FifoU8Flush(god.fifo);
   "$$FG$$\n";
 }
 
-#define NIST_TIME_OFFSET	(-7998-local_time_offset/CDATE_FREQ)
+#define NIST_TIME_OFFSET	(-8015-local_time_offset/CDATE_FREQ)
 #define NIST_TIME_TO_SWITCH	3
+
+I64 CDate2Unix(CDate dt)
+{
+  return ToI64((dt-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET);
+}
+
+CDate Unix2CDate(I64 timestamp)
+{
+  return (timestamp-NIST_TIME_OFFSET)*CDATE_FREQ+Str2Date("1/1/1970");
+}
 
 public U0 NISTSync()
 {
   I64 i,j;
-  CDate d;
+  CDate dt;
   CDateStruct ds;
   while (!ScanChar) {
-    d=Now;
-    Date2Struct(&ds,d);
-    i=ToI64((d-Str2Date("1/1/1970"))/CDATE_FREQ+NIST_TIME_OFFSET);
+    dt=Now;
+    Date2Struct(&ds,dt);
+    i=CDate2Unix(dt);
     j=FloorI64(i,60);
     "%d %d %02d %02d\n",i,j,ds.sec,(60+ds.sec-(i-j))%60;
     Sleep(100);
@@ -442,93 +524,303 @@ U0 NISTBeaconURL(I64 timestamp)
 {
   U8 *tag;
   CDateStruct ds;
-  CDate dt=(timestamp-NIST_TIME_OFFSET)*CDATE_FREQ+Str2Date("1/1/1970");
+  CDate dt=Unix2CDate(timestamp);
   Date2Struct(&ds,dt+local_time_offset+30*CDATE_FREQ);
   "$$TX,\"NIST Beacon Date:%D Time:%02d:%02d Unix TimeStamp:%u\","
 	"HTML=\"https://beacon.nist.gov/home\"$$\n",dt,ds.hour,ds.min,timestamp;
-  tag=MStrPrint("https:/beacon.nist.gov/rest/record/%d",timestamp);
+  tag=MStrPrint("https://beacon.nist.gov/rest/record/%d",timestamp);
   "$$TX,\"NIST Beacon Record:%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
   Free(tag);
 }
 
+U0 TOSGodDoodle(CNISTBeaconHexWordForm *gm,Bool NIST)
+{
+  CDC *dc;
+  Bool old_silent;
+  U8 *elems,*hex=MAlloc(sizeof(CNISTBeaconHexWordForm.rnd0)*12);
+
+  StrPrint(hex,"%s%s",gm->rnd0,gm->rnd1);
+  if (NIST) {
+    gm->timestamp=FloorI64(CDate2Unix(Now),60);
+    if (DocForm(gm(CNISTBeaconHexWordForm *)))
+      NISTBeaconURL(gm->timestamp);
+    else
+      goto gd_done;
+  }
+  CatPrint(hex,"%s%s",gm->rnd2,gm->rnd3);
+  if (NIST) {
+    gm->timestamp=FloorI64(CDate2Unix(Now),60);
+    if (DocForm(gm(CNISTBeaconHexWordForm *)))
+      NISTBeaconURL(gm->timestamp);
+    else
+      goto gd_done;
+  }
+  CatPrint(hex,"%s%s",gm->rnd4,gm->rnd5);
+  if (NIST) {
+    gm->timestamp=FloorI64(CDate2Unix(Now),60);
+    if (DocForm(gm(CNISTBeaconHexWordForm *)))
+      NISTBeaconURL(gm->timestamp);
+    else
+      goto gd_done;
+  }
+  CatPrint(hex,"%s%s",gm->rnd6,gm->rnd7);
+  if (NIST) {
+    gm->timestamp=FloorI64(CDate2Unix(Now),60);
+    if (DocForm(gm(CNISTBeaconHexWordForm *)))
+      NISTBeaconURL(gm->timestamp);
+    else
+      goto gd_done;
+  }
+  CatPrint(hex,"%s%s",gm->rnd8,gm->rnd9);
+  if (NIST) {
+    gm->timestamp=FloorI64(CDate2Unix(Now),60);
+    if (DocForm(gm(CNISTBeaconHexWordForm *)))
+      NISTBeaconURL(gm->timestamp);
+    else
+      goto gd_done;
+  }
+  CatPrint(hex,"%s%s",gm->rndA,gm->rndB);
+  if (elems=GodDoodleSprite(hex)) {
+    dc=Sprite2DC(elems);
+    BlogDCImgWrite(dc);
+    DCDel(dc);
+    Free(elems);
+    old_silent=Silent;
+    MakeWebSitePartial;
+    Silent(old_silent);
+  }
+gd_done:
+  Free(hex);
+}
+
+I64 GodMiscHeader(U8 *type=NULL)
+{
+  CDateStruct ds;
+  I64 res;
+  if (type) {
+    res=FloorI64(CDate2Unix(Now+120*CDATE_FREQ),60);
+    Date2Struct(&ds,Unix2CDate(res)+local_time_offset+30*CDATE_FREQ);
+    "Response of %s at %02d:%02d Timestamp:%d.\n\n",type,ds.hour,ds.min,res;
+    In("%c//Response of %s at %02d:%02d Timestamp:%d.\n\n",
+	  CH_ESC,type,ds.hour,ds.min,res);
+  }
+  "$$TX,\"Guidelines for Talking with God.\","
+	"HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
+  return res;
+}
+
+RegSetDftEntry("TempleOS/TOSGodMisc","I64 tos_timestamp=0,tos_type=0;\n");
+RegExeBranch("TempleOS/TOSGodMisc");
+
+U0 NISTGodMisc1()
+{
+  tos_type=PopUpPickLst("ExtDec5Bible\0ExtDec5Kosher\0LinuxWords\0HappyWords\0"
+	"Hex5Bible\0Hex8Books\0Doodle\0Movie\0Painting\0Metallica\0");
+  switch (tos_type) {
+    case: tos_timestamp=GodMiscHeader("Bible");		break;
+    case: tos_timestamp=GodMiscHeader("Kosher");	break;
+    case: tos_timestamp=GodMiscHeader("LinuxWords");	break;
+    case: tos_timestamp=GodMiscHeader("HappyWords");	break;
+    case: tos_timestamp=GodMiscHeader("Bible");		break;
+    case: tos_timestamp=GodMiscHeader("BookPick");	break;
+    case: tos_timestamp=GodMiscHeader("Doodle");	break;
+    case: tos_timestamp=GodMiscHeader("Movie");		break;
+    case: tos_timestamp=GodMiscHeader("Painting");	break;
+    case: tos_timestamp=GodMiscHeader("Metallica");	break;
+  }
+  RegWriteBranch("TempleOS/TOSGodMisc","I64 tos_timestamp=%d,tos_type=%d;\n",
+	tos_timestamp,tos_type);
+}
+
+U0 NISTGodMisc2()
+{
+  CRandExtDec5Form *gm=CAlloc(sizeof(CRandExtDec5Form));
+
+  gm->timestamp=tos_timestamp;
+  tos_timestamp=0;
+  RegWriteBranch("TempleOS/TOSGodMisc","I64 tos_timestamp=%d,tos_type=%d;\n",
+	tos_timestamp,tos_type);
+
+  switch (tos_type) {
+    case:
+      if (DocForm(gm(CRandExtDec5Form *))) {
+	NISTBeaconURL(gm->timestamp);
+	TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+	      gm->rnd0,20,-5,FALSE,FALSE);
+      }
+      break;
+    case:
+      if (DocForm(gm(CRandExtDec5Form *))) {
+	NISTBeaconURL(gm->timestamp);
+	TOSBookLines("~/Sup1/Sup1Blog/Kosher.TXT",100000,
+	      gm->rnd0,20,-5,FALSE,FALSE);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	Adam("GodInit(\"~/Sup1/Sup1Words/LinuxDict.TXT*\");");
+	GodWordBatch(gm);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	Adam("GodInit(\"~/Sup1/Sup1Words/HappyWords.TXT*\");");
+	GodWordBatch(gm);
+      }
+      break;
+    case:
+      if (DocForm(gm(CRandHex5Form *))) {
+	"$$TX,\"How this random Bible passage was chosen.\","
+	      "HTML=\"http://www.templeos.org/Wb"
+	      "/Home/Web/TAD/NISTPassage.html\"$$\n";
+	NISTBeaconURL(gm->timestamp);
+	TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+	      gm->rnd0,20,16,TRUE,TRUE);
+      }
+      break;
+    case:
+      if (DocForm(gm(CRandHex8Form *))) {
+	"$$TX,\"How this random book pick was chosen.\","
+	      "HTML=\"http://www.templeos.org/Wb"
+	      "/Home/Web/TAD/NISTPick001.html\"$$\n";
+	NISTBeaconURL(gm->timestamp);
+	GodBooksPassage("C:/Home/Sup1/Sup1Texts/*",,
+	      Str2I64(gm->rnd0,16),GBP_MEDIUM);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	TOSGodDoodle(gm,TRUE);
+      }
+      break;
+    case:
+      if (DocForm(gm(CMoviesForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodVideo("Top 100 Movies",
+	      "http://www.afi.com/100years/movies10.aspx",
+	      gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Movies.DD.Z");
+      }
+      break;
+    case:
+      if (DocForm(gm(CPaintingsForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodWebIdx("Top 100 Paintings",
+	      "http://www.brushwiz.com/most-famous-paintings",
+	      gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Paintings.DD.Z");
+      }
+      break;
+    case:
+      if (DocForm(gm(CMetallicaForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodVideo("Metallica Song",
+	      "http://home.hccnet.nl/a.r.adams/lyrics/"
+	      "metallica/songindex.html",
+	      gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Metallica.DD.Z");
+      }
+      break;
+  }
+  Free(gm);
+}
 
 U0 GodMisc()
 {
   U8 *st,*tag;
   CRandExtDec5Form *gm=CAlloc(sizeof(CRandExtDec5Form));
-  I64 i=PopUpPickLst("NISTBeacon\0HotBits\0Random.org\0RandomNumbers.info\0"
-	"ANU_NIST\0Password\0GenerateData\0VirtualNotary\0Timer\0");
+  I64 i=PopUpPickLst("NISTBeacon\0HotBits\0ANU_NIST\0Random.org\0"
+	"RandomNumbers.info\0Password\0GenerateData\0VirtualNotary\0Timer\0");
   if (i>=0) {
-    "$$TX,\"Guidelines for Talking with God.\","
-	  "HTML=\"http://www.templeos.org/Wb/Adam/God/HSNotes.html\"$$\n";
     switch (i) {
       case:
-	gm->timestamp=FloorI64((Now-Str2Date("1/1/1970"))/CDATE_FREQ+
-	      NIST_TIME_OFFSET-NIST_TIME_TO_SWITCH,60);
-	switch (PopUpPickLst("ExtDec5Bible\0HexWordBatch\0Hex5Bible\0"
-	      "Hex8Books\0Movie\0Metallica\0")) {
-	  case:
-	    if (DocForm(gm(CNISTBeaconRandExtDec5Form *))) {
-	      NISTBeaconURL(gm->timestamp);
-	      TOSBibleLines(gm->rnd0,20,-5,FALSE,FALSE);
-	    }
-	    break;
-	  case:
-	    if (DocForm(gm(CNISTBeaconHexWordForm *))) {
-	      NISTBeaconURL(gm->timestamp);
-	      GodWordBatch(gm);
-	    }
-	    break;
-	  case:
-	    if (DocForm(gm(CNISTBeaconRandHex5Form *))) {
-	      "$$TX,\"How this random Bible passage was chosen.\","
-		    "HTML=\"http://www.templeos.org/Wb"
-		    "/Home/Web/TAD/NISTPassage.html\"$$\n";
-	      NISTBeaconURL(gm->timestamp);
-	      TOSBibleLines(gm->rnd0,20,16,TRUE,TRUE);
-	    }
-	    break;
-	  case:
-	    if (DocForm(gm(CNISTBeaconRandHex8Form *))) {
-	      "$$TX,\"How this random book pick was chosen.\","
-		    "HTML=\"http://www.templeos.org/Wb"
-		    "/Home/Web/TAD/NISTPick001.html\"$$\n";
-	      NISTBeaconURL(gm->timestamp);
-	      GodBooksPassage("C:/Home/Sup1/Sup1Texts/*",,
-		    Str2I64(gm->rnd0,16),GBP_MEDIUM);
-	    }
-	    break;
-	  case:
-	    if (DocForm(gm(CNISTMoviesForm *))) {
-	      NISTBeaconURL(gm->timestamp);
-	      GodVideo("Top 100 Movies",
-		    "http://www.afi.com/100years/movies10.aspx",
-		    gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Movies.DD.Z");
-	    }
-	    break;
-	  case:
-	    if (DocForm(gm(CNISTMetallicaForm *))) {
-	      NISTBeaconURL(gm->timestamp);
-	      GodVideo("Metallica Song",
-		    "http://home.hccnet.nl/a.r.adams/lyrics/"
-		    "metallica/songindex.html",
-		    gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Metallica.DD.Z");
-	    }
-	    break;
-	}
+	NISTGodMisc1;
 	break;
       start:
 	case:
 	  tag="https://www.fourmilab.ch/hotbits/secure_generate.html";
 	  break;
 	case:
+	  tag="http://qrng.anu.edu.au/NIST.php";
+	  break;
+      end:
+	GodMiscHeader;
+	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
+	switch (PopUpPickLst("ExtDec5Bible\0ExtDec5Kosher\0LinuxWords\0"
+	      "HappyWords\0Hex5Bible\0Hex8Books\0Doodle\0Movie\0Painting\0"
+	      "Metallica\0")) {
+	  case:
+	    if (DocForm(gm(CRandExtDec5Form *)))
+	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+		    gm->rnd0,20,-5,FALSE,FALSE);
+	    break;
+	  case:
+	    if (DocForm(gm(CRandExtDec5Form *)))
+	      TOSBookLines("~/Sup1/Sup1Blog/Kosher.TXT",100000,
+		    gm->rnd0,20,-5,FALSE,FALSE);
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *))) {
+	      Adam("GodInit(\"~/Sup1/Sup1Words/LinuxDict.TXT*\");");
+	      GodWordBatch(gm);
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *))) {
+	      Adam("GodInit(\"~/Sup1/Sup1Words/HappyWords.TXT*\");");
+	      GodWordBatch(gm);
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CRandHex5Form *))) {
+	      "$$TX,\"How this random Bible passage was chosen.\","
+		    "HTML=\"http://www.templeos.org/Wb"
+		    "/Home/Web/TAD/Passage.html\"$$\n";
+	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+		    gm->rnd0,20,16,TRUE,TRUE);
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CRandHex8Form *))) {
+	      "$$TX,\"How this random book pick was chosen.\","
+		    "HTML=\"http://www.templeos.org/Wb"
+		    "/Home/Web/TAD/Pick001.html\"$$\n";
+	      GodBooksPassage("C:/Home/Sup1/Sup1Texts/*",,
+		    Str2I64(gm->rnd0,16),GBP_MEDIUM);
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *)))
+	      TOSGodDoodle(gm,FALSE);
+	    break;
+	  case:
+	    if (DocForm(gm(CMoviesForm *)))
+	      GodVideo("Top 100 Movies",
+		    "http://www.afi.com/100years/movies10.aspx",
+		    gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Movies.DD.Z");
+	    break;
+	  case:
+	    if (DocForm(gm(CPaintingsForm *))) {
+	      GodWebIdx("Top 100 Paintings",
+		    "http://www.brushwiz.com/most-famous-paintings",
+		    gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Paintings.DD.Z");
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CMetallicaForm *)))
+	      GodVideo("Metallica Song",
+		    "http://home.hccnet.nl/a.r.adams/lyrics/"
+		    "metallica/songindex.html",
+		    gm->rnd0,2,"C:/Home/Sup1/Sup1Blog/Metallica.DD.Z");
+	    break;
+	}
+	break;
+      start:
+	case:
 	  tag="http://www.random.org";
 	  break;
 	case:
 	  tag="http://www.randomnumbers.info";
-	  break;
-	case:
-	  tag="http://qrng.anu.edu.au/NIST.php";
 	  break;
 	case:
 	  tag="https://passed.pw";
@@ -537,12 +829,19 @@ U0 GodMisc()
 	  tag="http://www.generatedata.com";
 	  break;
       end:
+	GodMiscHeader;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
-	switch (PopUpPickLst("ExtDec5Bible\0HexWordBatch\0Hex5Bible\0"
-	      "Hex8Books\0Movie\0Metallica\0")) {
+	switch (PopUpPickLst("ExtDec5Bible\0ExtDec5Kosher\0HexWordBatch\0"
+	      "Hex5Bible\0Hex8Books\0Movie\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
-	      TOSBibleLines(gm->rnd0,20,-5,FALSE,FALSE);
+	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+		    gm->rnd0,20,-5,FALSE,FALSE);
+	    break;
+	  case:
+	    if (DocForm(gm(CRandExtDec5Form *)))
+	      TOSBookLines("~/Sup1/Sup1Blog/Kosher.TXT",100000,
+		    gm->rnd0,20,-5,FALSE,FALSE);
 	    break;
 	  case:
 	    if (DocForm(gm(CHexWordForm *)))
@@ -553,7 +852,8 @@ U0 GodMisc()
 	      "$$TX,\"How this random Bible passage was chosen.\","
 		    "HTML=\"http://www.templeos.org/Wb"
 		    "/Home/Web/TAD/Passage.html\"$$\n";
-	      TOSBibleLines(gm->rnd0,20,16,TRUE,TRUE);
+	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+		    gm->rnd0,20,16,TRUE,TRUE);
 	    }
 	    break;
 	  case:
@@ -581,6 +881,7 @@ U0 GodMisc()
 	}
 	break;
       case:
+	GodMiscHeader;
 	if (DocForm(gm(CCertRandDec5Form *))) {
 	  tag="http://virtual-notary.org";
 	  "$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
@@ -589,10 +890,12 @@ U0 GodMisc()
 		"-randomnum-%d.p12",gm->cert);
 	  "\n$$TX,\"%$$Q: %d\",HTML=\"%$$Q\"$$.\n",tag,gm->cert,st;
 	  Free(st);
-	  TOSBibleLines(gm->rnd0,20,-5,FALSE,FALSE);
+	  TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
+		gm->rnd0,20,-5,FALSE,FALSE);
 	}
 	break;
       case:
+	GodMiscHeader;
 	FifoU8Flush(god.fifo);
 	GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
 	GodBooksPassage("C:/Home/Sup1/Sup1Texts/*");
@@ -846,6 +1149,34 @@ U0 GodCodeJmp()
   DirTreeDel(tmpde1);
   Ed(st);
   Free(st);
+}
+
+RegSetDftEntry("TempleOS/TOSGodOffer","I64 tos_gus_gwen=0;\n");
+RegExeBranch("TempleOS/TOSGodOffer");
+
+U0 GodOffer()
+{
+  switch (PopUpPickLst("MosesComic\0GusGwen\0Fiction\0")) {
+    case:
+      "---- Moses Comic ---- "
+	    "(Set in the $TX,"Numbers 11",HTML="http://www.biblegateway.com/passage/?search=Numbers%%%%2011&version=NIV"$ "
+	    "part of the story.)\n"
+	    "Moses says, \"\"\n"
+	    "God says, \"\"\n";
+      break;
+    case:
+      "---- Gus and Gwen Soap Opera Episode %d ----\n"
+	    "Gus says, \"\"\n"
+	    "Gwen says, \"\"\n"
+	    "-----------------------------------------\n",tos_gus_gwen++;
+      RegWriteBranch("TempleOS/TOSGodOffer","I64 tos_gus_gwen=%d;\n",
+	    tos_gus_gwen);
+      break;
+    case:
+      "---- $TX,"Collaborative Fiction",HTML="http://en.wikipedia.org/wiki/Collaborative_fiction"$ ----\n"
+	    "Once upon a time ";
+      break;
+  }
 }
 
 if (FileFind("~/Sup1/Sup1Words/LinuxDict.TXT"))

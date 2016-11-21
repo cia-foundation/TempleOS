@@ -40,8 +40,7 @@ public CDoc *Doc2TXT(CDoc *doc_in)
   CDocEntry *doc_e,*doc_e2;
   I64 y,col;
   CDoc *doc_out=DocNew;
-  Bool unlock_doc_in=DocLock(doc_in),no_bwd;
-
+  Bool unlock_doc_in=DocLock(doc_in),no_bwd,line_has_html_code=FALSE;
   DocRecalc(doc_in);
 
   doc_out->flags|=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
@@ -55,7 +54,10 @@ public CDoc *Doc2TXT(CDoc *doc_in)
 	TXTPutS(doc_out,"\n",&col);
 	y++;
 	col=0;
+	line_has_html_code=FALSE;
       }
+      if (doc_e->type_u8==DOCT_HTML_CODE)
+	line_has_html_code=TRUE;
 
       no_bwd=TRUE;
       doc_e2=doc_e->next;
@@ -66,7 +68,7 @@ public CDoc *Doc2TXT(CDoc *doc_in)
 	}
 	doc_e2=doc_e2->next;
       }
-      if (no_bwd)
+      if (no_bwd && !(doc_e->type_u8==DOCT_NEW_LINE && line_has_html_code))
 	while (col<doc_e->x)
 	  TXTPutS(doc_out," ",&col);
 

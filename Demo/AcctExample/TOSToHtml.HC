@@ -1,29 +1,46 @@
 //This is a customized version of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
+//$MA-X+PU,"Diff",LM="WinMax;WinBorder;S2T(\"/*\",\"+r+S\");Diff(\"/Demo/ToHtmlToTXTDemo/ToHtml.HC.Z\",\"/Home/TOSToHtml.HC.Z\");View;"$
 
 #help_index "DolDoc/Conversion"
 //See $LK,"::/Doc/Credits.DD"$.
 
-U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,
+#define DOCET_UNDEF_COLOR	0x100000000
+#define DOCET_LINK_UNDERLINE	0x200000000
+U0 HtmlPutS(CDoc *doc,I64 u32_attr,I64 *_old_u32_attr,Bool underline_update,
 	U8 *st,I64 *_col,U8 *style_bitmap=NULL)
 {
   U8 *ch,*ptr;
+
   u32_attr&=0xFFFFFF00;
   if (u32_attr&DOCET_INVERT)
     u32_attr.u8[1]=(u32_attr.u8[1]&15)<<4|u32_attr.u8[1]>>4;
-  if (u32_attr!=*_old_u32_attr) {
-    if (!(u32_attr&DOCET_BLINK) &&
-	*_old_u32_attr!=-1 && *_old_u32_attr&DOCET_BLINK)
-      DocPrint(doc,"</blink>");
-    if (*_old_u32_attr!=-1)
+
+  if (underline_update &&
+	!(u32_attr&DOCET_UNDERLINE) && *_old_u32_attr&DOCET_UNDERLINE) {
+    if (!(*_old_u32_attr&DOCET_LINK_UNDERLINE))
+      DocPrint(doc,"</u>");
+    *_old_u32_attr&=~DOCET_LINK_UNDERLINE;
+  }
+  if (!(u32_attr&DOCET_BLINK) && *_old_u32_attr&DOCET_BLINK)
+    DocPrint(doc,"</blink>");
+
+  if (u32_attr&0xFF00!=*_old_u32_attr&0xFF00) {
+    if (!(*_old_u32_attr&DOCET_UNDEF_COLOR))
       DocPrint(doc,"</span>");
     DocPrint(doc,"<span class=c%02X>",u32_attr.u8[1]);
-    if (u32_attr&DOCET_BLINK &&
-	(*_old_u32_attr==-1 || !(*_old_u32_attr&DOCET_BLINK)))
-      DocPrint(doc,"<blink>");
-    *_old_u32_attr=u32_attr;
     if (style_bitmap)
       LBts(style_bitmap,u32_attr.u8[1]);
   }
+  if (u32_attr&DOCET_BLINK && !(*_old_u32_attr&DOCET_BLINK))
+    DocPrint(doc,"<blink>");
+  if (underline_update) {
+    if (u32_attr&DOCET_UNDERLINE && !(*_old_u32_attr&DOCET_UNDERLINE))
+      DocPrint(doc,"<u>");
+  } else //Keep same underline status.
+    u32_attr=u32_attr&~DOCET_UNDERLINE | *_old_u32_attr&DOCET_UNDERLINE;
+
+  *_old_u32_attr=u32_attr | *_old_u32_attr&DOCET_LINK_UNDERLINE;
+
   while (ch=*st++) {
     switch (ch) {
       case '\t':
@@ -143,10 +160,10 @@ U8 *TOSLinkCvt1(U8 *link_st)
 
 public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	U8 *body_footer=NULL,U8 *html_footer=NULL,Bool line_anchors=TRUE,
-	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
+	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1,Bool line_nums=FALSE)
 {//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
-  I64 i,y,old_y=MIN_I64,col,old_u32_attr=-1,old_attr;
+  I64 i,y,old_y=MIN_I64,col,old_u32_attr=DOCET_UNDEF_COLOR,old_attr,digits;
   U32 *hl,*src;
   U8 *st,st_2[2],*link_st,*style_bitmap=CAlloc(256/8);
   CBGR48 p[NUM_COLORS];
@@ -161,6 +178,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
     LBts(style_bitmap,i);
 
   DocRecalc(doc_in,RECALCt_NORMAL|RECALCF_TO_HTML);
+  digits=Log10(doc_in->head.last->y+1)+1;
 
   st_2[0]=0; st_2[1]=0;
   doc_out->flags|=DOCF_PLAIN_TEXT|DOCF_NO_CURSOR;
@@ -171,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -194,15 +212,21 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
   y=doc_e->y;
   while (doc_e!=doc_in) {
     if (!(doc_e->de_flags&DOCEF_SKIP)) {
-      if (y!=old_y && line_anchors) {
-	DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
+      if (y!=old_y) {
+	if (line_anchors)
+	  DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
+	if (line_nums)
+	  DocPrint(doc_out,"%0*d ",digits,y+1);
 	old_y=y;
       }
       while (y<doc_e->y) {
-	HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-	      &old_u32_attr,"\n",&col,style_bitmap);
-	if (++y!=old_y && line_anchors) {
-	  DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
+	HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,FALSE,
+	      "\n",&col,style_bitmap);
+	if (++y!=old_y) {
+	  if (line_anchors)
+	    DocPrint(doc_out,"<a name=\"l%d\"></a>",y+1);
+	  if (line_nums)
+	    DocPrint(doc_out,"%0*d ",digits,y+1);
 	  old_y=y;
 	}
 	col=0;
@@ -217,10 +241,11 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	}
 	doc_e2=doc_e2->next;
       }
+
       if (no_bwd)
 	while (col<doc_e->x)
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		&old_u32_attr," ",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,FALSE,
+		" ",&col,style_bitmap);
 
       link_st=NULL;
       if (doc_e->de_flags&DOCEF_HTML_LINK)
@@ -231,10 +256,13 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
       }
 
       if (link_st) {
-	if (old_u32_attr!=-1) {
+	if (old_u32_attr&DOCET_UNDERLINE &&!(old_u32_attr&DOCET_LINK_UNDERLINE))
+	  DocPrint(doc_out,"</u>");
+	if (old_u32_attr&DOCET_BLINK)
+	  DocPrint(doc_out,"</blink>");
+	if (!(old_u32_attr&DOCET_UNDEF_COLOR))
 	  DocPrint(doc_out,"</span>");
-	  old_u32_attr=-1;
-	}
+	old_u32_attr=DOCET_UNDEF_COLOR|DOCET_UNDERLINE|DOCET_LINK_UNDERLINE;
 	DocPrint(doc_out,"<a href=\"%s\">",link_st);
       }
 
@@ -251,7 +279,8 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 		  doc_e->type&0xFF00);
 	    while (*src) {
 	      st_2[0]=*src&0xFF;
-	      HtmlPutS(doc_out,*src++,&old_u32_attr,st_2,&col,style_bitmap);
+	      HtmlPutS(doc_out,*src++,&old_u32_attr,TRUE,
+		    st_2,&col,style_bitmap);
 	    }
 	    Free(hl);
 	  } else {
@@ -259,41 +288,48 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 		  doc_e->settings.final_u32_attr&0xF00==PURPLE<<8)
 	      DocPrint(doc_out,"<h1><center>");
 	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		  &old_u32_attr,doc_e->tag,&col,style_bitmap);
+		  &old_u32_attr,TRUE,doc_e->tag,&col,style_bitmap);
 	    if (doc_e->de_flags&DOCEF_CENTER_X && //$BK,1$Nonstandard$BK,0$
 		  doc_e->settings.final_u32_attr&0xF00==PURPLE<<8)
 	      DocPrint(doc_out,"</center></h1>");
 	  }
 	  break;
 	case DOCT_TAB:
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		&old_u32_attr,"\t",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,TRUE,
+		"\t",&col,style_bitmap);
 	  break;
 	case DOCT_HTML_CODE:
-	  if (old_u32_attr!=-1) {
+	  if (old_u32_attr&DOCET_UNDERLINE &&
+		!(old_u32_attr&DOCET_LINK_UNDERLINE))
+	    DocPrint(doc_out,"</u>");
+	  if (old_u32_attr&DOCET_BLINK)
+	    DocPrint(doc_out,"</blink>");
+	  if (!(old_u32_attr&DOCET_UNDEF_COLOR))
 	    DocPrint(doc_out,"</span>");
-	    old_u32_attr=-1;
-	  }
+	  old_u32_attr=DOCET_UNDEF_COLOR;
 	  DocPrint(doc_out,"%s",doc_e->tag);
 	  break;
 	case DOCT_SPRITE:
 	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		&old_u32_attr,doc_e->tag,&col,style_bitmap);
+		&old_u32_attr,TRUE,doc_e->tag,&col,style_bitmap);
 	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		&old_u32_attr,"/* Graphics Not Rendered in HTML */",
+		&old_u32_attr,TRUE,"/* Graphics Not Rendered in HTML */",
 		&col,style_bitmap);
 	  break;
 	default:
 	  if (doc_e->de_flags&DOCEF_TAG)
 	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		  &old_u32_attr,doc_e->tag,&col,style_bitmap);
+		  &old_u32_attr,TRUE,doc_e->tag,&col,style_bitmap);
       }
       if (link_st) {
-	if (old_u32_attr!=-1) {
+	if (old_u32_attr&DOCET_UNDERLINE &&!(old_u32_attr&DOCET_LINK_UNDERLINE))
+	  DocPrint(doc_out,"</u>");
+	if (old_u32_attr&DOCET_BLINK)
+	  DocPrint(doc_out,"</blink>");
+	if (!(old_u32_attr&DOCET_UNDEF_COLOR))
 	  DocPrint(doc_out,"</span>");
-	  old_u32_attr=-1;
-	}
 	DocPrint(doc_out,"</a>");
+	old_u32_attr=DOCET_UNDEF_COLOR|DOCET_UNDERLINE|DOCET_LINK_UNDERLINE;
 	Free(link_st);
       }
     }
@@ -301,15 +337,16 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
   }
   while (y++<doc_e->y) {
     HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-	  &old_u32_attr,"\n",&col,style_bitmap);
+	  &old_u32_attr,TRUE,"\n",&col,style_bitmap);
     col=0;
   }
-  if (old_u32_attr!=-1) {
-    if (old_u32_attr&DOCET_BLINK)
-      DocPrint(doc_out,"</blink>");
+  if (old_u32_attr&DOCET_UNDERLINE && !(old_u32_attr&DOCET_LINK_UNDERLINE))
+    DocPrint(doc_out,"</u>");
+  if (old_u32_attr&DOCET_BLINK)
+    DocPrint(doc_out,"</blink>");
+  if (!(old_u32_attr&DOCET_UNDEF_COLOR))
     DocPrint(doc_out,"</span>");
-    old_u32_attr=-1;
-  }
+  old_u32_attr=DOCET_UNDEF_COLOR;
   DocPrint(doc_out,"%s",body_footer);
   DocPrint(doc_out,"%s",html_footer);
 
@@ -334,7 +371,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 public U0 TOSToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
 	U8 *body_header=NULL,U8 *body_footer=NULL,U8 *html_footer=NULL,
 	I64 width=80,Bool line_anchors=TRUE,
-	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1)
+	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1,Bool line_nums=FALSE)
 {//Convert $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$file to HTML.
 //Supply your own link_cvt routine.
   U8 *in_name,*out_name;
@@ -353,7 +390,7 @@ public U0 TOSToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   DocTop(doc_in);
   DocPrint(doc_in,"$$BD,LTCYAN$$");	//$BK,1$Nonstandard$BK,0$
   doc_out=Doc2Html(doc_in,html_header,body_header,body_footer,html_footer,
-	line_anchors,link_cvt);
+	line_anchors,link_cvt,line_nums);
   StrCpy(&doc_out->filename.name,out_name);
 
   SettingsPop;
@@ -366,7 +403,7 @@ public U0 TOSToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
 }
 
 #help_index "TOS"
-U0 TOSWebFile(U8 *name)
+U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
 {
   U8 *name2;
   CDirEntry de;
@@ -393,7 +430,7 @@ U0 TOSWebFile(U8 *name)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.12",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -402,34 +439,13 @@ U0 TOSWebFile(U8 *name)
 	  "<div style=\"margin-left:auto; margin-right:auto;"
 	  " width: 640px;\">\n",
 	  "</div></pre></body>\n",
-	  "</html>\n",,line_anchors);
+	  "</html>\n",,line_anchors,,line_nums);
     Touch(name2,"",,de.datetime);
     Free(name2);
   }
 }
 
-public U0 MakeWebSite()
-{
-  CDirEntry *tmpde,*tmpde1;
-  DocClear;
-  Cd("D:/Wb");
-  DelTree("D:/Wb/Home/Budget");
-  DelTree("D:/Wb/Home/Private");
-  Del("D:/Wb/Home/*");
-  Touch("D:/Wb/Home/Web/index.DD.Z","");
-  Touch("D:/Wb/Home/Web/DownloadOS.DD.Z","");
-  Touch("D:/Wb/Home/Web/TempleOS.DD.Z","");
-  tmpde=tmpde1=FilesFind("*",
-	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
-  while (tmpde) {
-    TOSWebFile(tmpde->full_name);
-    tmpde=tmpde->next;
-  }
-  DirTreeDel(tmpde1);
-  Drv('C');
-}
-
-U0 FreshenWebDir(U8 *dirname)
+U0 FreshenWebDir(U8 *dirname,Bool line_nums=FALSE)
 {//No recurse
   CDirEntry *tmpde,*tmpde1;
   U8 *src,*dst;
@@ -451,9 +467,30 @@ U0 FreshenWebDir(U8 *dirname)
   src=MStrPrint("D:/Wb%s/*",dirname);
   tmpde=tmpde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
   while (tmpde) {
-    TOSWebFile(tmpde->full_name);
+    TOSWebFile(tmpde->full_name,line_nums);
     tmpde=tmpde->next;
   }
   DirTreeDel(tmpde1);
 }
 
+public U0 MakeWebSite()
+{
+  CDirEntry *tmpde,*tmpde1;
+  DocClear;
+  Cd("D:/Wb");
+  DelTree("D:/Wb/Home/Budget");
+  DelTree("D:/Wb/Home/Private");
+  Del("D:/Wb/Home/*");
+  Touch("D:/Wb/Home/Web/index.DD.Z","");
+  Touch("D:/Wb/Home/Web/DownloadOS.DD.Z","");
+  Touch("D:/Wb/Home/Web/TempleOS.DD.Z","");
+  tmpde=tmpde1=FilesFind("*",
+	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
+  while (tmpde) {
+    TOSWebFile(tmpde->full_name);
+    tmpde=tmpde->next;
+  }
+  DirTreeDel(tmpde1);
+  FreshenWebDir("/Home/Sup1/Sup1Words",TRUE);
+  Drv('C');
+}

@@ -96,10 +96,10 @@ U0 RegInit()
   U8 buf[STR_LEN];
   Bool version_present;
   RegSetDftEntry("Adam/SysMsgFlags","sys_msg_flags[0]=0;\n",TRUE);
-  StrPrint(buf,"registry_version=%4.3f;\n",os_version);
+  StrPrint(buf,"registry_version=%4.3f;\n",sys_os_version);
   version_present=RegSetDftEntry("Adam/SysRegVer",buf,TRUE);
   RegExeBranch("Adam");
-  if (registry_version!=os_version) {
+  if (registry_version!=sys_os_version) {
     RegWriteBranch("Adam/SysRegVer",buf);
     RegExeBranch("Adam");
   }

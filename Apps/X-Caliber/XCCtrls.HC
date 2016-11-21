@@ -1,6 +1,6 @@
 #define LASER_MAX_TEMP		30.0
 #define LASER_THRESHOLD_TEMP	10.0
-#define MASS_MAX_TEMP		5.0
+#define MAX_MASS_TEMP		5.0
 
 class CtrlPanelState
 {

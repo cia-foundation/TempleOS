@@ -38,13 +38,13 @@ I64 sprite_elem_base_sizes[SPT_NUM_TYPES]={
 
 I64 SpriteElemQuedBaseSize(I64 type)
 {
-  return sprite_elem_base_sizes[type]+offset(CSprite.start);
+  return sprite_elem_base_sizes[type&SPG_TYPE_MASK]+offset(CSprite.start);
 }
 
 I64 SpriteElemSize(CSprite *tmpg)
 {
-  I64 i=sprite_elem_base_sizes[tmpg->type];
-  switch (tmpg->type) {
+  I64 i=sprite_elem_base_sizes[tmpg->type&SPG_TYPE_MASK];
+  switch (tmpg->type&SPG_TYPE_MASK) {
     case SPT_POLYLINE:
       i+=tmpg->nu.num*sizeof(CD2I32);
       break;
@@ -80,7 +80,7 @@ I64 SpriteElemSize(CSprite *tmpg)
 public I64 SpriteSize(U8 *elems)
 {//Walk sprite elements and return size of sprite as binary data.
   CSprite *tmpg=elems-offset(CSprite.start),*tmpg1=tmpg;
-  while (tmpg->type)
+  while (tmpg->type&SPG_TYPE_MASK)
     tmpg(U8 *)+=SpriteElemSize(tmpg);
   return tmpg(U8 *)-tmpg1(U8 *)+sprite_elem_base_sizes[SPT_END];
 }
@@ -89,13 +89,22 @@ I64 SpriteTypeMask(U8 *elems)
 {
   I64 res=0;
   CSprite *tmpg=elems-offset(CSprite.start);
-  while (tmpg->type) {
-    if (tmpg->type>=SPT_NUM_TYPES)
+  while (tmpg->type&SPG_TYPE_MASK) {
+    if (tmpg->type&SPG_TYPE_MASK>=SPT_NUM_TYPES)
       return 1<<SPT_NUM_TYPES;
-    Bts(&res,tmpg->type);
+    Bts(&res,tmpg->type&SPG_TYPE_MASK);
     tmpg(U8 *)+=SpriteElemSize(tmpg);
   }
   return res;
+}
+
+U0 SpriteSelAll(U8 *elems,Bool val)
+{
+  CSprite *tmpg=elems-offset(CSprite.start);
+  while (tmpg->type&SPG_TYPE_MASK) {
+    BEqu(&tmpg->type,SPf_SEL,val);
+    tmpg(U8 *)+=SpriteElemSize(tmpg);
+  }
 }
 
 public U8 *DC2Sprite(CDC *tmpb)
@@ -118,8 +127,8 @@ public U8 *SpriteElem2Summary(CSprite *tmpg)
 {//Study $LK,"::/Demo/Graphics/SpriteText.HC"$.
   U8 buf[STR_LEN],buf2[STR_LEN];
   I32 *ptr;
-  StrPrint(buf,"%Z",tmpg->type,"ST_SPRITE_ELEM_TYPES");
-  switch (tmpg->type) {
+  StrPrint(buf,"%Z",tmpg->type&SPG_TYPE_MASK,"ST_SPRITE_ELEM_TYPES");
+  switch (tmpg->type&SPG_TYPE_MASK) {
     case SPT_COLOR:
       CatPrint(buf," %s",Color2Str(buf2,tmpg->c.color));
       break;

@@ -88,8 +88,8 @@ Bool BootDVDProbeAll(CBlkDev *bd)
   }
 }
 
-U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
-		CATARep **_head,I64 *num_hints)
+U0 ATARepEntry(I64 base0,I64 base1,I64 unit,U8 *msg,
+	CATARep **_head,I64 *num_hints)
 {
   I64 type;
   base0&=-8;
@@ -97,13 +97,13 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,I64 irq,U8 *msg,
   CATARep *tmpha;
   if (type=ATAProbe(base0,base1,unit)) {
     *num_hints+=1;
-    "\n\n$$PURPLE$$ $$BT+X,\"%d\",LM=\"%d\\n\"$$$$FG$$$$LM,4$$",*num_hints,*num_hints;
+    "\n$$PURPLE$$ $$BT+X,\"%d\",LM=\"%d\\n\"$$$$FG$$$$LM,4$$",*num_hints,*num_hints;
     if (type==BDT_ATA)
       "$$RED$$Hard Drive   $$LTBLUE$$ATA   ";
     else
       "$$RED$$CD/DVD Drive $$LTBLUE$$ATAPI ";
-    "%s$$FG$$\nBase0:0x%04X    Base1:0x%04X\nIrq:0x%02X Unit:%d$$LM,0$$\n",
-	  msg,base0,base1,irq,unit;
+    "%s$$FG$$\nBase0:0x%04X Base1:0x%04X Unit:%d$$LM,0$$\n",
+	  msg,base0,base1,unit;
     if (_head) {
       tmpha=CAlloc(sizeof(CATARep));
       tmpha->next=*_head;
@@ -130,7 +130,7 @@ Bool ATARepExitAllApplications()
 
 public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_head=NULL)
 {//Report possible ATA devices by probing.  Hard disks and CD/DVDs.
-  I64 d1,d2,d3,i,j,k,cnt=0,unlock_flags=0,num_hints=0;
+  I64 d1,d2,i,j,k,cnt=0,unlock_flags=0,num_hints=0;
 #assert NUM_BLKDEVS<=64
   if (_head) *_head=NULL;
 
@@ -155,35 +155,34 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_head=NULL)
 
 	d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x10);
 	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x14);
-	d3=PCIReadU8(j.u8[2],j.u8[1],j.u8[0],0x3C);
 	if (d1&1 && d2&1) {
-	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,0,"Primary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,"Primary IDE",_head,&num_hints);
 	} else {
-	  d1=0x1F0; d2=0x3F6; d3=14;
-	  ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
+	  d1=0x1F0; d2=0x3F6;
+	  ATARepEntry(d1,d2,0,"Primary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,"Primary IDE",_head,&num_hints);
 	}
 	d1=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x18);
 	d2=PCIReadU32(j.u8[2],j.u8[1],j.u8[0],0x1C);
 	if (d1&1 && d2&1) {
-	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,0,"Secondary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,"Secondary IDE",_head,&num_hints);
 	} else {
-	  d1=0x170; d2=0x376; d3=15;
-	  ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
-	  ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
+	  d1=0x170; d2=0x376;
+	  ATARepEntry(d1,d2,0,"Secondary IDE",_head,&num_hints);
+	  ATARepEntry(d1,d2,1,"Secondary IDE",_head,&num_hints);
 	}
       }
     }
   if (!cnt) {
-    d1=0x1F0; d2=0x3F6; d3=14;
-    ATARepEntry(d1,d2,0,d3,"Primary IDE",_head,&num_hints);
-    ATARepEntry(d1,d2,1,d3,"Primary IDE",_head,&num_hints);
+    d1=0x1F0; d2=0x3F6;
+    ATARepEntry(d1,d2,0,"Primary IDE",_head,&num_hints);
+    ATARepEntry(d1,d2,1,"Primary IDE",_head,&num_hints);
 
-    d1=0x170; d2=0x376; d3=15;
-    ATARepEntry(d1,d2,0,d3,"Secondary IDE",_head,&num_hints);
-    ATARepEntry(d1,d2,1,d3,"Secondary IDE",_head,&num_hints);
+    d1=0x170; d2=0x376;
+    ATARepEntry(d1,d2,0,"Secondary IDE",_head,&num_hints);
+    ATARepEntry(d1,d2,1,"Secondary IDE",_head,&num_hints);
   }
   '\n\n';
   for (i=0;i<NUM_BLKDEVS;i++)

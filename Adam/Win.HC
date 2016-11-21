@@ -17,7 +17,7 @@ winmgr.t->last_calc_idle_time=tS;
 U0 DrawProgressBars(CDC *dc)
 {
   I64 i,j,k,n,m;
-  U8 *st;
+  U8 *st,*st2;
   for (i=0;i<NUM_PROGRESS_BARS;i++) {
     if (m=sys_progresses[i].max) {
       dc->color=BLACK;
@@ -57,10 +57,15 @@ U0 DrawProgressBars(CDC *dc)
 	st=StrNew(sys_progresses[i].desc);
       else
 	st=MStrPrint("%d/%d",n,m);
-      GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,
+      if (sys_progresses[i].t0) {
+	st2=MStrPrint("%s %5.3f",st,tS-sys_progresses[i].t0);
+	Free(st);
+      } else
+	st2=st;
+      GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st2))/2,
 	    (GR_HEIGHT-FONT_HEIGHT-
-	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
-      Free(st);
+	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st2);
+      Free(st2);
     }
   }
 }

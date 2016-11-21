@@ -8,8 +8,8 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tmpg)
   CD3I32 *p;
   CMeshTri *tri;
   if (!doc) doc=DocPut;
-  DocPrint(doc,"%Z",tmpg->type,"ST_SPRITE_ELEM_CODES");
-  switch (tmpg->type) {
+  DocPrint(doc,"%Z",tmpg->type&SPG_TYPE_MASK,"ST_SPRITE_ELEM_CODES");
+  switch (tmpg->type&SPG_TYPE_MASK) {
     case SPT_COLOR:
       DocPrint(doc,"{%s}",
 	    Color2Str(buf1,tmpg->c.color));
@@ -92,7 +92,8 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tmpg)
 	if (i&3==3 && i+1<tmpg->nu.num)
 	  DocPrint(doc,"\n");
       }
-      if (tmpg->type==SPT_BSPLINE2||tmpg->type==SPT_BSPLINE3)
+      if (tmpg->type&SPG_TYPE_MASK==SPT_BSPLINE2||
+	    tmpg->type&SPG_TYPE_MASK==SPT_BSPLINE3)
 	DocPrint(doc,",FALSE}");
       else
 	DocPrint(doc,",TRUE}");
@@ -186,13 +187,13 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tmpg)
       DocPrint(doc,"}");
       break;
   }
-  DocPrint(doc,";\n");
+    DocPrint(doc,";\n");
 }
 
 public U0 Sprite2Code(CDoc *doc=NULL,U8 *elems)
 {//Sprite to text.
   CSprite *tmpg=elems-offset(CSprite.start);
-  while (tmpg->type) {
+  while (tmpg->type&SPG_TYPE_MASK) {
     SpriteElem2Code(doc,tmpg);
     tmpg(U8 *)+=SpriteElemSize(tmpg);
   }

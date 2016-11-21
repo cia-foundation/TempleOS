@@ -638,6 +638,8 @@ lex_float_start:
 	cc->token=TK_STR;
 	goto lex_end;
       case '\'':
+	if (cc->flags&CCF_NO_CHAR_CONST)
+	  break;
 	k=0;
 	for (j=0;j<8;j++) {
 	  if (!(ch=LexGetChar(cc)) || ch=='\'')
@@ -1175,7 +1177,6 @@ lex_check_comment:
 	  goto lex_end;
 	}
       case TK_NUM_TK:
-      default:
 	break;
     }
   }

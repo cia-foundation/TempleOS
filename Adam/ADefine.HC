@@ -4,15 +4,15 @@ U0 LoadDocDefines()
 {
   CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
 
-  DefinePrint("DD_OS_NAME_VERSION","TempleOS V%0.2f",os_version);
+  DefinePrint("DD_OS_NAME_VERSION","TempleOS V%0.2f",sys_os_version);
   DefinePrint("DD_TEMPLEOS_AGE","%0.1f",
 	(Now-Str2Date("8/1/2003"))/ToF64(1<<32)/CDATE_YEAR_DAYS);
 
   //This is cut and replaced when I generate a distro.
   //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,939");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,264");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","120,770");
+DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,303");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;

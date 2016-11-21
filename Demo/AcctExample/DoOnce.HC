@@ -18,7 +18,7 @@ U0 DoOnce()
 	DocBottom;
 	if (RunFile("::/Misc/OSInstall",,FALSE)) {
 	  *sys_registry_doc->filename.name='C';
-	  "\n\n1) TAD\n\n";
+	  "\n\n1) TAD\n2) DLC\n\n";
 	  switch (GetI64("Staff Member Number:")) {
 	    case 1:
 	      RegWriteBranch("TempleOS/Staff",
@@ -26,6 +26,11 @@ U0 DoOnce()
 		    "#define MACHINE_CFG %d\n",
 		    GetI64("Machine Cfg Number:")
 	      );
+	      break;
+	    case 2:
+	      RegWriteBranch("TempleOS/Staff",
+		    "#define PERSONAL_INITIALS \"DLC\"\n"
+		    "#define MACHINE_CFG 0\n");
 	      break;
 	  }
 	  Del("C:/Home/DoDistro.HC.Z");
@@ -43,6 +48,8 @@ U0 DoOnce()
 	  "D:/Tmp/Logs/*.log","D:/Home/WebLogRep.DD");
     Del("D:/Tmp/Logs/*.log");
   }
+  if (tos_timestamp)
+    Blog(TRUE);
 }
 
 DoOnce;

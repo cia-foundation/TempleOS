@@ -127,22 +127,10 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    }
 	    return TRUE;
 	  case SC_F5:
-	    if (sc&SCF_SHIFT) {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Edit/Collaborative Fiction");
-	      else
-		"---- $TX,"Collaborative Fiction",HTML="http://en.wikipedia.org/wiki/Collaborative_fiction"$ ----\n"
-		      "Once upon a time ";
-	    } else {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Edit/Moses Comic");
-	      else
-		"---- Moses Comic ---- "
-		      "(Set in the $TX,"Numbers 11",HTML="http://www.biblegateway.com/passage/?search=Numbers%%%%2011&version=NIV"$ "
-		      "part of the story.)\n"
-		      "Moses says, \"\"\n"
-		      "God says, \"\"\n";
-	    }
+	    if (sc&SCF_KEY_DESC)
+	      KeyDescSet("Edit/God Offering");
+	    else
+	      GodOffer;
 	    return TRUE;
 	  case SC_F6:
 	    if (sc&SCF_SHIFT) {
@@ -160,19 +148,14 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  case SC_F7:
 	    if (sc&SCF_SHIFT) {
 	      if (sc&SCF_KEY_DESC)
+		KeyDescSet("Cmd /NISTGodMisc2");
+	      else
+		NISTGodMisc2;
+	    } else {
+	      if (sc&SCF_KEY_DESC)
 		KeyDescSet("Cmd /God Misc");
 	      else
 		GodMisc;
-	    } else {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /God Doodle File");
-	      else {
-		st1=PopUpPickFile;
-		st2=FileRead(st1);
-		GodDoodle(st2);
-		Free(st2);
-		Free(st1);
-	      }
 	    }
 	    return TRUE;
 	  case SC_F8:

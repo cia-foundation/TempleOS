@@ -394,6 +394,7 @@ extern U0 (*fp_set_std_palette)();
 public extern U8 *Color2Str(U8 *buf,CColorROPU32 c);
 public extern CColorROPU16 Str2ColorU16(U8 *st);
 public extern CColorROPU32 Str2ColorU32(U8 *st);
+
 #help_index "Hash"
 #help_file "::/Doc/Hash"
 public _extern _HASH_ADD U0 HashAdd(CHash *tmph,CHashTable *table);
@@ -573,6 +574,7 @@ public extern U0 QSort(U8 *base,I64 num, I64 width,
 	I64 (*fp_compare)(U8 *e1,U8 *e2));
 public extern U0 QSortI64(I64 *base,I64 num,
 	I64 (*fp_compare)(I64 e1,I64 e2));
+public extern F64 sys_os_version;
 
 #help_index "Misc/Progress Bars"
 public extern U0 ProgressBarsRst();

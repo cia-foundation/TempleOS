@@ -2,7 +2,42 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----09/29/16 11:52:04----$IV,0$
+$IV,1$----11/21/16 01:46:12----$IV,0$
+
+$IV,1$----11/20/16 19:46:43----$IV,0$
+* $BK,1$TempleOS version 4.13 Released$BK,0$
+* Improved $LK,"::/Apps/TimeOut/TimeOut.HC"$.
+* Improved $LK,"::/Apps/X-Caliber/X-Caliber.HC"$.
+
+$IV,1$----11/19/16 08:19:51----$IV,0$
+* Improved Budget application.
+
+$IV,1$----11/17/16 18:49:51----$IV,0$
+* $LK,"R",A="MN:R"$("EagleDive","Talons");
+* Improved $LK,"::/Demo/Games/RocketScience.HC"$.
+* Improved $LK,"::/Demo/Games/Rocket.HC"$.
+
+$IV,1$----10/28/16 05:54:27----$IV,0$
+* Added $LK,"::/Demo/RadixSort.HC"$.
+
+$IV,1$----10/26/16 00:21:06----$IV,0$
+* Added $LK,"CProgress",A="MN:CProgress"$.t0.
+* Improved $LK,"::/Doc/Boot.DD"$.
+
+$IV,1$----10/25/16 18:02:44----$IV,0$
+* Improved $LK,"::/Adam/Gr/SpriteEd.HC"$.
+* Improved $LK,"::/Demo/AcctExample/TOSHolySpirit.HC"$.
+
+$IV,1$----10/12/16 10:55:26----$IV,0$
+* Added $LK,"CCF_NO_CHAR_CONST",A="MN:CCF_NO_CHAR_CONST"$.
+* Improved $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
+
+$IV,1$----10/03/16 01:09:35----$IV,0$
+* Changed $LK,"GodWord",A="MN:GodWord"$().
+
+$IV,1$----09/30/16 18:29:59----$IV,0$
+* Improved $LK,"Rand",A="MN:Rand"$()'s.
+* Improved $LK,"::/Adam/Opt/Utils/ToTXT.HC"$.
 
 $IV,1$----09/29/16 10:13:14----$IV,0$
 * $BK,1$TempleOS version 4.12 Released$BK,0$
@@ -83,7 +118,7 @@ $IV,1$----07/17/16 03:23:53----$IV,0$
 
 $IV,1$----07/15/16 10:11:10----$IV,0$
 * $BK,1$TempleOS version 4.10 Released$BK,0$
-* Improved $LK,"::/Demo/Games/EagleDive.HC"$.
+* Improved $LK,"::/Demo/Games/Talons.HC"$.
 
 $IV,1$----07/15/16 05:17:24----$IV,0$
 * Created $LK,"CDevGlbls",A="MN:CDevGlbls"$.uncached_alias.
@@ -93,7 +128,7 @@ $IV,1$----07/13/16 17:21:19----$IV,0$
 * Added multicore report to $LK,"CPURep",A="MN:CPURep"$().
 
 $IV,1$----07/09/16 08:46:36----$IV,0$
-* Changed scoring in $LK,"::/Demo/Games/EagleDive.HC"$.
+* Changed scoring in $LK,"::/Demo/Games/Talons.HC"$.
 * Replaced many $FG,2$"%Q"$FG$ with $FG,2$"%$$Q"$FG$.
 * Fixed $FG,2$'\x24'$FG$.
 * Added $FG,2$'\d'$FG$ for $FG,2$'$$'$FG$.
@@ -108,11 +143,11 @@ $IV,1$----07/07/16 07:21:03----$IV,0$
 
 $IV,1$----07/06/16 23:45:30----$IV,0$
 * Fixed multicore bug in $LK,"Sprite3",A="MN:Sprite3"$().
-* Improved $LK,"::/Demo/Games/EagleDive.HC"$.
+* Improved $LK,"::/Demo/Games/Talons.HC"$.
 
 $IV,1$----07/05/16 06:03:47----$IV,0$
 * $BK,1$TempleOS version 4.09 Released$BK,0$
-* Improved $LK,"::/Demo/Games/EagleDive.HC"$.
+* Improved $LK,"::/Demo/Games/Talons.HC"$.
 * Improved $LK,"GrFillTri0",A="MN:GrFillTri0"$().
 
 $IV,1$----07/03/16 04:30:05----$IV,0$
@@ -165,7 +200,7 @@ $IV,1$----06/16/16 19:49:39----$IV,0$
 
 $IV,1$----06/02/16 03:20:56----$IV,0$
 * $BK,1$TempleOS version 4.07 Released$BK,0$
-* Added claws to $LK,"::/Demo/Games/EagleDive.HC"$.
+* Added claws to $LK,"::/Demo/Games/Talons.HC"$.
 
 $IV,1$----05/30/16 21:16:44----$IV,0$
 * Added waterfall to $LK,"::/Demo/Games/RawHide.HC"$.

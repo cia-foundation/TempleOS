@@ -5,7 +5,7 @@ fp_compare() passes by value instead of ref.
 For ascending strings: return StrCmp(e1,e2);
 For ascending ints   : return e1-e2;
 
-Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.HC"$.
+Maybe, look at $LK,"::/Demo/MultiCore/MPRadix.HC"$.
 */
   I64 i,*left,*right,pivot;
   if (num>1) {
@@ -89,7 +89,7 @@ For ascending strings: return StrCmp(*e1,*e2);
 For ascending ints   : return *e1-*e2;
 Don't return e1-e2 if numbers can overflow, return -1,0 or 1.
 
-Maybe, look at $LK,"::/Demo/MultiCore/RadixSort.HC"$.
+Maybe, look at $LK,"::/Demo/MultiCore/MPRadix.HC"$.
 */
   U8 *tmp;
   if (width && num>1) {

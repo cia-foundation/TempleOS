@@ -22,6 +22,7 @@ LBts(&sys_run_level,RLf_DOC);
 #include "God/MakeGod"
 #include "AHash"
 #include "TaskSettings"
+#include "CPURep"
 #include "DevInfo"
 #include "ADefine"
 #include "WallPaper"

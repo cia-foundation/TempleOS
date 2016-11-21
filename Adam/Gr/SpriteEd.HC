@@ -9,7 +9,7 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
   CColorROPU32 color=BLACK;
   if (dc) DCRst(dc);
   while (elem_num-->0 && res!=head) {
-    switch (res->type) {
+    switch (res->type&SPG_TYPE_MASK) {
       case SPT_COLOR:
 	color=res->c.color;
 	if (dc) dc->color=color;
@@ -65,11 +65,10 @@ CSprite *Sprite2SpriteQue(U8 *elems)
   CSprite *res=CAlloc(sizeof(CSprite)),
 	*tmpg=elems-offset(CSprite.start),*tmpg1;
   QueInit(res);
-  while (tmpg->type) {
+  while (tmpg->type&SPG_TYPE_MASK) {
     tmpg1=MAlloc(SpriteElemSize(tmpg)+offset(CSprite.start));
     s=SpriteElemSize(tmpg);
     MemCpy(&tmpg1->start,&tmpg->start,s);
-    tmpg1->sel=FALSE;
     QueIns(tmpg1,res->last);
     tmpg(U8 *)+=s;
   }
@@ -117,8 +116,8 @@ U0 SpriteSetOrigin(CSprite *head,I64 dx,I64 dy,I64 dz)
   CD3I32 *p;
   CSprite *tmpg=head->next;
   while (tmpg!=head) {
-    if (tmpg->sel)
-      switch (tmpg->type) {
+    if (Bt(&tmpg->type,SPf_SEL))
+      switch (tmpg->type&SPG_TYPE_MASK) {
 	case SPT_ARROW:
 	case SPT_LINE:
 	case SPT_PLANAR_SYMMETRY:
@@ -203,7 +202,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tmpg)
   tmpg1->pwha.height=ToI64(m2)/0x10000;
   tmpg1->pwha.angle=-a1;
 
-  tmpg1->sel=tmpg->sel;
+  tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
 }
 
@@ -212,9 +211,9 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tmpg)
   I64 x,y,z;
   F64 m1,a1,m2,a2,s,c,x_radius=tmpg->pwha.width<<16,
 	y_radius=tmpg->pwha.height<<16;
-  CSprite *tmpg1=CAlloc(SpriteElemQuedBaseSize(tmpg->type));
+  CSprite *tmpg1=CAlloc(SpriteElemQuedBaseSize(tmpg->type&SPG_TYPE_MASK));
   tmpg1->type=tmpg->type;
-  if (tmpg->type==SPT_POLYGON)
+  if (tmpg->type&SPG_TYPE_MASK==SPT_POLYGON)
     tmpg1->pwhas.sides=tmpg->pwhas.sides;
 
   x=tmpg->pwha.x1; y=tmpg->pwha.y1; z=0;
@@ -244,7 +243,7 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tmpg)
   if (tmpg1->pwha.height<1) tmpg1->pwha.height=1;
   tmpg1->pwha.angle=-a1;
 
-  tmpg1->sel=tmpg->sel;
+  tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
 }
 
@@ -286,7 +285,7 @@ CSprite *SpriteTransformRect(I64 *r,CSprite *tmpg,F64 é)
   tmpg1->ppa.y2=tmpg1->ppa.y1+h;
   tmpg1->ppa.angle=-a1;
 
-  tmpg1->sel=tmpg->sel;
+  tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
 }
 
@@ -380,8 +379,8 @@ U0 SpriteTransform(I64 *r,CSprite *head)
   CD3I32 *p;
   CSprite *tmpg=head->next,head2,*tmpg1,*tmpg2,*tmpg3;
   while (tmpg!=head) {
-    if (tmpg->sel)
-      switch (tmpg->type) {
+    if (Bt(&tmpg->type,SPf_SEL))
+      switch (tmpg->type&SPG_TYPE_MASK) {
 	case SPT_WIDTH:
 	  tmpg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
 	  if (tmpg->w.width<0) tmpg->w.width=0;
@@ -502,11 +501,10 @@ U0 SpriteTransform(I64 *r,CSprite *head)
 	    Free(tmpg1);
 	    tmpg1=tmpg2;
 	  }
-	  tmpg3->type=SPT_POLYPT;
+	  tmpg3->type=SPT_POLYPT|tmpg->type&SPF_SEL;
 	  tmpg3->npu.num=num;
 	  QueIns(tmpg3,tmpg);
 	  QueRem(tmpg);
-	  tmpg3->sel=tmpg->sel;
 	  Free(tmpg);
 	  tmpg=tmpg3;
 	  break;
@@ -559,7 +557,7 @@ I64 SpriteQueSelCnt(CSprite *head,Bool val=TRUE)
   CSprite *tmpg=head->next;
   val=ToBool(val);
   while (tmpg!=head) {
-    if (ToBool(tmpg->sel)==val)
+    if (Bt(&tmpg->type,SPf_SEL)==val)
       res++;
     tmpg=tmpg->next;
   }
@@ -571,7 +569,7 @@ I64 SpriteQueSelAll(CSprite *head,Bool val=TRUE)
   I64 res=0;
   CSprite *tmpg=head->next;
   while (tmpg!=head) {
-    tmpg->sel=val;
+    BEqu(&tmpg->type,SPf_SEL,val);
     res++;
     tmpg=tmpg->next;
   }
@@ -590,7 +588,7 @@ CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *head,I64 *_cur_elem_num)
       tmpg=SpriteSetSettings(,head,doc_e->left_exp);
       if (tmpg!=head) {
 	tmpg=MAllocIdent(tmpg);
-	tmpg->sel=Bt(&doc_e->type,DOCEt_SEL);
+	BEqu(&tmpg->type,SPf_SEL,Bt(&doc_e->type,DOCEt_SEL));
 	if (*_cur_elem_num==doc_e->left_exp) {
 	  *_cur_elem_num=num;
 	  found=TRUE;
@@ -627,8 +625,8 @@ U0 SpriteSideBarPickNew(CDoc *doc,CSprite *head,I64 old_num)
       DocPrint(doc,"$$LTBLUE$$");
       doc_e=DocPrint(doc,"$$MU-UL,\"%$$Q\",LE=%d$$\n",st,cur_elem_num++);
     }
-    BEqu(&doc_e->de_flags,DOCEf_SEL,tmpg->sel);
-    BEqu(&doc_e->type,DOCEt_SEL,tmpg->sel);
+    BEqu(&doc_e->de_flags,DOCEf_SEL,Bt(&tmpg->type,&SPf_SEL));
+    BEqu(&doc_e->type,DOCEt_SEL,Bt(&tmpg->type,SPf_SEL));
     Free(st);
     tmpg=tmpg->next;
   }
@@ -716,25 +714,27 @@ Bool SpriteEdText(CSprite **_head,I64 *_cur_elem_num)
 }
 
 #define SPED_SEL_UNSEL_ALL	0
-#define SPED_SEL		1
-#define SPED_UNSEL		2
-#define SPED_SHIFT_PTS		3
-#define SPED_SHIFT_RECTS	4
-#define SPED_SHIFT_SEL		5
-#define SPED_TRANSFORM_SEL	6
-#define SPED_SET_ORIGIN		7
-#define SPED_SHIFT_SUB_ORIGIN	8
-#define SPED_TEXT_ED		9
-#define SPED_INS_CLIPBOARD	10
-#define SPED_MAIN_MENU		11
-#define SPED_EXIT		12
+#define SPED_SEL		2
+#define SPED_SEL_RECTS		3
+#define SPED_UNSEL		4
+#define SPED_UNSEL_RECTS	5
+#define SPED_SHIFT_PTS		6
+#define SPED_SHIFT_RECTS	7
+#define SPED_SHIFT_SEL		8
+#define SPED_TRANSFORM_SEL	9
+#define SPED_SET_ORIGIN		10
+#define SPED_SHIFT_SUB_ORIGIN	11
+#define SPED_TEXT_ED		12
+#define SPED_INS_CLIPBOARD	13
+#define SPED_MAIN_MENU		14
+#define SPED_EXIT		15
 
 U0 GrInit3()
 {
-  DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unselect All\0"
-	"Select\0Unselect\0Shift Points\0Shift Rects\0Shift Selected\0"
-	"Transform Selected\0Set Origin\0Insert Shift SubOrigin\0"
-	"Edit as Text\0Insert Clipboard\0Main Menu\0");
+  DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unselect All\0 \0Select\0"
+	"Select Rects\0Unselect\0Unselect Rects\0Shift Points\0Shift Rects\0"
+	"Shift Selected\0Transform Selected\0Set Origin\0"
+	"Insert Shift SubOrigin\0Edit as Text\0Insert Clipboard\0Main Menu\0");
 }
 GrInit3;
 
@@ -748,7 +748,9 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteEd.DD.Z\"$$\n\n"
 	"$$LTBLUE$$$$MU-UL,\"Select/Unselect All\",LE=SPED_SEL_UNSEL_ALL$$\n"
 	"$$MU-UL,\"Select Elems\",LE=SPED_SEL$$\n"
-	"$$MU-UL,\"Unsel Elems\",LE=SPED_UNSEL$$\n\n"
+	"$$MU-UL,\"Select Elems with Rects\",LE=SPED_SEL_RECTS$$\n"
+	"$$MU-UL,\"Unsel Elems\",LE=SPED_UNSEL$$\n"
+	"$$MU-UL,\"Unsel Elems with Rects\",LE=SPED_UNSEL_RECTS$$\n\n"
 	"$$MU-UL,\"Shift Points\",LE=SPED_SHIFT_PTS$$\n"
 	"$$MU-UL,\"Shift Points with Rects\",LE=SPED_SHIFT_RECTS$$\n"
 	"$$MU-UL,\"Shift Selected Elems\",LE=SPED_SHIFT_SEL$$\n"
@@ -780,9 +782,20 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 class CEdSprite
 {
   CEdSprite *next,*last;
+  CSprite *g;
   I32 type,num,flags,xx,yy,zz;
   I32 *x,*y,*z,*w,*h;
 };
+
+CEdSprite *EdSpriteNew(I64 type,CSprite *tmpg)
+{
+  CEdSprite *res=CAlloc(sizeof(CEdSprite));
+  res->g=tmpg;
+  if (tmpg->type&SPF_SEL)
+    res->flags|=SPEDF_SEL;
+  res->type=type;
+  return res;
+}
 
 U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *head)
 {
@@ -792,12 +805,11 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *head)
   CEdSprite *tmpes;
   CSprite *tmpg=elems-offset(CSprite.start);
   QueInit(head);
-  while (tmpg->type) {
-    switch (tmpg->type) {
+  while (tmpg->type&SPG_TYPE_MASK) {
+    switch (tmpg->type&SPG_TYPE_MASK) {
       case SPT_ELLIPSE:
       case SPT_POLYGON:
-	tmpes=CAlloc(sizeof(CEdSprite));
-	tmpes->type=SPEDT_WIDTH_HEIGHT;
+	tmpes=EdSpriteNew(SPEDT_WIDTH_HEIGHT,tmpg);
 	tmpes->xx=x;
 	tmpes->yy=y;
 	tmpes->x=&tmpg->pwha.x1;
@@ -812,8 +824,7 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *head)
       case SPT_LINE:
       case SPT_ARROW:
       case SPT_PLANAR_SYMMETRY:
-	tmpes=CAlloc(sizeof(CEdSprite));
-	tmpes->type=SPEDT_SIMPLE_PT;
+	tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	tmpes->xx=x;
 	tmpes->yy=y;
 	tmpes->x=&tmpg->pp.x2;
@@ -829,8 +840,7 @@ U0 SpritePtQueNew(U8 *elems,I64 x,I64 y,CEdSprite *head)
       case SPT_FLOOD_FILL_NOT:
       case SPT_CIRCLE:
 pq_x1_y1:
-	tmpes=CAlloc(sizeof(CEdSprite));
-	tmpes->type=SPEDT_SIMPLE_PT;
+	tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	tmpes->xx=x;
 	tmpes->yy=y;
 	tmpes->x=&tmpg->p.x1;
@@ -845,8 +855,7 @@ pq_x1_y1:
       case SPT_POLYLINE:
 	ptr=&tmpg->nu.u;
 	for (i=0;i<tmpg->nu.num;i++) {
-	  tmpes=CAlloc(sizeof(CEdSprite));
-	  tmpes->type=SPEDT_SIMPLE_PT;
+	  tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	  tmpes->xx=x;
 	  tmpes->yy=y;
 	  tmpes->x=&ptr[i<<1];
@@ -856,8 +865,7 @@ pq_x1_y1:
 	}
 	break;
       case SPT_POLYPT:
-	tmpes=CAlloc(sizeof(CEdSprite));
-	tmpes->type=SPEDT_SIMPLE_PT;
+	tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	tmpes->xx=x;
 	tmpes->yy=y;
 	tmpes->x=&tmpg->npu.x;
@@ -871,8 +879,7 @@ pq_x1_y1:
       case SPT_BSPLINE3_CLOSED:
 	p=&tmpg->nu.u;
 	for (i=0;i<tmpg->nu.num;i++) {
-	  tmpes=CAlloc(sizeof(CEdSprite));
-	  tmpes->type=SPEDT_SIMPLE_PT;
+	  tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	  tmpes->xx=x;
 	  tmpes->yy=y;
 	  tmpes->x=&p[i].x;
@@ -885,8 +892,7 @@ pq_x1_y1:
       case SPT_MESH:
 	break;
       case SPT_SHIFTABLE_MESH:
-	tmpes=CAlloc(sizeof(CEdSprite));
-	tmpes->type=SPEDT_SIMPLE_PT;
+	tmpes=EdSpriteNew(SPEDT_SIMPLE_PT,tmpg);
 	tmpes->xx=x;
 	tmpes->yy=y;
 	tmpes->x=&tmpg->pmu.x;
@@ -952,7 +958,7 @@ U0 SpriteCtrlPtsMove(CEdSprite *head,I64 dx,I64 dy)
   }
 }
 
-Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
+Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 {
   I64 msg_code,a1,a2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
   Bool res=TRUE;
@@ -968,6 +974,8 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	    1<<MSG_IP_R_UP|1<<MSG_IP_L_DOWN|1<<MSG_KEY_DOWN)) {
 	case MSG_IP_L_DOWN:
 	  switch (mode) {
+	    case SPED_SEL:
+	    case SPED_UNSEL:
 	    case SPED_SHIFT_PTS:
 	      xx=a1; yy=a2;
 	      best_dd=MAX_I64;
@@ -990,9 +998,15 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 		tmpes=tmpes->next;
 	      }
 	      cur_elem_num=best_es->num;
-	      best_es->flags|=SPEDF_SEL;
+	      if (mode!=SPED_UNSEL) {
+		best_es->flags|=SPEDF_SEL;
+		best_es->g->type|=SPF_SEL;
+	      } else {
+		best_es->flags&=~SPEDF_SEL;
+		best_es->g->type&=~SPF_SEL;
+	      }
 	      break;
-	    case SPED_SHIFT_RECTS:
+	    start:
 	      xx2=xx=a1; yy2=yy=a2;
 	      while (TRUE) {
 		SpriteCtrlPtsDraw(dc,&head);
@@ -1012,36 +1026,61 @@ Bool SpriteShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 		switch (tmpes->type) {
 		  case SPEDT_SIMPLE_PT:
 		    if (xx<=*tmpes->x+tmpes->xx<=xx2 &&
-			  yy<=*tmpes->y+tmpes->yy<=yy2)
-		      tmpes->flags|=SPEDF_SEL;
+			  yy<=*tmpes->y+tmpes->yy<=yy2) {
+		      if (mode!=SPED_UNSEL_RECTS) {
+			tmpes->flags|=SPEDF_SEL;
+			tmpes->g->type|=SPF_SEL;
+		      } else {
+			tmpes->flags&=~SPEDF_SEL;
+			tmpes->g->type&=~SPF_SEL;
+		      }
+		    }
 		    break;
 		  case SPEDT_WIDTH_HEIGHT:
 		    if (xx<=*tmpes->x+*tmpes->w+tmpes->xx<=xx2 &&
-			  yy<=*tmpes->y+*tmpes->h+tmpes->yy<=yy2)
-		      tmpes->flags|=SPEDF_SEL;
+			  yy<=*tmpes->y+*tmpes->h+tmpes->yy<=yy2) {
+		      if (mode!=SPED_UNSEL_RECTS) {
+			tmpes->flags|=SPEDF_SEL;
+			tmpes->g->type|=SPF_SEL;
+		      } else {
+			tmpes->flags&=~SPEDF_SEL;
+			tmpes->g->type&=~SPF_SEL;
+		      }
+		    }
 		    break;
 		}
 		tmpes=tmpes->next;
 	      }
+	      case SPED_SEL_RECTS:
+	      case SPED_UNSEL_RECTS:
+		break;
+	      case SPED_SHIFT_RECTS:
+		do {
+		  SpriteCtrlPtsDraw(dc,&head);
+		  msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN);
+		  if (msg_code==MSG_KEY_DOWN) goto gs_key;
+		} while (msg_code!=MSG_IP_L_DOWN);
+		xx=a1;yy=a2;
+		break;
+	    end:
+	  }
+	  switch (mode) {
+	    case SPED_SHIFT_PTS:
+	    case SPED_SHIFT_RECTS:
 	      do {
 		SpriteCtrlPtsDraw(dc,&head);
-		msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN);
-		if (msg_code==MSG_KEY_DOWN) goto gs_key;
-	      } while (msg_code!=MSG_IP_L_DOWN);
-	      xx=a1;yy=a2;
+		if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
+		  SpriteCtrlPtsMove(&head,a1-xx,a2-yy);
+		  xx=a1;yy=a2;
+		}
+	      } while (msg_code!=MSG_IP_L_UP);
+	      tmpes=head.next;
+	      while (tmpes!=&head) {
+		tmpes->flags&=~SPEDF_SEL;
+		tmpes->g->type&=~SPF_SEL;
+		tmpes=tmpes->next;
+	      }
 	      break;
-	  }
-	  do {
-	    SpriteCtrlPtsDraw(dc,&head);
-	    if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
-	      SpriteCtrlPtsMove(&head,a1-xx,a2-yy);
-	      xx=a1;yy=a2;
-	    }
-	  } while (msg_code!=MSG_IP_L_UP);
-	  tmpes=head.next;
-	  while (tmpes!=&head) {
-	    tmpes->flags&=~SPEDF_SEL;
-	    tmpes=tmpes->next;
 	  }
 	  break;
 	case MSG_KEY_DOWN:
@@ -1054,11 +1093,11 @@ gs_key:
 	      goto gs_done;
 	    case 'p':
 	    case 'P':
-	      mode=SPED_SHIFT_PTS;
+	      mode&=~1;
 	      break;
 	    case 'r':
 	    case 'R':
-	      mode=SPED_SHIFT_RECTS;
+	      mode|=1;
 	      break;
 	  }
 	  break;
@@ -1084,7 +1123,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
   Bool unlock;
   I64 i,r[16],msg_code,a1,a2,xx,yy,
 	old_de_flags;
-  CSprite *cur_elem,*head2,*next,*last,*tmpg,*insert_pt;
+  CSprite *head2,*next,*last,*tmpg,*insert_pt;
 
   old_de_flags=doc_ce->de_flags;
   tmpb=doc_ce->bin_data;
@@ -1104,23 +1143,6 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	    SpriteQueSelAll(*_head);
 	  else
 	    SpriteQueSelAll(*_head,FALSE);
-	  break;
-	case SPED_SEL:
-	case SPED_UNSEL:
-	  doc_ce->de_flags=old_de_flags;
-	  doc->cur_sprite=tmpb->data;
-	  do {
-	    doc->nearest_sprite_elem_num=0;
-	    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP);
-	    Refresh(2);
-	    if (msg_code==MSG_IP_L_DOWN) {
-	      *_cur_elem_num=doc->nearest_sprite_elem_num;
-	      cur_elem=SpriteSetSettings(,*_head,*_cur_elem_num);
-	      cur_elem->sel=ToBool(i==SPED_SEL);
-	      GetMsg(,,1<<MSG_IP_L_UP);
-	    }
-	  } while (msg_code!=MSG_IP_R_UP);
-	  doc->cur_sprite=NULL;
 	  break;
 	case SPED_SET_ORIGIN:
 	  SpriteQueSelAll(*_head);
@@ -1146,6 +1168,10 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  if (!SpriteQueSelCnt(*_head,FALSE))
 	    SpriteQueSelAll(*_head,FALSE);
 	  break;
+	case SPED_SEL:
+	case SPED_SEL_RECTS:
+	case SPED_UNSEL:
+	case SPED_UNSEL_RECTS:
 	case SPED_SHIFT_PTS:
 	case SPED_SHIFT_RECTS:
 	  RegOneTimePopUp(ARf_CSPRITE_PTS_RECTANGLES,
@@ -1154,7 +1180,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 		"Press '$$GREEN$$r$$FG$$' after one rectangle\n"
 		"to OR another rectangle.\n");
 	  doc_ce->de_flags=old_de_flags;
-	  if (SpriteShiftPts(tmpb->data,x,y,_cur_elem_num,i)) {
+	  if (SpriteSelUnselShiftPts(tmpb->data,x,y,_cur_elem_num,i)) {
 	    QueDel(*_head);
 	    Free(*_head);
 	    *_head=Sprite2SpriteQue(tmpb->data);

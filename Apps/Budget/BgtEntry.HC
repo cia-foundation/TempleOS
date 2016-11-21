@@ -7,6 +7,18 @@ U0 BgtEntryDel2(CBgtEntry *tmpb)
   }
 }
 
+CBgtEntry *BgtEntryCopy(CBgtEntry *tmpb,Bool periodic_copy)
+{
+  CBgtEntry *res=MAlloc(sizeof(CBgtEntry));
+  MemCpy(res,tmpb,sizeof(CBgtEntry));
+  if (periodic_copy) {
+    res->credit=StrNew(tmpb->credit);
+    res->debit =StrNew(tmpb->debit);
+    res->desc  =StrNew(tmpb->desc);
+  }
+  return res;
+}
+
 U0 BgtEntryDel(CBgtEntry *tmpb)
 {
   BgtEntryDel2(tmpb);

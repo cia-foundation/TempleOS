@@ -1,7 +1,7 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
-* $LK,"::/Demo/RandDemo.HC"$ Rand is kinda crappy.
+* $LK,"::/Demo/RandDemo.HC"$ is kinda crappy.
 
-* Cursor in $LK,"::/Home/TOSToHtml.HC"$.
+* Cursor in $LK,"~/TOSToHtml.HC"$.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.HC,Sleep(1)"$.
 
@@ -9,11 +9,23 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.HC"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
 
+* Get rid of $LK,"JobQue",A="MN:JobQue"$() and use just $LK,"Spawn",A="MN:Spawn"$()?  Not sure about this, probably.
+
+* Add missiles to $LK,"::/Apps/TimeOut/TimeOut.HC"$.
+
+* Add asteroid harbor defense to $LK,"::/Apps/X-Caliber/X-Caliber.HC"$.
+
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.HC,41"$
 * Backward <SHIFT-F3> is broken?
 
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.HC,AD"$ search string.
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
+
+* 11/19/16 editor took long time after copying old testament onto clipboard and exiting.
+
+* Nestled switch() start/end?
+
+* Editor filter froze.
 
 * Editor overstrike mode at cmd line with menu macro?  Probably, many other overstrike issues.
 
@@ -66,6 +78,8 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Get rid of JIFFY and HPET and just use tS.
 
+* Use "Rosetta Stone" in documentaion pointing to this: $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
+
 * Change %h*c so the character is not a arg?
 
 * $LK,"GrLineFat3",A="MN:GrLineFat3"$() needs a little work.
@@ -116,6 +130,10 @@ $FG,5$$TX+CX,"TODO: Too Hard, or Not Worth Doing."$$FG$
 * $LK,"ICMov",A="MN:ICMov"$() $LK,"PUSH_CMP",A="FF:::/Compiler/BackLib.HC,PUSH_CMP"$ and $LK,"MDf_STK",A="MN:MDf_STK"$?  Perhaps, it's okay.
 
 * Short FAT32 ~ names.
+
+* $LK,"Find",A="MN:Find"$() search text in sprites.
+
+* Links in text in sprites. 
 
 * Compiler: Inline functions?
 
@@ -170,8 +188,6 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 
 $FG,5$$TX+CX,"TODO? Not really, just angst."$$FG$
-* Nontimer $LK,"Rand",A="MN:Rand"$() is really bad!
-
 * Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
 $ID,5$CArrayDim dim;
 CHashFun *fun_ptr;
@@ -405,13 +421,15 @@ Abundance of Spirits			$TX,"1 Corinthians 14:12",HTML="http://www.usccb.org/bibl
 The stone rejected is cornerstone	$TX,"Matthew 21:42",HTML="http://www.biblegateway.com/verse/en/Matthew%2021:42"$
 Egypt rise like flood			$TX,"Jeremiah 46:7-8",HTML="http://www.biblegateway.com/passage/?search=Jeremiah%2046:7-8&version=NIV"$
 New wineskins				$TX,"Mark 2:22",HTML="http://www.biblegateway.com/verse/en/Mark%202:22"$
-Thousand songs of Solomon		$TX,"1 Kings 4:30-32",HTML="http://www.biblegateway.com/passage/?search=1%20Kings%204:30-32&version=NIV"$
+Thousand songs of Solomon		$TX,"1 Kings 4:32",HTML="http://www.biblegateway.com/passage/?search=1%20Kings%204:32&version=NIV"$
+Not rich, nor poor, but my portion	$TX,"Proverbs 30:8",HTML="http://www.biblegateway.com/verse/en/Proverbs%2030:8"$
+Be hot or cold. Lukewarm I spit you out	$TX,"Revelation 3:16",HTML="http://www.biblegateway.com/verse/en/Revelation%203:16"$
 
 $FG,5$$TX+CX,"Misc Notes"$$FG$
-Erik van der Karbargenbok: $LK,"TempleBot",A="PI:::/Home/Sup1/Sup1Bin/TempleBot"$.
+Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17416KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17426KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -425,13 +443,16 @@ Iceberg		$HC,"<center><img src=\"https://upload.wikimedia.org/wikipedia/commons/
 I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\" height=\"800\" alt=\"\"></center>"$
 NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
 Purple Frog	$HC,"<center><img src=\"https://s-media-cache-ak0.pinimg.com/736x/fb/08/2a/fb082a53bd798f5957a474ff9095e6d4.jpg\" width=\"640\" height=\"420\" alt=\"\"></center>"$
+Casino (Dog)	$HC,"<center><img src=\"http://www.templeos.org/images/Dog1855x1056.jpg\" width=\"640\" height=\"364\" alt=\"\"></center>"$
+
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
-$TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$
+$TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$	$TX,"Ticketmaster",HTML="http://www.nytimes.com/1994/11/06/business/ticketmaster-s-mr-tough-guy.html?pagewanted=a"$
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
 $TX,"Graphic Technologies",HTML="https://web.archive.org/web/20020811060541/http://www.graphic-technologies.com/"$	$TX,"Lexmark vs Static Control",HTML="https://en.wikipedia.org/wiki/Lexmark_International,_Inc._v._Static_Control_Components,_Inc."$
 
+$TX,"Stephen Davis",HTML="https://photos.google.com/share/AF1QipM4HI3mb_9qe8wDQ--nRfjIzOKyGG8heqWH-tbGBIIoxChWe4GeBegNzgHRy4Z1Qw?key=eGR0R0tyZG5tenRWd0tDN2RHRFRNTmI4NXdhc25B"$
 
 3qEeEGCAsBABAqFDBeE2G33qEeEGCAsBABAqFDBeE2G33qCsBDBDq2G3s2G3F2G3FqAet2G32G3AEDAqF3qCsBDBDq2G3s2G3F2G3FqAet2G32G3AEDAqF
 qFeDAsBDeDqCeF2G3sGGeF2sG3C2G3CBCeF
@@ -443,8 +464,10 @@ $TX,"Handford school",HTML="https:/pinterest.com/pin/255368241346360278"$
 $TX,"Look at PCI interrupt routing.",HTML="http://forum.osdev.org/viewtopic.php?f=1&t=29558"$
 $TX,"The sins of Newton",HTML="https://www.brainpickings.org/2012/01/04/isaac-newton-list-of-sins"$
 $TX,"Stalin's Tanks",HTML="https://boardgamegeek.com/boardgame/5198/stalins-tanks"$
+$TX,"Wisdom for the Way",HTML="https://www.amazon.com/Wisdom-Way-Wise-Words-People/dp/1404113258#reader_1404113258"$
 $TX,"Lamp shades",HTML="http://www.lampsplus.com/products/lamp-shades"$
 $TX,"The Original Jewish Temple",HTML="http://www.jewishvirtuallibrary.org/jsource/Judaism/The_Temple.html"$
+$TX,"Top 1000 Movies",HTML="http://www.theyshootpictures.com/gf1000_all1000films.htm"$
 $TX,"KingJamesBible with LineNums",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/NumBible.TXT"$
 $TX,"Higgs 5-Sigma Proof",HTML="http://understandinguncertainty.org/explaining-5-sigma-higgs-how-well-did-they-do"$
 $TX,"The Number Bleem",HTML="http://www.strangehorizons.com/2000/20001120/secret_number.shtml"$
