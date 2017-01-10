@@ -160,10 +160,10 @@ Bool ATAPIStartStop(CBlkDev *bd,F64 timeout,Bool start)
     return FALSE;
 }
 
-I64 ATAGetDevId(CBlkDev *bd,F64 timeout,U16 **_id_record)
+I64 ATAGetDevId(CBlkDev *bd,F64 timeout,Bool keep_id_record)
 {
-  U16 *id_record;
-  if (_id_record) *_id_record=NULL;
+  I64 res=BDT_NULL;
+  U16 *id_record=NULL;
   if (bd->type!=BDT_ATAPI && bd->base1)
     OutU8(bd->base1+ATAR1_CTRL,0x8);
   if (bd->flags & BDF_EXT_SIZE)
@@ -171,24 +171,30 @@ I64 ATAGetDevId(CBlkDev *bd,F64 timeout,U16 **_id_record)
   else
     OutU8(bd->base0+ATAR0_SEL,0xE0|bd->unit<<4);
   ATACmd(bd,ATA_ID_DEV);
-  if (!ATAWaitNotBUSY(bd,timeout))
-    return BDT_NULL;
-  if (InU8(bd->base0+ATAR0_STAT)&ATAS_ERR)
-    return BDT_ATAPI;
-  id_record=ACAlloc(512);
-  if (!ATAGetRes(bd,timeout,id_record,512,512,FALSE)) {
-    Free(id_record);
-    return BDT_NULL;
+  if (ATAWaitNotBUSY(bd,timeout)) {
+    if (InU8(bd->base0+ATAR0_STAT)&ATAS_ERR)
+      res=BDT_ATAPI;
+    else {
+      id_record=ACAlloc(512);
+      if (ATAGetRes(bd,timeout,id_record,512,512,FALSE))
+	res=BDT_ATA;
+      else {
+	Free(id_record);
+	id_record=NULL;
+      }
+    }
   }
-  if (_id_record) *_id_record=id_record;
-  return BDT_ATA;
+  if (keep_id_record) {
+     Free(bd->dev_id_record);
+     bd->dev_id_record=id_record;
+  }
+  return res;
 }
 
 I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
 {//Returns zero on err
   I64 res=0;
   Bool okay=TRUE;
-
   if (bd->type==BDT_ATAPI) {
     if (bd->flags & BDF_EXT_SIZE)
       OutU8(bd->base0+ATAR0_SEL,0xEF|bd->unit<<4);
@@ -207,9 +213,7 @@ I64 ATAReadNativeMax(CBlkDev *bd,F64 timeout)
       if (0<timeout<tS)
 	return FALSE;
     }
-
-    Free(bd->dev_id_record);
-    if (ATAGetDevId(bd,timeout,&bd->dev_id_record)==BDT_NULL)
+    if (ATAGetDevId(bd,timeout,TRUE)==BDT_NULL)
       okay=FALSE;
     else
       BEqu(&bd->flags,BDf_EXT_SIZE,Bt(&bd->dev_id_record[86],10));
@@ -310,7 +314,6 @@ Bool ATAInit(CBlkDev *bd)
     bd->flags|=BDF_EXT_SIZE;
 
   if (ATAReadNativeMax(bd,tS+0.1)) {
-
     ATABlkSel(bd,bd->max_blk,0);
     if (bd->flags&BDF_EXT_SIZE)
       ATACmd(bd,ATA_SET_MAX_EXT);
@@ -379,7 +382,7 @@ I64 ATAProbe(I64 base0,I64 base1,I64 unit)
   bd.base1=base1;
   bd.unit=unit;
   bd.blk_size=DVD_BLK_SIZE;
-  return ATAGetDevId(&bd,tS+0.1,NULL);
+  return ATAGetDevId(&bd,tS+0.1,FALSE);
 }
 
 Bool ATAPIReadBlks2(CBlkDev *bd,F64 timeout,U8 *buf,

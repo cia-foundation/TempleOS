@@ -151,7 +151,7 @@ U8 *CmdLinePmt()
   res=MAlloc(i+1+2);
   MemCpy(res,st,i+1);
   i--;
-  while (i>=0 && Bt(chars_bmp_white_space,res[i]))
+  while (i>=0 && Bt(char_bmp_white_space,res[i]))
     i--;
   i++;
   if (i>0 && res[i-1]==';')

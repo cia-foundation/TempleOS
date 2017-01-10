@@ -189,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -244,8 +244,8 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 
       if (no_bwd)
 	while (col<doc_e->x)
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,FALSE,
-		" ",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr&~DOCET_UNDERLINE,
+		&old_u32_attr,TRUE," ",&col,style_bitmap);
 
       link_st=NULL;
       if (doc_e->de_flags&DOCEF_HTML_LINK)
@@ -411,7 +411,7 @@ U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
   if (FileFind(name,&de)) {
     Free(de.full_name);
     "File:%s\n",name;
-    UncollapseFile(name,NULL);
+    Collapse(name,FALSE);
     Touch(name,"",,de.datetime);
     name2=ChgExt(name,"html");
 
@@ -430,7 +430,7 @@ U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -478,6 +478,8 @@ public U0 MakeWebSite()
   CDirEntry *tmpde,*tmpde1;
   DocClear;
   Cd("D:/Wb");
+  DelTree("D:/Wb/Home/Books1");
+  DelTree("D:/Wb/Home/Books2");
   DelTree("D:/Wb/Home/Budget");
   DelTree("D:/Wb/Home/Private");
   Del("D:/Wb/Home/*");

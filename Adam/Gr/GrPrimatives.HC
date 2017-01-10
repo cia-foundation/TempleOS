@@ -138,7 +138,7 @@ I64 GrFloodFillRay(CDC *dc,I64 x,I64 y,I64 z,I32 *db)
   I64 res,j,x1,ray_len,ray_len2;
 
   if (UnusedStk<0x80)
-    Dbg("Stk Overflow",Fs);
+    Panic("Stk Overflow",Fs);
 
   res=ray_len=GrRayLen(dc,&x,y,z,db);
   y--;
@@ -859,7 +859,7 @@ public Bool GrEllipse3(CDC *dc=gr.dc,
 {//3D. Transformation with pen width.
   Bool res;
   I64 x,y,z,xx,yy,zz;
-  F64 m1,a1,m2,a2,s,c;
+  F64 m1,arg1,m2,arg2,s,c;
   if (dc->flags & DCF_TRANSFORMATION) {
     dc->flags&=~DCF_TRANSFORMATION;
     (*dc->transform)(dc,&cx,&cy,&cz);
@@ -882,7 +882,7 @@ public Bool GrEllipse3(CDC *dc=gr.dc,
     x-=xx;
     y-=yy;
     z-=zz;
-    R2P(&m1,&a1,x,y);
+    R2P(&m1,&arg1,x,y);
 
     x=-y_radius*s;
     y=y_radius*c;
@@ -891,11 +891,11 @@ public Bool GrEllipse3(CDC *dc=gr.dc,
     x-=xx;
     y-=yy;
     z-=zz;
-    R2P(&m2,&a2,x,y);
-    m2*=Abs(Sin(a2-a1));
+    R2P(&m2,&arg2,x,y);
+    m2*=Abs(Sin(arg2-arg1));
 
     res=Ellipse(dc,cx,cy,cz,
-	  m1/0x10000,m2/0x10000,&GrPlot3,-a1,step,start_radians,len_radians);
+	  m1/0x10000,m2/0x10000,&GrPlot3,-arg1,step,start_radians,len_radians);
     dc->flags|=DCF_TRANSFORMATION;
   } else
     res=Ellipse(dc,cx,cy,cz,x_radius,y_radius,&GrPlot3,
@@ -924,7 +924,7 @@ public Bool GrRegPoly3(CDC *dc=gr.dc,
 {//3D. Clipping and transform and pen width.
   Bool res;
   I64 x,y,z,xx,yy,zz;
-  F64 m1,a1,m2,a2,s,c;
+  F64 m1,arg1,m2,arg2,s,c;
   if (dc->flags & DCF_TRANSFORMATION) {
     dc->flags&=~DCF_TRANSFORMATION;
     (*dc->transform)(dc,&cx,&cy,&cz);
@@ -947,7 +947,7 @@ public Bool GrRegPoly3(CDC *dc=gr.dc,
     x-=xx;
     y-=yy;
     z-=zz;
-    R2P(&m1,&a1,x,y);
+    R2P(&m1,&arg1,x,y);
 
     x=-y_radius*s;
     y=y_radius*c;
@@ -956,11 +956,11 @@ public Bool GrRegPoly3(CDC *dc=gr.dc,
     x-=xx;
     y-=yy;
     z-=zz;
-    R2P(&m2,&a2,x,y);
-    m2*=Abs(Sin(a2-a1));
+    R2P(&m2,&arg2,x,y);
+    m2*=Abs(Sin(arg2-arg1));
 
     res=RegPoly(dc,cx,cy,cz,
-	  m1/0x10000,m2/0x10000,sides,&GrPlot3,-a1,
+	  m1/0x10000,m2/0x10000,sides,&GrPlot3,-arg1,
 	  step,start_radians,len_radians);
     dc->flags|=DCF_TRANSFORMATION;
   } else

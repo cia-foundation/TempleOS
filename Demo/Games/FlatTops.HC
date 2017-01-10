@@ -173,7 +173,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   tmpo=obj_head.next;
   while (tmpo!=&obj_head) {
     if (tmpo->flags&OF_ACTIVE && tmpo->flags&OF_SHIP) {
-      SpriteZ3B(dc,tmpo->x,tmpo->y,0,
+      Sprite3ZB(dc,tmpo->x,tmpo->y,0,
 	    imgs[tmpo->player][tmpo->type],tmpo->é+ã/2);
 
       k=0;
@@ -224,7 +224,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   tmpo=obj_head.next;
   while (tmpo!=&obj_head) {
     if (tmpo->flags&OF_ACTIVE && !(tmpo->flags&OF_SHIP))
-      SpriteZ3B(dc,tmpo->x,tmpo->y,0,
+      Sprite3ZB(dc,tmpo->x,tmpo->y,0,
 	    imgs[tmpo->player][tmpo->type],tmpo->é+ã/2);
     if (tmpo->flags&OF_SHOOTING) {
       dc->color=LTRED;
@@ -425,8 +425,8 @@ Squadron *SquadronLaunch(I64 player,F64 x=MAX_F64,F64 y=MAX_F64)
     if (player==0) {
       launch_unit_x1=tmpo->x;
       launch_unit_y1=tmpo->y;
-      launch_unit_x2=ip.pos.x-main_task->pix_left-main_task->scroll_x;
-      launch_unit_y2=ip.pos.y-main_task->pix_top -main_task->scroll_y;
+      launch_unit_x2=ms.pos.x-main_task->pix_left-main_task->scroll_x;
+      launch_unit_y2=ms.pos.y-main_task->pix_top -main_task->scroll_y;
       launch_t=tS+0.5;
     }
     if (tmpo->squadron>=0) {
@@ -494,8 +494,8 @@ Squadron *SquadronSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
     if (player==0) {
       set_é_unit_x1=tmpo->x;
       set_é_unit_y1=tmpo->y;
-      set_é_unit_x2=ip.pos.x-main_task->pix_left-main_task->scroll_x;
-      set_é_unit_y2=ip.pos.y-main_task->pix_top -main_task->scroll_y;
+      set_é_unit_x2=ms.pos.x-main_task->pix_left-main_task->scroll_x;
+      set_é_unit_y2=ms.pos.y-main_task->pix_top -main_task->scroll_y;
       set_é_t=tS+0.5;
     }
     if (tmpo->squadron>=0) {
@@ -640,7 +640,7 @@ U0 Combat(F64 period)
 	  tmpt->target=tmpo1;
 	  tmpt->é=Arg(tmpo1->x-tmpo->x,tmpo1->y-tmpo->y);
 	  QueIns(tmpt,torpedo_head.last);
-	  Sweep(2000,2000,300);
+	  Sweep(2000,86,53);
 	} else if (tmpo->ship_guns>0 && d<tmpo->ship_guns_range) {
 	  tmpo->flags|=OF_SHOOTING;
 	  if (Rand<125.0*period) {
@@ -649,7 +649,7 @@ U0 Combat(F64 period)
 	      tmpo1->fuel*=0.75*Rand+0.25;
 	  }
 	  if (tS>next_noise) {
-	    Noise(100,75,200);
+	    Noise(100,29,46);
 	    next_noise=tS+0.1;
 	  }
 	}
@@ -662,7 +662,7 @@ U0 Combat(F64 period)
 	      tmpo1->fuel*=0.75*Rand+0.25;
 	  }
 	  if (tS>next_noise) {
-	    Noise(25,500,2000);
+	    Noise(25,62,86);
 	    next_noise=tS+0.025;
 	  }
 	}
@@ -781,7 +781,7 @@ U0 AnimateTask(I64)
 
 U0 FlatTops()
 {
-  I64 a1,a2;
+  I64 arg1,arg2;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLUE<<4+WHITE;
@@ -805,16 +805,16 @@ U0 FlatTops()
 	"  Slower(,'-');"
 	"}"
 	);
-  Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R;
+  Fs->win_inhibit|=WIF_SELF_MS_L|WIF_SELF_MS_R;
   Init;
   Fs->draw_it=&DrawIt;
   Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   try {
     while (TRUE)
-      switch (GetMsg(&a1,&a2,
-	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|1<<MSG_IP_R_D_UP)) {
+      switch (GetMsg(&arg1,&arg2,
+	    1<<MSG_KEY_DOWN|1<<MSG_MS_L_UP|1<<MSG_MS_R_UP|1<<MSG_MS_R_D_UP)) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      CleanUp;
 	      Init;
@@ -830,14 +830,14 @@ U0 FlatTops()
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_UP:
-	  SquadronSeté(0,a1,a2);
+	case MSG_MS_L_UP:
+	  SquadronSeté(0,arg1,arg2);
 	  break;
-	case MSG_IP_R_UP:
-	  SquadronLaunch(0,a1,a2);
+	case MSG_MS_R_UP:
+	  SquadronLaunch(0,arg1,arg2);
 	  break;
-	case MSG_IP_R_D_UP:
-	  SquadronReturn(0,a1,a2);
+	case MSG_MS_R_D_UP:
+	  SquadronReturn(0,arg1,arg2);
 	  break;
       }
 nv_done:

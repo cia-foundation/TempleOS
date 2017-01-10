@@ -2,7 +2,9 @@ Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
 {//Very dangerous
   I64 i,j,ext_base,drv_num,offset,cur_type;
   CMasterBoot mbr;
-  CBlkDev *bd=Let2BlkDev(drv_let);
+  CBlkDev *bd;
+  drv_let=Let2Let(drv_let);
+  bd=Let2BlkDev(drv_let);
   drv_num=bd->first_drv_let-'A';
   switch (bd->type) {
     case BDT_ATA:
@@ -17,7 +19,7 @@ Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
 	    if (cur_type==5 || cur_type==15)
 	      j=i;
 	    else {
-	      if (drv_num+'A'==ToUpper(drv_let)) {
+	      if (drv_num+'A'==drv_let) {
 		switch (type) {
 		  case FSt_REDSEA:
 		    mbr.p[i].type=MBR_PT_REDSEA;

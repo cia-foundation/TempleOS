@@ -244,7 +244,7 @@ CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
     res->unit=unit;
     res->base0=base0;
     res->base1=base1;
-    if (BlkDevAdd(res,FALSE,FALSE))
+    if (BlkDevAdd(res,,FALSE,FALSE))
       return res;
   }
   return NULL;

@@ -3,7 +3,7 @@
 U0 BSplineDemo()
 {
   CDC *dc=DCAlias;
-  I64 a1,a2,i=0,msg_code;
+  I64 arg1,arg2,i=0,msg_code;
   CD3I32 c[MAX_PTS];
 
   SettingsPush;
@@ -13,14 +13,14 @@ U0 BSplineDemo()
   "Sel ctrl points with left mouse.  Right when finished.\n";
   DCFill;
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP+1<<MSG_IP_R_UP);
-    if (msg_code==MSG_IP_L_UP) {
-      c[i].x=a1; c[i].y=a2; c[i].z=0;
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP+1<<MSG_MS_R_UP);
+    if (msg_code==MSG_MS_L_UP) {
+      c[i].x=arg1; c[i].y=arg2; c[i].z=0;
       dc->color=GREEN;
-      GrCircle(dc,a1,a2,10);
+      GrCircle(dc,arg1,arg2,10);
       i++;
     }
-  } while (i<MAX_PTS && msg_code!=MSG_IP_R_UP);
+  } while (i<MAX_PTS && msg_code!=MSG_MS_R_UP);
   dc->color=RED;
   Gr2BSpline(dc,c,i,TRUE);
   dc->color=BLUE;

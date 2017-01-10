@@ -26,58 +26,58 @@ U0 OptPass5(CCmpCtrl *cc)
 	  if (Bt(&tmpi->ic_data,i))
 	    ps->ptr--;
       }
-      if (tmpi->a2.type&MDF_STK) {
+      if (tmpi->arg2.type&MDF_STK) {
 	tmpi1=PrsPop(ps);
 	if (tmpi1->ic_code==IC_MOV || tmpi1->ic_code==IC_REG) {
-	  if (tmpi1->ic_flags & ICF_R_TO_INT) {
-	    if (tmpi1->a1.type&MDF_IMM)
-	      tmpi1->a1.disp=tmpi1->a1.disp(F64);
+	  if (tmpi1->ic_flags & ICF_RES_TO_INT) {
+	    if (tmpi1->arg1.type&MDF_IMM)
+	      tmpi1->arg1.disp=tmpi1->arg1.disp(F64);
 	    else
-	      tmpi->ic_flags|=ICF_A2_TO_INT;
-	  } else if (tmpi1->ic_flags&ICF_R_TO_F64) {
-	    if (tmpi1->a1.type&MDF_IMM)
-	      tmpi1->a1.disp(F64)=tmpi1->a1.disp;
+	      tmpi->ic_flags|=ICF_ARG2_TO_INT;
+	  } else if (tmpi1->ic_flags&ICF_RES_TO_F64) {
+	    if (tmpi1->arg1.type&MDF_IMM)
+	      tmpi1->arg1.disp(F64)=tmpi1->arg1.disp;
 	    else
-	      tmpi->ic_flags|=ICF_A2_TO_F64;
+	      tmpi->ic_flags|=ICF_ARG2_TO_F64;
 	  }
-	  tmpi->a2.type=tmpi1->a1.type&MDG_MASK+
-		MinI64(tmpi->a2.type.raw_type,
-		MinI64(tmpi1->r.type.raw_type,tmpi1->a1.type.raw_type));
-	  tmpi->a2.reg=tmpi1->a1.reg;
-	  tmpi->a2.disp=tmpi1->a1.disp;
+	  tmpi->arg2.type=tmpi1->arg1.type&MDG_MASK+
+		MinI64(tmpi->arg2.type.raw_type,
+		MinI64(tmpi1->res.type.raw_type,tmpi1->arg1.type.raw_type));
+	  tmpi->arg2.reg=tmpi1->arg1.reg;
+	  tmpi->arg2.disp=tmpi1->arg1.disp;
 	  tmpi->ic_flags|=tmpi1->ic_flags&ICG_NO_CVT_MASK;
 	  OptSetNOP2(tmpi1);
 	}
       }
 
-      if (tmpi->a1.type&MDF_STK) {
+      if (tmpi->arg1.type&MDF_STK) {
 	tmpi1=PrsPop(ps);
 	if (tmpi1->ic_code==IC_MOV || tmpi1->ic_code==IC_REG) {
-	  if (tmpi1->ic_flags & ICF_R_TO_INT) {
-	    if (tmpi1->a1.type&MDF_IMM)
-	      tmpi1->a1.disp=tmpi1->a1.disp(F64);
+	  if (tmpi1->ic_flags & ICF_RES_TO_INT) {
+	    if (tmpi1->arg1.type&MDF_IMM)
+	      tmpi1->arg1.disp=tmpi1->arg1.disp(F64);
 	    else
-	      tmpi->ic_flags|=ICF_A1_TO_INT;
-	  } else if (tmpi1->ic_flags&ICF_R_TO_F64) {
-	    if (tmpi1->a1.type&MDF_IMM) {
-	      if (tmpi1->a1.type&RTF_UNSIGNED)
-		tmpi1->a1.disp(F64)=tmpi1->a1.disp(U64);
+	      tmpi->ic_flags|=ICF_ARG1_TO_INT;
+	  } else if (tmpi1->ic_flags&ICF_RES_TO_F64) {
+	    if (tmpi1->arg1.type&MDF_IMM) {
+	      if (tmpi1->arg1.type&RTF_UNSIGNED)
+		tmpi1->arg1.disp(F64)=tmpi1->arg1.disp(U64);
 	      else
-		tmpi1->a1.disp(F64)=tmpi1->a1.disp(I64);
+		tmpi1->arg1.disp(F64)=tmpi1->arg1.disp(I64);
 	    } else
-	      tmpi->ic_flags|=ICF_A1_TO_F64;
+	      tmpi->ic_flags|=ICF_ARG1_TO_F64;
 	  }
-	  tmpi->a1.type=tmpi1->a1.type&MDG_MASK+
-		MinI64(tmpi->a1.type.raw_type,
-		MinI64(tmpi1->r.type.raw_type,tmpi1->a1.type.raw_type));
-	  CmpMinTypePointed(tmpi,tmpi1->a1_type_pointed_to);
-	  tmpi->a1.reg=tmpi1->a1.reg;
-	  tmpi->a1.disp=tmpi1->a1.disp;
+	  tmpi->arg1.type=tmpi1->arg1.type&MDG_MASK+
+		MinI64(tmpi->arg1.type.raw_type,
+		MinI64(tmpi1->res.type.raw_type,tmpi1->arg1.type.raw_type));
+	  CmpMinTypePointed(tmpi,tmpi1->arg1_type_pointed_to);
+	  tmpi->arg1.reg=tmpi1->arg1.reg;
+	  tmpi->arg1.disp=tmpi1->arg1.disp;
 	  tmpi->ic_flags|=tmpi1->ic_flags&ICG_NO_CVT_MASK;
 	  OptSetNOP2(tmpi1);
 	}
       }
-      if (tmpi->r.type&MDF_STK &&
+      if (tmpi->res.type&MDF_STK &&
 	    !(tmpi->ic_flags&ICF_RES_NOT_USED))
 	PrsPush(ps,tmpi);
     }

@@ -240,7 +240,7 @@ public Bool Plain(U8 *filename,I64 edf_dof_flags=0)
   return res;
 }
 
-#help_index "DolDoc;Task/Srv/Exe"
+#help_index "DolDoc;Job/Exe;Task/Job/Exe"
 public I64 PopUpEd(U8 *filename,CTask *parent=NULL,CTask **_pu_task=NULL)
 {//Create PopUp win task and edit a doc.
   U8 *st=MStrPrint("Ed(\"%Q\");",filename);

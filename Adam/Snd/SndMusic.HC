@@ -16,7 +16,7 @@ public class CMusicGlbls
   I64	play_note_num;
 
   F64	tM_correction,last_Beat,last_tM;
-} music={NULL,NULL,3,1.0,{0,2,3,5,7,8,10},FALSE,4,4,2.5,0.9,0,0,0,0};
+} music={NULL,NULL,4,1.0,{0,2,3,5,7,8,10},FALSE,4,4,2.5,0.9,0,0,0,0};
 
 #help_index "Snd/Music;Time/Seconds"
 public F64 tM()
@@ -30,7 +30,7 @@ public F64 Beat()
   PUSHFD
   CLI
   if (mp_cnt>1)
-    while (LBts(&sys_semas[SYS_SEMA_TMBEAT],0))
+    while (LBts(&sys_semas[SEMA_TMBEAT],0))
       PAUSE
   cur_tM=tM;
   res=music.last_Beat;
@@ -38,7 +38,7 @@ public F64 Beat()
     res+=(cur_tM-music.last_tM)*music.tempo;
   music.last_tM=cur_tM;
   music.last_Beat=res;
-  LBtr(&sys_semas[SYS_SEMA_TMBEAT],0);
+  LBtr(&sys_semas[SEMA_TMBEAT],0);
   POPFD
   return res;
 }
@@ -99,7 +99,7 @@ public U0 Play(U8 *st,U8 *words=NULL)
 {/* Notes are entered with a capital letter.
 
 Octaves are entered with a digit and
-stay set until changed.
+stay set until changed.  Mid C is octave 4.
 
 Durations are entered with
 'w' whole note
@@ -127,9 +127,9 @@ per second.  It defaults to
 2.5 and gets faster when bigger.
 */
   U8 *word,*last_st;
-  I64 note,i=0,timeout_val,timeout_val2;
+  I64 note,i=0,ona,timeout_val,timeout_val2;
   Bool tie;
-  F64 f,d,on_jiffies,off_jiffies;
+  F64 d,on_jiffies,off_jiffies;
   music.play_note_num=0;
   while (*st) {
     timeout_val=cnts.jiffies;
@@ -158,9 +158,9 @@ per second.  It defaults to
 	note++;
 	st++;
       }
-      f=Note2Freq(note,music.octave);
+      ona=Note2Ona(note,music.octave);
     } else
-      f=0;
+      ona=ONA_REST;
     if (words && (word=LstSub(i++,words)) && StrCmp(word," "))
       "%s",word;
     d=JIFFY_FREQ*music.note_len/music.tempo;
@@ -175,12 +175,12 @@ per second.  It defaults to
     timeout_val2=timeout_val+off_jiffies;
 
     if (!music.mute)
-      Snd(f);
+      Snd(ona);
     SleepUntil(timeout_val);
     music.tM_correction+=on_jiffies-ToI64(on_jiffies);
 
     if (!music.mute)
-      Snd(0);
+      Snd;
     SleepUntil(timeout_val2);
     music.tM_correction+=off_jiffies-ToI64(off_jiffies);
 
@@ -193,7 +193,7 @@ U0 MusicSettingsRst()
   music.play_note_num=0;
   music.stacatto_factor=0.9;
   music.tempo=2.5;
-  music.octave=3;
+  music.octave=4;
   music.note_len=1.0;
   music.meter_top=4;
   music.meter_bottom=4;
@@ -201,11 +201,11 @@ U0 MusicSettingsRst()
   PUSHFD
   CLI
   if (mp_cnt>1)
-    while (LBts(&sys_semas[SYS_SEMA_TMBEAT],0))
+    while (LBts(&sys_semas[SEMA_TMBEAT],0))
       PAUSE
   music.last_tM=tM;
   music.last_Beat=0.0;
-  LBtr(&sys_semas[SYS_SEMA_TMBEAT],0);
+  LBtr(&sys_semas[SEMA_TMBEAT],0);
   POPFD
 }
 

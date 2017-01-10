@@ -151,7 +151,7 @@ public U0 WinZBufUpdate()
   U16 *ptr;
   CTask *task,*task1;
   if (gr.win_z_buf) {
-    LBtr(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
+    LBtr(&sys_semas[SEMA_UPDATE_WIN_Z_BUF],0);
     task1=task=sys_winmgr_task;
     do {
       if (!TaskValidate(task)) break;

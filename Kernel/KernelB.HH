@@ -34,7 +34,7 @@ public _extern _LBEQU Bool LBEqu(
 	U8 *bit_field,I64 bit,Bool val); //Locked Set bit equ to val.
 
 #help_index "Boot"
-_extern SYS_BOOT_BASE U32 sys_boot_base;
+_extern MEM_BOOT_BASE U32 mem_boot_base;
 _extern SYS_BOOT_BLK U32 sys_boot_blk;
 _extern SYS_BOOT_PATCH_TABLE_BASE U32 sys_boot_patch_table_base;
 _extern SYS_BOOT_SRC U32 sys_boot_src;
@@ -176,12 +176,12 @@ public _extern _MEMSET_U32 U32 *MemSetU32(
 	U32 *dst,I64 val,I64 U32cnt); //Set chunk of U32s to value.
 public _extern _MEMSET U8 *MemSetU8(
 	U8 *dst,I64 val,I64 U8cnt); //Set chunk of U8s to value.
-_extern SYS_GIG_PAGES		U8 sys_gig_pages;
 _extern SYS_HEAP_DBG_FLAG	U8 sys_heap_dbg;
 _extern SYS_HEAP_INIT_FLAG	U8 sys_heap_init_flag;
 _extern SYS_HEAP_INIT_VAL	U8 sys_heap_init_val;
 _extern SYS_MEM_INIT_FLAG	U8 sys_mem_init_flag;
 _extern SYS_MEM_INIT_VAL	U8 sys_mem_init_val;
+_extern SYS_STAFF_MODE_FLAG	U8 sys_staff_mode_flag;
 _extern SYS_VAR_INIT_FLAG	U8 sys_var_init_flag;
 _extern SYS_VAR_INIT_VAL	U8 sys_var_init_val;
 
@@ -190,8 +190,10 @@ public _extern SYS_CODE_BP CBlkPool *sys_code_bp; //System's BlkPool for code.
 public _extern SYS_DATA_BP CBlkPool *sys_data_bp; //System's BlkPool for data.
 
 #help_index "Memory/Info"
-_extern SYS_HEAP_BASE	U8 *sys_heap_base;
-_extern SYS_HEAP_LIMIT	U8 *sys_heap_limit;
+_extern MEM_HEAP_BASE	U8 *mem_heap_base;
+_extern MEM_HEAP_LIMIT	U8 *mem_heap_limit;
+_extern MEM_MAPPED_SPACE U8 *mem_mapped_space;
+_extern MEM_PHYSICAL_SPACE U8 *mem_physical_space;
 
 #help_index "Messages;Windows"
 public _extern SYS_FOCUS_TASK CTask *sys_focus_task; //Current focus task.
@@ -208,21 +210,25 @@ public _extern SYS_PROGRESS1_DESC
 	U8 progress1_desc[PROGRESS_DESC_LEN]; //Progress 1 desc.
 public _extern SYS_PROGRESS1_MAX I64 progress1_max; //Progress 1 max.
 public _extern SYS_PROGRESS1_T0 F64 progress1_t0; //Progress 1 start time.
+public _extern SYS_PROGRESS1_TF F64 progress1_tf; //Progress 1 end time.
 public _extern SYS_PROGRESS2 I64 progress2; //Current progress 2.
 public _extern SYS_PROGRESS2_DESC
 	U8  progress2_desc[PROGRESS_DESC_LEN]; //Progress 2 desc.
 public _extern SYS_PROGRESS2_MAX I64 progress2_max; //Progress 2 max.
 public _extern SYS_PROGRESS2_T0 F64 progress2_t0; //Progress 2 start time.
+public _extern SYS_PROGRESS2_TF F64 progress2_tf; //Progress 2 end time.
 public _extern SYS_PROGRESS3 I64 progress3; //Current progress 3.
 public _extern SYS_PROGRESS3_DESC
 	U8  progress3_desc[PROGRESS_DESC_LEN]; //Progress 3 desc.
 public _extern SYS_PROGRESS3_MAX I64 progress3_max; //Progress 3 max.
 public _extern SYS_PROGRESS3_T0 F64 progress3_t0; //Progress 3 start time.
+public _extern SYS_PROGRESS3_TF F64 progress3_tf; //Progress 3 end time.
 public _extern SYS_PROGRESS4 I64 progress4; //Current progress 4.
 public _extern SYS_PROGRESS4_DESC
 	U8  progress4_desc[PROGRESS_DESC_LEN]; //Progress 4 desc.
 public _extern SYS_PROGRESS4_MAX I64 progress4_max; //Progress 4 max.
 public _extern SYS_PROGRESS4_T0 F64 progress4_t0; //Progress 4 start time.
+public _extern SYS_PROGRESS4_TF F64 progress4_tf; //Progress 4 end time.
 public _extern SYS_PROGRESSES
 	CProgress sys_progresses[NUM_PROGRESS_BARS]; //All progress bars.
 
@@ -232,7 +238,7 @@ public _extern SYS_CPU_STRUCTS CCPU *cpu_structs; //$LK,"Gs",A="MN:Gs"$ points t
 public _extern SYS_MP_CNT I64 mp_cnt; //Count of cores
 _extern SYS_MP_CNT_INITIAL I64 mp_cnt_initial; //only used during $LK,"Core0StartMP",A="MN:Core0StartMP"$
 _extern SYS_MP_CNT_LOCK I64 mp_cnt_lock;
-_extern SYS_SEMAS CSema sys_semas[NUM_SYS_SEMAS];
+_extern SYS_SEMAS CSema sys_semas[SEMA_NUM_SEMAS];
 
 #help_index "MultiCore;Processor"
 public _intern IC_GS CCPU *Gs(); //GS points to current $LK,"CCPU",A="MN:CCPU"$.
@@ -265,16 +271,17 @@ public _extern _XCHG_I64 I64 XchgI64(I64 *dst,I64 d); //eXchange I64s.
 public _extern _XCHG_U16 U16 XchgU16(U16 *dst,U16 d); //eXchange U16s.
 public _extern _XCHG_U32 U32 XchgU32(U32 *dst,U32 d); //eXchange U32s.
 public _extern _XCHG_U8  U8 XchgU8(U8 *dst,U8 d); //eXchange U8s.
-public _extern SYS_CACHE_LINE_WIDTH
-	I64 sys_cache_line_width; //CPU's Cache line width.
 _extern SYS_GDT CGDT sys_gdt;
 
 #help_index "Processor/Cache;Memory/Cache"
 public _intern IC_CLFLUSH U0 CLFlush(U8 *a); //Flush cache line inst.
+public _extern SYS_CACHE_LINE_WIDTH
+	I64 sys_cache_line_width; //CPU's Cache line width.
 
 #help_index "Processor/Page Tables;Memory/Page Tables"
 public _intern IC_INVLPG
 	U0 InvlPg(U8 *a); //Invalidate page at addr inst.
+public _extern MEM_PAGE_SIZE U64 mem_page_size;
 
 #help_index "Task;Processor"
 public _intern IC_FS CTask *Fs(); //FS seg reg points to the current $LK,"CTask",A="MN:CTask"$.

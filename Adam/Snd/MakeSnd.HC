@@ -10,7 +10,7 @@ class CSndWaveCtrl
 
 public U0 SndTaskEndCB()
 {//Will turn-off snd when a task gets killed.
-  Snd(0);
+  Snd;
   Exit;
 }
 

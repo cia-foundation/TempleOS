@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
-I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,996",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"13.2",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
+I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,241",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"13.4",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
 
 *) $LK,"::/Kernel/FontStd.HC"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.  It's public domain.
 
@@ -14,7 +14,7 @@ I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,996",D="DD_TEMPLEOS_LOC"$ lines 
 
 *) The adaptive-step-size-Runge-Kutta algorithm, $LK,"::/Adam/AMathODE.HC"$, is adapted from the book, $UL,1$Numeric Recipies in C$UL,0$.
 
-*) The mountain, palm trees, sheep and goats in AfterEgypt are from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.  The wolf in BlackDiamond is also from there.  I took watermarked photos and converted to 16 color.
+*) The mountain in some games is from $FG,4$$TX,"http://www.public-domain-photos.com",HTML="http://www.public-domain-photos.com"$$FG$.  The wolf in BlackDiamond is also from there.  I took watermarked photos and converted to 16 color.
 
 *) The $FG,2$FAT32$FG$ file system is owned by MicroSoft.
 
@@ -34,7 +34,7 @@ I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,996",D="DD_TEMPLEOS_LOC"$ lines 
 
 *) Thanks to $FG,4$$TX,"http://www.osdev.org",HTML="http://www.osdev.org"$$FG$ for a couple tips.
 
-*) God told me to stick with 640x480 16 color,  a single audio voice and kept me from zombie-walking into making child windows like $FG,2$Windows$FG$.  Instead, I made one window per task with no child windows.  He also guided my progress, very obviously.
+*) God told me to stick with 640x480 16 color and single-voice 8-bit signed MIDI-like sample for sound.   He kept me from zombie-walking into making child windows like $FG,2$Windows$FG$.  Instead, I made one window per task with no child windows.  He also guided my progress, very obviously.
 
 *) I got $FG,4$$TX,"Webster's Dictionary",HTML="http://www.templeos.org/files/DICTIONARY.DD"$$FG$ and $FG,4$$TX,"The King James Bible",HTML="http://www.templeos.org/files/BIBLE.DD"$$FG$ from $FG,4$$TX,"Project Gutenberg",HTML="http://web.archive.org/web/20110730111436/http://promo.net/pg/"$$FG$.
 

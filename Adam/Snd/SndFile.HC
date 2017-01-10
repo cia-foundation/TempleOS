@@ -67,7 +67,8 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
     d1=d->next;
     dt=d1->time-d->time;
     cnt2=dt*SNDFILE_SAMPLE_RATE;
-    SndWaveAddBuf(swc,&s->body[k],cnt2,d->freq,waveform,normalized_vol);
+    SndWaveAddBuf(swc,&s->body[k],cnt2,
+	  Ona2Freq(d->ona),waveform,normalized_vol);
     k+=cnt2;
     QueRem(d);
     Free(d);

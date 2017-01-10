@@ -1,0 +1,16 @@
+$WW,1$$LK,"ms.pos.x",A="MN:ms"$ and $LK,"ms.pos.y",A="MN:ms"$ can be used to access the x and y coordinates of the mouse.  They are relative to the scrn, not window.  These can be used if you don't want to use msg passing.  $LK,"ms.pos.z",A="MN:ms"$ is the wheel.
+
+$LK,"ms.pos_text.x",A="MN:CMsStateGlbls"$ and $LK,"ms.pos_text.y",A="MN:CMsStateGlbls"$ are the text column and row.  See $LK,"::/Demo/Games/Maze.HC"$.
+
+See $LK,"CMsStateGlbls",A="MN:CMsStateGlbls"$ and $LK,"CMsHardStateGlbls",A="MN:CMsHardStateGlbls"$.
+
+The $FG,2$hard$FG$ designation, as in $FG,2$ms_hard$FG$, represents hardware layer items before the application of an abstraction layer.
+
+$HL,1$//****
+ms_hard.pos.x=ms_hard.prescale.x*ms_hard.scale.x*ms_grid.x_speed;
+ms.presnap.x=ToI64(ms.scale.x*ms_hard.pos.x)+ms.offset.x;
+if (ms_grid.snap)
+  ms.pos.x=Trunc(ms.presnap.x/ms_grid.x)*ms_grid.x+ms_grid.x_offset;
+else
+  ms.pos.x=ms.presnap.x;
+//****$HL,0$

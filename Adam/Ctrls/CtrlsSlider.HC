@@ -176,7 +176,7 @@ CCtrl *SliderNew()
 {
   CCtrl *c=CAlloc(sizeof(CCtrl));
   c->win_task=Fs;
-  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
+  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_MS;
   c->type=CTRLT_GENERIC;
 ");
   if (*m->glbl_name)

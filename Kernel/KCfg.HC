@@ -1,20 +1,21 @@
 //This is run in a $LK,"#exe",A="FF:::/Kernel/Kernel.PRJ,KCfg"${}.
 
-U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0"
+U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0StaffMode\0"
 "HomeDir\0NoMP\0TextMode\0DontProbe\0AutoMountIDE\0BootRescueDrv\0Help\0";
 
 #define CFG_MEM_INIT		0
 #define CFG_HEAP_INIT		1
 #define CFG_VAR_INIT		2
-#define CFG_HOME_DIR		3
-#define CFG_NO_MP		4
-#define CFG_TEXT_MODE		5
-#define CFG_DONT_PROBE		6
-#define CFG_AUTO_MOUNT_IDE	7
-#define CFG_BOOT_RESCUE_DRV	8
-#define CFG_NUM_OPTIONS		9
+#define CFG_STAFF_MODE		3
+#define CFG_HOME_DIR		4
+#define CFG_NO_MP		5
+#define CFG_TEXT_MODE		6
+#define CFG_DONT_PROBE		7
+#define CFG_AUTO_MOUNT_IDE	8
+#define CFG_BOOT_RESCUE_DRV	9
+#define CFG_NUM_OPTIONS		10
 
-#define CFG_HELP		9
+#define CFG_HELP		10
 
 class CKernelCfg
 {
@@ -35,7 +36,7 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
 	"define shortly, enter the drive letter\n"
 	"of the drive with the account directory.\n"
 	"\n($$PURPLE$$<ENTER>$$FG$$ for cur drv) Boot Drv:";
-  ch=ToUpper(GetChar);
+  ch=Let2Let(GetChar);
   if ('A'<=ch<='Z')
     c->boot_drv_let=ch;
   else
@@ -109,7 +110,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	  case CFG_AUTO_MOUNT_IDE:
 	    if (state) {
 	      "First HD Drive Let:";
-	      c->auto_mount_ide_hd_let=ToUpper(GetChar);
+	      c->auto_mount_ide_hd_let=Let2Let(GetChar);
 	      if (!('A'<=c->auto_mount_ide_hd_let<='Z'))
 		c->auto_mount_ide_hd_let=0;
 	      '\n';
@@ -119,7 +120,7 @@ U0 KernelCfgOptions(CKernelCfg *c)
 		"First HD Drive:%C\n",'C';
 
 	      "First CD Drive Let:";
-	      c->auto_mount_ide_cd_let=ToUpper(GetChar);
+	      c->auto_mount_ide_cd_let=Let2Let(GetChar);
 	      if (!('A'<=c->auto_mount_ide_cd_let<='Z'))
 		c->auto_mount_ide_cd_let=0;
 	      '\n';

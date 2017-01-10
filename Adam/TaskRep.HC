@@ -23,7 +23,7 @@ public U0 TaskRep()
   CLI
   for (i=0;i<mp_cnt;i++) {
     c=&cpu_structs[i];
-    "$$PURPLE$$CPU:%d$$FG$$\n",i;
+    "$$PURPLE$$CPU%02X$$FG$$\n",i;
     TaskRepTask(c->seth_task,2);
   }
   POPFD

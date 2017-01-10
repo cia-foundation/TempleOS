@@ -56,11 +56,11 @@ CMenuEntry *MenuNewSub(CCmpCtrl *cc,CTask *task)
       if (cc->token==',')
 	Lex(cc);
       if (cc->token!=',' && cc->token!=')')
-	tmpme->a1=LexExpressionI64(cc);
+	tmpme->arg1=LexExpressionI64(cc);
       if (cc->token==',')
 	Lex(cc);
       if (cc->token!=',' && cc->token!=')')
-	tmpme->a2=LexExpressionI64(cc);
+	tmpme->arg2=LexExpressionI64(cc);
       if (cc->token!=')')
 	LexExcept(cc,"Missing ')' at ");
       if (Lex(cc)!=';')
@@ -177,7 +177,7 @@ U0 DrawMenu(CDC *dc)
   CMenuEntry *tmpme,*tmpse,*cur_submenu=NULL;
   U8 *st=NULL;
   CTask *task=MenuTask;
-  I64 i,w,x0,y0,x1=ip.pos.x,y1=ip.pos.y;
+  I64 i,w,x0,y0,x1=ms.pos.x,y1=ms.pos.y;
   if (!TaskValidate(task) || !(m=task->cur_menu)) {
     sys_cur_submenu_entry=NULL;
     return;
@@ -206,9 +206,9 @@ U0 DrawMenu(CDC *dc)
 	if (y0<=y1<y0+FONT_HEIGHT) {
 	  if (tmpse->msg_code==MSG_KEY_DOWN||
 		tmpse->msg_code==MSG_KEY_DOWN_UP) {
-	    if (!tmpse->a2)
-	      tmpse->a2=Char2ScanCode(tmpse->a1);
-	    st=ScanCode2KeyName(tmpse->a2);
+	    if (!tmpse->arg2)
+	      tmpse->arg2=Char2ScanCode(tmpse->arg1);
+	    st=ScanCode2KeyName(tmpse->arg2);
 	  }
 	  sys_cur_submenu_entry=cur_submenu=tmpse;
 	  dc->color=i&15;

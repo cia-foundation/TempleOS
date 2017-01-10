@@ -30,7 +30,7 @@ public U0 CPURep(Bool full=FALSE)
   CCPURep cr;
 
   if (!full)
-    "%d Cores %6h?nHz\n",mp_cnt,ToF64(cnts.time_stamp_freq);
+    "%03X Cores %6h?nHz\n",mp_cnt,ToF64(cnts.time_stamp_freq);
   else {
     cr.swaps=CAlloc(sizeof(I64)*mp_cnt);
     cr.cycles=CAlloc(sizeof(I64)*mp_cnt);
@@ -47,22 +47,22 @@ public U0 CPURep(Bool full=FALSE)
       Yield;
     tf=tS;
 
-    "\nCPU: %d Cores %6h?nHz\n",mp_cnt,ToF64(cnts.time_stamp_freq);
+    "\n%03X Cores %6h?nHz\n",mp_cnt,ToF64(cnts.time_stamp_freq);
     "\n         Context\n"
-	  "Core     Swaps/s         Cycles\n"
-	  "---- ------------- -----------------\n";
+	  "CPU     Swaps/s         Cycles\n"
+	  "--- ------------- -----------------\n";
     total_swaps=0;
     total_cycles=0;
     for (i=0;i<mp_cnt;i++) {
-      "%4d %13,d %17,d\n",i,
+      " %02X %13,d %17,d\n",i,
 	    ToI64(cr.swaps[i]/(tf-t0)),ToI64(cr.cycles[i]/(tf-t0));
       total_swaps+=cr.swaps[i];
       total_cycles+=cr.cycles[i];
     }
-    "---- ------------- -----------------\n";
-    "%4d %13,d %17,d\n",i,
+    "--- ------------- -----------------\n";
+    "%03X %13,d %17,d\n",i,
 	  ToI64(total_swaps/(tf-t0)),ToI64(total_cycles/(tf-t0));
-    " Avg %13,d %17,d\n\n",
+    "Avg %13,d %17,d\n\n",
 	  ToI64(total_swaps/(tf-t0)/i),ToI64(total_cycles/(tf-t0)/i);
     "Avg Cycles/Swap: %12.6f\n",ToF64(total_cycles)/total_swaps;
     "Avg Time/Swap  : %12.6fns\n\n",(tf-t0)*1000000000.0*i/total_swaps;

@@ -1,5 +1,5 @@
 U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,CArrayDim *tmpad,
-	U8 *data_addr_ip,U8 **_base,Bool data_heap,I64 pass)
+	U8 *data_addr_rip,U8 **_base,Bool data_heap,I64 pass)
 {
   U8 *dst=*_dst,*machine_code;
   I64 i,j,r,old_flags,type,size;
@@ -19,7 +19,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,CArrayDim *tmpad,
     Lex(cc);
     while (tmpm) {
       PrsVarInit2(cc,&dst,tmpm->member_class,&tmpm->dim,
-	    data_addr_ip,_base,data_heap,pass);
+	    data_addr_rip,_base,data_heap,pass);
       if (cc->token==',')
 	Lex(cc);
       tmpm=tmpm->next;
@@ -43,8 +43,8 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,CArrayDim *tmpad,
 	tmpa->next=aotc->abss;
 	tmpa->type=AAT_ADD_U64;
 	aotc->abss=tmpa;
-	tmpa->ip=data_addr_ip+dst-*_base;
-	*dst(I64 *)=aotc->ip;
+	tmpa->rip=data_addr_rip+dst-*_base;
+	*dst(I64 *)=aotc->rip;
 	for (j=0;j<i;j++)
 	  AOTStoreCodeU8(cc,machine_code[j]);
       }
@@ -65,7 +65,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,CArrayDim *tmpad,
 	  Lex(cc);
 	  COCPush(cc);
 	  COCInit(cc);
-	  ICAdd(cc,IC_ABS_ADDR,data_addr_ip,tmpc+1);
+	  ICAdd(cc,IC_ABS_ADDR,data_addr_rip,tmpc+1);
 	  ICAdd(cc,IC_IMM_I64,dst-*_base,tmpc+1);
 	  ICAdd(cc,IC_ADD,0,tmpc+1);
 	  if (!PrsExpression(cc,NULL,TRUE))
@@ -81,7 +81,7 @@ U0 PrsVarInit(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,CArrayDim *tmpad,
 	  if (machine_code=COCCompile(cc,&size,NULL,NULL)) {
 	    tmpie=CAlloc(sizeof(CAOTImportExport));
 	    tmpie->type=IET_MAIN;
-	    tmpie->ip=cc->aotc->ip;
+	    tmpie->rip=cc->aotc->rip;
 	    QueIns(tmpie,cc->aot->last_ie);
 	    for (i=0;i<size;i++)
 	      AOTStoreCodeU8(cc,machine_code[i]);
@@ -121,7 +121,7 @@ class CVI2
 };
 
 U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,
-	CArrayDim *tmpad,U8 *data_addr_ip,U8 **_base,Bool data_heap,I64 pass)
+	CArrayDim *tmpad,U8 *data_addr_rip,U8 **_base,Bool data_heap,I64 pass)
 {
   I64 i,j,cnt;
   U8 *st,*_b;
@@ -162,7 +162,7 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,
 	while (cc->token!='}') {
 	  tmpvi=MAlloc(offset(CVI2.base)+tmpad1->total_cnt*tmpc->size);
 	  _b=&tmpvi->base;
-	  PrsVarInit2(cc,&_b,tmpc,tmpad1,data_addr_ip,_base,data_heap,pass);
+	  PrsVarInit2(cc,&_b,tmpc,tmpad1,data_addr_rip,_base,data_heap,pass);
 	  QueIns(tmpvi,head.last);
 	  if (cc->token==',')
 	    Lex(cc);
@@ -189,7 +189,7 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,
 	*_dst=_b;
       } else {
 	for (i=0;i<tmpad1->cnt;i++) {
-	  PrsVarInit2(cc,_dst,tmpc,tmpad1,data_addr_ip,_base,data_heap,pass);
+	  PrsVarInit2(cc,_dst,tmpc,tmpad1,data_addr_rip,_base,data_heap,pass);
 	  if (tmpad1->cnt>1 && cc->token==',')
 	    Lex(cc);
 	}
@@ -198,7 +198,7 @@ U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,
       }
     }
   } else {
-    PrsVarInit(cc,_dst,tmpc,tmpad1,data_addr_ip,_base,data_heap,pass);
+    PrsVarInit(cc,_dst,tmpc,tmpad1,data_addr_rip,_base,data_heap,pass);
     LexPush(cc);
   }
 }
@@ -207,7 +207,7 @@ U0 PrsGlblInit(CCmpCtrl *cc,CHashGlblVar *tmpg,I64 pass)
 {
   U8 *dst=tmpg->data_addr;
   PrsVarInit2(cc,&dst,tmpg->var_class,&tmpg->dim,
-	tmpg->data_addr_ip,&tmpg->data_addr,
+	tmpg->data_addr_rip,&tmpg->data_addr,
 	Bt(&cc->opts,OPTf_GLBLS_ON_DATA_HEAP)||
 	Bt(&cc->flags,CCf_AOT_COMPILE),pass);
 }
@@ -223,7 +223,7 @@ U0 PrsStaticInit(CCmpCtrl *cc,CMemberLst *tmpm,I64 pass)
     COCPush(cc);
     COCInit(cc);
   }
-  PrsVarInit2(cc,&dst,tmpc,&tmpm->dim,tmpm->static_data_ip,
+  PrsVarInit2(cc,&dst,tmpc,&tmpm->dim,tmpm->static_data_rip,
 	&tmpm->static_data,Bt(&cc->flags,CCf_AOT_COMPILE),pass);
   if (cc->flags&CCF_AOT_COMPILE && pass==2) {
     if (cc->coc.coc_head.next!=&cc->coc.coc_head) {
@@ -232,7 +232,7 @@ U0 PrsStaticInit(CCmpCtrl *cc,CMemberLst *tmpm,I64 pass)
 	if (pass==2) {
 	  tmpie=CAlloc(sizeof(CAOTImportExport));
 	  tmpie->type=IET_MAIN;
-	  tmpie->ip=cc->aotc->ip;
+	  tmpie->rip=cc->aotc->rip;
 	  QueIns(tmpie,cc->aot->last_ie);
 	  for (i=0;i<size;i++)
 	    AOTStoreCodeU8(cc,machine_code[i]);
@@ -424,28 +424,28 @@ U0 PrsVarLst(CCmpCtrl *cc,CHashClass *tmpc,I64 mode,I64 union_base=0)
   Bool undef_array_size,first;
   cc->flags|=CCF_DONT_MAKE_RES;
   if (mode.u8[1]==PRS1B_CLASS)
-    cc->flags|=CCF_CLASS_IP;
+    cc->flags|=CCF_CLASS_DOL_OFFSET;
   if ((mode.u8[1]!=PRS1B_LOCAL_VAR && mode.u8[1]!=PRS1B_STATIC_LOCAL_VAR ||
 	mode&PRSF_UNION) && (cc->token=='(' || cc->token=='{'))
     Lex(cc);
   while (TRUE) {
+    if (mode&PRSF_UNION)
+      cc->class_dol_offset=union_base;
+    else
+      cc->class_dol_offset=tmpc->size;
     while (cc->token==';')
       Lex(cc);
-    if (mode&PRSF_UNION)
-      cc->class_ip=union_base;
-    else
-      cc->class_ip=tmpc->size;
     while (cc->token=='$$') {
       if (Lex(cc)!='=') //skip $$
 	LexExcept(cc,"Expecting '=' at ");
       Lex(cc); //skip =
-      cc->class_ip=LexExpression(cc);
-      if (-cc->class_ip>tmpc->neg_offset)
-	tmpc->neg_offset=-cc->class_ip;
+      cc->class_dol_offset=LexExpression(cc);
+      if (-cc->class_dol_offset>tmpc->neg_offset)
+	tmpc->neg_offset=-cc->class_dol_offset;
       if (mode&PRSF_UNION)
-	union_base=cc->class_ip;
+	union_base=cc->class_dol_offset;
       else
-	tmpc->size=cc->class_ip;
+	tmpc->size=cc->class_dol_offset;
       if (cc->token!=';')
 	LexExcept(cc,"Missing ';' at");
       Lex(cc); //skip ;
@@ -553,15 +553,10 @@ pvl_restart3:
 	  else
 	    tmpm->static_data=MAlloc(k,Fs->code_heap);
 	  if (cc->flags&CCF_AOT_COMPILE)	{
-	    tmpm->static_data_ip=cc->aotc->ip;
+	    tmpm->static_data_rip=cc->aotc->rip;
 	    k>>=3;
-	    if (sys_var_init_flag) {
-	      k<<=3;
-	      while (k--)
-		AOTStoreCodeU8(cc,sys_var_init_val);
-	    } else
-	      while (k--)
-		AOTStoreCodeU64(cc,0);
+	    while (k--)
+	      AOTStoreCodeU64(cc,0);
 	  } else
 	    if (sys_var_init_flag)
 	      MemSet(tmpm->static_data,sys_var_init_val,k);
@@ -579,13 +574,8 @@ pvl_restart3:
 	      k=(i+7)&~7;
 	      if (cc->flags&CCF_AOT_COMPILE)	{
 		k>>=3;
-		if (sys_var_init_flag) {
-		  k<<=3;
-		  while (k--)
-		    AOTStoreCodeU8(cc,sys_var_init_val);
-		} else
-		  while (k--)
-		    AOTStoreCodeU64(cc,0);
+		while (k--)
+		  AOTStoreCodeU64(cc,0);
 	      } else
 		if (sys_var_init_flag)
 		  MemSet(tmpm->static_data,sys_var_init_val,k);
@@ -597,7 +587,7 @@ pvl_restart3:
 	    LexPopNoRestore(cc);
 	    if (cc->flags&CCF_AOT_COMPILE)
 	      for (k=0;k<i;k++)
-		AOTStoreCodeU8At(cc,tmpm->static_data_ip+k,
+		AOTStoreCodeU8At(cc,tmpm->static_data_rip+k,
 		      tmpm->static_data[k]);
 	    tmpm->use_cnt=0;
 	    cc->flags|=CCF_DONT_MAKE_RES;
@@ -729,6 +719,6 @@ pvl_restart3:
     }
   }
 pvl_done:
-  cc->flags=cc->flags&~(CCF_CLASS_IP|CCF_DONT_MAKE_RES)|
-	old_flags& (CCF_CLASS_IP|CCF_DONT_MAKE_RES);
+  cc->flags=cc->flags&~(CCF_CLASS_DOL_OFFSET|CCF_DONT_MAKE_RES)|
+	old_flags&(CCF_CLASS_DOL_OFFSET|CCF_DONT_MAKE_RES);
 }

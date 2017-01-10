@@ -67,68 +67,68 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  break;
 	case IS_2_ARG:
 	  tmpi2=PrsPop(ps);
-	  if (tmpi2->ic_flags&ICF_R_TO_F64)
+	  if (tmpi2->ic_flags&ICF_RES_TO_F64)
 	    tmpc2=cmp.internal_types[RT_F64];
-	  else if (tmpi2->ic_flags & ICF_R_TO_INT)
+	  else if (tmpi2->ic_flags & ICF_RES_TO_INT)
 	    tmpc2=cmp.internal_types[RT_I64];
 	  else
-	    tmpc2=tmpi->t.a2c;
-	  tmpi->a2.type=MDF_STK+CmpRawType(tmpc2);
-	  tmpi->ic_flags|=ICF_A2_WAS_STK;
+	    tmpc2=tmpi->t.arg2_class;
+	  tmpi->arg2.type=MDF_STK+CmpRawType(tmpc2);
+	  tmpi->ic_flags|=ICF_ARG2_WAS_STK;
 	case IS_1_ARG:
 	  tmpi1=PrsPop(ps);
-	  if (tmpi1->ic_flags&ICF_R_TO_F64)
+	  if (tmpi1->ic_flags&ICF_RES_TO_F64)
 	    tmpc1=cmp.internal_types[RT_F64];
-	  else if (tmpi1->ic_flags & ICF_R_TO_INT)
+	  else if (tmpi1->ic_flags & ICF_RES_TO_INT)
 	    tmpc1=cmp.internal_types[RT_I64];
 	  else
-	    tmpc1=tmpi->t.a1c;
-	  tmpi->a1.type=MDF_STK+CmpRawType(tmpc1);
-	  tmpi->a1_type_pointed_to=CmpRawTypePointed(tmpc1);
-	  tmpi->ic_flags|=ICF_A1_WAS_STK;
+	    tmpc1=tmpi->t.arg1_class;
+	  tmpi->arg1.type=MDF_STK+CmpRawType(tmpc1);
+	  tmpi->arg1_type_pointed_to=CmpRawTypePointed(tmpc1);
+	  tmpi->ic_flags|=ICF_ARG1_WAS_STK;
 	  break;
 	case IS_0_ARG: //nobound switch
 	  break;
       }
       if (intermediate_code_table[code].res_cnt) {
-	tmpi->r.type=MDF_STK+CmpRawType(tmpc);
-	tmpi->ic_flags|=ICF_R_WAS_STK;
+	tmpi->res.type=MDF_STK+CmpRawType(tmpc);
+	tmpi->ic_flags|=ICF_RES_WAS_STK;
 	PrsPush(ps,tmpi);
       }
       switch [code] {
 	case IC_IMM_F64:
-	  tmpi->ic_flags&=~ICF_R_TO_F64;
-	  if (tmpi->ic_flags&ICF_R_TO_INT) {
+	  tmpi->ic_flags&=~ICF_RES_TO_F64;
+	  if (tmpi->ic_flags&ICF_RES_TO_INT) {
 	    tmpi->ic_data=ToI64(tmpi->ic_data(F64));
-	    tmpi->ic_flags&=~ICF_R_TO_INT;
+	    tmpi->ic_flags&=~ICF_RES_TO_INT;
 	    tmpi->ic_code=IC_IMM_I64;
 	  }
 	  break;
 	case IC_IMM_I64:
-	  tmpi->ic_flags&=~ICF_R_TO_INT;
-	  if (tmpi->ic_flags&ICF_R_TO_F64) {
+	  tmpi->ic_flags&=~ICF_RES_TO_INT;
+	  if (tmpi->ic_flags&ICF_RES_TO_F64) {
 	    tmpi->ic_data(F64)=ToF64(tmpi->ic_data);
-	    tmpi->ic_flags&=~ICF_R_TO_F64;
+	    tmpi->ic_flags&=~ICF_RES_TO_F64;
 	    tmpi->ic_code=IC_IMM_F64;
 	  }
 	  break;
 	case IC_RBP:
 	  tmpi->ic_code=IC_REG;
-	  tmpi->a1.reg=REG_RBP;
+	  tmpi->arg1.reg=REG_RBP;
 	  break;
 	case IC_DEREF:
-	  tmpi->a1_type_pointed_to=tmpi->r.type.raw_type;
+	  tmpi->arg1_type_pointed_to=tmpi->res.type.raw_type;
 	  if (tmpi1->ic_code==IC_LEA) {
 	    tmpi->ic_flags|=tmpi1->ic_flags;
-	    tmpi->a1.reg=tmpi1->a1.reg;
-	    tmpi->a1.disp=tmpi1->a1.disp;
-	    tmpi->a1.type=MDF_DISP+tmpi->r.type.raw_type;
-	    tmpi->a1_type_pointed_to=CmpRawTypePointed(tmpc);
+	    tmpi->arg1.reg=tmpi1->arg1.reg;
+	    tmpi->arg1.disp=tmpi1->arg1.disp;
+	    tmpi->arg1.type=MDF_DISP+tmpi->res.type.raw_type;
+	    tmpi->arg1_type_pointed_to=CmpRawTypePointed(tmpc);
 	    tmpi->ic_code=IC_MOV;
 	    OptFree(tmpi1);
-	    if (tmpi->a1.reg==REG_RBP)
+	    if (tmpi->arg1.reg==REG_RBP)
 	      for (i=0;i<member_cnt;i++)
-		if (mv[i].offset_start==tmpi->a1.disp) {
+		if (mv[i].offset_start==tmpi->arg1.disp) {
 		  mv[i].lea_balance--;
 		  mv[i].score++;
 		  break;
@@ -136,10 +136,10 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  } else if (tmpil1->ic_code==IC_ADD_CONST) {
 	    if (tmpil2->ic_code==IC_REG) {
 	      tmpi->ic_flags|=tmpil2->ic_flags|tmpil1->ic_flags;
-	      tmpi->a1.reg=tmpil2->a1.reg;
-	      tmpi->a1.disp=tmpi->ic_data;
-	      tmpi->a1.type=MDF_DISP+tmpi->r.type.raw_type;
-	      tmpi->a1_type_pointed_to=CmpRawTypePointed(tmpc);
+	      tmpi->arg1.reg=tmpil2->arg1.reg;
+	      tmpi->arg1.disp=tmpi->ic_data;
+	      tmpi->arg1.type=MDF_DISP+tmpi->res.type.raw_type;
+	      tmpi->arg1_type_pointed_to=CmpRawTypePointed(tmpc);
 	      tmpi->ic_code=IC_MOV;
 	      OptFree(tmpil2);
 	      OptFree(tmpil1);
@@ -150,18 +150,18 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	case IC__MM:
 	case IC_PP_:
 	case IC_MM_:
-	  CmpMinTypePointed(tmpi,CmpRawTypePointed(tmpi->t.a1c));
+	  CmpMinTypePointed(tmpi,CmpRawTypePointed(tmpi->t.arg1_class));
 	case IC_DEREF_PP:
 	case IC_DEREF_MM:
-	  if (tmpi1->ic_code==IC_LEA && tmpi1->a1.type&MDF_DISP &&
-		tmpi1->a1.reg==REG_RBP)
+	  if (tmpi1->ic_code==IC_LEA && tmpi1->arg1.type&MDF_DISP &&
+		tmpi1->arg1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
-	      if (mv[i].offset_start==tmpi1->a1.disp) {
+	      if (mv[i].offset_start==tmpi1->arg1.disp) {
 		mv[i].lea_balance--;
 		mv[i].score++;
 		break;
 	      }
-	  tmpi->a1_type_pointed_to=tmpi->r.type.raw_type;
+	  tmpi->arg1_type_pointed_to=tmpi->res.type.raw_type;
 	  break;
 	case IC_MUL:
 	case IC_DIV:
@@ -177,19 +177,19 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  }
 	  if (OptFixupBinaryOp2(&tmpi1,&tmpi2)) {
 	    tmpi->ic_flags|=tmpi1->ic_flags;
-	    if (tmpi->t.a1t!=tmpi2)
-	      tmpi->t.a1c=tmpi->t.a2c;
+	    if (tmpi->t.arg1_tree!=tmpi2)
+	      tmpi->t.arg1_class=tmpi->t.arg2_class;
 	    tmpi->ic_data=tmpi1->ic_data;
 	    tmpi->ic_code=IC_ADD_CONST;
-	    tmpi->a1_type_pointed_to=tmpi->r.type.raw_type;
-	    tmpi->a2.type=MDF_NULL;
+	    tmpi->arg1_type_pointed_to=tmpi->res.type.raw_type;
+	    tmpi->arg2.type=MDF_NULL;
 	    OptFree(tmpi1);
-	    if (tmpil2->ic_code==IC_REG && tmpil2->a1.reg==REG_RBP) {
+	    if (tmpil2->ic_code==IC_REG && tmpil2->arg1.reg==REG_RBP) {
 	      tmpi->ic_flags|=tmpil2->ic_flags;
 	      tmpi->ic_code=IC_LEA;
-	      tmpi->a1.reg=REG_RBP;
-	      tmpi->a1.type=MDF_DISP+tmpi->a1.type.raw_type;
-	      tmpi->a1.disp=tmpi->ic_data;
+	      tmpi->arg1.reg=REG_RBP;
+	      tmpi->arg1.type=MDF_DISP+tmpi->arg1.type.raw_type;
+	      tmpi->arg1.disp=tmpi->ic_data;
 	      for (i=0;i<member_cnt;i++)
 		if (mv[i].offset_start<=tmpi->ic_data<mv[i].offset_end) {
 		  mv[i].lea_balance++;
@@ -209,7 +209,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	    tmpi->ic_flags|=tmpi2->ic_flags;
 	    tmpi->ic_data=tmpi2->ic_data;
 	    tmpi->ic_code=IC_SUB_CONST;
-	    tmpi->a2.type=MDF_NULL;
+	    tmpi->arg2.type=MDF_NULL;
 	    OptFree(tmpi2);
 	  }
 	  break;
@@ -235,25 +235,25 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	case IC_AND_EQU:
 	case IC_OR_EQU:
 	case IC_XOR_EQU:
-	  if (tmpi1->ic_code==IC_LEA && tmpi1->a1.type&MDF_DISP &&
-		tmpi1->a1.reg==REG_RBP)
+	  if (tmpi1->ic_code==IC_LEA && tmpi1->arg1.type&MDF_DISP &&
+		tmpi1->arg1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
-	      if (mv[i].offset_start==tmpi1->a1.disp) {
+	      if (mv[i].offset_start==tmpi1->arg1.disp) {
 		mv[i].lea_balance--;
 		mv[i].score++;
 		break;
 	      }
-	  tmpi->a1_type_pointed_to=tmpi->r.type.raw_type;
-	  CmpMinTypePointed(tmpi,CmpRawTypePointed(tmpi->t.a1c));
+	  tmpi->arg1_type_pointed_to=tmpi->res.type.raw_type;
+	  CmpMinTypePointed(tmpi,CmpRawTypePointed(tmpi->t.arg1_class));
 	  break;
 	case IC_RETURN_VAL:
 	case IC_RETURN_VAL2:
 	  if (tmpc) {
 	    if (tmpc->raw_type==RT_F64 && tmpil1->ic_class->raw_type!=RT_F64)
-	      tmpil1->ic_flags|=ICF_R_TO_F64;
+	      tmpil1->ic_flags|=ICF_RES_TO_F64;
 	    else if (tmpc->raw_type!=RT_F64 &&
 		  tmpil1->ic_class->raw_type==RT_F64)
-	      tmpil1->ic_flags|=ICF_R_TO_INT;
+	      tmpil1->ic_flags|=ICF_RES_TO_INT;
 	  }
 	  break;
 	case IC_SQR:
@@ -287,8 +287,8 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  if ((tmpi1->ic_code==IC_IMM_I64 ||
 		tmpi1->ic_code==IC_IMM_F64) && !tmpi1->ic_data) {
 	    OptFree(tmpi1);
-	    MemCpy(&tmpi->a1,&tmpi->a2,sizeof(CICArg));
-	    tmpi->a2.type=MDF_NULL;
+	    MemCpy(&tmpi->arg1,&tmpi->arg2,sizeof(CICArg));
+	    tmpi->arg2.type=MDF_NULL;
 	    if (code==IC_BR_EQU_EQU)
 	      code=tmpi->ic_code=IC_BR_ZERO;
 	    else
@@ -298,7 +298,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  } else if ((tmpi2->ic_code==IC_IMM_I64 ||
 		tmpi2->ic_code==IC_IMM_F64) && !tmpi2->ic_data) {
 	    OptFree(tmpi2);
-	    tmpi->a2.type=MDF_NULL;
+	    tmpi->arg2.type=MDF_NULL;
 	    if (code==IC_BR_EQU_EQU)
 	      code=tmpi->ic_code=IC_BR_ZERO;
 	    else
@@ -310,7 +310,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  if (tmpi1->ic_code==IC_IMM_I64 || tmpi1->ic_code==IC_IMM_F64) {
 	    if (code==IC_BR_ZERO ^^ tmpi1->ic_data) {
 	      OptFree(tmpi1);
-	      tmpi->a1.type=MDF_NULL;
+	      tmpi->arg1.type=MDF_NULL;
 	      tmpi->ic_code=IC_JMP;
 	    } else {
 	      OptFree(tmpi1);
@@ -359,15 +359,15 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
 	  goto here1;
 	case IC_BR_MM_ZERO:
 	case IC_BR_MM_NOT_ZERO:
-	  if (tmpi1->ic_code==IC_LEA && tmpi1->a1.type&MDF_DISP &&
-		tmpi1->a1.reg==REG_RBP)
+	  if (tmpi1->ic_code==IC_LEA && tmpi1->arg1.type&MDF_DISP &&
+		tmpi1->arg1.reg==REG_RBP)
 	    for (i=0;i<member_cnt;i++)
-	      if (mv[i].offset_start==tmpi1->a1.disp) {
+	      if (mv[i].offset_start==tmpi1->arg1.disp) {
 		mv[i].lea_balance--;
 		mv[i].score++;
 		break;
 	      }
-	  tmpi->a1_type_pointed_to=CmpRawType(tmpc);
+	  tmpi->arg1_type_pointed_to=CmpRawType(tmpc);
 	  goto here1;
 	case IC_BR_LESS:
 	case IC_BR_GREATER_EQU:
@@ -504,7 +504,7 @@ here1:
 	case IC_LABEL:
 	  break;
 	default:
-	  "Pass:%d Missing IC handler\n",cc->pass;
+	  "Pass:%d Missing IC hndlr\n",cc->pass;
 	  ICPut(cc,tmpi);
 	  LexExcept(cc,"Compiler Optimization Error at ");
       }

@@ -56,7 +56,7 @@ I64 ProfCompare(U8 *i1,U8 *i2)
 
 public U0 ProfRep(I64 filter_cnt=1,Bool leave_it=OFF)
 {//Profiler report. Call $LK,"Prof",A="MN:Prof"$() first and collect data.
-  I64 i,hits,ip,last_ip=0,routine_total=0;
+  I64 i,hits,rip,last_rip=0,routine_total=0;
   F64 total_time;
   U8 buf[256],buf2[256],last_buf[256];
   if (!LBtr(&pf_prof_active,0))
@@ -69,12 +69,12 @@ public U0 ProfRep(I64 filter_cnt=1,Bool leave_it=OFF)
     QSortI64(pf_array,pf_buf_in_ptr,&ProfCompare);
     *last_buf=0;
     for (i=0;i<pf_buf_in_ptr;i+=hits) {
-      ip=pf_array[i];
+      rip=pf_array[i];
       hits=0;
       do hits++;
-      while (i+hits<pf_buf_in_ptr && pf_array[i+hits]==ip);
+      while (i+hits<pf_buf_in_ptr && pf_array[i+hits]==rip);
 
-      StrPrint(buf,"%p",ip);
+      StrPrint(buf,"%p",rip);
       StrFirstRem(buf,"+",buf2);
       if (StrCmp(buf2,last_buf)) {
 	if (*last_buf && routine_total>=filter_cnt)
@@ -85,8 +85,8 @@ public U0 ProfRep(I64 filter_cnt=1,Bool leave_it=OFF)
       }
       routine_total+=hits;
       if (hits>=filter_cnt) {
-	"%6.2f %08X:%P\n",100*hits/total_time,hits,ip;
-	last_ip=ip;
+	"%6.2f %08X:%P\n",100*hits/total_time,hits,rip;
+	last_rip=rip;
       }
     }
     if (*last_buf && routine_total>=filter_cnt)

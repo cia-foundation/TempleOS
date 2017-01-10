@@ -20,8 +20,7 @@ U0 InstallDrv(U8 drv_let)
 Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
 {
   if (ata_drv) {
-    XTalkWait(task,"PrtDsk;\nYCp%d\nYYY",ata_drv->num);
-    XTalkWait(task,"%d\nY\nY\n",(drv_dsk_dsk_size-DRV_HEADER)/2);
+    XTalkWait(task,"PrtDsk(,0.5,0.5);\nC\np%d\nY",ata_drv->num);
     return TRUE;
   } else
     return FALSE;
@@ -33,7 +32,7 @@ U0 VMInstallDrv(CTask *task,U8 drv_let,
   InstallDrv(drv_let);
   XTalkWait(task,"BootHDIns('%C');\n\nB\n0x20000\n",drv_let);
   if (ata_drv)
-    XTalkWait(task,"Cp%d\n",ata_drv->num);
+    XTalkWait(task,"C\np%d\n",ata_drv->num);
   if (atapi_drv)
     XTalkWait(task,"Tp%d\n",atapi_drv->num);
   XTalkWait(task,"\n\n\n"); //Exit Drives,Dsk Cache,Options
@@ -90,7 +89,7 @@ U0 RegularInstallWiz()
   WinVert(Fs->win_top,(Fs->win_top+Fs->win_bottom)>>2-1,task);
   WinVert(task->win_bottom+3,Fs->win_bottom);
   WinToTop(Fs);
-  XTalk(task,"Mount;\nCp");
+  XTalk(task,"Mount;\nC\np");
 
   num_hints=ATARep(FALSE,,&head);
   "\nInclude '$$PURPLE$$0x$$FG$$' for hexidecimal numbers.\n\n";
@@ -126,7 +125,10 @@ U0 RegularInstallWiz()
   DrvRep;
   do {
     st=GetStr("\nDestination Partition Letter: ");
-    drv_let=ToUpper(*st);
+    if (*st)
+      drv_let=Let2Let(*st);
+    else
+      drv_let=0;
     Free(st);
   } while (!('A'<=drv_let<='Z'));
   '\n';
@@ -148,7 +150,7 @@ U0 RegularInstallWiz()
   }
   InstallDrv(drv_let);
   XTalkWait(task,"BootHDIns('%C');\n\nB\n0x20000\n"
-	"Cs%s\n%s\n%C\n\n\n", //Exit Drives,Dsk Cache,Options
+	"C\ns%s\n%s\n%C\n\n\n", //Exit Drives,Dsk Cache,Options
 	drv_let,base0,base1,'0'+unit);
   "$$RED$$Install Master Boot loader?$$FG$$";
   if (YorN) {

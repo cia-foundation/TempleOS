@@ -174,7 +174,7 @@ Bool IsBlocked(BlockedStruct *head,U32 ip_num)
   return FALSE;
 }
 
-U0 BlockIPNums(LogStruct *head)
+U0 BlockIPNuip(LogStruct *head)
 {
   BlockedStruct blocked_head;
   LogStruct *tmplg=head->next,*tmplg1;
@@ -197,7 +197,7 @@ U0 BlockIPNums(LogStruct *head)
     tmplg=tmplg->next;
   }
 
-  //pass 2: removed blocked ip_nums
+  //pass 2: removed blocked ip_nuip
   tmplg=head->next;
   while (tmplg!=head) {
     tmplg1=tmplg->next;
@@ -241,7 +241,7 @@ Bool IPNumTreeAdd(LogStruct **_head,LogStruct *tmplg)
   LogStruct *head;
   if (UnusedStk<0x200) {
     PrintErr("Stk Overflow");
-    ThrowBreak;
+    throw;
   }
   if (head=*_head) {
     if (tmplg->ip_num==head->ip_num)
@@ -264,7 +264,7 @@ U0 LinkTreeAdd(LinkStruct **_root,LogStruct *tmplg)
   LinkStruct *root,*tmplk;
   if (UnusedStk<0x200) {
     PrintErr("Stk Overflow");
-    ThrowBreak;
+    throw;
   }
   if (root=*_root) {
     if (!(i=StrCmp(tmplg->link,root->link)))
@@ -287,7 +287,7 @@ U0 FileTreeAdd(LinkStruct **_root,LogStruct *tmplg)
   LinkStruct *root,*tmplk;
   if (UnusedStk<0x200) {
     PrintErr("Stk Overflow");
-    ThrowBreak;
+    throw;
   }
   if (root=*_root) {
     if (!(i=StrCmp(tmplg->file,root->file)))
@@ -503,7 +503,7 @@ U0 WebLogRep(U8 *mask,U8 *output_filename)
   head=PrsLogFiles(mask,&start,&end);
   start=GetDate("Start(%D):",start);
   end  =GetDate("End  (%D):",end);
-  BlockIPNums(head);
+  BlockIPNuip(head);
 
   DocClear;
   "$$WW,0$$";

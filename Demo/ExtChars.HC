@@ -32,4 +32,4 @@ SrcExample;
 //See $LK,"::/Demo/ScrnCodes.HC"$, $LK,"::/Demo/Graphics/CharAnimation.HC"$,
 //$LK,"::/Demo/Games/CharDemo.HC"$ and $LK,"::/Demo/Graphics/FontEd.HC"$.
 
-//See $LK,"chars_bmp_alpha",A="MN:chars_bmp_alpha"$ and $LK,"chars_bmp_alpha_numeric",A="MN:chars_bmp_alpha_numeric"$.
+//See $LK,"char_bmp_alpha",A="MN:char_bmp_alpha"$ and $LK,"char_bmp_alpha_numeric",A="MN:char_bmp_alpha_numeric"$.

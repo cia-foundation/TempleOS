@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
 
-RegSetDftEntry("TempleOS/RawHide","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/RawHide");
+RegDft("TempleOS/RawHide","F64 best_score=9999;\n");
+RegExe("TempleOS/RawHide");
 
 F64 t0,tf;
 I64 outside_cnt;
@@ -230,19 +230,19 @@ U0 DrawIt(CTask *task,CDC *dc)
       dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
     }
 
-  if (ip.pos.x-last_pos_x>0)
+  if (ms.pos.x-last_pos_x>0)
     left=FALSE;
-  else if (ip.pos.x-last_pos_x<0)
+  else if (ms.pos.x-last_pos_x<0)
     left=TRUE;
   if (left) {
     dc->flags|=DCF_JUST_MIRROR|DCF_SYMMETRY;
-    DCSymmetrySet(dc,ip.pos.x-task->pix_left-task->scroll_x,0,
-	  ip.pos.x-task->pix_left-task->scroll_x,1);
+    DCSymmetrySet(dc,ms.pos.x-task->pix_left-task->scroll_x,0,
+	  ms.pos.x-task->pix_left-task->scroll_x,1);
   }
-  Sprite3(dc,ip.pos.x-task->pix_left-task->scroll_x,
-	     ip.pos.y-task->pix_top -task->scroll_y,0,horse_imgs[frame&3]);
+  Sprite3(dc,ms.pos.x-task->pix_left-task->scroll_x,
+	     ms.pos.y-task->pix_top -task->scroll_y,0,horse_imgs[frame&3]);
   dc->flags&=~(DCF_JUST_MIRROR|DCF_SYMMETRY);
-  last_pos_x=ip.pos.x;
+  last_pos_x=ms.pos.x;
 
   if (tf) {
     dc->color=RED;
@@ -336,8 +336,8 @@ U0 AnimateTask(CTask *parent)
     max_speed=ClampU64(max_speed,MAX_U32/3,200*MAX_U32);
     cx=(MAP_WIDTH -parent->pix_width)/2,
 	  cy=(MAP_HEIGHT-parent->pix_height)/2;
-    cursor_x=ip.pos.x+cx-parent->pix_left-parent->scroll_x;
-    cursor_y=ip.pos.y+cy-parent->pix_top -parent->scroll_y;
+    cursor_x=ms.pos.x+cx-parent->pix_left-parent->scroll_x;
+    cursor_y=ms.pos.y+cy-parent->pix_top -parent->scroll_y;
     cnt=0;stress=0;
     my_outside_cnt=0;
     if (cursor_x<FENCE_WIDTH && cursor_y<FENCE_HEIGHT)
@@ -422,10 +422,10 @@ U0 AnimateTask(CTask *parent)
     if (!tf && !outside_cnt) {
       tf=tS;
       music.mute=TRUE;
-      Snd(2000);Sleep(200);Snd(0);Sleep(100);
+      Snd(86);Sleep(200);Snd;Sleep(100);
       if (tf-t0<best_score) {
 	best_score=tf-t0;
-	Snd(2000);Sleep(200);Snd(0);Sleep(100);
+	Snd(86);Sleep(200);Snd;Sleep(100);
       }
       music.mute=FALSE;
     }
@@ -451,10 +451,10 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-    Play("3qC2etG3DCBDCECFqFCsADADqB");
-    Play("C2etG3DCBDCECFqFCsADADqB");
-    Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
-    Play("2sG3A2G3AqG2etG3GDeBBqBFeBAqE");
+    Play("5qC4etG5DC4B5DCECFqFC4sA5D4A5D4qB");
+    Play("5C4etG5DC4B5DCECFqFC4sA5D4A5D4qB");
+    Play("4sGAGA5qG4etG5GD4eBBqB5F4eBA5qE");
+    Play("4sGAGA5qG4etG5GD4eBBqB5F4eBA5qE");
   }
 }
 
@@ -528,7 +528,7 @@ U0 CleanUp()
 
 U0 RawHide()
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   MenuPush(
 	"File {"
@@ -559,15 +559,15 @@ U0 RawHide()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_R_DOWN);
+      msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_KEY_DOWN+1<<MSG_MS_L_DOWN+1<<MSG_MS_R_DOWN);
       switch (msg_code) {
-	case MSG_IP_L_DOWN:  //Doesn't do anything, yet.
+	case MSG_MS_L_DOWN:  //Doesn't do anything, yet.
 	  break;
-	case MSG_IP_R_DOWN:  //Doesn't do anything, yet.
+	case MSG_MS_R_DOWN:  //Doesn't do anything, yet.
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      ReInit;
 	      break;
@@ -585,7 +585,7 @@ rh_done:
   MenuPop;
   SettingsPop;
   CleanUp;
-  RegWriteBranch("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
+  RegWrite("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
 }
 
 RawHide;

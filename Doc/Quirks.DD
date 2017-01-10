@@ -18,7 +18,7 @@ $WW,1$* You run a risk of problems if you do file operations on the same files s
 $ID,2$
 A) $LK,"DocBottom",A="MN:DocBottom"$() followed by $LK,"DocClear",A="MN:DocClear"$() to clear the $LK,"CDoc",A="MN:CDoc"$ so it has no active widgets.
 
-B) Disable window mgr button click checking with $FG,4$Fs->win_inhibit$FG$ set to mask $LK,"WIF_SELF_IP_L",A="MN:WIF_SELF_IP_L"$|$LK,"WIF_FOCUS_TASK_IP_L_D",A="MN:WIF_FOCUS_TASK_IP_L_D"$|$LK,"WIF_SELF_IP_R",A="MN:WIF_SELF_IP_R"$|$LK,"WIF_FOCUS_TASK_IP_R_D",A="MN:WIF_FOCUS_TASK_IP_R_D"$.  This inhibits window mgr operations but still generates messages from button clicks.
+B) Disable window mgr bttn click checking with $FG,4$Fs->win_inhibit$FG$ set to mask $LK,"WIF_SELF_MS_L",A="MN:WIF_SELF_MS_L"$|$LK,"WIF_FOCUS_TASK_MS_L_D",A="MN:WIF_FOCUS_TASK_MS_L_D"$|$LK,"WIF_SELF_MS_R",A="MN:WIF_SELF_MS_R"$|$LK,"WIF_FOCUS_TASK_MS_R_D",A="MN:WIF_FOCUS_TASK_MS_R_D"$.  This inhibits window mgr operations but still generates messages from bttn clicks.
 $ID,-2$
 * $FG,2$switch/case$FG$ stmts alloc a single jump table--do not use with wide, sparse ranges of case values.
 

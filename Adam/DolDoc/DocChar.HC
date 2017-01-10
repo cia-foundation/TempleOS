@@ -443,7 +443,7 @@ U0 EdCharIns(I64 ch,I64 sc,CDoc *doc)
   I64 i,j,m,y=doc_ce->y;
 
   if (doc->flags & DOCF_IN_DOLLAR) {
-    if (!Bt(chars_bmp_getkey,ch))
+    if (!Bt(char_bmp_printable,ch))
       goto ic_done;
     ChkDollarBufSize(doc);
     doc->dollar_buf[doc->dollar_buf_ptr++]=ch;
@@ -510,7 +510,7 @@ U0 EdCharIns(I64 ch,I64 sc,CDoc *doc)
     goto ic_done;
   }
   if (doc->flags & DOCF_OVERSTRIKE) {
-    if (Bt(chars_bmp_displayable,ch)) {
+    if (Bt(char_bmp_displayable,ch)) {
 ic_overstrike:
       if (IsEditableText(doc_ce)) {
 	if (doc->cur_col<doc_ce->max_col) {
@@ -578,7 +578,7 @@ ic_form_tab:
       DocInsEntry(doc,doc_ne);
     }
   } else {
-    if (Bt(chars_bmp_displayable,ch)) {
+    if (Bt(char_bmp_displayable,ch)) {
       if (doc_ce->type_u8==DOCT_DATA) {
 	while (TRUE) {
 	  i=doc_ce->len+doc_ce->min_col;

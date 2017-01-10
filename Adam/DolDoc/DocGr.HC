@@ -65,8 +65,9 @@ class CTransformForm
   F64 z_offset	fmtstr "$$DA-TRM,A=\"Z Offset:%12.6f\"$$\n";
 };
 
-Bool PopUpTransform(I64 *r)
-{
+#help_index "Graphics/Input;Graphics/Math/3D Transformation"
+public Bool PopUpTransform(I64 *r)
+{//Prompt for Mat4x4 transform.
   CTransformForm *tf=MAlloc(sizeof(CTransformForm));
   tf->x_scale=1.0;
   tf->y_scale=1.0;
@@ -96,6 +97,7 @@ Bool PopUpTransform(I64 *r)
     return FALSE;
 }
 
+#help_index "Graphics/Input"
 #define PU_SPACING	10
 U0 DrawIt(CTask *task,CDC *dc)
 {
@@ -124,7 +126,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 I64 DitherColor2(U8 *header=NULL)
 {
-  I64 msg_code,a1,a2,res=-1,i,j;
+  I64 msg_code,arg1,arg2,res=-1,i,j;
   DocClear;
   "%s",header;
   DocRecalc(DocPut);
@@ -132,21 +134,21 @@ I64 DitherColor2(U8 *header=NULL)
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->draw_it=&DrawIt;
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_KEY_DOWN);
-    if (msg_code==MSG_IP_L_DOWN) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
-      i=a1/PU_SPACING;
-      j=(a2-FramePtr("DitherFrame"))/PU_SPACING;
-      if (a1>=0 && a2>=0 && 0<=j<17 && 0<=i<17) {
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN|1<<MSG_KEY_DOWN);
+    if (msg_code==MSG_MS_L_DOWN) {
+      msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP);
+      i=arg1/PU_SPACING;
+      j=(arg2-FramePtr("DitherFrame"))/PU_SPACING;
+      if (arg1>=0 && arg2>=0 && 0<=j<17 && 0<=i<17) {
 	if (j==16) j=TRANSPARENT;
 	if (i==16) i=TRANSPARENT;
 	res=j+i<<16+ROPF_DITHER;
 	goto dc_done;
       }
     }
-  } while (!(msg_code==MSG_KEY_DOWN && (a1==CH_ESC || a1==CH_SHIFT_ESC)));
-  do GetMsg(&a1,&a2,1<<MSG_KEY_UP);
-  while (!a1);
+  } while (!(msg_code==MSG_KEY_DOWN && (arg1==CH_ESC || arg1==CH_SHIFT_ESC)));
+  do GetMsg(&arg1,&arg2,1<<MSG_KEY_UP);
+  while (!arg1);
 dc_done:
   SettingsPop;
   FramePtrDel("DitherFrame");

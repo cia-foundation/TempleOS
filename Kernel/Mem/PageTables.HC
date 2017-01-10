@@ -3,152 +3,203 @@ asm {
 
 USE32
 SYS_INIT_PAGE_TABLES::
-//Set page tables to identity map everything.
+//Check 1Gig page capability and set page size.
+	MOV	EAX,0x80000001
+	CPUID
+	MOV	EAX,1<<21
+	BT	EDX,26
+	JNC	@@05
+	MOV	EAX,1<<30
+@@05:	MOV	U32 [MEM_PAGE_SIZE],EAX
+
+//Set mapped space limit
+	MOV	EAX,[MEM_PHYSICAL_SPACE]
+	MOV	EDX,[MEM_PHYSICAL_SPACE+4]
+	BT	U32 [MEM_PAGE_SIZE],30 //Round-up to 1Gig boundary?
+	JNC	@@10
+	ADD	EAX,0x3FFFFFFF
+	ADC	EDX,0
+	AND	EAX,~0x3FFFFFFF
+@@10:	INC	EDX	//Need 4Gig extra for uncached alias up at top of space.
+	MOV	[MEM_MAPPED_SPACE],EAX
+	MOV	[MEM_MAPPED_SPACE+4],EDX
+
+//How many 2Meg pages?
+	MOV	CL,21
+	ADD	EAX,0x1FFFFF
+	ADC	EDX,0
+	SHRD	EAX,EDX
+	SHR	EDX,CL
+	MOV	[MEM_NUM_2MEG],EAX
+	MOV	[MEM_NUM_2MEG+4],EDX
+
+//How many 1Gig pages?
+	MOV	CL,9
+	ADD	EAX,0x1FF
+	ADC	EDX,0
+	SHRD	EAX,EDX
+	SHR	EDX,CL
+	MOV	[MEM_NUM_1GIG],EAX
+	MOV	[MEM_NUM_1GIG+4],EDX
+
+//How many 512Gig pages?
+	MOV	CL,9
+	ADD	EAX,0x1FF
+	ADC	EDX,0
+	SHRD	EAX,EDX
+	SHR	EDX,CL
+	MOV	[MEM_NUM_512GIG],EAX
+	MOV	[MEM_NUM_512GIG+4],EDX
+
+//Set $LK,"CSysFixedArea",A="MN:CSysFixedArea"$ to zero
 	MOV	EDI,SYS_FIXED_AREA
 	XOR	EAX,EAX
 	MOV	ECX,sizeof(CSysFixedArea)/4
-	REP_STOSD	//Init entire SYS_FIXED_AREA to zero
+	REP_STOSD
 
-	MOV	EAX,0x80000001
-	CPUID
-	BT	EDX,26
+	MOV	U32 [MEM_PML2],EDI
+//Check for 1Gig page capability.
+	BT	U32 [MEM_PAGE_SIZE],30
 	JC	@@15
+//Find PML2 Size
+	MOV	EAX,U32 [MEM_NUM_2MEG]
+	ADD	EAX,0x1FF
+	AND	EAX,~0x1FF
+	SHL	EAX,3
+	ADD	EDI,EAX
 
-	MOV	U8 [SYS_GIG_PAGES],FALSE
-//PML2: Use 2Meg PAges
+//Find PML3 Size
+@@15:	MOV	U32 [MEM_PML3],EDI
+	MOV	EAX,U32 [MEM_NUM_1GIG]
+	ADD	EAX,0x1FF
+	AND	EAX,~0x1FF
+	SHL	EAX,3
+	ADD	EDI,EAX
+
+//Find PML4 Size
+	MOV	U32 [MEM_PML4],EDI
+	MOV	EAX,U32 [MEM_NUM_512GIG]
+	ADD	EAX,0x1FF
+	AND	EAX,~0x1FF
+	SHL	EAX,3
+	ADD	EAX,EDI
+
+	MOV	U32 [MEM_HEAP_BASE],EAX
+
+//Set page tables to zero
+	MOV	EDI,U32 [MEM_PML2]
+	SUB	EAX,EDI
+	MOV	ECX,EAX
+	SHR	ECX,2
+	XOR	EAX,EAX
+	REP_STOSD
+
+//Check for 1Gig page capability.
+	BT	U32 [MEM_PAGE_SIZE],30
+	JC	@@30
+
+//PML2: Use 2Meg Pages
 	MOV	EAX,0x87 //bit 7 is page size (2Meg)
 	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml2
-	MOV	ECX,MEM_NUM_2MEG
-@@05:	MOV	U32 [EDI],EAX
+	MOV	EDI,[MEM_PML2]
+	MOV	ECX,[MEM_NUM_2MEG]
+@@20:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
 	ADD	EDI,4
 	ADD	EAX,0x200000
 	ADC	EDX,0
-	LOOP	@@05
+	LOOP	@@20
 //PML3: Use 2Meg Pages
-	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml2+7
+	MOV	EAX,[MEM_PML2]
+	OR	EAX,7
 	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml3
-	MOV	ECX,MEM_NUM_USED_1GIG
-@@10:	MOV	U32 [EDI],EAX
+	MOV	EDI,[MEM_PML3]
+	MOV	ECX,[MEM_NUM_1GIG]
+@@25:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
 	ADD	EDI,4
 	ADD	EAX,0x1000
 	ADC	EDX,0
-	LOOP	@@10
-	JMP	@@25
+	LOOP	@@25
+	JMP	@@40
 
-@@15:	MOV	U8 [SYS_GIG_PAGES],TRUE
 //PML3: Use 1Gig Pages
-	MOV	EAX,0x87 //bit 7 is page size (1Gig)
+@@30:	MOV	EAX,0x87 //bit 7 is page size (1Gig)
 	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml3
-	MOV	ECX,MEM_NUM_USED_1GIG
-@@20:	MOV	U32 [EDI],EAX
+	MOV	EDI,[MEM_PML3]
+	MOV	ECX,[MEM_NUM_1GIG]
+@@35:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
 	ADD	EDI,4
 	ADD	EAX,0x40000000
 	ADC	EDX,0
-	LOOP	@@20
+	LOOP	@@35
 
 //PML4
-@@25:	MOV	EAX,SYS_FIXED_AREA+CSysFixedArea.pml3+7
+@@40:	MOV	EAX,[MEM_PML3]
+	OR	EAX,7
 	XOR	EDX,EDX
-	MOV	EDI,SYS_FIXED_AREA+CSysFixedArea.pml4
-	MOV	ECX,MEM_NUM_1GIG/(0x1000/8)
-@@30:	MOV	U32 [EDI],EAX
+	MOV	EDI,[MEM_PML4]
+	MOV	ECX,[MEM_NUM_512GIG]
+@@45:	MOV	U32 [EDI],EAX
 	ADD	EDI,4
 	MOV	U32 [EDI],EDX
 	ADD	EDI,4
 	ADD	EAX,0x1000
 	ADC	EDX,0
-	LOOP	@@30
+	LOOP	@@45
+	RET
 
-	MOV	U32 [SYS_CODE_BP],SYS_FIXED_AREA+CSysFixedArea.adam_bp
+SYS_INIT_16MEG_SYS_CODE_BP::
+// Init sys_code_bp to BIOS E801 lowest 16Meg val.
+// $LK,"BlkPoolsInit",A="MN:BlkPoolsInit"$() adds the rest.
+	MOV	U32 [SYS_CODE_BP],SYS_FIXED_AREA+CSysFixedArea.sys_code_bp
 	MOV	U32 [SYS_CODE_BP+4],0
 
 	MOV	U32 [SYS_DATA_BP],0
 	MOV	U32 [SYS_DATA_BP+4],0
 
 	XOR	EAX,EAX
-	MOV	AX,U16 [SYS_MEM_E801] //1 Kb blks between 1M and 16M
+	MOV	AX,U16 [MEM_E801] //1 Kb blks between 1M and 16M
 	SHL	EAX,10
 	ADD	EAX,0x100000
-	MOV	EBX,U32 [SYS_HEAP_BASE] //SYS_FIXED_AREA+sizeof(CSysFixedArea)
-	SUB	EAX,EBX
+	MOV	EDI,U32 [MEM_HEAP_BASE]
+	SUB	EAX,EDI
 
-/*$AN,"ExpandHeap",A="ExpandHeap"$
-TempleOS initializes the heap to the val
-of the BIOS E801 lowest 16Meg val.  It
-later adds the rest to the heap.  There
-are a few allocations which occur while
-it is set to this small val.
-
-At some point, it might be nice to
-initialize to the full val but it is a
-pain without MAlloc up-and-running.
-*/
-
-#define CONSERVATIVE_16MEG_SIZE	0xF00000
-#define ESTIMATED_MISC_ALLOCS	0x100000
-
-#assert CONSERVATIVE_16MEG_SIZE-
-	(SYS_FIXED_AREA+sizeof(CSysFixedArea))>MEM_ADAM_STK+
-	ESTIMATED_MISC_ALLOCS
-
-//EBX=BASE EAX=SIZE
+//EDI=BASE EAX=SIZE
 	TEST	U8 [SYS_MEM_INIT_FLAG],1
-	JZ	@@35
+	JZ	@@05
 	PUSH	EAX
-	MOV	EDI,EBX
+	PUSH	EDI
 	MOV	ECX,EAX
 	MOV	AL,U8 [SYS_MEM_INIT_VAL]
 	REP_STOSB
+	POP	EDI
 	POP	EAX
 
-@@35:	SHR	EAX,MEM_PAGE_BITS
-	MOV	ESI,SYS_FIXED_AREA+CSysFixedArea.adam_bp
-	MOV	EDI,U32 CBlkPool.mem_free_lst[ESI]
-	MOV	U32 CMemBlk.next[EBX],EDI
-	MOV	U32 CMemBlk.next+4[EBX],0
-	MOV	U32 CBlkPool.mem_free_lst[ESI],EBX
+@@05:	SHR	EAX,MEM_PAG_BITS
+	MOV	ESI,SYS_FIXED_AREA+CSysFixedArea.sys_code_bp
+	MOV	EBX,U32 CBlkPool.mem_free_lst[ESI]
+	MOV	U32 CMemBlk.next[EDI],EBX
+	MOV	U32 CMemBlk.next+4[EDI],0
+	MOV	U32 CBlkPool.mem_free_lst[ESI],EDI
 	MOV	U32 CBlkPool.mem_free_lst+4[ESI],0
-	MOV	U32 CMemBlk.mb_signature[EBX],MBS_UNUSED_SIGNATURE_VAL
-	MOV	U32 CMemBlk.pages[EBX],EAX
-	SHL	EAX,MEM_PAGE_BITS
+	MOV	U32 CMemBlk.mb_signature[EDI],MBS_UNUSED_SIGNATURE_VAL
+	MOV	U32 CMemBlk.pags[EDI],EAX
+	SHL	EAX,MEM_PAG_BITS
 	ADD	U32 CBlkPool.alloced_u8s[ESI],EAX
+
+	BTS	U32 [SYS_RUN_LEVEL],RLf_16MEG_SYS_CODE_BP
 	RET
 }
 
 I64 *MemPageTable(U8 *a)
 {//Point to page table entry for addr.
-  if (sys_gig_pages)
-    return SYS_FIXED_AREA+offset(CSysFixedArea.pml3)+a>>30*8;
+  if (Bt(&mem_page_size,30))
+    return *MEM_PML3(U64 *)+a>>30*8;
   else
-    return SYS_FIXED_AREA+offset(CSysFixedArea.pml2)+a>>21*8;
+    return *MEM_PML2(U64 *)+a>>21*8;
 }
-
-I64 MemPageSize(U8 *)
-{//Page table entry size for addr.
-  if (sys_gig_pages)
-    return 1<<30; //1Gig
-  else
-    return 1<<21; //2Meg
-}
-
-Bool MemPagePresentMark(U8 *a,Bool val)
-{//Mark an addr's page present or not-present.
-  I64 *pte=MemPageTable(a);
-  Bool res=*pte&1;
-  if (val)
-    *pte=*pte|1;  //Mark present
-  else
-    *pte=*pte&~1; //Mark not present
-  InvlPg(a);
-  return res;
-}
-

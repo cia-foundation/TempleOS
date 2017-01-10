@@ -120,7 +120,7 @@ CCPU *CPUStructInit(I64 num,CCPU *c,CTask *seth_task)
   c->num=num;
   c->idle_factor=0.01;
   QueInit(&c->next_dying);
-  if (Bt(&sys_run_level,RLf_BOOT_HEAP)) {
+  if (Bt(&sys_run_level,RLf_16MEG_ADAM_HEAP_CTRL)) {
     c->idle_task=Spawn(0,NULL,"Idle Task",,Fs,,0);
     LBts(&c->idle_task->task_flags,TASKf_IDLE);
     c->tss=TSSNew(num);
@@ -165,7 +165,7 @@ U0 MPHalt()
 {//Halt all other cores.
   mp_cnt=1;
   MPNMInt;
-  BusyWait(10000);
+  Busy(10000);
 }
 
 U0 MPAPICInit()
@@ -189,45 +189,44 @@ U0 MPAPICInit()
   }
 }
 
-#assert !offset(CSrvCtrl.next_waiting)
+#assert !offset(CJobCtrl.next_waiting)
 
 U0 CoreAPSethTask()
 {
-  CSrvCtrl *ctrl=&Fs->srv_ctrl;
+  CJobCtrl *ctrl=&Fs->srv_ctrl;
   while (TRUE) {
     STI
     do {
       TaskKillDying;
       do PAUSE
-      while (LBts(&ctrl->flags,SVCRf_LOCKED));
-    } while (ctrl->next_waiting!=ctrl && SrvCmdRunOne(GetRFlags,ctrl));
+      while (LBts(&ctrl->flags,JOBCf_LOCKED));
+    } while (ctrl->next_waiting!=ctrl && JobRunOne(GetRFlags,ctrl));
     CLI
     LBts(&Fs->task_flags,TASKf_AWAITING_MSG);
-    LBtr(&ctrl->flags,SVCRf_LOCKED);
+    LBtr(&ctrl->flags,JOBCf_LOCKED);
     LBts(&Fs->task_flags,TASKf_IDLE);
     Yield;
     LBtr(&Fs->task_flags,TASKf_IDLE);
   }
 }
 
-CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
-       I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
-       I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
+CJob *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
+       I64 target_cpu=1,I64 flags=1<<JOBf_FREE_ON_COMPLETE,
+       I64 job_code=JOBT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0)
 {//Queue multicore jobs, handled by Seth tasks.
 //Set flags to zero if you wish to get the res.
   //See $LK,"::/Demo/MultiCore/Lock.HC"$
-  CSrvCtrl *ctrl;
-  CSrvCmd *tmpc;
+  CJobCtrl *ctrl;
+  CJob *tmpc;
   CTask *seth;
   if (!(0<=target_cpu<mp_cnt))
     throw('MultCore');
-  tmpc=ACAlloc(sizeof(CSrvCmd));
+  tmpc=ACAlloc(sizeof(CJob));
   if (aux_str)
     tmpc->aux_str=AStrNew(aux_str);
-  tmpc->cmd_code=cmd_code;
+  tmpc->job_code=job_code;
   tmpc->addr=fp_addr;
   tmpc->fun_arg=data;
-  tmpc->target_cpu=target_cpu;
   tmpc->flags=flags;
   tmpc->aux1=aux1;
   tmpc->aux2=aux2;
@@ -235,26 +234,26 @@ CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
   tmpc->ctrl=ctrl=&seth->srv_ctrl;
   PUSHFD
   CLI
-  while (LBts(&ctrl->flags,SVCRf_LOCKED))
+  while (LBts(&ctrl->flags,JOBCf_LOCKED))
     Yield;
   if (ctrl->next_waiting==ctrl && LBtr(&seth->task_flags,TASKf_AWAITING_MSG))
     MPInt(I_WAKE,target_cpu);
   QueIns(tmpc,ctrl->last_waiting);
-  LBtr(&ctrl->flags,SVCRf_LOCKED);
+  LBtr(&ctrl->flags,JOBCf_LOCKED);
   POPFD
   return tmpc;
 }
 
 CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
 	I64 target_cpu, CTask *parent=NULL, //NULL means adam
-	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE)
+	I64 stk_size=0,I64 flags=1<<JOBf_ADD_TO_QUE)
 {
   CTask *res;
-  CSrvCmd *tmpc=JobQue(fp_addr,data,target_cpu,
-	flags,SVCT_SPAWN_TASK,task_name,parent,stk_size);
-  CSrvCtrl *ctrl;
+  CJob *tmpc=JobQue(fp_addr,data,target_cpu,
+	flags,JOBT_SPAWN_TASK,task_name,parent,stk_size);
+  CJobCtrl *ctrl;
 
-  while (!Bt(&tmpc->flags,SVCf_DONE)) {
+  while (!Bt(&tmpc->flags,JOBf_DONE)) {
     LBts(&Fs->task_flags,TASKf_IDLE);
     Yield;
   }
@@ -264,12 +263,12 @@ CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   ctrl=tmpc->ctrl;
   PUSHFD
   CLI
-  while (LBts(&ctrl->flags,SVCRf_LOCKED))
+  while (LBts(&ctrl->flags,JOBCf_LOCKED))
     Yield;
   QueRem(tmpc);
-  LBtr(&ctrl->flags,SVCRf_LOCKED);
+  LBtr(&ctrl->flags,JOBCf_LOCKED);
   POPFD
-  SrvCmdDel(tmpc);
+  JobDel(tmpc);
   return res;
 }
 
@@ -301,8 +300,8 @@ U0 Core0StartMP()
     MPHalt; //sets mp_cnt to 1
     for (i=1;i<my_mp_cnt;i++) {
       c=&cpu_structs[i];
-      SrvCmdQueDel(&c->seth_task->srv_ctrl.next_waiting);
-      SrvCmdQueDel(&c->seth_task->srv_ctrl.next_done);
+      JobQueDel(&c->seth_task->srv_ctrl.next_waiting);
+      JobQueDel(&c->seth_task->srv_ctrl.next_done);
     }
   }
   MemSet(&cpu_structs[1],0,sizeof(CCPU)*(MP_MAX_PROCESSORS-1));
@@ -320,13 +319,13 @@ U0 Core0StartMP()
   WBINVD //Not sure why this is needed.	Might just need delay. $LK,"MemCpy",A="MN:MemCpy"$ above?
 
   *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4500; //assert init IPI
-  BusyWait(10000);
+  Busy(10000);
 
   *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4600+MPN_VECT; //start-up
-  BusyWait(200);
+  Busy(200);
   *(dev.uncached_alias+LAPIC_ICR_LOW)(U32 *)=0xC4600+MPN_VECT;
 
-  BusyWait(100000);
+  Busy(100000);
   for (i=0;i<10000;i++)
     LBts(&mp_cnt_lock,0); //Don't let more through
   my_mp_cnt=mp_cnt_initial;
@@ -335,7 +334,7 @@ U0 Core0StartMP()
     my_mp_cnt=MP_MAX_PROCESSORS;
 
   for (i=1;i<my_mp_cnt;i++) {
-    StrPrint(buf,"Seth Task CPU#%d",i);
+    StrPrint(buf,"Seth Task CPU%02X",i);
     task=Spawn(&CoreAPSethInit,NULL,buf,,,MEM_SETH_STK,0);
     task->rflags=RFLAGG_START;
 //$LK,"CTask",A="MN:CTask"$ alloced off this core's seth_task's heap (Which is Adam)
@@ -384,7 +383,7 @@ interrupt U0 IntMPCrash()
   mp_cnt=1;
   Raw(ON);
   text.raw_flags|=RWF_SHOW_DOLLAR;
-  "MP Crash CPU#%02X Task:%08X\n"
+  "MP Crash CPU%02X Task:%08X\n"
   "RIP:%P\n",dbg.mp_crash->cpu_num,dbg.mp_crash->task,dbg.mp_crash->rip;
-  Dbg(dbg.mp_crash->msg,dbg.mp_crash->msg_num);
+  Panic(dbg.mp_crash->msg,dbg.mp_crash->msg_num);
 }

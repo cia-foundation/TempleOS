@@ -12,7 +12,7 @@ I64 MPSum(I64 my_mp_cnt)
 
 I64 Sum(I64 n,I64 my_mp_cnt)
 {
-  CSrvCmd *tmpm[MP_MAX_PROCESSORS];
+  CJob *tmpm[MP_MAX_PROCESSORS];
   I64 res=0,i;
   mp_n=n+1;
   for (i=0;i<my_mp_cnt;i++)

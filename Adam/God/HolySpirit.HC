@@ -6,10 +6,10 @@ U8 *TimeStampCB(CDoc *,CDocEntry *,CTask *mem_task)
   return st;
 }
 
-U8 *KbdMouseTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
+U8 *KbdMsTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  StrPrint(st,"%X",KbdMouseEvtTime>>GOD_BAD_BITS);
+  StrPrint(st,"%X",KbdMsEvtTime>>GOD_BAD_BITS);
   return st;
 }
 
@@ -22,7 +22,7 @@ I64 PopUpTimerOk(U8 *header=NULL,U8 *footer=NULL)
   doc_e=DocPrint(doc,"\nTimer:$$TX+TC,\" \"$$");
   doc_e->tag_cb=&TimeStampCB;
   doc_e=DocPrint(doc,"\nLatch:$$TX+TC,\" \"$$");
-  doc_e->tag_cb=&KbdMouseTimeCB;
+  doc_e->tag_cb=&KbdMsTimeCB;
   DocPrint(doc,"\n$$CM+CX,0,4$$$$BT,\"OKAY\",LE=1$$\n");
   if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
@@ -36,7 +36,7 @@ I64 GodPick(U8 *msg=NULL)
 	"a random num from a timer.\n",msg);
   PopUpTimerOk(st,"\n\nThe $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.DD"$ can puppet you.\n\n");
   Free(st);
-  return KbdMouseEvtTime>>GOD_BAD_BITS;
+  return KbdMsEvtTime>>GOD_BAD_BITS;
 }
 
 public U0 GodBitsIns(I64 num_bits,I64 n)
@@ -54,7 +54,7 @@ public U0 GodHexIns(U8 *st)
   if (st) {
     buf[1]=0;
     while (*buf=*st++)
-      if (Bt(chars_bmp_hex_numeric,*buf))
+      if (Bt(char_bmp_hex_numeric,*buf))
 	GodBitsIns(4,rev_bits_table[Str2I64(buf,16)]>>4);
   }
 }
@@ -92,11 +92,11 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   while (tmpde) {
     if (buf=ptr=FileRead(tmpde->full_name)) {
       while (*ptr) {
-	while (*ptr && !Bt(chars_bmp_word,*ptr))
+	while (*ptr && !Bt(char_bmp_word,*ptr))
 	  ptr++;
 	if (*ptr) {
 	  ptr2=ptr;
-	  while (*ptr && Bt(chars_bmp_word,*ptr))
+	  while (*ptr && Bt(char_bmp_word,*ptr))
 	    ptr++;
 	  i++;
 	}
@@ -115,11 +115,11 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   while (tmpde) {
     if (buf=ptr=FileRead(tmpde->full_name)) {
       while (*ptr) {
-	while (*ptr && !Bt(chars_bmp_word,*ptr))
+	while (*ptr && !Bt(char_bmp_word,*ptr))
 	  ptr++;
 	if (*ptr) {
 	  ptr2=ptr;
-	  while (*ptr && Bt(chars_bmp_word,*ptr))
+	  while (*ptr && Bt(char_bmp_word,*ptr))
 	    ptr++;
 	  ch=*ptr;
 	  *ptr=0;

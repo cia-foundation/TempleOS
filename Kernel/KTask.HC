@@ -4,6 +4,9 @@ U0 Exit()
     LBts(&Fs->task_flags,TASKf_KILL_AFTER_DBG);
     G;
   } else {
+    if (sys_staff_mode_flag)
+      AdamLog("%p:%p:%p:%p:%p:%p\n",Caller(0),Caller(1),Caller(2),Caller(3),
+	    Caller(4),Caller(5),Caller(6),Caller(7));
     if (!Gs->num && !IsDbgMode)
       SingleUser(OFF);
     Fs->rflags=GetRFlags;
@@ -42,19 +45,31 @@ U0 DeathWait(CTask **_task,Bool send_exit=FALSE)
     Yield;
 }
 
-Bool Kill(CTask *task,Bool wait=TRUE)
+Bool Kill(CTask *task,Bool wait=TRUE,Bool just_break=FALSE)
 {//Terminate other task.
   I64 i;
-  if (TaskValidate(task) && task!=sys_winmgr_task) {
-    for (i=0;i<mp_cnt;i++)
-      if (task==cpu_structs[i].seth_task)
-	return FALSE;
-    LBts(&task->task_flags,TASKf_KILL_TASK);
-    if (wait) {
-      do Yield;
-      while (TaskValidate(task) && Bt(&task->task_flags,TASKf_KILL_TASK));
+  if (TaskValidate(task)) {
+    if (just_break) {
+      if (task!=Fs)
+	Break;
+      else {//TODO wait
+	sys_focus_task=task;
+	LBts(sys_ctrl_alt_flags,CTRL_ALT_C);
+	return TRUE;
+      }
+    } else {
+      if (task!=sys_winmgr_task) {
+	for (i=0;i<mp_cnt;i++)
+	  if (task==cpu_structs[i].seth_task)
+	    return FALSE;
+	LBts(&task->task_flags,TASKf_KILL_TASK);
+	if (wait) {
+	  do Yield;
+	  while (TaskValidate(task) && Bt(&task->task_flags,TASKf_KILL_TASK));
+	}
+	return TRUE;
+      }
     }
-    return TRUE;
   }
   return FALSE;
 }
@@ -187,7 +202,7 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->next_child_task=task->last_child_task=
 	(&task->next_child_task)(U8 *)-offset(CTask.next_sibling_task);
 
-  SrvCtrlInit(&task->srv_ctrl);
+  JobCtrlInit(&task->srv_ctrl);
   QueInit(&task->next_cc);
   QueInit(&task->next_except);
   QueInit(&task->next_ctrl);
@@ -228,7 +243,7 @@ CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
 	I64 target_cpu=-1,	//-1 for current CPU. See $LK,"multi-core",A="FI:::/Demo/MultiCore/LoadTest.HC"$.
 	CTask *parent=NULL,	//NULL means adam
 	I64 stk_size=0,		//0=default
-	I64 flags=1<<SVCf_ADD_TO_QUE)
+	I64 flags=1<<JOBf_ADD_TO_QUE)
 {//Create task on core running at address.
 //Alloc $LK,"CTask",A="MN:CTask"$ structure from code heap so addr will be short.
   //Could be alloced off of data heap.
@@ -260,7 +275,7 @@ CTask *Spawn(U0 (*fp_start_addr)(U8 *data),U8 *data=NULL,U8 *task_name=NULL,
   task->title_src=TTS_TASK_NAME;
   PUSHFD
   CLI
-  if (Bt(&flags,SVCf_ADD_TO_QUE)) {
+  if (Bt(&flags,JOBf_ADD_TO_QUE)) {
     TaskQueInsChild(task);
     TaskQueIns(task);
   }
@@ -279,7 +294,7 @@ U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE)
   if (fp_update_ctrls)
     (*fp_update_ctrls)(task);
   if (update_z_buf && Bt(&task->display_flags,DISPLAYf_SHOW))
-    LBts(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
+    LBts(&sys_semas[SEMA_UPDATE_WIN_Z_BUF],0);
   LBtr(&task->task_flags,TASKf_TASK_LOCK);
   POPFD
 }
@@ -356,7 +371,7 @@ U0 SrvTaskCont()
   FlushMsgs;
   while (TRUE) {
     CLI
-    if (SrvCmdsHandler(old_flags) && Fs->title_src==TTS_TASK_NAME)
+    if (JobsHndlr(old_flags) && Fs->title_src==TTS_TASK_NAME)
       MemCpy(Fs->task_title,Fs->task_name,TASK_NAME_LEN);
     FlushMsgs;
     LBts(&Fs->task_flags,TASKf_IDLE);
@@ -392,8 +407,7 @@ U0 SrvCmdLine(I64 dummy=0)
 {
   no_warn dummy;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
-  if (HashFind("SrvStartUp",adam_task->hash_table,HTT_FUN))
-    CallExtStr("SrvStartUp");
+  CallExtStr("SrvStartUp");
   SrvTaskCont;
 }
 
@@ -401,8 +415,7 @@ U0 UserCmdLine(I64 dummy=0)
 {//A user task ends-up calling this.
   no_warn dummy;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
-  if (HashFind("UserStartUp",adam_task->hash_table,HTT_FUN))
-    CallExtStr("UserStartUp");
+  CallExtStr("UserStartUp");
   if (!LBts(&Fs->display_flags,DISPLAYf_SHOW))
     Dbg;
   UserTaskCont;
@@ -463,15 +476,15 @@ I64 TaskEnd()
     return task->next_task;
   }
   if (LBtr(&task->display_flags,DISPLAYf_SHOW))
-    LBts(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0);
+    LBts(&sys_semas[SEMA_UPDATE_WIN_Z_BUF],0);
 
   while (LBts(&task->task_flags,TASKf_TASK_LOCK))
     PAUSE
-  while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
+  while (LBts(&task->srv_ctrl.flags,JOBCf_LOCKED))
     PAUSE
 
-  SrvCmdQueDel(&task->srv_ctrl.next_waiting);
-  SrvCmdQueDel(&task->srv_ctrl.next_done);
+  JobQueDel(&task->srv_ctrl.next_waiting);
+  JobQueDel(&task->srv_ctrl.next_done);
 
   if (IsRaw)
     VGAFlush;
@@ -500,7 +513,7 @@ I64 TaskEnd()
   tmpt =task->next_task; //save to return
   TaskQueRem(task);
 
-  LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
+  LBtr(&task->srv_ctrl.flags,JOBCf_LOCKED);
   LBtr(&task->task_flags,TASKf_TASK_LOCK);
 
   task->wake_jiffy=cnts.jiffies+DYING_JIFFIES;

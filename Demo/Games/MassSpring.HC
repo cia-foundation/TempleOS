@@ -99,7 +99,7 @@ U0 CleanUp()
 
 U0 MassSpringDemo()
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   MyMass *tmpm1=NULL,*tmpm2=NULL;
 
   PopUpOk("Left-Click to place mas\n"
@@ -130,23 +130,23 @@ U0 MassSpringDemo()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_KEY_DOWN);
+      msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_MS_L_DOWN|1<<MSG_MS_R_DOWN|1<<MSG_MS_R_UP|1<<MSG_KEY_DOWN);
       switch (msg_code) {
-	case MSG_IP_L_DOWN:
-	  PlaceMass(a1,a2);
+	case MSG_MS_L_DOWN:
+	  PlaceMass(arg1,arg2);
 	  break;
-	case MSG_IP_R_DOWN:
-	  tmpm1=MassFind(ode,a1,a2);
+	case MSG_MS_R_DOWN:
+	  tmpm1=MassFind(ode,arg1,arg2);
 	  tmpm2=NULL;
 	  break;
-	case MSG_IP_R_UP:
-	  if (tmpm1 && (tmpm2=MassFind(ode,a1,a2)) && tmpm1!=tmpm2)
+	case MSG_MS_R_UP:
+	  if (tmpm1 && (tmpm2=MassFind(ode,arg1,arg2)) && tmpm1!=tmpm2)
 	    PlaceSpring(tmpm1,tmpm2);
 	  tmpm1=tmpm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      CleanUp;
 	      Init;

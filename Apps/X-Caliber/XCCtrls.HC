@@ -12,7 +12,7 @@ class CtrlPanelState
 #define CTRL_PANEL_SPACING 33
 #define CTRL_PANEL_RANGE   30
 #define CTRL_PANEL_BORDER  2
-#define CTRL_PANEL_BUTTON_SIZE	12
+#define CTRL_PANEL_BTTN_SIZE	12
 
 #define TMP_Y	(+2)
 
@@ -23,19 +23,19 @@ U0 DrawCtrlPanelCtrl(CDC *dc,CCtrl *c)
 
   dc->color=LTRED;
   GrRect(dc, c->left,c->top,CTRL_PANEL_SPACING*3+2,
-	CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE+CTRL_PANEL_BUTTON_SIZE);
+	CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE+CTRL_PANEL_BTTN_SIZE);
   dc->color=DKGRAY;
   GrRect(dc, c->left+CTRL_PANEL_BORDER,c->top+CTRL_PANEL_BORDER,
 	CTRL_PANEL_SPACING*3+2-2*CTRL_PANEL_BORDER,
-	CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE+CTRL_PANEL_BUTTON_SIZE
+	CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE+CTRL_PANEL_BTTN_SIZE
 	-2*CTRL_PANEL_BORDER);
   dc->color=BLACK;
-  GrLine(dc,c->left+CTRL_PANEL_SPACING,(c->top+CTRL_PANEL_BUTTON_SIZE)+
+  GrLine(dc,c->left+CTRL_PANEL_SPACING,(c->top+CTRL_PANEL_BTTN_SIZE)+
 	CTRL_PANEL_SPACING,c->left+CTRL_PANEL_SPACING,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1);
-  GrLine(dc,c->left+2*CTRL_PANEL_SPACING+1,(c->top+CTRL_PANEL_BUTTON_SIZE)+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1);
+  GrLine(dc,c->left+2*CTRL_PANEL_SPACING+1,(c->top+CTRL_PANEL_BTTN_SIZE)+
 	CTRL_PANEL_SPACING,c->left+2*CTRL_PANEL_SPACING+1,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1);
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE-1);
 
   dc->color=BLACK;
   GrRect(dc,(c->left+c->right+1)/2-9*FONT_WIDTH/2-3,
@@ -55,30 +55,30 @@ U0 DrawCtrlPanelCtrl(CDC *dc,CCtrl *c)
 	c->top+CTRL_PANEL_BORDER+3+
 	(CTRL_PANEL_SPACING-FONT_HEIGHT)/2,"SpaceWalk");
   GrPrint(dc,c->left+CTRL_PANEL_SPACING-4*FONT_WIDTH/2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+
 	CTRL_PANEL_SPACING-FONT_HEIGHT-2,"Size");
   GrPrint(dc,c->left+2*CTRL_PANEL_SPACING+1-4*FONT_WIDTH/2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+
 	CTRL_PANEL_SPACING-FONT_HEIGHT-2,"Fuse");
   dc->color=LTRED;
   GrPrint(dc,c->left+CTRL_PANEL_SPACING-FONT_WIDTH/2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
 	"%d",s->shot_radius*10/CTRL_PANEL_RANGE);
   GrPrint(dc,c->left+2*CTRL_PANEL_SPACING+1-FONT_WIDTH/2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+CTRL_PANEL_RANGE+3,
 	"%d",s->fuse_time*10/CTRL_PANEL_RANGE);
   GrRect(dc,c->left+CTRL_PANEL_SPACING-3,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+
 	CTRL_PANEL_RANGE-1-s->shot_radius-2 ,7,5);
   GrRect(dc,c->left+2*CTRL_PANEL_SPACING+1-3,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+
 	CTRL_PANEL_RANGE-1-s->fuse_time-2,7,5);
   dc->color=YELLOW;
   GrRect(dc,c->left+CTRL_PANEL_SPACING-2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+
 	CTRL_PANEL_RANGE-1-s->shot_radius-1 ,5,3);
   GrRect(dc,c->left+2*CTRL_PANEL_SPACING+1-2,
-	(c->top+CTRL_PANEL_BUTTON_SIZE)+CTRL_PANEL_SPACING+
+	(c->top+CTRL_PANEL_BTTN_SIZE)+CTRL_PANEL_SPACING+
 	CTRL_PANEL_RANGE-1-s->fuse_time-1,5,3);
 
   d_range=c->right-c->left-5-5;
@@ -106,7 +106,7 @@ U0 UpdateDerivedCtrlPanelCtrl(CCtrl *c)
   c->left=c->win_task->pix_width-(CTRL_PANEL_SPACING*3+2);
   c->right=c->left+CTRL_PANEL_SPACING*3+2;
   c->top=c->win_task->pix_height-(CTRL_PANEL_SPACING*2+
-	CTRL_PANEL_RANGE+CTRL_PANEL_BUTTON_SIZE);
+	CTRL_PANEL_RANGE+CTRL_PANEL_BTTN_SIZE);
   c->bottom=c->top+CTRL_PANEL_SPACING*2+CTRL_PANEL_RANGE;
 
   s->shot_radius=ClampI64(s->shot_radius,0,CTRL_PANEL_RANGE-1);
@@ -122,10 +122,10 @@ U0 LeftClickCtrlPanel(CCtrl *c,I64 x,I64 y,Bool)
   else {
     if (x<(c->right+c->left)/2)
       s->shot_radius=CTRL_PANEL_RANGE-1
-	    -(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BUTTON_SIZE));
+	    -(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BTTN_SIZE));
     else
       s->fuse_time=CTRL_PANEL_RANGE-1
-	    -(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BUTTON_SIZE));
+	    -(y-(c->top+CTRL_PANEL_SPACING+CTRL_PANEL_BTTN_SIZE));
   }
   if (c->update_derived_vals)
     (*c->update_derived_vals)(c);
@@ -136,7 +136,7 @@ CCtrl *CtrlPanelNew()
   CCtrl *c=CAlloc(sizeof(CCtrl));
   MemSet(&ctrl_panel,0,sizeof(ctrl_panel));
   c->win_task=Fs;
-  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
+  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_MS;
   c->type=CTRLT_GENERIC;
   c->state=&ctrl_panel;
   c->draw_it=&DrawCtrlPanelCtrl;

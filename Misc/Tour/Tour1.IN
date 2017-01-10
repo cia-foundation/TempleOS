@@ -45,13 +45,13 @@ U0 RevealPopUpHelp(I64 scf)
     while (kbd.scan_code&(SCF_CTRL|SCF_ALT|SCF_SHIFT)==scf) {
       ScanKey(,,TRUE);
       if (1.0<tS-t0<1.15)
-	Snd(100);
+	Snd(34);
       else
-	Snd(0);
+	Snd;
       Sleep(1);
     }
     LBEqu(&Fs->win_inhibit,WIf_SELF_KEY_DESC,old_key_desc);
-    Snd(0);
+    Snd;
   } while (tS-t0<1.0);
 }
 

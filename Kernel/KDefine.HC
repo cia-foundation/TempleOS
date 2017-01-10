@@ -164,9 +164,9 @@ CColorROPU16 Str2ColorU16(U8 *st)
   while (TRUE) {
     if (!*st||StrOcc(str2color_lst,*st))
       return res;
-    if (Bt(chars_bmp_alpha,*st)) {
+    if (Bt(char_bmp_alpha,*st)) {
       ptr=st;
-      while (Bt(chars_bmp_alpha_numeric,*ptr))
+      while (Bt(char_bmp_alpha_numeric,*ptr))
 	ptr++;
       st2=ptr2=MAlloc(ptr-st+1);
       while (st<ptr)
@@ -185,7 +185,7 @@ CColorROPU16 Str2ColorU16(U8 *st)
 	return COLOR_INVALID;
       }
       Free(st2);
-    } else if (*st=='+'||*st=='|'||Bt(chars_bmp_white_space,*st))
+    } else if (*st=='+'||*st=='|'||Bt(char_bmp_white_space,*st))
       st++;
     else if ('0'<=*st<='9') {
       i=Str2I64(st,10,&ptr);

@@ -19,7 +19,7 @@ CDate Dos2CDate(U16 t,U16 d)
   return Struct2Date(&ds);
 }
 
-U0 FAT32DrvInit(CDrv *dv)
+U0 FAT32Init(CDrv *dv)
 {
   CFAT32Boot br32;
   Bool unlock;
@@ -43,18 +43,6 @@ U0 FAT32DrvInit(CDrv *dv)
   } catch
     if (unlock)
       DrvUnlock(dv);
-}
-
-Bool FAT32DrvValidate(U8 drv_let)
-{
-  CDrv *dv;
-  CFAT32Boot br;
-  if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_FAT32 &&
-	RBlks(dv,&br,dv->drv_offset,1) && br.signature==0xAA55 &&
-	br.sects==dv->size)
-    return TRUE;
-  else
-    return FALSE;
 }
 
 U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
@@ -115,11 +103,11 @@ U0 FAT32Fmt(U8 drv_let,Bool quick=TRUE)
 
     WBlks(dv,fis,dv->drv_offset+br->file_system_info_sect,1);
     WBlks(dv,br,dv->drv_offset,1);
-    FAT32DrvInit(dv);
+    FAT32Init(dv);
     ClustersAlloc(dv,0,1,FALSE); //Alloc #1
     br->root_cluster=ClustersAlloc(dv,0,1,FALSE);
     WBlks(dv,br,dv->drv_offset,1);
-    FAT32DrvInit(dv);
+    FAT32Init(dv);
     DrvUnlock(dv);
   } catch
     DrvUnlock(dv);

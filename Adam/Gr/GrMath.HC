@@ -110,7 +110,7 @@ public I64 *Mat4x4New(I64 *src,CTask *mem_task=NULL)
   return Mat4x4Equ(MAlloc(sizeof(I64)*16,mem_task),src);
 }
 
-public I64 *Mat4x4RotX(I64 *m1,F64 è)
+public I64 *Mat4x4RotX(I64 *m,F64 è)
 {//Rot matrix about X axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   F64 my_cos=Cos(è)*GR_SCALE,my_sin=Sin(è)*GR_SCALE;
   I64 r[16],r2[16];
@@ -121,10 +121,10 @@ public I64 *Mat4x4RotX(I64 *m1,F64 è)
   r[6]=-my_sin;
   r[0]=GR_SCALE;
   r[15]=GR_SCALE;
-  return Mat4x4Equ(m1,Mat4x4MulMat4x4Equ(r2,r,m1));
+  return Mat4x4Equ(m,Mat4x4MulMat4x4Equ(r2,r,m));
 }
 
-public I64 *Mat4x4RotY(I64 *m1,F64 ê)
+public I64 *Mat4x4RotY(I64 *m,F64 ê)
 {//Rot matrix about Y axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   F64 my_cos=Cos(ê)*GR_SCALE,my_sin=Sin(ê)*GR_SCALE;
   I64 r[16],r2[16];
@@ -135,10 +135,10 @@ public I64 *Mat4x4RotY(I64 *m1,F64 ê)
   r[2]=my_sin;
   r[5]=GR_SCALE;
   r[15]=GR_SCALE;
-  return Mat4x4Equ(m1,Mat4x4MulMat4x4Equ(r2,r,m1));
+  return Mat4x4Equ(m,Mat4x4MulMat4x4Equ(r2,r,m));
 }
 
-public I64 *Mat4x4RotZ(I64 *m1,F64 é)
+public I64 *Mat4x4RotZ(I64 *m,F64 é)
 {//Rot matrix about Z axis. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   F64 my_cos=Cos(é)*GR_SCALE,my_sin=Sin(é)*GR_SCALE;
   I64 r[16],r2[16];
@@ -149,15 +149,15 @@ public I64 *Mat4x4RotZ(I64 *m1,F64 é)
   r[1]=-my_sin;
   r[10]=GR_SCALE;
   r[15]=GR_SCALE;
-  return Mat4x4Equ(m1,Mat4x4MulMat4x4Equ(r2,r,m1));
+  return Mat4x4Equ(m,Mat4x4MulMat4x4Equ(r2,r,m));
 }
 
-public I64 *Mat4x4Scale(I64 *m1,F64 s)
+public I64 *Mat4x4Scale(I64 *m,F64 s)
 {//Scale 4x4 matrix by value.
   I64 i;
   for (i=0;i<16;i++)
-    m1[i]*=s;
-  return m1;
+    m[i]*=s;
+  return m;
 }
 
 public U0 DCPenWidthScale(CDC *dc=gr.dc)

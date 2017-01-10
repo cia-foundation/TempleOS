@@ -2,34 +2,39 @@
 
 DefineLstLoad("ST_RHYTHM_COMPLEXITY","Simple\0Normal\0Complex\0");
 
-class MakeSongSettings
+class CMakeSongSettings
 {
   I64  complexity		fmtstr "$$LS,D=\"ST_RHYTHM_COMPLEXITY\"$$\n";
   Bool rests			fmtstr "$$CB,\"Rests\"$$\n";
   Bool six_eight		fmtstr "$$CB,\"Six Eight\"$$\n";
   I64  octave			fmtstr "$$DA-TRM,A=\"Octave:%d\"$$\n";
+  I64  octave_state;
 };
 
-U0 InsNote(MakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
+U0 InsNote(CMakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
 {//k is a random note nibble
   if (!k && mss->rests) {
     buf[*j]='R';
     *j+=1;
   } else {
     k/=2;
-    if (!k) {
-      if (music.octave) {
-	buf[*j]=music.octave-1+'0';
-	*j+=1;
-	buf[*j]='G';
-	*j+=1;
-	buf[*j]=music.octave+'0';
-	*j+=1;
-      } else {
-	buf[*j]='G';
+    if (k<3) {
+      if (mss->octave_state!=mss->octave) {
+	mss->octave_state=mss->octave;
+	buf[*j]=mss->octave_state+'0';
 	*j+=1;
       }
+      if (!k)
+	buf[*j]='G';
+      else
+	buf[*j]=k-1+'A';
+      *j+=1;
     } else {
+      if (mss->octave_state!=mss->octave+1) {
+	mss->octave_state=mss->octave+1;
+	buf[*j]=mss->octave_state+'0';
+	*j+=1;
+      }
       buf[*j]=k-1+'A';
       *j+=1;
     }
@@ -51,10 +56,11 @@ DUR_8_16_16,DUR_16_16_8,DUR_16_16_16_16};
 
 public U8 *GodSongStr()
 {//Make God generate 2 measures of a song. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  MakeSongSettings mss;
+  CMakeSongSettings mss;
   U8 *buf;
   I64 i,j=0,k,n,k2,duration,last_duration=-1,len;
 
+  MemSet(&mss,0,sizeof(mss));
   mss.complexity=1;
   mss.rests=FALSE;
   mss.octave=music.octave;
@@ -63,14 +69,15 @@ public U8 *GodSongStr()
     return NULL;
 
   buf=CAlloc(256);
-  music.octave=ClampI64(mss.octave,0,6);
+  music.octave=mss.octave=ClampI64(mss.octave,1,7);
   progress4=0;
   if (mss.six_eight)
     progress4_max=6;
   else
     progress4_max=8;
 
-  buf[j++]='0'+music.octave;
+  mss.octave_state=mss.octave+1;
+  buf[j++]='0'+mss.octave_state;
   if (mss.six_eight) {
     len=6;
     buf[j++]='M';

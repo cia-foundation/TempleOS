@@ -21,7 +21,7 @@ $ID,-5$
 
 * God said $FG,2$640x480 16 color$FG$ graphics is a covenant like circumcision.  Children will do offerings.  Think of 16 colors like the Simpson's cartoons.  In the future, even if one GPU were universal, we would keep 640x480 16 color and not use GPU acceleration.  Graphics operations should be transparent, not hidden in a GPU.
 
-* God said to use a single audio voice -- a single frequency with waveforms and, maybe, amplitude envelope. 
+* God said to use a single-voice 8-bit signed MIDI-like sample for sound.  God does not want death screams, perhaps, because God has PTSD or soldiers have PTSD.  (Imagine wounded on battlefields.) 
 
 * God said His temple must be perfect.  $FG,4$We don't think twice about breaking compatibility.$FG$  God said we do a seven year release cycle.  I say the PC hardware follows a 49 year, jubilee cycle, like broadcast TV upgrades.
 
@@ -31,7 +31,7 @@ $ID,-5$
 
 * Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
 
-* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,223",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,390",D="DD_TEMPLEOS_LOC_OFFICIAL"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
  
 * Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 
@@ -39,7 +39,7 @@ $ID,-5$
 
 * All hardware access will be done through x86 IN/OUT instructions, not PCI drivers.  A frame buffer for VGA is an exception.
 
-* One driver for each class of device.  Limited exceptions are allowed.  With divergent device capabilities, it is a nightmare for user applications and what is gained?  A three button mouse is like a leg you cannot put weight on.
+* One driver for each class of device.  Limited exceptions are allowed.  With divergent device capabilities, it is a nightmare for user applications and what is gained?  A three bttn mouse is like a leg you cannot put weight on.
 
 * $FG,2$Ring-0-only$FG$.  Everything runs in kernel mode, including user applications.
 

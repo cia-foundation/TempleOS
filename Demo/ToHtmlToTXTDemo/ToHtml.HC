@@ -184,7 +184,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V4.13",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -239,8 +239,8 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 
       if (no_bwd)
 	while (col<doc_e->x)
-	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,FALSE,
-		" ",&col,style_bitmap);
+	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr&~DOCET_UNDERLINE,
+		&old_u32_attr,TRUE," ",&col,style_bitmap);
 
       link_st=NULL;
       if (doc_e->de_flags&DOCEF_HTML_LINK)
@@ -280,7 +280,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	    Free(hl);
 	  } else
 	    HtmlPutS(doc_out,doc_e->settings.final_u32_attr,
-		  &old_u32_attr,doc_e->tag,&col,style_bitmap);
+		  &old_u32_attr,TRUE,doc_e->tag,&col,style_bitmap);
 	  break;
 	case DOCT_TAB:
 	  HtmlPutS(doc_out,doc_e->settings.final_u32_attr,&old_u32_attr,TRUE,

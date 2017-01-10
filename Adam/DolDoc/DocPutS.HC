@@ -5,7 +5,7 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 //Does not handle partial Doc entries.
   //Returns last newly created dollar-sign CDocEntry or NULL.
   U8 *ptr=st,*ptr2,*st2,*ptr3,*ptr4,*src,
-	*char_bitmap;
+	*char_bmp;
   Bool unlock;
   I64 ch,j;
   CDocEntry *doc_e=NULL,*res=NULL,*doc_ce;
@@ -13,16 +13,16 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
     return NULL;
   unlock=DocLock(doc);
   if (doc->flags & DOCF_PLAIN_TEXT_TABS)
-    char_bitmap=chars_bmp_zero_cr_nl_cursor;
+    char_bmp=char_bmp_zero_cr_nl_cursor;
   else if (doc->flags & DOCF_PLAIN_TEXT)
-    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor;
+    char_bmp=char_bmp_zero_tab_cr_nl_cursor;
   else
-    char_bitmap=chars_bmp_zero_tab_ff_cr_nl_cursor_dollar;
+    char_bmp=char_bmp_zero_tab_cr_nl_cursor_dollar;
   doc_ce=doc->cur_entry;
   while (*ptr) {
     ptr2=ptr;
     do ch=*ptr++;
-    while (!Bt(char_bitmap,ch) || ch==CH_CURSOR && doc->flags&DOCF_NO_CURSOR);
+    while (!Bt(char_bmp,ch) || ch==CH_CURSOR && doc->flags&DOCF_NO_CURSOR);
     ptr--;
     if (!ch) {
       if (j=ptr-ptr2) {
@@ -76,12 +76,6 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 	  DocInsEntry(doc,doc_e);
 	  ptr++;
 	  break;
-	case CH_FORM_FEED:
-	  doc_e=DocEntryNewBase(doc,
-		DOCT_PAGE_BREAK|doc->settings_head.dft_text_attr<<8);
-	  DocInsEntry(doc,doc_e);
-	  ptr++;
-	  break;
 	case '\t':
 	  doc_e=DocEntryNewBase(doc,
 		DOCT_TAB|doc->settings_head.dft_text_attr<<8);
@@ -118,10 +112,6 @@ CDocEntry *DocPutS(CDoc *doc,U8 *st)
 		if (ch==CH_CURSOR) {
 		  doc_e=DocEntryNewBase(doc,
 			DOCT_CURSOR|doc->settings_head.dft_text_attr<<8);
-		  DocInsEntry(doc,doc_e);
-		} else if (ch==CH_FORM_FEED) {
-		  doc_e=DocEntryNewBase(doc,
-			DOCT_PAGE_BREAK|doc->settings_head.dft_text_attr<<8);
 		  DocInsEntry(doc,doc_e);
 		} else
 		  *ptr4++=ch;
@@ -184,7 +174,7 @@ public U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...)
       DocPutKey(doc,ch,0);
   else
     while (ch=*ptr) {
-      if (!Bt(chars_bmp_safe_dollar,ch) ||
+      if (!Bt(char_bmp_safe_dollar,ch) ||
 	    doc->flags & (DOCF_OVERSTRIKE|DOCF_IN_DOLLAR)) {
 	DocPutKey(doc,ch,0);
 	ptr++;
@@ -192,7 +182,7 @@ public U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...)
 	ptr2=ptr++;
 	while (TRUE) {
 	  ch=*ptr++;
-	  if (!Bt(chars_bmp_safe_dollar,ch))
+	  if (!Bt(char_bmp_safe_dollar,ch))
 	    break;
 	}
 	ptr--;
@@ -271,7 +261,7 @@ U0 DocDump(CDoc *doc,I64 uS_delay=0)
     doc_e=doc_e2;
     if (doc_e->type_u8==DOCT_NEW_LINE) {
       '\n';
-      BusyWait(uS_delay);
+      Busy(uS_delay);
       doc_e=doc_e->next;
     }
   }

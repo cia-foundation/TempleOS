@@ -2,7 +2,7 @@
 //ISO2 is ISO13490
 //ISO3 is ISO13346
 
-Bool ISODrvInit(CDrv *dv,I64 blk)
+Bool ISOInit(CDrv *dv,I64 blk)
 {
   CBlkDev *bd=dv->bd;
   I64 spc=bd->blk_size>>BLK_SIZE_BITS,i=blk/spc,drv_offset=0;
@@ -13,9 +13,9 @@ Bool ISODrvInit(CDrv *dv,I64 blk)
 
   try {
     unlock=DrvLock(dv);
-    dv->fs_type=FSt_ISO9660; //default
+    dv->fs_type=FSt_ISO9660;
     dv->spc=spc;
-    dv->drv_offset=bd->drv_offset=dv->data_area=dv->root_cluster=dv->size=0;
+    dv->data_area=dv->root_cluster=dv->drv_offset=bd->drv_offset=dv->size=0;
     while (TRUE) {
       dv->size=MaxI64(dv->size,(i+1)*spc);
       RBlks(dv,iso,i*spc,spc);
@@ -30,17 +30,17 @@ Bool ISODrvInit(CDrv *dv,I64 blk)
 	      break;
 	    case ISO1T_SUPPLEMENTARY_DESC:
 	      de=&iso->root_dir_record;
-	      dv->root_cluster=de->loc.little;
 	      dv->size=iso->vol_space_size.little*bd->blk_size>>BLK_SIZE_BITS;
 	      if (!StrCmp(iso->publisher_id,"TempleOS RedSea")) {
 		dv->fs_type=FSt_REDSEA;
 		bd->drv_offset=dv->drv_offset=19<<2+drv_offset;
 		bd->max_blk=dv->size-1;
 		dv->size-=bd->drv_offset;
-		RedSeaDrvInit(dv);
-	      }
+		RedSeaInit(dv);
+	      } else
+		dv->root_cluster=de->loc.little;
 	      res=TRUE;
-	      goto ipi_done;
+	      goto di_done;
 	    case ISO1T_TERMINATOR:
 	      throw('Drv');
 	  }
@@ -51,7 +51,7 @@ Bool ISODrvInit(CDrv *dv,I64 blk)
       }
       i++;
     }
-ipi_done:
+di_done:
     Free(iso);
     if (unlock)
       DrvUnlock(dv);

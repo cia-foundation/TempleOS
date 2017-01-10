@@ -6,9 +6,12 @@
 #define PCI_DEV_FILE "::/Misc/PCIDevices.DD.Z"
 
 /****
-//1) Plain text edit and remove file header and tail
-//2) Text find-and-replace "=0A=" with "".
-//3) Run PCIDevFileGen().
+//1) Download http://www.pcidatabase.com/reports.php?type=tab-delimeted
+//2) Rename to ::/Misc/PCIDevices.DD.Z
+//3) ToDolDoc("::/Misc/PCIDevices.DD.Z");
+//4) Edit and remove file header and tail
+//5) Text find-and-replace "=0A=" with "". (Doesn't seem necessary anmore.)
+//6) Run PCIDevFileGen(). (Doesn't seem necessary anmore.)
 
 public U0 PCIDevFileGen()
 {
@@ -168,34 +171,50 @@ public U0 PCIRep()
 #help_index "Info;Memory/Info"
 public U0 MemBIOSRep()
 {//Report the memory ranges reported by the BIOS at boot.
-  U16		*m01=SYS_MEM_E801;
-  CMemE820	*m20=SYS_MEM_E820;
+  U16		*m01=MEM_E801;
+  CMemE820	*m20=MEM_E820;
   CMemRange	*tmpmr;
   "Standard Addresses\n"
-	"0x000A0000-0x000BFFFF VGA\n"
-	"0xFEE00000-0xFEE00FFF See $$LK,\"APIC\",A=\"MN:LAPIC_BASE\"$$\n\n"
+	"000A0000-000BFFFF VGA\n"
+	"FEE00000-FEE00FFF See $$LK,\"APIC\",A=\"MN:LAPIC_BASE\"$$\n\n"
 	"32 Bit Device Mem\n";
-  while (LBts(&sys_semas[SYS_SEMA_DEV_MEM],0))
+  while (LBts(&sys_semas[SEMA_DEV_MEM],0))
     Yield;
   tmpmr=dev.mem32_head.next;
   while (tmpmr!=&dev.mem32_head) {
-    "%02X:0x%016X-0x%016X\n",
+    "%02X:%016X-%016X\n",
 	  tmpmr->type,tmpmr->base,tmpmr->base+tmpmr->size-1;
     tmpmr=tmpmr->next;
   }
-  LBtr(&sys_semas[SYS_SEMA_DEV_MEM],0);
+  LBtr(&sys_semas[SEMA_DEV_MEM],0);
 
   "\nBIOS Memory Report 15:E801\n"
-	"01:0x0000000000000000-0x%016X\n",0x100000+m01[0]<<10-1;
-  "01:0x0000000001000000-0x%016X\n",0x1000000+m01[1]<<16-1;
+	"01:0000000000000000-%016X\n",0x100000+m01[0]<<10-1;
+  "01:0000000001000000-%016X\n",SYS_16MEG_AREA_LIMIT+m01[1]<<16-1;
 
   if (m20->type) {
     '\n';
     "BIOS Memory Report 15:E820\n";
     while (m20->type) {
-      "%02X:0x%016X-0x%016X\n",m20->type,m20->base,m20->base+m20->len-1;
+      "%02X:%016X-%016X\n",m20->type,m20->base,m20->base+m20->len-1;
       m20++;
     }
   }
+}
 
+public U0 MemPageRep()
+{//Page Table Report.
+  "MAPPED\t  :%010X with ",mem_mapped_space;
+  if (Bt(&mem_page_size,30))
+    "$$RED$$1GIG$$FG$$ pages\n";
+  else
+    "$$RED$$2MEG$$FG$$ pages\n";
+  "PML2\t  :%010X 2MEG  :%08X\n",
+	*MEM_PML2(U64 *),*MEM_NUM_2MEG(U64 *);
+  "PML3\t  :%010X 1GIG  :%08X\n",
+	*MEM_PML3(U64 *),*MEM_NUM_1GIG(U64 *);
+  "PML4\t  :%010X 512GIG:%08X\n",
+	*MEM_PML4(U64 *),*MEM_NUM_512GIG(U64 *);
+  "FIXED_AREA:%010X\n",SYS_FIXED_AREA;
+  "HEAP_BASE :%010X\nHEAP_LIMIT:%010X\n",mem_heap_base,mem_heap_limit;
 }

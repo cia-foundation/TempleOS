@@ -1,11 +1,11 @@
 U0 AOTStoreCodeU8(CCmpCtrl *cc,U8 b)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64 i=aotc->ip>>AOT_BIN_BLK_BITS;
+  I64 i=aotc->rip>>AOT_BIN_BLK_BITS;
   CAOTBinBlk *tmpbin=aotc->bin;
   while (i--)
     if (!(tmpbin=tmpbin->next)) {
-      i=aotc->ip>>AOT_BIN_BLK_BITS+1;
+      i=aotc->rip>>AOT_BIN_BLK_BITS+1;
       tmpbin=&aotc->bin;
       while (i--) {
 	if (!tmpbin->next)
@@ -14,7 +14,7 @@ U0 AOTStoreCodeU8(CCmpCtrl *cc,U8 b)
       }
       break;
     }
-  tmpbin->body[aotc->ip++ & (AOT_BIN_BLK_SIZE-1)]=b;
+  tmpbin->body[aotc->rip++ & (AOT_BIN_BLK_SIZE-1)]=b;
   if (aotc->lst) {
     if (aotc->lst_col>=24) {
       '\n';
@@ -23,14 +23,14 @@ U0 AOTStoreCodeU8(CCmpCtrl *cc,U8 b)
     "%02X ",b;
     aotc->lst_col+=3;
   }
-  if (aotc->ip>aotc->num_bin_U8s)
-    aotc->num_bin_U8s=aotc->ip;
+  if (aotc->rip>aotc->num_bin_U8s)
+    aotc->num_bin_U8s=aotc->rip;
 }
 
 U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64 i=aotc->ip>>AOT_BIN_BLK_BITS,j=(aotc->ip+sizeof(U32))>>AOT_BIN_BLK_BITS;
+  I64 i=aotc->rip>>AOT_BIN_BLK_BITS,j=(aotc->rip+sizeof(U32))>>AOT_BIN_BLK_BITS;
   U32 *_d;
   CAOTBinBlk *tmpbin;
   if (i!=j)
@@ -40,7 +40,7 @@ U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
     tmpbin=aotc->bin;
     while (i--)
       if (!(tmpbin=tmpbin->next)) {
-	i=aotc->ip>>AOT_BIN_BLK_BITS+1;
+	i=aotc->rip>>AOT_BIN_BLK_BITS+1;
 	tmpbin=&aotc->bin;
 	while (i--) {
 	  if (!tmpbin->next)
@@ -49,9 +49,9 @@ U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
 	}
 	break;
       }
-    _d=tmpbin->body+ aotc->ip&(AOT_BIN_BLK_SIZE-1);
+    _d=tmpbin->body+ aotc->rip&(AOT_BIN_BLK_SIZE-1);
     *_d=d;
-    aotc->ip+=sizeof(U32);
+    aotc->rip+=sizeof(U32);
     if (aotc->lst) {
       if (aotc->lst_col>=24) {
 	'\n';
@@ -60,16 +60,16 @@ U0 AOTStoreCodeU32(CCmpCtrl *cc,U32 d)
       "%08X ",d;
       aotc->lst_col+=9;
     }
-    if (aotc->ip>aotc->num_bin_U8s)
-      aotc->num_bin_U8s=aotc->ip;
+    if (aotc->rip>aotc->num_bin_U8s)
+      aotc->num_bin_U8s=aotc->rip;
   }
 }
 
 U0 AOTStoreCodeU64(CCmpCtrl *cc,U64 q)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64 i=aotc->ip>>AOT_BIN_BLK_BITS,j=(aotc->ip+sizeof(I64))>>AOT_BIN_BLK_BITS,
-	*_q;
+  I64	i=aotc->rip>>AOT_BIN_BLK_BITS,
+	j=(aotc->rip+sizeof(I64))>>AOT_BIN_BLK_BITS, *_q;
   CAOTBinBlk *tmpbin;
   if (i!=j)
     for (i=0;i<sizeof(I64);i++)
@@ -78,7 +78,7 @@ U0 AOTStoreCodeU64(CCmpCtrl *cc,U64 q)
     tmpbin=aotc->bin;
     while (i--)
       if (!(tmpbin=tmpbin->next)) {
-	i=aotc->ip>>AOT_BIN_BLK_BITS+1;
+	i=aotc->rip>>AOT_BIN_BLK_BITS+1;
 	tmpbin=&aotc->bin;
 	while (i--) {
 	  if (!tmpbin->next)
@@ -87,9 +87,9 @@ U0 AOTStoreCodeU64(CCmpCtrl *cc,U64 q)
 	}
 	break;
       }
-    _q=tmpbin->body+ aotc->ip&(AOT_BIN_BLK_SIZE-1);
+    _q=tmpbin->body+ aotc->rip&(AOT_BIN_BLK_SIZE-1);
     *_q=q;
-    aotc->ip+=sizeof(I64);
+    aotc->rip+=sizeof(I64);
     if (aotc->lst) {
       if (aotc->lst_col>=24) {
 	'\n';
@@ -98,18 +98,18 @@ U0 AOTStoreCodeU64(CCmpCtrl *cc,U64 q)
       "%016X ",q;
       aotc->lst_col+=17;
     }
-    if (aotc->ip>aotc->num_bin_U8s)
-      aotc->num_bin_U8s=aotc->ip;
+    if (aotc->rip>aotc->num_bin_U8s)
+      aotc->num_bin_U8s=aotc->rip;
   }
 }
 
-U0 AOTStoreCodeU8At(CCmpCtrl *cc,I64 ip,...)
+U0 AOTStoreCodeU8At(CCmpCtrl *cc,I64 rip,...)
 {
   CAOTCtrl *aotc=cc->aotc;
   CAOTBinBlk *tmpbin;
   I64 i,j;
   for (j=0;j<argc;j++) {
-    i=ip>>AOT_BIN_BLK_BITS+1;
+    i=rip>>AOT_BIN_BLK_BITS+1;
     tmpbin=&aotc->bin;
     while (i--) {
       if (!tmpbin->next) {
@@ -118,10 +118,10 @@ U0 AOTStoreCodeU8At(CCmpCtrl *cc,I64 ip,...)
       }
       tmpbin=tmpbin->next;
     }
-    tmpbin->body[ip++ & (AOT_BIN_BLK_SIZE-1)]=argv[j];
+    tmpbin->body[rip++ & (AOT_BIN_BLK_SIZE-1)]=argv[j];
   }
-  if (ip>aotc->num_bin_U8s)
-    aotc->num_bin_U8s=ip;
+  if (rip>aotc->num_bin_U8s)
+    aotc->num_bin_U8s=rip;
 }
 
 I64 AsmLexExpression(CCmpCtrl *cc)
@@ -153,13 +153,13 @@ U0 AsmLineLst(CCmpCtrl *cc)
     if (doc_e2=aotc->lst_last_line) {
       if (tmpf->flags& LFSF_DOC) {
 	while (doc_e2->y<doc_e->y) {
-	  "%h*c%08X ",24-aotc->lst_col,CH_SPACE,aotc->lst_last_ip;
+	  "%h*c%08X ",24-aotc->lst_col,CH_SPACE,aotc->lst_last_rip;
 	  aotc->lst_col=0;
 	  doc_e2=LexPutLine(cc,doc_e2);
 	}
       } else {
 	while (*doc_e2(U8 *) && doc_e2!=doc_e) {
-	  "%h*c%08X ",24-aotc->lst_col,CH_SPACE,aotc->lst_last_ip;
+	  "%h*c%08X ",24-aotc->lst_col,CH_SPACE,aotc->lst_last_rip;
 	  aotc->lst_col=0;
 	  doc_e2=LexPutLine(cc,doc_e2);
 	}
@@ -171,5 +171,5 @@ U0 AsmLineLst(CCmpCtrl *cc)
     aotc->lst_last_line=NULL;
     aotc->lst_last_lfn=tmpf;
   }
-  aotc->lst_last_ip=aotc->ip;
+  aotc->lst_last_rip=aotc->rip;
 }

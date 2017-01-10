@@ -1,9 +1,8 @@
 #help_index "Windows"
 #help_file "::/Doc/Windows"
 
-CIPStateGlbls old_ip={IP_NULL,{-1000,-1000,0},{-1000,-1000,0},{-1000,-1000,0},
-  {0,0,0},{1.0,1.0,1.0},
-  0,(MAX_I32+1)>>3,0.0,GetTSC,0.350,0,0,
+CMsStateGlbls old_ms={{-1000,-1000,0},{-1000,-1000,0},{-1000,-1000,0},
+  {0,0,0},{1.0,1.0,1.0},0.0,GetTSC,0.350,0,0,
   FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
 };
 
@@ -11,9 +10,22 @@ public CWinMgrGlbls winmgr={0,0,0,WINMGR_FPS,tS,NULL,FALSE,FALSE,FALSE};
 winmgr.t=CAlloc(sizeof(CWinMgrTimingGlbls));
 winmgr.t->last_calc_idle_time=tS;
 
+U0 ProgressBarsRegTf(U8 *path=NULL)
+{
+  F64 t,p1,p2,p3,p4;
+  if (path) {
+    t=tS;
+    if (progress1_t0) p1=t-progress1_t0; else p1=0;
+    if (progress2_t0) p2=t-progress2_t0; else p2=0;
+    if (progress3_t0) p3=t-progress3_t0; else p3=0;
+    if (progress4_t0) p4=t-progress4_t0; else p4=0;
+    RegWrite(path,"progress1_tf=%0.3f;progress2_tf=%0.3f;\n"
+	  "progress3_tf=%0.3f;progress4_tf=%0.3f;\n",p1,p2,p3,p4);
+  }
+}
+
 #define PROGRESS_BAR_HEIGHT	20
 #define PROGRESS_BAR_WIDTH	(3*GR_WIDTH/4)
-
 U0 DrawProgressBars(CDC *dc)
 {
   I64 i,j,k,n,m;
@@ -52,20 +64,24 @@ U0 DrawProgressBars(CDC *dc)
 		PROGRESS_BAR_HEIGHT)/2-4);
       }
 
-      dc->color=WHITE;
+      dc->color=GREEN;
       if (*sys_progresses[i].desc)
 	st=StrNew(sys_progresses[i].desc);
       else
 	st=MStrPrint("%d/%d",n,m);
       if (sys_progresses[i].t0) {
-	st2=MStrPrint("%s %5.3f",st,tS-sys_progresses[i].t0);
+	st2=MStrPrint("%s %fs",st,tS-sys_progresses[i].t0);
 	Free(st);
       } else
 	st2=st;
-      GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st2))/2,
-	    (GR_HEIGHT-FONT_HEIGHT-
-	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st2);
-      Free(st2);
+      if (sys_progresses[i].tf) {
+	st=MStrPrint("%s/%fs",st2,sys_progresses[i].tf);
+	Free(st2);
+      } else
+	st=st2;
+      GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,(GR_HEIGHT-FONT_HEIGHT-
+	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
+      Free(st);
     }
   }
 }
@@ -75,24 +91,24 @@ U0 DrawWinGrid(CDC *dc)
   F64 d;
   dc->color=BLACK;
   dc->pen_width=1;
-  for (d=ip_grid.x_offset;d<GR_WIDTH; d+=ip_grid.x)
+  for (d=ms_grid.x_offset;d<GR_WIDTH; d+=ms_grid.x)
     GrLine(dc,d,0,d,GR_HEIGHT-1);
-  for (d=ip_grid.y_offset;d<GR_HEIGHT;d+=ip_grid.y)
+  for (d=ms_grid.y_offset;d<GR_HEIGHT;d+=ms_grid.y)
     GrLine(dc,0,d,GR_WIDTH-1,d);
 }
 
 U0 WinGrid(Bool val)
 {
   CGridGlbls last_grid;
-  MemCpy(&last_grid,&ip_grid,sizeof(CGridGlbls));
-  if (!val || PopUpForm(&ip_grid)) {
+  MemCpy(&last_grid,&ms_grid,sizeof(CGridGlbls));
+  if (!val || PopUpForm(&ms_grid)) {
     if (!val)
       GridInit;
-    mouse.prescale.x*=last_grid.x_speed/ip_grid.x_speed;
-    mouse.prescale.y*=last_grid.y_speed/ip_grid.y_speed;
-    mouse.prescale.z*=last_grid.z_speed/ip_grid.z_speed;
+    ms_hard.prescale.x*=last_grid.x_speed/ms_grid.x_speed;
+    ms_hard.prescale.y*=last_grid.y_speed/ms_grid.y_speed;
+    ms_hard.prescale.z*=last_grid.z_speed/ms_grid.z_speed;
   } else
-    MemCpy(&ip_grid,&last_grid,sizeof(CGridGlbls));
+    MemCpy(&ms_grid,&last_grid,sizeof(CGridGlbls));
 }
 U0 CtrlAltG(I64 sc)
 {
@@ -155,29 +171,29 @@ public U0 WinScrollRestore(CTask *task,CD3I64 *s)
   task->scroll_z=s->z;
 }
 
-U0 DrawInputPtr(CDC *dc)
+U0 DrawMs(CDC *dc)
 {
   I64 x,y;
   PUSHFD
   CLI
-  x=ip.pos.x;
-  y=ip.pos.y;
+  x=ms.pos.x;
+  y=ms.pos.y;
   POPFD
-  if (ip.show && ip.dev!=IP_NULL) {
+  if (ms.show && ms_hard.installed) {
     if (!Bt(&sys_run_level,RLf_VGA)) //if text mode
-      gr.text_base[ip.pos_text.x+ip.pos_text.y*TEXT_COLS]^=0x7F00;
+      gr.text_base[ms.pos_text.x+ms.pos_text.y*TEXT_COLS]^=0x7F00;
     else {
-      if (gr.fp_draw_input_ptr) {
-	if (ip.lb)
+      if (gr.fp_draw_ms) {
+	if (ms.lb)
 	  dc->color=ROP_XOR+LTPURPLE^TRANSPARENT;
-	else if (ip.rb)
+	else if (ms.rb)
 	  dc->color=ROP_XOR+LTCYAN^TRANSPARENT;
 	else
 	  dc->color=ROP_XOR+BLACK^TRANSPARENT;
-	if (winmgr.grab_scroll && gr.fp_draw_grab_input_ptr)
-	  (*gr.fp_draw_grab_input_ptr)(dc,x,y,winmgr.grab_scroll_closed);
+	if (winmgr.grab_scroll && gr.fp_draw_grab_ms)
+	  (*gr.fp_draw_grab_ms)(dc,x,y,winmgr.grab_scroll_closed);
 	else
-	  (*gr.fp_draw_input_ptr)(dc,x,y);
+	  (*gr.fp_draw_ms)(dc,x,y);
       }
     }
   }
@@ -185,50 +201,48 @@ U0 DrawInputPtr(CDC *dc)
 
 U0 WinFinalUpdate(CDC *dc)
 {
-  if (ip_grid.show)
+  if (ms_grid.show)
     DrawWinGrid(dc);
   DrawProgressBars(dc);
   if (winmgr.show_menu)
     DrawMenu(dc);
   else
     sys_cur_submenu_entry=NULL;
-  DrawInputPtr(dc);
+  DrawMs(dc);
 }
 
 gr.fp_final_scrn_update=&WinFinalUpdate;
 
-U0 WinIPUpdate()
+U0 WinMsUpdate()
 {
   I64 dd;
   Bool set=FALSE;
-  if (ip.dev==IP_MOUSE) {
-    ip.has_wheel=mouse.has_wheel;
-    if (mouse.evt) {
-      ip.throttle+=ip.throttle_step*SignI64(mouse.pos.z-ip.pos.z);
-      IPVarsUpdate(mouse.pos.x,mouse.pos.y,mouse.pos.z,
-	    mouse.buttons[0],mouse.buttons[1]);
-      mouse.evt=FALSE;
+  if (ms_hard.installed) {
+    ms.has_wheel=ms_hard.has_wheel;
+    if (ms_hard.evt) {
+      MsUpdate(ms_hard.pos.x,ms_hard.pos.y,ms_hard.pos.z,
+	    ms_hard.bttns[0],ms_hard.bttns[1]);
+      ms_hard.evt=FALSE;
       set=TRUE;
     }
-  } else if (ip.dev==IP_NULL && mouse.installed)
-    ip.dev=IP_MOUSE;
+  }
 
   if (set) {
-    if (ip.dev==IP_MOUSE) {
-      ip.speed=mouse.speed;
-      ip.timestamp=mouse.timestamp;
+    if (ms_hard.installed) {
+      ms.speed=ms_hard.speed;
+      ms.timestamp=ms_hard.timestamp;
     }
   } else
-    ip.speed*=0.95;
+    ms.speed*=0.95;
   if (gr.scrn_zoom!=1) {
     if (gr.continuous_scroll)
       GrScaleZoom(1.0);
     else {
-      dd=(ip.pos.x-gr.sx)*gr.scrn_zoom;
+      dd=(ms.pos.x-gr.sx)*gr.scrn_zoom;
       if (!(8<=dd<GR_WIDTH-8))
 	GrScaleZoom(1.0);
       else {
-	dd=(ip.pos.y-gr.sy)*gr.scrn_zoom;
+	dd=(ms.pos.y-gr.sy)*gr.scrn_zoom;
 	if (!(8<=dd<GR_HEIGHT-8))
 	  GrScaleZoom(1.0);
       }

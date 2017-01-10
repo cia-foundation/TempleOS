@@ -10,11 +10,11 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
   DocLock(doc);
   if (!exited) {
     if (doc_e->de_flags & DOCEF_ESC) {
-      Msg(MSG_KEY_DOWN,CH_ESC,0,1<<SVCf_DONT_FILTER);
+      Msg(MSG_KEY_DOWN,CH_ESC,0,1<<JOBf_DONT_FILTER);
       has_action=TRUE;
       goto er_done;
     } if (doc_e->de_flags & DOCEF_QUIT) {
-      Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0,1<<SVCf_DONT_FILTER);
+      Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0,1<<JOBf_DONT_FILTER);
       has_action=TRUE;
       goto er_done;
     } else if (doc_e->de_flags & DOCEF_CHECK_COLLAPSABLE) {
@@ -31,13 +31,13 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
       if (doc_e->de_flags & DOCEF_LEFT_EXP) {
 	res=doc_e->left_exp;
 	has_action=TRUE;
-	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<JOBf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_LEFT_CB && doc_e->left_cb) {
 	DocUnlock(doc);
 	res=(*doc_e->left_cb)(doc,doc_e);
 	has_action=TRUE;
-	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<JOBf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_LEFT_MACRO) {
 	if (doc_e->de_flags & DOCEF_POPUP) {
@@ -70,13 +70,13 @@ public I64 DocEntryRun(CDoc *doc,CDocEntry *doc_e,
       if (doc_e->de_flags & DOCEF_RIGHT_EXP) {
 	res=doc_e->right_exp;
 	has_action=TRUE;
-	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<JOBf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_RIGHT_CB && doc_e->right_cb) {
 	DocUnlock(doc);
 	res=(*doc_e->right_cb)(doc,doc_e);
 	has_action=TRUE;
-	Msg(MSG_CMD,res,0,1<<SVCf_DONT_FILTER);
+	Msg(MSG_CMD,res,0,1<<JOBf_DONT_FILTER);
       }
       if (doc_e->de_flags & DOCEF_RIGHT_MACRO) {
 	if (doc_e->de_flags & DOCEF_POPUP) {

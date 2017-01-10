@@ -61,7 +61,7 @@ U0 GrUpdateTasks()
   CTask *task,*task1;
   try {
     winmgr.ode_time=0;
-    if (Bt(&sys_semas[SYS_SEMA_UPDATE_WIN_Z_BUF],0))
+    if (Bt(&sys_semas[SEMA_UPDATE_WIN_Z_BUF],0))
       WinZBufUpdate;
     task1=task=sys_winmgr_task;
     do { //Loop through Core0 tasks.
@@ -110,14 +110,14 @@ public U0 GrScaleZoom(F64 scale)
   gr.scrn_zoom=gr.scrn_zoom*scale;
   GrFixZoomScale;
   s/=gr.scrn_zoom;
-  ip.scale.x*=s;
-  ip.scale.y*=s;
-  ip.scale.z*=s;
-  ip.offset.x=ip.pos.x-(ip.pos.x-ip.offset.x)*s;
-  ip.offset.y=ip.pos.y-(ip.pos.y-ip.offset.y)*s;
-  ip.offset.z=ip.pos.z-(ip.pos.z-ip.offset.z)*s;
-  gr.sx=ip.pos.x-gr.zoomed_dc->width >>1/gr.scrn_zoom;
-  gr.sy=ip.pos.y-gr.zoomed_dc->height>>1/gr.scrn_zoom;
+  ms.scale.x*=s;
+  ms.scale.y*=s;
+  ms.scale.z*=s;
+  ms.offset.x=ms.pos.x-(ms.pos.x-ms.offset.x)*s;
+  ms.offset.y=ms.pos.y-(ms.pos.y-ms.offset.y)*s;
+  ms.offset.z=ms.pos.z-(ms.pos.z-ms.offset.z)*s;
+  gr.sx=ms.pos.x-gr.zoomed_dc->width >>1/gr.scrn_zoom;
+  gr.sy=ms.pos.y-gr.zoomed_dc->height>>1/gr.scrn_zoom;
   GrFixZoomScale;
 }
 
@@ -330,7 +330,7 @@ U0 GrUpdateTextModeText()
   I64 cur_ch,i=TEXT_COLS*TEXT_ROWS;
   U16 *dst=text.vga_text_alias,*dst2=gr.vga_text_cache;
   Bool blink_flag=Blink;
-  if (LBtr(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0)) {
+  if (LBtr(&sys_semas[SEMA_FLUSH_VGA_IMAGE],0)) {
     while (i--) {
       cur_ch=*src++;
       if (cur_ch & ATTRF_SEL)
@@ -374,7 +374,7 @@ U0 GrUpdateVGAGraphics()
     src=gr.zoomed_dc->body;
   }
   dst=gr.scrn_image->body;
-  if (LBtr(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0)) {
+  if (LBtr(&sys_semas[SEMA_FLUSH_VGA_IMAGE],0)) {
     for (plane=1;plane<0x10;plane<<=1) {
       OutU8(VGAP_IDX,VGAR_MAP_MASK);
       OutU8(VGAP_DATA,plane);

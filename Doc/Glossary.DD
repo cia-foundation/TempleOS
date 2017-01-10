@@ -18,6 +18,7 @@ $FG,2$BG$FG$	Backround
 $FG,2$Bin$FG$	Binary
 $FG,2$Blk$FG$	Block
 $FG,2$Bmp$FG$	BitMap
+$FG,2$Bttn$FG$	Button
 $FG,2$Buf$FG$	Buffer
 $FG,2$Bwd$FG$	Backward
 $FG,2$CB$FG$	Call-Back, Code Block
@@ -25,6 +26,7 @@ $FG,2$Cfg$FG$	Config
 $FG,2$Chg$FG$	Change
 $FG,2$Chk$FG$	Check
 $FG,2$Const$FG$	Consant
+$FG,2$Cont$FG$	Continue
 $FG,2$Cmd$FG$	Command
 $FG,2$Cmp$FG$	Compiler
 $FG,2$Cnt$FG$	Count
@@ -60,6 +62,7 @@ $FG,2$Fun$FG$	Function
 $FG,2$Gen$FG$	Generate
 $FG,2$Glbl$FG$	Global
 $FG,2$Gr$FG$	Graphic
+$FG,2$Hndlr$FG$	Handler
 $FG,2$IDE$FG$	Integrated Drive Electronics, Integrated Development Environment
 $FG,2$Id$FG$	Identification
 $FG,2$Ident$FG$	Identifier, Identity, Identical
@@ -69,7 +72,6 @@ $FG,2$Init$FG$	Initialize
 $FG,2$Ins$FG$	Insert, Install
 $FG,2$Inst$FG$	Instruction
 $FG,2$Int$FG$	Interrupt, Integer
-$FG,2$ip_$FG$	Input Pointer.  See $LK,"InputPointer.HC",A="FI:::/Kernel/SerialDev/InputPointer.HC"$.
 $FG,2$Irq$FG$	Interrupt (Request)
 $FG,2$JIT$FG$	Just-in-Time
 $FG,2$Kbd$FG$	Keyboard
@@ -84,8 +86,10 @@ $FG,2$Man$FG$	Manual
 $FG,2$Mem$FG$	Memory
 $FG,2$Mgd$FG$	Managed
 $FG,2$Mgr$FG$	Manager
+$FG,2$Mid$FG$	Middle
 $FG,2$Mon$FG$	Month
 $FG,2$MP$FG$	MultiProcessor
+$FG,2$Ms$FG$	Mouse
 $FG,2$Msg$FG$	Message
 $FG,2$Num$FG$	Number
 $FG,2$Obj$FG$	Object
@@ -160,7 +164,7 @@ $ID,2$This is Adam, as in Adam and Eve, the parent of all tasks.  Adam is immort
 $ID,-2$$TR,"Seth Tasks"$
 $ID,2$In the Bible, $LK,"Seth",A="BF:Genesis,4:25"$$FG$ is Adam and Eve's child.  Each CPU core has an executive task called $FG,2$Seth$FG$ that is immortal.  The Adam task on $FG,2$Core0$FG$ is also its $FG,2$Seth$FG$ task.
 $ID,-2$$TR,"Code and Data Heaps"$
-$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ inst, exclusively, and that inst is limited to calling routines $FG,2$+/-2Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:Mem512Alloc"$ heaps.
+$ID,2$TempleOS uses the asm $FG,2$CALL$FG$ inst, exclusively, and that inst is limited to calling routines $FG,2$+/-2Gig$FG$ from the current code location.  To prevent out-of-range issues, I decided to separate code and data, placing all code within the lowest $FG,2$2Gig$FG$ of memory, addresses $FG,2$00000000$FG$-$FG,2$7FFFFFFF$FG$.  The compiler and $LK,"Load",A="MN:Load"$()er alloc memory from the code heap to store code and glbl vars, unless the compiler option $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$ is used.  When programs call $LK,"MAlloc",A="MN:MAlloc"$() is from the data heap, which in not limited in size, except by physical RAM memory.  You can alloc from any heap in any task at any time on any core, even making $LK,"independent",A="MN:MemPagAlloc"$ heaps.
 $ID,-2$$TR,"Parent, Child and PopUp Tasks"$
 $ID,2$Often a task will $LK,"Spawn",A="MN:Spawn"$() or $LK,"PopUp",A="MN:PopUp"$() a task as a helper.  The helper is known as a child Task, though you can $LK,"Spawn",A="MN:Spawn"$ a task and assign it a different parent... like $FG,2$Adam$FG$.  Links are kept as to who's whose child, so when one task is $LK,"Kill",A="MN:Kill"$()ed the child helper tasks die, too.  You can get a report of current system tasks with $LK,"TaskRep",A="MN:TaskRep"$().  There is just one window per task, so child tasks are needed for pop-ups.
 $ID,-2$$TR,"HolyC"$
@@ -176,6 +180,7 @@ $ID,2$In $FG,2$just-in-time$FG$ mode, the compiler places code and data in memor
 $ID,-2$$TR,"Compiler Intermediate Code"$
 $ID,2$The compiler generates insts one step before making actual assembly (machine) language insts.  This code is rev polish stack machine in nature and can be viewed with $LK,"PassTrace",A="MN:PassTrace"$().  The compiler does not $FG,2$interpret$FG$ code, except in the process of optimization to make the final machine code.  Assembly language output can be viewed when code is compiled with the $LK,"Trace",A="MN:Trace"$(), or, afterward, with $LK,"U",A="MN:U"$() or $LK,"Uf",A="MN:Uf"$("").
 $ID,-2$$TR,"Drive/Partition"$
+
 $ID,2$There is no distinction between $FG,2$drive$FG$ or $FG,2$partition$FG$.  They are specified with a single letter from $FG,2$A$FG$-$FG,2$Z$FG$.
 
 '$FG,2$:$FG$' is the boot drive.
@@ -197,8 +202,11 @@ $LK,"Editor Link Types",A="MN:LK_FILE"$
 $LK,"files_find_mask",A="FI:::/Doc/FileUtils.DD"$
 $LK,"Hash Table",A="HI:Hash"$
 $LK,"InFile",A="HI:InFile"$
+$LK,"Ona",A="HI:Snd"$
+$LK,"Pag",A="HI:Memory/BlkPool"$
 $LK,"RedSea File System",A="FI:::/Doc/RedSea.DD"$
 $LK,"Sprite",A="HI:Graphics/Sprite"$
+
 $TR,"CLI, STI, PUSHFD, POPFD"$
 $ID,2$These are x86 assembly insts.
 $FG,2$CLI$FG$ disable interrupts.

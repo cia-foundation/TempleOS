@@ -58,8 +58,8 @@ extern CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name);
 extern CMenu *MenuFilePush(U8 *filename);
 extern U0 MenuPop();
 extern CMenu *MenuPush(U8 *st);
-extern I64 Mount(Bool repartition=FALSE);
-extern CTask *Noise(I64 ms,F64 min_freq,F64 max_freq);
+extern U8 Mount(Bool caller_is_prtdsk=FALSE);
+extern CTask *Noise(I64 mS,F64 min_ona,F64 max_ona);
 extern Bool Plain(U8 *filename,I64 edf_dof_flags=0);
 extern Bool PopUpCancelOk(U8 *header=NULL,U8 *footer=NULL);
 extern I64 PopUpColor(U8 *header=NULL,
@@ -80,6 +80,7 @@ extern I64 PopUpRangeI64(
 extern Bool PopUpTransform(I64 *r);
 extern U0 Refresh(I64 cnt=1,Bool force=FALSE);
 extern U0 RegOneTimePopUp(I64 flag_num,U8 *msg);
+extern Bool RegWrite(U8 *path,U8 *fmt,...);
 extern U0 SettingsPop(CTask *task=NULL,I64 flags=0);
 extern CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0);
 extern U0 TemplateCtrlSlider(CDoc *doc);
@@ -87,7 +88,7 @@ extern Bool View();
 extern U0 ViewAnglesDel(CTask *task=NULL);
 extern CCtrl *ViewAnglesNew(CTask *task=NULL);
 extern Bool WinBorder(Bool val=OFF,CTask *task=NULL);
-extern CDoc *WinCursorPosSet(CTask *task,I64 ipx,I64 ipy,Bool set_cursor=TRUE);
+extern CDoc *WinCursorPosSet(CTask *task,I64 msx,I64 msy,Bool set_cursor=TRUE);
 extern Bool WinHorz(I64 left,I64 right,CTask *task=NULL);
 extern U0 WinMax(CTask *task=NULL);
 extern U0 WinScrollNull(CTask *task,CD3I64 *s);

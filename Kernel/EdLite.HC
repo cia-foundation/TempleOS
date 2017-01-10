@@ -232,7 +232,7 @@ Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0)
 	}
 	break;
       default:
-	if (Bt(chars_bmp_getkey,ch)) {
+	if (Bt(char_bmp_printable,ch)) {
 	  if (cur_line==&head) {
 	    cur_line=MAlloc(sizeof(CLine));
 	    cur_line->line=StrNew("");
@@ -327,11 +327,11 @@ Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0)
 U0 FixSet(U8 *filename,I64 line)
 {//Compiler calls this to set file line for Fix
   U8 *st=MStrPrint("FL:%s,%d",filename,line);
-  while (LBts(&sys_semas[SYS_SEMA_FIX],0))
+  while (LBts(&sys_semas[SEMA_FIX],0))
     Yield;
   Free(dbg.fix_file_line);
   dbg.fix_file_line=AStrNew(st);
-  LBtr(&sys_semas[SYS_SEMA_FIX],0);
+  LBtr(&sys_semas[SEMA_FIX],0);
 }
 
 Bool Fix(I64 edf_dof_flags=0)
@@ -339,10 +339,10 @@ Bool Fix(I64 edf_dof_flags=0)
   U8 *st;
   Bool res=FALSE;
 
-  while (LBts(&sys_semas[SYS_SEMA_FIX],0))
+  while (LBts(&sys_semas[SEMA_FIX],0))
     Yield;
   st=StrNew(dbg.fix_file_line);
-  LBtr(&sys_semas[SYS_SEMA_FIX],0);
+  LBtr(&sys_semas[SEMA_FIX],0);
 
   if (st) {
     if (IsRaw)

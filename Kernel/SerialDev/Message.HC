@@ -1,6 +1,6 @@
 U0 InputFilterTask()
 {
-  CSrvCmd *tmpc,*tmpc1;
+  CJob *tmpc,*tmpc1;
   Bool old_filter;
   I64 old_flags=GetRFlags;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
@@ -9,20 +9,20 @@ U0 InputFilterTask()
   LBEqu(&Fs->task_flags,TASKf_FILTER_INPUT,old_filter);
   while (TRUE) {
     CLI
-    SrvCmdsHandler(old_flags);
+    JobsHndlr(old_flags);
     tmpc1=&Fs->srv_ctrl.next_waiting;
     tmpc=tmpc1->next;
     if (tmpc==tmpc1)
       break;
     else {
-      if (tmpc->cmd_code==SVCT_TEXT_INPUT) {
+      if (tmpc->job_code==JOBT_TEXT_INPUT) {
 	QueRem(tmpc);
 	SetRFlags(old_flags);
 	try
 		ExePrint("%s",tmpc->aux_str);
 	catch
 	  Fs->catch_except=TRUE;
-	SrvCmdDel(tmpc);
+	JobDel(tmpc);
       } else
 	break;
     }
@@ -34,7 +34,7 @@ U0 InputFilterTask()
   SetRFlags(old_flags);
 }
 
-I64 ScanMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL)
+I64 ScanMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,I64 mask=~1,CTask *task=NULL)
 {/*Check for a message of type specified by a one in the mask.
 Throw-out messages not in mask.
 If no message fit mask, return NULL immediately.
@@ -42,27 +42,27 @@ Remove desired message, return $LK,"msg_code",A="MN:MSG_CMD"$.
 Note: This delivers messages from parent down to pop-up.
 */
   I64 res,old_flags;
-  CSrvCmd *tmpc,*tmpc1;
+  CJob *tmpc,*tmpc1;
   if (!task) task=Fs;
   old_flags=GetRFlags;
   tmpc1=&task->srv_ctrl.next_waiting;
   while (TRUE) {
     CLI
     if (task==Fs)
-      SrvCmdsHandler(old_flags);
+      JobsHndlr(old_flags);
     tmpc=tmpc1->next;
     if (tmpc==tmpc1)
       break;
     else {
-      if (tmpc->cmd_code==SVCT_MSG) {
+      if (tmpc->job_code==JOBT_MSG) {
 	QueRem(tmpc);
 	SetRFlags(old_flags);
 	res=tmpc->msg_code;
-	if (_a1)
-	  *_a1=tmpc->aux1;
-	if (_a2)
-	  *_a2=tmpc->aux2;
-	SrvCmdDel(tmpc);
+	if (_arg1)
+	  *_arg1=tmpc->aux1;
+	if (_arg2)
+	  *_arg2=tmpc->aux2;
+	JobDel(tmpc);
 	if ((res!=MSG_KEY_DOWN || !(tmpc->aux2&SCF_KEY_DESC) ||
 	      !Bt(&task->win_inhibit,WIf_SELF_KEY_DESC)) && Bt(&mask,res))
 	  goto sm_done;
@@ -71,13 +71,13 @@ Note: This delivers messages from parent down to pop-up.
     SetRFlags(old_flags);
   }
   res=MSG_NULL;
-  if (_a1)
-    *_a1=0;
-  if (_a2)
-    *_a2=0;
+  if (_arg1)
+    *_arg1=0;
+  if (_arg2)
+    *_arg2=0;
   if (task->parent_task&&task->parent_task->popup_task==task) {
     SetRFlags(old_flags);
-    return ScanMsg(_a1,_a2,mask,task->parent_task);
+    return ScanMsg(_arg1,_arg2,mask,task->parent_task);
   }
 sm_done:
   SetRFlags(old_flags);
@@ -86,20 +86,20 @@ sm_done:
 
 I64 FlushMsgs(CTask *task=NULL)
 {//Throw away all messages.  Return count.
-  I64 res=0,a1,a2;
-  while (ScanMsg(&a1,&a2,~1,task))
+  I64 res=0,arg1,arg2;
+  while (ScanMsg(&arg1,&arg2,~1,task))
     res++;
   return res;
 }
 
-I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,I64 mask=~1,CTask *task=NULL)
+I64 GetMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,I64 mask=~1,CTask *task=NULL)
 {//Wait for a message of type specified by a one in the mask.
 //Throw-out all messages not in mask.
   //Returns $LK,"msg_code",A="MN:MSG_CMD"$. See $LK,"::/Demo/MsgLoop.HC"$.
   I64 res;
   if (!task) task=Fs;
   LBtr(&task->task_flags,TASKf_IDLE);
-  while (!(res=ScanMsg(_a1,_a2,mask,task))) {
+  while (!(res=ScanMsg(_arg1,_arg2,mask,task))) {
     LBts(&task->task_flags,TASKf_IDLE);
     Yield;
   }
@@ -111,13 +111,13 @@ I64 ScanChar()
 {//Checks for $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$ and returns 0 immediately if no key.
 //Waits for $LK,"MSG_KEY_UP",A="MN:MSG_KEY_UP"$ of non-zero $LK,"ASCII",A="MN:CH_CTRLA"$ key and returns $LK,"ASCII",A="MN:CH_CTRLA"$ if key.
   //$LK,"ScanMsg",A="MN:ScanMsg"$() throws away other message types.
-  I64 a1a,a2a,a1b,a2b;
-  if (!ScanMsg(&a1a,&a2a,1<<MSG_KEY_DOWN)||!a1a)
+  I64 arg1a,arg2a,arg1b,arg2b;
+  if (!ScanMsg(&arg1a,&arg2a,1<<MSG_KEY_DOWN)||!arg1a)
     return 0;
   else
-    do GetMsg(&a1b,&a2b,1<<MSG_KEY_UP);
-    while (!a1b);  //Be careful of $LK,"SC_SHIFT",A="MN:SC_SHIFT"$ and $LK,"SC_CTRL",A="MN:SC_CTRL"$, etc.
-  return a1a;
+    do GetMsg(&arg1b,&arg2b,1<<MSG_KEY_UP);
+    while (!arg1b);  //Be careful of $LK,"SC_SHIFT",A="MN:SC_SHIFT"$ and $LK,"SC_CTRL",A="MN:SC_CTRL"$, etc.
+  return arg1a;
 }
 
 Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE)
@@ -162,7 +162,7 @@ I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,Bool raw_cursor=FALSE)
       //keyboard when in debugger with interrupts off.
       PUSHFD
       CLI
-      KbdMouseHandler(TRUE,FALSE);
+      KbdMsHndlr(TRUE,FALSE);
       KbdMsgsQue;
       POPFD
     } else {

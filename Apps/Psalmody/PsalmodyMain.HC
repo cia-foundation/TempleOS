@@ -41,43 +41,27 @@ U0 PsmRightClick(I64 x,I64 y)
     } else {
       switch (i) {
 	case PSMR_REST:
-	  if (tmpn->type==PSMT_NOTE) {
-	    tmpn->octave=OCTAVE_REST;
-	    tmpn->note=NOTE_REST;
-	  }
+	  if (tmpn->type==PSMT_NOTE)
+	    tmpn->ona=ONA_REST;
 	  break;
 	case PSMR_SHARP:
-	  if (tmpn->type==PSMT_NOTE && tmpn->octave!=OCTAVE_REST) {
+	  if (tmpn->type==PSMT_NOTE && tmpn->ona!=ONA_REST) {
 	    if (Btr(&tmpn->flags,PSMf_FLAT))
-	      tmpn->note++;
+	      tmpn->ona++;
 	    if (Btc(&tmpn->flags,PSMf_SHARP))
-	      tmpn->note--;
+	      tmpn->ona--;
 	    else
-	      tmpn->note++;
-	    if (tmpn->note<0) {
-	      tmpn->note=11;
-	      tmpn->octave--;
-	    } else if (tmpn->note>11) {
-	      tmpn->note=0;
-	      tmpn->octave++;
-	    }
+	      tmpn->ona++;
 	  }
 	  break;
 	case PSMR_FLAT:
-	  if (tmpn->type==PSMT_NOTE && tmpn->octave!=OCTAVE_REST) {
+	  if (tmpn->type==PSMT_NOTE && tmpn->ona!=ONA_REST) {
 	    if (Btr(&tmpn->flags,PSMf_SHARP))
-	      tmpn->note--;
+	      tmpn->ona--;
 	    if (Btc(&tmpn->flags,PSMf_FLAT))
-	      tmpn->note++;
+	      tmpn->ona++;
 	    else
-	      tmpn->note--;
-	    if (tmpn->note<0) {
-	      tmpn->note=11;
-	      tmpn->octave--;
-	    } else if (tmpn->note>11) {
-	      tmpn->note=0;
-	      tmpn->octave++;
-	    }
+	      tmpn->ona--;
 	  }
 	  break;
 	case PSMR_TIE:
@@ -123,35 +107,35 @@ U0 PsmRightClick(I64 x,I64 y)
 
 U0 PsmLeftClickPickNoteBox(I64 duration)
 {
-  I64 o,n,msg_code,a1,a2;
+  I64 o,n,msg_code,arg1,arg2;
   PsmNote *tmpn,*tmpn1;
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
-    if (msg_code==MSG_IP_MOVE) {
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP|1<<MSG_MS_MOVE);
+    if (msg_code==MSG_MS_MOVE) {
       DrawDC2;
-      DrawNote(psm.dc2,a1,a2,duration);
+      DrawNote(psm.dc2,arg1,arg2,duration);
     }
-  } while (msg_code!=MSG_IP_L_UP);
-  if (a2<13*FONT_HEIGHT) {
-    if (a1>psm.head.last->x)
+  } while (msg_code!=MSG_MS_L_UP);
+  if (arg2<13*FONT_HEIGHT) {
+    if (arg1>psm.head.last->x)
       tmpn1=psm.head.last;
-    else if (a1<psm.head.next->x)
+    else if (arg1<psm.head.next->x)
       tmpn1=&psm.head;
     else
-      tmpn1=PsmFindNote(a1-PSM_NOTE_SPACING/2,a2);
+      tmpn1=PsmFindNote(arg1-PSM_NOTE_SPACING/2,arg2);
     tmpn=CAlloc(sizeof(PsmNote));
     tmpn->type=PSMT_NOTE;
-    a2=a2/4-15;
-    n=-a2%7;
-    o=2+a2/-7;
-    n=-n;
+    arg2=arg2/4-15;
+    n=arg2%7;
+    o=4+arg2/-7;
     if (n<0) {
       n+=7;
       o++;
     }
     n=psm_note_inverse_map[n];
-    tmpn->note=n;
-    tmpn->octave=o;
+    if (n<3)
+      o--;
+    tmpn->ona=Note2Ona(n,o);
     tmpn->duration=duration;
     PsmSetWidth(tmpn);
     QueIns(tmpn,tmpn1);
@@ -162,22 +146,22 @@ U0 PsmLeftClickPickNoteBox(I64 duration)
 
 U0 PsmLeftClickPickMeterBox(I64 top,I64 bottom)
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   PsmNote *tmpn,*tmpn1;
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
-    if (msg_code==MSG_IP_MOVE) {
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP|1<<MSG_MS_MOVE);
+    if (msg_code==MSG_MS_MOVE) {
       DrawDC2;
-      DrawTimeSignature(psm.dc2,a1,a2,top,bottom);
+      DrawTimeSignature(psm.dc2,arg1,arg2,top,bottom);
     }
-  } while (msg_code!=MSG_IP_L_UP);
-  if (a2<13*FONT_HEIGHT) {
-    if (a1>=psm.head.x)
+  } while (msg_code!=MSG_MS_L_UP);
+  if (arg2<13*FONT_HEIGHT) {
+    if (arg1>=psm.head.x)
       tmpn1=psm.head.last;
-    else if (a1<psm.head.next->x)
+    else if (arg1<psm.head.next->x)
       tmpn1=&psm.head;
     else
-      tmpn1=PsmFindNote(a1-PSM_NOTE_SPACING/2,a2);
+      tmpn1=PsmFindNote(arg1-PSM_NOTE_SPACING/2,arg2);
     tmpn=CAlloc(sizeof(PsmNote));
     tmpn->type=PSMT_METER;
     tmpn->meter_top=top;
@@ -192,40 +176,39 @@ U0 PsmLeftClickPickMeterBox(I64 top,I64 bottom)
 U0 PsmLeftClickStaffPtr(I64 x,I64 y)
 {
   PsmNote *tmpn,*tmpn1;
-  I64 o,n,msg_code,a1,a2,n_original,o_original;
+  I64 o,n,msg_code,arg1,arg2,n_original,o_original;
   psm.cur_note=tmpn=PsmFindNote(x,y);
   if (tmpn!=&psm.head) {
     if (tmpn->type==PSMT_NOTE) {
-      n_original=tmpn->note;
-      o_original=tmpn->octave;
+      o_original=Ona2Octave(tmpn->ona);
+      n_original=Ona2Note  (tmpn->ona);
       do {
-	msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
-	if (msg_code==MSG_IP_L_UP) {
-	  tmpn1=PsmFindNote(a1,a2);
+	msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP|1<<MSG_MS_MOVE);
+	if (msg_code==MSG_MS_L_UP) {
+	  tmpn1=PsmFindNote(arg1,arg2);
 	  if (tmpn1==&psm.head || tmpn1==tmpn)
 	    goto move_note;
 	  else {
 	    Free(tmpn1->word);
 	    tmpn1->word=tmpn->word;
 	    tmpn->word=NULL;
-	    tmpn->note=n_original;
-	    tmpn->octave=o_original;
+	    tmpn->ona=Note2Ona(n_original,o_original);
 	  }
 	} else {
 move_note:
-	  a2=a2/4-15;
-	  n=-a2%7;
-	  o=2+a2/-7;
-	  n=-n;
+	  arg2=arg2/4-15;
+	  n=arg2%7;
+	  o=4+arg2/-7;
 	  if (n<0) {
 	    n+=7;
 	    o++;
 	  }
 	  n=psm_note_inverse_map[n];
-	  tmpn->note=n;
-	  tmpn->octave=o;
+	  if (n<3)
+	    o--;
+	  tmpn->ona=Note2Ona(n,o);
 	}
-      } while (msg_code!=MSG_IP_L_UP);
+      } while (msg_code!=MSG_MS_L_UP);
       PsmSetWidth(tmpn);
     }
   }
@@ -233,17 +216,17 @@ move_note:
 
 U0 PsmLeftClickStaffBox(I64 x,I64 y)
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_UP|1<<MSG_IP_MOVE);
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP|1<<MSG_MS_MOVE);
     DrawDC2;
     psm.dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
-    GrBorder(psm.dc2,x,y,a1,a2);
-    if (msg_code==MSG_IP_L_UP) {
-      if (x>a1) SwapI64(&x,&a1);
-      PsmMarkSel(x,a1,TRUE);
+    GrBorder(psm.dc2,x,y,arg1,arg2);
+    if (msg_code==MSG_MS_L_UP) {
+      if (x>arg1) SwapI64(&x,&arg1);
+      PsmMarkSel(x,arg1,TRUE);
     }
-  } while (msg_code!=MSG_IP_L_UP);
+  } while (msg_code!=MSG_MS_L_UP);
   DrawDC2;
 }
 
@@ -366,14 +349,12 @@ U0 PsmPopMode()
 
 U0 Psalmody(U8 *dirname="~/Psalmody")
 {
-  Bool was_playing;
-  I64 a1,a2,msg_code=0,col,
-	note=NOTE_REST,octave=OCTAVE_REST,psm_octave=3,timeout_val,timeout_val2,
-	old_doc_flags;
+  Bool was_playing,is_null=TRUE,was_null=TRUE;
+  I64 arg1,arg2,msg_code=0,col,ona=ONA_REST,last_ona=ONA_REST,
+	psm_octave=4,timeout_val,timeout_val2,old_doc_flags;
   U8 *filename=NULL,*st,*st2;
   PsmNote *tmpn;
-  F64 f=0,last_f=0,psm_duration=1.0,
-	d,evt_time=tS,note_down_time=tS;
+  F64 psm_duration=1.0,d,evt_time=tS,note_down_time=tS;
   CCtrl *c=TempoNew;
 
   if (DocPut) old_doc_flags=DocPut->flags;
@@ -421,13 +402,13 @@ U0 Psalmody(U8 *dirname="~/Psalmody")
 	"  MarkIncomplete(MSG_CMD,PSMF_INCOMPLETE);"
 	"}"
 	"Snd {"
-	"  Octave0(,'0');"
 	"  Octave1(,'1');"
 	"  Octave2(,'2');"
 	"  Octave3(,'3');"
 	"  Octave4(,'4');"
 	"  Octave5(,'5');"
 	"  Octave6(,'6');"
+	"  Octave7(,'7');"
 	"}"
 	"Help {"
 	"  Help(,,SC_F1);"
@@ -449,23 +430,23 @@ U0 Psalmody(U8 *dirname="~/Psalmody")
     while (TRUE) {
       was_playing=FALSE;
 mo_start:
-      if (ip.pos_text.y-Fs->win_top<18)
-	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
-	      1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_UP|
-	      1<<MSG_IP_MOVE|1<<MSG_CMD);
+      if (ms.pos_text.y-Fs->win_top<18)
+	msg_code=GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
+	      1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|1<<MSG_MS_R_UP|
+	      1<<MSG_MS_MOVE|1<<MSG_CMD);
       else
-	msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
-	      1<<MSG_IP_MOVE|1<<MSG_CMD);
+	msg_code=GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP|
+	      1<<MSG_MS_MOVE|1<<MSG_CMD);
 mo_got_msg:
-      if (msg_code==MSG_KEY_DOWN && a1==CH_SPACE && !a2) {
-//The Window Mgr sets the Doc cur_entry to a button
-	//and generates a <SPACE> when the Doc Buttons are clicked.
+      if (msg_code==MSG_KEY_DOWN && arg1==CH_SPACE && !arg2) {
+//The Window Mgr sets the Doc cur_entry to a bttn
+	//and generates a <SPACE> when the Doc Bttns are clicked.
 	//This is so that kbd and mouse are the same for Doc's.
-	//We must now pass the <SPACE> onto the Doc handler.
-	PutKey(a1,a2);
+	//We must now pass the <SPACE> onto the Doc hndlr.
+	PutKey(arg1,arg2);
 	goto mo_start;
       }
-      if (msg_code!=MSG_IP_MOVE) {
+      if (msg_code!=MSG_MS_MOVE) {
 	DocBottom;
 	if (was_playing || DocPut->cur_entry->y>=Fs->win_height-2) {
 	  PsmMenu(psm_octave);
@@ -473,11 +454,12 @@ mo_got_msg:
 	}
       }
 
-      octave=psm_octave;
+      ona=Note2Ona(3,psm_octave+1); //C
+      is_null=TRUE;
       switch (msg_code) {
 	case MSG_CMD:
 	  PsmPopMode;
-	  switch (a1) {
+	  switch (arg1) {
 	    case PSMF_CD:
 	      st2=dirname;
 	      if (dirname=PopUpPickDir) {
@@ -496,75 +478,71 @@ mo_got_msg:
 	  break;
 	case MSG_KEY_DOWN:
 	  evt_time=tS;
-	  if ('0'<=a1<='9') {
-	    psm_octave=a1-'0';
+	  if ('0'<=arg1<='9') {
+	    psm_octave=arg1-'0';
 	    PsmMenu(psm_octave);
 	    col=0;
 	  } else {
-	    switch (a1) {
+	    switch (arg1) {
 	      start:
-		case 'a': note=7; octave--; break;
-		case 's': note=8; octave--; break;
-		case 'e': note=9; octave--; break;
-		case 'd': note=10; octave--; break;
-		case 'r': note=11; octave--; break;
-		case 'f': note=0; break;
-		case 't': note=1; break;
-		case 'g': note=2; break;
-		case 'h': note=3; break;
-		case 'u': note=4; break;
-		case 'j': note=5; break;
-		case 'i': note=6; break;
-		case 'k': note=7; break;
-		case 'l': note=8; break;
-		case 'p': note=9; break;
-		case ';': note=10; break;
-		case '[': note=11; break;
-		case '\'': note=0; octave++; break;
-		case ']': note=1; octave++; break;
+		case 'a':	ona-=8;		break;
+		case 's':	ona-=7;		break;
+		case 'e':	ona-=6;		break;
+		case 'd':	ona-=5;		break;
+		case 'r':	ona-=4;		break;
+		case 'f':	ona-=3;		break;
+		case 't':	ona-=2;		break;
+		case 'g':	ona--;		break;
+		case 'h':			break;
+		case 'u':	ona++;		break;
+		case 'j':	ona+=2;		break;
+		case 'i':	ona+=3;		break;
+		case 'k':	ona+=4;		break;
+		case 'l':	ona+=5;		break;
+		case 'p':	ona+=6;		break;
+		case ';':	ona+=7;		break;
+		case '[':	ona+=8;		break;
+		case '\'':	ona+=9;		break;
+		case ']':	ona+=10;	break;
+		case CH_SPACE:	ona=ONA_REST;	break;
 	      end:
-		f=Note2Freq(note,octave);
-		break;
-	      case CH_SPACE:
-		note=NOTE_REST;
-		octave=OCTAVE_REST;
-		f=-1; //rest
+		is_null=FALSE;
 		break;
 
 	      case 0:
-		switch (a2.u8[0]) {
+		switch (arg2.u8[0]) {
 		  case SC_CURSOR_LEFT:
-		    if (a2&SCF_CTRL) {
+		    if (arg2&SCF_CTRL) {
 		      while (psm.cur_note->last!=&psm.head) {
 			psm.cur_note=psm.cur_note->last;
 			if (psm.cur_note!=&psm.head)
-			  LBEqu(&psm.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
+			  LBEqu(&psm.cur_note->flags,PSMf_SEL,arg2&SCF_SHIFT);
 		      }
 		    } else {
 		      if (psm.cur_note->last!=&psm.head) {
 			psm.cur_note=psm.cur_note->last;
 			if (psm.cur_note!=&psm.head)
-			  LBEqu(&psm.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
+			  LBEqu(&psm.cur_note->flags,PSMf_SEL,arg2&SCF_SHIFT);
 		      }
 		    }
 		    break;
 		  case SC_CURSOR_RIGHT:
-		    if (a2&SCF_CTRL) {
+		    if (arg2&SCF_CTRL) {
 		      while (psm.cur_note!=&psm.head) {
 			if (psm.cur_note!=&psm.head)
-			  LBEqu(&psm.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
+			  LBEqu(&psm.cur_note->flags,PSMf_SEL,arg2&SCF_SHIFT);
 			psm.cur_note=psm.cur_note->next;
 		      }
 		    } else {
 		      if (psm.cur_note!=&psm.head) {
 			if (psm.cur_note!=&psm.head)
-			  LBEqu(&psm.cur_note->flags,PSMf_SEL,a2&SCF_SHIFT);
+			  LBEqu(&psm.cur_note->flags,PSMf_SEL,arg2&SCF_SHIFT);
 			psm.cur_note=psm.cur_note->next;
 		      }
 		    }
 		    break;
 		  case SC_DELETE:
-		    if (a2&SCF_SHIFT)
+		    if (arg2&SCF_SHIFT)
 		      PsmCutToClipboard;
 		    else {
 		      tmpn=psm.cur_note;
@@ -576,9 +554,9 @@ mo_got_msg:
 		    }
 		    break;
 		  case SC_INS:
-		    if (a2&SCF_SHIFT)
+		    if (arg2&SCF_SHIFT)
 		      PsmPasteClipboard;
-		    else if (a2&SCF_CTRL)
+		    else if (arg2&SCF_CTRL)
 		      PsmCopyToClipboard;
 		    break;
 		  case SC_F1:
@@ -615,7 +593,7 @@ mo_got_msg:
 		if (filename) {
 		  psm.scrn_x=0;
 		  psm_duration=1.0;
-		  psm_octave=3;
+		  psm_octave=4;
 		  PsmSongDel(&psm.head);
 		  psm.cur_note=&psm.head;
 		  PsmLoadSong(filename,&psm_octave,&psm_duration);
@@ -645,7 +623,7 @@ mo_got_msg:
 		Free(filename);
 		filename=NULL;
 		psm_duration=1.0;
-		psm_octave=3;
+		psm_octave=4;
 		PsmSongDel(&psm.head);
 		psm.cur_note=&psm.head;
 		psm.scrn_x=0;
@@ -664,19 +642,18 @@ mo_got_msg:
 		while (tmpn!=&psm.head) {
 		  if (tmpn->type!=PSMT_METER) {
 		    timeout_val=cnts.jiffies;
-		    if (ip.pos_text.y-Fs->win_top<18)
-		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-			    1<<MSG_IP_L_DOWN|1<<MSG_IP_R_UP|1<<MSG_CMD);
+		    if (ms.pos_text.y-Fs->win_top<18)
+		      msg_code=ScanMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|
+			    1<<MSG_MS_L_DOWN|1<<MSG_MS_R_UP|1<<MSG_CMD);
 		    else
-		      msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|
-			    1<<MSG_IP_L_DOWN|1<<MSG_CMD);
+		      msg_code=ScanMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|
+			    1<<MSG_MS_L_DOWN|1<<MSG_CMD);
 		    if (msg_code) {
-		      f=0;
-		      Snd(0);
+		      Snd;
 		      psm.playing=FALSE;
 		      was_playing=TRUE;
-		      if (ip.pos_text.y-Fs->win_top>=18 &&
-			    msg_code==MSG_IP_L_DOWN)
+		      if (ms.pos_text.y-Fs->win_top>=18 &&
+			    msg_code==MSG_MS_L_DOWN)
 			goto mo_start;
 		      else
 			goto mo_got_msg;
@@ -685,16 +662,7 @@ mo_got_msg:
 		    psm.scrn_x+=tmpn->x-0.33*GR_WIDTH;
 		    if (PsmHasWords(tmpn->word))
 		      "%s",tmpn->word;
-		    note=tmpn->note;
-		    octave=tmpn->octave;
-		    if (note!=NOTE_REST)
-		      f=Note2Freq(note,octave);
-		    else
-		      f=-1; //rest
-		    if (f>0)
-		      Snd(f);
-		    else
-		      Snd(0);
+		    Snd(tmpn->ona);
 
 		    music.tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
 		    music.stacatto_factor=
@@ -709,7 +677,7 @@ mo_got_msg:
 			    d*(1.0-music.stacatto_factor);
 		    }
 		    SleepUntil(timeout_val);
-		    Snd(0);
+		    Snd;
 		    SleepUntil(timeout_val2);
 		  }
 		  tmpn=tmpn->next;
@@ -719,8 +687,7 @@ mo_got_msg:
 		psm.playing=FALSE;
 		PsmMenu(psm_octave);
 		col=0;
-		f=0;
-		Snd(0);
+		Snd;
 		break;
 	      case CH_BACKSPACE:
 		tmpn=psm.cur_note->last;
@@ -739,7 +706,7 @@ mo_got_msg:
 		else {
 		  psm.record_entry->checked=TRUE;
 		  psm_duration=1.0;
-		  psm_octave=3;
+		  psm_octave=4;
 		  psm.scrn_x=0;
 		}
 		PsmMenu(psm_octave);
@@ -756,57 +723,55 @@ mo_got_msg:
 	  break;
 	case MSG_KEY_UP:
 	  evt_time=tS;
-	  f=0;
 	  break;
-	case MSG_IP_MOVE:
-	  if (a2>18*FONT_HEIGHT)
+	case MSG_MS_MOVE:
+	  if (arg2>18*FONT_HEIGHT)
 	    Fs->win_inhibit=WIG_USER_TASK_DFT;
 	  else
 	    Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER
 		  -WIF_FOCUS_TASK_MENU-WIF_SELF_CTRLS;
 	  break;
-	case MSG_IP_L_DOWN:
-	  PsmDownKey(a1,a2);
-	  PsmLeftClick(a1,a2);
+	case MSG_MS_L_DOWN:
+	  PsmDownKey(arg1,arg2);
+	  PsmLeftClick(arg1,arg2);
 	  break;
-	case MSG_IP_L_UP:
-	  PsmUpKey(a1,a2);
+	case MSG_MS_L_UP:
+	  PsmUpKey(arg1,arg2);
 	  break;
 	default:
-	  PsmRightClick(a1,a2);
+	  PsmRightClick(arg1,arg2);
       }
-      if (f!=last_f) {
-	if (f>0) {
-	  st=LstSub(note,psm_note_lst);
-	  Snd(f);
-	} else {
-	  if (f<0)
-	    st="R";
-	  else
+      if (is_null)
+	ona=ONA_REST;
+      if (ona!=last_ona || is_null!=was_null) {
+	if (ona==ONA_REST) {
+	  if (is_null)
 	    st="";
-	  Snd(0);
-	}
+	  else
+	    st="R";
+	} else
+	  st=LstSub(Ona2Note(ona),psm_note_lst);
+	Snd(ona);
 	if (psm.record_entry->checked) {
-	  if (last_f) {
+	  if (!was_null) {
 	    music.tempo=4.4*tempo_state.tempo/TEMPO_RANGE+0.5;
 	    music.stacatto_factor=0.88*tempo_state.stacatto/TEMPO_RANGE+0.12;
-
 	    tmpn->duration=PsmCvtDuration(
 		  music.tempo*(evt_time-note_down_time));
 	    PsmSetWidth(tmpn);
 	    QueIns(tmpn,psm.cur_note->last);
 	  }
-	  if (f) {
+	  if (!is_null) {
 	    note_down_time=tS;
 	    tmpn=CAlloc(sizeof(PsmNote));
 	    tmpn->type=PSMT_NOTE;
-	    tmpn->note=note;
-	    tmpn->octave=octave;
+	    tmpn->ona=ona;
 	    if (st[1]=='#')
 	      Bts(&tmpn->flags,PSMf_SHARP);
 	  }
 	}
-	last_f=f;
+	last_ona=ona;
+	was_null=is_null;
 	"%s",st;
 	col+=StrLen(st);
 	if (col>=Fs->win_width-1) {

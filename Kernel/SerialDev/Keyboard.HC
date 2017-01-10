@@ -62,7 +62,7 @@ U0 KbdLEDsSet(I64 sc)
     Fs->catch_except=TRUE;
 }
 
-U0 KbdMouseCmdAck(...)
+U0 KbdMsCmdAck(...)
 {
   I64 i,ack,timeout;
   for (i=0;i<argc;i++) {
@@ -237,7 +237,7 @@ U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE)
 	buf[i+1]=0;
 	break;
     }
-  } else if (Bt(chars_bmp_printable,ch)) {
+  } else if (Bt(char_bmp_printable,ch)) {
     *buf=ch;
     buf[1]=0;
   } else
@@ -413,7 +413,7 @@ interrupt U0 IRQKbd()
   CLD
   OutU8(0x20,0x20);
   kbd.irqs_working=TRUE;
-  if (mouse.install_in_progress) {
+  if (ms_hard.install_in_progress) {
     kbd.rst=TRUE;
     return;
   }
@@ -438,7 +438,7 @@ U0 KbdInit()
   OutU8(0x21,InU8(0x21)&~2);
 }
 
-U0 KbdHandler()
+U0 KbdHndlr()
 {
   static U8 last_raw_byte=0;
   U8  raw_byte;
@@ -466,16 +466,16 @@ U0 KbdHandler()
 
 I64 KbdMsgsQue()
 {
-  I64 a1,a2,msg_code=MSG_NULL;
+  I64 arg1,arg2,msg_code=MSG_NULL;
   CTask *task_focus;
   if (task_focus=sys_focus_task) {
-    while (FifoI64Rem(kbd.scan_code_fifo,&a2)) {
-      a1=ScanCode2Char(a2);
-      if (a2 & SCF_KEY_UP) {
-	TaskMsg(task_focus,0,MSG_KEY_UP,a1,a2,0);
+    while (FifoI64Rem(kbd.scan_code_fifo,&arg2)) {
+      arg1=ScanCode2Char(arg2);
+      if (arg2 & SCF_KEY_UP) {
+	TaskMsg(task_focus,0,MSG_KEY_UP,arg1,arg2,0);
 	msg_code=MSG_KEY_UP;
       } else {
-	TaskMsg(task_focus,0,MSG_KEY_DOWN,a1,a2,0);
+	TaskMsg(task_focus,0,MSG_KEY_DOWN,arg1,arg2,0);
 	msg_code=MSG_KEY_DOWN;
       }
     }
@@ -483,10 +483,10 @@ I64 KbdMsgsQue()
   return msg_code;
 }
 
-I64 KbdMouseEvtTime()
+I64 KbdMsEvtTime()
 {//Timestamp of last key or mouse event.
-  if (mouse.timestamp>kbd.timestamp)
-    return mouse.timestamp;
+  if (ms_hard.timestamp>kbd.timestamp)
+    return ms_hard.timestamp;
   else
     return kbd.new_key_timestamp;
 }

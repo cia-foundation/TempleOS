@@ -12,7 +12,7 @@ U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _tmp_u32_attr)
     case DOCSS_NORMAL:
 hl_normal:
       while (len) {
-	while (len && !Bt(chars_bmp_alpha_numeric,*src)) {
+	while (len && !Bt(char_bmp_alpha_numeric,*src)) {
 	  tmp_u32_attr=_tmp_u32_attr;
 	  ch1=*src++;
 	  switch (ch1) {
@@ -65,7 +65,7 @@ hl_normal:
 	  if (!--len) goto hl_normal_done;
 	}
 	ptr=src;
-	while (len && Bt(chars_bmp_alpha_numeric,*src)) {
+	while (len && Bt(char_bmp_alpha_numeric,*src)) {
 	  src++;
 	  len--;
 	}

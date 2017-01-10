@@ -1,0 +1,28 @@
+/* To run this, do a directory, right click on
+this file's name and sel "InFile".
+Or, type $LK,"InFile",A="MN:InFile"$(filename);
+See $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$ in the glossary for more info.
+
+This InFile will renum the defines in
+InEd.DD.Z.  Test it by numbering a few wrong
+and running this demo.
+
+*/
+
+U8 i;
+
+"Ed(\"InEd.DD.Z\");\n";
+//Go to start of file
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_UP|SCF_CTRL);
+for (i=0;i<=0xC3;i++) {
+  if (i)
+    Msg(MSG_KEY_DOWN_UP,0,SC_F3);
+  else
+    "%c0x%c",CH_CTRLF,CH_ESC;
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  "%02X",i;
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  Msg(MSG_KEY_DOWN,0,SC_CURSOR_RIGHT);
+  "%c%c",CH_BACKSPACE,CH_BACKSPACE;
+}

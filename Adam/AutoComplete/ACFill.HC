@@ -212,11 +212,11 @@ U0 ACMisspelledFind(CDoc *doc)
   do {
     if (doc_e!=doc && doc_e->de_flags&DOCEF_TAG) {
       while (col<doc_e->max_col) {
-	while (col<doc_e->max_col && !Bt(chars_bmp_word,doc_e->tag[col]))
+	while (col<doc_e->max_col && !Bt(char_bmp_word,doc_e->tag[col]))
 	  col++;
 	if (col<doc_e->max_col) {
 	  col2=col;
-	  while (col2<doc_e->max_col && Bt(chars_bmp_word,doc_e->tag[col2]))
+	  while (col2<doc_e->max_col && Bt(char_bmp_word,doc_e->tag[col2]))
 	    col2++;
 	  ch=doc_e->tag[col2];
 	  doc_e->tag[col2]=0;

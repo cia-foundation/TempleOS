@@ -162,7 +162,7 @@ U8 *MPrintq(U8 *ptr,I64 flags)
 	      ptr++;
 	      for (j=0;j<2;j++) {
 		ch1=ToUpper(*ptr++);
-		if (Bt(chars_bmp_hex_numeric,ch1)) {
+		if (Bt(char_bmp_hex_numeric,ch1)) {
 		  if (ch1<='9')
 		    i=i<<4+ch1-'0';
 		  else

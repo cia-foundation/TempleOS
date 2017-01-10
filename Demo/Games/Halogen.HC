@@ -76,7 +76,7 @@ U0 Init()
 
 U0 Halogen()
 {
-  I64 a1,a2,ch=0,sc=0;
+  I64 arg1,arg2,ch=0,sc=0;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->text_attr=BLACK<<4+WHITE;
   MenuPush(
@@ -100,9 +100,9 @@ U0 Halogen()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      switch (ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
+      switch (ScanMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
 	case MSG_KEY_DOWN:
-	  ch=a1;sc=a2;
+	  ch=arg1;sc=arg2;
 	  switch (ch) {
 	    case '\n':
 	      Init;
@@ -113,7 +113,7 @@ U0 Halogen()
 	  }
 	  break;
 	case MSG_KEY_UP:
-	  ch=a1;sc=a2;
+	  ch=arg1;sc=arg2;
 	  if (!ch)
 	    switch (sc.u8[0]) {
 	      case SC_CURSOR_RIGHT:
@@ -140,12 +140,12 @@ U0 Halogen()
 	  break;
       }
       if (crash)
-	Snd(0);
+	Snd;
       else {
 	if (speed)
-	  Snd(speed+10);
+	  Snd(Freq2Ona(speed+10));
 	else
-	  Snd(0);
+	  Snd;
 	UpdateRoad;
       }
       Sleep(10);

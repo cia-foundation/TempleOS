@@ -3,7 +3,7 @@ public CTask *PopUpViewDoc(CDoc *doc,I64 dof_flags=0)
 {//Pass doc to PopUp win task for viewing.
   U8 *buf=MStrPrint("DocEd(0x%X,0x%X);",doc,dof_flags);
   CTask *task=Spawn(&SrvCmdLine,NULL,"View",,Fs);
-  TaskExe(task,NULL,buf,1<<SVCf_EXIT_ON_COMPLETE|1<<SVCf_FREE_ON_COMPLETE);
+  TaskExe(task,NULL,buf,1<<JOBf_EXIT_ON_COMPLETE|1<<JOBf_FREE_ON_COMPLETE);
   Free(buf);
   return task;
 }
@@ -120,7 +120,7 @@ public U8 *PopUpPickDefineSub(U8 *dname)
 
 #help_index "DolDoc/Input;StdIn/DolDoc"
 public I64 PopUp1(U8 *b1,I64 n1,U8 *header=NULL,U8 *footer=NULL)
-{//Make PopUp win task with one button.
+{//Make PopUp win task with one bttn.
   I64 i,l1=StrLen(b1);
   CDoc *doc=DocNew;
   if (header) DocPrint(doc,"%s",header);
@@ -132,7 +132,7 @@ public I64 PopUp1(U8 *b1,I64 n1,U8 *header=NULL,U8 *footer=NULL)
 }
 
 public I64 PopUp2(U8 *b1,I64 n1,U8 *b2,I64 n2,U8 *header=NULL,U8 *footer=NULL)
-{//Make PopUp win task with two buttons.
+{//Make PopUp win task with two bttns.
   I64 i,l1=StrLen(b1),l2=StrLen(b2),y;
   CDoc *doc=DocNew;
   if (header) {
@@ -151,17 +151,17 @@ public I64 PopUp2(U8 *b1,I64 n1,U8 *b2,I64 n2,U8 *header=NULL,U8 *footer=NULL)
 }
 
 public Bool PopUpOk(U8 *header=NULL,U8 *footer=NULL)
-{//Make PopUp win task with OKAY button.
+{//Make PopUp win task with OKAY bttn.
   return PopUp1("OKAY",1,header,footer)>0;
 }
 
 public Bool PopUpNoYes(U8 *header=NULL,U8 *footer=NULL)
-{//Make PopUp win task with NO/YES buttons.
+{//Make PopUp win task with NO/YES bttns.
   return $WW,0$PopUp2("YES",1,"NO",0,header,footer)>0;
 }
 
 public Bool PopUpCancelOk(U8 *header=NULL,U8 *footer=NULL)
-{//Make PopUp win task CANCEL/OKAY buttons.
+{//Make PopUp win task CANCEL/OKAY bttns.
   return PopUp2("OKAY",1,"CANCEL",0,header,footer)>0;
 }
 
@@ -265,7 +265,7 @@ public F64 PopUpRangeF64Log(F64 lo,F64 hi,I64 steps,
   return PopUpRangeF64Exp(lo,hi,Exp(Ln(hi/lo)/(steps-1)),fmt,header,footer);
 }
 
-#help_index "Task/Srv/Exe;Compiler"
+#help_index "Job/Exe;Task/Job/Exe;Compiler"
 public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
 {//Make adam_task execute file.
   Bool okay=TRUE;

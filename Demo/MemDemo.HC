@@ -2,16 +2,16 @@ U0 MemDemo()
 {
   I64 i;
 "$$HL,1$$$$BLACK$$
-#define MEM_PAGE_BITS		9
-#define MEM_PAGE_SIZE		(1<<MEM_PAGE_BITS)
+#define MEM_PAG_BITS		9
+#define MEM_PAG_SIZE		(1<<MEM_PAG_BITS)
 #define MEM_HEAP_HASH_SIZE	1024
-#define MEM_FREE_PAGE_HASH_SIZE	0x100
-#define MEM_EXTRA_HASH2_PAGES	2
+#define MEM_FREE_PAG_HASH_SIZE	0x100
+#define MEM_EXTRA_HASH2_PAGS	2
 
 public class CBlkPool
 {
-  CMemBlk *free_page_hash[MEM_FREE_PAGE_HASH_SIZE],
-	  *free_page_hash2[64-MEM_PAGE_BITS];
+  CMemBlk *free_pag_hash[MEM_FREE_PAG_HASH_SIZE],
+	  *free_pag_hash2[64-MEM_PAG_BITS];
 };
 
 public class CHeapCtrl
@@ -39,23 +39,23 @@ $$HL,0$$$$FG$$
   "\n\n";
 
   "$$PURPLE$$Pages of 512 bytes, owned by the system.$$FG$$\n";
-  for (i=MEM_HEAP_HASH_SIZE;i<MEM_FREE_PAGE_HASH_SIZE*MEM_PAGE_SIZE;
-	i+=MEM_PAGE_SIZE)
+  for (i=MEM_HEAP_HASH_SIZE;i<MEM_FREE_PAG_HASH_SIZE*MEM_PAG_SIZE;
+	i+=MEM_PAG_SIZE)
     if (i==0x1200)
       "...\n";
     else if (!(0x1200<i<0x1F200))
-      "Fs->data_heap->bp->free_page_hash[%X/512]"
+      "Fs->data_heap->bp->free_pag_hash[%X/512]"
 	  "$$BLACK$$ -->$$FG$$[X]$$BLACK$$ -->$$FG$$[X]$$BLACK$$ -->$$FG$$\n",i;
   "\n\n";
 
   "$$PURPLE$$Powers of two, owned by the system.$$FG$$\n";
-  for (i=Bsf(MEM_FREE_PAGE_HASH_SIZE*MEM_PAGE_SIZE);i<64;i++)
+  for (i=Bsf(MEM_FREE_PAG_HASH_SIZE*MEM_PAG_SIZE);i<64;i++)
     if (i==0x1A)
       "...\n";
     else if (!(0x1A<=i<=0x36))
-      "Fs->data_heap->bp->free_page_hash2[%X] %016X"
+      "Fs->data_heap->bp->free_pag_hash2[%X] %016X"
 	  "$$BLACK$$ -->$$FG$$[X]$$BLACK$$ -->$$FG$$[X]$$BLACK$$ -->$$FG$$\n",i,
-	  1<<i+MEM_EXTRA_HASH2_PAGES*MEM_PAGE_SIZE;
+	  1<<i+MEM_EXTRA_HASH2_PAGS*MEM_PAG_SIZE;
   "\n\n";
 }
 

@@ -27,7 +27,7 @@ U0 PDAnswer(U8 *a,I64 len)
 {
   DocLock(doc);
   a-=(len-1)/2;
-  DocPrint(doc,"CPU:%d Len:%2d ",Gs->num,len);
+  DocPrint(doc,"CPU%02X Len:%2d ",Gs->num,len);
   while (len--)
     DocPrint(doc,"%C",*a++); //%C is toupper char
   DocPrint(doc,"\n");

@@ -52,7 +52,7 @@ IRQ_TIMER::  //I_TIMER
 	MOV	U32 [RAX+RDX],0
 	JMP	@@25
 
-@@20:	CALL	&IntCore0TimerHandler	//Only Core 0 calls this.
+@@20:	CALL	&IntCore0TimerHndlr	//Only Core 0 calls this.
 @@25:	XOR	RAX,RAX
 	CMP	RSI,U64 GS:CCPU.idle_task[RAX]
 	JE	I32 RESTORE_SETH_TASK_IF_READY
@@ -61,7 +61,7 @@ IRQ_TIMER::  //I_TIMER
 INT_FAULT::
 	PUSH	RBX
 	PUSH	RAX
-	MOV	BL,U8 16[RSP]	//We pushed fault_num $LK,"IntFaultHandlersNew",A="MN:IntFaultHandlersNew"$().
+	MOV	BL,U8 16[RSP]	//We pushed fault_num $LK,"IntFaultHndlrsNew",A="MN:IntFaultHndlrsNew"$().
 	XOR	RAX,RAX
 	MOV	FS:U8 CTask.fault_num[RAX],BL
 	POP	RAX
@@ -106,11 +106,11 @@ U8 *IntEntryGet(I64 irq)
   return res;
 }
 
-U8 *IntEntrySet(I64 irq,U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0)
+U8 *IntEntrySet(I64 irq,U0 (*fp_new_hndlr)(),I64 type=IDTET_IRQ,I64 dpl=0)
 {//Set interrupt vector. See $LK,"IDTET_IRQ",A="MN:IDTET_IRQ"$.
 //See $LK,"::/Demo/Lectures/InterruptDemo.HC"$.
   //See $LK,"::/Demo/MultiCore/Interrupts.HC"$.
-  I64 fp=fp_new_handler;
+  I64 fp=fp_new_hndlr;
   U8 *res,*dst;
   PUSHFD
   CLI
@@ -163,7 +163,7 @@ interrupt U0 IntDivZero()
   throw('DivZero');
 }
 
-U8 *IntFaultHandlersNew()
+U8 *IntFaultHndlrsNew()
 {
   I64 i;
   U8 *res=MAlloc(256*7,Fs->code_heap),*dst=res;

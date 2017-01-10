@@ -1,7 +1,7 @@
 #help_index "Cmd Line (Typically)"
 
 #define FILEMASK_OFF_LIMITS "!*/Misc/PCIDevices.DD*;!*/Misc/Bible.TXT*;"\
-	"!*/Sup1/Sup1Texts/*;!*/Sup1/Sup1Words/*;!*/Sup1/Sup1Bin/*;"\
+	"!*/Books?/*;!*/Sup1/Sup1Words/*;!*/Sup1/Sup1Bin/*;"\
 	"!*/Sup1/Sup1Blog/NumBible.TXT*;!*/God/Vocab.DD*"
 
 public I64 F(U8 *needle_str,U8 *fu_flags=NULL)

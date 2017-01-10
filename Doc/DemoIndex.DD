@@ -8,7 +8,7 @@ $LK,"::/Doc/HelloWorld.DD"$
 
 $WW,0$$TR,"Games: Beginner"$
 $ID,2$$LK,"::/Demo/Graphics/NetOfDots.HC"$
-$LK,"::/Demo/Graphics/InputPointer.HC"$
+$LK,"::/Demo/Graphics/MouseDemo.HC"$
 $LK,"::/Demo/Graphics/Lines.HC"$
 $LK,"::/Demo/Graphics/SunMoon.HC"$
 $LK,"::/Demo/Graphics/LowPassFilter.HC"$
@@ -27,7 +27,6 @@ $LK,"::/Demo/RandDemo.HC"$
 $LK,"::/Demo/KeyBitMap.HC"$
 $LK,"::/Demo/Graphics/WinZBuf.HC"$
 $LK,"::/Demo/Graphics/Elephant.HC"$
-$LK,"::/Demo/Graphics/Mountain.HC"$
 $LK,"::/Demo/Graphics/WallPaperFish.HC"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Games/Digits.HC"$
 $LK,"::/Demo/Progress.HC"$ //has some ASM, just ignore
@@ -78,7 +77,6 @@ $LK,"::/Demo/Games/TreeCheckers.HC"$
 $LK,"::/Demo/MultiCore/Palindrome.HC"$
 $LK,"::/Demo/MultiCore/MPAdd.HC"$
 $LK,"::/Demo/MultiCore/Lock.HC"$
-$LK,"::/Demo/MultiCore/Clouds.HC"$
 $LK,"::/Demo/Graphics/Slider.HC"$
 $LK,"::/Demo/Graphics/WallPaperCtrl.HC"$ //Press SHIFT-F5 to Adam Include
 $LK,"::/Demo/Graphics/ScrollBars.HC"$
@@ -89,14 +87,13 @@ $LK,"::/Demo/Games/BigGuns.HC"$
 $LK,"::/Demo/Games/FlatTops.HC"$
 $LK,"::/Demo/Games/RawHide.HC"$
 $LK,"::/Demo/Games/DunGen.HC"$
-$MA-X+PU,"::/Apps/TimeOut",LM="Cd(\"::/Apps/TimeOut\");Dir;View;\n"$
+$MA-X+PU,"::/Apps/Titanium",LM="Cd(\"::/Apps/Titanium\");Dir;View;\n"$
 $LK,"::/Demo/Games/Collision.HC"$
 $ID,-2$$TR,"Games: Advanced"$
 $ID,2$$LK,"::/Demo/MultiCore/LoadTest.HC"$
 $LK,"::/Demo/MultiCore/Primes.HC"$
 $LK,"::/Demo/MultiCore/MPRadix.HC"$
 $LK,"::/Demo/MultiCore/Interrupts.HC"$
-$MA-X+PU,"::/Apps/AfterEgypt",LM="Cd(\"::/Apps/AfterEgypt\");Dir;View;\n"$
 $LK,"::/Demo/Games/Varoom.HC"$
 $LK,"::/Demo/Graphics/Shading.HC"$
 $LK,"::/Demo/Graphics/Transform.HC"$
@@ -108,7 +105,6 @@ $LK,"::/Demo/Graphics/SpriteText.HC"$
 $LK,"::/Demo/Graphics/SpriteRaw.HC"$
 $MA-X+PU,"::/Apps/GrModels",LM="Cd(\"::/Apps/GrModels\");Dir;View;\n"$
 $MA-X+PU,"::/Apps/KeepAway",LM="Cd(\"::/Apps/KeepAway\");Dir;View;\n"$
-$LK,"::/Demo/Graphics/Camp.HC"$
 $LK,"::/Demo/Games/Rocket.HC"$
 $LK,"::/Demo/Games/RocketScience.HC"$
 $LK,"::/Demo/Games/MassSpring.HC"$
@@ -162,7 +158,7 @@ $LK,"::/Demo/ClassMeta.HC"$
 $LK,"::/Demo/LastClass.HC"$
 $LK,"::/Demo/DolDoc/NumBible.HC"$
 $LK,"::/Demo/DolDoc/Form.HC"$
-$LK,"::/Demo/DolDoc/MenuButton.HC"$
+$LK,"::/Demo/DolDoc/MenuBttn.HC"$
 $LK,"::/Demo/DolDoc/MenuSprite.HC"$
 $LK,"::/Demo/DolDoc/ClickCallBack.HC"$
 $LK,"::/Demo/DolDoc/TreeDemo.HC"$

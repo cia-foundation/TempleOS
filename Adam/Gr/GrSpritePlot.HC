@@ -253,7 +253,7 @@ public U0 Sprite3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems)
   dc->flags=dc->flags&~DCF_TRANSFORMATION|old_flags;
 }
 
-public U0 SpriteMat3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,I64 *m)
+public U0 Sprite3Mat4x4B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,I64 *m)
 {//Plot rotated by matrix.
   I64 r[16],*old_r=dc->r,new_m[16],
 	old_flags=dc->flags&DCF_TRANSFORMATION;
@@ -266,28 +266,28 @@ public U0 SpriteMat3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,I64 *m)
   dc->flags=dc->flags&~DCF_TRANSFORMATION|old_flags;
 }
 
-public U0 SpriteX3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 è=0)
+public U0 Sprite3XB(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 è=0)
 {//Plot rotated around X axis.
   I64 r[16];
   Mat4x4IdentEqu(r);
   Mat4x4RotX(r,è);
-  SpriteMat3B(dc,x,y,z,elems,r);
+  Sprite3Mat4x4B(dc,x,y,z,elems,r);
 }
 
-public U0 SpriteY3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 ê=0)
+public U0 Sprite3YB(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 ê=0)
 {//Plot rotated around Y axis.
   I64 r[16];
   Mat4x4IdentEqu(r);
   Mat4x4RotY(r,ê);
-  SpriteMat3B(dc,x,y,z,elems,r);
+  Sprite3Mat4x4B(dc,x,y,z,elems,r);
 }
 
-public U0 SpriteZ3B(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 é=0)
+public U0 Sprite3ZB(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 é=0)
 {//Plot rotated around Z axis.
   I64 r[16];
   Mat4x4IdentEqu(r);
   Mat4x4RotZ(r,é);
-  SpriteMat3B(dc,x,y,z,elems,r);
+  Sprite3Mat4x4B(dc,x,y,z,elems,r);
 }
 
 public U0 SpriteExtents(U8 *elems,I64 *min_x=NULL,I64 *max_x=NULL,

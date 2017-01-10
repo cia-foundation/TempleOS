@@ -67,10 +67,10 @@ extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);
 
 #help_index "Debugging/Unassemble"
-public extern U8 *U(U8 *ip,I64 cnt=20,I64 seg_size=64);
-public extern U0 Ui(U8 *buf,U8 **_ip,I64 seg_size=64,
+public extern U8 *U(U8 *rip,I64 cnt=20,I64 seg_size=64);
+public extern U0 Ui(U8 *buf,U8 **_rip,I64 seg_size=64,
 	I64 *_jmp_dst=NULL,Bool just_ins=FALSE);
-public extern I64 Un(U8 *ip,I64 cnt=0x80,I64 seg_size=64);
+public extern I64 Un(U8 *rip,I64 cnt=0x80,I64 seg_size=64);
 extern CUAsmGlbls uasm;
 
 #help_index "Hash/System"

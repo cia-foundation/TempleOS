@@ -65,7 +65,7 @@ U0 ACSingleFileAdd(U8 *buf)
   while (TRUE) {
     while (TRUE) {
       if (ch=*ptr++) {
-	if (Bt(chars_bmp_alpha_numeric,ch))
+	if (Bt(char_bmp_alpha_numeric,ch))
 	  break;
       } else
 	return;
@@ -75,7 +75,7 @@ U0 ACSingleFileAdd(U8 *buf)
     ptr--;
     while (TRUE) {
       if (ch=*ptr2++) {
-	if (Bt(chars_bmp_alpha_numeric,ch))
+	if (Bt(char_bmp_alpha_numeric,ch))
 	  *ptr3++=ch;
 	else if (ch!=CH_CURSOR)
 	  break;

@@ -53,13 +53,10 @@ $ID,-8$
 F64 psm_durations[PSM_NUM_DURATIONS+1]={
 2*.25/3,.25,2*.5/3,.5,2.0/3.0,0.5*1.5,1.0,1.5,2.0,3.0,4.0,6.0,1000000.0};
 U8 *psm_duration_lst="st\0s\0et\0e\0qt\0e.\0q\0q.\0h\0h.\0w\0w.\0";
-U8 *psm_duration_imgs[PSM_NUM_DURATIONS]={$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,
-			$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<3>",BI=3$,
-			$IB,"<4>",BI=4$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<5>",BI=5$};
+U8 *psm_duration_imgs[PSM_NUM_DURATIONS]={
+	$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<5>",BI=5$};
 Bool psm_triplet_durations[PSM_NUM_DURATIONS]={TRUE,FALSE,TRUE,
-			FALSE,TRUE,FALSE,FALSE,FALSE,
-			FALSE,FALSE,FALSE,FALSE};
-
+	FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 
 Bool PsmBlink()
 {
@@ -117,7 +114,7 @@ U0 PsmSetOctave(I64 octave)
   I64 i;
   U8 buf[STR_LEN];
   CMenuEntry *tmpse;
-  for (i=0;i<=6;i++) {
+  for (i=1;i<=7;i++) {
     StrPrint(buf,"Snd/Octave%d",i);
     if (tmpse=MenuEntryFind(Fs->cur_menu,buf)) {
       if (i==octave)
@@ -149,7 +146,7 @@ U0 PsmRecalcNoteXY()
 {
   F64 measure_len=4,measure_left=measure_len;
   PsmNote *tmpn=psm.head.next;
-  I64 x=8-psm.scrn_x,note,octave;
+  I64 x=8-psm.scrn_x,ona,note,octave;
   while (TRUE) {
     tmpn->x=x;
     tmpn->y=50;
@@ -157,22 +154,18 @@ U0 PsmRecalcNoteXY()
       break;
     else {
       if (tmpn->type!=PSMT_METER) {
-	octave=tmpn->octave;
-	if (octave!=OCTAVE_REST) {
-	  note=tmpn->note;
+	if (tmpn->ona!=ONA_REST) {
+	  ona=tmpn->ona;
 	  if (Bt(&tmpn->flags,PSMf_SHARP))
-	    note--;
+	    ona--;
 	  if (Bt(&tmpn->flags,PSMf_FLAT))
-	    note++;
-	  if (note<0) {
-	    note=11;
-	    octave--;
-	  } else if (note>11) {
-	    note=0;
-	    octave++;
-	  }
+	    ona++;
+	  octave=Ona2Octave(ona);
+	  note	=Ona2Note  (ona);
 	  note=music.note_map[*LstSub(note,psm_note_lst)-'A'];
-	  tmpn->y=(15+(psm_note_map[note]-7*(octave-2)))*4;
+	  if (note<3)
+	    octave++;
+	  tmpn->y=(15+(psm_note_map[note]-7*(octave-4)))*4;
 	}
       }
       x+=tmpn->width;
@@ -237,7 +230,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       } else if (tmpn->flags&PSMF_SEL)
 	dc->color=RED;
       else {
-	if (tmpn->note!=NOTE_REST)
+	if (tmpn->ona!=ONA_REST)
 	  dc->color=BLACK;
 	else
 	  dc->color=LTGRAY;
@@ -314,21 +307,19 @@ U0 DrawPickTools()
     psm.dc2->color=ROPF_DITHER+WHITE<<16+RED;
   else
     psm.dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
-  GrBorder(psm.dc2,PSM_TOOLS_X,PSM_TOOLS_Y,
-	PSM_TOOLS_X+10,PSM_TOOLS_Y+10);
+  GrBorder(psm.dc2,PSM_TOOLS_X,PSM_TOOLS_Y,PSM_TOOLS_X+10,PSM_TOOLS_Y+10);
 
   if (psm.tool==PSMTT_PTR_TOOL)
     psm.dc2->color=RED;
   else
     psm.dc2->color=BLACK;
-  (*gr.fp_draw_input_ptr)(psm.dc2,PSM_TOOLS_X+15,PSM_TOOLS_Y);
+  (*gr.fp_draw_ms)(psm.dc2,PSM_TOOLS_X+15,PSM_TOOLS_Y);
   psm.dc2->color=BLACK;
 }
 
 Bool PsmGetPickToolBox(I64 xx,I64 yy)
 {
-  if (PSM_TOOLS_X<=xx<PSM_TOOLS_X+27 &&
-	PSM_TOOLS_Y<=yy<PSM_TOOLS_Y+15) {
+  if (PSM_TOOLS_X<=xx<PSM_TOOLS_X+27 && PSM_TOOLS_Y<=yy<PSM_TOOLS_Y+15) {
     PsmMarkSel(0,0,FALSE);
     if (xx<PSM_TOOLS_X+13)
       psm.tool=PSMTT_BOX_TOOL;

@@ -20,7 +20,7 @@ $WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
 
 * $LK,"ClassRep",A="MN:ClassRep"$() and the dynamic version $LK,"ClassRepD",A="MN:ClassRepD"$() can be used to dump structures.
 
-* $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/InFile/INProfile.IN"$ (This is an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$.)
+* $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/InFile/InProfile.IN"$ (This is an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$.)
 
 * Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The $FG,2$WinMgr$FG$ runs on $FG,2$Core0$FG$ and will overwrite raw text from other cores when it updates the scrn.
 
@@ -37,6 +37,6 @@ $ID,-2$
 
 * There is a heap check utility which can find leaks.  Use $LK,"HeapLog",A="MN:HeapLog"$(), $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() and $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().  It's a really simple program which intercepts $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().  You can customize the code to find other heap issues.
 
-* You can define handler functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ handlers take a scan_code as an arg.
+* You can define hndlr functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ hndlrs take a scan_code as an arg.
 
-* If you recompile $FG,2$Kernel$FG,2$$FG$ with $LK,"BootHDIns",A="MN:BootHDIns"$(), you can set the $FG,4$MemInit$FG$, option to initialize memory to a value at boot, the $FG,4$HeapInit$FG$ option to cause mem alloced off the heap to be initialized or $FG,4$VarInit$FG$ option so both global and local vars will be initialized to a value.  Pick a non-zero value to discover uninitialized var bugs.  You can set $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$, and $LK,"sys_heap_init_flag",A="MN:sys_heap_init_flag"$ directly after booting.
+* If you recompile $FG,2$Kernel$FG,2$$FG$ with $LK,"BootHDIns",A="MN:BootHDIns"$(), you can set the $FG,4$MemInit$FG$, option to initialize memory to a value at boot, the $FG,4$HeapInit$FG$ option to cause mem alloced off the heap to be initialized or $FG,4$VarInit$FG$ option so both global and local vars will be initialized to a value, but global AOT variables are always zero if not initialized.  Pick a non-zero value to discover uninitialized var bugs.  You can set $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$, and $LK,"sys_heap_init_flag",A="MN:sys_heap_init_flag"$ directly after booting.

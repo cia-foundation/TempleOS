@@ -23,7 +23,7 @@ U0 HeapCtrlDel(CHeapCtrl *hc)
     m=hc->next_mem_blk;
     while (m!=&hc->next_mem_blk) {
       m1=m->next;
-      Mem512TaskFree(m,hc);
+      MemPagTaskFree(m,hc);
       m=m1;
     }
     LBtr(&hc->locked_flags,HClf_LOCKED);

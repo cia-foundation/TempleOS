@@ -8,7 +8,7 @@ for sorting.  Then, it merge sorts them.
 
 I64 my_mp_cnt=1<<Bsr(mp_cnt);//Power of 2
 
-I32 *a1,*a2;
+I32 *arg1,*arg2;
 I32 *b[my_mp_cnt],bn[my_mp_cnt];
 I64 mp_not_done_flags;
 
@@ -73,25 +73,25 @@ U0 MPRadixSortDemo(I64 dummy=0)
   no_warn dummy;
   I64 i,j,k1,k2;
   F64 t0;
-  a1=MAlloc(NUM*sizeof(I32));
+  arg1=MAlloc(NUM*sizeof(I32));
   for (i=0;i<NUM;i++)
-    a1[i]=RandI32;
+    arg1[i]=RandI32;
 
-  a2=MAlloc(NUM*sizeof(I32));
+  arg2=MAlloc(NUM*sizeof(I32));
 
   "$$GREEN$$QSort$$FG$$\n";
   t0=tS;
-  MemCpy(a2,a1,sizeof(I32)*NUM);
-  QSort(a2,NUM,sizeof(I32),&Compare);
+  MemCpy(arg2,arg1,sizeof(I32)*NUM);
+  QSort(arg2,NUM,sizeof(I32),&Compare);
   "Time:%9.6f\n",tS-t0;
-  D(a2+NUM/4);
+  D(arg2+NUM/4);
 
   "$$GREEN$$QSortU32$$FG$$\n";
   t0=tS;
-  MemCpy(a2,a1,sizeof(I32)*NUM);
-  QSortU32(a2,NUM);
+  MemCpy(arg2,arg1,sizeof(I32)*NUM);
+  QSortU32(arg2,NUM);
   "Time:%9.6f\n",tS-t0;
-  D(a2+NUM/4);
+  D(arg2+NUM/4);
 
   for (i=0;i<my_mp_cnt;i++) {
 //$WW,0$We must do full size, just in case.
@@ -108,8 +108,8 @@ U0 MPRadixSortDemo(I64 dummy=0)
   k1=32-Bsr(my_mp_cnt);
   k2=my_mp_cnt/2;
   for (i=0;i<NUM;i++) {
-    j=a1[i]>>k1+k2; //This is a preliminary radix sort.
-    b[j][bn[j]++]=a1[i];
+    j=arg1[i]>>k1+k2; //This is a preliminary radix sort.
+    b[j][bn[j]++]=arg1[i];
   }
   mp_not_done_flags=1<<my_mp_cnt-1;
   for (i=0;i<my_mp_cnt;i++)
@@ -118,14 +118,14 @@ U0 MPRadixSortDemo(I64 dummy=0)
     Yield;
   j=0;
   for (i=0;i<my_mp_cnt;i++) {
-    MemCpy(&a2[j],b[i],bn[i]*sizeof(I32));
+    MemCpy(&arg2[j],b[i],bn[i]*sizeof(I32));
     j+=bn[i];
   }
   "Time:%9.6f\n",tS-t0;
-  D(a2+NUM/4);
+  D(arg2+NUM/4);
 
-  Free(a1);
-  Free(a2);
+  Free(arg1);
+  Free(arg2);
   for (i=0;i<my_mp_cnt;i++)
     Free(b[i]);
 }

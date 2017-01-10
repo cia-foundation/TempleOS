@@ -1,13 +1,14 @@
 #help_index "Install;File/Cmd Line (Typically);Cmd Line (Typically);"
-I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
+U8 Mount2(U8 boot_drv_let,CDoc *_doc,Bool _caller_is_prtdsk)
 {//If _doc, called by $LK,"::/Kernel/KCfg.HC"$ else called by $LK,"Mount",A="MN:Mount"$().
-  I64 cnt,res=0,num_hints,drv_let,type,unit;
+  I64 cnt,total=0,num_hints,drv_let,type,unit,prt_num;
   U8 blks_buf[STR_LEN],addr_buf[STR_LEN],base0_buf[STR_LEN],base1_buf[STR_LEN],
-	*filename=NULL,*filename2=NULL;
+	*filename=NULL,*filename2=NULL,res=0;
   CATARep *head=NULL,*tmpha;
-  Bool one_drv,make_free;
+  Bool whole_drv,make_free;
   CDoc *doc;
-  boot_drv_let=ToUpper(boot_drv_let);
+  if (boot_drv_let)
+    boot_drv_let=Let2Let(boot_drv_let);
   do {
     cnt=0;
     if (!_doc)
@@ -19,10 +20,10 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	  "$$GREEN$$Q$$FG$$-$$GREEN$$S$$FG$$ are ISO file write drives.\n"
 	  "$$GREEN$$T$$FG$$-$$GREEN$$Z$$FG$$ are ATAPI CD/DVD drives.\n"
 	  "\nDrive Letter ($$PURPLE$$<ENTER>$$FG$$ to exit):";
-    drv_let=ToUpper(GetChar);
+    drv_let=Let2Let(GetChar);
     '\n';
     if (type=Let2BlkDevType(drv_let)) {
-      one_drv=FALSE;
+      whole_drv=FALSE;
       if (_doc) { //Called by $LK,"::/Kernel/KCfg.HC"$
 	doc=_doc;
 	make_free=FALSE;
@@ -32,6 +33,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	make_free=TRUE;
       }
       unit=0;
+      prt_num=MIN_I64;
       switch (type) {
 	case BDT_RAM:
 	  "Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";
@@ -44,6 +46,7 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	  filename=GetStr("File Name:");
 	  break;
 	case BDT_ATA:
+	  prt_num=GetI64("Partition Num (Default=All):",prt_num);
 	case BDT_ATAPI:
 	  num_hints=ATARep(,,&head);
 	  if (type==BDT_ATAPI && boot_drv_let)
@@ -87,6 +90,8 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	case BDT_ISO_FILE_WRITE:
 	  if (!*blks_buf) StrCpy(blks_buf,"0");
 	  DocPrint(doc,"bd->max_blk=(%s)-1;\n",blks_buf);
+	  DocPrint(doc,"bd->drv_offset=19<<2+"
+		"(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;\n");
 	  break;
 	case BDT_ISO_FILE_READ:
 	  filename2=FileNameAbs(filename);
@@ -102,31 +107,37 @@ I64 Mount2(U8 boot_drv_let,CDoc *_doc,Bool repartition)
 	      make_free=TRUE;
 	  } else
 	    DocPrint(doc,"bd->base0=%s;bd->base1=%s;\n",base0_buf,base1_buf);
-	  if (type==BDT_ATA && repartition) {
+	  if (type==BDT_ATA && _caller_is_prtdsk) {
 	    "\nReformat WHOLE drive!";
-	    one_drv=YorN;
+	    whole_drv=YorN;
 	  }
 	  break;
       }
-      DocPrint(doc,"BlkDevAdd(bd,%d,%d);\n",one_drv,make_free);
+      DocPrint(doc,"BlkDevAdd(bd,%d,%d,%d);\n",prt_num,whole_drv,make_free);
       if (_doc) //Called by $LK,"::/Kernel/KCfg.HC"$
 	cnt++;
       else { //Called by $LK,"Mount",A="MN:Mount"$()
-	if ((cnt=ExeDoc(doc)) && one_drv)
-	  PrtDsk(drv_let);
+	if ((cnt=ExeDoc(doc)) && whole_drv) {
+	  if (_caller_is_prtdsk) {
+	    res=drv_let;
+	    PrtDsk(drv_let,1.0); //First mount whole drive.
+	  } else
+	    PrtDsk(drv_let);
+	}
 	DocDel(doc);
       }
     }
-    res+=cnt;
-  } while (cnt || !res && _doc); //At least 1 if Called by $LK,"::/Kernel/KCfg.HC"$
+    total+=cnt;
+  } while (cnt && !_caller_is_prtdsk ||
+	!total && _doc); //At least 1 if Called by $LK,"::/Kernel/KCfg.HC"$
   Free(filename);
   Free(filename2);
   return res;
 }
 
-public I64 Mount(Bool repartition=FALSE)
-{//Mount drives.
-  return Mount2(0,NULL,repartition);
+public U8 Mount(Bool caller_is_prtdsk=FALSE)
+{//Mount drives. Called from $LK,"PrtDsk(Mount)",A="FF:::/Adam/ABlkDev/PrtDsk.HC,Mount("$.
+  return Mount2(0,NULL,caller_is_prtdsk);
 }
 
 public U0 Unmount(U8 drv_let=0)
@@ -141,7 +152,7 @@ public U8 MountFile(U8 *filename)
   CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_READ);
   bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
   bd->file_dsk_name=AStrNew(filename3);
-  BlkDevAdd(bd,TRUE,TRUE);
+  BlkDevAdd(bd,,TRUE,TRUE);
   Free(filename3);
   Free(filename2);
   return dv->drv_let;

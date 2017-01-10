@@ -114,7 +114,7 @@ U0 Init()
       "Too large\n";
     else if (table_size<1) {
       "No table specified, aborting.\n";
-      ThrowBreak;
+      throw;
     }
   } while (table_size>MAX_TABLE_SIZE);
 
@@ -148,7 +148,7 @@ U0 Init()
   }
   if (!num_inputs_entered) {
     "No inputs specified, aborting.\n";
-    ThrowBreak;
+    throw;
   }
 
   "\nEnter the hex truth table columns values of the outputs.\n";
@@ -174,7 +174,7 @@ U0 Init()
 
   if (!num_outputs_entered) {
     "No output specified, aborting.\n";
-    ThrowBreak;
+    throw;
   }
 }
 

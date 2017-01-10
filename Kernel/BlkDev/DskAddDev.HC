@@ -24,18 +24,20 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
   }
 }
 
-I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
-{
-  I64 i,j,ext_base,offset,res=0;
+I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=MIN_I64,
+	Bool whole_drv,Bool make_free)
+{//It will mount just one partition of prt_num>=0.
+//When repartitioing whole drive, whole_drv=TRUE.
+  I64 i,j,ext_base,offset,res=0,num=0;
   CDrv *dv;
   CRedSeaBoot br;
   CMasterBoot mbr;
 
   bd->bd_signature=BD_SIGNATURE_VAL;
   if (make_free)
-    dv=DrvMakeFreeSlot(bd->first_drv_let+res);
+    dv=DrvMakeFreeSlot(bd->first_drv_let);
   else
-    dv=DrvMakeFreeSlot(DrvNextFreeLet(bd->first_drv_let+res));
+    dv=DrvMakeFreeSlot(DrvNextFreeLet(bd->first_drv_let));
   dv->bd=bd;
   dv->drv_offset=bd->drv_offset;
   dv->size=bd->max_blk+1-bd->drv_offset;
@@ -44,6 +46,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
     case BDT_ISO_FILE_READ:
     case BDT_ISO_FILE_WRITE:
       dv->dv_signature=DRV_SIGNATURE_VAL;
+      dv->prt_num=num;
       dv->fs_type=FSt_REDSEA;
 //This is to force creation of a RAM
       //drive during boot, so it is probably
@@ -63,8 +66,9 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	dv->dv_signature=0; //Revoke validation
       else {
 	dv->dv_signature=0; //Revoke validation
-	if (one_drv) {
+	if (whole_drv) {
 	  dv->dv_signature=DRV_SIGNATURE_VAL;
+	  dv->prt_num=num;
 	  res++;
 	  dv->fs_type=FSt_REDSEA;
 	  dv->size=bd->max_blk+1-bd->drv_offset;
@@ -75,12 +79,12 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	}
 	offset=0;
 	ext_base=INVALID_CLUSTER;
-	while (TRUE) {
+	while (prt_num<0 || num<=prt_num) {
 	  ATAReadBlks(bd,&mbr,offset,1);
 	  if (mbr.signature!=0xAA55)
 	    break;
 	  j=-1;
-	  for (i=0;i<4;i++) {
+	  for (i=0;i<4 && (prt_num<0 || num<=prt_num);i++) {
 	    if (mbr.p[i].type) {
 	      if (make_free)
 		dv=DrvMakeFreeSlot(bd->first_drv_let+res);
@@ -92,9 +96,10 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 	      switch (mbr.p[i].type) {
 		case MBR_PT_REDSEA:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
+		  dv->prt_num=num;
 		  res++;
 		  dv->fs_type=FSt_REDSEA;
-		  RedSeaDrvInit(dv);
+		  RedSeaInit(dv);
 		  break;
 		case MBR_PT_FAT32a:
 		case MBR_PT_FAT32b:
@@ -104,17 +109,19 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		case MBR_PT_FAT32f:
 		  ATAReadBlks(bd,&br,dv->drv_offset,1);
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
+		  dv->prt_num=num;
 		  res++;
 		  if (br.signature==MBR_PT_REDSEA) {
 		    dv->fs_type=FSt_REDSEA;
-		    RedSeaDrvInit(dv);
+		    RedSeaInit(dv);
 		  } else {
 		    dv->fs_type=FSt_FAT32;
-		    FAT32DrvInit(dv);
+		    FAT32Init(dv);
 		  }
 		  break;
 		case MBR_PT_NTFS:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
+		  dv->prt_num=num;
 		  res++;
 		  dv->fs_type=FSt_NTFS;
 		  break;
@@ -124,9 +131,11 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
 		  break;
 		default:
 		  dv->dv_signature=DRV_SIGNATURE_VAL;
+		  dv->prt_num=num;
 		  res++;
 		  dv->fs_type=FSt_UNKNOWN;
 	      }
+	      num++;
 	    }
 	  }
 	  if (Let2BlkDevType(bd->first_drv_let+res)!=bd->type)
@@ -145,6 +154,7 @@ I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free)
       break;
     case BDT_ATAPI:
       dv->dv_signature=DRV_SIGNATURE_VAL;
+      dv->prt_num=num;
       res++;
       dv->fs_type=FSt_ISO9660; //Start with this
       dv->size=0;

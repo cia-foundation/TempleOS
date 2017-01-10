@@ -65,7 +65,7 @@ Bool DamageDo(Unit *target,F64 damage)
       "%3d Life - %3f Damage\t=",target->life,damage;
     if (damage>=target->life) {
       "$$RED$$Killed$$FG$$\n";
-      Noise(1000*animation_delay,1000,4000);
+      Noise(1000*animation_delay,74,98);
       Sleep(1000*animation_delay);
       target->life=0;
       VisRecalc(VR_FRIENDLY_UNIT_DIED,target);
@@ -140,13 +140,13 @@ U0 UnitDirectFire(Unit *tmpu,Unit *target)
   if (d>=0) {
     "+%5.2f  Hit\n",d;
     target_hit=TRUE;
-    Noise(500*animation_delay,100,150);
+    Noise(500*animation_delay,34,41);
     Sleep(500*animation_delay);
     Line(NULL,x1,y1,0,x2,y2,0,&BulletPlot);
   } else {
     "-%5.2f  Miss\n",-d;
     target_hit=FALSE;
-    Noise(1000*animation_delay,750,1000);
+    Noise(1000*animation_delay,69,74);
     Sleep(1000*animation_delay);
     a=ã*2*Rand;
     d=(0.5-d/100)*HEX_SIDE;
@@ -162,7 +162,7 @@ U0 UnitDirectFire(Unit *tmpu,Unit *target)
       facing=0;
     DamageDo(target,HitDamage(tmpu,target,facing,range_factor));
   }
-  while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
+  while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
     Yield;
   target_unit=NULL;
 }
@@ -177,7 +177,7 @@ Bool HexOccupy(Bool overrun,Unit *tmpu,Unit *target)
     AttackHeader(tmpu,"OverRun",target);
   else
     AttackHeader(tmpu,"CloseAssault",target);
-  Noise(500*animation_delay,100,150);
+  Noise(500*animation_delay,34,41);
   Sleep(500*animation_delay);
   tmpu->fired=TRUE;
   target->fired=TRUE;
@@ -195,7 +195,7 @@ Bool HexOccupy(Bool overrun,Unit *tmpu,Unit *target)
   }
   if (DamageDo(target,Round(damage))) {
     "$$RED$$Success$$FG$$\n";
-    while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
+    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     return TRUE;
   } else {
@@ -203,7 +203,7 @@ Bool HexOccupy(Bool overrun,Unit *tmpu,Unit *target)
     VisRecalc(VR_FRIENDLY_UNIT_DIED,tmpu);
     alive_cnt[tmpu->player]--;
     "$$RED$$Failure$$FG$$\n";
-    while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
+    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     return FALSE;
   }
@@ -233,11 +233,11 @@ U0 IndirectResolveAll()
 
     if (d>=0) {
       "+%5.2f  Hit\n",d;
-      Noise(500*animation_delay,100,150);
+      Noise(500*animation_delay,34,41);
       Sleep(500*animation_delay);
     } else {
       "-%5.2f  Miss\n",-d;
-      Noise(1000*animation_delay,750,1000);
+      Noise(1000*animation_delay,69,74);
       Sleep(1000*animation_delay);
       i=RandU16%6;
       if (tmpi->row&1)
@@ -265,9 +265,9 @@ U0 IndirectResolveAll()
 	DamageDo(target,HitDamage(tmpu,target));
       }
     }
-    Noise(2000*animation_delay,800,1000);
+    Noise(2000*animation_delay,70,74);
     Sleep(2000*animation_delay);
-    while (snd.freq) //see $LK,"Snd",A="MN:Snd"$()
+    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     indirect_explosion=FALSE;
 

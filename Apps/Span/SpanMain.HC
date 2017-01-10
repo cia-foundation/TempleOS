@@ -1,6 +1,6 @@
 F64 SpanTime()
 {
-  if (run_button.state)
+  if (run_bttn.state)
     return a.elapsed_t+tS-a.start_wall_t;
   else
     return a.elapsed_t;
@@ -43,8 +43,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (cursor_mass) {
     dc->color=RED;
     dc->pen_width=2;
-    GrLine3(dc,ip.pos.x-task->pix_left-task->scroll_x,
-	  ip.pos.y-task->pix_top-task->scroll_y,0,
+    GrLine3(dc,ms.pos.x-task->pix_left-task->scroll_x,
+	  ms.pos.y-task->pix_top-task->scroll_y,0,
 	  cursor_mass->x,cursor_mass->y,0);
   }
 
@@ -134,7 +134,7 @@ U0 DelMass(MyMass *tmpm)
 
 U0 DrawSpring(CDC *dc,MyMass *tmpm,I64 x,I64 y)
 {
-  switch (mode_button.state) {
+  switch (mode_bttn.state) {
     case MD_CONCRETE:
       dc->color=LTGRAY;
       dc->pen_width=2;
@@ -156,7 +156,7 @@ U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
   MySpring *tmps=CAlloc(sizeof(MySpring));
   tmps->end1=tmpm1;
   tmps->end2=tmpm2;
-  switch (mode_button.state) {
+  switch (mode_bttn.state) {
     case MD_CONCRETE:
       tmps->base_const	      = 3.00*SPRING_SCALE;
       tmps->base_compression_strength=10.00*STRENGTH_SCALE;
@@ -208,8 +208,8 @@ U0 AnimateTask(SpanAnimateStruct *a)
     }
     AdjustLoads(ode);
     Refresh; //CMathODE updated once per refresh.
-    if (old_run!=run_button.state) {
-      if (run_button.state) {
+    if (old_run!=run_bttn.state) {
+      if (run_bttn.state) {
 	if (!a->elapsed_t || !a->saved_ode) {
 	  Free(a->saved_ode);
 	  a->saved_ode=SpanSave(ode);
@@ -220,7 +220,7 @@ U0 AnimateTask(SpanAnimateStruct *a)
 	ode->flags|=ODEF_PAUSED;
 	a->elapsed_t+=tS-a->start_wall_t;
       }
-      old_run=run_button.state;
+      old_run=run_bttn.state;
     }
   }
 }
@@ -230,7 +230,7 @@ U0 Init(SpanAnimateStruct *a)
   SpanDel(ode);
   ode=SpanNew;
 
-  run_button.state=0;
+  run_bttn.state=0;
   Refresh(2); //Allow stop to reg in animate task.
 
   if (a->saved_ode)
@@ -248,16 +248,16 @@ U0 SongTask(I64)
   music.tempo= 3.636;
   music.stacatto_factor= 0.902;
   while (TRUE) {
-    Play("3q.EeDqED2G3DhE");
-    Play("q.EeDqED2G3DhE");
-    Play("q.FeEFEqF2G3EhF");
-    Play("q.FeEFEqF2G3EhF");
+    Play("5q.EeDqED4G5DhE");
+    Play("5q.EeDqED4G5DhE");
+    Play("5q.FeEFEqF4G5EhF");
+    Play("5q.FeEFEqF4G5EhF");
   }
 }
 
 U0 Span()
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   MyMass   *tmpm1=NULL,*tmpm2=NULL;
   MySpring *tmps;
   CCtrl *bt_run,*bt_mode;
@@ -272,10 +272,10 @@ U0 Span()
   DocCursor;
   Fs->song_task=Spawn(&SongTask,NULL,"Song",,Fs);
 
-  bt_run =CtrlButtonNew(0,0,		  80,,
-	2,"Stopped\0Running\0",run_colors,&run_button);
-  bt_mode=CtrlButtonNew(0,3.0*FONT_HEIGHT,80,,
-	MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_button);
+  bt_run =CtrlBttnNew(0,0,		  80,,
+	2,"Stopped\0Running\0",run_colors,&run_bttn);
+  bt_mode=CtrlBttnNew(0,3.0*FONT_HEIGHT,80,,
+	MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_bttn);
   a.saved_ode=NULL;
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
@@ -323,30 +323,30 @@ U0 Span()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|
-	    1<<MSG_IP_L_UP|1<<MSG_KEY_DOWN|1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN|1<<MSG_MS_R_DOWN|
+	    1<<MSG_MS_L_UP|1<<MSG_KEY_DOWN|1<<MSG_MS_MOVE);
       DCFill(dc);
       switch (msg_code) {
-	case MSG_IP_L_DOWN:
+	case MSG_MS_L_DOWN:
 	  cursor_mass=tmpm1=tmpm2=NULL;
-	  switch (mode_button.state) {
+	  switch (mode_bttn.state) {
 	    case MD_MASS:
-	      PlaceMass(a1,a2);
+	      PlaceMass(arg1,arg2);
 	      break;
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      tmpm1=MassFind(ode,a1,a2);
+	      tmpm1=MassFind(ode,arg1,arg2);
 	      break;
 	    case MD_MOVE:
-	      if (run_button.state)
-		cursor_mass=MassFind(ode,a1,a2);
+	      if (run_bttn.state)
+		cursor_mass=MassFind(ode,arg1,arg2);
 	      else
-		if (tmpm1=MassFind(ode,a1,a2))
-		  MoveMass(tmpm1,a1,a2);
+		if (tmpm1=MassFind(ode,arg1,arg2))
+		  MoveMass(tmpm1,arg1,arg2);
 	      break;
 	    case MD_DELETE:
-	      MassOrSpringFind(ode,&tmpm1,&tmps,a1,a2);
+	      MassOrSpringFind(ode,&tmpm1,&tmps,arg1,arg2);
 	      if (tmpm1)
 		DelMass(tmpm1);
 	      if (tmps)
@@ -354,44 +354,44 @@ U0 Span()
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_UP:
-	  switch (mode_button.state) {
+	case MSG_MS_L_UP:
+	  switch (mode_bttn.state) {
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
-	      if (tmpm1 && (tmpm2=MassFind(ode,a1,a2)) && tmpm1!=tmpm2)
+	      if (tmpm1 && (tmpm2=MassFind(ode,arg1,arg2)) && tmpm1!=tmpm2)
 		PlaceSpring(tmpm1,tmpm2);
 	      break;
 	    case MD_MOVE:
-	      if (!run_button.state && tmpm1)
-		MoveMass(tmpm1,a1,a2);
+	      if (!run_bttn.state && tmpm1)
+		MoveMass(tmpm1,arg1,arg2);
 	      break;
 	  }
 	  cursor_mass=tmpm1=tmpm2=NULL;
 	  break;
-	case MSG_IP_MOVE:
-	  switch (mode_button.state) {
+	case MSG_MS_MOVE:
+	  switch (mode_bttn.state) {
 	    case MD_MOVE:
-	      if (!run_button.state && tmpm1)
-		MoveMass(tmpm1,a1,a2);
+	      if (!run_bttn.state && tmpm1)
+		MoveMass(tmpm1,arg1,arg2);
 	      break;
 	    case MD_CONCRETE:
 	    case MD_STEEL:
 	    case MD_WIRE:
 	      if (tmpm1) {
-		DrawSpring(dc,tmpm1,a1,a2);
+		DrawSpring(dc,tmpm1,arg1,arg2);
 	      }
 	      break;
 	  }
 	  break;
-	case MSG_IP_R_DOWN:
-	  mode_button.state++;
-	  if (mode_button.state>=MD_NUM_MODES)
-	    mode_button.state=0;
+	case MSG_MS_R_DOWN:
+	  mode_bttn.state++;
+	  if (mode_bttn.state>=MD_NUM_MODES)
+	    mode_bttn.state=0;
 	  cursor_mass=tmpm1=tmpm2=NULL;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      if (!SpanTime || !a.saved_ode) {
 		Free(a.saved_ode);
@@ -420,25 +420,25 @@ U0 Span()
 	      SpanWrite(ode);
 	      break;
 	    case CH_SPACE:
-	      run_button.state=!run_button.state;
+	      run_bttn.state=!run_bttn.state;
 	      break;
 	    case 'c':
-	      mode_button.state=MD_CONCRETE;
+	      mode_bttn.state=MD_CONCRETE;
 	      break;
 	    case 's':
-	      mode_button.state=MD_STEEL;
+	      mode_bttn.state=MD_STEEL;
 	      break;
 	    case 'w':
-	      mode_button.state=MD_WIRE;
+	      mode_bttn.state=MD_WIRE;
 	      break;
 	    case 'm':
-	      mode_button.state=MD_MASS;
+	      mode_bttn.state=MD_MASS;
 	      break;
 	    case 'v':
-	      mode_button.state=MD_MOVE;
+	      mode_bttn.state=MD_MOVE;
 	      break;
 	    case 'd':
-	      mode_button.state=MD_DELETE;
+	      mode_bttn.state=MD_DELETE;
 	      break;
 	    case CH_ESC:
 	      if (!SpanTime || !a.saved_ode) {
@@ -459,8 +459,8 @@ span_done: //Don't goto out of try
     PutExcept;
   DocClear;
   SettingsPop;
-  CtrlButtonDel(bt_run);
-  CtrlButtonDel(bt_mode);
+  CtrlBttnDel(bt_run);
+  CtrlBttnDel(bt_mode);
   SpanDel(ode);
   DCFill(dc);
   DCDel(dc);

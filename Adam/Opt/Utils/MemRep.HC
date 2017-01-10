@@ -35,11 +35,11 @@ I64 TaskStkSize(CTask *task)
 
 I64 TaskQueSize(CTask *task)
 {
-  CSrvCmd *tmpc,*tmpc1;
+  CJob *tmpc,*tmpc1;
   I64 res=0;
   PUSHFD
   CLI
-  while (LBts(&task->srv_ctrl.flags,SVCRf_LOCKED))
+  while (LBts(&task->srv_ctrl.flags,JOBCf_LOCKED))
     PAUSE
 
   tmpc1=&task->srv_ctrl.next_waiting;
@@ -56,7 +56,7 @@ I64 TaskQueSize(CTask *task)
     tmpc=tmpc->next;
   }
 
-  LBtr(&task->srv_ctrl.flags,SVCRf_LOCKED);
+  LBtr(&task->srv_ctrl.flags,JOBCf_LOCKED);
   POPFD
   return res;
 }
@@ -101,7 +101,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
   if (task==Fs)
     task->rsp=GetRSP;
   st=MStrUtil(task->task_title,SUF_REM_CTRL_CHARS|SUF_SAFE_DOLLAR);
-  "$$BLACK$$%-25ts %010X$$FG$$\n$$ID,2$$",st,task;
+  "$$BLACK$$%-27ts#%08X$$FG$$\n$$ID,2$$",st,task;
   Free(st);
   "Heap\t:%010X/%010X\n",TaskMemUsed(task,override_validate),
 	TaskMemAlloced(task,override_validate);
@@ -114,6 +114,8 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
     "Stk\t\t:$$RED$$$$BK,1$$Overflow$$BK,0$$$$FG$$/%010X\n",j;
 
   "HashTable\t:%010X\n",HashTableSize2(task->hash_table);
+  "FPU\t\t:%010X\n",MSize2(task->fpu_mmx);
+  "CurDir\t:%010X\n",MSize2(task->cur_dir);
 
   if (pdoc=DocPut(task))
     "PutDoc\t:%010X\n",DocSize(pdoc);
@@ -124,7 +126,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
 
   cc=task->next_cc;
   while (cc!=&task->next_cc) {
-    "Lex\t\t:%010X\n",CmpCtrlSize(cc);
+    "CmpCtrl\t:%010X\n",CmpCtrlSize(cc);
     cc=cc->next;
   }
 
@@ -136,7 +138,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
 
   if (task==sys_winmgr_task) {
     "gr.pen_brushes\t:%010X\n",PenBrushesSize;
-    "gr_scrn_zoom_tbles:%010X\n",ScrnZoomTablesSize;
+    "gr.scrn_zoom_tbles\t:%010X\n",ScrnZoomTablesSize;
   } else if (task==adam_task) {
     j=0;k=0;m=0;n=0;
     for (i=0;i<mp_cnt;i++) {
@@ -194,18 +196,17 @@ public U0 MemRep()
   I64 i;
   CTask *task;
   CCPU *c;
-  CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
+  CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
 
   "$$BLACK$$Low Memory\t:0000100000$$FG$$\n$$ID,2$$";
-  "Kernel\t:%010X-%010X\n",sys_boot_base-sizeof(CBinFile),bfh;
+  "Kernel\t:%010X-%010X\n",mem_boot_base-sizeof(CBinFile),bfh;
 
   "VGA\t\t:00000A0000-00000BFFFF\n";
   "$$ID,-2$$$$BLACK$$High Memory\t:0000100000-%010X$$FG$$\n",
-	sys_heap_limit;
-  "$$ID,2$$Fixed Area for page tables and misc\n\t\t:%010X-%010X\n",
+	mem_heap_limit;
+  "$LK,"SYS_FIXED_AREA",A="MN:CSysFixedArea"$\t:%010X-%010X\n",
 	SYS_FIXED_AREA,SYS_FIXED_AREA+sizeof(CSysFixedArea)-1;
-  "$$ID,-2$$";
 
   if (sys_data_bp) {
     "$$BLACK$$Code Heap\t:%010X/%010X$$FG$$\n",

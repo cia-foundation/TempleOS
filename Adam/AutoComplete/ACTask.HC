@@ -36,7 +36,7 @@ I64 ACSkipCrap(U8 *src,I64 len)
   I64 j;
   j=len-1;
   while (j>=0) {
-    if (Bt(chars_bmp_alpha_numeric,src[j]))
+    if (Bt(char_bmp_alpha_numeric,src[j]))
       break;
     else
       j--;
@@ -49,7 +49,7 @@ I64 ACPriorWordInStr(U8 *src,U8 *dst,I64 len,I64 buf_size)
   I64 i,j=0,k;
   i=len-1;
   while (i>=0)
-    if (!Bt(chars_bmp_alpha_numeric,src[i]))
+    if (!Bt(char_bmp_alpha_numeric,src[i]))
       break;
     else
       i--;
@@ -223,12 +223,12 @@ U0 ACTask(I64)
   WinHorz(51,Fs->win_right);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER
-	-WIF_SELF_IP_L-WIF_SELF_IP_R-WIG_DBL_CLICK;
+	-WIF_SELF_MS_L-WIF_SELF_MS_R-WIG_DBL_CLICK;
   Free(ac.cur_word);
   ac.cur_word=NULL;
   while (TRUE) {
     if (scan_code&(SCF_CTRL|SCF_ALT) ||
-	  GetTSC>KbdMouseEvtTime+cnts.time_stamp_freq>>1) {
+	  GetTSC>KbdMsEvtTime+cnts.time_stamp_freq>>1) {
       last_scan_code=scan_code;
       scan_code=kbd.scan_code;
     }

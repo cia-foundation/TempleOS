@@ -88,7 +88,7 @@ U0 MGCircle(I64 x,I64 y,F64 r)
   MGPlot(x+x1,y+y1);
   while (len-->=0) {
 
-    //m1@a1 * m2@a2	= m1*m2@(a1+a2)
+    //m1@a1 * m2@a2	= m1*m2@(arg1+arg2)
 
     //(x1+y1i)*(x2+y2i) = x1*x2+(x1*y1+x2*y2)i-y1*y2
 
@@ -114,7 +114,7 @@ U0 MiniGrLibDemo()
   for (i=0;i<300;i+=4)
     MGCircle(200,100+i,i);
   MGUpdate;
-  BusyWait(1500000);
+  Busy(1500000);
 /*
 We are returning graphics to normal operations under TempleOS.
 It is not normal to by-pass the TempleOS graphcis routines.

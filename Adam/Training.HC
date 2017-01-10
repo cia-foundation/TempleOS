@@ -1,6 +1,6 @@
 #help_index "Help System"
 
-U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
+U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_hndlr)(I64 sc),
 	U8 *desc,CTask *task=NULL)
 {
   I64 i=9,k,c;
@@ -12,7 +12,7 @@ U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
   if (sc&(SCF_SHIFT|SCF_NO_SHIFT)) i+=6;
   if (TaskValidate(task))
     Fs->hash_table=task->hash_table;
-  st2=SrcEdLink(fp_handler,256);
+  st2=SrcEdLink(fp_hndlr,256);
   Fs->hash_table=old_hash;
 
   k=*desc(U32 *);
@@ -36,9 +36,9 @@ U8 *KeyMapKeyMStrPrint(I64 sc,U0 (*fp_handler)(I64 sc),
   return res;
 }
 
-U0 KeyMapKeyPrint(I64 sc,U0 (*fp_handler)(I64 sc),U8 *desc,CTask *task=NULL)
+U0 KeyMapKeyPrint(I64 sc,U0 (*fp_hndlr)(I64 sc),U8 *desc,CTask *task=NULL)
 {
-  U8 *st=KeyMapKeyMStrPrint(sc,fp_handler,desc,task);
+  U8 *st=KeyMapKeyMStrPrint(sc,fp_hndlr,desc,task);
   "%s",st;
   Free(st);
 }
@@ -98,22 +98,22 @@ I64 KMCompare(U8 *e1,U8 *e2)
 
 U0 KeyMapFamily2(U8 **entries,CTask *task,I64 scf)
 {
-  I64 i,a1,a2;
+  I64 i,arg1,arg2;
   for (i=0;i<256;i++) {
-    a2=scf|i|SCF_KEY_DESC;
-    a1=ScanCode2Char(a2);
+    arg2=scf|i|SCF_KEY_DESC;
+    arg1=ScanCode2Char(arg2);
     *keydev.desc=0;
-    keydev.handler=NULL;
+    keydev.hndlr=NULL;
     if (TaskValidate(task) && !Bt(&task->win_inhibit,WIf_SELF_KEY_DESC)) {
       if (task==Fs)
-	PutKey(a1,a2);
+	PutKey(arg1,arg2);
       else
-	PostMsg(task,MSG_KEY_DOWN,a1,a2);
+	PostMsg(task,MSG_KEY_DOWN,arg1,arg2);
       Refresh(0,TRUE);
       Sleep(1); //Open loop because might be no response.  TODO: Drops msgs.
     }
     if (*keydev.desc && StrNCmp(keydev.desc,"Char  /",7))
-      entries[i]=KeyMapKeyMStrPrint(a2,keydev.handler,keydev.desc,task);
+      entries[i]=KeyMapKeyMStrPrint(arg2,keydev.hndlr,keydev.desc,task);
   }
 }
 

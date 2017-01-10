@@ -21,9 +21,9 @@ public class CGrGlbls
   I64	pan_text_x,pan_text_y;	//[-7,7]
   U0	(*fp_final_scrn_update)(CDC *dc);//Mouse cursor is handled here.
   U0	(*fp_wall_paper)(CTask *task);
-  U0	(*fp_draw_input_ptr)(CDC *dc,I64 x,I64 y);
-  U0	(*fp_draw_grab_input_ptr)(CDC *dc,I64 x,I64 y,Bool closed);
-  U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/AInputPointer.HC,empty_sprite"$
+  U0	(*fp_draw_ms)(CDC *dc,I64 x,I64 y);
+  U0	(*fp_draw_grab_ms)(CDC *dc,I64 x,I64 y,Bool closed);
+  U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/AMouse.HC,empty_sprite"$
 
   #define GR_NUM_PEN_BRUSHES 64
   CDC	*pen_brushes[GR_NUM_PEN_BRUSHES],

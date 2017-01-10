@@ -39,7 +39,7 @@ See also $LK,"GrUpdateScrn",A="MN:GrUpdateScrn"$().
     while (text.raw_col % text.cols)
       RawPutChar(CH_SPACE);
 
-  } else if (Bt(chars_bmp_displayable,ch)) {
+  } else if (Bt(char_bmp_displayable,ch)) {
     row=text.raw_col/text.cols%text.rows;
     col=text.raw_col%text.cols;
     if (!Bt(&sys_run_level,RLf_VGA)) { //if text mode
@@ -87,7 +87,7 @@ See also $LK,"GrUpdateScrn",A="MN:GrUpdateScrn"$().
 
 U0 VGAFlush()
 {//Flush winmgr vga cache, so updates whole scrn.
-  LBts(&sys_semas[SYS_SEMA_FLUSH_VGA_IMAGE],0);
+  LBts(&sys_semas[SEMA_FLUSH_VGA_IMAGE],0);
 }
 
 U0 WinDerivedValsUpdate(CTask *task)

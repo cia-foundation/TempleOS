@@ -44,15 +44,15 @@ I64 BCnt(I64 d)
   return res;
 }
 
-U0 IntCore0TimerHandler(CTask *)
-{//Called from $LK,"IntCore0TimerHandler",A="FF:::/Kernel/KInts.HC,IntCore0TimerHandler"$
+U0 IntCore0TimerHndlr(CTask *)
+{//Called from $LK,"IntCore0TimerHndlr",A="FF:::/Kernel/KInts.HC,IntCore0TimerHndlr"$
   I64 i;
   if (mp_cnt>1)
-    while (LBts(&sys_semas[SYS_SEMA_SYS_TIMER],0))
+    while (LBts(&sys_semas[SEMA_SYS_TIMER],0))
       PAUSE
   lock cnts.jiffies++;
   cnts.timer+=SYS_TIMER0_PERIOD+1;
-  LBtr(&sys_semas[SYS_SEMA_SYS_TIMER],0);
+  LBtr(&sys_semas[SEMA_SYS_TIMER],0);
   for (i=1;i<mp_cnt;i++)
     MPInt(I_TIMER,i);
   OutU8(0x20,0x20); //Acknowledge PIC Interrupt
@@ -64,7 +64,7 @@ I64 SysTimerRead()
   PUSHFD
   CLI
   if (mp_cnt>1)
-    while (LBts(&sys_semas[SYS_SEMA_SYS_TIMER],0))
+    while (LBts(&sys_semas[SEMA_SYS_TIMER],0))
       PAUSE
   OutU8(0x43,0); //Latch Timer0
   if ((i=InU8(0x40)+InU8(0x40)<<8)==SYS_TIMER0_PERIOD) {
@@ -72,7 +72,7 @@ I64 SysTimerRead()
       i=-1;
   }
   res=cnts.timer+SYS_TIMER0_PERIOD-i;
-  LBtr(&sys_semas[SYS_SEMA_SYS_TIMER],0);
+  LBtr(&sys_semas[SEMA_SYS_TIMER],0);
   POPFD
   return res;
 }
@@ -133,7 +133,7 @@ Bool Blink(F64 Hz=2.5)
   return ToI64(cnts.jiffies*2*Hz/JIFFY_FREQ)&1;
 }
 
-U0 BusyWait(I64 æS)
+U0 Busy(I64 æS)
 {//Loosely timed.
   I64 i;
   if (cnts.HPET_freq) {
@@ -152,63 +152,79 @@ U0 SleepUntil(I64 wake_jiffy)
   LBEqu(&Fs->task_flags,TASKf_IDLE,old_idle);
 }
 
-U0 Sleep(I64 ms)
+U0 Sleep(I64 mS)
 {//Not for power-saving.  It is to make a program pause without hogging the CPU.
-  if (!ms)
+  if (!mS)
     Yield;
   else
-    SleepUntil(cnts.jiffies+ms*JIFFY_FREQ/1000);
+    SleepUntil(cnts.jiffies+mS*JIFFY_FREQ/1000);
 }
 
-U0 Snd(F64 freq)
+F64 Ona2Freq(I8 ona)
+{//Ona to freq. Ona=60 is 440.0Hz.
+  if (ona==ONA_REST)
+    return 0;
+  else
+    return 440.0/32*2.0`(ona/12.0);
+}
+
+I8 Freq2Ona(F64 freq)
+{//Freq to Ona. 440.0Hz is Ona=60.
+  if (freq>0)
+    return ClampI64(12*Log2(32.0/440.0*freq),ONA_REST+1,MAX_I8);
+  else
+    return ONA_REST;
+}
+
+U0 Snd(I8 ona=ONA_REST)
 {//Play freq.  Zero means off.
   I64 period;
   CSndData *d;
-  if (!Bt(&sys_semas[SYS_SEMA_MUTE],0) &&
-	!LBts(&sys_semas[SYS_SEMA_SND],0)) { //Mutex. Just throw-out if in use
-    if (freq!=snd.freq) {
-      snd.freq=freq;
-      if (0<freq<=20000) {
-	period=SYS_TIMER_FREQ/freq;
-	OutU8(0x43,0xB6);
-	OutU8(0x42,period);
-	OutU8(0x42,period.u8[1]);
-	OutU8(0x61,3|InU8(0x61));
-      } else
-	OutU8(0x61,InU8(0x61)&~3);
+  if (!Bt(&sys_semas[SEMA_MUTE],0) &&
+	!LBts(&sys_semas[SEMA_SND],0)) { //Mutex. Just throw-out if in use
+    if (ona<=ONA_REST) {
+      snd.ona=ona;
+      OutU8(0x61,InU8(0x61)&~3);
+    } else if (ona!=snd.ona) {
+      snd.ona=ona;
+      period=ClampI64(SYS_TIMER_FREQ/Ona2Freq(ona),1,MAX_U16);
+      OutU8(0x43,0xB6);
+      OutU8(0x42,period);
+      OutU8(0x42,period.u8[1]);
+      OutU8(0x61,3|InU8(0x61));
     }
     if (!IsDbgMode && snd.record) {
       d=ACAlloc(sizeof(CSndData));
-      d->freq=freq;
+      d->ona=ona;
       d->time=tS;
       QueIns(d,snd.record_head.last);
     }
-    LBtr(&sys_semas[SYS_SEMA_SND],0);
+    LBtr(&sys_semas[SEMA_SND],0);
   }
 }
 
 U0 SndRst()
 {//Fix stuck sound.
-  if (Bt(&sys_semas[SYS_SEMA_SND],0)) {
+  if (Bt(&sys_semas[SEMA_SND],0)) {
     Sleep(1);
-    if (Bt(&sys_semas[SYS_SEMA_SND],0)) {
+    if (Bt(&sys_semas[SEMA_SND],0)) {
       Sleep(1);
-      LBtr(&sys_semas[SYS_SEMA_SND],0);
+      LBtr(&sys_semas[SEMA_SND],0);
     }
   }
-  Snd(0);
+  Snd;
 }
 
-U0 Beep(I64 freq=500,Bool busy=FALSE)
-{//Make beep at given freq.
-  Snd(freq);
+U0 Beep(I8 ona=62,Bool busy=FALSE)
+{//Make beep at given ona freq.
+  Snd(ona);
   if (busy)
-    BusyWait(500000);
+    Busy(500000);
   else
     Sleep(500);
-  Snd(0);
+  Snd;
   if (busy)
-    BusyWait(200000);
+    Busy(200000);
   else
     Sleep(200);
 }
@@ -219,17 +235,17 @@ Bool Mute(Bool val)
   if (val) {
     PUSHFD
     CLI
-    Snd(0);
-    res=LBts(&sys_semas[SYS_SEMA_MUTE],0);
+    Snd;
+    res=LBts(&sys_semas[SEMA_MUTE],0);
     POPFD
   } else
-    res=LBtr(&sys_semas[SYS_SEMA_MUTE],0);
+    res=LBtr(&sys_semas[SEMA_MUTE],0);
   return res;
 }
 
 Bool IsMute()
 {//Return is-mute flag.
-  return Bt(&sys_semas[SYS_SEMA_MUTE],0);
+  return Bt(&sys_semas[SEMA_MUTE],0);
 }
 
 Bool Silent(Bool val=ON)
@@ -244,12 +260,12 @@ Bool IsSilent()
 
 Bool SysDbg(Bool val)
 {//Set SysDbg bit you can use while debugging.
-  return LBEqu(&sys_semas[SYS_SEMA_DEBUG],0,val);
+  return LBEqu(&sys_semas[SEMA_DEBUG],0,val);
 }
 
 Bool IsSysDbg()
 {//Return SysDbg bit.
-  return Bt(&sys_semas[SYS_SEMA_DEBUG],0);
+  return Bt(&sys_semas[SEMA_DEBUG],0);
 }
 
 Bool Raw(Bool val)
@@ -266,25 +282,26 @@ Bool IsRaw()
 
 Bool SingleUser(Bool val)
 {//Set single-user mode.
-  return LBEqu(&sys_semas[SYS_SEMA_SINGLE_USER],0,val);
+  return LBEqu(&sys_semas[SEMA_SINGLE_USER],0,val);
 }
 
 Bool IsSingleUser()
 {//Return single-user mode.
-  return Bt(&sys_semas[SYS_SEMA_SINGLE_USER],0);
+  return Bt(&sys_semas[SEMA_SINGLE_USER],0);
 }
 
 Bool DbgMode(Bool val)
 {//Set dbg-mode.
-  return LBEqu(&sys_semas[SYS_SEMA_DBG_MODE],0,val);
+  return LBEqu(&sys_semas[SEMA_DBG_MODE],0,val);
 }
 
 Bool IsDbgMode()
 {//Return dbg-mode.
-  return Bt(&sys_semas[SYS_SEMA_DBG_MODE],0);
+  return Bt(&sys_semas[SEMA_DBG_MODE],0);
 }
 
-U0 ProgressBarsRst()
+U0 ProgressBarsRst(U8 *path=NULL)
 {
+  CallExtStr("ProgressBarsRegTf",path);
   MemSet(sys_progresses,0,sizeof(sys_progresses));
 }

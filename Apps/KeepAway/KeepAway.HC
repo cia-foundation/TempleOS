@@ -232,8 +232,8 @@ Frame imgs[LAST_STOPPED_DRIBBLING+1]={
   {{$IB,"<22>",BI=22$,$IB,"<23>",BI=23$},DRIBBLE_T/NUM_STOPPED_DRIBBLING_IMGS},
 };
 
-RegSetDftEntry("TempleOS/KeepAway","I64 best_score0=0,best_score1=9999;\n");
-RegExeBranch("TempleOS/KeepAway");
+RegDft("TempleOS/KeepAway","I64 best_score0=0,best_score1=9999;\n");
+RegExe("TempleOS/KeepAway");
 
 F64 game_t_end,foul_t_end;
 I64 score0,score1;
@@ -283,7 +283,7 @@ U0 DrawObj(CDC *dc,Obj *o,F64 tt)
     tmps=SpriteInterpolate((tt-o->last_t0)/(o->next_t0-o->last_t0),
 	  imgs[o->last_img].img[o->team],
 	  imgs[o->next_img].img[o->team]);
-    SpriteY3B(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,tmps,o->é);
+    Sprite3YB(dc,o->x,(o->y-o->z)/2,GR_Z_ALL-o->y,tmps,o->é);
     Free(tmps);
   }
 }
@@ -442,8 +442,8 @@ U0 AnimateTask(CTask *parent_task)
       if (score0-score1>best_score0-best_score1) {
 	best_score0=score0;
 	best_score1=score1;
-	Snd(2000);Sleep(100); Snd(0);Sleep(100);
-	Snd(2000);Sleep(100); Snd(0);Sleep(100);
+	Snd(86);Sleep(100); Snd;Sleep(100);
+	Snd(86);Sleep(100); Snd;Sleep(100);
       }
     }
 
@@ -498,13 +498,13 @@ U0 AnimateTask(CTask *parent_task)
 			score1+=6;
 		      else
 			score1+=2;
-		      Noise(250,1000,1000);
+		      Noise(250,74,74);
 		    } else {
 		      if (t0<shot_land_t+0.1)
 			score0+=6;
 		      else
 			score0+=2;
-		      Noise(250,2000,2000);
+		      Noise(250,86,86);
 		    }
 		    last_owner=o;
 		  }
@@ -515,8 +515,8 @@ U0 AnimateTask(CTask *parent_task)
 	    Shoot(o);
 	  if (!o->shooting) {
 	    if (o==human) {
-	      dx=(ip.pos.x-parent_task->pix_left-parent_task->scroll_x)-o->x;
-	      dy=(ip.pos.y-parent_task->pix_top-parent_task->scroll_y)*2-o->y;
+	      dx=(ms.pos.x-parent_task->pix_left-parent_task->scroll_x)-o->x;
+	      dy=(ms.pos.y-parent_task->pix_top-parent_task->scroll_y)*2-o->y;
 	    } else {
 	      if (!someone_has_ball && o->nearest_man_dd>4*MAN_SQR_RADIUS &&
 		    o->nearest_ball) {
@@ -551,7 +551,7 @@ U0 AnimateTask(CTask *parent_task)
 		      if (o==human && t0>o->foul_t0+1.0 &&
 			    dt && d/dt>FOUL_VELOCITY_THRESHOLD &&
 			    objs[j].team) {
-			Noise(250,500,500);
+			Noise(250,62,62);
 			score1+=1;
 			foul_t_end=t0+1.0;
 		      }
@@ -577,33 +577,33 @@ U0 AnimateTask(CTask *parent_task)
 	  o->x=parent_task->pix_width-COURT_BORDER-1-o->radius;
 	  o->DxDt=-COLLISION_DAMP*o->DxDt;
 	  if (o==ball)
-	    Noise(10,1000,2000);
+	    Noise(10,74,86);
 	}
 	if (o->x-o->radius<COURT_BORDER) {
 	  o->x=COURT_BORDER+o->radius;
 	  o->DxDt=-COLLISION_DAMP*o->DxDt;
 	  if (o==ball)
-	    Noise(10,1000,2000);
+	    Noise(10,74,86);
 	}
 
 	if (o->y+o->radius*2>=(parent_task->pix_height-COURT_BORDER)*2) {
 	  o->y=(parent_task->pix_height-COURT_BORDER)*2-1-o->radius*2;
 	  o->DyDt=-COLLISION_DAMP*o->DyDt;
 	  if (o==ball)
-	    Noise(10,1000,2000);
+	    Noise(10,74,86);
 	}
 	if (o->y-o->radius*2<2*COURT_BORDER) {
 	  o->y=COURT_BORDER*2+o->radius*2;
 	  o->DyDt=-COLLISION_DAMP*o->DyDt;
 	  if (o==ball)
-	    Noise(10,1000,2000);
+	    Noise(10,74,86);
 	}
 
 	if (o->z-o->radius*2<0) {
 	  o->z=o->radius*2;
 	  o->DzDt=-COLLISION_DAMP*o->DzDt;
 	  if (o->DzDt>ROLL_VELOCITY_THRESHOLD)
-	    Noise(10,1000,2000);
+	    Noise(10,74,86);
 	  if (o!=ball)
 	    o->DzDt=0;
 	} else if (o->z-o->radius*2>0)
@@ -647,7 +647,7 @@ U0 Init()
 
 U0 KeepAway()
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
 
   PopUpOk(
 	"Pass or hand-off to your team to score points.$$FG$$\n\n"
@@ -683,19 +683,19 @@ U0 KeepAway()
 
   try {
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_KEY_DOWN);
+      msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_MS_L_DOWN|1<<MSG_MS_R_DOWN|1<<MSG_KEY_DOWN);
       switch (msg_code) {
-	case MSG_IP_L_DOWN:
+	case MSG_MS_L_DOWN:
 ka_shoot:
 	  Shoot(human);
 	  break;
-	case MSG_IP_R_DOWN:
+	case MSG_MS_R_DOWN:
 ka_jump:
 	  human->DzDt=JUMP_VELOCITY;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      Init;
 	      break;
@@ -715,7 +715,7 @@ ka_done: //Don't goto out of try
   } catch
     PutExcept;
   SettingsPop;
-  RegWriteBranch("TempleOS/KeepAway","I64 best_score0=%d,best_score1=%d;\n",
+  RegWrite("TempleOS/KeepAway","I64 best_score0=%d,best_score1=%d;\n",
 	best_score0,best_score1);
   MenuPop;
 }

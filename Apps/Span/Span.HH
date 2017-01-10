@@ -24,7 +24,7 @@ I32 pen_width;
 
 CMathODE *ode=NULL;
 
-CCtrlButtonState run_button,mode_button;
+CCtrlBttnState run_bttn,mode_bttn;
 
 CColorROPU32 run_colors[2]={RED,GREEN};
 

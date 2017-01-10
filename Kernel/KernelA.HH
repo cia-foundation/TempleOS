@@ -13,7 +13,7 @@ extern class CHashClass;
 extern class CHashFun;
 extern class CHeapCtrl;
 extern class CIntermediateCode;
-extern class CSrvCtrl;
+extern class CJobCtrl;
 extern class CTask;
 
 #define NULL	0
@@ -355,7 +355,6 @@ class CSysLimitBase
 
 #help_index "Memory/Info"
 #define MEM_NUM_E820_ENTRIES	48
-#define MEM_E820_ENTRY_SIZE	20
 class CMemE820
 {
   U8	*base;
@@ -402,7 +401,7 @@ class CPatchTableAbsAddr
 #define IET_IMM_U32		9
 #define IET_REL_I64		10
 #define IET_IMM_I64		11
-#define IEF_IMM_NOT_REL			1
+#define IEF_IMM_NOT_REL		1
 //reserved
 #define IET_REL32_EXPORT	16
 #define IET_IMM32_EXPORT	17
@@ -417,7 +416,7 @@ class CPatchTableAbsAddr
 
 #help_index "Boot"
 class CKernel
-{//Must match $LK,"OSStartUp",A="FF:::/Kernel/KStart16.HC,SYS_BOOT_BASE"$
+{//Must match $LK,"OSStartUp",A="FF:::/Kernel/KStart16.HC,MEM_BOOT_BASE"$
   CBinFile h;
   U32	jmp,
 	boot_src,
@@ -428,10 +427,12 @@ class CKernel
 
   U0	start;
   U32	boot_base;
-  U16	sys_mem_E801[2];
-  CMemE820 sys_mem_E820[MEM_NUM_E820_ENTRIES];
+  U16	mem_E801[2];
+  CMemE820 mem_E820[MEM_NUM_E820_ENTRIES];
+  U64	mem_physical_space;
   CSysLimitBase sys_gdt_ptr;
   U16	sys_pci_busses;
+  ;$$=($$+15)&-16;
   CGDT	sys_gdt;
 };
 
@@ -440,39 +441,41 @@ class CKernel
 #define RLf_VGA			1
 #define RLf_32BIT		2
 #define RLf_PATCHED		3
-#define RLf_64BIT		4
-#define RLf_BOOT_HEAP		5
-#define RLf_FULL_HEAP		6
-#define RLf_RAW			7
-#define RLf_INTERRUPTS		8
-#define RLf_BLKDEV		9
-#define RLf_MP			10
-#define RLf_COMPILER		11
-#define RLf_DOC			12
-#define RLf_WINMGR		13
-#define RLf_REGISTRY		14
-#define RLf_HOME		15
-#define RLf_AUTO_COMPLETE	16
-#define RLf_ADAM_SERVER		17
+#define RLf_16MEG_SYS_CODE_BP	4
+#define RLf_64BIT		5
+#define RLf_16MEG_ADAM_HEAP_CTRL 6
+#define RLf_FULL_HEAPS		7
+#define RLf_RAW			8
+#define RLf_INTERRUPTS		9
+#define RLf_BLKDEV		10
+#define RLf_MP			11
+#define RLf_COMPILER		12
+#define RLf_DOC			13
+#define RLf_WINMGR		14
+#define RLf_REGISTRY		15
+#define RLf_HOME		16
+#define RLf_AUTO_COMPLETE	17
+#define RLf_ADAM_SERVER		18
 
 #define RLF_16BIT		0x00001
 #define RLF_VGA			0x00002
 #define RLF_32BIT		0x00004
 #define RLF_PATCHED		0x00008
-#define RLF_64BIT		0x00010
-#define RLF_BOOT_HEAP		0x00020
-#define RLF_FULL_HEAP		0x00040
-#define RLF_RAW			0x00080
-#define RLF_INTERRUPTS		0x00100
-#define RLF_BLKDEV		0x00200
-#define RLF_MP			0x00400
-#define RLF_COMPILER		0x00800
-#define RLF_DOC			0x01000
-#define RLF_WINMGR		0x02000
-#define RLF_REGISTRY		0x04000
-#define RLF_HOME		0x08000
-#define RLF_AUTO_COMPLETE	0x10000
-#define RLF_ADAM_SERVER		0x20000
+#define RLF_16MEG_SYS_CODE_BP	0x00010
+#define RLF_64BIT		0x00020
+#define RLF_16MEG_ADAM_HEAP_CTRL 0x00040
+#define RLF_FULL_HEAPS		0x00050
+#define RLF_RAW			0x00100
+#define RLF_INTERRUPTS		0x00200
+#define RLF_BLKDEV		0x00400
+#define RLF_MP			0x00800
+#define RLF_COMPILER		0x01000
+#define RLF_DOC			0x02000
+#define RLF_WINMGR		0x04000
+#define RLF_REGISTRY		0x08000
+#define RLF_HOME		0x10000
+#define RLF_AUTO_COMPLETE	0x20000
+#define RLF_ADAM_SERVER		0x40000
 
 #help_index "Processor"
 #define LAPIC_BASE		0xFEE00000
@@ -582,62 +585,48 @@ class CRAXRBCRCXRDX
 
 #help_index "Processor"
 #define DFT_CACHE_LINE_WIDTH	128
-#define SEMA_STRUCT_SIZE	DFT_CACHE_LINE_WIDTH
 
 //Semaphores
 class CSema
-{//I read you're supposed to use one cache line.
-//I don't know why.  Might be silly.
-  Bool	val;
-  U8	pad[SEMA_STRUCT_SIZE-sizeof(Bool)];
+{
+  Bool	val,pad[DFT_CACHE_LINE_WIDTH-1];
 };
-#define SYS_SEMA_DEBUG			0
-#define SYS_SEMA_RECORD_MACRO		1
-#define SYS_SEMA_SYS_TIMER		2
-#define SYS_SEMA_SYS_DATE		3
-#define SYS_SEMA_DBG_MODE		4
-#define SYS_SEMA_SND			5
-#define SYS_SEMA_HEAPLOG_ACTIVE		6
-#define SYS_SEMA_HEAPLOG_LOCK		7
-#define SYS_SEMA_REFRESH_IN_PROGRESS	8
-#define SYS_SEMA_FLUSH_VGA_IMAGE	9
-#define SYS_SEMA_SINGLE_USER		10
-#define SYS_SEMA_DSK_CACHE		11
-#define SYS_SEMA_FAR_CALL32		12
-#define SYS_SEMA_DEV_MEM		13
-#define SYS_SEMA_VGA			14
-#define SYS_SEMA_UPDATE_WIN_Z_BUF	15
-#define SYS_SEMA_TT			16
-#define SYS_SEMA_MUTE			17
-#define SYS_SEMA_FORCE_WINMGR		18
-#define SYS_SEMA_JUST_PUMP_MSGS		19
-#define SYS_SEMA_TMBEAT			20
-#define SYS_SEMA_FIX			21
-#define NUM_SYS_SEMAS			22
+#define SEMA_DEBUG		0
+#define SEMA_RECORD_MACRO	1
+#define SEMA_SYS_TIMER		2
+#define SEMA_SYS_DATE		3
+#define SEMA_DBG_MODE		4
+#define SEMA_SND		5
+#define SEMA_HEAPLOG_ACTIVE	6
+#define SEMA_HEAPLOG_LOCK	7
+#define SEMA_REFRESH_IN_PROGRESS 8
+#define SEMA_FLUSH_VGA_IMAGE	9
+#define SEMA_SINGLE_USER	10
+#define SEMA_DSK_CACHE		11
+#define SEMA_FAR_CALL32		12
+#define SEMA_DEV_MEM		13
+#define SEMA_VGA		14
+#define SEMA_UPDATE_WIN_Z_BUF	15
+#define SEMA_TT			16
+#define SEMA_MUTE		17
+#define SEMA_FORCE_WINMGR	18
+#define SEMA_JUST_PUMP_MSGS	19
+#define SEMA_TMBEAT		20
+#define SEMA_FIX		21
+#define SEMA_NUM_SEMAS		22
 
-#define SYSf_CTRL_ALT_DEL		0
-#define SYSf_CTRL_ALT_C			1
-#define SYSf_CTRL_ALT_X 		2
-#define SYSf_CTRL_ALT_TAB		3
+#define CTRL_ALT_DEL		0
+#define CTRL_ALT_C		1
+#define CTRL_ALT_X		2
+#define CTRL_ALT_TAB		3
 
 #help_index "Hash"
 public class CHash
-{
-//Hash entries are not removed.  New entries eclipse old by being
-  //in front for searches.  Old function code is not freed
-  //because a reference might use it.
+{//See $LK,"Hash",A="HI:Hash"$
   CHash	*next;
   U8	*str;
-  U32	type,use_cnt;
-//use_cnt is never decremented.  It is incremented
-  //each time a node is found in a hash search.
-  //One place it is used is to tell if a externed function was unused
-  //before being defined.  It is also used for popularity measures
-  //in autocomplete.	You can do a $LK,"Who",A="MN:Who"$() to see
-  //roughly how many times a symbol has been
-  //referenced.	Beware of instances where
-  //a hash entry is continuously searched for and
-  //racks-up huge use_cnt numbers.
+  U32	type,
+	use_cnt; // inc'ed every time search found, never dec'ed.
 };
 
 public class CHashTable
@@ -648,8 +637,7 @@ public class CHashTable
 };
 
 #help_index "Hash/System"
-//Hash table types
-//$LK,"ST_HTT_TYPES",A="FF:::/Kernel/KDefine.HC,ST_HTT_TYPES"$
+//Hash table types: $LK,"ST_HTT_TYPES",A="FF:::/Kernel/KDefine.HC,ST_HTT_TYPES"$
 #define HTt_EXPORT_SYS_SYM	0
 #define HTt_IMPORT_SYS_SYM	1
 #define HTt_DEFINE_STR		2
@@ -809,7 +797,7 @@ public class CMemberLst
   CArrayDim dim;
   U8	*static_data;
   union {
-    I64	static_data_ip;
+    I64	static_data_rip;
     I64 dft_val;
   }
   CHashFun *fun_ptr;
@@ -818,7 +806,7 @@ public class CMemberLst
 class CExternUsage
 {
   CExternUsage *next;
-  I64	ip;
+  I64	rip;
 };
 
 #help_index "Hash/System;Compiler/Internal"
@@ -832,7 +820,7 @@ public class CHashDefineStr:CHashSrcSym
 #define Cf_INTERNAL_TYPE	1
 
 public class CHashClass:CHashSrcSym
-{//See $LK,"PrsClassNew",A="MN:PrsClassNew"$().	base_class of $LK,"CHashFun",A="MN:CHashFun"$
+{//See $LK,"PrsClassNew",A="MN:PrsClassNew"$(). base_class of $LK,"CHashFun",A="MN:CHashFun"$
   I64	size,neg_offset;
   U32	member_cnt;
   U8	ptr_stars_cnt,raw_type;
@@ -879,7 +867,7 @@ public class CHashGlblVar:CHashSrcSym
   CArrayDim dim;
   U8	*data_addr;
   union {
-    I64	data_addr_ip;
+    I64	data_addr_rip;
     CAOTHeapGlbl *heap_glbl;
   }
 };
@@ -927,7 +915,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCT_CURSOR_MOVEMENT	26
 #define DOCT_ANCHOR		27
 #define DOCT_LINK		28
-#define DOCT_BUTTON		29
+#define DOCT_BTTN		29
 #define DOCT_DATA		30
 #define DOCT_CHECK_BOX		31
 #define DOCT_LST		32
@@ -1121,7 +1109,7 @@ public class CDocBin
   U32	num,flags,size,use_cnt;
   U0	end;
   U8	*data;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #define DOC_SCROLL_SPEED	8
@@ -1174,7 +1162,7 @@ public class CDocEntryBase
   U32	min_col,max_col;
   CDocSettings settings;
   I64	user_data;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #define DOCE_LEN_DFT	64
@@ -1209,7 +1197,7 @@ public class CDocEntry:CDocEntryBase
   U8	raw_type,pad[3];
   CDocBin *bin_data;
   U8	*data;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 //$LK,"DocForm",A="MN:DocForm"$() $LK,"DocMenu",A="MN:DocMenu"$() $LK,"DocEd",A="MN:DocEd"$() $LK,"PopUpMenu",A="MN:PopUpMenu"$()
@@ -1393,7 +1381,7 @@ public class CDoc //Linked Text File header
   CDocUndo undo_head;
 
   I64	user_data;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Windows"
@@ -1407,11 +1395,11 @@ tries to do something.
 #define WIF_SELF_FOCUS		0x0001 //If active this task cannot have focus
 		//MENU		0x0002
 #define WIF_SELF_CTRLS		0x0004
-#define WIF_SELF_IP_L		0x0008
-		//IP_L_D	0x0010
-#define WIF_SELF_IP_R		0x0020
-		//IP_R_D	0x0040
-#define WIF_SELF_IP_WHEEL	0x0080 //Does nothing, yet
+#define WIF_SELF_MS_L		0x0008
+		//MS_L_D	0x0010
+#define WIF_SELF_MS_R		0x0020
+		//MS_R_D	0x0040
+#define WIF_SELF_MS_WHEEL	0x0080 //Does nothing, yet
 #define WIF_SELF_BORDER		0x0100
 #define WIF_SELF_GRAB_SCROLL	0x0200
 #define WIF_SELF_DOC		0x0400
@@ -1420,24 +1408,24 @@ tries to do something.
 		//FOCUS		0x00010000
 #define WIF_FOCUS_TASK_MENU	0x00020000
 #define WIF_FOCUS_TASK_CTRLS	0x00040000
-#define WIF_FOCUS_TASK_IP_L	0x00080000
-#define WIF_FOCUS_TASK_IP_L_D	0x00100000
-#define WIF_FOCUS_TASK_IP_R	0x00200000
-#define WIF_FOCUS_TASK_IP_R_D	0x00400000
-#define WIF_FOCUS_TASK_IP_WHEEL	0x00800000 //Does nothing, yet
+#define WIF_FOCUS_TASK_MS_L	0x00080000
+#define WIF_FOCUS_TASK_MS_L_D	0x00100000
+#define WIF_FOCUS_TASK_MS_R	0x00200000
+#define WIF_FOCUS_TASK_MS_R_D	0x00400000
+#define WIF_FOCUS_TASK_MS_WHEEL	0x00800000 //Does nothing, yet
 #define WIF_FOCUS_TASK_BORDER	0x01000000
 #define WIF_FOCUS_TASK_GRAB_SCROLL 0x02000000
 
-#define WIG_DBL_CLICK		(WIF_FOCUS_TASK_IP_L_D|WIF_FOCUS_TASK_IP_R_D)
+#define WIG_DBL_CLICK		(WIF_FOCUS_TASK_MS_L_D|WIF_FOCUS_TASK_MS_R_D)
 #define WIG_TASK_DFT	(WIF_FOCUS_TASK_MENU|WIG_DBL_CLICK|\
 			0xFFFF-WIF_SELF_DOC-WIF_SELF_ODE)
 #define WIG_USER_TASK_DFT	WIF_SELF_KEY_DESC
 
 #define WIf_SELF_FOCUS		0
 #define WIf_SELF_CTRLS		2
-#define WIf_SELF_IP_L		3
-#define WIf_SELF_IP_R		5
-#define WIf_SELF_IP_WHEEL	7
+#define WIf_SELF_MS_L		3
+#define WIf_SELF_MS_R		5
+#define WIf_SELF_MS_WHEEL	7
 #define WIf_SELF_BORDER		8
 #define WIf_SELF_GRAB_SCROLL	9
 #define WIf_SELF_DOC		10
@@ -1445,11 +1433,11 @@ tries to do something.
 #define WIf_SELF_KEY_DESC	12
 #define WIf_FOCUS_TASK_MENU	17
 #define WIf_FOCUS_TASK_CTRLS	18
-#define WIf_FOCUS_TASK_IP_L	19
-#define WIf_FOCUS_TASK_IP_L_D	20
-#define WIf_FOCUS_TASK_IP_R	21
-#define WIf_FOCUS_TASK_IP_R_D	22
-#define WIf_FOCUS_TASK_IP_WHEEL	23
+#define WIf_FOCUS_TASK_MS_L	19
+#define WIf_FOCUS_TASK_MS_L_D	20
+#define WIf_FOCUS_TASK_MS_R	21
+#define WIf_FOCUS_TASK_MS_R_D	22
+#define WIf_FOCUS_TASK_MS_WHEEL	23
 #define WIf_FOCUS_TASK_BORDER	24
 #define WIf_FOCUS_TASK_GRAB_SCROLL 25
 
@@ -1586,12 +1574,12 @@ public class CAutoCompleteDictGlbls
 #define MDG_DISP_SIB_RIP	(MDF_DISP|MDF_SIB|MDF_RIP_DISP32)
 #define MDG_REG_DISP_SIB_RIP	(MDF_REG|MDG_DISP_SIB_RIP)
 
-#define ICF_R_TO_F64			0x000000001
-#define ICF_R_TO_INT			0x000000002
-#define ICF_A1_TO_F64			0x000000004
-#define ICF_A1_TO_INT			0x000000008
-#define ICF_A2_TO_F64			0x000000010
-#define ICF_A2_TO_INT			0x000000020
+#define ICF_RES_TO_F64			0x000000001
+#define ICF_RES_TO_INT			0x000000002
+#define ICF_ARG1_TO_F64			0x000000004
+#define ICF_ARG1_TO_INT			0x000000008
+#define ICF_ARG2_TO_F64			0x000000010
+#define ICF_ARG2_TO_INT			0x000000020
 #define ICF_USE_F64			0x000000040
 #define ICF_USE_UNSIGNED		0x000000080
 #define ICF_USE_INT			0x000000100 //highest priority
@@ -1601,9 +1589,9 @@ public class CAutoCompleteDictGlbls
 #define ICF_SHORT_JMP			0x000001000
 #define ICF_PUSH_RES			0x000002000
 #define ICF_PASS_TRACE			0x000004000
-#define ICF_R_WAS_STK			0x000008000
-#define ICF_A1_WAS_STK			0x000010000
-#define ICF_A2_WAS_STK			0x000020000
+#define ICF_RES_WAS_STK			0x000008000
+#define ICF_ARG1_WAS_STK		0x000010000
+#define ICF_ARG2_WAS_STK		0x000020000
 #define ICF_PUSH_CMP			0x000040000 //for 50<i<j<=100 exps
 #define ICF_POP_CMP			0x000080000 //for 50<i<j<=100 exps
 #define ICF_SWAP			0x000100000
@@ -1636,8 +1624,8 @@ class CICArg
 
 class CICTreeLinks
 {
-  CHashClass *a1c,*a2c;
-  CIntermediateCode *a1t,*a2t;
+  CHashClass *arg1_class,*arg2_class;
+  CIntermediateCode *arg1_tree,*arg2_tree;
   CHashClass *class2;
 };
 
@@ -1656,22 +1644,21 @@ class CIntermediateCode:CIntermediateCodeBase
 	ic_data,
 	ic_line;
   CHashClass *ic_class,*ic_class2;
-  CICArg a1,a2,r;
-  U8	a1_type_pointed_to; //Used for $LK,"IST_ASSIGN",A="MN:IST_ASSIGN"$ and $LK,"IST_DEREF",A="MN:IST_DEREF"$ $LK,"ic_codes",A="MN:intermediate_code_table"$.
+  CICArg arg1,arg2,res;
+  U8	arg1_type_pointed_to; //Used for $LK,"IST_ASSIGN",A="MN:IST_ASSIGN"$ and $LK,"IST_DEREF",A="MN:IST_DEREF"$ $LK,"ic_codes",A="MN:intermediate_code_table"$.
   union {
     U8 ic_body[IC_BODY_SIZE];
     //Tree Links are created in OptPass012.  An ADD opcode, for example,
-    //points back to its two earlier addend insts, not MAlloced,
-    //just pointers to prev CIntermediate codes in the array.
+    //points back to its two earlier arg CIntermediateCode's.
 
     //Tree links get destroyed during Pass789A when they get overwrites
     //by machine code.	(Saves room to union the output machine code buffer
     //with these links, since they are not needed after pass4.
 
-    //Tree links are mostly used during 012 and 3 for determining types.
+    //Tree links are used during passes 012 and 3 for determining types.
     CICTreeLinks t;
   };
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 class CPrsStk
@@ -1711,7 +1698,7 @@ class CCodeMisc
     I64 st_len;		//STR_CONST
     I64 num_consts;	//FLOAT_CONSTS
     I64 range;
-    I64 ip;		//ASM_LABEL
+    I64 rip;		//ASM_LABEL
   }
   union {
     CCodeMisc **jmp_table;
@@ -1856,7 +1843,7 @@ class CAsmUnresolvedRef
   CAsmUnresolvedRef *next;
   I64	type,line_num;
   U8	*machine_code;
-  I64	ip,rel_ip;
+  I64	rip,rel_rip;
   CAOT	*aot;
   U8	*str;	//Only for import glbls
   CAsmUndefHash *asm_undef_hash;
@@ -1957,7 +1944,7 @@ public class CHashOpcode:CHash
 class CAOTImportExport
 {
   CAOTImportExport *next,*last;
-  I64	ip,flags;
+  I64	rip,flags;
   CAOT	*aot;
   U8	*str,
 	*src_link,
@@ -1975,14 +1962,14 @@ class CAOTImportExport
 class CAOTAbsAddr
 {
   CAOTAbsAddr *next;
-  I64	ip;
+  I64	rip;
   U8	type,pad[7];
 };
 
 class CAOTHeapGlblRef
 {
   CAOTHeapGlblRef *next;
-  I64	ip;
+  I64	rip;
 };
 
 class CAOTHeapGlbl
@@ -1997,7 +1984,7 @@ class CAOT
 {
   CAOT	*next,*last;
   U8	*buf;
-  I64	ip,ip2,
+  I64	rip,rip2,
 	aot_U8s,
 	max_align_bits,module_org;
   CAOT	*parent_aot;
@@ -2025,7 +2012,7 @@ class CCodeCtrl
 #define __LINE__ #exe{StreamPrint("%d",\
 	Fs->last_cc->lex_include_stk->line_num);}
 #define __CMD_LINE__ #exe{StreamPrint("%d",Fs->last_cc->flags&CCF_CMD_LINE &&\
-	Fs->last_cc->lex_include_stk->depth<2);}
+	Fs->last_cc->lex_include_stk->depth<1);}
 #define __FILE__ #exe{StreamPrint("\"%s\"",\
 	Fs->last_cc->lex_include_stk->full_name);}
 #define __DIR__  #exe{StreamDir;}
@@ -2048,7 +2035,7 @@ class CLexFile
 
 class CAOTCtrl
 {
-  I64	ip; //Inst ptr
+  I64	rip; //Inst ptr
   CAsmArg arg1,arg2;
   CAOTBinBlk *bin;
   I64	num_bin_U8s,
@@ -2056,7 +2043,7 @@ class CAOTCtrl
   CAsmUnresolvedRef *local_unresolved,*glbl_unresolved;
   CAOTAbsAddr *abss;
   CAOTHeapGlbl *heap_glbls;
-  I64	lst_col,lst_last_ip;
+  I64	lst_col,lst_last_rip;
   U8	*last_label,*lst_last_line;
   CLexFile *lst_last_lfn;
   I64	seg_size;
@@ -2161,7 +2148,7 @@ class CLexHashTableContext
 #define CCF_NO_ABSS		0x1000000000
 #define CCF_PAREN		0x2000000000
 #define CCf_PAREN		37
-#define CCF_CLASS_IP		0x4000000000
+#define CCF_CLASS_DOL_OFFSET	0x4000000000
 #define CCF_DONT_MAKE_RES	0x8000000000
 
 public class CCmpCtrl
@@ -2173,14 +2160,14 @@ public class CCmpCtrl
   F64	cur_f64;
   U8	*cur_str;
   I64	cur_str_len,
-	class_ip;
+	class_dol_offset;
   U8	*dollar_buf;
   I64	dollar_cnt;
   U8	*cur_help_idx;
   I64	last_U16,
 	min_line,max_line,last_line_num,
 	lock_cnt;
-  U32	*chars_bmp_alpha_numeric;
+  U32	*char_bmp_alpha_numeric;
   CLexHashTableContext htc;
   CHashGeneric *hash_entry;
   CAbsCntsI64 abs_cnts;
@@ -2207,7 +2194,7 @@ public class CCmpCtrl
   CPrsStk *ps;
   CAOTCtrl *aotc;
   I64	aot_depth,pmt_line;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Compiler"
@@ -2727,6 +2714,7 @@ public class CDrv
   U16	fs_type;
   I64	drv_offset,
 	size,
+	prt_num,
 	file_system_info_sect,
 	fat1,fat2,
 	root_cluster,
@@ -2833,34 +2821,14 @@ class CMemUsed
 #endif
 
 #help_index "Memory/BlkPool"
-/*TempleOS does not mess with page tables after setting them up
-during boot -- $LK,"SYS_INIT_PAGE_TABLES",A="MN:SYS_INIT_PAGE_TABLES"$.
-
-$LK,"MEM_PAGE_SIZE",A="MN:MEM_PAGE_SIZE"$, the unit size for alloications, is arbitrary,
-and is not related to CPU hardware.
-
-All virtual addresses are ident to physical at all times.
-text.vga_alias is not identity-mapped, however.
-
-There is no high kernel memory because RAM's physical
-addresses are low.  (All motherboards that I know of
-put RAM in low addresses of 64-bit address space.)
-It's ring-0-only so all (or none) is kernel, remember.
-2Meg hardware pages are used. Only the caching bits matter.
-Remember, it is ring-0-only and identity-mapped!
-
-All code is placed in just the lowest 2Gig, so the CALL REL32
-inst always works.  It never changes out of ring-0, remember,
-so I don't need to waste cycles on use SYSCALL or software interrupts.
-Everything just uses CALL REL32.
-*/
+#help_file "::/Doc/Pags"
 
 #define MBS_USED_SIGNATURE_VAL		'MBUs'
 #define MBS_UNUSED_SIGNATURE_VAL	'MBUn'
 class CMemBlk
 {
   CMemBlk *next,*last;
-  U32	mb_signature,pages;
+  U32	mb_signature,pags;
 };
 
 #define MRT_UNUSED	0
@@ -2875,18 +2843,18 @@ class CMemRange
   I64	size;
 };
 
-#define MEM_PAGE_BITS		9
-#define MEM_PAGE_SIZE		(1<<MEM_PAGE_BITS)
+#define MEM_PAG_BITS		9
+#define MEM_PAG_SIZE		(1<<MEM_PAG_BITS)
 #define MEM_HEAP_HASH_SIZE	1024
-#define MEM_FREE_PAGE_HASH_SIZE	0x100
+#define MEM_FREE_PAG_HASH_SIZE	0x100
 //It is common to $LK,"MAlloc",A="MN:MAlloc"$() exact powers of two.  There is some overhead.
-//We add 2 pages, so a request is not rounded-up to next power of two.
-#define MEM_EXTRA_HASH2_PAGES	2
+//We add 2 pags, so a request is not rounded-up to next power of two.
+#define MEM_EXTRA_HASH2_PAGS	2
 
-#define MEM_ADAM_STK		(MEM_PAGE_SIZE*512) //Like 16384*MEM_PAGE_SIZE
-#define MEM_SETH_STK		(MEM_PAGE_SIZE*512)
-#define MEM_INTERRUPT_STK	(MEM_PAGE_SIZE*512)
-#define MEM_DFT_STK		(MEM_PAGE_SIZE*512)
+#define MEM_ADAM_STK		(MEM_PAG_SIZE*512) //Like 16384*MEM_PAG_SIZE
+#define MEM_SETH_STK		(MEM_PAG_SIZE*512)
+#define MEM_INTERRUPT_STK	(MEM_PAG_SIZE*512)
+#define MEM_DFT_STK		(MEM_PAG_SIZE*512)
 
 #define TASK_HASH_TABLE_SIZE	(1<<10)
 
@@ -2897,8 +2865,8 @@ public class CBlkPool
   I64	locked_flags,alloced_u8s,used_u8s;
   CMemBlk *mem_free_lst,
 	*mem_free_2meg_lst, //This is for Sup1CodeScraps/Mem/Mem2Meg.HC.
-	*free_page_hash[MEM_FREE_PAGE_HASH_SIZE],
-	*free_page_hash2[64-MEM_PAGE_BITS];
+	*free_pag_hash[MEM_FREE_PAG_HASH_SIZE],
+	*free_pag_hash2[64-MEM_PAG_BITS];
 };
 
 #help_index "Memory/HeapCtrl"
@@ -3017,12 +2985,12 @@ public class CKbdStateGlbls
 //BitTest, $LK,"Bt",A="MN:Bt"$(), with an unmerged scan code.
 	down_bitmap2[8];
 
-  Bool	rst,		//Private: Reset KbdMouse
+  Bool	rst,		//Private: Reset KbdMs
 	irqs_working;	//Private
 };
 
-#help_index "Input Pointer/Mouse"
-public class CMouseStateGlbls
+#help_index "Mouse"
+public class CMsHardStateGlbls
 {
   CD3I64 pos,		//Position in pixels
 	prescale;
@@ -3032,35 +3000,29 @@ public class CMouseStateGlbls
 	install_attempts, //Private
 	pkt_size;	//Private
   CFifoU8 *fifo,*fifo2; //Private
-  Bool	buttons[5],
+  Bool	bttns[5],
 	has_wheel,
-	has_ext_buttons,
+	has_ext_bttns,
 	evt,		//Private
 	installed,	//Private
 	install_in_progress, //Private
 	irqs_working;	//Private
 };
 
-#help_index "Input Pointer"
-#define IP_NULL		0
-#define IP_MOUSE	1
-public class CIPStateGlbls
+public class CMsStateGlbls
 {
-  I64	dev;		//$LK,"IP_NULL",A="MN:IP_NULL"$ or $LK,"IP_MOUSE",A="MN:IP_MOUSE"$
   CD3I64 pos,		//Position in pixels
 	pos_text,	//Position in text rows,cols
 	presnap,
 	offset;
   CD3	scale;
-  I64	throttle,	//Throttle is [MIN_I32,MAX_I32]
-	throttle_step;
   F64	speed;		//Output: How fast the user is moving it.
   I64	timestamp;	//Output: GetTSC when event.
   F64	dbl_time,	//Input: Time threshold for calling it a double click.
 	left_dbl_time,	//Private
 	right_dbl_time;	//Private
-  Bool	lb,		//Left Button
-	rb,		//Right Button
+  Bool	lb,		//Left Bttn
+	rb,		//Right Bttn
 	show,
 	has_wheel,
 	left_dbl,	//Private
@@ -3093,8 +3055,8 @@ public class CGridGlbls
 
 #define CTRLF_SHOW		1
 #define CTRLF_BORDER		2
-#define CTRLF_CAPTURE_LEFT_IP	4
-#define CTRLF_CAPTURE_RIGHT_IP	8
+#define CTRLF_CAPTURE_LEFT_MS	4
+#define CTRLF_CAPTURE_RIGHT_MS	8
 #define CTRLF_CLICKED		16
 
 #define WSSf_SET_TO_POS		0
@@ -3143,7 +3105,7 @@ public class CMenuEntry
   CMenuEntry *next;
   CMenuEntry *sub;
   U8	name[32];
-  I64	msg_code,a1,a2;
+  I64	msg_code,arg1,arg2;
   Bool	checked,dir,pad[6];
 };
 
@@ -3167,7 +3129,7 @@ class CBpt
 class CExcept
 {
   CExcept *next,*last;
-  I64	handler_catch,handler_untry,
+  I64	hndlr_catch,hndlr_untry,
 	rsp,rbp,rflags,rsi,rdi,r10,r11,r12,r13,r14,r15;
 };
 
@@ -3176,32 +3138,30 @@ class CFPU
   U8	body[512];
 };
 
-#help_index "Task/Srv/Exe"
-#define SVCf_WAKE_MASTER	0
-#define SVCf_FOCUS_MASTER	1
-#define SVCf_EXIT_ON_COMPLETE	2
-#define SVCf_DONT_FILTER	3
-#define SVCf_HIGHEST_PRIORITY	4
+#help_index "Job/Exe;Task/Job/Exe"
+#define JOBf_WAKE_MASTER	0
+#define JOBf_FOCUS_MASTER	1
+#define JOBf_EXIT_ON_COMPLETE	2
+#define JOBf_DONT_FILTER	3
+#define JOBf_HIGHEST_PRIORITY	4
 //MP flags
-#define SVCf_DONE		5
-#define SVCf_DISPATCHED		6
-#define SVCf_FREE_ON_COMPLETE	7
-#define SVCf_ADD_TO_QUE		8
+#define JOBf_DONE		5
+#define JOBf_DISPATCHED		6
+#define JOBf_FREE_ON_COMPLETE	7
+#define JOBf_ADD_TO_QUE		8
 
-#define SVCT_TEXT_INPUT		0 //$LK,"TaskText",A="MN:TaskText"$()	Feed StdIn
-#define SVCT_MSG		1 //$LK,"TaskMsg",A="MN:TaskMsg"$()	Post msg
-#define SVCT_EXE_STR		2 //$LK,"TaskExe",A="MN:TaskExe"$()	Compile & execute src code text
+#define JOBT_TEXT_INPUT		0 //$LK,"TaskText",A="MN:TaskText"$()	Feed StdIn
+#define JOBT_MSG		1 //$LK,"TaskMsg",A="MN:TaskMsg"$()	Post msg
+#define JOBT_EXE_STR		2 //$LK,"TaskExe",A="MN:TaskExe"$()	Compile & execute src code text
 //MP cmds
-#define SVCT_CALL		3 //$LK,"JobQue",A="MN:JobQue"$()	Tell MP to call function
-#define SVCT_SPAWN_TASK		4 //$LK,"Spawn",A="MN:Spawn"$()	Tell MP to spawn task
+#define JOBT_CALL		3 //$LK,"JobQue",A="MN:JobQue"$()	Tell MP to call function
+#define JOBT_SPAWN_TASK		4 //$LK,"Spawn",A="MN:Spawn"$()	Tell MP to spawn task
 
-class CSrvCmd
+class CJob
 {
-  CSrvCmd *next,*last;
-  CSrvCtrl *ctrl;
-  I64	cmd_code,flags,
-	target_cpu,servant_cpu_num,
-	msg_code;
+  CJob *next,*last;
+  CJobCtrl *ctrl;
+  I64	job_code,flags,msg_code;
 
   I64	(*addr)(U8 *fun_arg);
   U8	*fun_arg;
@@ -3214,11 +3174,11 @@ class CSrvCmd
 	*master_task;
 };
 
-#define SVCRf_LOCKED		0
-class CSrvCtrl
+#define JOBCf_LOCKED		0
+class CJobCtrl
 {
-  CSrvCmd *next_waiting,*last_waiting;
-  CSrvCmd *next_done,*last_done;
+  CJob *next_waiting,*last_waiting;
+  CJob *next_done,*last_done;
   I64	flags;
 };
 
@@ -3228,21 +3188,21 @@ class CSrvCtrl
 #define MSG_CMD			1
 #define MSG_KEY_DOWN		2  //($LK,"ASCII",A="MN:CH_CTRLA"$,$LK,"scan code",A="FI:::/Doc/CharOverview.DD"$) Press <CTRL-SHIFT-L>
 #define MSG_KEY_UP		3  //($LK,"ASCII",A="MN:CH_CTRLA"$,$LK,"scan code",A="FI:::/Doc/CharOverview.DD"$) Press <CTRL-SHIFT-L>
-#define MSG_IP_MOVE		4  //(x,y)
-#define MSG_IP_L_DOWN		5  //(x,y)
-#define MSG_IP_L_UP		6  //(x,y)
-#define MSG_IP_L_D_DOWN 	7  //(x,y)
-#define MSG_IP_L_D_UP		8  //(x,y)
-#define MSG_IP_R_DOWN		9  //(x,y)
-#define MSG_IP_R_UP		10 //(x,y)
-#define MSG_IP_R_D_DOWN 	11 //(x,y)
-#define MSG_IP_R_D_UP		12 //(x,y)
+#define MSG_MS_MOVE		4  //(x,y)
+#define MSG_MS_L_DOWN		5  //(x,y)
+#define MSG_MS_L_UP		6  //(x,y)
+#define MSG_MS_L_D_DOWN 	7  //(x,y)
+#define MSG_MS_L_D_UP		8  //(x,y)
+#define MSG_MS_R_DOWN		9  //(x,y)
+#define MSG_MS_R_UP		10 //(x,y)
+#define MSG_MS_R_D_DOWN 	11 //(x,y)
+#define MSG_MS_R_D_UP		12 //(x,y)
 
 #define MSG_KEY_DOWN_UP		-2  //Down & UP
-#define MSG_IP_L_DOWN_UP	-5  //Down & Up
-#define MSG_IP_L_D_DOWN_UP	-7  //Down & Up
-#define MSG_IP_R_DOWN_UP	-9  //Down & Up
-#define MSG_IP_R_D_DOWN_UP	-11 //Down & Up
+#define MSG_MS_L_DOWN_UP	-5  //Down & Up
+#define MSG_MS_L_D_DOWN_UP	-7  //Down & Up
+#define MSG_MS_R_DOWN_UP	-9  //Down & Up
+#define MSG_MS_R_D_DOWN_UP	-11 //Down & Up
 
 #help_index "Task/Settings"
 #define TSF_SAME_SONG	1
@@ -3261,7 +3221,7 @@ public class CTaskSettings
 	border_attr,border_src,
 	task_title[STR_LEN];
   Bool	border,hide_cursor,highlight_cursor,scroll,autocomplete,pad[3];
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Task"
@@ -3305,6 +3265,7 @@ public class CTaskSettings
 
 #define TASK_SIGNATURE_VAL		'TskS'
 #define TASK_NAME_LEN			32
+#define TASK_EXCEPT_CALLERS		8
 class CTaskStk
 {
   CTaskStk *next_stk;
@@ -3323,7 +3284,7 @@ public class CTask //The Fs segment reg points to current CTask.
 {
   CTask *addr; //Self-addressed ptr
   U32	task_signature,win_inhibit;
-U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
+  ;#assert $$==offset(CTaskDying.wake_jiffy)
   I64	wake_jiffy;
   U32	task_flags,display_flags;
 
@@ -3371,8 +3332,7 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   CExcept *next_except,*last_except;
   I64	except_rbp,	//throw routine's RBP
 	except_ch;	//throw(ch)
-  U8	*except_caller1,*except_caller2,*except_caller3,*except_caller4,
-	*except_caller5,*except_caller6,*except_caller7,*except_caller8;
+  U8	*except_callers[TASK_EXCEPT_CALLERS];
 
   Bool	catch_except;
   Bool	new_answer;
@@ -3387,7 +3347,7 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   F64	last_ode_time;
   CHashTable *hash_table;
 
-  CSrvCtrl srv_ctrl;
+  CJobCtrl srv_ctrl;
   CCmpCtrl *next_cc,*last_cc;
   CHashFun *last_fun;
 
@@ -3401,7 +3361,7 @@ U0 pad;#assert $$==offset(CTaskDying.wake_jiffy)
   CWinScroll horz_scroll,vert_scroll;
 
   I64	user_data;
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 class CTSS
@@ -3456,28 +3416,22 @@ public class CCPU //The Gs segment reg points to current CCPU.
   I64	kill_jiffy;
   CTSS	*tss;
   I64	start_stk[16];
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Memory/Page Tables"
 #define MEM_MIN_MEG		512 //512 Meg minimum.
-#define MEM_MAPPED_SPACE	0x4000000000 //Arbitrarily set to 256 Gig.
-#define MEM_NUM_2MEG		(MEM_MAPPED_SPACE>>21)
-#define MEM_NUM_USED_1GIG	(MEM_MAPPED_SPACE>>(21+9))
-#define MEM_NUM_1GIG		(0x1000/8)
-#define MEM_NUM_512GIG		(0x1000/8)
 
-#define SYS_FIXED_AREA	0x100000
+#define SYS_FIXED_AREA		0x100000
+#define SYS_16MEG_AREA_LIMIT	0x1000000
 public class CSysFixedArea
 {
-  U8	pml2[MEM_NUM_2MEG*8],pml3[MEM_NUM_1GIG*8],pml4[MEM_NUM_512GIG*8];
-  $$=($$+15)&-16;
   CFPU	init_fpu_mmx;
   CCPU	boot_cpu;
   CTask	adam;
-  CBlkPool adam_bp;
+  CBlkPool sys_code_bp;
   CHeapCtrl adam_hc;
-  $$=($$+MEM_PAGE_SIZE-1)&-MEM_PAGE_SIZE;
+  $$=($$+0x1000-1)&-0x1000;
 };
 
 #help_index "Char"
@@ -3509,7 +3463,6 @@ public class CSysFixedArea
 #define CH_CTRLZ	0x1A
 #define CH_CURSOR	0x05
 #define CH_BACKSPACE	0x08
-#define CH_FORM_FEED	0x0C
 #define CH_ESC		0x1B
 #define CH_SHIFT_ESC	0x1C
 #define CH_SHIFT_SPACE	0x1F
@@ -3528,8 +3481,8 @@ public class CSysFixedArea
 #define SCf_NUM 	13
 #define SCf_SCROLL	14
 #define SCf_NEW_KEY	15
-#define SCf_IP_L_DOWN	16
-#define SCf_IP_R_DOWN	17
+#define SCf_MS_L_DOWN	16
+#define SCf_MS_R_DOWN	17
 #define SCf_DELETE	18
 #define SCf_INS		19
 #define SCf_NO_SHIFT	30
@@ -3543,8 +3496,8 @@ public class CSysFixedArea
 #define SCF_NUM		(1<<SCf_NUM)
 #define SCF_SCROLL	(1<<SCf_SCROLL)
 #define SCF_NEW_KEY	(1<<SCf_NEW_KEY)
-#define SCF_IP_L_DOWN	(1<<SCf_IP_L_DOWN)
-#define SCF_IP_R_DOWN	(1<<SCf_IP_R_DOWN)
+#define SCF_MS_L_DOWN	(1<<SCf_MS_L_DOWN)
+#define SCF_MS_R_DOWN	(1<<SCf_MS_R_DOWN)
 #define SCF_DELETE	(1<<SCf_DELETE)
 #define SCF_INS 	(1<<SCf_INS)
 #define SCF_NO_SHIFT	(1<<SCf_NO_SHIFT)
@@ -3552,7 +3505,7 @@ public class CSysFixedArea
 
 //TempleOS places a 1 in bit 7 for
 //keys with an E0 prefix.
-//See $LK,"::/Doc/CharOverview.DD"$ and $LK,"KbdHandler",A="MN:KbdHandler"$().
+//See $LK,"::/Doc/CharOverview.DD"$ and $LK,"KbdHndlr",A="MN:KbdHndlr"$().
 #define SC_ESC		0x01
 #define SC_BACKSPACE	0x0E
 #define SC_TAB		0x0F
@@ -3712,7 +3665,7 @@ public class CDC
   //Set by $LK,"DCDepthBufAlloc",A="MN:DCDepthBufAlloc"$()
   I32	*depth_buf;
   I64	db_z; //private
-  U0 pad;#assert !($$&7) //(compiler lags one token)
+  ;#assert !($$&7) //(compiler lags one token)
 };
 
 #help_index "Devices"
@@ -3824,21 +3777,22 @@ class CKeyDevGlbls
 	**ctrl_alt_ret_addr; //addr of ret addr on stack in kbd irq
   U8	**ctrl_alt_no_shift_descs,**ctrl_alt_shift_descs,
 	desc[STR_LEN],
-	*handler;
+	*hndlr;
 };
 
 #help_index "Snd"
+#define ONA_REST	MIN_I8
 class CSndData
 {
   CSndData *next,*last;
-  F64	freq, //Hz
-	time;
+  F64	time;
+  I8	ona;
 };
 
 public class CSndGlbls
 {
-  F64	freq;
   CSndData record_head;
+  I8	ona;
   Bool	record;
 };
 
@@ -3873,6 +3827,7 @@ public class CDbgGlbls
 	*fix_file_line;
   CFunSegCache *fun_seg_cache;
   I64	fun_seg_cache_index;
+  Bool	panic;
 };
 
 #help_index "Boot"
@@ -3888,7 +3843,7 @@ public class CDbgGlbls
 #define BOOT_SRC_DVD		4
 
 // $LK,"In",A="MN:In"$("") StdIn for call to $LK,"BootHDIns",A="MN:BootHDIns"$().
-#define STD_DISTRO_DVD_CFG	"Tb\nScale2Mem(2048,0x40000)\nt \n\n\n\n"
+#define STD_DISTRO_DVD_CFG	"TB\nScale2Mem(2048,0x40000)\nT \n\n\n\n"
 
 #help_index "Misc/Registry"
 //Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()
@@ -3906,7 +3861,7 @@ public class CDbgGlbls
 class CProgress
 {
   I64	val,max;
-  F64	t0;
+  F64	t0,tf;
   U8	desc[PROGRESS_DESC_LEN];
 };
 
@@ -3923,5 +3878,30 @@ class CProgress
 #define PRTF_NEG		0x200
 #define PRTF_NEG_E		0x400
 #define PRTF_NEG_AUX_FMT_NUM	0x800
+
+#help_index "Misc/Host"
+//Host Operating System
+#define OS_OTHER	0
+#define OS_NATIVE	1
+#define OS_LINUX	2
+#define OS_WINDOWS	3
+//Virtual Machine
+#define VM_OTHER	0
+#define VM_NATIVE	1
+#define VM_VMWARE	2
+#define VM_QEMU		3
+#define VM_VIRTUALBOX	4
+
+#help_index "Misc/Install Registration"
+public class CInsReg
+{
+  Bool	registered;
+  I64	host_os		fmtstr "$$PURPLE$$Install Registration$$FG$$\n\n"
+			"Host OS:$$LS,D=\"ST_HOST_OSES\"$$\n";
+  I64	host_vm		fmtstr "Host VM:$$LS,D=\"ST_HOST_VMS\"$$\n";
+  U8	initials[8]	fmtstr "$$DA-P,A=\"Your Initials:%s\"$$\n";
+  I64	machine_num	fmtstr
+			"$$DA-TRM,A=\"This Machine Num (Choose Any):%d\"$$\n";
+};
 
 #help_index ""

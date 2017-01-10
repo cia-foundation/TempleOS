@@ -121,7 +121,7 @@ U0 ICAddRSP(CIntermediateCode *tmpi,I64 i,Bool optimize=TRUE)
 }
 
 extern U0 ICMov(CIntermediateCode *tmpi,
-	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 ip);
+	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 rip);
 
 #define MODR_REG			0
 #define MODR_INDIRECT_REG		1
@@ -131,6 +131,7 @@ extern U0 ICMov(CIntermediateCode *tmpi,
 #define MODR_SIB_D8_INDIRECT_REG	5
 #define MODR_SIB_D32_INDIRECT_REG	6
 #define MODR_RIP_REL			7
+#define MODR_RIP_REL_IMM_U32		8
 
 I64 ICModr1(I64 r,CICType t2,I64 r2,I64 d2)
 {//res.u8[0] is type
@@ -210,8 +211,8 @@ I64 ICModr1(I64 r,CICType t2,I64 r2,I64 d2)
   return res;
 }
 
-U0 ICModr2(CIntermediateCode *tmpi,I64 i,I64 d,I64 ip=0)
-{//t=0 means no SIB
+U0 ICModr2(CIntermediateCode *tmpi,I64 i,CICType t=0,I64 d,I64 rip=0)
+{
   switch [i.u8[0]] {
     case MODR_REG:
       break;
@@ -234,42 +235,58 @@ U0 ICModr2(CIntermediateCode *tmpi,I64 i,I64 d,I64 ip=0)
       ICU8(tmpi,i.u8[3]);
       ICU32(tmpi,d);
       break;
+    case MODR_RIP_REL_IMM_U32:
+      switch (t.raw_type) {
+	case RT_I8:
+	case RT_U8:
+	  d--;
+	  break;
+	case RT_I16:
+	case RT_U16:
+	  d-=2;
+	  break;
+	default:
+	  d-=4;
+      }
     case MODR_RIP_REL:
-      ICU32(tmpi,d-(ip+tmpi->ic_cnt));
+      ICU32(tmpi,d-(rip+4+tmpi->ic_cnt));
       tmpi->ic_flags&=~ICF_CODE_FINAL;
       break;
   }
 }
 
-#define SLASH_OP_INC	0x0003000000FFFE00
-#define SLASH_OP_DEC	0x052B000000FFFE01
-#define SLASH_OP_NOT	0x0000000000F7F602
-#define SLASH_OP_NEG	0x0000000000F7F603
-#define SLASH_OP_MUL	0x0000000000F7F604
-#define SLASH_OP_IMUL	0x0000000000F7F605
-#define SLASH_OP_DIV	0x0000000000F7F606
-#define SLASH_OP_MOV	0x0000000000898800
-#define SLASH_OP_PUSH	0x0000000000FFFF06
-#define SLASH_OP_POP	0x00000000008F8F00
-#define SLASH_OP_FADD	0x0000C1DE01DCDC00
-#define SLASH_OP_FSUB	0x0000E9DE01DCDC04
-#define SLASH_OP_FSUBR	0x0000E1DE01DCDC05
-#define SLASH_OP_FMUL	0x0000C9DE01DCDC01
-#define SLASH_OP_FDIV	0x0000F9DE01DCDC06
-#define SLASH_OP_FDIVR	0x0000F1DE01DCDC07
-#define SLASH_OP_FLD	0x0000000001DDDD00
-#define SLASH_OP_FSTP	0x0000000001DDDD03
-#define SLASH_OP_FISTTP	0x0000000001DDDD01
-#define SLASH_OP_FILD	0x0000000001DFDF05
+#define SLASH_OP_INC		0x0003000000FFFE00
+#define SLASH_OP_DEC		0x052B000000FFFE01
+#define SLASH_OP_NOT		0x0000000000F7F602
+#define SLASH_OP_NEG		0x0000000000F7F603
+#define SLASH_OP_IMM_U8		0x0000000000838000
+#define SLASH_OP_IMM_U32	0x0000000000818300
+#define SLASH_OP_MUL		0x0000000000F7F604
+#define SLASH_OP_IMUL		0x0000000000F7F605
+#define SLASH_OP_DIV		0x0000000000F7F606
+#define SLASH_OP_MOV		0x0000000000898800
+#define SLASH_OP_MOV_IMM	0x0000000000C7C600
+#define SLASH_OP_PUSH		0x0000000000FFFF06
+#define SLASH_OP_POP		0x00000000008F8F00
+#define SLASH_OP_FADD		0x0000C1DE01DCDC00
+#define SLASH_OP_FSUB		0x0000E9DE01DCDC04
+#define SLASH_OP_FSUBR		0x0000E1DE01DCDC05
+#define SLASH_OP_FMUL		0x0000C9DE01DCDC01
+#define SLASH_OP_FDIV		0x0000F9DE01DCDC06
+#define SLASH_OP_FDIVR		0x0000F1DE01DCDC07
+#define SLASH_OP_FLD		0x0000000001DDDD00
+#define SLASH_OP_FSTP		0x0000000001DDDD03
+#define SLASH_OP_FISTTP		0x0000000001DDDD01
+#define SLASH_OP_FILD		0x0000000001DFDF05
 
-U0 ICSlashOp(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 op,I64 ip)
+U0 ICSlashOp(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 op,I64 rip)
 {
   I64 i;
   if (t1&MDF_REG && !op.u8[3])
     t1=t1&(MDG_MASK|RTF_UNSIGNED)+RT_I64; //Set to 64 bit,preserving unsigned
   i=ICModr1(op.u8[0],t1,r1,d1);
-
-  if (tmpi->ic_flags&ICF_LOCK && op!=SLASH_OP_MOV && !(t1&MDF_REG))
+  if (tmpi->ic_flags&ICF_LOCK && !(t1&MDF_REG) &&
+	op&~7!=SLASH_OP_MOV && op!=SLASH_OP_MOV_IMM)
     ICU8(tmpi,OC_LOCK_PREFIX);
   switch (t1.raw_type) {
     case RT_I8:
@@ -287,10 +304,12 @@ U0 ICSlashOp(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 op,I64 ip)
 	ICRex(tmpi,i.u8[1]);
       ICU16(tmpi,i.u8[2]<<8+op.u8[2]);
   }
-  ICModr2(tmpi,i,d1,ip+4);
+  if (i.u8[0]==MODR_RIP_REL&& (op==SLASH_OP_MOV_IMM || op&~7==SLASH_OP_IMM_U32))
+    i.u8[0]=MODR_RIP_REL_IMM_U32;
+  ICModr2(tmpi,i,t1,d1,rip);
 }
 
-U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 ip)
+U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 rip)
 {
   switch (Bsr(t1)) {
     case MDf_REG:
@@ -306,7 +325,7 @@ U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 ip)
 	ICU8(tmpi,0x68);
 	ICU32(tmpi,d1);
       } else {
-	ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t1,r1,d1,ip);
+	ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t1,r1,d1,rip);
 	ICU8(tmpi,0x50+REG_RBX);
       }
       return;
@@ -319,12 +338,12 @@ U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 ip)
 	case RT_I64:
 	case RT_U64:
 	case RT_F64:
-	  ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_PUSH,ip);
+	  ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_PUSH,rip);
 	  return;
       }
       break;
   }
-  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t1,r1,d1,ip);
+  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t1,r1,d1,rip);
   ICU16(tmpi,0x5048+REG_RBX<<8);
 }
 
@@ -341,7 +360,7 @@ U0 ICPushRegs(CIntermediateCode *tmpi,I64 mask)
   }
 }
 
-U0 ICPop(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 ip)
+U0 ICPop(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 rip)
 {
   switch (Bsr(t1)) {
     case MDf_REG:
@@ -355,14 +374,14 @@ U0 ICPop(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 ip)
     case MDf_SIB:
       if (t1.raw_type<RT_I64) {
 	ICU8(tmpi,0x58+REG_RBX);
-	ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,ip);
+	ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,rip);
       } else
-	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_POP,ip);
+	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_POP,rip);
       break;
     case MDf_STK:
     case MDf_IMM:
       ICU8(tmpi,0x58+REG_RBX);
-      ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,ip);
+      ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,rip);
       break;
     default:
       ICAddRSP(tmpi,8);
@@ -424,7 +443,7 @@ I64 ICBuiltInFloatConst(F64 d)
 }
 
 U0 ICMov(CIntermediateCode *tmpi,
-	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 ip)
+	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 rip)
 {
   I64 i,cnt1,cnt2,b1_rex,b2_rex,b1,b2,b1_modr,b2_modr,
 	b1_r1,b1_r2,b2_r1,b2_r2,last_start=tmpi->ic_cnt;
@@ -485,7 +504,7 @@ U0 ICMov(CIntermediateCode *tmpi,
 	  ICU64(tmpi,d2);
 	}
       } else if (t2&MDF_STK)
-	ICPop(tmpi,t1,r1,d1,ip);
+	ICPop(tmpi,t1,r1,d1,rip);
       else {
 	if (r1==r2 && t2&MDF_REG)
 	  goto move_done;
@@ -515,16 +534,16 @@ U0 ICMov(CIntermediateCode *tmpi,
 	  default:
 	    ICU16(tmpi,i.u8[2]<<8+0x8B);
 	}
-	ICModr2(tmpi,i,d2,ip+4);
+	ICModr2(tmpi,i,,d2,rip);
       }
       break;
     case MDf_STK:
       if (tmpi->ic_flags&ICF_PUSH_CMP)
 	ICPopRegs(tmpi,1<<REG_RBX);
       if (t1.raw_type<t2.raw_type)
-	ICPush(tmpi,t2&MDG_MASK+t1.raw_type,r2,d2,ip);
+	ICPush(tmpi,t2&MDG_MASK+t1.raw_type,r2,d2,rip);
       else
-	ICPush(tmpi,t2,r2,d2,ip);
+	ICPush(tmpi,t2,r2,d2,rip);
       if (tmpi->ic_flags&ICF_PUSH_CMP)
 	ICPushRegs(tmpi,1<<REG_RBX);
       break;
@@ -532,42 +551,7 @@ U0 ICMov(CIntermediateCode *tmpi,
     case MDf_RIP_DISP32:
     case MDf_SIB:
       if (t2&MDF_IMM && (t1.raw_type<RT_I64 || (MIN_I32<=d2<=MAX_I32))) {
-	i=ICModr1(0,t1,r1,d1);
-	switch (t1.raw_type) {
-	  case RT_I8:
-	  case RT_U8:
-	    ICRex(tmpi,i.u8[1]);
-	    ICU16(tmpi,i.u8[2]<<8+0xC6);
-	    break;
-	  case RT_U16:
-	  case RT_I16:
-	    ICOpSizeRex(tmpi,i.u8[1]);
-	    ICU16(tmpi,i.u8[2]<<8+0xC7);
-	    break;
-	  default:
-	    ICRex(tmpi,i.u8[1]);
-	    ICU16(tmpi,i.u8[2]<<8+0xC7);
-	}
-	if (i.u8[0]!=MODR_RIP_REL)
-	  ICModr2(tmpi,i,d1,);
-	else {
-	  i=d1-(ip+tmpi->ic_cnt+4);
-	  switch (t1.raw_type) {
-	    case RT_I8:
-	    case RT_U8:
-	      i--;
-	      break;
-	    case RT_I16:
-	    case RT_U16:
-	      i-=2;
-	      break;
-	    default:
-	      i-=4;
-	  }
-	  ICU32(tmpi,i);
-	  tmpi->ic_flags&=~ICF_CODE_FINAL;
-	}
-
+	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_MOV_IMM,rip);
 	switch (t1.raw_type) {
 	  case RT_I8:
 	  case RT_U8:
@@ -582,10 +566,10 @@ U0 ICMov(CIntermediateCode *tmpi,
 	}
       } else {
 	if (t2&MDF_REG)
-	  ICSlashOp(tmpi,t1,r1,d1,r2+SLASH_OP_MOV,ip);
+	  ICSlashOp(tmpi,t1,r1,d1,r2+SLASH_OP_MOV,rip);
 	else {
-	  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t2,r2,d2,ip);
-	  ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,ip);
+	  ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,t2,r2,d2,rip);
+	  ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RBX,0,rip);
 	}
       }
       break;
@@ -675,7 +659,7 @@ move_redundant:
 }
 
 U0 ICLea(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
-	CICType t2,I64 r2,I64 d2,CCmpCtrl *cc,U8 *buf,I64 ip)
+	CICType t2,I64 r2,I64 d2,CCmpCtrl *cc,U8 *buf,I64 rip)
 {
   I64 i;
   CAOTAbsAddr *tmpa;
@@ -684,7 +668,7 @@ U0 ICLea(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
       i=ICModr1(r1,t2,r2,d2);
       i.u8[1]|=0x48;
       ICU24(tmpi,i.u8[2]<<16+0x8D00+i.u8[1]);
-      ICModr2(tmpi,i,d2,ip+4);
+      ICModr2(tmpi,i,,d2,rip);
       break;
     case MDf_STK:
       if (t2&MDF_RIP_DISP32) {
@@ -695,30 +679,30 @@ U0 ICLea(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
 	  tmpa->next=cc->aotc->abss;
 	  tmpa->type=AAT_ADD_U32;
 	  cc->aotc->abss=tmpa;
-	  tmpa->ip=ip+tmpi->ic_cnt-4;
+	  tmpa->rip=rip+tmpi->ic_cnt-4;
 	}
 	tmpi->ic_flags&=~ICF_CODE_FINAL;
 	break;
       } // Fall thru
     default:
-      ICLea(tmpi,MDF_REG+RT_I64,REG_RCX,0,t2,r2,d2,cc,buf,ip);
-      ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RCX,0,ip);
+      ICLea(tmpi,MDF_REG+RT_I64,REG_RCX,0,t2,r2,d2,cc,buf,rip);
+      ICMov(tmpi,t1,r1,d1,MDF_REG+RT_I64,REG_RCX,0,rip);
   }
 }
 
-U0 ICDeref(CIntermediateCode *tmpi,I64 ip)
+U0 ICDeref(CIntermediateCode *tmpi,I64 rip)
 {
   CICType t;
-  t=tmpi->r.type.raw_type;
-  if (t>tmpi->a1_type_pointed_to)
-    t=tmpi->a1_type_pointed_to;
-  if (tmpi->a1.type&MDF_REG)
-    ICMov(tmpi,tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
-	  MDF_DISP+t,tmpi->a1.reg,tmpi->a1.disp,ip);
+  t=tmpi->res.type.raw_type;
+  if (t>tmpi->arg1_type_pointed_to)
+    t=tmpi->arg1_type_pointed_to;
+  if (tmpi->arg1.type&MDF_REG)
+    ICMov(tmpi,tmpi->res.type,tmpi->res.reg,tmpi->res.disp,
+	  MDF_DISP+t,tmpi->arg1.reg,tmpi->arg1.disp,rip);
   else {
     ICMov(tmpi,MDF_REG+RT_I64,REG_RCX,0,
-	  tmpi->a1.type,tmpi->a1.reg,tmpi->a1.disp,ip);
-    ICMov(tmpi,tmpi->r.type,tmpi->r.reg,tmpi->r.disp,
-	  MDF_DISP+t,REG_RCX,0,ip);
+	  tmpi->arg1.type,tmpi->arg1.reg,tmpi->arg1.disp,rip);
+    ICMov(tmpi,tmpi->res.type,tmpi->res.reg,tmpi->res.disp,
+	  MDF_DISP+t,REG_RCX,0,rip);
   }
 }

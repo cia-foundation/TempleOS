@@ -11,7 +11,7 @@ U0 LexPutToken(CCmpCtrl *cc)
     "FLOAT:%e",cc->cur_f64;
   else if (cc->token=='\n')
     "<NEW_LINE>";
-  else if (Bt(chars_bmp_displayable,cc->token))
+  else if (Bt(char_bmp_displayable,cc->token))
     '' cc->token;
   else {
     "T:%X",cc->token;
@@ -187,38 +187,38 @@ U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tmpi)
   if (opcode>=IC_END_EXP && opcode!=IC_NOP2) {
     "%15ts %016X ",intermediate_code_table[opcode].name,tmpi->ic_data;
     if (cc->pass) {
-      if (tmpi->r.type.mode) {
-	"$$PURPLE$$R:$$FG$$";
-	ICArgPut(&tmpi->r,0);
+      if (tmpi->res.type.mode) {
+	"$$PURPLE$$RES:$$FG$$";
+	ICArgPut(&tmpi->res,0);
       }
-      if (tmpi->a1.type.mode) {
-	"$$PURPLE$$A1:$$FG$$";
+      if (tmpi->arg1.type.mode) {
+	"$$PURPLE$$ARG1:$$FG$$";
 	if (intermediate_code_table[tmpi->ic_code].type==IST_DEREF ||
 	      intermediate_code_table[tmpi->ic_code].type==IST_ASSIGN)
-	  ICArgPut(&tmpi->a1,tmpi->a1_type_pointed_to);
+	  ICArgPut(&tmpi->arg1,tmpi->arg1_type_pointed_to);
 	else
-	  ICArgPut(&tmpi->a1,0);
+	  ICArgPut(&tmpi->arg1,0);
       }
-      if (tmpi->a2.type.mode) {
-	"$$PURPLE$$A2:$$FG$$";
-	ICArgPut(&tmpi->a2,0);
+      if (tmpi->arg2.type.mode) {
+	"$$PURPLE$$ARG2:$$FG$$";
+	ICArgPut(&tmpi->arg2,0);
       }
       "$$PURPLE$$:$$FG$$";
     }
     ICClassPut(tmpi->ic_class);
     if (tmpi->ic_flags & ICF_LOCK)
       "$$BROWN$$lock$$FG$$ ";
-    if (tmpi->ic_flags & ICF_A2_TO_F64)
+    if (tmpi->ic_flags & ICF_ARG2_TO_F64)
       "$$LTBLUE$$a2d$$FG$$ ";
-    if (tmpi->ic_flags & ICF_A2_TO_INT)
+    if (tmpi->ic_flags & ICF_ARG2_TO_INT)
       "$$GREEN$$a2i$$FG$$ ";
-    if (tmpi->ic_flags & ICF_A1_TO_F64)
+    if (tmpi->ic_flags & ICF_ARG1_TO_F64)
       "$$LTBLUE$$a1d$$FG$$ ";
-    if (tmpi->ic_flags & ICF_A1_TO_INT)
+    if (tmpi->ic_flags & ICF_ARG1_TO_INT)
       "$$GREEN$$a1i$$FG$$ ";
-    if (tmpi->ic_flags & ICF_R_TO_F64)
+    if (tmpi->ic_flags & ICF_RES_TO_F64)
       "$$LTBLUE$$rd$$FG$$ ";
-    if (tmpi->ic_flags & ICF_R_TO_INT)
+    if (tmpi->ic_flags & ICF_RES_TO_INT)
       "$$GREEN$$ri$$FG$$ ";
     if (tmpi->ic_flags & ICF_USE_F64)
       "[F64] ";

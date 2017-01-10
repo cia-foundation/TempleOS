@@ -120,9 +120,6 @@ public U8 *DocSave(CDoc *doc,I64 *_size=NULL)
 	case DOCT_TAB:
 	  *dst++='\t';
 	  break;
-	case DOCT_PAGE_BREAK:
-	  *dst++=CH_FORM_FEED;
-	  break;
 	case DOCT_NEW_LINE:
 	  if (doc->flags&DOCF_CARRIAGE_RETURN)
 	    *dst++='\r';

@@ -14,7 +14,7 @@ speed-up.  Depressing.
 
 asm {
 
-LIMIT::	DU64	SAMPLES;	//Memory reference should suck, right?
+LIMIT::	DU64	SAMPLES;	//Memory reference should be bad, right?
 
 _BADLY_UNOPTIMIZED::
 	MOV	RAX,0
@@ -61,7 +61,7 @@ _WELL_OPTIMIZED3::
 	XOR	RAX,RAX
 	MOV	RCX,SAMPLES-1
 @@05:	ADD	RAX,RCX
-	LOOP	@@05	//Inst sucks in speed, but saves code size.
+	LOOP	@@05	//Inst has slow speed, but saves code size.
 	RET
 }
 

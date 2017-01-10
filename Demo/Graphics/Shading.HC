@@ -72,8 +72,8 @@ U0 DrawIt(CTask *task,CDC *dc)
   Mat4x4Scale(dc->r,tt);
   DCMat4x4Set(dc,dc->r);
 
-  ls.x=-(ip.pos.x-task->pix_left-task->scroll_x-cx);
-  ls.y=-(ip.pos.y-task->pix_top-task->scroll_y-cy);
+  ls.x=-(ms.pos.x-task->pix_left-task->scroll_x-cx);
+  ls.y=-(ms.pos.y-task->pix_top-task->scroll_y-cy);
   ls.z=GR_WIDTH/8;
   d=1<<16/D3I32Norm(&ls);
   ls.x*=d;

@@ -1,7 +1,7 @@
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
 
-RegSetDftEntry("TempleOS/CastleFrankenstein","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/CastleFrankenstein");
+RegDft("TempleOS/CastleFrankenstein","F64 best_score=9999;\n");
+RegExe("TempleOS/CastleFrankenstein");
 
 //Set snap to 4 and width to 4
 //if you edit this map.
@@ -224,14 +224,14 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    z1=0;
 	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
-	      SpriteMat3B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<5>",BI=5$,r3);
+	      Sprite3Mat4x4B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<5>",BI=5$,r3);
 	  } else if (c==YELLOW) {
 	    x1=x+SCRN_SCALE/2;
 	    y1=y+SCRN_SCALE/2;
 	    z1=0;
 	    DCTransform(dc,&x1,&y1,&z1);
 	    if (z1>0)
-	      SpriteMat3B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<6>",BI=6$,r3);
+	      Sprite3Mat4x4B(dc,x+SCRN_SCALE/2,y+SCRN_SCALE/2,0,$IB,"<6>",BI=6$,r3);
 	  }
 
 	  if (!map[(yy+1)*map_width+xx]) {
@@ -320,11 +320,11 @@ U0 DrawIt(CTask *task,CDC *dc)
       DCTransform(dc,&xx,&yy,&zz);
       if (zz>0) {
 	if (tmpm->dead)
-	  SpriteMat3B(dc,x,y,0,$IB,"<2>",BI=2$,r2);
+	  Sprite3Mat4x4B(dc,x,y,0,$IB,"<2>",BI=2$,r2);
 	else {
 	  tt=Tri(tS,1.0);
 	  tmps=SpriteInterpolate(tt,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$);
-	  SpriteMat3B(dc,x,y,0,tmps,r1);
+	  Sprite3Mat4x4B(dc,x,y,0,tmps,r1);
 	  Free(tmps);
 	}
       }
@@ -380,7 +380,7 @@ U0 Fire()
   F64 d,dx,dy,xx=Cos(man_é),yy=Sin(man_é);
   Monster *tmpm;
 
-  Noise(100,300,1000);
+  Noise(100,53,74);
   for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
     x=tmpm->x;
     y=tmpm->y;
@@ -489,9 +489,9 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-    Play("2q.A#1eG2AeA#qAq.A#1eG2eAeA#qA");
-    Play("q.A#1eG2A#A1qG2q.A#1eG2A#A1qG");
-    Play("3eA#A2qG3eA#A2qG3eA#A2G3AA#A2qG");
+    Play("3q.A#eGAeA#qAq.A#eGeAeA#qA");
+    Play("3q.A#eGA#AqGq.A#eGA#AqG");
+    Play("4eA#AqGeA#AqGeA#AGAA#AqG");
   }
 }
 
@@ -589,7 +589,7 @@ fs_done:
   SettingsPop;
   CleanUp;
   MenuPop;
-  RegWriteBranch("TempleOS/CastleFrankenstein","F64 best_score=%5.4f;\n",
+  RegWrite("TempleOS/CastleFrankenstein","F64 best_score=%5.4f;\n",
 	best_score);
 }
 

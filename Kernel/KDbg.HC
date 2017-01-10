@@ -1,11 +1,11 @@
 Bool ChkPtr(U8 *ptr)
 {//Check if addr is valid ptr.
-  if (sys_heap_base<=ptr<=MEM_MAPPED_SPACE) {
+  if (mem_heap_base<=ptr<=mem_mapped_space) {
     if (*MemPageTable(ptr)&1)
       return TRUE;
     else
       return FALSE;
-  } else if (ptr<sys_boot_base)
+  } else if (ptr<mem_boot_base)
     return FALSE;
   else if (ptr<VGAM_GRAPHICS)
     return TRUE;
@@ -15,12 +15,12 @@ Bool ChkPtr(U8 *ptr)
 
 Bool ChkCodePtr(U8 *ptr)
 {//Check if addr is valid code addr.
-  if (sys_heap_base<=ptr<=sys_heap_limit) {
+  if (mem_heap_base<=ptr<=mem_heap_limit) {
     if (*MemPageTable(ptr)&1)
       return TRUE;
     else
       return FALSE;
-  } else if (ptr<sys_boot_base)
+  } else if (ptr<mem_boot_base)
     return FALSE;
   else if (ptr<VGAM_GRAPHICS)
     return TRUE;
@@ -37,7 +37,7 @@ Bool ChkOnStk(U8 *ptr,CTask *task=NULL)
     if (&task->stk->stk_base<=ptr<=
 	  (&task->stk->stk_base)(U8 *)+task->stk->stk_size)
       res=TRUE;
-  } else if (sys_heap_base<=ptr<=sys_heap_limit)
+  } else if (mem_heap_base<=ptr<=mem_heap_limit)
     res=TRUE;
   POPFD
   return res;
@@ -214,7 +214,7 @@ U0 Da(U8 **addr,I64 cnt=0x10)
   }
 }
 
-U0 RawPrint(I64 ms=100,U8 *fmt,...)
+U0 RawPrint(I64 mS=100,U8 *fmt,...)
 {//Print using $LK,"Raw",A="MN:Raw"$ scrn output for a length of time.
 //$BK,1$Your heap must be good.$BK,0$
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
@@ -224,14 +224,14 @@ U0 RawPrint(I64 ms=100,U8 *fmt,...)
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
   "%s",buf;
-  BusyWait(ms<<10);
+  Busy(mS<<10);
   POPFD
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
   Free(buf);
 }
 
-U0 RawD(I64 ms=100,U8 *addr,I64 cnt=0x80)
+U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //scrn output for a fixed length
   //of time.
@@ -241,13 +241,13 @@ U0 RawD(I64 ms=100,U8 *addr,I64 cnt=0x80)
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
   D(addr,cnt);
-  BusyWait(ms<<10);
+  Busy(mS<<10);
   POPFD
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
 }
 
-U0 RawDm(I64 ms=100,U8 *addr,I64 cnt=0x80)
+U0 RawDm(I64 mS=100,U8 *addr,I64 cnt=0x80)
 {//Dumps a block of mem using $LK,"Raw",A="MN:Raw"$
 //scrn output for a fixed length
   //of time.
@@ -257,7 +257,7 @@ U0 RawDm(I64 ms=100,U8 *addr,I64 cnt=0x80)
   old_raw=Raw(ON);
   old_input_filter=LBtr(&Fs->task_flags,TASKf_INPUT_FILTER_TASK);
   Dm(addr,cnt);
-  BusyWait(ms<<10);
+  Busy(mS<<10);
   POPFD
   LBEqu(&Fs->task_flags,TASKf_INPUT_FILTER_TASK,old_input_filter);
   Raw(old_raw);
@@ -512,7 +512,7 @@ U0 DbgHelp()
 	">1+2*3+&Print;\t\t\t//Show calculation res.\n"
 	">*(0x70000)(I64 *)=0x123456789;\t//Assign value to 0x70000-0x70007.\n"
 	">_RAX=0x1234;\t\t\t//Set RAX to 0x1234.\n"
-	">_RIP=&SysThrowBreak;\t\t//Set RIP.\n"
+	">_RIP=&Break;\t\t//Set RIP.\n"
 	">I64 i;\t\t\t\t//Declare variable.\n"
 	">i=_RCX+_RDX;\t\t\t//Assign to variable.\n"
 	">U(&Print+0x8);\t\t\t//Unassemble Print.\n"
@@ -535,12 +535,15 @@ U0 Dbg2()
   Bool old_win_inhibit,old_waiting_msg,old_single;
   I64 i,old_getstr2;
   U8 buf[200];
-  if (IsRaw) {
-    i=Fs->rip;
-    Ui(buf,&i);
-    "%s",buf;
+  if (dbg.panic) {
+    if (IsRaw) {
+      i=Fs->rip;
+      Ui(buf,&i);
+      "%s",buf;
+    } else
+      U(Fs->rip,1);
   } else
-    U(Fs->rip,1);
+    dbg.panic=TRUE;
   old_waiting_msg=LBtr(&Fs->task_flags,TASKf_AWAITING_MSG);
   old_win_inhibit=Fs->win_inhibit;
   Fs->win_inhibit=WIG_USER_TASK_DFT;
@@ -549,7 +552,7 @@ U0 Dbg2()
   old_getstr2=fp_getstr2;
   fp_getstr2=&SysGetStr2;
   old_single=SingleUser(OFF);
-  while (!mouse.install_attempts)
+  while (!ms_hard.install_attempts)
     Yield;
   SingleUser(old_single);
   UserTaskCont;
@@ -575,7 +578,7 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
   }
   "\n\tTempleOS Debugger\n\n"
 	">Help;\t//For help.\n\n";
-  Beep(500,TRUE);
+  Beep(62,TRUE);
   if (fault_num==I_DBG) {
     if (dbg.msg) {
       "\n!!! %s",dbg.msg;
@@ -584,7 +587,8 @@ U0 Fault3(I64 fault_num,I64 fault_err_code)
       " !!!\n\n";
     }
   }
-  CallerRep;
+  if (dbg.panic)
+    CallerRep;
   Dbg2;
   POPFD
 }
@@ -631,12 +635,18 @@ U0 Fault2(I64 fault_num,I64 fault_err_code)
     Exit;
 }
 
-U0 Dbg(U8 *msg=NULL,I64 msg_num=0)
-{//Enters the debugger.Can be used as a panic.
+U0 Panic(U8 *msg=NULL,I64 msg_num=0,Bool panic=TRUE)
+{//Enter the debugger with panic?
   PUSHFD
   CLI
   dbg.msg=msg;
   dbg.msg_num=msg_num;
+  dbg.panic=panic;
   INT I_DBG
   POPFD
+}
+
+U0 Dbg(U8 *msg=NULL,I64 msg_num=0)
+{//Enter debugger, no panic.
+  Panic(msg,msg_num,FALSE);
 }

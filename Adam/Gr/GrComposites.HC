@@ -294,19 +294,19 @@ mesh_done:
   return res;
 }
 
-#help_index "Graphics/Misc;Input Pointer/Displayed Image"
-public U0 DrawStdInputPtr(CDC *dc,I64 x,I64 y)
+#help_index "Graphics/Misc;Mouse/Ptr"
+public U0 DrawStdMs(CDC *dc,I64 x,I64 y)
 {//This is a callback. See $LK,"::/Demo/Graphics/Grid.HC"$.
-//Called by $LK,"DrawInputPtr",A="MN:DrawInputPtr"$() which is
+//Called by $LK,"DrawMs",A="MN:DrawMs"$() which is
   //called by $LK,"WinFinalUpdate",A="MN:WinFinalUpdate"$().
   dc->pen_width=1;
   dc->flags&=~(DCF_TRANSFORMATION|DCF_SYMMETRY);
   GrArrow3(dc,x+8,y+8,0,x,y,0);
 }
 
-gr.fp_draw_input_ptr=&DrawStdInputPtr;
+gr.fp_draw_ms=&DrawStdMs;
 
-public U0 DrawWaitInputPtr(CDC *dc,I64 x,I64 y)
+public U0 DrawWaitMs(CDC *dc,I64 x,I64 y)
 {//This is a callback. See $LK,"::/Demo/Graphics/Grid.HC"$.
   I64 old_pen_width=dc->pen_width;
   CColorROPU32 old_color=dc->color;
@@ -319,4 +319,26 @@ public U0 DrawWaitInputPtr(CDC *dc,I64 x,I64 y)
   GrLine(dc,x-6,y+6,x+6,y-6);
   dc->pen_width=old_pen_width;
   dc->color=old_color;
+}
+
+#help_index "Graphics/GR Files;Graphics/Scrn"
+public Bool GRScrnCaptureRead(U8 *filename,CDC *dc=gr.dc,I64 x=0,I64 y=0)
+{//GrBlot TempleOS GR File to dc,x,y.
+  CDC *dc2;
+  if (dc2=GRRead(filename)) {
+    dc->color=ROP_EQU;
+    GrBlot(dc,x,y,dc2);
+    DCDel(dc2);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+public I64 GRScrnCaptureWrite(U8 *filename,Bool include_zoom=TRUE)
+{//Capture scrn to a TempleOS GR File.
+  I64 size;
+  CDC *dc=DCScrnCapture(include_zoom);
+  size=GRWrite(filename,dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
+  DCDel(dc);
+  return size;
 }

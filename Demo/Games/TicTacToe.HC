@@ -35,12 +35,12 @@ U0 DrawBoard(I64 player)
 	break;
 
     }
-//ip.pos.x,ip.pos.y are input pointer (mouse) x,y.
-    //ip.lb	is mouse left button
+//ms.pos.x,ms.pos.y are mouse x,y.
+    //ms.lb	is mouse left bttn
   if (player==1)
-    DrawX(dc,ip.pos.x-Fs->pix_left,ip.pos.y-Fs->pix_top);
+    DrawX(dc,ms.pos.x-Fs->pix_left,ms.pos.y-Fs->pix_top);
   else
-    DrawO(dc,ip.pos.x-Fs->pix_left,ip.pos.y-Fs->pix_top);
+    DrawO(dc,ms.pos.x-Fs->pix_left,ms.pos.y-Fs->pix_top);
   DCDel(dc);
 }
 
@@ -49,19 +49,19 @@ U0 TakeTurn(I64 player)
   I64 i,x=0,y=0;
   while (!(100<=x<400) || !(100<=y<400) || board[i]) {
     if (player==1)
-      Beep(500);
+      Beep;
     else
-      Beep(1000);
-    while (!ip.lb) {
+      Beep(74);
+    while (!ms.lb) {
       DrawBoard(player);
       Refresh;
     }
-    while (ip.lb) {
+    while (ms.lb) {
       DrawBoard(player);
       Refresh;
     }
-    x=ip.pos.x-Fs->pix_left;
-    y=ip.pos.y-Fs->pix_top;
+    x=ms.pos.x-Fs->pix_left;
+    y=ms.pos.y-Fs->pix_top;
     i=(x-100)/100+(y-100)/100*3;
   }
   board[i]=player;
@@ -91,18 +91,18 @@ U0 DoGame()
   while (TRUE) {
     TakeTurn(1);
     if (CheckWinner(1)) {
-      Beep(500);
-      Beep(500);
-      Beep(500);
+      Beep;
+      Beep;
+      Beep;
       break;
     }
     if (++moves==9) break;
 
     TakeTurn(2);
     if (CheckWinner(2)) {
-      Beep(1000);
-      Beep(1000);
-      Beep(1000);
+      Beep(74);
+      Beep(74);
+      Beep(74);
       break;
     }
     if (++moves==9) break;

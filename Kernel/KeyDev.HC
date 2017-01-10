@@ -54,10 +54,10 @@ U0 PutS(U8 *st)
 }
 
 U0 KeyDescSet(U8 *fmt,...)
-{//Call this from key handler to report desc in $LK,"KeyMap",A="MN:KeyMap"$().
+{//Call this from key hndlr to report desc in $LK,"KeyMap",A="MN:KeyMap"$().
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
   StrCpy(keydev.desc,buf);
-  keydev.handler=Caller;
+  keydev.hndlr=Caller;
   Free(buf);
 }
 
@@ -127,12 +127,12 @@ Bool KDInputFilterPutS(U8 *st)
 
 U0 CtrlAltDel(I64)
 {
-  LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_DEL);
+  LBts(sys_ctrl_alt_flags,CTRL_ALT_DEL);
 }
 
 U0 CtrlAltC(I64)
 {
-  LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_C);
+  LBts(sys_ctrl_alt_flags,CTRL_ALT_C);
 }
 
 U0 CtrlAltD(I64)
@@ -157,7 +157,7 @@ U0 CtrlAltM(I64)
 
 U0 CtrlAltN(I64)
 {
-  LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_TAB);
+  LBts(sys_ctrl_alt_flags,CTRL_ALT_TAB);
 }
 
 U0 CtrlAltT(I64)
@@ -172,15 +172,15 @@ U0 CtrlAltV(I64)
 
 U0 CtrlAltX(I64)
 {
-  LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_X);
+  LBts(sys_ctrl_alt_flags,CTRL_ALT_X);
 }
 
-U0 CtrlAltCBSet(U8 ch,U0 (*fp_handler)(I64 sc),
+U0 CtrlAltCBSet(U8 ch,U0 (*fp_hndlr)(I64 sc),
 	U8 *no_shift_desc=NULL,U8 *shift_desc=NULL,Bool in_irq=FALSE)
 {//Set callback for <CTRL-ALT-letter>.
   ch=ToUpper(ch)-'A';
   if (ch<26) {
-    keydev.fp_ctrl_alt_cbs[ch]=fp_handler;
+    keydev.fp_ctrl_alt_cbs[ch]=fp_hndlr;
 
     Free(keydev.ctrl_alt_no_shift_descs[ch]);
     if (no_shift_desc)

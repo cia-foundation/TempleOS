@@ -44,8 +44,8 @@ Bool BlkDevInit(CBlkDev *bd)
 	}
 	dv->fs_type=FSt_REDSEA;
 	dv->size=bd->max_blk+1-bd->drv_offset;
-	if (RedSeaDrvValidate(bd->first_drv_let))
-	  RedSeaDrvInit(dv);
+	if (RedSeaValidate(bd->first_drv_let))
+	  RedSeaInit(dv);
 	else
 	  RedSeaFmt(bd->first_drv_let);
 	res=TRUE;
@@ -54,21 +54,25 @@ Bool BlkDevInit(CBlkDev *bd)
 	if (FileFind(bd->file_dsk_name,&de,FUF_JUST_FILES)) {
 	  bd->max_blk=de.size>>BLK_SIZE_BITS-1;
 	  try bd->file_dsk=FOpen(bd->file_dsk_name,"rc",bd->max_blk+1);
-	  catch
+	  catch {
+	    if (Fs->except_ch=='File')
+	      PrintErr("Not Contiguous.  Move file to filename.ISO.C.\n");
 	    Fs->catch_except=TRUE;
+	  }
 	  if (bd->file_dsk) {
 	    dv->fs_type=FSt_REDSEA;
 	    dv->size=bd->max_blk+1-bd->drv_offset;
-	    if (RedSeaDrvValidate(bd->first_drv_let)) {
-	      RedSeaDrvInit(dv);
+	    if (RedSeaValidate(bd->first_drv_let)) {
+	      RedSeaInit(dv);
 	      res=TRUE;
-	    }
+	    } else
+	      PrintErr("Not RedSea\n");
 	  }
 	}
 	break;
       case BDT_ISO_FILE_WRITE:
 	if (!bd->file_dsk_name) {
-	  StrPrint(buf,"%C:/Drv%C.DRV.C",
+	  StrPrint(buf,"%C:/Drv%C.ISO.C",
 		blkdev.boot_drv_let,bd->first_drv_let);
 	  bd->file_dsk_name=AStrNew(buf);
 	}
@@ -78,6 +82,7 @@ Bool BlkDevInit(CBlkDev *bd)
 	dv->fs_type=FSt_REDSEA;
 	dv->size=bd->max_blk+1-bd->drv_offset;
 	RedSeaFmt(bd->first_drv_let);
+	CallExtStr("RedSeaISO9660",bd->file_dsk_name,bd->first_drv_let);
 	res=TRUE;
 	break;
       case BDT_ATA:

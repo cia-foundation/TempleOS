@@ -96,7 +96,7 @@ public Bool IsInHeapCtrl(U8 *a,CHeapCtrl *hc,Bool lock=TRUE)
       PAUSE
   m=hc->next_mem_blk;
   while (m!=&hc->next_mem_blk) {
-    if (a>=m && a<m(U8 *)+m->pages<<MEM_PAGE_BITS) {
+    if (a>=m && a<m(U8 *)+m->pags<<MEM_PAG_BITS) {
       if (lock)
 	LBtr(&hc->locked_flags,HClf_LOCKED);
       POPFD

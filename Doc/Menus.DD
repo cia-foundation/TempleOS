@@ -21,7 +21,7 @@ Help
   About(,'/');
 }
 $FG$
-The first arg is the msg code and it is optional with the default being $LK,"MSG_KEY_DOWN_UP",A="MN:MSG_KEY_DOWN_UP"$.  The second arg is the msg $FG,2$a1$FG$ value which is $LK,"ASCII",A="MN:CH_CTRLA"$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.  The third arg is the msg $FG,2$a2$FG$ value which is the $LK,"scan_code",A="FI:::/Doc/CharOverview.DD"$$FG$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.
+The first arg is the msg code and it is optional with the default being $LK,"MSG_KEY_DOWN_UP",A="MN:MSG_KEY_DOWN_UP"$.  The second arg is the msg $FG,2$arg1$FG$ value which is $LK,"ASCII",A="MN:CH_CTRLA"$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.  The third arg is the msg $FG,2$arg2$FG$ value which is the $LK,"scan_code",A="FI:::/Doc/CharOverview.DD"$$FG$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.
 
 Press $FG,2$<CTRL-SHIFT-l>$FG$ and "Insert ASCII/ScanCode".
 

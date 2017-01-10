@@ -466,17 +466,17 @@ I64 PrsFunCall(CCmpCtrl *cc,CPrsStk *ps,Bool indirect,CHashFun *tmpf)
 	throw('Compiler');
       else {
 	COCPush(cc);
-	cc->pass=0;	  OptPass012(cc);
+	cc->pass=0;	 OptPass012(cc);
 	cc->pass=1; tmpi=OptPass012(cc);
 	COCPop(cc);
 	last_class=OptClassFwd(tmpi->ic_class);
 	tmpc2=OptClassFwd(tmpm->member_class);
 	if (tmpc2->raw_type==RT_F64 && !tmpm->dim.next &&
 	      last_class->raw_type!=RT_F64)
-	  tmpi->ic_flags|=ICF_R_TO_F64;
+	  tmpi->ic_flags|=ICF_RES_TO_F64;
 	else
 	  if (tmpc2->raw_type!=RT_F64 && last_class->raw_type==RT_F64)
-	    tmpi->ic_flags|=ICF_R_TO_INT;
+	    tmpi->ic_flags|=ICF_RES_TO_INT;
       }
     }
     COCPush(cc);
@@ -703,12 +703,13 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	if (cc->flags & CCF_ASM_EXPRESSIONS) {
 	  cc->abs_cnts.abs_addres++;
 	  if (cc->flags&CCF_AOT_COMPILE)
-	    ICAdd(cc,IC_ABS_ADDR,cc->aotc->ip,cmp.internal_types[RT_PTR]);
+	    ICAdd(cc,IC_ABS_ADDR,cc->aotc->rip,cmp.internal_types[RT_PTR]);
 	  else
-	    ICAdd(cc,IC_IMM_I64,cc->aotc->ip,cmp.internal_types[RT_PTR]);
+	    ICAdd(cc,IC_IMM_I64,cc->aotc->rip,cmp.internal_types[RT_PTR]);
 	} else {
-	  if (cc->flags&CCF_CLASS_IP)
-	    ICAdd(cc,IC_IMM_I64,cc->class_ip,cmp.internal_types[RT_I64]);
+	  if (cc->flags&CCF_CLASS_DOL_OFFSET)
+	    ICAdd(cc,IC_IMM_I64,cc->class_dol_offset,
+		  cmp.internal_types[RT_I64]);
 	  else
 	    ICAdd(cc,IC_RIP,0,cmp.internal_types[RT_PTR]);
 	}
@@ -772,7 +773,7 @@ I64 PrsUnaryTerm(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 //	if (tmpg->flags&GVF_DATA_HEAP) //TODO
 	    //	  ICAdd(cc,IC_HEAP_GLBL,tmpm->static_data,tmpc);
 	    //	else
-	    ICAdd(cc,IC_ABS_ADDR,tmpm->static_data_ip,tmpc);
+	    ICAdd(cc,IC_ABS_ADDR,tmpm->static_data_rip,tmpc);
 	  } else
 	    ICAdd(cc,IC_IMM_I64,tmpm->static_data,tmpc);
 	} else {
@@ -878,7 +879,7 @@ pu_export_sys_sym:
 		if (tmpg->flags&GVF_DATA_HEAP)
 		  ICAdd(cc,IC_HEAP_GLBL,tmpg->heap_glbl,tmpc);
 		else
-		  ICAdd(cc,IC_ABS_ADDR,tmpg->data_addr_ip,tmpc);
+		  ICAdd(cc,IC_ABS_ADDR,tmpg->data_addr_rip,tmpc);
 	      }
 	    }
 	  } else {
@@ -1070,7 +1071,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	    LexExcept(cc,"Missing ']' at ");
 	  Lex(cc); //skip ]
 	  tmpi1=cc->coc.coc_head.last;
-	  tmpi1->ic_flags|=ICF_R_TO_INT;
+	  tmpi1->ic_flags|=ICF_RES_TO_INT;
 	  ICAdd(cc,IC_MUL,0,tmpc);
 	  ICAdd(cc,IC_ADD,0,tmpc);
 	  cc->flags|=CCF_RAX;
@@ -1086,7 +1087,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
 	LexExcept(cc,"Missing ']' at ");
       Lex(cc); //skip ]
       tmpi1=cc->coc.coc_head.last;
-      tmpi1->ic_flags|=ICF_R_TO_INT;
+      tmpi1->ic_flags|=ICF_RES_TO_INT;
       ICAdd(cc,IC_MUL,0,tmpc);
       ICAdd(cc,IC_ADD,0,tmpc);
       cc->flags&=~(CCF_RAX|CCF_ARRAY);

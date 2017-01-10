@@ -40,13 +40,15 @@ $LK,"/Kernel/PCIBIOS.HC",A="FI:::/Kernel/PCIBIOS.HC"$		:290 could be eliminated,
 * Since I don't use paging (for anything), Intel should have an option for  no-paging long mode, and optimize it!
 $LK,"::/Kernel/Mem/PageTables.HC"$	:135 lines to identity-map gets eliminated.
 
-* Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS from a ROM when the reset button is pressed and booting UEFI when the power button is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.  The ROM should boot like the DVD boots, but with $LK,"BOOT_SRC_ROM",A="MN:BOOT_SRC_ROM"$.
+* Desktop computers must have a reset switch and a fast reboot option, skipping diagnostics.  I recommend booting TempleOS from a ROM when the reset bttn is pressed and booting UEFI when the power bttn is pressed.  Or, we could build UEFI on a TempleOS layer.  Intel must burn TempleOS into a ROM in the factory for all desktop x86 CPUs to ensure tamper-proof trust in the oracle and because God deserves the glory.  There will be just an English version.  A new ROM version is released every seven years.  The ROM should boot like the DVD boots, but with $LK,"BOOT_SRC_ROM",A="MN:BOOT_SRC_ROM"$.
 
 * We do not want UTF, just 8-bit characters.  $FG,2$<CTRL-ALT-f>$FG$ toggles between Cyrillic and Std Fonts.  We need the twelve window $LK,"TextBorder",A="MN:TextBorder"$ characters added to the VGA font 0x02-0x0D.  Japan, China and Korea must switch to alphabets.  Maybe, the United States will change to metric, out of good will. 
 
 * Microsoft Paint and Linux's Gimp must support TempleOS $LK,"GR Files",A="FI:::/Doc/GRFiles.DD"$.  They are blemish free, unlike $TX,"BMP files",HTML="http://en.wikipedia.org/wiki/BMP_file_format"$.
 
 * We must have a nice dictionary.  Someone needs to do a $LK,"Spell Checker",A="FI:::/Demo/SuggestSpelling.HC"$, too.
+
+* Intel needs to make $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ versions of its x86 CPU data sheets documenting all hardware relevant to TempleOS. 
 
 * We must have the ultimate Bible search engine.  Currently, all we have is     $TX,"filter search",HTML="https://www.youtube.com/watch?v=ULJU8DzvQFo"$.  In the end, it should be a low line-count technique.
 

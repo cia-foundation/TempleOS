@@ -18,6 +18,7 @@ LBts(&sys_run_level,RLf_DOC);
 #include "Ctrls/MakeCtrls"
 #include "InFile"
 #include "ARegistry"
+#include "InsReg"
 #include "AutoComplete/MakeAC"
 #include "God/MakeGod"
 #include "AHash"
@@ -26,5 +27,6 @@ LBts(&sys_run_level,RLf_DOC);
 #include "DevInfo"
 #include "ADefine"
 #include "WallPaper"
-#include "AInputPointer"
+#include "AMouse"
+#include "Host"
 Cd("..");;

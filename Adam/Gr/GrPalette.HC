@@ -13,7 +13,7 @@ U0 GrPaletteIndicesSet()
   if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_VGA],0))
+  while (LBts(&sys_semas[SEMA_VGA],0))
     Yield;
   InU8(VGAP_INPUT_STAT); //Rsts attr index/data
   for (i=0;i<NUM_COLORS;i++) {
@@ -23,7 +23,7 @@ U0 GrPaletteIndicesSet()
   OutU8(VGAP_ATTR_INDEX,0x20);
   OutU8(VGAP_ATTR_DATA_WRITE,0); //Dummy write
   InU8(VGAP_INPUT_STAT); //Rsts attr index/data
-  LBtr(&sys_semas[SYS_SEMA_VGA],0);
+  LBtr(&sys_semas[SEMA_VGA],0);
   POPFD
 }
 
@@ -32,14 +32,14 @@ public U0 GrPaletteColorSet(I64 color_num,CBGR48 bgr48)
   if (!Bt(&sys_run_level,RLf_VGA)) return;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_VGA],0))
+  while (LBts(&sys_semas[SEMA_VGA],0))
     Yield;
   OutU8(VGAP_PALETTE_MASK,0xFF);
   OutU8(VGAP_REG_WRITE,color_num);
   OutU8(VGAP_PALETTE_DATA,bgr48.r>>10);
   OutU8(VGAP_PALETTE_DATA,bgr48.g>>10);
   OutU8(VGAP_PALETTE_DATA,bgr48.b>>10);
-  LBtr(&sys_semas[SYS_SEMA_VGA],0);
+  LBtr(&sys_semas[SEMA_VGA],0);
   POPFD
 }
 
@@ -49,14 +49,14 @@ public CBGR48 GrPaletteColorGet(I64 color_num)
   if (!Bt(&sys_run_level,RLf_VGA)) return 0;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_VGA],0))
+  while (LBts(&sys_semas[SEMA_VGA],0))
     Yield;
   OutU8(VGAP_PALETTE_MASK,0xFF);
   OutU8(VGAP_REG_READ,color_num);
   res.r=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
   res.g=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
   res.b=0xFFFF<<10*InU8(VGAP_PALETTE_DATA)/0xFC00;
-  LBtr(&sys_semas[SYS_SEMA_VGA],0);
+  LBtr(&sys_semas[SEMA_VGA],0);
   POPFD
   return res;
 }

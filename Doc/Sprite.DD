@@ -2,6 +2,6 @@ $WW,1$A $LK,"CSprite",A="MN:CSprite"$ is an ordered list of $LK,"these",A="MN:SP
 
 See $LK,"::/Demo/Graphics/SpritePlot.HC"$, $LK,"::/Demo/Graphics/SpritePlot3D.HC"$, $LK,"::/Demo/Graphics/SpritePut.HC"$, $LK,"::/Demo/Graphics/SpriteRaw.HC"$ and $LK,"SpriteMeshEd",A="MN:SpriteMeshEd"$().
 
-Be aware that copying $FG,2$SP$FG$, $FG,2$IB$FG$, or $FG,2$IS$FG$ entries with the clipboard ress in duplicate entries with different nums.  You can manually remove dups by editing with $FG,2$<CTRL-t>$FG$ and setting to the original num.
+Be aware that copying $FG,2$SP$FG$, $FG,2$IB$FG$, or $FG,2$IS$FG$ entries with the clipboard results in duplicate entries with different nums.  You can manually remove dups by editing with $FG,2$<CTRL-t>$FG$ and setting to the original num.
 
 See $LK,"::/Adam/Gr/GrSpritePlot.HC",A="FL:::/Adam/Gr/GrSpritePlot.HC,1"$ for how CSprite are stored.$FG$

@@ -144,7 +144,7 @@ stk size, so don't get in the habit.
 $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
 */
   MPCtrl1 job[mp_cnt];
-  CSrvCmd *cmd[mp_cnt];
+  CJob *cmd[mp_cnt];
 
   if (mode==VR_FRIENDLY_UNIT_DIED) {
     MemSet((&vis_unit_bitmap[enemy_player])(U8 *)+
@@ -200,7 +200,7 @@ U0 VisRecalcMap(I64 row,I64 col)
 {
   I64 i,hi,k,cnt;
   MPCtrl2 job[mp_cnt];
-  CSrvCmd *cmd[mp_cnt];
+  CJob *cmd[mp_cnt];
 
   cnt=mp_cnt; //Cores
   hi=map_rows;

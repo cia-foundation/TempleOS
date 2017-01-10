@@ -64,10 +64,10 @@ U0 UnitMoveAnimation(Unit *tmpu,I64 r,I64 c,I64 facing)
   move_x=x1; move_y=y1;
   moving=TRUE;
   if (tmpu->infantry)
-    Snd(300);
+    Snd(53);
   else {
     move_facing=tmpu->facing*60.0*ã/180.0;
-    Snd(150);
+    Snd(41);
     while (Wrap(f-move_facing,-ã)<=0) {
       move_facing-=0.03;
       Sleep(5*animation_delay);
@@ -76,12 +76,12 @@ U0 UnitMoveAnimation(Unit *tmpu,I64 r,I64 c,I64 facing)
       move_facing+=0.03;
       Sleep(5*animation_delay);
     }
-    Snd(100);
+    Snd(34);
   }
   move_facing=f;
   RowCol2XY(&x2,&y2,r,c);
   Line(NULL,x1,y1,0,x2,y2,0,&UnitMovePlot);
-  Snd(0);
+  Snd;
   moving_unit=NULL;
   moving=FALSE;
 }

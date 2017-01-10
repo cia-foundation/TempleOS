@@ -11,11 +11,11 @@ local_time_offset=-8*60*60*CDATE_FREQ; //Pacific
 // Remember you can set the time in the BIOS.
 
 //$AN,"",A="mouse_move_scale"$adjust these to set mouse move scale
-mouse.scale.x=0.5;
-mouse.scale.y=0.5;
-mouse.scale.z=5.0; //wheel
+ms_hard.scale.x=0.5;
+ms_hard.scale.y=0.5;
+ms_hard.scale.z=5.0; //wheel
 
 //don't change these
-mouse.prescale.x=mouse.pos.x/mouse.scale.x;
-mouse.prescale.y=mouse.pos.y/mouse.scale.y;
-mouse.prescale.z=mouse.pos.z/mouse.scale.z;
+ms_hard.prescale.x=ms_hard.pos.x/ms_hard.scale.x;
+ms_hard.prescale.y=ms_hard.pos.y/ms_hard.scale.y;
+ms_hard.prescale.z=ms_hard.pos.z/ms_hard.scale.z;

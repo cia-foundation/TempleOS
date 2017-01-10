@@ -10,7 +10,8 @@ import Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
 extern U0 AdamErr(U8 *fmt,...);
 extern U0 AdamLog(U8 *fmt,...);
 extern I64 BIOSTotalMem();
-extern I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free);
+extern I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=MIN_I64,
+	Bool whole_drv,Bool make_free);
 extern CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE);
 extern Bool BlkDevLock(CBlkDev *bd);
 extern CBlkDev *BlkDevNextFreeSlot(U8 first_drv_let,I64 type);
@@ -19,7 +20,6 @@ extern U0 BlkDevsRelease();
 extern U8 *Caller(I64 num=1);
 extern U8 *CatPrint(U8 *_dst,U8 *fmt,...);
 extern Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE);
-extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
 extern U0 DbgHelp();
 extern U8 *Define(U8 *dname);
 extern I64 DefineMatch(U8 *needle,U8 *haystack_lst_dname,I64 flags=0);
@@ -40,9 +40,9 @@ extern I64 FAT32AllocClusters(CDrv *dv,I64 c,I64 cnt);
 extern I64 FAT32AllocContiguousClusters(CDrv *dv,I64 cnt);
 extern Bool FAT32DirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,
 	Bool free_old_chain);
-extern U0 FAT32DrvInit(CDrv *dv);
 extern Bool FAT32FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0);
+extern U0 FAT32Init(CDrv *dv);
 extern U0 FClose(CFile *f);
 extern CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0);
 extern Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1);
@@ -59,18 +59,24 @@ extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
 extern Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0);
-extern Bool ISODrvInit(CDrv *dv,I64 blk);
+extern Bool ISOInit(CDrv *dv,I64 blk);
 extern Bool IsDbgMode();
 extern Bool IsDir(U8 *dir_name);
 extern Bool IsRaw();
+extern U0 JobCtrlInit(CJobCtrl *ctrl);
+extern U0 JobDel(CJob *tmpc);
+extern U0 JobQueDel(CJob *head);
+extern I64 JobsHndlr(I64 run_flags,CTask *task=NULL);
 extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
 extern I64 Let2BlkDevType(U8 drv_let);
 extern CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE);
+extern U8 Let2Let(U8 drv_let=0);
 extern U0 MPInt(U8 num,I64 cpu_num=1);
 extern U8 *MStrPrint(U8 *fmt,...);
 extern Bool MkDir(U8 *filename,I64 entry_cnt=0);
-extern U0 MouseIPSet(I64 x,I64 y,I64 z,I64 l,I64 r);
-extern U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0);
+extern U0 MsHardSet(I64 x,I64 y,I64 z,I64 l,I64 r);
+extern U0 Msg(I64 msg_code,I64 arg1,I64 arg2,I64 flags=0);
+extern U0 Panic(U8 *msg=NULL,I64 msg_num=0,Bool panic=TRUE);
 extern I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL);
 extern U0 Print(U8 *fmt,...);
 extern U0 PutChars(U64 ch);
@@ -79,24 +85,20 @@ extern Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
 extern I64 RedSeaAllocClusters(CDrv *dv,I64 cnt);
 extern Bool RedSeaDirNew(CDrv *dv,U8 *cur_dir,CDirEntry *tmpde,
 	Bool free_old_chain);
-extern U0 RedSeaDrvInit(CDrv *dv);
-extern Bool RedSeaDrvValidate(U8 drv_let);
 extern Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0);
 extern U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE);
 extern U0 RedSeaFreeFreeLst(CDrv *dv);
+extern U0 RedSeaInit(CDrv *dv);
+extern Bool RedSeaValidate(U8 drv_let);
 extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
     U8 *task_name=NULL,I64 target_cpu,CTask *parent=NULL, //NULL means adam
-    I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
-extern U0 SrvCmdDel(CSrvCmd *tmpc);
-extern U0 SrvCmdQueDel(CSrvCmd *head);
-extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
-extern U0 SrvCtrlInit(CSrvCtrl *ctrl);
+    I64 stk_size=0,I64 flags=1<<JOBf_ADD_TO_QUE);
 extern U8 *StrPrint(U8 *dst,U8 *fmt,...);
 extern U0 StrPrintFunSeg(U8 *buf,I64 addr,I64 field_len,I64 flags);
 extern Bool Suspend(CTask *task=NULL,Bool state=TRUE);
-extern CSrvCmd *TaskMsg(CTask *_srv,CTask *master,
-	I64 msg_code,I64 a1,I64 a2,I64 flags);
+extern CJob *TaskMsg(CTask *_srv,CTask *master,
+	I64 msg_code,I64 arg1,I64 arg2,I64 flags);
 extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
 extern Bool TaskValidate(CTask *task);
 extern U0 TaskWait(CTask *task=NULL,Bool cmd_line_pmt=FALSE);

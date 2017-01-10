@@ -37,7 +37,7 @@ F64 F(Complex *x)
   CDiv(&n1,&num,&denom);
 
   R2P(&m,&a,n1.x,n1.y);
-  if (ip.rb)
+  if (ms.rb)
     return ã+a;
   else
     return m;
@@ -65,7 +65,7 @@ F64 MPDraw(CTask *task)
 
 U0 Draw()
 {
-  CSrvCmd *tmpm[MP_MAX_PROCESSORS];
+  CJob *tmpm[MP_MAX_PROCESSORS];
   F64 y_total,old_y_total=MAX_F64;
   I64 i,w=Fs->pix_width,h=Fs->pix_height,cx=w/2,cy=h/2;
   CDC *dc=DCAlias;
@@ -94,7 +94,7 @@ U0 Draw()
 
 U0 PoleZeros()
 {
-  I64 msg_code,a1,a2,p11,p22,cx,cy;
+  I64 msg_code,arg1,arg2,p11,p22,cx,cy;
   Complex *tmpc=NULL;
 
   PopUpOk(
@@ -118,24 +118,25 @@ U0 PoleZeros()
   try {
     Draw;
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
-	    1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+1<<MSG_IP_R_UP+1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN+1<<MSG_MS_L_DOWN+
+	    1<<MSG_MS_L_UP+1<<MSG_MS_R_DOWN+1<<MSG_MS_R_UP+1<<MSG_MS_MOVE);
 pz_msg:
       cx=Fs->pix_width/2;
       cy=Fs->pix_height/2;
       switch (msg_code) {
-	case MSG_IP_L_DOWN:
-	  tmpc=PoleZeroFind(a1-cx,cy-a2);
+	case MSG_MS_L_DOWN:
+	  tmpc=PoleZeroFind(arg1-cx,cy-arg2);
 	  break;
-	case MSG_IP_MOVE:
+	case MSG_MS_MOVE:
 	  if (tmpc) {
-	    p11=a1;p22=a2;
+	    p11=arg1;p22=arg2;
 //get to last mouse move
-	    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+
-		  1<<MSG_IP_L_UP+1<<MSG_IP_R_DOWN+
-		  1<<MSG_IP_R_UP+1<<MSG_IP_MOVE))
-	      if (msg_code==MSG_IP_MOVE) {
-		p11=a1;p22=a2;
+	    while (msg_code=ScanMsg(&arg1,&arg2,
+		  1<<MSG_KEY_DOWN+1<<MSG_MS_L_DOWN+
+		  1<<MSG_MS_L_UP+1<<MSG_MS_R_DOWN+
+		  1<<MSG_MS_R_UP+1<<MSG_MS_MOVE))
+	      if (msg_code==MSG_MS_MOVE) {
+		p11=arg1;p22=arg2;
 	      } else
 		goto pz_msg;
 
@@ -144,20 +145,20 @@ pz_msg:
 	    Draw;
 	  }
 	  break;
-	case MSG_IP_L_UP:
+	case MSG_MS_L_UP:
 	  if (tmpc) {
-	    tmpc->x=a1-cx;
-	    tmpc->y=cy-a2;
+	    tmpc->x=arg1-cx;
+	    tmpc->y=cy-arg2;
 	    tmpc=NULL;
 	    Draw;
 	  }
 	  break;
-	case MSG_IP_R_DOWN:
-	case MSG_IP_R_UP:
+	case MSG_MS_R_DOWN:
+	case MSG_MS_R_UP:
 	  Draw;
 	  break;
 	case MSG_KEY_DOWN:
-	  if (a1==CH_SHIFT_ESC||a1==CH_ESC)
+	  if (arg1==CH_SHIFT_ESC||arg1==CH_ESC)
 	    goto pz_done;
       }
       Refresh;

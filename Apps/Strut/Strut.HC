@@ -28,7 +28,7 @@ class MySpring:CSpring
 #define MMD_NUM_MODES	2
 CColorROPU32 main_mode_colors[MMD_NUM_MODES]={LTRED,LTGREEN};
 DefineLstLoad("ST_MAIN_MODES","Edit\0Play\0");
-CCtrlButtonState main_mode_button;
+CCtrlBttnState main_mode_bttn;
 
 //Edit Modes
 #define EMD_MASS	0
@@ -39,7 +39,7 @@ CCtrlButtonState main_mode_button;
 #define EMD_NUM_MODES	5
 CColorROPU32 edit_mode_colors[EMD_NUM_MODES]={LTGRAY,LTCYAN,CYAN,YELLOW,LTBLUE};
 DefineLstLoad("ST_EDIT_MODES","Mass\0Spring\0Connector\0Thruster\0Move\0");
-CCtrlButtonState edit_mode_button;
+CCtrlBttnState edit_mode_bttn;
 
 CTask *task;
 F64 zoom;
@@ -64,14 +64,14 @@ U0 W2S(F64 wx,F64 wy,F64 *_sx,F64 *_sy)
 U0 Zoom(F64 d)
 {
   F64 sx,sy,wx,wy;
-  I64 i,x=ip.pos.x,y=ip.pos.y;
+  I64 i,x=ms.pos.x,y=ms.pos.y;
   d=Exp(Ln(d)/ZOOM_STEPS);
   for (i=0;i<ZOOM_STEPS;i++) {
     S2W(x,y,&wx,&wy);
     zoom=Clamp(zoom*d,0.02,50);
     W2S(wx,wy,&sx,&sy);
-    task->scroll_x=ip.pos.x-sx-task->pix_left;
-    task->scroll_y=ip.pos.y-sy-task->pix_top;
+    task->scroll_x=ms.pos.x-sx-task->pix_left;
+    task->scroll_y=ms.pos.y-sy-task->pix_top;
     Sleep(10);
   }
 }
@@ -92,7 +92,7 @@ U0 DrawIt(CTask *,CDC *dc)
   dc->flags|=DCF_TRANSFORMATION;
   Mat4x4Scale(dc->r,zoom);
 
-  switch (main_mode_button.state) {
+  switch (main_mode_bttn.state) {
     case MMD_EDIT:
       task->text_attr=DKGRAY<<4+WHITE;
       dc->color=BLACK;
@@ -105,12 +105,12 @@ U0 DrawIt(CTask *,CDC *dc)
       break;
   }
 
-  if (main_mode_button.state==MMD_EDIT) {
-    if (edit_mode_button.state==EMD_CONNECTOR) {
+  if (main_mode_bttn.state==MMD_EDIT) {
+    if (edit_mode_bttn.state==EMD_CONNECTOR) {
       dc->color=CYAN;
       S2W(FONT_WIDTH*11,FONT_HEIGHT*7,&x1,&y1);
       GrPutChar3(dc,x1,y1,0,next_action_key);
-    } else if (edit_mode_button.state==EMD_THRUSTER) {
+    } else if (edit_mode_bttn.state==EMD_THRUSTER) {
       dc->color=YELLOW;
       S2W(FONT_WIDTH*11,FONT_HEIGHT*7,&x1,&y1);
       GrPutChar3(dc,x1,y1,0,next_action_key);
@@ -164,7 +164,7 @@ U0 DrawIt(CTask *,CDC *dc)
 	}
 	dc->flags&=~DCF_SYMMETRY;
       }
-      SpriteZ3B(dc,x1,y1,0,$IB,"<3>",BI=3$,é);
+      Sprite3ZB(dc,x1,y1,0,$IB,"<3>",BI=3$,é);
       if (zoom>0.5) {
 	dc->color=YELLOW;
 	GrPutChar3(dc,(x1*7+x2)/8,(y1*7+y2)/8,0,tmps->action_key);
@@ -210,7 +210,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 
   tmps=ode->next_spring;
   while (tmps!=&ode->next_spring) {
-    if (main_mode_button.state==MMD_PLAY && tmps->type==EMD_THRUSTER &&
+    if (main_mode_bttn.state==MMD_PLAY && tmps->type==EMD_THRUSTER &&
 	  Bt(kbd.down_bitmap,action_scan_codes[tmps->action_key-'0'])) {
       D3Sub(&p,&tmps->end2->state->x,&tmps->end1->state->x);
       D3Unit(&p);
@@ -320,7 +320,7 @@ U0 CleanUp()
 
 U0 PlayShip()
 {
-  I64 a1,a2;
+  I64 arg1,arg2;
   F64 last_noise=0;
   Bool okay;
   ode->flags&=~ODEF_PAUSED;
@@ -353,14 +353,14 @@ U0 PlayShip()
 	);
   DocClear;
   try {
-    while (main_mode_button.state==MMD_PLAY) {
+    while (main_mode_bttn.state==MMD_PLAY) {
       BreakConnectors;
-      switch (ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
+      switch (ScanMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '0'...'9':
 	      if (tS>last_noise+0.25) {
-		Noise(250,40,200);
+		Noise(250,18,46);
 		last_noise=tS;
 	      }
 	      break;
@@ -378,8 +378,8 @@ U0 PlayShip()
 	      ode->drag_v3=0.0001;
 	      break;
 	    case CH_SPACE:
-	      if (++main_mode_button.state==MMD_NUM_MODES)
-		main_mode_button.state=0;
+	      if (++main_mode_bttn.state==MMD_NUM_MODES)
+		main_mode_bttn.state=0;
 	      GetMsg(,,1<<MSG_KEY_UP);
 	      goto ps_done;
 	    case CH_SHIFT_ESC:
@@ -388,7 +388,7 @@ U0 PlayShip()
 	  }
 	  break;
 	case MSG_KEY_UP:
-	  switch (a1) {
+	  switch (arg1) {
 	    case 'd':
 	      ode->drag_v2=0.000002;
 	      ode->drag_v3=0.0000001;
@@ -411,12 +411,12 @@ ps_done: //Don't goto out of try
 
 U0 EditShip()
 {
-  I64 a1,a2;
+  I64 arg1,arg2;
   F64 wx,wy;
   Bool okay;
   MyMass *tmpm1=NULL,*tmpm2=NULL;
-  CCtrl *bt_edit_mode=CtrlButtonNew(0,5*FONT_HEIGHT+4,80,,EMD_NUM_MODES,
-	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_button);
+  CCtrl *bt_edit_mode=CtrlBttnNew(0,5*FONT_HEIGHT+4,80,,EMD_NUM_MODES,
+	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_bttn);
   ode->flags|=ODEF_PAUSED;
   MenuPush(
 	"File {"
@@ -453,13 +453,14 @@ U0 EditShip()
 	);
   DocClear;
   try {
-    while (main_mode_button.state==MMD_EDIT) {
-      switch (ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|
-	    1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
-	case MSG_IP_L_DOWN:
-	  switch (edit_mode_button.state) {
+    while (main_mode_bttn.state==MMD_EDIT) {
+      switch (ScanMsg(&arg1,&arg2,
+	    1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|1<<MSG_MS_R_DOWN|
+	    1<<MSG_MS_MOVE|1<<MSG_KEY_DOWN|1<<MSG_KEY_UP)) {
+	case MSG_MS_L_DOWN:
+	  switch (edit_mode_bttn.state) {
 	    case EMD_MASS:
-	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
+	      S2W(ms.pos.x,ms.pos.y,&wx,&wy);
 	      tmpm1=PlaceMass(wx,wy);
 	      if (ode->next_mass==tmpm1)
 		tmpm1->img=$IB,"<1>",BI=1$;
@@ -471,26 +472,26 @@ U0 EditShip()
 	    case EMD_CONNECTOR:
 	    case EMD_THRUSTER:
 	    case EMD_MOVE:
-	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
+	      S2W(ms.pos.x,ms.pos.y,&wx,&wy);
 	      tmpm1=MassFind(ode,wx,wy);
 	      tmpm2=NULL;
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_UP:
-	  switch (edit_mode_button.state) {
+	case MSG_MS_L_UP:
+	  switch (edit_mode_bttn.state) {
 	    case EMD_MASS:
 	      break;
 	    case EMD_SPRING:
 	    case EMD_CONNECTOR:
 	    case EMD_THRUSTER:
-	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
+	      S2W(ms.pos.x,ms.pos.y,&wx,&wy);
 	      if (tmpm1 && (tmpm2=MassFind(ode,wx,wy)) && tmpm1!=tmpm2)
-		PlaceSpring(tmpm1,tmpm2,edit_mode_button.state);
+		PlaceSpring(tmpm1,tmpm2,edit_mode_bttn.state);
 	      tmpm1=tmpm2=NULL;
 	      break;
 	    case EMD_MOVE:
-	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
+	      S2W(ms.pos.x,ms.pos.y,&wx,&wy);
 	      if (tmpm1) {
 		tmpm1->x=wx;
 		tmpm1->y=wy;
@@ -501,10 +502,10 @@ U0 EditShip()
 	      break;
 	  }
 	  break;
-	case MSG_IP_MOVE:
-	  switch (edit_mode_button.state) {
+	case MSG_MS_MOVE:
+	  switch (edit_mode_bttn.state) {
 	    case EMD_MOVE:
-	      S2W(ip.pos.x,ip.pos.y,&wx,&wy);
+	      S2W(ms.pos.x,ms.pos.y,&wx,&wy);
 	      if (tmpm1) {
 		tmpm1->x=wx;
 		tmpm1->y=wy;
@@ -514,20 +515,20 @@ U0 EditShip()
 	      break;
 	  }
 	  break;
-	case MSG_IP_R_DOWN:
-	  if (++edit_mode_button.state==EMD_NUM_MODES)
-	    edit_mode_button.state=0;
+	case MSG_MS_R_DOWN:
+	  if (++edit_mode_bttn.state==EMD_NUM_MODES)
+	    edit_mode_bttn.state=0;
 	  break;
-	case MSG_IP_R_UP:
+	case MSG_MS_R_UP:
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      CleanUp;
 	      Init;
 	      break;
 	    case '0'...'9':
-	      next_action_key=a1;
+	      next_action_key=arg1;
 	      break;
 	    case 'c':
 	      CenterMasses;
@@ -538,19 +539,19 @@ U0 EditShip()
 	      ode->drag_v3=0.0001;
 	      break;
 	    case 'v':
-	      edit_mode_button.state=EMD_MOVE;
+	      edit_mode_bttn.state=EMD_MOVE;
 	      break;
 	    case 'm':
-	      edit_mode_button.state=EMD_MASS;
+	      edit_mode_bttn.state=EMD_MASS;
 	      break;
 	    case 'n':
-	      edit_mode_button.state=EMD_CONNECTOR;
+	      edit_mode_bttn.state=EMD_CONNECTOR;
 	      break;
 	    case 's':
-	      edit_mode_button.state=EMD_SPRING;
+	      edit_mode_bttn.state=EMD_SPRING;
 	      break;
 	    case 't':
-	      edit_mode_button.state=EMD_THRUSTER;
+	      edit_mode_bttn.state=EMD_THRUSTER;
 	      break;
 	    case 'z':
 	      Spawn(&Zoom,2.0(I64));
@@ -559,8 +560,8 @@ U0 EditShip()
 	      Spawn(&Zoom,0.5(I64));
 	      break;
 	    case CH_SPACE:
-	      if (++main_mode_button.state==MMD_NUM_MODES)
-		main_mode_button.state=0;
+	      if (++main_mode_bttn.state==MMD_NUM_MODES)
+		main_mode_bttn.state=0;
 	      GetMsg(,,1<<MSG_KEY_UP);
 	      goto es_done;
 	    case CH_SHIFT_ESC:
@@ -569,7 +570,7 @@ U0 EditShip()
 	  }
 	  break;
 	case MSG_KEY_UP:
-	  switch (a1) {
+	  switch (arg1) {
 	    case 'd':
 	      ode->flags|=ODEF_PAUSED;
 	      ode->drag_v2=0.000002;
@@ -587,7 +588,7 @@ es_done: //Don't goto out of try
     okay=FALSE;
   }
   MenuPop;
-  CtrlButtonDel(bt_edit_mode);
+  CtrlBttnDel(bt_edit_mode);
   if (!okay)
     throw;
 }
@@ -596,7 +597,7 @@ U0 Strut()
 {
   CCtrl *bt_main_mode;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R|WIG_DBL_CLICK;
+  Fs->win_inhibit|=WIF_SELF_MS_L|WIF_SELF_MS_R|WIG_DBL_CLICK;
   AutoComplete;
   WinBorder;
   WinMax;
@@ -613,9 +614,9 @@ U0 Strut()
 	"Press $$GREEN$$<z>$$FG$$ or $$GREEN$$<SHIFT-Z>$$FG$$ to zoom in/out.\n\n";
 
   PressAKey;
-  bt_main_mode=CtrlButtonNew(
+  bt_main_mode=CtrlBttnNew(
 	(GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_NUM_MODES,
-	Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_button);
+	Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_bttn);
   DocClear;
   Init;
   Fs->draw_it=&DrawIt;
@@ -629,6 +630,6 @@ U0 Strut()
     Fs->catch_except=TRUE;
   }
   SettingsPop;
-  CtrlButtonDel(bt_main_mode);
+  CtrlBttnDel(bt_main_mode);
 }
              øÿÿÿøÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ             øÿÿÿøÿÿÿ      ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ        ‚     ùÿÿÿöÿÿÿ      ÿÿÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿ  ÿÿÿÿÿ  ÿÿÿ                                                                                ÿÿÿ  ÿÿÿÿÿ  ÿÿÿÿÿÿÿÿ   ÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿÿÿÿÿÿÿÿÿ   

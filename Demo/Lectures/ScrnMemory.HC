@@ -35,7 +35,7 @@ are zero, so sel them and make them zero.
 You can't do reads on VGA memory, by the way.
 That means no read-modify-writes, too.
 */
-  BusyWait(4000000);
+  Busy(4000000);
 
   //TempleOS has a 4 plane memory duplicate of the scrn, $LK,"gr.scrn_image",A="MN:CGrGlbls"$,
   //and only writes actual changes.  See $LK,"GrUpdateVGAGraphics",A="MN:GrUpdateVGAGraphics"$().

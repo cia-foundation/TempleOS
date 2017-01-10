@@ -566,14 +566,14 @@ U0 FMRightClick()
   }
 }
 
-U8 *fm_ip_str=NULL;
+U8 *fm_ms_str=NULL;
 U0 (*fp_old_final_scrn_update)(CDC *dc);
 
 U0 FMFinalScrnUpdate(CDC *dc)
 {
-  if (fm_ip_str) {
+  if (fm_ms_str) {
     dc->color=LTRED;
-    GrPrint(dc,ip.pos.x,ip.pos.y,"%s",fm_ip_str);
+    GrPrint(dc,ms.pos.x,ms.pos.y,"%s",fm_ms_str);
   }
   (*fp_old_final_scrn_update)(dc);
 }
@@ -581,7 +581,7 @@ U0 FMFinalScrnUpdate(CDC *dc)
 public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 {//File manager. Also, used to choose files and dirs.
   CDirEntry *head=NULL,*tmpde,*tmpde1,*tmpde2;
-  I64 sc,ch,a1,a2,msg_code;
+  I64 sc,ch,arg1,arg2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
   U8 *res=NULL,*st,*st2,*old_cur_dir=CurDir;
   CDocEntry *doc_ce=NULL,*doc_e;
@@ -600,26 +600,26 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   }
   do {
     DocUnlock(doc);
-    do msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
-	    1<<MSG_IP_R_UP);
+    do msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|1<<MSG_MS_R_UP);
     while (Fs!=sys_focus_task);
     DocLock(doc);
     switch (msg_code) {
-      case MSG_IP_R_UP:
+      case MSG_MS_R_UP:
 	DocUnlock(doc);
 	FMRightClick;
 	DocLock(doc);
 	break;
-      case MSG_IP_L_DOWN:
+      case MSG_MS_L_DOWN:
 	doc_ce=doc->cur_entry;
-	fm_ip_str=doc_ce->tag;
+	fm_ms_str=doc_ce->tag;
 	gr.fp_final_scrn_update=&FMFinalScrnUpdate;
 	break;
-      case MSG_IP_L_UP:
+      case MSG_MS_L_UP:
 	if (doc_ce) {
 	  gr.fp_final_scrn_update=fp_old_final_scrn_update;
-	  if (WinCursorPosSet(Fs,a1+Fs->pix_left+Fs->scroll_x,
-		a2+Fs->pix_top+Fs->scroll_y,TRUE)) {
+	  if (WinCursorPosSet(Fs,arg1+Fs->pix_left+Fs->scroll_x,
+		arg2+Fs->pix_top+Fs->scroll_y,TRUE)) {
 	    doc_e=doc->cur_entry;
 	    if (doc_e!=doc_ce) {
 	      st2=NULL;
@@ -678,7 +678,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	break;
       case MSG_KEY_DOWN:
 	doc_ce=NULL;
-	ch=a1; sc=a2;
+	ch=arg1; sc=arg2;
 	if (sc.u8[0]==SC_DELETE && !(sc&(SCF_SHIFT|SCF_CTRL)))
 	  ch=CH_CTRLY;
 	if (ch && sc&SCF_ALT) goto fm_regular_key;

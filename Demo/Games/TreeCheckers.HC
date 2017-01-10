@@ -123,7 +123,7 @@ U0 KillsChk(I64 x1,I64 y1,I64 player)
       dd=SqrI64(x2-x1)+SqrI64(y2-y1);
       if (dd<=(CIRCLE_RAD+2)*(CIRCLE_RAD+2)) {
 	u[i].alive=FALSE;
-	Snd(500);Sleep(100);Snd(0);Sleep(25);
+	Snd(62);Sleep(100);Snd;Sleep(25);
 	num_alive[u[i].player]--;
 	do {
 	  found=FALSE;
@@ -132,7 +132,7 @@ U0 KillsChk(I64 x1,I64 y1,I64 player)
 		  !u[u[j].link].alive) {
 	      found=TRUE;
 	      u[j].alive=FALSE;
-	      Snd(500);Sleep(100);Snd(0);Sleep(25);
+	      Snd(62);Sleep(100);Snd;Sleep(25);
 	      num_alive[u[j].player]--;
 	    }
 	} while (found);
@@ -283,7 +283,7 @@ U0 CleanUp()
 
 U0 TreeCheckers()
 {
-  I64 msg_code,a1,a2,ch,sc;
+  I64 msg_code,arg1,arg2,ch,sc;
   Unit *tmpu;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
@@ -311,11 +311,11 @@ cn_start:
     show_start=FALSE;
     Fs->draw_it=&DrawIt;
     while (TRUE) {
-      msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN+1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+      msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_KEY_DOWN+1<<MSG_MS_L_DOWN+1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);
       switch (msg_code) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case '\n':
 	      CleanUp;
 	      goto cn_start;
@@ -324,20 +324,20 @@ cn_start:
 	      goto cn_done;
 	  }
 	  break;
-	case MSG_IP_L_DOWN:
+	case MSG_MS_L_DOWN:
 	  if (num_alive[0]>1 && num_alive[1]>1) {
-	    tmpu=UnitFind(a1,a2,cur_player);
+	    tmpu=UnitFind(arg1,arg2,cur_player);
 	    end_x=start_x=tmpu->x;
 	    end_y=start_y=tmpu->y;
 	    show_start=TRUE;
 	  }
 	  break;
-	case MSG_IP_MOVE:
+	case MSG_MS_MOVE:
 	  if (tmpu)
-	    UnitMove(tmpu,a1,a2);
+	    UnitMove(tmpu,arg1,arg2);
 	  break;
-	case MSG_IP_L_UP:
-	  UnitMove(tmpu,a1,a2);
+	case MSG_MS_L_UP:
+	  UnitMove(tmpu,arg1,arg2);
 	  KillsChk(tmpu->x,tmpu->y,cur_player);
 	  show_start=FALSE;
 	  tmpu=NULL;

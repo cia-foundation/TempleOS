@@ -14,7 +14,7 @@ U8 *LexStmt2Bin(CCmpCtrl *cc,I64 *_type,I64 cmp_flags=0)
       ICAdd(cc,IC_RET,0,0);
       if (res=COCCompile(cc,&size,NULL,_type)) {
 	if (cc->flags&CCF_AOT_COMPILE) {
-	  j=cc->aotc->ip;
+	  j=cc->aotc->rip;
 	  k=(size+7)>>3;
 	  for (i=0;i<k;i++)
 	    AOTStoreCodeU64(cc,res[i]);
@@ -85,7 +85,7 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
 	if (buf!=INVALID_PTR) {
 	  tmpie=CAlloc(sizeof(CAOTImportExport));
 	  tmpie->type=IET_MAIN;
-	  tmpie->ip=buf;
+	  tmpie->rip=buf;
 	  QueIns(tmpie,res->last_ie);
 	}
 	if (cmp_flags&CMPF_ASM_BLK)
@@ -173,7 +173,7 @@ CAOT *CmpBuf(U8 *buf,U8 *map_name=NULL,
 
 U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 {
-  I64 i,ip2=tmpaot->buf+tmpaot->ip,*str=NULL;
+  I64 i,rip2=tmpaot->buf+tmpaot->rip,*str=NULL;
   U8 *ptr;
   CCodeMisc *g_lb;
   CAOTAbsAddr *tmpa,*tmpa1;
@@ -183,16 +183,16 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
   tmpa=tmpaot->abss;
   while (tmpa) {
     tmpa1=tmpa->next;
-    ptr=ip2+tmpa->ip;
+    ptr=rip2+tmpa->rip;
     switch [tmpa->type] {
-      case AAT_ADD_U8:	*ptr(U8 *) +=ip2; break;
-      case AAT_SUB_U8:	*ptr(U8 *) -=ip2; break;
-      case AAT_ADD_U16:	*ptr(U16 *)+=ip2; break;
-      case AAT_SUB_U16:	*ptr(U16 *)-=ip2; break;
-      case AAT_ADD_U32:	*ptr(U32 *)+=ip2; break;
-      case AAT_SUB_U32:	*ptr(U32 *)-=ip2; break;
-      case AAT_ADD_U64:	*ptr(I64 *)+=ip2; break;
-      case AAT_SUB_U64:	*ptr(I64 *)-=ip2; break;
+      case AAT_ADD_U8:	*ptr(U8 *) +=rip2; break;
+      case AAT_SUB_U8:	*ptr(U8 *) -=rip2; break;
+      case AAT_ADD_U16:	*ptr(U16 *)+=rip2; break;
+      case AAT_SUB_U16:	*ptr(U16 *)-=rip2; break;
+      case AAT_ADD_U32:	*ptr(U32 *)+=rip2; break;
+      case AAT_SUB_U32:	*ptr(U32 *)-=rip2; break;
+      case AAT_ADD_U64:	*ptr(I64 *)+=rip2; break;
+      case AAT_SUB_U64:	*ptr(I64 *)-=rip2; break;
     }
     Free(tmpa);
     tmpa=tmpa1;
@@ -214,9 +214,9 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	str=NULL;
 	tmpex->type=HTT_EXPORT_SYS_SYM|HTF_IMM;
 	if (tmpie->type==IET_IMM32_EXPORT||tmpie->type==IET_IMM64_EXPORT)
-	  tmpex->val=tmpie->ip;
+	  tmpex->val=tmpie->rip;
 	else
-	  tmpex->val=tmpie->ip+ip2;
+	  tmpex->val=tmpie->rip+rip2;
 	tmpex->src_link=tmpie->src_link;
 	tmpie->src_link=NULL;
 	HashAdd(tmpex,Fs->hash_table);
@@ -249,7 +249,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	  }
 	}
 	if (tmpex || g_lb) {
-	  ptr=tmpie->ip+ip2;
+	  ptr=tmpie->rip+rip2;
 	  switch [tmpie->type] {
 	    case IET_REL_I0:
 	    case IET_IMM_U0:
@@ -294,7 +294,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
   }
   Free(str);
   if (!cc->aot_depth && Bt(&cc->opts,OPTf_TRACE))
-    Un(ip2,tmpaot->aot_U8s,64);
+    Un(rip2,tmpaot->aot_U8s,64);
   QueRem(tmpaot);
   Free(tmpaot);
 }
@@ -302,7 +302,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
 {
   CAOTCtrl *aotc=cc->aotc;
-  I64 i,ip2=tmpaot->ip+cc->aotc->ip;
+  I64 i,rip2=tmpaot->rip+cc->aotc->rip;
   U8 *ptr;
   CCodeMisc *g_lb=NULL;
   CAOTAbsAddr *tmpa,*tmpa1;
@@ -312,19 +312,19 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
   while (tmpa) {
     tmpa1=tmpa->next;
     tmpa->next=aotc->abss;
-    ptr=tmpaot->buf+tmpaot->ip+tmpa->ip;
+    ptr=tmpaot->buf+tmpaot->rip+tmpa->rip;
     switch [tmpa->type] {
-      case AAT_ADD_U8:	*ptr(U8 *)+=ip2;	break;
-      case AAT_SUB_U8:	*ptr(U8 *)-=ip2;	break;
-      case AAT_ADD_U16:	*ptr(U16 *)+=ip2;	break;
-      case AAT_SUB_U16:	*ptr(U16 *)-=ip2;	break;
-      case AAT_ADD_U32:	*ptr(U32 *)+=ip2;	break;
-      case AAT_SUB_U32:	*ptr(U32 *)-=ip2;	break;
-      case AAT_ADD_U64:	*ptr(I64 *)+=ip2;	break;
-      case AAT_SUB_U64:	*ptr(I64 *)-=ip2;	break;
+      case AAT_ADD_U8:	*ptr(U8 *)+=rip2;	break;
+      case AAT_SUB_U8:	*ptr(U8 *)-=rip2;	break;
+      case AAT_ADD_U16:	*ptr(U16 *)+=rip2;	break;
+      case AAT_SUB_U16:	*ptr(U16 *)-=rip2;	break;
+      case AAT_ADD_U32:	*ptr(U32 *)+=rip2;	break;
+      case AAT_SUB_U32:	*ptr(U32 *)-=rip2;	break;
+      case AAT_ADD_U64:	*ptr(I64 *)+=rip2;	break;
+      case AAT_SUB_U64:	*ptr(I64 *)-=rip2;	break;
     }
     aotc->abss=tmpa;
-    tmpa->ip+=ip2;
+    tmpa->rip+=rip2;
     tmpa=tmpa1;
   }
 
@@ -347,7 +347,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
     } else
       g_lb=NULL;
 
-    ptr=tmpaot->buf+tmpaot->ip+tmpie->ip;
+    ptr=tmpaot->buf+tmpaot->rip+tmpie->rip;
     if (g_lb) {
       i=g_lb->addr+tmpaot->buf;
       switch [tmpie->type] {
@@ -401,12 +401,12 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	  case IET_IMM_I64:
 	  case IET_REL_I0:
 	    break;
-	  case IET_REL_I8:	    *ptr(U8 *) -=ip2;	    break;
-	  case IET_REL_I16:	    *ptr(U16 *)-=ip2;	    break;
-	  case IET_REL_I32:	    *ptr(U32 *)-=ip2;	    break;
-	  case IET_REL_I64:	    *ptr(I64 *)-=ip2;	    break;
+	  case IET_REL_I8:	    *ptr(U8 *) -=rip2;	    break;
+	  case IET_REL_I16:	    *ptr(U16 *)-=rip2;	    break;
+	  case IET_REL_I32:	    *ptr(U32 *)-=rip2;	    break;
+	  case IET_REL_I64:	    *ptr(I64 *)-=rip2;	    break;
 	end:
-	  tmpie->ip+=ip2;
+	  tmpie->rip+=rip2;
 	  break;
       }
       tmpie->aot=NULL;
@@ -452,7 +452,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
       while (tmpa) {
 	tmpa1=tmpa->next;
 	if (!(tmpa->type&IEF_IMM_NOT_REL))
-	  *ptr(U32 *)++ =tmpa->ip;
+	  *ptr(U32 *)++ =tmpa->rip;
 	Free(tmpa);
 	tmpa=tmpa1;
       }
@@ -480,7 +480,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 	tmphgr=tmphg->references;
 	while (tmphgr) {
 	  tmphgr1=tmphgr->next;
-	  *ptr(U32 *)++=tmphgr->ip;
+	  *ptr(U32 *)++=tmphgr->rip;
 	  Free(tmphgr);
 	  tmphgr=tmphgr1;
 	}
@@ -496,7 +496,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
       if (!tmpie->type || IET_REL32_EXPORT<=tmpie->type<=IET_IMM64_EXPORT) {
 	QueRem(tmpie);
 	*ptr++=tmpie->type;
-	*ptr(U32 *)++=tmpie->ip;
+	*ptr(U32 *)++=tmpie->rip;
 	if (tmpie->str) {
 	  i=StrLen(tmpie->str);
 	  MemCpy(ptr,tmpie->str,i+1);
@@ -517,8 +517,8 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
       QueRem(tmpie);
       *ptr++=tmpie->type;
       if (tmpie->aot)
-	tmpie->ip+=tmpie->aot->ip2;
-      *ptr(U32 *)++=tmpie->ip;
+	tmpie->rip+=tmpie->aot->rip2;
+      *ptr(U32 *)++=tmpie->rip;
       if (tmpie->str) {
 	i=StrLen(tmpie->str);
 	MemCpy(ptr,tmpie->str,i+1);

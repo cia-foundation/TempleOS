@@ -15,7 +15,7 @@ because it is #included first.  $LK,"Kernel.PRJ",A="FF:::/Kernel/Kernel.PRJ,KSta
 */
 USE16
 SYS_KERNEL:: //This must match $LK,"CKernel",A="MN:CKernel"$.
-	JMP	U16 CORE0_16BIT_INIT
+	JMP	I16 CORE0_16BIT_INIT
 
 //************************************
 //  ASM Global vars required for 16-bit start-up
@@ -27,13 +27,13 @@ SYS_RUN_LEVEL::			DU32	0;
 #exe {StreamPrint("SYS_COMPILE_TIME:: DU64 0x%X;",Now);} //See $LK,"BootDVDProbe",A="MN:BootDVDProbe"$
 #assert SYS_COMPILE_TIME+sizeof(CDate)+sizeof(CBinFile)<DVD_BLK_SIZE
 
-SYS_BOOT_BASE::	DU32	0;	//Offset from start used by reboot
-SYS_MEM_E801::	DU16	0,0;
-SYS_MEM_E820::	DU8	MEM_NUM_E820_ENTRIES*MEM_E820_ENTRY_SIZE DUP (0);
-
-SYS_GDT_PTR::	DU16	sizeof(CGDT)-1;
-		DU64	0;
-SYS_PCI_BUSES::	DU16	0;
+MEM_BOOT_BASE::		DU32	0;	//Offset from start used by reboot
+MEM_E801::		DU16	0,0;
+MEM_E820::		DU8	MEM_NUM_E820_ENTRIES*sizeof(CMemE820) DUP (0);
+MEM_PHYSICAL_SPACE::	DU64	0;
+SYS_GDT_PTR::		DU16	sizeof(CGDT)-1;
+			DU64	0;
+SYS_PCI_BUSES::		DU16	0;
 
 	ALIGN	16,OC_NOP
 SYS_GDT:: //See $LK,"CGDT",A="MN:CGDT"$
@@ -61,9 +61,9 @@ CORE0_16BIT_INIT::
 	PUSH	ECX	//Will be $LK,"SYS_BOOT_SRC",A="FF:::/Kernel/KStart16.HC,[SYS_BOOT_SRC]"$. See $LK,"BootHD",A="FF:::/Adam/Opt/Boot/BootHD.HC,BOOT_SRC_HARDDRV"$, $LK,"BootDVD",A="FF:::/Adam/Opt/Boot/BootDVD.HC,BOOT_SRC_DVD"$ & $LK,"BootRAM",A="FF:::/Adam/Opt/Boot/BootRAM.HC,BOOT_SRC_RAM"$.
 	PUSH	EBX
 
-	CALL	U16 GET_IP
-GET_IP:	POP	BX
-	SUB	BX,GET_IP
+	CALL	U16 GET_RIP
+GET_RIP:	POP	BX
+	SUB	BX,GET_RIP
 	SHR	BX,4
 	MOV	AX,CS
 	ADD	AX,BX
@@ -88,20 +88,20 @@ GET_IP:	POP	BX
 	BTS	U32 [SYS_RUN_LEVEL],RLf_VGA
 @@10:
 
-//Get mem maps
+//Get mem maps.
 	MOV	AX,0xE801
 	INT	0x15
-	MOV	U16 [SYS_MEM_E801],CX
-	MOV	U16 [SYS_MEM_E801+2],DX
+	MOV	U16 [MEM_E801],CX
+	MOV	U16 [MEM_E801+2],DX
 
 	MOV	CX,MEM_NUM_E820_ENTRIES-1 //Leave one to terminate
 	XOR	EBX,EBX
 	MOV	AX,DS
 	MOV	ES,AX
-	MOV	DI,SYS_MEM_E820
+	MOV	DI,MEM_E820
 @@15:	PUSH	CX
 	MOV	EAX,0xE820
-	MOV	ECX,MEM_E820_ENTRY_SIZE
+	MOV	ECX,sizeof(CMemE820)
 	MOV	EDX,'PAMS'
 	INT	0x15
 	JC	@@20
@@ -109,23 +109,52 @@ GET_IP:	POP	BX
 	JNE	@@20
 	TEST	EBX,EBX
 	JZ	@@20
-	ADD	DI,MEM_E820_ENTRY_SIZE
+	ADD	DI,sizeof(CMemE820)
 	POP	CX
 	LOOP	@@15
-	JMP	@@25
+	SUB	SP,2
 @@20:	ADD	SP,2
 
+//Find how much space to map, start with E801 limit.
+	XOR	EAX,EAX
+	MOV	AX,[MEM_E801+2]
+	SHL	EAX,16
+	ADD	EAX,SYS_16MEG_AREA_LIMIT
+	XOR	EDX,EDX
+
+//Find max of E820 to set mapped space.
+	MOV	SI,MEM_E820
+@@25:	MOV	CL,CMemE820.type[SI]
+	TEST	CL,CL
+	JZ	@@35
+	MOV	EBX,CMemE820.base[SI]
+	MOV	ECX,CMemE820.base+4[SI]
+	ADD	EBX,CMemE820.len[SI]
+	ADC	ECX,CMemE820.len+4[SI]
+	SUB	EBX,EAX
+	SBB	ECX,EDX
+	JC	@@30
+	MOV	EAX,CMemE820.base[SI]
+	MOV	EDX,CMemE820.base+4[SI]
+	ADD	EAX,CMemE820.len[SI]
+	ADC	EDX,CMemE820.len+4[SI]
+@@30:	ADD	SI,sizeof(CMemE820)
+	JMP	@@25
+
+@@35:	MOV	[MEM_PHYSICAL_SPACE],EAX
+	MOV	[MEM_PHYSICAL_SPACE+4],EDX
+	
 //Get PCI Bus Info
-@@25:	MOV	U16 [SYS_PCI_BUSES],256
+	MOV	U16 [SYS_PCI_BUSES],256
 	XOR	DX,DX
 	MOV	AX,0xB101
 	INT	0x1A
 	CMP	DX,'PC'
-	JNE	@@30
+	JNE	@@40
 	MOV	CH,0
 	INC	CX
 	MOV	U16 [SYS_PCI_BUSES],CX
-@@30:
+@@40:
 	CLI
 //Enable A20
 	IN	AL,0x92
@@ -142,7 +171,7 @@ GET_IP:	POP	BX
 	MOV	ES,AX
 	SHL	EAX,4
 
-	MOV	U32 [SYS_BOOT_BASE],EAX
+	MOV	U32 [MEM_BOOT_BASE],EAX
 
 	MOV	DX,CS
 	SUB	DX,sizeof(CBinFile)/16

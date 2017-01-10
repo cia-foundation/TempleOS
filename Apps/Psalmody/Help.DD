@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Psalmody Help"$$FG$
 
-* The keyboard can be used as an organ by typing letter keys or clicking the mouse on the keyboard diagram$FG$.  You can "record" notes by pressing the red button and typing letters.  They will appear on the musical staff.  You can edit and save them.
+* The keyboard can be used as an organ by typing letter keys or clicking the mouse on the keyboard diagram$FG$.  You can "record" notes by pressing the red bttn and typing letters.  They will appear on the musical staff.  You can edit and save them.
 
 * The clipboard can be used to cut and paste.
 
@@ -8,7 +8,7 @@ $WW,1$$FG,5$$TX+CX,"Psalmody Help"$$FG$
 
 * The first line of the $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
 
-* You can take the $LK,"Play",A="MN:Play"$() stmts out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-l>$FG$, but you should do it after pressing $FG,2$<CTRL-t>$FG$ because the clipboard-insert in $FG,2$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="2qG3ECB2eGG3qCeFDsBGBG2qG3ECB2eGG3qCeFDsBGBGqEeEFqEB2eG3FetCAGqFCEeEFqEB2eG3FetCAGqFC"$ after pressing $FG,2$<CTRL-t>$FG$, now.
+* You can take the $LK,"Play",A="MN:Play"$() stmts out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-l>$FG$, but you should do it after pressing $FG,2$<CTRL-t>$FG$ because the clipboard-insert in $FG,2$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="4qG5EC4BeGG5qCeFD4sB5G4B5G4qG5EC4BeGG5qCeFD4sB5G4B5GqEeEFqE4BeG5FetC4A5GqFCEeEFqE4BeG5FetC4A5GqFC"$ after pressing $FG,2$<CTRL-t>$FG$, now.
 
 * You can call $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$("~/Psalmody"); to play your songs.
 

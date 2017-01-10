@@ -1,0 +1,1 @@
+$WW,1$The word $FG,2$Pag$FG$ refers to an arbitrilly created $LK,"MEM_PAG_SIZE",A="MN:MEM_PAG_SIZE"$ unit of heap allocation.  TempleOS does not alter the CPU page tables after setting them up at boot in $LK,"SYS_INIT_PAGE_TABLES",A="MN:SYS_INIT_PAGE_TABLES"$, so the CPU hardware page size is rarely important.

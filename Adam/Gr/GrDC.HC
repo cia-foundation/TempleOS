@@ -378,8 +378,8 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
 #help_index "Graphics/Device Contexts;Graphics/GR Files"
 public I64 GRWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
 {//TempleOS GR File.
-  I64 size;
-  U8 *st=DftExt(filename,"GR.Z"),
+  I64	size;
+  U8	*st=DftExt(filename,"GR.Z"),
 	*src=DCSave(dc,&size,dcsf_flags);
   FileWrite(st,src,size);
   Free(st);
@@ -389,8 +389,8 @@ public I64 GRWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
 
 public CDC *GRRead(U8 *filename,CTask *task=NULL)
 {//TempleOS GR File.
-  CDC *dc=NULL;
-  U8 *st=DftExt(filename,"GR.Z"),
+  CDC	*dc=NULL;
+  U8	*st=DftExt(filename,"GR.Z"),
 	*src=FileRead(st);
   if (src)
     dc=DCLoad(src,,task);
@@ -427,14 +427,4 @@ public CDC *DCScrnCapture(Bool include_zoom=TRUE,CTask *task=NULL)
   Free(dc->body);
   dc->body=dst;
   return dc;
-}
-
-#help_index "Graphics/GR Files;Graphics/Scrn"
-public I64 GRScrnCapture(U8 *filename,Bool include_zoom=TRUE)
-{//Capture scrn to a TempleOS GR File.
-  I64 size;
-  CDC *dc=DCScrnCapture(include_zoom);
-  size=GRWrite(filename,dc,DCSF_COMPRESSED|DCSF_PALETTE_GET);
-  DCDel(dc);
-  return size;
 }

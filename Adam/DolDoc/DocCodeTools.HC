@@ -359,7 +359,7 @@ U0 EdRACollect(CDoc *doc,CRenum *head)
 	StrCpy(buf,"@@");
 	i=2;
 	while (ch>=0 && i<sizeof(CEdFindText.find_text)) {
-	  if (Bt(chars_bmp_alpha_numeric,ch))
+	  if (Bt(char_bmp_alpha_numeric,ch))
 	    buf[i++]=ch;
 	  else
 	    break;
@@ -367,7 +367,7 @@ U0 EdRACollect(CDoc *doc,CRenum *head)
 	}
 	if (i<sizeof(CEdFindText.find_text)) {
 	  buf[i++]=0;
-	  while (ch>=0 && Bt(chars_bmp_white_space,ch))
+	  while (ch>=0 && Bt(char_bmp_white_space,ch))
 	    ch=EdRAGetU8(doc);
 	  if (ch==':') {
 	    ch=EdRAGetU8(doc);
@@ -426,7 +426,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
   I64 i,start_y,end_y,x,r,goto_line_num;
   U8 *b,*st,*st2,*prj_file;
   CTask *task=NULL;
-  CSrvCmd *tmpc;
+  CJob *tmpc;
   CQueVectU8 *indent;
 
   DocRecalc(doc);
@@ -442,7 +442,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
       task=Spawn(&SrvCmdLine,NULL,"Srv",,Fs);
       st2=CurDir;
       st=MStrPrint("Cd(\"%s\");",st2);
-      tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+      tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
       Free(st2);
       Free(st);
       WinHorz(Fs->win_left,Fs->win_right, task);
@@ -455,23 +455,23 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	  st2=DirFile(prj_file),
 		st=MStrPrint("Cd(\"%s\");",st2);
 	  Free(st2);
-	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|
-		1<<SVCf_FOCUS_MASTER|1<<SVCf_FREE_ON_COMPLETE);
+	  tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|
+		1<<JOBf_FOCUS_MASTER|1<<JOBf_FREE_ON_COMPLETE);
 	  Free(st);
 	  st=MStrPrint("\"$$WW,1$$\";Cmp(\"%s\",\"SysTmp\",\"SysTmp\");",
 		prj_file);
-	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+	  tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
 	  Free(st);
 	  if (JobResScan(tmpc,&r))
 	    if (!r) {
 	      tmpc=TaskExe(task,Fs,
 		    "Load(\"SysTmp\",LDF_JUST_LOAD);",
-		    1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+		    1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
 	      if (JobResScan(tmpc,&r))
 		okay=TRUE;
 	    }
 	  tmpc=TaskExe(task,Fs,"Del(\"SysTmp.*\");",
-		1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+		1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
 	  JobResScan(tmpc,&r);
 	} else {
 	  Free(prj_file);
@@ -483,7 +483,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	  else
 	    st=MStrPrint("\"$$WW,1$$\";ExeFile(\"%s\",CCF_JUST_LOAD);",
 		  doc->filename.name);
-	  tmpc=TaskExe(task,Fs,st,1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+	  tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
 	  Free(st);
 	  if (JobResScan(tmpc,&r) && r)
 	    okay=TRUE;
@@ -492,10 +492,10 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
       }
       if (!okay) {
 	PopUpOk("Has Errors");
-	while (LBts(&sys_semas[SYS_SEMA_FIX],0))
+	while (LBts(&sys_semas[SEMA_FIX],0))
 	  Yield;
 	ToFileLine(dbg.fix_file_line,&st,&i);
-	LBtr(&sys_semas[SYS_SEMA_FIX],0);
+	LBtr(&sys_semas[SEMA_FIX],0);
 	if (!StrCmp(st,doc->filename.name))
 	  goto_line_num=i;
 	Free(st);
@@ -510,9 +510,9 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	indent=EdRICode(doc);
 	DocUnlock(doc);
 	if (beep) {
-	  Snd(2000); Sleep(150); Snd(0);
+	  Snd(86); Sleep(150); Snd;
 	  Sleep(100);
-	  Snd(2000); Sleep(150); Snd(0);
+	  Snd(86); Sleep(150); Snd;
 	}
 	DocLock(doc);
 	EdRemFunLeadingSpace(doc);
@@ -577,9 +577,9 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	}
 	DocUnlock(doc);
 	if (beep) {
-	  Snd(2000); Sleep(150); Snd(0);
+	  Snd(86); Sleep(150); Snd;
 	  Sleep(100);
-	  Snd(2000); Sleep(150); Snd(0);
+	  Snd(86); Sleep(150); Snd;
 	}
 	DocLock(doc);
 	EdRenumAsm(doc);
@@ -633,7 +633,7 @@ U0 EdChSC(CDoc *doc)
     DocPrint(doc,"CH_SPACE,0x%X",sc);
   else if (ch==CH_SHIFT_SPACE)
     DocPrint(doc,"CH_SHIFT_SPACE,0x%X",sc);
-  else if (Bt(chars_bmp_displayable,ch))
+  else if (Bt(char_bmp_displayable,ch))
     DocPrint(doc,"'%c',0x%X",ch,sc);
   else
     DocPrint(doc,"0x%X,0x%X",ch,sc);

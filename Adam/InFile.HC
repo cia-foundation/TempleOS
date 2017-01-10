@@ -23,13 +23,13 @@ public U0 InGetStr(U8 *st)
   }
 }
 
-public U0 InPrint(I64 ms=100,U8 *fmt,...)
+public U0 InPrint(I64 mS=100,U8 *fmt,...)
 {//Print message with delay after each char.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=buf;
   I64 ch;
   while (ch=*st++) {
     '' ch;
-    Sleep(ms);
+    Sleep(mS);
   }
   Free(buf);
 }
@@ -112,29 +112,29 @@ public Bool InView()
   return res;
 }
 
-#help_index "InFile;Help System/Training;Input Pointer"
+#help_index "InFile;Help System/Training;Mouse"
 I64 in_plot_l,in_plot_r;
 
-Bool InSetIPPlot(I64 ms,I64 x,I64 y,I64 z)
+Bool InSetMsPlot(I64 mS,I64 x,I64 y,I64 z)
 {
-  IPSet(x,y,z,in_plot_l,in_plot_r);
-  Sleep(ms);
+  MsSet(x,y,z,in_plot_l,in_plot_r);
+  Sleep(mS);
   return TRUE;
 }
 
-public U0 InSetIP(I64 ms=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
+public U0 InSetMs(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
 		I64 l=MAX_I64,I64 r=MAX_I64)
-{//Move input pointer (mouse) to spot at certain speed.
+{//Move mouse to spot at certain speed.
   if (!(0<=x<GR_WIDTH))
-    x=ip.pos.x;
+    x=ms.pos.x;
   if (!(0<=y<GR_HEIGHT))
-    y=ip.pos.y;
+    y=ms.pos.y;
   if (z==MAX_I64)
-    z=ip.pos.z;
+    z=ms.pos.z;
   if (!(FALSE<=l<=TRUE))
-    l=ip.lb;
+    l=ms.lb;
   if (!(FALSE<=r<=TRUE))
-    r=ip.rb;
+    r=ms.rb;
   in_plot_l=l; in_plot_r=r;
-  Line(ms,ip.pos.x,ip.pos.y,ip.pos.z,x,y,z,&InSetIPPlot);
+  Line(mS,ms.pos.x,ms.pos.y,ms.pos.z,x,y,z,&InSetMsPlot);
 }

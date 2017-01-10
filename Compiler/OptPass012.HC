@@ -43,8 +43,8 @@ args.
     tmpc=tmpi->ic_class;
     tmpi->ic_class2=tmpc;
     tmpi_push=tmpi;
-    MemSet(&tmpi->a1,0,3*sizeof(CICArg));
-    tmpi->a1_type_pointed_to=0;
+    MemSet(&tmpi->arg1,0,3*sizeof(CICArg));
+    tmpi->arg1_type_pointed_to=0;
     switch [intermediate_code_table[code].arg_cnt] {
       case IS_V_ARG:
 	ps->ptr-=tmpi->ic_data>>2;
@@ -52,13 +52,13 @@ args.
       case IS_2_ARG:
 	tmpi2=PrsPop(ps);
 	tmpc2=tmpi2->ic_class;
-	tmpi->t.a2t=tmpi2;
-	tmpi->t.a2c=PrsPop(ps);
+	tmpi->t.arg2_tree=tmpi2;
+	tmpi->t.arg2_class=PrsPop(ps);
       case IS_1_ARG:
 	tmpi1=PrsPop(ps);
 	tmpc1=tmpi1->ic_class;
-	tmpi->t.a1t=tmpi1;
-	tmpi->t.a1c=PrsPop(ps);
+	tmpi->t.arg1_tree=tmpi1;
+	tmpi->t.arg1_class=PrsPop(ps);
 	break;
       case IS_0_ARG: //nobound switch
 	break;
@@ -67,19 +67,19 @@ args.
       cc->flags|=CCF_NOT_CONST;
     switch [code] {
       case IC_IMM_F64:
-	tmpi->ic_flags&=~ICF_R_TO_F64;
-	if (cc->pass==2 && tmpi->ic_flags&ICF_R_TO_INT) {
+	tmpi->ic_flags&=~ICF_RES_TO_F64;
+	if (cc->pass==2 && tmpi->ic_flags&ICF_RES_TO_INT) {
 	  tmpi->ic_data=ToI64(tmpi->ic_data(F64));
-	  tmpi->ic_flags&=~ICF_R_TO_INT;
+	  tmpi->ic_flags&=~ICF_RES_TO_INT;
 	  tmpi->ic_code=IC_IMM_I64;
 	  tmpi->ic_class=cmp.internal_types[RT_I64];
 	}
 	break;
       case IC_IMM_I64:
-	tmpi->ic_flags&=~ICF_R_TO_INT;
-	if (cc->pass==2 && tmpi->ic_flags&ICF_R_TO_F64) {
+	tmpi->ic_flags&=~ICF_RES_TO_INT;
+	if (cc->pass==2 && tmpi->ic_flags&ICF_RES_TO_F64) {
 	  tmpi->ic_data(F64)=ToF64(tmpi->ic_data);
-	  tmpi->ic_flags&=~ICF_R_TO_F64;
+	  tmpi->ic_flags&=~ICF_RES_TO_F64;
 	  tmpi->ic_code=IC_IMM_F64;
 	  tmpi->ic_class=cmp.internal_types[RT_F64];
 	}
@@ -299,9 +299,9 @@ args.
       case IC_POWER:
 	tmpc=tmpi->ic_class=cmp.internal_types[RT_F64];
 	if (tmpc1->raw_type!=RT_F64)
-	  tmpi1->ic_flags|=ICF_R_TO_F64;
+	  tmpi1->ic_flags|=ICF_RES_TO_F64;
 	if (tmpc2->raw_type!=RT_F64)
-	  tmpi2->ic_flags|=ICF_R_TO_F64;
+	  tmpi2->ic_flags|=ICF_RES_TO_F64;
 	tmpi_push->ic_class2=cmp.internal_types[RT_F64];
 	break;
       start:
@@ -332,7 +332,7 @@ args.
 		default:
 		  if (Bsf(i)==Bsr(i)) {
 		    tmpi->ic_flags|=tmpi1->ic_flags;
-		    tmpi->t.a1c=tmpi->t.a2c;
+		    tmpi->t.arg1_class=tmpi->t.arg2_class;
 		    tmpi->ic_data=Bsf(i);
 		    tmpi->ic_code=IC_SHL_CONST;
 		    OptSetNOP1(tmpi1);
@@ -356,16 +356,16 @@ args.
 		    tmpi->ic_code=IC_SHL_CONST;
 		    OptSetNOP1(tmpi2);
 		  } else if (tmpi1->ic_code==IC_MUL && cc->pass==2) {
-		    if (tmpi1->t.a1t->ic_code==IC_IMM_I64) {
+		    if (tmpi1->t.arg1_tree->ic_code==IC_IMM_I64) {
 		      tmpi1->ic_flags|=tmpi->ic_flags;
-		      tmpi1->t.a1t->ic_data*=tmpi2->ic_data;
+		      tmpi1->t.arg1_tree->ic_data*=tmpi2->ic_data;
 		      tmpi1->ic_class2=tmpi->ic_class2;
 		      tmpi_push=tmpi1;
 		      OptSetNOP1(tmpi2);
 		      OptSetNOP1(tmpi);
-		    } else if (tmpi1->t.a2t->ic_code==IC_IMM_I64) {
+		    } else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_I64) {
 		      tmpi1->ic_flags|=tmpi->ic_flags;
-		      tmpi1->t.a2t->ic_data*=tmpi2->ic_data;
+		      tmpi1->t.arg2_tree->ic_data*=tmpi2->ic_data;
 		      tmpi1->ic_class2=tmpi->ic_class2;
 		      tmpi_push=tmpi1;
 		      OptSetNOP1(tmpi2);
@@ -381,16 +381,16 @@ args.
 		OptSetNOP1(tmpi2);
 		OptSetNOP1(tmpi);
 	      } else if (tmpi1->ic_code==IC_MUL) {
-		if (tmpi1->t.a1t->ic_code==IC_IMM_F64) {
+		if (tmpi1->t.arg1_tree->ic_code==IC_IMM_F64) {
 		  tmpi1->ic_flags|=tmpi->ic_flags|tmpi2->ic_flags;
-		  tmpi1->t.a1t->ic_data(F64)*=tmpi2->ic_data(F64);
+		  tmpi1->t.arg1_tree->ic_data(F64)*=tmpi2->ic_data(F64);
 		  tmpi1->ic_class2=tmpi->ic_class2;
 		  tmpi_push=tmpi1;
 		  OptSetNOP1(tmpi2);
 		  OptSetNOP1(tmpi);
-		} else if (tmpi1->t.a2t->ic_code==IC_IMM_F64) {
+		} else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_F64) {
 		  tmpi1->ic_flags|=tmpi->ic_flags|tmpi2->ic_flags;
-		  tmpi1->t.a2t->ic_data(F64)*=tmpi2->ic_data(F64);
+		  tmpi1->t.arg2_tree->ic_data(F64)*=tmpi2->ic_data(F64);
 		  tmpi1->ic_class2=tmpi->ic_class2;
 		  tmpi_push=tmpi1;
 		  OptSetNOP1(tmpi2);
@@ -509,19 +509,19 @@ args.
 		  OptSetNOP1(tmpi);
 		} else if (tmpi2->ic_code==IC_ADD||
 		      tmpi2->ic_code==IC_SUB) {
-		  if (tmpi2->t.a1t->ic_code==IC_IMM_I64) {
+		  if (tmpi2->t.arg1_tree->ic_code==IC_IMM_I64) {
 		    tmpi2->ic_flags|=tmpi->ic_flags;
-		    tmpi2->t.a1t->ic_data+=tmpi1->ic_data;
+		    tmpi2->t.arg1_tree->ic_data+=tmpi1->ic_data;
 		    tmpi2->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi2;
 		    OptSetNOP1(tmpi1);
 		    OptSetNOP1(tmpi);
-		  } else if (tmpi2->t.a2t->ic_code==IC_IMM_I64) {
+		  } else if (tmpi2->t.arg2_tree->ic_code==IC_IMM_I64) {
 		    tmpi2->ic_flags|=tmpi->ic_flags;
 		    if (tmpi2->ic_code==IC_ADD)
-		      tmpi2->t.a2t->ic_data+=tmpi1->ic_data;
+		      tmpi2->t.arg2_tree->ic_data+=tmpi1->ic_data;
 		    else
-		      tmpi2->t.a2t->ic_data-=tmpi1->ic_data;
+		      tmpi2->t.arg2_tree->ic_data-=tmpi1->ic_data;
 		    tmpi2->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi2;
 		    OptSetNOP1(tmpi1);
@@ -537,19 +537,19 @@ args.
 		  OptSetNOP1(tmpi);
 		} else if (tmpi1->ic_code==IC_ADD ||
 		      tmpi1->ic_code==IC_SUB) {
-		  if (tmpi1->t.a1t->ic_code==IC_IMM_I64) {
+		  if (tmpi1->t.arg1_tree->ic_code==IC_IMM_I64) {
 		    tmpi1->ic_flags|=tmpi->ic_flags;
-		    tmpi1->t.a1t->ic_data+=tmpi2->ic_data;
+		    tmpi1->t.arg1_tree->ic_data+=tmpi2->ic_data;
 		    tmpi1->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi1;
 		    OptSetNOP1(tmpi2);
 		    OptSetNOP1(tmpi);
-		  } else if (tmpi1->t.a2t->ic_code==IC_IMM_I64) {
+		  } else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_I64) {
 		    tmpi1->ic_flags|=tmpi->ic_flags;
 		    if (tmpi1->ic_code==IC_ADD)
-		      tmpi1->t.a2t->ic_data+=tmpi2->ic_data;
+		      tmpi1->t.arg2_tree->ic_data+=tmpi2->ic_data;
 		    else
-		      tmpi1->t.a2t->ic_data-=tmpi2->ic_data;
+		      tmpi1->t.arg2_tree->ic_data-=tmpi2->ic_data;
 		    tmpi1->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi1;
 		    OptSetNOP1(tmpi2);
@@ -565,19 +565,19 @@ args.
 		  OptSetNOP1(tmpi);
 		} else if (tmpi2->ic_code==IC_ADD||
 		      tmpi2->ic_code==IC_SUB) {
-		  if (tmpi2->t.a1t->ic_code==IC_IMM_F64) {
+		  if (tmpi2->t.arg1_tree->ic_code==IC_IMM_F64) {
 		    tmpi2->ic_flags|=tmpi->ic_flags;
-		    tmpi2->t.a1t->ic_data(F64)+=tmpi1->ic_data(F64);
+		    tmpi2->t.arg1_tree->ic_data(F64)+=tmpi1->ic_data(F64);
 		    tmpi2->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi2;
 		    OptSetNOP1(tmpi1);
 		    OptSetNOP1(tmpi);
-		  } else if (tmpi2->t.a2t->ic_code==IC_IMM_F64) {
+		  } else if (tmpi2->t.arg2_tree->ic_code==IC_IMM_F64) {
 		    tmpi2->ic_flags|=tmpi->ic_flags;
 		    if (tmpi2->ic_code==IC_ADD)
-		      tmpi2->t.a2t->ic_data(F64)+=tmpi1->ic_data(F64);
+		      tmpi2->t.arg2_tree->ic_data(F64)+=tmpi1->ic_data(F64);
 		    else
-		      tmpi2->t.a2t->ic_data(F64)-=tmpi1->ic_data(F64);
+		      tmpi2->t.arg2_tree->ic_data(F64)-=tmpi1->ic_data(F64);
 		    tmpi2->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi2;
 		    OptSetNOP1(tmpi1);
@@ -593,19 +593,19 @@ args.
 		  OptSetNOP1(tmpi);
 		} else if (tmpi1->ic_code==IC_ADD ||
 		      tmpi1->ic_code==IC_SUB) {
-		  if (tmpi1->t.a1t->ic_code==IC_IMM_F64) {
+		  if (tmpi1->t.arg1_tree->ic_code==IC_IMM_F64) {
 		    tmpi1->ic_flags|=tmpi->ic_flags;
-		    tmpi1->t.a1t->ic_data(F64)+=tmpi2->ic_data(F64);
+		    tmpi1->t.arg1_tree->ic_data(F64)+=tmpi2->ic_data(F64);
 		    tmpi1->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi1;
 		    OptSetNOP1(tmpi2);
 		    OptSetNOP1(tmpi);
-		  } else if (tmpi1->t.a2t->ic_code==IC_IMM_F64) {
+		  } else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_F64) {
 		    tmpi1->ic_flags|=tmpi->ic_flags;
 		    if (tmpi1->ic_code==IC_ADD)
-		      tmpi1->t.a2t->ic_data(F64)+=tmpi2->ic_data(F64);
+		      tmpi1->t.arg2_tree->ic_data(F64)+=tmpi2->ic_data(F64);
 		    else
-		      tmpi1->t.a2t->ic_data(F64)-=tmpi2->ic_data(F64);
+		      tmpi1->t.arg2_tree->ic_data(F64)-=tmpi2->ic_data(F64);
 		    tmpi1->ic_class2=tmpi->ic_class2;
 		    tmpi_push=tmpi1;
 		    OptSetNOP1(tmpi2);
@@ -638,19 +638,19 @@ args.
 		} else
 		  if (tmpi1->ic_code==IC_ADD ||
 			tmpi1->ic_code==IC_SUB) {
-		    if (tmpi1->t.a1t->ic_code==IC_IMM_I64) {
+		    if (tmpi1->t.arg1_tree->ic_code==IC_IMM_I64) {
 		      tmpi1->ic_flags|=tmpi->ic_flags;
-		      tmpi1->t.a1t->ic_data-=tmpi2->ic_data;
+		      tmpi1->t.arg1_tree->ic_data-=tmpi2->ic_data;
 		      tmpi1->ic_class2=tmpi->ic_class2;
 		      tmpi_push=tmpi1;
 		      OptSetNOP1(tmpi2);
 		      OptSetNOP1(tmpi);
-		    } else if (tmpi1->t.a2t->ic_code==IC_IMM_I64) {
+		    } else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_I64) {
 		      tmpi1->ic_flags|=tmpi->ic_flags;
 		      if (tmpi1->ic_code==IC_ADD)
-			tmpi1->t.a2t->ic_data-=tmpi2->ic_data;
+			tmpi1->t.arg2_tree->ic_data-=tmpi2->ic_data;
 		      else
-			tmpi1->t.a2t->ic_data+=tmpi2->ic_data;
+			tmpi1->t.arg2_tree->ic_data+=tmpi2->ic_data;
 		      tmpi1->ic_class2=tmpi->ic_class2;
 		      tmpi_push=tmpi1;
 		      OptSetNOP1(tmpi2);
@@ -667,19 +667,19 @@ args.
 		    OptSetNOP1(tmpi);
 		  } else
 		    if (tmpi1->ic_code==IC_ADD || tmpi1->ic_code==IC_SUB) {
-		      if (tmpi1->t.a1t->ic_code==IC_IMM_F64) {
+		      if (tmpi1->t.arg1_tree->ic_code==IC_IMM_F64) {
 			tmpi1->ic_flags|=tmpi->ic_flags|tmpi2->ic_flags;
-			tmpi1->t.a1t->ic_data(F64)-=tmpi2->ic_data(F64);
+			tmpi1->t.arg1_tree->ic_data(F64)-=tmpi2->ic_data(F64);
 			tmpi1->ic_class2=tmpi->ic_class2;
 			tmpi_push=tmpi1;
 			OptSetNOP1(tmpi2);
 			OptSetNOP1(tmpi);
-		      } else if (tmpi1->t.a2t->ic_code==IC_IMM_F64) {
+		      } else if (tmpi1->t.arg2_tree->ic_code==IC_IMM_F64) {
 			tmpi1->ic_flags|=tmpi->ic_flags|tmpi2->ic_flags;
 			if (tmpi1->ic_code==IC_ADD)
-			  tmpi1->t.a2t->ic_data(F64)-=tmpi2->ic_data(F64);
+			  tmpi1->t.arg2_tree->ic_data(F64)-=tmpi2->ic_data(F64);
 			else
-			  tmpi1->t.a2t->ic_data(F64)+=tmpi2->ic_data(F64);
+			  tmpi1->t.arg2_tree->ic_data(F64)+=tmpi2->ic_data(F64);
 			tmpi1->ic_class2=tmpi->ic_class2;
 			tmpi_push=tmpi1;
 			OptSetNOP1(tmpi2);
@@ -807,7 +807,7 @@ args.
 	  }
 	  break;
       end:
-	tmpi->ic_flags&=~ICF_R_TO_INT;
+	tmpi->ic_flags&=~ICF_RES_TO_INT;
 	if (!tmpi_push->ic_class->ptr_stars_cnt) {
 	  if (tmpi_push->ic_class->raw_type==RT_F64)
 	    tmpi_push->ic_class2=cmp.internal_types[RT_F64];
@@ -860,16 +860,16 @@ args.
 	    tmpi->ic_flags=tmpi->ic_flags|ICF_USE_F64;
 	  if (tmpc->raw_type==RT_F64) {
 	    if (tmpc2->raw_type!=RT_F64)
-	      tmpi2->ic_flags|=ICF_R_TO_F64;
+	      tmpi2->ic_flags|=ICF_RES_TO_F64;
 	  }
 	  break;
 	case IC_ASSIGN:
 	  if (tmpc->raw_type==RT_F64) {
 	    if (tmpc2->raw_type!=RT_F64)
-	      tmpi2->ic_flags|=ICF_R_TO_F64;
+	      tmpi2->ic_flags|=ICF_RES_TO_F64;
 	  } else {
 	    if (tmpc2->raw_type==RT_F64)
-	      tmpi2->ic_flags|=ICF_R_TO_INT;
+	      tmpi2->ic_flags|=ICF_RES_TO_INT;
 	  }
 	  if (cc->pass==2 && tmpi1->ic_class->raw_type!=RT_F64) {
 	    if (tmpi1->ic_code==IC__PP) {
@@ -891,7 +891,7 @@ args.
 	case IC_OR_EQU:
 	case IC_XOR_EQU:
 	  if (tmpc2->raw_type==RT_F64)
-	    tmpi2->ic_flags|=ICF_R_TO_INT;
+	    tmpi2->ic_flags|=ICF_RES_TO_INT;
 	  break;
       end:
 	break;
@@ -947,7 +947,7 @@ args.
 	  while (tmpi2->ic_code!=IC_CALL_END)
 	    tmpi2=tmpi2->next;
 
-	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_R_TO_INT|tmpi2->ic_flags;
+	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_RES_TO_INT|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi->ic_code=IC_IMM_I64;
@@ -965,7 +965,7 @@ args.
 	  while (tmpi2->ic_code!=IC_CALL_END)
 	    tmpi2=tmpi2->next;
 
-	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_R_TO_F64|tmpi2->ic_flags;
+	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_RES_TO_F64|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi->ic_code=IC_IMM_I64;
@@ -974,7 +974,7 @@ args.
 	  tmpi->ic_class2=cmp.internal_types[RT_I64];
 	  OptSetNOP1(tmpi1);
 	}
-	if (tmpi1->ic_flags&ICF_R_TO_F64) {
+	if (tmpi1->ic_flags&ICF_RES_TO_F64) {
 	  i=0;
 	  tmpi2=tmpi1->last;
 	  while (TRUE) {
@@ -992,7 +992,7 @@ args.
 	    tmpi2=tmpi2->next;
 
 	  tmpi1->ic_flags=tmpi->ic_flags|tmpi1->ic_flags&
-		~(ICF_R_TO_F64|ICF_PUSH_RES)|tmpi2->ic_flags;
+		~(ICF_RES_TO_F64|ICF_PUSH_RES)|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi1->ic_class=cmp.internal_types[RT_I64];
@@ -1012,7 +1012,7 @@ args.
 	  while (tmpi2->ic_code!=IC_CALL_END)
 	    tmpi2=tmpi2->next;
 
-	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_R_TO_F64|tmpi2->ic_flags;
+	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_RES_TO_F64|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi->ic_code=IC_IMM_F64;
@@ -1030,7 +1030,7 @@ args.
 	  while (tmpi2->ic_code!=IC_CALL_END)
 	    tmpi2=tmpi2->next;
 
-	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_R_TO_INT|tmpi2->ic_flags;
+	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_RES_TO_INT|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi->ic_code=IC_IMM_F64;
@@ -1039,7 +1039,7 @@ args.
 	  tmpi->ic_class2=cmp.internal_types[RT_F64];
 	  OptSetNOP1(tmpi1);
 	}
-	if (tmpi1->ic_flags&ICF_R_TO_INT) {
+	if (tmpi1->ic_flags&ICF_RES_TO_INT) {
 	  i=0;
 	  tmpi2=tmpi1->last;
 	  while (TRUE) {
@@ -1057,7 +1057,7 @@ args.
 	    tmpi2=tmpi2->next;
 
 	  tmpi1->ic_flags=tmpi->ic_flags|tmpi1->ic_flags&
-		~(ICF_R_TO_INT|ICF_PUSH_RES)|tmpi2->ic_flags;
+		~(ICF_RES_TO_INT|ICF_PUSH_RES)|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi1->ic_class=cmp.internal_types[RT_F64];
@@ -1077,7 +1077,7 @@ args.
 	  while (tmpi2->ic_code!=IC_CALL_END)
 	    tmpi2=tmpi2->next;
 
-	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_R_TO_F64|tmpi2->ic_flags;
+	  tmpi->ic_flags|=tmpi1->ic_flags&~ICF_RES_TO_F64|tmpi2->ic_flags;
 	  OptSetNOP1(tmpi2);
 
 	  tmpi->ic_code=IC_IMM_I64;
@@ -1252,7 +1252,7 @@ args.
       case IC_ASM:
 	break;
       default:
-	"Pass:%d Missing IC handler\n",cc->pass;
+	"Pass:%d Missing IC hndlr\n",cc->pass;
 	ICPut(cc,tmpi);
 	LexExcept(cc,"Compiler Optimization Error at ");
     }
@@ -1270,9 +1270,9 @@ args.
     }
     if (tmpi->ic_class) {
       if (tmpi->ic_class->raw_type==RT_F64)
-	tmpi->ic_flags&=~ICF_R_TO_F64;
+	tmpi->ic_flags&=~ICF_RES_TO_F64;
       else
-	tmpi->ic_flags&=~ICF_R_TO_INT;
+	tmpi->ic_flags&=~ICF_RES_TO_INT;
       if (code>IC_END_EXP)
 	last_with_class=tmpi;
     }

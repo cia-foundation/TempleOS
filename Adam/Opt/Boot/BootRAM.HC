@@ -30,12 +30,13 @@ _extern _HI_CALL I64 HiCall(U8 *machine_code);
 _extern _HI_MEMCPY U8 *HiMemCpy(U8 *dst,U8 *src,I64 cnt);
 
 #help_index "Boot"
-public U0 BootRAM(U8 *filename)
-{//Softboot Kernel Bin file. No hardware reset.
+public U0 BootRAM(U8 *filename=NULL)
+{//Softboot Kernel.BIN file. No hardware reset.
   I64 size;
-  CKernel *hi_image,*lo_image=sys_boot_base-sizeof(CBinFile),
+  CKernel *hi_image,*lo_image=mem_boot_base-sizeof(CBinFile),
 	reg *sys_ram_reboot;
-
+  if (!filename)
+    filename="::/Kernel/" KERNEL_BIN_C;
   do if (!(hi_image=FileRead(filename,&size))) return;
   while (hi_image<0x100000); //If alloc from low 640K, just get another copy.
 

@@ -1,46 +1,6 @@
 #help_index "TOS"
 
-public U0 CursorRemFile(U8 *filename)
-{
-  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
-  DocWrite(doc);
-  DocDel(doc);
-}
-public U0 CursorRem(U8 *files_find_mask="*")
-{
-  I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+T+f+F+O");
-  CDirEntry *tmpde=FilesFind(files_find_mask,fuf_flags),*tmpde1=tmpde;
-  while (tmpde) {
-    CursorRemFile(tmpde->full_name);
-    Touch(tmpde->full_name,"",,tmpde->datetime);
-    tmpde=tmpde->next;
-  }
-  DirTreeDel(tmpde1);
-}
-
-U0 UncollapseFile(U8 *filename,I64 *)
-{
-  CDoc *doc=DocRead(filename,DOCF_NO_CURSOR);
-  DocCollapse(FALSE,doc);
-  DocWrite(doc);
-  DocDel(doc);
-}
-public U0 Uncollapse(U8 *files_find_mask="*",U8 *fu_flags=NULL)
-{
-  I64 fuf_flags=0;
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+f+F+$$+O");
-  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
-  CDirEntry *tmpde=FilesFind(files_find_mask,fuf_flags),*tmpde1=tmpde;
-  while (tmpde && !Bt(&fuf_flags,FUf_CANCEL)) {
-    UncollapseFile(tmpde->full_name,&fuf_flags);
-    Touch(tmpde->full_name,"",,tmpde->datetime);
-    tmpde=tmpde->next;
-  }
-  DirTreeDel(tmpde1);
-}
-
-#define VIDEO_FRAME_RATE	30
+#define VIDEO_FRAME_RATE	29.97
 
 #define FG_JUST_AUDIO	0
 #define FG_BOOT_DRV	1
@@ -104,7 +64,7 @@ public U0 FrameGrabberToggle()
     last_time=tS;
     if (fg_on) {
       fg_on=FALSE;
-      Snd(0);
+      Snd;
       wall->record=snd.record=FALSE;
       Sleep(1000);
       User("CopyVideo;Exit;\n");
@@ -113,7 +73,7 @@ public U0 FrameGrabberToggle()
       if (fg_mode!=FG_JUST_AUDIO)
 	Spawn(&FrameGrabberTask,NULL,"Frame Grabber");
       wall->record=snd.record=TRUE;
-      Snd(0);
+      Snd;
     }
   }
 }
@@ -123,7 +83,7 @@ public U0 JukeSong(I64 num)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,num,num+1);
+  JukeSongsPuppet("~/Sup1/Sup1Hymns",,num,num+1);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -133,7 +93,7 @@ public U0 JukeLines(I64 start_line,I64 end_line)
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,start_line*5,end_line*5);
+  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle;
 }
@@ -219,22 +179,18 @@ public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
   Free(out_name);
 }
 
-RegSetDftEntry("TempleOS/TOSVideos",
-	"I64 tos_code_walk_thru=1,tos_after_egypt_in_action=1;\n");
-RegExeBranch("TempleOS/TOSVideos");
+RegDft("TempleOS/TOSVideos","I64 tos_code_walk_thru=1;\n");
+RegExe("TempleOS/TOSVideos");
 
 U0 TOSRegInit()
 {
   DefinePrint("DD_CODE_WALK_THRU","Episode #%d",tos_code_walk_thru);
-  DefinePrint("DD_AFTER_EGYPT_IN_ACTION","Episode #%d",
-	tos_after_egypt_in_action);
 } TOSRegInit;
 
 U0 TOSRegWrite()
 {
-  RegWriteBranch("TempleOS/TOSVideos",
-	"I64 tos_code_walk_thru=%d,tos_after_egypt_in_action=%d;\n",
-	tos_code_walk_thru,tos_after_egypt_in_action);
+  RegWrite("TempleOS/TOSVideos",
+	"I64 tos_code_walk_thru=%d;\n",tos_code_walk_thru);
   TOSRegInit;
 }
 
@@ -261,23 +217,6 @@ U8 *TOSYouTube()
     res=NULL;
   Free(url);
   return res;
-}
-
-U0 AfterEgyptInAction()
-{
-  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  Adam("GodInit(\"/Adam/God/Vocab.DD*\");");
-  AutoComplete;
-  WinBorder;
-  WinMax;
-  if (!fg_on)
-    PopUp("Sleep(50);FrameGrabberToggle;");
-  Ed("~/Videos/AfterEgypt.DD.Z");
-  Msg(MSG_KEY_DOWN_UP,CH_SPACE,0x3900000039); //<SPACE>
-  ExeFile("::/Apps/AfterEgypt/Run");
-  SettingsPop;
-  tos_after_egypt_in_action++;
-  TOSRegWrite;
 }
 
 U0 CodeWalkThru()
@@ -309,16 +248,40 @@ U0 TOSJukeVideo(I64 start=0,I64 end=10)
   Free(buf);
   AutoComplete;
   FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Psalmody",,start,end);
+  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start,end);
   FrameGrabberToggle;
 }
 
-#define MEM_TEST_SIZE	128*0x100000
+#define MEM_TEST_SIZE	1024*1024
 U0 MemTest()
 {
-  while (sys_data_bp->alloced_u8s-sys_data_bp->used_u8s>MEM_TEST_SIZE*2) {
-    MemSet(MAlloc(MEM_TEST_SIZE),0x88,MEM_TEST_SIZE);
-    "%X\n",sys_data_bp->alloced_u8s-sys_data_bp->used_u8s;
+  U8 *b;
+  while (sys_data_bp->alloced_u8s-sys_data_bp->used_u8s>0x1000000) {
+    b=MAlloc(MEM_TEST_SIZE,Fs->data_heap);
+    MemSet(b,0x88,MSize(b));
+    "Data:%X\n",sys_data_bp->alloced_u8s-sys_data_bp->used_u8s;
     Yield;
   }
+  while (sys_code_bp->alloced_u8s-sys_code_bp->used_u8s>0x1000000) {
+    b=MAlloc(MEM_TEST_SIZE,Fs->code_heap);
+    MemSet(b,0x88,MSize(b));
+    "Code:%X\n",sys_code_bp->alloced_u8s-sys_code_bp->used_u8s;
+    Yield;
+  }
+}
+
+public I64 Profanity(
+	U8 *needle_filename="C:/Home/Sup1/Sup1Blog/Profanity.DD.Z",
+	U8 *files_find_mask="/*",U8 *fu_flags=NULL)
+{//Scan for profanity.
+  CCmpCtrl *cc;
+  I64 res=0;
+  if (FileFind(needle_filename)) {
+    cc=CmpCtrlNew(MStrPrint("#include \"%s\"",needle_filename));
+    while (Lex(cc))
+      if (cc->token==TK_IDENT)
+	res+=Find(cc->cur_str,files_find_mask,fu_flags);
+    CmpCtrlDel(cc);
+  }
+  return res;
 }

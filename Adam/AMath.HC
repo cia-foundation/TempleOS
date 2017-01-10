@@ -88,13 +88,13 @@ public Complex *CMul(Complex *prod,Complex *n1,Complex *n2)
 
 public Complex *CDiv(Complex *quot,Complex *n1,Complex *n2)
 {//quot=n1/n2
-  F64 m1,a1,m2,a2;
-  R2P(&m1,&a1,n1->x,n1->y);
-  R2P(&m2,&a2,n2->x,n2->y);
+  F64 m1,arg1,m2,arg2;
+  R2P(&m1,&arg1,n1->x,n1->y);
+  R2P(&m2,&arg2,n2->x,n2->y);
   m1/=m2;
-  a1-=a2;
-  quot->x=m1*Cos(a1);
-  quot->y=m1*Sin(a1);
+  arg1-=arg2;
+  quot->x=m1*Cos(arg1);
+  quot->y=m1*Sin(arg1);
   return quot;
 }
 

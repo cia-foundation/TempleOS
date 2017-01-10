@@ -22,7 +22,7 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE) {
-    Play("ABC");
+    Play("4AB5C");
   }
 }
 

@@ -69,7 +69,7 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   return res; //Num Entries
 }
 
-I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
+I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *char_bmp)
 {
   U8 *ptr,*ptr2;
   I64 res=0,ch;
@@ -79,11 +79,11 @@ I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
     if (doc_e->de_flags & DOCEF_TAG) {
       ptr=doc_e->tag;
       while (*ptr) {
-	while (*ptr && !Bt(chars_bmp,*ptr))
+	while (*ptr && !Bt(char_bmp,*ptr))
 	  ptr++;
 
 	ptr2=ptr;
-	while (*ptr && Bt(chars_bmp,*ptr))
+	while (*ptr && Bt(char_bmp,*ptr))
 	  ptr++;
 
 	ch=*ptr;
@@ -100,7 +100,7 @@ I64 DocWordsFile(CDoc *doc_out=NULL,U8 *filename,U32 *chars_bmp)
   DocDel(doc_in);
   return res;
 }
-public I64 Words(U8 *files_find_mask="*",U32 *chars_bmp=chars_bmp_alpha,
+public I64 Words(U8 *files_find_mask="*",U32 *char_bmp=char_bmp_alpha,
 	U8 *fu_flags=NULL)
 {//Break file into list of not-unique words.
   I64 fuf_flags=0,res=0;
@@ -110,7 +110,7 @@ public I64 Words(U8 *files_find_mask="*",U32 *chars_bmp=chars_bmp_alpha,
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
   while (tmpde) {
-    res+=DocWordsFile(doc_out,tmpde->full_name,chars_bmp);
+    res+=DocWordsFile(doc_out,tmpde->full_name,char_bmp);
     tmpde=tmpde->next;
   }
   DirTreeDel(tmpde1);

@@ -29,16 +29,15 @@ public _extern C32_EFLAGS U32 c32_eflags;
 public _extern C32_ESI U32 c32_esi;
 
 #help_index "Char/BitMaps"
-public extern U32 chars_bmp_alpha[16],chars_bmp_alpha_numeric[16],
-chars_bmp_alpha_numeric_no_at[16],	chars_bmp_word[16],
-chars_bmp_dec_numeric[16],		chars_bmp_hex_numeric[16],
-chars_bmp_white_space[16],		chars_bmp_non_eol_white_space[16],
-chars_bmp_zero_cr_nl_cursor[16],	chars_bmp_zero_tab_ff_cr_nl_cursor[16],
-chars_bmp_zero_tab_ff_cr_nl_cursor_dollar[16],chars_bmp_getkey[16],
-chars_bmp_macro[16],			chars_bmp_printable[16],
-chars_bmp_displayable[16],		chars_bmp_safe_dollar[16],
-chars_bmp_filename[16],			chars_bmp_non_eol[16];
-
+public extern U32 char_bmp_alpha[16],char_bmp_alpha_numeric[16],
+char_bmp_alpha_numeric_no_at[16],	char_bmp_word[16],
+char_bmp_dec_numeric[16],		char_bmp_hex_numeric[16],
+char_bmp_white_space[16],		char_bmp_non_eol_white_space[16],
+char_bmp_zero_cr_nl_cursor[16],	char_bmp_zero_tab_cr_nl_cursor[16],
+char_bmp_zero_tab_cr_nl_cursor_dollar[16],
+char_bmp_macro[16],			char_bmp_printable[16],
+char_bmp_displayable[16],		char_bmp_safe_dollar[16],
+char_bmp_filename[16],			char_bmp_non_eol[16];
 #help_index "Char/Conversion"
 public extern U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE);
 public extern I64 Char2ScanCode(I64 ch,I64 sc_flags=0);
@@ -187,10 +186,10 @@ public extern Bool EdLite(U8 *filename,I64 num=1,I64 edf_dof_flags=0);
 extern Bool EdLiteFileLine(U8 *fl_file_line,I64 edf_dof_flags=0);
 public extern Bool Fix(I64 edf_dof_flags=0);
 public extern U0 FixSet(U8 *filename,I64 line);
-public extern U0 G(U8 *ip=INVALID_PTR,CTask *task=NULL);
-public extern U0 G2(U8 *ip=INVALID_PTR,CTask *task=NULL);
+public extern U0 G(U8 *ms=INVALID_PTR,CTask *task=NULL);
+public extern U0 G2(U8 *ms=INVALID_PTR,CTask *task=NULL);
 public extern Bool IsDbgMode();
-public extern U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL);
+public extern U0 S(U8 *ms=INVALID_PTR,CTask *task=NULL);
 
 #help_index "Debugging/Debugger;DolDoc/Cmd Line (Typically);"\
 	"Cmd Line (Typically);Help System"
@@ -218,15 +217,16 @@ public extern CHash *FunSegFind(U8 *addr,I64 *_offset);
 #help_index "Debugging/Raw Output"
 public extern Bool IsRaw();
 public extern Bool Raw(Bool val);
-public extern U0 RawD(I64 ms=100,U8 *addr,I64 cnt=0x80);
-public extern U0 RawDm(I64 ms=100,U8 *addr,I64 cnt=0x80);
+public extern U0 RawD(I64 mS=100,U8 *addr,I64 cnt=0x80);
+public extern U0 RawDm(I64 mS=100,U8 *addr,I64 cnt=0x80);
 extern U0 RawDr(CTask *task=NULL);
-public extern U0 RawPrint(I64 ms=100,U8 *fmt,...);
+public extern U0 RawPrint(I64 mS=100,U8 *fmt,...);
 public extern U0 RawPutChar(I64 ch);
 public extern U0 VGAFlush();
 
 #help_index "Debugging;Debugging/Debugger"
 public extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
+public extern U0 Panic(U8 *msg=NULL,I64 msg_num=0,Bool panic=TRUE);
 
 #help_index "Define;Char/Define"
 #help_file "::/Doc/Define"
@@ -255,12 +255,12 @@ public extern CDoc *sys_clipboard_doc;
 extern CDoc *(*fp_doc_put)(CTask *task=NULL);
 
 #help_index "Exceptions"
+public extern U0 Break();
 public extern Bool BreakLock(CTask *task=NULL);
 public extern Bool BreakUnlock(CTask *task=NULL);
 public extern U0 PutExcept(Bool catch_it=TRUE);
 extern U0 SysTry(U8 *start_label,U8 *skip_label);
 extern U0 SysUntry();
-public extern U0 ThrowBreak(CTask *task=NULL);
 public extern U0 throw(I64 ch=0,Bool no_log=FALSE);
 
 #help_index "File/CD DVD"
@@ -350,6 +350,7 @@ extern U0 FAT32FreeClusters(CDrv *dv,I64 c);
 public extern CBlkDev *Let2BlkDev(U8 drv_let=0,Bool except=TRUE);
 public extern I64 Let2BlkDevType(U8 drv_let);
 public extern CDrv *Let2Drv(U8 drv_let=0,Bool except=TRUE);
+public extern U8 Let2Let(U8 drv_let=0);
 extern I64 Name2DirCluster(CDrv *dv,U8 *dirname);
 extern I64 Name2ParentDirCluster(CDrv *dv,U8 *dirname);
 public extern Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt);
@@ -384,7 +385,8 @@ extern I64 ATAProbe(I64 base0,I64 base1,I64 unit);
 extern U0 ATAReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt);
 extern U0 ATAWriteBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt);
 public extern I64 AutoMountIDE();
-extern I64 BlkDevAdd(CBlkDev *bd,Bool one_drv,Bool make_free);
+extern I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=MIN_I64,
+	Bool whole_drv,Bool make_free);
 extern U0 DskCacheInit(I64 size_in_U8s);
 public extern U0 DskCacheInvalidate(CDrv *dv);
 public extern CBlkDevGlbls blkdev;
@@ -441,23 +443,6 @@ public extern U0 Help();
 #help_index "Info;File/Cmd Line (Typically);Cmd Line (Typically);Install"
 public extern U0 DrvRep();
 
-#help_index "Input Pointer"
-#help_file "::/Doc/InputPointer"
-public extern U0 GridInit();
-public extern U0 IPSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
-	I64 l=MAX_I64,I64 r=MAX_I64);
-public extern CIPStateGlbls ip;
-public extern CGridGlbls ip_grid;
-extern CIPStateGlbls ip_last;
-
-#help_index "Input Pointer/Displayed Image"
-extern U0 IPVarsInit();
-extern U0 IPVarsUpdate(I64 x,I64 y,I64 z,Bool l,Bool r);
-
-#help_index "Input Pointer/Mouse"
-public extern CMouseStateGlbls mouse;
-extern CMouseStateGlbls mouse_last;
-
 #help_index "Install"
 #help_file "::/Doc/Install"
 extern CATARep *ATARepFind(CATARep *haystack_head,I64 needle_num);
@@ -470,16 +455,61 @@ public extern U0 Fmt(U8 drv_let,Bool quick=TRUE,
 #help_index "Install;Memory/BlkPool"
 public extern I64 Scale2Mem(I64 min,I64 max,I64 limit=2*1024*1024*1024);
 
+#help_index "Job/Exe;Task/Job/Exe"
+public extern U0 AdamErr(U8 *fmt,...);
+public extern U0 AdamLog(U8 *fmt,...);
+public extern I64 ExeCmdLine(CCmpCtrl *cc);
+public extern U0 JobDel(CJob *tmpc);
+public extern I64 JobsHndlr(I64 run_flags,CTask *task=NULL);
+extern U0 SrvCmdLine();
+public extern U0 SrvTaskCont();
+public extern CJob *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags);
+public extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
+public extern U0 UserTaskCont();
+
+#help_index "Job/Exe;Task/Job/Exe;Compiler"
+public extern I64 Adam(U8 *fmt,...);
+public extern I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL);
+public extern I64 PopUpPrint(U8 *fmt,...);
+
+#help_index "Job/Exe;Task/Job/Exe;MultiCore"
+public extern I64 JobResGet(CJob *rqst=NULL);
+public extern Bool JobResScan(CJob *rqst=NULL,I64 *_res=NULL);
+
+#help_index "Job/Text & Msgs;Task/Job/Text & Msgs"
+public extern CJob *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags);
+
+#help_index "Job/Text & Msgs;Task/Job/Text & Msgs;InFile;StdIn/InFile"
+public extern U0 In(U8 *fmt,...);
+public extern U0 InFile(U8 *filename);
+public extern U0 InStr(U8 *fmt,...);
+public extern U0 XTalk(CTask *task,U8 *fmt,...);
+public extern U0 XTalkStr(CTask *task,U8 *fmt,...);
+public extern U0 XTalkStrWait(CTask *task,U8 *fmt,...);
+public extern U0 XTalkWait(CTask *task,U8 *fmt,...);
+
+#help_index "Job/Text & Msgs;Task/Job/Text & Msgs;Messages"
+public extern U0 Msg(I64 msg_code,I64 arg1,I64 arg2,I64 flags=0);
+public extern U0 PostMsg(CTask *task,
+	I64 msg_code,I64 arg1,I64 arg2,I64 flags=0);
+public extern U0 PostMsgWait(CTask *task,I64 msg_code,
+	I64 arg1,I64 arg2,I64 flags=0);
+public extern CJob *TaskMsg(CTask *srv,CTask *master,
+		     I64 msg_code,I64 arg1,I64 arg2,I64 flags);
+
+#help_index "Job;Task/Job"
+#help_file "::/Doc/Job"
+
 #help_index "Keyboard Devices/System;Char/System"
 #help_file "::/Doc/KeyDev"
-public extern U0 CtrlAltCBSet(U8 ch,U0 (*fp_handler)(I64 sc),
+public extern U0 CtrlAltCBSet(U8 ch,U0 (*fp_hndlr)(I64 sc),
 	U8 *no_shift_desc=NULL,U8 *shift_desc=NULL,Bool in_irq=FALSE);
 public extern U0 KeyDescSet(U8 *fmt,...);
 public extern CKeyDevEntry *KeyDevAdd(Bool (*fp_put_key)(I64 ch,I64 sc),
 	Bool (*fp_puts)(U8 *st),I64 priority,Bool key_descs=FALSE);
 public extern U0 KeyDevRem(CKeyDevEntry *tmpk);
 extern CKeyDevGlbls keydev;
-extern CSrvCmd sys_macro_head;
+extern CJob sys_macro_head;
 extern CTask *sys_macro_task;
 
 #help_index "Keyboard Devices;Char/Input;StdIn"
@@ -492,12 +522,12 @@ public extern I64 GetKey(I64 *_scan_code=NULL,Bool echo=FALSE,
 public extern I64 GetS(U8 *buf,I64 size,Bool allow_ext=TRUE);
 public extern U8 *GetStr(U8 *msg=NULL,U8 *dft=NULL,I64 flags=0);
 extern U0	KbdInit();
-public extern I64 KbdMouseEvtTime();
-extern U0	KbdMouseHandler(Bool poll_kbd,Bool poll_mouse);
-extern U0	KbdMouseVarsInit();
+public extern I64 KbdMsEvtTime();
+extern U0	KbdMsHndlr(Bool poll_kbd,Bool poll_ms);
+extern U0	KbdMsInit();
 extern I64	KbdMsgsQue();
 public extern U0 KbdTypeMatic(U8 delay);
-extern Bool	MouseDriverInstall();
+extern Bool	MsHardDrvrInstall();
 public extern I64 PressAKey();
 public extern I64 ScanChar();
 public extern Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE);
@@ -529,10 +559,10 @@ public extern U8 *AMAlloc(I64 size);
 public extern U8 *AMAllocIdent(U8 *src);
 
 #help_index "Memory/BlkPool"
-public extern U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pages512);
-public extern U0 BlkPoolInit(CBlkPool *bp,I64 pages512);
-public extern U8 *Mem512Alloc(I64 pages512,CBlkPool *bp=NULL);
-public extern U0 Mem512Free(CMemBlk *m,CBlkPool *bp=NULL);
+public extern U0 BlkPoolAdd(CBlkPool *bp,CMemBlk *m,I64 pags);
+public extern U0 BlkPoolInit(CBlkPool *bp,I64 pags);
+public extern U8 *MemPagAlloc(I64 pags,CBlkPool *bp=NULL);
+public extern U0 MemPagFree(CMemBlk *m,CBlkPool *bp=NULL);
 
 #help_index "Memory/Heap"
 public extern U8 *CAlloc(I64 size,CTask *mem_task=NULL);
@@ -553,17 +583,15 @@ public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
 
 #help_index "Memory/Page Tables"
-public extern Bool MemPagePresentMark(U8 *a,Bool val);
-public extern I64 MemPageSize(U8 *a);
 public extern I64 *MemPageTable(U8 *a);
 
 #help_index "Messages"
 #help_file "::/Doc/Msgs"
 public extern I64 FlushMsgs(CTask *task=NULL);
-public extern I64 GetMsg(I64 *_a1=NULL,I64 *_a2=NULL,
+public extern I64 GetMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 	I64 mask=~1,CTask *task=NULL);
 extern U0 InputFilterTask();
-public extern I64 ScanMsg(I64 *_a1=NULL,I64 *_a2=NULL,
+public extern I64 ScanMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 	I64 mask=~1,CTask *task=NULL);
 
 #help_index "Misc"
@@ -577,7 +605,22 @@ public extern U0 QSortI64(I64 *base,I64 num,
 public extern F64 sys_os_version;
 
 #help_index "Misc/Progress Bars"
-public extern U0 ProgressBarsRst();
+public extern U0 ProgressBarsRst(U8 *path=NULL);
+
+#help_index "Mouse"
+#help_file "::/Doc/Mouse"
+public extern U0 GridInit();
+public extern U0 MsSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
+	I64 l=MAX_I64,I64 r=MAX_I64);
+public extern CMsStateGlbls ms;
+public extern CGridGlbls ms_grid;
+public extern CMsHardStateGlbls ms_hard;
+extern CMsHardStateGlbls ms_hard_last;
+extern CMsStateGlbls ms_last;
+
+#help_index "Mouse/Ptr"
+extern U0 MsInit();
+extern U0 MsUpdate(I64 x,I64 y,I64 z,Bool l,Bool r);
 
 #help_index "MultiCore"
 extern U0 Core0StartMP();
@@ -588,15 +631,15 @@ public extern U0 MPNMInt();
 extern CTask *SpawnQue(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 	U8 *task_name=NULL,I64 target_cpu,
 	CTask *parent=NULL, //NULL means adam
-	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
+	I64 stk_size=0,I64 flags=1<<JOBf_ADD_TO_QUE);
 
 #help_index "MultiCore;Boot"
 public extern U0 MPHalt();
 
-#help_index "MultiCore;Task/Srv/Exe"
-public extern CSrvCmd *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
-	I64 target_cpu=1,I64 flags=1<<SVCf_FREE_ON_COMPLETE,
-	I64 cmd_code=SVCT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
+#help_index "MultiCore;Job/Exe;Task/Job/Exe"
+public extern CJob *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
+	I64 target_cpu=1,I64 flags=1<<JOBf_FREE_ON_COMPLETE,
+	I64 job_code=JOBT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
 
 #help_index "PCI"
 public extern I64 PCIClassFind(I64 class_code,I64 n);
@@ -618,13 +661,16 @@ public extern I64 ATARep(Bool pmt=TRUE,
 #help_index "Processor"
 public extern U8 *IntEntryGet(I64 irq);
 public extern U8 *IntEntrySet(I64 irq,
-	U0 (*fp_new_handler)(),I64 type=IDTET_IRQ,I64 dpl=0);
+	U0 (*fp_new_hndlr)(),I64 type=IDTET_IRQ,I64 dpl=0);
 
 #help_index "Snd"
-public extern U0 Beep(I64 freq=500,Bool busy=FALSE);
+#help_file "::/Doc/Snd"
+public extern U0 Beep(I8 ona=62,Bool busy=FALSE);
+public extern I8 Freq2Ona(F64 freq);
 public extern Bool IsMute();
 public extern Bool Mute(Bool val);
-public extern U0 Snd(F64 freq);
+public extern F64 Ona2Freq(I64 ona);
+public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
 public extern CSndGlbls snd;
 
@@ -639,7 +685,7 @@ public extern I64 BirthWait(CTask **_task,I64 task_num=-1);
 public extern U0 DeathWait(CTask **_task,Bool send_exit=FALSE);
 public extern U0 Exit();
 public extern Bool IsSuspended(CTask *task=NULL);
-public extern Bool Kill(CTask *task,Bool wait=TRUE);
+public extern Bool Kill(CTask *task,Bool wait=TRUE,Bool just_break=FALSE);
 public extern Bool Suspend(CTask *task=NULL,Bool state=TRUE);
 _extern _TASK_CONTEXT_RESTORE U0 TaskContextRestore();
 _extern _TASK_END_NOW U0 TaskEndNow();
@@ -656,12 +702,12 @@ public extern I64 sys_num_spawned_tasks;
 extern CTask *sys_winmgr_task,*sys_task_being_scrn_updated;
 
 #help_index "Task/Delay;Time/CPU Cycles"
-public extern U0 BusyWait(I64 æS); //Loosely timed
+public extern U0 Busy(I64 æS); //Loosely timed
 public extern U0 PortNop(); //On the order of 1uS
 extern I64 TimeStampFreqCal();
 
 #help_index "Task/Delay;Time/Jiffies"
-public extern U0 Sleep(I64 ms);
+public extern U0 Sleep(I64 mS);
 public extern U0 SleepUntil(I64 wake_jiffy);
 
 #help_index "Task/Misc"
@@ -670,55 +716,11 @@ public extern U0 TSSBusy(I64 tr,Bool val=OFF);
 public extern U0 TaskDerivedValsUpdate(CTask *task=NULL,Bool update_z_buf=TRUE);
 public extern U0 WinDerivedValsUpdate(CTask *task);
 
-#help_index "Task/Srv"
-#help_file "::/Doc/TaskSrv"
-
-#help_index "Task/Srv/Exe"
-public extern U0 AdamErr(U8 *fmt,...);
-public extern U0 AdamLog(U8 *fmt,...);
-public extern I64 ExeCmdLine(CCmpCtrl *cc);
-public extern U0 SrvCmdDel(CSrvCmd *tmpc);
-extern U0 SrvCmdLine();
-public extern I64 SrvCmdsHandler(I64 run_flags,CTask *task=NULL);
-public extern U0 SrvTaskCont();
-public extern CSrvCmd *TaskExe(CTask *srv,CTask *master,U8 *data,I64 flags);
-public extern U0 TaskRstAwaitingMsg(CTask *task=NULL);
-public extern U0 UserTaskCont();
-
-#help_index "Task/Srv/Exe;Compiler"
-public extern I64 Adam(U8 *fmt,...);
-public extern I64 PopUp(U8 *buf,CTask *parent=NULL,CTask **_pu_task=NULL);
-public extern I64 PopUpPrint(U8 *fmt,...);
-
-#help_index "Task/Srv/Exe;MultiCore"
-public extern I64 JobResGet(CSrvCmd *rqst=NULL);
-public extern Bool JobResScan(CSrvCmd *rqst=NULL,I64 *_res=NULL);
-
-#help_index "Task/Srv/Text & Msgs"
-public extern CSrvCmd *TaskText(CTask *srv,CTask *master,U8 *data,I64 flags);
-
-#help_index "Task/Srv/Text & Msgs;InFile;StdIn/InFile"
-public extern U0 In(U8 *fmt,...);
-public extern U0 InFile(U8 *filename);
-public extern U0 InStr(U8 *fmt,...);
-public extern U0 XTalk(CTask *task,U8 *fmt,...);
-public extern U0 XTalkStr(CTask *task,U8 *fmt,...);
-public extern U0 XTalkStrWait(CTask *task,U8 *fmt,...);
-public extern U0 XTalkWait(CTask *task,U8 *fmt,...);
-
-#help_index "Task/Srv/Text & Msgs;Messages"
-public extern U0 Msg(I64 msg_code,I64 a1,I64 a2,I64 flags=0);
-public extern U0 PostMsg(CTask *task,I64 msg_code,I64 a1,I64 a2,I64 flags=0);
-public extern U0 PostMsgWait(CTask *task,I64 msg_code,
-	I64 a1,I64 a2,I64 flags=0);
-public extern CSrvCmd *TaskMsg(CTask *srv,CTask *master,
-		     I64 msg_code,I64 a1,I64 a2,I64 flags);
-
-#help_index "Task;Task/Srv/Exe;MultiCore"
+#help_index "Task;Job/Exe;Task/Job/Exe;MultiCore"
 public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 	U8 *task_name=NULL,I64 target_cpu=-1,	//-1 means current CPU
 	CTask *parent=NULL, //NULL means adam
-	I64 stk_size=0,I64 flags=1<<SVCf_ADD_TO_QUE);
+	I64 stk_size=0,I64 flags=1<<JOBf_ADD_TO_QUE);
 
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;

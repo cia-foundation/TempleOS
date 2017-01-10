@@ -553,7 +553,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	  i_jif>>=3;
 	  for (k=0;k<doc_e->scroll_len;k++) {
 	    ch=ptr[(i_jif+k)%j];
-	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
+	    if (!Bt(char_bmp_displayable,ch)) ch='.';
 	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
@@ -693,7 +693,7 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 	  x+=(doc_e->hex_ed_width-k)*3;
 	  for (j=0;j<k;j++) {
 	    ch=*bptr++;
-	    if (!Bt(chars_bmp_displayable,ch)) ch='.';
+	    if (!Bt(char_bmp_displayable,ch)) ch='.';
 	    if (recalc_flags&RECALCG_MASK==RECALCt_TO_SCRN &&
 		  !(doc_e->de_flags&DOCEF_DONT_DRAW)) {
 	      if (doc_e->de_flags & DOCEF_BORDER_PLOT &&
@@ -1057,7 +1057,7 @@ rc_adjust_xy:
 	  break;
 	case DOCT_LST:
 	case DOCT_TREE:
-	case DOCT_BUTTON:
+	case DOCT_BTTN:
 	case DOCT_LINK:
 	case DOCT_MENU_VAL:
 	case DOCT_MACRO:

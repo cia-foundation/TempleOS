@@ -87,7 +87,7 @@ CCtrl *SliderNew()
   }
   c=ACAlloc(sizeof(CCtrl));
   c->win_task=sys_winmgr_task;
-  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
+  c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_MS;
   c->type=CTRLT_GENERIC;
   c->state=ACAlloc(sizeof(CSliderState));
   c->draw_it=&DrawCtrlSlider;

@@ -9,6 +9,8 @@ Cd(__DIR__);;
 #include "Merge"
 #include "Profiler"
 #include "StrUtils"
+#include "DocUtils"
 #include "ToDolDoc"
 #include "ToTXT"
+#include "TOS"
 Cd("..");;

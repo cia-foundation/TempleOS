@@ -42,7 +42,7 @@ Bool ISO1FromName(U8 *dst,U8 *src)
       src++;
       if (*src==';')
 	break;
-      if (Bt(chars_bmp_filename,*src)) {
+      if (Bt(char_bmp_filename,*src)) {
 	if (j>=CDIR_FILENAME_LEN-1)
 	  return FALSE;
 	dst[j++]=*src++;

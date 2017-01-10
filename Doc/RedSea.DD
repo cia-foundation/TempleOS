@@ -6,13 +6,13 @@ $HL,1$#define CDIR_FILENAME_LEN	38 //Must include terminator zero
 
 The following bit field shows valid 8-Bit ASCII filename characters.
 
-U32 chars_bmp_filename[8]=
+U32 char_bmp_filename[8]=
 {0x0000000, 0x03FF73FB, 0xEFFFFFFF, 0x2FFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 
 public class CDirEntry //64-byte fixed-size
 {
   U16 attr;	//See $LK,"RS_ATTR_DIR",A="MN:RS_ATTR_DIR"$.  I would like to change these.
-  U8 name[CDIR_FILENAME_LEN]; //See $LK,"chars_bmp_filename",A="MN:chars_bmp_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
+  U8 name[CDIR_FILENAME_LEN]; //See $LK,"char_bmp_filename",A="MN:char_bmp_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
   I64 cluster; (blk) //One sector per cluster.
   I64 size;	//In bytes
   CDate datetime; //See  $LK,"DateTime",A="::/Doc/TimeDate.DD"$, $LK,"Implementation of DateTime",A="FI:::/Kernel/KDate.HC"$

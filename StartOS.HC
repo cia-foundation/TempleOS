@@ -28,6 +28,9 @@ LBts(&Fs->display_flags,DISPLAYf_CHILDREN_NOT_ON_TOP);
 LBts(&Fs->display_flags,DISPLAYf_SHOW);
 RegInit;
 LBts(&sys_run_level,RLf_REGISTRY);
+if (!ins_reg.registered)
+  InsUnreg;
+
 WallPaperInit;
 
 if (DrvIsWritable)
@@ -40,4 +43,4 @@ LBts(&sys_run_level,RLf_HOME);
 #help_index ""
 #include "/Home/MakeHome"
 
-//After this file, the Adam task enters $LK,"server mode",A="HI:Task/Srv"$.
+//After this file, the Adam task enters $LK,"server mode",A="HI:Job"$.

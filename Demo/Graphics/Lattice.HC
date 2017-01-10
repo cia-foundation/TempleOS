@@ -135,7 +135,7 @@ U0 SetMenu()
 U0 Lattice()
 {
   Bool aim=FALSE;
-  I64 a1,a2;
+  I64 arg1,arg2;
   CDC  *dc=DCAlias;
   DCDepthBufAlloc(dc);
   MenuPush(
@@ -181,29 +181,29 @@ U0 Lattice()
   Fs->draw_it=&DrawIt;
   try {
     while (TRUE) {
-      switch (GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|
-	    1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP|1<<MSG_IP_MOVE)) {
-	case MSG_IP_L_DOWN:
+      switch (GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN|
+	    1<<MSG_MS_R_DOWN|1<<MSG_MS_R_UP|1<<MSG_MS_MOVE)) {
+	case MSG_MS_L_DOWN:
 	  tt.first=TRUE;
-	  tt.x=a1;
-	  tt.y=a2;
+	  tt.x=arg1;
+	  tt.y=arg2;
 	  break;
-	case MSG_IP_R_DOWN:
+	case MSG_MS_R_DOWN:
 	  aim=TRUE;
-	  tt.é=Arg(a1-tt.x,a2-tt.y);
+	  tt.é=Arg(arg1-tt.x,arg2-tt.y);
 	  break;
-	case MSG_IP_MOVE:
+	case MSG_MS_MOVE:
 	  if (aim)
-	    tt.é=Arg(a1-tt.x,a2-tt.y);
+	    tt.é=Arg(arg1-tt.x,arg2-tt.y);
 	  break;
-	case MSG_IP_R_UP:
-	  tt.é=Arg(a1-tt.x,a2-tt.y);
+	case MSG_MS_R_UP:
+	  tt.é=Arg(arg1-tt.x,arg2-tt.y);
 	  aim=FALSE;
 	  break;
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case 0:
-	      switch (a2.u8[0]) {
+	      switch (arg2.u8[0]) {
 		case SC_CURSOR_LEFT:
 		  if (tt.dé_idx)
 		    tt.dé_idx--;
@@ -222,11 +222,11 @@ U0 Lattice()
 	      }
 	      break;
 	    case '0'...'9':
-	      tt.z=a1-'0';
+	      tt.z=arg1-'0';
 	      SetMenu;
 	      break;
 	    case 'c':
-	      tt.middle=PopUpColor("Middle Color\n\n");
+	      tt.middle=PopUpColor("Mid Color\n\n");
 	      tt.edge  =PopUpColor("Edge Color\n\n");
 	      break;
 	    case 'e':

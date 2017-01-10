@@ -5,18 +5,18 @@ StrCpy(captured_macro_name,"Test");
 
 I64 sys_macro_repeat_n=1;
 
-U0 SysMacroStripKey(CSrvCmd *macro_head,I64 a1,I64 a2)
+U0 SysMacroStripKey(CJob *macro_head,I64 arg1,I64 arg2)
 {
-  CSrvCmd *tmpc,*tmpc1;
+  CJob *tmpc,*tmpc1;
   tmpc=macro_head->next;
   while (tmpc!=macro_head) {
     tmpc1=tmpc->next;
-    if (tmpc->cmd_code==SVCT_MSG &&
+    if (tmpc->job_code==JOBT_MSG &&
 	  (tmpc->msg_code==MSG_KEY_DOWN || tmpc->msg_code==MSG_KEY_UP ||
 	  tmpc->msg_code==MSG_KEY_DOWN_UP) &&
-	  a1 && tmpc->aux1==a1 || !a1 && tmpc->aux2==a2) {
+	  arg1 && tmpc->aux1==arg1 || !arg1 && tmpc->aux2==arg2) {
       QueRem(tmpc);
-      SrvCmdDel(tmpc);
+      JobDel(tmpc);
     }
     tmpc=tmpc1;
   }
@@ -33,11 +33,11 @@ class CMacroTmp
   U8 buf[STR_LEN];
 };
 
-CMacroTmp *Cmd2MT(CSrvCmd *tmpc)
+CMacroTmp *Cmd2MT(CJob *tmpc)
 {
   U8 buf[8];
   CMacroTmp *tmpmt=CAlloc(sizeof(CMacroTmp));
-  if (Bt(chars_bmp_macro,tmpc->aux1) && tmpc->msg_code==MSG_KEY_DOWN) {
+  if (Bt(char_bmp_macro,tmpc->aux1) && tmpc->msg_code==MSG_KEY_DOWN) {
     tmpmt->type=MT_CHAR;
     buf[0]=tmpc->aux1;
     buf[1]=0;
@@ -50,13 +50,13 @@ CMacroTmp *Cmd2MT(CSrvCmd *tmpc)
   return tmpmt;
 }
 
-U8 *SysMacro2Str(CSrvCmd *macro_head)
+U8 *SysMacro2Str(CJob *macro_head)
 {
-  CSrvCmd *tmpc;
+  CJob *tmpc;
   I64 cnt=1; //terminating zero
   U8 *ptr,*m;
   CMacroTmp *tmpmt,*tmpmt1,head;
-  LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+  LBtr(&sys_semas[SEMA_RECORD_MACRO],0);
 
   QueInit(&head);
   head.type=MT_NULL;
@@ -107,7 +107,7 @@ U0 PlaySysMacro(I64 n=1)
   CTask *task=sys_focus_task;
   U8 *m;
   if (TaskValidate(task)) {
-    LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+    LBtr(&sys_semas[SEMA_RECORD_MACRO],0);
     m=SysMacro2Str(&sys_macro_head);
     while (n-- && TaskValidate(task)) {
       if (task==Fs)
@@ -139,7 +139,7 @@ I64 PopUpMacroMenu()
 {
   I64 res=0;
   U8 buf[STR_LEN];
-  CSrvCmd *tmpc;
+  CJob *tmpc;
   CDoc *doc=DocNew;
   CDocEntry *doc_e=DocPrint(doc,"$$DA-P,LEN=STR_LEN-1,A=\"Name:%%s\"$$");
   doc_e->data=captured_macro_name;
@@ -163,7 +163,7 @@ I64 PopUpMacroMenu()
   Fs->popup_task=sys_macro_task;
   LBts(&sys_macro_task->display_flags,DISPLAYf_WIN_ON_TOP);
   tmpc=TaskExe(sys_macro_task,Fs,buf,
-	1<<SVCf_WAKE_MASTER|1<<SVCf_FOCUS_MASTER);
+	1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
   JobResScan(tmpc,&res);
   Fs->popup_task=NULL;
   Kill(sys_macro_task);
@@ -183,9 +183,9 @@ U0 MacroTask(I64)
     WinRefocus(sys_focus_task);
     switch (i) {
       case SM_RECORD:
-	LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+	LBtr(&sys_semas[SEMA_RECORD_MACRO],0);
 	QueDel(&sys_macro_head,TRUE);
-	LBts(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+	LBts(&sys_semas[SEMA_RECORD_MACRO],0);
 	break;
       case SM_PLAY:
 	PlaySysMacro;
@@ -194,10 +194,10 @@ U0 MacroTask(I64)
 	PlaySysMacro(sys_macro_repeat_n);
 	break;
       case SM_STOP:
-	LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+	LBtr(&sys_semas[SEMA_RECORD_MACRO],0);
 	break;
       case SM_INS:
-	LBtr(&sys_semas[SYS_SEMA_RECORD_MACRO],0);
+	LBtr(&sys_semas[SEMA_RECORD_MACRO],0);
 	EdInsCapturedMacro;
 	break;
     }

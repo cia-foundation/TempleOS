@@ -8,7 +8,7 @@ I64 Str2I64(U8 *st,I64 radix=10,U8 **_end_ptr=NULL)
     if (_end_ptr) *_end_ptr=st;
     return 0;
   }
-  while (Bt(chars_bmp_white_space,*st))
+  while (Bt(char_bmp_white_space,*st))
     st++;
   while (TRUE)
     switch (*st) {
@@ -66,7 +66,7 @@ to avoid this.
   Bool neg=FALSE,neg_e=FALSE;
 
   ch=*src++;
-  while (Bt(chars_bmp_white_space,ch))
+  while (Bt(char_bmp_white_space,ch))
     ch=*src++;
   if (ch=='-') {
     neg=TRUE;
@@ -84,7 +84,7 @@ to avoid this.
   }
   i=0;
   while (TRUE) {
-    if (Bt(chars_bmp_dec_numeric,ch))
+    if (Bt(char_bmp_dec_numeric,ch))
       i=i*10+ch-'0';
     else {
       if (ch=='.' || ch=='e' || ch=='E')
@@ -98,7 +98,7 @@ to avoid this.
     ch=*src++;
   k=0;
   while (TRUE) {
-    if (Bt(chars_bmp_dec_numeric,ch)) {
+    if (Bt(char_bmp_dec_numeric,ch)) {
       i=i*10+ch-'0';
       k++;
     } else {
@@ -116,7 +116,7 @@ to avoid this.
   }
   j=0;
   while (TRUE) {
-    if (Bt(chars_bmp_dec_numeric,ch))
+    if (Bt(char_bmp_dec_numeric,ch))
       j=j*10+ch-'0';
     else {
       if (neg_e)

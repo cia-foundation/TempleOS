@@ -17,7 +17,7 @@ U8 *BlogLocalFile(CDate cdt=0)
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
   Date2Struct(&ds,cdt);
-  StrPrint(file,"%s/" PERSONAL_INITIALS "%02d%02d%02d.DD.Z",
+  StrPrint(file,"%s/" INS_REG_PERSONAL_INITIALS "%02d%02d%02d.DD.Z",
 	BlogLocalDir(cdt),ds.year%100,ds.mon,ds.day_of_mon);
   return file;
 }
@@ -39,7 +39,7 @@ U8 *BlogWebFile(CDate cdt=0)
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
   Date2Struct(&ds,cdt);
-  StrPrint(file,"%s/" PERSONAL_INITIALS "%02d%02d%02d.DD.Z",
+  StrPrint(file,"%s/" INS_REG_PERSONAL_INITIALS "%02d%02d%02d.DD.Z",
 	BlogWebDir(cdt),ds.year%100,ds.mon,ds.day_of_mon);
   return file;
 }
@@ -71,13 +71,13 @@ U0 BlogScrnShot()
 {
   Bool old_cursor=DocCursor;
   CDC *dc1,*dc2;
-  U8 *old_fp_draw_input_ptr=gr.fp_draw_input_ptr;
-  gr.fp_draw_input_ptr=NULL;
+  U8 *old_fp_draw_ms=gr.fp_draw_ms;
+  gr.fp_draw_ms=NULL;
   Refresh(2);
   dc1=DCScrnCapture;
   dc2=DCExt(dc1,0,FONT_HEIGHT,GR_WIDTH-1,GR_HEIGHT-1);
   BlogDCImgWrite(dc2);
-  gr.fp_draw_input_ptr=old_fp_draw_input_ptr;
+  gr.fp_draw_ms=old_fp_draw_ms;
   DCDel(dc1);
   DCDel(dc2);
   DocCursor(old_cursor);
@@ -92,23 +92,21 @@ public U0 MakeWebSitePartial()
   MkDir("D:/Wb/Home/Web/TAD/BlogDir");
 
   FreshenWebDir("/Home/Web");
-  FreshenWebDir("/Home/Web/" PERSONAL_INITIALS);
+  FreshenWebDir("/Home/Web/" INS_REG_PERSONAL_INITIALS);
   FreshenWebDir(BlogLocalDir+2);
   Drv('C');
 }
 
-public U0 Blog(Bool god_misc2=FALSE)
+public U0 Blog(Bool ALT_F6=TRUE)
 {
   if (!FileFind(BlogLocalFile,,FUF_JUST_FILES))
-    Copy("~/Web/" PERSONAL_INITIALS "/DailyBlogHeader.DD.Z",
+    Copy("~/Web/" INS_REG_PERSONAL_INITIALS "/DailyBlogHeader.DD.Z",
 	  BlogLocalFile);
   AutoComplete;
   WinBorder;
   WinMax;
   Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
-  if (god_misc2)
-    Msg(MSG_KEY_DOWN_UP,0,SC_F7|SCF_SHIFT|SCF_ALT);
-  else {
+  if (ALT_F6) {
     Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
     Msg(MSG_KEY_DOWN_UP,'\n',0);
   }

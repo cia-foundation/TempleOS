@@ -10,20 +10,20 @@ class CPlannedDrv
   Bool pri;
 };
 
-//Available to assist in writing scripts.
-I64 drv_dsk_dsk_size=0;
+public I64 PrtDsk(U8 drv_let=0,...)
+{/*Partition the disk containing partition drv_let.
 
-public I64 PrtDsk(U8 drv_let=0)
-{//Partition the disk containing partition drv_let.
-//drv_let=0 means add new drive that
-  //is not already mounted.
+drv_let=0 means add new drive that is not already mounted.
+
+>PrtDsk('C',0.5,0.25,0.25); //Make three.  50% C, 25% D, 25% E, round-up to blk.
+
+*/
   CBlkDev *bd;
   CPlannedDrv head,*tmppp;
   CMasterBoot mbr;
   Bool pri=TRUE;
-  I64 ext_base,drv_let2,pri_cnt=0,
-	i,start_offset,offset,remaining;
-  drv_dsk_dsk_size=0;
+  I64 ext_base,drv_let2,pri_cnt=0,i,start_offset,offset,
+	total,remaining,cur_arg=0;
   "This command does not play well\n"
 	"with other operating systems.\n"
 	"You really should use another\n"
@@ -34,17 +34,17 @@ public I64 PrtDsk(U8 drv_let=0)
 	"until you set block zero to zero\n"
 	"with $$LK,\"BootMHDZero\",\"MN:BootMHDZero\"$$()\n\n\n"
 	"Continue";
-  if (!YorN) return 0;
+  if (argc<=cur_arg && !YorN)
+    return 0;
+  '\n';
+
   if (drv_let && !Let2BlkDev(drv_let,FALSE))
     drv_let=0;
-  if (!drv_let) {
-    Mount(TRUE);
-    return 0;
-  }
-  if (!(bd=Let2BlkDev(drv_let,FALSE)) || bd->type!=BDT_ATA)
+  if (!drv_let && !(drv_let=Mount(TRUE)) ||
+	!(bd=Let2BlkDev(drv_let,FALSE)) || bd->type!=BDT_ATA)
     return 0;
 
-  drv_dsk_dsk_size=bd->max_blk+1;
+  total=bd->max_blk+1;
   QueInit(&head);
   drv_let2=bd->first_drv_let;
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO);
@@ -55,7 +55,7 @@ public I64 PrtDsk(U8 drv_let=0)
       tmppp->pri=FALSE;
       if (pri) {
 	"Primary Partition";
-	if (YorN) {
+	if (argc>cur_arg || YorN) {
 	  pri_cnt++;
 	  tmppp->pri=TRUE;
 	  if (pri_cnt==3)
@@ -63,10 +63,14 @@ public I64 PrtDsk(U8 drv_let=0)
 	} else
 	  pri=FALSE;
       }
-      "Blocks Remaining:%d (0x%X)\n",
+      "\nBlocks Remaining:%d (0x%X)\n",
 	    remaining-DRV_HEADER,remaining-DRV_HEADER;
-      tmppp->size=CeilU64(GetI64("Size in Blocks  :",
-	    remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
+      if (argc>cur_arg)
+	tmppp->size=MinI64(CeilU64(MaxI64(remaining,DRV_HEADER),ROUND_DRV_TO),
+	      CeilU64(argv[cur_arg++](F64)*total,ROUND_DRV_TO));
+      else
+	tmppp->size=CeilU64(GetI64("Size in Blocks  :",
+	      remaining-DRV_HEADER)+DRV_HEADER,ROUND_DRV_TO);
     } while (!(ROUND_DRV_TO<=tmppp->size<=FloorU64(remaining,ROUND_DRV_TO)));
     QueIns(tmppp,head.last);
     remaining-=tmppp->size;
@@ -85,7 +89,7 @@ public I64 PrtDsk(U8 drv_let=0)
     tmppp=tmppp->next;
     drv_let2++;
   }
-  if (!AreYouSure)
+  if (!argc && !AreYouSure)
     goto pd_done;
 
   remaining=FloorU64(bd->max_blk+1,ROUND_DRV_TO)-ROUND_DRV_TO;
@@ -149,15 +153,15 @@ public I64 PrtDsk(U8 drv_let=0)
   }
 
   bd->flags&=~(BDF_INITIALIZED | BDF_INIT_IN_PROGRESS);
-  BlkDevAdd(bd,FALSE,TRUE);
+  BlkDevAdd(bd,,FALSE,TRUE);
   for (i=bd->first_drv_let;i<drv_let2;i++)
     Fmt(i,,FALSE);
 
-pd_done:
+    pd_done:
   while (head.next!=&head) {
     tmppp=head.next;
     QueRem(tmppp);
     Free(tmppp);
   }
-  return drv_dsk_dsk_size;
+  return total;
 }

@@ -165,7 +165,7 @@ U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
   I64 res;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB108;
   c32_ebx=bus<<8+dev<<3+fun;
@@ -174,7 +174,7 @@ U8 PCIReadU8(I64 bus,I64 dev,I64 fun,I64 rg)
     res=c32_ecx.u8[0];
   else
     res=0xFF;
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
   return res;
 }
@@ -184,7 +184,7 @@ U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
   I64 res;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB109;
   c32_ebx=bus<<8+dev<<3+fun;
@@ -193,7 +193,7 @@ U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg)
     res=c32_ecx.u16[0];
   else
     res=0xFFFF;
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
   return res;
 }
@@ -203,7 +203,7 @@ U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
   I64 res;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB10A;
   c32_ebx=bus<<8+dev<<3+fun;
@@ -212,7 +212,7 @@ U32 PCIReadU32(I64 bus,I64 dev,I64 fun,I64 rg)
     res=c32_ecx;
   else
     res=0xFFFFFFFF;
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
   return res;
 }
@@ -221,14 +221,14 @@ U0 PCIWriteU8(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 {//Write U8 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB10B;
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   c32_ecx=val;
   FarCall32(sys_pci_services);
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
 }
 
@@ -236,14 +236,14 @@ U0 PCIWriteU16(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 {//Write U16 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB10C;
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   c32_ecx=val;
   FarCall32(sys_pci_services);
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
 }
 
@@ -251,14 +251,14 @@ U0 PCIWriteU32(I64 bus,I64 dev,I64 fun,I64 rg,I64 val)
 {//Write U32 in PCI configspace at bus,dev,fun,reg.
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB10D;
   c32_ebx=bus<<8+dev<<3+fun;
   c32_edi=rg;
   c32_ecx=val;
   FarCall32(sys_pci_services);
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
 }
 
@@ -273,7 +273,7 @@ else bus,dev,fun.
   I64 res;
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_FAR_CALL32],0))
+  while (LBts(&sys_semas[SEMA_FAR_CALL32],0))
     Yield;
   c32_eax=0xB103;
   c32_esi=n;
@@ -282,7 +282,7 @@ else bus,dev,fun.
     res=c32_ebx.u8[1]<<16+(c32_ebx&0xF8)<<5+c32_ebx&7;
   else
     res=-1;
-  LBtr(&sys_semas[SYS_SEMA_FAR_CALL32],0);
+  LBtr(&sys_semas[SEMA_FAR_CALL32],0);
   POPFD
   return res;
 }

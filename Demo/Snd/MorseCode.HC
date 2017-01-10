@@ -92,7 +92,7 @@ I64 MorseWaitKey()
     if (m_start) {
       GetMsg(NULL,NULL,1<<MSG_KEY_UP);
       m_end=tS;
-      Snd(0);
+      Snd;
       dt_down=m_end-m_start;
       m_start=0;
       space_sent=FALSE;
@@ -113,11 +113,11 @@ I64 MorseWaitKey()
       } else
 	ch=GetChar(,FALSE);
       m_start=tS;
-      Snd(1000);
+      Snd(74);
       if (ch==CH_SHIFT_ESC || ch==CH_ESC) {
 	'\n';
-	Snd(0);
-	ThrowBreak; //exit program
+	Snd;
+	throw; //exit program
       }
       dt_up=m_start-m_end;
       if (!space_sent && dt_up>=M_SPACE_THRESHOLD) {
@@ -170,7 +170,7 @@ U0 Morse()
       }
     }
   }
-  Snd(0);
+  Snd;
 }
 
 Morse;

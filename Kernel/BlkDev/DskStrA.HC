@@ -257,7 +257,7 @@ Bool FileNameChk(U8 *filename)
   }
   if (StrLen(filename)>=CDIR_FILENAME_LEN) return FALSE;
   while (*ptr)
-    if (!Bt(chars_bmp_filename,*ptr++))
+    if (!Bt(char_bmp_filename,*ptr++))
       return FALSE;
   return TRUE;
 }

@@ -490,7 +490,7 @@ I64 PopUpWidgetType()
 	"$$MU,\"Page Settings\",LE=DOCT_PAGE_LEN$$\n"
 	"$$MU,\"Cursor Movement\",LE=DOCT_CURSOR_MOVEMENT$$\n"
 	"$$MU,\"Macro\",LE=DOCT_MACRO$$\n"
-	"$$MU,\"Button\",LE=DOCT_BUTTON$$\n"
+	"$$MU,\"Bttn\",LE=DOCT_BTTN$$\n"
 	"$$MU,\"Check Box\",LE=DOCT_CHECK_BOX$$\n"
 	"$$MU,\"List\",LE=DOCT_LST$$\n"
 	"$$MU,\"Menu Val\",LE=DOCT_MENU_VAL$$\n"
@@ -661,7 +661,7 @@ U0 EdInsMacroMenu(Bool is_macro)
   Free(e);
 }
 
-class CEdButton
+class CEdBttn
 {
   U8	tag[512]   fmtstr "$$DA-P,A=\"Tag Text      :%s\"$$\n";
   Bool	popup	   fmtstr "$$CB,\"PopUp\"$$\n",
@@ -676,10 +676,10 @@ class CEdButton
   Bool	quote		fmtstr "$$CB,\"Quote\"$$\n";
 };
 
-U0 EdInsButton()
+U0 EdInsBttn()
 {
   U8 *st,buf[512];
-  CEdButton *e=CAlloc(sizeof(CEdButton));
+  CEdBttn *e=CAlloc(sizeof(CEdBttn));
   e->escape=TRUE;
   if (DocForm(e,,,,ctrl_L_footer)) {
     *buf=0;
@@ -1010,8 +1010,8 @@ U0 EdInsWidgetWiz()
     case DOCT_CURSOR_MOVEMENT:
       EdInsCursorMovement;
       break;
-    case DOCT_BUTTON:
-      EdInsButton;
+    case DOCT_BTTN:
+      EdInsBttn;
       break;
     case DOCT_DATA:
       EdInsData;

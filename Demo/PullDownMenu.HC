@@ -5,7 +5,7 @@
 
 U0 PullDownMenuDemo()
 {
-  I64 msg_code,a1,a2;
+  I64 msg_code,arg1,arg2;
   CMenuEntry *tmpse;
 
   MenuPush(
@@ -33,29 +33,29 @@ U0 PullDownMenuDemo()
 	"of the scrn.\n\n";
 
   do {
-    msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN+1<<MSG_CMD);
-    "\nCmd:%d A1:%X A2:%X\n\n",msg_code,a1,a2;
+    msg_code=GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN+1<<MSG_CMD);
+    "\nCmd:%d ARG1:%X ARG2:%X\n\n",msg_code,arg1,arg2;
 
     switch (msg_code) {
       case MSG_KEY_DOWN:
-	switch (a1) {//ASCII
+	switch (arg1) {//ASCII
 	  case CH_SPACE:
 	    Beep;
 	    break;
 	  case 0:
-	    switch (a2.u8[0]) {//a2=Scan code
+	    switch (arg2.u8[0]) {//arg2=Scan code
 	      case SC_F1:
-		if (a2&SCF_SHIFT)
+		if (arg2&SCF_SHIFT)
 		  "About PullDown Demo\n";
 		else
 		  "Test the menu.\n";
 		break;
 	      case SC_DELETE:
-		if (a2&SCF_SHIFT)
+		if (arg2&SCF_SHIFT)
 		  "Cut\n";
 		break;
 	      case SC_INS:
-		if (a2&SCF_SHIFT)
+		if (arg2&SCF_SHIFT)
 		  "Paste\n";
 		break;
 	    }
@@ -67,7 +67,7 @@ U0 PullDownMenuDemo()
 //I Recommend making your menu
       //drive by key strokes, but you can
       //use the $LK,"MSG_CMD",A="MN:MSG_CMD"$ val.
-	switch (a1) {
+	switch (arg1) {
 	  case M_OPTION1:
 	    "Option # 1\n";
 	    if (tmpse=MenuEntryFind(Fs->cur_menu,"Misc/Opt1"))
@@ -82,7 +82,7 @@ U0 PullDownMenuDemo()
 	break;
     }
 
-  } while (msg_code!=MSG_KEY_DOWN||(a1!=CH_SHIFT_ESC && a1!=CH_ESC));
+  } while (msg_code!=MSG_KEY_DOWN||(arg1!=CH_SHIFT_ESC && arg1!=CH_ESC));
   MenuPop;
 }
 

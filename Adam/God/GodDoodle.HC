@@ -64,7 +64,7 @@ U0 GodDoodleHexIns(U8 *st)
   if (st) {
     buf[1]=0;
     while (*buf=*st++)
-      if (Bt(chars_bmp_hex_numeric,*buf))
+      if (Bt(char_bmp_hex_numeric,*buf))
 	GodDoodleBitsIns(4,rev_bits_table[Str2I64(buf,16)]>>4);
   }
 }
@@ -87,7 +87,7 @@ I64 GodDoodleBits(I64 num_bits)
       } else if ('0'<=god.doodle_ch<='9')
 	GodDoodleSmooth(god.doodle_ch-'0');
       else
-	GodDoodleBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
+	GodDoodleBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
     }
   }
   return res;

@@ -203,7 +203,7 @@ U0 WinScrollsInit(CTask *task)
   if (!CtrlFindUnique(task,CTRLT_WIN_HSCROLL)) {
     c=CAlloc(sizeof(CCtrl));
     c->win_task=task;
-    c->flags=CTRLF_SHOW|CTRLF_BORDER|CTRLF_CAPTURE_LEFT_IP;
+    c->flags=CTRLF_SHOW|CTRLF_BORDER|CTRLF_CAPTURE_LEFT_MS;
     c->type=CTRLT_WIN_HSCROLL;
     c->state=&task->horz_scroll;
     c->update_derived_vals=&WinDerivedScrollValsUpdate;
@@ -215,7 +215,7 @@ U0 WinScrollsInit(CTask *task)
   if (!CtrlFindUnique(task,CTRLT_WIN_VSCROLL)) {
     c=CAlloc(sizeof(CCtrl));
     c->win_task=task;
-    c->flags=CTRLF_SHOW|CTRLF_BORDER|CTRLF_CAPTURE_LEFT_IP;
+    c->flags=CTRLF_SHOW|CTRLF_BORDER|CTRLF_CAPTURE_LEFT_MS;
     c->type=CTRLT_WIN_VSCROLL;
     c->state=&task->vert_scroll;
     c->update_derived_vals=&WinDerivedScrollValsUpdate;
@@ -364,7 +364,7 @@ public CCtrl *ViewAnglesNew(CTask *task=NULL)
     s->cy=GREEN;
     s->cz=LTGREEN;
     c->win_task=task;
-    c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_IP;
+    c->flags=CTRLF_SHOW|CTRLF_CAPTURE_LEFT_MS;
     c->type=CTRLT_VIEWING_ANGLES;
     c->state=s;
     c->draw_it=&DrawViewAnglesCtrl;

@@ -18,7 +18,7 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
   if (!(flags&TSF_SAME_SONG)) {
     if (tmpse->song_task=task->song_task) {
       Suspend(task->song_task);
-      Snd(0);
+      Snd;
     }
     task->song_task=NULL;
   }
@@ -83,7 +83,7 @@ U0 SettingsPop2(CTask *task,CTaskSettings *tmpse)
   StrCpy(task->task_title,tmpse->task_title);
   AutoComplete(tmpse->autocomplete);
   GrPaletteSet(tmpse->palette);
-  Snd(0);
+  Snd;
 }
 
 public U0 SettingsPop(CTask *task=NULL,I64 flags=0)

@@ -2,10 +2,10 @@ I64 MyLeftCB1(CDoc *,CDocEntry *)
 {
   I64 i;
   for (i=500;i<1000;i+=25) {
-    Snd(i);
+    Snd(Freq2Ona(i));
     Sleep(10);
   }
-  Snd(0);
+  Snd;
   return 0;
 }
 

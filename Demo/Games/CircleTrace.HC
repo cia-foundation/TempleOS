@@ -2,8 +2,8 @@
 
 //Giotto, a famous artist, drew a freehand circle to get a job.
 
-RegSetDftEntry("TempleOS/CircleTrace","F64 best_score=999;\n");
-RegExeBranch("TempleOS/CircleTrace");
+RegDft("TempleOS/CircleTrace","F64 best_score=999;\n");
+RegExe("TempleOS/CircleTrace");
 
 I64 cx,cy;
 F64 avg_error=0,elapsed_time=0,total_error=0,score=999;
@@ -13,7 +13,7 @@ U0 SongTask(I64)
   Fs->task_end_cb=&SndTaskEndCB;
   MusicSettingsRst;
   while (TRUE)
-    Play("hEDCARCDECR");
+    Play("5hEDC4A5RCDECR");
 }
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -35,7 +35,7 @@ Bool CTPlot(CDC *dc,I64 x,I64 y,I64)
 
 U0 CircleTrace()
 {
-  I64 msg_code,a1,a2,x1,y1;
+  I64 msg_code,arg1,arg2,x1,y1;
   F64 rad,t0,total_distance;
   CDC *dc=DCAlias;
 
@@ -57,12 +57,12 @@ U0 CircleTrace()
   dc->color=ROP_XOR+BLACK^TRANSPARENT;
   GrCircle(dc,cx,cy,CIRCLE_RADIUS);
   do {
-    msg_code=GetMsg(&a1,&a2,
-	  1<<MSG_KEY_DOWN+1<<MSG_IP_L_DOWN);
+    msg_code=GetMsg(&arg1,&arg2,
+	  1<<MSG_KEY_DOWN+1<<MSG_MS_L_DOWN);
     switch (msg_code) {
       case MSG_KEY_UP:
 	break;
-      case MSG_IP_L_DOWN:
+      case MSG_MS_L_DOWN:
 	DCFill;
 	dc->color=ROP_XOR+BLACK^TRANSPARENT;
 	GrCircle(dc,cx,cy,CIRCLE_RADIUS);
@@ -70,18 +70,18 @@ U0 CircleTrace()
 	t0=tS;
 	total_distance=0.001;
 	total_error=0;
-	x1=a1; y1=a2;
+	x1=arg1; y1=arg2;
 	do {
-	  msg_code=ScanMsg(&a1,&a2,
-		1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
+	  msg_code=ScanMsg(&arg1,&arg2,
+		1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);
 	  switch (msg_code) {
-	    case MSG_IP_L_UP:
+	    case MSG_MS_L_UP:
 	      break;
-	    case MSG_IP_MOVE:
-	      if (x1!=a1 || y1!=a2) {
-		total_distance+=Sqrt(Sqr(x1-a1)+Sqr(y1-a2));
-		Line(dc,x1,y1,0,a1,a2,0,&CTPlot);
-		x1=a1;y1=a2;
+	    case MSG_MS_MOVE:
+	      if (x1!=arg1 || y1!=arg2) {
+		total_distance+=Sqrt(Sqr(x1-arg1)+Sqr(y1-arg2));
+		Line(dc,x1,y1,0,arg1,arg2,0,&CTPlot);
+		x1=arg1;y1=arg2;
 //undo overlapping pixs on segments
 		GrPlot(dc,x1,y1);
 		rad=Sqrt(Sqr(x1-cx)+Sqr(y1-cy));
@@ -100,29 +100,29 @@ U0 CircleTrace()
 	  //no need to do anything until the window mgr runs.
 	  Refresh;
 
-	} while (msg_code!=MSG_IP_L_UP);
+	} while (msg_code!=MSG_MS_L_UP);
 	music.mute=TRUE; Sleep(200);
 	if (total_distance>0.95*CIRCUMFERENCE) {
 	  if (score<best_score) {
-	    Snd(2000);Sleep(50);Snd(0);Sleep(50);
-	    Snd(2000);Sleep(50);Snd(0);Sleep(50);
-	    Snd(2000);Sleep(50);
+	    Snd(86);Sleep(50);Snd;Sleep(50);
+	    Snd(86);Sleep(50);Snd;Sleep(50);
+	    Snd(86);Sleep(50);
 	    best_score=score;
 	  } else {
-	    Snd(500);Sleep(50);
+	    Snd(62);Sleep(50);
 	  }
 	} else {
-	  Snd(100);Sleep(1000);
+	  Snd(34);Sleep(1000);
 	}
-	Snd(0); Sleep(200); music.mute=FALSE;
+	Snd; Sleep(200); music.mute=FALSE;
 	break;
     }
-  } while (msg_code!=MSG_KEY_DOWN || a1!=CH_SHIFT_ESC && a1!=CH_ESC);
+  } while (msg_code!=MSG_KEY_DOWN || arg1!=CH_SHIFT_ESC && arg1!=CH_ESC);
   GetMsg(,,1<<MSG_KEY_UP);
   SettingsPop;
   DCFill;
   DCDel(dc);
-  RegWriteBranch("TempleOS/CircleTrace","F64 best_score=%5.4f;\n",best_score);
+  RegWrite("TempleOS/CircleTrace","F64 best_score=%5.4f;\n",best_score);
 }
 
 CircleTrace;  //Execute when #included

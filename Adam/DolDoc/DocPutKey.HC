@@ -16,7 +16,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
   if (!Bt(doldoc.clean_scan_codes,sc.u8[0]))
     doc->flags|=DOCF_UNDO_DIRTY;
   DocCaptureUndo(doc);
-  if (Bt(chars_bmp_getkey,ch) && !(sc&(SCF_CTRL|SCF_ALT))) {
+  if (Bt(char_bmp_printable,ch) && !(sc&(SCF_CTRL|SCF_ALT))) {
     if (sc&SCF_KEY_DESC) {
       st=Char2KeyName(ch,FALSE);
       KeyDescSet("Char  /'%s'",st);
@@ -348,7 +348,7 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		    } else {
 //$LK,"::/Adam/God/HSNotes.DD"$
 		      FifoU8Flush(god.fifo);
-		      GodBitsIns(GOD_GOOD_BITS,KbdMouseEvtTime>>GOD_BAD_BITS);
+		      GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
 		      if (sc&SCF_SHIFT)
 			GodBiblePassage;
 		      else

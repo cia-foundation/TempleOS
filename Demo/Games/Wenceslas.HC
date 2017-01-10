@@ -1,5 +1,5 @@
-RegSetDftEntry("TempleOS/Wenceslas","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/Wenceslas");
+RegDft("TempleOS/Wenceslas","F64 best_score=9999;\n");
+RegExe("TempleOS/Wenceslas");
 
 #define BORDER		5
 #define KING_STEP	6
@@ -177,12 +177,12 @@ U0 DrawIt(CTask *task,CDC *dc)
     Mat4x4RotY(r,tmpp->é+ã/2);
     Mat4x4RotX(r,ã/6);
     if (tmpp->stopped)
-      SpriteMat3B(dc,tmpp->x,tmpp->y,GR_Z_ALL,peasant_imgs[0],r);
+      Sprite3Mat4x4B(dc,tmpp->x,tmpp->y,GR_Z_ALL,peasant_imgs[0],r);
     else {
       tmps=SpriteInterpolate(Saw(animate_mS/250.0,1.0),
 	    peasant_imgs[ animate_phase   &3],
 	    peasant_imgs[(animate_phase+1)&3]);
-      SpriteMat3B(dc,tmpp->x,tmpp->y,GR_Z_ALL,tmps,r);
+      Sprite3Mat4x4B(dc,tmpp->x,tmpp->y,GR_Z_ALL,tmps,r);
       Free(tmps);
     }
     tmpp=tmpp->next;
@@ -193,12 +193,12 @@ U0 DrawIt(CTask *task,CDC *dc)
   Mat4x4RotY(r,king_é+ã/2);
   Mat4x4RotX(r,ã/6);
   if (tS>king_timeout)
-    SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,king_imgs[0],r);
+    Sprite3Mat4x4B(dc,king_x,king_y,GR_Z_ALL,king_imgs[0],r);
   else {
     tmps=SpriteInterpolate(Saw(king_mS/250.0,1.0),
 	  king_imgs[ king_phase   &3],
 	  king_imgs[(king_phase+1)&3]);
-    SpriteMat3B(dc,king_x,king_y,GR_Z_ALL,tmps,r);
+    Sprite3Mat4x4B(dc,king_x,king_y,GR_Z_ALL,tmps,r);
     Free(tmps);
   }
 
@@ -396,10 +396,10 @@ U0 AnimateTask(I64)
     if (!not_stopped_cnt && !tf) {
       tf=tS;
       music.mute=TRUE;
-      Snd(2000);Sleep(200);Snd(0);Sleep(100);
+      Snd(86);Sleep(200);Snd;Sleep(100);
       if (tf-t0<best_score) {
 	best_score=tf-t0;
-	Snd(2000);Sleep(200);Snd(0);Sleep(100);
+	Snd(86);Sleep(200);Snd;Sleep(100);
       }
       music.mute=FALSE;
     }
@@ -441,9 +441,9 @@ U0 SongTask(I64)
   music.tempo= 2.480;
   music.stacatto_factor= 0.902;
   while (TRUE) {
-    Play("3eCCCDCC2qG3eA2G3ABqCC");
-    Play("eCCCDCC2qG3eA2G3ABqCC");
-    Play("eGFEDEDqCeA2G3ABqCC");
+    Play("5eCCCDCC4qGeAGAB5qCC");
+    Play("5eCCCDCC4qGeAGAB5qCC");
+    Play("5eGFEDEDqC4eAGAB5qCC");
   }
 }
  
@@ -586,7 +586,7 @@ ws_done:
   SettingsPop;
   MenuPop;
   CleanUp;
-  RegWriteBranch("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
+  RegWrite("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
 }
 
 Wenceslas;

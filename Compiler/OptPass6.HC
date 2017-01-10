@@ -4,21 +4,21 @@ Bool OptIC6(CIntermediateCode *tmpi)
   if (tmpi->ic_code<IC_IMM_I64 || !(tmpil1=OptLag1(tmpi)))
     return FALSE;
   if (tmpil1->ic_code==IC_ADD_CONST && tmpi->ic_code==IC_DEREF &&
-	tmpi->ic_flags&ICF_A1_WAS_STK	&&  tmpi->a1.type&MDF_REG &&
-	tmpil1->r.type&MDF_REG && MIN_I32<=tmpil1->ic_data<=MAX_I32 &&
-	!Bt(&cmp.non_ptr_vars_mask,tmpil1->a1.reg)) {
-    if (tmpil1->a1.type&MDF_REG) {
-      tmpi->ic_flags=tmpi->ic_flags&~ICF_A1_WAS_STK | tmpil1->ic_flags;
+	tmpi->ic_flags&ICF_ARG1_WAS_STK	&&  tmpi->arg1.type&MDF_REG &&
+	tmpil1->res.type&MDF_REG && MIN_I32<=tmpil1->ic_data<=MAX_I32 &&
+	!Bt(&cmp.non_ptr_vars_mask,tmpil1->arg1.reg)) {
+    if (tmpil1->arg1.type&MDF_REG) {
+      tmpi->ic_flags=tmpi->ic_flags&~ICF_ARG1_WAS_STK | tmpil1->ic_flags;
       tmpi->ic_code=IC_MOV;
-      tmpi->a1.type=MDF_DISP+tmpi->a1_type_pointed_to;
-      tmpi->a1.reg=tmpil1->a1.reg;
-      tmpi->a1.disp=tmpil1->ic_data;
+      tmpi->arg1.type=MDF_DISP+tmpi->arg1_type_pointed_to;
+      tmpi->arg1.reg=tmpil1->arg1.reg;
+      tmpi->arg1.disp=tmpil1->ic_data;
       OptSetNOP2(tmpil1,-1);
     } else {
       tmpil1->ic_code=IC_MOV;
       tmpi->ic_code=IC_MOV;
-      tmpi->a1.type=MDF_DISP+tmpi->a1_type_pointed_to;
-      tmpi->a1.disp=tmpil1->ic_data;
+      tmpi->arg1.type=MDF_DISP+tmpi->arg1_type_pointed_to;
+      tmpi->arg1.disp=tmpil1->ic_data;
     }
     return TRUE;
   }
@@ -61,33 +61,33 @@ U0 OptPass6Lag(CCmpCtrl *cc,CPrsStk *ps,CIntermediateCode *tmpi,
   }
   if (intermediate_code_table[code].arg_cnt==IS_V_ARG)
     stk_ptr-=tmpi->ic_data>>3;
-  if (tmpi->a2.type&MDF_STK) {
+  if (tmpi->arg2.type&MDF_STK) {
     stk_ptr--;
     if (stk_ptr<reg_stk_size) {
-      tmpi->a2.type=MDF_REG+tmpi->a2.type.raw_type;
-      tmpi->a2.reg=Bsf(REGG_STK_TMP);
-      tmpi->a2.disp=0;
+      tmpi->arg2.type=MDF_REG+tmpi->arg2.type.raw_type;
+      tmpi->arg2.reg=Bsf(REGG_STK_TMP);
+      tmpi->arg2.disp=0;
     }
   }
-  if (tmpi->a1.type&MDF_STK) {
+  if (tmpi->arg1.type&MDF_STK) {
     stk_ptr--;
     if (stk_ptr<reg_stk_size) {
-      tmpi->a1.type=MDF_REG+tmpi->a1.type.raw_type;
-      tmpi->a1.reg=Bsf(REGG_STK_TMP);
-      tmpi->a1.disp=0;
+      tmpi->arg1.type=MDF_REG+tmpi->arg1.type.raw_type;
+      tmpi->arg1.reg=Bsf(REGG_STK_TMP);
+      tmpi->arg1.disp=0;
     }
   }
-  if (tmpi->r.type&MDF_STK && !(tmpi->ic_flags & ICF_PUSH_RES)) {
+  if (tmpi->res.type&MDF_STK && !(tmpi->ic_flags & ICF_PUSH_RES)) {
     stk_ptr++;
     if (stk_ptr<=reg_stk_size) {
-      tmpi->r.type=MDF_REG+tmpi->r.type.raw_type;
-      tmpi->r.reg=Bsf(REGG_STK_TMP);
+      tmpi->res.type=MDF_REG+tmpi->res.type.raw_type;
+      tmpi->res.reg=Bsf(REGG_STK_TMP);
       clobbered_reg_mask|=REGG_STK_TMP;
-      tmpi->r.disp=0;
+      tmpi->res.disp=0;
     }
   }
   while (OptIC6(tmpi));
-  if (tmpi->r.type.raw_type!=RT_F64 && !(tmpi->ic_flags&ICF_USE_F64))
+  if (tmpi->res.type.raw_type!=RT_F64 && !(tmpi->ic_flags&ICF_USE_F64))
     tmpi->ic_flags|=ICF_USE_INT;
   *_stk_ptr=stk_ptr;
   *_clobbered_reg_mask=clobbered_reg_mask;
@@ -113,49 +113,50 @@ U0 OptPass6(CCmpCtrl *cc)
       if (tmpil1->ic_code>IC_NOP2)
 	tmpil2=tmpil1;
       tmpil1=tmpi;
-      if (tmpi->a2.type&MDF_STK) {
-	if (tmpil2->r.type&MDF_STK &&
+      if (tmpi->arg2.type&MDF_STK) {
+	if (tmpil2->res.type&MDF_STK &&
 	      !(tmpil2->ic_flags&ICF_PUSH_RES)) {
 	  if (tmpi->ic_code==IC_ASSIGN && tmpi->ic_flags&ICF_BY_VAL &&
 		tmpi->ic_flags&ICF_RES_NOT_USED &&
 		tmpil2->ic_code!=IC_CALL_END &&
 		tmpil2->ic_code!=IC_CALL_END2 &&
 		tmpil2->ic_code!=IC_SET_RAX &&
-		!(tmpi->ic_flags&(ICF_A2_TO_F64|ICF_A2_TO_INT)) &&
-		!(tmpil2->ic_flags&(ICF_R_TO_F64|ICF_R_TO_INT))) {
-	    tmpil2->r.type =tmpi->a1.type&MDG_MASK+tmpi->a1_type_pointed_to;
-	    tmpil2->r.reg  =tmpi->a1.reg;
-	    tmpil2->r.disp =tmpi->a1.disp;
+		!(tmpi->ic_flags&(ICF_ARG2_TO_F64|ICF_ARG2_TO_INT)) &&
+		!(tmpil2->ic_flags&(ICF_RES_TO_F64|ICF_RES_TO_INT))) {
+	    tmpil2->res.type =tmpi->arg1.type&MDG_MASK+
+		  tmpi->arg1_type_pointed_to;
+	    tmpil2->res.reg  =tmpi->arg1.reg;
+	    tmpil2->res.disp =tmpi->arg1.disp;
 	    tmpil2->ic_flags=tmpil2->ic_flags
-		  &~(ICF_RES_NOT_USED|ICF_R_WAS_STK)
-	    |tmpi->ic_flags&~(ICF_BY_VAL|ICF_A1_WAS_STK|ICF_A2_WAS_STK);
+		  &~(ICF_RES_NOT_USED|ICF_RES_WAS_STK)
+	    |tmpi->ic_flags&~(ICF_BY_VAL|ICF_ARG1_WAS_STK|ICF_ARG2_WAS_STK);
 	    old_tmpil2=NULL;
 	    OptSetNOP1(tmpi);
 	  } else {
-	    tmpi->a2.type=MDF_REG+tmpi->a2.type.raw_type;
-	    tmpi->a2.reg=REG_RAX;
-	    tmpi->a2.disp=0;
-	    tmpil2->r.type=MDF_REG+tmpil2->r.type.raw_type;
-	    tmpil2->r.reg=REG_RAX;
-	    tmpil2->r.disp=0;
+	    tmpi->arg2.type=MDF_REG+tmpi->arg2.type.raw_type;
+	    tmpi->arg2.reg=REG_RAX;
+	    tmpi->arg2.disp=0;
+	    tmpil2->res.type=MDF_REG+tmpil2->res.type.raw_type;
+	    tmpil2->res.reg=REG_RAX;
+	    tmpil2->res.disp=0;
 	  }
 	}
-      } else if (tmpi->a1.type&MDF_STK && tmpil2->r.type&MDF_STK &&
+      } else if (tmpi->arg1.type&MDF_STK && tmpil2->res.type&MDF_STK &&
 	    !(tmpil2->ic_flags&ICF_PUSH_RES)) {
-	tmpi->a1.type=MDF_REG+tmpi->a1.type.raw_type;
-	tmpi->a1.disp=0;
-	tmpil2->r.type=MDF_REG+tmpil2->r.type.raw_type;
-	tmpil2->r.disp=0;
+	tmpi->arg1.type=MDF_REG+tmpi->arg1.type.raw_type;
+	tmpi->arg1.disp=0;
+	tmpil2->res.type=MDF_REG+tmpil2->res.type.raw_type;
+	tmpil2->res.disp=0;
 	if (intermediate_code_table[tmpi->ic_code].arg_cnt==IS_2_ARG) {
-	  tmpi->a1.reg=REG_R8;
-	  tmpil2->r.reg=REG_R8;
+	  tmpi->arg1.reg=REG_R8;
+	  tmpil2->res.reg=REG_R8;
 	} else {
-	  tmpi->a1.reg=REG_RAX;
-	  tmpil2->r.reg=REG_RAX;
+	  tmpi->arg1.reg=REG_RAX;
+	  tmpil2->res.reg=REG_RAX;
 	}
       }
       if (tmpi->ic_flags & ICF_PUSH_RES)
-	tmpi->r.type==MDF_STK+tmpi->r.type.raw_type;
+	tmpi->res.type==MDF_STK+tmpi->res.type.raw_type;
       if (old_tmpil2!=tmpil2) {
 	if (tmpil2->ic_code>IC_NOP2)
 	  OptPass6Lag(cc,ps,tmpil2,&stk_ptr,reg_stk_size,&clobbered_reg_mask);

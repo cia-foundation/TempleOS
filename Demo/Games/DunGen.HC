@@ -1,5 +1,5 @@
-RegSetDftEntry("TempleOS/DunGen","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/DunGen");
+RegDft("TempleOS/DunGen","F64 best_score=9999;\n");
+RegExe("TempleOS/DunGen");
 
 //Set snap to 4 and width to 4
 //if you edit this map.
@@ -232,7 +232,7 @@ U0 Attack()
   Monster *tmpm;
 
   man_attack_t0=tS;
-  Noise(100,300,1000);
+  Noise(100,53,74);
   for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
     if (!tmpm->dead &&
 	  man_x+man_dx==tmpm->x && man_y+man_dy==tmpm->y) {
@@ -438,7 +438,7 @@ dg_done:
     PutExcept;
   SettingsPop;
   MenuPop;
-  RegWriteBranch("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
+  RegWrite("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
   CleanUp;
 }
 

@@ -63,7 +63,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 
   //You can customize keys.  This routine
   //is called before the main editor
-  //key handler $LK,"DocPutKey",A="MN:DocPutKey"$().
+  //key hndlr $LK,"DocPutKey",A="MN:DocPutKey"$().
   //You can intercept any key.
 
   //Return TRUE if you completely
@@ -146,17 +146,10 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    }
 	    return TRUE;
 	  case SC_F7:
-	    if (sc&SCF_SHIFT) {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /NISTGodMisc2");
-	      else
-		NISTGodMisc2;
-	    } else {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /God Misc");
-	      else
-		GodMisc;
-	    }
+	    if (sc&SCF_KEY_DESC)
+	      KeyDescSet("Cmd /God Misc");
+	    else
+	      GodMisc;
 	    return TRUE;
 	  case SC_F8:
 	    if (sc&SCF_SHIFT) {
@@ -298,15 +291,15 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'p':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /JukeBox(Home/Sup1)");
+	  KeyDescSet("Cmd /JukeBox(Home/Sup1Hymns)");
 	else
-	  JukeBox("~/Sup1/Sup1Psalmody");
+	  JukeBox("~/Sup1/Sup1Hymns");
 	return TRUE;
       case 'P':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /JukeBox(Examples)");
+	  KeyDescSet("Cmd /JukeBox(Home/Sup1Songs)");
 	else
-	  JukeBox("::/Apps/Psalmody/Examples");
+	  JukeBox("~/Sup1/Sup1Songs");
 	return TRUE;
     }
   }

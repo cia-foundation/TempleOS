@@ -21,7 +21,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use the PullDown menu at the top of the scrn to learn commands, or for finding the keyboard controls to games.
 
-* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:~/HomeLocalize.HC,mouse.scale"$.
+* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:~/HomeLocalize.HC,ms_hard.scale"$.
 
 * You can set your local time zone by setting the $LK,"local_time_offset",A="MN:local_time_offset"$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:~/HomeLocalize.HC,local_time"$.
 

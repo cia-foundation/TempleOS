@@ -14,7 +14,7 @@ U0 DrawIt(CTask *task,CDC *)
   //	for (i=0;i<TEXT_COLS;i++)
   //	 TextChar(task,,i,j,text[j][i]);
 
-  TextPrint(task,0,0,ATTR>>8,"Draw a maze with left button.");
+  TextPrint(task,0,0,ATTR>>8,"Draw a maze with left bttn.");
   TextPrint(task,0,1,ATTR>>8,"Solve maze starting at right click.");
 }
 
@@ -69,7 +69,7 @@ U0 SolveMaze(I64 x,I64 y)
       if (stk_ptr==STK_SIZE) return;
       Sleep(100);
       if (ScanChar)
-	ThrowBreak;  //<CTRL-ALT-c>
+	throw;
     }
   }
 }
@@ -91,12 +91,11 @@ U0 Maze()
     do {
       MemSet(text,0,sizeof(text));
       while (!(ch=ScanChar)) {
-//Input Ptr (mouse) text x,y coordinates.
-	x=ip.pos_text.x-Fs->win_left-Fs->scroll_x/FONT_WIDTH;
-	y=ip.pos_text.y-Fs->win_top-Fs->scroll_y/FONT_HEIGHT;
-	if (ip.lb&&!winmgr.grab_scroll)
+	x=ms.pos_text.x-Fs->win_left-Fs->scroll_x/FONT_WIDTH;
+	y=ms.pos_text.y-Fs->win_top-Fs->scroll_y/FONT_HEIGHT;
+	if (ms.lb&&!winmgr.grab_scroll)
 	  text[y][x]=CH_SPACE+ATTRF_INVERT+ATTR;
-	if (ip.rb&&!winmgr.grab_scroll) {
+	if (ms.rb&&!winmgr.grab_scroll) {
 	  text[y][x]='*'+ATTR;
 	  SolveMaze(x,y);
 	  ch=GetChar;

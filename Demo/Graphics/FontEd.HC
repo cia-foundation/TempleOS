@@ -60,7 +60,7 @@ U0 FESave(Bool pmt)
   I64 i;
   for (i=0;i<256;i++) {
     DocPrint(doc,"0x%016X,",text.font[i]);
-    if (Bt(chars_bmp_safe_dollar,i))
+    if (Bt(char_bmp_safe_dollar,i))
       DocPrint(doc,"//%c",i);
     else if (i=='$$')
       DocPrint(doc,"//$$$$",i);
@@ -74,7 +74,7 @@ U0 FESave(Bool pmt)
 
 U0 FontEd()
 {
-  I64 msg_code,a1,a2,k;
+  I64 msg_code,arg1,arg2,k;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   MenuPush(
 	"File {"
@@ -90,12 +90,12 @@ U0 FontEd()
   try {
     Fs->draw_it=&DrawIt;
     while (TRUE) {
-      switch (msg_code=GetMsg(&a1,&a2,
-	    1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE)) {
+      switch (msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN|1<<MSG_MS_R_DOWN|1<<MSG_MS_MOVE)) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case 0:
-	      switch (a2.u8[0]) {
+	      switch (arg2.u8[0]) {
 		case SC_CURSOR_LEFT:
 		  cur_ch--;
 		  break;
@@ -120,22 +120,22 @@ U0 FontEd()
 	    case CH_SHIFT_ESC:
 	      goto fe_done;
 	    default:
-	      cur_ch=a1;
+	      cur_ch=arg1;
 	  }
 	  break;
-	case MSG_IP_L_DOWN:
-	case MSG_IP_R_DOWN:
-	  if (0<=a1<FONT_WIDTH*16 && FONT_HEIGHT*2<=a2<FONT_HEIGHT*16) {
-	    cur_ch=(a2/FONT_HEIGHT-2)*16+a1/FONT_WIDTH;
+	case MSG_MS_L_DOWN:
+	case MSG_MS_R_DOWN:
+	  if (0<=arg1<FONT_WIDTH*16 && FONT_HEIGHT*2<=arg2<FONT_HEIGHT*16) {
+	    cur_ch=(arg2/FONT_HEIGHT-2)*16+arg1/FONT_WIDTH;
 	    break;
 	  } //fall through
-	case MSG_IP_MOVE:
-	  k=((a2-BLOW_UP_CHAR_Y)/FONT_HEIGHT)*FONT_WIDTH+
-		(a1-BLOW_UP_CHAR_X)/FONT_WIDTH;
+	case MSG_MS_MOVE:
+	  k=((arg2-BLOW_UP_CHAR_Y)/FONT_HEIGHT)*FONT_WIDTH+
+		(arg1-BLOW_UP_CHAR_X)/FONT_WIDTH;
 	  if (0<=k<FONT_WIDTH*FONT_HEIGHT) {
-	    if (ip.lb||msg_code==MSG_IP_L_DOWN)
+	    if (ms.lb||msg_code==MSG_MS_L_DOWN)
 	      Bts(&text.font[cur_ch],k);
-	    if (ip.rb||msg_code==MSG_IP_R_DOWN)
+	    if (ms.rb||msg_code==MSG_MS_R_DOWN)
 	      Btr(&text.font[cur_ch],k);
 	  }
 	  break;

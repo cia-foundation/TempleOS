@@ -4,6 +4,8 @@ public CDoc *DocPut(CTask *task=NULL)
 //Basically, StdOut unless double buffering.
   CDoc *res;
   if (!task) task=Fs;
+  if (Bt(&task->task_flags,TASKf_INPUT_FILTER_TASK))
+    task=task->parent_task;
   if ((res=task->put_doc) && res->doc_signature==DOC_SIGNATURE_VAL)
     return res;
   else

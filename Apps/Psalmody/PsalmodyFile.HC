@@ -149,24 +149,22 @@ U0 PsmLoadSongStr(U8 *st,I64 *psm_octave,F64 *psm_duration)
 	Bts(&tmpn->flags,PSMf_FLAT);
 	note--;
 	st++;
+	if (note<0) //Ab
+	  note=11;
+	else if (note==2) //Cb
+	  *psm_octave-=1;
       } else if (*st=='#') {
 	Bts(&tmpn->flags,PSMf_SHARP);
 	note++;
 	st++;
+	if (note>11) //G#
+	  note=0;
+	else if (note==3) //B#
+	  *psm_octave+=1;
       }
-      if (note<0) {
-	note=11;
-	*psm_octave-=1;
-      } else if (note>11) {
-	note=0;
-	*psm_octave+=1;
-      }
-      tmpn->note=note;
-      tmpn->octave=*psm_octave;
-    } else {
-      tmpn->note=NOTE_REST;
-      tmpn->octave=OCTAVE_REST;
-    }
+      tmpn->ona=Note2Ona(note,*psm_octave);
+    } else
+      tmpn->ona=ONA_REST;
     if (*psm_duration<=2*.25/3)
       i=0;
     else if (*psm_duration<=.25)
@@ -251,11 +249,11 @@ U8 *PsmCvtSong()
 {
   PsmNote *tmpn;
   U8 *st,*src,*dst;
-  I64 i,note,octave,last_octave,last_duration;
+  I64 i,ona,note,octave,last_octave,last_duration;
 
   i=0;
   tmpn=psm.head.next;
-  last_octave=OCTAVE_REST;
+  last_octave=MIN_I64;
   last_duration=-1;
   while (tmpn!=&psm.head) {
     dst=&tmpn->ascii;
@@ -265,25 +263,19 @@ U8 *PsmCvtSong()
       *dst++='/';
       *dst++=tmpn->meter_bottom+'0';
     } else {
-      octave=tmpn->octave;
-      note=tmpn->note;
-      if (note!=NOTE_REST) {
+      if (tmpn->ona!=ONA_REST) {
+	ona=tmpn->ona;
 	if (Bt(&tmpn->flags,PSMf_SHARP))
-	  note--;
+	  ona--;
 	if (Bt(&tmpn->flags,PSMf_FLAT))
-	  note++;
-	if (note<0) {
-	  note=11;
-	  octave--;
-	} else if (note>11) {
-	  note=0;
-	  octave++;
-	}
+	  ona++;
+	octave=Ona2Octave(ona);
+	note  =Ona2Note  (ona);
 	note=music.note_map[*LstSub(note,psm_note_lst)-'A'];
       }
       if (Bt(&tmpn->flags,PSMf_TIE))
 	*dst++='(';
-      if (octave!=last_octave && note!=NOTE_REST) {
+      if (octave!=last_octave && tmpn->ona!=ONA_REST) {
 	*dst++=octave+'0';
 	last_octave=octave;
       }
@@ -294,7 +286,7 @@ U8 *PsmCvtSong()
 	  *dst++=src[1];
 	last_duration=tmpn->duration;
       }
-      if (note!=NOTE_REST) {
+      if (tmpn->ona!=ONA_REST) {
 	src=LstSub(note,psm_note_lst);
 	*dst++=src[0];
 	if (src[1])
@@ -419,7 +411,7 @@ U8 *PsmSaveSong(U8 *dirname,U8 *full_filename)
 	"    }\n"
 	"  } catch\n"
 	"    PutExcept;\n"
-	"  Snd(0);\n"
+	"  Snd;\n"
 	"}\n"
 	"\n"
 	"Song;\n");

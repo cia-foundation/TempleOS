@@ -24,8 +24,8 @@ U0 SysGlblsInit()
   }
 
   DbgMode(ON);
-  rev_bits_table	=CAlloc(256);
-  set_bits_table	=CAlloc(256);
+  rev_bits_table=CAlloc(256);
+  set_bits_table=CAlloc(256);
   for (i=0;i<256;i++)
     for (j=0;j<8;j++) {
       if (Bt(&i,7-j))	LBts(rev_bits_table+i,j);
@@ -47,16 +47,17 @@ U0 SysGlblsInit()
   for (i=-308;i<309;i++)
     pow10_I64[i+309]=Pow10(i);
 
+  snd.ona=ONA_REST;
   QueInit(&snd.record_head);
   snd.record_head.time=tS;
 
   ProgressBarsRst;
 
   QueInit(&dev.pci_head);
-  dev.mem64_ptr=MEM_MAPPED_SPACE;
+  dev.mem64_ptr=mem_mapped_space;
 
   dbg.fun_seg_cache=CAlloc(FUN_SEG_CACHE_SIZE*sizeof(CFunSegCache));
-  dbg.int_fault_code=IntFaultHandlersNew;
+  dbg.int_fault_code=IntFaultHndlrsNew;
 }
 
 U0 SysGrInit()
@@ -131,17 +132,15 @@ U0 Reboot()
 
 U0 KernelMain()
 {//Continued from $LK,"Kernel",A="FF:::/Kernel/KStart64.HC,I32 &Kernel"$
-  OutU8(0x61,InU8(0x61)&~3); //Snd(0);
+  OutU8(0x61,InU8(0x61)&~3); //Snd;
   adam_task=Fs;
   BlkPoolsInit;
-  LBts(&sys_run_level,RLf_FULL_HEAP);
   SysGlblsInit;
   Mem32DevInit;
-  MemPagesNotPresentMark;
   UncachedAliasAlloc;
   LoadKernel;
   SysGrInit;
-  StrCpy(Fs->task_name,"Adam Task CPU#0");
+  StrCpy(Fs->task_name,"Adam Task CPU00");
   StrCpy(Fs->task_title,Fs->task_name);
   Fs->title_src=TTS_TASK_NAME;
   Fs->win_right=text.cols-2;
@@ -152,7 +151,7 @@ U0 KernelMain()
   Core0Init;
   IntInit1;
 
-  //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"BusyWait",A="MN:BusyWait"$()
+  //Before this point use $LK,"Snd",A="MN:Snd"$() and $LK,"Busy",A="MN:Busy"$()
   //to debug.  After this point, use $LK,"RawPrint",A="MN:RawPrint"$()
   LBts(&sys_run_level,RLf_RAW);
   "TempleOS V%5.3f\t%D %T\n\n",
@@ -165,7 +164,7 @@ U0 KernelMain()
   IntsInit;
   "Enable IRQ's\n";
   SetRFlags(RFLAGG_NORMAL);
-  BusyWait(2000);
+  Busy(2000);
   IntInit2;
   LBts(&sys_run_level,RLf_INTERRUPTS);
 
@@ -185,10 +184,10 @@ U0 KernelMain()
 	    "LBts(&sys_run_level,RLf_MP);");
   };
 
-  KbdMouseVarsInit;
-  IPVarsInit;
+  KbdMsInit;
+  MsInit;
   KbdInit;
-  Spawn(&MouseDriverInstall);
+  Spawn(&MsHardDrvrInstall);
 
   "Loading Compiler\n";
   Cd("/Compiler");

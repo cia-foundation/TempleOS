@@ -2,7 +2,7 @@ U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tmpu,U8 *label,Bool undefined)
 {
   CAOTImportExport *tmpie;
   CAsmUndefHash *tmpauh;
-  I64 r=Call(tmpu->machine_code);
+  I64 res=Call(tmpu->machine_code);
   if (undefined) {
     tmpauh=tmpu->asm_undef_hash;
     while (tmpauh) {
@@ -10,31 +10,32 @@ U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tmpu,U8 *label,Bool undefined)
 	tmpie=CAlloc(sizeof(CAOTImportExport));
 	tmpie->next=tmpauh->hash->ie_lst;
 	tmpauh->hash->ie_lst=tmpie;
-	tmpie->ip=tmpu->ip;
+	tmpie->rip=tmpu->rip;
 	tmpie->aot=cc->aot;
 	tmpie->type=tmpu->type;
       }
       tmpauh=tmpauh->next; //Technically, more than one won't work.
     }
   } else if (!(tmpu->type&IEF_IMM_NOT_REL)) {
-    r-=tmpu->rel_ip;
-    if (tmpu->type==IET_REL_I8 && !(MIN_I8<=r<=MAX_I8) ||
-	  tmpu->type==IET_REL_I16 && !(MIN_I16<=r<=MAX_I16)) {
+    res-=tmpu->rel_rip;
+    if (tmpu->type==IET_REL_I8 && !(MIN_I8<=res<=MAX_I8) ||
+	  tmpu->type==IET_REL_I16 && !(MIN_I16<=res<=MAX_I16)) {
       PrintErr("Branch out of range at line:%04d %s\n",
 	    tmpu->line_num,label);
       LexExcept(cc);
     }
-    if (tmpu->U8_avail && tmpu->type>IET_IMM_U8 && -124<=r<=123)
+    if (tmpu->U8_avail && tmpu->type>IET_IMM_U8 && -124<=res<=123)
       PrintWarn("could use I8 displacement at line:%04d %s %s\n",
 	    tmpu->line_num,cc->aotc->last_label,label);
   }
-  AOTStoreCodeU8At(cc,tmpu->ip,r.u8[0]);
+  AOTStoreCodeU8At(cc,tmpu->rip,res.u8[0]);
   if (tmpu->type>=IET_REL_I16) {
-    AOTStoreCodeU8At(cc,tmpu->ip+1,r.u8[1]);
+    AOTStoreCodeU8At(cc,tmpu->rip+1,res.u8[1]);
     if (tmpu->type>=IET_REL_I32) {
-      AOTStoreCodeU8At(cc,tmpu->ip+2,r.u8[2],r.u8[3]);
+      AOTStoreCodeU8At(cc,tmpu->rip+2,res.u8[2],res.u8[3]);
       if (tmpu->type>=IET_REL_I64)
-	AOTStoreCodeU8At(cc,tmpu->ip+4,r.u8[4],r.u8[5],r.u8[6],r.u8[7]);
+	AOTStoreCodeU8At(cc,tmpu->rip+4,res.u8[4],res.u8[5],
+	      res.u8[6],res.u8[7]);
     }
   }
 }
@@ -157,8 +158,8 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tmpaot)
 	  tmpeu=tmpf->ext_lst;
 	  while (tmpeu) {
 	    tmpeu8=tmpeu->next;
-	    j=tmpf->exe_addr-(tmpeu->ip+4);
-	    AOTStoreCodeU8At(cc,tmpeu->ip,j.u8[0],j.u8[1],j.u8[2],j.u8[3]);
+	    j=tmpf->exe_addr-(tmpeu->rip+4);
+	    AOTStoreCodeU8At(cc,tmpeu->rip,j.u8[0],j.u8[1],j.u8[2],j.u8[3]);
 	    Free(tmpeu);
 	    tmpeu=tmpeu8;
 	  }
@@ -167,11 +168,11 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tmpaot)
 	  tmpie=CAlloc(sizeof(CAOTImportExport));
 	  tmpie->type=IET_REL32_EXPORT;
 	  if (tmpex->type & HTT_FUN)
-	    tmpie->ip=tmpf->exe_addr;
+	    tmpie->rip=tmpf->exe_addr;
 	  else if (tmpex->type & HTT_GLBL_VAR)
-	    tmpie->ip=tmpex(CHashGlblVar *)->data_addr_ip;
+	    tmpie->rip=tmpex(CHashGlblVar *)->data_addr_rip;
 	  else
-	    tmpie->ip=tmpex->val;
+	    tmpie->rip=tmpex->val;
 	  tmpie->aot=cc->aot;
 	  if (tmpex->type & HTF_IMM)
 	    tmpie->type++;
@@ -185,15 +186,15 @@ U0 AOTGlblsResolve(CCmpCtrl *cc,CAOT *tmpaot)
   }
 }
 
-U0 AsmUnresolvedAdd(CCmpCtrl *cc,U8 *machine_code,I64 type,I64 ip,I64 rel_ip,
+U0 AsmUnresolvedAdd(CCmpCtrl *cc,U8 *machine_code,I64 type,I64 rip,I64 rel_rip,
 	CAsmUndefHash *local_asm_undef_hash,CAsmUndefHash *glbl_asm_undef_hash,
 	I64 line_num,Bool U8_avail)
 {
   CAsmUnresolvedRef *tmpu=MAlloc(sizeof(CAsmUnresolvedRef));
   tmpu->machine_code=machine_code;
   tmpu->type=type;
-  tmpu->ip=ip;
-  tmpu->rel_ip=rel_ip;
+  tmpu->rip=rip;
+  tmpu->rel_rip=rel_rip;
   tmpu->aot=cc->aot;
   tmpu->imm_flag=FALSE;
   tmpu->line_num=line_num;

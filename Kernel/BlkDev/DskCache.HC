@@ -3,7 +3,7 @@ U0 DskCacheInit(I64 size_in_U8s)
   CCacheBlk *tmpc;
   I64 i,cnt;
 
-  while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
+  while (LBts(&sys_semas[SEMA_DSK_CACHE],0))
     Yield;
   Free(blkdev.cache_ctrl);
   Free(blkdev.cache_base);
@@ -34,7 +34,7 @@ U0 DskCacheInit(I64 size_in_U8s)
       tmpc->next_hash=tmpc->last_hash=tmpc;
     }
   }
-  LBtr(&sys_semas[SYS_SEMA_DSK_CACHE],0);
+  LBtr(&sys_semas[SEMA_DSK_CACHE],0);
 }
 
 I64 DskCacheHash(I64 blk)
@@ -77,7 +77,7 @@ U0 DskCacheAdd(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {
   CCacheBlk *tmpc;
   if (blkdev.cache_base) {
-    while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
+    while (LBts(&sys_semas[SEMA_DSK_CACHE],0))
       Yield;
     while (cnt-->0) {
       if (!(tmpc=DskCacheFind(dv,blk)))
@@ -90,7 +90,7 @@ U0 DskCacheAdd(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
       blk++;
       buf+=BLK_SIZE;
     }
-    LBtr(&sys_semas[SYS_SEMA_DSK_CACHE],0);
+    LBtr(&sys_semas[SEMA_DSK_CACHE],0);
   }
 }
 
@@ -98,7 +98,7 @@ U0 DskCacheInvalidate2(CDrv *dv)
 {
   CCacheBlk *tmpc,*tmpc1;
   if (blkdev.cache_base) {
-    while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
+    while (LBts(&sys_semas[SEMA_DSK_CACHE],0))
       Yield;
     tmpc=blkdev.cache_ctrl->last_lru;
     while (tmpc!=blkdev.cache_ctrl) {
@@ -112,7 +112,7 @@ U0 DskCacheInvalidate2(CDrv *dv)
       }
       tmpc=tmpc1;
     }
-    LBtr(&sys_semas[SYS_SEMA_DSK_CACHE],0);
+    LBtr(&sys_semas[SEMA_DSK_CACHE],0);
   }
 }
 
@@ -120,7 +120,7 @@ U0 RCache(CDrv *dv,U8 **_buf, I64 *_blk, I64 *_cnt)
 {
   CCacheBlk *tmpc;
   if (blkdev.cache_base) {
-    while (LBts(&sys_semas[SYS_SEMA_DSK_CACHE],0))
+    while (LBts(&sys_semas[SEMA_DSK_CACHE],0))
       Yield;
 //fetch leading blks from cache
     while (*_cnt>0) {
@@ -140,6 +140,6 @@ U0 RCache(CDrv *dv,U8 **_buf, I64 *_blk, I64 *_cnt)
       } else
 	break;
     }
-    LBtr(&sys_semas[SYS_SEMA_DSK_CACHE],0);
+    LBtr(&sys_semas[SEMA_DSK_CACHE],0);
   }
 }

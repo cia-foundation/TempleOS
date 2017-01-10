@@ -253,7 +253,7 @@ U8 *ExpandBuf(CArcCompress *arc,CTask *mem_task=NULL)
   U8 *res;
 
   if (!(CT_NONE<=arc->compression_type<=CT_8_BIT) ||
-	arc->expanded_size>MEM_MAPPED_SPACE)
+	arc->expanded_size>mem_mapped_space)
     throw('Compress');
 
   res=MAlloc(arc->expanded_size+1,mem_task);

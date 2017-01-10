@@ -21,7 +21,7 @@ I64 HashEntrySize(CHashSrcSym *tmph)
       if (StrCmp(tmph->str,KERNEL_MODULE_NAME))
 	return MSize(tmph(CHashGeneric *)->user_data0);
       else {
-	bfh=sys_boot_base-sizeof(CBinFile);
+	bfh=mem_boot_base-sizeof(CBinFile);
 	return bfh->file_size;
       }
     case HTt_WORD:

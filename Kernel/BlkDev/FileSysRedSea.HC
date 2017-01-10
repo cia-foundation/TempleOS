@@ -55,7 +55,7 @@ U0 RedSeaFreeLstBuild(CDrv *dv)
       DrvUnlock(dv);
 }
 
-U0 RedSeaDrvInit(CDrv *dv)
+U0 RedSeaInit(CDrv *dv)
 {
   CRedSeaBoot br;
   Bool unlock;
@@ -79,7 +79,7 @@ U0 RedSeaDrvInit(CDrv *dv)
       DrvUnlock(dv);
 }
 
-Bool RedSeaDrvValidate(U8 drv_let)
+Bool RedSeaValidate(U8 drv_let)
 {
   CDrv *dv;
   CRedSeaBoot br;
@@ -119,7 +119,7 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
     WZeroBlks(dv,dv->drv_offset,i);
 
     WBlks(dv,br,dv->drv_offset,1);
-    RedSeaDrvInit(dv);
+    RedSeaInit(dv);
     ClustersAlloc(dv,0,1,FALSE);	//Alloc #1
 
     root_dir_blks=MaxI64(1,dv->bd->init_root_dir_blks);
@@ -144,7 +144,7 @@ U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)
     d_native->datetime=Now;
 
     WBlks(dv,root_dir,br->root_cluster,root_dir_blks);
-    RedSeaDrvInit(dv);
+    RedSeaInit(dv);
     DrvUnlock(dv);
   } catch
     DrvUnlock(dv);

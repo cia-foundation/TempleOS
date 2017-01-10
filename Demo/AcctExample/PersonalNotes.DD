@@ -1,19 +1,32 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
+* $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
+* Add asteroid harbor defense.
+* Afterburner thruster.
+
+* $LK,"::/Apps/Titanium/Titanium.HC"$
+* Lead-in at start of game with no enemy.
+* Have highway of death.
+* Fix straight shooting.
+* Helicopters.
+* Anti-Aircraft.
+
+* Make registry files more robust.
+
+* $MA-X+PU,"64-Bit Device Memory",LM="F(\"mem64_ptr\");View;"$ is not implemented.
+
 * $LK,"::/Demo/RandDemo.HC"$ is kinda crappy.
 
 * Cursor in $LK,"~/TOSToHtml.HC"$.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.HC,Sleep(1)"$.
 
+* Naming standard with regard to "MAX_".
+
 * Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
 
 * $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.HC"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
 
 * Get rid of $LK,"JobQue",A="MN:JobQue"$() and use just $LK,"Spawn",A="MN:Spawn"$()?  Not sure about this, probably.
-
-* Add missiles to $LK,"::/Apps/TimeOut/TimeOut.HC"$.
-
-* Add asteroid harbor defense to $LK,"::/Apps/X-Caliber/X-Caliber.HC"$.
 
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.HC,41"$
 * Backward <SHIFT-F3> is broken?
@@ -43,8 +56,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Compiler Optimization: heap_glbls with added offset.  Might exist.
 
-* AfterEgypt: $LK,"Numbers,13:33",A="BF:Numbers,13:33"$ scouts? $LK,"Numbers,21:8",A="BF:Numbers,21:8"$ snakes?
-
 * Bug: Find-and-replace text on $$PT$$ line before it.
 * 12/25/2015 Copy-Paste index.html glitch if source window 40 columns.
 * 01/06/2016 Editor filter "str" applied to output from LineRep looks broken.
@@ -55,7 +66,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Good $LK,"spell checker",A="MN:ACMisspelledFind"$.
 * Good Bible search.
 
-* Can $LK,"MEM_EXTRA_HASH2_PAGES",A="MN:MEM_EXTRA_HASH2_PAGES"$ be just one?
+* Can $LK,"MEM_EXTRA_HASH2_PAGS",A="MN:MEM_EXTRA_HASH2_PAGS"$ be just one?
 
 * Bible ranges in $LK,"BibleVerse",A="MN:BibleVerse"$(). 
 
@@ -140,7 +151,7 @@ $FG,5$$TX+CX,"TODO: Too Hard, or Not Worth Doing."$$FG$
 * Compiler: FunPtr local vars?  I forgot if this was hard or not.
 $ID,5$$HL,1$U0 Main()
 {
-  U0 (*fp_old_draw_input_ptr)(CDC *dc,I64 x,I64 y)=gr.fp_draw_input_ptr;
+  U0 (*fp_old_draw_ms)(CDC *dc,I64 x,I64 y)=gr.fp_draw_ms;
 }
 $ID,-5$$HL,0$
 * Compiler: Get rid of $LK,"0x20000",A="FF:::/Compiler/CMain.HC,0x20000"$ limit.
@@ -155,7 +166,7 @@ $FG,5$$TX+CX,"Bugs"$$FG$
 
 * Bug introduced around 11/1/15.  Changed $LK,"::/Kernel/Sched.HC"$ and now $LK,"WinToTop",A="MN:WinToTop"$ is called on Adam task at start-up, sometimes.  Might be user's fault because of bad keys pressed during VMware power-on init.  Might be fixed by $LK,"ACf_INIT_IN_PROGRESS",A="MN:ACf_INIT_IN_PROGRESS"$.
 
-* 1/12/16 $LK,"ATARepEntry",A="MN:ATARepEntry"$ shows corrupted buttons.  Weird.  Perhaps, my imagination.
+* 1/12/16 $LK,"ATARepEntry",A="MN:ATARepEntry"$ shows corrupted bttns.  Weird.  Perhaps, my imagination.
 
 
 $FG,5$$TX+CX,"3rd Party Bugs"$$FG$
@@ -179,7 +190,7 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * 1/?/2015,8/10/2015 Macro sel in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
 
-* 5/7/14:Something like $LK,"InSetIP",A="MN:InSetIP"$ caused hang, then reboot in TestSuite.
+* 5/7/14:Something like $LK,"InSetMs",A="MN:InSetMs"$ caused hang, then reboot in TestSuite.
 * 5/7/14:#63 Maybe, $LK,"::/Demo/Graphics/Pick3D.HC"$ crashed in TestSuite.
 
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (Forgot what this is talking about.)
@@ -193,6 +204,8 @@ $ID,5$CArrayDim dim;
 CHashFun *fun_ptr;
 $ID,-5$
 * extern of fun with dft arg of str?
+
+* ISO.C on FAT32 created by Windows or Linux are not contiguous.
 
 * Might want to warn switch[] dup case numbers.
 
@@ -219,13 +232,15 @@ $ID,-5$
 * Compiler: Type for either F64 or I64, like Print -- no conversion.
 * Compiler: Arg type ... that did do conversion, if we have one that doesn't.
 
-* $LK,"R",A="MN:R"$("chars_bmp_","set_");
+* $LK,"R",A="MN:R"$("char_bmp_","set_");
 
 * Clean-up code $LK,"FileNameAbs",A="MN:FileNameAbs"$(), does it need so many local var names?  I guess no choice.
 
 
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
+
+* Make so just CdRom; command to copy entire disk to ::/CdRom directory? 
 
 * $LK,"MP DepthBuf",A="FF:::/Adam/Gr/SpriteMesh.HC,dc->depth_buf=e->"$ is a kludge because of dc->depth_buf=NULL in various graphics routines.
 
@@ -251,7 +266,7 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Eliminate?  $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$() change to 3x3?
 * Eliminate?  $LK,"ROP_XOR",A="MN:ROP_XOR"$?
 
-* $LK,"WinMgrTask",A="MN:WinMgrTask"$ needs to do doc operations on $LK,"PostMsg",A="MN:PostMsg"$() msgs for mouse.  Already works for $LK,"IPSet",A="MN:IPSet"$()?
+* $LK,"WinMgrTask",A="MN:WinMgrTask"$ needs to do doc operations on $LK,"PostMsg",A="MN:PostMsg"$() msgs for ms_hard.  Already works for $LK,"MsSet",A="MN:MsSet"$()?
 
 * Should Msgs in PopUp queue get fwded to parent when task dies?
 
@@ -270,8 +285,6 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Compiler: !F64 ~F64
 
 * Compiler: &=, |= can overflow with Bts Btr on small data types?
-
-* Compiler: $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ for local vars?
 
 * Implement $LK,"RS_ATTR_FIXED",A="MN:RS_ATTR_FIXED"$ fixed pos files?
 
@@ -359,7 +372,7 @@ $FG,5$$TX+CX,"Test"$$FG$
 
 * $LK,"FileMgr",A="MN:FileMgr"$() help link scrolls out of window.
 
-* $LK,"MouseDriverInstall",A="MN:MouseDriverInstall"$() throws exceptions?  Doesn't work?  Why mouse $LK,"0x9FC30",A="FF:::/Kernel/SerialDev/Mouse.HC,9FC"$?
+* $LK,"MsHardDrvrInstall",A="MN:MsHardDrvrInstall"$() throws exceptions?  Doesn't work?  Why mouse $LK,"0x9FC30",A="FF:::/Kernel/SerialDev/Mouse.HC,9FC"$?
 
 * VirtualBox MP reboot?
 
@@ -380,7 +393,7 @@ $FG,5$$TX+CX,"Uncategorized"$$FG$
   >Might want to do ZOOM in U8 graphics and convert scrn capture to U8
   >Might want to rev bit order
 
-* This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/SrvCmd.HC,Fs->catch_except=TRUE"$ causes problems because it
+* This $LK,"Fs->catch_except=TRUE",A="FF:::/Kernel/Job.HC,Fs->catch_except=TRUE"$ causes problems because it
 catches divide and out-of-mem.  Not sure what to do, yet.
 
 * Release semaphores or break lock sema,usb_td
@@ -429,7 +442,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17426KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17354KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -438,12 +451,15 @@ Frosting	$HC,"<center><img src=\"http://www.templeos.org/images/Frosting.jpg\" w
 Soap Carvings	$HC,"<center><img src=\"http://www.templeos.org/images/SoapCarvings.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
 CottonTail	$HC,"<center><img src=\"http://www.templeos.org/images/CttnTail.jpg\" width=\"644\" height=\"1113\" alt=\"\"></center>"$
 TempleOS Logo	$HC,"<center><img src=\"http://www.templeos.org/images/Logo128x152.jpg\" width=\"640\" height=\"760\" alt=\"\"></center>"$
+T-Shirts & Mug	$HC,"<img src=\"http://www.templeos.org/Wb/Home/Web/Imgs/Gear2387x2849.jpg\" width=\"477\" height=\"569\" alt=\"\">"$
 Pew Pew Pew	$HC,"<center><img src=\"http://i.imgur.com/sMpJ0ch.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
 Iceberg		$HC,"<center><img src=\"https://upload.wikimedia.org/wikipedia/commons/3/38/Blue_ice_in_South_Greenland_-_Visit_Greenland.jpg\" width=\"640\" height=\"480\" alt=\"\"></center>"$
 I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\" height=\"800\" alt=\"\"></center>"$
 NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
 Purple Frog	$HC,"<center><img src=\"https://s-media-cache-ak0.pinimg.com/736x/fb/08/2a/fb082a53bd798f5957a474ff9095e6d4.jpg\" width=\"640\" height=\"420\" alt=\"\"></center>"$
 Casino (Dog)	$HC,"<center><img src=\"http://www.templeos.org/images/Dog1855x1056.jpg\" width=\"640\" height=\"364\" alt=\"\"></center>"$
+Dianna's Cross	$HC,"<iframe src=\"https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fthephysicsgirl%2Fposts%2F1133902680027666&width=500\" width=\"500\" height=\"671\" style=\"border:none;overflow:hidden\" scrolling=\"no\" frameborder=\"0\" allowTransparency=\"true\"></iframe>"$
+
 
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
@@ -476,6 +492,7 @@ $TX,"TOSZ Compression",HTML="http://www.templeos.org/Wb/Linux/TOSZ.CPP"$
 $TX,"ATA/ATAPI spec",HTML="http://www.t13.org/Documents/UploadedDocuments/docs2007/D1532v1r4b-AT_Attachment_with_Packet_Interface_-_7_Volume_1.pdf"$
 $TX,"Patton Prayer",HTML="http://www.pattonhq.com/prayer.html"$
 $TX,"Streaming Terry A. Davis",HTML="https://www.youtube.com/channel/UCdX4uJUwSFwiY3XBvu-F_-Q/live"$
+$TX,"Bleem",HTML="http://strangehorizons.com/fiction/the-secret-number/"$
 
 $TX,"WWW.OSDEV.ORG",HTML="http://www.osdev.org"$
 $TX,"NIST Beacon",HTML="http://www.nist.gov/itl/csd/ct/nist_beacon.cfm"$

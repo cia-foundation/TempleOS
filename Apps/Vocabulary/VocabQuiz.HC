@@ -41,13 +41,13 @@ U0 VocabQuiz()
 	'\n';
 	if (ch-'1'==num) {
 	  "$$LTGREEN$$Correct\n$$FG$$";
-	  Snd(1000);
+	  Snd(74);
 	} else {
 	  "$$LTRED$$Incorrect\n$$FG$$";
-	  Snd(200);
+	  Snd(46);
 	}
 	Sleep(500);
-	Snd(0);
+	Snd;
 	ACDPopUpDef(right_word);
 	break;
       }

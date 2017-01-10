@@ -322,78 +322,73 @@ _extern _STRCPY U0 StrCpy(
 
 //These bitmaps go to 0-511 so that $LK,"Lex",A="MN:Lex"$() can use them with $LK,"Token Codes",A="MN:TK_EOF"$.
 U32
-  chars_bmp_alpha[16]=
+  char_bmp_alpha[16]=
   {0x0000000,0x00000000,0x87FFFFFF,0x07FFFFFE,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_alpha_numeric[16]=
+  char_bmp_alpha_numeric[16]=
   {0x0000000,0x03FF0000,0x87FFFFFF,0x07FFFFFE,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_alpha_numeric_no_at[16]=
+  char_bmp_alpha_numeric_no_at[16]=
   {0x0000000,0x03FF0000,0x87FFFFFE,0x07FFFFFE,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_word[16]=
+  char_bmp_word[16]=
   {0x0000000,0x03FF0080,0x87FFFFFE,0x07FFFFFE,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_filename[16]=
+  char_bmp_filename[16]=
   {0x0000000,0x03FF73FB,0xEFFFFFFF,0x6FFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_dec_numeric[16]=
+  char_bmp_dec_numeric[16]=
   {0x0000000,0x03FF0000,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_hex_numeric[16]=
+  char_bmp_hex_numeric[16]=
   {0x0000000,0x03FF0000,0x7E,0x7E,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_white_space[16]=
-  {0x80003600,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  char_bmp_white_space[16]=
+  {0x80002600,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_non_eol_white_space[16]=
-  {0x80001200,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  char_bmp_non_eol_white_space[16]=
+  {0x80000200,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_zero_cr_nl_cursor[16]=
+  char_bmp_zero_cr_nl_cursor[16]=
   {0x00002421,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_zero_tab_ff_cr_nl_cursor[16]=
-  {0x00003621,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  char_bmp_zero_tab_cr_nl_cursor[16]=
+  {0x00002621,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_zero_tab_ff_cr_nl_cursor_dollar[16]=
-  {0x00003621,0x10,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+  char_bmp_zero_tab_cr_nl_cursor_dollar[16]=
+  {0x00002621,0x10,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 
-  chars_bmp_getkey[16]=
-  {0x80002600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
-  0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
-  0,0,0,0,0,0,0,0},
-
-  chars_bmp_macro[16]=
+  char_bmp_macro[16]=
   {0x80002600,0xFFFFFFDF,0xFFFFFFFF,0x7FFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_printable[16]=
-  {0x80003600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
+  char_bmp_printable[16]=
+  {0x80002600,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_displayable[16]=
+  char_bmp_displayable[16]=
   {0x80000000,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},
 
-  chars_bmp_safe_dollar[16]=
+  char_bmp_safe_dollar[16]=
   {0x80000000,0xFFFFFFEF,0xFFFFFFFF,0x7FFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0,0,0,0,0,0,0,0},//same but no dollar sign
 
-  chars_bmp_non_eol[16]=
+  char_bmp_non_eol[16]=
   {0xFFFFDBFE,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
   0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
@@ -527,14 +522,14 @@ U8 *StrUtil(U8 *_src,I64 flags)
   I64 ch;
 
   if (flags & SUF_REM_LEADING)
-    while (Bt(chars_bmp_white_space,*src))
+    while (Bt(char_bmp_white_space,*src))
       src++;
   while (ch=*src++)
-    if (Bt(chars_bmp_white_space,ch)) {
+    if (Bt(char_bmp_white_space,ch)) {
       if (!(flags & SUF_REM_SPACES)) {
 	if (flags & SUF_SINGLE_SPACE) {
 	  *dst++ = CH_SPACE;
-	  while ((ch=*src++) && Bt(chars_bmp_white_space,ch));
+	  while ((ch=*src++) && Bt(char_bmp_white_space,ch));
 	  src--;
 	} else
 	  *dst++ = ch;
@@ -544,7 +539,7 @@ U8 *StrUtil(U8 *_src,I64 flags)
   *dst=0;
 
   if (flags & SUF_REM_TRAILING)
-    while (dst!=_src && (!*dst || Bt(chars_bmp_white_space,*dst)))
+    while (dst!=_src && (!*dst || Bt(char_bmp_white_space,*dst)))
       *dst-- =0;
   if (flags & SUF_TO_UPPER)
     for (dst=_src;*dst;dst++) {
@@ -561,7 +556,7 @@ U8 *StrUtil(U8 *_src,I64 flags)
   if (flags & SUF_SAFE_DOLLAR)
     for (dst=_src;*dst;dst++) {
       ch=*dst;
-      if (!Bt(chars_bmp_safe_dollar,*dst))
+      if (!Bt(char_bmp_safe_dollar,*dst))
 	*dst='.';
     }
   if (flags & SUF_S2T)
@@ -634,7 +629,7 @@ U8 *StrFind(U8 *needle,U8 *haystack_str,I64 flags=0)
       haystack_str=StrMatch(needle,haystack_str);
     if (haystack_str && flags & SFF_WHOLE_LABELS_BEFORE &&
 	  haystack_str!=saved_haystack_str &&
-	  Bt(chars_bmp_alpha_numeric,*(haystack_str-1))) {
+	  Bt(char_bmp_alpha_numeric,*(haystack_str-1))) {
       haystack_str++;
       if (*haystack_str)
 	cont=TRUE;
@@ -642,7 +637,7 @@ U8 *StrFind(U8 *needle,U8 *haystack_str,I64 flags=0)
 	haystack_str=NULL;
     }
     if (haystack_str && flags & SFF_WHOLE_LABELS_AFTER &&
-	  Bt(chars_bmp_alpha_numeric,*(haystack_str+plen))) {
+	  Bt(char_bmp_alpha_numeric,*(haystack_str+plen))) {
       haystack_str++;
       if (*haystack_str)
 	cont=TRUE;

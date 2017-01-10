@@ -10,7 +10,7 @@ class CMeshEdVertex
   CMeshEdVertex *next,*last,*copy;
 
   U0 start;
-  CD3I32 p;  //World coordinates of the point.
+  CD3I32 p; //World coordinates of the point.
   U0 end;
   CD3I32 p0,
 	pt; //Transformed coordinates.	(Scrn)
@@ -34,7 +34,7 @@ class CMeshEdTri
 
 class CMeshFrame
 {
-  I64 ip_z,thickness; //Input pointer (mouse) Z-coordinate
+  I64 ms_z,thickness; //Mouse Z-coordinate
   I64 ed_mode,cx,cy;
   CColorROPU32 cur_color;
   Bool grid_on,flip_y,sel_rect,vertex_on,closed,pad[3];
@@ -80,7 +80,7 @@ CMeshEdVertex *MeshVertexFindScrPt(CMeshFrame *e,I64 x,I64 y)
   while (tmpv!=&e->vertex_head) {
     if (!(tmpv->flags&VF_IGNORE)) {
       dd=SqrI64(x-tmpv->pt.x)+SqrI64(y-tmpv->pt.y);
-      dz=AbsI64(e->ip_z-tmpv->p.z);
+      dz=AbsI64(e->ms_z-tmpv->p.z);
       if (dd<best_dd || dd==best_dd && dz<best_dz) {
 	res=tmpv;
 	best_dd=dd;
@@ -425,17 +425,17 @@ U0 MeshCurSnap(CMeshFrame *e)
     Mat4x4MulXYZ(e->w2s,&x1,&y1,&z1);
     x2=0; y2=e->cur_snap<<16; z2=0;
     Mat4x4MulXYZ(e->w2s,&x2,&y2,&z2);
-    ip_grid.x=Max(1,MaxI64(x1,x2)>>16);
-    ip_grid.y=Max(1,MaxI64(y1,y2)>>16);
-    ip_grid.z=Min(ip_grid.x,ip_grid.y);
+    ms_grid.x=Max(1,MaxI64(x1,x2)>>16);
+    ms_grid.y=Max(1,MaxI64(y1,y2)>>16);
+    ms_grid.z=Min(ms_grid.x,ms_grid.y);
   }
 }
 
 U0 MeshScaleZoom(CMeshFrame *e,F64 scale)
 {
   CTask *task=Fs;
-  I64	x=ip.pos.x-task->pix_left-task->scroll_x-task->pix_width/2,
-	y=ip.pos.y-task->pix_top-task->scroll_y-task->pix_height/2;
+  I64	x=ms.pos.x-task->pix_left-task->scroll_x-task->pix_width/2,
+	y=ms.pos.y-task->pix_top-task->scroll_y-task->pix_height/2;
   task->horz_scroll.pos*=scale;
   task->vert_scroll.pos*=scale;
   task->horz_scroll.pos+=scale*x-x;
@@ -561,9 +561,9 @@ I64 *MeshSetW2S(CMeshFrame *e,CTask *task)
 U0 MeshCursorW(CMeshFrame *e,CTask *task,I64 *_x,I64 *_y,I64 *_z)
 {
   I64	x_shadow,y_shadow,z_shadow,
-	xc=ip.pos.x-task->pix_left-task->scroll_x-e->cx,
-	yc=ip.pos.y-task->pix_top-task->scroll_y-e->cy,zc=0,
-	x=0,y=0,z=e->ip_z,
+	xc=ms.pos.x-task->pix_left-task->scroll_x-e->cx,
+	yc=ms.pos.y-task->pix_top-task->scroll_y-e->cy,zc=0,
+	x=0,y=0,z=e->ms_z,
 	i,x2,y2,z2;
   Mat4x4MulXYZ(e->w2s,&x,&y,&z); //scrn of Z vect
 
@@ -584,7 +584,7 @@ U0 MeshCursorW(CMeshFrame *e,CTask *task,I64 *_x,I64 *_y,I64 *_z)
   Mat4x4MulXYZ(e->s2w,&x,&y,&z);
   x=RoundI64(x,e->cur_snap);
   y=RoundI64(y,e->cur_snap);
-  z=RoundI64(e->ip_z,e->cur_snap);
+  z=RoundI64(e->ms_z,e->cur_snap);
   *_x=x; *_y=y; *_z=z;
 }
 
@@ -729,7 +729,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   //GR_Z_ALL is set to half of the Z-range which is an I32.
   dc->z=GR_Z_ALL;
 
-  //Light source set to input pointer (mouse).
+  //Light source set to mouse.
   MeshCursorW(e,task,&x,&y,&z);
   dc->ls.x=x;
   dc->ls.y=y;
@@ -785,7 +785,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     tmpv=tmpv->next;
   }
 
-  if (CtrlInside(c,ip.presnap.x,ip.presnap.y)||winmgr.show_menu) {
+  if (CtrlInside(c,ms.presnap.x,ms.presnap.y)||winmgr.show_menu) {
     GridInit;
     task->win_inhibit=WIF_SELF_DOC;
   } else {
@@ -828,7 +828,7 @@ U0 MeshInit(CMeshFrame *e,Bool flip_y)
   e->ed_mode='v';
   e->grid_on=TRUE;
   e->vertex_on=TRUE;
-  e->ip_z=0;
+  e->ms_z=0;
   e->thickness=25;
   e->closed=TRUE;
   e->view_scale=1.0;
@@ -971,7 +971,7 @@ See $LK,"::/Demo/Graphics/SpritePlot3D.HC"$.
 $WW,0$*/
   CCtrl *c=CtrlFindUnique(Fs,CTRLT_VIEWING_ANGLES);
   CViewAngles *s,*old_s;
-  I64 i,msg_code,sel_mode,a1,a2,make_tri_vertex_num=0,x,y,z;
+  I64 i,msg_code,sel_mode,arg1,arg2,make_tri_vertex_num=0,x,y,z;
   CD3I32 p0a,p0b;
   CMeshEdVertex *va[3],*tmpv;
   Bool adjusting_z=FALSE,moving,save_and_exit;
@@ -1077,33 +1077,34 @@ $WW,0$*/
   try {//In case of <CTRL-ALT-c>
     while (TRUE) {
       MeshUpdateMenu(&e);
-      msg_code=GetMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|
-	    1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP);
+      msg_code=GetMsg(&arg1,&arg2,
+	    1<<MSG_MS_MOVE|1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN|
+	    1<<MSG_MS_L_UP|1<<MSG_MS_R_DOWN|1<<MSG_MS_R_UP);
 me_restart:
       switch (msg_code) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case 0:
-	      switch (a2.u8[0]) {
+	      switch (arg2.u8[0]) {
 		case SC_DELETE:
-		  if (a2&SCF_SHIFT)
+		  if (arg2&SCF_SHIFT)
 		    goto me_clipboard_cut;
 		  else {
 		    if (MeshSelCnt(&e))
 		      MeshClipboardDel(&e);
 		    else if (e.ed_mode!='t')
 		      MeshVertexDel(&e,MeshVertexFindScrPt(&e,
-			    ip.presnap.x-Fs->pix_left-Fs->scroll_x,
-			    ip.presnap.y-Fs->pix_top-Fs->scroll_y));
+			    ms.presnap.x-Fs->pix_left-Fs->scroll_x,
+			    ms.presnap.y-Fs->pix_top-Fs->scroll_y));
 		    MeshVertexSelAll(&e,FALSE);
 		    MeshTriSelAll(&e,FALSE);
 		    make_tri_vertex_num=0;
 		  }
 		  break;
 		case SC_INS:
-		  if (a2&SCF_CTRL)
+		  if (arg2&SCF_CTRL)
 		    goto me_clipboard_copy;
-		  else if (a2&SCF_SHIFT)
+		  else if (arg2&SCF_SHIFT)
 		    goto me_clipboard_paste;
 	      }
 	      break;
@@ -1129,7 +1130,7 @@ me_restart:
 	    case 'p':
 	      e.thickness=PopUpGetI64("Thickness (%d):",e.thickness);
 	    case 'n':
-	      if (a1=='n' || a1=='p')
+	      if (arg1=='n' || arg1=='p')
 		e.closed=TRUE;
 	      else
 		e.closed=PopUpNoYes("Closed?\n");
@@ -1143,9 +1144,9 @@ me_chain:
 	    case 'M':
 	      adjusting_z=FALSE;
 	      moving=FALSE;
-	      e.ed_mode=a1;
+	      e.ed_mode=arg1;
 	      make_tri_vertex_num=0;
-	      Snd(0);
+	      Snd;
 	      break;
 	    case 'T':
 	      MeshTransformSel(&e);
@@ -1166,29 +1167,29 @@ me_chain:
 	    case 'a':
 	    case 'u':
 	    case 'o':
-	      if (a1=='a')
+	      if (arg1=='a')
 		sel_mode=SEL_MESH_EQU;
-	      else if (a1=='u')
+	      else if (arg1=='u')
 		sel_mode=SEL_MESH_AND;
 	      else
 		sel_mode=SEL_MESH_OR;
-	      if ((msg_code=GetMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN|
-		    1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|1<<MSG_IP_R_UP))
-		    !=MSG_IP_L_DOWN) {
+	      if ((msg_code=GetMsg(&arg1,&arg2,1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN|
+		    1<<MSG_MS_L_UP|1<<MSG_MS_R_DOWN|1<<MSG_MS_R_UP))
+		    !=MSG_MS_L_DOWN) {
 		Beep; Beep;
 		goto me_restart;
 	      }
-	      e.x1=a1; e.y1=a2;
-	      e.x2=a1; e.y2=a2;
+	      e.x1=arg1; e.y1=arg2;
+	      e.x2=arg1; e.y2=arg2;
 	      e.sel_rect=TRUE;
 	      while (TRUE) {
-		msg_code=GetMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN|
-		      1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|1<<MSG_IP_R_DOWN|
-		      1<<MSG_IP_R_UP);
-		if (msg_code==MSG_IP_MOVE) {
-		  e.x2=a1; e.y2=a2;
-		} else if (msg_code==MSG_IP_L_UP) {
-		  e.x2=a1; e.y2=a2;
+		msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_MOVE|1<<MSG_KEY_DOWN|
+		      1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|1<<MSG_MS_R_DOWN|
+		      1<<MSG_MS_R_UP);
+		if (msg_code==MSG_MS_MOVE) {
+		  e.x2=arg1; e.y2=arg2;
+		} else if (msg_code==MSG_MS_L_UP) {
+		  e.x2=arg1; e.y2=arg2;
 		  break;
 		} else {
 		  e.sel_rect=FALSE;
@@ -1268,13 +1269,13 @@ me_clipboard_cut:
 	      if (moving)
 		MeshVertexIgnoreSet(&e,TRUE);
 	      if (tmpv=MeshVertexFindScrPt(&e,
-		    ip.pos.x-Fs->pix_left-Fs->scroll_x,
-		    ip.pos.y-Fs->pix_top-Fs->scroll_y)) {
-		Noise(25,2000,8000);
-		e.ip_z=RoundI64(tmpv->p.z,e.cur_snap);
+		    ms.pos.x-Fs->pix_left-Fs->scroll_x,
+		    ms.pos.y-Fs->pix_top-Fs->scroll_y)) {
+		Noise(25,86,110);
+		e.ms_z=RoundI64(tmpv->p.z,e.cur_snap);
 	      } else {
 		Beep; Beep;
-		e.ip_z=0;
+		e.ms_z=0;
 	      }
 	      MeshVertexIgnoreSet(&e,FALSE);
 	      if (moving) {
@@ -1319,14 +1320,14 @@ me_clipboard_cut:
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_DOWN:
+	case MSG_MS_L_DOWN:
 	  switch (e.ed_mode) {
 	    case 'm':
 	      if (!moving) {
 		if (!MeshSelCnt(&e) &&
-		      (tmpv=MeshVertexFindScrPt(&e,a1,a2))) {
+		      (tmpv=MeshVertexFindScrPt(&e,arg1,arg2))) {
 		  tmpv->flags|=VF_SEL;
-		  e.ip_z=RoundI64(tmpv->p.z,e.cur_snap);
+		  e.ms_z=RoundI64(tmpv->p.z,e.cur_snap);
 		}
 		if (MeshSelCnt(&e)) {
 		  MeshCursorW(&e,Fs,&x,&y,&z);
@@ -1341,9 +1342,9 @@ me_clipboard_cut:
 	    case 'M':
 	      if (!adjusting_z && !moving) {
 		if (!MeshSelCnt(&e) &&
-		      (tmpv=MeshVertexFindScrPt(&e,a1,a2))) {
+		      (tmpv=MeshVertexFindScrPt(&e,arg1,arg2))) {
 		  tmpv->flags|=VF_SEL;
-		  e.ip_z=RoundI64(tmpv->p.z,e.cur_snap);
+		  e.ms_z=RoundI64(tmpv->p.z,e.cur_snap);
 		}
 		if (MeshSelCnt(&e)) {
 		  MeshCursorW(&e,Fs,&x,&y,&z);
@@ -1353,23 +1354,23 @@ me_clipboard_cut:
 		  MeshP0Capture(&e);
 		  moving=TRUE;
 
-		  p0b.x=ip.presnap.x;
-		  p0b.y=ip.presnap.y;
-		  p0b.z=e.ip_z;
+		  p0b.x=ms.presnap.x;
+		  p0b.y=ms.presnap.y;
+		  p0b.z=e.ms_z;
 		  adjusting_z=TRUE;
-		  Snd(ClampI64(3*e.ip_z+1500,0,15000));
+		  Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
 		}
 	      }
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_UP:
+	case MSG_MS_L_UP:
 	  switch (e.ed_mode) {
 	    case 'n':
 	    case 'f':
 	    case 'p':
 	    case 'v':
-	      Noise(25,2000,8000);
+	      Noise(25,86,110);
 	      MeshCursorW(&e,Fs,&x,&y,&z);
 	      e.cur_vertex=MeshVertexNew(&e,x,y,z);
 	      break;
@@ -1377,10 +1378,10 @@ me_clipboard_cut:
 	    case 'M':
 	      if (moving) {
 		if (adjusting_z) {
-		  e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
-		  *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+		  e.ms_z=RoundI64(Sign(p0b.y-ms.presnap.y)
+		  *Sqrt(Sqr(p0b.x-ms.presnap.x)+Sqr(p0b.y-ms.presnap.y))
 		  +p0b.z,e.cur_snap);
-		  Snd(0);
+		  Snd;
 		  adjusting_z=FALSE;
 		  MeshCursorW(&e,Fs,&x,&y,&z);
 		  MeshP0Offset(&e,0,0,z-p0a.z);
@@ -1394,14 +1395,14 @@ me_clipboard_cut:
 	      }
 	      break;
 	    case 't':
-	      if (tmpv=MeshVertexFindScrPt(&e,a1,a2)) {
+	      if (tmpv=MeshVertexFindScrPt(&e,arg1,arg2)) {
 		for (i=0;i<make_tri_vertex_num;i++)
 		  if (va[i]==tmpv) {
 		    Beep; Beep;
 		    break;
 		  }
 		if (i==make_tri_vertex_num) {
-		  Noise(25,2000,8000);
+		  Noise(25,86,110);
 		  va[make_tri_vertex_num++]=tmpv;
 		  tmpv->flags|=VF_SEL;
 		  if (make_tri_vertex_num==3) {
@@ -1415,7 +1416,7 @@ me_clipboard_cut:
 	      break;
 	  }
 	  break;
-	case MSG_IP_R_DOWN:
+	case MSG_MS_R_DOWN:
 	  if (!adjusting_z && e.ed_mode!='M' &&
 		(e.chain_pred==e.vertex_head.last ||
 		e.ed_mode!='n' && e.ed_mode!='f' && e.ed_mode!='p')) {
@@ -1427,19 +1428,19 @@ me_clipboard_cut:
 	      p0a.z=z;
 	      MeshP0Capture(&e);
 	    }
-	    p0b.x=ip.presnap.x;
-	    p0b.y=ip.presnap.y;
-	    p0b.z=e.ip_z;
+	    p0b.x=ms.presnap.x;
+	    p0b.y=ms.presnap.y;
+	    p0b.z=e.ms_z;
 	    adjusting_z=TRUE;
-	    Snd(ClampI64(3*e.ip_z+1500,0,15000));
+	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
 	  }
 	  break;
-	case MSG_IP_R_UP:
+	case MSG_MS_R_UP:
 	  if (adjusting_z) {
-	    e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
-	    *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+	    e.ms_z=RoundI64(Sign(p0b.y-ms.presnap.y)
+	    *Sqrt(Sqr(p0b.x-ms.presnap.x)+Sqr(p0b.y-ms.presnap.y))
 	    +p0b.z,e.cur_snap);
-	    Snd(0);
+	    Snd;
 	    adjusting_z=FALSE;
 	    if (moving) {
 	      MeshCursorW(&e,Fs,&x,&y,&z);
@@ -1452,26 +1453,26 @@ me_clipboard_cut:
 	  } else  if (e.ed_mode=='n') {
 	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
 	      MeshPolygon(&e,e.chain_pred->next,e.vertex_head.last,FALSE);
-	    a1=e.ed_mode;
+	    arg1=e.ed_mode;
 	    goto me_chain;
 	  } else if (e.ed_mode=='f') {
 	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
 	      MeshFence(&e);
-	    a1=e.ed_mode;
+	    arg1=e.ed_mode;
 	    goto me_chain;
 	  } else if (e.ed_mode=='p') {
 	    if (e.chain_pred && e.chain_pred!=e.vertex_head.last)
 	      MeshPrism(&e);
-	    a1=e.ed_mode;
+	    arg1=e.ed_mode;
 	    goto me_chain;
 	  }
 	  break;
-	case MSG_IP_MOVE:
+	case MSG_MS_MOVE:
 	  if (adjusting_z) {
-	    e.ip_z=RoundI64(Sign(p0b.y-ip.presnap.y)
-	    *Sqrt(Sqr(p0b.x-ip.presnap.x)+Sqr(p0b.y-ip.presnap.y))
+	    e.ms_z=RoundI64(Sign(p0b.y-ms.presnap.y)
+	    *Sqrt(Sqr(p0b.x-ms.presnap.x)+Sqr(p0b.y-ms.presnap.y))
 	    +p0b.z,e.cur_snap);
-	    Snd(ClampI64(3*e.ip_z+1500,0,15000));
+	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
 	  }
 	  if (moving) {
 	    MeshCursorW(&e,Fs,&x,&y,&z);

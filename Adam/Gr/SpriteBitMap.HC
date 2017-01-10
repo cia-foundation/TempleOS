@@ -201,7 +201,7 @@ U0 GrBitMapEdEtch(CDC *img,I64 width,CColorROPU32 bkcolor)
 I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
 	I64 *_xx2,I64 *_yy2,CDC **_img,CColorROPU32 bkcolor)
 {
-  I64 i,j,mode=SPBM_LINE,color=BLACK,width=1,msg_code,a1,a2,x1,y1,x11,y11,
+  I64 i,j,mode=SPBM_LINE,color=BLACK,width=1,msg_code,arg1,arg2,x1,y1,x11,y11,
 	x22,y22,res,xx1=*_xx1,yy1=*_yy1,xx2=*_xx2,yy2=*_yy2,
 	old_de_flags=doc_e->de_flags;
   Bool down=FALSE;
@@ -222,11 +222,11 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
     dc->pen_width=1;
     GrBorder(dc,xx1-1,yy1-1,xx2,yy2);//This is done little bit too often.
 
-    while (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_L_DOWN|1<<MSG_IP_L_UP|
-	  1<<MSG_IP_R_DOWN|1<<MSG_IP_MOVE|1<<MSG_KEY_DOWN)) {
+    while (msg_code=ScanMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|
+	  1<<MSG_MS_R_DOWN|1<<MSG_MS_MOVE|1<<MSG_KEY_DOWN)) {
       switch (msg_code) {
 	case MSG_KEY_DOWN:
-	  switch (a1) {
+	  switch (arg1) {
 	    case CH_SHIFT_ESC:
 	      res=SPE_ABORT;
 	      goto bm_key_up_done;
@@ -235,7 +235,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
 	      goto bm_key_up_done;
 	    case 'c': //eye-dropper
 	      dc2=DCScrnCapture(FALSE);
-	      color=GrPeek(dc2,ip.pos.x,ip.pos.y)^15;//Mouse cursor is XORed.
+	      color=GrPeek(dc2,ms.pos.x,ms.pos.y)^15;//Mouse cursor is XORed.
 	      DCDel(dc2);
 	      break;
 	    case 't': //Set to transparent color
@@ -244,7 +244,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
 	  }
 	  break;
 
-	case MSG_IP_R_DOWN:
+	case MSG_MS_R_DOWN:
 bm_menu:
 	  DCFill(dc);
 	  StrCpy(Fs->task_title,"Sprite BitMap Menu");
@@ -353,26 +353,26 @@ bm_menu:
 	  GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	  down=FALSE;
 	  break;
-	case MSG_IP_L_DOWN:
+	case MSG_MS_L_DOWN:
 	  switch (mode) {
 	    case SPBM_PT:
 	      img->color=color;
 	      img->pen_width=width;
-	      GrPlot3(img,a1-xx1,a2-yy1,0);
+	      GrPlot3(img,arg1-xx1,arg2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
 	    start:
 	      if (down)
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
-	      x1=a1; y1=a2;
+	      x1=arg1; y1=arg2;
 	      down=TRUE;
 	      dc->color=color;
 	      dc->pen_width=width;
 	      case SPBM_LINE:
-		GrLine3(dc,x1,y1,0,a1,a2,0);
+		GrLine3(dc,x1,y1,0,arg1,arg2,0);
 		break;
 	      case SPBM_ARROW:
-		GrArrow3(dc,x1,y1,0,a1,a2,0);
+		GrArrow3(dc,x1,y1,0,arg1,arg2,0);
 		break;
 	      case SPBM_RECT:
 		GrRect(dc,x1,y1,1,1);
@@ -394,12 +394,12 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
 		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(dc,a1,a2,clipboard);
+		  GrBlot(dc,arg1,arg2,clipboard);
 		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
 		  dc2=DCCopy(clipboard);
 		  DCColorChg(dc2,bkcolor);
-		  GrBlot(dc,a1,a2,dc2);
+		  GrBlot(dc,arg1,arg2,dc2);
 		  DCDel(dc2);
 		}
 	      }
@@ -407,48 +407,48 @@ bm_menu:
 	    case SPBM_TEXT:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrPrint(dc,a1,a2,"%s",st);
+	      GrPrint(dc,arg1,arg2,"%s",st);
 	      break;
 	    case SPBM_TEXT_BOX:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrTextBox3(dc,a1,a2,0,st);
+	      GrTextBox3(dc,arg1,arg2,0,st);
 	      break;
 	    case SPBM_TEXT_DIAMOND:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrTextDiamond3(dc,a1,a2,0,st);
+	      GrTextDiamond3(dc,arg1,arg2,0,st);
 	      break;
 	    case SPBM_FLOOD_FILL:
 	      img->color=color;
-	      GrFloodFill(img,a1-xx1,a2-yy1);
+	      GrFloodFill(img,arg1-xx1,arg2-yy1);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
 	    case SPBM_FLOOD_FILL_NOT:
 	      img->color=color;
-	      GrFloodFill(img,a1-xx1,a2-yy1,TRUE);
+	      GrFloodFill(img,arg1-xx1,arg2-yy1,TRUE);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
 	    case SPBM_POLYLINE:
 	      if (!down) {
-		x1=a1; y1=a2;
+		x1=arg1; y1=arg2;
 		down=TRUE;
 		dc->color=color;
 		dc->pen_width=width;
-		GrLine3(dc,x1,y1,0,a1,a2,0);
+		GrLine3(dc,x1,y1,0,arg1,arg2,0);
 	      }
 	      break;
 	    case SPBM_POLYPT:
-	      x1=a1; y1=a2;
+	      x1=arg1; y1=arg2;
 	      down=TRUE;
 	      img->color=color;
 	      img->pen_width=width;
-	      GrLine3(img,x1-xx1,y1-yy1,0,a1-xx1,a2-yy1,0);
+	      GrLine3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
 	  }
 	  break;
-	case MSG_IP_MOVE:
+	case MSG_MS_MOVE:
 	  switch (mode) {
 	    case SPBM_LINE:
 	    case SPBM_ARROW:
@@ -458,26 +458,26 @@ bm_menu:
 		dc->color=color;
 		dc->pen_width=width;
 		if (mode==SPBM_ARROW)
-		  GrArrow3(dc,x1,y1,0,a1,a2,0);
+		  GrArrow3(dc,x1,y1,0,arg1,arg2,0);
 		else
-		  GrLine3(dc,x1,y1,0,a1,a2,0);
+		  GrLine3(dc,x1,y1,0,arg1,arg2,0);
 	      }
 	      break;
 	    case SPBM_RECT:
 	      if (down) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
-		if (x1<a1) {
+		if (x1<arg1) {
 		  x11=x1;
-		  x22=a1;
+		  x22=arg1;
 		} else {
-		  x11=a1;
+		  x11=arg1;
 		  x22=x1;
 		}
-		if (y1<a2) {
+		if (y1<arg2) {
 		  y11=y1;
-		  y22=a2;
+		  y22=arg2;
 		} else {
-		  y11=a2;
+		  y11=arg2;
 		  y22=y1;
 		}
 		dc->color=color;
@@ -488,18 +488,18 @@ bm_menu:
 	    case SPBM_DELETE:
 	      if (down) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
-		if (x1<a1) {
+		if (x1<arg1) {
 		  x11=x1;
-		  x22=a1;
+		  x22=arg1;
 		} else {
-		  x11=a1;
+		  x11=arg1;
 		  x22=x1;
 		}
-		if (y1<a2) {
+		if (y1<arg2) {
 		  y11=y1;
-		  y22=a2;
+		  y22=arg2;
 		} else {
-		  y11=a2;
+		  y11=arg2;
 		  y22=y1;
 		}
 		dc->color=ROPF_DITHER+WHITE<<16+BLACK;
@@ -512,7 +512,7 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		dc->color=color;
 		dc->pen_width=width;
-		GrCircle3(dc,x1,y1,0,Sqrt(SqrI64(a1-x1)+SqrI64(a2-y1)));
+		GrCircle3(dc,x1,y1,0,Sqrt(SqrI64(arg1-x1)+SqrI64(arg2-y1)));
 	      }
 	      break;
 	    case SPBM_PASTE:
@@ -521,12 +521,12 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
 		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(dc,a1,a2,clipboard);
+		  GrBlot(dc,arg1,arg2,clipboard);
 		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
 		  dc2=DCCopy(clipboard);
 		  DCColorChg(dc2,bkcolor);
-		  GrBlot(dc,a1,a2,dc2);
+		  GrBlot(dc,arg1,arg2,dc2);
 		  DCDel(dc2);
 		}
 	      }
@@ -534,30 +534,30 @@ bm_menu:
 	    case SPBM_TEXT:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrPrint(dc,a1,a2,"%s",st);
+	      GrPrint(dc,arg1,arg2,"%s",st);
 	      break;
 	    case SPBM_TEXT_BOX:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrTextBox3(dc,a1,a2,0,st);
+	      GrTextBox3(dc,arg1,arg2,0,st);
 	      break;
 	    case SPBM_TEXT_DIAMOND:
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      dc->color=color;
-	      GrTextDiamond3(dc,a1,a2,0,st);
+	      GrTextDiamond3(dc,arg1,arg2,0,st);
 	      break;
 	    case SPBM_POLYPT:
 	      if (down) {
 		img->color=color;
 		img->pen_width=width;
-		GrLine3(img,x1-xx1,y1-yy1,0,a1-xx1,a2-yy1,0);
+		GrLine3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
-		x1=a1; y1=a2;
+		x1=arg1; y1=arg2;
 	      }
 	      break;
 	  }
 	  break;
-	case MSG_IP_L_UP:
+	case MSG_MS_L_UP:
 	  switch (mode) {
 	    case SPBM_LINE:
 	    case SPBM_ARROW:
@@ -566,29 +566,29 @@ bm_menu:
 	      img->color=color;
 	      img->pen_width=width;
 	      if (mode==SPBM_ARROW)
-		GrArrow3(img,x1-xx1,y1-yy1,0,a1-xx1,a2-yy1,0);
+		GrArrow3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 	      else
-		GrLine3(img,x1-xx1,y1-yy1,0,a1-xx1,a2-yy1,0);
+		GrLine3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      if (mode==SPBM_POLYLINE) {
-		x1=a1; y1=a2;
+		x1=arg1; y1=arg2;
 	      } else
 		down=FALSE;
 	      break;
 	    case SPBM_RECT:
 	      img->color=color;
-	      if (x1<a1) {
+	      if (x1<arg1) {
 		x11=x1;
-		x22=a1;
+		x22=arg1;
 	      } else {
-		x11=a1;
+		x11=arg1;
 		x22=x1;
 	      }
-	      if (y1<a2) {
+	      if (y1<arg2) {
 		y11=y1;
-		y22=a2;
+		y22=arg2;
 	      } else {
-		y11=a2;
+		y11=arg2;
 		y22=y1;
 	      }
 	      GrRect(img,x11-xx1,y11-yy1,x22-x11+1,y22-y11+1);
@@ -597,18 +597,18 @@ bm_menu:
 	      break;
 	    case SPBM_COPY:
 	    case SPBM_DELETE:
-	      if (x1<a1) {
+	      if (x1<arg1) {
 		x11=x1;
-		x22=a1;
+		x22=arg1;
 	      } else {
-		x11=a1;
+		x11=arg1;
 		x22=x1;
 	      }
-	      if (y1<a2) {
+	      if (y1<arg2) {
 		y11=y1;
-		y22=a2;
+		y22=arg2;
 	      } else {
-		y11=a2;
+		y11=arg2;
 		y22=y1;
 	      }
 	      DCDel(clipboard);
@@ -622,7 +622,8 @@ bm_menu:
 	    case SPBM_CIRCLE:
 	      img->color=color;
 	      img->pen_width=width;
-	      GrCircle3(img,x1-xx1,y1-yy1,0,Sqrt(SqrI64(a1-x1)+SqrI64(a2-y1)));
+	      GrCircle3(img,x1-xx1,y1-yy1,0,
+		    Sqrt(SqrI64(arg1-x1)+SqrI64(arg2-y1)));
 	      down=FALSE;
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
@@ -632,12 +633,12 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
 		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(img,a1-xx1,a2-yy1,clipboard);
+		  GrBlot(img,arg1-xx1,arg2-yy1,clipboard);
 		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
 		  dc2=DCCopy(clipboard);
 		  DCColorChg(dc2,bkcolor);
-		  GrBlot(img,a1-xx1,a2-yy1,dc2);
+		  GrBlot(img,arg1-xx1,arg2-yy1,dc2);
 		  DCDel(dc2);
 		}
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
@@ -645,15 +646,15 @@ bm_menu:
 	      break;
 	    case SPBM_TEXT:
 	      img->color=color;
-	      GrPrint(img,a1-xx1,a2-yy1,"%s",st);
+	      GrPrint(img,arg1-xx1,arg2-yy1,"%s",st);
 	      goto bm_menu;
 	    case SPBM_TEXT_BOX:
 	      img->color=color;
-	      GrTextBox3(img,a1-xx1,a2-yy1,0,st);
+	      GrTextBox3(img,arg1-xx1,arg2-yy1,0,st);
 	      goto bm_menu;
 	    case SPBM_TEXT_DIAMOND:
 	      img->color=color;
-	      GrTextDiamond3(img,a1-xx1,a2-yy1,0,st);
+	      GrTextDiamond3(img,arg1-xx1,arg2-yy1,0,st);
 	      goto bm_menu;
 	  }
 	  break;

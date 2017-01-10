@@ -2,7 +2,7 @@
 
 U0 LoadDocDefines()
 {
-  CBinFile *bfh=sys_boot_base-sizeof(CBinFile);
+  CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
 
   DefinePrint("DD_OS_NAME_VERSION","TempleOS V%0.2f",sys_os_version);
   DefinePrint("DD_TEMPLEOS_AGE","%0.1f",
@@ -11,8 +11,8 @@ U0 LoadDocDefines()
   //This is cut and replaced when I generate a distro.
   //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","120,770");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,303");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,466");
+DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,791");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;
@@ -27,12 +27,14 @@ $ID,-4$
   DefinePrint("DD_SYS_FIXED_AREA_BASE","%08X",SYS_FIXED_AREA);
   DefinePrint("DD_SYS_FIXED_AREA_END","%08X",
 	SYS_FIXED_AREA+sizeof(CSysFixedArea)-1);
-  DefinePrint("DD_SYS_HEAP_BASE","%08X",sys_heap_base);
-  DefinePrint("DD_SYS_HEAP_LIMIT","%08X",sys_heap_limit);
+  DefinePrint("DD_MEM_HEAP_BASE","%08X",mem_heap_base);
+  DefinePrint("DD_MEM_HEAP_LIMIT","%08X",mem_heap_limit);
   DefinePrint("DD_MEM_MIN_MEG","%dMeg",MEM_MIN_MEG);
   DefinePrint("DD_UNCACHED_ALIAS","%010X",dev.uncached_alias);
-  DefinePrint("DD_MEM_MAPPED_SPACE_GIG","%dGig",MEM_MAPPED_SPACE/0x40000000);
-  DefinePrint("DD_MEM_MAPPED_SPACE_END","%010X",MEM_MAPPED_SPACE-1);
+  DefinePrint("DD_PHYSICAL_SPACE_END","%010X",
+	mem_physical_space-1);
+  DefinePrint("DD_MAPPED_SPACE_END","%010X",
+	mem_mapped_space-1);
   DefinePrint("DD_JIFFY_HZ","%dHz",JIFFY_FREQ);
 }
 

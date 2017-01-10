@@ -14,13 +14,13 @@ _TEST_EXCEPT::
 	MOV	R15,U64 CExcept.r15[RAX]
 	PUSH	U64 CExcept.rflags[RAX]
 	POPFD
-	JMP	U64 CExcept.handler_catch[RAX]
+	JMP	U64 CExcept.hndlr_catch[RAX]
 
 _TAKE_EXCEPT::
 	XOR	RAX,RAX
 	MOV	RAX,FS:U64 CTask.last_except[RAX]
 	MOV	RSP,U64 CExcept.rsp[RAX]
-	JMP	U64 CExcept.handler_untry[RAX]
+	JMP	U64 CExcept.hndlr_untry[RAX]
 
 _SAVE_EXCEPT_REGS::
 	PUSH	RBP
@@ -45,9 +45,9 @@ _extern _SAVE_EXCEPT_REGS U0 SaveExceptRegs(CExcept *t);
 U0 PutExcept(Bool catch_it=TRUE)
 {//Print exception msg and catch exception.
   "Except:%c:",Fs->except_ch;
-  "%P:%P:%P:%P:%P:%P\n",Fs->except_caller1,Fs->except_caller2,
-	Fs->except_caller3,Fs->except_caller4,Fs->except_caller5,
-	Fs->except_caller6,Fs->except_caller7,Fs->except_caller8;
+  "%P:%P:%P:%P:%P:%P\n",Fs->except_callers[0],Fs->except_callers[1],
+	Fs->except_callers[2],Fs->except_callers[3],Fs->except_callers[4],
+	Fs->except_callers[5],Fs->except_callers[6],Fs->except_callers[7];
   Fs->catch_except=catch_it;
 }
 
@@ -65,8 +65,8 @@ U0 SysTry(U8 *catch_start,U8 *untry_start)
 {
   I64 *rbp=GetRBP;
   CExcept *tmpt=MAlloc(sizeof(CExcept));
-  tmpt->handler_catch=catch_start;
-  tmpt->handler_untry=untry_start;
+  tmpt->hndlr_catch=catch_start;
+  tmpt->hndlr_untry=untry_start;
   tmpt->rsp=rbp(U8 *)+sizeof(CTryStk);
   tmpt->rbp=*rbp;
   tmpt->rflags=GetRFlags;
@@ -86,22 +86,17 @@ U0 throw(I64 ch=0,Bool no_log=FALSE)
 //In the catcher, fetch ch from Fs->except_ch.
   CExcept *tmpt=Fs->last_except;
   Bool was_raw;
+  I64 i;
   Fs->except_ch=ch;
-  Fs->except_caller1=Caller(1);
-  Fs->except_caller2=Caller(2);
-  Fs->except_caller3=Caller(3);
-  Fs->except_caller4=Caller(4);
-  Fs->except_caller5=Caller(5);
-  Fs->except_caller6=Caller(6);
-  Fs->except_caller7=Caller(7);
-  Fs->except_caller8=Caller(8);
+  for (i=0;i<TASK_EXCEPT_CALLERS;i++)
+    Fs->except_callers[i]=Caller(i+1);
   Fs->except_rbp=GetRBP;
   Fs->catch_except=FALSE;
   if (!no_log)
-    AdamLog("Except:%c:%p:%p:%p:%p:%p:%p\n",ch,Fs->except_caller1,
-	  Fs->except_caller2,Fs->except_caller3,Fs->except_caller4,
-	  Fs->except_caller5,Fs->except_caller6,Fs->except_caller7,
-	  Fs->except_caller8);
+    AdamLog("Except:%c:%p:%p:%p:%p:%p:%p\n",ch,Fs->except_callers[0],
+	  Fs->except_callers[1],Fs->except_callers[2],Fs->except_callers[3],
+	  Fs->except_callers[4],Fs->except_callers[5],Fs->except_callers[6],
+	  Fs->except_callers[7]);
   while (Fs->next_except!=&Fs->next_except) {
     TestExcept;
     if (Fs->catch_except)
@@ -113,17 +108,17 @@ U0 throw(I64 ch=0,Bool no_log=FALSE)
   }
   was_raw=Raw(ON);
   PutExcept(FALSE);
-  Dbg("Unhandled Exception");
+  Panic("Unhandled Exception");
   Raw(was_raw);
 }
 
 #exe {Option(OPTf_NO_REG_VAR,OFF);};
 
-U0 SysThrowBreak()
-{
+U0 Break()
+{//Send <CTRL-ALT-c>.
   if (Bt(&Fs->task_flags,TASKf_BREAK_TO_SHIFT_ESC))
     Msg(MSG_KEY_DOWN,CH_SHIFT_ESC,0x20100000201);
-  else {//TODO: Might want lock
+  else {
     Fs->wake_jiffy=0;
     TaskRstAwaitingMsg;
     DrvsRelease();
@@ -131,17 +126,6 @@ U0 SysThrowBreak()
     FlushMsgs;
     throw('Break');
   }
-}
-
-U0 ThrowBreak(CTask *task=NULL)
-{//Can be used to exit an app, but not a task.
-  if (task && task!=Fs) {
-    if (!TaskValidate(task)) return;
-//TODO: Might want lock
-    sys_focus_task=task;
-    LBts(sys_ctrl_alt_flags,SYSf_CTRL_ALT_C);
-  } else
-    SysThrowBreak;
 }
 
 Bool BreakLock(CTask *task=NULL)
@@ -157,9 +141,9 @@ Bool BreakUnlock(CTask *task=NULL)
   res=LBtr(&task->task_flags,TASKf_BREAK_LOCKED);
   if (LBtr(&task->task_flags,TASKf_PENDING_BREAK)) {
     if (task==Fs)
-      ThrowBreak;
+      Break;
     else
-      task->rip=&ThrowBreak;
+      task->rip=&Break;
   }
   return res;
 }

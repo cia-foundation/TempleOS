@@ -7,7 +7,7 @@ it from the cmd line.
 
 //This is to demo glbl var access.
 //Glbs defined elsewhere can accessed too, like cnts.jiffies.
-I64 glbl_hz=400,glbl_hz_step=100,glbl_hz_base=100;
+I64 glbl_ona=Freq2Ona(400),glbl_ona_step=10,glbl_ona_base=Freq2Ona(100);
 
 asm {
 //Opcodes are slightly different to make writing my x86_64 assembler easier.
@@ -27,9 +27,9 @@ _BEEPS2::
 	PUSH	U64 [&cnts.jiffies]
 
 @@05:	PUSH	RCX
-//U0 $LK,"Beep",A="MN:Beep"$(I64 freq=500,Bool busy=FALSE)
+//U0 $LK,"Beep",A="MN:Beep"$(I8 ona=62,Bool busy=FALSE)
 	PUSH	FALSE	//Do not busy (spin) wait
-	PUSH	U64 [&glbl_hz]	//evaluated at run time
+	PUSH	U64 [&glbl_ona]	//evaluated at run time
 	CALL	&Beep
 	POP	RCX
 	LOOP	@@05
@@ -64,28 +64,22 @@ U0 AsmAndC2()
   asm {
     LIST
 //You can clobber RAX,RBX,RCX,RDX, but preserve the rest.
-
     MOV	RCX,R15 //You can clobber RAX,RBX,RCX,RDX. Preserve the rest.
-
     @@05:	PUSH	RCX
-//U0 $LK,"Snd",A="MN:Snd"$(F64 freq);
 
-    MOV	RAX,RCX	//freq=loop*100.0+100.0
-    IMUL2	RAX,glbl_hz_step	//evaluated at compile ttime
-    ADD	RAX,U64 [&glbl_hz_base] //evaluated at run time
+//U0 $LK,"Snd",A="MN:Snd"$(I8 ona);
+    MOV	RAX,RCX	//ona=loop*10+100.0Hz
+    IMUL2	RAX,glbl_ona_step //Intentionally evaluated at compile time
+    ADD	RAX,U64 [&glbl_ona_base]  //Intentionally evaluated at run time
     PUSH	RAX
-    FILD	U64 [RSP]	//Convert from int to floating
-    FSTP	U64 [RSP]
-
     CALL	&Snd	//We can skip IMPORT with & if JIT compiling.
-
-    MOV	RCX,cnts.time_stamp_freq>>3	//JIT Const.  Simple delay loop.
+    MOV	RCX,cnts.time_stamp_freq>>3 //JIT Const.  Simple delay loop.
 @@10:	LOOP	@@10
 
     POP	RCX
     LOOP	@@05
   }
-  Snd(0);
+  Snd;
 }
 
 AsmAndC2;

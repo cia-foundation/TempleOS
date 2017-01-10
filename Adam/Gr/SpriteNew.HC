@@ -15,20 +15,20 @@ I64 sprite_elem_base_sizes[SPT_NUM_TYPES]={
   sizeof(CSpritePt),		//SPT_PT
   sizeof(CSpriteNumPtU8s),	//SPT_POLYPT
   sizeof(CSpritePtPt),		//SPT_LINE
-  sizeof(CSpriteNumU8s),		//SPT_POLYLINE
+  sizeof(CSpriteNumU8s),	//SPT_POLYLINE
   sizeof(CSpritePtPt),		//SPT_RECT
-  sizeof(CSpritePtPtAng),		//SPT_ROTATED_RECT
+  sizeof(CSpritePtPtAng),	//SPT_ROTATED_RECT
   sizeof(CSpritePtRad),		//SPT_CIRCLE
-  sizeof(CSpritePtWHAng),		//SPT_ELLIPSE
+  sizeof(CSpritePtWHAng),	//SPT_ELLIPSE
   sizeof(CSpritePtWHAngSides),	//SPT_POLYGON
-  sizeof(CSpriteNumU8s),		//SPT_BSPLINE2
-  sizeof(CSpriteNumU8s),		//SPT_BSPLINE2_CLOSED
-  sizeof(CSpriteNumU8s),		//SPT_BSPLINE3
-  sizeof(CSpriteNumU8s),		//SPT_BSPLINE3_CLOSED
+  sizeof(CSpriteNumU8s),	//SPT_BSPLINE2
+  sizeof(CSpriteNumU8s),	//SPT_BSPLINE2_CLOSED
+  sizeof(CSpriteNumU8s),	//SPT_BSPLINE3
+  sizeof(CSpriteNumU8s),	//SPT_BSPLINE3_CLOSED
   sizeof(CSpritePt),		//SPT_FLOOD_FILL
   sizeof(CSpritePt),		//SPT_FLOOD_FILL_NOT
-  sizeof(CSpritePtWHU8s),		//SPT_BITMAP
-  sizeof(CSpriteMeshU8s),		//SPT_MESH
+  sizeof(CSpritePtWHU8s),	//SPT_BITMAP
+  sizeof(CSpriteMeshU8s),	//SPT_MESH
   sizeof(CSpritePtMeshU8s),	//SPT_SHIFTABLE_MESH
   sizeof(CSpritePtPt),		//SPT_ARROW
   sizeof(CSpritePtStr),		//SPT_TEXT

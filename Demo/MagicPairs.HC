@@ -258,7 +258,7 @@ class RangeJob
   CDoc *doc;
   I64 num,lo,hi,N,sqrt_primes,cbrt_primes;
   Prime *primes;
-  CSrvCmd *cmd;
+  CJob *cmd;
 } rj[mp_cnt];
 
 I64 TestCoreSubRange(RangeJob *r)

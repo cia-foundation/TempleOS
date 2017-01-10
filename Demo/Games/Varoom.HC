@@ -87,8 +87,8 @@
 
 
 
-RegSetDftEntry("TempleOS/Varoom","F64 best_score=9999;\n");
-RegExeBranch("TempleOS/Varoom");
+RegDft("TempleOS/Varoom","F64 best_score=9999;\n");
+RegExe("TempleOS/Varoom");
 
 F64 distance,t0,tf;
 Bool game_over;
@@ -468,7 +468,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->x=task->pix_width>>1;
   dc->y=task->pix_height-150;
   dc->z=GR_Z_ALL;
-  SpriteMat3B(dc,0,0,-100,c[0].img,r);
+  Sprite3Mat4x4B(dc,0,0,-100,c[0].img,r);
 
   //Map
   GrBlot(dc,w-track_map->width,h-track_map->height,track_map);
@@ -509,9 +509,9 @@ U0 AnimateTask(I64)
   Track *tmpt,*tmpt2;
   while (TRUE) {
     if (!game_over)
-      Snd(0.01*c[0].speed*3+10);
+      Snd(12.0*Log2(c[0].speed/500+0.7));
     else
-      Snd(0);
+      Snd;
     for (i=0;i<NUM_CARS;i++) {
       tmpc=&c[i];
       tmpc->p.x-=0.01*tmpc->speed*Cos(tmpc->é-ã/2);
@@ -542,7 +542,7 @@ U0 AnimateTask(I64)
       for (i=1;i<NUM_CARS;i++)
 	if (D3I32DistSqr(&c[i].p,&c[0].p)<CAR_LENGTH>>1*CAR_LENGTH>>1) {
 	  game_over=TRUE;
-	  Noise(500,50,100);
+	  Noise(500,22,34);
 	  Sleep(500);
 	  break;
 	}
@@ -697,7 +697,7 @@ vr_done: //Don't goto out of try
   CleanUp;
   SettingsPop;
   MenuPop;
-  RegWriteBranch("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
+  RegWrite("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
 }
 
 Varoom;

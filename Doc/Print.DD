@@ -75,9 +75,13 @@ $LK,"TextPrint",A="MN:TextPrint"$(CTask *task,I64 x,I64 y,I64 attr,U8 *fmt,...) 
 
 $LK,"ExePrint",A="MN:ExePrint"$(U8 *fmt,...) compiles and execute a string.  Note: It returns the res of the last executed expression.
 
-$LK,"InPrint",A="MN:InPrint"$(I64 ms,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
+$LK,"Once",A="MN:Once"$(U8 *fmt,...) Writes User code to $LK,"Registry",A="FI:~/Registry.HC"$ to be executed next boot.
 
-$LK,"RawPrint",A="MN:RawPrint"$(I64 ms,U8 *fmt,...) sends direct to scrn memory, bypassing window manager.
+$LK,"AOnce",A="MN:AOnce"$(U8 *fmt,...) Writes Adam code to $LK,"Registry",A="FI:~/Registry.HC"$ to be executed next boot.
+
+$LK,"InPrint",A="MN:InPrint"$(I64 mS,U8 *fmt,...) $LK,"PutChars",A="MN:PutChars"$()s one at a time with a delay.
+
+$LK,"RawPrint",A="MN:RawPrint"$(I64 mS,U8 *fmt,...) sends direct to scrn memory, bypassing window manager.
 
 $LK,"User",A="MN:User"$(U8 *fmt,...) Spawns a user and execute a string on start-up.
 

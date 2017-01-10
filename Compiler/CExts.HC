@@ -38,7 +38,7 @@ extern I64 PrsUnaryTerm(
 	CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,CArrayDim **_tmpad,
 	I64 *max_prec,I64 *unary_pre_prec,I64 *paren_prec);
 extern U0 PrsVarInit2(CCmpCtrl *cc,U8 **_dst,CHashClass *tmpc,
-	CArrayDim *tmpad,U8 *data_addr_ip,U8 **_base,Bool data_heap,I64 pass);
+	CArrayDim *tmpad,U8 *data_addr_rip,U8 **_base,Bool data_heap,I64 pass);
 _extern CMP_TEMPLATES			U32 cmp_templates[1];
 _extern CMP_TEMPLATES_DONT_POP		U32 cmp_templates_dont_pop[1];
 _extern CMP_TEMPLATES_DONT_PUSH2	U32 cmp_templates_dont_push2[1];

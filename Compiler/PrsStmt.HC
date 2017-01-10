@@ -99,7 +99,7 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *tmp_return,
     tmpf->clobbered_reg_mask=REGG_CLOBBERED+REGG_STK_TMP;
     tmpf->str=name;
     if (cc->flags&CCF_AOT_COMPILE)
-      tmpf->exe_addr=aotc->ip;
+      tmpf->exe_addr=aotc->rip;
     else
       tmpf->exe_addr=&UndefinedExtern;
     LBts(&tmpf->flags,Cf_EXTERN);
@@ -169,7 +169,7 @@ U0 PrsFun(CCmpCtrl *cc,CHashClass *tmp_return,U8 *name,I64 fsp_flags)
   ICAdd(cc,IC_LEAVE,0,cc->htc.fun->return_class);
   cc->htc.fun->size&=~7;
   if (cc->flags&CCF_AOT_COMPILE) {
-    cc->htc.fun->exe_addr=cc->aotc->ip;
+    cc->htc.fun->exe_addr=cc->aotc->rip;
     cc->htc.fun->type|=HTF_EXPORT|HTF_RESOLVE;
     r=COCCompile(cc,&size,&cc->htc.fun->dbg_info,NULL);
     if (r) {
@@ -300,7 +300,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
 	case PRS0__EXTERN:
 	  if (cc->flags&CCF_AOT_COMPILE) {
 	    tmpg=CAlloc(sizeof(CHashGlblVar));
-	    tmpg->data_addr_ip=val;
+	    tmpg->data_addr_rip=val;
 	    tmpg->type=HTT_GLBL_VAR | HTF_EXPORT;
 	  } else {
 	    tmpg=CAlloc(sizeof(CHashGlblVar),Fs->code_heap);
@@ -351,24 +351,20 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
 	      if (cc->token=='=')
 		tmpg->data_addr=CAlloc(j);
 	      if (tmpc->size>=8) //align
-		while (aotc->ip&7)
+		while (aotc->rip&7)
 		  AOTStoreCodeU8(cc,0);
 	      else if (tmpc->size==4)
-		while (aotc->ip&3)
+		while (aotc->rip&3)
 		  AOTStoreCodeU8(cc,0);
 	      else if (tmpc->size==2)
-		while (aotc->ip&1)
+		while (aotc->rip&1)
 		  AOTStoreCodeU8(cc,0);
-	      tmpg->data_addr_ip=aotc->ip;
+	      tmpg->data_addr_rip=aotc->rip;
 	      tmpg->type=HTT_GLBL_VAR | HTF_EXPORT;
 	      if (tmpex && tmpex->type & HTT_GLBL_VAR)
 		has_alias=TRUE;
-	      if (sys_var_init_flag)
-		for (k=0;k<j;k++)
-		  AOTStoreCodeU8(cc,sys_var_init_val);
-	      else
-		for (k=0;k<j;k++)
-		  AOTStoreCodeU8(cc,0);
+	      for (k=0;k<j;k++)
+		AOTStoreCodeU8(cc,0); //Init AOT glbl to zero.
 	    }
 	  } else {
 	    if (Bt(&cc->opts,OPTf_GLBLS_ON_DATA_HEAP)) {
@@ -423,14 +419,10 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
 	  tmpg->size=tmpg->dim.total_cnt*tmpc->size;
 	  if (tmphg)
 	    tmphg->size=tmpg->size;
-	  if (cc->flags&CCF_AOT_COMPILE) {
-	    if (sys_var_init_flag)
-	      for (k=0;k<tmpg->size;k++)
-		AOTStoreCodeU8(cc,sys_var_init_val);
-	    else
-	      for (k=0;k<tmpg->size;k++)
-		AOTStoreCodeU8(cc,0);
-	  } else
+	  if (cc->flags&CCF_AOT_COMPILE)
+	    for (k=0;k<tmpg->size;k++)
+	      AOTStoreCodeU8(cc,0);
+	  else
 	    if (sys_var_init_flag)
 	      MemSet(tmpg->data_addr,sys_var_init_val,k);
 	  LexPopRestore(cc);
@@ -440,7 +432,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
 	PrsGlblInit(cc,tmpg,2);
 	if (cc->flags&CCF_AOT_COMPILE)
 	  for (k=0;k<tmpg->size;k++)
-	    AOTStoreCodeU8At(cc,tmpg->data_addr_ip+k,tmpg->data_addr[k]);
+	    AOTStoreCodeU8At(cc,tmpg->data_addr_rip+k,tmpg->data_addr[k]);
 	LexPopNoRestore(cc);
       }
       if (has_alias) {
@@ -450,7 +442,7 @@ U0 PrsGlblVarLst(CCmpCtrl *cc,I64 saved_mode,CHashClass *saved_tmpc,
 	}
 	tmpex(CHashGlblVar *)->flags|=GVF_ALIAS;
 	tmpex(CHashGlblVar *)->data_addr=tmpg->data_addr;
-	tmpex(CHashGlblVar *)->data_addr_ip=tmpg->data_addr_ip;
+	tmpex(CHashGlblVar *)->data_addr_rip=tmpg->data_addr_rip;
       }
       if (cc->token==',')
 	Lex(cc);

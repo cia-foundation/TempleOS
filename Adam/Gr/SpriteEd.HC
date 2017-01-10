@@ -181,7 +181,7 @@ U0 SpriteSetOrigin(CSprite *head,I64 dx,I64 dy,I64 dz)
 CSprite *SpriteTransformCircle(I64 *r,CSprite *tmpg)
 {
   I64 x,y,z;
-  F64 m1,a1,m2,radius=tmpg->pr.radius<<16;
+  F64 m1,arg1,m2,radius=tmpg->pr.radius<<16;
   CSprite *tmpg1=CAlloc(SpriteElemQuedBaseSize(SPT_ELLIPSE));
   tmpg1->type=SPT_ELLIPSE;
 
@@ -192,7 +192,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tmpg)
 
   x=radius; y=0; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
-  R2P(&m1,&a1,x,y);
+  R2P(&m1,&arg1,x,y);
 
   x=0; y=radius; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
@@ -200,7 +200,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tmpg)
 
   tmpg1->pwha.width =ToI64(m1)/0x10000;
   tmpg1->pwha.height=ToI64(m2)/0x10000;
-  tmpg1->pwha.angle=-a1;
+  tmpg1->pwha.angle=-arg1;
 
   tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
@@ -209,7 +209,7 @@ CSprite *SpriteTransformCircle(I64 *r,CSprite *tmpg)
 CSprite *SpriteTransformEllipse(I64 *r,CSprite *tmpg)
 {
   I64 x,y,z;
-  F64 m1,a1,m2,a2,s,c,x_radius=tmpg->pwha.width<<16,
+  F64 m1,arg1,m2,arg2,s,c,x_radius=tmpg->pwha.width<<16,
 	y_radius=tmpg->pwha.height<<16;
   CSprite *tmpg1=CAlloc(SpriteElemQuedBaseSize(tmpg->type&SPG_TYPE_MASK));
   tmpg1->type=tmpg->type;
@@ -228,20 +228,20 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tmpg)
   y=x_radius*s;
   z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
-  R2P(&m1,&a1,x,y);
+  R2P(&m1,&arg1,x,y);
 
   x=-y_radius*s;
   y=y_radius*c;
   z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
-  R2P(&m2,&a2,x,y);
-  m2*=Abs(Sin(a2-a1));
+  R2P(&m2,&arg2,x,y);
+  m2*=Abs(Sin(arg2-arg1));
 
   tmpg1->pwha.width=ToI64(m1)/0x10000;
   if (tmpg1->pwha.width<1) tmpg1->pwha.width=1;
   tmpg1->pwha.height=ToI64(m2)/0x10000;
   if (tmpg1->pwha.height<1) tmpg1->pwha.height=1;
-  tmpg1->pwha.angle=-a1;
+  tmpg1->pwha.angle=-arg1;
 
   tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
@@ -250,7 +250,7 @@ CSprite *SpriteTransformEllipse(I64 *r,CSprite *tmpg)
 CSprite *SpriteTransformRect(I64 *r,CSprite *tmpg,F64 é)
 {
   I64 x,y,z,w,h;
-  F64 m1,a1,m2,a2,s,c,
+  F64 m1,arg1,m2,arg2,s,c,
 	x_radius=(tmpg->pp.x2-tmpg->pp.x1)<<16,
 	y_radius=(tmpg->pp.y2-tmpg->pp.y1)<<16;
   CSprite *tmpg1=CAlloc(SpriteElemQuedBaseSize(SPT_ROTATED_RECT));
@@ -268,14 +268,14 @@ CSprite *SpriteTransformRect(I64 *r,CSprite *tmpg,F64 é)
   y=x_radius*s;
   z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
-  R2P(&m1,&a1,x,y);
+  R2P(&m1,&arg1,x,y);
 
   x=-y_radius*s;
   y=y_radius*c;
   z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
-  R2P(&m2,&a2,x,y);
-  m2*=Abs(Sin(a2-a1));
+  R2P(&m2,&arg2,x,y);
+  m2*=Abs(Sin(arg2-arg1));
 
   w=ToI64(m1)/0x10000;
   if (w<1) w=1;
@@ -283,7 +283,7 @@ CSprite *SpriteTransformRect(I64 *r,CSprite *tmpg,F64 é)
   if (h<1) h=1;
   tmpg1->ppa.x2=tmpg1->ppa.x1+w;
   tmpg1->ppa.y2=tmpg1->ppa.y1+h;
-  tmpg1->ppa.angle=-a1;
+  tmpg1->ppa.angle=-arg1;
 
   tmpg1->type|=tmpg->type&SPF_SEL;
   return tmpg1;
@@ -371,10 +371,9 @@ CSprite *SpriteTransformBitMap(I64 *r,CSprite *tmpg)
   return tmpg1;
 }
 
-U0 SpriteTransform(I64 *r,CSprite *head)
+U0 SpriteTransformQue(CSprite *head,I64 *r)
 {
-  I64 i,j,k,num,
-	x,y,z,x1,y1,z1,x2,y2,z2,x3,y3,z3;
+  I64 i,j,k,num,x,y,z,x1,y1,z1,x2,y2,z2,x3,y3,z3;
   I32 *ptr;
   CD3I32 *p;
   CSprite *tmpg=head->next,head2,*tmpg1,*tmpg2,*tmpg3;
@@ -960,7 +959,7 @@ U0 SpriteCtrlPtsMove(CEdSprite *head,I64 dx,I64 dy)
 
 Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 {
-  I64 msg_code,a1,a2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
+  I64 msg_code,arg1,arg2,xx,yy,xx2,yy2,dd,best_dd,cur_elem_num;
   Bool res=TRUE;
   CDC *dc=DCAlias;
   CEdSprite head,*tmpes,*best_es;
@@ -970,14 +969,14 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
   if (head.next!=&head) {
     while (TRUE) {
       SpriteCtrlPtsDraw(dc,&head); //has Refresh
-      switch (msg_code=ScanMsg(&a1,&a2,
-	    1<<MSG_IP_R_UP|1<<MSG_IP_L_DOWN|1<<MSG_KEY_DOWN)) {
-	case MSG_IP_L_DOWN:
+      switch (msg_code=ScanMsg(&arg1,&arg2,
+	    1<<MSG_MS_R_UP|1<<MSG_MS_L_DOWN|1<<MSG_KEY_DOWN)) {
+	case MSG_MS_L_DOWN:
 	  switch (mode) {
 	    case SPED_SEL:
 	    case SPED_UNSEL:
 	    case SPED_SHIFT_PTS:
-	      xx=a1; yy=a2;
+	      xx=arg1; yy=arg2;
 	      best_dd=MAX_I64;
 	      tmpes=head.next;
 	      while (tmpes!=&head) {
@@ -1007,14 +1006,15 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	      }
 	      break;
 	    start:
-	      xx2=xx=a1; yy2=yy=a2;
+	      xx2=xx=arg1; yy2=yy=arg2;
 	      while (TRUE) {
 		SpriteCtrlPtsDraw(dc,&head);
 		dc->color=ROPF_DITHER+WHITE<<16+RED;
 		GrBorder(dc,xx,yy,xx2,yy2);
-		if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
-		  if (msg_code==MSG_IP_MOVE) {
-		    xx2=a1; yy2=a2;
+		if (msg_code=ScanMsg(&arg1,&arg2,
+		      1<<MSG_MS_MOVE|1<<MSG_MS_L_UP)) {
+		  if (msg_code==MSG_MS_MOVE) {
+		    xx2=arg1; yy2=arg2;
 		  } else
 		    break;
 		}
@@ -1057,10 +1057,11 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	      case SPED_SHIFT_RECTS:
 		do {
 		  SpriteCtrlPtsDraw(dc,&head);
-		  msg_code=ScanMsg(&a1,&a2,1<<MSG_KEY_DOWN|1<<MSG_IP_L_DOWN);
+		  msg_code=ScanMsg(&arg1,&arg2,
+			1<<MSG_KEY_DOWN|1<<MSG_MS_L_DOWN);
 		  if (msg_code==MSG_KEY_DOWN) goto gs_key;
-		} while (msg_code!=MSG_IP_L_DOWN);
-		xx=a1;yy=a2;
+		} while (msg_code!=MSG_MS_L_DOWN);
+		xx=arg1;yy=arg2;
 		break;
 	    end:
 	  }
@@ -1069,11 +1070,12 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	    case SPED_SHIFT_RECTS:
 	      do {
 		SpriteCtrlPtsDraw(dc,&head);
-		if (msg_code=ScanMsg(&a1,&a2,1<<MSG_IP_MOVE|1<<MSG_IP_L_UP)) {
-		  SpriteCtrlPtsMove(&head,a1-xx,a2-yy);
-		  xx=a1;yy=a2;
+		if (msg_code=ScanMsg(&arg1,&arg2,
+		      1<<MSG_MS_MOVE|1<<MSG_MS_L_UP)) {
+		  SpriteCtrlPtsMove(&head,arg1-xx,arg2-yy);
+		  xx=arg1;yy=arg2;
 		}
-	      } while (msg_code!=MSG_IP_L_UP);
+	      } while (msg_code!=MSG_MS_L_UP);
 	      tmpes=head.next;
 	      while (tmpes!=&head) {
 		tmpes->flags&=~SPEDF_SEL;
@@ -1085,11 +1087,11 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	  break;
 	case MSG_KEY_DOWN:
 gs_key:
-	  switch (a1.u8[0]) {
+	  switch (arg1.u8[0]) {
 	    case CH_SHIFT_ESC:
 	      res=FALSE;
 	    case CH_ESC:
-	      GetMsg(&a1,&a2,1<<MSG_KEY_UP);
+	      GetMsg(&arg1,&arg2,1<<MSG_KEY_UP);
 	      goto gs_done;
 	    case 'p':
 	    case 'P':
@@ -1101,7 +1103,7 @@ gs_key:
 	      break;
 	  }
 	  break;
-	case MSG_IP_R_UP:
+	case MSG_MS_R_UP:
 	  goto gs_done;
       }
     }
@@ -1121,7 +1123,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
   CDocEntry *doc_e2;
   CDocBin *tmpb;
   Bool unlock;
-  I64 i,r[16],msg_code,a1,a2,xx,yy,
+  I64 i,r[16],msg_code,arg1,arg2,xx,yy,
 	old_de_flags;
   CSprite *head2,*next,*last,*tmpg,*insert_pt;
 
@@ -1147,8 +1149,8 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	case SPED_SET_ORIGIN:
 	  SpriteQueSelAll(*_head);
 	  doc_ce->de_flags=old_de_flags;
-	  GetMsg(&a1,&a2,1<<MSG_IP_L_UP);
-	  SpriteSetOrigin(*_head,x-a1,y-a2,0);
+	  GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP);
+	  SpriteSetOrigin(*_head,x-arg1,y-arg2,0);
 	  SpriteEdUpdate(doc,doc_ce,*_head);
 	  SpriteQueSelAll(*_head,FALSE);
 	  break;
@@ -1156,15 +1158,15 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  if (!SpriteQueSelCnt(*_head))
 	    SpriteQueSelAll(*_head);
 	  doc_ce->de_flags=old_de_flags;
-	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
-	  xx=a1; yy=a2;
+	  GetMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN);
+	  xx=arg1; yy=arg2;
 	  do {
-	    msg_code=GetMsg(&a1,&a2,
-		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-	    SpriteSetOrigin(*_head,a1-xx,a2-yy,0);
-	    xx=a1; yy=a2;
+	    msg_code=GetMsg(&arg1,&arg2,
+		  1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);
+	    SpriteSetOrigin(*_head,arg1-xx,arg2-yy,0);
+	    xx=arg1; yy=arg2;
 	    SpriteEdUpdate(doc,doc_ce,*_head);
-	  } while (msg_code!=MSG_IP_L_UP);
+	  } while (msg_code!=MSG_MS_L_UP);
 	  if (!SpriteQueSelCnt(*_head,FALSE))
 	    SpriteQueSelAll(*_head,FALSE);
 	  break;
@@ -1191,7 +1193,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  if (!SpriteQueSelCnt(*_head))
 	    SpriteQueSelAll(*_head);
 	  if (PopUpTransform(r)) {
-	    SpriteTransform(r,*_head);
+	    SpriteTransformQue(*_head,r);
 	    SpriteEdUpdate(doc,doc_ce,*_head);
 	  }
 	  if (!SpriteQueSelCnt(*_head,FALSE))
@@ -1205,15 +1207,15 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  tmpg->p.x1=0;
 	  tmpg->p.y1=0;
 	  QueIns(tmpg,insert_pt->last);
-	  GetMsg(&a1,&a2,1<<MSG_IP_L_DOWN);
-	  xx=a1; yy=a2;
+	  GetMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN);
+	  xx=arg1; yy=arg2;
 	  do {
-	    msg_code=GetMsg(&a1,&a2,
-		  1<<MSG_IP_L_UP+1<<MSG_IP_MOVE);
-	    tmpg->p.x1=a1-xx;
-	    tmpg->p.y1=a2-yy;
+	    msg_code=GetMsg(&arg1,&arg2,
+		  1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);
+	    tmpg->p.x1=arg1-xx;
+	    tmpg->p.y1=arg2-yy;
 	    SpriteEdUpdate(doc,doc_ce,*_head);
-	  } while (msg_code!=MSG_IP_L_UP);
+	  } while (msg_code!=MSG_MS_L_UP);
 	  *_cur_elem_num+=1;
 	  break;
 	case SPED_INS_CLIPBOARD:
@@ -1264,4 +1266,17 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
     case SPED_EXIT:	return SPE_EXIT;
     case SPED_MAIN_MENU:	return SPE_CONT;
   }
+}
+
+#help_index "Graphics/Sprite;Sprites;Graphics/Math/3D Transformation"
+public U8 *SpriteTransform(U8 *elems,I64 *r)
+{//Rotate Sprite using 4x4 matrix. Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
+  U8 *res;
+  CSprite *head=Sprite2SpriteQue(elems);
+  SpriteQueSelAll(head);
+  SpriteTransformQue(head,r);
+  res=SpriteQue2Sprite(head);
+  QueDel(head);
+  Free(head);
+  return res;
 }

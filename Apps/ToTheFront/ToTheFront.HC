@@ -16,7 +16,7 @@ U0 TurnNew()
 
   SleepUntil(msg_off_timeout);
   msg_off_timeout=cnts.jiffies+JIFFY_FREQ*2*animation_delay+1;
-  Snd(1000);
+  Snd(74);
   StrPrint(msg_buf,"Turn %d",++turn);
   VRSetUp(0);
   VRSetUp(1);
@@ -36,7 +36,7 @@ U0 PhaseNew()
 
   SleepUntil(msg_off_timeout);
   msg_off_timeout=cnts.jiffies+JIFFY_FREQ*2*animation_delay+1;
-  Snd(1000);
+  Snd(74);
   switch (phase) {
     case PHASE_INDIRECT0:
     case PHASE_INDIRECT1:
@@ -102,7 +102,7 @@ U0 UserChk()
 
 U0 TaskEndCB()
 {
-  Snd(0);
+  Snd;
   progress4=progress4_max=progress1=progress1_max=0;
   Exit;
 }
@@ -132,7 +132,7 @@ U0 ToTheFront()
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Cd(__DIR__);
-  Fs->win_inhibit|=WIF_SELF_IP_L|WIF_SELF_IP_R|WIG_DBL_CLICK;
+  Fs->win_inhibit|=WIF_SELF_MS_L|WIF_SELF_MS_R|WIG_DBL_CLICK;
 
   MenuPush(
 	"File {"
@@ -181,7 +181,7 @@ U0 ToTheFront()
 	while (TRUE) {
 	  msg_off_timeout=0;
 	  StrCpy(msg_buf,"Game Over");
-	  Snd(0);
+	  Snd;
 	  ch=GetChar(,FALSE);
 	  if (ch=='\n') {
 	    CleanUp;

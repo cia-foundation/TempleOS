@@ -19,9 +19,9 @@ _BEEPS::
 	MOV	RCX,U64 SF_ARG1[RBP]  //$LK,"SF_ARG1",A="FF:::/Kernel/KernelA.HH,SF_ARG1"$
 
 @@05:	PUSH	RCX
-//U0 $LK,"Beep",A="MN:Beep"$(I64 freq=500,Bool busy=FALSE)
+//U0 $LK,"Beep",A="MN:Beep"$(I8 ona=62,Bool busy=FALSE)
 	PUSH	FALSE	//Do not busy (spin) wait
-	PUSH	500	//Hz
+	PUSH	62	//500 Hz
 	CALL	Beep
 	POP	RCX
 	LOOP	@@05
@@ -49,30 +49,26 @@ I64 AsmAndC1()
 //You can clobber RAX,RBX,RCX,RDX.  The compiler expects that.
 
     IMPORT	Snd; //Import an not use & or don't import and use &Snd.
-    MOV	RCX,&i[RBP] //You can clobber RAX,RBX,RCX,RDX.
-//You better preserve the rest.
+    MOV		RCX,&i[RBP] //You can clobber RAX,RBX,RCX,RDX.
+		//You better preserve the rest.
+@@05:	PUSH	RCX
 
-    @@05:	PUSH	RCX
-//U0 $LK,"Snd",A="MN:Snd"$(F64 freq);
-
-    MOV	RAX,RCX	//freq=loop*100.0+100.0
-    IMUL2	RAX,100 //TempleOS uses nonstandard opcodes
-//to avoid multiple form of the same one.
-    //See $LK,"::/Compiler/OpCodes.DD"$.
-    ADD	RAX,100
+		//U0 $LK,"Snd",A="MN:Snd"$(I8 ona);
+    MOV		RAX,RCX	//ona=loop*10+50
+    IMUL2	RAX,10 //TempleOS uses nonstandard opcodes
+		//to avoid multiple form of the same one.
+		//See $LK,"::/Compiler/OpCodes.DD"$.
+    ADD		RAX,40
     PUSH	RAX
-    FILD	U64 [RSP]	//Convert from int to floating
-    FSTP	U64 [RSP]
-
     CALL	Snd
 
-    MOV	RCX,cnts.time_stamp_freq>>3	//JIT Const.  Simple delay loop
+    MOV		RCX,cnts.time_stamp_freq>>3 //JIT Const.  Simple delay loop
 @@10:	LOOP	@@10
 
-    POP	RCX
+    POP		RCX
     LOOP	@@05
   }
-  Snd(0);
+  Snd;
   return i;
 }
 

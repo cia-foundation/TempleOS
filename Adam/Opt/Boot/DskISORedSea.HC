@@ -25,7 +25,27 @@ class CElTorito
   U8 zero2[20];
 };
 
-U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let,I64 stage2_blk=0,I64 stage2_size=0)
+U0 RedSeaISO9660Stage1(U8 *iso_filename,U8 *stage2_filename)
+{
+  CDirEntry de;
+  CFile *out_file=NULL;
+  U8	*stage1_buf=CAlloc(DVD_BOOT_LOADER_SIZE);
+  if (FileFind(stage2_filename,&de) && (out_file=FOpen(iso_filename,"wc+"))) {
+    MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
+    *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=de.cluster>>2;
+    *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)=
+	  (de.size+DVD_BLK_SIZE-1)>>(BLK_SIZE_BITS+2);
+    *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=de.cluster&3;
+    if (de.cluster&3)
+      *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)+=1;
+    FWBlks(out_file,stage1_buf,
+	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
+    FClose(out_file);
+  }
+  Free(stage1_buf);
+}
+
+U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let)
 {
   CDrv	*dv=Let2Drv(drv_let);
   CISO1PriDesc *iso_pri=CAlloc(DVD_BLK_SIZE),
@@ -35,8 +55,7 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let,I64 stage2_blk=0,I64 stage2_size=0)
   I64 iso_size=0,i,j;
   U32 *d;
   CElTorito *et=CAlloc(DVD_BLK_SIZE);
-  U8	*stage1_buf=CAlloc(DVD_BOOT_LOADER_SIZE),
-	*zero_buf=CAlloc(DVD_BLK_SIZE);
+  U8	*zero_buf=CAlloc(DVD_BLK_SIZE);
   CFile *out_file=NULL;
 
   if (out_file=FOpen(iso_filename,"wc+")) {
@@ -87,20 +106,9 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let,I64 stage2_blk=0,I64 stage2_size=0)
     et->sect_cnt=4;  //5 seems like the limit, 4 is safer
     et->load_rba=20<<2>>2+1;
     FWBlks(out_file,et,20<<2,4);
-
-    MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
-    *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=stage2_blk>>2;
-    *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)=
-	  (stage2_size+DVD_BLK_SIZE-1)>>(BLK_SIZE_BITS+2);
-    *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=stage2_blk&3;
-    if (stage2_blk&3)
-      *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)+=1;
-    FWBlks(out_file,stage1_buf,
-	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
     FClose(out_file);
   }
   Free(zero_buf);
-  Free(stage1_buf);
   Free(et);
   Free(iso_pri);
   Free(iso_boot);
@@ -129,7 +137,7 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
 	U8 *_stage2_filename=NULL)
 {//See $LK,"::/Misc/DoDistro.HC"$. Must be ISO.C
   I64 i,res,root_cnt,root_dir_blks,bitmap_blks,bitmap_blks1;
-  CDirEntry *tmpde,de;
+  CDirEntry *tmpde;
   U8 buf[STR_LEN],*iso_filename,*src_dir,*stage2_filename;
   CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('Q')); //First $LK,"BDT_ISO_FILE_WRITE",A="MN:BDT_ISO_FILE_WRITE"$
   CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_WRITE);
@@ -162,13 +170,10 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
     bd->max_blk--; //Inclusive.
     bd->file_dsk_name=AStrNew(iso_filename);
     bd->init_root_dir_blks=root_dir_blks;
-    BlkDevAdd(bd,TRUE,TRUE);
+    BlkDevAdd(bd,,TRUE,TRUE);
     StrPrint(buf,"%C:/",dv->drv_let);
     CopyTree(src_dir,buf,TRUE);
-    if (FileFind(stage2_filename,&de))
-      RedSeaISO9660(iso_filename,dv->drv_let,de.cluster,de.size);
-    else
-      RedSeaISO9660(iso_filename,dv->drv_let);
+    RedSeaISO9660Stage1(iso_filename,stage2_filename);
     DrvDel(dv);
     BlkDevDel(bd);
   }

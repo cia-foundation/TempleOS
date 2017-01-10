@@ -139,7 +139,7 @@ U0 NowDateTimeStruct(CDateStruct *_ds)
   MemSet(_ds,0,sizeof(CDateStruct));
   PUSHFD
   CLI
-  while (LBts(&sys_semas[SYS_SEMA_SYS_DATE],0))
+  while (LBts(&sys_semas[SEMA_SYS_DATE],0))
     PAUSE
 
   OutU8(0x70,0x0A);
@@ -172,7 +172,7 @@ U0 NowDateTimeStruct(CDateStruct *_ds)
   else
     is_bcd=TRUE;
 
-  LBtr(&sys_semas[SYS_SEMA_SYS_DATE],0);
+  LBtr(&sys_semas[SEMA_SYS_DATE],0);
   POPFD
   if (is_bcd)
     for (i=2;i<9;i++)

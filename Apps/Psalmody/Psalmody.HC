@@ -5,13 +5,13 @@ This uses four types of ctrls
 
   2) The $LK,"CCtrl",A="MN:CCtrl"$ type for the tempo/stacatto sliders.
 
-  3) The active $LK,"CDoc",A="MN:CDoc"$ sprite buttons with macros for left/record/play/right.
+  3) The active $LK,"CDoc",A="MN:CDoc"$ sprite bttns with macros for left/record/play/right.
 
   4) Hand-made ctrls for the kbdgraphic, notes and staff.
 
 This uses four types of output
 
-  1) The $LK,"CDoc",A="MN:CDoc"$ for the text and buttons and kbdgraphic.
+  1) The $LK,"CDoc",A="MN:CDoc"$ for the text and bttns and kbdgraphic.
 
   2) The Fs->draw_it() for the staff region, drawn every refresh.
 
@@ -21,9 +21,6 @@ This uses four types of output
 
 See $LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$(), $LK,"GrUpdateTasks",A="MN:GrUpdateTasks"$() and $LK,"GrUpdateScrn",A="MN:GrUpdateScrn"$().
 $WW,1$$WW,0$*/
-
-#define NOTE_REST	MIN_I64
-#define OCTAVE_REST	MIN_I64
 
 #define PSMT_HEAD	0
 #define PSMT_NOTE	1
@@ -41,14 +38,7 @@ class PsmNote
   I64 x,y;
   U8 *word;
   I64 type,flags;
-  union {
-    I64 note;
-    I64 meter_top;
-  };
-  union {
-    I64 octave;
-    I64 meter_bottom;
-  }
+  I64 ona,meter_top,meter_bottom;
   I64 duration,width;
   U8 ascii[32];
 };
@@ -62,8 +52,7 @@ class PsmCtrl
   PsmNote head;
   PsmNote clipboard;
   CMenuEntry *incomplete_entry,*record_entry;
-  I64 scrn_x,
-	tool;
+  I64 scrn_x,tool;
   PsmNote *cur_note;
   CDC *dc2;
   Bool playing;

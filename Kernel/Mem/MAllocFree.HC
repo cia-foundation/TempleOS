@@ -51,20 +51,20 @@ _MALLOC::
 	JMP	I32 MALLOC_ALMOST_DONE
 
 //Big allocation
-@@30:	ADD	RAX,sizeof(CMemBlk)+MEM_PAGE_SIZE-1
-	SHR	RAX,MEM_PAGE_BITS
+@@30:	ADD	RAX,sizeof(CMemBlk)+MEM_PAG_SIZE-1
+	SHR	RAX,MEM_PAG_BITS
 
 	PUSH	RDX //preserve HeapCtrl
 	PUSH	RDX
 	PUSH	RAX
-	CALL	&Mem512TaskAlloc
+	CALL	&MemPagTaskAlloc
 	POP	RDX
 	TEST	RAX,RAX
 	JZ	@@45	//Out of memory
 	MOV	RSI,RAX
-	MOV	EAX,U32 CMemBlk.pages[RSI]
+	MOV	EAX,U32 CMemBlk.pags[RSI]
 
-	SHL	RAX,MEM_PAGE_BITS
+	SHL	RAX,MEM_PAG_BITS
 	SUB	RAX,sizeof(CMemBlk)
 	ADD	RSI,sizeof(CMemBlk)
 	JMP	I32 MALLOC_ALMOST_DONE
@@ -77,13 +77,13 @@ _MALLOC::
 	TEST	RSI,RSI
 	JNZ	I32 @@60
 	PUSH	RAX		//-**** save byte size
-	ADD	RAX,16*MEM_PAGE_SIZE-1
-	SHR	RAX,MEM_PAGE_BITS
+	ADD	RAX,16*MEM_PAG_SIZE-1
+	SHR	RAX,MEM_PAG_BITS
 
 	PUSH	RDX //preserve HeapCtrl
 	PUSH	RDX
 	PUSH	RAX
-	CALL	&Mem512TaskAlloc
+	CALL	&MemPagTaskAlloc
 	POP	RDX
 	TEST	RAX,RAX
 	JNZ	@@50
@@ -99,8 +99,8 @@ _MALLOC::
 	JMP	I32 MALLOC_FINAL_EXIT //Never gets here, hopefully.
 
 @@50:	MOV	RSI,RAX
-	MOV	EAX,U32 CMemBlk.pages[RSI]
-	SHL	RAX,MEM_PAGE_BITS
+	MOV	EAX,U32 CMemBlk.pags[RSI]
+	SHL	RAX,MEM_PAG_BITS
 
 //Can it be combined with last chunk? (Never Free these chunks.)
 	MOV	RDI,U64 CHeapCtrl.last_mergable[RDX]
@@ -109,8 +109,8 @@ _MALLOC::
 	JNE	@@55
 
 	PUSH	RAX
-	MOV	EAX,U32 CMemBlk.pages[RDI]
-	ADD	U32 CMemBlk.pages[RSI],EAX
+	MOV	EAX,U32 CMemBlk.pags[RDI]
+	ADD	U32 CMemBlk.pags[RSI],EAX
 //QueRem
 	MOV	RAX,U64 CMemBlk.next[RDI]
 	MOV	RBX,U64 CMemBlk.last[RDI]
@@ -161,7 +161,7 @@ MALLOC_ALMOST_DONE:
 
 //Caller1/Caller2
 	PUSH	RDX
-	MOV	RDX,U64 [SYS_HEAP_LIMIT]
+	MOV	RDX,U64 [MEM_HEAP_LIMIT]
 	MOV	RDI,U64 SF_RIP[RBP]
 	CMP	RDI,RDX
 	JB	@@80
@@ -190,7 +190,7 @@ MALLOC_ALMOST_DONE:
 	MOV	U64 CMemUsed.hc[RSI],RDX
 	LEA	RAX,U64 CMemUsed.start[RSI]
 
-	TEST	U8 [SYS_SEMAS+SYS_SEMA_HEAPLOG_ACTIVE*SEMA_STRUCT_SIZE],1
+	TEST	U8 [SYS_SEMAS+SEMA_HEAPLOG_ACTIVE*DFT_CACHE_LINE_WIDTH],1
 	JZ	@@105
 	PUSH	RAX
 	PUSH	RAX
@@ -221,13 +221,13 @@ MALLOC_FINAL_EXIT:
 	RET1	16
 //************************************
 _FREE::
-//Be aware of $LK,"heap_hash",A="FF:::/Kernel/Mem/MAllocFree.HC,heap_hash"$ in $LK,"Mem512TaskAlloc",A="MN:Mem512TaskAlloc"$().
+//Be aware of $LK,"heap_hash",A="FF:::/Kernel/Mem/MAllocFree.HC,heap_hash"$ in $LK,"MemPagTaskAlloc",A="MN:MemPagTaskAlloc"$().
 	PUSH	RBP
 	MOV	RBP,RSP
 	PUSH	RSI
 	PUSH	RDI
 
-	TEST	U8 [SYS_SEMAS+SYS_SEMA_HEAPLOG_ACTIVE*SEMA_STRUCT_SIZE],1
+	TEST	U8 [SYS_SEMAS+SEMA_HEAPLOG_ACTIVE*DFT_CACHE_LINE_WIDTH],1
 	JZ	@@15
 	MOV	RBX,U64 SF_ARG1[RBP]
 	TEST	RBX,RBX
@@ -285,7 +285,7 @@ _FREE::
 	MOV	U64 CMemUsed.next[RDI],RDX
 
 //Caller1/Caller2
-	MOV	RDX,U64 [SYS_HEAP_LIMIT]
+	MOV	RDX,U64 [MEM_HEAP_LIMIT]
 	MOV	RDI,U64 SF_RIP[RBP]
 	CMP	RDI,RDX
 	JB	@@35
@@ -321,7 +321,7 @@ _FREE::
 	PUSH	RDX
 	PUSH	RDX
 	PUSH	RSI
-	CALL	&Mem512TaskFree
+	CALL	&MemPagTaskFree
 	POP	RDX
 
 @@55:	LOCK

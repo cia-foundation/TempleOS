@@ -35,10 +35,10 @@ U0 HeapLogMAlloc(U8 *addr)
     i=addr>>3 &(HL_HASH_SIZE-1);
     PUSHFD
     CLI
-    while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+    while (LBts(&sys_semas[SEMA_HEAPLOG_LOCK],0))
       PAUSE
     QueIns(tmphl,heaplog_head[i].last);
-    LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+    LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
     POPFD
   }
 }
@@ -52,20 +52,20 @@ U0 HeapLogFree(U8 *addr)
     i=addr>>3 &(HL_HASH_SIZE-1);
     PUSHFD
     CLI
-    while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+    while (LBts(&sys_semas[SEMA_HEAPLOG_LOCK],0))
       PAUSE
     tmphl=heaplog_head[i].next;
     while (tmphl!=&heaplog_head[i]) {
       if (addr==tmphl->addr) {
 	QueRem(tmphl);
-	LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+	LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
 	POPFD
 	Free(tmphl);
 	return;
       }
       tmphl=tmphl->next;
     }
-    LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+    LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
     POPFD
   }
 }
@@ -74,7 +74,7 @@ public Bool HeapLog(Bool val=ON,CTask *task=NULL)
 {//Turn on.  Collect data.  Call $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() or  $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().
   I64 i;
   if (val) {
-    if (Bt(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
+    if (Bt(&sys_semas[SEMA_HEAPLOG_ACTIVE],0)) {
       "HeapLog Already Active\n";
       return TRUE;
     } else {
@@ -85,7 +85,7 @@ public Bool HeapLog(Bool val=ON,CTask *task=NULL)
 	heaplog_hc_watched=task;//Actually, not a task, must be a HeapCtrl.
       PUSHFD
       CLI
-      while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+      while (LBts(&sys_semas[SEMA_HEAPLOG_LOCK],0))
 	PAUSE
       heaplog_hc=HeapCtrlInit(,,sys_data_bp);
       ext[EXT_HEAPLOG_MALLOC]=&HeapLogMAlloc;
@@ -93,13 +93,13 @@ public Bool HeapLog(Bool val=ON,CTask *task=NULL)
       heaplog_head=MAlloc(sizeof(CHeapLogHash)*HL_HASH_SIZE,heaplog_hc);
       for (i=0;i<HL_HASH_SIZE;i++)
 	QueInit(&heaplog_head[i]);
-      LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+      LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
       POPFD
-      LBts(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0);
+      LBts(&sys_semas[SEMA_HEAPLOG_ACTIVE],0);
       return FALSE;
     }
   } else {
-    if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
+    if (!LBtr(&sys_semas[SEMA_HEAPLOG_ACTIVE],0)) {
       "HeapLog Not Active\n";
       return FALSE;
     } else {
@@ -116,12 +116,12 @@ public U0 HeapLogAddrRep(Bool leave_it=OFF)
 {//Call $LK,"HeapLog",A="MN:HeapLog"$() first and collect data.
   I64 i,j,total=0;
   CHeapLog *tmphl,hl;
-  if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
+  if (!LBtr(&sys_semas[SEMA_HEAPLOG_ACTIVE],0)) {
     "HeapLog Not Active\n";
     return;
   }
   "$$WW,0$$";
-  while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+  while (LBts(&sys_semas[SEMA_HEAPLOG_LOCK],0))
     PAUSE
   for (i=0;i<HL_HASH_SIZE;i++) {
     tmphl=heaplog_head[i].next;
@@ -136,9 +136,9 @@ public U0 HeapLogAddrRep(Bool leave_it=OFF)
       tmphl=hl.next;
     }
   }
-  LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+  LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
   "\n$$LTRED$$Total:%08X$$FG$$\n",total;
-  LBts(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0);
+  LBts(&sys_semas[SEMA_HEAPLOG_ACTIVE],0);
   if (!leave_it)
     HeapLog(OFF);
 }
@@ -148,7 +148,7 @@ public U0 HeapLogSizeRep(Bool leave_it=OFF)
   I64 i,j,k,total=0;
   CHeapLog *tmphla,hla,*tmphls,*tmphls1;
   CHeapLogHash *size_head;
-  if (!LBtr(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0)) {
+  if (!LBtr(&sys_semas[SEMA_HEAPLOG_ACTIVE],0)) {
     "HeapLog Not Active\n";
     return;
   }
@@ -158,7 +158,7 @@ public U0 HeapLogSizeRep(Bool leave_it=OFF)
     QueInit(&size_head[i]);
 
   "$$WW,0$$";
-  while (LBts(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0))
+  while (LBts(&sys_semas[SEMA_HEAPLOG_LOCK],0))
     PAUSE
   for (i=0;i<HL_HASH_SIZE;i++) {
     tmphla=heaplog_head[i].next;
@@ -187,7 +187,7 @@ hl_found:
       tmphla=hla.next;
     }
   }
-  LBtr(&sys_semas[SYS_SEMA_HEAPLOG_LOCK],0);
+  LBtr(&sys_semas[SEMA_HEAPLOG_LOCK],0);
 
   for (i=0;i<HL_HASH_SIZE;i++) {
     tmphls=size_head[i].next;
@@ -205,7 +205,7 @@ hl_found:
   Free(size_head);
 
   "\n$$LTRED$$Total:%08X$$FG$$\n",total;
-  LBts(&sys_semas[SYS_SEMA_HEAPLOG_ACTIVE],0);
+  LBts(&sys_semas[SEMA_HEAPLOG_ACTIVE],0);
   if (!leave_it)
     HeapLog(OFF);
 }

@@ -39,9 +39,9 @@ CCmpCtrl *CmpCtrlNew(U8 *buf=NULL,I64 flags=0,U8 *filename=NULL)
   cc->htc.define_hash_table=cc->htc.hash_table_lst=
 	cc->htc.glbl_hash_table=cc->htc.local_hash_table=Fs->hash_table;
   if (flags&CCF_KEEP_AT_SIGN)
-    cc->chars_bmp_alpha_numeric=chars_bmp_alpha_numeric_no_at;
+    cc->char_bmp_alpha_numeric=char_bmp_alpha_numeric_no_at;
   else
-    cc->chars_bmp_alpha_numeric=chars_bmp_alpha_numeric;
+    cc->char_bmp_alpha_numeric=char_bmp_alpha_numeric;
   tmpf=LexFilePush(cc);
   QueInit(&cc->next_stream_blk);
   if (filename)
@@ -155,11 +155,6 @@ lgc_start2:
 		tmpf->line_num=doc_e->y+1;
 		cc->last_U16='\t';
 		goto lgc_done;
-	      case DOCT_PAGE_BREAK:
-		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
-		tmpf->line_num=doc_e->y+2; //TODO: should be a page down
-		cc->last_U16=CH_FORM_FEED;
-		goto lgc_done;
 	      case DOCT_INS_BIN:
 		tmpf->buf_ptr=cc->cur_buf_ptr=&lex_zeros;
 		tmpf->line_num=doc_e->y+1;
@@ -245,7 +240,6 @@ lgc_start2:
 	}
 	break;
       case CH_CURSOR:
-      case CH_FORM_FEED:
 	goto lgc_start1;
       case '\n':
 	tmpf=cc->lex_include_stk;
@@ -261,7 +255,7 @@ lgc_done:
     if (cc->last_U16==CH_SHIFT_SPACE)
       cc->last_U16=CH_SPACE;
     if (cc->opts & OPTF_ECHO &&
-	  cc->last_U16<256 && Bt(chars_bmp_printable,cc->last_U16))
+	  cc->last_U16<256 && Bt(char_bmp_printable,cc->last_U16))
       '' cc->last_U16;
   }
   return cc->last_U16;
@@ -271,7 +265,7 @@ U0 LexSkipEol(CCmpCtrl *cc)
 {//$LK,"LexGetChar",A="MN:LexGetChar"$ to NULL until end-of-line.
   I64 ch;
   do ch=$WW,0$LexGetChar(cc);
-  while (Bt(chars_bmp_non_eol,ch));
+  while (Bt(char_bmp_non_eol,ch));
 }
 
 U8 *LexFirstRem(CCmpCtrl *cc,U8 *marker,I64 _len=NULL)
@@ -413,7 +407,7 @@ I64 LexInStr(CCmpCtrl *cc,U8 *buf,I64 size,Bool *done)
 	  j=0;
 	  for (k=0;k<2;k++) {
 	    ch=ToUpper(LexGetChar(cc));
-	    if (Bt(chars_bmp_hex_numeric,ch)) {
+	    if (Bt(char_bmp_hex_numeric,ch)) {
 	      if (ch<='9')
 		j=j<<4+ch-'0';
 	      else
@@ -482,7 +476,7 @@ lex_ident:
 	    LexExcept(cc,"Ident limited to STR_LEN chars at ");
 	  else if (!(ch=LexGetChar(cc)))
 	    break;
-	  else if (Bt(cc->chars_bmp_alpha_numeric,ch))
+	  else if (Bt(cc->char_bmp_alpha_numeric,ch))
 	    buf[i++]=ch;
 	  else if (ch==TK_SUPERSCRIPT)
 	    buf[i++]='>';
@@ -526,7 +520,7 @@ lex_ident:
 	if (ch=='X') {
 	  while (TRUE) {
 	    ch=ToUpper(LexGetChar(cc));
-	    if (Bt(chars_bmp_hex_numeric,ch)) {
+	    if (Bt(char_bmp_hex_numeric,ch)) {
 	      if (ch<='9')
 		i=i<<4+ch-'0';
 	      else
@@ -554,7 +548,7 @@ lex_ident:
 	  }
 	}
 	while (TRUE) {
-	  if (Bt(chars_bmp_dec_numeric,ch))
+	  if (Bt(char_bmp_dec_numeric,ch))
 	    i=i*10+ch-'0';
 	  else {
 	    if (ch=='.' || ch=='e' || ch=='E') break;
@@ -576,7 +570,7 @@ lex_is_int:
 lex_float_start:
 	k=0;
 	while (TRUE) {
-	  if (Bt(chars_bmp_dec_numeric,ch)) {
+	  if (Bt(char_bmp_dec_numeric,ch)) {
 	    i=i*10+ch-'0';
 	    k++;
 	  } else {
@@ -597,7 +591,7 @@ lex_float_start:
 	}
 	j=0;
 	while (TRUE) {
-	  if (Bt(chars_bmp_dec_numeric,ch))
+	  if (Bt(char_bmp_dec_numeric,ch))
 	    j=j*10+ch-'0';
 	  else {
 	    if (neg_e)
@@ -660,7 +654,7 @@ lex_float_start:
 		i=0;
 		for (l=0;l<2;l++) {
 		  ch=ToUpper(LexGetChar(cc));
-		  if (Bt(chars_bmp_hex_numeric,ch)) {
+		  if (Bt(char_bmp_hex_numeric,ch)) {
 		    if (ch<='9')
 		      i=i<<4+ch-'0';
 		    else
@@ -723,7 +717,7 @@ lex_float_start:
 	      HashSrcFileSet(cc,tmph);
 
 	      do ch=LexGetChar(cc); //skip space between define name and start
-	      while (Bt(chars_bmp_non_eol_white_space,ch));
+	      while (Bt(char_bmp_non_eol_white_space,ch));
 
 	      i=j=0;
 	      buf2=NULL;
@@ -749,7 +743,7 @@ lex_float_start:
 		      ch=LexGetChar(cc);
 		      if (ch=='/') {
 			do ch=LexGetChar(cc);
-			while (Bt(chars_bmp_non_eol,ch));
+			while (Bt(char_bmp_non_eol,ch));
 			break;
 		      } else {
 			buf[j++]='/';
@@ -757,7 +751,7 @@ lex_float_start:
 		      }
 		    } else if (ch=='\\')
 		      break;
-		    else if (Bt(chars_bmp_non_eol,ch))
+		    else if (Bt(char_bmp_non_eol,ch))
 		      buf[j++]=ch;
 		    else
 		      break;
