@@ -49,4 +49,4 @@ U0 MakeMyISO(U8 *_out_iso_filename)
 
 MakeMyISO("/Tmp/MyDistro.ISO");
 
-// Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.HC,1"$.
+// Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$.

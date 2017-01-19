@@ -326,11 +326,11 @@ wh_done:
 
 #help_index "Info;Hash;Cmd Line (Typically)"
 
-#define HDR_MAX	16
+#define HDR_NUM	16
 public I64 HashDepthRep(CHashTable *table=NULL)
 {//Hash table linked-list chain depth report.
 //Histogram of collision count.
-  I64 i,j,longest=0,cnt=0,a[HDR_MAX];
+  I64 i,j,longest=0,cnt=0,a[HDR_NUM];
   CHash *tmph;
   if (!table) table=Fs->hash_table;
   MemSet(a,0,sizeof(a));
@@ -338,7 +338,7 @@ public I64 HashDepthRep(CHashTable *table=NULL)
     tmph=table->body[i];
     if (tmph) {
       j=LinkedLstCnt(tmph);
-      if (j<HDR_MAX)
+      if (j<HDR_NUM)
 	a[j]++;
       cnt+=j;
       if (j>longest)
@@ -346,7 +346,7 @@ public I64 HashDepthRep(CHashTable *table=NULL)
     }
   }
   "Histogram\n";
-  for (i=0;i<HDR_MAX;i++)
+  for (i=0;i<HDR_NUM;i++)
     if (a[i])
       "%02d:%d\n",i,a[i];
   "Size:%d Count:%d Longest:%d\n",

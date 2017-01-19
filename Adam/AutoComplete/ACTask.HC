@@ -4,7 +4,7 @@ U0 ACDDictWordsAdd(U8 *st)
   I64 i;
   U8 *ptr;
   if (st && *st && (ptr=ACDWordPtAt(st))) {
-    for (i=0;i<ACD_MAX_FILLINS;i++) {
+    for (i=0;i<ACD_FILLINS_NUM;i++) {
       if (*ptr++!=ACD_WORD_CHAR)
 	break;
       if (i) '\n';
@@ -21,7 +21,7 @@ U0 ACDocRst(I64 left,I64 top)
 {
   CDoc *doc=DocPut;
   DocRst(doc,TRUE);
-  doc->flags|=DOCF_MIN_SIZE;
+  doc->flags|=DOCF_SIZE_MIN;
   Fs->border_src=BDS_CONST;
   Fs->border_attr=LTGRAY<<4+DrvTextAttrGet(':')&15;
   Fs->text_attr  =LTGRAY<<4+BLUE;
@@ -63,7 +63,7 @@ I64 ACPriorWordInStr(U8 *src,U8 *dst,I64 len,I64 buf_size)
 U0 ACFillInAdd(CHashAC *tmpw)
 {
   I64 k;
-  if (ac.num_fillins<AC_MAX_FILLINS ||
+  if (ac.num_fillins<AC_FILLINS_NUM ||
 	tmpw->hits>ac.fillin_hits[ac.num_fillins-1]) {
     for (k=ac.num_fillins-1;k>=0;k--) {
       if (tmpw->hits<=ac.fillin_hits[k])
@@ -75,7 +75,7 @@ U0 ACFillInAdd(CHashAC *tmpw)
     }
     ac.fillin_matches[k+1]=tmpw;
     ac.fillin_hits[k+1]   =tmpw->hits;
-    if (ac.num_fillins<AC_MAX_FILLINS)
+    if (ac.num_fillins<AC_FILLINS_NUM)
       ac.num_fillins++;
   }
 }

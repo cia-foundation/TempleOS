@@ -74,7 +74,7 @@ public U8 *FileNameForm(U8 *dft=NULL,I64 dof_flags=0,CTask *mem_task=NULL)
 public U8 *PopUpFileName(U8 *dft=NULL,I64 dof_flags=0)
 {//Filename chooser. Uses form, not $LK,"FileMgr",A="MN:FileMgr"$().
   U8 *st=MStrPrint("FileNameForm(\"%Q\",0x%X,Fs->parent_task);",
-	dft,dof_flags|DOF_MIN_SIZE),*res=PopUp(st,Fs);
+	dft,dof_flags|DOF_SIZE_MIN),*res=PopUp(st,Fs);
   Free(st);
   return res;
 }
@@ -184,7 +184,7 @@ public U8 *PopUpGetStr(U8 *header=NULL)
   return res;
 }
 
-public I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
+public I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=I64_MIN,I64 hi=I64_MAX)
 {//Prompt for I64 text expression in PopUp win task.
   U8 *st=MStrPrint("GetI64(0x%X,0x%X,0x%X,0x%X);",msg,dft,lo,hi);
   I64 res=PopUp(st,Fs);
@@ -192,7 +192,7 @@ public I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64)
   return res;
 }
 
-public F64 PopUpGetF64(U8 *msg,F64 dft,F64 lo=MIN_F64,F64 hi=MAX_F64)
+public F64 PopUpGetF64(U8 *msg,F64 dft,F64 lo=F64_MIN,F64 hi=F64_MAX)
 {//Prompt for F64 text expression in PopUp win task.
   U8 *st=MStrPrint("GetF64(0x%X,0x%X(F64),0x%X(F64),0x%X(F64));",msg,dft,lo,hi);
   F64 res=PopUp(st,Fs)(F64);

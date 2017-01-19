@@ -30,12 +30,12 @@ U0 DrawProgressBars(CDC *dc)
 {
   I64 i,j,k,n,m;
   U8 *st,*st2;
-  for (i=0;i<NUM_PROGRESS_BARS;i++) {
+  for (i=0;i<PROGRESS_BARS_NUM;i++) {
     if (m=sys_progresses[i].max) {
       dc->color=BLACK;
       GrRect(dc,
 	    (GR_WIDTH-PROGRESS_BAR_WIDTH)/2,
-	    (GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2,
+	    (GR_HEIGHT-(PROGRESS_BARS_NUM*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2,
 	    PROGRESS_BAR_WIDTH,PROGRESS_BAR_HEIGHT);
 
       dc->color=LTGREEN;
@@ -44,7 +44,7 @@ U0 DrawProgressBars(CDC *dc)
 	n=m;
       GrRect(dc,
 	    (GR_WIDTH-PROGRESS_BAR_WIDTH)/2+2,
-	    (GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2+2,
+	    (GR_HEIGHT-(PROGRESS_BARS_NUM*2-1-i*4)*PROGRESS_BAR_HEIGHT)/2+2,
 	    n*(PROGRESS_BAR_WIDTH-4)/m,
 	    PROGRESS_BAR_HEIGHT-4);
 
@@ -56,11 +56,11 @@ U0 DrawProgressBars(CDC *dc)
 	  GrLine(dc,
 		(GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*
 		(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
-		(GR_HEIGHT-(NUM_PROGRESS_BARS*2-1-i*4)*
+		(GR_HEIGHT-(PROGRESS_BARS_NUM*2-1-i*4)*
 		PROGRESS_BAR_HEIGHT)/2+4,
 		(GR_WIDTH-PROGRESS_BAR_WIDTH)/2+1+j*
 		(PROGRESS_BAR_WIDTH-4)/ToF64(k+1),
-		(GR_HEIGHT-(NUM_PROGRESS_BARS*2-3-i*4)*
+		(GR_HEIGHT-(PROGRESS_BARS_NUM*2-3-i*4)*
 		PROGRESS_BAR_HEIGHT)/2-4);
       }
 
@@ -80,7 +80,7 @@ U0 DrawProgressBars(CDC *dc)
       } else
 	st=st2;
       GrPrint(dc,(GR_WIDTH-FONT_WIDTH*StrLen(st))/2,(GR_HEIGHT-FONT_HEIGHT-
-	    (NUM_PROGRESS_BARS*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
+	    (PROGRESS_BARS_NUM*2-2-i*4)*PROGRESS_BAR_HEIGHT)/2,"%s",st);
       Free(st);
     }
   }
@@ -203,6 +203,9 @@ U0 WinFinalUpdate(CDC *dc)
 {
   if (ms_grid.show)
     DrawWinGrid(dc);
+  if (ms_grid.coord)
+    GrPrint(dc,GR_WIDTH-FONT_WIDTH*10,FONT_HEIGHT*3,
+	  "(%03d,%03d)",ms.pos.x,ms.pos.y);
   DrawProgressBars(dc);
   if (winmgr.show_menu)
     DrawMenu(dc);

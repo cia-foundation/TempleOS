@@ -45,9 +45,9 @@ to a class by advancing 1 struct fwd
 for one * and two fwd for two **.
 */
   I64 i;
-  CHashClass *res=CAlloc(sizeof(CHashClass)*(MAX_PTR_STARS+1),Fs->code_heap),
+  CHashClass *res=CAlloc(sizeof(CHashClass)*(PTR_STARS_NUM+1),Fs->code_heap),
 	*tmpc=res;
-  for (i=0;i<=MAX_PTR_STARS;i++) {
+  for (i=0;i<=PTR_STARS_NUM;i++) {
     tmpc->type=HTT_CLASS;
     tmpc->raw_type=RT_PTR;
     tmpc->size=sizeof(U8 *);
@@ -62,9 +62,9 @@ for one * and two fwd for two **.
 CHashFun *PrsFunNew()
 {
   I64 i;
-  CHashFun *res=CAlloc(sizeof(CHashFun)*(MAX_PTR_STARS+1),Fs->code_heap),
+  CHashFun *res=CAlloc(sizeof(CHashFun)*(PTR_STARS_NUM+1),Fs->code_heap),
 	*tmpf=res;
-  for (i=0;i<=MAX_PTR_STARS;i++) {
+  for (i=0;i<=PTR_STARS_NUM;i++) {
     tmpf->type=HTT_FUN;
     tmpf->raw_type=RT_PTR;
     tmpf->size=sizeof(U8 *);
@@ -170,7 +170,7 @@ I64 COCFloatConstFind(CCmpCtrl *cc,F64 d)
       for (i=0;i<cm->num_consts;i++)
 	if (cm->float_consts[i]==d)
 	  return cm->addr+i*sizeof(F64);
-      if (cm->num_consts<CM_MAX_CONSTS)  {
+      if (cm->num_consts<CM_CONSTS_NUM)  {
 	cm->float_consts[cm->num_consts++]=d;
 	return cm->addr+i*sizeof(F64);
       }
@@ -178,7 +178,7 @@ I64 COCFloatConstFind(CCmpCtrl *cc,F64 d)
     cm=cm->next;
   }
   cm=COCMiscNew(cc,CMT_FLOAT_CONSTS);
-  cm->float_consts=MAlloc(CM_MAX_CONSTS*sizeof(F64));
+  cm->float_consts=MAlloc(CM_CONSTS_NUM*sizeof(F64));
   cm->float_consts[cm->num_consts++]=d;
   return cm->addr;
 }
@@ -252,7 +252,7 @@ U8 *COCCompile(CCmpCtrl *cc,I64 *_code_size,CDbgInfo **_dbg,I64 *_type)
   CCodeMisc *lb;
   I64 i,code_size,last_code_size;
 
-  COptReg reg_offsets[NUM_REGS];
+  COptReg reg_offsets[REG_REGS_NUM];
   if (_dbg) *_dbg=NULL;
   cc->pass=0;
   COCHeaderPut(cc,1,TRUE);

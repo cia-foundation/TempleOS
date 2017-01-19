@@ -34,8 +34,8 @@ CColorROPU32 run_colors[2]={RED,GREEN};
 #define MD_WIRE		3
 #define MD_MOVE		4
 #define MD_DELETE	5
-#define MD_NUM_MODES	6
-CColorROPU32 mode_colors[MD_NUM_MODES]=
+#define MD_MODES_NUM	6
+CColorROPU32 mode_colors[MD_MODES_NUM]=
 {BROWN,LTGRAY,DKGRAY,RED,PURPLE,RED};
   DefineLstLoad("ST_SPAN_MODES","Mass\0Concrete\0Steel\0Wire\0Move\0Delete\0");
 

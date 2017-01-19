@@ -7,7 +7,7 @@
 #define DOWNLOAD_FILE4		"TempleOSUltraRS.ISO"
 #define DOWNLOAD_FILE4_SIZE	 1600000
 
-#define MAX_HOURS		(24*3)
+#define HOURS_MAX		(24*3)
 
 class LogStruct
 {
@@ -383,8 +383,8 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
 
   "\n\nDownloads of /TempleOSCD.ISO\n"
 	"'-' is a dup.  '+' is not a dup.\n";
-  if (hours_end-hours_start>=MAX_HOURS)
-    i=hours_end-MAX_HOURS+1;
+  if (hours_end-hours_start>=HOURS_MAX)
+    i=hours_end-HOURS_MAX+1;
   else
     i=hours_start;
   for (;i<=hours_end;i++) {
@@ -467,8 +467,8 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
 	  day_cnts[(i+local_time_offset)>>32-days_start];
 
   "\n\nHits on /index.html\n";
-  if (hours_end-hours_start>=MAX_HOURS)
-    i=hours_end-MAX_HOURS+1;
+  if (hours_end-hours_start>=HOURS_MAX)
+    i=hours_end-HOURS_MAX+1;
   else
     i=hours_start;
   for (;i<=hours_end;i++) {
@@ -496,7 +496,7 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
 U0 WebLogRep(U8 *mask,U8 *output_filename)
 {
   LogStruct *head;
-  CDate start=MAX_I64,end=MIN_I64;
+  CDate start=I64_MAX,end=I64_MIN;
 
   DocMax;
 

@@ -94,11 +94,11 @@ F64 distance,t0,tf;
 Bool game_over;
 
 #define BORDER		7500
-#define R		10000
+#define RADIUS		10000
 #define WIDTH		2000
 #define SHOULDER	200
 #define D_é		(2*ã/360)   //Curve track slice is one degree.
-#define D_S		(2*ã*R/360) //Straight track slice is degree at 10000.
+#define D_S		(2*ã*RADIUS/360) //Straight track is degree at 10000.
 #define DIPS		5
 #define DIP_DEPTH	50
 class Track
@@ -110,34 +110,34 @@ class Track
   F64 é,d;
   CD3I32 left[4],center[4],right[4];
 } track_head,
-  *track_start[MP_MAX_PROCESSORS],*track_end[MP_MAX_PROCESSORS];
+  *track_start[MP_PROCESSORS_NUM],*track_end[MP_PROCESSORS_NUM];
 
 CDC *track_map;
 #define MAP_BITS	9
 I64 t_minx,t_maxx,t_minz,t_maxz;
 
-#define NUM_BUSHES	512
+#define BUSHES_NUM	512
 class Bush
 {
   CD3I32 p;
   Bool sym,pad[3];
   U8 *img;
-} b[NUM_BUSHES];
+} b[BUSHES_NUM];
 
-#define NUM_CARS	8
+#define CARS_NUM	8
 class Car
 {
   CD3I32 p;
   F64 é,dé,speed;
   U8 *img;
   Track *t;
-} c[NUM_CARS];
+} c[CARS_NUM];
 
 I64 DipY(I64 x,I64 z)
 {
   F64 m,a;
   R2P(&m,&a,x,z);
-  return DIP_DEPTH*m*Cos(DIPS*a)/R;
+  return DIP_DEPTH*m*Cos(DIPS*a)/RADIUS;
 }
 
 #define CAR_LENGTH	400
@@ -272,26 +272,26 @@ U0 InitTrack()
   MemSet(&track_head,0,sizeof(Track));
   QueInit(&track_head);
 
-  t_minx=t_minz=MAX_I64;
-  t_maxx=t_maxz=MIN_I64;
+  t_minx=t_minz=I64_MAX;
+  t_maxx=t_maxz=I64_MIN;
 
   x=0; z=0; é=0;
-  for (d=0;d<6*R;d+=D_S)
+  for (d=0;d<6*RADIUS;d+=D_S)
     TrackSlice(&x,&z,é,D_S);
   for (i=0;i<180;i++,é+=D_é)
-    TrackSlice(&x,&z,é,D_é*R);
-  for (d=0;d<R;d+=D_S)
+    TrackSlice(&x,&z,é,D_é*RADIUS);
+  for (d=0;d<RADIUS;d+=D_S)
     TrackSlice(&x,&z,é,D_S);
   for (i=0;i<90;i++,é-=D_é)
-    TrackSlice(&x,&z,é,D_é*R);
+    TrackSlice(&x,&z,é,D_é*RADIUS);
   for (i=0;i<180;i++,é+=D_é)
-    TrackSlice(&x,&z,é,D_é*R);
+    TrackSlice(&x,&z,é,D_é*RADIUS);
   for (i=0;i<90;i++,é-=D_é)
-    TrackSlice(&x,&z,é,D_é*R);
-  for (d=0;d<R;d+=D_S)
+    TrackSlice(&x,&z,é,D_é*RADIUS);
+  for (d=0;d<RADIUS;d+=D_S)
     TrackSlice(&x,&z,é,D_S);
   for (i=0;i<180;i++,é+=D_é)
-    TrackSlice(&x,&z,é,D_é*R);
+    TrackSlice(&x,&z,é,D_é*RADIUS);
 
   CoupleEnds;
 
@@ -378,7 +378,7 @@ U0 MPUpdateWin(CDC *dc2)
   }
 
   dc->flags|=DCF_TRANSFORMATION;
-  for (i=Gs->num;i<NUM_BUSHES;i+=mp_cnt) {
+  for (i=Gs->num;i<BUSHES_NUM;i+=mp_cnt) {
     x=b[i].p.x-c[0].p.x; y=b[i].p.y-c[0].p.y; z=b[i].p.z-c[0].p.z;
     Mat4x4MulXYZ(r,&x,&y,&z);
     if (z>0) {
@@ -394,7 +394,7 @@ U0 MPUpdateWin(CDC *dc2)
       dc->flags&=~(DCF_SYMMETRY|DCF_JUST_MIRROR);
     }
   }
-  for (i=Gs->num+1;i<NUM_CARS;i+=mp_cnt) {
+  for (i=Gs->num+1;i<CARS_NUM;i+=mp_cnt) {
     tmpc=&c[i];
     x=tmpc->p.x-c[0].p.x; y=tmpc->p.y-c[0].p.y; z=tmpc->p.z-c[0].p.z;
     Mat4x4MulXYZ(r,&x,&y,&z);
@@ -474,7 +474,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrBlot(dc,w-track_map->width,h-track_map->height,track_map);
 
   dc->pen_width=2;
-  for (i=0;i<NUM_CARS;i++) {
+  for (i=0;i<CARS_NUM;i++) {
     if (i)
       dc->color=LTPURPLE;
     else
@@ -512,7 +512,7 @@ U0 AnimateTask(I64)
       Snd(12.0*Log2(c[0].speed/500+0.7));
     else
       Snd;
-    for (i=0;i<NUM_CARS;i++) {
+    for (i=0;i<CARS_NUM;i++) {
       tmpc=&c[i];
       tmpc->p.x-=0.01*tmpc->speed*Cos(tmpc->é-ã/2);
       tmpc->p.z+=0.01*tmpc->speed*Sin(tmpc->é-ã/2);
@@ -539,7 +539,7 @@ U0 AnimateTask(I64)
       tmpc->p.y=DipY(tmpc->p.x,tmpc->p.z);
     }
     if (!game_over && on_track) {
-      for (i=1;i<NUM_CARS;i++)
+      for (i=1;i<CARS_NUM;i++)
 	if (D3I32DistSqr(&c[i].p,&c[0].p)<CAR_LENGTH>>1*CAR_LENGTH>>1) {
 	  game_over=TRUE;
 	  Noise(500,22,34);
@@ -572,7 +572,7 @@ U0 InitBushes()
   I64 i,j,x,z;
   track_map->color=LTGREEN;
   track_map->pen_width=1;
-  for (i=0;i<NUM_BUSHES;i++) {
+  for (i=0;i<BUSHES_NUM;i++) {
     tmpb=&b[i];
 
 ib_restart:
@@ -602,7 +602,7 @@ U0 Init()
   InitTrack;
   InitBushes;
   tmpt=track_head.next;
-  for (i=0;i<NUM_CARS;i++) {
+  for (i=0;i<CARS_NUM;i++) {
     tmpc=&c[i];
     tmpc->t=tmpt;
     tmpc->p.x=tmpt->x;
@@ -617,7 +617,7 @@ U0 Init()
       tmpc->img=$IB,"<6>",BI=6$;
       tmpc->speed=2500.0;
     }
-    d=(i+1)*track_head.last->d/NUM_CARS;
+    d=(i+1)*track_head.last->d/CARS_NUM;
     while (tmpt->next!=&track_head && tmpt->d<d)
       tmpt=tmpt->next;
   }

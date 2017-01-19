@@ -156,7 +156,7 @@ public U0 ODERenum(CMathODE *ode)
 public CMass *MassFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 {//Search for mass nearest to x,y,z.
   CMass *tmpm,*best_mass=NULL;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
 
   tmpm=ode->next_mass;
   while (tmpm!=&ode->next_mass) {
@@ -173,7 +173,7 @@ public CMass *MassFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 public CSpring *SpringFind(CMathODE *ode,F64 x,F64 y,F64 z=0)
 {//Find spring midpoint nearest x,y,z.
   CSpring *tmps,*best_spring=NULL;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
 
   tmps=ode->next_spring;
   while (tmps!=&ode->next_spring) {
@@ -195,7 +195,7 @@ public U0 MassOrSpringFind(
 {//Find spring or mass nearest x,y,z.
   CMass   *tmpm,*best_mass=NULL;
   CSpring *tmps,*best_spring=NULL;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
 
   tmpm=ode->next_mass;
   while (tmpm!=&ode->next_mass) {

@@ -1,4 +1,4 @@
-#help_index "TOS"
+#help_index "Misc/TOS/Cfg"
 
 #define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
 #define BLOG_BASE		"/Home/Web/"\
@@ -9,24 +9,24 @@
 #define BLOG_WEB_BASE		PERSONAL_WEB BLOG_BASE
 
 #define SLOP	BLK_SIZE
-U0 TOSBootRescueDrv1()
+U0 TOSDbgDistro1()
 {
   CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
   bfh(I64)+=bfh->file_size-1;
-  DefinePrint("TOS_BOOT_RESCUE_DRV","0x%X",
+  DefinePrint("TOS_DBG_DISTRO","0x%X",
 	CeilI64(SYS_KERNEL_END+SLOP,BLK_SIZE));
-  DefinePrint("TOS_BOOT_RESCUE_DRV_END",  "0x%X",FloorI64(
+  DefinePrint("TOS_DBG_DISTRO_END",  "0x%X",FloorI64(
 	(BOOT_RAM_LIMIT-(BOOT_STK_SIZE+DVD_BOOT_LOADER_SIZE))>>4<<4-
 	(bfh(I64)-SYS_KERNEL_END)-SLOP,BLK_SIZE));
-  DefinePrint("CFG_BOOT_RESCUE_DRV_FILE","\"/Tmp/BootRescueDrv.BIN.Z\"");
-} TOSBootRescueDrv1;
+  DefinePrint("CFG_DBG_DISTRO_FILE","\"/Tmp/DbgDistro.BIN.Z\"");
+} TOSDbgDistro1;
 
-U0 TOSBootRescueDrv2()
+U0 TOSDbgDistro2()
 {
-  DefinePrint("CFG_BOOT_RESCUE_DRV","\"a0x%X\n0x%X\n\"",TOS_BOOT_RESCUE_DRV,
-	(TOS_BOOT_RESCUE_DRV_END-TOS_BOOT_RESCUE_DRV)/BLK_SIZE);
-  DefinePrint("CFG_BOOT_RESCUE_DRV_START","\"0x%X\"",TOS_BOOT_RESCUE_DRV);
-} TOSBootRescueDrv2;
+  DefinePrint("CFG_DBG_DISTRO","\"a0x%X\n0x%X\n\"",TOS_DBG_DISTRO,
+	(TOS_DBG_DISTRO_END-TOS_DBG_DISTRO)/BLK_SIZE);
+  DefinePrint("CFG_DBG_DISTRO_START","\"0x%X\"",TOS_DBG_DISTRO);
+} TOSDbgDistro2;
 
 U0 TOSInit()
 {
@@ -62,8 +62,8 @@ U0 TOSInit()
 #define TOS_CFG		"\n" CFG_RAM_DRVS CFG_DVD_DRVS CFG_HARD_DRVS "\n"\
 			CFG_DSK_CACHE CFG_OPTS
 #define TOS_DVD_CFG	"TB\n0x20000\nT \n\n\nStaffMode\nAutoMountIDE\nCT\n"
-#define TOS_DVD_DBG_CFG "A" CFG_BOOT_RESCUE_DRV\
+#define TOS_DVD_DBG_CFG "A" CFG_DBG_DISTRO\
 			"B\nScale2Mem(2048,0x40000)\n\n\n"\
-			"NoMP\nTextMode\nDontProbe\nBootRescueDrv\n"\
-			"C:" CFG_BOOT_RESCUE_DRV_FILE "\n"\
-			CFG_BOOT_RESCUE_DRV_START "\n\n"
+			"NoMP\nTextMode\nDontProbe\nDbgDistro\n"\
+			"C:" CFG_DBG_DISTRO_FILE "\n"\
+			CFG_DBG_DISTRO_START "\n\n"

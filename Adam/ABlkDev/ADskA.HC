@@ -204,7 +204,7 @@ public I64 DelTree(U8 *files_find_mask,U8 *fu_flags=NULL)
   return res;
 }
 
-U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
+U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=I64_MIN)
 {
   CDrv *dv=Let2Drv(*filename);
   CDirEntry de;
@@ -219,7 +219,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
       if (!*cur_dir)
 	StrCpy(cur_dir,"/");
       ScanFlags(&de.attr,Define("ST_FILE_ATTRS"),attr);
-      if (cdt==MIN_I64)
+      if (cdt==I64_MIN)
 	de.datetime=Now;
       else
 	de.datetime=cdt;
@@ -230,7 +230,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=MIN_I64)
   Free(cur_dir);
 }
 public U0 Touch(U8 *files_find_mask="*",U8 *attr="+?",
-	U8 *fu_flags=NULL,CDate cdt=MIN_I64)
+	U8 *fu_flags=NULL,CDate cdt=I64_MIN)
 {/*Touch file attributes and DateTime.
 Default lists attributes.
 attr: "+?" =show current

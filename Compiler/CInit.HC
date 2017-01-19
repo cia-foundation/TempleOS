@@ -1,9 +1,9 @@
-#define NUM_INTERNAL_TYPES	17
+#define INTERNAL_TYPES_NUM	17
 
 class CInternalType
 {
   U8 type,size,name[8];
-} internal_types_table[NUM_INTERNAL_TYPES]={
+} internal_types_table[INTERNAL_TYPES_NUM]={
   {RT_I0,0,"I0i"},{RT_I0,0,"I0"},{RT_U0,0,"U0i"},{RT_U0,0,"U0"},
   {RT_I8,1,"I8i"},{RT_I8,1,"I8"},{RT_I8,1,"Bool"},
   {RT_U8,1,"U8i"},{RT_U8,1,"U8"},
@@ -13,7 +13,7 @@ class CInternalType
   {RT_F64,8,"F64i"},{RT_F64,8,"F64"},
 };
 
-CIntermediateStruct intermediate_code_table[IC_NUM_ENTRIES]={
+CIntermediateStruct intermediate_code_table[IC_ICS_NUM]={
   {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"END"},
   {IS_0_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"NOP1"},
   {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"END_EXP"},
@@ -185,10 +185,10 @@ CIntermediateStruct intermediate_code_table[IC_NUM_ENTRIES]={
   {IS_2_ARG,0,IST_NULL,FALSE,TRUE,0,0,0,"SWAP_U64"},
   {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"ABS_I64"},
   {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SIGN_I64"},
-  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MIN_I64"},
-  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MIN_U64"},
-  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MAX_I64"},
-  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MAX_U64"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"I64_MIN"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"U64_MIN"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"I64_MAX"},
+  {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"U64_MAX"},
   {IS_2_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"MOD_U64"},
   {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SQRI64"},
   {IS_1_ARG,0,IST_NULL,FALSE,FALSE,0,0,0,"SQRU64"},
@@ -241,21 +241,21 @@ U0 CmpFillTables()
   I64 i;
   U32 *d;
 
-  cmp.to_reg_vars_map=CAlloc(NUM_REGS*sizeof(U8));
+  cmp.to_reg_vars_map=CAlloc(REG_REGS_NUM*sizeof(U8));
   cmp.num_reg_vars=0;
   cmp.reg_vars_mask=REGG_LOCAL_VARS;
-  for (i=0;i<NUM_REGS;i++)
+  for (i=0;i<REG_REGS_NUM;i++)
     if (Bt(&cmp.reg_vars_mask,i))
       cmp.to_reg_vars_map[cmp.num_reg_vars++]=i;
 
-  cmp.non_ptr_vars_map=CAlloc(NUM_REGS*sizeof(U8));
+  cmp.non_ptr_vars_map=CAlloc(REG_REGS_NUM*sizeof(U8));
   cmp.num_non_ptr_vars=0;
   cmp.non_ptr_vars_mask=REGG_LOCAL_NON_PTR_VARS;
-  for (i=0;i<NUM_REGS;i++)
+  for (i=0;i<REG_REGS_NUM;i++)
     if (Bt(&cmp.non_ptr_vars_mask,i))
       cmp.non_ptr_vars_map[cmp.num_non_ptr_vars++]=i;
 
-  cmp.dual_U16_tokens1=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.dual_U16_tokens1=d=CAlloc(sizeof(U32)*TK_TKS_NUM);
   d['!']=TK_NOT_EQU<<16+'=';
   d['&']=TK_AND_AND<<16+'&';
   d['*']=TK_MUL_EQU<<16+'=';
@@ -270,7 +270,7 @@ U0 CmpFillTables()
   d['|']=TK_OR_OR<<16+'|';
   d['%']=TK_MOD_EQU<<16+'=';
 
-  cmp.dual_U16_tokens2=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.dual_U16_tokens2=d=CAlloc(sizeof(U32)*TK_TKS_NUM);
   d['&']=TK_AND_EQU<<16+'=';
   d['+']=TK_ADD_EQU<<16+'=';
   d['-']=TK_MINUS_MINUS<<16+'-';
@@ -280,11 +280,11 @@ U0 CmpFillTables()
   d['^']=TK_XOR_XOR<<16+'^';
   d['|']=TK_OR_EQU<<16+'=';
 
-  cmp.dual_U16_tokens3=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.dual_U16_tokens3=d=CAlloc(sizeof(U32)*TK_TKS_NUM);
   d['-']=TK_SUB_EQU<<16+'=';
   d['/']=TK_DIV_EQU<<16+'=';
 
-  cmp.binary_ops=d=CAlloc(sizeof(U32)*TK_NUM_TK);
+  cmp.binary_ops=d=CAlloc(sizeof(U32)*TK_TKS_NUM);
   d['`']   =(PREC_EXP+ASSOCF_RIGHT)<<16+IC_POWER;
   d[TK_SHL]=(PREC_EXP+ASSOCF_LEFT)<<16+IC_SHL;
   d[TK_SHR]=(PREC_EXP+ASSOCF_LEFT)<<16+IC_SHR;

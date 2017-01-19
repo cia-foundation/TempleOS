@@ -1,7 +1,7 @@
 asm {/* See $LK,"::/Doc/Boot.DD"$.
 TempleOS starts in real, calls some BIOS
 routines, switches to 32 bit, and 64 bit mode
-and continues in $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ at $LK,"KernelMain",A="MN:KernelMain"$().
+and continues in $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ at $LK,"KMain",A="MN:KMain"$().
 
 The boot loader jumps here in real-mode (16-bit).
 It actually jumps to the $LK,"CBinFile",A="MN:CBinFile"$ header which is
@@ -29,7 +29,7 @@ SYS_RUN_LEVEL::			DU32	0;
 
 MEM_BOOT_BASE::		DU32	0;	//Offset from start used by reboot
 MEM_E801::		DU16	0,0;
-MEM_E820::		DU8	MEM_NUM_E820_ENTRIES*sizeof(CMemE820) DUP (0);
+MEM_E820::		DU8	MEM_E820_ENTRIES_NUM*sizeof(CMemE820) DUP (0);
 MEM_PHYSICAL_SPACE::	DU64	0;
 SYS_GDT_PTR::		DU16	sizeof(CGDT)-1;
 			DU64	0;
@@ -45,8 +45,8 @@ GDT_CS64:	DU64	0x00209A0000000000,0; //The $LK,"Charter",A="FI:::/Doc/Charter.DD
 GDT_CS64_RING3:	DU64	0x0020FA0000000000,0; //$LK,"Ring3",A="FI:::/Demo/Lectures/Ring3.HC"$, so you can play with.
 GDT_DS:		DU64	0x00CF92000000FFFF,0;
 GDT_DS_RING3:	DU64	0x00CFF2000000FFFF,0;
-GDT_TR:		DU8	MP_MAX_PROCESSORS*16 DUP(0);
-GDT_TR_RING3:	DU8	MP_MAX_PROCESSORS*16 DUP(0);
+GDT_TR:		DU8	MP_PROCESSORS_NUM*16 DUP(0);
+GDT_TR_RING3:	DU8	MP_PROCESSORS_NUM*16 DUP(0);
 #assert $$-SYS_GDT==sizeof(CGDT)
 
 #assert $$-SYS_KERNEL==sizeof(CKernel)-sizeof(CBinFile)
@@ -94,7 +94,7 @@ GET_RIP:	POP	BX
 	MOV	U16 [MEM_E801],CX
 	MOV	U16 [MEM_E801+2],DX
 
-	MOV	CX,MEM_NUM_E820_ENTRIES-1 //Leave one to terminate
+	MOV	CX,MEM_E820_ENTRIES_NUM-1 //Leave one to terminate
 	XOR	EBX,EBX
 	MOV	AX,DS
 	MOV	ES,AX

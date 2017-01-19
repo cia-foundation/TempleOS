@@ -225,4 +225,4 @@
 #define IC_LIMIT_I64		0xBF
 #define IC_LIMIT_U64		0xC0
 
-#define IC_NUM_ENTRIES		0xC5
+#define IC_ICS_NUM		0xC5

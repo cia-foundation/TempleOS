@@ -10,7 +10,7 @@ CTask *main_task;
 #define OT_CARRIER	0
 #define OT_CRUISER	1
 #define OT_FIGHTER	2
-#define OT_NUM_TYPES	3
+#define OT_TYPES_NUM	3
 
 #define OF_SHIP		1
 #define OF_ACTIVE	2
@@ -83,13 +83,13 @@ U0 SquadronRem(Obj *o)
   succ->last_in_squadron=pred;
 }
 
-#define NUM_PLAYERS	2
+#define PLAYERS_NUM	2
 
-I64 num_carriers[NUM_PLAYERS]={2,3},
-    num_cruisers[NUM_PLAYERS]={2,3},
-    num_planes_per_squadron[NUM_PLAYERS]={6,5},
-    num_squadrons_per_carrier[NUM_PLAYERS]={2,3},
-    num_alive[NUM_PLAYERS],
+I64 num_carriers[PLAYERS_NUM]={2,3},
+    num_cruisers[PLAYERS_NUM]={2,3},
+    num_planes_per_squadron[PLAYERS_NUM]={6,5},
+    num_squadrons_per_carrier[PLAYERS_NUM]={2,3},
+    num_alive[PLAYERS_NUM],
     num_squadrons;
 
 Obj *ObjFind(F64 x,F64 y,
@@ -97,7 +97,7 @@ Obj *ObjFind(F64 x,F64 y,
 	     I64 type_mask=-1,I64 player_mask=-1,F64 *_d=NULL)
 {
   Obj *tmpo=obj_head.next,*best=NULL;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
   while (tmpo!=&obj_head) {
     if (tmpo->flags&flag_mask==flag_val &&
 	  Bt(&type_mask,tmpo->type)&&Bt(&player_mask,tmpo->player)) {
@@ -154,7 +154,7 @@ $SP,"<5>",BI=5$
 
 $SP,"<6>",BI=6$
 $BG$
-U8 *imgs[NUM_PLAYERS][OT_NUM_TYPES]={{$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$}};
+U8 *imgs[PLAYERS_NUM][OT_TYPES_NUM]={{$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$}};
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
@@ -289,7 +289,7 @@ U0 Init()
   launch_t=return_t=set_é_t=0;
   main_task=Fs;
   num_squadrons=0;
-  for (player=0;player<NUM_PLAYERS;player++) {
+  for (player=0;player<PLAYERS_NUM;player++) {
     num_alive[player]=0;
     for (ship=0;ship<num_cruisers[player];ship++) {
       tmpo1=CAlloc(sizeof(Obj));
@@ -380,14 +380,14 @@ U0 CleanUp()
 }
 
 Obj *ObjLaunch(I64 player,I64 squadron=-1,
-	Obj *host=NULL,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
+	Obj *host=NULL,F64 x=F64_MAX,F64 y=F64_MAX,F64 é=F64_MAX)
 {
   Obj *tmpo;
   F64 cur_time=tS;
   if (!host)
     host=ObjFind(x,y,,,1<<OT_CARRIER,1<<player);
   if (host && cur_time>host->next_action_time) {
-    if (é==MAX_F64)
+    if (é==F64_MAX)
       é=Arg(x-host->x,y-host->y);
     tmpo=obj_head.next;
     while (tmpo!=&obj_head) {
@@ -401,7 +401,7 @@ Obj *ObjLaunch(I64 player,I64 squadron=-1,
 	else {
 	  tmpo->flags=tmpo->flags&~OF_RETURNING|OF_ACTIVE;
 	  tmpo->é=host->é;
-	  if (x==MAX_F64 || y==MAX_F64 || Sqr(x-host->x)+Sqr(y-host->y)>3*3)
+	  if (x==F64_MAX || y==F64_MAX || Sqr(x-host->x)+Sqr(y-host->y)>3*3)
 	    tmpo->dé=Wrap(é-tmpo->é,-ã);
 	  else
 	    tmpo->dé=0;
@@ -417,7 +417,7 @@ Obj *ObjLaunch(I64 player,I64 squadron=-1,
   return NULL;
 }
 
-Squadron *SquadronLaunch(I64 player,F64 x=MAX_F64,F64 y=MAX_F64)
+Squadron *SquadronLaunch(I64 player,F64 x=F64_MAX,F64 y=F64_MAX)
 {
   Squadron *tmps;
   Obj *tmpo;
@@ -473,12 +473,12 @@ Squadron *SquadronReturn(I64 player,F64 x,F64 y)
   return NULL;
 }
 
-Obj *ObjSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
+Obj *ObjSeté(I64 player,F64 x=F64_MAX,F64 y=F64_MAX,F64 é=F64_MAX)
 {
   Obj *tmpo;
   if ((tmpo=ObjFind(x,y,,,,1<<player)) && tmpo->flags&OF_ACTIVE &&
 	!(tmpo->flags&OF_RETURNING)) {
-    if (é==MAX_F64)
+    if (é==F64_MAX)
       é=Arg(x-tmpo->x,y-tmpo->y);
     tmpo->dé+=Wrap(é-(tmpo->é+tmpo->dé),-ã);
     return tmpo;
@@ -486,7 +486,7 @@ Obj *ObjSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
   return NULL;
 }
 
-Squadron *SquadronSeté(I64 player,F64 x=MAX_F64,F64 y=MAX_F64,F64 é=MAX_F64)
+Squadron *SquadronSeté(I64 player,F64 x=F64_MAX,F64 y=F64_MAX,F64 é=F64_MAX)
 {
   Squadron *tmps;
   Obj *tmpo;

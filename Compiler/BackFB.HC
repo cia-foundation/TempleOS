@@ -457,7 +457,7 @@ U0 ICFCmpAndBranch(CCmpCtrl *cc,CIntermediateCode *tmpi,I64 rip,
       else
 	i+=8;
     }
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 

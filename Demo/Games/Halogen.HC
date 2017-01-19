@@ -1,8 +1,8 @@
-#define NUM_ROAD	512
+#define ROAD_NUM	512
 #define ROAD_WIDTH_BY_2	200
 #define CAR_WIDTH_BY_2	100
 
-I64 road_x[NUM_ROAD],road_trend;
+I64 road_x[ROAD_NUM],road_trend;
 F64 speed,distance;
 I64 road_ptr=0,car_x;
 F64 t_last;
@@ -12,11 +12,11 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   I64 w=task->pix_width,h=task->pix_height;
   I64 i,x,y,xx;
-  xx=w>>1-car_x+road_x[road_ptr&(NUM_ROAD-1)];
+  xx=w>>1-car_x+road_x[road_ptr&(ROAD_NUM-1)];
 
   dc->color=LTGRAY;
-  for (i=0;i<NUM_ROAD;i++) {
-    x=w>>1-car_x+road_x[(i+road_ptr)&(NUM_ROAD-1)];
+  for (i=0;i<ROAD_NUM;i++) {
+    x=w>>1-car_x+road_x[(i+road_ptr)&(ROAD_NUM-1)];
     y=h-0.5*i;
     if (y<(h+FONT_HEIGHT)>>1) break;
     GrPlot(dc,x+ROAD_WIDTH_BY_2-0.4*i,y);
@@ -48,8 +48,8 @@ U0 UpdateRoad()
   t_last=t0;
   while (distance>1.0) {
     road_trend=ClampI64(road_trend+SignI64(RandU16%3-1),-5,5);
-    road_x[road_ptr&(NUM_ROAD-1)]=
-	  road_x[(road_ptr-1)&(NUM_ROAD-1)]+=road_trend/3;
+    road_x[road_ptr&(ROAD_NUM-1)]=
+	  road_x[(road_ptr-1)&(ROAD_NUM-1)]+=road_trend/3;
     road_ptr++;
     distance-=1.0;
   }
@@ -65,7 +65,7 @@ U0 Init()
   road_trend=0;
   road_ptr=0;
   car_x=0;
-  for (i=0;i<NUM_ROAD;i++) {
+  for (i=0;i<ROAD_NUM;i++) {
     road_x[i]=x;
     road_trend=ClampI64(road_trend+SignI64(RandU16%3-1),-5,5);
     x+=road_trend/3;

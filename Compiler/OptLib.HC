@@ -83,7 +83,7 @@ CIntermediateCode *OptLead1(CIntermediateCode *tmpi)
 I64 CmpOffset2Reg(I64 offset,COptReg *reg_offsets)
 {
   I64 i;
-  for (i=0;i<NUM_REGS;i++)
+  for (i=0;i<REG_REGS_NUM;i++)
     if (offset==reg_offsets[i].offset)
       return i;
   return -1;

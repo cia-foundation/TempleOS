@@ -48,13 +48,32 @@ public I64 LinkChk(U8 *files_find_mask="/*",U8 *fu_flags=NULL)
 {//Check documents for broken file links.
   I64 fuf_flags=0,res=0;
   CDirEntry *tmpde,*tmpde1;
+  U8 *st;
+  progress2_max=1;
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+r+$$+f+F+O");
   ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
   tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
   while (tmpde && !Bt(&fuf_flags,FUf_CANCEL)) {
+
+    st=MStrPrint("Before %s Broke:%d",tmpde->full_name,res);
+    if (StrLen(st)>PROGRESS_DESC_LEN-1)
+      st[PROGRESS_DESC_LEN-1]=0;
+    StrCpy(progress2_desc,st);
+    Free(st);
+    Yield;
+
     res+=LinkChkFile(tmpde->full_name,&fuf_flags);
+
+    st=MStrPrint("After %s Broke:%d",tmpde->full_name,res);
+    if (StrLen(st)>PROGRESS_DESC_LEN-1)
+      st[PROGRESS_DESC_LEN-1]=0;
+    StrCpy(progress2_desc,st);
+    Free(st);
+    Yield;
+
     tmpde=tmpde->next;
   }
   DirTreeDel(tmpde1);
+  progress2_max=0;
   return res;
 }

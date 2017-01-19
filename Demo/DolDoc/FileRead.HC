@@ -1,6 +1,6 @@
 public U0 DocProfile(U8 *filename,I64 flags)
 {
-  I64 i,*cmd_stats=CAlloc(sizeof(I64)*DOCT_NUM_TYPES),
+  I64 i,*cmd_stats=CAlloc(sizeof(I64)*DOCT_TYPES_NUM),
 	*flags_stats=CAlloc(sizeof(I64)*64),
 	*type_flags_stats=CAlloc(sizeof(I64)*64);
 //Note: word wrap is determined by
@@ -33,7 +33,7 @@ public U0 DocProfile(U8 *filename,I64 flags)
 	"$$LK,\"Doc Type Codes\","
 	"A=\"FF:::/Adam/DolDoc/DocInit.HC,ST_DOC_CMDS\"$$.\n"
 	"$$FG$$";
-  for (i=0;i<DOCT_NUM_TYPES;i++)
+  for (i=0;i<DOCT_TYPES_NUM;i++)
     if (cmd_stats[i])
       "%4Z:%d\n",i,"ST_DOC_CMDS",cmd_stats[i];
 
@@ -76,5 +76,5 @@ The flag arrays $LK,"doldoc.type_flags_form",A="MN:CDolDocGlbls"$, etc
 are useful.
 */
 
-DocProfile("::/Doc/ChangeLog.DD",0);
-DocProfile("::/Doc/ChangeLog.DD",DOCF_PLAIN_TEXT);
+DocProfile("::/Doc/ChgLog.DD",0);
+DocProfile("::/Doc/ChgLog.DD",DOCF_PLAIN_TEXT);

@@ -226,26 +226,26 @@ I64 AsmMakeArgMask(CCmpCtrl *cc,CAsmArg *arg)
     if (arg->indirect)
       res&=0x00FFFF0000;
     else if (arg->num.i<0) {
-      if (arg->num.i>=MIN_I8)
+      if (arg->num.i>=I8_MIN)
 	res&=0x8FE;
-      else if (arg->num.i>=MIN_I16)
+      else if (arg->num.i>=I16_MIN)
 	res&=0x8EE;
-      else if (arg->num.i>=MIN_I32)
+      else if (arg->num.i>=I32_MIN)
 	res&=0x8CE;
       else
 	res&=0x88E;
     } else {
-      if (arg->num.i<=MAX_I8)
+      if (arg->num.i<=I8_MAX)
 	res&=0xFFE;
-      else if (arg->num.i<=MAX_U8)
+      else if (arg->num.i<=U8_MAX)
 	res&=0xFEE;
-      else if (arg->num.i<=MAX_I16)
+      else if (arg->num.i<=I16_MAX)
 	res&=0xEEE;
-      else if (arg->num.i<=MAX_U16)
+      else if (arg->num.i<=U16_MAX)
 	res&=0xECE;
-      else if (arg->num.i<=MAX_I32)
+      else if (arg->num.i<=I32_MAX)
 	res&=0xCCE;
-      else if (arg->num.i<=MAX_U32)
+      else if (arg->num.i<=U32_MAX)
 	res&=0xC8E;
       else
 	res&=0x88E;
@@ -280,7 +280,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 	      aotc->rip,num2->rel,num2->num.local_asm_undef_hash,
 	      num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 	      U8_avail);
-      else if (!num2->imm_flag && !(MIN_I8<=num2->num.i<=MAX_I8))
+      else if (!num2->imm_flag && !(I8_MIN<=num2->num.i<=I8_MAX))
 	LexExcept(cc,"Branch out of range at ");
       if (num2->imm_flag) {
 	if (num2->num.abs_cnts.abs_addres&1) {
@@ -307,7 +307,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 		aotc->rip,num2->rel,num2->num.local_asm_undef_hash,
 		num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 		U8_avail);
-	else if (!num2->imm_flag && !(MIN_I16<=num2->num.i<=MAX_I16))
+	else if (!num2->imm_flag && !(I16_MIN<=num2->num.i<=I16_MAX))
 	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
@@ -334,7 +334,7 @@ Bool AsmStoreNum(CCmpCtrl *cc,CAsmNum2 *num2,I64 cnt,Bool U8_avail)
 		aotc->rip,num2->rel,num2->num.local_asm_undef_hash,
 		num2->num.glbl_asm_undef_hash,cc->lex_include_stk->line_num,
 		U8_avail);
-	else if (!num2->imm_flag && !(MIN_I32<=num2->num.i<=MAX_I32))
+	else if (!num2->imm_flag && !(I32_MIN<=num2->num.i<=I32_MAX))
 	  LexExcept(cc,"Branch out of range at ");
 	if (num2->imm_flag) {
 	  if (num2->num.abs_cnts.abs_addres&1) {
@@ -542,7 +542,7 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tmpo,I64 argcnt)
 	      if (tmpa1->imm_or_off_present) {
 		MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 		if (!cur.disp.num.machine_code &&
-		      MIN_I8<=cur.disp.num.i<=MAX_I8) {
+		      I8_MIN<=cur.disp.num.i<=I8_MAX) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		} else if (aotc->seg_size==16) {
@@ -689,7 +689,7 @@ Bool PrsAsmInst(CCmpCtrl *cc,CHashOpcode *tmpo,I64 argcnt)
 	      if (tmpa1->imm_or_off_present) {
 		MemCpy(&cur.disp.num,&tmpa1->num,sizeof(CAsmNum));
 		if (!cur.disp.num.machine_code &&
-		      MIN_I8<=cur.disp.num.i<=MAX_I8) {
+		      I8_MIN<=cur.disp.num.i<=I8_MAX) {
 		  cur.ModrM|=0x40;
 		  cur.disp.U8_cnt=1;
 		} else if (aotc->seg_size==16) {

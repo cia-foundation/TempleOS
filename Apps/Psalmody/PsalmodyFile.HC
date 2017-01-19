@@ -253,7 +253,7 @@ U8 *PsmCvtSong()
 
   i=0;
   tmpn=psm.head.next;
-  last_octave=MIN_I64;
+  last_octave=I64_MIN;
   last_duration=-1;
   while (tmpn!=&psm.head) {
     dst=&tmpn->ascii;

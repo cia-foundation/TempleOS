@@ -1,9 +1,9 @@
 File
 {
-  ChgDsk(,'m');
+  Rename(,'r');
+  MkDir(,'d');
   FmtDrv(,'f');
-  MakeISOFile(,'M');
-  BurnISOFile(,'B');
+  UnmountDrv(,'u');
   Abort(,CH_SHIFT_ESC);
   Exit(,CH_ESC);
 }
@@ -12,11 +12,18 @@ Edit
 {
   Ed(,CH_SPACE);
   Plain(,CH_SHIFT_SPACE);
-  Rename(,'r');
-  MkDir(,'d');
   Copy(,CH_CTRLC);
   Paste(,CH_CTRLV);
   DeleteFile(,CH_CTRLY);
+}
+
+CDDVD
+{
+  ChgDsk(,'c');
+  MountISOC(,'i');
+  MakeRedSeaISOC(,'m');
+  MakeISO9660ISO(,'M');
+  BurnISOFile(,'B');
 }
 
 Program

@@ -1,5 +1,5 @@
 #define MAP_WIDTH		640	//Change this, if you like.
-#define MAX_UNITS		32	//Change this, if you like.
+#define UNITS_NUM		32	//Change this, if you like.
 #define HEX_SIDE		11
 
 U0 InitDefines()
@@ -60,10 +60,10 @@ class Unit
   Bool	vis[2],fired,infantry,indirect_fire,pad[3];
 };
 
-Unit	units[2][MAX_UNITS];
+Unit	units[2][UNITS_NUM];
 
-// Bt(vis_unit_bitmap,player1+player0*((MAX_UNITS+7)&~7))
-U8	vis_unit_bitmap[2][(((MAX_UNITS+7)&~7)*MAX_UNITS)>>3];
+// Bt(vis_unit_bitmap,player1+player0*((UNITS_NUM+7)&~7))
+U8	vis_unit_bitmap[2][(((UNITS_NUM+7)&~7)*UNITS_NUM)>>3];
 
 #define PHASE_START	0
 #define PHASE_INDIRECT	0

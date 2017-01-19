@@ -42,11 +42,11 @@ U0 DocInit()
   }
   CmpCtrlDel(cc);
 
-  for (i=0;i<DOCT_NUM_TYPES;i++)
+  for (i=0;i<DOCT_TYPES_NUM;i++)
     doldoc.dft_de_flags[i]&=~DOCG_BL_IV_UL;
 
   doldoc.type_flags_form[0]=0;
-  for (i=0;i<DOCT_NUM_TYPES;i++)
+  for (i=0;i<DOCT_TYPES_NUM;i++)
     if (Bt(&doldoc.dft_de_flags[i],DOCEf_TAG) && i!=DOCT_TEXT || i==DOCT_HEX_ED)
       Bts(doldoc.type_flags_form,i);
 

@@ -149,7 +149,7 @@ public U0 DCRst(CDC *dc)
   Mat4x4IdentEqu(dc->r);
   dc->r_norm=GR_SCALE;
   dc->flags&=~(DCF_SYMMETRY|DCF_TRANSFORMATION|DCF_JUST_MIRROR);
-  MemCpy(dc->palette,gr_palette_std,sizeof(CBGR48)*NUM_COLORS);
+  MemCpy(dc->palette,gr_palette_std,sizeof(CBGR48)*COLORS_NUM);
 }
 
 public U0 DCExtentsInit(CDC *dc=NULL)
@@ -159,10 +159,10 @@ public U0 DCExtentsInit(CDC *dc=NULL)
   //You should clear the record flag yourself
   if (!dc)   dc=gr.dc;
   dc->flags|=DCF_RECORD_EXTENTS;
-  dc->min_x=MAX_I64;
-  dc->max_x=MIN_I64;
-  dc->min_y=MAX_I64;
-  dc->max_y=MIN_I64;
+  dc->min_x=I64_MAX;
+  dc->max_x=I64_MIN;
+  dc->min_y=I64_MAX;
+  dc->max_y=I64_MIN;
 }
 
 public CDC *DCAlias(CDC *dc=NULL,CTask *task=NULL)
@@ -229,7 +229,7 @@ public I64 DCSize(CDC *dc)
 public I32 *DCDepthBufRst(CDC *dc)
 {//Reset device context depth buf to far away.
   if (dc->depth_buf)
-    MemSetU32(dc->depth_buf,MAX_I32,dc->width_internal*dc->height);
+    MemSetU32(dc->depth_buf,I32_MAX,dc->width_internal*dc->height);
   return dc->depth_buf;
 }
 
@@ -288,7 +288,7 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
   U8 *res,*ptr,*body;
   CArcCompress *arc;
   I64 body_size=dc->width_internal*dc->height,total_size,flags;
-  CBGR48 palette[NUM_COLORS];
+  CBGR48 palette[COLORS_NUM];
 
   if (dcsf_flags&DCSF_COMPRESSED) {
     arc=CompressBuf(dc->body,body_size);
@@ -308,10 +308,10 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
   if (dcsf_flags&DCSF_PALETTE_GET)
     GrPaletteGet(palette);
   else
-    MemCpy(palette,&dc->palette,NUM_COLORS*sizeof(CBGR48));
-  if (MemCmp(palette,gr_palette_std,NUM_COLORS*sizeof(CBGR48))) {
+    MemCpy(palette,&dc->palette,COLORS_NUM*sizeof(CBGR48));
+  if (MemCmp(palette,gr_palette_std,COLORS_NUM*sizeof(CBGR48))) {
     flags|=DCF_PALETTE;
-    total_size+=NUM_COLORS*sizeof(CBGR48);
+    total_size+=COLORS_NUM*sizeof(CBGR48);
   }
 
   ptr=res=MAlloc(total_size);
@@ -323,8 +323,8 @@ public U8 *DCSave(CDC *dc,I64 *_size=NULL,I64 dcsf_flags=DCSF_COMPRESSED)
 
 #assert offset(CDC.end)==offset(CDC.palette)
   if (flags&DCF_PALETTE) {
-    MemCpy(ptr,palette,NUM_COLORS*sizeof(CBGR48));
-    ptr+=NUM_COLORS*sizeof(CBGR48);
+    MemCpy(ptr,palette,COLORS_NUM*sizeof(CBGR48));
+    ptr+=COLORS_NUM*sizeof(CBGR48);
   }
 
   MemCpy(ptr,body,body_size);
@@ -349,10 +349,10 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
   ptr+=offset(CDC.end)-offset(CDC.start);
 
   if (res->flags&DCF_PALETTE) {
-    MemCpy(&res->palette,ptr,NUM_COLORS*sizeof(CBGR48));
-    ptr+=NUM_COLORS*sizeof(CBGR48);
+    MemCpy(&res->palette,ptr,COLORS_NUM*sizeof(CBGR48));
+    ptr+=COLORS_NUM*sizeof(CBGR48);
   } else
-    MemCpy(&res->palette,gr_palette_std,NUM_COLORS*sizeof(CBGR48));
+    MemCpy(&res->palette,gr_palette_std,COLORS_NUM*sizeof(CBGR48));
 
   body_size=res->width_internal*res->height;
   if (res->flags&DCF_COMPRESSED) {

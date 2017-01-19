@@ -1,14 +1,14 @@
 //Makes a mesh man.
 
-#define MAX_VERTICES	1024
-#define MAX_TRIS	1024
+#define VERTICES_NUM	1024
+#define TRIS_NUM	1024
 
 class Man
 {
   I32 vertex_cnt;
   I32 tri_cnt;
-  CD3I32   v[MAX_VERTICES];
-  CMeshTri t[MAX_TRIS];
+  CD3I32   v[VERTICES_NUM];
+  CMeshTri t[TRIS_NUM];
 } *m;
 
 class ManDefineStruct

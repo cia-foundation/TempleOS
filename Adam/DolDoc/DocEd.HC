@@ -146,13 +146,13 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
     LBts(&Fs->display_flags,DISPLAYf_SHOW);
     WinZBufUpdate;
   }
-  if (dof_flags&DOF_MIN_SIZE)
-    doc->flags|=DOCF_MIN_SIZE;
+  if (dof_flags&DOF_SIZE_MIN)
+    doc->flags|=DOCF_SIZE_MIN;
 
   DocUnlock(doc);
   if (!(dof_flags&DOF_DONT_WINMGR_SYNC)) {
     Refresh(2,TRUE);
-    if (doc->flags&DOCF_MIN_SIZE)
+    if (doc->flags&DOCF_SIZE_MIN)
       Refresh(2,TRUE);
   }
   res=View;
@@ -178,7 +178,7 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
   }
   Free(old_task_title);
   DocDel(bdoc);
-  if (dof_flags&DOF_MIN_SIZE) {
+  if (dof_flags&DOF_SIZE_MIN) {
     WinHorz(old_left,old_right);
     WinVert(old_top,old_bottom);
   }

@@ -7,8 +7,8 @@ $SP,"<2>",BI=2$
 $SP,"<3>",BI=3$
 
 $BG$
-#define NUM_STARS	8192
-I64 stars_x[NUM_STARS],stars_y[NUM_STARS];
+#define STARS_NUM	8192
+I64 stars_x[STARS_NUM],stars_y[STARS_NUM];
 
 #define RADIUS	7
 
@@ -25,8 +25,8 @@ class MySpring:CSpring
 //Main Modses
 #define MMD_EDIT	0
 #define MMD_PLAY	1
-#define MMD_NUM_MODES	2
-CColorROPU32 main_mode_colors[MMD_NUM_MODES]={LTRED,LTGREEN};
+#define MMD_MODES_NUM	2
+CColorROPU32 main_mode_colors[MMD_MODES_NUM]={LTRED,LTGREEN};
 DefineLstLoad("ST_MAIN_MODES","Edit\0Play\0");
 CCtrlBttnState main_mode_bttn;
 
@@ -36,8 +36,8 @@ CCtrlBttnState main_mode_bttn;
 #define EMD_CONNECTOR	2
 #define EMD_THRUSTER	3
 #define EMD_MOVE	4
-#define EMD_NUM_MODES	5
-CColorROPU32 edit_mode_colors[EMD_NUM_MODES]={LTGRAY,LTCYAN,CYAN,YELLOW,LTBLUE};
+#define EMD_MODES_NUM	5
+CColorROPU32 edit_mode_colors[EMD_MODES_NUM]={LTGRAY,LTCYAN,CYAN,YELLOW,LTBLUE};
 DefineLstLoad("ST_EDIT_MODES","Mass\0Spring\0Connector\0Thruster\0Move\0");
 CCtrlBttnState edit_mode_bttn;
 
@@ -100,7 +100,7 @@ U0 DrawIt(CTask *,CDC *dc)
     case MMD_PLAY:
       task->text_attr=BLACK<<4+WHITE;
       dc->color=WHITE;
-      for (i=0;i<NUM_STARS;i++)
+      for (i=0;i<STARS_NUM;i++)
 	GrPlot3(dc,stars_x[i],stars_y[i],0);
       break;
   }
@@ -293,7 +293,7 @@ U0 Init()
   task=Fs;
   for (i=0;i<=9;i++)
     action_scan_codes[i]=Char2ScanCode('0'+i);
-  for (i=0;i<NUM_STARS;i++) {
+  for (i=0;i<STARS_NUM;i++) {
     stars_x[i]=RandU32%8192-4096;
     stars_y[i]=RandU32%8192-4096;
   }
@@ -378,7 +378,7 @@ U0 PlayShip()
 	      ode->drag_v3=0.0001;
 	      break;
 	    case CH_SPACE:
-	      if (++main_mode_bttn.state==MMD_NUM_MODES)
+	      if (++main_mode_bttn.state==MMD_MODES_NUM)
 		main_mode_bttn.state=0;
 	      GetMsg(,,1<<MSG_KEY_UP);
 	      goto ps_done;
@@ -415,7 +415,7 @@ U0 EditShip()
   F64 wx,wy;
   Bool okay;
   MyMass *tmpm1=NULL,*tmpm2=NULL;
-  CCtrl *bt_edit_mode=CtrlBttnNew(0,5*FONT_HEIGHT+4,80,,EMD_NUM_MODES,
+  CCtrl *bt_edit_mode=CtrlBttnNew(0,5*FONT_HEIGHT+4,80,,EMD_MODES_NUM,
 	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_bttn);
   ode->flags|=ODEF_PAUSED;
   MenuPush(
@@ -516,7 +516,7 @@ U0 EditShip()
 	  }
 	  break;
 	case MSG_MS_R_DOWN:
-	  if (++edit_mode_bttn.state==EMD_NUM_MODES)
+	  if (++edit_mode_bttn.state==EMD_MODES_NUM)
 	    edit_mode_bttn.state=0;
 	  break;
 	case MSG_MS_R_UP:
@@ -560,7 +560,7 @@ U0 EditShip()
 	      Spawn(&Zoom,0.5(I64));
 	      break;
 	    case CH_SPACE:
-	      if (++main_mode_bttn.state==MMD_NUM_MODES)
+	      if (++main_mode_bttn.state==MMD_MODES_NUM)
 		main_mode_bttn.state=0;
 	      GetMsg(,,1<<MSG_KEY_UP);
 	      goto es_done;
@@ -615,7 +615,7 @@ U0 Strut()
 
   PressAKey;
   bt_main_mode=CtrlBttnNew(
-	(GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_NUM_MODES,
+	(GR_WIDTH-4*FONT_WIDTH-16)>>1,1*FONT_HEIGHT+4,80,,MMD_MODES_NUM,
 	Define("ST_MAIN_MODES"),main_mode_colors,&main_mode_bttn);
   DocClear;
   Init;

@@ -1,23 +1,23 @@
-#define NUM_ZEROS	2
-Complex zeros[NUM_ZEROS]={{10.0,0},{-30,0}};
-#define NUM_POLES	2
-Complex poles[NUM_POLES]={{-20.0,-15.0},{-20.0,15.0}};
+#define ZEROS_NUM	2
+Complex zeros[ZEROS_NUM]={{10.0,0},{-30,0}};
+#define POLES_NUM	2
+Complex poles[POLES_NUM]={{-20.0,-15.0},{-20.0,15.0}};
 
 F64 scale;
 
 Complex *PoleZeroFind(I64 x,I64 y)
 {
   I64 i;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
   Complex *res=NULL;
-  for (i=0;i<NUM_POLES;i++) {
+  for (i=0;i<POLES_NUM;i++) {
     dd=Sqr(poles[i].x-x)+Sqr(poles[i].y-y);
     if (dd<best_dd) {
       best_dd=dd;
       res=&poles[i];
     }
   }
-  for (i=0;i<NUM_ZEROS;i++) {
+  for (i=0;i<ZEROS_NUM;i++) {
     dd=Sqr(zeros[i].x-x)+Sqr(zeros[i].y-y);
     if (dd<best_dd) {
       best_dd=dd;
@@ -32,8 +32,8 @@ F64 F(Complex *x)
   F64 m,a;
   Complex num,denom,n1;
 
-  CPoly(&num,  NUM_ZEROS,zeros,x);
-  CPoly(&denom,NUM_POLES,poles,x);
+  CPoly(&num,  ZEROS_NUM,zeros,x);
+  CPoly(&denom,POLES_NUM,poles,x);
   CDiv(&n1,&num,&denom);
 
   R2P(&m,&a,n1.x,n1.y);
@@ -65,8 +65,8 @@ F64 MPDraw(CTask *task)
 
 U0 Draw()
 {
-  CJob *tmpm[MP_MAX_PROCESSORS];
-  F64 y_total,old_y_total=MAX_F64;
+  CJob *tmpm[MP_PROCESSORS_NUM];
+  F64 y_total,old_y_total=F64_MAX;
   I64 i,w=Fs->pix_width,h=Fs->pix_height,cx=w/2,cy=h/2;
   CDC *dc=DCAlias;
   while (TRUE) {
@@ -85,9 +85,9 @@ U0 Draw()
   dc->color=15;
   GrLine(dc,0,cy,w,cy);
   GrLine(dc,cx,0,cx,h);
-  for (i=0;i<NUM_ZEROS;i++)
+  for (i=0;i<ZEROS_NUM;i++)
     GrPrint(dc,cx+zeros[i].x-FONT_WIDTH/2,cy-zeros[i].y-FONT_HEIGHT/2,"o");
-  for (i=0;i<NUM_POLES;i++)
+  for (i=0;i<POLES_NUM;i++)
     GrPrint(dc,cx+poles[i].x-FONT_WIDTH/2,cy-poles[i].y-FONT_HEIGHT/2,"x");
   DCDel(dc);
 }

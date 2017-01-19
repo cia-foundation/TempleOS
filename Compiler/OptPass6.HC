@@ -5,7 +5,7 @@ Bool OptIC6(CIntermediateCode *tmpi)
     return FALSE;
   if (tmpil1->ic_code==IC_ADD_CONST && tmpi->ic_code==IC_DEREF &&
 	tmpi->ic_flags&ICF_ARG1_WAS_STK	&&  tmpi->arg1.type&MDF_REG &&
-	tmpil1->res.type&MDF_REG && MIN_I32<=tmpil1->ic_data<=MAX_I32 &&
+	tmpil1->res.type&MDF_REG && I32_MIN<=tmpil1->ic_data<=I32_MAX &&
 	!Bt(&cmp.non_ptr_vars_mask,tmpil1->arg1.reg)) {
     if (tmpil1->arg1.type&MDF_REG) {
       tmpi->ic_flags=tmpi->ic_flags&~ICF_ARG1_WAS_STK | tmpil1->ic_flags;

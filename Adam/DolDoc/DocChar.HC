@@ -18,14 +18,14 @@ public I64 EdCurU8(CDoc *doc)
   return res;
 }
 
-public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
+public U0 EdCursorLeft(CDoc *doc,I64 sc=I64_MIN)
 {//Move cursor left. Might need a call to $LK,"DocRecalc",A="MN:DocRecalc"$().
 //See $LK,"EdRenumAsm",A="MN:EdRenumAsm"$ for an example.
   U8 *dst;
   Bool unlock=DocLock(doc);
   CDocEntry *doc_ce=doc->cur_entry,*original_ce=doc_ce,*doc_ne;
   I64 cc=doc->cur_col,y=doc_ce->y;
-  if (sc!=MIN_I64) sc=sc.u32[0];
+  if (sc!=I64_MIN) sc=sc.u32[0];
   if (sc>=0 && sc&SCF_CTRL) {
     while (doc_ce->last!=doc && (doc_ce->last->y==y ||
 	  doc_ce->de_flags & (DOCEF_SKIP|DOCEF_FILTER_SKIP)))
@@ -90,14 +90,14 @@ public U0 EdCursorLeft(CDoc *doc,I64 sc=MIN_I64)
     DocUnlock(doc);
 }
 
-public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
+public U0 EdCursorRight(CDoc *doc,I64 sc=I64_MIN)
 {//Move cursor right. Might need a call to $LK,"DocRecalc",A="MN:DocRecalc"$().
 //See $LK,"EdRenumAsm",A="MN:EdRenumAsm"$ for an example.
   Bool unlock=DocLock(doc);
   U8 *dst;
   CDocEntry *doc_ce=doc->cur_entry,*original_ce=doc_ce,*doc_ne;
   I64 cc=doc->cur_col,y=doc_ce->y,old_de_flags,old_color;
-  if (sc!=MIN_I64) sc=sc.u32[0];
+  if (sc!=I64_MIN) sc=sc.u32[0];
   if (sc>=0 && sc&SCF_CTRL) {
     while (doc_ce!=doc && doc_ce->next->y==y &&
 	  doc_ce->next->type_u8!=DOCT_SOFT_NEW_LINE && doc_ce->next!=doc &&
@@ -166,7 +166,7 @@ public U0 EdCursorRight(CDoc *doc,I64 sc=MIN_I64)
     DocUnlock(doc);
 }
 
-public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
+public U0 EdLineUp(CDoc *doc,I64 sc=I64_MIN)
 {//Move cursor up. Might need a call to $LK,"DocRecalc",A="MN:DocRecalc"$().
 //See $LK,"EdRenumAsm",A="MN:EdRenumAsm"$ for an example.
   Bool unlock=DocLock(doc);
@@ -174,7 +174,7 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
   I64 y,x;
   CDocEntry *doc_ce=doc->cur_entry,*doc_ne;
 
-  if (sc!=MIN_I64) sc=sc.u32[0];
+  if (sc!=I64_MIN) sc=sc.u32[0];
   if (doc_ce->type_u8==DOCT_HEX_ED) {
     doc->cur_col=doc->cur_col-doc_ce->hex_ed_width*3;
     if (doc->cur_col>=0) {
@@ -277,14 +277,14 @@ public U0 EdLineUp(CDoc *doc,I64 sc=MIN_I64)
     DocUnlock(doc);
 }
 
-public U0 EdLineDown(CDoc *doc,I64 sc=MIN_I64)
+public U0 EdLineDown(CDoc *doc,I64 sc=I64_MIN)
 {//Move cursor down. Might need a call to $LK,"DocRecalc",A="MN:DocRecalc"$().
 //See $LK,"EdRenumAsm",A="MN:EdRenumAsm"$ for an example.
   Bool unlock=DocLock(doc);
   U8 *dst;
   I64 y,x,old_de_flags=0,old_color;
   CDocEntry *doc_ce=doc->cur_entry,*doc_ne,*doc_ce2;
-  if (sc!=MIN_I64) sc=sc.u32[0];
+  if (sc!=I64_MIN) sc=sc.u32[0];
   if (doc_ce->type_u8==DOCT_HEX_ED) {
     doc->cur_col=doc->cur_col+doc_ce->hex_ed_width*3;
     if (doc->cur_col>=doc_ce->len*3) {

@@ -280,7 +280,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
   if (diameter>=1)
     switch (n) {
       case 0:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=0;i<r;i++)
 	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
 		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
@@ -293,7 +293,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 1:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=r+1;i<diameter;i++)
 	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
 		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
@@ -306,7 +306,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 2:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=0;i<r;i++)
 	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
 		  gr.circle_hi[diameter][i]+cy,z,z);
@@ -319,7 +319,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 3:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=r+1;i<diameter;i++)
 	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
 		  gr.circle_hi[diameter][i]+cy,z,z);
@@ -332,7 +332,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 4:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=0;i<r;i++)
 	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
 		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
@@ -345,7 +345,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 5:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=r+1;i<diameter;i++)
 	    res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
 		  gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
@@ -358,7 +358,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 6:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=0;i<r;i++)
 	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
 		  gr.circle_hi[diameter][i]+cy,z,z);
@@ -371,7 +371,7 @@ I64 GrFillSemiCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter,I64 n)
 	}
 	break;
       case 7:
-	if (diameter<GR_NUM_PEN_BRUSHES)
+	if (diameter<GR_PEN_BRUSHES_NUM)
 	  for (i=r+1;i<diameter;i++)
 	    res+=GrVLine(dc,cx+i-r,gr.circle_lo[diameter][i]+cy,
 		  gr.circle_hi[diameter][i]+cy,z,z);
@@ -391,7 +391,7 @@ public I64 GrFillCircle(CDC *dc=gr.dc,I64 cx,I64 cy,I64 z=0,I64 diameter)
 {//2D. Clipping but not transformation.
   I64 res=0,i,k,r=diameter>>1,rr;
   if (diameter>=1) {
-    if (diameter<GR_NUM_PEN_BRUSHES)
+    if (diameter<GR_PEN_BRUSHES_NUM)
       for (i=0;i<diameter;i++)
 	res+=GrHLine(dc,gr.circle_lo[diameter][i]+cx,
 	      gr.circle_hi[diameter][i]+cx,cy+i-r,z,z);
@@ -462,7 +462,7 @@ public Bool GrPlot3(CDC *dc=gr.dc,I64 x,I64 y,I64 z)
   dc->db_z=z;
   if (dc->brush || w<=0)
     GrPlot1(dc,x,y);
-  else if (dc->pen_width<GR_NUM_PEN_BRUSHES) {
+  else if (dc->pen_width<GR_PEN_BRUSHES_NUM) {
     if (dc->color.c0.rop!=ROPB_COLLISION)
       dc->color.c0.rop=ROPB_MONO;
     if (dc->depth_buf) {

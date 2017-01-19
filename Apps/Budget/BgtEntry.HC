@@ -36,7 +36,7 @@ U0 BgtIns(CBgtEntry *tmpb)
 class CBgtEntryForm
 {
   U8	date[512]	fmtstr "$$DA-P,A=\"Date       :%s\"$$\n";
-  F64	amount		fmtstr "Amount     $$$$$$DA,A=\"%6.2f\"$$\n";
+  F64	amount		fmtstr "Amount     $$$$$$DA,A=\"%8.2f\"$$\n";
   U8	credit[512]	fmtstr "$$DA-P,A=\"Credit Acct:%s\"$$\n";
   U8	debit [512]	fmtstr "$$DA-P,A=\"Debit  Acct:%s\"$$\n";
   U8	desc  [512]	fmtstr "$$DA-P,A=\"Desc       :%s\"$$\n";

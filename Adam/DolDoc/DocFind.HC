@@ -17,7 +17,7 @@ public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
   return res;
 }
 
-public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=MIN_I64,
+public Bool DocFind(CDoc *haystack_doc,I64 start_line_num=I64_MIN,
 U8 *needle,I64 match=1)
 {//Find str by searching tags. Move cur_entry & center.
   Bool res=FALSE,unlock;
@@ -26,7 +26,7 @@ U8 *needle,I64 match=1)
   I64 i;
   if (haystack_doc) {
     unlock=DocLock(haystack_doc);
-    if (start_line_num==MIN_I64) {
+    if (start_line_num==I64_MIN) {
       res=TRUE;
       doc_e=haystack_doc->head.next;
     } else {

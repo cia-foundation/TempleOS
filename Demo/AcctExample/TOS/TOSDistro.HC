@@ -1,6 +1,6 @@
-//The CFG defines are $LK,"~/TOSCfg.HC",A="FI:::/Demo/AcctExample/TOSCfg.HC"$.
+//The CFG defines are $LK,"~/TOS/TOSCfg.HC",A="FI:::/Demo/AcctExample/TOS/TOSCfg.HC"$.
 
-#help_index "TOS"
+#help_index "Misc/TOS/Distro"
 
 #define MAKE_STD	1
 #define MAKE_STD_RS	0
@@ -13,8 +13,8 @@
 #define MAKE_DBG	0
 #define MAKE_STAFF	1
 
-U8 TOSGetDrv()
-{
+public U8 TOSGetDrv()
+{//Pmt for drv let.
   I64 res;
   "Drive (%s):",TOS_HDS;
   res=Let2Let(GetChar);
@@ -22,8 +22,8 @@ U8 TOSGetDrv()
   return res;
 }
 
-U0 TOSBootHDIns(U8 drv_let=0)
-{
+public U0 TOSBootHDIns(U8 drv_let=0)
+{//Make Compiler and Kernel. Reinstall Kernel.
   drv_let=Let2Let(drv_let);
   In(TOS_CFG);
   BootHDIns(drv_let);
@@ -31,8 +31,8 @@ U0 TOSBootHDIns(U8 drv_let=0)
     BootMHDIns(drv_let);
 }
 
-U0 TOSCopyDrv(U8 src,U8 dst)
-{
+public U0 TOSCopyDrv(U8 src,U8 dst)
+{//Fmt dst and copy entire drv.
   U8 buf_s[STR_LEN],buf_d[STR_LEN];
   src=Let2Let(src);
   dst=Let2Let(dst);
@@ -48,9 +48,9 @@ U0 TOSCopyDrv(U8 src,U8 dst)
   TOSBootHDIns(dst);
 }
 
-U0 TOSPromptAndCopyDrv()
-{
-  I64 src,dst;
+public U0 TOSPmtAndCopyDrv()
+{//Pmt for drv lets. Then, Fmt dst and copy entire drv.
+   I64 src,dst;
   "$$RED$$\nCopy Src Drive:\n$$FG$$";
   src=TOSGetDrv;
   "$$RED$$\nCopy Dst Drive:\n$$FG$$";
@@ -58,7 +58,7 @@ U0 TOSPromptAndCopyDrv()
   TOSCopyDrv(src,dst);
 }
 
-public U0 CopySongs(U8 threshold='7')
+U0 DistroSongsPrep(U8 threshold='7')
 {
   CDoc *doc;
   CDocEntry *doc_e;
@@ -79,10 +79,13 @@ public U0 CopySongs(U8 threshold='7')
 
 U0 DistroPrep()
 {
+  AOnceFlush; //Don't want in Registry
+  OnceFlush;
+
   Del("/Home/Demo*");
   DelTree("/Home/*Tmp.DD.Z");
   if (FileFind("/Home/Sup1/Sup1Hymns"))
-    CopySongs;
+    DistroSongsPrep;
 
   DelTree("/Tmp");
   MkDir("/Tmp");
@@ -102,13 +105,13 @@ U0 DistroPrep()
   Del("/Demo/AcctExample/Test*");
   Copy("/Home/Web/index.DD.Z",
 	"/Demo/ToHtmlToTXTDemo/DemoInPage.DD.Z");
-  if (FileFind("/Home/Sup1/Sup1Utils/SortHeaders.HC.Z"))
-    ExeFile("/Home/Sup1/Sup1Utils/SortHeaders.HC.Z");
+  if (FileFind("~/Sup1/Sup1Utils/SortHeaders.HC.Z"))
+    ExeFile("~/Sup1/Sup1Utils/SortHeaders.HC.Z");
 
-  if (FileFind("/Home/Sup1/Sup1Blog/YouTube.DD.Z"))
-    Sort("/Home/Sup1/Sup1Blog/YouTube.DD.Z",,2);
+  if (FileFind("~/Sup1/Sup1Blog/YouTube.DD.Z"))
+    Sort("~/Sup1/Sup1Blog/YouTube.DD.Z",,2);
 
-  //Once in a while, do $LK,"~/Sup1/Sup1Utils/DblSpaceScan.HC"$.
+  //Once in a while, do ~/Sup1/Sup1Utils/DblSpaceScan.HC.
 
   CursorRem("/*");
   DelTree("/Demo/*.BI*");
@@ -117,11 +120,11 @@ U0 DistroPrep()
   Move(ACD_DEF_FILENAME,ACD_DEF_FILENAME_Z);
 }
 
-U0 MakeBootRescueDrvFile()
+U0 DbgDistroFilePrep()
 {
   CBlkDev *bd;
   if (!Let2Drv('A',FALSE)) {
-    In(CFG_BOOT_RESCUE_DRV "\n");
+    In(CFG_DBG_DISTRO "\n");
     Mount;
   }
   bd=Let2BlkDev('A');
@@ -148,7 +151,7 @@ U0 MakeBootRescueDrvFile()
   Copy("C:/Adam/AMem.HC.Z",	"A:/Adam");
   Copy("C:/Adam/TaskRep.HC.Z",	"A:/Adam");
 
-  FileWrite("C:" CFG_BOOT_RESCUE_DRV_FILE,
+  FileWrite("C:" CFG_DBG_DISTRO_FILE,
 	bd->RAM_dsk,(bd->max_blk+1)<<BLK_SIZE_BITS);
 }
 
@@ -193,8 +196,8 @@ I64 MakeLineRepFile()
   DistroPrep;
 
   Cd("C:/");
-  DelTree("B:/TOS");
-  CopyTree("C:/Home","B:/TOS");
+  DelTree("B:/TOS/TOS");
+  CopyTree("C:/Home","B:/TOS/TOS");
   DelTree("C:/Home");
 
   DocMax;
@@ -202,7 +205,7 @@ I64 MakeLineRepFile()
   res=LineRep;
   if (doc=DocPut) {
     st=StrNew(doc->filename.name);
-    StrCpy(doc->filename.name,"B:/TOS/Web/LineRep.DD.Z");
+    StrCpy(doc->filename.name,"B:/TOS/TOS/Web/LineRep.DD.Z");
     DocWrite(doc);
     StrCpy(doc->filename.name,st);
     Free(st);
@@ -213,8 +216,8 @@ I64 MakeLineRepFile()
 	LineRep("C:/Compiler/*","-S+$$")+
 	LineRep("C:/Kernel/*");
   DocClear;
-  CopyTree("B:/TOS","C:/Home");
-  DelTree("B:/TOS");
+  CopyTree("B:/TOS/TOS","C:/Home");
+  DelTree("B:/TOS/TOS");
 
   doc=DocRead("C:/Adam/ADefine.HC.Z");
   DocTreeFind(doc,"LineRep",&tree_branch,&start_indent,&end_indent);
@@ -253,7 +256,7 @@ U0 MakeStaffDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOS_STAFF_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -262,7 +265,7 @@ U0 DbgDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  MakeBootRescueDrvFile;
+  DbgDistroFilePrep;
   In(TOS_DVD_DBG_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
@@ -280,7 +283,7 @@ U0 MakeDbgDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOS_DBG_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - Debug Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -306,7 +309,7 @@ U0 MakeStdDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -315,7 +318,7 @@ U0 MakeStdRedSeaDistro()
   StdDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -348,7 +351,7 @@ U0 MakeUltraDistro()
   ISO9660ISO(TOS_ISO_NAME,TOS_DISTRO_DIR "/*",,
 	TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOS_ULTRA_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -357,7 +360,7 @@ U0 MakeUltraRedSeaDistro()
   UltraDistroPrep;
   RedSeaISO(TOS_ISO_C_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
   DefinePrint("DD_TEMPLEOS_ULTRA_RS_SIZE",
-	"Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
+	"Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 	0.01*(100*Size(TOS_ISO_C_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -367,28 +370,28 @@ U0 UpdateISODocDefines()
   try {
 #if MAKE_STD
     DefinePrint("DD_TEMPLEOSCD_SIZE",
-	  "Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+	  "Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCD.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSCD.ISO","+s")/1024);
 #endif
 #if MAKE_STD_RS
     DefinePrint("DD_TEMPLEOSCD_RS_SIZE",
-	  "Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
+	  "Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - Standard RedSea Distro (%0.1fMB)",
 	  0.1*(10*Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_RS_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSCDRS.ISO","+s")/1024);
 #endif
 #if MAKE_ULTRA
     DefinePrint("DD_TEMPLEOS_ULTRA_SIZE",
-	  "Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
+	  "Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - UltraSmall Distro (%0.2fMB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltra.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOS_ULTRA_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSUltra.ISO","+s")/1024);
 #endif
 #if MAKE_ULTRA_RS
     DefinePrint("DD_TEMPLEOS_ULTRA_RS_SIZE",
-	  "Download $TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
+	  "Download $TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$ - UltraSmall RedSea Distro (%0.2fMB)",
 	  0.01*(100*Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOS_ULTRA_RS_K_SIZE",
 	  "%dKB",Size("D:/Wb/TempleOSUltraRS.ISO","+s")/1024);
@@ -399,32 +402,54 @@ U0 UpdateISODocDefines()
 UpdateISODocDefines;
 
 
+I64 tos_progress;
+F64 tos_progress_t0;
+
 U0 TOSProgress(U8 *st)
 {
   U8 buf[STR_LEN];
+  progress4=tos_progress;
+  progress3_max=1;
+  *progress4_desc=0;
+  progress4_max=13+MAKE_STD+MAKE_STD_RS+MAKE_ULTRA+MAKE_ULTRA_RS+MAKE_SUP1+
+	MAKE_WEB+MAKE_BOOKS1+MAKE_BOOKS2+MAKE_DBG+MAKE_STAFF;
+  progress4_t0=tos_progress_t0;
   StrPrint(buf,"%d. %s",++progress4,st);
   "$$PURPLE$$$$TX+CX,\"%s\"$$$$FG$$\n",buf;
   StrCpy(progress3_desc,buf);
+  tos_progress=progress4;
 }
 
-U0 TOSProfanity()
+I64 TOSProfanity()
 {
-  Profanity(,"D:/Wb/*;"
+  I64 res;
+  if (res=Profanity(,"D:/Wb/*;"
 	"!*/Misc/PCIDevices.DD*;!*/Misc/Bible.TXT*;"
 	"!*/Books?/*;!*/Sup1/Sup1Words/*;!*/Sup1/Sup1Blog/Profanity.DD*;"
-	"!*/Sup1/Sup1Blog/NumBible.TXT*;!*/God/Vocab.DD*"
-  );
+	"!*/Sup1/Sup1Blog/NumBible.TXT*;!*/God/Vocab.DD*")) {
+    while (PressAKey!=CH_SHIFT_ESC) {
+      ProgressBarsRst;
+      if (Profanity(,"C:/Home/*;"
+	    "!*/Misc/PCIDevices.DD*;!*/Misc/Bible.TXT*;"
+	    "!*/Books?/*;!*/Sup1/Sup1Words/*;!*/Sup1/Sup1Blog/Profanity.DD*;"
+	    "!*/Sup1/Sup1Blog/NumBible.TXT*;!*/God/Vocab.DD*")) {
+	"\n\nEdit profanity and press $FG,2$ESC$FG$.\n";
+	if (!View)
+	  break;
+	DocBottom;
+      } else
+	break;
+    }
+  }
+  return res;
 }
 
-public U0 TOSRegen()
+U0 TOSRegen3()
 {
+  I64 slash_home=0;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  progress3_max=1;
-  progress4=-1;
-  *progress4_desc=0;
-  progress4_max=12+MAKE_STD+MAKE_STD_RS+MAKE_ULTRA+MAKE_ULTRA_RS+MAKE_SUP1+
-	MAKE_WEB+MAKE_BOOKS1+MAKE_BOOKS2+MAKE_DBG+MAKE_STAFF;
-  progress4_t0=tS;
+  tos_progress=-1;
+  tos_progress_t0=tS;
   RegExe("TempleOS/TOSRegen");
 
   TOSProgress("ChkDsk All");
@@ -518,13 +543,16 @@ public U0 TOSRegen()
   MakeSymFiles;
 
   DocClear;
-  TOSProgress("Make WebSite");
-  MakeWebSite;
+  TOSProgress("Freshen WebSite");
+  FreshenSite;
 
   DocClear;
   TOSProgress("Check WebSite for Profanity");
   if (TOSProfanity)
     throw;
+
+  TOSProgress("Find /Home");
+  slash_home=F2("/Home","-i+la");
 
   TOSProgress("ChkDsk All");
   Drv('C');
@@ -532,14 +560,30 @@ public U0 TOSRegen()
 
   TOSProgress("Done");
   SettingsPop;
-  "Elapsed Time:%5.3f\n",tS-progress4_t0;
+  "F2(\"/Home\") Cnt\t:%d\n",slash_home;
+  "Elapsed Time\t:%5.3fs\n",tS-progress4_t0;
   ProgressBarsRst("TempleOS/TOSRegen");
 }
 
-public U0 PreBackUp()
-{
+public U0 TOSPreRegen()
+{//Copy bookmarks and bins from D:/Home/Sup1 to C:/Home/Sup1
   Copy("D:/Home/Sup1/Sup1Blog/Bookmarks.html","C:/Home/Sup1/Sup1Blog");
   Del("C:/Home/Sup1/Sup1Bin/*");
   Copy("D:/Home/Sup1/Sup1Bin/*","C:/Home/Sup1/Sup1Bin");
   Copy("D:/Home/Sup1/Sup1Bin/God*","C:/Linux");
+}
+
+U0 TOSRegen2()
+{
+  TOSChgLog; //$LK,"::/Doc/ChgLog.DD"$ datetime matches Kernel $LK,"sys_compile_time",A="MN:sys_compile_time"$.
+  TOSBootHDIns('C');
+  Once("TOSRegen3;");
+  BootRAM("C:/Kernel/" KERNEL_BIN_C); //Boot new Kernel and Compiler.
+}
+
+public U0 TOSRegen()
+{//Generate distro ISO's and website image, D:/Wb.
+  TOSBootHDIns('C');
+  Once("TOSRegen2;");
+  BootRAM("C:/Kernel/" KERNEL_BIN_C); //Boot to load $LK,"TOS_CFG",A="PF:::/Demo/AcctExample/TOS/TOSCfg.HC,TOS_CFG"$.
 }

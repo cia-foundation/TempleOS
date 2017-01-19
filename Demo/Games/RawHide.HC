@@ -17,7 +17,7 @@ CDC *map_dc;
 #define GATE_HEIGHT	7
 F64 gate_é,gate_t;
 
-$BG,10$
+
 
 $SP,"<1>",BI=1$	$SP,"<2>",BI=2$	$SP,"<3>",BI=3$
 
@@ -37,7 +37,7 @@ $SP,"<9>",BI=9$
 
 
 
-$BG$
+
 #define ANIMAL_WIDTH	20
 #define ANIMAL_HEIGHT	16
 
@@ -45,7 +45,7 @@ U8 *cow_imgs[4]  ={$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<2>",BI=
    *bull_imgs[4] ={$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$,$IB,"<5>",BI=5$},
    *horse_imgs[4]={$IB,"<7>",BI=7$,$IB,"<8>",BI=8$,$IB,"<7>",BI=7$,$IB,"<8>",BI=8$};
 
-#define NUM_ANIMALS	100
+#define ANIMALS_NUM	100
 
 class Animal
 {
@@ -84,8 +84,8 @@ U0 RiverMake()
       waterfall_width=r_width[y];
       waterfall_x=r_x[y]-waterfall_width/2;
     } else {
-      dx=ClampI64(dx+RandI32/64,-MAX_I32,MAX_I32)-MAX_I32/256;
-      w=ClampI64(w+RandI32*2,10*MAX_U32,150*MAX_U32);
+      dx=ClampI64(dx+RandI32/64,-I32_MAX,I32_MAX)-I32_MAX/256;
+      w=ClampI64(w+RandI32*2,10*U32_MAX,150*U32_MAX);
       x+=dx;
     }
   }
@@ -105,7 +105,7 @@ U0 RiverMake()
       map_dc->pen_width=r_width[y]+10;
       GrPlot3(map_dc,r_x[y]+x.i32[1],y,0);
     }
-    x=ClampI64(x+RandI32,-6*MAX_U32,6*MAX_U32);
+    x=ClampI64(x+RandI32,-6*U32_MAX,6*U32_MAX);
   }
 
   //Plot water
@@ -219,7 +219,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   RiverDropsDraw(dc,cx,cy);
 
-  for (i=0;i<NUM_ANIMALS;i++)
+  for (i=0;i<ANIMALS_NUM;i++)
     if (!a[i].dead) {
       if (a[i].dx<0) {
 	dc->flags|=DCF_JUST_MIRROR|DCF_SYMMETRY;
@@ -262,8 +262,8 @@ U0 DrawIt(CTask *task,CDC *dc)
 
 U0 BuddySel(I64 i)
 {
-  I64 b,best_b=i,score,best_score=MAX_I64;
-  for (b=0;b<NUM_ANIMALS;b++) {
+  I64 b,best_b=i,score,best_score=I64_MAX;
+  for (b=0;b<ANIMALS_NUM;b++) {
     if (b!=i && !a[b].dead) {
       score=RandU32%(512*512)+
 	    SqrI64(a[b].x.i32[1]-a[i].x.i32[1])+
@@ -328,12 +328,12 @@ Bool CheckMap(I64 x,I64 y)
 
 U0 AnimateTask(CTask *parent)
 {
-  I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=MAX_I64,updates=0,
+  I64 i,cx,cy,cursor_x,cursor_y,dd,ddx,ddy,cnt,max_speed=I64_MAX,updates=0,
 	my_outside_cnt;
   F64 f,d,dx,dy,s,stress;
   Animal *tmpa,*tmpa1;
   while (TRUE) {
-    max_speed=ClampU64(max_speed,MAX_U32/3,200*MAX_U32);
+    max_speed=ClampU64(max_speed,U32_MAX/3,200*U32_MAX);
     cx=(MAP_WIDTH -parent->pix_width)/2,
 	  cy=(MAP_HEIGHT-parent->pix_height)/2;
     cursor_x=ms.pos.x+cx-parent->pix_left-parent->scroll_x;
@@ -343,7 +343,7 @@ U0 AnimateTask(CTask *parent)
     if (cursor_x<FENCE_WIDTH && cursor_y<FENCE_HEIGHT)
       gate_t=tS;
     RedrawGate;
-    for (i=0;i<NUM_ANIMALS;i++) {
+    for (i=0;i<ANIMALS_NUM;i++) {
       tmpa=&a[i];
       if (!tmpa->dead) {
 //Move away from horse
@@ -353,14 +353,14 @@ U0 AnimateTask(CTask *parent)
 	  d=Sqrt(dd);
 	  dx=ddx/d;
 	  dy=ddy/d;
-	  f=5.0e2*MAX_U32/dd;
+	  f=5.0e2*U32_MAX/dd;
 	  tmpa->dx+=f*dx;
 	  tmpa->dy+=f*dy;
 	}
 
-	//Resel buddy about every NUM_ANIMALS*10ms=5.12 seconds
+	//Resel buddy about every ANIMALS_NUM*10ms=5.12 seconds
 	tmpa1=&a[tmpa->buddy];
-	if (tmpa1->dead || i==updates%NUM_ANIMALS) {
+	if (tmpa1->dead || i==updates%ANIMALS_NUM) {
 	  BuddySel(i);
 	  tmpa1=&a[tmpa->buddy];
 	}
@@ -374,7 +374,7 @@ U0 AnimateTask(CTask *parent)
 	  stress+=Abs(s);
 	  dx=ddx/d;
 	  dy=ddy/d;
-	  f=-0.001*s*MAX_U32;
+	  f=-0.001*s*U32_MAX;
 	  tmpa->dx+=f*dx;
 	  tmpa->dy+=f*dy;
 	}
@@ -438,7 +438,7 @@ U0 AnimateTask(CTask *parent)
       stress=0;
     if (stress>100.0) {
       Yield;
-      max_speed=stress/5.0*MAX_U32; //Converge faster at start-up
+      max_speed=stress/5.0*U32_MAX; //Converge faster at start-up
     } else {
       Sleep(10);
       max_speed=0; //Will be set to normal max speed
@@ -487,8 +487,8 @@ U0 ReInit()
   for (i=MAP_BORDER;i<=MAP_HEIGHT-MAP_BORDER;i++)
     RiverDropsNext(Fs);
 
-  MemSet(a,0,NUM_ANIMALS*sizeof(Animal));
-  for (i=0;i<NUM_ANIMALS;i++) {
+  MemSet(a,0,ANIMALS_NUM*sizeof(Animal));
+  for (i=0;i<ANIMALS_NUM;i++) {
     a[i].num=i;
     do {
       a[i].x=(64+RandU32%(MAP_WIDTH-128))<<32;
@@ -501,7 +501,7 @@ U0 ReInit()
     a[i].frame0=RandU16&3;
     BuddySel(i);
   }
-  outside_cnt=NUM_ANIMALS;
+  outside_cnt=ANIMALS_NUM;
   gate_t=0;
   gate_é=0;
   t0=tS;
@@ -514,7 +514,7 @@ U0 Init()
   rd_lock=0;
   QueInit(&rd_head);
   map_dc=DCNew(MAP_WIDTH,MAP_HEIGHT);
-  a=MAlloc(NUM_ANIMALS*sizeof(Animal));
+  a=MAlloc(ANIMALS_NUM*sizeof(Animal));
   ReInit;
 }
 

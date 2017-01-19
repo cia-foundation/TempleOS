@@ -1,7 +1,7 @@
 //This is run in a $LK,"#exe",A="FF:::/Kernel/Kernel.PRJ,KCfg"${}.
 
 U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0StaffMode\0"
-"HomeDir\0NoMP\0TextMode\0DontProbe\0AutoMountIDE\0BootRescueDrv\0Help\0";
+"HomeDir\0NoMP\0TextMode\0DontProbe\0AutoMountIDE\0DbgDistro\0Help\0";
 
 #define CFG_MEM_INIT		0
 #define CFG_HEAP_INIT		1
@@ -12,23 +12,23 @@ U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0StaffMode\0"
 #define CFG_TEXT_MODE		6
 #define CFG_DONT_PROBE		7
 #define CFG_AUTO_MOUNT_IDE	8
-#define CFG_BOOT_RESCUE_DRV	9
-#define CFG_NUM_OPTIONS		10
+#define CFG_DBG_DISTRO	9
+#define CFG_OPTIONS_NUM		10
 
 #define CFG_HELP		10
 
-class CKernelCfg
+class CKCfg
 {
   U8 *dsk_cache_size_exp;
   CDoc *add_dev;
-  U8 *boot_rescue_drv_file,*boot_rescue_drv_start;
+  U8 *dbg_distro_file,*dbg_distro_start;
   U8 *home_dir;
-  Bool opts[CFG_NUM_OPTIONS];
+  Bool opts[CFG_OPTIONS_NUM];
   U8 mem_init_val,heap_init_val,var_init_val,
 	boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
 };
 
-CDoc *KernelCfgAddDev(CKernelCfg *c)
+CDoc *KCfgAddDev(CKCfg *c)
 {
   I64 ch;
   CDoc *doc=DocNew;
@@ -47,14 +47,14 @@ CDoc *KernelCfgAddDev(CKernelCfg *c)
   return doc;
 }
 
-U0 KernelCfgOptions(CKernelCfg *c)
+U0 KCfgOptions(CKCfg *c)
 {
   I64 i;
   U8 *st=NULL,*st2,*st3;
   Bool state;
   do {
     Free(st);
-    for (i=0;i<CFG_NUM_OPTIONS;i++)
+    for (i=0;i<CFG_OPTIONS_NUM;i++)
       if (i==CFG_HOME_DIR)
 	"$$PURPLE$$%13tz$$FG$$:\"%s\"\n",i,kernel_cfg_options,c->home_dir;
       else
@@ -73,10 +73,10 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	    "$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
 	    "$$PURPLE$$DontProbe$$FG$$ Just prompt CD/DVD ports, don't probe.\n"
 	    "$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
-	    "$$PURPLE$$BootRescueDrv$$FG$$ Include RAM Drv in Kernel.BIN.\n"
+	    "$$PURPLE$$DbgDistro$$FG$$ Include RAM Drv in Kernel.BIN.\n"
 	    "\n";
     else
-      if (0<=i<CFG_NUM_OPTIONS) {
+      if (0<=i<CFG_OPTIONS_NUM) {
 	state=c->opts[i]=!c->opts[i];
 	switch (i) {
 	  case CFG_MEM_INIT:
@@ -133,13 +133,13 @@ U0 KernelCfgOptions(CKernelCfg *c)
 	      c->auto_mount_ide_cd_let=0;
 	    }
 	    break;
-	  case CFG_BOOT_RESCUE_DRV:
-	    Free(c->boot_rescue_drv_file);
-	    c->boot_rescue_drv_file=0;
-	    c->boot_rescue_drv_start=0;
+	  case CFG_DBG_DISTRO:
+	    Free(c->dbg_distro_file);
+	    c->dbg_distro_file=0;
+	    c->dbg_distro_start=0;
 	    if (state) {
-	      c->boot_rescue_drv_file=GetStr("Boot Rescue Drv File:");
-	      c->boot_rescue_drv_start=GetI64("Boot Rescue Drv Start:");
+	      c->dbg_distro_file=GetStr("Dbg Distro File:");
+	      c->dbg_distro_start=GetI64("Dbg Distro Start:");
 	    }
 	    break;
 	}
@@ -148,25 +148,25 @@ U0 KernelCfgOptions(CKernelCfg *c)
   Free(st);
 }
 
-CKernelCfg *KernelCfgNew()
+CKCfg *KCfgNew()
 {
-  CKernelCfg *c=CAlloc(sizeof(CKernelCfg));
+  CKCfg *c=CAlloc(sizeof(CKCfg));
 
-  c->add_dev=KernelCfgAddDev(c);
+  c->add_dev=KCfgAddDev(c);
   c->home_dir=StrNew("::/Home");
   c->dsk_cache_size_exp=GetStr(
 	"Disk Cache Size in Bytes,\n"
 	"gets rounded-up funny,\n"
 	"($$PURPLE$$<ENTER>$$FG$$ will use default.):",
 	"Scale2Mem(0x80000,0x8000000)");
-  KernelCfgOptions(c);
+  KCfgOptions(c);
   return c;
 }
  
-U0 KernelCfgDel(CKernelCfg *c)
+U0 KCfgDel(CKCfg *c)
 {
   DocDel(c->add_dev);
-  Free(c->boot_rescue_drv_file);
+  Free(c->dbg_distro_file);
   Free(c->home_dir);
   Free(c->dsk_cache_size_exp);
   Free(c);

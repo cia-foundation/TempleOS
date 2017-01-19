@@ -62,13 +62,13 @@ I64 man_x,man_y,man_dx,man_dy;
 Bool man_attack;
 F64 man_attack_t0;
 
-#define NUM_MONSTERS	10
+#define MONSTERS_NUM	10
 I64 monsters_left;
 class Monster
 {
   I64 x,y,dx,dy;
   Bool dead,pad[7];
-} monsters[NUM_MONSTERS];
+} monsters[MONSTERS_NUM];
 
 F64 t0,tf;
 
@@ -176,7 +176,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       }
   }
 
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++)
     if (!tmpm->dead && LOS(tmpm->x,tmpm->y,man_x,man_y)) {
       x1=(tmpm->x-scrn_x)*SCRN_SCALE+SCRN_SCALE/2;
       y1=(tmpm->y-scrn_y)*SCRN_SCALE+SCRN_SCALE/2;
@@ -233,7 +233,7 @@ U0 Attack()
 
   man_attack_t0=tS;
   Noise(100,53,74);
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++) {
     if (!tmpm->dead &&
 	  man_x+man_dx==tmpm->x && man_y+man_dy==tmpm->y) {
       tmpm->dead=TRUE;
@@ -270,7 +270,7 @@ U0 Init()
   man_dy=0;
   scrn_x=0;
   scrn_y=0;
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++) {
     tmpm->dead=FALSE;
     tmpm->dx=0;
     tmpm->dy=0;
@@ -279,7 +279,7 @@ U0 Init()
       tmpm->y=RandU64%(map_height-2)+1;
     } while (!map[(tmpm->y)*map_width+tmpm->x]);
   }
-  monsters_left=NUM_MONSTERS;
+  monsters_left=MONSTERS_NUM;
   tf=0;
   t0=tS;
 }
@@ -296,7 +296,7 @@ U0 AnimateTask(I64)
   Monster *tmpm;
 
   while (TRUE) {
-    for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+    for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++)
       if (!tmpm->dead) {
 	dx=RandU16%3-1;
 	dy=RandU16%3-1;

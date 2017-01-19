@@ -210,11 +210,11 @@ public U0 MemPageRep()
   else
     "$$RED$$2MEG$$FG$$ pages\n";
   "PML2\t  :%010X 2MEG  :%08X\n",
-	*MEM_PML2(U64 *),*MEM_NUM_2MEG(U64 *);
+	*MEM_PML2(U64 *),*MEM_2MEG_NUM(U64 *);
   "PML3\t  :%010X 1GIG  :%08X\n",
-	*MEM_PML3(U64 *),*MEM_NUM_1GIG(U64 *);
+	*MEM_PML3(U64 *),*MEM_1GIG_NUM(U64 *);
   "PML4\t  :%010X 512GIG:%08X\n",
-	*MEM_PML4(U64 *),*MEM_NUM_512GIG(U64 *);
+	*MEM_PML4(U64 *),*MEM_512GIG_NUM(U64 *);
   "FIXED_AREA:%010X\n",SYS_FIXED_AREA;
   "HEAP_BASE :%010X\nHEAP_LIMIT:%010X\n",mem_heap_base,mem_heap_limit;
 }

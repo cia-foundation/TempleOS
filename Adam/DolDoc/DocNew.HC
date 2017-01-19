@@ -276,7 +276,7 @@ public U0 DocRst(CDoc *doc,Bool is_old)
   doc->dollar_buf_ptr=0;
   doc->cmd_U8=CH_SPACE;
   doc->page_line_num=0;
-  doc->best_d=MAX_I64;
+  doc->best_d=I64_MAX;
 
   s=&doc->settings_head;
   s->left_margin=DOC_DFT;
@@ -376,7 +376,7 @@ public CDoc *DocNew(U8 *filename=NULL,CTask *task=NULL)
   doc->left_click_link=&EdLeftClickLink;
   doc->dollar_buf_size=84;
   doc->dollar_buf=MAlloc(doc->dollar_buf_size,task);
-  doc->max_entries=MAX_I64;
+  doc->max_entries=I64_MAX;
   doc->win_task=task;
   doc->mem_task=task;
   DocRst(doc,FALSE);

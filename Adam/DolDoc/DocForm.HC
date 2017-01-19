@@ -223,8 +223,8 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
   doc->desc='Form';
   if (header) DocPrint(doc,"%s",header);
   doc->flags|=DOCF_OVERSTRIKE|DOCF_FORM;
-  if (dof_flags&DOF_MIN_SIZE)
-    doc->flags|=DOCF_MIN_SIZE;
+  if (dof_flags&DOF_SIZE_MIN)
+    doc->flags|=DOCF_SIZE_MIN;
   ml=tmpc->member_lst_and_root;
   while (ml) {
     if ((fmtstr=MemberMetaData("fmtstr",ml)) &&
@@ -332,12 +332,12 @@ dm_restart:
 
 public I64 PopUpMenu(CDoc *doc,I64 dof_flags=0)
 {//Run menu chooser doc in PopUp win task.
-  doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
+  doc->flags|=DOCF_SIZE_MIN | DOCF_FORM;
   return PopUpPrint("DocMenu(0x%X,0x%X);",doc,dof_flags);
 }
 
 public Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,
-	I64 dof_flags=DOF_MIN_SIZE,U8 *header=NULL,U8 *footer=NULL)
+	I64 dof_flags=DOF_SIZE_MIN,U8 *header=NULL,U8 *footer=NULL)
 {//See $LK,"::/Demo/DolDoc/Form.HC"$ and $LK,"::/Demo/LastClass.HC"$.
   return PopUpPrint("DocForm(0x%X,0x%X,0x%X,0x%X,0x%X);",_d,class_name,
 	dof_flags,header,footer);

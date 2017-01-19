@@ -115,7 +115,7 @@ U0 BlkDevsRelease()
 {//When task dies, release all owned BlkDevs.
   I64 i;
   CBlkDev *bd;
-  for (i=0;i<NUM_BLKDEVS;i++) {
+  for (i=0;i<BLKDEVS_NUM;i++) {
     bd=&blkdev.blkdevs[i];
     if (bd->owning_task==Fs && bd->bd_signature==BD_SIGNATURE_VAL)
       BlkDevUnlock(bd,TRUE);
@@ -151,7 +151,7 @@ CBlkDev *BlkDevNextFreeSlot(U8 first_drv_let,I64 type)
       }
       return res;
     }
-  } while (++i<NUM_BLKDEVS);
+  } while (++i<BLKDEVS_NUM);
   throw('BlkDev');
   return NULL; //never gets here
 }
@@ -168,7 +168,7 @@ U0 BlkDevDel(CBlkDev *bd)
 CBlkDev *BlkDevChk(CBlkDev *bd,Bool except=TRUE)
 {//Check for valid BlkDev. Throw exception.
   if (!bd || bd->bd_signature!=BD_SIGNATURE_VAL ||
-	!(BDT_NULL<bd->type<BDT_NUM_TYPES)) {
+	!(BDT_NULL<bd->type<BDT_TYPES_NUM)) {
     if (except)
       throw('BlkDev');
     else

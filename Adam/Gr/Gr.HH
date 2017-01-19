@@ -147,7 +147,7 @@ public class CSpritePtMeshU8s : CSpriteBase
 #define SPT_TEXT		27	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_TEXT_BOX		28	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
 #define SPT_TEXT_DIAMOND	29	//$LK,"CSpritePtStr",A="MN:CSpritePtStr"$
-#define SPT_NUM_TYPES		30
+#define SPT_TYPES_NUM		30
 #define SPG_TYPE_MASK		0x7F
 
 #help_index "Graphics/Sprite;Sprites;Sprites/Binary"

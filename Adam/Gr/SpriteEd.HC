@@ -661,7 +661,7 @@ U0 SpriteSideBarTask(CTask *parent,CSprite **_head,I64 *_cur_elem_num)
   CDocEntry *doc_e;
   CDoc *doc=DocPut;
   Spawn(&SpriteSideBarTask2,parent,"CSpriteTask",,Fs);
-  doc->flags|=DOCF_MIN_SIZE|DOCF_FORM;
+  doc->flags|=DOCF_SIZE_MIN|DOCF_FORM;
   while (TRUE) {
     SpriteSideBarPickNew(doc,*_head,*_cur_elem_num);
     DocHighlightCursor(,doc);
@@ -977,7 +977,7 @@ Bool SpriteSelUnselShiftPts(U8 *elems,I64 x,I64 y,I64 *_cur_elem_num,I64 mode)
 	    case SPED_UNSEL:
 	    case SPED_SHIFT_PTS:
 	      xx=arg1; yy=arg2;
-	      best_dd=MAX_I64;
+	      best_dd=I64_MAX;
 	      tmpes=head.next;
 	      while (tmpes!=&head) {
 		switch (tmpes->type) {

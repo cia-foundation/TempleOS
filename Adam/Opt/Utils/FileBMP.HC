@@ -1,6 +1,6 @@
 #help_index "Graphics/Windows BMP Files"
 
-#define NUM_BMP_COLORS	16
+#define BMP_COLORS_NUM	16
 
 class CFileBMP
 {
@@ -23,13 +23,13 @@ class CFileBMP
 
   U0 end;
 
-  CBGR24 palette[NUM_BMP_COLORS];
+  CBGR24 palette[BMP_COLORS_NUM];
 };
 
 public CFileBMP *BMP4To(CDC *dc)
 {//To Windows 4-bit BMP.
   U8 *src,*ptr;
-  CBGR48 palette[NUM_COLORS];
+  CBGR48 palette[COLORS_NUM];
   I64 i,x,y,w=dc->width>>1,
 	size=sizeof(CFileBMP)+dc->width*dc->height>>1;
   CFileBMP *bmp	=CAlloc(size);
@@ -43,8 +43,8 @@ public CFileBMP *BMP4To(CDC *dc)
   bmp->bit_cnt	=4;
   bmp->image_size	=dc->width*dc->height>>1;
   GrPaletteGet(palette);
-#assert NUM_COLORS==NUM_BMP_COLORS
-  for (i=0;i<NUM_BMP_COLORS;i++) {
+#assert COLORS_NUM==BMP_COLORS_NUM
+  for (i=0;i<BMP_COLORS_NUM;i++) {
     bmp->palette[i].b=palette[i].b>>8;
     bmp->palette[i].g=palette[i].g>>8;
     bmp->palette[i].r=palette[i].r>>8;
@@ -66,7 +66,7 @@ public CFileBMP *BMPRLE4To(CDC *dc)
 {//To Windows RLE4 bit BMP.
   U8 *src,*ptr,*start;
   I64 i,x,y,w=dc->width,cnt,pattern;
-  CBGR48 palette[NUM_COLORS];
+  CBGR48 palette[COLORS_NUM];
   CFileBMP *bmp	=CAlloc(sizeof(CFileBMP)+2*(dc->width+1)*dc->height);
   bmp->type	='BM';
   bmp->planes	=1;
@@ -77,8 +77,8 @@ public CFileBMP *BMPRLE4To(CDC *dc)
   bmp->bit_cnt	=4;
   bmp->compression=2; //RLE4
   GrPaletteGet(palette);
-#assert NUM_COLORS==NUM_BMP_COLORS
-  for (i=0;i<NUM_BMP_COLORS;i++) {
+#assert COLORS_NUM==BMP_COLORS_NUM
+  for (i=0;i<BMP_COLORS_NUM;i++) {
     bmp->palette[i].b=palette[i].b>>8;
     bmp->palette[i].g=palette[i].g>>8;
     bmp->palette[i].r=palette[i].r>>8;
@@ -94,7 +94,7 @@ public CFileBMP *BMPRLE4To(CDC *dc)
 	src+=2;
 	cnt=2;
 	x+=2;
-	while (x<w && cnt<MAX_U8) {
+	while (x<w && cnt<U8_MAX) {
 	  if (*src&15==pattern&15) {
 	    src++;
 	    cnt++;
@@ -184,14 +184,14 @@ public I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4)
 U8 *BMPPaletteNew(CFileBMP *bmp)
 {
   I64 i,j,best,score,best_score;
-  CBGR48 palette[NUM_COLORS];
-  U8 *res=CAlloc(NUM_BMP_COLORS*sizeof(U8));
+  CBGR48 palette[COLORS_NUM];
+  U8 *res=CAlloc(BMP_COLORS_NUM*sizeof(U8));
   GrPaletteGet(palette);
-#assert NUM_COLORS==NUM_BMP_COLORS
-  for (i=0;i<NUM_BMP_COLORS;i++) {
+#assert COLORS_NUM==BMP_COLORS_NUM
+  for (i=0;i<BMP_COLORS_NUM;i++) {
     best=i;
-    best_score=MAX_I64;
-    for (j=0;j<NUM_BMP_COLORS;j++) {
+    best_score=I64_MAX;
+    for (j=0;j<BMP_COLORS_NUM;j++) {
       score=SqrI64(bmp->palette[i].r-palette[j].r>>8)+
 	    SqrI64(bmp->palette[i].g-palette[j].g>>8)+
 	    SqrI64(bmp->palette[i].b-palette[j].b>>8);
@@ -205,7 +205,7 @@ U8 *BMPPaletteNew(CFileBMP *bmp)
   return res;
 }
 
-U8 ms_paint_palette[NUM_BMP_COLORS]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
+U8 ms_paint_palette[BMP_COLORS_NUM]={0,4,2,6,1,5,3,8,7,12,10,14,9,13,11,15};
 
 I64 BMP24Color(CBGR24 *ptr,Bool dither_probability)
 {
@@ -245,7 +245,7 @@ public CDC *BMPRead(U8 *filename,Bool dither_probability=FALSE,
   CDC *res=NULL;
   if (ptr=FileRead(filename)) {
     bmp=ptr;
-    if (0<bmp->width<MAX_I32 && 0<bmp->height<MAX_I32) {
+    if (0<bmp->width<I32_MAX && 0<bmp->height<I32_MAX) {
       res=DCNew(bmp->width,bmp->height);
       ptr+=bmp->data_offset;
       if (bmp->compression==2)

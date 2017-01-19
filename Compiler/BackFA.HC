@@ -309,7 +309,7 @@ U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tmpi,U8 *buf,I64 rip)
 	throw('Compiler');
       else {
 	i=tmpex->val-(rip+tmpi->ic_cnt+5);
-	if (!(MIN_I32<=i<=MAX_I32)) {
+	if (!(I32_MIN<=i<=I32_MAX)) {
 	  throw('Compiler');
 //	    ICU16(tmpi,0xBB48);
 	  //	    ICU64(tmpi,tmpex->val);
@@ -322,7 +322,7 @@ U0 ICFPow(CCmpCtrl *cc,CIntermediateCode *tmpi,U8 *buf,I64 rip)
     }
   } else {
     i=tmpex->val-(rip+tmpi->ic_cnt+5);
-    if (!(MIN_I32<=i<=MAX_I32)) {
+    if (!(I32_MIN<=i<=I32_MAX)) {
       ICU16(tmpi,0xBB48);
       ICU64(tmpi,tmpex->val);
       ICU16(tmpi,0xD3FF);

@@ -1,5 +1,10 @@
 #help_index "DolDoc/Misc"
 
+CColorROPU32 highlight_hash_type_colors[HTt_TYPES_NUM]=
+	DOC_COLOR_EXPORT_SYS_SYM,0,DOC_COLOR_DEFINE_STR,DOC_COLOR_GLBL_VAR,
+	DOC_COLOR_CLASS,DOC_COLOR_KEYWORD,DOC_COLOR_FUN,0,0,DOC_COLOR_KEYWORD,
+	DOC_COLOR_KEYWORD,DOC_COLOR_KEYWORD,DOC_COLOR_REG,0,0,0,0};
+
 U32 *DocHighlight(CDocEntry *doc_e,U8 *src,I64 len,I64 _tmp_u32_attr)
 {//Be aware of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
   U32 *res=MAlloc((len+1)*sizeof(U32)),*dst=res;
@@ -35,12 +40,12 @@ hl_normal:
 	      }
 	      break;
 	    case '\'':
-	      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+	      tmp_u32_attr=DOC_COLOR_CHAR_CONST<<8|mask_tmp_u32_attr;
 	      *dst++=ch1+tmp_u32_attr;
 	      len--;
 	      goto hl_single_quote;
 	    case '\"':
-	      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+	      tmp_u32_attr=DOC_COLOR_STR<<8|mask_tmp_u32_attr;
 	      *dst++=ch1+tmp_u32_attr;
 	      len--;
 	      goto hl_dbl_quote;
@@ -71,13 +76,13 @@ hl_normal:
 	}
 	ch=*src;
 	*src=0;
-	if (tmph=HashFind(ptr,cmp.asm_hash,
-	      HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE|HTT_REG)) {
-	  if (tmph->type&(HTT_KEYWORD|HTT_ASM_KEYWORD|HTT_OPCODE))
-	    tmp_u32_attr=DOC_COLOR_KEYWORD<<8|mask_tmp_u32_attr;
-	  else
-	    tmp_u32_attr=DOC_COLOR_KEYWORD2<<8|mask_tmp_u32_attr;
-	} else
+	if (tmph=HashFind(ptr,adam_task->hash_table,
+	      HTT_EXPORT_SYS_SYM|HTT_DEFINE_STR|HTT_GLBL_VAR|HTT_CLASS|
+	      HTT_INTERNAL_TYPE|HTT_FUN|HTT_KEYWORD|HTT_ASM_KEYWORD|
+	      HTT_OPCODE|HTT_REG))
+	  tmp_u32_attr=highlight_hash_type_colors[HashTypeNum(tmph)]<<8|
+		mask_tmp_u32_attr;
+	else
 	  tmp_u32_attr=_tmp_u32_attr;
 	while (ch1=*ptr++)
 	  *dst++=ch1+tmp_u32_attr;
@@ -88,7 +93,7 @@ hl_normal_done:
       s->comment_depth=0;
       break;
     case DOCSS_SINGLE_QUOTE:
-      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_CHAR_CONST<<8|mask_tmp_u32_attr;
 hl_single_quote:
       last_ch=0;
       while (len--) {
@@ -105,7 +110,7 @@ hl_single_quote:
       s->comment_depth=0;
       break;
     case DOCSS_DBL_QUOTE:
-      tmp_u32_attr=DOC_COLOR_QUOTE<<8|mask_tmp_u32_attr;
+      tmp_u32_attr=DOC_COLOR_CHAR_CONST<<8|mask_tmp_u32_attr;
 hl_dbl_quote:
       last_ch=0;
       while (len--) {

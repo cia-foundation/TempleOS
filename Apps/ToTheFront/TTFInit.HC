@@ -234,7 +234,7 @@ U0 InitUnits()
   I64 i,j,row,col,type;
   Unit *tmpu;
   MemSet(units,0,sizeof(units));
-  alive_cnt[0]=alive_cnt[1]=MAX_UNITS;
+  alive_cnt[0]=alive_cnt[1]=UNITS_NUM;
   for (j=0;j<2;j++)
     for (i=0;i<alive_cnt[j];i++) {
       tmpu=&units[j][i];
@@ -243,25 +243,25 @@ U0 InitUnits()
       tmpu->life=100;
       tmpu->facing=RandU16%6;
       if (!j) {
-	if (i>=MAX_UNITS/2) {
-	  if (i>=15*MAX_UNITS/16)
+	if (i>=UNITS_NUM/2) {
+	  if (i>=15*UNITS_NUM/16)
 	    type=UT_ARTILLERY;
 	  else
 	    type=UT_INFANTRY;
 	} else {
-	  if (i>=MAX_UNITS/4)
+	  if (i>=UNITS_NUM/4)
 	    type=UT_MD_TANK;
 	  else
 	    type=UT_LT_TANK;
 	}
       } else {
-	if (i>=MAX_UNITS/2) {
-	  if (i>=15*MAX_UNITS/16)
+	if (i>=UNITS_NUM/2) {
+	  if (i>=15*UNITS_NUM/16)
 	    type=UT_ARTILLERY;
 	  else
 	    type=UT_INFANTRY;
 	} else {
-	  if (i>=MAX_UNITS/4)
+	  if (i>=UNITS_NUM/4)
 	    type=UT_MD_TANK;
 	  else
 	    type=UT_LT_TANK;

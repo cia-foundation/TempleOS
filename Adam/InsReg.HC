@@ -1,4 +1,4 @@
-#help_index "Misc/Install Registration"
+#help_index "Registry/Install Registration"
 
 public CInsReg ins_reg;
 MemSet(&ins_reg,0,sizeof(CInsReg));
@@ -31,7 +31,7 @@ public Bool InsReg(U8 drv_let=0,I64 action=RR_REGISTER)
     if (drv_let)
       *sys_registry_doc->filename.name=drv_let;
     RegWrite("Adam/InsReg",
-	"#help_index \"Misc/Install Registration\"\n"
+	"#help_index \"Registry/Install Registration\"\n"
 	"MemSet(&ins_reg,0,sizeof(CInsReg));\n"
 	"ins_reg.registered=%d;\n"
 	"ins_reg.host_os=%d;\n"

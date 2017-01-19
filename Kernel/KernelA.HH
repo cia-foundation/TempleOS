@@ -21,30 +21,30 @@ extern class CTask;
 #define FALSE	0
 #define ON	1
 #define OFF	0
-#define MIN_I8 (-0x80)
-#define MAX_I8 0x7F
-#define MIN_U8 0
-#define MAX_U8 0xFF
-#define MIN_I16 (-0x8000)
-#define MAX_I16 0x7FFF
-#define MIN_U16 0
-#define MAX_U16 0xFFFF
-#define MIN_I32 (-0x80000000)
-#define MAX_I32 0x7FFFFFFF
-#define MIN_U32 0
-#define MAX_U32 0xFFFFFFFF
-#define MIN_I64 (-0x8000000000000000)
-#define MAX_I64 0x7FFFFFFFFFFFFFFF
-#define MIN_U64 0
-#define MAX_U64 0xFFFFFFFFFFFFFFFF
-#define INVALID_PTR	MAX_I64
+#define I8_MIN (-0x80)
+#define I8_MAX 0x7F
+#define U8_MIN 0
+#define U8_MAX 0xFF
+#define I16_MIN (-0x8000)
+#define I16_MAX 0x7FFF
+#define U16_MIN 0
+#define U16_MAX 0xFFFF
+#define I32_MIN (-0x80000000)
+#define I32_MAX 0x7FFFFFFF
+#define U32_MIN 0
+#define U32_MAX 0xFFFFFFFF
+#define I64_MIN (-0x8000000000000000)
+#define I64_MAX 0x7FFFFFFFFFFFFFFF
+#define U64_MIN 0
+#define U64_MAX 0xFFFFFFFFFFFFFFFF
+#define INVALID_PTR	I64_MAX
 #define STR_LEN 144
 
 //(Int to F64 conversion is signed)
 //Turn off 80-bit float constants with $LK,"OPTf_NO_BUILTIN_CONST",A="MN:OPTf_NO_BUILTIN_CONST"$.
-#define MAX_U64_F64 (0x43F0000000000000(F64))
-#define MAX_F64 (0x7FEFFFFFFFFFFFFF(F64))
-#define MIN_F64 (0xFFEFFFFFFFFFFFFF(F64))
+#define U64_F64_MAX (0x43F0000000000000(F64))
+#define F64_MAX (0x7FEFFFFFFFFFFFFF(F64))
+#define F64_MIN (0xFFEFFFFFFFFFFFFF(F64))
 #define inf	(0x7FF0000000000000(F64))
 #define ì	(0x7FF0000000000000(F64))
 #define pi	(0x400921FB54442D18(F64))
@@ -301,7 +301,7 @@ public class CMathODE
 //0xFF for your own interrupts.
 #define I_USER			0x40
 
-#define MP_MAX_PROCESSORS	128
+#define MP_PROCESSORS_NUM	128
 
 #define SYS_START_CR0		0x0031
 
@@ -343,8 +343,8 @@ class CGDT
   CGDTEntry cs64_ring3;	//$LK,"Ring3",A="FI:::/Demo/Lectures/Ring3.HC"$, in case you want to play around.
   CGDTEntry ds;
   CGDTEntry ds_ring3;
-  CGDTEntry tr[MP_MAX_PROCESSORS];
-  CGDTEntry tr_ring3[MP_MAX_PROCESSORS];
+  CGDTEntry tr[MP_PROCESSORS_NUM];
+  CGDTEntry tr_ring3[MP_PROCESSORS_NUM];
 };
 
 class CSysLimitBase
@@ -354,7 +354,7 @@ class CSysLimitBase
 };
 
 #help_index "Memory/Info"
-#define MEM_NUM_E820_ENTRIES	48
+#define MEM_E820_ENTRIES_NUM	48
 class CMemE820
 {
   U8	*base;
@@ -428,7 +428,7 @@ class CKernel
   U0	start;
   U32	boot_base;
   U16	mem_E801[2];
-  CMemE820 mem_E820[MEM_NUM_E820_ENTRIES];
+  CMemE820 mem_E820[MEM_E820_ENTRIES_NUM];
   U64	mem_physical_space;
   CSysLimitBase sys_gdt_ptr;
   U16	sys_pci_busses;
@@ -456,26 +456,30 @@ class CKernel
 #define RLf_HOME		16
 #define RLf_AUTO_COMPLETE	17
 #define RLf_ADAM_SERVER		18
+#define RLf_ONCE_ADAM		19
+#define RLf_ONCE_USER		20
 
-#define RLF_16BIT		0x00001
-#define RLF_VGA			0x00002
-#define RLF_32BIT		0x00004
-#define RLF_PATCHED		0x00008
-#define RLF_16MEG_SYS_CODE_BP	0x00010
-#define RLF_64BIT		0x00020
-#define RLF_16MEG_ADAM_HEAP_CTRL 0x00040
-#define RLF_FULL_HEAPS		0x00050
-#define RLF_RAW			0x00100
-#define RLF_INTERRUPTS		0x00200
-#define RLF_BLKDEV		0x00400
-#define RLF_MP			0x00800
-#define RLF_COMPILER		0x01000
-#define RLF_DOC			0x02000
-#define RLF_WINMGR		0x04000
-#define RLF_REGISTRY		0x08000
-#define RLF_HOME		0x10000
-#define RLF_AUTO_COMPLETE	0x20000
-#define RLF_ADAM_SERVER		0x40000
+#define RLF_16BIT		0x000001
+#define RLF_VGA			0x000002
+#define RLF_32BIT		0x000004
+#define RLF_PATCHED		0x000008
+#define RLF_16MEG_SYS_CODE_BP	0x000010
+#define RLF_64BIT		0x000020
+#define RLF_16MEG_ADAM_HEAP_CTRL 0x000040
+#define RLF_FULL_HEAPS		0x000050
+#define RLF_RAW			0x000100
+#define RLF_INTERRUPTS		0x000200
+#define RLF_BLKDEV		0x000400
+#define RLF_MP			0x000800
+#define RLF_COMPILER		0x001000
+#define RLF_DOC			0x002000
+#define RLF_WINMGR		0x004000
+#define RLF_REGISTRY		0x008000
+#define RLF_HOME		0x010000
+#define RLF_AUTO_COMPLETE	0x020000
+#define RLF_ADAM_SERVER		0x040000
+#define RLF_ONCE_ADAM		0x080000
+#define RLF_ONCE_USER		0x100000
 
 #help_index "Processor"
 #define LAPIC_BASE		0xFEE00000
@@ -581,7 +585,7 @@ class CRAXRBCRCXRDX
 #define EXT_HEAPLOG_MALLOC	2
 #define EXT_HEAPLOG_FREE	3
 #define EXT_DBG_RESUME		4
-#define EXT_NUM_ENTRIES		5
+#define EXT_EXTS_NUM		5
 
 #help_index "Processor"
 #define DFT_CACHE_LINE_WIDTH	128
@@ -613,7 +617,7 @@ class CSema
 #define SEMA_JUST_PUMP_MSGS	19
 #define SEMA_TMBEAT		20
 #define SEMA_FIX		21
-#define SEMA_NUM_SEMAS		22
+#define SEMA_SEMAS_NUM		22
 
 #define CTRL_ALT_DEL		0
 #define CTRL_ALT_C		1
@@ -655,7 +659,7 @@ public class CHashTable
 #define HTt_MODULE		14
 #define HTt_HELP_FILE		15
 #define HTt_FRAME_PTR		16
-#define HTt_NUM_TYPES		17
+#define HTt_TYPES_NUM		17
 
 #define HTf_PRIVATE		23
 #define HTf_PUBLIC		24
@@ -757,7 +761,7 @@ public class CHashImport:CHashSrcSym
 };
 
 #help_index "Compiler/Internal"
-#define MAX_PTR_STARS	4
+#define PTR_STARS_NUM	4
 
 //Member Lst Flags
 #define MLF_DFT_AVAILABLE	1
@@ -930,7 +934,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCT_HTML_CODE		41
 #define DOCT_ERROR		42
 
-#define DOCT_NUM_TYPES		43
+#define DOCT_TYPES_NUM		43
 
 //CDocEntry.type flags upper bits
 #define DOCET_BLINK		ATTRF_BLINK
@@ -945,7 +949,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEt_UNDERLINE		ATTRf_UNDERLINE
 
 #define DOCG_DBL_BUF_FLAGS	(DOCF_OVERSTRIKE|DOCF_PLAIN_TEXT|\
-		DOCF_PLAIN_TEXT_TABS|DOCF_MIN_SIZE|DOCF_NO_CURSOR|\
+		DOCF_PLAIN_TEXT_TABS|DOCF_SIZE_MIN|DOCF_NO_CURSOR|\
 		DOCF_FORM|DOCF_DBL_DOLLARS|DOCF_DONT_SWAP_OUT|\
 		DOCF_DO_FULL_REFRESH|DOCF_BORDER_DOC|DOCF_HIDE_CURSOR|\
 		DOCF_DONT_HIGHLIGHT_CURSOR|DOCF_CARRIAGE_RETURN)
@@ -1098,7 +1102,7 @@ public class CHashGlblVar:CHashSrcSym
 #define DOCEf_DONT_DRAW		59 //only works on sprites
 #define DOCEf_DFT_LEN		60
 #define DOCEf_DFT_RAW_TYPE	61
-#define DOCEf_NUM_FLAGS		62
+#define DOCEf_FLAGS_NUM		62
 
 public class CDocBin
 {
@@ -1109,7 +1113,7 @@ public class CDocBin
   U32	num,flags,size,use_cnt;
   U0	end;
   U8	*data;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #define DOC_SCROLL_SPEED	8
@@ -1127,11 +1131,17 @@ public class CDocBin
 #define DOC_COLOR_ANCHOR	DKGRAY
 #define DOC_COLOR_TREE		PURPLE
 #define DOC_COLOR_PMT		GREEN
-#define DOC_COLOR_BIN		CYAN
-#define DOC_COLOR_KEYWORD	BLUE
-#define DOC_COLOR_KEYWORD2	LTRED
 #define DOC_COLOR_COMMENT	GREEN
-#define DOC_COLOR_QUOTE		BROWN
+#define DOC_COLOR_BIN		LTGREEN
+#define DOC_COLOR_STR		BROWN
+#define DOC_COLOR_CHAR_CONST	BROWN
+#define DOC_COLOR_EXPORT_SYS_SYM LTPURPLE
+#define DOC_COLOR_DEFINE_STR	CYAN
+#define DOC_COLOR_GLBL_VAR	LTCYAN
+#define DOC_COLOR_CLASS		LTBLUE
+#define DOC_COLOR_FUN		PURPLE
+#define DOC_COLOR_KEYWORD	BLUE
+#define DOC_COLOR_REG		LTRED
 
 public class CDocSettings
 {
@@ -1143,7 +1153,7 @@ public class CDocSettings
 	cur_text_attr,dft_text_attr;
 };
 
-#define DOC_DFT 		MIN_I32
+#define DOC_DFT 		I32_MIN
 
 public class CDocEntryBase
 {
@@ -1162,7 +1172,7 @@ public class CDocEntryBase
   U32	min_col,max_col;
   CDocSettings settings;
   I64	user_data;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #define DOCE_LEN_DFT	64
@@ -1197,11 +1207,11 @@ public class CDocEntry:CDocEntryBase
   U8	raw_type,pad[3];
   CDocBin *bin_data;
   U8	*data;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 //$LK,"DocForm",A="MN:DocForm"$() $LK,"DocMenu",A="MN:DocMenu"$() $LK,"DocEd",A="MN:DocEd"$() $LK,"PopUpMenu",A="MN:PopUpMenu"$()
-#define	DOF_MIN_SIZE		0x01
+#define	DOF_SIZE_MIN		0x01
 #define	DOF_INTERCEPT_TASK_END	0x02
 #define DOF_DONT_HOME		0x04
 #define DOF_WIN_MAX		0x08
@@ -1237,7 +1247,7 @@ class CEdFileName
 #define EDF_COLLAPSE		0x200
 #define EDF_UNCOLLAPSE		0x400
 #define EDF_WAS_WRITE		0x800 //Was exit ESC or SHIFT_ESC?
-//Combines with $LK,"Document Flags",A="MN:DOF_MIN_SIZE"$
+//Combines with $LK,"Document Flags",A="MN:DOF_SIZE_MIN"$
 
 #define EDf_BAIL		8
 #define EDf_COLLAPSE		9
@@ -1254,7 +1264,7 @@ class CEdFileName
 //Reserved x2
 #define DOCF_BORDER_DOC		0x100
 #define DOCF_FORM		0x200
-#define DOCF_MIN_SIZE		0x400
+#define DOCF_SIZE_MIN		0x400
 #define DOCF_HIDE_CURSOR	0x800  //use $LK,"DocCursor",A="MN:DocCursor"$
 #define DOCF_DONT_HIGHLIGHT_CURSOR 0x1000 //use $LK,"DocHighlightCursor",A="MN:DocHighlightCursor"$
 #define DOCF_NO_SCROLL_BARS	0x2000 //use $LK,"DocScroll",A="MN:DocScroll"$
@@ -1290,7 +1300,7 @@ class CEdFileName
 //Reserved x2
 #define DOCf_BORDER_DOC		8
 #define DOCf_FORM		9
-#define DOCf_MIN_SIZE		10
+#define DOCf_SIZE_MIN		10
 #define DOCf_HIDE_CURSOR	11  //use $LK,"DocCursor",A="MN:DocCursor"$
 #define DOCf_DONT_HIGHLIGHT_CURSOR 12  //use $LK,"DocHighlightCursor",A="MN:DocHighlightCursor"$
 #define DOCf_NO_SCROLL_BARS	13  //use $LK,"DocScroll",A="MN:DocScroll"$
@@ -1381,7 +1391,7 @@ public class CDoc //Linked Text File header
   CDocUndo undo_head;
 
   I64	user_data;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #help_index "Windows"
@@ -1444,8 +1454,8 @@ tries to do something.
 class CWinMgrTimingGlbls
 {
   I64	last_total_jiffies,
-	last_idle_pt_hits[MP_MAX_PROCESSORS],
-	last_swap_cnter[MP_MAX_PROCESSORS];
+	last_idle_pt_hits[MP_PROCESSORS_NUM],
+	last_swap_cnter[MP_PROCESSORS_NUM];
   F64	last_calc_idle_time,calc_idle_delta_time;
   I64	calc_idle_cnt;
 };
@@ -1467,7 +1477,7 @@ public class CWinMgrGlbls
 
 #help_index "AutoComplete"
 #define ACf_INIT_IN_PROGRESS	0
-#define AC_MAX_FILLINS 10
+#define AC_FILLINS_NUM 10
 public class CAutoCompleteGlbls
 {
   I64	num_words;
@@ -1476,8 +1486,8 @@ public class CAutoCompleteGlbls
   I64	flags;
   CTask	*task;
   I64	partial_len,num_fillins,
-	fillin_hits	[AC_MAX_FILLINS+1];
-  CHashAC *fillin_matches[AC_MAX_FILLINS+1];
+	fillin_hits	[AC_FILLINS_NUM+1];
+  CHashAC *fillin_matches[AC_FILLINS_NUM+1];
 };
 
 #help_index "AutoComplete/Dictionary"
@@ -1504,12 +1514,12 @@ public class CAutoCompleteGlbls
 #define ACD_POS_CHAR		0x04
 #define ACD_EXTRA_CHAR		0x05
 
-#define ACD_MAX_FILLINS 10
+#define ACD_FILLINS_NUM 10
 public class CAutoCompleteDictGlbls
 {
   U8	*word_lst;
   I64	word_lst_size,num_words,num_fillins;
-  U8	*fillins[ACD_MAX_FILLINS];
+  U8	*fillins[ACD_FILLINS_NUM];
   Bool	has_words,has_defs;
 };
 
@@ -1551,7 +1561,7 @@ public class CAutoCompleteDictGlbls
 #define RT_UF32		13 //Not implemented, Fictitious
 #define RT_F64		14
 #define RT_UF64		15 //Fictitious
-#define RT_NUM_IT	16
+#define RT_RTS_NUM	16
 #define RTF_UNSIGNED	1
 #define RTG_MASK	0xFF
 
@@ -1658,7 +1668,7 @@ class CIntermediateCode:CIntermediateCodeBase
     //Tree links are used during passes 012 and 3 for determining types.
     CICTreeLinks t;
   };
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 class CPrsStk
@@ -1685,7 +1695,7 @@ class CPrsStk
 #define CMF_I16_JMP_TABLE	0x10
 #define CMF_U16_JMP_TABLE	0x20
 
-#define CM_MAX_CONSTS		16
+#define CM_CONSTS_NUM		16
 
 class CCodeMisc
 {
@@ -1756,22 +1766,22 @@ PUSH RDI PUSH R8 PUSH R9 PUSH R10 PUSH R11 PUSH R12 PUSH R13 PUSH R14 PUSH R15
 #define POP_REGS POP R15 POP R14 POP R13 POP R12 POP R11 POP R10 POP R9 \
 POP R8 POP RDI POP RSI POP RBP POP RBX POP RDX POP RCX POP RAX
 
-#define NUM_REGS	16
+#define REG_RAX		0
+#define REG_RCX		1
+#define REG_RDX		2
+#define REG_RBX		3
+#define REG_RSP		4
+#define REG_RBP		5
+#define REG_RSI		6
+#define REG_RDI		7
+#define REG_R8		8
+#define REG_REGS_NUM	16
 
-#define REG_RAX	0
-#define REG_RCX	1
-#define REG_RDX	2
-#define REG_RBX	3
-#define REG_RSP	4
-#define REG_RBP	5
-#define REG_RSI	6
-#define REG_RDI	7
-#define REG_R8	8
-#define REG_RIP	16	//Used by compiler, not really it's num
+#define REG_RIP		16	//Used by compiler, not really it's num
 //Be careful: RBPu8, RSPu8, RSIu8, RDIu8 are 20-24
 #define REG_NONE	32	//noreg flag sets it to this
 #define REG_ALLOC	33	//reg flag sets it to this
-#define REG_UNDEF	MIN_I8
+#define REG_UNDEF	I8_MIN
 
 #define REGG_CLOBBERED		0x013F //RAX,RCX,RDX,RBX,R8
 #define REGG_SAVED		0x0030 //RBP,RSP
@@ -2094,7 +2104,7 @@ class CAOTCtrl
 #define TK_ELLIPSIS	0x124
 #define TK_INS_BIN	0x125
 #define TK_INS_BIN_SIZE 0x126
-#define TK_NUM_TK	0x127
+#define TK_TKS_NUM	0x127
 
 class CLexHashTableContext
 {
@@ -2119,7 +2129,7 @@ class CLexHashTableContext
 #define CCF_JUST_LOAD		0x040
 #define CCF_KEEP_NEW_LINES	0x080
 #define CCF_KEEP_DOT		0x100
-#define CCF_KEEP_NUM_SIGN	0x200
+#define CCF_KEEP_SIGN_NUM	0x200
 #define CCF_KEEP_AT_SIGN	0x400
 #define CCF_NO_CHAR_CONST	0x800
 #define CCf_PASS_TRACE_PRESENT	12
@@ -2194,14 +2204,14 @@ public class CCmpCtrl
   CPrsStk *ps;
   CAOTCtrl *aotc;
   I64	aot_depth,pmt_line;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #help_index "Compiler"
 public class CCmpGlbls
 {
   CHashTable *asm_hash;
-  CHashClass *internal_types[RT_NUM_IT];
+  CHashClass *internal_types[RT_RTS_NUM];
   CIntermediateCode ic_nop;
   U32	*dual_U16_tokens1,*dual_U16_tokens2,*dual_U16_tokens3,
 	*binary_ops;
@@ -2621,7 +2631,7 @@ public class CDirEntry
 #define BDT_ISO_FILE_READ	3
 #define BDT_ISO_FILE_WRITE	4
 #define BDT_ATAPI		5
-#define BDT_NUM_TYPES		6
+#define BDT_TYPES_NUM		6
 
 #define BDF_REMOVABLE		0x001
 #define BDF_INITIALIZED		0x002
@@ -2646,7 +2656,7 @@ public class CDirEntry
 //locked flags
 #define BDlf_LOCKED		0
 
-#define NUM_BLKDEVS		26
+#define BLKDEVS_NUM		26
 #define BD_SIGNATURE_VAL	'BDSV'
 public class CBlkDev
 {
@@ -2680,7 +2690,7 @@ public class CBlkDev
 #define FSt_ISO13346	5 //Not Supported (CD/DVD)
 #define FSt_NTFS	6 //Not Supported
 #define FSt_UNKNOWN	7
-#define FSt_NUM_TYPES	8
+#define FSt_TYPES_NUM	8
 #define FSG_TYPE_MASK	0x7FFF
 //File system type flags
 #define FStf_DISABLE	15
@@ -2701,7 +2711,7 @@ class CFreeLst
   I64	start,size;
 };
 
-#define NUM_DRVS		26
+#define DRVS_NUM		26
 
 #define DRV_SIGNATURE_VAL	'DVSV'
 public class CDrv
@@ -2743,18 +2753,23 @@ class CCacheBlk
 };
 
 #help_index "File/System"
+#define DFT_ISO_FILENAME	"::/Tmp/CDDVD.ISO"
+#define DFT_ISO_C_FILENAME	"::/Tmp/CDDVD.ISO.C"
+
 public class CBlkDevGlbls
 {
   CBlkDev *blkdevs;
-  U8	*dft_iso_filename;  //See $LK,"blkdev.dft_iso_filename",A="FF:::/Kernel/KEnd.HC,blkdev.dft_iso_filename"$
+  U8	*dft_iso_filename;	//$TX,"\"::/Tmp/CDDVD.ISO\"",D="DFT_ISO_FILENAME"$
+  U8	*dft_iso_c_filename;	//$TX,"\"::/Tmp/CDDVD.ISO.C\"",D="DFT_ISO_C_FILENAME"$
   U8	*tmp_filename;
   U8	*home_dir;
   CCacheBlk *cache_base,*cache_ctrl,**cache_hash_table;
   I64	cache_size,read_cnt,write_cnt;
   CDrv	*drvs,*let_to_drv[32];
-  I64	auto_mount_ide_cnt;
+  I64	auto_mount_ide_cnt,
+	ins_base0,ins_base1;	//Install cd/dvd controller.
   U8	boot_drv_let,first_hd_drv_let,first_dvd_drv_let;
-  Bool	dvd_boot_is_good,pad[4];
+  Bool	dvd_boot_is_good,ins_unit,pad[3];
 };
 
 #help_index "File/Internal"
@@ -2765,7 +2780,7 @@ public class CDirContext
 };
 
 #help_index "File/CFile"
-#define FFB_NEXT_BLK		MAX_I64
+#define FFB_NEXT_BLK		I64_MAX
 
 #define FF_WRITE		1
 #define FF_NEW_FILE		2
@@ -2893,7 +2908,7 @@ public class CDevGlbls
   I64	*idt;
   U8	*mem64_ptr;
   U8	*uncached_alias; //Alias of lowest 4Gig.
-  U8	mp_apic_ids[MP_MAX_PROCESSORS];
+  U8	mp_apic_ids[MP_PROCESSORS_NUM];
   CMemRange mem32_head;
   CPCIDev pci_head;
 };
@@ -2942,7 +2957,7 @@ public class CDevGlbls
 #define YELLOW			14
 #define WHITE			15
 
-#define NUM_COLORS		16
+#define COLORS_NUM		16
 #define COLOR_INVALID		16
 #define COLOR_MONO		0xFF
 
@@ -3034,8 +3049,9 @@ public class CMsStateGlbls
 public class CGridGlbls
 {
   Bool	snap	fmtstr "$$CB,\"Snap Grid\"$$\n",
-	show	fmtstr "$$CB,\"Show Grid\"$$\n";
-  U8	pad[6];
+	show	fmtstr "$$CB,\"Show Grid\"$$\n",
+	coord	fmtstr "$$CB,\"Show Coordinates\"$$\n";
+  U8	pad[5];
   F64	x	fmtstr "$$DA-TRM,A=\"X Spacing:%6.3f\"$$\n",
 	y	fmtstr "$$DA-TRM,A=\"Y Spacing:%6.3f\"$$\n",
 	z	fmtstr "$$DA-TRM,A=\"Z Spacing:%6.3f\"$$\n",
@@ -3215,13 +3231,13 @@ public class CTaskSettings
   U0	(*task_end_cb)();
   CTask *song_task,*animate_task;
   I64	scroll_x,scroll_y,scroll_z;
-  CBGR48 palette[NUM_COLORS];
+  CBGR48 palette[COLORS_NUM];
   U32	win_inhibit;
   U8	text_attr,title_src,
 	border_attr,border_src,
 	task_title[STR_LEN];
   Bool	border,hide_cursor,highlight_cursor,scroll,autocomplete,pad[3];
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #help_index "Task"
@@ -3284,7 +3300,7 @@ public class CTask //The Fs segment reg points to current CTask.
 {
   CTask *addr; //Self-addressed ptr
   U32	task_signature,win_inhibit;
-  ;#assert $$==offset(CTaskDying.wake_jiffy)
+#assert $$==offset(CTaskDying.wake_jiffy)
   I64	wake_jiffy;
   U32	task_flags,display_flags;
 
@@ -3361,7 +3377,7 @@ public class CTask //The Fs segment reg points to current CTask.
   CWinScroll horz_scroll,vert_scroll;
 
   I64	user_data;
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 class CTSS
@@ -3416,7 +3432,7 @@ public class CCPU //The Gs segment reg points to current CCPU.
   I64	kill_jiffy;
   CTSS	*tss;
   I64	start_stk[16];
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #help_index "Memory/Page Tables"
@@ -3570,7 +3586,7 @@ public class CTextGlbls
 //z-vals less than zero are in front of scrn and not drawn.
 //we want to shift all Z-vals into a drawable range.
 //GR_Z_ALL is set to half of the Z-range which is an I32.
-#define GR_Z_ALL	(MAX_I32/2)
+#define GR_Z_ALL	(I32_MAX/2)
 
 #help_index "Graphics/Device Contexts"
 //Low 8 bits reserved for flags that go into saved bitmaps
@@ -3615,7 +3631,7 @@ public class CDC
 	height,
 	flags;
   U0	end;
-  CBGR48 palette[NUM_COLORS];
+  CBGR48 palette[COLORS_NUM];
 
   //public (Change directly)
   CColorROPU32 color,
@@ -3665,7 +3681,7 @@ public class CDC
   //Set by $LK,"DCDepthBufAlloc",A="MN:DCDepthBufAlloc"$()
   I32	*depth_buf;
   I64	db_z; //private
-  ;#assert !($$&7) //(compiler lags one token)
+#assert !($$&7)
 };
 
 #help_index "Devices"
@@ -3692,7 +3708,7 @@ public class CDC
 #define VGAR_MAP_MASK		0x02
 
 #help_index "Compression/Piece by Piece"
-#define ARC_MAX_BITS	12
+#define ARC_BITS_MAX	12
 
 #define CT_NONE 	1
 #define CT_7_BIT	2
@@ -3718,8 +3734,8 @@ public class CArcCtrl
 	saved_basecode,
 	entry_used,
 	last_ch;
-  CArcEntry compress[1<<ARC_MAX_BITS],
-	*hash[1<<ARC_MAX_BITS];
+  CArcEntry compress[1<<ARC_BITS_MAX],
+	*hash[1<<ARC_BITS_MAX];
 };
 
 #help_index "Compression"
@@ -3781,7 +3797,7 @@ class CKeyDevGlbls
 };
 
 #help_index "Snd"
-#define ONA_REST	MIN_I8
+#define ONA_REST	I8_MIN
 class CSndData
 {
   CSndData *next,*last;
@@ -3845,7 +3861,7 @@ public class CDbgGlbls
 // $LK,"In",A="MN:In"$("") StdIn for call to $LK,"BootHDIns",A="MN:BootHDIns"$().
 #define STD_DISTRO_DVD_CFG	"TB\nScale2Mem(2048,0x40000)\nT \n\n\n\n"
 
-#help_index "Misc/Registry"
+#help_index "Registry"
 //Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()
 #define ARf_FLOODFILL			0
 #define ARf_CSPRITE_INS_CLIPBOARD	1
@@ -3856,7 +3872,7 @@ public class CDbgGlbls
 #define ARf_MANAGE_SLIDER		6
 
 #help_index "Misc/Progress Bars"
-#define NUM_PROGRESS_BARS	4
+#define PROGRESS_BARS_NUM	4
 #define PROGRESS_DESC_LEN	(64-8-8)
 class CProgress
 {
@@ -3892,7 +3908,7 @@ class CProgress
 #define VM_QEMU		3
 #define VM_VIRTUALBOX	4
 
-#help_index "Misc/Install Registration"
+#help_index "Registry/Install Registration"
 public class CInsReg
 {
   Bool	registered;

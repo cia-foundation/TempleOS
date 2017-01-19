@@ -1,14 +1,14 @@
 //Place this file in /Home and change
 //anything you want.
 
-U0 InsTime()
+U0 TimeIns()
 {
   CDate cdt;
   cdt=Now;
   "$$IV,1$$----%D %T----$$IV,0$$\n",cdt,cdt;
 }
 
-U0 InsFileLink()
+U0 FileLinkIns()
 {
   U8 *st=PopUpPickFile;
   st[0]=':';  //This is my personal code, not production. LOL
@@ -16,7 +16,7 @@ U0 InsFileLink()
   Free(st);
 }
 
-U0 InsDirLinks()
+U0 DirLinksIns()
 {
   CDirEntry *tmpde,*tmpde1;
   U8 *st=PopUpPickDir,*st2;
@@ -128,40 +128,47 @@ Bool MyPutKey(I64 ch,I64 sc)
 	    return TRUE;
 	  case SC_F5:
 	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Edit/God Offering");
+	      KeyDescSet("Cmd /GodOffer");
 	    else
 	      GodOffer;
 	    return TRUE;
 	  case SC_F6:
 	    if (sc&SCF_SHIFT) {
 	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /Ins Misc");
+		KeyDescSet("Cmd /TOSIns");
 	      else
-		TOSInsMisc;
+		TOSIns;
 	    } else {
 	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /Ins Datetime");
+		KeyDescSet("Cmd /TimeIns");
 	      else
-		InsTime;
+		TimeIns;
 	    }
 	    return TRUE;
 	  case SC_F7:
-	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Cmd /God Misc");
-	    else
-	      GodMisc;
+	    if (sc&SCF_SHIFT) {
+	      if (sc&SCF_KEY_DESC)
+		KeyDescSet("Cmd /NISTGodIns2");
+	      else
+		NISTGodIns2;
+	    } else {
+	      if (sc&SCF_KEY_DESC)
+		KeyDescSet("Cmd /GodIns");
+	      else
+		GodIns;
+	    }
 	    return TRUE;
 	  case SC_F8:
 	    if (sc&SCF_SHIFT) {
 	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /Ins Dir Links");
+		KeyDescSet("Cmd /DirLinksIns");
 	      else
-		InsDirLinks;
+		DirLinksIns;
 	    } else {
 	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /Ins File Link");
+		KeyDescSet("Cmd /FileLinkIns");
 	      else
-		InsFileLink;
+		FileLinkIns;
 	    }
 	    return TRUE;
 	}
@@ -180,7 +187,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'h':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Tile Horizontally");
+	  KeyDescSet("Cmd /WinTileHorz");
 	else
 	  WinTileHorz;
 	return TRUE;
@@ -192,7 +199,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'm':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Maximize");
+	  KeyDescSet("Cmd /WinMax");
 	else {
 	  WinBorder;
 	  WinMax;
@@ -200,13 +207,13 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'v':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Tile Vertically");
+	  KeyDescSet("Cmd /WinTileVert");
 	else
 	  WinTileVert;
 	return TRUE;
       case 'V':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Frame Grabber Toggle");
+	  KeyDescSet("Cmd /FrameGrabberToggle");
 	else
 	  FrameGrabberToggle;
 	return TRUE;

@@ -82,17 +82,17 @@ U0 ICAddSubEctImm(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
       } else if (d==-1 && op.u8[0]==0x03) {
 	ICU24(tmpi,0xC8FF00+i+(r1&7)<<16);
 	return;
-      } else if (MIN_I8<=d<=MAX_I8) {
+      } else if (I8_MIN<=d<=I8_MAX) {
 	ICU24(tmpi,0xC08300+op.u8[1]<<19+i+(r1&7)<<16);
 	ICU8(tmpi,d);
 	return;
-      } else if (MIN_I32<=d<=MAX_I32) {
+      } else if (I32_MIN<=d<=I32_MAX) {
 	ICU24(tmpi,0xC08100+op.u8[1]<<19+i+(r1&7)<<16);
 	ICU32(tmpi,d);
 	return;
       }
     }
-    if (op.u8[0]==0x03 && MIN_I32<=d<=MAX_I32 &&
+    if (op.u8[0]==0x03 && I32_MIN<=d<=I32_MAX &&
 	  !Bt(&cmp.non_ptr_vars_mask,r2)) {
       i=ICModr1(r1,MDF_DISP+RT_I64,r2,d);
       i.u8[1]|=0x48;
@@ -141,12 +141,12 @@ U0 ICAddSubEctImm(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
 	ICModr2(tmpi,i,,d1,rip);
 	return;
       }
-      if (MIN_I8<=d<=MAX_I8 || t1&(RTG_MASK-RTF_UNSIGNED)==RT_I8) {
+      if (I8_MIN<=d<=I8_MAX || t1&(RTG_MASK-RTF_UNSIGNED)==RT_I8) {
 	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_IMM_U8+op.u8[1],rip+1);
 	ICU8(tmpi,d);
 	return;
       }
-      if (MIN_I32<=d<=MAX_I32 || t1.raw_type<RT_I64) {
+      if (I32_MIN<=d<=I32_MAX || t1.raw_type<RT_I64) {
 	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_IMM_U32+op.u8[1],rip);
 	if (t1&(RTG_MASK-RTF_UNSIGNED)==RT_I16)
 	  ICU16(tmpi,d);
@@ -237,7 +237,7 @@ U0 ICMul(CIntermediateCode *tmpi,I64 rip)
   }
   i=arg2->disp;
   if (!(tmpi->ic_class->raw_type&RTF_UNSIGNED) &&
-	arg2->type&MDF_IMM && MIN_I32<=i<=MAX_I32) {
+	arg2->type&MDF_IMM && I32_MIN<=i<=I32_MAX) {
     if (tmpi->res.type==MDF_REG+RT_I64) {
       ICMov(tmpi,tmpi->res.type,tmpi->res.reg,tmpi->res.disp,
 	    arg1->type,arg1->reg,arg1->disp,rip);
@@ -248,7 +248,7 @@ U0 ICMul(CIntermediateCode *tmpi,I64 rip)
       j=0xC0004D;
     else
       j=0xC00048;
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       ICU32(tmpi,i<<24+0x6B00+j+(r&7)<<16+(r&7)<<19);
     else {
       ICU24(tmpi,0x6900+j+(r&7)<<16+(r&7)<<19);
@@ -286,7 +286,7 @@ U0 ICMulEqu(CIntermediateCode *tmpi,I64 rip)
 {
   I64 i=tmpi->arg2.disp,r=REG_RAX,j;
   if (!(tmpi->ic_class->raw_type&RTF_UNSIGNED) &&
-	tmpi->arg2.type&MDF_IMM && MIN_I32<=i<=MAX_I32) {
+	tmpi->arg2.type&MDF_IMM && I32_MIN<=i<=I32_MAX) {
     if (tmpi->ic_flags & ICF_BY_VAL) {
       if (tmpi->arg1.type==MDF_REG+RT_I64)
 	r=tmpi->arg1.reg;
@@ -298,7 +298,7 @@ U0 ICMulEqu(CIntermediateCode *tmpi,I64 rip)
 	j=0xC0004D;
       else
 	j=0xC00048;
-      if (MIN_I8<=i<=MAX_I8)
+      if (I8_MIN<=i<=I8_MAX)
 	ICU32(tmpi,i<<24+0x6B00+j+(r&7)<<16+(r&7)<<19);
       else {
 	ICU24(tmpi,0x6900+j+(r&7)<<16+(r&7)<<19);
@@ -312,7 +312,7 @@ U0 ICMulEqu(CIntermediateCode *tmpi,I64 rip)
       ICMov(tmpi,MDF_REG+RT_I64,REG_RBX,0,
 	    MDF_DISP+tmpi->arg1_type_pointed_to,REG_RCX,0,rip);
       r=REG_RBX;
-      if (MIN_I8<=i<=MAX_I8)
+      if (I8_MIN<=i<=I8_MAX)
 	ICU32(tmpi,i<<24+0xDB6B48);
       else {
 	ICU24(tmpi,0xDB6948);
@@ -513,7 +513,7 @@ U0 ICAddSubEctEqu(CIntermediateCode *tmpi,U8 type_pointed_to,
     if (t3&MDF_IMM && op.u8[2]) {
       if (!d3.u32[1]) {
 	if (tmpi->ic_flags&ICF_RES_NOT_USED &&
-	      t2&MDF_REG && d3(U64)<=MAX_I8) {
+	      t2&MDF_REG && d3(U64)<=I8_MAX) {
 	  ICSlashOp(tmpi,MDF_DISP+type_pointed_to,r2,0,0x838000+op.u8[4],rip);
 	  ICU8(tmpi,d3);
 	  done=TRUE;

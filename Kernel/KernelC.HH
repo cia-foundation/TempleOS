@@ -38,6 +38,7 @@ char_bmp_zero_tab_cr_nl_cursor_dollar[16],
 char_bmp_macro[16],			char_bmp_printable[16],
 char_bmp_displayable[16],		char_bmp_safe_dollar[16],
 char_bmp_filename[16],			char_bmp_non_eol[16];
+
 #help_index "Char/Conversion"
 public extern U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE);
 public extern I64 Char2ScanCode(I64 ch,I64 sc_flags=0);
@@ -385,7 +386,7 @@ extern I64 ATAProbe(I64 base0,I64 base1,I64 unit);
 extern U0 ATAReadBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt);
 extern U0 ATAWriteBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt);
 public extern I64 AutoMountIDE();
-extern I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=MIN_I64,
+extern I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=I64_MIN,
 	Bool whole_drv,Bool make_free);
 extern U0 DskCacheInit(I64 size_in_U8s);
 public extern U0 DskCacheInvalidate(CDrv *dv);
@@ -610,8 +611,8 @@ public extern U0 ProgressBarsRst(U8 *path=NULL);
 #help_index "Mouse"
 #help_file "::/Doc/Mouse"
 public extern U0 GridInit();
-public extern U0 MsSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
-	I64 l=MAX_I64,I64 r=MAX_I64);
+public extern U0 MsSet(I64 x=I64_MAX,I64 y=I64_MAX,I64 z=I64_MAX,
+	I64 l=I64_MAX,I64 r=I64_MAX);
 public extern CMsStateGlbls ms;
 public extern CGridGlbls ms_grid;
 public extern CMsHardStateGlbls ms_hard;

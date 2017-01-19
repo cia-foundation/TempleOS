@@ -353,7 +353,7 @@ public U0 DskView(U8 drv_let=0)
   GrCircle(dc,h>>1,v>>1,radius);
 
   j=1;
-  for (i=0;i<NUM_DRVS;i++) {
+  for (i=0;i<DRVS_NUM;i++) {
     dv=&blkdev.drvs[i];
     if (bd==dv->bd && dv->fs_type) {
       sect_start=-(dv->drv_offset*2*ã/(bd->max_blk+1));

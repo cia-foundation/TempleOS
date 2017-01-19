@@ -9,8 +9,9 @@ U0 SysGlblsInit()
   sys_focus_task=Fs;
   QueInit(&sys_macro_head);
 
-  blkdev.dft_iso_filename=AStrNew("::/Tmp/CDDVD.ISO");
-  blkdev.tmp_filename=AStrNew("~/Tmp.DD.Z");
+  blkdev.dft_iso_filename	=AStrNew(DFT_ISO_FILENAME);
+  blkdev.dft_iso_c_filename	=AStrNew(DFT_ISO_C_FILENAME);
+  blkdev.tmp_filename		=AStrNew("~/Tmp.DD.Z");
   blkdev.dvd_boot_is_good=TRUE;
   #exe {
     if (!kernel_cfg->auto_mount_ide_hd_let)
@@ -32,7 +33,7 @@ U0 SysGlblsInit()
       if (Bt(&i,j))	set_bits_table[i]++;
     }
 
-  ext=CAlloc(EXT_NUM_ENTRIES*sizeof(U8 *));
+  ext=CAlloc(EXT_EXTS_NUM*sizeof(U8 *));
   fp_getstr2=&SysGetStr2;
   KeyDevInit;
 
@@ -130,8 +131,9 @@ U0 Reboot()
   SysHlt;
 }
 
-U0 KernelMain()
-{//Continued from $LK,"Kernel",A="FF:::/Kernel/KStart64.HC,I32 &Kernel"$
+U0 KMain()
+{//Continued from $LK,"KStart64.HC",A="FF:::/Kernel/KStart64.HC,I32 &KMain"$
+  CBlkDev *bd;
   OutU8(0x61,InU8(0x61)&~3); //Snd;
   adam_task=Fs;
   BlkPoolsInit;
@@ -172,9 +174,22 @@ U0 KernelMain()
   BlkDevsInitAll;
   "ChgDsk(':');\n";
   ChgDsk(':');
-  #exe {StreamPrint("HomeSet(\"%s\");",kernel_cfg->home_dir);}
+  #exe {
+    StreamPrint("HomeSet(\"%s\");\n"
+	  "blkdev.ins_base0=%d;blkdev.ins_base1=%d;blkdev.ins_unit =%d;\n",
+	  kernel_cfg->home_dir,
+	  blkdev.ins_base0,blkdev.ins_base1,blkdev.ins_unit);
+  }
   Gs->idle_task->cur_dv=blkdev.let_to_drv[*blkdev.home_dir-'A'];
   DrvRep;
+  if (blkdev.dvd_boot_is_good) {
+    bd=Let2BlkDev(':');
+    if (bd->type==BDT_ATAPI) {
+      blkdev.ins_base0=bd->base0;
+      blkdev.ins_base1=bd->base1;
+      blkdev.ins_unit =bd->unit;
+    }
+  }
   LBts(&sys_run_level,RLf_BLKDEV);
 
   #exe {
@@ -213,10 +228,10 @@ U0 KernelMain()
 asm {	ALIGN	16,OC_NOP
 SYS_KERNEL_END::
 #exe {
-  if (kernel_cfg->opts[CFG_BOOT_RESCUE_DRV])
+  if (kernel_cfg->opts[CFG_DBG_DISTRO])
     StreamPrint("DU8 0x%X-(SYS_KERNEL_END-SYS_KERNEL+"
 	"BOOT_RAM_BASE+sizeof(CBinFile)) DUP (0);"
-	"BINFILE \"%s\";",kernel_cfg->boot_rescue_drv_start,
-			  kernel_cfg->boot_rescue_drv_file);
+	"BINFILE \"%s\";",kernel_cfg->dbg_distro_start,
+			  kernel_cfg->dbg_distro_file);
 };
 }

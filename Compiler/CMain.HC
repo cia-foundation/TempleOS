@@ -255,7 +255,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	    case IET_IMM_U0:
 	      break;
 	    case IET_REL_I8:
-	      if (!(MIN_I8<=i-ptr-1<=MAX_I8))
+	      if (!(I8_MIN<=i-ptr-1<=I8_MAX))
 		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U8 *) =i-ptr-1;
 	      break;
@@ -263,7 +263,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	      *ptr(U8 *) =i;
 	      break;
 	    case IET_REL_I16:
-	      if (!(MIN_I16<=i-ptr-2<=MAX_I16))
+	      if (!(I16_MIN<=i-ptr-2<=I16_MAX))
 		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U16 *)=i-ptr-2;
 	      break;
@@ -271,7 +271,7 @@ U0 CmpFixUpJITAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	      *ptr(U16 *)=i;
 	      break;
 	    case IET_REL_I32:
-	      if (!(MIN_I32<=i-ptr-4<=MAX_I32))
+	      if (!(I32_MIN<=i-ptr-4<=I32_MAX))
 		LexExcept(cc,"Branch out of range at ");
 	      *ptr(U32 *)=i-ptr-4;
 	      break;
@@ -355,7 +355,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	case IET_IMM_U0:
 	  break;
 	case IET_REL_I8:
-	  if (!(MIN_I8<=i-ptr-1<=MAX_I8))
+	  if (!(I8_MIN<=i-ptr-1<=I8_MAX))
 	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U8 *) =i-ptr-1;
 	  break;
@@ -363,7 +363,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	  *ptr(U8 *) =i;
 	  break;
 	case IET_REL_I16:
-	  if (!(MIN_I16<=i-ptr-2<=MAX_I16))
+	  if (!(I16_MIN<=i-ptr-2<=I16_MAX))
 	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U16 *)=i-ptr-2;
 	  break;
@@ -371,7 +371,7 @@ U0 CmpFixUpAOTAsm(CCmpCtrl *cc,CAOT *tmpaot)
 	  *ptr(U16 *)=i;
 	  break;
 	case IET_REL_I32:
-	  if (!(MIN_I32<=i-ptr-4<=MAX_I32))
+	  if (!(I32_MIN<=i-ptr-4<=I32_MAX))
 	    LexExcept(cc,"Branch out of range at ");
 	  *ptr(U32 *)=i-ptr-4;
 	  break;
@@ -538,7 +538,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
     size=(sizeof(CBinFile)+aot_U8s+i+15)&-16;
     bfh=MAlloc(size);
     bfh->jmp=0xEB+256*(sizeof(CBinFile)-2);
-#assert sizeof(CBinFile)-2<=MAX_I8
+#assert sizeof(CBinFile)-2<=I8_MAX
     bfh->reserved=0;
     bfh->bin_signature=BIN_SIGNATURE_VAL;
     bfh->module_org=tmpaot->module_org;

@@ -14,7 +14,7 @@ Bool OptIC4(CIntermediateCode *tmpi)
       if ((tmpil2->ic_code==IC_REG || tmpil2->ic_code==IC_MOV) &&
 	    tmpil2->arg1.type&MDF_REG) {
 	i=tmpil1->ic_data;
-	if (MIN_I32<=i<=MAX_I32 &&
+	if (I32_MIN<=i<=I32_MAX &&
 	      !Bt(&cmp.non_ptr_vars_mask,tmpil2->arg1.reg)) {
 	  tmpil1->ic_flags|=tmpil2->ic_flags&ICG_NO_CVT_MASK;
 	  tmpil1->ic_code=IC_LEA;
@@ -26,7 +26,7 @@ Bool OptIC4(CIntermediateCode *tmpi)
 	}
       } else if (tmpil2->ic_code==IC_SHL_CONST && tmpil2->arg1.type&MDF_REG) {
 	i=tmpil1->ic_data;
-	if (MIN_I32<=i<=MAX_I32 && tmpil2->arg1.reg!=REG_RSP &&
+	if (I32_MIN<=i<=I32_MAX && tmpil2->arg1.reg!=REG_RSP &&
 	      1<=tmpil2->ic_data<=3) {
 	  tmpil1->ic_flags|=tmpil2->ic_flags&ICG_NO_CVT_MASK;
 	  tmpil1->ic_code=IC_LEA;
@@ -96,7 +96,7 @@ Bool OptIC4(CIntermediateCode *tmpi)
       if (tmpil2->ic_code==IC_ADD_CONST && tmpil2->arg1.type&MDF_REG &&
 	    tmpil1->arg1.type&MDF_STK) {
 	i=tmpil2->ic_data;
-	if (MIN_I32<=i<=MAX_I32 &&
+	if (I32_MIN<=i<=I32_MAX &&
 	      !Bt(&cmp.non_ptr_vars_mask,tmpil2->arg1.reg)) {
 	  tmpil1->ic_flags|=tmpil2->ic_flags;
 	  tmpil1->ic_code=IC_MOV;
@@ -219,7 +219,7 @@ U0 OptPass4(CCmpCtrl *cc,COptReg *reg_offsets,I64 *_type)
 	  } else if ((tmpi1->ic_code==IC_ABS_ADDR ||
 		tmpi1->ic_code==IC_MOV &&
 		tmpi1->arg1.type==MDF_IMM+RT_I64 &&
-		0<=tmpi1->arg1.disp<=MAX_I32)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
+		0<=tmpi1->arg1.disp<=I32_MAX)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
 	    if (tmpi1->ic_code==IC_ABS_ADDR)
 	      tmpi->arg1.disp=tmpi1->ic_data;
 	    else
@@ -263,7 +263,7 @@ p4_lea_gone:
 	    }
 	  } else if ((tmpi1->ic_code==IC_ABS_ADDR || tmpi1->ic_code==IC_MOV &&
 		tmpi1->arg1.type==MDF_IMM+RT_I64 &&
-		0<=tmpi1->arg1.disp<=MAX_I32)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
+		0<=tmpi1->arg1.disp<=I32_MAX)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
 	    tmpi->ic_flags|=tmpi1->ic_flags;
 	    if (tmpi1->ic_code==IC_ABS_ADDR)
 	      tmpi->arg1.disp=tmpi1->ic_data;
@@ -400,7 +400,7 @@ p4_sib:
 	    }
 	  } else if ((tmpi1->ic_code==IC_ABS_ADDR ||
 		tmpi1->ic_code==IC_MOV && tmpi1->arg1.type==MDF_IMM+RT_I64 &&
-		0<=tmpi1->arg1.disp<=MAX_I32)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
+		0<=tmpi1->arg1.disp<=I32_MAX)&& !(tmpi1->ic_flags&ICF_NO_RIP)) {
 	    tmpi->ic_flags|=tmpi1->ic_flags;
 	    if (tmpi1->ic_code==IC_ABS_ADDR)
 	      tmpi->arg1.disp=tmpi1->ic_data;
@@ -471,7 +471,7 @@ p4_sib:
 		  } else if (tmpil2->ic_code!=IC_ABS_ADDR &&
 			!(tmpil2->ic_code==IC_MOV &&
 			tmpil2->arg1.type==MDF_IMM+RT_I64 &&
-			0<=tmpil2->arg1.disp<=MAX_I32) ||
+			0<=tmpil2->arg1.disp<=I32_MAX) ||
 			tmpil2->ic_flags&ICF_NO_RIP)
 		    tmpil2=NULL;
 		  else {
@@ -483,7 +483,7 @@ p4_sib:
 		}
 	      } else {
 		if (tmpi2->arg1.type==MDF_IMM+RT_I64 &&
-		      0<=tmpi2->arg1.disp<=MAX_I32 &&
+		      0<=tmpi2->arg1.disp<=I32_MAX &&
 		      !(tmpi2->ic_flags&ICF_NO_RIP)) {
 		  tmpil2=tmpi2;
 		  tmpi2=NULL;
@@ -503,7 +503,7 @@ p4_sib:
 	      }
 	    } else if (tmpi2->ic_code==IC_MOV && tmpi2->res.type&MDF_STK &&
 		  tmpi2->arg1.type==MDF_IMM+RT_I64 &&
-		  0<=tmpi2->arg1.disp<=MAX_I32 &&
+		  0<=tmpi2->arg1.disp<=I32_MAX &&
 		  !(tmpi2->ic_flags&ICF_NO_RIP)) {
 	      tmpi->arg2.disp=tmpi2->arg1.disp;
 	      tmpi->ic_flags|=tmpi2->ic_flags|ICF_BY_VAL;

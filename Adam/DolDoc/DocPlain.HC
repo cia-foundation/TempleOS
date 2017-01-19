@@ -47,7 +47,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
   U8 *buf,*buf2;
 
   if (doc_e->type_u8==DOCT_FOREGROUND &&
-	doc->flags&DOCF_COLOR_NAMES && 0<=attr<NUM_COLORS) {
+	doc->flags&DOCF_COLOR_NAMES && 0<=attr<COLORS_NUM) {
     buf=StrNew(DefineSub(attr,"ST_COLORS"));
     attr=DOC_DFT;
   } else
@@ -58,7 +58,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 
     de_flags=doc_e->de_flags&~(DOCG_BL_IV_UL|DOCEF_SEL|
 	  DOCEF_HIGHLIGHT|DOCEF_WORD_WRAP|DOCEF_SKIP|DOCEF_FILTER_SKIP);
-    for (i=0;i<DOCEf_NUM_FLAGS;i++)
+    for (i=0;i<DOCEf_FLAGS_NUM;i++)
       if (Bt(&f1,i)!=Bt(&de_flags,i)) {
 	if (Bt(&de_flags,i)) {
 	  if (!(1<<i&DOCEG_HAS_ARG)) {
@@ -92,7 +92,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
       case DOCT_BACKGROUND:
       case DOCT_DFT_FOREGROUND:
       case DOCT_DFT_BACKGROUND:
-	if (doc->flags&DOCF_COLOR_NAMES && 0<=attr<NUM_COLORS) {
+	if (doc->flags&DOCF_COLOR_NAMES && 0<=attr<COLORS_NUM) {
 	  buf2=MStrPrint("%s%Z,",buf,doc_e->attr,"ST_COLORS");
 	  Free(buf); buf=buf2;
 	  break;
@@ -114,7 +114,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	  buf2=MStrPrint("%s%d,",buf,doc_e->attr);
 	  Free(buf); buf=buf2;
 	}
-      case DOCT_NUM_TYPES-1: //nobound switch
+      case DOCT_TYPES_NUM-1: //nobound switch
 	break;
     }
     de_flags=doc_e->de_flags & DOCEG_HAS_ARG;
@@ -202,7 +202,7 @@ U8 *Doc2PlainText(CDoc *doc,CDocEntry *doc_e)
 	case DOCEf_USER_DATA:
 	  buf2=MStrPrint("%sU=0x%X,",buf,doc_e->user_data);
 	  break;
-	case DOCEf_NUM_FLAGS-1: //nobound switch
+	case DOCEf_FLAGS_NUM-1: //nobound switch
 	  break;
       }
       Free(buf); buf=buf2;
@@ -285,7 +285,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	  else
 	    doc_e->attr=attr;
 	  break;
-#assert DOCT_ERROR==DOCT_NUM_TYPES-1
+#assert DOCT_ERROR==DOCT_TYPES_NUM-1
 	case DOCT_ERROR:
 	  goto pd_err;
       }
@@ -460,7 +460,7 @@ CDocEntry *PrsDollarCmd(CDoc *doc,U8 *st)
 	    else
 	      goto pd_err;
 	    break;
-	  case DOCEf_NUM_FLAGS-1: //nobound switch
+	  case DOCEf_FLAGS_NUM-1: //nobound switch
 	    break;
 	}
       }

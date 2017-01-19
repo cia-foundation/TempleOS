@@ -178,7 +178,7 @@ public Bool GrTextBox3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,U8 *s,I64 border=2)
   return ToBool(res);
 }
 
-#define MAX_DIAMOND_SLOPE	2.75
+#define DIAMOND_SLOPE_MAX	2.75
 
 public Bool GrTextDiamond3(CDC *dc=gr.dc,
 	I64 x1,I64 y1,I64 z1,U8 *_s,I64 border=2)
@@ -223,12 +223,12 @@ public Bool GrTextDiamond3(CDC *dc=gr.dc,
       do {
 	dx_old=dx; dy_old=dy;
 	m=ToF64(dx)/dy;
-	if (m<1/MAX_DIAMOND_SLOPE) {
-	  dy=MaxI64(dy,Ceil(MAX_DIAMOND_SLOPE*dx));
-	  m=1/MAX_DIAMOND_SLOPE;
-	} else if (m>MAX_DIAMOND_SLOPE) {
-	  dy=MaxI64(dy,Ceil(dx/MAX_DIAMOND_SLOPE));
-	  m=MAX_DIAMOND_SLOPE;
+	if (m<1/DIAMOND_SLOPE_MAX) {
+	  dy=MaxI64(dy,Ceil(DIAMOND_SLOPE_MAX*dx));
+	  m=1/DIAMOND_SLOPE_MAX;
+	} else if (m>DIAMOND_SLOPE_MAX) {
+	  dy=MaxI64(dy,Ceil(dx/DIAMOND_SLOPE_MAX));
+	  m=DIAMOND_SLOPE_MAX;
 	}
 	dx=MaxI64(dx,w+Ceil(m*AbsI64(y-y1)));
 	dx=MaxI64(dx,w+Ceil(m*AbsI64(y+FONT_HEIGHT-y1)));

@@ -1,11 +1,11 @@
 I64 sc_1,sc_2;
 
-#define NUM_DROPS	0x2000
+#define DROPS_NUM	0x2000
 
 class Drop
 {
   I32 x,y;
-} drops[NUM_DROPS];
+} drops[DROPS_NUM];
 
 CDC *cur_dc;
 
@@ -49,7 +49,7 @@ U0 DrawDrops(CTask *,CDC *dc)
 {
   I64 i;
   dc->color=BLUE;
-  for (i=0;i<NUM_DROPS;i++)
+  for (i=0;i<DROPS_NUM;i++)
     if (drops[i].y>=0 && GrPeek(dc,drops[i].x,drops[i].y)==WHITE)
       GrPlot(dc,drops[i].x,drops[i].y);
 }
@@ -80,21 +80,21 @@ U0 AnimateTask(I64)
     for (i=0;i<2;i++) {
       j=0;
       do {
-	if (++cur_drop>=NUM_DROPS)
+	if (++cur_drop>=DROPS_NUM)
 	  cur_drop=0;
 	if (drops[cur_drop].y<0)
 	  break;
 	j++;
-      } while (j<=NUM_DROPS);
+      } while (j<=DROPS_NUM);
 
       drops[cur_drop].x=RandU32%w;
       drops[cur_drop].y=0;
     }
 
-    for (i=0;i<NUM_DROPS;i++) {
+    for (i=0;i<DROPS_NUM;i++) {
       if (drops[i].y>=0) {
 	if (drops[i].y>=h-1)
-	  drops[i].y=-MAX_I32;
+	  drops[i].y=-I32_MAX;
 	else {
 	  x0=x1=drops[i].x;
 	  y0=y1=drops[i].y;
@@ -141,8 +141,8 @@ U0 Init()
 {
   I64 i;
   MemSet(drops,0,sizeof(drops));
-  for (i=0;i<NUM_DROPS;i++)
-    drops[i].y=-MAX_I32;
+  for (i=0;i<DROPS_NUM;i++)
+    drops[i].y=-I32_MAX;
 }
 
 U0 RainDrops()

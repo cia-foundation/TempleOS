@@ -8,7 +8,7 @@ I64 TSSSize(CTSS *tss)
 I64 PenBrushesSize()
 {
   I64 res=0,i;
-  for (i=0;i<GR_NUM_PEN_BRUSHES;i++)
+  for (i=0;i<GR_PEN_BRUSHES_NUM;i++)
     res+=DCSize(gr.pen_brushes[i])+DCSize(gr.collision_pen_brushes[i])+
 	  DCSize(gr.even_pen_brushes[i])+DCSize(gr.odd_pen_brushes[i]);
   return res;
@@ -17,7 +17,7 @@ I64 PenBrushesSize()
 I64 ScrnZoomTablesSize()
 {
   I64 res=0,i;
-  for (i=1;i<=GR_MAX_SCRN_ZOOM;i++)
+  for (i=1;i<=GR_SCRN_ZOOM_MAX;i++)
     res+=MSize2(gr.scrn_zoom_tables[i]);
   return res;
 }
@@ -65,7 +65,7 @@ I64 BlkDevsSize()
 {
   I64 i,j,res=MSize2(blkdev.blkdevs);
   CBlkDev *bd;
-  for (i=0;i<NUM_BLKDEVS;i++) {
+  for (i=0;i<BLKDEVS_NUM;i++) {
     bd=&blkdev.blkdevs[i];
     if (bd->bd_signature==BD_SIGNATURE_VAL) {
       j=(bd->max_blk+1)<<BLK_SIZE_BITS;
@@ -81,7 +81,7 @@ I64 BlkDevsSize()
 I64 DrvsSize()
 {
   I64 i,res=MSize2(blkdev.drvs);
-  for (i=0;i<NUM_DRVS;i++)
+  for (i=0;i<DRVS_NUM;i++)
     res+=MSize2(blkdev.drvs[i].cur_fat_blk)+MSize2(blkdev.drvs[i].fis);
   return res;
 }

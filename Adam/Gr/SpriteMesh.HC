@@ -76,7 +76,7 @@ CMeshEdTri *MeshTriNew(CMeshFrame *e,CColorROPU32 color,
 CMeshEdVertex *MeshVertexFindScrPt(CMeshFrame *e,I64 x,I64 y)
 {//Scrn coordinates
   CMeshEdVertex *res=NULL,*tmpv=e->vertex_head.next;
-  I64 dd,dz,best_dd=MAX_I64,best_dz=MAX_I64;
+  I64 dd,dz,best_dd=I64_MAX,best_dz=I64_MAX;
   while (tmpv!=&e->vertex_head) {
     if (!(tmpv->flags&VF_IGNORE)) {
       dd=SqrI64(x-tmpv->pt.x)+SqrI64(y-tmpv->pt.y);
@@ -1358,7 +1358,7 @@ me_clipboard_cut:
 		  p0b.y=ms.presnap.y;
 		  p0b.z=e.ms_z;
 		  adjusting_z=TRUE;
-		  Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
+		  Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,I8_MAX));
 		}
 	      }
 	      break;
@@ -1432,7 +1432,7 @@ me_clipboard_cut:
 	    p0b.y=ms.presnap.y;
 	    p0b.z=e.ms_z;
 	    adjusting_z=TRUE;
-	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
+	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,I8_MAX));
 	  }
 	  break;
 	case MSG_MS_R_UP:
@@ -1472,7 +1472,7 @@ me_clipboard_cut:
 	    e.ms_z=RoundI64(Sign(p0b.y-ms.presnap.y)
 	    *Sqrt(Sqr(p0b.x-ms.presnap.x)+Sqr(p0b.y-ms.presnap.y))
 	    +p0b.z,e.cur_snap);
-	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,MAX_I8));
+	    Snd(ClampI64(Freq2Ona(3*e.ms_z+1500),0,I8_MAX));
 	  }
 	  if (moving) {
 	    MeshCursorW(&e,Fs,&x,&y,&z);

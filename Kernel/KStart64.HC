@@ -37,7 +37,7 @@ USE64
 	CALL	SET_FS_BASE
 	MOV	RSP,U64 CTask.rsp[RAX]
 
-	JMP	I32 &KernelMain
+	JMP	I32 &KMain
 
 //************************************
 USE32

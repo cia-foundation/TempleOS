@@ -9,10 +9,10 @@ U0 LoadDocDefines()
 	(Now-Str2Date("8/1/2003"))/ToF64(1<<32)/CDATE_YEAR_DAYS);
 
   //This is cut and replaced when I generate a distro.
-  //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
+  //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,466");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,791");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,710");
+DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,944");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;

@@ -28,9 +28,9 @@ class MySpring:CSpring
 };
 
 #define SPIN_GAIN		0.25
-#define MAX_MASSES		8
-#define MAX_SPRINGS		16
-#define MAX_MISSILES		2
+#define MASSES_NUM		8
+#define SPRINGS_NUM		16
+#define MISSILES_NUM		2
 #define ST_HUMAN1		0
 #define ST_ENEMY1		1
 #define ST_ENEMY2		2
@@ -53,14 +53,14 @@ class Ship
 {
   Ship *next,*last;
   I64 type,masses,springs;
-  MyMass   p[MAX_MASSES];
-  MySpring s[MAX_SPRINGS];
+  MyMass   p[MASSES_NUM];
+  MySpring s[SPRINGS_NUM];
   F64 fire_rate;
   F64 reload_timeout,spacewalk_timeout;
   F64 die_time,die_timeout;
   I64 spacewalk_side;
   F64 laser_temperature;
-  Missile missiles[MAX_MISSILES];
+  Missile missiles[MISSILES_NUM];
   Bool lasering,exploding,laser_overheat;
 } ship_head,*human;
 
@@ -77,8 +77,8 @@ class Shot
 F64 t_solar_storm;
 Bool alarm;
 
-#define MAX_THRUST	200.0
-#define MAX_ANTISPIN	25.0
+#define THRUST_MAX	200.0
+#define ANTISPIN_MAX	25.0
 #define SPACEWALK_TIME	7.5
 
 #define CMD_NULL	0
@@ -89,8 +89,8 @@ Bool alarm;
 #define CMD_EXIT	5
 Bool game_over,show_level_msg;
 
-#define NUM_STARS	100
-I64 stars_x[NUM_STARS],stars_y[NUM_STARS];
+#define STARS_NUM	100
+I64 stars_x[STARS_NUM],stars_y[STARS_NUM];
 
 CMathODE *ode=NULL;
 I64 level,score,remaining;
@@ -471,7 +471,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    (task->pix_height-FONT_HEIGHT)/2+50,"Level %d",level);
   }
 
-  for (i=0;i<NUM_STARS;i++)
+  for (i=0;i<STARS_NUM;i++)
     GrPlot(dc,stars_x[i],stars_y[i]);
 
   tmpm=ode->next_mass;
@@ -534,7 +534,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
-		  0,MAX_THRUST);
+		  0,THRUST_MAX);
 
 	    if (d=D3Norm(D3Sub(&p1,&tmpsp->p[0].x,&tmpsp->p[2].x))) {
 	      D3Sub(&p2,&tmpsp->p[0].DxDt,&tmpsp->p[2].DxDt);
@@ -543,7 +543,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 	    } else
 	      spin=0;
 	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,
-		  0,MAX_THRUST);
+		  0,THRUST_MAX);
 	  }
 
 	  D3Sub(&p1,&tmpsp->p[1].x,&tmpsp->p[0].x);
@@ -737,7 +737,7 @@ U0 Explosion(MyMass *tmpm1,MyMass *tmpm2,F64 tons)
 Ship TargetGet(Missile *tmpmi)
 {
   Ship *tmpsp,*res=NULL;
-  F64 dd,best_dd=MAX_F64;
+  F64 dd,best_dd=F64_MAX;
   I64 i;
   CD3 p,p1,p2;
   D3Unit(D3Sub(&p,&tmpmi->p_front.state->x,&tmpmi->p_back.state->x));
@@ -831,15 +831,15 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	    if (0.485<d<0.515) {
 	      D3Unit(D3Sub(&p,&tmpsp->p[2].state->x,&tmpsp->p[1].state->x));
 	      if (tmpsp->spacewalk_side==3) {
-		tmpsp->p[3].DstateDt->DxDt-=10*MAX_THRUST*p.x;
-		tmpsp->p[3].DstateDt->DyDt-=10*MAX_THRUST*p.y;
-		tmpsp->p[1].DstateDt->DxDt+=10*MAX_THRUST*p.x;
-		tmpsp->p[1].DstateDt->DyDt+=10*MAX_THRUST*p.y;
+		tmpsp->p[3].DstateDt->DxDt-=10*THRUST_MAX*p.x;
+		tmpsp->p[3].DstateDt->DyDt-=10*THRUST_MAX*p.y;
+		tmpsp->p[1].DstateDt->DxDt+=10*THRUST_MAX*p.x;
+		tmpsp->p[1].DstateDt->DyDt+=10*THRUST_MAX*p.y;
 	      } else {
-		tmpsp->p[4].DstateDt->DxDt+=10*MAX_THRUST*p.x;
-		tmpsp->p[4].DstateDt->DyDt+=10*MAX_THRUST*p.y;
-		tmpsp->p[2].DstateDt->DxDt-=10*MAX_THRUST*p.x;
-		tmpsp->p[2].DstateDt->DyDt-=10*MAX_THRUST*p.y;
+		tmpsp->p[4].DstateDt->DxDt+=10*THRUST_MAX*p.x;
+		tmpsp->p[4].DstateDt->DyDt+=10*THRUST_MAX*p.y;
+		tmpsp->p[2].DstateDt->DxDt-=10*THRUST_MAX*p.x;
+		tmpsp->p[2].DstateDt->DyDt-=10*THRUST_MAX*p.y;
 	      }
 	    }
 	  } else {
@@ -851,7 +851,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	    } else
 	      spin=0;
 	    t_left =Clamp(human_t_left+SPIN_GAIN*spin*human_antispin,
-		  0,MAX_THRUST);
+		  0,THRUST_MAX);
 
 	    if (d=D3Norm(D3Sub(&p1,&tmpsp->p[0].state->x,
 		  &tmpsp->p[2].state->x))) {
@@ -861,7 +861,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	    } else
 	      spin=0;
 	    t_right=Clamp(human_t_right-SPIN_GAIN*spin*human_antispin,
-		  0,MAX_THRUST);
+		  0,THRUST_MAX);
 
 	    D3Sub(&p1,&tmpsp->p[0].state->x,&tmpsp->p[1].state->x);
 	    D3Sub(&p2,&tmpsp->p[0].state->x,&tmpsp->p[2].state->x);
@@ -905,7 +905,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 	    p2.x=p.x*Cos(é_thrust)-p.y*Sin(é_thrust);
 	    p2.y=p.y*Cos(é_thrust)+p.x*Sin(é_thrust);
 	    p2.z=0;
-	    D3AddEqu(&tmpmi->p_back.DstateDt->DxDt,D3MulEqu(&p2,MAX_THRUST));
+	    D3AddEqu(&tmpmi->p_back.DstateDt->DxDt,D3MulEqu(&p2,THRUST_MAX));
 	  }
 	}
       } else
@@ -970,7 +970,7 @@ U0 CheckDamage()
 	human->laser_overheat=FALSE;
     }
     if (!human->laser_overheat && human->lasering) {
-      if (human->laser_temperature>=LASER_MAX_TEMP) {
+      if (human->laser_temperature>=LASER_TEMP_MAX) {
 	human->laser_overheat=TRUE;
 	Snd;
       } else {
@@ -982,7 +982,7 @@ U0 CheckDamage()
 	p2.y=-p.x;
 	p2.z=0;
 	best_mass=NULL;
-	best_distance=MAX_F64;
+	best_distance=F64_MAX;
 	tmpm=ode->next_mass;
 	while (tmpm!=&ode->next_mass) {
 	  D3Sub(&p1,&human->p[0].x,&tmpm->x);
@@ -1050,7 +1050,7 @@ U0 CheckDamage()
     }
     if (!tmpsp->exploding) {
       for (i=0;i<tmpsp->masses;i++)
-	if (tmpsp->p[i].temperature>MAX_MASS_TEMP)
+	if (tmpsp->p[i].temperature>MASS_TEMP_MAX)
 	  death_score++;
       if (death_score) {
 	tmpsp->exploding=TRUE;
@@ -1249,7 +1249,7 @@ U0 ExpireMissiles()
   while (tmpmi!=&missile_head) {
     tmpm1=tmpmi->next;
     if (tmpmi->launched) {
-      best_dd=MAX_F64;
+      best_dd=F64_MAX;
       if (tmpmi->target)
 	for (i=0;i<tmpmi->target->masses;i++) {
 	  dd=D3DistSqr(&tmpmi->p_front.x,&tmpmi->target->p[i].x);
@@ -1331,7 +1331,7 @@ U0 Init()
   QueInit(&shot_head);
   QueInit(&missile_head);
 
-  for (i=0;i<NUM_STARS;i++) {
+  for (i=0;i<STARS_NUM;i++) {
     stars_x[i]=RandU16%GR_WIDTH;
     stars_y[i]=RandU16%GR_HEIGHT;
   }
@@ -1407,7 +1407,7 @@ U0 XCaliber()
 		    else if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time+=2;
 		    else
-		      human_t_right=MAX_THRUST;
+		      human_t_right=THRUST_MAX;
 		    break;
 		  case SC_CURSOR_LEFT:
 		    if (sc&SCF_CTRL)
@@ -1415,21 +1415,21 @@ U0 XCaliber()
 		    else if (sc&SCF_SHIFT)
 		      ctrl_panel.fuse_time-=2;
 		    else
-		      human_t_left =MAX_THRUST;
+		      human_t_left =THRUST_MAX;
 		    break;
 		  case SC_CURSOR_UP:
 		    if (sc&SCF_SHIFT)
 		      ctrl_panel.shot_radius+=2;
 		    else {
-		      human_t_right=MAX_THRUST;
-		      human_t_left =MAX_THRUST;
+		      human_t_right=THRUST_MAX;
+		      human_t_left =THRUST_MAX;
 		    }
 		    break;
 		  case SC_CURSOR_DOWN:
 		    if (sc&SCF_SHIFT)
 		      ctrl_panel.shot_radius-=2;
 		    else
-		      human_antispin=MAX_ANTISPIN;
+		      human_antispin=ANTISPIN_MAX;
 		    break;
 		}
 		break;

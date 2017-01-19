@@ -6,8 +6,8 @@
   Option(OPTf_WARN_PAREN,ON);
   Option(OPTf_WARN_DUP_TYPES,ON);
   #include "KCfg"
-  CKernelCfg *kernel_cfg;
-  kernel_cfg=KernelCfgNew;
+  CKCfg *kernel_cfg;
+  kernel_cfg=KCfgNew;
 };
 
 #include "KernelA.HH"
@@ -58,4 +58,4 @@
 #include "FunSeg"
 #include "KEnd"
 
-#exe {KernelCfgDel(kernel_cfg);};
+#exe {KCfgDel(kernel_cfg);};

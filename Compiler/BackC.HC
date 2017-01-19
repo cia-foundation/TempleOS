@@ -16,7 +16,7 @@ U0 ICAndBranch(CIntermediateCode *tmpi,I64 rip,I64 is,U8 *buf,I64 rip2)
     arg2=&tmpi->arg2;
   }
 
-  if (arg2->type&MDF_IMM && arg2->disp>MAX_U32)
+  if (arg2->type&MDF_IMM && arg2->disp>U32_MAX)
     override=TRUE;
   else
     override=FALSE;
@@ -27,11 +27,11 @@ U0 ICAndBranch(CIntermediateCode *tmpi,I64 rip,I64 is,U8 *buf,I64 rip2)
     it=arg2->type.raw_type;
 
   i=arg2->disp;
-  if (arg2->type&MDF_IMM && i<=MAX_U32) {
+  if (arg2->type&MDF_IMM && i<=U32_MAX) {
     ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,arg1->type,arg1->reg,arg1->disp,rip2);
-    if (i<=MAX_U8)
+    if (i<=U8_MAX)
       ICU16(tmpi,i<<8+0xA8);
-    else if (i<=MAX_U16)
+    else if (i<=U16_MAX)
       ICU32(tmpi,i<<16+0xA900+OC_OP_SIZE_PREFIX);
     else {
       ICU8(tmpi,0xA9);
@@ -136,7 +136,7 @@ U0 ICAndBranch(CIntermediateCode *tmpi,I64 rip,I64 is,U8 *buf,I64 rip2)
     i=lb->addr-(rip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 
@@ -317,7 +317,7 @@ U0 ICBrBitOps(CIntermediateCode *tmpi,I64 rip,
     i=lb->addr-(rip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 
@@ -564,7 +564,7 @@ U0 ICOrEqu(CIntermediateCode *tmpi,I64 rip2)
 	tmpi->ic_flags&ICF_RES_NOT_USED) {
     i=tmpi->arg2.disp;
     bit=Bsf(i);
-    if (0<=bit==Bsr(i) && i>MAX_I8) {
+    if (0<=bit==Bsr(i) && i>I8_MAX) {
       tmpi->arg2.disp=bit;
       tmpi->arg2.reg=0;
       tmpi->arg1.type=tmpi->arg1.type&MDG_MASK+RT_I64;
@@ -618,12 +618,12 @@ U0 ICSwitch(CIntermediateCode *tmpi,I64 rip,
       j=tmpi->arg2.disp;
       ICMov(tmpi,MDF_REG+RT_I64,r,0,
 	    tmpi->arg1.type,tmpi->arg1.reg,tmpi->arg1.disp,rip2);
-      if (MIN_I8<=j<=MAX_I8) {
+      if (I8_MIN<=j<=I8_MAX) {
 	i=0xF88348+(r&7)<<16;
 	if (r>7) i++;
 	ICU24(tmpi,i);
 	ICU8(tmpi,j);
-      } else if (MIN_I32<=j<=MAX_I32) {
+      } else if (I32_MIN<=j<=I32_MAX) {
 	i=0xF88148+(r&7)<<16;
 	if (r>7) i++;
 	ICU24(tmpi,i);
@@ -650,7 +650,7 @@ U0 ICSwitch(CIntermediateCode *tmpi,I64 rip,
     short_jmp=ToBool(tmpi->ic_flags&ICF_SHORT_JMP);
     if (!buf && lb->addr!=INVALID_PTR) {
       i=lb->addr-(rip+2);
-      if (MIN_I8<=i<=MAX_I8)
+      if (I8_MIN<=i<=I8_MAX)
 	short_jmp=TRUE;
     }
     if (short_jmp) {
@@ -666,12 +666,12 @@ U0 ICSwitch(CIntermediateCode *tmpi,I64 rip,
   lb=tmpi->ic_data;
   begin=lb->begin->addr;
   if (!buf && begin!=INVALID_PTR) {
-    min=MAX_I64;
-    max=MIN_I64;
+    min=I64_MAX;
+    max=I64_MIN;
     for (i=0;i<lb->range;i++) {
       if (lb->jmp_table[i]->addr==INVALID_PTR) {
-	min=MIN_I64;
-	max=MAX_I64;
+	min=I64_MIN;
+	max=I64_MAX;
 	break;
       } else {
 	j=lb->jmp_table[i]->addr-begin;
@@ -679,13 +679,13 @@ U0 ICSwitch(CIntermediateCode *tmpi,I64 rip,
 	max=MaxI64(max,j);
       }
     }
-    if (MIN_I8<=min<=max<=MAX_I8)
+    if (I8_MIN<=min<=max<=I8_MAX)
       lb->flags|=CMF_I8_JMP_TABLE;
-    else if (MIN_U8<=min<=max<=MAX_U8)
+    else if (U8_MIN<=min<=max<=U8_MAX)
       lb->flags|=CMF_U8_JMP_TABLE;
-    else if (MIN_I16<=min<=max<=MAX_I16)
+    else if (I16_MIN<=min<=max<=I16_MAX)
       lb->flags|=CMF_I16_JMP_TABLE;
-    else if (MIN_U16<=min<=max<=MAX_U16)
+    else if (U16_MIN<=min<=max<=U16_MAX)
       lb->flags|=CMF_U16_JMP_TABLE;
   }
 

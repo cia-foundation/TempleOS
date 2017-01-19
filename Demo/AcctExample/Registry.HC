@@ -2,9 +2,9 @@ $TR-UL,"Adam"$
 $ID,2$$TR,"SysMsgFlags"$
 $ID,2$sys_msg_flags[0]=0xFF;
 $ID,-2$$TR,"SysRegVer"$
-$ID,2$registry_version=5.000;
+$ID,2$registry_version=5.010;
 $ID,-2$$TR,"InsReg"$
-$ID,2$#help_index "Misc/Install Registration"
+$ID,2$#help_index "Registry/Install Registration"
 MemSet(&ins_reg,0,sizeof(CInsReg));
 ins_reg.registered=1;
 ins_reg.host_os=2;
@@ -24,12 +24,12 @@ HashPublic("INS_REG_MACHINE_NUM",HTT_DEFINE_STR);
 $ID,-2$$ID,-2$$TR-UL,"TempleOS"$
 $ID,2$$TR,"EagleDive"$
 $ID,2$F64 best_score=147.6932;
-$ID,-2$$TR,"TOSGodOffer"$
-$ID,2$I64 tos_gus_gwen=22;
-$ID,-2$$TR,"TOSVideos"$
-$ID,2$I64 tos_code_walk_thru=105;
 $ID,-2$$TR,"DiningStars"$
 $ID,2$F64 best_score=9999.0000;
+$ID,-2$$TR,"CircleTrace"$
+$ID,2$F64 best_score=4.9425;
+$ID,-2$$TR,"TOSNIST"$
+$ID,2$I64 tos_nist_offset=-8049;
 $ID,-2$$TR,"BlackDiamond"$
 $ID,2$I64 best_score=1;
 $ID,-2$$TR,"DunGen"$
@@ -52,20 +52,23 @@ $ID,-2$$TR,"BomberGolf"$
 $ID,2$I64 best_score=175;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=220.470;
+progress3_tf=0.000;progress4_tf=228.734;
 $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"XCaliber"$
 $ID,2$I64 best_score=90;
-I64 msg_flags=3;
+I64 msg_flags=2;
 $ID,-2$$TR,"Talons"$
 $ID,2$F64 best_score=9999.0000;
-$ID,-2$$TR,"CircleTrace"$
-$ID,2$F64 best_score=4.9425;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=174.320;
+progress3_tf=0.000;progress4_tf=192.371;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$
-$ID,2$$ID,-2$$ID,-2$
+$ID,2$$ID,-2$$ID,-2$$TR,"DemoCompany"$
+$ID,2$$TR,"Game1"$
+$ID,2$F64 best_score=1735.08564;
+$TR,"SimpleVal"$
+$ID,2$1236;
+$ID,-2$$ID,-2$$ID,-2$

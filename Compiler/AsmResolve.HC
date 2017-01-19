@@ -18,8 +18,8 @@ U0 AsmResolve(CCmpCtrl *cc,CAsmUnresolvedRef *tmpu,U8 *label,Bool undefined)
     }
   } else if (!(tmpu->type&IEF_IMM_NOT_REL)) {
     res-=tmpu->rel_rip;
-    if (tmpu->type==IET_REL_I8 && !(MIN_I8<=res<=MAX_I8) ||
-	  tmpu->type==IET_REL_I16 && !(MIN_I16<=res<=MAX_I16)) {
+    if (tmpu->type==IET_REL_I8 && !(I8_MIN<=res<=I8_MAX) ||
+	  tmpu->type==IET_REL_I16 && !(I16_MIN<=res<=I16_MAX)) {
       PrintErr("Branch out of range at line:%04d %s\n",
 	    tmpu->line_num,label);
       LexExcept(cc);

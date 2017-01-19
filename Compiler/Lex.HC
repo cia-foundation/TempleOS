@@ -319,7 +319,7 @@ CDoc *LexDocRead(U8 *abs_filename,I64 flags)
   return doc;
 }
 
-I64 cmp_type_flags_src_code[(DOCT_NUM_TYPES+63)/64]={
+I64 cmp_type_flags_src_code[(DOCT_TYPES_NUM+63)/64]={
   1<<DOCT_TEXT|1<<DOCT_TAB|1<<DOCT_INS_BIN|1<<DOCT_INS_BIN_SIZE};
 
 U0 LexAttachDoc(CCmpCtrl *cc,CLexFile *tmpf=NULL,
@@ -684,7 +684,7 @@ lex_float_start:
 	cc->token=TK_CHAR_CONST;
 	goto lex_end;
       case '#':
-	if (cc->flags&CCF_KEEP_NUM_SIGN) {
+	if (cc->flags&CCF_KEEP_SIGN_NUM) {
 	  cc->token=ch;
 	  goto lex_end;
 	}
@@ -1170,7 +1170,7 @@ lex_check_comment:
 	  cc->token=ch;
 	  goto lex_end;
 	}
-      case TK_NUM_TK:
+      case TK_TKS_NUM:
 	break;
     }
   }

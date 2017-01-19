@@ -122,14 +122,14 @@ Bool InSetMsPlot(I64 mS,I64 x,I64 y,I64 z)
   return TRUE;
 }
 
-public U0 InSetMs(I64 mS=7,I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,
-		I64 l=MAX_I64,I64 r=MAX_I64)
+public U0 InSetMs(I64 mS=7,I64 x=I64_MAX,I64 y=I64_MAX,I64 z=I64_MAX,
+		I64 l=I64_MAX,I64 r=I64_MAX)
 {//Move mouse to spot at certain speed.
   if (!(0<=x<GR_WIDTH))
     x=ms.pos.x;
   if (!(0<=y<GR_HEIGHT))
     y=ms.pos.y;
-  if (z==MAX_I64)
+  if (z==I64_MAX)
     z=ms.pos.z;
   if (!(FALSE<=l<=TRUE))
     l=ms.lb;

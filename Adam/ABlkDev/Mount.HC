@@ -33,7 +33,7 @@ U8 Mount2(U8 boot_drv_let,CDoc *_doc,Bool _caller_is_prtdsk)
 	make_free=TRUE;
       }
       unit=0;
-      prt_num=MIN_I64;
+      prt_num=I64_MIN;
       switch (type) {
 	case BDT_RAM:
 	  "Addr of RAM disk ($$PURPLE$$<ENTER>$$FG$$ to MAlloc):";

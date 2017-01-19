@@ -275,7 +275,7 @@ U0 Span()
   bt_run =CtrlBttnNew(0,0,		  80,,
 	2,"Stopped\0Running\0",run_colors,&run_bttn);
   bt_mode=CtrlBttnNew(0,3.0*FONT_HEIGHT,80,,
-	MD_NUM_MODES,Define("ST_SPAN_MODES"),mode_colors,&mode_bttn);
+	MD_MODES_NUM,Define("ST_SPAN_MODES"),mode_colors,&mode_bttn);
   a.saved_ode=NULL;
 
   Fs->win_inhibit|=WIG_DBL_CLICK;
@@ -386,7 +386,7 @@ U0 Span()
 	  break;
 	case MSG_MS_R_DOWN:
 	  mode_bttn.state++;
-	  if (mode_bttn.state>=MD_NUM_MODES)
+	  if (mode_bttn.state>=MD_MODES_NUM)
 	    mode_bttn.state=0;
 	  cursor_mass=tmpm1=tmpm2=NULL;
 	  break;

@@ -207,15 +207,15 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode)
       break;
     case FM_PICK_FILE:
       DocPrint(doc,"$$PURPLE$$Pick file and press <ESC>\n\n");
-      doc->flags|=DOCF_MIN_SIZE;
+      doc->flags|=DOCF_SIZE_MIN;
       break;
     case FM_PICK_DIR:
       DocPrint(doc,"$$PURPLE$$Pick directory and press <ESC>\n\n");
-      doc->flags|=DOCF_MIN_SIZE;
+      doc->flags|=DOCF_SIZE_MIN;
       break;
   }
   DocPrint(doc,"$$LTBLUE$$");
-  for (i=0;i<NUM_DRVS;i++) {
+  for (i=0;i<DRVS_NUM;i++) {
     dv=&blkdev.drvs[i];
     if (dv->bd->type==BDT_ATAPI) {
       if (dv->bd->flags&BDF_INITIALIZED)
@@ -388,7 +388,7 @@ U0 FMFmtDrv(CDoc *doc)
   Free(st);
 }
 
-U0 FMMakeISO(CDoc *doc)
+U0 FMMakeISO(CDoc *doc,I64 type)
 {
   CDocEntry *doc_ce=doc->cur_entry;
   CDirEntry *tmpde;
@@ -402,12 +402,19 @@ U0 FMMakeISO(CDoc *doc)
       tmpde=tmpde->parent;
     if (tmpde && *tmpde->full_name) {
       Silent;
-      if (tmpde->full_name[StrLen(tmpde->full_name)-1]=='/')
-	st=MStrPrint("%s*",tmpde->full_name);
-      else
-	st=MStrPrint("%s/*",tmpde->full_name);
-      ISO9660ISO(,st);
-      Free(st);
+      switch (type) {
+	case FSt_REDSEA:
+	  RedSeaISO(,tmpde->full_name);
+	  break;
+	case FSt_ISO9660:
+	  if (tmpde->full_name[StrLen(tmpde->full_name)-1]=='/')
+	    st=MStrPrint("%s*",tmpde->full_name);
+	  else
+	    st=MStrPrint("%s/*",tmpde->full_name);
+	  ISO9660ISO(,st);
+	  Free(st);
+	  break;
+      }
       Silent(OFF);
     }
   }
@@ -486,32 +493,35 @@ U0 FMCopy(CDoc *doc)
 #define FMR_PASTE		6
 #define FMR_CHG_DSK		7
 #define FMR_FORMAT		8
-#define FMR_MOUNT_ISO		9
+#define FMR_MOUNT_REDSEA_ISO_C	9
 #define FMR_UNMOUNT		10
-#define FMR_MAKE_ISO		11
-#define FMR_BURN_ISO		12
-#define FMR_HELP		13
+#define FMR_MAKE_REDSEA_ISO_C	11
+#define FMR_MAKE_ISO9660	12
+#define FMR_BURN_ISO		13
+#define FMR_HELP		14
 
 I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 {
   I64 i;
   CDoc *doc=DocNew;
   if (header) DocPrint(doc,"%s",header);
-  DocPrint(doc,"$$CM+LX,1,1 $$$$BT,\"INCLUDE               \",LE=FMR_INCLUDE$$"
-	"$$CM+LX,27,0$$$$BT,\"ADAM INCLUDE          \",LE=FMR_ADAM_INCLUDE$$"
-	"$$CM+LX,1,3 $$$$BT,\"DELETE                \",LE=FMR_DELETE$$"
-	"$$CM+LX,27,0$$$$BT,\"RENAME                \",LE=FMR_RENAME$$"
-	"$$CM+LX,1,3 $$$$BT,\"MAKE DIRECTORY        \",LE=FMR_MKDIR$$"
-	"$$CM+LX,27,0$$$$BT,\"PLAIN-TEXT EDIT       \",LE=FMR_PLAIN$$"
-	"$$CM+LX,1,3 $$$$BT,\"PASTE CLIPBOARD FILES \",LE=FMR_PASTE$$"
-	"$$CM+LX,27,0$$$$BT,\"CHANGE DISK(MOUNT IT) \",LE=FMR_CHG_DSK$$"
-	"$$CM+LX,1,3 $$$$BT,\"FORMAT                \",LE=FMR_FORMAT$$"
-	"$$CM+LX,1,3 $$$$BT,\"MOUNT ISO.C FILE      \",LE=FMR_MOUNT_ISO$$"
-	"$$CM+LX,27,0$$$$BT,\"UNMOUNT               \",LE=FMR_UNMOUNT$$"
-	"$$CM+LX,1,3 $$$$BT,\"MAKE ISO (CD/DVD) FILE\",LE=FMR_MAKE_ISO$$"
-	"$$CM+LX,27,0$$$$BT,\"BURN ISO (CD/DVD) FILE\",LE=FMR_BURN_ISO$$"
-	"$$CM+LX,1,3 $$$$BT,\"HELP                  \",LE=FMR_HELP$$"
-	"$$CM+LX,27,0$$$$BT,\"CANCEL                \",LE=DOCM_CANCEL$$\n");
+  DocPrint(doc,"$$CM+LX,1,1 $$$$BT,\"INCLUDE                 \",LE=FMR_INCLUDE$$"
+	"$$CM+LX,29,0$$$$BT,\"ADAM INCLUDE            \",LE=FMR_ADAM_INCLUDE$$"
+	"$$CM+LX,1,3 $$$$BT,\"DELETE                  \",LE=FMR_DELETE$$"
+	"$$CM+LX,29,0$$$$BT,\"RENAME                  \",LE=FMR_RENAME$$"
+	"$$CM+LX,1,3 $$$$BT,\"MAKE DIRECTORY          \",LE=FMR_MKDIR$$"
+	"$$CM+LX,29,0$$$$BT,\"PLAIN-TEXT EDIT         \",LE=FMR_PLAIN$$"
+	"$$CM+LX,1,3 $$$$BT,\"PASTE CLIPBOARD FILES   \",LE=FMR_PASTE$$"
+	"$$CM+LX,29,0$$$$BT,\"CHANGE DISK(MOUNT IT)   \",LE=FMR_CHG_DSK$$"
+	"$$CM+LX,1,3 $$$$BT,\"FORMAT                  \",LE=FMR_FORMAT$$"
+	"$$CM+LX,1,3 $$$$BT,\"MOUNT ISO.C FILE        \","
+	"LE=FMR_MOUNT_REDSEA_ISO_C$$"
+	"$$CM+LX,29,0$$$$BT,\"UNMOUNT                 \",LE=FMR_UNMOUNT$$"
+	"$$CM+LX,1,3 $$$$BT,\"MAKE ISO.C (CD/DVD) FILE\",LE=FMR_MAKE_REDSEA_ISO_C$$"
+	"$$CM+LX,29,0$$$$BT,\"MAKE ISO (CD/DVD) FILE  \",LE=FMR_MAKE_ISO9660$$"
+	"$$CM+LX,1,3 $$$$BT,\"BURN ISO (CD/DVD) FILE  \",LE=FMR_BURN_ISO$$"
+	"$$CM+LX,1,3 $$$$BT,\"HELP                    \",LE=FMR_HELP$$"
+	"$$CM+LX,29,0$$$$BT,\"CANCEL                  \",LE=DOCM_CANCEL$$\n");
   if (footer) DocPrint(doc,"%s",footer);
   i=PopUpMenu(doc);
   DocDel(doc);
@@ -543,18 +553,21 @@ U0 FMRightClick()
       Msg(MSG_KEY_DOWN,0,SC_INS+SCF_SHIFT);
       break;
     case FMR_CHG_DSK:
-      Msg(MSG_KEY_DOWN,'m',0);
+      Msg(MSG_KEY_DOWN,'c',0);
       break;
     case FMR_FORMAT:
       Msg(MSG_KEY_DOWN,'f',0);
       break;
-    case FMR_MOUNT_ISO:
+    case FMR_MOUNT_REDSEA_ISO_C:
       Msg(MSG_KEY_DOWN,'i',0);
       break;
     case FMR_UNMOUNT:
       Msg(MSG_KEY_DOWN,'u',0);
       break;
-    case FMR_MAKE_ISO:
+    case FMR_MAKE_REDSEA_ISO_C:
+      Msg(MSG_KEY_DOWN,'m',0);
+      break;
+    case FMR_MAKE_ISO9660:
       Msg(MSG_KEY_DOWN,'M',0);
       break;
     case FMR_BURN_ISO:
@@ -702,7 +715,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    case CH_CTRLY:
 	      FMDelete(doc);
 	      break;
-	    case 'm':
+	    case 'c':
 	      FMChgDsk(doc);
 	      break;
 	    case 'i':
@@ -712,7 +725,10 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	      FMUnmount(doc);
 	      break;
 	    case 'M':
-	      FMMakeISO(doc);
+	      FMMakeISO(doc,FSt_ISO9660);
+	      break;
+	    case 'm':
+	      FMMakeISO(doc,FSt_REDSEA);
 	      break;
 	    case 'B':
 	      FMBurnISO(doc);

@@ -194,7 +194,7 @@ U0 AsmHashLoad()
   }
   Free(tmpo_max);
   CmpCtrlDel(cc);
-  for (i=0;i<NUM_INTERNAL_TYPES;i++) {
+  for (i=0;i<INTERNAL_TYPES_NUM;i++) {
     tmpit=&internal_types_table[i];
     tmpc=PrsClassNew;
     tmpc->type=HTT_INTERNAL_TYPE;

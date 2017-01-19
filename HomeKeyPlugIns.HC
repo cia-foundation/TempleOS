@@ -1,7 +1,7 @@
 //Place this file in /Home and change
 //anything you want.
 
-U0 InsTime()
+U0 TimeIns()
 {
   CDate cdt;
   cdt=Now;
@@ -83,9 +83,9 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  case SC_F7:
 	    if (!(sc&SCF_SHIFT)) {
 	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /Ins Datetime");
+		KeyDescSet("Cmd /TimeIns");
 	      else
-		InsTime;
+		TimeIns;
 	    }
 	    return TRUE;
 	}
@@ -104,13 +104,13 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'h':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Tile Horizontally");
+	  KeyDescSet("Cmd /WinTileHorz");
 	else
 	  WinTileHorz;
 	return TRUE;
       case 'm':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Maximize");
+	  KeyDescSet("Cmd /WinMax");
 	else {
 	  WinBorder;
 	  WinMax;
@@ -118,7 +118,7 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'v':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Tile Vertically");
+	  KeyDescSet("Cmd /WinTileVert");
 	else
 	  WinTileVert;
 	return TRUE;

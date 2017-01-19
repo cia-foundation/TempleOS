@@ -48,14 +48,14 @@ $SP,"<15>",BI=15$
 $SP,"<16>",BI=16$
 $ID,-8$
 #define PSM_NOTE_SPACING	9
-#define PSM_NUM_DURATIONS	12
+#define PSM_DURATIONS_NUM	12
 
-F64 psm_durations[PSM_NUM_DURATIONS+1]={
+F64 psm_durations[PSM_DURATIONS_NUM+1]={
 2*.25/3,.25,2*.5/3,.5,2.0/3.0,0.5*1.5,1.0,1.5,2.0,3.0,4.0,6.0,1000000.0};
 U8 *psm_duration_lst="st\0s\0et\0e\0qt\0e.\0q\0q.\0h\0h.\0w\0w.\0";
-U8 *psm_duration_imgs[PSM_NUM_DURATIONS]={
+U8 *psm_duration_imgs[PSM_DURATIONS_NUM]={
 	$IB,"<1>",BI=1$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3$,$IB,"<3>",BI=3$,$IB,"<4>",BI=4$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<5>",BI=5$};
-Bool psm_triplet_durations[PSM_NUM_DURATIONS]={TRUE,FALSE,TRUE,
+Bool psm_triplet_durations[PSM_DURATIONS_NUM]={TRUE,FALSE,TRUE,
 	FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 
 Bool PsmBlink()
@@ -127,7 +127,7 @@ U0 PsmSetOctave(I64 octave)
 
 U0 DrawNote(CDC *dc,I64 x,I64 y,I64 duration)
 {
-  if (0<=duration<=PSM_NUM_DURATIONS) {
+  if (0<=duration<=PSM_DURATIONS_NUM) {
     Sprite3(dc,x,y,0,psm_duration_imgs[duration]);
     if (psm_triplet_durations[duration])
       Sprite3(dc,x,y,0,$IB,"<16>",BI=16$);
@@ -273,7 +273,7 @@ I64 PsmGetPickNoteBoxDuration(I64 xx,I64 yy)
 {
   I64 i,x1,x2;
   if (PSM_NOTE_BOX_Y-14<=yy<PSM_NOTE_BOX_Y+6) {
-    for (i=0;i<PSM_NUM_DURATIONS;i++) {
+    for (i=0;i<PSM_DURATIONS_NUM;i++) {
       PsmSetPickNoteBoxX(i,&x1);
       PsmSetPickNoteBoxX(i+1,&x2);
       if (x1<=xx+PSM_NOTE_SPACING/2<x2)
@@ -286,7 +286,7 @@ I64 PsmGetPickNoteBoxDuration(I64 xx,I64 yy)
 U0 DrawPickNoteBox()
 {
   I64 i,x;
-  for (i=0;i<PSM_NUM_DURATIONS;i++) {
+  for (i=0;i<PSM_DURATIONS_NUM;i++) {
     PsmSetPickNoteBoxX(i,&x);
     if (PsmIsDotted(i))
       psm.dc2->color=RED;
@@ -330,9 +330,9 @@ Bool PsmGetPickToolBox(I64 xx,I64 yy)
     return FALSE;
 }
 
-#define PSM_NUM_METERS	7
-I64 meter_tops[PSM_NUM_METERS]	={2,3,4,5,6,7,9},
-   meter_bottoms[PSM_NUM_METERS]={4,4,4,4,8,8,8};
+#define PSM_METERS_NUM	7
+I64 meter_tops[PSM_METERS_NUM]	={2,3,4,5,6,7,9},
+   meter_bottoms[PSM_METERS_NUM]={4,4,4,4,8,8,8};
 
 #define PSM_METER_X	485
 #define PSM_METER_Y	13*FONT_HEIGHT
@@ -340,7 +340,7 @@ I64 meter_tops[PSM_NUM_METERS]	={2,3,4,5,6,7,9},
 Bool PsmGetPickMeterBox(I64 xx,I64 yy,I64 *top,I64 *bottom)
 {
   I64 i;
-  if (PSM_METER_X<=xx<PSM_METER_X+PSM_METER_W*PSM_NUM_METERS &&
+  if (PSM_METER_X<=xx<PSM_METER_X+PSM_METER_W*PSM_METERS_NUM &&
 	PSM_METER_Y<=yy<PSM_METER_Y+2*FONT_HEIGHT) {
     i=(xx-PSM_METER_X)/PSM_METER_W;
     *top=meter_tops[i];
@@ -354,7 +354,7 @@ U0 DrawPickMeterBox()
 {
   I64 i;
   psm.dc2->color=BLACK;
-  for (i=0;i<PSM_NUM_METERS;i++)
+  for (i=0;i<PSM_METERS_NUM;i++)
     DrawTimeSignature(psm.dc2,PSM_METER_X+i*PSM_METER_W,PSM_METER_Y,
 	  meter_tops[i],meter_bottoms[i]);
 }

@@ -61,7 +61,7 @@ Unit *UnitFind(I64 row,I64 col)
 {//Finds unit in a hexagon.
   I64 i,j;
   for (j=0;j<2;j++)
-    for (i=0;i<MAX_UNITS;i++)
+    for (i=0;i<UNITS_NUM;i++)
       if (units[j][i].life>0 &&
 	    units[j][i].row==row &&
 	    units[j][i].col==col)

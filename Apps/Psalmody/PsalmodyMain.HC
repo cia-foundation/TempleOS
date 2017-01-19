@@ -17,7 +17,7 @@ F64 PopUpDuration()
 	"$$MU,\"Make Rest\",LE=PSMR_REST$$\n"
 	"$$MU,\"Insert Note\",LE=PSMR_INS_NOTE$$\n"
 	"$$MU,\"Delete Note\",LE=PSMR_DELETE_NOTE$$\n\n");
-  for (i=0;i<PSM_NUM_DURATIONS;i++)
+  for (i=0;i<PSM_DURATIONS_NUM;i++)
     DocPrint(doc,"$$MU,\"%7.5f\",LE=%d$$\n",psm_durations[i],i);
   DocPrint(doc,"\n$$MU,\"CANCEL\",LE=DOCM_CANCEL$$\n");
   i=PopUpMenu(doc);
@@ -35,7 +35,7 @@ U0 PsmRightClick(I64 x,I64 y)
   if (tmpn!=&psm.head) {
     Fs->win_inhibit=WIG_USER_TASK_DFT;
     i=PopUpDuration;
-    if (0<=i<PSM_NUM_DURATIONS) {
+    if (0<=i<PSM_DURATIONS_NUM) {
       if (tmpn->type==PSMT_NOTE)
 	tmpn->duration=i;
     } else {
@@ -240,7 +240,7 @@ U0 PsmLeftClick(I64 x,I64 y)
       PsmLeftClickStaffBox(x,y);
   } else {
     duration=PsmGetPickNoteBoxDuration(x,y);
-    if (0<=duration<PSM_NUM_DURATIONS)
+    if (0<=duration<PSM_DURATIONS_NUM)
       PsmLeftClickPickNoteBox(duration);
     else if (PsmGetPickMeterBox(x,y,&top,&bottom))
       PsmLeftClickPickMeterBox(top,bottom);
@@ -253,7 +253,7 @@ U8 PsmCvtDuration(F64 d)
 {
   F64 d1,d2;
   I64 j;
-  for (j=0;j<PSM_NUM_DURATIONS;j++) {
+  for (j=0;j<PSM_DURATIONS_NUM;j++) {
     d1=psm_durations[j];
     d2=psm_durations[j+1];
     if (d<d1*d2/(d1+d2))
@@ -262,7 +262,7 @@ U8 PsmCvtDuration(F64 d)
   return 0;
 }
 
-#define PSM_NUM_KEYS	20
+#define PSM_KEYS_NUM	20
 class PsmKey
 {
   U8 x,w,h,ascii;
@@ -273,7 +273,7 @@ class PsmKey
 #define PSM_B_W	8
 #define PSM_B_H	20
 
-PsmKey psm_kbd[PSM_NUM_KEYS]={
+PsmKey psm_kbd[PSM_KEYS_NUM]={
   { 2*PSM_W_W-4,PSM_B_W,PSM_B_H,'e' },
   { 3*PSM_W_W-4,PSM_B_W,PSM_B_H,'r' },
   { 4*PSM_W_W-4,PSM_B_W,PSM_B_H,'t' },
@@ -304,7 +304,7 @@ U0 PsmDownKey(I64 x,I64 y)
   y-=FONT_HEIGHT*13;
   if (0<=y<PSM_W_H) {
     x-=16;
-    for (i=0;i<PSM_NUM_KEYS;i++) {
+    for (i=0;i<PSM_KEYS_NUM;i++) {
       o=&psm_kbd[i];
       if (o->x<=x<o->x+o->w && y<o->h) {
 	Msg(MSG_KEY_DOWN,o->ascii,0);
@@ -321,7 +321,7 @@ U0 PsmUpKey(I64 x,I64 y)
   y-=FONT_HEIGHT*13;
   if (0<=y<PSM_W_H) {
     x-=16;
-    for (i=0;i<PSM_NUM_KEYS;i++) {
+    for (i=0;i<PSM_KEYS_NUM;i++) {
       o=&psm_kbd[i];
       if (o->x<=x<o->x+o->w && y<o->h) {
 	Msg(MSG_KEY_UP,o->ascii,0);

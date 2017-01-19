@@ -4,7 +4,7 @@ U0 PlayerIndirect()
   I64 i,remaining=0,msg_code,arg1,arg2;
   F64 target_x,target_y;
   ViewPlayerSet(cur_player);
-  for (i=0;i<MAX_UNITS;i++) {
+  for (i=0;i<UNITS_NUM;i++) {
     tmpu=&units[cur_player][i];
     if (tmpu->life>0 && tmpu->indirect_fire)
       remaining++;

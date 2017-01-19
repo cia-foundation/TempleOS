@@ -87,12 +87,12 @@ U8 *king_imgs[4]={$IB,"<2>",BI=2$,$IB,"<1>",BI=1$,$IB,"<2>",BI=2$,$IB,"<3>",BI=3
 U8 *peasant_imgs[4]={$IB,"<5>",BI=5$,$IB,"<4>",BI=4$,$IB,"<5>",BI=5$,$IB,"<6>",BI=6$};
 
 
-#define NUM_TREES	8
+#define TREES_NUM	8
 class Tree
 {
   U16 x,y;
   I64 fire_frame_idx;
-} trees[NUM_TREES];
+} trees[TREES_NUM];
 
 U64 snow_x,snow_y,new_snow_mS;
 #define SNOW_TILE_SIZE	128
@@ -103,7 +103,7 @@ I64 king_x,king_y,king_mS,king_phase,
 F64 king_timeout,king_é,t0,tf,door_open_t0;
 I64 animate_mS,animate_phase;
 
-#define NUM_PEASANTS	10
+#define PEASANTS_NUM	10
 class Peasant
 {
   Peasant *next,*last;
@@ -127,7 +127,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   F64 tt;
 
   dc->pen_width=1;
-  for (i=0;i<NUM_TREES;i++) {
+  for (i=0;i<TREES_NUM;i++) {
     if (trees[i].y<=h/2) {//Draw trees behind house
       if (trees[i].fire_frame_idx) {
 	if (trees[i].fire_frame_idx++&1)
@@ -144,7 +144,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   if (tS<door_open_t0+1.0)
     Sprite3(dc,w/2,h/2,0,$IB,"<11>",BI=11$);
 
-  for (i=0;i<NUM_TREES;i++) {
+  for (i=0;i<TREES_NUM;i++) {
     if (trees[i].y>h/2) {//Draw trees in front of house
       if (trees[i].fire_frame_idx) {
 	if (trees[i].fire_frame_idx++&1)
@@ -269,7 +269,7 @@ U0 Init()
   snow_tile=DCNew(SNOW_TILE_SIZE,SNOW_TILE_SIZE);
 
   SpriteExtents($IB,"<7>",BI=7$,&min_x,&max_x,&min_y,&max_y);
-  for (i=0;i<NUM_TREES;i++) {
+  for (i=0;i<TREES_NUM;i++) {
     trees[i].x=RandU16%(w-2*BORDER-(max_x-min_x+1))+BORDER-min_x;
     trees[i].y=RandU16%(h-2*BORDER-(max_y-min_y+1))+BORDER-min_y;
     trees[i].fire_frame_idx=0;
@@ -280,7 +280,7 @@ U0 Init()
 
   SpriteExtents($IB,"<12>",BI=12$,&min_x,&max_x,&min_y,&max_y);
   QueInit(&peasant_head);
-  for (i=0;i<NUM_PEASANTS;i++) {
+  for (i=0;i<PEASANTS_NUM;i++) {
     tmpp=MAlloc(sizeof(Peasant));
     tmpp->x=RandU16%(w-2*BORDER-(max_x-min_x+1))+BORDER-min_x;
     tmpp->y=RandU16%(h-2*BORDER-(max_y-min_y+1))+BORDER-min_y;
@@ -313,7 +313,7 @@ U0 CleanUp()
 U0 Follow(CTask *,Peasant *tmpp)
 {
   Step *tmps=king_step_head.next;
-  F64 d,best_d=MAX_F64;
+  F64 d,best_d=F64_MAX;
   while (tmps!=&king_step_head) {
     if ((d=Sqr(tmps->x-tmpp->x)+Sqr(tmps->y-tmpp->y)) &&
 	  d<15*15) {
@@ -369,7 +369,7 @@ U0 AnimateTask(I64)
 	  tmpp->stopped=TRUE;
 	  tmpp->door_opened_t0=door_open_t0=tS;
 	}
-	for (i=0;i<NUM_TREES;i++) //Hang-out by fire
+	for (i=0;i<TREES_NUM;i++) //Hang-out by fire
 	  if (trees[i].fire_frame_idx &&
 		Sqr(tmpp->x-trees[i].x)+Sqr(tmpp->y-trees[i].y)<20*20) {
 	    tmpp->stopped=TRUE;
@@ -429,7 +429,7 @@ U0 AnimateTask(I64)
 U0 BurnTrees()
 {
   I64 i;
-  for (i=0;i<NUM_TREES;i++)
+  for (i=0;i<TREES_NUM;i++)
     if (Sqr(king_x-trees[i].x)+Sqr(king_y-trees[i].y)<10*10)
       trees[i].fire_frame_idx=1;
 }

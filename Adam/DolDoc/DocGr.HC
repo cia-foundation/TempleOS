@@ -9,7 +9,7 @@ public I64 PopUpColor(U8 *header=NULL,
     DocPrint(doc,"%s",header);
   if (allow_transparent)
     DocPrint(doc,"$$MU,\"TRANSPARENT\",LE=TRANSPARENT$$\n");
-  for (i=0;i<NUM_COLORS;i++)
+  for (i=0;i<COLORS_NUM;i++)
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-8Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",i);
   if (allow_dft)
     DocPrint(doc,"$$BG,WHITE$$$$MU,\"DEFAULT\",LE=DOC_DFT$$$$BG$$");
@@ -33,14 +33,14 @@ public I64 PopUpColorLighting(U8 *header=NULL)
 	"\n");
   DocPrint(doc,
 	"\n$$LTPURPLE$$Single-Sided Full-Range Double-Sided Full-Range\n$$BLACK$$");
-  for (i=0;i<NUM_COLORS/2;i++) {
+  for (i=0;i<COLORS_NUM/2;i++) {
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$ ",i,i,"ST_COLORS",i);
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",i,i,"ST_COLORS",
 	  ROPF_TWO_SIDED+i);
   }
   DocPrint(doc,
 	"\n$$LTPURPLE$$Single-Sided Half-Range Double-Sided Half-Range\n$$BLACK$$");
-  for (i=0;i<NUM_COLORS;i++) {
+  for (i=0;i<COLORS_NUM;i++) {
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$ ",
 	  i,i,"ST_COLORS",ROPF_HALF_RANGE_COLOR+i);
     DocPrint(doc,"$$BG,%d$$$$MU,\"__%-19Z__\",LE=%d$$$$BG$$\n",

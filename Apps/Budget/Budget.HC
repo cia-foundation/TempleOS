@@ -46,7 +46,7 @@ class CBgtTemplate
   U16 flags;
   U8 start_date[16]	fmtstr "$$DA-P,A=\"Start Date:%s\"$$\n";
   U8 end_date[16]	fmtstr "$$DA-P,A=\"End Date  :%s\"$$\n";
-  F64 period		fmtstr "$$DA,A=\"Period    :%6.2f\"$$\n";
+  F64 period		fmtstr "$$DA,A=\"Period    :%8.2f\"$$\n";
   U0 end;
 
   CBgtEntry b;

@@ -28,7 +28,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
   CGrSym old_sym;
   MemCpy(&old_sym,&dc->sym,sizeof(CGrSym));
   if (dc->flags & DCF_LOCATE_NEAREST)
-    dc->nearest_dist=MAX_I64;
+    dc->nearest_dist=I64_MAX;
   while (tmpg->type&SPG_TYPE_MASK) {
     switch (tmpg->type&SPG_TYPE_MASK) {
       case SPT_COLOR:
@@ -293,16 +293,16 @@ public U0 Sprite3ZB(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,F64 é=0)
 public U0 SpriteExtents(U8 *elems,I64 *min_x=NULL,I64 *max_x=NULL,
 				   I64 *min_y=NULL,I64 *max_y=NULL)
 {//Ignores flood fills.
-  CDC *dc=DCNew(MAX_I32,MAX_I32,Fs,TRUE);
+  CDC *dc=DCNew(I32_MAX,I32_MAX,Fs,TRUE);
   DCExtentsInit(dc);
-  Sprite3(dc,MAX_I32/2,MAX_I32/2,MAX_I32/2,elems);
+  Sprite3(dc,I32_MAX/2,I32_MAX/2,I32_MAX/2,elems);
   if (dc->min_x<=dc->max_x) {
-    dc->min_x-=MAX_I32/2;
-    dc->max_x-=MAX_I32/2;
+    dc->min_x-=I32_MAX/2;
+    dc->max_x-=I32_MAX/2;
   }
   if (dc->min_y<=dc->max_y) {
-    dc->min_y-=MAX_I32/2;
-    dc->max_y-=MAX_I32/2;
+    dc->min_y-=I32_MAX/2;
+    dc->max_y-=I32_MAX/2;
   }
   if (min_x) *min_x=dc->min_x;
   if (max_x) *max_x=dc->max_x;

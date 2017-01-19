@@ -113,7 +113,7 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *tmp_return,
   HashSrcFileSet(cc,tmpf);
   PrsVarLst(cc,tmpf,PRS0_NULL|PRS1_FUN_ARG);
   tmpf->arg_cnt=tmpf->member_cnt;
-  if (0<tmpf->arg_cnt<<3<=MAX_I16 && !Bt(&tmpf->flags,Ff_DOT_DOT_DOT))
+  if (0<tmpf->arg_cnt<<3<=I16_MAX && !Bt(&tmpf->flags,Ff_DOT_DOT_DOT))
     LBts(&tmpf->flags,Ff_RET1);
   tmpm=tmpf->member_lst_and_root;
   while (tmpm) {
@@ -582,7 +582,7 @@ U0 PrsSwitch(CCmpCtrl *cc,I64 try_cnt)
   CCodeMisc *lb_dft,*lb_fwd_case,*mc_jt,*lb_entry,**jmp_table;
   CIntermediateCode *tmpi_sub,*tmpi_cmp,*tmpi_jmp,*tmpi_start;
   Bool dft_found=FALSE,nobound;
-  I64 i,k_start=MIN_I64,k_end,lo=MAX_I64,hi=MIN_I64,range;
+  I64 i,k_start=I64_MIN,k_end,lo=I64_MAX,hi=I64_MIN,range;
 
   if (cc->token=='(')
     nobound=FALSE;
@@ -679,7 +679,7 @@ sw_cont:
 	    ICAdd(cc,IC_LABEL,lb_fwd_case,0);
 	  }
 	  if (cc->token==':') {
-	    if (k_start==MIN_I64)
+	    if (k_start==I64_MIN)
 	      k_start=0;
 	    else
 	      k_start++;
@@ -937,7 +937,7 @@ Bool PrsStmt(CCmpCtrl *cc,I64 try_cnt=0,
 	    if (tmpex->type & HTT_KEYWORD) {
 	      i=tmpex(CHashGeneric *)->user_data0;
 	      switch [i] {
-		case KW_NUM_KEYWORDS-1: //nobound switch
+		case KW_KWS_NUM-1: //nobound switch
 		default: //A keyword that is not valid here is just a symbol.
 		  goto sm_not_keyword_afterall;
 		start:

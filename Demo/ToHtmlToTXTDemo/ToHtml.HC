@@ -157,10 +157,10 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1,Bool line_nums=FALSE)
 {//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
-  I64 i,y,old_y=MIN_I64,col,old_u32_attr=DOCET_UNDEF_COLOR,old_attr,digits;
+  I64 i,y,old_y=I64_MIN,col,old_u32_attr=DOCET_UNDEF_COLOR,old_attr,digits;
   U32 *hl,*src;
   U8 *st,st_2[2],*link_st,*style_bitmap=CAlloc(256/8);
-  CBGR48 p[NUM_COLORS];
+  CBGR48 p[COLORS_NUM];
   GrPaletteGet(p);
   CDoc *doc_out=DocNew;
   Bool unlock_doc_in=DocLock(doc_in),no_bwd;
@@ -184,7 +184,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";

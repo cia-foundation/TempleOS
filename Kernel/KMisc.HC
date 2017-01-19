@@ -171,7 +171,7 @@ F64 Ona2Freq(I8 ona)
 I8 Freq2Ona(F64 freq)
 {//Freq to Ona. 440.0Hz is Ona=60.
   if (freq>0)
-    return ClampI64(12*Log2(32.0/440.0*freq),ONA_REST+1,MAX_I8);
+    return ClampI64(12*Log2(32.0/440.0*freq),ONA_REST+1,I8_MAX);
   else
     return ONA_REST;
 }
@@ -187,7 +187,7 @@ U0 Snd(I8 ona=ONA_REST)
       OutU8(0x61,InU8(0x61)&~3);
     } else if (ona!=snd.ona) {
       snd.ona=ona;
-      period=ClampI64(SYS_TIMER_FREQ/Ona2Freq(ona),1,MAX_U16);
+      period=ClampI64(SYS_TIMER_FREQ/Ona2Freq(ona),1,U16_MAX);
       OutU8(0x43,0xB6);
       OutU8(0x42,period);
       OutU8(0x42,period.u8[1]);
@@ -301,7 +301,7 @@ Bool IsDbgMode()
 }
 
 U0 ProgressBarsRst(U8 *path=NULL)
-{
+{//Reset all progress bars to zero.
   CallExtStr("ProgressBarsRegTf",path);
   MemSet(sys_progresses,0,sizeof(sys_progresses));
 }

@@ -41,6 +41,6 @@ Option(OPTf_WARN_DUP_TYPES,OFF);
 LBts(&sys_run_level,RLf_HOME);
 
 #help_index ""
-#include "/Home/MakeHome"
+#include "~/MakeHome"
 
 //After this file, the Adam task enters $LK,"server mode",A="HI:Job"$.

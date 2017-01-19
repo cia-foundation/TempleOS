@@ -1,6 +1,6 @@
-#define LASER_MAX_TEMP		30.0
+#define LASER_TEMP_MAX		30.0
 #define LASER_THRESHOLD_TEMP	10.0
-#define MAX_MASS_TEMP		5.0
+#define MASS_TEMP_MAX		5.0
 
 class CtrlPanelState
 {
@@ -82,7 +82,7 @@ U0 DrawCtrlPanelCtrl(CDC *dc,CCtrl *c)
 	CTRL_PANEL_RANGE-1-s->fuse_time-1,5,3);
 
   d_range=c->right-c->left-5-5;
-  d=s->laser_temperature*d_range/LASER_MAX_TEMP;
+  d=s->laser_temperature*d_range/LASER_TEMP_MAX;
   dc->color=BLACK;
   GrRect(dc,c->left+5-1,c->bottom+TMP_Y-2,d_range+2,2+1+1);
   if (d>1.0) {

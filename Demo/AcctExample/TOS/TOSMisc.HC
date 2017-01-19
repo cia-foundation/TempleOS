@@ -1,4 +1,4 @@
-#help_index "TOS"
+#help_index "Misc/TOS"
 
 #define VIDEO_FRAME_RATE	29.97
 
@@ -58,7 +58,7 @@ I64 CopyVideo()
 }
 
 public U0 FrameGrabberToggle()
-{
+{//The frame grabber saves BMP files to D:/Tmp/ScrnShots.
   static F64 last_time=0;
   if (tS-last_time>3.0) {
     last_time=tS;
@@ -79,7 +79,7 @@ public U0 FrameGrabberToggle()
 }
 
 public U0 JukeSong(I64 num)
-{
+{//Make movie of one song.
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
@@ -89,7 +89,7 @@ public U0 JukeSong(I64 num)
 }
 
 public U0 JukeLines(I64 start_line,I64 end_line)
-{
+{//Make movie of many lines of songs.
   AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
@@ -99,14 +99,14 @@ public U0 JukeLines(I64 start_line,I64 end_line)
 }
 
 public U0 ChkAll()
-{
+{//ChkDsk on C & D.
   U8 *ptr=TOS_HDS;
   while (*ptr)
     ChkDsk(*ptr++);
 }
 
 public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
-{
+{//Use OCR to make a text DolDoc from CDC.
   U8 byte_bit_cnts[256];
   I64 i,j,*ptr,row,col,ch,best_ch,score,best_score,
 	cur_char_image,diff_image,total_score=0;
@@ -127,7 +127,7 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
 	  if (GrPeek(dc,col*FONT_WIDTH+j+dx,row*FONT_HEIGHT+i+dy)!=WHITE)
 	    LBts(&cur_char_image,i*8+j);
 
-      best_score=MAX_I64;
+      best_score=I64_MAX;
       best_ch=0;
       ptr=&text.font[32];
       for (ch=32;ch<127;ch++) {
@@ -152,10 +152,10 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
   return doc;
 }
 
-public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
-{
+public U0 BMP2Doc(U8 *_in_name,U8 *_out_name=NULL)
+{//Use OCR to make a text DolDoc from BMP file.
   U8 *in_name,*out_name;
-  I64 dx,dy,score,best_score=MAX_I64;
+  I64 dx,dy,score,best_score=I64_MAX;
   CDC *dc;
   CDoc *doc;
   in_name=DftExt(_in_name,"BMP");
@@ -179,66 +179,11 @@ public U0 BMP2TXT(U8 *_in_name,U8 *_out_name=NULL)
   Free(out_name);
 }
 
-RegDft("TempleOS/TOSVideos","I64 tos_code_walk_thru=1;\n");
-RegExe("TempleOS/TOSVideos");
-
-U0 TOSRegInit()
-{
-  DefinePrint("DD_CODE_WALK_THRU","Episode #%d",tos_code_walk_thru);
-} TOSRegInit;
-
-U0 TOSRegWrite()
-{
-  RegWrite("TempleOS/TOSVideos",
-	"I64 tos_code_walk_thru=%d;\n",tos_code_walk_thru);
-  TOSRegInit;
-}
-
-class CYouTubeForm2
-{
-  U8 special[STR_LEN] fmtstr "$$DA-P,A=\"SerialNum:%s\"$$\n";
-};
-
-U8 *TOSYouTube()
-{
-  U8 *res;
-  CYouTubeForm2 *url=CAlloc(sizeof(CYouTubeForm2));
-  if (DocForm(url(CYouTubeForm2 *)) && *url->special)
-    res=MStrPrint("$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\">"
-	  "<param name=\\\"movie\\\" "
-	  "value=\\\"http://www.youtube.com/v/%s\\\"></param><param "
-	  "name=\\\"allowscriptaccess\\\" value=\\\"always\\\"></param><embed "
-	  "src=\\\"http://www.youtube.com/v/%s\\\" "
-	  "type=\\\"application/x-shockwave-flash\\\" "
-	  "allowscriptaccess=\\\"always\\\" "
-	  "width=\\\"640\\\" height=\\\"520\\\"></embed></object>\"$$",
-	  url->special,url->special);
-  else
-    res=NULL;
-  Free(url);
-  return res;
-}
-
-U0 CodeWalkThru()
-{
-  SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
-  AutoComplete;
-  WinBorder;
-  WinMax;
-  if (!fg_on)
-    PopUp("Sleep(50);FrameGrabberToggle;");
-  Ed("~/Videos/RandomCode.DD.Z");
-  SettingsPop;
-  Msg(MSG_KEY_DOWN_UP,'b',0x83000000830); //<ALT-b>
-  tos_code_walk_thru++;
-  TOSRegWrite;
-}
-
-U0 TempleOSTheme()
+U0 TOSTheme()
 {
   if (!fg_on)
     PopUp("Sleep(50);FrameGrabberToggle;");
-  ExeFile("~/Sup1/Sup1Graphics/TempleOSTheme.HC");
+  ExeFile("~/Sup1/Sup1Graphics/TOS/TOSTheme.HC");
   DocClear;
 }
 
@@ -271,7 +216,7 @@ U0 MemTest()
 }
 
 public I64 Profanity(
-	U8 *needle_filename="C:/Home/Sup1/Sup1Blog/Profanity.DD.Z",
+	U8 *needle_filename="~/Sup1/Sup1Blog/Profanity.DD.Z",
 	U8 *files_find_mask="/*",U8 *fu_flags=NULL)
 {//Scan for profanity.
   CCmpCtrl *cc;
@@ -284,4 +229,23 @@ public I64 Profanity(
     CmpCtrlDel(cc);
   }
   return res;
+}
+
+U0 TOSChgLog2()
+{
+  InStr("\"Ed(\\\"::/Doc/ChgLog.DD.Z\\\");\n\";
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
+  Msg(MSG_KEY_DOWN_UP,CH_CTRLY,0);
+  Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
+  Msg(MSG_KEY_DOWN_UP,CH_ESC,0);"
+  "\"Exit;\n\";");
+}
+
+public U0 TOSChgLog()
+{//Opdate ChgLog file.
+  User("TOSChgLog2;\n");
 }

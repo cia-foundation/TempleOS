@@ -1,4 +1,4 @@
-#define MAX_TABLE_SIZE 0x10000
+#define TABLE_SIZE_MAX 0x10000
 
 I64 output_found,passes,table_size;
 
@@ -65,16 +65,16 @@ U8 *gate_type_lst="NULL\0OUTPUT\0INPUT\0"
 #define GT_OR3		10
 #define GT_NAND3	11
 #define GT_NOR3		12
-#define GT_NUM_ENTRIES	13
+#define GT_ENTRIES_NUM	13
 
-#define MAX_SEL_GATES	128
+#define SEL_GATES_NUM	128
 
-U8 *imgs[GT_NUM_ENTRIES]={NULL,NULL,NULL,
+U8 *imgs[GT_ENTRIES_NUM]={NULL,NULL,NULL,
 $IB,"<NOT>",BI=1$,$IB,"<AND>",BI=2$,$IB,"<OR>",BI=3$,$IB,"<NAND>",BI=4$,$IB,"<NOR>",BI=5$,$IB,"<XOR>",BI=6$,$IB,"<AND3>",BI=7$,$IB,"<OR3>",BI=8$,$IB,"<NAND3>",BI=9$,$IB,"<NOR3>",BI=10$};
 
 I64 num_inputs_entered,num_outputs_entered;
 I64 num_sel_gates,
-    sel_gates[MAX_SEL_GATES];
+    sel_gates[SEL_GATES_NUM];
 
 U0 GetGates()
 {
@@ -83,12 +83,12 @@ U0 GetGates()
 
   "\nEnter the available gate types in the order you prefer them to be used.\n"
 	"Your choices are:\n";
-  for (i=GT_FIRST_REAL_GATE;i<GT_NUM_ENTRIES;i++)
+  for (i=GT_FIRST_REAL_GATE;i<GT_ENTRIES_NUM;i++)
     "%z ",i,gate_type_lst;
   '\n';
 
   num_sel_gates=0;
-  while (num_sel_gates<GT_NUM_ENTRIES) {
+  while (num_sel_gates<GT_ENTRIES_NUM) {
     "%d",num_sel_gates;
     st=GetStr(" Gate: ");
     if (!*st) {
@@ -110,13 +110,13 @@ U0 Init()
 
   do {
     table_size=GetI64("\nTable size in hex (3 input=0x100,4=0x10000): ",0);
-    if (table_size>MAX_TABLE_SIZE)
+    if (table_size>TABLE_SIZE_MAX)
       "Too large\n";
     else if (table_size<1) {
       "No table specified, aborting.\n";
       throw;
     }
-  } while (table_size>MAX_TABLE_SIZE);
+  } while (table_size>TABLE_SIZE_MAX);
 
   gate_type_table =CAlloc(table_size*sizeof(U8));
   displayed_design=MAlloc((table_size+7)/8);

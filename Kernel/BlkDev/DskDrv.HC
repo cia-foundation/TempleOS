@@ -28,7 +28,7 @@ U0 DrvsRelease()
 {//When task dies, release all owned drvs.
   I64 i;
   CDrv *dv;
-  for (i=0;i<NUM_DRVS;i++) {
+  for (i=0;i<DRVS_NUM;i++) {
     dv=&blkdev.drvs[i];
     if (dv->owning_task==Fs && dv->dv_signature==DRV_SIGNATURE_VAL)
       DrvUnlock(dv,TRUE);
@@ -40,7 +40,7 @@ CDrv *DrvMakeFreeSlot(U8 drv_let)
 //!!! drv_let is not a $LK,"remapped",A="MN:DrvMap"$ drv.
   I64 i=Let2Let(drv_let)-'A';
   CDrv *res;
-  if (!(0<=i<NUM_DRVS))
+  if (!(0<=i<DRVS_NUM))
     throw('Drv');
   res=&blkdev.drvs[i];
   MemSet(res,0,sizeof(CDrv));
@@ -52,7 +52,7 @@ U8 DrvNextFreeLet(U8 first_drv_let='C')
 {//Locate free slot for new drv, like during $LK,"Mount",A="MN:Mount"$().
 //!!! first_drv_let is not a $LK,"remapped",A="MN:DrvMap"$ drv.
   I64 i=Let2Let(first_drv_let)-'A',type=Let2BlkDevType(first_drv_let);
-  if (!(0<=i<NUM_DRVS))
+  if (!(0<=i<DRVS_NUM))
     throw('Drv');
   do
     if (blkdev.drvs[i].dv_signature!=DRV_SIGNATURE_VAL) {
@@ -61,7 +61,7 @@ U8 DrvNextFreeLet(U8 first_drv_let='C')
       else
 	return i+'A';
     }
-  while (++i<NUM_DRVS);
+  while (++i<DRVS_NUM);
   throw('Drv');
   return 0; //Never gets here.
 }
@@ -79,7 +79,7 @@ U0 DrvBlkDevDel(CBlkDev *bd)
 {//Delete drv's of BlkDev
   I64 i;
   CDrv *dv;
-  for (i=0;i<NUM_DRVS;i++) {
+  for (i=0;i<DRVS_NUM;i++) {
     dv=&blkdev.drvs[i];
     if (dv->bd==bd)
       DrvDel(dv);
@@ -316,7 +316,7 @@ U8 *DrvModelNum(U8 drv_let=0)
   return res;
 }
 
-U8 blkdev_text_attr[BDT_NUM_TYPES]={BLACK,LTCYAN,WHITE,LTGREEN,LTRED,LTBLUE};
+U8 blkdev_text_attr[BDT_TYPES_NUM]={BLACK,LTCYAN,WHITE,LTGREEN,LTRED,LTBLUE};
 U8 drv_text_attr[3]={BLACK,BLUE,RED};
 
 U8 DrvTextAttrGet(U8 drv_let=0)
@@ -336,7 +336,7 @@ U0 DrvRep()
   I64 ch,i,drv_let,attr;
   U8 *st;
   "\nDefined Drives:\n";
-  for (i=0,dv=blkdev.drvs;i<NUM_DRVS;i++,dv++) {
+  for (i=0,dv=blkdev.drvs;i<DRVS_NUM;i++,dv++) {
     if (dv->dv_signature==DRV_SIGNATURE_VAL) {
       bd=dv->bd;
       drv_let=Drv2Let(dv);

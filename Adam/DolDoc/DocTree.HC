@@ -60,7 +60,7 @@ ft_done:
 
 public Bool DocTreeMake(CDoc *doc,U8 *path)
 {//Make registry-like tree widget.
-  I64 i=0,j=MIN_I64,k=0;
+  I64 i=0,j=I64_MIN,k=0;
   U8 *st1=StrNew(path),
 	*st2=MAlloc(StrLen(path)+1),
 	*st3=StrNew(path);

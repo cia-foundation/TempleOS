@@ -18,7 +18,7 @@ U0 GrSetUpTables()
     for (j=0;j<8;j++)
       gr.to_8_colors(U8 *)[k++]=i;
 
-  for (i=0;i<GR_NUM_PEN_BRUSHES;i++) {
+  for (i=0;i<GR_PEN_BRUSHES_NUM;i++) {
     k=i+1;
 
     rr=k*k;
@@ -77,7 +77,7 @@ U0 GrSetUpTables()
     //	  MemSet(text.vga_alias,0,GR_HEIGHT*GR_WIDTH>>3);
     MemSet(gr.scrn_image->body,0,GR_WIDTH*GR_HEIGHT>>1);
   }
-  for (i=1;i<=GR_MAX_SCRN_ZOOM;i++) {
+  for (i=1;i<=GR_SCRN_ZOOM_MAX;i++) {
     dst=gr.scrn_zoom_tables[i]=MAlloc(256*i);
     for (j=0;j<256;j++) {
       m=0;

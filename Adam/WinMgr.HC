@@ -193,7 +193,7 @@ I64 WinQueIPMsgs(Bool que)
 U0 WinCalcIdles()
 {
   F64 calc_idle_time;
-  I64 i,k,total_jiffies,total_jiffies_delta,idle_pt_hits[MP_MAX_PROCESSORS];
+  I64 i,k,total_jiffies,total_jiffies_delta,idle_pt_hits[MP_PROCESSORS_NUM];
   CCPU *c;
   CWinMgrTimingGlbls *t=winmgr.t;
 

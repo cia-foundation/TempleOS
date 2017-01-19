@@ -3,7 +3,7 @@
 
 //This file is executed by the
 //first terminal window upon start-up.
-//See $LK,"Once",A="FF:/Home/HomeSys.HC,Once"$ and $LK,"Home Files",A="FF:::/Doc/GuideLines.DD,/Home Files"$.
+//See $LK,"Once",A="FF:~/HomeSys.HC,Once"$ and $LK,"Home Files",A="FF:::/Doc/GuideLines.DD,/Home Files"$.
 
 //Delete the rest from this file.
 

@@ -19,9 +19,9 @@ F64 é,t0,tf,snd_timeout;
 #define PHASES_GROUPS	8
 #define HACK_DIST	5
 
-#define U_NUM_ENEMY	(PHASES_GROUPS*64)
-#define U_NUM_FRIENDLY	(PHASES_GROUPS*16)
-#define U_NUM	(U_NUM_FRIENDLY+U_NUM_ENEMY)
+#define U_ENEMY_NUM	(PHASES_GROUPS*64)
+#define U_FRIENDLY_NUM	(PHASES_GROUPS*16)
+#define U_NUM	(U_FRIENDLY_NUM+U_ENEMY_NUM)
 class Unit
 {
   I64 x,y,best_dd;
@@ -181,8 +181,8 @@ U8 *enemy_hacking_imgs[4]={$IB,"<14>",BI=14$,$IB,"<13>",BI=13$,$IB,"<14>",BI=14$
 
 
 $BG$
-#define LS_NUM_APTS		20
-#define LS_NUM_MOUNTAINS	3
+#define LS_APTS_NUM		20
+#define LS_MOUNTAINS_NUM	3
 #define LS_NUM			128
 class LandScapeItem
 {
@@ -456,7 +456,7 @@ U0 ExplosionDo(I64 x,I64 y,I64 scroll_y)
 	ManDie(tmpu,TRUE);
     }
   }
-  for (i=0;i<LS_NUM_APTS;i++) {
+  for (i=0;i<LS_APTS_NUM;i++) {
     x2=ls[i].x;
     y2=(ls[i].y-scroll_y)&(MAP_HEIGHT-1);
     if (SqrI64(x-x2)+SqrI64(y-y2)<100*100) {
@@ -514,7 +514,7 @@ U0 CheckCollisions()
 	}
       }
       if (!tmpb->dead)
-	for (i=0;i<LS_NUM_APTS;i++)
+	for (i=0;i<LS_APTS_NUM;i++)
 	  if (2*SqrI64(x-ls[i].x)+
 		3*SqrI64(y+35-(ls[i].y-scroll_y)&(MAP_HEIGHT-1))<2*60*60) {
 	    tmpb->dead=TRUE;
@@ -543,38 +543,38 @@ U0 Init()
   é=-ã/2;
 
   for (i=0;i<LS_NUM;i++) {
-    ls[i].x=(Fs->pix_width-100)*RandU32/MAX_U32+50;
-    ls[i].y=(MAP_HEIGHT-100)*RandU32/MAX_U32+50;
+    ls[i].x=(Fs->pix_width-100)*RandU32/U32_MAX+50;
+    ls[i].y=(MAP_HEIGHT-100)*RandU32/U32_MAX+50;
     ls[i].img=landscape_imgs[RandU16%(LS_TYPES-2)];
   }
 
-  for (i=0;i<LS_NUM_APTS;i++)
+  for (i=0;i<LS_APTS_NUM;i++)
     ls[i].img=landscape_imgs[LS_TYPES-1]; //Apartment
 
-  for (;i<LS_NUM_APTS+LS_NUM_MOUNTAINS;i++)
+  for (;i<LS_APTS_NUM+LS_MOUNTAINS_NUM;i++)
     ls[i].img=landscape_imgs[LS_TYPES-2]; //mountain
 
   MemSet(u,0,sizeof(u));
   for (i=0,tmpu=u;i<U_NUM;i++,tmpu++) {
-    if (i<U_NUM_FRIENDLY) {
+    if (i<U_FRIENDLY_NUM) {
       tmpu->friendly=TRUE;
       if (!(i&7)) {
-	xx=(Fs->pix_width-200)*RandU32/MAX_U32;
-	yy=(MAP_HEIGHT-200)*RandU32/MAX_U32;
+	xx=(Fs->pix_width-200)*RandU32/U32_MAX;
+	yy=(MAP_HEIGHT-200)*RandU32/U32_MAX;
       }
     } else {
       tmpu->friendly=FALSE;
       if (!(i&31)) {
-	xx=(Fs->pix_width-200)*RandU32/MAX_U32;
-	yy=(MAP_HEIGHT-200)*RandU32/MAX_U32;
+	xx=(Fs->pix_width-200)*RandU32/U32_MAX;
+	yy=(MAP_HEIGHT-200)*RandU32/U32_MAX;
       }
       if (!(i&15))
 	tmpu->tank=TRUE;
     }
     tmpu->dead=FALSE;
-    tmpu->x=xx+64*RandI32/MAX_I32+100;
-    tmpu->y=yy+64*RandU32/MAX_I32-64+100;
-    tmpu->best_dd=MAX_I64;
+    tmpu->x=xx+64*RandI32/I32_MAX+100;
+    tmpu->y=yy+64*RandU32/I32_MAX-64+100;
+    tmpu->best_dd=I64_MAX;
     tmpu->é=ã/2;
     tmpu->phase=2*ã*Rand;
   }
@@ -584,8 +584,8 @@ U0 Init()
     e[i].dead=TRUE;
     e[i].num=i;
   }
-  friendly_left=U_NUM_FRIENDLY;
-  enemy_left   =U_NUM_ENEMY;
+  friendly_left=U_FRIENDLY_NUM;
+  enemy_left   =U_ENEMY_NUM;
   enemy_by_friendly=0;
   bullets_fired=0;
   missile_bmp =15;
@@ -661,11 +661,11 @@ Bool FireMissile(I64 n)
 U0 MenMove(I64 phase_group)
 {
   I64 i,j,dd,best,best_dd;
-  for (i=phase_group;i<U_NUM_FRIENDLY;i+=PHASES_GROUPS) {
+  for (i=phase_group;i<U_FRIENDLY_NUM;i+=PHASES_GROUPS) {
     if (!u[i].dead) {
-      best=U_NUM_FRIENDLY;
-      best_dd=MAX_I64;
-      for (j=U_NUM_FRIENDLY;j<U_NUM;j++) {
+      best=U_FRIENDLY_NUM;
+      best_dd=I64_MAX;
+      for (j=U_FRIENDLY_NUM;j<U_NUM;j++) {
 	if (!u[j].dead) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
 	  if (dd<best_dd) {
@@ -675,18 +675,18 @@ U0 MenMove(I64 phase_group)
 	}
       }
       u[i].best_dd=best_dd;
-      if (best_dd!=MAX_I64) {
+      if (best_dd!=I64_MAX) {
 	u[i].x+=4*SignI64(u[best].x-u[i].x);
 	u[i].y+=4*SignI64(u[best].y-u[i].y);
 	u[i].é=Arg(u[best].x-u[i].x,u[best].y-u[i].y);
       }
     }
   }
-  for (i=U_NUM_FRIENDLY+phase_group;i<U_NUM;i+=PHASES_GROUPS) {
+  for (i=U_FRIENDLY_NUM+phase_group;i<U_NUM;i+=PHASES_GROUPS) {
     if (!u[i].dead) {
       best=0;
-      best_dd=MAX_I64;
-      for (j=0;j<U_NUM_FRIENDLY;j++) {
+      best_dd=I64_MAX;
+      for (j=0;j<U_FRIENDLY_NUM;j++) {
 	if (!u[j].dead) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
 	  if (dd<best_dd) {
@@ -696,7 +696,7 @@ U0 MenMove(I64 phase_group)
 	}
       }
       u[i].best_dd=best_dd;
-      if (best_dd!=MAX_I64) {
+      if (best_dd!=I64_MAX) {
 	u[i].x+=4*SignI64(u[best].x-u[i].x);
 	u[i].y+=4*SignI64(u[best].y-u[i].y);
 	u[i].é=Arg(u[best].x-u[i].x,u[best].y-u[i].y);
@@ -708,11 +708,11 @@ U0 MenMove(I64 phase_group)
 U0 MenFight(I64 phase_group)
 {
   I64 i,j,dd,best,best_dd;
-  for (i=phase_group;i<U_NUM_FRIENDLY;i+=PHASES_GROUPS) {
+  for (i=phase_group;i<U_FRIENDLY_NUM;i+=PHASES_GROUPS) {
     if (!u[i].dead) {
-      best=U_NUM_FRIENDLY;
-      best_dd=MAX_I64;
-      for (j=U_NUM_FRIENDLY;j<U_NUM;j++) {
+      best=U_FRIENDLY_NUM;
+      best_dd=I64_MAX;
+      for (j=U_FRIENDLY_NUM;j<U_NUM;j++) {
 	if (!u[j].dead && u[i].y-u[j].y<8) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
 	  if (dd<best_dd) {
@@ -726,11 +726,11 @@ U0 MenFight(I64 phase_group)
 	ManDie(&u[best],FALSE);
     }
   }
-  for (i=U_NUM_FRIENDLY+phase_group;i<U_NUM;i+=PHASES_GROUPS) {
+  for (i=U_FRIENDLY_NUM+phase_group;i<U_NUM;i+=PHASES_GROUPS) {
     if (!u[i].dead) {
       best=0;
-      best_dd=MAX_I64;
-      for (j=0;j<U_NUM_FRIENDLY;j++) {
+      best_dd=I64_MAX;
+      for (j=0;j<U_FRIENDLY_NUM;j++) {
 	if (!u[j].dead&& u[i].y-u[j].y<8) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
 	  if (dd<best_dd) {
@@ -898,7 +898,7 @@ U0 Titanium()
       }
       SleepUntil(next_update_jiffy);
 
-      total_score=3*(U_NUM_ENEMY-enemy_left)+5*enemy_by_friendly
+      total_score=3*(U_ENEMY_NUM-enemy_left)+5*enemy_by_friendly
 	    -100*friendly_fire-10*(tS-t0)-bullets_fired;
       if (game_over) {
 	tf=tS;

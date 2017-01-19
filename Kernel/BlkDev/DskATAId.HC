@@ -102,8 +102,11 @@ U0 ATARepEntry(I64 base0,I64 base1,I64 unit,U8 *msg,
       "$$RED$$Hard Drive   $$LTBLUE$$ATA   ";
     else
       "$$RED$$CD/DVD Drive $$LTBLUE$$ATAPI ";
-    "%s$$FG$$\nBase0:0x%04X Base1:0x%04X Unit:%d$$LM,0$$\n",
-	  msg,base0,base1,unit;
+    "%s$$FG$$\n",msg;
+    if (base0==blkdev.ins_base0 && unit==blkdev.ins_unit)
+      "$$PURPLE$$(Drive originally installed from.)$$FG$$\n";
+    "Base0:0x%04X Base1:0x%04X Unit:%d$$LM,0$$\n",
+	  base0,base1,unit;
     if (_head) {
       tmpha=CAlloc(sizeof(CATARep));
       tmpha->next=*_head;
@@ -131,13 +134,13 @@ Bool ATARepExitAllApplications()
 public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_head=NULL)
 {//Report possible ATA devices by probing.  Hard disks and CD/DVDs.
   I64 d1,d2,i,j,k,cnt=0,unlock_flags=0,num_hints=0;
-#assert NUM_BLKDEVS<=64
+#assert BLKDEVS_NUM<=64
   if (_head) *_head=NULL;
 
   if (pmt && ATARepExitAllApplications)
     return 0;
 
-  for (i=0;i<NUM_BLKDEVS;i++)
+  for (i=0;i<BLKDEVS_NUM;i++)
     if (blkdev.blkdevs[i].bd_signature==BD_SIGNATURE_VAL)
       BEqu(&unlock_flags,i,
 	    BlkDevLock(&blkdev.blkdevs[i]));
@@ -185,7 +188,7 @@ public I64 ATARep(Bool pmt=TRUE,Bool just_ide=FALSE,CATARep **_head=NULL)
     ATARepEntry(d1,d2,1,"Secondary IDE",_head,&num_hints);
   }
   '\n\n';
-  for (i=0;i<NUM_BLKDEVS;i++)
+  for (i=0;i<BLKDEVS_NUM;i++)
     if (Bt(&unlock_flags,i))
       BlkDevUnlock(&blkdev.blkdevs[i]);
   return num_hints;
@@ -205,7 +208,7 @@ CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,CATARep **_atapi_drv)
 {//This is for when trying to sort-out main hard drives and CD/DVD drives.
   CATARep *res=NULL,*tmpha=head,*ata_drv=NULL,*atapi_drv=NULL;
   CBlkDev *bd;
-  Bool was_silent=Silent;
+  Bool was_silent=Silent,ins_found=FALSE;
   bd=Let2BlkDev(':',FALSE);
   Silent(was_silent);
   while (tmpha) {
@@ -223,9 +226,16 @@ CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,CATARep **_atapi_drv)
 	      tmpha->unit==ata_drv->unit && tmpha->num<ata_drv->num)
 	  ata_drv=tmpha;
       } else if (tmpha->type==BDT_ATAPI) {
-	if (!atapi_drv || tmpha->unit<atapi_drv->unit ||
-	      tmpha->unit==atapi_drv->unit && tmpha->num<atapi_drv->num)
+	if (!atapi_drv || !ins_found && (tmpha->unit<atapi_drv->unit ||
+	      tmpha->unit==atapi_drv->unit && tmpha->num<atapi_drv->num))
 	  atapi_drv=tmpha;
+      }
+    }
+    if (tmpha->type==BDT_ATAPI && bd && bd->type==BDT_ATA &&
+      tmpha->base0==blkdev.ins_base0 && tmpha->unit==blkdev.ins_unit) {
+      if (!ins_found) {
+	atapi_drv=tmpha;
+	ins_found=TRUE;
       }
     }
     tmpha=tmpha->next;
@@ -238,7 +248,7 @@ CATARep *ATAIDDrvs(CATARep *head,CATARep **_ata_drv,CATARep **_atapi_drv)
 CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
 {
   CBlkDev *res;
-  if (0<=first_drv_let-'A'<NUM_DRVS && (type==BDT_ATA || type==BDT_ATAPI) &&
+  if (0<=first_drv_let-'A'<DRVS_NUM && (type==BDT_ATA || type==BDT_ATAPI) &&
 	0<=unit<=1) {
     res=BlkDevNextFreeSlot(first_drv_let,type);
     res->unit=unit;

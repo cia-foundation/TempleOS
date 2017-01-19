@@ -33,7 +33,7 @@ extern Bool DocHighlightCursor(Bool show=OFF,CDoc *doc=NULL);
 extern U0 DocInsDoc(CDoc *doc=NULL,CDoc *doc2);
 extern U0 DocInsEntry(CDoc *doc,CDocEntry *doc_e);
 extern Bool DocLock(CDoc *doc);
-extern I64 DocMax(I64 i=MAX_I64);
+extern I64 DocMax(I64 i=I64_MAX);
 extern CDoc *DocNew(U8 *filename=NULL,CTask *task=NULL);
 extern CDocEntry *DocPrint(CDoc *doc=NULL,U8 *fmt,...);
 extern CDoc *DocPut(CTask *task=NULL);
@@ -50,7 +50,7 @@ extern U0 EdCodeTools(CDoc *doc);
 extern U8 *EdSprite(I64 bin_num);
 extern I64 ExeDoc(CDoc *doc,I64 ccf_flags=0);
 extern I64 FindWiz();
-extern I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64);
+extern I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=I64_MIN,I64 hi=I64_MAX);
 extern Bool GrPlot0(CDC *dc,I64 x,I64 y);
 extern I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL);
@@ -69,8 +69,8 @@ extern I64 PopUpColorLighting(U8 *header=NULL);
 extern I64 PopUpFile(U8 *filename,
 	Bool warn_ext=TRUE,CTask *parent=NULL,CTask **_pu_task=NULL);
 extern Bool PopUpForm(U8 *_d,U8 *class_name=lastclass,
-	I64 dof_flags=DOF_MIN_SIZE,U8 *header=NULL,U8 *footer=NULL);
-extern I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=MIN_I64,I64 hi=MAX_I64);
+	I64 dof_flags=DOF_SIZE_MIN,U8 *header=NULL,U8 *footer=NULL);
+extern I64 PopUpGetI64(U8 *msg,I64 dft,I64 lo=I64_MIN,I64 hi=I64_MAX);
 extern U8 *PopUpGetStr(U8 *header=NULL);
 extern I64 PopUpMenu(CDoc *doc,I64 dof_flags=0);
 extern Bool PopUpNoYes(U8 *header=NULL,U8 *footer=NULL);
@@ -78,6 +78,8 @@ extern Bool PopUpOk(U8 *header=NULL,U8 *footer=NULL);
 extern I64 PopUpRangeI64(
 	I64 lo,I64 hi,I64 step=1,U8 *header=NULL,U8 *footer=NULL);
 extern Bool PopUpTransform(I64 *r);
+extern I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
+	U8 *_stage2_filename=NULL);
 extern U0 Refresh(I64 cnt=1,Bool force=FALSE);
 extern U0 RegOneTimePopUp(I64 flag_num,U8 *msg);
 extern Bool RegWrite(U8 *path,U8 *fmt,...);

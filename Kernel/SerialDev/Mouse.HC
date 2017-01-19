@@ -3,7 +3,7 @@ U0 GridInit()
   ms_grid.x=ms_grid.y=ms_grid.z=8;
   ms_grid.x_offset=ms_grid.y_offset=ms_grid.z_offset=0;
   ms_grid.x_speed =ms_grid.y_speed =ms_grid.z_speed =1;
-  ms_grid.show=ms_grid.snap=FALSE;
+  ms_grid.show=ms_grid.snap=ms_grid.coord=FALSE;
 }
 
 U0 MsUpdate(I64 x,I64 y,I64 z,Bool l,Bool r)
@@ -39,13 +39,13 @@ U0 MsUpdate(I64 x,I64 y,I64 z,Bool l,Bool r)
   LBEqu(&kbd.scan_code,SCf_MS_R_DOWN,ms.rb);
 }
 
-U0 MsSet(I64 x=MAX_I64,I64 y=MAX_I64,I64 z=MAX_I64,I64 l=MAX_I64,I64 r=MAX_I64)
+U0 MsSet(I64 x=I64_MAX,I64 y=I64_MAX,I64 z=I64_MAX,I64 l=I64_MAX,I64 r=I64_MAX)
 {//Note: Generates a message. See $LK,"MsSet",A="FF:::/Demo/Games/Zing.HC,MsSet"$().
   if (!(0<=x<GR_WIDTH))
     x=ms.pos.x;
   if (!(0<=y<GR_HEIGHT))
     y=ms.pos.y;
-  if (z==MAX_I64)
+  if (z==I64_MAX)
     z=ms.pos.z;
 
   if (!(FALSE<=l<=TRUE))

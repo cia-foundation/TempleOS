@@ -46,7 +46,7 @@ U0 DocBinsValidate(CDoc *doc)
     if (doc_e->de_flags & DOCEF_HAS_BIN) {
       if (b=doc_e->bin_data=DocBinFindNum(doc,doc_e->bin_num)) {
 	if (doc_e->de_flags & DOCEF_BIN_PTR_LINK)
-	  b->tmp_use_cnt=MAX_I32;
+	  b->tmp_use_cnt=I32_MAX;
 	if (!b->use_cnt++)
 	  b->renum_num=++renum_num;
 	doc_e->bin_num=b->renum_num;

@@ -22,7 +22,7 @@ U0 VRSetUp(I64 player)
   Unit *ut0,*ut1;
   ut0=&units[player][0];
   ut1=&units[player^1][0];
-  for (i=0;i<MAX_UNITS;i++,ut0++,ut1++) {
+  for (i=0;i<UNITS_NUM;i++,ut0++,ut1++) {
     LBtr(&ut1->vis[player],0);
     LBEqu(&ut0->vis[player],0,ut0->life>0);
   }
@@ -32,15 +32,15 @@ U0 VRMerge(I64 player)
 {
   I64 i,j;
   Unit *ut1;
-  U8 *dst,*src,*mask=CAlloc((MAX_UNITS+7)>>3);
-  for (j=0;j<MAX_UNITS;j++) {//p0
-    src=&vis_unit_bitmap[player][(((MAX_UNITS+7)&~7)*j)>>3];
+  U8 *dst,*src,*mask=CAlloc((UNITS_NUM+7)>>3);
+  for (j=0;j<UNITS_NUM;j++) {//p0
+    src=&vis_unit_bitmap[player][(((UNITS_NUM+7)&~7)*j)>>3];
     dst=mask;
-    for (i=0;i<(MAX_UNITS+7)>>3;i++) //player1
+    for (i=0;i<(UNITS_NUM+7)>>3;i++) //player1
       *dst++|=*src++;
   }
   ut1=&units[player^1][0];
-  for (j=0;j<MAX_UNITS;j++,ut1++)
+  for (j=0;j<UNITS_NUM;j++,ut1++)
     LBEqu(&ut1->vis[player],0,Bt(mask,j) && ut1->life>0);
   Free(mask);
 }
@@ -63,7 +63,7 @@ Bool MPVisRecalc(MPCtrl1 *job)
     case VR_UPDATE_FRIENDLY_UNIT:
     case VR_ONE_FRIENDLY_UNIT:
       if (job->mode==VR_UPDATE_FRIENDLY_UNIT)
-	range=MAX_F64;
+	range=F64_MAX;
       RowCol2XY(&x1,&y1,row,col);
       for (i=job->lo;i<job->hi;i++,ut1++) {
 	seen=FALSE;
@@ -78,7 +78,7 @@ Bool MPVisRecalc(MPCtrl1 *job)
 	}
 	if (job->mode==VR_UPDATE_FRIENDLY_UNIT)
 	  LBEqu(&vis_unit_bitmap[cur_player],
-		i+job->tmpu->num*((MAX_UNITS+7)&~7),seen);
+		i+job->tmpu->num*((UNITS_NUM+7)&~7),seen);
       }
       break;
     case VR_ONE_ENEMY_UNIT:
@@ -87,15 +87,15 @@ Bool MPVisRecalc(MPCtrl1 *job)
 	if (ut1->life>0 &&
 	      LOS(row,col,ut1->row,ut1->col)) {
 	  LBts(&vis_unit_bitmap[enemy_player],
-		job->tmpu->num+i*((MAX_UNITS+7)&~7));
+		job->tmpu->num+i*((UNITS_NUM+7)&~7));
 	  res=TRUE;
 	} else
 	  LBtr(&vis_unit_bitmap[enemy_player],
-		job->tmpu->num+i*((MAX_UNITS+7)&~7));
+		job->tmpu->num+i*((UNITS_NUM+7)&~7));
       break;
     case VR_ALL_UNITS:
       ut0=&units[cur_player][0];
-      for (i=0;i<MAX_UNITS;i++,ut0++)
+      for (i=0;i<UNITS_NUM;i++,ut0++)
 	if (ut0->life>0) {
 	  RowCol2XY(&x1,&y1,ut0->row,ut0->col);
 	  ut1=&units[enemy_player][job->lo];
@@ -103,15 +103,15 @@ Bool MPVisRecalc(MPCtrl1 *job)
 	    if (ut1->life>0 &&
 		  LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
 	      LBts(&ut1->vis[cur_player],0);
-	      LBts(&vis_unit_bitmap[cur_player],j+i*((MAX_UNITS+7)&~7));
+	      LBts(&vis_unit_bitmap[cur_player],j+i*((UNITS_NUM+7)&~7));
 	    } else
-	      LBtr(&vis_unit_bitmap[cur_player],j+i*((MAX_UNITS+7)&~7));
+	      LBtr(&vis_unit_bitmap[cur_player],j+i*((UNITS_NUM+7)&~7));
 	  }
 	} else
 	  for (j=job->lo;j<job->hi;j++)
-	    LBtr(&vis_unit_bitmap[cur_player],j+i*((MAX_UNITS+7)&~7));
+	    LBtr(&vis_unit_bitmap[cur_player],j+i*((UNITS_NUM+7)&~7));
       ut0=&units[enemy_player][0];
-      for (i=0;i<MAX_UNITS;i++,ut0++)
+      for (i=0;i<UNITS_NUM;i++,ut0++)
 	if (ut0->life>0) {
 	  RowCol2XY(&x1,&y1,ut0->row,ut0->col);
 	  ut1=&units[cur_player][job->lo];
@@ -119,13 +119,13 @@ Bool MPVisRecalc(MPCtrl1 *job)
 	    if (ut1->life>0 &&
 		  LOS(ut0->row,ut0->col,ut1->row,ut1->col)) {
 	      LBts(&ut1->vis[enemy_player],0);
-	      LBts(&vis_unit_bitmap[enemy_player],j+i*((MAX_UNITS+7)&~7));
+	      LBts(&vis_unit_bitmap[enemy_player],j+i*((UNITS_NUM+7)&~7));
 	    } else
-	      LBtr(&vis_unit_bitmap[enemy_player],j+i*((MAX_UNITS+7)&~7));
+	      LBtr(&vis_unit_bitmap[enemy_player],j+i*((UNITS_NUM+7)&~7));
 	  }
 	} else
 	  for (j=job->lo;j<job->hi;j++)
-	    LBtr(&vis_unit_bitmap[enemy_player],j+i*((MAX_UNITS+7)&~7));
+	    LBtr(&vis_unit_bitmap[enemy_player],j+i*((UNITS_NUM+7)&~7));
       break;
   }
   return res;
@@ -148,13 +148,13 @@ $LK,"MAlloc",A="MN:MAlloc"$() would probably be the better choice.
 
   if (mode==VR_FRIENDLY_UNIT_DIED) {
     MemSet((&vis_unit_bitmap[enemy_player])(U8 *)+
-	  (tmpu->num*((MAX_UNITS+7)&~7))>>3,0,(MAX_UNITS+7)>>3);
+	  (tmpu->num*((UNITS_NUM+7)&~7))>>3,0,(UNITS_NUM+7)>>3);
     VRMerge(enemy_player);
     return 0; //Return any value--don't care
   }
 
   cnt=mp_cnt; //Cores
-  hi=MAX_UNITS;
+  hi=UNITS_NUM;
   if (mode==VR_ONE_ENEMY_UNIT) {
     for (hi--;hi>=0;hi--)
       if (units[enemy_player][hi].life>0)

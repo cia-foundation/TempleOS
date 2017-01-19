@@ -94,7 +94,7 @@ U0 GrUpdateTasks()
 
 U0 GrFixZoomScale()
 {
-  gr.scrn_zoom=ClampI64(gr.scrn_zoom,1,GR_MAX_SCRN_ZOOM);
+  gr.scrn_zoom=ClampI64(gr.scrn_zoom,1,GR_SCRN_ZOOM_MAX);
   if (gr.scrn_zoom==1) {
     gr.sx=0;
     gr.sy=0;

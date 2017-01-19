@@ -102,7 +102,7 @@ U0 ICXorXor(CIntermediateCode *tmpi,I64 rip)
 U0 ICCmp(CIntermediateCode *tmpi,I64 us,I64 is,I64 rip)
 {
   I64 r1,d1,r2,i=0x48,j=tmpi->arg2.disp;
-  if (tmpi->arg2.type&MDF_IMM && MIN_I32<=j<=MAX_I32) {
+  if (tmpi->arg2.type&MDF_IMM && I32_MIN<=j<=I32_MAX) {
     if (!(tmpi->ic_flags&(ICF_POP_CMP|ICF_PUSH_CMP)) &&
 	  tmpi->arg1.type&MDF_DISP && //TODO
 	  tmpi->arg1.type.raw_type>=RT_I64 && tmpi->arg1.reg!=REG_RAX) {
@@ -111,20 +111,20 @@ U0 ICCmp(CIntermediateCode *tmpi,I64 us,I64 is,I64 rip)
       ICZero(tmpi,REG_RAX);
       if (r1>7)
 	i++;
-      if (MIN_I8<=j<=MAX_I8)
+      if (I8_MIN<=j<=I8_MAX)
 	i+=0x388300;
       else
 	i+=0x388100;
       if (!d1) {
 	ICU24(tmpi,0x000000+i+(r1&7)<<16);
-      } else if (MIN_I8<=d1<=MAX_I8) {
+      } else if (I8_MIN<=d1<=I8_MAX) {
 	ICU24(tmpi,0x400000+i+(r1&7)<<16);
 	ICU8(tmpi,d1);
       } else {
 	ICU24(tmpi,0x800000+i+(r1&7)<<16);
 	ICU32(tmpi,d1);
       }
-      if (MIN_I8<=j<=MAX_I8)
+      if (I8_MIN<=j<=I8_MAX)
 	ICU8(tmpi,j);
       else
 	ICU32(tmpi,j);
@@ -144,7 +144,7 @@ U0 ICCmp(CIntermediateCode *tmpi,I64 us,I64 is,I64 rip)
       ICZero(tmpi,REG_RAX);
       if (r1>7)
 	i++;
-      if (MIN_I8<=j<=MAX_I8) {
+      if (I8_MIN<=j<=I8_MAX) {
 	ICU24(tmpi,0xF88300+i+(r1&7)<<16);
 	ICU8(tmpi,j);
       } else {
@@ -475,7 +475,7 @@ U0 ICCmpAndBranch(CIntermediateCode *tmpi,Bool has_res,I64 rip,
   CICArg *arg1=&tmpi->arg1,*arg2=&tmpi->arg2;
 
   j=arg1->disp;
-  if (arg1->type&MDF_IMM && MIN_I32<=j<=MAX_I32) {
+  if (arg1->type&MDF_IMM && I32_MIN<=j<=I32_MAX) {
     SwapI64(&arg1,&arg2);
     swap=TRUE;
     us=not_us;
@@ -487,7 +487,7 @@ U0 ICCmpAndBranch(CIntermediateCode *tmpi,Bool has_res,I64 rip,
     is=us;
 
   j=arg2->disp;
-  if (arg2->type&MDF_IMM && MIN_I32<=j<=MAX_I32) {
+  if (arg2->type&MDF_IMM && I32_MIN<=j<=I32_MAX) {
     if (!has_res && arg1->type&MDG_REG_DISP_SIB_RIP)
       ICAddSubEctImm(tmpi,arg1->type,arg1->reg,arg1->disp,
 	    arg1->type,arg1->reg,arg1->disp,j,0x073B,rip2);
@@ -517,7 +517,7 @@ U0 ICCmpAndBranch(CIntermediateCode *tmpi,Bool has_res,I64 rip,
       } else {
 	if (r1>7)
 	  i++;
-	if (MIN_I8<=j<=MAX_I8) {
+	if (I8_MIN<=j<=I8_MAX) {
 	  ICU24(tmpi,0xF88300+i+(r1&7)<<16);
 	  ICU8(tmpi,j);
 	} else {
@@ -606,7 +606,7 @@ U0 ICCmpAndBranch(CIntermediateCode *tmpi,Bool has_res,I64 rip,
       else
 	i+=8;
     }
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 
@@ -665,7 +665,7 @@ U0 ICTestAndBranch(CIntermediateCode *tmpi,I64 rip,I64 is,U8 *buf,I64 rip2)
     i=lb->addr-(rip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 
@@ -698,7 +698,7 @@ U0 ICFlagBranch(CIntermediateCode *tmpi,I64 rip,I64 is,U8 *buf)
     i=lb->addr-(rip+2);
     if (lb->flags&CMF_POP_CMP)
       i+=8;
-    if (MIN_I8<=i<=MAX_I8)
+    if (I8_MIN<=i<=I8_MAX)
       short_jmp=TRUE;
   }
 

@@ -10,8 +10,8 @@ U0 Init()
   MemSet(y,0,sizeof(y));
   for (i=0;i<16;i++) {
     é=Rand*2*ã;
-    dx[i]=MAX_I32*Cos(é);
-    dy[i]=MAX_I32*Sin(é);
+    dx[i]=I32_MAX*Cos(é);
+    dy[i]=I32_MAX*Sin(é);
   }
 }
  

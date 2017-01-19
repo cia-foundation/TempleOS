@@ -306,7 +306,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tmpc1,
     }
     Lex(cc);
     tmpc1++;
-    if (++ptr_stars_cnt>MAX_PTR_STARS)
+    if (++ptr_stars_cnt>PTR_STARS_NUM)
       LexExcept(cc,"Too many *'s at ");
   }
 
@@ -327,7 +327,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tmpc1,
     ptr_stars_cnt=1; //fun_ptr
     while (Lex(cc)=='*')
       ptr_stars_cnt++; //fun_ptr
-    if (ptr_stars_cnt>MAX_PTR_STARS)
+    if (ptr_stars_cnt>PTR_STARS_NUM)
       LexExcept(cc,"Too many *'s at ");
   } else
     ptr_stars_cnt=-1; //fun_ptr
@@ -675,6 +675,11 @@ pvl_restart3:
 	    tmpc->size+=i;
 	  }
 	  tmpm->size=i;
+	  if (mode&PRSF_UNION)
+	    cc->class_dol_offset=union_base;
+	  else
+	    cc->class_dol_offset=tmpc->size;
+
 	  while (cc->token==TK_IDENT) {
 	    tmp_meta=MAlloc(sizeof(CMemberLstMeta));
 	    tmp_meta->next=tmpm->meta;

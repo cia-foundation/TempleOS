@@ -19,7 +19,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
   if (cnt>0)
     f->max_blk=cnt-1;
   else
-    f->max_blk=MAX_I64;
+    f->max_blk=I64_MAX;
   f->file_cluster_num=INVALID_CLUSTER;
   full_name=FileNameAbs(filename);
   f->dv=Let2Drv(*full_name);
@@ -103,7 +103,7 @@ I64 FSetCluster(CFile *f,I64 c,I64 blk,Bool read)
   if (f->cluster!=c) {
     if (f->flags & FF_BUF_DIRTY) {
       i=dv->spc;
-      if (f->max_blk!=MAX_I64) {
+      if (f->max_blk!=I64_MAX) {
 	i=f->max_blk+1-f->file_cluster_num*dv->spc;
 	if (i>dv->spc)
 	  i=dv->spc;
@@ -115,7 +115,7 @@ I64 FSetCluster(CFile *f,I64 c,I64 blk,Bool read)
     f->file_cluster_num=blk/dv->spc;
     if (read) {
       i=dv->spc;
-      if (f->max_blk!=MAX_I64) {
+      if (f->max_blk!=I64_MAX) {
 	i=f->max_blk+1-f->file_cluster_num*dv->spc;
 	if (i>dv->spc)
 	  i=dv->spc;

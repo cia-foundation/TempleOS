@@ -154,7 +154,7 @@ CMemberLst *MemberLstNew(I64 _reg)
   return res;
 }
 
-Bool  MemberLstCmp(CMemberLst *tmpm1,CMemberLst *tmpm2,I64 cnt=MAX_I64)
+Bool  MemberLstCmp(CMemberLst *tmpm1,CMemberLst *tmpm2,I64 cnt=I64_MAX)
 {
   while (tmpm1 && tmpm2 && cnt--) {
     if (StrCmp(tmpm1->str,tmpm2->str) ||

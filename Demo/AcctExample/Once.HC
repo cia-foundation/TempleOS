@@ -21,7 +21,7 @@ U0 Tmp()
 	  Del("C:/Home/DoDistro.HC.Z");
 	  Del("D:/Home/DoDistro.HC.Z");
 	  OnceDrv('C',"\"\n\nRun TOSStaffIns;\n\n\n\";");
-	  OnceDrv('D',"\"\n\nRun TOSStaffIns;\n\n\n\";");
+	  OnceDrv('D',""); //This command uses cached Registry file.
 	  if (PressAKey!=CH_SHIFT_ESC)
 	    Reboot; //Too dangerous for amateurs until reboot.
 	}

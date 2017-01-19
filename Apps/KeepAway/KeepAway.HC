@@ -200,36 +200,36 @@ This is just a video game. Relax.
 
 #define FIRST_STANDING		0
 
-#define NUM_RUNNING_IMGS	4
+#define RUNNING_IMGS_NUM	4
 #define FIRST_RUNNING	0
-#define LAST_RUNNING	(FIRST_RUNNING+NUM_RUNNING_IMGS-1)
+#define LAST_RUNNING	(FIRST_RUNNING+RUNNING_IMGS_NUM-1)
 
-#define NUM_SHOOTING_IMGS	5
+#define SHOOTING_IMGS_NUM	5
 #define FIRST_SHOOTING	(LAST_RUNNING+1)
-#define LAST_SHOOTING	(FIRST_SHOOTING+NUM_SHOOTING_IMGS-1)
+#define LAST_SHOOTING	(FIRST_SHOOTING+SHOOTING_IMGS_NUM-1)
 
-#define NUM_DRIBBLING_IMGS	4
+#define DRIBBLING_IMGS_NUM	4
 #define FIRST_DRIBBLING	(LAST_SHOOTING+1)
-#define LAST_DRIBBLING	(FIRST_DRIBBLING+NUM_DRIBBLING_IMGS-1)
+#define LAST_DRIBBLING	(FIRST_DRIBBLING+DRIBBLING_IMGS_NUM-1)
 
-#define NUM_STOPPED_DRIBBLING_IMGS	2
+#define STOPPED_DRIBBLING_IMGS_NUM	2
 #define FIRST_STOPPED_DRIBBLING	(LAST_DRIBBLING+1)
 #define LAST_STOPPED_DRIBBLING	\
-	(FIRST_STOPPED_DRIBBLING+NUM_STOPPED_DRIBBLING_IMGS-1)
+	(FIRST_STOPPED_DRIBBLING+STOPPED_DRIBBLING_IMGS_NUM-1)
 
 Frame imgs[LAST_STOPPED_DRIBBLING+1]={
-  {{$IB,"<6>",BI=6$,$IB,"<7>",BI=7$},2*DRIBBLE_T/NUM_RUNNING_IMGS},
-  {{$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},2*DRIBBLE_T/NUM_RUNNING_IMGS},
-  {{$IB,"<6>",BI=6$,$IB,"<7>",BI=7$},2*DRIBBLE_T/NUM_RUNNING_IMGS},
-  {{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$},2*DRIBBLE_T/NUM_RUNNING_IMGS},
+  {{$IB,"<6>",BI=6$,$IB,"<7>",BI=7$},2*DRIBBLE_T/RUNNING_IMGS_NUM},
+  {{$IB,"<2>",BI=2$,$IB,"<3>",BI=3$},2*DRIBBLE_T/RUNNING_IMGS_NUM},
+  {{$IB,"<6>",BI=6$,$IB,"<7>",BI=7$},2*DRIBBLE_T/RUNNING_IMGS_NUM},
+  {{$IB,"<4>",BI=4$,$IB,"<5>",BI=5$},2*DRIBBLE_T/RUNNING_IMGS_NUM},
   {{$IB,"<8>",BI=8$,$IB,"<9>",BI=9$},0.1},{{$IB,"<10>",BI=10$,$IB,"<11>",BI=11$},0.2},
   {{$IB,"<12>",BI=12$,$IB,"<13>",BI=13$},0.2},{{$IB,"<12>",BI=12$,$IB,"<13>",BI=13$},0.1},{{$IB,"<14>",BI=14$,$IB,"<15>",BI=15$},0.1},
-  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},2*DRIBBLE_T/NUM_DRIBBLING_IMGS},
-  {{$IB,"<16>",BI=16$,$IB,"<17>",BI=17$},2*DRIBBLE_T/NUM_DRIBBLING_IMGS},
-  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},2*DRIBBLE_T/NUM_DRIBBLING_IMGS},
-  {{$IB,"<18>",BI=18$,$IB,"<19>",BI=19$},2*DRIBBLE_T/NUM_DRIBBLING_IMGS},
-  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},DRIBBLE_T/NUM_STOPPED_DRIBBLING_IMGS},
-  {{$IB,"<22>",BI=22$,$IB,"<23>",BI=23$},DRIBBLE_T/NUM_STOPPED_DRIBBLING_IMGS},
+  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},2*DRIBBLE_T/DRIBBLING_IMGS_NUM},
+  {{$IB,"<16>",BI=16$,$IB,"<17>",BI=17$},2*DRIBBLE_T/DRIBBLING_IMGS_NUM},
+  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},2*DRIBBLE_T/DRIBBLING_IMGS_NUM},
+  {{$IB,"<18>",BI=18$,$IB,"<19>",BI=19$},2*DRIBBLE_T/DRIBBLING_IMGS_NUM},
+  {{$IB,"<20>",BI=20$,$IB,"<21>",BI=21$},DRIBBLE_T/STOPPED_DRIBBLING_IMGS_NUM},
+  {{$IB,"<22>",BI=22$,$IB,"<23>",BI=23$},DRIBBLE_T/STOPPED_DRIBBLING_IMGS_NUM},
 };
 
 RegDft("TempleOS/KeepAway","I64 best_score0=0,best_score1=9999;\n");
@@ -238,8 +238,8 @@ RegExe("TempleOS/KeepAway");
 F64 game_t_end,foul_t_end;
 I64 score0,score1;
 
-#define NUM_PER_SIDE	3
-#define NUM_OBJS	(NUM_PER_SIDE*2+1)
+#define PER_SIDE_NUM	3
+#define OBJS_NUM	(PER_SIDE_NUM*2+1)
 Bool someone_shooting,someone_has_ball;
 F64 shot_land_t;
 	
@@ -250,7 +250,7 @@ class Obj
   F64 get_ball_dt,get_ball_é,nearest_man_dd,last_t0,next_t0,foul_t0;
   I64 last_img,next_img;
   Bool stopped,shooting,has_ball,nearest_ball,pad[4];
-} objs[NUM_OBJS],*ball,*human,*last_owner;
+} objs[OBJS_NUM],*ball,*human,*last_owner;
 
 /*Just to be different, I didn't use the built-in
 DCF_TRANSFORMATION flag in this game.
@@ -297,7 +297,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 {
   F64 tt=tS,d,d_down,d_up;
   I64 i;
-  Obj *o_sort[NUM_OBJS],*o;
+  Obj *o_sort[OBJS_NUM],*o;
 
   DCDepthBufAlloc(dc);
   dc->ls.x=10000;
@@ -313,7 +313,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrBorder(dc,COURT_BORDER,COURT_BORDER,
 	task->pix_width -1-COURT_BORDER,
 	task->pix_height-1-COURT_BORDER);
-  for (i=0;i<NUM_OBJS;i++) {
+  for (i=0;i<OBJS_NUM;i++) {
     o=o_sort[i]=&objs[i];
     if (o!=ball) {
       if (o->has_ball) {
@@ -385,8 +385,8 @@ U0 DrawIt(CTask *task,CDC *dc)
     }
   }
 
-  QSortI64(o_sort,NUM_OBJS,&ObjCompare);
-  for (i=0;i<NUM_OBJS;i++)
+  QSortI64(o_sort,OBJS_NUM,&ObjCompare);
+  for (i=0;i<OBJS_NUM;i++)
     DrawObj(dc,o_sort[i],tt);
   tt=(game_t_end-tS)/60;
   if (tt<=0) {
@@ -449,7 +449,7 @@ U0 AnimateTask(CTask *parent_task)
 
     if (game_t_end) {
       MemSet(&nearest_ball,0,sizeof(nearest_ball));
-      for (i=0;i<NUM_OBJS;i++) {
+      for (i=0;i<OBJS_NUM;i++) {
 	o=&objs[i];
 	o->nearest_ball=FALSE;
 	if (o!=ball) {
@@ -468,7 +468,7 @@ U0 AnimateTask(CTask *parent_task)
       nearest_ball[0]->nearest_ball=TRUE;
       nearest_ball[1]->nearest_ball=TRUE;
 
-      for (i=0;i<NUM_OBJS;i++) {
+      for (i=0;i<OBJS_NUM;i++) {
 	o=&objs[i];
 	if (o==ball) {
 	  o->x+=dt*o->DxDt;
@@ -482,7 +482,7 @@ U0 AnimateTask(CTask *parent_task)
 	      dy=ball->y-o->y;
 	      if (dx*dx+dy*dy<HAND_SQR_OFFSET && ball->z<o->z+HAND_Z_OFFSET) {
 		gets_ball=TRUE;
-		for (j=0;j<NUM_PER_SIDE*2;j++)
+		for (j=0;j<PER_SIDE_NUM*2;j++)
 		  if (j!=i && objs[j].has_ball) {
 		    if (Rand<2.0*dt) {
 		      objs[j].stolen_t0=t0;
@@ -523,8 +523,8 @@ U0 AnimateTask(CTask *parent_task)
 		dx=o->DxDt=MAN_VELOCITY*Cos(o->get_ball_é);
 		dy=o->DyDt=MAN_VELOCITY*Sin(o->get_ball_é);
 	      } else {
-		dx=o->DxDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
-		dy=o->DyDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/MAX_I16*dt;
+		dx=o->DxDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/I16_MAX*dt;
+		dy=o->DyDt+=RANDOM_MAN_ACCELERATION/sqrt2*RandI16/I16_MAX*dt;
 	      }
 	    }
 	    d=Sqrt(dx*dx+dy*dy);
@@ -532,8 +532,8 @@ U0 AnimateTask(CTask *parent_task)
 	      o->é=Arg(dx,dy)+ã/2;
 	      dx*=MAN_VELOCITY/sqrt2*dt/d;
 	      dy*=MAN_VELOCITY/sqrt2*dt/d;
-	      o->nearest_man_dd=MAX_F64;
-	      for (j=0;j<NUM_PER_SIDE*2;j++)
+	      o->nearest_man_dd=F64_MAX;
+	      for (j=0;j<PER_SIDE_NUM*2;j++)
 		if (j!=i) {
 		  dx2=objs[j].x-o->x;
 		  dy2=objs[j].y-o->y;
@@ -626,7 +626,7 @@ U0 Init()
   someone_shooting=FALSE;
   shot_land_t=0;
   MemSet(&objs,0,sizeof(objs));
-  for (i=0;i<NUM_PER_SIDE*2;i++) {
+  for (i=0;i<PER_SIDE_NUM*2;i++) {
     objs[i].team=i&1;
     objs[i].x=Fs->pix_width/2;
     objs[i].y=2*Fs->pix_height/2;

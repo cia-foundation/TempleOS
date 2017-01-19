@@ -14,9 +14,9 @@ TempleOS distribution.
 You can pass html meta data as args to $LK,"ToHtml",A="FF:::/Demo/ToHtmlToTXTDemo/ToHtml.HC,ToHtml"$().
 
 If you want to blog like I do, see these files...
-$LK,"::/Demo/AcctExample/TOSToHtml.HC"$
+$LK,"::/Demo/AcctExample/TOS/TOSToHtml.HC"$
 $LK,"::/Demo/AcctExample/HomeKeyPlugIns.HC"$
-$LK,"::/Demo/AcctExample/TOSHolySpirit.HC"$
+$LK,"::/Demo/AcctExample/TOS/TOSHolySpirit.HC"$
 */
 
 Cd(__DIR__);;

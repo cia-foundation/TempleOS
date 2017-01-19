@@ -234,7 +234,7 @@ class CIntermediateStruct
 #define IC_COS			0xB6
 #define IC_TAN			0xB7
 #define IC_ATAN			0xB8
-#define IC_NUM_ENTRIES		0xB9
+#define IC_ICS_NUM		0xB9
 
 #define KW_INCLUDE	0
 #define KW_DEFINE	1
@@ -310,7 +310,7 @@ class CIntermediateStruct
 #define AKW_LIST	86
 #define AKW_NOLIST	87
 #define AKW_BINFILE	88
-#define KW_NUM_KEYWORDS	89
+#define KW_KWS_NUM	89
 
 #define CMP_TEMPLATE_INC	0x00
 #define CMP_TEMPLATE_DEC	0x01

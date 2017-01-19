@@ -152,6 +152,8 @@ $ID,2$$MA-X+PU,"::/Demo/InFile",LM="Cd(\"::/Demo/InFile\");Dir;View;\n"$
 $LK,"::/Demo/Print.HC"$
 $LK,"::/Demo/SubIntAccess.HC"$
 $LK,"::/Demo/ParenWarn.HC"$
+$LK,"::/Demo/NullCase.HC"$
+$LK,"::/Demo/OnceDemo.HC"$
 $LK,"::/Demo/CompileDemo.HC"$
 $LK,"::/Demo/Prompt.HC"$
 $LK,"::/Demo/ClassMeta.HC"$

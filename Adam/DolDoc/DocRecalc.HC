@@ -255,9 +255,9 @@ I64 DocTmpAttr(CDoc *doc,CDocEntry *doc_e,I64 cur_u8_attr)
 
 public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
 {//Recalc and fmt.  Also used by WinMgr to draw on scrn.
-  I64 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=MAX_I64,xx,yy,zz,
+  I64 i,ii,j,k,x,x0,y,y0,D,d2,col,col2,best_col=0,best_d=I64_MAX,xx,yy,zz,
 	num_entries=0,i_jif,cur_u8_attr,tmp_u32_attr,
-	cursor_y=MIN_I64,left_margin,right_margin,y_plot_top,y_plot_bottom,
+	cursor_y=I64_MIN,left_margin,right_margin,y_plot_top,y_plot_bottom,
 	top,left,bottom,right,width,height,scroll_x,scroll_y,pix_top,pix_left;
   CDocEntry reg *doc_e,reg *doc_e2,*best_doc_e,*next_clear_found=NULL,
 	*added_cursor=NULL;
@@ -422,8 +422,8 @@ public Bool DocRecalc(CDoc *doc,I64 recalc_flags=RECALCt_NORMAL)
   skipped_update= doc_e==doc && doc->head.next!=doc;
 
   if (full_refresh) {
-    doc->min_x=MAX_I32; doc->min_y=MAX_I32;
-    doc->max_x=MIN_I32; doc->max_y=MIN_I32;
+    doc->min_x=I32_MAX; doc->min_y=I32_MAX;
+    doc->max_x=I32_MIN; doc->max_y=I32_MIN;
   }
   while (doc_e!=doc) {
     while (TRUE) {
@@ -967,7 +967,7 @@ rc_adjust_xy:
 	    dc->flags|=DCF_DONT_DRAW;
 	  bptr=tmpb->data;
 	  ii=SpriteTypeMask(bptr);
-	  if (ii&1<<SPT_NUM_TYPES) {
+	  if (ii&1<<SPT_TYPES_NUM) {
 	    bptr=gr.empty_sprite;
 	    ii=SpriteTypeMask(bptr);
 	  }
@@ -1042,7 +1042,7 @@ rc_adjust_xy:
 	      doc_e->de_flags&DOCEF_TAG && doc_e->tag)
 	  x-=StrLen(doc_e->tag);
 	break;
-      case DOCT_NUM_TYPES-1: //nobound switch
+      case DOCT_TYPES_NUM-1: //nobound switch
       default:
 	break;
     }
@@ -1178,7 +1178,7 @@ rc_skip:
 	}
       }
     }
-    if (doc->flags & DOCF_MIN_SIZE) {
+    if (doc->flags & DOCF_SIZE_MIN) {
       if (Bt(&win_task->display_flags,DISPLAYf_NO_BORDER)) {
 	if (left<0)
 	  left=0;

@@ -3,25 +3,25 @@
 //See ::/Apps/Vocabulary/VocabQuiz.HC.Z
 //for another example of dictionary usage.
 
-#define NUM_ROWS	20
-#define NUM_COLS	20
-#define MAX_DIMENSION	MaxI64(NUM_ROWS,NUM_COLS)
+#define ROWS_NUM	20
+#define COLS_NUM	20
+#define DIM_MAX	MaxI64(ROWS_NUM,COLS_NUM)
 
-U8 m[NUM_ROWS][NUM_COLS];
+U8 m[ROWS_NUM][COLS_NUM];
 
 U0 Init()
 {
   I64 x,y;
-  for (y=0;y<NUM_ROWS;y++)
-    for (x=0;x<NUM_COLS;x++)
+  for (y=0;y<ROWS_NUM;y++)
+    for (x=0;x<COLS_NUM;x++)
       m[y][x]='A'+RandU16%26;
 }
 
 U0 Display()
 {
   I64 x,y;
-  for (y=0;y<NUM_ROWS;y++) {
-    for (x=0;x<NUM_COLS;x++)
+  for (y=0;y<ROWS_NUM;y++) {
+    for (x=0;x<COLS_NUM;x++)
       '' m[y][x];
     '\n';
   }
@@ -29,7 +29,7 @@ U0 Display()
 
 U0 GetWord(U8 *dst,I64 x,I64 y,I64 dx,I64 dy)
 {
-  while (0<=x<NUM_COLS && 0<=y<NUM_ROWS) {
+  while (0<=x<COLS_NUM && 0<=y<ROWS_NUM) {
     *dst++=m[y][x];
     y+=dy;
     x+=dx;
@@ -41,9 +41,9 @@ U0 GetWord(U8 *dst,I64 x,I64 y,I64 dx,I64 dy)
 U0 Search(I64 dx,I64 dy)
 {
   I64 x,y,i,n;
-  U8 buf[MAX_DIMENSION+1],*ptr;
-  for (y=0;y<NUM_ROWS;y++)
-    for (x=0;x<NUM_COLS;x++) {
+  U8 buf[DIM_MAX+1],*ptr;
+  for (y=0;y<ROWS_NUM;y++)
+    for (x=0;x<COLS_NUM;x++) {
       GetWord(buf,x,y,dx,dy);
       n=StrLen(buf);
       for (i=n;i>2;i--) {
@@ -70,14 +70,14 @@ U0 SimpleWordSearch()
 }
 
 //************************************
-U8 words[NUM_ROWS*NUM_COLS*8][MAX_DIMENSION+1];
-U8 *word_ptrs[NUM_ROWS*NUM_COLS*8];
+U8 words[ROWS_NUM*COLS_NUM*8][DIM_MAX+1];
+U8 *word_ptrs[ROWS_NUM*COLS_NUM*8];
 
 U0 CollectWords(I64 dx,I64 dy,I64 *_n)
 {
   I64 x,y,n=*_n;
-  for (y=0;y<NUM_ROWS;y++)
-    for (x=0;x<NUM_COLS;x++) {
+  for (y=0;y<ROWS_NUM;y++)
+    for (x=0;x<COLS_NUM;x++) {
       GetWord(&words[n],x,y,dx,dy);
       word_ptrs[n]=&words[n];
       n++;

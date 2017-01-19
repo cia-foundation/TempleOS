@@ -11,7 +11,7 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
       break;
     case BDT_ATA:
     case BDT_ATAPI:
-      for (i=0;i<NUM_BLKDEVS;i++) {
+      for (i=0;i<BLKDEVS_NUM;i++) {
 	bd1=&blkdev.blkdevs[i];
 	if (bd1->bd_signature==BD_SIGNATURE_VAL && bd!=bd1 &&
 	      (bd1->type==BDT_ATAPI || bd1->type==BDT_ATA) &&
@@ -24,7 +24,7 @@ U0 BlkDevLockFwdingSet(CBlkDev *bd)
   }
 }
 
-I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=MIN_I64,
+I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=I64_MIN,
 	Bool whole_drv,Bool make_free)
 {//It will mount just one partition of prt_num>=0.
 //When repartitioing whole drive, whole_drv=TRUE.
@@ -226,9 +226,9 @@ U0 BlkDevsInitAll()
 {
   CBlkDev *bd;
   I64 i;
-  blkdev.blkdevs=CAlloc(sizeof(CBlkDev)*NUM_BLKDEVS);
-  blkdev.drvs=CAlloc(sizeof(CDrv)*NUM_DRVS);
-  for (i=0;i<NUM_DRVS;i++)
+  blkdev.blkdevs=CAlloc(sizeof(CBlkDev)*BLKDEVS_NUM);
+  blkdev.drvs=CAlloc(sizeof(CDrv)*DRVS_NUM);
+  for (i=0;i<DRVS_NUM;i++)
     blkdev.let_to_drv[i]=&blkdev.drvs[i];
   #exe {
     if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])

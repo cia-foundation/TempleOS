@@ -289,8 +289,13 @@ Bool PrsExpression(CCmpCtrl *cc,I64 *_max_prec,Bool end_exp,CPrsStk *_ps=NULL)
       LexExcept(cc,"Compiler Parse Error at ");
     Free(ps);
   }
-  if (end_exp && res)
-    ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
+  if (res) {
+    if (end_exp)
+      ICAdd(cc,IC_END_EXP,0,0,ICF_RES_NOT_USED);
+    if (cc->coc.coc_head.last->ic_class==
+	  cmp.internal_types[RT_U0])
+      LexWarn(cc,"U0 Expression ");
+  }
   cc->flags|=old_flags&(CCF_PREINC|CCF_PREDEC);
   return res;
 }
@@ -963,6 +968,7 @@ I64 PrsUnaryModifier(CCmpCtrl *cc,CPrsStk *ps,CMemberLst **_local_var,
   CCodeMisc *cm;
   I64 mode,old_flags;
   Bool was_paren=Btr(&cc->flags,CCf_PAREN);
+
   *_local_var=NULL;
   switch (cc->token) {
     case '.':

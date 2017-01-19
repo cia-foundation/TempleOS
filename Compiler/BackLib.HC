@@ -99,18 +99,18 @@ U0 ICAddRSP(CIntermediateCode *tmpi,I64 i,Bool optimize=TRUE)
   }
   last_start=tmpi->ic_cnt;
   if (i>0) {
-    if (i<=MAX_I8)
+    if (i<=I8_MAX)
       ICU32(tmpi,0xC48348+i<<24);
-    else if (i<=MAX_I32) {
+    else if (i<=I32_MAX) {
       ICU24(tmpi,0xC48148);
       ICU32(tmpi,i);
     } else
       throw('Compiler');
   } else if (i<0) {
     i=-i;
-    if (i<=MAX_I8)
+    if (i<=I8_MAX)
       ICU32(tmpi,0xEC8348+i<<24);
-    else if (i<=MAX_I32) {
+    else if (i<=I32_MAX) {
       ICU24(tmpi,0xEC8148);
       ICU32(tmpi,i);
     } else
@@ -166,7 +166,7 @@ I64 ICModr1(I64 r,CICType t2,I64 r2,I64 d2)
       if (!d2 && r2!=REG_RBP) {
 	res.u8[2]=r<<3+r2;
 	res.u8[0]=MODR_INDIRECT_REG;
-      } else if (MIN_I8<=d2<=MAX_I8) {
+      } else if (I8_MIN<=d2<=I8_MAX) {
 	res.u8[2]=0x40+r<<3+r2;
 	res.u8[0]=MODR_D8_INDIRECT_REG;
       } else {
@@ -190,7 +190,7 @@ I64 ICModr1(I64 r,CICType t2,I64 r2,I64 d2)
 	if (!d2 && r2.u8[0]&7!=REG_RBP) {
 	  res.u8[2]=4+r<<3;
 	  res.u8[0]=MODR_SIB_INDIRECT_REG;
-	} else if (MIN_I8<=d2<=MAX_I8) {
+	} else if (I8_MIN<=d2<=I8_MAX) {
 	  res.u8[2]=0x44+r<<3;
 	  res.u8[0]=MODR_SIB_D8_INDIRECT_REG;
 	} else {
@@ -319,9 +319,9 @@ U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 rip)
 	ICU8(tmpi,0x50+r1);
       return;
     case MDf_IMM:
-      if (MIN_I8<=d1<=MAX_I8)
+      if (I8_MIN<=d1<=I8_MAX)
 	ICU16(tmpi,0x6A+d1<<8);
-      else if (MIN_I32<=d1<=MAX_I32) {
+      else if (I32_MIN<=d1<=I32_MAX) {
 	ICU8(tmpi,0x68);
 	ICU32(tmpi,d1);
       } else {
@@ -350,7 +350,7 @@ U0 ICPush(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 rip)
 U0 ICPushRegs(CIntermediateCode *tmpi,I64 mask)
 {
   I64 i;
-  for (i=0;i<NUM_REGS;i++) {
+  for (i=0;i<REG_REGS_NUM;i++) {
     if (Bt(&mask,i)) {
       if (i>7)
 	ICU16(tmpi,0x5049+(i&7)<<8);
@@ -391,7 +391,7 @@ U0 ICPop(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,I64 rip)
 U0 ICPopRegs(CIntermediateCode *tmpi,I64 mask)
 {
   I64 i;
-  for (i=NUM_REGS-1;i>=0;i--) {
+  for (i=REG_REGS_NUM-1;i>=0;i--) {
     if (Bt(&mask,i)) {
       if (i>7)
 	ICU16(tmpi,0x5849+(i&7)<<8);
@@ -454,7 +454,7 @@ U0 ICMov(CIntermediateCode *tmpi,
       if (t2&MDF_IMM) {
 	if (!d2)
 	  ICZero(tmpi,r1);
-	else if (0<=d2<=MAX_U8) {
+	else if (0<=d2<=U8_MAX) {
 	  ICZero(tmpi,r1);
 	  if (r1>7)
 	    ICU24(tmpi,d2<<16+(0xB0+r1&7)<<8+0x41);
@@ -462,7 +462,7 @@ U0 ICMov(CIntermediateCode *tmpi,
 	    ICU24(tmpi,d2<<16+(0xB0+r1)<<8+0x40);
 	  else
 	    ICU16(tmpi,d2<<8+0xB0+r1);
-	} else if (MIN_I8<=d2<0) {
+	} else if (I8_MIN<=d2<0) {
 	  if (r1>7) {
 	    r1&=7;
 	    ICU24(tmpi,d2<<16+(0xB0+r1)<<8+0x41);
@@ -474,7 +474,7 @@ U0 ICMov(CIntermediateCode *tmpi,
 	      ICU16(tmpi,d2<<8+0xB0+r1);
 	    ICU32(tmpi,0xC0BE0F48+r1<<24+r1<<27);
 	  }
-	} else if (0<=d2<=MAX_U32) {
+	} else if (0<=d2<=U32_MAX) {
 	  if (r1>7) {
 	    r1&=7;
 	    ICU16(tmpi,(0xB8+r1)<<8+0x41);
@@ -483,7 +483,7 @@ U0 ICMov(CIntermediateCode *tmpi,
 	    ICU8(tmpi,0xB8+r1);
 	    ICU32(tmpi,d2);
 	  }
-	} else if (MIN_I32<=d2<0) {
+	} else if (I32_MIN<=d2<0) {
 	  if (r1>7) {
 	    r1&=7;
 	    ICU16(tmpi,(0xB8+r1)<<8+0x41);
@@ -550,7 +550,7 @@ U0 ICMov(CIntermediateCode *tmpi,
     case MDf_DISP:
     case MDf_RIP_DISP32:
     case MDf_SIB:
-      if (t2&MDF_IMM && (t1.raw_type<RT_I64 || (MIN_I32<=d2<=MAX_I32))) {
+      if (t2&MDF_IMM && (t1.raw_type<RT_I64 || (I32_MIN<=d2<=I32_MAX))) {
 	ICSlashOp(tmpi,t1,r1,d1,SLASH_OP_MOV_IMM,rip);
 	switch (t1.raw_type) {
 	  case RT_I8:

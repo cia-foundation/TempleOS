@@ -44,7 +44,7 @@ AP_32BIT_INIT:
 	LOCK
 	BTR	U32 [SYS_MP_CNT_LOCK],0
 
-	CMP	ESI,MP_MAX_PROCESSORS
+	CMP	ESI,MP_PROCESSORS_NUM
 	JAE	I32 _SYS_HLT
 
 	IMUL2	ESI,sizeof(CCPU)
@@ -304,7 +304,7 @@ U0 Core0StartMP()
       JobQueDel(&c->seth_task->srv_ctrl.next_done);
     }
   }
-  MemSet(&cpu_structs[1],0,sizeof(CCPU)*(MP_MAX_PROCESSORS-1));
+  MemSet(&cpu_structs[1],0,sizeof(CCPU)*(MP_PROCESSORS_NUM-1));
 
   //When you start-up other cores, they jump to an addr
   //specified by a byte vect number, $LK,"MPN_VECT",A="MN:MPN_VECT"$ which corresponds
@@ -330,8 +330,8 @@ U0 Core0StartMP()
     LBts(&mp_cnt_lock,0); //Don't let more through
   my_mp_cnt=mp_cnt_initial;
 
-  if (my_mp_cnt>MP_MAX_PROCESSORS)
-    my_mp_cnt=MP_MAX_PROCESSORS;
+  if (my_mp_cnt>MP_PROCESSORS_NUM)
+    my_mp_cnt=MP_PROCESSORS_NUM;
 
   for (i=1;i<my_mp_cnt;i++) {
     StrPrint(buf,"Seth Task CPU%02X",i);
@@ -363,7 +363,7 @@ U0 Core0Init()
 
   //Must be in code heap because init code uses 32 bit addr of cpu_struct
   adam_task->gs=cpu_structs=
-	CAlloc(sizeof(CCPU)*MP_MAX_PROCESSORS,Fs->code_heap);
+	CAlloc(sizeof(CCPU)*MP_PROCESSORS_NUM,Fs->code_heap);
   CPUStructInit(0,cpu_structs,adam_task);
   asm {//RAX has GS
     IMPORT SET_GS_BASE;

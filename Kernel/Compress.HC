@@ -14,7 +14,7 @@ U0 ArcEntryGet(CArcCtrl *c)
     c->entry_used=FALSE;
     c->cur_entry=c->next_entry;
     c->cur_bits_in_use=c->next_bits_in_use;
-    if (c->next_bits_in_use<ARC_MAX_BITS) {
+    if (c->next_bits_in_use<ARC_BITS_MAX) {
       c->next_entry = &c->compress[i++];
       if (i==c->free_limit) {
 	c->next_bits_in_use++;
@@ -52,7 +52,7 @@ _ARC_ENTRY_GET::
 	MOV	U64 CArcCtrl.cur_entry[RSI],RAX
 	MOV	RCX,U64 CArcCtrl.next_bits_in_use[RSI]
 	MOV	U64 CArcCtrl.cur_bits_in_use[RSI],RCX
-	CMP	RCX,ARC_MAX_BITS
+	CMP	RCX,ARC_BITS_MAX
 	JAE	@@05
 	MOV	RAX,RDX
 	SHL	RAX,4
@@ -116,7 +116,7 @@ U0 ArcCompressBuf(CArcCtrl *c)
   src_ptr=c->src_buf+c->src_pos;
   src_limit=c->src_buf+c->src_size;
 
-  if (c->saved_basecode==MAX_U32)
+  if (c->saved_basecode==U32_MAX)
     basecode=*src_ptr++;
   else
     basecode=c->saved_basecode;
@@ -175,7 +175,7 @@ U0 ArcExpandBuf(CArcCtrl *c)
     *dst_ptr++ = * -- c->stk_ptr;
 
   if (c->stk_ptr==c->stk_base && dst_ptr<dst_limit) {
-    if (c->saved_basecode==MAX_U32) {
+    if (c->saved_basecode==U32_MAX) {
       lastcode=BFieldExtU32(c->src_buf,c->src_pos,
 	    c->next_bits_in_use);
       c->src_pos+=c->next_bits_in_use;
@@ -223,7 +223,7 @@ CArcCtrl *ArcCtrlNew(Bool expand,I64 compression_type=CT_8_BIT)
   CArcCtrl *c;
   c=CAlloc(sizeof(CArcCtrl));
   if (expand) {
-    c->stk_base=MAlloc(1<<ARC_MAX_BITS);
+    c->stk_base=MAlloc(1<<ARC_BITS_MAX);
     c->stk_ptr=c->stk_base;
   }
   if (compression_type==CT_7_BIT)
@@ -234,7 +234,7 @@ CArcCtrl *ArcCtrlNew(Bool expand,I64 compression_type=CT_8_BIT)
   c->free_idx=c->min_table_entry;
   c->next_bits_in_use=c->min_bits+1;
   c->free_limit=1<<c->next_bits_in_use;
-  c->saved_basecode=MAX_U32;
+  c->saved_basecode=U32_MAX;
   c->entry_used=TRUE;
   ArcEntryGet(c);
   c->entry_used=TRUE;

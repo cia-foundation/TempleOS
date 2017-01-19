@@ -1,10 +1,10 @@
-#define NUM_DISKS	6
+#define DISKS_NUM	6
 #define PEDESTAL_HEIGHT	20
 #define DISK_HEIGHT	7
 #define DISK_UNIT_WIDTH	5
 
 I64 poles_x[3];
-I64 disks_x[NUM_DISKS],disks_y[NUM_DISKS],disks_pole[NUM_DISKS];
+I64 disks_x[DISKS_NUM],disks_y[DISKS_NUM],disks_pole[DISKS_NUM];
 
 I64 OtherPole(I64 pole1,I64 pole2)
 {
@@ -14,7 +14,7 @@ I64 OtherPole(I64 pole1,I64 pole2)
 I64 TopDisk(I64 pole)
 {
   I64 i;
-  for (i=0;i<NUM_DISKS;i++)
+  for (i=0;i<DISKS_NUM;i++)
     if (disks_pole[i]==pole)
       return i;
   return -1;
@@ -23,7 +23,7 @@ I64 TopDisk(I64 pole)
 I64 PosInStk(I64 pole,I64 disk)
 {
   I64 res=0,i;
-  for (i=NUM_DISKS-1;i>disk;i--)
+  for (i=DISKS_NUM-1;i>disk;i--)
     if (disks_pole[i]==pole)
       res++;
   return res;
@@ -32,7 +32,7 @@ I64 PosInStk(I64 pole,I64 disk)
 U0 SetDisksRestXY()
 {
   I64 i;
-  for (i=0;i<NUM_DISKS;i++) {
+  for (i=0;i<DISKS_NUM;i++) {
     disks_x[i]=poles_x[disks_pole[i]];
     disks_y[i]=Fs->pix_height-PEDESTAL_HEIGHT
 	  -(DISK_HEIGHT+1)/2-1-(DISK_HEIGHT+1)*PosInStk(disks_pole[i],i);
@@ -56,15 +56,15 @@ U0 DrawIt(CTask *task,CDC *dc)
   for (i=0;i<3;i++) {
     dc->color=BLACK;
     GrRect(dc,poles_x[i]-3,
-	  task->pix_height-PEDESTAL_HEIGHT-(NUM_DISKS+1)*(DISK_HEIGHT+1),
-	  7,(NUM_DISKS+1)*(DISK_HEIGHT+1));
+	  task->pix_height-PEDESTAL_HEIGHT-(DISKS_NUM+1)*(DISK_HEIGHT+1),
+	  7,(DISKS_NUM+1)*(DISK_HEIGHT+1));
     dc->color=YELLOW;
     GrRect(dc,poles_x[i]-2,
-	  task->pix_height-PEDESTAL_HEIGHT+1-(NUM_DISKS+1)*(DISK_HEIGHT+1),
-	  5,(NUM_DISKS+1)*(DISK_HEIGHT+1)-1);
+	  task->pix_height-PEDESTAL_HEIGHT+1-(DISKS_NUM+1)*(DISK_HEIGHT+1),
+	  5,(DISKS_NUM+1)*(DISK_HEIGHT+1)-1);
   }
 
-  for (i=0;i<NUM_DISKS;i++) {
+  for (i=0;i<DISKS_NUM;i++) {
     dc->color=BLACK;
     GrRect(dc,disks_x[i]-(i+1)*DISK_UNIT_WIDTH,
 	  disks_y[i]-DISK_HEIGHT/2,(i+1)*(DISK_UNIT_WIDTH*2)+1,DISK_HEIGHT);
@@ -92,7 +92,7 @@ U0 MoveDisks(I64 src_pole,I64 dst_pole,I64 num)
   top=TopDisk(src_pole);
   for (y=disks_y[top];
 	y>Fs->pix_height-PEDESTAL_HEIGHT-(DISK_HEIGHT+1)/2
-	-(DISK_HEIGHT+1)*(NUM_DISKS+2);y--) {
+	-(DISK_HEIGHT+1)*(DISKS_NUM+2);y--) {
     disks_y[top]=y;
     MySleep;
   }
@@ -125,7 +125,7 @@ U0 Init()
   for (i=0;i<3;i++)
     poles_x[i]=(1+i)*Fs->pix_width/4;
 
-  for (i=0;i<NUM_DISKS;i++)
+  for (i=0;i<DISKS_NUM;i++)
     disks_pole[i]=0;
 
   SetDisksRestXY;
@@ -140,7 +140,7 @@ U0 Hanoi()
 
   Sleep(1000);
   try {
-    MoveDisks(0,2,NUM_DISKS);
+    MoveDisks(0,2,DISKS_NUM);
     Beep; Beep;
     DocClear;
     DocBottom;

@@ -138,7 +138,7 @@ public U0 SndWaveCtrlDel(CSndWaveCtrl *swc)
 #define WF_TRI			3
 #define WF_SAWTOOTH		4
 #define WF_NOISE		5
-#define WF_NUM_WAVEFORMS	6
+#define WF_WAVEFORMS_NUM	6
 
 public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
   F64 _freq,I64 _waveform=WF_SQUARE,F64 _amp=1.0,F64 _left=1.0, F64 _right=1.0)
@@ -157,7 +157,7 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
   } else {
     phase=swc->phase;
     i=0;
-    amp=Min(MAX_I32,MAX_I32*_amp);
+    amp=Min(I32_MAX,I32_MAX*_amp);
     f=2*ã/swc->sample_rate*_freq;
     switch (_waveform) {
       case WF_NOISE:
@@ -201,13 +201,13 @@ public U0 SndWaveAddBuf(CSndWaveCtrl *swc,U8 *buf,I64 num_samples,
 	  if (phase<ã) {
 	    if (phase<f) {
 	      swc->last_y=swc->next_y;
-	      swc->next_y=a*RandI16/MAX_U16;
+	      swc->next_y=a*RandI16/U16_MAX;
 	    }
 	    j=swc->last_y*(ã-phase)+swc->next_y*phase;
 	  } else {
 	    if (phase-ã<f) {
 	      swc->last_y=swc->next_y;
-	      swc->next_y=a*RandI16/MAX_U16;
+	      swc->next_y=a*RandI16/U16_MAX;
 	    }
 	    j=swc->last_y*(2.0*ã-phase)+swc->next_y*(phase-ã);
 	  }

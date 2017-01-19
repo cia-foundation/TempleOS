@@ -173,7 +173,7 @@ public U0 DocCollapse(Bool collapse=TRUE,CDoc *doc=NULL)
 }
 
 #help_index "DolDoc/Cmd Line (Typically);Cmd Line (Typically)"
-public I64 DocMax(I64 i=MAX_I64)
+public I64 DocMax(I64 i=I64_MAX)
 {//Set max document entries. (Cmd line buffer size.)
 //Adjusts the size of the cmd line buf.
   //Normally, the cmd line deletes entries

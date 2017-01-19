@@ -150,7 +150,7 @@ gs_done:
 }
 
 #help_index "Keyboard Devices;Char/Input;StdIn"
-public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
+public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=I64_MIN,I64 hi=I64_MAX)
 {//Prompt user for I64 expression.
   Bool okay;
   U8 *st;
@@ -176,7 +176,7 @@ public I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=MIN_I64,I64 hi=MAX_I64)
   }
 }
 
-public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
+public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=F64_MIN,F64 hi=F64_MAX)
 {//Prompt user for F64 expression.
   Bool okay;
   U8 *st;
@@ -202,12 +202,12 @@ public F64 GetF64(U8 *msg=NULL,F64 dft=0,F64 lo=MIN_F64,F64 hi=MAX_F64)
   }
 }
 
-public CDate GetDate(U8 *msg=NULL,CDate dft=MIN_I64,
-	CDate lo=MIN_I64,CDate hi=MAX_I64)
+public CDate GetDate(U8 *msg=NULL,CDate dft=I64_MIN,
+	CDate lo=I64_MIN,CDate hi=I64_MAX)
 {//Prompt user for date expression. (Use $LK,"Now",A="MN:Now"$() if you want current time.)
   U8 *st;
   CDate res;
-  if (dft==MIN_I64) dft=Now;
+  if (dft==I64_MIN) dft=Now;
   while (TRUE) {
     if (msg)
       "" msg,dft,dft;

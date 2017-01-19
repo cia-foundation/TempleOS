@@ -16,9 +16,9 @@ $TX,"Source Code By Sym",HTML="http://www.templeos.org/Wb/Home/Web/SymsAlpha.htm
 	
 $LK,"TempleOS Credits",A="FI:::/Doc/Credits.DD"$			$LK,"History of TempleOS",A="FI:~/Web/History.DD"$
 
-$LK,"Why 640x480?",A="FI:::/Home/Web/640x480.DD"$				$LK,"Dianna Cowern",A="FI:~/Web/DLC/DLC.DD"$
+$LK,"Why 640x480?",A="FI:~/Web/640x480.DD"$				$LK,"Dianna Cowern",A="FI:~/Web/DLC/DLC.DD"$
 $FG$
-$LK,"Change Log",A="FI:::/Doc/ChangeLog.DD"$				$LK,"Terry Davis",A="FI:~/Web/TAD/TAD.DD"$
+$LK,"Change Log",A="FI:::/Doc/ChgLog.DD"$				$LK,"Terry Davis",A="FI:~/Web/TAD/TAD.DD"$
 
 The Brits are moving to $TX,"ban \"hacking tools\"",HTML="http://www.theregister.co.uk/2008/01/02/hacker_toll_ban_guidance"$.  Take my $LK,"unassembler",A="MN:Ui"$ from my cold dead hands.  NRA is for guns; IRA is for computers.
 

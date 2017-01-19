@@ -1,13 +1,13 @@
-#define NUM_BALLS	7
-#define NUM_SPRINGS	3
+#define BALLS_NUM	7
+#define SPRINGS_NUM	3
 
 #define STRETCH 	500.0
 #define GRAVITY 	50.0 //not really gravity
 #define BALL_RADIUS	5
 #define BASE_SIZE	10
 
-CMass balls[NUM_BALLS];
-CSpring springs[NUM_SPRINGS];
+CMass balls[BALLS_NUM];
+CSpring springs[SPRINGS_NUM];
 F64 collision_t;
 
 U0 DrawIt(CTask *task,CDC *dc)
@@ -25,7 +25,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   GrLine(dc,balls[0].x,balls[0].y,
 	ms.pos.x-task->pix_left-task->scroll_x,
 	ms.pos.y-task->pix_top-task->scroll_y);
-  for (i=0;i<NUM_SPRINGS;i++)
+  for (i=0;i<SPRINGS_NUM;i++)
     GrLine(dc,springs[i].end1->x,springs[i].end1->y,
 	  springs[i].end2->x,springs[i].end2->y);
 
@@ -35,7 +35,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->color=BLACK;
   GrCircle(dc,balls[0].x,balls[0].y,BALL_RADIUS);
 
-  for (i=1;i<NUM_BALLS;i++) {
+  for (i=1;i<BALLS_NUM;i++) {
     dc->color=LTPURPLE;
     GrCircle(dc,balls[i].x,balls[i].y,BALL_RADIUS);
     GrFloodFill(dc,balls[i].x,balls[i].y,TRUE);
@@ -65,7 +65,7 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
   D3AddEqu(&balls[0].DstateDt->DxDt,D3MulEqu(&p2,STRETCH));
 
   D3Equ(&p2,task->pix_width>>1,task->pix_height>>1,0);
-  for (i=1;i<NUM_BALLS;i++) {
+  for (i=1;i<BALLS_NUM;i++) {
     D3Sub(&p,&p2,&balls[i].state->x);
     if (d=D3Norm(&p)) {
 //Gravity would be /(d*d*d), but that's too exponential.
@@ -74,8 +74,8 @@ U0 MyDerivative(CMathODE *ode,F64 t,COrder2D3 *,COrder2D3 *)
     }
   }
 
-  for (i=0;i<NUM_BALLS;i++)
-    for (j=i+1;j<NUM_BALLS;j++) {
+  for (i=0;i<BALLS_NUM;i++)
+    for (j=i+1;j<BALLS_NUM;j++) {
       D3Sub(&p,&balls[j].state->x,&balls[i].state->x);
       dd=D3NormSqr(&p);
       if (dd<=(2*BALL_RADIUS)*(2*BALL_RADIUS)) {
@@ -124,14 +124,14 @@ U0 Whap()
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;
-  MemSet(balls,0,NUM_BALLS*sizeof(CMass));
+  MemSet(balls,0,BALLS_NUM*sizeof(CMass));
   D3Equ(&balls[0].x,100,100,0);
-  for (i=1;i<NUM_BALLS;i++)
+  for (i=1;i<BALLS_NUM;i++)
     D3Equ(&balls[i].x,
 	  RandI16%500+Fs->pix_width>>1,RandI16%500+Fs->pix_height>>1,0);
   balls[0].x=ms.pos.x-Fs->pix_left-Fs->scroll_x;
   balls[0].y=ms.pos.y-Fs->pix_top-Fs->scroll_y;
-  for (i=0;i<NUM_BALLS;i++) {
+  for (i=0;i<BALLS_NUM;i++) {
     balls[i].mass=1.0;
     balls[i].drag_profile_factor=1.0;
     QueIns(&balls[i],ode->last_mass);
@@ -140,7 +140,7 @@ U0 Whap()
   balls[2].y=balls[1].y;
   balls[3].x=balls[1].x;
   balls[3].y=balls[1].y+15;
-  MemSet(springs,0,NUM_SPRINGS*sizeof(CSpring));
+  MemSet(springs,0,SPRINGS_NUM*sizeof(CSpring));
   springs[0].end1=&balls[1];
   springs[0].end2=&balls[2];
   springs[0].rest_len=15;

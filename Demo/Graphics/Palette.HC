@@ -2,13 +2,13 @@ U0 PaletteDemo()
 {
   I64 i,j;
   CBGR48 bgr;
-  for (i=0;i<NUM_COLORS;i++)
+  for (i=0;i<COLORS_NUM;i++)
     "$$BLACK$$$$BG,%d$$__%-8Z__$$FG$$$$BG$$\n",i,i,"ST_COLORS";
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
 //Alternatively, use $LK,"GrPaletteSet",A="MN:GrPaletteSet"$(gr_palette_gray);
-  for (i=0;i<NUM_COLORS;i++) {
-    j=0xFFFF*i/(NUM_COLORS-1);
+  for (i=0;i<COLORS_NUM;i++) {
+    j=0xFFFF*i/(COLORS_NUM-1);
     bgr.b=j;
     bgr.g=j;
     bgr.r=j;

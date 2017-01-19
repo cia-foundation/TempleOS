@@ -239,7 +239,7 @@ public U0 FunRep(U8 *st,U8 *rbp=NULL,I64 max_depth=2,CTask *task=NULL)
     } else {
       tmpm=tmpf->member_lst_and_root;
       while (tmpm) {
-	if (0<=tmpm->reg<NUM_REGS)
+	if (0<=tmpm->reg<REG_REGS_NUM)
 	  "%08Z %s\n",tmpm->reg,"ST_U64_REGS",tmpm->str;
 	else
 	  "%08tX %s\n",tmpm->offset,tmpm->str;

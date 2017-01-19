@@ -1,0 +1,167 @@
+$WW,1$$FG,5$$TX+CX,"TOS Staff Policies"$$FG$
+
+* Motto: Run toward bugs, not away from bugs.
+
+* Be Metallica.  Use short, sharp, powerful words, as though a song.
+
+* Be careful $FG,2$/Demo/AcctExample$FG$ doesn't get extra files.  When you run TOSRegen(), it will copy home files to $FG,2$/Demo/AcctExample$FG$.
+
+* Be careful $FG,2$remote/Wb$FG$ site doesn't get extra files.  If you delete or rename a file, also delete the $FG,2$remote/Wb$FG$ file from the site.
+
+$TR,"PreRegen()"$
+$ID,2$
+Linux: Export Bookmarks to ~/TAD/Home/Sup1/Sup1Blog/Bookmarks.html
+Linux: >vm_in
+Linux: VMware Machine: "TOS"
+{
+  TempleOS: >TOSPreRegen;
+  TempleOS: Update Budget
+}
+$ID,-2$
+$TR,"NewRelease(Bool full=FALSE)"$
+$ID,2$
+if ($FG,2$full$FG$)
+  ]PreRegen()
+
+Linux: VMware Machine:"TOS"
+{
+  TempleOS: >TOSRegen($FG,2$full$FG$);
+}
+Linux: >vm_out
+
+if ($FG,2$full$FG$) {
+  Linux: Burn ~/TAD to memory stick.
+
+  On other machine {
+    Linux: Copy ~/TAD from memory stick.
+
+    VMware: VMware NewMachine:"TOS", Install TempleOSStaff.ISO
+    { //2048 Meg RAM or 57344 Meg RAM
+      TempleOS: $LK,"TOSStaffIns",A="MN:TOSStaffIns"$(); in VMware.
+      TempleOS: >TOSRegen;
+      TempleOS: >#include "::/Misc/OSTestSuite"
+      TempleOS: >Del("~/Demo*");
+    }
+
+    Linux: >emu_staff_new
+    Linux: >emu8core or >emu24core
+    {
+      TempleOS: $LK,"TOSStaffIns",A="MN:TOSStaffIns"$(); in QEMU.
+      TempleOS: >TOSRegen;
+    }
+  }
+}
+
+Linux: CrossFTP sync ~/TAD/Site1/Wb to remote/Wb
+
+if ($FG,2$full$FG$) {
+  FileZilla
+    Upload ~/TAD/Site1/index.html to remote/index.html
+    Upload ~/TAD/Site1/TempleOS.html to remote/TempleOS.html
+}
+
+In WebHost FileMgr {
+  Del {
+    remote/TempleOSCD.ISO
+    remote/TempleOSSup1.ISO.C
+    remote/TempleOSWeb.ISO.C
+    remote/TempleOSUltra.ISO
+  }
+  Copy up one level to remote root {
+    remote/Wb/TempleOSCD.ISO
+    remote/Wb/TempleOSSup1.ISO.C
+    remote/Wb/TempleOSWeb.ISO.C
+    remote/Wb/TempleOSUltra.ISO
+  }
+}
+$ID,-2$
+$TR,"NewVersion(Bool full=FALSE)"$
+$ID,2$
+Increment minor version number.
+  >$LK,"R",A="MN:R"$("3.12","3.13","-i-l");  //Approve by hand.
+
+Add version release notice in $LK,"::/Doc/ChgLog.DD"$.
+
+]NewRelease(TRUE);
+
+Submit to www.betanews.com.
+Send email to MajorGeeks.
+if ($FG,2$full$FG$) {
+  Submit to www.upload.com.
+  Upload to SourceForge.
+}
+$ID,-2$
+$TR,"NewYearlyVersion()"$
+$ID,2$
+Increment major version number.
+  >$LK,"R",A="MN:R"$("3.13","4.00","-i-l");  //Approve by hand.
+
+Add version release notice in $LK,"::/Doc/ChgLog.DD"$.
+
+$LK,"Update ::/Misc/PCIDevices.DD",A="FF:::/Adam/DevInfo.HC,PCIDevFileGen"$
+
+Remove 6 months from bottom of $LK,"::/Doc/ChgLog.DD"$.
+
+]NewVersion(TRUE);
+$ID,-2$
+* If you change the compiler language syntax, immediately make a ]NewRelease(TRUE).
+
+
+$FG,5$$TX+CX,"TOS Staff Indoctrination"$$FG$
+
+Make a list of all the ways you make a project scalable.  With TempleOS, we scale down, not up, so do we do the opposite of all of them.
+
+How would you improve this $LK,"LZW Compression",A="FI:::/Kernel/Compress.HC"$?  We have a 100,000 line of code limit, so it's a trick, thought provoking, question introducing you to our way of thinking.
+
+We hope to define objective metrics so we can simply ask the world to reduce the lines of code and be perfectly objective.
+
+We hope for an objective metric for the compiler, such as how fast it compiles itself (having been compiled by itself).  It's a little less elegant, but we actually compile kernel and compiler together all the time with $LK,"TOSBootHDIns",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,TOSBootHDIns"$('C').  We have the freedom to change the $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ language, like how I made type-casting post-fix.  We need some more limitations on the problem because we don't want a ridiculous language.
+
+Consider these games as the basis of the vector space we wish to span:
+
+$LK,"/Demo/Games/BattleLines.HC",A="FI:::/Demo/Games/BattleLines.HC"$
+$LK,"/Demo/Games/BigGuns.HC",A="FI:::/Demo/Games/BigGuns.HC"$
+$LK,"/Demo/Games/BlackDiamond.HC",A="FI:::/Demo/Games/BlackDiamond.HC"$
+$LK,"/Demo/Games/BomberGolf.HC",A="FI:::/Demo/Games/BomberGolf.HC"$
+$LK,"/Demo/Games/CastleFrankenstein.HC",A="FI:::/Demo/Games/CastleFrankenstein.HC"$
+$LK,"/Demo/Games/CharDemo.HC",A="FI:::/Demo/Games/CharDemo.HC"$
+$LK,"/Demo/Games/CircleTrace.HC",A="FI:::/Demo/Games/CircleTrace.HC"$
+$LK,"/Demo/Games/Collision.HC",A="FI:::/Demo/Games/Collision.HC"$
+$LK,"/Demo/Games/Digits.HC",A="FI:::/Demo/Games/Digits.HC"$
+$LK,"/Demo/Games/DunGen.HC",A="FI:::/Demo/Games/DunGen.HC"$
+$LK,"/Demo/Games/ElephantWalk.HC",A="FI:::/Demo/Games/ElephantWalk.HC"$
+$LK,"/Demo/Games/FlapBat.HC",A="FI:::/Demo/Games/FlapBat.HC"$
+$LK,"/Demo/Games/FlatTops.HC",A="FI:::/Demo/Games/FlatTops.HC"$
+$LK,"/Demo/Games/Halogen.HC",A="FI:::/Demo/Games/Halogen.HC"$
+$LK,"/Demo/Games/MassSpring.HC",A="FI:::/Demo/Games/MassSpring.HC"$
+$LK,"/Demo/Games/Maze.HC",A="FI:::/Demo/Games/Maze.HC"$
+$LK,"/Demo/Games/RainDrops.HC",A="FI:::/Demo/Games/RainDrops.HC"$
+$LK,"/Demo/Games/RawHide.HC",A="FI:::/Demo/Games/RawHide.HC"$
+$LK,"/Demo/Games/Rocket.HC",A="FI:::/Demo/Games/Rocket.HC"$
+$LK,"/Demo/Games/RocketScience.HC",A="FI:::/Demo/Games/RocketScience.HC"$
+$LK,"/Demo/Games/Squirt.HC",A="FI:::/Demo/Games/Squirt.HC"$
+$LK,"/Demo/Games/Talons.HC",A="FI:::/Demo/Games/Talons.HC"$
+$LK,"/Demo/Games/TheDead.HC",A="FI:::/Demo/Games/TheDead.HC"$
+$LK,"/Demo/Games/TicTacToe.HC",A="FI:::/Demo/Games/TicTacToe.HC"$
+$LK,"/Demo/Games/TreeCheckers.HC",A="FI:::/Demo/Games/TreeCheckers.HC"$
+$LK,"/Demo/Games/Varoom.HC",A="FI:::/Demo/Games/Varoom.HC"$
+$LK,"/Demo/Games/Wenceslas.HC",A="FI:::/Demo/Games/Wenceslas.HC"$
+$LK,"/Demo/Games/Whap.HC",A="FI:::/Demo/Games/Whap.HC"$
+$LK,"/Demo/Games/Zing.HC",A="FI:::/Demo/Games/Zing.HC"$
+$LK,"/Demo/Games/ZoneOut.HC",A="FI:::/Demo/Games/ZoneOut.HC"$
+
+Unlike Linux and Windows, we do not want to handle all usage models.  On the contrary, we want to cherry-pick the hell out of our target usage so we maximize the elegance and simple beauty while delivering something good for $FG,4$$TX,"Hymns",HTML="http://www.templeos.org/Wb/Home/Web/TAD/HymnVideos.html"$$FG$.
+
+If we can define the vector space we hope to span, precisely, then we can leave the operating system on autopilot for future generations.  They simply make the best possible solution to the vector space.
+
+Knuth other literate coding homos are wrong -- if you have a well define way of doing things, it usually doesn't matter as long as it is consistent and easy to remember, so you don't vasillate.  Try to do things in the way the computer naturally wants to do them.  Don't be an arrogant French buffoon.  Top-down is ridiculous because you have to make headers for every function.  Bottom-up is how a computer wants to do it.  In the past, there was a big-endian/little-endian battle.  Little endian is obviously the way the computer naturally wants to operate.
+
+Do not bloat a compiler with theoretical optimizations that bad programmers might require.  We would rather teach them.  As a matter of fact, there is a very straight forward way to convert the C language to machine code.
+
+When I solicit line-of-code reducing optimizations, I plan to make it 100% objective, if possible, and chuckle at the fun, hard-to-understand hacks.
+
+If you have ideas on how to make TempleOS more like Linux, I'm not interested.  However, if you have ideas to make it more like the 8-bit computer generation operating systems or like DOS, I am interested.  We want the creative spirit of the 8-bit generation of computers.
+
+$FG,8$
+* "Linux" is a trademark owned by Linus Torvalds.
+* "Windows" is a trademark owned by MicroSoft Corp.

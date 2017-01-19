@@ -50,7 +50,7 @@ public _extern _CALL_IND I64 CallInd(
 
 #help_index "Call/System Extern Num"
 public _extern SYS_EXTERN_TABLE /*argpop*/
-	I64 (**ext)(...); //Array of fun ptrs.	See $LK,"Extern Num Definitions",A="MN:EXT_NUM_ENTRIES"$
+	I64 (**ext)(...); //Array of fun ptrs.	See $LK,"Extern Num Definitions",A="MN:EXT_EXTS_NUM"$
 public _extern _CALLEXTNUM
 	I64 CallExtNum(I64 num,...); //Call ext num with fixed number of args.
 
@@ -230,7 +230,7 @@ public _extern SYS_PROGRESS4_MAX I64 progress4_max; //Progress 4 max.
 public _extern SYS_PROGRESS4_T0 F64 progress4_t0; //Progress 4 start time.
 public _extern SYS_PROGRESS4_TF F64 progress4_tf; //Progress 4 end time.
 public _extern SYS_PROGRESSES
-	CProgress sys_progresses[NUM_PROGRESS_BARS]; //All progress bars.
+	CProgress sys_progresses[PROGRESS_BARS_NUM]; //All progress bars.
 
 #help_index "MultiCore"
 #help_file "::/Doc/MultiCore"
@@ -238,7 +238,7 @@ public _extern SYS_CPU_STRUCTS CCPU *cpu_structs; //$LK,"Gs",A="MN:Gs"$ points t
 public _extern SYS_MP_CNT I64 mp_cnt; //Count of cores
 _extern SYS_MP_CNT_INITIAL I64 mp_cnt_initial; //only used during $LK,"Core0StartMP",A="MN:Core0StartMP"$
 _extern SYS_MP_CNT_LOCK I64 mp_cnt_lock;
-_extern SYS_SEMAS CSema sys_semas[SEMA_NUM_SEMAS];
+_extern SYS_SEMAS CSema sys_semas[SEMA_SEMAS_NUM];
 
 #help_index "MultiCore;Processor"
 public _intern IC_GS CCPU *Gs(); //GS points to current $LK,"CCPU",A="MN:CCPU"$.

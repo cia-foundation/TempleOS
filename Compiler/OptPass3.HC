@@ -13,8 +13,8 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
   ps->ptr=0;
   ps->ptr2=0;
 
-  for (i=0;i<NUM_REGS;i++) {
-    reg_offsets[i].offset=MAX_I64;
+  for (i=0;i<REG_REGS_NUM;i++) {
+    reg_offsets[i].offset=I64_MAX;
     reg_offsets[i].m=NULL;
   }
   if (cc->htc.fun) {
@@ -26,7 +26,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
     tmpm=cc->htc.fun->member_lst_and_root;
     while (tmpm) {
       tmpc=OptClassFwd(tmpm->member_class);
-      if (0<=tmpm->reg<NUM_REGS) {
+      if (0<=tmpm->reg<REG_REGS_NUM) {
 	if (Bts(&used_reg_mask,tmpm->reg))
 	  PrintWarn("Reg in use\n $$LK,\"FL:%s,%d\"$$ '%s' in '%s'\n",
 		cc->lex_include_stk->full_name,
@@ -36,7 +36,7 @@ U0 OptPass3(CCmpCtrl *cc,COptReg *reg_offsets)
       } else if (tmpc->raw_type!=RT_F64 && tmpm->reg!=REG_NONE ||
 	    tmpm->reg==REG_ALLOC) {
 	if (tmpm->reg==REG_ALLOC)
-	  mv[member_cnt].score=MAX_I64/2; //big but not too big
+	  mv[member_cnt].score=I64_MAX/2; //big but not too big
 	mv[member_cnt].offset_start=tmpm->offset;
 	mv[member_cnt].offset_end=tmpm->offset+MaxI64(1,tmpm->size);
 	mv[member_cnt++].m=tmpm;

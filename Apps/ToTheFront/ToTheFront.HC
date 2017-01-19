@@ -7,7 +7,7 @@ U0 TurnNew()
 {
   I64 i,j;
   for (j=0;j<2;j++)
-    for (i=0;i<MAX_UNITS;i++) {
+    for (i=0;i<UNITS_NUM;i++) {
       units[j][i].remaining_movement=units[j][i].movement;
       units[j][i].fired=FALSE;
     }

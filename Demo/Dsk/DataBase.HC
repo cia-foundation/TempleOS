@@ -1,5 +1,5 @@
 #define DB_FILENAME	"~/DataBaseDemo.BIN"
-#define DB_MAX_ACCT	100
+#define DB_ACCT_MAX	100
 #define DB_ACCT_BLKS	1
 
 class Acct
@@ -11,7 +11,7 @@ class Acct
 
 U0 InitDatabase()
 { //Write new contiguous file
-  CFile *f=FOpen(DB_FILENAME,"w",DB_MAX_ACCT*DB_ACCT_BLKS);
+  CFile *f=FOpen(DB_FILENAME,"w",DB_ACCT_MAX*DB_ACCT_BLKS);
   FClose(f);
 }
 
@@ -22,7 +22,7 @@ U0 WriteAcct()
   I64 acctnum;
 
   acctnum=GetI64("Acct #",-1);
-  if (0<=acctnum<DB_MAX_ACCT) {
+  if (0<=acctnum<DB_ACCT_MAX) {
     MemSet(&a,0,BLK_SIZE);
     if (DocForm(&a)) {
       f=FOpen(DB_FILENAME,"w+");
@@ -39,7 +39,7 @@ U0 ReadAcct()
   I64 acctnum;
 
   acctnum=GetI64("Acct #",-1);
-  if (0<=acctnum<DB_MAX_ACCT) {
+  if (0<=acctnum<DB_ACCT_MAX) {
     f=FOpen(DB_FILENAME,"r");
     FRBlks(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
     FClose(f);

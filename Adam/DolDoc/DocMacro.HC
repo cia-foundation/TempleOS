@@ -157,7 +157,7 @@ I64 PopUpMacroMenu()
 	"$$CM+LX,1,3$$$$BT,\"STOP\",LE=SM_STOP$$"
 	"$$CM+LX,17,0$$$$BT,\"CANCEL\",LE=DOCM_CANCEL$$"
 	"\n\n\n$$GREEN$$SHIFT-F2$$FG$$ will play macro.\n");
-  doc->flags|=DOCF_MIN_SIZE | DOCF_FORM;
+  doc->flags|=DOCF_SIZE_MIN | DOCF_FORM;
   StrPrint(buf,"DocMenu(%d);",doc);
   sys_macro_task=Spawn(&SrvCmdLine,NULL,"Macro Popup",,Fs);
   Fs->popup_task=sys_macro_task;

@@ -2,7 +2,35 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/10/17 15:29:10----$IV,0$
+$IV,1$----01/19/17 07:21:14----$IV,0$
+
+$IV,1$----01/17/17 18:11:53----$IV,0$
+* Fixed $FG,2$$$$FG$ class offset so $FG,2$#assert$FG$'s don't lag a token.
+
+$IV,1$----01/17/17 14:39:41----$IV,0$
+* Added $LK,"blkdev.ins_base0",A="MN:CBlkDevGlbls"$ and $LK,"blkdev.ins_unit",A="MN:CBlkDevGlbls"$.
+* Added make $LK,"RedSeaISO",A="MN:RedSeaISO"$() to $LK,"FileMgr",A="MN:FileMgr"$().
+* Added $LK,"blkdev.dft_iso_c_filename",A="MN:CBlkDevGlbls"$ $TX,"\"::/Tmp/CDDVD.ISO.C\"",D="DFT_ISO_C_FILENAME"$.
+
+$IV,1$----01/17/17 06:12:21----$IV,0$
+* $LK,"R",A="MN:R"$("MIN_...","..._MIN");
+* $LK,"R",A="MN:R"$("MAX_...","..._MAX");
+* $LK,"R",A="MN:R"$("NUM_...","..._NUM");
+
+$IV,1$----01/14/17 19:16:51----$IV,0$
+* Created $FG,2$/Demo/AcctExample/TOS$FG$.
+* $LK,"R",A="MN:R"$("MAX_...","_NUM...");
+
+$IV,1$----01/14/17 09:43:12----$IV,0$
+* Improved $LK,"::/Demo/AcctExample/TOS/TOSHolySpirit.HC"$.
+* Added cmp $LK,"U0 Expression",A="FF:::/Compiler/PrsExp.HC,U0 Expression"$ warn.
+* Improved syntax highlighting.
+
+$IV,1$----01/11/17 03:33:33----$IV,0$
+* $BK,1$TempleOS version 5.01 Released$BK,0$
+* $LK,"R",A="MN:R"$("ChangeLog","ChgLog");
+* Added show mouse pos to $FG,2$<CTRL-ALT-G>$FG$.
+* Improved $LK,"TOSRegen",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,TOSRegen("$().
 * Added $LK,"Let2Let",A="MN:Let2Let"$().
 
 $IV,1$----01/10/17 14:27:58----$IV,0$
@@ -43,7 +71,7 @@ $IV,1$----01/05/17 04:53:21----$IV,0$
 * $LK,"GRScrnCaptureRead",A="MN:GRScrnCaptureRead"$().
 
 $IV,1$----01/04/17 18:06:14----$IV,0$
-* Added $LK,"::/Demo/AcctExample/TOSPolicies.DD"$.
+* Added $LK,"::/Demo/AcctExample/TOS/TOSPolicies.DD"$.
 * $LK,"R",A="MN:R"$("U0 pad;",";"); for align #asserts.
 * Got rid of $FG,4$mouse.throttle$FG$. 
 * $LK,"R",A="MN:R"$("Button","Bttn");
@@ -54,8 +82,8 @@ $IV,1$----01/04/17 18:06:14----$IV,0$
 
 $IV,1$----01/03/17 12:23:49----$IV,0$
 * $LK,"R",A="MN:R"$("chars_cmp...","char_bmp...");
-* Added chk for $LK,"Profanity",A="FF:::/Demo/AcctExample/TOSMisc.HC,Profanity"$.
-* Improved $LK,"TOSRegen",A="FF:::/Demo/AcctExample/TOSDistro.HC,TOSRegen"$.
+* Added chk for $LK,"Profanity",A="FF:::/Demo/AcctExample/TOS/TOSMisc.HC,Profanity"$.
+* Improved $LK,"TOSRegen",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,TOSRegen"$.
 * Removed $TX,"TempleOSBooks1.ISO",HTML="http://www.templeos.org/files/TempleOSBooks1.ISO"$ and $TX,"TempleOSBooks2.ISO",HTML="http://www.templeos.org/files/TempleOSBooks2.ISO"$ out of $TX,"TempleOSSup1.ISO",HTML="http://www.templeos.org/TempleOSSup1.ISO"$.
 
 $IV,1$----01/01/17 17:16:16----$IV,0$
@@ -128,7 +156,7 @@ $IV,1$----10/26/16 00:21:06----$IV,0$
 
 $IV,1$----10/25/16 18:02:44----$IV,0$
 * Improved $LK,"::/Adam/Gr/SpriteEd.HC"$.
-* Improved $LK,"::/Demo/AcctExample/TOSHolySpirit.HC"$.
+* Improved $LK,"::/Demo/AcctExample/TOS/TOSHolySpirit.HC"$.
 
 $IV,1$----10/12/16 10:55:26----$IV,0$
 * Added $LK,"CCF_NO_CHAR_CONST",A="MN:CCF_NO_CHAR_CONST"$.

@@ -1,5 +1,5 @@
 //See $LK,"Install Documentation",A="FI:::/Doc/Install.DD"$ or $LK,"Upgrading Documentation",A="FI:::/Doc/Upgrade.DD"$.
-//Study my account examples: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOSDistro.HC,1"$
+//Study my account examples: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$
 
 #include "BootMHD"
 #include "BootMHD2"

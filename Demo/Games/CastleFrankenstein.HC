@@ -98,13 +98,13 @@ F64 man_é;
 
 F64 t0,tf;
 
-#define NUM_MONSTERS	10
+#define MONSTERS_NUM	10
 I64 monsters_left;
 class Monster
 {
   I64 x,y;
   Bool dead,pad[7];
-} monsters[NUM_MONSTERS];
+} monsters[MONSTERS_NUM];
 
 U0 CFTransform(CDC *dc,I64 *x,I64 *y,I64 *z)
 {
@@ -308,7 +308,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   }
 
   //Draw Monsters
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++) {
     x=tmpm->x;
     y=tmpm->y;
     if (LOS(x,y,man_xx,man_yy)) {
@@ -350,7 +350,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
     //Draw Things on heads-up Map
   dc->color=LTPURPLE;
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++)
     if (!tmpm->dead)
       GrPlot3(dc,2*(tmpm->x/SCRN_SCALE),
 	    2*(map_height-1-tmpm->y/SCRN_SCALE),0);
@@ -381,7 +381,7 @@ U0 Fire()
   Monster *tmpm;
 
   Noise(100,53,74);
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++) {
     x=tmpm->x;
     y=tmpm->y;
     if (!tmpm->dead &&
@@ -428,14 +428,14 @@ U0 Init()
   man_yy=(map_height-1-MAN_START_Y)*SCRN_SCALE;
   man_é=0;
 
-  for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++) {
+  for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++) {
     tmpm->dead=FALSE;
     do {
       tmpm->x=RandU64%((map_width-2)*SCRN_SCALE)+SCRN_SCALE;
       tmpm->y=RandU64%((map_height-2)*SCRN_SCALE)+SCRN_SCALE;
     } while (!map[(tmpm->y/SCRN_SCALE)*map_width+tmpm->x/SCRN_SCALE]);
   }
-  monsters_left=NUM_MONSTERS;
+  monsters_left=MONSTERS_NUM;
   tf=0;
   t0=tS;
 }
@@ -447,7 +447,7 @@ U0 AnimateTask(I64)
 
   while (TRUE) {
     dd=0.25*SCRN_SCALE*Sin(tS/2);
-    for (i=0,tmpm=monsters;i<NUM_MONSTERS;i++,tmpm++)
+    for (i=0,tmpm=monsters;i<MONSTERS_NUM;i++,tmpm++)
       if (!tmpm->dead) {
 	x=tmpm->x;
 	y=tmpm->y;

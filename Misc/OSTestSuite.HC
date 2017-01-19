@@ -40,132 +40,67 @@ U0 TSFileChar(U8 *name,I64 mS=750,I64 ch=CH_SPACE,Bool wait=TRUE)
 /*
 U0 DoMouseDemo()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Graphics/MouseDemo\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoPullDownMenu()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/PullDownMenu\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoTicTacToe()
 {
+  XTalkWait(task,"#include \"::/Demo/Games/TicTacToe\";\n");
 }
-
 U0 DoLife()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Graphics/Life\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoZing()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Games/Zing\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoSlider()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Graphics/Slider\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoScrollBars()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Graphics/ScrollBars\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoWhap()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Games/Whap\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoDataBase()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Dsk/DataBase\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoDskRaw()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Dsk/DskRaw\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoTimeClock()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Apps/TimeClock\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoLectures()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Lectures\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoInFile()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/InFile\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoSpy()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/Spy\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
 }
-
 U0 DoUnusedDefine()
 {
-  CTask *task=User;
   XTalkWait(task,"#include \"::/Demo/DolDoc/UnusedDefine\";\n");
-  Sleep(500);
-  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  DeathWait(&task,TRUE);
+}
+U0 DoOnceDemo()
+{
+  XTalkWait(task,"#include \"::/Demo/OnceDemo\";\n");
 }
 */
 $PL,1000$
@@ -1233,7 +1168,15 @@ U0 DoXCaliber()
 {
   I64 i;
   CTask *task=User;
-  XTalkWait(task,"#include \"::/Apps/X-Caliber/Run\";\n");
+  XTalk(task,"#include \"::/Apps/X-Caliber/Run\";\n");
+
+  Sleep(100);
+  if(TaskValidate(task->popup_task)) {
+    PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,0,SCF_CTRL|SC_CURSOR_DOWN);
+    PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+    DeathWait(&task->popup_task);
+  }
+
   for (i=0;i<5;i++) {
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SCF_SHIFT|SC_CURSOR_UP);
     PostMsgWait(task,MSG_KEY_DOWN_UP,0,SCF_SHIFT|SC_CURSOR_RIGHT);
@@ -1376,7 +1319,7 @@ U0 DoToHtmlToTXT()
 {
   CTask *task=User("#include \"::/Demo/ToHtmlToTXTDemo/HtmlGen\";"
 	"#include \"::/Demo/ToHtmlToTXTDemo/TXTGen\";"
-	"Type(\"/Home/DemoOutPage.TXT\");Sleep(750);\n");
+	"Type(\"~/DemoOutPage.TXT\");Sleep(750);\n");
   DeathWait(&task,TRUE);
 }
 

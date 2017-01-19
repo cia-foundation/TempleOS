@@ -18,11 +18,11 @@ U0 OptPass5(CCmpCtrl *cc)
       if (intermediate_code_table[code].arg_cnt==IS_V_ARG)
 	ps->ptr-=tmpi->ic_data>>3;
       if (code==IC_PUSH_REGS) {
-	for (i=0;i<NUM_REGS;i++)
+	for (i=0;i<REG_REGS_NUM;i++)
 	  if (Bt(&tmpi->ic_data,i))
 	    ps->ptr++;
       } else if (code==IC_POP_REGS) {
-	for (i=0;i<NUM_REGS;i++)
+	for (i=0;i<REG_REGS_NUM;i++)
 	  if (Bt(&tmpi->ic_data,i))
 	    ps->ptr--;
       }

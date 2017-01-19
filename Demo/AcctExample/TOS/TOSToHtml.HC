@@ -1,5 +1,5 @@
 //This is a customized version of $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
-//$MA-X+PU,"Diff",LM="WinMax;WinBorder;S2T(\"/*\",\"+r+S\");Diff(\"/Demo/ToHtmlToTXTDemo/ToHtml.HC.Z\",\"/Home/TOSToHtml.HC.Z\");View;"$
+//$MA-X+PU,"Diff",LM="WinMax;WinBorder;S2T(\"/*\",\"+r+S\");Diff(\"/Demo/ToHtmlToTXTDemo/ToHtml.HC.Z\",\"~/TOS/TOSToHtml.HC.Z\");View;"$
 
 #help_index "DolDoc/Conversion"
 //See $LK,"::/Doc/Credits.DD"$.
@@ -163,10 +163,10 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	U8 (*link_cvt)(U8 *link_st)=&TOSLinkCvt1,Bool line_nums=FALSE)
 {//Cvt $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$doc to HTML file.
   CDocEntry *doc_e,*style,*doc_e2;
-  I64 i,y,old_y=MIN_I64,col,old_u32_attr=DOCET_UNDEF_COLOR,old_attr,digits;
+  I64 i,y,old_y=I64_MIN,col,old_u32_attr=DOCET_UNDEF_COLOR,old_attr,digits;
   U32 *hl,*src;
   U8 *st,st_2[2],*link_st,*style_bitmap=CAlloc(256/8);
-  CBGR48 p[NUM_COLORS];
+  CBGR48 p[COLORS_NUM];
   GrPaletteGet(p);
   CDoc *doc_out=DocNew;
   Bool unlock_doc_in=DocLock(doc_in),no_bwd;
@@ -189,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -402,7 +402,7 @@ public U0 TOSToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   Free(out_name);
 }
 
-#help_index "TOS"
+#help_index "Misc/TOS"
 U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
 {
   U8 *name2;
@@ -430,7 +430,7 @@ U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.00",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -473,8 +473,8 @@ U0 FreshenWebDir(U8 *dirname,Bool line_nums=FALSE)
   DirTreeDel(tmpde1);
 }
 
-public U0 MakeWebSite()
-{
+public U0 FreshenSite()
+{//Regen html files in D:/Wb
   CDirEntry *tmpde,*tmpde1;
   DocClear;
   Cd("D:/Wb");

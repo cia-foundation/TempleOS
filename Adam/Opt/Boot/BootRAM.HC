@@ -36,7 +36,7 @@ public U0 BootRAM(U8 *filename=NULL)
   CKernel *hi_image,*lo_image=mem_boot_base-sizeof(CBinFile),
 	reg *sys_ram_reboot;
   if (!filename)
-    filename="::/Kernel/" KERNEL_BIN_C;
+    filename="::/" KERNEL_BIN_C;
   do if (!(hi_image=FileRead(filename,&size))) return;
   while (hi_image<0x100000); //If alloc from low 640K, just get another copy.
 

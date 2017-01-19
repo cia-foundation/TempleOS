@@ -1,10 +1,10 @@
-#define MAX_PTS	16
+#define PTS_NUM	16
 
 U0 BSplineDemo()
 {
   CDC *dc=DCAlias;
   I64 arg1,arg2,i=0,msg_code;
-  CD3I32 c[MAX_PTS];
+  CD3I32 c[PTS_NUM];
 
   SettingsPush;
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;
@@ -20,7 +20,7 @@ U0 BSplineDemo()
       GrCircle(dc,arg1,arg2,10);
       i++;
     }
-  } while (i<MAX_PTS && msg_code!=MSG_MS_R_UP);
+  } while (i<PTS_NUM && msg_code!=MSG_MS_R_UP);
   dc->color=RED;
   Gr2BSpline(dc,c,i,TRUE);
   dc->color=BLUE;

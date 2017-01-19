@@ -41,7 +41,7 @@ I64 HashVal(CHash *tmph)
       return tmph(CHashGeneric *)->user_data0;
 
     case -1:		//nobound switch
-    case HTt_NUM_TYPES: //nobound switch
+    case HTt_TYPES_NUM: //nobound switch
     default:
       return 0;
   }

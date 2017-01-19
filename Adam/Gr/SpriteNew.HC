@@ -3,7 +3,7 @@
 
 U8 polypt_map[9]={0,1,2,3,0,4,5,6,7};
 
-I64 sprite_elem_base_sizes[SPT_NUM_TYPES]={
+I64 sprite_elem_base_sizes[SPT_TYPES_NUM]={
   sizeof(CSpriteBase),		//SPT_END
   sizeof(CSpriteColor),		//SPT_COLOR
   sizeof(CSpriteDitherColor),	//SPT_DITHER_COLOR
@@ -90,8 +90,8 @@ I64 SpriteTypeMask(U8 *elems)
   I64 res=0;
   CSprite *tmpg=elems-offset(CSprite.start);
   while (tmpg->type&SPG_TYPE_MASK) {
-    if (tmpg->type&SPG_TYPE_MASK>=SPT_NUM_TYPES)
-      return 1<<SPT_NUM_TYPES;
+    if (tmpg->type&SPG_TYPE_MASK>=SPT_TYPES_NUM)
+      return 1<<SPT_TYPES_NUM;
     Bts(&res,tmpg->type&SPG_TYPE_MASK);
     tmpg(U8 *)+=SpriteElemSize(tmpg);
   }

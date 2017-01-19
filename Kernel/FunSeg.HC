@@ -248,7 +248,7 @@ U8 *SrcFileName(U8 *addr,I64 cnt=1,CTask *mem_task=NULL)
     if (dbg_info=tmph->dbg_info) {
       j=dbg_info->max_line-dbg_info->min_line+1;
       body=dbg_info->body;
-      best_d=MAX_I64;
+      best_d=I64_MAX;
       for (i=0;i<j;i++) {
 	if (0<body[i]<=addr<body[i]+cnt) {
 	  ii=i+1;

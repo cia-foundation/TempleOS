@@ -9,7 +9,7 @@ public Bool HostChgDsk(U8 *iso_filename)
     WinBorder;
     WinMax;
     DocClear;
-    "$$PURPLE$$$$TX+CX,\"Change CD/DVD\"$$$$FG$$\n\n\n\n";
+    "$$PURPLE$$$$TX+CX,\"Set to %s\"$$$$FG$$\n\n\n\n",iso_filename;
     switch (ins_reg.host_vm) {
       case VM_VMWARE:
 	if (IsDotC(iso_filename))

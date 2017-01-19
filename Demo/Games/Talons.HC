@@ -23,7 +23,7 @@ RegExe("TempleOS/Talons");
 #define SNOW_ELEVATION		55
 
 //Too big makes off-scrn draws take place.
-#define MAX_PANEL_SIZE		16
+#define PANEL_SIZE_MAX		16
 
 
 
@@ -174,7 +174,7 @@ CD3 normals[MAP_HEIGHT][MAP_WIDTH];
 
 class MPCtrl {
   I64 init_not_done_flags,update_not_done_flags,app_not_done_flags;
-  I64 strip_width[MP_MAX_PROCESSORS];
+  I64 strip_width[MP_PROCESSORS_NUM];
   Bool app_done;
 } mp;
 
@@ -284,11 +284,11 @@ U0 MPDoPanels(CTask *task)
 	  h=1;
 	  do {
 	    cont=FALSE;
-	    if (w<MAX_PANEL_SIZE && TestSameSlope(i,j,w+1,h)) {
+	    if (w<PANEL_SIZE_MAX && TestSameSlope(i,j,w+1,h)) {
 	      w++;
 	      cont=TRUE;
 	    }
-	    if (h<MAX_PANEL_SIZE && TestSameSlope(i,j,w,h+1)) {
+	    if (h<PANEL_SIZE_MAX && TestSameSlope(i,j,w,h+1)) {
 	      h++;
 	      cont=TRUE;
 	    }
@@ -407,7 +407,7 @@ U0 InitElevations()
     j=1<<(RandU32%6);
     l=0;
     while (j--) {
-      if (!l && RandU16<MAX_U16/4)
+      if (!l && RandU16<U16_MAX/4)
 	l=RandU16%(j+1);
       if (l) {
 	x1=ClampI64(x-j,0,MAP_WIDTH-1);
@@ -659,7 +659,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
   xh>>=1;  yh>>=1;
   xh2>>=1; yh2>>=1;
   w_on_map=FALSE;
-  dd_old=MAX_I64;
+  dd_old=I64_MAX;
   for (strip_width=0;cnts.jiffies<update_jiffy_limit;strip_width++) {
     x1h=x1wa;
     y1h=y1wa;
@@ -689,7 +689,7 @@ U0 MPDrawIt(CTask *task,CDC *dc)
     if (h_on_map)
       w_on_map=TRUE;
     else if (w_on_map) {
-      strip_width=MAX_I64;
+      strip_width=I64_MAX;
       break;
     }
     x1wb-=yh2;
@@ -866,7 +866,7 @@ U0 Core0Talons()
   if (0<=xx<MAP_WIDTH && 0<=yy<MAP_HEIGHT)
     elev=elevations[yy][xx];
   else
-    elev=MAX_I64;
+    elev=I64_MAX;
 
   height=z/COORDINATE_SCALE-elev;
   if (height<0 && elev>WATER_ELEVATION*MAP_SCALE && !game_tf) {
@@ -892,7 +892,7 @@ U0 Core0Talons()
     while (mp.update_not_done_flags)
       Sleep(1);
 
-    min_strip_width=MAX_F64;
+    min_strip_width=F64_MAX;
     for (i=0;i<mp_cnt;i++)
       min_strip_width=Min(min_strip_width,32.0*mp.strip_width[i]/(i+32.0));
     strip_height=ClampI64(
@@ -936,7 +936,7 @@ U0 Core0Talons()
 
 Obj *FishFind(I64 x1,I64 y1,I64 *_dd)
 {
-  I64 dd,best_dd=MAX_I64;
+  I64 dd,best_dd=I64_MAX;
   Obj *res=NULL,*tmpo;
   Panel *tmpp=panel_head;
   while (tmpp) {
@@ -1230,7 +1230,6 @@ U0 Talons()
   MenuPop;
 }
 
-Seed(1);
 Talons;
                   
    àÿÿÿýÿÿÿ   

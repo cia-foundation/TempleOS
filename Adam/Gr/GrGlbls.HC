@@ -25,16 +25,16 @@ public class CGrGlbls
   U0	(*fp_draw_grab_ms)(CDC *dc,I64 x,I64 y,Bool closed);
   U8	*empty_sprite; //Gets assigned $LK,"gr.empty_sprite",A="FF:::/Adam/AMouse.HC,empty_sprite"$
 
-  #define GR_NUM_PEN_BRUSHES 64
-  CDC	*pen_brushes[GR_NUM_PEN_BRUSHES],
-	*collision_pen_brushes[GR_NUM_PEN_BRUSHES],
-	*even_pen_brushes[GR_NUM_PEN_BRUSHES],
-	*odd_pen_brushes[GR_NUM_PEN_BRUSHES];
-  I8	circle_lo[GR_NUM_PEN_BRUSHES][GR_NUM_PEN_BRUSHES],
-	circle_hi[GR_NUM_PEN_BRUSHES][GR_NUM_PEN_BRUSHES];
+  #define GR_PEN_BRUSHES_NUM 64
+  CDC	*pen_brushes[GR_PEN_BRUSHES_NUM],
+	*collision_pen_brushes[GR_PEN_BRUSHES_NUM],
+	*even_pen_brushes[GR_PEN_BRUSHES_NUM],
+	*odd_pen_brushes[GR_PEN_BRUSHES_NUM];
+  I8	circle_lo[GR_PEN_BRUSHES_NUM][GR_PEN_BRUSHES_NUM],
+	circle_hi[GR_PEN_BRUSHES_NUM][GR_PEN_BRUSHES_NUM];
 
-  #define GR_MAX_SCRN_ZOOM	8
-  U8	*scrn_zoom_tables[GR_MAX_SCRN_ZOOM+1];
+  #define GR_SCRN_ZOOM_MAX	8
+  U8	*scrn_zoom_tables[GR_SCRN_ZOOM_MAX+1];
   I64	scrn_zoom,sx,sy;
 
   //When zoomed, this keeps the mouse centered.

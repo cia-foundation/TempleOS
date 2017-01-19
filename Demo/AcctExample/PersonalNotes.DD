@@ -1,4 +1,5 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
+
 * $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
 * Add asteroid harbor defense.
 * Afterburner thruster.
@@ -10,26 +11,20 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Helicopters.
 * Anti-Aircraft.
 
-* Make registry files more robust.
-
 * $MA-X+PU,"64-Bit Device Memory",LM="F(\"mem64_ptr\");View;"$ is not implemented.
 
-* $LK,"::/Demo/RandDemo.HC"$ is kinda crappy.
-
-* Cursor in $LK,"~/TOSToHtml.HC"$.
+* Cursor in $LK,"~/TOS/TOSToHtml.HC"$.
 
 * Investigate why packet loss $LK,"Training Sleep(1)",A="FF:::/Adam/Training.HC,Sleep(1)"$.
-
-* Naming standard with regard to "MAX_".
 
 * Add AVL or red/black binary tree library support.  We have fixed-size stack.  Auto-balancing binary tree is very needed.  I've done everything myself.  I don't want to ruin a perfect record.  I'm in no hurry.
 
 * $LK,"SpriteEd",A="FI:::/Adam/Gr/SpriteEd.HC"$ shift pts, Ctrl pt for ellipse/polygon w,h is off when rotated.
 
-* Get rid of $LK,"JobQue",A="MN:JobQue"$() and use just $LK,"Spawn",A="MN:Spawn"$()?  Not sure about this, probably.
-
 * God said this is bad.  $LK,"FL:::/Adam/DolDoc/DocFind.HC,41"$
 * Backward <SHIFT-F3> is broken?
+
+* $LK,"Find",A="MN:Find"$() search sprite text?
 
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.HC,AD"$ search string.
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
@@ -442,7 +437,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17354KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17378KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$

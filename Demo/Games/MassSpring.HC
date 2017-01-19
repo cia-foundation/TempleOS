@@ -17,8 +17,7 @@ U0 DrawIt(CTask *,CDC *dc)
   dc->color=RED;
   tmps=ode->next_spring;
   while (tmps!=&ode->next_spring) {
-    GrLine(dc,tmps->end1->x,tmps->end1->y,
-	  tmps->end2->x,tmps->end2->y);
+    GrLine(dc,tmps->end1->x,tmps->end1->y,tmps->end2->x,tmps->end2->y);
     tmps=tmps->next;
   }
 

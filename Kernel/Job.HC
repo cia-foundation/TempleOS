@@ -480,7 +480,7 @@ U0 InFile(U8 *filename)
 }
 
 U0 In(U8 *fmt,...)
-{//Send text to own input buffer. See $LK,"::/Demo/AcctExample/TOSDistro.HC"$.
+{//Send text to own input buffer. See $LK,"::/Demo/AcctExample/TOS/TOSDistro.HC"$.
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv),*st=AStrNew(buf);
   InStr("\"%%s\",%d;Free(%d);",st,st);
   Free(buf);

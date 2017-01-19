@@ -268,7 +268,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	    lb=OptLabelFwd(tmpi->ic_data);
 	    short_jmp=ToBool(tmpi->ic_flags&ICF_SHORT_JMP);
 	    if (!buf && lb->addr!=INVALID_PTR &&
-		  MIN_I8+5<lb->addr-rip<MAX_I8-5)
+		  I8_MIN+5<lb->addr-rip<I8_MAX-5)
 	      short_jmp=TRUE;
 	    if (short_jmp) {
 	      tmpi->ic_flags|=ICF_SHORT_JMP;
@@ -322,7 +322,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	    break;
 	  case IC_CALL:
 	    i=tmpi->ic_data-(rip2+5);
-	    if (!(MIN_I32<=i<=MAX_I32) && !(cc->flags&CCF_AOT_COMPILE)) {
+	    if (!(I32_MIN<=i<=I32_MAX) && !(cc->flags&CCF_AOT_COMPILE)) {
 	      ICU16(tmpi,0xBB48);
 	      ICU64(tmpi,tmpi->ic_data);
 	      ICU16(tmpi,0xD3FF);
@@ -393,7 +393,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICPopRegs(tmpi,cc->htc.fun->used_reg_mask&
 		    (REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS));
 	  }
-	  if (tmpi->ic_data<=MAX_I16) {
+	  if (tmpi->ic_data<=I16_MAX) {
 	    if (tmpi->ic_data)
 	      ICU8(tmpi,0xC9); //LEAVE
 	    else
@@ -709,8 +709,8 @@ cc->pass==10 is final pass, code is placed into buf.
 	      ICPushRegs(tmpi,cc->htc.fun->used_reg_mask
 		    &(REGG_LOCAL_VARS|REGG_LOCAL_NON_PTR_VARS));
 	    }
-	    for (i=0;i<NUM_REGS;i++)
-	      if (reg_offsets[i]>0 && reg_offsets[i].offset!=MAX_I64) {
+	    for (i=0;i<REG_REGS_NUM;i++)
+	      if (reg_offsets[i]>0 && reg_offsets[i].offset!=I64_MAX) {
 		tmpc=OptClassFwd(reg_offsets[i].m->member_class);
 		ICMov(tmpi,MDF_REG+RT_I64,i,0,MDF_DISP+tmpc->raw_type,
 		      REG_RBP,reg_offsets[i].offset,rip2);
@@ -721,7 +721,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  ICAddRSP(tmpi,tmpi->ic_data);
 	  break;
 	case IC_CALL_INDIRECT:
-	  if (MIN_I8<=tmpi->ic_data<=MAX_I8) {
+	  if (I8_MIN<=tmpi->ic_data<=I8_MAX) {
 	    ICU24(tmpi,0x2454FF);  //CALL disp[RSP]
 	    ICU8(tmpi,tmpi->ic_data);
 	  } else {
@@ -910,7 +910,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_IN_U32:
 	  if (tmpi->arg1.type&MDF_IMM) {
 	    ICU16(tmpi,0xC033);
-	    if (tmpi->arg1.disp<=MAX_U8)
+	    if (tmpi->arg1.disp<=U8_MAX)
 	      ICU16(tmpi,0xE5+tmpi->arg1.disp<<8);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg1.disp<<16);
@@ -926,7 +926,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_IN_U16:
 	  if (tmpi->arg1.type&MDF_IMM) {
 	    ICU16(tmpi,0xC033);
-	    if (tmpi->arg1.disp<=MAX_U8)
+	    if (tmpi->arg1.disp<=U8_MAX)
 	      ICU24(tmpi,0xE500+OC_OP_SIZE_PREFIX+tmpi->arg1.disp<<16);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg1.disp<<16);
@@ -942,7 +942,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	case IC_IN_U8:
 	  if (tmpi->arg1.type&MDF_IMM) {
 	    ICU16(tmpi,0xC033);
-	    if (tmpi->arg1.disp<=MAX_U8)
+	    if (tmpi->arg1.disp<=U8_MAX)
 	      ICU16(tmpi,0xE4+tmpi->arg1.disp<<8);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg1.disp<<16);
@@ -959,7 +959,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  if (tmpi->arg2.type&MDF_IMM) {
 	    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
 		  tmpi->arg1.type,tmpi->arg1.reg,tmpi->arg1.disp,rip2);
-	    if (tmpi->arg2.disp<=MAX_U8)
+	    if (tmpi->arg2.disp<=U8_MAX)
 	      ICU16(tmpi,0xE7+tmpi->arg2.disp<<8);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg2.disp<<16);
@@ -977,7 +977,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  if (tmpi->arg2.type&MDF_IMM) {
 	    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
 		  tmpi->arg1.type,tmpi->arg1.reg,tmpi->arg1.disp,rip2);
-	    if (tmpi->arg2.disp<=MAX_U8)
+	    if (tmpi->arg2.disp<=U8_MAX)
 	      ICU24(tmpi,0xE700+OC_OP_SIZE_PREFIX+tmpi->arg2.disp<<16);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg2.disp<<16);
@@ -995,7 +995,7 @@ cc->pass==10 is final pass, code is placed into buf.
 	  if (tmpi->arg2.type&MDF_IMM) {
 	    ICMov(tmpi,MDF_REG+RT_I64,REG_RAX,0,
 		  tmpi->arg1.type,tmpi->arg1.reg,tmpi->arg1.disp,rip2);
-	    if (tmpi->arg2.disp<=MAX_U8)
+	    if (tmpi->arg2.disp<=U8_MAX)
 	      ICU16(tmpi,0xE6+tmpi->arg2.disp<<8);
 	    else {
 	      ICU32(tmpi,0xBA00+OC_OP_SIZE_PREFIX+tmpi->arg2.disp<<16);

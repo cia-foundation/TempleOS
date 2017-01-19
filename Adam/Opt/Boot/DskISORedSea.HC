@@ -142,43 +142,47 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
   CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('Q')); //First $LK,"BDT_ISO_FILE_WRITE",A="MN:BDT_ISO_FILE_WRITE"$
   CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_WRITE);
 
-  if (!_iso_filename)
-    _iso_filename=blkdev.dft_iso_filename;
-  iso_filename=ChgExt(_iso_filename,"ISO.C");
-  src_dir=DirNameAbs(_src_dir);
-  if (_stage2_filename) {
-    stage2_filename=FileNameAbs(_stage2_filename);
-    *stage2_filename=dv->drv_let;
-    i=StrLen(src_dir);
-    if (i!=3)	//If not head
-      i++;	//Skip slash
-    StrCpy(stage2_filename+3,stage2_filename+i);
-  } else
-    stage2_filename=NULL;
-  tmpde=FilesFind(src_dir,FUF_RECURSE);
-  root_cnt=LinkedLstCnt(tmpde)+3;
-  root_dir_blks=CeilU64(root_cnt<<6,BLK_SIZE)>>BLK_SIZE_BITS;
-  if (res=RedSeaISOPass1(tmpde)>>BLK_SIZE_BITS) {
-    bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
-    bitmap_blks=1;
-    do {
-      bitmap_blks1=bitmap_blks;
-      bitmap_blks=(res+bitmap_blks+BLK_SIZE<<3-1)/BLK_SIZE<<3;
-    } while (bitmap_blks!=bitmap_blks1);
+  if (!IsDir(_src_dir))
+    PrintErr("'%s' is not a dir.\n",_src_dir);
+  else {
+    if (!_iso_filename)
+      _iso_filename=blkdev.dft_iso_c_filename;
+    iso_filename=ChgExt(_iso_filename,"ISO.C");
+    src_dir=DirNameAbs(_src_dir);
+    if (_stage2_filename) {
+      stage2_filename=FileNameAbs(_stage2_filename);
+      *stage2_filename=dv->drv_let;
+      i=StrLen(src_dir);
+      if (i!=3)	//If not root
+	i++;	//Skip slash
+      StrCpy(stage2_filename+3,stage2_filename+i);
+    } else
+      stage2_filename=NULL;
+    tmpde=FilesFind(src_dir,FUF_RECURSE);
+    root_cnt=LinkedLstCnt(tmpde)+3;
+    root_dir_blks=CeilU64(root_cnt<<6,BLK_SIZE)>>BLK_SIZE_BITS;
+    if (res=RedSeaISOPass1(tmpde)>>BLK_SIZE_BITS) {
+      bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
+      bitmap_blks=1;
+      do {
+	bitmap_blks1=bitmap_blks;
+	bitmap_blks=(res+bitmap_blks+BLK_SIZE<<3-1)/BLK_SIZE<<3;
+      } while (bitmap_blks!=bitmap_blks1);
 
-    bd->max_blk=CeilI64(bd->drv_offset+1+bitmap_blks+res,4);
-    bd->max_blk--; //Inclusive.
-    bd->file_dsk_name=AStrNew(iso_filename);
-    bd->init_root_dir_blks=root_dir_blks;
-    BlkDevAdd(bd,,TRUE,TRUE);
-    StrPrint(buf,"%C:/",dv->drv_let);
-    CopyTree(src_dir,buf,TRUE);
-    RedSeaISO9660Stage1(iso_filename,stage2_filename);
-    DrvDel(dv);
-    BlkDevDel(bd);
+      bd->max_blk=CeilI64(bd->drv_offset+1+bitmap_blks+res,4);
+      bd->max_blk--; //Inclusive.
+      bd->file_dsk_name=AStrNew(iso_filename);
+      bd->init_root_dir_blks=root_dir_blks;
+      BlkDevAdd(bd,,TRUE,TRUE);
+      StrPrint(buf,"%C:/",dv->drv_let);
+      CopyTree(src_dir,buf,TRUE);
+      RedSeaISO9660Stage1(iso_filename,stage2_filename);
+      DrvDel(dv);
+      BlkDevDel(bd);
+    }
+    Free(stage2_filename);
+    Free(src_dir);
+    Free(iso_filename);
   }
-  Free(stage2_filename);
-  Free(src_dir);
-  Free(iso_filename);
   return res;
 }

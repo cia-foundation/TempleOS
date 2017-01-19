@@ -1,18 +1,19 @@
-U8 *BlogLocalDir(CDate cdt=0)
-{
+#help_index "Misc/Blog"
+
+public U8 *BlogLocalDir(CDate cdt=0)
+{//MAlloc dirname of blog for date.
   static U8 dir[STR_LEN];
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
   Date2Struct(&ds,cdt);
-  StrPrint(dir,BLOG_LOCAL_BASE "/%d%Z",
-	ds.year,ds.mon-1,"ST_MONTHS");
+  StrPrint(dir,BLOG_LOCAL_BASE "/%d%Z",ds.year,ds.mon-1,"ST_MONTHS");
   if (!FileFind(dir,,FUF_JUST_DIRS))
     MkDir(dir);
   return dir;
 }
 
-U8 *BlogLocalFile(CDate cdt=0)
-{
+public U8 *BlogLocalFile(CDate cdt=0)
+{//MAlloc filename of blog for date.
   static U8 file[STR_LEN];
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
@@ -22,8 +23,8 @@ U8 *BlogLocalFile(CDate cdt=0)
   return file;
 }
 
-U8 *BlogWebDir(CDate cdt=0)
-{
+public U8 *BlogWebDir(CDate cdt=0)
+{//MAlloc D:/Wb/dirname of blog for date.
   static U8 dir[STR_LEN];
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
@@ -33,8 +34,8 @@ U8 *BlogWebDir(CDate cdt=0)
   return dir;
 }
 
-U8 *BlogWebFile(CDate cdt=0)
-{
+public U8 *BlogWebFile(CDate cdt=0)
+{//MAlloc D:/Wb/filename of blog for date.
   static U8 file[STR_LEN];
   CDateStruct ds;
   if (!cdt) cdt=Now+local_time_offset;
@@ -45,15 +46,15 @@ U8 *BlogWebFile(CDate cdt=0)
 }
 
 public U8 *FileNameNumNext(U8 *files_find_mask,U8 *fmt)
-{
+{//Cnt files in a mask. Create next filename.
   CDirEntry *tmpde=FilesFind(files_find_mask);
   U8 *res=MStrPrint(fmt,FileCnt(tmpde));
   DirTreeDel(tmpde);
   return res;
 }
 
-U0 BlogDCImgWrite(CDC *dc,CDate cdt=0)
-{
+public U0 BlogDCImgWrite(CDC *dc,CDate cdt=0)
+{//Add dc to blog as BMP file.
   U8 file_mask[STR_LEN],file_name[STR_LEN],*st1,*st2;
   if (!cdt) cdt=Now+local_time_offset;
   StrPrint(file_mask,"%s/Img*",BlogLocalDir(cdt));
@@ -67,9 +68,9 @@ U0 BlogDCImgWrite(CDC *dc,CDate cdt=0)
   Free(st2);
 }
 
-U0 BlogScrnShot()
-{
-  Bool old_cursor=DocCursor;
+public U0 BlogScrnShot()
+{//Add scrn shot to blog as BMP file.
+  Bool old_cursor=DocCursor,old_silent;
   CDC *dc1,*dc2;
   U8 *old_fp_draw_ms=gr.fp_draw_ms;
   gr.fp_draw_ms=NULL;
@@ -81,15 +82,18 @@ U0 BlogScrnShot()
   DCDel(dc1);
   DCDel(dc2);
   DocCursor(old_cursor);
+  old_silent=Silent;
+  FreshenBlog;
+  Silent(old_silent);
 }
 
-public U0 MakeWebSitePartial()
-{
+public U0 FreshenBlog()
+{//Regen html files for D:/Home/Web.
   MkDir("D:/Wb");
   MkDir("D:/Wb/Home");
   MkDir("D:/Wb/Home/Web");
-  MkDir("D:/Wb/Home/Web/TAD");
-  MkDir("D:/Wb/Home/Web/TAD/BlogDir");
+  MkDir("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS);
+  MkDir("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS "/BlogDir");
 
   FreshenWebDir("/Home/Web");
   FreshenWebDir("/Home/Web/" INS_REG_PERSONAL_INITIALS);
@@ -97,8 +101,8 @@ public U0 MakeWebSitePartial()
   Drv('C');
 }
 
-public U0 Blog(Bool ALT_F6=TRUE)
-{
+public U0 Blog(Bool god_misc2=FALSE)
+{//Make entry in blog.
   if (!FileFind(BlogLocalFile,,FUF_JUST_FILES))
     Copy("~/Web/" INS_REG_PERSONAL_INITIALS "/DailyBlogHeader.DD.Z",
 	  BlogLocalFile);
@@ -106,7 +110,9 @@ public U0 Blog(Bool ALT_F6=TRUE)
   WinBorder;
   WinMax;
   Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
-  if (ALT_F6) {
+  if (god_misc2)
+    Msg(MSG_KEY_DOWN_UP,0,SC_F7|SCF_SHIFT|SCF_ALT);
+  else {
     Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
     Msg(MSG_KEY_DOWN_UP,'\n',0);
   }

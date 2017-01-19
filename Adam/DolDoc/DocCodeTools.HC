@@ -601,7 +601,7 @@ U0 EdPopUpChSC(I64 *_ch,I64 *_sc)
 {
   I64 sc;
   "Press A Key\n";
-  DocPut->flags|=DOCF_MIN_SIZE;
+  DocPut->flags|=DOCF_SIZE_MIN;
   do GetMsg(_ch,&sc,1<<MSG_KEY_DOWN);
   while (sc.u8[0]==SC_SHIFT || sc.u8[0]==SC_CTRL || sc.u8[0]==SC_ALT);
   *_sc=sc;

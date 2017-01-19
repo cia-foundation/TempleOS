@@ -12,7 +12,7 @@ I64 MPSum(I64 my_mp_cnt)
 
 I64 Sum(I64 n,I64 my_mp_cnt)
 {
-  CJob *tmpm[MP_MAX_PROCESSORS];
+  CJob *tmpm[MP_PROCESSORS_NUM];
   I64 res=0,i;
   mp_n=n+1;
   for (i=0;i<my_mp_cnt;i++)
@@ -37,21 +37,21 @@ F64 Test(I64 n,I64 my_mp_cnt)
   return end-start;
 }
 
-#define MIN_VAL		1000
-#define MIN_TEST	3
-#define MAX_TEST	7
-#define NUM_TESTS	(MAX_TEST-MIN_TEST+1)
-#define MAX_PERCENT	200
+#define VAL_MIN		1000
+#define TEST_MIN	3
+#define TEST_MAX	7
+#define TESTS_NUM	(TEST_MAX-TEST_MIN+1)
+#define PERCENT_MAX	200
 
 U0 MPAdd()
 {
   I64 i,n,
 	h=Fs->pix_width,
 	v=Fs->pix_height;
-  F64 t1,t2,ress[NUM_TESTS];
+  F64 t1,t2,ress[TESTS_NUM];
   CDC *dc=DCAlias;
 
-  for (i=0,n=MIN_VAL;i<NUM_TESTS;i++,n*=10) {
+  for (i=0,n=VAL_MIN;i<TESTS_NUM;i++,n*=10) {
     t1=Test(n,1);
     t2=Test(n,mp_cnt);
     ress[i]=t2*100.0/t1;
@@ -62,19 +62,19 @@ U0 MPAdd()
   DocClear;
 
   dc->color=BLUE;
-  for (i=MAX_PERCENT/10;i<MAX_PERCENT;i+=MAX_PERCENT/10) {
-    GrPrint(dc,0,v-ToF64(i)/MAX_PERCENT*v-FONT_HEIGHT,"%3d%%",i);
-    GrLine(dc,0,v-ToF64(i)/MAX_PERCENT*v,h,v-ToF64(i)/MAX_PERCENT*v);
+  for (i=PERCENT_MAX/10;i<PERCENT_MAX;i+=PERCENT_MAX/10) {
+    GrPrint(dc,0,v-ToF64(i)/PERCENT_MAX*v-FONT_HEIGHT,"%3d%%",i);
+    GrLine(dc,0,v-ToF64(i)/PERCENT_MAX*v,h,v-ToF64(i)/PERCENT_MAX*v);
   }
 
-  for (i=0;i<NUM_TESTS-1;i++) {
+  for (i=0;i<TESTS_NUM-1;i++) {
     dc->color=RED;
     dc->pen_width=2;
-    GrLine3(dc,i*h/(NUM_TESTS-1),      v-ress[i  ]/MAX_PERCENT*v,0,
-	  (i+1)*h/(NUM_TESTS-1),v-ress[i+1]/MAX_PERCENT*v,0);
+    GrLine3(dc,i*h/(TESTS_NUM-1),      v-ress[i  ]/PERCENT_MAX*v,0,
+	  (i+1)*h/(TESTS_NUM-1),v-ress[i+1]/PERCENT_MAX*v,0);
     dc->color=GREEN;
-    GrPrint(dc,i*h/(NUM_TESTS-1),v-FONT_HEIGHT,"10e%d",i+MIN_TEST);
-    GrLine(dc,i*h/(NUM_TESTS-1),0,i*h/(NUM_TESTS-1),v);
+    GrPrint(dc,i*h/(TESTS_NUM-1),v-FONT_HEIGHT,"10e%d",i+TEST_MIN);
+    GrLine(dc,i*h/(TESTS_NUM-1),0,i*h/(TESTS_NUM-1),v);
   }
   PressAKey;
 

@@ -13,8 +13,8 @@ class CFileSND
 };
 
 //Windows media constraint.
-//#define MAX_SND_FILE_DATA	0x0007FF00
-#define MAX_SND_FILE_DATA	0x7FFFFF00
+//#define SND_FILE_DATA_MAX	0x0007FF00
+#define SND_FILE_DATA_MAX	0x7FFFFF00
 
 public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
 	F64 averaging=0.0,I64 waveform=WF_SQUARE,
@@ -96,7 +96,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
       level+=s->body[i];
     level/=cnt-1;
     for (i=0;i<cnt-1;i++)
-      s->body[i]=ClampI64(s->body[i]-level,MIN_I16,MAX_I16);
+      s->body[i]=ClampI64(s->body[i]-level,I16_MIN,I16_MAX);
   }
 
   for (i=0;i<cnt-1;i++)
@@ -117,10 +117,10 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
   file_num=0;
   while (cnt2>0) {
     i=cnt2;
-    if (i>MAX_SND_FILE_DATA)
-      i=MAX_SND_FILE_DATA;
+    if (i>SND_FILE_DATA_MAX)
+      i=SND_FILE_DATA_MAX;
     s->data_size=EndianU32(i*sizeof(I16));
-    MemCpy(s->body,&s->body[file_num*MAX_SND_FILE_DATA],i*sizeof(I16));
+    MemCpy(s->body,&s->body[file_num*SND_FILE_DATA_MAX],i*sizeof(I16));
     StrPrint(name2,"%s%03d.SND",name,file_num++);
     FileWrite(name2,s,offset(CFileSND.body)+i*sizeof(I16));
     cnt2-=i;

@@ -302,7 +302,7 @@ U0 RedSeaFreeClusters(CDrv *dv,I64 c,I64 cnt)
 I64 RedSeaAllocClusters(CDrv *dv,I64 cnt)
 {
   CFreeLst *tmpf,*best_free=NULL;
-  I64 i,first,best_size=MAX_I64;
+  I64 i,first,best_size=I64_MAX;
   Bool unlock,unlock_break;
   if (cnt<=0)
     throw('Drv');
