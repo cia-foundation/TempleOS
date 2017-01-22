@@ -1,0 +1,13 @@
+diff --git a/isoparser/record.py b/isoparser/record.py
+index 4cf19f3..a09160d 100644
+--- a/isoparser/record.py
++++ b/isoparser/record.py
+@@ -47,7 +47,7 @@ class Record(object):
+ 
+         self.embedded_susp_entries = susp_entries
+ 
+-        assert source.cursor <= target
++        #assert source.cursor <= target
+         source.unpack_raw(target - source.cursor)
+ 
+     def __repr__(self):

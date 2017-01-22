@@ -1,0 +1,3 @@
+[submodule "isoparser"]
+	path = isoparser
+	url = https://github.com/barneygale/isoparser.git
