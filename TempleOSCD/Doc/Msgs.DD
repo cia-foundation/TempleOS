@@ -1,0 +1,1 @@
+$WW,1$There are a maximum of 63 message types, so a bitmask can be passed.  Messages have two args.  See $LK,"Message Codes",A="MN:MSG_NULL"$.

@@ -1,0 +1,10 @@
+$WW,1$$FG,5$$TX+CX,"Linux TOSZ Utility"$$FG$
+
+
+$FG,2$TOSZ [-ascii] filename$FG$
+
+Will uncompress a single file from within Linux.  The $FG,2$-ascii$FG$ flag will convert the irregular TempleOS ASCII 5 and ASCII 31 characters to spaces.  (ASCII 5 is used to mark the cursor pos and ASCII 31 is used for shifted space characters and will cause problems unless you convert them.)
+
+$FG,8$
+* "Linux" is a trademark owned by Linus Torvalds.
+$FG$

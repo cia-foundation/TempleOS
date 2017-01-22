@@ -1,0 +1,98 @@
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+TourPut(
+"Now, we're going to demonstrate how to work "
+"with programs.  We'll change to the "
+"$$GREEN$$/Demo/Games$$FG$$ directory.\n\n"
+"Note that directories are specified with "
+"a forward slash, not a backslash.  "
+"Drives can be specified in a $$GREEN$$Cd()$$FG$$ command "
+"and the boot drive is specified with \"$$GREEN$$::$$FG$$\".\n\n"
+"$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
+
+InPrint(25,"Cd(\"::/Demo/Games\");Dir;");
+InGetStr("\n");
+
+TourPut(
+"Now, we're going to edit a file.  Normally, "
+"you'll probably left-click on a directory "
+"listing to edit a file, but we're going to "
+"type it on the command line.\n\n"
+"$$GREEN$$<ENTER>$$FG$$ to complete the command.\n");
+
+InPrint(25,"Ed(\"CastleFrankenstein.HC.Z\");");
+InGetStr("\n");
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
+
+Sleep(1000);
+Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
+TourPut(
+"This is a first-person-shooter.\n\n"
+"There is no \"$$GREEN$$main()$$FG$$\" function in TempleOS "
+"programs.  Any program stmts outside "
+"functions get executed when you $$GREEN$$#include$$FG$$ "
+"them at the command line.\n\n"
+"The \"$$GREEN$$CastleFrankenstein;$$FG$$\" stmt at the "
+"bottom will run the program when we "
+"$$GREEN$$#include$$FG$$ it.\n",TRUE);
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
+
+InGetChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"Now, run the CastleFrankenstein.HC.Z program.  Press $$GREEN$$<ENTER>$$FG$$.\n");
+
+InPrint(25,"#include \"CastleFrankenstein\";");
+InGetStr("\n");
+TourPut(
+"Move around with cursor keys and press $$GREEN$$<SHIFT-ESC>$$FG$$ when you "
+"are done.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"The program is still in memory and we can start it again by typing "
+"\"$$GREEN$$CastleFrankenstein;$$FG$$\".\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$ at the command line to run it again.\n");
+
+InPrint(25,"CastleFrankenstein;");
+InGetStr("\n");
+TourPut(
+"Move around with cursor keys and press $$GREEN$$<SHIFT-ESC>$$FG$$ when you "
+"are done.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"$$GREEN$$<CTRL-ALT-a>$$FG$$\tExtended ASCII.\n"
+"$$GREEN$$<CTRL-ALT-c>$$FG$$\tBreak(interrupt) program.\n"
+"$$GREEN$$<CTRL-ALT-m>$$FG$$\tMutes sound.\n"
+"$$GREEN$$<CTRL-ALT-n>$$FG$$\tNext tasks.\n"
+"$$GREEN$$<CTRL-ALT-t>$$FG$$\tTerminal window.\n"
+"$$GREEN$$<CTRL-ALT-x>$$FG$$\tKill task (window).\n",TRUE);
+
+InPrint(50,"Ed(\"CastleFrankenstein.HC.Z\");\n");
+
+TourPut("Press $$GREEN$$<F5>$$FG$$ in the editor to run the file being edited.\n");
+
+InGetKey(SC_F5);
+Sleep(1000);
+CTask *task=sys_focus_task;
+
+TourPut(
+"Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the application.  "
+"Then, press $$GREEN$$<CTRL-ALT-x>$$FG$$ to kill the task.\n");
+WinToTop(task);
+DeathWait(&task);
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the editor.\n");
+
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"Explore the $$RED$$$TX+L+PU+UL,"DemoIndex",A="FI:::/Doc/DemoIndex.DD"$$$FG$$.  "
+"You'll find it on your menu.  It's arranged by difficulty.  "
+"Hit $$GREEN$$<SPACE>$$FG$$ on a demo index listing "
+"and $$GREEN$$<F5>$$FG$$ to run from the editor.\n",TRUE);
+ 

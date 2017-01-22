@@ -1,0 +1,11 @@
+$WW,1$$FG,5$$TX+CX,"Sprite Main Menu Help"$$FG$
+
+Order of elements matters.  They are executed in the order they appear in the side-bar.  You can set the insert point for new elements by click the element in the side-bar and making it RED.
+
+After you create a 3D Mesh, you can edit it by seling it in the side-bar so it is colored RED.  Then, click EDIT-3D-MESH.  A shiftable 3D mesh has a 2D offset to position the origin.  You can convert between shiftable and non-shiftable by editing it with the other command.
+
+You can convert all elements to a BitMap if END is RED in the side-bar and you CONVERT-TO-BITMAP.  Later, you can edit that bitmap by seling it in the side bar so it is colored RED and clicking EDIT-BITMAP.
+
+If you have a 3D icon, you might want to place a background-colored rectangle under the 3D icon, so it hovers above.  Use TRANSFORM-OFF and TRANSFORM-ON.  You will also need to set the Z offset of the icon.  Go to the Edit menu and sel EDIT-AS-TEXT and change the third INT to Z offset.  Good luck.
+
+While inserting vector elements, you can usually press $FG,2$'c'$FG$ to eye-dropper the color under the mouse.  Press $FG,2$'t'$FG$ for transparent.

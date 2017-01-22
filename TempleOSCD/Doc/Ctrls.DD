@@ -1,0 +1,1 @@
+$WW,1$To create a TempleOS graphic ctrl, you define callback functions and insert a $LK,"CCtrl",A="MN:CCtrl"$ structure in the $LK,"CTask",A="MN:CTask"$ queue.  See $LK,"::/Demo/Graphics/Slider.HC"$, $LK,"::/Demo/Graphics/ScrollBars.HC"$ and $LK,"TermBttnNew",A="FF:::/Adam/WallPaper.HC,TermBttnNew"$.  There is a template-code ctrl generator, if you press $FG,2$<CTRL-SHIFT-L>$FG$.

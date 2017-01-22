@@ -1,0 +1,14 @@
+$WW,1$TempleOS does master-slave multicore instead of SMP.  $FG,2$Core0$FG$ is the master.  The master core's applications explicitly assign computational jobs to other cores and the TempleOS scheduler does not move tasks between cores.
+
+There are multicore safe locks for file access and heap allocations, however, so TempleOS is symmetrical in some sense.  See $LK,"::/Demo/MultiCore/LoadTest.HC"$.
+
+Only tasks on $FG,2$Core0$FG$ can have windows, but other cores can help render them.
+
+Each core has an executive $LK,"Seth Task",A="FF:::/Doc/Glossary.DD,Seth Tasks"$ which is the father of all tasks on that core.  $LK,"Adam",A="FF:::/Doc/Glossary.DD,Adam Task"$ is the $LK,"Seth Task",A="FF:::/Doc/Glossary.DD,Seth Tasks"$ on $FG,2$Core0$FG$.
+
+You give a job to a $LK,"Seth Task",A="FF:::/Doc/Glossary.DD,Seth Tasks"$ with $LK,"JobQue",A="MN:JobQue"$() and get the result with $LK,"JobResGet",A="MN:JobResGet"$().  You spawn a task on any core with $LK,"Spawn",A="MN:Spawn"$().
+
+Note: You must use the $FG,2$LOCK$FG$ asm prefix when changing shared structures in a multicore environment.  The $LK,"LBts",A="MN:LBts"$(), $LK,"LBtr",A="MN:LBtr"$() and $LK,"LBtc",A="MN:LBtc"$() insts have $FG,2$LOCK$FG$ prefixes.  The compiler has a $FG,2$lock{}$FG$ feature but it doesn't work well.  See $LK,"::/Demo/MultiCore/Lock.HC"$.
+
+See $LK,"::/Demo/Graphics/Transform.HC"$.
+See $LK,"::/Kernel/MultiProc.HC"$.

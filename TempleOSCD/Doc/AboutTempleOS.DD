@@ -1,0 +1,33 @@
+$WW,1$$FG,5$$TX+CX,"TempleOS"$$FG$
+
+
+$FG,5$Websites:$FG$
+$TX,"www.templeos.org",HTML="http://www.templeos.org"$
+
+$FG,5$Owner/President:$FG$
+$TX,"Terry A. Davis",HTML="mailto:tdavis@templeos.org"$
+
+$HC,"<center><img src=\"http://www.templeos.org/images/140414TerryADavis.jpg\" width=\"432\" height=\"324\" alt=\"\"></center>"$
+
+8144 Sickle Lane
+Las Vegas, NV 89128
+(702)254-4223
+
+$TX,"tdavis@templeos.org",HTML="mailto:tdavis@templeos.org"$
+
+
+$FG,5$About Me:$FG$
+
+$TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$      $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$ 
+
+I was a National Merit Scholar with a 1440 SAT at Arizona State University.  I have a bachelor's in Computer System Engineering from ASU, basically, embedded systems, and a master's in Electrical Engineering from ASU, control systems.  I worked as a software, hardware and mechanical engineer at Ticketmaster from 1990-1996.
+
+I designed a 3 axis stepper-motor-driven milling machine 1996-1997 with a CAD/CAM package for a company I started called Home Automation and Robotic Equipment.
+
+$HC,"<center><img src=\"http://www.templeos.org/images/Machine.jpg\" width=\"600\" height=\"400\" alt=\"\"></center>"$
+
+I worked for a company named Xytec Corp. 1997-1999.  We made FPGA-based image processing equipment.  I wrote $FG,2$$TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$$FG$ from 2000-2001 for H.A.R.E.  I worked as head software/electrical engineer for a company called Graphic Technologies, 2001-2002, making replacement chips for toner printer cartridges so they could be refilled. 
+
+$FG,5$Credits:$FG$
+See $LK,"::/Doc/Credits.DD"$.
+

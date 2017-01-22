@@ -1,0 +1,1 @@
+$WW,1$A $FG,2$Queue$FG$ is a bunch of $LK,"MAlloc",A="MN:MAlloc"$()ed chunks of mem linked together in a circle with one ptr to the $FG,2$next$FG$ value and another ptr to the $FG,2$last$FG$ value.  These ptrs must be stored in the first locations in the structure.

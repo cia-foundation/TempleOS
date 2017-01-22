@@ -1,0 +1,47 @@
+$WW,1$$FG,5$$TX+CX,"Assembler"$$FG$
+
+See $LK,"::/Compiler/OpCodes.DD"$ for opcodes.  They're not standard.  Some invalid insts are not flagged and some valid insts are not implemented. 16-bit asm support is limited.
+
+Here are example inst formats:
+$HL,1$	ADD	RAX,I64 FS:DISP[RSI+RDI*8]
+$HL,0$$HL,1$	ADD	RAX,I64 [DISP]
+$HL,0$
+$FG,2$$$$FG$ Current compiler output pos (inst ptr).  Even works in HolyC expressions.
+
+$FG,2$$$$FG$ works in $FG,2$class$FG$es.
+  $FG,2$class MyFun
+  {
+    $$=-16;
+    I64 local1;
+    I64 local2;
+    $$=$$+256;
+    I64 crazy;
+  };$FG$
+
+$FG,4$LABEL$FG,2$::
+$FG$  Defines an exported glbl label.
+
+$FG,4$LABEL$FG,2$:
+$FG$  Defines an non-exported glbl label.
+
+$FG,2$@@$FG,4$LABEL$FG,2$:
+$FG$  Defines a local label with scope valid between two global labels.
+
+$FG,2$DU8$FG$, $FG,2$DU16$FG$, $FG,2$DU32$FG$, $FG,2$DU64$FG$
+  Define BYTE, WORD, DWORD or QWORD. Can be used with $FG,2$DUP()$FG$ and ASCII strings.  For your convenience, the ASCII strings do not have terminating zeros.  Define cmds must end with a semicolon.
+
+$FG,2$USE16$FG$, $FG,2$USE32$FG$, $FG,2$USE64$FG$
+
+$FG,2$IMPORT$FG$ $FG,4$sym1name$FG$, $FG,4$sym2name$FG$;
+
+$FG,2$LIST$FG$, $FG,2$NOLIST$FG$
+
+$FG,2$ALIGN$FG$ $FG,4$num$FG$, $FG,4$fill_byte$FG$
+  Align to $FG,4$num$FG$ boundary and fill with $FG,4$fill_byte$FG$.
+
+$FG,2$MODULE_ORG$FG$ $FG,4$num$FG$
+  Set code addr for JIT or set module $LK,"Load",A="MN:Load"$() addr -- has 16-byte $LK,"CBinFile",A="MN:CBinFile"$ header and patch table trailing.
+
+$FG,2$BINFILE$FG,4$ "FileName.BIN"$FG$;
+
+See $LK,"Assembly Language",A="FF:::/Doc/GuideLines.DD,Assembly Language"$, $LK,"::/Demo/Asm/AsmAndC1.HC"$, $LK,"::/Demo/Asm/AsmAndC2.HC"$ and $LK,"::/Demo/Asm/AsmAndC3.HC"$.

@@ -1,0 +1,64 @@
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\n";
+
+TourPut("Press $$GREEN$$<F1>$$FG$$ for the main help index.\n"
+	"\n"
+	"The $$GREEN$$<F1>$$FG$$ key works both in "
+	"the editor and at the command line.\n"
+	"\n"
+	"You can find the $LK+PU,"Demo Index",A="FI:::/Doc/DemoIndex.DD"$ on the help index.\n");
+InGetKey(SC_F1);
+
+TourPut(
+"Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort and exit.\n");
+InGetChar(CH_SHIFT_ESC);
+
+U0 RevealPopUpHelp(I64 scf)
+{
+  F64 t0;
+  U8 *st,*st2;
+  Bool old_key_desc;
+  do {
+    AutoComplete(ON);
+    st=ScanCode2KeyName(scf);
+    st2=MStrUtil(st,SUF_REM_TRAILING);
+    Free(st);
+    st=MStrPrint(
+	  "If you have $$GREEN$$AutoComplete$$FG$$ on, you "
+	  "can list the key commands.  This works both "
+	  "in the editor and at the command line.\n"
+	  "\n"
+	  "You can click the links to jump to source code.\n"
+	  "\n"
+	  "Press and hold the $$GREEN$$<%s>$$FG$$ key.\n"
+	  "Hold it for more than 1.0 seconds.\n",st2);
+    Free(st2);
+    TourPut(st);
+    Free(st);
+
+    old_key_desc=LBtr(&Fs->win_inhibit,WIf_SELF_KEY_DESC);
+    while (kbd.scan_code&(SCF_CTRL|SCF_ALT|SCF_SHIFT)!=scf)
+      Sleep(1);
+
+    t0=tS;
+    while (kbd.scan_code&(SCF_CTRL|SCF_ALT|SCF_SHIFT)==scf) {
+      ScanKey(,,TRUE);
+      if (1.0<tS-t0<1.15)
+	Snd(34);
+      else
+	Snd;
+      Sleep(1);
+    }
+    LBEqu(&Fs->win_inhibit,WIf_SELF_KEY_DESC,old_key_desc);
+    Snd;
+  } while (tS-t0<1.0);
+}
+
+RevealPopUpHelp(SCF_CTRL);
+RevealPopUpHelp(SCF_CTRL|SCF_SHIFT);
+RevealPopUpHelp(SCF_ALT);
+RevealPopUpHelp(SCF_ALT|SCF_SHIFT);
+RevealPopUpHelp(SCF_CTRL|SCF_ALT);
+RevealPopUpHelp(SCF_CTRL|SCF_ALT|SCF_SHIFT);
+

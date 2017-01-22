@@ -1,0 +1,3 @@
+$WW,1$TempleOS has a class for 3 dimensional points consisting of F64s.  HolyC is not C++ -- it does not support passing or returning values from functions which are not 64-bits, therefore, it can't be implemented with operator overloading.  Making all function args and returns 64-bit is a core prinicple of TempleOS.
+
+As a courtesy, most of the CD3 functions return the addr of the destination vect, so you can nestle calls.  They do not alloc new space for the destination vect.

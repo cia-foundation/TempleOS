@@ -1,0 +1,19 @@
+$FG,2$$WW,1$AutoComplete$FG$ is the $FG,7$LTGRAY$FG$ window on the right of the scrn.  $LK,"ACInit",A="MN:ACInit"$() collects words from all text files in subdirectories.  Normally, the call to $LK,"ACInit",A="MN:ACInit"$() is in $LK,"HomeSys.HC",A="FF:~/HomeSys.HC,ACInit"$.  It provides auto-complete for typing, jump-to-code and jump-to-dictionary functionality.
+
+$FG,2$<ALT-SHIFT-A>$FG$	Closes the $FG,7$LTGRAY$FG$ AutoComplete window.
+$FG,2$<ALT-a>$FG$		Opens the $FG,7$LTGRAY$FG$ AutoComplete window.
+
+$FG,2$<CTRL-SHIFT-F1>$FG$	Jumps to the source code for 1st symbol in the window.
+$FG,2$<CTRL-SHIFT-F2>$FG$	Jumps to the source code for 2nd symbol in the window.
+$FG,2$<CTRL-SHIFT-Fn>$FG$	Jumps to the source code for n-th symbol in the window.
+$FG,2$<CTRL-F1>$FG$	Autocompletes the 1st symbol in the window.
+$FG,2$<CTRL-F2>$FG$	Autocompletes the 2nd symbol in the window.
+$FG,2$<CTRL-Fn>$FG$	Autocompletes the n-th symbol in the window.
+$FG,2$<CTRL-SHIFT-1>$FG$	Jumps to the dictionary for 1st symbol in the window.
+$FG,2$<CTRL-SHIFT-2>$FG$	Jumps to the dictionary for 2nd symbol in the window.
+$FG,2$<CTRL-SHIFT-n>$FG$	Jumps to the dictionary for n-th symbol in the window.
+$FG,2$<CTRL-1>$FG$	Autocompletes the 1st dictionary word in the window.
+$FG,2$<CTRL-2>$FG$	Autocompletes the 2nd dictionary word in the window.
+$FG,2$<CTRL-n>$FG$	Autocompletes the n-th dictionary word in the window.
+
+If you have the raw Project Gutenberg dictionary file, you can generate the TempleOS processed dictionary files with the stand-alone program $LK,"::/Adam/AutoComplete/ACDictGen.HC"$.

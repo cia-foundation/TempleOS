@@ -1,0 +1,15 @@
+$WW,1$$LK,"gr.text_base",A="MN:CGrGlbls"$ must be updated 30fps in your Fs->draw_it() callback.  You probably want $LK,"GrPrint",A="MN:GrPrint"$() or just $LK,"Print",A="MN:Print"$().  The $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ code takes care of plotting text to $LK,"gr.text_base",A="MN:CGrGlbls"$.
+
+Bits 0-7	8-Bit ASCII Scrn Code
+Bits 8-11	Foreground $LK,"color",A="MN:BLACK"$
+Bits 12-15	Background $LK,"color",A="MN:BLACK"$
+Bits 16-20	Signed X pos shift val
+Bits 21-25	Signed Y pos shift val
+Bit  28		$LK,"Blink",A="MN:ATTRF_BLINK"$
+Bit  29		$LK,"Invert",A="MN:ATTRF_INVERT"$ed (Swap foreground and background)
+Bit  30		$LK,"Sel",A="MN:ATTRF_SEL"$ (XOR colors with FF)
+Bit  31		$LK,"Underline",A="MN:ATTRF_UNDERLINE"$
+
+$LK,"GrUpdateTaskWin",A="MN:GrUpdateTaskWin"$() calls $LK,"DocUpdateTaskDocs",A="MN:DocUpdateTaskDocs"$() which calls $LK,"DocRecalc",A="MN:DocRecalc"$() where the document text is plotted into $LK,"gr.text_base",A="MN:CGrGlbls"$.  Then, $LK,"GrUpdateTextBG",A="MN:GrUpdateTextBG"$() and $LK,"GrUpdateTextFG",A="MN:GrUpdateTextFG"$() render the $LK,"gr.text_base",A="MN:CGrGlbls"$ onto $LK,"gr.dc2",A="MN:CGrGlbls"$, a raw graphic bitmap.
+
+See $LK,"::/Demo/Games/Maze.HC"$.

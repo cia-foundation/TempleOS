@@ -1,0 +1,120 @@
+$FG,5$$TX+CX,"Scoping and Linkage"$$FG$
+$WW,1$
+$LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.DD,JIT Compile Mode"$ makes use of the current task's hash sym table and its parent tasks' tables.  It fetches syms from parent tasks' tables if not found locally in the current task's table and it places new syms in the current task's table.  Conceptually, syms are at the scope of environment vars in other operating systems.
+
+When a sym is placed into a table, older syms with ident names will be overshadowed if they exist.  Duplicates are not allowed in many cases, especially in asm blks.  Dupicates are allowed, by design in other cases, so that you can repeatedly $FG,2$#include$FG$ the same file from the cmd line while developing it.  Or, so you can repeatedly declare a function with a standard name, like $FG,2$DrawIt()$FG$.  This case might occur when the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$$FG$ is starting-up loading-in many little utilities.
+
+$FG,2$extern$FG$ binds a new $LK,"HTT_FUN",A="MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",A="MN:HTT_GLBL_VAR"$ sym to an existing sym of the same name if it exists in the sym table (just in just-in-time code).  It also can be used to generate a fwd reference.
+
+$FG,2$import$FG$ binds a new $LK,"HTT_FUN",A="MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",A="MN:HTT_GLBL_VAR"$ sym to a sym of the same name imported from the task's sym table at $LK,"Load",A="MN:Load"$() time.  If no sym exists to bind to at $LK,"Load",A="MN:Load"$() time, the code using this sym will be left incomplete until the sym is defined.
+
+$WW,1$
+$FG,2$_extern$FG$ binds a new $LK,"HTT_FUN",A="MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",A="MN:HTT_GLBL_VAR"$ sym to an existing sym, of a $BK,1$different$BK,0$ name.  It must exists in the sym table.  Basically, this binds C to asm.
+
+$FG,2$_import$FG$ binds a new $LK,"HTT_FUN",A="MN:HTT_FUN"$ or $LK,"HTT_GLBL_VAR",A="MN:HTT_GLBL_VAR"$ sym to a sym, of a $BK,1$different$BK,0$ name imported from the task's sym table at $LK,"Load",A="MN:Load"$() time.  If no sym exists to bind to at $LK,"Load",A="MN:Load"$() time, the code using this sym will be left incomplete until the sym is defined.  Basically, this binds C to asm from elsewhere.
+
+
+$WW,0$$FG,5$Ahead of Time Compilation$FG$
+                    $FG,2$G$FG$lobalScope/$FG,2$F$FG$unctionScope
+                    | $FG,2$C$FG$odeHeap/$FG,2$D$FG$ataHeap/$FG,2$S$FG$tack/$FG,2$R$FG$egister
+                    | | TaskHashEntry:Export$FG,2$S$FG$ysSym/$FG,2$D$FG$efine/$FG,2$F$FG$unction/$FG,2$C$FG$lass
+                    | | | UsageScope: $FG,2$M$FG$odule/$FG,2$A$FG$smLocal/Asm$FG,2$B$FG$lk/$FG,2$T$FG$askAndChildren/$FG,2$F$FG$unction
+                    | | | |UsageScope: $FG,2$G$FG$lbl/Asm$FG,2$L$FG$ocal/$FG,2$R$FG$emainder/$FG,2$g$FG$lblThisBlkAndRemainder
+                    | | | || $FG,2$S$FG$taticVarInit/$FG,2$D$FG$ynamicVarInitAllowed/$FG,2$N$FG$oInitAllowed
+                    | | | || | Are dups allowed within the namespace? A dup overshadows the original.
+                    | | | || | $FG,2$D$FG$upsAllowed/$FG,2$N$FG$oDups/NoDupsBut$FG,2$P$FG$ad/$FG,2$W$FG$arningUnlessClosedOut
+
+asm export $FG,2$label::$FG$  G C S MG   N
+asm        $FG,2$label:$FG$   G C   MG   N
+asm local  $FG,2$@@label:$FG$ G C   AL   N
+asm $FG,2$IMPORT label;$FG$   G C   MR   N
+asm export $FG,2$label::$FG$  F C S BG   N
+asm        $FG,2$label:$FG$   F C   BG   N
+asm local  $FG,2$@@label:$FG$ F C   AL   N
+asm $FG,2$IMPORT label;$FG$   F C   BR   N
+C   goto   $FG,2$label:$FG$   F C   FG   N
+
+           $FG,2$#define$FG$  x     MR   D
+           function G C S MR   D
+           var      F R   FR   N
+           var      F S   FR   N
+$FG,2$static$FG$     var      F C   FR D N
+           var      G C S MR D D
+           var      G D   MR N D
+           $FG,2$class$FG$    G     MR   D
+class      member   G     MR   P
+$FG,2$extern     class$FG$    G     MR   D
+$FG,2$extern$FG$     function G C   MR   W
+$FG,2$import$FG$     function G C   MR   D
+$FG,2$import$FG$     var      G C   MR   D
+$FG,2$_extern$FG$    function G C   MR   D
+$FG,2$_extern$FG$    var      G C   MR   D
+$FG,2$_import$FG$    function G C   MR   D
+$FG,2$_import$FG$    var      G C   MR   D
+
+
+$FG,5$Just in Time Compilation$FG$
+                    $FG,2$G$FG$lobalScope/$FG,2$F$FG$unctionScope
+                    | $FG,2$C$FG$odeHeap/$FG,2$D$FG$ataHeap/$FG,2$S$FG$tack/$FG,2$R$FG$egister
+                    | | TaskHashEntry:Export$FG,2$S$FG$ysSym/$FG,2$D$FG$efine/$FG,2$F$FG$unction/$FG,2$C$FG$lass
+                    | | | UsageScope: $FG,2$M$FG$odule/$FG,2$A$FG$smLocal/Asm$FG,2$B$FG$lk/$FG,2$T$FG$askAndChildren/$FG,2$F$FG$unction
+                    | | | |UsageScope: $FG,2$G$FG$lbl/Asm$FG,2$L$FG$ocal/$FG,2$R$FG$emainder/$FG,2$g$FG$lblThisBlkAndRemainder
+                    | | | || $FG,2$S$FG$taticVarInit/$FG,2$D$FG$ynamicVarInitAllowed/$FG,2$N$FG$oInitAllowed
+                    | | | || | Are dups allowed within the namespace? A dup overshadows the original.
+                    | | | || | $FG,2$D$FG$upsAllowed/$FG,2$N$FG$oDups/NoDupsBut$FG,2$P$FG$ad/$FG,2$W$FG$arningUnlessClosedOut
+
+asm export $FG,2$label::$FG$  G C S Tg   N
+asm        $FG,2$label:$FG$   G C   BG   N
+asm local  $FG,2$@@label:$FG$ G C   AL   N
+asm $FG,2$IMPORT label;$FG$   G C   TR   N
+asm export $FG,2$label::$FG$  F C   BG   N
+asm        $FG,2$label:$FG$   F C   BG   N
+asm local  $FG,2$@@label:$FG$ F C   AL   N
+asm $FG,2$IMPORT label;$FG$   F C   BR   N
+C   goto   $FG,2$label:$FG$   F C   FG   N
+
+           $FG,2$#define$FG$  x   D TR   D
+           function G C F TR   D
+           var      F R   FR   N
+           var      F S   FR   N
+$FG,2$static$FG$     var      F C   FR D N
+           var      G C G TR D D
+           var      G D G TR S D
+           $FG,2$class$FG$    G   C TR   D
+class      member   G     TR   P
+$FG,2$extern     class$FG$    G   C TR   D
+$FG,2$extern$FG$     function G C F TR   W
+$FG,2$extern$FG$     var      G C G TR   D
+$FG,2$extern$FG$     var      G D G TR   D
+$FG,2$_extern$FG$    function G C F TR   D
+$FG,2$_extern$FG$    var      G C G TR   D
+
+$WW,1$
+* Goto labels must not have the same name as global scope objects.  GoTo's are rare and I don't want to slow the compiler and add code to fix this.  You will get errors if a collision happens, so it's not very dangerous, but the error message is baffling.
+
+* The member names $FG,2$pad$FG$ and $FG,2$reserved$FG$ are special because multiple instances with the same name are allowed in a class.
+
+* Use $FG,2$reg$FG$ or $FG,2$noreg$FG$ in front of local var names to override automatic reg var allocation.  You can, optionally, specify a reg after the $FG,2$reg$FG$ keyword.
+ 
+* Local non-reg function vars can be accessed in asm blks with $FG,2$&i[RBP]$FG$ for example.
+
+* Glbl vars and functions can be accessed in asm with and $FG,2$&$FG$ as in
+	$FG,2$MOV	RAX,I64 [&glbl_var]
+	CALL	I32 &Fun
+	CALL	I32 &SYS_SYM$FG$
+
+* In $FG,2$JIT$FG$ asm code, &SYS_SYM and &Fun don't need $FG,2$IMPORT$FG$.
+
+* All offspring tasks of a task inherit syms.
+
+* The $FG,2$sizeof()$FG$ and HolyC structure members can be used in asm blks.
+
+* Using $FG,2$&i$FG$ in $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ or $FG,2$i.u8[2]$FG$ on a local var, $FG,2$i$FG$, will force it to $FG,2$noreg$FG$.
+
+* Using $FG,2$try$FG$/$FG,2$catch$FG$ in a function will force all local vars to $FG,2$noreg$FG$.
+
+* An unused gap on the stk is left for $FG,2$reg$FG$ vars.
+
+* Note: $FG,2$static$FG$ function vars do not go on the data heap, no matter the setting of the $LK,"OPTf_GLBLS_ON_DATA_HEAP",A="MN:OPTf_GLBLS_ON_DATA_HEAP"$$FG$.  They may in the future.
+
+* $LK,"OPTf_EXTERNS_TO_IMPORTS",A="MN:OPTf_EXTERNS_TO_IMPORTS"$ will treat $FG,2$_extern$FG$ as $FG,2$_import$FG$ and $FG,2$extern$FG$ as $FG,2$import$FG$.  This allows a header to be used either as a $FG,2$JIT compiled$FG$ or $FG,2$AOT compiled$FG$ header.

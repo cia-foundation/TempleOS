@@ -1,0 +1,33 @@
+File
+{
+  Rename(,'r');
+  MkDir(,'d');
+  FmtDrv(,'f');
+  UnmountDrv(,'u');
+  Abort(,CH_SHIFT_ESC);
+  Exit(,CH_ESC);
+}
+
+Edit
+{
+  Ed(,CH_SPACE);
+  Plain(,CH_SHIFT_SPACE);
+  Copy(,CH_CTRLC);
+  Paste(,CH_CTRLV);
+  DeleteFile(,CH_CTRLY);
+}
+
+CDDVD
+{
+  ChgDsk(,'c');
+  MountISOC(,'i');
+  MakeRedSeaISOC(,'m');
+  MakeISO9660ISO(,'M');
+  BurnISOFile(,'B');
+}
+
+Program
+{
+  Include(,0,0x3F0000003F);
+  AdamInclude(,0,0x23F0000023F);
+}

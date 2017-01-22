@@ -1,0 +1,25 @@
+"FF(\"/Kernel/*\");";
+TourPut(
+"Let's list files in the $$GREEN$$/Kernel$$FG$$ and sub directories.\n\n"
+"TempleOS masks have one base directory and multiple filename masks.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+InGetStr("\n");
+
+"FF(\"/Kernel/*\",\"-r\");";
+TourPut(
+"The recurse $$GREEN$$+r$$FG$$ flag is usually set.  Let's turn it off.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+InGetStr("\n");
+
+"FF(\"/Kernel/St*;*.HH*\");";
+TourPut(
+"Let's have two mask of $$GREEN$$St*$$FG$$ plus $$GREEN$$*.HH*$$FG$$\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+InGetStr("\n");
+
+"FF(\"/Kernel/St*;*.HH*;!*Print*\");";
+TourPut(
+"Let's unsel $$GREEN$$*Print*$$FG$$.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+InGetStr("\n");
+TourPut("There is no way to include multiple base directories.\n",TRUE);

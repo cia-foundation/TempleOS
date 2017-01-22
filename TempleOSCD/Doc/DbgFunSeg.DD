@@ -1,0 +1,2 @@
+$WW,1$Use $FG,2$%p$FG$ to print a pointer with FunSeg+Offset or use $FG,2$%P$FG$ to print a link to a FunSeg+Offset.
+ 

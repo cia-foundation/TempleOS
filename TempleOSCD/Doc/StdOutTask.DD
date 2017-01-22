@@ -1,0 +1,1 @@
+$WW,1$There is one $LK,"CDoc",A="MN:CDoc"$ for the task's border: $FG,2$Fs->border_doc$FG$.  There is a pair for the task's client area: $FG,2$Fs->put_doc$FG$ and $FG,2$Fs->display_doc$FG$.  You can, optionally, do double buffering, otherwise $FG,2$Fs->put_doc$FG$ is the same as $FG,2$Fs->display_doc$FG$.  See $LK,"::/Demo/Spy.HC"$.

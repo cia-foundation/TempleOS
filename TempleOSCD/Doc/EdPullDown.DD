@@ -1,0 +1,77 @@
+File
+{
+  Save(,CH_CTRLS);
+  SaveAs(,CH_CTRLA);
+  Abort(,CH_SHIFT_ESC);
+  Exit(,CH_ESC);
+}
+
+Edit
+{
+  Undo(,CH_CTRLH,0x80E0000080E);
+  Cut(,CH_CTRLX);
+  Copy(,CH_CTRLC);
+  Paste(,CH_CTRLV);
+  DelLine(,CH_CTRLY);
+  FindReplace(,CH_CTRLF);
+  FindNext(,,0x3D0000003D);
+  FindLast(,,0x23D0000023D);
+  GoLine(,CH_CTRLG,0x42200000422);
+  GoBegin(,,0x4C800000448);
+  GoEnd(,,0x4D000000450);
+  GoLeft(,,0x4CB0000044B);
+  GoRight(,,0x4CD0000044D);
+  GoLBrace(,0x5B,0x61A0000061A);
+  GoRBrace(,0x5D,0x61B0000061B);
+  Macro(,,0x3C0000003C);
+  PlayMacro(,,0x23C0000023C);
+}
+
+Insert
+{
+  TextWidgets(,CH_CTRLL,0x42600000426);
+  GraphicResource(,CH_CTRLR,0x41300000413);
+  FileName(,,0x3E0000003E);
+  DirName(,,0x23E0000023E);
+  GodWord(,,0x4100000041);
+  GodBiblePassage(,,0x24100000241);
+  GodSong(,,0x4000000040);
+  GodDoodle(,,0x24000000240);
+  IndentIn(,CH_CTRLI,0x41700000417);
+  IndentOut(,CH_CTRLI,0x61700000617);
+  WordWrapOn(,CH_CTRLW,0x41100000411);
+  WordWrapOff(,CH_CTRLW,0x61100000611);
+  UnderlineOn(,CH_CTRLU,0x41600000416);
+  UnderlineOff(,CH_CTRLU,0x61600000616);
+  BlinkOn(,CH_CTRLK,0x42500000425);
+  BlinkOff(2,CH_CTRLK,0x62500000625);
+  InvertOn(,CH_CTRLZ,0x42C0000042C);
+  InvertOff(,CH_CTRLZ,0x62C0000062C);
+  SuperToggle(,CH_CTRLP,0x41900000419);
+  SubToggle(,CH_CTRLP,0x61900000619);
+  PageBreak(,CH_CTRLJ,0x41C0000041C);
+}
+
+Program
+{
+  CodeTools(,CH_CTRLL,0x62600000626);
+  Include(,0,0x3F0000003F);
+  AdamInclude(,0,0x23F0000023F);
+}
+
+View
+{
+  PlainText(,CH_CTRLT);
+  Collapse(,CH_CTRLO,0x61800000618);
+  Uncollapse(,CH_CTRLO,0x41800000418);
+  Border(,CH_CTRLB);
+  FileMgr(,CH_CTRLD,0x42000000420);
+  Search(,CH_CTRLF,0x62100000621);
+}
+
+Help
+{
+  Menu(,CH_CTRLM,0x43200000432);
+  Help(,,0x3B0000003B);
+  About(,,0x23B0000023B);
+}

@@ -1,0 +1,11 @@
+/* To run this, do a directory, right click on
+this file's name and sel "InFile".
+Or, type $LK,"InFile",A="MN:InFile"$(filename);
+See $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$ in the glossary for more info.
+
+Profiling does not $UL,1$require$UL,0$ InFiles.
+*/
+"$$RED$$Prof;$$FG$$\n";
+"$$RED$$//Collecting Data$$FG$$";
+PressAKey;
+"\n$$RED$$ProfRep;$$FG$$\n";

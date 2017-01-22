@@ -1,0 +1,14 @@
+$WW,1$The editor mostly stays in a $LK,"GetKey",A="MN:GetKey"$()/$LK,"PutKey",A="MN:PutKey"$() loop.  The putkey portion is where keys are acted-upon.  TempleOS has a chain of putkey hndlrs in a $LK,"Circular Queue",A="HI:Circular Queue"$ with priorities.  The highest priority hndlrs can choose to terminate handling, otherwise, the keys get sent on down the chain.
+
+$LK,"KeyDevAdd",A="MN:KeyDevAdd"$() defines a putkey device with a priority.  "Device" might be a misnomer.  Currently, the following are defined:
+
+Priority    Hndlr
+---------- ---------
+$FG,2$0x20000000$FG$ $LK,"MyPutKey",A="MN:MyPutKey"$() user hndlr
+$FG,2$0x40000000$FG$ $LK,"KDInputFilterPutKey",A="MN:KDInputFilterPutKey"$() for $LK,"In",A="MN:In"$(), $LK,"InStr",A="MN:InStr"$(), and $LK,"InFile",A="MN:InFile"$() handling.
+$FG,2$0x60000000$FG$ $LK,"KDRawPutKey",A="MN:KDRawPutKey"$() nonwindowed direct to video mem debug output. 
+$FG,2$0x80000000$FG$ $LK,"KDDocPutKey",A="MN:KDDocPutKey"$() standard document cmds
+
+Since handling individual keys is slow, TempleOS supports PutS() as well.  If no puts hndlr is defined, individual keys are sent.
+
+$LK,"CDoc",A="MN:CDoc"$$FG,2$.user_put_key$FG$ and $LK,"CDoc",A="MN:CDoc"$$FG,2$.user_put_s$FG$ are call back routines which offer some neat tricks.  See $LK,"::/Apps/Psalmody/JukeBox.HC"$.  There is a var $LK,"CDoc",A="MN:CDoc"$$FG,2$.user_put_data$FG$ which gets passed to them.

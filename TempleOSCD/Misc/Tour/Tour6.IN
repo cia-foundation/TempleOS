@@ -1,0 +1,50 @@
+PopUp("ACInit(\"::/*;!*/Bible.TXT*\");");
+AutoComplete(ON);
+Sleep(3500);
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+"\nCd(\"::/Demo\");\n";
+
+TourPut(
+"AutoComplete is a feature which also lets you jump to source code of "
+"symbols.  The function keys jump to code, while the number keys jump to "
+"dictionary definitions.\n\n"
+"We will now place some text on the command line and jump to source code.\n",
+TRUE);
+
+"BootHD";
+
+TourPut(
+"Look at the $$GREEN$$BootHDIns$$FG$$ entry in the AutoComplete "
+"window.  Notice it is underlined.  This means a source code link is "
+"available.\n\n"
+"Press $$GREEN$$<CTRL-SHIFT-F1>$$FG$$ to jump to source code.\n");
+InGetKey(SC_F1|SCF_CTRL|SCF_SHIFT);
+Sleep(500);
+WinToTop;//Kludge
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut("Press $$GREEN$$<CTRL-F1>$$FG$$ to autocomplete.\n");
+InGetKey(SC_F1|SCF_CTRL);
+Sleep(500);
+
+Msg(MSG_KEY_DOWN,'\n',SCF_CTRL|SCF_SHIFT);
+"\n";
+
+TourPut(
+"Tip: You can restart the AutoComplete window if you have closed it by "
+"pressing $$GREEN$$<CTRL-F1>$$FG$$.\n",TRUE);
+
+TourPut(
+"You can also use the $$GREEN$$Man()$$FG$$ function to jump to source code.  "
+"(I use AutoComplete.)  The $$GREEN$$Man()$$FG$$ is good for short symbol "
+"names or when inside the debugger.\n",TRUE);
+InPrint(,"Man(\"U\");");
+Sleep(1500);
+"\n";
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort the source code.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);

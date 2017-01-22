@@ -1,0 +1,45 @@
+$WW,1$GR graphics files are 8-bits-per-pixels but only 4-bits of color, with transparency and no palette.  Compression is the standard TempleOS$FG$ LZW compression.
+$HL,1$
+#define DCF_COMPRESSED		1 //This is the only saved flag.
+#define DCF_PALETTE		2
+
+#define TRANSPARENT		0xFF
+#define BLACK			0
+#define BLUE			1
+#define GREEN			2
+#define CYAN			3
+#define RED			4
+#define PURPLE			5
+#define BROWN			6
+#define LTGRAY			7
+#define DKGRAY			8
+#define LTBLUE			9
+#define LTGREEN			10
+#define LTCYAN			11
+#define LTRED			12
+#define LTPURPLE		13
+#define YELLOW			14
+#define WHITE			15
+
+class CBGR48
+{
+  U16	r,g,b,pad;
+};
+
+CBGR48 gr_palette_std[16]={
+0x000000000000,0x00000000AAAA,0x0000AAAA0000,0x0000AAAAAAAA,
+0xAAAA00000000,0xAAAA0000AAAA,0xAAAA55550000,0xAAAAAAAAAAAA,
+0x555555555555,0x55555555FFFF,0x5555FFFF5555,0x5555FFFFFFFF,
+0xFFFF55555555,0xFFFF5555FFFF,0xFFFFFFFF5555,0xFFFFFFFFFFFF};
+
+class GRFile
+{
+  I32	width;
+  I32   width_internal; //Rounded-up to multiple of 8.
+  I32   height;
+  I32	flags;		//DCF_COMPRESSED? See $LK,"::/Kernel/Compress.HC"$.
+  CBGR48 palette[16];	//Included if DCF_PALETTE.
+  U8	body[];
+};$HL,0$
+
+See $LK,"DCSave",A="MN:DCSave"$(), $LK,"GRWrite",A="MN:GRWrite"$(), $LK,"DCLoad",A="MN:DCLoad"$(), and $LK,"GRRead",A="MN:GRRead"$().

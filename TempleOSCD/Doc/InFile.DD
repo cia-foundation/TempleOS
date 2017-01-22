@@ -1,0 +1,7 @@
+$WW,1$$FG,2$InFiles$FG$ are used to generate user input to automate operations.  The TempleOS tour is done with an $FG,2$InFile$FG$.  It reminds me of a Unix pipe because $FG,2$StdOut$FG$ of one gets chained into $FG,2$StdIn$FG$ of another.
+
+When an $FG,2$InFile$FG$ runs, a child task is $LK,"Spawn",A="MN:Spawn"$()ed which intercepts real user input and generates fake input.  InFiles are $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ programs run by the child whose stdout goes to the parent's input buffer.  $LK,"Msg",A="MN:Msg"$() can be included in an $FG,2$InFile$FG$ to send special keys or mouse cmds to the parent.  While an $FG,2$InFile$FG$ is running, the normal input gets diverted to the InFile task and can be filtered and sent back to the parent task.  Unless you are driving functions which prompt for data, you can probably use an $FG,2$#include$FG$ file in place of an $FG,2$InFile$FG$.
+
+See $LK,"::/Demo/InFile/InDir.IN"$.
+
+Note: $LK,"In",A="MN:In"$("") can be used if all you need is to send ASCII characters.  It differs from $LK,"InStr",A="MN:InStr"$().  You'll probably use $LK,"In",A="MN:In"$() a lot and not $LK,"InStr",A="MN:InStr"$().  With $LK,"In",A="MN:In"$(), for example, you can place answers to the prompts for recompiling the $FG,2$Kernel$FG$ module during $LK,"BootHDIns",A="MN:BootHDIns"$().

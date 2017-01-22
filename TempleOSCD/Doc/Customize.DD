@@ -1,0 +1,6 @@
+
+$WW,1$* You can adjust the mouse movement rate by setting global vars in your start-up file.  See $LK,"mouse scale",A="FF:~/HomeLocalize.HC,ms_hard.scale"$.
+
+* You can set your local time zone by setting the $FG,4$local_time_offset$FG$ global var in a start-up file.  It's units are $LK,"CDATE_FREQ",A="MN:CDATE_FREQ"$.  See $LK,"local time",A="FF:~/HomeLocalize.HC,local_time"$.
+
+* Get rid of this msg $LK,"here",A="FF:~/Once.HC,Customize.DD"$.

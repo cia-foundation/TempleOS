@@ -1,0 +1,61 @@
+//Compile this by calling $LK,"BootHDIns",A="MN:BootHDIns"$().
+//Don't do it directly.  See $LK,"Cmp(\"/Kernel/Kernel\")",A="FF:::/Adam/Opt/Boot/BootHDIns.HC,Cmp(\"/Kernel/Kernel\""$.
+
+#exe {
+  Cd(__DIR__);;
+  Option(OPTf_WARN_PAREN,ON);
+  Option(OPTf_WARN_DUP_TYPES,ON);
+  #include "KCfg"
+  CKCfg *kernel_cfg;
+  kernel_cfg=KCfgNew;
+};
+
+#include "KernelA.HH"
+#include "KStart16"
+#include "KStart32"
+#include "KStart64"
+#include "KMathA"
+#include "KUtils"
+#exe {Option(OPTf_KEEP_PRIVATE,ON);};
+#include "/Compiler/CompilerA.HH"
+#exe {Option(OPTf_EXTERNS_TO_IMPORTS,ON);};
+#include "/Compiler/CompilerB.HH"
+#exe {Option(OPTf_EXTERNS_TO_IMPORTS,OFF);};
+#exe {Option(OPTf_KEEP_PRIVATE,OFF);};
+#include "KernelB.HH"
+#include "KExts"
+#include "StrA"
+#include "KGlbls"
+#include "KMathB"
+#include "Sched"
+#include "Mem/MakeMem"
+#include "FontStd"
+#include "FontCyrillic"
+#include "StrB"
+#include "KHashA"
+#include "KInts"
+#include "KDataTypes"
+#include "Compress"
+#include "KHashB"
+#include "KLoad"
+#include "KDate"
+#include "StrPrint"
+#include "StrScan"
+#include "KDefine"
+#include "Display"
+#include "KMisc"
+#include "KDbg"
+#include "KeyDev"
+#include "KExcept"
+#include "SerialDev/MakeSerialDev"
+#include "QSort"
+#include "KTask"
+#include "Job"
+#include "PCIBIOS"
+#include "MultiProc"
+#include "EdLite"
+#include "BlkDev/MakeBlkDev"
+#include "FunSeg"
+#include "KEnd"
+
+#exe {KCfgDel(kernel_cfg);};

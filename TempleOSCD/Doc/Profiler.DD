@@ -1,0 +1,7 @@
+$WW,1$The profiler records where the CPU was executing when the $TX,"1000Hz",D="DD_JIFFY_HZ"$ timer interrupt occured, so you can learn where time is spent.
+
+Use the $LK,"Prof",A="MN:Prof"$() depth argument to record a hit in the N routines which called the current routine, as well.
+
+When done collecting statistics, use $LK,"ProfRep",A="MN:ProfRep"$() for a report.  You might need a $LK,"DocMax",A="MN:DocMax"$() to expand the command line window buffer to fit it all.
+
+Study the code.  The profiler is very simple.  You might want to enhance it or modify it to debug something in particular.

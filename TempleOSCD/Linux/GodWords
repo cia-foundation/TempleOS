@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#This prints ten random words.
+
+echo "$(shuf -n 10 /usr/share/dict/words --random-source=/dev/urandom | tr '\n' ' ')"
+

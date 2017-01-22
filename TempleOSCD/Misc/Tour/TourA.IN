@@ -1,0 +1,44 @@
+TourPut("Press $$GREEN$$<ENTER>$$FG$$.");
+"Ed(\"HI:Debugging\");";
+InGetStr("\n");
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+TourPut(
+"We will now use $$RED$$$$TX+L+PU+UL,\"Uf\",A=\"MN:Uf\"$$$$FG$$() to "
+"unassemble a function.  It takes the function name as a string arg.\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+"WinBorder;WinMax;\nUf(\"CAlloc\");";
+InGetStr("\n");
+
+TourPut("Press $$GREEN$$<CURSOR-UP>$$FG$$ eight times..");
+I64 i;
+for (i=0;i<8;i++)
+  InGetKey(SC_CURSOR_UP);
+
+TourPut(
+"Press $$GREEN$$<SPACE>$$FG$$.\n");
+InGetStr(" ");
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ when finished.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);
+
+//Puts the cursor at the bottom.
+Msg(MSG_KEY_DOWN,0,SC_CURSOR_DOWN|SCF_CTRL);
+
+TourPut(
+"We can unassemble a numeric address with "
+"$$RED$$$$TX+L+PU+UL,\"U\",A=\"MN:U\"$$$$FG$$().\n\n"
+"Press $$GREEN$$<ENTER>$$FG$$.\n");
+"U(&CAlloc);";
+InGetStr("\n");
+
+TourPut("The opcodes are slightly nonstandard.\n",TRUE);
+"Ed(\"::/Compiler/OpCodes.DD.Z\");\n";
+
+Msg(MSG_KEY_DOWN,CH_CTRLF,0x42100000421);
+"MOV";
+Msg(MSG_KEY_DOWN,CH_ESC,0x100000001);
+
+TourPut("Press $$GREEN$$<SHIFT-ESC>$$FG$$ to abort.\n");
+InUntilChar(CH_ESC,CH_SHIFT_ESC);

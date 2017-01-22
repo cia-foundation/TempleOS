@@ -1,0 +1,5 @@
+$WW,1$$FG,5$$TX+CX,"Graphic Sprite Resource Help"$$FG$
+
+A sprite is an ordered list of elements such as lines, rectangles, bitmaps and color changes.  In a program's source code, you first $FG,2$make a sprite$FG$ somewhere outside a function.  Then, you $FG,2$insert a pointer$FG$ to the sprite as an "*elems" arg when calling $LK,"Sprite",A="MN:Sprite"$() or $LK,"Sprite3",A="MN:Sprite3"$().  See $LK,"Sprites",A="HI:Sprites"$.
+
+You can create a $FG,2$sprite macro$FG$ on your $LK,"PersonalMenu",A="FI:~/PersonalMenu.DD"$ with a payload of $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ source code to execute when it ESC's back to the cmd line.  If you check "Pop-Up", it will spawn a new task and run the payload.  A pop-up macro can be placed in any document.

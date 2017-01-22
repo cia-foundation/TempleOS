@@ -1,0 +1,42 @@
+$WW,1$$FG,5$$TX+CX,"Debugging Overview"$$FG$
+
+* You can enter the debugger with $LK,"Dbg",A="MN:Dbg"$() or $FG,2$<CTRL-ALT-d>$FG$.  You might enter the debugger through a fault.  Enter $LK,"G",A="MN:G"$() or $LK,"G2",A="MN:G2"$() to continue execution.  Place a call to $LK,"Dbg",A="MN:Dbg"$() in your code at fatal error points to enter the debugger.  If you see a stk dump, record the label+offset and unassemble, $LK,"U",A="MN:U"$(). $LK,"U",A="MN:U"$($LK,"_RIP",A="MN:_RIP"$); 
+
+* $LK,"U",A="MN:U"$(&FunName+offset) to unassemble mem or $LK,"Uf",A="MN:Uf"$("FunName") to unassemble a function. $LK,"U",A="MN:U"$($LK,"_RIP",A="MN:_RIP"$-16);
+
+* While debugging, you specify addresses of assembly routines with just the label, as in $FG,2$_MALLOC+0x20$FG$.  You specify $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ function names with $FG,2$&$FG$ before functions as in $FG,2$&Print+0x10$FG$.
+
+* I use $LK,"progress1",A="MN:progress1"$-$LK,"progress4",A="MN:progress4"$ for debugging because they show on the wallpaper.  They're just global int vars.
+
+* You can use $LK,"AdamLog",A="MN:AdamLog"$() to send text to the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ window.  It works like $LK,"Print",A="MN:Print"$().  I never use that.  Instead, I use $LK,"RawPrint",A="MN:RawPrint"$().
+
+* $LK,"D",A="MN:D"$(), $LK,"DocD",A="MN:DocD"$(), $LK,"RawD",A="MN:RawD"$() to do 16 column hex dump mem with numbering from zero.  With $LK,"DocD",A="MN:DocD"$ the values are updated continually and you can alter mem by editing.
+
+* $LK,"Dm",A="MN:Dm"$(), $LK,"DocDm",A="MN:DocDm"$(), $LK,"RawDm",A="MN:RawDm"$() to do 16 column hex dump mem with addresses showing.
+
+* $LK,"Da",A="MN:Da"$() to do one column address dump (for stk, etc.) with symbolic addresses.
+
+* $LK,"Dr",A="MN:Dr"$() dumps regs.  You can display and modify regs in the debugger with var-like labels, $FG,4$_RAX$FG$, $FG,4$_RBX$FG$, etc.
+
+* $LK,"ClassRep",A="MN:ClassRep"$() and the dynamic version $LK,"ClassRepD",A="MN:ClassRepD"$() can be used to dump structures.
+
+* $LK,"Prof",A="MN:Prof"$() and $LK,"ProfRep",A="MN:ProfRep"$() provide code profiling.  See $LK,"::/Demo/InFile/InProfile.IN"$ (This is an $LK,"InFile",A="FF:::/Doc/Glossary.DD,InFile"$.)
+
+* Use $LK,"RawPrint",A="MN:RawPrint"$() to print debug info bypassing the window framework.  You pass these routines a count in milliseconds for how long it should be displayed.  You can use $LK,"Raw",A="MN:Raw"$($FG,2$TRUE$FG$) to make all output bypass the window framework.  The $FG,2$WinMgr$FG$ runs on $FG,2$Core0$FG$ and will overwrite raw text from other cores when it updates the scrn.
+
+* Use $LK,"SysDbg",A="MN:SysDbg"$() to set a flag which you can read with $LK,"IsSysDbg",A="MN:IsSysDbg"$() when you wish to trigger some debug activity.  It's just a handy simple flag, nothing fancy.
+
+* There are flags for various trace options that can help debugging when there are compiler bugs.  Often, you place them in $FG,2$#exe{}$FG$ blocks.
+$ID,2$
+$LK,"Echo",A="MN:Echo"$() turns on or off raw data going into the lexical analyzer.
+
+$LK,"Trace",A="MN:Trace"$() unassembles code generated from the HolyC compiler.
+
+$LK,"PassTrace",A="MN:PassTrace"$() shows intermediate code coming-out after optimization.  The bits ctrl which passes are displayed.
+$ID,-2$
+
+* There is a heap check utility which can find leaks.  Use $LK,"HeapLog",A="MN:HeapLog"$(), $LK,"HeapLogAddrRep",A="MN:HeapLogAddrRep"$() and $LK,"HeapLogSizeRep",A="MN:HeapLogSizeRep"$().  It's a really simple program which intercepts $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().  You can customize the code to find other heap issues.
+
+* You can define hndlr functions for $FG,2$<CTRL-ALT-letter>$FG$ keys with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ hndlrs take a scan_code as an arg.
+
+* If you recompile $FG,2$Kernel$FG,2$$FG$ with $LK,"BootHDIns",A="MN:BootHDIns"$(), you can set the $FG,4$MemInit$FG$, option to initialize memory to a value at boot, the $FG,4$HeapInit$FG$ option to cause mem alloced off the heap to be initialized or $FG,4$VarInit$FG$ option so both global and local vars will be initialized to a value, but global AOT variables are always zero if not initialized.  Pick a non-zero value to discover uninitialized var bugs.  You can set $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$, and $LK,"sys_heap_init_flag",A="MN:sys_heap_init_flag"$ directly after booting.

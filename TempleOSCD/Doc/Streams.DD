@@ -1,0 +1,7 @@
+$WW,1$There are no streams in the traditional sense.  The cmd line output gets sent to the cursor location of a document being edited and by using cursor keys, text can be injected all over the document.  $LK,"Sprites",A="HI:Sprites"$ can be injected and are not serialized!  Furthermore, the input can come from triggering macro widgets.  See $LK,"Doc Overview",A="FI:::/Doc/DolDocOverview.DD"$ and $LK,"Doc Routines",A="HI:DolDoc"$.
+
+If you had a remote term and sent key $LK,"Scan Codes",A="MN:SC_INS"$, the user would press $FG,2$<CTRL-m>$FG$ to access his $FG,2$Personal Menu$FG$ to trigger his macros.  However, the local $LK,"~/PersonalMenu.DD"$ might differ from the remote, causing loss of sync between local and remote sessions.  Also, the window size of local and remote might differ, so word-wrapped text would be different.  Injecting output text with different windows sizes would cause remote and local documents to not be in sync.
+
+See $LK,"Char Overview",A="FI:::/Doc/CharOverview.DD"$ and $LK,"Char Routines",A="HI:Char"$.
+
+You can send characters into $FG,2$StdIn$FG$.  See $LK,"In",A="MN:In"$(), $LK,"XTalk",A="MN:XTalk"$() and $LK,"InFile",A="HI:InFile"$.

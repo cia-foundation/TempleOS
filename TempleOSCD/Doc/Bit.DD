@@ -1,0 +1,14 @@
+
+$FG,5$These take a pointer to a bit field.$FG$
+$WW,1$$FG,2$Bt$FG$:	Bit Test
+$FG,2$Bts$FG$:	Bit Test and Set to one
+$FG,2$Btr$FG$:	Bit Test and Rst to zero
+$FG,2$Btc$FG$:	Bit Test and Compliment (toggle)
+$FG,2$BEqu$FG$:	Set bit to value.
+
+$FG$Bit operations are "atomic", no interrupt between the reading and writing the bit, important when multitasking.  For multicore use "locked" forms.$FG$
+
+$FG,5$These don't take a pointer, but the actual field.$FG$
+$FG,2$Bsf$FG$:	Bit Scan Fwd (Pos of first low one bit or -1)
+$FG,2$Bsr$FG$:	Bit Scan Rev (Pos of first high one bit or -1)
+$FG,2$BCnt$FG$:	Bit Cnt (Cnt of set bits)

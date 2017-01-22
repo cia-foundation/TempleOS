@@ -1,0 +1,13 @@
+$WW,1$$LK,"CDC",A="MN:CDC"$'s have a 4x4 matrix for rotating, scaling, skewing and shifting in 3 dimensions.  To make the graphics routines use the transform, you must set the $LK,"DCF_TRANSFORMATION",A="MN:DCF_TRANSFORMATION"$ flag.
+
+The matrix consists of ints that have been scaled 32 bits ($LK,"GR_SCALE",A="MN:GR_SCALE"$).  See $LK,"::/Demo/Lectures/FixedPoint.HC"$ to learn why.
+
+See $LK,"Mat4x4IdentEqu",A="MN:Mat4x4IdentEqu"$(), $LK,"Mat4x4IdentNew",A="MN:Mat4x4IdentNew"$(), $LK,"Mat4x4Equ",A="MN:Mat4x4Equ"$() and $LK,"Mat4x4New",A="MN:Mat4x4New"$().  See $LK,"Mat4x4RotX",A="MN:Mat4x4RotX"$(), $LK,"Mat4x4RotY",A="MN:Mat4x4RotY"$(), $LK,"Mat4x4RotZ",A="MN:Mat4x4RotZ"$() and $LK,"Mat4x4Scale",A="MN:Mat4x4Scale"$() to rotate about axes and scale.  Combine them with $LK,"Mat4x4MulMat4x4Equ",A="MN:Mat4x4MulMat4x4Equ"$()/$LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$() and assign them to the $LK,"CDC",A="MN:CDC"$.$FG,2$dc$FG$ with $LK,"DCMat4x4Set",A="MN:DCMat4x4Set"$().  See $LK,"::/Demo/Graphics/Box.HC"$.
+
+You can rotate single points using $LK,"Mat4x4MulXYZ",A="MN:Mat4x4MulXYZ"$().
+
+The 4th dimension allows a neat trick where you can place pos shifts (translations), into the matrix and $LK,"Mat4x4MulMat4x4Equ",A="MN:Mat4x4MulMat4x4Equ"$/$LK,"Mat4x4MulMat4x4New",A="MN:Mat4x4MulMat4x4New"$ them to combine rotation/shift operations.  Normally, you can't combine pos shift operations.  See $LK,"Mat4x4TranslationEqu",A="MN:Mat4x4TranslationEqu"$() and $LK,"::/Demo/Graphics/Transform.HC"$.
+
+Finally, $LK,"CDC",A="MN:CDC"$'s have an $FG,2$x$FG$, $FG,2$y$FG$ and $FG,2$z$FG$ which is an additional shift (translation).
+
+The transformation is implemented as a callback on the $LK,"CDC",A="MN:CDC"$'s $FG,2$transform()$FG$ member.  The default $FG,2$transform()$FG$ callback is $LK,"DCTransform",A="MN:DCTransform"$().  See $LK,"::/Demo/Games/Talons.HC"$ or $LK,"::/Demo/Games/CastleFrankenstein.HC"$ to see how to change the $FG,2$transform()$FG$ callback for foreshortening.

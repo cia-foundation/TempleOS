@@ -1,0 +1,7 @@
+$FG,5$$TX+CX,"Sprite SideBar Help"$$FG$
+
+$WW,1$You can cut and paste elements in this side-bar to reorder, delete or duplicating them.  Click an element in the side-bar after you make changes to cause the changes to take-effect.
+
+You can click on an element to make it the insert point for new elements.
+
+The RED element is the current insert point for new elements.

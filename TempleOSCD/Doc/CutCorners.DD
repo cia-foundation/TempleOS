@@ -1,0 +1,20 @@
+$WW,1$$FG,5$$TX+CX,"Cut Corners"$
+$FG$
+There are a few places where I cut corners in the interest of not junking-up code.  This is part of the TempleOS mentality.  I try not to let stupid legacy compatibility issues enter and junk-up TempleOS.
+
+* I made my type-casting operator post-fix because it makes the compiler way cleaner.
+
+* TempleOS does not figure-out $FG,2$FAT32$FG$ short name alias numbers.  $LK,"FAT32DirNew",A="MN:FAT32DirNew"$().  It can cause hard drive corruption, so I might have to do it.  It would really take a lot of junky code for this hatefully, detestable, legacy issue.  "Please don't make me ruin my beautiful shiny-new TempleOS with that!"  I am also not enthused about $FG,2$FAT32$FG$ because it is in patent limbo.  $FG,2$FAT32$FG$ might get removed from TempleOS.  There is the $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$  64-bit file system that works perfectly well.  $FG,2$FAT32$FG$ is useful, however, because it assists in transferring between dual booted operating systems.
+
+* I changed the $LK,"asm opcodes",A="FI:::/Compiler/OpCodes.DD"$ names to remove the ambiguity between insts with different numbers of arguments, making my $LK,"assembler",A="FI:::/Compiler/Asm.HC"$ simpler and I did minimal 16-bit asm support, since 64-bit is what you should be using, unless you're doing a $LK,"boot loader",A="FI:::/Adam/Opt/Boot/BootDVD.HC"$.
+
+* There are no user-controlled file-sharing locks.  However, the drive and file system have locks and concurrent operations should be fine. 
+
+* A hidden window is never refreshed.  Certain tasks are never done, therefore.  During refresh, the entry count limit of the document buffer is, normally, checked and enforced.  If you print to the command-line in a task whose window is covered, no limit on buffer exists and it will alloc memory for the document buffer until the system runs out of memory and crashes.
+
+* Even if a local function variable is declared less than 64 bits, the compiler does calculations with 64-bit.
+
+* $LK,"Print",A="FI:::/Doc/Print.DD"$() uses $LK,"StrPrintJoin",A="MN:StrPrintJoin"$().  You cannot use vastly over-sized fields for %f.
+
+* $LK,"GrEllipse3",A="MN:GrEllipse3"$() is broken on transformations.
+ 

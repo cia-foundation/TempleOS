@@ -1,0 +1,3 @@
+$WW,1$The compiler's lexical analyzer can be used in your programs to simplify parsing.  See $LK,"Doc Parsing",A="FF:::/Adam/DolDoc/DocPlain.HC,CmpCtrlNew"$ or $LK,"Parse Opcode File",A="FF:::/Compiler/AsmInit.HC,Opcodes.DD"$.
+
+See $LK,"Tokens",A="MN:TK_IDENT"$.

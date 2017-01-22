@@ -1,0 +1,7 @@
+$WW,1$$FG,2$#help_index "Topic/SubTopic;OtherTopic"$FG$
+The help index preprocessor compiler directive sets the topics for syms subsequently defined.  You specify subtopics with a '$FG,2$/$FG$' tree hierarchy and separate multiple topics with a '$FG,2$;$FG$'.  The index ctrls $LK,"HI:index",A="MN:LK_HELP_INDEX"$ links.
+
+$FG,2$public$FG$ causes a sym to appear in help_index reports.
+
+$FG,2$#help_file "filename[.DD.Z]"$FG$
+The help file preprocessor directive makes a file into the heading of a $LK,"HI:index",A="MN:LK_HELP_INDEX"$ report for the current help index.

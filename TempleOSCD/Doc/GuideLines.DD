@@ -1,0 +1,135 @@
+$WW,1$$FG,5$$TX+CX,"Directory Structure"$$FG$
+
+$FG,2$/Home$FG$ All your user data should be placed in here to ease backing-up your data.  When you install an application it will create a subdirectory of your $FG,2$/Home$FG$ directory for storage.
+
+$FG,2$/Apps$FG$ Applications are placed in subdirectories of $FG,2$/Apps$FG$.  Applications should have a file called $FG,2$Install.HC.Z$FG$ which will install the app, possibly making files or directories in $FG,2$/Home$FG$.  The file, $FG,2$Load.HC.Z$FG$ will load the application into mem.  The file, $FG,2$Run.HC.Z$FG$, will usually load and execute the app.  To add an app to your PersonalMenu, use $FG,2$<CTRL-l>$FG$, insert a macro with the PopUp option checked and invoke the $FG,2$Run.HC.Z$FG$ file.
+
+$FG,2$/Demo$FG$ Here you can find lots of sample code to do various things.
+
+$FG,2$/Doc$FG$ Here you can find documentation.
+
+$FG,2$/Kernel$FG$ The core of the operating system is found here.  Since priviledge levels are not used, calling it a $FG,2$kernel$FG$ is deceptive.  It is $FG,2$AOT$FG$ compiled by $LK,"BootHDIns",A="MN:BootHDIns"$().  It is loaded by the boot loader and must fit in 640K.
+
+$FG,2$/Compiler$FG$ The compiler module src code is found here.  The compiler is $FG,2$AOT$FG$ compiled to produce a binary file which is loaded at boot.  It, too, is $FG,2$AOT$FG$ compiled by $LK,"BootHDIns",A="MN:BootHDIns"$().
+
+$FG,2$/Adam$FG$ The non-kernel part of the operating system is found here.  It is $FG,2$JIT$FG$ compiled during boot.  The $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ is the father of all tasks, like Adam and Eve.
+
+$FG,2$/0000Boot$FG$ Boot files go here.  Stage 2 of the TempleOS hard drive master boot loader, the old hard drive master boot record which is just blk#0, and the CD/DVD $LK,"0000Kernel.BIN.C",A="FI:::/Kernel/Kernel.PRJ"$ file go here.  ASCII $FG,2$0000$FG$ is near the top, alphabetically, in case you use $TX,"MagicISO",HTML="http://www.magiciso.com"$.
+
+
+
+$FG,5$$TX+CX,"::/Home Files"$$FG$
+
+The home dir is specified with $FG,2$'~'$FG$.  The home dir is $FG,2$::/Home$FG$ unless you change it with $LK,"HomeSet",A="MN:HomeSet"$() or compile the kernel with a cfg option.  An empty $FG,2$/Home$FG$ dir should be valid because it will get default files from the root dir. 
+
+$LK,"~/PersonalMenu.DD"$ a menu viewed with the $FG,2$<CTRL-m>$FG$ key or by clicking "$FG,2$MENU$FG$" in the upper left border area of a window.
+
+$LK,"~/PersonalNotes.DD"$ a personal note file viewed with the $FG,2$<CTRL-SHIFT-M>$FG$ key.
+
+$LK,"~/MakeHome.HC"$ a file compiled by the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ during $LK,"StartOS",A="FF:::/StartOS.HC,MakeHome"$.
+
+$FG,4$~/Home*$FG$ Copy $FG,2$Home*$FG$ files from the root into $FG,2$~$FG$ and customize them.  These files are invoked when the $LK,"Adam Task",A="FF:::/Doc/Glossary.DD,Adam Task"$ starts-up.
+
+$LK,"~/Once.HC"$ a file invoked at the start-up of the first user.  Customize this!
+
+$LK,"~/Registry.HC"$ can be edited by hand or deleted to reset to defaults.  Takes affect next boot.
+
+
+
+$FG,5$$TX+CX,"Application Policies"$$FG$
+
+* Place applications in their own $FG,2$/Apps$FG$ subdirectory.
+
+* Make a file called $FG,2$Load.HC.Z$FG$ to load the application.
+
+* Make a file called $FG,2$Run.HC.Z$FG$ to load and run the application, preferable by $FG,2$#include$FG$ing the $FG,2$Load.HC.Z$FG$ file.
+
+* Place user data in a subdirectory of $FG,2$/Home$FG$, preferably naming the subdirectory the same as the $FG,2$/Apps$FG$ subdirectory.  Or, place data in the $FG,2$Registry.HC.Z$FG$ file.  See $LK,"::/Demo/RegistryDemo.HC"$.
+
+* If the app needs files in the $FG,2$/Home$FG$ directory, make an $FG,2$/Apps$FG$ file called $FG,2$Install.HC.Z$FG$ or $FG,2$Install.IN.Z$FG$ to create the $FG,2$/Home$FG$ subdirectory.
+
+ 
+
+$FG,5$$TX+CX,"Programming Guidelines"$$FG$
+
+* Virtual mem/Paging is not used -- it is identity mapped in $FG,2$x86_64$FG$ mode.  The stk does not grow, so alloc enough when the task (process) is $LK,"Spawn",A="MN:Spawn"$ed and use the heap for most things.  (The $FG,2$heap$FG$ refers to $LK,"MAlloc",A="MN:MAlloc"$() and $LK,"Free",A="MN:Free"$().)
+
+* You can $LK,"Free",A="MN:Free"$($FG,2$NULL$FG$)$FG$.
+
+* See $LK,"Naming Convention",A="FF:::/Doc/Glossary.DD,Naming Convention"$ and $LK,"Abbreviations",A="FF:::/Doc/Glossary.DD,Abbreviations"$.
+
+* There are two modes of compiling, $LK,"AOT Compile Mode",A="FF:::/Doc/Glossary.DD,AOT Compile Mode"$ and $LK,"JIT Compile Mode",A="FF:::/Doc/Glossary.DD,JIT Compile Mode"$.  Compilation is done in both -- neither is "interpreted".  Use $FG,2$$LK,"JIT Mode",A="FF:::/Doc/Glossary.DD,JIT Compile Mode"$$FG$.
+
+* $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$
+
+* Use $FG,2$I64$FG$ instead of smaller int sizes because the compiler converts everything to 64-bit.  Don't use unsigned$FG$ unless it actually breaks.  A policy of signed keeps it simple so you don't have to agonize over choices.
+
+$ID,5$$HL,1$U32 DistDist(U16 x1, U16 y1, U16 x2, U16 y2)
+{//This requires zero-extend when fetching args.
+  return SqrI64(x1-x2)+SqrI64(y1-y2);
+}
+
+I64 DistDist(I64 x1, I64 y1, I64 x2, I64 y2)
+{
+  return SqrI64(x1-x2)+SqrI64(y1-y2);
+}$HL,0$
+$ID,-5$
+* In-order, short circuit logic is assumed.
+
+* Avoid boolean expression assignments.  Boolean assignments don't have short circuit logic and are not compiled efficiently.  The $FG,2$Bool$FG$ type is just an alias for a 1 byte signed int -- nothing forces it to $FG,2$1$FG$ or $FG,2$0$FG$.  There is a $LK,"ToBool",A="MN:ToBool"$() function that will for to $FG,2$1$FG$ ot $FG,2$0$FG$, however.
+
+* Glbl vars in $FG,2$AOT$FG$ BIN modules are initialized to zero.  They occupy space in BIN files.
+
+* Bracketing code with $FG,2$PUSHFD CLI$FG$ and $FG,2$POPFD$FG$ will protect against simultaneous accesses from tasks on $UL,1$one$UL,0$ core.  To protect against multiple cores, you need a locked semaphore.  I think semiphores need to be in their own cache line, but I'm not sure.  I use lock bits in a lot of places not aligned.
+
+* $LK,"SysDbg",A="MN:SysDbg"$() and $LK,"IsSysDbg",A="MN:IsSysDbg"$() are really handy when working on the compiler or kernel.  It's just a bit you can set and test.
+
+* I don't use $FG,2$U0 *$FG$ because the size is zero for ptr arithmetic.
+
+* Use $FG,2$$LK,"CH_SHIFT_SPACE",A="MN:CH_SHIFT_SPACE"$$FG$ for spaces in quotes in source code because I run $LK,"Spaces-to-Tabs",A="FF:::/Adam/Opt/Utils/StrUtils.HC,S2T"$ on source code.
+
+* Do not use $FG,2$#if$FG$ or $FG,2$#ifdef$FG$
+
+
+
+$FG,5$$TX+CX,"Hash Sym Tables"$$FG$
+
+* See $LK,"::/Adam/AHash.HC"$ for examples of how the hash tables are set-up.  Basically, syms are placed into hash tables and child process hash tables are chained to parents.  This provides scopes for vars and functions.
+
+* $FG,2$adam_task->hash_table$FG$ holds the $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ syms loaded in on start-up.
+
+* $FG,2$Fs->hash_table$FG$ holds user HolyC syms and if a sym is not found, it checks parents.  When a duplicate sym is added to the table, it overshadows the prev sym.  When developing software, typically you include the file at the cmd prompt, make changes and reinclude it.  Old syms are overshadowed but they are still there.  Periodically, kill the TASK and start fresh when mem is low.  If you wish your applications to free themselves instead of staying in mem, spawn or $LK,"PopUp",A="MN:PopUp"$() a task to run the application and kill it when it's done.
+
+* To display the contents of a hash table, use the $LK,"Who",A="MN:Who"$() routine or the varients.  $LK,"HashDepthRep",A="MN:HashDepthRep"$() gives a histogram  of how long the chains are, in case you wish to make hash table sizes bigger.
+
+
+
+$FG,5$$TX+CX,"Assembly Language"$$FG$
+
+See $LK,"::/Doc/Asm.DD"$.
+
+* $FG,2$FS$FG$ must always point to the cur $LK,"CTask",A="MN:CTask"$.
+
+* $FG,2$GS$FG$ must always point to the cur $LK,"CCPU",A="MN:CCPU"$.
+
+* Don't change the segment regs unless interrupts are off.  It's hard to do, anyway.  $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$ and $LK,"SET_GS_BASE",A="MN:SET_GS_BASE"$.
+
+* When interacting with $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ compiled code, preserve $FG,2$RBP, RSI, RDI, R10-R15$FG$ because the compiler uses these for reg vars.  You are free to clobber $FG,2$RAX, RBX, RCX, RDX$FG$, $FG,2$R8$FG$ and $FG,2$R9$FG$.  See $LK,"Compiler Reg Masks",A="MN:REGG_LOCAL_VARS"$, $LK,"PUSH_C_REGS",A="MN:PUSH_C_REGS"$ and $LK,"POP_C_REGS",A="MN:POP_C_REGS"$
+
+* I recommend using the standard stk frame for functions because $LK,"Caller",A="MN:Caller"$() is used to display the call stk, such as for the wallpaper.
+$FG,2$	PUSH	RBP
+	MOV	RBP,RSP
+	SUB	RSP,nnnn
+...
+	LEAVE
+	RET
+$FG$
+* The args are removed from the stack with $FG,2$RET1$FG$ stmts.
+
+	$FG,2$RET1	16	//remove two args$FG$
+
+* No args are passed in regs.
+
+* RAX holds function return values, of course.
+$FG,8$
+* "MagicISO" is a trademark owned by MagicISO Corp.

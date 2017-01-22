@@ -1,0 +1,27 @@
+$WW,1$$FG,5$$TX+CX,"Char Overview"$$FG$
+
+A $FG,2$Char$FG$acter is a single byte holding an ASCII code for a letter, num or sym.  The $FG,2$TempleOS$FG$ term is a $FG,2$U8$FG$.
+
+Standard ASCII values range from 0 to 127.  Values below 32 are ctrl key's.  So, an ASCII #3 is a $FG,2$<CTRL-c>$FG$.  TempleOS uses a few nonstandard values below 32.  See $LK,"Char Definitions",A="MN:CH_SHIFT_SPACE"$.
+
+ASCII #5  is the cursor location in a saved file.
+ASCII #28 is $FG,2$<SHIFT-ESC>$FG$.
+ASCII #31 is a $FG,2$<SHIFT-SPACE>$FG$.
+
+TempleOS ASCII is 8-bit instead of 7-bit, so it also uses the range from 128-255.  Press $FG,2$<CTRL-ALT-a>$FG$ to see shapes for 128-255.  Technically, $FG,2$<CTRL-ALT-a>$FG$ are $LK,"scrn codes",A="HI:TextBase Layer"$.
+
+A $FG,2$Key$FG$ is typically specified with a scan code.  TempleOS scan codes contain the key value in the lowest $FG,2$U8$FG$, and flags in the upper 3 bytes.  See $LK,"Scan Code Flags",A="MN:SCF_CTRL"$ and $LK,"Scan Codes",A="MN:SC_INS"$.
+
+TempleOS stores scan codes in 8 bytes.
+  $FG,2$Byte 0$FG$   is the code.  NumPad keys, SHIFT, ALT, CTRL and GUI keys combined.
+  $FG,2$Byte 1-3$FG$ are $LK,"flags",A="MN:SCf_KEY_UP"$
+
+The upper 4-bytes are copied from lower 4-bytes.
+  $FG,2$Byte 4$FG$   is the code.  Left, Right and NumPad keys distinct.
+  $FG,2$Byte 5-7$FG$ are $LK,"flags",A="MN:SCf_KEY_UP"$
+
+Run the program $LK,"::/Demo/MsgLoop.HC"$ to examine scan code.  Press $FG,2$<CTRL-SHIFT-l>$FG$ and "Insert ASCII/ScanCode".$FG$
+
+See $LK,"Key Allocations",A="FI:::/Doc/KeyAlloc.DD"$ and $LK,"CKbdStateGlbls",A="MN:CKbdStateGlbls"$.
+
+A $FG,2$String$FG$ is a bunch of ASCII characters terminated with a zero.

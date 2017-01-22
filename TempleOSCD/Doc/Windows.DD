@@ -1,0 +1,1 @@
+$WW,1$Only tasks on $FG,2$Core0$FG$ can have a window and there can be only one window per task.  The window Z-buffer, top-to-bottom order is determined by the order in the task queue, with the $FG,2$WinMgr$FG$ on the bottom.  A task can have child task popup windows.

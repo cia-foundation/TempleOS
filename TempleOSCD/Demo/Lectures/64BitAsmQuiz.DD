@@ -1,0 +1,89 @@
+$WW,1$$FG,5$$TX+CX,"64-Bit Assembly Quiz"$$FG$
+
+1) In 64-bit mode, how many bytes are always pushed?
+
+	PUSH	12
+	PUSH	EAX
+
+2) What happens to the upper 32-bits?
+
+	XOR	EAX,EAX
+	MOV	EAX,0x12345678
+	MOV	EAX,0x80000000
+
+3) How do you set FS or GS values?
+
+4) If FS points to current task record, what's wrong with this instruction?
+
+	MOV	RAX,U64 FS:[TSS_SOME_MEMBER]
+
+5) Which instruction takes more bytes?
+
+	MOV	RAX,U64 [R8]
+	MOV	RAX,U64 [R13]
+
+6) Are these the same number of bytes?
+
+	MOV	RAX,1234
+	MOV	R8,1234
+	MOV	EAX,1234
+
+7) True or False
+
+  a) You can access the lowest byte of RAX.
+
+  b) You can access the lowest byte of ESI.
+
+  c) You can access the second-to-lowest byte of RAX.
+
+  d) You can access the second-to-lowest byte of ESI.
+
+8) How do you call a subroutine at 0x10,0000,0000 from code at 0x00,0010,0000?
+
+9) How much faster is a REL32 call instruction compared to a software interrupt or SYSCALL?
+
+10) How long does an IN or OUT instruction take on a 1GHz machine and on a 3GHz machine?
+
+11) How do you push all 16 regs?
+
+12) Should you put the regs in a TSS?
+
+13) You can have 4K or 4Meg pages in 32-bit mode.  You can have 4K or what size pages in 64-bit mode?
+
+14) On a fresh CPU with an empty TLB, how many memory accesses (page tables) does it take to access one virtual address?
+
+----
+
+TempleOS identity-maps everything, all the time, so the usual convention of upper memory being for kernel does not apply.  It uses physical addresses, basically.  It puts all code in the lowest 2-Gig memory range so that it can use the CALL REL32 instruction, the fastest.  It never changes privilege levels or messes with page tables, once it is up-and-running.
+
+----
+
+ANSWERS:
+
+1) All stack pushes and pops are 64-bits.
+
+2) The upper 32-bits are set to zero.
+
+3) To set FS or GS, you use WRMSR to write a model specific reg.  See $LK,"IA32_FS_BASE",A="MN:IA32_FS_BASE"$ and $LK,"SET_FS_BASE",A="MN:SET_FS_BASE"$.
+
+4) Displacement addressing is now RIP relative, so RIP would be added to TSS_SOME_MEMBER.  (Useless)
+
+5) The R13 instruction takes one more byte because it is like $LK,"REG_RBP",A="MN:REG_RBP"$ in the ModR.
+
+6) The R8 instruction needs a REX byte prefix to specify upper-8 reg.
+
+7) You can access the lowest byte of any reg.  You can access AH but not the second-to-lowest byte of ESI.
+
+8) To call a subroutine farther than 2Gig away, you put the address into RAX, then CALL RAX.
+
+9) CALL REL32 is significantly faster.  See $LK,"::/Demo/Lectures/InterruptDemo.HC"$.
+
+10) IN or OUT instructions happen at a fixed speed based on the original ISA bus clock.
+
+11) PUSHAD is not available for 64-bit mode, so you do it by hand.
+
+12) The TSS is no longer used to hold the task state because there are 16 regs and they are 64-bits, not 32-bits.  I guess Intel decided doing it by hand was better than TSSes.
+
+13) 64-bit mode has 4K or 2Meg page size.
+
+14) For one access, there are 3-4 levels of page tables plus the location itself.

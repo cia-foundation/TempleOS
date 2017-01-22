@@ -1,0 +1,25 @@
+$WW,1$$FG,5$$TX+CX,"Key Allocations"$$FG$
+
+See $LK,"Char",A="HI:Char"$ for definition of scan codes.
+
+See $MA-X+PU,"Key Map",LM="KeyMap;View;\n"$ for a detailed list of key commands.
+
+When you are at the cmd line, editing documents, browsing documentation and help, entering items in forms or in menu's, the $LK,"DolDoc",A="MN:CDoc"$ editor handles keys.  It allows you to define your own key hndlrs in a $LK,"MyPutKey",A="MN:MyPutKey"$() function.  If you choose, you can catch keys, overriding the default hndlrs.  See $LK,"DocPutKey",A="MN:DocPutKey"$().  The following is an overview of key allocations.
+
+$FG,2$<ALT-keys>$FG$ and $FG,2$<ALT-SHIFT-keys>$FG$  Free for user configurations in your $LK,"MyPutKey",A="MN:MyPutKey"$() hndlr, except for $FG,2$ALT-BACKSPACE$FG$ (undo).  There are a few examples pre-defined, but you can change them if you wish.
+
+$FG,2$<CTRL-ALT-keys>$FG$ and $FG,2$<CTRL-ALT-SHIFT-keys>$FG$  Handled at a system level, NOT by the $LK,"CDoc",A="MN:CDoc"$ editor.  I reserve the right to alloc these, but in the mean time, you can define your own hndlrs with $LK,"CtrlAltCBSet",A="MN:CtrlAltCBSet"$().  They operate either in a interrupt environment or in the window mgr when it queues kbd msgs.  You can do $LK,"Raw",A="MN:Raw"$() output.  $FG,2$<CTRL-ALT-letter>$FG$ hndlrs take a scan_code as an arg.
+
+$FG,2$<CTRL-function key>$FG$  Auto-completes local words.
+
+$FG,2$<CTRL-digit key>$FG$  $FG$Auto-completes dictionary words.
+
+$FG,2$<CTRL-SHIFT-function key>$FG$  $FG$Jumps to src code.
+
+$FG,2$<CTRL-SHIFT-digit key>$FG$  Jumps to dictionary definition.
+
+$FG,2$<function keys>$FG$ and $FG,2$<SHIFT-function keys>$FG$  $FG$I reserve the right to alloc these, but there are some free now.
+
+$FG,2$<CTRL-key>$FG$ and $FG,2$<CTRL-SHIFT-key>$FG$  I reserve the right to alloc to these.  There are not many free.
+$AN,"",A="PutKeyHandling"$
+See $LK,"Keyboard Devices",A="HI:Keyboard Devices/System"$.

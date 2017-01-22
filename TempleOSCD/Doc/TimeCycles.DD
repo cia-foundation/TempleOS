@@ -1,0 +1,1 @@
+$WW,1$Intel/AMD have an inst that returns the num of CPU cycles since boot.  This is not a steady, calibrated real time value.  TempleOS measures it and you can convert with $LK,"cnts.time_stamp_freq",A="MN:CCntsGlbls"$, a value continuously calibrated from other cnts.

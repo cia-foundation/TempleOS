@@ -1,0 +1,28 @@
+$WW,1$A pull-down menu appears when you move the mouse to the top of the scrn.  Menus are created with $LK,"MenuPush",A="MN:MenuPush"$(), $LK,"MenuFilePush",A="MN:MenuFilePush"$(), $LK,"MenuNew",A="MN:MenuNew"$() or $LK,"MenuFile",A="MN:MenuFile"$() and assigned to $FG,4$Fs->cur_menu$FG$.  The format is:
+
+$FG,2$
+File 
+{
+  Open(,'O');
+  Save(,'S');
+  Exit(,CH_SHIFT_ESC);
+}
+Edit {
+  Cut(,,SC_DELETE|SCF_SHIFT);
+  Paste(,,SC_INS|SCF_SHIFT);
+}
+Misc {
+  Opt1(MSG_CMD,M_OPTION1);
+  Opt2(MSG_CMD,M_OPTION2);
+}
+Help
+{
+  Help(,'?');
+  About(,'/');
+}
+$FG$
+The first arg is the msg code and it is optional with the default being $LK,"MSG_KEY_DOWN_UP",A="MN:MSG_KEY_DOWN_UP"$.  The second arg is the msg $FG,2$arg1$FG$ value which is $LK,"ASCII",A="MN:CH_CTRLA"$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.  The third arg is the msg $FG,2$arg2$FG$ value which is the $LK,"scan_code",A="FI:::/Doc/CharOverview.DD"$$FG$ of the key in the case of $LK,"MSG_KEY_DOWN",A="MN:MSG_KEY_DOWN"$.
+
+Press $FG,2$<CTRL-SHIFT-l>$FG$ and "Insert ASCII/ScanCode".
+
+See $LK,"::/Demo/PullDownMenu.HC"$.
