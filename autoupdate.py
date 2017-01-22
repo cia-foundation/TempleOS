@@ -51,7 +51,6 @@ if pre_hash != post_hash:
     if subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--', EXTRACTED_ISO_DIR]) == 1:
         print('---- Commit & push')
         subprocess.check_call(['git', 'commit', '-m', 'Nightly update (ISO SHA-1 %s)' % post_hash[0:7]])
-        subprocess.check_call(['git', 'push', 'origin', 'master'])
     else:
         print('---- No changes in source tree')
 else:
