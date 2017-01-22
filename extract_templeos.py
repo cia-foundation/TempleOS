@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import errno
 import isoparser
 import os
@@ -34,7 +36,7 @@ def decompress_all_files_in(path):
 			decompress_all_files_in(full_path)
 		elif full_path.endswith('.Z'):
 			decompressed_path = full_path[0:len(full_path)-2]
-			subprocess.call(['./TOSZ', '-ascii', full_path, decompressed_path])
+			subprocess.check_call(['./TOSZ', '-ascii', full_path, decompressed_path])
 			os.remove(full_path)
 
 # Extract TempleOS disk tree
