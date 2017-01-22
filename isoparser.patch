@@ -1,7 +1,7 @@
-diff --git a/isoparser/record.py b/isoparser/record.py
+diff --git a/isoparser/isoparser/record.py b/isoparser/isoparser/record.py
 index 4cf19f3..a09160d 100644
---- a/isoparser/record.py
-+++ b/isoparser/record.py
+--- a/isoparser/isoparser/record.py
++++ b/isoparser/isoparser/record.py
 @@ -47,7 +47,7 @@ class Record(object):
  
          self.embedded_susp_entries = susp_entries
