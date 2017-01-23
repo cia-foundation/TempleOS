@@ -445,7 +445,7 @@ U0 TimerGodIns()
   FifoU8Flush(god.fifo);
   GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
   switch (PopUpPickLst("Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
-	"Painting1000\0Metallica\0PhysisGirl\0")) {
+	"Painting1000\0Metallica\0")) {
     case:
       StrPrint(buf,"%05X",GodBits(5*4));
       "$$TX,\"How this random Bible passage was chosen.\","
@@ -486,9 +486,6 @@ U0 TimerGodIns()
 	    "metallica/songindex.html",
 	    buf,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
       break;
-    case:
-      GodVideoU32(GodBits(32),"~/Sup1/Sup1Blog/PhysicsGirl.DD.Z");
-      break;
   }
 }
 
@@ -515,7 +512,7 @@ public U0 GodIns()
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0"
 	      "HappyWords\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
-	      "Painting100\0Painting1000\0Metallica\0PhysicsGirl\0")) {
+	      "Painting100\0Painting1000\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -583,11 +580,6 @@ public U0 GodIns()
 		    "metallica/songindex.html",
 		    gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
 	    break;
-	  case:
-	    if (DocForm(gm(CRandHex8Form *)))
-	      GodVideoU32(Str2I64(gm->rnd0,16),
-		    "~/Sup1/Sup1Blog/PhysicsGirl.DD.Z");
-	    break;
 	}
 	break;
       start:
@@ -606,7 +598,7 @@ public U0 GodIns()
 	GodHeaderIns;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0HexWordBatch\0"
-	      "Hex5Bible\0Hex8Books\0Movie100\0Metallica\0PhysicsGirl\0")) {
+	      "Hex5Bible\0Hex8Books\0Movie100\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -646,11 +638,6 @@ public U0 GodIns()
 		    "http://home.hccnet.nl/a.r.adams/lyrics/"
 		    "metallica/songindex.html",
 		    gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
-	    break;
-	  case:
-	    if (DocForm(gm(CRandHex8Form *)))
-	      GodVideoU32(Str2I64(gm->rnd0,16),
-		    "~/Sup1/Sup1Blog/PhysicsGirl.DD.Z");
 	    break;
 	}
 	break;

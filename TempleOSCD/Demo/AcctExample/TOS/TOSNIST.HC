@@ -49,7 +49,7 @@ U0 NISTGodIns1()
 {
   tos_type=PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
 	"Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0Painting1000\0"
-	"Metallica\0PhysicsGirl\0");
+	"Metallica\0");
   switch (tos_type) {
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("LinuxWords");	break;
@@ -61,7 +61,6 @@ U0 NISTGodIns1()
     case: tos_timestamp=GodHeaderIns("Painting100");	break;
     case: tos_timestamp=GodHeaderIns("Painting1000");	break;
     case: tos_timestamp=GodHeaderIns("Metallica");	break;
-    case: tos_timestamp=GodHeaderIns("PhysicsGirl");	break;
   }
   Once("tos_timestamp=%d;\ntos_type=%d;\n"
 	"In(\"Blog(TRUE);\n\");",tos_timestamp,tos_type);
@@ -152,12 +151,6 @@ U0 NISTGodIns2()
 	      "http://home.hccnet.nl/a.r.adams/lyrics/"
 	      "metallica/songindex.html",
 	      gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
-      }
-      break;
-    case:
-      if (DocForm(gm(CRandHex8Form *))) {
-	NISTBeaconURL(gm->timestamp);
-	GodVideoU32(Str2I64(gm->rnd0,16),"~/Sup1/Sup1Blog/PhysicsGirl.DD.Z");
       }
       break;
   }

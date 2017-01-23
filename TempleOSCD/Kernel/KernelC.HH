@@ -38,6 +38,7 @@ char_bmp_zero_tab_cr_nl_cursor_dollar[16],
 char_bmp_macro[16],			char_bmp_printable[16],
 char_bmp_displayable[16],		char_bmp_safe_dollar[16],
 char_bmp_filename[16],			char_bmp_non_eol[16];
+
 #help_index "Char/Conversion"
 public extern U8 *Char2KeyName(I64 ch,Bool include_ctrl=TRUE);
 public extern I64 Char2ScanCode(I64 ch,I64 sc_flags=0);
@@ -227,7 +228,6 @@ public extern U0 VGAFlush();
 #help_index "Debugging;Debugging/Debugger"
 public extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
 public extern U0 Panic(U8 *msg=NULL,I64 msg_num=0,Bool panic=TRUE);
-
 #help_index "Define;Char/Define"
 #help_file "::/Doc/Define"
 public extern U8 *Define(U8 *dname);
