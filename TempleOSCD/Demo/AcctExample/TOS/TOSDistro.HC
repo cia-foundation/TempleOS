@@ -570,6 +570,8 @@ public U0 TOSPreRegen()
   Copy("D:/Home/Sup1/Sup1Blog/Bookmarks.html","C:/Home/Sup1/Sup1Blog");
   Del("C:/Home/Sup1/Sup1Bin/*");
   Copy("D:/Home/Sup1/Sup1Bin/*","C:/Home/Sup1/Sup1Bin");
+  Copy("D:/Home/Sup1/Sup1CodeScraps/Comm/TOSSocket*",
+	"C:/Home/Sup1/Sup1CodeScraps/Comm");
   Copy("D:/Home/Sup1/Sup1Bin/God*","C:/Linux");
 }
 

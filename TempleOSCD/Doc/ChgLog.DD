@@ -2,6 +2,8 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
+$IV,1$----01/22/17 17:18:21----$IV,0$
+
 $IV,1$----01/22/17 06:08:00----$IV,0$
 * $BK,1$TempleOS version 5.02 Released$BK,0$
 * Changed polling of $LK,"KbdMsHndlr",A="MN:KbdMsHndlr"$() in $LK,"WinMgrSleep",A="MN:WinMgrSleep"$(), increased fifos.

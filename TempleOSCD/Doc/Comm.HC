@@ -5,11 +5,6 @@ it in your start-up scripts.
 
 #help_index "Comm"
 
-#define COM1_BASE	0x3F8
-#define COM2_BASE	0x2F8
-#define COM3_BASE	0x3E8
-#define COM4_BASE	0x2E8
-
 #define UART_THR		0
 #define UART_RDR		0
 #define UART_BRDL		0
@@ -21,96 +16,117 @@ it in your start-up scripts.
 #define UART_LSR		5
 #define UART_MSR		6
 
-I64 comm_base[5]={0,0x3F8,0x2F8,0x3E8,0x2E8};
+#define COMf_ENABLED	0
+class CComm
+{
+  I64	base,
+	flags;
+  CFifoU8 *RX_fifo;
+  CFifoU8 *TX_fifo;
+} comm_ports[5];
 
-CFifoU8 *comm_fifos[5]={NULL,NULL,NULL,NULL,NULL};
+U0 CommHndlr(I64 port)
+{
+  CComm *c=&comm_ports[port];
+  I64 b=0,stat;
+  if (Bt(&c->flags,COMf_ENABLED)) {
+    stat=InU8(c->base+UART_IIR);
+    if (stat & 4)	//RX
+      FifoU8Ins(c->RX_fifo,InU8(c->base+UART_RDR));
+    if (stat & 2) {	//TX
+      if (FifoU8Rem(c->TX_fifo,&b))
+	OutU8(c->base+UART_THR,b);
+      else
+	OutU8(c->base+UART_IER,1); //RX but no THR empty
+    }
+  }
+}
 
 interrupt U0 IRQComm3()
 {
-  I64 base=comm_base[2];
-  if (comm_fifos[2] && (InU8(base+UART_IIR) & 0xFE)==4)   //RX IRQ
-    FifoU8Ins(comm_fifos[2],InU8(base+UART_RDR));
-
-  base=comm_base[4];
-  if (comm_fifos[4] && (InU8(base+UART_IIR) & 0xFE)==4)   //RX IRQ
-    FifoU8Ins(comm_fifos[4],InU8(base+UART_RDR));
+  CommHndlr(2);
+  CommHndlr(4);
   OutU8(0x20,0x20);
 }
 
 interrupt U0 IRQComm4()
 {
-  I64 base=comm_base[1];
-  if (comm_fifos[1] && (InU8(base+UART_IIR) & 0xFE)==4)   //RX IRQ
-    FifoU8Ins(comm_fifos[1],InU8(base+UART_RDR));
-
-  base=comm_base[3];
-  if (comm_fifos[3] && (InU8(base+UART_IIR) & 0xFE)==4)   //RX IRQ
-    FifoU8Ins(comm_fifos[3],InU8(base+UART_RDR));
+  CommHndlr(1);
+  CommHndlr(3);
   OutU8(0x20,0x20);
 }
 
-IntEntrySet(0x23,&IRQComm3);
-IntEntrySet(0x24,&IRQComm4);
-
-public U0 CommInit8n1(I64 port,I64 baud)
+U0 CommInit()
 {
-  I64 base=comm_base[port];
+  MemSet(&comm_ports,0,sizeof(comm_ports));
+  comm_ports[1].base=0x3F8;
+  comm_ports[2].base=0x2F8;
+  comm_ports[3].base=0x3E8;
+  comm_ports[4].base=0x2E8;
+  IntEntrySet(0x23,&IRQComm3);
+  IntEntrySet(0x24,&IRQComm4);
+}
+CommInit;
+
+public CComm *CommInit8n1(I64 port,I64 baud)
+{
+  CComm *c=&comm_ports[port];
 
   PUSHFD
   CLI
-  if (comm_fifos[port])
-    FifoU8Del(comm_fifos[port]);
-  comm_fifos[port]=FifoU8New(256);
-  OutU8(base+UART_LCR,0);     //Set for IER
-  OutU8(base+UART_IER,0);     //Disable all IRQ
-  OutU8(base+UART_LCR,0x80);  //Enable baud rate control
-  OutU8(base+UART_BRDL,(0x180/(baud/300)) & 0xFF); //LSB
-  OutU8(base+UART_BRDH,(0x180/(baud/300)) / 256);  //MSB
-  OutU8(base+UART_LCR,3);     // 8-none-1
+  if (LBts(&c->flags,COMf_ENABLED)) {
+    FifoU8Del(c->RX_fifo);
+    FifoU8Del(c->TX_fifo);
+  }
+  c->RX_fifo=FifoU8New(256);
+  c->TX_fifo=FifoU8New(256);
+  OutU8(c->base+UART_LCR,0);	//Set for IER
+  OutU8(c->base+UART_IER,0);	//Disable all IRQ
+  OutU8(c->base+UART_LCR,0x80);	//Enable baud rate control
+  OutU8(c->base+UART_BRDL,(0x180/(baud/300)) & 0xFF);	//LSB
+  OutU8(c->base+UART_BRDH,(0x180/(baud/300)) / 256);	//MSB
+  OutU8(c->base+UART_LCR,3);	//8-none-1
 
-  InU8(base+UART_RDR);	//read garbage
-  InU8(base+UART_LSR);
+  InU8(c->base+UART_RDR);	//read garbage
+  InU8(c->base+UART_LSR);
 
-  OutU8(base+UART_MCR,4);
-  OutU8(base+UART_IER,0);     //Disable all IRQ
-  OutU8(base+UART_MCR,0xA);	  //out2 and rts
-  OutU8(0x21,InU8(0x21) & (0xFF-0x18)); //Enable 8259 IRQ 3 & 4
-  OutU8(base+UART_IER,1);	  //Enable RX IRQ
+  OutU8(c->base+UART_MCR,4);
+  OutU8(c->base+UART_IER,0);	//Disable all IRQ
+  OutU8(c->base+UART_MCR,0xA);	//out2 and rts
+  OutU8(0x21,InU8(0x21) & (0xFF-0x18));	//Enable 8259 IRQ 3 & 4
+  OutU8(c->base+UART_IER,1);	//RX but no THR empty
   POPFD
+
+  return c;
 }
 
-public U0 CommBusyPutChar(I64 port,U8 b)
+public U0 CommPutChar(I64 port,U8 b)
 {
-  I64 base=comm_base[port];
-  while (!(InU8(base+UART_LSR) & 0x20))
-    Yield;
-  OutU8(base+UART_THR,b);
-  while (!(InU8(base+UART_LSR) & 0x20))
-    Yield;
+  CComm *c=&comm_ports[port];
+  PUSHFD
+  CLI
+  FifoU8Ins(c->TX_fifo,b);
+  OutU8(c->base+UART_IER,3);	//RX and THR empty
+  POPFD
+  Sleep(10); //!!! Remove this line!!!	Linux echo_socket is too slow.
 }
 
-public U0 CommBusyPutS(I64 port,U8 *st)
+U0 CommPutS(I64 port,U8 *st)
 {
-  I64 b,base=comm_base[port];
-  while (b=*(st++)) {
-    while (!(InU8(base+UART_LSR) & 0x20))
-      Yield;
-    OutU8(base+UART_THR,b);
-  }
-  while (!(InU8(base+UART_LSR) & 0x20))
-    Yield;
+  I64 b;
+  while (b=*st++)
+    CommPutChar(port,b);
 }
 
-public U0 CommBusyWriteBlk(I64 port,U8 *buf,I64 count)
+public U0 CommPutBlk(I64 port,U8 *buf,I64 cnt)
 {
-  I64 base=comm_base[port];
-  while (count--) {
-    while (!(InU8(base+UART_LSR) & 0x20))
-      Yield;
-    OutU8(base+UART_THR,*(buf++));
-  }
-  while (!(InU8(base+UART_LSR) & 0x20))
-    Yield;
+  while (cnt--)
+    CommPutChar(port,*buf++);
 }
 
-#help_index ""
+public U0 CommPrint(I64 port,U8 *fmt,...)
+{
+  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
+  CommPutS(port,buf);
+  Free(buf);
+}
