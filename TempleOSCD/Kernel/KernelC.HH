@@ -228,6 +228,7 @@ public extern U0 VGAFlush();
 #help_index "Debugging;Debugging/Debugger"
 public extern U0 Dbg(U8 *msg=NULL,I64 msg_num=0);
 public extern U0 Panic(U8 *msg=NULL,I64 msg_num=0,Bool panic=TRUE);
+
 #help_index "Define;Char/Define"
 #help_file "::/Doc/Define"
 public extern U8 *Define(U8 *dname);
@@ -657,7 +658,6 @@ public _extern SYS_PCI_SERVICES
 #help_index "PCI;Info;File/System;Devices"
 public extern I64 ATARep(Bool pmt=TRUE,
 	Bool just_ide=FALSE,CATARep **_head=NULL);
-
 #help_index "Processor"
 public extern U8 *IntEntryGet(I64 irq);
 public extern U8 *IntEntrySet(I64 irq,
