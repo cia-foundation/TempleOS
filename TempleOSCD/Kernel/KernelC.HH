@@ -658,6 +658,7 @@ public _extern SYS_PCI_SERVICES
 #help_index "PCI;Info;File/System;Devices"
 public extern I64 ATARep(Bool pmt=TRUE,
 	Bool just_ide=FALSE,CATARep **_head=NULL);
+
 #help_index "Processor"
 public extern U8 *IntEntryGet(I64 irq);
 public extern U8 *IntEntrySet(I64 irq,

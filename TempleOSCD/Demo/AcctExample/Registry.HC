@@ -51,9 +51,6 @@ $ID,2$F64 best_score=43.9944;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
 progress3_tf=0.000;progress4_tf=228.734;
-$ID,-2$$TR,"TOSRegen"$
-$ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=197.584;
 $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"XCaliber"$
@@ -63,6 +60,9 @@ $ID,-2$$TR,"Talons"$
 $ID,2$F64 best_score=9999.0000;
 $ID,-2$$TR,"BomberGolf"$
 $ID,2$I64 best_score=175;
+$ID,-2$$TR,"TOSRegen"$
+$ID,2$progress1_tf=0.000;progress2_tf=0.000;
+progress3_tf=0.000;progress4_tf=185.280;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$

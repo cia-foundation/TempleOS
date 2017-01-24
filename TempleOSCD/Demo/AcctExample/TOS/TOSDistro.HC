@@ -575,6 +575,22 @@ public U0 TOSPreRegen()
   Copy("D:/Home/Sup1/Sup1Bin/God*","C:/Linux");
 }
 
+public U0 TOSSongsIn()
+{//Copy songs from D:/Home/Sup1 to C:/Home/Sup1
+  Del("C:/Home/Sup1/Sup1Hymns/*");
+  Del("C:/Home/Sup1/Sup1Songs/*");
+  Copy("D:/Home/Sup1/Sup1Hymns/*","C:/Home/Sup1/Sup1Hymns");
+  Copy("D:/Home/Sup1/Sup1Songs/*","C:/Home/Sup1/Sup1Songs");
+}
+
+public U0 TOSSongsOut()
+{//Copy songs from C:/Home/Sup1 to D:/Home/Sup1
+  Del("D:/Home/Sup1/Sup1Hymns/*");
+  Del("D:/Home/Sup1/Sup1Songs/*");
+  Copy("C:/Home/Sup1/Sup1Hymns/*","D:/Home/Sup1/Sup1Hymns");
+  Copy("C:/Home/Sup1/Sup1Songs/*","D:/Home/Sup1/Sup1Songs");
+}
+
 U0 TOSRegen2()
 {
   TOSChgLog; //$LK,"::/Doc/ChgLog.DD"$ datetime matches Kernel $LK,"sys_compile_time",A="MN:sys_compile_time"$.

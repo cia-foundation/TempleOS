@@ -11,7 +11,7 @@ U0 LoadDocDefines()
   //This is cut and replaced when I generate a distro.
   //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
   $TR-C,"LineRep"$
-  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,747");
+  $ID,4$DefinePrint("DD_TEMPLEOS_LOC","119,763");
 DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","81,933");
 $ID,-4$
   DefinePrint("DD_KERNEL","%08X",bfh);
