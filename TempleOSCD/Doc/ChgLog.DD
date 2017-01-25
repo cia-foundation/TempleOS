@@ -2,7 +2,8 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/24/17 18:15:33----$IV,0$
+$IV,1$----01/24/17 21:56:06----$IV,0$
+* Improved $LK,"::/Apps/Psalmody/JukeBox.HC"$
 * $LK,"R",A="MN:R"$("TreeBranch","Tree");
 * Added $LK,"DocTreeWrite",A="MN:DocTreeWrite"$() and $LK,"DocTreeAppend",A="MN:DocTreeAppend"$().
 

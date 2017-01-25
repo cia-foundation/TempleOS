@@ -80,7 +80,6 @@ public U0 FrameGrabberToggle()
 
 public U0 JukeSong(I64 num)
 {//Make movie of one song.
-  AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,num,num+1);
@@ -90,7 +89,6 @@ public U0 JukeSong(I64 num)
 
 public U0 JukeLines(I64 start_line,I64 end_line)
 {//Make movie of many lines of songs.
-  AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
@@ -185,16 +183,6 @@ U0 TOSTheme()
     PopUp("Sleep(50);FrameGrabberToggle;");
   ExeFile("~/Sup1/Sup1Graphics/TOS/TOSTheme.HC");
   DocClear;
-}
-
-U0 TOSJukeVideo(I64 start=0,I64 end=10)
-{
-  U8 *buf=FileRead("::/Misc/Bible.TXT.Z"); //Put in cache
-  Free(buf);
-  AutoComplete;
-  FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start,end);
-  FrameGrabberToggle;
 }
 
 #define MEM_TEST_SIZE	1024*1024

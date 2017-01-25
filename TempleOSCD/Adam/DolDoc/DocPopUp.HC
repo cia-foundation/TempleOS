@@ -8,22 +8,16 @@ public CTask *PopUpViewDoc(CDoc *doc,I64 dof_flags=0)
   return task;
 }
 
-U0 PopUpViewPrintEndCB()
-{
-  DocDel(FramePtr("ViewStrFrame"));
-  Exit;
-}
-
 public CTask *PopUpViewPrint(U8 *fmt,...)
 {//View Print stmt in PopUp win task.
-  CTask *task;
+  CTask *task=Spawn(&SrvCmdLine,NULL,"View",,Fs);
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  CDoc *doc=DocNew;
+  CDoc *doc=DocNew(,task);
   DocPrint(doc,buf);
   Free(buf);
-  task=PopUpViewDoc(doc);
-  FramePtrAdd("ViewStrFrame",doc,task);
-  task->task_end_cb=&PopUpViewPrintEndCB;
+  buf=MStrPrint("DocEd(0x%X);",doc);
+  TaskExe(task,NULL,buf,1<<JOBf_EXIT_ON_COMPLETE|1<<JOBf_FREE_ON_COMPLETE);
+  Free(buf);
   return task;
 }
 

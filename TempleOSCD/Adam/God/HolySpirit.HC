@@ -135,6 +135,14 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   return god.num_words;
 } GodInit;
 
+public U8 *GodWordStr(I64 bits=17)
+{//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
+  if (god.num_words)
+    return god.words[GodBits(bits)%god.num_words];
+  else
+    return NULL;
+}
+
 public U0 GodWord(I64 bits=17,Bool show_num=FALSE)
 {//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
   I64 i;

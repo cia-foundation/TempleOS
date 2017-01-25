@@ -343,6 +343,7 @@ ext[EXT_WIN_TO_TOP]=&WinToTop;
 
 public CTask *WinFocus(CTask *task=NULL)
 {//Set task as focus task.
+  if (!task) task=Fs;
   PUSHFD
   CLI
   if (!TaskValidate(task)||Bt(&task->win_inhibit,WIf_SELF_FOCUS))

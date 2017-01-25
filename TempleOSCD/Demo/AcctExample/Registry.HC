@@ -62,7 +62,7 @@ $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=186.240;
+progress3_tf=0.000;progress4_tf=196.900;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$

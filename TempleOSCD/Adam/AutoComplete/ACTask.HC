@@ -222,8 +222,7 @@ U0 ACTask(I64)
   LBts(&Fs->display_flags,DISPLAYf_SHOW);
   WinHorz(51,Fs->win_right);
   LBts(&Fs->display_flags,DISPLAYf_WIN_ON_TOP);
-  Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_BORDER
-	-WIF_SELF_MS_L-WIF_SELF_MS_R-WIG_DBL_CLICK;
+  Fs->win_inhibit=WIG_NO_FOCUS_TASK_DFT;
   Free(ac.cur_word);
   ac.cur_word=NULL;
   while (TRUE) {
