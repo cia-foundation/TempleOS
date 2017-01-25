@@ -31,7 +31,7 @@ $ID,2$F64 best_score=4.9425;
 $ID,-2$$TR,"TOSNIST"$
 $ID,2$I64 tos_nist_offset=-8049;
 $ID,-2$$TR,"BlackDiamond"$
-$ID,2$I64 best_score=1;
+$ID,2$I64 best_score=23;
 $ID,-2$$TR,"DunGen"$
 $ID,2$F64 best_score=20.5295;
 $ID,-2$$TR,"CastleFrankenstein"$
@@ -51,8 +51,6 @@ $ID,2$F64 best_score=43.9944;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
 progress3_tf=0.000;progress4_tf=228.734;
-$ID,-2$$TR,"Titanium"$
-$ID,2$I64 best_score=16469;
 $ID,-2$$TR,"XCaliber"$
 $ID,2$I64 best_score=90;
 I64 msg_flags=2;
@@ -60,15 +58,12 @@ $ID,-2$$TR,"Talons"$
 $ID,2$F64 best_score=9999.0000;
 $ID,-2$$TR,"BomberGolf"$
 $ID,2$I64 best_score=175;
+$ID,-2$$TR,"Titanium"$
+$ID,2$I64 best_score=16469;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=185.280;
+progress3_tf=0.000;progress4_tf=186.240;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$
-$ID,2$$ID,-2$$ID,-2$$TR,"DemoCompany"$
-$ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=1735.08564;
-$TR,"SimpleVal"$
-$ID,2$1236;
-$ID,-2$$ID,-2$$ID,-2$
+$ID,2$$ID,-2$$ID,-2$

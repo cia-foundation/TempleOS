@@ -189,7 +189,6 @@ I64 MakeLineRepFile()
   U8 *st;
   CDoc *doc;
   I64 res,official;
-  CDocEntry *tree_branch,*start_indent,*end_indent;
 
   DocClear;
   Drv('C');
@@ -219,15 +218,10 @@ I64 MakeLineRepFile()
   CopyTree("B:/TOS/TOS","C:/Home");
   DelTree("B:/TOS/TOS");
 
-  doc=DocRead("C:/Adam/ADefine.HC.Z");
-  DocTreeFind(doc,"LineRep",&tree_branch,&start_indent,&end_indent);
-  DocCut(doc,start_indent->next,end_indent->last);
-  doc->cur_entry=start_indent->next;
-  doc->cur_col=0;
-  DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",res);
-  DocPrint(doc,"DefinePrint(\"DD_TEMPLEOS_LOC_OFFICIAL\",\"%,d\");\n",official);
-  DocWrite(doc);
-  DocDel(doc);
+  DocTreeFWrite("C:/Adam/ADefine.HC.Z","LineRep",
+	"DefinePrint(\"DD_TEMPLEOS_LOC\",\"%,d\");\n",res);
+  DocTreeFAppend("C:/Adam/ADefine.HC.Z","LineRep",
+	"DefinePrint(\"DD_TEMPLEOS_LOC_OFFICIAL\",\"%,d\");\n",official);
 
   DefinePrint("DD_TEMPLEOS_LOC","%,d",res);
   DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","%,d",official);
@@ -573,6 +567,18 @@ public U0 TOSPreRegen()
   Copy("D:/Home/Sup1/Sup1CodeScraps/Comm/TOSSocket*",
 	"C:/Home/Sup1/Sup1CodeScraps/Comm");
   Copy("D:/Home/Sup1/Sup1Bin/God*","C:/Linux");
+}
+
+public U0 TOSHomeIn()
+{//Copy D:/Home to C:/Home
+  DelTree("C:/Home");
+  CopyTree("D:/Home","C:/Home");
+}
+
+public U0 TOSHomeOut()
+{//Copy C:/Home to D:/Home
+  DelTree("D:/Home");
+  CopyTree("C:/Home","D:/Home");
 }
 
 public U0 TOSSongsIn()

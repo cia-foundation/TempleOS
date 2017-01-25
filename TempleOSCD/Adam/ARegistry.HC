@@ -43,26 +43,14 @@ public Bool RegDft(U8 *path,U8 *val,Bool is_adam_entry=FALSE)
 public I64 RegExe(U8 *path)
 {//Execute doc tree branch in registry.
   RegCache;
-  return DocTreeBranchExe(sys_registry_doc,path);
+  return DocTreeExe(sys_registry_doc,path);
 }
 
 public Bool RegWrite(U8 *path,U8 *fmt,...)
 {//Rewrite doc tree branch in registry.
-  Bool res,unlock_doc;
-  CDocEntry *tree_branch,*start_indent,*end_indent;
-  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
+  Bool res;
   RegCache;
-  unlock_doc=DocLock(sys_registry_doc);
-  if (res=DocTreeFind(sys_registry_doc,path,
-	&tree_branch,&start_indent,&end_indent))
-    DocCut(sys_registry_doc,tree_branch,end_indent);
-  DocTreeMake(sys_registry_doc,path);
-  DocPrint(sys_registry_doc,"%s",buf);
-  if (DrvIsWritable(*sys_registry_doc->filename.name))
-    DocWrite(sys_registry_doc);
-  if (unlock_doc)
-    DocUnlock(sys_registry_doc);
-  Free(buf);
+  res=DocTreeWriteJoin(sys_registry_doc,path,TRUE,fmt,argc,argv);
   return res;
 }
 
@@ -85,24 +73,10 @@ public I64 RegCnt(U8 *path)
 }
 
 public Bool RegAppend(U8 *path,U8 *fmt,...)
-{//Rewrite doc tree branch in registry.
-  Bool res,unlock_doc;
-  CDocEntry *tree_branch,*start_indent,*end_indent;
-  U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
+{//Append to doc tree branch in registry.
+  Bool res;
   RegCache;
-  unlock_doc=DocLock(sys_registry_doc);
-  if (res=DocTreeFind(sys_registry_doc,path,
-	&tree_branch,&start_indent,&end_indent)) {
-    sys_registry_doc->cur_entry=end_indent;
-    sys_registry_doc->cur_col=sys_registry_doc->cur_entry->min_col;
-  } else
-    DocTreeMake(sys_registry_doc,path);
-  DocPrint(sys_registry_doc,"%s",buf);
-  if (DrvIsWritable(*sys_registry_doc->filename.name))
-    DocWrite(sys_registry_doc);
-  if (unlock_doc)
-    DocUnlock(sys_registry_doc);
-  Free(buf);
+  res=DocTreeAppendJoin(sys_registry_doc,path,TRUE,fmt,argc,argv);
   return res;
 }
  

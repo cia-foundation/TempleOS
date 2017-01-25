@@ -87,17 +87,18 @@ public U0 DocCut(CDoc *doc,CDocEntry *start,CDocEntry *end)
 {//Del start to end entry, including end points.
   Bool unlock_doc=DocLock(doc);
   CDocEntry *doc_e1;
-  while (start!=doc) {
-    doc_e1=start->next;
-    if (start==doc->cur_entry) {
-      doc->cur_entry=start->next;
-      doc->cur_col=doc->cur_entry->min_col;
-    }
-    DocEntryDel(doc,start);
-    if (start==end)
-      break;
-    start=doc_e1;
-  }
+  if (start!=doc && (start->last!=end || end==doc))
+    do {
+      doc_e1=start->next;
+      if (start==doc->cur_entry) {
+	doc->cur_entry=start->next;
+	doc->cur_col=doc->cur_entry->min_col;
+      }
+      DocEntryDel(doc,start);
+      if (start==end)
+	break;
+      start=doc_e1;
+    } while (start!=doc);
   DocRemSoftNewLines(doc,NULL);
   if (unlock_doc)
     DocUnlock(doc);
@@ -108,15 +109,16 @@ public CDoc *DocCopy(CDoc *doc,CDocEntry *start,CDocEntry *end)
   CDoc *doc2=DocNew;
   Bool unlock_doc=DocLock(doc);
   CDocEntry *doc_ne;
-  while (start!=doc) {
-    if (!Bt(doldoc.type_flags_data,start->type_u8)) {
-      doc_ne=DocEntryCopy(doc2,start);
-      QueIns(doc_ne,doc2->head.last);
-    }
-    if (start==end)
-      break;
-    start=start->next;
-  }
+  if (start!=doc && (start->last!=end || end==doc))
+    do {
+      if (!Bt(doldoc.type_flags_data,start->type_u8)) {
+	doc_ne=DocEntryCopy(doc2,start);
+	QueIns(doc_ne,doc2->head.last);
+      }
+      if (start==end)
+	break;
+      start=start->next;
+    } while (start!=doc);
   if (unlock_doc)
     DocUnlock(doc);
   return doc2;
