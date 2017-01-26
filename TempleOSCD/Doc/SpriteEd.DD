@@ -4,4 +4,4 @@ Order of elements matters.  They are executed in the order they appear in the si
 
 You can set the current insert point element by clicking the element in the side-bar and making it RED.
 
-$FG,2$Insert Shift Suborigin$FG$ is an element which shifts subsequent elements.  Perhaps, you inserted a sprite's elements from the clipboard and want to shift it around?  This command is also useful if you call $LK,"SpriteInterpolate",A="MN:SpriteInterpolate"$() in programs.
+$FG,2$Insert Shift Suborigin$FG$ is an element which shifts subsequent elements.  Perhaps, you inserted a sprite's elements from the clip and want to shift it around?  This command is also useful if you call $LK,"SpriteInterpolate",A="MN:SpriteInterpolate"$() in programs.

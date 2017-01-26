@@ -12,9 +12,9 @@ U0 Rev(U8 *in_name,U8 *out_name)
   DocTop(doc_in);
   while (doc_in->head.next!=doc_in) {
     EdLineDown(doc_in,SC_CURSOR_DOWN|SCF_SHIFT);
-    EdCutToClipboard(doc_in);
+    ClipCut(doc_in);
     DocTop(doc_out);
-    EdPasteClipboard(doc_out);
+    ClipPaste(doc_out);
   }
   DocWrite(doc_out);
 }

@@ -178,7 +178,7 @@ U8 *FileDblRead(U8 *filename,I64 line)
 {//FileDbl's are DolDoc files with 2-line entries.
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocLineNumGoTo(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
+  if (DocGoToLine(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
     res=StrNew(doc->cur_entry->tag);
   DocDel(doc);
   return res;
@@ -188,7 +188,7 @@ U8 *FileDblWrite(U8 *filename,I64 line,U8 *st)
 {//FileDbl's are DolDoc files with 2-line entries.
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocLineNumGoTo(doc,line-1)) {
+  if (DocGoToLine(doc,line-1)) {
     if (doc->cur_entry->type_u8==DOCT_TEXT) {
       Free(doc->cur_entry->tag);
       doc->cur_entry->tag=StrNew(st);

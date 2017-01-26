@@ -71,7 +71,7 @@ I64 BlkDevsSize()
       j=(bd->max_blk+1)<<BLK_SIZE_BITS;
       if (bd->type==BDT_RAM)
 	"RAMDsk %C\t:%010X/%010X\n",
-	      bd->first_drv_let,j-UnusedDrvSpace(bd->first_drv_let),j;
+	      bd->first_drv_let,j-DrvUnused(bd->first_drv_let),j;
       res+=MSize2(bd->dev_id_record);
     }
   }
@@ -172,7 +172,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
       "DskCache\t:%010X\n",
 	    MSize2(blkdev.cache_base)+MSize2(blkdev.cache_hash_table)+
 	    MSize2(blkdev.cache_ctrl);
-    "Clipboard\t:%010X\n",DocSize(sys_clipboard_doc);
+    "Clip\t:%010X\n",DocSize(sys_clip_doc);
     "AutoComplete:%010X\n",CallExtStr("AutoCompleteSize");
     "gr.to_8_bits\t:%010X\n",MSize2(gr.to_8_bits);
     "gr.to_8_colors\t:%010X\n",MSize2(gr.to_8_colors);

@@ -9,7 +9,7 @@ U8 *YouTubeGet(U8 *filename="~/Sup1/Sup1Blog/YouTube.DD.Z",U8 *needle)
   while (DocFind(doc,line,needle)) {
     if (!(doc->cur_entry->y&1)) {
       title=doc->cur_entry->tag;
-      DocLineNumGoTo(doc,doc->cur_entry->y+2);
+      DocGoToLine(doc,doc->cur_entry->y+2);
       if (doc->cur_entry->type_u8==DOCT_TEXT) {
 	code=doc->cur_entry->tag;
 	DocPrint(doc2,"$$MU-UL,\"%s\",LE=0x%X$$\n",title,code);

@@ -1,19 +1,19 @@
-#help_index "DolDoc/Clipboard"
+#help_index "DolDoc/Clip"
 
-sys_clipboard_doc=DocNew;
+sys_clip_doc=DocNew;
 
-public U0 ClipboardDel()
-{//Delete everything on clipboard.
-  DocRst(sys_clipboard_doc,TRUE);
+public U0 ClipDel()
+{//Delete everything on clip.
+  DocRst(sys_clip_doc,TRUE);
 }
 
-public U0 EdCopyToClipboard(CDoc *doc)
-{//Copy $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ flagged entries to clipboard.
-  CDoc *doc2=sys_clipboard_doc;
+public U0 ClipCopy(CDoc *doc)
+{//Copy $LK,"DOCET_SEL",A="MN:DOCET_SEL"$ flagged entries to clip.
+  CDoc *doc2=sys_clip_doc;
   Bool unlock_doc=DocLock(doc),
 	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_e=doc->head.next,*doc_ne;
-  ClipboardDel;
+  ClipDel;
   while (doc_e!=doc) {
     if (doc_e->type & DOCET_SEL) {
       doc_e->type&=~DOCET_SEL;
@@ -30,13 +30,13 @@ public U0 EdCopyToClipboard(CDoc *doc)
     DocUnlock(doc);
 }
 
-public U0 EdCutToClipboard(CDoc *doc)
-{//Remove sel entries and place on clipboard.
-  CDoc *doc2=sys_clipboard_doc;
+public U0 ClipCut(CDoc *doc)
+{//Remove sel entries and place on clip.
+  CDoc *doc2=sys_clip_doc;
   Bool unlock_doc=DocLock(doc),
 	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_e=doc->head.next,*doc_e1,*doc_ne,*doc_e2=NULL;
-  ClipboardDel;
+  ClipDel;
   while (doc_e!=doc) {
     doc_e1=doc_e->next;
     if (doc_e->type & DOCET_SEL) {
@@ -62,9 +62,9 @@ public U0 EdCutToClipboard(CDoc *doc)
     DocUnlock(doc);
 }
 
-public U0 EdPasteClipboard(CDoc *doc)
-{//Insert copy of clipboard at insert pt, cur_entry.
-  CDoc *doc2=sys_clipboard_doc;
+public U0 ClipPaste(CDoc *doc)
+{//Insert copy of clip at insert pt, cur_entry.
+  CDoc *doc2=sys_clip_doc;
   Bool unlock_doc=DocLock(doc),
 	unlock_doc2=DocLock(doc2);
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;

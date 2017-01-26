@@ -25,6 +25,7 @@ $FG,2$CB$FG$	Call-Back, Code Block
 $FG,2$Cfg$FG$	Config
 $FG,2$Chg$FG$	Change
 $FG,2$Chk$FG$	Check
+$FG,2$Clip$FG$	Clipboard
 $FG,2$Clus$FG$	Cluster
 $FG,2$Cmd$FG$	Command
 $FG,2$Cmp$FG$	Compiler

@@ -3865,7 +3865,7 @@ public class CDbgGlbls
 #help_index "Registry"
 //Registry sys_msg_flags. $LK,"RegOneTimePopUp",A="MN:RegOneTimePopUp"$()
 #define ARf_FLOODFILL			0
-#define ARf_CSPRITE_INS_CLIPBOARD	1
+#define ARf_CSPRITE_INS_CLIP		1
 #define ARf_PLANAR_SYMMETRY		2
 #define ARf_PSALMODY_JUKEBOX		3
 #define ARf_MESH_ED			4

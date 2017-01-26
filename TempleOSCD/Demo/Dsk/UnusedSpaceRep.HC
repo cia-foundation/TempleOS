@@ -6,7 +6,7 @@ U0 UnusedSpaceRep()
     if ((dv=Let2Drv(i+'A',FALSE)) &&
 	  (dv->fs_type==FSt_FAT32 || dv->fs_type==FSt_REDSEA))
       "%C: %7.3f%% Free\n",
-	    Drv2Let(dv),UnusedDrvSpace(Drv2Let(dv))*100.0/(dv->size*BLK_SIZE);
+	    Drv2Let(dv),DrvUnused(Drv2Let(dv))*100.0/(dv->size*BLK_SIZE);
 }
 
 UnusedSpaceRep;

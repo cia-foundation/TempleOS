@@ -369,7 +369,7 @@ U0 Psalmody(U8 *dirname="~/Psalmody")
   MemSet(&psm,0,sizeof(PsmCtrl));
   psm.scrn_x=0;
   psm.head.next=psm.head.last=&psm.head;
-  psm.clipboard.next=psm.clipboard.last=&psm.clipboard;
+  psm.clip.next=psm.clip.last=&psm.clip;
   psm.cur_note=&psm.head;
   psm.dc2=DCAlias;
 
@@ -543,7 +543,7 @@ mo_got_msg:
 		    break;
 		  case SC_DELETE:
 		    if (arg2&SCF_SHIFT)
-		      PsmCutToClipboard;
+		      PsmCutToClip;
 		    else {
 		      tmpn=psm.cur_note;
 		      psm.cur_note=tmpn->next;
@@ -555,9 +555,9 @@ mo_got_msg:
 		    break;
 		  case SC_INS:
 		    if (arg2&SCF_SHIFT)
-		      PsmPasteClipboard;
+		      PsmPasteClip;
 		    else if (arg2&SCF_CTRL)
-		      PsmCopyToClipboard;
+		      PsmCopyToClip;
 		    break;
 		  case SC_F1:
 		    PsmPopMode;
@@ -609,13 +609,13 @@ mo_got_msg:
 		PsmPushMode(psm_octave);
 		break;
 	      case CH_CTRLC:
-		PsmCopyToClipboard;
+		PsmCopyToClip;
 		break;
 	      case CH_CTRLV:
-		PsmPasteClipboard;
+		PsmPasteClip;
 		break;
 	      case CH_CTRLX:
-		PsmCutToClipboard;
+		PsmCutToClip;
 		break;
 	      case '.':
 		PsmMenu(psm_octave);
@@ -786,7 +786,7 @@ mo_done:
     PutExcept;
   PsmPopMode;
   PsmSongDel(&psm.head);
-  PsmSongDel(&psm.clipboard);
+  PsmSongDel(&psm.clip);
   TempoDel(c);
   DCFill;
   DCDel(psm.dc2);

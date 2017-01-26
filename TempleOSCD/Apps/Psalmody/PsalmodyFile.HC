@@ -26,10 +26,10 @@ U0 PsmSongDel(PsmNote *head)
   QueInit(head);
 }
 
-U0 PsmCutToClipboard()
+U0 PsmCutToClip()
 {
   PsmNote *tmpn,*tmpn1;
-  PsmSongDel(&psm.clipboard);
+  PsmSongDel(&psm.clip);
   tmpn=psm.head.next;
   while (tmpn!=&psm.head) {
     tmpn1=tmpn->next;
@@ -38,33 +38,33 @@ U0 PsmCutToClipboard()
 	psm.cur_note=tmpn->next;
       QueRem(tmpn);
       tmpn->flags&=~PSMF_SEL;
-      QueIns(tmpn,psm.clipboard.last);
+      QueIns(tmpn,psm.clip.last);
     }
     tmpn=tmpn1;
   }
 }
 
-U0 PsmPasteClipboard()
+U0 PsmPasteClip()
 {
   PsmNote *tmpn,*tmpn1;
-  tmpn=psm.clipboard.next;
-  while (tmpn!=&psm.clipboard) {
+  tmpn=psm.clip.next;
+  while (tmpn!=&psm.clip) {
     tmpn1=PsmNoteCopy(tmpn);
     QueIns(tmpn1,psm.cur_note->last);
     tmpn=tmpn->next;
   }
 }
 
-U0 PsmCopyToClipboard()
+U0 PsmCopyToClip()
 {
   PsmNote *tmpn,*tmpn1;
-  PsmSongDel(&psm.clipboard);
+  PsmSongDel(&psm.clip);
   tmpn=psm.head.next;
   while (tmpn!=&psm.head) {
     if (tmpn->flags&PSMF_SEL) {
       tmpn->flags&=~PSMF_SEL;
       tmpn1=PsmNoteCopy(tmpn);
-      QueIns(tmpn1,psm.clipboard.last);
+      QueIns(tmpn1,psm.clip.last);
     }
     tmpn=tmpn->next;
   }

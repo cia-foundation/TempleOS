@@ -219,17 +219,17 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'l':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Edit/Put Link to Cur Pos on Clipboard");
+	  KeyDescSet("Edit/Put Link to Cur Pos on Clip");
 	else {
-	  ClipboardDel;
+	  ClipDel;
 	  st1=FileNameAbs(BIBLE_FILENAME);
 	  st2=FileNameAbs(DocPut->filename.name);
 	  if (!StrCmp(st1,st2)) {
 	    Free(st1);
 	    st1=BibleLine2Verse(DocPut->cur_entry->y+1,',');
-	    DocPrint(sys_clipboard_doc,"$$LK,\"BF:%s\"$$",st1);
+	    DocPrint(sys_clip_doc,"$$LK,\"BF:%s\"$$",st1);
 	  } else
-	    DocPrint(sys_clipboard_doc,"$$LK,\"FL:%s,%d\"$$",
+	    DocPrint(sys_clip_doc,"$$LK,\"FL:%s,%d\"$$",
 		  st2,DocPut->cur_entry->y+1);
 	  Free(st1);
 	  Free(st2);
@@ -237,11 +237,11 @@ Bool MyPutKey(I64 ch,I64 sc)
 	return TRUE;
       case 'L':
 	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Edit/Place Anchor, Put Link to Clipboard");
+	  KeyDescSet("Edit/Place Anchor, Put Link to Clip");
 	else {
 	  i=RandU32;
-	  ClipboardDel;
-	  DocPrint(sys_clipboard_doc,"$$LK,\"<TODO>\",A=\"FA:%s,ANC%d\"$$",
+	  ClipDel;
+	  DocPrint(sys_clip_doc,"$$LK,\"<TODO>\",A=\"FA:%s,ANC%d\"$$",
 		DocPut->filename.name,i);
 	  "$$AN,\"<TODO>\",A=\"ANC%d\"$$",i;
 	}

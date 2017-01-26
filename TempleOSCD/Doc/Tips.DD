@@ -71,7 +71,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $FG,2$<CTRL-ALT-f>$FG$ to toggle between $LK,"Std Font",A="FI:::/Kernel/FontStd.HC"$ and $LK,"Cyrillic Font",A="FI:::/Kernel/FontCyrillic.HC"$.
 
-* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clipboard.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
+* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clip.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
 
 * You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 

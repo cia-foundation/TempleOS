@@ -158,7 +158,7 @@ public U8 *BibleLine2Verse(I64 line,I64 separate_ch=CH_SPACE)
   }
   if (0<=--i<cnt) {
     doc=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
-    DocLineNumGoTo(doc,line); //one based
+    DocGoToLine(doc,line); //one based
     doc_e=doc->cur_entry;
     while (doc_e!=doc && (doc_e->type_u8!=DOCT_TEXT || !*doc_e->tag))
       doc_e=doc_e->next;
@@ -222,7 +222,7 @@ public U0 BookLines(CDoc *doc_out=NULL,I64 start,I64 lines,
   if (!doc_out) doc_out=DocPut;
   if (doc_out && FileFind(book_filename)) {
     doc_in=DocRead(book_filename,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
-    DocLineNumGoTo(doc_in,start); //one based
+    DocGoToLine(doc_in,start); //one based
     doc_e=doc_in->cur_entry;
     while (lines>0 && doc_e!=doc_in) {
       if (doc_e->type_u8==DOCT_TEXT)
@@ -255,7 +255,7 @@ public U0 BibleVerse(CDoc *doc_out=NULL,U8 *verse,I64 lines)
     if (i>=0) {
       i=Str2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
       doc_in=DocRead(BIBLE_FILENAME,DOCF_PLAIN_TEXT|DOCF_NO_CURSOR);
-      DocLineNumGoTo(doc_in,i); //one based
+      DocGoToLine(doc_in,i); //one based
       if (*st2) {
 	StrCpy(doc_in->find_replace->find_text,st2);
 	EdFindNext(doc_in);

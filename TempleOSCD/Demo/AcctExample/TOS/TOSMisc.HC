@@ -48,7 +48,7 @@ I64 CopyVideo()
     DelTree("D:/Tmp/ScrnShots");
     if (fg_mode==FG_RAM_DRV) {
       res=CopyTree("B:/Tmp/ScrnShots","D:/Tmp/ScrnShots");
-      "Unused Space: %12.6fMeg\n",UnusedDrvSpace('B')/1024.0/1024.0;
+      "Unused Space: %12.6fMeg\n",DrvUnused('B')/1024.0/1024.0;
     } else
       res=CopyTree("::/Tmp/ScrnShots","D:/Tmp/ScrnShots");
     "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",

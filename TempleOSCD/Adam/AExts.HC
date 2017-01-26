@@ -7,7 +7,7 @@ extern U0 ACMisspelledFind(CDoc *doc);
 extern I64 AdamFile(U8 *filename,Bool warn_ext=TRUE);
 extern Bool AutoComplete(Bool val=OFF);
 extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
-extern U0 ClipboardDel();
+extern U0 ClipDel();
 extern CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type);
 extern Bool CtrlInside(CCtrl *c,I64 x,I64 y);
 extern U8 *DC2Sprite(CDC *tmpb);

@@ -7,10 +7,10 @@ $FG,2$<CTRL-y> or <DEL>$FG$
 $ID,2$Delete file or tree.
 $ID,-2$
 $FG,2$<CTRL-c> or <CTRL-INS>$FG$
-$ID,2$Copy select files to clipboard.
+$ID,2$Copy select files to clip.
 $ID,-2$
 $FG,2$<CTRL-v> or <SHIFT-INS>$FG$
-$ID,2$Paste clipboard.
+$ID,2$Paste clip.
 $ID,-2$
 $FG,2$LEFT-CLICK,drag-drop$FG$
 $ID,2$Move a file or tree to a dir.

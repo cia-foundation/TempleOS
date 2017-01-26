@@ -724,7 +724,7 @@ Bool SpriteEdText(CSprite **_head,I64 *_cur_elem_num)
 #define SPED_SET_ORIGIN		10
 #define SPED_SHIFT_SUB_ORIGIN	11
 #define SPED_TEXT_ED		12
-#define SPED_INS_CLIPBOARD	13
+#define SPED_INS_CLIP		13
 #define SPED_MAIN_MENU		14
 #define SPED_EXIT		15
 
@@ -733,7 +733,7 @@ U0 GrInit3()
   DefineLstLoad("ST_SPRITE_ED_MENU","Select/Unselect All\0 \0Select\0"
 	"Select Rects\0Unselect\0Unselect Rects\0Shift Points\0Shift Rects\0"
 	"Shift Selected\0Transform Selected\0Set Origin\0"
-	"Insert Shift SubOrigin\0Edit as Text\0Insert Clipboard\0Main Menu\0");
+	"Insert Shift SubOrigin\0Edit as Text\0Insert Clip\0Main Menu\0");
 }
 GrInit3;
 
@@ -757,7 +757,7 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 	"$$MU-UL,\"Set Origin\",LE=SPED_SET_ORIGIN$$\n"
 	"$$MU-UL,\"Insert Shift SubOrigin\",LE=SPED_SHIFT_SUB_ORIGIN$$\n\n"
 	"$$MU-UL,\"Edit as Text\",LE=SPED_TEXT_ED$$\n"
-	"$$MU-UL,\"Insert Clipboard Sprite's\",LE=SPED_INS_CLIPBOARD$$\n\n"
+	"$$MU-UL,\"Insert Clip Sprite's\",LE=SPED_INS_CLIP$$\n\n"
 	"$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=SPED_MAIN_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=SPED_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$");
@@ -1218,17 +1218,17 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	  } while (msg_code!=MSG_MS_L_UP);
 	  *_cur_elem_num+=1;
 	  break;
-	case SPED_INS_CLIPBOARD:
-	  RegOneTimePopUp(ARf_CSPRITE_INS_CLIPBOARD,
+	case SPED_INS_CLIP:
+	  RegOneTimePopUp(ARf_CSPRITE_INS_CLIP,
 		"You will probably want to shift around\n"
 		"the location of element groups.  Use\n"
 		"'Insert shift sub-origin' after picking the\n"
 		"element to insert before.  Or,\n"
 		"use 'shift points'.\n");
 	  insert_pt=SpriteSetSettings(,*_head,*_cur_elem_num);
-	  unlock=DocLock(sys_clipboard_doc);
-	  doc_e2=sys_clipboard_doc->head.next;
-	  while (doc_e2!=sys_clipboard_doc) {
+	  unlock=DocLock(sys_clip_doc);
+	  doc_e2=sys_clip_doc->head.next;
+	  while (doc_e2!=sys_clip_doc) {
 	    if (doc_e2->type_u8==DOCT_SPRITE) {
 	      head2=Sprite2SpriteQue(doc_e2->bin_data->data);
 	      if (head2->next!=head2) {
@@ -1249,7 +1249,7 @@ I64 SpriteEd(CDoc *doc,CDocEntry *doc_ce,I64 x,I64 y,
 	    doc_e2=doc_e2->next;
 	  }
 	  if (unlock)
-	    DocUnlock(sys_clipboard_doc);
+	    DocUnlock(sys_clip_doc);
 	  SpriteEdUpdate(doc,doc_ce,*_head);
 	  break;
 	case SPED_TEXT_ED:

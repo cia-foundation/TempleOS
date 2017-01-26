@@ -29,7 +29,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.HC,AD"$ search string.
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
 
-* 11/19/16 editor took long time after copying old testament onto clipboard and exiting.
+* 11/19/16 editor took long time after copying old testament onto clip and exiting.
 
 * Nestled switch() start/end?
 

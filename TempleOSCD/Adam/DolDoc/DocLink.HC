@@ -127,7 +127,7 @@ Bool DocFileEd(I64 _type,U8 *filename,
       if (res || other_found)
 	switch (type) {
 	  case LK_FILE_LINE:
-	    res=DocLineNumGoTo(doc,*_num);
+	    res=DocGoToLine(doc,*_num);
 	    break;
 	  case LK_FILE_ANCHOR:
 	    res=DocAnchorFind(doc,needle_str);

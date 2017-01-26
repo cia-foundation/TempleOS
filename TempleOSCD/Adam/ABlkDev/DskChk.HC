@@ -421,7 +421,7 @@ I64 FAT32UnusedDrvSpace(U8 drv_let=0)
     DrvUnlock(dv);
   return res*BLK_SIZE*dv->spc;
 }
-public I64 UnusedDrvSpace(U8 drv_let=0)
+public I64 DrvUnused(U8 drv_let=0)
 {//Returns unused size in bytes.
   CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
   U8 *old_dir=StrNew(Fs->cur_dir);

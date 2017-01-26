@@ -62,7 +62,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       if (StrLen(doc_ce->tag)>1)
 	doc_ce->tag[0]=ch;
       doc2=DocRead(tmpde->full_name);
-      DocLineNumGoTo(doc2,1);
+      DocGoToLine(doc2,1);
       doc_e=doc2->cur_entry;
       if (doc_e!=doc2 && doc_e->type_u8==DOCT_TEXT && StrLen(doc_e->tag)>=3) {
 	doc_e->tag[2]=ch;
@@ -73,7 +73,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
     } else if (ch=='r') {
       if (!DocTreeFFind(tmpde->full_name,"Reward1")) {
 	doc2=DocRead(tmpde->full_name);
-	DocLineNumGoTo(doc2,2);
+	DocGoToLine(doc2,2);
 	DocPrint(doc2,
 	      "\n$$TR,\"Reward1\"$$\n"
 	      "$$ID,2$$CallExtStr(\"JukeReward\",\"\"\n"

@@ -1,6 +1,6 @@
 #help_index "DolDoc/Editor"
 
-public Bool DocLineNumGoTo(CDoc *doc,I64 line_num) //one based
+public Bool DocGoToLine(CDoc *doc,I64 line_num) //one based
 {//Nearest to specified line num.  Move cur_entry & center.
   Bool res=FALSE,unlock;
   if (doc) {
@@ -30,7 +30,7 @@ U8 *needle,I64 match=1)
       res=TRUE;
       doc_e=haystack_doc->head.next;
     } else {
-      res=DocLineNumGoTo(haystack_doc,start_line_num);
+      res=DocGoToLine(haystack_doc,start_line_num);
       doc_e=haystack_doc->cur_entry;
     }
     if (res) {
@@ -580,5 +580,5 @@ U0 EdGoToLine(CDoc *doc)
   CEdLineGoTo gtl;
   gtl.line=1;
   if (DocForm(&gtl))
-    DocLineNumGoTo(doc,gtl.line);
+    DocGoToLine(doc,gtl.line);
 }

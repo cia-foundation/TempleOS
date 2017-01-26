@@ -2,7 +2,9 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/25/17 19:55:36----$IV,0$
+$IV,1$----01/25/17 20:44:17----$IV,0$
+* $LK,"R",A="MN:R"$("DocLineNumGoto","DocGoToLine");
+* $LK,"R",A="MN:R"$("Clipboard","Clip");
 * $LK,"R",A="MN:R"$("AutoMountIDE","MountIDEAuto");
 * $LK,"R",A="MN:R"$("ChgExt","ExtChg");
 * $LK,"R",A="MN:R"$("DftExt","ExtDft");

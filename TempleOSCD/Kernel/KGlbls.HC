@@ -3,7 +3,7 @@
 
 CJob sys_macro_head;
 CTask *sys_macro_task;
-CDoc *sys_clipboard_doc;
+CDoc *sys_clip_doc;
 
 CTask *adam_task;
 I64 sys_num_spawned_tasks;

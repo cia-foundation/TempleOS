@@ -248,8 +248,8 @@ public extern U8 *Mem64DevAlloc(I64 *_pages1Gig);
 public extern U0 Mem64DevFree(U8 *base,I64 pages1Gig);
 public extern CDevGlbls dev;
 
-#help_index "DolDoc/Clipboard"
-public extern CDoc *sys_clipboard_doc;
+#help_index "DolDoc/Clip"
+public extern CDoc *sys_clip_doc;
 
 #help_index "DolDoc/Task;StdOut/Task"
 #help_file "::/Doc/StdOutTask"
@@ -488,6 +488,7 @@ public extern U0 XTalk(CTask *task,U8 *fmt,...);
 public extern U0 XTalkStr(CTask *task,U8 *fmt,...);
 public extern U0 XTalkStrWait(CTask *task,U8 *fmt,...);
 public extern U0 XTalkWait(CTask *task,U8 *fmt,...);
+
 #help_index "Job/Text & Msgs;Task/Job/Text & Msgs;Messages"
 public extern U0 Msg(I64 msg_code,I64 arg1,I64 arg2,I64 flags=0);
 public extern U0 PostMsg(CTask *task,

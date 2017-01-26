@@ -333,7 +333,6 @@ $LK,"CDoc",A="FL:::/Kernel/KernelA.HH,1353"$
 $LK,"MemSetU8",A="FL:::/Kernel/KernelB.HH,178"$
 $LK,"_FCLEX",A="FL:::/Kernel/KMathA.HC.Z,646"$
 $LK,"_D3_DOT",A="FL:::/Kernel/KMathA.HC.Z,113"$
-$LK,"ARf_CSPRITE_INS_CLIPBOARD",A="FL:::/Kernel/KernelA.HH,3868"$
 $LK,"CH_CTRLZ",A="FL:::/Kernel/KernelA.HH,3480"$
 $LK,"CHashGeneric",A="FL:::/Kernel/KernelA.HH,725"$
 $LK,"SYS_FIND_PCIBIOS_SERVICE_DIR",A="FL:::/Kernel/PCIBIOS.HC.Z,8"$
@@ -690,7 +689,6 @@ $LK,"_LXCHG_I64",A="FL:::/Kernel/KUtils.HC.Z,217"$
 $LK,"MDG_DISP_SIB_RIP",A="FL:::/Kernel/KernelA.HH,1585"$
 $LK,"DOCEt_BLINK",A="FL:::/Kernel/KernelA.HH,945"$
 $LK,"DOCET_BLINK",A="FL:::/Kernel/KernelA.HH,939"$
-$LK,"sys_clipboard_doc",A="FL:::/Kernel/KGlbls.HC.Z,6"$
 $LK,"JOBf_DONE",A="FL:::/Kernel/KernelA.HH,3165"$
 $LK,"CCF_NO_DEFINES",A="FL:::/Kernel/KernelA.HH,2128"$
 $LK,"DOCEf_SKIP_IN_FORM",A="FL:::/Kernel/KernelA.HH,1098"$
@@ -1611,6 +1609,7 @@ $LK,"CDATE_YEAR_DAYS",A="FL:::/Kernel/KernelA.HH,183"$
 $LK,"RFLAGf_OVERFLOW",A="FL:::/Kernel/KernelA.HH,316"$
 $LK,"SYS_POW",A="FL:::/Kernel/KMathA.HC.Z,462"$
 $LK,"StrNICmp",A="FL:::/Kernel/StrA.HC.Z,315"$
+$LK,"ARf_CSPRITE_INS_CLIP",A="FL:::/Kernel/KernelA.HH,3868"$
 $LK,"DOCf_NULL_GRAB_SCROLL",A="FL:::/Kernel/KernelA.HH,1311"$
 $LK,"DOCEf_RIGHT_X",A="FL:::/Kernel/KernelA.HH,1069"$
 $LK,"DOCEF_RIGHT_X",A="FL:::/Kernel/KernelA.HH,981"$
@@ -2455,6 +2454,7 @@ $LK,"HTt_CLASS",A="FL:::/Kernel/KernelA.HH,648"$
 $LK,"Cd2DirEntry",A="FL:::/Kernel/BlkDev/DskStrA.HC.Z,221",BI=528$
 $LK,"IET_IMM_U0",A="FL:::/Kernel/KernelA.HH,395"$
 $LK,"FifoU8Rem",A="FL:::/Kernel/KDataTypes.HC.Z,190",BI=529$
+$LK,"sys_clip_doc",A="FL:::/Kernel/KGlbls.HC.Z,6"$
 $LK,"StrLastRem",A="FL:::/Kernel/StrA.HC.Z,604",BI=530$
 $LK,"BlkDevAdd",A="FL:::/Kernel/BlkDev/DskAddDev.HC.Z,27",BI=531$
 $LK,"REGG_CLOBBERED",A="FL:::/Kernel/KernelA.HH,1787"$

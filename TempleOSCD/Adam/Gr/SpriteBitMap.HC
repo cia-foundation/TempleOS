@@ -75,10 +75,10 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 	"$$MU-UL,\"Flood Fill Not Color\",LE=SPBM_FLOOD_FILL_NOT$$\n"
 	"$$MU-UL,\"PolyLine\",LE=SPBM_POLYLINE$$\n"
 	"$$MU-UL,\"PolyPoint\",LE=SPBM_POLYPT$$\n"
-	"\n$$MU-UL,\"Copy to Clipboard\",LE=SPBM_COPY$$\n"
-	"$$MU-UL,\"Delete to Clipboard\",LE=SPBM_DELETE$$\n"
-	"$$MU-UL,\"Paste Clipboard\",LE=SPBM_PASTE$$\n"
-	"$$MU-UL,\"Paste Transparent Clipboard\",LE=SPBM_PASTE_TRANSPARENT$$\n"
+	"\n$$MU-UL,\"Copy to Clip\",LE=SPBM_COPY$$\n"
+	"$$MU-UL,\"Delete to Clip\",LE=SPBM_DELETE$$\n"
+	"$$MU-UL,\"Paste Clip\",LE=SPBM_PASTE$$\n"
+	"$$MU-UL,\"Paste Transparent Clip\",LE=SPBM_PASTE_TRANSPARENT$$\n"
 	"\n$$MU-UL,\"Save BMP File\",LE=SPBM_SAVE_BMP$$\n"
 	"$$MU-UL,\"Save GR File\",LE=SPBM_SAVE_GRA$$\n"
 	"\n$$MU-UL,\"Undo\",LE=SPBM_UNDO$$\n"
@@ -208,7 +208,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
   U8 *st=NULL;
   CEdFileName filename;
   CDC *img=*_img,
-	*clipboard=NULL,*undo=NULL,*dc2;
+	*clip=NULL,*undo=NULL,*dc2;
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
 
   doc_e->de_flags|=DOCEF_DONT_DRAW;
@@ -390,14 +390,14 @@ bm_menu:
 	      break;
 	    case SPBM_PASTE:
 	    case SPBM_PASTE_TRANSPARENT:
-	      if (clipboard) {
+	      if (clip) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
-		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(dc,arg1,arg2,clipboard);
-		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
+		  clip->flags|=DCF_NO_TRANSPARENTS;
+		  GrBlot(dc,arg1,arg2,clip);
+		  clip->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
-		  dc2=DCCopy(clipboard);
+		  dc2=DCCopy(clip);
 		  DCColorChg(dc2,bkcolor);
 		  GrBlot(dc,arg1,arg2,dc2);
 		  DCDel(dc2);
@@ -517,14 +517,14 @@ bm_menu:
 	      break;
 	    case SPBM_PASTE:
 	    case SPBM_PASTE_TRANSPARENT:
-	      if (clipboard) {
+	      if (clip) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
-		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(dc,arg1,arg2,clipboard);
-		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
+		  clip->flags|=DCF_NO_TRANSPARENTS;
+		  GrBlot(dc,arg1,arg2,clip);
+		  clip->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
-		  dc2=DCCopy(clipboard);
+		  dc2=DCCopy(clip);
 		  DCColorChg(dc2,bkcolor);
 		  GrBlot(dc,arg1,arg2,dc2);
 		  DCDel(dc2);
@@ -611,9 +611,9 @@ bm_menu:
 		y11=arg2;
 		y22=y1;
 	      }
-	      DCDel(clipboard);
-	      clipboard=DCExt(img,x11-xx1,y11-yy1,x22-xx1,y22-yy1);
-	      clipboard->bkcolor=bkcolor;
+	      DCDel(clip);
+	      clip=DCExt(img,x11-xx1,y11-yy1,x22-xx1,y22-yy1);
+	      clip->bkcolor=bkcolor;
 	      if (mode==SPBM_DELETE) {
 		img->color=bkcolor;
 		GrRect(img,x11-xx1,y11-yy1,x22-x11+1,y22-y11+1);
@@ -629,14 +629,14 @@ bm_menu:
 	      break;
 	    case SPBM_PASTE:
 	    case SPBM_PASTE_TRANSPARENT:
-	      if (clipboard) {
+	      if (clip) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		if (mode==SPBM_PASTE) {
-		  clipboard->flags|=DCF_NO_TRANSPARENTS;
-		  GrBlot(img,arg1-xx1,arg2-yy1,clipboard);
-		  clipboard->flags&=~DCF_NO_TRANSPARENTS;
+		  clip->flags|=DCF_NO_TRANSPARENTS;
+		  GrBlot(img,arg1-xx1,arg2-yy1,clip);
+		  clip->flags&=~DCF_NO_TRANSPARENTS;
 		} else {
-		  dc2=DCCopy(clipboard);
+		  dc2=DCCopy(clip);
 		  DCColorChg(dc2,bkcolor);
 		  GrBlot(img,arg1-xx1,arg2-yy1,dc2);
 		  DCDel(dc2);
@@ -665,7 +665,7 @@ bm_menu:
 bm_key_up_done:
   GetMsg(,,1<<MSG_KEY_UP);
 bm_done:
-  DCDel(clipboard);
+  DCDel(clip);
   DCDel(undo);
   Free(st);
   DCFill(dc);
