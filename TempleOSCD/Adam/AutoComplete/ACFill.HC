@@ -11,7 +11,7 @@ public U8 *ACDDefGet(U8 *st,I64 def_num=1)
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+      FBlkRead(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
 	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;
@@ -55,7 +55,7 @@ public U8 *ACDDefsGet(U8 *st)
     if (f=FOpen(ACD_DEF_FILENAME,"r")) {
       buf=MAlloc(ACD_BLK_SIZE*2+1);
       buf[ACD_BLK_SIZE*2]=0; //terminate
-      FRBlks(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
+      FBlkRead(f,buf,tmph->user_data0*ACD_BLK_SIZE/BLK_SIZE,
 	    ACD_BLK_SIZE*2/BLK_SIZE);
       FClose(f);
       in_ptr=buf;

@@ -135,7 +135,7 @@ U8 *CmdLinePmt()
       "%8.6fs ans=0x%08X=%d\n",Fs->answer_time,Fs->answer,Fs->answer;
     Fs->new_answer=FALSE;
   }
-  if (st=CurDir) {
+  if (st=DirCur) {
     "%s",st;
     Free(st);
   }

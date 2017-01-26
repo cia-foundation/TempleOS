@@ -891,7 +891,7 @@ U0 PrsBinFile(CCmpCtrl *cc)
   U8 *buf,*st;
   if (cc->token!=TK_STR)
     LexExcept(cc,"Expecting string at ");
-  st=DftExt(cc->cur_str,"BIN");
+  st=ExtDft(cc->cur_str,"BIN");
   buf=FileRead(st,&size);
   Free(st);
   for (i=0;i<size;i++)

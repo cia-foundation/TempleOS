@@ -177,7 +177,7 @@ U0 TOSIns()
 public U0 GodCodeJmp()
 {//Jump to rand code in OS. See $LK,"::/Adam/God/HSNotes.DD"$.
   CDirEntry *tmpde1=FilesFind("/*",
-	FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUSTER_ORDER),
+	FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUS_ORDER),
 	*tmpde=tmpde1;
   I64 cnt=0,num;
   CDoc *doc;

@@ -181,7 +181,7 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * 4/13/14 Strut or RawHide crashed when $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ was set during testsuite.  Perhaps, floodfill?
 
-* $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.  I don't know if I fixed this.
+* $LK,"DskChk",A="MN:DskChk"$ alloc unalloced.  I don't know if I fixed this.
 
 * 1/?/2015,8/10/2015 Macro sel in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
 

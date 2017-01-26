@@ -2,9 +2,9 @@ U0 InstallDrv(U8 drv_let)
 {
   U8 *st;
   ExePrint("CopyTree(\"::/\",\"%C:/\");",drv_let);
-  ExePrint("MkDir(\"%C:/Tmp\");",drv_let);
-  ExePrint("MkDir(\"%C:/Tmp/ScrnShots\");",drv_let);
-  ExePrint("MkDir(\"%C:/Home\");",drv_let);
+  ExePrint("DirMk(\"%C:/Tmp\");",drv_let);
+  ExePrint("DirMk(\"%C:/Tmp/ScrnShots\");",drv_let);
+  ExePrint("DirMk(\"%C:/Home\");",drv_let);
 
   st=MStrPrint("%C:/Home/DoDistro.HC.Z",drv_let);
   if (!FileFind(st))
@@ -20,7 +20,7 @@ U0 InstallDrv(U8 drv_let)
 Bool VMPrtDsk(CTask *task,CATARep *ata_drv)
 {
   if (ata_drv) {
-    XTalkWait(task,"PrtDsk(,0.5,0.5);\nC\np%d\nY",ata_drv->num);
+    XTalkWait(task,"DskPrt(,0.5,0.5);\nC\np%d\nY",ata_drv->num);
     return TRUE;
   } else
     return FALSE;

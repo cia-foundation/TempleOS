@@ -1,7 +1,7 @@
 //This is run in a $LK,"#exe",A="FF:::/Kernel/Kernel.PRJ,KCfg"${}.
 
 U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0StaffMode\0"
-"HomeDir\0NoMP\0TextMode\0DontProbe\0AutoMountIDE\0DbgDistro\0Help\0";
+"HomeDir\0NoMP\0TextMode\0DontProbe\0MountIDEAuto\0DbgDistro\0Help\0";
 
 #define CFG_MEM_INIT		0
 #define CFG_HEAP_INIT		1
@@ -11,7 +11,7 @@ U8 *kernel_cfg_options="MemInit\0HeapInit\0VarInit\0StaffMode\0"
 #define CFG_NO_MP		5
 #define CFG_TEXT_MODE		6
 #define CFG_DONT_PROBE		7
-#define CFG_AUTO_MOUNT_IDE	8
+#define CFG_MOUNT_IDE_AUTO	8
 #define CFG_DBG_DISTRO	9
 #define CFG_OPTIONS_NUM		10
 
@@ -25,7 +25,7 @@ class CKCfg
   U8 *home_dir;
   Bool opts[CFG_OPTIONS_NUM];
   U8 mem_init_val,heap_init_val,var_init_val,
-	boot_drv_let,auto_mount_ide_hd_let,auto_mount_ide_cd_let;
+	boot_drv_let,mount_ide_auto_hd_let,mount_ide_auto_cd_let;
 };
 
 CDoc *KCfgAddDev(CKCfg *c)
@@ -72,7 +72,7 @@ U0 KCfgOptions(CKCfg *c)
 	    "$$PURPLE$$NoMP$$FG$$ No multicore.\n"
 	    "$$PURPLE$$TextMode$$FG$$ Text Mode (requires hard reboot).\n"
 	    "$$PURPLE$$DontProbe$$FG$$ Just prompt CD/DVD ports, don't probe.\n"
-	    "$$PURPLE$$AutoMountIDE$$FG$$ AutoMount IDE drives to 'C' and 'T'.\n"
+	    "$$PURPLE$$MountIDEAuto$$FG$$ Auto Mount IDE drives to 'C' and 'T'.\n"
 	    "$$PURPLE$$DbgDistro$$FG$$ Include RAM Drv in Kernel.BIN.\n"
 	    "\n";
     else
@@ -107,30 +107,30 @@ U0 KCfgOptions(CKCfg *c)
 	    else
 	      c->opts[i]=FALSE;
 	    break;
-	  case CFG_AUTO_MOUNT_IDE:
+	  case CFG_MOUNT_IDE_AUTO:
 	    if (state) {
 	      "First HD Drive Let:";
-	      c->auto_mount_ide_hd_let=Let2Let(GetChar);
-	      if (!('A'<=c->auto_mount_ide_hd_let<='Z'))
-		c->auto_mount_ide_hd_let=0;
+	      c->mount_ide_auto_hd_let=Let2Let(GetChar);
+	      if (!('A'<=c->mount_ide_auto_hd_let<='Z'))
+		c->mount_ide_auto_hd_let=0;
 	      '\n';
-	      if (c->auto_mount_ide_hd_let)
-		"First HD Drive:%C\n",c->auto_mount_ide_hd_let;
+	      if (c->mount_ide_auto_hd_let)
+		"First HD Drive:%C\n",c->mount_ide_auto_hd_let;
 	      else
 		"First HD Drive:%C\n",'C';
 
 	      "First CD Drive Let:";
-	      c->auto_mount_ide_cd_let=Let2Let(GetChar);
-	      if (!('A'<=c->auto_mount_ide_cd_let<='Z'))
-		c->auto_mount_ide_cd_let=0;
+	      c->mount_ide_auto_cd_let=Let2Let(GetChar);
+	      if (!('A'<=c->mount_ide_auto_cd_let<='Z'))
+		c->mount_ide_auto_cd_let=0;
 	      '\n';
-	      if (c->auto_mount_ide_cd_let)
-		"First CD Drive:%C\n",c->auto_mount_ide_cd_let;
+	      if (c->mount_ide_auto_cd_let)
+		"First CD Drive:%C\n",c->mount_ide_auto_cd_let;
 	      else
 		"First CD Drive:%C\n",'T';
 	    } else {
-	      c->auto_mount_ide_hd_let=0;
-	      c->auto_mount_ide_cd_let=0;
+	      c->mount_ide_auto_hd_let=0;
+	      c->mount_ide_auto_cd_let=0;
 	    }
 	    break;
 	  case CFG_DBG_DISTRO:

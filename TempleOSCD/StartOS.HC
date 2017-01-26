@@ -34,7 +34,7 @@ if (!ins_reg.registered)
 WallPaperInit;
 
 if (DrvIsWritable)
-  MkDir("/Tmp"); //Good to have a Tmp
+  DirMk("/Tmp"); //Good to have a Tmp
 
 Option(OPTf_WARN_PAREN,OFF);
 Option(OPTf_WARN_DUP_TYPES,OFF);

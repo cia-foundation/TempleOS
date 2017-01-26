@@ -54,14 +54,14 @@ U0 TOSInit()
 #define TOS_ISO_NAME	"B:/TempleOSCD.ISO"
 #define TOS_ISO_C_NAME	"B:/TempleOSCD.ISO.C"
 #define TOS_DISTRO_DIR	"B:/Distro"
-#define CFG_OPTS	"StaffMode\nAutoMountIDE\nCT\n"
-#define CFG_DBG_OPTS	"StaffMode\nAutoMountIDE\nCT"\
+#define CFG_OPTS	"StaffMode\nMountIDEAuto\nCT\n"
+#define CFG_DBG_OPTS	"StaffMode\nMountIDEAuto\nCT"\
 			"HeapInit\n130\nMemInit\n131\nVarInit\n132\n\n"
-#define CFG_DBGZ_OPTS	"StaffMode\nAutoMountIDE\nCT"\
+#define CFG_DBGZ_OPTS	"StaffMode\nMountIDEAuto\nCT"\
 			"HeapInit\n0\nMemInit\n0\nVarInit\n0\n\n"
 #define TOS_CFG		"\n" CFG_RAM_DRVS CFG_DVD_DRVS CFG_HARD_DRVS "\n"\
 			CFG_DSK_CACHE CFG_OPTS
-#define TOS_DVD_CFG	"TB\n0x20000\nT \n\n\nStaffMode\nAutoMountIDE\nCT\n"
+#define TOS_DVD_CFG	"TB\n0x20000\nT \n\n\nStaffMode\nMountIDEAuto\nCT\n"
 #define TOS_DVD_DBG_CFG "A" CFG_DBG_DISTRO\
 			"B\nScale2Mem(2048,0x40000)\n\n\n"\
 			"NoMP\nTextMode\nDontProbe\nDbgDistro\n"\

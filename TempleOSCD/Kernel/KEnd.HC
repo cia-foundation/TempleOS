@@ -14,14 +14,14 @@ U0 SysGlblsInit()
   blkdev.tmp_filename		=AStrNew("~/Tmp.DD.Z");
   blkdev.dvd_boot_is_good=TRUE;
   #exe {
-    if (!kernel_cfg->auto_mount_ide_hd_let)
-      kernel_cfg->auto_mount_ide_hd_let='C';
-    if (!kernel_cfg->auto_mount_ide_cd_let)
-      kernel_cfg->auto_mount_ide_cd_let='T';
+    if (!kernel_cfg->mount_ide_auto_hd_let)
+      kernel_cfg->mount_ide_auto_hd_let='C';
+    if (!kernel_cfg->mount_ide_auto_cd_let)
+      kernel_cfg->mount_ide_auto_cd_let='T';
     StreamPrint("blkdev.first_hd_drv_let=%d;",
-	  kernel_cfg->auto_mount_ide_hd_let);
+	  kernel_cfg->mount_ide_auto_hd_let);
     StreamPrint("blkdev.first_dvd_drv_let=%d;",
-	  kernel_cfg->auto_mount_ide_cd_let);
+	  kernel_cfg->mount_ide_auto_cd_let);
   }
 
   DbgMode(ON);
@@ -172,8 +172,8 @@ U0 KMain()
 
   TimeStampFreqCal;
   BlkDevsInitAll;
-  "ChgDsk(':');\n";
-  ChgDsk(':');
+  "DskChg(':');\n";
+  DskChg(':');
   #exe {
     StreamPrint("HomeSet(\"%s\");\n"
 	  "blkdev.ins_base0=%d;blkdev.ins_base1=%d;blkdev.ins_unit =%d;\n",

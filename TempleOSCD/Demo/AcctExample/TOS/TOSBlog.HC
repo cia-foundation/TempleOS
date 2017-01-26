@@ -8,7 +8,7 @@ public U8 *BlogLocalDir(CDate cdt=0)
   Date2Struct(&ds,cdt);
   StrPrint(dir,BLOG_LOCAL_BASE "/%d%Z",ds.year,ds.mon-1,"ST_MONTHS");
   if (!FileFind(dir,,FUF_JUST_DIRS))
-    MkDir(dir);
+    DirMk(dir);
   return dir;
 }
 
@@ -89,11 +89,11 @@ public U0 BlogScrnShot()
 
 public U0 FreshenBlog()
 {//Regen html files for D:/Home/Web.
-  MkDir("D:/Wb");
-  MkDir("D:/Wb/Home");
-  MkDir("D:/Wb/Home/Web");
-  MkDir("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS);
-  MkDir("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS "/BlogDir");
+  DirMk("D:/Wb");
+  DirMk("D:/Wb/Home");
+  DirMk("D:/Wb/Home/Web");
+  DirMk("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS);
+  DirMk("D:/Wb/Home/Web/" INS_REG_PERSONAL_INITIALS "/BlogDir");
 
   FreshenWebDir("/Home/Web");
   FreshenWebDir("/Home/Web/" INS_REG_PERSONAL_INITIALS);

@@ -1,5 +1,5 @@
 #define ZERO_BUF_SIZE	2048
-U0 WZeroBlks(CDrv *dv,I64 blk,I64 cnt)
+U0 BlkWriteZero(CDrv *dv,I64 blk,I64 cnt)
 {//Fill blk cnt with zeros in Drv.
   I64 n;
   U8 *z=CAlloc(ZERO_BUF_SIZE<<BLK_SIZE_BITS);
@@ -14,7 +14,7 @@ U0 WZeroBlks(CDrv *dv,I64 blk,I64 cnt)
     n=cnt;
     if (n>ZERO_BUF_SIZE)
       n=ZERO_BUF_SIZE;
-    WBlks(dv,z,blk,n);
+    BlkWrite(dv,z,blk,n);
     blk+=n;
     cnt-=n;
     if (show_progress)
@@ -28,7 +28,7 @@ U0 WZeroBlks(CDrv *dv,I64 blk,I64 cnt)
   }
 }
 
-Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
+Bool BlkRead(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {//Read blk cnt from Drv to buf.
   Bool res=TRUE,unlock;
   CBlkDev *bd=dv->bd;
@@ -49,7 +49,7 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	  break;
 	case BDT_ISO_FILE_READ:
 	case BDT_ISO_FILE_WRITE:
-	  FRBlks(bd->file_dsk,buf,blk,cnt);
+	  FBlkRead(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:
@@ -68,7 +68,7 @@ Bool RBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
   return res;
 }
 
-Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
+Bool BlkWrite(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 {//Write blk cnt from buf to Drv.
   Bool res=TRUE,unlock;
   CBlkDev *bd=dv->bd;
@@ -89,7 +89,7 @@ Bool WBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 	  break;
 	case BDT_ISO_FILE_READ:
 	case BDT_ISO_FILE_WRITE:
-	  FWBlks(bd->file_dsk,buf,blk,cnt);
+	  FBlkWrite(bd->file_dsk,buf,blk,cnt);
 	  break;
 	case BDT_ATA:
 	case BDT_ATAPI:

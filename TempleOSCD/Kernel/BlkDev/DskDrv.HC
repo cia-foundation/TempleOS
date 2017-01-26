@@ -93,7 +93,7 @@ U0 DrvFATBlkAlloc(CDrv *dv)
   dv->cur_fat_blk=AMAlloc(BLK_SIZE);
   dv->cur_fat_blk_num=0;
   dv->fat_blk_dirty=0;
-  RBlks(dv,dv->cur_fat_blk,dv->fat1,1);
+  BlkRead(dv,dv->cur_fat_blk,dv->fat1,1);
 }
 
 U0 DrvFATBlkClean(CDrv *dv,I64 fat_sel=3)
@@ -101,13 +101,13 @@ U0 DrvFATBlkClean(CDrv *dv,I64 fat_sel=3)
   if ((dv->fs_type==FSt_FAT32 || dv->fs_type==FSt_REDSEA) &&
        Bt(&dv->fat_blk_dirty,0)) {
     if (dv->fat1==dv->fat2) {
-      WBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
+      BlkWrite(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
       LBtr(&dv->fat_blk_dirty,0);
     } else {
       if (fat_sel==3 || !fat_sel)
-	WBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
+	BlkWrite(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
       if (fat_sel==3 || fat_sel==1) {
-	WBlks(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
+	BlkWrite(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
 	LBtr(&dv->fat_blk_dirty,0);
       }
     }
@@ -117,7 +117,7 @@ U0 DrvFATBlkClean(CDrv *dv,I64 fat_sel=3)
 U0 DrvFATBlkSet(CDrv *dv,I64 c,I64 fat_sel=3)
 {
   I64 fat_blk_num;
-  if (c==INVALID_CLUSTER)
+  if (c==INVALID_CLUS)
     throw('Drv');
   switch (dv->fs_type) {
     case FSt_FAT32:
@@ -133,9 +133,9 @@ U0 DrvFATBlkSet(CDrv *dv,I64 c,I64 fat_sel=3)
     DrvFATBlkClean(dv,fat_sel);
     dv->cur_fat_blk_num=fat_blk_num;
     if (fat_sel==3 || !fat_sel)
-      RBlks(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
+      BlkRead(dv,dv->cur_fat_blk,dv->fat1+dv->cur_fat_blk_num,1);
     else
-      RBlks(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
+      BlkRead(dv,dv->cur_fat_blk,dv->fat2+dv->cur_fat_blk_num,1);
   }
 }
 
@@ -216,7 +216,7 @@ CBlkDev *DrvIsWritable(U8 drv_let=0,Bool except=FALSE)
 }
 
 U0 DskCacheInvalidate(CDrv *dv)
-{//Needed for removable media. Called by $LK,"ChgDsk",A="MN:ChgDsk"$().
+{//Needed for removable media. Called by $LK,"DskChg",A="MN:DskChg"$().
   Bool unlock;
   CBlkDev *bd=dv->bd;
   DrvChk(dv);
@@ -234,7 +234,7 @@ U0 DskCacheInvalidate(CDrv *dv)
       DrvUnlock(dv);
 }
 
-U0 ChgDsk(U8 drv_let=0)
+U0 DskChg(U8 drv_let=0)
 {//Change disk. (Needed for removable media.)
   CDrv *dv=Let2Drv(drv_let);
   CBlkDev *bd=dv->bd;
@@ -267,7 +267,7 @@ Bool Drv(U8 drv_let)
   bd=BlkDevChk(dv->bd);
   if (dv!=Fs->cur_dv) {
     if (bd->flags & BDF_REMOVABLE && !(bd->flags & BDF_INITIALIZED))
-      ChgDsk(Drv2Let(dv));
+      DskChg(Drv2Let(dv));
     if (bd->type==BDT_RAM ||
 	bd->type==BDT_ISO_FILE_READ || bd->type==BDT_ISO_FILE_WRITE)
       BlkDevInit(bd);

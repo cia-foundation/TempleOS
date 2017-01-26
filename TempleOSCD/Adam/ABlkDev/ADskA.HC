@@ -6,34 +6,34 @@ public U8 *DBlk(I64 blk,Bool write=FALSE)
   //See $LK,"::/Demo/Dsk/DskRaw.HC"$.
   U8 *buf=MAlloc(BLK_SIZE);
 
-  RBlks(Fs->cur_dv,buf,blk,1);
+  BlkRead(Fs->cur_dv,buf,blk,1);
   DocD(buf,BLK_SIZE);
   if (write) {
     "Edit and press <ESC> to write or <SHIFT-ESC>\n";
     if (View) {
       "Write\n";
-      WBlks(Fs->cur_dv,buf,blk,1);
+      BlkWrite(Fs->cur_dv,buf,blk,1);
     }
   }
   return buf;
 }
 
-public U8 *DCluster(I64 c,Bool write=FALSE,I64 num=0)
-{//Dump disk cluster. Optionally, write.
-//If you set write to TRUE, the cluster will
+public U8 *DClus(I64 c,Bool write=FALSE,I64 num=0)
+{//Dump disk clus. Optionally, write.
+//If you set write to TRUE, the clus will
   //be written when you press <ESC>.
   //See $LK,"::/Demo/Dsk/DskRaw.HC"$.
-  //Do $LK,"Dir",A="MN:Dir"$("*",TRUE); to get cluster numbers of files.
+  //Do $LK,"Dir",A="MN:Dir"$("*",TRUE); to get clus numbers of files.
   U8 *buf=MAlloc(Fs->cur_dv->spc<<BLK_SIZE_BITS);
-  c=ClusterNumNext(Fs->cur_dv,c,num);
-  RClusters(Fs->cur_dv,buf,c,1);
-  "Cluster:%X\n",c;
+  c=ClusNumNext(Fs->cur_dv,c,num);
+  ClusRead(Fs->cur_dv,buf,c,1);
+  "Clus:%X\n",c;
   DocD(buf,Fs->cur_dv->spc<<BLK_SIZE_BITS);
   if (write) {
     "Edit and press <ESC> to write or <SHIFT-ESC>\n";
     if (View) {
       "Write\n";
-      WClusters(Fs->cur_dv,buf,c,1);
+      ClusWrite(Fs->cur_dv,buf,c,1);
     }
   }
   return buf;
@@ -67,7 +67,7 @@ public Bool Copy(U8 *src_files_find_mask,U8 *dst_files_find_mask=".")
   CDirContext *dirc;
   CDirEntry *tmpde,*tmpde1;
   U8 *st;
-  if (!(tmpde1=FilesFind(src_files_find_mask,FUF_CLUSTER_ORDER)))
+  if (!(tmpde1=FilesFind(src_files_find_mask,FUF_CLUS_ORDER)))
     return FALSE;
   if (IsDir(dst_files_find_mask)) {
     if (dirc=DirContextNew(dst_files_find_mask,TRUE)) {
@@ -109,7 +109,7 @@ I64 CopyTree2(CDirEntry *tmpde,I64 src_dir_len,I64 dst_dir_len,U8 *dst_dir)
     MemCpy(st,dst_dir,dst_dir_len);
     StrCpy(st+dst_dir_len,tmpde->full_name+src_dir_len);
     if (tmpde->attr & RS_ATTR_DIR) {
-      MkDir(st,LinkedLstCnt(tmpde->sub));
+      DirMk(st,LinkedLstCnt(tmpde->sub));
       res+=CopyTree2(tmpde->sub,src_dir_len,dst_dir_len,dst_dir);
     } else
       if (CopySingle(tmpde->full_name,st))
@@ -140,12 +140,12 @@ public I64 CopyTree(U8 *src_files_find_mask,U8 *dst_files_find_mask,
   Free(st2);
   if (dirc=DirContextNew(src_files_find_mask,TRUE,,no_mask)) {
     tmpde=FilesFind(dirc->mask,FUF_RECURSE);
-    st1=CurDir;
+    st1=DirCur;
     DirContextDel(dirc);
     i1=StrLen(st1);
     if (i1==3) i1--;
     if (dirc=DirContextNew(dst_files_find_mask,TRUE,TRUE)) {
-      st2=CurDir;
+      st2=DirCur;
       i2=StrLen(st2);
       if (i2==3) i2--;
       res=CopyTree2(tmpde,i1,i2,st2);

@@ -24,7 +24,7 @@ U0 RawAccess(I64 drv_let=0)
 
   try {
     blk=GetI64("Blk to Read: ",old_offset,0,bd->max_blk);
-    RBlks(dv,buf,blk,1);
+    BlkRead(dv,buf,blk,1);
     D(buf,BLK_SIZE);
   } catch
     PutExcept;
@@ -37,5 +37,5 @@ U0 RawAccess(I64 drv_let=0)
 
 RawAccess;
 
-//See $LK,"RBlks",A="MN:RBlks"$(), $LK,"WBlks",A="MN:WBlks"$(), $LK,"DrvLock",A="MN:DrvLock"$(), $LK,"DrvUnlock",A="MN:DrvUnlock"$()
-//$LK,"DBlk",A="MN:DBlk"$(), $LK,"DCluster",A="MN:DCluster"$(), $LK,"BlkDevLock",A="MN:BlkDevLock"$() and $LK,"BlkDevUnlock",A="MN:BlkDevUnlock"$().
+//See $LK,"BlkRead",A="MN:BlkRead"$(), $LK,"BlkWrite",A="MN:BlkWrite"$(), $LK,"DrvLock",A="MN:DrvLock"$(), $LK,"DrvUnlock",A="MN:DrvUnlock"$()
+//$LK,"DBlk",A="MN:DBlk"$(), $LK,"DClus",A="MN:DClus"$(), $LK,"BlkDevLock",A="MN:BlkDevLock"$() and $LK,"BlkDevUnlock",A="MN:BlkDevUnlock"$().

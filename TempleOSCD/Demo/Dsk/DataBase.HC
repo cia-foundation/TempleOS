@@ -26,7 +26,7 @@ U0 WriteAcct()
     MemSet(&a,0,BLK_SIZE);
     if (DocForm(&a)) {
       f=FOpen(DB_FILENAME,"w+");
-      FWBlks(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
+      FBlkWrite(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
       FClose(f);
     }
   }
@@ -41,7 +41,7 @@ U0 ReadAcct()
   acctnum=GetI64("Acct #",-1);
   if (0<=acctnum<DB_ACCT_MAX) {
     f=FOpen(DB_FILENAME,"r");
-    FRBlks(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
+    FBlkRead(f,&a,acctnum*DB_ACCT_BLKS,DB_ACCT_BLKS);
     FClose(f);
     ClassRep(&a);
   }

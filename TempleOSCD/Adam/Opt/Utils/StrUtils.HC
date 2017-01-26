@@ -14,9 +14,9 @@ public I64 Sort(U8 *_in_name,U8 *_out_name=NULL,
   I64 i,j,cnt=0,res;
 
   if (!_in_name) return 0;
-  in_name=DftExt(_in_name,"DD.Z");
+  in_name=ExtDft(_in_name,"DD.Z");
   if (_out_name)
-    out_name=DftExt(_out_name,"DD.Z");
+    out_name=ExtDft(_out_name,"DD.Z");
   else
     out_name=StrNew(in_name);
 

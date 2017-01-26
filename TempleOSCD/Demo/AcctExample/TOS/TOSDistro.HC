@@ -63,9 +63,9 @@ U0 DistroSongsPrep(U8 threshold='7')
   CDoc *doc;
   CDocEntry *doc_e;
   CDirEntry *tmpde=FilesFind("/Home/Sup1/Sup1Hymns/*.HC*",
-	FUF_CLUSTER_ORDER),*tmpde1=tmpde;
+	FUF_CLUS_ORDER),*tmpde1=tmpde;
   DelTree("/Apps/Psalmody/Examples");
-  MkDir("/Apps/Psalmody/Examples");
+  DirMk("/Apps/Psalmody/Examples");
   while (tmpde) {
     doc=DocRead(tmpde->full_name);
     doc_e=doc->head.next;
@@ -88,8 +88,8 @@ U0 DistroPrep()
     DistroSongsPrep;
 
   DelTree("/Tmp");
-  MkDir("/Tmp");
-  MkDir("/Tmp/ScrnShots");
+  DirMk("/Tmp");
+  DirMk("/Tmp/ScrnShots");
 
   Touch("/PersonalMenu.DD.Z","+T");
   Touch("/Home/PersonalMenu.DD.Z","+T");
@@ -130,19 +130,19 @@ U0 DbgDistroFilePrep()
   bd=Let2BlkDev('A');
   Fmt('A',,FALSE,FSt_REDSEA);
 
-  MkDir("A:/Compiler");
+  DirMk("A:/Compiler");
   Copy("C:/Compiler/Compiler.BIN.Z",	"A:/Compiler");
   Copy("C:/Compiler/OpCodes.DD.Z",	"A:/Compiler");
   Copy("C:/Compiler/CompilerA.HH.Z",	"A:/Compiler");
   Copy("C:/Compiler/CompilerB.HH.Z",	"A:/Compiler");
 
-  MkDir("A:/Kernel");
+  DirMk("A:/Kernel");
   Copy("C:/Kernel/*.HH*",		"A:/Kernel");
   CopyTree("C:/Kernel/BlkDev",		"A:/Kernel/BlkDev");
 
   Copy("C:/Home/Sup1/Sup1Distro/DbgStartOS.HC.Z","A:/StartOS.HC.Z");
 
-  MkDir("A:/Adam");
+  DirMk("A:/Adam");
   Copy("C:/Home/Sup1/Sup1Distro/DbgMakeAdam.HC.Z","A:/Adam/MakeAdam.HC.Z");
   Copy("C:/Home/Sup1/Sup1Distro/DbgMount.HC.Z","A:/Adam");
   Copy("C:/Adam/AExts.HC.Z",	"A:/Adam");
@@ -266,7 +266,7 @@ U0 DbgDistroPrep()
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   DelTree(TOS_DISTRO_DIR "/Home");
-  MkDir(TOS_DISTRO_DIR "/Home");
+  DirMk(TOS_DISTRO_DIR "/Home");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
   Del(TOS_DISTRO_DIR BOOT_DIR "/OldMBR.BIN.C");
   Del(TOS_DISTRO_DIR BOOT_DIR "/BootMHD2.BIN.C");
@@ -292,7 +292,7 @@ U0 StdDistroPrep()
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   DelTree(TOS_DISTRO_DIR "/Home");
-  MkDir(TOS_DISTRO_DIR "/Home");
+  DirMk(TOS_DISTRO_DIR "/Home");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
   Del(TOS_DISTRO_DIR BOOT_DIR "/OldMBR.BIN.C");
   Del(TOS_DISTRO_DIR BOOT_DIR "/BootMHD2.BIN.C");
@@ -327,7 +327,7 @@ U0 UltraDistroPrep()
   Del(TOS_DISTRO_DIR "/Misc/Bible.TXT.Z");
 
   DelTree(TOS_DISTRO_DIR "/Apps");
-  MkDir(TOS_DISTRO_DIR "/Apps");
+  DirMk(TOS_DISTRO_DIR "/Apps");
   DelTree(TOS_DISTRO_DIR "/Demo");
   DelTree(TOS_DISTRO_DIR "/Misc/Tour");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
@@ -446,11 +446,11 @@ U0 TOSRegen3()
   tos_progress_t0=tS;
   RegExe("TempleOS/TOSRegen");
 
-  TOSProgress("ChkDsk All");
+  TOSProgress("DskChk All");
   AutoComplete;
   WinBorder;
   WinMax;
-  ChkAll;
+  DskChkAll;
 
   TOSProgress("Make LineRep");
   MakeLineRepFile;
@@ -548,9 +548,9 @@ U0 TOSRegen3()
   TOSProgress("Find /Home");
   slash_home=F2("/Home","-i+la");
 
-  TOSProgress("ChkDsk All");
+  TOSProgress("DskChk All");
   Drv('C');
-  ChkAll;
+  DskChkAll;
 
   TOSProgress("Done");
   SettingsPop;

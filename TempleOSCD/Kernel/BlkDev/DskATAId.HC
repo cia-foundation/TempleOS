@@ -260,7 +260,7 @@ CBlkDev *ATAMount(U8 first_drv_let,I64 type,I64 base0,I64 base1,I64 unit)
   return NULL;
 }
 
-I64 AutoMountIDE()
+I64 MountIDEAuto()
 {//Try to mount hard drive and CD/DVD, automatically. (Kernel.Cfg option).
 //It uses 'C' and 'T' as first drive letters or whatever you set
   //in config when compiling Kernel.BIN.
@@ -288,6 +288,6 @@ I64 AutoMountIDE()
     tmpha=tmpha->next;
   }
   LinkedLstDel(head);
-  blkdev.auto_mount_ide_cnt=res;
+  blkdev.mount_ide_auto_cnt=res;
   return res;
 }

@@ -2295,7 +2295,7 @@ public class CATARep
 #define BLK_SIZE	(1<<BLK_SIZE_BITS)
 #define DVD_BLK_SIZE	(4*BLK_SIZE)
 #define DVD_BOOT_LOADER_SIZE	DVD_BLK_SIZE*1
-#define INVALID_CLUSTER (-1)
+#define INVALID_CLUS (-1)
 
 class CMBRPrt
 {
@@ -2324,7 +2324,7 @@ class CRedSeaBoot
 	signature,reserved[4]; //MBR_PT_REDSEA=0x88. Distinguish from real FAT32
   I64	drv_offset,	//For CD/DVD image copy.
 	sects,
-	root_cluster,
+	root_clus,
 	bitmap_sects,
 	unique_id;
   U8	code[462];
@@ -2336,7 +2336,7 @@ class CFAT32Boot
   U8	jump_and_nop[3],
 	oem_name[8];
   U16	bytes_per_sect;
-  U8	sects_per_cluster;
+  U8	sects_per_clus;
   U16	reserved_sects;
   U8	copies_of_fat;
   U16	max_root_dir_entries,	//Not used
@@ -2350,7 +2350,7 @@ class CFAT32Boot
 	sects_per_fat;
   U16	flags,
 	version;
-  U32	root_cluster;
+  U32	root_clus;
   U16	file_system_info_sect,
 	backup_boot_sect;
   U8	reserved[12],
@@ -2369,7 +2369,7 @@ class CFAT32FileInfoSect
   U32	signature1;
   U8	unknown[480];
   U32	signature2,
-	free_clusters,
+	free_clus,
 	most_recently_alloced;
   U8	reserved[12];
   U32	signature3;
@@ -2384,10 +2384,10 @@ class CFAT32DirEntry
   U16	CrtTime,
 	CrtDate,
 	LstAccDate,
-	cluster_hi,
+	clus_hi,
 	WrtTime,
 	WrtDate,
-	cluster_lo;
+	clus_lo;
   U32	size;
 };
 
@@ -2556,7 +2556,7 @@ public class CDirEntry
   U0	start;
   U16	attr;
   U8	name[CDIR_FILENAME_LEN];
-  I64	cluster,size;
+  I64	clus,size;
   CDate datetime;
 };
 #define CDIR_SIZE (sizeof(CDirEntry)-offset(CDirEntry.start))
@@ -2584,7 +2584,7 @@ public class CDirEntry
 #define FUf_JUST_JIT		16
 #define FUf_JUST_GR		17
 #define FUf_Z_OR_NOT_Z		18
-#define FUf_CLUSTER_ORDER	19
+#define FUf_CLUS_ORDER	19
 #define FUf_SCAN_PARENTS	20
 #define FUf_FLATTEN_TREE	21
 #define FUf_WHOLE_LABELS	22
@@ -2611,14 +2611,14 @@ public class CDirEntry
 #define FUF_JUST_JIT		0x0010000 //J
 #define FUF_JUST_GR		0x0020000 //G
 #define FUF_Z_OR_NOT_Z		0x0040000 //Z
-#define FUF_CLUSTER_ORDER	0x0080000 //O Move disk head one direction
+#define FUF_CLUS_ORDER	0x0080000 //O Move disk head one direction
 #define FUF_SCAN_PARENTS	0x0100000 //P
 #define FUF_FLATTEN_TREE	0x0200000 //f
 #define FUF_WHOLE_LABELS	0x0400000 //l
 #define FUF_WHOLE_LABELS_BEFORE	0x0800000 //lb
 #define FUF_WHOLE_LABELS_AFTER	0x1000000 //la
 
-#define FUG_FILES_FIND	(FUF_RECURSE|FUF_SINGLE|FUF_CLUSTER_ORDER|\
+#define FUG_FILES_FIND	(FUF_RECURSE|FUF_SINGLE|FUF_CLUS_ORDER|\
   FUF_JUST_DIRS|FUF_JUST_FILES|FUF_JUST_TXT|FUF_JUST_DD|\
   FUF_JUST_SRC|FUF_JUST_AOT|FUF_JUST_JIT|FUF_JUST_GR|FUF_FLATTEN_TREE)
 #define FUG_FILE_FIND	(FUF_JUST_DIRS|FUF_JUST_FILES|FUF_Z_OR_NOT_Z|\
@@ -2728,9 +2728,9 @@ public class CDrv
 	prt_num,
 	file_system_info_sect,
 	fat1,fat2,
-	root_cluster,
+	root_clus,
 	data_area,
-	spc; //sectors per cluster
+	spc; //sectors per clus
   CDate fat32_local_time_offset;
   CTask *owning_task;
   CBlkDev *bd;
@@ -2767,7 +2767,7 @@ public class CBlkDevGlbls
   CCacheBlk *cache_base,*cache_ctrl,**cache_hash_table;
   I64	cache_size,read_cnt,write_cnt;
   CDrv	*drvs,*let_to_drv[32];
-  I64	auto_mount_ide_cnt,
+  I64	mount_ide_auto_cnt,
 	ins_base0,ins_base1;	//Install cd/dvd controller.
   U8	boot_drv_let,first_hd_drv_let,first_dvd_drv_let;
   Bool	dvd_boot_is_good,ins_unit,pad[3];
@@ -2795,8 +2795,8 @@ public class CFile //See $LK,"::/Demo/Dsk/DataBase.HC"$.
   I64	flags;
   CDirEntry de;
   CDrv	*dv;
-  I64	fblk_num,cluster,file_cluster_num,max_blk;
-  U8	*cluster_buf;
+  I64	fblk_num,clus,file_clus_num,max_blk;
+  U8	*clus_buf;
 };
 
 #help_index "Memory/Heap"

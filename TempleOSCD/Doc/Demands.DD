@@ -11,7 +11,7 @@ See $LK,"::/Kernel/BlkDev/FileSysRedSea.HC"$ and $LK,"::/Adam/Opt/Boot/DskISORed
 $LK,"::/Kernel/BlkDev/FileSysFAT.HC"$	:974 lines for FAT32 gets eliminated.
 $LK,"::/Kernel/BlkDev/FileSysISO.HC"$	:233 lines for ISO9660 gets eliminated.
 $LK,"::/Adam/Opt/Boot/DskISO9660.HC"$	:507 lines for making ISO files.
-$LK,"::/Kernel/BlkDev/DskCluster.HC"$	:152 All the cluster operations become blk.
+$LK,"::/Kernel/BlkDev/DskClus.HC"$	:152 All the clus operations become blk.
 
 * Microsoft must cancel SecureBoot because it makes dual booting impossible.  TempleOS is an additional operating system that must be used along-side Windows or Linux, not as a replacement.  It must dual boot because it has no networking. Real hardware as opposed to VMware is like the difference between looking in a telescope eye piece vs just looking at an off-line image.  God said the C64/Apple II generation owned ancestral lands.  VMware is like being taken off of our land and moved onto a reservation.  In this case, however, it will not stand.
 

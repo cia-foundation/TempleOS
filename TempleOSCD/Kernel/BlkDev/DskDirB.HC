@@ -8,7 +8,7 @@ U0 HomeSet(U8 *dirname)
 
 Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
 {//Change directory. Optionally, make directories, too.
-  I64 maxlen,cur_dir_cluster=0;
+  I64 maxlen,cur_dir_clus=0;
   U8 *chg_to_buf,*new_cur_dir,*buf;
   CDrv *dv;
   Bool res=TRUE;
@@ -52,16 +52,16 @@ Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
 	return FALSE;
     } else if (StrCmp(buf,".") && *buf) {
       dv=Fs->cur_dv;
-      cur_dir_cluster=Name2DirCluster(dv,new_cur_dir);
+      cur_dir_clus=Name2DirClus(dv,new_cur_dir);
       switch (dv->fs_type) {
 	case FSt_REDSEA:
-	  res=RedSeaCd(buf,cur_dir_cluster);
+	  res=RedSeaCd(buf,cur_dir_clus);
 	  break;
 	case FSt_FAT32:
-	  res=FAT32Cd(buf,cur_dir_cluster);
+	  res=FAT32Cd(buf,cur_dir_clus);
 	  break;
 	case FSt_ISO9660:
-	  res=ISO1Cd(buf,cur_dir_cluster);
+	  res=ISO1Cd(buf,cur_dir_clus);
 	  break;
 	default:
 	  PrintErr("File System Not Supported\n");
@@ -70,7 +70,7 @@ Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE)
       if (!res && make_dirs) {
 	Free(Fs->cur_dir);
 	Fs->cur_dir=StrNew(new_cur_dir);
-	res=MkDir(buf);
+	res=DirMk(buf);
       }
       if (res) {
 	if (StrCmp(new_cur_dir,"/"))
@@ -109,7 +109,7 @@ I64 Dir(U8 *files_find_mask,Bool full)
   CDateStruct ds;
   I64 csize=0xFFFF,c=0xFFFF,res=0;
   tmpde1=FilesFind(files_find_mask);
-  if (!(st=CurDir))
+  if (!(st=DirCur))
     PrintErr("Invalid Drive\n");
   else {
     if (tmpde1) {
@@ -123,8 +123,8 @@ I64 Dir(U8 *files_find_mask,Bool full)
       while (tmpde2) {
 	if (tmpde2->size>csize)
 	  csize=tmpde2->size;
-	if (tmpde2->cluster>c)
-	  c=tmpde2->cluster;
+	if (tmpde2->clus>c)
+	  c=tmpde2->clus;
 	tmpde2=tmpde2->next;
       }
       csize=Bsr(csize)/4+1;
@@ -133,7 +133,7 @@ I64 Dir(U8 *files_find_mask,Bool full)
       "$$MA,T=\"Directory\",LM=\"PopUpCd;Dir;\n\"$$ of %s\n",st;
       if (full)
 	"__DATE__ __TIME__ %*ts %*ts\n",
-	      csize,"SIZE",c,"CLUSTER";
+	      csize,"SIZE",c,"CLUS";
       else
 	"DATE_ TIME_ %*ts\n",csize,"SIZE";
       while (tmpde1) {
@@ -141,7 +141,7 @@ I64 Dir(U8 *files_find_mask,Bool full)
 	res++;
 	if (full)
 	  "%D %T %0*tX %0*tX ",tmpde1->datetime,tmpde1->datetime,
-		csize,tmpde1->size,c,tmpde1->cluster;
+		csize,tmpde1->size,c,tmpde1->clus;
 	else {
 	  Date2Struct(&ds,tmpde1->datetime+local_time_offset);
 	  "%02d/%02d %02d:%02d %0*tX ",ds.mon,ds.day_of_mon,ds.hour,ds.min,
@@ -162,7 +162,7 @@ I64 Dir(U8 *files_find_mask,Bool full)
   return res;
 }
 
-Bool MkDir(U8 *filename,I64 entry_cnt=0)
+Bool DirMk(U8 *filename,I64 entry_cnt=0)
 {//Make directory. $LK,"Cd",A="MN:Cd"$() can also make directories.
 //entry_cnt is for preallocating dir blks, leave it zero if you like.
   U8 *name;

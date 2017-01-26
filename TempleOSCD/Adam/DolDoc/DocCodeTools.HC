@@ -440,7 +440,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	DocFlagsToggle(doc,DOCF_PLAIN_TEXT);
       DocWrite(doc);
       task=Spawn(&SrvCmdLine,NULL,"Srv",,Fs);
-      st2=CurDir;
+      st2=DirCur;
       st=MStrPrint("Cd(\"%s\");",st2);
       tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
       Free(st2);

@@ -8,9 +8,9 @@ $WW,1$* You run a risk of problems if you do file operations on the same files s
 
 * The syntax highlighting occassionally glitches.  The compiler doesn't.
 
-* Call $LK,"ChgDsk",A="MN:ChgDsk"$() when you insert a new removable media.
+* Call $LK,"DskChg",A="MN:DskChg"$() when you insert a new removable media.
 
-* Accessing CD/DVD's is flacky.  Try $LK,"Drv",A="MN:Drv"$() or $LK,"ChgDsk",A="MN:ChgDsk"$() twice.
+* Accessing CD/DVD's is flacky.  Try $LK,"Drv",A="MN:Drv"$() or $LK,"DskChg",A="MN:DskChg"$() twice.
 
 * You can only $FG,2$extern$FG$ something once.  There is a varient called $FG,2$_extern$FG$ which binds a HolyC definition to a asm sym.  This, too, can only be done once.
 

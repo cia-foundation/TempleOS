@@ -63,7 +63,7 @@ I64 SizeRep1(CDirEntry *tmpde,I64 *_fuf_flags)
     else if ((i=tmpde->size) && Bt(_fuf_flags,FUf_EXPAND) &&
 	  FileAttr(tmpde->name)&RS_ATTR_COMPRESSED) {
       dv=Let2Drv(*tmpde->full_name);
-      RBlks(dv,buf,Cluster2Blk(dv,tmpde->cluster),1);
+      BlkRead(dv,buf,Clus2Blk(dv,tmpde->clus),1);
       i=(&buf)(CArcCompress *)->expanded_size;
     }
     tmpde->user_data=i;

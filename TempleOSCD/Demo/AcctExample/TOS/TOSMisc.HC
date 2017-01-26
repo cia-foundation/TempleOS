@@ -20,7 +20,7 @@ U0 FrameGrabberTask(I64)
     st_dir="B:/Tmp/ScrnShots";
   else
     st_dir="::/Tmp/ScrnShots";
-  MkDir(st_dir);
+  DirMk(st_dir);
   while (fg_on) {
     StrPrint(buf,"%s/VID%05d.BMP.Z",st_dir,frame_num++);
     StrCpy(buf2,buf);
@@ -96,11 +96,11 @@ public U0 JukeLines(I64 start_line,I64 end_line)
     FrameGrabberToggle;
 }
 
-public U0 ChkAll()
-{//ChkDsk on C & D.
+public U0 DskChkAll()
+{//DskChk on C & D.
   U8 *ptr=TOS_HDS;
   while (*ptr)
-    ChkDsk(*ptr++);
+    DskChk(*ptr++);
 }
 
 public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
@@ -156,11 +156,11 @@ public U0 BMP2Doc(U8 *_in_name,U8 *_out_name=NULL)
   I64 dx,dy,score,best_score=I64_MAX;
   CDC *dc;
   CDoc *doc;
-  in_name=DftExt(_in_name,"BMP");
+  in_name=ExtDft(_in_name,"BMP");
   if (_out_name)
-    out_name=DftExt(_out_name,"DD.Z");
+    out_name=ExtDft(_out_name,"DD.Z");
   else
-    out_name=ChgExt(_in_name,"DD.Z");
+    out_name=ExtChg(_in_name,"DD.Z");
   if (dc=BMPRead(in_name)) {
     for (dy=-3;dy<=4;dy++)
       for (dx=-3;dx<=4;dx++) {

@@ -59,7 +59,7 @@ U0 LogScrambleDemo()
 {
   U8 *dirname;
   Cd(__DIR__);
-  dirname=CurDir;
+  dirname=DirCur;
   ST_WARN_ST "This will scramble all .LOG files in '%s'.\n\n",dirname;
   Free(dirname);
   if (AreYouSure)

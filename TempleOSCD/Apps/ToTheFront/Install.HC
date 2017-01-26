@@ -1,2 +1,2 @@
-MkDir("~/ToTheFront");
+DirMk("~/ToTheFront");
 

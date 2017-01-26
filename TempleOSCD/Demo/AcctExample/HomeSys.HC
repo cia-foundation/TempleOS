@@ -39,7 +39,7 @@ U0 StartUpTasks()
 
 if (DrvIsWritable(':')) {
   DelTree("::/Tmp/ScrnShots");
-  MkDir("::/Tmp/ScrnShots");
+  DirMk("::/Tmp/ScrnShots");
 }
 
 StartUpTasks;

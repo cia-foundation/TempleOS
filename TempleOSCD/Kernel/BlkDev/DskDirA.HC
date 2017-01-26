@@ -81,13 +81,13 @@ I64 DirEntryCompareName(CDirEntry *e1,CDirEntry *e2)
   }
 }
 
-I64 DirEntryCompareCluster(CDirEntry *e1,CDirEntry *e2)
+I64 DirEntryCompareClus(CDirEntry *e1,CDirEntry *e2)
 {
-  return e1->cluster-e2->cluster;
+  return e1->clus-e2->clus;
 }
 
 #define SK_NAME		0
-#define SK_CLUSTER	1
+#define SK_CLUS	1
 
 U0 DirFilesSort(CDirEntry **_tmpde,I64 key)
 {
@@ -107,8 +107,8 @@ U0 DirFilesSort(CDirEntry **_tmpde,I64 key)
 	case SK_NAME:
 	  QSortI64(sort_buf,cnt,&DirEntryCompareName);
 	  break;
-	case SK_CLUSTER:
-	  QSortI64(sort_buf,cnt,&DirEntryCompareCluster);
+	case SK_CLUS:
+	  QSortI64(sort_buf,cnt,&DirEntryCompareClus);
 	  break;
       }
       tmpde=sort_buf[0];

@@ -58,7 +58,7 @@ Bool ISO1CDirFill(CDirEntry *tmpde,CISO1DirEntry *de)
   Bool res;
   MemSet(tmpde,0,sizeof(CDirEntry));
   res=ISO1FromName(tmpde->name,&de->name_len);
-  tmpde->cluster=de->loc.little;
+  tmpde->clus=de->loc.little;
   tmpde->size=de->size.little;
   tmpde->attr=FileAttr(tmpde->name);
   if (de->flags & ISO1_ATTR_DIR)
@@ -67,7 +67,7 @@ Bool ISO1CDirFill(CDirEntry *tmpde,CISO1DirEntry *de)
   return res;
 }
 
-Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
+Bool ISO1FileFind(CDrv *dv,I64 cur_dir_clus,U8 *name,
 	CDirEntry *_res,I64 fuf_flags=0)
 {//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$
   CISO1DirEntry *isoptr,*buf;
@@ -83,11 +83,11 @@ Bool ISO1FileFind(CDrv *dv,I64 cur_dir_cluster,U8 *name,
     try {
       unlock=DrvLock(dv);
       isoptr=MAlloc(dv->spc<<BLK_SIZE_BITS);
-      RClusters(dv,isoptr,cur_dir_cluster,1);
+      ClusRead(dv,isoptr,cur_dir_clus,1);
       if (isoptr->name_len==1 && !isoptr->name) {//curdir
 	i=(isoptr->size.little+dv->spc<<BLK_SIZE_BITS-1)/dv->spc<<BLK_SIZE_BITS;
 	buf=MAlloc(dv->spc<<BLK_SIZE_BITS*i);
-	RClusters(dv,buf,cur_dir_cluster,i);
+	ClusRead(dv,buf,cur_dir_clus,i);
 	Free(isoptr);
       } else {
 	buf=isoptr;
@@ -131,7 +131,7 @@ U8 *ISO1FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
 {
   U8 *buf=NULL;
   CDirEntry de;
-  I64 c,blk_cnt,cur_dir_cluster;
+  I64 c,blk_cnt,cur_dir_clus;
   DrvChk(dv);
   *_size=0;
   *_attr=0;
@@ -140,12 +140,12 @@ U8 *ISO1FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
   else
     try {
       DrvLock(dv);
-      cur_dir_cluster=Name2DirCluster(dv,cur_dir);
-      if (ISO1FileFind(dv,cur_dir_cluster,filename,&de,FUF_JUST_FILES)) {
+      cur_dir_clus=Name2DirClus(dv,cur_dir);
+      if (ISO1FileFind(dv,cur_dir_clus,filename,&de,FUF_JUST_FILES)) {
 	blk_cnt=(de.size+BLK_SIZE-1)>>BLK_SIZE_BITS;
 	buf=MAlloc(blk_cnt<<BLK_SIZE_BITS+1);
-	c=de.cluster;
-	c=RClustersBlks(dv,buf,c,blk_cnt);
+	c=de.clus;
+	c=ClusBlkRead(dv,buf,c,blk_cnt);
 	buf[de.size]=0; //Terminate
 	*_size=de.size;
 	*_attr=FileAttr(de.name,de.attr);
@@ -156,12 +156,12 @@ U8 *ISO1FileRead(CDrv *dv,U8 *cur_dir,U8 *filename,I64 *_size,I64 *_attr)
   return buf;
 }
 
-Bool ISO1Cd(U8 *name,I64 cur_dir_cluster)
+Bool ISO1Cd(U8 *name,I64 cur_dir_clus)
 {
   CDirEntry de;
   if (Fs->cur_dv->fs_type!=FSt_ISO9660)
     PrintErr("Not ISO9660 Drv\n");
-  else if (ISO1FileFind(Fs->cur_dv,cur_dir_cluster,name,&de,FUF_JUST_DIRS))
+  else if (ISO1FileFind(Fs->cur_dv,cur_dir_clus,name,&de,FUF_JUST_DIRS))
     return TRUE;
   else {
     "%s ",name;
@@ -175,16 +175,16 @@ CDirEntry *ISO1FilesFind(U8 *files_find_mask,
 {
   CDrv *dv=Fs->cur_dv;
   CISO1DirEntry *buf,*buf2,*isoptr;
-  I64 i,cur_dir_cluster=Name2DirCluster(dv,Fs->cur_dir);
+  I64 i,cur_dir_clus=Name2DirClus(dv,Fs->cur_dir);
   CDirEntry *res=NULL,*tmpde;
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
   isoptr=MAlloc(dv->spc<<BLK_SIZE_BITS);
-  RClusters(dv,isoptr,cur_dir_cluster,1);
+  ClusRead(dv,isoptr,cur_dir_clus,1);
   if (isoptr->name_len==1 && !isoptr->name) {//curdir
     i=(isoptr->size.little+dv->spc<<BLK_SIZE_BITS-1)/dv->spc<<BLK_SIZE_BITS;
     buf=MAlloc(dv->spc<<BLK_SIZE_BITS*i);
-    RClusters(dv,buf,cur_dir_cluster,i);
+    ClusRead(dv,buf,cur_dir_clus,i);
     Free(isoptr);
   } else {
     buf=isoptr;

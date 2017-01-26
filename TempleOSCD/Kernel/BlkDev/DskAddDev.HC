@@ -78,7 +78,7 @@ I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=I64_MIN,
 	  break;
 	}
 	offset=0;
-	ext_base=INVALID_CLUSTER;
+	ext_base=INVALID_CLUS;
 	while (prt_num<0 || num<=prt_num) {
 	  ATAReadBlks(bd,&mbr,offset,1);
 	  if (mbr.signature!=0xAA55)
@@ -144,7 +144,7 @@ I64 BlkDevAdd(CBlkDev *bd,I64 prt_num=I64_MIN,
 	    break;
 	  if (!mbr.p[j].offset)
 	    break;
-	  if (ext_base==INVALID_CLUSTER) {
+	  if (ext_base==INVALID_CLUS) {
 	    offset=mbr.p[j].offset;
 	    ext_base=offset;
 	  } else
@@ -231,8 +231,8 @@ U0 BlkDevsInitAll()
   for (i=0;i<DRVS_NUM;i++)
     blkdev.let_to_drv[i]=&blkdev.drvs[i];
   #exe {
-    if (kernel_cfg->opts[CFG_AUTO_MOUNT_IDE])
-      StreamPrint("AutoMountIDE;");
+    if (kernel_cfg->opts[CFG_MOUNT_IDE_AUTO])
+      StreamPrint("MountIDEAuto;");
     StreamPrint("#exe {Option(OPTf_WARN_PAREN,OFF);}");
     StreamDoc(kernel_cfg->add_dev);
     StreamPrint("#exe {Option(OPTf_WARN_PAREN,ON);}");

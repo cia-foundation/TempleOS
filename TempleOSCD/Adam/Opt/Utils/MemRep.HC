@@ -115,7 +115,7 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
 
   "HashTable\t:%010X\n",HashTableSize2(task->hash_table);
   "FPU\t\t:%010X\n",MSize2(task->fpu_mmx);
-  "CurDir\t:%010X\n",MSize2(task->cur_dir);
+  "DirCur\t:%010X\n",MSize2(task->cur_dir);
 
   if (pdoc=DocPut(task))
     "PutDoc\t:%010X\n",DocSize(pdoc);

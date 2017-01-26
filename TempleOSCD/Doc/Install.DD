@@ -14,7 +14,7 @@ Two TempleOS partitions are highly recommended, so you can boot to a back-up and
 $ID,2$$LK,"Mount",A="MN:Mount"$() use if the drive is partitioned.
 $ID,2$This command mounts a drive making it accessible.  For simplicity, sel $FG,2$'C'$FG$ as the first drive letter for your hard drive.  The first partition will be $FG,2$'C'$FG$, second, $FG,2$'D'$FG$, etc.  TempleOS needs 3 numbers to utilize a hard drive -- base0, base1, and unit.  When you enter a hexadecimal number, do it like in $FG,2$C$FG$ with a $FG,2$0x$FG$ prefix.  If the probe was successful, you can just enter the number in the probe box instead of base0.
 $ID,-2$
-$LK,"PrtDsk",A="MN:PrtDsk"$($FG,2$'C'$FG$) use if drive is not partitioned
+$LK,"DskPrt",A="MN:DskPrt"$($FG,2$'C'$FG$) use if drive is not partitioned
 
 $ID,2$This will perform a special $LK,"Mount",A="MN:Mount"$() automatically.
 

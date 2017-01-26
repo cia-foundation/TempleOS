@@ -71,13 +71,13 @@ U0 DrawHexes()
   }
 }
 
-U0 MakeTerrain(U8 color,I64 cnt,I64 cluster_lo,I64 cluster_hi)
+U0 MakeTerrain(U8 color,I64 cnt,I64 clus_lo,I64 clus_hi)
 {
   I64 i,j,l,row,col;
   for (i=0;i<cnt;i++) {
     col=RandU32%map_cols;
     row=RandU32%map_rows;
-    l=cluster_lo+RandU16%(cluster_hi-cluster_lo+1);
+    l=clus_lo+RandU16%(clus_hi-clus_lo+1);
     for (j=0;j<l;j++) {
       terrain[row][col]=color;
       Toward(&row,&col,RandU16%6);

@@ -200,7 +200,7 @@ U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0)
   return res;
 }
 
-U8 *ChgExt(U8 *filename,U8 *extension)
+U8 *ExtChg(U8 *filename,U8 *extension)
 {//Change filename extension.
   U8 *res=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
   StrCpy(res,filename);
@@ -209,7 +209,7 @@ U8 *ChgExt(U8 *filename,U8 *extension)
   return CatPrint(res,".%s",extension);
 }
 
-U8 *DftExt(U8 *filename,U8 *extension)
+U8 *ExtDft(U8 *filename,U8 *extension)
 {//Give extension if has none.
   U8 *res=MAlloc(StrLen(filename)+1+StrLen(extension)+1);
   StrCpy(res,filename);
@@ -278,7 +278,7 @@ U8 *FileNameTmpTxt()
   return MStrPrint("~/SysTmp%X.DD.Z",GetTSC>>8&0xFFFFFFFF);
 }
 
-U8 *CurDir(CTask *task=NULL,CTask *mem_task=NULL)
+U8 *DirCur(CTask *task=NULL,CTask *mem_task=NULL)
 {//MAlloc copy of cur dir with drv letter.
   U8 *st;
   if (!task) task=Fs;

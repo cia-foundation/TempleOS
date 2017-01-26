@@ -16,7 +16,7 @@ Flags are either text or int values.
   $LK,"FUF_FLATTEN_TREE",A="MN:FUF_FLATTEN_TREE"$	$FG,2$+f$FG$ use with '$FG,2$+F$FG$'.  Just use $FG,2$+F$FG$, probably.
   $LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$		$FG,2$+D$FG$ just directories
   $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$	$FG,2$+F$FG$ just files (Flattens trees)
-  $LK,"FUF_CLUSTER_ORDER",A="MN:FUF_CLUSTER_ORDER"$	$FG,2$+O$FG$ sort by cluster (move head one direction)
+  $LK,"FUF_CLUS_ORDER",A="MN:FUF_CLUS_ORDER"$	$FG,2$+O$FG$ sort by clus (move head one direction)
   $LK,"FUF_JUST_TXT",A="MN:FUF_JUST_TXT"$		$FG,2$+T$FG$ just text files	: $LK,"FILEMASK_TXT",A="MN:FILEMASK_TXT"$
   $LK,"FUF_JUST_DD",A="MN:FUF_JUST_DD"$		$FG,2$+$$$FG$ just $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ files	: $LK,"FILEMASK_DD",A="MN:FILEMASK_DD"$
   $LK,"FUF_JUST_SRC",A="MN:FUF_JUST_SRC"$		$FG,2$+S$FG$ just src files	: $LK,"FILEMASK_SRC",A="MN:FILEMASK_SRC"$

@@ -284,7 +284,7 @@ U0 FMMkDir(CDoc *doc)
       Cd(parent->full_name);
       if (DocForm(&fn)) {
 	Silent;
-	MkDir(fn.name);
+	DirMk(fn.name);
 	Silent(OFF);
       }
     }
@@ -293,7 +293,7 @@ U0 FMMkDir(CDoc *doc)
     Cd(tmpde->full_name);
     if (DocForm(&fn)) {
       Silent;
-      MkDir(fn.name);
+      DirMk(fn.name);
       Silent(OFF);
     }
   }
@@ -335,7 +335,7 @@ U0 FMChgDsk(CDoc *doc)
     while (tmpde->parent)
       tmpde=tmpde->parent;
     Silent;
-    ChgDsk(*tmpde->full_name);
+    DskChg(*tmpde->full_name);
     Silent(OFF);
   }
 }
@@ -596,7 +596,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   CDirEntry *head=NULL,*tmpde,*tmpde1,*tmpde2;
   I64 sc,ch,arg1,arg2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
-  U8 *res=NULL,*st,*st2,*old_cur_dir=CurDir;
+  U8 *res=NULL,*st,*st2,*old_cur_dir=DirCur;
   CDocEntry *doc_ce=NULL,*doc_e;
   Bool okay;
 
