@@ -88,7 +88,7 @@ U8 *TOSLinkCvt2(U8 *filename,I64 line_num)
 //Make your own LinkCvt routine
   U8 *res=NULL,*st;
   if (filename) {
-    st=ChgExt(filename,"html");
+    st=ExtChg(filename,"html");
     if (st && StrLen(st)>3 && !StrNCmp(st+1,":/",2))
       res=MStrPrint(PERSONAL_WEB "/%s#l%d",st+3,line_num);
     Free(st);
@@ -189,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -380,11 +380,11 @@ public U0 TOSToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinHorz(0,width-1); //Sets doc width for word wrap.
 
-  in_name=DftExt(_in_name,"HC.Z");
+  in_name=ExtDft(_in_name,"HC.Z");
   if (_out_name)
-    out_name=DftExt(_out_name,"html");
+    out_name=ExtDft(_out_name,"html");
   else
-    out_name=ChgExt(_in_name,"html");
+    out_name=ExtChg(_in_name,"html");
 
   doc_in=DocRead(in_name);
   DocTop(doc_in);
@@ -413,7 +413,7 @@ U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
     "File:%s\n",name;
     Collapse(name,FALSE);
     Touch(name,"",,de.datetime);
-    name2=ChgExt(name,"html");
+    name2=ExtChg(name,"html");
 
     if (StrMatch(BLOG_BASE,name) || StrMatch(DAILY_BASE,name))
       line_anchors=FALSE;
@@ -430,7 +430,7 @@ U0 TOSWebFile(U8 *name,Bool line_nums=FALSE)
 	  "<meta name=\"keywords\" "
 	  "content=\"Operating System,64-Bit,64 Bit,"
 	  "Temple,OS,TempleOS,Free,Open Source,Public Domain,x86_64\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n",
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$\">\n",
 
 	  "<body style=\"background-color:#55FFFF; border-style:solid;
 	  border-width:8px; border-color:#0000AA;
@@ -451,7 +451,7 @@ U0 FreshenWebDir(U8 *dirname,Bool line_nums=FALSE)
   U8 *src,*dst;
 
   src=MStrPrint("D:/Wb%s",dirname);
-  MkDir(src);
+  DirMk(src);
   Free(src);
 
   src=MStrPrint("D:/Wb%s/*",dirname);
@@ -465,7 +465,7 @@ U0 FreshenWebDir(U8 *dirname,Bool line_nums=FALSE)
   Free(dst);
 
   src=MStrPrint("D:/Wb%s/*",dirname);
-  tmpde=tmpde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
+  tmpde=tmpde1=FilesFind(src,FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUS_ORDER);
   while (tmpde) {
     TOSWebFile(tmpde->full_name,line_nums);
     tmpde=tmpde->next;
@@ -487,7 +487,7 @@ public U0 FreshenSite()
   Touch("D:/Wb/Home/Web/DownloadOS.DD.Z","");
   Touch("D:/Wb/Home/Web/TempleOS.DD.Z","");
   tmpde=tmpde1=FilesFind("*",
-	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUSTER_ORDER);
+	FUF_RECURSE|FUF_JUST_FILES|FUF_JUST_TXT|FUF_CLUS_ORDER);
   while (tmpde) {
     TOSWebFile(tmpde->full_name);
     tmpde=tmpde->next;

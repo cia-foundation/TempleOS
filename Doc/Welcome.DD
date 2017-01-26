@@ -75,9 +75,9 @@ There are no object files in TempleOS and, normally, you don't make executable f
 
 Tasks have no priority and are never removed from the queue.  Instead, they often poll whatever they are waiting on and swap-out.  (Swapping tasks takes half a microsecond and does not involve disk activity or memory maps.)  See $LK,"Scheduler",A="FL:::/Kernel/Sched.HC,1"$.  Polling keeps it simple.  It might be a problem if you had lots of tasks busy, which rarely happens on a home computer.  The order of the tasks in the queue determines front-to-back window order.
 
-The $FG,2$FAT32$FG$ filesystem is supported to makes exchanging files with a dual booted other operating system easy and there is the simple, 64-bit TempleOS $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ filesystem.  The $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ has allocation bitmap for clusters and all files are stored contiguously.  You can't grow files.
+The $FG,2$FAT32$FG$ filesystem is supported to makes exchanging files with a dual booted other operating system easy and there is the simple, 64-bit TempleOS $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ filesystem.  The $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ has allocation bitmap for clus and all files are stored contiguously.  You can't grow files.
 
-TempleOS is geared toward reading and writing whole files.  Since whole files are processed, compression is possible.  Filenames ending in "$FG,2$.Z$FG$" are automatically compressed or uncompressed when stored and fetched.  TempleOS does support direct block random access into files, however -- $LK,"FRBlks",A="MN:FRBlks"$() and $LK,"FWBlks",A="MN:FWBlks"$().
+TempleOS is geared toward reading and writing whole files.  Since whole files are processed, compression is possible.  Filenames ending in "$FG,2$.Z$FG$" are automatically compressed or uncompressed when stored and fetched.  TempleOS does support direct block random access into files, however -- $LK,"FBlkRead",A="MN:FBlkRead"$() and $LK,"FBlkWrite",A="MN:FBlkWrite"$().
 
 If a file is not found, "$FG,2$.Z$FG$" is added or removed and a search is done, again.  There is no $FG,2$PATH$FG$, but parent directories are searched when a file is not found.  This feature is especially useful for default account files.
 

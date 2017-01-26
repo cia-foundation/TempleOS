@@ -14,13 +14,13 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
   U8 *full_name;
   Bool contiguous=StrOcc(flags,'c');
 
-  f->cluster=INVALID_CLUSTER;
+  f->clus=INVALID_CLUS;
   f->fblk_num=0;
   if (cnt>0)
     f->max_blk=cnt-1;
   else
     f->max_blk=I64_MAX;
-  f->file_cluster_num=INVALID_CLUSTER;
+  f->file_clus_num=INVALID_CLUS;
   full_name=FileNameAbs(filename);
   f->dv=Let2Drv(*full_name);
   if (f->dv->fs_type==FSt_REDSEA)
@@ -31,7 +31,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
 	  !(FileAttr(filename) & RS_ATTR_CONTIGUOUS))
       throw('File');
   }
-  f->cluster_buf=CAlloc(f->dv->spc<<BLK_SIZE_BITS);
+  f->clus_buf=CAlloc(f->dv->spc<<BLK_SIZE_BITS);
   if (StrOcc(flags,'w')) {
     f->flags=f->flags|FF_WRITE|FF_NEEDS_WRITE;
     if (StrOcc(flags,'+')) {
@@ -48,7 +48,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
     if (dirc=DirContextNew(full_name)) {
       StrCpy(f->de.name,dirc->mask);
       if (cnt>0) {//We pre-alloc the whole thing.
-	f->de.cluster=ClustersAlloc(f->dv,0,
+	f->de.clus=ClusAlloc(f->dv,0,
 	      (cnt+f->dv->spc-1)/f->dv->spc,contiguous);
 	f->de.size=cnt<<BLK_SIZE_BITS;
 	DirNew(dirc->dv,Fs->cur_dir,&f->de,TRUE);
@@ -64,7 +64,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0)
       return f;
     }
   }
-  Free(f->cluster_buf);
+  Free(f->clus_buf);
   Free(full_name);
   Free(f);
   return NULL;
@@ -75,7 +75,7 @@ U0 FClose(CFile *f)
   CDirContext *dirc;
   if (f) {
     if (f->flags & FF_BUF_DIRTY) {
-      WClusters(f->dv,f->cluster_buf,f->cluster,1);
+      ClusWrite(f->dv,f->clus_buf,f->clus,1);
       f->flags&=~FF_BUF_DIRTY;
     }
     if (f->flags & FF_NEEDS_WRITE) {
@@ -90,46 +90,46 @@ U0 FClose(CFile *f)
       } else
 	throw('File');
     }
-    Free(f->cluster_buf);
+    Free(f->clus_buf);
     Free(f->de.full_name);
     Free(f);
   }
 }
 
-I64 FSetCluster(CFile *f,I64 c,I64 blk,Bool read)
+I64 FSetClus(CFile *f,I64 c,I64 blk,Bool read)
 {
   CDrv *dv=f->dv;
   I64 i;
-  if (f->cluster!=c) {
+  if (f->clus!=c) {
     if (f->flags & FF_BUF_DIRTY) {
       i=dv->spc;
       if (f->max_blk!=I64_MAX) {
-	i=f->max_blk+1-f->file_cluster_num*dv->spc;
+	i=f->max_blk+1-f->file_clus_num*dv->spc;
 	if (i>dv->spc)
 	  i=dv->spc;
       }
-      WClustersBlks(dv,f->cluster_buf,f->cluster,i);
+      ClusBlkWrite(dv,f->clus_buf,f->clus,i);
       f->flags=f->flags & ~FF_BUF_DIRTY;
     }
-    f->cluster=c;
-    f->file_cluster_num=blk/dv->spc;
+    f->clus=c;
+    f->file_clus_num=blk/dv->spc;
     if (read) {
       i=dv->spc;
       if (f->max_blk!=I64_MAX) {
-	i=f->max_blk+1-f->file_cluster_num*dv->spc;
+	i=f->max_blk+1-f->file_clus_num*dv->spc;
 	if (i>dv->spc)
 	  i=dv->spc;
       }
-      c=RClustersBlks(dv,f->cluster_buf,c,i);
+      c=ClusBlkRead(dv,f->clus_buf,c,i);
     }
   }
   return c;
 }
 
-Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
+Bool FBlkRead(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 {//Read [nth,n+cnt) blks of file.
   CDrv *dv=f->dv;
-  I64 spc=dv->spc,i,j,c=f->de.cluster;
+  I64 spc=dv->spc,i,j,c=f->de.clus;
   if (!f || !dv) return FALSE;
   if (blk==FFB_NEXT_BLK)
     blk=f->fblk_num;
@@ -138,38 +138,38 @@ Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
   if (cnt<=0) return TRUE;
 
   if (f->flags & FF_CONTIGUOUS) {
-    RBlks(dv,buf,Cluster2Blk(dv,c)+blk,cnt);
+    BlkRead(dv,buf,Clus2Blk(dv,c)+blk,cnt);
     blk+=cnt;
   } else {
     i=blk/spc;
-    if (0<=f->file_cluster_num<=i) {
-      c=f->cluster;
-      i-=f->file_cluster_num;
+    if (0<=f->file_clus_num<=i) {
+      c=f->clus;
+      i-=f->file_clus_num;
     }
     if (i>0)
-      c=ClusterNumNext(dv,c,i);
+      c=ClusNumNext(dv,c,i);
 
     if (i=blk%spc) {
-      c=FSetCluster(f,c,blk,TRUE);
+      c=FSetClus(f,c,blk,TRUE);
       if (cnt<spc-i)
 	j=cnt;
       else
 	j=spc-i;
-      MemCpy(buf,f->cluster_buf+i<<BLK_SIZE_BITS,j<<BLK_SIZE_BITS);
+      MemCpy(buf,f->clus_buf+i<<BLK_SIZE_BITS,j<<BLK_SIZE_BITS);
       buf+=j<<BLK_SIZE_BITS;
       cnt-=j;
       blk+=j;
     }
     while (cnt>=spc) {
-      c=FSetCluster(f,c,blk,TRUE);
-      MemCpy(buf,f->cluster_buf,spc<<BLK_SIZE_BITS);
+      c=FSetClus(f,c,blk,TRUE);
+      MemCpy(buf,f->clus_buf,spc<<BLK_SIZE_BITS);
       buf+=spc<<BLK_SIZE_BITS;
       cnt-=spc;
       blk+=spc;
     }
     if (cnt>0) {
-      c=FSetCluster(f,c,blk,TRUE);
-      MemCpy(buf,f->cluster_buf,cnt<<BLK_SIZE_BITS);
+      c=FSetClus(f,c,blk,TRUE);
+      MemCpy(buf,f->clus_buf,cnt<<BLK_SIZE_BITS);
       buf+=cnt<<BLK_SIZE_BITS;
       blk+=cnt;
     }
@@ -178,10 +178,10 @@ Bool FRBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
   return TRUE;
 }
 
-Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
+Bool FBlkWrite(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 {//Write [nth,n+cnt) blks of file.
   CDrv *dv=f->dv;
-  I64 spc=dv->spc,i,j,c=f->de.cluster,c1;
+  I64 spc=dv->spc,i,j,c=f->de.clus,c1;
   if (!f || !dv) return FALSE;
   if (blk==FFB_NEXT_BLK)
     blk=f->fblk_num;
@@ -191,68 +191,68 @@ Bool FWBlks(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
     return FALSE;
   if (cnt<=0) return TRUE;
   if (f->flags & FF_CONTIGUOUS) {
-    WBlks(dv,buf,Cluster2Blk(dv,c)+blk,cnt);
+    BlkWrite(dv,buf,Clus2Blk(dv,c)+blk,cnt);
     blk+=cnt;
   } else {
     if (!c) {
-      c=ClustersAlloc(dv,0,1,FALSE);
-      f->file_cluster_num=0;
-      f->cluster=c;
-      f->de.cluster=c;
+      c=ClusAlloc(dv,0,1,FALSE);
+      f->file_clus_num=0;
+      f->clus=c;
+      f->de.clus=c;
       f->flags|=FF_NEEDS_WRITE|FF_NEW_FILE;
     }
     i=blk/spc;
-    if (0<=f->file_cluster_num<=i) {
-      c=f->cluster;
-      i-=f->file_cluster_num;
+    if (0<=f->file_clus_num<=i) {
+      c=f->clus;
+      i-=f->file_clus_num;
     }
     while (i>0) {
       c1=c;
-      c=ClusterNumNext(dv,c1,1);
-      if (c==INVALID_CLUSTER) {
-	c=ClustersAlloc(dv,c1,i,FALSE);
+      c=ClusNumNext(dv,c1,1);
+      if (c==INVALID_CLUS) {
+	c=ClusAlloc(dv,c1,i,FALSE);
 	if (i>1)
-	  c=ClusterNumNext(dv,c,i-1);
+	  c=ClusNumNext(dv,c,i-1);
 	break;
       } else
 	i--;
     }
 
     if (i=blk%spc) {
-      FSetCluster(f,c,blk,TRUE);
+      FSetClus(f,c,blk,TRUE);
       if (cnt<spc-i)
 	j=cnt;
       else
 	j=spc-i;
-      MemCpy(f->cluster_buf+BLK_SIZE*i,buf,j<<BLK_SIZE_BITS);
+      MemCpy(f->clus_buf+BLK_SIZE*i,buf,j<<BLK_SIZE_BITS);
       f->flags|=FF_BUF_DIRTY;
       buf+=j<<BLK_SIZE_BITS;
       cnt-=j;
       blk+=j;
       if (cnt>0) {
 	c1=c;
-	c=ClusterNumNext(dv,c1,1);
-	if (c==INVALID_CLUSTER)
-	  c=ClustersAlloc(dv,c1,1,FALSE);
+	c=ClusNumNext(dv,c1,1);
+	if (c==INVALID_CLUS)
+	  c=ClusAlloc(dv,c1,1,FALSE);
       }
     }
     while (cnt>=spc) {
-      FSetCluster(f,c,blk,FALSE);
-      MemCpy(f->cluster_buf,buf,spc<<BLK_SIZE_BITS);
+      FSetClus(f,c,blk,FALSE);
+      MemCpy(f->clus_buf,buf,spc<<BLK_SIZE_BITS);
       f->flags|=FF_BUF_DIRTY;
       buf+=spc<<BLK_SIZE_BITS;
       cnt-=spc;
       blk+=spc;
       if (cnt>0) {
 	c1=c;
-	c=ClusterNumNext(dv,c1,1);
-	if (c==INVALID_CLUSTER)
-	  c=ClustersAlloc(dv,c1,1,FALSE);
+	c=ClusNumNext(dv,c1,1);
+	if (c==INVALID_CLUS)
+	  c=ClusAlloc(dv,c1,1,FALSE);
       }
     }
     if (cnt>0) {
-      FSetCluster(f,c,blk,TRUE);
-      MemCpy(f->cluster_buf,buf,cnt<<BLK_SIZE_BITS);
+      FSetClus(f,c,blk,TRUE);
+      MemCpy(f->clus_buf,buf,cnt<<BLK_SIZE_BITS);
       f->flags|=FF_BUF_DIRTY;
       buf+=cnt<<BLK_SIZE_BITS;
       blk+=cnt;

@@ -2,7 +2,34 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/19/17 07:21:14----$IV,0$
+$IV,1$----01/25/17 20:44:17----$IV,0$
+* $LK,"R",A="MN:R"$("DocLineNumGoto","DocGoToLine");
+* $LK,"R",A="MN:R"$("Clipboard","Clip");
+* $LK,"R",A="MN:R"$("AutoMountIDE","MountIDEAuto");
+* $LK,"R",A="MN:R"$("ChgExt","ExtChg");
+* $LK,"R",A="MN:R"$("DftExt","ExtDft");
+* $LK,"R",A="MN:R"$("CurDir","DirCur");
+* $LK,"R",A="MN:R"$("MkDir","DirMk");
+* $LK,"R",A="MN:R"$("ChkDsk","DskChk");
+* $LK,"R",A="MN:R"$("ChgDsk","DskChg");
+* $LK,"R",A="MN:R"$("PrtDsk","DskPrt");
+* $LK,"R",A="MN:R"$("RBlks","BlkRead");
+* $LK,"R",A="MN:R"$("WBlks","BlkWrite");
+* $LK,"R",A="MN:R"$("FRBlks","FBlkRead");
+* $LK,"R",A="MN:R"$("FWBlks","FBlkWrite");
+* $LK,"R",A="MN:R"$("Cluster","Clus");
+* $LK,"R",A="MN:R"$("RClusters","ClusRead");
+* $LK,"R",A="MN:R"$("WClusters","ClusWrite");
+
+
+$IV,1$----01/24/17 21:56:06----$IV,0$
+* Improved $LK,"::/Apps/Psalmody/JukeBox.HC"$
+* $LK,"R",A="MN:R"$("TreeBranch","Tree");
+* Added $LK,"DocTreeWrite",A="MN:DocTreeWrite"$() and $LK,"DocTreeAppend",A="MN:DocTreeAppend"$().
+
+$IV,1$----01/22/17 06:08:00----$IV,0$
+* $BK,1$TempleOS version 5.02 Released$BK,0$
+* Changed polling of $LK,"KbdMsHndlr",A="MN:KbdMsHndlr"$() in $LK,"WinMgrSleep",A="MN:WinMgrSleep"$(), increased fifos.
 
 $IV,1$----01/17/17 18:11:53----$IV,0$
 * Fixed $FG,2$$$$FG$ class offset so $FG,2$#assert$FG$'s don't lag a token.
@@ -46,7 +73,7 @@ $IV,1$----01/10/17 11:45:41----$IV,0$
 * Added $LK,"::/Adam/InsReg.HC"$ with $LK,"InsReg",A="MN:InsReg"$(), $LK,"InsRereg",A="MN:InsRereg"$() and $LK,"InsUnreg",A="MN:InsUnreg"$().
 * Added $LK,"::/Adam/Host.HC"$ with $LK,"HostChgDsk",A="MN:HostChgDsk"$().
 * Added $LK,"::/Adam/Opt/Utils/TOS.HC"$ with $LK,"TOSStdIns",A="MN:TOSStdIns"$().
-* Added cmd line args for partition % to $LK,"PrtDsk",A="MN:PrtDsk"$().
+* Added cmd line args for partition % to $LK,"DskPrt",A="MN:DskPrt"$().
 
 $IV,1$----01/09/17 21:48:34----$IV,0$
 * $LK,"R",A="MN:R"$("a1","arg1");
@@ -62,7 +89,7 @@ $IV,1$----01/09/17 02:30:59----$IV,0$
 * Moved AfterEgypt to the supplemental disk.
 
 $IV,1$----01/06/17 06:07:19----$IV,0$
-* Fixed $LK,"ChgDsk",A="MN:ChgDsk"$().
+* Fixed $LK,"DskChg",A="MN:DskChg"$().
 * Improved $LK,"::/Misc/OSTestSuite.HC"$.
 
 $IV,1$----01/05/17 04:53:21----$IV,0$

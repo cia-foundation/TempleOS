@@ -9,7 +9,7 @@ U8 *YouTubeGet(U8 *filename="~/Sup1/Sup1Blog/YouTube.DD.Z",U8 *needle)
   while (DocFind(doc,line,needle)) {
     if (!(doc->cur_entry->y&1)) {
       title=doc->cur_entry->tag;
-      DocLineNumGoTo(doc,doc->cur_entry->y+2);
+      DocGoToLine(doc,doc->cur_entry->y+2);
       if (doc->cur_entry->type_u8==DOCT_TEXT) {
 	code=doc->cur_entry->tag;
 	DocPrint(doc2,"$$MU-UL,\"%s\",LE=0x%X$$\n",title,code);
@@ -177,7 +177,7 @@ U0 TOSIns()
 public U0 GodCodeJmp()
 {//Jump to rand code in OS. See $LK,"::/Adam/God/HSNotes.DD"$.
   CDirEntry *tmpde1=FilesFind("/*",
-	FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUSTER_ORDER),
+	FUF_JUST_FILES|FUF_RECURSE|FUF_JUST_SRC|FUF_CLUS_ORDER),
 	*tmpde=tmpde1;
   I64 cnt=0,num;
   CDoc *doc;

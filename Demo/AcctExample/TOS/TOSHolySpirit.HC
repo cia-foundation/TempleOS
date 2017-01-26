@@ -178,7 +178,7 @@ U8 *FileDblRead(U8 *filename,I64 line)
 {//FileDbl's are DolDoc files with 2-line entries.
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocLineNumGoTo(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
+  if (DocGoToLine(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
     res=StrNew(doc->cur_entry->tag);
   DocDel(doc);
   return res;
@@ -188,7 +188,7 @@ U8 *FileDblWrite(U8 *filename,I64 line,U8 *st)
 {//FileDbl's are DolDoc files with 2-line entries.
   U8 *res=NULL;
   CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocLineNumGoTo(doc,line-1)) {
+  if (DocGoToLine(doc,line-1)) {
     if (doc->cur_entry->type_u8==DOCT_TEXT) {
       Free(doc->cur_entry->tag);
       doc->cur_entry->tag=StrNew(st);
@@ -201,7 +201,7 @@ U8 *FileDblWrite(U8 *filename,I64 line,U8 *st)
   return res;
 }
 
-U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
+U0 GodVideoDigits(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
 {
   U8 *st,*st2;
   CGodVideoForm *gvf=CAlloc(sizeof(CGodVideoForm));
@@ -250,6 +250,36 @@ U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
     }
   }
   Free(gvf);
+}
+
+U0 GodVideoU32(U32 rand_u32,U8 *filename)
+{
+  U8 *st,*st2;
+  I64 i,num;
+  Bool old_silent=Silent;
+  num=LineRep(filename,"-S")/2;
+  Silent(old_silent);
+  if (num) {
+    i=rand_u32%num;
+    if (st=FileDblRead(filename,i*2)) {
+      st2=FileDblRead(filename,i*2+1);
+      PutFileLink(filename);
+      "\nGod's response:\n"
+	    "%08X-->#%d out of %d\n%s\n",rand_u32,i,num,st;
+      "$$HC,\"<object width=\\\"640\\\" height=\\\"520\\\">"
+	    "<param name=\\\"movie\\\" "
+	    "value=\\\"http://www.youtube.com/v/%s\\\"></param><param "
+	    "name=\\\"allowscriptaccess\\\" "
+	    "value=\\\"always\\\"></param><embed "
+	    "src=\\\"http://www.youtube.com/v/%s\\\" "
+	    "type=\\\"application/x-shockwave-flash\\\" "
+	    "allowscriptaccess=\\\"always\\\" "
+	    "width=\\\"640\\\" height=\\\"520\\\">"
+	    "</embed></object>\"$$\n",st2,st2;
+      Free(st2);
+      Free(st);
+    }
+  }
 }
 
 U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
@@ -414,7 +444,7 @@ U0 TimerGodIns()
   GodHeaderIns;
   FifoU8Flush(god.fifo);
   GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
-  switch (PopUpPickLst("Hex5Bible\0Hex8Books\0Doodle\0Movie\0Painting100\0"
+  switch (PopUpPickLst("Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
 	"Painting1000\0Metallica\0")) {
     case:
       StrPrint(buf,"%05X",GodBits(5*4));
@@ -432,9 +462,9 @@ U0 TimerGodIns()
       break;
     case:
       StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
-      GodVideo("Top 100 Movies",
+      GodVideoDigits("Top 100 Movies",
 	    "http://www.afi.com/100years/movies10.aspx",
-	    buf,2,"~/Sup1/Sup1Blog/Movies.DD.Z");
+	    buf,2,"~/Sup1/Sup1Blog/Movies100.DD.Z");
       break;
     case:
       StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
@@ -451,7 +481,7 @@ U0 TimerGodIns()
       break;
     case:
       StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
-      GodVideo("Metallica Song",
+      GodVideoDigits("Metallica Song",
 	    "http://home.hccnet.nl/a.r.adams/lyrics/"
 	    "metallica/songindex.html",
 	    buf,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
@@ -481,8 +511,8 @@ public U0 GodIns()
 	GodHeaderIns;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0"
-	      "HappyWords\0Hex5Bible\0Hex8Books\0Doodle\0Movie\0Painting100\0"
-	      "Painting1000\0Metallica\0")) {
+	      "HappyWords\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
+	      "Painting100\0Painting1000\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -524,9 +554,9 @@ public U0 GodIns()
 	    break;
 	  case:
 	    if (DocForm(gm(CMoviesForm *)))
-	      GodVideo("Top 100 Movies",
+	      GodVideoDigits("Top 100 Movies",
 		    "http://www.afi.com/100years/movies10.aspx",
-		    gm->rnd0,2,"~/Sup1/Sup1Blog/Movies.DD.Z");
+		    gm->rnd0,2,"~/Sup1/Sup1Blog/Movies100.DD.Z");
 	    break;
 	  case:
 	    if (DocForm(gm(CPaintings100Form *))) {
@@ -545,7 +575,7 @@ public U0 GodIns()
 	    break;
 	  case:
 	    if (DocForm(gm(CMetallicaForm *)))
-	      GodVideo("Metallica Song",
+	      GodVideoDigits("Metallica Song",
 		    "http://home.hccnet.nl/a.r.adams/lyrics/"
 		    "metallica/songindex.html",
 		    gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");
@@ -563,13 +593,12 @@ public U0 GodIns()
 	  tag="https://passed.pw";
 	  break;
 	case GSRC_GENERATE_DATA:
-	  tag="http://www.generatedata.com";
 	  break;
       end:
 	GodHeaderIns;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0HexWordBatch\0"
-	      "Hex5Bible\0Hex8Books\0Movie\0Metallica\0")) {
+	      "Hex5Bible\0Hex8Books\0Movie100\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -599,13 +628,13 @@ public U0 GodIns()
 	    break;
 	  case:
 	    if (DocForm(gm(CMoviesForm *)))
-	      GodVideo("Top 100 Movies",
+	      GodVideoDigits("Top 100 Movies",
 		    "http://www.afi.com/100years/movies10.aspx",
-		    gm->rnd0,2,"~/Sup1/Sup1Blog/Movies.DD.Z");
+		    gm->rnd0,2,"~/Sup1/Sup1Blog/Movies100.DD.Z");
 	    break;
 	  case:
 	    if (DocForm(gm(CMetallicaForm *)))
-	      GodVideo("Metallica Song",
+	      GodVideoDigits("Metallica Song",
 		    "http://home.hccnet.nl/a.r.adams/lyrics/"
 		    "metallica/songindex.html",
 		    gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");

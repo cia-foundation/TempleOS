@@ -1,5 +1,5 @@
-I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1)
-{//Return next cnt'th cluster in chain.
+I64 ClusNumNext(CDrv *dv,I64 c,I64 cnt=1)
+{//Return next cnt'th clus in chain.
   Bool unlock;
   DrvChk(dv);
   if (cnt<=0) return c;
@@ -16,7 +16,7 @@ I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1)
 	  c=dv->cur_fat_blk[c & (BLK_SIZE/4-1)];
 	}
 	if (!(0<c<0x0FFFFFF8))
-	  c=INVALID_CLUSTER;
+	  c=INVALID_CLUS;
 	break;
       default:
 	throw('Drv');
@@ -29,8 +29,8 @@ I64 ClusterNumNext(CDrv *dv,I64 c,I64 cnt=1)
   return c;
 }
 
-I64 Cluster2Blk(CDrv *dv,I64 c)
-{//Drv cluster num to blk num.
+I64 Clus2Blk(CDrv *dv,I64 c)
+{//Drv clus num to blk num.
   DrvChk(dv);
   switch (dv->fs_type) {
     case FSt_REDSEA:
@@ -43,8 +43,8 @@ I64 Cluster2Blk(CDrv *dv,I64 c)
   }
 }
 
-I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
-{//Accepts blk count, so padding on last cluster is not read.
+I64 ClusBlkRead(CDrv *dv,U8 *buf,I64 c,I64 blks)
+{//Accepts blk count, so padding on last clus is not read.
   I64 i;
   Bool unlock;
   DrvChk(dv);
@@ -53,11 +53,11 @@ I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
     unlock=DrvLock(dv);
     switch (dv->fs_type) {
       case FSt_ISO9660:
-	RBlks(dv,buf,dv->data_area+c*dv->spc,blks);
+	BlkRead(dv,buf,dv->data_area+c*dv->spc,blks);
 	c+=(blks+dv->spc-1)/dv->spc;
 	break;
       case FSt_REDSEA:
-	RBlks(dv,buf,c,blks);
+	BlkRead(dv,buf,c,blks);
 	c+=blks;
 	break;
       case FSt_FAT32:
@@ -65,9 +65,9 @@ I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
 	  i=blks;
 	  if (i>dv->spc)
 	    i=dv->spc;
-	  RBlks(dv,buf,dv->data_area+c*dv->spc,i);
+	  BlkRead(dv,buf,dv->data_area+c*dv->spc,i);
 	  buf+=i<<BLK_SIZE_BITS;
-	  c=ClusterNumNext(dv,c,1);
+	  c=ClusNumNext(dv,c,1);
 	  blks-=i;
 	}
 	if (blks)
@@ -84,13 +84,13 @@ I64 RClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
   return c;
 }
 
-I64 RClusters(CDrv *dv,U8 *buf,I64 c,I64 cnt)
-{//Read cluster cnt from drv to buf.
-  return RClustersBlks(dv,buf,c,cnt*dv->spc);
+I64 ClusRead(CDrv *dv,U8 *buf,I64 c,I64 cnt)
+{//Read clus cnt from drv to buf.
+  return ClusBlkRead(dv,buf,c,cnt*dv->spc);
 }
 
-I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
-{//Accepts blk count, so padding on last cluster is not written.
+I64 ClusBlkWrite(CDrv *dv,U8 *buf,I64 c,I64 blks)
+{//Accepts blk count, so padding on last clus is not written.
   I64 i;
   Bool unlock;
   DrvChk(dv);
@@ -99,7 +99,7 @@ I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
     unlock=DrvLock(dv);
     switch (dv->fs_type) {
       case FSt_REDSEA:
-	WBlks(dv,buf,c,blks);
+	BlkWrite(dv,buf,c,blks);
 	c=0;
 	break;
       case FSt_FAT32:
@@ -109,9 +109,9 @@ I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
 	  i=blks;
 	  if (i>dv->spc)
 	    i=dv->spc;
-	  WBlks(dv,buf,dv->data_area+c*dv->spc,i);
+	  BlkWrite(dv,buf,dv->data_area+c*dv->spc,i);
 	  buf+=i<<BLK_SIZE_BITS;
-	  c=ClusterNumNext(dv,c);
+	  c=ClusNumNext(dv,c);
 	  blks-=i;
 	}
 	break;
@@ -126,25 +126,25 @@ I64 WClustersBlks(CDrv *dv,U8 *buf,I64 c,I64 blks)
   return c;
 }
 
-I64 WClusters(CDrv *dv,U8 *buf,I64 c,I64 cnt)
-{//Write cluster cnt from buf to drv.
-  return WClustersBlks(dv,buf,c,cnt*dv->spc);
+I64 ClusWrite(CDrv *dv,U8 *buf,I64 c,I64 cnt)
+{//Write clus cnt from buf to drv.
+  return ClusBlkWrite(dv,buf,c,cnt*dv->spc);
 }
 
-I64 ClustersAlloc(CDrv *dv,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
-{//Alloc cluster cnt into chain.
-//c=0 means first cluster in chain
+I64 ClusAlloc(CDrv *dv,I64 c=0,I64 cnt=1,Bool contiguous=FALSE)
+{//Alloc clus cnt into chain.
+//c=0 means first clus in chain
   DrvChk(dv);
   if (cnt<=0) return c;
   switch (dv->fs_type) {
     case FSt_REDSEA:
-      return RedSeaAllocClusters(dv,cnt);
+      return RedSeaAllocClus(dv,cnt);
     case FSt_FAT32:
       if (contiguous) {
 	if (c) throw('File');
-	return FAT32AllocContiguousClusters(dv,cnt);
+	return FAT32AllocContiguousClus(dv,cnt);
       } else
-	return FAT32AllocClusters(dv,c,cnt);
+	return FAT32AllocClus(dv,c,cnt);
     default:
       throw('Drv');
   }

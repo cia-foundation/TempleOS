@@ -87,7 +87,7 @@ I64 Size1(CDirEntry *tmpde,I64 *_fuf_flags,I64 round_to)
 	  !(tmpde->attr&RS_ATTR_DIR) &&
 	  FileAttr(tmpde->name)&RS_ATTR_COMPRESSED) {
       dv=Let2Drv(*tmpde->full_name);
-      RBlks(dv,buf,Cluster2Blk(dv,tmpde->cluster),1);
+      BlkRead(dv,buf,Clus2Blk(dv,tmpde->clus),1);
       i=(&buf)(CArcCompress *)->expanded_size;
     }
     if (round_to)

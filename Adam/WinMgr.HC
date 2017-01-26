@@ -2,7 +2,7 @@
 
 public U0 Refresh(I64 cnt=1,Bool force=FALSE)
 {//Wait for 30fps WinMgr to start & finish scrn refresh.
-  //0,FALSE Cnt Sync to WinMgr. (not used)
+//0,FALSE Cnt Sync to WinMgr. (not used)
   //0,TRUE  Pump Msgs.
   //1 Cnt Wait and Pump Msgs.
   //2 Cnt Make Sure to do a Full Refresh
@@ -14,20 +14,16 @@ public U0 Refresh(I64 cnt=1,Bool force=FALSE)
   if (!cnt&&force)
     LBts(&sys_semas[SEMA_JUST_PUMP_MSGS],0);
   while (Bt(&sys_semas[SEMA_REFRESH_IN_PROGRESS],0)) {
-    if (force) {
-      LBts(&sys_semas[SEMA_FORCE_WINMGR],0);
-      if (sys_winmgr_task) sys_winmgr_task->wake_jiffy=cnts.jiffies;
-    }
+    if (force && sys_winmgr_task)
+      sys_winmgr_task->wake_jiffy=cnts.jiffies;
     Yield;
   }
   if (cnt>1 && old_doc)
     old_full_refresh=LBts(&old_doc->flags,DOCf_DO_FULL_REFRESH);
   update_cnt=winmgr.updates+cnt;
   while (winmgr.updates<update_cnt) {
-    if (force) {
-      LBts(&sys_semas[SEMA_FORCE_WINMGR],0);
-      if (sys_winmgr_task) sys_winmgr_task->wake_jiffy=cnts.jiffies;
-    }
+    if (force && sys_winmgr_task)
+      sys_winmgr_task->wake_jiffy=cnts.jiffies;
     Sleep(1);
   }
   if (old_doc)
@@ -281,16 +277,10 @@ I64 WinMgrSleep(Bool flush_msgs=FALSE)
       music.cur_song_task=NULL;
     }
     winmgr.updates++;
-    if (!ms_hard.install_attempts)
-      SleepUntil(timeout_val); //Just for before mouse install attempt at boot.
-    else
-      do {
-	KbdMsHndlr(FALSE,TRUE);
-	SleepUntil(MinI64(timeout_val,cnts.jiffies+JIFFY_FREQ/500));
-      } while (cnts.jiffies<timeout_val &&
-	    !Bt(&sys_semas[SEMA_FORCE_WINMGR],0));
+    if (ms_hard.install_attempts) //Don't call before boot mouse install attempt
+      KbdMsHndlr(FALSE,TRUE);
+    SleepUntil(timeout_val);
   }
-  LBtr(&sys_semas[SEMA_FORCE_WINMGR],0);
   return msg_code;
 }
 

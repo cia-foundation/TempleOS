@@ -165,7 +165,7 @@ You might want to use $LK,"DocPrintAtomic",A="MN:DocPrintAtomic"$().
 
 See $LK,"::/Demo/DolDoc/TreeDemo.HC"$.
 $ID,-2$$TR,"SP Sprite"$
-$ID,2$Insert a sprite into text with $FG,2$<CTRL-r>$FG$.  The cursor location at the time you press $FG,2$<CTRL-r>$FG$ is critical because the sprite will be offset from that location.  This is important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clipboard requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-t>$FG$ and manually adding a $FG,2$$$SP...$$$FG$ entry with the same $FG,2$BI=$FG$ num.
+$ID,2$Insert a sprite into text with $FG,2$<CTRL-r>$FG$.  The cursor location at the time you press $FG,2$<CTRL-r>$FG$ is critical because the sprite will be offset from that location.  This is important when adding images to programs.  Numbers for sprites are automatically chosen because copying to and from the clip requires this.  You can insert another sprite with the same image by hitting $FG,2$<CTRL-t>$FG$ and manually adding a $FG,2$$$SP...$$$FG$ entry with the same $FG,2$BI=$FG$ num.
 
 You can add a text tag to the $FG,2$$$SP...$$$FG$ cmd by manually adding text into the $FG,2$$$SP...$$$FG$ cmd, as in $FG,2$$$SP,"pic 2",BI=2$$$FG$.  If you enter a tag of the form $FG,2$"<1>"$FG$ then the number in the tag will be updated to match the $FG,2$BI=$FG$ number.
 $ID,-2$$TR,"IB Insert Binary"$

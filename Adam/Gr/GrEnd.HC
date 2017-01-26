@@ -10,20 +10,20 @@ U0 CtrlAltZ(I64 sc)
 CtrlAltCBSet('Z',&CtrlAltZ,"Cmd /Zoom In",
 	"Cmd /Zoom Out");
 
-U0 Scrn2Clipboard(I64)
+U0 Scrn2Clip(I64)
 {
   CDC *dc=DCScrnCapture;
   U8 *elems=DC2Sprite(dc);
-  Bool unlock_doc=DocLock(sys_clipboard_doc);
-  ClipboardDel;
-  DocSprite(sys_clipboard_doc,elems);
+  Bool unlock_doc=DocLock(sys_clip_doc);
+  ClipDel;
+  DocSprite(sys_clip_doc,elems);
   if (unlock_doc)
-    DocUnlock(sys_clipboard_doc);
+    DocUnlock(sys_clip_doc);
   Free(elems);
   DCDel(dc);
 }
 U0 CtrlAltS(I64)
 {
-  Spawn(&Scrn2Clipboard);
+  Spawn(&Scrn2Clip);
 }
-CtrlAltCBSet('S',&CtrlAltS,"Cmd /Scrn Shot to Clipboard");
+CtrlAltCBSet('S',&CtrlAltS,"Cmd /Scrn Shot to Clip");

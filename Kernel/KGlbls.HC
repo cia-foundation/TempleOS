@@ -3,7 +3,7 @@
 
 CJob sys_macro_head;
 CTask *sys_macro_task;
-CDoc *sys_clipboard_doc;
+CDoc *sys_clip_doc;
 
 CTask *adam_task;
 I64 sys_num_spawned_tasks;
@@ -13,7 +13,7 @@ U8 *rev_bits_table, //Table with U8 bits revd
    *set_bits_table; //Table with count of set bits in a U8
 CDate local_time_offset;
 F64	*pow10_I64,
-	sys_os_version=5.010;
+	sys_os_version=5.020;
 
 CAutoCompleteDictGlbls acd;
 CAutoCompleteGlbls ac;

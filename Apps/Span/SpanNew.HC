@@ -69,7 +69,7 @@ Bool SpanWrite(CMathODE *ode)
   U8 *name,*buf;
   I64 size;
   Bool res=FALSE,old_silent=Silent;
-  MkDir("~/Span");
+  DirMk("~/Span");
   Silent(old_silent);
   if (name=PopUpFileName("~/Span/Game.DATA")) {
     if (buf=SpanSave(ode,&size)) {
@@ -115,7 +115,7 @@ U8 *SpanRead()
 {
   U8 *src=NULL,*name;
   Bool old_silent=Silent;
-  MkDir("~/Span");
+  DirMk("~/Span");
   Silent(old_silent);
   if (name=PopUpPickFile("~/Span")) {
     src=FileRead(name);

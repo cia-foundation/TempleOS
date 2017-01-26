@@ -57,8 +57,8 @@ Bool CopySingle(U8 *f1,U8 *f2) //Just one file
 	  n=cnt;
 	  i=j;
 	}
-	FRBlks(in_file, buf,FFB_NEXT_BLK,n);
-	FWBlks(out_file,buf,FFB_NEXT_BLK,n);
+	FBlkRead(in_file, buf,FFB_NEXT_BLK,n);
+	FBlkWrite(out_file,buf,FFB_NEXT_BLK,n);
 	cnt-=n;
 	j-=n<<BLK_SIZE_BITS;
       }

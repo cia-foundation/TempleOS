@@ -588,33 +588,33 @@ U0 MeshCursorW(CMeshFrame *e,CTask *task,I64 *_x,I64 *_y,I64 *_z)
   *_x=x; *_y=y; *_z=z;
 }
 
-CMeshEdVertex	sys_clipboard_vertex_head;
-CMeshEdTri	sys_clipboard_tri_head;
+CMeshEdVertex	sys_clip_vertex_head;
+CMeshEdTri	sys_clip_tri_head;
 
-U0 MeshClipboardInit()
+U0 MeshClipInit()
 {
-  QueInit(&sys_clipboard_vertex_head);
-  QueInit(&sys_clipboard_tri_head);
+  QueInit(&sys_clip_vertex_head);
+  QueInit(&sys_clip_tri_head);
 }
 
-U0 MeshClipboardRst()
+U0 MeshClipRst()
 {
-  QueDel(&sys_clipboard_vertex_head,TRUE);
-  QueDel(&sys_clipboard_tri_head,TRUE);
-  MeshClipboardInit;
+  QueDel(&sys_clip_vertex_head,TRUE);
+  QueDel(&sys_clip_tri_head,TRUE);
+  MeshClipInit;
 }
 
-U0 MeshClipboardCopy(CMeshFrame *e)
+U0 MeshClipCopy(CMeshFrame *e)
 {
   CMeshEdVertex	*tmpv=e->vertex_head.next,*tmpv2;
   CMeshEdTri	*tmpt=e->tri_head.next,*tmpt2;
 
-  MeshClipboardRst;
+  MeshClipRst;
   while (tmpv!=&e->vertex_head) {
     if (tmpv->flags&VF_SEL) {
       tmpv->copy=tmpv2=ACAlloc(sizeof(CMeshEdVertex));
       MemCpy(&tmpv2->p,&tmpv->p,sizeof(CD3I32));
-      QueIns(tmpv2,sys_clipboard_vertex_head.last);
+      QueIns(tmpv2,sys_clip_vertex_head.last);
       tmpv->flags|=VF_COPIED;
       tmpv->flags&=~VF_SEL;
     } else {
@@ -631,7 +631,7 @@ U0 MeshClipboardCopy(CMeshFrame *e)
       tmpt2->t[1]=tmpt->t[1]->copy;
       tmpt2->t[2]=tmpt->t[2]->copy;
       tmpt2->mt.color=tmpt->mt.color;
-      QueIns(tmpt2,sys_clipboard_tri_head.last);
+      QueIns(tmpt2,sys_clip_tri_head.last);
       tmpt->flags|=TF_COPIED;
       tmpt->flags&=~TF_SEL;
     } else
@@ -640,11 +640,11 @@ U0 MeshClipboardCopy(CMeshFrame *e)
   }
 }
 
-U0 MeshClipboardCut(CMeshFrame *e)
+U0 MeshClipCut(CMeshFrame *e)
 {
   CMeshEdVertex	*tmpv=e->vertex_head.next,*tmpv1;
   CMeshEdTri	*tmpt=e->tri_head.next,*tmpt1;
-  MeshClipboardCopy(e);
+  MeshClipCopy(e);
   while (tmpt!=&e->tri_head) {
     tmpt1=tmpt->next;
     if (tmpt->flags&TF_COPIED)
@@ -659,8 +659,8 @@ U0 MeshClipboardCut(CMeshFrame *e)
   }
 }
 
-U0 MeshClipboardDel(CMeshFrame *e)
-{//Technically not clipboard
+U0 MeshClipDel(CMeshFrame *e)
+{//Technically not clip
   CMeshEdVertex	*tmpv=e->vertex_head.next,*tmpv1;
   CMeshEdTri	*tmpt=e->tri_head.next,*tmpt1;
   while (tmpt!=&e->tri_head) {
@@ -677,14 +677,14 @@ U0 MeshClipboardDel(CMeshFrame *e)
   }
 }
 
-U0 MeshClipboardPaste(CMeshFrame *e)
+U0 MeshClipPaste(CMeshFrame *e)
 {
-  CMeshEdVertex	*tmpv2=sys_clipboard_vertex_head.next,*tmpv;
-  CMeshEdTri	*tmpt2=sys_clipboard_tri_head.next,*tmpt;
+  CMeshEdVertex	*tmpv2=sys_clip_vertex_head.next,*tmpv;
+  CMeshEdTri	*tmpt2=sys_clip_tri_head.next,*tmpt;
 
   MeshVertexSelAll(e,FALSE);
   MeshTriSelAll(e,FALSE);
-  while (tmpv2!=&sys_clipboard_vertex_head) {
+  while (tmpv2!=&sys_clip_vertex_head) {
     tmpv2->copy=tmpv=CAlloc(sizeof(CMeshEdVertex));
     MemCpy(&tmpv->p,&tmpv2->p,sizeof(CD3I32));
     QueIns(tmpv,e->vertex_head.last);
@@ -692,7 +692,7 @@ U0 MeshClipboardPaste(CMeshFrame *e)
     tmpv2=tmpv2->next;
   }
 
-  while (tmpt2!=&sys_clipboard_tri_head) {
+  while (tmpt2!=&sys_clip_tri_head) {
     tmpt=MeshTriNew(e,tmpt2->mt.color,tmpt2->t[0]->copy,
 	  tmpt2->t[1]->copy,tmpt2->t[2]->copy);
     tmpt->flags|=TF_SEL;
@@ -700,7 +700,7 @@ U0 MeshClipboardPaste(CMeshFrame *e)
   }
 }
 
-MeshClipboardInit;
+MeshClipInit;
 
 U0 DrawIt(CTask *task,CDC *dc)
 {
@@ -1088,10 +1088,10 @@ me_restart:
 	      switch (arg2.u8[0]) {
 		case SC_DELETE:
 		  if (arg2&SCF_SHIFT)
-		    goto me_clipboard_cut;
+		    goto me_clip_cut;
 		  else {
 		    if (MeshSelCnt(&e))
-		      MeshClipboardDel(&e);
+		      MeshClipDel(&e);
 		    else if (e.ed_mode!='t')
 		      MeshVertexDel(&e,MeshVertexFindScrPt(&e,
 			    ms.presnap.x-Fs->pix_left-Fs->scroll_x,
@@ -1103,9 +1103,9 @@ me_restart:
 		  break;
 		case SC_INS:
 		  if (arg2&SCF_CTRL)
-		    goto me_clipboard_copy;
+		    goto me_clip_copy;
 		  else if (arg2&SCF_SHIFT)
-		    goto me_clipboard_paste;
+		    goto me_clip_paste;
 	      }
 	      break;
 	    case CH_BACKSPACE:
@@ -1209,27 +1209,27 @@ me_chain:
 	      WinBorder(Bt(&Fs->display_flags,DISPLAYf_NO_BORDER));
 	      break;
 	    case CH_CTRLC:
-me_clipboard_copy:
+me_clip_copy:
 	      if (e.ed_mode=='t') {
 		Beep;Beep;
 	      } else
-		MeshClipboardCopy(&e);
+		MeshClipCopy(&e);
 	      break;
 	    case CH_CTRLV:
-me_clipboard_paste:
+me_clip_paste:
 	      if (e.ed_mode=='t') {
 		Beep;Beep;
 	      } else {
-		MeshClipboardPaste(&e);
+		MeshClipPaste(&e);
 		e.ed_mode='m';
 	      }
 	      break;
 	    case CH_CTRLX:
-me_clipboard_cut:
+me_clip_cut:
 	      if (e.ed_mode=='t') {
 		Beep;Beep;
 	      } else
-		MeshClipboardCut(&e);
+		MeshClipCut(&e);
 	      break;
 	    case CH_SHIFT_ESC:
 	      save_and_exit=FALSE;

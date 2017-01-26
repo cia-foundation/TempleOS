@@ -10,12 +10,12 @@ class CPlannedDrv
   Bool pri;
 };
 
-public I64 PrtDsk(U8 drv_let=0,...)
+public I64 DskPrt(U8 drv_let=0,...)
 {/*Partition the disk containing partition drv_let.
 
 drv_let=0 means add new drive that is not already mounted.
 
->PrtDsk('C',0.5,0.25,0.25); //Make three.  50% C, 25% D, 25% E, round-up to blk.
+>DskPrt('C',0.5,0.25,0.25); //Make three.  50% C, 25% D, 25% E, round-up to blk.
 
 */
   CBlkDev *bd;

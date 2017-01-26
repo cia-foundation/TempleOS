@@ -21,20 +21,20 @@ I64 RedSeaChkDskLst(CDrv *dv,CDirEntry *tmpde1,
       errs+=RedSeaChkDskLst(dv,tmpde1->sub,bits,bits2,size,bpc);
     j=(tmpde1->size+bpc-1)/bpc;
     for (i=0;i<j;i++) {
-      if (i+tmpde1->cluster-dv->data_area>size) {
-	PrintErr("Invalid Cluster:%s Cluster:%X\n",tmpde1->full_name,
-	      i+tmpde1->cluster);
+      if (i+tmpde1->clus-dv->data_area>size) {
+	PrintErr("Invalid Clus:%s Clus:%X\n",tmpde1->full_name,
+	      i+tmpde1->clus);
 	errs++;
 	break;
       }
-      if (LBts(bits,i+tmpde1->cluster-dv->data_area)) {
-	PrintErr("Dbl Alloc:%s Cluster:%X\n",tmpde1->full_name,
-	      i+tmpde1->cluster);
+      if (LBts(bits,i+tmpde1->clus-dv->data_area)) {
+	PrintErr("Dbl Alloc:%s Clus:%X\n",tmpde1->full_name,
+	      i+tmpde1->clus);
 	errs++;
       }
-      if (!LBtr(bits2,i+tmpde1->cluster-dv->data_area)) {
-	PrintErr("UnAlloc:%s Cluster:%X\n",tmpde1->full_name,
-	      i+tmpde1->cluster);
+      if (!LBtr(bits2,i+tmpde1->clus-dv->data_area)) {
+	PrintErr("UnAlloc:%s Clus:%X\n",tmpde1->full_name,
+	      i+tmpde1->clus);
 	errs++;
       }
     }
@@ -59,27 +59,27 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   bpc=dv->spc<<BLK_SIZE_BITS;
   bits=CAlloc((size+7)>>3);
   bits2=CAlloc((size+7)>>3+BLK_SIZE);
-  RBlks(dv,bits2,dv->fat1,((size+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS);
+  BlkRead(dv,bits2,dv->fat1,((size+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS);
 
   //Get Root Dir size
   ptr2=MAlloc(bpc);
-  RBlks(dv,ptr2,dv->root_cluster,1);
+  BlkRead(dv,ptr2,dv->root_clus,1);
   ptr=ptr2(U8 *)-offset(CDirEntry.start);
   j=(ptr->size+bpc-1)/bpc;
   Free(ptr2);
 
   for (i=0;i<j;i++) {
-    if (i+dv->root_cluster-dv->data_area>size) {
-      PrintErr("Invalid Cluster: RootDir Cluster:%X\n",i+dv->root_cluster);
+    if (i+dv->root_clus-dv->data_area>size) {
+      PrintErr("Invalid Clus: RootDir Clus:%X\n",i+dv->root_clus);
       errs++;
       break;
     }
-    if (LBts(bits,i+dv->root_cluster-dv->data_area)) {
-      PrintErr("Dbl Alloc: RootDir Cluster:%X\n",i+dv->root_cluster);
+    if (LBts(bits,i+dv->root_clus-dv->data_area)) {
+      PrintErr("Dbl Alloc: RootDir Clus:%X\n",i+dv->root_clus);
       errs++;
     }
-    if (!LBtr(bits2,i+dv->root_cluster-dv->data_area)) {
-      PrintErr("UnAlloc: RootDir Cluster:%X\n",i+dv->root_cluster);
+    if (!LBtr(bits2,i+dv->root_clus-dv->data_area)) {
+      PrintErr("UnAlloc: RootDir Clus:%X\n",i+dv->root_clus);
       errs++;
     }
   }
@@ -88,10 +88,10 @@ I64 RedSeaChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
 	bits,bits2,size,bpc);
   for (i=1;i<size;i++)
     if (Bt(bits2,i)) {
-      PrintWarn("Shouldn't Alloc Cluster:%0X\n",i+dv->data_area);
+      PrintWarn("Shouldn't Alloc Clus:%0X\n",i+dv->data_area);
       errs++;
       if (ChkDskConfirm(_fix,_confirm))
-	RedSeaFreeClusters(dv,i+dv->data_area,1);
+	RedSeaFreeClus(dv,i+dv->data_area,1);
     }
 
   Free(files_find_mask);
@@ -113,23 +113,23 @@ I64 FAT32ChkDskLst(CDrv *dv,CDirEntry *tmpde1,
     if (tmpde1->attr & RS_ATTR_DIR && tmpde1->sub)
       errs+=FAT32ChkDskLst(dv,tmpde1->sub,bits,bits2,size,bpc);
     i=0;
-    c=tmpde1->cluster;
+    c=tmpde1->clus;
     while (0<c<0x0FFFFFF8) {
       if (c>size) {
-	PrintErr("Invalid Cluster:%s Cluster:%X\n",tmpde1->full_name,c);
+	PrintErr("Invalid Clus:%s Clus:%X\n",tmpde1->full_name,c);
 	errs++;
 	break;
       }
       if (LBts(bits,c)) {
-	PrintErr("Dbl Alloc:%s Cluster:%X\n",tmpde1->full_name,c);
+	PrintErr("Dbl Alloc:%s Clus:%X\n",tmpde1->full_name,c);
 	errs++;
       }
       if (!bits2[c]) {
-	PrintErr("UnAlloc:%s Cluster:%X\n",tmpde1->full_name,c);
+	PrintErr("UnAlloc:%s Clus:%X\n",tmpde1->full_name,c);
 	errs++;
       } else
 	bits2[c]=0;
-      c=ClusterNumNext(dv,c);
+      c=ClusNumNext(dv,c);
       i++;
     }
     if (!(tmpde1->attr & RS_ATTR_DIR)) {
@@ -163,25 +163,25 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   bpc=dv->spc<<BLK_SIZE_BITS;
   bits=CAlloc((size+7)>>3);
   bits2=CAlloc(size*4+BLK_SIZE);
-  RBlks(dv,bits2,dv->fat1,(size*4+BLK_SIZE-1)>>BLK_SIZE_BITS);
+  BlkRead(dv,bits2,dv->fat1,(size*4+BLK_SIZE-1)>>BLK_SIZE_BITS);
 
-  c=dv->root_cluster;
+  c=dv->root_clus;
   while (0<c<0x0FFFFFF8) {
     if (c>size) {
-      PrintErr("Invalid Cluster: RootDir Cluster:%X\n",c);
+      PrintErr("Invalid Clus: RootDir Clus:%X\n",c);
       errs++;
       break;
     }
     if (LBts(bits,c)) {
-      PrintErr("Dbl Alloc: RootDir Cluster:%X\n",c);
+      PrintErr("Dbl Alloc: RootDir Clus:%X\n",c);
       errs++;
     }
     if (!bits2[c]) {
-      PrintErr("UnAlloc: RootDir Cluster:%X\n",c);
+      PrintErr("UnAlloc: RootDir Clus:%X\n",c);
       errs++;
     } else
       bits2[c]=0;
-    c=ClusterNumNext(dv,c);
+    c=ClusNumNext(dv,c);
   }
 
   errs+=FAT32ChkDskLst(dv,FilesFind(files_find_mask,FUF_RECURSE),
@@ -190,10 +190,10 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   bits2[1]=0; //See $LK,"FAT32Fmt",A="MN:FAT32Fmt"$()
   for (i=1;i<size;i++)
     if (bits2[i]) {
-      PrintWarn("Shouldn't Alloc Cluster:%0X\n",i);
+      PrintWarn("Shouldn't Alloc Clus:%0X\n",i);
       errs++;
       if (ChkDskConfirm(_fix,_confirm))
-	FAT32FreeClusters(dv,i);
+	FAT32FreeClus(dv,i);
     }
   Free(files_find_mask);
   Free(bits);
@@ -204,7 +204,7 @@ I64 FAT32ChkDsk(U8 drv_let,Bool *_fix,Bool *_confirm)
   return errs;
 }
 
-public I64 ChkDsk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
+public I64 DskChk(U8 drv_let=0,Bool fix=FALSE,Bool confirm=TRUE)
 {//Check disk for allocation errors and, optionally, fix.
 //You probably want to reformat and reinstall.
   I64 errs=0;
@@ -246,7 +246,7 @@ U0 RedSeaDrvView(U8 drv_let=0)
   try {
     i=((s+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
-    RBlks(dv,bitmap,dv->fat1,i);
+    BlkRead(dv,bitmap,dv->fat1,i);
     i=0;
     for (y=0;y<GR_HEIGHT-3*FONT_HEIGHT;y++) {
       if (ScanKey)
@@ -288,7 +288,7 @@ U0 FAT32DrvView(U8 drv_let=0)
   try {
     i=(s*4+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
-    RBlks(dv,bitmap,dv->fat1,i);
+    BlkRead(dv,bitmap,dv->fat1,i);
     i=0;
     for (y=0;y<GR_HEIGHT-3*FONT_HEIGHT;y++) {
       if (ScanKey)
@@ -394,7 +394,7 @@ I64 RedSeaUnusedDrvSpace(U8 drv_let=0)
     l=dv->size+dv->drv_offset-dv->data_area;
     i=((l+7)>>3+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
-    RBlks(dv,bitmap,dv->fat1,i);
+    BlkRead(dv,bitmap,dv->fat1,i);
     for (i=0;i<l;i++)
       if (!Bt(bitmap,i))
 	res++;
@@ -412,7 +412,7 @@ I64 FAT32UnusedDrvSpace(U8 drv_let=0)
     l=(dv->size+dv->spc-1)/dv->spc-(2+dv->data_area-dv->drv_offset);
     i=(l*4+BLK_SIZE-1)>>BLK_SIZE_BITS;
     bitmap=MAlloc(i<<BLK_SIZE_BITS);
-    RBlks(dv,bitmap,dv->fat1,i);
+    BlkRead(dv,bitmap,dv->fat1,i);
     for (i=0;i<l;i++)
       if (!bitmap[i])
 	res++;
@@ -421,7 +421,7 @@ I64 FAT32UnusedDrvSpace(U8 drv_let=0)
     DrvUnlock(dv);
   return res*BLK_SIZE*dv->spc;
 }
-public I64 UnusedDrvSpace(U8 drv_let=0)
+public I64 DrvUnused(U8 drv_let=0)
 {//Returns unused size in bytes.
   CDrv *dv=Let2Drv(drv_let),*old_dv=Fs->cur_dv;
   U8 *old_dir=StrNew(Fs->cur_dir);

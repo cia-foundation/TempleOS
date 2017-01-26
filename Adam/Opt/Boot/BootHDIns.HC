@@ -35,19 +35,19 @@ public U0 BootHDIns(U8 drv_let=0)
 	else {
 	  Free(de.full_name);
 	  "Modifying partition boot record.\n";
-	  RBlks(dv,&br,dv->drv_offset,1);
+	  BlkRead(dv,&br,dv->drv_offset,1);
 	  br.jump_and_nop[0]=OC_JMP_REL8;
 	  br.jump_and_nop[1]=offset(CFAT32Boot.code)-2;
 #assert offset(CFAT32Boot.code)>=offset(CRedSeaBoot.code)
 	  br.jump_and_nop[2]=OC_NOP;
 	  *BHD_BLK_CNT(U16 *)=(de.size+BLK_SIZE-1)>>BLK_SIZE_BITS;
-	  *BHD_DAP_BLK(I64 *)=Cluster2Blk(dv,de.cluster);
+	  *BHD_DAP_BLK(I64 *)=Clus2Blk(dv,de.clus);
 	  for (i=0;i<BHD_END-BHD_CODE;i++)
 	    br.code[i]=BHD_CODE(U8 *)[i];
 #assert sizeof(CFAT32Boot.code)>=BHD_END-BHD_CODE
 	  for (;i<sizeof(CFAT32Boot.code);i++)
 	    br.code[i]=0;
-	  WBlks(dv,&br,dv->drv_offset,1);
+	  BlkWrite(dv,&br,dv->drv_offset,1);
 	}
 	break;
       default:

@@ -440,7 +440,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	DocFlagsToggle(doc,DOCF_PLAIN_TEXT);
       DocWrite(doc);
       task=Spawn(&SrvCmdLine,NULL,"Srv",,Fs);
-      st2=CurDir;
+      st2=DirCur;
       st=MStrPrint("Cd(\"%s\");",st2);
       tmpc=TaskExe(task,Fs,st,1<<JOBf_WAKE_MASTER|1<<JOBf_FOCUS_MASTER);
       Free(st2);
@@ -504,7 +504,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
     case EF_REINDENT:
       start_y=doc->cur_entry->y;
       EdReplaceTroubleAll(doc,TRUE,FALSE);
-      DocLineNumGoTo(doc,start_y+1);
+      DocGoToLine(doc,start_y+1);
       if (EdGoToFun(doc,FALSE,FALSE)) {
 	start_y=doc->cur_entry->y;
 	indent=EdRICode(doc);
@@ -516,7 +516,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	}
 	DocLock(doc);
 	EdRemFunLeadingSpace(doc);
-	DocLineNumGoTo(doc,start_y+1);
+	DocGoToLine(doc,start_y+1);
 	doc_e=doc->cur_entry;
 	end_y=start_y+indent->total_cnt;
 	while (start_y<=doc_e->y<end_y) {
@@ -562,7 +562,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
       }
       start_y=doc->cur_entry->y;
       EdReplaceTroubleAll(doc,FALSE,FALSE);
-      DocLineNumGoTo(doc,start_y+1);
+      DocGoToLine(doc,start_y+1);
       break;
     case EF_RENUM_ASM:
       if (EdGoToFun(doc,FALSE,TRUE)) {
@@ -588,7 +588,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
   }
 
   DocRecalc(doc);
-  DocLineNumGoTo(doc,goto_line_num);
+  DocGoToLine(doc,goto_line_num);
 
   DocUnlock(doc);
   if (!unlock)

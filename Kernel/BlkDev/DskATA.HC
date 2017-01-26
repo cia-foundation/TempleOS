@@ -463,7 +463,7 @@ Bool ATARBlks(CDrv *dv,U8 *buf, I64 blk, I64 cnt)
 
 U0 ATAWriteBlks(CBlkDev *bd,U8 *buf, I64 blk, I64 cnt)
 {//For low level disk access.
-//Use WBlks() instead.
+//Use BlkWrite() instead.
   I64 i,U32s_avail,sects_avail,retries=3;
   F64 timeout;
   Bool unlock=BlkDevLock(bd);

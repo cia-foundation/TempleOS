@@ -71,7 +71,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $FG,2$<CTRL-ALT-f>$FG$ to toggle between $LK,"Std Font",A="FI:::/Kernel/FontStd.HC"$ and $LK,"Cyrillic Font",A="FI:::/Kernel/FontCyrillic.HC"$.
 
-* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clipboard.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
+* Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clip.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
 
 * You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 
@@ -145,7 +145,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * With $FG,2$start$FG$/$FG,2$end$FG$, common trailing code is fast.  Common leading code is slow.$FG$
 
-* The first line of the $MA-X+PU,"Psalmody",LM="#include \"::/Apps/Psalmody/Run\"\n"$ $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DELETE>$FG$ to delete songs.
+* The first line of the $MA-X+PU,"Psalmody",LM="#include \"::/Apps/Psalmody/Run\"\n"$ $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ song files is a comment with a category recognized by $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  The categories are $FG,2$"no nothing"$FG$, $FG,2$"has words"$FG$, $FG,2$"has graphics"$FG$, or $FG,2$"special"$FG$.  The third character in the song comment is a digit rating number, shown in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$().  You can set the song rating in $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$() by pressing $FG,2$0$FG$-$FG,2$9$FG$.  You can press $FG,2$<DEL>$FG$ to delete songs.
 
 $FG,8$
 * "Linux" is a trademark owned by Linus Torvalds.

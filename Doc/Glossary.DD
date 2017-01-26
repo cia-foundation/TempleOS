@@ -25,11 +25,13 @@ $FG,2$CB$FG$	Call-Back, Code Block
 $FG,2$Cfg$FG$	Config
 $FG,2$Chg$FG$	Change
 $FG,2$Chk$FG$	Check
-$FG,2$Const$FG$	Consant
-$FG,2$Cont$FG$	Continue
+$FG,2$Clip$FG$	Clipboard
+$FG,2$Clus$FG$	Cluster
 $FG,2$Cmd$FG$	Command
 $FG,2$Cmp$FG$	Compiler
 $FG,2$Cnt$FG$	Count
+$FG,2$Const$FG$	Consant
+$FG,2$Cont$FG$	Continue
 $FG,2$Ctrl$FG$	Control.  The ctrl key is indicated with "$FG,2$^$FG$" in documentation.
 $FG,2$Cur$FG$	Current
 $FG,2$Cvt$FG$	Convert

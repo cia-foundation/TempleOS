@@ -3,14 +3,14 @@ $WW,1$$FG,5$$TX+CX,"File Manager"$$FG$
 $FG,2$<SHIFT CURSOR>$FG$
 $ID,2$Select files.
 $ID,-2$
-$FG,2$<CTRL-y> or <DELETE>$FG$
+$FG,2$<CTRL-y> or <DEL>$FG$
 $ID,2$Delete file or tree.
 $ID,-2$
 $FG,2$<CTRL-c> or <CTRL-INS>$FG$
-$ID,2$Copy select files to clipboard.
+$ID,2$Copy select files to clip.
 $ID,-2$
 $FG,2$<CTRL-v> or <SHIFT-INS>$FG$
-$ID,2$Paste clipboard.
+$ID,2$Paste clip.
 $ID,-2$
 $FG,2$LEFT-CLICK,drag-drop$FG$
 $ID,2$Move a file or tree to a dir.
@@ -37,7 +37,7 @@ $FG,2$'d'$FG$
 $ID,2$Make Dir.
 $ID,-2$
 $FG,2$'c'$FG$
-$ID,2$ChgDsk (Remount removable media).  Do not do this on blank disks.
+$ID,2$DskChg (Remount removable media).  Do not do this on blank disks.
 $ID,-2$
 $FG,2$'f'$FG$
 $ID,2$Format drive.
@@ -59,7 +59,7 @@ $ID,2$Burn CD/DVD ISO file.  This burns a CD/DVD using the image file, $FG,2$$TX
 $ID,-2$
 
 $FG,5$Instructions on Using CD/DVD's$FG$
-$ID,2$If you have not recompiled Kernel and defined your CD/DVD drive, exit the FileMgr and use $LK,"Mount",A="MN:Mount"$ to define your CD/DVD drive.  Place a CD/DVD in the drive and press $FG,2$'c'$FG$ when on top of the CD/DVD drive letter to mount the drive.  It will call $LK,"ChgDsk",A="MN:ChgDsk"$(), the TempleOS cmd to mount removable media.
+$ID,2$If you have not recompiled Kernel and defined your CD/DVD drive, exit the FileMgr and use $LK,"Mount",A="MN:Mount"$ to define your CD/DVD drive.  Place a CD/DVD in the drive and press $FG,2$'c'$FG$ when on top of the CD/DVD drive letter to mount the drive.  It will call $LK,"DskChg",A="MN:DskChg"$(), the TempleOS cmd to mount removable media.
 $ID,-2$
 
 $FG,5$Instructions on Burning CD/DVD's$FG$

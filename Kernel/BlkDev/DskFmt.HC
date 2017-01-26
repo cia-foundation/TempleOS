@@ -9,7 +9,7 @@ Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
   switch (bd->type) {
     case BDT_ATA:
       offset=0;
-      ext_base=INVALID_CLUSTER;
+      ext_base=INVALID_CLUS;
       while (TRUE) {
 	ATAReadBlks(bd,&mbr,offset,1);
 	j=-1;
@@ -42,7 +42,7 @@ Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA)
 	  break;
 	if (!mbr.p[j].offset)
 	  break;
-	if (ext_base==INVALID_CLUSTER) {
+	if (ext_base==INVALID_CLUS) {
 	  offset=mbr.p[j].offset;
 	  ext_base=offset;
 	} else

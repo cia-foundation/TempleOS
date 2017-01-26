@@ -182,12 +182,12 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (!(sc&SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Cut To Clipboard");
+		    KeyDescSet("Edit/Cut To Clip");
 		  else
 		    KeyDescSet("Char  /Delete");
 		} else {
 		  if (sc&SCF_SHIFT)
-		    EdCutToClipboard(doc);
+		    ClipCut(doc);
 		  else
 		    EdCharDel(doc);
 		}
@@ -197,16 +197,16 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	      if (sc&(SCF_SHIFT|SCF_CTRL)!=(SCF_SHIFT|SCF_CTRL)) {
 		if (sc&SCF_KEY_DESC) {
 		  if (sc&SCF_SHIFT)
-		    KeyDescSet("Edit/Paste Clipboard");
+		    KeyDescSet("Edit/Paste Clip");
 		  else if (sc&SCF_CTRL)
-		    KeyDescSet("Edit/Copy to Clipboard");
+		    KeyDescSet("Edit/Copy to Clip");
 		  else
 		    KeyDescSet("Edit/Toggle Overstrike");
 		} else {
 		  if (sc&SCF_SHIFT)
-		    EdPasteClipboard(doc);
+		    ClipPaste(doc);
 		  else if (sc&SCF_CTRL)
-		    EdCopyToClipboard(doc);
+		    ClipCopy(doc);
 		  else
 		    doc->flags^=DOCF_OVERSTRIKE;
 		}
@@ -383,9 +383,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	case CH_CTRLC:
 	  if (!(sc&SCF_SHIFT)) {
 	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Edit/Copy to Clipboard");
+	      KeyDescSet("Edit/Copy to Clip");
 	    else
-	      EdCopyToClipboard(doc);
+	      ClipCopy(doc);
 	  }
 	  break;
 	case CH_CTRLD:
@@ -616,9 +616,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	case CH_CTRLV:
 	  if (!(sc&SCF_SHIFT)) {
 	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Edit/Paste Clipboard");
+	      KeyDescSet("Edit/Paste Clip");
 	    else
-	      EdPasteClipboard(doc);
+	      ClipPaste(doc);
 	  }
 	  break;
 	case CH_CTRLW:
@@ -637,9 +637,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	case CH_CTRLX:
 	  if (!(sc&SCF_SHIFT)) {
 	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Edit/Cut To Clipboard");
+	      KeyDescSet("Edit/Cut To Clip");
 	    else
-	      EdCutToClipboard(doc);
+	      ClipCut(doc);
 	  }
 	  break;
 	case CH_CTRLY:

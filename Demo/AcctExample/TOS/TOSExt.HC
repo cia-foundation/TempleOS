@@ -255,7 +255,8 @@ extern U0 FreshenBlog();
 extern U0 GodBooksPassageU32(U32 rand_u32,U8 *files_find_mask,
 	U8 *file_mask="*",I64 len=512,I64 verbosity=GBP_MEDIUM);
 extern I64 GodHeaderIns(U8 *type=NULL);
-extern U0 GodVideo(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename);
+extern U0 GodVideoDigits(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename);
+extern U0 GodVideoU32(U32 rand_u32,U8 *filename);
 extern U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
 extern U0 GodWordBatch(CHexWordForm *gm);
 extern U0 TOSBookLines(U8 *book_filename,I64 book_lines,U8 *st,I64 num_lines,

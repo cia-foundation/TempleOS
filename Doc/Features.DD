@@ -20,7 +20,7 @@
 
 * ATAPI PIO $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
 
-* $LK,"Partitioning",A="MN:PrtDsk"$ tool, installer, $FG,2$boot loaders$FG$ for CD/DVD and hard disk.
+* $LK,"Partitioning",A="MN:DskPrt"$ tool, installer, $FG,2$boot loaders$FG$ for CD/DVD and hard disk.
 
 * $FG,2$Editor/Browser$FG$ for a new $LK,"Document Format",A="FI:::/Doc/DolDocOverview.DD"$.  Source files and the command line window can have graphics, links, icons, trees, colors, super/sub scripts, margins.  Everything is seamless through-out the tool chain.  No need for separate resource files.
 

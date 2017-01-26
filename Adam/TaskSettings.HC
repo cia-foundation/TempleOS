@@ -10,7 +10,7 @@ public CTaskSettings *SettingsPush(CTask *task=NULL,I64 flags=0)
   if (!task) task=Fs;
   if (!TaskValidate(task)) return NULL;
   tmpse=CAlloc(sizeof(CTaskSettings),task);
-  tmpse->cur_dir=CurDir(task,task);
+  tmpse->cur_dir=DirCur(task,task);
   tmpse->draw_it=task->draw_it;
   GrPaletteGet(tmpse->palette);
   tmpse->task_end_cb=task->task_end_cb;

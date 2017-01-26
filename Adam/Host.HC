@@ -59,8 +59,8 @@ Place the CDDVD %s in the drive.
 ",iso_filename;
     }
     if (PressAKey!=CH_SHIFT_ESC) {
-      ">$FG,2$ChgDsk('T');$FG$\n\n";
-      ChgDsk('T');
+      ">$FG,2$DskChg('T');$FG$\n\n";
+      DskChg('T');
       res=TRUE;
     }
   } catch

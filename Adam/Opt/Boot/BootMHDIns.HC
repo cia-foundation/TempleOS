@@ -29,7 +29,7 @@ public U0 BootMHDOldRead(U8 src_drv,U8 dst_drv)
     BlkDevUnlock(bd);
 
     Drv(dst_drv);
-    MkDir(BOOT_DIR);
+    DirMk(BOOT_DIR);
     FileWrite(BOOT_DIR_OLDMBR_BIN_C,&mbr,BLK_SIZE);
   }
 }
@@ -103,7 +103,7 @@ public Bool BootMHDIns(U8 drv_let,U8 *drv_lst=NULL)
       j=0;
       if (FileFind(BOOT_DIR_OLDMBR_BIN_C,&de,FUF_JUST_FILES)) {
 	Free(de.full_name);
-	*_q++=Cluster2Blk(dv,de.cluster);
+	*_q++=Clus2Blk(dv,de.clus);
 	CatPrint(menu_ptr,"0. Old Boot Record\n\r");
 	j++;
       }
@@ -127,7 +127,7 @@ public Bool BootMHDIns(U8 drv_let,U8 *drv_lst=NULL)
       else {
 	Free(de.full_name);
 	*BMHD_BLK_CNT(U16 *)=(size+BLK_SIZE-1)>>BLK_SIZE_BITS;
-	*BMHD_DAP_BLK(I64 *)=Cluster2Blk(dv,de.cluster);
+	*BMHD_DAP_BLK(I64 *)=Clus2Blk(dv,de.clus);
 //Bypass partition bounds-checking
 	BlkDevLock(bd);
 	ATAReadBlks(bd,&mbr,0,1);

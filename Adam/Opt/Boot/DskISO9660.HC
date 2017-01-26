@@ -124,8 +124,8 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tmpde,CISO1DirEntry *tmpi,
 	  MemSet(buf,0,DVD_BLK_SIZE);
 	}
 	if (write) {
-	  FRBlks(in_file,buf,i<<2,n);
-	  FWBlks(out_file,buf,*_cur_blk<<2,n);
+	  FBlkRead(in_file,buf,i<<2,n);
+	  FBlkWrite(out_file,buf,*_cur_blk<<2,n);
 	}
 	*_cur_blk+=1;
       }
@@ -181,7 +181,7 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tmpde,CISO1DirEntry *tmpi,
   if (write)
     "%X:%s\n",*_cur_blk,tmpde->full_name;
   if (write)
-    FWBlks(out_file,dir_blk_buf,*_cur_blk<<2,n<<2);
+    FBlkWrite(out_file,dir_blk_buf,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
 
   tmpi2->len=sizeof(CISO1DirEntry)-1;
@@ -212,7 +212,7 @@ I64 DVDFileCreate2(CFile *out_file,CDirEntry *tmpde,CISO1DirEntry *tmpi,
   if (write)
     "%X:%s\n",*_cur_blk,tmpde->full_name;
   if (write)
-    FWBlks(out_file,dir_blk_buf2,*_cur_blk<<2,n<<2);
+    FBlkWrite(out_file,dir_blk_buf2,*_cur_blk<<2,n<<2);
   *_cur_blk+=n;
 
   Free(dir_blk_buf);
@@ -328,7 +328,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
 
   if (!_filename)
     _filename=blkdev.dft_iso_filename;
-  filename=DftExt(_filename,"ISO");
+  filename=ExtDft(_filename,"ISO");
 
   if (_stage2_filename)
     stage2_filename=FileNameAbs(_stage2_filename);
@@ -367,7 +367,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
     goto cf_done;
 
   while (cur_blk<20<<2>>2)
-    FWBlks(out_file,zero_buf,cur_blk++<<2,4);
+    FBlkWrite(out_file,zero_buf,cur_blk++<<2,4);
 
   iso_pri->type=ISO1T_PRI_VOL_DESC;
   StrCpy(iso_pri->id,"CD001");
@@ -407,7 +407,7 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
     et->sect_cnt=4;  //5 seems like the limit, 4 is safer
     et->load_rba=cur_blk+1;
     "%X: Pre Boot Blk\n",cur_blk;
-    FWBlks(out_file,et,cur_blk++<<2,4);
+    FBlkWrite(out_file,et,cur_blk++<<2,4);
     "%X: Boot Stage 1\n",cur_blk;
     cur_blk+=DVD_BOOT_LOADER_SIZE/DVD_BLK_SIZE;
   }
@@ -434,10 +434,10 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   for (i=1;i<=max_depth;i++)
     DVDFillPathTable(headdir,&itabbuf,&itabbuf2,1,FALSE,&first_free,1,i);
   "%X: Path Table 0\n",cur_blk;
-  FWBlks(out_file,tabbuf,cur_blk<<2,tabsize<<2);
+  FBlkWrite(out_file,tabbuf,cur_blk<<2,tabsize<<2);
   cur_blk+=tabsize;
   "%X: Path Table 1\n",cur_blk;
-  FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
+  FBlkWrite(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
   MemSet(tabbuf,0,tabsize*DVD_BLK_SIZE);
@@ -458,35 +458,35 @@ public I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
   for (i=1;i<=max_depth;i++)
     DVDFillPathTable(headdir,&itabbuf,&itabbuf2,1,TRUE,&first_free,1,i);
   "%X: Path Table 2\n",cur_blk;
-  FWBlks(out_file,tabbuf,cur_blk<<2,tabsize<<2);
+  FBlkWrite(out_file,tabbuf,cur_blk<<2,tabsize<<2);
   cur_blk+=tabsize;
   "%X: Path Table 3\n",cur_blk;
-  FWBlks(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
+  FBlkWrite(out_file,tabbuf2,cur_blk<<2,tabsize2<<2);
   cur_blk+=tabsize2;
 
   DirTreeDel2(headdir);
   FillU32Palindrome(&iso_pri->vol_space_size,cur_blk);
   FillU32Palindrome(&iso_sup->vol_space_size,cur_blk);
-  FWBlks(out_file,iso_pri,16<<2,4);
+  FBlkWrite(out_file,iso_pri,16<<2,4);
 
   iso_term->type=ISO1T_TERMINATOR;
   StrCpy(iso_term->id,"CD001");
   iso_term->version=1;
   if (stage2_filename) {
-    FWBlks(out_file,iso_boot,17<<2,4);
-    FWBlks(out_file,iso_sup,18<<2,4);
-    FWBlks(out_file,iso_term,19<<2,4);
+    FBlkWrite(out_file,iso_boot,17<<2,4);
+    FBlkWrite(out_file,iso_sup,18<<2,4);
+    FBlkWrite(out_file,iso_term,19<<2,4);
     stage2_size=(Size(stage2_filename,"+s")+DVD_BLK_SIZE-1)/DVD_BLK_SIZE;
     MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
     *(BDVD_BLK_CNT-BDVD_START+stage1_buf)(U16 *)=stage2_size;
     *(BDVD_BLK_LO -BDVD_START+stage1_buf)(U32 *)=stage2_blk;
     "$$RED$$!!! Boot Stage 2 !!! %X-%X$$FG$$\n",
 	  stage2_blk,stage2_blk+stage2_size-1;
-    FWBlks(out_file,stage1_buf,
+    FBlkWrite(out_file,stage1_buf,
 	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
   } else {
-    FWBlks(out_file,iso_sup,17<<2,4);
-    FWBlks(out_file,iso_term,18<<2,4);
+    FBlkWrite(out_file,iso_sup,17<<2,4);
+    FBlkWrite(out_file,iso_term,18<<2,4);
   }
 
   cf_done:

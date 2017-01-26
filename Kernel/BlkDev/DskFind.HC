@@ -21,8 +21,8 @@ CDirEntry *FilesFind2(U8 *files_find_mask,I64 fuf_flags)
     DirFilesSort(&res,SK_NAME);
     if (fuf_flags&(FUF_FLATTEN_TREE|FUF_JUST_FILES))
       DirFilesFlatten(res,&res,fuf_flags);
-    if (fuf_flags&FUF_CLUSTER_ORDER)
-      DirFilesSort(&res,SK_CLUSTER);
+    if (fuf_flags&FUF_CLUS_ORDER)
+      DirFilesSort(&res,SK_CLUS);
   }
   return res;
 }
@@ -57,7 +57,7 @@ $LK,"DirTreeDel",A="MN:DirTreeDel"$() or $LK,"DirTreeDel2",A="MN:DirTreeDel2"$()
 Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
 {//$LK,"FUF_JUST_DIRS",A="MN:FUF_JUST_DIRS"$, $LK,"FUF_JUST_FILES",A="MN:FUF_JUST_FILES"$, $LK,"FUF_Z_OR_NOT_Z",A="MN:FUF_Z_OR_NOT_Z"$, $LK,"FUF_SCAN_PARENTS",A="MN:FUF_SCAN_PARENTS"$
 //If you pass _de, you must Free(_de->full_name);
-  I64 i,j,cur_dir_cluster;
+  I64 i,j,cur_dir_clus;
   U8 *altname,*curname,*full_name=NULL;
   CDirEntry de;
   CDirContext *dirc;
@@ -81,18 +81,18 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
       Silent(old_silent);
     else {
       Silent(old_silent);
-      cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
+      cur_dir_clus=Name2DirClus(dirc->dv,Fs->cur_dir);
       switch (dirc->dv->fs_type) {
 	case FSt_REDSEA:
-	  res=RedSeaFileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=RedSeaFileFind(dirc->dv,cur_dir_clus,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	case FSt_FAT32:
-	  res=FAT32FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=FAT32FileFind(dirc->dv,cur_dir_clus,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	case FSt_ISO9660:
-	  res=ISO1FileFind(dirc->dv,cur_dir_cluster,dirc->mask,
+	  res=ISO1FileFind(dirc->dv,cur_dir_clus,dirc->mask,
 		&de,fuf_flags);
 	  break;
 	default:
@@ -118,21 +118,21 @@ Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0)
       Silent(old_silent);
     else {
       Silent(old_silent);
-      cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
+      cur_dir_clus=Name2DirClus(dirc->dv,Fs->cur_dir);
       while (!res && StrCmp(Fs->cur_dir,"/")) {
 	Cd("..");
-	cur_dir_cluster=Name2DirCluster(dirc->dv,Fs->cur_dir);
+	cur_dir_clus=Name2DirClus(dirc->dv,Fs->cur_dir);
 	switch (dirc->dv->fs_type) {
 	  case FSt_REDSEA:
-	    res=RedSeaFileFind(dirc->dv,cur_dir_cluster,
+	    res=RedSeaFileFind(dirc->dv,cur_dir_clus,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  case FSt_FAT32:
-	    res=FAT32FileFind(dirc->dv,cur_dir_cluster,
+	    res=FAT32FileFind(dirc->dv,cur_dir_clus,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  case FSt_ISO9660:
-	    res=ISO1FileFind(dirc->dv,cur_dir_cluster,
+	    res=ISO1FileFind(dirc->dv,cur_dir_clus,
 		  dirc->mask,&de,fuf_flags);
 	    break;
 	  default:

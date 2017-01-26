@@ -1661,8 +1661,8 @@ U0 OSTestSuite()
   TS("HeapLogSizeRep");	XTalkWait(task,"HeapLogSizeRep;Sleep(750);\n");
   TS("CPURep");		if (mp_cnt>1)
 				XTalkWait(task,"CPURep(TRUE);Sleep(750);\n");
-  TS("ChkDsk");		if (DrvIsWritable(':'))
-				XTalkWait(task,"ChkDsk;Sleep(750);\n");
+  TS("DskChk");		if (DrvIsWritable(':'))
+				XTalkWait(task,"DskChk;Sleep(750);\n");
   TS("DrvView");	if (DrvIsWritable(':')) {
     XTalkWait(task,"DrvView;\n");
     Sleep(750);

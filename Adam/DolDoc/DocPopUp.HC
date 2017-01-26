@@ -8,22 +8,16 @@ public CTask *PopUpViewDoc(CDoc *doc,I64 dof_flags=0)
   return task;
 }
 
-U0 PopUpViewPrintEndCB()
-{
-  DocDel(FramePtr("ViewStrFrame"));
-  Exit;
-}
-
 public CTask *PopUpViewPrint(U8 *fmt,...)
 {//View Print stmt in PopUp win task.
-  CTask *task;
+  CTask *task=Spawn(&SrvCmdLine,NULL,"View",,Fs);
   U8 *buf=StrPrintJoin(NULL,fmt,argc,argv);
-  CDoc *doc=DocNew;
+  CDoc *doc=DocNew(,task);
   DocPrint(doc,buf);
   Free(buf);
-  task=PopUpViewDoc(doc);
-  FramePtrAdd("ViewStrFrame",doc,task);
-  task->task_end_cb=&PopUpViewPrintEndCB;
+  buf=MStrPrint("DocEd(0x%X);",doc);
+  TaskExe(task,NULL,buf,1<<JOBf_EXIT_ON_COMPLETE|1<<JOBf_FREE_ON_COMPLETE);
+  Free(buf);
   return task;
 }
 
@@ -34,7 +28,7 @@ public U8 *PopUpPickFile(U8 *dir=NULL)
   if (dir)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",dir);
   else {
-    st2=CurDir;
+    st2=DirCur;
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_FILE,Fs->parent_task);",st2);
     Free(st2);
   }
@@ -49,7 +43,7 @@ public U8 *PopUpPickDir(U8 *dir=NULL)
   if (dir)
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",dir);
   else {
-    st2=CurDir;
+    st2=DirCur;
     st=MStrPrint("Cd(\"%Q\");FileMgr(FM_PICK_DIR,Fs->parent_task);",st2);
     Free(st2);
   }
@@ -270,7 +264,7 @@ public I64 AdamFile(U8 *filename,Bool warn_ext=TRUE)
 {//Make adam_task execute file.
   Bool okay=TRUE;
   U8 *name=FileNameAbs(filename),
-	*name2=DftExt(name,"HC.Z");
+	*name2=ExtDft(name,"HC.Z");
   I64 res=0;
   if (warn_ext &&
 	!FilesFindMatch(name2,FILEMASK_JIT) &&
@@ -288,7 +282,7 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
 {//$LK,"ExeFile2",A="MN:ExeFile2"$() in $LK,"PopUp",A="MN:PopUp"$ task. Cont as User.
   Bool okay=TRUE;
   U8 *st,*name=FileNameAbs(filename),
-	*name2=DftExt(name,"HC.Z");
+	*name2=ExtDft(name,"HC.Z");
   I64 res=0;
   if (warn_ext &&
 	!FilesFindMatch(name2,FILEMASK_JIT) &&
@@ -310,7 +304,7 @@ public I64 PopUpFile(U8 *filename,Bool warn_ext=TRUE,
 public I64 PopUpRunFile(U8 *filename,I64 ccf_flags=0,...)
 {//$LK,"ExeFile",A="MN:ExeFile"$() with args using $LK,"LastFun",A="MN:LastFun"$() in $LK,"PopUp",A="MN:PopUp"$ task.
   U8 *st,*name=FileNameAbs(filename),
-	*name2=DftExt(name,"HC.Z");
+	*name2=ExtDft(name,"HC.Z");
   I64 res=0;
   st=MStrPrint(
 	"\"$$$$WW+H,1$$$$\";ExeFile2(\"%s\",0x%X);LastFun(0x%X,0x%X);",

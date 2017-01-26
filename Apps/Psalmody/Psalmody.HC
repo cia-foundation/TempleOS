@@ -50,7 +50,7 @@ class PsmNote
 class PsmCtrl
 {
   PsmNote head;
-  PsmNote clipboard;
+  PsmNote clip;
   CMenuEntry *incomplete_entry,*record_entry;
   I64 scrn_x,tool;
   PsmNote *cur_note;

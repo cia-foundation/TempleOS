@@ -39,7 +39,7 @@ U0 DoIt()
 
   //$BK,1$WARNING:$BK,0$ If you use the put_doc you
   //run the risk of the user pressing
-  //<CTRL-t> or using the clipboard, both
+  //<CTRL-t> or using the clip, both
   //of which will crash.	So, you might want
   //to use the border_doc.
 

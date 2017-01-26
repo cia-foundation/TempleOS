@@ -1,1 +1,1 @@
-MkDir("~/Span");
+DirMk("~/Span");

@@ -48,7 +48,7 @@ U0 NISTBeaconURL(I64 timestamp)
 U0 NISTGodIns1()
 {
   tos_type=PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
-	"Hex5Bible\0Hex8Books\0Doodle\0Movie\0Painting100\0Painting1000\0"
+	"Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0Painting1000\0"
 	"Metallica\0");
   switch (tos_type) {
     case: tos_timestamp=GodHeaderIns("Bible");		break;
@@ -56,8 +56,8 @@ U0 NISTGodIns1()
     case: tos_timestamp=GodHeaderIns("HappyWords");	break;
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("BookPick");	break;
-    case: tos_timestamp=GodHeaderIns("Doodle");	break;
-    case: tos_timestamp=GodHeaderIns("Movie");		break;
+    case: tos_timestamp=GodHeaderIns("Doodle");		break;
+    case: tos_timestamp=GodHeaderIns("Movie100");	break;
     case: tos_timestamp=GodHeaderIns("Painting100");	break;
     case: tos_timestamp=GodHeaderIns("Painting1000");	break;
     case: tos_timestamp=GodHeaderIns("Metallica");	break;
@@ -122,9 +122,9 @@ U0 NISTGodIns2()
     case:
       if (DocForm(gm(CMoviesForm *))) {
 	NISTBeaconURL(gm->timestamp);
-	GodVideo("Top 100 Movies",
+	GodVideoDigits("Top 100 Movies",
 	      "http://www.afi.com/100years/movies10.aspx",
-	      gm->rnd0,2,"~/Sup1/Sup1Blog/Movies.DD.Z");
+	      gm->rnd0,2,"~/Sup1/Sup1Blog/Movies100.DD.Z");
       }
       break;
     case:
@@ -147,7 +147,7 @@ U0 NISTGodIns2()
     case:
       if (DocForm(gm(CMetallicaForm *))) {
 	NISTBeaconURL(gm->timestamp);
-	GodVideo("Metallica Song",
+	GodVideoDigits("Metallica Song",
 	      "http://home.hccnet.nl/a.r.adams/lyrics/"
 	      "metallica/songindex.html",
 	      gm->rnd0,2,"~/Sup1/Sup1Blog/Metallica.DD.Z");

@@ -20,7 +20,7 @@ U0 FrameGrabberTask(I64)
     st_dir="B:/Tmp/ScrnShots";
   else
     st_dir="::/Tmp/ScrnShots";
-  MkDir(st_dir);
+  DirMk(st_dir);
   while (fg_on) {
     StrPrint(buf,"%s/VID%05d.BMP.Z",st_dir,frame_num++);
     StrCpy(buf2,buf);
@@ -48,7 +48,7 @@ I64 CopyVideo()
     DelTree("D:/Tmp/ScrnShots");
     if (fg_mode==FG_RAM_DRV) {
       res=CopyTree("B:/Tmp/ScrnShots","D:/Tmp/ScrnShots");
-      "Unused Space: %12.6fMeg\n",UnusedDrvSpace('B')/1024.0/1024.0;
+      "Unused Space: %12.6fMeg\n",DrvUnused('B')/1024.0/1024.0;
     } else
       res=CopyTree("::/Tmp/ScrnShots","D:/Tmp/ScrnShots");
     "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",
@@ -80,7 +80,6 @@ public U0 FrameGrabberToggle()
 
 public U0 JukeSong(I64 num)
 {//Make movie of one song.
-  AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,num,num+1);
@@ -90,7 +89,6 @@ public U0 JukeSong(I64 num)
 
 public U0 JukeLines(I64 start_line,I64 end_line)
 {//Make movie of many lines of songs.
-  AutoComplete;
   if (!fg_on)
     FrameGrabberToggle;
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
@@ -98,11 +96,11 @@ public U0 JukeLines(I64 start_line,I64 end_line)
     FrameGrabberToggle;
 }
 
-public U0 ChkAll()
-{//ChkDsk on C & D.
+public U0 DskChkAll()
+{//DskChk on C & D.
   U8 *ptr=TOS_HDS;
   while (*ptr)
-    ChkDsk(*ptr++);
+    DskChk(*ptr++);
 }
 
 public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
@@ -158,11 +156,11 @@ public U0 BMP2Doc(U8 *_in_name,U8 *_out_name=NULL)
   I64 dx,dy,score,best_score=I64_MAX;
   CDC *dc;
   CDoc *doc;
-  in_name=DftExt(_in_name,"BMP");
+  in_name=ExtDft(_in_name,"BMP");
   if (_out_name)
-    out_name=DftExt(_out_name,"DD.Z");
+    out_name=ExtDft(_out_name,"DD.Z");
   else
-    out_name=ChgExt(_in_name,"DD.Z");
+    out_name=ExtChg(_in_name,"DD.Z");
   if (dc=BMPRead(in_name)) {
     for (dy=-3;dy<=4;dy++)
       for (dx=-3;dx<=4;dx++) {
@@ -185,16 +183,6 @@ U0 TOSTheme()
     PopUp("Sleep(50);FrameGrabberToggle;");
   ExeFile("~/Sup1/Sup1Graphics/TOS/TOSTheme.HC");
   DocClear;
-}
-
-U0 TOSJukeVideo(I64 start=0,I64 end=10)
-{
-  U8 *buf=FileRead("::/Misc/Bible.TXT.Z"); //Put in cache
-  Free(buf);
-  AutoComplete;
-  FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start,end);
-  FrameGrabberToggle;
 }
 
 #define MEM_TEST_SIZE	1024*1024

@@ -349,12 +349,12 @@ U0 KbdMsInit()
 {
   MemSet(&kbd,0,sizeof(CKbdStateGlbls));
   kbd.fifo=FifoU8New(8);
-  kbd.fifo2=FifoU8New(64);
-  kbd.scan_code_fifo=FifoI64New(128);
+  kbd.fifo2=FifoU8New(0x1000);
+  kbd.scan_code_fifo=FifoI64New(0x1000);
   kbd.irqs_working=FALSE;
   MemSet(&ms_hard,0,sizeof(CMsHardStateGlbls));
   ms_hard.fifo=FifoU8New(8);
-  ms_hard.fifo2=FifoU8New(64);
+  ms_hard.fifo2=FifoU8New(0x1000);
   ms_hard.scale.x=0.5;
   ms_hard.scale.y=0.5;
   ms_hard.scale.z=1.0;

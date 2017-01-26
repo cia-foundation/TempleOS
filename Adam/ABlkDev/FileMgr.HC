@@ -145,7 +145,7 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode)
 {
   CDrv *dv;
   I64 i;
-  CDoc *doc=*_doc,*doc2=sys_clipboard_doc,*parent_doc;
+  CDoc *doc=*_doc,*doc2=sys_clip_doc,*parent_doc;
   CFMUncollapsedLst *tmpc=NULL;
   U8 *cur_entry=NULL,*next_entry=NULL;
   CDocEntry *doc_ce;
@@ -284,7 +284,7 @@ U0 FMMkDir(CDoc *doc)
       Cd(parent->full_name);
       if (DocForm(&fn)) {
 	Silent;
-	MkDir(fn.name);
+	DirMk(fn.name);
 	Silent(OFF);
       }
     }
@@ -293,7 +293,7 @@ U0 FMMkDir(CDoc *doc)
     Cd(tmpde->full_name);
     if (DocForm(&fn)) {
       Silent;
-      MkDir(fn.name);
+      DirMk(fn.name);
       Silent(OFF);
     }
   }
@@ -335,7 +335,7 @@ U0 FMChgDsk(CDoc *doc)
     while (tmpde->parent)
       tmpde=tmpde->parent;
     Silent;
-    ChgDsk(*tmpde->full_name);
+    DskChg(*tmpde->full_name);
     Silent(OFF);
   }
 }
@@ -439,7 +439,7 @@ U0 FMBurnISO(CDoc *doc)
 
 U0 FMCopy(CDoc *doc)
 {
-  CDoc *doc2=sys_clipboard_doc;
+  CDoc *doc2=sys_clip_doc;
   U8 *st;
   CDocEntry *doc_ce=doc->cur_entry,*doc_e;
   CDirEntry *tmpde,*tmpde1=NULL,*tmpde2;
@@ -511,7 +511,7 @@ I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 	"$$CM+LX,29,0$$$$BT,\"RENAME                  \",LE=FMR_RENAME$$"
 	"$$CM+LX,1,3 $$$$BT,\"MAKE DIRECTORY          \",LE=FMR_MKDIR$$"
 	"$$CM+LX,29,0$$$$BT,\"PLAIN-TEXT EDIT         \",LE=FMR_PLAIN$$"
-	"$$CM+LX,1,3 $$$$BT,\"PASTE CLIPBOARD FILES   \",LE=FMR_PASTE$$"
+	"$$CM+LX,1,3 $$$$BT,\"PASTE CLIP FILES        \",LE=FMR_PASTE$$"
 	"$$CM+LX,29,0$$$$BT,\"CHANGE DISK(MOUNT IT)   \",LE=FMR_CHG_DSK$$"
 	"$$CM+LX,1,3 $$$$BT,\"FORMAT                  \",LE=FMR_FORMAT$$"
 	"$$CM+LX,1,3 $$$$BT,\"MOUNT ISO.C FILE        \","
@@ -596,7 +596,7 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
   CDirEntry *head=NULL,*tmpde,*tmpde1,*tmpde2;
   I64 sc,ch,arg1,arg2,msg_code;
   CDoc *doc=NULL,*old_put_doc=DocPut,*old_display_doc=DocDisplay;
-  U8 *res=NULL,*st,*st2,*old_cur_dir=CurDir;
+  U8 *res=NULL,*st,*st2,*old_cur_dir=DirCur;
   CDocEntry *doc_ce=NULL,*doc_e;
   Bool okay;
 

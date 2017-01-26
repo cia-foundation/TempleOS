@@ -6,7 +6,7 @@
 #include "DskBlkDev"
 #include "DskDrv"
 #include "DskBlk"
-#include "DskCluster"
+#include "DskClus"
 #include "DskStrB"
 #include "DskAddDev"
 #include "DskDirA"

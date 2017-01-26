@@ -32,13 +32,13 @@ U0 RedSeaISO9660Stage1(U8 *iso_filename,U8 *stage2_filename)
   U8	*stage1_buf=CAlloc(DVD_BOOT_LOADER_SIZE);
   if (FileFind(stage2_filename,&de) && (out_file=FOpen(iso_filename,"wc+"))) {
     MemCpy(stage1_buf,BDVD_START,BDVD_END-BDVD_START);
-    *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=de.cluster>>2;
+    *(BDVD_BLK_LO	-BDVD_START+stage1_buf)(U32 *)=de.clus>>2;
     *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)=
 	  (de.size+DVD_BLK_SIZE-1)>>(BLK_SIZE_BITS+2);
-    *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=de.cluster&3;
-    if (de.cluster&3)
+    *(BDVD_SHIFT_BLKS	-BDVD_START+stage1_buf)(U16 *)=de.clus&3;
+    if (de.clus&3)
       *(BDVD_BLK_CNT	-BDVD_START+stage1_buf)(U16 *)+=1;
-    FWBlks(out_file,stage1_buf,
+    FBlkWrite(out_file,stage1_buf,
 	  20<<2+1<<2,DVD_BOOT_LOADER_SIZE/BLK_SIZE);
     FClose(out_file);
   }
@@ -61,7 +61,7 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let)
   if (out_file=FOpen(iso_filename,"wc+")) {
     iso_size=FSize(out_file)/DVD_BLK_SIZE;
     for (i=0;i<dv->bd->drv_offset;i+=4)
-      FWBlks(out_file,zero_buf,i,4);
+      FBlkWrite(out_file,zero_buf,i,4);
 
     iso_pri->type=ISO1T_PRI_VOL_DESC;
     StrCpy(iso_pri->id,"CD001");
@@ -70,7 +70,7 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let)
     FillU16Palindrome(&iso_pri->vol_seq_num,1);
     FillU16Palindrome(&iso_pri->log_block_size,DVD_BLK_SIZE);
     FillU32Palindrome(&iso_pri->vol_space_size,iso_size);
-    FillU32Palindrome(&iso_pri->root_dir_record,dv->root_cluster);
+    FillU32Palindrome(&iso_pri->root_dir_record,dv->root_clus);
     iso_pri->file_structure_version=1;
     StrCpy(iso_pri->publisher_id,"TempleOS RedSea");
 
@@ -82,17 +82,17 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let)
     iso_boot->version=1;
     StrCpy(iso_boot(U8 *)+7,"EL TORITO SPECIFICATION");
 
-    FWBlks(out_file,iso_pri,16<<2,4);
+    FBlkWrite(out_file,iso_pri,16<<2,4);
     iso_term->type=ISO1T_TERMINATOR;
     StrCpy(iso_term->id,"CD001");
     iso_term->version=1;
 
     d=iso_boot(U8 *)+0x47;
     *d=20<<2>>2;
-    FWBlks(out_file,iso_boot,17<<2,4);
+    FBlkWrite(out_file,iso_boot,17<<2,4);
 
-    FWBlks(out_file,iso_sup,18<<2,4);
-    FWBlks(out_file,iso_term,19<<2,4);
+    FBlkWrite(out_file,iso_sup,18<<2,4);
+    FBlkWrite(out_file,iso_term,19<<2,4);
 
     et->w[0]=1;
     StrCpy(&et->w[2],"TempleOS");
@@ -105,7 +105,7 @@ U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let)
     et->media_type=0;//0=no emu 2=1.44meg 4=hard drive
     et->sect_cnt=4;  //5 seems like the limit, 4 is safer
     et->load_rba=20<<2>>2+1;
-    FWBlks(out_file,et,20<<2,4);
+    FBlkWrite(out_file,et,20<<2,4);
     FClose(out_file);
   }
   Free(zero_buf);
@@ -147,7 +147,7 @@ public I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,
   else {
     if (!_iso_filename)
       _iso_filename=blkdev.dft_iso_c_filename;
-    iso_filename=ChgExt(_iso_filename,"ISO.C");
+    iso_filename=ExtChg(_iso_filename,"ISO.C");
     src_dir=DirNameAbs(_src_dir);
     if (_stage2_filename) {
       stage2_filename=FileNameAbs(_stage2_filename);

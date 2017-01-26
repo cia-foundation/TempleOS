@@ -698,7 +698,7 @@ lex_float_start:
 	  case KW_INCLUDE:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
-	    fbuf=DftExt(cc->cur_str,"HC.Z");
+	    fbuf=ExtDft(cc->cur_str,"HC.Z");
 	    buf2=FileNameAbs(fbuf);
 	    Free(fbuf);
 	    if (Bt(&sys_run_level,RLf_DOC))
@@ -1029,7 +1029,7 @@ lex_ifjit:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
 	    tmph=CAlloc(sizeof(CHashSrcSym));
-	    fbuf=DftExt(cc->cur_str,"DD.Z");
+	    fbuf=ExtDft(cc->cur_str,"DD.Z");
 	    tmph->str=FileNameAbs(fbuf);
 	    Free(fbuf);
 	    tmph->type=HTT_HELP_FILE|HTF_PUBLIC;

@@ -1,7 +1,7 @@
 File
 {
   Rename(,'r');
-  MkDir(,'d');
+  DirMk(,'d');
   FmtDrv(,'f');
   UnmountDrv(,'u');
   Abort(,CH_SHIFT_ESC);
@@ -19,7 +19,7 @@ Edit
 
 CDDVD
 {
-  ChgDsk(,'c');
+  DskChg(,'c');
   MountISOC(,'i');
   MakeRedSeaISOC(,'m');
   MakeISO9660ISO(,'M');

@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"RedSea File System"$$FG$
 
-The RedSea file system is a simple, 64-bit, file system which is similar to FAT32, but with absolute block addresses instead of clusters, fixed-sized 64-byte directory entries and no FAT table, just an allocation bitmap.  A cluster is just one 512 byte sector.  Files are stored in contiguous blocks and cannot grow in size.
+The RedSea file system is a simple, 64-bit, file system which is similar to FAT32, but with absolute block addresses instead of clus, fixed-sized 64-byte directory entries and no FAT table, just an allocation bitmap.  A clus is just one 512 byte sector.  Files are stored in contiguous blocks and cannot grow in size.
 
 $HL,1$#define CDIR_FILENAME_LEN	38 //Must include terminator zero
 
@@ -13,7 +13,7 @@ public class CDirEntry //64-byte fixed-size
 {
   U16 attr;	//See $LK,"RS_ATTR_DIR",A="MN:RS_ATTR_DIR"$.  I would like to change these.
   U8 name[CDIR_FILENAME_LEN]; //See $LK,"char_bmp_filename",A="MN:char_bmp_filename"$, $LK,"FileNameChk",A="MN:FileNameChk"$
-  I64 cluster; (blk) //One sector per cluster.
+  I64 clus; (blk) //One sector per clus.
   I64 size;	//In bytes
   CDate datetime; //See  $LK,"DateTime",A="::/Doc/TimeDate.DD"$, $LK,"Implementation of DateTime",A="FI:::/Kernel/KDate.HC"$
 };
@@ -24,7 +24,7 @@ public class CRedSeaBoot //RedSea is type FAT32 in partition table to fool BIOS.
   U8 signature,reserved[4]; //MBR_PT_REDSEA=0x88. Distinguish from real FAT32.
   I64 drv_offset;	//For CD/DVD image copy.
   I64 sects;
-  I64 root_cluster; (root_blk)
+  I64 root_clus; (root_blk)
   I64 bitmap_sects;
   I64 unique_id;
   U8 code[462];

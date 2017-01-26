@@ -29,7 +29,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Cannot include ':' in $LK,"Document Links",A="FF:::/Adam/DolDoc/DocLink.HC,AD"$ search string.
 * $$DA fixed width string: <Del> or <BACKSPACE> permanently shortens.
 
-* 11/19/16 editor took long time after copying old testament onto clipboard and exiting.
+* 11/19/16 editor took long time after copying old testament onto clip and exiting.
 
 * Nestled switch() start/end?
 
@@ -181,7 +181,7 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * 4/13/14 Strut or RawHide crashed when $LK,"sys_var_init_flag",A="MN:sys_var_init_flag"$ was set during testsuite.  Perhaps, floodfill?
 
-* $LK,"ChkDsk",A="MN:ChkDsk"$ alloc unalloced.  I don't know if I fixed this.
+* $LK,"DskChk",A="MN:DskChk"$ alloc unalloced.  I don't know if I fixed this.
 
 * 1/?/2015,8/10/2015 Macro sel in Menu did not go to shell?  No, I think just <CTRL-m> twice.  Not a bug.
 
@@ -453,7 +453,6 @@ I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\
 NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
 Purple Frog	$HC,"<center><img src=\"https://s-media-cache-ak0.pinimg.com/736x/fb/08/2a/fb082a53bd798f5957a474ff9095e6d4.jpg\" width=\"640\" height=\"420\" alt=\"\"></center>"$
 Casino (Dog)	$HC,"<center><img src=\"http://www.templeos.org/images/Dog1855x1056.jpg\" width=\"640\" height=\"364\" alt=\"\"></center>"$
-Dianna's Cross	$HC,"<iframe src=\"https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fthephysicsgirl%2Fposts%2F1133902680027666&width=500\" width=\"500\" height=\"671\" style=\"border:none;overflow:hidden\" scrolling=\"no\" frameborder=\"0\" allowTransparency=\"true\"></iframe>"$
 
 
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$

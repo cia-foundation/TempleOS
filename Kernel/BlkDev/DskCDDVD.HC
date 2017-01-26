@@ -15,10 +15,10 @@ Bool ISOInit(CDrv *dv,I64 blk)
     unlock=DrvLock(dv);
     dv->fs_type=FSt_ISO9660;
     dv->spc=spc;
-    dv->data_area=dv->root_cluster=dv->drv_offset=bd->drv_offset=dv->size=0;
+    dv->data_area=dv->root_clus=dv->drv_offset=bd->drv_offset=dv->size=0;
     while (TRUE) {
       dv->size=MaxI64(dv->size,(i+1)*spc);
-      RBlks(dv,iso,i*spc,spc);
+      BlkRead(dv,iso,i*spc,spc);
       buf[0](U32)=iso->id[0](U32);
       buf[4](U16)=iso->id[4](U8);
       switch (LstMatch(buf,"CD001\0CDW02\0BEA01\0BOOT2\0NSR02\0NSR03\0TEA01\0",
@@ -38,7 +38,7 @@ Bool ISOInit(CDrv *dv,I64 blk)
 		dv->size-=bd->drv_offset;
 		RedSeaInit(dv);
 	      } else
-		dv->root_cluster=de->loc.little;
+		dv->root_clus=de->loc.little;
 	      res=TRUE;
 	      goto di_done;
 	    case ISO1T_TERMINATOR:
@@ -58,7 +58,7 @@ di_done:
   } catch {
     dv->fs_type=FSt_ISO9660;
     dv->spc=spc;
-    dv->drv_offset=bd->drv_offset=dv->data_area=dv->root_cluster=0;
+    dv->drv_offset=bd->drv_offset=dv->data_area=dv->root_clus=0;
     Free(iso);
     if (unlock)
       DrvUnlock(dv);
@@ -71,7 +71,7 @@ U0 DVDImageRead(U8 dvd_drv_let,U8 *out_name)
   CDrv *dv=Let2Drv(dvd_drv_let);
   CBlkDev *bd=dv->bd;
   U8 *buf=MAlloc(COPY_BUF_BLKS<<BLK_SIZE_BITS),
-	*out_name2=DftExt(out_name,"ISO");
+	*out_name2=ExtDft(out_name,"ISO");
   CFile *f=FOpen(out_name2,"w");
   I64 n,spc=bd->blk_size>>BLK_SIZE_BITS,blk=0,cnt,retry;
   BlkDevInit(bd);
@@ -97,7 +97,7 @@ U0 DVDImageRead(U8 dvd_drv_let,U8 *out_name)
     if (!retry)
       ATAPIReadBlks2(bd,0,buf,blk/spc,n/spc,TRUE);
 
-    FWBlks(f,buf,blk,n);
+    FBlkWrite(f,buf,blk,n);
     cnt-=n;
     blk+=n;
   }
@@ -136,7 +136,7 @@ U0 DVDImageWriteTask(CDualBuf *d)
       buf=d->buf0;
     while (d->in_buf>d->out_buf+1)
       Yield;
-    FRBlks(f,buf,blk,n);
+    FBlkRead(f,buf,blk,n);
     d->in_buf++;
     cnt-=n;
     blk+=n;
@@ -156,7 +156,7 @@ U0 DVDImageWrite(U8 dvd_drv_let,U8 *in_name=NULL,I64 media_type=MT_DVD)
 
   if (!in_name)
     in_name=blkdev.dft_iso_filename;
-  in_name3=DftExt(in_name,"ISO");
+  in_name3=ExtDft(in_name,"ISO");
   in_name2=FileNameAbs(in_name3);
   f=FOpen(in_name2,"r");
   if (!f) {

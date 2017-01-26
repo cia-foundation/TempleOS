@@ -428,10 +428,10 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
   CAOTHeapGlblRef *tmphgr,*tmphgr1;
   CAOTHeapGlbl *tmphg,*tmphg1;
 
-  fbuf=DftExt(filename,"PRJ.Z");
+  fbuf=ExtDft(filename,"PRJ.Z");
   fbuf2=MStrPrint("#include \"%s\"",fbuf);
   if (map_name)
-    fbuf3=DftExt(map_name,"MAP.Z");
+    fbuf3=ExtDft(map_name,"MAP.Z");
 
   if (tmpaot=CmpBuf(fbuf2,fbuf3,&error_cnt,&warning_cnt,mapfile_drv_let)) {
     aot_U8s=tmpaot->aot_U8s;
@@ -550,9 +550,9 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 	  size-aot_U8s-sizeof(CBinFile));
     Free(fbuf2);
     if (out_name)
-      fbuf2=DftExt(out_name,"BIN.Z");
+      fbuf2=ExtDft(out_name,"BIN.Z");
     else
-      fbuf2=ChgExt(fbuf,"BIN.Z");
+      fbuf2=ExtChg(fbuf,"BIN.Z");
     FileWrite(fbuf2,bfh,size);
     Free(bfh);
     Free(tmpaot->buf);
@@ -614,7 +614,7 @@ I64 ExePrint(U8 *fmt,...)
 I64 ExeFile(U8 *name,I64 ccf_flags=0)
 {//JIT Compile and execute a file.
   I64 res;
-  U8 *name2=DftExt(name,"HC.Z"),
+  U8 *name2=ExtDft(name,"HC.Z"),
 	*st=MStrPrint("#include \"%s\";",name2);
   res=ExePutS(st,name,ccf_flags);
   Free(st);
@@ -657,7 +657,7 @@ I64 ExePrint2(U8 *fmt,...)
 I64 ExeFile2(U8 *name,I64 ccf_flags=0)
 {//throws exceptions
   I64 res;
-  U8 *name2=DftExt(name,"HC.Z"),*st=MStrPrint("#include \"%s\";",name2);
+  U8 *name2=ExtDft(name,"HC.Z"),*st=MStrPrint("#include \"%s\";",name2);
   res=ExePutS2(st,name,ccf_flags);
   Free(st);
   Free(name2);

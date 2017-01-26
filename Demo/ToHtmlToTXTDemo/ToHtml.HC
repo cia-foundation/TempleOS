@@ -83,7 +83,7 @@ U8 *TOSLinkCvt2(U8 *filename,I64 line_num)
 //Make your own LinkCvt routine
   U8 *res=NULL,*st;
   if (filename) {
-    st=ChgExt(filename,"html");
+    st=ExtChg(filename,"html");
     if (st && StrLen(st)>3 && !StrNCmp(st+1,":/",2))
       res=MStrPrint("http://www.templeos.org/Wb/%s#l%d",st+3,line_num);
     Free(st);
@@ -184,7 +184,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<head>\n"
 	  "<meta http-equiv=\"Content-Type\" "
 	  "content=\"text/html;charset=US-ASCII\">\n"
-	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.01",D="DD_OS_NAME_VERSION"$\">\n";
+	  "<meta name=\"generator\" content=\"$TX,"TempleOS V5.02",D="DD_OS_NAME_VERSION"$\">\n";
   if (!body_header) body_header=
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
@@ -368,11 +368,11 @@ public U0 ToHtml(U8 *_in_name,U8 *_out_name=NULL,U8 *html_header=NULL,
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   WinHorz(0,width-1); //Sets doc width for word wrap.
 
-  in_name=DftExt(_in_name,"HC.Z");
+  in_name=ExtDft(_in_name,"HC.Z");
   if (_out_name)
-    out_name=DftExt(_out_name,"html");
+    out_name=ExtDft(_out_name,"html");
   else
-    out_name=ChgExt(_in_name,"html");
+    out_name=ExtChg(_in_name,"html");
 
   doc_in=DocRead(in_name);
   doc_out=Doc2Html(doc_in,html_header,body_header,body_footer,html_footer,

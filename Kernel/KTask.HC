@@ -228,7 +228,7 @@ I64 TaskInit(CTask *task,I64 stk_size)
   task->win_top		=13;
   task->win_bottom	=text.rows-2;
 
-  if (blkdev.home_dir) {//Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart64.HC,TaskInit"$. I guess ok until $LK,"ChgDsk",A="FF:::/Kernel/KEnd.HC,ChgDsk"$().
+  if (blkdev.home_dir) {//Beware Adam $LK,"TaskInit",A="FF:::/Kernel/KStart64.HC,TaskInit"$. I guess ok until $LK,"DskChg",A="FF:::/Kernel/KEnd.HC,DskChg"$().
     task->cur_dv=blkdev.let_to_drv[*blkdev.home_dir-'A'];
     task->cur_dir=StrNew(blkdev.home_dir+2,task);
   } else

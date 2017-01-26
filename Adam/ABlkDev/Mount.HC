@@ -120,9 +120,9 @@ U8 Mount2(U8 boot_drv_let,CDoc *_doc,Bool _caller_is_prtdsk)
 	if ((cnt=ExeDoc(doc)) && whole_drv) {
 	  if (_caller_is_prtdsk) {
 	    res=drv_let;
-	    PrtDsk(drv_let,1.0); //First mount whole drive.
+	    DskPrt(drv_let,1.0); //First mount whole drive.
 	  } else
-	    PrtDsk(drv_let);
+	    DskPrt(drv_let);
 	}
 	DocDel(doc);
       }
@@ -136,7 +136,7 @@ U8 Mount2(U8 boot_drv_let,CDoc *_doc,Bool _caller_is_prtdsk)
 }
 
 public U8 Mount(Bool caller_is_prtdsk=FALSE)
-{//Mount drives. Called from $LK,"PrtDsk(Mount)",A="FF:::/Adam/ABlkDev/PrtDsk.HC,Mount("$.
+{//Mount drives. Called from $LK,"DskPrt(Mount)",A="FF:::/Adam/ABlkDev/DskPrt.HC,Mount("$.
   return Mount2(0,NULL,caller_is_prtdsk);
 }
 
@@ -147,7 +147,7 @@ public U0 Unmount(U8 drv_let=0)
 
 public U8 MountFile(U8 *filename)
 {//Mount ISO.C file.
-  U8 *filename2=DftExt(filename,"ISO.C"),*filename3=FileNameAbs(filename2);
+  U8 *filename2=ExtDft(filename,"ISO.C"),*filename3=FileNameAbs(filename2);
   CDrv *dv=DrvMakeFreeSlot(DrvNextFreeLet('M')); //First $LK,"BDT_ISO_FILE_READ",A="MN:BDT_ISO_FILE_READ"$
   CBlkDev *bd=BlkDevNextFreeSlot(dv->drv_let,BDT_ISO_FILE_READ);
   bd->drv_offset=19<<2+(DVD_BLK_SIZE*2+DVD_BOOT_LOADER_SIZE)/BLK_SIZE;
