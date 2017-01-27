@@ -177,7 +177,7 @@ I8 Freq2Ona(F64 freq)
 }
 
 U0 Snd(I8 ona=ONA_REST)
-{//Play freq.  Zero means off.
+{//Play ona, a piano key num. -128 means rest.
   I64 period;
   CSndData *d;
   if (!Bt(&sys_semas[SEMA_MUTE],0) &&
