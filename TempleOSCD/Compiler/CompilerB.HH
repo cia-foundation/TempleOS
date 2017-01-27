@@ -11,7 +11,6 @@ public _extern _LAST_FUN I64 LastFun(I64 argc,I64 *argv);
 public extern I64 RunFile(U8 *name,I64 ccf_flags=0,...);
 public extern I64 RunFile2(U8 *name,I64 ccf_flags=0,...);
 public extern CCmpGlbls cmp;
-
 #help_index "Compiler/Directive"
 #help_file "::/Doc/Directives"
 public extern Bool Echo(Bool val);
@@ -61,6 +60,7 @@ public extern I64 MemberMetaData(U8 *st,CMemberLst *ml);
 public extern CMemberLstMeta *MemberMetaFind(U8 *st,CMemberLst *ml);
 public extern CHashClass *OptClassFwd(CHashClass *tmpc);
 public extern I64 PrsKeyWord(CCmpCtrl *cc);
+
 #help_index "Compiler;Cmd Line (Typically)"
 extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);
