@@ -2,6 +2,8 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
+$IV,1$----01/28/17 12:13:53----$IV,0$
+
 $IV,1$----01/27/17 08:13:37----$IV,0$
 * Added $LK,"DocLineRead",A="MN:DocLineRead"$() and $LK,"DocLineWrite",A="MN:DocLineWrite"$().
 
