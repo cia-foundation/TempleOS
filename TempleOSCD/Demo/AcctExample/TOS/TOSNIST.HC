@@ -48,13 +48,14 @@ U0 NISTBeaconURL(I64 timestamp)
 U0 NISTGodIns1()
 {
   tos_type=PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0Words1000\0"
-	"Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0Painting1000\0"
-	"Metallica\0");
+	"Words10k\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
+	"Painting1000\0Metallica\0");
   switch (tos_type) {
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("LinuxWords");	break;
     case: tos_timestamp=GodHeaderIns("HappyWords");	break;
     case: tos_timestamp=GodHeaderIns("Words1000");	break;
+    case: tos_timestamp=GodHeaderIns("Words10k");	break;
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("BookPick");	break;
     case: tos_timestamp=GodHeaderIns("Doodle");		break;
@@ -98,6 +99,12 @@ U0 NISTGodIns2()
       if (DocForm(gm(CHexWordForm *))) {
 	NISTBeaconURL(gm->timestamp);
 	GodWordBatch(gm,10,3);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodWordBatch(gm,10,4);
       }
       break;
     case:

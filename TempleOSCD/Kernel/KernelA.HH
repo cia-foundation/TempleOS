@@ -3215,6 +3215,7 @@ class CJobCtrl
 #define MSG_MS_R_D_DOWN 	11 //(x,y)
 #define MSG_MS_R_D_UP		12 //(x,y)
 
+//Fake messages used to send both an up and down.
 #define MSG_KEY_DOWN_UP		-2  //Down & UP
 #define MSG_MS_L_DOWN_UP	-5  //Down & Up
 #define MSG_MS_L_D_DOWN_UP	-7  //Down & Up

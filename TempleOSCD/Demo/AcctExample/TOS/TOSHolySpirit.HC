@@ -278,6 +278,7 @@ U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits)
 {//Insert batch of words from rand hex.
   I64 i=0,j,k,min;
   CDirEntry *tmpde,*tmpde1;
+  U8 *filename;
 
   FifoU8Flush(god.fifo);
   GodHexIns(gm->rnd0);
@@ -302,7 +303,11 @@ U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits)
     }
     DirTreeDel(tmpde1);
   } else {
-    PutFileLink("::/Home/Sup1/Sup1Blog/NumWords1000.TXT");
+    if (digits==3)
+      filename="::/Home/Sup1/Sup1Blog/NumWords1000.TXT";
+    else
+      filename="::/Home/Sup1/Sup1Blog/NumWords10k.TXT";
+    PutFileLink(filename);
     '\n';
   }
 
@@ -353,7 +358,7 @@ U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits)
 	if (k<=9) {
 	  j=j*10+k;
 	  if (!--i) {
-	    "%s\n",DocLineRead("::/Home/Sup1/Sup1Blog/NumWords1000.TXT",j+1);
+	    "%s\n",DocLineRead(filename,j+1);
 	    break;
 	  }
 	}
@@ -514,7 +519,7 @@ public U0 GodIns()
 	GodHeaderIns;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
-	      "Words1000\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
+	      "Words1000\0Words10k\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
 	      "Painting100\0Painting1000\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
@@ -536,6 +541,10 @@ public U0 GodIns()
 	  case:
 	    if (DocForm(gm(CHexWordForm *)))
 	      GodWordBatch(gm,10,3);
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *)))
+	      GodWordBatch(gm,10,4);
 	    break;
 	  case:
 	    if (DocForm(gm(CRandHex5Form *))) {

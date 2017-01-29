@@ -235,6 +235,8 @@ $ID,-5$
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
 
+* Can we get rid of $LK,"MSG_CMD",A="MN:MSG_CMD"$?
+
 * Make so just CdRom; command to copy entire disk to ::/CdRom directory? 
 
 * $LK,"MP DepthBuf",A="FF:::/Adam/Gr/SpriteMesh.HC,dc->depth_buf=e->"$ is a kludge because of dc->depth_buf=NULL in various graphics routines.
@@ -437,7 +439,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17378KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17380KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
