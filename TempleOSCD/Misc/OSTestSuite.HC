@@ -661,7 +661,30 @@ U0 DoLightTable()
   BirthWait(&task->popup_task);
   TaskWait(task->popup_task);
   PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
-  Sleep(750);
+
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,120		,180);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,160		,120);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,320		,10);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-160	,120);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-120	,180);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_R_DOWN_UP,0,0);
+
+  MsSet(320,190);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+
+  PostMsgWait(task,MSG_MS_R_DOWN,290,240);
+  PostMsgWait(task,MSG_MS_R_UP	,320,220);
+
+  Sleep(1500);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);
   DeathWait(&task,TRUE);
 }

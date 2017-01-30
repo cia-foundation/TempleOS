@@ -5,6 +5,7 @@ class Photon
 } p_root;
 
 CDC *map;
+F64 ts;
 
 #define TAIL 20
 U0 DrawIt(CTask *,CDC *dc)
@@ -17,6 +18,20 @@ U0 DrawIt(CTask *,CDC *dc)
     GrLine(dc,tmpp->p.x-TAIL*tmpp->v.x,tmpp->p.y-TAIL*tmpp->v.y,
 	  tmpp->p.x,tmpp->p.y);
     tmpp=tmpp->next;
+  }
+}
+
+U0 RandomBurst()
+{
+  I64 i;
+  F64 é;
+  Photon *tmpp;
+  for (i=0;i<1000;i++) {
+    tmpp=CAlloc(sizeof(Photon));
+    D3Equ(&tmpp->p,Fs->pix_width*Rand,Fs->pix_height*Rand);
+    é=2*ã*Rand;
+    D3Equ(&tmpp->v,Cos(é),Sin(é));
+    QueIns(tmpp,p_root.last);
   }
 }
 
@@ -86,15 +101,13 @@ U0 SnellsLaw(CDC *dc,Photon *tmpp,I64 last,I64 next)
 
 U0 AnimateTask(I64)
 {
-  CD3 v;
   Photon *tmpp;
   I64 last,next;
   while (TRUE) {
     tmpp=p_root.next;
     while (tmpp!=&p_root) {
       last=GrPeek(map,tmpp->p.x,tmpp->p.y);
-      D3Mul(&v,1.5,&tmpp->v);
-      D3AddEqu(&tmpp->p,&v);
+      D3AddEqu(&tmpp->p,&tmpp->v);
       if (tmpp->p.x<=0)		tmpp->v.x=-tmpp->v.x;
       if (tmpp->p.x>=map->width)	tmpp->v.x=-tmpp->v.x;
       if (tmpp->p.y<=0)		tmpp->v.y=-tmpp->v.y;
@@ -106,12 +119,13 @@ U0 AnimateTask(I64)
 	SnellsLaw(map,tmpp,last,next);
       tmpp=tmpp->next;
     }
-    Sleep(10);
+    Sleep(1000*ts);
   }
 }
 
 U0 Init()
 {
+  ts=0.01;
   map=DCNew(Fs->pix_width,Fs->pix_height);
   QueInit(&p_root);
 }
@@ -138,11 +152,15 @@ U0 LightTable()
 	"Edit {"
 	"  Fill(,CH_SPACE);"
 	"}"
+	"Play {"
+	"  RandomBurst(,'b');"
+	"  ElapseTime(,'e');"
+	"}"
 	);
   PopUpOk(
-	"Draw splines with $$GREEN$${Left-Click}$$FG$$.\n\n"
+	"Draw splines with $$GREEN$${Left-click}$$FG$$.\n\n"
 	"Fill lens with $$GREEN$$<SPACE>$$FG$$.\n\n"
-	"$$GREEN$${Right-Drag}$$FG$$ to fire rays.\n"
+	"$$GREEN$${Right-drag}$$FG$$ to fire rays.\n"
 	);
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-
@@ -189,7 +207,9 @@ lt_restart:
 	      i++;
 	    }
 	  } while (i<PTS_NUM-1 && msg_code!=MSG_MS_R_UP);
-	  Gr2BSpline(map,c,i);
+	  map->pen_width=2;
+	  Gr2BSpline3(map,c,i);
+	  map->pen_width=1;
 	  break;
 	case MSG_KEY_DOWN:
 	  switch (arg1) {
@@ -200,6 +220,14 @@ lt_restart:
 	      DCFill;
 	      CleanUp;
 	      Init;
+	      break;
+	    case 'r':
+	      RandomBurst;
+	      break;
+	    case 'e':
+	      ts=0.00;
+	      Sleep(2500);
+	      ts=0.01;
 	      break;
 	    case CH_ESC:
 	    case CH_SHIFT_ESC:

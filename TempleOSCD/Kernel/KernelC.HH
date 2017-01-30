@@ -725,7 +725,6 @@ public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;
-
 #help_index "Time/Date/CDate;Date/CDate"
 #help_file "::/Doc/TimeDate"
 extern U0 Date2ISO1(CISO1Date *dst,CDate cdt);

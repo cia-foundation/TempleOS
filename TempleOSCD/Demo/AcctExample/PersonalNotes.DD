@@ -1,7 +1,5 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
-* TestSuite $LK,"DoLightTable",A="FF:::/Misc/OSTestSuite.HC,DoLightTable"$
-
 * $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
 * Add asteroid harbor defense.
 * Afterburner thruster.
@@ -441,7 +439,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17384KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17386KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$

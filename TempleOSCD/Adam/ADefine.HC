@@ -18,7 +18,7 @@ U0 LoadDocDefines()
   //$LK,"DD_BOOT_HIGH_LOC_DVD",A="FF:::/Adam/Opt/Boot/BootDVD.HC,DD_BOOT_HIGH_LOC_DVD"$
 
   $TR-C,"LineRep"$
-$ID,4$DefinePrint("DD_TEMPLEOS_LOC","120,185");
+$ID,4$DefinePrint("DD_TEMPLEOS_LOC","120,236");
 DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","82,012");
 $ID,-4$
   DefinePrint("DD_MP_VECT","%08X",MP_VECT_ADDR);
