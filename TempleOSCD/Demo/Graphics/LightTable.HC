@@ -21,6 +21,36 @@ U0 DrawIt(CTask *,CDC *dc)
   }
 }
 
+U0 RayBurst(I64 x1,I64 y1,I64 x2,I64 y2)
+{
+  CD3 p,v,n,n2;
+  I64 i;
+  Photon *tmpp;
+  D3Equ(&p,x2,y2);
+  D3Equ(&v,x2-x1,y2-y1);
+  D3Unit(&v);
+  D3Equ(&n,v.y,-v.x);
+
+  tmpp=CAlloc(sizeof(Photon));
+  D3Copy(&tmpp->p,&p);
+  D3Copy(&tmpp->v,&v);
+  QueIns(tmpp,p_root.last);
+
+  for (i=2;i<=9;i+=3) {
+    D3Mul(&n2,i,&n);
+ 
+    tmpp=CAlloc(sizeof(Photon));
+    D3Add(&tmpp->p,&p,&n2);
+    D3Copy(&tmpp->v,&v);
+    QueIns(tmpp,p_root.last);
+
+    tmpp=CAlloc(sizeof(Photon));
+    D3Sub(&tmpp->p,&p,&n2);
+    D3Copy(&tmpp->v,&v);
+    QueIns(tmpp,p_root.last);
+  }
+}
+
 U0 RandomBurst()
 {
   I64 i;
@@ -185,11 +215,7 @@ lt_restart:
 	  break;
 	case MSG_MS_R_UP:
 	  ray_x2=arg1; ray_y2=arg2;
-	  tmpp=CAlloc(sizeof(Photon));
-	  tmpp->p.x=ray_x2; tmpp->p.y=ray_y2;
-	  tmpp->v.x=ray_x2-ray_x1; tmpp->v.y=ray_y2-ray_y1;
-	  D3Unit(&tmpp->v);
-	  QueIns(tmpp,p_root.last);
+	  RayBurst(ray_x1,ray_y1,ray_x2,ray_y2);
 	  break;
 	case MSG_MS_L_DOWN:
 	  i=0;
