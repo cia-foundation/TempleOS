@@ -12,7 +12,7 @@ U0 TS(U8 *desc)
     (PROGRESS_DESC_LEN-StrLen(st))>>1,CH_SPACE,st);
   Free(st);
   progress4=ts_i++;
-  progress4_max=170;
+  progress4_max=171;
   progress4_t0=ts_t0;
   *progress4_desc=0;
   RegExe("TempleOS/OSTestSuite");
@@ -652,6 +652,17 @@ U0 DoF2Macro()
 
   Sleep(1000);
   XTalk(task,"\n");
+  DeathWait(&task,TRUE);
+}
+
+U0 DoLightTable()
+{
+  CTask *task=User("#include \"::/Demo/Graphics/LightTable\";\n");
+  BirthWait(&task->popup_task);
+  TaskWait(task->popup_task);
+  PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
+  Sleep(750);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);
   DeathWait(&task,TRUE);
 }
 
@@ -1572,6 +1583,7 @@ U0 OSTestSuite()
   TS("Symmetry");	DoSymmetry;
   TS("Shadow");		TSFileChar("::/Demo/Graphics/Shadow",1500);
   TS("Transform");	TSFileChar("::/Demo/Graphics/Transform",,CH_SHIFT_ESC);
+  TS("LightTable");	DoLightTable;
   TS("PredatorPrey");	DoPredatorPrey;
   TS("PoleZeros");	DoPoleZeros;
   TS("Digits");		DoDigits;

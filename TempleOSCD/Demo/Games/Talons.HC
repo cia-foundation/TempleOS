@@ -1226,8 +1226,8 @@ U0 Talons()
   SettingsPop;
   CleanUp;
   PostCleanUp;
-  RegWrite("TempleOS/Talons","F64 best_score=%5.4f;\n",best_score);
   MenuPop;
+  RegWrite("TempleOS/Talons","F64 best_score=%5.4f;\n",best_score);
 }
 
 Talons;

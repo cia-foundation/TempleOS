@@ -715,9 +715,9 @@ ka_done: //Don't goto out of try
   } catch
     PutExcept;
   SettingsPop;
+  MenuPop;
   RegWrite("TempleOS/KeepAway","I64 best_score0=%d,best_score1=%d;\n",
 	best_score0,best_score1);
-  MenuPop;
 }
         Ê     p   ¨      ­ÿÿÿûÿÿÿûÿÿÿ­ÿÿÿûÿÿÿ   ·ÿÿÿûÿÿÿûÿÿÿ·ÿÿÿûÿÿÿ   ­ÿÿÿ   ûÿÿÿ­ÿÿÿ      ·ÿÿÿ   ûÿÿÿ·ÿÿÿ   
    ·ÿÿÿûÿÿÿöÿÿÿ·ÿÿÿûÿÿÿ

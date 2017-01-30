@@ -694,8 +694,8 @@ U0 Varoom()
 vr_done: //Don't goto out of try
   } catch
     PutExcept;
-  CleanUp;
   SettingsPop;
+  CleanUp;
   MenuPop;
   RegWrite("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
 }

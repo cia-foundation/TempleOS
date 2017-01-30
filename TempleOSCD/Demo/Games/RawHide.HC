@@ -582,9 +582,9 @@ rh_done:
     GetMsg(,,1<<MSG_KEY_UP);
   } catch
     PutExcept;
-  MenuPop;
   SettingsPop;
   CleanUp;
+  MenuPop;
   RegWrite("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
 }
 

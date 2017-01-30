@@ -1,5 +1,7 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
+* TestSuite $LK,"DoLightTable",A="FF:::/Misc/OSTestSuite.HC,DoLightTable"$
+
 * $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
 * Add asteroid harbor defense.
 * Afterburner thruster.

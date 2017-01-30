@@ -437,9 +437,9 @@ dg_done:
   } catch
     PutExcept;
   SettingsPop;
+  CleanUp;
   MenuPop;
   RegWrite("TempleOS/DunGen","F64 best_score=%5.4f;\n",best_score);
-  CleanUp;
 }
 
 DunGen;

@@ -584,8 +584,8 @@ ws_done:
   } catch
     PutExcept;
   SettingsPop;
-  MenuPop;
   CleanUp;
+  MenuPop;
   RegWrite("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
 }
 

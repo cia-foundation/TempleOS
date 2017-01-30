@@ -67,6 +67,7 @@ $LK,"::/Demo/Snd/WaterFowl.HC"$
 $MA-X+PU,"::/Apps/Psalmody/Examples",LM="Cd(\"::/Apps/Psalmody/Examples\");Dir;View;\n"$
 $LK,"CPURep",A="MN:CPURep"$
 $LK,"::/Demo/MultiCore/MPPrint.HC"$
+$LK,"::/Demo/Graphics/LightTable.HC"$
 $LK,"::/Demo/Graphics/PredatorPrey.HC"$
 $LK,"::/Demo/Graphics/Cartesian.HC"$
 $LK,"::/Demo/Graphics/Hanoi.HC"$
