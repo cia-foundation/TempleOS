@@ -362,7 +362,7 @@ U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits)
 	    break;
 	  }
 	}
-      } while (FifoU8Cnt(god.fifo)>4);
+      } while (FifoU8Cnt(god.fifo)>=4);
     }
   }
   FifoU8Flush(god.fifo);
