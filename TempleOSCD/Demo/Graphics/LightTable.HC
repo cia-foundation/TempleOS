@@ -96,25 +96,27 @@ U0 RayBurst(I64 x1,I64 y1,I64 x2,I64 y2)
   CD3 p,v,n,n2;
   I64 i;
   Photon *tmpp;
-  D3Equ(&p,x2,y2);
-  D3Equ(&v,x2-x1,y2-y1);
-  D3Unit(&v);
-  D3Equ(&n,v.y,-v.x);
-
-  tmpp=PhotonNew;
-  D3Copy(&tmpp->p,&p);
-  D3Copy(&tmpp->v,&v);
-
-  for (i=2;i<=9;i+=3) {
-    D3Mul(&n2,i,&n);
- 
-    tmpp=PhotonNew;
-    D3Add(&tmpp->p,&p,&n2);
-    D3Copy(&tmpp->v,&v);
+  if (x1!=x2 || y1!=y2) {
+    D3Equ(&p,x2,y2);
+    D3Equ(&v,x2-x1,y2-y1);
+    D3Unit(&v);
+    D3Equ(&n,v.y,-v.x);
 
     tmpp=PhotonNew;
-    D3Sub(&tmpp->p,&p,&n2);
+    D3Copy(&tmpp->p,&p);
     D3Copy(&tmpp->v,&v);
+
+    for (i=2;i<=9;i+=3) {
+      D3Mul(&n2,i,&n);
+
+      tmpp=PhotonNew;
+      D3Add(&tmpp->p,&p,&n2);
+      D3Copy(&tmpp->v,&v);
+
+      tmpp=PhotonNew;
+      D3Sub(&tmpp->p,&p,&n2);
+      D3Copy(&tmpp->v,&v);
+    }
   }
 }
 
@@ -133,8 +135,9 @@ U0 RandomBurst()
 
 U0 FindNormal(Photon *tmpp)
 {
-  CD3 p,p1,p2,v,s;
-  F64 é=Arg(tmpp->v.x,tmpp->v.y),è;
+  CD3 p,p1,p2;
+  F64 x,y,é=Arg(tmpp->v.x,tmpp->v.y),è;
+  I64 c;
 
   D3Copy(&tmpp->p_snell_inhibit,&tmpp->p);
 
@@ -152,35 +155,49 @@ U0 FindNormal(Photon *tmpp)
   D3Div(&tmpp->p,&p,bmp_scale);
 
   //Draw an arc one direction, finding point of contact.
-  for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
-    D3Equ(&s,Cos(é+ã-ã/4-è),Sin(é+ã-ã/4-è));
-    D3Mul(&v,bmp_norm_radius,&s);
-    D3Add(&p1,&p,&v);
-    if (BmpPeek(p1.x,p1.y)!=BLACK)
+  for (è=0;è<=ã/4;è+=0.125*ã/bmp_norm_radius) {
+    x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
+    y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
+    c=BmpPeek(x,y);
+    if (c!=BLACK)
+      break;
+    x=p.x+bmp_norm_radius*Cos(é+ã-ã/4+è);
+    y=p.y+bmp_norm_radius*Sin(é+ã-ã/4+è);
+    c=BmpPeek(x,y);
+    if (c!=BLACK)
       break;
   }
-  if (BmpPeek(p1.x,p1.y)!=WHITE)
+  if (c==WHITE)
+    D3Equ(&p1,x,y);
+  else
     D3Copy(&p1,&tmpp->p);
 
     //Draw an arc other direction, finding point of contact.
-  for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
-    D3Equ(&s,Cos(é+ã+ã/4+è),Sin(é+ã+ã/4+è));
-    D3Mul(&v,bmp_norm_radius,&s);
-    D3Add(&p2,&p,&v);
-    if (BmpPeek(p2.x,p2.y)!=BLACK)
+  for (è=0;è<=ã/4;è+=0.125*ã/bmp_norm_radius) {
+    x=p.x+bmp_norm_radius*Cos(é+ã+ã/4-è);
+    y=p.y+bmp_norm_radius*Sin(é+ã+ã/4-è);
+    c=BmpPeek(x,y);
+    if (c!=BLACK)
+      break;
+    x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
+    y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
+    c=BmpPeek(x,y);
+    if (c!=BLACK)
       break;
   }
-  if (BmpPeek(p2.x,p2.y)!=WHITE)
+  if (c==WHITE)
+    D3Equ(&p2,x,y);
+  else
     D3Copy(&p2,&tmpp->p);
 
-  D3Sub(&s,&p1,&p2);
-  if (D3NormSqr(&s)<1.0) {
+  D3Sub(&p,&p1,&p2);
+  if (D3NormSqr(&p)<1.0) {
     D3Equ(&tmpp->n,Cos(é),Sin(é));
     lock {zero_normal++;}
   } else {
-    D3Equ(&tmpp->n,s.y,-s.x);
+    D3Equ(&tmpp->n,p.y,-p.x);
     if (D3Dot(&tmpp->n,&tmpp->v)<0)
-      D3Equ(&tmpp->n,-s.y,s.x);
+      D3Equ(&tmpp->n,-p.y,p.x);
     D3Unit(&tmpp->n);
   }
 }
@@ -494,6 +511,8 @@ lt_restart:
 	    case '\n':
 	      CleanUp;
 	      Init;
+	      mode=LTM_LINE;
+	      LTMenuSet(mode);
 	      break;
 	    case 'r':
 	      RandomBurst;
