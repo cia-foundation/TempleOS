@@ -10,7 +10,7 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
 	CDoc *_doc,CDocEntry *_doc_e)
 {
   CTask	*pu_task;
-  I64	i;
+  I64	res;
   CDoc *doc=DocNew;
   CDocEntry *doc_de;
   U8	*st;
@@ -63,7 +63,7 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
   st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_head,_cur_elem_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   if (TaskValidate(pu_task)) {
     *_head=SpriteSideBar2SpriteQue(DocPut(pu_task),*_head,_cur_elem_num);
     Kill(pu_task);
@@ -72,12 +72,12 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
   _doc_e->tag=StrNew(doc_de->data,_doc->mem_task);
   _doc->cur_col=0;
   DocDel(doc);
-  return i;
+  return res;
 }
 
 Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
 {
-  I64 i;
+  I64 res;
   CDoc *doc=DocNew;
   CDocEntry *doc_e;
   doc_e=DocPrint(doc,"  $$DA,A=\"x1:%%d\"$$\n");
@@ -95,10 +95,10 @@ Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
 
   DocPrint(doc," $$BT,\"Use These Extents\",LE=TRUE$$");
   DocPrint(doc,"$$CM,3,0$$$$BT,\"Drag-Out New Extents\",LE=FALSE$$\n\n");
-  do i=PopUpMenu(doc);
-  while (i!=FALSE && i!=TRUE);
+  do res=PopUpMenu(doc);
+  while (res!=FALSE && res!=TRUE);
   DocDel(doc);
-  return i;
+  return res;
 }
 
 U0 SpriteScrnInit(CDC *dc,I64,I64)

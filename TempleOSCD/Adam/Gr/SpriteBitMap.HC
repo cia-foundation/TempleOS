@@ -42,7 +42,7 @@ GrInit4;
 
 I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 {
-  I64 i;
+  I64 res;
   U8 *st1,*st2,buf[STR_LEN];
   CDoc *doc=DocNew;
 
@@ -86,9 +86,9 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 	"$$MU-UL,\"Exit  Sprite\",LE=SPBM_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$\n"
 	"\nRight-Click to get back to this menu.",st1,st2,width);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   DocDel(doc);
-  return i;
+  return res;
 }
 
 U0 GrBitMapEdPrepPersistentDC(CDC *dc,I64 xx1,I64 yy1,CDC *img)

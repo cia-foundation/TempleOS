@@ -10,5 +10,5 @@ extern U0 DocPrintPartial(CDoc *doc=NULL,U8 *fmt,...);
 extern CDocEntry *DocPutS(CDoc *doc,U8 *st);
 extern U8 *DocSave(CDoc *doc,I64 *_size=NULL);
 extern I64 EdLeftClickLink(CDoc *doc,CDocEntry *doc_e);
-extern U8 *PopUpPickLst(U8 *lst);
+extern I64 PopUpPickLst(U8 *lst);
 extern I64 TermRightClickLink(CDoc *doc,CDocEntry *doc_e);

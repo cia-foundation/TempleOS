@@ -2,11 +2,9 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----01/31/17 03:33:54----$IV,0$
-* Added $LK,"TOS Linux Setup",A="FF:::/Demo/AcctExample/TOS/TOSPolicies.DD,TOS Linux Setup"$.
-
-$IV,1$----01/31/17 00:20:31----$IV,0$
+$IV,1$----01/31/17 07:51:26----$IV,0$
 * Added $LK,"::/Demo/Graphics/LightTable.HC"$.
+* Added $LK,"TOS Linux Setup",A="FF:::/Demo/AcctExample/TOS/TOSPolicies.DD,TOS Linux Setup"$.
 
 $IV,1$----01/27/17 08:13:37----$IV,0$
 * Added $LK,"DocLineRead",A="MN:DocLineRead"$() and $LK,"DocLineWrite",A="MN:DocLineWrite"$().

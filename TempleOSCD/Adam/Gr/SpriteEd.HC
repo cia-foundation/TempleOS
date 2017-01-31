@@ -741,7 +741,7 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 {
   U8 *st;
   CTask *pu_task;
-  I64 i;
+  I64 res;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteEd.DD.Z\"$$\n\n"
@@ -764,13 +764,13 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
   st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_head,_cur_elem_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   if (TaskValidate(pu_task)) {
     *_head=SpriteSideBar2SpriteQue(DocPut(pu_task),*_head,_cur_elem_num);
     Kill(pu_task);
   }
   DocDel(doc);
-  return i;
+  return res;
 }
 
 #define SPEDT_SIMPLE_PT		0
