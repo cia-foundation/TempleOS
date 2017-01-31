@@ -372,6 +372,7 @@ public extern Bool FileFind(U8 *filename,CDirEntry *_de=NULL,I64 fuf_flags=0);
 public extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);
 public extern I64 FileWrite(U8 *filename,
 	U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
+
 #help_index "File/Program Routines;File/FileNames"
 public extern CDirEntry *FilesFind(U8 *files_find_mask,I64 fuf_flags=0);
 
@@ -760,5 +761,4 @@ public extern F64 tS(); //From SysTimerFreq.
 
 #help_index "Windows"
 public extern Bool WinInside(I64 x,I64 y,CTask *task=NULL,I64 border=0);
-
 #help_index ""

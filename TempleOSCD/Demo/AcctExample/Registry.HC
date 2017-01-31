@@ -50,7 +50,7 @@ $ID,-2$$TR,"Wenceslas"$
 $ID,2$F64 best_score=43.9944;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=227.004;
+progress3_tf=0.000;progress4_tf=229.523;
 $ID,-2$$TR,"XCaliber"$
 $ID,2$I64 best_score=90;
 I64 msg_flags=2;
@@ -62,13 +62,13 @@ $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=203.589;
+progress3_tf=0.000;progress4_tf=201.797;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$
 $ID,2$$ID,-2$$ID,-2$$TR,"DemoCompany"$
 $ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=188.69015;
+$ID,2$F64 best_score=236.35149;
 $TR,"SimpleVal"$
-$ID,2$1236;
+$ID,2$1237;
 $ID,-2$$ID,-2$$ID,-2$

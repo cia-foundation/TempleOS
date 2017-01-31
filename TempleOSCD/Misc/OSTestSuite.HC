@@ -657,7 +657,7 @@ U0 DoF2Macro()
 
 U0 DoLightTable()
 {
-  CTask *task=User("#include \"::/Demo/Graphics/LightTable\";\n");
+  CTask *task=User("#include \"::/Demo/Graphics/LightTable\";\n\n");
   BirthWait(&task->popup_task);
   TaskWait(task->popup_task);
   PostMsgWait(task->popup_task,MSG_KEY_DOWN_UP,CH_SPACE,0);
@@ -681,8 +681,8 @@ U0 DoLightTable()
   MsSet(320,190);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_SPACE,0);
 
-  PostMsgWait(task,MSG_MS_R_DOWN,290,240);
-  PostMsgWait(task,MSG_MS_R_UP	,320,220);
+  PostMsgWait(task,MSG_MS_R_DOWN,460,280);
+  PostMsgWait(task,MSG_MS_R_UP	,500,220);
 
   Sleep(1500);
   PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);

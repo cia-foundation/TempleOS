@@ -7,11 +7,36 @@ class Photon
 CDC *map;
 F64 ts;
 
+U8	*bmp;
+F64	bmp_scale;
+I64	bmp_mem,bmp_width,bmp_height;
+
+I64 BmpPeek(I64 x,I64 y)
+{
+  if (0<=x<bmp_width && 0<=y<bmp_height) {
+    if (Bt(bmp,y*bmp_width+x))
+      return WHITE;
+    else
+      return BLACK;
+  } else
+    return -1;
+}
+
+U0 BmpPlot(U8 *bmp,I64 x,I64 y,I64)
+{
+  if (0<=x<bmp_width && 0<=y<bmp_height)
+    Bts(bmp,y*bmp_width+x);
+}
+
 #define TAIL 20
 U0 DrawIt(CTask *,CDC *dc)
 {
   Photon *tmpp;
   GrBlot(dc,0,0,map);
+  dc->color=WHITE;
+  GrPrint(dc,0,0,"Mem:0x%X %,dMeg Scale:%0.3f (%d,%d)-->(%d,%d)",
+	bmp_mem,bmp_mem/1024/1024,bmp_scale,
+	map->width,map->height,bmp_width,bmp_height);
   tmpp=p_root.next;
   while (tmpp!=&p_root) {
     dc->color=LTRED;
@@ -65,30 +90,34 @@ U0 RandomBurst()
   }
 }
 
-#define HEIGHT	10
-U0 FindNormal(CDC *dc,Photon *tmpp,I64 last,I64,CD3 *_normal)
+#define HEIGHT	(5*bmp_scale)
+U0 FindNormal(Photon *tmpp,I64 last,I64,CD3 *_normal)
 {
-  CD3 p1,p2,v,s;
+  CD3 p1,p2,v,s,bmp_p;
   F64 é=Arg(tmpp->v.x,tmpp->v.y),è;
+
+  D3Mul(&bmp_p,bmp_scale,&tmpp->p);
+  while (BmpPeek(bmp_p.x,bmp_p.y)==last)
+    D3AddEqu(&bmp_p,&tmpp->v);
 
   for (è=0;è<ã/2;è+=ã/HEIGHT) {
     D3Equ(&s,Cos(é+ã-ã/4-è),Sin(é+ã-ã/4-è));
     D3Mul(&v,HEIGHT,&s);
-    D3Add(&p1,&tmpp->p,&v);
-    if (GrPeek(dc,p1.x,p1.y)!=last)
+    D3Add(&p1,&bmp_p,&v);
+    if (BmpPeek(p1.x,p1.y)!=BLACK)
       break;
   }
-  if (GrPeek(dc,p1.x,p1.y)==last)
+  if (BmpPeek(p1.x,p1.y)!=WHITE)
     D3Copy(&p1,&tmpp->p);
 
   for (è=0;è<ã/2;è+=ã/HEIGHT) {
     D3Equ(&s,Cos(é+ã+ã/4+è),Sin(é+ã+ã/4+è));
     D3Mul(&v,HEIGHT,&s);
-    D3Add(&p2,&tmpp->p,&v);
-    if (GrPeek(dc,p2.x,p2.y)!=last)
+    D3Add(&p2,&bmp_p,&v);
+    if (BmpPeek(p2.x,p2.y)!=BLACK)
       break;
   }
-  if (GrPeek(dc,p2.x,p2.y)==last)
+  if (BmpPeek(p2.x,p2.y)!=WHITE)
     D3Copy(&p2,&tmpp->p);
  
   D3Sub(&s,&p1,&p2);
@@ -99,7 +128,7 @@ U0 FindNormal(CDC *dc,Photon *tmpp,I64 last,I64,CD3 *_normal)
   D3Unit(_normal);
 }
 
-U0 SnellsLaw(CDC *dc,Photon *tmpp,I64 last,I64 next)
+U0 SnellsLaw(Photon *tmpp,I64 last,I64 next)
 {
 //n1 and n2 are refraction index.
 //n1 Sin(é1) == n2 Sin(é2)
@@ -113,7 +142,7 @@ U0 SnellsLaw(CDC *dc,Photon *tmpp,I64 last,I64 next)
     n2=1.5;
   else
     n2=1.0;
-  FindNormal(dc,tmpp,last,next,&normal);
+  FindNormal(tmpp,last,next,&normal);
   én=Arg(normal.x,normal.y);
   //dot=m1m2Cos(é);
   é1=ACos(D3Dot(&normal,&tmpp->v));
@@ -138,15 +167,14 @@ U0 AnimateTask(I64)
     while (tmpp!=&p_root) {
       last=GrPeek(map,tmpp->p.x,tmpp->p.y);
       D3AddEqu(&tmpp->p,&tmpp->v);
-      if (tmpp->p.x<=0)		tmpp->v.x=-tmpp->v.x;
+      if (tmpp->p.x<=0)			tmpp->v.x=-tmpp->v.x;
       if (tmpp->p.x>=map->width)	tmpp->v.x=-tmpp->v.x;
-      if (tmpp->p.y<=0)		tmpp->v.y=-tmpp->v.y;
-      if (tmpp->p.y>=map->height) tmpp->v.y=-tmpp->v.y;
+      if (tmpp->p.y<=0)			tmpp->v.y=-tmpp->v.y;
+      if (tmpp->p.y>=map->height)	tmpp->v.y=-tmpp->v.y;
       next=GrPeek(map,tmpp->p.x,tmpp->p.y);
       if (last!=next &&
-	    (last==BLACK && next==WHITE) ||
-	    (last==WHITE       && next==BLACK))
-	SnellsLaw(map,tmpp,last,next);
+	    (last==BLACK && next==WHITE) || (last==WHITE && next==BLACK))
+	SnellsLaw(tmpp,last,next);
       tmpp=tmpp->next;
     }
     Sleep(1000*ts);
@@ -158,20 +186,30 @@ U0 Init()
   ts=0.01;
   map=DCNew(Fs->pix_width,Fs->pix_height);
   QueInit(&p_root);
+  //x*y=bmp_mem*8
+  //x/y=640/480
+  //x=640/480*y
+  //640/480*y^2=bmp_mem*8
+  //y=Sqrt(bmp_mem*8*480/640)
+  //bmp_scale=Sqrt(bmp_mem*8*480/640)/480
+  bmp_scale=Sqrt(bmp_mem*8*Fs->pix_height/Fs->pix_width)/Fs->pix_height;
+  bmp_width =bmp_scale*Fs->pix_width;
+  bmp_height=bmp_scale*Fs->pix_height;
+  bmp=CAlloc(bmp_width*bmp_height/8);
 }
 
 U0 CleanUp()
 {
   QueDel(&p_root,TRUE);
   DCDel(map);
+  Free(bmp);
 }
 
 #define PTS_NUM	1024
 U0 LightTable()
 {
-  I64 msg_code,i,arg1,arg2,ray_x1,ray_y1,ray_x2,ray_y2;
+  I64 msg_code,i,cnt,arg1,arg2,ray_x1,ray_y1,ray_x2,ray_y2;
   CD3I32 *c=MAlloc(PTS_NUM*sizeof(CD3I32));
-  Photon *tmpp;
 
   MenuPush(
 	"File {"
@@ -183,10 +221,19 @@ U0 LightTable()
 	"  Fill(,CH_SPACE);"
 	"}"
 	"Play {"
-	"  RandomBurst(,'b');"
+	"  RandomBurst(,'r');"
 	"  ElapseTime(,'e');"
 	"}"
 	);
+
+  MemBIOSRep;
+  bmp_mem=GetI64("\n\n\nHow much memory for the high resolution\n"
+	"shadow bitmap that helps improve the\n"
+	"accuracy of the normal vector estimate?\n"
+	"You can choose up to the largest\n"
+	"contiguous chunk of physical memory.\n\n"
+	"Mem (0x%0X):",1024*1024*16);
+
   PopUpOk(
 	"Draw splines with $$GREEN$${Left-click}$$FG$$.\n\n"
 	"Fill lens with $$GREEN$$<SPACE>$$FG$$.\n\n"
@@ -218,24 +265,28 @@ lt_restart:
 	  RayBurst(ray_x1,ray_y1,ray_x2,ray_y2);
 	  break;
 	case MSG_MS_L_DOWN:
-	  i=0;
+	  cnt=0;
 	  map->color=ROP_XOR+WHITE;
 	  do {
-	    c[i].x=arg1; c[i].y=arg2; c[i].z=0;
-	    Gr2BSpline(map,c,i+1);
+	    c[cnt].x=arg1; c[cnt].y=arg2; c[cnt].z=0;
+	    Gr2BSpline(map,c,cnt+1);
 	    msg_code=GetMsg(&arg1,&arg2,
 		  1<<MSG_KEY_DOWN+1<<MSG_MS_L_UP+1<<MSG_MS_MOVE+1<<MSG_MS_R_UP);
-	    Gr2BSpline(map,c,i+1);
+	    Gr2BSpline(map,c,cnt+1);
 	    if (msg_code==MSG_KEY_DOWN)
 	      goto lt_restart;
 	    else if (msg_code==MSG_MS_L_UP) {
-	      Noise(100,30,50);
-	      i++;
+	      Sweep(100,70,100);
+	      cnt++;
 	    }
-	  } while (i<PTS_NUM-1 && msg_code!=MSG_MS_R_UP);
-	  map->pen_width=2;
-	  Gr2BSpline3(map,c,i);
-	  map->pen_width=1;
+	  } while (cnt<PTS_NUM-1 && msg_code!=MSG_MS_R_UP);
+	  map->color=WHITE;
+	  Gr2BSpline3(map,c,cnt);
+	  for (i=0;i<cnt;i++) {
+	    c[i].x*=bmp_scale;
+	    c[i].y*=bmp_scale;
+	  }
+	  BSpline2(bmp,c,cnt,&BmpPlot);
 	  break;
 	case MSG_KEY_DOWN:
 	  switch (arg1) {
@@ -243,7 +294,6 @@ lt_restart:
 	      GrFloodFill(map,ms.pos.x-Fs->pix_left,ms.pos.y-Fs->pix_top);
 	      break;
 	    case '\n':
-	      DCFill;
 	      CleanUp;
 	      Init;
 	      break;
@@ -266,7 +316,6 @@ lt_done:
     GetMsg(,,1<<MSG_KEY_UP);
   } catch
     PutExcept;
-  DCFill;
   Free(c);
   SettingsPop;
   CleanUp;
