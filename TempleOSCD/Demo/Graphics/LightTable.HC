@@ -155,7 +155,7 @@ U0 FindNormal(Photon *tmpp)
   D3Div(&tmpp->p,&p,bmp_scale);
 
   //Draw an arc one direction, finding point of contact.
-  for (step=1.0;step>=0.01;step/=4)
+  for (step=1.0;step>=0.01;step/=4) {
     for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
       y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
@@ -168,6 +168,14 @@ U0 FindNormal(Photon *tmpp)
       if (c!=BLACK)
 	goto fn_p1;
     }
+    for (;è<=3*ã/4;è+=step*ã/bmp_norm_radius) {
+      x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
+      y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p1;
+    }
+  }
 fn_p1:
   if (c==WHITE)
     D3Equ(&p1,x,y);
@@ -175,7 +183,7 @@ fn_p1:
     D3Copy(&p1,&tmpp->p);
 
     //Draw an arc other direction, finding point of contact.
-  for (step=1.0;step>=0.01;step/=4)
+  for (step=1.0;step>=0.01;step/=4) {
     for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
       y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
@@ -188,6 +196,14 @@ fn_p1:
       if (c!=BLACK)
 	goto fn_p2;
     }
+    for (;è<=3*ã/4;è+=step*ã/bmp_norm_radius) {
+      x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
+      y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p2;
+    }
+  }
 fn_p2:
   if (c==WHITE)
     D3Equ(&p2,x,y);
