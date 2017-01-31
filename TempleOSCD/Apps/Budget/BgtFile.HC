@@ -5,7 +5,7 @@ U0 BgtDataRead()
   I64		i,cnt,size;
   U8		*b,*ptr;
   I64		max_num;
-  U8		**s=StrFileRead(BGT_STRINGS_FILE,&max_num);
+  U8		**s=StrFileRead(bgt_string_file,&max_num);
 
   MemSet(&b_head,0,sizeof(CBgtEntry));
   QueInit(&b_head);
@@ -14,7 +14,7 @@ U0 BgtDataRead()
   QueInit(&t_head);
   t_head.b.date=Now;
 
-  if (ptr=b=FileRead(BGT_DATA_FILE,&size)) {
+  if (ptr=b=FileRead(bgt_data_file,&size)) {
     cnt=*ptr(I64 *)++;
     for (i=0;i<cnt;i++) {
       tmpb=CAlloc(sizeof(CBgtEntry));
@@ -84,7 +84,7 @@ U0 BgtDataWrite()
     cnt2++;
     tmpt=tmpt->next;
   }
-  StrFileWrite(BGT_STRINGS_FILE,table);
+  StrFileWrite(bgt_string_file,table);
   StrFileDel(table);
 
   size=sizeof(I64)*2+cnt1*BE_SIZE+cnt2*(BT_SIZE+BE_SIZE);
@@ -112,7 +112,7 @@ U0 BgtDataWrite()
     tmpt=tmpt->next;
   }
 
-  FileWrite(BGT_DATA_FILE,buf,size);
+  FileWrite(bgt_data_file,buf,size);
   Free(buf);
 }
 

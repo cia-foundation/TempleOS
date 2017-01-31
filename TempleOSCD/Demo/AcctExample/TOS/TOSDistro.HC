@@ -96,7 +96,6 @@ U0 DistroPrep()
 
   DelTree("/Demo/AcctExample");
   CopyTree("/Home","/Demo/AcctExample");
-  DelTree("/Demo/AcctExample/Budget");
   DelTree("/Demo/AcctExample/Private");
   DelTree("/Demo/AcctExample/Sup1");
   DelTree("/Demo/AcctExample/Books1");

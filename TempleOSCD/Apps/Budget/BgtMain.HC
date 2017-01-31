@@ -50,7 +50,7 @@ Bool BgtPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       PopUpOk(	"Set the name and color of your accounts.\n"
 	    "To delete accounts, manually edit\n"
 	    "$$GREEN$$~/Budget/Accts.DD.Z$$FG$$.");
-      if (PopUpEd(BGT_ACCTS_FILE,Fs)) {
+      if (PopUpEd(bgt_accts_file,Fs)) {
 	BgtAcctsRead;
 	BgtRegen;
       }
@@ -167,9 +167,15 @@ U0 BgtRegen()
   doc->user_put_key=&BgtPutKey;
 }
 
-U0 Budget()
+U0 Budget(U8 *dirname="~/Budget")
 {
   CDoc *pdoc,*ddoc,*old_put,*old_display;
+
+  Cd(dirname);
+  bgt_string_file	=FileNameAbs("Strs.DD.Z");
+  bgt_accts_file	=FileNameAbs("Accts.DD.Z");
+  bgt_data_file		=FileNameAbs("Bgt.DATA.Z");
+
   BgtAcctsRead;
   BgtDataRead;
   CBgtTemplatesExpand;

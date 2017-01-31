@@ -480,7 +480,6 @@ public U0 FreshenSite()
   Cd("D:/Wb");
   DelTree("D:/Wb/Home/Books1");
   DelTree("D:/Wb/Home/Books2");
-  DelTree("D:/Wb/Home/Budget");
   DelTree("D:/Wb/Home/Private");
   Del("D:/Wb/Home/*");
   Touch("D:/Wb/Home/Web/index.DD.Z","");
