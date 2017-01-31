@@ -9,7 +9,7 @@ F64 ts;
 
 U8	*bmp;
 F64	bmp_scale;
-I64	bmp_mem,bmp_width,bmp_height;
+I64	bmp_mem,bmp_width,bmp_height,bmp_norm_radius;
 
 I64 BmpPeek(I64 x,I64 y)
 {
@@ -81,7 +81,7 @@ U0 RandomBurst()
   I64 i;
   F64 é;
   Photon *tmpp;
-  for (i=0;i<1000;i++) {
+  for (i=0;i<256;i++) {
     tmpp=CAlloc(sizeof(Photon));
     D3Equ(&tmpp->p,Fs->pix_width*Rand,Fs->pix_height*Rand);
     é=2*ã*Rand;
@@ -90,7 +90,6 @@ U0 RandomBurst()
   }
 }
 
-#define HEIGHT	(5*bmp_scale)
 U0 FindNormal(Photon *tmpp,I64 last,I64,CD3 *_normal)
 {
   CD3 p1,p2,v,s,bmp_p;
@@ -100,9 +99,9 @@ U0 FindNormal(Photon *tmpp,I64 last,I64,CD3 *_normal)
   while (BmpPeek(bmp_p.x,bmp_p.y)==last)
     D3AddEqu(&bmp_p,&tmpp->v);
 
-  for (è=0;è<ã/2;è+=ã/HEIGHT) {
+  for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
     D3Equ(&s,Cos(é+ã-ã/4-è),Sin(é+ã-ã/4-è));
-    D3Mul(&v,HEIGHT,&s);
+    D3Mul(&v,bmp_norm_radius,&s);
     D3Add(&p1,&bmp_p,&v);
     if (BmpPeek(p1.x,p1.y)!=BLACK)
       break;
@@ -110,9 +109,9 @@ U0 FindNormal(Photon *tmpp,I64 last,I64,CD3 *_normal)
   if (BmpPeek(p1.x,p1.y)!=WHITE)
     D3Copy(&p1,&tmpp->p);
 
-  for (è=0;è<ã/2;è+=ã/HEIGHT) {
+  for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
     D3Equ(&s,Cos(é+ã+ã/4+è),Sin(é+ã+ã/4+è));
-    D3Mul(&v,HEIGHT,&s);
+    D3Mul(&v,bmp_norm_radius,&s);
     D3Add(&p2,&bmp_p,&v);
     if (BmpPeek(p2.x,p2.y)!=BLACK)
       break;
@@ -196,6 +195,7 @@ U0 Init()
   bmp_width =bmp_scale*Fs->pix_width;
   bmp_height=bmp_scale*Fs->pix_height;
   bmp=CAlloc(bmp_width*bmp_height/8);
+  bmp_norm_radius=Min(10*bmp_scale,250);
 }
 
 U0 CleanUp()
@@ -302,7 +302,8 @@ lt_restart:
 	      break;
 	    case 'e':
 	      ts=0.00;
-	      Sleep(2500);
+	      Sleep(1500);
+	      FlushMsgs;
 	      ts=0.01;
 	      break;
 	    case CH_ESC:
