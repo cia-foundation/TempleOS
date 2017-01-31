@@ -136,7 +136,7 @@ U0 RandomBurst()
 U0 FindNormal(Photon *tmpp)
 {
   CD3 p,p1,p2;
-  F64 x,y,é=Arg(tmpp->v.x,tmpp->v.y),è;
+  F64 step,x,y,é=Arg(tmpp->v.x,tmpp->v.y),è;
   I64 c;
 
   D3Copy(&tmpp->p_snell_inhibit,&tmpp->p);
@@ -155,43 +155,47 @@ U0 FindNormal(Photon *tmpp)
   D3Div(&tmpp->p,&p,bmp_scale);
 
   //Draw an arc one direction, finding point of contact.
-  for (è=0;è<=ã/4;è+=0.125*ã/bmp_norm_radius) {
-    x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
-    y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
-    c=BmpPeek(x,y);
-    if (c!=BLACK)
-      break;
-    x=p.x+bmp_norm_radius*Cos(é+ã-ã/4+è);
-    y=p.y+bmp_norm_radius*Sin(é+ã-ã/4+è);
-    c=BmpPeek(x,y);
-    if (c!=BLACK)
-      break;
-  }
+  for (step=1.0;step>=0.01;step/=4)
+    for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
+      x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
+      y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p1;
+      x=p.x+bmp_norm_radius*Cos(é+ã-ã/4+è);
+      y=p.y+bmp_norm_radius*Sin(é+ã-ã/4+è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p1;
+    }
+fn_p1:
   if (c==WHITE)
     D3Equ(&p1,x,y);
   else
     D3Copy(&p1,&tmpp->p);
 
     //Draw an arc other direction, finding point of contact.
-  for (è=0;è<=ã/4;è+=0.125*ã/bmp_norm_radius) {
-    x=p.x+bmp_norm_radius*Cos(é+ã+ã/4-è);
-    y=p.y+bmp_norm_radius*Sin(é+ã+ã/4-è);
-    c=BmpPeek(x,y);
-    if (c!=BLACK)
-      break;
-    x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
-    y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
-    c=BmpPeek(x,y);
-    if (c!=BLACK)
-      break;
-  }
+  for (step=1.0;step>=0.01;step/=4)
+    for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
+      x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
+      y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p2;
+      x=p.x+bmp_norm_radius*Cos(é+ã+ã/4-è);
+      y=p.y+bmp_norm_radius*Sin(é+ã+ã/4-è);
+      c=BmpPeek(x,y);
+      if (c!=BLACK)
+	goto fn_p2;
+    }
+fn_p2:
   if (c==WHITE)
     D3Equ(&p2,x,y);
   else
     D3Copy(&p2,&tmpp->p);
 
   D3Sub(&p,&p1,&p2);
-  if (D3NormSqr(&p)<1.0) {
+  if (D3NormSqr(&p)<0.01) {
     D3Equ(&tmpp->n,Cos(é),Sin(é));
     lock {zero_normal++;}
   } else {
@@ -206,7 +210,7 @@ U0 SnellsLaw(Photon *tmpp,I64 last,I64 next)
 {
 //n1 and n2 are refraction index.
 //n1 Sin(é1) == n2 Sin(é2)
-  F64 é=Arg(tmpp->v.x,tmpp->v.y),én,n1,n2,é1,é2,éa,éb;
+  F64 é=Arg(tmpp->v.x,tmpp->v.y),én,n1,n2,é1,é2;
   if (last==WHITE)
     n1=1.5;
   else
@@ -217,17 +221,13 @@ U0 SnellsLaw(Photon *tmpp,I64 last,I64 next)
     n2=1.0;
   FindNormal(tmpp);
   én=Arg(tmpp->n.x,tmpp->n.y);
-  //dot=m1m2Cos(é);
+  //Dot=m1m2Cos(é);
   é1=ACos(D3Dot(&tmpp->n,&tmpp->v));
   é2=ASin(n1*Sin(é1)/n2);
-  //é --> (én+é1)
-  //é <-- (én+é2)
-  éa=én+é2;
-  éb=én-é2;
-  if (Abs(Wrap(éa-é))<Abs(Wrap(éb-é)))
-    é=éa;
+  if (Wrap(é-én)>=0)
+    é=én+é2;
   else
-    é=éb;
+    é=én-é2;
   D3Equ(&tmpp->v,Cos(é),Sin(é));
   lock {snell_cnt++;}
 }
@@ -503,8 +503,11 @@ lt_restart:
 	  }
 	  break;
 	case MSG_MS_R_UP:
-	  mode=PopUpPickLst("Line\0Spline\0FloodFill\0TestRay\0");
-	  LTMenuSet(mode);
+	  i=PopUpPickLst("Line\0Spline\0FloodFill\0TestRay\0");
+	  if (i>=0) {
+	    mode=i;
+	    LTMenuSet(mode);
+	  }
 	  break;
 	case MSG_KEY_DOWN:
 	  switch (arg1) {
