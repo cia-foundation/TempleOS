@@ -21,7 +21,6 @@ extern U0 StreamDir();
 public extern I64 StreamExePrint(U8 *fmt,...);
 public extern U0 StreamPrint(U8 *fmt,...);
 public extern Bool Trace(Bool val=ON);
-
 #help_index "Compiler/Lex"
 #help_file "::/Doc/Lex"
 extern U0 ClassMemberLstDel(CHashClass *c);

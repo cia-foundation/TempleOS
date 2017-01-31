@@ -1,14 +1,24 @@
+/*
+There is a coarse and a fine-grained.
+The coarse gets flood-filled but the
+fine grained is only outlines.
+*/
+
 class Photon
 {
   Photon *next,*last;
   CD3 p,v,p_snell_inhibit;
 } p_root[mp_cnt];
 I64 p_root_locks;
+
+#define ANIMATE_JIFFIES	(JIFFY_FREQ*0.01)
+I64 master_sleep_jiffy;
 CTask *animate_tasks[mp_cnt];
 
+
 CDC *map;
-F64 ts;
 I64 photon_cnt,snell_cnt;
+Bool full_speed;
 
 U8	*bmp;
 F64	bmp_scale,bmp_scale_sqr;
@@ -35,7 +45,7 @@ Photon *PhotonNew()
 {
   I64 num=photon_cnt++%mp_cnt;
   Photon *res=CAlloc(sizeof(Photon));
-  while (!LBts(&p_root_locks,num))
+  while (LBts(&p_root_locks,num))
     Yield;
   QueIns(res,p_root[num].last);
   LBtr(&p_root_locks,num);
@@ -54,7 +64,7 @@ U0 DrawIt(CTask *,CDC *dc)
 	map->width,map->height,bmp_width,bmp_height);
   GrPrint(dc,0,FONT_HEIGHT,"PhotonCnt:%d SnellCnt:%d",photon_cnt,snell_cnt);
   for (i=0;i<mp_cnt;i++) {
-    while (!LBts(&p_root_locks,i))
+    while (LBts(&p_root_locks,i))
       Yield;
     tmpp=p_root[i].next;
     while (tmpp!=&p_root[i]) {
@@ -113,6 +123,12 @@ U0 FindNormal(Photon *tmpp,CD3 *_normal)
   F64 é=Arg(tmpp->v.x,tmpp->v.y),è;
 
   D3Copy(&tmpp->p_snell_inhibit,&tmpp->p);
+
+  //Coarse grains has black and white filled-in BSplines.
+  //Fine grained has only white outline without being filled-in.
+
+  //Back-up a step and move fwd to get a fined-grained value
+  //for the point of contact.
   D3SubEqu(&tmpp->p,&tmpp->v);
   D3Mul(&p,bmp_scale,&tmpp->p);
   D3Copy(&p1,&p);
@@ -121,6 +137,7 @@ U0 FindNormal(Photon *tmpp,CD3 *_normal)
   D3Copy(&p,&p1);
   D3Div(&tmpp->p,&p,bmp_scale);
 
+  //Draw an arc one direction, finding point of contact.
   for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
     D3Equ(&s,Cos(é+ã-ã/4-è),Sin(é+ã-ã/4-è));
     D3Mul(&v,bmp_norm_radius,&s);
@@ -131,6 +148,7 @@ U0 FindNormal(Photon *tmpp,CD3 *_normal)
   if (BmpPeek(p1.x,p1.y)!=WHITE)
     D3Copy(&p1,&tmpp->p);
 
+  //Draw an arc other direction, finding point of contact.
   for (è=0;è<ã/2;è+=ã/bmp_norm_radius) {
     D3Equ(&s,Cos(é+ã+ã/4+è),Sin(é+ã+ã/4+è));
     D3Mul(&v,bmp_norm_radius,&s);
@@ -182,10 +200,22 @@ U0 SnellsLaw(Photon *tmpp,I64 last,I64 next)
 
 U0 AnimateTask(I64)
 {
-  Photon *tmpp,*root=&p_root[Gs->num];
-  I64 last,next;
   while (TRUE) {
-    while (!LBts(&p_root_locks,Gs->num))
+    master_sleep_jiffy+=ANIMATE_JIFFIES;
+    if (cnts.jiffies>=master_sleep_jiffy)
+      master_sleep_jiffy=cnts.jiffies+ANIMATE_JIFFIES;
+    SleepUntil(master_sleep_jiffy);
+  }
+}
+
+U0 MPAnimateTask(I64)
+{
+  I64	last_master_jiffy=0,
+	timeout_jiffy=master_sleep_jiffy+ANIMATE_JIFFIES,
+	last,next;
+  Photon *tmpp,*root=&p_root[Gs->num];
+  while (TRUE) {
+    while (LBts(&p_root_locks,Gs->num))
       Yield;
     tmpp=root->next;
     while (tmpp!=root) {
@@ -210,16 +240,24 @@ U0 AnimateTask(I64)
       next=GrPeek(map,tmpp->p.x,tmpp->p.y);
       if (last!=next && (last==BLACK && next==WHITE) ||
 	    (last==WHITE && next==BLACK) &&
+//Don't do a snell operation too close to the last.  Just ignore it.
 	    D3DistSqr(&tmpp->p_snell_inhibit,&tmpp->p)>=4.0)
 	SnellsLaw(tmpp,last,next);
       tmpp=tmpp->next;
+      if (cnts.jiffies>=timeout_jiffy)
+	break;
     }
     LBtr(&p_root_locks,Gs->num);
-    if (ts)
-      Sleep(1000*ts);
-    else {
-      Yield;
-      Yield; //Give a more time unlocked.
+    if (cnts.jiffies>=timeout_jiffy) {
+      Sleep(1);
+      timeout_jiffy=master_sleep_jiffy+ANIMATE_JIFFIES;
+    }
+    if (!full_speed) {
+      while (master_sleep_jiffy==last_master_jiffy)
+	Sleep(1);
+      last_master_jiffy=master_sleep_jiffy;
+      SleepUntil(master_sleep_jiffy);
+      timeout_jiffy=master_sleep_jiffy+ANIMATE_JIFFIES;
     }
   }
 }
@@ -227,11 +265,12 @@ U0 AnimateTask(I64)
 U0 Init()
 {
   I64 i;
-  ts=0.01;
+  master_sleep_jiffy=cnts.jiffies;
+  full_speed=FALSE;
   photon_cnt=snell_cnt=0;
   map=DCNew(Fs->pix_width,Fs->pix_height);
   for (i=0;i<mp_cnt;i++) {
-    while (!LBts(&p_root_locks,i))
+    while (LBts(&p_root_locks,i))
       Yield;
     QueInit(&p_root[i]);
     LBtr(&p_root_locks,i);
@@ -254,7 +293,7 @@ U0 CleanUp()
 {
   I64 i;
   for (i=0;i<mp_cnt;i++) {
-    while (!LBts(&p_root_locks,i))
+    while (LBts(&p_root_locks,i))
       Yield;
     QueDel(&p_root[i],TRUE);
     LBtr(&p_root_locks,i);
@@ -309,8 +348,9 @@ U0 LightTable()
   DocClear;
   Init;
   Fs->draw_it=&DrawIt;
+  Fs->animate_task=Spawn(&AnimateTask,NULL,"Animate",,Fs);
   for (i=0;i<mp_cnt;i++)
-    animate_tasks[i]=Spawn(&AnimateTask,NULL,"Animate",i);
+    animate_tasks[i]=Spawn(&MPAnimateTask,NULL,"MPAnimate",i);
   try {
     while (TRUE) {
       msg_code=GetMsg(&arg1,&arg2,
@@ -361,10 +401,10 @@ lt_restart:
 	      RandomBurst;
 	      break;
 	    case 'e':
-	      ts=0.00;
+	      full_speed=TRUE;
 	      Sleep(1500);
 	      FlushMsgs;
-	      ts=0.01;
+	      full_speed=FALSE;
 	      break;
 	    case CH_ESC:
 	    case CH_SHIFT_ESC:
@@ -378,9 +418,9 @@ lt_done:
   } catch
     PutExcept;
   Free(c);
+  SettingsPop;
   for (i=0;i<mp_cnt;i++)
     Kill(animate_tasks[i]);
-  SettingsPop;
   CleanUp;
   MenuPop;
 }
