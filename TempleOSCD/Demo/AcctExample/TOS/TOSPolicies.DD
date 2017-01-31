@@ -162,6 +162,23 @@ When I solicit line-of-code reducing optimizations, I plan to make it 100% objec
 
 If you have ideas on how to make TempleOS more like Linux, I'm not interested.  However, if you have ideas to make it more like the 8-bit computer generation operating systems or like DOS, I am interested.  We want the creative spirit of the 8-bit generation of computers.
 
+
+$FG,5$$TX+CX,"TOS Linux SetUp"$$FG$
+
+My Linux home directory is	/home/tad
+I place all my files in		/home/tad/TAD
+I place my scripts in		/home/tad/TAD/Bin
+/home/tad/TAD/Bin is in my path.
+I place my icons in		/home/tad/TAD/Desktop
+I copy D:/Home in and out of	/home/tad/TAD/Home
+
+When I make a back-up, I copy	/home/tad/TAD to /home/tad/Archives/TAD170131
+
+http://www.templeos.org		/home/tad/TAD/Site1
+				/home/tad/TAD/Site1Stale
+
+Every month, I transfer my blog directory from Site1 to Site1Stale and remove it from TempleOS.
+
 $FG,8$
 * "Linux" is a trademark owned by Linus Torvalds.
 * "Windows" is a trademark owned by MicroSoft Corp.

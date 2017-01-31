@@ -561,6 +561,7 @@ U0 TOSRegen3()
 
 public U0 TOSPreRegen()
 {//Copy bookmarks and bins from D:/Home/Sup1 to C:/Home/Sup1
+  Copy("D:/Home/Private/*","C:/Home/Private");
   Copy("D:/Home/Sup1/Sup1Blog/Bookmarks.html","C:/Home/Sup1/Sup1Blog");
   Del("C:/Home/Sup1/Sup1Bin/*");
   Copy("D:/Home/Sup1/Sup1Bin/*","C:/Home/Sup1/Sup1Bin");

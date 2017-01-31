@@ -21,6 +21,7 @@ extern U0 StreamDir();
 public extern I64 StreamExePrint(U8 *fmt,...);
 public extern U0 StreamPrint(U8 *fmt,...);
 public extern Bool Trace(Bool val=ON);
+
 #help_index "Compiler/Lex"
 #help_file "::/Doc/Lex"
 extern U0 ClassMemberLstDel(CHashClass *c);
@@ -60,7 +61,6 @@ public extern I64 MemberMetaData(U8 *st,CMemberLst *ml);
 public extern CMemberLstMeta *MemberMetaFind(U8 *st,CMemberLst *ml);
 public extern CHashClass *OptClassFwd(CHashClass *tmpc);
 public extern I64 PrsKeyWord(CCmpCtrl *cc);
-
 #help_index "Compiler;Cmd Line (Typically)"
 extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);
