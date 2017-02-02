@@ -7,7 +7,7 @@ fine grained is only outlines.
 class Photon
 {
   Photon *next,*last;
-  CD3 p,v,n,p_snell_inhibit;
+  CD3 p,v,n,p_normal_inhibit;
 } p_root[mp_cnt];
 I64 p_root_locks;
 
@@ -15,24 +15,21 @@ I64 p_root_locks;
 I64 master_sleep_jiffy;
 CTask *animate_tasks[mp_cnt];
 
-
+#define LENS_COLOR	WHITE
+#define MIRROR_COLOR	DKGRAY
 CDC *map;
-I64 photon_cnt,snell_cnt,snell_inhibit,zero_normal;
+
+I64 photon_cnt,mirror_cnt,snell_cnt,normal_inhibit,zero_normal;
 Bool full_speed,show_normals;
 
-U8	*bmp;
+U8	*bmp_refract,*bmp_reflect;
 F64	bmp_scale,find_normal_dist_sqr;
 I64	bmp_mem,bmp_width,bmp_height,bmp_norm_radius;
 
-I64 BmpPeek(I64 x,I64 y)
+#define BORDER	10
+I64 BmpPeek(U8 *bmp,I64 x,I64 y)
 {
-  if (0<=x<bmp_width && 0<=y<bmp_height) {
-    if (Bt(bmp,y*bmp_width+x))
-      return WHITE;
-    else
-      return BLACK;
-  } else
-    return -1;
+  return Bt(bmp,y*bmp_width+x);
 }
 
 U0 BmpPlot(U8 *bmp,I64 x,I64 y,I64)
@@ -41,10 +38,8 @@ U0 BmpPlot(U8 *bmp,I64 x,I64 y,I64)
     Bts(bmp,y*bmp_width+x);
 }
 
-U0 DualLine(F64 x1,F64 y1,F64 x2,F64 y2)
+U0 BmpLine(U8 *bmp,F64 x1,F64 y1,F64 x2,F64 y2)
 {
-  map->color=WHITE;
-  GrLine(map,x1,y1,x2,y2);
   Line(bmp,x1*bmp_scale,y1*bmp_scale,0,x2*bmp_scale,y2*bmp_scale,0,&BmpPlot);
 }
 
@@ -70,8 +65,8 @@ U0 DrawIt(CTask *,CDC *dc)
 	bmp_mem,bmp_mem/1024/1024,bmp_scale,
 	map->width,map->height,bmp_width,bmp_height);
   GrPrint(dc,0,FONT_HEIGHT,
-	"PhotonCnt:%d SnellCnt:%d SnellInhibit:%d ZeroNormal:%d",
-	photon_cnt,snell_cnt,snell_inhibit,zero_normal);
+	"PhotonCnt:%d MirrorCnt:%d SnellCnt:%d SnellInhibit:%d ZeroNormal:%d",
+	photon_cnt,mirror_cnt,snell_cnt,normal_inhibit,zero_normal);
   for (i=0;i<mp_cnt;i++) {
     while (LBts(&p_root_locks,i))
       Yield;
@@ -91,12 +86,15 @@ U0 DrawIt(CTask *,CDC *dc)
   }
 }
 
+#define WING	9
+
 U0 RayBurst(I64 x1,I64 y1,I64 x2,I64 y2)
 {
   CD3 p,v,n,n2;
   I64 i;
   Photon *tmpp;
-  if (x1!=x2 || y1!=y2) {
+  if ((x1!=x2 || y1!=y2) && BORDER+WING<x2<map->width-BORDER-WING &&
+	BORDER+WING<y2<map->height-BORDER-WING) {
     D3Equ(&p,x2,y2);
     D3Equ(&v,x2-x1,y2-y1);
     D3Unit(&v);
@@ -106,7 +104,7 @@ U0 RayBurst(I64 x1,I64 y1,I64 x2,I64 y2)
     D3Copy(&tmpp->p,&p);
     D3Copy(&tmpp->v,&v);
 
-    for (i=2;i<=9;i+=3) {
+    for (i=2;i<=WING;i+=3) {
       D3Mul(&n2,i,&n);
 
       tmpp=PhotonNew;
@@ -127,19 +125,20 @@ U0 RandomBurst()
   Photon *tmpp;
   for (i=0;i<256;i++) {
     tmpp=PhotonNew;
-    D3Equ(&tmpp->p,Fs->pix_width*Rand,Fs->pix_height*Rand);
+    D3Equ(&tmpp->p,(Fs->pix_width-BORDER*2)*Rand+BORDER,
+		(Fs->pix_height-BORDER*2)*Rand+BORDER);
     é=2*ã*Rand;
     D3Equ(&tmpp->v,Cos(é),Sin(é));
   }
 }
 
-U0 FindNormal(Photon *tmpp)
+U0 FindNormal(U8 *bmp,Photon *tmpp)
 {
   CD3 p,p1,p2;
   F64 step,x,y,é=Arg(tmpp->v.x,tmpp->v.y),è;
-  I64 c;
+  I64 state;
 
-  D3Copy(&tmpp->p_snell_inhibit,&tmpp->p);
+  D3Copy(&tmpp->p_normal_inhibit,&tmpp->p);
 
   //Coarse grains has black and white filled-in BSplines.
   //Fine grained has only white outline without being filled-in.
@@ -149,7 +148,8 @@ U0 FindNormal(Photon *tmpp)
   D3SubEqu(&tmpp->p,&tmpp->v);
   D3Mul(&p,bmp_scale,&tmpp->p);
   D3Copy(&p1,&p);
-  while (BmpPeek(p1.x,p1.y)==BLACK && D3DistSqr(&p,&p1)<find_normal_dist_sqr)
+  while (BmpPeek(bmp,p1.x,p1.y)==BLACK &&
+	D3DistSqr(&p,&p1)<find_normal_dist_sqr)
     D3AddEqu(&p1,&tmpp->v);
   D3Copy(&p,&p1);
   D3Div(&tmpp->p,&p,bmp_scale);
@@ -159,25 +159,22 @@ U0 FindNormal(Photon *tmpp)
     for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
       y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p1;
       x=p.x+bmp_norm_radius*Cos(é+ã-ã/4+è);
       y=p.y+bmp_norm_radius*Sin(é+ã-ã/4+è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p1;
     }
     for (;è<=3*ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã-ã/4-è);
       y=p.y+bmp_norm_radius*Sin(é+ã-ã/4-è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p1;
     }
   }
 fn_p1:
-  if (c==WHITE)
+  if (state)
     D3Equ(&p1,x,y);
   else
     D3Copy(&p1,&tmpp->p);
@@ -187,25 +184,22 @@ fn_p1:
     for (è=0;è<=ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
       y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p2;
       x=p.x+bmp_norm_radius*Cos(é+ã+ã/4-è);
       y=p.y+bmp_norm_radius*Sin(é+ã+ã/4-è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p2;
     }
     for (;è<=3*ã/4;è+=step*ã/bmp_norm_radius) {
       x=p.x+bmp_norm_radius*Cos(é+ã+ã/4+è);
       y=p.y+bmp_norm_radius*Sin(é+ã+ã/4+è);
-      c=BmpPeek(x,y);
-      if (c!=BLACK)
+      if (state=BmpPeek(bmp,x,y))
 	goto fn_p2;
     }
   }
 fn_p2:
-  if (c==WHITE)
+  if (state)
     D3Equ(&p2,x,y);
   else
     D3Copy(&p2,&tmpp->p);
@@ -222,28 +216,53 @@ fn_p2:
   }
 }
 
+U0 Mirror(Photon *tmpp)
+{/*$SP,"<1>",BI=1$
+
+
+
+
+
+
+
+
+
+
+é$SY,3$out$SY,0$ = ã+é$SY,3$n$SY,0$ -  (é$SY,3$in$SY,0$-é$SY,3$n$SY,0$)
+
+*/
+  F64 é=Arg(tmpp->v.x,tmpp->v.y),é$SY,3$n$SY,0$;
+  FindNormal(bmp_reflect,tmpp);
+  é$SY,3$n$SY,0$=Arg(tmpp->n.x,tmpp->n.y);
+
+  D3Equ(&tmpp->v,Cos(2*é$SY,3$n$SY,0$+ã-é),Sin(2*é$SY,3$n$SY,0$+ã-é));
+  lock {mirror_cnt++;}
+}
+
 U0 SnellsLaw(Photon *tmpp,I64 last,I64 next)
 {
 //n1 and n2 are refraction index.
 //n1 Sin(é1) == n2 Sin(é2)
-  F64 é=Arg(tmpp->v.x,tmpp->v.y),én,n1,n2,é1,é2;
-  if (last==WHITE)
+  F64 é=Arg(tmpp->v.x,tmpp->v.y),é$SY,3$n$SY,0$,n1,n2,é1,é2;
+  if (last==LENS_COLOR)
     n1=1.5;
   else
     n1=1.0;
-  if (next==WHITE)
+  if (next==LENS_COLOR)
     n2=1.5;
   else
     n2=1.0;
-  FindNormal(tmpp);
-  én=Arg(tmpp->n.x,tmpp->n.y);
+  FindNormal(bmp_refract,tmpp);
+  é$SY,3$n$SY,0$=Arg(tmpp->n.x,tmpp->n.y);
+
   //Dot=m1m2Cos(é);
   é1=ACos(D3Dot(&tmpp->n,&tmpp->v));
   é2=ASin(n1*Sin(é1)/n2);
-  if (Wrap(é-én)>=0)
-    é=én+é2;
+  if (Wrap(é-é$SY,3$n$SY,0$)>=0)
+    é=é$SY,3$n$SY,0$+é2;
   else
-    é=én-é2;
+    é=é$SY,3$n$SY,0$-é2;
+
   D3Equ(&tmpp->v,Cos(é),Sin(é));
   lock {snell_cnt++;}
 }
@@ -272,37 +291,45 @@ U0 MPAnimateTask(I64)
     while (tmpp!=root) {
       last=GrPeek(map,tmpp->p.x,tmpp->p.y);
       D3AddEqu(&tmpp->p,&tmpp->v);
-      if (tmpp->p.x<0) {
-	tmpp->p.x=-tmpp->p.x;
+      if (tmpp->p.x<BORDER) {
+	tmpp->p.x=2*BORDER-tmpp->p.x;
 	tmpp->v.x=-tmpp->v.x;
       }
-      if (tmpp->p.x>=map->width) {
-	tmpp->p.x-=tmpp->p.x-map->width;
+      if (tmpp->p.x>=map->width-BORDER) {
+	tmpp->p.x-=tmpp->p.x-map->width+BORDER;
 	tmpp->v.x=-tmpp->v.x;
       }
-      if (tmpp->p.y<0) {
-	tmpp->p.y=-tmpp->p.y;
+      if (tmpp->p.y<BORDER) {
+	tmpp->p.y=2*BORDER-tmpp->p.y;
 	tmpp->v.y=-tmpp->v.y;
       }
-      if (tmpp->p.y>=map->height) {
-	tmpp->p.y-=tmpp->p.y-map->height;
+      if (tmpp->p.y>=map->height-BORDER) {
+	tmpp->p.y-=tmpp->p.y-map->height+BORDER;
 	tmpp->v.y=-tmpp->v.y;
       }
       next=GrPeek(map,tmpp->p.x,tmpp->p.y);
 
-      if (D3DistSqr(&tmpp->p_snell_inhibit,&tmpp->p)<4.0)
+      if (D3DistSqr(&tmpp->p_normal_inhibit,&tmpp->p)<4.0)
 	inhibit=TRUE;
       else
 	inhibit=FALSE;
 
-      if (last!=next && (last==BLACK && next==WHITE) ||
-	    (last==WHITE && next==BLACK)) {
-	if (inhibit)
-	  lock {snell_inhibit++;}
-	else
-	  SnellsLaw(tmpp,last,next);
+      if (last!=next) {
+	if ((last==BLACK && next==LENS_COLOR) ||
+	      (last==LENS_COLOR && next==BLACK)) {
+	  if (inhibit)
+	    lock {normal_inhibit++;}
+	  else
+	    SnellsLaw(tmpp,last,next);
+	} else if (last==BLACK && next==MIRROR_COLOR) {
+	  if (inhibit)
+	    lock {normal_inhibit++;}
+	  else
+	    Mirror(tmpp);
+	} else if (!inhibit)
+	  D3Zero(&tmpp->p_normal_inhibit);
       } else if (!inhibit)
-	D3Zero(&tmpp->p_snell_inhibit);
+	D3Zero(&tmpp->p_normal_inhibit);
 
       tmpp=tmpp->next;
       if (cnts.jiffies>=timeout_jiffy)
@@ -328,7 +355,7 @@ U0 Init()
   I64 i;
   master_sleep_jiffy=cnts.jiffies;
   full_speed=show_normals=FALSE;
-  photon_cnt=snell_cnt=snell_inhibit=zero_normal=0;
+  photon_cnt=mirror_cnt=snell_cnt=normal_inhibit=zero_normal=0;
   map=DCNew(Fs->pix_width,Fs->pix_height);
   for (i=0;i<mp_cnt;i++) {
     while (LBts(&p_root_locks,i))
@@ -342,12 +369,17 @@ U0 Init()
   //640/480*y^2=bmp_mem*8
   //y=Sqrt(bmp_mem*8*480/640)
   //bmp_scale=Sqrt(bmp_mem*8*480/640)/480
-  bmp_scale=Sqrt(bmp_mem*8*Fs->pix_height/Fs->pix_width)/Fs->pix_height;
+  bmp_scale=Sqrt(bmp_mem/2*8*Fs->pix_height/Fs->pix_width)/Fs->pix_height;
+
   find_normal_dist_sqr=2*Sqr(bmp_scale);
+#assert Sqrt(2)<=BORDER
+
   bmp_width =bmp_scale*Fs->pix_width;
   bmp_height=bmp_scale*Fs->pix_height;
-  bmp=CAlloc(bmp_width*bmp_height/8);
+  bmp_refract=CAlloc(bmp_width*bmp_height/8);
+  bmp_reflect=CAlloc(bmp_width*bmp_height/8);
   bmp_norm_radius=Min(10*bmp_scale,250);
+#assert 10<=BORDER
 }
 
 U0 CleanUp()
@@ -360,13 +392,16 @@ U0 CleanUp()
     LBtr(&p_root_locks,i);
   }
   DCDel(map);
-  Free(bmp);
+  Free(bmp_refract);
+  Free(bmp_reflect);
 }
 
-#define LTM_LINE	0
-#define LTM_SPLINE	1
-#define LTM_FLOOD_FILL	2
-#define LTM_TEST_RAY	3
+#define LTM_REFLECT_LINE	0
+#define LTM_REFLECT_SPLINE	1
+#define LTM_REFRACT_LINE	2
+#define LTM_REFRACT_SPLINE	3
+#define LTM_REFRACT_FLOOD_FILL	4
+#define LTM_TEST_RAY		5
 
 U0 LTMenuSet(I64 mode)
 {
@@ -376,18 +411,28 @@ U0 LTMenuSet(I64 mode)
   else
     entry->checked=FALSE;
 
-  entry=MenuEntryFind(Fs->cur_menu,"Mode/LineMode");
-  if (mode==LTM_LINE)
+  entry=MenuEntryFind(Fs->cur_menu,"Mode/ReflectLine");
+  if (mode==LTM_REFLECT_LINE)
     entry->checked=TRUE;
   else
     entry->checked=FALSE;
-  entry=MenuEntryFind(Fs->cur_menu,"Mode/SplineMode");
-  if (mode==LTM_SPLINE)
+  entry=MenuEntryFind(Fs->cur_menu,"Mode/ReflectSpline");
+  if (mode==LTM_REFLECT_SPLINE)
     entry->checked=TRUE;
   else
     entry->checked=FALSE;
-  entry=MenuEntryFind(Fs->cur_menu,"Mode/FloodFill");
-  if (mode==LTM_FLOOD_FILL)
+  entry=MenuEntryFind(Fs->cur_menu,"Mode/RefractLine");
+  if (mode==LTM_REFRACT_LINE)
+    entry->checked=TRUE;
+  else
+    entry->checked=FALSE;
+  entry=MenuEntryFind(Fs->cur_menu,"Mode/RefractSpline");
+  if (mode==LTM_REFRACT_SPLINE)
+    entry->checked=TRUE;
+  else
+    entry->checked=FALSE;
+  entry=MenuEntryFind(Fs->cur_menu,"Mode/RefractFloodFill");
+  if (mode==LTM_REFRACT_FLOOD_FILL)
     entry->checked=TRUE;
   else
     entry->checked=FALSE;
@@ -401,7 +446,7 @@ U0 LTMenuSet(I64 mode)
 #define PTS_NUM	1024
 U0 LightTable()
 {
-  I64 msg_code,mode=LTM_LINE,i,cnt,arg1,arg2,x1,y1,x2,y2;
+  I64 msg_code,mode=LTM_REFLECT_LINE,i,cnt,arg1,arg2,x1,y1,x2,y2;
   CD3I32 *c=MAlloc(PTS_NUM*sizeof(CD3I32));
 
   p_root_locks=0;
@@ -412,10 +457,12 @@ U0 LightTable()
 	"  Exit(,CH_ESC);"
 	"}"
 	"Mode {"
-	"  LineMode(,'0');"
-	"  SplineMode(,'1');"
-	"  FloodFill(,'2');"
-	"  TestRay(,'3');"
+	"  ReflectLine(,'0');"
+	"  ReflectSpline(,'1');"
+	"  RefractLine(,'2');"
+	"  RefractSpline(,'3');"
+	"  RefractFloodFill(,'4');"
+	"  TestRay(,'5');"
 	"}"
 	"Play {"
 	"  RandomBurst(,'r');"
@@ -459,9 +506,10 @@ lt_restart:
 	  Sweep(100,90,100);
 	  x2=arg1; y2=arg2;
 	  switch (mode) {
-	    case LTM_FLOOD_FILL:
+	    case LTM_REFRACT_FLOOD_FILL:
+	      map->color=LENS_COLOR;
 	      GrFloodFill(map,x2,y2);
-	      mode=LTM_LINE;
+	      mode=LTM_REFLECT_LINE;
 	      LTMenuSet(mode);
 	      break;
 	    case LTM_TEST_RAY:
@@ -472,8 +520,12 @@ lt_restart:
 	case MSG_MS_L_DOWN:
 	  x1=arg1; y1=arg2;
 	  switch (mode) {
-	    case LTM_LINE:
-	      map->color=ROP_XOR+WHITE;
+	    case LTM_REFLECT_LINE:
+	    case LTM_REFRACT_LINE:
+	      if (mode==LTM_REFLECT_LINE)
+		map->color=ROP_XOR+MIRROR_COLOR;
+	      else
+		map->color=ROP_XOR+LENS_COLOR;
 	      while (TRUE) {
 		x2=arg1; y2=arg2;
 		GrLine(map,x1,y1,x2,y2);
@@ -488,11 +540,23 @@ lt_restart:
 		  break;
 		}
 	      }
-	      DualLine(x1,y1,x2,y2);
+	      if (mode==LTM_REFLECT_LINE)
+		map->color=MIRROR_COLOR;
+	      else
+		map->color=LENS_COLOR;
+	      GrLine(map,x1,y1,x2,y2);
+	      if (mode==LTM_REFLECT_LINE)
+		BmpLine(bmp_reflect,x1,y1,x2,y2);
+	      else
+		BmpLine(bmp_refract,x1,y1,x2,y2);
 	      break;
-	    case LTM_SPLINE:
+	    case LTM_REFLECT_SPLINE:
+	    case LTM_REFRACT_SPLINE:
 	      cnt=0;
-	      map->color=ROP_XOR+WHITE;
+	      if (mode==LTM_REFLECT_SPLINE)
+		map->color=ROP_XOR+MIRROR_COLOR;
+	      else
+		map->color=ROP_XOR+LENS_COLOR;
 	      do {
 		c[cnt].x=arg1; c[cnt].y=arg2; c[cnt].z=0;
 		Gr2BSpline(map,c,cnt+1);
@@ -506,20 +570,27 @@ lt_restart:
 		  cnt++;
 		}
 	      } while (cnt<PTS_NUM-1 && msg_code!=MSG_MS_R_UP);
-	      map->color=WHITE;
+	      if (mode==LTM_REFLECT_SPLINE)
+		map->color=MIRROR_COLOR;
+	      else
+		map->color=LENS_COLOR;
 	      Gr2BSpline3(map,c,cnt);
 	      for (i=0;i<cnt;i++) {
 		c[i].x*=bmp_scale;
 		c[i].y*=bmp_scale;
 	      }
-	      BSpline2(bmp,c,cnt,&BmpPlot);
-	      mode=LTM_LINE;
+	      if (mode==LTM_REFLECT_SPLINE)
+		BSpline2(bmp_refract,c,cnt,&BmpPlot);
+	      else
+		BSpline2(bmp_refract,c,cnt,&BmpPlot);
+	      mode=LTM_REFLECT_LINE;
 	      LTMenuSet(mode);
 	      break;
 	  }
 	  break;
 	case MSG_MS_R_UP:
-	  i=PopUpPickLst("Line\0Spline\0FloodFill\0TestRay\0");
+	  i=PopUpPickLst("Reflect Line\0Reflect Spline\0Refract Line\0"
+		"Refract Spline\0Refract Flood Fill\0TestRay\0");
 	  if (i>=0) {
 	    mode=i;
 	    LTMenuSet(mode);
@@ -530,7 +601,7 @@ lt_restart:
 	    case '\n':
 	      CleanUp;
 	      Init;
-	      mode=LTM_LINE;
+	      mode=LTM_REFLECT_LINE;
 	      LTMenuSet(mode);
 	      break;
 	    case 'r':
@@ -546,7 +617,7 @@ lt_restart:
 	      show_normals=!show_normals;
 	      LTMenuSet(mode);
 	      break;
-	    case '0'...'3':
+	    case '0'...'5':
 	      mode=arg1-'0';
 	      LTMenuSet(mode);
 	      break;
@@ -570,3 +641,4 @@ lt_done:
 }
 
 LightTable;
+        ª      F   0   *      G   1   H      G   1       H   P      é$SY,3$n$SY,0$ G   2   H   N   K   <   ã+é$SY,3$n$SY,0$ 1   	   é$SY,3$in$SY,0$ %   F   é$SY,3$out$SY,0$  

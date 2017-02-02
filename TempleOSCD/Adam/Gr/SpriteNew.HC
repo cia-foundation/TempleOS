@@ -159,7 +159,7 @@ public U8 *SpriteElem2Summary(CSprite *tmpg)
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      CatPrint(buf," %d,%d:%-16tQ",tmpg->ps.x1,tmpg->ps.y1,tmpg->ps.st);
+      CatPrint(buf," %d,%d:%-16t$$Q",tmpg->ps.x1,tmpg->ps.y1,tmpg->ps.st);
       break;
     case SPT_POLYLINE:
     case SPT_POLYPT:

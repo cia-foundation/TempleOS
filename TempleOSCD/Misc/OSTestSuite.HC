@@ -659,10 +659,11 @@ U0 DoLightTable()
 {
   CTask *task=User("#include \"::/Demo/Graphics/LightTable\";\n\n");
   TaskWait(task);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'2',0);
   PostMsgWait(task,MSG_MS_L_DOWN,   100		,200);
   PostMsgWait(task,MSG_MS_L_UP,     640-100	,200);
 
-  PostMsgWait(task,MSG_KEY_DOWN_UP,'1',0);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'3',0);
   PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
   PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
   PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
@@ -676,10 +677,10 @@ U0 DoLightTable()
   PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
   PostMsgWait(task,MSG_MS_R_DOWN_UP,0,0);
 
-  PostMsgWait(task,MSG_KEY_DOWN_UP,'2',0);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'4',0);
   PostMsgWait(task,MSG_MS_L_DOWN_UP,320,190);
 
-  PostMsgWait(task,MSG_KEY_DOWN_UP,'3',0);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'5',0);
   PostMsgWait(task,MSG_MS_L_DOWN,460,280);
   PostMsgWait(task,MSG_MS_L_UP	,500,220);
 

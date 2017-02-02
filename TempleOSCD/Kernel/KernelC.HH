@@ -582,6 +582,7 @@ public _extern _MSIZE2 I64 MSize2(U8 *src); //Internal size
 public extern U0 HeapCtrlDel(CHeapCtrl *hc);
 public extern CHeapCtrl *HeapCtrlInit(CHeapCtrl *hc=NULL,
 	CTask *task=NULL,CBlkPool *bp);
+
 #help_index "Memory/Page Tables"
 public extern I64 *MemPageTable(U8 *a);
 
@@ -721,7 +722,6 @@ public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 	U8 *task_name=NULL,I64 target_cpu=-1,	//-1 means current CPU
 	CTask *parent=NULL, //NULL means adam
 	I64 stk_size=0,I64 flags=1<<JOBf_ADD_TO_QUE);
-
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;
 
