@@ -120,7 +120,7 @@ U0 Whap()
 	"  Exit(,CH_ESC);"
 	"}"
 	);
-  ode->derivative=&MyDerivative;
+  ode->derive=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;

@@ -80,7 +80,7 @@ U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
 U0 Init()
 {
   ode=ODENew(0,1e-4,ODEF_HAS_MASSES);
-  ode->derivative=&MyDerivative;
+  ode->derive=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;

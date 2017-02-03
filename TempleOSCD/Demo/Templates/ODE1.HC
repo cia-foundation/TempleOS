@@ -26,7 +26,7 @@ U0 MyDerivative(CMathODE *ode,F64,COrder2D3 *,COrder2D3 *)
 U0 Init()
 {
   ode=ODENew(0,1e-4,ODEF_HAS_MASSES);
-  ode->derivative=&MyDerivative;
+  ode->derive=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;

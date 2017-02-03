@@ -300,7 +300,7 @@ U0 Init()
   next_action_key='1';
   zoom=1.0;
   ode=ODENew(0,1e-4,ODEF_HAS_MASSES);
-  ode->derivative=&MyDerivative;
+  ode->derive=&MyDerivative;
   ode->acceleration_limit=5e3;
   ode->drag_v2=0.000002;
   ode->drag_v3=0.0000001;
@@ -323,7 +323,7 @@ U0 PlayShip()
   I64 arg1,arg2;
   F64 last_noise=0;
   Bool okay;
-  ode->flags&=~ODEF_PAUSED;
+  ODEPause(ode,OFF);
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -417,7 +417,7 @@ U0 EditShip()
   MyMass *tmpm1=NULL,*tmpm2=NULL;
   CCtrl *bt_edit_mode=CtrlBttnNew(0,5*FONT_HEIGHT+4,80,,EMD_MODES_NUM,
 	Define("ST_EDIT_MODES"),edit_mode_colors,&edit_mode_bttn);
-  ode->flags|=ODEF_PAUSED;
+  ODEPause(ode);
   MenuPush(
 	"File {"
 	"  Abort(,CH_SHIFT_ESC);"
@@ -534,7 +534,7 @@ U0 EditShip()
 	      CenterMasses;
 	      break;
 	    case 'd':
-	      ode->flags&=~ODEF_PAUSED;
+	      ODEPause(ode,OFF);
 	      ode->drag_v2=0.002;
 	      ode->drag_v3=0.0001;
 	      break;
@@ -572,7 +572,7 @@ U0 EditShip()
 	case MSG_KEY_UP:
 	  switch (arg1) {
 	    case 'd':
-	      ode->flags|=ODEF_PAUSED;
+	      ODEPause(ode);
 	      ode->drag_v2=0.000002;
 	      ode->drag_v3=0.0000001;
 	      break;

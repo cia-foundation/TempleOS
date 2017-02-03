@@ -215,9 +215,9 @@ U0 AnimateTask(SpanAnimateStruct *a)
 	  a->saved_ode=SpanSave(ode);
 	}
 	a->start_wall_t=tS;
-	ode->flags&=~ODEF_PAUSED;
+	ODEPause(ode,OFF);
       } else {
-	ode->flags|=ODEF_PAUSED;
+	ODEPause(ode);
 	a->elapsed_t+=tS-a->start_wall_t;
       }
       old_run=run_bttn.state;

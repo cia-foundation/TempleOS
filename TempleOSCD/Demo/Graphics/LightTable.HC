@@ -277,59 +277,65 @@ U0 AnimateTask(I64)
   }
 }
 
+#define BABY_STEPS	4
+
 U0 MPAnimateTask(I64)
 {
-  I64	last_master_jiffy=0,
+  I64	i,last_master_jiffy=0,
 	timeout_jiffy=master_sleep_jiffy+ANIMATE_JIFFIES,
 	last,next;
   Bool	inhibit;
+  CD3	step;
   Photon *tmpp,*root=&p_root[Gs->num];
   while (TRUE) {
     while (LBts(&p_root_locks,Gs->num))
       Yield;
     tmpp=root->next;
     while (tmpp!=root) {
-      last=GrPeek(map,tmpp->p.x,tmpp->p.y);
-      D3AddEqu(&tmpp->p,&tmpp->v);
-      if (tmpp->p.x<BORDER) {
-	tmpp->p.x=2*BORDER-tmpp->p.x;
-	tmpp->v.x=-tmpp->v.x;
-      }
-      if (tmpp->p.x>=map->width-BORDER) {
-	tmpp->p.x-=tmpp->p.x-map->width+BORDER;
-	tmpp->v.x=-tmpp->v.x;
-      }
-      if (tmpp->p.y<BORDER) {
-	tmpp->p.y=2*BORDER-tmpp->p.y;
-	tmpp->v.y=-tmpp->v.y;
-      }
-      if (tmpp->p.y>=map->height-BORDER) {
-	tmpp->p.y-=tmpp->p.y-map->height+BORDER;
-	tmpp->v.y=-tmpp->v.y;
-      }
-      next=GrPeek(map,tmpp->p.x,tmpp->p.y);
+      for (i=0;i<BABY_STEPS;i++) {
+	last=GrPeek(map,tmpp->p.x,tmpp->p.y);
+	D3Div(&step,&tmpp->v,BABY_STEPS);
+	D3AddEqu(&tmpp->p,&step);
+	if (tmpp->p.x<BORDER) {
+	  tmpp->p.x=2*BORDER-tmpp->p.x;
+	  tmpp->v.x=-tmpp->v.x;
+	}
+	if (tmpp->p.x>=map->width-BORDER) {
+	  tmpp->p.x-=tmpp->p.x-map->width+BORDER;
+	  tmpp->v.x=-tmpp->v.x;
+	}
+	if (tmpp->p.y<BORDER) {
+	  tmpp->p.y=2*BORDER-tmpp->p.y;
+	  tmpp->v.y=-tmpp->v.y;
+	}
+	if (tmpp->p.y>=map->height-BORDER) {
+	  tmpp->p.y-=tmpp->p.y-map->height+BORDER;
+	  tmpp->v.y=-tmpp->v.y;
+	}
+	next=GrPeek(map,tmpp->p.x,tmpp->p.y);
 
-      if (D3DistSqr(&tmpp->p_normal_inhibit,&tmpp->p)<4.0)
-	inhibit=TRUE;
-      else
-	inhibit=FALSE;
+	if (D3DistSqr(&tmpp->p_normal_inhibit,&tmpp->p)<4.0)
+	  inhibit=TRUE;
+	else
+	  inhibit=FALSE;
 
-      if (last!=next) {
-	if ((last==BLACK && next==LENS_COLOR) ||
-	      (last==LENS_COLOR && next==BLACK)) {
-	  if (inhibit)
-	    lock {normal_inhibit++;}
-	  else
-	    SnellsLaw(tmpp,last,next);
-	} else if (last==BLACK && next==MIRROR_COLOR) {
-	  if (inhibit)
-	    lock {normal_inhibit++;}
-	  else
-	    Mirror(tmpp);
+	if (last!=next) {
+	  if ((last==BLACK && next==LENS_COLOR) ||
+		(last==LENS_COLOR && next==BLACK)) {
+	    if (inhibit)
+	      lock {normal_inhibit++;}
+	    else
+	      SnellsLaw(tmpp,last,next);
+	  } else if (last==BLACK && next==MIRROR_COLOR) {
+	    if (inhibit)
+	      lock {normal_inhibit++;}
+	    else
+	      Mirror(tmpp);
+	  } else if (!inhibit)
+	    D3Zero(&tmpp->p_normal_inhibit);
 	} else if (!inhibit)
 	  D3Zero(&tmpp->p_normal_inhibit);
-      } else if (!inhibit)
-	D3Zero(&tmpp->p_normal_inhibit);
+      }
 
       tmpp=tmpp->next;
       if (cnts.jiffies>=timeout_jiffy)
@@ -580,7 +586,7 @@ lt_restart:
 		c[i].y*=bmp_scale;
 	      }
 	      if (mode==LTM_REFLECT_SPLINE)
-		BSpline2(bmp_refract,c,cnt,&BmpPlot);
+		BSpline2(bmp_reflect,c,cnt,&BmpPlot);
 	      else
 		BSpline2(bmp_refract,c,cnt,&BmpPlot);
 	      mode=LTM_REFLECT_LINE;

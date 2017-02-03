@@ -241,6 +241,12 @@ public class CSpring
 #define ODEF_HAS_MASSES	1
 #define ODEF_PAUSED	2
 #define ODEF_STARTED	4
+#define ODEF_BUSY	8
+
+#define ODEf_HAS_MASSES	0
+#define ODEf_PAUSED	1
+#define ODEf_STARTED	2
+#define ODEf_BUSY	3
 
 public class CMathODE
 {
@@ -272,7 +278,13 @@ public class CMathODE
 	*tmp0,*tmp1,*tmp2,*tmp3,
 	*tmp4,*tmp5,*tmp6,*tmp7;
   CTask	*mem_task,*win_task;
-  U0	(*derivative)(CMathODE *o,F64 t,F64 *state,F64 *DstateDt);
+  U0	(*derive)(CMathODE *o,F64 t,F64 *state,F64 *DstateDt);
+  U0	(*mp_derive)(CMathODE *o,F64 t, //If break into parallel pieces.
+		I64 cpu_num,F64 *state,F64 *DstateDt);
+  CTask **slave_tasks;
+  I64	mp_not_done_flags;
+  F64	mp_t,*mp_state,*mp_DstateDt;
+
   I64	user_data;
 };
 
