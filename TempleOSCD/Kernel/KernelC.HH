@@ -674,7 +674,6 @@ public extern F64 Ona2Freq(I64 ona);
 public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
 public extern CSndGlbls snd;
-
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
 
