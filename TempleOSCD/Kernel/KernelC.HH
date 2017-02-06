@@ -604,7 +604,6 @@ public extern U0 QSort(U8 *base,I64 num, I64 width,
 public extern U0 QSortI64(I64 *base,I64 num,
 	I64 (*fp_compare)(I64 e1,I64 e2));
 public extern F64 sys_os_version;
-
 #help_index "Misc/Progress Bars"
 public extern U0 ProgressBarsRst(U8 *path=NULL);
 
@@ -674,6 +673,7 @@ public extern F64 Ona2Freq(I64 ona);
 public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
 public extern CSndGlbls snd;
+
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
 

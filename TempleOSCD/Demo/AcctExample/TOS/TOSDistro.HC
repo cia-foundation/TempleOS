@@ -12,6 +12,7 @@
 #define MAKE_BOOKS2	0
 #define MAKE_DBG	0
 #define MAKE_STAFF	1
+#define PROFANITY_CHK	0
 
 public U8 TOSGetDrv()
 {//Pmt for drv let.
@@ -405,7 +406,7 @@ U0 TOSProgress(U8 *st)
   progress3_max=1;
   *progress4_desc=0;
   progress4_max=13+MAKE_STD+MAKE_STD_RS+MAKE_ULTRA+MAKE_ULTRA_RS+MAKE_SUP1+
-	MAKE_WEB+MAKE_BOOKS1+MAKE_BOOKS2+MAKE_DBG+MAKE_STAFF;
+	MAKE_WEB+MAKE_BOOKS1+MAKE_BOOKS2+MAKE_DBG+MAKE_STAFF+PROFANITY_CHK;
   progress4_t0=tos_progress_t0;
   StrPrint(buf,"%d. %s",++progress4,st);
   "$$PURPLE$$$$TX+CX,\"%s\"$$$$FG$$\n",buf;
@@ -539,10 +540,12 @@ U0 TOSRegen3()
   TOSProgress("Freshen WebSite");
   FreshenSite;
 
+#if PROFANITY_CHK
   DocClear;
   TOSProgress("Check WebSite for Profanity");
   if (TOSProfanity)
     throw;
+#endif
 
   TOSProgress("Find /Home");
   slash_home=F2("/Home","-i+la");

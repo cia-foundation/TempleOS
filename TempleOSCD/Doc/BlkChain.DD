@@ -1,0 +1,20 @@
+$WW,1$$FG,5$$TX+CX,"Block Chain"$$FG$
+
+There was a technique on the Commodore 64 where disk blocks were chained together with a block pointer at the end of each block.  This is far inferior to having a file allocation table, as in FAT32.
+
+The $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ file system does not allow files to grow because it only has an allocation bitmap and not a FAT table.  This "flaw" is by design.  I am intentionally crippling this operating system, making it a toy with the wisdom that this will prevent commercialization and corruption.  The toy spirit of the operating system will be preserved going into the future.  The vision for this operating system was a modern Commodore 64, which was a fun toy.
+
+Doing whole file operations is the TempleOS way of doing thinks.  It is the simplest and, ironically, the fastest.  It is obnoxious in the characteristic way that TempleOS is obnoxious, flaunting massive modern resources in a way that makes old programmers protest.
+
+Doing whole file operations will sabotage efforts to change the 640x480 resolution and violate the ban on multimedia.  When doing large, whole-file operations, immediately memory fragmentation is a serious problem, but not so for allocations in the range under a Meg (with occasional larger ones).
+
+The file compression scheme in TempleOS only works on whole file operations and the $LK,"DolDoc",A="FI:::/Doc/DolDoc.DD"$ format cannot have text tacked onto the end, since binary data is at the end.
+
+I don't want to spoil fun, so of course I offer a way to get awesome performance that is, ironically, superior.  $LK,"FBlkRead",A="MN:FBlkRead"$() and $LK,"FBlkWrite",A="MN:FBlkWrite"$() allow you to read a block offset from the start of a file.  Since files are all contiguous, this is incredibly efficient.  You just have to declare the desired file size when you create it with $LK,"FOpen",A="MN:FOpen"$() and cannot change it.  See $LK,"::/Demo/Dsk/DataBase.HC"$.
+
+If you like, you are encouraged to to do raw $LK,"BlkRead",A="MN:BlkRead"$() and $LK,"BlkWrite",A="MN:BlkWrite"$() directly on a drive.  Just get a pointer to a $LK,"CDrv",A="MN:CDrv"$ with $LK,"Let2Drv",A="MN:Let2Drv"$() and you are on your way!  Your computer is supposed to be a fun toy!  You can make an entire partition used for a database, or invent a file system.
+
+On the whole, the $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ file system with its whole-file-only limitation bring beautiful harmony.  It beautifully captures the spirit of TempleOS with simplicity and, ironic speed, since contiguous is fastest.
+
+$FG,8$
+* "Commodore 64" is a trademark owned by Polabe Holding NV.

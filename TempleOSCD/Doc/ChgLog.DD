@@ -2,7 +2,8 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----02/04/17 04:03:19----$IV,0$
+$IV,1$----02/05/17 14:53:42----$IV,0$
+* Added $LK,"::/Doc/BlkChain.DD"$.
 
 $IV,1$----02/03/17 17:27:36----$IV,0$
 * Added multicore $LK,"::/Adam/AMathODE.HC"$.
