@@ -435,7 +435,7 @@ I64 GodHeaderIns(U8 *type=NULL)
   CDateStruct ds;
   I64 res;
   if (type) {//If NISTBeacon
-    res=FloorI64(CDate2Unix(Now+2*60*CDATE_FREQ),60);
+    res=FloorI64(CDate2Unix(Now+1*60*CDATE_FREQ),60);
     Date2Struct(&ds,Unix2CDate(res)+local_time_offset+30*CDATE_FREQ);
     "Response of %s at %02d:%02d Timestamp:%d.\n\n",type,ds.hour,ds.min,res;
     In("%c//Response of %s at %02d:%02d Timestamp:%d.\n\n",
