@@ -501,7 +501,7 @@ public U0 GodIns()
 {//<ALT-F7> Insert misc rand God item into blog.
   U8 *st,*tag;
   CRandExtDec5Form *gm=CAlloc(sizeof(CRandExtDec5Form));
-  I64 god_src=PopUpPickLst("NISTBeacon\0HotBits\0ANU_NIST\0Random.org\0"
+  I64 god_src=PopUpPickLst("NISTBeacon\0HotBits\0ANU_NIST\0Google\0Random.org\0"
 	"RandomNumbers.info\0Password\0GenerateData\0VirtualNotary\0Timer\0");
   if (god_src>=GSRC_NIST_BEACON) {
     switch (god_src) {
@@ -599,6 +599,9 @@ public U0 GodIns()
 	}
 	break;
       start:
+	case GSRC_GOOGLE:
+	  tag="http://www.google.com";
+	  break;
 	case GSRC_RANDOM_ORG:
 	  tag="http://www.random.org";
 	  break;
