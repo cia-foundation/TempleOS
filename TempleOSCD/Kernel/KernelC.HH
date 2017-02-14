@@ -604,6 +604,7 @@ public extern U0 QSort(U8 *base,I64 num, I64 width,
 public extern U0 QSortI64(I64 *base,I64 num,
 	I64 (*fp_compare)(I64 e1,I64 e2));
 public extern F64 sys_os_version;
+
 #help_index "Misc/Progress Bars"
 public extern U0 ProgressBarsRst(U8 *path=NULL);
 
@@ -640,7 +641,6 @@ public extern U0 MPHalt();
 public extern CJob *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
 	I64 target_cpu=1,I64 flags=1<<JOBf_FREE_ON_COMPLETE,
 	I64 job_code=JOBT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
-
 #help_index "PCI"
 public extern I64 PCIClassFind(I64 class_code,I64 n);
 public extern U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg);
