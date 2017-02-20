@@ -11,6 +11,7 @@ public _extern _LAST_FUN I64 LastFun(I64 argc,I64 *argv);
 public extern I64 RunFile(U8 *name,I64 ccf_flags=0,...);
 public extern I64 RunFile2(U8 *name,I64 ccf_flags=0,...);
 public extern CCmpGlbls cmp;
+
 #help_index "Compiler/Directive"
 #help_file "::/Doc/Directives"
 public extern Bool Echo(Bool val);
@@ -20,7 +21,6 @@ extern U0 StreamDir();
 public extern I64 StreamExePrint(U8 *fmt,...);
 public extern U0 StreamPrint(U8 *fmt,...);
 public extern Bool Trace(Bool val=ON);
-
 #help_index "Compiler/Lex"
 #help_file "::/Doc/Lex"
 extern U0 ClassMemberLstDel(CHashClass *c);

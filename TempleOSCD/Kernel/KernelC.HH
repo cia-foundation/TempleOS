@@ -594,7 +594,6 @@ public extern I64 GetMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 extern U0 InputFilterTask();
 public extern I64 ScanMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 	I64 mask=~1,CTask *task=NULL);
-
 #help_index "Misc"
 public extern I64 EndianI64(I64 d);
 public extern U16 EndianU16(U16 d);
@@ -641,6 +640,7 @@ public extern U0 MPHalt();
 public extern CJob *JobQue(I64 (*fp_addr)(U8 *data),U8 *data=NULL,
 	I64 target_cpu=1,I64 flags=1<<JOBf_FREE_ON_COMPLETE,
 	I64 job_code=JOBT_CALL,U8 *aux_str=NULL,I64 aux1=0,I64 aux2=0);
+
 #help_index "PCI"
 public extern I64 PCIClassFind(I64 class_code,I64 n);
 public extern U16 PCIReadU16(I64 bus,I64 dev,I64 fun,I64 rg);
