@@ -13,11 +13,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Helicopters.
 * Anti-Aircraft.
 
-* Bug:          7FD77BA0 48BB182D4454 MOV	U64 RBX,I64 4019,21FB,5444,2D18
-                7FD77BA6 FB211940    
-* Opt?          7FD77BAA 53           PUSH	U64 RBX
-
-
 * $MA-X+PU,"64-Bit Device Memory",LM="F(\"mem64_ptr\");View;"$ is not implemented.
 
 * Cursor in $LK,"~/TOS/TOSToHtml.HC"$.
@@ -446,7 +441,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17396KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17402KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -512,3 +507,6 @@ $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_
 
 $TX,"8-Bit Pixel Art",HTML="http://8bitdecals.com/8-bit-image-gallery"$
 $TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
+
+
+sha256sum
