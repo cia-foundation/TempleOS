@@ -237,6 +237,8 @@ $ID,-5$
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
 
+* Should we get rid of drive mapping.  It's ugly.
+
 * Can we get rid of $LK,"MSG_CMD",A="MN:MSG_CMD"$?
 
 * Make so just CdRom; command to copy entire disk to ::/CdRom directory? 

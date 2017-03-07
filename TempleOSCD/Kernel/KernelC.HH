@@ -275,6 +275,7 @@ public extern Bool FBlkWrite(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1);
 public extern U0 FClose(CFile *f);
 public extern CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0);
 public extern I64 FSize(CFile *f);
+
 #help_index "File/Cmd Line (Typically);Cmd Line (Typically)"
 public extern Bool Cd(U8 *dirname=NULL,Bool make_dirs=FALSE);
 public extern I64 Del(U8 *files_find_mask,Bool make_mask=FALSE,
@@ -593,7 +594,6 @@ public extern I64 GetMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 extern U0 InputFilterTask();
 public extern I64 ScanMsg(I64 *_arg1=NULL,I64 *_arg2=NULL,
 	I64 mask=~1,CTask *task=NULL);
-
 #help_index "Misc"
 public extern I64 EndianI64(I64 d);
 public extern U16 EndianU16(U16 d);
