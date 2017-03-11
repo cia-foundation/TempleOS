@@ -453,7 +453,7 @@ U0 TimerGodIns()
   FifoU8Flush(god.fifo);
   GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
   switch (PopUpPickLst("Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
-	"Painting1000\0Metallica\0")) {
+	"Painting1000\0Poems100\0Metallica\0")) {
     case:
       StrPrint(buf,"%05X",GodBits(5*4));
       "$$TX,\"How this random Bible passage was chosen.\","
@@ -489,6 +489,12 @@ U0 TimerGodIns()
       break;
     case:
       StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
+      GodWebIdx("Top 100 Poems",
+	    "http://100.best-poems.net/top-100-best-poems.html",
+	    buf,2,"~/Sup1/Sup1Blog/Poems100.DD.Z");
+      break;
+    case:
+      StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
       GodVideoDigits("Metallica Song",
 	    "http://home.hccnet.nl/a.r.adams/lyrics/"
 	    "metallica/songindex.html",
@@ -520,7 +526,7 @@ public U0 GodIns()
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
 	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
 	      "Words1000\0Words10k\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
-	      "Painting100\0Painting1000\0Metallica\0")) {
+	      "Painting100\0Painting1000\0Poems100\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -587,6 +593,13 @@ public U0 GodIns()
 		    "http://en.most-famous-paintings.com/MostFamousPaintings."
 		    "nsf/ListOfTop1000MostPopularPainting",
 		    gm->rnd0,3,"~/Sup1/Sup1Blog/Paintings1000.DD.Z");
+	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CPoems100Form *))) {
+	      GodWebIdx("Top 100 Poems",
+		    "http://100.best-poems.net/top-100-best-poems.html",
+		    gm->rnd0,2,"~/Sup1/Sup1Blog/Poems100.DD.Z");
 	    }
 	    break;
 	  case:

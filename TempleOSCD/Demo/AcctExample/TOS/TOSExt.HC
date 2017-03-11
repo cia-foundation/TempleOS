@@ -167,6 +167,25 @@ class CPaintings1000Form
   I64	cert;
 };
 
+class CPoems100Form
+{
+  I64	timestamp;
+  U8	rnd0[512]	fmtstr "$$DA-P,"
+	"A=\"Poems #00-99 (2 Decimal Digits from Hex):%s\"$$\n";
+  U8	rnd1[512];
+  U8	rnd2[512];
+  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
+  I64	cert;
+};
+
 class CMetallicaForm
 {
   I64	timestamp;
