@@ -160,6 +160,7 @@ public extern U0	QueVectU8Del(CQueVectU8 *v);
 public extern I64	QueVectU8Get(CQueVectU8 *v,I64 idx);
 public extern CQueVectU8 *QueVectU8New(I64 min_idx=0);
 public extern U0	QueVectU8Put(CQueVectU8 *v,I64 idx,U8 ch);
+
 #help_index "Debugging"
 public extern U8 *Caller(I64 num=1);
 public extern Bool ChkCodePtr(U8 *ptr);
@@ -390,7 +391,6 @@ extern U0 DskCacheInit(I64 size_in_U8s);
 public extern U0 DskCacheInvalidate(CDrv *dv);
 public extern I64 MountIDEAuto();
 public extern CBlkDevGlbls blkdev;
-
 #help_index "Graphics/Color"
 extern U0 (*fp_set_std_palette)();
 public extern U8 *Color2Str(U8 *buf,CColorROPU32 c);
