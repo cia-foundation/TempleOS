@@ -391,6 +391,7 @@ extern U0 DskCacheInit(I64 size_in_U8s);
 public extern U0 DskCacheInvalidate(CDrv *dv);
 public extern I64 MountIDEAuto();
 public extern CBlkDevGlbls blkdev;
+
 #help_index "Graphics/Color"
 extern U0 (*fp_set_std_palette)();
 public extern U8 *Color2Str(U8 *buf,CColorROPU32 c);
@@ -673,7 +674,6 @@ public extern F64 Ona2Freq(I64 ona);
 public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
 public extern CSndGlbls snd;
-
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
 

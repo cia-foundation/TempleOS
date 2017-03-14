@@ -7,7 +7,7 @@ Option(OPTf_WARN_DUP_TYPES,ON);
 KbdTypeMatic(0);
 
 // Las Vegas is -7 during summer, -8 during winter
-local_time_offset=-8*60*60*CDATE_FREQ; //Pacific
+local_time_offset=-7*60*60*CDATE_FREQ; //Pacific
 // Remember you can set the time in the BIOS.
 
 //$AN,"",A="mouse_move_scale"$adjust these to set mouse move scale

@@ -7,7 +7,7 @@ CTask *JukeReward(U8 *msg)
   res->title_src=TTS_LOCKED_CONST;
 
   doc=DocNew(,res);
-  DocPrint(doc,"$$WW+H,1$$%s",msg);
+  DocPrint(doc,"$$WW+H,1$$$$RED$$%s",msg);
 
   buf=MStrPrint("DocEd(0x%X);",doc);
   TaskExe(res,NULL,buf,1<<JOBf_EXIT_ON_COMPLETE|1<<JOBf_FREE_ON_COMPLETE);
