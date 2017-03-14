@@ -89,7 +89,6 @@ I64 DrvsSize()
 Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
 {
   I64 i,j,k,m,n;
-  U8 *st;
   CDoc *pdoc,*ddoc,*bdoc;
   CCmpCtrl *cc;
   CMathODE *o;
@@ -100,10 +99,8 @@ Bool MemRepTask(CTask *task,Bool override_validate=FALSE)
     return FALSE;
   if (task==Fs)
     task->rsp=GetRSP;
-  st=MStrUtil(task->task_title,SUF_REM_CTRL_CHARS|SUF_SAFE_DOLLAR);
-  "$$BLACK$$%-27ts#%08X$$FG$$\n$$ID,2$$",st,task;
-  Free(st);
-  "Heap\t:%010X/%010X\n",TaskMemUsed(task,override_validate),
+  "$$BLACK$$%-27t$$Q#%08X$$FG$$\n",task->task_title,task;
+  "$$ID,2$$Heap\t:%010X/%010X\n",TaskMemUsed(task,override_validate),
 	TaskMemAlloced(task,override_validate);
 
   i=UnusedStk(task);

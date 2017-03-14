@@ -151,7 +151,8 @@ public _extern _D3_DIST_SQR F64 D3DistSqr(CD3 *d1,CD3 *d2); //Distance Squared
 public _extern _D3_DIV CD3 *D3Div(CD3 *quot,CD3 *d,F64 s); //quot=d/s
 public _extern _D3_DIV_EQU CD3 *D3DivEqu(CD3 *quot,F64 s); //quot/=s
 public _extern _D3_DOT F64 D3Dot(CD3 *d1,CD3 *d2); //d1 dot d2
-public _extern _D3_EQU CD3 *D3Equ(CD3 *dst,F64 x,F64 y,F64 z); //dst=(x,y,z)
+public _extern _D3_EQU CD3 *D3Equ(
+	CD3 *dst,F64 x=0,F64 y=0,F64 z=0); //dst=(x,y,z)
 public _extern _D3_MUL CD3 *D3Mul(CD3 *prod,F64 s,CD3 *d); //prod=s*d
 public _extern _D3_MUL_EQU CD3 *D3MulEqu(CD3 *prod,F64 s); //prod*=s
 public _extern _D3_NORM F64 D3Norm(CD3 *d); //Norm

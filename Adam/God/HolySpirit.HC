@@ -143,19 +143,10 @@ public U8 *GodWordStr(I64 bits=17)
     return NULL;
 }
 
-public U0 GodWord(I64 bits=17,Bool show_num=FALSE)
+public U0 GodWord(I64 bits=17)
 {//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  I64 i;
-  if (god.num_words) {
-    i=GodBits(bits);
-    if (show_num)
-      "%05X Mod %05X = %05X (Line:%0*d):",
-	    i,god.num_words,i%god.num_words,
-	    ToI64(Log10(god.num_words)+1),i%god.num_words+1;
-    "%s ",god.words[i%god.num_words];
-    if (show_num)
-      '\n';
-  }
+  if (god.num_words)
+    "%s ",god.words[GodBits(bits)%god.num_words];
 }
 
 public U0 GodBiblePassage(I64 num_lines=20)

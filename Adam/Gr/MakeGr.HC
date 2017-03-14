@@ -23,6 +23,7 @@ Cd(__DIR__);;
 #include "SpriteMesh"
 #include "SpriteBitMap"
 #include "SpriteCode"
+#include "SpriteSideBar"
 #include "SpriteEd"
 #include "SpriteMain"
 

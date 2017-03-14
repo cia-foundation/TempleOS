@@ -39,7 +39,7 @@ U0 Lighting(CDC *dc,CD3I32 *ls,CD3I32 *poly,I64 color)
   //TempleOS will generate a random U16
   //and compare to dither_probability_u16 and
   //will pick from two colors.
-  //Probability dithering does not work with pen_width>1 at this time.
+  //Probability dithering does not work with thick>1 at this time.
   if (i<0) {
     dc->color=ROPF_PROBABILITY_DITHER+BLACK<<16+color;
     dc->dither_probability_u16=-i;

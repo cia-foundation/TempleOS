@@ -7,7 +7,7 @@ I64 sprite_elem_base_sizes[SPT_TYPES_NUM]={
   sizeof(CSpriteBase),		//SPT_END
   sizeof(CSpriteColor),		//SPT_COLOR
   sizeof(CSpriteDitherColor),	//SPT_DITHER_COLOR
-  sizeof(CSpriteW),		//SPT_WIDTH
+  sizeof(CSpriteT),		//SPT_THICK
   sizeof(CSpritePtPt),		//SPT_PLANAR_SYMMETRY
   sizeof(CSpriteBase),		//SPT_TRANSFORM_ON
   sizeof(CSpriteBase),		//SPT_TRANSFORM_OFF
@@ -153,13 +153,13 @@ public U8 *SpriteElem2Summary(CSprite *tmpg)
     case SPT_CIRCLE:
       CatPrint(buf," (%d,%d):%dR",tmpg->pr.x1,tmpg->pr.y1,tmpg->pr.radius);
       break;
-    case SPT_WIDTH:
-      CatPrint(buf," %d",tmpg->w.width);
+    case SPT_THICK:
+      CatPrint(buf," %d",tmpg->t.thick);
       break;
     case SPT_TEXT:
     case SPT_TEXT_BOX:
     case SPT_TEXT_DIAMOND:
-      CatPrint(buf," %d,%d:%-16tQ",tmpg->ps.x1,tmpg->ps.y1,tmpg->ps.st);
+      CatPrint(buf," %d,%d:%-16t$$Q",tmpg->ps.x1,tmpg->ps.y1,tmpg->ps.st);
       break;
     case SPT_POLYLINE:
     case SPT_POLYPT:

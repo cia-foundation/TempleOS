@@ -23,4 +23,4 @@ extern U0 GodBiblePassage(I64 num_lines=20);
 extern U0 GodBitsIns(I64 num_bits,I64 n);
 extern U0 GodDoodle(U8 *hex=NULL);
 extern U0 GodSong();
-extern U0 GodWord(I64 bits=17,Bool show_num=FALSE);
+extern U0 GodWord(I64 bits=17);

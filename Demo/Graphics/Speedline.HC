@@ -28,7 +28,7 @@ public U0 SpeedLineDemo()
 	x2=arg1; y2=arg2;
 	cnt=0;
 	while (msg_code!=MSG_MS_L_UP) {
-	  dc->pen_width=0.04*ms.speed;
+	  dc->thick=0.04*ms.speed;
 	  GrLine3(dc,x1,y1,0,x2,y2,0);
 	  msg_code=GetMsg(&arg1,&arg2,
 		1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);

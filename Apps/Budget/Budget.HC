@@ -1,6 +1,6 @@
-#define BGT_STRINGS_FILE	"~/Budget/Strs.DD.Z"
-#define BGT_ACCTS_FILE		"~/Budget/Accts.DD.Z"
-#define BGT_DATA_FILE		"~/Budget/Bgt.DATA.Z"
+U8 *bgt_string_file;
+U8 *bgt_accts_file;
+U8 *bgt_data_file;
 
 #define BE_NORMAL		0
 #define BE_GAS			1

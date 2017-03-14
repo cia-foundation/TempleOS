@@ -1,11 +1,11 @@
 #help_index "Graphics/Sprite;Sprites"
 
 CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
-	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_width=NULL,
+	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_thick=NULL,
 	I64 *_xx=NULL,I64 *_yy=NULL)
 {
   CSprite *res=head->next;
-  I64 width=1,xx=0,yy=0;
+  I64 thick=1,xx=0,yy=0;
   CColorROPU32 color=BLACK;
   if (dc) DCRst(dc);
   while (elem_num-->0 && res!=head) {
@@ -19,9 +19,9 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
 	      res->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	if (dc) dc->color=color;
 	break;
-      case SPT_WIDTH:
-	width=res->w.width;
-	if (dc) dc->pen_width=width;
+      case SPT_THICK:
+	thick=res->t.thick;
+	if (dc) dc->thick=thick;
 	break;
       case SPT_SHIFT:
 	xx+=res->p.x1;
@@ -43,7 +43,7 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
     res=res->next;
   }
   if (_color) *_color=color;
-  if (_width) *_width=width;
+  if (_thick) *_thick=thick;
   if (_xx) *_xx=xx;
   if (_yy) *_yy=yy;
   return res;
@@ -380,9 +380,9 @@ U0 SpriteTransformQue(CSprite *head,I64 *r)
   while (tmpg!=head) {
     if (Bt(&tmpg->type,SPf_SEL))
       switch (tmpg->type&SPG_TYPE_MASK) {
-	case SPT_WIDTH:
-	  tmpg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
-	  if (tmpg->w.width<0) tmpg->w.width=0;
+	case SPT_THICK:
+	  tmpg->t.thick*=Sqrt(Mat4x4NormSqr65536(r))/65536;
+	  if (tmpg->t.thick<0) tmpg->t.thick=0;
 	  break;
 	case SPT_PLANAR_SYMMETRY:
 	case SPT_ARROW:
@@ -575,105 +575,6 @@ I64 SpriteQueSelAll(CSprite *head,Bool val=TRUE)
   return res;
 }
 
-CSprite *SpriteSideBar2SpriteQue(CDoc *doc,CSprite *head,I64 *_cur_elem_num)
-{//For the side-bar
-  CSprite *res=CAlloc(sizeof(CSprite)),*tmpg;
-  CDocEntry *doc_e=doc->head.next;
-  Bool found=FALSE;
-  I64 num=0;
-  QueInit(res);
-  while (doc_e!=doc) {
-    if (doc_e->type_u8==DOCT_MENU_VAL && doc_e->left_exp>=0) {
-      tmpg=SpriteSetSettings(,head,doc_e->left_exp);
-      if (tmpg!=head) {
-	tmpg=MAllocIdent(tmpg);
-	BEqu(&tmpg->type,SPf_SEL,Bt(&doc_e->type,DOCEt_SEL));
-	if (*_cur_elem_num==doc_e->left_exp) {
-	  *_cur_elem_num=num;
-	  found=TRUE;
-	}
-	QueIns(tmpg,res->last);
-	num++;
-      }
-    }
-    doc_e=doc_e->next;
-  }
-  if (!found)
-    *_cur_elem_num=num;
-  QueDel(head);
-  Free(head);
-  return res;
-}
-
-U0 SpriteSideBarPickNew(CDoc *doc,CSprite *head,I64 old_num)
-{
-  CSprite *tmpg;
-  CDocEntry *doc_cur_e=NULL,*doc_e;
-  I64 cur_elem_num=0;
-  U8 *st;
-  DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite SideBar\"$$\n"
-	"$$LK+PU+CX,\"Click for Help\","
-	"A=\"FI:::/Doc/SpriteSideBar.DD.Z\"$$\n\n");
-  tmpg=head->next;
-  while (tmpg!=head) {
-    st=SpriteElem2Summary(tmpg);
-    if (cur_elem_num==old_num) {
-      DocPrint(doc,"$$LTRED$$");
-      doc_e=doc_cur_e=DocPrint(doc,"$$MU-UL,\"%Q\",LE=%d$$\n",st,cur_elem_num++);
-    } else {
-      DocPrint(doc,"$$LTBLUE$$");
-      doc_e=DocPrint(doc,"$$MU-UL,\"%$$Q\",LE=%d$$\n",st,cur_elem_num++);
-    }
-    BEqu(&doc_e->de_flags,DOCEf_SEL,Bt(&tmpg->type,&SPf_SEL));
-    BEqu(&doc_e->type,DOCEt_SEL,Bt(&tmpg->type,SPf_SEL));
-    Free(st);
-    tmpg=tmpg->next;
-  }
-  if (cur_elem_num==old_num) {
-    DocPrint(doc,"$$LTRED$$");
-    doc_cur_e=DocPrint(doc,"$$MU-UL,\"END\",LE=%d$$\n",cur_elem_num);
-  } else {
-    DocPrint(doc,"$$LTBLUE$$");
-    DocPrint(doc,"$$MU-UL,\"END\",LE=%d$$\n",cur_elem_num);
-  }
-  if (doc_cur_e)
-    doc->cur_entry=doc_cur_e;
-}
-
-U0 SpriteSideBarTask2(CTask *grand_parent)
-{
-  I64 w,h;
-  CTask *parent=Fs->parent_task,*pu_task;
-  while (TRUE) {
-    pu_task=grand_parent->popup_task;
-    if (TaskValidate(pu_task)) {
-      w=parent->win_right-parent->win_left;
-      WinHorz(pu_task->win_right+2,pu_task->win_right+2+w,parent);
-      h=parent->win_bottom-parent->win_top;
-      WinVert(pu_task->win_top,pu_task->win_top+h,parent);
-    }
-    Refresh;
-  }
-}
-
-U0 SpriteSideBarTask(CTask *parent,CSprite **_head,I64 *_cur_elem_num)
-{
-  CDocEntry *doc_e;
-  CDoc *doc=DocPut;
-  Spawn(&SpriteSideBarTask2,parent,"CSpriteTask",,Fs);
-  doc->flags|=DOCF_SIZE_MIN|DOCF_FORM;
-  while (TRUE) {
-    SpriteSideBarPickNew(doc,*_head,*_cur_elem_num);
-    DocHighlightCursor(,doc);
-    View;
-    doc_e=doc->cur_entry;
-    if (doc_e->type_u8==DOCT_MENU_VAL)
-      *_cur_elem_num=doc_e->left_exp;
-    *_head=SpriteSideBar2SpriteQue(doc,*_head,_cur_elem_num);
-    DocClear(doc);
-  }
-}
-
 Bool SpriteEdText(CSprite **_head,I64 *_cur_elem_num)
 {
   Bool res;
@@ -741,7 +642,7 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
 {
   U8 *st;
   CTask *pu_task;
-  I64 i;
+  I64 res;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$PURPLE$$$$TX+CX,\"Sprite Edit Menu\"$$\n"
 	"$$LK+PU+CX,\"Click for Help\",A=\"FI:::/Doc/SpriteEd.DD.Z\"$$\n\n"
@@ -764,13 +665,13 @@ I64 PopUpSpriteEd(CSprite **_head,I64 *_cur_elem_num)
   st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_head,_cur_elem_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   if (TaskValidate(pu_task)) {
     *_head=SpriteSideBar2SpriteQue(DocPut(pu_task),*_head,_cur_elem_num);
     Kill(pu_task);
   }
   DocDel(doc);
-  return i;
+  return res;
 }
 
 #define SPEDT_SIMPLE_PT		0

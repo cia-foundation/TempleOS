@@ -308,7 +308,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->ls.y*=d;
   dc->ls.z*=d;
 
-  dc->pen_width=2;
+  dc->thick=2;
   dc->color=RED;
   GrBorder(dc,COURT_BORDER,COURT_BORDER,
 	task->pix_width -1-COURT_BORDER,
@@ -715,9 +715,9 @@ ka_done: //Don't goto out of try
   } catch
     PutExcept;
   SettingsPop;
+  MenuPop;
   RegWrite("TempleOS/KeepAway","I64 best_score0=%d,best_score1=%d;\n",
 	best_score0,best_score1);
-  MenuPop;
 }
         Ê     p   ¨      ­ÿÿÿûÿÿÿûÿÿÿ­ÿÿÿûÿÿÿ   ·ÿÿÿûÿÿÿûÿÿÿ·ÿÿÿûÿÿÿ   ­ÿÿÿ   ûÿÿÿ­ÿÿÿ      ·ÿÿÿ   ûÿÿÿ·ÿÿÿ   
    ·ÿÿÿûÿÿÿöÿÿÿ·ÿÿÿûÿÿÿ

@@ -87,9 +87,9 @@ Bool PopUpCd()
 }
 
 #help_index "DolDoc/Input;Char/Lists;StdIn/DolDoc"
-public U8 *PopUpPickLst(U8 *lst)
+public I64 PopUpPickLst(U8 *lst)
 {//Prompt for lst entry in PopUp win task.
-  I64 i=0;
+  I64 res,i=0;
   CDoc *doc=DocNew;
   DocPrint(doc,"$$LTBLUE$$");
   while (*lst) {
@@ -101,9 +101,9 @@ public U8 *PopUpPickLst(U8 *lst)
     lst+=StrLen(lst)+1;
   }
   DocPrint(doc,"\n$$MU,\"CANCEL\",LE=DOCM_CANCEL$$\n");
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   DocDel(doc);
-  return i;
+  return res;
 }
 
 #help_index "DolDoc/Input;Char/Lists;Char/Define;StdIn/DolDoc"

@@ -12,7 +12,7 @@ U0 TS(U8 *desc)
     (PROGRESS_DESC_LEN-StrLen(st))>>1,CH_SPACE,st);
   Free(st);
   progress4=ts_i++;
-  progress4_max=170;
+  progress4_max=171;
   progress4_t0=ts_t0;
   *progress4_desc=0;
   RegExe("TempleOS/OSTestSuite");
@@ -652,6 +652,40 @@ U0 DoF2Macro()
 
   Sleep(1000);
   XTalk(task,"\n");
+  DeathWait(&task,TRUE);
+}
+
+U0 DoLightTable()
+{
+  CTask *task=User("#include \"::/Demo/Graphics/LightTable\";\n\n");
+  TaskWait(task);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'2',0);
+  PostMsgWait(task,MSG_MS_L_DOWN,   100		,200);
+  PostMsgWait(task,MSG_MS_L_UP,     640-100	,200);
+
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'3',0);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,100		,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,120		,180);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,160		,120);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,320		,10);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-160	,120);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-120	,180);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,640-100	,200);
+  PostMsgWait(task,MSG_MS_R_DOWN_UP,0,0);
+
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'4',0);
+  PostMsgWait(task,MSG_MS_L_DOWN_UP,320,190);
+
+  PostMsgWait(task,MSG_KEY_DOWN_UP,'5',0);
+  PostMsgWait(task,MSG_MS_L_DOWN,460,280);
+  PostMsgWait(task,MSG_MS_L_UP	,500,220);
+
+  Sleep(1500);
+  PostMsgWait(task,MSG_KEY_DOWN_UP,CH_ESC,0);
   DeathWait(&task,TRUE);
 }
 
@@ -1572,6 +1606,7 @@ U0 OSTestSuite()
   TS("Symmetry");	DoSymmetry;
   TS("Shadow");		TSFileChar("::/Demo/Graphics/Shadow",1500);
   TS("Transform");	TSFileChar("::/Demo/Graphics/Transform",,CH_SHIFT_ESC);
+  TS("LightTable");	DoLightTable;
   TS("PredatorPrey");	DoPredatorPrey;
   TS("PoleZeros");	DoPoleZeros;
   TS("Digits");		DoDigits;

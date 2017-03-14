@@ -38,3 +38,5 @@ Files with names ending in .Z are compressed.  See $LK,"::/Kernel/Compress.HC"$.
 To replace ISO9660, make hard-drive partition image of a measured size and copy onto a CD/DVD starting at about sector 20, with EL TORITO booting.  512-byte sectors will be placed on top of 2048-byte CD/DCD sectors, so there will be four blocks per CD/DVD sector.
 
 RedSea file system has no bad block table and no redundant allocation table.
+
+Read $LK,"Block Chain",A="FI:::/Doc/BlkChain.DD"$ for a philosophical explaination of RedSea reasoning.

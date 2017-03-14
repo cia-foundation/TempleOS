@@ -126,7 +126,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   Peasant *tmpp;
   F64 tt;
 
-  dc->pen_width=1;
+  dc->thick=1;
   for (i=0;i<TREES_NUM;i++) {
     if (trees[i].y<=h/2) {//Draw trees behind house
       if (trees[i].fire_frame_idx) {
@@ -163,14 +163,14 @@ U0 DrawIt(CTask *task,CDC *dc)
       dc->color=DKGRAY;
     else
       dc->color=LTGRAY;
-    dc->pen_width=4;
+    dc->thick=4;
     GrPlot3(dc,tmpst->x,tmpst->y,0);
     tmpst=tmpst->next;
   }
 
   DCDepthBufAlloc(dc);
   dc->flags|=DCF_TRANSFORMATION;
-  dc->pen_width=1;
+  dc->thick=1;
   tmpp=peasant_head.next;
   while (tmpp!=&peasant_head) {
     Mat4x4IdentEqu(r);
@@ -188,7 +188,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     tmpp=tmpp->next;
   }
 
-  dc->pen_width=1;
+  dc->thick=1;
   Mat4x4IdentEqu(r);
   Mat4x4RotY(r,king_é+ã/2);
   Mat4x4RotX(r,ã/6);
@@ -202,7 +202,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     Free(tmps);
   }
 
-  dc->pen_width=1;
+  dc->thick=1;
   dc->color=ROP_MONO|WHITE;
   for (y=snow_y%SNOW_TILE_SIZE-SNOW_TILE_SIZE;y<=h;y+=SNOW_TILE_SIZE)
     for (x=snow_x%SNOW_TILE_SIZE-SNOW_TILE_SIZE;x<=w;x+=SNOW_TILE_SIZE)
@@ -584,8 +584,8 @@ ws_done:
   } catch
     PutExcept;
   SettingsPop;
-  MenuPop;
   CleanUp;
+  MenuPop;
   RegWrite("TempleOS/Wenceslas","F64 best_score=%5.4f;\n",best_score);
 }
 

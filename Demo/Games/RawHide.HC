@@ -102,7 +102,7 @@ U0 RiverMake()
   for (y=MAP_BORDER;y<MAP_HEIGHT-MAP_BORDER;y++) {
     if (!(waterfall_y-9<y<waterfall_y+WATERFALL_HEIGHT+9)) {
       map_dc->color=YELLOW;
-      map_dc->pen_width=r_width[y]+10;
+      map_dc->thick=r_width[y]+10;
       GrPlot3(map_dc,r_x[y]+x.i32[1],y,0);
     }
     x=ClampI64(x+RandI32,-6*U32_MAX,6*U32_MAX);
@@ -111,7 +111,7 @@ U0 RiverMake()
   //Plot water
   for (y=MAP_BORDER;y<MAP_HEIGHT-MAP_BORDER;y++) {
     map_dc->color=BLUE;
-    map_dc->pen_width=r_width[y];
+    map_dc->thick=r_width[y];
     GrPlot3(map_dc,r_x[y],y,0);
   }
 }
@@ -471,7 +471,7 @@ U0 ReInit()
   //Plot fence
   for (i=FENCE_WIDTH;i>0;i-=16)
     Sprite3(map_dc,i,FENCE_HEIGHT,0,$IB,"<9>",BI=9$);
-  map_dc->pen_width=1;
+  map_dc->thick=1;
   map_dc->color=BROWN;
   for (i=0;i<FENCE_HEIGHT-16;i+=16)
     GrLine(map_dc,FENCE_WIDTH-1,i,FENCE_WIDTH-1,i+7);
@@ -479,7 +479,7 @@ U0 ReInit()
   GrLine(map_dc,FENCE_WIDTH,0,FENCE_WIDTH,FENCE_HEIGHT-6);
   RedrawGate;
 
-  map_dc->pen_width=MAP_BORDER;
+  map_dc->thick=MAP_BORDER;
   map_dc->color=RED;
   GrBorder(map_dc,MAP_BORDER/2,MAP_BORDER/2,
 	MAP_WIDTH-(MAP_BORDER+1)/2,MAP_HEIGHT-(MAP_BORDER+1)/2);
@@ -582,9 +582,9 @@ rh_done:
     GetMsg(,,1<<MSG_KEY_UP);
   } catch
     PutExcept;
-  MenuPop;
   SettingsPop;
   CleanUp;
+  MenuPop;
   RegWrite("TempleOS/RawHide","F64 best_score=%5.4f;\n",best_score);
 }
 

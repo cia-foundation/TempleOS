@@ -29,18 +29,13 @@ U0 ODERstPtrs(CMathODE *ode)
 
 public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
 {//Make differential equation ctrl struct. See $LK,"flags",A="MN:ODEF_HAS_MASSES"$.
-
   //The tolerance is not precise.
   //You can min_tolerance and it will
   //dynamically adjust tolerance to utilize
   //the CPU.
-
   I64 s=n*sizeof(F64);
-  CMathODE *ode=MAlloc(sizeof(CMathODE));
-
-  ode->t=0;
+  CMathODE *ode=CAlloc(sizeof(CMathODE));
   ode->t_scale=1.0;
-  ode->base_t=0;
   ode->flags=flags;
   ode->n_internal=ode->n=n;
   ode->h=1e-6;
@@ -48,22 +43,38 @@ public CMathODE *ODENew(I64 n,F64 max_tolerance=1e-6,I64 flags=0)
   ode->h_max=1e32;
   ode->max_tolerance=ode->min_tolerance=ode->tolerance_internal=max_tolerance;
   ode->win_task=ode->mem_task=Fs;
-  ode->derivative=NULL;
   QueInit(&ode->next_mass);
   QueInit(&ode->next_spring);
-  ode->acceleration_limit=ode->drag_v=ode->drag_v2=ode->drag_v3=0;
-
   ode->state=CAlloc(s);
   ode->array_base=MAlloc(12*s);
   ODERstPtrs(ode);
   return ode;
 }
 
+
+public Bool ODEPause(CMathODE *ode,Bool val=ON)
+{//Pause ODE.
+  Bool res;
+  if (!ode) return OFF;
+  res=LBEqu(&ode->flags,ODEf_PAUSED,val);
+  if (val)
+    while (Bt(&ode->flags,ODEf_BUSY))
+      Yield;
+  return res;
+}
+
 public U0 ODEDel(CMathODE *ode)
 {//Free ODE node, but not masses or springs.
+  I64 i;
   if (!ode) return;
+  ODEPause(ode);
   Free(ode->state);
   Free(ode->array_base);
+  if (ode->slave_tasks) {
+    for (i=0;i<mp_cnt;i++)
+      Kill(ode->slave_tasks[i]);
+    Free(ode->slave_tasks);
+  }
   Free(ode);
 }
 
@@ -319,6 +330,53 @@ U0 ODEApplyAccelerationLimit(CMathODE *ode)
   }
 }
 
+U0 ODEMPTask(CMathODE *ode)
+{
+  while (TRUE) {
+    while (!Bt(&ode->mp_not_done_flags,Gs->num))
+      Yield;
+    if (ode->mp_derive)
+      (*ode->mp_derive)(ode,ode->mp_t,
+	    Gs->num,ode->mp_state,ode->mp_DstateDt);
+    LBtr(&ode->mp_not_done_flags,Gs->num);
+  }
+}
+
+U0 ODEMPWake(CMathODE *ode)
+{
+  I64 i;
+  if (!ode->slave_tasks) {
+    ode->slave_tasks=CAlloc(mp_cnt*sizeof(CTask *));
+    for (i=0;i<mp_cnt;i++)
+      ode->slave_tasks[i]=Spawn(&ODEMPTask,ode,"ODE Slave",i);
+  }
+  for (i=0;i<mp_cnt;i++) {
+    Suspend(ode->slave_tasks[i],FALSE);
+    MPInt(I_WAKE,i);
+  }
+}
+
+U0 ODEMPSleep(CMathODE *ode)
+{
+  I64 i;
+  if (ode->slave_tasks) {
+    while (ode->mp_not_done_flags)
+      Yield;
+    for (i=0;i<mp_cnt;i++)
+      Suspend(ode->slave_tasks[i]);
+  }
+}
+
+U0 ODECallMPDerivative(CMathODE *ode,F64 t,F64 *state,F64 *DstateDt)
+{
+  ode->mp_t=t;
+  ode->mp_state=state;
+  ode->mp_DstateDt=DstateDt;
+  ode->mp_not_done_flags=1<<mp_cnt-1;
+  do Yield;
+  while (ode->mp_not_done_flags);
+}
+
 U0 ODECallDerivative(CMathODE *ode,F64 t,F64 *state,F64 *DstateDt)
 {
   CMass *tmpm;
@@ -334,7 +392,10 @@ U0 ODECallDerivative(CMathODE *ode,F64 t,F64 *state,F64 *DstateDt)
     }
     ODECalcSprings(ode);
     ODECalcDrag(ode);
-    (*ode->derivative)(ode,t,state,DstateDt);
+    if (ode->mp_derive)
+      ODECallMPDerivative(ode,t,state,DstateDt);
+    if (ode->derive)
+      (*ode->derive)(ode,t,state,DstateDt);
     tmpm=ode->next_mass;
     while (tmpm!=&ode->next_mass) {
       if (!(tmpm->flags&MSF_INACTIVE)) {
@@ -347,8 +408,12 @@ U0 ODECallDerivative(CMathODE *ode,F64 t,F64 *state,F64 *DstateDt)
       tmpm=tmpm->next;
     }
     ODEApplyAccelerationLimit(ode);
-  } else
-    (*ode->derivative)(ode,t,state,DstateDt);
+  } else {
+    if (ode->mp_derive)
+      ODECallMPDerivative(ode,t,state,DstateDt);
+    if (ode->derive)
+      (*ode->derive)(ode,t,state,DstateDt);
+  }
 }
 
 U0 ODEOneStep(CMathODE *ode)
@@ -453,6 +518,7 @@ U0 ODECashKarp(CMathODE *ode)
     tmpstate[i]=state[i]+h*(ODEb61*DstateDt[i]+
 	  ODEb62*ak2[i]+ODEb63*ak3[i]+ODEb64*ak4[i]+ODEb65*ak5[i]);
   ODECallDerivative(ode,ode->t+ODEa6*h,tmpstate,ak6);
+
   for (i=0;i<n;i++)
     outstate[i]=state[i]+h*(ODEc1*DstateDt[i]+
 	  ODEc3*ak3[i]+ODEc4*ak4[i]+ODEc6*ak6[i]);
@@ -499,7 +565,7 @@ U0 ODERK5OneStep(CMathODE *ode)
 F64 ode_alloced_factor=0.75;
 
 U0 ODEsUpdate(CTask *task)
-{/* This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScrn.HC,ODEsUpdate"$ on a continuous
+{/* This routine is called by the $LK,"window mgr",A="FF:::/Adam/Gr/GrScrn.HC,ODEsUpdate"$on a continuous
 basis to allow real-time simulation.  It is intended
 to provide ress good enough for games.  It uses a runge-kutta
 integrator which is a better algorithm than doing it with Euler.
@@ -537,41 +603,54 @@ it has a timeout.
       t_desired=ode->t_scale*d+t_initial;
       if (ode->flags&ODEF_PAUSED)
 	ode->base_t+=t_desired-ode->t; //Slip
-      else if (ode->derivative) {
-	ODEState2Internal(ode);
-	MemCpy(ode->initial_state,ode->state_internal,
-	      ode->n_internal*sizeof(F64));
-	while (ode->t<t_desired) {
-	  ode->h_max=t_desired-ode->t;
-	  ODECallDerivative(ode,ode->t,ode->state_internal,ode->DstateDt);
-	  for (i=0;i<ode->n_internal;i++)
-	    ode->state_scale[i]=Abs(ode->state_internal[i])+
-		  Abs(ode->DstateDt[i]*ode->h)+ode->tolerance_internal;
-	  ODERK5OneStep(ode);
-	  if (tS>timeout_time) {
-	    ode->base_t+=t_desired-ode->t; //Slip
-	    goto ode_done;
-
-	  }
-	}
-
-	//Interpolate if end time was not exact.
-	if (ode->t!=t_desired) {
-	  if (interpolation=ode->t-t_initial) {
-	    interpolation=(t_desired-t_initial)/interpolation;
-	    if (interpolation!=1.0)
+      else {
+	ode->flags|=ODEF_BUSY;
+	if (ode->flags&ODEF_PAUSED)
+	  ode->base_t+=t_desired-ode->t; //Slip
+	else {
+	  if (ode->derive || ode->mp_derive) {
+	    if (ode->mp_derive)
+	      ODEMPWake(ode);
+	    ODEState2Internal(ode);
+	    MemCpy(ode->initial_state,ode->state_internal,
+		  ode->n_internal*sizeof(F64));
+	    while (ode->t<t_desired) {
+	      ode->h_max=t_desired-ode->t;
+	      ODECallDerivative(ode,ode->t,ode->state_internal,ode->DstateDt);
 	      for (i=0;i<ode->n_internal;i++)
-		ode->state_internal[i]=(ode->state_internal[i]-
-		      ode->initial_state[i])*interpolation+
-		      ode->initial_state[i];
-	  }
-	  ode->t=t_desired;
-	}
-ode_done:
-	ODEInternal2State(ode);
+		ode->state_scale[i]=Abs(ode->state_internal[i])+
+		      Abs(ode->DstateDt[i]*ode->h)+ode->tolerance_internal;
+	      ODERK5OneStep(ode);
+	      if (tS>timeout_time) {
+		ode->base_t+=t_desired-ode->t; //Slip
+		goto ode_done;
 
-	//Convenience call to set vals
-	ODECallDerivative(ode,ode->t,ode->state_internal,ode->DstateDt);
+	      }
+	    }
+
+	    //Interpolate if end time was not exact.
+	    if (ode->t!=t_desired) {
+	      if (interpolation=ode->t-t_initial) {
+		interpolation=(t_desired-t_initial)/interpolation;
+		if (interpolation!=1.0)
+		  for (i=0;i<ode->n_internal;i++)
+		    ode->state_internal[i]=(ode->state_internal[i]-
+			  ode->initial_state[i])*interpolation+
+			  ode->initial_state[i];
+	      }
+	      ode->t=t_desired;
+	    }
+ode_done:
+	    ODEInternal2State(ode);
+
+	    //Convenience call to set vals
+	    ODECallDerivative(ode,ode->t,ode->state_internal,ode->DstateDt);
+
+	    if (ode->mp_derive)
+	      ODEMPSleep(ode);
+	  }
+	}
+	ode->flags&=~ODEF_BUSY;
       }
       ode->base_t+=(1.0-ode->t_scale)*d;
       ode=ode->next;
@@ -592,7 +671,7 @@ ode_done:
 
     ode=task->next_ode;
     while (ode!=&task->next_ode) {
-      if (!(ode->flags&ODEF_PAUSED) && ode->derivative) {
+      if (!(ode->flags&ODEF_PAUSED) && ode->derive) {
 	if (ode->min_tolerance!=ode->max_tolerance) {
 	  if (d>0)
 	    ode->tolerance_internal*=10.0`d;

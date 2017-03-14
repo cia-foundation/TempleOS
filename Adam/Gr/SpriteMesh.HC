@@ -800,7 +800,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   else
     dc->color=ROP_XOR+TRANSPARENT;
   GrPrint(dc,0,0,"%6.3f%% (%d,%d,%d)",e->view_scale*100,x,y,z);
-  dc->pen_width=1;
+  dc->thick=1;
   dc->color&=0xF;
   if (Blink(10))
     dc->color^=0xF;
@@ -808,7 +808,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   if (e->sel_rect) {
     dc->flags&=~DCF_TRANSFORMATION;
-    dc->pen_width=1;
+    dc->thick=1;
     if (Blink)
       dc->color=ROPF_DITHER+RED<<16+WHITE;
     else

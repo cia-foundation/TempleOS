@@ -3,7 +3,7 @@ CDC *img1=DCNew(64,64);
 CDC *img2=DCNew(512,512);
 
 img1->color=COLOR_MONO;
-img1->pen_width=3;
+img1->thick=3;
 GrCircle(img1,30,30,20);
 GrFloodFill3(img1,30,30,0,TRUE);
 GrLine3(img1,60,0,0,0,60,0);
@@ -13,7 +13,7 @@ img2->color=RED;
 img2->brush=img1;
 GrCircle(img2,256-30,256-30,128,67);
 img2->color=BLUE;
-img2->pen_width=6;
+img2->thick=6;
 img2->brush=NULL;
 GrLine3(img2,128,128,0,256+128,256+128,0);
 GrLine3(img2,256+128,128,0,128,256+128,0);

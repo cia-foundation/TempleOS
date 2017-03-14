@@ -844,9 +844,9 @@ nv_done:
     GetMsg(,,1<<MSG_KEY_UP);
   } catch
     PutExcept;
-  MenuPop;
   SettingsPop;
   CleanUp;
+  MenuPop;
 }
 
 FlatTops;

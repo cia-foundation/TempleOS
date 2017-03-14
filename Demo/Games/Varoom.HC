@@ -313,7 +313,7 @@ U0 InitTrack()
   GrRect(track_map,0,0,track_map->width,track_map->height);
   tmpt=track_head.next;
   track_map->color=YELLOW;
-  track_map->pen_width=3;
+  track_map->thick=3;
   while (tmpt!=&track_head) {
     GrPlot3(track_map,track_map->width-(tmpt->x-t_minx)>>MAP_BITS,
 	  (tmpt->z-t_minz)>>MAP_BITS,0);
@@ -473,7 +473,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   //Map
   GrBlot(dc,w-track_map->width,h-track_map->height,track_map);
 
-  dc->pen_width=2;
+  dc->thick=2;
   for (i=0;i<CARS_NUM;i++) {
     if (i)
       dc->color=LTPURPLE;
@@ -571,7 +571,7 @@ U0 InitBushes()
   Bush *tmpb;
   I64 i,j,x,z;
   track_map->color=LTGREEN;
-  track_map->pen_width=1;
+  track_map->thick=1;
   for (i=0;i<BUSHES_NUM;i++) {
     tmpb=&b[i];
 
@@ -694,8 +694,8 @@ U0 Varoom()
 vr_done: //Don't goto out of try
   } catch
     PutExcept;
-  CleanUp;
   SettingsPop;
+  CleanUp;
   MenuPop;
   RegWrite("TempleOS/Varoom","F64 best_score=%5.4f;\n",best_score);
 }

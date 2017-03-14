@@ -48,7 +48,7 @@ U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
   LogStruct *tmplg;
   CDateStruct ds;
   I64 i;
-  "%Q\n",name;
+  "%$$Q\n",name;
   while (doc_e!=doc) {
     if (doc_e->type_u8==DOCT_TEXT) {
       tmplg=CAlloc(sizeof(LogStruct));
@@ -124,7 +124,7 @@ U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
 	  throw;
       } catch {
 	Fs->catch_except=TRUE;
-	"%Q\n",doc_e->tag;
+	"%$$Q\n",doc_e->tag;
 	LogStructDel(tmplg);
       }
     }
@@ -317,7 +317,7 @@ U0 LinkTreeTraverse(LinkStruct *root)
 {
   if (root) {
     LinkTreeTraverse(root->left);
-    "%3d:%Q\n",root->cnt,root->link;
+    "%3d:%$$Q\n",root->cnt,root->link;
     LinkTreeTraverse(root->right);
   }
 }
@@ -335,7 +335,7 @@ U0 FileTreeTraverse(LinkStruct *root)
 {
   if (root) {
     FileTreeTraverse(root->left);
-    "%3d:%Q\n",root->cnt,root->file;
+    "%3d:%$$Q\n",root->cnt,root->file;
     FileTreeTraverse(root->right);
   }
 }
@@ -378,8 +378,11 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
 
   "\n\nDownloads of /TempleOSCD.ISO\n";
   for (i=start;i<=end;i+=1<<32)
-    "%D:%5d%5d\n",i,day_dup_cnts[(i+local_time_offset)>>32-days_start],
-	  day_cnts[(i+local_time_offset)>>32-days_start];
+    "%D  Dups:%5d  Total:%5d  Uniques:%5d\n",i,
+	  day_dup_cnts[(i+local_time_offset)>>32-days_start],
+	  day_cnts[(i+local_time_offset)>>32-days_start],
+	  day_cnts[(i+local_time_offset)>>32-days_start]-
+	  day_dup_cnts[(i+local_time_offset)>>32-days_start];
 
   "\n\nDownloads of /TempleOSCD.ISO\n"
 	"'-' is a dup.  '+' is not a dup.\n";
@@ -396,7 +399,7 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
       '+';
     '\n';
   }
-  "Total:%d  Dups:%d\n",cnt,dups;
+  "Total:%d  Dups:%d  Uniques:%d\n",cnt,dups,cnt-dups;
 
   "\n\nDownloads of /TempleOSCD.ISO\n";
   LinkTreeTraverse(link_root);
@@ -463,8 +466,11 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
   "\n\nHits on /index.html\n"
 	"'-' is a dup.  '+' is not a dup.\n";
   for (i=start;i<=end;i+=1<<32)
-    "%D:%5d%5d\n",i,day_dup_cnts[(i+local_time_offset)>>32-days_start],
-	  day_cnts[(i+local_time_offset)>>32-days_start];
+    "%D  Dups:%5d  Total:%5d  Uniques:%5d\n",i,
+	  day_dup_cnts[(i+local_time_offset)>>32-days_start],
+	  day_cnts[(i+local_time_offset)>>32-days_start],
+	  day_cnts[(i+local_time_offset)>>32-days_start]-
+	  day_dup_cnts[(i+local_time_offset)>>32-days_start];
 
   "\n\nHits on /index.html\n";
   if (hours_end-hours_start>=HOURS_MAX)
@@ -480,7 +486,7 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
       '+';
     '\n';
   }
-  "Total:%d  Dups:%d\n",cnt,dups;
+  "Total:%d  Dups:%d  Uniques:%d\n",cnt,dups,cnt-dups;
 
   "\n\nHits on /index.html\n";
   LinkTreeTraverse(link_root);

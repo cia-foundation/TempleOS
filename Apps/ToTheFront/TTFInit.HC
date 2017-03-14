@@ -150,10 +150,10 @@ U0 DrawRivers()
 		rivers[r][c]) {
 	    RowCol2XY(&x2,&y2,r,c);
 	    map_dc->color=LTBLUE;
-	    map_dc->pen_width=4;
+	    map_dc->thick=4;
 	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
 	    map_dc->color=BLUE;
-	    map_dc->pen_width=2;
+	    map_dc->thick=2;
 	    GrLine3(map_dc,x1,y1,0,x2,y2,0);
 	  }
 	}
@@ -166,7 +166,7 @@ U0 DrawRoads()
   I64 i,j,k,r,c;
   F64 x1,y1,x2,y2;
   map_dc->color=RED;
-  map_dc->pen_width=3;
+  map_dc->thick=3;
   for (j=0;j<map_rows;j++)
     for (i=0;i<map_cols;i++) {
       if (roads[j][i]) {

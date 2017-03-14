@@ -101,7 +101,6 @@ U0 PoleZeros()
 	"Drag the poles and zeros with left mouse.\n"
 	"Hold right mouse for phase plot.\n"
 	);
-  Refresh;
 
   SettingsPush; //See $LK,"SettingsPush",A="MN:SettingsPush"$
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS-WIF_SELF_BORDER;

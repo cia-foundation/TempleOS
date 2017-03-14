@@ -3,7 +3,7 @@ I64 glbl_r[4][4];
 U0 DrawIt(CTask *,CDC *dc)
 {
   I64 *old_r=dc->r;
-  dc->pen_width=2;
+  dc->thick=2;
   dc->color=RED;
   dc->x=200;
   dc->y=200;

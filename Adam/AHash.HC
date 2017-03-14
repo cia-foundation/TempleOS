@@ -157,7 +157,7 @@ U8 *idx=NULL,CDoc *doc=NULL)
   CHashGeneric *ptr;
   CWho *lst;
   I64 cnt,i,j,k,f=0;
-  U8 buf[512],*st,*last_idx=StrNew(""),*cur_idx,*comment;
+  U8 buf[512],*last_idx=StrNew(""),*cur_idx,*comment;
   Bool recurse,publics,map;
   CTask *task;
 
@@ -267,13 +267,11 @@ U8 *idx=NULL,CDoc *doc=NULL)
 
       if (!idx) {
 	if (ptr->type & HTT_DEFINE_STR) {
-	  st=MStrUtil(ptr(CHashDefineStr *)->data,SUF_SAFE_DOLLAR);
 	  j=ptr(CHashDefineStr *)->cnt;
 	  if (j==-1)
-	    StrPrint(buf,"%-10tQ   ",st);
+	    StrPrint(buf,"%-10t$$Q   ",ptr(CHashDefineStr *)->data);
 	  else
-	    StrPrint(buf,"%-10tQ %02X",st,j);
-	  Free(st);
+	    StrPrint(buf,"%-10t$$Q %02X",ptr(CHashDefineStr *)->data,j);
 	} else if (ptr->type & HTT_GLBL_VAR)
 	  StrPrint(buf,"%010X   ",ptr(CHashGlblVar *)->data_addr);
 	else

@@ -1,7 +1,7 @@
 CMathODE *SpanNew()
 {
   CMathODE *ode=ODENew(0,1e-4,ODEF_HAS_MASSES|ODEF_PAUSED);
-  ode->derivative=&MyDerivative;
+  ode->derive=&MyDerivative;
   ode->drag_v2=0.002;
   ode->drag_v3=0.00001;
   ode->acceleration_limit=5e3;

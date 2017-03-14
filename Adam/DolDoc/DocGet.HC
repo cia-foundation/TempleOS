@@ -51,6 +51,12 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
       i+=StrLen(src);
     } else if (doc_e2->type_u8==DOCT_TAB)
       i++;
+    else if (doc_e2->type_u8==DOCT_SHIFTED_X ||
+	  doc_e2->type_u8==DOCT_SHIFTED_Y) {
+      if (doc_e2->attr<0)
+	i++;
+      i+=6; //$$SY,3$$
+    }
     doc_e2=doc_e2->next;
   }
   res=MAlloc(i+1);
@@ -63,6 +69,19 @@ public U8 *DocScanLine(CDoc *doc,CDocEntry *doc_e,
 	*dst++=*src++;
     } else if (doc_e->type_u8==DOCT_TAB)
       *dst++='\t';
+    else if (doc_e->type_u8==DOCT_SHIFTED_Y) {
+      *dst(U32 *)++='$$SY,';
+      if (doc_e->attr<0)
+	*dst++='-';
+      *dst++='0'+AbsI64(doc_e->attr); //Supposedly -7 to 7 (single digit)
+      *dst++='$$';
+    } else if (doc_e->type_u8==DOCT_SHIFTED_X) {
+      *dst(U32 *)++='$$SX,';
+      if (doc_e->attr<0)
+	*dst++='-';
+      *dst++='0'+AbsI64(doc_e->attr); //Supposedly -7 to 7 (single digit)
+      *dst++='$$';
+    }
     if (doc_e==doc->cur_entry && cur_col)
       *cur_col=start-res+doc->cur_col;
     doc_e=doc_e->next;

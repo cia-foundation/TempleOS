@@ -331,3 +331,32 @@ public Bool Type(U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to command line.
   return DocType(,filename,trailing_new_lines);
 }
+
+#help_index "DolDoc/File"
+
+public U8 *DocLineRead(U8 *filename,I64 line,CTask *mem_task=NULL)
+{//Extract line from stored doc file. (Slow.)
+  U8 *res=NULL;
+  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
+  if (DocGoToLine(doc,line) && doc->cur_entry->type_u8==DOCT_TEXT)
+    res=StrNew(doc->cur_entry->tag,mem_task);
+  DocDel(doc);
+  return res;
+}
+
+public U8 *DocLineWrite(U8 *filename,I64 line,U8 *st)
+{//Write line to stored doc file. (Slow.)
+  U8 *res=NULL;
+  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
+  if (DocGoToLine(doc,line)) {
+    if (doc->cur_entry->type_u8==DOCT_TEXT) {
+      Free(doc->cur_entry->tag);
+      doc->cur_entry->tag=StrNew(st);
+    } else
+      DocPrint(doc,"%s",st);
+    DocTop(doc);
+    DocWrite(doc);
+  }
+  DocDel(doc);
+  return res;
+}

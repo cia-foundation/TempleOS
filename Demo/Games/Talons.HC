@@ -462,14 +462,14 @@ U0 ClawDraw(CDC *dc,I64 x1,I64 y1,I64 x2,I64 y2,I64 w,I64 segments,Bool talon)
 {
   I64 i,j;
   for (i=0,j=segments;i<segments;i++,j--) {
-    dc->pen_width=w;
+    dc->thick=w;
     dc->color=BLACK;
     GrLine3(dc,
 	j*x1/segments+i*x2/segments,
 	j*y1/segments+i*y2/segments,0,
 	(j-1)*x1/segments+(i+1)*x2/segments,
 	(j-1)*y1/segments+(i+1)*y2/segments,0);
-    dc->pen_width=w-2;
+    dc->thick=w-2;
     dc->color=YELLOW;
     GrLine3(dc,
 	j*x1/segments+i*x2/segments,
@@ -907,7 +907,7 @@ U0 Core0Talons()
     }
   }
 
-  dc->pen_width=2;
+  dc->thick=2;
   if (game_tf && fish_left)
     dc->color=WHITE;
   else
@@ -1226,8 +1226,8 @@ U0 Talons()
   SettingsPop;
   CleanUp;
   PostCleanUp;
-  RegWrite("TempleOS/Talons","F64 best_score=%5.4f;\n",best_score);
   MenuPop;
+  RegWrite("TempleOS/Talons","F64 best_score=%5.4f;\n",best_score);
 }
 
 Talons;

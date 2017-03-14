@@ -33,7 +33,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   while (tmps!=&ode->next_spring) {
     if (!(tmps->flags&SSF_INACTIVE)) {
       dc->color=tmps->color;
-      dc->pen_width=tmps->pen_width;
+      dc->thick=tmps->thick;
       GrLine3(dc,tmps->end1->x,tmps->end1->y,0,
 	    tmps->end2->x,tmps->end2->y,0);
     }
@@ -42,7 +42,7 @@ U0 DrawIt(CTask *task,CDC *dc)
 
   if (cursor_mass) {
     dc->color=RED;
-    dc->pen_width=2;
+    dc->thick=2;
     GrLine3(dc,ms.pos.x-task->pix_left-task->scroll_x,
 	  ms.pos.y-task->pix_top-task->scroll_y,0,
 	  cursor_mass->x,cursor_mass->y,0);
@@ -137,15 +137,15 @@ U0 DrawSpring(CDC *dc,MyMass *tmpm,I64 x,I64 y)
   switch (mode_bttn.state) {
     case MD_CONCRETE:
       dc->color=LTGRAY;
-      dc->pen_width=2;
+      dc->thick=2;
       break;
     case MD_STEEL:
       dc->color=DKGRAY;
-      dc->pen_width=2;
+      dc->thick=2;
       break;
     case MD_WIRE:
       dc->color=RED;
-      dc->pen_width=1;
+      dc->thick=1;
       break;
   }
   GrLine3(dc,tmpm->x,tmpm->y,0,x,y,0);
@@ -164,7 +164,7 @@ U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
       tmps->base_cost		      = 0.30*COST_SCALE;
       NullSpring(tmps,1.0);
       tmps->color=LTGRAY;
-      tmps->pen_width=2;
+      tmps->thick=2;
       break;
     case MD_STEEL:
       tmps->base_const	      = 1.00*SPRING_SCALE;
@@ -173,7 +173,7 @@ U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
       tmps->base_cost		      = 1.00*COST_SCALE;
       NullSpring(tmps,1.0);
       tmps->color=DKGRAY;
-      tmps->pen_width=2;
+      tmps->thick=2;
       break;
     case MD_WIRE:
       tmps->base_const	      = 0.25*SPRING_SCALE;
@@ -182,7 +182,7 @@ U0 PlaceSpring(MyMass *tmpm1,MyMass *tmpm2)
       tmps->base_cost		      = 0.10*COST_SCALE;
       NullSpring(tmps,WIRE_PERCENT);
       tmps->color=RED;
-      tmps->pen_width=1;
+      tmps->thick=1;
       tmps->flags|=SSF_NO_COMPRESSION;
       break;
   }
@@ -215,9 +215,9 @@ U0 AnimateTask(SpanAnimateStruct *a)
 	  a->saved_ode=SpanSave(ode);
 	}
 	a->start_wall_t=tS;
-	ode->flags&=~ODEF_PAUSED;
+	ODEPause(ode,OFF);
       } else {
-	ode->flags|=ODEF_PAUSED;
+	ODEPause(ode);
 	a->elapsed_t+=tS-a->start_wall_t;
       }
       old_run=run_bttn.state;

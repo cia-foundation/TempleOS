@@ -1317,7 +1317,7 @@ U0 InitLevel()
     PlaceShip(ST_ENEMY1);
   PlaceShip(ST_ENEMY2);
   show_level_msg=TRUE;
-  ode->flags|=ODEF_PAUSED;
+  ODEPause(ode);
 }
 
 U0 Init()
@@ -1386,7 +1386,7 @@ U0 XCaliber()
   Fs->draw_it=&DrawIt;
   do {
     ode=ODENew(0,0.01,ODEF_HAS_MASSES);
-    ode->derivative=&MyDerivative;
+    ode->derive=&MyDerivative;
     ode->min_tolerance=1e-9;
     ode->drag_v3=0.00001;
     Init;
@@ -1492,7 +1492,7 @@ U0 XCaliber()
 	ch=GetKey(&sc);
 	if (ch=='\n')
 	  ch=0;
-	ode->flags&=~ODEF_PAUSED;
+	ODEPause(ode,OFF);
 	show_level_msg=FALSE;
       } else if (game_over) {
 	ch=ScanChar;

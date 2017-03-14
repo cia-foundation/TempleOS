@@ -2,7 +2,7 @@
 
 Option(OPTf_WARN_HEADER_MISMATCH,OFF);
 public Bool GrPlot0(CDC *dc=gr.dc,I64 x,I64 y)
-{//2D. No clipping or transformation or pen width.
+{//2D. No clipping or transformation or thick.
   U8 *dst;
   I32 *db;
   I64 d,dist;
@@ -858,19 +858,36 @@ public I64 GrPutChar(CDC *dc=gr.dc,I64 x,I64 y,U8 ch)
 
 I64 GrPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
 {//Use $LK,"GrPrint",A="MN:GrPrint"$()
-  I64 x0,ch,res;
+  I64 x0,sx=0,sy=0,res;
   if (!_s) return 0;
   x0=x;
   res=0;
-  while (ch=*_s++) {
-    if (ch=='\n') {
+  while (*_s) {
+    if (*_s=='\n') {
       x=x0;
       y+=FONT_HEIGHT;
-    } else if (ch=='\t')
+      _s++;
+    } else if (*_s=='\t') {
       x=x0+CeilU64(x-x0+FONT_WIDTH,8*FONT_WIDTH);
-    else {
-      res+=GrPutChar(dc,x,y,ch);
+      _s++;
+    } else if (*_s(U32 *)=='$$SY,') {
+      if (_s[4]=='-') {
+	_s++;
+	sy='0'-_s[4];
+      } else
+	sy=_s[4]-'0';
+      _s+=6;
+    } else if (*_s(U32 *)=='$$SX,') {
+      if (_s[4]=='-') {
+	_s++;
+	sx='0'-_s[4];
+      } else
+	sx=_s[4]-'0';
+      _s+=6;
+    } else {
+      res+=GrPutChar(dc,x+sx,y+sy,*_s);
       x+=FONT_WIDTH;
+      _s++;
     }
   }
   return res;
@@ -878,20 +895,36 @@ I64 GrPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
 
 I64 GrVPutS(CDC *dc=gr.dc,I64 x,I64 y,U8 *_s)
 {//Vertical Text.  Use $LK,"GrVPrint",A="MN:GrVPrint"$()
-  I64 y0,res;
+  I64 y0,sx=0,sy=0,res;
   U8 buf[2];
   if (!_s) return 0;
   y0=y;
   res=0;
-
   buf[1]=0;
-  while (*buf=*_s++) {
-    if (*buf=='\n') {
+  while (*_s) {
+    if (*_s=='\n') {
       y=y0;
       x+=FONT_WIDTH;
-    } else if (*buf=='\t')
+      _s++;
+    } else if (*_s=='\t') {
       y=y0+CeilU64(y-y0+FONT_HEIGHT,8*FONT_HEIGHT);
-    else {
+      _s++;
+    } else if (*_s(U32 *)=='$$SY,') {
+      if (_s[4]=='-') {
+	_s++;
+	sx='0'-_s[4];
+      } else
+	sx=_s[4]-'0';
+      _s+=6;
+    } else if (*_s(U32 *)=='$$SX,') {
+      if (_s[4]=='-') {
+	_s++;
+	sy='0'-_s[4];
+      } else
+	sy=_s[4]-'0';
+      _s+=6;
+    } else {
+      *buf=*_s++;
       res+=GrPutS(dc,x,y,buf);
       y+=FONT_HEIGHT;
     }
@@ -1629,7 +1662,7 @@ gr_done:
 }
 
 public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
-{//3D. No transformation or pen width.
+{//3D. No transformation or thick.
 //Returns cnt of pixs changed
   //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   I64 dist,dx,dz,z,res=0,i,j,d;
@@ -1798,7 +1831,7 @@ gr_done:
 }
 
 public I64 GrVLine(CDC *dc=gr.dc,I64 x,I64 y1,I64 y2,I64 z1=0,I64 z2=0)
-{//3D. No transformation or pen width.
+{//3D. No transformation or thick.
 //Returns cnt of pixs changed
   //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   I64 dist,dy,dz,z,res=0,i,j,d;

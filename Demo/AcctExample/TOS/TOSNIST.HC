@@ -47,19 +47,22 @@ U0 NISTBeaconURL(I64 timestamp)
 
 U0 NISTGodIns1()
 {
-  tos_type=PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
-	"Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0Painting1000\0"
-	"Metallica\0");
+  tos_type=PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0Words1000\0"
+	"Words10k\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
+	"Painting1000\0Poems100\0Metallica\0");
   switch (tos_type) {
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("LinuxWords");	break;
     case: tos_timestamp=GodHeaderIns("HappyWords");	break;
+    case: tos_timestamp=GodHeaderIns("Words1000");	break;
+    case: tos_timestamp=GodHeaderIns("Words10k");	break;
     case: tos_timestamp=GodHeaderIns("Bible");		break;
     case: tos_timestamp=GodHeaderIns("BookPick");	break;
     case: tos_timestamp=GodHeaderIns("Doodle");		break;
     case: tos_timestamp=GodHeaderIns("Movie100");	break;
     case: tos_timestamp=GodHeaderIns("Painting100");	break;
     case: tos_timestamp=GodHeaderIns("Painting1000");	break;
+    case: tos_timestamp=GodHeaderIns("Poems100");	break;
     case: tos_timestamp=GodHeaderIns("Metallica");	break;
   }
   Once("tos_timestamp=%d;\ntos_type=%d;\n"
@@ -83,14 +86,26 @@ U0 NISTGodIns2()
       if (DocForm(gm(CHexWordForm *))) {
 	NISTBeaconURL(gm->timestamp);
 	Adam("GodInit(\"~/Sup1/Sup1Words/LinuxDict.TXT*\");");
-	GodWordBatch(gm);
+	GodWordBatch(gm,16,5);
       }
       break;
     case:
       if (DocForm(gm(CHexWordForm *))) {
 	NISTBeaconURL(gm->timestamp);
 	Adam("GodInit(\"~/Sup1/Sup1Words/HappyWords.TXT*\");");
-	GodWordBatch(gm);
+	GodWordBatch(gm,16,5);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodWordBatch(gm,10,3);
+      }
+      break;
+    case:
+      if (DocForm(gm(CHexWordForm *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodWordBatch(gm,10,4);
       }
       break;
     case:
@@ -142,6 +157,14 @@ U0 NISTGodIns2()
 	      "http://en.most-famous-paintings.com/MostFamousPaintings."
 	      "nsf/ListOfTop1000MostPopularPainting",
 	      gm->rnd0,3,"~/Sup1/Sup1Blog/Paintings1000.DD.Z");
+      }
+      break;
+    case:
+      if (DocForm(gm(CPoems100Form *))) {
+	NISTBeaconURL(gm->timestamp);
+	GodWebIdx("Top 100 Poems",
+	      "http://100.best-poems.net/top-100-best-poems.html",
+	      gm->rnd0,2,"~/Sup1/Sup1Blog/Poems100.DD.Z");
       }
       break;
     case:

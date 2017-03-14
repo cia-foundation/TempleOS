@@ -51,8 +51,8 @@ U0 SpriteElem2Code(CDoc *doc,CSprite *tmpg)
     case SPT_CIRCLE:
       DocPrint(doc,"{(%d,%d):%d}",tmpg->pr.x1,tmpg->pr.y1,tmpg->pr.radius);
       break;
-    case SPT_WIDTH:
-      DocPrint(doc,"{%d}",tmpg->w.width);
+    case SPT_THICK:
+      DocPrint(doc,"{%d}",tmpg->t.thick);
       break;
     case SPT_ELLIPSE:
       DocPrint(doc,"{(%d,%d):(%d,%d),%0.4f}",tmpg->pwha.x1,tmpg->pwha.y1,
@@ -280,10 +280,10 @@ CSprite *Code2SpriteElem(CCmpCtrl *cc,I64 type)
 	else
 	  g.type=SPT_FLOOD_FILL;
 	break;
-      case SPT_WIDTH:
+      case SPT_THICK:
 	Lex(cc); //Skip {
-	g.w.width=LexExpressionI64(cc);
-	g.type=SPT_WIDTH;
+	g.t.thick=LexExpressionI64(cc);
+	g.type=SPT_THICK;
 	break;
       case SPT_CIRCLE:
 	Lex(cc); //Skip {

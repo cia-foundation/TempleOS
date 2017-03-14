@@ -6,12 +6,13 @@
 #define GSRC_NIST_BEACON	0
 #define GSRC_HOTBITS		1
 #define GSRC_ANU_NIST		2
-#define GSRC_RANDOM_ORG		3
-#define GSRC_RANDOM_NUMBERS_INFO 4
-#define GSRC_PASSWORD		5
-#define GSRC_GENERATE_DATA	6
-#define GSRC_VIRTUAL_NOTARY	7
-#define GSRC_TIMER		8
+#define GSRC_GOOGLE		3
+#define GSRC_RANDOM_ORG		4
+#define GSRC_RANDOM_NUMBERS_INFO 5
+#define GSRC_PASSWORD		6
+#define GSRC_GENERATE_DATA	7
+#define GSRC_VIRTUAL_NOTARY	8
+#define GSRC_TIMER		9
 
 #define GBP_SHORT	0
 #define GBP_MEDIUM	1
@@ -166,6 +167,25 @@ class CPaintings1000Form
   I64	cert;
 };
 
+class CPoems100Form
+{
+  I64	timestamp;
+  U8	rnd0[512]	fmtstr "$$DA-P,"
+	"A=\"Poems #00-99 (2 Decimal Digits from Hex):%s\"$$\n";
+  U8	rnd1[512];
+  U8	rnd2[512];
+  U8	rnd3[512];
+  U8	rnd4[512];
+  U8	rnd5[512];
+  U8	rnd6[512];
+  U8	rnd7[512];
+  U8	rnd8[512];
+  U8	rnd9[512];
+  U8	rndA[512];
+  U8	rndB[512];
+  I64	cert;
+};
+
 class CMetallicaForm
 {
   I64	timestamp;
@@ -258,7 +278,7 @@ extern I64 GodHeaderIns(U8 *type=NULL);
 extern U0 GodVideoDigits(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename);
 extern U0 GodVideoU32(U32 rand_u32,U8 *filename);
 extern U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
-extern U0 GodWordBatch(CHexWordForm *gm);
+extern U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits);
 extern U0 TOSBookLines(U8 *book_filename,I64 book_lines,U8 *st,I64 num_lines,
 	I64 radix,Bool modulo,Bool plus_one);
 extern U0 TOSGodDoodle(I64 god_src,CNISTBeaconHexWordForm *gm=NULL);

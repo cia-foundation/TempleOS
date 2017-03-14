@@ -207,8 +207,8 @@ U0 ToTheFront()
   ProgressBarsRst;
 
   SettingsPop;
-  MenuPop;
   DCDel(map_dc);
   CleanUp;
+  MenuPop;
   Seed;
 }

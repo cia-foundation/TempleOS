@@ -42,7 +42,7 @@ GrInit4;
 
 I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 {
-  I64 i;
+  I64 res;
   U8 *st1,*st2,buf[STR_LEN];
   CDoc *doc=DocNew;
 
@@ -86,9 +86,9 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 	"$$MU-UL,\"Exit  Sprite\",LE=SPBM_EXIT$$\n"
 	"$$MU-UL,\"Abort Sprite\",LE=DOCM_CANCEL$$\n"
 	"\nRight-Click to get back to this menu.",st1,st2,width);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   DocDel(doc);
-  return i;
+  return res;
 }
 
 U0 GrBitMapEdPrepPersistentDC(CDC *dc,I64 xx1,I64 yy1,CDC *img)
@@ -219,7 +219,7 @@ I64 SpriteBitMapEd(CDoc *,CDocEntry *doc_e,CDC *dc,I64 *_xx1,I64 *_yy1,
       GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 
     dc->color=ROPF_DITHER+WHITE<<16+BLACK;
-    dc->pen_width=1;
+    dc->thick=1;
     GrBorder(dc,xx1-1,yy1-1,xx2,yy2);//This is done little bit too often.
 
     while (msg_code=ScanMsg(&arg1,&arg2,1<<MSG_MS_L_DOWN|1<<MSG_MS_L_UP|
@@ -308,7 +308,7 @@ bm_menu:
 	      if (i>=0) color=i;
 	      goto bm_menu;
 	    case SPBM_WIDTH:
-	      i=PopUpRangeI64(1,16,1,"Pen Width\n");
+	      i=PopUpRangeI64(1,16,1,"Thick\n");
 	      if (i>=0) width=i;
 	      goto bm_menu;
 	    case SPBM_UNDO:
@@ -357,7 +357,7 @@ bm_menu:
 	  switch (mode) {
 	    case SPBM_PT:
 	      img->color=color;
-	      img->pen_width=width;
+	      img->thick=width;
 	      GrPlot3(img,arg1-xx1,arg2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
@@ -367,7 +367,7 @@ bm_menu:
 	      x1=arg1; y1=arg2;
 	      down=TRUE;
 	      dc->color=color;
-	      dc->pen_width=width;
+	      dc->thick=width;
 	      case SPBM_LINE:
 		GrLine3(dc,x1,y1,0,arg1,arg2,0);
 		break;
@@ -383,7 +383,7 @@ bm_menu:
 	      case SPBM_COPY:
 	      case SPBM_DELETE:
 		dc->color=ROPF_DITHER+WHITE<<16+BLACK;
-		dc->pen_width=1;
+		dc->thick=1;
 		GrBorder(dc,x1,y1,x1,y1);
 		break;
 	    end:
@@ -434,7 +434,7 @@ bm_menu:
 		x1=arg1; y1=arg2;
 		down=TRUE;
 		dc->color=color;
-		dc->pen_width=width;
+		dc->thick=width;
 		GrLine3(dc,x1,y1,0,arg1,arg2,0);
 	      }
 	      break;
@@ -442,7 +442,7 @@ bm_menu:
 	      x1=arg1; y1=arg2;
 	      down=TRUE;
 	      img->color=color;
-	      img->pen_width=width;
+	      img->thick=width;
 	      GrLine3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 	      GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      break;
@@ -456,7 +456,7 @@ bm_menu:
 	      if (down) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		dc->color=color;
-		dc->pen_width=width;
+		dc->thick=width;
 		if (mode==SPBM_ARROW)
 		  GrArrow3(dc,x1,y1,0,arg1,arg2,0);
 		else
@@ -503,7 +503,7 @@ bm_menu:
 		  y22=y1;
 		}
 		dc->color=ROPF_DITHER+WHITE<<16+BLACK;
-		dc->pen_width=1;
+		dc->thick=1;
 		GrBorder(dc,x11,y11,x22,y22);
 	      }
 	      break;
@@ -511,7 +511,7 @@ bm_menu:
 	      if (down) {
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		dc->color=color;
-		dc->pen_width=width;
+		dc->thick=width;
 		GrCircle3(dc,x1,y1,0,Sqrt(SqrI64(arg1-x1)+SqrI64(arg2-y1)));
 	      }
 	      break;
@@ -549,7 +549,7 @@ bm_menu:
 	    case SPBM_POLYPT:
 	      if (down) {
 		img->color=color;
-		img->pen_width=width;
+		img->thick=width;
 		GrLine3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 		x1=arg1; y1=arg2;
@@ -564,7 +564,7 @@ bm_menu:
 	    case SPBM_POLYPT:
 	    case SPBM_POLYLINE:
 	      img->color=color;
-	      img->pen_width=width;
+	      img->thick=width;
 	      if (mode==SPBM_ARROW)
 		GrArrow3(img,x1-xx1,y1-yy1,0,arg1-xx1,arg2-yy1,0);
 	      else
@@ -621,7 +621,7 @@ bm_menu:
 	      goto bm_menu;
 	    case SPBM_CIRCLE:
 	      img->color=color;
-	      img->pen_width=width;
+	      img->thick=width;
 	      GrCircle3(img,x1-xx1,y1-yy1,0,
 		    Sqrt(SqrI64(arg1-x1)+SqrI64(arg2-y1)));
 	      down=FALSE;

@@ -2,6 +2,26 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
+$IV,1$----03/14/17 01:47:41----$IV,0$
+
+$IV,1$----03/14/17 00:14:39----$IV,0$
+* $BK,1$TempleOS version 5.03 Released$BK,0$
+* $LK,"R",A="MN:R"$("pen_width","thick");
+
+$IV,1$----02/05/17 16:37:39----$IV,0$
+* Added $LK,"::/Doc/BlkChain.DD"$.
+
+$IV,1$----02/03/17 17:27:36----$IV,0$
+* Added multicore $LK,"::/Adam/AMathODE.HC"$.
+* Improved support for sub and super scripts.
+
+$IV,1$----01/31/17 10:22:10----$IV,0$
+* Added $LK,"::/Demo/Graphics/LightTable.HC"$.
+* Added $LK,"TOS Linux Setup",A="FF:::/Demo/AcctExample/TOS/TOSPolicies.DD,TOS Linux Setup"$.
+
+$IV,1$----01/27/17 08:13:37----$IV,0$
+* Added $LK,"DocLineRead",A="MN:DocLineRead"$() and $LK,"DocLineWrite",A="MN:DocLineWrite"$().
+
 $IV,1$----01/25/17 20:44:17----$IV,0$
 * $LK,"R",A="MN:R"$("DocLineNumGoto","DocGoToLine");
 * $LK,"R",A="MN:R"$("Clipboard","Clip");

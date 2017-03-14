@@ -108,6 +108,7 @@ $MA-X+PU,"::/Apps/KeepAway",LM="Cd(\"::/Apps/KeepAway\");Dir;View;\n"$
 $LK,"::/Demo/Games/Rocket.HC"$
 $LK,"::/Demo/Games/RocketScience.HC"$
 $LK,"::/Demo/Games/MassSpring.HC"$
+$LK,"::/Demo/Graphics/LightTable.HC"$
 $LK,"::/Demo/Games/Whap.HC"$
 $LK,"::/Demo/Games/Squirt.HC"$
 $MA-X+PU,"::/Apps/X-Caliber",LM="Cd(\"::/Apps/X-Caliber\");Dir;View;\n"$

@@ -174,43 +174,16 @@ public U0 GodBooksPassageU32(U32 rand_u32,U8 *files_find_mask,
   }
 }
 
-U8 *FileDblRead(U8 *filename,I64 line)
-{//FileDbl's are DolDoc files with 2-line entries.
-  U8 *res=NULL;
-  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocGoToLine(doc,line-1) && doc->cur_entry->type_u8==DOCT_TEXT)
-    res=StrNew(doc->cur_entry->tag);
-  DocDel(doc);
-  return res;
-}
-
-U8 *FileDblWrite(U8 *filename,I64 line,U8 *st)
-{//FileDbl's are DolDoc files with 2-line entries.
-  U8 *res=NULL;
-  CDoc *doc=DocRead(filename,DOCF_PLAIN_TEXT_TABS|DOCF_NO_CURSOR);
-  if (DocGoToLine(doc,line-1)) {
-    if (doc->cur_entry->type_u8==DOCT_TEXT) {
-      Free(doc->cur_entry->tag);
-      doc->cur_entry->tag=StrNew(st);
-    } else
-      DocPrint(doc,"%s",st);
-    DocTop(doc);
-    DocWrite(doc);
-  }
-  DocDel(doc);
-  return res;
-}
-
 U0 GodVideoDigits(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
 {
   U8 *st,*st2;
   CGodVideoForm *gvf=CAlloc(sizeof(CGodVideoForm));
   I64 i=ExtDecFromHex(rnd,digits);
   if (!i) i=Round(10`digits);
-  if (st=FileDblRead(filename,i*2)) {
+  if (st=DocLineRead(filename,i*2+1)) {
     StrCpy(gvf->title,st);
     Free(st);
-    if (!(st=FileDblRead(filename,i*2+1))||!*st) {
+    if (!(st=DocLineRead(filename,i*2+2))||!*st) {
       Free(st);
       if (DocForm(gvf) && *gvf->serial) {
 	if (gvf->min || gvf->sec)
@@ -218,7 +191,7 @@ U0 GodVideoDigits(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
 		gvf->serial,gvf->min*60+gvf->sec);
 	else
 	  st=StrNew(gvf->serial);
-	FileDblWrite(filename,i*2+1,st);
+	DocLineWrite(filename,i*2+2,st);
       } else
 	st=NULL;
     }
@@ -261,8 +234,8 @@ U0 GodVideoU32(U32 rand_u32,U8 *filename)
   Silent(old_silent);
   if (num) {
     i=rand_u32%num;
-    if (st=FileDblRead(filename,i*2)) {
-      st2=FileDblRead(filename,i*2+1);
+    if (st=DocLineRead(filename,i*2+1)) {
+      st2=DocLineRead(filename,i*2+2);
       PutFileLink(filename);
       "\nGod's response:\n"
 	    "%08X-->#%d out of %d\n%s\n",rand_u32,i,num,st;
@@ -288,8 +261,8 @@ U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
   I64 i=ExtDecFromHex(rnd,digits);
   if (!i) i=Round(10`digits);
   "'%s'-->(Taking first %d decimal digits) #%02d\n",rnd,digits,i;
-  st1=FileDblRead(filename,i*2);
-  st2=FileDblRead(filename,i*2+1);
+  st1=DocLineRead(filename,i*2+1);
+  st2=DocLineRead(filename,i*2+2);
   "God's response:\n";
   "$$TX,\"%s\",HTML=\"%s\"$$\n",title,webpage;
   PutFileLink(filename);
@@ -301,10 +274,11 @@ U0 GodWebIdx(U8 *title,U8 *webpage,U8 *rnd,I64 digits,U8 *filename)
   Free(st2);
 }
 
-U0 GodWordBatch(CHexWordForm *gm)
+U0 GodWordBatch(CHexWordForm *gm,I64 radix,I64 digits)
 {//Insert batch of words from rand hex.
-  I64 i=0;
+  I64 i=0,j,k,min;
   CDirEntry *tmpde,*tmpde1;
+  U8 *filename;
 
   FifoU8Flush(god.fifo);
   GodHexIns(gm->rnd0);
@@ -319,13 +293,23 @@ U0 GodWordBatch(CHexWordForm *gm)
   GodHexIns(gm->rnd9);
   GodHexIns(gm->rndA);
   GodHexIns(gm->rndB);
-  tmpde=tmpde1=FilesFind(god.word_file_mask,god.word_fuf_flags);
-  while (tmpde) {
-    PutFileLink(tmpde->full_name);
+
+  if (radix==16) {
+    tmpde=tmpde1=FilesFind(god.word_file_mask,god.word_fuf_flags);
+    while (tmpde) {
+      PutFileLink(tmpde->full_name);
+      '\n';
+      tmpde=tmpde->next;
+    }
+    DirTreeDel(tmpde1);
+  } else {
+    if (digits==3)
+      filename="::/Home/Sup1/Sup1Blog/NumWords1000.TXT";
+    else
+      filename="::/Home/Sup1/Sup1Blog/NumWords10k.TXT";
+    PutFileLink(filename);
     '\n';
-    tmpde=tmpde->next;
   }
-  DirTreeDel(tmpde1);
 
   "\n$$RED$$";
   if (*gm->rnd0)
@@ -353,9 +337,33 @@ U0 GodWordBatch(CHexWordForm *gm)
   if (*gm->rndB)
     "%s\n",gm->rndB;
   '\n';
-  while (FifoU8Cnt(god.fifo)>20) {
-     "%02d: ",i++;
-     GodWord(20,TRUE);
+  if (radix==16)
+    min=digits*4;
+  else
+    min=4;
+  while (FifoU8Cnt(god.fifo)>=min) {
+    if (radix==16) {
+      j=GodBits(digits*4);
+      if (god.num_words) {
+	"%02d: %0*X Mod %0*X = %0*X (Line:%0*d):",i++,
+	      digits,j,digits,god.num_words,digits,j%god.num_words,
+	      ToI64(Log10(god.num_words)+1),j%god.num_words+1;
+	"%s\n",god.words[j%god.num_words];
+      }
+    } else {
+      i=digits;
+      j=0;
+      do {
+	k=GodBits(4);
+	if (k<=9) {
+	  j=j*10+k;
+	  if (!--i) {
+	    "%s\n",DocLineRead(filename,j+1);
+	    break;
+	  }
+	}
+      } while (FifoU8Cnt(god.fifo)>=4);
+    }
   }
   FifoU8Flush(god.fifo);
   "$$FG$$\n";
@@ -427,7 +435,7 @@ I64 GodHeaderIns(U8 *type=NULL)
   CDateStruct ds;
   I64 res;
   if (type) {//If NISTBeacon
-    res=FloorI64(CDate2Unix(Now+2*60*CDATE_FREQ),60);
+    res=FloorI64(CDate2Unix(Now+1*60*CDATE_FREQ),60);
     Date2Struct(&ds,Unix2CDate(res)+local_time_offset+30*CDATE_FREQ);
     "Response of %s at %02d:%02d Timestamp:%d.\n\n",type,ds.hour,ds.min,res;
     In("%c//Response of %s at %02d:%02d Timestamp:%d.\n\n",
@@ -445,7 +453,7 @@ U0 TimerGodIns()
   FifoU8Flush(god.fifo);
   GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
   switch (PopUpPickLst("Hex5Bible\0Hex8Books\0Doodle\0Movie100\0Painting100\0"
-	"Painting1000\0Metallica\0")) {
+	"Painting1000\0Poems100\0Metallica\0")) {
     case:
       StrPrint(buf,"%05X",GodBits(5*4));
       "$$TX,\"How this random Bible passage was chosen.\","
@@ -481,6 +489,12 @@ U0 TimerGodIns()
       break;
     case:
       StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
+      GodWebIdx("Top 100 Poems",
+	    "http://100.best-poems.net/top-100-best-poems.html",
+	    buf,2,"~/Sup1/Sup1Blog/Poems100.DD.Z");
+      break;
+    case:
+      StrPrint(buf,"%05X",GodBits(2*5*4)); //Little bit risky if no dec.
       GodVideoDigits("Metallica Song",
 	    "http://home.hccnet.nl/a.r.adams/lyrics/"
 	    "metallica/songindex.html",
@@ -493,7 +507,7 @@ public U0 GodIns()
 {//<ALT-F7> Insert misc rand God item into blog.
   U8 *st,*tag;
   CRandExtDec5Form *gm=CAlloc(sizeof(CRandExtDec5Form));
-  I64 god_src=PopUpPickLst("NISTBeacon\0HotBits\0ANU_NIST\0Random.org\0"
+  I64 god_src=PopUpPickLst("NISTBeacon\0HotBits\0ANU_NIST\0Google\0Random.org\0"
 	"RandomNumbers.info\0Password\0GenerateData\0VirtualNotary\0Timer\0");
   if (god_src>=GSRC_NIST_BEACON) {
     switch (god_src) {
@@ -510,9 +524,9 @@ public U0 GodIns()
       end:
 	GodHeaderIns;
 	"$$TX,\"%$$Q\",HTML=\"%$$Q\"$$\n",tag,tag;
-	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0"
-	      "HappyWords\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
-	      "Painting100\0Painting1000\0Metallica\0")) {
+	switch (PopUpPickLst("ExtDec5Bible\0LinuxWords\0HappyWords\0"
+	      "Words1000\0Words10k\0Hex5Bible\0Hex8Books\0Doodle\0Movie100\0"
+	      "Painting100\0Painting1000\0Poems100\0Metallica\0")) {
 	  case:
 	    if (DocForm(gm(CRandExtDec5Form *)))
 	      TOSBookLines("~/Sup1/Sup1Blog/NumBible.TXT",ST_BIBLE_LINES,
@@ -521,14 +535,22 @@ public U0 GodIns()
 	  case:
 	    if (DocForm(gm(CHexWordForm *))) {
 	      Adam("GodInit(\"~/Sup1/Sup1Words/LinuxDict.TXT*\");");
-	      GodWordBatch(gm);
+	      GodWordBatch(gm,16,5);
 	    }
 	    break;
 	  case:
 	    if (DocForm(gm(CHexWordForm *))) {
 	      Adam("GodInit(\"~/Sup1/Sup1Words/HappyWords.TXT*\");");
-	      GodWordBatch(gm);
+	      GodWordBatch(gm,16,5);
 	    }
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *)))
+	      GodWordBatch(gm,10,3);
+	    break;
+	  case:
+	    if (DocForm(gm(CHexWordForm *)))
+	      GodWordBatch(gm,10,4);
 	    break;
 	  case:
 	    if (DocForm(gm(CRandHex5Form *))) {
@@ -574,6 +596,13 @@ public U0 GodIns()
 	    }
 	    break;
 	  case:
+	    if (DocForm(gm(CPoems100Form *))) {
+	      GodWebIdx("Top 100 Poems",
+		    "http://100.best-poems.net/top-100-best-poems.html",
+		    gm->rnd0,2,"~/Sup1/Sup1Blog/Poems100.DD.Z");
+	    }
+	    break;
+	  case:
 	    if (DocForm(gm(CMetallicaForm *)))
 	      GodVideoDigits("Metallica Song",
 		    "http://home.hccnet.nl/a.r.adams/lyrics/"
@@ -583,6 +612,9 @@ public U0 GodIns()
 	}
 	break;
       start:
+	case GSRC_GOOGLE:
+	  tag="http://www.google.com";
+	  break;
 	case GSRC_RANDOM_ORG:
 	  tag="http://www.random.org";
 	  break;
@@ -606,7 +638,7 @@ public U0 GodIns()
 	    break;
 	  case:
 	    if (DocForm(gm(CHexWordForm *)))
-	      GodWordBatch(gm);
+	      GodWordBatch(gm,16,5);
 	    break;
 	  case:
 	    if (DocForm(gm(CRandHex5Form *))) {

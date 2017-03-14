@@ -25,13 +25,13 @@ U0 BgtAcctsUpdate()
 U0 BgtAcctsWrite()
 {
   BgtAcctsUpdate;
-  StrFileWrite(BGT_ACCTS_FILE,accts_table,TRUE);
+  StrFileWrite(bgt_accts_file,accts_table,TRUE);
 }
 
 U0 BgtAcctsRead()
 {
   I64	i,max_num;
-  U8	*colors,**s=StrFileRead(BGT_ACCTS_FILE,&max_num,&colors,TRUE);
+  U8	*colors,**s=StrFileRead(bgt_accts_file,&max_num,&colors,TRUE);
   StrFileDel(accts_table);
   accts_table=HashTableNew(512);
   accts_table_strs=0;

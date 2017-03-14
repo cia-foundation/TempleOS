@@ -1,5 +1,7 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
+* Does entire tool chain support super/sub script?
+
 * $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
 * Add asteroid harbor defense.
 * Afterburner thruster.
@@ -69,7 +71,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Reset MPs with $LK,"Core0StartMP",A="MN:Core0StartMP"$() after boot.  Free old task memory?
 
-* Use pen_width and pen_height when clipping with pen_width>1.
+* Use thick and pen_height when clipping with thick>1.
 
 * $LK,"~/Sup1/Sup1Games/Rocks.HC"$.
 
@@ -235,6 +237,10 @@ $ID,-5$
 $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Make binary tree look-up using FUN_SEG symbol addresses, so we can eliminate fun_seg cache and wall-paper kludge?  All HolyC functions and glbl vars would have left-right for address search.
 
+* Should we get rid of drive mapping.  It's ugly.
+
+* Can we get rid of $LK,"MSG_CMD",A="MN:MSG_CMD"$?
+
 * Make so just CdRom; command to copy entire disk to ::/CdRom directory? 
 
 * $LK,"MP DepthBuf",A="FF:::/Adam/Gr/SpriteMesh.HC,dc->depth_buf=e->"$ is a kludge because of dc->depth_buf=NULL in various graphics routines.
@@ -250,7 +256,7 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * $LK,"TRANSPARENT",A="MN:TRANSPARENT"$ does not work with $LK,"ROPF_DITHER",A="MN:ROPF_DITHER"$.
 
-* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with pen_width>1 is broken.
+* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with thick>1 is broken.
 
 * $LK,"GrPutChar3",A="MN:GrPutChar3"$() with depth buf?
 
@@ -296,6 +302,8 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 $FG,5$$TX+CX,"Inspirational Ideas"$$FG$
 * Redo videos, make more professional.
+
+* Add icons.
 
 * Use standard terminology from "the literature".
 
@@ -437,7 +445,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17378KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17400KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -453,7 +461,10 @@ I made dis	$HC,"<center><img src=\"http://i.imgur.com/cZKkxTX.jpg\" width=\"640\
 NIST Beacon	$HC,"<center><img src=\"http://www.nist.gov/itl/csd/ct/images/beacon_architecture_2013.jpg\" width=\"550\" height=\"278\" alt=\"\"></center>"$
 Purple Frog	$HC,"<center><img src=\"https://s-media-cache-ak0.pinimg.com/736x/fb/08/2a/fb082a53bd798f5957a474ff9095e6d4.jpg\" width=\"640\" height=\"420\" alt=\"\"></center>"$
 Casino (Dog)	$HC,"<center><img src=\"http://www.templeos.org/images/Dog1855x1056.jpg\" width=\"640\" height=\"364\" alt=\"\"></center>"$
-
+Sombrero	$HC,"<center><img src=\"https://upload.wikimedia.org/wikipedia/commons/5/5e/M104_ngc4594_sombrero_galaxy_hi-res.jpg\" width=\"640\" height=\"359\" alt=\"\"></center>"$
+Zinger		$HC,"<center><img src=\"http://media.shopwell.com/gladson/00041300000031_full.jpg\" width=\"432\" height=\"234\" alt=\"\"></center>"$
+Dianna Throne	$HC,"<center><img src=\"http://i.imgur.com/RtcK6iX.jpg%EF%BB%BF\" width=\"640\" height=\"746\" alt=\"\"></center>"$
+170310 Terry	$HC,"<center><img src=\"http://www.templeos.org/images/170310TerryADavis.jpg\" width=\"640\" height=\"640\" alt=\"\"></center>"$
 
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
@@ -503,3 +514,6 @@ $TX,"C64 Programmers Reference Guide",HTML="http://www.commodore.ca/manuals/c64_
 
 $TX,"8-Bit Pixel Art",HTML="http://8bitdecals.com/8-bit-image-gallery"$
 $TX,"8-Bit Japanese Pixel Art",HTML="http://designmadeinjapan.com/magazine/illustration-icon/tumblr-gifs-of-japanese-life"$
+
+
+sha256sum

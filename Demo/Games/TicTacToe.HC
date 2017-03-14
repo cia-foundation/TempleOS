@@ -4,14 +4,14 @@ I64 board_y[9]={150,150,150,250,250,250,350,350,350};
 
 U0 DrawX(CDC *dc,I64 x,I64 y)
 {
-  dc->pen_width=5;
+  dc->thick=5;
   GrLine3(dc,x-20,y-20,0,x+20,y+20,0);
   GrLine3(dc,x+20,y-20,0,x-20,y+20,0);
 }
 
 U0 DrawO(CDC *dc,I64 x,I64 y)
 {
-  dc->pen_width=5;
+  dc->thick=5;
   GrCircle3(dc,x,y,0,25);
 }
 
@@ -20,7 +20,7 @@ U0 DrawBoard(I64 player)
   I64 i;
   CDC *dc=DCAlias;
   DCFill;
-  dc->pen_width=5;
+  dc->thick=5;
   GrLine3(dc,200,100,0,200,400,0);
   GrLine3(dc,300,100,0,300,400,0);
   GrLine3(dc,100,200,0,400,200,0);

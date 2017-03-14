@@ -341,7 +341,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->y=task->pix_height-2*map_height;
   dc->z=0;
   dc->transform=&DCTransform;
-  dc->pen_width=2;
+  dc->thick=2;
   for (i=0;i<map_height;i++)
     for (j=0;j<map_width;j++) {
       dc->color=map[(map_height-1-i)*map_width+j];

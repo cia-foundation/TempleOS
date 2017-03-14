@@ -19,7 +19,7 @@ F64 base_compression_strength,base_tensile_strength,
 base_const,base_cost;
 
 CColorROPU32 color;
-I32 pen_width;
+I32 thick;
 };
 
 CMathODE *ode=NULL;

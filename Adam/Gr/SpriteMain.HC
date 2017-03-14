@@ -10,7 +10,7 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
 	CDoc *_doc,CDocEntry *_doc_e)
 {
   CTask	*pu_task;
-  I64	i;
+  I64	res;
   CDoc *doc=DocNew;
   CDocEntry *doc_de;
   U8	*st;
@@ -23,7 +23,7 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
 
   DocPrint(doc,"$$MU-UL,\"Color (4-bit)\",LE=SPT_COLOR$$\n"
 	"$$MU-UL,\"Dither Color (4-bit)\",LE=SPT_DITHER_COLOR$$\n"
-	"$$MU-UL,\"Width\",LE=SPT_WIDTH$$\n"
+	"$$MU-UL,\"Thick\",LE=SPT_THICK$$\n"
 	"$$MU-UL,\"Planar Symmetry\",LE=SPT_PLANAR_SYMMETRY$$\n"
 	"\n$$MU-UL,\"Point\",LE=SPT_PT$$\n"
 	"$$MU-UL,\"Line\",LE=SPT_LINE$$\n"
@@ -63,7 +63,7 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
   st=MStrPrint("SpriteSideBarTask(0x%X,0x%X,0x%X);",Fs,_head,_cur_elem_num);
   PopUp(st,NULL,&pu_task);
   Free(st);
-  i=PopUpMenu(doc);
+  res=PopUpMenu(doc);
   if (TaskValidate(pu_task)) {
     *_head=SpriteSideBar2SpriteQue(DocPut(pu_task),*_head,_cur_elem_num);
     Kill(pu_task);
@@ -72,12 +72,12 @@ I64 PopUpSpriteMain(CSprite **_head,I64 *_cur_elem_num,
   _doc_e->tag=StrNew(doc_de->data,_doc->mem_task);
   _doc->cur_col=0;
   DocDel(doc);
-  return i;
+  return res;
 }
 
 Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
 {
-  I64 i;
+  I64 res;
   CDoc *doc=DocNew;
   CDocEntry *doc_e;
   doc_e=DocPrint(doc,"  $$DA,A=\"x1:%%d\"$$\n");
@@ -95,22 +95,22 @@ Bool PopUpExtents(I64 *_x1,I64 *_x2,I64 *_y1,I64 *_y2)
 
   DocPrint(doc," $$BT,\"Use These Extents\",LE=TRUE$$");
   DocPrint(doc,"$$CM,3,0$$$$BT,\"Drag-Out New Extents\",LE=FALSE$$\n\n");
-  do i=PopUpMenu(doc);
-  while (i!=FALSE && i!=TRUE);
+  do res=PopUpMenu(doc);
+  while (res!=FALSE && res!=TRUE);
   DocDel(doc);
-  return i;
+  return res;
 }
 
 U0 SpriteScrnInit(CDC *dc,I64,I64)
 {
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
-  I64 xx,yy,old_pen_width=dc->pen_width;
+  I64 xx,yy,old_pen_width=dc->thick;
   CColorROPU32 old_color=dc->color;
   Refresh;
   DCFill(dc);
   if (dc->flags&DCF_SYMMETRY) {
     dc->flags&=~DCF_SYMMETRY;
-    dc->pen_width=1;
+    dc->thick=1;
     xx=dc->sym.sny*8192;
     yy=-dc->sym.snx*8192;
     dc->color=RED;
@@ -125,7 +125,7 @@ U0 SpriteScrnInit(CDC *dc,I64,I64)
     dc->flags|=DCF_SYMMETRY;
   }
   dc->color=old_color;
-  dc->pen_width=old_pen_width;
+  dc->thick=old_pen_width;
 }
 
 CSprite *SMLine(CDC *dc,I64 x,I64 y,I64 arg1,I64 arg2,CColorROPU32 color)
@@ -176,10 +176,10 @@ CSprite *SMPlanarSymmetry(CDC *dc,I64 x,I64 y,I64 arg1,I64 arg2)
 {
   I64 msg_code,x1=arg1,y1=arg2,x2=arg1,y2=arg2,old_width,old_flags;
   CSprite *res;
-  old_width=dc->pen_width;
+  old_width=dc->thick;
   old_flags=dc->flags;
   dc->flags&=~DCF_SYMMETRY;
-  dc->pen_width=1;
+  dc->thick=1;
   do {
     dc->color=ROPF_DITHER+WHITE<<16+BLACK;
     GrLine3(dc,x1,y1,0,x2,y2,0);
@@ -188,7 +188,7 @@ CSprite *SMPlanarSymmetry(CDC *dc,I64 x,I64 y,I64 arg1,I64 arg2)
     x2=arg1; y2=arg2;
   } while (msg_code!=MSG_MS_L_UP);
   dc->flags=old_flags&DCF_SYMMETRY|dc->flags&~DCF_SYMMETRY;
-  dc->pen_width=old_width;
+  dc->thick=old_width;
   res=CAlloc(SpriteElemQuedBaseSize(SPT_PLANAR_SYMMETRY));
   res->type=SPT_PLANAR_SYMMETRY;
   res->pp.x1=x1-x;
@@ -238,8 +238,8 @@ CSprite *SMScrnBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,
 	xx1=arg1,yy1=arg2,xx2=arg1,yy2=arg2,old_width;
   CDC *dc3,*img;
   CSprite *res;
-  old_width=dc2->pen_width;
-  dc2->pen_width=1;
+  old_width=dc2->thick;
+  dc2->thick=1;
   do {
     dc2->color=ROPF_DITHER+WHITE<<16+BLACK;
     GrBorder(dc2,xx1+Fs->pix_left+Fs->scroll_x,yy1+Fs->pix_top+Fs->scroll_y,
@@ -279,7 +279,7 @@ CSprite *SMScrnBitMap(I64 eletype,CDC *dc,CDC *dc2,I64 x,I64 y,
   MemCpy(&res->pwhu.u,img->body,((xx2-xx1+7)&~7)*(yy2-yy1));
   DCDel(img);
   DCDel(dc3);
-  dc2->pen_width=old_width;
+  dc2->thick=old_width;
   Fs->win_inhibit=WIG_TASK_DFT-WIF_SELF_FOCUS
 	-WIF_SELF_BORDER-WIF_SELF_GRAB_SCROLL;
   return res;
@@ -596,8 +596,8 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
   if (sel) {
     xx1=arg1; yy1=arg2;
     xx2=arg1; yy2=arg2;
-    old_width=dc->pen_width;
-    dc->pen_width=1;
+    old_width=dc->thick;
+    dc->thick=1;
     do {
       dc->color=ROPF_DITHER+WHITE<<16+BLACK;
       GrBorder(dc,xx1,yy1,xx2,yy2);
@@ -615,7 +615,7 @@ I64 SMBitMap(I64 eletype,CDoc *doc,CDocEntry *doc_ce,CSprite *head,
 	yy1=y1; yy2=y2;
       }
     } while (msg_code!=MSG_MS_L_UP);
-    dc->pen_width=old_width;
+    dc->thick=old_width;
   }
 
   xx2++; yy2++;
@@ -812,7 +812,7 @@ U0 SMTaskTitleSet(I64 eletype)
 I64 SpriteMainEd(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
-  I64 res,i,x,y,arg1,arg2,xx,yy,xx1,yy1,xx2,yy2,width,eletype=SPT_MENU,
+  I64 res,i,x,y,arg1,arg2,xx,yy,xx1,yy1,xx2,yy2,thick,eletype=SPT_MENU,
 	cur_elem_num,old_border_src=Fs->border_src,old_title_src=Fs->title_src,
 	old_de_flags=doc_ce->de_flags;
   CColorROPU32 bm_bkcolor,color;
@@ -831,7 +831,7 @@ I64 SpriteMainEd(CDoc *doc)
 
   while (TRUE) {
     insert_pt=SpriteSetSettings(dc,head,cur_elem_num,xx,yy,
-	  &color,&width,&x,&y);
+	  &color,&thick,&x,&y);
     x+=xx; y+=yy;
     DCFill;
     if (eletype==SPT_MENU) {
@@ -847,7 +847,7 @@ I64 SpriteMainEd(CDoc *doc)
       eletype=PopUpSpriteMain(&head,&cur_elem_num,doc,doc_ce);
       xx+=StrLen(doc_ce->tag)*FONT_WIDTH;
       insert_pt=SpriteSetSettings(dc,head,cur_elem_num,x,y,
-	    &color,&width,&x,&y);
+	    &color,&thick,&x,&y);
       x+=xx; y+=yy;
 
       SpriteEdUpdate(doc,doc_ce,head);
@@ -982,14 +982,14 @@ I64 SpriteMainEd(CDoc *doc)
 	Fs->win_inhibit=WIG_TASK_DFT|WIF_FOCUS_TASK_MS_L|WIF_FOCUS_TASK_MS_R|
 	      WIF_FOCUS_TASK_BORDER-WIF_SELF_FOCUS-WIF_SELF_GRAB_SCROLL;
 	break;
-      case SPT_WIDTH:
+      case SPT_THICK:
 	doc_ce->de_flags|=DOCEF_DONT_DRAW;
-	i=PopUpRangeI64(1,16,1,"Pen Width\n");
+	i=PopUpRangeI64(1,16,1,"Thick\n");
 	if (i>=1) {
-	  width=i;
-	  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_WIDTH));
-	  tmpg->type=SPT_WIDTH;
-	  tmpg->w.width=width;
+	  thick=i;
+	  tmpg=CAlloc(SpriteElemQuedBaseSize(SPT_THICK));
+	  tmpg->type=SPT_THICK;
+	  tmpg->t.thick=thick;
 	  QueIns(tmpg,insert_pt->last);
 	  SpriteEdUpdate(doc,doc_ce,head);
 	  cur_elem_num++;
@@ -1027,7 +1027,7 @@ I64 SpriteMainEd(CDoc *doc)
 
     if (eletype!=SPT_MENU) {
       insert_pt=SpriteSetSettings(dc,head,cur_elem_num,xx,yy,
-	    &color,&width,&x,&y);
+	    &color,&thick,&x,&y);
       x+=xx; y+=yy;
       SpriteScrnInit(dc,x,y);
       if (eletype==SPT_EXIT) {
