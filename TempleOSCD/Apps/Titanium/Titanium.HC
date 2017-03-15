@@ -339,7 +339,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       Sprite3(dc,ls[i].x,yy,0,ls[i].img);
   }
 
-  dc->pen_width=3;
+  dc->thick=3;
   dc->color=BROWN;
   GrLine3(dc,0,  (finish_line-scroll_y)&(MAP_HEIGHT-1),0,
 	GR_WIDTH,(finish_line-scroll_y)&(MAP_HEIGHT-1),0);

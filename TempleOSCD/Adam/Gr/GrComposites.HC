@@ -92,7 +92,7 @@ public I64 GrRect3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,I64 w,I64 h)
 
 public U0 GrBorder(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
 	I64 step=1,I64 start=0)
-{//2D. Transformation with pen width.
+{//2D. Transformation with thick.
 //Can be used with ROPF_DITHER+WHITE<<16+BLACK for dotted rect.
   GrLine3(dc,x1,y1,0,x2,y1,0,step,start);
   GrLine3(dc,x2,y1,0,x2,y2,0,step,start);
@@ -102,7 +102,7 @@ public U0 GrBorder(CDC *dc=gr.dc,I64 x1,I64 y1,I64 x2,I64 y2,
 
 public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,
 	I64 x2,I64 y2,I64 z2,F64 w=2.75,I64 step=1,I64 start=0)
-{//3D. Transformation with pen width.
+{//3D. Transformation with thick.
   I64 _x1,_y1,_z1,_x2,_y2,_z2,dx,dy;
   F64 d;
   Bool res=FALSE,was_transform=FALSE,was_symmetry=FALSE;
@@ -121,7 +121,7 @@ public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,
     res=Line(dc,_x1,_y1,_z1,_x2,_y2,_z2,&GrPlot3,step,start);
     dx=_x2-_x1; dy=_y2-_y1;
     if (d=Sqrt(dx*dx+dy*dy)) {
-      d=w*dc->pen_width/d;
+      d=w*dc->thick/d;
       res|=Line(dc,_x2-dx*d+dy*d+0.5,_y2-dy*d-dx*d+0.5,_z2,
 	    _x2,_y2,_z2,&GrPlot3,step);
       res|=Line(dc,_x2-dx*d-dy*d+0.5,_y2-dy*d+dx*d+0.5,_z2,
@@ -134,7 +134,7 @@ public Bool GrArrow3(CDC *dc=gr.dc,I64 x1,I64 y1,I64 z1,
   res|=Line(dc,x1,y1,z1,x2,y2,z2,&GrPlot3,step,start);
   dx=x2-x1; dy=y2-y1;
   if (d=Sqrt(dx*dx+dy*dy)) {
-    d=w*dc->pen_width/d;
+    d=w*dc->thick/d;
     res|=Line(dc,x2-dx*d+dy*d+0.5,y2-dy*d-dx*d+0.5,z2,
 	  x2,y2,z2,&GrPlot3,step);
     res|=Line(dc,x2-dx*d-dy*d+0.5,y2-dy*d+dx*d+0.5,z2,
@@ -299,7 +299,7 @@ public U0 DrawStdMs(CDC *dc,I64 x,I64 y)
 {//This is a callback. See $LK,"::/Demo/Graphics/Grid.HC"$.
 //Called by $LK,"DrawMs",A="MN:DrawMs"$() which is
   //called by $LK,"WinFinalUpdate",A="MN:WinFinalUpdate"$().
-  dc->pen_width=1;
+  dc->thick=1;
   dc->flags&=~(DCF_TRANSFORMATION|DCF_SYMMETRY);
   GrArrow3(dc,x+8,y+8,0,x,y,0);
 }
@@ -308,16 +308,16 @@ gr.fp_draw_ms=&DrawStdMs;
 
 public U0 DrawWaitMs(CDC *dc,I64 x,I64 y)
 {//This is a callback. See $LK,"::/Demo/Graphics/Grid.HC"$.
-  I64 old_pen_width=dc->pen_width;
+  I64 old_pen_width=dc->thick;
   CColorROPU32 old_color=dc->color;
-  dc->pen_width=3;
+  dc->thick=3;
   dc->color=LTRED;
   GrCircle3(dc,x,y,0,7);
   GrLine3(dc,x-6,y+6,0,x+6,y-6,0);
   dc->color=RED;
   GrCircle(dc,x,y,7);
   GrLine(dc,x-6,y+6,x+6,y-6);
-  dc->pen_width=old_pen_width;
+  dc->thick=old_pen_width;
   dc->color=old_color;
 }
 

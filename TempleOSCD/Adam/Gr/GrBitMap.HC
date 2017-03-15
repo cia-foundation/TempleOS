@@ -2,7 +2,7 @@
 
 Option(OPTf_WARN_HEADER_MISMATCH,OFF);
 public Bool GrPlot0(CDC *dc=gr.dc,I64 x,I64 y)
-{//2D. No clipping or transformation or pen width.
+{//2D. No clipping or transformation or thick.
   U8 *dst;
   I32 *db;
   I64 d,dist;
@@ -1662,7 +1662,7 @@ gr_done:
 }
 
 public I64 GrHLine(CDC *dc=gr.dc,I64 x1,I64 x2,I64 y,I64 z1=0,I64 z2=0)
-{//3D. No transformation or pen width.
+{//3D. No transformation or thick.
 //Returns cnt of pixs changed
   //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   I64 dist,dx,dz,z,res=0,i,j,d;
@@ -1831,7 +1831,7 @@ gr_done:
 }
 
 public I64 GrVLine(CDC *dc=gr.dc,I64 x,I64 y1,I64 y2,I64 z1=0,I64 z2=0)
-{//3D. No transformation or pen width.
+{//3D. No transformation or thick.
 //Returns cnt of pixs changed
   //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
   I64 dist,dy,dz,z,res=0,i,j,d;

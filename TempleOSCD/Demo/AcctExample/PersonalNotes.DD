@@ -71,7 +71,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Reset MPs with $LK,"Core0StartMP",A="MN:Core0StartMP"$() after boot.  Free old task memory?
 
-* Use pen_width and pen_height when clipping with pen_width>1.
+* Use thick and pen_height when clipping with thick>1.
 
 * $LK,"~/Sup1/Sup1Games/Rocks.HC"$.
 
@@ -256,7 +256,7 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 * $LK,"TRANSPARENT",A="MN:TRANSPARENT"$ does not work with $LK,"ROPF_DITHER",A="MN:ROPF_DITHER"$.
 
-* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with pen_width>1 is broken.
+* $LK,"ROP_XOR",A="MN:ROP_XOR"$ with thick>1 is broken.
 
 * $LK,"GrPutChar3",A="MN:GrPutChar3"$() with depth buf?
 
@@ -302,6 +302,8 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 
 $FG,5$$TX+CX,"Inspirational Ideas"$$FG$
 * Redo videos, make more professional.
+
+* Add icons.
 
 * Use standard terminology from "the literature".
 
@@ -443,7 +445,7 @@ $FG,5$$TX+CX,"Misc Notes"$$FG$
 Erik van der Karbargenbok: $LK,"TempleBot",A="PI:~/Sup1/Sup1Bin/TempleBot"$.
 Intel CEO's name: Brian Krzanich
 >$FG,2$lspci -v$FG$
-Size:$TX,"17402KB",D="DD_TEMPLEOSCD_K_SIZE"$
+Size:$TX,"17400KB",D="DD_TEMPLEOSCD_K_SIZE"$
 
 $FG,5$$TX+CX,"My Web Bookmarks"$$FG$$WW,0$
 $TX,"My FireFox Bookmarks",HTML="http://www.templeos.org/Wb/Home/Sup1/Sup1Blog/Bookmarks"$
@@ -464,12 +466,18 @@ Zinger		$HC,"<center><img src=\"http://media.shopwell.com/gladson/00041300000031
 Dianna Throne	$HC,"<center><img src=\"http://i.imgur.com/RtcK6iX.jpg%EF%BB%BF\" width=\"640\" height=\"746\" alt=\"\"></center>"$
 170310 Terry	$HC,"<center><img src=\"http://www.templeos.org/images/170310TerryADavis.jpg\" width=\"640\" height=\"640\" alt=\"\"></center>"$
 
+$TX,"Linus Torvalds (Dec 28, 1969)",HTML="https://en.wikipedia.org/wiki/Linus_Torvalds"$
+$TX,"John Carmack   (Aug 20, 1970)",HTML="https://en.wikipedia.org/wiki/John_Carmack"$
+$TX,"Terry A. Davis (Dec 15, 1969)",HTML="https://motherboard.vice.com/en_us/article/gods-lonely-programmer"$
+
 $TX,"SimStructure",HTML="http://www.templeos.org/files/SimStrSetUp.zip"$
 $TX,"ASU_Transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$      $TX,"ASU Course Catalog (See page 261)",HTML="https://catalog.asu.edu/files/shared/archives/1994-1996/general/UG1994-1996.pdf/1994-1996-UG-241-267.pdf"$
 $TX,"Dr. David Pheanis",HTML="https://webapp4.asu.edu/directory/person/77201"$	$TX,"Dr. Konstantinos S. Tsakalis",HTML="http://ecee.engineering.asu.edu/directory/tenured-and-tenure-track-faculty/kostantinos-s-tsakalis"$	$TX,"Dr. Walter Higgins",HTML="https://webapp4.asu.edu/directory/directorysearch?cn=Walter+Higgins"$
 $TX,"Peter Gadwa",HTML="http://www.wired.com/magazine/2010/11/mf_ticketmaster/all/1"$	$TX,"Ticketmaster",HTML="http://www.nytimes.com/1994/11/06/business/ticketmaster-s-mr-tough-guy.html?pagewanted=a"$
 $TX,"Tom Foley",HTML="http://web.gccaz.edu/~tfoley/perspage.html"$
 $TX,"Graphic Technologies",HTML="https://web.archive.org/web/20020811060541/http://www.graphic-technologies.com/"$	$TX,"Lexmark vs Static Control",HTML="https://en.wikipedia.org/wiki/Lexmark_International,_Inc._v._Static_Control_Components,_Inc."$
+
+
 
 $TX,"Stephen Davis",HTML="https://photos.google.com/share/AF1QipM4HI3mb_9qe8wDQ--nRfjIzOKyGG8heqWH-tbGBIIoxChWe4GeBegNzgHRy4Z1Qw?key=eGR0R0tyZG5tenRWd0tDN2RHRFRNTmI4NXdhc25B"$
 

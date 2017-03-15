@@ -30,9 +30,9 @@ public class CSpriteDitherColor : CSpriteBase
   U16 dither_color;
 };
 
-public class CSpriteW : CSpriteBase
+public class CSpriteT : CSpriteBase
 {
-  I32 width;
+  I32 thick;
 };
 
 public class CSpritePt : CSpriteBase
@@ -120,7 +120,7 @@ public class CSpritePtMeshU8s : CSpriteBase
 #define SPT_END			0	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
 #define SPT_COLOR		1	//$LK,"CSpriteColor",A="MN:CSpriteColor"$
 #define SPT_DITHER_COLOR	2	//$LK,"CSpriteDitherColor",A="MN:CSpriteDitherColor"$
-#define SPT_WIDTH		3	//$LK,"CSpriteW",A="MN:CSpriteW"$
+#define SPT_THICK		3	//$LK,"CSpriteT",A="MN:CSpriteT"$
 #define SPT_PLANAR_SYMMETRY	4	//$LK,"CSpritePtPt",A="MN:CSpritePtPt"$
 #define SPT_TRANSFORM_ON	5	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
 #define SPT_TRANSFORM_OFF	6	//$LK,"CSpriteBase",A="MN:CSpriteBase"$
@@ -163,7 +163,7 @@ public class CSprite
     CSpriteBase		b;
     CSpriteColor	c;
     CSpriteDitherColor	d;
-    CSpriteW	w;
+    CSpriteT		t;
     CSpritePt		p;
     CSpritePtPt		pp;
     CSpritePtPtAng	ppa;

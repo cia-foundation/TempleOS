@@ -126,7 +126,7 @@ U0 DrawIt(CTask *task,CDC *dc)
     tmpt=&targets[i];
     if (tmpt->dead) {
       for (j=0;j<40;j++) {
-	dc->pen_width=4;
+	dc->thick=4;
 	if (j&1)
 	  dc->color=ROPF_DITHER|LTGRAY<<16|BLACK;
 	else

@@ -1,11 +1,11 @@
 #help_index "Graphics/Sprite;Sprites"
 
 CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
-	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_width=NULL,
+	I64 x=0,I64 y=0,CColorROPU32 *_color=NULL,I64 *_thick=NULL,
 	I64 *_xx=NULL,I64 *_yy=NULL)
 {
   CSprite *res=head->next;
-  I64 width=1,xx=0,yy=0;
+  I64 thick=1,xx=0,yy=0;
   CColorROPU32 color=BLACK;
   if (dc) DCRst(dc);
   while (elem_num-->0 && res!=head) {
@@ -19,9 +19,9 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
 	      res->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	if (dc) dc->color=color;
 	break;
-      case SPT_WIDTH:
-	width=res->w.width;
-	if (dc) dc->pen_width=width;
+      case SPT_THICK:
+	thick=res->t.thick;
+	if (dc) dc->thick=thick;
 	break;
       case SPT_SHIFT:
 	xx+=res->p.x1;
@@ -43,7 +43,7 @@ CSprite *SpriteSetSettings(CDC *dc=NULL,CSprite *head,I64 elem_num,
     res=res->next;
   }
   if (_color) *_color=color;
-  if (_width) *_width=width;
+  if (_thick) *_thick=thick;
   if (_xx) *_xx=xx;
   if (_yy) *_yy=yy;
   return res;
@@ -380,9 +380,9 @@ U0 SpriteTransformQue(CSprite *head,I64 *r)
   while (tmpg!=head) {
     if (Bt(&tmpg->type,SPf_SEL))
       switch (tmpg->type&SPG_TYPE_MASK) {
-	case SPT_WIDTH:
-	  tmpg->w.width*=Sqrt(Mat4x4NormSqr65536(r))/65536;
-	  if (tmpg->w.width<0) tmpg->w.width=0;
+	case SPT_THICK:
+	  tmpg->t.thick*=Sqrt(Mat4x4NormSqr65536(r))/65536;
+	  if (tmpg->t.thick<0) tmpg->t.thick=0;
 	  break;
 	case SPT_PLANAR_SYMMETRY:
 	case SPT_ARROW:

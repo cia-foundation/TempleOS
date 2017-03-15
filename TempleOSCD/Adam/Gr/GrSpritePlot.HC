@@ -20,7 +20,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 {//Plot a sprite into a CDC.
   CSprite *tmpg=elems-offset(CSprite.start);
   I64 i,j,k,x1,y1,z1,x2,y2,
-	*old_r,*r2,old_flags=dc->flags,old_pen_width=dc->pen_width;
+	*old_r,*r2,old_flags=dc->flags,old_pen_width=dc->thick;
   I32 *ptr;
   CColorROPU32 old_color=dc->color;
   CDC *img;
@@ -39,9 +39,9 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
 	      tmpg->d.dither_color.u8[0]|
 	      tmpg->d.dither_color.u8[1]<<COLORROP_BITS|ROPF_DITHER;
 	break;
-      case SPT_WIDTH:
-	dc->pen_width=tmpg->w.width;
-	DCPenWidthScale(dc);
+      case SPT_THICK:
+	dc->thick=tmpg->t.thick;
+	DCThickScale(dc);
 	break;
       case SPT_TRANSFORM_ON:
 	if (!(dc->flags&DCF_TRANSFORMATION)) {
@@ -237,7 +237,7 @@ public U0 Sprite3(CDC *dc=gr.dc,I64 x,I64 y,I64 z,U8 *elems,
   }
   MemCpy(&dc->sym,&old_sym,sizeof(CGrSym));
   dc->color=old_color;
-  dc->pen_width=old_pen_width;
+  dc->thick=old_pen_width;
   dc->flags=dc->flags&~(DCF_SYMMETRY|DCF_TRANSFORMATION) |
 	old_flags&(DCF_SYMMETRY|DCF_TRANSFORMATION);
 }

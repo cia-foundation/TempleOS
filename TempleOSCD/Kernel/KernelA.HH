@@ -3665,11 +3665,11 @@ public class CDC
 
   //Set with $LK,"DCMat4x4Set",A="MN:DCMat4x4Set"$().  $LK,"Free",A="MN:Free"$() before setting.
   I64	*r, //rotation matrix of quads decimal in lo
-	r_norm; //shifted 32 bits.  Used for scaling pen width
+	r_norm; //shifted 32 bits.  Used for scaling thick
 
   //public (Change directly)
   I32	x,y,z,
-	pen_width;
+	thick;
 
   //Can be changed from the default $LK,"DCTransform",A="MN:DCTransform"$()
   U0	(*transform)(CDC *dc,I64 *x,I64 *y,I64 *z);

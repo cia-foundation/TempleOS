@@ -160,15 +160,15 @@ public I64 *Mat4x4Scale(I64 *m,F64 s)
   return m;
 }
 
-public U0 DCPenWidthScale(CDC *dc=gr.dc)
-{//Scale device context's pen width by norm of transformation.
+public U0 DCThickScale(CDC *dc=gr.dc)
+{//Scale device context's thick by norm of transformation.
   I64 d;
   if (dc->flags&DCF_TRANSFORMATION) {
-    if (dc->pen_width) {
-      d=dc->pen_width*dc->r_norm+0x80000000; //Round
-      dc->pen_width=d.i32[1];
-      if (dc->pen_width<1)
-	dc->pen_width=1;
+    if (dc->thick) {
+      d=dc->thick*dc->r_norm+0x80000000; //Round
+      dc->thick=d.i32[1];
+      if (dc->thick<1)
+	dc->thick=1;
     }
   }
 }

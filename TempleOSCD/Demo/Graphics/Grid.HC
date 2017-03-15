@@ -2,7 +2,7 @@
 
 U0 DrawMyMs(CDC *dc,I64 x,I64 y)
 {
-  dc->pen_width=1;
+  dc->thick=1;
   dc->flags&=~(DCF_TRANSFORMATION|DCF_SYMMETRY);
   GrRect(dc,x,y,GRID,GRID);
 }

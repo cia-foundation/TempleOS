@@ -308,7 +308,7 @@ U0 DrawIt(CTask *task,CDC *dc)
   dc->ls.y*=d;
   dc->ls.z*=d;
 
-  dc->pen_width=2;
+  dc->thick=2;
   dc->color=RED;
   GrBorder(dc,COURT_BORDER,COURT_BORDER,
 	task->pix_width -1-COURT_BORDER,

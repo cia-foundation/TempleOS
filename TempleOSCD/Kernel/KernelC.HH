@@ -534,7 +534,6 @@ public extern I64 ScanChar();
 public extern Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE);
 public extern Bool YorN();
 public extern CKbdStateGlbls	kbd;
-
 #help_index "Math"
 public extern I64 CeilI64(I64 num,I64 to);
 public extern U64 CeilU64(U64 num,U64 to);
@@ -674,6 +673,7 @@ public extern F64 Ona2Freq(I64 ona);
 public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
 public extern CSndGlbls snd;
+
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
 

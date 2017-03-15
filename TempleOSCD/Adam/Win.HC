@@ -90,7 +90,7 @@ U0 DrawWinGrid(CDC *dc)
 {
   F64 d;
   dc->color=BLACK;
-  dc->pen_width=1;
+  dc->thick=1;
   for (d=ms_grid.x_offset;d<GR_WIDTH; d+=ms_grid.x)
     GrLine(dc,d,0,d,GR_HEIGHT-1);
   for (d=ms_grid.y_offset;d<GR_HEIGHT;d+=ms_grid.y)

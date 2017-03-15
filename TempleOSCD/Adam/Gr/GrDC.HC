@@ -46,7 +46,7 @@ public I64 Mat4x4NormSqr65536(I64 *r)
 
 public U0 DCMat4x4Set(CDC *dc=NULL,I64 *r)
 {//Set device context's rot matrix. Will be $LK,"Free",A="MN:Free"$d() in $LK,"DCDel",A="MN:DCDel"$().Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
-//The main purpose is to set matrix norm for pen width scaling.
+//The main purpose is to set matrix norm for thick scaling.
   //NULL as dc means gr.dc
   if (!dc)   dc=gr.dc;
   dc->r=r;
@@ -95,7 +95,7 @@ public U0 DCLighting(CDC *dc,
   //TempleOS will generate a random U16
   //and compare to dither_probability_u16 and
   //will pick from two colors.
-  //Probability dithering does not work with pen_width>1 at this time.
+  //Probability dithering does not work with thick>1 at this time.
   if (color.c0.rop&ROPBF_TWO_SIDED) {
     color.c0.rop&=~ROPBF_TWO_SIDED;
     i=AbsI64(i)<<1;
@@ -137,7 +137,7 @@ public U0 DCRst(CDC *dc)
   dc->color2=BLACK;
   dc->bkcolor=BLACK;
   dc->collision_cnt=0;
-  dc->pen_width=1;
+  dc->thick=1;
   dc->ls.x=37837; //1<<16/Sqrt(3)
   dc->ls.y=37837;
   dc->ls.z=37837;
@@ -365,7 +365,7 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
     MemCpy(res->body,ptr,body_size);
     ptr+=body_size;
   }
-  res->pen_width=1;
+  res->thick=1;
   res->r=Mat4x4IdentNew(task);
   res->r_norm.u32[1]=1;
   res->dc_signature=DCS_SIGNATURE_VAL;

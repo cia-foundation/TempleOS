@@ -16,7 +16,7 @@ $TX,"Source Code By Sym",HTML="http://www.templeos.org/Wb/Home/Web/SymsAlpha.htm
 	
 $LK,"TempleOS Credits",A="FI:::/Doc/Credits.DD"$			$LK,"History of TempleOS",A="FI:~/Web/History.DD"$
 
-$LK,"Why 640x480?",A="FI:~/Web/640x480.DD"$
+$LK,"Why 640x480?",A="FI:~/Web/640x480.DD"$				$LK,"Dianna Cowern",A="FI:~/Web/DLC/DLC.DD"$
 $FG$
 $LK,"Change Log",A="FI:::/Doc/ChgLog.DD"$				$LK,"Terry Davis",A="FI:~/Web/TAD/TAD.DD"$
 
@@ -183,7 +183,7 @@ $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://w
 
 $HC,"<object width=\"640\" height=\"520\"><param name=\"movie\" value=\"http://www.youtube.com/v/W_b4zMxfLvA\"></param><param name=\"allowscriptaccess\" value=\"always\"></param><embed src=\"http://www.youtube.com/v/W_b4zMxfLvA\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" width=\"640\" height=\"520\"></embed></object>"$
 
-I wrote all $LK,"120,793",A="FF:~/Web/LineRep.DD,Kernel.PRJ",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the last $TX,"13.6",D="DD_TEMPLEOS_AGE"$ years, full-time, including the 64-bit compiler.  It was called, at various times, "$FG,4$$TX,"Hoppy",HTML="http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX,"The J Operating System",HTML="http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$", "$FG,4$$TX,"LoseThos",HTML="http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$" and "$FG,4$$TX,"SparrowOS",HTML="http://web.archive.org/web/*/http://www.sparrowos.com/*"$$FG$".  Here are my $FG,4$$TX,"college transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
+I wrote all $LK,"120,834",A="FF:~/Web/LineRep.DD,Kernel.PRJ",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the last $TX,"13.6",D="DD_TEMPLEOS_AGE"$ years, full-time, including the 64-bit compiler.  It was called, at various times, "$FG,4$$TX,"Hoppy",HTML="http://web.archive.org/web/*/http://www.simstructure.hare.com/*"$$FG$", "$FG,4$$TX,"The J Operating System",HTML="http://wayback.archive.org/web/*/http://www.justrighteous.org/*"$$FG$", "$FG,4$$TX,"LoseThos",HTML="http://web.archive.org/web/*/http://www.losethos.com/*"$$FG$" and "$FG,4$$TX,"SparrowOS",HTML="http://web.archive.org/web/*/http://www.sparrowos.com/*"$$FG$".  Here are my $FG,4$$TX,"college transcripts",HTML="http://www.templeos.org/files/ASU_Transcripts.pdf"$$FG$.  I've been a professional operating system developer since 1990 when I was hired to work on Ticketmaster's VAX OS.
 
 $FG,8$
 * "Commodore 64" is a trademark owned by Polabe Holding NV.

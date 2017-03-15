@@ -25,7 +25,7 @@ U0 Doodle()
 	x1=arg1; y1=arg2;
 	x2=arg1; y2=arg2;
 	dc->color=ROP_XOR+color^TRANSPARENT;
-	dc->pen_width=7;
+	dc->thick=7;
 	do {
 	  GrLine3(dc,x1,y1,0,x2,y2,0);
 	  msg_code=GetMsg(&arg1,&arg2,1<<MSG_MS_L_UP+1<<MSG_MS_MOVE);

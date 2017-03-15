@@ -69,7 +69,7 @@ U0 MPAdd()
 
   for (i=0;i<TESTS_NUM-1;i++) {
     dc->color=RED;
-    dc->pen_width=2;
+    dc->thick=2;
     GrLine3(dc,i*h/(TESTS_NUM-1),      v-ress[i  ]/PERCENT_MAX*v,0,
 	  (i+1)*h/(TESTS_NUM-1),v-ress[i+1]/PERCENT_MAX*v,0);
     dc->color=GREEN;

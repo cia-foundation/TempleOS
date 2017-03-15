@@ -79,7 +79,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       GrLine(dc,u[i].x,u[i].y,u[u[i].link].x,u[u[i].link].y);
       if (Blink) {
 	dc->color=BLUE;
-	dc->pen_width=6;
+	dc->thick=6;
 	GrPlot3(dc,(u[i].x+u[u[i].link].x)>>1,(u[i].y+u[u[i].link].y)>>1,0);
       }
     }
