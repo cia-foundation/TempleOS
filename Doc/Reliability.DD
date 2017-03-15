@@ -1,0 +1,24 @@
+$WW,1$$FG,5$$TX+CX,"RedSea Reliability"$$FG$
+
+TempleOS is like the 1040EZ tax form compared to the full 1040 form.  Obviously, it is simpler.  If you allow mission creep, pretty soon the 1040EZ looks just like the 1040 and the messed-up 1040EZ has no purpose.
+
+The Commodore 64 had a file system that was simple enough for peers in my generation to enjoy the thrill of knowing exactly what is going on at the hardware level and writing fun projects to access it.
+
+My primary design criteria is simplicity.  If it is simple enough for only 100,000 people to learn, lets try to make it simpler so that 1 million can learn it.
+
+Obviously, we don't do bad block tables, or redundant FATs.
+
+We use the simplest possible technique, a contiguous-file-only allocation bitmap, not $LK,"Block Chains",A="FI:::/Doc/BlkChain.DD"$ or FAT tables.
+
+You can be a good toy or you can be a good professional tool, but not both.  TempleOS's file manager will start too slowly once a few thousand files exist because the file manager makes a list of all files on start-up.
+
+Do not have more than a few thousand files or the file manager will not function.
+
+You are encouraged to keep your entire drive limited to, maybe, 100 Meg of files because you are suppoosed to operate as a kayak instead of a Titanic.  If you do this, backing-up will be only a minute or so and you should do it at least once a day. 
+
+Third party software should be run from ISO files or CD/DVDs directly, without installing to hard drive.
+
+Multimedia graphics and sound is, basically, forbidden.  If you ignore this, all hell will break loose because memory will fragment with large files and the original vision of kayak hard-drive back-ups won't work.
+
+$FG,8$
+* "Commodore 64" is a trademark owned by Polabe Holding NV.

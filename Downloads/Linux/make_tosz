@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#Make TOSZ
+
+echo Make TOSZ
+cc TOSZ.CPP -o TOSZ
+chmod 777 TOSZ
