@@ -1,3 +1,43 @@
+#help_index "Misc/PLog"
+
+public U8 *PLogLocalDir(CDate cdt=0)
+{//MAlloc dirname of private log for date.
+  static U8 dir[STR_LEN];
+  CDateStruct ds;
+  if (!cdt) cdt=Now+local_time_offset;
+  Date2Struct(&ds,cdt);
+  StrPrint(dir,"~/Private/%d%Z",ds.year,ds.mon-1,"ST_MONTHS");
+  if (!FileFind(dir,,FUF_JUST_DIRS))
+    DirMk(dir);
+  return dir;
+}
+
+public U8 *PLogLocalFile(CDate cdt=0)
+{//MAlloc filename of private log for date.
+  static U8 file[STR_LEN];
+  CDateStruct ds;
+  if (!cdt) cdt=Now+local_time_offset;
+  Date2Struct(&ds,cdt);
+  StrPrint(file,"%s/" INS_REG_PERSONAL_INITIALS "PLog%02d%02d%02d.DD.Z",
+	PLogLocalDir(cdt),ds.year%100,ds.mon,ds.day_of_mon);
+  return file;
+}
+
+
+public U0 PLog()
+{//Make entry in private log.
+  if (!FileFind(PLogLocalFile,,FUF_JUST_FILES))
+    Copy("~/Private/DailyPLogHeader.DD.Z",PLogLocalFile);
+  AutoComplete;
+  WinBorder;
+  WinMax;
+  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
+  Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
+  Msg(MSG_KEY_DOWN_UP,'\n',0);
+  if (Ed(PLogLocalFile,EDF_WAS_WRITE))
+    DocOpt(PLogLocalFile,"-r");
+}
+
 #help_index "Misc/Blog"
 
 public U8 *BlogLocalDir(CDate cdt=0)

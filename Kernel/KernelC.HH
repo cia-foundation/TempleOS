@@ -534,6 +534,7 @@ public extern I64 ScanChar();
 public extern Bool ScanKey(I64 *_ch=NULL,I64 *_scan_code=NULL,Bool echo=FALSE);
 public extern Bool YorN();
 public extern CKbdStateGlbls	kbd;
+
 #help_index "Math"
 public extern I64 CeilI64(I64 num,I64 to);
 public extern U64 CeilU64(U64 num,U64 to);
@@ -760,5 +761,4 @@ public extern F64 tS(); //From SysTimerFreq.
 
 #help_index "Windows"
 public extern Bool WinInside(I64 x,I64 y,CTask *task=NULL,I64 border=0);
-
 #help_index ""
