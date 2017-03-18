@@ -21,6 +21,18 @@ U8 *EdOverStrikeCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
   return st;
 }
 
+U8 *EdAutoSaveCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
+{
+  CDoc *doc=doc_e->user_data;
+  U8 *st=MAlloc(8,mem_task);
+  if (doc->flags & DOCF_AUTO_SAVE)
+    *st='S';
+  else
+    *st='Ä';
+  st[1]=0;
+  return st;
+}
+
 U8 *EdFilterCB(CDoc *,CDocEntry *doc_e,CTask *mem_task)
 {
   CDoc *doc=doc_e->user_data;
@@ -109,7 +121,7 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
     DocDataFmt(bdoc,doc_e);
   }
 
-  DocPrint(bdoc,"$$CM+BY+RX+NC,-30,1$$");
+  DocPrint(bdoc,"$$CM+BY+RX+NC,-31,1$$");
   doc_e=DocPrint(bdoc,"$$TX+BD+TC,\"     \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdMoreCB;
@@ -122,6 +134,9 @@ public Bool DocEd(CDoc *doc,I64 dof_flags=0)
   doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdOverStrikeCB;
+  doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
+  doc_e->user_data=doc;
+  doc_e->tag_cb=&EdAutoSaveCB;
   doc_e=DocPrint(bdoc,"$$TX+BD+TC,\" \"$$");
   doc_e->user_data=doc;
   doc_e->tag_cb=&EdDollarCB;

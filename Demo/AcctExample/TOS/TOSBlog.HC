@@ -34,6 +34,7 @@ public U0 PLog()
   Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN|SCF_CTRL);
   Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
   Msg(MSG_KEY_DOWN_UP,'\n',0);
+  Msg(MSG_KEY_DOWN_UP,CH_CTRLS,0x61F0000061F);
   if (Ed(PLogLocalFile,EDF_WAS_WRITE))
     DocOpt(PLogLocalFile,"-r");
 }
@@ -156,6 +157,7 @@ public U0 Blog(Bool god_misc2=FALSE)
     Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
     Msg(MSG_KEY_DOWN_UP,'\n',0);
   }
+  Msg(MSG_KEY_DOWN_UP,CH_CTRLS,0x61F0000061F);
   if (Ed(BlogLocalFile,EDF_WAS_WRITE)) {
     DocOpt(BlogLocalFile,"-r");
     Copy(BlogLocalFile,"::" DAILY_BASE ".DD.Z");

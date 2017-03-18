@@ -1268,11 +1268,12 @@ class CEdFileName
 // DOC header flags
 #define DOCF_PLAIN_TEXT 	0x1
 #define DOCF_PLAIN_TEXT_TABS	0x2 //has '\t', not DOCT_TAB
-#define DOCF_NO_CURSOR		0x4
-#define DOCF_CARRIAGE_RETURN	0x8
-#define DOCF_DBL_DOLLARS	0x10
-#define DOCF_COLOR_NAMES	0x20
-//Reserved x2
+#define DOCF_AUTO_SAVE		0x4
+#define DOCF_NO_CURSOR		0x8
+#define DOCF_CARRIAGE_RETURN	0x10
+#define DOCF_DBL_DOLLARS	0x20
+#define DOCF_COLOR_NAMES	0x40
+//Reserved x1
 #define DOCF_BORDER_DOC		0x100
 #define DOCF_FORM		0x200
 #define DOCF_SIZE_MIN		0x400
@@ -1304,11 +1305,12 @@ class CEdFileName
 
 #define DOCf_PLAIN_TEXT 	0
 #define DOCf_PLAIN_TEXT_TABS	1 //has '\t', not DOCT_TAB
-#define DOCf_NO_CURSOR		2
-#define DOCf_CARRIAGE_RETURN	3
-#define DOCf_DBL_DOLLARS	4
-#define DOCf_COLOR_NAMES	5
-//Reserved x2
+#define DOCf_AUTO_SAVE		2
+#define DOCf_NO_CURSOR		3
+#define DOCf_CARRIAGE_RETURN	4
+#define DOCf_DBL_DOLLARS	5
+#define DOCf_COLOR_NAMES	6
+//Reserved x1
 #define DOCf_BORDER_DOC		8
 #define DOCf_FORM		9
 #define DOCf_SIZE_MIN		10

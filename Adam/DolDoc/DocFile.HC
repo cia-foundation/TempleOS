@@ -265,6 +265,8 @@ Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
       u->doc_flags=doc->flags;
       res=TRUE;
     }
+    if (doc->flags&DOCF_AUTO_SAVE)
+      DocWrite(doc);
     if (unlock)
       DocUnlock(doc);
   }

@@ -2,7 +2,10 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----03/16/17 12:05:16----$IV,0$
+$IV,1$----03/17/17 03:46:54----$IV,0$
+
+$IV,1$----03/17/17 00:35:11----$IV,0$
+* Added toggle AutoSave $FG,2$<CTRL-SHIFT-s>$FG$.
 
 $IV,1$----03/14/17 00:14:39----$IV,0$
 * $BK,1$TempleOS version 5.03 Released$BK,0$
