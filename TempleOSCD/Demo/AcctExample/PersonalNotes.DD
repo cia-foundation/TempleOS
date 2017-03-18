@@ -60,7 +60,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Document, perhaps with video, $LK,"GetStr",A="MN:GetStr"$() all the way down into $LK,"PutKey",A="MN:PutKey"$() code.
 
 * Better dictionary.
-* Good $LK,"spell checker",A="MN:ACMisspelledFind"$.
+* Good spell checker.
 * Good Bible search.
 
 * Can $LK,"MEM_EXTRA_HASH2_PAGS",A="MN:MEM_EXTRA_HASH2_PAGS"$ be just one?

@@ -577,9 +577,9 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 	case CH_CTRLS:
 	  if (sc&SCF_SHIFT) {
 	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Edit/Find Misspelled");
+	      KeyDescSet("Edit/Toggle AutoSave");
 	    else
-	      ACMisspelledFind(doc);
+	      LBtc(&doc->flags,DOCf_AUTO_SAVE);
 	  } else {
 	    if (sc&SCF_KEY_DESC)
 	      KeyDescSet("Edit/Save");

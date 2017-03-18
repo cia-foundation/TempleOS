@@ -25,6 +25,7 @@ Edit
   GoRBrace(,0x5D,0x61B0000061B);
   Macro(,,0x3C0000003C);
   PlayMacro(,,0x23C0000023C);
+  AutoSaveToggle(,CH_CTRLS,0x61F0000061F);
 }
 
 Insert

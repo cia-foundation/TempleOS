@@ -11,6 +11,7 @@ public _extern _LAST_FUN I64 LastFun(I64 argc,I64 *argv);
 public extern I64 RunFile(U8 *name,I64 ccf_flags=0,...);
 public extern I64 RunFile2(U8 *name,I64 ccf_flags=0,...);
 public extern CCmpGlbls cmp;
+
 #help_index "Compiler/Directive"
 #help_file "::/Doc/Directives"
 public extern Bool Echo(Bool val);
@@ -64,7 +65,6 @@ public extern I64 PrsKeyWord(CCmpCtrl *cc);
 #help_index "Compiler;Cmd Line (Typically)"
 extern I64 Cmp(U8 *filename,
 	U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0);
-
 #help_index "Debugging/Unassemble"
 public extern U8 *U(U8 *rip,I64 cnt=20,I64 seg_size=64);
 public extern U0 Ui(U8 *buf,U8 **_rip,I64 seg_size=64,

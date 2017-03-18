@@ -3,7 +3,6 @@ extern U0 ACDDefsPut(CDoc *doc=NULL,U8 *st,I64 num=-1);
 extern U0 ACDFillin(I64 n);
 extern U0 ACFillIn(I64 n);
 extern U0 ACMan(I64 n,CTask *parent_task=NULL);
-extern U0 ACMisspelledFind(CDoc *doc);
 extern I64 AdamFile(U8 *filename,Bool warn_ext=TRUE);
 extern Bool AutoComplete(Bool val=OFF);
 extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
