@@ -2,7 +2,7 @@ $WW,1$$FG,5$$TX+CX,"Change Log"$$FG$
 
 Use $LK,"R",A="MN:R"$() to rename if I change a label.
 
-$IV,1$----03/18/17 23:30:18----$IV,0$
+$IV,1$----03/20/17 21:14:42----$IV,0$
 
 $IV,1$----03/17/17 00:35:11----$IV,0$
 * Added toggle AutoSave $FG,2$<CTRL-SHIFT-s>$FG$.
