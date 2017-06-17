@@ -1,17 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
-sys.path.append('isoparser')
+sys.path.append('redseafs')
 
 import errno
-import isoparser
+from isoc import RedSea
 import os
 import subprocess
 
 ISO_FILE = sys.argv[1]
 OUTPUT_DIR = sys.argv[2]
 
-iso = isoparser.parse(ISO_FILE)
+S_IFDIR  = 0o040000  # directory
+
+iso = RedSea(ISO_FILE)
 
 def make_sure_path_exists(path):
     try:
@@ -20,15 +22,20 @@ def make_sure_path_exists(path):
         if exception.errno != errno.EEXIST:
             raise
 
-def extract(node, path):
+def extract(iso_path, path):
     make_sure_path_exists(path)
-    for entry in node.children:
-        full_path = os.path.join(path, entry.name)
 
-        if entry.is_directory:
-            extract(entry, full_path)
+    for entry in iso.readdir(iso_path if len(iso_path) else '/', -1):
+        if entry[0] == '.': continue
+
+        iso_full_path = iso_path + '/' + entry
+        full_path = os.path.join(path, entry)
+        stat = iso.getattr(iso_full_path)
+
+        if stat['st_mode'] & S_IFDIR:
+            extract(iso_full_path, full_path)
         else:
-            open(full_path, 'wb').write(entry.content)
+            open(full_path, 'wb').write(iso.read(iso_full_path, stat['st_size'], 0, -1))
 
 def decompress_all_files_in(path):
     for item in os.listdir(path):
@@ -42,7 +49,7 @@ def decompress_all_files_in(path):
             os.remove(full_path)
 
 # Extract TempleOS disk tree
-extract(iso.root, OUTPUT_DIR)
+extract('', OUTPUT_DIR)
 
 # Decompress compressed files
 decompress_all_files_in(OUTPUT_DIR)

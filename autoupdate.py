@@ -1,15 +1,13 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
+#!/usr/bin/env python3
 
 import hashlib
 import os
 import subprocess
 import sys
-import urllib
+import urllib.request
 
-ISO_URL = 'http://www.templeos.org/TempleOSCD.ISO'
-FILE_NAME = 'TempleOSCD.iso'
+ISO_URL = 'http://www.templeos.org/files/TOS_Distro.ISO'
+FILE_NAME = 'TOS_Distro.ISO'
 EXTRACTED_ISO_DIR = 'TempleOSCD'
 
 force = (len(sys.argv) > 1 and sys.argv[1] == '-f')
@@ -33,7 +31,7 @@ else:
 print('-- Pre-hash:', pre_hash)
 
 print('-- Grabbing', ISO_URL)
-urllib.urlretrieve(ISO_URL, FILE_NAME)
+urllib.request.urlretrieve(ISO_URL, FILE_NAME)
 
 post_hash = hash_of_file(FILE_NAME)
 print('-- Post-hash:', post_hash)
