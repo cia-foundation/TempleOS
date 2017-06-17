@@ -55,7 +55,7 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
 
   aotc->bin=CAlloc(sizeof(CAOTBinBlk));
   aotc->max_align_bits=0;
-  aotc->module_org=INVALID_PTR;
+  aotc->org=INVALID_PTR;
 
   MemCpy(htc,&cc->htc,sizeof(CLexHashTableContext));
   if (cc->htc.fun)
@@ -120,10 +120,10 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
       if (cc->flags&CCF_AOT_COMPILE)
 	res->buf=MAlloc(aotc->num_bin_U8s);
       else {
-	if (aotc->module_org==INVALID_PTR)
+	if (aotc->org==INVALID_PTR)
 	  res->buf=MAlloc(aotc->num_bin_U8s,Fs->code_heap);
 	else
-	  res->buf=aotc->module_org;
+	  res->buf=aotc->org;
       }
       res->aot_U8s=aotc->num_bin_U8s;
       tmpbin=aotc->bin;
@@ -143,7 +143,7 @@ CAOT *CmpJoin(CCmpCtrl *cc,I64 cmp_flags,U8 *map_name=NULL,U8 mapfile_drv_let=0)
     res->abss=aotc->abss;
     res->heap_glbls=aotc->heap_glbls;
     res->max_align_bits=aotc->max_align_bits;
-    res->module_org=aotc->module_org;
+    res->org=aotc->org;
   }
   cc->aot=parent;
   MemCpy(&cc->htc,htc,sizeof(CLexHashTableContext));
@@ -541,7 +541,7 @@ I64 Cmp(U8 *filename,U8 *map_name=NULL,U8 *out_name=NULL,U8 mapfile_drv_let=0)
 #assert sizeof(CBinFile)-2<=I8_MAX
     bfh->reserved=0;
     bfh->bin_signature=BIN_SIGNATURE_VAL;
-    bfh->module_org=tmpaot->module_org;
+    bfh->org=tmpaot->org;
     bfh->module_align_bits=tmpaot->max_align_bits;
     bfh->patch_table_offset=sizeof(CBinFile)+aot_U8s;
     bfh->file_size=size;

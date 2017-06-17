@@ -22,7 +22,6 @@ CDDVD
   DskChg(,'c');
   MountISOC(,'i');
   MakeRedSeaISOC(,'m');
-  MakeISO9660ISO(,'M');
   BurnISOFile(,'B');
 }
 

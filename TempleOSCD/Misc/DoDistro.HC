@@ -35,10 +35,7 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
   DirMk("/Distro/Tmp");
   DirMk("/Distro/Tmp/ScrnShots");
-  ISO9660ISO(out_iso_filename,"/Distro/*",,"/Distro" BOOT_DIR_KERNEL_BIN_C);
-
-  //If you want $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ filesystem, use this instead but make it ISO.C.
-  //RedSeaISO(out_iso_filename,"/Distro","/Distro" BOOT_DIR_KERNEL_BIN_C);
+  RedSeaISO(out_iso_filename,"/Distro","/Distro" BOOT_DIR_KERNEL_BIN_C);
 
   //If CD-ROM use MT_CD instead of MT_DVD.
   //DVDImageWrite('T',out_iso_filename,MT_DVD); //Uncomment to burn.
@@ -47,6 +44,6 @@ U0 MakeMyISO(U8 *_out_iso_filename)
   Free(out_iso_filename);
 }
 
-MakeMyISO("/Tmp/MyDistro.ISO");
+MakeMyISO("/Tmp/MyDistro.ISO.C");
 
 // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$.

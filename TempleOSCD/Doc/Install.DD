@@ -6,7 +6,7 @@ Dual booting with another operating system is the best way to use TempleOS.  I o
 
 The $LK,"::/Misc/OSInstall.HC"$ script will automate much of this.  It runs if you boot the CD/DVD-ROM.
 
-See $LK,"Boot.DD",A="FI:::/Doc/Boot.DD"$ for an overview of booting.  See $LK,"Requirements",A="FI:::/Doc/Requirements.DD"$ for supported hardware.  See $LK,"Upgrading",A="FI:::/Doc/Upgrade.DD"$ if you are upgrading.
+See $LK,"Boot.DD",A="FI:::/Doc/Boot.DD"$ for an overview of booting.  See $LK,"Requirements",A="FI:::/Doc/Requirements.DD"$ for supported hardware.
 
 Two TempleOS partitions are highly recommended, so you can boot to a back-up and fix the primary when you work on it.  Odds are, you only need a couple gigabytes for your TempleOS partitions.
 

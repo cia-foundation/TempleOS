@@ -126,38 +126,6 @@ Bool MyPutKey(I64 ch,I64 sc)
 		"$$BLUE$$";
 	    }
 	    return TRUE;
-	  case SC_F5:
-	    if (sc&SCF_KEY_DESC)
-	      KeyDescSet("Cmd /GodOffer");
-	    else
-	      GodOffer;
-	    return TRUE;
-	  case SC_F6:
-	    if (sc&SCF_SHIFT) {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /TOSIns");
-	      else
-		TOSIns;
-	    } else {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /TimeIns");
-	      else
-		TimeIns;
-	    }
-	    return TRUE;
-	  case SC_F7:
-	    if (sc&SCF_SHIFT) {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /NISTGodIns2");
-	      else
-		NISTGodIns2;
-	    } else {
-	      if (sc&SCF_KEY_DESC)
-		KeyDescSet("Cmd /GodIns");
-	      else
-		GodIns;
-	    }
-	    return TRUE;
 	  case SC_F8:
 	    if (sc&SCF_SHIFT) {
 	      if (sc&SCF_KEY_DESC)
@@ -185,6 +153,18 @@ Bool MyPutKey(I64 ch,I64 sc)
 	else
 	  AutoComplete;
 	return TRUE;
+      case 'f': //With sync
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Cmd /FrameGrabber Sync");
+	else
+	  FrameGrabberToggle(TRUE,FALSE,FALSE);
+	return TRUE;
+      case 'F': //With sync and intro TOS theme
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Cmd /FrameGrabber Intro");
+	else
+	  FrameGrabberToggle(TRUE,TRUE,FALSE);
+	return TRUE;
       case 'h':
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /WinTileHorz");
@@ -210,12 +190,6 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  KeyDescSet("Cmd /WinTileVert");
 	else
 	  WinTileVert;
-	return TRUE;
-      case 'V':
-	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /FrameGrabberToggle");
-	else
-	  FrameGrabberToggle;
 	return TRUE;
       case 'l':
 	if (sc&SCF_KEY_DESC)
@@ -283,30 +257,6 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  KeyDescSet("Dol /Unindent 5");
 	else
 	  "$$ID,-5$$";
-	return TRUE;
-      case 'b':
-	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /Jump to Bad Code");
-	else //$LK,"::/Adam/God/HSNotes.DD"$
-	  GodCodeJmp;
-	return TRUE;
-      case 'g':
-	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Edit/BlogScrnShot");
-	else
-	  BlogScrnShot;
-	return TRUE;
-      case 'p':
-	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /JukeBox(Home/Sup1Hymns)");
-	else
-	  JukeBox("~/Sup1/Sup1Hymns");
-	return TRUE;
-      case 'P':
-	if (sc&SCF_KEY_DESC)
-	  KeyDescSet("Cmd /JukeBox(Home/Sup1Songs)");
-	else
-	  JukeBox("~/Sup1/Sup1Songs");
 	return TRUE;
     }
   }

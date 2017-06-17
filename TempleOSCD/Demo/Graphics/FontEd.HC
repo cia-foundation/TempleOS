@@ -125,7 +125,7 @@ U0 FontEd()
 	  break;
 	case MSG_MS_L_DOWN:
 	case MSG_MS_R_DOWN:
-	  if (0<=arg1<FONT_WIDTH*16 && FONT_HEIGHT*2<=arg2<FONT_HEIGHT*16) {
+	  if (0<=arg1<FONT_WIDTH*16 && 0<=arg2-2*FONT_HEIGHT<FONT_HEIGHT*16) {
 	    cur_ch=(arg2/FONT_HEIGHT-2)*16+arg1/FONT_WIDTH;
 	    break;
 	  } //fall through

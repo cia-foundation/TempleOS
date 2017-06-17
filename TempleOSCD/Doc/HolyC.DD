@@ -209,7 +209,7 @@ $FG$$ID,-2$
 
 * You can use $LK,"Option",A="MN:Option"$($LK,"OPTf_WARN_DUP_TYPES",A="MN:OPTf_WARN_DUP_TYPES"$,ON) to find dup local var type stmts.
 
-* With the $FG,2$#exe{}$FG$ feature in your src code, you can place programs that insert text into the stream of code being compiled.  See $LK,"#exe {}",A="FF:::/Kernel/KEnd.HC,#exe {"$ for an example where the date/time and compile-time prompting for cfguration data is placed into a program.  $LK,"StreamPrint",A="MN:StreamPrint"$() places text into a src program stream following the conclusion of the $FG,2$#exe{}$FG$ blk.
+* With the $FG,2$#exe{}$FG$ feature in your src code, you can place programs that insert text into the stream of code being compiled.  See $LK,"#exe {}",A="FF:::/Kernel/KMain.HC,#exe {"$ for an example where the date/time and compile-time prompting for cfguration data is placed into a program.  $LK,"StreamPrint",A="MN:StreamPrint"$() places text into a src program stream following the conclusion of the $FG,2$#exe{}$FG$ blk.
 
 * No $FG,2$#define$FG$ functions exist (I'm not a fan)
 
@@ -223,7 +223,7 @@ $FG$$ID,-2$
 
 * $FG,2$union$FG$ is more like a class, so you don't reference it with a $FG,2$union$FG$ label after you define it.  Some common unions are declared in $LK,"KernelA.HH",A="MN:U16"$ for 1,2,4 and 8 byte objects.  If you place a type in front of a union declaration, that is the type when used by itself.  See $LK,"::/Demo/SubIntAccess.HC"$. 
 
-* $FG,2$class$FG$ member vars can have meta data. $FG,2$fmtstr$FG$ and $FG,2$fmtdata$FG$ are two meta data types now used.  All compiler structures are saved and you can access the compiler's info about classes and vars.  See $LK,"::/Demo/ClassMeta.HC"$ and  $LK,"DocForm",A="MN:DocForm"$().
+* $FG,2$class$FG$ member vars can have meta data. $FG,2$format$FG$ and $FG,2$data$FG$ are two meta data types now used.  All compiler structures are saved and you can access the compiler's info about classes and vars.  See $LK,"::/Demo/ClassMeta.HC"$ and  $LK,"DocForm",A="MN:DocForm"$().
 
 * There is a keyword $FG,2$lastclass$FG$ you use as a dft arg.  It is set to the class name of the prev arg.  See $LK,"::/Demo/LastClass.HC"$, $LK,"ClassRep",A="MN:ClassRep"$(), $LK,"DocForm",A="MN:DocForm"$()  and $LK,"::/Demo/Dsk/BlkDevRep.HC"$.
 

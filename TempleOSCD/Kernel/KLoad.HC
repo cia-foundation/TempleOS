@@ -200,7 +200,7 @@ CBinFile *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR)
   }
 
   if (bfh_addr==INVALID_PTR) {
-    if (bfh->module_org==INVALID_PTR) {
+    if (bfh->org==INVALID_PTR) {
       misalignment=module_align-sizeof(CBinFile);
       if (misalignment<0)
 	misalignment&=module_align-1;
@@ -215,7 +215,7 @@ CBinFile *Load(U8 *filename,I64 ld_flags=0,CBinFile *bfh_addr=INVALID_PTR)
 	goto lo_skip; //File is already in code heap area, don't copy.
       }
     } else
-      bfh_addr=bfh->module_org;
+      bfh_addr=bfh->org;
   }
   MemCpy(bfh_addr,bfh,size);
   Free(bfh);

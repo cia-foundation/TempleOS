@@ -85,7 +85,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * When using $FG,2$<CTRL-l>$FG$ to insert links in documents, you can usually leave the $FG,2$Tag Text$FG$ blank and it will be filled-in automatically based on other entries.
 
-* There is a feature of the precompiler that allows code to be executed in the middle of compilation and data inserted into the compilation stream.  Click here for an example: $LK,"#exe {",A="FF:::/Kernel/KEnd.HC,#exe {"$.
+* There is a feature of the precompiler that allows code to be executed in the middle of compilation and data inserted into the compilation stream.  Click here for an example: $LK,"#exe {",A="FF:::/Kernel/KMain.HC,#exe {"$.
 
 * If you output to the cmd line and wish to allow users to scroll around and view data, you can use $LK,"View",A="MN:View"$().
 

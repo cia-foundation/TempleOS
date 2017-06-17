@@ -278,7 +278,6 @@ Bool Drv(U8 drv_let)
   switch (dv->fs_type) {
     case FSt_REDSEA:
     case FSt_FAT32:
-    case FSt_ISO9660:
       return TRUE;
     default:
       PrintErr("File System Not Supported\n");

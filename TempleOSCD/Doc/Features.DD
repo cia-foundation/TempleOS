@@ -18,7 +18,7 @@
 
 * ATA PIO Hard drives, support for $FG,2$FAT32$FG$ and $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ file systems with file compression.
 
-* ATAPI PIO $FG,2$CD/DVD$FG$ support with $FG,2$ISO9660$FG$ file system.  Can make bootable $FG,2$ISO9660$FG$ ISO files so you can roll-your-own distro's.
+* ATAPI PIO $FG,2$CD/DVD$FG$ support with $FG,2$RedSea$FG$ file system.  Can make bootable ISO files so you can roll-your-own distro's.
 
 * $LK,"Partitioning",A="MN:DskPrt"$ tool, installer, $FG,2$boot loaders$FG$ for CD/DVD and hard disk.
 

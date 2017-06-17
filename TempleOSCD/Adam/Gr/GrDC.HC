@@ -414,7 +414,7 @@ public CDC *DCScrnCapture(Bool include_zoom=TRUE,CTask *task=NULL)
 {//Capture scrn to a device context.
   CDC *dc;
   U8 *dst;
-  Refresh(2,TRUE);
+  Refresh(0,FALSE);
   if (include_zoom)
     dc=DCCopy(gr.scrn_image,task);
   else

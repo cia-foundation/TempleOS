@@ -208,11 +208,11 @@ U0 DocDataScan(CDoc *doc,CDocEntry *doc_e)
 #help_index "DolDoc/Input;StdIn/DolDoc"
 public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     I64 dof_flags=0,U8 *header=NULL,U8 *footer=NULL)
-{//User input. Supply a class name that has fmtstr definitions.
+{//User input. Supply a class name that has format definitions.
 //See $LK,"::/Demo/DolDoc/Form.HC"$ and $LK,"::/Demo/LastClass.HC"$.
   CMemberLst *ml;
   CDocEntry *doc_e;
-  U8 *fmtstr;
+  U8 *format;
   CHashClass *tmpc,*tmpc2;
   CDoc *doc;
   Bool res=FALSE;
@@ -227,8 +227,8 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
     doc->flags|=DOCF_SIZE_MIN;
   ml=tmpc->member_lst_and_root;
   while (ml) {
-    if ((fmtstr=MemberMetaData("fmtstr",ml)) &&
-	  (doc_e=DocPrint(doc,"%s",fmtstr))) {
+    if ((format=MemberMetaData("format",ml)) &&
+	  (doc_e=DocPrint(doc,"%s",format))) {
       tmpc2=ml->member_class;
       if ((doc_e->type_u8==DOCT_DATA || doc_e->type_u8==DOCT_LST ||
 	    doc_e->type_u8==DOCT_CHECK_BOX) && !tmpc2->ptr_stars_cnt) {
@@ -254,7 +254,7 @@ public Bool DocForm(U8 *_d,U8 *class_name=lastclass,
 	doc_e->data=*doc_e->user_data(U8 **);
       } else
 	doc_e->data=_d+ml->offset;
-      doc_e->my_fmt_data=MemberMetaData("fmtdata",ml);
+      doc_e->my_fmt_data=MemberMetaData("data",ml);
       DocDataFmt(doc,doc_e);
     }
     ml=ml->next;

@@ -1,13 +1,9 @@
-//ISO1 is ISO9660
-//ISO2 is ISO13490
-//ISO3 is ISO13346
-
 Bool ISOInit(CDrv *dv,I64 blk)
 {
   CBlkDev *bd=dv->bd;
   I64 spc=bd->blk_size>>BLK_SIZE_BITS,i=blk/spc,drv_offset=0;
-  CISO1PriDesc *iso=MAlloc(bd->blk_size);
-  CISO1DirEntry *de;
+  CISOPriDesc *iso=MAlloc(bd->blk_size);
+  CISODirEntry *de;
   Bool unlock,res=FALSE;
   U8 buf[8];
 
@@ -25,10 +21,10 @@ Bool ISOInit(CDrv *dv,I64 blk)
 	    LMF_EXACT)) {
 	case 0:
 	  switch (iso->type) {
-	    case ISO1T_BOOT_RECORD:
+	    case ISOT_BOOT_RECORD:
 	      drv_offset+=(2*DVD_BLK_SIZE+DVD_BLK_SIZE)/BLK_SIZE;
 	      break;
-	    case ISO1T_SUPPLEMENTARY_DESC:
+	    case ISOT_SUPPLEMENTARY_DESC:
 	      de=&iso->root_dir_record;
 	      dv->size=iso->vol_space_size.little*bd->blk_size>>BLK_SIZE_BITS;
 	      if (!StrCmp(iso->publisher_id,"TempleOS RedSea")) {
@@ -41,11 +37,11 @@ Bool ISOInit(CDrv *dv,I64 blk)
 		dv->root_clus=de->loc.little;
 	      res=TRUE;
 	      goto di_done;
-	    case ISO1T_TERMINATOR:
+	    case ISOT_TERMINATOR:
 	      throw('Drv');
 	  }
 	  break;
-	default: //Its normal for ISO13346 to read NULL blk as terminator
+	default: //Its normal for ISO3346 to read NULL blk as terminator
 	  PrintErr("File System Not Supported\n");
 	  throw('Drv');
       }

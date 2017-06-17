@@ -35,13 +35,13 @@ public CFileBMP *BMP4To(CDC *dc)
   CFileBMP *bmp	=CAlloc(size);
   bmp->type	='BM';
   bmp->planes	=1;
-  bmp->file_size	=size;
+  bmp->file_size=size;
   bmp->data_offset=sizeof(CFileBMP);
   bmp->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
   bmp->width	=dc->width;
   bmp->height	=dc->height;
   bmp->bit_cnt	=4;
-  bmp->image_size	=dc->width*dc->height>>1;
+  bmp->image_size=dc->width*dc->height>>1;
   GrPaletteGet(palette);
 #assert COLORS_NUM==BMP_COLORS_NUM
   for (i=0;i<BMP_COLORS_NUM;i++) {
@@ -128,13 +128,13 @@ public CFileBMP *BMP24To(CDC *dc)
   CFileBMP *bmp	=CAlloc(size);
   bmp->type	='BM';
   bmp->planes	=1;
-  bmp->file_size	=size;
+  bmp->file_size=size;
   bmp->data_offset=offset(CFileBMP.end);
   bmp->header_size=offset(CFileBMP.end)-offset(CFileBMP.header_size);
   bmp->width	=dc->width;
   bmp->height	=dc->height;
   bmp->bit_cnt	=32;
-  bmp->image_size	=dc->width*dc->height<<2;
+  bmp->image_size=dc->width*dc->height<<2;
 
   bgr=bmp(U8 *)+bmp->data_offset;
   for (y=dc->height-1;y>=0;y--) {
@@ -340,4 +340,47 @@ public I64 BMPScrnCapture(U8 *filename,I64 bits=4,Bool include_zoom=TRUE)
   I64 size=BMPWrite(filename,dc,bits);
   DCDel(dc);
   return size;
+}
+
+public I64 GR2BMPLst(U8 *files_find_mask,U8 *fu_flags=NULL,
+	U8 *out_print_fmt="~:/Tmp/VID%05d.BMP.Z",F64 fps=30000.0/1001)
+{/*Cvt movie from GR lst to BMP lst
+"+d" will delete GRLst files.
+*/
+  I64 res=0,fuf_flags=0;
+  CDirEntry *tmpde,*tmpde1;
+  CDC *dc,*base=DCNew(GR_WIDTH,GR_HEIGHT);
+  U8 *st,*last_st;
+  CDate cdt=I64_MIN;
+  Bool old_silent;
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),"+f+F");
+  ScanFlags(&fuf_flags,Define("ST_FILE_UTIL_FLAGS"),fu_flags);
+  tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags&FUG_FILES_FIND);
+  last_st=MStrPrint(out_print_fmt,0);
+  progress1_max=LinkedLstCnt(tmpde);
+  while (tmpde) {
+    dc=GRRead(tmpde->full_name);
+    GrBlot(base,dc->x0,dc->y0,dc);
+    if (cdt==I64_MIN)
+      cdt=dc->cdt;
+    while (cdt<=dc->cdt) {
+      st=MStrPrint(out_print_fmt,res++);
+      BMPWrite(st,base);
+      Free(st);
+      cdt+=CDATE_FREQ/fps;
+    }
+    if (fuf_flags&FUF_DEL) {
+      old_silent=Silent;
+      Del(tmpde->full_name);
+      Silent(old_silent);
+    }
+    DCDel(dc);
+    progress1++;
+    tmpde=tmpde->next;
+  }
+  progress1=progress1_max=0;
+  DirTreeDel(tmpde1);
+  Free(last_st);
+  DCDel(base);
+  return res;
 }

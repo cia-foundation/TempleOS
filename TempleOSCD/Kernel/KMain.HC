@@ -170,7 +170,7 @@ U0 KMain()
   IntInit2;
   LBts(&sys_run_level,RLf_INTERRUPTS);
 
-  TimeStampFreqCal;
+  TimeCal;
   BlkDevsInitAll;
   "DskChg(':');\n";
   DskChg(':');
@@ -210,7 +210,7 @@ U0 KMain()
   LBts(&sys_run_level,RLf_COMPILER);
 
   DbgMode(OFF);
-  cnts.time_stamp_freq_initial=TimeStampFreqCal;
+  cnts.time_stamp_freq_initial=TimeCal;
   Cd("/");
   try ExeFile("StartOS"); //Continues $LK,"/StartOS.HC",A="FL:/StartOS.HC,1"$
   catch {

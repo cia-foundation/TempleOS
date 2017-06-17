@@ -299,7 +299,7 @@ Bool FAT32FileFind(CDrv *dv,I64 cur_dir_clus,
   if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else if (!CFileNameTo(dname,name))
-    PrintErr("Invalid FileName.\n");
+    PrintErr("Invalid FileName: \"%s\".\n",name);
   else
     try {
       unlock=DrvLock(dv);
@@ -391,10 +391,8 @@ Bool FAT32Cd(U8 *name,I64 cur_dir_clus)
     PrintErr("Not FAT32 Drv\n");
   else if (FAT32FileFind(Fs->cur_dv,cur_dir_clus,name,&de,FUF_JUST_DIRS))
     return TRUE;
-  else {
-    "%s ",name;
-    PrintErr("File not found.\n");
-  }
+  else
+    PrintErr("File not found: \"%s\".\n",name);
   return FALSE;
 }
 
@@ -809,7 +807,7 @@ I64 FAT32FileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   if (dv->fs_type!=FSt_FAT32)
     PrintErr("Not FAT32 Drv\n");
   else if (!CFileNameTo(de.name,name))
-    PrintErr("Invalid FileName.\n");
+    PrintErr("Invalid FileName: \"%s\".\n",name);
   else {
     FAT32FilesDel(dv,cur_dir,de.name,0,FALSE,FALSE);
     if (attr & RS_ATTR_CONTIGUOUS)

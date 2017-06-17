@@ -86,9 +86,6 @@ U0 Fmt(I64 drv_let,Bool quick=TRUE,Bool confirm=TRUE,I64 type=FSt_FAT32)
       DskCacheInvalidate(Let2Drv(drv_let));
       Drv(drv_let);
       break;
-    case FSt_ISO9660:
-      PrintErr("Not Writable\n");
-      break;
     default:
       PrintErr("File System Not Supported\n");
   }

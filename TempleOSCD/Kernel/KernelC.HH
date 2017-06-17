@@ -705,7 +705,7 @@ extern CTask *sys_winmgr_task,*sys_task_being_scrn_updated;
 #help_index "Task/Delay;Time/CPU Cycles"
 public extern U0 Busy(I64 ÊS); //Loosely timed
 public extern U0 PortNop(); //On the order of 1uS
-extern I64 TimeStampFreqCal();
+extern I64 TimeCal();
 
 #help_index "Task/Delay;Time/Jiffies"
 public extern U0 Sleep(I64 mS);
@@ -728,7 +728,6 @@ public extern CCntsGlbls cnts;
 
 #help_index "Time/Date/CDate;Date/CDate"
 #help_file "::/Doc/TimeDate"
-extern U0 Date2ISO1(CISO1Date *dst,CDate cdt);
 public extern U0 Date2Struct(CDateStruct *_ds,CDate cdt);
 extern U8 *MPrintDate(CDate cdt);
 extern U8 *MPrintTime(CDate cdt);
@@ -754,11 +753,11 @@ public extern I64 HPET();
 #help_index "Time/Jiffies"
 #help_file "::/Doc/TimeJiffy"
 public extern I64 SysTimerRead();//18.33333*65536Hz (SYS_TIMER_FREQ)
-
 #help_index "Time/Seconds"
 public extern Bool Blink(F64 Hz=2.5);
 public extern F64 tS(); //From SysTimerFreq.
 
 #help_index "Windows"
 public extern Bool WinInside(I64 x,I64 y,CTask *task=NULL,I64 border=0);
+
 #help_index ""

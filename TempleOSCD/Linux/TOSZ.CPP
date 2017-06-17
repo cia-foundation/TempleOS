@@ -273,16 +273,36 @@ BOOL Cvt(char *in_name,char *out_name,BOOL cvt_ascii)
   return okay;
 }
 
+void FillGaps(char *in_name)
+{
+  char buf[512];
+  FILE *fp;
+  int i=0,i1;
+  sprintf(buf,"ls %s",in_name);
+  fp = popen(buf, "r");
+  if (fp) {
+    while (fgets(buf,sizeof(buf), fp)) {
+      printf("%s\n",buf);
+    }
+    pclose(fp);
+  }
+}
+
 int main(int argc, char* argv[])
 {
   char *in_name,*out_name,buf[256];
-  BOOL cvt_ascii,del_in=FALSE;
+  BOOL cvt_ascii,fill_gaps,del_in=FALSE;
   int i=1,l;
   if (argc>i && !strcmp(argv[i],"-ascii")) {
     cvt_ascii=TRUE;
     i++;
   } else
     cvt_ascii=FALSE;
+  if (argc>i && !strcmp(argv[i],"-gaps")) {
+    fill_gaps=TRUE;
+    i++;
+  } else
+    fill_gaps=FALSE;
   if (argc>i) {
     in_name=argv[i++];
     if (argc>i)
@@ -296,7 +316,9 @@ int main(int argc, char* argv[])
       }
       out_name=buf;
     }
-    if (Cvt(in_name,out_name,cvt_ascii)) {
+    if (fill_gaps)
+      FillGaps(in_name);
+    else if (Cvt(in_name,out_name,cvt_ascii)) {
       if (del_in) {
 	sprintf(buf,"rm %s",in_name);
 	system(buf);
@@ -304,8 +326,9 @@ int main(int argc, char* argv[])
     } else
       printf("Fail: %s %s\r\n",in_name,out_name);
   } else
-    puts("TOSZ [-ascii] in_name [out_name]\r\n\r\n"
+    puts("TOSZ [-ascii] [-gaps] in_name [out_name]\r\n\r\n"
 	  "TOSZ expands a single TempleOS file. The -ascii flag will convert "
-	  "nonstandard TempleOS ASCII characters to regular ASCII.\r\n");
+	  "nonstandard TempleOS ASCII characters to regular ASCII. The -gap flag "
+          "will fill-in missing BMP files in the sequence VID%05d.BMP.\r\n");
   return EXIT_SUCCESS;
 }

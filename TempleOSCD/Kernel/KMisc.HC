@@ -82,7 +82,7 @@ I64 HPET()
   return *(dev.uncached_alias+HPET_MAIN_CNT)(I64 *);
 }
 
-I64 TimeStampFreqCal()
+I64 TimeCal()
 {
   static I64 time_stamp_start=0,timer_start=0,HPET_start=0;
   I64 i;

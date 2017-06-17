@@ -235,7 +235,7 @@ $FG,5$*.BIN.Z;*.BIN.C;*.BIN$FG$
 $FG,5$*.DATA.Z;*.DATA$FG$
   Data files
 $FG,5$*.ISO$FG$
-  CD/DVD image file--ISO9660.
+  CD/DVD image file.
 $FG,5$*.IN.Z;*.IN$FG$
   $FG,2$InFile$FG$ Basically a HolyC program whose stdout goes to the input of a task when $LK,"InFile",A="MN:InFile"$() is called.
 $FG,5$*.GR.Z;*.GR$FG$

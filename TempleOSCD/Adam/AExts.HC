@@ -51,8 +51,6 @@ extern I64 ExeDoc(CDoc *doc,I64 ccf_flags=0);
 extern I64 FindWiz();
 extern I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=I64_MIN,I64 hi=I64_MAX);
 extern Bool GrPlot0(CDC *dc,I64 x,I64 y);
-extern I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
-	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL);
 extern CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name);
 extern CMenu *MenuFilePush(U8 *filename);
 extern U0 MenuPop();

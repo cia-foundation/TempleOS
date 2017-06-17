@@ -945,14 +945,14 @@ U0 PrsAsmBlk(CCmpCtrl *cc,I64 cmp_flags)
 	      LexExcept(cc,"Missing ';' at");
 	    Lex(cc); //skip ';';
 	    break;
-	  case AKW_MODULE_ORG:
+	  case AKW_ORG:
 	    if (cc->htc.local_var_lst)
 	      LexExcept(cc,"ORG not allowed in fun asm blk ");
-	    if (aotc->module_org!=INVALID_PTR)
+	    if (aotc->org!=INVALID_PTR)
 	      LexExcept(cc,"Just one org allowed ");
 	    if (aotc->rip)
 	      LexExcept(cc,"ORG must be at beginning ");
-	    aotc->module_org=AsmLexExpression(cc);
+	    aotc->org=AsmLexExpression(cc);
 	    break;
 	  case AKW_ALIGN:
 	    if (cc->htc.local_var_lst)

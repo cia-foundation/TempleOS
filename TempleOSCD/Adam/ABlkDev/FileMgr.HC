@@ -141,6 +141,9 @@ CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_head,Bool init)
   return tmpde;
 }
 
+#define DEF2_PROCESSED		1
+#define DEF2_NOT_INITIALIZED	2
+
 U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode)
 {
   CDrv *dv;
@@ -222,7 +225,7 @@ U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode)
 	tmpde=FMRebuildDocDrv(Drv2Let(dv),doc,_head,TRUE);
       else {
 	tmpde=FMRebuildDocDrv(Drv2Let(dv),doc,_head,FALSE);
-	tmpde->flags|=DEF_NOT_INITIALIZED;
+	tmpde->user_data2|=DEF2_NOT_INITIALIZED;
       }
     } else if (dv->fs_type==FSt_REDSEA || dv->fs_type==FSt_FAT32)
       FMRebuildDocDrv(Drv2Let(dv),doc,_head,TRUE);
@@ -388,11 +391,10 @@ U0 FMFmtDrv(CDoc *doc)
   Free(st);
 }
 
-U0 FMMakeISO(CDoc *doc,I64 type)
+U0 FMMakeISO(CDoc *doc)
 {
   CDocEntry *doc_ce=doc->cur_entry;
   CDirEntry *tmpde;
-  U8 *st;
   if (doc_ce->type_u8==DOCT_TREE || doc_ce->type_u8==DOCT_MENU_VAL)
     tmpde=doc_ce->user_data;
   else
@@ -402,19 +404,7 @@ U0 FMMakeISO(CDoc *doc,I64 type)
       tmpde=tmpde->parent;
     if (tmpde && *tmpde->full_name) {
       Silent;
-      switch (type) {
-	case FSt_REDSEA:
-	  RedSeaISO(,tmpde->full_name);
-	  break;
-	case FSt_ISO9660:
-	  if (tmpde->full_name[StrLen(tmpde->full_name)-1]=='/')
-	    st=MStrPrint("%s*",tmpde->full_name);
-	  else
-	    st=MStrPrint("%s/*",tmpde->full_name);
-	  ISO9660ISO(,st);
-	  Free(st);
-	  break;
-      }
+      RedSeaISO(,tmpde->full_name);
       Silent(OFF);
     }
   }
@@ -455,18 +445,18 @@ U0 FMCopy(CDoc *doc)
     while (doc_e!=doc2) {
       if (doc_e->type_u8==DOCT_MENU_VAL) {
 	tmpde=doc_e->user_data;
-	tmpde->flags|=DEF_PROCESSED;
+	tmpde->user_data2|=DEF2_PROCESSED;
 	tmpde2=tmpde->parent;
-	if (!tmpde2 || !(tmpde2->flags&DEF_PROCESSED)) {
+	if (!tmpde2 || !(tmpde2->user_data2&DEF2_PROCESSED)) {
 	  Silent;
 	  Copy(tmpde->full_name,tmpde1->full_name);
 	  Silent(OFF);
 	}
       } else if (doc_e->type_u8==DOCT_TREE) {
 	tmpde=doc_e->user_data;
-	tmpde->flags|=DEF_PROCESSED;
+	tmpde->user_data2|=DEF2_PROCESSED;
 	tmpde2=tmpde->parent;
-	if (!tmpde2 || !(tmpde2->flags&DEF_PROCESSED)) {
+	if (!tmpde2 || !(tmpde2->user_data2&DEF2_PROCESSED)) {
 	  Silent;
 	  if (*tmpde1->name)
 	    st=MStrPrint("%s/%s",tmpde1->full_name,tmpde->name);
@@ -496,9 +486,8 @@ U0 FMCopy(CDoc *doc)
 #define FMR_MOUNT_REDSEA_ISO_C	9
 #define FMR_UNMOUNT		10
 #define FMR_MAKE_REDSEA_ISO_C	11
-#define FMR_MAKE_ISO9660	12
-#define FMR_BURN_ISO		13
-#define FMR_HELP		14
+#define FMR_BURN_ISO		12
+#define FMR_HELP		13
 
 I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 {
@@ -518,8 +507,7 @@ I64 PopUpFMRight(U8 *header=NULL,U8 *footer=NULL)
 	"LE=FMR_MOUNT_REDSEA_ISO_C$$"
 	"$$CM+LX,29,0$$$$BT,\"UNMOUNT                 \",LE=FMR_UNMOUNT$$"
 	"$$CM+LX,1,3 $$$$BT,\"MAKE ISO.C (CD/DVD) FILE\",LE=FMR_MAKE_REDSEA_ISO_C$$"
-	"$$CM+LX,29,0$$$$BT,\"MAKE ISO (CD/DVD) FILE  \",LE=FMR_MAKE_ISO9660$$"
-	"$$CM+LX,1,3 $$$$BT,\"BURN ISO (CD/DVD) FILE  \",LE=FMR_BURN_ISO$$"
+	"$$CM+LX,29,0$$$$BT,\"BURN ISO (CD/DVD) FILE  \",LE=FMR_BURN_ISO$$"
 	"$$CM+LX,1,3 $$$$BT,\"HELP                    \",LE=FMR_HELP$$"
 	"$$CM+LX,29,0$$$$BT,\"CANCEL                  \",LE=DOCM_CANCEL$$\n");
   if (footer) DocPrint(doc,"%s",footer);
@@ -566,9 +554,6 @@ U0 FMRightClick()
       break;
     case FMR_MAKE_REDSEA_ISO_C:
       Msg(MSG_KEY_DOWN,'m',0);
-      break;
-    case FMR_MAKE_ISO9660:
-      Msg(MSG_KEY_DOWN,'M',0);
       break;
     case FMR_BURN_ISO:
       Msg(MSG_KEY_DOWN,'B',0);
@@ -724,11 +709,8 @@ public U8 *FileMgr(I64 mode=FM_NORMAL,CTask *mem_task=NULL)
 	    case 'u':
 	      FMUnmount(doc);
 	      break;
-	    case 'M':
-	      FMMakeISO(doc,FSt_ISO9660);
-	      break;
 	    case 'm':
-	      FMMakeISO(doc,FSt_REDSEA);
+	      FMMakeISO(doc);
 	      break;
 	    case 'B':
 	      FMBurnISO(doc);

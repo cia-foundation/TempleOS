@@ -262,7 +262,7 @@ ti_restart:
       for (j=0;j<UNITS_NUM/2;j++) {
 	if (i!=j) {
 	  dd=SqrI64(u[i].x-u[j].x)+SqrI64(u[i].y-u[j].y);
-	  if (u[j].x<=u[i].x && dd<best_dd) {
+	  if ((u[j].x<u[i].x || u[j].king) && dd<best_dd ) {
 	    best_dd=dd;
 	    best=j;
 	  }
