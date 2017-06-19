@@ -1,16 +1,16 @@
 class FDStruct
 {//Use <CTRL-l> and sel "Data", "List" or "Check Box"
-//to generate the fmtstrs.
-  F64 num1	fmtstr "$$DA-TRM,A=\"Float 1:%12.8f\"$$\n";
-  F64 num2	fmtstr "$$DA-TRM,A=\"Float 2:%12e\"$$\n";
-  I64 num3	fmtstr "$$DA-TRM,A=\"Int   1:0x%016X\"$$\n";
-  I64 num4	fmtstr "$$DA-TRM,A=\"Int   2:%12d\"$$\n";
-  I64 type	fmtstr "$$LS,D=\"ST_PERSON_TYPE\"$$\n";
-  U8  name[32]	fmtstr "$$DA-P,A=\"Name   :%s\"$$\n";
-  U8  *address1	fmtstr "$$DA+M,A=\"Address:%s\"$$\n"; //+M is unlimited len U8 *.
-  U8  *address2	fmtstr "$$DA+M,A=\"Address:%s\"$$\n"; //+M is unlimited len U8 *.
-  CDate datetime fmtstr "$$DA-TRM,A=\"Date   :%8D\"$$\n";
-  Bool	check	fmtstr "$$CB,\"Check\"$$\n";
+//to generate the formats.
+  F64 num1	format "$$DA-TRM,A=\"Float 1:%12.8f\"$$\n";
+  F64 num2	format "$$DA-TRM,A=\"Float 2:%12e\"$$\n";
+  I64 num3	format "$$DA-TRM,A=\"Int   1:0x%016X\"$$\n";
+  I64 num4	format "$$DA-TRM,A=\"Int   2:%12d\"$$\n";
+  I64 type	format "$$LS,D=\"ST_PERSON_TYPE\"$$\n";
+  U8  name[32]	format "$$DA-P,A=\"Name   :%s\"$$\n";
+  U8  *address1	format "$$DA+M,A=\"Address:%s\"$$\n"; //+M is unlimited len U8 *.
+  U8  *address2	format "$$DA+M,A=\"Address:%s\"$$\n"; //+M is unlimited len U8 *.
+  CDate datetime format "$$DA-TRM,A=\"Date   :%8D\"$$\n";
+  Bool	check	format "$$CB,\"Check\"$$\n";
 };
 
 U0 FormDemo()

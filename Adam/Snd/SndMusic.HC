@@ -127,7 +127,7 @@ per second.  It defaults to
 2.5 and gets faster when bigger.
 */
   U8 *word,*last_st;
-  I64 note,i=0,ona,timeout_val,timeout_val2;
+  I64 note,octave,i=0,ona,timeout_val,timeout_val2;
   Bool tie;
   F64 d,on_jiffies,off_jiffies;
   music.play_note_num=0;
@@ -151,14 +151,19 @@ per second.  It defaults to
     note=*st++-'A';
     if (note<7) {
       note=music.note_map[note];
+      octave=music.octave;
       if (*st=='b') {
 	note--;
+	if (note==2)
+	  octave--;
 	st++;
       } else if (*st=='#') {
 	note++;
+	if (note==3)
+	  octave++;
 	st++;
       }
-      ona=Note2Ona(note,music.octave);
+      ona=Note2Ona(note,octave);
     } else
       ona=ONA_REST;
     if (words && (word=LstSub(i++,words)) && StrCmp(word," "))

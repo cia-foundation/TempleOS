@@ -8,7 +8,7 @@ $ID,2$#help_index "Registry/Install Registration"
 MemSet(&ins_reg,0,sizeof(CInsReg));
 ins_reg.registered=1;
 ins_reg.host_os=2;
-ins_reg.host_vm=2;
+ins_reg.host_vm=3;
 
 #define INS_REG_PERSONAL_INITIALS "TAD"
 StrCpy(ins_reg.initials,"TAD");
@@ -28,8 +28,6 @@ $ID,-2$$TR,"DiningStars"$
 $ID,2$F64 best_score=9999.0000;
 $ID,-2$$TR,"CircleTrace"$
 $ID,2$F64 best_score=4.9425;
-$ID,-2$$TR,"TOSNIST"$
-$ID,2$I64 tos_nist_offset=-8049;
 $ID,-2$$TR,"BlackDiamond"$
 $ID,2$I64 best_score=2;
 $ID,-2$$TR,"DunGen"$
@@ -50,7 +48,7 @@ $ID,-2$$TR,"Wenceslas"$
 $ID,2$F64 best_score=43.9944;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=227.554;
+progress3_tf=0.000;progress4_tf=223.150;
 $ID,-2$$TR,"XCaliber"$
 $ID,2$I64 best_score=90;
 I64 msg_flags=2;
@@ -62,15 +60,13 @@ $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=188.144;
-$ID,-2$$TR,"TempleTetris"$
-$ID,2$I64 hiscore=1000;
+progress3_tf=0.000;progress4_tf=279.384;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$
 $ID,2$$ID,-2$$ID,-2$$TR,"DemoCompany"$
 $ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=202.07117;
+$ID,2$F64 best_score=187.05180;
 $TR,"SimpleVal"$
-$ID,2$1239;
+$ID,2$1245;
 $ID,-2$$ID,-2$$ID,-2$

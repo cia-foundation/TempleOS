@@ -3,9 +3,9 @@
 #define DB_ACCT_BLKS	1
 
 class Acct
-{//Use <CTRL-l> to help generate fmtstrs.
-  U8 name[32] fmtstr "$$DA-P,LEN=32,A=\"Name:%s\"$$\n";
-  U8 addr[64] fmtstr "$$DA-P,LEN=64,A=\"Addr:%s\"$$\n";
+{//Use <CTRL-l> to help generate formats.
+  U8 name[32] format "$$DA-P,LEN=32,A=\"Name:%s\"$$\n";
+  U8 addr[64] format "$$DA-P,LEN=64,A=\"Addr:%s\"$$\n";
   U8 pad[DB_ACCT_BLKS*BLK_SIZE-64-32];
 };
 

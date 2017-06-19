@@ -244,12 +244,10 @@ U0 PrsStaticInit(CCmpCtrl *cc,CMemberLst *tmpm,I64 pass)
   }
 }
 
-Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
-{//Returns false on empty []
-//dim->next!=0 for array
+U0 PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
+{//dim->next!=0 for array
   CArrayDim *tmpad,*tmpad1;
   I64 j;
-  Bool res=TRUE;
   dim->next=NULL;
   dim->cnt=0;
   dim->total_cnt=1;
@@ -258,30 +256,30 @@ Bool PrsArrayDims(CCmpCtrl *cc,I64 mode,CArrayDim *dim)
     if (mode.u8[1]==PRS1B_FUN_ARG)
       LexExcept(cc,"No arrays in fun args at ");
     do {
-      if (Lex(cc)==']' && !dim->next) {
-	j=-1;
-	res=FALSE;
-      } else {
+      if (Lex(cc)==']' && !dim->next)
+	j=0;
+      else {
 	if ((j=LexExpressionI64(cc))<0)
 	  LexExcept(cc,"Invalid array size at ");
       }
-      tmpad1=&dim->next;
-      while (tmpad1->next) {
-	tmpad1->next->total_cnt*=j;
-	tmpad1=tmpad1->next;
-      }
       tmpad=MAlloc(sizeof(CArrayDim));
-      tmpad1->next=tmpad;
-      tmpad1=tmpad;
       tmpad->next=NULL;
+      tmpad1=&dim;
+      do {
+	tmpad1->total_cnt*=j;
+	if (!tmpad1->next) {
+	  tmpad1->next=tmpad;
+	  break;
+	}
+	tmpad1=tmpad1->next;
+      } while (tmpad1);
+      tmpad1=tmpad;
       tmpad->cnt=j;
       tmpad->total_cnt=1;
-      dim->total_cnt*=j;
       if (cc->token!=']')
 	LexExcept(cc,"Missing ']' at ");
     } while (Lex(cc)=='[');
   }
-  return res;
 }
 
 CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tmpc1,
@@ -292,7 +290,6 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tmpc1,
   CHashClass *tmpc1=*_tmpc1,*tmpc2;
   CHashFun *fun_ptr=NULL;
   CHashExport *tmpex=NULL;
-  CArrayDim *tmpad2;
 
   pt_start:
   if (!tmpc1 || !(tmpc1->type & (HTT_CLASS|HTT_INTERNAL_TYPE)))
@@ -358,12 +355,7 @@ CHashClass *PrsType(CCmpCtrl *cc,CHashClass **_tmpc1,
     fun_ptr=PrsFunJoin(cc,tmpc1,NULL,fsp_flags)+ptr_stars_cnt;
     tmpc1=cmp.internal_types[RT_PTR]+ptr_stars_cnt;
   }
-  if (!PrsArrayDims(cc,mode,tmpad) && cc->token!='=') {
-    tmpc1++;
-    tmpad2=tmpad->next->next;
-    Free(tmpad->next);
-    tmpad->next=tmpad2;
-  }
+  PrsArrayDims(cc,mode,tmpad);
 
   tmpc2=OptClassFwd(tmpc1);
   if (tmpc2->ptr_stars_cnt) {

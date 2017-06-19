@@ -286,7 +286,7 @@ class CIntermediateStruct
 #define KW_NOARGPOP	47
 
 #define AKW_ALIGN	64
-#define AKW_MODULE_ORG	65
+#define AKW_ORG		65
 #define AKW_I0		66
 #define AKW_I8		67
 #define AKW_I16		68

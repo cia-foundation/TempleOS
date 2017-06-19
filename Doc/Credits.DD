@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"Credits"$$FG$
 
-I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,241",D="DD_TEMPLEOS_LOC"$ lines of TempleOS over the past $TX,"13.4",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
+I, $FG,2$Terry A. Davis$FG$, wrote all of TempleOS over the past $TX,"13.8",D="DD_TEMPLEOS_AGE"$ years (full-time).  It can run on some bare metal 64-bit PC's from about 2005-2010 with no layering, libraries, tools, modules or anything from other sources.  Otherwise, you run it in a virtual machine, like $FG,2$VMware$FG$, $FG,2$QEMU$FG$ or $FG,2$VirtualBox$FG$.  It is independent and stands alone.  It has no networking, so it certainly doesn't call home.  100% of the src code is including on all distro's, from the kernel to the compiler to the boot loaders!  It is public domain, not GPL.
 
 *) $LK,"::/Kernel/FontStd.HC"$, is taken from $FG,4$$TX,"FreeDOS",HTML="http://www.freedos.org"$$FG$.  It's public domain.
 
@@ -23,8 +23,6 @@ I, $FG,2$Terry A. Davis$FG$, wrote all $TX,"119,241",D="DD_TEMPLEOS_LOC"$ lines 
 *) I included $LK,"PCIDevice Lst File",A="FI:::/Misc/PCIDevices.DD",HTML="http://www.pcidatabase.com/reports.php?type=tab-delimeted"$.
 
 *) Thanks to whoever wrote this $FG,4$$TX,"CppHtml.HC.Z",HTML="http://web.archive.org/web/20100325153025/http://home.scarlet.be/zoetrope/cpphtml.htm"$$FG$.  I'm a novice on web stuff and you helped me with html.  See $LK,"::/Demo/ToHtmlToTXTDemo/ToHtml.HC"$.
-
-*) I used $FG,4$$TX,"MagicISO",HTML="http://www.magiciso.com"$$FG$ to burn test CD's to help me understand the ISO9660 file system format.  I mostly used the $FG,4$$TX,"ISO9660",HTML="http://users.telenet.be/it3.consultants.bvba/handouts/ISO9960.html"$$FG$ spec.
 
 *) I looked at bootable CD boot sects, but didn't learn anything, finding it easier to make my own.
 

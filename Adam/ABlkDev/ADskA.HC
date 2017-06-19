@@ -226,7 +226,7 @@ U0 TouchFile(U8 *filename,U8 *attr,CDate cdt=I64_MIN)
       DirNew(dv,cur_dir,&de,FALSE);
     }
   } else
-    PrintErr("File not found.\n");
+    PrintErr("File not found: \"%s\".\n",filename);
   Free(cur_dir);
 }
 public U0 Touch(U8 *files_find_mask="*",U8 *attr="+?",

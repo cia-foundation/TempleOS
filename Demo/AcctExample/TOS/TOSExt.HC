@@ -21,7 +21,7 @@
 class CRandExtDec5Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,A=\"5 Decimal Digits from Hex:%s\"$$\n";
+  U8	rnd0[512]	format "$$DA-P,A=\"5 Decimal Digits from Hex:%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
@@ -39,43 +39,43 @@ class CRandExtDec5Form
 class CHexWordForm
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#0:%s\"$$\n";
-  U8	rnd1[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
-  U8	rnd2[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
-  U8	rnd3[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
-  U8	rnd4[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
-  U8	rnd5[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
-  U8	rnd6[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
-  U8	rnd7[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
-  U8	rnd8[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
-  U8	rnd9[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
-  U8	rndA[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
-  U8	rndB[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
+  U8	rnd0[512]	format "$$DA-P,A=\"Hex Word Indices#0:%s\"$$\n";
+  U8	rnd1[512]	format "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
+  U8	rnd2[512]	format "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
+  U8	rnd3[512]	format "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
+  U8	rnd4[512]	format "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
+  U8	rnd5[512]	format "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
+  U8	rnd6[512]	format "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
+  U8	rnd7[512]	format "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
+  U8	rnd8[512]	format "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
+  U8	rnd9[512]	format "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
+  U8	rndA[512]	format "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
+  U8	rndB[512]	format "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
   I64	cert;
 };
 
 class CNISTBeaconHexWordForm
 {
-  I64	timestamp	fmtstr "$$DA,A=\"TimeStamp:%d\"$$\n";
-  U8	rnd0[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#0:%s\"$$\n";
-  U8	rnd1[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
-  U8	rnd2[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
-  U8	rnd3[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
-  U8	rnd4[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
-  U8	rnd5[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
-  U8	rnd6[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
-  U8	rnd7[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
-  U8	rnd8[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
-  U8	rnd9[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
-  U8	rndA[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
-  U8	rndB[512]	fmtstr "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
+  I64	timestamp	format "$$DA,A=\"TimeStamp:%d\"$$\n";
+  U8	rnd0[512]	format "$$DA-P,A=\"Hex Word Indices#0:%s\"$$\n";
+  U8	rnd1[512]	format "$$DA-P,A=\"Hex Word Indices#1:%s\"$$\n";
+  U8	rnd2[512]	format "$$DA-P,A=\"Hex Word Indices#2:%s\"$$\n";
+  U8	rnd3[512]	format "$$DA-P,A=\"Hex Word Indices#3:%s\"$$\n";
+  U8	rnd4[512]	format "$$DA-P,A=\"Hex Word Indices#4:%s\"$$\n";
+  U8	rnd5[512]	format "$$DA-P,A=\"Hex Word Indices#5:%s\"$$\n";
+  U8	rnd6[512]	format "$$DA-P,A=\"Hex Word Indices#6:%s\"$$\n";
+  U8	rnd7[512]	format "$$DA-P,A=\"Hex Word Indices#7:%s\"$$\n";
+  U8	rnd8[512]	format "$$DA-P,A=\"Hex Word Indices#8:%s\"$$\n";
+  U8	rnd9[512]	format "$$DA-P,A=\"Hex Word Indices#9:%s\"$$\n";
+  U8	rndA[512]	format "$$DA-P,A=\"Hex Word Indices#A:%s\"$$\n";
+  U8	rndB[512]	format "$$DA-P,A=\"Hex Word Indices#B:%s\"$$\n";
   I64	cert;
 };
 
 class CRandHex5Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P-TRM,LEN=5,"
+  U8	rnd0[512]	format "$$DA-P-TRM,LEN=5,"
 	"A=\"Line (5-Digit Hex):%5s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -94,7 +94,7 @@ class CRandHex5Form
 class CRandHex8Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P-TRM,LEN=8,"
+  U8	rnd0[512]	format "$$DA-P-TRM,LEN=8,"
 	"A=\"Line (8-Digit Hex):%8s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -113,7 +113,7 @@ class CRandHex8Form
 class CMoviesForm
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,"
+  U8	rnd0[512]	format "$$DA-P,"
 	"A=\"Movie #1-100 (2 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -132,7 +132,7 @@ class CMoviesForm
 class CPaintings100Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,"
+  U8	rnd0[512]	format "$$DA-P,"
 	"A=\"Painting #00-99 (2 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -151,7 +151,7 @@ class CPaintings100Form
 class CPaintings1000Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,"
+  U8	rnd0[512]	format "$$DA-P,"
 	"A=\"Painting #000-999 (3 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -170,7 +170,7 @@ class CPaintings1000Form
 class CPoems100Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,"
+  U8	rnd0[512]	format "$$DA-P,"
 	"A=\"Poems #00-99 (2 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -189,7 +189,7 @@ class CPoems100Form
 class CMetallicaForm
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,"
+  U8	rnd0[512]	format "$$DA-P,"
 	"A=\"Song #1-99 (2 Decimal Digits from Hex):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
@@ -208,7 +208,7 @@ class CMetallicaForm
 class CCertRandDec5Form
 {
   I64	timestamp;
-  U8	rnd0[512]	fmtstr "$$DA-P,A=\"Line (Dec):%s\"$$\n";
+  U8	rnd0[512]	format "$$DA-P,A=\"Line (Dec):%s\"$$\n";
   U8	rnd1[512];
   U8	rnd2[512];
   U8	rnd3[512];
@@ -220,55 +220,81 @@ class CCertRandDec5Form
   U8	rnd9[512];
   U8	rndA[512];
   U8	rndB[512];
-  I64	cert		fmtstr "$$DA,A=\"Certificate:%d\"$$\n";
+  I64	cert		format "$$DA,A=\"Certificate:%d\"$$\n";
 };
 
 class CGodVideoForm
 {
-  U8	title[STR_LEN]	fmtstr "$$DA-P,A=\"Title:%s\"$$\n";
-  U8	serial[STR_LEN] fmtstr "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
-  I64	min		fmtstr "$$DA,A=\"Minutes:%d\"$$\n";
-  I64	sec		fmtstr "$$DA,A=\"Seconds:%d\"$$\n";
+  U8	title[STR_LEN]	format "$$DA-P,A=\"Title:%s\"$$\n";
+  U8	serial[STR_LEN] format "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
+  I64	min		format "$$DA,A=\"Minutes:%d\"$$\n";
+  I64	sec		format "$$DA,A=\"Seconds:%d\"$$\n";
 };
 
 class CWebBibleForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Bible Passage:%s\"$$\n";
+  U8	tag[STR_LEN]	format "$$DA-P,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] format "$$DA-P,A=\"Bible Passage:%s\"$$\n";
   I64	min;
   I64	sec;
 };
 
 class CYouTubeForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Title:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
-  I64	min		fmtstr "$$DA,A=\"Minutes:%d\"$$\n";
-  I64	sec		fmtstr "$$DA,A=\"Seconds:%d\"$$\n";
+  U8	tag[STR_LEN]	format "$$DA-P,A=\"Title:%s\"$$\n";
+  U8	special[STR_LEN] format "$$DA-P-TRM,LEN=11,A=\"SerialNum:%11s\"$$\n";
+  I64	min		format "$$DA,A=\"Minutes:%d\"$$\n";
+  I64	sec		format "$$DA,A=\"Seconds:%d\"$$\n";
 };
 
 class CImgurForm
 {
   U8	tag[STR_LEN];
-  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"SerialNum:%s\"$$\n";
-  I64	min		fmtstr "$$DA,A=\"Width    :%d\"$$\n";
-  I64	sec		fmtstr "$$DA,A=\"Height   :%d\"$$\n";
+  U8	special[STR_LEN] format "$$DA-P,A=\"SerialNum:%s\"$$\n";
+  I64	min		format "$$DA,A=\"Width    :%d\"$$\n";
+  I64	sec		format "$$DA,A=\"Height   :%d\"$$\n";
 };
 
 class CWikipediaForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
-  U8	special[STR_LEN] fmtstr "$$DA-P,A=\"Index   :%s\"$$\n";
+  U8	tag[STR_LEN]	format "$$DA-P,A=\"Tag Text:%s\"$$\n";
+  U8	special[STR_LEN] format "$$DA-P,A=\"Index   :%s\"$$\n";
   I64	min;
   I64	sec;
 };
 
 class CWebBookMarkForm
 {
-  U8	tag[STR_LEN]	fmtstr "$$DA-P,A=\"Tag Text:%s\"$$\n";
+  U8	tag[STR_LEN]	format "$$DA-P,A=\"Tag Text:%s\"$$\n";
   U8	special[STR_LEN];
   I64	min;
   I64	sec;
+};
+
+DefineLstLoad("ST_FAMLY_PHOTOS","Family1_58-78\0Family2_78-86\0"
+	"Family3_86-99\0Family4_99\0");
+
+class CFamilyPhotoForm
+{
+  I64	volume		format	"$$LS,D=\"ST_FAMLY_PHOTOS\"$$\n";
+  I64	part		format	"$$DA,A=\"Part   :%d\"$$\n";
+  U8	picture[STR_LEN] format	"$$DA-P,A=\"Picture:%s\"$$\n";
+  I64	width		format	"$$GREEN$$640x427 or 640x960$$FG$$\n"
+				"$$DA,A=\"Width  :%d\"$$\n";
+  I64	height		format	"$$DA,A=\"Height :%d\"$$\n";
+};
+
+class CBlogImgForm
+{
+  U8	picture[STR_LEN] format "$$DA-P,A=\"Picture:%s\"$$\n";
+  I64	width		format "$$DA,A=\"Width  :%d\"$$\n";
+  I64	height		format "$$DA,A=\"Height :%d\"$$\n";
+};
+
+class CBlogVideoForm
+{
+  U8	video[STR_LEN]	format "$$DA-P,A=\"Video:%s\"$$\n";
+  Bool	big		format "$$CB,\"Big\"$$\n";
 };
 
 extern U0 FreshenBlog();

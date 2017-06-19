@@ -2,7 +2,7 @@
 
 public U0 Refresh(I64 cnt=1,Bool force=FALSE)
 {//Wait for 30fps WinMgr to start & finish scrn refresh.
-//0,FALSE Cnt Sync to WinMgr. (not used)
+  //0,FALSE Cnt Sync to WinMgr.
   //0,TRUE  Pump Msgs.
   //1 Cnt Wait and Pump Msgs.
   //2 Cnt Make Sure to do a Full Refresh
@@ -29,6 +29,24 @@ public U0 Refresh(I64 cnt=1,Bool force=FALSE)
   if (old_doc)
     LBEqu(&old_doc->flags,DOCf_DO_FULL_REFRESH,old_full_refresh);
   LBEqu(&Fs->task_flags,TASKf_IDLE,old_idle);
+}
+
+#help_index "Windows;Cmd Line (Typically)"
+
+public Bool ScrnCast(Bool val=ON,U8 *print_fmt="B:/Tmp/%X.GR")
+{//WinMgr saves GR files to a dir.
+  Bool old_val;
+  if (val) {
+    if (!(old_val=LBtr(&winmgr.scrn_cast,0))) {
+      Free(winmgr.scrn_cast_print_fmt);
+      winmgr.scrn_cast_print_fmt=AStrNew(print_fmt);
+      winmgr.scrn_cast_now=Now;
+      winmgr.scrn_cast_tS=tS;
+      LBts(&winmgr.scrn_cast,0);
+    }
+  } else
+    old_val=LBtr(&winmgr.scrn_cast,0);
+  return old_val;
 }
 
 #help_index "Windows"
@@ -223,8 +241,11 @@ I64 WinMgrSleep(Bool flush_msgs=FALSE)
   CCtrl *c;
   Bool que;
   F64 t,t_delta;
+  U8 *st;
+  CDC *diff;
+  CDate cdt;
 
-  TimeStampFreqCal;
+  TimeCal;
   if ((t_delta=(t=tS)-winmgr.last_refresh_tS)>0.01)
     winmgr.fps=Max(1.0/t_delta,1);
   else
@@ -260,11 +281,36 @@ I64 WinMgrSleep(Bool flush_msgs=FALSE)
   WinMsUpdate;
 
   if (!LBtr(&sys_semas[SEMA_JUST_PUMP_MSGS],0)) {
-    timeout_val=cnts.jiffies+JIFFY_FREQ/WINMGR_FPS;
+    t=tS+WINMGR_PERIOD/8;
+    while (winmgr.ideal_refresh_tS<t)
+      winmgr.ideal_refresh_tS+=WINMGR_PERIOD;
+    timeout_val=cnts.jiffies+(winmgr.ideal_refresh_tS-tS)*JIFFY_FREQ;
     LBts(&sys_semas[SEMA_REFRESH_IN_PROGRESS],0);
     GrUpdateScrn;
     LBtr(&sys_semas[SEMA_REFRESH_IN_PROGRESS],0);
-
+    if (winmgr.scrn_cast) {
+      cdt=winmgr.scrn_cast_now+ToI64(CDATE_FREQ*(tS-winmgr.scrn_cast_tS));
+      if (!winmgr.scrn_cast_dc) {
+	winmgr.scrn_cast_dc=DCCopy(winmgr.dc2_alias);
+	winmgr.scrn_cast_dc->cdt=cdt;
+	st=MStrPrint(winmgr.scrn_cast_print_fmt,cdt);
+	GRWrite(st,winmgr.scrn_cast_dc);
+	Free(st);
+      } else if (MemCmp(winmgr.scrn_cast_dc->body,
+	    winmgr.dc2_alias->body,MSize(winmgr.dc2_alias->body))) {
+	diff=DCDiff(winmgr.scrn_cast_dc,winmgr.dc2_alias);
+	diff->cdt=cdt;
+	st=MStrPrint(winmgr.scrn_cast_print_fmt,cdt);
+	GRWrite(st,diff);
+	Free(st);
+	DCDel(diff);
+	Free(winmgr.scrn_cast_dc->body);
+	winmgr.scrn_cast_dc->body=MAllocIdent(winmgr.dc2_alias->body);
+      }
+    } else if (winmgr.scrn_cast_dc) {
+      DCDel(winmgr.scrn_cast_dc); //TODO: $LK,"MemRep",A="MN:MemRep"$ can crash.
+      winmgr.scrn_cast_dc=NULL;
+    }
     if (sys_focus_task && !Bt(&sys_focus_task->task_flags,TASKf_HAS_SONG)) {
       Free(music.cur_song);
       music.cur_song=NULL;
@@ -404,6 +450,7 @@ U0 WinMgrTask(I64)
   gr.dc->win_task=Fs;
   Fs->win_inhibit&=~WIF_SELF_CTRLS;
   GrSetUpTables;
+  winmgr.dc2_alias=DCAlias(gr.dc2);
   WinZBufUpdate;
   LBts(&sys_run_level,RLf_WINMGR);
   while (TRUE) {

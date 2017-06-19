@@ -8,19 +8,15 @@ U0 LoadDocDefines()
   DefinePrint("DD_TEMPLEOS_AGE","%0.1f",
 	(Now-Str2Date("8/1/2003"))/ToF64(1<<32)/CDATE_YEAR_DAYS);
 
-  //This is cut and replaced when I generate a distro.
-  //See $LK,"DD_TEMPLEOS_LOC",A="FF:::/Demo/AcctExample/TOS/TOSDistro.HC,DD_TEMPLEOS_LOC"$.
- 
   DefinePrint("DD_KERNEL","%08X",bfh);
   bfh(I64)+=bfh->file_size-1;
   DefinePrint("DD_KERNEL_END","%08X",bfh);
 
   //$LK,"DD_BOOT_HIGH_LOC_DVD",A="FF:::/Adam/Opt/Boot/BootDVD.HC,DD_BOOT_HIGH_LOC_DVD"$
 
-  $TR-C,"LineRep"$
-$ID,4$DefinePrint("DD_TEMPLEOS_LOC","120,860");
-DefinePrint("DD_TEMPLEOS_LOC_OFFICIAL","82,136");
-$ID,-4$
+$TR,"LineRep"$
+$ID,2$DefinePrint("DD_TEMPLEOS_LOC","80,800");
+$ID,-2$
   DefinePrint("DD_MP_VECT","%08X",MP_VECT_ADDR);
   DefinePrint("DD_MP_VECT_END","%08X",
 	MP_VECT_ADDR+COREAP_16BIT_INIT_END-COREAP_16BIT_INIT-1);

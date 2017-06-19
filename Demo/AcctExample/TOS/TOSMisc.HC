@@ -1,64 +1,41 @@
 #help_index "Misc/TOS"
 
-#define VIDEO_FRAME_RATE	29.97
-
-#define FG_JUST_AUDIO	0
-#define FG_BOOT_DRV	1
-#define FG_RAM_DRV	2
-I64	fg_mode=FG_RAM_DRV;
 Bool	fg_on =FALSE;
 
-U0 FrameGrabberTask(I64)
-{//#!/bin/bash
-//for f in ./ScrnShots/*.Z; do ./Bin/TOSZ $$f; done
-  //ffmpeg -r 8 -i VID%05d.BMP -y Movie.avi
-  I64 frame_num=0;
-  U8  buf[STR_LEN],buf2[STR_LEN],*st_dir;
-  F64 end_time=tS;
-  Silent;	//no output to scrn
-  if (fg_mode==FG_RAM_DRV)
-    st_dir="B:/Tmp/ScrnShots";
-  else
-    st_dir="::/Tmp/ScrnShots";
-  DirMk(st_dir);
-  while (fg_on) {
-    StrPrint(buf,"%s/VID%05d.BMP.Z",st_dir,frame_num++);
-    StrCpy(buf2,buf);
-    BMPScrnCapture(buf);
-    while (TRUE) {
-      end_time+=1.0/VIDEO_FRAME_RATE;
-      if (end_time<tS) {
-	StrPrint(buf,"%s/VID%05d.BMP.Z",st_dir,frame_num++);
-	Copy(buf2,buf);
-      } else
-	break;
-    }
-    SleepUntil(cnts.jiffies+(end_time-tS)*JIFFY_FREQ);
-  }
-}
-
-I64 CopyVideo()
+I64 CopyVideo(Bool reverb)
 {
   I64 res=0;
-  Del("D:/Tmp/*.SND");
-  if (fg_mode==FG_JUST_AUDIO)
-    SndFileCreate("D:/Tmp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35,2.5);
-  else {
-    SndFileCreate("D:/Tmp/Audio",0.115,0.0,WF_SQUARE,0.45,0.35);
-    DelTree("D:/Tmp/ScrnShots");
-    if (fg_mode==FG_RAM_DRV) {
-      res=CopyTree("B:/Tmp/ScrnShots","D:/Tmp/ScrnShots");
-      "Unused Space: %12.6fMeg\n",DrvUnused('B')/1024.0/1024.0;
-    } else
-      res=CopyTree("::/Tmp/ScrnShots","D:/Tmp/ScrnShots");
-    "$$BK,1$$Files Copied:%d$$BK,0$$ Time:%8.3fm\n",
-	  res,res/60.0/VIDEO_FRAME_RATE;
+  F64 delay=0,intensity=0;
+  Bool old_silent=Silent;
+  if (reverb) {
+    delay=0.45;
+    intensity=0.35;
   }
+  Del("D:/Tmp/*.SND");
+  Del("D:/Tmp/*.MV");
+  Silent(old_silent);
+  RunFile("~/Sup1/Sup1Snd/SndFile",,
+	"D:/Tmp/AUD%03d.SND",0.115,0.0,1,delay,intensity,0.185);
+  GR2MV("D:/Tmp/VID%03d.MV","B:/Tmp","+d");
   return res;
 }
 
-public U0 FrameGrabberToggle()
-{//The frame grabber saves BMP files to D:/Tmp/ScrnShots.
+#help_index "Misc/TOS"
+U0 DelScrnShots()
+{
+  Bool old_silent=Silent;
+  DelTree("B:/Tmp");
+  DirMk("B:/Tmp");
+  Del("D:/Tmp/*.SND");
+  Del("D:/Tmp/*.MV");
+  Del("C:/Tmp/*.SND");
+  Del("C:/Tmp/*.MV");
+  Silent(old_silent);
+}
+
+public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
+	Bool reverb,Bool just_audio=FALSE)
+{//The frame grabber saves GR files to B:/Tmp.
   static F64 last_time=0;
   if (tS-last_time>3.0) {
     last_time=tS;
@@ -66,34 +43,42 @@ public U0 FrameGrabberToggle()
       fg_on=FALSE;
       Snd;
       wall->record=snd.record=FALSE;
-      Sleep(1000);
-      User("CopyVideo;Exit;\n");
+      ScrnCast(OFF);
+      User("CopyVideo(%d);Exit;\n",reverb);
     } else {
+      DelScrnShots;
       fg_on=TRUE;
-      if (fg_mode!=FG_JUST_AUDIO)
-	Spawn(&FrameGrabberTask,NULL,"Frame Grabber");
+      if (!just_audio)
+	ScrnCast(ON);
       wall->record=snd.record=TRUE;
       Snd;
+      if (sync_tone) {Beep;}
+      if (tos_theme) {User("ExeFile(\"~/TOS/TOSTheme\");Exit;\n");}
     }
   }
 }
 
-public U0 JukeSong(I64 num)
+public U0 JukeSong(I64 num,I64 passes=2)
 {//Make movie of one song.
   if (!fg_on)
-    FrameGrabberToggle;
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",,num,num+1);
+    FrameGrabberToggle(FALSE,FALSE,FALSE);
+  JukeSongsPuppet("~/Sup1/Sup1Hymns",passes,num,num+1);
   if (fg_on)
-    FrameGrabberToggle;
+    FrameGrabberToggle(FALSE,FALSE,TRUE);
 }
 
 public U0 JukeLines(I64 start_line,I64 end_line)
-{//Make movie of many lines of songs.
+{//Make movie of many lines of songs, starting at 0.
   if (!fg_on)
-    FrameGrabberToggle;
+    FrameGrabberToggle(FALSE,FALSE,FALSE);
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
   if (fg_on)
-    FrameGrabberToggle;
+    FrameGrabberToggle(FALSE,FALSE,TRUE);
+}
+
+public U0 TADHymn(I64 num)
+{//Make 2-lines of songs movie starting at 1.
+  JukeLines((num-1)*2,num*2);
 }
 
 public U0 DskChkAll()
@@ -150,41 +135,6 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
   return doc;
 }
 
-public U0 BMP2Doc(U8 *_in_name,U8 *_out_name=NULL)
-{//Use OCR to make a text DolDoc from BMP file.
-  U8 *in_name,*out_name;
-  I64 dx,dy,score,best_score=I64_MAX;
-  CDC *dc;
-  CDoc *doc;
-  in_name=ExtDft(_in_name,"BMP");
-  if (_out_name)
-    out_name=ExtDft(_out_name,"DD.Z");
-  else
-    out_name=ExtChg(_in_name,"DD.Z");
-  if (dc=BMPRead(in_name)) {
-    for (dy=-3;dy<=4;dy++)
-      for (dx=-3;dx<=4;dx++) {
-	doc=DC2Doc(dc,dx,dy,&score);
-	if (score<best_score) {
-	  best_score=score;
-	  StrCpy(&doc->filename.name,out_name);
-	  DocWrite(doc);
-	}
-	DocDel(doc);
-      }
-  }
-  Free(in_name);
-  Free(out_name);
-}
-
-U0 TOSTheme()
-{
-  if (!fg_on)
-    PopUp("Sleep(50);FrameGrabberToggle;");
-  ExeFile("~/Sup1/Sup1Graphics/TOS/TOSTheme.HC");
-  DocClear;
-}
-
 #define MEM_TEST_SIZE	1024*1024
 U0 MemTest()
 {
@@ -201,39 +151,4 @@ U0 MemTest()
     "Code:%X\n",sys_code_bp->alloced_u8s-sys_code_bp->used_u8s;
     Yield;
   }
-}
-
-public I64 Profanity(
-	U8 *needle_filename="~/Sup1/Sup1Blog/Profanity.DD.Z",
-	U8 *files_find_mask="/*",U8 *fu_flags=NULL)
-{//Scan for profanity.
-  CCmpCtrl *cc;
-  I64 res=0;
-  if (FileFind(needle_filename)) {
-    cc=CmpCtrlNew(MStrPrint("#include \"%s\"",needle_filename));
-    while (Lex(cc))
-      if (cc->token==TK_IDENT)
-	res+=Find(cc->cur_str,files_find_mask,fu_flags);
-    CmpCtrlDel(cc);
-  }
-  return res;
-}
-
-U0 TOSChgLog2()
-{
-  InStr("\"Ed(\\\"::/Doc/ChgLog.DD.Z\\\");\n\";
-  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_UP|SCF_CTRL);
-  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
-  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
-  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
-  Msg(MSG_KEY_DOWN_UP,0,SC_CURSOR_DOWN);
-  Msg(MSG_KEY_DOWN_UP,CH_CTRLY,0);
-  Msg(MSG_KEY_DOWN_UP,0,SC_F6|SCF_ALT);
-  Msg(MSG_KEY_DOWN_UP,CH_ESC,0);"
-  "\"Exit;\n\";");
-}
-
-public U0 TOSChgLog()
-{//Opdate ChgLog file.
-  User("TOSChgLog2;\n");
 }

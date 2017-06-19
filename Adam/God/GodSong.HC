@@ -4,10 +4,10 @@ DefineLstLoad("ST_RHYTHM_COMPLEXITY","Simple\0Normal\0Complex\0");
 
 class CMakeSongSettings
 {
-  I64  complexity		fmtstr "$$LS,D=\"ST_RHYTHM_COMPLEXITY\"$$\n";
-  Bool rests			fmtstr "$$CB,\"Rests\"$$\n";
-  Bool six_eight		fmtstr "$$CB,\"Six Eight\"$$\n";
-  I64  octave			fmtstr "$$DA-TRM,A=\"Octave:%d\"$$\n";
+  I64  complexity		format "$$LS,D=\"ST_RHYTHM_COMPLEXITY\"$$\n";
+  Bool rests			format "$$CB,\"Rests\"$$\n";
+  Bool six_eight		format "$$CB,\"Six Eight\"$$\n";
+  I64  octave			format "$$DA-TRM,A=\"Octave:%d\"$$\n";
   I64  octave_state;
 };
 

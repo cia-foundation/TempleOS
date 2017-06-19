@@ -39,7 +39,7 @@ $FG,2$LIST$FG$, $FG,2$NOLIST$FG$
 $FG,2$ALIGN$FG$ $FG,4$num$FG$, $FG,4$fill_byte$FG$
   Align to $FG,4$num$FG$ boundary and fill with $FG,4$fill_byte$FG$.
 
-$FG,2$MODULE_ORG$FG$ $FG,4$num$FG$
+$FG,2$ORG$FG$ $FG,4$num$FG$
   Set code addr for JIT or set module $LK,"Load",A="MN:Load"$() addr -- has 16-byte $LK,"CBinFile",A="MN:CBinFile"$ header and patch table trailing.
 
 $FG,2$BINFILE$FG,4$ "FileName.BIN"$FG$;

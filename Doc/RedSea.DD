@@ -39,4 +39,6 @@ To replace ISO9660, make hard-drive partition image of a measured size and copy 
 
 RedSea file system has no bad block table and no redundant allocation table.
 
-Read $LK,"Block Chain",A="FI:::/Doc/BlkChain.DD"$ for a philosophical explaination of RedSea reasoning.
+See $LK,"Block Chain",A="FI:::/Doc/BlkChain.DD"$ for RedSea allocation bitmap discussion.
+
+See $LK,"Reliability",A="FI:::/Doc/Reliability.DD"$ for RedSea reliability discussion.

@@ -1,9 +1,8 @@
-//See $LK,"Install Documentation",A="FI:::/Doc/Install.DD"$ or $LK,"Upgrading Documentation",A="FI:::/Doc/Upgrade.DD"$.
+//See $LK,"Install Documentation",A="FI:::/Doc/Install.DD"$.
 //Study my account examples: $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$
 
 #include "BootDVD"
 #include "DskISORedSea"
-#include "DskISO9660"
 
 #help_index "Install"
 

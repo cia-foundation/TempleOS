@@ -264,9 +264,9 @@ Bool DocCaptureUndo(CDoc *doc,Bool force=FALSE)
       doc->undo_cnt++;
       u->doc_flags=doc->flags;
       res=TRUE;
+      if (doc->flags&DOCF_AUTO_SAVE)
+	DocWrite(doc);
     }
-    if (doc->flags&DOCF_AUTO_SAVE)
-      DocWrite(doc);
     if (unlock)
       DocUnlock(doc);
   }
@@ -296,8 +296,7 @@ U0 DocUndoRestore(CDoc *doc)
     DocUnlock(doc);
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GR Files;"\
-	"DolDoc/Output;StdOut/DolDoc"
+#help_index "Graphics/GR Files;DolDoc/Output;StdOut/DolDoc"
 public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
 {//Output txt or graphic file to document.
   Bool res=FALSE;
@@ -311,12 +310,6 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
       DocDump(doc2,100000);
     DocDel(doc2);
     res=TRUE;
-  } else if (FilesFindMatch(filename,"*.BMP.Z")) {
-    DocBMP(doc,filename,,FALSE);
-    res=TRUE;
-  } else if (FilesFindMatch(filename,"*.BMP;*.bmp")) {
-    DocBMP(doc,filename,,TRUE);
-    res=TRUE;
   } else if (FilesFindMatch(filename,"*.GR*")) {
     DocGR(doc,filename);
     res=TRUE;
@@ -326,7 +319,7 @@ public Bool DocType(CDoc *doc=NULL,U8 *filename,I64 trailing_new_lines=1)
   return res;
 }
 
-#help_index "Graphics/Windows BMP Files;Graphics/GR Files;"\
+#help_index "Graphics/GR Files;"\
 	"File/Cmd Line (Typically);DolDoc/Cmd Line (Typically);"\
 	"StdOut;Cmd Line (Typically)"
 public Bool Type(U8 *filename,I64 trailing_new_lines=1)

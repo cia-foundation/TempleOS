@@ -1,11 +1,5 @@
-#define DOWNLOAD_FILE1		"TempleOSCD.ISO"
-#define DOWNLOAD_FILE1_SIZE	17000000
-#define DOWNLOAD_FILE2		"TempleOSUltra.ISO"
-#define DOWNLOAD_FILE2_SIZE	 1900000
-#define DOWNLOAD_FILE3		"TempleOSCDRS.ISO"
-#define DOWNLOAD_FILE3_SIZE	16000000
-#define DOWNLOAD_FILE4		"TempleOSUltraRS.ISO"
-#define DOWNLOAD_FILE4_SIZE	 1600000
+#define DOWNLOAD_FILE1		"TOS_Distro.ISO"
+#define DOWNLOAD_FILE1_SIZE	16000000
 
 #define HOURS_MAX		(24*3)
 
@@ -39,7 +33,7 @@ U0 LogStructDel(LogStruct *tmplg)
   Free(tmplg);
 }
 
-U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
+U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_dstart,CDate *_dend)
 {
   CDoc *doc=DocRead(name,
 	DOCF_PLAIN_TEXT_TABS|DOCF_DBL_DOLLARS|DOCF_NO_CURSOR);
@@ -84,9 +78,10 @@ U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
 	if (*src++!=CH_SPACE) throw;
 	i=Str2I64(src,10,&src);
 	tmplg->datetime-=(i/100+i%100/60.0)*CDATE_FREQ*60*60;
-
-	if (tmplg->datetime<*_start) *_start=tmplg->datetime;
-	if (tmplg->datetime>*_end)   *_end  =tmplg->datetime;
+	if (!(Str2Date("1/1/2017")<=tmplg->datetime<Str2Date("1/1/2050")))
+	  throw;
+	if (tmplg->datetime<*_dstart) *_dstart=tmplg->datetime;
+	if (tmplg->datetime>*_dend)   *_dend  =tmplg->datetime;
 
 	do if (!*src) throw;
 	while (*src++!=']');
@@ -133,13 +128,13 @@ U0 PrsSingleLogFile(LogStruct *head,U8 *name,CDate *_start,CDate *_end)
   DocDel(doc);
 }
 
-LogStruct *PrsLogFiles(U8 *files_find_mask,CDate *_start,CDate *_end)
+LogStruct *PrsLogFiles(U8 *files_find_mask,CDate *_dstart,CDate *_dend)
 {
   LogStruct *head=CAlloc(sizeof(LogStruct));
   CDirEntry *tmpde=FilesFind(files_find_mask),*tmpde1=tmpde;
   QueInit(head);
   while (tmpde) {
-    PrsSingleLogFile(head,tmpde->full_name,_start,_end);
+    PrsSingleLogFile(head,tmpde->full_name,_dstart,_dend);
     tmpde=tmpde->next;
   }
   DirTreeDel(tmpde1);
@@ -181,13 +176,7 @@ U0 BlockIPNuip(LogStruct *head)
 
   QueInit(&blocked_head);
 
-  BlockedStructAdd(&blocked_head,70<<24+173<<16+110<<8+214);
-  BlockedStructAdd(&blocked_head,68<<24+224<<16+130<<8+96);
-  BlockedStructAdd(&blocked_head,68<<24+96<<16+100<<8+126);
-  BlockedStructAdd(&blocked_head,68<<24+96<<16+110<<8+213);
-  BlockedStructAdd(&blocked_head,68<<24+96<<16+242<<8+108);
-  BlockedStructAdd(&blocked_head,68<<24+227<<16+61<<8+11);
-  BlockedStructAdd(&blocked_head,68<<24+227<<16+61<<8+139);
+  BlockedStructAdd(&blocked_head,68<<24+227<<16+61<<8+6);
 
   //pass 1: collect robot lst
   while (tmplg!=head) {
@@ -214,13 +203,7 @@ U0 BlockIPNuip(LogStruct *head)
 Bool IsDownLoad(LogStruct *tmplg)
 {
   if (StrMatch(DOWNLOAD_FILE1,tmplg->file)&&tmplg->size>=
-	DOWNLOAD_FILE1_SIZE ||
-	StrMatch(DOWNLOAD_FILE2,tmplg->file)&&tmplg->size>=
-	DOWNLOAD_FILE2_SIZE ||
-	StrMatch(DOWNLOAD_FILE3,tmplg->file)&&tmplg->size>=
-	DOWNLOAD_FILE3_SIZE ||
-	StrMatch(DOWNLOAD_FILE4,tmplg->file)&&tmplg->size>=
-	DOWNLOAD_FILE4_SIZE)
+	DOWNLOAD_FILE1_SIZE)
     return TRUE;
   else
     return FALSE;
@@ -228,9 +211,15 @@ Bool IsDownLoad(LogStruct *tmplg)
 
 Bool IsIndex(LogStruct *tmplg)
 {
-  if (!StrCmp(tmplg->file,"/index.html") ||
-	!StrNCmp(tmplg->file+StrLen(tmplg->file)-14,"/TempleOS.html",14) ||
-	!StrCmp(tmplg->file,"/"))
+  if (!StrCmp(tmplg->file,"/index.html") || !StrCmp(tmplg->file,"/"))
+    return TRUE;
+  else
+    return FALSE;
+}
+
+Bool IsKeeper(LogStruct *tmplg,CDate dstart,CDate dend)
+{
+  if (dstart<=tmplg->datetime<=dend && !StrOcc(tmplg->file,'?'))
     return TRUE;
   else
     return FALSE;
@@ -340,7 +329,7 @@ U0 FileTreeTraverse(LinkStruct *root)
   }
 }
 
-U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
+U0 DownLoadRep(LogStruct *head,CDate dstart,CDate dend)
 {
   I64 i,j,cnt,dups,
 	hours_start,hours_end,*hour_cnts,*dup_cnts,
@@ -349,11 +338,11 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
   LinkStruct *link_root=NULL;
   CDateStruct ds;
 
-  i=start*24;hours_start=i.u32[1];
-  i=end  *24;hours_end	=i.u32[1];
+  i=dstart*24;hours_start=i.u32[1];
+  i=dend  *24;hours_end	=i.u32[1];
 
-  days_start=(start+local_time_offset)>>32;
-  days_end  =(end+local_time_offset)>>32;
+  days_start=(dstart+local_time_offset)>>32;
+  days_end  =(dend+local_time_offset)>>32;
 
   hour_cnts=CAlloc((hours_end-hours_start+1)*sizeof(I64));
   dup_cnts =CAlloc((hours_end-hours_start+1)*sizeof(I64));
@@ -361,7 +350,7 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
   day_dup_cnts=CAlloc((days_end-days_start+1)*sizeof(I64));
   dups=cnt=0;
   while (tmplg!=head) {
-    if (start<=tmplg->datetime<=end && IsDownLoad(tmplg)) {
+    if (IsKeeper(tmplg,dstart,dend) && IsDownLoad(tmplg)) {
       i=tmplg->datetime*24;
       hour_cnts[i.u32[1]-hours_start]++;
       day_cnts[(tmplg->datetime+local_time_offset)>>32-days_start]++;
@@ -376,15 +365,15 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
     tmplg=tmplg->next;
   }
 
-  "\n\nDownloads of /TempleOSCD.ISO\n";
-  for (i=start;i<=end;i+=1<<32)
+  "\n\nDownloads of /TOS_Distro.ISO\n";
+  for (i=dstart;i<=dend;i+=1<<32)
     "%D  Dups:%5d  Total:%5d  Uniques:%5d\n",i,
 	  day_dup_cnts[(i+local_time_offset)>>32-days_start],
 	  day_cnts[(i+local_time_offset)>>32-days_start],
 	  day_cnts[(i+local_time_offset)>>32-days_start]-
 	  day_dup_cnts[(i+local_time_offset)>>32-days_start];
 
-  "\n\nDownloads of /TempleOSCD.ISO\n"
+  "\n\nDownloads of /TOS_Distro.ISO\n"
 	"'-' is a dup.  '+' is not a dup.\n";
   if (hours_end-hours_start>=HOURS_MAX)
     i=hours_end-HOURS_MAX+1;
@@ -401,7 +390,7 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
   }
   "Total:%d  Dups:%d  Uniques:%d\n",cnt,dups,cnt-dups;
 
-  "\n\nDownloads of /TempleOSCD.ISO\n";
+  "\n\nDownloads of /TOS_Distro.ISO\n";
   LinkTreeTraverse(link_root);
   '\n';
 
@@ -412,12 +401,12 @@ U0 DownLoadRep(LogStruct *head,CDate start,CDate end)
   Free(day_dup_cnts);
 }
 
-U0 FileRep(LogStruct *head,CDate start,CDate end)
+U0 FileRep(LogStruct *head,CDate dstart,CDate dend)
 {
   LogStruct *tmplg=head->next;
   LinkStruct *file_root=NULL;
   while (tmplg!=head) {
-    if (start<=tmplg->datetime<=end)
+    if (IsKeeper(tmplg,dstart,dend))
       FileTreeAdd(&file_root,tmplg);
     tmplg=tmplg->next;
   }
@@ -427,7 +416,7 @@ U0 FileRep(LogStruct *head,CDate start,CDate end)
   FileTreeDel(file_root);
 }
 
-U0 IndexRep(LogStruct *head,CDate start,CDate end)
+U0 IndexRep(LogStruct *head,CDate dstart,CDate dend)
 {
   I64 i,j,cnt,dups,
 	hours_start,hours_end,*hour_cnts,*dup_cnts,
@@ -436,11 +425,11 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
   LinkStruct *link_root=NULL;
   CDateStruct ds;
 
-  i=start*24;hours_start=i.u32[1];
-  i=end  *24;hours_end	=i.u32[1];
+  i=dstart*24;hours_start=i.u32[1];
+  i=dend  *24;hours_end	=i.u32[1];
 
-  days_start=(start+local_time_offset)>>32;
-  days_end  =(end+local_time_offset)>>32;
+  days_start=(dstart+local_time_offset)>>32;
+  days_end  =(dend+local_time_offset)>>32;
 
   hour_cnts=CAlloc((hours_end-hours_start+1)*sizeof(I64));
   dup_cnts =CAlloc((hours_end-hours_start+1)*sizeof(I64));
@@ -448,7 +437,7 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
   day_dup_cnts=CAlloc((days_end-days_start+1)*sizeof(I64));
   dups=cnt=0;
   while (tmplg!=head) {
-    if (start<=tmplg->datetime<=end && IsIndex(tmplg)) {
+    if (IsKeeper(tmplg,dstart,dend) && IsIndex(tmplg)) {
       i=tmplg->datetime*24;
       hour_cnts[i.u32[1]-hours_start]++;
       day_cnts[(tmplg->datetime+local_time_offset)>>32-days_start]++;
@@ -465,7 +454,7 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
 
   "\n\nHits on /index.html\n"
 	"'-' is a dup.  '+' is not a dup.\n";
-  for (i=start;i<=end;i+=1<<32)
+  for (i=dstart;i<=dend;i+=1<<32)
     "%D  Dups:%5d  Total:%5d  Uniques:%5d\n",i,
 	  day_dup_cnts[(i+local_time_offset)>>32-days_start],
 	  day_cnts[(i+local_time_offset)>>32-days_start],
@@ -502,29 +491,33 @@ U0 IndexRep(LogStruct *head,CDate start,CDate end)
 U0 WebLogRep(U8 *mask,U8 *output_filename)
 {
   LogStruct *head;
-  CDate start=I64_MAX,end=I64_MIN;
+  CDate dstart=I64_MAX,dend=I64_MIN;
 
   DocMax;
 
-  head=PrsLogFiles(mask,&start,&end);
-  start=GetDate("Start(%D):",start);
-  end  =GetDate("End  (%D):",end);
-  BlockIPNuip(head);
+  head=PrsLogFiles(mask,&dstart,&dend);
+  if (dstart>dend)
+    PrintErr("No Data.\n");
+  else {
+    dstart=GetDate("Start(%D):",dstart);
+    dend  =GetDate("End  (%D):",dend);
+    BlockIPNuip(head);
 
-  DocClear;
-  "$$WW,0$$";
-  IndexRep(head,start,end);
-  FileRep(head,start,end);
-  DownLoadRep(head,start,end);
+    DocClear;
+    "$$WW,0$$";
+    IndexRep(head,dstart,dend);
+    FileRep(head,dstart,dend);
+    DownLoadRep(head,dstart,dend);
 
-  StrCpy(DocPut->filename.name,output_filename);
-  DocWrite(DocPut,TRUE);
+    StrCpy(DocPut->filename.name,output_filename);
+    DocWrite(DocPut,TRUE);
 
-  "$$WW,1$$";
+    "$$WW,1$$";
+  }
   LogLstDel(head);
 }
 
 #if __CMD_LINE__
 Cd(__DIR__);;
-WebLogRep("*.LOG*","~/DemoWebLog.DD.Z");
+WebLogRep("*.log*","~/DemoWebLog.DD.Z");
 #endif

@@ -5,13 +5,10 @@ extern U0 ACFillIn(I64 n);
 extern U0 ACMan(I64 n,CTask *parent_task=NULL);
 extern I64 AdamFile(U8 *filename,Bool warn_ext=TRUE);
 extern Bool AutoComplete(Bool val=OFF);
-extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
 extern U0 ClipDel();
 extern CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type);
 extern Bool CtrlInside(CCtrl *c,I64 x,I64 y);
 extern U8 *DC2Sprite(CDC *tmpb);
-extern U0 DocBMP(CDoc *doc=NULL,U8 *filename,
-	Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE);
 extern U0 DocBinDel(CDoc *doc,CDocBin *b);
 extern U0 DocBinsValidate(CDoc *doc);
 extern U0 DocBottom(CDoc *doc=NULL);
@@ -51,8 +48,6 @@ extern I64 ExeDoc(CDoc *doc,I64 ccf_flags=0);
 extern I64 FindWiz();
 extern I64 GetI64(U8 *msg=NULL,I64 dft=0,I64 lo=I64_MIN,I64 hi=I64_MAX);
 extern Bool GrPlot0(CDC *dc,I64 x,I64 y);
-extern I64 ISO9660ISO(U8 *_filename=NULL,U8 *src_files_find_mask,
-	U8 *fu_flags=NULL,U8 *_stage2_filename=NULL);
 extern CMenuEntry *MenuEntryFind(CMenu *haystack_menu,U8 *needle_full_name);
 extern CMenu *MenuFilePush(U8 *filename);
 extern U0 MenuPop();

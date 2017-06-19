@@ -76,5 +76,5 @@ The flag arrays $LK,"doldoc.type_flags_form",A="MN:CDolDocGlbls"$, etc
 are useful.
 */
 
-DocProfile("::/Doc/ChgLog.DD",0);
-DocProfile("::/Doc/ChgLog.DD",DOCF_PLAIN_TEXT);
+DocProfile("::/Doc/Welcome.DD",0);
+DocProfile("::/Doc/Welcome.DD",DOCF_PLAIN_TEXT);

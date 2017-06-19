@@ -2,7 +2,7 @@
 
 #define FILEMASK_OFF_LIMITS "!*/Misc/PCIDevices.DD*;!*/Misc/Bible.TXT*;"\
 	"!*/Books?/*;!*/Sup1/Sup1Words/*;!*/Sup1/Sup1Bin/*;"\
-	"!*/Sup1/Sup1Blog/NumBible.TXT*;!*/God/Vocab.DD*"
+	"!*/God/Vocab.DD*"
 
 public I64 F(U8 *needle_str,U8 *fu_flags=NULL)
 {//Find text in all text files.

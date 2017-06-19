@@ -48,10 +48,9 @@ U0 SysGlblsInit()
   for (i=-308;i<309;i++)
     pow10_I64[i+309]=Pow10(i);
 
-  QueInit(&scrncast.snd_head);
-  scrncast.t0_now=Now;
-  scrncast.t0_tS=tS;
-  scrncast.ona=scrncast.snd_head.ona=0;
+  snd.ona=ONA_REST;
+  QueInit(&snd.record_head);
+  snd.record_head.time=tS;
 
   ProgressBarsRst;
 

@@ -281,7 +281,7 @@ U0 CoreAPSethInit()
 }
 
 U0 Core0StartMP()
-{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KEnd.HC,Core0StartMP"$.
+{//Called by adam during $LK,"start-up",A="FF:::/Kernel/KMain.HC,Core0StartMP"$.
   CTask *task;
   U8 buf[STR_LEN];
   CAP16BitInit *mp=MP_VECT_ADDR;

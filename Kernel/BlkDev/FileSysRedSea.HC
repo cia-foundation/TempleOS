@@ -166,7 +166,7 @@ Bool RedSeaFileFind(CDrv *dv,I64 cur_dir_clus,U8 *name,
   if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else if (!CFileNameTo(dname,name))
-    PrintErr("Invalid FileName.\n");
+    PrintErr("Invalid FileName: \"%s\".\n",name);
   else
     try {
       unlock=DrvLock(dv);
@@ -240,10 +240,8 @@ Bool RedSeaCd(U8 *name,I64 cur_dir_clus)
     PrintErr("Not RedSea Drv\n");
   else if (RedSeaFileFind(Fs->cur_dv,cur_dir_clus,name,&de,FUF_JUST_DIRS))
     return TRUE;
-  else {
-    "%s ",name;
-    PrintErr("File not found.\n");
-  }
+  else
+    PrintErr("File not found: \"%s\".\n",name);
   return FALSE;
 }
 
@@ -518,7 +516,7 @@ I64 RedSeaFileWrite(CDrv *dv,U8 *cur_dir,U8 *name,U8 *buf,I64 size,
   if (dv->fs_type!=FSt_REDSEA)
     PrintErr("Not RedSea Drv\n");
   else if (!CFileNameTo(de.name,name))
-    PrintErr("Invalid FileName.\n");
+    PrintErr("Invalid FileName: \"%s\".\n",name);
   else {
     RedSeaFilesDel(dv,cur_dir,de.name,0,FALSE,FALSE);
     de.size=size;

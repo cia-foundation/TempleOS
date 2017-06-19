@@ -1,14 +1,7 @@
 #help_index "Misc/TOS/Cfg"
 
-#define PERSONAL_WEB		"http:/" "/www.templeos.org/Wb"
-#define BLOG_BASE		"/Home/Web/"\
-				INS_REG_PERSONAL_INITIALS "/BlogDir"
-#define DAILY_BASE		"/Home/Web/"\
-				INS_REG_PERSONAL_INITIALS "/DailyBlog"
-#define BLOG_LOCAL_BASE		"::" BLOG_BASE
-#define BLOG_WEB_BASE		PERSONAL_WEB BLOG_BASE
-
 #define SLOP	BLK_SIZE
+
 U0 TOSDbgDistro1()
 {
   CBinFile *bfh=mem_boot_base-sizeof(CBinFile);
@@ -51,8 +44,7 @@ U0 TOSInit()
   }
 } TOSInit;
 
-#define TOS_ISO_NAME	"B:/TempleOSCD.ISO"
-#define TOS_ISO_C_NAME	"B:/TempleOSCD.ISO.C"
+#define TOS_ISO_NAME	"B:/TOS_Distro.ISO.C"
 #define TOS_DISTRO_DIR	"B:/Distro"
 #define CFG_OPTS	"StaffMode\nMountIDEAuto\nCT\n"
 #define CFG_DBG_OPTS	"StaffMode\nMountIDEAuto\nCT"\

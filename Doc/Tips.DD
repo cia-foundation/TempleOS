@@ -73,7 +73,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * Use $FG,2$<CTRL-ALT-s>$FG$ will capture the scrn as a sprite on the clip.  You can save the cmd line doc as text with $FG,2$<CTRL-a>$FG$.
 
-* You can save a sprite as a $FG,2$.BMP$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
+* You can save a sprite as a $FG,2$.GR$FG$ file in $FG,2$<CTRL-r>$FG$ on the Sprite BitMap Menu.
 
 * You can eye-dropper colors in the $FG,2$<CTRL-r>$FG$ sprite editor by pressing $FG,2$'c'$FG$.  Press $FG,2$'t'$FG$ for transparent.
 
@@ -85,7 +85,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * When using $FG,2$<CTRL-l>$FG$ to insert links in documents, you can usually leave the $FG,2$Tag Text$FG$ blank and it will be filled-in automatically based on other entries.
 
-* There is a feature of the precompiler that allows code to be executed in the middle of compilation and data inserted into the compilation stream.  Click here for an example: $LK,"#exe {",A="FF:::/Kernel/KEnd.HC,#exe {"$.
+* There is a feature of the precompiler that allows code to be executed in the middle of compilation and data inserted into the compilation stream.  Click here for an example: $LK,"#exe {",A="FF:::/Kernel/KMain.HC,#exe {"$.
 
 * If you output to the cmd line and wish to allow users to scroll around and view data, you can use $LK,"View",A="MN:View"$().
 
@@ -131,7 +131,7 @@ $FG,2$Merge(\"C:/*\",\"D:/*\",\"+r+d\");$FG$ to check my changes.
 
 * For advanced heap debugging, play with $LK,"_CFG_HEAP_DBG",A="MN:_CFG_HEAP_DBG"$.  You're on your own.
 
-* You can use $LK,"Type",A="MN:Type"$() to display $FG,2$.BMP$FG$ or $FG,2$.GR$FG$ files.
+* You can use $LK,"Type",A="MN:Type"$() to display $FG,2$.GR$FG$ files.
 
 * Use $LK,"Man",A="MN:Man"$() to jump to short sym name src code.
 

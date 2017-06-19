@@ -1,5 +1,5 @@
 //This is executed by the Adam task at boot.
-//See $LK,"Adam Start-up",A="FF:::/Kernel/KEnd.HC,\"StartOS"$.
+//See $LK,"Adam Start-up",A="FF:::/Kernel/KMain.HC,\"StartOS"$.
 
 #help_index "Compiler/Directive"
 public extern I8i Option(I64i num,I8i val);

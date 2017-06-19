@@ -387,7 +387,7 @@ class CBinFile
   U8	module_align_bits,
 	reserved;
   U32	bin_signature;
-  I64	module_org,
+  I64	org,
 	patch_table_offset, //$LK,"Patch Table Generation",A="FF:::/Compiler/CMain.HC,IET_ABS_ADDR"$
 	file_size;
 };
@@ -1233,24 +1233,24 @@ public class CDocEntry:CDocEntryBase
 
 class CEdFindText
 {
-  U8	find_text[STR_LEN] fmtstr "$$DA-P,"
+  U8	find_text[STR_LEN] format "$$DA-P,"
 	"A=\"Find        :%s\"$$\n",
-	replace_text[STR_LEN] fmtstr "$$DA-P,"
+	replace_text[STR_LEN] format "$$DA-P,"
 	"A=\"Replace     :%s\"$$\n";
-  Bool	replace			fmtstr "$$CB,\"Replace\"$$\n",
-	scan_fwd		fmtstr "$$CB,\"Fwd\"$$\n",
-	scan_sel_text		fmtstr "$$CB,\"Selection\"$$\n",
-	match_case		fmtstr "$$CB,\"Match Case\"$$\n",
-	whole_labels		fmtstr "$$CB,\"Whole Labels\"$$\n",
-	local_var		fmtstr "$$CB,\"Rename Local Var\"$$\n",
+  Bool	replace			format "$$CB,\"Replace\"$$\n",
+	scan_fwd		format "$$CB,\"Fwd\"$$\n",
+	scan_sel_text		format "$$CB,\"Selection\"$$\n",
+	match_case		format "$$CB,\"Match Case\"$$\n",
+	whole_labels		format "$$CB,\"Whole Labels\"$$\n",
+	local_var		format "$$CB,\"Rename Local Var\"$$\n",
 	pmt,pad;
-  I64	filter_lines		fmtstr "$$DA,A=\"Filter Lines:%d\"$$\n";
+  I64	filter_lines		format "$$DA,A=\"Filter Lines:%d\"$$\n";
 };
 
 class CEdFileName
 {
   CDirContext *dirc;
-  U8	name[256] fmtstr "$$DA-P,LEN=255,A=\"FileName:%s\"$$";
+  U8	name[256] format "$$DA-P,LEN=255,A=\"FileName:%s\"$$";
 };
 
 //$LK,"Ed",A="MN:Ed"$()
@@ -1475,7 +1475,8 @@ class CWinMgrTimingGlbls
   I64	calc_idle_cnt;
 };
 
-#define WINMGR_FPS			30
+#define WINMGR_FPS	(30000.0/1001)
+#define WINMGR_PERIOD	(1001/30000.0)
 
 public class CWinMgrGlbls
 {
@@ -1483,11 +1484,16 @@ public class CWinMgrGlbls
   F64	ode_time,
 	last_ode_time,
 	fps,		//You can read but not write this. You have no control.
+	ideal_refresh_tS,
 	last_refresh_tS;
   CWinMgrTimingGlbls *t;
+  CDate	scrn_cast_now;
+  F64	scrn_cast_tS;
+  U8	*scrn_cast_print_fmt;
+  CDC	*scrn_cast_dc,*dc2_alias;
   Bool	show_menu,
-	grab_scroll,
-	grab_scroll_closed;
+	grab_scroll,grab_scroll_closed,
+	scrn_cast;
 };
 
 #help_index "AutoComplete"
@@ -2011,7 +2017,7 @@ class CAOT
   U8	*buf;
   I64	rip,rip2,
 	aot_U8s,
-	max_align_bits,module_org;
+	max_align_bits,org;
   CAOT	*parent_aot;
   CAOTImportExport *next_ie,*last_ie;
   CAOTAbsAddr *abss;
@@ -2064,7 +2070,7 @@ class CAOTCtrl
   CAsmArg arg1,arg2;
   CAOTBinBlk *bin;
   I64	num_bin_U8s,
-	max_align_bits,module_org;
+	max_align_bits,org;
   CAsmUnresolvedRef *local_unresolved,*glbl_unresolved;
   CAOTAbsAddr *abss;
   CAOTHeapGlbl *heap_glbls;
@@ -2302,7 +2308,7 @@ public class CATARep
 #define FILEMASK_SRC	"*.HC*;*.HH*;*.IN*;*.PRJ*"
 #define FILEMASK_DD	FILEMASK_SRC ";*.DD*"
 #define FILEMASK_TXT	FILEMASK_DD ";*.TXT*"
-#define FILEMASK_GR	"*.GR*;*.BMP*"
+#define FILEMASK_GR	"*.GR*"
 
 #help_index "File/Low Level"
 #define BLK_SIZE_BITS	9
@@ -2458,80 +2464,39 @@ class CATAPITrack
 	last_layer_jmp;
 };
 
-//ISO1 is ISO9660
-//ISO2 is ISO13490
-//ISO3 is ISO13346
-
-class CISO1Date
-{
-  U8	year,mon,day,hour,min,sec,sec100;
-};
-
-class CISO1DirEntry
-{
-  U8	len,ext_attr_len;
-  CPalindromeU32 loc;
-  CPalindromeU32 size;
-  CISO1Date date;
-  U8	flags,file_unit_size,interleave;
-  CPalindromeU16 vol_seq_num;
-  U8	name_len,name;
-};
-
-class CISO1PathEntry
-{
-  U8	name_len,zero;
-  U32	blk;
-  U16	parent_entry_num,
-	name[1]; //Aligned to U16 boundries
-};
-
 //ISO9660
-#define ISO1T_BOOT_RECORD		0
-#define ISO1T_PRI_VOL_DESC		1
-#define ISO1T_SUPPLEMENTARY_DESC	2
-#define ISO1T_VOL_DRV_DESC		3
-#define ISO1T_TERMINATOR		255
+#define ISOT_BOOT_RECORD	0
+#define ISOT_PRI_VOL_DESC	1
+#define ISOT_SUPPLEMENTARY_DESC	2
+#define ISOT_VOL_DRV_DESC	3
+#define ISOT_TERMINATOR		255
 
-class CISO1PriDesc
+class CISODirEntry
+{
+  U8 pad[2];
+  CPalindromeU32 loc;
+  U8 pad[24];
+};
+
+class CISOPriDesc
 {
   U8	type,
 	id[5],
 	version,
-	unused1,
-	system_id[32],
-	vol_id[32],
-	unused2[8];
+	pad[73];
   CPalindromeU32 vol_space_size;
-  U8	unused3[32];
+  U8	pad[32];
   CPalindromeU16 vol_set_size;
   CPalindromeU16 vol_seq_num;
   CPalindromeU16 log_block_size;
-  CPalindromeU32 path_table_size;
-  U32	type_l_path_table,
-	opt_type_l_path_table,
-	type_m_path_table,
-	opt_type_m_path_table;
-  CISO1DirEntry root_dir_record;
-  U8	vol_set_id[128],
+  U8	pad[20];
+  CISODirEntry root_dir_record;
+  U8	pad[128],
 	publisher_id[128],
-	preparer_id[128],
-	application_id[128],
-	copyright_file_id[37],
-	abstract_file_id[37],
-	bibliographic_file_id[37],
-	creation_date[17],
-	modification_date[17],
-	expiration_date[17],
-	effective_date[17],
+	pad[435],
 	file_structure_version,
-	unused4,
-	application_data[512],
-	unused5[653];
+	pad[1166];
 };
-
-#define ISO1_BASE_YEAR	1900
-#define ISO1_ATTR_DIR	2
 
 //Red Sea Attributes
 //See $LK,"ST_FILE_ATTRS",A="MN:ST_FILE_ATTRS"$
@@ -2557,15 +2522,12 @@ class CISO1PriDesc
 
 #help_index "File/Low Level;File/Program Routines"
 //CDirEntry flags (Used by $LK,"FileMgr",A="MN:FileMgr"$())
-#define DEF_PROCESSED		1
-#define DEF_NOT_INITIALIZED	2
-
 #define CDIR_FILENAME_LEN	38 //Must include terminator zero
 public class CDirEntry
 {
   CDirEntry *next,*parent,*sub;
   U8	*full_name;
-  I64	flags,user_data;
+  I64	user_data,user_data2;
 
   U0	start;
   U16	attr;
@@ -2580,6 +2542,7 @@ public class CDirEntry
 //See $LK,"ST_FILE_UTIL_FLAGS",A="MN:ST_FILE_UTIL_FLAGS"$
 #define FUf_RECURSE		0
 #define FUf_DIFF		1
+#define FUf_DEL			1
 #define FUf_IGNORE		2
 #define FUf_ALL			3
 #define FUf_CANCEL		4
@@ -2607,6 +2570,7 @@ public class CDirEntry
 
 #define FUF_RECURSE		0x0000001 //r
 #define FUF_DIFF		0x0000002 //d
+#define FUF_DEL			0x0000002 //d
 #define FUF_IGNORE		0x0000004 //i
 #define FUF_ALL			0x0000008 //a
 #define FUF_CANCEL		0x0000010 //c
@@ -2700,12 +2664,10 @@ public class CBlkDev
 #define FSt_NULL	0
 #define FSt_REDSEA	1 //Supported
 #define FSt_FAT32	2 //Supported except for short names, to some degree
-#define FSt_ISO9660	3 //Supported (CD/DVD)
-#define FSt_ISO13490	4 //Not Supported (CD/DVD)
-#define FSt_ISO13346	5 //Not Supported (CD/DVD)
-#define FSt_NTFS	6 //Not Supported
-#define FSt_UNKNOWN	7
-#define FSt_TYPES_NUM	8
+#define FSt_ISO9660	3 //Not Supported
+#define FSt_NTFS	4 //Not Supported
+#define FSt_UNKNOWN	5
+#define FSt_TYPES_NUM	6
 #define FSG_TYPE_MASK	0x7FFF
 //File system type flags
 #define FStf_DISABLE	15
@@ -3063,19 +3025,19 @@ public class CMsStateGlbls
 
 public class CGridGlbls
 {
-  Bool	snap	fmtstr "$$CB,\"Snap Grid\"$$\n",
-	show	fmtstr "$$CB,\"Show Grid\"$$\n",
-	coord	fmtstr "$$CB,\"Show Coordinates\"$$\n";
+  Bool	snap	format "$$CB,\"Snap Grid\"$$\n",
+	show	format "$$CB,\"Show Grid\"$$\n",
+	coord	format "$$CB,\"Show Coordinates\"$$\n";
   U8	pad[5];
-  F64	x	fmtstr "$$DA-TRM,A=\"X Spacing:%6.3f\"$$\n",
-	y	fmtstr "$$DA-TRM,A=\"Y Spacing:%6.3f\"$$\n",
-	z	fmtstr "$$DA-TRM,A=\"Z Spacing:%6.3f\"$$\n",
-	x_offset fmtstr "$$DA-TRM,A=\"X Offset :%6.3f\"$$\n",
-	y_offset fmtstr "$$DA-TRM,A=\"Y Offset :%6.3f\"$$\n",
-	z_offset fmtstr "$$DA-TRM,A=\"Z Offset :%6.3f\"$$\n",
-	x_speed	fmtstr "$$DA-TRM,A=\"X Speed  :%6.3f\"$$\n",
-	y_speed	fmtstr "$$DA-TRM,A=\"Y Speed  :%6.3f\"$$\n",
-	z_speed	fmtstr "$$DA-TRM,A=\"Z Speed  :%6.3f\"$$\n";
+  F64	x	format "$$DA-TRM,A=\"X Spacing:%6.3f\"$$\n",
+	y	format "$$DA-TRM,A=\"Y Spacing:%6.3f\"$$\n",
+	z	format "$$DA-TRM,A=\"Z Spacing:%6.3f\"$$\n",
+	x_offset format "$$DA-TRM,A=\"X Offset :%6.3f\"$$\n",
+	y_offset format "$$DA-TRM,A=\"Y Offset :%6.3f\"$$\n",
+	z_offset format "$$DA-TRM,A=\"Z Offset :%6.3f\"$$\n",
+	x_speed	format "$$DA-TRM,A=\"X Speed  :%6.3f\"$$\n",
+	y_speed	format "$$DA-TRM,A=\"Y Speed  :%6.3f\"$$\n",
+	z_speed	format "$$DA-TRM,A=\"Z Speed  :%6.3f\"$$\n";
 };
 
 #help_index "Ctrls"
@@ -3643,7 +3605,9 @@ class CGrSym
 public class CDC
 {
   U0	start;
-  I32	width,width_internal,
+  CDate cdt;
+  I32	x0,y0,
+	width,width_internal,
 	height,
 	flags;
   U0	end;
@@ -3928,11 +3892,11 @@ class CProgress
 public class CInsReg
 {
   Bool	registered;
-  I64	host_os		fmtstr "$$PURPLE$$Install Registration$$FG$$\n\n"
+  I64	host_os		format "$$PURPLE$$Install Registration$$FG$$\n\n"
 			"Host OS:$$LS,D=\"ST_HOST_OSES\"$$\n";
-  I64	host_vm		fmtstr "Host VM:$$LS,D=\"ST_HOST_VMS\"$$\n";
-  U8	initials[8]	fmtstr "$$DA-P,A=\"Your Initials:%s\"$$\n";
-  I64	machine_num	fmtstr
+  I64	host_vm		format "Host VM:$$LS,D=\"ST_HOST_VMS\"$$\n";
+  U8	initials[8]	format "$$DA-P,A=\"Your Initials:%s\"$$\n";
+  I64	machine_num	format
 			"$$DA-TRM,A=\"This Machine Num (Choose Any):%d\"$$\n";
 };
 

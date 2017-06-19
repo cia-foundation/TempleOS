@@ -33,9 +33,13 @@ $FG,2$"%F"$FG$ text file by filename.
 
 $FG,2$"%$$F"$FG$ $LK,"DolDoc",A="FI:::/Doc/DolDocOverview.DD"$ file in memory.
 
-$FG,2$"%p"$FG$ ptr.
+$FG,2$"%p"$FG$ ptr. 
+
+$FG,2$"%,p"$FG$ ptr with no offset. 
 
 $FG,2$"%P"$FG$ link to ptr.
+
+$FG,2$"%,P"$FG$ link to ptr with no offset.
 
 $FG,2$"%D"$FG$ date.  Pass a $LK,"CDate",A="MN:CDate"$.
 

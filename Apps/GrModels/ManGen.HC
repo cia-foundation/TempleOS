@@ -13,66 +13,66 @@ class Man
 
 class ManDefineStruct
 {
-  F64 head_rad	 fmtstr
+  F64 head_rad	 format
 	"$$DA-TRM,A=\"Head Radius                :%8.3f\"$$\n";
 
-  F64 torso_len  fmtstr
+  F64 torso_len  format
 	"$$DA-TRM,A=\"Torso Length               :%8.3f\"$$\n";
-  F64 arm_len	 fmtstr
+  F64 arm_len	 format
 	"$$DA-TRM,A=\"Arm Length                 :%8.3f\"$$\n";
-  F64 hand_len	 fmtstr
+  F64 hand_len	 format
 	"$$DA-TRM,A=\"Hand Length                :%8.3f\"$$\n";
-  F64 leg_len	 fmtstr
+  F64 leg_len	 format
 	"$$DA-TRM,A=\"Leg Length                 :%8.3f\"$$\n";
-  F64 foot_len	 fmtstr
+  F64 foot_len	 format
 	"$$DA-TRM,A=\"Foot Length                :%8.3f\"$$\n";
-  F64 torso_width fmtstr
+  F64 torso_width format
 	"$$DA-TRM,A=\"Torso Width                :%8.3f\"$$\n";
-  F64 torso_depth fmtstr
+  F64 torso_depth format
 	"$$DA-TRM,A=\"Torso Depth                :%8.3f\"$$\n";
-  F64 arm_rad	 fmtstr
+  F64 arm_rad	 format
 	"$$DA-TRM,A=\"Arm Radius                 :%8.3f\"$$\n";
-  F64 hand_rad	 fmtstr
+  F64 hand_rad	 format
 	"$$DA-TRM,A=\"Hand Radius                :%8.3f\"$$\n";
-  F64 leg_rad	 fmtstr
+  F64 leg_rad	 format
 	"$$DA-TRM,A=\"Leg Radius                 :%8.3f\"$$\n";
-  F64 foot_rad	 fmtstr
+  F64 foot_rad	 format
 	"$$DA-TRM,A=\"Foot Radius                :%8.3f\"$$\n\n";
 
-  F64 r_shoulder_a1	 fmtstr
+  F64 r_shoulder_a1	 format
 	"$$DA-TRM,A=\"R.Shoulder Front/Back Angle:%8.3f\"$$\n";
-  F64 l_shoulder_a1	 fmtstr
+  F64 l_shoulder_a1	 format
 	"$$DA-TRM,A=\"L.Shoulder Front/Back Angle:%8.3f\"$$\n";
-  F64 r_hip_a1	 fmtstr
+  F64 r_hip_a1	 format
 	"$$DA-TRM,A=\"R.Hip Front/Back Angle     :%8.3f\"$$\n";
-  F64 l_hip_a1	 fmtstr
+  F64 l_hip_a1	 format
 	"$$DA-TRM,A=\"L.Hip Front/Back Angle     :%8.3f\"$$\n";
 
-  F64 r_shoulder_a2	 fmtstr
+  F64 r_shoulder_a2	 format
 	"$$DA-TRM,A=\"R.Shoulder Side Angle      :%8.3f\"$$\n";
-  F64 l_shoulder_a2	 fmtstr
+  F64 l_shoulder_a2	 format
 	"$$DA-TRM,A=\"L.Shoulder Side Angle      :%8.3f\"$$\n";
-  F64 r_hip_a2	 fmtstr
+  F64 r_hip_a2	 format
 	"$$DA-TRM,A=\"R.Hip Side Angle           :%8.3f\"$$\n";
-  F64 l_hip_a2	 fmtstr
+  F64 l_hip_a2	 format
 	"$$DA-TRM,A=\"L.Hip Side Angle           :%8.3f\"$$\n";
 
-  F64 r_elbow_a	 fmtstr
+  F64 r_elbow_a	 format
 	"$$DA-TRM,A=\"R.Elbow Angle              :%8.3f\"$$\n";
-  F64 l_elbow_a	 fmtstr
+  F64 l_elbow_a	 format
 	"$$DA-TRM,A=\"L.Elbow Angle              :%8.3f\"$$\n";
-  F64 r_knee_a	 fmtstr
+  F64 r_knee_a	 format
 	"$$DA-TRM,A=\"R.Knee Angle               :%8.3f\"$$\n";
-  F64 l_knee_a	 fmtstr
+  F64 l_knee_a	 format
 	"$$DA-TRM,A=\"L.Knee Angle               :%8.3f\"$$\n";
 
-  F64 r_wrist_a	 fmtstr
+  F64 r_wrist_a	 format
 	"$$DA-TRM,A=\"R.Wrist Angle              :%8.3f\"$$\n";
-  F64 l_wrist_a	 fmtstr
+  F64 l_wrist_a	 format
 	"$$DA-TRM,A=\"L.Wrist Angle              :%8.3f\"$$\n";
-  F64 r_ankle_a	 fmtstr
+  F64 r_ankle_a	 format
 	"$$DA-TRM,A=\"R.Ankle Angle              :%8.3f\"$$\n";
-  F64 l_ankle_a	 fmtstr
+  F64 l_ankle_a	 format
 	"$$DA-TRM,A=\"L.Ankle Angle              :%8.3f\"$$\n";
 
 };

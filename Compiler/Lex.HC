@@ -442,7 +442,7 @@ I64 Lex(CCmpCtrl *cc)
 {//Fetch next token.
   I64 i,j,k,l,ch;
   CHash *tmph;
-  Bool str_done,neg_e;
+  Bool str_done,in_str,neg_e;
   U8 *fbuf,*buf2,*buf3,buf[STR_LEN];
   cc->last_line_num=cc->lex_include_stk->line_num;
   while (TRUE) {
@@ -722,6 +722,7 @@ lex_float_start:
 	      i=j=0;
 	      buf2=NULL;
 	      if (ch) {
+		in_str=FALSE;
 		do {
 		  if (ch=='\\') {
 		    if (ch=LexGetChar(cc)) {
@@ -734,14 +735,16 @@ lex_float_start:
 		      buf[j++]='\\';
 		      break;
 		    }
-		  } else if (ch!='\n')
+		  } else if (ch!='\n') {
+		    if (ch=='\"')
+		      in_str=!in_str;
 		    buf[j++]=ch;
-		  else
+		  } else
 		    break;
 		  while (ch=LexGetChar(cc)) {
 		    if (ch=='/') {
 		      ch=LexGetChar(cc);
-		      if (ch=='/') {
+		      if (ch=='/' && !in_str) {
 			do ch=LexGetChar(cc);
 			while (Bt(char_bmp_non_eol,ch));
 			break;
@@ -749,11 +752,22 @@ lex_float_start:
 			buf[j++]='/';
 			cc->flags|=CCF_USE_LAST_U16;
 		      }
-		    } else if (ch=='\\')
-		      break;
-		    else if (Bt(char_bmp_non_eol,ch))
+		    } else if (ch=='\\') {
+		      if (ch=LexGetChar(cc)) {
+			if (ch=='\"') {
+			  buf[j++]='\\';
+			  buf[j++]=ch;
+			} else {
+			  cc->flags|=CCF_USE_LAST_U16;
+			  ch='\\';
+			  break;
+			}
+		      }
+		    } else if (Bt(char_bmp_non_eol,ch)) {
+		      if (ch=='\"')
+			in_str=!in_str;
 		      buf[j++]=ch;
-		    else
+		    } else
 		      break;
 		    if (j>=STR_LEN-4) {//Spot for ['\'][ch],[ch],[0]
 		      buf[j++]=0;

@@ -11,14 +11,3 @@ $WW,1$$FG,5$$TX+CX,"Psalmody Help"$$FG$
 * You can take the $LK,"Play",A="MN:Play"$() stmts out of a song file and place them in your programs.  You can also add a song to a document with $FG,2$<CTRL-l>$FG$, but you should do it after pressing $FG,2$<CTRL-t>$FG$ because the clip-insert in $FG,2$<CTRL-l>$FG$ is screwy.  See this $SO,"<Song>",A="4qG5EC4BeGG5qCeFD4sB5G4B5G4qG5EC4BeGG5qCeFD4sB5G4B5GqEeEFqE4BeG5FetC4A5GqFCEeEFqE4BeG5FetC4A5GqFC"$ after pressing $FG,2$<CTRL-t>$FG$, now.
 
 * You can call $LK,"JukeBox",A="FF:::/Apps/Psalmody/JukeBox.HC,JukeBox"$("~/Psalmody"); to play your songs.
-
-* To create a $FG,2$.SND$FG$ file which can be exported and played under Windows, set the $FG,2$Bool$FG$ $LK,"snd.record",A="MN:CSndGlbls"$ to $FG,2$TRUE$FG$, play music, and set it to $FG,2$FALSE$FG$.  Then, call $LK,"SndFileCreate",A="MN:SndFileCreate"$().  You might wish to make a $FG,2$<CTRL-ALT-key>$FG$ to toggle this system level recording feat.  See $LK,"Snd",A="MN:Snd"$().  Add this code to your $LK,"~/HomeKeyPlugIns.HC"$ file.
-
-$FG,5$U0 CtrlAltR(I64)
-{
-  snd.record=!snd.record;
-}
-CtrlAltCBSet('R',&CtrlAltR,"Cmd /Toggle snd.record");$FG$
-
-* When calling $LK,"SndFileCreate",A="MN:SndFileCreate"$() you can set a waveform.  The PC speaker is $LK,"WF_SQUARE",A="MN:WF_SQUARE"$.  You can sel reverb and averaging, also.
-

@@ -51,9 +51,6 @@ $ID,-2$
 $FG,2$'m'$FG$
 $ID,2$Make CD/DVD ISO.C file.  This creates a $LK,"RedSea",A="FI:::/Doc/RedSea.DD"$ ISO file image of the dir the cursor is on.  The name of the ISO file is $FG,2$$TX,"\"::/Tmp/CDDVD.ISO.C\"",D="DFT_ISO_C_FILENAME"$$FG$ $LK,"blkdev.dft_iso_c_filename",A="MN:CBlkDevGlbls"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
 $ID,-2$
-$FG,2$'M'$FG$
-$ID,2$Make CD/DVD ISO file.  This creates a ISO9660 file image of the dir the cursor is on.  The name of the ISO file is $FG,2$$TX,"\"::/Tmp/CDDVD.ISO\"",D="DFT_ISO_FILENAME"$$FG$ $LK,"blkdev.dft_iso_filename",A="MN:CBlkDevGlbls"$ and can be redefined in your start-up scripts.  You may wish to place it on a different drive.
-$ID,-2$
 $FG,2$'B'$FG$
 $ID,2$Burn CD/DVD ISO file.  This burns a CD/DVD using the image file, $FG,2$$TX,"\"::/Tmp/CDDVD.ISO\"",D="DFT_ISO_FILENAME"$$FG$ $LK,"blkdev.dft_iso_filename",A="MN:CBlkDevGlbls"$ to the drive the cursor is on.
 $ID,-2$

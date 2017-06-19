@@ -23,7 +23,7 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
 //Averaging should be a num from 0.0 to 0.999.
   //Vol should be from 0.0 to 1.0.
   //Set reverb_delay to like 0.3 sec and reverb_intensity to like 0.4.
-  I64 i,k,cnt,cnt2,level,file_num;
+  I64 i,i1,k,cnt,cnt2,level,file_num;
   F64 avg,dt;
   CFileSND *s;
   CSndWaveCtrl *swc=SndWaveCtrlNew(SNDFILE_SAMPLE_RATE,16,1);
@@ -63,13 +63,16 @@ public I64 SndFileCreate(U8 *base_filename,F64 normalized_vol=1.0,
 
   d=snd.record_head.next;
   k=0;
+  i=d->time*SNDFILE_SAMPLE_RATE;
   while (d->next!=&snd.record_head) {
     d1=d->next;
-    dt=d1->time-d->time;
-    cnt2=dt*SNDFILE_SAMPLE_RATE;
-    SndWaveAddBuf(swc,&s->body[k],cnt2,
-	  Ona2Freq(d->ona),waveform,normalized_vol);
-    k+=cnt2;
+    i1=d1->time*SNDFILE_SAMPLE_RATE;
+    if (i1-i) {
+      SndWaveAddBuf(swc,&s->body[k],i1-i,
+	    Ona2Freq(d->ona),waveform,normalized_vol);
+      k+=i1-i;
+      i=i1;
+    }
     QueRem(d);
     Free(d);
     d=d1;
