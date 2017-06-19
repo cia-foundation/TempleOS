@@ -71,7 +71,7 @@ U0 JukeSongPuppet(CTask *juke_task,I64 passes,I64 song_num,U8 *name)
 }
 
 public U0 JukeSongsPuppet(U8 *dirname="~/Psalmody",I64 passes=2,
-	I64 start_song=0,I64 end_song=I64_MAX,F64 start_delay=0)
+	I64 start_song=0,I64 end_song=I64_MAX)
 {//Help make music video by puppeting JukeBox task.
   I64 i;
   CDirEntry *tmpde,*tmpde1;
@@ -80,7 +80,6 @@ public U0 JukeSongsPuppet(U8 *dirname="~/Psalmody",I64 passes=2,
   tmpde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
   for (tmpde=tmpde1,i=0;tmpde && i<start_song;i++)
     tmpde=tmpde->next;
-  Sleep(start_delay*1000);
   for (i=start_song;tmpde && i<end_song;i++) {
     JukeSongPuppet(juke_task,passes,i,tmpde->name);
     tmpde=tmpde->next;

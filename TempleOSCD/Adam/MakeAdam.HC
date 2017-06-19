@@ -6,7 +6,7 @@ Cd(__DIR__);;
 #include "TaskRep"
 #include "AMathODE"
 #include "Gr/MakeGr"
-#include "Snd/MakeSnd"
+#include "ASnd"
 #include "ABlkDev/MakeABlkDev"
 #include "Menu"
 #include "Win"

@@ -156,12 +156,16 @@ Bool MyPutKey(I64 ch,I64 sc)
       case 'f': //With sync
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /FrameGrabber Sync");
+	else if (fg_on)
+	  FrameGrabberToggle(FALSE,FALSE,FALSE);
 	else
 	  FrameGrabberToggle(TRUE,FALSE,FALSE);
 	return TRUE;
       case 'F': //With sync and intro TOS theme
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /FrameGrabber Intro");
+	else if (fg_on)
+	  FrameGrabberToggle(FALSE,FALSE,TRUE);
 	else
 	  FrameGrabberToggle(TRUE,TRUE,FALSE);
 	return TRUE;
@@ -219,6 +223,20 @@ Bool MyPutKey(I64 ch,I64 sc)
 		DocPut->filename.name,i);
 	  "$$AN,\"<TODO>\",A=\"ANC%d\"$$",i;
 	}
+	return TRUE;
+      case 'p':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Cmd /JukeBox");
+	else
+	  PopUp("#include \"::/Apps/Psalmody/Load\";"
+		"JukeBox(\"::/Home/Sup1/Sup1Hymns\");");
+	return TRUE;
+      case 'P':
+	if (sc&SCF_KEY_DESC)
+	  KeyDescSet("Cmd /Psalmody");
+	else
+	  PopUp("#include \"::/Apps/Psalmody/Load\";"
+		"Psalmody(\"~/Sup1/Sup1Hymns\");");
 	return TRUE;
 
 	//Ins your own ALT-key plug-ins

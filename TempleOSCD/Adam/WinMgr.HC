@@ -35,7 +35,7 @@ public U0 Refresh(I64 cnt=1,Bool force=FALSE)
 
 public Bool ScrnCast(Bool val=ON,U8 *print_fmt="B:/Tmp/%X.GR")
 {//WinMgr saves GR files to a dir.
-  Bool old_val,old_silent=Silent;
+  Bool old_val;
   if (val) {
     if (!(old_val=LBtr(&winmgr.scrn_cast,0))) {
       Free(winmgr.scrn_cast_print_fmt);
@@ -46,7 +46,6 @@ public Bool ScrnCast(Bool val=ON,U8 *print_fmt="B:/Tmp/%X.GR")
     }
   } else
     old_val=LBtr(&winmgr.scrn_cast,0);
-  Silent(old_silent);
   return old_val;
 }
 

@@ -323,7 +323,8 @@ public U0 TOSPreRegen()
   CopyTree("D:/Home/Sup1/Sup1Bin","C:/Home/Sup1/Sup1Bin");
   Copy("D:/Home/Sup1/Sup1CodeScraps/Comm/TOSSocket*",
 	"C:/Home/Sup1/Sup1CodeScraps/Comm");
-  Copy("D:/Home/Sup1/Sup1Bin/God*","C:/Linux");
+  DelTree("C:/Linux");
+  CopyTree("D:/Linux","C:/Linux");
 }
 
 public U0 TOSRegen()

@@ -1,6 +1,5 @@
 Cd(__DIR__);;
 #include "Diff"
-#include "FileBMP"
 #include "Find"
 #include "HeapLog"
 #include "LineRep"

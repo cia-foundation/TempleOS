@@ -1,6 +1,6 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
-* Make $LK,"GR2BMPLst",A="MN:GR2BMPLst"$ combine disjoint rects for same frame.
+* Make MV files combine disjoint rects for same frame.
 
 * God said to reconsider switch start/end, perhaps preface portion?
 
@@ -198,8 +198,6 @@ $FG,5$$TX+CX,"Bugs? Not really sure."$$FG$
 
 * $LK,"StrPrintJoin",A="MN:StrPrintJoin"$(,st); With st="\n\\"; (Forgot what this is talking about.)
 
-* $LK,"BMPRLE4To",A="MN:BMPRLE4To"$() has files_size too big by 108.  Fixed?
-
 
 $FG,5$$TX+CX,"TODO? Not really, just angst."$$FG$
 * Should these be moved into $LK,"CHashClass",A="MN:CHashClass"$ from $LK,"CMemberLst",A="MN:CMemberLst"$ and $LK,"CHashGlblVar",A="MN:CHashGlblVar"$?
@@ -278,8 +276,6 @@ $FG,5$$TX+CX,"Committee Needed"$$FG$
 * Should Msgs in PopUp queue get fwded to parent when task dies?
 
 * Import Intel datasheets so we can use links in $LK,"Code",A="FI:::/Kernel/Mem/PageTables.HC"$ for documentation.  I tried a PDF-to-text convertor and it wasn't acceptible.
-
-* Why are BMP file $LK,"CBGR24",A="MN:CBGR24"$'s wrong?  $LK,"::/Adam/Opt/Utils/FileBMP.HC"$.
 
 * Switch stmt with sparse cases?  Maybe, ban sparse switch stmts.
 

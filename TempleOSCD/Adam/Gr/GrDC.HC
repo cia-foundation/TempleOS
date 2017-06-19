@@ -376,6 +376,10 @@ public CDC *DCLoad(U8 *src,I64 *_size=NULL,CTask *task=NULL)
 #help_index "Graphics/GR Files"
 #help_file "::/Doc/GRFiles"
 #help_index "Graphics/Device Contexts;Graphics/GR Files"
+
+#define GR_FILE_MAX	(offset(CDC.end)-offset(CDC.start)+\
+	COLORS_NUM*sizeof(CBGR48)+sizeof(CArcCtrl)+GR_WIDTH*GR_HEIGHT)
+
 public I64 GRWrite(U8 *filename,CDC *dc,I64 dcsf_flags=DCSF_COMPRESSED)
 {//TempleOS GR File.
   I64	size;

@@ -2308,7 +2308,7 @@ public class CATARep
 #define FILEMASK_SRC	"*.HC*;*.HH*;*.IN*;*.PRJ*"
 #define FILEMASK_DD	FILEMASK_SRC ";*.DD*"
 #define FILEMASK_TXT	FILEMASK_DD ";*.TXT*"
-#define FILEMASK_GR	"*.GR*;*.BMP*"
+#define FILEMASK_GR	"*.GR*"
 
 #help_index "File/Low Level"
 #define BLK_SIZE_BITS	9

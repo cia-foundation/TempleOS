@@ -31,7 +31,7 @@ $ID,-5$
 
 * Low line count is the highest good, so it is easy to learn the whole thing.  Users should see the light at the end of the tunnel.  One file system, for example, is better than many file systems.
 
-* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"82,150",D="DD_TEMPLEOS_LOC"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
+* There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,494",D="DD_TEMPLEOS_LOC"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
 
 * The metric for resolving all TempleOS code governance issues is how fast the compiler compiles itself and the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  The $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ language should be changed to optimize this metric, as I did when I changed type casting from prefix standard C to postfix $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$, but we need a rule to prevent degenerating into a brainfuck language.
  

@@ -749,10 +749,10 @@ public extern U16 mon_start_days2[12];
 #help_index "Time/HPET"
 #help_file "::/Doc/TimeHPET"
 public extern I64 HPET();
-
 #help_index "Time/Jiffies"
 #help_file "::/Doc/TimeJiffy"
 public extern I64 SysTimerRead();//18.33333*65536Hz (SYS_TIMER_FREQ)
+
 #help_index "Time/Seconds"
 public extern Bool Blink(F64 Hz=2.5);
 public extern F64 tS(); //From SysTimerFreq.

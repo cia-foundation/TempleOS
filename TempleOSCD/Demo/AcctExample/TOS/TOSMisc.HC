@@ -12,11 +12,11 @@ I64 CopyVideo(Bool reverb)
     intensity=0.35;
   }
   Del("D:/Tmp/*.SND");
-  DelTree("D:/Tmp/ScrnShots");
-  DirMk("D:/Tmp/ScrnShots");
+  Del("D:/Tmp/*.MV");
   Silent(old_silent);
-  SndFileCreate("D:/Tmp/Audio",0.115,0.0,WF_SQUARE,delay,intensity);
-  GR2BMPLst("B:/Tmp","+d","D:/Tmp/ScrnShots/VID%05d.BMP.Z");
+  RunFile("~/Sup1/Sup1Snd/SndFile",,
+	"D:/Tmp/AUD%03d.SND",0.115,0.0,1,delay,intensity,0.185);
+  GR2MV("D:/Tmp/VID%03d.MV","B:/Tmp","+d");
   return res;
 }
 
@@ -27,17 +27,15 @@ U0 DelScrnShots()
   DelTree("B:/Tmp");
   DirMk("B:/Tmp");
   Del("D:/Tmp/*.SND");
-  DelTree("D:/Tmp/ScrnShots");
-  DirMk("D:/Tmp/ScrnShots");
+  Del("D:/Tmp/*.MV");
   Del("C:/Tmp/*.SND");
-  DelTree("C:/Tmp/ScrnShots");
-  DirMk("C:/Tmp/ScrnShots");
+  Del("C:/Tmp/*.MV");
   Silent(old_silent);
 }
 
 public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
 	Bool reverb,Bool just_audio=FALSE)
-{//The frame grabber saves BMP files to D:/Tmp/ScrnShots.
+{//The frame grabber saves GR files to B:/Tmp.
   static F64 last_time=0;
   if (tS-last_time>3.0) {
     last_time=tS;
@@ -73,7 +71,7 @@ public U0 JukeLines(I64 start_line,I64 end_line)
 {//Make movie of many lines of songs, starting at 0.
   if (!fg_on)
     FrameGrabberToggle(FALSE,FALSE,FALSE);
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5,1.5);
+  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle(FALSE,FALSE,TRUE);
 }
@@ -135,33 +133,6 @@ public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)
   }
   if (_total_score) *_total_score=total_score;
   return doc;
-}
-
-public U0 BMP2Doc(U8 *_in_name,U8 *_out_name=NULL)
-{//Use OCR to make a text DolDoc from BMP file.
-  U8 *in_name,*out_name;
-  I64 dx,dy,score,best_score=I64_MAX;
-  CDC *dc;
-  CDoc *doc;
-  in_name=ExtDft(_in_name,"BMP");
-  if (_out_name)
-    out_name=ExtDft(_out_name,"DD.Z");
-  else
-    out_name=ExtChg(_in_name,"DD.Z");
-  if (dc=BMPRead(in_name)) {
-    for (dy=-3;dy<=4;dy++)
-      for (dx=-3;dx<=4;dx++) {
-	doc=DC2Doc(dc,dx,dy,&score);
-	if (score<best_score) {
-	  best_score=score;
-	  StrCpy(&doc->filename.name,out_name);
-	  DocWrite(doc);
-	}
-	DocDel(doc);
-      }
-  }
-  Free(in_name);
-  Free(out_name);
 }
 
 #define MEM_TEST_SIZE	1024*1024

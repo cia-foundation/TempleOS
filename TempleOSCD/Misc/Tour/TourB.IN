@@ -17,5 +17,4 @@ InPrint(250,"Dir;\n");
 
 Sleep(1500);
 TourPut(
-"$$GREEN$$Type()$$FG$$ can also be used on $$GREEN$$.BMP$$FG$$ or $$GREEN$$.GR$$FG$$ "
-"files!",TRUE);
+"$$GREEN$$Type()$$FG$$ can also be used on $$GREEN$$.GR$$FG$$ files!",TRUE);

@@ -5,13 +5,10 @@ extern U0 ACFillIn(I64 n);
 extern U0 ACMan(I64 n,CTask *parent_task=NULL);
 extern I64 AdamFile(U8 *filename,Bool warn_ext=TRUE);
 extern Bool AutoComplete(Bool val=OFF);
-extern I64 BMPWrite(U8 *filename,CDC *dc,I64 bits=4);
 extern U0 ClipDel();
 extern CCtrl *CtrlFindUnique(CTask *haystack_task,I64 needle_type);
 extern Bool CtrlInside(CCtrl *c,I64 x,I64 y);
 extern U8 *DC2Sprite(CDC *tmpb);
-extern U0 DocBMP(CDoc *doc=NULL,U8 *filename,
-	Bool dither_probability=FALSE,Bool use_ms_paint_palette=FALSE);
 extern U0 DocBinDel(CDoc *doc,CDocBin *b);
 extern U0 DocBinsValidate(CDoc *doc);
 extern U0 DocBottom(CDoc *doc=NULL);

@@ -26,8 +26,7 @@
 #define SPBM_ADD_OUTLINE	23
 #define SPBM_ETCH		24
 #define SPBM_UNDO		25
-#define SPBM_SAVE_BMP		26
-#define SPBM_SAVE_GRA		27
+#define SPBM_SAVE_GR		26
 
 U0 GrInit4()
 {
@@ -36,7 +35,7 @@ U0 GrInit4()
 	"Rect\0Circle\0Text\0Text Box\0Text Diamond\0Flood Fill\0"
 	"Flood Fill Not Color\0PolyLine\0PolyPoint\0Copy\0Delete\0Paste\0"
 	"Paste Transparent\0Find and Replace\0Trim to Extents\0Add Outline\0"
-	"Etch\0Undo\0Save BMP\0Save GR\0");
+	"Etch\0Undo\0Save GR\0");
 }
 GrInit4;
 
@@ -79,8 +78,7 @@ I64 PopUpSpriteBitMap(CColorROPU32 color,I64 width)
 	"$$MU-UL,\"Delete to Clip\",LE=SPBM_DELETE$$\n"
 	"$$MU-UL,\"Paste Clip\",LE=SPBM_PASTE$$\n"
 	"$$MU-UL,\"Paste Transparent Clip\",LE=SPBM_PASTE_TRANSPARENT$$\n"
-	"\n$$MU-UL,\"Save BMP File\",LE=SPBM_SAVE_BMP$$\n"
-	"$$MU-UL,\"Save GR File\",LE=SPBM_SAVE_GRA$$\n"
+	"\n$$MU-UL,\"Save GR File\",LE=SPBM_SAVE_GR$$\n"
 	"\n$$MU-UL,\"Undo\",LE=SPBM_UNDO$$\n"
 	"\n$$PURPLE$$$$MU-UL,\"+] Sprite Main Menu\",LE=SPBM_MAIN_MENU$$$$LTBLUE$$\n"
 	"$$MU-UL,\"Exit  Sprite\",LE=SPBM_EXIT$$\n"
@@ -293,12 +291,7 @@ bm_menu:
 		GrBitMapEdPrepPersistentDC(dc,xx1,yy1,img);
 	      }
 	      goto bm_menu;
-	    case SPBM_SAVE_BMP:
-	      *filename.name=0;
-	      if (DocForm(&filename) && *filename.name)
-		BMPWrite(filename.name,img);
-	      goto bm_menu;
-	    case SPBM_SAVE_GRA:
+	    case SPBM_SAVE_GR:
 	      *filename.name=0;
 	      if (DocForm(&filename) && *filename.name)
 		GRWrite(filename.name,img,DCSF_COMPRESSED|DCSF_PALETTE_GET);
