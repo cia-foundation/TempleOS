@@ -6,8 +6,7 @@ CMsStateGlbls old_ms={{-1000,-1000,0},{-1000,-1000,0},{-1000,-1000,0},
   FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE
 };
 
-public CWinMgrGlbls winmgr={0,0,0,WINMGR_FPS,tS,tS,NULL,
-	Now,tS,NULL,NULL,NULL,FALSE,FALSE,FALSE,FALSE};
+public CWinMgrGlbls winmgr={0,0,0,WINMGR_FPS,tS,tS,NULL,FALSE,FALSE,FALSE};
 winmgr.t=CAlloc(sizeof(CWinMgrTimingGlbls));
 winmgr.t->last_calc_idle_time=tS;
 

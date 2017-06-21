@@ -13,7 +13,7 @@ U0 TOSStaffIns()
   "\nDownload TOS_Supplemental1.ISO.C\tfrom http://www.templeos.org\n";
 
   if (PressAKey!=CH_SHIFT_ESC) {
-    if (HostChgDsk("/home/tad/TOS_Supplemental1.ISO.C"))
+    if (HostChgDsk("/home/tad/Downloads/TOS_Supplemental1.ISO.C"))
       CopyTree("T:/","~/Sup1");
 
     Once("TOSBootHDIns;");

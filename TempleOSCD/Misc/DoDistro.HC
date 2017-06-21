@@ -32,7 +32,7 @@ U0 MakeMyISO(U8 *_out_iso_filename)
 
   //To save space, optionally delete dictionary.
   //Del("/Distro/Adam/AutoComplete/ACDefs.DATA");
-  CopyTree("/Linux","/Distro/Linux");	  //You can leave this out.
+  CopyTree("/Downloads","/Distro/Downloads");	  //You can leave this out.
   DirMk("/Distro/Tmp");
   DirMk("/Distro/Tmp/ScrnShots");
   RedSeaISO(out_iso_filename,"/Distro","/Distro" BOOT_DIR_KERNEL_BIN_C);

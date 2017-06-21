@@ -1,5 +1,7 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
+* Compiler Bug: $LK,"AUWrite",A="MN:AUWrite"$() dst->cdt=t0_now+ToI64(CDATE_FREQ*(tmpsd->tS-t0_tS));
+
 * Make MV files combine disjoint rects for same frame.
 
 * God said to reconsider switch start/end, perhaps preface portion?

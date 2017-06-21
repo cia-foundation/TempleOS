@@ -31,24 +31,6 @@ public U0 Refresh(I64 cnt=1,Bool force=FALSE)
   LBEqu(&Fs->task_flags,TASKf_IDLE,old_idle);
 }
 
-#help_index "Windows;Cmd Line (Typically)"
-
-public Bool ScrnCast(Bool val=ON,U8 *print_fmt="B:/Tmp/%X.GR")
-{//WinMgr saves GR files to a dir.
-  Bool old_val;
-  if (val) {
-    if (!(old_val=LBtr(&winmgr.scrn_cast,0))) {
-      Free(winmgr.scrn_cast_print_fmt);
-      winmgr.scrn_cast_print_fmt=AStrNew(print_fmt);
-      winmgr.scrn_cast_now=Now;
-      winmgr.scrn_cast_tS=tS;
-      LBts(&winmgr.scrn_cast,0);
-    }
-  } else
-    old_val=LBtr(&winmgr.scrn_cast,0);
-  return old_val;
-}
-
 #help_index "Windows"
 
 I64 WinQueIPMsgs(Bool que)
@@ -288,28 +270,28 @@ I64 WinMgrSleep(Bool flush_msgs=FALSE)
     LBts(&sys_semas[SEMA_REFRESH_IN_PROGRESS],0);
     GrUpdateScrn;
     LBtr(&sys_semas[SEMA_REFRESH_IN_PROGRESS],0);
-    if (winmgr.scrn_cast) {
-      cdt=winmgr.scrn_cast_now+ToI64(CDATE_FREQ*(tS-winmgr.scrn_cast_tS));
-      if (!winmgr.scrn_cast_dc) {
-	winmgr.scrn_cast_dc=DCCopy(winmgr.dc2_alias);
-	winmgr.scrn_cast_dc->cdt=cdt;
-	st=MStrPrint(winmgr.scrn_cast_print_fmt,cdt);
-	GRWrite(st,winmgr.scrn_cast_dc);
+    if (scrncast.record  && !scrncast.just_audio) {
+      cdt=scrncast.t0_now(I64)+ToI64(CDATE_FREQ*(tS-scrncast.t0_tS));
+      if (!scrncast.dc) {
+	scrncast.dc=DCCopy(scrncast.dc2_alias);
+	scrncast.dc->cdt=cdt;
+	st=MStrPrint(scrncast.print_fmt,cdt);
+	GRWrite(st,scrncast.dc);
 	Free(st);
-      } else if (MemCmp(winmgr.scrn_cast_dc->body,
-	    winmgr.dc2_alias->body,MSize(winmgr.dc2_alias->body))) {
-	diff=DCDiff(winmgr.scrn_cast_dc,winmgr.dc2_alias);
+      } else if (MemCmp(scrncast.dc->body,
+	    scrncast.dc2_alias->body,MSize(scrncast.dc2_alias->body))) {
+	diff=DCDiff(scrncast.dc,scrncast.dc2_alias);
 	diff->cdt=cdt;
-	st=MStrPrint(winmgr.scrn_cast_print_fmt,cdt);
+	st=MStrPrint(scrncast.print_fmt,cdt);
 	GRWrite(st,diff);
 	Free(st);
 	DCDel(diff);
-	Free(winmgr.scrn_cast_dc->body);
-	winmgr.scrn_cast_dc->body=MAllocIdent(winmgr.dc2_alias->body);
+	Free(scrncast.dc->body);
+	scrncast.dc->body=MAllocIdent(scrncast.dc2_alias->body);
       }
-    } else if (winmgr.scrn_cast_dc) {
-      DCDel(winmgr.scrn_cast_dc); //TODO: $LK,"MemRep",A="MN:MemRep"$ can crash.
-      winmgr.scrn_cast_dc=NULL;
+    } else if (scrncast.dc) {
+      DCDel(scrncast.dc); //TODO: $LK,"MemRep",A="MN:MemRep"$ can crash.
+      scrncast.dc=NULL;
     }
     if (sys_focus_task && !Bt(&sys_focus_task->task_flags,TASKf_HAS_SONG)) {
       Free(music.cur_song);
@@ -450,7 +432,7 @@ U0 WinMgrTask(I64)
   gr.dc->win_task=Fs;
   Fs->win_inhibit&=~WIF_SELF_CTRLS;
   GrSetUpTables;
-  winmgr.dc2_alias=DCAlias(gr.dc2);
+  scrncast.dc2_alias=DCAlias(gr.dc2);
   WinZBufUpdate;
   LBts(&sys_run_level,RLf_WINMGR);
   while (TRUE) {

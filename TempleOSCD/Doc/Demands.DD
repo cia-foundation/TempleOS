@@ -17,7 +17,7 @@ $LK,"::/Kernel/BlkDev/DskClus.HC"$	:152 All the clus operations become blk.
 
 * VMware has a bug stretching 640x480 16 color to full scrn.
 
-* VMware PC speaker's distortion is a good idea, but it is too much for hymns.  VMware should make an adjustment for distortion and an adjustment for reverb.
+* VMware PC speaker's distortion is a good idea, but it is too much for hymns.
 
 * VMware and others must list TempleOS as an official 64-bit operating system.
 

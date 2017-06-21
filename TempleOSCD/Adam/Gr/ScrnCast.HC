@@ -1,4 +1,4 @@
-#help_index "Graphics/Device Contexts;Graphics/GR Files"
+#help_index "ScrnCast;Graphics/Device Contexts;Graphics/GR Files"
 
 #define MV_FILE_MAX	0x007FF000
 
@@ -55,4 +55,42 @@ public I64 GR2MV(U8 *print_fmt="VID%03d.MV",
   DirTreeDel(tmpde1);
   DCDel(dc_base);
   return file_num;
+}
+
+#help_index "ScrnCast;Snd/AU Files"
+public U0 SndShift(CSndData *head,F64 dt=0)
+{//Shift CSndData in time.
+  CSndData *tmpsd,*tmpsd1;
+  if (dt) {
+    tmpsd=head->next;
+    while (tmpsd!=head) {
+      tmpsd1=tmpsd->next;
+      tmpsd->tS-=dt;
+      if (tmpsd->tS<tmpsd->last->tS) {
+	QueRem(tmpsd);
+	Free(tmpsd);
+      }
+      tmpsd=tmpsd1;
+    }
+  }
+}
+
+public I64 AUWrite(U8 *filename,CSndData *head,CDate *t0_now,F64 t0_tS)
+{//Write AU file.
+  CSndData *tmpsd;
+  CAUData *base,*dst;
+  I64 size=(1+QueCnt(head))*sizeof(CAUData);
+  U8 *st=ExtDft(filename,"AU");
+  base=dst=MAlloc(size);
+  tmpsd=head;
+  do {
+    dst->cdt=t0_now(I64)+ToI64(CDATE_FREQ*(tmpsd->tS-t0_tS));
+    dst->ona=tmpsd->ona;
+    dst++;
+    tmpsd=tmpsd->next;
+  } while (tmpsd!=head);
+  FileWrite(st,base,dst(U8 *)-base(U8 *));
+  Free(base);
+  Free(st);
+  return size;
 }

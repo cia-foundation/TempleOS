@@ -14,6 +14,8 @@
 #define SHORT_MAX	0x7FFF
 #define INT_MIN 	(-0x80000000)
 #define INT_MAX 	0x7FFFFFFF
+#define LONG_LONG_MIN 	(-0x8000000000000000l)
+#define LONG_LONG_MAX 	0x7FFFFFFFFFFFFFFFl
 #define DWORD_MIN 	0
 #define DWORD_MAX 	0xFFFFFFFF
 #define CDATE_FREQ	49710 // Hz
@@ -68,6 +70,56 @@ int FSize(FILE *f)
   fseek(f,0,SEEK_END);
   res=ftell(f);
   fseek(f,original,SEEK_SET);
+  return res;
+}
+
+class CQue
+{public:
+  CQue *next,*last;
+};
+
+void QueIns(void *entry,void *pred)
+{
+  CQue * succ;
+  succ=((CQue *)pred)->next;
+  ((CQue *)entry)->last=(CQue *)pred;
+  ((CQue *)entry)->next=succ;
+  succ ->last=(CQue *)entry;
+  ((CQue *)pred)->next=(CQue *)entry;
+}
+
+void QueRem(void *entry)
+{
+  ((CQue *)entry)->last->next=((CQue *)entry)->next;
+  ((CQue *)entry)->next->last=((CQue *)entry)->last;
+}
+
+void QueDel(void *head,BOOL querem=FALSE)
+{//Free entries in queue, not head.
+  CQue *tmpq=((CQue *)head)->next,*tmpq1;
+  while (tmpq!=head) {
+    tmpq1=((CQue *)tmpq)->next;
+    if (querem)
+      QueRem(tmpq);
+    Free(tmpq);
+    tmpq=tmpq1;
+  }
+}
+
+void QueInit(void *head)
+{//Free entries in queue, not head.
+  ((CQue *)head)->next=(CQue *)head;
+  ((CQue *)head)->last=(CQue *)head;
+}
+
+int QueCnt(CQue *head)
+{//Count of nodes in queue, not head.
+  CQue *tmpq=((CQue *)head)->next;
+  int res=0;
+  while (tmpq!=head) {
+    res++;
+    tmpq=((CQue *)tmpq)->next;
+  }
   return res;
 }
 
@@ -322,20 +374,99 @@ BOOL Cvt(char *in_name,char *out_name,BOOL cvt_ascii)
   return okay;
 }
 
+long long ona2freq[256]=
+{0x0000000000000000,0x3F825AA2E3AF0B1E,0x3F83720820155763,0x3F849A0A791E127D,
+0x3F85D3A6D600CAB9,0x3F871FE927CA0DE9,0x3F887FED4E47AE02,0x3F89F4E00A91D08B,
+0x3F8B800000000000,0x3F8D229EC465C8A4,0x3F8EDE22007F7915,0x3F905A0250C2B956,
+0x3F9152EC0E758E71,0x3F925AA2E3AF0B1E,0x3F93720820155763,0x3F949A0A791E127D,
+0x3F95D3A6D600CAB9,0x3F971FE927CA0DE9,0x3F987FED4E47AE02,0x3F99F4E00A91D08B,
+0x3F9B800000000000,0x3F9D229EC465C8A4,0x3F9EDE22007F7915,0x3FA05A0250C2B956,
+0x3FA152EC0E758E71,0x3FA25AA2E3AF0B1E,0x3FA3720820155763,0x3FA49A0A791E127D,
+0x3FA5D3A6D600CAB9,0x3FA71FE927CA0DE9,0x3FA87FED4E47AE02,0x3FA9F4E00A91D08B,
+0x3FAB800000000000,0x3FAD229EC465C89F,0x3FAEDE22007F791A,0x3FB05A0250C2B956,
+0x3FB152EC0E758E6E,0x3FB25AA2E3AF0B22,0x3FB3720820155763,0x3FB49A0A791E127A,
+0x3FB5D3A6D600CABC,0x3FB71FE927CA0DE9,0x3FB87FED4E47ADFE,0x3FB9F4E00A91D08F,
+0x3FBB800000000000,0x3FBD229EC465C89F,0x3FBEDE22007F791A,0x3FC05A0250C2B956,
+0x3FC152EC0E758E6E,0x3FC25AA2E3AF0B22,0x3FC3720820155763,0x3FC49A0A791E127A,
+0x3FC5D3A6D600CABC,0x3FC71FE927CA0DE9,0x3FC87FED4E47ADFE,0x3FC9F4E00A91D08F,
+0x3FCB800000000000,0x3FCD229EC465C89F,0x3FCEDE22007F791A,0x3FD05A0250C2B956,
+0x3FD152EC0E758E6E,0x3FD25AA2E3AF0B22,0x3FD3720820155763,0x3FD49A0A791E127A,
+0x3FD5D3A6D600CABC,0x3FD71FE927CA0DE9,0x3FD87FED4E47ADFE,0x3FD9F4E00A91D08F,
+0x3FDB800000000000,0x3FDD229EC465C89F,0x3FDEDE22007F791A,0x3FE05A0250C2B956,
+0x3FE152EC0E758E6E,0x3FE25AA2E3AF0B22,0x3FE3720820155763,0x3FE49A0A791E127A,
+0x3FE5D3A6D600CABC,0x3FE71FE927CA0DE9,0x3FE87FED4E47ADFE,0x3FE9F4E00A91D08F,
+0x3FEB800000000000,0x3FED229EC465C8A2,0x3FEEDE22007F7918,0x3FF05A0250C2B956,
+0x3FF152EC0E758E6F,0x3FF25AA2E3AF0B20,0x3FF3720820155763,0x3FF49A0A791E127B,
+0x3FF5D3A6D600CABB,0x3FF71FE927CA0DE9,0x3FF87FED4E47AE00,0x3FF9F4E00A91D08D,
+0x3FFB800000000000,0x3FFD229EC465C8A2,0x3FFEDE22007F7918,0x40005A0250C2B956,
+0x400152EC0E758E6F,0x40025AA2E3AF0B20,0x4003720820155763,0x40049A0A791E127B,
+0x4005D3A6D600CABB,0x40071FE927CA0DE9,0x40087FED4E47AE00,0x4009F4E00A91D08D,
+0x400B800000000000,0x400D229EC465C8A0,0x400EDE22007F791A,0x40105A0250C2B956,
+0x401152EC0E758E6F,0x40125AA2E3AF0B21,0x4013720820155763,0x40149A0A791E127A,
+0x4015D3A6D600CABC,0x40171FE927CA0DE9,0x40187FED4E47ADFE,0x4019F4E00A91D08E,
+0x401B800000000000,0x401D229EC465C8A0,0x401EDE22007F7918,0x40205A0250C2B956,
+0x402152EC0E758E6F,0x40225AA2E3AF0B20,0x4023720820155763,0x40249A0A791E127A,
+0x4025D3A6D600CABC,0x40271FE927CA0DE9,0x40287FED4E47ADFF,0x4029F4E00A91D08E,
+0x402B800000000000,0x402D229EC465C8A0,0x402EDE22007F7918,0x40305A0250C2B956,
+0x403152EC0E758E6F,0x40325AA2E3AF0B21,0x4033720820155763,0x40349A0A791E127B,
+0x4035D3A6D600CABC,0x40371FE927CA0DE9,0x40387FED4E47ADFF,0x4039F4E00A91D08E,
+0x403B800000000000,0x403D229EC465C8A0,0x403EDE22007F791A,0x40405A0250C2B956,
+0x404152EC0E758E6F,0x40425AA2E3AF0B21,0x4043720820155763,0x40449A0A791E127A,
+0x4045D3A6D600CABC,0x40471FE927CA0DE9,0x40487FED4E47ADFE,0x4049F4E00A91D08E,
+0x404B800000000000,0x404D229EC465C8A2,0x404EDE22007F7918,0x40505A0250C2B956,
+0x405152EC0E758E6F,0x40525AA2E3AF0B20,0x4053720820155763,0x40549A0A791E127B,
+0x4055D3A6D600CABB,0x40571FE927CA0DE9,0x40587FED4E47AE00,0x4059F4E00A91D08D,
+0x405B800000000000,0x405D229EC465C8A2,0x405EDE22007F7918,0x40605A0250C2B956,
+0x406152EC0E758E6F,0x40625AA2E3AF0B20,0x4063720820155763,0x40649A0A791E127B,
+0x4065D3A6D600CABB,0x40671FE927CA0DE9,0x40687FED4E47AE00,0x4069F4E00A91D08D,
+0x406B800000000000,0x406D229EC465C89F,0x406EDE22007F791A,0x40705A0250C2B956,
+0x407152EC0E758E6E,0x40725AA2E3AF0B22,0x4073720820155763,0x40749A0A791E127A,
+0x4075D3A6D600CABC,0x40771FE927CA0DE9,0x40787FED4E47ADFE,0x4079F4E00A91D08F,
+0x407B800000000000,0x407D229EC465C89F,0x407EDE22007F791A,0x40805A0250C2B956,
+0x408152EC0E758E6E,0x40825AA2E3AF0B22,0x4083720820155763,0x40849A0A791E127A,
+0x4085D3A6D600CABC,0x40871FE927CA0DE9,0x40887FED4E47ADFE,0x4089F4E00A91D08F,
+0x408B800000000000,0x408D229EC465C89F,0x408EDE22007F791A,0x40905A0250C2B956,
+0x409152EC0E758E6E,0x40925AA2E3AF0B22,0x4093720820155763,0x40949A0A791E127A,
+0x4095D3A6D600CABC,0x40971FE927CA0DE9,0x40987FED4E47ADFE,0x4099F4E00A91D08F,
+0x409B800000000000,0x409D229EC465C89F,0x409EDE22007F791A,0x40A05A0250C2B956,
+0x40A152EC0E758E6E,0x40A25AA2E3AF0B22,0x40A3720820155763,0x40A49A0A791E127A,
+0x40A5D3A6D600CABC,0x40A71FE927CA0DE9,0x40A87FED4E47ADFE,0x40A9F4E00A91D08F,
+0x40AB800000000000,0x40AD229EC465C8A4,0x40AEDE22007F7915,0x40B05A0250C2B956,
+0x40B152EC0E758E71,0x40B25AA2E3AF0B1E,0x40B3720820155763,0x40B49A0A791E127D,
+0x40B5D3A6D600CAB9,0x40B71FE927CA0DE9,0x40B87FED4E47AE02,0x40B9F4E00A91D08B,
+0x40BB800000000000,0x40BD229EC465C8A4,0x40BEDE22007F7915,0x40C05A0250C2B956,
+0x40C152EC0E758E71,0x40C25AA2E3AF0B1E,0x40C3720820155763,0x40C49A0A791E127D,
+0x40C5D3A6D600CAB9,0x40C71FE927CA0DE9,0x40C87FED4E47AE02,0x40C9F4E00A91D08B,
+0x40CB800000000000,0x40CD229EC465C8A4,0x40CEDE22007F7915,0x40D05A0250C2B956,
+0x40D152EC0E758E71,0x40D25AA2E3AF0B1E,0x40D3720820155763,0x40D49A0A791E127D};
+
 #define ONA_REST	CHAR_MIN
 
 double Ona2Freq(char ona)
 {//Ona to freq. Ona=60 is 440.0Hz.
+  double *d;
   if (ona==ONA_REST)
     return 0;
-//  else
-//    return 440.0/32*pow(2.0,ona/12.0);
+  else {
+//       return 440.0/32*pow(2.0,ona/12.0);
+
+//This avoids needing to link math library to this file.
+    d=(double *)&ona2freq[ona+128];
+    return *d;
+  }
 }
+
+class CAUData
+{public:
+  long long cdt;
+  char ona;
+};
 
 class CSndData
 {public:
-  double	time;
-  char	ona;
+  CSndData *next,*last;
+  double tS;
+  char ona;
 };
 
 class CSndWaveCtrl
@@ -401,18 +532,17 @@ class CFileSND
 
 #define SND_FILE_MAX	0x007FF000
 
-int SndFileCreate(char *print_fmt,double normalized_vol=1.0,
-	double reverb_delay=0,double reverb_intensity=0,double time_shift=0)
+int SndFileCreate(CSndData *head,char *print_fmt,double vol=1.0)
 {
-  int i,i1,k,cnt,cnt2,level,file_num;
+  int i,i1,k,cnt,cnt2,file_num;
   double dt;
   CFileSND *s;
   CSndWaveCtrl *swc=SndWaveCtrlNew(SNDFILE_SAMPLE_RATE);
-  CSndData *d,*d1;
+  CSndData *tmpsd;
   char st[512];
   FILE *out_file;
 
-//  dt=snd.record_head.last->time-snd.record_head.next->time;
+  dt=head->last->tS-head->tS;
   if (!dt) return 0;
   cnt=dt*SNDFILE_SAMPLE_RATE;
   cnt++; //Terminator
@@ -424,73 +554,28 @@ int SndFileCreate(char *print_fmt,double normalized_vol=1.0,
   s->sample_rate=EndianDWORD(SNDFILE_SAMPLE_RATE);
   s->channels=EndianDWORD(1);
 
-  if (time_shift) {
-//    d=snd.record_head.next;
-    d->time-=time_shift;
-//    while (d->next!=&snd.record_head) {
-    while (TRUE) {
-//      d1=d->next;
-      dt=d1->time-d->time;
-      if (dt<0) {
-//	QueRem(d1);
-//	Free(d1);
-      } else
-	break;
-    }
-  }
-
-//  d=snd.record_head.next;
   k=0;
-  i=d->time*SNDFILE_SAMPLE_RATE;
-//  while (d->next!=&snd.record_head) {
-//    d1=d->next;
-    i1=d1->time*SNDFILE_SAMPLE_RATE;
-    if (i1-i) {
+  i=head->tS*SNDFILE_SAMPLE_RATE;
+  tmpsd=head->next;
+  while (tmpsd!=head) {
+    i1=tmpsd->tS*SNDFILE_SAMPLE_RATE;
+    if (i1-i>0) {
+      if (k+i1-i>cnt) {
+        i1=cnt-k+i;
+        if (i1-i<=0)
+          break;
+      }
       SndWaveAddBuf(swc,(BYTE *)&s->body[k],i1-i,
-	Ona2Freq(d->ona),normalized_vol);
+	    Ona2Freq(tmpsd->last->ona),vol);
       k+=i1-i;
       i=i1;
     }
-//    QueRem(d);
-//    Free(d);
-    d=d1;
-//  }
-
-  //Reverb
-  if (reverb_intensity) {
-    if (dt=reverb_delay*SNDFILE_SAMPLE_RATE)
-      for (i=dt;i<cnt;i++)
-	s->body[i]+=reverb_intensity*s->body[i-(DWORD)dt];
-  }
-
-  //Get rid of D.C. component
-  for (k=0;k<3;k++) {
-    level=0;
-    for (i=0;i<cnt-1;i++)
-      level+=s->body[i];
-    level/=cnt-1;
-    for (i=0;i<cnt-1;i++) {
-      if (s->body[i]-level<=SHORT_MIN)
-        s->body[i]=SHORT_MIN;
-      else if (s->body[i]-level>=SHORT_MIN)
-        s->body[i]=SHORT_MAX;
-      else
-        s->body[i]=s->body[i]-level;
-    }
+    tmpsd=tmpsd->next;
   }
 
   for (i=0;i<cnt-1;i++)
     s->body[i]=EndianWORD(s->body[i]);
-
   s->body[cnt-1]=0;
-
-//  d=snd.record_head.next;
-//  while (d!=&snd.record_head) {
-//    d1=d->next;
-//    QueRem(d);
-//    Free(d);
-    d=d1;
-//  }
 
   cnt2=cnt;
   file_num=0;
@@ -509,7 +594,34 @@ int SndFileCreate(char *print_fmt,double normalized_vol=1.0,
   }
   Free(s);
   Free(swc);
-  return cnt;
+  return file_num;
+}
+
+void AURead(CSndData *head,char *au_name)
+{
+  CSndData *tmpsd;
+  FILE *in_file;
+  CAUData aud;
+  long long t0_cdt;
+  BOOL first=TRUE;
+
+  memset(head,0,sizeof(CSndData));
+  QueInit(head);
+  if (in_file=fopen(au_name,"rb")) {
+    while (fread(&aud,1,sizeof(CAUData),in_file)) {
+      if (first) {
+        tmpsd=head;
+        t0_cdt=aud.cdt;
+        first=FALSE;
+      } else {
+        tmpsd=(CSndData *)malloc(sizeof(CSndData));
+        QueIns(tmpsd,head->last);
+      }
+      tmpsd->ona=aud.ona;
+      tmpsd->tS=1.0*(aud.cdt-t0_cdt)/CDATE_FREQ;
+    }
+    fclose(in_file);
+  }
 }
 
 #define GR_WIDTH	640
@@ -539,7 +651,7 @@ class CBGR48
 
 class CDC
 {public:
-  CDate cdt;
+  long long cdt;
   int	x0,y0,
 	width,width_internal,
 	height,
@@ -625,7 +737,6 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
 }
 
 #define BMP_COLORS_NUM	16
-
 class CFileBMP
 {public:
   WORD  type;
@@ -728,10 +839,8 @@ int MV2BMPLst(char *mv_print_fmt,char *dir_print_fmt,char *bmp_print_fmt,
   CDC *dc,*base;
   BYTE *src,*src_base;
   char st[512],st_dir[512],st_bmp[512],st_mp4[512];
-  CDate cdt;
+  long long cdt=LONG_LONG_MIN;
   FILE *mv_file,*lst_file=fopen("TOSZTEMP_VID_LIST.TXT","wt");
-  cdt.time=0;
-  cdt.date=INT_MIN;
 
   if (mv_print_fmt)
     mv_percent_cnt=StrOcc(mv_print_fmt,'%');
@@ -775,21 +884,16 @@ int MV2BMPLst(char *mv_print_fmt,char *dir_print_fmt,char *bmp_print_fmt,
 	  break;
         }
         GrBlot(base,dc->x0,dc->y0,dc);
-        if (cdt.time==0 && cdt.date==INT_MIN) {
-	  cdt.time=dc->cdt.time;
-	  cdt.date=dc->cdt.date;
-        }
-        while (cdt.date<dc->cdt.date||
-	      ((cdt.date==dc->cdt.date) && (cdt.time<=dc->cdt.time))) {
+        if (cdt==LONG_LONG_MIN) 
+	  cdt=dc->cdt;
+        while (cdt<=dc->cdt) {
 	  if (bmp_percent_cnt)
 	    sprintf(st_bmp,bmp_print_fmt,bmp_num);
 	  else
 	    strcpy(st_bmp,bmp_print_fmt);
 	  sprintf(st,"%s/%s",st_dir,st_bmp);
 	  BMPWrite(st,base);
-	  if (cdt.time>=DWORD_MAX-(DWORD)(CDATE_FREQ/fps)+1)
-	    cdt.date++;
-	  cdt.time+=(DWORD)(CDATE_FREQ/fps);
+	  cdt+=(DWORD)(CDATE_FREQ/fps);
 	  if (!bmp_percent_cnt) {
 	    cont=FALSE;
 	    break;
@@ -836,7 +940,7 @@ int MV2BMPLst(char *mv_print_fmt,char *dir_print_fmt,char *bmp_print_fmt,
 
 int SND2MP4Lst(char *snd_print_fmt,char *mp4_print_fmt,char *out_name,
 	int rate=24000)
-{//Cvt SND lst to BMP lst
+{//Cvt SND lst to MP4
   int num=0,snd_percent_cnt,mp4_percent_cnt,mkdir_percent_cnt;
   char st[512],st_snd[512],st_mp4[512];
   FILE *snd_file,*lst_file=fopen("TOSZTEMP_AUD_LIST.TXT","wt");
@@ -883,50 +987,42 @@ int SND2MP4Lst(char *snd_print_fmt,char *mp4_print_fmt,char *out_name,
   return num;
 }
 
+int AU2SNDLst(char *au_name,char *snd_print_fmt,
+	char *mp4_print_fmt,char *out_name,int rate=24000)
+{//Cvt AU file to SND lst to MP4
+  int num=0,snd_percent_cnt;
+  FILE *au_file;
+  CSndData head;
+  if (snd_print_fmt)
+    snd_percent_cnt=StrOcc(snd_print_fmt,'%');
+  else
+    snd_percent_cnt=0;
+  AURead(&head,au_name);
+  num=SndFileCreate(&head,snd_print_fmt);
+  QueDel(&head);
+  return SND2MP4Lst(snd_print_fmt,mp4_print_fmt,out_name,rate);
+}
+
 int main(int argc, char* argv[])
 {
-  char *in_name,*out_name,st[256],
-        *mv_print_fmt,*snd_print_fmt;
+  char *in_name,*out_name,st[256],*mv_print_fmt,*au_name;
   BOOL cvt_ascii,del_in=FALSE;
   int i=1,l;
-  if (argc>i && !strcmp(argv[i],"-bmp")) {
+  if (argc>i && !strcmp(argv[i],"-mp4")) {
     i++;
     if (argc>i) 
       mv_print_fmt=argv[i++];
     else
       mv_print_fmt=(char *)"VID%03d.MV";
     if (argc>i) 
-      out_name=argv[i++];
+      au_name=argv[i++];
     else
-      out_name=(char *)"VIDEO.MP4";
-    MV2BMPLst(mv_print_fmt,(char *)"TOSZTEMP%03d",(char *)"TOSZTEMP%06d.BMP",
-	  (char *)"TOSZTEMPVID%03d.MP4",out_name);
-  } else if (argc>i && !strcmp(argv[i],"-snd")) {
-    i++;
-    if (argc>i) 
-      snd_print_fmt=argv[i++];
-    else
-      snd_print_fmt=(char *)"AUD%03d.SND";
-    if (argc>i) 
-      out_name=argv[i++];
-    else
-      out_name=(char *)"AUDIO.MP4";
-    SND2MP4Lst(snd_print_fmt,(char *)"TOSZTEMPAUD%03d.MP4",out_name);
-  } else if (argc>i && !strcmp(argv[i],"-mp4")) {
-    i++;
-    if (argc>i) 
-      mv_print_fmt=argv[i++];
-    else
-      mv_print_fmt=(char *)"VID%03d.MV";
-    if (argc>i) 
-      snd_print_fmt=argv[i++];
-    else
-      snd_print_fmt=(char *)"AUD%03d.SND";
+      au_name=(char *)"AUDIO.AU";
     MV2BMPLst(mv_print_fmt,(char *)"TOSZTEMP%03d",
-          (char *)"TOSZTEMP%06d.BMP",(char *)"TOSZTEMPVID%03d.MP4",
-          (char *)"TOSZVIDEO.MP4");
-    SND2MP4Lst(snd_print_fmt,(char *)"TOSZTEMPAUD%03d.MP4",
-          (char *)"TOSZAUDIO.MP4");
+	  (char *)"TOSZTEMP%06d.BMP",(char *)"TOSZTEMPVID%03d.MP4",
+	  (char *)"TOSZVIDEO.MP4");
+    AU2SNDLst(au_name,(char *)"TOSZTEMP%03d.SND",
+	  (char *)"TOSZTEMPAUD%03d.MP4",(char *)"TOSZAUDIO.MP4");
     if (argc>i) 
       out_name=argv[i++];
     else
@@ -973,19 +1069,13 @@ int main(int argc, char* argv[])
       } else
         printf("Fail: %s %s\r\n",in_name,out_name);
     } else {
-      puts("TOSZ [-ascii] in_name [out_name]\r\n\r\n"
-	    "TOSZ expands a single TempleOS file.  "
+      puts("TOSZ [-ascii] in_name [out_name]\r\n"
+	    "expands a single TempleOS file.  "
 	    "The -ascii flag will convert "
 	    "nonstandard TempleOS ASCII "
-	    "characters to regular ASCII.\r\n\r\n");
-      puts("TOSZ -bmp VID%03d.MV VIDEO.MP4\r\n"
-	    "TOSZ will expand MV files to a sequence of BMP files and, "
-	    "will call ffmpeg to convert BMP files to an MP4 file.\r\n\r\n");
-      puts("TOSZ -snd AUD%03d.SND AUDIO.MP4\r\n\r\n"
-	    "TOSZ will call ffmpeg to convert SND files "
-	    "to an MP4 file.\r\n");
-      puts("TOSZ -mp4 VID%03d.MV AUD%03d.SND MOVIE.MP4\r\n\r\n"
-	    "TOSZ will call ffmpeg to convert MV files and SND files "
+	    "characters to regular ASCII.\r\n\r\n"
+	    "TOSZ -mp4 VID%03d.MV AUDIO.AU MOVIE.MP4\r\n"
+	    "will call ffmpeg to convert MV files and an AU file "
 	    "to a combined MP4 file.\r\n");
     }
   }

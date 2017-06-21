@@ -162,7 +162,7 @@ U0 UnitDirectFire(Unit *tmpu,Unit *target)
       facing=0;
     DamageDo(target,HitDamage(tmpu,target,facing,range_factor));
   }
-  while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
+  while (scrncast.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
     Yield;
   target_unit=NULL;
 }
@@ -195,7 +195,7 @@ Bool HexOccupy(Bool overrun,Unit *tmpu,Unit *target)
   }
   if (DamageDo(target,Round(damage))) {
     "$$RED$$Success$$FG$$\n";
-    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
+    while (scrncast.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     return TRUE;
   } else {
@@ -203,7 +203,7 @@ Bool HexOccupy(Bool overrun,Unit *tmpu,Unit *target)
     VisRecalc(VR_FRIENDLY_UNIT_DIED,tmpu);
     alive_cnt[tmpu->player]--;
     "$$RED$$Failure$$FG$$\n";
-    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
+    while (scrncast.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     return FALSE;
   }
@@ -267,7 +267,7 @@ U0 IndirectResolveAll()
     }
     Noise(2000*animation_delay,70,74);
     Sleep(2000*animation_delay);
-    while (snd.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
+    while (scrncast.ona!=ONA_REST) //see $LK,"Snd",A="MN:Snd"$()
       Yield;
     indirect_explosion=FALSE;
 

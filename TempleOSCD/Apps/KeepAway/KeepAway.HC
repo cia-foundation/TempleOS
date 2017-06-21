@@ -165,20 +165,6 @@ $BG$class Frame
 
 #define COURT_BORDER		10
 #define COLLISION_DAMP		0.8
-
-/* Viscosity is way bigger than
-real air viscosity.  In reality
-air is approximated by V and V$SY,-3$2$SY,0$
-terms and is smaller.  However, I use
-this to produce a rolling friction
-value, too.  If you want to see my
-best attempt at realistic physics
-download SimStructure.
-
-http://www.templeos.org/files/SimStrSetUp.zip
-
-This is just a video game. Relax.
-*/
 #define AIR_VISCOSITY		0.1
 
 #define GRAVITY_ACCELERATION	500

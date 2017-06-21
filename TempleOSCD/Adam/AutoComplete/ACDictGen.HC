@@ -4,8 +4,6 @@ which will regenerate processed dictionary
 files from a raw Project Gutenberg
 dictionary file.
 
-$TX,"http://www.templeos.org/files/DICTIONARY.DD",HTML="http://www.templeos.org/files/DICTIONARY.DD"$
-
 See $LK,"::/Doc/Credits.DD"$.
 */
 
