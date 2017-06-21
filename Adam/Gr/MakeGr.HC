@@ -14,7 +14,7 @@ Cd(__DIR__);;
 #include "GrBitMap"
 #include "GrPrimatives"
 #include "GrComposites"
-#include "GrMV"
+#include "ScrnCast"
 
 #define SPE_ABORT	(-1)
 #define SPE_EXIT	0

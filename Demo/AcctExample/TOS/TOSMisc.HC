@@ -2,56 +2,47 @@
 
 Bool	fg_on =FALSE;
 
-I64 CopyVideo(Bool reverb)
+I64 CopyVideo()
 {
   I64 res=0;
-  F64 delay=0,intensity=0;
   Bool old_silent=Silent;
-  if (reverb) {
-    delay=0.45;
-    intensity=0.35;
-  }
-  Del("D:/Tmp/*.SND");
+  Del("D:/Tmp/*.AU");
   Del("D:/Tmp/*.MV");
   Silent(old_silent);
-  RunFile("~/Sup1/Sup1Snd/SndFile",,
-	"D:/Tmp/AUD%03d.SND",0.115,0.0,1,delay,intensity,0.185);
+  SndShift(&scrncast.snd_head,0.185);
+  AUWrite("D:/Tmp/AUDIO",&scrncast.snd_head,scrncast.t0_now,scrncast.t0_tS);
+  QueDel(&scrncast.snd_head,TRUE);
   GR2MV("D:/Tmp/VID%03d.MV","B:/Tmp","+d");
   return res;
 }
 
-#help_index "Misc/TOS"
+#help_index "ScrnCast/TOS"
 U0 DelScrnShots()
 {
   Bool old_silent=Silent;
   DelTree("B:/Tmp");
   DirMk("B:/Tmp");
-  Del("D:/Tmp/*.SND");
+  Del("D:/Tmp/*.AU");
   Del("D:/Tmp/*.MV");
-  Del("C:/Tmp/*.SND");
+  Del("C:/Tmp/*.AU");
   Del("C:/Tmp/*.MV");
   Silent(old_silent);
 }
 
 public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
-	Bool reverb,Bool just_audio=FALSE)
+	Bool just_audio=FALSE)
 {//The frame grabber saves GR files to B:/Tmp.
   static F64 last_time=0;
   if (tS-last_time>3.0) {
     last_time=tS;
     if (fg_on) {
       fg_on=FALSE;
-      Snd;
-      wall->record=snd.record=FALSE;
       ScrnCast(OFF);
-      User("CopyVideo(%d);Exit;\n",reverb);
+      User("CopyVideo;Exit;\n");
     } else {
       DelScrnShots;
       fg_on=TRUE;
-      if (!just_audio)
-	ScrnCast(ON);
-      wall->record=snd.record=TRUE;
-      Snd;
+      ScrnCast(ON,just_audio);
       if (sync_tone) {Beep;}
       if (tos_theme) {User("ExeFile(\"~/TOS/TOSTheme\");Exit;\n");}
     }
@@ -61,19 +52,19 @@ public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
 public U0 JukeSong(I64 num,I64 passes=2)
 {//Make movie of one song.
   if (!fg_on)
-    FrameGrabberToggle(FALSE,FALSE,FALSE);
+    FrameGrabberToggle(FALSE,FALSE);
   JukeSongsPuppet("~/Sup1/Sup1Hymns",passes,num,num+1);
   if (fg_on)
-    FrameGrabberToggle(FALSE,FALSE,TRUE);
+    FrameGrabberToggle(FALSE,FALSE);
 }
 
 public U0 JukeLines(I64 start_line,I64 end_line)
 {//Make movie of many lines of songs, starting at 0.
   if (!fg_on)
-    FrameGrabberToggle(FALSE,FALSE,FALSE);
+    FrameGrabberToggle(FALSE,FALSE);
   JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
   if (fg_on)
-    FrameGrabberToggle(FALSE,FALSE,TRUE);
+    FrameGrabberToggle(FALSE,FALSE);
 }
 
 public U0 TADHymn(I64 num)
@@ -81,6 +72,7 @@ public U0 TADHymn(I64 num)
   JukeLines((num-1)*2,num*2);
 }
 
+#help_index "Misc/TOS"
 public U0 DskChkAll()
 {//DskChk on C & D.
   U8 *ptr=TOS_HDS;

@@ -664,6 +664,11 @@ public extern U8 *IntEntryGet(I64 irq);
 public extern U8 *IntEntrySet(I64 irq,
 	U0 (*fp_new_hndlr)(),I64 type=IDTET_IRQ,I64 dpl=0);
 
+#help_index "ScrnCast;Cmd Line (Typically)"
+public extern Bool ScrnCast(Bool val=ON,Bool just_audio=FALSE,
+	U8 *print_fmt="B:/Tmp/%X.GR")
+public extern CScrnCastGlbls scrncast;
+
 #help_index "Snd"
 #help_file "::/Doc/Snd"
 public extern U0 Beep(I8 ona=62,Bool busy=FALSE);
@@ -673,7 +678,6 @@ public extern Bool Mute(Bool val);
 public extern F64 Ona2Freq(I64 ona);
 public extern U0 Snd(I8 ona=ONA_REST);
 public extern U0 SndRst();
-public extern CSndGlbls snd;
 
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
@@ -725,7 +729,6 @@ public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;
-
 #help_index "Time/Date/CDate;Date/CDate"
 #help_file "::/Doc/TimeDate"
 public extern U0 Date2Struct(CDateStruct *_ds,CDate cdt);
@@ -749,6 +752,7 @@ public extern U16 mon_start_days2[12];
 #help_index "Time/HPET"
 #help_file "::/Doc/TimeHPET"
 public extern I64 HPET();
+
 #help_index "Time/Jiffies"
 #help_file "::/Doc/TimeJiffy"
 public extern I64 SysTimerRead();//18.33333*65536Hz (SYS_TIMER_FREQ)

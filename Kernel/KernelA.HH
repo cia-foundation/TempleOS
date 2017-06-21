@@ -1487,13 +1487,7 @@ public class CWinMgrGlbls
 	ideal_refresh_tS,
 	last_refresh_tS;
   CWinMgrTimingGlbls *t;
-  CDate	scrn_cast_now;
-  F64	scrn_cast_tS;
-  U8	*scrn_cast_print_fmt;
-  CDC	*scrn_cast_dc,*dc2_alias;
-  Bool	show_menu,
-	grab_scroll,grab_scroll_closed,
-	scrn_cast;
+  Bool	show_menu,grab_scroll,grab_scroll_closed;
 };
 
 #help_index "AutoComplete"
@@ -3778,18 +3772,30 @@ class CKeyDevGlbls
 
 #help_index "Snd"
 #define ONA_REST	I8_MIN
-class CSndData
-{
-  CSndData *next,*last;
-  F64	time;
+
+#help_index "ScrnCast;Snd/AU Files"
+public class CAUData
+{//Fmt of AU files
+  CDate	cdt;
   I8	ona;
 };
 
-public class CSndGlbls
-{
-  CSndData record_head;
+class CSndData
+{//Fmt recorded in mem
+  CSndData *next,*last;
+  F64	tS;
   I8	ona;
-  Bool	record;
+};
+
+public class CScrnCastGlbls
+{
+  CSndData snd_head;
+  CDate	t0_now;
+  F64	t0_tS;
+  U8	*print_fmt;
+  CDC	*dc,*dc2_alias;
+  Bool	record,just_audio;
+  I8	ona;
 };
 
 #help_index "Debugging/FunSeg"

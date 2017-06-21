@@ -26,7 +26,7 @@ CMsStateGlbls	ms,ms_last;
 CKbdStateGlbls	kbd;
 CKeyDevGlbls	keydev;
 CMsHardStateGlbls ms_hard,ms_hard_last;
-CSndGlbls	snd;
+CScrnCastGlbls	scrncast;
 CTextGlbls	text;
 
 U8  *(*fp_getstr2)(I64 flags=0);

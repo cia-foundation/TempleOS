@@ -988,7 +988,7 @@ int SND2MP4Lst(char *snd_print_fmt,char *mp4_print_fmt,char *out_name,
 }
 
 int AU2SNDLst(char *au_name,char *snd_print_fmt,
-	char *mp4_print_fmt,char *out_name,double vol=1.0,int rate=24000)
+	char *mp4_print_fmt,char *out_name,int rate=24000)
 {//Cvt AU file to SND lst to MP4
   int num=0,snd_percent_cnt;
   FILE *au_file;
@@ -998,7 +998,7 @@ int AU2SNDLst(char *au_name,char *snd_print_fmt,
   else
     snd_percent_cnt=0;
   AURead(&head,au_name);
-  num=SndFileCreate(&head,snd_print_fmt,vol);
+  num=SndFileCreate(&head,snd_print_fmt);
   QueDel(&head);
   return SND2MP4Lst(snd_print_fmt,mp4_print_fmt,out_name,rate);
 }
@@ -1008,7 +1008,6 @@ int main(int argc, char* argv[])
   char *in_name,*out_name,st[256],*mv_print_fmt,*au_name;
   BOOL cvt_ascii,del_in=FALSE;
   int i=1,l;
-  double vol=0.1;
   if (argc>i && !strcmp(argv[i],"-mp4")) {
     i++;
     if (argc>i) 
@@ -1023,7 +1022,7 @@ int main(int argc, char* argv[])
 	  (char *)"TOSZTEMP%06d.BMP",(char *)"TOSZTEMPVID%03d.MP4",
 	  (char *)"TOSZVIDEO.MP4");
     AU2SNDLst(au_name,(char *)"TOSZTEMP%03d.SND",
-	  (char *)"TOSZTEMPAUD%03d.MP4",(char *)"TOSZAUDIO.MP4",vol);
+	  (char *)"TOSZTEMPAUD%03d.MP4",(char *)"TOSZAUDIO.MP4");
     if (argc>i) 
       out_name=argv[i++];
     else

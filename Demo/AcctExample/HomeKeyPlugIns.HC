@@ -157,17 +157,17 @@ Bool MyPutKey(I64 ch,I64 sc)
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /FrameGrabber Sync");
 	else if (fg_on)
-	  FrameGrabberToggle(FALSE,FALSE,FALSE);
+	  FrameGrabberToggle(FALSE,FALSE);
 	else
-	  FrameGrabberToggle(TRUE,FALSE,FALSE);
+	  FrameGrabberToggle(TRUE,FALSE);
 	return TRUE;
       case 'F': //With sync and intro TOS theme
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /FrameGrabber Intro");
 	else if (fg_on)
-	  FrameGrabberToggle(FALSE,FALSE,TRUE);
+	  FrameGrabberToggle(FALSE,FALSE);
 	else
-	  FrameGrabberToggle(TRUE,TRUE,FALSE);
+	  FrameGrabberToggle(TRUE,TRUE);
 	return TRUE;
       case 'h':
 	if (sc&SCF_KEY_DESC)

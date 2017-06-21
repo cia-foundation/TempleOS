@@ -49,7 +49,7 @@ I am tmpted to help amateur hardware device designers by making the hardware int
 
 The original PC had general purpose digital IO through the parallel port.  That was fun.  I have enough battles to fight, so I'll leave being a savior to hobbiest hardware engineers to somebody else.
 
-Digital cameras will be super-simple high speed serial, but TempleOS is forever limited to 16 colors and multimedia is banned because large files being loaded into memory fragments memory, so cameras are somewhat unwelcome.  I have enough problems without making the Brits anxious about autonomous gun turrets and killer robots.  The reason I say cameras will be super-simple serial is because we are replacing USB ports with super-simple serial.  Windows/Linux will have only super-simple serial ports unless people buy a USB PCI expansion card.  So, the digital cameras will be super-simple serial.
+Digital cameras will be super-simple high speed serial, but TempleOS is forever limited to 16 colors and multimedia is banned because large files being loaded into memory fragments memory, so cameras are somewhat unwelcome.  I have enough problems without making the Brits anxious about autonomous gun turrets and killer robots.  The reason I say cameras will be super-simple serial is because we are replacing USB ports with super-simple serial.  PC's will have only super-simple serial ports unless people buy a USB PCI expansion card.  So, the digital cameras will be super-simple serial.
 
 
 $FG,5$$TX+CX,"Version 1.0"$$FG$

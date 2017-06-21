@@ -221,9 +221,9 @@ U0 UpdateISODocDefines()
   try {
     DefinePrint("DD_TEMPLEOSCD_SIZE",
 	  "Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
-	  0.1*(10*Size("D:/TOS_Distro.ISO","+s")/1024/1024));
+	  0.1*(10*Size("D:/Downloads/TOS_Distro.ISO","+s")/1024/1024));
     DefinePrint("DD_TEMPLEOSCD_K_SIZE",
-	  "%dKB",Size("D:/TOS_Distro.ISO","+s")/1024);
+	  "%dKB",Size("D:/Downloads/TOS_Distro.ISO","+s")/1024);
   } catch
     Fs->catch_except=TRUE;
 }
@@ -270,22 +270,22 @@ U0 TOSRegen2()
   TOSProgress("Make Standard Distro ISO");
   MakeStdDistro;
   DocClear;
-  Move(TOS_ISO_NAME,"D:/TOS_Distro.ISO");
+  Move(TOS_ISO_NAME,"D:/Downloads/TOS_Distro.ISO");
 
   TOSProgress("Make Supplemental1 ISO");
-  RedSeaISO("D:/TOS_Supplemental1","C:/Home/Sup1");
+  RedSeaISO("D:/Downloads/TOS_Supplemental1","C:/Home/Sup1");
 
 #if MAKE_DBG
   TOSProgress("Make Dbg Distro ISO");
   MakeDbgDistro;
   DocClear;
-  Move(TOS_ISO_NAME,"D:/TOS_Dbg.ISO");
+  Move(TOS_ISO_NAME,"D:/Downloads/TOS_Dbg.ISO");
 #endif
 #if MAKE_STAFF
   TOSProgress("Make Staff Distro ISO");
   MakeStaffDistro;
   DocClear;
-  Move(TOS_ISO_NAME,"D:/TOS_Staff.ISO");
+  Move(TOS_ISO_NAME,"D:/Downloads/TOS_Staff.ISO");
 #endif
 
   UpdateISODocDefines;
@@ -323,8 +323,8 @@ public U0 TOSPreRegen()
   CopyTree("D:/Home/Sup1/Sup1Bin","C:/Home/Sup1/Sup1Bin");
   Copy("D:/Home/Sup1/Sup1CodeScraps/Comm/TOSSocket*",
 	"C:/Home/Sup1/Sup1CodeScraps/Comm");
-  DelTree("C:/Linux");
-  CopyTree("D:/Linux","C:/Linux");
+  DelTree("C:/Downloads/Linux");
+  CopyTree("D:/Downloads/Linux","C:/Downloads/Linux");
 }
 
 public U0 TOSRegen()
