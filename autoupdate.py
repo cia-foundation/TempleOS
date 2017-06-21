@@ -6,7 +6,7 @@ import subprocess
 import sys
 import urllib.request
 
-ISO_URL = 'http://www.templeos.org/files/TOS_Distro.ISO'
+ISO_URL = 'http://www.templeos.org/Downloads/TOS_Distro.ISO'
 FILE_NAME = 'TOS_Distro.ISO'
 EXTRACTED_ISO_DIR = 'TempleOSCD'
 
