@@ -296,38 +296,38 @@ CSprite *SpriteTransformBitMap(I64 *r,CSprite *tmpg)
   I64 x,y,z,minx,maxx,miny,maxy,minz,maxz;
   CSprite *tmpg1;
 
-  x=0; y=0; z=0;
+  x=tmpg->pwhu.x1; y=tmpg->pwhu.y1; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
   minx=maxx=x;
   miny=maxy=y;
   minz=maxz=z;
 
-  x=0; y=tmpg->pwhu.height; z=0;
+  x=tmpg->pwhu.x1; y=tmpg->pwhu.y1+tmpg->pwhu.height; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
-  if (y<minx) miny=y;
-  if (y>maxx) maxy=y;
-  if (z<minx) minz=z;
-  if (z>maxx) maxz=z;
+  if (y<miny) miny=y;
+  if (y>maxy) maxy=y;
+  if (z<minz) minz=z;
+  if (z>maxz) maxz=z;
 
-  x=tmpg->pwhu.width; y=0; z=0;
+  x=tmpg->pwhu.x1+tmpg->pwhu.width; y=tmpg->pwhu.y1; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
-  if (y<minx) miny=y;
-  if (y>maxx) maxy=y;
-  if (z<minx) minz=z;
-  if (z>maxx) maxz=z;
+  if (y<miny) miny=y;
+  if (y>maxy) maxy=y;
+  if (z<minz) minz=z;
+  if (z>maxz) maxz=z;
 
-  x=tmpg->pwhu.width; y=tmpg->pwhu.height; z=0;
+  x=tmpg->pwhu.x1+tmpg->pwhu.width; y=tmpg->pwhu.y1+tmpg->pwhu.height; z=0;
   Mat4x4MulXYZ(r,&x,&y,&z);
   if (x<minx) minx=x;
   if (x>maxx) maxx=x;
-  if (y<minx) miny=y;
-  if (y>maxx) maxy=y;
-  if (z<minx) minz=z;
-  if (z>maxx) maxz=z;
+  if (y<miny) miny=y;
+  if (y>maxy) maxy=y;
+  if (z<minz) minz=z;
+  if (z>maxz) maxz=z;
 
   dc3=DCNew(maxx-minx+1,maxy-miny+1);
 
@@ -345,8 +345,8 @@ CSprite *SpriteTransformBitMap(I64 *r,CSprite *tmpg)
   DCMat4x4Set(dc3,r);
   dc3->flags|=DCF_TRANSFORMATION;
 
-  dc3->x=-minx;
-  dc3->y=-miny;
+  dc3->x=tmpg->pwhu.x1-minx;
+  dc3->y=tmpg->pwhu.y1-miny;
   dc3->z=-minz;
   GrBlot3(dc3,0,0,0,img);
   Free(img);
@@ -362,11 +362,6 @@ CSprite *SpriteTransformBitMap(I64 *r,CSprite *tmpg)
   Mat4x4MulXYZ(r,&x,&y,&z);
   tmpg1->pwhu.x1=x;
   tmpg1->pwhu.y1=y;
-
-  x=0; y=0; z=0;
-  Mat4x4MulXYZ(r,&x,&y,&z);
-  tmpg1->pwhu.x1+=minx-x;
-  tmpg1->pwhu.y1+=miny-y;
 
   return tmpg1;
 }

@@ -49,35 +49,42 @@ public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
   }
 }
 
-public U0 JukeSong(I64 num,I64 passes=2)
+public U0 JukeSong(I64 vol,I64 num,I64 passes=2)
 {//Make movie of one song.
+  U8 *st=MStrPrint("~/Sup%d/Sup%dHymns",vol,vol);
   if (!fg_on)
     FrameGrabberToggle(FALSE,FALSE);
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",passes,num,num+1);
+  JukeSongsPuppet(st,passes,num,num+1);
   if (fg_on)
     FrameGrabberToggle(FALSE,FALSE);
+  Free(st);
 }
 
-public U0 JukeLines(I64 start_line,I64 end_line)
+public U0 JukeLines(I64 vol,I64 start_line,I64 end_line)
 {//Make movie of many lines of songs, starting at 0.
+  U8 *st=MStrPrint("~/Sup%d/Sup%dHymns",vol,vol);
   if (!fg_on)
     FrameGrabberToggle(FALSE,FALSE);
-  JukeSongsPuppet("~/Sup1/Sup1Hymns",,start_line*5,end_line*5);
+  JukeSongsPuppet(st,,start_line*5,end_line*5);
   if (fg_on)
     FrameGrabberToggle(FALSE,FALSE);
+  Free(st);
 }
 
-public U0 TADHymn(I64 num)
-{//Make 2-lines of songs movie starting at 1.
-  JukeLines((num-1)*2,num*2);
+public U0 TADHymns(I64 vol,I64 let)
+{//Make 2-lines of songs movie
+  I64 line=2*(ToUpper(let)-'A');
+  JukeLines(vol,line,line+2);
 }
 
 #help_index "Misc/TOS"
 public U0 DskChkAll()
 {//DskChk on C & D.
   U8 *ptr=TOS_HDS;
-  while (*ptr)
-    DskChk(*ptr++);
+  while (*ptr) {
+    "DskChk('%c')\n",*ptr;
+    DskChk(*ptr++,TRUE);
+  }
 }
 
 public CDoc *DC2Doc(CDC *dc,I64 dx=0,I64 dy=0,I64 *_total_score=NULL)

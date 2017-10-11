@@ -76,11 +76,17 @@ public U0 JukeSongsPuppet(U8 *dirname="~/Psalmody",I64 passes=2,
   I64 i;
   CDirEntry *tmpde,*tmpde1;
   CTask *juke_task=User("JukeBox(0x%X);\n",dirname);
+  F64 t0;
   Cd(dirname);
   tmpde1=FilesFind("*",FUF_RECURSE|FUF_JUST_TXT|FUF_JUST_FILES);
   for (tmpde=tmpde1,i=0;tmpde && i<start_song;i++)
     tmpde=tmpde->next;
+  if (scrncast.record)
+    t0=scrncast.t0_tS;
+  else
+    t0=tS;
   for (i=start_song;tmpde && i<end_song;i++) {
+    "%12.6fs %s\n",tS-t0,tmpde->full_name;
     JukeSongPuppet(juke_task,passes,i,tmpde->name);
     tmpde=tmpde->next;
   }

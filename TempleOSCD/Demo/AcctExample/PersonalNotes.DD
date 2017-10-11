@@ -10,6 +10,8 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * Does entire tool chain support super/sub script?
 
+* 170624 $LK,"DskChk",A="MN:DskChk"$() showed extra alloced clus for FAT32, Sup1Hymns.  ClusNum was '.'+1 and clus was zero.
+
 * $LK,"::/Apps/X-Caliber/X-Caliber.HC"$
 * Add asteroid harbor defense.
 * Afterburner thruster.

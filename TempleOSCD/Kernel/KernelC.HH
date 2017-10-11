@@ -681,7 +681,6 @@ public extern U0 SndRst();
 
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
-
 #help_index "StdOut"
 #help_file "::/Doc/Streams"
 
@@ -729,6 +728,7 @@ public extern CTask *Spawn(U0 (*fp_addr)(U8 *data),U8 *data=NULL,
 
 #help_index "Time/CPU Cycles;Time/HPET;Time/Jiffies"
 public extern CCntsGlbls cnts;
+
 #help_index "Time/Date/CDate;Date/CDate"
 #help_file "::/Doc/TimeDate"
 public extern U0 Date2Struct(CDateStruct *_ds,CDate cdt);

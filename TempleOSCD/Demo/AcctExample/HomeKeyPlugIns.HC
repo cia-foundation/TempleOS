@@ -229,14 +229,14 @@ Bool MyPutKey(I64 ch,I64 sc)
 	  KeyDescSet("Cmd /JukeBox");
 	else
 	  PopUp("#include \"::/Apps/Psalmody/Load\";"
-		"JukeBox(\"::/Home/Sup1/Sup1Hymns\");");
+		"JukeBox(\"::/Home/Sup3/Sup3Hymns\");");
 	return TRUE;
       case 'P':
 	if (sc&SCF_KEY_DESC)
 	  KeyDescSet("Cmd /Psalmody");
 	else
 	  PopUp("#include \"::/Apps/Psalmody/Load\";"
-		"Psalmody(\"~/Sup1/Sup1Hymns\");");
+		"Psalmody(\"~/Sup3/Sup3Hymns\");");
 	return TRUE;
 
 	//Ins your own ALT-key plug-ins
