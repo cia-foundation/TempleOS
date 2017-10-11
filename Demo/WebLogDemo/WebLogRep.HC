@@ -219,9 +219,14 @@ Bool IsIndex(LogStruct *tmplg)
 
 Bool IsKeeper(LogStruct *tmplg,CDate dstart,CDate dend)
 {
-  if (dstart<=tmplg->datetime<=dend && !StrOcc(tmplg->file,'?'))
+  if (dstart<=tmplg->datetime<=dend && !StrOcc(tmplg->file,'?') &&
+    StrLen(tmplg->file)>2 && 'A'<=tmplg->file[1]<='Z' &&
+    tmplg->size && tmplg->file[StrLen(tmplg->file)-1]!='/' &&
+    (StrLen(tmplg->file)<3 || MemCmp(&tmplg->file[1],"Wb",2)) &&
+    (StrLen(tmplg->file)<7 || MemCmp(&tmplg->file[1],"Family",6))) {
     return TRUE;
-  else
+
+}  else
     return FALSE;
 }
 

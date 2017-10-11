@@ -275,14 +275,11 @@ per second.  It defaults to
       ona=ONA_REST;
     if (words && (word=LstSub(i++,words)) && StrCmp(word," "))
       "%s",word;
+
     d=JIFFY_FREQ*music.note_len/music.tempo;
-    if (tie) {
-      on_jiffies  =d;
-      off_jiffies =0;
-    } else {
-      on_jiffies  =d*music.stacatto_factor;
-      off_jiffies =d*(1.0-music.stacatto_factor);
-    }
+    on_jiffies	=d*music.stacatto_factor;
+    off_jiffies =d*(1.0-music.stacatto_factor);
+
     timeout_val+=on_jiffies;
     timeout_val2=timeout_val+off_jiffies;
 
@@ -291,7 +288,7 @@ per second.  It defaults to
     SleepUntil(timeout_val);
     music.tM_correction+=on_jiffies-ToI64(on_jiffies);
 
-    if (!music.mute)
+    if (!music.mute && !tie)
       Snd;
     SleepUntil(timeout_val2);
     music.tM_correction+=off_jiffies-ToI64(off_jiffies);

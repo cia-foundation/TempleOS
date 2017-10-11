@@ -29,7 +29,10 @@ public U0 TOSCopyDrv(U8 src,U8 dst)
   src=Let2Let(src);
   dst=Let2Let(dst);
 
-  Fmt(dst,,FALSE,FSt_FAT32);
+  if (dst=='D')
+    Fmt(dst,,FALSE,FSt_FAT32);
+  else
+    Fmt(dst,,FALSE,FSt_REDSEA);
 
   StrPrint(buf_s,"%c:/",src);
   StrPrint(buf_d,"%c:/",dst);
@@ -69,6 +72,8 @@ U0 DistroPrep()
   CopyTree("/Home","/Demo/AcctExample");
   DelTree("/Demo/AcctExample/TAD");
   DelTree("/Demo/AcctExample/Sup1");
+  DelTree("/Demo/AcctExample/Sup2");
+  DelTree("/Demo/AcctExample/Sup3");
   Del("/Demo/AcctExample/Test*");
   if (FileFind("~/Sup1/Sup1Utils/SortHeaders.HC.Z"))
     ExeFile("~/Sup1/Sup1Utils/SortHeaders.HC.Z");
@@ -125,6 +130,8 @@ U0 StaffDistroPrep()
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
   DelTree(TOS_DISTRO_DIR "/Home/Sup1");
+  DelTree(TOS_DISTRO_DIR "/Home/Sup2");
+  DelTree(TOS_DISTRO_DIR "/Home/Sup3");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
 }
 U0 MakeStaffDistro()
@@ -239,7 +246,7 @@ U0 TOSProgress(U8 *st)
   progress4=tos_progress;
   progress3_max=1;
   *progress4_desc=0;
-  progress4_max=8+MAKE_DBG+MAKE_STAFF;
+  progress4_max=9+MAKE_DBG+MAKE_STAFF;
   progress4_t0=tos_progress_t0;
   StrPrint(buf,"%d. %s",++progress4,st);
   "$$PURPLE$$$$TX+CX,\"%s\"$$$$FG$$\n",buf;
@@ -274,6 +281,12 @@ U0 TOSRegen2()
 
   TOSProgress("Make Supplemental1 ISO");
   RedSeaISO("D:/Downloads/TOS_Supplemental1","C:/Home/Sup1");
+
+  TOSProgress("Make Supplemental2 ISO");
+  RedSeaISO("D:/Downloads/TOS_Supplemental2","C:/Home/Sup2");
+
+  TOSProgress("Make Supplemental3 ISO");
+  RedSeaISO("D:/Downloads/TOS_Supplemental3","C:/Home/Sup3");
 
 #if MAKE_DBG
   TOSProgress("Make Dbg Distro ISO");
@@ -316,7 +329,7 @@ U0 TOSRegen2()
 }
 
 public U0 TOSPreRegen()
-{//Copy bookmarks and bins from D:/Home/Sup1 to C:/Home/Sup1
+{//Copy bins from D:/Home/Sup1 to C:/Home/Sup1
   Copy("D:/Home/" INS_REG_PERSONAL_INITIALS "/*",
 	"C:/Home/" INS_REG_PERSONAL_INITIALS);
   DelTree("C:/Home/Sup1/Sup1Bin");

@@ -189,7 +189,7 @@ public CDoc *Doc2Html(CDoc *doc_in,U8 *html_header=NULL,U8 *body_header=NULL,
 	  "<body>\n"
 	  "<pre style=\"font-family:courier;font-size:10pt\">\n";
   if (!body_footer) body_footer=
-	  "</pre></body>\n</html>\n";
+	  "</pre></body>\n";
   if (!html_footer) html_footer=
 	  "</html>\n";
 
