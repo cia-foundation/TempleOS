@@ -8,7 +8,7 @@ $ID,2$#help_index "Registry/Install Registration"
 MemSet(&ins_reg,0,sizeof(CInsReg));
 ins_reg.registered=1;
 ins_reg.host_os=2;
-ins_reg.host_vm=3;
+ins_reg.host_vm=2;
 
 #define INS_REG_PERSONAL_INITIALS "TAD"
 StrCpy(ins_reg.initials,"TAD");
@@ -48,7 +48,7 @@ $ID,-2$$TR,"Wenceslas"$
 $ID,2$F64 best_score=43.9944;
 $ID,-2$$TR,"OSTestSuite"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=223.150;
+progress3_tf=0.000;progress4_tf=287.834;
 $ID,-2$$TR,"XCaliber"$
 $ID,2$I64 best_score=90;
 I64 msg_flags=2;
@@ -60,13 +60,23 @@ $ID,-2$$TR,"Titanium"$
 $ID,2$I64 best_score=16469;
 $ID,-2$$TR,"TOSRegen"$
 $ID,2$progress1_tf=0.000;progress2_tf=0.000;
-progress3_tf=0.000;progress4_tf=256.163;
+progress3_tf=0.000;progress4_tf=98.144;
+$ID,-2$$TR,"TempleTetris"$
+$ID,2$I64 hiscore=0;
 $ID,-2$$ID,-2$$TR,"Once"$
 $ID,2$$TR,"Adam"$
 $ID,2$$ID,-2$$TR,"User"$
 $ID,2$$ID,-2$$ID,-2$$TR,"DemoCompany"$
 $ID,2$$TR,"Game1"$
-$ID,2$F64 best_score=187.05180;
+$ID,2$F64 best_score=434.94752;
 $TR,"SimpleVal"$
-$ID,2$1245;
-$ID,-2$$ID,-2$$ID,-2$
+$ID,2$1246;
+$ID,-2$$ID,-2$$ID,-2$$TR,"WalnutZone"$
+$ID,2$$TR,"Cherub"$
+$ID,2$#define rom_path M:/SnailNet
+I64 sound_mode=2;
+I64 sound_enable=1;
+I64 use_keyboard=1;
+I64 use_gamepad=0;
+I64 lcd_scale=2;
+$ID,-2$$ID,-2$

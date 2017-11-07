@@ -676,11 +676,12 @@ public extern I8 Freq2Ona(F64 freq);
 public extern Bool IsMute();
 public extern Bool Mute(Bool val);
 public extern F64 Ona2Freq(I64 ona);
-public extern U0 Snd(I8 ona=ONA_REST);
+public extern U0 Snd(I8 ona=0);
 public extern U0 SndRst();
 
 #help_index "StdIn"
 #help_file "::/Doc/Streams"
+
 #help_index "StdOut"
 #help_file "::/Doc/Streams"
 

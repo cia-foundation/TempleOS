@@ -154,7 +154,7 @@ U0 PsmRecalcNoteXY()
       break;
     else {
       if (tmpn->type!=PSMT_METER) {
-	if (tmpn->ona!=ONA_REST) {
+	if (tmpn->ona) {
 	  ona=tmpn->ona;
 	  if (Bt(&tmpn->flags,PSMf_SHARP))
 	    ona--;
@@ -230,7 +230,7 @@ U0 DrawIt(CTask *task,CDC *dc)
       } else if (tmpn->flags&PSMF_SEL)
 	dc->color=RED;
       else {
-	if (tmpn->ona!=ONA_REST)
+	if (tmpn->ona)
 	  dc->color=BLACK;
 	else
 	  dc->color=LTGRAY;

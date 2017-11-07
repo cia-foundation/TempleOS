@@ -3771,8 +3771,6 @@ class CKeyDevGlbls
 };
 
 #help_index "Snd"
-#define ONA_REST	I8_MIN
-
 #help_index "ScrnCast;Snd/AU Files"
 public class CAUData
 {//Fmt of AU files

@@ -51,7 +51,7 @@ U0 SysGlblsInit()
   QueInit(&scrncast.snd_head);
   scrncast.t0_now=Now;
   scrncast.t0_tS=tS;
-  scrncast.ona=scrncast.snd_head.ona=ONA_REST;
+  scrncast.ona=scrncast.snd_head.ona=0;
 
   ProgressBarsRst;
 

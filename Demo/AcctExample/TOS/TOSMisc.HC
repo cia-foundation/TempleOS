@@ -49,7 +49,17 @@ public U0 FrameGrabberToggle(Bool sync_tone,Bool tos_theme,
   }
 }
 
-public U0 JukeSong(I64 vol,I64 num,I64 passes=2)
+public U0 JukeSongTAD(I64 num,I64 passes=2)
+{//Make movie of one song.
+  if (!fg_on)
+    FrameGrabberToggle(FALSE,FALSE);
+  Sleep(200);
+  JukeSongsPuppet("~/TAD/Songs",passes,num,num+1);
+  if (fg_on)
+    FrameGrabberToggle(FALSE,FALSE);
+}
+
+public U0 JukeSongSup(I64 vol,I64 num,I64 passes=2)
 {//Make movie of one song.
   U8 *st=MStrPrint("~/Sup%d/Sup%dHymns",vol,vol);
   if (!fg_on)

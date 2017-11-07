@@ -164,7 +164,7 @@ U0 PsmLoadSongStr(U8 *st,I64 *psm_octave,F64 *psm_duration)
       }
       tmpn->ona=Note2Ona(note,*psm_octave);
     } else
-      tmpn->ona=ONA_REST;
+      tmpn->ona=0;
     if (*psm_duration<=2*.25/3)
       i=0;
     else if (*psm_duration<=.25)
@@ -263,7 +263,7 @@ U8 *PsmCvtSong()
       *dst++='/';
       *dst++=tmpn->meter_bottom+'0';
     } else {
-      if (tmpn->ona!=ONA_REST) {
+      if (tmpn->ona) {
 	ona=tmpn->ona;
 	if (Bt(&tmpn->flags,PSMf_SHARP))
 	  ona--;
@@ -275,7 +275,7 @@ U8 *PsmCvtSong()
       }
       if (Bt(&tmpn->flags,PSMf_TIE))
 	*dst++='(';
-      if (octave!=last_octave && tmpn->ona!=ONA_REST) {
+      if (octave!=last_octave && tmpn->ona) {
 	*dst++=octave+'0';
 	last_octave=octave;
       }
@@ -286,7 +286,7 @@ U8 *PsmCvtSong()
 	  *dst++=src[1];
 	last_duration=tmpn->duration;
       }
-      if (tmpn->ona!=ONA_REST) {
+      if (tmpn->ona) {
 	src=LstSub(note,psm_note_lst);
 	*dst++=src[0];
 	if (src[1])
