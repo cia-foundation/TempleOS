@@ -1,5 +1,15 @@
 $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
+* Change mouse Z to wheel.
+
+* 10/28/17 Editor froze when filter search 3, in bible, "hour".
+
+* 10/28/17 Titanium froze
+
+* Corrupt ISO.C 
+
+* DskChk CDROM
+
 * Compiler Bug: $LK,"AUWrite",A="MN:AUWrite"$() dst->cdt=t0_now+ToI64(CDATE_FREQ*(tmpsd->tS-t0_tS));
 
 * Make MV files combine disjoint rects for same frame.
@@ -22,8 +32,6 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 * Fix straight shooting.
 * Helicopters.
 * Anti-Aircraft.
-
-* Fix $LK,"::/Home/Sup1/Sup1Graphics/ICOFile.HC"$
 
 * $MA-X+PU,"64-Bit Device Memory",LM="F(\"mem64_ptr\");View;"$ is not implemented.
 

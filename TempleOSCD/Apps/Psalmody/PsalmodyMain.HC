@@ -42,10 +42,10 @@ U0 PsmRightClick(I64 x,I64 y)
       switch (i) {
 	case PSMR_REST:
 	  if (tmpn->type==PSMT_NOTE)
-	    tmpn->ona=ONA_REST;
+	    tmpn->ona=0;
 	  break;
 	case PSMR_SHARP:
-	  if (tmpn->type==PSMT_NOTE && tmpn->ona!=ONA_REST) {
+	  if (tmpn->type==PSMT_NOTE && tmpn->ona) {
 	    if (Btr(&tmpn->flags,PSMf_FLAT))
 	      tmpn->ona++;
 	    if (Btc(&tmpn->flags,PSMf_SHARP))
@@ -55,7 +55,7 @@ U0 PsmRightClick(I64 x,I64 y)
 	  }
 	  break;
 	case PSMR_FLAT:
-	  if (tmpn->type==PSMT_NOTE && tmpn->ona!=ONA_REST) {
+	  if (tmpn->type==PSMT_NOTE && tmpn->ona) {
 	    if (Btr(&tmpn->flags,PSMf_SHARP))
 	      tmpn->ona--;
 	    if (Btc(&tmpn->flags,PSMf_FLAT))
@@ -350,7 +350,7 @@ U0 PsmPopMode()
 U0 Psalmody(U8 *dirname="~/Psalmody")
 {
   Bool was_playing,is_null=TRUE,was_null=TRUE;
-  I64 arg1,arg2,msg_code=0,col,ona=ONA_REST,last_ona=ONA_REST,
+  I64 arg1,arg2,msg_code=0,col,ona=0,last_ona=0,
 	psm_octave=4,timeout_val,timeout_val2,old_doc_flags;
   U8 *filename=NULL,*st,*st2;
   PsmNote *tmpn;
@@ -504,7 +504,7 @@ mo_got_msg:
 		case '[':	ona+=8;		break;
 		case '\'':	ona+=9;		break;
 		case ']':	ona+=10;	break;
-		case CH_SPACE:	ona=ONA_REST;	break;
+		case CH_SPACE:	ona=0;		break;
 	      end:
 		is_null=FALSE;
 		break;
@@ -742,9 +742,9 @@ mo_got_msg:
 	  PsmRightClick(arg1,arg2);
       }
       if (is_null)
-	ona=ONA_REST;
+	ona=0;
       if (ona!=last_ona || is_null!=was_null) {
-	if (ona==ONA_REST) {
+	if (!ona) {
 	  if (is_null)
 	    st="";
 	  else

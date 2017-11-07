@@ -272,7 +272,7 @@ per second.  It defaults to
       }
       ona=Note2Ona(note,octave);
     } else
-      ona=ONA_REST;
+      ona=0;
     if (words && (word=LstSub(i++,words)) && StrCmp(word," "))
       "%s",word;
 

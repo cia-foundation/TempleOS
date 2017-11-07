@@ -130,7 +130,7 @@ I64 Dir(U8 *files_find_mask,Bool full)
       "$$MA,T=\"Directory\",LM=\"PopUpCd;Dir;\n\"$$ of %s\n",st;
       if (full)
 	"__DATE__ __TIME__ %*ts %*ts\n",
-	      csize,"SIZE",c,"CLUS";
+	      csize,"SIZE",c,"BLK";
       else
 	"DATE_ TIME_ %*ts\n",csize,"SIZE";
       while (tmpde1) {

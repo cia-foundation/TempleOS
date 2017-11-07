@@ -68,6 +68,7 @@ U0 RedSeaInit(CDrv *dv)
     RedSeaFreeFreeLst(dv);
     dv->spc=1;
     dv->size=br.sects;
+"Init sects:%X	size:%X\n",br.sects,dv->size; //sponge
     dv->data_area=dv->drv_offset+br.bitmap_sects;
     dv->root_clus=br.root_clus;
     dv->fat1=dv->fat2=dv->drv_offset+1;
@@ -85,10 +86,17 @@ Bool RedSeaValidate(U8 drv_let)
   CRedSeaBoot br;
   if ((dv=Let2Drv(drv_let,FALSE)) && dv->fs_type==FSt_REDSEA &&
 	BlkRead(dv,&br,dv->drv_offset,1) && br.signature==MBR_PT_REDSEA &&
-	br.signature2==0xAA55 && br.sects==dv->size)
+	br.signature2==0xAA55 /* && br.sects==dv->size*/){ //sponge
+"dv:%X br:%X\n",dv->size,br.sects;
+dv->size=br.sects;
+
     return TRUE;
-  else
+
+}  else{
+ClassRep(&br);
+"sects:%X  size:%X\n",br.sects,dv->size; //sponge
     return FALSE;
+}
 }
 
 U0 RedSeaFmt(U8 drv_let,Bool quick=TRUE)

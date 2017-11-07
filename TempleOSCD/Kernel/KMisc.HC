@@ -162,7 +162,7 @@ U0 Sleep(I64 mS)
 
 F64 Ona2Freq(I8 ona)
 {//Ona to freq. Ona=60 is 440.0Hz.
-  if (ona==ONA_REST)
+  if (!ona)
     return 0;
   else
     return 440.0/32*2.0`(ona/12.0);
@@ -171,18 +171,18 @@ F64 Ona2Freq(I8 ona)
 I8 Freq2Ona(F64 freq)
 {//Freq to Ona. 440.0Hz is Ona=60.
   if (freq>0)
-    return ClampI64(12*Log2(32.0/440.0*freq),ONA_REST+1,I8_MAX);
+    return ClampI64(12*Log2(32.0/440.0*freq),1,I8_MAX);
   else
-    return ONA_REST;
+    return 0;
 }
 
-U0 Snd(I8 ona=ONA_REST)
-{//Play ona, a piano key num. -128 means rest.
+U0 Snd(I8 ona=0)
+{//Play ona, a piano key num. 0 means rest.
   I64 period;
   CSndData *d;
   if (!Bt(&sys_semas[SEMA_MUTE],0) &&
 	!LBts(&sys_semas[SEMA_SND],0)) { //Mutex. Just throw-out if in use
-    if (ona<=ONA_REST) {
+    if (!ona) {
       scrncast.ona=ona;
       OutU8(0x61,InU8(0x61)&~3);
     } else if (ona!=scrncast.ona) {

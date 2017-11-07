@@ -4,6 +4,8 @@ before import is resolved, you can use
 "import".  Otherwise, use a fun pointer
 var and check it before calling.
 */
+import U0 ClassRep(U8 *_d,U8 *class_name=lastclass,
+	I64 max_depth=2,Bool fun=FALSE,I64 offset=0);
 import U8 *DocSave(CDoc *doc,I64 *_size=NULL);
 import Bool DocUnlock(CDoc *doc);
 import Bool Ed(U8 *link_st,I64 edf_dof_flags=0);
