@@ -2,6 +2,7 @@
 
 #help_index "Misc/TOS/Distro"
 
+#define MAKE_LITE	1
 #define MAKE_DBG	0
 #define MAKE_STAFF	1
 
@@ -120,26 +121,59 @@ U0 DbgDistroFilePrep()
 	bd->RAM_dsk,(bd->max_blk+1)<<BLK_SIZE_BITS);
 }
 
-U0 StaffDistroPrep()
+
+U0 StdDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  In(TOS_DVD_CFG);
+  In(STD_DISTRO_DVD_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
-  DelTree(TOS_DISTRO_DIR "/Home/Sup1");
-  DelTree(TOS_DISTRO_DIR "/Home/Sup2");
-  DelTree(TOS_DISTRO_DIR "/Home/Sup3");
+  DelTree(TOS_DISTRO_DIR "/Home");
+  DirMk(TOS_DISTRO_DIR "/Home");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
+  Del(TOS_DISTRO_DIR BOOT_DIR "/OldMBR.BIN.C");
+  Del(TOS_DISTRO_DIR BOOT_DIR "/BootMHD2.BIN.C");
 }
-U0 MakeStaffDistro()
+U0 MakeStdDistro()
 {
-  StaffDistroPrep;
+  StdDistroPrep;
   RedSeaISO(TOS_ISO_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
-  DefinePrint("DD_TEMPLEOS_STAFF_SIZE",
-	"Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
+  DefinePrint("DD_TEMPLEOSCD_SIZE",
+	"Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
+  Drv('C');
+}
+
+U0 LiteDistroPrep()
+{
+  Drv('C');
+  DistroPrep;
+  In(STD_DISTRO_DVD_CFG);
+  BootDVDIns('C');
+  Fmt('B',,FALSE,FSt_REDSEA);
+  DelTree(TOS_DISTRO_DIR);
+  CopyTree("C:/",TOS_DISTRO_DIR "/");
+  DelTree(TOS_DISTRO_DIR "/Home");
+  DirMk(TOS_DISTRO_DIR "/Home");
+  DelTree(TOS_DISTRO_DIR "/Apps");
+  DelTree(TOS_DISTRO_DIR "/Demo");
+  Copy(TOS_DISTRO_DIR "/Demo/Games/Talons.HC.Z",TOS_DISTRO_DIR "/Home");
+  Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
+  Del(TOS_DISTRO_DIR BOOT_DIR "/OldMBR.BIN.C");
+  Del(TOS_DISTRO_DIR BOOT_DIR "/BootMHD2.BIN.C");
+  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACDefs.DATA.Z");
+  Del(TOS_DISTRO_DIR "/Adam/AutoComplete/ACWords.DATA.Z");
+  Del(TOS_DISTRO_DIR "/Misc/Bible.TXT.Z");
+}
+U0 MakeLiteDistro()
+{
+  LiteDistroPrep;
+  RedSeaISO(TOS_ISO_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
+  DefinePrint("DD_TEMPLEOSCD_SIZE",
+	"Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -170,27 +204,26 @@ U0 MakeDbgDistro()
   Drv('C');
 }
 
-U0 StdDistroPrep()
+U0 StaffDistroPrep()
 {
   Drv('C');
   DistroPrep;
-  In(STD_DISTRO_DVD_CFG);
+  In(TOS_DVD_CFG);
   BootDVDIns('C');
   Fmt('B',,FALSE,FSt_REDSEA);
   DelTree(TOS_DISTRO_DIR);
   CopyTree("C:/",TOS_DISTRO_DIR "/");
-  DelTree(TOS_DISTRO_DIR "/Home");
-  DirMk(TOS_DISTRO_DIR "/Home");
+  DelTree(TOS_DISTRO_DIR "/Home/Sup1");
+  DelTree(TOS_DISTRO_DIR "/Home/Sup2");
+  DelTree(TOS_DISTRO_DIR "/Home/Sup3");
   Del(TOS_DISTRO_DIR "/" KERNEL_BIN_C);
-  Del(TOS_DISTRO_DIR BOOT_DIR "/OldMBR.BIN.C");
-  Del(TOS_DISTRO_DIR BOOT_DIR "/BootMHD2.BIN.C");
 }
-U0 MakeStdDistro()
+U0 MakeStaffDistro()
 {
-  StdDistroPrep;
+  StaffDistroPrep;
   RedSeaISO(TOS_ISO_NAME,TOS_DISTRO_DIR,TOS_DISTRO_DIR BOOT_DIR_KERNEL_BIN_C);
-  DefinePrint("DD_TEMPLEOSCD_SIZE",
-	"Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - Standard Distro (%0.1fMB)",
+  DefinePrint("DD_TEMPLEOS_STAFF_SIZE",
+	"Download $TX,"TempleOS V5.03",D="DD_OS_NAME_VERSION"$ - T.S. Company Internal Distro (%0.1fMB)",
 	0.1*(10*Size(TOS_ISO_NAME,"+s")/1024/1024));
   Drv('C');
 }
@@ -246,7 +279,7 @@ U0 TOSProgress(U8 *st)
   progress4=tos_progress;
   progress3_max=1;
   *progress4_desc=0;
-  progress4_max=9+MAKE_DBG+MAKE_STAFF;
+  progress4_max=9+MAKE_LITE+MAKE_DBG+MAKE_STAFF;
   progress4_t0=tos_progress_t0;
   StrPrint(buf,"%d. %s",++progress4,st);
   "$$PURPLE$$$$TX+CX,\"%s\"$$$$FG$$\n",buf;
@@ -288,6 +321,12 @@ U0 TOSRegen2()
   TOSProgress("Make Supplemental3 ISO");
   RedSeaISO("D:/Downloads/TOS_Supplemental3","C:/Home/Sup3");
 
+#if MAKE_LITE
+  TOSProgress("Make Lite Distro ISO");
+  MakeLiteDistro;
+  DocClear;
+  Move(TOS_ISO_NAME,"D:/Downloads/TOS_Lite.ISO");
+#endif
 #if MAKE_DBG
   TOSProgress("Make Dbg Distro ISO");
   MakeDbgDistro;
