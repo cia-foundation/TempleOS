@@ -7,9 +7,9 @@ SYS_INIT_PAGE_TABLES::
 	MOV	EAX,0x80000001
 	CPUID
 	MOV	EAX,1<<21
-	BT	EDX,26
-	JNC	@@05
-	MOV	EAX,1<<30
+//	BT	EDX,26
+//	JNC	@@05
+//	MOV	EAX,1<<30
 @@05:	MOV	U32 [MEM_PAGE_SIZE],EAX
 
 //Set mapped space limit
