@@ -91,7 +91,6 @@ public extern U8 *AStrNew(U8 *buf);
 
 #help_index "Char/Operations;Memory/Heap"
 public extern U8 *StrNew(U8 *buf,CTask *mem_task=NULL);
-
 #help_index "Char/Output;StdOut"
 public extern U0 GetOutOfDollar();
 public extern Bool IsSilent();
