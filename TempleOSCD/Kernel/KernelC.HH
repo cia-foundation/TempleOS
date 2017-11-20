@@ -91,6 +91,7 @@ public extern U8 *AStrNew(U8 *buf);
 
 #help_index "Char/Operations;Memory/Heap"
 public extern U8 *StrNew(U8 *buf,CTask *mem_task=NULL);
+
 #help_index "Char/Output;StdOut"
 public extern U0 GetOutOfDollar();
 public extern Bool IsSilent();
@@ -153,7 +154,6 @@ public extern I64	LinkedLstCnt(U8 **_lst);
 public extern U8	*LinkedLstCopy(U8 **_lst,CTask *mem_task=NULL);
 public extern U0	LinkedLstDel(U8 **_lst);
 public extern I64	LinkedLstSize(U8 **_lst);
-
 #help_index "Data Types/Queue Vector"
 public extern U0	QueVectU8Del(CQueVectU8 *v);
 public extern I64	QueVectU8Get(CQueVectU8 *v,I64 idx);

@@ -72,6 +72,7 @@ public extern U0 Ui(U8 *buf,U8 **_rip,I64 seg_size=64,
 	I64 *_jmp_dst=NULL,Bool just_ins=FALSE);
 public extern I64 Un(U8 *rip,I64 cnt=0x80,I64 seg_size=64);
 extern CUAsmGlbls uasm;
+
 #help_index "Hash/System"
 public extern I64 HashEntrySize(CHashSrcSym *tmph);
 public extern I64 HashEntrySize2(CHashSrcSym *tmph);
