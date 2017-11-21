@@ -161,22 +161,11 @@ public U8 *GodSongStr()
   return buf;
 }
 
-public U8 *GodSongStdStr()
-{//Make std God generate song. (2measuresx2+2measuresx2).
-  U8 *st=NULL,*st1=GodSongStr,*st2=GodSongStr;
+public U0 GodSong()
+{//Make God generate 2measuresx2+2measuresx2. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
+  U8 *st1=GodSongStr,*st2=GodSongStr;
   if (st1 && st2)
-    st=MStrPrint("%s%s%s%s",st1,st1,st2,st2);
+    DocPrint(DocPut,"$$SO,\"<Song>\",A=\"%s%s%s%s\"$$",st1,st1,st2,st2);
   Free(st1);
   Free(st2);
-  return st;
-}
-
-#help_index "God;DolDoc"
-public U0 DocInsGodSongStd(CDoc *doc=NULL)
-{//Ins Std God generate song.
-  U8 *st;
-  if (!doc) doc=DocPut;
-  if (st=GodSongStdStr)
-    DocPrint(doc,"$$SO,\"<Song>\",A=\"%s\"$$",st);
-  Free(st);
 }

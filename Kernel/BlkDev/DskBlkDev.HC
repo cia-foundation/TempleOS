@@ -59,12 +59,9 @@ Bool BlkDevInit(CBlkDev *bd)
 	      PrintErr("Not Contiguous.  Move file to filename.ISO.C.\n");
 	    Fs->catch_except=TRUE;
 	  }
-
 	  if (bd->file_dsk) {
 	    dv->fs_type=FSt_REDSEA;
 	    dv->size=bd->max_blk+1-bd->drv_offset;
-
-"drvoffset:%X\n",bd->drv_offset;//Sponge
 	    if (RedSeaValidate(bd->first_drv_let)) {
 	      RedSeaInit(dv);
 	      res=TRUE;
