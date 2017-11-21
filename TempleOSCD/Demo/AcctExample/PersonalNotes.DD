@@ -6,7 +6,7 @@ $WW,1$$FG,5$$TX+CX,"TODO"$$FG$
 
 * 10/28/17 Titanium froze, easy repeatable
 
-* Corrupt ISO.C 
+* Corrupt ISO.C, might be fix--no longer dependent on direntry ISO filesize
 
 * DskChk CDROM
 
