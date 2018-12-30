@@ -1,14 +1,10 @@
-                           TempleOS
+# TempleOS
 
-You can't do much until you burn a TempleOS CD/DVD from the ISO file
-and boot it, or you aim your virtual machine's CD/DVD at the ISO file
-and boot.  TempleOS files are compressed and the source code can only be 
-compiled by the TempleOS compiler... which is available when you boot
-the CD/DVD.  TempleOS is 100% open source with all source present.
+Burn a TempleOS CD/DVD from the ISO file and boot it or aim your virtual machine's CD/DVD at the ISO file
+and boot. TempleOS files are compressed and the source code can only be 
+compiled by the TOS compiler inside of TempleOS. TempleOS is 100% open source.
 
-TempleOS is 64-bit and will not run on 32-bit hardware.
-
-TempleOS requires 512 Meg of RAM minimum.
+TempleOS is 64-bit and will not run on 32-bit hardware and requires at least 512 Meg of RAM.
 
 TempleOS may require you to enter I/O port addresses for the CD/DVD drive
 and the hard drive.  In Windows, you can find I/O port info in the
