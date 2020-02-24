@@ -45,8 +45,10 @@ def decompress_all_files_in(path):
             decompress_all_files_in(full_path)
         elif full_path.endswith('.Z'):
             decompressed_path = full_path[0:len(full_path)-2]
-            subprocess.check_call(['./TOSZ', '-ascii', full_path, decompressed_path])
-            os.remove(full_path)
+            if full_path.endswith('.BIN.Z'):
+                subprocess.check_call(['./TOSZ', full_path, decompressed_path])
+            else:
+                subprocess.check_call(['./TOSZ', '-ascii', full_path, decompressed_path])
 
 # Extract TempleOS disk tree
 extract('', OUTPUT_DIR)
