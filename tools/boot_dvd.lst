@@ -1,0 +1,233 @@
+     1                                  ; boot_dvd.asm - NASM translation of TempleOS BootDVD.HC
+     2                                  ; Boot loader for CD/DVD-ROM booting via El Torito
+     3                                  ; Assembled with: nasm -f bin -o boot_dvd.bin boot_dvd.asm
+     4                                  
+     5                                  BITS 16
+     6                                  
+     7                                  ; Constants from KernelA.HH
+     8                                  %define BLK_SIZE_BITS           9
+     9                                  %define BLK_SIZE                (1 << BLK_SIZE_BITS)        ; 512
+    10                                  %define DVD_BLK_SIZE            (4 * BLK_SIZE)              ; 2048
+    11                                  %define DVD_BOOT_LOADER_SIZE    DVD_BLK_SIZE                ; 2048
+    12                                  %define BOOT_RAM_BASE           0x07C00
+    13                                  %define BOOT_RAM_LIMIT          0x97000
+    14                                  %define BOOT_STK_SIZE           BLK_SIZE                    ; 512
+    15                                  %define BOOT_SRC_DVD            4
+    16                                  
+    17                                  ; BOOT_HIGH_LOC = (BOOT_RAM_LIMIT - (BOOT_STK_SIZE + DVD_BOOT_LOADER_SIZE)) >> 4
+    18                                  ; = (0x97000 - (512 + 2048)) >> 4 = (0x97000 - 0xA00) >> 4 = 0x96600 >> 4 = 0x9660
+    19                                  %define BOOT_HIGH_LOC           0x9660
+    20                                  
+    21                                  BDVD_START:
+    22 00000000 FC                          cld
+    23 00000001 B86096                      mov     ax, BOOT_HIGH_LOC
+    24 00000004 8EC0                        mov     es, ax
+    25                                  
+    26 00000006 FA                          cli
+    27 00000007 8ED0                        mov     ss, ax
+    28 00000009 BC000A                      mov     sp, BOOT_STK_SIZE + DVD_BOOT_LOADER_SIZE
+    29 0000000C FB                          sti
+    30                                  
+    31                                      ; Determine our load address and copy ourselves to BOOT_HIGH_LOC
+    32 0000000D E80000                      call    BDVD_GET_RIP
+    33                                  BDVD_GET_RIP:
+    34 00000010 5B                          pop     bx
+    35 00000011 83EB10                      sub     bx, BDVD_GET_RIP - BDVD_START
+    36 00000014 C1EB04                      shr     bx, 4
+    37 00000017 8CC8                        mov     ax, cs
+    38 00000019 01D8                        add     ax, bx
+    39 0000001B 8ED8                        mov     ds, ax
+    40 0000001D B90008                      mov     cx, DVD_BOOT_LOADER_SIZE
+    41 00000020 31F6                        xor     si, si
+    42 00000022 31FF                        xor     di, di
+    43 00000024 F3A4                        rep     movsb
+    44                                  
+    45 00000026 B86096                      mov     ax, BOOT_HIGH_LOC
+    46 00000029 8ED8                        mov     ds, ax
+    47                                  
+    48                                      ; Far jump to relocated code at BOOT_HIGH_LOC:BDVD_MAIN
+    49 0000002B EA                          db      0xEA
+    50 0000002C A8006096                    dw      BDVD_MAIN - BDVD_START, BOOT_HIGH_LOC
+    51                                  
+    52                                  ; Data area
+    53 00000030 00                      BDVD_BIOS_DRV_NUM:     db  0
+    54 00000031 00                      BDVD_PAGE:              db  0
+    55                                  
+    56                                  ; BIOS Disk Address Packet for INT 13h/AH=42h
+    57 00000032 1000                    BDVD_DAP:               db  16, 0      ; size=16, reserved=0
+    58 00000034 0100                                            db  1, 0        ; count=1, reserved=0
+    59 00000036 00000000                BDVD_DAP_BUF:           dw  0, 0       ; offset, segment
+    60 0000003A 0000000000000000        BDVD_DAP_BLK:           dq  0          ; LBA
+    61                                  
+    62 00000042 4C6F6164696E672054-     BDVD_TEMPLEOS_MSG:      db  "Loading TempleOS", 0
+    62 0000004B 656D706C654F5300   
+    63 00000053 54656D706C654F5320-     BDVD_NOT64_MSG:         db  "TempleOS requires a 64-bit capable processor.", 13, 10, 0
+    63 0000005C 726571756972657320-
+    63 00000065 612036342D62697420-
+    63 0000006E 63617061626C652070-
+    63 00000077 726F636573736F722E-
+    63 00000080 0D0A00             
+    64                                  
+    65                                  ; These fields get patched by build_iso.py with the kernel location
+    66                                  ; Offsets from BDVD_START are used for patching
+    67 00000083 0000                    BDVD_BLK_LO:            dw  0          ; DVD LBA low word
+    68 00000085 0000                    BDVD_BLK_HI:            dw  0          ; DVD LBA high word
+    69 00000087 0000                    BDVD_BLK_CNT:           dw  0          ; Number of DVD blocks to read
+    70 00000089 0000                    BDVD_SHIFT_BLKS:        dw  0          ; Sub-block alignment offset
+    71 0000008B 00000000                BDVD_PROGRESS_STEP:     dd  0
+    72 0000008F 00000000                BDVD_PROGRESS_VAL:      dd  0
+    73                                  
+    74                                  ; Put a character to screen via BIOS
+    75                                  BDVD_PUT_CHAR:
+    76 00000093 B40E                        mov     ah, 0x0E
+    77 00000095 B307                        mov     bl, 7
+    78 00000097 8A3E3100                    mov     bh, [BDVD_PAGE - BDVD_START]
+    79 0000009B CD10                        int     0x10
+    80                                  BDVD_RET:
+    81 0000009D C3                          ret
+    82                                  
+    83                                  ; Print null-terminated string at DS:SI
+    84                                  BDVD_PUTS:
+    85                                  .loop:
+    86 0000009E AC                          lodsb
+    87 0000009F 84C0                        test    al, al
+    88 000000A1 74FA                        jz      BDVD_RET
+    89 000000A3 E8EDFF                      call    BDVD_PUT_CHAR
+    90 000000A6 EBF6                        jmp     .loop
+    91                                  
+    92                                  ; Main entry point (runs after relocation)
+    93                                  BDVD_MAIN:
+    94 000000A8 88163000                    mov     [BDVD_BIOS_DRV_NUM - BDVD_START], dl
+    95                                  
+    96                                      ; Get current video page
+    97 000000AC B40F                        mov     ah, 0x0F
+    98 000000AE CD10                        int     0x10
+    99 000000B0 883E3100                    mov     [BDVD_PAGE - BDVD_START], bh
+   100                                  
+   101                                      ; Check for 64-bit CPU support
+   102 000000B4 66B800000080                mov     eax, 0x80000000
+   103 000000BA 0FA2                        cpuid
+   104 000000BC 663D01000080                cmp     eax, 0x80000001
+   105 000000C2 720F                        jb      .not64
+   106                                  
+   107 000000C4 66B801000080                mov     eax, 0x80000001
+   108 000000CA 0FA2                        cpuid
+   109 000000CC 660FBAE21D                  bt      edx, 29
+   110 000000D1 7208                        jc      .is64
+   111                                  
+   112                                  .not64:
+   113 000000D3 BE5300                      mov     si, BDVD_NOT64_MSG - BDVD_START
+   114 000000D6 E8C5FF                      call    BDVD_PUTS
+   115                                  .hang:
+   116 000000D9 EBFE                        jmp     .hang
+   117                                  
+   118                                  .is64:
+   119 000000DB BE4200                      mov     si, BDVD_TEMPLEOS_MSG - BDVD_START
+   120 000000DE E8BDFF                      call    BDVD_PUTS
+   121                                  
+   122                                      ; Set up ES to point to kernel load area
+   123 000000E1 B8C007                      mov     ax, BOOT_RAM_BASE / 16
+   124 000000E4 8EC0                        mov     es, ax
+   125 000000E6 6631C9                      xor     ecx, ecx
+   126 000000E9 8B0E8700                    mov     cx, [BDVD_BLK_CNT - BDVD_START]
+   127                                  
+   128                                      ; Calculate progress bar step
+   129 000000ED 66B800004000                mov     eax, (80 - 7 - 9) * 65536      ; 64 columns * 65536
+   130 000000F3 6631D2                      xor     edx, edx
+   131 000000F6 66F7F1                      div     ecx
+   132 000000F9 66A38B00                    mov     [BDVD_PROGRESS_STEP - BDVD_START], eax
+   133 000000FD 66C7068F0000000000          mov     dword [BDVD_PROGRESS_VAL - BDVD_START], 0
+   134                                  
+   135                                      ; Load starting LBA
+   136 00000106 A18300                      mov     ax, [BDVD_BLK_LO - BDVD_START]
+   137 00000109 8B168500                    mov     dx, [BDVD_BLK_HI - BDVD_START]
+   138                                  
+   139                                      ; Read kernel blocks from CD/DVD
+   140                                  .read_loop:
+   141 0000010D 51                          push    cx              ; save block count
+   142 0000010E 50                          push    ax              ; save LBA low
+   143 0000010F 52                          push    dx              ; save LBA high
+   144 00000110 06                          push    es              ; save buffer segment
+   145                                  
+   146                                      ; Set up DAP for INT 13h
+   147 00000111 A33A00                      mov     [BDVD_DAP_BLK - BDVD_START], ax
+   148 00000114 89163C00                    mov     [BDVD_DAP_BLK + 2 - BDVD_START], dx
+   149 00000118 8CC0                        mov     ax, es
+   150 0000011A A33800                      mov     [BDVD_DAP_BUF + 2 - BDVD_START], ax   ; segment
+   151 0000011D BE3200                      mov     si, BDVD_DAP - BDVD_START              ; DS:SI = DAP
+   152 00000120 B442                        mov     ah, 0x42
+   153 00000122 8A163000                    mov     dl, [BDVD_BIOS_DRV_NUM - BDVD_START]
+   154 00000126 CD13                        int     0x13
+   155                                  
+   156                                      ; Advance buffer by one DVD block
+   157 00000128 58                          pop     ax              ; ES
+   158 00000129 058000                      add     ax, DVD_BLK_SIZE / 16
+   159 0000012C 8EC0                        mov     es, ax
+   160 0000012E 5A                          pop     dx              ; LBA high
+   161 0000012F 58                          pop     ax              ; LBA low
+   162 00000130 40                          inc     ax
+   163 00000131 7501                        jnz     .no_carry
+   164 00000133 42                          inc     dx
+   165                                  .no_carry:
+   166                                  
+   167                                      ; Print progress dot
+   168 00000134 50                          push    ax
+   169 00000135 8B1E9100                    mov     bx, [BDVD_PROGRESS_VAL + 2 - BDVD_START]
+   170 00000139 66A18B00                    mov     eax, [BDVD_PROGRESS_STEP - BDVD_START]
+   171 0000013D 6601068F00                  add     [BDVD_PROGRESS_VAL - BDVD_START], eax
+   172 00000142 391E9100                    cmp     [BDVD_PROGRESS_VAL + 2 - BDVD_START], bx
+   173 00000146 7405                        je      .no_dot
+   174 00000148 B02E                        mov     al, '.'
+   175 0000014A E846FF                      call    BDVD_PUT_CHAR
+   176                                  .no_dot:
+   177 0000014D 58                          pop     ax
+   178                                  
+   179 0000014E 59                          pop     cx
+   180 0000014F E2BC                        loop    .read_loop
+   181                                  
+   182                                      ; Shift data backward to align on 512-byte boundary within DVD block
+   183 00000151 1E                          push    ds
+   184 00000152 8B1E8900                    mov     bx, [BDVD_SHIFT_BLKS - BDVD_START]
+   185 00000156 C1E305                      shl     bx, BLK_SIZE_BITS - 4           ; Convert blocks to segment offset
+   186 00000159 8B0E8700                    mov     cx, [BDVD_BLK_CNT - BDVD_START]
+   187 0000015D B8C007                      mov     ax, BOOT_RAM_BASE / 16
+   188 00000160 8EC0                        mov     es, ax
+   189 00000162 01D8                        add     ax, bx
+   190 00000164 8ED8                        mov     ds, ax
+   191                                  .shift_loop:
+   192 00000166 51                          push    cx
+   193 00000167 31F6                        xor     si, si
+   194 00000169 31FF                        xor     di, di
+   195 0000016B B90002                      mov     cx, DVD_BLK_SIZE / 4
+   196 0000016E 66F3A5                      rep     movsd
+   197 00000171 8CD8                        mov     ax, ds
+   198 00000173 058000                      add     ax, DVD_BLK_SIZE / 16
+   199 00000176 8ED8                        mov     ds, ax
+   200 00000178 8CC0                        mov     ax, es
+   201 0000017A 058000                      add     ax, DVD_BLK_SIZE / 16
+   202 0000017D 8EC0                        mov     es, ax
+   203 0000017F 59                          pop     cx
+   204 00000180 E2E4                        loop    .shift_loop
+   205 00000182 1F                          pop     ds
+   206                                  
+   207                                      ; Pass boot info to kernel in registers
+   208                                      ; EBX = 32-bit LBA (BLK_LO in low word, BLK_HI in high word)
+   209 00000183 668B1E8300                  mov     ebx, dword [BDVD_BLK_LO - BDVD_START]
+   210                                      ; EAX = SHIFT_BLKS in high word, BOOT_SRC_DVD in low word
+   211 00000188 A18900                      mov     ax, [BDVD_SHIFT_BLKS - BDVD_START]
+   212 0000018B 66C1E010                    shl     eax, 16
+   213 0000018F B80400                      mov     ax, BOOT_SRC_DVD
+   214                                  
+   215                                      ; Far jump to kernel entry point at BOOT_RAM_BASE
+   216 00000192 EA                          db      0xEA
+   217 00000193 0000C007                    dw      0x0000, BOOT_RAM_BASE / 16
+   218                                  
+   219                                  BDVD_END:
+   220                                  
+   221                                  ; Verify boot loader fits in DVD_BOOT_LOADER_SIZE
+   222                                  %if (BDVD_END - BDVD_START) > DVD_BOOT_LOADER_SIZE
+   223                                      %error "Boot loader exceeds DVD_BOOT_LOADER_SIZE"
+   224                                  %endif
+   225                                  
+   226                                  ; Pad to exactly DVD_BOOT_LOADER_SIZE
+   227 00000197 00<rep 669h>            times DVD_BOOT_LOADER_SIZE - (BDVD_END - BDVD_START) db 0
