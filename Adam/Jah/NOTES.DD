@@ -7,7 +7,7 @@ transition.
 $FG,2$Phase status:$FG$
   [X] 1. Branch + scaffold (this directory exists, stubs present)
   [X] 2. Core API rename + compat shim active
-  [ ] 3. Vocab swap
+  [X] 3. Vocab swap
   [ ] 4. Scripture swap
   [ ] 5. Selassie lectures
   [ ] 6. Boot persona rewrite
