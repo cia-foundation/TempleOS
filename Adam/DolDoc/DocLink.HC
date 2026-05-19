@@ -236,12 +236,12 @@ public I64 EdLinkCvt(U8 *link_st,U8 **_filename=NULL,U8 **_needle_str=NULL,
 	  }
 	  needle_str=StrNew(ptr+1);
 	}
-	i=DefineMatch(filename2,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE);
+	i=DefineMatch(filename2,"ST_SCRIPTURE_BOOKS",LMF_IGNORE_CASE);
 	if (i<0)
 	  res=-1;
 	else {
-	  num=Str2I64(DefineSub(i,"ST_BIBLE_BOOK_LINES"));
-	  filename2=BIBLE_FILENAME;
+	  num=Str2I64(DefineSub(i,"ST_SCRIPTURE_BOOK_LINES"));
+	  filename2=SCRIPTURE_FILENAME;
 	}
 	break;
       case LK_FILE_LINE:
@@ -318,7 +318,7 @@ public Bool DocLinkChk(CDoc *doc,U8 *link_st)
 	st=StrNew(link_st+3);
 	if (StrOcc(st,','))
 	  StrLastRem(st,",");
-	if (DefineMatch(st,"ST_BIBLE_BOOKS",LMF_IGNORE_CASE)>=0)
+	if (DefineMatch(st,"ST_SCRIPTURE_BOOKS",LMF_IGNORE_CASE)>=0)
 	  res=TRUE;
 	Free(st);
 	break;
@@ -349,7 +349,7 @@ public U8 *DocLinkFile(U8 *link_st,CTask *mem_task=NULL)
 	Free(st);
 	break;
       case LK_BIBLE_FIND:
-	res=StrNew(BIBLE_FILENAME,mem_task);
+	res=StrNew(SCRIPTURE_FILENAME,mem_task);
 	break;
     }
     Free(filename);

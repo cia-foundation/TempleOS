@@ -31,8 +31,8 @@ public class CDolDocGlbls
 } doldoc;
 MemSet(&doldoc,0,sizeof(CDolDocGlbls));
 
-#help_index "God"
-#define BIBLE_FILENAME	"::/Misc/Bible.TXT.Z"
+#help_index "Jah"
+#define SCRIPTURE_FILENAME	"::/Misc/Scriptures.TXT.Z"
 
 #include "DocExt"
 #include "DocBin"

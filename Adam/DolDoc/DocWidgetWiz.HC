@@ -124,7 +124,7 @@ class CEdBibleLink
 {
   U8	tag[512]	format "$$DA-P,A=\"Tag Text      :%s\"$$\n",
 	file[512];
-  I64	book		format "$$LS,D=\"ST_BIBLE_BOOKS\"$$\n";
+  I64	book		format "$$LS,D=\"ST_SCRIPTURE_BOOKS\"$$\n";
   U8	aux[512]	format "$$DA-P,A=\"Chapter Verse :%s\"$$\n";
   I64	num;
 
@@ -281,10 +281,10 @@ Bool GetLink(I64 type,U8 **_tag,U8 **_link,Bool *_pop_up,
 	if (DocForm(e,"CEdBibleLink",,,ctrl_L_footer)) {
 	  res=TRUE;
 	  if (!*e->tag)
-	    *_tag=MStrPrint("%Z,%s",e->book,"ST_BIBLE_BOOKS",e->aux);
+	    *_tag=MStrPrint("%Z,%s",e->book,"ST_SCRIPTURE_BOOKS",e->aux);
 	  else
 	    *_tag=StrNew(e->tag);
-	  *_link=MStrPrint("BF:%Z,%s",e->book,"ST_BIBLE_BOOKS",e->aux);
+	  *_link=MStrPrint("BF:%Z,%s",e->book,"ST_SCRIPTURE_BOOKS",e->aux);
 	}
 	break;
       case LK_DEF:

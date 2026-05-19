@@ -8,7 +8,8 @@ $FG,2$Phase status:$FG$
   [X] 1. Branch + scaffold (this directory exists, stubs present)
   [X] 2. Core API rename + compat shim active
   [X] 3. Vocab swap
-  [ ] 4. Scripture swap
+  [X] 4. Scripture swap (symbol/file rename — content append deferred to 4b)
+  [ ] 4b. Append Kebra Nagast + Holy Piby (PD) to Scriptures.TXT
   [ ] 5. Selassie lectures
   [ ] 6. Boot persona rewrite
   [ ] 7. Demo / tour cleanup

@@ -1554,7 +1554,7 @@ U0 OSTestSuite()
   TS("RadixDort");	TSFile("::/Demo/RadixSort");
   TS("MPAdd");		DoMPAdd;
   TS("Primes");		TSFile("::/Demo/MultiCore/Primes");
-  TS("Palindrome");	if (FileFind(BIBLE_FILENAME))
+  TS("Palindrome");	if (FileFind(SCRIPTURE_FILENAME))
 				TSFile("::/Demo/MultiCore/Palindrome");
   TS("MPRadix");	if (mp_cnt>1) TSFile("::/Demo/MultiCore/MPRadix");
   TS("LoadTest");	if (mp_cnt>1 && DrvIsWritable(':'))

@@ -151,8 +151,8 @@ public U0 JahWord(I64 bits=17)
 
 public U0 JahScripturePassage(I64 num_lines=20)
 {//Make Jah pick a scripture passage. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
-  I64 start=JahBits(21)%(ST_BIBLE_LINES-(num_lines-1))+1;
-  U8 *verse=BibleLine2Verse(start);
+  I64 start=JahBits(21)%(ST_SCRIPTURE_LINES-(num_lines-1))+1;
+  U8 *verse=ScriptureLine2Verse(start);
   "%s\n\n",verse;
   Free(verse);
   BookLines(,start,num_lines);

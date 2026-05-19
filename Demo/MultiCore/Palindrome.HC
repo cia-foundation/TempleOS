@@ -93,4 +93,4 @@ U0 Palindrome(U8 *filename)
   "Time:%9.5f\n",tS-t0;
 }
 
-Palindrome(BIBLE_FILENAME);
+Palindrome(SCRIPTURE_FILENAME);
