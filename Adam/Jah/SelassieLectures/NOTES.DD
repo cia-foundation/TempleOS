@@ -1,35 +1,51 @@
-$FG,5$$TX+CX,"Selassie Lectures — Scaffold Notes"$$FG$
+$FG,5$$TX+CX,"Selassie Lectures — Index and Notes"$$FG$
 
-This directory will hold the public addresses of Haile Selassie I,
-formatted as DolDoc and indexed from ::/Doc/Selassie.DD.
+This directory holds the public addresses of Haile Selassie I,
+formatted as DolDoc excerpt collections with full citation.
 
-$FG,2$Planned contents (Phase 5):$FG$
+$FG,2$Available now$FG$
 
-  WarUN1963.DD       1963 address to the United Nations General
-                     Assembly. The "until the philosophy which holds
-                     one race superior and another inferior" address.
+  $LK,"Appeal to the League of Nations (7 June 1936)",A="FI:::/Adam/Jah/SelassieLectures/LeagueOfNations1936.DD"$
+  $LK,"Address to the United Nations (4 October 1963)",A="FI:::/Adam/Jah/SelassieLectures/WarUN1963.DD"$
 
-  OAU1963.DD         1963 Addis Ababa address founding the
-                     Organisation of African Unity.
+$FG,2$Planned (sourcing pending)$FG$
 
-  LeagueOfNations1936.DD
-                     1936 address to the League of Nations after the
-                     Italian invasion. "It is us today. It will be
-                     you tomorrow."
+  OAU1963.DD       1963 Addis Ababa founding address, Organisation
+                   of African Unity.
+  Jamaica1968.DD   1968 Jamaica state visit remarks.
+  Education1967.DD 1967 "Importance of Education" address.
 
-  Jamaica1968.DD     1968 Jamaica state visit remarks.
+------------------------------------------------------------
 
-  Education1967.DD   1967 "Importance of Education" address.
+$FG,2$Sourcing$FG$
 
-$FG,2$Sourcing:$FG$
+Primary source: Wikisource, which curates only public-domain or
+freely-licensed material. Selassie I's writings are public domain
+in Ethiopia (life + 50 years, from 1975 — PD since 2025) and in the
+United States. The Wikisource translation of the 1936 League of
+Nations appeal is explicitly released into the worldwide public
+domain. The 1963 UN translation is reproduced under UN Administrative
+Instruction ST/AI/189/Add.9/Rev.2.
 
-  All entries are historical public addresses, transcribed from
-  contemporaneous records. Each .DD file leads with a header citing
-  the date, venue, and source of the transcription.
+Source URLs:
+  Wikisource author page:
+    https://en.wikisource.org/wiki/Author:Haile_Selassie
+  1936 League of Nations appeal:
+    https://en.wikisource.org/wiki/Appeal_to_The_League_of_Nations
+  1963 UN General Assembly address:
+    https://en.wikisource.org/wiki/Selassie%27s_Address_to_the_United_Nations
 
-$FG,2$Framing:$FG$
+$FG,2$Editorial policy$FG$
 
-  Selassie I identified as Ethiopian Orthodox and did not claim
-  divinity. These are presented as the teachings of a head of state
-  and reformer, held in reverence by Rastafari, not as scripture.
-  See ::/Adam/Jah/JSNotes.DD.
+Each file holds curated short excerpts with full attribution rather
+than full-text reproductions, regardless of public-domain status.
+The collection grows by adding sourced excerpts, not by paraphrasing
+or by reproducing material without verification of the underlying
+source.
+
+$FG,2$Framing$FG$
+
+Selassie I identified as Ethiopian Orthodox and did not claim
+divinity. These are presented as the teachings of a head of state
+and reformer, held in reverence by Rastafari, not as scripture.
+See ::/Adam/Jah/JSNotes.DD.
