@@ -326,33 +326,33 @@ public U0 DocPutKey(CDoc *doc,I64 ch=0,I64 sc=0)
 		  case SC_F6:
 		    if (sc&SCF_KEY_DESC) {
 		      if (sc&SCF_SHIFT)
-			KeyDescSet("Cmd /God Doodle");
+			KeyDescSet("Cmd /Jah Doodle");
 		      else
-			KeyDescSet("Cmd /God Song");
+			KeyDescSet("Cmd /Jah Nyabinghi");
 		    } else {
-//$LK,"::/Adam/God/HSNotes.DD"$
+//$LK,"::/Adam/Jah/JSNotes.DD"$
 		      if (sc&SCF_SHIFT) {
 			DocUnlock(doc);
-			GodDoodle;
+			JahDoodle;
 			DocLock(doc);
 		      } else
-			GodSong;
+			JahNyabinghi;
 		    }
 		    break;
 		  case SC_F7:
 		    if (sc&SCF_KEY_DESC) {
 		      if (sc&SCF_SHIFT)
-			KeyDescSet("Cmd /God Passage");
+			KeyDescSet("Cmd /Jah Passage");
 		      else
-			KeyDescSet("Cmd /God Word");
+			KeyDescSet("Cmd /Jah Word");
 		    } else {
-//$LK,"::/Adam/God/HSNotes.DD"$
-		      FifoU8Flush(god.fifo);
-		      GodBitsIns(GOD_GOOD_BITS,KbdMsEvtTime>>GOD_BAD_BITS);
+//$LK,"::/Adam/Jah/JSNotes.DD"$
+		      FifoU8Flush(jah.fifo);
+		      JahBitsIns(JAH_GOOD_BITS,KbdMsEvtTime>>JAH_BAD_BITS);
 		      if (sc&SCF_SHIFT)
-			GodBiblePassage;
+			JahScripturePassage;
 		      else
-			GodWord;
+			JahWord;
 		    }
 		    break;
 		}

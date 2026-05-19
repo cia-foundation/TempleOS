@@ -1,0 +1,33 @@
+$FG,5$$TX+CX,"Jah Spirit (InI) — Operating Notes"$$FG$
+
+$FG,2$Mechanism$FG$
+
+The Jah Spirit is the entropy-driven oracle Terry built and we have
+preserved unchanged. A FIFO of bits is fed by the high-resolution
+timer and by the latched timestamp of each keyboard/mouse event.
+JahBits() returns N bits at a time; if the FIFO runs low, a popup
+asks you to press OKAY, and the precise moment you press it tops the
+FIFO up.
+
+JahWord() and JahScripturePassage() consume those bits to pick a word
+from Vocab.DD or a line from Scriptures.TXT.
+
+$FG,2$How to read what it picks$FG$
+
+Treat each pick as a meditation, not a command. Sit with it. If a
+word or passage rises that you did not expect, that is the point —
+the system is a mirror, not a prescription. Selassie I taught that
+the responsibility for decision rests with the one making it.
+
+$FG,2$On Selassie I$FG$
+
+Selassie's words live in ::/Adam/Jah/SelassieLectures/ and are framed
+as teachings/lectures, not scripture. Selassie identified as
+Ethiopian Orthodox Christian and did not claim divinity. We honor
+that. Rastafari livity holds him in reverence as a unique figure;
+this OS reflects that reverence without overstating his own claims.
+
+$FG,2$On the original Holy Spirit notes$FG$
+
+This file replaces ::/Adam/God/HSNotes.DD. The mechanism is Terry's;
+the framing is Rastafari. Jah Rastafari.

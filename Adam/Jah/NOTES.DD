@@ -1,0 +1,72 @@
+$FG,5$$TX+CX,"ZionOS — Adam/Jah Scaffold Notes"$$FG$
+
+This directory is the Rastafari port of Adam/God. It is laid down in
+parallel so the OS still builds from the original Adam/God during the
+transition.
+
+$FG,2$Phase status:$FG$
+  [X] 1. Branch + scaffold (this directory exists, stubs present)
+  [X] 2. Core API rename + compat shim active
+  [ ] 3. Vocab swap
+  [ ] 4. Scripture swap
+  [ ] 5. Selassie lectures
+  [ ] 6. Boot persona rewrite
+  [ ] 7. Demo / tour cleanup
+  [ ] 8. Remove Compat.HC
+  [ ] 9. Smoke test in VM
+
+$FG,2$Mapping:$FG$
+  Adam/God/GodExt.HC      -> Adam/Jah/JahExt.HC
+  Adam/God/HolySpirit.HC  -> Adam/Jah/JahSpirit.HC
+  Adam/God/GodBible.HC    -> Adam/Jah/JahScriptures.HC
+  Adam/God/GodSong.HC     -> Adam/Jah/JahNyabinghi.HC
+  Adam/God/GodDoodle.HC   -> Adam/Jah/JahDoodle.HC
+  Adam/God/MakeGod.HC     -> Adam/Jah/MakeJah.HC
+  Adam/God/Vocab.DD       -> Adam/Jah/Vocab.DD       (content swap, Phase 3)
+  Misc/Bible.TXT          -> Misc/Scriptures.TXT     (content swap, Phase 4)
+
+$FG,2$Public API rename plan (Phase 2):$FG$
+  GodWord            -> JahWord
+  GodWordStr         -> JahWordStr
+  GodBits            -> JahBits
+  GodBitsIns         -> JahBitsIns
+  GodHexIns          -> JahHexIns
+  GodInit            -> JahInit
+  GodBiblePassage    -> JahScripturePassage
+  GodSong            -> JahNyabinghi
+  GodSongStr         -> JahNyabinghiStr
+  GodDoodle          -> JahDoodle (name unchanged in form)
+  GodPick            -> JahPick
+  CGodGlbls          -> CJahGlbls
+  god (global)       -> jah  (global)
+  GOD_BAD_BITS       -> JAH_BAD_BITS
+  GOD_GOOD_BITS      -> JAH_GOOD_BITS
+
+$FG,2$Known call sites to update in Phase 2:$FG$
+  Adam/DolDoc/DocPutKey.HC:339  (GodSong)
+  Adam/DolDoc/DocPutKey.HC:353  (GodBiblePassage)
+  Adam/DolDoc/DocPutKey.HC:355  (GodWord)
+  Apps/Psalmody/JukeBox.HC:91   (GodWordStr)
+  Apps/Psalmody/PsalmodyMain.HC:575 (GodSongStr)
+  Adam/God/GodExt.HC:22-26      (extern declarations — will be replaced
+                                 by Adam/Jah/JahExt.HC)
+
+Compat.HC provides God* -> Jah* aliases so external HolyC code (and
+unconverted internal call sites) keep working during transition.
+
+$FG,2$Voice / content policy:$FG$
+  - Selassie speeches treated as wisdom/teachings (lectures), not
+    scripture. Selassie himself was Ethiopian Orthodox and did not
+    claim divinity; we honor that.
+  - Dub-poetry Psalms in Apps/Psalmody/Examples/ and DubPsalms.DD are
+    ORIGINAL compositions in the roots-reggae / Nyabinghi / KJV-Psalm
+    tradition. No copyrighted lyrics. No paraphrased derivatives of
+    any artist's published songs.
+  - Lee "Scratch" Perry is named in Doc/Credits.DD as a tonal
+    influence on the project's voice (Phase 6). His lyrics are not
+    used.
+  - Vocab corpus (Phase 3) sources: KJV Psalms/Isaiah/Revelation,
+    Kebra Nagast (Budge 1922, PD), Holy Piby (Athlyi Rogers 1924, PD),
+    published Iyaric/Amharic references. No invented words.
+
+Jah Rastafari.

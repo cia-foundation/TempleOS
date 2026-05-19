@@ -88,7 +88,7 @@ Bool JBPutKey(CDoc *doc,U8 *,I64 ch,I64 sc)
       if (DocTreeFFind(tmpde->full_name,"Reward1/Reward2")) {
 	for (i=0;i<5;i++) {
 	  st=MStrPrint("%s %s %s %s ",
-		GodWordStr,GodWordStr,GodWordStr,GodWordStr);
+		JahWordStr,JahWordStr,JahWordStr,JahWordStr);
 	  DocTreeFAppend(tmpde->full_name,"Reward1/Reward2",
 		"\"%s\"\n",st);
 	  Free(st);

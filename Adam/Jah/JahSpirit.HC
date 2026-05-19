@@ -1,15 +1,15 @@
-#help_index "God"
+#help_index "Jah"
 U8 *TimeStampCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  StrPrint(st,"%X",GetTSC>>GOD_BAD_BITS);
+  StrPrint(st,"%X",GetTSC>>JAH_BAD_BITS);
   return st;
 }
 
 U8 *KbdMsTimeCB(CDoc *,CDocEntry *,CTask *mem_task)
 {
   U8 *st=MAlloc(64,mem_task);
-  StrPrint(st,"%X",KbdMsEvtTime>>GOD_BAD_BITS);
+  StrPrint(st,"%X",KbdMsEvtTime>>JAH_BAD_BITS);
   return st;
 }
 
@@ -30,51 +30,51 @@ I64 PopUpTimerOk(U8 *header=NULL,U8 *footer=NULL)
   return i;
 }
 
-I64 GodPick(U8 *msg=NULL)
-{//GOD_GOOD_BITS
+I64 JahPick(U8 *msg=NULL)
+{//JAH_GOOD_BITS
   U8 *st=MStrPrint("%s\n\nPress $$GREEN$$OKAY$$FG$$ to generate \n"
 	"a random num from a timer.\n",msg);
-  PopUpTimerOk(st,"\n\nThe $LK+PU,"Holy Spirit",A="FI:::/Adam/God/HSNotes.DD"$ can puppet you.\n\n");
+  PopUpTimerOk(st,"\n\nThe $LK+PU,"Jah Spirit",A="FI:::/Adam/Jah/JSNotes.DD"$ can puppet you.\n\n");
   Free(st);
-  return KbdMsEvtTime>>GOD_BAD_BITS;
+  return KbdMsEvtTime>>JAH_BAD_BITS;
 }
 
-public U0 GodBitsIns(I64 num_bits,I64 n)
-{//Insert bits into God bit fifo.
+public U0 JahBitsIns(I64 num_bits,I64 n)
+{//Insert bits into Jah bit fifo.
   I64 i;
   for (i=0;i<num_bits;i++) {
-    FifoU8Ins(god.fifo,n&1);
+    FifoU8Ins(jah.fifo,n&1);
     n>>=1;
   }
 }
 
-public U0 GodHexIns(U8 *st)
-{//Insert hex record into God bit fifo.
+public U0 JahHexIns(U8 *st)
+{//Insert hex record into Jah bit fifo.
   U8 buf[2];
   if (st) {
     buf[1]=0;
     while (*buf=*st++)
       if (Bt(char_bmp_hex_numeric,*buf))
-	GodBitsIns(4,rev_bits_table[Str2I64(buf,16)]>>4);
+	JahBitsIns(4,rev_bits_table[Str2I64(buf,16)]>>4);
   }
 }
 
-public I64 GodBits(I64 num_bits,U8 *msg=NULL)
+public I64 JahBits(I64 num_bits,U8 *msg=NULL)
 {//Return N bits. If low on entropy pop-up okay.
   U8 b;
   I64 res=0;
   while (num_bits) {
-    if (FifoU8Rem(god.fifo,&b)) {
+    if (FifoU8Rem(jah.fifo,&b)) {
       res=res<<1+b;
       num_bits--;
     } else
-      GodBitsIns(GOD_GOOD_BITS,GodPick(msg));
+      JahBitsIns(JAH_GOOD_BITS,JahPick(msg));
   }
   return res;
 }
 
-public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
-{//Read God's vocab file for picking words.
+public I64 JahInit(U8 *files_find_mask="/Adam/Jah/Vocab.DD*",U8 *fu_flags=NULL)
+{//Read Jah's vocab file for picking words.
   I64 i,ch,fuf_flags=0;
   U8 *buf,*ptr,*ptr2;
   CDirEntry *tmpde,*tmpde1;
@@ -83,9 +83,9 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
   if (fuf_flags&~FUG_FILES_FIND)
     throw('FUF');
 
-  Free(god.word_file_mask);
-  god.word_file_mask=StrNew(files_find_mask);
-  god.word_fuf_flags=fuf_flags;
+  Free(jah.word_file_mask);
+  jah.word_file_mask=StrNew(files_find_mask);
+  jah.word_fuf_flags=fuf_flags;
 
   tmpde=tmpde1=FilesFind(files_find_mask,fuf_flags);
   i=0;
@@ -106,9 +106,9 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
     tmpde=tmpde->next;
   }
 
-  Free(god.words);
-  god.num_words=i;
-  god.words=MAlloc(i*sizeof(U8 *));
+  Free(jah.words);
+  jah.num_words=i;
+  jah.words=MAlloc(i*sizeof(U8 *));
 
   tmpde=tmpde1;
   i=0;
@@ -123,7 +123,7 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
 	    ptr++;
 	  ch=*ptr;
 	  *ptr=0;
-	  god.words[i++]=StrNew(ptr2);
+	  jah.words[i++]=StrNew(ptr2);
 	  *ptr=ch;
 	}
       }
@@ -132,26 +132,26 @@ public I64 GodInit(U8 *files_find_mask="/Adam/God/Vocab.DD*",U8 *fu_flags=NULL)
     tmpde=tmpde->next;
   }
   DirTreeDel(tmpde1);
-  return god.num_words;
-} GodInit;
+  return jah.num_words;
+} JahInit;
 
-public U8 *GodWordStr(I64 bits=17)
-{//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  if (god.num_words)
-    return god.words[GodBits(bits)%god.num_words];
+public U8 *JahWordStr(I64 bits=17)
+{//Make Jah pick a word. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
+  if (jah.num_words)
+    return jah.words[JahBits(bits)%jah.num_words];
   else
     return NULL;
 }
 
-public U0 GodWord(I64 bits=17)
-{//Make God pick a word. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  if (god.num_words)
-    "%s ",god.words[GodBits(bits)%god.num_words];
+public U0 JahWord(I64 bits=17)
+{//Make Jah pick a word. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
+  if (jah.num_words)
+    "%s ",jah.words[JahBits(bits)%jah.num_words];
 }
 
-public U0 GodBiblePassage(I64 num_lines=20)
-{//Make God pick a Bible passage. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  I64 start=GodBits(21)%(ST_BIBLE_LINES-(num_lines-1))+1;
+public U0 JahScripturePassage(I64 num_lines=20)
+{//Make Jah pick a scripture passage. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
+  I64 start=JahBits(21)%(ST_BIBLE_LINES-(num_lines-1))+1;
   U8 *verse=BibleLine2Verse(start);
   "%s\n\n",verse;
   Free(verse);

@@ -572,7 +572,7 @@ mo_got_msg:
 		filename=NULL;
 		PsmPopMode;
 		music.octave=psm_octave;
-		if (st2=GodSongStr) {
+		if (st2=JahNyabinghiStr) {
 		  PsmLoadSongStr(st2,&psm_octave,&psm_duration);
 		  Free(st2);
 		}

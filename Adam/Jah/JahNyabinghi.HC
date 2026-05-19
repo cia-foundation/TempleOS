@@ -1,4 +1,4 @@
-#help_index "God"
+#help_index "Jah"
 
 DefineLstLoad("ST_RHYTHM_COMPLEXITY","Simple\0Normal\0Complex\0");
 
@@ -49,13 +49,13 @@ U0 InsNote(CMakeSongSettings *mss,U8 *buf,I64 k,I64 *j)
 #define DUR_8_16_16	5
 #define DUR_16_16_8	6
 
-U8 god_simple_songs [5]={DUR_4,DUR_4,DUR_4,DUR_4,DUR_8_8};
-U8 god_normal_songs [5]={DUR_4,DUR_4,DUR_8_8,DUR_3_3_3,DUR_16_16_16_16};
-U8 god_complex_songs[9]={DUR_4,DUR_4,DUR_8_8,DUR_8_8,DUR_8DOT_16,DUR_3_3_3,
+U8 jah_simple_songs [5]={DUR_4,DUR_4,DUR_4,DUR_4,DUR_8_8};
+U8 jah_normal_songs [5]={DUR_4,DUR_4,DUR_8_8,DUR_3_3_3,DUR_16_16_16_16};
+U8 jah_complex_songs[9]={DUR_4,DUR_4,DUR_8_8,DUR_8_8,DUR_8DOT_16,DUR_3_3_3,
 DUR_8_16_16,DUR_16_16_8,DUR_16_16_16_16};
 
-public U8 *GodSongStr()
-{//Make God generate 2 measures of a song. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
+public U8 *JahNyabinghiStr()
+{//Make Jah generate 2 measures of a song. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
   CMakeSongSettings mss;
   U8 *buf;
   I64 i,j=0,k,n,k2,duration,last_duration=-1,len;
@@ -86,29 +86,29 @@ public U8 *GodSongStr()
     buf[j++]='8';
   } else
     len=8;
-  FifoU8Flush(god.fifo);
+  FifoU8Flush(jah.fifo);
   for (i=0;i<len;i++) {
-    n=GodBits(8);
+    n=JahBits(8);
     if (mss.complexity==2)
-      duration=god_complex_songs[n%9];
+      duration=jah_complex_songs[n%9];
     else if (mss.complexity==1)
-      duration=god_normal_songs[n%5];
+      duration=jah_normal_songs[n%5];
     else
-      duration=god_simple_songs[n%5];
+      duration=jah_simple_songs[n%5];
 
     switch (duration) {
       case DUR_8_8:
 	if (last_duration!=DUR_8_8)
 	  buf[j++]='e';
-	InsNote(&mss,buf,GodBits(4),&j);
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	break;
       case DUR_8DOT_16:
 	buf[j++]='e';
 	buf[j++]='.';
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	buf[j++]='s';
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	duration=DUR_16_16_16_16;
 	break;
       case DUR_3_3_3:
@@ -116,33 +116,33 @@ public U8 *GodSongStr()
 	  buf[j++]='e';
 	  buf[j++]='t';
 	}
-	InsNote(&mss,buf,GodBits(4),&j);
-	InsNote(&mss,buf,GodBits(4),&j);
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	break;
       case DUR_8_16_16:
 	if (last_duration!=DUR_8_8)
 	  buf[j++]='e';
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	buf[j++]='s';
-	InsNote(&mss,buf,GodBits(4),&j);
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	duration=DUR_16_16_16_16;
 	break;
       case DUR_16_16_8:
 	if (last_duration!=DUR_16_16_16_16)
 	  buf[j++]='s';
-	InsNote(&mss,buf,GodBits(4),&j);
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	buf[j++]='e';
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
 	duration=DUR_8_8;
 	break;
       case DUR_16_16_16_16:
 	if (last_duration!=DUR_16_16_16_16)
 	  buf[j++]='s';
-	k =GodBits(4);
-	k2=GodBits(4);
+	k =JahBits(4);
+	k2=JahBits(4);
 	InsNote(&mss,buf,k,&j);
 	InsNote(&mss,buf,k2,&j);
 	InsNote(&mss,buf,k,&j);
@@ -151,7 +151,7 @@ public U8 *GodSongStr()
       default:
 	if (last_duration!=DUR_4)
 	  buf[j++]='q';
-	InsNote(&mss,buf,GodBits(4),&j);
+	InsNote(&mss,buf,JahBits(4),&j);
     }
     last_duration=duration;
     progress4++;
@@ -161,9 +161,9 @@ public U8 *GodSongStr()
   return buf;
 }
 
-public U0 GodSong()
-{//Make God generate 2measuresx2+2measuresx2. $LK+PU,"Holy Spirit Instructions",A="FI:::/Adam/God/HSNotes.DD"$
-  U8 *st1=GodSongStr,*st2=GodSongStr;
+public U0 JahNyabinghi()
+{//Make Jah generate 2measuresx2+2measuresx2. $LK+PU,"Jah Spirit Instructions",A="FI:::/Adam/Jah/JSNotes.DD"$
+  U8 *st1=JahNyabinghiStr,*st2=JahNyabinghiStr;
   if (st1 && st2)
     DocPrint(DocPut,"$$SO,\"<Song>\",A=\"%s%s%s%s\"$$",st1,st1,st2,st2);
   Free(st1);

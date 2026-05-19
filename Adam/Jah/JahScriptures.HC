@@ -1,4 +1,4 @@
-#help_index "God"
+#help_index "Jah"
 U0 BibleInit()
 {
   DefineLstLoad("ST_BIBLE_BOOKS",
