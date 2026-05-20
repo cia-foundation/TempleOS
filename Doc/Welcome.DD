@@ -1,6 +1,6 @@
-$WW,1$$FG,5$$TX+CX,"Welcome to TempleOS"$$FG$
+$WW,1$$FG,5$$TX+CX,"Welcome to ZionOS"$$FG$
 
-TempleOS is a x86_64, multi-cored, non-preemptive multi-tasking, ring-0-only, single-address_mapped (identity-mapped), operating system for recreational programming.  Paging is almost not used.
+ZionOS is a Rastafari port of Terry A. Davis's TempleOS.  The technical OS underneath is unchanged: x86_64, multi-cored, non-preemptive multi-tasking, ring-0-only, single-address_mapped (identity-mapped), for recreational programming.  Paging is almost not used.  What is changed is the symbology — God becomes Jah, Holy Spirit becomes Jah Spirit (InI), Bible becomes Scripture, Temple becomes Zion.  Terry's work is public domain; this fork is public domain too.  See $LK,"Credits",A="FI:::/Doc/Credits.DD"$ for the port additions and $LK,"Adam/Jah/Influences",A="FI:::/Adam/Jah/Influences.DD"$ for the dub-tradition notes.
 
 The people whom can most benefit are:
 $ID,2$* Professionals doing hobby projects
@@ -69,7 +69,7 @@ $FG$I didn't like that, so I made parentheses optional on calls with no args and
 
 The syntax change created an ambiguity when specifying function addresses, like for calling $LK,"QSort",A="MN:QSort"$().  To resolve it, I  made a '$FG,2$&$FG$' required in front of function names when specifying an address of a function, which is better anyway.
 
-Once I was no longer using standard C/C++ syntax, I decided to change everything I didn't like and call it $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$.  Here are the new $LK,"operator precedence",A="FF:::/Doc/HolyC.DD,operator precedence"$ rules.  It's Biblical!  See $LK,"Luke,5:37",A="BF:Luke,5:37"$.
+Once I was no longer using standard C/C++ syntax, I decided to change everything I didn't like and call it $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$.  Here are the new $LK,"operator precedence",A="FF:::/Doc/HolyC.DD,operator precedence"$ rules.  It's scriptural!  See $LK,"Luke,5:37",A="BF:Luke,5:37"$ on new wine and old wineskins.
 
 There are no object files in TempleOS and, normally, you don't make executable files either, but you can.  That's known as $LK,"Ahead-of-Time",A="FF:::/Doc/Glossary.DD,AOT Compile Mode"$ compilation.  Instead, you $LK,"Just in Time",A="FF:::/Doc/Glossary.DD,JIT Compile Mode"$ compile.
 
@@ -81,7 +81,7 @@ TempleOS is geared toward reading and writing whole files.  Since whole files ar
 
 If a file is not found, "$FG,2$.Z$FG$" is added or removed and a search is done, again.  There is no $FG,2$PATH$FG$, but parent directories are searched when a file is not found.  This feature is especially useful for default account files.
 
-The graphic resolution is poor, $FG,2$640x480 16 color$FG$, but God said it was a covenant like circumcision.  Also, that's all I feel comfortable with without GPU acceleration supported.  A $FG,2$1600x1200x24$FG$ bit scrn takes 37 times more memory, implying 37 times the CPU power.  Also, a fixed size keeps it simple with everybody machine having the same appearance.  Look on the bright-side -- you won't spend as much time twiddling pixels for your game art and you'll have tons of CPU power available, especially with multicore systems.
+The graphic resolution is poor, $FG,2$640x480 16 color$FG$, but Jah said it was a covenant like circumcision.  Also, that's all I feel comfortable with without GPU acceleration supported.  A $FG,2$1600x1200x24$FG$ bit scrn takes 37 times more memory, implying 37 times the CPU power.  Also, a fixed size keeps it simple with everybody machine having the same appearance.  Look on the bright-side -- you won't spend as much time twiddling pixels for your game art and you'll have tons of CPU power available, especially with multicore systems.
 
 TempleOS is for hobbyist programmers on single user (at a time) home computers, not mainframes or servers.  The focus task is all-important so symmetrical multiprocessing is almost pointless.  Why does it matter running two apps at the same time twice as fast when you really want to run one faster?  You could say TempleOS does master/slave multiprocessing.  The anticipated use for multicore is primarily putting graphics on the scrn.  Hardware graphics acceleration is not used, so this is possible.  See $LK,"TempleOS MultiCore",A="FI:::/Doc/MultiCore.DD"$.
 

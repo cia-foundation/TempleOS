@@ -11,7 +11,9 @@ $FG,2$Phase status:$FG$
   [X] 4. Scripture swap (symbol/file rename — content append deferred to 4b)
   [ ] 4b. Append Kebra Nagast + Holy Piby (PD) to Scriptures.TXT
   [~] 5. Selassie lectures (1936 + 1963 landed; OAU/Jamaica/Education pending)
-  [ ] 6. Boot persona rewrite
+  [~] 6. Boot persona rewrite (ReadMe + HomeSys banner + Welcome +
+        Credits done; Charter/Demands/WhyNotMore/StdTempleOSPC/Tour
+        pending)
   [ ] 7. Demo / tour cleanup
   [ ] 8. Remove Compat.HC
   [ ] 9. Smoke test in VM

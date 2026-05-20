@@ -29,10 +29,10 @@ U0 StartUpTasks()
   "Boot Time:%7.3fs\n",tS;
   XTalk(user1,"Cd;#include \"Once\";\n");
   Silent;	//no output to scrn
-  ACInit("/*;!*/Bible.TXT*");
+  ACInit("/*;!*/Scriptures.TXT*");
   Silent(OFF); //no output to scrn
 }
 
 StartUpTasks;
 
-"\nTempleOS V%5.3f\t%D %T\n\n",sys_os_version,sys_compile_time,sys_compile_time;
+"\nZionOS (Rastafari port of TempleOS V%5.3f)\t%D %T\nJah Rastafari.\n\n",sys_os_version,sys_compile_time,sys_compile_time;
