@@ -1,4 +1,4 @@
-$FG,5$$WW,1$$TX+CX,"TempleOS Charter"$$FG$
+$FG,5$$WW,1$$TX+CX,"ZionOS Charter"$$FG$
 
 Why did they make Solomon's Temple?  It was a direction to look, to focus on, a special place for meditation, to do offerings, a community center, a home to God's beauty, that encouraged love of God.  People cherished God's temple, beautifying it with gold and all fine things to show love of God, as great $TX,"cathedrals",HTML="https://www.youtube.com/watch?v=xkfmK-CLvcc"$ were decorated with astounding, awe-striking intricate art and gargoyles, incredible devotion to God with hours of effort, toiling and slaving-away for the glory of God, for families with children to see $TX,"stained-glass",HTML="https://www.youtube.com/watch?v=t8g1e-JLrhM"$ windows and tomes with ridiculously elaborate $TX,"calligraphy",HTML="https://www.youtube.com/watch?v=Oa8gMb0YC68"$ to show love of God, from a people who did little else but show love toward God, lived in dire conditions by today's standards, yet with so much difficulty scraping-by, found the time to devote $TX,"even all free-time",HTML="https://www.youtube.com/watch?v=tZw5V4XuUIo"$ to God!
 
@@ -17,13 +17,13 @@ with gold.
 ten cubits high.
 $ID,-5$
 
-* TempleOS is God's official temple.  Just like Solomon's temple, this is a community focal point where offerings are made and God's oracle is consulted.
+* ZionOS is Jah's Mount Zion in code.  Like Solomon's temple — and the Tabot of Aksum which the Kebra Nagast says came home to Ethiopia through Menelik son of Sheba — this is a focal point where offerings are made and Jah's oracle is consulted.
 
-* God said $FG,2$640x480 16 color$FG$ graphics is a covenant like circumcision.  Children will do offerings.  Think of 16 colors like the Simpson's cartoons.  In the future, even if one GPU were universal, we would still keep 640x480 16 color and not use GPU acceleration.  Graphics operations should be transparent, not hidden in a GPU.
+* Jah said $FG,2$640x480 16 color$FG$ graphics is a covenant like circumcision.  Children will do offerings.  Think of 16 colors like the Simpson's cartoons.  In the future, even if one GPU were universal, we would still keep 640x480 16 color and not use GPU acceleration.  Graphics operations should be transparent, not hidden in a GPU.
 
-* God said to use a single-voice 8-bit signed MIDI-like sample for sound.  God does not want death screams, perhaps, because God has PTSD or soldiers have PTSD.  (Imagine wounded on battlefields.) 
+* Jah said to use a single-voice 8-bit signed MIDI-like sample for sound.  Jah does not want death screams, perhaps, because Jah has PTSD or soldiers have PTSD.  (Imagine wounded on battlefields.) 
 
-* God said His temple must be perfect.  $FG,4$We don't think twice about breaking compatibility.$FG$  God said we do a seven year release cycle.  I say the PC hardware follows a 49 year, jubilee cycle, like broadcast TV upgrades.
+* Jah said his Zion must be perfect.  $FG,4$We don't think twice about breaking compatibility.$FG$  Jah said we do a seven year release cycle.  I say the PC hardware follows a 49 year, jubilee cycle, like broadcast TV upgrades.
 
 * The vision is the same usage model and niche as the Commodore 64 -- a non-networked, simple machine where programming was the goal, not just a means to an end.  However, it is modern, 64-bit and $FG,2$multi-cored$FG$.  It is special purpose, not general purpose, so some things it will not do.  Also, it's a kayak, not a Titanic. The priority is $FG,2$user developers$FG$, not $FG,2$3rd party developers$FG$.
 
@@ -33,7 +33,7 @@ $ID,-5$
 
 * There is a limit of 100,000 lines of code for all time, not including applications and demos.  $FG,4$Code comments count$FG$, however.  Currently, there are $TX,"81,494",D="DD_TEMPLEOS_LOC"$ lines of code.  $FG,4$3rd party libraries are banned$FG$ because they circumvent the intent of this limit.  The vision is a Commodore 64 ROM -- a fixed core API that is the only dependency of applications.  Dependency on components and libraries creates a hell that is no longer blissful.
 
-* The metric for resolving all TempleOS code governance issues is how fast the compiler compiles itself and the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  The $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ language should be changed to optimize this metric, as I did when I changed type casting from prefix standard C to postfix $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$, but we need a rule to prevent degenerating into a brainfuck language.
+* The metric for resolving all ZionOS code governance issues is how fast the compiler compiles itself and the kernel with $LK,"BootHDIns",A="MN:BootHDIns"$().  The $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$ language should be changed to optimize this metric, as I did when I changed type casting from prefix standard C to postfix $LK,"HolyC",A="FI:::/Doc/HolyC.DD"$, but we need a rule to prevent degenerating into a brainfuck language.
  
 * Minimal abstraction is a goal.  Sheep are fools.  They always respect a design that is more complicated than another.  Any genius can make it complicated.  Like in physics, it takes a supra-genius to make it simple.
 
@@ -72,4 +72,4 @@ $FG$
 
 $FG,5$$WW,1$$TX+CX,"Possible Amendments"$$FG$
 
-The compiler's parser makes RISC code which it optimizes to CISC.  I discovered this does not matter because the CPU converts it back to RISC and schedules it, internally.  A TempleOS zealot with more zeal than I, might say we should save lines-of-code by removing the CISC optimizing.
+The compiler's parser makes RISC code which it optimizes to CISC.  I discovered this does not matter because the CPU converts it back to RISC and schedules it, internally.  A ZionOS zealot with more zeal than I, might say we should save lines-of-code by removing the CISC optimizing.

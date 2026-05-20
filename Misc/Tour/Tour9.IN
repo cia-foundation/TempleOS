@@ -1,4 +1,4 @@
-"Ed(\"::/Misc/Bible.TXT.Z\");\n";
+"Ed(\"::/Misc/Scriptures.TXT.Z\");\n";
 TourPut("Press $$GREEN$$<CTRL-F>$$FG$$ to find.\n");
 InGetChar(CH_CTRLF);
 
