@@ -1,0 +1,145 @@
+name: Standalone apps
+
+# Builds TempleOS as a double-click app for Windows (single .exe) and macOS
+# (.app in a .dmg), from this tree. See Standalone/README.md.
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  disk:
+    name: TempleOS ISO and installed disk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends nasm qemu-system-x86 qemu-utils
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Build ISO
+        run: python3 Standalone/mkiso.py -o dist/TempleOS.ISO
+      - name: Install TempleOS onto a disk image
+        run: python3 Standalone/mkdisk.py -o dist/TempleOS.qcow2
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: Standalone/launcher/go.mod
+      - name: Self-test launcher with the disk
+        run: |
+          cd Standalone/launcher
+          go vet ./...
+          go build -o "$RUNNER_TEMP/app/TempleOS" .
+          cp ../../dist/TempleOS.qcow2 "$RUNNER_TEMP/app/"
+          "$RUNNER_TEMP/app/TempleOS" -data "$RUNNER_TEMP/data" -self-test 90s
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TempleOS-disk
+          path: dist/
+
+  windows:
+    name: Windows app
+    needs: disk
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: Standalone/launcher/go.mod
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          path-type: inherit
+          install: mingw-w64-ucrt-x86_64-qemu zip
+      - uses: actions/download-artifact@v4
+        with:
+          name: TempleOS-disk
+          path: dist
+      - name: Package
+        run: Standalone/package/windows.sh dist/TempleOS.qcow2 out/TempleOS-Windows-x64.exe
+      - name: Self-test (outside MSYS2, so only bundled DLLs are found)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath out\TempleOS-Windows-x64.exe `
+            -ArgumentList "-data", "$env:RUNNER_TEMP\data", "-self-test", "180s" `
+            -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput selftest.txt -RedirectStandardError selftest-err.txt
+          Get-Content selftest.txt, selftest-err.txt
+          exit $p.ExitCode
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TempleOS-Windows-x64
+          path: out/TempleOS-Windows-x64.exe
+
+  macos:
+    name: macOS app (${{ matrix.arch }})
+    needs: disk
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: Standalone/launcher/go.mod
+      - name: Install QEMU
+        run: brew install qemu dylibbundler
+      - uses: actions/download-artifact@v4
+        with:
+          name: TempleOS-disk
+          path: dist
+      - name: Package
+        run: |
+          mkdir -p out
+          Standalone/package/macos.sh dist/TempleOS.qcow2 out/TempleOS-macOS-${{ matrix.arch }}.dmg
+      - name: Self-test (without Homebrew's QEMU)
+        run: |
+          brew uninstall --ignore-dependencies qemu
+          out/TempleOS.app/Contents/MacOS/TempleOS -data "$RUNNER_TEMP/data" -self-test 180s
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TempleOS-macOS-${{ matrix.arch }}
+          path: out/TempleOS-macOS-${{ matrix.arch }}.dmg
+
+  release:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [disk, windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/TempleOS-Windows-x64.exe
+            artifacts/TempleOS-macOS-arm64.dmg
+            artifacts/TempleOS-macOS-x64.dmg
+            artifacts/TempleOS.ISO

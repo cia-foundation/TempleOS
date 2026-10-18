@@ -1,0 +1,5 @@
+# Standalone app build outputs
+/dist/
+/out/
+/Standalone/launcher/payload.zip
+/Standalone/launcher/rsrc_windows_*.syso
